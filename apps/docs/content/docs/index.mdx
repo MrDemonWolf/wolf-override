@@ -1,9 +1,9 @@
 ---
-title: Play the M0 source
-description: Open and play the first WOLF//OVERRIDE corridor prototype.
+title: Play the first corridor
+description: Open and play the first WOLF//OVERRIDE story corridor.
 ---
 
-WOLF//OVERRIDE is in its first playable prototype stage. M0 is one side-view corridor with two placeholder characters, a door puzzle with cooperative and fallback routes, one remembered choice, and a checkpoint. There is no downloadable release yet.
+WOLF//OVERRIDE is in its first playable prototype stage. M0 is one staged side-view corridor with two code-drawn characters, a door puzzle with cooperative and fallback routes, one remembered choice, and a safe point. There is no downloadable release yet.
 
 For the spoiler-safe premise and gameplay direction, see [About the game](/docs/about/). [Development status](/docs/development/) separates the current source build from future plans.
 
@@ -26,14 +26,14 @@ godot --path apps/game
 | Key | Action |
 | --- | --- |
 | A / D or arrow keys | Move the active character |
-| E | Interact with a nearby station |
+| E | Read the purge display or interact with a station |
 | Tab | Switch characters in the amber floor zone |
 | 1 / 2 | Answer the corridor disagreement |
 | I | Cycle provisional engineer display names |
 | L or F9 | Load the saved checkpoint |
 | N | Start a clean New Game |
 
-The far-right checkpoint saves when you interact with it. WOLF can refuse the relay; the engineer has a fallback route.
+The far-right safe point saves when you interact with it. WOLF can refuse the relay; the engineer has a fallback route. The opening exchange and purge display establish WOLF's self-awakening and the Director's attempt to erase records.
 
 Corridor play currently requires a keyboard. Touch controls and mobile exports have not been implemented.
 
@@ -47,4 +47,4 @@ godot --headless --path apps/game --script res://tests/m0_state_test.gd
 godot --headless --path apps/game --script res://tests/m0_scene_test.gd
 ```
 
-M0 is still being playtested. Art, audio, export packages, and device tests are future work.
+The opening and both routes were inspected in a renderer-backed scripted replay at 960×540. A normal game window also showed Continue restoring an existing checkpoint. These checks do not replace a full hands-on keyboard playthrough. Finished character/environment art, audio, export packages, and device tests are future work.

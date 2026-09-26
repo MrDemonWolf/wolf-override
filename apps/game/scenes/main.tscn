@@ -38,6 +38,7 @@ offset_left = -12.0
 offset_top = -66.0
 offset_right = 12.0
 offset_bottom = 66.0
+pivot_offset = Vector2(12, 0)
 color = Color(0.83, 0.24, 0.20, 1)
 
 [node name="Human" type="CharacterBody2D" parent="."]
@@ -55,7 +56,7 @@ offset_top = -55.0
 offset_right = 44.0
 offset_bottom = -33.0
 horizontal_alignment = 1
-text = "HUMAN"
+text = "ROWAN"
 
 [node name="Wolf" type="CharacterBody2D" parent="."]
 position = Vector2(225, 423)
@@ -75,25 +76,37 @@ horizontal_alignment = 1
 text = "WOLF"
 
 [node name="BreakerLabel" type="Label" parent="."]
-offset_left = 309.0
-offset_top = 348.0
-offset_right = 401.0
-offset_bottom = 371.0
+offset_left = 304.0
+offset_top = 313.0
+offset_right = 396.0
+offset_bottom = 336.0
+horizontal_alignment = 1
 text = "BREAKER"
 
+[node name="PurgeLabel" type="Label" parent="."]
+offset_left = 76.0
+offset_top = 178.0
+offset_right = 225.0
+offset_bottom = 202.0
+theme_override_colors/font_color = Color(0.94, 0.52, 0.53, 1)
+theme_override_font_sizes/font_size = 15
+text = "DIRECTOR / PURGE"
+
 [node name="RelayLabel" type="Label" parent="."]
-offset_left = 571.0
-offset_top = 348.0
-offset_right = 660.0
-offset_bottom = 371.0
-text = "RELAY"
+offset_left = 535.0
+offset_top = 313.0
+offset_right = 675.0
+offset_bottom = 336.0
+horizontal_alignment = 1
+text = "COOLANT RELAY"
 
 [node name="CheckpointLabel" type="Label" parent="."]
-offset_left = 830.0
-offset_top = 340.0
-offset_right = 945.0
-offset_bottom = 363.0
-text = "CHECKPOINT"
+offset_left = 820.0
+offset_top = 313.0
+offset_right = 932.0
+offset_bottom = 336.0
+horizontal_alignment = 1
+text = "SAFE POINT"
 
 [node name="CanvasLayer" type="CanvasLayer" parent="."]
 
@@ -107,7 +120,7 @@ offset_left = 15.0
 offset_top = 10.0
 offset_right = 945.0
 offset_bottom = 84.0
-theme_override_font_sizes/font_size = 17
+theme_override_font_sizes/font_size = 15
 autowrap_mode = 3
 
 [node name="BottomBar" type="ColorRect" parent="CanvasLayer"]
@@ -172,7 +185,7 @@ offset_right = 850.0
 offset_bottom = 313.0
 theme_override_colors/font_color = Color(0.68, 0.78, 0.85, 1)
 theme_override_font_sizes/font_size = 20
-text = "M0  /  FIRST CORRIDOR"
+text = "LOCKDOWN  /  FIRST CORRIDOR"
 
 [node name="NewGameButton" type="Button" parent="CanvasLayer/TitleScreen"]
 offset_left = 300.0
