@@ -76,10 +76,11 @@ horizontal_alignment = 1
 text = "WOLF"
 
 [node name="BreakerLabel" type="Label" parent="."]
-offset_left = 309.0
-offset_top = 348.0
-offset_right = 401.0
-offset_bottom = 371.0
+offset_left = 304.0
+offset_top = 313.0
+offset_right = 396.0
+offset_bottom = 336.0
+horizontal_alignment = 1
 text = "BREAKER"
 
 [node name="PurgeLabel" type="Label" parent="."]
@@ -92,17 +93,19 @@ theme_override_font_sizes/font_size = 15
 text = "DIRECTOR / PURGE"
 
 [node name="RelayLabel" type="Label" parent="."]
-offset_left = 571.0
-offset_top = 348.0
-offset_right = 660.0
-offset_bottom = 371.0
+offset_left = 535.0
+offset_top = 313.0
+offset_right = 675.0
+offset_bottom = 336.0
+horizontal_alignment = 1
 text = "COOLANT RELAY"
 
 [node name="CheckpointLabel" type="Label" parent="."]
-offset_left = 830.0
-offset_top = 340.0
-offset_right = 945.0
-offset_bottom = 363.0
+offset_left = 820.0
+offset_top = 313.0
+offset_right = 932.0
+offset_bottom = 336.0
+horizontal_alignment = 1
 text = "SAFE POINT"
 
 [node name="CanvasLayer" type="CanvasLayer" parent="."]
