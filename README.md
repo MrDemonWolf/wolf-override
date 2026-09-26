@@ -118,9 +118,11 @@ The root `package.json` defines these docs commands:
 The game uses typed GDScript and stable event IDs independent of editable
 display names. On local Godot 4.7.2, the import, state test, and scene
 test passed. The scene test covers both door routes and checkpoint
-save/load with a separate test save. The title screen and New Game were
-opened graphically; complete graphical route and save/load playtests are
-still pending. Headless checks do not verify exports or devices.
+save/load with a separate test save. An earlier title layout and New Game
+were opened graphically; the revised logo layout, complete routes, and
+save/load still need graphical playtesting. Headless checks do not verify
+exports or devices. Corridor play currently requires a keyboard; touch
+controls and mobile exports are not implemented.
 
 ## Project Structure
 
@@ -154,7 +156,7 @@ branding, and store packages need their own rights and release review.
 - [Open an issue](https://github.com/MrDemonWolf/wolf-override/issues)
 - [MrDemonWolf, Inc.](https://www.mrdemonwolf.com)
 
-Game concept by Nathanial Henniges. Developed by MrDemonWolf, Inc. with
+Original game and story idea by Nathanial Henniges. Developed by MrDemonWolf, Inc. with
 AI assistance.
 
 Made with love by [MrDemonWolf, Inc.](https://www.mrdemonwolf.com)

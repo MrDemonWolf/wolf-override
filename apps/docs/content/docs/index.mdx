@@ -35,13 +35,16 @@ godot --path apps/game
 
 The far-right checkpoint saves when you interact with it. WOLF can refuse the relay; the engineer has a fallback route.
 
+Corridor play currently requires a keyboard. Touch controls and mobile exports have not been implemented.
+
 ## Check the source
 
-These commands check import and deterministic state logic. They do not prove that the full corridor or an exported game works.
+These commands check import, state logic, both door routes, and checkpoint save/load through the scene. They do not prove graphical play or exported builds.
 
 ```sh
 godot --headless --path apps/game --import
 godot --headless --path apps/game --script res://tests/m0_state_test.gd
+godot --headless --path apps/game --script res://tests/m0_scene_test.gd
 ```
 
 M0 is still being playtested. Art, audio, export packages, and device tests are future work.
