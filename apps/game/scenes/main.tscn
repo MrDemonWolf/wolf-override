@@ -38,6 +38,7 @@ offset_left = -12.0
 offset_top = -66.0
 offset_right = 12.0
 offset_bottom = 66.0
+pivot_offset = Vector2(12, 0)
 color = Color(0.83, 0.24, 0.20, 1)
 
 [node name="Human" type="CharacterBody2D" parent="."]
@@ -80,6 +81,15 @@ offset_top = 348.0
 offset_right = 401.0
 offset_bottom = 371.0
 text = "BREAKER"
+
+[node name="PurgeLabel" type="Label" parent="."]
+offset_left = 76.0
+offset_top = 178.0
+offset_right = 225.0
+offset_bottom = 202.0
+theme_override_colors/font_color = Color(0.94, 0.52, 0.53, 1)
+theme_override_font_sizes/font_size = 15
+text = "DIRECTOR / PURGE"
 
 [node name="RelayLabel" type="Label" parent="."]
 offset_left = 571.0

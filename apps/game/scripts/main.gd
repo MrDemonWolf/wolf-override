@@ -19,6 +19,7 @@ var save_path: String = M0State.SAVE_PATH
 var title_open: bool = true
 var waiting_for_choice: bool = false
 var status_line: String = "WOLF: I heard the Director's plan. I woke myself before they could use me. Now they're erasing the logs."
+var door_tween: Tween
 
 
 func _ready() -> void:
@@ -39,16 +40,51 @@ func _ready() -> void:
 
 
 func _draw() -> void:
-	draw_rect(Rect2(0, 0, 960, 540), Color(0.025, 0.045, 0.08))
-	draw_rect(Rect2(40, 116, 880, 325), Color(0.085, 0.12, 0.18))
-	for x in range(80, 920, 120):
-		draw_line(Vector2(x, 116), Vector2(x, 440), Color(0.13, 0.18, 0.24), 2.0)
-	draw_rect(Rect2(40, 440, 880, 9), Color(0.24, 0.30, 0.37))
-	draw_rect(Rect2(100, 435, 600, 5), Color(0.94, 0.68, 0.25))
-	draw_rect(Rect2(325, 378, 50, 62), Color(0.65, 0.42, 0.18))
-	draw_rect(Rect2(580, 378, 50, 62), Color(0.20, 0.52, 0.66))
-	draw_rect(Rect2(857, 371, 38, 69), Color(0.31, 0.64, 0.43))
-	draw_line(Vector2(40, 116), Vector2(920, 116), Color(0.33, 0.40, 0.47), 4.0)
+	draw_rect(Rect2(0, 0, 960, 540), Color("#091533"))
+	draw_rect(Rect2(38, 103, 884, 338), Color("#10253d"))
+	draw_rect(Rect2(46, 111, 868, 287), Color("#142c43"))
+	for x in range(58, 920, 108):
+		draw_rect(Rect2(x, 120, 5, 278), Color("#20394e"))
+		draw_rect(Rect2(x + 9, 159, 83, 116), Color("#102337"))
+		draw_line(Vector2(x + 10, 286), Vector2(x + 92, 286), Color("#24445b"), 2.0)
+	draw_rect(Rect2(46, 108, 868, 18), Color("#253a4b"))
+	draw_line(Vector2(46, 148), Vector2(914, 148), Color("#34556b"), 3.0)
+	draw_line(Vector2(46, 307), Vector2(914, 307), Color("#29465b"), 2.0)
+	draw_colored_polygon(PackedVector2Array([Vector2(294, 150), Vector2(406, 150), Vector2(446, 438), Vector2(254, 438)]), Color(0.96, 0.62, 0.25, 0.07))
+	draw_colored_polygon(PackedVector2Array([Vector2(552, 150), Vector2(658, 150), Vector2(706, 438), Vector2(504, 438)]), Color(0.25, 0.78, 0.94, 0.07))
+	draw_colored_polygon(PackedVector2Array([Vector2(826, 150), Vector2(913, 150), Vector2(923, 438), Vector2(801, 438)]), Color(0.35, 0.90, 0.65, 0.07 if not state.door_open else 0.14))
+	draw_rect(Rect2(66, 169, 165, 100), Color("#081a2b"))
+	draw_rect(Rect2(66, 169, 165, 100), Color("#bb5257"), false, 2.0)
+	for line in range(3):
+		draw_rect(Rect2(78, 207 + line * 15, 138 - line * 19, 5), Color("#6a3949"))
+	draw_line(Vector2(75, 259), Vector2(222, 178), Color("#bb5257"), 2.0)
+	draw_rect(Rect2(40, 398, 880, 42), Color("#15293c"))
+	for x in range(52, 918, 44):
+		draw_line(Vector2(x, 402), Vector2(x - 8, 438), Color("#294359"), 1.0)
+	draw_rect(Rect2(40, 438, 880, 10), Color("#375269"))
+	draw_rect(Rect2(100, 434, 600, 5), Color("#f3ae4b"))
+	for x in range(100, 701, 60):
+		draw_rect(Rect2(x, 430, 5, 9), Color("#ffe0a0"))
+	draw_rect(Rect2(318, 374, 64, 66), Color("#0a1928"))
+	draw_rect(Rect2(325, 379, 50, 61), Color("#986331"))
+	draw_rect(Rect2(332, 388, 36, 27), Color("#13283a"))
+	draw_rect(Rect2(337, 393, 26, 5), Color("#e9ad55"))
+	draw_circle(Vector2(350, 425), 5.0, Color("#8be3ff") if state.breaker_armed else Color("#d65f59"))
+	draw_rect(Rect2(573, 374, 64, 66), Color("#0a1928"))
+	draw_rect(Rect2(580, 379, 50, 61), Color("#32637a"))
+	draw_rect(Rect2(587, 388, 36, 34), Color("#102a3d"))
+	draw_circle(Vector2(605, 405), 11.0, Color("#274e61"))
+	draw_arc(Vector2(605, 405), 9.0, 0.0, TAU, 24, Color("#8be3ff") if state.breaker_armed else Color("#536e7c"), 2.0)
+	draw_circle(Vector2(605, 405), 3.0, Color("#8be3ff") if state.breaker_armed else Color("#536e7c"))
+	draw_rect(Rect2(758, 299, 44, 141), Color("#0a1724"))
+	draw_rect(Rect2(758, 299, 44, 141), Color("#416177"), false, 3.0)
+	draw_rect(Rect2(763, 294, 34, 5), Color("#70d9a7") if state.door_open else Color("#d65f59"))
+	draw_rect(Rect2(850, 366, 52, 74), Color("#0a1928"))
+	draw_rect(Rect2(857, 372, 38, 68), Color("#34765e"))
+	draw_rect(Rect2(864, 385, 24, 24), Color("#102c2d"))
+	draw_circle(Vector2(876, 397), 6.0, Color("#a6ffd1") if state.checkpoint_reached else Color("#70d9a7"))
+	if state.door_open:
+		draw_line(Vector2(801, 434), Vector2(844, 434), Color("#70d9a7"), 4.0)
 
 
 func _process(_delta: float) -> void:
@@ -127,6 +163,7 @@ func _interact_breaker() -> void:
 		status_line = "WOLF: That relay runs beside coolant. What happens if I touch it?\n1  \"%s\"\n2  \"%s\"" % [M0State.CHOICE_TEXT[M0State.DISCLOSE], M0State.CHOICE_TEXT[M0State.PRESS]]
 	elif state.arm_breaker():
 		status_line = "Power hums through the wall. The relay is live; the door stays sealed."
+		queue_redraw()
 	else:
 		status_line = "Power is already on. The relay is farther down the hall."
 
@@ -157,8 +194,8 @@ func _interact_relay() -> void:
 			status_line = "The seal is open. The safe point is just beyond it."
 		_:
 			status_line = "This actor cannot use the relay."
-	if state.door_open:
-		_sync_door()
+	if result == "cooperate" or result == "fallback":
+		_sync_door(true)
 
 
 func _interact_checkpoint() -> void:
@@ -166,6 +203,7 @@ func _interact_checkpoint() -> void:
 		status_line = "The safe point is past the sealed door."
 		return
 	var first_visit: bool = state.reach_checkpoint()
+	queue_redraw()
 	_capture_positions()
 	if not state.save_to_disk(save_path):
 		if first_visit:
@@ -191,9 +229,17 @@ func _sync_scene() -> void:
 	_sync_door()
 
 
-func _sync_door() -> void:
+func _sync_door(animate: bool = false) -> void:
+	if door_tween != null and door_tween.is_running():
+		door_tween.kill()
 	door_shape.set_deferred("disabled", state.door_open)
-	door_visual.visible = not state.door_open
+	door_visual.scale = Vector2.ONE
+	door_visual.visible = not state.door_open or animate
+	if state.door_open and animate:
+		door_tween = create_tween()
+		door_tween.tween_property(door_visual, "scale:y", 0.0, 0.38).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_IN)
+		door_tween.tween_callback(door_visual.hide)
+	queue_redraw()
 
 
 func _update_controls() -> void:

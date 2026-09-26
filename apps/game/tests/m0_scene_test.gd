@@ -56,6 +56,11 @@ func _run() -> void:
 	await _tap(&"interact")
 	if not _require(state.door_open and state.route == "cooperate", "WOLF cooperation opens door"):
 		return
+	await create_timer(0.45).timeout
+	var door_visual: ColorRect = game.get_node("Door/Visual") as ColorRect
+	_expect(not door_visual.visible, "door retracts after cooperation")
+	await _tap(&"interact")
+	_expect(not door_visual.visible, "reusing the open relay does not replay the door seal")
 	if not _require(await _walk_to(wolf, 876.0), "WOLF walks through opened door to checkpoint"):
 		return
 	await _tap(&"interact")
