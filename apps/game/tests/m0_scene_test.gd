@@ -21,54 +21,86 @@ func _run() -> void:
 	game.call("_new_game")
 	var state: M0State = game.get("state") as M0State
 	var start_x: float = human.position.x
-	Input.action_press(&"move_right")
-	await physics_frame
-	await physics_frame
-	await physics_frame
-	Input.action_release(&"move_right")
-	_expect(human.position.x > start_x, "active engineer moves right")
-	human.position.x = 350.0
-	game.call("_interact")
-	_expect(game.get("waiting_for_choice"), "breaker opens authored disagreement")
-	game.call("_choose", State.DISCLOSE)
-	game.call("_interact")
-	_expect(state.breaker_armed, "breaker arms after choice")
-	game.call("_switch_actor")
-	_expect(state.active_actor == "wolf" and wolf.controlled, "switches to WOLF in amber zone")
-	wolf.position.x = 605.0
-	game.call("_interact")
-	_expect(state.door_open and state.route == "cooperate", "WOLF cooperation opens door")
-	wolf.position.x = 876.0
-	game.call("_interact")
-	_expect(state.checkpoint_reached and FileAccess.file_exists(path), "cooperative checkpoint saves")
+	if not _require(await _walk_to(human, 350.0), "active engineer reaches breaker by moving right"):
+		return
+	_expect(human.position.x > start_x and is_equal_approx(wolf.position.x, 225.0), "inactive WOLF stays at start")
+	await _tap(&"interact")
+	if not _require(game.get("waiting_for_choice"), "breaker opens authored disagreement"):
+		return
+	await _tap(&"choice_1")
+	if not _require(state.memory.get("choice_id") == State.DISCLOSE, "first dialogue key records disclosed risk"):
+		return
+	await _tap(&"interact")
+	if not _require(state.breaker_armed, "breaker arms after choice"):
+		return
+	await _tap(&"switch_actor")
+	if not _require(state.active_actor == "wolf" and wolf.controlled, "switches to WOLF in amber zone"):
+		return
+	if not _require(await _walk_to(wolf, 605.0), "WOLF reaches relay by moving right"):
+		return
+	await _tap(&"interact")
+	if not _require(state.door_open and state.route == "cooperate", "WOLF cooperation opens door"):
+		return
+	if not _require(await _walk_to(wolf, 876.0), "WOLF walks through opened door to checkpoint"):
+		return
+	await _tap(&"interact")
+	if not _require(state.checkpoint_reached and FileAccess.file_exists(path), "cooperative checkpoint saves"):
+		return
+	_expect(str(game.get("status_line")).contains(State.CHOICE_TEXT[State.DISCLOSE]), "cooperative checkpoint displays the selected choice")
 	var saved: Dictionary = state.to_dict()
 	game.call("_new_game")
 	state = game.get("state") as M0State
-	_expect(state.memory.is_empty() and not state.door_open, "New Game clears current play")
-	game.call("_load_game")
+	_expect(state.memory.is_empty() and not state.door_open and human.position == state.human_position, "New Game clears current play")
+	await _tap(&"load_game")
 	state = game.get("state") as M0State
-	_expect(state.to_dict() == saved and state.active_actor == "wolf", "load restores cooperative scene")
+	if not _require(state.to_dict() == saved and state.active_actor == "wolf", "load restores cooperative scene"):
+		return
 	_expect(wolf.position == state.wolf_position and state.checkpoint_callback().contains(State.CHOICE_TEXT[State.DISCLOSE]), "load restores positions and actual callback")
 
 	game.call("_new_game")
 	state = game.get("state") as M0State
-	human.position.x = 350.0
-	game.call("_interact")
-	game.call("_choose", State.PRESS)
-	game.call("_interact")
-	game.call("_switch_actor")
-	wolf.position.x = 605.0
-	game.call("_interact")
-	_expect(not state.door_open and state.memory.get("choice_id") == State.PRESS, "WOLF refusal preserves choice and locked door")
-	game.call("_switch_actor")
-	human.position.x = 605.0
-	game.call("_interact")
-	_expect(state.door_open and state.route == "fallback", "engineer bypass opens door")
-	human.position.x = 876.0
-	game.call("_interact")
-	_expect(state.checkpoint_reached, "fallback reaches checkpoint")
+	if not _require(await _walk_to(human, 350.0), "engineer reaches breaker on fresh fallback play"):
+		return
+	await _tap(&"interact")
+	if not _require(game.get("waiting_for_choice"), "fallback opens authored disagreement"):
+		return
+	await _tap(&"choice_2")
+	if not _require(state.memory.get("choice_id") == State.PRESS, "second dialogue key records pressed risk"):
+		return
+	await _tap(&"interact")
+	if not _require(state.breaker_armed, "fallback breaker arms"):
+		return
+	await _tap(&"switch_actor")
+	if not _require(state.active_actor == "wolf", "fallback switches to WOLF"):
+		return
+	if not _require(await _walk_to(wolf, 605.0), "WOLF reaches relay on fallback play"):
+		return
+	await _tap(&"interact")
+	if not _require(not state.door_open and state.memory.get("choice_id") == State.PRESS, "WOLF refusal preserves choice and locked door"):
+		return
+	Input.action_press(&"move_right")
+	for _frame in range(180):
+		await physics_frame
+	Input.action_release(&"move_right")
+	_expect(wolf.position.x < 760.0, "locked door physically blocks WOLF")
+	if not _require(await _walk_to(wolf, 605.0), "WOLF can return to switching zone after refusal"):
+		return
+	await _tap(&"switch_actor")
+	if not _require(state.active_actor == "human", "fallback switches to engineer"):
+		return
+	if not _require(await _walk_to(human, 605.0), "engineer reaches manual bypass"):
+		return
+	await _tap(&"interact")
+	if not _require(state.door_open and state.route == "fallback", "engineer bypass opens door"):
+		return
+	if not _require(await _walk_to(human, 876.0), "engineer walks through opened door to checkpoint"):
+		return
+	await _tap(&"interact")
+	if not _require(state.checkpoint_reached, "fallback reaches checkpoint"):
+		return
+	_expect(str(game.get("status_line")).contains(State.CHOICE_TEXT[State.PRESS]), "fallback checkpoint displays the selected choice")
 	saved = state.to_dict()
-	game.call("_load_game")
+	await _tap(&"load_game")
 	state = game.get("state") as M0State
 	_expect(state.to_dict() == saved and state.checkpoint_callback().contains(State.CHOICE_TEXT[State.PRESS]), "fallback save loads with one accurate memory")
 
@@ -79,7 +111,34 @@ func _run() -> void:
 	quit(1 if failures > 0 else 0)
 
 
+func _tap(action: StringName) -> void:
+	await process_frame
+	Input.action_press(action)
+	await process_frame
+	Input.action_release(action)
+
+
+func _walk_to(actor: M0Actor, target_x: float) -> bool:
+	var action: StringName = &"move_right" if target_x > actor.position.x else &"move_left"
+	Input.action_press(action)
+	var reached: bool = false
+	for _frame in range(300):
+		await physics_frame
+		if absf(actor.position.x - target_x) <= 12.0:
+			reached = true
+			break
+	Input.action_release(action)
+	return reached
+
+
 func _expect(condition: bool, label: String) -> void:
 	if not condition:
 		failures += 1
 		push_error("M0 scene check failed: " + label)
+
+
+func _require(condition: bool, label: String) -> bool:
+	_expect(condition, label)
+	if not condition:
+		quit(1)
+	return condition
