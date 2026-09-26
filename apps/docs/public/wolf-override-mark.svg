@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-labelledby="title desc">
+  <title id="title">WOLF//OVERRIDE wolf mark</title>
+  <desc id="desc">An alert robotic wolf inside a broken cyan containment ring.</desc>
+  <g fill="none" stroke="#8be3ff" stroke-width="17" stroke-linecap="square">
+    <path d="M100 303A186 186 0 0 1 120 177"/>
+    <path d="M147 139A186 186 0 0 1 348 121"/>
+    <path d="M395 160A186 186 0 0 1 385 368"/>
+    <path d="M351 399A186 186 0 0 1 164 401"/>
+    <path d="M105 356l32-32M121 371l32-32M375 172l32-32M391 188l32-32"/>
+  </g>
+  <path fill="#091533" d="M130 63 202 169 256 199 310 169 382 63 401 245 433 298 393 342 373 399 315 431 256 473 197 431 139 399 119 342 79 298 111 245Z"/>
+  <path fill="#eaf4ff" d="m146 107 48 66-38 57-27-41Zm220 0-48 66 38 57 27-41Z"/>
+  <path fill="#8be3ff" d="m145 131 27 42-16 30-12-19Zm222 0-27 42 16 30 12-19Z"/>
+  <path fill="#eaf4ff" d="m193 199 40-20 23 39 23-39 40 20 35 64-46 49-52-17-52 17-46-49Z"/>
+  <path fill="#8be3ff" d="m247 214 9 17 9-17-9 73Z"/>
+  <path fill="#091533" d="m193 250 45 24-19 30-44-31Zm126 0-45 24 19 30 44-31Z"/>
+  <path fill="#8be3ff" d="m188 270 39 12-14 12-25-10Zm136 0-39 12 14 12 25-10Z"/>
+  <path fill="#eaf4ff" d="m163 287 59 38-11 69-51-35-31-52Zm186 0-59 38 11 69 51-35 31-52Z"/>
+  <path fill="#8be3ff" d="m172 322 30 19-6 31-25-20Zm168 0-30 19 6 31 25-20Z"/>
+  <path fill="#eaf4ff" d="m219 305 37 12 37-12 25 40-20 50-42 28-42-28-20-50Z"/>
+  <path fill="#091533" d="m226 346 30-10 30 10-8 19-22 8-22-8Z"/>
+  <path fill="none" stroke="#091533" stroke-width="8" stroke-linecap="round" d="M256 374v16m-24 3 24 12 24-12"/>
+  <path fill="#8be3ff" d="m235 420 21 15 21-15-8 30-13 11-13-11Z"/>
+  <path fill="none" stroke="#8be3ff" stroke-width="7" stroke-linecap="round" d="m346 205 16 30-15 23m-181-53-16 30 15 23"/>
+  <circle cx="350" cy="256" r="8" fill="#8be3ff"/>
+</svg>

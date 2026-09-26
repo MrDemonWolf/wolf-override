@@ -1,10 +1,12 @@
 import Link from 'next/link';
 
 export default function HomePage() {
+  const assetBase = process.env.GITHUB_PAGES === 'true' ? '/wolf-override' : '';
   return (
     <main id="nd-page" className="site-shell">
       <header className="site-header">
         <Link className="wordmark" href="/" aria-label="WOLF//OVERRIDE home">
+          <img src={`${assetBase}/wolf-override-mark.svg`} alt="" width="40" height="40" aria-hidden="true" />
           WOLF<span>//</span>OVERRIDE
         </Link>
         <Link className="header-link" href="/docs/about/">Game guide <span aria-hidden="true">↗</span></Link>

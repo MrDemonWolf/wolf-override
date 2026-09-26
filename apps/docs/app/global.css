@@ -67,11 +67,15 @@ a:focus-visible { outline: 3px solid #8be3ff; outline-offset: 4px; }
   border-bottom: 1px solid #42617f66;
 }
 .wordmark {
+  display: inline-flex;
+  align-items: center;
+  gap: .65rem;
   color: #f4faff;
   font-size: clamp(1rem, 1.5vw, 1.22rem);
   font-weight: 900;
   letter-spacing: .07em;
 }
+.wordmark img { display: block; width: 2.5rem; height: 2.5rem; }
 .wordmark span { color: #8be3ff; }
 .header-link {
   color: #ccdcf1;

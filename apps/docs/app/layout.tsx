@@ -9,6 +9,9 @@ export const metadata: Metadata = {
     template: '%s | WOLF//OVERRIDE',
   },
   description: 'A side-view sci-fi horror game by MrDemonWolf, Inc.',
+  icons: {
+    icon: `${process.env.GITHUB_PAGES === 'true' ? '/wolf-override' : ''}/wolf-override-mark.svg`,
+  },
 };
 
 export default function RootLayout({ children }: { children: ReactNode }) {

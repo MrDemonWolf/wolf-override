@@ -7,6 +7,7 @@ extends Node2D
 @onready var hud: Label = $CanvasLayer/TopBar/HUD
 @onready var story: Label = $CanvasLayer/BottomBar/Story
 @onready var title_screen: ColorRect = $CanvasLayer/TitleScreen
+@onready var title_mark: TextureRect = $CanvasLayer/TitleScreen/LogoMark
 @onready var title_line: ColorRect = $CanvasLayer/TitleScreen/TitleLine
 @onready var title_logo: Label = $CanvasLayer/TitleScreen/GameTitle
 @onready var new_game_button: Button = $CanvasLayer/TitleScreen/NewGameButton
@@ -27,9 +28,11 @@ func _ready() -> void:
 	new_game_button.pressed.connect(_new_game)
 	continue_button.pressed.connect(_load_game)
 	new_game_button.grab_focus()
+	title_mark.modulate = Color(1, 1, 1, 0)
 	title_line.modulate = Color(1, 1, 1, 0)
 	title_logo.modulate = Color(1, 1, 1, 0)
 	var reveal: Tween = create_tween()
+	reveal.tween_property(title_mark, "modulate", Color.WHITE, 0.4)
 	reveal.tween_property(title_line, "modulate", Color.WHITE, 0.25)
 	reveal.tween_property(title_logo, "modulate", Color.WHITE, 0.35)
 

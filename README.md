@@ -1,46 +1,160 @@
-# WOLF//OVERRIDE
-**M0 source prototype.** Working title; first Godot checks passed, full playtest pending.
+# WOLF//OVERRIDE - Wake up. Choose who to trust.
 
-A side-view sci-fi horror game about an engineer and an independent robotic wolf companion escaping a secret facility together.
+<img src="apps/docs/public/wolf-override-mark.svg" alt="WOLF//OVERRIDE robotic wolf mark" width="160">
 
-Detailed story, ending and production drafts live in Notion. The copied local handoff files are working notes, not public repository material.
+WOLF//OVERRIDE is a side-view sci-fi game in development. WOLF, a robotic
+wolf, wakes himself after overhearing plans to misuse him. He and a human
+engineer must work together to protect people and preserve evidence while
+finding a way out.
 
-## M0 source prototype
-[apps/game/project.godot](apps/game/project.godot) opens a branded title screen, then one 2D corridor with distinct human and WOLF placeholders, a marked switching zone, a breaker/relay door puzzle, WOLF's possible refusal and a human bypass. One `relay_disagreement` event records the actual reply; WOLF recalls it at the checkpoint. That checkpoint saves actor, positions, draft display name, puzzle and memory state. New Game resets in-memory state.
+One choice can change what your companion remembers.
 
-Target editor: **Godot 4.7.2 stable**, selected from the [official release archive](https://godotengine.org/download/archive/). The user installed 4.7.2 via Homebrew. Headless import, M0 state and scene checks, and a brief headless scene start passed after moving the project to `apps/game`. The scene check drives both puzzle routes and checkpoint save/load with a separate test save. The graphical title screen opened; Continue was disabled with no save, and Enter started New Game. Character switching was observed before the move; complete puzzle routes and save/load still need graphical play. No art/audio assets or exported binaries are included. Mac first; Windows, iPhone, iPad and Android remain unverified targets.
+**Current status:** M0 is a source prototype, not a downloadable game.
+It has one corridor, placeholder characters, and one complete puzzle.
+Full graphical playtesting, art, audio, exports, and device testing are
+still ahead.
 
-### Controls
-- On the title screen, Enter starts New Game. Continue becomes available when a valid checkpoint save exists.
-- `A`/`D` or arrow keys: move the active character.
-- `E`: interact with a nearby marked station.
-- `Tab`: switch characters while the active character is in the amber floor zone.
-- `1`/`2`: answer the single breaker disagreement.
-- `I`: cycle provisional human display names; stable actor IDs stay unchanged.
-- `L` or `F9`: load the saved checkpoint. `N`: start a clean New Game.
+## Features
 
-The far-right checkpoint saves automatically on interaction. The save file lives under Godot's `user://` directory. The human bypass remains available even when WOLF refuses the relay.
+- **Two playable characters** - Move the engineer and WOLF through one
+  side-view corridor, switching in a marked area.
+- **Cooperation with a fallback** - Open a powered door together, or use
+  the engineer's bypass if WOLF refuses.
+- **A remembered choice** - One authored disagreement records the reply
+  you select and recalls it at the checkpoint.
+- **Checkpoint save and load** - Restore the active character, positions,
+  puzzle state, provisional display name, and choice memory.
 
-### Run and verify
-Homebrew links `godot` on PATH. Run from this repository root:
+These features describe the M0 prototype. The broader story and its
+cinematic presentation remain in development.
 
-```sh
+## Getting Started
+
+The [public game guide](apps/docs/content/docs/index.mdx) has setup and
+controls. There is no installer or store release yet; run M0 from source.
+
+1. Get [Godot 4.7.2 stable](https://godotengine.org/download/archive/).
+2. Clone the repository:
+
+   ```bash
+   git clone https://github.com/MrDemonWolf/wolf-override.git
+   cd wolf-override
+   ```
+
+3. Open the project in Godot, then press **F5**:
+
+   ```bash
+   godot --path apps/game --editor
+   ```
+
+To launch the game directly, run `godot --path apps/game`.
+
+## Usage
+
+The title screen offers New Game. Continue is available when a valid
+checkpoint save exists.
+
+| Key                | Action                                      |
+| ------------------ | ------------------------------------------- |
+| Enter              | Start New Game from the title screen        |
+| A / D or arrow keys | Move the active character                   |
+| E                  | Interact with a nearby marked station       |
+| Tab                | Switch characters in the amber floor zone  |
+| 1 / 2              | Answer the breaker disagreement            |
+| I                  | Cycle provisional engineer display names   |
+| L or F9            | Load the saved checkpoint                   |
+| N                  | Start a clean current run                   |
+
+Interact at the far-right checkpoint to save. Godot stores the file in
+its `user://` directory.
+
+## Tech Stack
+
+| Layer          | Technology                                  |
+| -------------- | ------------------------------------------- |
+| Game           | Godot 4.7.2 stable, typed GDScript, 2D      |
+| Game state     | Authored events and versioned local saves   |
+| Public site    | Next.js 16.1.1, Fumadocs, MDX, TypeScript   |
+| Docs workspace | Bun 1.4.2                                   |
+
+## Development
+
+### Prerequisites
+
+- Godot **4.7.2 stable** for the game.
+- Bun **1.4.2** for the public docs app only.
+
+### Setup
+
+From the repository root, run the game checks:
+
+```bash
 godot --headless --path apps/game --import
 godot --headless --path apps/game --script res://tests/m0_state_test.gd
 godot --headless --path apps/game --script res://tests/m0_scene_test.gd
-godot --path apps/game
 ```
 
-The three headless commands passed on Godot 4.7.2; the last launched the game. Graphical route play, exports and device checks remain separate.
+To work on the public docs site, install its declared dependencies and
+start the local server:
 
-## Public docs
-The [docs app](apps/docs/content/docs/index.mdx) uses the same Next.js/Fumadocs structure as WolfWave's docs. It contains public setup information only. Its dependencies and build have not yet been verified.
+```bash
+bun install
+bun run docs:dev
+```
 
-## Repository boundary
-This repository is public. Keep story routes, ending drafts, private handoffs and connected-service notes in Notion. No external art or audio assets were added; record rights before adding any future asset.
+The docs dependency install, type check, and build have not yet been
+verified in this repository.
 
-## Credits
-WOLF//OVERRIDE was conceived by Nathanial Henniges. MrDemonWolf, Inc. is developing the game with help from AI tools.
+### Development Scripts
+
+The root `package.json` defines these docs commands:
+
+- `bun run docs:dev` - Start the local docs site.
+- `bun run docs:check` - Generate MDX and Next types, then check TypeScript.
+- `bun run docs:build` - Build the static public site.
+
+### Code Quality
+
+The game uses typed GDScript and stable event IDs independent of editable
+display names. On local Godot 4.7.2, the import, state test, and scene
+test passed. The scene test covers both door routes and checkpoint
+save/load with a separate test save. The title screen and New Game were
+opened graphically; complete graphical route and save/load playtests are
+still pending. Headless checks do not verify exports or devices.
+
+## Project Structure
+
+```text
+wolf-override/
+├── apps/
+│   ├── game/       # Godot M0 project, scenes, scripts, tests, asset register
+│   └── docs/       # Public landing page and game guide
+├── .github/         # Game checks workflow
+├── LICENSE          # GPLv3 license text
+└── package.json     # Docs workspace commands
+```
+
+This public repository contains source and public docs. Detailed story
+drafts and production notes live in Notion. Record an asset's origin and
+rights in [the asset register](apps/game/assets/manifest.json) before
+adding it to the game.
 
 ## License
-Copyright 2026 MrDemonWolf, Inc. Game source code and public documentation are licensed under [GPL-3.0-or-later](LICENSE). Future art, audio, and branding need their own recorded terms in [the asset register](apps/game/assets/manifest.json); this prototype contains no acquired art or audio.
+
+![GitHub license](https://img.shields.io/github/license/mrdemonwolf/wolf-override.svg?style=for-the-badge&logo=github)
+
+Copyright 2026 MrDemonWolf, Inc. Game source code and public docs use
+[GPL-3.0-or-later](LICENSE). The provisional logo is separate branding;
+its AI-assisted concept and SVG redraw are recorded in
+[the asset register](apps/game/assets/manifest.json). Future art, audio,
+branding, and store packages need their own rights and release review.
+
+## Contact
+
+- [Open an issue](https://github.com/MrDemonWolf/wolf-override/issues)
+- [MrDemonWolf, Inc.](https://www.mrdemonwolf.com)
+
+Game concept by Nathanial Henniges. Developed by MrDemonWolf, Inc. with
+AI assistance.
+
+Made with love by [MrDemonWolf, Inc.](https://www.mrdemonwolf.com)

@@ -1,7 +1,8 @@
-[gd_scene load_steps=7 format=3]
+[gd_scene load_steps=8 format=3]
 
 [ext_resource type="Script" path="res://scripts/main.gd" id="1_main"]
 [ext_resource type="Script" path="res://scripts/m0_actor.gd" id="2_actor"]
+[ext_resource type="Texture2D" path="res://assets/logo-mark.svg" id="3_logo"]
 
 [sub_resource type="RectangleShape2D" id="FloorShape"]
 size = Vector2(960, 60)
@@ -132,59 +133,68 @@ grow_vertical = 2
 color = Color(0.025, 0.045, 0.08, 1)
 
 [node name="Brand" type="Label" parent="CanvasLayer/TitleScreen"]
-offset_left = 108.0
+offset_left = 300.0
 offset_top = 106.0
-offset_right = 660.0
+offset_right = 852.0
 offset_bottom = 137.0
 theme_override_colors/font_color = Color(0.61, 0.77, 0.85, 1)
 theme_override_font_sizes/font_size = 18
 text = "MRDEMONWOLF, INC. PRESENTS"
 
+[node name="LogoMark" type="TextureRect" parent="CanvasLayer/TitleScreen"]
+offset_left = 68.0
+offset_top = 161.0
+offset_right = 276.0
+offset_bottom = 369.0
+texture = ExtResource("3_logo")
+expand_mode = 1
+stretch_mode = 5
+
 [node name="TitleLine" type="ColorRect" parent="CanvasLayer/TitleScreen"]
-offset_left = 108.0
+offset_left = 300.0
 offset_top = 153.0
-offset_right = 650.0
+offset_right = 880.0
 offset_bottom = 157.0
 color = Color(0.10, 0.76, 0.92, 1)
 
 [node name="GameTitle" type="Label" parent="CanvasLayer/TitleScreen"]
-offset_left = 102.0
+offset_left = 294.0
 offset_top = 175.0
-offset_right = 920.0
+offset_right = 940.0
 offset_bottom = 271.0
-theme_override_font_sizes/font_size = 65
+theme_override_font_sizes/font_size = 58
 text = "WOLF//OVERRIDE"
 
 [node name="Subtitle" type="Label" parent="CanvasLayer/TitleScreen"]
-offset_left = 108.0
+offset_left = 300.0
 offset_top = 282.0
-offset_right = 820.0
+offset_right = 850.0
 offset_bottom = 313.0
 theme_override_colors/font_color = Color(0.68, 0.78, 0.85, 1)
 theme_override_font_sizes/font_size = 20
 text = "M0  /  FIRST CORRIDOR"
 
 [node name="NewGameButton" type="Button" parent="CanvasLayer/TitleScreen"]
-offset_left = 108.0
+offset_left = 300.0
 offset_top = 365.0
-offset_right = 296.0
+offset_right = 488.0
 offset_bottom = 415.0
 theme_override_font_sizes/font_size = 21
 text = "NEW GAME"
 
 [node name="ContinueButton" type="Button" parent="CanvasLayer/TitleScreen"]
-offset_left = 312.0
+offset_left = 504.0
 offset_top = 365.0
-offset_right = 500.0
+offset_right = 692.0
 offset_bottom = 415.0
 theme_override_font_sizes/font_size = 21
 text = "CONTINUE"
 
 [node name="Credit" type="Label" parent="CanvasLayer/TitleScreen"]
-offset_left = 108.0
+offset_left = 300.0
 offset_top = 485.0
-offset_right = 600.0
+offset_right = 740.0
 offset_bottom = 514.0
 theme_override_colors/font_color = Color(0.59, 0.70, 0.77, 1)
 theme_override_font_sizes/font_size = 17
-text = "by MrDemonWolf, Inc."
+text = "Concept: Nathanial Henniges  /  AI-assisted development"

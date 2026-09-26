@@ -1,9 +1,21 @@
 {
   "schema_version": 1,
   "design_revision": 4,
-  "assets": [],
-  "status": "Documentation snapshot; no art/audio assets created or acquired.",
-  "merge_warning": "Never overwrite an existing populated provenance register with this empty snapshot.",
+  "assets": [
+    {
+      "asset_id": "wolf-override-logo-mark",
+      "path": "apps/game/assets/logo-mark.svg",
+      "published_copy": "apps/docs/public/wolf-override-mark.svg",
+      "source_or_tool": "ChatGPT Create image in the MDW WOLF//OVERRIDE [Game] project; SVG redrawn from the generated concept",
+      "source_reference": "https://chatgpt.com/g/g-p-6ab60b48c7608191987f04a81b04b5e2-mdw-wolf-override-game/c/6ab75d05-b1a4-83e9-9c6d-a64f23e45d81",
+      "terms_reference": "https://openai.com/policies/terms-of-use/",
+      "rights_review_status": "Provisional branding; trademark and final asset-rights review pending. Not covered by the code/docs GPL license.",
+      "modifications": "Simplified the generated concept into original SVG paths using the public docs navy, cyan and white palette.",
+      "implementation_status": "Provisional mark used by the game title, README and public landing page."
+    }
+  ],
+  "status": "One provisional brand mark recorded; no game art or audio acquired.",
+  "merge_warning": "Preserve this populated provenance register when merging future handoffs.",
   "future_entry_fields": [
     "asset_id",
     "path",

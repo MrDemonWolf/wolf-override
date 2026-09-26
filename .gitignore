@@ -1,5 +1,6 @@
 .godot/
 /node_modules/
+.DS_Store
 
 # Internal Revision 4 design and handoff files live in Notion.
 /AGENTS.md
