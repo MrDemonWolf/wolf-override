@@ -23,6 +23,7 @@ var door_tween: Tween
 
 
 func _ready() -> void:
+	get_window().title = "WOLF//OVERRIDE"
 	_install_inputs()
 	_sync_scene()
 	_refresh_ui()
