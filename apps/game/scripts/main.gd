@@ -13,6 +13,7 @@ extends Node2D
 @onready var continue_button: Button = $CanvasLayer/TitleScreen/ContinueButton
 
 var state: M0State = M0State.new()
+var save_path: String = M0State.SAVE_PATH
 var title_open: bool = true
 var waiting_for_choice: bool = false
 var status_line: String = "Director ordered the maintenance logs erased. Reach the BREAKER and press E."
@@ -22,7 +23,7 @@ func _ready() -> void:
 	_install_inputs()
 	_sync_scene()
 	_refresh_ui()
-	continue_button.disabled = M0State.load_from_disk() == null
+	continue_button.disabled = M0State.load_from_disk(save_path) == null
 	new_game_button.pressed.connect(_new_game)
 	continue_button.pressed.connect(_load_game)
 	new_game_button.grab_focus()
@@ -78,7 +79,7 @@ func _new_game() -> void:
 
 
 func _load_game() -> void:
-	var loaded: M0State = M0State.load_from_disk()
+	var loaded: M0State = M0State.load_from_disk(save_path)
 	if loaded == null:
 		status_line = "No valid checkpoint save found. Current game was not changed."
 		return
@@ -162,7 +163,7 @@ func _interact_checkpoint() -> void:
 		return
 	var first_visit: bool = state.reach_checkpoint()
 	_capture_positions()
-	if not state.save_to_disk():
+	if not state.save_to_disk(save_path):
 		if first_visit:
 			state.checkpoint_reached = false
 		status_line = "Checkpoint reached, but saving failed. Try E here again; current play remains intact."
