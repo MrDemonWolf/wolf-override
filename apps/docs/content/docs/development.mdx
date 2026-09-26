@@ -10,13 +10,14 @@ WOLF//OVERRIDE is in early development. Its current milestone is **M0**, a sourc
 - Two distinguishable placeholder characters with movement, interaction, and a deliberate switching area.
 - A power and door puzzle with a cooperative route and a human fallback if WOLF refuses.
 - One authored disagreement, a saved choice with a later callback, and a safe checkpoint.
+- A first exchange, readable purge display, and objectives that follow each puzzle step.
 - New Game and versioned save/load state for the current corridor.
 
 These are prototype features, not a complete campaign. [Play the M0 source](/docs/) explains how to open it in Godot 4.7.2.
 
 ## Checked so far
 
-Godot 4.7.2 headless import, deterministic state checks, and a scene check of both routes and checkpoint save/load passed locally and for test commit `049b550` in [Game checks](https://github.com/MrDemonWolf/wolf-override/actions/runs/36227626860). The scene check also verifies the logo resource and New Game/Continue button signals with an isolated save. An earlier title layout was seen graphically; New Game opened and character switching was observed. The revised logo layout and complete graphical playthroughs of both routes and checkpoint save/load remain unchecked.
+Godot 4.7.2 headless import, deterministic state checks, and a scene check of both routes and checkpoint save/load passed locally. The scene check verifies the title buttons, story beats, changing objectives, and route reactions with an isolated save. A renderer-backed scripted replay of both routes was inspected at 960×540; a normal game window showed Continue restoring an existing checkpoint. A full hands-on keyboard playthrough, export, and device test have not been run.
 
 ## Still to come
 
