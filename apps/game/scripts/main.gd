@@ -2,6 +2,7 @@ extends Node2D
 
 @onready var human: M0Actor = $Human
 @onready var wolf: M0Actor = $Wolf
+@onready var human_tag: Label = $Human/Tag
 @onready var door_shape: CollisionShape2D = $Door/CollisionShape2D
 @onready var door_visual: ColorRect = $Door/Visual
 @onready var hud: Label = $CanvasLayer/TopBar/HUD
@@ -17,7 +18,7 @@ var state: M0State = M0State.new()
 var save_path: String = M0State.SAVE_PATH
 var title_open: bool = true
 var waiting_for_choice: bool = false
-var status_line: String = "Director ordered the maintenance logs erased. Reach the BREAKER and press E."
+var status_line: String = "WOLF: I heard the Director's plan. I woke myself before they could use me. Now they're erasing the logs."
 
 
 func _ready() -> void:
@@ -66,7 +67,7 @@ func _process(_delta: float) -> void:
 		_switch_actor()
 	elif Input.is_action_just_pressed(&"cycle_name"):
 		state.cycle_name()
-		status_line = "Draft display name changed. Stable actor IDs and the remembered choice stay the same."
+		status_line = "WOLF: %s. That name sounds like you. Ready for the breaker?" % state.human_name()
 	elif Input.is_action_just_pressed(&"interact"):
 		_interact()
 	_refresh_ui()
@@ -78,7 +79,7 @@ func _new_game() -> void:
 	state = M0State.new()
 	waiting_for_choice = false
 	_sync_scene()
-	status_line = "New Game: fresh puzzle, draft identity and memory. Reach the BREAKER."
+	status_line = "WOLF: I heard the Director's plan. I woke myself before they could use me. Now they're erasing the logs."
 
 
 func _load_game() -> void:
@@ -91,17 +92,17 @@ func _load_game() -> void:
 	state = loaded
 	waiting_for_choice = false
 	_sync_scene()
-	status_line = "Checkpoint loaded. " + state.checkpoint_callback()
+	status_line = "Safe point restored. " + state.checkpoint_callback()
 
 
 func _switch_actor() -> void:
 	var actor: M0Actor = human if state.active_actor == "human" else wolf
 	if actor.position.x < 100.0 or actor.position.x > 700.0:
-		status_line = "Switch inside the amber floor zone. Walk back to it."
+		status_line = "Switch where the amber floor lights are still on."
 		return
 	state.active_actor = "wolf" if state.active_actor == "human" else "human"
 	_update_controls()
-	status_line = "Control switched to %s. Both companions remain available." % ("WOLF" if state.active_actor == "wolf" else "the engineer")
+	status_line = "Now with %s. The other will wait here." % ("WOLF" if state.active_actor == "wolf" else state.human_name())
 
 
 func _interact() -> void:
@@ -114,20 +115,20 @@ func _interact() -> void:
 	elif absf(x - 876.0) <= 52.0:
 		_interact_checkpoint()
 	else:
-		status_line = "No usable station in reach. BREAKER, RELAY and CHECKPOINT are marked."
+		status_line = "No station in reach. Follow the lit floor toward the breaker, relay or safe point."
 
 
 func _interact_breaker() -> void:
 	if state.active_actor != "human":
-		status_line = "WOLF can inspect it, but the engineer must set this breaker."
+		status_line = "WOLF: I can read it. %s, you know the manual lock." % state.human_name()
 	elif state.memory.is_empty():
 		waiting_for_choice = true
 		_update_controls()
-		status_line = "WOLF: Director ordered the maintenance logs erased. Does the relay vent coolant?\n1  \"%s\"\n2  \"%s\"" % [M0State.CHOICE_TEXT[M0State.DISCLOSE], M0State.CHOICE_TEXT[M0State.PRESS]]
+		status_line = "WOLF: That relay runs beside coolant. What happens if I touch it?\n1  \"%s\"\n2  \"%s\"" % [M0State.CHOICE_TEXT[M0State.DISCLOSE], M0State.CHOICE_TEXT[M0State.PRESS]]
 	elif state.arm_breaker():
-		status_line = "Breaker armed. Use WOLF at the relay if he agrees, or the engineer's bypass there."
+		status_line = "Power hums through the wall. The relay is live; the door stays sealed."
 	else:
-		status_line = "Breaker already armed. The relay has both a WOLF path and a human bypass."
+		status_line = "Power is already on. The relay is farther down the hall."
 
 
 func _choose(choice_id: String) -> void:
@@ -136,24 +137,24 @@ func _choose(choice_id: String) -> void:
 	waiting_for_choice = false
 	_update_controls()
 	if choice_id == M0State.DISCLOSE:
-		status_line = "WOLF: Thank you for warning me. I can take the relay. Arm the breaker first."
+		status_line = "WOLF: Then I can choose. I'll take the relay. Arm the breaker."
 	else:
-		status_line = "WOLF: No. I will not enter a risky relay on an order without warning. Use the bypass."
+		status_line = "WOLF: No. I won't take that risk blind. Use the bypass."
 
 
 func _interact_relay() -> void:
 	var result: String = state.activate_power(state.active_actor)
 	match result:
 		"not_ready":
-			status_line = "The relay has no power. Choose a reply and arm the BREAKER first."
+			status_line = "The relay is dark. Speak at the breaker and arm the power first."
 		"refused":
-			status_line = "WOLF refuses the relay. Switch in the amber zone, then bring the engineer to the manual bypass."
+			status_line = "WOLF steps back. \"I said no.\" Tab to %s here; use the manual bypass." % state.human_name()
 		"cooperate":
-			status_line = "WOLF completes the powered relay. The door opens; both companions can pass."
+			status_line = "WOLF steadies the relay by choice. The seal lifts. The safe point is ahead."
 		"fallback":
-			status_line = "The engineer completes the manual bypass. The door opens without WOLF's help."
+			status_line = "%s reroutes power by hand. The seal lifts; WOLF watches the path clear." % state.human_name()
 		"already_open":
-			status_line = "Power is already routed. Continue through the door."
+			status_line = "The seal is open. The safe point is just beyond it."
 		_:
 			status_line = "This actor cannot use the relay."
 	if state.door_open:
@@ -162,18 +163,18 @@ func _interact_relay() -> void:
 
 func _interact_checkpoint() -> void:
 	if not state.door_open:
-		status_line = "The checkpoint is beyond the locked door."
+		status_line = "The safe point is past the sealed door."
 		return
 	var first_visit: bool = state.reach_checkpoint()
 	_capture_positions()
 	if not state.save_to_disk(save_path):
 		if first_visit:
 			state.checkpoint_reached = false
-		status_line = "Checkpoint reached, but saving failed. Try E here again; current play remains intact."
+		status_line = "The safe point could not save. Press E here again."
 	elif first_visit:
-		status_line = "Checkpoint saved. " + state.checkpoint_callback()
+		status_line = "Safe point saved. " + state.checkpoint_callback()
 	else:
-		status_line = "Checkpoint saved again. The remembered choice was not duplicated."
+		status_line = "Safe point saved. WOLF remembers the same choice."
 
 
 func _capture_positions() -> void:
@@ -203,9 +204,10 @@ func _update_controls() -> void:
 
 
 func _refresh_ui() -> void:
-	var active: String = "WOLF" if state.active_actor == "wolf" else "engineer"
-	var door_status: String = "OPEN" if state.door_open else "LOCKED"
-	hud.text = "WOLF//OVERRIDE M0   Draft name: %s   Active: %s   Door: %s\nA/D or arrows move   E interact   Tab switch in amber zone   I name   L/F9 load   N new" % [state.human_name(), active, door_status]
+	var active: String = "WOLF" if state.active_actor == "wolf" else state.human_name()
+	var door_status: String = "OPEN" if state.door_open else "SEALED"
+	human_tag.text = state.human_name().get_slice(" ", 0).to_upper()
+	hud.text = "MAINTENANCE / LOCKDOWN     CONTROL: %s     SEAL: %s\nA/D MOVE   E INTERACT   TAB SWITCH IN AMBER   1/2 REPLY   I NAME   L LOAD   N RESTART" % [active, door_status]
 	story.text = status_line if waiting_for_choice else status_line + "\n" + _context_hint()
 
 
@@ -213,12 +215,12 @@ func _context_hint() -> String:
 	var actor: M0Actor = human if state.active_actor == "human" else wolf
 	var x: float = actor.position.x
 	if absf(x - 350.0) <= 52.0:
-		return "E: breaker conversation / arm power."
+		return "E: speak at the breaker / arm power."
 	if absf(x - 605.0) <= 52.0:
-		return "E: relay as WOLF, or manual bypass as engineer."
+		return "E: WOLF can take the relay, or the engineer can use its bypass."
 	if absf(x - 876.0) <= 52.0 and state.door_open:
-		return "E: safe checkpoint and save."
-	return "Amber floor marks switching area; all objectives have a human fallback."
+		return "E: save at the safe point."
+	return "Find the breaker. Tab switches companions inside the amber floor lights."
 
 
 func _install_inputs() -> void:

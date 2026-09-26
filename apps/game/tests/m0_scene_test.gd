@@ -32,6 +32,7 @@ func _run() -> void:
 	new_game_button.pressed.emit()
 	if not _require(not game.get("title_open") and not title_screen.visible, "New Game button starts play through its signal"):
 		return
+	_expect(str(game.get("status_line")).contains("I woke myself"), "opening establishes WOLF's own awakening")
 	var state: M0State = game.get("state") as M0State
 	_expect(state.memory.is_empty() and not state.door_open and state.active_actor == "human", "New Game button starts clean")
 	var start_x: float = human.position.x
@@ -92,6 +93,7 @@ func _run() -> void:
 	await _tap(&"interact")
 	if not _require(not state.door_open and state.memory.get("choice_id") == State.PRESS, "WOLF refusal preserves choice and locked door"):
 		return
+	_expect(str(game.get("status_line")).contains("I said no"), "WOLF voices his refusal in the corridor")
 	Input.action_press(&"move_right")
 	for _frame in range(180):
 		await physics_frame
