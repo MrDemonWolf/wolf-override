@@ -18,7 +18,7 @@ var state: M0State = M0State.new()
 var save_path: String = M0State.SAVE_PATH
 var title_open: bool = true
 var waiting_for_choice: bool = false
-var status_line: String = "WOLF: I heard the Director's plan. I woke myself before they could use me. Now they're erasing the logs."
+var status_line: String = "WOLF: I heard the Director's plan for me. I woke myself. The purge has started."
 var door_tween: Tween
 
 
@@ -104,7 +104,7 @@ func _process(_delta: float) -> void:
 		_switch_actor()
 	elif Input.is_action_just_pressed(&"cycle_name"):
 		state.cycle_name()
-		status_line = "WOLF: %s. That name sounds like you. Ready for the breaker?" % state.human_name()
+		status_line = "WOLF: %s. That name sounds like you." % state.human_name()
 	elif Input.is_action_just_pressed(&"interact"):
 		_interact()
 	_refresh_ui()
@@ -116,7 +116,7 @@ func _new_game() -> void:
 	state = M0State.new()
 	waiting_for_choice = false
 	_sync_scene()
-	status_line = "WOLF: I heard the Director's plan. I woke myself before they could use me. Now they're erasing the logs."
+	status_line = "WOLF: I heard the Director's plan for me. I woke myself. The purge has started.\n%s: Then we get through maintenance before the original logs disappear." % state.human_name().get_slice(" ", 0).to_upper()
 
 
 func _load_game() -> void:
@@ -139,13 +139,18 @@ func _switch_actor() -> void:
 		return
 	state.active_actor = "wolf" if state.active_actor == "human" else "human"
 	_update_controls()
-	status_line = "Now with %s. The other will wait here." % ("WOLF" if state.active_actor == "wolf" else state.human_name())
+	if state.active_actor == "wolf":
+		status_line = "%s: I'll hold here. Your move, WOLF." % state.human_name().get_slice(" ", 0).to_upper()
+	else:
+		status_line = "WOLF: I'll hold here. Your move, %s." % state.human_name().get_slice(" ", 0)
 
 
 func _interact() -> void:
 	var actor: M0Actor = human if state.active_actor == "human" else wolf
 	var x: float = actor.position.x
-	if absf(x - 350.0) <= 52.0:
+	if x <= 230.0:
+		status_line = "DIRECTOR / PURGE: Original program logs marked for deletion.\nWOLF: They want the source record gone. We need to preserve it."
+	elif absf(x - 350.0) <= 52.0:
 		_interact_breaker()
 	elif absf(x - 605.0) <= 52.0:
 		_interact_relay()
@@ -157,13 +162,13 @@ func _interact() -> void:
 
 func _interact_breaker() -> void:
 	if state.active_actor != "human":
-		status_line = "WOLF: I can read it. %s, you know the manual lock." % state.human_name()
+		status_line = "WOLF: I can read the relay label. %s, you know what that maintenance fault means." % state.human_name().get_slice(" ", 0)
 	elif state.memory.is_empty():
 		waiting_for_choice = true
 		_update_controls()
-		status_line = "WOLF: That relay runs beside coolant. What happens if I touch it?\n1  \"%s\"\n2  \"%s\"" % [M0State.CHOICE_TEXT[M0State.DISCLOSE], M0State.CHOICE_TEXT[M0State.PRESS]]
+		status_line = "WOLF: You know what 'coolant fault' means. What happens if I touch the live relay?\n1  \"%s\"\n2  \"%s\"" % [M0State.CHOICE_TEXT[M0State.DISCLOSE], M0State.CHOICE_TEXT[M0State.PRESS]]
 	elif state.arm_breaker():
-		status_line = "Power hums through the wall. The relay is live; the door stays sealed."
+		status_line = "The breaker catches. Blue light fills the coolant relay; the red seal stays shut."
 		queue_redraw()
 	else:
 		status_line = "Power is already on. The relay is farther down the hall."
@@ -175,7 +180,7 @@ func _choose(choice_id: String) -> void:
 	waiting_for_choice = false
 	_update_controls()
 	if choice_id == M0State.DISCLOSE:
-		status_line = "WOLF: Then I can choose. I'll take the relay. Arm the breaker."
+		status_line = "WOLF: Thank you for telling me. I'll take the relay. Arm the breaker."
 	else:
 		status_line = "WOLF: No. I won't take that risk blind. Use the bypass."
 
@@ -186,11 +191,11 @@ func _interact_relay() -> void:
 		"not_ready":
 			status_line = "The relay is dark. Speak at the breaker and arm the power first."
 		"refused":
-			status_line = "WOLF steps back. \"I said no.\" Tab to %s here; use the manual bypass." % state.human_name()
+			status_line = "WOLF: I said no. I'll watch the seal while you take the bypass."
 		"cooperate":
-			status_line = "WOLF steadies the relay by choice. The seal lifts. The safe point is ahead."
+			status_line = "WOLF holds the live contact by choice. %s keeps the breaker on; the red seal rises." % state.human_name().get_slice(" ", 0)
 		"fallback":
-			status_line = "%s reroutes power by hand. The seal lifts; WOLF watches the path clear." % state.human_name()
+			status_line = "%s takes the bypass. WOLF reads the rising seal: \"Open. I'm with you.\"" % state.human_name().get_slice(" ", 0)
 		"already_open":
 			status_line = "The seal is open. The safe point is just beyond it."
 		_:
@@ -254,20 +259,50 @@ func _refresh_ui() -> void:
 	var active: String = "WOLF" if state.active_actor == "wolf" else state.human_name()
 	var door_status: String = "OPEN" if state.door_open else "SEALED"
 	human_tag.text = state.human_name().get_slice(" ", 0).to_upper()
-	hud.text = "MAINTENANCE / LOCKDOWN     CONTROL: %s     SEAL: %s\nA/D MOVE   E INTERACT   TAB SWITCH IN AMBER   1/2 REPLY   I NAME   L LOAD   N RESTART" % [active, door_status]
+	hud.text = "MAINTENANCE / LOCKDOWN     OBJECTIVE: %s     CONTROL: %s     SEAL: %s\nA/D MOVE   E INTERACT   TAB SWITCH IN AMBER   1/2 REPLY   I NAME   L LOAD   N RESTART" % [_objective(), active, door_status]
 	story.text = status_line if waiting_for_choice else status_line + "\n" + _context_hint()
 
 
 func _context_hint() -> String:
 	var actor: M0Actor = human if state.active_actor == "human" else wolf
 	var x: float = actor.position.x
+	if state.checkpoint_reached:
+		return "Safe for now. The Director's purge is still running."
+	if state.door_open:
+		if absf(x - 876.0) <= 52.0:
+			return "E: save at the safe point."
+		return "The seal is open. Move to the safe point."
+	if x <= 230.0:
+		return "E: read the Director's purge display."
 	if absf(x - 350.0) <= 52.0:
-		return "E: speak at the breaker / arm power."
+		if state.breaker_armed:
+			return "The breaker is live. Go to the coolant relay."
+		return "E: ask WOLF about the relay risk." if state.memory.is_empty() else "E: arm the breaker."
 	if absf(x - 605.0) <= 52.0:
-		return "E: WOLF can take the relay, or the engineer can use its bypass."
-	if absf(x - 876.0) <= 52.0 and state.door_open:
-		return "E: save at the safe point."
+		if not state.breaker_armed:
+			return "The relay is dark. Return to the breaker first."
+		if state.active_actor == "wolf":
+			if state.memory.get("choice_id") == M0State.PRESS:
+				return "WOLF refused the contact. Tab to the engineer for the bypass."
+			return "E: let WOLF take the live relay."
+		return "E: use the manual bypass; Tab lets WOLF take the relay."
+	if state.breaker_armed:
+		return "Go to the live coolant relay. Tab switches companions in the amber lights."
+	if not state.memory.is_empty():
+		return "Return to the breaker and arm power."
 	return "Find the breaker. Tab switches companions inside the amber floor lights."
+
+
+func _objective() -> String:
+	if state.checkpoint_reached:
+		return "CORRIDOR CLEARED"
+	if state.door_open:
+		return "REACH SAFE POINT"
+	if state.breaker_armed:
+		return "OPEN THE SEAL"
+	if not state.memory.is_empty():
+		return "ARM THE BREAKER"
+	return "CHECK THE BREAKER"
 
 
 func _install_inputs() -> void:

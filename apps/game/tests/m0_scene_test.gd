@@ -35,6 +35,10 @@ func _run() -> void:
 	_expect(str(game.get("status_line")).contains("I woke myself"), "opening establishes WOLF's own awakening")
 	var state: M0State = game.get("state") as M0State
 	_expect(state.memory.is_empty() and not state.door_open and state.active_actor == "human", "New Game button starts clean")
+	_expect(game.call("_objective") == "CHECK THE BREAKER", "opening points to the first corridor objective")
+	await process_frame
+	await _tap(&"interact")
+	_expect(str(game.get("status_line")).contains("Original program logs marked for deletion"), "purge display establishes evidence stakes without inventory")
 	var start_x: float = human.position.x
 	if not _require(await _walk_to(human, 350.0), "active engineer reaches breaker by moving right"):
 		return
@@ -45,9 +49,11 @@ func _run() -> void:
 	await _tap(&"choice_1")
 	if not _require(state.memory.get("choice_id") == State.DISCLOSE, "first dialogue key records disclosed risk"):
 		return
+	_expect(game.call("_objective") == "ARM THE BREAKER", "honest answer advances the objective")
 	await _tap(&"interact")
 	if not _require(state.breaker_armed, "breaker arms after choice"):
 		return
+	_expect(game.call("_objective") == "OPEN THE SEAL", "powered relay becomes the objective")
 	await _tap(&"switch_actor")
 	if not _require(state.active_actor == "wolf" and wolf.controlled, "switches to WOLF in amber zone"):
 		return
@@ -56,6 +62,8 @@ func _run() -> void:
 	await _tap(&"interact")
 	if not _require(state.door_open and state.route == "cooperate", "WOLF cooperation opens door"):
 		return
+	_expect(game.call("_objective") == "REACH SAFE POINT", "open seal points to safety")
+	_expect(str(game.call("_context_hint")).contains("Move to the safe point"), "open-door hint no longer sends the player back to the breaker")
 	await create_timer(0.45).timeout
 	var door_visual: ColorRect = game.get_node("Door/Visual") as ColorRect
 	_expect(not door_visual.visible, "door retracts after cooperation")
@@ -66,6 +74,7 @@ func _run() -> void:
 	await _tap(&"interact")
 	if not _require(state.checkpoint_reached and FileAccess.file_exists(path), "cooperative checkpoint saves"):
 		return
+	_expect(game.call("_objective") == "CORRIDOR CLEARED", "checkpoint closes the first scene")
 	_expect(str(game.get("status_line")).contains(State.CHOICE_TEXT[State.DISCLOSE]), "cooperative checkpoint displays the selected choice")
 	var saved: Dictionary = state.to_dict()
 	game.call("_new_game")
@@ -114,10 +123,12 @@ func _run() -> void:
 	await _tap(&"interact")
 	if not _require(state.door_open and state.route == "fallback", "engineer bypass opens door"):
 		return
+	_expect(str(game.call("_context_hint")).contains("Move to the safe point"), "fallback hint points through the open seal")
 	if not _require(await _walk_to(human, 876.0), "engineer walks through opened door to checkpoint"):
 		return
 	await _tap(&"cycle_name")
 	_expect(state.name_index == 1, "draft identity changes before fallback save")
+	_expect(not str(game.get("status_line")).contains("breaker"), "identity line does not rewind the scene after the seal opens")
 	await _tap(&"interact")
 	if not _require(state.checkpoint_reached, "fallback reaches checkpoint"):
 		return
