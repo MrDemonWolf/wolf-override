@@ -1,0 +1,207 @@
+class_name M0State
+extends RefCounted
+
+const SAVE_VERSION: int = 1
+const SAVE_PATH: String = "user://m0-save.json"
+const EVENT_ID: String = "relay_disagreement"
+const DISCLOSE: String = "disclose_risk"
+const PRESS: String = "press_without_warning"
+const HUMAN_NAMES = ["Rowan Vale", "Alex Bennett", "Morgan Reed"]
+const CHOICE_TEXT = {
+	"disclose_risk": "The relay may vent coolant. Your call.",
+	"press_without_warning": "Go now. We can talk after.",
+}
+
+var active_actor: String = "human"
+var name_index: int = 0
+var human_position: Vector2 = Vector2(160.0, 410.0)
+var wolf_position: Vector2 = Vector2(225.0, 423.0)
+var memory: Dictionary = {}
+var breaker_armed: bool = false
+var door_open: bool = false
+var route: String = ""
+var checkpoint_reached: bool = false
+
+
+func human_name() -> String:
+	return HUMAN_NAMES[name_index]
+
+
+func cycle_name() -> void:
+	name_index = (name_index + 1) % HUMAN_NAMES.size()
+
+
+func record_choice(choice_id: String) -> bool:
+	if not memory.is_empty() or not CHOICE_TEXT.has(choice_id):
+		return false
+	memory = {
+		"event_id": EVENT_ID,
+		"choice_id": choice_id,
+		"selected_text": CHOICE_TEXT[choice_id],
+		"context": "breaker_relay_risk",
+		"sequence": 1,
+		"observed_by": ["human", "wolf"],
+	}
+	return true
+
+
+func arm_breaker() -> bool:
+	if memory.is_empty() or breaker_armed:
+		return false
+	breaker_armed = true
+	return true
+
+
+func activate_power(actor_id: String) -> String:
+	if not breaker_armed:
+		return "not_ready"
+	if door_open:
+		return "already_open"
+	if actor_id == "wolf":
+		if memory.get("choice_id") != DISCLOSE:
+			return "refused"
+		route = "cooperate"
+	elif actor_id == "human":
+		route = "fallback"
+	else:
+		return "invalid_actor"
+	door_open = true
+	return route
+
+
+func reach_checkpoint() -> bool:
+	if not door_open or checkpoint_reached:
+		return false
+	checkpoint_reached = true
+	return true
+
+
+func checkpoint_callback() -> String:
+	if not checkpoint_reached or memory.is_empty():
+		return ""
+	var said: String = str(memory.get("selected_text", ""))
+	if memory.get("choice_id") == PRESS:
+		return "WOLF: You said \"%s\" I refused the relay; you found the bypass." % said
+	if route == "cooperate":
+		return "WOLF: You said \"%s\" I chose to help with the relay." % said
+	return "WOLF: You said \"%s\" You chose the bypass anyway." % said
+
+
+func to_dict() -> Dictionary:
+	return {
+		"version": SAVE_VERSION,
+		"identity": {"actor_id": "human", "name_index": name_index},
+		"active_actor": active_actor,
+		"positions": {
+			"human": [human_position.x, human_position.y],
+			"wolf": [wolf_position.x, wolf_position.y],
+		},
+		"memory": memory.duplicate(true),
+		"puzzle": {"breaker_armed": breaker_armed, "door_open": door_open, "route": route},
+		"checkpoint_reached": checkpoint_reached,
+	}
+
+
+static func from_dict(raw: Variant) -> M0State:
+	if not (raw is Dictionary):
+		return null
+	var data: Dictionary = raw
+	if not _whole_in_range(data.get("version"), SAVE_VERSION, SAVE_VERSION):
+		return null
+	var raw_identity: Variant = data.get("identity")
+	var raw_positions: Variant = data.get("positions")
+	var raw_puzzle: Variant = data.get("puzzle")
+	var raw_memory: Variant = data.get("memory")
+	if not (raw_identity is Dictionary) or not (raw_positions is Dictionary) or not (raw_puzzle is Dictionary) or not (raw_memory is Dictionary):
+		return null
+	var identity: Dictionary = raw_identity
+	var positions: Dictionary = raw_positions
+	var puzzle: Dictionary = raw_puzzle
+	var loaded_memory: Dictionary = raw_memory
+	if identity.get("actor_id") != "human" or not _whole_in_range(identity.get("name_index"), 0, HUMAN_NAMES.size() - 1):
+		return null
+	if data.get("active_actor") != "human" and data.get("active_actor") != "wolf":
+		return null
+	if not _valid_position(positions.get("human")) or not _valid_position(positions.get("wolf")):
+		return null
+	if typeof(puzzle.get("breaker_armed")) != TYPE_BOOL or typeof(puzzle.get("door_open")) != TYPE_BOOL:
+		return null
+	if puzzle.get("route") != "" and puzzle.get("route") != "cooperate" and puzzle.get("route") != "fallback":
+		return null
+	if typeof(data.get("checkpoint_reached")) != TYPE_BOOL:
+		return null
+	if not loaded_memory.is_empty():
+		var choice_id: Variant = loaded_memory.get("choice_id")
+		if typeof(choice_id) != TYPE_STRING or loaded_memory.size() != 6 or loaded_memory.get("event_id") != EVENT_ID or not CHOICE_TEXT.has(choice_id):
+			return null
+		if loaded_memory.get("selected_text") != CHOICE_TEXT[choice_id] or loaded_memory.get("context") != "breaker_relay_risk":
+			return null
+		if not _whole_in_range(loaded_memory.get("sequence"), 1, 1) or loaded_memory.get("observed_by") != ["human", "wolf"]:
+			return null
+	if puzzle["breaker_armed"] and loaded_memory.is_empty():
+		return null
+	if puzzle["door_open"] != (puzzle["route"] != ""):
+		return null
+	if puzzle["door_open"] and not puzzle["breaker_armed"]:
+		return null
+	if puzzle["route"] == "cooperate" and loaded_memory.get("choice_id") != DISCLOSE:
+		return null
+	if data["checkpoint_reached"] and not puzzle["door_open"]:
+		return null
+	var state: M0State = M0State.new()
+	state.name_index = int(identity["name_index"])
+	state.active_actor = str(data["active_actor"])
+	state.human_position = Vector2(float(positions["human"][0]), float(positions["human"][1]))
+	state.wolf_position = Vector2(float(positions["wolf"][0]), float(positions["wolf"][1]))
+	state.memory = loaded_memory.duplicate(true)
+	if not state.memory.is_empty():
+		state.memory["sequence"] = int(state.memory["sequence"])
+	state.breaker_armed = puzzle["breaker_armed"]
+	state.door_open = puzzle["door_open"]
+	state.route = str(puzzle["route"])
+	state.checkpoint_reached = data["checkpoint_reached"]
+	return state
+
+
+func save_to_disk(path: String = SAVE_PATH) -> bool:
+	var temp_path: String = path + ".tmp"
+	var file: FileAccess = FileAccess.open(temp_path, FileAccess.WRITE)
+	if file == null:
+		return false
+	var stored: bool = file.store_string(JSON.stringify(to_dict()))
+	file.flush()
+	var write_error: Error = file.get_error()
+	file.close()
+	if not stored or write_error != OK:
+		return false
+	return DirAccess.rename_absolute(ProjectSettings.globalize_path(temp_path), ProjectSettings.globalize_path(path)) == OK
+
+
+static func load_from_disk(path: String = SAVE_PATH) -> M0State:
+	if not FileAccess.file_exists(path):
+		return null
+	var file: FileAccess = FileAccess.open(path, FileAccess.READ)
+	if file == null:
+		return null
+	var body: String = file.get_as_text()
+	file.close()
+	var json: JSON = JSON.new()
+	if json.parse(body) != OK:
+		return null
+	var loaded: M0State = from_dict(json.data)
+	return loaded if loaded != null and loaded.checkpoint_reached else null
+
+
+static func _whole_in_range(value: Variant, low: int, high: int) -> bool:
+	if typeof(value) != TYPE_INT and typeof(value) != TYPE_FLOAT:
+		return false
+	return value >= low and value <= high and int(value) == value
+
+
+static func _valid_position(value: Variant) -> bool:
+	if not (value is Array) or value.size() != 2:
+		return false
+	for component in value:
+		if typeof(component) != TYPE_INT and typeof(component) != TYPE_FLOAT:
+			return false
+	return float(value[0]) >= 40.0 and float(value[0]) <= 920.0 and float(value[1]) >= 0.0 and float(value[1]) <= 540.0

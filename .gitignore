@@ -1,0 +1,12 @@
+.godot/
+/node_modules/
+
+# Internal Revision 4 design and handoff files live in Notion.
+/AGENTS.md
+/PROJECT_CONTEXT.md
+/CHATGPT_PROJECT_INSTRUCTIONS.md
+/CODEX_HANDOFF.md
+/PROJECT_INSTRUCTIONS.txt
+/PACKAGE_VALIDATION.txt
+/docs/
+/*.zip

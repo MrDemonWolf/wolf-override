@@ -1,0 +1,47 @@
+---
+title: Play the M0 source
+description: Open and play the first WOLF//OVERRIDE corridor prototype.
+---
+
+WOLF//OVERRIDE is in its first playable prototype stage. M0 is one side-view corridor with two placeholder characters, a door puzzle with cooperative and fallback routes, one remembered choice, and a checkpoint. There is no downloadable release yet.
+
+For the spoiler-safe premise and gameplay direction, see [About the game](/docs/about/). [Development status](/docs/development/) separates the current source build from future plans.
+
+## Open the game
+
+Install Godot **4.7.2 stable**, then run from the repository root:
+
+```sh
+godot --path apps/game --editor
+```
+
+Press **F5** in the editor to run the project, or use the **Run Project** button. To start the game directly:
+
+```sh
+godot --path apps/game
+```
+
+## Controls
+
+| Key | Action |
+| --- | --- |
+| A / D or arrow keys | Move the active character |
+| E | Interact with a nearby station |
+| Tab | Switch characters in the amber floor zone |
+| 1 / 2 | Answer the corridor disagreement |
+| I | Cycle provisional engineer display names |
+| L or F9 | Load the saved checkpoint |
+| N | Start a clean New Game |
+
+The far-right checkpoint saves when you interact with it. WOLF can refuse the relay; the engineer has a fallback route.
+
+## Check the source
+
+These commands check import and deterministic state logic. They do not prove that the full corridor or an exported game works.
+
+```sh
+godot --headless --path apps/game --import
+godot --headless --path apps/game --script res://tests/m0_state_test.gd
+```
+
+M0 is still being playtested. Art, audio, export packages, and device tests are future work.

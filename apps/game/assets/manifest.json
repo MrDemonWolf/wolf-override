@@ -1,0 +1,16 @@
+{
+  "schema_version": 1,
+  "design_revision": 4,
+  "assets": [],
+  "status": "Documentation snapshot; no art/audio assets created or acquired.",
+  "merge_warning": "Never overwrite an existing populated provenance register with this empty snapshot.",
+  "future_entry_fields": [
+    "asset_id",
+    "path",
+    "source_or_tool",
+    "terms_reference",
+    "rights_review_status",
+    "modifications",
+    "implementation_status"
+  ]
+}
