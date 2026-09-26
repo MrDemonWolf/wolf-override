@@ -1,0 +1,32 @@
+name: Game checks
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  godot:
+    runs-on: ubuntu-24.04
+    env:
+      GODOT_BIN: ${{ runner.temp }}/Godot_v4.7.2-stable_linux.x86_64
+    steps:
+      - uses: actions/checkout@v7
+      - name: Get pinned Godot 4.7.2
+        run: |
+          curl --fail --location --retry 3 \
+            https://github.com/godotengine/godot-builds/releases/download/4.7.2-stable/Godot_v4.7.2-stable_linux.x86_64.zip \
+            -o "$RUNNER_TEMP/godot.zip"
+          printf '%s  %s\n' cadd3204e728a35d3f13adb7fd0d7902636b79f6b95c40c265eb73b6c35329e4 "$RUNNER_TEMP/godot.zip" | sha256sum --check
+          unzip -q "$RUNNER_TEMP/godot.zip" -d "$RUNNER_TEMP"
+          chmod +x "$GODOT_BIN"
+          "$GODOT_BIN" --version
+      - name: Import game
+        run: '"$GODOT_BIN" --headless --path apps/game --import'
+      - name: Check M0 state
+        run: '"$GODOT_BIN" --headless --path apps/game --script res://tests/m0_state_test.gd'
+      - name: Check M0 scene
+        run: '"$GODOT_BIN" --headless --path apps/game --script res://tests/m0_scene_test.gd'

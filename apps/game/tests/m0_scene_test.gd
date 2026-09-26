@@ -20,6 +20,13 @@ func _run() -> void:
 
 	game.call("_new_game")
 	var state: M0State = game.get("state") as M0State
+	var start_x: float = human.position.x
+	Input.action_press(&"move_right")
+	await physics_frame
+	await physics_frame
+	await physics_frame
+	Input.action_release(&"move_right")
+	_expect(human.position.x > start_x, "active engineer moves right")
 	human.position.x = 350.0
 	game.call("_interact")
 	_expect(game.get("waiting_for_choice"), "breaker opens authored disagreement")
