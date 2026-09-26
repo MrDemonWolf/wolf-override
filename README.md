@@ -10,8 +10,9 @@ finding a way out.
 One choice can change what your companion remembers.
 
 **Current status:** M0 is a source prototype, not a downloadable game.
-It has one corridor, placeholder characters, and one complete puzzle.
-Full graphical playtesting, art, audio, exports, and device testing are
+It has one staged corridor, code-drawn prototype characters, authored
+opening dialogue, and one complete puzzle. Full route-by-route graphical
+playtesting, finished art and audio, exports, and device testing are
 still ahead.
 
 ## Features
@@ -22,6 +23,9 @@ still ahead.
   the engineer's bypass if WOLF refuses.
 - **A remembered choice** - One authored disagreement records the reply
   you select and recalls it at the checkpoint.
+- **A story-led corridor** - WOLF describes waking himself as the Director's
+  logs are erased; the purge warning, coolant relay and safe point carry
+  that opening beat through the puzzle.
 - **Checkpoint save and load** - Restore the active character, positions,
   puzzle state, provisional display name, and choice memory.
 
@@ -118,11 +122,11 @@ The root `package.json` defines these docs commands:
 The game uses typed GDScript and stable event IDs independent of editable
 display names. On local Godot 4.7.2, the import, state test, and scene
 test passed. The scene test covers both door routes, title button signals,
-and checkpoint save/load with a separate test save. An earlier title layout
-and New Game were opened graphically; the revised logo layout, complete
-routes, and save/load still need graphical playtesting. Headless checks do
-not verify exports or devices. Corridor play currently requires a keyboard; touch
-controls and mobile exports are not implemented.
+door retraction, and checkpoint save/load with a separate test save. The
+current title and opening corridor were inspected graphically; the complete
+routes and save/load still need graphical playtesting. Headless checks do
+not verify exports or devices. Corridor play currently requires a keyboard;
+touch controls and mobile exports are not implemented.
 
 ## Project Structure
 
