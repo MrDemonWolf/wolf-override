@@ -11,8 +11,6 @@ permissions:
 jobs:
   godot:
     runs-on: ubuntu-24.04
-    env:
-      GODOT_BIN: ${{ runner.temp }}/Godot_v4.7.2-stable_linux.x86_64
     steps:
       - uses: actions/checkout@v7
       - name: Get pinned Godot 4.7.2
@@ -22,8 +20,10 @@ jobs:
             -o "$RUNNER_TEMP/godot.zip"
           printf '%s  %s\n' cadd3204e728a35d3f13adb7fd0d7902636b79f6b95c40c265eb73b6c35329e4 "$RUNNER_TEMP/godot.zip" | sha256sum --check
           unzip -q "$RUNNER_TEMP/godot.zip" -d "$RUNNER_TEMP"
-          chmod +x "$GODOT_BIN"
-          "$GODOT_BIN" --version
+          godot_bin="$RUNNER_TEMP/Godot_v4.7.2-stable_linux.x86_64"
+          chmod +x "$godot_bin"
+          "$godot_bin" --version
+          echo "GODOT_BIN=$godot_bin" >> "$GITHUB_ENV"
       - name: Import game
         run: '"$GODOT_BIN" --headless --path apps/game --import'
       - name: Check M0 state
