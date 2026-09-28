@@ -250,6 +250,7 @@ a:focus-visible,
   color: #a9bdd3;
   font-size: .8rem;
 }
+.site-footer a { color: inherit; text-decoration: underline; text-underline-offset: .2em; }
 .footer-divider { padding-inline: .5rem; color: #8be3ff; }
 :root:not(.dark) .site-shell {
   background:

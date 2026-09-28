@@ -77,6 +77,7 @@ export default function HomePage() {
 
       <footer className="site-footer">
         <span>WOLF//OVERRIDE <span className="footer-divider">/</span> By MrDemonWolf, Inc.</span>
+        <Link href="/docs/credits/">Credits and tools</Link>
         <span>In development · No public release yet</span>
       </footer>
     </main>

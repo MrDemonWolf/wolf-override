@@ -170,6 +170,12 @@ drafts and production notes live in Notion. Record an asset's origin and
 rights in [the asset register](apps/game/assets/manifest.json) before
 adding it to the game.
 
+## Credits
+
+Original game and core story idea by Nathanial Henniges. Developed by
+MrDemonWolf, Inc. with AI assistance. See the [full credits, research
+references, tools, and asset provenance](https://mrdemonwolf.github.io/wolf-override/docs/credits/).
+
 ## License
 
 ![GitHub license](https://img.shields.io/github/license/mrdemonwolf/wolf-override.svg?style=for-the-badge&logo=github)
@@ -185,8 +191,5 @@ and release review remain open.
 
 - [Open an issue](https://github.com/MrDemonWolf/wolf-override/issues)
 - [MrDemonWolf, Inc.](https://www.mrdemonwolf.com)
-
-Original game and story idea by Nathanial Henniges. Developed by MrDemonWolf, Inc. with
-AI assistance.
 
 Made with love by [MrDemonWolf, Inc.](https://www.mrdemonwolf.com)
