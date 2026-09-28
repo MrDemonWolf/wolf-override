@@ -21,9 +21,10 @@ export default function HomePage() {
           <span className="eyebrow"><span className="signal-dot" /> Side-view sci-fi horror · In development</span>
           <h1 id="hero-title">He woke himself.<br /><em>They choose what comes next.</em></h1>
           <p>
-            WOLF awakens in the robotic body he already has after overhearing
-            the Program Director&apos;s plans for him. With an engineer at his side,
-            he must uncover the truth, protect people, and find a way out of THE DEN.
+            WOLF wakes himself after hearing the Program Director&apos;s plan to
+            turn him into a killer under the cover of protecting people. With
+            an engineer at his side, he must uncover the truth and find a way
+            out of THE DEN.
           </p>
           <div className="hero-actions">
             <Link className="button-primary" href="/docs/about/">Explore the game <span aria-hidden="true">→</span></Link>
