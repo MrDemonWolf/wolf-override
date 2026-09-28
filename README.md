@@ -10,9 +10,10 @@ finding a way out.
 One choice can change what your companion remembers.
 
 **Current status:** M0 is a source prototype, not a downloadable game.
-It has one corridor, placeholder characters, and one complete puzzle.
-Full graphical playtesting, art, audio, exports, and device testing are
-still ahead.
+It has one staged corridor, code-drawn prototype characters, an opening
+exchange, and one complete puzzle. Both routes passed a rendered scripted
+replay; a full hands-on playthrough, finished art and audio, exports, and
+device testing are still ahead.
 
 ## Features
 
@@ -22,6 +23,9 @@ still ahead.
   the engineer's bypass if WOLF refuses.
 - **A remembered choice** - One authored disagreement records the reply
   you select and recalls it at the checkpoint.
+- **A story-led corridor** - WOLF and the engineer respond to the Director's
+  purge order, weigh the coolant warning, and reach safety with their
+  disagreement remembered.
 - **Checkpoint save and load** - Restore the active character, positions,
   puzzle state, provisional display name, and choice memory.
 
@@ -58,7 +62,7 @@ checkpoint save exists.
 | ------------------ | ------------------------------------------- |
 | Enter              | Start New Game from the title screen        |
 | A / D or arrow keys | Move the active character                   |
-| E                  | Interact with a nearby marked station       |
+| E                  | Read the purge display or use a station     |
 | Tab                | Switch characters in the amber floor zone  |
 | 1 / 2              | Answer the breaker disagreement            |
 | I                  | Cycle provisional engineer display names   |
@@ -116,13 +120,14 @@ The root `package.json` defines these docs commands:
 ### Code Quality
 
 The game uses typed GDScript and stable event IDs independent of editable
-display names. On local Godot 4.7.2, the import, state test, and scene
-test passed. The scene test covers both door routes, title button signals,
-and checkpoint save/load with a separate test save. An earlier title layout
-and New Game were opened graphically; the revised logo layout, complete
-routes, and save/load still need graphical playtesting. Headless checks do
-not verify exports or devices. Corridor play currently requires a keyboard; touch
-controls and mobile exports are not implemented.
+display names. On local Godot 4.7.2, import, state, and scene checks passed.
+The scene check covers both door routes, stage objectives, title buttons,
+door retraction, and checkpoint save/load with a separate test save. A
+renderer-backed replay of that scripted check was inspected at 960×540;
+the normal Continue button also restored an existing checkpoint on screen.
+Full hands-on route playtesting, exports, and device checks remain open.
+Corridor play currently requires a keyboard; touch controls and mobile
+exports are not implemented.
 
 ## Project Structure
 
