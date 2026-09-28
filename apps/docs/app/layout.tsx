@@ -16,7 +16,7 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: ReactNode }) {
   return (
-    <html lang="en">
+    <html lang="en" className="dark">
       <body>
         <a className="skip-link" href="#nd-page">Skip to content</a>
         <RootProvider search={{ enabled: false }} theme={{ enabled: false }}>
