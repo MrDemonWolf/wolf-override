@@ -1,6 +1,6 @@
 # WOLF//OVERRIDE game quality guide
 
-This is the public, spoiler-safe guide for people and coding agents working on the game. The local `AGENTS.md` and private Notion pages contain story decisions; do not copy those drafts into this public repository.
+This is the public, spoiler-safe guide for people and coding agents working on the game. The ignored local `PRIVATE_AGENTS.md` and private Notion pages contain story decisions; do not copy those drafts into this public repository.
 
 ## Build a playable scene, not a longer status message
 
