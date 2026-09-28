@@ -31,14 +31,15 @@ export default function HomePage() {
           </div>
           <p className="release-note">Early source prototype · No public download yet</p>
         </div>
-        <div className="hero-scene" role="img" aria-label="Conceptual corridor illustration of an engineer and WOLF facing a sealed door; not captured gameplay">
-          <div className="scene-grid" aria-hidden="true" />
-          <div className="scene-door" aria-hidden="true"><span>ACCESS // 01</span></div>
-          <div className="scene-human" aria-hidden="true"><span>H</span></div>
-          <div className="scene-wolf" aria-hidden="true"><span>W</span></div>
-          <div className="scene-floor" aria-hidden="true" />
-          <div className="scene-caption" aria-hidden="true">CONCEPTUAL SCENE / NOT GAMEPLAY CAPTURE</div>
-        </div>
+        <figure className="hero-scene">
+          <img
+            src={`${assetBase}/title-corridor-key-art-provisional.png`}
+            width="1672"
+            height="941"
+            alt="An engineer and WOLF stand beside a sealed, blue-lit door in a dark research corridor."
+          />
+          <figcaption className="scene-caption">Provisional title artwork, not gameplay capture</figcaption>
+        </figure>
       </section>
 
       <section className="game-section" aria-labelledby="game-title">

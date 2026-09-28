@@ -9,13 +9,16 @@ finding a way out.
 
 One choice can change what your companion remembers.
 
+![Provisional title art: Rowan and WOLF at a locked research corridor](apps/game/assets/title-corridor-key-art-provisional.png)
+
 **Current status:** The first playable chapter slice runs from source; there
 is no download yet. It has a staged corridor, a second records room,
-code-drawn prototype characters, one door puzzle, and a first record-copying
-objective. Finished art and audio, the wider campaign, exports, and device
-testing are still ahead.
+provisional static character and title art, one door puzzle, and a first
+record-copying objective. Character animation, audio, the wider campaign,
+exports, and device testing are still ahead.
 
-**Quick play:** You control the engineer. Open the corridor door, save at the
+**Quick play:** You control the engineer, who uses they/them pronouns. Rowan
+Vale is their provisional default name. Open the corridor door, save at the
 safe point, then press **E** again to enter Records Access. Copy the purge
 trace, use WOLF's mirror readout or the engineer's manual port, and reach the
 exit. [The step-by-step guide](https://mrdemonwolf.github.io/wolf-override/docs/)
@@ -171,10 +174,11 @@ adding it to the game.
 ![GitHub license](https://img.shields.io/github/license/mrdemonwolf/wolf-override.svg?style=for-the-badge&logo=github)
 
 Copyright 2026 MrDemonWolf, Inc. Game source code and public docs use
-[GPL-3.0-or-later](LICENSE). The provisional logo is separate branding;
-its AI-assisted concept and SVG redraw are recorded in
-[the asset register](apps/game/assets/manifest.json). Future art, audio,
-branding, and store packages need their own rights and release review.
+[GPL-3.0-or-later](LICENSE). The provisional logo, character sprites and
+title art are separate assets with AI-assisted provenance recorded in
+[the asset register](apps/game/assets/manifest.json); they are not covered
+by the code/docs GPL. Final asset, audio, branding and store-package rights
+and release review remain open.
 
 ## Contact
 

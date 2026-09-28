@@ -127,7 +127,6 @@ a:focus-visible,
 .eyebrow,
 .feature-index,
 .scene-caption,
-.scene-door span,
 .release-note {
   font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
   font-size: .78rem;
@@ -182,83 +181,25 @@ a:focus-visible,
 .hero p.release-note { margin-top: 1.3rem; color: #a4b9d0; font-size: .7rem; letter-spacing: .06em; }
 .hero-scene {
   position: relative;
+  margin: 0;
   height: clamp(320px, 35vw, 470px);
   overflow: hidden;
   border: 1px solid #5572958a;
   border-radius: .45rem;
-  background:
-    radial-gradient(circle at 74% 34%, #5bb9e038, transparent 30%),
-    linear-gradient(155deg, #102d4a, #071421 70%);
-  box-shadow: 0 28px 80px #0007, inset 0 0 70px #091533;
+  background: #071421;
+  box-shadow: 0 28px 80px #0007;
 }
-.scene-grid {
-  position: absolute;
-  inset: 0;
-  background:
-    linear-gradient(#8be3ff0d 1px, transparent 1px),
-    linear-gradient(90deg, #8be3ff0d 1px, transparent 1px);
-  background-size: 40px 40px;
-  mask-image: linear-gradient(to bottom, transparent, #000 65%);
-}
-.scene-door {
-  position: absolute;
-  right: 13%;
-  bottom: 15%;
-  width: 22%;
-  height: 64%;
-  border: 3px solid #5fa8c6;
-  background: linear-gradient(90deg, #122a41, #22435e 50%, #0e263c 51%);
-  box-shadow: inset 0 0 0 10px #06131f, 0 0 34px #4fadd533;
-}
-.scene-door span {
-  position: absolute;
-  top: 17%;
-  left: 50%;
-  width: 8rem;
-  color: #9cd6ea;
-  font-size: .52rem;
-  text-align: center;
-  transform: translateX(-50%);
-}
-.scene-human,
-.scene-wolf {
-  position: absolute;
-  z-index: 1;
-  bottom: 14%;
-  display: grid;
-  place-items: center;
-  color: #eaf4ff;
-  font-family: ui-monospace, monospace;
-  font-size: .7rem;
-  font-weight: 800;
-}
-.scene-human {
-  left: 27%;
-  width: 9%;
-  height: 30%;
-  border: 2px solid #bad9e9;
-  border-radius: 35% 35% 12% 12%;
-  background: #41657b;
-}
-.scene-wolf {
-  left: 48%;
-  width: 15%;
-  height: 23%;
-  border: 2px solid #83dff8;
-  clip-path: polygon(0 0, 20% 24%, 31% 0, 70% 0, 85% 24%, 100% 0, 100% 100%, 0 100%);
-  background: #245b79;
-  box-shadow: 0 0 30px #8be3ff55;
-}
-.scene-floor {
+.hero-scene img { display: block; width: 100%; height: 100%; object-fit: cover; object-position: left center; }
+.scene-caption {
   position: absolute;
   right: 0;
-  bottom: 13%;
+  bottom: 0;
   left: 0;
-  height: 2px;
-  background: #92e0f2;
-  box-shadow: 0 0 20px #8be3ff;
+  padding: .8rem 1rem;
+  background: #071421d9;
+  color: #d8f2fc;
+  font-size: .62rem;
 }
-.scene-caption { position: absolute; bottom: 5%; left: 5%; color: #a9d4e7; font-size: .62rem; }
 .game-section,
 .stakes-section { border-top: 1px solid #42617f66; padding-block: 4rem; }
 .game-section h2,
