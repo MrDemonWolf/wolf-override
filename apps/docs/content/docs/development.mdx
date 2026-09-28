@@ -1,9 +1,50 @@
 ---
-title: Development status
-description: What exists in WOLF//OVERRIDE today and what remains planned.
+title: Development setup and status
+description: Run the source game and docs locally, then see what has been checked.
 ---
 
 WOLF//OVERRIDE is in early development. Its current milestone is **M0**, a source prototype of one side-view corridor. There is no public download, release date, or announced price.
+
+## Set up on macOS
+
+1. Get [Godot 4.7.2 stable](https://godotengine.org/download/archive/) for the game. The repository and CI use this version; check your installed command with `godot --version`. Bun 1.4.2 is needed only if you want to work on the docs site; check it with `bun --version`.
+2. Clone the repository if you do not have it yet:
+
+   ```sh
+   git clone https://github.com/MrDemonWolf/wolf-override.git
+   cd wolf-override
+   ```
+
+   If you already have a checkout, run the following commands from its root instead.
+3. Open the game project, then press **F5** in Godot to play:
+
+   ```sh
+   godot --path apps/game --editor
+   ```
+
+   To launch the game directly after importing it, run `godot --path apps/game`. The [play guide](/docs/) walks through the corridor and both door routes.
+4. To run the public docs site locally, use a second terminal in the repository root:
+
+   ```sh
+   bun install --frozen-lockfile
+   bun run docs:dev
+   ```
+
+   Open the local URL printed by Next.js. Bun is not needed to play the game.
+
+## Run the checks
+
+From the repository root:
+
+```sh
+godot --headless --path apps/game --import
+godot --headless --path apps/game --script res://tests/m0_state_test.gd
+godot --headless --path apps/game --script res://tests/m0_scene_test.gd
+bun run docs:check
+GITHUB_PAGES=true bun run docs:build
+```
+
+The Godot commands check import, state logic, both scripted door routes, and checkpoint save/load. The Bun commands check docs types and build the static Pages site. Headless checks cannot confirm the on-screen feel; exports and device tests are separate work.
 
 ## In the M0 source build
 

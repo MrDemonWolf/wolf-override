@@ -40,8 +40,9 @@ cinematic presentation remain in development.
 
 ## Getting Started
 
-The [public game guide](https://mrdemonwolf.github.io/wolf-override/docs/) has setup and
-controls. There is no installer or store release yet; run M0 from source.
+The [public game guide](https://mrdemonwolf.github.io/wolf-override/docs/) has
+controls. The [developer setup guide](https://mrdemonwolf.github.io/wolf-override/docs/development/)
+has the local tools and checks. There is no installer or store release yet; run M0 from source.
 
 1. Get [Godot 4.7.2 stable](https://godotengine.org/download/archive/).
 2. Clone the repository:
@@ -111,7 +112,7 @@ To work on the public docs site, install its declared dependencies and
 start the local server:
 
 ```bash
-bun install
+bun install --frozen-lockfile
 bun run docs:dev
 ```
 
