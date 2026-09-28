@@ -16,10 +16,10 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: ReactNode }) {
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
       <body>
         <a className="skip-link" href="#nd-page">Skip to content</a>
-        <RootProvider search={{ enabled: false }} theme={{ enabled: false }}>
+        <RootProvider search={{ enabled: false }} theme={{ defaultTheme: 'dark', enableSystem: false }}>
           {children}
         </RootProvider>
       </body>

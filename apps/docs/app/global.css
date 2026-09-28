@@ -2,7 +2,24 @@
 @import "fumadocs-ui/css/ocean.css";
 @import "fumadocs-ui/css/preset.css";
 
-:root,
+:root {
+  color-scheme: light;
+  --color-fd-background: #f4f9fd;
+  --color-fd-foreground: #122540;
+  --color-fd-muted: #e7f1f8;
+  --color-fd-muted-foreground: #3d5873;
+  --color-fd-card: #ffffff;
+  --color-fd-card-foreground: #122540;
+  --color-fd-popover: #ffffff;
+  --color-fd-popover-foreground: #122540;
+  --color-fd-border: #b8cad9;
+  --color-fd-primary: #006a95;
+  --color-fd-primary-foreground: #ffffff;
+  --color-fd-accent: #d9edf8;
+  --color-fd-accent-foreground: #102f4c;
+  --color-fd-ring: #006a95;
+}
+
 .dark {
   color-scheme: dark;
   --color-fd-background: #091533;
@@ -25,12 +42,13 @@
 html { scroll-behavior: smooth; }
 body {
   margin: 0;
-  background: #091533;
-  color: #eaf4ff;
+  background: var(--color-fd-background);
+  color: var(--color-fd-foreground);
   font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
 }
 a { text-decoration: none; }
-a:focus-visible { outline: 3px solid #8be3ff; outline-offset: 4px; }
+a:focus-visible,
+.theme-toggle:focus-visible { outline: 3px solid var(--color-fd-ring); outline-offset: 4px; }
 .skip-link {
   position: fixed;
   z-index: 100;
@@ -66,6 +84,19 @@ a:focus-visible { outline: 3px solid #8be3ff; outline-offset: 4px; }
   min-height: 5.5rem;
   border-bottom: 1px solid #42617f66;
 }
+.header-actions { display: flex; align-items: center; gap: 1.25rem; }
+.theme-toggle {
+  padding: .45rem .65rem;
+  border: 1px solid #6d94af;
+  border-radius: .35rem;
+  background: transparent;
+  color: #eaf4ff;
+  font: inherit;
+  font-size: .85rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+.theme-toggle:hover { background: #8be3ff24; }
 .wordmark {
   display: inline-flex;
   align-items: center;
@@ -279,6 +310,49 @@ a:focus-visible { outline: 3px solid #8be3ff; outline-offset: 4px; }
   font-size: .8rem;
 }
 .footer-divider { padding-inline: .5rem; color: #8be3ff; }
+:root:not(.dark) .site-shell {
+  background:
+    radial-gradient(ellipse 50% 38% at 80% 17%, #d4eaf6 0%, transparent 72%),
+    linear-gradient(145deg, #f9fcff, #f0f7fc 58%, #e9f3fa);
+}
+:root:not(.dark) .site-header,
+:root:not(.dark) .game-section,
+:root:not(.dark) .stakes-section,
+:root:not(.dark) .site-footer { border-color: #b8cad9; }
+:root:not(.dark) .wordmark,
+:root:not(.dark) .hero h1,
+:root:not(.dark) .game-section h2,
+:root:not(.dark) .stakes-section h2,
+:root:not(.dark) .closing-cta h2,
+:root:not(.dark) .feature-strip strong { color: #122540; }
+:root:not(.dark) .wordmark span,
+:root:not(.dark) .header-link span,
+:root:not(.dark) .hero h1 em,
+:root:not(.dark) .feature-index,
+:root:not(.dark) .footer-divider { color: #006a95; }
+:root:not(.dark) .header-link,
+:root:not(.dark) .text-link { color: #005d85; }
+:root:not(.dark) .header-link:hover,
+:root:not(.dark) .text-link:hover { color: #003d61; }
+:root:not(.dark) .theme-toggle { color: #12344e; border-color: #8caec4; }
+:root:not(.dark) .theme-toggle:hover { background: #d9edf8; }
+:root:not(.dark) .eyebrow { color: #165a79; }
+:root:not(.dark) .signal-dot { background: #006a95; box-shadow: 0 0 12px #006a9566; }
+:root:not(.dark) .hero p,
+:root:not(.dark) .section-lead,
+:root:not(.dark) .stakes-copy p,
+:root:not(.dark) .closing-cta p,
+:root:not(.dark) .feature-strip p { color: #34516c; }
+:root:not(.dark) .hero p.release-note,
+:root:not(.dark) .site-footer { color: #435f79; }
+:root:not(.dark) .button-primary { background: #006a95; border-color: #006a95; color: #ffffff; }
+:root:not(.dark) .button-primary:hover { background: #005578; }
+:root:not(.dark) .text-link { text-decoration-color: #006a9588; }
+:root:not(.dark) .feature-strip > div { background: #ffffffcc; border-color: #b8cad9; }
+:root:not(.dark) .closing-cta {
+  background: radial-gradient(circle at 90% 0%, #c5e7f5, transparent 40%), #e7f3fa;
+  border-color: #a7c7d9;
+}
 @media (max-width: 850px) {
   .hero { grid-template-columns: 1fr; padding-block: 4rem 3rem; }
   .hero-scene { max-height: 370px; }
@@ -286,6 +360,9 @@ a:focus-visible { outline: 3px solid #8be3ff; outline-offset: 4px; }
 }
 @media (max-width: 540px) {
   .site-header, .site-footer, .hero, .game-section, .stakes-section, .closing-cta { width: min(100% - 2rem, 1280px); }
+  .site-header { flex-wrap: wrap; padding-block: 1rem; }
+  .header-actions { width: 100%; justify-content: space-between; gap: .65rem; }
+  .theme-toggle { font-size: .75rem; }
   .hero h1 { font-size: clamp(2.8rem, 12vw, 4rem); }
   .site-footer { flex-direction: column; }
 }
