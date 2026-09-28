@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import ThemeToggle from './theme-toggle';
 
 export default function HomePage() {
   const assetBase = process.env.GITHUB_PAGES === 'true' ? '/wolf-override' : '';
@@ -9,7 +10,10 @@ export default function HomePage() {
           <img src={`${assetBase}/wolf-override-mark.svg`} alt="" width="40" height="40" aria-hidden="true" />
           WOLF<span>//</span>OVERRIDE
         </Link>
-        <Link className="header-link" href="/docs/">Game guide <span aria-hidden="true">↗</span></Link>
+        <div className="header-actions">
+          <ThemeToggle />
+          <Link className="header-link" href="/docs/">Game guide <span aria-hidden="true">↗</span></Link>
+        </div>
       </header>
 
       <section className="hero" aria-labelledby="hero-title">
