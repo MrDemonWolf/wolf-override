@@ -49,6 +49,7 @@ func _run() -> void:
 		return
 	await _tap(&"interact")
 	_expect(state.chapter_complete and game.call("_objective") == "FIRST COPY SECURED", "first chapter resolves after two traces")
+	_expect(str(game.get("status_line")).contains("A list doesn't tell me who's a threat"), "WOLF questions the Director's target labels after the first copy")
 	var saved: Dictionary = state.to_dict()
 	game.call("_new_game")
 	_expect((game.get("state") as M0State).chapter_id == "lockdown", "New Game clears chapter progress")

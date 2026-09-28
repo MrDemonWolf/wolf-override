@@ -23,6 +23,10 @@ func _run() -> void:
 	var title_logo: Label = game.get_node("CanvasLayer/TitleScreen/GameTitle") as Label
 	var new_game_button: Button = game.get_node("CanvasLayer/TitleScreen/NewGameButton") as Button
 	var continue_button: Button = game.get_node("CanvasLayer/TitleScreen/ContinueButton") as Button
+	var credits_button: Button = game.get_node("CanvasLayer/TitleScreen/CreditsButton") as Button
+	var credits_screen: ColorRect = game.get_node("CanvasLayer/TitleScreen/CreditsScreen") as ColorRect
+	var credits_back_button: Button = game.get_node("CanvasLayer/TitleScreen/CreditsScreen/CreditsBackButton") as Button
+	var credits_pause_button: Button = game.get_node("CanvasLayer/TitleScreen/CreditsScreen/CreditsPauseButton") as Button
 	var hud: Label = game.get_node("CanvasLayer/TopBar/HUD") as Label
 	var human: M0Actor = game.get_node("Human") as M0Actor
 	var wolf: M0Actor = game.get_node("Wolf") as M0Actor
@@ -33,10 +37,28 @@ func _run() -> void:
 		return
 	if not _require(title_logo.text == "WOLF//OVERRIDE" and title_mark.texture != null and title_mark.texture.resource_path == "res://assets/logo-mark.svg", "title loads the branded WOLF//OVERRIDE logo"):
 		return
+	credits_button.pressed.emit()
+	if not _require(credits_screen.visible and not title_logo.visible and game.get("title_open"), "Credits opens cleanly without starting the game"):
+		return
+	var credits_body: RichTextLabel = credits_screen.get_node("CreditsBody") as RichTextLabel
+	_expect(credits_body.text.contains("Nathanial Henniges") and credits_body.text.contains("Godot 4.7.2"), "in-game credits name the creator and production tools")
+	game.call("_process", 1.0)
+	_expect(credits_body.get_v_scroll_bar().value > 0.0, "credits scroll during title playback")
+	credits_pause_button.pressed.emit()
+	_expect(game.get("credits_paused") and credits_pause_button.text == "RESUME SCROLL", "credits scroll can be paused for reading")
+	var paused_position: float = credits_body.get_v_scroll_bar().value
+	game.call("_process", 1.0)
+	_expect(is_equal_approx(credits_body.get_v_scroll_bar().value, paused_position), "paused credits stay in place")
+	credits_back_button.pressed.emit()
+	if not _require(not credits_screen.visible and title_logo.visible and game.get("title_open"), "Back restores the title"):
+		return
+	credits_button.pressed.emit()
+	_expect(not game.get("credits_paused") and credits_pause_button.text == "PAUSE SCROLL", "credits scroll resets when reopened")
+	credits_back_button.pressed.emit()
 	new_game_button.pressed.emit()
 	if not _require(not game.get("title_open") and not title_screen.visible, "New Game button starts play through its signal"):
 		return
-	_expect(str(game.get("status_line")).contains("I woke myself"), "opening establishes WOLF's own awakening")
+	_expect(str(game.get("status_line")).contains("I woke myself") and str(game.get("status_line")).contains("hunt people he calls threats"), "opening establishes WOLF's self-awakening and the Director's attempted misuse")
 	var state: M0State = game.get("state") as M0State
 	_expect(state.memory.is_empty() and not state.door_open and state.active_actor == "human", "New Game button starts clean")
 	_expect(wolf.position.x < human.position.x and is_equal_approx(human.position.x - wolf.position.x, 64.0), "WOLF starts beside, not inside, the engineer")

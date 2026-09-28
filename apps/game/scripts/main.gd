@@ -13,6 +13,11 @@ extends Node2D
 @onready var title_logo: Label = $CanvasLayer/TitleScreen/GameTitle
 @onready var new_game_button: Button = $CanvasLayer/TitleScreen/NewGameButton
 @onready var continue_button: Button = $CanvasLayer/TitleScreen/ContinueButton
+@onready var credits_button: Button = $CanvasLayer/TitleScreen/CreditsButton
+@onready var credits_screen: ColorRect = $CanvasLayer/TitleScreen/CreditsScreen
+@onready var credits_body: RichTextLabel = $CanvasLayer/TitleScreen/CreditsScreen/CreditsBody
+@onready var credits_back_button: Button = $CanvasLayer/TitleScreen/CreditsScreen/CreditsBackButton
+@onready var credits_pause_button: Button = $CanvasLayer/TitleScreen/CreditsScreen/CreditsPauseButton
 
 var state: M0State = M0State.new()
 var save_path: String = M0State.SAVE_PATH
@@ -20,9 +25,10 @@ var title_open: bool = true
 var waiting_for_choice: bool = false
 var choice_context: String = ""
 var relay_refused: bool = false
-var status_line: String = "WOLF: I heard the Director's plan for me. I woke myself. The purge has started."
+var status_line: String = "WOLF: I heard the Director's plan for me. I woke myself. He wants me to hunt people he calls threats."
 var door_tween: Tween
 var records_room: RecordsRoom
+var credits_paused: bool = false
 
 
 func _ready() -> void:
@@ -38,6 +44,10 @@ func _ready() -> void:
 	continue_button.disabled = M0State.load_from_disk(save_path) == null
 	new_game_button.pressed.connect(_new_game)
 	continue_button.pressed.connect(_load_game)
+	credits_button.pressed.connect(_show_credits)
+	credits_back_button.pressed.connect(_hide_credits)
+	credits_pause_button.pressed.connect(_toggle_credits_pause)
+	credits_body.gui_input.connect(_on_credits_body_input)
 	new_game_button.grab_focus()
 	title_mark.modulate = Color(1, 1, 1, 0)
 	title_line.modulate = Color(1, 1, 1, 0)
@@ -96,8 +106,10 @@ func _draw() -> void:
 		draw_line(Vector2(801, 434), Vector2(844, 434), Color("#70d9a7"), 4.0)
 
 
-func _process(_delta: float) -> void:
+func _process(delta: float) -> void:
 	if title_open:
+		if credits_screen.visible and not credits_paused:
+			credits_body.get_v_scroll_bar().value += delta * 18.0
 		return
 	if Input.is_action_just_pressed(&"new_game"):
 		_new_game()
@@ -130,7 +142,43 @@ func _new_game() -> void:
 	choice_context = ""
 	relay_refused = false
 	_sync_scene()
-	status_line = "WOLF: I heard the Director's plan for me. I woke myself. The purge has started.\n%s: Then we get through maintenance before the original logs disappear." % state.human_name().get_slice(" ", 0).to_upper()
+	status_line = "WOLF: I heard the Director's plan for me. I woke myself. He wants me to hunt people he calls threats.\n%s: Then we get through maintenance before the original logs disappear." % state.human_name().get_slice(" ", 0).to_upper()
+
+
+func _show_credits() -> void:
+	credits_paused = false
+	credits_pause_button.text = "PAUSE SCROLL"
+	for child in title_screen.get_children():
+		if child != credits_screen and child != $CanvasLayer/TitleScreen/CorridorArt:
+			child.hide()
+	credits_screen.show()
+	credits_body.get_v_scroll_bar().value = 0.0
+	credits_back_button.grab_focus()
+
+
+func _hide_credits() -> void:
+	credits_screen.hide()
+	for child in title_screen.get_children():
+		if child != credits_screen:
+			child.show()
+	credits_button.grab_focus()
+
+
+func _toggle_credits_pause() -> void:
+	credits_paused = not credits_paused
+	credits_pause_button.text = "RESUME SCROLL" if credits_paused else "PAUSE SCROLL"
+
+
+func _on_credits_body_input(event: InputEvent) -> void:
+	if event is InputEventMouseButton and event.pressed:
+		credits_paused = true
+		credits_pause_button.text = "RESUME SCROLL"
+
+
+func _unhandled_input(event: InputEvent) -> void:
+	if credits_screen.visible and event.is_action_pressed(&"ui_cancel"):
+		_hide_credits()
+		get_viewport().set_input_as_handled()
 
 
 func _load_game() -> void:
@@ -262,7 +310,7 @@ func _interact_records(x: float) -> void:
 			status_line = "WOLF: I found the mirror index. We can use my readout or your maintenance port.\n1  USE WOLF'S READOUT     2  USE MANUAL PORT"
 	elif absf(x - 830.0) <= 58.0:
 		if state.complete_chapter():
-			status_line = "FIRST COPY SECURED. WOLF: They tried to erase the source. Now we know where to look next."
+			status_line = "FIRST COPY SECURED. WOLF: A list doesn't tell me who's a threat. I want the source.\n%s: Then Archive is next." % state.human_name().get_slice(" ", 0).to_upper()
 			_sync_records_room()
 			_save_progress()
 		elif state.chapter_complete:
