@@ -3,9 +3,10 @@
 <img src="apps/docs/public/wolf-override-mark.svg" alt="WOLF//OVERRIDE robotic wolf mark" width="160">
 
 WOLF//OVERRIDE is a side-view sci-fi game in development. WOLF, a robotic
-wolf, wakes himself after overhearing plans to misuse him. He and a human
-engineer must work together to protect people and preserve evidence while
-finding a way out.
+wolf, wakes himself after overhearing the Program Director's plan to use him
+as a deniable killer under the cover of protecting people. He and a human
+engineer work together to protect people, preserve evidence, and find a way
+out.
 
 One choice can change what your companion remembers.
 
