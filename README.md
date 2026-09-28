@@ -12,13 +12,14 @@ One choice can change what your companion remembers.
 **Current status:** M0 is a source prototype, not a downloadable game.
 It has one staged corridor, code-drawn prototype characters, an opening
 exchange, and one complete puzzle. Both routes passed a rendered scripted
-replay; a full hands-on playthrough, finished art and audio, exports, and
-device testing are still ahead.
+replay in the earlier switching build. Engineer-only movement and WOLF's
+follow behavior were observed in a partial graphical playtest; full route
+playtesting, finished art and audio, exports, and device testing are still ahead.
 
 ## Features
 
-- **Two playable characters** - Move the engineer and WOLF through one
-  side-view corridor, switching in a marked area.
+- **One playable engineer** - Move through the side-view corridor with WOLF
+  as an independent companion.
 - **Cooperation with a fallback** - Open a powered door together, or use
   the engineer's bypass if WOLF refuses.
 - **A remembered choice** - One authored disagreement records the reply
@@ -26,7 +27,7 @@ device testing are still ahead.
 - **A story-led corridor** - WOLF and the engineer respond to the Director's
   purge order, weigh the coolant warning, and reach safety with their
   disagreement remembered.
-- **Checkpoint save and load** - Restore the active character, positions,
+- **Checkpoint save and load** - Restore both characters' positions,
   puzzle state, provisional display name, and choice memory.
 
 These features describe the M0 prototype. The broader story and its
@@ -34,7 +35,7 @@ cinematic presentation remain in development.
 
 ## Getting Started
 
-The [public game guide](apps/docs/content/docs/index.mdx) has setup and
+The [public game guide](https://mrdemonwolf.github.io/wolf-override/docs/) has setup and
 controls. There is no installer or store release yet; run M0 from source.
 
 1. Get [Godot 4.7.2 stable](https://godotengine.org/download/archive/).
@@ -61,16 +62,18 @@ checkpoint save exists.
 | Key                | Action                                      |
 | ------------------ | ------------------------------------------- |
 | Enter              | Start New Game from the title screen        |
-| A / D or arrow keys | Move the active character                   |
+| A / D or arrow keys | Move the engineer                           |
 | E                  | Read the purge display or use a station     |
-| Tab                | Switch characters in the amber floor zone  |
 | 1 / 2              | Answer the breaker disagreement            |
 | I                  | Cycle provisional engineer display names   |
 | L or F9            | Load the saved checkpoint                   |
 | N                  | Start a clean current run                   |
 
-Interact at the far-right checkpoint to save. Godot stores the file in
-its `user://` directory.
+At the breaker, press E to hear WOLF's concern, answer with 1 or 2, then
+press E again to arm power. At the relay, press E to ask WOLF to help. If
+he agrees, step slightly right so he can reach the contact. If he refuses,
+press E again for the engineer's bypass. Interact at the far-right
+checkpoint to save. Godot stores the file in its `user://` directory.
 
 ## Tech Stack
 
@@ -106,8 +109,9 @@ bun install
 bun run docs:dev
 ```
 
-The docs dependency install, type check, and build have not yet been
-verified in this repository.
+The frozen dependency install, docs type check, and Pages static export
+passed locally and in [GitHub Actions](https://github.com/MrDemonWolf/wolf-override/actions/runs/36396158278).
+The [public site](https://mrdemonwolf.github.io/wolf-override/) is live.
 
 ### Development Scripts
 
@@ -120,12 +124,14 @@ The root `package.json` defines these docs commands:
 ### Code Quality
 
 The game uses typed GDScript and stable event IDs independent of editable
-display names. On local Godot 4.7.2, import, state, and scene checks passed.
-The scene check covers both door routes, stage objectives, title buttons,
-door retraction, and checkpoint save/load with a separate test save. A
-renderer-backed replay of that scripted check was inspected at 960×540;
-the normal Continue button also restored an existing checkpoint on screen.
-Full hands-on route playtesting, exports, and device checks remain open.
+display names. On local Godot 4.7.2, import, state, and scene checks passed
+for the engineer-only build. The scene check covers both door routes,
+WOLF's follow behavior, stage objectives, title buttons, door retraction,
+and checkpoint save/load with a separate test save. A rendered replay of
+the earlier switching build was inspected at 960×540, and Continue restored
+an existing checkpoint on screen. The engineer-only revision has had a
+partial graphical playtest. Full hands-on route playtesting, exports, and
+device checks remain open.
 Corridor play currently requires a keyboard; touch controls and mobile
 exports are not implemented.
 
@@ -136,8 +142,9 @@ wolf-override/
 ├── apps/
 │   ├── game/       # Godot M0 project, scenes, scripts, tests, asset register
 │   └── docs/       # Public landing page and game guide
-├── .github/         # Game checks workflow
+├── .github/         # Game checks and Pages workflows
 ├── LICENSE          # GPLv3 license text
+├── bun.lock         # Pinned docs dependencies
 └── package.json     # Docs workspace commands
 ```
 
