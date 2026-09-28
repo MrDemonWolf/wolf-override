@@ -59,7 +59,7 @@ horizontal_alignment = 1
 text = "ROWAN"
 
 [node name="Wolf" type="CharacterBody2D" parent="."]
-position = Vector2(225, 423)
+position = Vector2(96, 423)
 collision_mask = 2
 script = ExtResource("2_actor")
 actor_id = &"wolf"

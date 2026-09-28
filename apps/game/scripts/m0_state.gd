@@ -1,7 +1,7 @@
 class_name M0State
 extends RefCounted
 
-const SAVE_VERSION: int = 1
+const SAVE_VERSION: int = 2
 const SAVE_PATH: String = "user://m0-save.json"
 const EVENT_ID: String = "relay_disagreement"
 const DISCLOSE: String = "disclose_risk"
@@ -15,7 +15,7 @@ const CHOICE_TEXT = {
 var active_actor: String = "human"
 var name_index: int = 0
 var human_position: Vector2 = Vector2(160.0, 410.0)
-var wolf_position: Vector2 = Vector2(225.0, 423.0)
+var wolf_position: Vector2 = Vector2(96.0, 423.0)
 var memory: Dictionary = {}
 var breaker_armed: bool = false
 var door_open: bool = false
@@ -91,7 +91,7 @@ func to_dict() -> Dictionary:
 	return {
 		"version": SAVE_VERSION,
 		"identity": {"actor_id": "human", "name_index": name_index},
-		"active_actor": active_actor,
+		"active_actor": "human",
 		"positions": {
 			"human": [human_position.x, human_position.y],
 			"wolf": [wolf_position.x, wolf_position.y],
@@ -106,7 +106,7 @@ static func from_dict(raw: Variant) -> M0State:
 	if not (raw is Dictionary):
 		return null
 	var data: Dictionary = raw
-	if not _whole_in_range(data.get("version"), SAVE_VERSION, SAVE_VERSION):
+	if not _whole_in_range(data.get("version"), 1, SAVE_VERSION):
 		return null
 	var raw_identity: Variant = data.get("identity")
 	var raw_positions: Variant = data.get("positions")
@@ -120,7 +120,8 @@ static func from_dict(raw: Variant) -> M0State:
 	var loaded_memory: Dictionary = raw_memory
 	if identity.get("actor_id") != "human" or not _whole_in_range(identity.get("name_index"), 0, HUMAN_NAMES.size() - 1):
 		return null
-	if data.get("active_actor") != "human" and data.get("active_actor") != "wolf":
+	var legacy_wolf_save: bool = data.get("version") == 1 and data.get("active_actor") == "wolf"
+	if data.get("active_actor") != "human" and not legacy_wolf_save:
 		return null
 	if not _valid_position(positions.get("human")) or not _valid_position(positions.get("wolf")):
 		return null
@@ -150,9 +151,11 @@ static func from_dict(raw: Variant) -> M0State:
 		return null
 	var state: M0State = M0State.new()
 	state.name_index = int(identity["name_index"])
-	state.active_actor = str(data["active_actor"])
-	state.human_position = Vector2(float(positions["human"][0]), float(positions["human"][1]))
-	state.wolf_position = Vector2(float(positions["wolf"][0]), float(positions["wolf"][1]))
+	state.active_actor = "human"
+	var human_x: float = float(positions["wolf"][0]) if legacy_wolf_save else float(positions["human"][0])
+	state.human_position = Vector2(human_x, float(positions["human"][1]))
+	var wolf_x: float = clampf(human_x - 64.0, 40.0, 920.0) if legacy_wolf_save else float(positions["wolf"][0])
+	state.wolf_position = Vector2(wolf_x, float(positions["wolf"][1]))
 	state.memory = loaded_memory.duplicate(true)
 	if not state.memory.is_empty():
 		state.memory["sequence"] = int(state.memory["sequence"])

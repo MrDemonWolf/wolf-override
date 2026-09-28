@@ -16,7 +16,6 @@ func _initialize() -> void:
 	_expect(state.activate_power("human") == "fallback" and state.door_open, "human fallback opens door")
 	_expect(state.activate_power("human") == "already_open", "door outcome cannot repeat")
 	_expect(state.reach_checkpoint() and not state.reach_checkpoint(), "checkpoint records once")
-	state.active_actor = "wolf"
 	state.cycle_name()
 	state.human_position = Vector2(605.0, 410.0)
 	state.wolf_position = Vector2(876.0, 423.0)
@@ -24,7 +23,7 @@ func _initialize() -> void:
 	var decoded: M0State = State.from_dict(JSON.parse_string(JSON.stringify(state.to_dict())))
 	_expect(decoded != null, "JSON state restores")
 	if decoded != null:
-		_expect(decoded.active_actor == "wolf" and decoded.name_index == 1, "actor and draft identity restore")
+		_expect(decoded.active_actor == "human" and decoded.name_index == 1, "engineer control and draft identity restore")
 		_expect(decoded.human_position == state.human_position and decoded.wolf_position == state.wolf_position, "positions restore")
 		_expect(decoded.door_open and decoded.route == "fallback" and decoded.breaker_armed, "puzzle restores")
 		_expect(decoded.memory == state.memory, "actual choice restores without duplicate memory")
@@ -39,6 +38,17 @@ func _initialize() -> void:
 	var loaded: M0State = State.load_from_disk(path)
 	_expect(loaded != null and loaded.to_dict() == state.to_dict(), "checkpoint file loads full state")
 	DirAccess.remove_absolute(ProjectSettings.globalize_path(path))
+	var legacy_wolf_save: Dictionary = state.to_dict()
+	legacy_wolf_save["version"] = 1
+	legacy_wolf_save["active_actor"] = "wolf"
+	var migrated: M0State = State.from_dict(legacy_wolf_save)
+	_expect(migrated != null, "legacy WOLF-controlled checkpoint loads")
+	if migrated != null:
+		_expect(migrated.active_actor == "human" and migrated.human_position == Vector2(876.0, 410.0), "legacy checkpoint restores engineer at safe point without wolf-height floor overlap")
+		_expect(migrated.wolf_position == Vector2(812.0, 423.0) and migrated.to_dict()["version"] == State.SAVE_VERSION, "legacy companion restores one follow gap left of engineer")
+	var invalid_new_save: Dictionary = state.to_dict()
+	invalid_new_save["active_actor"] = "wolf"
+	_expect(State.from_dict(invalid_new_save) == null, "new saves cannot restore WOLF control")
 
 	var forged: Dictionary = state.to_dict()
 	forged["memory"]["event_id"] = "future_event"
