@@ -16,6 +16,11 @@ replay in the earlier switching build. Engineer-only movement and WOLF's
 follow behavior were observed in a partial graphical playtest; full route
 playtesting, finished art and audio, exports, and device testing are still ahead.
 
+**Quick play:** You control the engineer while WOLF follows. Go right to the
+breaker (**E → 1 or 2 → E**), then the relay, then the safe point (**E** to
+save). [The step-by-step guide](https://mrdemonwolf.github.io/wolf-override/docs/)
+explains both door routes.
+
 ## Features
 
 - **One playable engineer** - Move through the side-view corridor with WOLF
@@ -69,11 +74,12 @@ checkpoint save exists.
 | L or F9            | Load the saved checkpoint                   |
 | N                  | Start a clean current run                   |
 
-At the breaker, press E to hear WOLF's concern, answer with 1 or 2, then
-press E again to arm power. At the relay, press E to ask WOLF to help. If
-he agrees, step slightly right so he can reach the contact. If he refuses,
-press E again for the engineer's bypass. Interact at the far-right
-checkpoint to save. Godot stores the file in its `user://` directory.
+At the relay, choice **1** lets WOLF help: stand toward the right side so
+he can reach the contact, then press E. If he asks for room, step right and
+press E again. With choice **2**, press E to hear his refusal, then E again
+for the engineer's bypass. Interact at the far-right checkpoint to save.
+Godot stores the file in its `user://` directory. **N** restarts the
+current run without deleting that save.
 
 ## Tech Stack
 

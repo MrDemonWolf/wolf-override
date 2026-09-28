@@ -9,7 +9,7 @@ export default function HomePage() {
           <img src={`${assetBase}/wolf-override-mark.svg`} alt="" width="40" height="40" aria-hidden="true" />
           WOLF<span>//</span>OVERRIDE
         </Link>
-        <Link className="header-link" href="/docs/about/">Game guide <span aria-hidden="true">↗</span></Link>
+        <Link className="header-link" href="/docs/">Game guide <span aria-hidden="true">↗</span></Link>
       </header>
 
       <section className="hero" aria-labelledby="hero-title">
@@ -64,7 +64,7 @@ export default function HomePage() {
         <h2 id="closing-title">Meet WOLF. See what exists.</h2>
         <p>Explore the game&apos;s premise and the current M0 source build. Art, audio, and a downloadable release are still in development.</p>
         <div className="hero-actions">
-          <Link className="button-primary" href="/docs/about/">Read the game guide <span aria-hidden="true">→</span></Link>
+          <Link className="button-primary" href="/docs/">Read the game guide <span aria-hidden="true">→</span></Link>
           <Link className="text-link" href="/docs/development/">See what&apos;s built</Link>
         </div>
       </section>
