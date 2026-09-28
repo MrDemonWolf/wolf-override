@@ -170,6 +170,9 @@ drafts and production notes live in Notion. Record an asset's origin and
 rights in [the asset register](apps/game/assets/manifest.json) before
 adding it to the game.
 
+The [game quality guide](AGENT.md) sets the shared bar for playable scenes,
+companion behavior, accessibility and honest playtest claims.
+
 ## Credits
 
 Original game and core story idea by Nathanial Henniges. Developed by

@@ -3,7 +3,7 @@
 .DS_Store
 
 # Internal Revision 4 design and handoff files live in Notion.
-/AGENTS.md
+/PRIVATE_AGENTS.md
 /PROJECT_CONTEXT.md
 /CHATGPT_PROJECT_INSTRUCTIONS.md
 /CODEX_HANDOFF.md
