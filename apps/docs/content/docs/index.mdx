@@ -1,44 +1,76 @@
 ---
 title: Play the first corridor
-description: Open and play the first WOLF//OVERRIDE story corridor.
+description: Start M0 and follow the breaker, relay, and safe point.
 ---
 
-WOLF//OVERRIDE is in its first playable prototype stage. M0 is one staged side-view corridor with two code-drawn characters, a door puzzle with cooperative and fallback routes, one remembered choice, and a safe point. There is no downloadable release yet.
+**You play the engineer.** WOLF follows as an independent companion. In this source prototype, your goal is to open one sealed door and reach the safe point. WOLF remembers what you say during the puzzle.
 
-For the spoiler-safe premise and gameplay direction, see [About the game](/docs/about/). [Development status](/docs/development/) separates the current source build from future plans.
+**Your path:** Breaker → Relay → Safe point. Follow the objective at the top of the game screen if you lose your place.
 
-## Open the game
+This game currently runs from Godot source. The website is a guide; there is no browser game or downloadable build yet.
 
-Install Godot **4.7.2 stable**, then run from the repository root:
+## 1. Start New Game
 
-```sh
-godot --path apps/game --editor
-```
-
-Press **F5** in the editor to run the project, or use the **Run Project** button. To start the game directly:
+**Already have the repository?** With [Godot **4.7.2 stable**](https://godotengine.org/download/archive/) installed, run this from the repository root:
 
 ```sh
 godot --path apps/game
 ```
 
-## Controls
+**Need the source first?** Clone it, then launch the game:
+
+```sh
+git clone https://github.com/MrDemonWolf/wolf-override.git
+cd wolf-override
+godot --path apps/game
+```
+
+Choose **New Game** on the title screen.
+
+## 2. Use the breaker
+
+Move right to the **amber BREAKER**. Press **E** to hear WOLF's concern about the coolant risk. Press **1** or **2** to answer, then press **E** again to arm power.
+
+Your answer changes how WOLF responds at the relay. It is remembered at the safe point; it is not an instant game ending.
+
+## 3. Open the door at the relay
+
+Continue right to the **blue COOLANT RELAY**.
+
+- **If you chose 1 (tell WOLF the risk):** Stand toward the right side of the relay so WOLF can reach its contact, then press **E**. If he asks for room, move a few steps right while the relay prompt stays visible and press **E** again.
+- **If you chose 2 (press WOLF to act):** Press **E** to hear his refusal. Press **E** again to use the engineer's manual bypass. You can still open the door.
+
+## 4. Save at the safe point
+
+Walk through the open door to the **green SAFE POINT** and press **E**. WOLF recalls the answer you actually chose. The checkpoint saves both characters' positions, door state, name, and choice.
+
+On the title screen, **Continue** becomes available when a valid checkpoint exists. During play, **L** or **F9** loads it. **N** starts a clean current run; it does not delete the checkpoint file.
+
+## Keys to remember
 
 | Key | Action |
 | --- | --- |
 | A / D or arrow keys | Move the engineer |
-| E | Read the purge display or interact with a station |
-| 1 / 2 | Answer the corridor disagreement |
+| E | Interact with a station |
+| 1 / 2 | Answer WOLF at the breaker |
+
+### More keys
+
+| Key | Action |
+| --- | --- |
 | I | Cycle provisional engineer display names |
 | L or F9 | Load the saved checkpoint |
-| N | Start a clean New Game |
+| N | Restart the current run |
 
-At the breaker, press E to hear WOLF's concern, choose 1 or 2, then press E again to arm power. At the relay, press E to ask for help. If WOLF agrees, step slightly right to give him room at the contact. If he refuses, press E again for the engineer's bypass. The far-right safe point saves when you interact with it.
+At the far-left **red PURGE DISPLAY**, **E** shows optional story context. It is not required to open the door. Corridor play currently requires a keyboard; touch controls and mobile exports have not been implemented.
 
-The opening exchange and purge display establish WOLF's self-awakening and the Director's attempt to erase records.
+## What exists today
 
-Corridor play currently requires a keyboard. Touch controls and mobile exports have not been implemented.
+M0 is one prototype corridor with placeholder characters and art. [About the game](/docs/about/) explains the wider premise; [development status](/docs/development/) separates built features from plans.
 
-## Check the source
+Godot 4.7.2 headless import, state, and scene checks passed for the engineer-only build. A partial graphical playtest covered movement and WOLF's follow behavior. A full hands-on play of both current routes, exports, and device tests remain open.
+
+## Developer checks
 
 These commands check import, state logic, both door routes, and checkpoint save/load through the scene. They do not prove graphical play or exported builds.
 
@@ -47,5 +79,3 @@ godot --headless --path apps/game --import
 godot --headless --path apps/game --script res://tests/m0_state_test.gd
 godot --headless --path apps/game --script res://tests/m0_scene_test.gd
 ```
-
-The engineer-only build passed headless import, state, and scene checks locally. Movement and WOLF's follow behavior were observed in a partial graphical playtest. The earlier switching build was inspected in a rendered scripted replay at 960×540, and Continue restored an existing checkpoint on screen. A full graphical playthrough of both current routes, finished character/environment art, audio, export packages, and device tests remain open.
