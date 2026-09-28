@@ -1,11 +1,11 @@
 ---
-title: Play the first corridor
-description: Start M0 and follow the breaker, relay, and safe point.
+title: Play the first chapter slice
+description: Open the first door, then secure a first copy in Records Access.
 ---
 
-**You play the engineer.** WOLF follows as an independent companion. In this source prototype, your goal is to open one sealed door and reach the safe point. WOLF remembers what you say during the puzzle.
+**You play the engineer.** WOLF follows and takes a task of his own. In this source build, open the first sealed door, then secure a first copy in Records Access. WOLF remembers what you say during the door puzzle.
 
-**Your path:** Breaker → Relay → Safe point. Follow the objective at the top of the game screen if you lose your place.
+**Your path:** Breaker → Relay → Safe point → Purge queue → Mirror port → Exit. Follow the objective at the top of the game screen if you lose your place.
 
 This game currently runs from Godot source. The website is a guide; there is no browser game or downloadable build yet.
 
@@ -42,9 +42,19 @@ Continue right to the **blue COOLANT RELAY**.
 
 ## 4. Save at the safe point
 
-Walk through the open door to the **green SAFE POINT** and press **E**. WOLF recalls the answer you actually chose. The checkpoint saves both characters' positions, door state, name, and choice.
+Walk through the open door to the **green SAFE POINT** and press **E**. WOLF recalls the answer you actually chose. The checkpoint saves both characters' positions, door state, name, and choice. Press **E** again to enter **Records Access**.
 
-On the title screen, **Continue** becomes available when a valid checkpoint exists. During play, **L** or **F9** loads it. **N** starts a clean current run; it does not delete the checkpoint file.
+On the title screen, **Continue** becomes available when a valid checkpoint exists. During play, **L** or **F9** loads your saved progress. **N** starts a clean current run; it does not delete the save file.
+
+## 5. Secure the first copy
+
+In Records Access, the engineer stays playable while WOLF heads toward the mirror on his own.
+
+1. Go to the **purge queue** on the left and press **E** to copy its trace.
+2. Go to the **mirror port** in the middle and press **E**. Press **1** after WOLF arrives to use his readout, or **2** to use the engineer's manual maintenance port. If WOLF is still checking, wait for him or choose the manual port.
+3. Go to the **exit** on the right and press **E**. The first copy is secured, and **Continue** restores the room and your progress.
+
+These two traces provide a first lead. They are not a complete case against the Director.
 
 ## Keys to remember
 
@@ -52,7 +62,7 @@ On the title screen, **Continue** becomes available when a valid checkpoint exis
 | --- | --- |
 | A / D or arrow keys | Move the engineer |
 | E | Interact with a station |
-| 1 / 2 | Answer WOLF at the breaker |
+| 1 / 2 | Answer at the breaker or mirror port |
 
 ### More keys
 
@@ -66,16 +76,17 @@ At the far-left **red PURGE DISPLAY**, **E** shows optional story context. It is
 
 ## What exists today
 
-M0 is one prototype corridor with placeholder characters and art. [About the game](/docs/about/) explains the wider premise; [development status](/docs/development/) separates built features from plans.
+The first chapter slice has two prototype rooms with placeholder characters and art. [About the game](/docs/about/) explains the wider premise; [development status](/docs/development/) separates built features from plans.
 
-Godot 4.7.2 headless import, state, and scene checks passed for the engineer-only build. A partial graphical playtest covered movement and WOLF's follow behavior. A full hands-on play of both current routes, exports, and device tests remain open.
+Godot 4.7.2 headless import, state, M0 scene, and chapter scene checks passed. A partial graphical playtest covered movement and WOLF's follow behavior in the first corridor. Three rendered Records Access frames were inspected, but its routes have not been played by hand. Exports and device tests remain open.
 
 ## Developer checks
 
-These commands check import, state logic, both door routes, and checkpoint save/load through the scene. They do not prove graphical play or exported builds.
+These commands check import, state logic, both door and mirror routes, and chapter save/load through the scenes. They do not prove graphical play or exported builds.
 
 ```sh
 godot --headless --path apps/game --import
 godot --headless --path apps/game --script res://tests/m0_state_test.gd
 godot --headless --path apps/game --script res://tests/m0_scene_test.gd
+godot --headless --path apps/game --script res://tests/chapter_scene_test.gd
 ```

@@ -44,9 +44,9 @@ export default function HomePage() {
       <section className="game-section" aria-labelledby="game-title">
         <span className="eyebrow">01 / What you do</span>
         <h2 id="game-title">Two minds. One way forward.</h2>
-        <p className="section-lead">The M0 source prototype tests the relationship at the heart of the game in a single side-view corridor.</p>
+        <p className="section-lead">The first playable chapter slice begins in a side-view corridor and continues into Records Access.</p>
         <div className="feature-strip">
-          <div><span className="feature-index">01 /</span><strong>Play the engineer</strong><p>Move through the corridor with WOLF beside you as an independent companion.</p></div>
+          <div><span className="feature-index">01 /</span><strong>Play the engineer</strong><p>Move through two rooms with WOLF beside you as an independent companion.</p></div>
           <div><span className="feature-index">02 /</span><strong>Solve it together</strong><p>Open the route through cooperation, or use the engineer&apos;s fallback when WOLF refuses.</p></div>
           <div><span className="feature-index">03 /</span><strong>Live with a choice</strong><p>Choose a response in one disagreement and hear WOLF remember it later.</p></div>
         </div>
@@ -66,7 +66,7 @@ export default function HomePage() {
       <section className="closing-cta" aria-labelledby="closing-title">
         <span className="eyebrow">The story starts here</span>
         <h2 id="closing-title">Meet WOLF. See what exists.</h2>
-        <p>Explore the game&apos;s premise and the current M0 source build. Art, audio, and a downloadable release are still in development.</p>
+        <p>Explore the game&apos;s premise and the current two-room source build. Art, audio, and a downloadable release are still in development.</p>
         <div className="hero-actions">
           <Link className="button-primary" href="/docs/">Read the game guide <span aria-hidden="true">→</span></Link>
           <Link className="text-link" href="/docs/development/">See what&apos;s built</Link>
