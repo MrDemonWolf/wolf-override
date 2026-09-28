@@ -185,7 +185,7 @@ offset_right = 850.0
 offset_bottom = 313.0
 theme_override_colors/font_color = Color(0.68, 0.78, 0.85, 1)
 theme_override_font_sizes/font_size = 20
-text = "LOCKDOWN  /  FIRST CORRIDOR"
+text = "CHAPTER 1  /  LOCKDOWN"
 
 [node name="NewGameButton" type="Button" parent="CanvasLayer/TitleScreen"]
 offset_left = 300.0

@@ -9,22 +9,22 @@ finding a way out.
 
 One choice can change what your companion remembers.
 
-**Current status:** M0 is a source prototype, not a downloadable game.
-It has one staged corridor, code-drawn prototype characters, an opening
-exchange, and one complete puzzle. Both routes passed a rendered scripted
-replay in the earlier switching build. Engineer-only movement and WOLF's
-follow behavior were observed in a partial graphical playtest; full route
-playtesting, finished art and audio, exports, and device testing are still ahead.
+**Current status:** The first playable chapter slice runs from source; there
+is no download yet. It has a staged corridor, a second records room,
+code-drawn prototype characters, one door puzzle, and a first record-copying
+objective. Finished art and audio, the wider campaign, exports, and device
+testing are still ahead.
 
-**Quick play:** You control the engineer while WOLF follows. Go right to the
-breaker (**E → 1 or 2 → E**), then the relay, then the safe point (**E** to
-save). [The step-by-step guide](https://mrdemonwolf.github.io/wolf-override/docs/)
-explains both door routes.
+**Quick play:** You control the engineer. Open the corridor door, save at the
+safe point, then press **E** again to enter Records Access. Copy the purge
+trace, use WOLF's mirror readout or the engineer's manual port, and reach the
+exit. [The step-by-step guide](https://mrdemonwolf.github.io/wolf-override/docs/)
+shows each step.
 
 ## Features
 
-- **One playable engineer** - Move through the side-view corridor with WOLF
-  as an independent companion.
+- **One playable engineer** - Move through two side-view rooms while WOLF
+  follows and takes an independent task.
 - **Cooperation with a fallback** - Open a powered door together, or use
   the engineer's bypass if WOLF refuses.
 - **A remembered choice** - One authored disagreement records the reply
@@ -32,17 +32,19 @@ explains both door routes.
 - **A story-led corridor** - WOLF and the engineer respond to the Director's
   purge order, weigh the coolant warning, and reach safety with their
   disagreement remembered.
+- **A first records objective** - Preserve a purge-order trace and a mirror
+  timestamp using WOLF's readout or the engineer's maintenance port.
 - **Checkpoint save and load** - Restore both characters' positions,
-  puzzle state, provisional display name, and choice memory.
+  puzzle and chapter progress, provisional display name, and choice memory.
 
-These features describe the M0 prototype. The broader story and its
-cinematic presentation remain in development.
+This is one chapter slice, not the full investigation or campaign. Its wider
+story and cinematic presentation remain in development.
 
 ## Getting Started
 
 The [public game guide](https://mrdemonwolf.github.io/wolf-override/docs/) has
 controls. The [developer setup guide](https://mrdemonwolf.github.io/wolf-override/docs/development/)
-has the local tools and checks. There is no installer or store release yet; run M0 from source.
+has the local tools and checks. There is no installer or store release yet; run the game from source.
 
 1. Get [Godot 4.7.2 stable](https://godotengine.org/download/archive/).
 2. Clone the repository:
@@ -69,8 +71,8 @@ checkpoint save exists.
 | ------------------ | ------------------------------------------- |
 | Enter              | Start New Game from the title screen        |
 | A / D or arrow keys | Move the engineer                           |
-| E                  | Read the purge display or use a station     |
-| 1 / 2              | Answer the breaker disagreement            |
+| E                  | Read, use a station, or enter Records Access |
+| 1 / 2              | Answer at the breaker or mirror port        |
 | I                  | Cycle provisional engineer display names   |
 | L or F9            | Load the saved checkpoint                   |
 | N                  | Start a clean current run                   |
@@ -78,9 +80,13 @@ checkpoint save exists.
 At the relay, choice **1** lets WOLF help: stand toward the right side so
 he can reach the contact, then press E. If he asks for room, step right and
 press E again. With choice **2**, press E to hear his refusal, then E again
-for the engineer's bypass. Interact at the far-right checkpoint to save.
-Godot stores the file in its `user://` directory. **N** restarts the
-current run without deleting that save.
+for the engineer's bypass. Press **E** at the far-right checkpoint to save,
+then **E** again to enter Records Access. Copy the purge-order trace at the
+first station. WOLF heads to the mirror himself; press **E** there, then **1**
+after he arrives for his readout or **2** for the manual port. Press **E** at
+the exit to secure the first copy. Continue restores chapter progress. Godot
+stores the save in its `user://` directory; **N** restarts the current run
+without deleting it.
 
 ## Tech Stack
 
@@ -106,6 +112,7 @@ From the repository root, run the game checks:
 godot --headless --path apps/game --import
 godot --headless --path apps/game --script res://tests/m0_state_test.gd
 godot --headless --path apps/game --script res://tests/m0_scene_test.gd
+godot --headless --path apps/game --script res://tests/chapter_scene_test.gd
 ```
 
 To work on the public docs site, install its declared dependencies and
@@ -131,14 +138,13 @@ The root `package.json` defines these docs commands:
 ### Code Quality
 
 The game uses typed GDScript and stable event IDs independent of editable
-display names. On local Godot 4.7.2, import, state, and scene checks passed
-for the engineer-only build. The scene check covers both door routes,
-WOLF's follow behavior, stage objectives, title buttons, door retraction,
-and checkpoint save/load with a separate test save. A rendered replay of
-the earlier switching build was inspected at 960×540, and Continue restored
-an existing checkpoint on screen. The engineer-only revision has had a
-partial graphical playtest. Full hands-on route playtesting, exports, and
-device checks remain open.
+display names. On local Godot 4.7.2, headless import, state, M0 scene, and
+chapter scene checks passed. The scene checks cover both door routes, both
+mirror routes, and Continue restoring chapter progress with separate test
+saves. A partial graphical playtest covered engineer movement and WOLF's
+follow behavior in the first corridor. Three rendered Records Access frames
+were inspected; its routes have not been played by hand. Exports and device
+checks remain unrun.
 Corridor play currently requires a keyboard; touch controls and mobile
 exports are not implemented.
 
@@ -147,7 +153,7 @@ exports are not implemented.
 ```text
 wolf-override/
 ├── apps/
-│   ├── game/       # Godot M0 project, scenes, scripts, tests, asset register
+│   ├── game/       # Godot project, scenes, scripts, tests, asset register
 │   └── docs/       # Public landing page and game guide
 ├── .github/         # Game checks and Pages workflows
 ├── LICENSE          # GPLv3 license text

@@ -18,14 +18,21 @@ var state: M0State = M0State.new()
 var save_path: String = M0State.SAVE_PATH
 var title_open: bool = true
 var waiting_for_choice: bool = false
+var choice_context: String = ""
 var relay_refused: bool = false
 var status_line: String = "WOLF: I heard the Director's plan for me. I woke myself. The purge has started."
 var door_tween: Tween
+var records_room: RecordsRoom
 
 
 func _ready() -> void:
 	get_window().title = "WOLF//OVERRIDE"
 	_install_inputs()
+	records_room = RecordsRoom.new()
+	records_room.z_index = 1
+	add_child(records_room)
+	human.z_index = 2
+	wolf.z_index = 2
 	_sync_scene()
 	_refresh_ui()
 	continue_button.disabled = M0State.load_from_disk(save_path) == null
@@ -98,9 +105,15 @@ func _process(_delta: float) -> void:
 		_load_game()
 	elif waiting_for_choice:
 		if Input.is_action_just_pressed(&"choice_1"):
-			_choose(M0State.DISCLOSE)
+			if choice_context == "mirror":
+				_choose_mirror("wolf")
+			else:
+				_choose(M0State.DISCLOSE)
 		elif Input.is_action_just_pressed(&"choice_2"):
-			_choose(M0State.PRESS)
+			if choice_context == "mirror":
+				_choose_mirror("manual")
+			else:
+				_choose(M0State.PRESS)
 	elif Input.is_action_just_pressed(&"cycle_name"):
 		state.cycle_name()
 		status_line = "WOLF: %s. That name sounds like you." % state.human_name()
@@ -114,6 +127,7 @@ func _new_game() -> void:
 	title_screen.hide()
 	state = M0State.new()
 	waiting_for_choice = false
+	choice_context = ""
 	relay_refused = false
 	_sync_scene()
 	status_line = "WOLF: I heard the Director's plan for me. I woke myself. The purge has started.\n%s: Then we get through maintenance before the original logs disappear." % state.human_name().get_slice(" ", 0).to_upper()
@@ -128,13 +142,20 @@ func _load_game() -> void:
 	title_screen.hide()
 	state = loaded
 	waiting_for_choice = false
+	choice_context = ""
 	relay_refused = false
 	_sync_scene()
-	status_line = "Safe point restored. " + state.checkpoint_callback()
+	if state.chapter_id == "records":
+		status_line = "Records access restored. WOLF is checking the mirror." if not state.chapter_complete else "The first copy is safe. The Archive trail is next."
+	else:
+		status_line = "Safe point restored. " + state.checkpoint_callback()
 
 
 func _interact() -> void:
 	var x: float = human.position.x
+	if state.chapter_id == "records":
+		_interact_records(x)
+		return
 	if x <= 230.0:
 		status_line = "DIRECTOR / PURGE: Original program logs marked for deletion.\nWOLF: They want the source record gone. We need to preserve it."
 	elif absf(x - 350.0) <= 52.0:
@@ -150,6 +171,7 @@ func _interact() -> void:
 func _interact_breaker() -> void:
 	if state.memory.is_empty():
 		waiting_for_choice = true
+		choice_context = "relay"
 		_update_controls()
 		status_line = "WOLF: You know what 'coolant fault' means. What happens if I touch the live relay?\n1  \"%s\"\n2  \"%s\"" % [M0State.CHOICE_TEXT[M0State.DISCLOSE], M0State.CHOICE_TEXT[M0State.PRESS]]
 	elif state.arm_breaker():
@@ -163,6 +185,7 @@ func _choose(choice_id: String) -> void:
 	if not state.record_choice(choice_id):
 		return
 	waiting_for_choice = false
+	choice_context = ""
 	_update_controls()
 	if choice_id == M0State.DISCLOSE:
 		status_line = "WOLF: Thank you for telling me. I'll take the relay. Arm the breaker."
@@ -198,6 +221,13 @@ func _interact_checkpoint() -> void:
 	if not state.door_open:
 		status_line = "The safe point is past the sealed door."
 		return
+	if state.checkpoint_reached:
+		if state.enter_records():
+			_sync_scene()
+			var remembered_line: String = "I refused the live relay; I'm still here." if state.memory.get("choice_id") == M0State.PRESS else "I chose the relay. I'm checking this path too."
+			status_line = "WOLF: %s\nTake the purge queue. I'll inspect the mirror." % remembered_line
+			_save_progress()
+		return
 	var first_visit: bool = state.reach_checkpoint()
 	queue_redraw()
 	_capture_positions()
@@ -209,6 +239,62 @@ func _interact_checkpoint() -> void:
 		status_line = "Safe point saved. " + state.checkpoint_callback()
 	else:
 		status_line = "Safe point saved. WOLF remembers the same choice."
+
+
+func _interact_records(x: float) -> void:
+	if absf(x - 190.0) <= 58.0:
+		if state.preserve_purge_trace():
+			status_line = "The Director's purge order has a time and target ID. %s keeps a local copy; the original logs are still missing." % state.human_name().get_slice(" ", 0)
+		else:
+			status_line = "The purge-order trace is already copied. The mirror port may confirm when the source existed."
+		_sync_records_room()
+		_save_progress()
+	elif absf(x - 520.0) <= 58.0:
+		if not state.purge_trace_preserved:
+			status_line = "The mirror index has no context yet. Copy the purge-order trace first."
+		elif state.mirror_trace_preserved:
+			status_line = "The mirror timestamp is already preserved. The exit is to the right."
+			_save_progress()
+		else:
+			waiting_for_choice = true
+			choice_context = "mirror"
+			_update_controls()
+			status_line = "WOLF: I found the mirror index. We can use my readout or your maintenance port.\n1  USE WOLF'S READOUT     2  USE MANUAL PORT"
+	elif absf(x - 830.0) <= 58.0:
+		if state.complete_chapter():
+			status_line = "FIRST COPY SECURED. WOLF: They tried to erase the source. Now we know where to look next."
+			_sync_records_room()
+			_save_progress()
+		elif state.chapter_complete:
+			status_line = "The first copy is safe. The Archive trail is next."
+			_save_progress()
+		else:
+			status_line = "Exit sealed until the purge order and mirror timestamp are copied."
+	else:
+		status_line = "Follow the station lights: purge queue, mirror port, then exit."
+
+
+func _choose_mirror(route_id: String) -> void:
+	if route_id == "wolf" and absf(wolf.position.x - 520.0) > 42.0:
+		status_line = "WOLF: I'm still checking the drive. Wait for me, or press 2 for the manual port."
+		return
+	if not state.preserve_mirror_trace(route_id):
+		return
+	waiting_for_choice = false
+	choice_context = ""
+	_update_controls()
+	if route_id == "wolf":
+		status_line = "WOLF brings the mirror timestamp by his own choice. The purge target existed before the deletion order."
+	else:
+		status_line = "%s copies the timestamp through the maintenance port. WOLF keeps watch." % state.human_name().get_slice(" ", 0)
+	_sync_records_room()
+	_save_progress()
+
+
+func _save_progress() -> void:
+	_capture_positions()
+	if not state.save_to_disk(save_path):
+		status_line += " Save failed; interact here again to retry."
 
 
 func _capture_positions() -> void:
@@ -223,6 +309,15 @@ func _sync_scene() -> void:
 	wolf.velocity = Vector2.ZERO
 	_update_controls()
 	_sync_door()
+	_sync_records_room()
+
+
+func _sync_records_room() -> void:
+	records_room.visible = state.chapter_id == "records"
+	records_room.purge_trace_preserved = state.purge_trace_preserved
+	records_room.mirror_trace_preserved = state.mirror_trace_preserved
+	records_room.chapter_complete = state.chapter_complete
+	records_room.queue_redraw()
 
 
 func _sync_door(animate: bool = false) -> void:
@@ -230,7 +325,7 @@ func _sync_door(animate: bool = false) -> void:
 		door_tween.kill()
 	door_shape.set_deferred("disabled", state.door_open)
 	door_visual.scale = Vector2.ONE
-	door_visual.visible = not state.door_open or animate
+	door_visual.visible = state.chapter_id == "lockdown" and (not state.door_open or animate)
 	if state.door_open and animate:
 		door_tween = create_tween()
 		door_tween.tween_property(door_visual, "scale:y", 0.0, 0.38).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_IN)
@@ -241,7 +336,8 @@ func _sync_door(animate: bool = false) -> void:
 func _update_controls() -> void:
 	human.controlled = not title_open and not waiting_for_choice
 	wolf.controlled = false
-	wolf.follow_target = human if human.controlled else null
+	wolf.autonomous_target_x = 520.0 if state.chapter_id == "records" and not state.mirror_trace_preserved else -1.0
+	wolf.follow_target = human if human.controlled and wolf.autonomous_target_x < 0.0 else null
 	human.queue_redraw()
 	wolf.queue_redraw()
 
@@ -249,14 +345,27 @@ func _update_controls() -> void:
 func _refresh_ui() -> void:
 	var door_status: String = "OPEN" if state.door_open else "SEALED"
 	human_tag.text = state.human_name().get_slice(" ", 0).to_upper()
-	hud.text = "MAINTENANCE / LOCKDOWN     OBJECTIVE: %s     CONTROL: %s     SEAL: %s\nA/D MOVE   E INTERACT   1/2 REPLY   I NAME   L LOAD   N RESTART" % [_objective(), state.human_name(), door_status]
+	if state.chapter_id == "records":
+		hud.text = "LOCKDOWN / FIRST COPY     OBJECTIVE: %s     CONTROL: %s\nA/D MOVE   E INTERACT   1/2 REPLY   I NAME   L LOAD   N RESTART" % [_objective(), state.human_name()]
+	else:
+		hud.text = "MAINTENANCE / LOCKDOWN     OBJECTIVE: %s     CONTROL: %s     SEAL: %s\nA/D MOVE   E INTERACT   1/2 REPLY   I NAME   L LOAD   N RESTART" % [_objective(), state.human_name(), door_status]
 	story.text = status_line if waiting_for_choice else status_line + "\n" + _context_hint()
 
 
 func _context_hint() -> String:
 	var x: float = human.position.x
+	if state.chapter_id == "records":
+		if state.chapter_complete:
+			return "Chapter 1 complete. The preserved trail points toward Archive."
+		if absf(x - 190.0) <= 58.0:
+			return "E: copy the purge-order trace." if not state.purge_trace_preserved else "Purge order copied. Find the mirror port."
+		if absf(x - 520.0) <= 58.0:
+			return "E: examine the mirror port." if state.purge_trace_preserved else "Copy the purge order first."
+		if absf(x - 830.0) <= 58.0:
+			return "E: secure the first copy." if state.mirror_trace_preserved else "Preserve both traces before leaving."
+		return "Follow the lit floor line to the next station."
 	if state.checkpoint_reached:
-		return "Safe for now. The Director's purge is still running."
+		return "E: enter records access. The Director's purge is still running."
 	if state.door_open:
 		if absf(x - 876.0) <= 52.0:
 			return "E: save at the safe point."
@@ -281,6 +390,14 @@ func _context_hint() -> String:
 
 
 func _objective() -> String:
+	if state.chapter_id == "records":
+		if state.chapter_complete:
+			return "FIRST COPY SECURED"
+		if not state.purge_trace_preserved:
+			return "COPY PURGE ORDER"
+		if not state.mirror_trace_preserved:
+			return "COPY MIRROR INDEX"
+		return "REACH EXIT"
 	if state.checkpoint_reached:
 		return "CORRIDOR CLEARED"
 	if state.door_open:

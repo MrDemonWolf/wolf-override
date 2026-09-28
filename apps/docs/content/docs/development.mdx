@@ -3,7 +3,7 @@ title: Development setup and status
 description: Run the source game and docs locally, then see what has been checked.
 ---
 
-WOLF//OVERRIDE is in early development. Its current milestone is **M0**, a source prototype of one side-view corridor. There is no public download, release date, or announced price.
+WOLF//OVERRIDE is in early development. The current source build has a first playable chapter slice: the original side-view corridor and a second Records Access room. There is no public download, release date, or announced price.
 
 ## Set up on macOS
 
@@ -22,7 +22,7 @@ WOLF//OVERRIDE is in early development. Its current milestone is **M0**, a sourc
    godot --path apps/game --editor
    ```
 
-   To launch the game directly after importing it, run `godot --path apps/game`. The [play guide](/docs/) walks through the corridor and both door routes.
+   To launch the game directly after importing it, run `godot --path apps/game`. The [play guide](/docs/) walks through the door puzzle and Records Access.
 4. To run the public docs site locally, use a second terminal in the repository root:
 
    ```sh
@@ -40,25 +40,27 @@ From the repository root:
 godot --headless --path apps/game --import
 godot --headless --path apps/game --script res://tests/m0_state_test.gd
 godot --headless --path apps/game --script res://tests/m0_scene_test.gd
+godot --headless --path apps/game --script res://tests/chapter_scene_test.gd
 bun run docs:check
 GITHUB_PAGES=true bun run docs:build
 ```
 
-The Godot commands check import, state logic, both scripted door routes, and checkpoint save/load. The Bun commands check docs types and build the static Pages site. Headless checks cannot confirm the on-screen feel; exports and device tests are separate work.
+The Godot commands check import, state logic, both scripted door routes, both Records Access mirror routes, and save/load. The Bun commands check docs types and build the static Pages site. Headless checks cannot confirm the on-screen feel; exports and device tests are separate work.
 
-## In the M0 source build
+## In the current source build
 
 - Two distinguishable placeholder characters: the engineer is playable and WOLF accompanies him without player switching.
 - A power and door puzzle with a cooperative route and a human fallback if WOLF refuses.
 - One authored disagreement, a saved choice with a later callback, and a safe checkpoint.
 - A first exchange, readable purge display, and objectives that follow each puzzle step.
-- New Game and versioned save/load state for the current corridor.
+- A second room where the engineer copies a purge-order trace, then uses WOLF's independent mirror readout or a manual maintenance port to preserve a timestamp.
+- New Game and versioned save/load for both rooms, positions, and chapter progress.
 
-These are prototype features, not a complete campaign. [Play the M0 source](/docs/) explains how to open it in Godot 4.7.2.
+These are prototype features, not a complete investigation or campaign. [Play the source build](/docs/) explains how to open it in Godot 4.7.2.
 
 ## Checked so far
 
-Godot 4.7.2 headless import, deterministic state checks, and a scene check of both routes and checkpoint save/load passed locally for the engineer-only build. Engineer movement and WOLF's follow behavior were observed in a partial graphical playtest. A rendered scripted replay of the earlier switching build was inspected at 960×540, and Continue restored an existing checkpoint on screen. A full hands-on keyboard playthrough of both current routes, export, and device test have not been run.
+Godot 4.7.2 headless import, deterministic state checks, M0 scene checks, and chapter scene checks passed locally. The scene checks exercise both door routes, both mirror routes, and Continue restoring chapter progress. Engineer movement and WOLF's follow behavior were observed in a partial graphical playtest of the first corridor. Three rendered Records Access frames were inspected, but its routes have not been played by hand. Export and device tests have not been run.
 
 ## Still to come
 

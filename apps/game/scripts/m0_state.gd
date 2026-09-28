@@ -1,7 +1,7 @@
 class_name M0State
 extends RefCounted
 
-const SAVE_VERSION: int = 2
+const SAVE_VERSION: int = 3
 const SAVE_PATH: String = "user://m0-save.json"
 const EVENT_ID: String = "relay_disagreement"
 const DISCLOSE: String = "disclose_risk"
@@ -21,6 +21,11 @@ var breaker_armed: bool = false
 var door_open: bool = false
 var route: String = ""
 var checkpoint_reached: bool = false
+var chapter_id: String = "lockdown"
+var purge_trace_preserved: bool = false
+var mirror_trace_preserved: bool = false
+var mirror_route: String = ""
+var chapter_complete: bool = false
 
 
 func human_name() -> String:
@@ -76,6 +81,37 @@ func reach_checkpoint() -> bool:
 	return true
 
 
+func enter_records() -> bool:
+	if not checkpoint_reached or chapter_id != "lockdown":
+		return false
+	chapter_id = "records"
+	human_position = Vector2(128.0, 410.0)
+	wolf_position = Vector2(64.0, 423.0)
+	return true
+
+
+func preserve_purge_trace() -> bool:
+	if chapter_id != "records" or purge_trace_preserved:
+		return false
+	purge_trace_preserved = true
+	return true
+
+
+func preserve_mirror_trace(selected_route: String) -> bool:
+	if chapter_id != "records" or not purge_trace_preserved or mirror_trace_preserved or (selected_route != "wolf" and selected_route != "manual"):
+		return false
+	mirror_trace_preserved = true
+	mirror_route = selected_route
+	return true
+
+
+func complete_chapter() -> bool:
+	if chapter_id != "records" or not purge_trace_preserved or not mirror_trace_preserved or chapter_complete:
+		return false
+	chapter_complete = true
+	return true
+
+
 func checkpoint_callback() -> String:
 	if not checkpoint_reached or memory.is_empty():
 		return ""
@@ -99,6 +135,11 @@ func to_dict() -> Dictionary:
 		"memory": memory.duplicate(true),
 		"puzzle": {"breaker_armed": breaker_armed, "door_open": door_open, "route": route},
 		"checkpoint_reached": checkpoint_reached,
+		"chapter_id": chapter_id,
+		"purge_trace_preserved": purge_trace_preserved,
+		"mirror_trace_preserved": mirror_trace_preserved,
+		"mirror_route": mirror_route,
+		"chapter_complete": chapter_complete,
 	}
 
 
@@ -149,6 +190,25 @@ static func from_dict(raw: Variant) -> M0State:
 		return null
 	if data["checkpoint_reached"] and not puzzle["door_open"]:
 		return null
+	if data["version"] == SAVE_VERSION:
+		if data.get("chapter_id") != "lockdown" and data.get("chapter_id") != "records":
+			return null
+		if typeof(data.get("purge_trace_preserved")) != TYPE_BOOL or typeof(data.get("mirror_trace_preserved")) != TYPE_BOOL or typeof(data.get("chapter_complete")) != TYPE_BOOL:
+			return null
+		if typeof(data.get("mirror_route")) != TYPE_STRING:
+			return null
+		if data["chapter_id"] == "lockdown":
+			if data["purge_trace_preserved"] or data["mirror_trace_preserved"] or data["mirror_route"] != "" or data["chapter_complete"]:
+				return null
+		elif not data["checkpoint_reached"]:
+			return null
+		if data["mirror_trace_preserved"]:
+			if not data["purge_trace_preserved"] or (data["mirror_route"] != "wolf" and data["mirror_route"] != "manual"):
+				return null
+		elif data["mirror_route"] != "":
+			return null
+		if data["chapter_complete"] and not data["mirror_trace_preserved"]:
+			return null
 	var state: M0State = M0State.new()
 	state.name_index = int(identity["name_index"])
 	state.active_actor = "human"
@@ -163,6 +223,12 @@ static func from_dict(raw: Variant) -> M0State:
 	state.door_open = puzzle["door_open"]
 	state.route = str(puzzle["route"])
 	state.checkpoint_reached = data["checkpoint_reached"]
+	if data["version"] == SAVE_VERSION:
+		state.chapter_id = data["chapter_id"]
+		state.purge_trace_preserved = data["purge_trace_preserved"]
+		state.mirror_trace_preserved = data["mirror_trace_preserved"]
+		state.mirror_route = data["mirror_route"]
+		state.chapter_complete = data["chapter_complete"]
 	return state
 
 
