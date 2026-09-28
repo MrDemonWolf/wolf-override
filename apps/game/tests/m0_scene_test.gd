@@ -35,6 +35,8 @@ func _run() -> void:
 	_expect(str(game.get("status_line")).contains("I woke myself"), "opening establishes WOLF's own awakening")
 	var state: M0State = game.get("state") as M0State
 	_expect(state.memory.is_empty() and not state.door_open and state.active_actor == "human", "New Game button starts clean")
+	_expect(wolf.position.x < human.position.x and is_equal_approx(human.position.x - wolf.position.x, 64.0), "WOLF starts beside, not inside, the engineer")
+	_expect(human.controlled and not wolf.controlled and not InputMap.has_action(&"switch_actor"), "only the engineer has movement controls")
 	_expect(game.call("_objective") == "CHECK THE BREAKER", "opening points to the first corridor objective")
 	await process_frame
 	await _tap(&"interact")
@@ -42,7 +44,14 @@ func _run() -> void:
 	var start_x: float = human.position.x
 	if not _require(await _walk_to(human, 350.0), "active engineer reaches breaker by moving right"):
 		return
-	_expect(human.position.x > start_x and is_equal_approx(wolf.position.x, 225.0), "inactive WOLF stays at start")
+	_expect(human.position.x > start_x and wolf.position.x > 225.0 and wolf.position.x < human.position.x, "WOLF follows the engineer autonomously")
+	if not _require(await _walk_to(human, 450.0), "engineer can move beyond the breaker"):
+		return
+	if not _require(await _walk_to(human, 350.0), "engineer can backtrack to the breaker"):
+		return
+	for _frame in range(40):
+		await physics_frame
+	_expect(absf(human.position.x - wolf.position.x - 64.0) <= 5.0, "WOLF settles behind the engineer after backtracking")
 	await _tap(&"interact")
 	if not _require(game.get("waiting_for_choice"), "breaker opens authored disagreement"):
 		return
@@ -54,11 +63,16 @@ func _run() -> void:
 	if not _require(state.breaker_armed, "breaker arms after choice"):
 		return
 	_expect(game.call("_objective") == "OPEN THE SEAL", "powered relay becomes the objective")
-	await _tap(&"switch_actor")
-	if not _require(state.active_actor == "wolf" and wolf.controlled, "switches to WOLF in amber zone"):
+	if not _require(await _walk_to(human, 605.0), "engineer reaches relay with WOLF following"):
 		return
-	if not _require(await _walk_to(wolf, 605.0), "WOLF reaches relay by moving right"):
+	_expect(not wolf.controlled and wolf.position.x > 400.0 and wolf.position.x < human.position.x, "WOLF stays a companion at the relay")
+	_expect(str(game.call("_context_hint")).contains("give WOLF room"), "relay hint waits for WOLF to reach the contact")
+	await _tap(&"interact")
+	if not _require(not state.door_open and str(game.get("status_line")).contains("give me room"), "early relay request keeps the seal closed until WOLF is near"):
 		return
+	if not _require(await _walk_to(human, 655.0), "engineer gives WOLF room at the contact"):
+		return
+	_expect(absf(wolf.position.x - 605.0) <= 32.0, "WOLF reaches the relay before cooperation")
 	await _tap(&"interact")
 	if not _require(state.door_open and state.route == "cooperate", "WOLF cooperation opens door"):
 		return
@@ -69,7 +83,7 @@ func _run() -> void:
 	_expect(not door_visual.visible, "door retracts after cooperation")
 	await _tap(&"interact")
 	_expect(not door_visual.visible, "reusing the open relay does not replay the door seal")
-	if not _require(await _walk_to(wolf, 876.0), "WOLF walks through opened door to checkpoint"):
+	if not _require(await _walk_to(human, 876.0), "engineer walks through opened door to checkpoint"):
 		return
 	await _tap(&"interact")
 	if not _require(state.checkpoint_reached and FileAccess.file_exists(path), "cooperative checkpoint saves"):
@@ -82,9 +96,9 @@ func _run() -> void:
 	_expect(state.memory.is_empty() and not state.door_open and human.position == state.human_position, "New Game clears current play")
 	await _tap(&"load_game")
 	state = game.get("state") as M0State
-	if not _require(state.to_dict() == saved and state.active_actor == "wolf", "load restores cooperative scene"):
+	if not _require(state.to_dict() == saved and state.active_actor == "human" and human.controlled and not wolf.controlled, "load restores cooperative scene with engineer control"):
 		return
-	_expect(wolf.position == state.wolf_position and state.checkpoint_callback().contains(State.CHOICE_TEXT[State.DISCLOSE]), "load restores positions and actual callback")
+	_expect(human.position == state.human_position and wolf.position == state.wolf_position and state.checkpoint_callback().contains(State.CHOICE_TEXT[State.DISCLOSE]), "load restores positions and actual callback")
 
 	game.call("_new_game")
 	state = game.get("state") as M0State
@@ -96,29 +110,23 @@ func _run() -> void:
 	await _tap(&"choice_2")
 	if not _require(state.memory.get("choice_id") == State.PRESS, "second dialogue key records pressed risk"):
 		return
+	_expect(str(game.get("status_line")).contains("I won't take that risk blind"), "WOLF refuses the live contact")
 	await _tap(&"interact")
 	if not _require(state.breaker_armed, "fallback breaker arms"):
 		return
-	await _tap(&"switch_actor")
-	if not _require(state.active_actor == "wolf", "fallback switches to WOLF"):
+	if not _require(await _walk_to(human, 605.0), "engineer reaches manual bypass on fallback play"):
 		return
-	if not _require(await _walk_to(wolf, 605.0), "WOLF reaches relay on fallback play"):
-		return
+	_expect(not state.door_open and str(game.call("_context_hint")).contains("ask WOLF"), "relay first offers WOLF a choice")
 	await _tap(&"interact")
-	if not _require(not state.door_open and state.memory.get("choice_id") == State.PRESS, "WOLF refusal preserves choice and locked door"):
+	if not _require(not state.door_open and state.route.is_empty() and game.get("relay_refused"), "WOLF refuses and keeps the seal closed"):
 		return
-	_expect(str(game.get("status_line")).contains("I said no"), "WOLF voices his refusal in the corridor")
+	_expect(str(game.get("status_line")).contains("I said no") and str(game.call("_context_hint")).contains("manual bypass"), "refusal clearly offers the engineer's bypass")
 	Input.action_press(&"move_right")
 	for _frame in range(180):
 		await physics_frame
 	Input.action_release(&"move_right")
-	_expect(wolf.position.x < 760.0, "locked door physically blocks WOLF")
-	if not _require(await _walk_to(wolf, 605.0), "WOLF can return to switching zone after refusal"):
-		return
-	await _tap(&"switch_actor")
-	if not _require(state.active_actor == "human", "fallback switches to engineer"):
-		return
-	if not _require(await _walk_to(human, 605.0), "engineer reaches manual bypass"):
+	_expect(human.position.x < 760.0, "locked door physically blocks the engineer")
+	if not _require(await _walk_to(human, 605.0), "engineer can return to manual bypass after refusal"):
 		return
 	await _tap(&"interact")
 	if not _require(state.door_open and state.route == "fallback", "engineer bypass opens door"):
@@ -137,6 +145,7 @@ func _run() -> void:
 	await _tap(&"load_game")
 	state = game.get("state") as M0State
 	_expect(state.to_dict() == saved and state.checkpoint_callback().contains(State.CHOICE_TEXT[State.PRESS]), "fallback save loads with one accurate memory")
+	_expect(not game.get("relay_refused"), "load clears the transient refusal prompt")
 	game.queue_free()
 	await process_frame
 	game = GAME_SCENE.instantiate() as Node2D
@@ -152,7 +161,7 @@ func _run() -> void:
 	state = game.get("state") as M0State
 	if not _require(not game.get("title_open") and not title_screen.visible, "Continue button starts saved play through its signal"):
 		return
-	_expect(state.to_dict() == saved and state.active_actor == "human" and state.route == "fallback" and state.name_index == 1 and state.memory.get("choice_id") == State.PRESS, "Continue restores actor, puzzle, identity and one accurate memory")
+	_expect(state.to_dict() == saved and state.active_actor == "human" and human.controlled and not wolf.controlled and state.route == "fallback" and state.name_index == 1 and state.memory.get("choice_id") == State.PRESS, "Continue restores engineer control, puzzle, identity and one accurate memory")
 	_expect(human.position == state.human_position and wolf.position == state.wolf_position and state.checkpoint_callback().contains(State.CHOICE_TEXT[State.PRESS]), "Continue restores both actor positions and actual callback")
 
 	DirAccess.remove_absolute(ProjectSettings.globalize_path(path))

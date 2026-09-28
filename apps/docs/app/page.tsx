@@ -42,7 +42,7 @@ export default function HomePage() {
         <h2 id="game-title">Two minds. One way forward.</h2>
         <p className="section-lead">The M0 source prototype tests the relationship at the heart of the game in a single side-view corridor.</p>
         <div className="feature-strip">
-          <div><span className="feature-index">01 /</span><strong>Switch perspectives</strong><p>Move between the engineer and WOLF in a deliberate switching area.</p></div>
+          <div><span className="feature-index">01 /</span><strong>Play the engineer</strong><p>Move through the corridor with WOLF beside you as an independent companion.</p></div>
           <div><span className="feature-index">02 /</span><strong>Solve it together</strong><p>Open the route through cooperation, or use the engineer&apos;s fallback when WOLF refuses.</p></div>
           <div><span className="feature-index">03 /</span><strong>Live with a choice</strong><p>Choose a response in one disagreement and hear WOLF remember it later.</p></div>
         </div>

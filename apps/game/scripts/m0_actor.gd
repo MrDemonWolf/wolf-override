@@ -4,13 +4,23 @@ extends CharacterBody2D
 @export var actor_id: StringName = &"human"
 
 var controlled: bool = false
+var follow_target: Node2D
 
 const WALK_SPEED: float = 190.0
+const FOLLOW_SPEED: float = 220.0
+const FOLLOW_GAP: float = 64.0
 const GRAVITY: float = 900.0
 
 
 func _physics_process(delta: float) -> void:
-	velocity.x = Input.get_axis(&"move_left", &"move_right") * WALK_SPEED if controlled else 0.0
+	if controlled:
+		velocity.x = Input.get_axis(&"move_left", &"move_right") * WALK_SPEED
+	elif follow_target != null:
+		var target_x: float = clampf(follow_target.position.x - FOLLOW_GAP, 40.0, 920.0)
+		var distance: float = target_x - position.x
+		velocity.x = clampf(distance / delta, -FOLLOW_SPEED, FOLLOW_SPEED) if absf(distance) > 2.0 else 0.0
+	else:
+		velocity.x = 0.0
 	if is_on_floor():
 		velocity.y = 0.0
 	else:

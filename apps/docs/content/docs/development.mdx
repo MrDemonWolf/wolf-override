@@ -7,7 +7,7 @@ WOLF//OVERRIDE is in early development. Its current milestone is **M0**, a sourc
 
 ## In the M0 source build
 
-- Two distinguishable placeholder characters with movement, interaction, and a deliberate switching area.
+- Two distinguishable placeholder characters: the engineer is playable and WOLF accompanies him without player switching.
 - A power and door puzzle with a cooperative route and a human fallback if WOLF refuses.
 - One authored disagreement, a saved choice with a later callback, and a safe checkpoint.
 - A first exchange, readable purge display, and objectives that follow each puzzle step.
@@ -17,7 +17,7 @@ These are prototype features, not a complete campaign. [Play the M0 source](/doc
 
 ## Checked so far
 
-Godot 4.7.2 headless import, deterministic state checks, and a scene check of both routes and checkpoint save/load passed locally. The scene check verifies the title buttons, story beats, changing objectives, and route reactions with an isolated save. A renderer-backed scripted replay of both routes was inspected at 960×540; a normal game window showed Continue restoring an existing checkpoint. A full hands-on keyboard playthrough, export, and device test have not been run.
+Godot 4.7.2 headless import, deterministic state checks, and a scene check of both routes and checkpoint save/load passed locally for the engineer-only build. Engineer movement and WOLF's follow behavior were observed in a partial graphical playtest. A rendered scripted replay of the earlier switching build was inspected at 960×540, and Continue restored an existing checkpoint on screen. A full hands-on keyboard playthrough of both current routes, export, and device test have not been run.
 
 ## Still to come
 
