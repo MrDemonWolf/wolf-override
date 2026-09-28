@@ -344,11 +344,12 @@ func _update_controls() -> void:
 
 func _refresh_ui() -> void:
 	var door_status: String = "OPEN" if state.door_open else "SEALED"
+	var control_label: String = "%s (they/them)" % state.human_name()
 	human_tag.text = state.human_name().get_slice(" ", 0).to_upper()
 	if state.chapter_id == "records":
-		hud.text = "LOCKDOWN / FIRST COPY     OBJECTIVE: %s     CONTROL: %s\nA/D MOVE   E INTERACT   1/2 REPLY   I NAME   L LOAD   N RESTART" % [_objective(), state.human_name()]
+		hud.text = "LOCKDOWN / FIRST COPY     OBJECTIVE: %s     CONTROL: %s\nA/D MOVE   E INTERACT   1/2 REPLY   I NAME   L LOAD   N RESTART" % [_objective(), control_label]
 	else:
-		hud.text = "MAINTENANCE / LOCKDOWN     OBJECTIVE: %s     CONTROL: %s     SEAL: %s\nA/D MOVE   E INTERACT   1/2 REPLY   I NAME   L LOAD   N RESTART" % [_objective(), state.human_name(), door_status]
+		hud.text = "MAINTENANCE / LOCKDOWN     OBJECTIVE: %s     CONTROL: %s     SEAL: %s\nA/D MOVE   E INTERACT   1/2 REPLY   I NAME   L LOAD   N RESTART" % [_objective(), control_label, door_status]
 	story.text = status_line if waiting_for_choice else status_line + "\n" + _context_hint()
 
 

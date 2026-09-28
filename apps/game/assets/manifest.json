@@ -12,9 +12,40 @@
       "rights_review_status": "Provisional branding; trademark and final asset-rights review pending. Not covered by the code/docs GPL license.",
       "modifications": "Simplified the generated concept into original SVG paths using the public docs navy, cyan and white palette.",
       "implementation_status": "Provisional mark used by the game title, README and public landing page."
+    },
+    {
+      "asset_id": "wolf-side-right-provisional",
+      "path": "apps/game/assets/wolf-side-right-provisional.png",
+      "source_or_tool": "ChatGPT Create image via Chrome in the MDW WOLF//OVERRIDE [Game] project",
+      "source_reference": "Create wolf concept sheet chat in the private game project, September 28, 2026; revised game-scale prompt and conversation URL retained in ignored art notes",
+      "terms_reference": "https://openai.com/policies/terms-of-use/",
+      "rights_review_status": "Provisional AI-assisted character art, human reviewed. Final commercial asset-rights review remains open; not covered by the code/docs GPL license.",
+      "modifications": "Selected second, higher-contrast 1774x887 RGBA generation with transparency; displayed as a scaled static side-view Sprite2D and flipped when WOLF moves left. No pixel edits.",
+      "implementation_status": "Provisional WOLF sprite used in the corridor and Records Access; animation and final art direction pending."
+    },
+    {
+      "asset_id": "rowan-side-right-provisional",
+      "path": "apps/game/assets/rowan-side-right-provisional.png",
+      "source_or_tool": "ChatGPT Create image via Chrome in the MDW WOLF//OVERRIDE [Game] project",
+      "source_reference": "Create wolf concept sheet chat in the private game project, September 28, 2026; edited Rowan design and conversation URL retained in ignored art notes",
+      "terms_reference": "https://openai.com/policies/terms-of-use/",
+      "rights_review_status": "Provisional AI-assisted appearance option, human reviewed. Character appearance and final commercial asset-rights review remain open; not covered by the code/docs GPL license.",
+      "modifications": "Selected 1024x1536 RGBA edit of the masculine-presenting Rowan draft: cohesive deep-red hooded field jacket with charcoal trousers and boots, replacing the mixed yellow and silver details. Transparent original is displayed as a scaled static side-view Sprite2D and flipped when Rowan moves left. No pixel edits.",
+      "implementation_status": "Provisional Rowan appearance used in the corridor and Records Access; animation and appearance options pending."
+    },
+    {
+      "asset_id": "title-corridor-key-art-provisional",
+      "path": "apps/game/assets/title-corridor-key-art-provisional.png",
+      "published_copy": "apps/docs/public/title-corridor-key-art-provisional.png",
+      "source_or_tool": "ChatGPT Create image via Chrome in the MDW WOLF//OVERRIDE [Game] project",
+      "source_reference": "Create wolf concept sheet chat in the private game project, September 28, 2026; title composition prompt and conversation URL retained in ignored art notes",
+      "terms_reference": "https://openai.com/policies/terms-of-use/",
+      "rights_review_status": "Provisional AI-assisted title art, human reviewed. Final commercial asset-rights review remains open; not covered by the code/docs GPL license.",
+      "modifications": "Original 1672x941 RGB image, with Rowan and WOLF at the left of a research corridor and dark space for live title/menu text at the right. No pixel edits or baked-in lettering.",
+      "implementation_status": "Provisional cinematic title background in the Godot title screen and public landing page; a 960x540 renderer-backed title frame was visually inspected."
     }
   ],
-  "status": "One provisional brand mark recorded; no game art or audio acquired.",
+  "status": "One provisional brand mark, two provisional character images and one title background recorded; no audio acquired.",
   "merge_warning": "Preserve this populated provenance register when merging future handoffs.",
   "future_entry_fields": [
     "asset_id",

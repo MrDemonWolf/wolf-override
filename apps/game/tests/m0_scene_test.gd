@@ -18,14 +18,18 @@ func _run() -> void:
 	game.set("save_path", path)
 	root.add_child(game)
 	var title_screen: Control = game.get_node("CanvasLayer/TitleScreen") as Control
+	var title_art: TextureRect = game.get_node("CanvasLayer/TitleScreen/CorridorArt") as TextureRect
 	var title_mark: TextureRect = game.get_node("CanvasLayer/TitleScreen/LogoMark") as TextureRect
 	var title_logo: Label = game.get_node("CanvasLayer/TitleScreen/GameTitle") as Label
 	var new_game_button: Button = game.get_node("CanvasLayer/TitleScreen/NewGameButton") as Button
 	var continue_button: Button = game.get_node("CanvasLayer/TitleScreen/ContinueButton") as Button
+	var hud: Label = game.get_node("CanvasLayer/TopBar/HUD") as Label
 	var human: M0Actor = game.get_node("Human") as M0Actor
 	var wolf: M0Actor = game.get_node("Wolf") as M0Actor
 
 	if not _require(game.get("title_open") and title_screen.visible and continue_button.disabled, "fresh title disables Continue without a test checkpoint"):
+		return
+	if not _require(title_art.texture != null and title_art.texture.resource_path == "res://assets/title-corridor-key-art-provisional.png", "title shows the corridor artwork"):
 		return
 	if not _require(title_logo.text == "WOLF//OVERRIDE" and title_mark.texture != null and title_mark.texture.resource_path == "res://assets/logo-mark.svg", "title loads the branded WOLF//OVERRIDE logo"):
 		return
@@ -136,6 +140,7 @@ func _run() -> void:
 		return
 	await _tap(&"cycle_name")
 	_expect(state.name_index == 1, "draft identity changes before fallback save")
+	_expect(hud.text.contains("CONTROL: Alex Bennett (they/them)"), "protagonist keeps they/them when the provisional name changes")
 	_expect(not str(game.get("status_line")).contains("breaker"), "identity line does not rewind the scene after the seal opens")
 	await _tap(&"interact")
 	if not _require(state.checkpoint_reached, "fallback reaches checkpoint"):
