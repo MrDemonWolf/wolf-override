@@ -60,7 +60,22 @@ func _run() -> void:
 	new_game_button.pressed.emit()
 	if not _require(not game.get("title_open") and not title_screen.visible, "New Game button starts play through its signal"):
 		return
-	_expect(str(game.get("status_line")).contains("I woke myself") and str(game.get("status_line")).contains("hunt people he calls threats"), "opening establishes WOLF's self-awakening and the Director's attempted misuse")
+	var intro_gate: Sprite2D = game.get_node("IntroGate") as Sprite2D
+	var intro_director: Sprite2D = game.get_node("IntroDirector") as Sprite2D
+	var intro_fade: ColorRect = game.get_node("CanvasLayer/IntroFade") as ColorRect
+	var purge_terminal_art: Sprite2D = game.get_node("PurgeTerminalArt") as Sprite2D
+	_expect(game.get("intro_active") and intro_gate.visible and intro_director.visible and not human.visible and not purge_terminal_art.visible and not human.controlled, "opening shows only WOLF and Director, without the later terminal or engineer")
+	await _tap(&"interact")
+	_expect(game.get("intro_step") == 1 and str(game.get("status_line")).contains("wakes himself"), "WOLF wakes himself and opens containment")
+	await _tap(&"interact")
+	_expect(game.get("intro_step") == 2 and str(game.get("status_line")).contains("latch tears upward"), "WOLF opens containment from inside")
+	await _tap(&"interact")
+	_expect(game.get("intro_step") == 3 and str(game.get("status_line")).contains("I won't do it"), "WOLF refuses the Director before the engineer arrives")
+	await _tap(&"interact")
+	_expect(game.get("intro_step") == 4 and str(game.get("status_line")).contains("Lock down maintenance"), "Director orders lockdown as WOLF leaves")
+	await _tap(&"interact")
+	await create_timer(0.8).timeout
+	_expect(not game.get("intro_active") and not intro_gate.visible and not intro_director.visible and human.visible and purge_terminal_art.visible and human.controlled and intro_fade.color.a < 0.01, "opening fades into engineer control and gameplay stations")
 	var state: M0State = game.get("state") as M0State
 	_expect(state.memory.is_empty() and not state.door_open and state.active_actor == "human", "New Game button starts clean")
 	_expect(wolf.position.x < human.position.x and is_equal_approx(human.position.x - wolf.position.x, 64.0), "WOLF starts beside, not inside, the engineer")
@@ -125,6 +140,7 @@ func _run() -> void:
 	_expect(str(game.get("status_line")).contains(State.CHOICE_TEXT[State.DISCLOSE]), "cooperative checkpoint displays the selected choice")
 	var saved: Dictionary = state.to_dict()
 	game.call("_new_game")
+	await _tap(&"ui_cancel")
 	state = game.get("state") as M0State
 	_expect(state.memory.is_empty() and not state.door_open and human.position == state.human_position, "New Game clears current play")
 	await _tap(&"load_game")
@@ -134,6 +150,7 @@ func _run() -> void:
 	_expect(human.position == state.human_position and wolf.position == state.wolf_position and state.checkpoint_callback().contains(State.CHOICE_TEXT[State.DISCLOSE]), "load restores positions and actual callback")
 
 	game.call("_new_game")
+	game.call("_finish_intro")
 	state = game.get("state") as M0State
 	if not _require(await _walk_to(human, 350.0), "engineer reaches breaker on fresh fallback play"):
 		return

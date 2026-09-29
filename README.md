@@ -13,14 +13,16 @@ One choice can change what your companion remembers.
 ![Provisional title art: Rowan and WOLF at a locked research corridor](apps/game/assets/title-corridor-key-art-provisional.png)
 
 **Current status:** The first playable chapter slice runs from source; there
-is no download yet. It has a staged corridor, a second records room,
+is no download yet. It has a short, skippable opening escape scene, a staged corridor, a second records room,
 provisional character, title, room, and machine art, one door puzzle, and a first
 record-copying objective. Character animation, audio, the wider campaign,
 exports, and device testing are still ahead.
 
-**Quick play:** You control the engineer, who uses they/them pronouns. Rowan
-Vale is their provisional default name. Open the corridor door, save at the
-safe point, then press **E** again to enter Records Access. Copy the purge
+**Quick play:** The opening shows only WOLF and the Director. Press **E** to
+advance WOLF's escape or **Esc** to skip it. You then control the engineer,
+who uses they/them pronouns; Rowan Vale is their provisional default name.
+Open the corridor door, save at the safe point, then press **E** again to enter
+Records Access. Copy the purge
 trace, use WOLF's mirror readout or the engineer's manual port, and reach the
 exit. [The step-by-step guide](https://mrdemonwolf.github.io/wolf-override/docs/)
 shows each step.

@@ -1,4 +1,4 @@
-[gd_scene load_steps=12 format=3]
+[gd_scene load_steps=14 format=3]
 
 [ext_resource type="Script" path="res://scripts/main.gd" id="1_main"]
 [ext_resource type="Script" path="res://scripts/m0_actor.gd" id="2_actor"]
@@ -7,6 +7,8 @@
 [ext_resource type="Texture2D" path="res://assets/rowan-side-right-provisional.png" id="5_rowan"]
 [ext_resource type="Texture2D" path="res://assets/title-corridor-key-art-provisional.png" id="6_title_art"]
 [ext_resource type="Texture2D" path="res://assets/maintenance-props-provisional.png" id="7_props"]
+[ext_resource type="Texture2D" path="res://assets/director-side-left-provisional.png" id="8_director"]
+[ext_resource type="Texture2D" path="res://assets/records-props-provisional.png" id="9_records_props"]
 
 [sub_resource type="RectangleShape2D" id="FloorShape"]
 size = Vector2(960, 60)
@@ -22,6 +24,9 @@ size = Vector2(62, 34)
 
 [node name="Main" type="Node2D"]
 script = ExtResource("1_main")
+
+[node name="IntroCamera" type="Camera2D" parent="."]
+position = Vector2(480, 270)
 
 [node name="Floor" type="StaticBody2D" parent="."]
 position = Vector2(480, 470)
@@ -98,6 +103,29 @@ offset_bottom = -52.0
 horizontal_alignment = 1
 text = "WOLF"
 
+[node name="IntroGate" type="Sprite2D" parent="."]
+visible = false
+z_index = 3
+position = Vector2(81, 365)
+scale = Vector2(0.22, 0.22)
+texture = ExtResource("7_props")
+region_enabled = true
+region_rect = Rect2(1086, 0, 543, 724)
+
+[node name="IntroDirector" type="Sprite2D" parent="."]
+visible = false
+z_index = 2
+position = Vector2(255, 410)
+scale = Vector2(0.047, 0.047)
+texture = ExtResource("8_director")
+
+[node name="PurgeTerminalArt" type="Sprite2D" parent="."]
+position = Vector2(150, 286)
+scale = Vector2(0.2, 0.2)
+texture = ExtResource("9_records_props")
+region_enabled = true
+region_rect = Rect2(0, 0, 724, 724)
+
 [node name="BreakerArt" type="Sprite2D" parent="."]
 z_index = 1
 position = Vector2(350, 372)
@@ -154,15 +182,6 @@ offset_bottom = 336.0
 horizontal_alignment = 1
 text = "BREAKER"
 
-[node name="PurgeLabel" type="Label" parent="."]
-offset_left = 76.0
-offset_top = 178.0
-offset_right = 225.0
-offset_bottom = 202.0
-theme_override_colors/font_color = Color(0.94, 0.52, 0.53, 1)
-theme_override_font_sizes/font_size = 15
-text = "DIRECTOR / PURGE"
-
 [node name="RelayLabel" type="Label" parent="."]
 offset_left = 535.0
 offset_top = 313.0
@@ -180,6 +199,12 @@ horizontal_alignment = 1
 text = "SAFE POINT"
 
 [node name="CanvasLayer" type="CanvasLayer" parent="."]
+
+[node name="IntroAlarm" type="ColorRect" parent="CanvasLayer"]
+offset_right = 960.0
+offset_bottom = 540.0
+mouse_filter = 2
+color = Color(0.35, 0.03, 0.05, 0)
 
 [node name="TopBar" type="ColorRect" parent="CanvasLayer"]
 offset_right = 960.0
@@ -358,3 +383,9 @@ offset_right = 771.0
 offset_bottom = 502.0
 theme_override_font_sizes/font_size = 19
 text = "PAUSE SCROLL"
+
+[node name="IntroFade" type="ColorRect" parent="CanvasLayer"]
+offset_right = 960.0
+offset_bottom = 540.0
+mouse_filter = 2
+color = Color(0, 0, 0, 0)

@@ -34,6 +34,16 @@
       "implementation_status": "Provisional Rowan appearance used in the corridor and Records Access; animation and appearance options pending."
     },
     {
+      "asset_id": "director-side-left-provisional",
+      "path": "apps/game/assets/director-side-left-provisional.png",
+      "source_or_tool": "ChatGPT Create image via Chrome in the MDW WOLF//OVERRIDE [Game] project",
+      "source_reference": "https://chatgpt.com/g/g-p-6ab60b48c7608191987f04a81b04b5e2-wolf-override-game/c/6abb8e65-0574-83ea-812c-5695a8d27eff",
+      "terms_reference": "https://openai.com/policies/terms-of-use/",
+      "rights_review_status": "Provisional AI-assisted character art, human reviewed. Final commercial asset-rights review remains open; not covered by the code/docs GPL license.",
+      "modifications": "Original 1024x1536 RGBA generation with transparent background. Shown as a scaled static side-profile Sprite2D in the opening cutscene; source pixels unchanged.",
+      "implementation_status": "Provisional Director appearance in the opening cutscene."
+    },
+    {
       "asset_id": "title-corridor-key-art-provisional",
       "path": "apps/game/assets/title-corridor-key-art-provisional.png",
       "published_copy": "apps/docs/public/title-corridor-key-art-provisional.png",
@@ -85,7 +95,7 @@
       "implementation_status": "Provisional interactive prop art in Records Access."
     }
   ],
-  "status": "One provisional brand mark, two provisional character images, one title background, two gameplay backgrounds and two prop sheets recorded; no audio acquired.",
+  "status": "One provisional brand mark, three provisional character images, one title background, two gameplay backgrounds and two prop sheets recorded; no audio acquired.",
   "merge_warning": "Preserve this populated provenance register when merging future handoffs.",
   "future_entry_fields": [
     "asset_id",
