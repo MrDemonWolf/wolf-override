@@ -28,6 +28,7 @@ func _run() -> void:
 	var credits_back_button: Button = game.get_node("CanvasLayer/TitleScreen/CreditsScreen/CreditsBackButton") as Button
 	var credits_pause_button: Button = game.get_node("CanvasLayer/TitleScreen/CreditsScreen/CreditsPauseButton") as Button
 	var hud: Label = game.get_node("CanvasLayer/TopBar/HUD") as Label
+	var top_card: ColorRect = game.get_node("CanvasLayer/TopBar") as ColorRect
 	var tutorial_prompt: ColorRect = game.get_node("CanvasLayer/TutorialPrompt") as ColorRect
 	var tutorial_text: Label = game.get_node("CanvasLayer/TutorialPrompt/Text") as Label
 	var human: M0Actor = game.get_node("Human") as M0Actor
@@ -67,6 +68,10 @@ func _run() -> void:
 	var intro_fade: ColorRect = game.get_node("CanvasLayer/IntroFade") as ColorRect
 	var purge_terminal_art: Sprite2D = game.get_node("PurgeTerminalArt") as Sprite2D
 	_expect(game.get("intro_active") and intro_gate.visible and intro_director.visible and not human.visible and not purge_terminal_art.visible and not human.controlled, "opening shows only WOLF and Director, without the later terminal or engineer")
+	_expect(top_card.visible and hud.text.contains("CONTAINMENT"), "opening starts with a location slate")
+	await create_timer(3.2).timeout
+	game.call("_refresh_ui")
+	_expect(not top_card.visible, "opening slate fades away and does not reappear each frame")
 	await _tap(&"interact")
 	_expect(game.get("intro_step") == 1 and str(game.get("status_line")).contains("wakes himself"), "WOLF wakes himself and opens containment")
 	await _tap(&"interact")
@@ -83,6 +88,10 @@ func _run() -> void:
 	_expect(wolf.position.x < human.position.x and is_equal_approx(human.position.x - wolf.position.x, 64.0), "WOLF starts beside, not inside, the engineer")
 	_expect(human.controlled and not wolf.controlled and not InputMap.has_action(&"switch_actor"), "only the engineer has movement controls")
 	_expect(game.call("_objective") == "CHECK THE BREAKER", "opening points to the first corridor objective")
+	_expect(top_card.visible and hud.text.contains("CHECK THE BREAKER"), "new gameplay objective appears as a short card")
+	await create_timer(3.9).timeout
+	game.call("_refresh_ui")
+	_expect(not top_card.visible, "gameplay objective card fades without returning each frame")
 	_expect(tutorial_prompt.visible and tutorial_text.text.contains("A / D  MOVE"), "New Game teaches movement after the opening")
 	Input.action_press(&"move_right")
 	game.call("_process", 0.016)
