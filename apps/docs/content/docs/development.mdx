@@ -42,6 +42,7 @@ godot --headless --path apps/game --script res://tests/m0_state_test.gd
 godot --headless --path apps/game --script res://tests/m0_scene_test.gd
 godot --headless --path apps/game --script res://tests/chapter_scene_test.gd
 godot --headless --path apps/game --script res://tests/ui_controls_test.gd
+godot --headless --path apps/game --script res://tests/settings_test.gd
 bun run docs:check
 GITHUB_PAGES=true bun run docs:build
 ```
@@ -56,7 +57,7 @@ The Godot commands check import, state logic, both scripted door routes, both Re
 - A first exchange, readable purge display, and objectives that follow each puzzle step.
 - A second room where the engineer copies a purge-order trace, then uses WOLF's independent mirror readout or a manual maintenance port to preserve a timestamp.
 - New Game and versioned save/load for both rooms, positions, and chapter progress.
-- Basic controller mappings, on-screen mobile controls, and a pause menu with saved video settings.
+- Controller mappings, on-screen mobile controls, and title/pause Settings with saved display preferences, audio bus volumes, keyboard/controller rebinding, duplicate-binding checks, and stick deadzone.
 
 These are prototype features, not a complete investigation or campaign. [Play the source build](/docs/) explains how to open it in Godot 4.7.2.
 
