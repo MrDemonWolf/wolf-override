@@ -39,6 +39,4 @@ func _physics_process(delta: float) -> void:
 func _draw() -> void:
 	if controlled:
 		var ground_y: float = 22.0 if actor_id == &"wolf" else 34.0
-		draw_line(Vector2(-31, ground_y), Vector2(31, ground_y), Color("#eaf4ff"), 3.0)
-		draw_line(Vector2(-31, ground_y), Vector2(-24, ground_y - 5), Color("#eaf4ff"), 2.0)
-		draw_line(Vector2(31, ground_y), Vector2(24, ground_y - 5), Color("#eaf4ff"), 2.0)
+		draw_line(Vector2(-20, ground_y), Vector2(20, ground_y), Color("#8be3ff80"), 2.0)

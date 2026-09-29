@@ -19,7 +19,12 @@ extends Node2D
 @onready var door_visual: ColorRect = $Door/Visual
 @onready var top_card: ColorRect = $CanvasLayer/TopBar
 @onready var hud: Label = $CanvasLayer/TopBar/HUD
+@onready var dialogue_accent: ColorRect = $CanvasLayer/BottomBar/Accent
+@onready var speaker: Label = $CanvasLayer/BottomBar/Speaker
+@onready var speaker_rule: ColorRect = $CanvasLayer/BottomBar/SpeakerRule
 @onready var story: Label = $CanvasLayer/BottomBar/Story
+@onready var context_hint: ColorRect = $CanvasLayer/ContextHint
+@onready var context_hint_text: Label = $CanvasLayer/ContextHint/Text
 @onready var tutorial_prompt: ColorRect = $CanvasLayer/TutorialPrompt
 @onready var tutorial_text: Label = $CanvasLayer/TutorialPrompt/Text
 @onready var pause_button: Button = $CanvasLayer/PauseButton
@@ -115,10 +120,6 @@ func _ready() -> void:
 func _draw() -> void:
 	draw_rect(Rect2(0, 0, 960, 540), Color("#091533"))
 	draw_texture_rect(CORRIDOR_BACKGROUND, Rect2(0, 0, 960, 680), false)
-	draw_line(Vector2(40, 440), Vector2(920, 440), Color("#375269"), 2.0)
-	draw_line(Vector2(100, 435), Vector2(700, 435), Color("#f3ae4b"), 2.0)
-	for x in range(100, 701, 60):
-		draw_rect(Rect2(x, 430, 5, 9), Color("#ffe0a0"))
 	if state.door_open:
 		draw_line(Vector2(801, 434), Vector2(844, 434), Color("#70d9a7"), 4.0)
 
@@ -509,7 +510,7 @@ func _interact() -> void:
 	elif absf(x - 876.0) <= 52.0:
 		_interact_checkpoint()
 	else:
-		status_line = "No station in reach. Follow the lit floor toward the breaker, relay or safe point."
+		status_line = "No station in reach. Follow the labeled breaker, relay or safe point."
 
 
 func _interact_breaker() -> void:
@@ -756,17 +757,17 @@ func _update_controls() -> void:
 func _refresh_ui() -> void:
 	pause_button.visible = not title_open and not chapter_close_active and not pause_overlay.visible
 	pause_button.text = "SKIP" if intro_active else "PAUSE"
-	touch_controls.visible = touch_enabled and not title_open and not pause_overlay.visible
+	touch_controls.visible = (touch_enabled or waiting_for_choice) and not title_open and not pause_overlay.visible
 	var touch_move: bool = not intro_active and not chapter_close_active and not waiting_for_choice
-	touch_left.visible = touch_move
-	touch_right.visible = touch_move
-	touch_use.visible = not waiting_for_choice
+	touch_left.visible = touch_enabled and touch_move
+	touch_right.visible = touch_enabled and touch_move
+	touch_use.visible = touch_enabled and not waiting_for_choice
 	touch_use.text = "CONTINUE" if intro_active or chapter_close_active else "USE"
 	touch_choice_1.visible = waiting_for_choice
 	touch_choice_2.visible = waiting_for_choice
 	if waiting_for_choice:
-		touch_choice_1.text = "1  WOLF READOUT" if choice_context == "mirror" else "1  TELL WOLF"
-		touch_choice_2.text = "2  MANUAL PORT" if choice_context == "mirror" else "2  PRESS WOLF"
+		touch_choice_1.text = "1  USE WOLF'S READOUT" if choice_context == "mirror" else "1  %s" % M0State.CHOICE_TEXT[M0State.DISCLOSE]
+		touch_choice_2.text = "2  USE MANUAL PORT" if choice_context == "mirror" else "2  %s" % M0State.CHOICE_TEXT[M0State.PRESS]
 	tutorial_prompt.visible = not title_open and not intro_active and state.chapter_id == "lockdown" and tutorial_step < 2
 	if tutorial_prompt.visible:
 		if tutorial_step == 0:
@@ -783,13 +784,13 @@ func _refresh_ui() -> void:
 		if last_top_card_key != "intro":
 			last_top_card_key = "intro"
 			_show_top_card("03:17 / CONTAINMENT\nWOLF//OVERRIDE", 2.6)
-		story.text = status_line + ("\nTAP CONTINUE  /  SKIP" if touch_enabled else "\nE: continue   ESC: skip opening")
+		_set_dialogue(status_line, "TAP CONTINUE  /  SKIP" if touch_enabled else "E / A  CONTINUE    ESC / START  SKIP")
 		return
 	if chapter_close_active:
 		if last_top_card_key != "chapter_close":
 			last_top_card_key = "chapter_close"
 			_show_top_card("RECORDS ACCESS\nFIRST COPY SECURED", 3.4)
-		story.text = status_line
+		_set_dialogue(status_line, "TAP CONTINUE" if touch_enabled else "E / A  CONTINUE")
 		return
 	breaker_art.modulate = Color.WHITE if state.breaker_armed else Color("#879ba5")
 	breaker_status_light.color = Color("#8be3ff") if state.breaker_armed else Color("#d48954")
@@ -802,7 +803,33 @@ func _refresh_ui() -> void:
 		last_top_card_key = card_key
 		var location: String = "RECORDS ACCESS / FIRST COPY" if state.chapter_id == "records" else "MAINTENANCE / LOCKDOWN"
 		_show_top_card("%s\n%s" % [location, _objective()], 3.4)
-	story.text = status_line if waiting_for_choice else status_line + "\n" + (_context_hint().replace("E:", "USE:") if touch_enabled else _context_hint())
+	_set_dialogue(status_line, "" if waiting_for_choice else (_context_hint().replace("E:", "USE:") if touch_enabled else _context_hint()))
+
+
+func _set_dialogue(message: String, hint: String) -> void:
+	var display_message: String = message.get_slice("\n1  ", 0) if waiting_for_choice else message
+	var colon: int = display_message.find(":")
+	var first_line: String = display_message.get_slice("\n", 0)
+	var name: String = display_message.substr(0, colon) if colon > 0 and colon < first_line.length() else ""
+	var human_name: String = state.human_name().get_slice(" ", 0).to_upper()
+	var second_line: String = display_message.get_slice("\n", 1) if display_message.contains("\n") else ""
+	var second_name: String = second_line.get_slice(":", 0)
+	var named_speakers: Array[String] = ["WOLF", "DIRECTOR", "DIRECTOR / PURGE", human_name]
+	if name in named_speakers and not (second_name in named_speakers):
+		speaker.text = name
+		story.text = display_message.substr(colon + 1).strip_edges()
+	else:
+		speaker.text = ""
+		story.text = display_message
+	var has_speaker: bool = not speaker.text.is_empty()
+	speaker.visible = has_speaker
+	speaker_rule.visible = has_speaker
+	story.offset_left = 160.0 if has_speaker else 20.0
+	var tint: Color = Color("#8be3ff") if name == "WOLF" else (Color("#ff9a9f") if name.begins_with("DIRECTOR") else (Color("#f4d5ae") if name == human_name else Color("#9fc3d2")))
+	dialogue_accent.color = tint
+	speaker.add_theme_color_override("font_color", tint)
+	context_hint.visible = not hint.is_empty()
+	context_hint_text.text = hint
 
 
 func _show_top_card(message: String, hold_seconds: float) -> void:
@@ -828,7 +855,7 @@ func _context_hint() -> String:
 			return "E: examine the mirror port." if state.purge_trace_preserved else "Copy the purge order first."
 		if absf(x - 830.0) <= 58.0:
 			return "E: secure the first copy." if state.mirror_trace_preserved else "Preserve both traces before leaving."
-		return "Follow the lit floor line to the next station."
+		return "Follow the station lights: purge queue, mirror port, then exit."
 	if state.checkpoint_reached:
 		return "E: enter records access. The Director's purge is still running."
 	if state.door_open:

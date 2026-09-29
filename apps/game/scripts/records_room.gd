@@ -40,7 +40,7 @@ func _add_station_label(caption: String, center_x: float, tint: Color, label_y: 
 	label.position = Vector2(center_x - 90.0, label_y)
 	label.size = Vector2(180.0, 30.0)
 	label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	label.add_theme_font_size_override("font_size", 17)
+	label.add_theme_font_size_override("font_size", 13)
 	label.add_theme_color_override("font_color", tint)
 	add_child(label)
 	return label
@@ -57,7 +57,6 @@ func refresh_state() -> void:
 func _draw() -> void:
 	draw_rect(Rect2(0, 0, 960, 540), Color("#071221"))
 	draw_texture_rect(RECORDS_BACKGROUND, Rect2(0, 0, 960, 680), false)
-	draw_line(Vector2(40, 440), Vector2(920, 440), Color("#405b6d"), 2.0)
 
 	_draw_exit()
 	_draw_machine_lights()
