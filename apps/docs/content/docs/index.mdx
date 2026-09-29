@@ -25,7 +25,7 @@ cd wolf-override
 godot --path apps/game
 ```
 
-Choose **New Game** on the title screen. The short opening shows only WOLF and the Director as WOLF wakes himself and leaves containment. Press **E** to advance each beat, or **Esc** to skip to engineer control. Continue resumes your save without replaying the opening.
+Choose **New Game** on the title screen. The short opening shows only WOLF and the Director as WOLF wakes himself and leaves containment. Press **E** to advance each beat, or **Esc** to skip to engineer control. A small prompt then teaches movement and reading the first display. Continue resumes your save without replaying the opening.
 
 ## 2. Use the breaker
 
@@ -52,7 +52,7 @@ In Records Access, the engineer stays playable while WOLF heads toward the mirro
 
 1. Go to the **purge queue** on the left and press **E** to copy its trace.
 2. Go to the **mirror port** in the middle and press **E**. Press **1** after WOLF arrives to use his readout, or **2** to use the engineer's manual maintenance port. If WOLF is still checking, wait for him or choose the manual port.
-3. Go to the **exit** on the right and press **E**. The first copy is secured, and **Continue** restores the room and your progress.
+3. Go to the **exit** on the right and press **E**. The shutter opens as the first copy is secured. Press **E** once more to return to control. **Continue** restores the room and your progress.
 
 These two traces provide a first lead. They are not a complete case against the Director.
 
@@ -76,9 +76,9 @@ At the far-left **red PURGE DISPLAY**, **E** shows optional story context. It is
 
 ## What exists today
 
-The first chapter slice has two prototype rooms with provisional static character art. [About the game](/docs/about/) explains the wider premise; [development status](/docs/development/) separates built features from plans.
+The first chapter slice has two playable rooms with provisional static character art. [About the game](/docs/about/) explains the wider premise; [development status](/docs/development/) separates built features from plans.
 
-Godot 4.7.2 headless import, state, M0 scene, and chapter scene checks passed. A partial graphical playtest covered movement and WOLF's follow behavior in the first corridor. Three rendered Records Access frames were inspected, but its routes have not been played by hand. Exports and device tests remain open.
+Godot 4.7.2 headless import, state, M0 scene, and chapter scene checks passed. The purge interaction was checked in a normal Godot window, and tutorial and Records completion frames were inspected at 960×540. The full routes have not been played by hand. Exports and device tests remain open.
 
 ## Developer checks
 

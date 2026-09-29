@@ -21,6 +21,7 @@ exports, and device testing are still ahead.
 **Quick play:** The opening shows only WOLF and the Director. Press **E** to
 advance WOLF's escape or **Esc** to skip it. You then control the engineer,
 who uses they/them pronouns; Rowan Vale is their provisional default name.
+The opening tutorial teaches movement and the first interaction as you play.
 Open the corridor door, save at the safe point, then press **E** again to enter
 Records Access. Copy the purge
 trace, use WOLF's mirror readout or the engineer's manual port, and reach the
@@ -90,7 +91,8 @@ for the engineer's bypass. Press **E** at the far-right checkpoint to save,
 then **E** again to enter Records Access. Copy the purge-order trace at the
 first station. WOLF heads to the mirror himself; press **E** there, then **1**
 after he arrives for his readout or **2** for the manual port. Press **E** at
-the exit to secure the first copy. Continue restores chapter progress. Godot
+the exit to secure the first copy, then **E** to continue after the closing beat.
+Continue restores chapter progress. Godot
 stores the save in its `user://` directory; **N** restarts the current run
 without deleting it.
 
@@ -146,11 +148,11 @@ The root `package.json` defines these docs commands:
 The game uses typed GDScript and stable event IDs independent of editable
 display names. On local Godot 4.7.2, headless import, state, M0 scene, and
 chapter scene checks passed. The scene checks cover both door routes, both
-mirror routes, and Continue restoring chapter progress with separate test
-saves. A partial graphical playtest covered engineer movement and WOLF's
-follow behavior in the first corridor. Three rendered Records Access frames
-were inspected; its routes have not been played by hand. Exports and device
-checks remain unrun.
+mirror routes, the opening tutorial, the chapter close, and Continue restoring
+progress with separate test saves. The purge interaction was checked in a
+normal Godot window, and 960×540 tutorial and Records completion frames were
+inspected. Full corridor-to-Records routes have not been played by hand.
+Exports and device checks remain unrun.
 Corridor play currently requires a keyboard; touch controls and mobile
 exports are not implemented.
 

@@ -28,6 +28,8 @@ func _run() -> void:
 	var credits_back_button: Button = game.get_node("CanvasLayer/TitleScreen/CreditsScreen/CreditsBackButton") as Button
 	var credits_pause_button: Button = game.get_node("CanvasLayer/TitleScreen/CreditsScreen/CreditsPauseButton") as Button
 	var hud: Label = game.get_node("CanvasLayer/TopBar/HUD") as Label
+	var tutorial_prompt: ColorRect = game.get_node("CanvasLayer/TutorialPrompt") as ColorRect
+	var tutorial_text: Label = game.get_node("CanvasLayer/TutorialPrompt/Text") as Label
 	var human: M0Actor = game.get_node("Human") as M0Actor
 	var wolf: M0Actor = game.get_node("Wolf") as M0Actor
 	var relay_spark: Line2D = game.get_node("RelaySpark") as Line2D
@@ -81,9 +83,15 @@ func _run() -> void:
 	_expect(wolf.position.x < human.position.x and is_equal_approx(human.position.x - wolf.position.x, 64.0), "WOLF starts beside, not inside, the engineer")
 	_expect(human.controlled and not wolf.controlled and not InputMap.has_action(&"switch_actor"), "only the engineer has movement controls")
 	_expect(game.call("_objective") == "CHECK THE BREAKER", "opening points to the first corridor objective")
+	_expect(tutorial_prompt.visible and tutorial_text.text.contains("A / D  MOVE"), "New Game teaches movement after the opening")
+	Input.action_press(&"move_right")
+	game.call("_process", 0.016)
+	Input.action_release(&"move_right")
+	_expect(tutorial_prompt.visible and tutorial_text.text.contains("E  READ DISPLAY"), "movement advances the opening interaction hint")
 	await process_frame
 	await _tap(&"interact")
 	_expect(str(game.get("status_line")).contains("Original program logs marked for deletion"), "purge display establishes evidence stakes without inventory")
+	_expect(not tutorial_prompt.visible, "reading the display clears the opening tutorial")
 	var start_x: float = human.position.x
 	if not _require(await _walk_to(human, 350.0), "active engineer reaches breaker by moving right"):
 		return
