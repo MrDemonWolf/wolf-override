@@ -1,4 +1,4 @@
-[gd_scene load_steps=15 format=3]
+[gd_scene load_steps=16 format=3]
 
 [ext_resource type="Script" path="res://scripts/main.gd" id="1_main"]
 [ext_resource type="Script" path="res://scripts/m0_actor.gd" id="2_actor"]
@@ -10,6 +10,7 @@
 [ext_resource type="Texture2D" path="res://assets/director-side-left-provisional.png" id="8_director"]
 [ext_resource type="Texture2D" path="res://assets/records-props-provisional.png" id="9_records_props"]
 [ext_resource type="Script" path="res://scripts/pause_overlay.gd" id="10_pause_overlay"]
+[ext_resource type="Script" path="res://scripts/game_settings.gd" id="11_settings"]
 
 [sub_resource type="RectangleShape2D" id="FloorShape"]
 size = Vector2(960, 60)
@@ -465,10 +466,18 @@ text = "CONTINUE"
 [node name="CreditsButton" type="Button" parent="CanvasLayer/TitleScreen"]
 offset_left = 460.0
 offset_top = 425.0
-offset_right = 852.0
+offset_right = 648.0
 offset_bottom = 469.0
 theme_override_font_sizes/font_size = 18
 text = "CREDITS"
+
+[node name="SettingsButton" type="Button" parent="CanvasLayer/TitleScreen"]
+offset_left = 664.0
+offset_top = 425.0
+offset_right = 852.0
+offset_bottom = 469.0
+theme_override_font_sizes/font_size = 18
+text = "SETTINGS"
 
 [node name="Credit" type="Label" parent="CanvasLayer/TitleScreen"]
 offset_left = 460.0
@@ -607,8 +616,9 @@ text = "ESC / START TO RESUME"
 
 [node name="SettingsMenu" type="Control" parent="CanvasLayer/PauseOverlay/Panel"]
 visible = false
-offset_right = 450.0
-offset_bottom = 389.0
+offset_right = 760.0
+offset_bottom = 464.0
+script = ExtResource("11_settings")
 
 [node name="Title" type="Label" parent="CanvasLayer/PauseOverlay/Panel/SettingsMenu"]
 offset_left = 32.0

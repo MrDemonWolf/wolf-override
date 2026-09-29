@@ -34,3 +34,5 @@ jobs:
         run: '"$GODOT_BIN" --headless --path apps/game --script res://tests/chapter_scene_test.gd'
       - name: Check UI and controls
         run: '"$GODOT_BIN" --headless --path apps/game --script res://tests/ui_controls_test.gd'
+      - name: Check settings persistence and rebinding
+        run: '"$GODOT_BIN" --headless --path apps/game --script res://tests/settings_test.gd'

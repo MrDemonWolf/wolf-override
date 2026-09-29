@@ -36,7 +36,7 @@ extends Node2D
 @onready var touch_choice_2: Button = $CanvasLayer/TouchControls/Choice2
 @onready var pause_overlay: PauseOverlay = $CanvasLayer/PauseOverlay
 @onready var pause_menu: Control = $CanvasLayer/PauseOverlay/Panel/PauseMenu
-@onready var settings_menu: Control = $CanvasLayer/PauseOverlay/Panel/SettingsMenu
+@onready var settings_menu: GameSettings = $CanvasLayer/PauseOverlay/Panel/SettingsMenu
 @onready var resume_button: Button = $CanvasLayer/PauseOverlay/Panel/PauseMenu/ResumeButton
 @onready var settings_button: Button = $CanvasLayer/PauseOverlay/Panel/PauseMenu/SettingsButton
 @onready var settings_back_button: Button = $CanvasLayer/PauseOverlay/Panel/SettingsMenu/BackButton
@@ -93,6 +93,7 @@ func _ready() -> void:
 	pause_overlay.resume_requested.connect(_resume_game)
 	resume_button.pressed.connect(_resume_game)
 	settings_button.pressed.connect(_show_settings)
+	$CanvasLayer/TitleScreen/SettingsButton.pressed.connect(_show_title_settings)
 	settings_back_button.pressed.connect(_show_pause_menu)
 	records_room = RecordsRoom.new()
 	records_room.z_index = 1
@@ -339,6 +340,16 @@ func _setup_touch_controls() -> void:
 		button.add_theme_color_override("font_color", Color.WHITE)
 		button.add_theme_color_override("font_hover_color", Color.WHITE)
 		button.add_theme_color_override("font_pressed_color", Color.WHITE)
+	var menu_theme: Theme = Theme.new()
+	for type_name: String in ["Button", "OptionButton"]:
+		menu_theme.set_stylebox("normal", type_name, normal)
+		menu_theme.set_stylebox("hover", type_name, hover)
+		menu_theme.set_stylebox("pressed", type_name, hover)
+		menu_theme.set_font_size("font_size", type_name, 16)
+	menu_theme.set_stylebox("tab_selected", "TabBar", hover)
+	menu_theme.set_stylebox("tab_unselected", "TabBar", normal)
+	menu_theme.set_font_size("font_size", "TabBar", 17)
+	settings_menu.theme = menu_theme
 
 
 func _bind_touch_button(button: Button, action: StringName) -> void:
@@ -350,13 +361,16 @@ func _setup_settings() -> void:
 	fps_options.add_item("30 FPS", 30)
 	fps_options.add_item("60 FPS", 60)
 	fps_options.add_item("UNCAPPED", 0)
+	fps_options.add_item("90 FPS", 90)
+	fps_options.add_item("120 FPS", 120)
+	fps_options.add_item("144 FPS", 144)
 	resolution_options.add_item("960 × 540", 0)
 	resolution_options.add_item("1280 × 720", 1)
 	resolution_options.add_item("1920 × 1080", 2)
 	var config: ConfigFile = ConfigFile.new()
 	config.load(settings_path)
 	var fps: int = int(config.get_value("video", "fps_limit", 60))
-	if not fps in [0, 30, 60]:
+	if not fps in [0, 30, 60, 90, 120, 144]:
 		fps = 60
 	Engine.max_fps = fps
 	fps_options.select(fps_options.get_item_index(fps))
@@ -376,6 +390,7 @@ func _setup_settings() -> void:
 	fps_options.item_selected.connect(_on_fps_selected)
 	resolution_options.item_selected.connect(_on_resolution_selected)
 	fullscreen_toggle.toggled.connect(_on_fullscreen_toggled)
+	settings_menu.configure(settings_path)
 
 
 func _resolution_size(index: int) -> Vector2i:
@@ -407,6 +422,7 @@ func _on_fullscreen_toggled(enabled: bool) -> void:
 
 func _save_settings() -> void:
 	var config: ConfigFile = ConfigFile.new()
+	config.load(settings_path)
 	config.set_value("video", "fps_limit", fps_options.get_selected_id())
 	config.set_value("video", "resolution", resolution_options.selected)
 	config.set_value("video", "fullscreen", fullscreen_toggle.button_pressed)
@@ -424,8 +440,7 @@ func _on_pause_button() -> void:
 func _pause_game() -> void:
 	for action: StringName in [&"move_left", &"move_right", &"interact", &"choice_1", &"choice_2"]:
 		Input.action_release(action)
-	pause_menu.show()
-	settings_menu.hide()
+	_show_pause_menu()
 	pause_overlay.show()
 	pause_button.hide()
 	touch_controls.hide()
@@ -434,6 +449,7 @@ func _pause_game() -> void:
 
 
 func _resume_game() -> void:
+	settings_menu.cancel_capture()
 	get_tree().paused = false
 	pause_overlay.hide()
 	_refresh_ui()
@@ -441,13 +457,32 @@ func _resume_game() -> void:
 
 func _show_settings() -> void:
 	pause_menu.hide()
+	var panel: Control = $CanvasLayer/PauseOverlay/Panel
+	panel.position = Vector2(100, 38)
+	panel.size = Vector2(760, 464)
+	$CanvasLayer/PauseOverlay/Panel/Accent.hide()
 	settings_menu.show()
-	fps_options.grab_focus()
+	settings_menu.tabs.grab_focus()
+
+
+func _show_title_settings() -> void:
+	pause_overlay.show()
+	get_tree().paused = true
+	_show_settings()
 
 
 func _show_pause_menu() -> void:
+	if title_open and pause_overlay.visible:
+		_resume_game()
+		return
+	settings_menu.cancel_capture()
+	var panel: Control = $CanvasLayer/PauseOverlay/Panel
+	panel.position = Vector2(255, 78)
+	panel.size = Vector2(450, 389)
+	$CanvasLayer/PauseOverlay/Panel/Accent.show()
 	settings_menu.hide()
 	pause_menu.show()
+	$CanvasLayer/PauseOverlay/Panel/PauseMenu/PauseHint.text = "TAP RESUME TO RETURN" if touch_enabled and not controller_active else "%s  RESUME" % settings_menu.prompt(&"pause_game", controller_active)
 	resume_button.grab_focus()
 
 
@@ -785,19 +820,21 @@ func _refresh_ui() -> void:
 		touch_choice_2.size = Vector2(428.0, 76.0) if touch_layout else Vector2(522.0, 40.0)
 		touch_choice_1.add_theme_font_size_override("font_size", 17 if touch_layout else 16)
 		touch_choice_2.add_theme_font_size_override("font_size", 17 if touch_layout else 16)
-		var choice_1_key: String = "X" if controller_active else "1"
-		var choice_2_key: String = "Y" if controller_active else "2"
+		var choice_1_key: String = settings_menu.prompt(&"choice_1", controller_active)
+		var choice_2_key: String = settings_menu.prompt(&"choice_2", controller_active)
 		touch_choice_1.text = "%s  %s" % [choice_1_key, "USE WOLF'S READOUT" if choice_context == "mirror" else M0State.CHOICE_TEXT[M0State.DISCLOSE]]
 		touch_choice_2.text = "%s  %s" % [choice_2_key, "USE MANUAL PORT" if choice_context == "mirror" else M0State.CHOICE_TEXT[M0State.PRESS]]
 	tutorial_prompt.visible = not title_open and not intro_active and state.chapter_id == "lockdown" and tutorial_step < 2
 	if tutorial_prompt.visible:
+		var interact_key: String = settings_menu.prompt(&"interact", controller_active)
+		var move_keys: String = "%s / %s" % [settings_menu.prompt(&"move_left", false), settings_menu.prompt(&"move_right", false)]
 		if tutorial_step == 0:
-			var move_label: String = "HOLD ◀ / ▶" if touch_layout else ("STICK / D-PAD MOVE" if controller_active else "A / D  MOVE")
+			var move_label: String = "HOLD ◀ / ▶" if touch_layout else ("STICK / D-PAD MOVE" if controller_active else "%s  MOVE" % move_keys)
 			tutorial_text.text = "%s\nReach the purge display." % move_label
 		elif human.position.x <= 230.0:
-			tutorial_text.text = "%s\nSee what the Director is deleting." % ("TAP USE" if touch_layout else ("A  READ DISPLAY" if controller_active else "E  READ DISPLAY"))
+			tutorial_text.text = "%s\nSee what the Director is deleting." % ("TAP USE" if touch_layout else "%s  READ DISPLAY" % interact_key)
 		else:
-			tutorial_text.text = "%s\nFind the red purge display." % ("HOLD ◀ / ▶" if touch_layout else ("STICK / D-PAD RETURN" if controller_active else "A / D  RETURN"))
+			tutorial_text.text = "%s\nFind the red purge display." % ("HOLD ◀ / ▶" if touch_layout else ("STICK / D-PAD RETURN" if controller_active else "%s  RETURN" % move_keys))
 	if title_open:
 		top_card.hide()
 		return
@@ -805,13 +842,13 @@ func _refresh_ui() -> void:
 		if last_top_card_key != "intro":
 			last_top_card_key = "intro"
 			_show_top_card("03:17 / CONTAINMENT\nWOLF//OVERRIDE", 2.6)
-		_set_dialogue(status_line, "TAP CONTINUE  /  SKIP" if touch_layout else ("A  CONTINUE    START  SKIP" if controller_active else "E  CONTINUE    ESC  SKIP"))
+		_set_dialogue(status_line, "TAP CONTINUE  /  SKIP" if touch_layout else "%s  CONTINUE    %s  SKIP" % [settings_menu.prompt(&"interact", controller_active), settings_menu.prompt(&"pause_game", controller_active)])
 		return
 	if chapter_close_active:
 		if last_top_card_key != "chapter_close":
 			last_top_card_key = "chapter_close"
 			_show_top_card("RECORDS ACCESS\nFIRST COPY SECURED", 3.4)
-		_set_dialogue(status_line, "TAP CONTINUE" if touch_layout else ("A  CONTINUE" if controller_active else "E  CONTINUE"))
+		_set_dialogue(status_line, "TAP CONTINUE" if touch_layout else "%s  CONTINUE" % settings_menu.prompt(&"interact", controller_active))
 		return
 	breaker_art.modulate = Color.WHITE if state.breaker_armed else Color("#879ba5")
 	breaker_status_light.color = Color("#8be3ff") if state.breaker_armed else Color("#d48954")
@@ -828,12 +865,16 @@ func _refresh_ui() -> void:
 	if touch_layout:
 		hint = hint.replace("E:", "USE:")
 	elif controller_active:
-		hint = hint.replace("E:", "A:")
+		hint = hint.replace("E:", "%s:" % settings_menu.prompt(&"interact", true))
+	else:
+		hint = hint.replace("E:", "%s:" % settings_menu.prompt(&"interact", false))
 	_set_dialogue(status_line, "" if waiting_for_choice else hint)
 
 
 func _set_dialogue(message: String, hint: String) -> void:
 	var display_message: String = message.get_slice("\n1  ", 0) if waiting_for_choice else message
+	display_message = display_message.replace("Press E", "Tap USE" if touch_enabled and not controller_active else "Press %s" % settings_menu.prompt(&"interact", controller_active))
+	display_message = display_message.replace("press 2", "tap 2" if touch_enabled and not controller_active else "press %s" % settings_menu.prompt(&"choice_2", controller_active))
 	var colon: int = display_message.find(":")
 	var first_line: String = display_message.get_slice("\n", 0)
 	var name: String = display_message.substr(0, colon) if colon > 0 and colon < first_line.length() else ""
