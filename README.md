@@ -14,7 +14,7 @@ One choice can change what your companion remembers.
 
 **Current status:** The first playable chapter slice runs from source; there
 is no download yet. It has a staged corridor, a second records room,
-provisional static character and title art, one door puzzle, and a first
+provisional character, title, room, and machine art, one door puzzle, and a first
 record-copying objective. Character animation, audio, the wider campaign,
 exports, and device testing are still ahead.
 
@@ -184,9 +184,9 @@ references, tools, and asset provenance](https://mrdemonwolf.github.io/wolf-over
 ![GitHub license](https://img.shields.io/github/license/mrdemonwolf/wolf-override.svg?style=for-the-badge&logo=github)
 
 Copyright 2026 MrDemonWolf, Inc. Game source code and public docs use
-[GPL-3.0-or-later](LICENSE). The provisional logo, character sprites and
-title art are separate assets with AI-assisted provenance recorded in
-[the asset register](apps/game/assets/manifest.json); they are not covered
+[GPL-3.0-or-later](LICENSE). The provisional logo, character sprites, title
+art, room backgrounds, and machine props are separate assets with AI-assisted provenance
+recorded in [the asset register](apps/game/assets/manifest.json); they are not covered
 by the code/docs GPL. Final asset, audio, branding and store-package rights
 and release review remain open.
 
