@@ -31,6 +31,7 @@ func _run() -> void:
 	var human: M0Actor = game.get_node("Human") as M0Actor
 	var wolf: M0Actor = game.get_node("Wolf") as M0Actor
 	var relay_spark: Line2D = game.get_node("RelaySpark") as Line2D
+	var relay_status_light: ColorRect = game.get_node("RelayStatusLight") as ColorRect
 
 	if not _require(game.get("title_open") and title_screen.visible and continue_button.disabled, "fresh title disables Continue without a test checkpoint"):
 		return
@@ -105,6 +106,7 @@ func _run() -> void:
 	await _tap(&"interact")
 	if not _require(state.door_open and state.route == "cooperate", "WOLF cooperation opens door"):
 		return
+	_expect(relay_status_light.color == Color("#a4f0c4"), "open relay changes from live cyan to completed green")
 	_expect(relay_spark.visible and relay_spark.default_color == Color("#8be3ff"), "WOLF's contact produces a visible cyan relay spark")
 	_expect(game.call("_objective") == "REACH SAFE POINT", "open seal points to safety")
 	_expect(str(game.call("_context_hint")).contains("Move to the safe point"), "open-door hint no longer sends the player back to the breaker")
@@ -153,6 +155,7 @@ func _run() -> void:
 	await _tap(&"interact")
 	if not _require(not state.door_open and state.route.is_empty() and game.get("relay_refused"), "WOLF refuses and keeps the seal closed"):
 		return
+	_expect(relay_status_light.color == Color("#f3ae4b"), "refused relay shows an amber state")
 	_expect(str(game.get("status_line")).contains("I said no") and str(game.call("_context_hint")).contains("manual bypass"), "refusal clearly offers the engineer's bypass")
 	Input.action_press(&"move_right")
 	for _frame in range(180):

@@ -1,4 +1,4 @@
-[gd_scene load_steps=11 format=3]
+[gd_scene load_steps=12 format=3]
 
 [ext_resource type="Script" path="res://scripts/main.gd" id="1_main"]
 [ext_resource type="Script" path="res://scripts/m0_actor.gd" id="2_actor"]
@@ -6,12 +6,13 @@
 [ext_resource type="Texture2D" path="res://assets/wolf-side-right-provisional.png" id="4_wolf"]
 [ext_resource type="Texture2D" path="res://assets/rowan-side-right-provisional.png" id="5_rowan"]
 [ext_resource type="Texture2D" path="res://assets/title-corridor-key-art-provisional.png" id="6_title_art"]
+[ext_resource type="Texture2D" path="res://assets/maintenance-props-provisional.png" id="7_props"]
 
 [sub_resource type="RectangleShape2D" id="FloorShape"]
 size = Vector2(960, 60)
 
 [sub_resource type="RectangleShape2D" id="DoorShape"]
-size = Vector2(24, 132)
+size = Vector2(56, 132)
 
 [sub_resource type="RectangleShape2D" id="HumanShape"]
 size = Vector2(28, 60)
@@ -37,12 +38,19 @@ collision_layer = 2
 shape = SubResource("DoorShape")
 
 [node name="Visual" type="ColorRect" parent="Door"]
-offset_left = -12.0
+offset_left = -28.0
 offset_top = -66.0
-offset_right = 12.0
+offset_right = 28.0
 offset_bottom = 66.0
-pivot_offset = Vector2(12, 0)
-color = Color(0.83, 0.24, 0.20, 1)
+pivot_offset = Vector2(28, 0)
+color = Color(0, 0, 0, 0)
+
+[node name="DoorArt" type="Sprite2D" parent="Door/Visual"]
+position = Vector2(28, 66)
+scale = Vector2(0.22, 0.22)
+texture = ExtResource("7_props")
+region_enabled = true
+region_rect = Rect2(1086, 0, 543, 724)
 
 [node name="Human" type="CharacterBody2D" parent="."]
 position = Vector2(160, 410)
@@ -59,6 +67,7 @@ scale = Vector2(0.047, 0.047)
 texture = ExtResource("5_rowan")
 
 [node name="Tag" type="Label" parent="Human"]
+visible = false
 offset_left = -44.0
 offset_top = -63.0
 offset_right = 44.0
@@ -81,12 +90,55 @@ scale = Vector2(0.0733, 0.0733)
 texture = ExtResource("4_wolf")
 
 [node name="Tag" type="Label" parent="Wolf"]
+visible = false
 offset_left = -44.0
 offset_top = -74.0
 offset_right = 44.0
 offset_bottom = -52.0
 horizontal_alignment = 1
 text = "WOLF"
+
+[node name="BreakerArt" type="Sprite2D" parent="."]
+z_index = 1
+position = Vector2(350, 372)
+scale = Vector2(0.22, 0.22)
+texture = ExtResource("7_props")
+region_enabled = true
+region_rect = Rect2(0, 0, 543, 724)
+
+[node name="RelayArt" type="Sprite2D" parent="."]
+z_index = 1
+position = Vector2(605, 372)
+scale = Vector2(0.22, 0.22)
+texture = ExtResource("7_props")
+region_enabled = true
+region_rect = Rect2(543, 0, 543, 724)
+
+[node name="CheckpointArt" type="Sprite2D" parent="."]
+z_index = 1
+position = Vector2(876, 372)
+scale = Vector2(0.22, 0.22)
+texture = ExtResource("7_props")
+region_enabled = true
+region_rect = Rect2(1629, 0, 543, 724)
+
+[node name="BreakerStatusLight" type="ColorRect" parent="."]
+z_index = 2
+offset_left = 341.0
+offset_top = 354.0
+offset_right = 359.0
+offset_bottom = 359.0
+mouse_filter = 2
+color = Color(0.72, 0.4, 0.17, 1)
+
+[node name="RelayStatusLight" type="ColorRect" parent="."]
+z_index = 2
+offset_left = 596.0
+offset_top = 355.0
+offset_right = 614.0
+offset_bottom = 360.0
+mouse_filter = 2
+color = Color(0.33, 0.43, 0.48, 1)
 
 [node name="RelaySpark" type="Line2D" parent="."]
 visible = false

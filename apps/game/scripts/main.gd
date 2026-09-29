@@ -3,6 +3,11 @@ extends Node2D
 @onready var human: M0Actor = $Human
 @onready var wolf: M0Actor = $Wolf
 @onready var relay_spark: Line2D = $RelaySpark
+@onready var breaker_art: Sprite2D = $BreakerArt
+@onready var relay_art: Sprite2D = $RelayArt
+@onready var checkpoint_art: Sprite2D = $CheckpointArt
+@onready var breaker_status_light: ColorRect = $BreakerStatusLight
+@onready var relay_status_light: ColorRect = $RelayStatusLight
 @onready var human_tag: Label = $Human/Tag
 @onready var door_shape: CollisionShape2D = $Door/CollisionShape2D
 @onready var door_visual: ColorRect = $Door/Visual
@@ -34,6 +39,7 @@ var records_room: RecordsRoom
 var credits_paused: bool = false
 
 const WOLF_SPRITE_REST: Vector2 = Vector2(0.0, -15.0)
+const CORRIDOR_BACKGROUND: Texture2D = preload("res://assets/maintenance-corridor-background-provisional.png")
 
 
 func _ready() -> void:
@@ -65,51 +71,16 @@ func _ready() -> void:
 
 func _draw() -> void:
 	draw_rect(Rect2(0, 0, 960, 540), Color("#091533"))
-	draw_rect(Rect2(38, 103, 884, 338), Color("#10253d"))
-	draw_rect(Rect2(46, 111, 868, 287), Color("#142c43"))
-	for x in range(58, 920, 108):
-		draw_rect(Rect2(x, 120, 5, 278), Color("#20394e"))
-		draw_rect(Rect2(x + 9, 159, 83, 116), Color("#102337"))
-		draw_line(Vector2(x + 10, 286), Vector2(x + 92, 286), Color("#24445b"), 2.0)
-	draw_rect(Rect2(46, 108, 868, 18), Color("#253a4b"))
-	draw_line(Vector2(46, 148), Vector2(914, 148), Color("#34556b"), 3.0)
-	draw_line(Vector2(46, 307), Vector2(914, 307), Color("#29465b"), 2.0)
-	draw_colored_polygon(PackedVector2Array([Vector2(294, 150), Vector2(406, 150), Vector2(446, 438), Vector2(254, 438)]), Color(0.96, 0.62, 0.25, 0.07))
-	draw_colored_polygon(PackedVector2Array([Vector2(552, 150), Vector2(658, 150), Vector2(706, 438), Vector2(504, 438)]), Color(0.25, 0.78, 0.94, 0.07))
-	draw_colored_polygon(PackedVector2Array([Vector2(826, 150), Vector2(913, 150), Vector2(923, 438), Vector2(801, 438)]), Color(0.35, 0.90, 0.65, 0.07 if not state.door_open else 0.14))
+	draw_texture_rect(CORRIDOR_BACKGROUND, Rect2(0, 88, 960, 540), false)
 	draw_rect(Rect2(66, 169, 165, 100), Color("#081a2b"))
 	draw_rect(Rect2(66, 169, 165, 100), Color("#bb5257"), false, 2.0)
 	for line in range(3):
 		draw_rect(Rect2(78, 207 + line * 15, 138 - line * 19, 5), Color("#6a3949"))
 	draw_line(Vector2(75, 259), Vector2(222, 178), Color("#bb5257"), 2.0)
-	draw_rect(Rect2(40, 398, 880, 42), Color("#15293c"))
-	for x in range(52, 918, 44):
-		draw_line(Vector2(x, 402), Vector2(x - 8, 438), Color("#294359"), 1.0)
-	draw_rect(Rect2(40, 438, 880, 10), Color("#375269"))
-	draw_rect(Rect2(100, 434, 600, 5), Color("#f3ae4b"))
+	draw_line(Vector2(40, 440), Vector2(920, 440), Color("#375269"), 2.0)
+	draw_line(Vector2(100, 435), Vector2(700, 435), Color("#f3ae4b"), 2.0)
 	for x in range(100, 701, 60):
 		draw_rect(Rect2(x, 430, 5, 9), Color("#ffe0a0"))
-	draw_rect(Rect2(318, 374, 64, 66), Color("#0a1928"))
-	draw_rect(Rect2(325, 379, 50, 61), Color("#986331"))
-	draw_rect(Rect2(332, 388, 36, 27), Color("#13283a"))
-	draw_rect(Rect2(337, 393, 26, 5), Color("#e9ad55"))
-	draw_circle(Vector2(350, 425), 5.0, Color("#8be3ff") if state.breaker_armed else Color("#d65f59"))
-	draw_rect(Rect2(573, 374, 64, 66), Color("#0a1928"))
-	draw_rect(Rect2(580, 379, 50, 61), Color("#32765f") if state.door_open else (Color("#705332") if relay_refused else Color("#32637a")))
-	draw_rect(Rect2(587, 388, 36, 34), Color("#102a3d"))
-	draw_circle(Vector2(605, 405), 11.0, Color("#274e61"))
-	var relay_light: Color = Color("#a4f0c4") if state.door_open else (Color("#f3ae4b") if relay_refused else (Color("#8be3ff") if state.breaker_armed else Color("#536e7c")))
-	draw_arc(Vector2(605, 405), 9.0, 0.0, TAU, 24, relay_light, 2.0)
-	if state.door_open or relay_refused:
-		draw_arc(Vector2(605, 405), 16.0, 0.0, TAU, 24, relay_light, 2.0)
-	draw_circle(Vector2(605, 405), 3.0, relay_light)
-	draw_rect(Rect2(758, 299, 44, 141), Color("#0a1724"))
-	draw_rect(Rect2(758, 299, 44, 141), Color("#416177"), false, 3.0)
-	draw_rect(Rect2(763, 294, 34, 5), Color("#70d9a7") if state.door_open else Color("#d65f59"))
-	draw_rect(Rect2(850, 366, 52, 74), Color("#0a1928"))
-	draw_rect(Rect2(857, 372, 38, 68), Color("#34765e"))
-	draw_rect(Rect2(864, 385, 24, 24), Color("#102c2d"))
-	draw_circle(Vector2(876, 397), 6.0, Color("#a6ffd1") if state.checkpoint_reached else Color("#70d9a7"))
 	if state.door_open:
 		draw_line(Vector2(801, 434), Vector2(844, 434), Color("#70d9a7"), 4.0)
 
@@ -414,9 +385,12 @@ func _flash_relay_spark(from_wolf: bool) -> void:
 
 func _sync_records_room() -> void:
 	records_room.visible = state.chapter_id == "records"
+	breaker_status_light.visible = not records_room.visible
+	relay_status_light.visible = not records_room.visible
 	records_room.purge_trace_preserved = state.purge_trace_preserved
 	records_room.mirror_trace_preserved = state.mirror_trace_preserved
 	records_room.chapter_complete = state.chapter_complete
+	records_room.exit_art.visible = not state.chapter_complete
 	records_room.queue_redraw()
 
 
@@ -445,6 +419,11 @@ func _update_controls() -> void:
 func _refresh_ui() -> void:
 	var door_status: String = "OPEN" if state.door_open else "SEALED"
 	var control_label: String = "%s (they/them)" % state.human_name()
+	breaker_art.modulate = Color.WHITE if state.breaker_armed else Color("#879ba5")
+	breaker_status_light.color = Color("#8be3ff") if state.breaker_armed else Color("#d48954")
+	relay_art.modulate = Color.WHITE if state.breaker_armed else Color("#879ba5")
+	relay_status_light.color = Color("#a4f0c4") if state.door_open else (Color("#f3ae4b") if relay_refused else (Color("#8be3ff") if state.breaker_armed else Color("#536e7c")))
+	checkpoint_art.modulate = Color("#d5ffe3") if state.checkpoint_reached else Color.WHITE
 	human_tag.text = state.human_name().get_slice(" ", 0).to_upper()
 	if state.chapter_id == "records":
 		hud.text = "LOCKDOWN / FIRST COPY     OBJECTIVE: %s     CONTROL: %s\nA/D MOVE   E INTERACT   1/2 REPLY   I NAME   L LOAD   N RESTART" % [_objective(), control_label]
