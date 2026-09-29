@@ -43,9 +43,49 @@
       "rights_review_status": "Provisional AI-assisted title art, human reviewed. Final commercial asset-rights review remains open; not covered by the code/docs GPL license.",
       "modifications": "Original 1672x941 RGB image, with Rowan and WOLF at the left of a research corridor and dark space for live title/menu text at the right. No pixel edits or baked-in lettering.",
       "implementation_status": "Provisional cinematic title background in the Godot title screen and public landing page; a 960x540 renderer-backed title frame was visually inspected."
+    },
+    {
+      "asset_id": "maintenance-corridor-background-provisional",
+      "path": "apps/game/assets/maintenance-corridor-background-provisional.png",
+      "source_or_tool": "ChatGPT Create image via Chrome in the WOLF//OVERRIDE [Game] project",
+      "source_reference": "https://chatgpt.com/g/g-p-6ab60b48c7608191987f04a81b04b5e2-wolf-override-game/c/6abb82fd-5d14-83e9-9332-a78148b708b2",
+      "terms_reference": "https://openai.com/policies/terms-of-use/",
+      "rights_review_status": "Provisional AI-assisted environment art, human review in progress. Final commercial asset-rights review remains open; not covered by the code/docs GPL license.",
+      "modifications": "Original 1672x941 RGB image generated without characters, stations or UI. Displayed behind live Godot corridor props with a vertical offset; source pixels unchanged.",
+      "implementation_status": "Provisional gameplay background for the maintenance corridor."
+    },
+    {
+      "asset_id": "records-access-background-provisional",
+      "path": "apps/game/assets/records-access-background-provisional.png",
+      "source_or_tool": "ChatGPT Create image via Chrome in the WOLF//OVERRIDE [Game] project",
+      "source_reference": "https://chatgpt.com/g/g-p-6ab60b48c7608191987f04a81b04b5e2-wolf-override-game/c/6abb82fd-5d14-83e9-9332-a78148b708b2",
+      "terms_reference": "https://openai.com/policies/terms-of-use/",
+      "rights_review_status": "Provisional AI-assisted environment art, human review in progress. Final commercial asset-rights review remains open; not covered by the code/docs GPL license.",
+      "modifications": "Original 1672x941 RGB image generated as a matching archival bay without characters, stations or UI. Displayed behind live Godot Records props with a vertical offset; source pixels unchanged.",
+      "implementation_status": "Provisional gameplay background for Records Access."
+    },
+    {
+      "asset_id": "maintenance-props-provisional",
+      "path": "apps/game/assets/maintenance-props-provisional.png",
+      "source_or_tool": "ChatGPT Create image via Chrome in the WOLF//OVERRIDE [Game] project",
+      "source_reference": "https://chatgpt.com/g/g-p-6ab60b48c7608191987f04a81b04b5e2-wolf-override-game/c/6abb82fd-5d14-83e9-9332-a78148b708b2",
+      "terms_reference": "https://openai.com/policies/terms-of-use/",
+      "rights_review_status": "Provisional AI-assisted gameplay props, human review in progress. Final commercial asset-rights review remains open; not covered by the code/docs GPL license.",
+      "modifications": "Original 2172x724 RGBA sprite sheet with four isolated props. Godot Sprite2D regions display the breaker, relay, seal and safe-point art without modifying source pixels; live tint and door motion show gameplay state.",
+      "implementation_status": "Provisional interactive prop art in the maintenance corridor."
+    },
+    {
+      "asset_id": "records-props-provisional",
+      "path": "apps/game/assets/records-props-provisional.png",
+      "source_or_tool": "ChatGPT Create image via Chrome in the WOLF//OVERRIDE [Game] project",
+      "source_reference": "https://chatgpt.com/g/g-p-6ab60b48c7608191987f04a81b04b5e2-wolf-override-game/c/6abb82fd-5d14-83e9-9332-a78148b708b2",
+      "terms_reference": "https://openai.com/policies/terms-of-use/",
+      "rights_review_status": "Provisional AI-assisted gameplay props, human review in progress. Final commercial asset-rights review remains open; not covered by the code/docs GPL license.",
+      "modifications": "Original 2172x724 RGBA sprite sheet with three isolated props. Godot Sprite2D regions display the purge queue, mirror port and exit; source pixels are unchanged. The exit art hides when the chapter is secured.",
+      "implementation_status": "Provisional interactive prop art in Records Access."
     }
   ],
-  "status": "One provisional brand mark, two provisional character images and one title background recorded; no audio acquired.",
+  "status": "One provisional brand mark, two provisional character images, one title background, two gameplay backgrounds and two prop sheets recorded; no audio acquired.",
   "merge_warning": "Preserve this populated provenance register when merging future handoffs.",
   "future_entry_fields": [
     "asset_id",
