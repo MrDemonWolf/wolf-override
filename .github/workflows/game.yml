@@ -32,3 +32,5 @@ jobs:
         run: '"$GODOT_BIN" --headless --path apps/game --script res://tests/m0_scene_test.gd'
       - name: Check first chapter scene
         run: '"$GODOT_BIN" --headless --path apps/game --script res://tests/chapter_scene_test.gd'
+      - name: Check UI and controls
+        run: '"$GODOT_BIN" --headless --path apps/game --script res://tests/ui_controls_test.gd'

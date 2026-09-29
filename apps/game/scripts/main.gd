@@ -21,6 +21,23 @@ extends Node2D
 @onready var story: Label = $CanvasLayer/BottomBar/Story
 @onready var tutorial_prompt: ColorRect = $CanvasLayer/TutorialPrompt
 @onready var tutorial_text: Label = $CanvasLayer/TutorialPrompt/Text
+@onready var pause_button: Button = $CanvasLayer/PauseButton
+@onready var touch_controls: Control = $CanvasLayer/TouchControls
+@onready var touch_left: Button = $CanvasLayer/TouchControls/Left
+@onready var touch_right: Button = $CanvasLayer/TouchControls/Right
+@onready var touch_use: Button = $CanvasLayer/TouchControls/Use
+@onready var touch_choice_1: Button = $CanvasLayer/TouchControls/Choice1
+@onready var touch_choice_2: Button = $CanvasLayer/TouchControls/Choice2
+@onready var pause_overlay: PauseOverlay = $CanvasLayer/PauseOverlay
+@onready var pause_menu: Control = $CanvasLayer/PauseOverlay/Panel/PauseMenu
+@onready var settings_menu: Control = $CanvasLayer/PauseOverlay/Panel/SettingsMenu
+@onready var resume_button: Button = $CanvasLayer/PauseOverlay/Panel/PauseMenu/ResumeButton
+@onready var settings_button: Button = $CanvasLayer/PauseOverlay/Panel/PauseMenu/SettingsButton
+@onready var settings_back_button: Button = $CanvasLayer/PauseOverlay/Panel/SettingsMenu/BackButton
+@onready var fps_options: OptionButton = $CanvasLayer/PauseOverlay/Panel/SettingsMenu/FPSOptions
+@onready var resolution_options: OptionButton = $CanvasLayer/PauseOverlay/Panel/SettingsMenu/ResolutionOptions
+@onready var fullscreen_toggle: CheckButton = $CanvasLayer/PauseOverlay/Panel/SettingsMenu/FullscreenToggle
+@onready var settings_note: Label = $CanvasLayer/PauseOverlay/Panel/SettingsMenu/SettingsNote
 @onready var title_screen: ColorRect = $CanvasLayer/TitleScreen
 @onready var title_mark: TextureRect = $CanvasLayer/TitleScreen/LogoMark
 @onready var title_line: ColorRect = $CanvasLayer/TitleScreen/TitleLine
@@ -35,6 +52,8 @@ extends Node2D
 
 var state: M0State = M0State.new()
 var save_path: String = M0State.SAVE_PATH
+var settings_path: String = "user://settings.cfg"
+var touch_enabled: bool = OS.has_feature("ios") or OS.has_feature("android")
 var title_open: bool = true
 var intro_active: bool = false
 var intro_step: int = 0
@@ -59,6 +78,13 @@ const CORRIDOR_BACKGROUND: Texture2D = preload("res://assets/maintenance-corrido
 func _ready() -> void:
 	get_window().title = "WOLF//OVERRIDE"
 	_install_inputs()
+	_setup_settings()
+	_setup_touch_controls()
+	pause_button.pressed.connect(_on_pause_button)
+	pause_overlay.resume_requested.connect(_resume_game)
+	resume_button.pressed.connect(_resume_game)
+	settings_button.pressed.connect(_show_settings)
+	settings_back_button.pressed.connect(_show_pause_menu)
 	records_room = RecordsRoom.new()
 	records_room.z_index = 1
 	add_child(records_room)
@@ -85,7 +111,7 @@ func _ready() -> void:
 
 func _draw() -> void:
 	draw_rect(Rect2(0, 0, 960, 540), Color("#091533"))
-	draw_texture_rect(CORRIDOR_BACKGROUND, Rect2(0, 88, 960, 540), false)
+	draw_texture_rect(CORRIDOR_BACKGROUND, Rect2(0, 0, 960, 680), false)
 	draw_line(Vector2(40, 440), Vector2(920, 440), Color("#375269"), 2.0)
 	draw_line(Vector2(100, 435), Vector2(700, 435), Color("#f3ae4b"), 2.0)
 	for x in range(100, 701, 60):
@@ -100,7 +126,7 @@ func _process(delta: float) -> void:
 			credits_body.get_v_scroll_bar().value += delta * 18.0
 		return
 	if intro_active:
-		if Input.is_action_just_pressed(&"ui_cancel"):
+		if Input.is_action_just_pressed(&"ui_cancel") or Input.is_action_just_pressed(&"pause_game"):
 			_finish_intro()
 		elif Input.is_action_just_pressed(&"interact"):
 			_advance_intro()
@@ -114,6 +140,9 @@ func _process(delta: float) -> void:
 		elif Input.is_action_just_pressed(&"interact"):
 			_finish_chapter_close()
 		_refresh_ui()
+		return
+	if Input.is_action_just_pressed(&"pause_game"):
+		_pause_game()
 		return
 	if tutorial_step == 0 and (Input.is_action_pressed(&"move_left") or Input.is_action_pressed(&"move_right")):
 		tutorial_step = 1
@@ -141,6 +170,8 @@ func _process(delta: float) -> void:
 
 
 func _new_game() -> void:
+	get_tree().paused = false
+	pause_overlay.hide()
 	if intro_tween != null and intro_tween.is_running():
 		intro_tween.kill()
 	if chapter_tween != null and chapter_tween.is_running():
@@ -282,6 +313,138 @@ func _on_credits_body_input(event: InputEvent) -> void:
 		credits_pause_button.text = "RESUME SCROLL"
 
 
+func _setup_touch_controls() -> void:
+	_bind_touch_button(touch_left, &"move_left")
+	_bind_touch_button(touch_right, &"move_right")
+	_bind_touch_button(touch_use, &"interact")
+	_bind_touch_button(touch_choice_1, &"choice_1")
+	_bind_touch_button(touch_choice_2, &"choice_2")
+	var normal: StyleBoxFlat = StyleBoxFlat.new()
+	normal.bg_color = Color("#0a203680")
+	normal.border_color = Color("#52c6e8")
+	normal.set_border_width_all(2)
+	normal.set_corner_radius_all(6)
+	var hover: StyleBoxFlat = normal.duplicate() as StyleBoxFlat
+	hover.bg_color = Color("#174461")
+	for button: Button in [touch_left, touch_right, touch_use, touch_choice_1, touch_choice_2, pause_button, resume_button, settings_button, settings_back_button, fps_options, resolution_options]:
+		button.add_theme_stylebox_override("normal", normal)
+		button.add_theme_stylebox_override("hover", hover)
+		button.add_theme_stylebox_override("pressed", hover)
+		button.add_theme_color_override("font_color", Color.WHITE)
+		button.add_theme_color_override("font_hover_color", Color.WHITE)
+		button.add_theme_color_override("font_pressed_color", Color.WHITE)
+
+
+func _bind_touch_button(button: Button, action: StringName) -> void:
+	button.button_down.connect(func() -> void: Input.action_press(action))
+	button.button_up.connect(func() -> void: Input.action_release(action))
+
+
+func _setup_settings() -> void:
+	fps_options.add_item("30 FPS", 30)
+	fps_options.add_item("60 FPS", 60)
+	fps_options.add_item("UNCAPPED", 0)
+	resolution_options.add_item("960 × 540", 0)
+	resolution_options.add_item("1280 × 720", 1)
+	resolution_options.add_item("1920 × 1080", 2)
+	var config: ConfigFile = ConfigFile.new()
+	config.load(settings_path)
+	var fps: int = int(config.get_value("video", "fps_limit", 60))
+	if not fps in [0, 30, 60]:
+		fps = 60
+	Engine.max_fps = fps
+	fps_options.select(fps_options.get_item_index(fps))
+	var resolution: int = clampi(int(config.get_value("video", "resolution", 0)), 0, 2)
+	resolution_options.select(resolution)
+	var mobile: bool = OS.has_feature("ios") or OS.has_feature("android")
+	resolution_options.disabled = mobile
+	fullscreen_toggle.disabled = mobile
+	settings_note.text = "Window size is managed by iOS/Android." if mobile else "Window size applies on desktop."
+	if mobile:
+		$CanvasLayer/PauseOverlay/Panel/PauseMenu/PauseHint.text = "TAP RESUME TO RETURN"
+	if not mobile:
+		get_window().size = _resolution_size(resolution)
+		fullscreen_toggle.button_pressed = bool(config.get_value("video", "fullscreen", false))
+		if fullscreen_toggle.button_pressed:
+			get_window().mode = Window.MODE_FULLSCREEN
+	fps_options.item_selected.connect(_on_fps_selected)
+	resolution_options.item_selected.connect(_on_resolution_selected)
+	fullscreen_toggle.toggled.connect(_on_fullscreen_toggled)
+
+
+func _resolution_size(index: int) -> Vector2i:
+	match index:
+		1:
+			return Vector2i(1280, 720)
+		2:
+			return Vector2i(1920, 1080)
+		_:
+			return Vector2i(960, 540)
+
+
+func _on_fps_selected(index: int) -> void:
+	Engine.max_fps = fps_options.get_item_id(index)
+	_save_settings()
+
+
+func _on_resolution_selected(index: int) -> void:
+	if not resolution_options.disabled:
+		get_window().size = _resolution_size(index)
+		_save_settings()
+
+
+func _on_fullscreen_toggled(enabled: bool) -> void:
+	if not fullscreen_toggle.disabled:
+		get_window().mode = Window.MODE_FULLSCREEN if enabled else Window.MODE_WINDOWED
+		_save_settings()
+
+
+func _save_settings() -> void:
+	var config: ConfigFile = ConfigFile.new()
+	config.set_value("video", "fps_limit", fps_options.get_selected_id())
+	config.set_value("video", "resolution", resolution_options.selected)
+	config.set_value("video", "fullscreen", fullscreen_toggle.button_pressed)
+	if config.save(settings_path) != OK:
+		settings_note.text = "Settings could not be saved."
+
+
+func _on_pause_button() -> void:
+	if intro_active:
+		_finish_intro()
+	else:
+		_pause_game()
+
+
+func _pause_game() -> void:
+	for action: StringName in [&"move_left", &"move_right", &"interact", &"choice_1", &"choice_2"]:
+		Input.action_release(action)
+	pause_menu.show()
+	settings_menu.hide()
+	pause_overlay.show()
+	pause_button.hide()
+	touch_controls.hide()
+	get_tree().paused = true
+	resume_button.grab_focus()
+
+
+func _resume_game() -> void:
+	get_tree().paused = false
+	pause_overlay.hide()
+	_refresh_ui()
+
+
+func _show_settings() -> void:
+	pause_menu.hide()
+	settings_menu.show()
+	fps_options.grab_focus()
+
+
+func _show_pause_menu() -> void:
+	settings_menu.hide()
+	pause_menu.show()
+	resume_button.grab_focus()
+
+
 func _unhandled_input(event: InputEvent) -> void:
 	if credits_screen.visible and event.is_action_pressed(&"ui_cancel"):
 		_hide_credits()
@@ -289,6 +452,8 @@ func _unhandled_input(event: InputEvent) -> void:
 
 
 func _load_game() -> void:
+	get_tree().paused = false
+	pause_overlay.hide()
 	var loaded: M0State = M0State.load_from_disk(save_path)
 	if loaded == null:
 		status_line = "No valid checkpoint save found. Current game was not changed."
@@ -584,25 +749,37 @@ func _update_controls() -> void:
 
 
 func _refresh_ui() -> void:
+	pause_button.visible = not title_open and not chapter_close_active and not pause_overlay.visible
+	pause_button.text = "SKIP" if intro_active else "PAUSE"
+	touch_controls.visible = touch_enabled and not title_open and not pause_overlay.visible
+	var touch_move: bool = not intro_active and not chapter_close_active and not waiting_for_choice
+	touch_left.visible = touch_move
+	touch_right.visible = touch_move
+	touch_use.visible = not waiting_for_choice
+	touch_use.text = "CONTINUE" if intro_active or chapter_close_active else "USE"
+	touch_choice_1.visible = waiting_for_choice
+	touch_choice_2.visible = waiting_for_choice
+	if waiting_for_choice:
+		touch_choice_1.text = "1  WOLF READOUT" if choice_context == "mirror" else "1  TELL WOLF"
+		touch_choice_2.text = "2  MANUAL PORT" if choice_context == "mirror" else "2  PRESS WOLF"
 	tutorial_prompt.visible = not title_open and not intro_active and state.chapter_id == "lockdown" and tutorial_step < 2
 	if tutorial_prompt.visible:
 		if tutorial_step == 0:
-			tutorial_text.text = "A / D  MOVE\nReach the purge display."
+			var move_label: String = "HOLD ◀ / ▶" if touch_enabled else ("STICK / D-PAD MOVE" if not Input.get_connected_joypads().is_empty() else "A / D  MOVE")
+			tutorial_text.text = "%s\nReach the purge display." % move_label
 		elif human.position.x <= 230.0:
-			tutorial_text.text = "E  READ DISPLAY\nSee what the Director is deleting."
+			tutorial_text.text = "%s\nSee what the Director is deleting." % ("TAP USE" if touch_enabled else "E  READ DISPLAY")
 		else:
-			tutorial_text.text = "A / D  RETURN\nFind the red purge display."
+			tutorial_text.text = "%s\nFind the red purge display." % ("HOLD ◀ / ▶" if touch_enabled else "A / D  RETURN")
 	if intro_active:
 		var phase: String = "03:17 / CONTAINMENT" if intro_step <= 1 else ("03:18 / BREACH" if intro_step <= 3 else "03:19 / LOCKDOWN")
-		hud.text = "%s    WOLF//OVERRIDE\nE CONTINUE    ESC SKIP" % phase
-		story.text = status_line + "\nE: continue   ESC: skip opening"
+		hud.text = "%s\nWOLF//OVERRIDE" % phase
+		story.text = status_line + ("\nTAP CONTINUE  /  SKIP" if touch_enabled else "\nE: continue   ESC: skip opening")
 		return
 	if chapter_close_active:
-		hud.text = "RECORDS ACCESS / FIRST COPY SECURED\nE CONTINUE"
+		hud.text = "RECORDS ACCESS\nFIRST COPY SECURED"
 		story.text = status_line
 		return
-	var door_status: String = "OPEN" if state.door_open else "SEALED"
-	var control_label: String = "%s (they/them)" % state.human_name()
 	breaker_art.modulate = Color.WHITE if state.breaker_armed else Color("#879ba5")
 	breaker_status_light.color = Color("#8be3ff") if state.breaker_armed else Color("#d48954")
 	relay_art.modulate = Color.WHITE if state.breaker_armed else Color("#879ba5")
@@ -610,10 +787,10 @@ func _refresh_ui() -> void:
 	checkpoint_art.modulate = Color("#d5ffe3") if state.checkpoint_reached else Color.WHITE
 	human_tag.text = state.human_name().get_slice(" ", 0).to_upper()
 	if state.chapter_id == "records":
-		hud.text = "LOCKDOWN / FIRST COPY     OBJECTIVE: %s     CONTROL: %s\nA/D MOVE   E INTERACT" % [_objective(), control_label]
+		hud.text = "RECORDS ACCESS / FIRST COPY\n%s" % _objective()
 	else:
-		hud.text = "MAINTENANCE / LOCKDOWN     OBJECTIVE: %s     CONTROL: %s     SEAL: %s\nA/D MOVE   E INTERACT" % [_objective(), control_label, door_status]
-	story.text = status_line if waiting_for_choice else status_line + "\n" + _context_hint()
+		hud.text = "MAINTENANCE / LOCKDOWN\n%s" % _objective()
+	story.text = status_line if waiting_for_choice else status_line + "\n" + (_context_hint().replace("E:", "USE:") if touch_enabled else _context_hint())
 
 
 func _context_hint() -> String:
@@ -679,9 +856,18 @@ func _install_inputs() -> void:
 	_add_action(&"interact", KEY_E)
 	_add_action(&"choice_1", KEY_1)
 	_add_action(&"choice_2", KEY_2)
+	_add_action(&"pause_game", KEY_ESCAPE)
 	_add_action(&"cycle_name", KEY_I)
 	_add_action(&"load_game", KEY_L, KEY_F9)
 	_add_action(&"new_game", KEY_N)
+	_add_joy_button(&"move_left", JOY_BUTTON_DPAD_LEFT)
+	_add_joy_button(&"move_right", JOY_BUTTON_DPAD_RIGHT)
+	_add_joy_axis(&"move_left", -1.0)
+	_add_joy_axis(&"move_right", 1.0)
+	_add_joy_button(&"interact", JOY_BUTTON_A)
+	_add_joy_button(&"choice_1", JOY_BUTTON_X)
+	_add_joy_button(&"choice_2", JOY_BUTTON_Y)
+	_add_joy_button(&"pause_game", JOY_BUTTON_START)
 
 
 func _add_action(action: StringName, key: Key, alternate: Key = KEY_NONE) -> void:
@@ -695,3 +881,18 @@ func _add_action(action: StringName, key: Key, alternate: Key = KEY_NONE) -> voi
 		var secondary: InputEventKey = InputEventKey.new()
 		secondary.physical_keycode = alternate
 		InputMap.action_add_event(action, secondary)
+
+
+func _add_joy_button(action: StringName, button_index: JoyButton) -> void:
+	var event: InputEventJoypadButton = InputEventJoypadButton.new()
+	event.button_index = button_index
+	if not InputMap.action_has_event(action, event):
+		InputMap.action_add_event(action, event)
+
+
+func _add_joy_axis(action: StringName, value: float) -> void:
+	var event: InputEventJoypadMotion = InputEventJoypadMotion.new()
+	event.axis = JOY_AXIS_LEFT_X
+	event.axis_value = value
+	if not InputMap.action_has_event(action, event):
+		InputMap.action_add_event(action, event)

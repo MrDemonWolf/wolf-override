@@ -198,7 +198,7 @@ func _run() -> void:
 		return
 	await _tap(&"cycle_name")
 	_expect(state.name_index == 1, "draft identity changes before fallback save")
-	_expect(hud.text.contains("CONTROL: Alex Bennett (they/them)"), "protagonist keeps they/them when the provisional name changes")
+	_expect(str(game.get("status_line")).contains("Alex Bennett") and hud.text.contains("MAINTENANCE"), "provisional name changes without crowding the objective display")
 	_expect(not str(game.get("status_line")).contains("breaker"), "identity line does not rewind the scene after the seal opens")
 	await _tap(&"interact")
 	if not _require(state.checkpoint_reached, "fallback reaches checkpoint"):

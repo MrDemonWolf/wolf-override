@@ -16,7 +16,7 @@ One choice can change what your companion remembers.
 is no download yet. It has a short, skippable opening escape scene, a staged corridor, a second records room,
 provisional character, title, room, and machine art, one door puzzle, and a first
 record-copying objective. Character animation, audio, the wider campaign,
-exports, and device testing are still ahead.
+public export packages and physical-device testing are still ahead.
 
 **Quick play:** The opening shows only WOLF and the Director. Press **E** to
 advance WOLF's escape or **Esc** to skip it. You then control the engineer,
@@ -83,6 +83,16 @@ checkpoint save exists.
 | I                  | Cycle provisional engineer display names   |
 | L or F9            | Load the saved checkpoint                   |
 | N                  | Start a clean current run                   |
+| Esc                | Pause or resume during play; skip the opening |
+
+A basic controller map is available: left stick or D-pad moves, A interacts,
+X/Y selects choices 1/2, and Start pauses. On iOS and Android, on-screen
+left/right, Use, choice, and Pause buttons appear during play. Controller
+hardware and physical touch devices have not been tested yet.
+
+The pause menu has Resume and Settings. Settings save a 30 FPS, 60 FPS, or
+uncapped limit; desktop builds also offer three window sizes and fullscreen.
+Mobile window size is managed by the operating system.
 
 At the relay, choice **1** lets WOLF help: stand toward the right side so
 he can reach the contact, then press E. If he asks for room, step right and
@@ -152,9 +162,10 @@ mirror routes, the opening tutorial, the chapter close, and Continue restoring
 progress with separate test saves. The purge interaction was checked in a
 normal Godot window, and 960×540 tutorial and Records completion frames were
 inspected. Full corridor-to-Records routes have not been played by hand.
-Exports and device checks remain unrun.
-Corridor play currently requires a keyboard; touch controls and mobile
-exports are not implemented.
+The new input/settings check also passed. A local iOS simulator export built
+and launched on iPhone 17e and iPhone 18 Pro Max simulators; the 17e title
+screen was inspected. The full route, controller hardware, touch gestures,
+public export packages, and physical devices remain untested.
 
 ## Project Structure
 
