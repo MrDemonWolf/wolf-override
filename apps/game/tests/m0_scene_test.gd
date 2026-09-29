@@ -30,6 +30,7 @@ func _run() -> void:
 	var hud: Label = game.get_node("CanvasLayer/TopBar/HUD") as Label
 	var human: M0Actor = game.get_node("Human") as M0Actor
 	var wolf: M0Actor = game.get_node("Wolf") as M0Actor
+	var relay_spark: Line2D = game.get_node("RelaySpark") as Line2D
 
 	if not _require(game.get("title_open") and title_screen.visible and continue_button.disabled, "fresh title disables Continue without a test checkpoint"):
 		return
@@ -84,6 +85,8 @@ func _run() -> void:
 	await _tap(&"choice_1")
 	if not _require(state.memory.get("choice_id") == State.DISCLOSE, "first dialogue key records disclosed risk"):
 		return
+	await create_timer(0.1).timeout
+	_expect(wolf.body_sprite.position.distance_to(Vector2(0.0, -15.0)) > 2.0, "WOLF visibly reacts to the disclosed risk")
 	_expect(game.call("_objective") == "ARM THE BREAKER", "honest answer advances the objective")
 	await _tap(&"interact")
 	if not _require(state.breaker_armed, "breaker arms after choice"):
@@ -102,11 +105,13 @@ func _run() -> void:
 	await _tap(&"interact")
 	if not _require(state.door_open and state.route == "cooperate", "WOLF cooperation opens door"):
 		return
+	_expect(relay_spark.visible and relay_spark.default_color == Color("#8be3ff"), "WOLF's contact produces a visible cyan relay spark")
 	_expect(game.call("_objective") == "REACH SAFE POINT", "open seal points to safety")
 	_expect(str(game.call("_context_hint")).contains("Move to the safe point"), "open-door hint no longer sends the player back to the breaker")
-	await create_timer(0.45).timeout
+	await create_timer(0.68).timeout
 	var door_visual: ColorRect = game.get_node("Door/Visual") as ColorRect
 	_expect(not door_visual.visible, "door retracts after cooperation")
+	_expect(not relay_spark.visible and wolf.body_sprite.position == Vector2(0.0, -15.0), "contact reaction settles after the seal opens")
 	await _tap(&"interact")
 	_expect(not door_visual.visible, "reusing the open relay does not replay the door seal")
 	if not _require(await _walk_to(human, 876.0), "engineer walks through opened door to checkpoint"):
@@ -137,6 +142,8 @@ func _run() -> void:
 	if not _require(state.memory.get("choice_id") == State.PRESS, "second dialogue key records pressed risk"):
 		return
 	_expect(str(game.get("status_line")).contains("I won't take that risk blind"), "WOLF refuses the live contact")
+	await create_timer(0.1).timeout
+	_expect(wolf.body_sprite.position.x < -2.0, "WOLF visibly steps back from the unwarned request")
 	await _tap(&"interact")
 	if not _require(state.breaker_armed, "fallback breaker arms"):
 		return
@@ -157,6 +164,7 @@ func _run() -> void:
 	await _tap(&"interact")
 	if not _require(state.door_open and state.route == "fallback", "engineer bypass opens door"):
 		return
+	_expect(relay_spark.visible and relay_spark.default_color == Color("#f3ae4b"), "manual bypass produces a distinct amber relay spark")
 	_expect(str(game.call("_context_hint")).contains("Move to the safe point"), "fallback hint points through the open seal")
 	if not _require(await _walk_to(human, 876.0), "engineer walks through opened door to checkpoint"):
 		return
