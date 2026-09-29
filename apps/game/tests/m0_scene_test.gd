@@ -124,6 +124,7 @@ func _run() -> void:
 	_expect(speaker.text == "WOLF" and story.text.contains("coolant fault") and not story.text.contains("\n1  "), "dialogue identifies WOLF and keeps response text out of the question")
 	_expect(not context_hint.visible and choice_1_button.visible and choice_2_button.visible, "disagreement offers visible choices without a competing interaction hint")
 	_expect(choice_1_button.text.contains(State.CHOICE_TEXT[State.DISCLOSE]) and choice_2_button.text.contains(State.CHOICE_TEXT[State.PRESS]), "choice buttons show the complete response text")
+	_expect(choice_1_button.size.y == 40.0 and choice_2_button.size.y == 40.0 and choice_1_button.text.begins_with("1  "), "keyboard choices use compact cards with number prompts")
 	await _tap(&"choice_1")
 	if not _require(state.memory.get("choice_id") == State.DISCLOSE, "first dialogue key records disclosed risk"):
 		return

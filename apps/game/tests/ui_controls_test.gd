@@ -35,6 +35,23 @@ func _run() -> void:
 	await process_frame
 	use.button_up.emit()
 	_expect(game.get("tutorial_step") == 2 and not (game.get_node("CanvasLayer/TutorialPrompt") as ColorRect).visible, "touch use reads the display and clears the tutorial")
+	game.set("waiting_for_choice", true)
+	game.call("_refresh_ui")
+	var first_choice: Button = touch.get_node("Choice1") as Button
+	var second_choice: Button = touch.get_node("Choice2") as Button
+	_expect(first_choice.size.y == 76.0 and second_choice.position.x > first_choice.position.x, "touch choices retain large side-by-side targets")
+	var controller_event: InputEventJoypadButton = InputEventJoypadButton.new()
+	controller_event.button_index = JOY_BUTTON_X
+	controller_event.pressed = true
+	game.call("_input", controller_event)
+	_expect(first_choice.size.y == 40.0 and second_choice.position.y > first_choice.position.y and first_choice.text.begins_with("X  ") and second_choice.text.begins_with("Y  "), "controller choices use compact stacked cards with action prompts")
+	_expect(not right.visible and not use.visible, "controller input hides mobile touch movement controls")
+	var touch_event: InputEventScreenTouch = InputEventScreenTouch.new()
+	touch_event.pressed = true
+	game.call("_input", touch_event)
+	_expect(first_choice.size.y == 76.0 and first_choice.text.begins_with("1  "), "touch input restores large choice targets")
+	game.set("waiting_for_choice", false)
+	game.call("_refresh_ui")
 	game.call("_pause_game")
 	var overlay: PauseOverlay = game.get_node("CanvasLayer/PauseOverlay") as PauseOverlay
 	_expect(paused and overlay.visible, "pause freezes the game and opens the menu")

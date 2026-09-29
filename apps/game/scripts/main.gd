@@ -60,6 +60,7 @@ var state: M0State = M0State.new()
 var save_path: String = M0State.SAVE_PATH
 var settings_path: String = "user://settings.cfg"
 var touch_enabled: bool = OS.has_feature("ios") or OS.has_feature("android")
+var controller_active: bool = false
 var title_open: bool = true
 var intro_active: bool = false
 var intro_step: int = 0
@@ -456,6 +457,17 @@ func _unhandled_input(event: InputEvent) -> void:
 		get_viewport().set_input_as_handled()
 
 
+func _input(event: InputEvent) -> void:
+	var use_controller: bool = controller_active
+	if event is InputEventJoypadButton and event.pressed or event is InputEventJoypadMotion and absf(event.axis_value) > 0.45:
+		use_controller = true
+	elif event is InputEventScreenTouch and event.pressed or event is InputEventScreenDrag or event is InputEventKey and event.pressed or event is InputEventMouseButton and event.pressed:
+		use_controller = false
+	if use_controller != controller_active:
+		controller_active = use_controller
+		_refresh_ui()
+
+
 func _load_game() -> void:
 	get_tree().paused = false
 	pause_overlay.hide()
@@ -755,28 +767,37 @@ func _update_controls() -> void:
 
 
 func _refresh_ui() -> void:
+	var touch_layout: bool = touch_enabled and not controller_active
 	pause_button.visible = not title_open and not chapter_close_active and not pause_overlay.visible
 	pause_button.text = "SKIP" if intro_active else "PAUSE"
-	touch_controls.visible = (touch_enabled or waiting_for_choice) and not title_open and not pause_overlay.visible
+	touch_controls.visible = (touch_layout or waiting_for_choice) and not title_open and not pause_overlay.visible
 	var touch_move: bool = not intro_active and not chapter_close_active and not waiting_for_choice
-	touch_left.visible = touch_enabled and touch_move
-	touch_right.visible = touch_enabled and touch_move
-	touch_use.visible = touch_enabled and not waiting_for_choice
+	touch_left.visible = touch_layout and touch_move
+	touch_right.visible = touch_layout and touch_move
+	touch_use.visible = touch_layout and not waiting_for_choice
 	touch_use.text = "CONTINUE" if intro_active or chapter_close_active else "USE"
 	touch_choice_1.visible = waiting_for_choice
 	touch_choice_2.visible = waiting_for_choice
 	if waiting_for_choice:
-		touch_choice_1.text = "1  USE WOLF'S READOUT" if choice_context == "mirror" else "1  %s" % M0State.CHOICE_TEXT[M0State.DISCLOSE]
-		touch_choice_2.text = "2  USE MANUAL PORT" if choice_context == "mirror" else "2  %s" % M0State.CHOICE_TEXT[M0State.PRESS]
+		touch_choice_1.position = Vector2(42.0, 355.0) if touch_layout else Vector2(396.0, 350.0)
+		touch_choice_2.position = Vector2(490.0, 355.0) if touch_layout else Vector2(396.0, 396.0)
+		touch_choice_1.size = Vector2(428.0, 76.0) if touch_layout else Vector2(522.0, 40.0)
+		touch_choice_2.size = Vector2(428.0, 76.0) if touch_layout else Vector2(522.0, 40.0)
+		touch_choice_1.add_theme_font_size_override("font_size", 17 if touch_layout else 16)
+		touch_choice_2.add_theme_font_size_override("font_size", 17 if touch_layout else 16)
+		var choice_1_key: String = "X" if controller_active else "1"
+		var choice_2_key: String = "Y" if controller_active else "2"
+		touch_choice_1.text = "%s  %s" % [choice_1_key, "USE WOLF'S READOUT" if choice_context == "mirror" else M0State.CHOICE_TEXT[M0State.DISCLOSE]]
+		touch_choice_2.text = "%s  %s" % [choice_2_key, "USE MANUAL PORT" if choice_context == "mirror" else M0State.CHOICE_TEXT[M0State.PRESS]]
 	tutorial_prompt.visible = not title_open and not intro_active and state.chapter_id == "lockdown" and tutorial_step < 2
 	if tutorial_prompt.visible:
 		if tutorial_step == 0:
-			var move_label: String = "HOLD ◀ / ▶" if touch_enabled else ("STICK / D-PAD MOVE" if not Input.get_connected_joypads().is_empty() else "A / D  MOVE")
+			var move_label: String = "HOLD ◀ / ▶" if touch_layout else ("STICK / D-PAD MOVE" if controller_active else "A / D  MOVE")
 			tutorial_text.text = "%s\nReach the purge display." % move_label
 		elif human.position.x <= 230.0:
-			tutorial_text.text = "%s\nSee what the Director is deleting." % ("TAP USE" if touch_enabled else "E  READ DISPLAY")
+			tutorial_text.text = "%s\nSee what the Director is deleting." % ("TAP USE" if touch_layout else ("A  READ DISPLAY" if controller_active else "E  READ DISPLAY"))
 		else:
-			tutorial_text.text = "%s\nFind the red purge display." % ("HOLD ◀ / ▶" if touch_enabled else "A / D  RETURN")
+			tutorial_text.text = "%s\nFind the red purge display." % ("HOLD ◀ / ▶" if touch_layout else ("STICK / D-PAD RETURN" if controller_active else "A / D  RETURN"))
 	if title_open:
 		top_card.hide()
 		return
@@ -784,13 +805,13 @@ func _refresh_ui() -> void:
 		if last_top_card_key != "intro":
 			last_top_card_key = "intro"
 			_show_top_card("03:17 / CONTAINMENT\nWOLF//OVERRIDE", 2.6)
-		_set_dialogue(status_line, "TAP CONTINUE  /  SKIP" if touch_enabled else "E / A  CONTINUE    ESC / START  SKIP")
+		_set_dialogue(status_line, "TAP CONTINUE  /  SKIP" if touch_layout else ("A  CONTINUE    START  SKIP" if controller_active else "E  CONTINUE    ESC  SKIP"))
 		return
 	if chapter_close_active:
 		if last_top_card_key != "chapter_close":
 			last_top_card_key = "chapter_close"
 			_show_top_card("RECORDS ACCESS\nFIRST COPY SECURED", 3.4)
-		_set_dialogue(status_line, "TAP CONTINUE" if touch_enabled else "E / A  CONTINUE")
+		_set_dialogue(status_line, "TAP CONTINUE" if touch_layout else ("A  CONTINUE" if controller_active else "E  CONTINUE"))
 		return
 	breaker_art.modulate = Color.WHITE if state.breaker_armed else Color("#879ba5")
 	breaker_status_light.color = Color("#8be3ff") if state.breaker_armed else Color("#d48954")
@@ -803,7 +824,12 @@ func _refresh_ui() -> void:
 		last_top_card_key = card_key
 		var location: String = "RECORDS ACCESS / FIRST COPY" if state.chapter_id == "records" else "MAINTENANCE / LOCKDOWN"
 		_show_top_card("%s\n%s" % [location, _objective()], 3.4)
-	_set_dialogue(status_line, "" if waiting_for_choice else (_context_hint().replace("E:", "USE:") if touch_enabled else _context_hint()))
+	var hint: String = _context_hint()
+	if touch_layout:
+		hint = hint.replace("E:", "USE:")
+	elif controller_active:
+		hint = hint.replace("E:", "A:")
+	_set_dialogue(status_line, "" if waiting_for_choice else hint)
 
 
 func _set_dialogue(message: String, hint: String) -> void:
