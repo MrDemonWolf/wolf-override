@@ -29,6 +29,11 @@ func _run() -> void:
 	var credits_pause_button: Button = game.get_node("CanvasLayer/TitleScreen/CreditsScreen/CreditsPauseButton") as Button
 	var hud: Label = game.get_node("CanvasLayer/TopBar/HUD") as Label
 	var top_card: ColorRect = game.get_node("CanvasLayer/TopBar") as ColorRect
+	var speaker: Label = game.get_node("CanvasLayer/BottomBar/Speaker") as Label
+	var story: Label = game.get_node("CanvasLayer/BottomBar/Story") as Label
+	var context_hint: ColorRect = game.get_node("CanvasLayer/ContextHint") as ColorRect
+	var choice_1_button: Button = game.get_node("CanvasLayer/TouchControls/Choice1") as Button
+	var choice_2_button: Button = game.get_node("CanvasLayer/TouchControls/Choice2") as Button
 	var tutorial_prompt: ColorRect = game.get_node("CanvasLayer/TutorialPrompt") as ColorRect
 	var tutorial_text: Label = game.get_node("CanvasLayer/TutorialPrompt/Text") as Label
 	var human: M0Actor = game.get_node("Human") as M0Actor
@@ -89,6 +94,7 @@ func _run() -> void:
 	_expect(human.controlled and not wolf.controlled and not InputMap.has_action(&"switch_actor"), "only the engineer has movement controls")
 	_expect(game.call("_objective") == "CHECK THE BREAKER", "opening points to the first corridor objective")
 	_expect(top_card.visible and hud.text.contains("CHECK THE BREAKER"), "new gameplay objective appears as a short card")
+	_expect(speaker.text.is_empty() and story.text.begins_with("WOLF:") and story.text.contains("\n%s:" % state.human_name().get_slice(" ", 0).to_upper()), "two speakers keep their own names in the opening exchange")
 	await create_timer(3.9).timeout
 	game.call("_refresh_ui")
 	_expect(not top_card.visible, "gameplay objective card fades without returning each frame")
@@ -115,6 +121,9 @@ func _run() -> void:
 	await _tap(&"interact")
 	if not _require(game.get("waiting_for_choice"), "breaker opens authored disagreement"):
 		return
+	_expect(speaker.text == "WOLF" and story.text.contains("coolant fault") and not story.text.contains("\n1  "), "dialogue identifies WOLF and keeps response text out of the question")
+	_expect(not context_hint.visible and choice_1_button.visible and choice_2_button.visible, "disagreement offers visible choices without a competing interaction hint")
+	_expect(choice_1_button.text.contains(State.CHOICE_TEXT[State.DISCLOSE]) and choice_2_button.text.contains(State.CHOICE_TEXT[State.PRESS]), "choice buttons show the complete response text")
 	await _tap(&"choice_1")
 	if not _require(state.memory.get("choice_id") == State.DISCLOSE, "first dialogue key records disclosed risk"):
 		return

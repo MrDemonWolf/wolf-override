@@ -181,6 +181,8 @@ offset_top = 313.0
 offset_right = 396.0
 offset_bottom = 336.0
 horizontal_alignment = 1
+theme_override_colors/font_color = Color(0.69, 0.82, 0.87, 1)
+theme_override_font_sizes/font_size = 13
 text = "BREAKER"
 
 [node name="RelayLabel" type="Label" parent="."]
@@ -189,6 +191,8 @@ offset_top = 313.0
 offset_right = 675.0
 offset_bottom = 336.0
 horizontal_alignment = 1
+theme_override_colors/font_color = Color(0.69, 0.82, 0.87, 1)
+theme_override_font_sizes/font_size = 13
 text = "COOLANT RELAY"
 
 [node name="CheckpointLabel" type="Label" parent="."]
@@ -197,6 +201,8 @@ offset_top = 313.0
 offset_right = 932.0
 offset_bottom = 336.0
 horizontal_alignment = 1
+theme_override_colors/font_color = Color(0.69, 0.82, 0.87, 1)
+theme_override_font_sizes/font_size = 13
 text = "SAFE POINT"
 
 [node name="CanvasLayer" type="CanvasLayer" parent="."]
@@ -230,26 +236,74 @@ theme_override_font_sizes/font_size = 15
 autowrap_mode = 3
 
 [node name="BottomBar" type="ColorRect" parent="CanvasLayer"]
-offset_left = 28.0
-offset_top = 449.0
-offset_right = 932.0
-offset_bottom = 528.0
+offset_left = 34.0
+offset_top = 444.0
+offset_right = 926.0
+offset_bottom = 526.0
 mouse_filter = 2
-color = Color(0.025, 0.045, 0.08, 0.90)
+color = Color(0.018, 0.035, 0.061, 0.94)
 
 [node name="Accent" type="ColorRect" parent="CanvasLayer/BottomBar"]
-offset_right = 4.0
-offset_bottom = 79.0
+offset_right = 3.0
+offset_bottom = 82.0
 mouse_filter = 2
 color = Color(0.22, 0.78, 0.92, 1)
 
+[node name="TopRule" type="ColorRect" parent="CanvasLayer/BottomBar"]
+offset_left = 3.0
+offset_right = 892.0
+offset_bottom = 2.0
+mouse_filter = 2
+color = Color(0.24, 0.5, 0.62, 0.7)
+
+[node name="Speaker" type="Label" parent="CanvasLayer/BottomBar"]
+offset_left = 20.0
+offset_top = 13.0
+offset_right = 140.0
+offset_bottom = 62.0
+theme_override_font_sizes/font_size = 15
+vertical_alignment = 1
+
+[node name="SpeakerRule" type="ColorRect" parent="CanvasLayer/BottomBar"]
+offset_left = 143.0
+offset_top = 14.0
+offset_right = 144.0
+offset_bottom = 68.0
+mouse_filter = 2
+color = Color(0.52, 0.72, 0.81, 0.43)
+
 [node name="Story" type="Label" parent="CanvasLayer/BottomBar"]
-offset_left = 18.0
-offset_top = 8.0
-offset_right = 888.0
-offset_bottom = 73.0
-theme_override_font_sizes/font_size = 16
+offset_left = 160.0
+offset_top = 9.0
+offset_right = 875.0
+offset_bottom = 76.0
+theme_override_font_sizes/font_size = 17
 autowrap_mode = 3
+vertical_alignment = 1
+
+[node name="ContextHint" type="ColorRect" parent="CanvasLayer"]
+offset_left = 253.0
+offset_top = 405.0
+offset_right = 802.0
+offset_bottom = 440.0
+mouse_filter = 2
+color = Color(0.018, 0.041, 0.073, 0.9)
+
+[node name="Accent" type="ColorRect" parent="CanvasLayer/ContextHint"]
+offset_right = 3.0
+offset_bottom = 35.0
+mouse_filter = 2
+color = Color(0.24, 0.77, 0.9, 1)
+
+[node name="Text" type="Label" parent="CanvasLayer/ContextHint"]
+offset_left = 13.0
+offset_top = 3.0
+offset_right = 539.0
+offset_bottom = 32.0
+theme_override_colors/font_color = Color(0.76, 0.86, 0.91, 1)
+theme_override_font_sizes/font_size = 14
+autowrap_mode = 3
+vertical_alignment = 1
 
 [node name="TutorialPrompt" type="ColorRect" parent="CanvasLayer"]
 visible = false
@@ -316,20 +370,20 @@ text = "USE"
 
 [node name="Choice1" type="Button" parent="CanvasLayer/TouchControls"]
 visible = false
-offset_left = 472.0
-offset_top = 345.0
-offset_right = 690.0
-offset_bottom = 435.0
-theme_override_font_sizes/font_size = 18
+offset_left = 42.0
+offset_top = 355.0
+offset_right = 470.0
+offset_bottom = 431.0
+theme_override_font_sizes/font_size = 17
 text = "1  WOLF"
 
 [node name="Choice2" type="Button" parent="CanvasLayer/TouchControls"]
 visible = false
-offset_left = 700.0
-offset_top = 345.0
-offset_right = 928.0
-offset_bottom = 435.0
-theme_override_font_sizes/font_size = 18
+offset_left = 490.0
+offset_top = 355.0
+offset_right = 918.0
+offset_bottom = 431.0
+theme_override_font_sizes/font_size = 17
 text = "2  MANUAL"
 
 [node name="TitleScreen" type="ColorRect" parent="CanvasLayer"]
