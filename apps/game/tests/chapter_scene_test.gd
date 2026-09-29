@@ -18,6 +18,7 @@ func _run() -> void:
 	game.set("save_path", path)
 	root.add_child(game)
 	game.call("_new_game")
+	game.call("_finish_intro")
 	var state: M0State = _checkpoint_state(State.DISCLOSE)
 	game.set("state", state)
 	game.call("_sync_scene")
@@ -52,6 +53,7 @@ func _run() -> void:
 	_expect(str(game.get("status_line")).contains("A list doesn't tell me who's a threat"), "WOLF questions the Director's target labels after the first copy")
 	var saved: Dictionary = state.to_dict()
 	game.call("_new_game")
+	game.call("_finish_intro")
 	_expect((game.get("state") as M0State).chapter_id == "lockdown", "New Game clears chapter progress")
 	game.call("_load_game")
 	state = game.get("state") as M0State
@@ -63,6 +65,7 @@ func _run() -> void:
 	game.set("save_path", path)
 	root.add_child(game)
 	game.call("_new_game")
+	game.call("_finish_intro")
 	state = _checkpoint_state(State.PRESS)
 	game.set("state", state)
 	game.call("_sync_scene")

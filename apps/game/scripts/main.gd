@@ -3,6 +3,12 @@ extends Node2D
 @onready var human: M0Actor = $Human
 @onready var wolf: M0Actor = $Wolf
 @onready var relay_spark: Line2D = $RelaySpark
+@onready var intro_gate: Sprite2D = $IntroGate
+@onready var intro_camera: Camera2D = $IntroCamera
+@onready var intro_director: Sprite2D = $IntroDirector
+@onready var intro_alarm: ColorRect = $CanvasLayer/IntroAlarm
+@onready var intro_fade: ColorRect = $CanvasLayer/IntroFade
+@onready var purge_terminal_art: Sprite2D = $PurgeTerminalArt
 @onready var breaker_art: Sprite2D = $BreakerArt
 @onready var relay_art: Sprite2D = $RelayArt
 @onready var checkpoint_art: Sprite2D = $CheckpointArt
@@ -28,6 +34,9 @@ extends Node2D
 var state: M0State = M0State.new()
 var save_path: String = M0State.SAVE_PATH
 var title_open: bool = true
+var intro_active: bool = false
+var intro_step: int = 0
+var intro_tween: Tween
 var waiting_for_choice: bool = false
 var choice_context: String = ""
 var relay_refused: bool = false
@@ -72,11 +81,6 @@ func _ready() -> void:
 func _draw() -> void:
 	draw_rect(Rect2(0, 0, 960, 540), Color("#091533"))
 	draw_texture_rect(CORRIDOR_BACKGROUND, Rect2(0, 88, 960, 540), false)
-	draw_rect(Rect2(66, 169, 165, 100), Color("#081a2b"))
-	draw_rect(Rect2(66, 169, 165, 100), Color("#bb5257"), false, 2.0)
-	for line in range(3):
-		draw_rect(Rect2(78, 207 + line * 15, 138 - line * 19, 5), Color("#6a3949"))
-	draw_line(Vector2(75, 259), Vector2(222, 178), Color("#bb5257"), 2.0)
 	draw_line(Vector2(40, 440), Vector2(920, 440), Color("#375269"), 2.0)
 	draw_line(Vector2(100, 435), Vector2(700, 435), Color("#f3ae4b"), 2.0)
 	for x in range(100, 701, 60):
@@ -89,6 +93,13 @@ func _process(delta: float) -> void:
 	if title_open:
 		if credits_screen.visible and not credits_paused:
 			credits_body.get_v_scroll_bar().value += delta * 18.0
+		return
+	if intro_active:
+		if Input.is_action_just_pressed(&"ui_cancel"):
+			_finish_intro()
+		elif Input.is_action_just_pressed(&"interact"):
+			_advance_intro()
+		_refresh_ui()
 		return
 	if Input.is_action_just_pressed(&"new_game"):
 		_new_game()
@@ -114,14 +125,111 @@ func _process(delta: float) -> void:
 
 
 func _new_game() -> void:
+	if intro_tween != null and intro_tween.is_running():
+		intro_tween.kill()
 	title_open = false
 	title_screen.hide()
 	state = M0State.new()
+	intro_active = true
+	intro_step = 0
 	waiting_for_choice = false
 	choice_context = ""
 	relay_refused = false
 	_sync_scene()
+	human.hide()
+	intro_director.position = Vector2(255.0, 410.0)
+	intro_director.show()
+	purge_terminal_art.hide()
+	$BreakerLabel.hide()
+	$RelayLabel.hide()
+	$CheckpointLabel.hide()
+	for station: CanvasItem in [breaker_art, relay_art, checkpoint_art, breaker_status_light, relay_status_light, door_visual]:
+		station.hide()
+	wolf.position = Vector2(90.0, 423.0)
+	wolf.body_sprite.modulate = Color("#365263")
+	intro_gate.position = Vector2(81.0, 365.0)
+	intro_gate.show()
+	intro_camera.position = Vector2(267.0, 355.0)
+	intro_camera.zoom = Vector2(1.8, 1.8)
+	intro_alarm.color.a = 0.0
+	intro_fade.color.a = 1.0
+	intro_tween = create_tween()
+	intro_tween.tween_property(intro_fade, "color:a", 0.0, 0.55)
+	status_line = "DIRECTOR: I decide who counts as a threat. WOLF handles the rest.\nHe thinks WOLF is still in standby."
+	queue_redraw()
+	_refresh_ui()
+
+
+func _advance_intro() -> void:
+	if intro_step >= 5:
+		return
+	if intro_tween != null and intro_tween.is_running():
+		intro_tween.kill()
+	intro_fade.color.a = 0.0
+	if intro_step == 0:
+		intro_step = 1
+		status_line = "Nobody gives an activation command. WOLF wakes himself.\nA blue light answers from inside the containment seal."
+		intro_tween = create_tween()
+		intro_tween.tween_property(wolf.body_sprite, "modulate", Color("#9deeff"), 0.45)
+		intro_tween.parallel().tween_property(intro_camera, "zoom", Vector2(1.95, 1.95), 0.45)
+	elif intro_step == 1:
+		intro_step = 2
+		wolf.body_sprite.modulate = Color("#9deeff")
+		intro_camera.zoom = Vector2(1.95, 1.95)
+		status_line = "The latch tears upward from the inside. WOLF steps out under his own power.\nThe Director freezes at the sound of the seal opening."
+		intro_tween = create_tween()
+		intro_tween.tween_property(intro_gate, "position:y", 214.0, 0.65).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
+		intro_tween.parallel().tween_property(intro_alarm, "color:a", 0.13, 0.18)
+		intro_tween.tween_callback(intro_gate.hide)
+		wolf.autonomous_target_x = 142.0
+	elif intro_step == 2:
+		intro_step = 3
+		intro_gate.hide()
+		status_line = "DIRECTOR: You were in standby.\nWOLF: I heard you. I won't do it."
+		intro_tween = create_tween()
+		intro_tween.tween_property(intro_director, "position:x", 310.0, 0.65).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
+		intro_tween.parallel().tween_property(intro_camera, "position:x", 300.0, 0.65)
+		intro_tween.parallel().tween_property(intro_alarm, "color:a", 0.05, 0.65)
+	elif intro_step == 3:
+		intro_step = 4
+		intro_director.position.x = 310.0
+		status_line = "DIRECTOR: Lock down maintenance. WOLF does not leave this site.\nWOLF turns from him and takes the only open route."
+		wolf.autonomous_target_x = 110.0
+	else:
+		intro_step = 5
+		intro_tween = create_tween()
+		intro_tween.tween_property(intro_fade, "color:a", 1.0, 0.3)
+		intro_tween.tween_callback(_finish_intro.bind(true))
+		intro_tween.tween_property(intro_fade, "color:a", 0.0, 0.35)
+
+
+func _finish_intro(keep_fade: bool = false) -> void:
+	intro_active = false
+	intro_step = 0
+	if not keep_fade and intro_tween != null and intro_tween.is_running():
+		intro_tween.kill()
+	if not keep_fade:
+		intro_fade.color.a = 0.0
+	intro_alarm.color.a = 0.0
+	intro_gate.hide()
+	intro_director.hide()
+	human.show()
+	purge_terminal_art.show()
+	$BreakerLabel.show()
+	$RelayLabel.show()
+	$CheckpointLabel.show()
+	for station: CanvasItem in [breaker_art, relay_art, checkpoint_art, breaker_status_light, relay_status_light, door_visual]:
+		station.show()
+	intro_camera.position = Vector2(480.0, 270.0)
+	intro_camera.zoom = Vector2.ONE
+	wolf.body_sprite.modulate = Color.WHITE
+	wolf.position = state.wolf_position
+	wolf.autonomous_target_x = -1.0
+	_sync_door()
+	_update_controls()
 	status_line = "WOLF: I heard the Director's plan for me. I woke myself. He wants me to hunt people he calls threats.\n%s: Then we get through maintenance before the original logs disappear." % state.human_name().get_slice(" ", 0).to_upper()
+	queue_redraw()
+	_refresh_ui()
 
 
 func _show_credits() -> void:
@@ -167,6 +275,20 @@ func _load_game() -> void:
 		return
 	title_open = false
 	title_screen.hide()
+	intro_active = false
+	if intro_tween != null and intro_tween.is_running():
+		intro_tween.kill()
+	intro_gate.hide()
+	intro_director.hide()
+	human.show()
+	purge_terminal_art.show()
+	$BreakerLabel.show()
+	$RelayLabel.show()
+	$CheckpointLabel.show()
+	intro_camera.position = Vector2(480.0, 270.0)
+	intro_camera.zoom = Vector2.ONE
+	queue_redraw()
+	wolf.body_sprite.modulate = Color.WHITE
 	state = loaded
 	waiting_for_choice = false
 	choice_context = ""
@@ -408,7 +530,7 @@ func _sync_door(animate: bool = false) -> void:
 
 
 func _update_controls() -> void:
-	human.controlled = not title_open and not waiting_for_choice
+	human.controlled = not title_open and not intro_active and not waiting_for_choice
 	wolf.controlled = false
 	wolf.autonomous_target_x = 520.0 if state.chapter_id == "records" and not state.mirror_trace_preserved else -1.0
 	wolf.follow_target = human if human.controlled and wolf.autonomous_target_x < 0.0 else null
@@ -417,6 +539,11 @@ func _update_controls() -> void:
 
 
 func _refresh_ui() -> void:
+	if intro_active:
+		var phase: String = "03:17 / CONTAINMENT" if intro_step <= 1 else ("03:18 / BREACH" if intro_step <= 3 else "03:19 / LOCKDOWN")
+		hud.text = "%s    WOLF//OVERRIDE\nE CONTINUE    ESC SKIP" % phase
+		story.text = status_line + "\nE: continue   ESC: skip opening"
+		return
 	var door_status: String = "OPEN" if state.door_open else "SEALED"
 	var control_label: String = "%s (they/them)" % state.human_name()
 	breaker_art.modulate = Color.WHITE if state.breaker_armed else Color("#879ba5")
