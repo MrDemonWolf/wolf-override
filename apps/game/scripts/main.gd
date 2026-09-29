@@ -19,6 +19,8 @@ extends Node2D
 @onready var door_visual: ColorRect = $Door/Visual
 @onready var hud: Label = $CanvasLayer/TopBar/HUD
 @onready var story: Label = $CanvasLayer/BottomBar/Story
+@onready var tutorial_prompt: ColorRect = $CanvasLayer/TutorialPrompt
+@onready var tutorial_text: Label = $CanvasLayer/TutorialPrompt/Text
 @onready var title_screen: ColorRect = $CanvasLayer/TitleScreen
 @onready var title_mark: TextureRect = $CanvasLayer/TitleScreen/LogoMark
 @onready var title_line: ColorRect = $CanvasLayer/TitleScreen/TitleLine
@@ -37,6 +39,9 @@ var title_open: bool = true
 var intro_active: bool = false
 var intro_step: int = 0
 var intro_tween: Tween
+var chapter_close_active: bool = false
+var chapter_tween: Tween
+var tutorial_step: int = 2
 var waiting_for_choice: bool = false
 var choice_context: String = ""
 var relay_refused: bool = false
@@ -101,6 +106,17 @@ func _process(delta: float) -> void:
 			_advance_intro()
 		_refresh_ui()
 		return
+	if chapter_close_active:
+		if Input.is_action_just_pressed(&"new_game"):
+			_new_game()
+		elif Input.is_action_just_pressed(&"load_game"):
+			_load_game()
+		elif Input.is_action_just_pressed(&"interact"):
+			_finish_chapter_close()
+		_refresh_ui()
+		return
+	if tutorial_step == 0 and (Input.is_action_pressed(&"move_left") or Input.is_action_pressed(&"move_right")):
+		tutorial_step = 1
 	if Input.is_action_just_pressed(&"new_game"):
 		_new_game()
 	elif Input.is_action_just_pressed(&"load_game"):
@@ -127,6 +143,10 @@ func _process(delta: float) -> void:
 func _new_game() -> void:
 	if intro_tween != null and intro_tween.is_running():
 		intro_tween.kill()
+	if chapter_tween != null and chapter_tween.is_running():
+		chapter_tween.kill()
+	chapter_close_active = false
+	tutorial_step = 0
 	title_open = false
 	title_screen.hide()
 	state = M0State.new()
@@ -276,6 +296,10 @@ func _load_game() -> void:
 	title_open = false
 	title_screen.hide()
 	intro_active = false
+	if chapter_tween != null and chapter_tween.is_running():
+		chapter_tween.kill()
+	chapter_close_active = false
+	tutorial_step = 2
 	if intro_tween != null and intro_tween.is_running():
 		intro_tween.kill()
 	intro_gate.hide()
@@ -306,6 +330,7 @@ func _interact() -> void:
 		_interact_records(x)
 		return
 	if x <= 230.0:
+		tutorial_step = 2
 		status_line = "DIRECTOR / PURGE: Original program logs marked for deletion.\nWOLF: They want the source record gone. We need to preserve it."
 	elif absf(x - 350.0) <= 52.0:
 		_interact_breaker()
@@ -419,7 +444,15 @@ func _interact_records(x: float) -> void:
 	elif absf(x - 830.0) <= 58.0:
 		if state.complete_chapter():
 			status_line = "FIRST COPY SECURED. WOLF: A list doesn't tell me who's a threat. I want the source.\n%s: Then Archive is next." % state.human_name().get_slice(" ", 0).to_upper()
-			_sync_records_room()
+			chapter_close_active = true
+			_update_controls()
+			_sync_records_room(true)
+			chapter_tween = create_tween()
+			chapter_tween.tween_property(intro_camera, "position", Vector2(576.0, 270.0), 0.5).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
+			chapter_tween.parallel().tween_property(intro_camera, "zoom", Vector2(1.25, 1.25), 0.5)
+			chapter_tween.parallel().tween_property(records_room.exit_art, "position:y", 245.0, 0.5)
+			chapter_tween.parallel().tween_property(records_room.exit_art, "modulate:a", 0.0, 0.5)
+			chapter_tween.tween_callback(records_room.exit_art.hide)
 			_save_progress()
 		elif state.chapter_complete:
 			status_line = "The first copy is safe. The Archive trail is next."
@@ -428,6 +461,16 @@ func _interact_records(x: float) -> void:
 			status_line = "Exit sealed until the purge order and mirror timestamp are copied."
 	else:
 		status_line = "Follow the station lights: purge queue, mirror port, then exit."
+
+
+func _finish_chapter_close() -> void:
+	if chapter_tween != null and chapter_tween.is_running():
+		chapter_tween.kill()
+	chapter_close_active = false
+	intro_camera.position = Vector2(480.0, 270.0)
+	intro_camera.zoom = Vector2.ONE
+	_sync_records_room()
+	_update_controls()
 
 
 func _choose_mirror(route_id: String) -> void:
@@ -505,15 +548,17 @@ func _flash_relay_spark(from_wolf: bool) -> void:
 	relay_spark_tween.tween_callback(relay_spark.hide)
 
 
-func _sync_records_room() -> void:
+func _sync_records_room(animate_exit: bool = false) -> void:
 	records_room.visible = state.chapter_id == "records"
 	breaker_status_light.visible = not records_room.visible
 	relay_status_light.visible = not records_room.visible
 	records_room.purge_trace_preserved = state.purge_trace_preserved
 	records_room.mirror_trace_preserved = state.mirror_trace_preserved
 	records_room.chapter_complete = state.chapter_complete
-	records_room.exit_art.visible = not state.chapter_complete
-	records_room.queue_redraw()
+	records_room.exit_art.position = Vector2(830.0, 375.0)
+	records_room.exit_art.modulate = Color.WHITE
+	records_room.exit_art.visible = not state.chapter_complete or animate_exit
+	records_room.refresh_state()
 
 
 func _sync_door(animate: bool = false) -> void:
@@ -530,7 +575,7 @@ func _sync_door(animate: bool = false) -> void:
 
 
 func _update_controls() -> void:
-	human.controlled = not title_open and not intro_active and not waiting_for_choice
+	human.controlled = not title_open and not intro_active and not chapter_close_active and not waiting_for_choice
 	wolf.controlled = false
 	wolf.autonomous_target_x = 520.0 if state.chapter_id == "records" and not state.mirror_trace_preserved else -1.0
 	wolf.follow_target = human if human.controlled and wolf.autonomous_target_x < 0.0 else null
@@ -539,10 +584,22 @@ func _update_controls() -> void:
 
 
 func _refresh_ui() -> void:
+	tutorial_prompt.visible = not title_open and not intro_active and state.chapter_id == "lockdown" and tutorial_step < 2
+	if tutorial_prompt.visible:
+		if tutorial_step == 0:
+			tutorial_text.text = "A / D  MOVE\nReach the purge display."
+		elif human.position.x <= 230.0:
+			tutorial_text.text = "E  READ DISPLAY\nSee what the Director is deleting."
+		else:
+			tutorial_text.text = "A / D  RETURN\nFind the red purge display."
 	if intro_active:
 		var phase: String = "03:17 / CONTAINMENT" if intro_step <= 1 else ("03:18 / BREACH" if intro_step <= 3 else "03:19 / LOCKDOWN")
 		hud.text = "%s    WOLF//OVERRIDE\nE CONTINUE    ESC SKIP" % phase
 		story.text = status_line + "\nE: continue   ESC: skip opening"
+		return
+	if chapter_close_active:
+		hud.text = "RECORDS ACCESS / FIRST COPY SECURED\nE CONTINUE"
+		story.text = status_line
 		return
 	var door_status: String = "OPEN" if state.door_open else "SEALED"
 	var control_label: String = "%s (they/them)" % state.human_name()
@@ -553,9 +610,9 @@ func _refresh_ui() -> void:
 	checkpoint_art.modulate = Color("#d5ffe3") if state.checkpoint_reached else Color.WHITE
 	human_tag.text = state.human_name().get_slice(" ", 0).to_upper()
 	if state.chapter_id == "records":
-		hud.text = "LOCKDOWN / FIRST COPY     OBJECTIVE: %s     CONTROL: %s\nA/D MOVE   E INTERACT   1/2 REPLY   I NAME   L LOAD   N RESTART" % [_objective(), control_label]
+		hud.text = "LOCKDOWN / FIRST COPY     OBJECTIVE: %s     CONTROL: %s\nA/D MOVE   E INTERACT" % [_objective(), control_label]
 	else:
-		hud.text = "MAINTENANCE / LOCKDOWN     OBJECTIVE: %s     CONTROL: %s     SEAL: %s\nA/D MOVE   E INTERACT   1/2 REPLY   I NAME   L LOAD   N RESTART" % [_objective(), control_label, door_status]
+		hud.text = "MAINTENANCE / LOCKDOWN     OBJECTIVE: %s     CONTROL: %s     SEAL: %s\nA/D MOVE   E INTERACT" % [_objective(), control_label, door_status]
 	story.text = status_line if waiting_for_choice else status_line + "\n" + _context_hint()
 
 
