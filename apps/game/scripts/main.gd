@@ -17,6 +17,7 @@ extends Node2D
 @onready var human_tag: Label = $Human/Tag
 @onready var door_shape: CollisionShape2D = $Door/CollisionShape2D
 @onready var door_visual: ColorRect = $Door/Visual
+@onready var top_card: ColorRect = $CanvasLayer/TopBar
 @onready var hud: Label = $CanvasLayer/TopBar/HUD
 @onready var story: Label = $CanvasLayer/BottomBar/Story
 @onready var tutorial_prompt: ColorRect = $CanvasLayer/TutorialPrompt
@@ -58,6 +59,8 @@ var title_open: bool = true
 var intro_active: bool = false
 var intro_step: int = 0
 var intro_tween: Tween
+var top_card_tween: Tween
+var last_top_card_key: String = ""
 var chapter_close_active: bool = false
 var chapter_tween: Tween
 var tutorial_step: int = 2
@@ -183,6 +186,7 @@ func _new_game() -> void:
 	state = M0State.new()
 	intro_active = true
 	intro_step = 0
+	last_top_card_key = ""
 	waiting_for_choice = false
 	choice_context = ""
 	relay_refused = false
@@ -454,6 +458,7 @@ func _unhandled_input(event: InputEvent) -> void:
 func _load_game() -> void:
 	get_tree().paused = false
 	pause_overlay.hide()
+	last_top_card_key = ""
 	var loaded: M0State = M0State.load_from_disk(save_path)
 	if loaded == null:
 		status_line = "No valid checkpoint save found. Current game was not changed."
@@ -771,13 +776,19 @@ func _refresh_ui() -> void:
 			tutorial_text.text = "%s\nSee what the Director is deleting." % ("TAP USE" if touch_enabled else "E  READ DISPLAY")
 		else:
 			tutorial_text.text = "%s\nFind the red purge display." % ("HOLD ◀ / ▶" if touch_enabled else "A / D  RETURN")
+	if title_open:
+		top_card.hide()
+		return
 	if intro_active:
-		var phase: String = "03:17 / CONTAINMENT" if intro_step <= 1 else ("03:18 / BREACH" if intro_step <= 3 else "03:19 / LOCKDOWN")
-		hud.text = "%s\nWOLF//OVERRIDE" % phase
+		if last_top_card_key != "intro":
+			last_top_card_key = "intro"
+			_show_top_card("03:17 / CONTAINMENT\nWOLF//OVERRIDE", 2.6)
 		story.text = status_line + ("\nTAP CONTINUE  /  SKIP" if touch_enabled else "\nE: continue   ESC: skip opening")
 		return
 	if chapter_close_active:
-		hud.text = "RECORDS ACCESS\nFIRST COPY SECURED"
+		if last_top_card_key != "chapter_close":
+			last_top_card_key = "chapter_close"
+			_show_top_card("RECORDS ACCESS\nFIRST COPY SECURED", 3.4)
 		story.text = status_line
 		return
 	breaker_art.modulate = Color.WHITE if state.breaker_armed else Color("#879ba5")
@@ -786,11 +797,24 @@ func _refresh_ui() -> void:
 	relay_status_light.color = Color("#a4f0c4") if state.door_open else (Color("#f3ae4b") if relay_refused else (Color("#8be3ff") if state.breaker_armed else Color("#536e7c")))
 	checkpoint_art.modulate = Color("#d5ffe3") if state.checkpoint_reached else Color.WHITE
 	human_tag.text = state.human_name().get_slice(" ", 0).to_upper()
-	if state.chapter_id == "records":
-		hud.text = "RECORDS ACCESS / FIRST COPY\n%s" % _objective()
-	else:
-		hud.text = "MAINTENANCE / LOCKDOWN\n%s" % _objective()
+	var card_key: String = "%s:%s" % [state.chapter_id, _objective()]
+	if last_top_card_key != card_key:
+		last_top_card_key = card_key
+		var location: String = "RECORDS ACCESS / FIRST COPY" if state.chapter_id == "records" else "MAINTENANCE / LOCKDOWN"
+		_show_top_card("%s\n%s" % [location, _objective()], 3.4)
 	story.text = status_line if waiting_for_choice else status_line + "\n" + (_context_hint().replace("E:", "USE:") if touch_enabled else _context_hint())
+
+
+func _show_top_card(message: String, hold_seconds: float) -> void:
+	if top_card_tween != null and top_card_tween.is_running():
+		top_card_tween.kill()
+	hud.text = message
+	top_card.modulate.a = 1.0
+	top_card.show()
+	top_card_tween = create_tween()
+	top_card_tween.tween_interval(hold_seconds)
+	top_card_tween.tween_property(top_card, "modulate:a", 0.0, 0.45)
+	top_card_tween.tween_callback(top_card.hide)
 
 
 func _context_hint() -> String:
