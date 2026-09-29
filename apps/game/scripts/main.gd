@@ -2,6 +2,7 @@ extends Node2D
 
 @onready var human: M0Actor = $Human
 @onready var wolf: M0Actor = $Wolf
+@onready var relay_spark: Line2D = $RelaySpark
 @onready var human_tag: Label = $Human/Tag
 @onready var door_shape: CollisionShape2D = $Door/CollisionShape2D
 @onready var door_visual: ColorRect = $Door/Visual
@@ -27,8 +28,12 @@ var choice_context: String = ""
 var relay_refused: bool = false
 var status_line: String = "WOLF: I heard the Director's plan for me. I woke myself. He wants me to hunt people he calls threats."
 var door_tween: Tween
+var wolf_reaction_tween: Tween
+var relay_spark_tween: Tween
 var records_room: RecordsRoom
 var credits_paused: bool = false
+
+const WOLF_SPRITE_REST: Vector2 = Vector2(0.0, -15.0)
 
 
 func _ready() -> void:
@@ -90,11 +95,14 @@ func _draw() -> void:
 	draw_rect(Rect2(337, 393, 26, 5), Color("#e9ad55"))
 	draw_circle(Vector2(350, 425), 5.0, Color("#8be3ff") if state.breaker_armed else Color("#d65f59"))
 	draw_rect(Rect2(573, 374, 64, 66), Color("#0a1928"))
-	draw_rect(Rect2(580, 379, 50, 61), Color("#32637a"))
+	draw_rect(Rect2(580, 379, 50, 61), Color("#32765f") if state.door_open else (Color("#705332") if relay_refused else Color("#32637a")))
 	draw_rect(Rect2(587, 388, 36, 34), Color("#102a3d"))
 	draw_circle(Vector2(605, 405), 11.0, Color("#274e61"))
-	draw_arc(Vector2(605, 405), 9.0, 0.0, TAU, 24, Color("#8be3ff") if state.breaker_armed else Color("#536e7c"), 2.0)
-	draw_circle(Vector2(605, 405), 3.0, Color("#8be3ff") if state.breaker_armed else Color("#536e7c"))
+	var relay_light: Color = Color("#a4f0c4") if state.door_open else (Color("#f3ae4b") if relay_refused else (Color("#8be3ff") if state.breaker_armed else Color("#536e7c")))
+	draw_arc(Vector2(605, 405), 9.0, 0.0, TAU, 24, relay_light, 2.0)
+	if state.door_open or relay_refused:
+		draw_arc(Vector2(605, 405), 16.0, 0.0, TAU, 24, relay_light, 2.0)
+	draw_circle(Vector2(605, 405), 3.0, relay_light)
 	draw_rect(Rect2(758, 299, 44, 141), Color("#0a1724"))
 	draw_rect(Rect2(758, 299, 44, 141), Color("#416177"), false, 3.0)
 	draw_rect(Rect2(763, 294, 34, 5), Color("#70d9a7") if state.door_open else Color("#d65f59"))
@@ -237,8 +245,10 @@ func _choose(choice_id: String) -> void:
 	_update_controls()
 	if choice_id == M0State.DISCLOSE:
 		status_line = "WOLF: Thank you for telling me. I'll take the relay. Arm the breaker."
+		_react_as_wolf(true)
 	else:
 		status_line = "WOLF: No. I won't take that risk blind. Use the bypass."
+		_react_as_wolf(false)
 
 
 func _interact_relay() -> void:
@@ -253,10 +263,15 @@ func _interact_relay() -> void:
 		"refused":
 			relay_refused = true
 			status_line = "WOLF: I said no. I won't take the live contact. Press E again for the manual bypass."
+			_react_as_wolf(false)
+			queue_redraw()
 		"cooperate":
 			status_line = "WOLF holds the live contact by choice. %s keeps the breaker on; the red seal rises." % state.human_name().get_slice(" ", 0)
+			_react_as_wolf(true)
+			_flash_relay_spark(true)
 		"fallback":
 			status_line = "%s takes the bypass. WOLF reads the rising seal: \"Open. I'm with you.\"" % state.human_name().get_slice(" ", 0)
+			_flash_relay_spark(false)
 		"already_open":
 			status_line = "The seal is open. The safe point is just beyond it."
 		_:
@@ -351,6 +366,13 @@ func _capture_positions() -> void:
 
 
 func _sync_scene() -> void:
+	if wolf_reaction_tween != null and wolf_reaction_tween.is_running():
+		wolf_reaction_tween.kill()
+	if relay_spark_tween != null and relay_spark_tween.is_running():
+		relay_spark_tween.kill()
+	wolf.body_sprite.position = WOLF_SPRITE_REST
+	wolf.body_sprite.rotation_degrees = 0.0
+	relay_spark.hide()
 	human.position = state.human_position
 	wolf.position = state.wolf_position
 	human.velocity = Vector2.ZERO
@@ -358,6 +380,36 @@ func _sync_scene() -> void:
 	_update_controls()
 	_sync_door()
 	_sync_records_room()
+
+
+func _react_as_wolf(accepting: bool) -> void:
+	if wolf_reaction_tween != null and wolf_reaction_tween.is_running():
+		wolf_reaction_tween.kill()
+	wolf.body_sprite.position = WOLF_SPRITE_REST
+	wolf.body_sprite.rotation_degrees = 0.0
+	var lean: Vector2 = Vector2(11.0, -24.0) if accepting else Vector2(-13.0, -13.0)
+	var tilt: float = 8.0 if accepting else -9.0
+	wolf_reaction_tween = create_tween()
+	wolf_reaction_tween.tween_property(wolf.body_sprite, "position", lean, 0.18).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
+	wolf_reaction_tween.parallel().tween_property(wolf.body_sprite, "rotation_degrees", tilt, 0.18)
+	wolf_reaction_tween.tween_interval(0.18)
+	wolf_reaction_tween.tween_property(wolf.body_sprite, "position", WOLF_SPRITE_REST, 0.24)
+	wolf_reaction_tween.parallel().tween_property(wolf.body_sprite, "rotation_degrees", 0.0, 0.24)
+
+
+func _flash_relay_spark(from_wolf: bool) -> void:
+	if relay_spark_tween != null and relay_spark_tween.is_running():
+		relay_spark_tween.kill()
+	relay_spark.points = PackedVector2Array([
+		Vector2(583.0, 393.0), Vector2(592.0, 381.0), Vector2(600.0, 398.0),
+		Vector2(610.0, 380.0), Vector2(620.0, 393.0),
+	])
+	relay_spark.default_color = Color("#8be3ff") if from_wolf else Color("#f3ae4b")
+	relay_spark.modulate.a = 1.0
+	relay_spark.show()
+	relay_spark_tween = create_tween()
+	relay_spark_tween.tween_property(relay_spark, "modulate:a", 0.0, 0.48)
+	relay_spark_tween.tween_callback(relay_spark.hide)
 
 
 func _sync_records_room() -> void:
