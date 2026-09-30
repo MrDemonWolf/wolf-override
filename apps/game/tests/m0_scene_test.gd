@@ -16,6 +16,7 @@ func _run() -> void:
 		DirAccess.remove_absolute(ProjectSettings.globalize_path(path))
 	var game: Node2D = GAME_SCENE.instantiate() as Node2D
 	game.set("save_path", path)
+	game.set("settings_path", "%s-settings.cfg" % path)
 	root.add_child(game)
 	var title_screen: Control = game.get_node("CanvasLayer/TitleScreen") as Control
 	var title_art: TextureRect = game.get_node("CanvasLayer/TitleScreen/CorridorArt") as TextureRect
@@ -80,7 +81,7 @@ func _run() -> void:
 	await _tap(&"interact")
 	_expect(game.get("intro_step") == 1 and str(game.get("status_line")).contains("wakes himself"), "WOLF wakes himself and opens containment")
 	await _tap(&"interact")
-	_expect(game.get("intro_step") == 2 and str(game.get("status_line")).contains("latch tears upward"), "WOLF opens containment from inside")
+	_expect(game.get("intro_step") == 2 and str(game.get("status_line")).contains("gate slides aside"), "WOLF opens containment from inside through a sliding gate")
 	await _tap(&"interact")
 	_expect(game.get("intro_step") == 3 and str(game.get("status_line")).contains("I won't do it"), "WOLF refuses the Director before the engineer arrives")
 	await _tap(&"interact")
@@ -232,6 +233,7 @@ func _run() -> void:
 	await process_frame
 	game = GAME_SCENE.instantiate() as Node2D
 	game.set("save_path", path)
+	game.set("settings_path", "%s-settings.cfg" % path)
 	root.add_child(game)
 	title_screen = game.get_node("CanvasLayer/TitleScreen") as Control
 	continue_button = game.get_node("CanvasLayer/TitleScreen/ContinueButton") as Button

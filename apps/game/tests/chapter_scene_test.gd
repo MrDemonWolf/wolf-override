@@ -16,6 +16,7 @@ func _run() -> void:
 		DirAccess.remove_absolute(ProjectSettings.globalize_path(path))
 	var game: Node2D = GAME_SCENE.instantiate() as Node2D
 	game.set("save_path", path)
+	game.set("settings_path", "%s-settings.cfg" % path)
 	root.add_child(game)
 	game.call("_new_game")
 	game.call("_finish_intro")
@@ -66,6 +67,7 @@ func _run() -> void:
 
 	game = GAME_SCENE.instantiate() as Node2D
 	game.set("save_path", path)
+	game.set("settings_path", "%s-settings.cfg" % path)
 	root.add_child(game)
 	game.call("_new_game")
 	game.call("_finish_intro")
