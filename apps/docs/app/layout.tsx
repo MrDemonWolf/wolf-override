@@ -2,8 +2,15 @@ import type { Metadata } from 'next';
 import type { ReactNode } from 'react';
 import { RootProvider } from 'fumadocs-ui/provider/next';
 import './global.css';
+import { siteUrl } from '@/lib/seo';
 
 export const metadata: Metadata = {
+  metadataBase: new URL(`${siteUrl}/`),
+  applicationName: 'WOLF//OVERRIDE',
+  authors: [{ name: 'Nathanial Henniges', url: 'https://mrdemonwolf.com' }],
+  creator: 'Nathanial Henniges',
+  publisher: 'MrDemonWolf, Inc.',
+  robots: { index: true, follow: true, googleBot: { index: true, follow: true, 'max-image-preview': 'large' } },
   title: {
     default: 'WOLF//OVERRIDE',
     template: '%s | WOLF//OVERRIDE',

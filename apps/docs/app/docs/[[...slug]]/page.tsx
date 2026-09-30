@@ -4,6 +4,7 @@ import { DocsBody, DocsDescription, DocsPage, DocsTitle } from 'fumadocs-ui/layo
 import { createRelativeLink } from 'fumadocs-ui/mdx';
 import { getMDXComponents } from '@/mdx-components';
 import { source } from '@/lib/source';
+import { pageMetadata } from '@/lib/seo';
 
 type PageProps = { params: Promise<{ slug?: string[] }> };
 
@@ -32,5 +33,5 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   const { slug } = await params;
   const page = source.getPage(slug);
   if (!page) notFound();
-  return { title: page.data.title, description: page.data.description };
+  return pageMetadata(page.data.title, page.data.description ?? `Read ${page.data.title} in the WOLF//OVERRIDE game guide.`, `${page.url}/`);
 }

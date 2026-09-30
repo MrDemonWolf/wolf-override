@@ -2,6 +2,12 @@ import Link from 'next/link';
 import ThemeToggle from './theme-toggle';
 import Downloads from './downloads';
 import './marketing.css';
+import { pageMetadata, siteDescription } from '@/lib/seo';
+
+export const metadata = {
+  ...pageMetadata('WOLF//OVERRIDE | Sci-fi Horror Adventure', siteDescription, '/'),
+  title: { absolute: 'WOLF//OVERRIDE | Sci-fi Horror Adventure' },
+};
 
 export default function HomePage() {
   const base = process.env.GITHUB_PAGES === 'true' ? '/wolf-override' : '';
