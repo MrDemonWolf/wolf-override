@@ -58,8 +58,10 @@
 .marketing-download-links{display:flex;flex-wrap:wrap;gap:1rem 2rem;margin-top:1.5rem}
 .marketing-game-frame{margin:2.5rem 0 0;border:1px solid var(--mk-line);background:var(--mk-surface)}
 .marketing-game-frame img{display:block;width:100%;height:auto}
+.marketing-game-frame a{display:block}
 .marketing-game-frame figcaption{display:flex;justify-content:space-between;flex-wrap:wrap;gap:.5rem;padding:1rem;font-size:.8rem;color:var(--mk-muted)}
 .marketing-game-frame strong{color:var(--mk-text)}
+.marketing-menu-frame{max-width:580px;margin:1rem 0 0 auto}
 .marketing-download-detail{font-size:.82rem;color:var(--mk-muted);line-height:1.5}
 .marketing-coming-soon{font:.75rem "Courier New",monospace;text-transform:uppercase;letter-spacing:.06em;color:var(--mk-accent);margin-top:.7rem}
 .marketing-download-note{font-size:.8rem;line-height:1.7;color:var(--mk-muted);margin-top:1.5rem}

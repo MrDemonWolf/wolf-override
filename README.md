@@ -18,6 +18,9 @@ provisional character, title, room, and machine art, one door puzzle, and a firs
 record-copying objective. Character animation, audio, the wider campaign,
 public export packages and physical-device testing are still ahead.
 
+The gameplay camera follows the engineer across each room with a closer view.
+The title and settings menus use THE DEN's local-terminal styling.
+
 **Quick play:** The opening shows only WOLF and the Director. Press **E** to
 advance WOLF's escape or **Esc** to skip it. You then control the engineer,
 who uses they/them pronouns; Rowan Vale is their provisional default name.
