@@ -10,12 +10,23 @@ func _initialize() -> void:
 
 func _run() -> void:
 	var path: String = "user://settings-test-%s.cfg" % OS.get_process_id()
+	var corrupt: ConfigFile = ConfigFile.new()
+	for key: String in ["fps_limit", "resolution", "msaa_2d"]:
+		corrupt.set_value("video", key, {"bad": true})
+	corrupt.set_value("audio", "Music", {"bad": true})
+	corrupt.set_value("controls", "deadzone", "bad")
+	corrupt.save(path)
 	var game: Node2D = GAME.instantiate() as Node2D
 	game.set("settings_path", path)
 	game.set("save_path", "user://settings-save-test-%s.json" % OS.get_process_id())
 	root.add_child(game)
+	var malformed: ConfigFile = ConfigFile.new()
+	malformed.set_value("audio", "Music", {"bad": true})
+	malformed.set_value("controls", "deadzone", "bad")
+	_expect(GameSettings.number(malformed, "audio", "Music", 100.0) == 100.0 and GameSettings.number(malformed, "controls", "deadzone", 0.25) == 0.25, "malformed numeric preferences fall back safely")
 	(game.get_node("CanvasLayer/TitleScreen/SettingsButton") as Button).pressed.emit()
 	var menu: GameSettings = game.get("settings_menu") as GameSettings
+	_expect(Engine.max_fps == 60 and (menu.volumes["Music"] as HSlider).value == 100.0 and menu.deadzone.value == 0.25, "malformed saved preferences do not interrupt scene setup")
 	_expect(paused and menu.is_visible_in_tree() and game.get("title_open"), "settings open before starting a game")
 	menu.tabs.current_tab = 1
 	var music: HSlider = menu.volumes["Music"]
@@ -33,6 +44,10 @@ func _run() -> void:
 	_expect(config.get_value("audio", "Music") == 37.0 and config.get_value("video", "msaa_2d") == 2 and config.get_value("video", "fps_limit") == 30, "video saves preserve audio and extra graphics preferences")
 	_expect(root.msaa_2d == Viewport.MSAA_4X, "edge smoothing applies to the game viewport")
 	menu.tabs.current_tab = 2
+	menu.begin_capture(&"interact", "keyboard")
+	menu._input(_key(KEY_N))
+	_expect(menu.prompt(&"interact", false) == "E" and not menu.capture_action.is_empty(), "restart shortcut cannot be assigned to interaction")
+	menu.cancel_capture()
 	menu.begin_capture(&"interact", "keyboard")
 	menu._input(_key(KEY_Q))
 	_expect(menu.prompt(&"interact", false) == "Q" and menu.capture_action.is_empty(), "keyboard rebind changes the actual InputMap and ends capture")

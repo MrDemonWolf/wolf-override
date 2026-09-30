@@ -16,6 +16,7 @@ func _run() -> void:
 		DirAccess.remove_absolute(ProjectSettings.globalize_path(path))
 	var game: Node2D = GAME_SCENE.instantiate() as Node2D
 	game.set("save_path", path)
+	game.set("settings_path", "%s-settings.cfg" % path)
 	root.add_child(game)
 	var title_screen: Control = game.get_node("CanvasLayer/TitleScreen") as Control
 	var title_art: TextureRect = game.get_node("CanvasLayer/TitleScreen/CorridorArt") as TextureRect
@@ -232,6 +233,7 @@ func _run() -> void:
 	await process_frame
 	game = GAME_SCENE.instantiate() as Node2D
 	game.set("save_path", path)
+	game.set("settings_path", "%s-settings.cfg" % path)
 	root.add_child(game)
 	title_screen = game.get_node("CanvasLayer/TitleScreen") as Control
 	continue_button = game.get_node("CanvasLayer/TitleScreen/ContinueButton") as Button

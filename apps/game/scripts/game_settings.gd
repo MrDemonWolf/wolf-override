@@ -29,7 +29,7 @@ func configure(path: String) -> void:
 	var config: ConfigFile = ConfigFile.new()
 	config.load(settings_path)
 	vsync.set_pressed_no_signal(bool(config.get_value("video", "vsync", true)))
-	antialiasing.select(clampi(int(config.get_value("video", "msaa_2d", 0)), 0, 3))
+	antialiasing.select(clampi(int(number(config, "video", "msaa_2d", 0)), 0, 3))
 	_apply_graphics()
 	for bus: String in BUSES:
 		if AudioServer.get_bus_index(bus) < 0:
@@ -38,9 +38,9 @@ func configure(path: String) -> void:
 			AudioServer.set_bus_name(index, bus)
 			AudioServer.set_bus_send(index, "Master")
 		var slider: HSlider = volumes[bus]
-		slider.set_value_no_signal(clampf(float(config.get_value("audio", bus, 100.0)), 0.0, 100.0))
+		slider.set_value_no_signal(clampf(number(config, "audio", bus, 100.0), 0.0, 100.0))
 		_apply_volume(bus, slider.value)
-	deadzone.set_value_no_signal(clampf(float(config.get_value("controls", "deadzone", 0.25)), 0.1, 0.8))
+	deadzone.set_value_no_signal(clampf(number(config, "controls", "deadzone", 0.25), 0.1, 0.8))
 	_apply_deadzone(deadzone.value)
 	for action: StringName in ACTIONS:
 		for kind: String in ["keyboard", "controller"]:
@@ -53,7 +53,30 @@ func configure(path: String) -> void:
 	select_tab(0)
 
 
+static func number(config: ConfigFile, section: String, key: String, fallback: float) -> float:
+	var value: Variant = config.get_value(section, key, fallback)
+	if (value is int or value is float) and is_finite(float(value)):
+		return float(value)
+	return fallback
+
+
 func _build_menu() -> void:
+	var surface: Panel = Panel.new()
+	surface.position = Vector2(24, 126)
+	surface.size = Vector2(712, 240)
+	surface.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	var surface_style: StyleBoxFlat = StyleBoxFlat.new()
+	surface_style.bg_color = Color("#102333")
+	surface_style.set_corner_radius_all(8)
+	surface.add_theme_stylebox_override("panel", surface_style)
+	add_child(surface)
+	move_child(surface, 0)
+	var subtitle: Label = _label("WOLF//OVERRIDE  /  PREFERENCES", 12)
+	subtitle.position = Vector2(34, 15)
+	subtitle.modulate = Color("#89acbf")
+	add_child(subtitle)
+	$Title.position.y = 35
+	$Title.add_theme_font_size_override("font_size", 27)
 	tabs = TabBar.new()
 	tabs.position = Vector2(32, 81)
 	tabs.size = Vector2(696, 38)
@@ -166,6 +189,7 @@ func _page_box() -> VBoxContainer:
 func _label(caption: String, font_size: int) -> Label:
 	var label: Label = Label.new()
 	label.text = caption
+	label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 	label.add_theme_font_size_override("font_size", font_size)
 	return label
 
@@ -182,6 +206,7 @@ func _slider_row(parent: Node, caption: String, minimum: float, maximum: float, 
 	slider.max_value = maximum
 	slider.step = step
 	slider.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	slider.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 	row.add_child(slider)
 	var value_label: Label = _label("", 16)
 	value_label.custom_minimum_size.x = 64
@@ -190,6 +215,56 @@ func _slider_row(parent: Node, caption: String, minimum: float, maximum: float, 
 	# Programmatic loads do not emit value_changed.
 	row.visibility_changed.connect(func() -> void: value_label.text = "%d%%" % roundi(slider.value if maximum == 100 else slider.value * 100))
 	return slider
+
+
+func apply_theme() -> void:
+	var menu_theme: Theme = Theme.new()
+	var normal: StyleBoxFlat = StyleBoxFlat.new()
+	normal.bg_color = Color("#182f40")
+	normal.border_color = Color("#345366")
+	normal.set_border_width_all(1)
+	normal.set_corner_radius_all(5)
+	normal.content_margin_left = 12
+	normal.content_margin_right = 12
+	var hover: StyleBoxFlat = normal.duplicate() as StyleBoxFlat
+	hover.bg_color = Color("#234859")
+	hover.border_color = Color("#64cce5")
+	var focus: StyleBoxFlat = StyleBoxFlat.new()
+	focus.border_color = Color("#8de5f5")
+	focus.set_border_width_all(2)
+	focus.set_corner_radius_all(5)
+	focus.bg_color = Color.TRANSPARENT
+	for type_name: String in ["Button", "OptionButton", "CheckButton"]:
+		menu_theme.set_stylebox("normal", type_name, normal)
+		menu_theme.set_stylebox("hover", type_name, hover)
+		menu_theme.set_stylebox("pressed", type_name, hover)
+		menu_theme.set_stylebox("focus", type_name, focus)
+		menu_theme.set_font_size("font_size", type_name, 16)
+	var tab_normal: StyleBoxFlat = normal.duplicate() as StyleBoxFlat
+	tab_normal.content_margin_left = 20
+	tab_normal.content_margin_right = 20
+	tab_normal.expand_margin_left = -4
+	tab_normal.expand_margin_right = -4
+	var tab_selected: StyleBoxFlat = tab_normal.duplicate() as StyleBoxFlat
+	tab_selected.bg_color = hover.bg_color
+	tab_selected.border_color = hover.border_color
+	menu_theme.set_stylebox("tab_selected", "TabBar", tab_selected)
+	menu_theme.set_stylebox("tab_unselected", "TabBar", tab_normal)
+	menu_theme.set_font_size("font_size", "TabBar", 16)
+	var track: StyleBoxFlat = StyleBoxFlat.new()
+	track.bg_color = Color("#345366")
+	track.content_margin_top = 3
+	track.content_margin_bottom = 3
+	track.set_corner_radius_all(3)
+	menu_theme.set_stylebox("slider", "HSlider", track)
+	var fill: StyleBoxFlat = track.duplicate() as StyleBoxFlat
+	fill.bg_color = Color("#64cce5")
+	menu_theme.set_stylebox("grabber_area", "HSlider", fill)
+	menu_theme.set_stylebox("grabber_area_highlight", "HSlider", fill)
+	theme = menu_theme
+	for node: Button in [$BackButton, $FPSOptions, $ResolutionOptions]:
+		for state: String in ["normal", "hover", "pressed"]:
+			node.remove_theme_stylebox_override(state)
 
 
 func select_tab(index: int) -> void:
@@ -247,15 +322,19 @@ func _input(event: InputEvent) -> void:
 	var binding: InputEvent = _decode_binding(_encode_binding(event))
 	if binding == null:
 		return
-	for action: StringName in ACTIONS:
+	for action: StringName in InputMap.get_actions():
+		if action.begins_with("ui_"):
+			continue
 		if action != capture_action and InputMap.action_has_event(action, binding):
-			note.text = "Already used by %s. Choose another input or cancel." % ACTION_NAMES[ACTIONS.find(action)]
+			var action_index: int = ACTIONS.find(action)
+			var caption: String = ACTION_NAMES[action_index] if action_index >= 0 else str(action).replace("_", " ")
+			note.text = "Already used by %s. Choose another input or cancel." % caption
 			return
 	_replace_binding(capture_action, capture_kind, binding)
 	cancel_capture()
 	_refresh_bindings()
-	_save_extra()
-	note.text = "Binding saved."
+	if _save_extra():
+		note.text = "Binding saved."
 
 
 func _event_kind(event: InputEvent) -> String:
@@ -359,11 +438,11 @@ func reset_controls() -> void:
 			InputMap.action_add_event(action, event)
 	deadzone.value = 0.25
 	_refresh_bindings()
-	_save_extra()
-	note.text = "Default controls restored."
+	if _save_extra():
+		note.text = "Default controls restored."
 
 
-func _save_extra() -> void:
+func _save_extra() -> bool:
 	var config: ConfigFile = ConfigFile.new()
 	config.load(settings_path)
 	config.set_value("video", "vsync", vsync.button_pressed)
@@ -381,6 +460,8 @@ func _save_extra() -> void:
 				config.set_value("bindings", key, current[0])
 	if config.save(settings_path) != OK:
 		note.text = "Settings could not be saved."
+		return false
+	return true
 
 
 func _family_bindings(events: Array[InputEvent], kind: String) -> Array[Dictionary]:

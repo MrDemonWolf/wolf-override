@@ -205,7 +205,8 @@ func _new_game() -> void:
 		station.hide()
 	wolf.position = Vector2(90.0, 423.0)
 	wolf.body_sprite.modulate = Color("#365263")
-	intro_gate.position = Vector2(81.0, 365.0)
+	intro_gate.position = Vector2(90.0, 365.0)
+	$IntroCage.show()
 	intro_gate.show()
 	intro_camera.position = Vector2(267.0, 355.0)
 	intro_camera.zoom = Vector2(1.8, 1.8)
@@ -270,6 +271,7 @@ func _finish_intro(keep_fade: bool = false) -> void:
 		intro_fade.color.a = 0.0
 	intro_alarm.color.a = 0.0
 	intro_gate.hide()
+	$IntroCage.hide()
 	intro_director.hide()
 	human.show()
 	purge_terminal_art.show()
@@ -340,16 +342,7 @@ func _setup_touch_controls() -> void:
 		button.add_theme_color_override("font_color", Color.WHITE)
 		button.add_theme_color_override("font_hover_color", Color.WHITE)
 		button.add_theme_color_override("font_pressed_color", Color.WHITE)
-	var menu_theme: Theme = Theme.new()
-	for type_name: String in ["Button", "OptionButton"]:
-		menu_theme.set_stylebox("normal", type_name, normal)
-		menu_theme.set_stylebox("hover", type_name, hover)
-		menu_theme.set_stylebox("pressed", type_name, hover)
-		menu_theme.set_font_size("font_size", type_name, 16)
-	menu_theme.set_stylebox("tab_selected", "TabBar", hover)
-	menu_theme.set_stylebox("tab_unselected", "TabBar", normal)
-	menu_theme.set_font_size("font_size", "TabBar", 17)
-	settings_menu.theme = menu_theme
+	settings_menu.apply_theme()
 
 
 func _bind_touch_button(button: Button, action: StringName) -> void:
@@ -369,12 +362,12 @@ func _setup_settings() -> void:
 	resolution_options.add_item("1920 × 1080", 2)
 	var config: ConfigFile = ConfigFile.new()
 	config.load(settings_path)
-	var fps: int = int(config.get_value("video", "fps_limit", 60))
+	var fps: int = int(GameSettings.number(config, "video", "fps_limit", 60))
 	if not fps in [0, 30, 60, 90, 120, 144]:
 		fps = 60
 	Engine.max_fps = fps
 	fps_options.select(fps_options.get_item_index(fps))
-	var resolution: int = clampi(int(config.get_value("video", "resolution", 0)), 0, 2)
+	var resolution: int = clampi(int(GameSettings.number(config, "video", "resolution", 0)), 0, 2)
 	resolution_options.select(resolution)
 	var mobile: bool = OS.has_feature("ios") or OS.has_feature("android")
 	resolution_options.disabled = mobile
@@ -523,6 +516,7 @@ func _load_game() -> void:
 	intro_gate.hide()
 	intro_director.hide()
 	human.show()
+	$IntroCage.hide()
 	purge_terminal_art.show()
 	$BreakerLabel.show()
 	$RelayLabel.show()
