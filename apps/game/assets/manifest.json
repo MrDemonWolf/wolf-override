@@ -93,9 +93,18 @@
       "rights_review_status": "Provisional AI-assisted gameplay props, human review in progress. Final commercial asset-rights review remains open; not covered by the code/docs GPL license.",
       "modifications": "Original 2172x724 RGBA sprite sheet with three isolated props. Godot Sprite2D regions display the purge queue, mirror port and exit; source pixels are unchanged. The exit art hides when the chapter is secured.",
       "implementation_status": "Provisional interactive prop art in Records Access."
+    },
+    {
+      "asset_id": "corridor-source-build-capture",
+      "path": "apps/docs/public/corridor-source-build.png",
+      "source_or_tool": "Godot 4.7.2 normal-renderer capture of the repository source game on September 30, 2026",
+      "source_reference": "apps/game/scenes/main.tscn at 3958498; New Game with intro finished, isolated save/settings",
+      "rights_review_status": "Derivative screenshot using the registered provisional game art. Underlying commercial asset-rights review remains open; no new third-party artwork acquired.",
+      "modifications": "960x540 scripted renderer still, no image edits. Not a full hands-on route or release acceptance test.",
+      "implementation_status": "Public marketing gameplay section, labeled development frame with provisional art/UI."
     }
   ],
-  "status": "One provisional brand mark, three provisional character images, one title background, two gameplay backgrounds and two prop sheets recorded; no audio acquired.",
+  "status": "One provisional brand mark, three provisional character images, one title background, two gameplay backgrounds, two prop sheets and one derivative marketing capture recorded; no audio acquired.",
   "merge_warning": "Preserve this populated provenance register when merging future handoffs.",
   "future_entry_fields": [
     "asset_id",
