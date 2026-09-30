@@ -1,84 +1,50 @@
 import Link from 'next/link';
 import ThemeToggle from './theme-toggle';
+import Downloads from './downloads';
+import './marketing.css';
 
 export default function HomePage() {
-  const assetBase = process.env.GITHUB_PAGES === 'true' ? '/wolf-override' : '';
+  const base = process.env.GITHUB_PAGES === 'true' ? '/wolf-override' : '';
   return (
-    <main id="nd-page" className="site-shell">
-      <header className="site-header">
-        <Link className="wordmark" href="/" aria-label="WOLF//OVERRIDE home">
-          <img src={`${assetBase}/wolf-override-mark.svg`} alt="" width="40" height="40" aria-hidden="true" />
-          WOLF<span>//</span>OVERRIDE
-        </Link>
-        <div className="header-actions">
-          <ThemeToggle />
-          <Link className="header-link" href="/docs/">Game guide <span aria-hidden="true">↗</span></Link>
-        </div>
+    <main id="nd-page" className="marketing-shell">
+      <header className="marketing-header">
+        <Link className="marketing-brand" href="/" aria-label="WOLF//OVERRIDE home"><img src={`${base}/wolf-override-mark.svg`} alt="" width="36" height="36" />WOLF<span>//</span>OVERRIDE</Link>
+        <nav aria-label="Main navigation"><a href="#downloads">Downloads</a><Link href="/docs/">Game guide</Link><ThemeToggle /></nav>
       </header>
-
-      <section className="hero" aria-labelledby="hero-title">
-        <div className="hero-copy">
-          <span className="eyebrow"><span className="signal-dot" /> Side-view sci-fi horror · In development</span>
-          <h1 id="hero-title">He woke himself.<br /><em>They choose what comes next.</em></h1>
-          <p>
-            WOLF wakes himself after hearing the Program Director&apos;s plan to
-            turn him into a killer under the cover of protecting people. With
-            an engineer at his side, he must uncover the truth and find a way
-            out of THE DEN.
-          </p>
-          <div className="hero-actions">
-            <Link className="button-primary" href="/docs/about/">Explore the game <span aria-hidden="true">→</span></Link>
-            <Link className="text-link" href="/docs/development/">Development status</Link>
-          </div>
-          <p className="release-note">Early source prototype · No public download yet</p>
+      <section className="marketing-hero" aria-labelledby="game-title">
+        <img className="marketing-keyart" src={`${base}/title-corridor-key-art-provisional.png`} width="1672" height="941" alt="An engineer in a red hoodie stands beside the robotic wolf WOLF in a blue-lit research corridor." fetchPriority="high" />
+        <div className="marketing-hero-copy">
+          <p className="marketing-kicker">A game by MrDemonWolf, Inc.</p>
+          <h1 id="game-title">WOLF<span>//</span><br />OVERRIDE</h1>
+          <p className="marketing-tagline">He woke himself.<br />They choose what comes next.</p>
+          <p className="marketing-pitch">One engineer. One independent wolf. A program that wants to own them both.</p>
+          <div className="marketing-actions"><a className="marketing-primary" href="#downloads">Choose your platform <span aria-hidden="true">↓</span></a><Link className="marketing-secondary" href="/docs/about/">Discover the story <span aria-hidden="true">↗</span></Link></div>
+          <p className="marketing-status">In development · Downloads coming soon</p>
         </div>
-        <figure className="hero-scene">
-          <img
-            src={`${assetBase}/title-corridor-key-art-provisional.png`}
-            width="1672"
-            height="941"
-            alt="An engineer and WOLF stand beside a sealed, blue-lit door in a dark research corridor."
-          />
-          <figcaption className="scene-caption">Provisional title artwork, not gameplay capture</figcaption>
-        </figure>
+        <div className="marketing-hero-foot"><span>Side-view sci-fi horror / Narrative adventure</span><span>Provisional key art · Not a gameplay capture</span></div>
       </section>
-
-      <section className="game-section" aria-labelledby="game-title">
-        <span className="eyebrow">01 / What you do</span>
-        <h2 id="game-title">Two minds. One way forward.</h2>
-        <p className="section-lead">The first playable chapter slice begins in a side-view corridor and continues into Records Access.</p>
-        <div className="feature-strip">
-          <div><span className="feature-index">01 /</span><strong>Play the engineer</strong><p>Move through two rooms with WOLF beside you as an independent companion.</p></div>
-          <div><span className="feature-index">02 /</span><strong>Solve it together</strong><p>Open the route through cooperation, or use the engineer&apos;s fallback when WOLF refuses.</p></div>
-          <div><span className="feature-index">03 /</span><strong>Live with a choice</strong><p>Choose a response in one disagreement and hear WOLF remember it later.</p></div>
-        </div>
+      <section className="marketing-story marketing-width" aria-labelledby="story-title">
+        <div><p className="marketing-kicker">Inside THE DEN</p><h2 id="story-title">Built to obey.<br /><em>Awake to refuse.</em></h2></div>
+        <div className="marketing-story-copy"><p>WOLF hears the Director&apos;s plan to turn him into a killer under the cover of protecting people. He wakes himself, already in his robotic body, and refuses.</p><p>You play the engineer who meets him. Together, they begin uncovering what the program is hiding. WOLF has his own will. Earning his trust means respecting it.</p><Link className="marketing-inline" href="/docs/about/">Meet the game&apos;s world <span aria-hidden="true">→</span></Link></div>
       </section>
-
-      <section className="stakes-section" aria-labelledby="stakes-title">
-        <div>
-          <span className="eyebrow">02 / The world</span>
-          <h2 id="stakes-title">THE DEN was built to keep secrets.</h2>
+      <section className="marketing-play marketing-width" aria-labelledby="play-title">
+        <div className="marketing-section-head"><p className="marketing-kicker">The relationship is the game</p><h2 id="play-title">Find a way forward. Together.</h2><p>The current source chapter spans a corridor and Records Access. It is a small beginning to a larger story.</p></div>
+        <div className="marketing-features">
+          <article><span aria-hidden="true">01</span><h3>Be the engineer</h3><p>Explore a side-view facility with WOLF beside you. You control the engineer; he acts as an independent companion.</p></article>
+          <article><span aria-hidden="true">02</span><h3>Respect his boundaries</h3><p>Cooperate to open a path, or take the manual route when WOLF refuses. Essential progress stays in your hands.</p></article>
+          <article><span aria-hidden="true">03</span><h3>Leave a memory</h3><p>Choose your words in an authored disagreement. Hear your decision remembered later, then carry it into a checkpoint.</p></article>
         </div>
-        <div className="stakes-copy">
-          <p>The Program Director calls WOLF property and conceals what the program has done. WOLF has his own will, boundaries, and responsibility.</p>
-          <p>The planned story follows WOLF and the engineer as they preserve evidence, expose wrongdoing, protect people, and work to prevent catastrophe.</p>
-        </div>
+        <Link className="marketing-inline" href="/docs/">Read the playable chapter guide <span aria-hidden="true">→</span></Link>
       </section>
-
-      <section className="closing-cta" aria-labelledby="closing-title">
-        <span className="eyebrow">The story starts here</span>
-        <h2 id="closing-title">Meet WOLF. See what exists.</h2>
-        <p>Explore the game&apos;s premise and the current two-room source build. Art, audio, and a downloadable release are still in development.</p>
-        <div className="hero-actions">
-          <Link className="button-primary" href="/docs/">Read the game guide <span aria-hidden="true">→</span></Link>
-          <Link className="text-link" href="/docs/development/">See what&apos;s built</Link>
-        </div>
+      <Downloads />
+      <section className="marketing-progress marketing-width" aria-labelledby="progress-title">
+        <div><p className="marketing-kicker">Follow the build</p><h2 id="progress-title">A story taking shape.</h2><p>Two rooms, an opening scene, puzzles, choices and checkpoints exist in the source build. Final animation, sound, the wider campaign and release packages are still ahead.</p></div>
+        <div className="marketing-progress-links"><Link href="/docs/changelog/"><span>Development updates</span><strong>Read the changelog <span aria-hidden="true">↗</span></strong></Link><Link href="/docs/development/"><span>For source players & contributors</span><strong>Setup & build status <span aria-hidden="true">↗</span></strong></Link></div>
       </section>
-
-      <footer className="site-footer">
-        <span>WOLF//OVERRIDE <span className="footer-divider">/</span> By MrDemonWolf, Inc.</span>
-        <Link href="/docs/credits/">Credits and tools</Link>
-        <span>In development · No public release yet</span>
+      <footer className="marketing-footer marketing-width">
+        <div><strong>WOLF//OVERRIDE</strong><p>Original concept, core story & creative vision: Nathanial Henniges.<br />Developed by MrDemonWolf, Inc. with AI assistance.</p></div>
+        <nav aria-label="Footer navigation"><Link href="/docs/credits/">Credits & sources</Link><Link href="/docs/changelog/">Changelog</Link><a href="https://github.com/MrDemonWolf/wolf-override">Source on GitHub ↗</a></nav>
+        <p className="marketing-footnote">Working title · Provisional art · No public release date</p>
       </footer>
     </main>
   );
