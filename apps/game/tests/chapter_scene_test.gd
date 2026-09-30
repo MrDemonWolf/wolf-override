@@ -53,13 +53,29 @@ func _run() -> void:
 	_expect(state.chapter_complete and game.call("_objective") == "FIRST COPY SECURED", "first chapter resolves after two traces")
 	_expect(str(game.get("status_line")).contains("A list doesn't tell me who's a threat"), "WOLF questions the Director's target labels after the first copy")
 	_expect(game.get("chapter_close_active") and not human.controlled, "first copy opens a player-paced closing beat")
+	_expect((game.get_node("CanvasLayer/PauseButton") as Button).visible, "closing beat keeps the pause button available")
+	await _tap(&"pause_game")
+	_expect(paused and game.get("chapter_close_active") and (game.get_node("CanvasLayer/PauseOverlay") as Control).visible, "pause key opens the menu without dismissing the closing beat")
+	var closing_camera: Camera2D = game.get_node("IntroCamera") as Camera2D
+	var paused_camera_position: Vector2 = closing_camera.position
+	await create_timer(0.1, true).timeout
+	_expect(closing_camera.position == paused_camera_position, "pause freezes the closing camera transition")
+	(game.get_node("CanvasLayer/PauseOverlay") as PauseOverlay).resume_requested.emit()
+	_expect(not paused and game.get("chapter_close_active") and not human.controlled, "resume preserves the closing beat until Continue")
 	await _tap(&"interact")
 	_expect(not game.get("chapter_close_active") and human.controlled, "closing beat returns control to the engineer")
 	var saved: Dictionary = state.to_dict()
 	game.call("_new_game")
-	game.call("_finish_intro")
+	for _step in range(5):
+		game.call("_advance_intro")
+	var ending_intro_tween: Tween = game.get("intro_tween") as Tween
+	ending_intro_tween.custom_step(0.4)
+	var intro_fade: ColorRect = game.get_node("CanvasLayer/IntroFade") as ColorRect
+	_expect(not game.get("intro_active") and intro_fade.color.a > 0.0, "intro returns control while its fade-in is still running")
 	_expect((game.get("state") as M0State).chapter_id == "lockdown", "New Game clears chapter progress")
+	(game.get_node("CanvasLayer/IntroAlarm") as ColorRect).color.a = 0.13
 	game.call("_load_game")
+	_expect(intro_fade.color.a == 0.0 and (game.get_node("CanvasLayer/IntroAlarm") as ColorRect).color.a == 0.0 and not ending_intro_tween.is_running(), "Continue cancels the remaining intro transition and clears fade and alarm overlays")
 	state = game.get("state") as M0State
 	_expect(state.to_dict() == saved and human.position == state.human_position and wolf.position == state.wolf_position, "Continue restores progress and both positions")
 	game.queue_free()

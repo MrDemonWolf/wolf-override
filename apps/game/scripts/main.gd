@@ -139,7 +139,9 @@ func _process(delta: float) -> void:
 		_refresh_ui()
 		return
 	if chapter_close_active:
-		if Input.is_action_just_pressed(&"new_game"):
+		if Input.is_action_just_pressed(&"pause_game"):
+			_pause_game()
+		elif Input.is_action_just_pressed(&"new_game"):
 			_new_game()
 		elif Input.is_action_just_pressed(&"load_game"):
 			_load_game()
@@ -387,7 +389,7 @@ func _setup_settings() -> void:
 		$CanvasLayer/PauseOverlay/Panel/PauseMenu/PauseHint.text = "TAP RESUME TO RETURN"
 	if not mobile:
 		get_window().size = _resolution_size(resolution)
-		fullscreen_toggle.button_pressed = bool(config.get_value("video", "fullscreen", false))
+		fullscreen_toggle.button_pressed = GameSettings.boolean(config, "video", "fullscreen", false)
 		if fullscreen_toggle.button_pressed:
 			get_window().mode = Window.MODE_FULLSCREEN
 	fps_options.item_selected.connect(_on_fps_selected)
@@ -525,6 +527,8 @@ func _load_game() -> void:
 		intro_tween.kill()
 	intro_gate.hide()
 	intro_director.hide()
+	intro_fade.color.a = 0.0
+	intro_alarm.color.a = 0.0
 	human.show()
 	$IntroCage.hide()
 	wolf.z_index = 2
@@ -809,7 +813,7 @@ func _update_controls() -> void:
 
 func _refresh_ui() -> void:
 	var touch_layout: bool = touch_enabled and not controller_active
-	pause_button.visible = not title_open and not chapter_close_active and not pause_overlay.visible
+	pause_button.visible = not title_open and not pause_overlay.visible
 	pause_button.text = "SKIP" if intro_active else "PAUSE"
 	touch_controls.visible = (touch_layout or waiting_for_choice) and not title_open and not pause_overlay.visible
 	var touch_move: bool = not intro_active and not chapter_close_active and not waiting_for_choice
@@ -992,6 +996,8 @@ func _install_inputs() -> void:
 	_add_joy_button(&"choice_1", JOY_BUTTON_X)
 	_add_joy_button(&"choice_2", JOY_BUTTON_Y)
 	_add_joy_button(&"pause_game", JOY_BUTTON_START)
+	_add_joy_button(&"ui_cancel", JOY_BUTTON_B)
+	_add_joy_button(&"ui_accept", JOY_BUTTON_A)
 
 
 func _add_action(action: StringName, key: Key, alternate: Key = KEY_NONE) -> void:

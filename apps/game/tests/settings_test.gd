@@ -15,6 +15,10 @@ func _run() -> void:
 		corrupt.set_value("video", key, {"bad": true})
 	corrupt.set_value("audio", "Music", {"bad": true})
 	corrupt.set_value("controls", "deadzone", "bad")
+	corrupt.set_value("video", "fullscreen", {})
+	corrupt.set_value("video", "vsync", {})
+	corrupt.set_value("bindings", "interact_keyboard", {"type": "key", "code": KEY_N})
+	corrupt.set_value("bindings", "choice_1_keyboard", {"type": "key", "code": KEY_N})
 	corrupt.save(path)
 	var game: Node2D = GAME.instantiate() as Node2D
 	game.set("settings_path", path)
@@ -27,7 +31,22 @@ func _run() -> void:
 	(game.get_node("CanvasLayer/TitleScreen/SettingsButton") as Button).pressed.emit()
 	var menu: GameSettings = game.get("settings_menu") as GameSettings
 	_expect(Engine.max_fps == 60 and (menu.volumes["Music"] as HSlider).value == 100.0 and menu.deadzone.value == 0.25, "malformed saved preferences do not interrupt scene setup")
+	_expect(menu.prompt(&"interact", false) == "E" and menu.prompt(&"choice_1", false) == "1" and menu.vsync.button_pressed, "invalid booleans and reserved loaded bindings restore safe defaults")
 	_expect(paused and menu.is_visible_in_tree() and game.get("title_open"), "settings open before starting a game")
+	await process_frame
+	Input.parse_input_event(_controller_button(JOY_BUTTON_B, true))
+	await process_frame
+	_expect(not paused and not game.get("pause_overlay").visible and game.get("title_open"), "controller B closes title settings through native event dispatch")
+	Input.parse_input_event(_controller_button(JOY_BUTTON_B, false))
+	await process_frame
+	(game.get_node("CanvasLayer/TitleScreen/SettingsButton") as Button).pressed.emit()
+	(game.get_node("CanvasLayer/PauseOverlay/Panel/SettingsMenu/BackButton") as Button).grab_focus()
+	Input.parse_input_event(_controller_button(JOY_BUTTON_A, true))
+	await process_frame
+	Input.parse_input_event(_controller_button(JOY_BUTTON_A, false))
+	await process_frame
+	_expect(not paused and not game.get("pause_overlay").visible, "controller A activates the focused settings Back button")
+	(game.get_node("CanvasLayer/TitleScreen/SettingsButton") as Button).pressed.emit()
 	menu.tabs.current_tab = 1
 	var music: HSlider = menu.volumes["Music"]
 	music.value = 37.0
@@ -57,11 +76,11 @@ func _run() -> void:
 	menu._input(_key(KEY_ESCAPE))
 	_expect(menu.capture_action.is_empty() and paused, "Escape cancels rebinding without unpausing")
 	menu.begin_capture(&"choice_1", "controller")
-	var button: InputEventJoypadButton = InputEventJoypadButton.new()
-	button.button_index = JOY_BUTTON_B
-	button.pressed = true
-	menu._input(button)
-	_expect(menu.prompt(&"choice_1", true) == "B", "controller rebind updates the action prompt")
+	Input.parse_input_event(_controller_button(JOY_BUTTON_B, true))
+	await process_frame
+	_expect(menu.prompt(&"choice_1", true) == "B" and paused and menu.is_visible_in_tree() and menu.capture_action.is_empty(), "controller B rebind is consumed before menu cancellation")
+	Input.parse_input_event(_controller_button(JOY_BUTTON_B, false))
+	await process_frame
 	menu.begin_capture(&"move_left", "controller")
 	var axis: InputEventJoypadMotion = InputEventJoypadMotion.new()
 	axis.axis = JOY_AXIS_RIGHT_X
@@ -101,6 +120,23 @@ func _run() -> void:
 	root.msaa_2d = Viewport.MSAA_DISABLED
 	reloaded.queue_free()
 	await process_frame
+	var swaps: ConfigFile = ConfigFile.new()
+	swaps.set_value("bindings", "interact_keyboard", {"type": "key", "code": KEY_1})
+	swaps.set_value("bindings", "choice_1_keyboard", {"type": "key", "code": KEY_E})
+	swaps.set_value("bindings", "choice_2_controller", {"type": "button", "code": JOY_BUTTON_MAX})
+	swaps.set_value("bindings", "move_left_keyboard", {"type": "key", "code": KEY_Q})
+	swaps.set_value("bindings", "move_right_keyboard", {"type": "key", "code": KEY_Q})
+	swaps.save(path)
+	var swapped_game: Node2D = GAME.instantiate() as Node2D
+	swapped_game.set("settings_path", path)
+	root.add_child(swapped_game)
+	var swapped: GameSettings = swapped_game.get("settings_menu") as GameSettings
+	_expect(swapped.prompt(&"interact", false) == "1" and swapped.prompt(&"choice_1", false) == "E", "legitimate saved keyboard swaps survive whole-map validation")
+	_expect(swapped.prompt(&"choice_2", true) == "Y", "invalid saved controller code retains its default")
+	_expect(swapped.prompt(&"move_left", false) != swapped.prompt(&"move_right", false) and (swapped.prompt(&"move_left", false) == "A" or swapped.prompt(&"move_right", false) == "D"), "conflicting loaded overrides cannot bind opposing movement to one key")
+	swapped.reset_controls()
+	swapped_game.queue_free()
+	await process_frame
 	DirAccess.remove_absolute(ProjectSettings.globalize_path(path))
 	if failures == 0:
 		print("Settings persistence and rebinding checks passed")
@@ -112,6 +148,13 @@ func _key(code: Key) -> InputEventKey:
 	event.keycode = code
 	event.physical_keycode = code
 	event.pressed = true
+	return event
+
+
+func _controller_button(code: JoyButton, pressed: bool) -> InputEventJoypadButton:
+	var event: InputEventJoypadButton = InputEventJoypadButton.new()
+	event.button_index = code
+	event.pressed = pressed
 	return event
 
 
