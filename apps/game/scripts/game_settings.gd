@@ -28,7 +28,7 @@ func configure(path: String) -> void:
 	_build_menu()
 	var config: ConfigFile = ConfigFile.new()
 	config.load(settings_path)
-	vsync.set_pressed_no_signal(bool(config.get_value("video", "vsync", true)))
+	vsync.set_pressed_no_signal(boolean(config, "video", "vsync", true))
 	antialiasing.select(clampi(int(number(config, "video", "msaa_2d", 0)), 0, 3))
 	_apply_graphics()
 	for bus: String in BUSES:
@@ -42,6 +42,7 @@ func configure(path: String) -> void:
 		_apply_volume(bus, slider.value)
 	deadzone.set_value_no_signal(clampf(number(config, "controls", "deadzone", 0.25), 0.1, 0.8))
 	_apply_deadzone(deadzone.value)
+	var overrides: Dictionary = {}
 	for action: StringName in ACTIONS:
 		for kind: String in ["keyboard", "controller"]:
 			var saved: Variant = config.get_value("bindings", "%s_%s" % [action, kind], {})
@@ -49,6 +50,23 @@ func configure(path: String) -> void:
 				var event: InputEvent = _decode_binding(saved)
 				if event != null and _event_kind(event) == kind:
 					_replace_binding(action, kind, event)
+					overrides["%s_%s" % [action, kind]] = [action, kind, event]
+	# Validate the whole loaded map so legitimate key swaps are preserved.
+	while not overrides.is_empty():
+		var rejected: bool = false
+		for key: String in overrides.keys():
+			var entry: Array = overrides[key]
+			if not _binding_conflict(entry[0], entry[2]).is_empty():
+				for old: InputEvent in InputMap.action_get_events(entry[0]):
+					if _event_kind(old) == entry[1]:
+						InputMap.action_erase_event(entry[0], old)
+				for original: InputEvent in defaults[entry[0]]:
+					if _event_kind(original) == entry[1]:
+						InputMap.action_add_event(entry[0], original)
+				overrides.erase(key)
+				rejected = true
+		if not rejected:
+			break
 	_refresh_bindings()
 	select_tab(0)
 
@@ -58,6 +76,11 @@ static func number(config: ConfigFile, section: String, key: String, fallback: f
 	if (value is int or value is float) and is_finite(float(value)):
 		return float(value)
 	return fallback
+
+
+static func boolean(config: ConfigFile, section: String, key: String, fallback: bool) -> bool:
+	var value: Variant = config.get_value(section, key, fallback)
+	return value if value is bool else fallback
 
 
 func _build_menu() -> void:
@@ -226,6 +249,8 @@ func apply_theme() -> void:
 	normal.set_corner_radius_all(5)
 	normal.content_margin_left = 12
 	normal.content_margin_right = 12
+	normal.content_margin_top = 8
+	normal.content_margin_bottom = 8
 	var hover: StyleBoxFlat = normal.duplicate() as StyleBoxFlat
 	hover.bg_color = Color("#234859")
 	hover.border_color = Color("#64cce5")
@@ -250,6 +275,10 @@ func apply_theme() -> void:
 	tab_selected.border_color = hover.border_color
 	menu_theme.set_stylebox("tab_selected", "TabBar", tab_selected)
 	menu_theme.set_stylebox("tab_unselected", "TabBar", tab_normal)
+	var tab_focus: StyleBoxFlat = focus.duplicate() as StyleBoxFlat
+	tab_focus.expand_margin_left = -4
+	tab_focus.expand_margin_right = -4
+	menu_theme.set_stylebox("tab_focus", "TabBar", tab_focus)
 	menu_theme.set_font_size("font_size", "TabBar", 16)
 	var track: StyleBoxFlat = StyleBoxFlat.new()
 	track.bg_color = Color("#345366")
@@ -262,6 +291,11 @@ func apply_theme() -> void:
 	menu_theme.set_stylebox("grabber_area", "HSlider", fill)
 	menu_theme.set_stylebox("grabber_area_highlight", "HSlider", fill)
 	theme = menu_theme
+	for label: Label in [$FPSLabel, $ResolutionLabel]:
+		label.add_theme_font_size_override("font_size", 16)
+		label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	for button: Button in [$FPSOptions, $ResolutionOptions, $FullscreenToggle, $BackButton]:
+		button.add_theme_font_size_override("font_size", 16)
 	for node: Button in [$BackButton, $FPSOptions, $ResolutionOptions]:
 		for state: String in ["normal", "hover", "pressed"]:
 			node.remove_theme_stylebox_override(state)
@@ -322,14 +356,12 @@ func _input(event: InputEvent) -> void:
 	var binding: InputEvent = _decode_binding(_encode_binding(event))
 	if binding == null:
 		return
-	for action: StringName in InputMap.get_actions():
-		if action.begins_with("ui_"):
-			continue
-		if action != capture_action and InputMap.action_has_event(action, binding):
-			var action_index: int = ACTIONS.find(action)
-			var caption: String = ACTION_NAMES[action_index] if action_index >= 0 else str(action).replace("_", " ")
-			note.text = "Already used by %s. Choose another input or cancel." % caption
-			return
+	var conflict: StringName = _binding_conflict(capture_action, binding)
+	if not conflict.is_empty():
+		var action_index: int = ACTIONS.find(conflict)
+		var caption: String = ACTION_NAMES[action_index] if action_index >= 0 else str(conflict).replace("_", " ")
+		note.text = "Already used by %s. Choose another input or cancel." % caption
+		return
 	_replace_binding(capture_action, capture_kind, binding)
 	cancel_capture()
 	_refresh_bindings()
@@ -339,6 +371,13 @@ func _input(event: InputEvent) -> void:
 
 func _event_kind(event: InputEvent) -> String:
 	return "keyboard" if event is InputEventKey else ("controller" if event is InputEventJoypadButton or event is InputEventJoypadMotion else "")
+
+
+func _binding_conflict(target: StringName, event: InputEvent) -> StringName:
+	for action: StringName in InputMap.get_actions():
+		if not action.begins_with("ui_") and action != target and InputMap.action_has_event(action, event):
+			return action
+	return &""
 
 
 func _replace_binding(action: StringName, kind: String, event: InputEvent) -> void:

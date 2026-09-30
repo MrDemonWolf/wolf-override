@@ -164,7 +164,7 @@ static func from_dict(raw: Variant) -> M0State:
 	var legacy_wolf_save: bool = data.get("version") == 1 and data.get("active_actor") == "wolf"
 	if data.get("active_actor") != "human" and not legacy_wolf_save:
 		return null
-	if not _valid_position(positions.get("human")) or not _valid_position(positions.get("wolf")):
+	if not _valid_position(positions.get("human"), 414.0) or not _valid_position(positions.get("wolf"), 427.0):
 		return null
 	if typeof(puzzle.get("breaker_armed")) != TYPE_BOOL or typeof(puzzle.get("door_open")) != TYPE_BOOL:
 		return null
@@ -267,10 +267,10 @@ static func _whole_in_range(value: Variant, low: int, high: int) -> bool:
 	return value >= low and value <= high and int(value) == value
 
 
-static func _valid_position(value: Variant) -> bool:
+static func _valid_position(value: Variant, floor_height: float) -> bool:
 	if not (value is Array) or value.size() != 2:
 		return false
 	for component in value:
 		if typeof(component) != TYPE_INT and typeof(component) != TYPE_FLOAT:
 			return false
-	return float(value[0]) >= 40.0 and float(value[0]) <= 920.0 and float(value[1]) >= 0.0 and float(value[1]) <= 540.0
+	return float(value[0]) >= 40.0 and float(value[0]) <= 920.0 and float(value[1]) >= 0.0 and float(value[1]) <= floor_height

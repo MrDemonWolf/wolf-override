@@ -100,6 +100,13 @@ func _initialize() -> void:
 	_expect(State.from_dict(impossible) == null, "rejects unknown future save version")
 
 	if failures == 0:
+		var below_floor: Dictionary = records.to_dict()
+		below_floor["positions"]["human"][1] = 530.0
+		_expect(State.from_dict(below_floor) == null, "rejects human position below the floor")
+		below_floor = records.to_dict()
+		below_floor["positions"]["wolf"][1] = 530.0
+		_expect(State.from_dict(below_floor) == null, "rejects WOLF position below the floor")
+	if failures == 0:
 		print("M0 state checks passed")
 	quit(1 if failures > 0 else 0)
 
