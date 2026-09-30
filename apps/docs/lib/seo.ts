@@ -1,6 +1,6 @@
 import type { Metadata } from 'next';
 
-export const siteUrl = 'https://mrdemonwolf.github.io/wolf-override';
+export const siteUrl = 'https://wolf-override.mrdemonwolf.dev';
 export const siteDescription = 'A side-view sci-fi horror adventure by MrDemonWolf, Inc. Explore THE DEN with an independent robotic wolf, solve puzzles and make choices he remembers. In development.';
 
 export function pageMetadata(title: string, description: string, path: string): Metadata {

@@ -37,8 +37,6 @@ jobs:
       - name: Check download platform suggestions
         run: bun run apps/docs/app/downloads.test.ts
       - name: Build docs
-        env:
-          GITHUB_PAGES: 'true'
         run: bun run docs:build
       - uses: actions/upload-pages-artifact@v4
         if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'

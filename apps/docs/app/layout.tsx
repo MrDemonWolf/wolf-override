@@ -17,7 +17,7 @@ export const metadata: Metadata = {
   },
   description: 'A side-view sci-fi horror game by MrDemonWolf, Inc.',
   icons: {
-    icon: `${process.env.GITHUB_PAGES === 'true' ? '/wolf-override' : ''}/wolf-override-mark.svg`,
+    icon: '/wolf-override-mark.svg',
   },
 };
 

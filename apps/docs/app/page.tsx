@@ -10,7 +10,7 @@ export const metadata = {
 };
 
 export default function HomePage() {
-  const base = process.env.GITHUB_PAGES === 'true' ? '/wolf-override' : '';
+  const base = '';
   return (
     <main id="nd-page" className="marketing-shell">
       <header className="marketing-header">

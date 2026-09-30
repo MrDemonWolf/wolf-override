@@ -19,7 +19,7 @@ record-copying objective. Character animation, audio, the wider campaign,
 public export packages and physical-device testing are still ahead.
 
 The gameplay camera follows the engineer across each room with a closer view.
-The title and settings menus use THE DEN's local-terminal styling.
+Settings uses THE DEN's local-terminal styling; the title screen keeps its game presentation.
 
 **Quick play:** The opening shows only WOLF and the Director. Press **E** to
 advance WOLF's escape or **Esc** to skip it. You then control the engineer,
@@ -28,7 +28,7 @@ The opening tutorial teaches movement and the first interaction as you play.
 Open the corridor door, save at the safe point, then press **E** again to enter
 Records Access. Copy the purge
 trace, use WOLF's mirror readout or the engineer's manual port, and reach the
-exit. [The step-by-step guide](https://mrdemonwolf.github.io/wolf-override/docs/)
+exit. [The step-by-step guide](https://wolf-override.mrdemonwolf.dev/docs/)
 shows each step.
 
 ## Features
@@ -52,8 +52,8 @@ story and cinematic presentation remain in development.
 
 ## Getting Started
 
-The [public game guide](https://mrdemonwolf.github.io/wolf-override/docs/) has
-controls. The [developer setup guide](https://mrdemonwolf.github.io/wolf-override/docs/development/)
+The [public game guide](https://wolf-override.mrdemonwolf.dev/docs/) has
+controls. The [developer setup guide](https://wolf-override.mrdemonwolf.dev/docs/development/)
 has the local tools and checks. There is no installer or store release yet; run the game from source.
 
 1. Get [Godot 4.7.2 stable](https://godotengine.org/download/archive/).
@@ -146,7 +146,7 @@ bun run docs:dev
 
 The frozen dependency install, docs type check, and Pages static export
 passed locally and in [GitHub Actions](https://github.com/MrDemonWolf/wolf-override/actions/runs/36396158278).
-The [public site](https://mrdemonwolf.github.io/wolf-override/) is live.
+The [public site](https://wolf-override.mrdemonwolf.dev/) is live.
 
 ### Development Scripts
 
@@ -195,7 +195,7 @@ companion behavior, accessibility and honest playtest claims.
 
 Original game and core story idea by Nathanial Henniges. Developed by
 MrDemonWolf, Inc. with AI assistance. See the [full credits, research
-references, tools, and asset provenance](https://mrdemonwolf.github.io/wolf-override/docs/credits/).
+references, tools, and asset provenance](https://wolf-override.mrdemonwolf.dev/docs/credits/).
 
 ## License
 
