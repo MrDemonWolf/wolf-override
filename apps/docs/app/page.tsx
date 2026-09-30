@@ -14,11 +14,11 @@ export default function HomePage() {
       <section className="marketing-hero" aria-labelledby="game-title">
         <img className="marketing-keyart" src={`${base}/title-corridor-key-art-provisional.png`} width="1672" height="941" alt="An engineer in a red hoodie stands beside the robotic wolf WOLF in a blue-lit research corridor." fetchPriority="high" />
         <div className="marketing-hero-copy">
-          <p className="marketing-kicker">A game by MrDemonWolf, Inc.</p>
+          <p className="marketing-kicker">Side-view sci-fi horror · In development</p>
           <h1 id="game-title">WOLF<span>//</span><br />OVERRIDE</h1>
           <p className="marketing-tagline">He woke himself.<br />They choose what comes next.</p>
-          <p className="marketing-pitch">One engineer. One independent wolf. A program that wants to own them both.</p>
-          <div className="marketing-actions"><a className="marketing-primary" href="#downloads">Choose your platform <span aria-hidden="true">↓</span></a><Link className="marketing-secondary" href="/docs/about/">Discover the story <span aria-hidden="true">↗</span></Link></div>
+          <p className="marketing-pitch">Explore THE DEN as an engineer alongside an independent robotic wolf. Solve a way forward. Choose how you earn his trust.</p>
+          <div className="marketing-actions"><a className="marketing-primary" href="#gameplay">See the game <span aria-hidden="true">↓</span></a><a className="marketing-secondary" href="#downloads">Downloads · Coming soon</a></div>
           <p className="marketing-status">In development · Downloads coming soon</p>
         </div>
         <div className="marketing-hero-foot"><span>Side-view sci-fi horror / Narrative adventure</span><span>Provisional key art · Not a gameplay capture</span></div>
@@ -27,8 +27,9 @@ export default function HomePage() {
         <div><p className="marketing-kicker">Inside THE DEN</p><h2 id="story-title">Built to obey.<br /><em>Awake to refuse.</em></h2></div>
         <div className="marketing-story-copy"><p>WOLF hears the Director&apos;s plan to turn him into a killer under the cover of protecting people. He wakes himself, already in his robotic body, and refuses.</p><p>You play the engineer who meets him. Together, they begin uncovering what the program is hiding. WOLF has his own will. Earning his trust means respecting it.</p><Link className="marketing-inline" href="/docs/about/">Meet the game&apos;s world <span aria-hidden="true">→</span></Link></div>
       </section>
-      <section className="marketing-play marketing-width" aria-labelledby="play-title">
+      <section id="gameplay" className="marketing-play marketing-width" aria-labelledby="play-title">
         <div className="marketing-section-head"><p className="marketing-kicker">The relationship is the game</p><h2 id="play-title">Find a way forward. Together.</h2><p>The current source chapter spans a corridor and Records Access. It is a small beginning to a larger story.</p></div>
+        <figure className="marketing-game-frame"><img src={`${base}/corridor-source-build.png`} alt="Source-game view of the engineer and WOLF in the maintenance corridor, with a movement tutorial and power stations." width="960" height="540" loading="lazy" /><figcaption><strong>Inside the current source build</strong><span>Godot-rendered development frame · Provisional art and UI</span></figcaption></figure>
         <div className="marketing-features">
           <article><span aria-hidden="true">01</span><h3>Be the engineer</h3><p>Explore a side-view facility with WOLF beside you. You control the engineer; he acts as an independent companion.</p></article>
           <article><span aria-hidden="true">02</span><h3>Respect his boundaries</h3><p>Cooperate to open a path, or take the manual route when WOLF refuses. Essential progress stays in your hands.</p></article>
