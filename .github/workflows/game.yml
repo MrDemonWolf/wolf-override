@@ -4,6 +4,7 @@ on:
   push:
     branches: [main]
   pull_request:
+  workflow_dispatch:
 
 permissions:
   contents: read
@@ -11,6 +12,10 @@ permissions:
 jobs:
   godot:
     runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    defaults:
+      run:
+        shell: bash
     steps:
       - uses: actions/checkout@v7
       - name: Get pinned Godot 4.7.2
@@ -25,14 +30,22 @@ jobs:
           "$godot_bin" --version
           echo "GODOT_BIN=$godot_bin" >> "$GITHUB_ENV"
       - name: Import game
-        run: '"$GODOT_BIN" --headless --path apps/game --import'
+        run: '"$GODOT_BIN" --headless --path apps/game --import 2>&1 | tee "$RUNNER_TEMP/wolf-check-import.log"'
       - name: Check M0 state
-        run: '"$GODOT_BIN" --headless --path apps/game --script res://tests/m0_state_test.gd'
+        run: '"$GODOT_BIN" --headless --path apps/game --script res://tests/m0_state_test.gd 2>&1 | tee "$RUNNER_TEMP/wolf-check-state.log"'
       - name: Check M0 scene
-        run: '"$GODOT_BIN" --headless --path apps/game --script res://tests/m0_scene_test.gd'
+        run: '"$GODOT_BIN" --headless --path apps/game --script res://tests/m0_scene_test.gd 2>&1 | tee "$RUNNER_TEMP/wolf-check-corridor.log"'
       - name: Check first chapter scene
-        run: '"$GODOT_BIN" --headless --path apps/game --script res://tests/chapter_scene_test.gd'
+        run: '"$GODOT_BIN" --headless --path apps/game --script res://tests/chapter_scene_test.gd 2>&1 | tee "$RUNNER_TEMP/wolf-check-chapter.log"'
       - name: Check UI and controls
-        run: '"$GODOT_BIN" --headless --path apps/game --script res://tests/ui_controls_test.gd'
+        run: '"$GODOT_BIN" --headless --path apps/game --script res://tests/ui_controls_test.gd 2>&1 | tee "$RUNNER_TEMP/wolf-check-controls.log"'
       - name: Check settings persistence and rebinding
-        run: '"$GODOT_BIN" --headless --path apps/game --script res://tests/settings_test.gd'
+        run: '"$GODOT_BIN" --headless --path apps/game --script res://tests/settings_test.gd 2>&1 | tee "$RUNNER_TEMP/wolf-check-settings.log"'
+      - name: Preserve failed check logs
+        if: failure()
+        uses: actions/upload-artifact@v7
+        with:
+          name: game-check-failure-logs
+          path: ${{ runner.temp }}/wolf-check-*.log
+          if-no-files-found: ignore
+          retention-days: 7

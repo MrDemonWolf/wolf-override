@@ -49,6 +49,27 @@ GITHUB_PAGES=true bun run docs:build
 
 The Godot commands check import, state logic, both scripted door routes, both Records Access mirror routes, and save/load. The Bun commands check docs types and build the static Pages site. Headless checks cannot confirm the on-screen feel; exports and device tests are separate work.
 
+## Continuous integration and deployment
+
+Every pull request and push to main runs a checksum-verified Godot 4.7.2 import and all five deterministic game checks. The workflow can also be started manually from GitHub Actions. Game jobs have a 15-minute limit; failing import/test logs are retained as downloadable artifacts for seven days. The log pipelines retain the command's failure status.
+
+Docs changes run type checks and a production Pages build before merge. Main-branch docs changes then deploy to GitHub Pages. Build and deployment jobs have time limits. This pipeline deploys the website, not game installers.
+
+Graphical route play, hardware input, exports, signing and devices remain separate gates. A green workflow does not certify a finished game or a distributable package.
+
+## Direct macOS updater preparation
+
+**Status: planned, not integrated or enabled.** The game contains no Sparkle framework, updater object, update feed or automatic network check. The [changelog](/docs/changelog/) is the first release-notes foundation.
+
+Sparkle is a candidate for direct macOS downloads. A Godot app needs a tested native integration and repeatable export packaging; a GDScript setting alone cannot add Sparkle. Store-distributed builds should use their store update channels.
+
+1. **Prepare:** keep source changelog entries accurate; select a native integration approach and pin its dependency only after reviewing it against the actual exported Godot bundle.
+2. **Integrate while disabled:** package the framework and a native bridge in a separate direct-macOS test build. Construct `SPUStandardUpdaterController` with `startingUpdater: false`; do not call `startUpdater` or expose an enabled update action. Verify no startup update request.
+3. **Validate distribution:** establish monotonic bundle versions, Developer ID signing/notarization, secure EdDSA key handling, signed update archives and an HTTPS appcast. Test an older-to-newer update, rejected invalid signatures, failed downloads and save compatibility with temporary user data.
+4. **Enable only after approval:** activate the tested direct-macOS updater in a real release. Keep it absent from store builds; Windows needs a separate solution.
+
+No keys, feed, native dependency or signing changes have been created. This is a staged integration plan, not working updater support. References checked: [Sparkle setup](https://sparkle-project.org/documentation/) and [programmatic setup](https://sparkle-project.org/documentation/programmatic-setup/).
+
 ## In the current source build
 
 - Two distinguishable characters with provisional static art: the engineer is playable and WOLF accompanies them without player switching.
