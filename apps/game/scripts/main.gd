@@ -204,6 +204,8 @@ func _new_game() -> void:
 	for station: CanvasItem in [breaker_art, relay_art, checkpoint_art, breaker_status_light, relay_status_light, door_visual]:
 		station.hide()
 	wolf.position = Vector2(115.0, 423.0)
+	wolf.z_index = 2
+	wolf.body_sprite.position = WOLF_SPRITE_REST
 	wolf.body_sprite.modulate = Color("#365263")
 	intro_gate.position = Vector2(115.0, 365.0)
 	intro_gate.set("opening", 0.0)
@@ -236,15 +238,20 @@ func _advance_intro() -> void:
 		intro_step = 2
 		wolf.body_sprite.modulate = Color("#9deeff")
 		intro_camera.zoom = Vector2(1.95, 1.95)
-		status_line = "The latch tears upward from the inside. WOLF steps out under his own power.\nThe Director freezes at the sound of the seal opening."
+		status_line = "The latch breaks from the inside. The gate slides aside. WOLF steps out under his own power.\nThe Director freezes at the sound of the seal opening."
 		intro_tween = create_tween()
 		intro_tween.tween_property(intro_gate, "opening", 1.0, 0.65).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
 		intro_tween.parallel().tween_property(intro_alarm, "color:a", 0.13, 0.18)
 		intro_tween.tween_callback(intro_gate.hide)
+		intro_tween.tween_callback(func() -> void: wolf.z_index = 5)
+		intro_tween.tween_property(wolf.body_sprite, "position:y", WOLF_SPRITE_REST.y + 8.0, 0.28)
 		intro_tween.tween_callback(func() -> void: wolf.autonomous_target_x = 185.0)
 	elif intro_step == 2:
 		intro_step = 3
 		intro_gate.hide()
+		wolf.z_index = 5
+		wolf.body_sprite.position.y = WOLF_SPRITE_REST.y + 8.0
+		wolf.autonomous_target_x = 185.0
 		status_line = "DIRECTOR: You were in standby.\nWOLF: I heard you. I won't do it."
 		intro_tween = create_tween()
 		intro_tween.tween_property(intro_director, "position:x", 310.0, 0.65).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
@@ -284,6 +291,8 @@ func _finish_intro(keep_fade: bool = false) -> void:
 	intro_camera.position = Vector2(480.0, 270.0)
 	intro_camera.zoom = Vector2.ONE
 	wolf.body_sprite.modulate = Color.WHITE
+	wolf.body_sprite.position = WOLF_SPRITE_REST
+	wolf.z_index = 2
 	wolf.position = state.wolf_position
 	wolf.autonomous_target_x = -1.0
 	_sync_door()
@@ -518,6 +527,8 @@ func _load_game() -> void:
 	intro_director.hide()
 	human.show()
 	$IntroCage.hide()
+	wolf.z_index = 2
+	wolf.body_sprite.position = WOLF_SPRITE_REST
 	purge_terminal_art.show()
 	$BreakerLabel.show()
 	$RelayLabel.show()

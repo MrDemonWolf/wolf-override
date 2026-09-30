@@ -11,19 +11,19 @@ func _draw() -> void:
 	var steel: Color = Color("#24323a")
 	var edge: Color = Color("#6b7e86")
 	if shutter:
-		var bottom: float = maxf(-53.0, 72.0 - opening * 128.0)
-		if bottom <= -53.0:
+		var right: float = 80.0 - opening * 160.0
+		if right <= -80.0:
 			return
-		for x: int in range(-72, 73, 18):
-			draw_rect(Rect2(x - 3, -53, 6, bottom + 53), Color("#111a20"))
-			draw_line(Vector2(x - 2, -53), Vector2(x - 2, bottom), Color("#52616a"), 1.0)
-			draw_line(Vector2(x + 2, -53), Vector2(x + 2, bottom), Color("#080e13"), 2.0)
-		for rest_y: int in [-49, 16, 68]:
-			var y: float = rest_y - opening * 128.0
-			if y < -53.0:
+		for rest_x: int in range(-72, 73, 18):
+			var x: float = rest_x - opening * 160.0
+			if x < -77.0:
 				continue
-			draw_rect(Rect2(-80, y, 160, 5), steel)
-			draw_line(Vector2(-80, y), Vector2(80, y), edge, 1.0)
+			draw_rect(Rect2(x - 3, -53, 6, 125), Color("#111a20"))
+			draw_line(Vector2(x - 2, -53), Vector2(x - 2, 72), Color("#52616a"), 1.0)
+			draw_line(Vector2(x + 2, -53), Vector2(x + 2, 72), Color("#080e13"), 2.0)
+		for y: int in [-49, 16, 68]:
+			draw_rect(Rect2(-80, y, right + 80, 5), steel)
+			draw_line(Vector2(-80, y), Vector2(right, y), edge, 1.0)
 		return
 	draw_colored_polygon(PackedVector2Array([Vector2(-88, -64), Vector2(-78, -73), Vector2(98, -73), Vector2(88, -64)]), Color("#3b4b53"))
 	draw_rect(Rect2(-88, -64, 176, 12), Color("#18242c"))

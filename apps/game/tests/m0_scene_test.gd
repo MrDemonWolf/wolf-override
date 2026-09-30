@@ -81,7 +81,7 @@ func _run() -> void:
 	await _tap(&"interact")
 	_expect(game.get("intro_step") == 1 and str(game.get("status_line")).contains("wakes himself"), "WOLF wakes himself and opens containment")
 	await _tap(&"interact")
-	_expect(game.get("intro_step") == 2 and str(game.get("status_line")).contains("latch tears upward"), "WOLF opens containment from inside")
+	_expect(game.get("intro_step") == 2 and str(game.get("status_line")).contains("gate slides aside"), "WOLF opens containment from inside through a sliding gate")
 	await _tap(&"interact")
 	_expect(game.get("intro_step") == 3 and str(game.get("status_line")).contains("I won't do it"), "WOLF refuses the Director before the engineer arrives")
 	await _tap(&"interact")
