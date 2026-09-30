@@ -14,6 +14,7 @@ func _run() -> void:
 	var old_fps: int = Engine.max_fps
 	var game: Node2D = GAME_SCENE.instantiate() as Node2D
 	game.set("settings_path", path)
+	game.set("save_path", "%s-save.json" % path)
 	root.add_child(game)
 	_expect(_has_button(&"interact", JOY_BUTTON_A) and _has_button(&"pause_game", JOY_BUTTON_START), "gamepad action buttons are mapped")
 	_expect(_has_button(&"move_left", JOY_BUTTON_DPAD_LEFT) and _has_button(&"move_right", JOY_BUTTON_DPAD_RIGHT), "gamepad D-pad movement is mapped")
@@ -41,7 +42,7 @@ func _run() -> void:
 	var second_choice: Button = touch.get_node("Choice2") as Button
 	_expect(first_choice.size.y == 76.0 and second_choice.position.x > first_choice.position.x, "touch choices retain large side-by-side targets")
 	var controller_event: InputEventJoypadButton = InputEventJoypadButton.new()
-	controller_event.button_index = JOY_BUTTON_X
+	controller_event.button_index = JOY_BUTTON_RIGHT_SHOULDER
 	controller_event.pressed = true
 	game.call("_input", controller_event)
 	_expect(first_choice.size.y == 40.0 and second_choice.position.y > first_choice.position.y and first_choice.text.begins_with("X  ") and second_choice.text.begins_with("Y  "), "controller choices use compact stacked cards with action prompts")
@@ -65,6 +66,35 @@ func _run() -> void:
 	(game.get_node("CanvasLayer/PauseOverlay/Panel/SettingsMenu/BackButton") as Button).pressed.emit()
 	overlay.resume_requested.emit()
 	_expect(not paused and not overlay.visible and (game.get_node("Human") as M0Actor).controlled, "resume returns to the same playable state")
+	var menu: GameSettings = game.get("settings_menu") as GameSettings
+	menu.call("_replace_binding", &"interact", "controller", _controller_button(JOY_BUTTON_B, false))
+	menu.call("_replace_binding", &"choice_2", "controller", _controller_button(JOY_BUTTON_A, false))
+	game.call("_new_game")
+	await process_frame
+	Input.parse_input_event(_controller_button(JOY_BUTTON_B, true))
+	await process_frame
+	await process_frame
+	_expect(game.get("intro_active") and game.get("intro_step") == 1, "remapped B continues the intro instead of triggering native menu cancel")
+	Input.parse_input_event(_controller_button(JOY_BUTTON_B, false))
+	await process_frame
+	game.call("_finish_intro")
+	(game.get_node("Human") as M0Actor).position.x = 350.0
+	game.call("_interact")
+	first_choice.grab_focus()
+	await process_frame
+	Input.parse_input_event(_controller_button(JOY_BUTTON_A, true))
+	await process_frame
+	_expect((game.get("state") as M0State).memory.get("choice_id") == M0State.PRESS and not game.get("waiting_for_choice"), "remapped A selects the second response even when native menu focus is on the first")
+	Input.parse_input_event(_controller_button(JOY_BUTTON_A, false))
+	await process_frame
+	menu.reset_controls()
+	game.call("_pause_game")
+	(game.get_node("CanvasLayer/PauseOverlay/Panel/PauseMenu/TitleButton") as Button).pressed.emit()
+	var new_game: Button = game.get_node("CanvasLayer/TitleScreen/NewGameButton") as Button
+	_expect(not paused and game.get("title_open") and not overlay.visible and not (game.get_node("Human") as M0Actor).controlled and new_game.has_focus(), "Return to Title hides the pause menu and focuses New Game with actor control stopped")
+	_expect((game.get_node("CanvasLayer/TitleScreen/ContinueButton") as Button).disabled, "returning without a saved checkpoint keeps Continue disabled")
+	new_game.pressed.emit()
+	_expect(game.get("intro_active") and (game.get("state") as M0State).memory.is_empty(), "New Game from the returned title clears the previous remembered choice")
 	Engine.max_fps = old_fps
 	DirAccess.remove_absolute(ProjectSettings.globalize_path(path))
 	game.queue_free()
@@ -79,6 +109,13 @@ func _has_button(action: StringName, index: JoyButton) -> bool:
 		if event is InputEventJoypadButton and event.button_index == index:
 			return true
 	return false
+
+
+func _controller_button(index: JoyButton, pressed: bool) -> InputEventJoypadButton:
+	var event: InputEventJoypadButton = InputEventJoypadButton.new()
+	event.button_index = index
+	event.pressed = pressed
+	return event
 
 
 func _expect(condition: bool, label: String) -> void:

@@ -93,6 +93,7 @@ func _ready() -> void:
 	pause_overlay.resume_requested.connect(_resume_game)
 	resume_button.pressed.connect(_resume_game)
 	settings_button.pressed.connect(_show_settings)
+	$CanvasLayer/PauseOverlay/Panel/PauseMenu/TitleButton.pressed.connect(_return_to_title)
 	$CanvasLayer/TitleScreen/SettingsButton.pressed.connect(_show_title_settings)
 	settings_back_button.pressed.connect(_show_pause_menu)
 	records_room = RecordsRoom.new()
@@ -132,7 +133,7 @@ func _process(delta: float) -> void:
 			credits_body.get_v_scroll_bar().value += delta * 18.0
 		return
 	if intro_active:
-		if Input.is_action_just_pressed(&"ui_cancel") or Input.is_action_just_pressed(&"pause_game"):
+		if Input.is_action_just_pressed(&"pause_game"):
 			_finish_intro()
 		elif Input.is_action_just_pressed(&"interact"):
 			_advance_intro()
@@ -347,7 +348,7 @@ func _setup_touch_controls() -> void:
 	normal.set_corner_radius_all(6)
 	var hover: StyleBoxFlat = normal.duplicate() as StyleBoxFlat
 	hover.bg_color = Color("#174461")
-	for button: Button in [touch_left, touch_right, touch_use, touch_choice_1, touch_choice_2, pause_button, resume_button, settings_button, settings_back_button, fps_options, resolution_options]:
+	for button: Button in [touch_left, touch_right, touch_use, touch_choice_1, touch_choice_2, pause_button, resume_button, settings_button, settings_back_button, fps_options, resolution_options, $CanvasLayer/PauseOverlay/Panel/PauseMenu/TitleButton]:
 		button.add_theme_stylebox_override("normal", normal)
 		button.add_theme_stylebox_override("hover", hover)
 		button.add_theme_stylebox_override("pressed", hover)
@@ -482,13 +483,30 @@ func _show_pause_menu() -> void:
 		return
 	settings_menu.cancel_capture()
 	var panel: Control = $CanvasLayer/PauseOverlay/Panel
-	panel.position = Vector2(255, 78)
-	panel.size = Vector2(450, 389)
+	panel.position = Vector2(255, 55)
+	panel.size = Vector2(450, 430)
+	pause_menu.size = Vector2(450, 430)
 	$CanvasLayer/PauseOverlay/Panel/Accent.show()
 	settings_menu.hide()
 	pause_menu.show()
 	$CanvasLayer/PauseOverlay/Panel/PauseMenu/PauseHint.text = "TAP RESUME TO RETURN" if touch_enabled and not controller_active else "%s  RESUME" % settings_menu.prompt(&"pause_game", controller_active)
 	resume_button.grab_focus()
+
+
+func _return_to_title() -> void:
+	_resume_game()
+	if intro_active:
+		_finish_intro()
+	if chapter_tween != null and chapter_tween.is_running():
+		chapter_tween.kill()
+	chapter_close_active = false
+	title_open = true
+	_hide_credits()
+	title_screen.show()
+	continue_button.disabled = M0State.load_from_disk(save_path) == null
+	_update_controls()
+	_refresh_ui()
+	new_game_button.grab_focus()
 
 
 func _unhandled_input(event: InputEvent) -> void:
@@ -506,6 +524,15 @@ func _input(event: InputEvent) -> void:
 	if use_controller != controller_active:
 		controller_active = use_controller
 		_refresh_ui()
+	# Direct response bindings win over native focused-button acceptance.
+	if waiting_for_choice and not get_tree().paused and not event.is_echo():
+		var response: int = 1 if event.is_action_pressed(&"choice_1") else (2 if event.is_action_pressed(&"choice_2") else 0)
+		if response != 0:
+			if choice_context == "mirror":
+				_choose_mirror("wolf" if response == 1 else "manual")
+			else:
+				_choose(M0State.DISCLOSE if response == 1 else M0State.PRESS)
+			get_viewport().set_input_as_handled()
 
 
 func _load_game() -> void:
@@ -633,7 +660,7 @@ func _interact_checkpoint() -> void:
 	if state.checkpoint_reached:
 		if state.enter_records():
 			_sync_scene()
-			var remembered_line: String = "I refused the live relay; I'm still here." if state.memory.get("choice_id") == M0State.PRESS else "I chose the relay. I'm checking this path too."
+			var remembered_line: String = "I refused the live relay; I'm still here." if state.memory.get("choice_id") == M0State.PRESS else ("I chose the relay. I'm checking this path too." if state.route == "cooperate" else "You used the manual bypass. I'm checking this path with you.")
 			status_line = "WOLF: %s\nTake the purge queue. I'll inspect the mirror." % remembered_line
 			_save_progress()
 		return
@@ -676,7 +703,7 @@ func _interact_records(x: float) -> void:
 			_update_controls()
 			_sync_records_room(true)
 			chapter_tween = create_tween()
-			chapter_tween.tween_property(intro_camera, "position", Vector2(576.0, 270.0), 0.5).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
+			chapter_tween.tween_property(intro_camera, "position", Vector2(576.0, 330.0), 0.5).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
 			chapter_tween.parallel().tween_property(intro_camera, "zoom", Vector2(1.25, 1.25), 0.5)
 			chapter_tween.parallel().tween_property(records_room.exit_art, "position:y", 245.0, 0.5)
 			chapter_tween.parallel().tween_property(records_room.exit_art, "modulate:a", 0.0, 0.5)
@@ -824,8 +851,8 @@ func _refresh_ui() -> void:
 	touch_choice_1.visible = waiting_for_choice
 	touch_choice_2.visible = waiting_for_choice
 	if waiting_for_choice:
-		touch_choice_1.position = Vector2(42.0, 355.0) if touch_layout else Vector2(396.0, 350.0)
-		touch_choice_2.position = Vector2(490.0, 355.0) if touch_layout else Vector2(396.0, 396.0)
+		touch_choice_1.position = Vector2(42.0, 110.0) if touch_layout else Vector2(396.0, 110.0)
+		touch_choice_2.position = Vector2(490.0, 110.0) if touch_layout else Vector2(396.0, 156.0)
 		touch_choice_1.size = Vector2(428.0, 76.0) if touch_layout else Vector2(522.0, 40.0)
 		touch_choice_2.size = Vector2(428.0, 76.0) if touch_layout else Vector2(522.0, 40.0)
 		touch_choice_1.add_theme_font_size_override("font_size", 17 if touch_layout else 16)
@@ -906,6 +933,10 @@ func _set_dialogue(message: String, hint: String) -> void:
 	dialogue_accent.color = tint
 	speaker.add_theme_color_override("font_color", tint)
 	context_hint.visible = not hint.is_empty()
+	var cinematic: bool = intro_active or chapter_close_active
+	context_hint.position = Vector2(650, 94) if cinematic else Vector2(253, 405)
+	context_hint.size = Vector2(278, 35) if cinematic else Vector2(549, 35)
+	context_hint_text.size.x = 252 if cinematic else 526
 	context_hint_text.text = hint
 
 
@@ -934,7 +965,7 @@ func _context_hint() -> String:
 			return "E: secure the first copy." if state.mirror_trace_preserved else "Preserve both traces before leaving."
 		return "Follow the station lights: purge queue, mirror port, then exit."
 	if state.checkpoint_reached:
-		return "E: enter records access. The Director's purge is still running."
+		return "E: enter records access. The Director's purge is still running." if absf(x - 876.0) <= 52.0 else ("E: read the Director's purge display." if x <= 230.0 else "Return to the safe point to enter records access.")
 	if state.door_open:
 		if absf(x - 876.0) <= 52.0:
 			return "E: save at the safe point."

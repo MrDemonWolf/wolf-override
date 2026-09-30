@@ -280,6 +280,11 @@ func apply_theme() -> void:
 	tab_focus.expand_margin_right = -4
 	menu_theme.set_stylebox("tab_focus", "TabBar", tab_focus)
 	menu_theme.set_font_size("font_size", "TabBar", 16)
+	menu_theme.set_stylebox("panel", "PopupMenu", normal)
+	menu_theme.set_stylebox("hover", "PopupMenu", hover)
+	menu_theme.set_font_size("font_size", "PopupMenu", 16)
+	menu_theme.set_color("font_color", "PopupMenu", Color("#e2edf2"))
+	menu_theme.set_color("font_hover_color", "PopupMenu", Color.WHITE)
 	var track: StyleBoxFlat = StyleBoxFlat.new()
 	track.bg_color = Color("#345366")
 	track.content_margin_top = 3

@@ -168,7 +168,7 @@ func _run() -> void:
 	_expect(str(game.get("status_line")).contains(State.CHOICE_TEXT[State.DISCLOSE]), "cooperative checkpoint displays the selected choice")
 	var saved: Dictionary = state.to_dict()
 	game.call("_new_game")
-	await _tap(&"ui_cancel")
+	await _tap(&"pause_game")
 	state = game.get("state") as M0State
 	_expect(state.memory.is_empty() and not state.door_open and human.position == state.human_position, "New Game clears current play")
 	await _tap(&"load_game")

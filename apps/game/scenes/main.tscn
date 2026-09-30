@@ -533,7 +533,7 @@ offset_bottom = 425.0
 theme_override_colors/default_color = Color(0.82, 0.89, 0.94, 1)
 theme_override_font_sizes/normal_font_size = 19
 bbcode_enabled = true
-text = "[center][color=#73DDF5]ORIGINAL GAME & STORY[/color]\n[font_size=30][b]Nathanial Henniges[/b][/font_size]\n\n\n[color=#73DDF5]DEVELOPMENT[/color]\n[font_size=26][b]MrDemonWolf, Inc.[/b][/font_size]\n\n\n[color=#73DDF5]AI-ASSISTED PRODUCTION[/color]\nChatGPT and Codex assisted with research, writing and code.\nNathanial directed and reviewed the work.\n\n\n[color=#73DDF5]PROVISIONAL ART[/color]\nCreated with ChatGPT Create.\nThe WOLF//OVERRIDE mark was redrawn from a generated concept.\n\n\n[color=#73DDF5]BUILT WITH[/color]\nGodot 4.7.2  /  GDScript\nNext.js  /  Fumadocs  /  Bun\n\n\n[color=#73DDF5]RESEARCH REFERENCES[/color]\nFumito Ueda on companion storytelling\nNIST AI Risk Management Framework\nNational Archives records guidance\n\nResearch helped refine the craft. The original game and story idea belong to Nathanial Henniges.\n\nFull sources and asset credits:\nmrdemonwolf.github.io/wolf-override/docs/credits/\n\n\n[font_size=24][b]THANK YOU FOR PLAYING[/b][/font_size][/center]"
+text = "[center][color=#73DDF5]ORIGINAL CONCEPT, CORE STORY & CREATIVE VISION[/color]\n[font_size=30][b]Nathanial Henniges[/b][/font_size]\n\n\n[color=#73DDF5]DEVELOPMENT[/color]\n[font_size=26][b]MrDemonWolf, Inc.[/b][/font_size]\n\n\n[color=#73DDF5]AI-ASSISTED PRODUCTION[/color]\nChatGPT and Codex assisted with research, writing and code.\nNathanial directed and reviewed the work.\n\n\n[color=#73DDF5]PROVISIONAL ART[/color]\nCreated with ChatGPT Create.\nThe WOLF//OVERRIDE mark was redrawn from a generated concept.\n\n\n[color=#73DDF5]BUILT WITH[/color]\nGodot 4.7.2  /  GDScript\nNext.js  /  Fumadocs  /  Bun\n\n\n[color=#73DDF5]RESEARCH & CRAFT REFERENCES[/color]\nFumito Ueda / The Last Guardian\nCompanion behavior and visual storytelling\n\nNaughty Dog / The Last of Us Part II\nReviewed controls and readable presentation\n\nGame Accessibility Guidelines\nPlayer-paced text and recognizable interactions\n\nNIST AI Risk Management Framework\nNational Archives records guidance\n\nReferences inform craft, not the origin of this game.\nOriginal concept, core story and creative vision:\nNathanial Henniges.\nReferenced creators are not project contributors.\n\nFull sources, tools and asset credits:\nmrdemonwolf.github.io/wolf-override/docs/credits/\n\n\n[font_size=24][b]THANK YOU FOR PLAYING[/b][/font_size][/center]"
 
 [node name="CreditsBackButton" type="Button" parent="CanvasLayer/TitleScreen/CreditsScreen"]
 offset_left = 189.0
@@ -611,13 +611,31 @@ text = "SETTINGS"
 
 [node name="PauseHint" type="Label" parent="CanvasLayer/PauseOverlay/Panel/PauseMenu"]
 offset_left = 50.0
-offset_top = 307.0
+offset_top = 343.0
 offset_right = 400.0
-offset_bottom = 348.0
+offset_bottom = 365.0
 horizontal_alignment = 1
 theme_override_colors/font_color = Color(0.67, 0.79, 0.85, 1)
 theme_override_font_sizes/font_size = 16
 text = "ESC / START TO RESUME"
+
+[node name="TitleButton" type="Button" parent="CanvasLayer/PauseOverlay/Panel/PauseMenu"]
+offset_left = 50.0
+offset_top = 275.0
+offset_right = 400.0
+offset_bottom = 331.0
+theme_override_font_sizes/font_size = 19
+text = "RETURN TO TITLE"
+
+[node name="ReturnWarning" type="Label" parent="CanvasLayer/PauseOverlay/Panel/PauseMenu"]
+offset_left = 36.0
+offset_top = 375.0
+offset_right = 414.0
+offset_bottom = 420.0
+theme_override_colors/font_color = Color(0.67, 0.79, 0.85, 1)
+theme_override_font_sizes/font_size = 14
+text = "Returning keeps your last checkpoint.\nUnsaved progress will be lost."
+horizontal_alignment = 1
 
 [node name="SettingsMenu" type="Control" parent="CanvasLayer/PauseOverlay/Panel"]
 visible = false
