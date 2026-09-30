@@ -33,6 +33,13 @@ func _run() -> void:
 	_expect(Engine.max_fps == 60 and (menu.volumes["Music"] as HSlider).value == 100.0 and menu.deadzone.value == 0.25, "malformed saved preferences do not interrupt scene setup")
 	_expect(menu.prompt(&"interact", false) == "E" and menu.prompt(&"choice_1", false) == "1" and menu.vsync.button_pressed, "invalid booleans and reserved loaded bindings restore safe defaults")
 	_expect(paused and menu.is_visible_in_tree() and game.get("title_open"), "settings open before starting a game")
+	var navigation_actions: Array[StringName] = [&"ui_left", &"ui_right", &"ui_up", &"ui_down"]
+	var navigation_buttons: Array[JoyButton] = [JOY_BUTTON_DPAD_LEFT, JOY_BUTTON_DPAD_RIGHT, JOY_BUTTON_DPAD_UP, JOY_BUTTON_DPAD_DOWN]
+	for index: int in navigation_actions.size():
+		var stick: InputEventJoypadMotion = InputEventJoypadMotion.new()
+		stick.axis = JOY_AXIS_LEFT_X if index < 2 else JOY_AXIS_LEFT_Y
+		stick.axis_value = -1.0 if index % 2 == 0 else 1.0
+		_expect(InputMap.action_has_event(navigation_actions[index], _controller_button(navigation_buttons[index], true)) and InputMap.action_has_event(navigation_actions[index], stick), "menu direction keeps D-pad and stick mappings: %s" % navigation_actions[index])
 	await process_frame
 	Input.parse_input_event(_controller_button(JOY_BUTTON_B, true))
 	await process_frame
