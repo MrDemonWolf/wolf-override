@@ -40,6 +40,13 @@ func _run() -> void:
 	Input.parse_input_event(_controller_button(JOY_BUTTON_B, false))
 	await process_frame
 	(game.get_node("CanvasLayer/TitleScreen/SettingsButton") as Button).pressed.emit()
+	(game.get_node("CanvasLayer/PauseOverlay/Panel/SettingsMenu/BackButton") as Button).grab_focus()
+	Input.parse_input_event(_controller_button(JOY_BUTTON_A, true))
+	await process_frame
+	Input.parse_input_event(_controller_button(JOY_BUTTON_A, false))
+	await process_frame
+	_expect(not paused and not game.get("pause_overlay").visible, "controller A activates the focused settings Back button")
+	(game.get_node("CanvasLayer/TitleScreen/SettingsButton") as Button).pressed.emit()
 	menu.tabs.current_tab = 1
 	var music: HSlider = menu.volumes["Music"]
 	music.value = 37.0

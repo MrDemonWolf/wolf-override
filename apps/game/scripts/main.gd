@@ -997,6 +997,7 @@ func _install_inputs() -> void:
 	_add_joy_button(&"choice_2", JOY_BUTTON_Y)
 	_add_joy_button(&"pause_game", JOY_BUTTON_START)
 	_add_joy_button(&"ui_cancel", JOY_BUTTON_B)
+	_add_joy_button(&"ui_accept", JOY_BUTTON_A)
 
 
 func _add_action(action: StringName, key: Key, alternate: Key = KEY_NONE) -> void:
