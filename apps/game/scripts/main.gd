@@ -83,6 +83,8 @@ var records_room: RecordsRoom
 var credits_paused: bool = false
 
 const WOLF_SPRITE_REST: Vector2 = Vector2(0.0, -15.0)
+const GAMEPLAY_ZOOM: float = 1.18
+const GAMEPLAY_VIEW_WIDTH: float = 960.0 / GAMEPLAY_ZOOM
 const CORRIDOR_BACKGROUND: Texture2D = preload("res://assets/maintenance-corridor-background-provisional.png")
 
 
@@ -135,6 +137,19 @@ func _draw() -> void:
 		draw_line(Vector2(801, 434), Vector2(844, 434), Color("#70d9a7"), 4.0)
 
 
+func _update_gameplay_camera() -> void:
+	var half_view: float = GAMEPLAY_VIEW_WIDTH * 0.5
+	intro_camera.position = Vector2(clampf(human.position.x, half_view, 960.0 - half_view), 330.0)
+
+
+func _start_gameplay_camera() -> void:
+	intro_camera.zoom = Vector2.ONE * GAMEPLAY_ZOOM
+	_update_gameplay_camera()
+	intro_camera.position_smoothing_enabled = true
+	intro_camera.position_smoothing_speed = 4.0
+	intro_camera.reset_smoothing()
+
+
 func _process(delta: float) -> void:
 	if title_open:
 		if credits_screen.visible and not credits_paused:
@@ -158,6 +173,7 @@ func _process(delta: float) -> void:
 			_finish_chapter_close()
 		_refresh_ui()
 		return
+	_update_gameplay_camera()
 	if Input.is_action_just_pressed(&"pause_game"):
 		_pause_game()
 		return
@@ -223,6 +239,7 @@ func _new_game() -> void:
 	$IntroCage.show()
 	intro_gate.show()
 	intro_camera.position = Vector2(267.0, 355.0)
+	intro_camera.position_smoothing_enabled = false
 	intro_camera.zoom = Vector2(1.8, 1.8)
 	intro_alarm.color.a = 0.0
 	intro_fade.color.a = 1.0
@@ -299,8 +316,7 @@ func _finish_intro(keep_fade: bool = false) -> void:
 	$CheckpointLabel.show()
 	for station: CanvasItem in [breaker_art, relay_art, checkpoint_art, breaker_status_light, relay_status_light, door_visual]:
 		station.show()
-	intro_camera.position = Vector2(480.0, 270.0)
-	intro_camera.zoom = Vector2.ONE
+	_start_gameplay_camera()
 	wolf.body_sprite.modulate = Color.WHITE
 	wolf.body_sprite.position = WOLF_SPRITE_REST
 	wolf.z_index = 2
@@ -572,8 +588,6 @@ func _load_game() -> void:
 	$BreakerLabel.show()
 	$RelayLabel.show()
 	$CheckpointLabel.show()
-	intro_camera.position = Vector2(480.0, 270.0)
-	intro_camera.zoom = Vector2.ONE
 	queue_redraw()
 	wolf.body_sprite.modulate = Color.WHITE
 	state = loaded
@@ -581,6 +595,7 @@ func _load_game() -> void:
 	choice_context = ""
 	relay_refused = false
 	_sync_scene()
+	_start_gameplay_camera()
 	if state.chapter_id == "records":
 		status_line = "Records access restored. WOLF is checking the mirror." if not state.chapter_complete else "The first copy is safe. The Archive trail is next."
 	else:
@@ -708,6 +723,7 @@ func _interact_records(x: float) -> void:
 		if state.complete_chapter():
 			status_line = "FIRST COPY SECURED. WOLF: A list doesn't tell me who's a threat. I want the source.\n%s: Then Archive is next." % state.human_name().get_slice(" ", 0).to_upper()
 			chapter_close_active = true
+			intro_camera.position_smoothing_enabled = false
 			_update_controls()
 			_sync_records_room(true)
 			chapter_tween = create_tween()
@@ -730,8 +746,7 @@ func _finish_chapter_close() -> void:
 	if chapter_tween != null and chapter_tween.is_running():
 		chapter_tween.kill()
 	chapter_close_active = false
-	intro_camera.position = Vector2(480.0, 270.0)
-	intro_camera.zoom = Vector2.ONE
+	_start_gameplay_camera()
 	_sync_records_room()
 	_update_controls()
 

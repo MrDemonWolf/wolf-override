@@ -89,6 +89,8 @@ func _run() -> void:
 	await _tap(&"interact")
 	await create_timer(0.8).timeout
 	_expect(not game.get("intro_active") and not intro_gate.visible and not intro_director.visible and human.visible and purge_terminal_art.visible and human.controlled and intro_fade.color.a < 0.01, "opening fades into engineer control and gameplay stations")
+	var gameplay_camera: Camera2D = game.get_node("IntroCamera") as Camera2D
+	_expect(gameplay_camera.zoom.x > 1.0 and gameplay_camera.position_smoothing_enabled, "play view is closer and follows the engineer after the opening")
 	var state: M0State = game.get("state") as M0State
 	_expect(state.memory.is_empty() and not state.door_open and state.active_actor == "human", "New Game button starts clean")
 	_expect(wolf.position.x < human.position.x and is_equal_approx(human.position.x - wolf.position.x, 64.0), "WOLF starts beside, not inside, the engineer")
@@ -138,6 +140,8 @@ func _run() -> void:
 	_expect(game.call("_objective") == "OPEN THE SEAL", "powered relay becomes the objective")
 	if not _require(await _walk_to(human, 605.0), "engineer reaches relay with WOLF following"):
 		return
+	game.call("_update_gameplay_camera")
+	_expect(gameplay_camera.position.x > 480.0 and gameplay_camera.position.x < 560.0, "camera scrolls toward the engineer without exposing the corridor edge")
 	_expect(not wolf.controlled and wolf.position.x > 400.0 and wolf.position.x < human.position.x, "WOLF stays a companion at the relay")
 	_expect(str(game.call("_context_hint")).contains("give WOLF room"), "relay hint waits for WOLF to reach the contact")
 	await _tap(&"interact")

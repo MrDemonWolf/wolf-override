@@ -89,12 +89,13 @@ func _build_menu() -> void:
 	surface.size = Vector2(712, 240)
 	surface.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	var surface_style: StyleBoxFlat = StyleBoxFlat.new()
-	surface_style.bg_color = Color("#102333")
-	surface_style.set_corner_radius_all(8)
+	surface_style.bg_color = Color("#0b1b29")
+	surface_style.border_color = Color("#416779")
+	surface_style.set_border_width_all(1)
 	surface.add_theme_stylebox_override("panel", surface_style)
 	add_child(surface)
 	move_child(surface, 0)
-	var subtitle: Label = _label("WOLF//OVERRIDE  /  PREFERENCES", 12)
+	var subtitle: Label = _label("THE DEN  /  LOCAL CONFIGURATION", 13)
 	subtitle.position = Vector2(34, 15)
 	subtitle.modulate = Color("#89acbf")
 	add_child(subtitle)
@@ -246,7 +247,7 @@ func apply_theme() -> void:
 	normal.bg_color = Color("#182f40")
 	normal.border_color = Color("#345366")
 	normal.set_border_width_all(1)
-	normal.set_corner_radius_all(5)
+	normal.set_corner_radius_all(2)
 	normal.content_margin_left = 12
 	normal.content_margin_right = 12
 	normal.content_margin_top = 8
@@ -257,7 +258,7 @@ func apply_theme() -> void:
 	var focus: StyleBoxFlat = StyleBoxFlat.new()
 	focus.border_color = Color("#8de5f5")
 	focus.set_border_width_all(2)
-	focus.set_corner_radius_all(5)
+	focus.set_corner_radius_all(2)
 	focus.bg_color = Color.TRANSPARENT
 	for type_name: String in ["Button", "OptionButton", "CheckButton"]:
 		menu_theme.set_stylebox("normal", type_name, normal)
