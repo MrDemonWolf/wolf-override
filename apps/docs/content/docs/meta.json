@@ -1,4 +1,4 @@
 {
-  "title": "Documentation",
-  "pages": ["index", "changelog", "about", "credits", "development"]
+  "title": "Game guide",
+  "pages": ["index", "controls", "walkthrough", "about", "development", "changelog", "credits"]
 }

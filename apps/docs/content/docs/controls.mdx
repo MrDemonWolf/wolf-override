@@ -1,0 +1,87 @@
+---
+title: Controls and settings
+description: Keyboard, controller, touch, saved preferences, and checkpoint recovery in the current WOLF//OVERRIDE source build.
+---
+
+You control the engineer throughout play. WOLF follows and acts independently. The tables below show **default bindings**; the in-game prompts reflect your selected keyboard or controller bindings.
+
+## Keyboard and mouse
+
+| Input | Action |
+| --- | --- |
+| A / D or left / right arrow | Move |
+| E | Interact; advance the opening or chapter closing beat |
+| 1 / 2 or click a response | Choose the displayed answer |
+| Esc | Pause or resume during play; skip the opening |
+| L or F9 | Restore the checkpoint |
+| N | Start a clean run, including the opening |
+| I | Cycle provisional engineer display names |
+
+Restarting does not delete the checkpoint file. Saving in the fresh run replaces it. Loading restores the saved room, character positions, puzzle state, display name, and actual remembered choices.
+
+## Controller
+
+| Default input | Action |
+| --- | --- |
+| Left stick or D-pad left / right | Move |
+| A | Interact or advance |
+| X / Y | Choose answer 1 / 2 |
+| Start | Pause; skip the opening |
+
+Button labels use the current generic controller mapping. Other controllers may label equivalent buttons differently. Menus support focus navigation and confirmation; physical controller behavior still needs a complete playtest.
+
+## Touch
+
+On iOS and Android builds, hold the left/right arrows to move, tap **USE** to interact, and select the displayed answer. **PAUSE** opens Resume, Settings, and Return to Title.
+
+Touch controls appear for mobile builds; desktop uses keyboard/mouse or controller prompts. There is no public mobile download yet. A simulator launch has been checked, but full touch gestures and physical devices remain unverified.
+
+## Pause and resume
+
+Open Pause during gameplay or a player-paced closing beat. Choose:
+
+- **Resume** to continue from the paused state.
+- **Settings** to change your preferences.
+- **Return to Title** to leave the current session. Your checkpoint stays; unsaved progress is lost.
+
+During the opening, the pause binding **skips the opening** instead of opening Pause.
+
+## Settings
+
+Open **Settings** from the title or Pause. The terminal theme belongs to this menu.
+
+### Display
+
+| Setting | What it does |
+| --- | --- |
+| FPS limit | 30, 60, 90, 120, 144, or uncapped |
+| V-sync | Synchronizes frame delivery with the display when supported |
+| Edge smoothing | Off, 2×, 4×, or 8× MSAA for 2D edges |
+| Window size | Desktop: 960×540, 1280×720, or 1920×1080 |
+| Fullscreen | Desktop fullscreen; mobile window sizing is managed by the OS |
+
+The menu shows the detected GPU and Compatibility renderer. It does not switch renderers or guarantee that every device reaches the selected FPS limit.
+
+### Audio
+
+Master, Music, Effects, and Voice each have a volume slider. Preferences are saved, but the current source build contains no music, effects tracks, or recorded voice. A silent build is expected today.
+
+### Controls
+
+Select a keyboard or controller binding, then press the replacement input. Conflicting bindings are rejected. **Esc** or **CANCEL REBIND** cancels capture. Use **RESTORE DEFAULT CONTROLS** if you need the original mappings.
+
+Stick deadzone adjusts how far the controller stick must move before movement registers. Increase it if a stick drifts while untouched. The Controls panel scrolls to show its remaining options.
+
+## If something seems wrong
+
+| Problem | Try this |
+| --- | --- |
+| The objective card disappeared | Check the station labels and nearby interaction prompt, or open the [walkthrough](/docs/walkthrough/). |
+| WOLF will not help at the relay | Advance his response and use the manual bypass. His refusal keeps an engineer-only path open. |
+| Continue is disabled | Reach and use the safe point first. Continue requires a valid checkpoint file. |
+| Loading says no valid checkpoint exists | The current run stays unchanged. Continue playing to the safe point. |
+| Movement or choices use unexpected keys | Check Controls or restore default bindings. |
+| There is no sound | Audio content has not been added to this source build. |
+| The game will not open | Verify Godot 4.7.2 and import the project through the editor; see [development setup](/docs/development/). |
+
+Report reproducible problems through [GitHub Issues](https://github.com/MrDemonWolf/wolf-override/issues). Include your OS, Godot version, input method, and steps; omit private notes and personal paths from logs.

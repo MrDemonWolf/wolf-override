@@ -1,0 +1,63 @@
+---
+title: Chapter walkthrough
+description: Optional puzzle help for the maintenance corridor and Records Access in the current source chapter.
+---
+
+import Image from 'next/image';
+import corridor from '../../public/corridor-source-build.png';
+
+**Puzzle solutions ahead.** This covers the two playable source rooms. It does not reveal future chapters or campaign endings. For a lighter introduction, use [Start here](/docs/).
+
+**Route:** Breaker → Coolant relay → Safe point → Purge queue → Mirror port → Exit.
+
+<a href={corridor.src} target="_blank" rel="noopener noreferrer" aria-label="Open full-size corridor screenshot"><Image src={corridor} alt="Development frame showing the engineer and WOLF at the coolant relay, with labeled corridor stations." unoptimized /></a>
+
+Current Godot-rendered corridor frame. Tap to enlarge. Art and UI are provisional; the screenshot shows the source build, not a downloadable release.
+
+## 1. Read the corridor
+
+After the opening, move the engineer with **A/D** or the arrow keys. An interaction prompt appears near a station. At the far-left red **PURGE DISPLAY**, **E** reads optional context; this is not needed to open the door.
+
+All keys here are defaults. Use your rebound interaction/choice controls if you changed them in [Settings](/docs/controls/).
+
+## 2. Arm the breaker
+
+Move right to the amber **BREAKER**. Interact to hear WOLF's concern about coolant risk. Choose answer **1** or **2**, then interact again to arm power.
+
+The answer changes his response at the relay and is remembered later. Repeated station use does not add duplicate consequences.
+
+## 3. Open the sealed door
+
+Continue right to the blue **COOLANT RELAY**.
+
+### WOLF-assisted path
+
+If you chose **1**, telling WOLF about the risk, stand toward the relay's right side and interact. He needs room to reach his contact. If he asks for space, move a few steps right while the relay prompt stays visible, then interact again.
+
+### Engineer-only path
+
+If you chose **2**, pressing WOLF to act, interact to hear his refusal. Interact again to perform the engineer's manual bypass.
+
+Both paths open the door and let you continue. You never switch to controlling WOLF.
+
+## 4. Use the safe point
+
+Walk through the door to the green **SAFE POINT** and interact. WOLF recalls the answer from this run, and the checkpoint saves positions, door state, display name, and memory.
+
+Interact again to enter **Records Access**. A valid checkpoint enables **Continue** on the title. **L/F9** restores it during play.
+
+## 5. Preserve the first copy
+
+WOLF heads toward the mirror independently while you keep control of the engineer.
+
+1. Interact with the **PURGE QUEUE** on the left to copy its trace.
+2. Interact with the **MIRROR PORT** in the middle. Choose **1** when WOLF is ready to use his readout, or **2** for the manual maintenance port. If he is still checking, wait or use the manual option.
+3. Move to the **EXIT** on the right and interact. The shutter opens when the first copy is secured. Advance the closing beat to return to control.
+
+The preserved traces are a first lead. A full investigation is still future work. Continue restores saved chapter progress.
+
+## After the slice
+
+You can revisit the room, return to the title through Pause, or start another run to try the other response. **New Game** clears the current timeline; it retains the previous checkpoint until the new run saves over it.
+
+If you are stuck, [Controls and settings](/docs/controls/#if-something-seems-wrong) has recovery tips. [Development status](/docs/development/) explains which routes have automated checks and which still need hands-on play.
