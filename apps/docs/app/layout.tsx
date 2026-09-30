@@ -25,7 +25,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
   return (
     <html lang="en" suppressHydrationWarning>
       <body>
-        <a className="skip-link" href="#nd-page">Skip to content</a>
+        <a className="skip-link" href="#main-content">Skip to content</a>
         <RootProvider search={{ enabled: false }} theme={{ defaultTheme: 'dark', enableSystem: false }}>
           {children}
         </RootProvider>

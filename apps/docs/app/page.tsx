@@ -17,11 +17,11 @@ export default function HomePage() {
         <Link className="marketing-brand" href="/" aria-label="WOLF//OVERRIDE home"><img src={`${base}/wolf-override-mark.svg`} alt="" width="36" height="36" />WOLF<span>//</span>OVERRIDE</Link>
         <nav aria-label="Main navigation"><a href="#downloads">Downloads</a><Link href="/docs/">Game guide</Link><ThemeToggle /></nav>
       </header>
-      <section className="marketing-hero" aria-labelledby="game-title">
+      <section className="marketing-hero" aria-labelledby="main-content">
         <img className="marketing-keyart" src={`${base}/title-corridor-key-art-provisional.png`} width="1672" height="941" alt="An engineer in a red hoodie stands beside the robotic wolf WOLF in a blue-lit research corridor." fetchPriority="high" />
         <div className="marketing-hero-copy">
           <p className="marketing-kicker">Side-view sci-fi horror · In development</p>
-          <h1 id="game-title">WOLF<span>//</span><br />OVERRIDE</h1>
+          <h1 id="main-content" tabIndex={-1}>WOLF<span>//</span><br />OVERRIDE</h1>
           <p className="marketing-tagline">He woke himself.<br />They choose what comes next.</p>
           <p className="marketing-pitch">Explore THE DEN as an engineer alongside an independent robotic wolf. Solve a way forward. Choose how you earn his trust.</p>
           <div className="marketing-actions"><a className="marketing-primary" href="#gameplay">See the game <span aria-hidden="true">↓</span></a><a className="marketing-secondary" href="#downloads">Downloads · Coming soon</a></div>
