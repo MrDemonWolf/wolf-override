@@ -28,7 +28,7 @@ The opening tutorial teaches movement and the first interaction as you play.
 Open the corridor door, save at the safe point, then press **E** again to enter
 Records Access. Copy the purge
 trace, use WOLF's mirror readout or the engineer's manual port, and reach the
-exit. [The step-by-step guide](https://wolf-override.mrdemonwolf.dev/docs/)
+exit. [The step-by-step guide](https://wolfoverride.mrdemonwolf.dev/docs/)
 shows each step.
 
 ## Features
@@ -52,8 +52,8 @@ story and cinematic presentation remain in development.
 
 ## Getting Started
 
-The [public game guide](https://wolf-override.mrdemonwolf.dev/docs/) has
-controls. The [developer setup guide](https://wolf-override.mrdemonwolf.dev/docs/development/)
+The [public game guide](https://wolfoverride.mrdemonwolf.dev/docs/) has
+controls. The [developer setup guide](https://wolfoverride.mrdemonwolf.dev/docs/development/)
 has the local tools and checks. There is no installer or store release yet; run the game from source.
 
 1. Get [Godot 4.7.2 stable](https://godotengine.org/download/archive/).
@@ -146,7 +146,7 @@ bun run docs:dev
 
 The frozen dependency install, docs type check, and Pages static export
 passed locally and in [GitHub Actions](https://github.com/MrDemonWolf/wolf-override/actions/runs/36396158278).
-The [public site](https://wolf-override.mrdemonwolf.dev/) is live.
+The [public site](https://wolfoverride.mrdemonwolf.dev/) is live.
 
 ### Development Scripts
 
@@ -195,7 +195,7 @@ companion behavior, accessibility and honest playtest claims.
 
 Original game and core story idea by Nathanial Henniges. Developed by
 MrDemonWolf, Inc. with AI assistance. See the [full credits, research
-references, tools, and asset provenance](https://wolf-override.mrdemonwolf.dev/docs/credits/).
+references, tools, and asset provenance](https://wolfoverride.mrdemonwolf.dev/docs/credits/).
 
 ## License
 
