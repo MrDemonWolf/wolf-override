@@ -19,6 +19,8 @@ Run the relevant headless checks after code changes. For a claim about movement,
 
 Keep public copy accurate about what is playable today. Nathanial Henniges originated the game and core story; research informs craft and does not replace that credit. Detailed story drafts stay in Notion and ignored local files.
 
+Credit Nathanial's original concept, core story and creative vision explicitly. Add outside research to both in-game credits and the public source list only after consulting it; say what it informed. Keep reviewed suggestions distinct from implemented features. Referenced developers are research sources, not project contributors or endorsers.
+
 ## Craft references
 
 - [Game Accessibility Guidelines: identify interactive elements](https://gameaccessibilityguidelines.com/give-a-clear-indication-that-interactive-elements-are-interactive/) and [player-paced text](https://gameaccessibilityguidelines.com/allow-players-to-progress-through-text-prompts-at-their-own-pace/)
