@@ -22,7 +22,7 @@ WOLF//OVERRIDE is in early development. The current source build has a first pla
    godot --path apps/game --editor
    ```
 
-   To launch the game directly after importing it, run `godot --path apps/game`. The [play guide](/docs/) walks through the door puzzle and Records Access.
+   To launch the game directly after importing it, run `godot --path apps/game`. [Start here](/docs/) introduces the game; the optional [walkthrough](/docs/walkthrough/) covers both puzzle paths.
 4. To run the public docs site locally, use a second terminal in the repository root:
 
    ```sh
@@ -44,7 +44,7 @@ godot --headless --path apps/game --script res://tests/chapter_scene_test.gd
 godot --headless --path apps/game --script res://tests/ui_controls_test.gd
 godot --headless --path apps/game --script res://tests/settings_test.gd
 bun run docs:check
-GITHUB_PAGES=true bun run docs:build
+bun run docs:build
 ```
 
 The Godot commands check import, state logic, both scripted door routes, both Records Access mirror routes, and save/load. The Bun commands check docs types and build the static Pages site. Headless checks cannot confirm the on-screen feel; exports and device tests are separate work.
@@ -63,12 +63,7 @@ Graphical route play, hardware input, exports, signing and devices remain separa
 
 Sparkle is a candidate for direct macOS downloads. A Godot app needs a tested native integration and repeatable export packaging; a GDScript setting alone cannot add Sparkle. Store-distributed builds should use their store update channels.
 
-1. **Prepare:** keep source changelog entries accurate; select a native integration approach and pin its dependency only after reviewing it against the actual exported Godot bundle.
-2. **Integrate while disabled:** package the framework and a native bridge in a separate direct-macOS test build. Construct `SPUStandardUpdaterController` with `startingUpdater: false`; do not call `startUpdater` or expose an enabled update action. Verify no startup update request.
-3. **Validate distribution:** establish monotonic bundle versions, Developer ID signing/notarization, secure EdDSA key handling, signed update archives and an HTTPS appcast. Test an older-to-newer update, rejected invalid signatures, failed downloads and save compatibility with temporary user data.
-4. **Enable only after approval:** activate the tested direct-macOS updater in a real release. Keep it absent from store builds; Windows needs a separate solution.
-
-No keys, feed, native dependency or signing changes have been created. This is a staged integration plan, not working updater support. References checked: [Sparkle setup](https://sparkle-project.org/documentation/) and [programmatic setup](https://sparkle-project.org/documentation/programmatic-setup/).
+No keys, feed, native dependency or signing changes have been created. Packaging, signing, update verification and save compatibility must be checked before a release can enable it. References: [Sparkle setup](https://sparkle-project.org/documentation/) and [programmatic setup](https://sparkle-project.org/documentation/programmatic-setup/).
 
 ## In the current source build
 
@@ -78,7 +73,7 @@ No keys, feed, native dependency or signing changes have been created. This is a
 - A first exchange, readable purge display, and objectives that follow each puzzle step.
 - A second room where the engineer copies a purge-order trace, then uses WOLF's independent mirror readout or a manual maintenance port to preserve a timestamp.
 - New Game and versioned save/load for both rooms, positions, and chapter progress.
-- Controller mappings, on-screen mobile controls, and title/pause Settings with saved display preferences, audio bus volumes, keyboard/controller rebinding, duplicate-binding checks, and stick deadzone.
+- Controller mappings, on-screen mobile controls, and title/pause Settings with saved display preferences, audio bus volumes, keyboard/controller rebinding, duplicate-binding checks, and stick deadzone. [Controls and settings](/docs/controls/) lists the available options and test limits.
 
 These are prototype features, not a complete investigation or campaign. [Play the source build](/docs/) explains how to open it in Godot 4.7.2.
 
@@ -89,3 +84,9 @@ Godot 4.7.2 headless import, deterministic state, M0 scene, chapter scene, and i
 ## Still to come
 
 Final character art and animation, audio, the wider story, public export packages, complete touch/controller playtests, and physical-device testing remain future work. The corridor key art on the landing page is provisional and is not a gameplay capture; its origin and rights review status are recorded in the [asset register](https://github.com/MrDemonWolf/wolf-override/blob/main/apps/game/assets/manifest.json).
+
+## Contributing and reporting problems
+
+Use a focused branch and include the relevant checks in a pull request. Keep the Godot pin, stable narrative IDs, existing asset sources and engineer-only viewpoint intact. Follow the repository's [public agent guide](https://github.com/MrDemonWolf/wolf-override/blob/main/AGENT.md).
+
+Report reproducible bugs through [GitHub Issues](https://github.com/MrDemonWolf/wolf-override/issues) with OS, Godot version, input method and steps. Private story drafts belong in the project's private notes, not public issues, pull requests or exported site content.

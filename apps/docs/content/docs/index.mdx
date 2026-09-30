@@ -1,100 +1,52 @@
 ---
-title: Play the first chapter slice
-description: Open the first door, then secure a first copy in Records Access.
+title: Start here
+description: Your quick guide to playing WOLF//OVERRIDE, a story-driven sci-fi horror adventure in development.
 ---
 
-**You play the engineer.** WOLF follows and takes a task of his own. In this source build, open the first sealed door, then secure a first copy in Records Access. WOLF remembers what you say during the door puzzle.
+**Play the engineer. Get through THE DEN with WOLF.** Explore a side-view facility, solve a path forward, and choose how you respond to an independent robotic companion.
 
-**Your path:** Breaker → Relay → Safe point → Purge queue → Mirror port → Exit. A short objective card appears when your goal changes, then fades. Follow the station labels and the prompt near the bottom if you lose your place.
+The current source chapter has two rooms, an opening scene, a cooperation or manual door puzzle, a remembered disagreement, and checkpoints. Downloads are **coming soon**. This website is the guide; the game runs locally in Godot.
 
-This game currently runs from Godot source. The website is a guide; there is no browser game or downloadable build yet.
+## Start playing
 
-## 1. Start New Game
+1. Follow [development setup](/docs/development/#set-up-on-macos) to get the source and **Godot 4.7.2**.
+2. From the repository root, launch the imported project:
 
-**Already have the repository?** With [Godot **4.7.2 stable**](https://godotengine.org/download/archive/) installed, run this from the repository root:
+   ```sh
+   godot --path apps/game
+   ```
 
-```sh
-godot --path apps/game
-```
+3. Choose **New Game**. Advance the opening at your pace, then follow the movement and interaction prompts.
 
-**Need the source first?** Clone it, then launch the game:
+The opening shows WOLF and the Director before the engineer enters. **E** advances a beat; **Esc** skips the opening. These are default keys; [Controls and settings](/docs/controls/) explains rebinding and controller/touch input.
 
-```sh
-git clone https://github.com/MrDemonWolf/wolf-override.git
-cd wolf-override
-godot --path apps/game
-```
+## Your first goal
 
-Choose **New Game** on the title screen. The short opening shows only WOLF and the Director as WOLF wakes himself and leaves containment. Press **E** to advance each beat, or **Esc** to skip to engineer control. A small prompt then teaches movement and reading the first display. Continue resumes your save without replaying the opening.
+Restore power and open the sealed maintenance door. Read the station labels and the nearby interaction prompt. Objective cards appear briefly when your goal changes.
 
-## 2. Use the breaker
+WOLF can help or refuse. You keep control of the engineer, and a manual route lets you continue if he declines. A choice you make in the corridor is remembered later.
 
-Move right to the **amber BREAKER**. Press **E** to hear WOLF's concern about the coolant risk. Press **1** or **2** to answer, then press **E** again to arm power.
+**Stuck?** The [optional chapter walkthrough](/docs/walkthrough/) shows each station and both puzzle paths. It reveals solutions for the current source chapter only.
 
-Your answer changes how WOLF responds at the relay. It is remembered at the safe point; it is not an instant game ending.
+## Save your progress
 
-## 3. Open the door at the relay
+Use the green **SAFE POINT** beyond the door. **Continue** on the title screen resumes a valid checkpoint without replaying the opening.
 
-Continue right to the **blue COOLANT RELAY**.
+Returning to the title keeps your checkpoint and loses progress made since that save. **New Game** starts a fresh run; the old checkpoint remains until the new run saves over it. There is currently one checkpoint file, not multiple save slots.
 
-- **If you chose 1 (tell WOLF the risk):** Stand toward the right side of the relay so WOLF can reach its contact, then press **E**. If he asks for room, move a few steps right while the relay prompt stays visible and press **E** again.
-- **If you chose 2 (press WOLF to act):** Press **E** to hear his refusal. Press **E** again to use the engineer's manual bypass. You can still open the door.
+## Find what you need
 
-## 4. Save at the safe point
-
-Walk through the open door to the **green SAFE POINT** and press **E**. WOLF recalls the answer you actually chose. The checkpoint saves both characters' positions, door state, name, and choice. Press **E** again to enter **Records Access**.
-
-On the title screen, **Continue** becomes available when a valid checkpoint exists. During play, **L** or **F9** loads your saved progress. **N** starts a clean current run; it does not delete the save file.
-
-## 5. Secure the first copy
-
-In Records Access, the engineer stays playable while WOLF heads toward the mirror on his own.
-
-1. Go to the **purge queue** on the left and press **E** to copy its trace.
-2. Go to the **mirror port** in the middle and press **E**. Press **1** after WOLF arrives to use his readout, or **2** to use the engineer's manual maintenance port. If WOLF is still checking, wait for him or choose the manual port.
-3. Go to the **exit** on the right and press **E**. The shutter opens as the first copy is secured. Press **E** once more to return to control. **Continue** restores the room and your progress.
-
-These two traces provide a first lead. They are not a complete case against the Director.
-
-## Keys to remember
-
-| Key | Action |
+| I want to… | Go here |
 | --- | --- |
-| A / D or arrow keys | Move the engineer |
-| E | Advance the opening or interact with a station |
-| 1 / 2 or click a response | Answer at the breaker or mirror port |
-| Esc | Pause or resume during play; skip the opening |
+| Learn the keys, controller buttons, or Settings | [Controls and settings](/docs/controls/) |
+| Get help with a puzzle | [Chapter walkthrough](/docs/walkthrough/) |
+| Understand the premise without campaign spoilers | [About the game](/docs/about/) |
+| Install the source, run checks, or see build status | [Development setup](/docs/development/) |
+| Follow changes | [Changelog](/docs/changelog/) |
+| See creators, tools, research, and asset rights | [Credits and sources](/docs/credits/) |
 
-**Controller:** Left stick or D-pad moves. A interacts, X/Y picks choices 1/2, and Start pauses. This mapping has an automated check; physical controller input still needs a playtest.
+## What to expect
 
-**Touch:** On iOS and Android, hold the left/right arrows to move, tap **USE** to interact, and tap **1** or **2** for a choice. Tap **PAUSE** for Resume, Settings, or Return to Title. From the title, choose New Game or Continue from your saved checkpoint. Returning to title keeps your checkpoint but loses unsaved progress. Touch gestures still need a hands-on device or simulator playtest.
+Characters and environments use provisional artwork. Final animation, sound, the wider campaign, and release packages are still in development. The current chapter is a small beginning, and its puzzles do not select a campaign ending.
 
-**Settings:** Open Settings from the title screen or pause menu. Display includes 30/60/90/120/144 FPS or uncapped, V-sync, and 2D edge smoothing. Desktop also has window sizes and fullscreen; mobile window size is OS-managed. Audio has Master, Music, Effects, and Voice volume. Controls lets you remap movement, interaction, choices, and pause for keyboard and controller, adjust stick deadzone, or restore defaults. Preferences are saved. Audio tracks are still being developed; physical controller input remains untested.
-
-### More keys
-
-| Key | Action |
-| --- | --- |
-| I | Cycle provisional engineer display names |
-| L or F9 | Load the saved checkpoint |
-| N | Restart the current run |
-
-At the far-left **red PURGE DISPLAY**, **E** or **USE** shows optional story context. It is not required to open the door.
-
-## What exists today
-
-The first chapter slice has two playable rooms with provisional static character art. [About the game](/docs/about/) explains the wider premise; [development status](/docs/development/) separates built features from plans.
-
-Godot 4.7.2 headless import, state, M0 scene, chapter scene, and input/settings checks passed. The purge interaction was checked in a normal Godot window, and tutorial, Records completion, touch layout, and pause/settings frames were inspected at 960×540. The full routes have not been played by hand. A local iOS simulator build launched on two simulators and its title screen was inspected on iPhone 17e. Full touch play, controller hardware, physical devices, and public export packages remain open.
-
-## Developer checks
-
-These commands check import, state logic, both door and mirror routes, and chapter save/load through the scenes. They do not prove graphical play or exported builds.
-
-```sh
-godot --headless --path apps/game --import
-godot --headless --path apps/game --script res://tests/m0_state_test.gd
-godot --headless --path apps/game --script res://tests/m0_scene_test.gd
-godot --headless --path apps/game --script res://tests/chapter_scene_test.gd
-godot --headless --path apps/game --script res://tests/ui_controls_test.gd
-```
+For what has actually been tested—including the limits of controller, touch, and simulator checks—see [development status](/docs/development/#checked-so-far).
