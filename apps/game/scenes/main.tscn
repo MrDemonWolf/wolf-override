@@ -115,7 +115,7 @@ shutter = true
 
 [node name="IntroCage" type="Node2D" parent="."]
 visible = false
-z_index = 1
+z_index = 4
 position = Vector2(90, 365)
 script = ExtResource("12_cage")
 

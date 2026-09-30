@@ -206,6 +206,7 @@ func _new_game() -> void:
 	wolf.position = Vector2(90.0, 423.0)
 	wolf.body_sprite.modulate = Color("#365263")
 	intro_gate.position = Vector2(90.0, 365.0)
+	intro_gate.set("opening", 0.0)
 	$IntroCage.show()
 	intro_gate.show()
 	intro_camera.position = Vector2(267.0, 355.0)
@@ -237,7 +238,7 @@ func _advance_intro() -> void:
 		intro_camera.zoom = Vector2(1.95, 1.95)
 		status_line = "The latch tears upward from the inside. WOLF steps out under his own power.\nThe Director freezes at the sound of the seal opening."
 		intro_tween = create_tween()
-		intro_tween.tween_property(intro_gate, "position:y", 214.0, 0.65).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
+		intro_tween.tween_property(intro_gate, "opening", 1.0, 0.65).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
 		intro_tween.parallel().tween_property(intro_alarm, "color:a", 0.13, 0.18)
 		intro_tween.tween_callback(intro_gate.hide)
 		wolf.autonomous_target_x = 142.0
