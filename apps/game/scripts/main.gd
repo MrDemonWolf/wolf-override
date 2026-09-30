@@ -1,5 +1,7 @@
 extends Node2D
 
+const CHANGELOG_URL: String = "https://mrdemonwolf.github.io/wolf-override/docs/changelog/"
+
 @onready var human: M0Actor = $Human
 @onready var wolf: M0Actor = $Wolf
 @onready var relay_spark: Line2D = $RelaySpark
@@ -107,6 +109,7 @@ func _ready() -> void:
 	new_game_button.pressed.connect(_new_game)
 	continue_button.pressed.connect(_load_game)
 	credits_button.pressed.connect(_show_credits)
+	$CanvasLayer/TitleScreen/ChangelogButton.pressed.connect(_open_changelog)
 	credits_back_button.pressed.connect(_hide_credits)
 	credits_pause_button.pressed.connect(_toggle_credits_pause)
 	credits_body.gui_input.connect(_on_credits_body_input)
@@ -118,6 +121,11 @@ func _ready() -> void:
 	reveal.tween_property(title_mark, "modulate", Color.WHITE, 0.4)
 	reveal.tween_property(title_line, "modulate", Color.WHITE, 0.25)
 	reveal.tween_property(title_logo, "modulate", Color.WHITE, 0.35)
+
+
+func _open_changelog() -> void:
+	if OS.shell_open(CHANGELOG_URL) != OK:
+		$CanvasLayer/TitleScreen/ChangelogButton.text = "LINK UNAVAILABLE"
 
 
 func _draw() -> void:

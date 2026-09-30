@@ -16,6 +16,8 @@ func _run() -> void:
 	game.set("settings_path", path)
 	game.set("save_path", "%s-save.json" % path)
 	root.add_child(game)
+	var changelog: Button = game.get_node("CanvasLayer/TitleScreen/ChangelogButton") as Button
+	_expect(changelog.pressed.is_connected(Callable(game, "_open_changelog")) and str(game.CHANGELOG_URL) == "https://mrdemonwolf.github.io/wolf-override/docs/changelog/", "title changelog points to the public development updates")
 	_expect(_has_button(&"interact", JOY_BUTTON_A) and _has_button(&"pause_game", JOY_BUTTON_START), "gamepad action buttons are mapped")
 	_expect(_has_button(&"move_left", JOY_BUTTON_DPAD_LEFT) and _has_button(&"move_right", JOY_BUTTON_DPAD_RIGHT), "gamepad D-pad movement is mapped")
 	game.call("_new_game")

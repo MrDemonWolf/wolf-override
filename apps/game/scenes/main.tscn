@@ -484,6 +484,15 @@ offset_bottom = 469.0
 theme_override_font_sizes/font_size = 18
 text = "SETTINGS"
 
+[node name="ChangelogButton" type="Button" parent="CanvasLayer/TitleScreen"]
+offset_left = 48.0
+offset_top = 459.0
+offset_right = 278.0
+offset_bottom = 513.0
+theme_override_font_sizes/font_size = 18
+text = "CHANGELOG ↗"
+tooltip_text = "Opens development updates in your browser"
+
 [node name="Credit" type="Label" parent="CanvasLayer/TitleScreen"]
 offset_left = 460.0
 offset_top = 485.0

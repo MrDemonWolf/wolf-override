@@ -1,0 +1,49 @@
+---
+title: Changelog
+description: Spoiler-free changes to the WOLF//OVERRIDE source game and website.
+---
+
+These are development updates to the source build, not downloadable releases. There is no public game package or automatic updater yet. Original concept, core story and creative vision: Nathanial Henniges.
+
+## September 30, 2026
+
+### Menus and controls
+
+- Added **Return to Title** to Pause for keyboard, controller and touch checkpoint recovery. Returning keeps the last checkpoint; unsaved progress is lost.
+- Fixed controller confirmation and remapped response conflicts so the intended choice is remembered.
+- Improved settings tab spacing, typography, padding, focus indicators and dropdown styling.
+- Hardened saved preferences against invalid values and conflicting bindings.
+- Fixed interrupted-load transitions and allowed Pause during closing dialogue.
+
+### Scene presentation
+
+- Added a framed containment cage, a gate that slides aside, and WOLF stepping forward after it opens.
+- Moved cinematic prompts and response cards clear of characters; adjusted the closing camera to show both actors above dialogue.
+- Corrected nearby checkpoint prompts and callbacks to match the route actually taken.
+- Expanded in-game and website credits with consulted design research, separate from project contributors.
+
+### Website and development
+
+- Added this changelog and a title-screen link that opens it in your browser.
+- Added manual CI runs, bounded job times and downloadable game-check failure logs.
+- Recorded a staged Sparkle plan for direct macOS distribution. Integration is **not implemented or enabled**.
+
+Five deterministic Godot checks and the docs build passed during the UI review. Agents inspected 44 rendered stills. This does not replace complete hands-on routes, physical-controller testing, touch-device testing or export checks.
+
+## September 29, 2026
+
+- Added a player-paced Director/WOLF opening before the engineer enters gameplay.
+- Added short-lived location and objective cards, a guided movement/interaction tutorial, and clearer station feedback.
+- Improved speaker labels, response cards and the chapter closing beat.
+- Added controller and touch input, Pause, and saved Display, Audio and Controls settings.
+- Added provisional room and machinery artwork with provenance in the asset register.
+
+## Earlier foundation
+
+The initial source slice established engineer-only movement, WOLF's independent cooperation/refusal, a manual puzzle fallback, remembered choices, checkpoints and save/load across two rooms. The public site added a play guide, development setup, light/dark themes and credits.
+
+## What is next
+
+Complete hands-on route testing comes first. Directional character animation, sound, adjustable dialogue presentation and release/device validation remain future work. Story drafts stay private; this page records source changes without campaign spoilers.
+
+See [development status](/docs/development/) for test boundaries and [credits](/docs/credits/) for tools, research and asset provenance.

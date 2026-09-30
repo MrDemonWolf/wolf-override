@@ -23,6 +23,8 @@ Credit Nathanial's original concept, core story and creative vision explicitly. 
 
 ## Craft references
 
+Keep the public website changelog current for implemented player-facing changes. Use development dates until real versions are released; distinguish source changes from downloadable releases and keep private plot drafts out.
+
 - [Game Accessibility Guidelines: identify interactive elements](https://gameaccessibilityguidelines.com/give-a-clear-indication-that-interactive-elements-are-interactive/) and [player-paced text](https://gameaccessibilityguidelines.com/allow-players-to-progress-through-text-prompts-at-their-own-pace/)
 - [Fumito Ueda on companion storytelling in *The Last Guardian*](https://blog.playstation.com/2016/06/21/the-last-guardian-5-storytelling-secrets/)
 - [Godot 4.7 animation tracks](https://docs.godotengine.org/en/4.7/tutorials/animation/animation_track_types.html)
