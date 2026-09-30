@@ -203,9 +203,9 @@ func _new_game() -> void:
 	$CheckpointLabel.hide()
 	for station: CanvasItem in [breaker_art, relay_art, checkpoint_art, breaker_status_light, relay_status_light, door_visual]:
 		station.hide()
-	wolf.position = Vector2(90.0, 423.0)
+	wolf.position = Vector2(115.0, 423.0)
 	wolf.body_sprite.modulate = Color("#365263")
-	intro_gate.position = Vector2(90.0, 365.0)
+	intro_gate.position = Vector2(115.0, 365.0)
 	intro_gate.set("opening", 0.0)
 	$IntroCage.show()
 	intro_gate.show()
@@ -241,7 +241,7 @@ func _advance_intro() -> void:
 		intro_tween.tween_property(intro_gate, "opening", 1.0, 0.65).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
 		intro_tween.parallel().tween_property(intro_alarm, "color:a", 0.13, 0.18)
 		intro_tween.tween_callback(intro_gate.hide)
-		wolf.autonomous_target_x = 142.0
+		intro_tween.tween_callback(func() -> void: wolf.autonomous_target_x = 185.0)
 	elif intro_step == 2:
 		intro_step = 3
 		intro_gate.hide()
