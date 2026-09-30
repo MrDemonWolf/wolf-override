@@ -9,6 +9,7 @@ For each bounded gameplay change, identify the player's immediate goal, the acti
 - Make each interactive station recognizable before the player presses a key. Pair color with a label, shape or motion; show idle, available and completed states where those distinctions matter.
 - Tie feedback to real state changes. Use a small number of coherent reactions such as a contact light, seal motion, copy confirmation or room transition. Do not show fake loading, progress or consequences.
 - Let players read consequential dialogue and choices at their own pace. Keep controls and text readable over the scene. Do not make trust, identity or refusal remove essential controls.
+- Keep settings typography, padding and focus styles consistent across tabs. Preserve a visible keyboard/controller focus indicator within each control's borders. Pause and Back must work during player-paced dialogue; validate saved preferences as well as newly captured bindings.
 - Give a chapter beat a beginning, escalation and short aftermath. Preserve quiet moments that let the engineer and WOLF feel present together. Do not add a new system merely to dress up one scene.
 - Use the existing Godot 4.7 project, typed GDScript, built-in nodes and InputMap. Add audio or art only with source and rights status in `apps/game/assets/manifest.json`; do not invent credits for people, music or tools that were not involved.
 
