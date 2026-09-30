@@ -1,4 +1,4 @@
-[gd_scene load_steps=16 format=3]
+[gd_scene load_steps=17 format=3]
 
 [ext_resource type="Script" path="res://scripts/main.gd" id="1_main"]
 [ext_resource type="Script" path="res://scripts/m0_actor.gd" id="2_actor"]
@@ -11,6 +11,7 @@
 [ext_resource type="Texture2D" path="res://assets/records-props-provisional.png" id="9_records_props"]
 [ext_resource type="Script" path="res://scripts/pause_overlay.gd" id="10_pause_overlay"]
 [ext_resource type="Script" path="res://scripts/game_settings.gd" id="11_settings"]
+[ext_resource type="Script" path="res://scripts/containment_cage.gd" id="12_cage"]
 
 [sub_resource type="RectangleShape2D" id="FloorShape"]
 size = Vector2(960, 60)
@@ -108,11 +109,15 @@ text = "WOLF"
 [node name="IntroGate" type="Sprite2D" parent="."]
 visible = false
 z_index = 3
-position = Vector2(81, 365)
-scale = Vector2(0.22, 0.22)
-texture = ExtResource("7_props")
-region_enabled = true
-region_rect = Rect2(1086, 0, 543, 724)
+position = Vector2(90, 365)
+script = ExtResource("12_cage")
+shutter = true
+
+[node name="IntroCage" type="Node2D" parent="."]
+visible = false
+z_index = 1
+position = Vector2(90, 365)
+script = ExtResource("12_cage")
 
 [node name="IntroDirector" type="Sprite2D" parent="."]
 visible = false
