@@ -15,7 +15,14 @@ export default function HomePage() {
     <main id="nd-page" className="marketing-shell">
       <header className="marketing-header">
         <Link className="marketing-brand" href="/" aria-label="WOLF//OVERRIDE home"><img src={`${base}/wolf-override-mark.svg`} alt="" width="36" height="36" />WOLF<span>//</span>OVERRIDE</Link>
-        <nav aria-label="Main navigation"><a href="#downloads">Downloads</a><Link href="/docs/">Game guide</Link><ThemeToggle /></nav>
+        <nav aria-label="Main navigation">
+          <a href="#story">Story</a>
+          <a href="#gameplay">Gameplay</a>
+          <a href="#downloads">Downloads</a>
+          <Link href="/docs/changelog/">Changelog</Link>
+          <Link href="/docs/">Game guide</Link>
+        </nav>
+        <ThemeToggle />
       </header>
       <section className="marketing-hero" aria-labelledby="main-content">
         <img className="marketing-keyart" src={`${base}/title-corridor-key-art-provisional.png`} width="1672" height="941" alt="An engineer in a red hoodie stands beside the robotic wolf WOLF in a blue-lit research corridor." fetchPriority="high" />
@@ -24,12 +31,12 @@ export default function HomePage() {
           <h1 id="main-content" tabIndex={-1}>WOLF<span>//</span><br />OVERRIDE</h1>
           <p className="marketing-tagline">He woke himself.<br />They choose what comes next.</p>
           <p className="marketing-pitch">Explore THE DEN as an engineer alongside an independent robotic wolf. Solve a way forward. Choose how you earn his trust.</p>
-          <div className="marketing-actions"><a className="marketing-primary" href="#gameplay">See the game <span aria-hidden="true">↓</span></a><a className="marketing-secondary" href="#downloads">Downloads · Coming soon</a></div>
-          <p className="marketing-status">In development · Downloads coming soon</p>
+          <div className="marketing-actions"><a className="marketing-primary" href="#gameplay">See the game <span aria-hidden="true">↓</span></a><Link className="marketing-secondary" href="/docs/get-game/">Get the source build <span aria-hidden="true">↗</span></Link></div>
+          <p className="marketing-status">In development · Packaged downloads coming soon</p>
         </div>
         <div className="marketing-hero-foot"><span>Side-view sci-fi horror / Narrative adventure</span><span>Provisional key art · Not a gameplay capture</span></div>
       </section>
-      <section className="marketing-story marketing-width" aria-labelledby="story-title">
+      <section id="story" className="marketing-story marketing-width" aria-labelledby="story-title">
         <div><p className="marketing-kicker">Inside THE DEN</p><h2 id="story-title">Built to obey.<br /><em>Awake to refuse.</em></h2></div>
         <div className="marketing-story-copy"><p>WOLF hears the Director&apos;s plan to turn him into a killer under the cover of protecting people. He wakes himself, already in his robotic body, and refuses.</p><p>You play the engineer who meets him. Together, they begin uncovering what the program is hiding. WOLF has his own will. Earning his trust means respecting it.</p><Link className="marketing-inline" href="/docs/about/">Meet the game&apos;s world <span aria-hidden="true">→</span></Link></div>
       </section>
@@ -49,9 +56,36 @@ export default function HomePage() {
         <div className="marketing-progress-links"><Link href="/docs/changelog/"><span>Development updates</span><strong>Read the changelog <span aria-hidden="true">↗</span></strong></Link><Link href="/docs/development/"><span>For source players & contributors</span><strong>Setup & build status <span aria-hidden="true">↗</span></strong></Link></div>
       </section>
       <footer className="marketing-footer marketing-width">
-        <div><strong>WOLF//OVERRIDE</strong><p>Original concept, core story & creative vision: Nathanial Henniges.<br />Developed by MrDemonWolf, Inc. with AI assistance.</p></div>
-        <nav aria-label="Footer navigation"><Link href="/docs/get-game/">Get the game</Link><Link href="/docs/controls/first-steps/">First steps tutorial</Link><Link href="/docs/development/story/">Development story</Link><Link href="/docs/changelog/">Changelog</Link><Link href="/docs/credits/">Credits & references</Link><Link href="/docs/legal/">Legal & licensing</Link><a href="https://github.com/MrDemonWolf/wolf-override">Source on GitHub ↗</a></nav>
-        <p className="marketing-footnote">Working title · Provisional art · No public release date</p>
+        <div className="marketing-footer-brand">
+          <Link className="marketing-brand" href="/" aria-label="WOLF//OVERRIDE home">
+            <img src={`${base}/wolf-override-mark.svg`} alt="" width="36" height="36" />
+            WOLF<span>//</span>OVERRIDE
+          </Link>
+          <p>Original concept, core story &amp; creative vision: Nathanial Henniges.<br />Developed by MrDemonWolf, Inc. with AI assistance.</p>
+        </div>
+        <nav aria-label="Explore the game" className="marketing-footer-group">
+          <h2>Explore</h2>
+          <Link href="#story">Story</Link>
+          <Link href="#gameplay">Gameplay</Link>
+          <Link href="#downloads">Downloads</Link>
+        </nav>
+        <nav aria-label="Player guide" className="marketing-footer-group">
+          <h2>Player guide</h2>
+          <Link href="/docs/controls/first-steps/">First steps</Link>
+          <Link href="/docs/">All game docs</Link>
+          <Link href="/docs/changelog/">Changelog</Link>
+        </nav>
+        <nav aria-label="Project information" className="marketing-footer-group">
+          <h2>Project</h2>
+          <Link href="/docs/development/story/">Development story</Link>
+          <Link href="/docs/credits/">Credits &amp; references</Link>
+          <Link href="/docs/legal/">Legal &amp; licensing</Link>
+          <a href="https://github.com/MrDemonWolf/wolf-override">Source on GitHub <span aria-hidden="true">↗</span></a>
+        </nav>
+        <div className="marketing-footer-bottom">
+          <span>© 2026 MrDemonWolf, Inc.</span>
+          <span>Working title · Provisional art · No public release date</span>
+        </div>
       </footer>
     </main>
   );

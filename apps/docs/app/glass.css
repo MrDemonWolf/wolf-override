@@ -13,8 +13,8 @@
 }
 
 .marketing-shell .marketing-header {
-  position: sticky;
-  top: .75rem;
+  position: relative;
+  top: auto;
   z-index: 30;
   width: min(calc(100% - 2rem), 1232px);
   min-height: 4.75rem;
@@ -31,15 +31,53 @@
 .marketing-shell .marketing-header nav > a,
 .marketing-shell .theme-toggle {
   border-radius: .7rem;
-  transition: background-color .2s ease, border-color .2s ease;
+  transition: background-color .2s ease, border-color .2s ease, color .2s ease;
 }
 
-.marketing-shell .marketing-header nav > a { padding: .65rem .8rem; }
-.marketing-shell .marketing-header nav > a:hover { background: var(--glass-shine); }
+.marketing-shell .marketing-header nav {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: flex-end;
+  gap: .25rem;
+  margin-left: auto;
+}
+.marketing-shell .marketing-header nav > a {
+  display: inline-flex;
+  min-height: 2.75rem;
+  align-items: center;
+  padding: .65rem .75rem;
+  border: 1px solid transparent;
+  color: var(--mk-text);
+  text-decoration: none;
+}
+.marketing-shell .marketing-header nav > a:hover,
+.marketing-shell .marketing-header nav > a:focus-visible { background: var(--glass-shine); }
 .marketing-shell .theme-toggle {
-  padding-inline: .9rem;
+  display: inline-flex;
+  min-width: 2.9rem;
+  min-height: 2.9rem;
+  align-items: center;
+  justify-content: center;
+  gap: .55rem;
+  margin-left: .6rem;
+  padding-inline: .75rem;
   border-color: var(--glass-line);
   background: var(--glass-shine);
+  color: var(--mk-text);
+  cursor: pointer;
+}
+.marketing-shell .theme-toggle:hover {
+  border-color: var(--mk-accent);
+  background: color-mix(in srgb, var(--glass-shine) 70%, var(--mk-accent) 30%);
+}
+.marketing-shell .theme-toggle svg {
+  width: 1.1rem;
+  height: 1.1rem;
+  flex: none;
+}
+.marketing-shell .theme-toggle-label {
+  font: 650 .78rem/1 var(--font-heading);
 }
 
 .marketing-shell .marketing-features article,
@@ -181,6 +219,86 @@
   box-shadow: var(--glass-shadow);
 }
 
+html {
+  scrollbar-width: thin;
+  scrollbar-color: #345070 #091533;
+}
+html:not(.dark) { scrollbar-color: #7394a7 #e7f1f8; }
+html::-webkit-scrollbar { width: .8rem; height: .8rem; }
+html::-webkit-scrollbar-track { background: #091533; }
+html:not(.dark)::-webkit-scrollbar-track { background: #e7f1f8; }
+html::-webkit-scrollbar-thumb {
+  border: 3px solid #091533;
+  border-radius: 999px;
+  background: #345070;
+}
+html:not(.dark)::-webkit-scrollbar-thumb {
+  border-color: #e7f1f8;
+  background: #7394a7;
+}
+html::-webkit-scrollbar-thumb:hover { background: #8be3ff; }
+html:not(.dark)::-webkit-scrollbar-thumb:hover { background: #006a95; }
+
+.marketing-shell [id="story"],
+.marketing-shell [id="gameplay"],
+.marketing-shell [id="downloads"] { scroll-margin-top: 7rem; }
+
+.marketing-shell .marketing-footer {
+  display: grid;
+  grid-template-columns: minmax(15rem, 1.7fr) repeat(3, minmax(8rem, 1fr));
+  gap: 2.5rem 2rem;
+  padding-block: 3.5rem 1.5rem;
+  border-top: 1px solid var(--glass-line);
+}
+.marketing-shell .marketing-footer-brand .marketing-brand { display: inline-flex; }
+.marketing-shell .marketing-footer-brand .marketing-brand img { width: 2.25rem; height: 2.25rem; }
+.marketing-shell .marketing-footer-brand p {
+  max-width: 34ch;
+  margin: 1rem 0 0;
+  color: var(--mk-muted);
+  font-size: .85rem;
+  line-height: 1.75;
+}
+.marketing-shell .marketing-footer-group {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: flex-start;
+  flex-wrap: nowrap;
+  gap: .25rem;
+  font-size: .83rem;
+}
+.marketing-shell .marketing-footer-group h2 {
+  margin: .25rem 0 .65rem;
+  color: var(--mk-text);
+  font: 700 .76rem/1.4 var(--font-heading);
+  letter-spacing: .1em;
+  text-transform: uppercase;
+}
+.marketing-shell .marketing-footer-group a {
+  display: inline-flex;
+  min-height: 2.4rem;
+  align-items: center;
+  color: var(--mk-muted);
+  text-decoration: none;
+  text-underline-offset: .25em;
+}
+.marketing-shell .marketing-footer-group a:hover,
+.marketing-shell .marketing-footer-group a:focus-visible {
+  color: var(--mk-text);
+  text-decoration: underline;
+}
+.marketing-shell .marketing-footer-bottom {
+  display: flex;
+  grid-column: 1 / -1;
+  justify-content: space-between;
+  gap: 1rem;
+  padding-top: 1.25rem;
+  border-top: 1px solid var(--glass-line);
+  color: var(--mk-muted);
+  font-size: .75rem;
+}
+
 .nd-docs-layout .nd-sidebar {
   background: var(--color-fd-background);
   background: color-mix(in srgb, var(--color-fd-background) 82%, transparent);
@@ -192,16 +310,52 @@
 
 @media (max-width: 700px) {
   .marketing-shell .marketing-header {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
     width: calc(100% - 1.5rem);
     min-height: 0;
     margin: .75rem auto -7.5rem;
     padding: .8rem 1rem;
     border-radius: 1.2rem;
   }
-  .marketing-shell .marketing-header nav { gap: .25rem; }
-  .marketing-shell .marketing-header nav > a { padding: .6rem .3rem; }
+  .marketing-shell .marketing-header > .marketing-brand {
+    grid-column: 1;
+    grid-row: 1;
+    min-width: 0;
+  }
+  .marketing-shell .marketing-header > .theme-toggle {
+    grid-column: 2;
+    grid-row: 1;
+    justify-self: end;
+    width: auto;
+  }
+  .marketing-shell .marketing-header nav {
+    grid-column: 1 / -1;
+    grid-row: 2;
+    justify-content: center;
+    gap: .15rem;
+    margin: .15rem -.25rem -.1rem;
+  }
+  .marketing-shell .marketing-header nav > a { min-height: 2.7rem; padding: .5rem .45rem; font-size: .78rem; }
+  .marketing-shell .marketing-header > .theme-toggle { margin: 0; }
+  .marketing-shell .theme-toggle-label { display: none; }
   .marketing-shell .marketing-hero-copy { padding-top: 16rem; }
   .marketing-shell .marketing-source-note { align-items: flex-start; flex-direction: column; gap: .8rem; }
+  .marketing-shell [id="story"],
+  .marketing-shell [id="gameplay"],
+  .marketing-shell [id="downloads"] { scroll-margin-top: 9.5rem; }
+  .marketing-shell .marketing-footer { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 2rem 1.25rem; }
+  .marketing-shell .marketing-footer-brand { grid-column: 1 / -1; }
+  .marketing-shell .marketing-footer-bottom { flex-direction: column; }
+}
+
+@media (min-width: 701px) and (max-width: 980px) {
+  .marketing-shell .marketing-header { flex-wrap: wrap; row-gap: .35rem; }
+  .marketing-shell .marketing-header nav { width: calc(100% - 3.5rem); justify-content: center; order: 3; }
+  .marketing-shell .marketing-header > .marketing-brand { order: 1; }
+  .marketing-shell .marketing-header > .theme-toggle { order: 2; margin-left: auto; }
+  .marketing-shell .marketing-footer { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 2rem 1.4rem; }
+  .marketing-shell .marketing-footer-brand { grid-column: 1 / -1; }
 }
 
 @supports not (backdrop-filter: blur(1px)) {
