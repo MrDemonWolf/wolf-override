@@ -105,8 +105,16 @@
   border-radius: inherit;
   background: transparent;
   color: var(--mk-text);
+  color-scheme: dark;
   font: 700 .95rem var(--font-heading);
   cursor: pointer;
+}
+.marketing-shell .marketing-platform-picker option {
+  background-color: var(--mk-bg);
+  color: var(--mk-text);
+}
+:root:not(.dark) .marketing-shell .marketing-platform-picker select {
+  color-scheme: light;
 }
 .marketing-shell .marketing-platform-picker select:focus-visible { outline: none; }
 .marketing-shell .marketing-other-platforms {
