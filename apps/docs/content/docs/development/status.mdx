@@ -1,0 +1,28 @@
+---
+title: Current status
+description: Implemented source-game features, limits, and future work.
+---
+
+WOLF//OVERRIDE is an early source prototype. It contains two connected playable rooms, not a complete investigation or campaign. There is no public download, release date, or announced price.
+
+## In the source build
+
+- The engineer is the sole playable character. WOLF accompanies them independently; both have provisional static art.
+- The corridor has a power and door puzzle with a cooperative route and a manual route if WOLF refuses.
+- One authored disagreement is remembered, with a later callback and safe checkpoint.
+- The opening, purge display, station feedback, and objective cards guide the first steps.
+- Records Access lets the engineer copy a purge-order trace, then preserve a timestamp through WOLF's independent readout or a manual maintenance port.
+- New Game and versioned save/load cover both rooms, positions, and chapter progress.
+- Controller mappings, mobile on-screen controls, and saved Display, Audio, and Controls preferences are present. [Controls and settings](/docs/controls/) explains them.
+
+## Still to come
+
+Final character art and animation, audio, the wider story, public export packages, complete touch/controller playtests, and physical-device testing remain future work. The corridor key art on the landing page is provisional and is not a gameplay capture. Its source and rights-review status are in the [asset register](https://github.com/MrDemonWolf/wolf-override/blob/main/apps/game/assets/manifest.json).
+
+## Direct macOS updater
+
+**Planned, not integrated or enabled.** The game has no Sparkle framework, updater object, update feed, or automatic network check. Sparkle is a candidate for direct macOS downloads, but a Godot app needs a tested native integration and repeatable export packaging. Store builds should use their store channels.
+
+No keys, feed, native dependency, or signing changes have been created. Packaging, signing, update verification, and save compatibility must be checked before a release could enable it. References: [Sparkle setup](https://sparkle-project.org/documentation/) and [programmatic setup](https://sparkle-project.org/documentation/programmatic-setup/).
+
+See [Testing and deployment](/docs/development/testing/) for what checks have and have not established. The [changelog](/docs/changelog/) records source changes by date.

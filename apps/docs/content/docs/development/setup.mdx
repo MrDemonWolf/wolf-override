@@ -1,0 +1,39 @@
+---
+title: Set up the project
+description: Play the source game with Godot 4.7.2 or run the docs site locally.
+---
+
+There is no public game package yet. The playable chapter slice runs from this repository in Godot 4.7.2. Bun is needed only for website work.
+
+## Play on macOS
+
+1. Get [Godot 4.7.2 stable](https://godotengine.org/download/archive/) and check the installed command with `godot --version`.
+2. Clone the repository, or use an existing checkout:
+
+   ```sh
+   git clone https://github.com/MrDemonWolf/wolf-override.git
+   cd wolf-override
+   ```
+
+3. Import the game project and press **F5** in the editor:
+
+   ```sh
+   godot --path apps/game --editor
+   ```
+
+4. After importing, `godot --path apps/game` launches the game directly.
+
+The [start guide](/docs/) introduces the first goal. [Controls and settings](/docs/controls/) covers input and checkpoints. The [walkthrough](/docs/walkthrough/) contains optional puzzle solutions.
+
+## Run the docs site
+
+The repository pins Bun 1.4.2. From the repository root, check `bun --version`, then run:
+
+```sh
+bun install --frozen-lockfile
+bun run docs:dev
+```
+
+Open the local URL printed by Next.js. Bun is not needed to play the game.
+
+For automated commands and validation limits, see [Testing and deployment](/docs/development/testing/).

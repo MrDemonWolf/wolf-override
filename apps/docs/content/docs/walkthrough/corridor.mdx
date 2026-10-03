@@ -1,0 +1,45 @@
+---
+title: Maintenance corridor
+description: Optional step-by-step help for the breaker, coolant relay, and safe point.
+---
+
+import Image from 'next/image';
+import corridor from '../../../public/corridor-source-build.png';
+
+**Puzzle solutions for the first source room follow.** For a spoiler-light introduction, use [Start here](/docs/).
+
+<a href={corridor.src} target="_blank" rel="noopener noreferrer" aria-label="Open full-size corridor screenshot"><Image src={corridor} alt="Development frame showing the engineer and WOLF at the coolant relay, with labeled corridor stations." unoptimized /></a>
+
+Current Godot-rendered corridor frame. Open it for a full-size view. Art and UI are provisional; this is a source-build capture, not a downloadable release.
+
+## 1. Read the corridor
+
+After the opening, move the engineer with **A/D** or the arrow keys. An interaction prompt appears near a station. At the far-left red **PURGE DISPLAY**, **E** reads optional context; this is not needed to open the door.
+
+These are default keys. If you changed bindings, use the inputs shown by the game. See the [input guide](/docs/controls/input/).
+
+## 2. Arm the breaker
+
+Move right to the amber **BREAKER**. Interact to hear WOLF's concern about coolant risk. Choose answer **1** or **2**, then interact again to arm power.
+
+The answer changes his response at the relay and is remembered later. Repeated station use does not add duplicate consequences.
+
+## 3. Open the sealed door
+
+Continue right to the blue **COOLANT RELAY**.
+
+### WOLF-assisted route
+
+If you chose **1**, telling WOLF about the risk, stand toward the relay's right side and interact. He needs room to reach his contact. If he asks for space, move a few steps right while the relay prompt stays visible, then interact again.
+
+### Engineer-only route
+
+If you chose **2**, pressing WOLF to act, interact to hear his refusal. Interact again to perform the engineer's manual bypass.
+
+Both routes open the door. You never switch to controlling WOLF.
+
+## 4. Use the safe point
+
+Walk through the door to the green **SAFE POINT** and interact. WOLF recalls the answer from this run. The checkpoint saves positions, door state, display name, and memory.
+
+Interact again to enter Records Access. A valid checkpoint enables **Continue** on the title screen. **L/F9** restores it during play. For the next room, open the [Records Access guide](/docs/walkthrough/records-access/).

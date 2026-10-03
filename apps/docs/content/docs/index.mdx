@@ -9,7 +9,7 @@ The current source chapter has two rooms, an opening scene, a cooperation or man
 
 ## Start playing
 
-1. Follow [development setup](/docs/development/#set-up-on-macos) to get the source and **Godot 4.7.2**.
+1. Follow [source setup](/docs/development/setup/) to get the source and **Godot 4.7.2**.
 2. From the repository root, launch the imported project:
 
    ```sh
@@ -18,7 +18,7 @@ The current source chapter has two rooms, an opening scene, a cooperation or man
 
 3. Choose **New Game**. Advance the opening at your pace, then follow the movement and interaction prompts.
 
-The opening shows WOLF and the Director before the engineer enters. **E** advances a beat; **Esc** skips the opening. These are default keys; [Controls and settings](/docs/controls/) explains rebinding and controller/touch input.
+The opening shows WOLF and the Director before the engineer enters. **E** advances a beat; **Esc** skips the opening. These are default keys; the [input guide](/docs/controls/input/) explains controller and touch input.
 
 ## Your first goal
 
@@ -26,7 +26,7 @@ Restore power and open the sealed maintenance door. Read the station labels and 
 
 WOLF can help or refuse. You keep control of the engineer, and a manual route lets you continue if he declines. A choice you make in the corridor is remembered later.
 
-**Stuck?** The [optional chapter walkthrough](/docs/walkthrough/) shows each station and both puzzle paths. It reveals solutions for the current source chapter only.
+**Stuck?** The [optional chapter walkthrough](/docs/walkthrough/) separates the corridor and Records Access solutions. It reveals only the current source chapter.
 
 ## Save your progress
 
@@ -34,19 +34,19 @@ Use the green **SAFE POINT** beyond the door. **Continue** on the title screen r
 
 Returning to the title keeps your checkpoint and loses progress made since that save. **New Game** starts a fresh run; the old checkpoint remains until the new run saves over it. There is currently one checkpoint file, not multiple save slots.
 
-## Find what you need
+## Explore the guide
 
-| I want to… | Go here |
-| --- | --- |
-| Learn the keys, controller buttons, or Settings | [Controls and settings](/docs/controls/) |
-| Get help with a puzzle | [Chapter walkthrough](/docs/walkthrough/) |
-| Understand the premise without campaign spoilers | [About the game](/docs/about/) |
-| Install the source, run checks, or see build status | [Development setup](/docs/development/) |
-| Follow changes | [Changelog](/docs/changelog/) |
-| See creators, tools, research, and asset rights | [Credits and sources](/docs/credits/) |
+<nav className="guide-card-grid" aria-label="Guide sections">
+  <a href="/docs/controls/"><strong>Play and settings</strong><span>Inputs, preferences, checkpoints, and quick fixes</span></a>
+  <a href="/docs/walkthrough/"><strong>Chapter help</strong><span>Optional solutions, split by room</span></a>
+  <a href="/docs/about/"><strong>About the game</strong><span>Premise and current gameplay direction</span></a>
+  <a href="/docs/development/"><strong>Development</strong><span>Source setup, status, and testing</span></a>
+  <a href="/docs/changelog/"><strong>Changelog</strong><span>Public source changes by date</span></a>
+  <a href="/docs/credits/"><strong>Credits and sources</strong><span>Creators, tools, research, and asset rights</span></a>
+</nav>
 
 ## What to expect
 
 Characters and environments use provisional artwork. Final animation, sound, the wider campaign, and release packages are still in development. The current chapter is a small beginning, and its puzzles do not select a campaign ending.
 
-For what has actually been tested—including the limits of controller, touch, and simulator checks—see [development status](/docs/development/#checked-so-far).
+For what has actually been tested—including the limits of controller, touch, and simulator checks—see [Testing and deployment](/docs/development/testing/).

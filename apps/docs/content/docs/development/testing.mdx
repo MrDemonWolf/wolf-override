@@ -1,0 +1,41 @@
+---
+title: Testing and deployment
+description: Automated checks, GitHub Pages delivery, and the boundaries of current validation.
+---
+
+## Run the checks
+
+From the repository root:
+
+```sh
+godot --headless --path apps/game --import
+godot --headless --path apps/game --script res://tests/m0_state_test.gd
+godot --headless --path apps/game --script res://tests/m0_scene_test.gd
+godot --headless --path apps/game --script res://tests/chapter_scene_test.gd
+godot --headless --path apps/game --script res://tests/ui_controls_test.gd
+godot --headless --path apps/game --script res://tests/settings_test.gd
+bun run docs:check
+bun run docs:build
+```
+
+The Godot commands check import, state logic, both scripted door routes, both Records Access mirror routes, and save/load. Bun checks docs types and builds the static Pages site. Headless checks do not establish how a route feels on screen; exports and devices need separate checks.
+
+## Continuous integration
+
+Every pull request and push to main runs a checksum-verified Godot 4.7.2 import and five deterministic game checks. The workflow also supports manual runs. Game jobs have a 15-minute limit; failing import/test logs are retained as downloadable artifacts for seven days. Log pipelines retain the command's failure status.
+
+Docs changes run type checks and a production Pages build before merge. Main-branch docs changes then deploy the website to GitHub Pages. Build and deployment jobs have time limits. This pipeline does not create game installers.
+
+## What has been observed
+
+Godot 4.7.2 headless import, deterministic state, M0 scene, chapter scene, and input/settings checks passed locally in the prior source-build review. Scene checks exercise both door routes, both mirror routes, and Continue restoring chapter progress. Engineer movement and WOLF's follow behavior were observed in a partial graphical playtest of the first corridor. Rendered touch, pause, and settings frames were inspected. Complete routes have not been played by hand.
+
+A temporary iOS simulator export built and launched on two booted iPhone simulators; the iPhone 17e title screen was inspected. Touch gestures, controller hardware, and physical devices were not tested. Godot's official 4.7.2 iOS template contained only x86_64 simulator code in a slice labeled arm64; the local simulator build used a temporary version-matched arm64 library. No distributable iOS package is published.
+
+Graphical route play, hardware input, exports, signing, and physical devices remain separate gates. A green workflow does not certify a finished game or release package.
+
+## Contributing and reporting problems
+
+Use a focused branch and include relevant checks in a pull request. Keep the Godot pin, stable narrative IDs, existing asset sources, and engineer-only viewpoint intact. Follow the [public agent guide](https://github.com/MrDemonWolf/wolf-override/blob/main/AGENT.md).
+
+Report reproducible bugs through [GitHub Issues](https://github.com/MrDemonWolf/wolf-override/issues) with OS, Godot version, input method, and steps. Private story drafts belong in private notes, not public issues, pull requests, or exported site content.
