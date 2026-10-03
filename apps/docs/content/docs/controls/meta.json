@@ -1,4 +1,4 @@
 {
   "title": "Play and settings",
-  "pages": ["index", "input", "settings", "saves", "troubleshooting"]
+  "pages": ["index", "first-steps", "input", "settings", "saves", "troubleshooting"]
 }

@@ -41,7 +41,7 @@ export default function HomePage() {
           <article><span aria-hidden="true">02</span><h3>Respect his boundaries</h3><p>Cooperate to open a path, or take the manual route when WOLF refuses. Essential progress stays in your hands.</p></article>
           <article><span aria-hidden="true">03</span><h3>Leave a memory</h3><p>Choose your words in an authored disagreement. Hear your decision remembered later, then carry it into a checkpoint.</p></article>
         </div>
-        <Link className="marketing-inline" href="/docs/">Read the playable chapter guide <span aria-hidden="true">→</span></Link>
+        <Link className="marketing-inline" href="/docs/controls/first-steps/">New to the game? Start with the first-steps tutorial <span aria-hidden="true">→</span></Link>
       </section>
       <Downloads />
       <section className="marketing-progress marketing-width" aria-labelledby="progress-title">
@@ -50,7 +50,7 @@ export default function HomePage() {
       </section>
       <footer className="marketing-footer marketing-width">
         <div><strong>WOLF//OVERRIDE</strong><p>Original concept, core story & creative vision: Nathanial Henniges.<br />Developed by MrDemonWolf, Inc. with AI assistance.</p></div>
-        <nav aria-label="Footer navigation"><Link href="/docs/get-game/">Get the game</Link><Link href="/docs/development/story/">Development story</Link><Link href="/docs/changelog/">Changelog</Link><Link href="/docs/credits/">Credits & references</Link><Link href="/docs/legal/">Legal & licensing</Link><a href="https://github.com/MrDemonWolf/wolf-override">Source on GitHub ↗</a></nav>
+        <nav aria-label="Footer navigation"><Link href="/docs/get-game/">Get the game</Link><Link href="/docs/controls/first-steps/">First steps tutorial</Link><Link href="/docs/development/story/">Development story</Link><Link href="/docs/changelog/">Changelog</Link><Link href="/docs/credits/">Credits & references</Link><Link href="/docs/legal/">Legal & licensing</Link><a href="https://github.com/MrDemonWolf/wolf-override">Source on GitHub ↗</a></nav>
         <p className="marketing-footnote">Working title · Provisional art · No public release date</p>
       </footer>
     </main>

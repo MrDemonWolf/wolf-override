@@ -23,7 +23,9 @@ Credit Nathanial's original concept, core story and creative vision explicitly. 
 
 ## Craft references
 
-Keep the public website changelog current for implemented player-facing changes. Use development dates until real versions are released; distinguish source changes from downloadable releases and keep private plot drafts out.
+Keep the public docs in `apps/docs/content/docs` in sync with the playable source build as it changes. For player-facing updates, review and update the relevant beginner tutorial, controls/settings/save guides, and chapter walkthrough. Add a spoiler-light first-play explanation when a new core mechanic needs onboarding; keep puzzle solutions clearly labeled as spoilers. Update the public website changelog for implemented player-facing changes, and keep credits, references, tools, asset rights, and legal pages accurate when those details change. Link new or moved guide pages from the docs index or relevant topic page so players can find them. Use development dates until real versions are released; distinguish source changes from downloadable releases and keep private plot drafts out.
+
+Before finishing a gameplay or docs task, check that links and claims match the current source build, run the docs checks/build when docs change, and include docs/changelog updates with the implementation when player-facing behavior changed.
 
 - [Game Accessibility Guidelines: identify interactive elements](https://gameaccessibilityguidelines.com/give-a-clear-indication-that-interactive-elements-are-interactive/) and [player-paced text](https://gameaccessibilityguidelines.com/allow-players-to-progress-through-text-prompts-at-their-own-pace/)
 - [Fumito Ueda on companion storytelling in *The Last Guardian*](https://blog.playstation.com/2016/06/21/the-last-guardian-5-storytelling-secrets/)
