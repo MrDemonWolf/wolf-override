@@ -3,25 +3,27 @@ title: Set up the project
 description: Play the source game with Godot 4.7.2 or run the docs site locally.
 ---
 
-There is no public game package yet. The playable chapter slice runs from this repository in Godot 4.7.2. Bun is needed only for website work.
+There is no packaged game download or installer yet. The playable desktop chapter slice runs from this repository in Godot 4.7.2. Bun is needed only for website work.
 
-## Play on macOS
+## Play on Windows, macOS, or Linux
 
-1. Get [Godot 4.7.2 stable](https://godotengine.org/download/archive/) and check the installed command with `godot --version`.
-2. Clone the repository, or use an existing checkout:
+1. Install the standard editor build of [Godot 4.7.2](https://godotengine.org/download/archive/) for your operating system.
+2. Download the [current source ZIP](https://github.com/MrDemonWolf/wolf-override/archive/refs/heads/main.zip) and extract it, or clone the repository:
 
    ```sh
    git clone https://github.com/MrDemonWolf/wolf-override.git
    cd wolf-override
    ```
 
-3. Import the game project and press **F5** in the editor:
+3. Open Godot Project Manager, choose **Import**, and select `apps/game/project.godot` inside the extracted folder. Open the imported project and press **F5** to run the game.
+
+If you have Git and Godot on your command line, you can import and launch from the repository root:
 
    ```sh
    godot --path apps/game --editor
    ```
 
-4. After importing, `godot --path apps/game` launches the game directly.
+After importing, `godot --path apps/game` launches the game directly. The ZIP is a moving development snapshot, not a packaged release or installer.
 
 The [start guide](/docs/) introduces the first goal. [Controls and settings](/docs/controls/) covers input and checkpoints. The [walkthrough](/docs/walkthrough/) contains optional puzzle solutions.
 

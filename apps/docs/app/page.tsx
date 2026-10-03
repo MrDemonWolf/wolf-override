@@ -50,7 +50,7 @@ export default function HomePage() {
       </section>
       <footer className="marketing-footer marketing-width">
         <div><strong>WOLF//OVERRIDE</strong><p>Original concept, core story & creative vision: Nathanial Henniges.<br />Developed by MrDemonWolf, Inc. with AI assistance.</p></div>
-        <nav aria-label="Footer navigation"><Link href="/docs/credits/">Credits & sources</Link><Link href="/docs/changelog/">Changelog</Link><a href="https://github.com/MrDemonWolf/wolf-override">Source on GitHub ↗</a></nav>
+        <nav aria-label="Footer navigation"><Link href="/docs/get-game/">Get the game</Link><Link href="/docs/development/story/">Development story</Link><Link href="/docs/changelog/">Changelog</Link><Link href="/docs/credits/">Credits & references</Link><Link href="/docs/legal/">Legal & licensing</Link><a href="https://github.com/MrDemonWolf/wolf-override">Source on GitHub ↗</a></nav>
         <p className="marketing-footnote">Working title · Provisional art · No public release date</p>
       </footer>
     </main>
