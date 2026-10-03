@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import type { ReactNode } from 'react';
 import { RootProvider } from 'fumadocs-ui/provider/next';
 import './global.css';
+import './glass.css';
 import { siteUrl } from '@/lib/seo';
 
 export const metadata: Metadata = {
