@@ -104,15 +104,6 @@
       "implementation_status": "Archived public gameplay frame, captured September 30, 2026, before the in-game font and theme update. The station layout and route remain representative; control labels may differ. Do not present it as a current interface capture."
     },
     {
-      "asset_id": "terminal-title-source-build-capture",
-      "path": "apps/docs/public/terminal-title-source-build.png",
-      "source_or_tool": "Godot 4.7.2 normal-renderer capture of the repository title menu on September 30, 2026",
-      "source_reference": "apps/game/scenes/main.tscn; title menu at game startup with isolated save/settings",
-      "rights_review_status": "Derivative screenshot using the registered provisional title art and logo. Underlying commercial asset-rights review remains open; no new third-party artwork acquired.",
-      "modifications": "960x540 scripted renderer still, no image edits. Not a full hands-on route or release acceptance test.",
-      "implementation_status": "Archived September 30, 2026 title-menu screenshot. The New Game option remains the starting point, but title copy, fonts, and layout are outdated. May be used only as dated historical context in the first-steps guide; do not present it as the current interface."
-    },
-    {
       "asset_id": "roboto-variable-font",
       "path": "apps/game/assets/fonts/Roboto-Variable.ttf",
       "published_copy": "apps/docs/public/fonts/Roboto-Variable.ttf",

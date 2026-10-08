@@ -7,6 +7,7 @@ const EVENT_ID: String = "relay_disagreement"
 const DISCLOSE: String = "disclose_risk"
 const PRESS: String = "press_without_warning"
 const HUMAN_NAMES = ["Rowan Vale", "Alex Bennett", "Morgan Reed"]
+const MAX_SELECTED_TEXT_LENGTH: int = 200
 const CHOICE_TEXT = {
 	"disclose_risk": "The relay may vent coolant. Your call.",
 	"press_without_warning": "Go now. We can talk after.",
@@ -176,7 +177,11 @@ static func from_dict(raw: Variant) -> M0State:
 		var choice_id: Variant = loaded_memory.get("choice_id")
 		if typeof(choice_id) != TYPE_STRING or loaded_memory.size() != 6 or loaded_memory.get("event_id") != EVENT_ID or not CHOICE_TEXT.has(choice_id):
 			return null
-		if loaded_memory.get("selected_text") != CHOICE_TEXT[choice_id] or loaded_memory.get("context") != "breaker_relay_risk":
+		# Keep the words the player actually saw, so later wording edits never invalidate older saves.
+		var selected_text: Variant = loaded_memory.get("selected_text")
+		if typeof(selected_text) != TYPE_STRING or (selected_text as String).is_empty() or (selected_text as String).length() > MAX_SELECTED_TEXT_LENGTH:
+			return null
+		if loaded_memory.get("context") != "breaker_relay_risk":
 			return null
 		if not _whole_in_range(loaded_memory.get("sequence"), 1, 1) or loaded_memory.get("observed_by") != ["human", "wolf"]:
 			return null
@@ -190,7 +195,7 @@ static func from_dict(raw: Variant) -> M0State:
 		return null
 	if data["checkpoint_reached"] and not puzzle["door_open"]:
 		return null
-	if data["version"] == SAVE_VERSION:
+	if data["version"] >= 3:
 		if data.get("chapter_id") != "lockdown" and data.get("chapter_id") != "records":
 			return null
 		if typeof(data.get("purge_trace_preserved")) != TYPE_BOOL or typeof(data.get("mirror_trace_preserved")) != TYPE_BOOL or typeof(data.get("chapter_complete")) != TYPE_BOOL:
@@ -223,7 +228,7 @@ static func from_dict(raw: Variant) -> M0State:
 	state.door_open = puzzle["door_open"]
 	state.route = str(puzzle["route"])
 	state.checkpoint_reached = data["checkpoint_reached"]
-	if data["version"] == SAVE_VERSION:
+	if data["version"] >= 3:
 		state.chapter_id = data["chapter_id"]
 		state.purge_trace_preserved = data["purge_trace_preserved"]
 		state.mirror_trace_preserved = data["mirror_trace_preserved"]
@@ -247,6 +252,23 @@ func save_to_disk(path: String = SAVE_PATH) -> bool:
 
 
 static func load_from_disk(path: String = SAVE_PATH) -> M0State:
+	var loaded: M0State = _read_checkpoint(path)
+	if loaded != null:
+		return loaded
+	# Only used when the main checkpoint is missing or unreadable, e.g. the first save or a rename that removed the old file first.
+	var temp_path: String = path + ".tmp"
+	var recovered: M0State = _read_checkpoint(temp_path)
+	if recovered != null:
+		var global_temp: String = ProjectSettings.globalize_path(temp_path)
+		var global_path: String = ProjectSettings.globalize_path(path)
+		# Promote the recovered copy; fall back to copying so the only readable checkpoint never
+		# stays at .tmp, where the next save would overwrite it.
+		if DirAccess.rename_absolute(global_temp, global_path) != OK and not DirAccess.dir_exists_absolute(global_path):
+			DirAccess.copy_absolute(global_temp, global_path)
+	return recovered
+
+
+static func _read_checkpoint(path: String) -> M0State:
 	if not FileAccess.file_exists(path):
 		return null
 	var file: FileAccess = FileAccess.open(path, FileAccess.READ)

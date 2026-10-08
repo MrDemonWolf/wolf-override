@@ -20,6 +20,20 @@ func _run() -> void:
 	_expect(changelog.pressed.is_connected(Callable(game, "_open_changelog")) and str(game.CHANGELOG_URL) == "https://wolfoverride.mrdemonwolf.dev/docs/changelog/" and str(game.SITE_URL).begins_with("https://wolfoverride.mrdemonwolf.dev"), "title changelog points to the public development updates")
 	_expect(_has_button(&"interact", JOY_BUTTON_A) and _has_button(&"pause_game", JOY_BUTTON_START), "gamepad action buttons are mapped")
 	_expect(_has_button(&"move_left", JOY_BUTTON_DPAD_LEFT) and _has_button(&"move_right", JOY_BUTTON_DPAD_RIGHT), "gamepad D-pad movement is mapped")
+	var project_theme: Theme = ThemeDB.get_project_theme()
+	var ring: StyleBoxFlat = project_theme.get_stylebox("focus", "Button") as StyleBoxFlat if project_theme != null and project_theme.has_stylebox("focus", "Button") else null
+	_expect(ring != null and ring.border_color.is_equal_approx(Color("#8de5f5")) and ring.border_width_left == 2 and ring.expand_margin_left == 0.0 and ring.bg_color.a == 0.0, "the shared theme gives buttons an inset cyan focus ring")
+	var title_new_game: Button = game.get_node("CanvasLayer/TitleScreen/NewGameButton") as Button
+	var shared_settings: GameSettings = game.get_node("CanvasLayer/PauseOverlay/Panel/SettingsMenu") as GameSettings
+	_expect(title_new_game.get_theme_stylebox("focus") == ring and shared_settings.vsync.get_theme_stylebox("focus") == ring and (shared_settings.volumes["Music"] as HSlider).get_theme_stylebox("focus") == ring and shared_settings.deadzone.get_theme_stylebox("focus") == ring, "title and Settings controls, sliders included, share the theme focus ring")
+	var tab_ring: StyleBoxFlat = shared_settings.tabs.get_theme_stylebox("tab_focus") as StyleBoxFlat
+	_expect(tab_ring != null and tab_ring.border_width_left == 2 and tab_ring.expand_margin_left == -4.0, "settings tabs keep their inset focus ring")
+	var resume_focus: StyleBoxFlat = (game.get_node("CanvasLayer/PauseOverlay/Panel/PauseMenu/ResumeButton") as Button).get_theme_stylebox("focus") as StyleBoxFlat
+	var resume_normal: StyleBoxFlat = (game.get_node("CanvasLayer/PauseOverlay/Panel/PauseMenu/ResumeButton") as Button).get_theme_stylebox("normal") as StyleBoxFlat
+	_expect(resume_focus != null and resume_focus.border_width_left > resume_normal.border_width_left and resume_focus.bg_color.a == 1.0, "pause-menu focus is heavier than the pause-menu button border")
+	for bordered_path: String in ["CanvasLayer/PauseOverlay/Panel/SettingsMenu/BackButton", "CanvasLayer/PauseOverlay/Panel/SettingsMenu/FPSOptions", "CanvasLayer/PauseOverlay/Panel/SettingsMenu/ResolutionOptions"]:
+		var bordered: Button = game.get_node(bordered_path) as Button
+		_expect(bordered.get_theme_stylebox("focus") == resume_focus and (bordered.get_theme_stylebox("normal") as StyleBoxFlat).border_width_left < resume_focus.border_width_left, "%s uses the heavier focus style over its cyan border" % bordered.name)
 	game.call("_new_game")
 	game.call("_finish_intro")
 	game.set("touch_enabled", true)
@@ -58,6 +72,10 @@ func _run() -> void:
 	game.call("_pause_game")
 	var overlay: PauseOverlay = game.get_node("CanvasLayer/PauseOverlay") as PauseOverlay
 	_expect(paused and overlay.visible, "pause freezes the game and opens the menu")
+	_expect(root.gui_get_focus_owner() == null, "pause opened in touch mode leaves no focused button")
+	await _send_key(KEY_DOWN, true)
+	await _send_key(KEY_DOWN, false)
+	_expect((game.get_node("CanvasLayer/PauseOverlay/Panel/PauseMenu/ResumeButton") as Button).has_focus(), "the first arrow press in a touch-opened pause menu focuses Resume without moving past it")
 	(game.get_node("CanvasLayer/PauseOverlay/Panel/PauseMenu/SettingsButton") as Button).pressed.emit()
 	_expect((game.get_node("CanvasLayer/PauseOverlay/Panel/SettingsMenu") as Control).visible, "settings open while paused")
 	var fps: OptionButton = game.get_node("CanvasLayer/PauseOverlay/Panel/SettingsMenu/FPSOptions") as OptionButton
@@ -148,6 +166,28 @@ func _run() -> void:
 	Input.parse_input_event(_controller_button(JOY_BUTTON_X, false))
 	await process_frame
 	_expect(game.get("title_open") and not game.get("waiting_for_choice") and (game.get("state") as M0State).memory.is_empty(), "returning to the title drops a pending choice")
+	# A controller picked up on a touch device starts from a sensible menu control, not a stray press.
+	game.set("controller_active", false)
+	root.gui_release_focus()
+	Input.parse_input_event(_controller_button(JOY_BUTTON_A, true))
+	await process_frame
+	Input.parse_input_event(_controller_button(JOY_BUTTON_A, false))
+	await process_frame
+	_expect(game.get("title_open") and game.get("controller_active") and new_game.has_focus(), "the first controller press on an unfocused touch title focuses New Game without starting a game")
+	# On a touch-opened pause menu, B is still the cancel press: it resumes rather than only revealing focus.
+	game.set("touch_enabled", true)
+	game.set("controller_active", false)
+	new_game.pressed.emit()
+	game.call("_finish_intro")
+	await process_frame
+	game.call("_pause_game")
+	_expect(paused and root.gui_get_focus_owner() == null, "a touch-opened pause menu starts unfocused")
+	Input.parse_input_event(_controller_button(JOY_BUTTON_B, true))
+	await process_frame
+	Input.parse_input_event(_controller_button(JOY_BUTTON_B, false))
+	await process_frame
+	_expect(not paused and not overlay.visible, "controller B on a touch-opened pause menu resumes play like any cancel press")
+	game.set("touch_enabled", false)
 	Engine.max_fps = old_fps
 	DirAccess.remove_absolute(ProjectSettings.globalize_path(path))
 	game.queue_free()
@@ -172,9 +212,13 @@ func _controller_button(index: JoyButton, pressed: bool) -> InputEventJoypadButt
 
 
 func _send_escape(pressed: bool) -> void:
+	await _send_key(KEY_ESCAPE, pressed)
+
+
+func _send_key(code: Key, pressed: bool) -> void:
 	var event: InputEventKey = InputEventKey.new()
-	event.keycode = KEY_ESCAPE
-	event.physical_keycode = KEY_ESCAPE
+	event.keycode = code
+	event.physical_keycode = code
 	event.pressed = pressed
 	Input.parse_input_event(event)
 	await process_frame

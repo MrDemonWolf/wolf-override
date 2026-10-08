@@ -9,11 +9,17 @@ Use the green **SAFE POINT** beyond the sealed door. **Continue** on the title s
 
 There is one checkpoint file, not multiple save slots. Loading a missing or invalid checkpoint leaves the current run unchanged.
 
+When **Continue** is unavailable, a short note under it says why: **No checkpoint yet** means you have not saved at a safe point, and **Saved checkpoint could not be read** means the checkpoint file is damaged. Reaching the safe point in a new run replaces a damaged file.
+
+Entering Records Access, copying a trace there and securing the exit also save your progress. If one of those saves fails, the hint line shows **Save failed. Use a station to try again.** until you move to another spot or a later save works. After the exit fails to save, it stays until a later save works. Using the same station again tries the save again; if entering Records Access did not save, the first station there does. Progress since the last successful save is stored once a later save works. If the first safe-point save fails, the safe point stays unused so you can use it again.
+
+If the checkpoint file is missing or damaged but a complete save was still being written when the game closed, Continue uses that save instead.
+
 ## Leave or restart
 
 - **Return to Title** keeps the last checkpoint. Progress made after it is lost.
 - **New Game** begins a fresh run with the opening. The old checkpoint remains until the fresh run saves over it.
-- **L** or **F9** restores the last checkpoint during play with default keyboard bindings.
+- To restore the last checkpoint during play, open **Pause**, choose **Return to Title** (it warns that unsaved progress is lost), then **Continue**.
 
 ## Pause
 

@@ -44,6 +44,10 @@ func _run() -> void:
 
 	if not _require(game.get("title_open") and title_screen.visible and continue_button.disabled, "fresh title disables Continue without a test checkpoint"):
 		return
+	var continue_note: Label = game.get_node("CanvasLayer/TitleScreen/ContinueNote") as Label
+	_expect(continue_note.text == "No checkpoint yet. Reach a SAFE POINT to save." and continue_button.tooltip_text == continue_note.text, "disabled Continue explains that no checkpoint exists yet")
+	var note_width: float = continue_note.get_theme_font("font").get_string_size(continue_note.text, HORIZONTAL_ALIGNMENT_LEFT, -1, continue_note.get_theme_font_size("font_size")).x
+	_expect(note_width <= continue_note.size.x and continue_note.position.y >= continue_button.position.y + continue_button.size.y and continue_note.position.y + continue_note.size.y <= credits_button.position.y, "Continue caption fits between the title button rows")
 	if not _require(title_art.texture != null and title_art.texture.resource_path == "res://assets/title-corridor-key-art-provisional.png", "title shows the corridor artwork"):
 		return
 	if not _require(title_logo.text == "WOLF//OVERRIDE" and title_mark.texture != null and title_mark.texture.resource_path == "res://assets/logo-mark.svg", "title loads the branded WOLF//OVERRIDE logo"):
@@ -101,11 +105,20 @@ func _run() -> void:
 	await create_timer(3.9).timeout
 	game.call("_refresh_ui")
 	_expect(not top_card.visible, "gameplay objective card fades without returning each frame")
-	_expect(tutorial_prompt.visible and tutorial_text.text.contains("A / D  MOVE"), "New Game teaches movement after the opening")
+	_expect(tutorial_prompt.visible and tutorial_text.text == "A / D  MOVE\nE  READ DISPLAY (optional)", "New Game teaches movement and offers the nearby display as optional")
+	var breaker_art: Sprite2D = game.get_node("BreakerArt") as Sprite2D
+	var tutorial_rect: Rect2 = tutorial_prompt.get_global_rect()
+	_expect(not tutorial_rect.intersects(purge_terminal_art.get_global_transform_with_canvas() * purge_terminal_art.get_rect()) and not tutorial_rect.intersects(breaker_art.get_global_transform_with_canvas() * breaker_art.get_rect()) and not tutorial_rect.intersects(top_card.get_global_rect()), "tutorial box leaves the purge display, breaker and objective card uncovered")
+	_expect(_widest_line(tutorial_text) <= tutorial_text.size.x, "tutorial lines fit inside the tutorial box")
 	Input.action_press(&"move_right")
 	game.call("_process", 0.016)
 	Input.action_release(&"move_right")
-	_expect(tutorial_prompt.visible and tutorial_text.text.contains("E  READ DISPLAY"), "movement advances the opening interaction hint")
+	_expect(tutorial_prompt.visible and tutorial_text.text == "E  READ DISPLAY (optional)\nOr head right to the breaker.", "movement leaves the display optional and points on to the breaker")
+	game.set("touch_enabled", true)
+	game.call("_refresh_ui")
+	_expect(tutorial_text.text.begins_with("TAP USE  READ DISPLAY (optional)") and _widest_line(tutorial_text) <= tutorial_text.size.x, "touch tutorial line fits inside the tutorial box")
+	game.set("touch_enabled", false)
+	game.call("_refresh_ui")
 	await process_frame
 	await _tap(&"interact")
 	_expect(str(game.get("status_line")).contains("Original program logs marked for deletion"), "purge display establishes evidence stakes without inventory")
@@ -143,14 +156,13 @@ func _run() -> void:
 	game.call("_update_gameplay_camera")
 	_expect(gameplay_camera.position.x > 480.0 and gameplay_camera.position.x < 560.0, "camera scrolls toward the engineer without exposing the corridor edge")
 	_expect(not wolf.controlled and wolf.position.x > 400.0 and wolf.position.x < human.position.x, "WOLF stays a companion at the relay")
-	_expect(str(game.call("_context_hint")).contains("give WOLF room"), "relay hint waits for WOLF to reach the contact")
+	_expect(str(game.call("_context_hint")).contains("ask WOLF"), "relay hint offers WOLF the live contact")
 	await _tap(&"interact")
-	if not _require(not state.door_open and str(game.get("status_line")).contains("give me room"), "early relay request keeps the seal closed until WOLF is near"):
+	if not _require(not state.door_open and game.get("wolf_heading_to_relay") and str(game.get("status_line")).contains("I've got the contact"), "WOLF sets off for the contact himself and the seal stays closed until he arrives"):
 		return
-	if not _require(await _walk_to(human, 655.0), "engineer gives WOLF room at the contact"):
+	_expect(str(game.call("_context_hint")).contains("manual bypass"), "the engineer keeps a bypass while WOLF walks")
+	if not _require(await _wait_until(func() -> bool: return not game.get("wolf_heading_to_relay"), 120), "WOLF reaches the contact by himself"):
 		return
-	_expect(absf(wolf.position.x - 605.0) <= 32.0, "WOLF reaches the relay before cooperation")
-	await _tap(&"interact")
 	if not _require(state.door_open and state.route == "cooperate", "WOLF cooperation opens door"):
 		return
 	_expect(relay_status_light.color == Color("#a4f0c4"), "open relay changes from live cyan to completed green")
@@ -177,7 +189,8 @@ func _run() -> void:
 	(game.get_node("CanvasLayer/PauseOverlay/Panel/PauseMenu/TitleButton") as Button).pressed.emit()
 	state = game.get("state") as M0State
 	_expect(state.memory.is_empty() and not state.door_open and human.position == state.human_position, "New Game clears current play")
-	await _tap(&"load_game")
+	game.call("_load_game")
+	await process_frame
 	state = game.get("state") as M0State
 	if not _require(state.to_dict() == saved and state.active_actor == "human" and human.controlled and not wolf.controlled, "load restores cooperative scene with engineer control"):
 		return
@@ -186,8 +199,15 @@ func _run() -> void:
 	game.call("_new_game")
 	game.call("_finish_intro")
 	state = game.get("state") as M0State
+	_expect(game.get("tutorial_step") == 0 and tutorial_prompt.visible, "fresh fallback play starts with the tutorial")
+	if not _require(await _walk_to(human, 270.0), "engineer heads for the breaker without reading the display"):
+		return
+	await process_frame
+	_expect(tutorial_prompt.visible and tutorial_text.text == "A / D  MOVE\nHead right to the breaker." and game.call("_objective") == "CHECK THE BREAKER", "skipping the display keeps the tutorial and objective pointed at the breaker")
 	if not _require(await _walk_to(human, 350.0), "engineer reaches breaker on fresh fallback play"):
 		return
+	await process_frame
+	_expect(game.get("tutorial_step") == 2 and not tutorial_prompt.visible and not str(game.get("status_line")).contains("Original program logs"), "reaching the breaker clears the tutorial without reading the display")
 	await _tap(&"interact")
 	if not _require(game.get("waiting_for_choice"), "fallback opens authored disagreement"):
 		return
@@ -231,7 +251,8 @@ func _run() -> void:
 		return
 	_expect(str(game.get("status_line")).contains(State.CHOICE_TEXT[State.PRESS]), "fallback checkpoint displays the selected choice")
 	saved = state.to_dict()
-	await _tap(&"load_game")
+	game.call("_load_game")
+	await process_frame
 	state = game.get("state") as M0State
 	_expect(state.to_dict() == saved and state.checkpoint_callback().contains(State.CHOICE_TEXT[State.PRESS]), "fallback save loads with one accurate memory")
 	_expect(not game.get("relay_refused"), "load clears the transient refusal prompt")
@@ -247,6 +268,8 @@ func _run() -> void:
 	wolf = game.get_node("Wolf") as M0Actor
 	if not _require(game.get("title_open") and title_screen.visible and not continue_button.disabled, "fresh title enables Continue for the test checkpoint"):
 		return
+	continue_note = game.get_node("CanvasLayer/TitleScreen/ContinueNote") as Label
+	_expect(continue_note.text.is_empty() and continue_button.tooltip_text.is_empty(), "enabled Continue shows no warning caption")
 	continue_button.pressed.emit()
 	state = game.get("state") as M0State
 	if not _require(not game.get("title_open") and not title_screen.visible, "Continue button starts saved play through its signal"):
@@ -254,6 +277,31 @@ func _run() -> void:
 	_expect(state.to_dict() == saved and state.active_actor == "human" and human.controlled and not wolf.controlled and state.route == "fallback" and state.name_index == 1 and state.memory.get("choice_id") == State.PRESS, "Continue restores engineer control, puzzle, identity and one accurate memory")
 	_expect(human.position == state.human_position and wolf.position == state.wolf_position and state.checkpoint_callback().contains(State.CHOICE_TEXT[State.PRESS]), "Continue restores both actor positions and actual callback")
 
+	var unreadable: FileAccess = FileAccess.open(path, FileAccess.WRITE)
+	unreadable.store_string("not a checkpoint")
+	unreadable.close()
+	game.call("_refresh_continue")
+	_expect(continue_button.disabled and continue_note.text == "Saved checkpoint could not be read." and continue_button.tooltip_text == continue_note.text, "disabled Continue explains an unreadable checkpoint")
+
+	# Disclosed risk, but the engineer takes the bypass while WOLF is still walking.
+	game.call("_new_game")
+	game.call("_finish_intro")
+	state = game.get("state") as M0State
+	if not _require(await _walk_to(human, 350.0), "engineer reaches breaker on the disclose-then-bypass route"):
+		return
+	await _tap(&"interact")
+	await _tap(&"choice_1")
+	await _tap(&"interact")
+	if not _require(state.breaker_armed, "breaker arms on the disclose-then-bypass route"):
+		return
+	if not _require(await _walk_to(human, 605.0), "engineer reaches the relay after disclosing"):
+		return
+	await _tap(&"interact")
+	if not _require(game.get("wolf_heading_to_relay"), "WOLF heads for the contact after the risk is disclosed"):
+		return
+	await _tap(&"interact")
+	_expect(state.door_open and state.route == "fallback" and not game.get("wolf_heading_to_relay") and str(game.get("status_line")).contains("takes the bypass"), "a second use while WOLF walks is the engineer's bypass")
+	_expect(wolf.follow_target == human, "WOLF returns to following after the bypass")
 	DirAccess.remove_absolute(ProjectSettings.globalize_path(path))
 	game.queue_free()
 	if failures == 0:
@@ -279,6 +327,21 @@ func _action_event(action: StringName, pressed: bool) -> InputEventAction:
 	event.action = action
 	event.pressed = pressed
 	return event
+
+
+func _widest_line(label: Label) -> float:
+	var widest: float = 0.0
+	for line: String in label.text.split("\n"):
+		widest = maxf(widest, label.get_theme_font("font").get_string_size(line, HORIZONTAL_ALIGNMENT_LEFT, -1, label.get_theme_font_size("font_size")).x)
+	return widest
+
+
+func _wait_until(condition: Callable, frames: int) -> bool:
+	for _frame in range(frames):
+		await physics_frame
+		if condition.call():
+			return true
+	return false
 
 
 func _walk_to(actor: M0Actor, target_x: float) -> bool:

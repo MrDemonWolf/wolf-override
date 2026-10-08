@@ -314,10 +314,10 @@ vertical_alignment = 1
 
 [node name="TutorialPrompt" type="ColorRect" parent="CanvasLayer"]
 visible = false
-offset_left = 92.0
-offset_top = 189.0
-offset_right = 408.0
-offset_bottom = 255.0
+offset_left = 300.0
+offset_top = 96.0
+offset_right = 616.0
+offset_bottom = 162.0
 mouse_filter = 2
 color = Color(0.025, 0.06, 0.1, 0.91)
 
@@ -333,7 +333,7 @@ offset_top = 9.0
 offset_right = 305.0
 offset_bottom = 57.0
 theme_override_font_sizes/font_size = 17
-text = "A / D  MOVE\nReach the purge display."
+text = "A / D  MOVE\nE  READ DISPLAY (optional)"
 
 [node name="PauseButton" type="Button" parent="CanvasLayer"]
 visible = false
@@ -456,19 +456,28 @@ text = "CHAPTER 1  /  LOCKDOWN"
 
 [node name="NewGameButton" type="Button" parent="CanvasLayer/TitleScreen"]
 offset_left = 460.0
-offset_top = 365.0
+offset_top = 349.0
 offset_right = 648.0
-offset_bottom = 415.0
+offset_bottom = 399.0
 theme_override_font_sizes/font_size = 21
 text = "NEW GAME"
 
 [node name="ContinueButton" type="Button" parent="CanvasLayer/TitleScreen"]
 offset_left = 664.0
-offset_top = 365.0
+offset_top = 349.0
 offset_right = 852.0
-offset_bottom = 415.0
+offset_bottom = 399.0
 theme_override_font_sizes/font_size = 21
 text = "CONTINUE"
+
+[node name="ContinueNote" type="Label" parent="CanvasLayer/TitleScreen"]
+offset_left = 460.0
+offset_top = 401.0
+offset_right = 852.0
+offset_bottom = 422.0
+theme_override_colors/font_color = Color(0.59, 0.70, 0.77, 1)
+theme_override_font_sizes/font_size = 15
+horizontal_alignment = 2
 
 [node name="CreditsButton" type="Button" parent="CanvasLayer/TitleScreen"]
 offset_left = 460.0

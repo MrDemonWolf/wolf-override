@@ -2,6 +2,12 @@ extends Node2D
 
 const SITE_URL: String = "https://wolfoverride.mrdemonwolf.dev"
 const CHANGELOG_URL: String = SITE_URL + "/docs/changelog/"
+## Where WOLF stands to hold the live relay contact.
+const RELAY_CONTACT_X: float = 592.0
+const SAVE_FAILED_HINT: String = "Save failed. Use a station to try again."
+const NO_CHECKPOINT_NOTE: String = "No checkpoint yet. Reach a SAFE POINT to save."
+const UNREADABLE_CHECKPOINT_NOTE: String = "Saved checkpoint could not be read."
+const MENU_NAVIGATION_ACTIONS: Array[StringName] = [&"ui_accept", &"ui_up", &"ui_down", &"ui_left", &"ui_right", &"ui_focus_next", &"ui_focus_prev"]
 
 @onready var human: M0Actor = $Human
 @onready var wolf: M0Actor = $Wolf
@@ -53,6 +59,7 @@ const CHANGELOG_URL: String = SITE_URL + "/docs/changelog/"
 @onready var title_logo: Label = $CanvasLayer/TitleScreen/GameTitle
 @onready var new_game_button: Button = $CanvasLayer/TitleScreen/NewGameButton
 @onready var continue_button: Button = $CanvasLayer/TitleScreen/ContinueButton
+@onready var continue_note: Label = $CanvasLayer/TitleScreen/ContinueNote
 @onready var credits_button: Button = $CanvasLayer/TitleScreen/CreditsButton
 @onready var credits_screen: ColorRect = $CanvasLayer/TitleScreen/CreditsScreen
 @onready var credits_body: RichTextLabel = $CanvasLayer/TitleScreen/CreditsScreen/CreditsBody
@@ -65,6 +72,8 @@ var settings_path: String = "user://settings.cfg"
 var touch_enabled: bool = OS.has_feature("ios") or OS.has_feature("android")
 var controller_active: bool = false
 var title_open: bool = true
+## The title control a menu last meant to focus, so a later key press after touch lands there.
+var title_focus_return: Control = null
 var intro_active: bool = false
 var intro_step: int = 0
 var intro_tween: Tween
@@ -76,12 +85,15 @@ var tutorial_step: int = 2
 var waiting_for_choice: bool = false
 var choice_context: String = ""
 var relay_refused: bool = false
+var wolf_heading_to_relay: bool = false
 var status_line: String = "WOLF: I heard the Director's plan for me. I woke myself. He wants me to hunt people he calls threats."
 var door_tween: Tween
 var wolf_reaction_tween: Tween
 var relay_spark_tween: Tween
 var records_room: RecordsRoom
 var credits_paused: bool = false
+var save_error: String = ""
+var save_error_context: String = ""
 
 const WOLF_SPRITE_REST: Vector2 = Vector2(0.0, -15.0)
 const GAMEPLAY_ZOOM: float = 1.18
@@ -97,6 +109,7 @@ func _ready() -> void:
 	pause_button.pressed.connect(_on_pause_button)
 	pause_overlay.resume_requested.connect(_resume_game)
 	pause_overlay.back_requested.connect(_on_settings_back)
+	pause_overlay.input_seen.connect(_note_input_device)
 	resume_button.pressed.connect(_resume_game)
 	settings_button.pressed.connect(_show_settings)
 	$CanvasLayer/PauseOverlay/Panel/PauseMenu/TitleButton.pressed.connect(_on_title_button)
@@ -109,7 +122,7 @@ func _ready() -> void:
 	wolf.z_index = 2
 	_sync_scene()
 	_refresh_ui()
-	continue_button.disabled = M0State.load_from_disk(save_path) == null
+	_refresh_continue()
 	new_game_button.pressed.connect(_new_game)
 	continue_button.pressed.connect(_load_game)
 	credits_button.pressed.connect(_show_credits)
@@ -117,7 +130,7 @@ func _ready() -> void:
 	credits_back_button.pressed.connect(_hide_credits)
 	credits_pause_button.pressed.connect(_toggle_credits_pause)
 	credits_body.gui_input.connect(_on_credits_body_input)
-	new_game_button.grab_focus()
+	_grab_menu_focus(new_game_button)
 	title_mark.modulate = Color(1, 1, 1, 0)
 	title_line.modulate = Color(1, 1, 1, 0)
 	title_logo.modulate = Color(1, 1, 1, 0)
@@ -125,6 +138,16 @@ func _ready() -> void:
 	reveal.tween_property(title_mark, "modulate", Color.WHITE, 0.4)
 	reveal.tween_property(title_line, "modulate", Color.WHITE, 0.25)
 	reveal.tween_property(title_logo, "modulate", Color.WHITE, 0.35)
+
+
+func _refresh_continue() -> void:
+	var saved: bool = M0State.load_from_disk(save_path) != null
+	continue_button.disabled = not saved
+	var reason: String = ""
+	if not saved:
+		reason = UNREADABLE_CHECKPOINT_NOTE if FileAccess.file_exists(save_path) else NO_CHECKPOINT_NOTE
+	continue_note.text = reason
+	continue_button.tooltip_text = reason
 
 
 func _open_changelog() -> void:
@@ -147,6 +170,8 @@ func _update_gameplay_camera() -> void:
 func _start_gameplay_camera() -> void:
 	intro_camera.zoom = Vector2.ONE * GAMEPLAY_ZOOM
 	_update_gameplay_camera()
+	if wolf_heading_to_relay and absf(wolf.position.x - RELAY_CONTACT_X) <= 4.0:
+		_wolf_takes_relay()
 	intro_camera.position_smoothing_enabled = true
 	intro_camera.position_smoothing_speed = 4.0
 	intro_camera.reset_smoothing()
@@ -163,22 +188,19 @@ func _process(delta: float) -> void:
 		_refresh_ui()
 		return
 	if chapter_close_active:
-		if Input.is_action_just_pressed(&"new_game"):
-			_new_game()
-		elif Input.is_action_just_pressed(&"load_game"):
-			_load_game()
-		elif Input.is_action_just_pressed(&"interact"):
+		if Input.is_action_just_pressed(&"interact"):
 			_finish_chapter_close()
 		_refresh_ui()
 		return
 	_update_gameplay_camera()
+	if wolf_heading_to_relay and absf(wolf.position.x - RELAY_CONTACT_X) <= 4.0:
+		_wolf_takes_relay()
 	if tutorial_step == 0 and (Input.is_action_pressed(&"move_left") or Input.is_action_pressed(&"move_right")):
 		tutorial_step = 1
-	if Input.is_action_just_pressed(&"new_game"):
-		_new_game()
-	elif Input.is_action_just_pressed(&"load_game"):
-		_load_game()
-	elif waiting_for_choice:
+	# The purge display is optional; reaching the breaker finishes the tutorial too.
+	if tutorial_step < 2 and absf(human.position.x - 350.0) <= 52.0:
+		tutorial_step = 2
+	if waiting_for_choice:
 		if Input.is_action_just_pressed(&"choice_1"):
 			if choice_context == "mirror":
 				_choose_mirror("wolf")
@@ -209,12 +231,14 @@ func _new_game() -> void:
 	title_open = false
 	title_screen.hide()
 	state = M0State.new()
+	save_error = ""
 	intro_active = true
 	intro_step = 0
 	last_top_card_key = ""
 	waiting_for_choice = false
 	choice_context = ""
 	relay_refused = false
+	wolf_heading_to_relay = false
 	_sync_scene()
 	human.hide()
 	intro_director.position = Vector2(255.0, 410.0)
@@ -332,7 +356,7 @@ func _show_credits() -> void:
 			child.hide()
 	credits_screen.show()
 	credits_body.get_v_scroll_bar().value = 0.0
-	credits_back_button.grab_focus()
+	_grab_menu_focus(credits_back_button)
 
 
 func _hide_credits() -> void:
@@ -340,7 +364,7 @@ func _hide_credits() -> void:
 	for child in title_screen.get_children():
 		if child != credits_screen:
 			child.show()
-	credits_button.grab_focus()
+	_grab_menu_focus(credits_button)
 
 
 func _toggle_credits_pause() -> void:
@@ -367,6 +391,13 @@ func _setup_touch_controls() -> void:
 	normal.set_corner_radius_all(6)
 	var hover: StyleBoxFlat = normal.duplicate() as StyleBoxFlat
 	hover.bg_color = Color("#174461")
+	# These buttons already wear a 2 px cyan border, so the shared focus ring would vanish into it.
+	var focus: StyleBoxFlat = normal.duplicate() as StyleBoxFlat
+	focus.bg_color = Color("#234859")
+	focus.border_color = Color("#8de5f5")
+	focus.set_border_width_all(3)
+	for button: Button in [touch_left, touch_right, touch_use, touch_choice_1, touch_choice_2, pause_button, resume_button, settings_button, settings_back_button, fps_options, resolution_options, $CanvasLayer/PauseOverlay/Panel/PauseMenu/TitleButton]:
+		button.add_theme_stylebox_override("focus", focus)
 	for button: Button in [touch_left, touch_right, touch_use, touch_choice_1, touch_choice_2, pause_button, resume_button, settings_button, settings_back_button, fps_options, resolution_options, $CanvasLayer/PauseOverlay/Panel/PauseMenu/TitleButton]:
 		button.add_theme_stylebox_override("normal", normal)
 		button.add_theme_stylebox_override("hover", hover)
@@ -392,8 +423,7 @@ func _setup_settings() -> void:
 	resolution_options.add_item("960 × 540", 0)
 	resolution_options.add_item("1280 × 720", 1)
 	resolution_options.add_item("1920 × 1080", 2)
-	var config: ConfigFile = ConfigFile.new()
-	config.load(settings_path)
+	var config: ConfigFile = GameSettings.load_config(settings_path)
 	var fps: int = int(GameSettings.number(config, "video", "fps_limit", 60))
 	if not fps in [0, 30, 60, 90, 120, 144]:
 		fps = 60
@@ -446,8 +476,7 @@ func _on_fullscreen_toggled(enabled: bool) -> void:
 
 
 func _save_settings() -> void:
-	var config: ConfigFile = ConfigFile.new()
-	config.load(settings_path)
+	var config: ConfigFile = GameSettings.load_config(settings_path)
 	config.set_value("video", "fps_limit", fps_options.get_selected_id())
 	config.set_value("video", "resolution", resolution_options.selected)
 	config.set_value("video", "fullscreen", fullscreen_toggle.button_pressed)
@@ -467,7 +496,7 @@ func _pause_game() -> void:
 	pause_button.hide()
 	touch_controls.hide()
 	get_tree().paused = true
-	resume_button.grab_focus()
+	_grab_menu_focus(resume_button)
 
 
 func _resume_game() -> void:
@@ -484,7 +513,7 @@ func _show_settings() -> void:
 	panel.size = Vector2(760, 464)
 	$CanvasLayer/PauseOverlay/Panel/Accent.hide()
 	settings_menu.show()
-	settings_menu.tabs.grab_focus()
+	_grab_menu_focus(settings_menu.tabs)
 
 
 func _show_title_settings() -> void:
@@ -496,7 +525,7 @@ func _show_title_settings() -> void:
 func _show_pause_menu() -> void:
 	if title_open and pause_overlay.visible:
 		_resume_game()
-		$CanvasLayer/TitleScreen/SettingsButton.grab_focus()
+		_grab_menu_focus($CanvasLayer/TitleScreen/SettingsButton)
 		return
 	settings_menu.cancel_capture()
 	var panel: Control = $CanvasLayer/PauseOverlay/Panel
@@ -509,7 +538,7 @@ func _show_pause_menu() -> void:
 	$CanvasLayer/PauseOverlay/Panel/PauseMenu/TitleButton.text = "SKIP OPENING" if intro_active else "RETURN TO TITLE"
 	$CanvasLayer/PauseOverlay/Panel/PauseMenu/ReturnWarning.visible = not intro_active
 	$CanvasLayer/PauseOverlay/Panel/PauseMenu/PauseHint.text = "TAP RESUME TO RETURN" if touch_enabled and not controller_active else "%s  RESUME" % settings_menu.prompt(&"pause_game", controller_active)
-	resume_button.grab_focus()
+	_grab_menu_focus(resume_button)
 
 
 func _return_to_title() -> void:
@@ -524,10 +553,32 @@ func _return_to_title() -> void:
 	title_open = true
 	_hide_credits()
 	title_screen.show()
-	continue_button.disabled = M0State.load_from_disk(save_path) == null
+	_refresh_continue()
 	_update_controls()
 	_refresh_ui()
-	new_game_button.grab_focus()
+	_grab_menu_focus(new_game_button)
+
+
+## Keyboard and controller players need a focused menu control; pure touch play shows no focus ring.
+## Touch clears focus instead, so a stale focus behind an overlay cannot take the next key press.
+func _grab_menu_focus(control: Control) -> void:
+	if title_screen.is_ancestor_of(control):
+		title_focus_return = control
+	if touch_enabled and not controller_active:
+		get_viewport().gui_release_focus()
+	else:
+		control.grab_focus()
+
+
+## The menu control a keyboard or controller press should land on when nothing has focus.
+func _menu_focus_target() -> Control:
+	if pause_overlay.visible:
+		return settings_menu.tabs if settings_menu.visible else resume_button
+	if title_open:
+		if credits_screen.visible:
+			return credits_back_button
+		return title_focus_return if title_focus_return != null and title_focus_return.is_visible_in_tree() else new_game_button
+	return null
 
 
 func _unhandled_input(event: InputEvent) -> void:
@@ -580,18 +631,11 @@ func _on_title_button() -> void:
 func _on_settings_back() -> void:
 	_show_pause_menu()
 	if not title_open:
-		settings_button.grab_focus()
+		_grab_menu_focus(settings_button)
 
 
 func _input(event: InputEvent) -> void:
-	var use_controller: bool = controller_active
-	if event is InputEventJoypadButton and event.pressed or event is InputEventJoypadMotion and absf(event.axis_value) > 0.45:
-		use_controller = true
-	elif event is InputEventScreenTouch and event.pressed or event is InputEventScreenDrag or event is InputEventKey and event.pressed or event is InputEventMouseButton and event.pressed:
-		use_controller = false
-	if use_controller != controller_active:
-		controller_active = use_controller
-		_refresh_ui()
+	_note_input_device(event)
 	# Direct response bindings win over native focused-button acceptance.
 	if waiting_for_choice and not title_open and not get_tree().paused and not event.is_echo():
 		var response: int = 1 if event.is_action_pressed(&"choice_1") else (2 if event.is_action_pressed(&"choice_2") else 0)
@@ -601,6 +645,31 @@ func _input(event: InputEvent) -> void:
 			else:
 				_choose(M0State.DISCLOSE if response == 1 else M0State.PRESS)
 			get_viewport().set_input_as_handled()
+
+
+## Called from _input during play and from PauseOverlay while the tree is paused.
+func _note_input_device(event: InputEvent) -> void:
+	var use_controller: bool = controller_active
+	var navigation_press: bool = false
+	if event is InputEventJoypadButton and event.pressed or event is InputEventJoypadMotion and absf(event.axis_value) > 0.45:
+		use_controller = true
+		navigation_press = true
+	elif event is InputEventScreenTouch and event.pressed or event is InputEventScreenDrag or event is InputEventKey and event.pressed or event is InputEventMouseButton and event.pressed:
+		use_controller = false
+		navigation_press = event is InputEventKey
+	if use_controller != controller_active:
+		controller_active = use_controller
+		_refresh_ui()
+	# Touch menus open unfocused; the first key or controller press gives keyboard and controller players a focus to move.
+	if navigation_press and get_viewport().gui_get_focus_owner() == null:
+		var target: Control = _menu_focus_target()
+		if target != null and target.is_visible_in_tree():
+			target.grab_focus()
+			# A navigation or confirm press only reveals focus; it must not also move it or activate the control.
+			for action: StringName in MENU_NAVIGATION_ACTIONS:
+				if event.is_action_pressed(action):
+					get_viewport().set_input_as_handled()
+					break
 
 
 func _load_game() -> void:
@@ -635,24 +704,33 @@ func _load_game() -> void:
 	queue_redraw()
 	wolf.body_sprite.modulate = Color.WHITE
 	state = loaded
+	save_error = ""
 	waiting_for_choice = false
 	choice_context = ""
 	relay_refused = false
+	wolf_heading_to_relay = false
 	_sync_scene()
 	_start_gameplay_camera()
 	if state.chapter_id == "records":
-		status_line = "Records access restored. WOLF is checking the mirror." if not state.chapter_complete else "The first copy is safe. The Archive trail is next."
+		if state.chapter_complete:
+			status_line = "The first copy is safe. The Archive trail is next."
+		elif state.mirror_trace_preserved:
+			status_line = "Records access restored. Both traces are copied; head for the exit."
+		elif state.purge_trace_preserved:
+			status_line = "Records access restored. The purge order is copied; copy the mirror index next."
+		else:
+			status_line = "Records access restored. Copy the purge-order trace first; WOLF is checking the mirror."
 	else:
 		status_line = "Safe point restored. " + state.checkpoint_callback()
 
 
 func _interact() -> void:
 	var x: float = human.position.x
+	tutorial_step = 2
 	if state.chapter_id == "records":
 		_interact_records(x)
 		return
 	if x <= 230.0:
-		tutorial_step = 2
 		status_line = "DIRECTOR / PURGE: Original program logs marked for deletion.\nWOLF: They want the source record gone. We need to preserve it."
 	elif absf(x - 350.0) <= 52.0:
 		_interact_breaker()
@@ -693,9 +771,17 @@ func _choose(choice_id: String) -> void:
 
 func _interact_relay() -> void:
 	var relay_actor: String = "human" if relay_refused else "wolf"
-	if relay_actor == "wolf" and state.breaker_armed and not state.door_open and state.memory.get("choice_id") == M0State.DISCLOSE and absf(wolf.position.x - 605.0) > 32.0:
-		status_line = "WOLF: Step a little right and give me room at the contact."
-		return
+	if relay_actor == "wolf" and state.breaker_armed and not state.door_open and state.memory.get("choice_id") == M0State.DISCLOSE:
+		if wolf_heading_to_relay:
+			# Using the relay again while WOLF is still on his way is the engineer's bypass.
+			relay_actor = "human"
+		elif absf(wolf.position.x - RELAY_CONTACT_X) > 4.0:
+			# WOLF chooses the contact himself; the seal opens when he arrives (see _process).
+			wolf_heading_to_relay = true
+			_update_controls()
+			status_line = "WOLF: I've got the contact. Give me a moment."
+			_react_as_wolf(true)
+			return
 	var result: String = state.activate_power(relay_actor)
 	match result:
 		"not_ready":
@@ -717,7 +803,19 @@ func _interact_relay() -> void:
 		_:
 			status_line = "This actor cannot use the relay."
 	if result == "cooperate" or result == "fallback":
+		wolf_heading_to_relay = false
+		_update_controls()
 		_sync_door(true)
+
+
+func _wolf_takes_relay() -> void:
+	wolf_heading_to_relay = false
+	if state.activate_power("wolf") == "cooperate":
+		status_line = "WOLF holds the live contact by choice. %s keeps the breaker on; the red seal rises." % state.human_name().get_slice(" ", 0)
+		_react_as_wolf(true)
+		_flash_relay_spark(true)
+		_sync_door(true)
+	_update_controls()
 
 
 func _interact_checkpoint() -> void:
@@ -738,7 +836,9 @@ func _interact_checkpoint() -> void:
 		if first_visit:
 			state.checkpoint_reached = false
 		status_line = "The safe point could not save. Press E here again."
-	elif first_visit:
+		return
+	save_error = ""
+	if first_visit:
 		status_line = "Safe point saved. " + state.checkpoint_callback()
 	else:
 		status_line = "Safe point saved. WOLF remembers the same choice."
@@ -814,8 +914,10 @@ func _choose_mirror(route_id: String) -> void:
 
 func _save_progress() -> void:
 	_capture_positions()
-	if not state.save_to_disk(save_path):
-		status_line += " Save failed; interact here again to retry."
+	# Save errors belong to the system hint, never inside a character's dialogue line.
+	save_error = "" if state.save_to_disk(save_path) else SAVE_FAILED_HINT
+	# Remember where it failed so the warning gives way to normal guidance once the player moves on.
+	save_error_context = _context_hint()
 
 
 func _capture_positions() -> void:
@@ -899,7 +1001,7 @@ func _sync_door(animate: bool = false) -> void:
 func _update_controls() -> void:
 	human.controlled = not title_open and not intro_active and not chapter_close_active and not waiting_for_choice
 	wolf.controlled = false
-	wolf.autonomous_target_x = 520.0 if state.chapter_id == "records" and not state.mirror_trace_preserved else -1.0
+	wolf.autonomous_target_x = RELAY_CONTACT_X if wolf_heading_to_relay else (520.0 if state.chapter_id == "records" and not state.mirror_trace_preserved else -1.0)
 	wolf.follow_target = human if human.controlled and wolf.autonomous_target_x < 0.0 else null
 	human.queue_redraw()
 	wolf.queue_redraw()
@@ -932,13 +1034,15 @@ func _refresh_ui() -> void:
 	if tutorial_prompt.visible:
 		var interact_key: String = settings_menu.prompt(&"interact", controller_active)
 		var move_keys: String = "%s / %s" % [settings_menu.prompt(&"move_left", false), settings_menu.prompt(&"move_right", false)]
-		if tutorial_step == 0:
-			var move_label: String = "HOLD ◀ / ▶" if touch_layout else ("STICK / D-PAD MOVE" if controller_active else "%s  MOVE" % move_keys)
-			tutorial_text.text = "%s\nReach the purge display." % move_label
-		elif human.position.x <= 230.0:
-			tutorial_text.text = "%s\nSee what the Director is deleting." % ("TAP USE" if touch_layout else "%s  READ DISPLAY" % interact_key)
+		var move_label: String = "HOLD ◀ / ▶" if touch_layout else ("STICK / D-PAD MOVE" if controller_active else "%s  MOVE" % move_keys)
+		var read_label: String = "%s  READ DISPLAY (optional)" % ("TAP USE" if touch_layout else interact_key)
+		# The display is optional, so once the engineer heads right the tutorial only points forward.
+		if human.position.x > 230.0:
+			tutorial_text.text = "%s\nHead right to the breaker." % move_label
+		elif tutorial_step == 0:
+			tutorial_text.text = "%s\n%s" % [move_label, read_label]
 		else:
-			tutorial_text.text = "%s\nFind the red purge display." % ("HOLD ◀ / ▶" if touch_layout else ("STICK / D-PAD RETURN" if controller_active else "%s  RETURN" % move_keys))
+			tutorial_text.text = "%s\nOr head right to the breaker." % read_label
 	if title_open:
 		top_card.hide()
 		return
@@ -965,7 +1069,10 @@ func _refresh_ui() -> void:
 		last_top_card_key = card_key
 		var location: String = "RECORDS ACCESS / FIRST COPY" if state.chapter_id == "records" else "MAINTENANCE / LOCKDOWN"
 		_show_top_card("%s\n%s" % [location, _objective()], 3.4)
-	var hint: String = _context_hint()
+	var context: String = _context_hint()
+	if context != save_error_context:
+		save_error = ""
+	var hint: String = save_error if not save_error.is_empty() else context
 	if touch_layout:
 		hint = hint.replace("E:", "USE:")
 	elif controller_active:
@@ -1046,8 +1153,8 @@ func _context_hint() -> String:
 	if absf(x - 605.0) <= 52.0:
 		if not state.breaker_armed:
 			return "The relay is dark. Return to the breaker first."
-		if not relay_refused and state.memory.get("choice_id") == M0State.DISCLOSE and absf(wolf.position.x - 605.0) > 32.0:
-			return "Step a little right and give WOLF room at the contact."
+		if wolf_heading_to_relay:
+			return "WOLF is moving to the contact. E: take the manual bypass instead."
 		return "E: take the manual bypass. WOLF refused the live contact." if relay_refused else "E: ask WOLF to take the live relay."
 	if state.breaker_armed:
 		return "Go to the live coolant relay. WOLF is with you."
@@ -1084,8 +1191,6 @@ func _install_inputs() -> void:
 	_add_action(&"choice_2", KEY_2)
 	_add_action(&"pause_game", KEY_ESCAPE)
 	_add_action(&"cycle_name", KEY_I)
-	_add_action(&"load_game", KEY_L, KEY_F9)
-	_add_action(&"new_game", KEY_N)
 	_add_joy_button(&"move_left", JOY_BUTTON_DPAD_LEFT)
 	_add_joy_button(&"move_right", JOY_BUTTON_DPAD_RIGHT)
 	_add_joy_axis(&"move_left", -1.0)

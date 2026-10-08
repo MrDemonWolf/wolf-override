@@ -7,11 +7,21 @@ These are development updates to the source build, not downloadable releases. Th
 
 ## October 8, 2026
 
+- After you tell WOLF about the relay risk, he walks to the contact himself; you no longer have to find the exact spot. Using the relay again while he is walking takes the engineer's bypass instead.
+- Removed the N (new run) and L/F9 (load checkpoint) hotkeys, which discarded unsaved progress without warning. Use Pause, then Return to Title, then New Game or Continue.
 - Pause during the opening now pauses instead of skipping; choose **Skip Opening** from Pause to go straight to play.
 - On Android, Back backs out of menus and pauses play instead of closing the game; it only closes the game from the title screen.
 - Switching away from the game during play pauses it.
 - Returning to the title no longer leaves an unanswered choice that a later key press could answer.
 - In-game changelog and credits links point at wolfoverride.mrdemonwolf.dev.
+- Settings files are now read safely: damaged, oversized or unexpected content is ignored and default settings load instead.
+- When Continue is unavailable, a note under it says whether no checkpoint exists yet or the saved checkpoint could not be read.
+- When entering Records Access, copying a trace or securing the exit fails to save, the hint line now says so instead of a character's dialogue, and tells you to use a station to try again; normal hints return once you move on or a later save works.
+- If the checkpoint file is missing or damaged, Continue uses a complete save that was still being written when the game closed, and Continue keeps working with saves made before small wording changes.
+- Continuing in Records Access now tells you which copy is next or that the exit is open.
+- Title, credits and Pause menus now use the same cyan selection outline as Settings, drawn inside each button, and Settings sliders now use it too; Pause menu buttons and the Settings **BACK**, FPS limit and resolution controls also thicken and fill so the selection stands out from their border.
+- Menus opened by touch no longer show a selection outline; the first arrow key or controller press selects a menu item without activating it. With a keyboard or controller, closing title Settings by **BACK**, Esc, controller B or Android Back returns the selection to **SETTINGS**; after closing it by touch, the first arrow key or controller press selects **SETTINGS**.
+- The opening tutorial now matches the objective card: it marks the nearby display as optional, points toward your first goal instead of sending you back, clears when you reach that goal or interact with anything, and sits clear of the display and station art.
 
 ## October 7, 2026
 
