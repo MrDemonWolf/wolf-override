@@ -255,7 +255,7 @@ static func load_from_disk(path: String = SAVE_PATH) -> M0State:
 	var loaded: M0State = _read_checkpoint(path)
 	if loaded != null:
 		return loaded
-	# A crash between writing the temporary file and renaming it leaves the newest checkpoint there.
+	# Only used when the main checkpoint is missing or unreadable, e.g. the first save or a rename that removed the old file first.
 	var temp_path: String = path + ".tmp"
 	var recovered: M0State = _read_checkpoint(temp_path)
 	if recovered != null:

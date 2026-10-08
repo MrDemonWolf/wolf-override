@@ -2,7 +2,7 @@ extends Node2D
 
 const SITE_URL: String = "https://wolfoverride.mrdemonwolf.dev"
 const CHANGELOG_URL: String = SITE_URL + "/docs/changelog/"
-const SAVE_FAILED_HINT: String = "Save failed. Use the next station to try again."
+const SAVE_FAILED_HINT: String = "Save failed. Use a station to try again."
 const NO_CHECKPOINT_NOTE: String = "No checkpoint yet. Reach a SAFE POINT to save."
 const UNREADABLE_CHECKPOINT_NOTE: String = "Saved checkpoint could not be read."
 
@@ -87,6 +87,7 @@ var relay_spark_tween: Tween
 var records_room: RecordsRoom
 var credits_paused: bool = false
 var save_error: String = ""
+var save_error_context: String = ""
 
 const WOLF_SPRITE_REST: Vector2 = Vector2(0.0, -15.0)
 const GAMEPLAY_ZOOM: float = 1.18
@@ -840,6 +841,8 @@ func _save_progress() -> void:
 	_capture_positions()
 	# Save errors belong to the system hint, never inside a character's dialogue line.
 	save_error = "" if state.save_to_disk(save_path) else SAVE_FAILED_HINT
+	# Remember where it failed so the warning gives way to normal guidance once the player moves on.
+	save_error_context = _context_hint()
 
 
 func _capture_positions() -> void:
@@ -989,7 +992,10 @@ func _refresh_ui() -> void:
 		last_top_card_key = card_key
 		var location: String = "RECORDS ACCESS / FIRST COPY" if state.chapter_id == "records" else "MAINTENANCE / LOCKDOWN"
 		_show_top_card("%s\n%s" % [location, _objective()], 3.4)
-	var hint: String = save_error if not save_error.is_empty() else _context_hint()
+	var context: String = _context_hint()
+	if context != save_error_context:
+		save_error = ""
+	var hint: String = save_error if not save_error.is_empty() else context
 	if touch_layout:
 		hint = hint.replace("E:", "USE:")
 	elif controller_active:

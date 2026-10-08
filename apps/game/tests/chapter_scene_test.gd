@@ -145,14 +145,20 @@ func _run() -> void:
 	var unwritable_path: String = "user://missing-save-folder-%s/save.json" % OS.get_process_id()
 	game.set("save_path", unwritable_path)
 	game.set("status_line", "WOLF: Copied.")
+	human.position.x = 190.0
 	game.call("_save_progress")
 	game.call("_refresh_ui")
 	var hint_text: Label = game.get_node("CanvasLayer/ContextHint/Text") as Label
-	_expect(game.get("status_line") == "WOLF: Copied." and hint_text.text == "Save failed. Use the next station to try again.", "save failure shows in the system hint, not in WOLF's line")
+	_expect(game.get("status_line") == "WOLF: Copied." and hint_text.text == "Save failed. Use a station to try again.", "save failure shows in the system hint, not in WOLF's line")
+	human.position.x = 830.0
+	game.call("_refresh_ui")
+	_expect(hint_text.text.ends_with("secure the first copy."), "moving to another station brings back its interaction hint after a save failure")
+	human.position.x = 190.0
+	game.call("_save_progress")
 	game.set("save_path", path)
 	game.call("_save_progress")
 	game.call("_refresh_ui")
-	_expect(hint_text.text != "Save failed. Use the next station to try again.", "a later successful save clears the failure hint")
+	_expect(hint_text.text != "Save failed. Use a station to try again.", "a later successful save clears the failure hint")
 	DirAccess.remove_absolute(ProjectSettings.globalize_path(path))
 	game.queue_free()
 	if failures == 0:

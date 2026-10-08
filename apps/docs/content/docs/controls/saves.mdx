@@ -11,9 +11,9 @@ There is one checkpoint file, not multiple save slots. Loading a missing or inva
 
 When **Continue** is unavailable, a short note under it says why: **No checkpoint yet** means you have not saved at a safe point, and **Saved checkpoint could not be read** means the checkpoint file is damaged. Reaching the safe point in a new run replaces a damaged file.
 
-Entering Records Access, copying a trace there and securing the exit also save your progress. If one of those saves fails, the hint line shows **Save failed. Use the next station to try again.** Progress since the last successful save is stored once a later save works. If the first safe-point save fails, the safe point stays unused so you can use it again.
+Entering Records Access, copying a trace there and securing the exit also save your progress. If one of those saves fails, the hint line shows **Save failed. Use a station to try again.** until you move to another spot. Using the same station again tries the save again; if entering Records Access did not save, the first station there does. Progress since the last successful save is stored once a later save works. If the first safe-point save fails, the safe point stays unused so you can use it again.
 
-If the game closes while it is writing a save, Continue recovers the save that was being written when it is complete and valid.
+If the checkpoint file is missing or damaged but a complete save was still being written when the game closed, Continue uses that save instead.
 
 ## Leave or restart
 
