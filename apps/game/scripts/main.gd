@@ -396,7 +396,7 @@ func _setup_touch_controls() -> void:
 	focus.bg_color = Color("#234859")
 	focus.border_color = Color("#8de5f5")
 	focus.set_border_width_all(3)
-	for button: Button in [touch_left, touch_right, touch_use, touch_choice_1, touch_choice_2, pause_button, resume_button, settings_button, $CanvasLayer/PauseOverlay/Panel/PauseMenu/TitleButton]:
+	for button: Button in [touch_left, touch_right, touch_use, touch_choice_1, touch_choice_2, pause_button, resume_button, settings_button, settings_back_button, fps_options, resolution_options, $CanvasLayer/PauseOverlay/Panel/PauseMenu/TitleButton]:
 		button.add_theme_stylebox_override("focus", focus)
 	for button: Button in [touch_left, touch_right, touch_use, touch_choice_1, touch_choice_2, pause_button, resume_button, settings_button, settings_back_button, fps_options, resolution_options, $CanvasLayer/PauseOverlay/Panel/PauseMenu/TitleButton]:
 		button.add_theme_stylebox_override("normal", normal)
