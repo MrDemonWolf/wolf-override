@@ -1,51 +1,58 @@
-'use client';
-import { useEffect, useState } from 'react';
+import { Fragment } from 'react';
 import Link from 'next/link';
 
-type Platform = 'windows' | 'macos' | 'ios' | 'android';
-const platforms: Record<Platform, string> = { windows: 'Windows', macos: 'macOS', ios: 'iPhone / iPad', android: 'Android' };
-const channels: { platform: Platform; name: string; detail: string }[] = [
-  { platform: 'windows', name: 'Windows download', detail: 'Direct desktop download' },
-  { platform: 'macos', name: 'macOS download', detail: 'Direct desktop download' },
-  { platform: 'macos', name: 'Mac App Store', detail: 'Store distribution' },
-  { platform: 'macos', name: 'Homebrew', detail: 'Install from your terminal' },
-  { platform: 'ios', name: 'iOS / iPadOS App Store', detail: 'iPhone and iPad' },
-  { platform: 'android', name: 'Google Play', detail: 'Android phones and tablets' },
-];
+/** The one place the landing page sends players for the current source build. */
+export const sourceBuildHref = '/docs/get-game/';
 
-export function detectPlatform(ua: string, platform: string, touchPoints: number): Platform | '' {
-  if (/Android/i.test(ua)) return 'android';
-  if (/iPhone|iPad|iPod/i.test(ua) || (platform === 'MacIntel' && touchPoints > 1)) return 'ios';
-  if (/Mac/i.test(ua)) return 'macos';
-  if (/Windows/i.test(ua)) return 'windows';
-  return '';
+/** Planned distribution targets. None has a package or a release date yet. */
+export const plannedPlatforms = [
+  { name: 'Windows', status: 'no release date' },
+  { name: 'macOS', status: 'no release date' },
+  { name: 'iPhone / iPad', status: 'no release date' },
+  { name: 'Android', status: 'no release date' },
+] as const;
+
+export function ArrowIcon() {
+  return (
+    <svg aria-hidden="true" className="size-5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M5 12h14M13 6l6 6-6 6" />
+    </svg>
+  );
 }
 
 export default function Downloads() {
-  const [platform, setPlatform] = useState<Platform | ''>('');
-  useEffect(() => {
-    setPlatform(detectPlatform(navigator.userAgent, navigator.platform, navigator.maxTouchPoints));
-  }, []);
-  const preferred = channels.filter(channel => channel.platform === platform);
-  const other = channels.filter(channel => channel.platform !== platform);
-  const card = (channel: typeof channels[number]) => (
-    <div key={channel.name} className="marketing-download" title="Coming soon — no download is available yet">
-      <span className="marketing-download-platform">{platforms[channel.platform]}</span>
-      <button type="button" disabled aria-describedby="download-note">{channel.name}</button>
-      <span className="marketing-download-detail">{channel.detail}</span>
-      <span className="marketing-coming-soon">Coming soon</span>
-    </div>
-  );
   return (
-    <section id="downloads" className="marketing-downloads" aria-labelledby="downloads-title">
-      <div className="marketing-width">
-        <p className="marketing-kicker">Choose your way into THE DEN</p>
-        <div className="marketing-download-heading"><h2 id="downloads-title" tabIndex={-1}>Try the source build.</h2><p id="download-note">Packaged releases are still in development; there is no packaged game download yet. Windows, macOS, iPhone/iPad and Android releases are planned, but no public release date is set. Run the current development build with Godot.</p></div>
-        <div className="marketing-source-note"><div><strong>Want to try it now?</strong><p>Download the source snapshot and follow the Godot setup guide. It is a development build, not an installer.</p></div><Link className="marketing-secondary marketing-source-link" href="/docs/get-game/">Get the source build <span aria-hidden="true">→</span></Link></div>
-        <div className="marketing-platform-picker"><label htmlFor="platform">Your platform</label><span className="marketing-platform-select"><select id="platform" value={platform} onChange={event => setPlatform(event.target.value as Platform | '')}><option value="">Choose a platform</option>{Object.entries(platforms).map(([value, label]) => <option key={value} value={value}>{label}</option>)}</select></span><p>Suggested from your browser. You can choose any platform.</p></div>
-        {platform && <div className="marketing-preferred"><h3>Planned for {platforms[platform]}</h3><div className="marketing-download-grid">{preferred.map(card)}</div></div>}
-        <details className="marketing-other-platforms"><summary>{platform ? 'Other platforms & planned channels' : 'View all planned channels'}</summary><div className="marketing-download-grid">{other.map(card)}</div></details>
-        <div className="marketing-download-links"><Link className="marketing-inline" href="/docs/get-game/">Get the game: source build guide →</Link><Link className="marketing-inline" href="/docs/changelog/">Follow the changelog →</Link></div>
+    <section
+      id="downloads"
+      aria-labelledby="downloads-title"
+      className="border-y border-line bg-surface bg-[radial-gradient(circle_at_85%_8%,rgba(67,162,201,.14),transparent_42%)] py-18 min-[701px]:py-24"
+    >
+      <div className="marketing-width grid gap-10 min-[701px]:grid-cols-[minmax(0,1.2fr)_minmax(0,1fr)] min-[701px]:items-start min-[701px]:gap-16">
+        <div>
+          <p className="hud-label mb-5">Get the build</p>
+          <h2 id="downloads-title" tabIndex={-1}>Try the source build.</h2>
+          <p className="m-0 max-w-[50ch] text-body text-muted">
+            There is no packaged game download yet. The current development build runs from source in Godot; it is not an installer and has no release date.
+          </p>
+          <Link
+            href={sourceBuildHref}
+            className="mt-8 inline-flex min-h-13 items-center justify-between gap-5 rounded-control border border-accent bg-accent px-5 py-3 font-heading text-body font-bold text-ink transition-[filter,transform] hover:-translate-y-px hover:text-ink hover:brightness-105 motion-reduce:transition-none motion-reduce:hover:translate-y-0 max-[700px]:w-full"
+          >
+            Get the source build
+            <ArrowIcon />
+          </Link>
+        </div>
+        <div className="rounded-card border border-line-strong bg-ink p-6">
+          <h3 className="m-0 font-heading text-body font-bold">Planned platforms:</h3>
+          <dl className="mt-4 grid grid-cols-[auto_minmax(0,1fr)] gap-x-6 gap-y-3 text-body">
+            {plannedPlatforms.map((platform) => (
+              <Fragment key={platform.name}>
+                <dt className="font-heading font-semibold">{platform.name}</dt>
+                <dd className="m-0 text-muted">{platform.status}</dd>
+              </Fragment>
+            ))}
+          </dl>
+        </div>
       </div>
     </section>
   );

@@ -18,9 +18,9 @@
   --color-line-strong: #5a7896;
   --color-accent: #8be3ff;
 
-  --text-label: .78rem;
-  --text-label--line-height: 1.2;
-  --text-label--letter-spacing: .13em;
+  --text-label: .875rem;
+  --text-label--line-height: 1.4;
+  --text-label--letter-spacing: .12em;
   --text-body: 1rem;
   --text-body--line-height: 1.6;
   --text-lead: clamp(1rem, 1.45vw, 1.2rem);
@@ -44,6 +44,26 @@
 @theme inline static {
   --font-sans: var(--font-roboto), Helvetica, Arial, Lucida, sans-serif;
   --font-heading: var(--font-montserrat), Helvetica, Arial, Lucida, sans-serif;
+}
+
+/*
+ * Small uppercase label (section eyebrows, hero meta lines, feature indexes).
+ * Montserrat with tracking and tabular numerals; the label size never drops
+ * below .875rem so it stays readable on phones. Colour defaults to the accent
+ * and can be overridden with a text-* utility.
+ */
+@layer components {
+  .hud-label {
+    margin: 0;
+    color: var(--color-accent);
+    font-family: var(--font-heading);
+    font-size: var(--text-label);
+    font-weight: 600;
+    line-height: var(--text-label--line-height);
+    letter-spacing: var(--text-label--letter-spacing);
+    font-variant-numeric: tabular-nums;
+    text-transform: uppercase;
+  }
 }
 
 :root {
