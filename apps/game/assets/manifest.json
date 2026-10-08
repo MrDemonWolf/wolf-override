@@ -16,11 +16,11 @@
     {
       "asset_id": "wolf-side-right-provisional",
       "path": "apps/game/assets/wolf-side-right-provisional.png",
-      "source_or_tool": "ChatGPT Create image via Chrome in the MDW WOLF//OVERRIDE [Game] project",
+      "source_or_tool": "ChatGPT Create image via Chrome in the MDW WOLF//OVERRIDE [Game] project; ImageMagick used for transparent canvas extension",
       "source_reference": "Create wolf concept sheet chat in the private game project, September 28, 2026; revised game-scale prompt and conversation URL retained in ignored art notes",
       "terms_reference": "https://openai.com/policies/terms-of-use/",
       "rights_review_status": "Provisional AI-assisted character art, human reviewed. Final commercial asset-rights review remains open; not covered by the code/docs GPL license.",
-      "modifications": "Selected second, higher-contrast 1774x887 RGBA generation with transparency; displayed as a scaled static side-view Sprite2D and flipped when WOLF moves left. No pixel edits.",
+      "modifications": "Selected the second, higher-contrast 1774x887 RGBA generation with transparency; extended the canvas by 64 transparent pixels on all sides to 1902x1015 with ImageMagick, preserving every original pixel exactly. Displayed as a scaled static side-view Sprite2D and flipped when WOLF moves left.",
       "implementation_status": "Provisional WOLF sprite used in the corridor and Records Access; animation and final art direction pending."
     },
     {
@@ -36,22 +36,22 @@
     {
       "asset_id": "director-side-left-provisional",
       "path": "apps/game/assets/director-side-left-provisional.png",
-      "source_or_tool": "ChatGPT Create image via Chrome in the MDW WOLF//OVERRIDE [Game] project",
-      "source_reference": "https://chatgpt.com/g/g-p-6ab60b48c7608191987f04a81b04b5e2-wolf-override-game/c/6abb8e65-0574-83ea-812c-5695a8d27eff",
+      "source_or_tool": "ChatGPT Pro image edit via Chrome in the MDW WOLF//OVERRIDE [Game] project; Remove BG applied to final output",
+      "source_reference": "Retained in private art notes (conversation link not published)",
       "terms_reference": "https://openai.com/policies/terms-of-use/",
       "rights_review_status": "Provisional AI-assisted character art, human reviewed. Final commercial asset-rights review remains open; not covered by the code/docs GPL license.",
-      "modifications": "Original 1024x1536 RGBA generation with transparent background. Shown as a scaled static side-profile Sprite2D in the opening cutscene; source pixels unchanged.",
+      "modifications": "Revised the original photorealistic cutout toward Rowan’s inked, faceted cel-shaded style, then removed the background. Final 1024x1536 RGBA profile sprite.",
       "implementation_status": "Provisional Director appearance in the opening cutscene."
     },
     {
       "asset_id": "title-corridor-key-art-provisional",
       "path": "apps/game/assets/title-corridor-key-art-provisional.png",
       "published_copy": "apps/docs/public/title-corridor-key-art-provisional.png",
-      "source_or_tool": "ChatGPT Create image via Chrome in the MDW WOLF//OVERRIDE [Game] project",
+      "source_or_tool": "ChatGPT Create image via Chrome in the MDW WOLF//OVERRIDE [Game] project; 2026-10-07 edit with the Codex built-in image_gen tool (edit mode)",
       "source_reference": "Create wolf concept sheet chat in the private game project, September 28, 2026; title composition prompt and conversation URL retained in ignored art notes",
       "terms_reference": "https://openai.com/policies/terms-of-use/",
       "rights_review_status": "Provisional AI-assisted title art, human reviewed. Final commercial asset-rights review remains open; not covered by the code/docs GPL license.",
-      "modifications": "Original 1672x941 RGB image, with Rowan and WOLF at the left of a research corridor and dark space for live title/menu text at the right. No pixel edits or baked-in lettering.",
+      "modifications": "Original 1672x941 RGB image, with Rowan and WOLF at the left of a research corridor and dark space for live title/menu text at the right. No pixel edits or baked-in lettering. 2026-10-07: WOLF's head redrawn to remove an extra ear; the rest of the composition was kept (about 0.6% of pixels changed).",
       "implementation_status": "Provisional cinematic title background in the Godot title screen and public landing page; a 960x540 renderer-backed title frame was visually inspected."
     },
     {
@@ -61,7 +61,7 @@
       "source_reference": "https://chatgpt.com/g/g-p-6ab60b48c7608191987f04a81b04b5e2-wolf-override-game/c/6abb82fd-5d14-83e9-9332-a78148b708b2",
       "terms_reference": "https://openai.com/policies/terms-of-use/",
       "rights_review_status": "Provisional AI-assisted environment art, human review in progress. Final commercial asset-rights review remains open; not covered by the code/docs GPL license.",
-      "modifications": "Original 1672x941 RGB image generated without characters, stations or UI. Displayed behind live Godot corridor props with a vertical offset; source pixels unchanged.",
+      "modifications": "Original 1672x941 RGB image generated without characters, stations or UI. Displayed at 960x540 to preserve the source 16:9 ratio, vertically offset behind live Godot corridor props; source pixels unchanged.",
       "implementation_status": "Provisional gameplay background for the maintenance corridor."
     },
     {
@@ -71,7 +71,7 @@
       "source_reference": "https://chatgpt.com/g/g-p-6ab60b48c7608191987f04a81b04b5e2-wolf-override-game/c/6abb82fd-5d14-83e9-9332-a78148b708b2",
       "terms_reference": "https://openai.com/policies/terms-of-use/",
       "rights_review_status": "Provisional AI-assisted environment art, human review in progress. Final commercial asset-rights review remains open; not covered by the code/docs GPL license.",
-      "modifications": "Original 1672x941 RGB image generated as a matching archival bay without characters, stations or UI. Displayed behind live Godot Records props with a vertical offset; source pixels unchanged.",
+      "modifications": "Original 1672x941 RGB image generated as a matching archival bay without characters, stations or UI. Displayed at 960x540 to preserve the source 16:9 ratio, vertically offset behind live Godot Records props; source pixels unchanged.",
       "implementation_status": "Provisional gameplay background for Records Access."
     },
     {
@@ -101,7 +101,7 @@
       "source_reference": "apps/game/scenes/main.tscn and scripts/main.gd on September 30, 2026; New Game, intro finished, purge display read, engineer walked to the relay with isolated save/settings",
       "rights_review_status": "Derivative screenshot using the registered provisional game art. Underlying commercial asset-rights review remains open; no new third-party artwork acquired.",
       "modifications": "Updated 960x540 scripted normal-renderer still after the closer following camera and raised gameplay framing. No image edits. Not a full hands-on route or release acceptance test.",
-      "implementation_status": "Public marketing gameplay section, labeled development frame with provisional art/UI."
+      "implementation_status": "Archived public gameplay frame, captured September 30, 2026, before the in-game font and theme update. The station layout and route remain representative; control labels may differ. Do not present it as a current interface capture."
     },
     {
       "asset_id": "terminal-title-source-build-capture",
@@ -110,10 +110,32 @@
       "source_reference": "apps/game/scenes/main.tscn; title menu at game startup with isolated save/settings",
       "rights_review_status": "Derivative screenshot using the registered provisional title art and logo. Underlying commercial asset-rights review remains open; no new third-party artwork acquired.",
       "modifications": "960x540 scripted renderer still, no image edits. Not a full hands-on route or release acceptance test.",
-      "implementation_status": "Public marketing title-menu frame, labeled development build."
+      "implementation_status": "Archived September 30, 2026 title-menu screenshot. The New Game option remains the starting point, but title copy, fonts, and layout are outdated. May be used only as dated historical context in the first-steps guide; do not present it as the current interface."
+    },
+    {
+      "asset_id": "roboto-variable-font",
+      "path": "apps/game/assets/fonts/Roboto-Variable.ttf",
+      "published_copy": "apps/docs/public/fonts/Roboto-Variable.ttf",
+      "source_or_tool": "Locally installed Google Fonts variable font, copied byte-for-byte from the developer's font library",
+      "source_reference": "https://fonts.google.com/specimen/Roboto",
+      "terms_reference": "SIL Open Font License 1.1; bundled license text is in apps/game/assets/fonts/Roboto-OFL.txt and apps/docs/public/fonts/Roboto-OFL.txt",
+      "rights_review_status": "Redistributed unchanged under SIL Open Font License 1.1; license text included beside both bundled copies.",
+      "modifications": "No font outlines changed. Used as the game and Docs reading font; Godot selects the regular weight through FontVariation.",
+      "implementation_status": "Bundled locally for the game and Docs website."
+    },
+    {
+      "asset_id": "montserrat-variable-font",
+      "path": "apps/game/assets/fonts/Montserrat-Variable.ttf",
+      "published_copy": "apps/docs/public/fonts/Montserrat-Variable.ttf",
+      "source_or_tool": "Locally installed Google Fonts variable font, copied byte-for-byte from the developer's font library",
+      "source_reference": "https://fonts.google.com/specimen/Montserrat",
+      "terms_reference": "SIL Open Font License 1.1; bundled license text is in apps/game/assets/fonts/Montserrat-OFL.txt and apps/docs/public/fonts/Montserrat-OFL.txt",
+      "rights_review_status": "Redistributed unchanged under SIL Open Font License 1.1; license text included beside both bundled copies.",
+      "modifications": "No font outlines changed. Used for headings and controls; Godot selects semibold and bold weights through FontVariation.",
+      "implementation_status": "Bundled locally for the game and Docs website."
     }
   ],
-  "status": "One provisional brand mark, three provisional character images, one title background, two gameplay backgrounds, two prop sheets and two derivative marketing captures recorded; no audio acquired.",
+  "status": "One provisional brand mark, three provisional character images, one title background, two gameplay backgrounds, two prop sheets, two derivative marketing captures, and the Roboto and Montserrat font families recorded; no audio acquired.",
   "merge_warning": "Preserve this populated provenance register when merging future handoffs.",
   "future_entry_fields": [
     "asset_id",

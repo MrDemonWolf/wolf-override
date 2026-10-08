@@ -131,8 +131,8 @@ func _open_changelog() -> void:
 
 
 func _draw() -> void:
-	draw_rect(Rect2(0, 0, 960, 540), Color("#091533"))
-	draw_texture_rect(CORRIDOR_BACKGROUND, Rect2(0, 0, 960, 680), false)
+	draw_rect(Rect2(0, 0, 960, 680), Color("#091533"))
+	draw_texture_rect(CORRIDOR_BACKGROUND, Rect2(0, 60, 960, 540), false)
 	if state.door_open:
 		draw_line(Vector2(801, 434), Vector2(844, 434), Color("#70d9a7"), 4.0)
 
