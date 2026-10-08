@@ -174,7 +174,7 @@ func _run() -> void:
 	Input.parse_input_event(_controller_button(JOY_BUTTON_A, false))
 	await process_frame
 	_expect(game.get("title_open") and game.get("controller_active") and new_game.has_focus(), "the first controller press on an unfocused touch title focuses New Game without starting a game")
-	# A touch-opened pause menu keeps its first controller press as a focus reveal, even B (ui_cancel).
+	# On a touch-opened pause menu, B is still the cancel press: it resumes rather than only revealing focus.
 	game.set("touch_enabled", true)
 	game.set("controller_active", false)
 	new_game.pressed.emit()
@@ -186,8 +186,7 @@ func _run() -> void:
 	await process_frame
 	Input.parse_input_event(_controller_button(JOY_BUTTON_B, false))
 	await process_frame
-	_expect(paused and overlay.visible and (game.get("resume_button") as Button).has_focus(), "the first controller B on a touch-opened pause menu reveals focus without closing it")
-	game.call("_resume_game")
+	_expect(not paused and not overlay.visible, "controller B on a touch-opened pause menu resumes play like any cancel press")
 	game.set("touch_enabled", false)
 	Engine.max_fps = old_fps
 	DirAccess.remove_absolute(ProjectSettings.globalize_path(path))
