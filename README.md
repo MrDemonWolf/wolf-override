@@ -130,11 +130,11 @@ without deleting it.
 From the repository root, run the game checks:
 
 ```bash
-godot --headless --path apps/game --import
-godot --headless --path apps/game --script res://tests/m0_state_test.gd
-godot --headless --path apps/game --script res://tests/m0_scene_test.gd
-godot --headless --path apps/game --script res://tests/chapter_scene_test.gd
+bun run game:check
 ```
+
+This imports the project and runs every headless suite with a temporary user
+data folder, so your own saves are untouched.
 
 To work on the public docs site, install its declared dependencies and
 start the local server:

@@ -3,10 +3,14 @@
   "private": true,
   "license": "GPL-3.0-or-later",
   "packageManager": "bun@1.4.2",
-  "workspaces": ["apps/*"],
+  "workspaces": [
+    "apps/*"
+  ],
   "scripts": {
     "docs:dev": "bun run --filter docs dev",
     "docs:check": "bun run --filter docs types:check",
-    "docs:build": "bun run --filter docs build"
+    "docs:build": "bun run --filter docs build",
+    "docs:test": "bun run --filter docs test",
+    "game:check": "scripts/check-game.sh"
   }
 }
