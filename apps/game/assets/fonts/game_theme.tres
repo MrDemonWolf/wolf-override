@@ -1,0 +1,13 @@
+[gd_resource type="Theme" load_steps=3 format=3]
+
+[ext_resource type="FontVariation" path="res://assets/fonts/Roboto-Regular.tres" id="1_body"]
+[ext_resource type="FontVariation" path="res://assets/fonts/Montserrat-Semibold.tres" id="2_controls"]
+
+[resource]
+default_font = ExtResource("1_body")
+default_font_size = 16
+Button/fonts/font = ExtResource("2_controls")
+CheckButton/fonts/font = ExtResource("2_controls")
+OptionButton/fonts/font = ExtResource("2_controls")
+PopupMenu/fonts/font = ExtResource("2_controls")
+TabBar/fonts/font = ExtResource("2_controls")

@@ -130,11 +130,11 @@ without deleting it.
 From the repository root, run the game checks:
 
 ```bash
-godot --headless --path apps/game --import
-godot --headless --path apps/game --script res://tests/m0_state_test.gd
-godot --headless --path apps/game --script res://tests/m0_scene_test.gd
-godot --headless --path apps/game --script res://tests/chapter_scene_test.gd
+bun run game:check
 ```
+
+This imports the project and runs every headless suite with a temporary user
+data folder, so your own saves are untouched.
 
 To work on the public docs site, install its declared dependencies and
 start the local server:
@@ -205,7 +205,8 @@ Copyright 2026 MrDemonWolf, Inc. Game source code and public docs use
 [GPL-3.0-or-later](LICENSE). The provisional logo, character sprites, title
 art, room backgrounds, and machine props are separate assets with AI-assisted provenance
 recorded in [the asset register](apps/game/assets/manifest.json); they are not covered
-by the code/docs GPL. Final asset, audio, branding and store-package rights
+by the code/docs GPL. The bundled Roboto and Montserrat fonts use the SIL
+Open Font License 1.1, with the license text beside each copy. Final asset, audio, branding and store-package rights
 and release review remain open.
 
 ## Contact

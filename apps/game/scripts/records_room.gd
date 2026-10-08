@@ -55,8 +55,8 @@ func refresh_state() -> void:
 
 
 func _draw() -> void:
-	draw_rect(Rect2(0, 0, 960, 540), Color("#071221"))
-	draw_texture_rect(RECORDS_BACKGROUND, Rect2(0, 0, 960, 680), false)
+	draw_rect(Rect2(0, 0, 960, 680), Color("#071221"))
+	draw_texture_rect(RECORDS_BACKGROUND, Rect2(0, 60, 960, 540), false)
 
 	_draw_exit()
 	_draw_machine_lights()

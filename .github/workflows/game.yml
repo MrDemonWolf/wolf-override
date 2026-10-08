@@ -17,7 +17,9 @@ jobs:
       run:
         shell: bash
     steps:
-      - uses: actions/checkout@v7
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
       - name: Get pinned Godot 4.7.2
         run: |
           curl --fail --location --retry 3 \
@@ -29,23 +31,16 @@ jobs:
           chmod +x "$godot_bin"
           "$godot_bin" --version
           echo "GODOT_BIN=$godot_bin" >> "$GITHUB_ENV"
-      - name: Import game
-        run: '"$GODOT_BIN" --headless --path apps/game --import 2>&1 | tee "$RUNNER_TEMP/wolf-check-import.log"'
-      - name: Check M0 state
-        run: '"$GODOT_BIN" --headless --path apps/game --script res://tests/m0_state_test.gd 2>&1 | tee "$RUNNER_TEMP/wolf-check-state.log"'
-      - name: Check M0 scene
-        run: '"$GODOT_BIN" --headless --path apps/game --script res://tests/m0_scene_test.gd 2>&1 | tee "$RUNNER_TEMP/wolf-check-corridor.log"'
-      - name: Check first chapter scene
-        run: '"$GODOT_BIN" --headless --path apps/game --script res://tests/chapter_scene_test.gd 2>&1 | tee "$RUNNER_TEMP/wolf-check-chapter.log"'
-      - name: Check UI and controls
-        run: '"$GODOT_BIN" --headless --path apps/game --script res://tests/ui_controls_test.gd 2>&1 | tee "$RUNNER_TEMP/wolf-check-controls.log"'
-      - name: Check settings persistence and rebinding
-        run: '"$GODOT_BIN" --headless --path apps/game --script res://tests/settings_test.gd 2>&1 | tee "$RUNNER_TEMP/wolf-check-settings.log"'
+      - name: Import and run headless checks
+        timeout-minutes: 5
+        env:
+          CHECK_LOG_DIR: ${{ runner.temp }}/wolf-check-logs
+        run: scripts/check-game.sh
       - name: Preserve failed check logs
-        if: failure()
-        uses: actions/upload-artifact@v7
+        if: failure() || cancelled()
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7
         with:
           name: game-check-failure-logs
-          path: ${{ runner.temp }}/wolf-check-*.log
+          path: ${{ runner.temp }}/wolf-check-logs/
           if-no-files-found: ignore
           retention-days: 7

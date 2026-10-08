@@ -152,9 +152,22 @@ func _checkpoint_state(choice_id: String) -> M0State:
 
 func _tap(action: StringName) -> void:
 	await process_frame
+	if action == &"pause_game":
+		# Pause is event-driven, so send a real input event.
+		Input.parse_input_event(_action_event(action, true))
+		await process_frame
+		Input.parse_input_event(_action_event(action, false))
+		return
 	Input.action_press(action)
 	await process_frame
 	Input.action_release(action)
+
+
+func _action_event(action: StringName, pressed: bool) -> InputEventAction:
+	var event: InputEventAction = InputEventAction.new()
+	event.action = action
+	event.pressed = pressed
+	return event
 
 
 func _walk_to(actor: M0Actor, target_x: float) -> bool:
