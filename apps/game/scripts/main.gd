@@ -194,6 +194,9 @@ func _process(delta: float) -> void:
 	_update_gameplay_camera()
 	if tutorial_step == 0 and (Input.is_action_pressed(&"move_left") or Input.is_action_pressed(&"move_right")):
 		tutorial_step = 1
+	# The purge display is optional; reaching the breaker finishes the tutorial too.
+	if tutorial_step < 2 and absf(human.position.x - 350.0) <= 52.0:
+		tutorial_step = 2
 	if Input.is_action_just_pressed(&"new_game"):
 		_new_game()
 	elif Input.is_action_just_pressed(&"load_game"):
@@ -722,11 +725,11 @@ func _load_game() -> void:
 
 func _interact() -> void:
 	var x: float = human.position.x
+	tutorial_step = 2
 	if state.chapter_id == "records":
 		_interact_records(x)
 		return
 	if x <= 230.0:
-		tutorial_step = 2
 		status_line = "DIRECTOR / PURGE: Original program logs marked for deletion.\nWOLF: They want the source record gone. We need to preserve it."
 	elif absf(x - 350.0) <= 52.0:
 		_interact_breaker()
@@ -1010,13 +1013,15 @@ func _refresh_ui() -> void:
 	if tutorial_prompt.visible:
 		var interact_key: String = settings_menu.prompt(&"interact", controller_active)
 		var move_keys: String = "%s / %s" % [settings_menu.prompt(&"move_left", false), settings_menu.prompt(&"move_right", false)]
-		if tutorial_step == 0:
-			var move_label: String = "HOLD ◀ / ▶" if touch_layout else ("STICK / D-PAD MOVE" if controller_active else "%s  MOVE" % move_keys)
-			tutorial_text.text = "%s\nReach the purge display." % move_label
-		elif human.position.x <= 230.0:
-			tutorial_text.text = "%s\nSee what the Director is deleting." % ("TAP USE" if touch_layout else "%s  READ DISPLAY" % interact_key)
+		var move_label: String = "HOLD ◀ / ▶" if touch_layout else ("STICK / D-PAD MOVE" if controller_active else "%s  MOVE" % move_keys)
+		var read_label: String = "%s  READ DISPLAY (optional)" % ("TAP USE" if touch_layout else interact_key)
+		# The display is optional, so once the engineer heads right the tutorial only points forward.
+		if human.position.x > 230.0:
+			tutorial_text.text = "%s\nHead right to the breaker." % move_label
+		elif tutorial_step == 0:
+			tutorial_text.text = "%s\n%s" % [move_label, read_label]
 		else:
-			tutorial_text.text = "%s\nFind the red purge display." % ("HOLD ◀ / ▶" if touch_layout else ("STICK / D-PAD RETURN" if controller_active else "%s  RETURN" % move_keys))
+			tutorial_text.text = "%s\nOr head right to the breaker." % read_label
 	if title_open:
 		top_card.hide()
 		return

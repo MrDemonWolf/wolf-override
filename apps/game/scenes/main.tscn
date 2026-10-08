@@ -314,10 +314,10 @@ vertical_alignment = 1
 
 [node name="TutorialPrompt" type="ColorRect" parent="CanvasLayer"]
 visible = false
-offset_left = 92.0
-offset_top = 189.0
-offset_right = 408.0
-offset_bottom = 255.0
+offset_left = 300.0
+offset_top = 96.0
+offset_right = 616.0
+offset_bottom = 162.0
 mouse_filter = 2
 color = Color(0.025, 0.06, 0.1, 0.91)
 
@@ -333,7 +333,7 @@ offset_top = 9.0
 offset_right = 305.0
 offset_bottom = 57.0
 theme_override_font_sizes/font_size = 17
-text = "A / D  MOVE\nReach the purge display."
+text = "A / D  MOVE\nE  READ DISPLAY (optional)"
 
 [node name="PauseButton" type="Button" parent="CanvasLayer"]
 visible = false

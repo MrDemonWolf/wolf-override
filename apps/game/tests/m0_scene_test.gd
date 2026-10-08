@@ -105,11 +105,20 @@ func _run() -> void:
 	await create_timer(3.9).timeout
 	game.call("_refresh_ui")
 	_expect(not top_card.visible, "gameplay objective card fades without returning each frame")
-	_expect(tutorial_prompt.visible and tutorial_text.text.contains("A / D  MOVE"), "New Game teaches movement after the opening")
+	_expect(tutorial_prompt.visible and tutorial_text.text == "A / D  MOVE\nE  READ DISPLAY (optional)", "New Game teaches movement and offers the nearby display as optional")
+	var breaker_art: Sprite2D = game.get_node("BreakerArt") as Sprite2D
+	var tutorial_rect: Rect2 = tutorial_prompt.get_global_rect()
+	_expect(not tutorial_rect.intersects(purge_terminal_art.get_global_transform_with_canvas() * purge_terminal_art.get_rect()) and not tutorial_rect.intersects(breaker_art.get_global_transform_with_canvas() * breaker_art.get_rect()) and not tutorial_rect.intersects(top_card.get_global_rect()), "tutorial box leaves the purge display, breaker and objective card uncovered")
+	_expect(_widest_line(tutorial_text) <= tutorial_text.size.x, "tutorial lines fit inside the tutorial box")
 	Input.action_press(&"move_right")
 	game.call("_process", 0.016)
 	Input.action_release(&"move_right")
-	_expect(tutorial_prompt.visible and tutorial_text.text.contains("E  READ DISPLAY"), "movement advances the opening interaction hint")
+	_expect(tutorial_prompt.visible and tutorial_text.text == "E  READ DISPLAY (optional)\nOr head right to the breaker.", "movement leaves the display optional and points on to the breaker")
+	game.set("touch_enabled", true)
+	game.call("_refresh_ui")
+	_expect(tutorial_text.text.begins_with("TAP USE  READ DISPLAY (optional)") and _widest_line(tutorial_text) <= tutorial_text.size.x, "touch tutorial line fits inside the tutorial box")
+	game.set("touch_enabled", false)
+	game.call("_refresh_ui")
 	await process_frame
 	await _tap(&"interact")
 	_expect(str(game.get("status_line")).contains("Original program logs marked for deletion"), "purge display establishes evidence stakes without inventory")
@@ -190,8 +199,15 @@ func _run() -> void:
 	game.call("_new_game")
 	game.call("_finish_intro")
 	state = game.get("state") as M0State
+	_expect(game.get("tutorial_step") == 0 and tutorial_prompt.visible, "fresh fallback play starts with the tutorial")
+	if not _require(await _walk_to(human, 270.0), "engineer heads for the breaker without reading the display"):
+		return
+	await process_frame
+	_expect(tutorial_prompt.visible and tutorial_text.text == "A / D  MOVE\nHead right to the breaker." and game.call("_objective") == "CHECK THE BREAKER", "skipping the display keeps the tutorial and objective pointed at the breaker")
 	if not _require(await _walk_to(human, 350.0), "engineer reaches breaker on fresh fallback play"):
 		return
+	await process_frame
+	_expect(game.get("tutorial_step") == 2 and not tutorial_prompt.visible and not str(game.get("status_line")).contains("Original program logs"), "reaching the breaker clears the tutorial without reading the display")
 	await _tap(&"interact")
 	if not _require(game.get("waiting_for_choice"), "fallback opens authored disagreement"):
 		return
@@ -291,6 +307,13 @@ func _action_event(action: StringName, pressed: bool) -> InputEventAction:
 	event.action = action
 	event.pressed = pressed
 	return event
+
+
+func _widest_line(label: Label) -> float:
+	var widest: float = 0.0
+	for line: String in label.text.split("\n"):
+		widest = maxf(widest, label.get_theme_font("font").get_string_size(line, HORIZONTAL_ALIGNMENT_LEFT, -1, label.get_theme_font_size("font_size")).x)
+	return widest
 
 
 func _walk_to(actor: M0Actor, target_x: float) -> bool:
