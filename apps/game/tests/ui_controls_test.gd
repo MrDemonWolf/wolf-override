@@ -65,9 +65,27 @@ func _run() -> void:
 	game.call("_on_fps_selected", 0)
 	var config: ConfigFile = ConfigFile.new()
 	_expect(config.load(path) == OK and Engine.max_fps == 30 and config.get_value("video", "fps_limit") == 30, "FPS cap applies and persists")
-	(game.get_node("CanvasLayer/PauseOverlay/Panel/SettingsMenu/BackButton") as Button).pressed.emit()
-	overlay.resume_requested.emit()
-	_expect(not paused and not overlay.visible and (game.get_node("Human") as M0Actor).controlled, "resume returns to the same playable state")
+	var settings_menu: GameSettings = game.get_node("CanvasLayer/PauseOverlay/Panel/SettingsMenu") as GameSettings
+	settings_menu.begin_capture(&"interact", "keyboard")
+	await _send_escape(true)
+	await _send_escape(false)
+	_expect(paused and overlay.visible and settings_menu.capture_action.is_empty(), "Escape cancels a key rebind without resuming")
+	await _send_escape(true)
+	await _send_escape(false)
+	_expect(paused and overlay.visible and (game.get_node("CanvasLayer/PauseOverlay/Panel/PauseMenu") as Control).visible and not settings_menu.visible, "Escape in Settings returns to the pause menu")
+	await _send_escape(true)
+	await _send_escape(false)
+	await process_frame
+	_expect(not paused and not overlay.visible and (game.get_node("Human") as M0Actor).controlled, "physical Escape resumes and does not re-pause on the same press")
+	await _send_escape(true)
+	await _send_escape(false)
+	_expect(paused and overlay.visible, "physical Escape pauses during play")
+	Input.parse_input_event(_controller_button(JOY_BUTTON_START, true))
+	await process_frame
+	Input.parse_input_event(_controller_button(JOY_BUTTON_START, false))
+	await process_frame
+	await process_frame
+	_expect(not paused and not overlay.visible, "controller Start resumes without re-pausing")
 	var menu: GameSettings = game.get("settings_menu") as GameSettings
 	menu.call("_replace_binding", &"interact", "controller", _controller_button(JOY_BUTTON_B, false))
 	menu.call("_replace_binding", &"choice_2", "controller", _controller_button(JOY_BUTTON_A, false))
@@ -118,6 +136,15 @@ func _controller_button(index: JoyButton, pressed: bool) -> InputEventJoypadButt
 	event.button_index = index
 	event.pressed = pressed
 	return event
+
+
+func _send_escape(pressed: bool) -> void:
+	var event: InputEventKey = InputEventKey.new()
+	event.keycode = KEY_ESCAPE
+	event.physical_keycode = KEY_ESCAPE
+	event.pressed = pressed
+	Input.parse_input_event(event)
+	await process_frame
 
 
 func _expect(condition: bool, label: String) -> void:

@@ -95,6 +95,7 @@ func _ready() -> void:
 	_setup_touch_controls()
 	pause_button.pressed.connect(_on_pause_button)
 	pause_overlay.resume_requested.connect(_resume_game)
+	pause_overlay.back_requested.connect(_on_settings_back)
 	resume_button.pressed.connect(_resume_game)
 	settings_button.pressed.connect(_show_settings)
 	$CanvasLayer/PauseOverlay/Panel/PauseMenu/TitleButton.pressed.connect(_return_to_title)
@@ -156,16 +157,12 @@ func _process(delta: float) -> void:
 			credits_body.get_v_scroll_bar().value += delta * 18.0
 		return
 	if intro_active:
-		if Input.is_action_just_pressed(&"pause_game"):
-			_finish_intro()
-		elif Input.is_action_just_pressed(&"interact"):
+		if Input.is_action_just_pressed(&"interact"):
 			_advance_intro()
 		_refresh_ui()
 		return
 	if chapter_close_active:
-		if Input.is_action_just_pressed(&"pause_game"):
-			_pause_game()
-		elif Input.is_action_just_pressed(&"new_game"):
+		if Input.is_action_just_pressed(&"new_game"):
 			_new_game()
 		elif Input.is_action_just_pressed(&"load_game"):
 			_load_game()
@@ -174,9 +171,6 @@ func _process(delta: float) -> void:
 		_refresh_ui()
 		return
 	_update_gameplay_camera()
-	if Input.is_action_just_pressed(&"pause_game"):
-		_pause_game()
-		return
 	if tutorial_step == 0 and (Input.is_action_pressed(&"move_left") or Input.is_action_pressed(&"move_right")):
 		tutorial_step = 1
 	if Input.is_action_just_pressed(&"new_game"):
@@ -504,6 +498,7 @@ func _show_title_settings() -> void:
 func _show_pause_menu() -> void:
 	if title_open and pause_overlay.visible:
 		_resume_game()
+		$CanvasLayer/TitleScreen/SettingsButton.grab_focus()
 		return
 	settings_menu.cancel_capture()
 	var panel: Control = $CanvasLayer/PauseOverlay/Panel
@@ -537,6 +532,22 @@ func _unhandled_input(event: InputEvent) -> void:
 	if credits_screen.visible and event.is_action_pressed(&"ui_cancel"):
 		_hide_credits()
 		get_viewport().set_input_as_handled()
+		return
+	# Pause is event-driven so the press that resumes from PauseOverlay (handled in its _input)
+	# can never re-pause in the same frame.
+	if title_open or get_tree().paused or event.is_echo() or not event.is_action_pressed(&"pause_game"):
+		return
+	if intro_active:
+		_finish_intro()
+	else:
+		_pause_game()
+	get_viewport().set_input_as_handled()
+
+
+func _on_settings_back() -> void:
+	_show_pause_menu()
+	if not title_open:
+		settings_button.grab_focus()
 
 
 func _input(event: InputEvent) -> void:
