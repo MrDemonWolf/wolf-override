@@ -2,8 +2,13 @@ import Link from 'next/link';
 import ThemeToggle from './theme-toggle';
 import MarketingNavigation from './marketing-navigation';
 import Downloads from './downloads';
+import corridorCapture480 from './images/corridor-start-capture-480.webp';
+import corridorCapture960 from './images/corridor-start-capture-960.webp';
 import './marketing.css';
 import { pageMetadata, siteDescription } from '@/lib/seo';
+
+// Static export has no image optimiser, so the hero ships hand-encoded WebP sizes of the key art.
+const keyArtSrcSet = ['640', '1024', '1672'].map((w) => `/title-corridor-key-art-provisional-${w}.webp ${w}w`).join(', ');
 
 export const metadata = {
   ...pageMetadata('WOLF//OVERRIDE | Sci-fi Horror Adventure', siteDescription, '/'),
@@ -26,7 +31,7 @@ export default function HomePage() {
         <ThemeToggle />
       </header>
       <section className="marketing-hero" aria-labelledby="main-content">
-        <img className="marketing-keyart" src={`${base}/title-corridor-key-art-provisional.png`} width="1672" height="941" alt="An engineer in a red hoodie stands beside the robotic wolf WOLF in a blue-lit research corridor." fetchPriority="high" />
+        <img className="marketing-keyart" src={`${base}/title-corridor-key-art-provisional-1024.webp`} srcSet={keyArtSrcSet} sizes="100vw" width="1672" height="941" alt="An engineer in a red hoodie stands beside the robotic wolf WOLF in a blue-lit research corridor." fetchPriority="high" decoding="async" />
         <div className="marketing-hero-copy">
           <p className="marketing-kicker">Sci-fi horror · In development</p>
           <h1 id="main-content" tabIndex={-1}>WOLF<span>//</span><br />OVERRIDE</h1>
@@ -43,7 +48,7 @@ export default function HomePage() {
       </section>
       <section id="gameplay" className="marketing-play marketing-width" aria-labelledby="play-title">
         <div className="marketing-section-head"><p className="marketing-kicker">The relationship is the game</p><h2 id="play-title" tabIndex={-1}>Find a way forward. Together.</h2><p>The current source build includes a maintenance corridor and Records Access. This is the opening of a larger story.</p></div>
-        <figure className="marketing-game-frame"><a href={`${base}/corridor-source-build.png`} target="_blank" rel="noopener noreferrer" aria-label="Open full-size archived corridor screenshot"><img src={`${base}/corridor-source-build.png`} alt="Archived gameplay frame showing the engineer and WOLF beside the coolant relay, with the breaker, sealed door and safe point visible." width="960" height="540" loading="lazy" /></a><figcaption><strong>Archived gameplay frame</strong><span>Godot capture from September 30, 2026 · Before the current font and UI updates · Provisional art and UI</span></figcaption></figure>
+        <figure className="marketing-game-frame"><a href={corridorCapture960.src} target="_blank" rel="noopener noreferrer" aria-label="Open full-size corridor capture"><img src={corridorCapture960.src} srcSet={`${corridorCapture480.src} 480w, ${corridorCapture960.src} 960w`} sizes="(min-width: 680px) 960px, 100vw" alt="Gameplay frame at the start of the maintenance corridor: the engineer and WOLF stand by the purge display while the objective card reads CHECK THE BREAKER and a tutorial box lists the move and read controls." width={corridorCapture960.width} height={corridorCapture960.height} loading="lazy" decoding="async" /></a><figcaption><strong>Source build capture, October 8, 2026</strong><span>Provisional art and UI</span></figcaption></figure>
         <div className="marketing-features">
           <article><span aria-hidden="true">01</span><h3>Play as the engineer</h3><p>You guide the engineer through THE DEN. WOLF moves and acts independently.</p></article>
           <article><span aria-hidden="true">02</span><h3>Respect his boundaries</h3><p>WOLF may choose to help. If he refuses, take the manual route; essential progress stays in your hands.</p></article>

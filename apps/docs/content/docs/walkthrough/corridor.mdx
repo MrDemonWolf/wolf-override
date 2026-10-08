@@ -3,12 +3,12 @@ title: Maintenance corridor
 description: Optional step-by-step help for the breaker, coolant relay, and safe point.
 ---
 
-import Image from 'next/image';
-import corridor from '../../../public/corridor-source-build.png';
+import corridor480 from '../../../app/images/corridor-start-capture-480.webp';
+import corridor960 from '../../../app/images/corridor-start-capture-960.webp';
 
 **Puzzle solutions for the first source room follow.** For a spoiler-light introduction, use [Start here](/docs/).
 
-<figure className="guide-screenshot"><a href={corridor.src} target="_blank" rel="noopener noreferrer" aria-label="Open full-size archived corridor screenshot"><Image src={corridor} alt="Archived gameplay frame showing the engineer and WOLF at the coolant relay, with labeled corridor stations." unoptimized /></a><figcaption>Archived Godot gameplay frame captured September 30, 2026, before the current font and UI updates. The station layout and route remain representative; control labels may differ.</figcaption></figure>
+<figure className="guide-screenshot"><a href={corridor960.src} target="_blank" rel="noopener noreferrer" aria-label="Open full-size corridor capture"><img src={corridor960.src} srcSet={`${corridor480.src} 480w, ${corridor960.src} 960w`} sizes="(min-width: 680px) 680px, 100vw" alt="Gameplay frame at the start of the maintenance corridor: the engineer and WOLF stand by the purge display at the left, with the BREAKER and COOLANT RELAY labels further right and the objective card reading CHECK THE BREAKER." width={corridor960.width} height={corridor960.height} loading="lazy" decoding="async" /></a><figcaption>Source build capture, October 8, 2026 · Provisional art and UI</figcaption></figure>
 
 ## 1. Read the corridor
 
