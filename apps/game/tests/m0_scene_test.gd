@@ -173,6 +173,8 @@ func _run() -> void:
 	var saved: Dictionary = state.to_dict()
 	game.call("_new_game")
 	await _tap(&"pause_game")
+	_expect(paused and game.get("intro_active"), "Pause during the opening pauses instead of skipping")
+	(game.get_node("CanvasLayer/PauseOverlay/Panel/PauseMenu/TitleButton") as Button).pressed.emit()
 	state = game.get("state") as M0State
 	_expect(state.memory.is_empty() and not state.door_open and human.position == state.human_position, "New Game clears current play")
 	await _tap(&"load_game")

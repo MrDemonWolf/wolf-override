@@ -1,6 +1,7 @@
 extends Node2D
 
-const CHANGELOG_URL: String = "https://mrdemonwolf.github.io/wolf-override/docs/changelog/"
+const SITE_URL: String = "https://wolfoverride.mrdemonwolf.dev"
+const CHANGELOG_URL: String = SITE_URL + "/docs/changelog/"
 
 @onready var human: M0Actor = $Human
 @onready var wolf: M0Actor = $Wolf
@@ -98,7 +99,7 @@ func _ready() -> void:
 	pause_overlay.back_requested.connect(_on_settings_back)
 	resume_button.pressed.connect(_resume_game)
 	settings_button.pressed.connect(_show_settings)
-	$CanvasLayer/PauseOverlay/Panel/PauseMenu/TitleButton.pressed.connect(_return_to_title)
+	$CanvasLayer/PauseOverlay/Panel/PauseMenu/TitleButton.pressed.connect(_on_title_button)
 	$CanvasLayer/TitleScreen/SettingsButton.pressed.connect(_show_title_settings)
 	settings_back_button.pressed.connect(_show_pause_menu)
 	records_room = RecordsRoom.new()
@@ -455,10 +456,7 @@ func _save_settings() -> void:
 
 
 func _on_pause_button() -> void:
-	if intro_active:
-		_finish_intro()
-	else:
-		_pause_game()
+	_pause_game()
 
 
 func _pause_game() -> void:
@@ -508,6 +506,8 @@ func _show_pause_menu() -> void:
 	$CanvasLayer/PauseOverlay/Panel/Accent.show()
 	settings_menu.hide()
 	pause_menu.show()
+	$CanvasLayer/PauseOverlay/Panel/PauseMenu/TitleButton.text = "SKIP OPENING" if intro_active else "RETURN TO TITLE"
+	$CanvasLayer/PauseOverlay/Panel/PauseMenu/ReturnWarning.visible = not intro_active
 	$CanvasLayer/PauseOverlay/Panel/PauseMenu/PauseHint.text = "TAP RESUME TO RETURN" if touch_enabled and not controller_active else "%s  RESUME" % settings_menu.prompt(&"pause_game", controller_active)
 	resume_button.grab_focus()
 
@@ -519,6 +519,8 @@ func _return_to_title() -> void:
 	if chapter_tween != null and chapter_tween.is_running():
 		chapter_tween.kill()
 	chapter_close_active = false
+	waiting_for_choice = false
+	choice_context = ""
 	title_open = true
 	_hide_credits()
 	title_screen.show()
@@ -537,11 +539,42 @@ func _unhandled_input(event: InputEvent) -> void:
 	# can never re-pause in the same frame.
 	if title_open or get_tree().paused or event.is_echo() or not event.is_action_pressed(&"pause_game"):
 		return
-	if intro_active:
-		_finish_intro()
+	_pause_game()
+	get_viewport().set_input_as_handled()
+
+
+func _notification(what: int) -> void:
+	match what:
+		NOTIFICATION_WM_GO_BACK_REQUEST:
+			_handle_back()
+		NOTIFICATION_APPLICATION_PAUSED, NOTIFICATION_APPLICATION_FOCUS_OUT:
+			# Leaving the app mid-play pauses it so nothing advances unseen.
+			if is_node_ready() and not title_open and not get_tree().paused:
+				_pause_game()
+
+
+## Android Back walks out of nested menus one step at a time; it only quits from the bare title.
+func _handle_back() -> void:
+	if not settings_menu.capture_action.is_empty():
+		settings_menu.cancel_capture()
+	elif pause_overlay.visible and settings_menu.visible:
+		_on_settings_back()
+	elif pause_overlay.visible:
+		_resume_game()
+	elif credits_screen.visible:
+		_hide_credits()
+	elif title_open:
+		get_tree().quit()
 	else:
 		_pause_game()
-	get_viewport().set_input_as_handled()
+
+
+func _on_title_button() -> void:
+	if intro_active:
+		_resume_game()
+		_finish_intro()
+	else:
+		_return_to_title()
 
 
 func _on_settings_back() -> void:
@@ -560,7 +593,7 @@ func _input(event: InputEvent) -> void:
 		controller_active = use_controller
 		_refresh_ui()
 	# Direct response bindings win over native focused-button acceptance.
-	if waiting_for_choice and not get_tree().paused and not event.is_echo():
+	if waiting_for_choice and not title_open and not get_tree().paused and not event.is_echo():
 		var response: int = 1 if event.is_action_pressed(&"choice_1") else (2 if event.is_action_pressed(&"choice_2") else 0)
 		if response != 0:
 			if choice_context == "mirror":
@@ -875,7 +908,7 @@ func _update_controls() -> void:
 func _refresh_ui() -> void:
 	var touch_layout: bool = touch_enabled and not controller_active
 	pause_button.visible = not title_open and not pause_overlay.visible
-	pause_button.text = "SKIP" if intro_active else "PAUSE"
+	pause_button.text = "PAUSE"
 	touch_controls.visible = (touch_layout or waiting_for_choice) and not title_open and not pause_overlay.visible
 	var touch_move: bool = not intro_active and not chapter_close_active and not waiting_for_choice
 	touch_left.visible = touch_layout and touch_move
@@ -913,7 +946,7 @@ func _refresh_ui() -> void:
 		if last_top_card_key != "intro":
 			last_top_card_key = "intro"
 			_show_top_card("03:17 / CONTAINMENT\nWOLF//OVERRIDE", 2.6)
-		_set_dialogue(status_line, "TAP CONTINUE  /  SKIP" if touch_layout else "%s  CONTINUE    %s  SKIP" % [settings_menu.prompt(&"interact", controller_active), settings_menu.prompt(&"pause_game", controller_active)])
+		_set_dialogue(status_line, "TAP CONTINUE  /  PAUSE" if touch_layout else "%s  CONTINUE    %s  PAUSE" % [settings_menu.prompt(&"interact", controller_active), settings_menu.prompt(&"pause_game", controller_active)])
 		return
 	if chapter_close_active:
 		if last_top_card_key != "chapter_close":

@@ -17,7 +17,7 @@ func _run() -> void:
 	game.set("save_path", "%s-save.json" % path)
 	root.add_child(game)
 	var changelog: Button = game.get_node("CanvasLayer/TitleScreen/ChangelogButton") as Button
-	_expect(changelog.pressed.is_connected(Callable(game, "_open_changelog")) and str(game.CHANGELOG_URL) == "https://mrdemonwolf.github.io/wolf-override/docs/changelog/", "title changelog points to the public development updates")
+	_expect(changelog.pressed.is_connected(Callable(game, "_open_changelog")) and str(game.CHANGELOG_URL) == "https://wolfoverride.mrdemonwolf.dev/docs/changelog/" and str(game.SITE_URL).begins_with("https://wolfoverride.mrdemonwolf.dev"), "title changelog points to the public development updates")
 	_expect(_has_button(&"interact", JOY_BUTTON_A) and _has_button(&"pause_game", JOY_BUTTON_START), "gamepad action buttons are mapped")
 	_expect(_has_button(&"move_left", JOY_BUTTON_DPAD_LEFT) and _has_button(&"move_right", JOY_BUTTON_DPAD_RIGHT), "gamepad D-pad movement is mapped")
 	game.call("_new_game")
@@ -115,6 +115,39 @@ func _run() -> void:
 	_expect((game.get_node("CanvasLayer/TitleScreen/ContinueButton") as Button).disabled, "returning without a saved checkpoint keeps Continue disabled")
 	new_game.pressed.emit()
 	_expect(game.get("intro_active") and (game.get("state") as M0State).memory.is_empty(), "New Game from the returned title clears the previous remembered choice")
+	# Android Back walks out of menus one step at a time and pauses play instead of quitting.
+	game.call("_new_game")
+	game.call("_finish_intro")
+	await process_frame
+	game.notification(Node.NOTIFICATION_WM_GO_BACK_REQUEST)
+	_expect(paused and overlay.visible, "Back during play opens Pause")
+	(game.get_node("CanvasLayer/PauseOverlay/Panel/PauseMenu/SettingsButton") as Button).pressed.emit()
+	game.notification(Node.NOTIFICATION_WM_GO_BACK_REQUEST)
+	_expect(paused and (game.get_node("CanvasLayer/PauseOverlay/Panel/PauseMenu") as Control).visible and not settings_menu.visible, "Back in Settings returns to Pause")
+	game.notification(Node.NOTIFICATION_WM_GO_BACK_REQUEST)
+	_expect(not paused and not overlay.visible, "Back in Pause resumes play")
+	game.notification(Node.NOTIFICATION_APPLICATION_FOCUS_OUT)
+	_expect(paused and overlay.visible, "losing app focus during play pauses the game")
+	game.call("_resume_game")
+	# Pause during the opening is a real pause; skipping is an explicit menu choice.
+	game.call("_new_game")
+	await process_frame
+	await _send_escape(true)
+	await _send_escape(false)
+	var title_button: Button = game.get_node("CanvasLayer/PauseOverlay/Panel/PauseMenu/TitleButton") as Button
+	_expect(paused and game.get("intro_active") and title_button.text == "SKIP OPENING", "Pause during the opening keeps the opening and offers Skip Opening")
+	title_button.pressed.emit()
+	_expect(not paused and not game.get("intro_active"), "Skip Opening resumes into play")
+	# A choice left open when returning to the title cannot be committed from the title.
+	(game.get_node("Human") as M0Actor).position.x = 350.0
+	game.call("_interact")
+	game.call("_pause_game")
+	title_button.pressed.emit()
+	Input.parse_input_event(_controller_button(JOY_BUTTON_X, true))
+	await process_frame
+	Input.parse_input_event(_controller_button(JOY_BUTTON_X, false))
+	await process_frame
+	_expect(game.get("title_open") and not game.get("waiting_for_choice") and (game.get("state") as M0State).memory.is_empty(), "returning to the title drops a pending choice")
 	Engine.max_fps = old_fps
 	DirAccess.remove_absolute(ProjectSettings.globalize_path(path))
 	game.queue_free()
