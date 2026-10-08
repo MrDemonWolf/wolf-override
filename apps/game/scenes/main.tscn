@@ -354,10 +354,11 @@ text = "A / D  MOVE\nE  READ DISPLAY (optional)"
 
 [node name="PauseButton" type="Button" parent="CanvasLayer"]
 visible = false
-offset_left = 873.0
+offset_left = 854.0
 offset_top = 16.0
 offset_right = 942.0
 offset_bottom = 72.0
+grow_horizontal = 0
 theme_type_variation = &"TouchButton"
 theme_override_font_sizes/font_size = 17
 text = "PAUSE"
@@ -388,10 +389,11 @@ theme_override_font_sizes/font_size = 34
 text = "▶"
 
 [node name="Use" type="Button" parent="CanvasLayer/TouchControls"]
-offset_left = 810.0
+offset_left = 773.0
 offset_top = 345.0
 offset_right = 928.0
 offset_bottom = 435.0
+grow_horizontal = 0
 theme_type_variation = &"TouchButton"
 theme_override_font_sizes/font_size = 23
 text = "USE"
