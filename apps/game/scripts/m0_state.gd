@@ -259,7 +259,12 @@ static func load_from_disk(path: String = SAVE_PATH) -> M0State:
 	var temp_path: String = path + ".tmp"
 	var recovered: M0State = _read_checkpoint(temp_path)
 	if recovered != null:
-		DirAccess.rename_absolute(ProjectSettings.globalize_path(temp_path), ProjectSettings.globalize_path(path))
+		var global_temp: String = ProjectSettings.globalize_path(temp_path)
+		var global_path: String = ProjectSettings.globalize_path(path)
+		# Promote the recovered copy; fall back to copying so the only readable checkpoint never
+		# stays at .tmp, where the next save would overwrite it.
+		if DirAccess.rename_absolute(global_temp, global_path) != OK:
+			DirAccess.copy_absolute(global_temp, global_path)
 	return recovered
 
 

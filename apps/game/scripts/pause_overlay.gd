@@ -11,6 +11,9 @@ func _input(event: InputEvent) -> void:
 	if not visible:
 		return
 	input_seen.emit(event)
+	# A first press on an unfocused touch menu only reveals focus; Main marks it handled.
+	if get_viewport().is_input_handled():
+		return
 	if not (event.is_action_pressed(&"pause_game") or event.is_action_pressed(&"ui_cancel")):
 		return
 	var settings_menu: GameSettings = get_node_or_null("Panel/SettingsMenu") as GameSettings

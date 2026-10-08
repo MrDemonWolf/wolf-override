@@ -151,6 +151,20 @@ func _initialize() -> void:
 		below_floor = records.to_dict()
 		below_floor["positions"]["wolf"][1] = 530.0
 		_expect(State.from_dict(below_floor) == null, "rejects WOLF position below the floor")
+	# A blocked promotion must not lose the only readable checkpoint.
+	var blocked_path: String = "user://m0-blocked-%s.json" % OS.get_process_id()
+	var blocked_state: M0State = M0State.new()
+	blocked_state.record_choice(M0State.DISCLOSE)
+	blocked_state.arm_breaker()
+	blocked_state.activate_power("wolf")
+	blocked_state.reach_checkpoint()
+	blocked_state.save_to_disk(blocked_path)
+	DirAccess.rename_absolute(ProjectSettings.globalize_path(blocked_path), ProjectSettings.globalize_path(blocked_path + ".tmp"))
+	DirAccess.make_dir_absolute(ProjectSettings.globalize_path(blocked_path))
+	var blocked_loaded: M0State = M0State.load_from_disk(blocked_path)
+	_expect(blocked_loaded != null and blocked_loaded.checkpoint_reached and FileAccess.file_exists(blocked_path + ".tmp"), "a recovered checkpoint that cannot be promoted still loads and keeps its temporary copy")
+	DirAccess.remove_absolute(ProjectSettings.globalize_path(blocked_path))
+	DirAccess.remove_absolute(ProjectSettings.globalize_path(blocked_path + ".tmp"))
 	if failures == 0:
 		print("M0 state checks passed")
 	quit(1 if failures > 0 else 0)

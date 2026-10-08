@@ -174,6 +174,21 @@ func _run() -> void:
 	Input.parse_input_event(_controller_button(JOY_BUTTON_A, false))
 	await process_frame
 	_expect(game.get("title_open") and game.get("controller_active") and new_game.has_focus(), "the first controller press on an unfocused touch title focuses New Game without starting a game")
+	# A touch-opened pause menu keeps its first controller press as a focus reveal, even B (ui_cancel).
+	game.set("touch_enabled", true)
+	game.set("controller_active", false)
+	new_game.pressed.emit()
+	game.call("_finish_intro")
+	await process_frame
+	game.call("_pause_game")
+	_expect(paused and root.gui_get_focus_owner() == null, "a touch-opened pause menu starts unfocused")
+	Input.parse_input_event(_controller_button(JOY_BUTTON_B, true))
+	await process_frame
+	Input.parse_input_event(_controller_button(JOY_BUTTON_B, false))
+	await process_frame
+	_expect(paused and overlay.visible and (game.get("resume_button") as Button).has_focus(), "the first controller B on a touch-opened pause menu reveals focus without closing it")
+	game.call("_resume_game")
+	game.set("touch_enabled", false)
 	Engine.max_fps = old_fps
 	DirAccess.remove_absolute(ProjectSettings.globalize_path(path))
 	game.queue_free()
