@@ -456,19 +456,28 @@ text = "CHAPTER 1  /  LOCKDOWN"
 
 [node name="NewGameButton" type="Button" parent="CanvasLayer/TitleScreen"]
 offset_left = 460.0
-offset_top = 365.0
+offset_top = 349.0
 offset_right = 648.0
-offset_bottom = 415.0
+offset_bottom = 399.0
 theme_override_font_sizes/font_size = 21
 text = "NEW GAME"
 
 [node name="ContinueButton" type="Button" parent="CanvasLayer/TitleScreen"]
 offset_left = 664.0
-offset_top = 365.0
+offset_top = 349.0
 offset_right = 852.0
-offset_bottom = 415.0
+offset_bottom = 399.0
 theme_override_font_sizes/font_size = 21
 text = "CONTINUE"
+
+[node name="ContinueNote" type="Label" parent="CanvasLayer/TitleScreen"]
+offset_left = 460.0
+offset_top = 401.0
+offset_right = 852.0
+offset_bottom = 422.0
+theme_override_colors/font_color = Color(0.59, 0.70, 0.77, 1)
+theme_override_font_sizes/font_size = 15
+horizontal_alignment = 2
 
 [node name="CreditsButton" type="Button" parent="CanvasLayer/TitleScreen"]
 offset_left = 460.0

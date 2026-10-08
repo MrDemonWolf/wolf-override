@@ -2,6 +2,9 @@ extends Node2D
 
 const SITE_URL: String = "https://wolfoverride.mrdemonwolf.dev"
 const CHANGELOG_URL: String = SITE_URL + "/docs/changelog/"
+const SAVE_FAILED_HINT: String = "Save failed. Use the next station to try again."
+const NO_CHECKPOINT_NOTE: String = "No checkpoint yet. Reach a SAFE POINT to save."
+const UNREADABLE_CHECKPOINT_NOTE: String = "Saved checkpoint could not be read."
 
 @onready var human: M0Actor = $Human
 @onready var wolf: M0Actor = $Wolf
@@ -53,6 +56,7 @@ const CHANGELOG_URL: String = SITE_URL + "/docs/changelog/"
 @onready var title_logo: Label = $CanvasLayer/TitleScreen/GameTitle
 @onready var new_game_button: Button = $CanvasLayer/TitleScreen/NewGameButton
 @onready var continue_button: Button = $CanvasLayer/TitleScreen/ContinueButton
+@onready var continue_note: Label = $CanvasLayer/TitleScreen/ContinueNote
 @onready var credits_button: Button = $CanvasLayer/TitleScreen/CreditsButton
 @onready var credits_screen: ColorRect = $CanvasLayer/TitleScreen/CreditsScreen
 @onready var credits_body: RichTextLabel = $CanvasLayer/TitleScreen/CreditsScreen/CreditsBody
@@ -82,6 +86,7 @@ var wolf_reaction_tween: Tween
 var relay_spark_tween: Tween
 var records_room: RecordsRoom
 var credits_paused: bool = false
+var save_error: String = ""
 
 const WOLF_SPRITE_REST: Vector2 = Vector2(0.0, -15.0)
 const GAMEPLAY_ZOOM: float = 1.18
@@ -109,7 +114,7 @@ func _ready() -> void:
 	wolf.z_index = 2
 	_sync_scene()
 	_refresh_ui()
-	continue_button.disabled = M0State.load_from_disk(save_path) == null
+	_refresh_continue()
 	new_game_button.pressed.connect(_new_game)
 	continue_button.pressed.connect(_load_game)
 	credits_button.pressed.connect(_show_credits)
@@ -125,6 +130,16 @@ func _ready() -> void:
 	reveal.tween_property(title_mark, "modulate", Color.WHITE, 0.4)
 	reveal.tween_property(title_line, "modulate", Color.WHITE, 0.25)
 	reveal.tween_property(title_logo, "modulate", Color.WHITE, 0.35)
+
+
+func _refresh_continue() -> void:
+	var saved: bool = M0State.load_from_disk(save_path) != null
+	continue_button.disabled = not saved
+	var reason: String = ""
+	if not saved:
+		reason = UNREADABLE_CHECKPOINT_NOTE if FileAccess.file_exists(save_path) else NO_CHECKPOINT_NOTE
+	continue_note.text = reason
+	continue_button.tooltip_text = reason
 
 
 func _open_changelog() -> void:
@@ -209,6 +224,7 @@ func _new_game() -> void:
 	title_open = false
 	title_screen.hide()
 	state = M0State.new()
+	save_error = ""
 	intro_active = true
 	intro_step = 0
 	last_top_card_key = ""
@@ -522,7 +538,7 @@ func _return_to_title() -> void:
 	title_open = true
 	_hide_credits()
 	title_screen.show()
-	continue_button.disabled = M0State.load_from_disk(save_path) == null
+	_refresh_continue()
 	_update_controls()
 	_refresh_ui()
 	new_game_button.grab_focus()
@@ -633,13 +649,21 @@ func _load_game() -> void:
 	queue_redraw()
 	wolf.body_sprite.modulate = Color.WHITE
 	state = loaded
+	save_error = ""
 	waiting_for_choice = false
 	choice_context = ""
 	relay_refused = false
 	_sync_scene()
 	_start_gameplay_camera()
 	if state.chapter_id == "records":
-		status_line = "Records access restored. WOLF is checking the mirror." if not state.chapter_complete else "The first copy is safe. The Archive trail is next."
+		if state.chapter_complete:
+			status_line = "The first copy is safe. The Archive trail is next."
+		elif state.mirror_trace_preserved:
+			status_line = "Records access restored. Both traces are copied; head for the exit."
+		elif state.purge_trace_preserved:
+			status_line = "Records access restored. The purge order is copied; copy the mirror index next."
+		else:
+			status_line = "Records access restored. Copy the purge-order trace first; WOLF is checking the mirror."
 	else:
 		status_line = "Safe point restored. " + state.checkpoint_callback()
 
@@ -736,7 +760,9 @@ func _interact_checkpoint() -> void:
 		if first_visit:
 			state.checkpoint_reached = false
 		status_line = "The safe point could not save. Press E here again."
-	elif first_visit:
+		return
+	save_error = ""
+	if first_visit:
 		status_line = "Safe point saved. " + state.checkpoint_callback()
 	else:
 		status_line = "Safe point saved. WOLF remembers the same choice."
@@ -812,8 +838,8 @@ func _choose_mirror(route_id: String) -> void:
 
 func _save_progress() -> void:
 	_capture_positions()
-	if not state.save_to_disk(save_path):
-		status_line += " Save failed; interact here again to retry."
+	# Save errors belong to the system hint, never inside a character's dialogue line.
+	save_error = "" if state.save_to_disk(save_path) else SAVE_FAILED_HINT
 
 
 func _capture_positions() -> void:
@@ -963,7 +989,7 @@ func _refresh_ui() -> void:
 		last_top_card_key = card_key
 		var location: String = "RECORDS ACCESS / FIRST COPY" if state.chapter_id == "records" else "MAINTENANCE / LOCKDOWN"
 		_show_top_card("%s\n%s" % [location, _objective()], 3.4)
-	var hint: String = _context_hint()
+	var hint: String = save_error if not save_error.is_empty() else _context_hint()
 	if touch_layout:
 		hint = hint.replace("E:", "USE:")
 	elif controller_active:

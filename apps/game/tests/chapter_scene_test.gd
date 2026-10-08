@@ -132,6 +132,27 @@ func _run() -> void:
 	game.call("_sync_scene")
 	game.call("_interact_checkpoint")
 	_expect(str(game.get("status_line")).contains("manual bypass") and not str(game.get("status_line")).contains("I chose the relay"), "Records entry remembers the actual manual route even when the risk was disclosed")
+	state.preserve_purge_trace()
+	state.save_to_disk(path)
+	game.call("_load_game")
+	_expect(str(game.get("status_line")).contains("copy the mirror index"), "Continue after the purge copy points at the mirror index")
+	state = game.get("state") as M0State
+	state.preserve_mirror_trace("manual")
+	state.save_to_disk(path)
+	game.call("_load_game")
+	_expect(str(game.get("status_line")).contains("head for the exit"), "Continue after both copies points at the exit")
+
+	var unwritable_path: String = "user://missing-save-folder-%s/save.json" % OS.get_process_id()
+	game.set("save_path", unwritable_path)
+	game.set("status_line", "WOLF: Copied.")
+	game.call("_save_progress")
+	game.call("_refresh_ui")
+	var hint_text: Label = game.get_node("CanvasLayer/ContextHint/Text") as Label
+	_expect(game.get("status_line") == "WOLF: Copied." and hint_text.text == "Save failed. Use the next station to try again.", "save failure shows in the system hint, not in WOLF's line")
+	game.set("save_path", path)
+	game.call("_save_progress")
+	game.call("_refresh_ui")
+	_expect(hint_text.text != "Save failed. Use the next station to try again.", "a later successful save clears the failure hint")
 	DirAccess.remove_absolute(ProjectSettings.globalize_path(path))
 	game.queue_free()
 	if failures == 0:

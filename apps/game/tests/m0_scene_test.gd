@@ -44,6 +44,10 @@ func _run() -> void:
 
 	if not _require(game.get("title_open") and title_screen.visible and continue_button.disabled, "fresh title disables Continue without a test checkpoint"):
 		return
+	var continue_note: Label = game.get_node("CanvasLayer/TitleScreen/ContinueNote") as Label
+	_expect(continue_note.text == "No checkpoint yet. Reach a SAFE POINT to save." and continue_button.tooltip_text == continue_note.text, "disabled Continue explains that no checkpoint exists yet")
+	var note_width: float = continue_note.get_theme_font("font").get_string_size(continue_note.text, HORIZONTAL_ALIGNMENT_LEFT, -1, continue_note.get_theme_font_size("font_size")).x
+	_expect(note_width <= continue_note.size.x and continue_note.position.y >= continue_button.position.y + continue_button.size.y and continue_note.position.y + continue_note.size.y <= credits_button.position.y, "Continue caption fits between the title button rows")
 	if not _require(title_art.texture != null and title_art.texture.resource_path == "res://assets/title-corridor-key-art-provisional.png", "title shows the corridor artwork"):
 		return
 	if not _require(title_logo.text == "WOLF//OVERRIDE" and title_mark.texture != null and title_mark.texture.resource_path == "res://assets/logo-mark.svg", "title loads the branded WOLF//OVERRIDE logo"):
@@ -247,12 +251,20 @@ func _run() -> void:
 	wolf = game.get_node("Wolf") as M0Actor
 	if not _require(game.get("title_open") and title_screen.visible and not continue_button.disabled, "fresh title enables Continue for the test checkpoint"):
 		return
+	continue_note = game.get_node("CanvasLayer/TitleScreen/ContinueNote") as Label
+	_expect(continue_note.text.is_empty() and continue_button.tooltip_text.is_empty(), "enabled Continue shows no warning caption")
 	continue_button.pressed.emit()
 	state = game.get("state") as M0State
 	if not _require(not game.get("title_open") and not title_screen.visible, "Continue button starts saved play through its signal"):
 		return
 	_expect(state.to_dict() == saved and state.active_actor == "human" and human.controlled and not wolf.controlled and state.route == "fallback" and state.name_index == 1 and state.memory.get("choice_id") == State.PRESS, "Continue restores engineer control, puzzle, identity and one accurate memory")
 	_expect(human.position == state.human_position and wolf.position == state.wolf_position and state.checkpoint_callback().contains(State.CHOICE_TEXT[State.PRESS]), "Continue restores both actor positions and actual callback")
+
+	var unreadable: FileAccess = FileAccess.open(path, FileAccess.WRITE)
+	unreadable.store_string("not a checkpoint")
+	unreadable.close()
+	game.call("_refresh_continue")
+	_expect(continue_button.disabled and continue_note.text == "Saved checkpoint could not be read." and continue_button.tooltip_text == continue_note.text, "disabled Continue explains an unreadable checkpoint")
 
 	DirAccess.remove_absolute(ProjectSettings.globalize_path(path))
 	game.queue_free()

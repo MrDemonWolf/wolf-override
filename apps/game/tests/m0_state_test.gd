@@ -99,6 +99,51 @@ func _initialize() -> void:
 	impossible["version"] = State.SAVE_VERSION + 1
 	_expect(State.from_dict(impossible) == null, "rejects unknown future save version")
 
+	var legacy_wording: Dictionary = state.to_dict()
+	legacy_wording["memory"]["selected_text"] = "Earlier wording of the same choice."
+	var legacy_wording_loaded: M0State = State.from_dict(legacy_wording)
+	_expect(legacy_wording_loaded != null and legacy_wording_loaded.checkpoint_callback().contains("Earlier wording of the same choice."), "older choice wording still loads and is quoted as saved")
+	for bad_text: Variant in ["", "x".repeat(State.MAX_SELECTED_TEXT_LENGTH + 1), 7]:
+		var bad_wording: Dictionary = state.to_dict()
+		bad_wording["memory"]["selected_text"] = bad_text
+		_expect(State.from_dict(bad_wording) == null, "rejects empty, oversized or non-text choice wording")
+
+	var v3_fixture: Variant = JSON.parse_string("""{"version": 3, "identity": {"actor_id": "human", "name_index": 0}, "active_actor": "human",
+		"positions": {"human": [128.0, 410.0], "wolf": [520.0, 423.0]},
+		"memory": {"event_id": "relay_disagreement", "choice_id": "disclose_risk", "selected_text": "The relay may vent coolant. Your call.", "context": "breaker_relay_risk", "sequence": 1, "observed_by": ["human", "wolf"]},
+		"puzzle": {"breaker_armed": true, "door_open": true, "route": "cooperate"}, "checkpoint_reached": true,
+		"chapter_id": "records", "purge_trace_preserved": true, "mirror_trace_preserved": true, "mirror_route": "wolf", "chapter_complete": false}""")
+	var v3_loaded: M0State = State.from_dict(v3_fixture)
+	_expect(v3_loaded != null and v3_loaded.chapter_id == "records" and v3_loaded.purge_trace_preserved and v3_loaded.mirror_trace_preserved and v3_loaded.mirror_route == "wolf" and not v3_loaded.chapter_complete, "literal v3 records save keeps its chapter and both traces")
+
+	var recovery_path: String = "user://m0-state-recovery-%s.json" % OS.get_process_id()
+	_expect(records.save_to_disk(recovery_path), "recovery fixture saves")
+	DirAccess.rename_absolute(ProjectSettings.globalize_path(recovery_path), ProjectSettings.globalize_path(recovery_path + ".tmp"))
+	var recovered: M0State = State.load_from_disk(recovery_path)
+	_expect(recovered != null and recovered.to_dict() == records.to_dict(), "surviving temporary save loads when the main file is missing")
+	_expect(FileAccess.file_exists(recovery_path) and not FileAccess.file_exists(recovery_path + ".tmp"), "recovered temporary save is promoted into place")
+	DirAccess.rename_absolute(ProjectSettings.globalize_path(recovery_path), ProjectSettings.globalize_path(recovery_path + ".tmp"))
+	_write_text(recovery_path, "not json")
+	recovered = State.load_from_disk(recovery_path)
+	_expect(recovered != null and recovered.to_dict() == records.to_dict(), "surviving temporary save replaces an unreadable main file")
+	for leftover: String in [recovery_path, recovery_path + ".tmp"]:
+		if FileAccess.file_exists(leftover):
+			DirAccess.remove_absolute(ProjectSettings.globalize_path(leftover))
+
+	var malformed_bodies: Dictionary = {
+		"non-JSON": "WOLF//OVERRIDE save",
+		"truncated JSON": JSON.stringify(records.to_dict()).left(40),
+		"empty file": "",
+		"JSON array root": "[1, 2, 3]",
+	}
+	var malformed_index: int = 0
+	for label: String in malformed_bodies:
+		var malformed_path: String = "user://m0-state-malformed-%s-%d.json" % [OS.get_process_id(), malformed_index]
+		malformed_index += 1
+		_write_text(malformed_path, malformed_bodies[label])
+		_expect(State.load_from_disk(malformed_path) == null, "rejects a malformed save (%s)" % label)
+		DirAccess.remove_absolute(ProjectSettings.globalize_path(malformed_path))
+
 	if failures == 0:
 		var below_floor: Dictionary = records.to_dict()
 		below_floor["positions"]["human"][1] = 530.0
@@ -109,6 +154,15 @@ func _initialize() -> void:
 	if failures == 0:
 		print("M0 state checks passed")
 	quit(1 if failures > 0 else 0)
+
+
+func _write_text(path: String, body: String) -> void:
+	var file: FileAccess = FileAccess.open(path, FileAccess.WRITE)
+	if file == null:
+		_expect(false, "test file opens for writing: " + path)
+		return
+	file.store_string(body)
+	file.close()
 
 
 func _expect(condition: bool, label: String) -> void:
