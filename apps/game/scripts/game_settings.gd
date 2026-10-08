@@ -7,6 +7,7 @@ const HEADING_FONT: FontVariation = preload("res://assets/fonts/Montserrat-Bold.
 const ACTIONS: Array[StringName] = [&"move_left", &"move_right", &"interact", &"choice_1", &"choice_2", &"pause_game"]
 const ACTION_NAMES: Array[String] = ["Move left", "Move right", "Interact / continue", "Response 1", "Response 2", "Pause"]
 const BUSES: Array[String] = ["Master", "Music", "Effects", "Voice"]
+const MAX_SETTINGS_BYTES: int = 65536
 
 var settings_path: String
 var tabs: TabBar
@@ -29,8 +30,7 @@ func configure(path: String) -> void:
 	for action: StringName in ACTIONS:
 		defaults[action] = InputMap.action_get_events(action)
 	_build_menu()
-	var config: ConfigFile = ConfigFile.new()
-	config.load(settings_path)
+	var config: ConfigFile = load_config(settings_path)
 	vsync.set_pressed_no_signal(boolean(config, "video", "vsync", true))
 	antialiasing.select(clampi(int(number(config, "video", "msaa_2d", 0)), 0, 3))
 	_apply_graphics()
@@ -72,6 +72,37 @@ func configure(path: String) -> void:
 			break
 	_refresh_bindings()
 	select_tab(0)
+
+
+## Reads a settings file without letting it construct objects or load resources.
+## ConfigFile.load parses object and resource forms before any value can be checked.
+static func load_config(path: String) -> ConfigFile:
+	var config: ConfigFile = ConfigFile.new()
+	if not FileAccess.file_exists(path):
+		return config
+	var file: FileAccess = FileAccess.open(path, FileAccess.READ)
+	if file == null:
+		return config
+	if file.get_length() > MAX_SETTINGS_BYTES:
+		file.close()
+		push_warning("Settings file is too large; using defaults.")
+		return config
+	var text: String = file.get_as_text()
+	file.close()
+	# Reject the bare names too, so a comment between a name and "(" cannot slip past.
+	var unsafe: RegEx = RegEx.create_from_string("\\b(Object|Resource|SubResource|ExtResource)\\b")
+	if unsafe.search(text) != null:
+		push_warning("Settings file has unexpected content; using defaults.")
+		return config
+	# A damaged file is expected input here, so report it once as a warning, not an engine error.
+	var printing: bool = Engine.print_error_messages
+	Engine.print_error_messages = false
+	var result: Error = config.parse(text)
+	Engine.print_error_messages = printing
+	if result != OK:
+		push_warning("Settings file could not be read; using defaults.")
+		return ConfigFile.new()
+	return config
 
 
 static func number(config: ConfigFile, section: String, key: String, fallback: float) -> float:
@@ -498,8 +529,7 @@ func reset_controls() -> void:
 
 
 func _save_extra() -> bool:
-	var config: ConfigFile = ConfigFile.new()
-	config.load(settings_path)
+	var config: ConfigFile = load_config(settings_path)
 	config.set_value("video", "vsync", vsync.button_pressed)
 	config.set_value("video", "msaa_2d", antialiasing.selected)
 	for bus: String in BUSES:

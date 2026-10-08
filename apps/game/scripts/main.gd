@@ -392,8 +392,7 @@ func _setup_settings() -> void:
 	resolution_options.add_item("960 × 540", 0)
 	resolution_options.add_item("1280 × 720", 1)
 	resolution_options.add_item("1920 × 1080", 2)
-	var config: ConfigFile = ConfigFile.new()
-	config.load(settings_path)
+	var config: ConfigFile = GameSettings.load_config(settings_path)
 	var fps: int = int(GameSettings.number(config, "video", "fps_limit", 60))
 	if not fps in [0, 30, 60, 90, 120, 144]:
 		fps = 60
@@ -446,8 +445,7 @@ func _on_fullscreen_toggled(enabled: bool) -> void:
 
 
 func _save_settings() -> void:
-	var config: ConfigFile = ConfigFile.new()
-	config.load(settings_path)
+	var config: ConfigFile = GameSettings.load_config(settings_path)
 	config.set_value("video", "fps_limit", fps_options.get_selected_id())
 	config.set_value("video", "resolution", resolution_options.selected)
 	config.set_value("video", "fullscreen", fullscreen_toggle.button_pressed)

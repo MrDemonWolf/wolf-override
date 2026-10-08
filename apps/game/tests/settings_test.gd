@@ -9,6 +9,7 @@ func _initialize() -> void:
 
 
 func _run() -> void:
+	await _check_hostile_settings()
 	var path: String = "user://settings-test-%s.cfg" % OS.get_process_id()
 	var corrupt: ConfigFile = ConfigFile.new()
 	for key: String in ["fps_limit", "resolution", "msaa_2d"]:
@@ -148,6 +149,40 @@ func _run() -> void:
 	if failures == 0:
 		print("Settings persistence and rebinding checks passed")
 	quit(1 if failures > 0 else 0)
+
+
+func _check_hostile_settings() -> void:
+	var pid: int = OS.get_process_id()
+	var path: String = "user://settings-hostile-%s.cfg" % pid
+	var script_path: String = "user://evil-%s.gd" % pid
+	var save_path: String = "user://settings-hostile-save-%s.json" % pid
+	_write_text(script_path, "extends RefCounted\n\n\nstatic func _static_init() -> void:\n\tEngine.set_meta(\"wolf_settings_poc\", true)\n\n\nfunc _init() -> void:\n\tEngine.set_meta(\"wolf_settings_poc\", true)\n")
+	var cases: Dictionary = {
+		"object payload": "[video]\nfps_limit=Object(RefCounted,\"script\":Resource(\"%s\"))\n" % script_path,
+		"truncated file": "[video\nfps_limit=",
+		"oversized file": "[video]\nfps_limit=30\n" + ";".repeat(GameSettings.MAX_SETTINGS_BYTES),
+	}
+	for label: String in cases:
+		_write_text(path, cases[label])
+		var game: Node2D = GAME.instantiate() as Node2D
+		game.set("settings_path", path)
+		game.set("save_path", save_path)
+		root.add_child(game)
+		var menu: GameSettings = game.get("settings_menu") as GameSettings
+		_expect(not Engine.has_meta("wolf_settings_poc"), "%s does not run code from the settings file" % label)
+		_expect(Engine.max_fps == 60 and menu.vsync.button_pressed and (menu.volumes["Music"] as HSlider).value == 100.0 and menu.prompt(&"interact", false) == "E", "%s loads default settings" % label)
+		game.queue_free()
+		await process_frame
+		if Engine.has_meta("wolf_settings_poc"):
+			Engine.remove_meta("wolf_settings_poc")
+	for file: String in [path, script_path, save_path]:
+		DirAccess.remove_absolute(ProjectSettings.globalize_path(file))
+
+
+func _write_text(path: String, text: String) -> void:
+	var file: FileAccess = FileAccess.open(path, FileAccess.WRITE)
+	file.store_string(text)
+	file.close()
 
 
 func _key(code: Key) -> InputEventKey:
