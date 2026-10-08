@@ -28,12 +28,19 @@ func _run() -> void:
 	_expect(title_new_game.get_theme_stylebox("focus") == ring and shared_settings.vsync.get_theme_stylebox("focus") == ring and (shared_settings.volumes["Music"] as HSlider).get_theme_stylebox("focus") == ring and shared_settings.deadzone.get_theme_stylebox("focus") == ring, "title and Settings controls, sliders included, share the theme focus ring")
 	var tab_ring: StyleBoxFlat = shared_settings.tabs.get_theme_stylebox("tab_focus") as StyleBoxFlat
 	_expect(tab_ring != null and tab_ring.border_width_left == 2 and tab_ring.expand_margin_left == -4.0, "settings tabs keep their inset focus ring")
-	var resume_focus: StyleBoxFlat = (game.get_node("CanvasLayer/PauseOverlay/Panel/PauseMenu/ResumeButton") as Button).get_theme_stylebox("focus") as StyleBoxFlat
-	var resume_normal: StyleBoxFlat = (game.get_node("CanvasLayer/PauseOverlay/Panel/PauseMenu/ResumeButton") as Button).get_theme_stylebox("normal") as StyleBoxFlat
-	_expect(resume_focus != null and resume_focus.border_width_left > resume_normal.border_width_left and resume_focus.bg_color.a == 1.0, "pause-menu focus is heavier than the pause-menu button border")
+	# The theme pass gave title, pause and HUD buttons one lifted style: the ring rides over the state fill
+	# instead of replacing it, so it stays wider than the button border and keeps a colour hover never uses.
+	var resume: Button = game.get_node("CanvasLayer/PauseOverlay/Panel/PauseMenu/ResumeButton") as Button
+	var resume_normal: StyleBoxFlat = resume.get_theme_stylebox("normal") as StyleBoxFlat
+	var resume_hover: StyleBoxFlat = resume.get_theme_stylebox("hover") as StyleBoxFlat
+	_expect(resume.get_theme_stylebox("focus") == ring and resume_normal != null and resume_hover != null and ring.border_width_left > resume_normal.border_width_left and not ring.border_color.is_equal_approx(resume_hover.border_color) and resume_normal.shadow_size > 0 and resume_normal.corner_radius_top_left > 0, "pause-menu buttons share the inset ring, heavier than their border and distinct from hover")
+	_expect(title_new_game.get_theme_stylebox("normal") == resume_normal, "title and pause buttons wear the same theme style")
+	# Settings alone keeps the terminal identity: squared controls with the same ring colour and width, squared to match.
 	for bordered_path: String in ["CanvasLayer/PauseOverlay/Panel/SettingsMenu/BackButton", "CanvasLayer/PauseOverlay/Panel/SettingsMenu/FPSOptions", "CanvasLayer/PauseOverlay/Panel/SettingsMenu/ResolutionOptions"]:
 		var bordered: Button = game.get_node(bordered_path) as Button
-		_expect(bordered.get_theme_stylebox("focus") == resume_focus and (bordered.get_theme_stylebox("normal") as StyleBoxFlat).border_width_left < resume_focus.border_width_left, "%s uses the heavier focus style over its cyan border" % bordered.name)
+		var bordered_focus: StyleBoxFlat = bordered.get_theme_stylebox("focus") as StyleBoxFlat
+		var bordered_normal: StyleBoxFlat = bordered.get_theme_stylebox("normal") as StyleBoxFlat
+		_expect(bordered_focus != null and bordered_normal != null and bordered_focus.border_color.is_equal_approx(ring.border_color) and bordered_focus.border_width_left == ring.border_width_left and bordered_focus.expand_margin_left == 0.0 and bordered_focus.bg_color.a == 0.0 and bordered_focus.corner_radius_top_left == 0 and bordered_normal.corner_radius_top_left == 0 and bordered_normal.border_width_left < bordered_focus.border_width_left, "%s keeps a squared terminal ring inside its border" % bordered.name)
 	game.call("_new_game")
 	game.call("_finish_intro")
 	game.set("touch_enabled", true)
@@ -51,7 +58,7 @@ func _run() -> void:
 	use.button_down.emit()
 	await process_frame
 	use.button_up.emit()
-	_expect(game.get("tutorial_step") == 2 and not (game.get_node("CanvasLayer/TutorialPrompt") as ColorRect).visible, "touch use reads the display and clears the tutorial")
+	_expect(game.get("tutorial_step") == 2 and not (game.get_node("CanvasLayer/TutorialPrompt") as Control).visible, "touch use reads the display and clears the tutorial")
 	game.set("waiting_for_choice", true)
 	game.call("_refresh_ui")
 	var first_choice: Button = touch.get_node("Choice1") as Button

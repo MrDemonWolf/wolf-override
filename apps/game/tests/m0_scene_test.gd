@@ -29,13 +29,13 @@ func _run() -> void:
 	var credits_back_button: Button = game.get_node("CanvasLayer/TitleScreen/CreditsScreen/CreditsBackButton") as Button
 	var credits_pause_button: Button = game.get_node("CanvasLayer/TitleScreen/CreditsScreen/CreditsPauseButton") as Button
 	var hud: Label = game.get_node("CanvasLayer/TopBar/HUD") as Label
-	var top_card: ColorRect = game.get_node("CanvasLayer/TopBar") as ColorRect
+	var top_card: Panel = game.get_node("CanvasLayer/TopBar") as Panel
 	var speaker: Label = game.get_node("CanvasLayer/BottomBar/Speaker") as Label
 	var story: Label = game.get_node("CanvasLayer/BottomBar/Story") as Label
-	var context_hint: ColorRect = game.get_node("CanvasLayer/ContextHint") as ColorRect
+	var context_hint: Panel = game.get_node("CanvasLayer/ContextHint") as Panel
 	var choice_1_button: Button = game.get_node("CanvasLayer/TouchControls/Choice1") as Button
 	var choice_2_button: Button = game.get_node("CanvasLayer/TouchControls/Choice2") as Button
-	var tutorial_prompt: ColorRect = game.get_node("CanvasLayer/TutorialPrompt") as ColorRect
+	var tutorial_prompt: Panel = game.get_node("CanvasLayer/TutorialPrompt") as Panel
 	var tutorial_text: Label = game.get_node("CanvasLayer/TutorialPrompt/Text") as Label
 	var human: M0Actor = game.get_node("Human") as M0Actor
 	var wolf: M0Actor = game.get_node("Wolf") as M0Actor

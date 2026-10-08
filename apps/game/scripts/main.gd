@@ -26,15 +26,15 @@ const MENU_NAVIGATION_ACTIONS: Array[StringName] = [&"ui_accept", &"ui_up", &"ui
 @onready var human_tag: Label = $Human/Tag
 @onready var door_shape: CollisionShape2D = $Door/CollisionShape2D
 @onready var door_visual: ColorRect = $Door/Visual
-@onready var top_card: ColorRect = $CanvasLayer/TopBar
+@onready var top_card: Panel = $CanvasLayer/TopBar
 @onready var hud: Label = $CanvasLayer/TopBar/HUD
 @onready var dialogue_accent: ColorRect = $CanvasLayer/BottomBar/Accent
 @onready var speaker: Label = $CanvasLayer/BottomBar/Speaker
 @onready var speaker_rule: ColorRect = $CanvasLayer/BottomBar/SpeakerRule
 @onready var story: Label = $CanvasLayer/BottomBar/Story
-@onready var context_hint: ColorRect = $CanvasLayer/ContextHint
+@onready var context_hint: Panel = $CanvasLayer/ContextHint
 @onready var context_hint_text: Label = $CanvasLayer/ContextHint/Text
-@onready var tutorial_prompt: ColorRect = $CanvasLayer/TutorialPrompt
+@onready var tutorial_prompt: Panel = $CanvasLayer/TutorialPrompt
 @onready var tutorial_text: Label = $CanvasLayer/TutorialPrompt/Text
 @onready var pause_button: Button = $CanvasLayer/PauseButton
 @onready var touch_controls: Control = $CanvasLayer/TouchControls
@@ -44,6 +44,7 @@ const MENU_NAVIGATION_ACTIONS: Array[StringName] = [&"ui_accept", &"ui_up", &"ui
 @onready var touch_choice_1: Button = $CanvasLayer/TouchControls/Choice1
 @onready var touch_choice_2: Button = $CanvasLayer/TouchControls/Choice2
 @onready var pause_overlay: PauseOverlay = $CanvasLayer/PauseOverlay
+@onready var menu_panel: Panel = $CanvasLayer/PauseOverlay/Panel
 @onready var pause_menu: Control = $CanvasLayer/PauseOverlay/Panel/PauseMenu
 @onready var settings_menu: GameSettings = $CanvasLayer/PauseOverlay/Panel/SettingsMenu
 @onready var resume_button: Button = $CanvasLayer/PauseOverlay/Panel/PauseMenu/ResumeButton
@@ -77,6 +78,8 @@ var title_focus_return: Control = null
 var intro_active: bool = false
 var intro_step: int = 0
 var intro_tween: Tween
+var menu_tween: Tween
+var backdrop_tween: Tween
 var top_card_tween: Tween
 var last_top_card_key: String = ""
 var chapter_close_active: bool = false
@@ -98,6 +101,9 @@ var save_error_context: String = ""
 const WOLF_SPRITE_REST: Vector2 = Vector2(0.0, -15.0)
 const GAMEPLAY_ZOOM: float = 1.18
 const GAMEPLAY_VIEW_WIDTH: float = 960.0 / GAMEPLAY_ZOOM
+## Menu cards fade and slide in over this long; short enough never to hold up input or players who want little motion.
+const MENU_REVEAL_SECONDS: float = 0.12
+const MENU_REVEAL_OFFSET: Vector2 = Vector2(0.0, 10.0)
 const CORRIDOR_BACKGROUND: Texture2D = preload("res://assets/maintenance-corridor-background-provisional.png")
 
 
@@ -115,6 +121,9 @@ func _ready() -> void:
 	$CanvasLayer/PauseOverlay/Panel/PauseMenu/TitleButton.pressed.connect(_on_title_button)
 	$CanvasLayer/TitleScreen/SettingsButton.pressed.connect(_show_title_settings)
 	settings_back_button.pressed.connect(_show_pause_menu)
+	# Every menu button, including the ones Settings builds, shares the same hover, focus and press motion.
+	for node: Node in $CanvasLayer.find_children("*", "BaseButton", true, false):
+		UIMotion.attach(node as BaseButton)
 	records_room = RecordsRoom.new()
 	records_room.z_index = 1
 	add_child(records_room)
@@ -384,27 +393,8 @@ func _setup_touch_controls() -> void:
 	_bind_touch_button(touch_use, &"interact")
 	_bind_touch_button(touch_choice_1, &"choice_1")
 	_bind_touch_button(touch_choice_2, &"choice_2")
-	var normal: StyleBoxFlat = StyleBoxFlat.new()
-	normal.bg_color = Color("#0a203680")
-	normal.border_color = Color("#52c6e8")
-	normal.set_border_width_all(2)
-	normal.set_corner_radius_all(6)
-	var hover: StyleBoxFlat = normal.duplicate() as StyleBoxFlat
-	hover.bg_color = Color("#174461")
-	# These buttons already wear a 2 px cyan border, so the shared focus ring would vanish into it.
-	var focus: StyleBoxFlat = normal.duplicate() as StyleBoxFlat
-	focus.bg_color = Color("#234859")
-	focus.border_color = Color("#8de5f5")
-	focus.set_border_width_all(3)
-	for button: Button in [touch_left, touch_right, touch_use, touch_choice_1, touch_choice_2, pause_button, resume_button, settings_button, settings_back_button, fps_options, resolution_options, $CanvasLayer/PauseOverlay/Panel/PauseMenu/TitleButton]:
-		button.add_theme_stylebox_override("focus", focus)
-	for button: Button in [touch_left, touch_right, touch_use, touch_choice_1, touch_choice_2, pause_button, resume_button, settings_button, settings_back_button, fps_options, resolution_options, $CanvasLayer/PauseOverlay/Panel/PauseMenu/TitleButton]:
-		button.add_theme_stylebox_override("normal", normal)
-		button.add_theme_stylebox_override("hover", hover)
-		button.add_theme_stylebox_override("pressed", hover)
-		button.add_theme_color_override("font_color", Color.WHITE)
-		button.add_theme_color_override("font_hover_color", Color.WHITE)
-		button.add_theme_color_override("font_pressed_color", Color.WHITE)
+	# Button looks come from the project theme (game_theme.tres): touch and HUD buttons use its TouchButton
+	# variation from the scene, and Settings applies the Terminal variations itself.
 	settings_menu.apply_theme()
 
 
@@ -493,6 +483,7 @@ func _pause_game() -> void:
 		Input.action_release(action)
 	_show_pause_menu()
 	pause_overlay.show()
+	_fade_backdrop()
 	pause_button.hide()
 	touch_controls.hide()
 	get_tree().paused = true
@@ -508,18 +499,40 @@ func _resume_game() -> void:
 
 func _show_settings() -> void:
 	pause_menu.hide()
-	var panel: Control = $CanvasLayer/PauseOverlay/Panel
-	panel.position = Vector2(100, 38)
-	panel.size = Vector2(760, 464)
+	menu_panel.position = Vector2(100, 38)
+	menu_panel.size = Vector2(760, 464)
 	$CanvasLayer/PauseOverlay/Panel/Accent.hide()
 	settings_menu.show()
+	_reveal_menu()
 	_grab_menu_focus(settings_menu.tabs)
 
 
 func _show_title_settings() -> void:
 	pause_overlay.show()
+	_fade_backdrop()
 	get_tree().paused = true
 	_show_settings()
+
+
+## The dimmed backdrop fades in when the overlay opens; the card slides in separately so Settings
+## and the pause menu each arrive with the same short motion.
+func _fade_backdrop() -> void:
+	if backdrop_tween != null and backdrop_tween.is_running():
+		backdrop_tween.kill()
+	pause_overlay.modulate.a = 0.0
+	backdrop_tween = pause_overlay.create_tween()
+	backdrop_tween.tween_property(pause_overlay, "modulate:a", 1.0, MENU_REVEAL_SECONDS)
+
+
+func _reveal_menu() -> void:
+	if menu_tween != null and menu_tween.is_running():
+		menu_tween.kill()
+	var resting: Vector2 = menu_panel.position
+	menu_panel.position = resting + MENU_REVEAL_OFFSET
+	menu_panel.modulate.a = 0.0
+	menu_tween = pause_overlay.create_tween().set_parallel(true)
+	menu_tween.tween_property(menu_panel, "position", resting, MENU_REVEAL_SECONDS).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
+	menu_tween.tween_property(menu_panel, "modulate:a", 1.0, MENU_REVEAL_SECONDS)
 
 
 func _show_pause_menu() -> void:
@@ -528,9 +541,8 @@ func _show_pause_menu() -> void:
 		_grab_menu_focus($CanvasLayer/TitleScreen/SettingsButton)
 		return
 	settings_menu.cancel_capture()
-	var panel: Control = $CanvasLayer/PauseOverlay/Panel
-	panel.position = Vector2(255, 55)
-	panel.size = Vector2(450, 430)
+	menu_panel.position = Vector2(255, 55)
+	menu_panel.size = Vector2(450, 430)
 	pause_menu.size = Vector2(450, 430)
 	$CanvasLayer/PauseOverlay/Panel/Accent.show()
 	settings_menu.hide()
@@ -538,6 +550,7 @@ func _show_pause_menu() -> void:
 	$CanvasLayer/PauseOverlay/Panel/PauseMenu/TitleButton.text = "SKIP OPENING" if intro_active else "RETURN TO TITLE"
 	$CanvasLayer/PauseOverlay/Panel/PauseMenu/ReturnWarning.visible = not intro_active
 	$CanvasLayer/PauseOverlay/Panel/PauseMenu/PauseHint.text = "TAP RESUME TO RETURN" if touch_enabled and not controller_active else "%s  RESUME" % settings_menu.prompt(&"pause_game", controller_active)
+	_reveal_menu()
 	_grab_menu_focus(resume_button)
 
 
