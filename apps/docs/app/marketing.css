@@ -1,13 +1,13 @@
 .marketing-shell {
-  --mk-bg: #080f1b;
-  --mk-surface: #101e2c;
-  --mk-text: #edf5f7;
-  --mk-muted: #b2c5cd;
-  --mk-line: #385363;
-  --mk-accent: #8be3ff;
-  --mk-control-radius: var(--ui-control-radius, .75rem);
-  --mk-card-radius: var(--ui-card-radius, 1rem);
-  --mk-hero-bg: #080f1b;
+  --mk-bg: var(--color-ink);
+  --mk-surface: var(--color-surface);
+  --mk-text: var(--color-text);
+  --mk-muted: var(--color-muted);
+  --mk-line: var(--color-line);
+  --mk-accent: var(--color-accent);
+  --mk-control-radius: var(--radius-control, .75rem);
+  --mk-card-radius: var(--radius-card, 1rem);
+  --mk-hero-bg: var(--color-ink);
   display: flow-root;
   overflow: clip;
   background: var(--mk-bg);
@@ -21,8 +21,8 @@
 }
 
 .marketing-header {
-  --mk-accent: #8be3ff;
-  --mk-text: #edf5f7;
+  --mk-accent: var(--color-accent);
+  --mk-text: var(--color-text);
   position: relative;
   z-index: 30;
   display: flex;
@@ -186,13 +186,13 @@
   min-height: clamp(46rem, 92svh, 60rem);
   align-items: center;
   isolation: isolate;
-  --mk-hero-bg: #080f1b;
-  --mk-bg: #080f1b;
-  --mk-surface: #101e2c;
-  --mk-text: #edf5f7;
-  --mk-muted: #b2c5cd;
-  --mk-line: #385363;
-  --mk-accent: #8be3ff;
+  --mk-hero-bg: var(--color-ink);
+  --mk-bg: var(--color-ink);
+  --mk-surface: var(--color-surface);
+  --mk-text: var(--color-text);
+  --mk-muted: var(--color-muted);
+  --mk-line: var(--color-line);
+  --mk-accent: var(--color-accent);
   background: var(--mk-hero-bg);
   color: #edf5f7;
 }
