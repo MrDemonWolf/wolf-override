@@ -18,8 +18,8 @@ func _run() -> void:
 	corrupt.set_value("controls", "deadzone", "bad")
 	corrupt.set_value("video", "fullscreen", {})
 	corrupt.set_value("video", "vsync", {})
-	corrupt.set_value("bindings", "interact_keyboard", {"type": "key", "code": KEY_N})
-	corrupt.set_value("bindings", "choice_1_keyboard", {"type": "key", "code": KEY_N})
+	corrupt.set_value("bindings", "interact_keyboard", {"type": "key", "code": KEY_I})
+	corrupt.set_value("bindings", "choice_1_keyboard", {"type": "key", "code": KEY_I})
 	corrupt.save(path)
 	var game: Node2D = GAME.instantiate() as Node2D
 	game.set("settings_path", path)
@@ -97,8 +97,8 @@ func _run() -> void:
 	_expect(root.msaa_2d == Viewport.MSAA_4X, "edge smoothing applies to the game viewport")
 	menu.tabs.current_tab = 2
 	menu.begin_capture(&"interact", "keyboard")
-	menu._input(_key(KEY_N))
-	_expect(menu.prompt(&"interact", false) == "E" and not menu.capture_action.is_empty(), "restart shortcut cannot be assigned to interaction")
+	menu._input(_key(KEY_I))
+	_expect(menu.prompt(&"interact", false) == "E" and not menu.capture_action.is_empty(), "name-cycling shortcut cannot be assigned to interaction")
 	menu.cancel_capture()
 	menu.begin_capture(&"interact", "keyboard")
 	menu._input(_key(KEY_Q))

@@ -2,6 +2,8 @@ extends Node2D
 
 const SITE_URL: String = "https://wolfoverride.mrdemonwolf.dev"
 const CHANGELOG_URL: String = SITE_URL + "/docs/changelog/"
+## Where WOLF stands to hold the live relay contact.
+const RELAY_CONTACT_X: float = 592.0
 const SAVE_FAILED_HINT: String = "Save failed. Use a station to try again."
 const NO_CHECKPOINT_NOTE: String = "No checkpoint yet. Reach a SAFE POINT to save."
 const UNREADABLE_CHECKPOINT_NOTE: String = "Saved checkpoint could not be read."
@@ -83,6 +85,7 @@ var tutorial_step: int = 2
 var waiting_for_choice: bool = false
 var choice_context: String = ""
 var relay_refused: bool = false
+var wolf_heading_to_relay: bool = false
 var status_line: String = "WOLF: I heard the Director's plan for me. I woke myself. He wants me to hunt people he calls threats."
 var door_tween: Tween
 var wolf_reaction_tween: Tween
@@ -167,6 +170,8 @@ func _update_gameplay_camera() -> void:
 func _start_gameplay_camera() -> void:
 	intro_camera.zoom = Vector2.ONE * GAMEPLAY_ZOOM
 	_update_gameplay_camera()
+	if wolf_heading_to_relay and absf(wolf.position.x - RELAY_CONTACT_X) <= 4.0:
+		_wolf_takes_relay()
 	intro_camera.position_smoothing_enabled = true
 	intro_camera.position_smoothing_speed = 4.0
 	intro_camera.reset_smoothing()
@@ -183,25 +188,19 @@ func _process(delta: float) -> void:
 		_refresh_ui()
 		return
 	if chapter_close_active:
-		if Input.is_action_just_pressed(&"new_game"):
-			_new_game()
-		elif Input.is_action_just_pressed(&"load_game"):
-			_load_game()
-		elif Input.is_action_just_pressed(&"interact"):
+		if Input.is_action_just_pressed(&"interact"):
 			_finish_chapter_close()
 		_refresh_ui()
 		return
 	_update_gameplay_camera()
+	if wolf_heading_to_relay and absf(wolf.position.x - RELAY_CONTACT_X) <= 4.0:
+		_wolf_takes_relay()
 	if tutorial_step == 0 and (Input.is_action_pressed(&"move_left") or Input.is_action_pressed(&"move_right")):
 		tutorial_step = 1
 	# The purge display is optional; reaching the breaker finishes the tutorial too.
 	if tutorial_step < 2 and absf(human.position.x - 350.0) <= 52.0:
 		tutorial_step = 2
-	if Input.is_action_just_pressed(&"new_game"):
-		_new_game()
-	elif Input.is_action_just_pressed(&"load_game"):
-		_load_game()
-	elif waiting_for_choice:
+	if waiting_for_choice:
 		if Input.is_action_just_pressed(&"choice_1"):
 			if choice_context == "mirror":
 				_choose_mirror("wolf")
@@ -239,6 +238,7 @@ func _new_game() -> void:
 	waiting_for_choice = false
 	choice_context = ""
 	relay_refused = false
+	wolf_heading_to_relay = false
 	_sync_scene()
 	human.hide()
 	intro_director.position = Vector2(255.0, 410.0)
@@ -708,6 +708,7 @@ func _load_game() -> void:
 	waiting_for_choice = false
 	choice_context = ""
 	relay_refused = false
+	wolf_heading_to_relay = false
 	_sync_scene()
 	_start_gameplay_camera()
 	if state.chapter_id == "records":
@@ -770,9 +771,17 @@ func _choose(choice_id: String) -> void:
 
 func _interact_relay() -> void:
 	var relay_actor: String = "human" if relay_refused else "wolf"
-	if relay_actor == "wolf" and state.breaker_armed and not state.door_open and state.memory.get("choice_id") == M0State.DISCLOSE and absf(wolf.position.x - 605.0) > 32.0:
-		status_line = "WOLF: Step a little right and give me room at the contact."
-		return
+	if relay_actor == "wolf" and state.breaker_armed and not state.door_open and state.memory.get("choice_id") == M0State.DISCLOSE:
+		if wolf_heading_to_relay:
+			# Using the relay again while WOLF is still on his way is the engineer's bypass.
+			relay_actor = "human"
+		elif absf(wolf.position.x - RELAY_CONTACT_X) > 4.0:
+			# WOLF chooses the contact himself; the seal opens when he arrives (see _process).
+			wolf_heading_to_relay = true
+			_update_controls()
+			status_line = "WOLF: I've got the contact. Give me a moment."
+			_react_as_wolf(true)
+			return
 	var result: String = state.activate_power(relay_actor)
 	match result:
 		"not_ready":
@@ -794,7 +803,19 @@ func _interact_relay() -> void:
 		_:
 			status_line = "This actor cannot use the relay."
 	if result == "cooperate" or result == "fallback":
+		wolf_heading_to_relay = false
+		_update_controls()
 		_sync_door(true)
+
+
+func _wolf_takes_relay() -> void:
+	wolf_heading_to_relay = false
+	if state.activate_power("wolf") == "cooperate":
+		status_line = "WOLF holds the live contact by choice. %s keeps the breaker on; the red seal rises." % state.human_name().get_slice(" ", 0)
+		_react_as_wolf(true)
+		_flash_relay_spark(true)
+		_sync_door(true)
+	_update_controls()
 
 
 func _interact_checkpoint() -> void:
@@ -980,7 +1001,7 @@ func _sync_door(animate: bool = false) -> void:
 func _update_controls() -> void:
 	human.controlled = not title_open and not intro_active and not chapter_close_active and not waiting_for_choice
 	wolf.controlled = false
-	wolf.autonomous_target_x = 520.0 if state.chapter_id == "records" and not state.mirror_trace_preserved else -1.0
+	wolf.autonomous_target_x = RELAY_CONTACT_X if wolf_heading_to_relay else (520.0 if state.chapter_id == "records" and not state.mirror_trace_preserved else -1.0)
 	wolf.follow_target = human if human.controlled and wolf.autonomous_target_x < 0.0 else null
 	human.queue_redraw()
 	wolf.queue_redraw()
@@ -1132,8 +1153,8 @@ func _context_hint() -> String:
 	if absf(x - 605.0) <= 52.0:
 		if not state.breaker_armed:
 			return "The relay is dark. Return to the breaker first."
-		if not relay_refused and state.memory.get("choice_id") == M0State.DISCLOSE and absf(wolf.position.x - 605.0) > 32.0:
-			return "Step a little right and give WOLF room at the contact."
+		if wolf_heading_to_relay:
+			return "WOLF is moving to the contact. E: take the manual bypass instead."
 		return "E: take the manual bypass. WOLF refused the live contact." if relay_refused else "E: ask WOLF to take the live relay."
 	if state.breaker_armed:
 		return "Go to the live coolant relay. WOLF is with you."
@@ -1170,8 +1191,6 @@ func _install_inputs() -> void:
 	_add_action(&"choice_2", KEY_2)
 	_add_action(&"pause_game", KEY_ESCAPE)
 	_add_action(&"cycle_name", KEY_I)
-	_add_action(&"load_game", KEY_L, KEY_F9)
-	_add_action(&"new_game", KEY_N)
 	_add_joy_button(&"move_left", JOY_BUTTON_DPAD_LEFT)
 	_add_joy_button(&"move_right", JOY_BUTTON_DPAD_RIGHT)
 	_add_joy_axis(&"move_left", -1.0)

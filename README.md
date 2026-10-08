@@ -84,8 +84,6 @@ checkpoint save exists.
 | E                  | Read, use a station, or enter Records Access |
 | 1 / 2              | Answer at the breaker or mirror port        |
 | I                  | Cycle provisional engineer display names   |
-| L or F9            | Load the saved checkpoint                   |
-| N                  | Start a clean current run                   |
 | Esc                | Pause or resume; Pause offers Skip Opening during the opening |
 
 A basic controller map is available: left stick or D-pad moves, A interacts,
@@ -97,17 +95,16 @@ The pause menu has Resume and Settings. Settings save a 30 FPS, 60 FPS, or
 uncapped limit; desktop builds also offer three window sizes and fullscreen.
 Mobile window size is managed by the operating system.
 
-At the relay, choice **1** lets WOLF help: stand toward the right side so
-he can reach the contact, then press E. If he asks for room, step right and
-press E again. With choice **2**, press E to hear his refusal, then E again
+At the relay, choice **1** lets WOLF help: press E and he walks to the
+contact himself; the seal opens when he arrives. Press E again while he is
+walking to take the engineer's bypass instead. With choice **2**, press E to hear his refusal, then E again
 for the engineer's bypass. Press **E** at the far-right checkpoint to save,
 then **E** again to enter Records Access. Copy the purge-order trace at the
 first station. WOLF heads to the mirror himself; press **E** there, then **1**
 after he arrives for his readout or **2** for the manual port. Press **E** at
 the exit to secure the first copy, then **E** to continue after the closing beat.
 Continue restores chapter progress. Godot
-stores the save in its `user://` directory; **N** restarts the current run
-without deleting it.
+stores the save in its `user://` directory.
 
 ## Tech Stack
 
