@@ -30,7 +30,15 @@ jobs:
           "$godot_bin" --version
           echo "GODOT_BIN=$godot_bin" >> "$GITHUB_ENV"
       - name: Import game
-        run: '"$GODOT_BIN" --headless --path apps/game --import 2>&1 | tee "$RUNNER_TEMP/wolf-check-import.log"'
+        # A fresh clone's first import loads the project theme before its fonts are imported and
+        # prints ordering errors; the second import must be clean.
+        run: |
+          "$GODOT_BIN" --headless --path apps/game --import > "$RUNNER_TEMP/wolf-check-import-first.log" 2>&1
+          "$GODOT_BIN" --headless --path apps/game --import 2>&1 | tee "$RUNNER_TEMP/wolf-check-import.log"
+          if grep -q 'ERROR' "$RUNNER_TEMP/wolf-check-import.log"; then
+            echo "Second import reported errors" >&2
+            exit 1
+          fi
       - name: Check M0 state
         run: '"$GODOT_BIN" --headless --path apps/game --script res://tests/m0_state_test.gd 2>&1 | tee "$RUNNER_TEMP/wolf-check-state.log"'
       - name: Check M0 scene

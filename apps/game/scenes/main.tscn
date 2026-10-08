@@ -1,4 +1,4 @@
-[gd_scene load_steps=17 format=3]
+[gd_scene load_steps=18 format=3]
 
 [ext_resource type="Script" path="res://scripts/main.gd" id="1_main"]
 [ext_resource type="Script" path="res://scripts/m0_actor.gd" id="2_actor"]
@@ -12,6 +12,7 @@
 [ext_resource type="Script" path="res://scripts/pause_overlay.gd" id="10_pause_overlay"]
 [ext_resource type="Script" path="res://scripts/game_settings.gd" id="11_settings"]
 [ext_resource type="Script" path="res://scripts/containment_cage.gd" id="12_cage"]
+[ext_resource type="FontVariation" path="res://assets/fonts/Montserrat-Bold.tres" id="13_display"]
 
 [sub_resource type="RectangleShape2D" id="FloorShape"]
 size = Vector2(960, 60)
@@ -440,6 +441,7 @@ offset_left = 454.0
 offset_top = 175.0
 offset_right = 940.0
 offset_bottom = 271.0
+theme_override_fonts/font = ExtResource("13_display")
 theme_override_font_sizes/font_size = 42
 text = "WOLF//OVERRIDE"
 
@@ -524,6 +526,7 @@ offset_top = 35.0
 offset_right = 775.0
 offset_bottom = 80.0
 horizontal_alignment = 1
+theme_override_fonts/font = ExtResource("13_display")
 theme_override_font_sizes/font_size = 28
 text = "WOLF//OVERRIDE"
 
@@ -542,7 +545,7 @@ offset_bottom = 425.0
 theme_override_colors/default_color = Color(0.82, 0.89, 0.94, 1)
 theme_override_font_sizes/normal_font_size = 19
 bbcode_enabled = true
-text = "[center][color=#73DDF5]ORIGINAL CONCEPT, CORE STORY & CREATIVE VISION[/color]\n[font_size=30][b]Nathanial Henniges[/b][/font_size]\n\n\n[color=#73DDF5]DEVELOPMENT[/color]\n[font_size=26][b]MrDemonWolf, Inc.[/b][/font_size]\n\n\n[color=#73DDF5]AI-ASSISTED PRODUCTION[/color]\nChatGPT and Codex assisted with research, writing and code.\nNathanial directed and reviewed the work.\n\n\n[color=#73DDF5]PROVISIONAL ART[/color]\nCreated with ChatGPT Create.\nThe WOLF//OVERRIDE mark was redrawn from a generated concept.\n\n\n[color=#73DDF5]BUILT WITH[/color]\nGodot 4.7.2  /  GDScript\nNext.js  /  Fumadocs  /  Bun\n\n\n[color=#73DDF5]RESEARCH & CRAFT REFERENCES[/color]\nFumito Ueda / The Last Guardian\nCompanion behavior and visual storytelling\n\nNaughty Dog / The Last of Us Part II\nReviewed controls and readable presentation\n\nGame Accessibility Guidelines\nPlayer-paced text and recognizable interactions\n\nGodot 4.7 Camera2D reference\nCamera follow and smoothing\n\nNielsen Norman Group\nMobile screenshot readability\n\nNIST AI Risk Management Framework\nNational Archives records guidance\n\nReferences inform craft, not the origin of this game.\nOriginal concept, core story and creative vision:\nNathanial Henniges.\nReferenced creators are not project contributors.\n\nFull sources, tools and asset credits:\nmrdemonwolf.github.io/wolf-override/docs/credits/\n\n\n[font_size=24][b]THANK YOU FOR PLAYING[/b][/font_size][/center]"
+text = "[center][color=#73DDF5]ORIGINAL CONCEPT, CORE STORY & CREATIVE VISION[/color]\n[font_size=30][b]Nathanial Henniges[/b][/font_size]\n\n\n[color=#73DDF5]DEVELOPMENT[/color]\n[font_size=26][b]MrDemonWolf, Inc.[/b][/font_size]\n\n\n[color=#73DDF5]AI-ASSISTED PRODUCTION[/color]\nChatGPT and Codex assisted with research, writing and code.\nNathanial directed and reviewed the work.\n\n\n[color=#73DDF5]PROVISIONAL ART[/color]\nCreated with ChatGPT Create.\nThe WOLF//OVERRIDE mark was redrawn from a generated concept.\n\n\n[color=#73DDF5]TYPEFACES[/color]\nRoboto and Montserrat\nSIL Open Font License 1.1\n\n\n[color=#73DDF5]BUILT WITH[/color]\nGodot 4.7.2  /  GDScript\nNext.js  /  Fumadocs  /  Bun\n\n\n[color=#73DDF5]RESEARCH & CRAFT REFERENCES[/color]\nFumito Ueda / The Last Guardian\nCompanion behavior and visual storytelling\n\nNaughty Dog / The Last of Us Part II\nReviewed controls and readable presentation\n\nGame Accessibility Guidelines\nPlayer-paced text and recognizable interactions\n\nGodot 4.7 Camera2D reference\nCamera follow and smoothing\n\nNielsen Norman Group\nMobile screenshot readability\n\nNIST AI Risk Management Framework\nNational Archives records guidance\n\nReferences inform craft, not the origin of this game.\nOriginal concept, core story and creative vision:\nNathanial Henniges.\nReferenced creators are not project contributors.\n\nFull sources, tools and asset credits:\nmrdemonwolf.github.io/wolf-override/docs/credits/\n\n\n[font_size=24][b]THANK YOU FOR PLAYING[/b][/font_size][/center]"
 
 [node name="CreditsBackButton" type="Button" parent="CanvasLayer/TitleScreen/CreditsScreen"]
 offset_left = 189.0
@@ -599,6 +602,7 @@ offset_left = 32.0
 offset_top = 29.0
 offset_right = 419.0
 offset_bottom = 75.0
+theme_override_fonts/font = ExtResource("13_display")
 theme_override_font_sizes/font_size = 31
 text = "SESSION PAUSED"
 
@@ -657,6 +661,7 @@ offset_left = 32.0
 offset_top = 29.0
 offset_right = 419.0
 offset_bottom = 75.0
+theme_override_fonts/font = ExtResource("13_display")
 theme_override_font_sizes/font_size = 31
 text = "SYSTEM SETTINGS"
 

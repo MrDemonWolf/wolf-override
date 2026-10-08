@@ -205,7 +205,8 @@ Copyright 2026 MrDemonWolf, Inc. Game source code and public docs use
 [GPL-3.0-or-later](LICENSE). The provisional logo, character sprites, title
 art, room backgrounds, and machine props are separate assets with AI-assisted provenance
 recorded in [the asset register](apps/game/assets/manifest.json); they are not covered
-by the code/docs GPL. Final asset, audio, branding and store-package rights
+by the code/docs GPL. The bundled Roboto and Montserrat fonts use the SIL
+Open Font License 1.1, with the license text beside each copy. Final asset, audio, branding and store-package rights
 and release review remain open.
 
 ## Contact

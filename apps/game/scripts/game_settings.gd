@@ -1,6 +1,9 @@
 class_name GameSettings
 extends Control
 
+const BODY_FONT: FontVariation = preload("res://assets/fonts/Roboto-Regular.tres")
+const CONTROL_FONT: FontVariation = preload("res://assets/fonts/Montserrat-Semibold.tres")
+const HEADING_FONT: FontVariation = preload("res://assets/fonts/Montserrat-Bold.tres")
 const ACTIONS: Array[StringName] = [&"move_left", &"move_right", &"interact", &"choice_1", &"choice_2", &"pause_game"]
 const ACTION_NAMES: Array[String] = ["Move left", "Move right", "Interact / continue", "Response 1", "Response 2", "Pause"]
 const BUSES: Array[String] = ["Master", "Music", "Effects", "Voice"]
@@ -98,8 +101,10 @@ func _build_menu() -> void:
 	var subtitle: Label = _label("THE DEN  /  LOCAL CONFIGURATION", 13)
 	subtitle.position = Vector2(34, 15)
 	subtitle.modulate = Color("#89acbf")
+	subtitle.add_theme_font_override("font", CONTROL_FONT)
 	add_child(subtitle)
 	$Title.position.y = 35
+	$Title.add_theme_font_override("font", HEADING_FONT)
 	$Title.add_theme_font_size_override("font_size", 27)
 	tabs = TabBar.new()
 	tabs.position = Vector2(32, 81)
@@ -243,6 +248,8 @@ func _slider_row(parent: Node, caption: String, minimum: float, maximum: float, 
 
 func apply_theme() -> void:
 	var menu_theme: Theme = Theme.new()
+	menu_theme.default_font = BODY_FONT
+	menu_theme.default_font_size = 16
 	var normal: StyleBoxFlat = StyleBoxFlat.new()
 	normal.bg_color = Color("#182f40")
 	normal.border_color = Color("#345366")
@@ -261,6 +268,7 @@ func apply_theme() -> void:
 	focus.set_corner_radius_all(2)
 	focus.bg_color = Color.TRANSPARENT
 	for type_name: String in ["Button", "OptionButton", "CheckButton"]:
+		menu_theme.set_font("font", type_name, CONTROL_FONT)
 		menu_theme.set_stylebox("normal", type_name, normal)
 		menu_theme.set_stylebox("hover", type_name, hover)
 		menu_theme.set_stylebox("pressed", type_name, hover)
@@ -280,9 +288,11 @@ func apply_theme() -> void:
 	tab_focus.expand_margin_left = -4
 	tab_focus.expand_margin_right = -4
 	menu_theme.set_stylebox("tab_focus", "TabBar", tab_focus)
+	menu_theme.set_font("font", "TabBar", CONTROL_FONT)
 	menu_theme.set_font_size("font_size", "TabBar", 16)
 	menu_theme.set_stylebox("panel", "PopupMenu", normal)
 	menu_theme.set_stylebox("hover", "PopupMenu", hover)
+	menu_theme.set_font("font", "PopupMenu", CONTROL_FONT)
 	menu_theme.set_font_size("font_size", "PopupMenu", 16)
 	menu_theme.set_color("font_color", "PopupMenu", Color("#e2edf2"))
 	menu_theme.set_color("font_hover_color", "PopupMenu", Color.WHITE)
