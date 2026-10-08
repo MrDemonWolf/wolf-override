@@ -70,6 +70,8 @@ var settings_path: String = "user://settings.cfg"
 var touch_enabled: bool = OS.has_feature("ios") or OS.has_feature("android")
 var controller_active: bool = false
 var title_open: bool = true
+## The title control a menu last meant to focus, so a later key press after touch lands there.
+var title_focus_return: Control = null
 var intro_active: bool = false
 var intro_step: int = 0
 var intro_tween: Tween
@@ -557,6 +559,8 @@ func _return_to_title() -> void:
 ## Keyboard and controller players need a focused menu control; pure touch play shows no focus ring.
 ## Touch clears focus instead, so a stale focus behind an overlay cannot take the next key press.
 func _grab_menu_focus(control: Control) -> void:
+	if title_screen.is_ancestor_of(control):
+		title_focus_return = control
 	if touch_enabled and not controller_active:
 		get_viewport().gui_release_focus()
 	else:
@@ -568,8 +572,11 @@ func _menu_focus_target() -> Control:
 	if pause_overlay.visible:
 		return settings_menu.tabs if settings_menu.visible else resume_button
 	if title_open:
-		return credits_back_button if credits_screen.visible else new_game_button
+		if credits_screen.visible:
+			return credits_back_button
+		return title_focus_return if title_focus_return != null and title_focus_return.is_visible_in_tree() else new_game_button
 	return null
+
 
 func _unhandled_input(event: InputEvent) -> void:
 	if credits_screen.visible and event.is_action_pressed(&"ui_cancel"):

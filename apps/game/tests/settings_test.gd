@@ -73,10 +73,13 @@ func _run() -> void:
 	_expect(root.gui_get_focus_owner() == null, "touch-opened title settings focus nothing")
 	(game.get_node("CanvasLayer/PauseOverlay/Panel/SettingsMenu/BackButton") as Button).pressed.emit()
 	_expect(not paused and root.gui_get_focus_owner() == null, "touch Back from title settings focuses nothing")
+	Input.parse_input_event(_key(KEY_DOWN))
+	await process_frame
+	Input.parse_input_event(_key(KEY_DOWN, false))
+	await process_frame
+	_expect(title_settings.has_focus(), "a key press after touch Back from title settings selects the title Settings button")
 	game.set("touch_enabled", false)
-	title_settings.grab_focus()
 	title_settings.pressed.emit()
-	(game.get_node("CanvasLayer/TitleScreen/SettingsButton") as Button).pressed.emit()
 	menu.tabs.current_tab = 1
 	var music: HSlider = menu.volumes["Music"]
 	music.value = 37.0

@@ -25,7 +25,7 @@ func _run() -> void:
 	_expect(ring != null and ring.border_color.is_equal_approx(Color("#8de5f5")) and ring.border_width_left == 2 and ring.expand_margin_left == 0.0 and ring.bg_color.a == 0.0, "the shared theme gives buttons an inset cyan focus ring")
 	var title_new_game: Button = game.get_node("CanvasLayer/TitleScreen/NewGameButton") as Button
 	var shared_settings: GameSettings = game.get_node("CanvasLayer/PauseOverlay/Panel/SettingsMenu") as GameSettings
-	_expect(title_new_game.get_theme_stylebox("focus") == ring and shared_settings.vsync.get_theme_stylebox("focus") == ring and (game.get_node("CanvasLayer/PauseOverlay/Panel/SettingsMenu/BackButton") as Button).get_theme_stylebox("focus") == ring, "title and Settings controls share the theme focus ring")
+	_expect(title_new_game.get_theme_stylebox("focus") == ring and shared_settings.vsync.get_theme_stylebox("focus") == ring and (game.get_node("CanvasLayer/PauseOverlay/Panel/SettingsMenu/BackButton") as Button).get_theme_stylebox("focus") == ring and (shared_settings.volumes["Music"] as HSlider).get_theme_stylebox("focus") == ring and shared_settings.deadzone.get_theme_stylebox("focus") == ring, "title and Settings controls, sliders included, share the theme focus ring")
 	var tab_ring: StyleBoxFlat = shared_settings.tabs.get_theme_stylebox("tab_focus") as StyleBoxFlat
 	_expect(tab_ring != null and tab_ring.border_width_left == 2 and tab_ring.expand_margin_left == -4.0, "settings tabs keep their inset focus ring")
 	var resume_focus: StyleBoxFlat = (game.get_node("CanvasLayer/PauseOverlay/Panel/PauseMenu/ResumeButton") as Button).get_theme_stylebox("focus") as StyleBoxFlat
