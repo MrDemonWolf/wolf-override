@@ -22,7 +22,7 @@ The gameplay camera follows the engineer across each room with a closer view.
 Settings uses THE DEN's local-terminal styling; the title screen keeps its game presentation.
 
 **Quick play:** The opening shows only WOLF and the Director. Press **E** to
-advance WOLF's escape or **Esc** to skip it. You then control the engineer,
+advance WOLF's escape, or **Esc** to pause and choose Skip Opening. You then control the engineer,
 who uses they/them pronouns; Rowan Vale is their provisional default name.
 The opening tutorial teaches movement and the first interaction as you play.
 Open the corridor door, save at the safe point, then press **E** again to enter
@@ -86,7 +86,7 @@ checkpoint save exists.
 | I                  | Cycle provisional engineer display names   |
 | L or F9            | Load the saved checkpoint                   |
 | N                  | Start a clean current run                   |
-| Esc                | Pause or resume during play; skip the opening |
+| Esc                | Pause or resume; Pause offers Skip Opening during the opening |
 
 A basic controller map is available: left stick or D-pad moves, A interacts,
 X/Y selects choices 1/2, and Start pauses. On iOS and Android, on-screen
