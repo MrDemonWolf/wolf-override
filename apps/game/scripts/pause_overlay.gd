@@ -3,10 +3,15 @@ extends ColorRect
 
 signal resume_requested
 signal back_requested
+## Main's _input stops while the tree is paused, so the overlay forwards input for device and focus tracking.
+signal input_seen(event: InputEvent)
 
 
 func _input(event: InputEvent) -> void:
-	if not visible or not (event.is_action_pressed(&"pause_game") or event.is_action_pressed(&"ui_cancel")):
+	if not visible:
+		return
+	input_seen.emit(event)
+	if not (event.is_action_pressed(&"pause_game") or event.is_action_pressed(&"ui_cancel")):
 		return
 	var settings_menu: GameSettings = get_node_or_null("Panel/SettingsMenu") as GameSettings
 	if settings_menu != null and not settings_menu.capture_action.is_empty():

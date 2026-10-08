@@ -44,16 +44,38 @@ func _run() -> void:
 	await process_frame
 	Input.parse_input_event(_controller_button(JOY_BUTTON_B, true))
 	await process_frame
+	var title_settings: Button = game.get_node("CanvasLayer/TitleScreen/SettingsButton") as Button
 	_expect(not paused and not game.get("pause_overlay").visible and game.get("title_open"), "controller B closes title settings through native event dispatch")
+	_expect(title_settings.has_focus(), "controller B from title settings leaves the title Settings button focused")
 	Input.parse_input_event(_controller_button(JOY_BUTTON_B, false))
 	await process_frame
-	(game.get_node("CanvasLayer/TitleScreen/SettingsButton") as Button).pressed.emit()
+	title_settings.pressed.emit()
+	Input.parse_input_event(_key(KEY_ESCAPE))
+	await process_frame
+	Input.parse_input_event(_key(KEY_ESCAPE, false))
+	await process_frame
+	_expect(not paused and game.get("title_open") and title_settings.has_focus(), "Esc from title settings leaves the title Settings button focused")
+	title_settings.pressed.emit()
+	game.notification(Node.NOTIFICATION_WM_GO_BACK_REQUEST)
+	_expect(not paused and game.get("title_open") and title_settings.has_focus(), "Android Back from title settings leaves the title Settings button focused")
+	title_settings.pressed.emit()
 	(game.get_node("CanvasLayer/PauseOverlay/Panel/SettingsMenu/BackButton") as Button).grab_focus()
 	Input.parse_input_event(_controller_button(JOY_BUTTON_A, true))
 	await process_frame
 	Input.parse_input_event(_controller_button(JOY_BUTTON_A, false))
 	await process_frame
 	_expect(not paused and not game.get("pause_overlay").visible, "controller A activates the focused settings Back button")
+	_expect(title_settings.has_focus(), "the settings Back button leaves the title Settings button focused")
+	# Pure touch play opens and closes Settings without a focus ring nobody asked for.
+	game.set("touch_enabled", true)
+	game.set("controller_active", false)
+	title_settings.pressed.emit()
+	_expect(root.gui_get_focus_owner() == null, "touch-opened title settings focus nothing")
+	(game.get_node("CanvasLayer/PauseOverlay/Panel/SettingsMenu/BackButton") as Button).pressed.emit()
+	_expect(not paused and root.gui_get_focus_owner() == null, "touch Back from title settings focuses nothing")
+	game.set("touch_enabled", false)
+	title_settings.grab_focus()
+	title_settings.pressed.emit()
 	(game.get_node("CanvasLayer/TitleScreen/SettingsButton") as Button).pressed.emit()
 	menu.tabs.current_tab = 1
 	var music: HSlider = menu.volumes["Music"]
@@ -107,7 +129,7 @@ func _run() -> void:
 	_expect(not reset_config.has_section_key("bindings", "interact_keyboard"), "reset clears saved overrides")
 	saved.save(path)
 	game.call("_show_pause_menu")
-	_expect(not paused and game.get("title_open"), "Back from title settings returns to the title")
+	_expect(not paused and game.get("title_open") and title_settings.has_focus(), "Back from title settings returns to the title with Settings focused")
 	game.queue_free()
 	await process_frame
 	var reloaded: Node2D = GAME.instantiate() as Node2D
@@ -185,11 +207,11 @@ func _write_text(path: String, text: String) -> void:
 	file.close()
 
 
-func _key(code: Key) -> InputEventKey:
+func _key(code: Key, pressed: bool = true) -> InputEventKey:
 	var event: InputEventKey = InputEventKey.new()
 	event.keycode = code
 	event.physical_keycode = code
-	event.pressed = true
+	event.pressed = pressed
 	return event
 
 

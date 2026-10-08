@@ -5,6 +5,7 @@ const CHANGELOG_URL: String = SITE_URL + "/docs/changelog/"
 const SAVE_FAILED_HINT: String = "Save failed. Use a station to try again."
 const NO_CHECKPOINT_NOTE: String = "No checkpoint yet. Reach a SAFE POINT to save."
 const UNREADABLE_CHECKPOINT_NOTE: String = "Saved checkpoint could not be read."
+const MENU_NAVIGATION_ACTIONS: Array[StringName] = [&"ui_accept", &"ui_up", &"ui_down", &"ui_left", &"ui_right", &"ui_focus_next", &"ui_focus_prev"]
 
 @onready var human: M0Actor = $Human
 @onready var wolf: M0Actor = $Wolf
@@ -103,6 +104,7 @@ func _ready() -> void:
 	pause_button.pressed.connect(_on_pause_button)
 	pause_overlay.resume_requested.connect(_resume_game)
 	pause_overlay.back_requested.connect(_on_settings_back)
+	pause_overlay.input_seen.connect(_note_input_device)
 	resume_button.pressed.connect(_resume_game)
 	settings_button.pressed.connect(_show_settings)
 	$CanvasLayer/PauseOverlay/Panel/PauseMenu/TitleButton.pressed.connect(_on_title_button)
@@ -123,7 +125,7 @@ func _ready() -> void:
 	credits_back_button.pressed.connect(_hide_credits)
 	credits_pause_button.pressed.connect(_toggle_credits_pause)
 	credits_body.gui_input.connect(_on_credits_body_input)
-	new_game_button.grab_focus()
+	_grab_menu_focus(new_game_button)
 	title_mark.modulate = Color(1, 1, 1, 0)
 	title_line.modulate = Color(1, 1, 1, 0)
 	title_logo.modulate = Color(1, 1, 1, 0)
@@ -349,7 +351,7 @@ func _show_credits() -> void:
 			child.hide()
 	credits_screen.show()
 	credits_body.get_v_scroll_bar().value = 0.0
-	credits_back_button.grab_focus()
+	_grab_menu_focus(credits_back_button)
 
 
 func _hide_credits() -> void:
@@ -357,7 +359,7 @@ func _hide_credits() -> void:
 	for child in title_screen.get_children():
 		if child != credits_screen:
 			child.show()
-	credits_button.grab_focus()
+	_grab_menu_focus(credits_button)
 
 
 func _toggle_credits_pause() -> void:
@@ -384,6 +386,13 @@ func _setup_touch_controls() -> void:
 	normal.set_corner_radius_all(6)
 	var hover: StyleBoxFlat = normal.duplicate() as StyleBoxFlat
 	hover.bg_color = Color("#174461")
+	# These buttons already wear a 2 px cyan border, so the shared focus ring would vanish into it.
+	var focus: StyleBoxFlat = normal.duplicate() as StyleBoxFlat
+	focus.bg_color = Color("#234859")
+	focus.border_color = Color("#8de5f5")
+	focus.set_border_width_all(3)
+	for button: Button in [touch_left, touch_right, touch_use, touch_choice_1, touch_choice_2, pause_button, resume_button, settings_button, $CanvasLayer/PauseOverlay/Panel/PauseMenu/TitleButton]:
+		button.add_theme_stylebox_override("focus", focus)
 	for button: Button in [touch_left, touch_right, touch_use, touch_choice_1, touch_choice_2, pause_button, resume_button, settings_button, settings_back_button, fps_options, resolution_options, $CanvasLayer/PauseOverlay/Panel/PauseMenu/TitleButton]:
 		button.add_theme_stylebox_override("normal", normal)
 		button.add_theme_stylebox_override("hover", hover)
@@ -482,7 +491,7 @@ func _pause_game() -> void:
 	pause_button.hide()
 	touch_controls.hide()
 	get_tree().paused = true
-	resume_button.grab_focus()
+	_grab_menu_focus(resume_button)
 
 
 func _resume_game() -> void:
@@ -499,7 +508,7 @@ func _show_settings() -> void:
 	panel.size = Vector2(760, 464)
 	$CanvasLayer/PauseOverlay/Panel/Accent.hide()
 	settings_menu.show()
-	settings_menu.tabs.grab_focus()
+	_grab_menu_focus(settings_menu.tabs)
 
 
 func _show_title_settings() -> void:
@@ -511,7 +520,7 @@ func _show_title_settings() -> void:
 func _show_pause_menu() -> void:
 	if title_open and pause_overlay.visible:
 		_resume_game()
-		$CanvasLayer/TitleScreen/SettingsButton.grab_focus()
+		_grab_menu_focus($CanvasLayer/TitleScreen/SettingsButton)
 		return
 	settings_menu.cancel_capture()
 	var panel: Control = $CanvasLayer/PauseOverlay/Panel
@@ -524,7 +533,7 @@ func _show_pause_menu() -> void:
 	$CanvasLayer/PauseOverlay/Panel/PauseMenu/TitleButton.text = "SKIP OPENING" if intro_active else "RETURN TO TITLE"
 	$CanvasLayer/PauseOverlay/Panel/PauseMenu/ReturnWarning.visible = not intro_active
 	$CanvasLayer/PauseOverlay/Panel/PauseMenu/PauseHint.text = "TAP RESUME TO RETURN" if touch_enabled and not controller_active else "%s  RESUME" % settings_menu.prompt(&"pause_game", controller_active)
-	resume_button.grab_focus()
+	_grab_menu_focus(resume_button)
 
 
 func _return_to_title() -> void:
@@ -542,8 +551,25 @@ func _return_to_title() -> void:
 	_refresh_continue()
 	_update_controls()
 	_refresh_ui()
-	new_game_button.grab_focus()
+	_grab_menu_focus(new_game_button)
 
+
+## Keyboard and controller players need a focused menu control; pure touch play shows no focus ring.
+## Touch clears focus instead, so a stale focus behind an overlay cannot take the next key press.
+func _grab_menu_focus(control: Control) -> void:
+	if touch_enabled and not controller_active:
+		get_viewport().gui_release_focus()
+	else:
+		control.grab_focus()
+
+
+## The menu control a keyboard or controller press should land on when nothing has focus.
+func _menu_focus_target() -> Control:
+	if pause_overlay.visible:
+		return settings_menu.tabs if settings_menu.visible else resume_button
+	if title_open:
+		return credits_back_button if credits_screen.visible else new_game_button
+	return null
 
 func _unhandled_input(event: InputEvent) -> void:
 	if credits_screen.visible and event.is_action_pressed(&"ui_cancel"):
@@ -595,18 +621,11 @@ func _on_title_button() -> void:
 func _on_settings_back() -> void:
 	_show_pause_menu()
 	if not title_open:
-		settings_button.grab_focus()
+		_grab_menu_focus(settings_button)
 
 
 func _input(event: InputEvent) -> void:
-	var use_controller: bool = controller_active
-	if event is InputEventJoypadButton and event.pressed or event is InputEventJoypadMotion and absf(event.axis_value) > 0.45:
-		use_controller = true
-	elif event is InputEventScreenTouch and event.pressed or event is InputEventScreenDrag or event is InputEventKey and event.pressed or event is InputEventMouseButton and event.pressed:
-		use_controller = false
-	if use_controller != controller_active:
-		controller_active = use_controller
-		_refresh_ui()
+	_note_input_device(event)
 	# Direct response bindings win over native focused-button acceptance.
 	if waiting_for_choice and not title_open and not get_tree().paused and not event.is_echo():
 		var response: int = 1 if event.is_action_pressed(&"choice_1") else (2 if event.is_action_pressed(&"choice_2") else 0)
@@ -616,6 +635,31 @@ func _input(event: InputEvent) -> void:
 			else:
 				_choose(M0State.DISCLOSE if response == 1 else M0State.PRESS)
 			get_viewport().set_input_as_handled()
+
+
+## Called from _input during play and from PauseOverlay while the tree is paused.
+func _note_input_device(event: InputEvent) -> void:
+	var use_controller: bool = controller_active
+	var navigation_press: bool = false
+	if event is InputEventJoypadButton and event.pressed or event is InputEventJoypadMotion and absf(event.axis_value) > 0.45:
+		use_controller = true
+		navigation_press = true
+	elif event is InputEventScreenTouch and event.pressed or event is InputEventScreenDrag or event is InputEventKey and event.pressed or event is InputEventMouseButton and event.pressed:
+		use_controller = false
+		navigation_press = event is InputEventKey
+	if use_controller != controller_active:
+		controller_active = use_controller
+		_refresh_ui()
+	# Touch menus open unfocused; the first key or controller press gives keyboard and controller players a focus to move.
+	if navigation_press and get_viewport().gui_get_focus_owner() == null:
+		var target: Control = _menu_focus_target()
+		if target != null and target.is_visible_in_tree():
+			target.grab_focus()
+			# A navigation or confirm press only reveals focus; it must not also move it or activate the control.
+			for action: StringName in MENU_NAVIGATION_ACTIONS:
+				if event.is_action_pressed(action):
+					get_viewport().set_input_as_handled()
+					break
 
 
 func _load_game() -> void:
