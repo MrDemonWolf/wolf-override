@@ -30,6 +30,8 @@ Every pull request runs docs type checks, the docs tests and a production Pages 
 
 Godot 4.7.2 headless import, scripted state, M0 scene, chapter scene, and input/settings checks passed locally in the prior source-build review. Scene checks exercise both door routes, both mirror routes, and Continue restoring chapter progress. Engineer movement and WOLF's follow behavior were observed in a partial graphical playtest of the first corridor. Rendered touch, pause, and settings frames were inspected. Complete routes have not been played by hand.
 
+The Service Junction, the closer play camera, the layered room art, the station props, the redrawn characters and the generated sounds were checked only by the headless suites above and by rendered still frames at 960×540. None of them has been played by hand, so their feel, timing, readability and sound are not yet validated.
+
 A temporary iOS simulator export built and launched on two booted iPhone simulators; the iPhone 17e title screen was inspected. Touch gestures, controller hardware, and physical devices were not tested. Godot's official 4.7.2 iOS template contained only x86_64 simulator code in a slice labeled arm64; the local simulator build used a temporary version-matched arm64 library. No distributable iOS package is published.
 
 Graphical route play, hardware input, exports, signing, and physical devices remain separate gates. A green workflow does not certify a finished game or release package.

@@ -42,7 +42,7 @@ export default function HomePage() {
         <div className="marketing-story-copy"><p>The Director plans to use WOLF to kill, claiming it will protect people. WOLF wakes in his robotic body and refuses.</p><p>You play the engineer who meets him. Together, you begin to uncover what the program is hiding. WOLF has his own will; his trust must be earned.</p><Link className="marketing-inline" href="/docs/about/">Meet the game&apos;s world <span aria-hidden="true">→</span></Link></div>
       </section>
       <section id="gameplay" className="marketing-play marketing-width" aria-labelledby="play-title">
-        <div className="marketing-section-head"><p className="marketing-kicker">The relationship is the game</p><h2 id="play-title" tabIndex={-1}>Find a way forward. Together.</h2><p>The current source build includes a maintenance corridor and Records Access. This is the opening of a larger story.</p></div>
+        <div className="marketing-section-head"><p className="marketing-kicker">The relationship is the game</p><h2 id="play-title" tabIndex={-1}>Find a way forward. Together.</h2><p>The current source build includes a maintenance corridor, Records Access and the Service Junction. This is the opening of a larger story.</p></div>
         <figure className="marketing-game-frame"><a href={`${base}/corridor-source-build.png`} target="_blank" rel="noopener noreferrer" aria-label="Open full-size archived corridor screenshot"><img src={`${base}/corridor-source-build.png`} alt="Archived gameplay frame showing the engineer and WOLF beside the coolant relay, with the breaker, sealed door and safe point visible." width="960" height="540" loading="lazy" /></a><figcaption><strong>Archived gameplay frame</strong><span>Godot capture from September 30, 2026 · Before the current font and UI updates · Provisional art and UI</span></figcaption></figure>
         <div className="marketing-features">
           <article><span aria-hidden="true">01</span><h3>Play as the engineer</h3><p>You guide the engineer through THE DEN. WOLF moves and acts independently.</p></article>
@@ -53,7 +53,7 @@ export default function HomePage() {
       </section>
       <Downloads />
       <section className="marketing-progress marketing-width" aria-labelledby="progress-title">
-        <div><p className="marketing-kicker">Follow the build</p><h2 id="progress-title">A story taking shape.</h2><p>The source build contains two rooms, an opening scene, puzzles, choices and checkpoints. Animation, sound, the wider campaign and release packages are still in development.</p></div>
+        <div><p className="marketing-kicker">Follow the build</p><h2 id="progress-title">A story taking shape.</h2><p>The source build contains three rooms, an opening scene, puzzles, choices, checkpoints and generated sound effects. Animation, music, the wider campaign and release packages are still in development.</p></div>
         <div className="marketing-progress-links"><Link href="/docs/changelog/"><span>Development updates</span><strong>Read the changelog <span aria-hidden="true">↗</span></strong></Link><Link href="/docs/development/"><span>For source players & contributors</span><strong>Setup & build status <span aria-hidden="true">↗</span></strong></Link></div>
       </section>
       <footer className="marketing-footer marketing-width">
