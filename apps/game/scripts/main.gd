@@ -188,8 +188,15 @@ var corridor_defaults: Dictionary = {}
 var trial_lamps: PackedVector2Array = PackedVector2Array([Vector2(0.143, 0.188), Vector2(0.507, 0.188), Vector2(0.857, 0.188)])
 
 const WOLF_SPRITE_REST: Vector2 = Vector2(0.0, -15.0)
-const GAMEPLAY_ZOOM: float = 1.18
+const GAMEPLAY_ZOOM: float = 1.35
 const GAMEPLAY_VIEW_WIDTH: float = 960.0 / GAMEPLAY_ZOOM
+## The play camera's resting height. At 1.35 it puts the floor (y 440) 27 px above the context hint
+## (screen y 405) while the ceiling lamps (y ~188) and the junction's arm rail (y 196) stay in view.
+const GAMEPLAY_CAMERA_Y: float = 360.0
+## The chapter-close shots frame the room's right end a little closer than play, both actors above
+## the dialogue card.
+const CHAPTER_CLOSE_ZOOM: float = 1.45
+const CHAPTER_CLOSE_CAMERA: Vector2 = Vector2(960.0 - 480.0 / CHAPTER_CLOSE_ZOOM, 352.0)
 ## Menu cards fade and slide in over this long; short enough never to hold up input or players who want little motion.
 const MENU_REVEAL_SECONDS: float = 0.12
 const MENU_REVEAL_OFFSET: Vector2 = Vector2(0.0, 10.0)
@@ -405,7 +412,7 @@ func _attach_status_glow(light: ColorRect) -> Sprite2D:
 
 func _update_gameplay_camera() -> void:
 	var half_view: float = GAMEPLAY_VIEW_WIDTH * 0.5
-	intro_camera.position = Vector2(clampf(human.position.x, half_view, 960.0 - half_view), 330.0)
+	intro_camera.position = Vector2(clampf(human.position.x, half_view, 960.0 - half_view), GAMEPLAY_CAMERA_Y)
 
 
 func _start_gameplay_camera() -> void:
@@ -1200,8 +1207,7 @@ func _interact_records(x: float) -> void:
 			impact.rumble(0.3, 0.4, 0.12)
 			impact.burst(exit_sparks)
 			chapter_tween = create_tween()
-			chapter_tween.tween_property(intro_camera, "position", Vector2(576.0, 330.0), 0.5).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
-			chapter_tween.parallel().tween_property(intro_camera, "zoom", Vector2(1.25, 1.25), 0.5)
+			_frame_chapter_close()
 			chapter_tween.parallel().tween_property(records_room.exit_art, "position:y", 245.0, 0.5)
 			chapter_tween.parallel().tween_property(records_room.exit_art, "modulate:a", 0.0, 0.5)
 			chapter_tween.tween_callback(records_room.exit_art.hide)
@@ -1408,9 +1414,15 @@ func _leave_junction() -> void:
 	_update_controls()
 	status_line = "SERVICE LINE CLEARED. WOLF: It's quiet now. The line runs on toward Archive.\n%s: Then that's where we go." % state.human_name().get_slice(" ", 0).to_upper()
 	chapter_tween = create_tween()
-	# As far right as the room allows at the closing zoom, the same frame the Records close uses.
-	chapter_tween.tween_property(intro_camera, "position", Vector2(960.0 - 480.0 / 1.25, 330.0), 0.5).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
-	chapter_tween.parallel().tween_property(intro_camera, "zoom", Vector2(1.25, 1.25), 0.5)
+	# The same frame the Records close uses.
+	_frame_chapter_close()
+
+
+## Starts the chapter-close camera move on chapter_tween: as far right as the room allows at the
+## closing zoom, so the exit and both actors share the shot.
+func _frame_chapter_close() -> void:
+	chapter_tween.tween_property(intro_camera, "position", CHAPTER_CLOSE_CAMERA, 0.5).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
+	chapter_tween.parallel().tween_property(intro_camera, "zoom", Vector2.ONE * CHAPTER_CLOSE_ZOOM, 0.5)
 
 
 ## Runs the pressure line every frame in the junction: held USE at the valve cranks it, the line

@@ -364,9 +364,9 @@ vertical_alignment = 1
 
 [node name="TutorialPrompt" type="Panel" parent="CanvasLayer"]
 visible = false
-offset_left = 300.0
+offset_left = 322.0
 offset_top = 96.0
-offset_right = 616.0
+offset_right = 638.0
 offset_bottom = 162.0
 mouse_filter = 2
 theme_type_variation = &"HudCard"

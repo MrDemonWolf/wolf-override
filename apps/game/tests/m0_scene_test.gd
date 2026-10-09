@@ -154,7 +154,14 @@ func _run() -> void:
 	if not _require(await _walk_to(human, 605.0), "engineer reaches relay with WOLF following"):
 		return
 	game.call("_update_gameplay_camera")
-	_expect(gameplay_camera.position.x > 480.0 and gameplay_camera.position.x < 560.0, "camera scrolls toward the engineer without exposing the corridor edge")
+	var half_view: Vector2 = Vector2(960.0, 540.0) * 0.5 / gameplay_camera.zoom
+	_expect(is_equal_approx(gameplay_camera.zoom.x, 1.35), "play view uses the 1.35 gameplay zoom")
+	_expect(gameplay_camera.position.x > 560.0 and gameplay_camera.position.x - half_view.x >= 0.0 and gameplay_camera.position.x + half_view.x <= 960.0, "camera scrolls toward the engineer without exposing the corridor edge")
+	_expect(is_equal_approx(gameplay_camera.position.x, clampf(human.position.x, half_view.x, 960.0 - half_view.x)), "the camera centres on the engineer inside its room clamp")
+	# Feet on the floor (y 440) stay at least 24 px above the context hint, and the ceiling lamps (y ~188) stay in view.
+	var feet_screen_y: float = (440.0 - gameplay_camera.position.y) * gameplay_camera.zoom.y + 270.0
+	_expect(feet_screen_y <= context_hint.position.y - 24.0, "the actors' feet sit clear above the context hint")
+	_expect(gameplay_camera.position.y - half_view.y <= 170.0 and gameplay_camera.position.y + half_view.y <= 600.0, "play view keeps the ceiling lamps in view and stays on the painting")
 	_expect(not wolf.controlled and wolf.position.x > 400.0 and wolf.position.x < human.position.x, "WOLF stays a companion at the relay")
 	_expect(str(game.call("_context_hint")).contains("ask WOLF"), "relay hint offers WOLF the live contact")
 	await _tap(&"interact")
