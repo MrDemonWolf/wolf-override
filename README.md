@@ -67,14 +67,15 @@ The title screen offers New Game, Continue (when a valid checkpoint
 exists), Credits, Settings and a link to the public changelog. The
 opening is player-paced; Pause offers Skip Opening during it. Defaults:
 
-| Action                        | Keyboard            | Controller          | Touch                         |
-| ----------------------------- | ------------------- | ------------------- | ----------------------------- |
-| Move                          | A / D or arrow keys | Left stick or D-pad | Hold the on-screen arrows     |
-| Interact / continue a beat    | E                   | A                   | USE (CONTINUE during a beat)  |
-| Answer 1 / Answer 2           | 1 / 2 or click      | X / Y               | Tap the response              |
-| Pause or resume               | Esc                 | Start               | PAUSE                         |
-| Back in menus / cancel rebind | Esc                 | B                   | Android Back                  |
-| Cycle the provisional name    | I (not rebindable)  | -                   | -                             |
+| Action                     | Keyboard             | Controller          | Touch                        |
+| -------------------------- | -------------------- | ------------------- | ---------------------------- |
+| Move                       | A / D or arrow keys  | Left stick or D-pad | Hold the on-screen arrows    |
+| Interact / continue a beat | E                    | A                   | USE (CONTINUE during a beat) |
+| Answer 1 / Answer 2        | 1 / 2 or click       | X / Y               | Tap the response             |
+| Pause or resume            | Esc                  | Start               | PAUSE; tap RESUME to return  |
+| Back in menus              | Esc                  | B                   | Android Back                 |
+| Cancel a rebind            | Esc or CANCEL REBIND | -                   | Android Back                 |
+| Cycle the provisional name | I (not rebindable)   | -                   | -                            |
 
 Move, Interact, both answers and Pause can be rebound in Settings. The
 pause menu has Resume, Settings and Return to Title (Skip Opening during
@@ -91,12 +92,12 @@ has the puzzle solutions.
 
 ## Tech Stack
 
-| Layer          | Technology                                      |
-| -------------- | ----------------------------------------------- |
-| Game           | Godot 4.7.2 stable, typed GDScript, 2D          |
-| Game state     | Authored events and versioned JSON saves        |
+| Layer          | Technology                                                            |
+| -------------- | --------------------------------------------------------------------- |
+| Game           | Godot 4.7.2 stable, typed GDScript, 2D                                |
+| Game state     | Authored events and versioned JSON saves                              |
 | Public site    | Next.js 16.1.1, Fumadocs UI 16.4.6, Tailwind CSS 4.1, MDX, TypeScript |
-| Docs workspace | Bun 1.4.2                                       |
+| Docs workspace | Bun 1.4.2                                                             |
 
 ## Development
 

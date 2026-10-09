@@ -10,7 +10,7 @@
       "source_reference": "Create Logo Mark chat in the private MDW WOLF//OVERRIDE [Game] ChatGPT project; URL retained in private art notes",
       "terms_reference": "https://openai.com/policies/terms-of-use/",
       "rights_review_status": "Provisional branding; trademark and final asset-rights review pending. Not covered by the code/docs GPL license.",
-      "modifications": "Simplified the generated concept into original SVG paths using the public docs navy, cyan and white palette.",
+      "modifications": "Simplified the generated concept into original SVG paths using the public docs navy, cyan and white palette. The published docs copy adds a 160 px intrinsic width and height so Markdown renderers such as GitHub show it at mark size; the game copy keeps the bare 512 viewBox for Godot import.",
       "implementation_status": "Provisional mark used by the game title, README and public landing page."
     },
     {
