@@ -67,6 +67,7 @@ func _run() -> void:
 	_expect(absf(door.get_global_transform().origin.y + door.region_rect.size.y * door.scale.y * 0.5 - 440.0) < 0.5, "the corridor seal stands on the floor")
 	_expect(absf(junction.door_art.get_global_transform().origin.y + junction.door_art.region_rect.size.y * junction.door_art.scale.y * 0.5 - 440.0) < 0.5, "the junction door stands on the floor")
 	_expect(is_equal_approx(records.exit_art.position.y, RecordsRoom.EXIT_REST.y), "the exit hatch rests where the chapter close resets it")
+	_expect(records.exit_art.z_index >= 0 and records.exit_art.z_as_relative, "the exit hatch draws over the open doorway the records room paints, so its lift-away shows")
 	game.queue_free()
 	await process_frame
 	for leftover: String in [path, "%s-settings.cfg" % path]:
@@ -79,6 +80,7 @@ func _run() -> void:
 
 func _check_plates(room_name: String, depth: RoomDepth) -> void:
 	_expect(depth.painting != null and depth.mid_painting != null and depth.near_painting != null, "%s has far, mid and near plates" % room_name)
+	_expect(depth.far_dust.z_index < depth.mid_layer.z_index and depth.far_dust.z_index >= depth.backdrop_layer.z_index and depth.far_dust.get_index() > depth.backdrop_layer.get_index(), "%s: the far dust drifts over the far wall and behind the mid plate" % room_name)
 	var mid: Sprite2D = depth.mid_layer.get_node("Painting") as Sprite2D
 	_expect(is_equal_approx(mid.position.y + depth.walkway_y * mid.scale.y, RoomDepth.FLOOR_Y), "%s: the mid plate's walkway is the floor" % room_name)
 	_expect(mid.position.x == 0.0 and is_equal_approx(mid.texture.get_width() * mid.scale.x, RoomDepth.ROOM_WIDTH), "%s: the mid plate spans the room 1:1" % room_name)

@@ -54,9 +54,12 @@ func _ready() -> void:
 	var purge_art: Sprite2D = RoomDepth.make_prop("PurgeArt", PURGE_QUEUE, PURGE_REGION, PURGE_SCALE, 190.0)
 	var mirror_art: Sprite2D = RoomDepth.make_prop("MirrorArt", MIRROR_PORT, MIRROR_REGION, MIRROR_SCALE, 520.0)
 	exit_art = RoomDepth.make_prop("ExitArt", EXIT_HATCH, EXIT_REGION, EXIT_SCALE, EXIT_REST.x)
-	for prop: Sprite2D in [purge_art, mirror_art, exit_art]:
+	for prop: Sprite2D in [purge_art, mirror_art]:
 		# One step under this node's own drawing, so the status lights drawn in _draw() sit on the art.
 		prop.z_index = -1
+	# The exit hatch stays at this node's depth, over the open doorway _draw_exit() paints once the
+	# chapter is complete, so the hatch can be seen lifting away during the close.
+	for prop: Sprite2D in [purge_art, mirror_art, exit_art]:
 		add_child(prop)
 		floor_reflections.append(FloorReflection.attach(prop))
 	purge_glow = _add_glow("PurgeGlow", PURGE_LIGHT.get_center())

@@ -18,7 +18,9 @@ const BACKDROP_SCROLL: Vector2 = Vector2(0.9, 1.0)
 const NEAR_SCROLL: Vector2 = Vector2(1.15, 1.0)
 const Z_BACKDROP: int = -4
 const Z_MID: int = -3
-const Z_ATMOSPHERE: int = -3
+## Far dust shares the backdrop's depth and is added after it, so it drifts over the far wall but
+## behind the mid plate's pillars and pipes.
+const Z_ATMOSPHERE: int = -4
 const Z_NEAR: int = 3
 ## The near edge strips are anchored past the room edges so their outer edges stay off screen
 ## through every framing: Parallax2D shifts a layer by (camera x - 480) * (1 - scroll), which at
