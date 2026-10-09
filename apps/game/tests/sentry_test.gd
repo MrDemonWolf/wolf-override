@@ -36,7 +36,9 @@ func _check_brain() -> void:
 	brain.tick(1.0, 100.0, false, -1.0)
 	_expect(is_equal_approx(brain.x, 700.0) and brain.facing < 0.0, "patrol runs left from the far end at 140 px/s")
 	brain.tick(1.0, 100.0, false, -1.0)
-	_expect(is_equal_approx(brain.x, 640.0) and brain.facing > 0.0, "it bounces off 600 and comes back")
+	_expect(is_equal_approx(brain.x, SentryBrain.PATROL_MIN_X * 2.0 - 560.0) and brain.facing > 0.0, "it bounces off its near end and comes back")
+	_expect(is_equal_approx(SentryBrain.PATROL_MIN_X - SentryBrain.HALF_WIDTH, SentryBrain.COVER_MAX_X + M0State.HUMAN_HALF_WIDTH), "the patrol turns where its front edge meets an engineer at the alcove's right end")
+	_expect(SentryBrain.PATROL_MIN_X < DropArm.MARK_X - DropArm.HIT_RANGE and SentryBrain.PATROL_MAX_X > DropArm.MARK_X + DropArm.HIT_RANGE, "the patrol still crosses the whole hit window")
 	var sliced: SentryBrain = _patrolling_at(SentryBrain.PATROL_MAX_X, -1.0)
 	var whole: SentryBrain = _patrolling_at(SentryBrain.PATROL_MAX_X, -1.0)
 	var lowest: float = INF
@@ -47,7 +49,9 @@ func _check_brain() -> void:
 		highest = maxf(highest, sliced.x)
 	whole.tick(5.0, 100.0, false, -1.0)
 	_expect(absf(sliced.x - whole.x) < 0.01 and sliced.facing == whole.facing, "sliced and whole deltas land on the same patrol position")
-	_expect(lowest >= SentryBrain.PATROL_MIN_X - 0.01 and highest <= SentryBrain.PATROL_MAX_X + 0.01, "patrol stays inside 600..840")
+	_expect(lowest >= SentryBrain.PATROL_MIN_X - 0.01 and highest <= SentryBrain.PATROL_MAX_X + 0.01, "patrol stays inside its range")
+	for cover_x: float in [SentryBrain.COVER_MIN_X, JunctionRoom.ARM_X, SentryBrain.COVER_MAX_X]:
+		_expect(lowest - cover_x > SentryBrain.CONTACT_RANGE - 0.01, "a patrolling sentry never runs into an engineer hidden at %.0f" % cover_x)
 	# Detection: only in the lane, only ahead (or touching), never in the alcove.
 	_expect(_patrolling_at(700.0, -1.0).tick(0.001, 600.0, true, -1.0) == &"chase", "an exposed engineer ahead inside its sight is seen")
 	_expect(_patrolling_at(840.0, -1.0).tick(0.001, 665.0, true, -1.0) == &"chase", "175 px ahead is inside its sight")
@@ -75,6 +79,15 @@ func _check_brain() -> void:
 	_expect(chaser.state == &"chase", "2.4 s back over the rubble it is still after the engineer")
 	chaser.tick(0.1, 500.0, false, -1.0)
 	_expect(chaser.state == &"patrol", "2.5 s back over the rubble and it gives up")
+	var parked_x: float = chaser.x
+	chaser.tick(0.02, 500.0, false, -1.0)
+	_expect(chaser.facing > 0.0 and is_equal_approx(chaser.x - parked_x, SentryBrain.PATROL_SPEED * 0.02), "after a chase it turns and walks back into its patrol instead of jumping")
+	var walk_back_sliced: SentryBrain = _patrolling_at(SentryBrain.CHASE_MIN_X, -1.0)
+	var walk_back_whole: SentryBrain = _patrolling_at(SentryBrain.CHASE_MIN_X, -1.0)
+	for _frame: int in 300:
+		walk_back_sliced.tick(3.0 / 300.0, 500.0, false, -1.0)
+	walk_back_whole.tick(3.0, 500.0, false, -1.0)
+	_expect(absf(walk_back_sliced.x - walk_back_whole.x) < 0.01 and walk_back_sliced.facing == walk_back_whole.facing, "walking back in lands the same with sliced and whole deltas")
 	_expect(not _patrolling_at(700.0, -1.0).touches(700.0), "a patrolling sentry is not contact")
 	# Fixated on WOLF.
 	var fixated: SentryBrain = _patrolling_at(SentryBrain.PATROL_MAX_X, -1.0)
@@ -83,6 +96,8 @@ func _check_brain() -> void:
 	_expect(is_equal_approx(fixated.x, JunctionRoom.WOLF_BAIT_X - SentryBrain.BAIT_OFFSET) and is_equal_approx(fixated.x, DropArm.MARK_X) and fixated.facing > 0.0, "it parks short of WOLF, on the floor mark, facing him")
 	fixated.tick(1.0, 600.0, true, JunctionRoom.WOLF_BAIT_X)
 	_expect(fixated.state == &"fixated" and is_equal_approx(fixated.x, DropArm.MARK_X), "an engineer elsewhere in the lane does not break its hold")
+	_expect(JunctionRoom.WOLF_BAIT_X - M0State.WOLF_HALF_WIDTH >= fixated.x + SentryBrain.HALF_WIDTH, "the parked sentry does not overlap WOLF")
+	_expect(JunctionRoom.WOLF_BAIT_X - M0State.WOLF_HALF_WIDTH > DropArm.MARK_X + JunctionRoom.TANK_SIZE.x * 0.5, "WOLF stands clear of the tank's footprint")
 	var from_left: SentryBrain = _patrolling_at(SentryBrain.PATROL_MIN_X, 1.0)
 	from_left.tick(2.0, 100.0, false, JunctionRoom.WOLF_BAIT_X)
 	_expect(is_equal_approx(from_left.x, DropArm.MARK_X), "it parks on the mark from either side")

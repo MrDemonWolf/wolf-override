@@ -7,10 +7,6 @@ extends RefCounted
 ## the room sets [member paused] during a choice and never ticks it while the game is paused or
 ## during a knockdown.
 
-const PATROL_MIN_X: float = 600.0
-const PATROL_MAX_X: float = 840.0
-const PATROL_SPEED: float = 140.0
-const CHASE_SPEED: float = 230.0
 ## The rubble line the sentry never crosses; an engineer at or left of LANE_ENTRY_X is out of its lane.
 const RUBBLE_X: float = 540.0
 const LANE_ENTRY_X: float = RUBBLE_X + 5.0
@@ -23,13 +19,20 @@ const SIGHT_RANGE: float = 180.0
 ## Half the sentry's body. Bodies touching (this plus half the engineer) is contact.
 const HALF_WIDTH: float = 26.0
 const CONTACT_RANGE: float = HALF_WIDTH + M0State.HUMAN_HALF_WIDTH
+## The patrol turns where its front edge meets an engineer standing at the alcove's right end, so a
+## patrolling sentry never runs into someone hiding there (624; the patrol still crosses the mark).
+const PATROL_MIN_X: float = COVER_MAX_X + CONTACT_RANGE
+const PATROL_MAX_X: float = 840.0
+const PATROL_SPEED: float = 140.0
+const CHASE_SPEED: float = 230.0
 ## The closest it comes to the rubble while chasing: one pixel more than contact range past the lane
 ## edge, so an engineer anywhere out of the lane is out of reach.
 const CHASE_MIN_X: float = LANE_ENTRY_X + CONTACT_RANGE + 1.0
 ## Seconds an engineer must stay back over the rubble before a chase gives up.
 const LOSE_SECONDS: float = 2.5
-## A fixated sentry parks this far short of the one drawing it.
-const BAIT_OFFSET: float = 40.0
+## A fixated sentry parks this far short of the one drawing it: its body and WOLF's clear each other
+## (26 + 31 = 57), and WOLF stands clear of the tank's footprint over the mark.
+const BAIT_OFFSET: float = 60.0
 const EPSILON: float = 0.00001
 
 var state: StringName = &"dormant"
@@ -125,7 +128,17 @@ func reset(door_blown: bool, down: bool, down_x: float) -> void:
 
 
 func _patrol(delta: float) -> void:
+	# Outside the patrol range (a chase parked it short of the rubble): face back into it and walk
+	# there at patrol speed rather than jumping in.
+	var below: bool = x < PATROL_MIN_X
+	var above: bool = x > PATROL_MAX_X
+	if below:
+		facing = 1.0
+	elif above:
+		facing = -1.0
 	x += facing * PATROL_SPEED * delta
+	if (below and x <= PATROL_MIN_X) or (above and x >= PATROL_MAX_X):
+		return
 	# Bounce off either end, keeping any overshoot so sliced and whole deltas land the same.
 	while x < PATROL_MIN_X or x > PATROL_MAX_X:
 		if x < PATROL_MIN_X:

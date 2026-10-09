@@ -3,6 +3,7 @@
 - A missed drop dents the tank, vents a short coolant cloud over the mark and sends the sentry after you; the arm winches the tank back up for another try a few seconds later.
 - Bringing down the sentry and leaving the junction both autosave, and Continue restores each stage. Being caught by the sentry or walking into the coolant cloud is a knockdown back to the last autosave with your choices intact.
 - New generated sounds for the sentry's motors, the arm's winch, the tank landing and the exit bolt.
+- The sentry's patrol now turns before it reaches the ARM PANEL alcove, so it no longer brushes past an engineer hiding there; after giving up a chase it walks back into its patrol instead of jumping; and when WOLF draws it onto the mark it stops clear of him, with WOLF standing clear of the tank.
 - In the Service Junction, whether the door blast knocks you down now depends only on where you stand when the fuse ends: in front of the door is a knockdown with the door still sealed, anywhere at or left of the relief vent the door goes and the game saves. Standing just short of the vent can no longer do both at once.
 - The relief vent's danger zone now matches its floor grate and the on-screen warning: any part of the engineer over the grate when it lets go is a knockdown, and the hint warns you while you stand there. The grate is drawn wider to show the whole zone.
 - During a knockdown the engineer now draws in front of WOLF, and the vent's steam burst is lighter and see-through.
