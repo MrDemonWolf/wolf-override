@@ -31,9 +31,10 @@ const WOLF_BAIT_X: float = DropArm.MARK_X + SentryBrain.BAIT_OFFSET
 ## The engineer's front foot on the rubble line: where the question of how to drop the tank comes up,
 ## still outside the sentry's lane.
 const CHOICE_X: float = RUBBLE_X - M0State.HUMAN_HALF_WIDTH
-## The tank hangs centred here, low enough to stay below the on-screen answers, and lands with its
-## base on the floor.
-const TANK_REST_Y: float = 300.0
+## The tank hangs centred here and lands with its base on the floor. At the play framing (zoom 1.35,
+## camera y 360) its top sits at screen y ~186, below the answer buttons (Main.CHOICE_ROW_TOP), and
+## its base (y 354) clears the sentry's mast (Sentry.DRAWN_HEIGHT) as it patrols underneath.
+const TANK_REST_Y: float = 326.0
 const TANK_SIZE: Vector2 = Vector2(36.0, 56.0)
 const RAIL_Y: float = 196.0
 ## The hatch slides open this long after the bolt arcs.
@@ -54,6 +55,10 @@ const COOLANT: Color = Color("#7fe8ff")
 const SEAM_RED: Color = Color("#ff6a55")
 ## The VALVE label sits this far left of the wheel so SEAL CHARGED ends before the door art.
 const VALVE_LABEL_SHIFT: float = 22.0
+## The relief vent's painted caption: its baseline start, text and size.
+const VENT_LABEL_POSITION: Vector2 = Vector2(VENT_X - 42.0, 346.0)
+const VENT_LABEL: String = "RELIEF VENT"
+const VENT_LABEL_FONT_SIZE: int = 11
 ## The gauge dial sits above the pipe run (y 292), clear of the VALVE label below it.
 const GAUGE_CENTRE: Vector2 = Vector2(VALVE_X - 48.0, 266.0)
 
@@ -622,7 +627,7 @@ func _draw_vent() -> void:
 	draw_rect(grate, STEEL, false, 2.0)
 	var vent_light: Color = SEAM_RED if line_state == &"tripped" else (DIM.lerp(AMBER, gauge) if line_state == &"building" else DIM)
 	draw_rect(Rect2(VENT_X - 13.0, 352.0, 26.0, 5.0), vent_light)
-	draw_string(ThemeDB.fallback_font, Vector2(VENT_X - 42.0, 346.0), "RELIEF VENT", HORIZONTAL_ALIGNMENT_LEFT, -1, 11, Color("#8fa6b2"))
+	draw_string(ThemeDB.fallback_font, VENT_LABEL_POSITION, VENT_LABEL, HORIZONTAL_ALIGNMENT_LEFT, -1, VENT_LABEL_FONT_SIZE, Color("#8fa6b2"))
 
 
 ## A dial mounted above the pipe run beside the valve whose needle is the gauge (above the station

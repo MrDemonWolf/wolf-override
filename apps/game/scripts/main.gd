@@ -193,9 +193,14 @@ const GAMEPLAY_VIEW_WIDTH: float = 960.0 / GAMEPLAY_ZOOM
 ## The play camera's resting height. At 1.35 it puts the floor (y 440) 27 px above the context hint
 ## (screen y 405) while the ceiling lamps (y ~188) and the junction's arm rail (y 196) stay in view.
 const GAMEPLAY_CAMERA_Y: float = 360.0
-## The chapter-close shots frame the room's right end a little closer than play, both actors above
-## the dialogue card.
-const CHAPTER_CLOSE_ZOOM: float = 1.45
+## The answer buttons start just under the top card (bottom y 78). The keyboard pair ends at y 174
+## and the touch pair at y 164, so the junction's hanging tank (JunctionRoom.TANK_REST_Y) stays in
+## view below them at the play framing.
+const CHOICE_ROW_TOP: float = 88.0
+## The chapter-close shots frame the room's right end closer than play, both actors above the
+## dialogue card. At 1.55 the left edge (x ~341) falls in the gap between the junction's relief vent
+## (its label and grate end by x 336) and the gauge and VALVE label (from x ~354), so no label is cut.
+const CHAPTER_CLOSE_ZOOM: float = 1.55
 const CHAPTER_CLOSE_CAMERA: Vector2 = Vector2(960.0 - 480.0 / CHAPTER_CLOSE_ZOOM, 352.0)
 ## Menu cards fade and slide in over this long; short enough never to hold up input or players who want little motion.
 const MENU_REVEAL_SECONDS: float = 0.12
@@ -1951,8 +1956,8 @@ func _refresh_ui() -> void:
 	touch_choice_1.visible = waiting_for_choice
 	touch_choice_2.visible = waiting_for_choice
 	if waiting_for_choice:
-		touch_choice_1.position = Vector2(42.0, 110.0) if touch_layout else Vector2(396.0, 110.0)
-		touch_choice_2.position = Vector2(490.0, 110.0) if touch_layout else Vector2(396.0, 156.0)
+		touch_choice_1.position = Vector2(42.0, CHOICE_ROW_TOP) if touch_layout else Vector2(396.0, CHOICE_ROW_TOP)
+		touch_choice_2.position = Vector2(490.0, CHOICE_ROW_TOP) if touch_layout else Vector2(396.0, CHOICE_ROW_TOP + 46.0)
 		touch_choice_1.size = Vector2(428.0, 76.0) if touch_layout else Vector2(522.0, 40.0)
 		touch_choice_2.size = Vector2(428.0, 76.0) if touch_layout else Vector2(522.0, 40.0)
 		touch_choice_1.add_theme_font_size_override("font_size", 17 if touch_layout else 16)

@@ -12,6 +12,8 @@ const FLOOR_Y: float = 440.0
 ## The drawing below is laid out for a 44 px body and scaled to the brain's real width.
 const DRAW_SCALE: float = SentryBrain.HALF_WIDTH / 22.0
 const BODY_SIZE: Vector2 = Vector2(SentryBrain.HALF_WIDTH * 2.0, 40.0 * DRAW_SCALE)
+## How far the drawing reaches above the floor: the top of the sensor mast's ball.
+const DRAWN_HEIGHT: float = 62.0 * DRAW_SCALE
 ## How far it keels over when the tank lands on it.
 const DOWN_DEGREES: float = 78.0
 

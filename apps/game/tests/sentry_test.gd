@@ -206,6 +206,17 @@ func _check_scene() -> void:
 	_expect(await _walk_until_choice(game), "stepping onto the rubble line brings up the question")
 	_expect(game.get("choice_context") == "lane" and human.position.x < SentryBrain.LANE_ENTRY_X and not human.controlled, "the question comes up before the engineer is in the lane")
 	_expect(touch_choice_1.visible and touch_choice_1.text.contains("Draw it under the arm"), "the answers are on screen")
+	# The tank WOLF is asking about hangs in view below the answers in both layouts at the play framing.
+	var touch_choice_2: Button = game.get_node("CanvasLayer/TouchControls/Choice2") as Button
+	var tank_top_screen: float = (room.tank.position.y - JunctionRoom.TANK_SIZE.y * 0.5 - camera.position.y) * camera.zoom.y + 270.0
+	for touch_layout: bool in [false, true]:
+		game.set("touch_enabled", touch_layout)
+		game.call("_refresh_ui")
+		var answers_bottom: float = maxf(touch_choice_1.get_global_rect().end.y, touch_choice_2.get_global_rect().end.y)
+		_expect(is_equal_approx(camera.zoom.y, 1.35) and tank_top_screen >= answers_bottom + 8.0, "the hanging tank sits below the %s answers (tank top %.0f, answers end %.0f)" % ["touch" if touch_layout else "keyboard", tank_top_screen, answers_bottom])
+	game.set("touch_enabled", false)
+	game.call("_refresh_ui")
+	_expect(JunctionRoom.TANK_REST_Y + JunctionRoom.TANK_SIZE.y * 0.5 <= Sentry.FLOOR_Y - Sentry.DRAWN_HEIGHT - 8.0, "the hung tank clears the patrolling sentry's mast")
 	var frozen_x: float = brain.x
 	for _frame: int in 20:
 		await physics_frame
@@ -251,6 +262,8 @@ func _check_scene() -> void:
 	_expect(state.junction_cleared and game.get("chapter_close_active") and not human.controlled and (game.get_node("CanvasLayer/TopBar/HUD") as Label).text.contains("SERVICE LINE CLEARED"), "USE at the open hatch clears the junction into a closing beat")
 	var autosave_d: M0State = State.load_from_disk(path)
 	_expect(autosave_d != null and autosave_d.junction_cleared, "autosave D records the cleared junction")
+	await create_timer(0.6).timeout
+	_expect(_close_cuts_no_label(camera, room), "the closing shot cuts no junction label at its edges")
 	await _tap(&"pause_game")
 	_expect(paused, "pause works during the closing beat")
 	(game.get_node("CanvasLayer/PauseOverlay") as PauseOverlay).resume_requested.emit()
@@ -394,6 +407,29 @@ func _start_at_b(game: Node2D, choice_id: String) -> Dictionary:
 	game.call("_save_progress")
 	await physics_frame
 	return State.load_from_disk(game.get("save_path")).to_dict()
+
+
+## True when neither edge of the settled closing shot falls inside a station label or the painted
+## RELIEF VENT caption.
+func _close_cuts_no_label(camera: Camera2D, room: JunctionRoom) -> bool:
+	var half_width: float = 480.0 / camera.zoom.x
+	var edges: Array[float] = [camera.position.x - half_width, camera.position.x + half_width]
+	var font: Font = ThemeDB.fallback_font
+	var vent_start: float = JunctionRoom.VENT_LABEL_POSITION.x
+	var spans: Array[Vector2] = [Vector2(vent_start, vent_start + font.get_string_size(JunctionRoom.VENT_LABEL, HORIZONTAL_ALIGNMENT_LEFT, -1, JunctionRoom.VENT_LABEL_FONT_SIZE).x)]
+	for child: Node in room.get_children():
+		var label: Label = child as Label
+		if label == null or not label.visible:
+			continue
+		var text_width: float = label.get_theme_font("font").get_string_size(label.text, HORIZONTAL_ALIGNMENT_LEFT, -1, label.get_theme_font_size("font_size")).x
+		var centre: float = label.position.x + label.size.x * 0.5
+		spans.append(Vector2(centre - text_width * 0.5, centre + text_width * 0.5))
+	for edge: float in edges:
+		for span: Vector2 in spans:
+			if edge > span.x - 4.0 and edge < span.y + 4.0:
+				push_error("the closing edge at x %.1f cuts a label spanning %.1f..%.1f" % [edge, span.x, span.y])
+				return false
+	return true
 
 
 func _walk_until_choice(game: Node2D) -> bool:
