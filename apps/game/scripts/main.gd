@@ -9,6 +9,21 @@ const NO_CHECKPOINT_NOTE: String = "No checkpoint yet. Reach a SAFE POINT to sav
 const UNREADABLE_CHECKPOINT_NOTE: String = "Saved checkpoint could not be read."
 const MENU_NAVIGATION_ACTIONS: Array[StringName] = [&"ui_accept", &"ui_up", &"ui_down", &"ui_left", &"ui_right", &"ui_focus_next", &"ui_focus_prev"]
 
+## One switch for the depth pass (parallax, glows, haze, dust, reflections, grade) so a Settings toggle can follow.
+@export var effects_enabled: bool = true:
+	set(value):
+		effects_enabled = value
+		if is_node_ready():
+			_apply_effects()
+## Trial corridor built from three generated plates (far, mid, near) instead of the single painting, for comparison stills.
+@export var corridor_layers_trial: bool = false:
+	set(value):
+		corridor_layers_trial = value
+		if is_node_ready():
+			_apply_corridor_variant()
+
+@onready var corridor_depth: RoomDepth = $CorridorDepth
+@onready var post_grade: ColorRect = $PostProcess/Grade
 @onready var human: M0Actor = $Human
 @onready var wolf: M0Actor = $Wolf
 @onready var relay_spark: Line2D = $RelaySpark
@@ -23,6 +38,7 @@ const MENU_NAVIGATION_ACTIONS: Array[StringName] = [&"ui_accept", &"ui_up", &"ui
 @onready var checkpoint_art: Sprite2D = $CheckpointArt
 @onready var breaker_status_light: ColorRect = $BreakerStatusLight
 @onready var relay_status_light: ColorRect = $RelayStatusLight
+@onready var door_art: Sprite2D = $Door/Visual/DoorArt
 @onready var human_tag: Label = $Human/Tag
 @onready var door_shape: CollisionShape2D = $Door/CollisionShape2D
 @onready var door_visual: ColorRect = $Door/Visual
@@ -97,6 +113,13 @@ var records_room: RecordsRoom
 var credits_paused: bool = false
 var save_error: String = ""
 var save_error_context: String = ""
+var floor_reflections: Array[FloorReflection] = []
+var breaker_status_glow: Sprite2D
+var relay_status_glow: Sprite2D
+## The corridor plates and lamps the scene ships with, restored when the layer trial is switched off.
+var corridor_defaults: Dictionary = {}
+## Ceiling lamp centres of the trial far plate, as fractions of that plate.
+var trial_lamps: PackedVector2Array = PackedVector2Array([Vector2(0.143, 0.188), Vector2(0.507, 0.188), Vector2(0.857, 0.188)])
 
 const WOLF_SPRITE_REST: Vector2 = Vector2(0.0, -15.0)
 const GAMEPLAY_ZOOM: float = 1.18
@@ -104,7 +127,12 @@ const GAMEPLAY_VIEW_WIDTH: float = 960.0 / GAMEPLAY_ZOOM
 ## Menu cards fade and slide in over this long; short enough never to hold up input or players who want little motion.
 const MENU_REVEAL_SECONDS: float = 0.12
 const MENU_REVEAL_OFFSET: Vector2 = Vector2(0.0, 10.0)
-const CORRIDOR_BACKGROUND: Texture2D = preload("res://assets/maintenance-corridor-background-provisional.png")
+## Trial plates load only when the trial is on, so the default build never holds them in memory.
+const TRIAL_FAR_PATH: String = "res://assets/trial/corridor-far-trial.png"
+const TRIAL_MID_PATH: String = "res://assets/trial/corridor-mid-trial.png"
+const TRIAL_NEAR_PATH: String = "res://assets/trial/corridor-near-trial.png"
+## The near plate's crate block would hide the safe point, so only the pipe run to its left is used.
+const TRIAL_NEAR_REGION: Rect2 = Rect2(0.0, 0.0, 1530.0, 1080.0)
 
 
 func _ready() -> void:
@@ -129,6 +157,15 @@ func _ready() -> void:
 	add_child(records_room)
 	human.z_index = 2
 	wolf.z_index = 2
+	corridor_defaults = {"painting": corridor_depth.painting, "lamps": corridor_depth.lamps}
+	for grounded: Sprite2D in [human.body_sprite, wolf.body_sprite, intro_director, breaker_art, relay_art, checkpoint_art, door_art]:
+		floor_reflections.append(FloorReflection.attach(grounded))
+	floor_reflections.append_array(records_room.floor_reflections)
+	breaker_status_glow = _attach_status_glow(breaker_status_light)
+	relay_status_glow = _attach_status_glow(relay_status_light)
+	if corridor_layers_trial:
+		_apply_corridor_variant()
+	_apply_effects()
 	_sync_scene()
 	_refresh_ui()
 	_refresh_continue()
@@ -165,10 +202,45 @@ func _open_changelog() -> void:
 
 
 func _draw() -> void:
-	draw_rect(Rect2(0, 0, 960, 680), Color("#091533"))
-	draw_texture_rect(CORRIDOR_BACKGROUND, Rect2(0, 60, 960, 540), false)
-	if state.door_open:
+	# The corridor painting itself is CorridorDepth's parallax backdrop.
+	if state.door_open and state.chapter_id == "lockdown":
 		draw_line(Vector2(801, 434), Vector2(844, 434), Color("#70d9a7"), 4.0)
+
+
+## Every depth effect hangs off this one switch; the rooms keep their plain paintings when it is off.
+func _apply_effects() -> void:
+	corridor_depth.effects_enabled = effects_enabled
+	records_room.depth.effects_enabled = effects_enabled
+	post_grade.visible = effects_enabled
+	for reflection: FloorReflection in floor_reflections:
+		reflection.enabled = effects_enabled
+	for glow: Sprite2D in [breaker_status_glow, relay_status_glow, records_room.purge_glow, records_room.mirror_glow]:
+		glow.visible = effects_enabled
+
+
+func _apply_corridor_variant() -> void:
+	if corridor_layers_trial:
+		corridor_depth.painting = load(TRIAL_FAR_PATH) as Texture2D
+		corridor_depth.mid_painting = load(TRIAL_MID_PATH) as Texture2D
+		corridor_depth.near_painting = load(TRIAL_NEAR_PATH) as Texture2D
+		corridor_depth.near_region = TRIAL_NEAR_REGION
+		corridor_depth.lamps = trial_lamps
+	else:
+		corridor_depth.painting = corridor_defaults["painting"] as Texture2D
+		corridor_depth.mid_painting = null
+		corridor_depth.near_painting = null
+		corridor_depth.near_region = Rect2()
+		corridor_depth.lamps = corridor_defaults["lamps"] as PackedVector2Array
+	corridor_depth.rebuild()
+
+
+## A small additive glow riding on a station status light; it takes the light's colour each refresh.
+func _attach_status_glow(light: ColorRect) -> Sprite2D:
+	var glow: Sprite2D = RoomDepth.make_glow(light.color, Vector2(64.0, 30.0), 0.75)
+	glow.name = "Glow"
+	glow.position = light.size * 0.5
+	light.add_child(glow)
+	return glow
 
 
 func _update_gameplay_camera() -> void:
@@ -989,6 +1061,9 @@ func _sync_records_room(animate_exit: bool = false) -> void:
 	records_room.visible = state.chapter_id == "records"
 	breaker_status_light.visible = not records_room.visible
 	relay_status_light.visible = not records_room.visible
+	# The records backdrop sits at the same depth as the corridor's, so corridor-only dressing hides with it.
+	for corridor_only: CanvasItem in [corridor_depth, purge_terminal_art, breaker_art, relay_art, checkpoint_art, $BreakerLabel, $RelayLabel, $CheckpointLabel]:
+		corridor_only.visible = not records_room.visible
 	records_room.purge_trace_preserved = state.purge_trace_preserved
 	records_room.mirror_trace_preserved = state.mirror_trace_preserved
 	records_room.chapter_complete = state.chapter_complete
@@ -1075,6 +1150,8 @@ func _refresh_ui() -> void:
 	breaker_status_light.color = Color("#8be3ff") if state.breaker_armed else Color("#d48954")
 	relay_art.modulate = Color.WHITE if state.breaker_armed else Color("#879ba5")
 	relay_status_light.color = Color("#a4f0c4") if state.door_open else (Color("#f3ae4b") if relay_refused else (Color("#8be3ff") if state.breaker_armed else Color("#536e7c")))
+	breaker_status_glow.modulate = Color(breaker_status_light.color, 0.75 if state.breaker_armed else 0.45)
+	relay_status_glow.modulate = Color(relay_status_light.color, 0.75 if state.breaker_armed else 0.3)
 	checkpoint_art.modulate = Color("#d5ffe3") if state.checkpoint_reached else Color.WHITE
 	human_tag.text = state.human_name().get_slice(" ", 0).to_upper()
 	var card_key: String = "%s:%s" % [state.chapter_id, _objective()]

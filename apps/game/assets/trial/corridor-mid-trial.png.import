@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://ckctxqpqjrwqg"
-path="res://.godot/imported/wolf-side-right-provisional.png-981b4785bbf0bc0cbbd8af92b47d62fb.ctex"
+uid="uid://b2fugmdrafkb6"
+path="res://.godot/imported/corridor-mid-trial.png-e7b2b771394f6b58b9731ced82f9e61f.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/wolf-side-right-provisional.png"
-dest_files=["res://.godot/imported/wolf-side-right-provisional.png-981b4785bbf0bc0cbbd8af92b47d62fb.ctex"]
+source_file="res://assets/trial/corridor-mid-trial.png"
+dest_files=["res://.godot/imported/corridor-mid-trial.png-e7b2b771394f6b58b9731ced82f9e61f.ctex"]
 
 [params]
 
@@ -23,7 +23,7 @@ compress/rdo_quality_loss=0.0
 compress/hdr_compression=1
 compress/normal_map=0
 compress/channel_pack=0
-mipmaps/generate=true
+mipmaps/generate=false
 mipmaps/limit=-1
 roughness/mode=0
 roughness/src_normal=""

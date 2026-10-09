@@ -21,7 +21,7 @@
       "terms_reference": "https://openai.com/policies/terms-of-use/",
       "rights_review_status": "Provisional AI-assisted character art, human reviewed. Final commercial asset-rights review remains open; not covered by the code/docs GPL license.",
       "modifications": "Selected the second, higher-contrast 1774x887 RGBA generation with transparency; extended the canvas by 64 transparent pixels on all sides to 1902x1015 with ImageMagick, preserving every original pixel exactly. Displayed as a scaled static side-view Sprite2D and flipped when WOLF moves left.",
-      "implementation_status": "Provisional WOLF sprite used in the corridor and Records Access; animation and final art direction pending."
+      "implementation_status": "Provisional WOLF sprite used in the corridor and Records Access; animation and final art direction pending. Since 2026-10-08 the Godot import generates mipmaps and the sprite samples them (linear-with-mipmaps filter), so the heavily downscaled sheet no longer aliases; source pixels remain unchanged."
     },
     {
       "asset_id": "rowan-side-right-provisional",
@@ -31,7 +31,7 @@
       "terms_reference": "https://openai.com/policies/terms-of-use/",
       "rights_review_status": "Provisional AI-assisted appearance option, human reviewed. Character appearance and final commercial asset-rights review remain open; not covered by the code/docs GPL license.",
       "modifications": "Selected 1024x1536 RGBA edit of the masculine-presenting Rowan draft: cohesive deep-red hooded field jacket with charcoal trousers and boots, replacing the mixed yellow and silver details. Transparent original is displayed as a scaled static side-view Sprite2D and flipped when Rowan moves left. No pixel edits.",
-      "implementation_status": "Provisional Rowan appearance used in the corridor and Records Access; animation and appearance options pending."
+      "implementation_status": "Provisional Rowan appearance used in the corridor and Records Access; animation and appearance options pending. Since 2026-10-08 the Godot import generates mipmaps and the sprite samples them (linear-with-mipmaps filter), so the heavily downscaled sheet no longer aliases; source pixels remain unchanged."
     },
     {
       "asset_id": "director-side-left-provisional",
@@ -41,7 +41,7 @@
       "terms_reference": "https://openai.com/policies/terms-of-use/",
       "rights_review_status": "Provisional AI-assisted character art, human reviewed. Final commercial asset-rights review remains open; not covered by the code/docs GPL license.",
       "modifications": "Revised the original photorealistic cutout toward Rowan’s inked, faceted cel-shaded style, then removed the background. Final 1024x1536 RGBA profile sprite.",
-      "implementation_status": "Provisional Director appearance in the opening cutscene."
+      "implementation_status": "Provisional Director appearance in the opening cutscene. Since 2026-10-08 the Godot import generates mipmaps and the sprite samples them (linear-with-mipmaps filter), so the heavily downscaled sheet no longer aliases; source pixels remain unchanged."
     },
     {
       "asset_id": "title-corridor-key-art-provisional",
@@ -62,7 +62,7 @@
       "terms_reference": "https://openai.com/policies/terms-of-use/",
       "rights_review_status": "Provisional AI-assisted environment art, human review in progress. Final commercial asset-rights review remains open; not covered by the code/docs GPL license.",
       "modifications": "Original 1672x941 RGB image generated without characters, stations or UI. Displayed at 960x540 to preserve the source 16:9 ratio, vertically offset behind live Godot corridor props; source pixels unchanged.",
-      "implementation_status": "Provisional gameplay background for the maintenance corridor."
+      "implementation_status": "Provisional gameplay background for the maintenance corridor. Since 2026-10-08 it is drawn 1.06x larger as a Parallax2D backdrop at 0.9x camera speed with additive glows, light shafts and haze layered over its painted lamps; source pixels remain unchanged."
     },
     {
       "asset_id": "records-access-background-provisional",
@@ -72,7 +72,7 @@
       "terms_reference": "https://openai.com/policies/terms-of-use/",
       "rights_review_status": "Provisional AI-assisted environment art, human review in progress. Final commercial asset-rights review remains open; not covered by the code/docs GPL license.",
       "modifications": "Original 1672x941 RGB image generated as a matching archival bay without characters, stations or UI. Displayed at 960x540 to preserve the source 16:9 ratio, vertically offset behind live Godot Records props; source pixels unchanged.",
-      "implementation_status": "Provisional gameplay background for Records Access."
+      "implementation_status": "Provisional gameplay background for Records Access. Since 2026-10-08 it is drawn 1.06x larger as a Parallax2D backdrop at 0.9x camera speed with additive glows, light shafts and haze layered over its painted lamps; source pixels remain unchanged."
     },
     {
       "asset_id": "maintenance-props-provisional",
@@ -82,7 +82,7 @@
       "terms_reference": "https://openai.com/policies/terms-of-use/",
       "rights_review_status": "Provisional AI-assisted gameplay props, human review in progress. Final commercial asset-rights review remains open; not covered by the code/docs GPL license.",
       "modifications": "Original 2172x724 RGBA sprite sheet with four isolated props. Godot Sprite2D regions display the breaker, relay, seal and safe-point art without modifying source pixels; live tint and door motion show gameplay state.",
-      "implementation_status": "Provisional interactive prop art in the maintenance corridor."
+      "implementation_status": "Provisional interactive prop art in the maintenance corridor. Since 2026-10-08 the Godot import generates mipmaps and the sprite samples them (linear-with-mipmaps filter), so the heavily downscaled sheet no longer aliases; source pixels remain unchanged."
     },
     {
       "asset_id": "records-props-provisional",
@@ -92,7 +92,7 @@
       "terms_reference": "https://openai.com/policies/terms-of-use/",
       "rights_review_status": "Provisional AI-assisted gameplay props, human review in progress. Final commercial asset-rights review remains open; not covered by the code/docs GPL license.",
       "modifications": "Original 2172x724 RGBA sprite sheet with three isolated props. Godot Sprite2D regions display the purge queue, mirror port and exit; source pixels are unchanged. The exit art hides when the chapter is secured.",
-      "implementation_status": "Provisional interactive prop art in Records Access."
+      "implementation_status": "Provisional interactive prop art in Records Access. Since 2026-10-08 the Godot import generates mipmaps and the sprite samples them (linear-with-mipmaps filter), so the heavily downscaled sheet no longer aliases; source pixels remain unchanged."
     },
     {
       "asset_id": "corridor-source-build-capture",
@@ -124,9 +124,39 @@
       "rights_review_status": "Redistributed unchanged under SIL Open Font License 1.1; license text included beside both bundled copies.",
       "modifications": "No font outlines changed. Used for headings and controls; Godot selects semibold and bold weights through FontVariation.",
       "implementation_status": "Bundled locally for the game and Docs website."
+    },
+    {
+      "asset_id": "corridor-far-trial",
+      "path": "apps/game/assets/trial/corridor-far-trial.png",
+      "source_or_tool": "Codex built-in image_gen tool, 2026-10-08, generated as three separate depth plates (far, mid, near)",
+      "source_reference": "Reference: apps/game/assets/maintenance-corridor-background-provisional.png (the registered maintenance corridor painting); generation prompts retained in ignored art notes",
+      "terms_reference": "https://openai.com/policies/terms-of-use/",
+      "rights_review_status": "Trial AI-generated environment plates, not yet human reviewed for final use. Commercial asset-rights review open; not covered by the code/docs GPL license.",
+      "modifications": "Original 1920x1080 RGB far plate (wall, floor, three ceiling lamps), copied unchanged.",
+      "implementation_status": "Trial only: loaded when Main.corridor_layers_trial is on, drawn as the corridor parallax backdrop (0.9x camera speed) for comparison stills. Off by default; the single-painting corridor remains the shipped look."
+    },
+    {
+      "asset_id": "corridor-mid-trial",
+      "path": "apps/game/assets/trial/corridor-mid-trial.png",
+      "source_or_tool": "Codex built-in image_gen tool, 2026-10-08, generated as three separate depth plates (far, mid, near)",
+      "source_reference": "Reference: apps/game/assets/maintenance-corridor-background-provisional.png (the registered maintenance corridor painting); generation prompts retained in ignored art notes",
+      "terms_reference": "https://openai.com/policies/terms-of-use/",
+      "rights_review_status": "Trial AI-generated environment plates, not yet human reviewed for final use. Commercial asset-rights review open; not covered by the code/docs GPL license.",
+      "modifications": "Original 1920x1080 RGBA mid plate (ceiling pipe run, two pillars, side tanks on transparency), copied unchanged.",
+      "implementation_status": "Trial only: loaded when Main.corridor_layers_trial is on, drawn at 0.95x camera speed between the backdrop and the props. Off by default."
+    },
+    {
+      "asset_id": "corridor-near-trial",
+      "path": "apps/game/assets/trial/corridor-near-trial.png",
+      "source_or_tool": "Codex built-in image_gen tool, 2026-10-08, generated as three separate depth plates (far, mid, near)",
+      "source_reference": "Reference: apps/game/assets/maintenance-corridor-background-provisional.png (the registered maintenance corridor painting); generation prompts retained in ignored art notes",
+      "terms_reference": "https://openai.com/policies/terms-of-use/",
+      "rights_review_status": "Trial AI-generated environment plates, not yet human reviewed for final use. Commercial asset-rights review open; not covered by the code/docs GPL license.",
+      "modifications": "Original 1920x1080 RGBA near plate (left pipe column, floor-front rail, right crate stack), copied unchanged. The game shows only the region x < 1530 px so the crate stack cannot cover the safe point.",
+      "implementation_status": "Trial only: loaded when Main.corridor_layers_trial is on, drawn in front of the actors at 1.1x camera speed. Off by default."
     }
   ],
-  "status": "One provisional brand mark, three provisional character images, one title background, two gameplay backgrounds, two prop sheets, two derivative marketing captures, and the Roboto and Montserrat font families recorded; no audio acquired.",
+  "status": "One provisional brand mark, three provisional character images, one title background, two gameplay backgrounds, two prop sheets, three trial corridor depth plates (off by default), two derivative marketing captures, and the Roboto and Montserrat font families recorded; no audio acquired. Glows, haze, dust, reflections and the screen grade are procedural built-in nodes and two small shaders, not image assets.",
   "merge_warning": "Preserve this populated provenance register when merging future handoffs.",
   "future_entry_fields": [
     "asset_id",
