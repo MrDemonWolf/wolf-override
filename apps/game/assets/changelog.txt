@@ -14,6 +14,12 @@
 - A damaged or hand-edited save that places the engineer or WOLF past the junction's sealed door is now rejected instead of loading into a spot with no way back.
 - The play camera now sits closer to the engineer and WOLF in every room and shows them a little higher on screen, so their feet stay clear of the hint bar while the ceiling lamps and station labels remain in view. The Records and Service Junction closing shots move in closer instead of pulling back, without cutting any station label at the edge, and the first movement tip is centred over the room. Answer buttons sit a little higher and the junction's coolant tank hangs a little lower, so the tank stays in view below them when WOLF asks how to bring it down.
 - Credits in the game and on this website now list Claude Code by Anthropic alongside ChatGPT and Codex as AI coding assistants, the Codex image tool for the new art, and the generated sound effects.
+- In the Service Junction, a door that is already down now stays spent after Continue or a knockdown: using the breaker or the valve again no longer builds pressure, vents steam or sets off a second blast.
+- If an automatic save fails to write, a knockdown now returns you to the start of the step you were on instead of an older save, and your next interact press anywhere in the room tries the save again. A save file that becomes unreadable mid-room no longer sends a knockdown back to an earlier room.
+- Entering Records Access or the Service Junction now starts the camera on the engineer instead of panning across the room.
+- On touch play the camera sits a little lower while the arrows and USE are on screen, so the characters' feet and the machines' bases are no longer hidden behind the buttons.
+- The Service Junction's pipes no longer run through the OVERLOAD BREAKER and RELIEF VENT labels; the vent pipe now runs down to its floor grate, with its label beside it in the same font as the other labels.
+- The room art now loads as compressed textures and the unused part of each foreground layer was trimmed, to use less graphics memory. This has not been measured on a device yet.
 - Website: a Service Junction walkthrough with its solutions marked as spoilers, plus updated first steps (holding interact, knockdowns), input, saving, status and credits pages. None of the new room, camera, art or sound has been played through by hand yet; expect tuning after the first playtest.
 
 == October 8, 2026 ==
