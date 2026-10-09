@@ -20,7 +20,9 @@ const FLOOR_Y: float = 440.0
 ## x 452), and where he holds once the door is down.
 const WOLF_SEAM_X: float = 418.0
 const WOLF_RUBBLE_X: float = 500.0
-## How long the vent burst and the door blast stay dangerous after they go.
+## The sealed door body is this wide; its left face is M0State.JUNCTION_DOOR_LEFT_X.
+const DOOR_WIDTH: float = 56.0
+## How long the grate stays dangerous after the relief vent lets go.
 const HAZARD_SECONDS: float = 0.4
 const VENT_REASON: String = "The relief vent let go under you. Stand clear of the grate when the gauge peaks."
 const BLAST_REASON: String = "The door blew with you in front of it. Get left of the vent before the fuse ends."
@@ -29,6 +31,10 @@ const GREEN: Color = Color("#a4f0c4")
 const DIM: Color = Color("#3e4f5a")
 const STEEL: Color = Color("#4a6572")
 const SEAM_RED: Color = Color("#ff6a55")
+## The VALVE label sits this far left of the wheel so SEAL CHARGED ends before the door art.
+const VALVE_LABEL_SHIFT: float = 22.0
+## The gauge dial sits above the pipe run (y 292), clear of the VALVE label below it.
+const GAUGE_CENTRE: Vector2 = Vector2(VALVE_X - 48.0, 266.0)
 
 ## Lamp centres as fractions of the reused corridor painting.
 var lamps: PackedVector2Array = PackedVector2Array([Vector2(0.345, 0.251), Vector2(0.604, 0.251), Vector2(0.87, 0.251)])
@@ -39,6 +45,12 @@ var line_state: StringName = &"idle"
 var gauge: float = 0.0
 var turns: int = 0
 var door_blown: bool = false
+## Reduced Motion: the charged seam holds a steady glow instead of strobing.
+var reduce_motion: bool = false:
+	set(value):
+		reduce_motion = value
+		if is_node_ready():
+			_sync_seam()
 
 var depth: RoomDepth
 var breaker_art: Sprite2D
@@ -52,7 +64,6 @@ var vent_puff: CPUParticles2D
 var blast_sparks: CPUParticles2D
 var blast_dust: CPUParticles2D
 var vent_hazard: Hazard
-var blast_hazard: Hazard
 var breaker_glow: Sprite2D
 var seam_glow: Sprite2D
 var breaker_label: Label
@@ -106,12 +117,13 @@ func _ready() -> void:
 	valve_wheel.z_index = 1
 	add_child(valve_wheel)
 	_build_particles()
-	vent_hazard = Hazard.make("VentHazard", Rect2(PressureLine.VENT_MIN_X, 380.0, PressureLine.VENT_MAX_X - PressureLine.VENT_MIN_X, 60.0), VENT_REASON)
-	blast_hazard = Hazard.make("BlastHazard", Rect2(PressureLine.BLAST_MIN_X, 300.0, PressureLine.BLAST_MAX_X - PressureLine.BLAST_MIN_X, 140.0), BLAST_REASON)
+	# The hurtbox is the drawn grate: a body touching it is on the vent (PressureLine.is_on_vent).
+	# The door blast has no hurtbox; main.gd decides it from PressureLine.is_in_blast alone.
+	vent_hazard = Hazard.make("VentHazard", Rect2(PressureLine.VENT_GRATE_MIN_X, 380.0, PressureLine.VENT_GRATE_MAX_X - PressureLine.VENT_GRATE_MIN_X, 60.0), VENT_REASON)
 	add_child(vent_hazard)
-	add_child(blast_hazard)
 	breaker_label = _add_station_label("OVERLOAD BREAKER", BREAKER_X, Color("#b0d1de"))
-	valve_label = _add_station_label("VALVE", VALVE_X, Color("#b0d1de"))
+	# Centred a little left of the wheel so its longest text (SEAL CHARGED) ends before the door art.
+	valve_label = _add_station_label("VALVE", VALVE_X - VALVE_LABEL_SHIFT, Color("#b0d1de"))
 	door_label = _add_station_label("SEALED DOOR", DOOR_X, Color("#ffc7c7"), 276.0)
 	_add_station_label("EXIT", HATCH_X, DIM, 276.0)
 	refresh_state()
@@ -141,7 +153,7 @@ func _build_door() -> void:
 	door_body.collision_mask = 0
 	door_shape = CollisionShape2D.new()
 	var box: RectangleShape2D = RectangleShape2D.new()
-	box.size = Vector2(56.0, 132.0)
+	box.size = Vector2(DOOR_WIDTH, 132.0)
 	door_shape.shape = box
 	# Off until the junction is the room in play (see set_active).
 	door_shape.disabled = true
@@ -174,17 +186,20 @@ func _build_particles() -> void:
 	vent_steam.name = "VentSteam"
 	vent_steam.position = Vector2(VENT_X, FLOOR_Y - 4.0)
 	vent_steam.emission_shape = CPUParticles2D.EMISSION_SHAPE_RECTANGLE
-	vent_steam.emission_rect_extents = Vector2(22.0, 2.0)
+	vent_steam.emission_rect_extents = Vector2((PressureLine.VENT_GRATE_MAX_X - PressureLine.VENT_GRATE_MIN_X) * 0.5 - 6.0, 2.0)
 	vent_steam.z_index = 3
 	add_child(vent_steam)
 	vent_puff = FxPresets.dust_burst()
 	vent_puff.name = "VentPuff"
 	vent_puff.position = vent_steam.position
-	vent_puff.color = Color(FxPresets.STEAM, 0.7)
+	# Translucent and thin enough that the engineer, the grate and the breaker read through it.
+	vent_puff.emission_shape = CPUParticles2D.EMISSION_SHAPE_RECTANGLE
+	vent_puff.emission_rect_extents = vent_steam.emission_rect_extents
+	vent_puff.color = Color(FxPresets.STEAM, 0.3)
 	vent_puff.initial_velocity_min = 160.0
 	vent_puff.initial_velocity_max = 260.0
 	vent_puff.spread = 30.0
-	vent_puff.amount = 28
+	vent_puff.amount = 16
 	vent_puff.z_index = 3
 	add_child(vent_puff)
 	blast_sparks = FxPresets.sparks(AMBER)
@@ -220,9 +235,8 @@ func _add_station_label(caption: String, center_x: float, tint: Color, label_y: 
 ## collision never leaks into the corridor or Records, which share the same coordinates.
 func set_active(active: bool) -> void:
 	door_shape.set_deferred("disabled", not active or door_blown)
-	for hazard: Hazard in [vent_hazard, blast_hazard]:
-		hazard.armed = false
-		hazard.set_deferred("monitoring", active)
+	vent_hazard.armed = false
+	vent_hazard.set_deferred("monitoring", active)
 
 
 ## Copies the live pressure line in; the gauge needle, steam, seam and labels all follow it.
@@ -259,16 +273,28 @@ func _turn_wheel(to_turns: int) -> void:
 
 ## Labels, glows and the seam follow the line's phase; the parent calls this after state changes.
 func refresh_state() -> void:
-	var armed: bool = line_state != &"idle" and line_state != &"tripped"
-	breaker_label.text = "BREAKER TRIPPED" if line_state == &"tripped" else ("BREAKER LIVE" if armed else "OVERLOAD BREAKER")
-	breaker_label.add_theme_color_override("font_color", SEAM_RED if line_state == &"tripped" else (Color("#8be3ff") if armed else Color("#b0d1de")))
-	breaker_glow.modulate = Color(_breaker_light_color(), 0.75 if armed else 0.4)
-	valve_label.text = "SEAL CHARGED" if line_state == &"charged" or line_state == &"fuse" else ("VALVE  %d / %d" % [turns, PressureLine.TURNS_NEEDED] if armed else "VALVE")
-	valve_label.add_theme_color_override("font_color", GREEN if turns >= PressureLine.TURNS_NEEDED else Color("#b0d1de"))
+	if is_spent():
+		# The blast used the line up: the same labels whether it just went or a save brought it back.
+		breaker_label.text = "BREAKER SPENT"
+		breaker_label.add_theme_color_override("font_color", Color("#8fa6b2"))
+		valve_label.text = "VALVE SPENT"
+		valve_label.add_theme_color_override("font_color", Color("#8fa6b2"))
+	else:
+		var armed: bool = line_state != &"idle" and line_state != &"tripped"
+		breaker_label.text = "BREAKER TRIPPED" if line_state == &"tripped" else ("BREAKER LIVE" if armed else "OVERLOAD BREAKER")
+		breaker_label.add_theme_color_override("font_color", SEAM_RED if line_state == &"tripped" else (Color("#8be3ff") if armed else Color("#b0d1de")))
+		valve_label.text = "SEAL CHARGED" if line_state in [&"charged", &"fuse", &"blown"] else ("VALVE  %d / %d" % [turns, PressureLine.TURNS_NEEDED] if armed else "VALVE")
+		valve_label.add_theme_color_override("font_color", GREEN if turns >= PressureLine.TURNS_NEEDED else Color("#b0d1de"))
+	breaker_glow.modulate = Color(_breaker_light_color(), 0.75 if line_state in [&"building", &"charged", &"fuse"] and not door_blown else 0.4)
 	door_label.text = "DOOR DOWN" if door_blown else "SEALED DOOR"
 	door_label.add_theme_color_override("font_color", GREEN if door_blown else Color("#ffc7c7"))
 	_sync_seam()
 	queue_redraw()
+
+
+## True once the door is down, whether it just went or a save brought it back.
+func is_spent() -> bool:
+	return door_blown
 
 
 func _sync_seam() -> void:
@@ -278,8 +304,10 @@ func _sync_seam() -> void:
 	seam_glow.visible = not door_blown
 	match line_state:
 		&"charged", &"fuse":
-			# The seam strobes white only once the third turn is real.
+			# The seam strobes white only once the third turn is real; Reduced Motion holds it steady.
 			seam_glow.modulate = Color(Color.WHITE, 0.9)
+			if reduce_motion:
+				return
 			_seam_tween = create_tween().set_loops()
 			_seam_tween.tween_property(seam_glow, "modulate", Color(SEAM_RED, 0.5), 0.08)
 			_seam_tween.tween_property(seam_glow, "modulate", Color(Color.WHITE, 0.9), 0.08)
@@ -302,6 +330,7 @@ func vent_blows() -> void:
 ## blast zone is dangerous for a moment.
 func door_blast() -> void:
 	door_blown = true
+	vent_hazard.armed = false
 	door_shape.set_deferred("disabled", true)
 	blast_sparks.restart()
 	blast_dust.restart()
@@ -314,7 +343,6 @@ func door_blast() -> void:
 	_door_tween.tween_property(door_visual, "scale:y", 0.06, 0.22).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_IN)
 	_door_tween.parallel().tween_property(door_visual, "rotation_degrees", 6.0, 0.22)
 	_door_tween.tween_callback(door_visual.hide)
-	_arm_hazard(blast_hazard)
 	refresh_state()
 
 
@@ -336,13 +364,13 @@ func reset_transient() -> void:
 	_seam_tween = null
 	_door_tween = null
 	_hazard_tween = null
-	for hazard: Hazard in [vent_hazard, blast_hazard]:
-		hazard.armed = false
+	vent_hazard.armed = false
 	vent_steam.emitting = false
 	vent_puff.emitting = false
 	blast_sparks.emitting = false
 	blast_dust.emitting = false
-	valve_wheel.rotation_degrees = 0.0
+	# A blown door left the wheel at its third quarter; a restored save shows it the same way.
+	valve_wheel.rotation_degrees = 90.0 * PressureLine.TURNS_NEEDED if door_blown else 0.0
 	door_visual.scale = Vector2.ONE
 	door_visual.rotation_degrees = 0.0
 	door_visual.visible = not door_blown
@@ -385,11 +413,13 @@ func _draw_pressure_line() -> void:
 	draw_line(Vector2(VALVE_X, y), Vector2(VALVE_X, 350.0), pressure, 2.0)
 
 
+## The grate spans exactly the vent's hurtbox (PressureLine.VENT_GRATE_*), so what is drawn is
+## what hurts.
 func _draw_vent() -> void:
-	var grate: Rect2 = Rect2(VENT_X - 30.0, FLOOR_Y - 8.0, 60.0, 8.0)
+	var grate: Rect2 = Rect2(PressureLine.VENT_GRATE_MIN_X, FLOOR_Y - 8.0, PressureLine.VENT_GRATE_MAX_X - PressureLine.VENT_GRATE_MIN_X, 8.0)
 	draw_rect(grate, Color("#141c24"))
-	for slat: int in 6:
-		var x: float = grate.position.x + 6.0 + slat * 9.0
+	for slat: int in 7:
+		var x: float = grate.position.x + 6.0 + slat * 10.0
 		draw_line(Vector2(x, grate.position.y + 1.0), Vector2(x, grate.end.y - 1.0), Color("#5c707c"), 2.0)
 	draw_rect(grate, STEEL, false, 2.0)
 	var vent_light: Color = SEAM_RED if line_state == &"tripped" else (DIM.lerp(AMBER, gauge) if line_state == &"building" else DIM)
@@ -397,11 +427,12 @@ func _draw_vent() -> void:
 	draw_string(ThemeDB.fallback_font, Vector2(VENT_X - 42.0, 346.0), "RELIEF VENT", HORIZONTAL_ALIGNMENT_LEFT, -1, 11, Color("#8fa6b2"))
 
 
-## A dial on the pipe run beside the valve whose needle is the gauge, and three lights stacked
-## left of the wheel that go green per real turn (both clear of the station label and the actors).
+## A dial mounted above the pipe run beside the valve whose needle is the gauge (above the station
+## label at y 309, so it never covers it), and three lights stacked left of the wheel that go
+## green per real turn.
 func _draw_gauge_and_lights() -> void:
-	var centre: Vector2 = Vector2(VALVE_X - 48.0, 326.0)
-	draw_line(Vector2(centre.x, 292.0), Vector2(centre.x, centre.y - 18.0), Color("#263540"), 6.0)
+	var centre: Vector2 = GAUGE_CENTRE
+	draw_line(Vector2(centre.x, 292.0), Vector2(centre.x, centre.y + 18.0), Color("#263540"), 6.0)
 	draw_circle(centre, 18.0, Color("#101820"))
 	draw_arc(centre, 15.0, PI, TAU, 24, Color("#5c707c"), 2.0, true)
 	draw_arc(centre, 15.0, PI + PI * 0.78, TAU, 8, SEAM_RED, 3.0, true)
@@ -410,7 +441,7 @@ func _draw_gauge_and_lights() -> void:
 	draw_circle(centre, 2.5, Color("#d8e6ec"))
 	for light: int in PressureLine.TURNS_NEEDED:
 		var rect: Rect2 = Rect2(VALVE_X - 40.0, 356.0 + light * 12.0, 12.0, 6.0)
-		draw_rect(rect, GREEN if light < turns else Color("#1f2a33"))
+		draw_rect(rect, GREEN if light < turns or door_blown else Color("#1f2a33"))
 		draw_rect(rect, STEEL, false, 1.0)
 
 
@@ -419,6 +450,8 @@ func _draw_breaker_light() -> void:
 
 
 func _breaker_light_color() -> Color:
+	if door_blown:
+		return DIM
 	match line_state:
 		&"tripped":
 			return SEAM_RED

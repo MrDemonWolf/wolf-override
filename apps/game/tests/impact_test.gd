@@ -95,6 +95,25 @@ func _run() -> void:
 	_expect(camera.offset == Vector2.ZERO and Engine.time_scale == 1.0 and intro_fade.color.a == 0.0 and intro_alarm.color.a == 0.0, "a disabled kit does nothing")
 	impact.enabled = true
 
+	# Rumble follows the controller in use, not always the first one connected.
+	var pad_press: InputEventJoypadButton = InputEventJoypadButton.new()
+	pad_press.device = 1
+	pad_press.button_index = JOY_BUTTON_A
+	pad_press.pressed = true
+	game.call("_note_input_device", pad_press)
+	_expect(game.get("controller_active") and impact.rumble_device == 1, "a press on the second pad makes it the one that rumbles")
+	var pad_motion: InputEventJoypadMotion = InputEventJoypadMotion.new()
+	pad_motion.device = 0
+	pad_motion.axis = JOY_AXIS_LEFT_X
+	pad_motion.axis_value = 1.0
+	game.call("_note_input_device", pad_motion)
+	_expect(impact.rumble_device == 0, "moving the first pad's stick hands rumble back to it")
+	var key_press: InputEventKey = InputEventKey.new()
+	key_press.pressed = true
+	key_press.physical_keycode = KEY_D
+	game.call("_note_input_device", key_press)
+	_expect(not game.get("controller_active"), "a key press returns to keyboard play")
+
 	# Existing moments route through the kit: the relay contact and the seal landing.
 	var relay_sparks: CPUParticles2D = game.get("relay_sparks") as CPUParticles2D
 	var door_dust: CPUParticles2D = game.get("door_dust") as CPUParticles2D
@@ -174,6 +193,7 @@ func _run() -> void:
 	state = game.get("state") as M0State
 	_expect(state.to_dict() == pre_save and state.memory.get("choice_id") == State.PRESS and not state.checkpoint_reached and state.chapter_id == "lockdown", "without a checkpoint the beat snapshot restores the choice, not an older save")
 	_expect(human.controlled and human.position == state.human_position, "the engineer is back at the beat start")
+	_expect(str(game.get("status_line")).ends_with("Back at the start of this beat."), "without a checkpoint the restore line does not claim an autosave")
 
 	# Reduced Motion knockdown: no tilt, no dip, still a restore.
 	impact.reduce_motion = true

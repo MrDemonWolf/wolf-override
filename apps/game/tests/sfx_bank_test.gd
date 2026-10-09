@@ -23,7 +23,9 @@ func _run() -> void:
 	for player: AudioStreamPlayer in bank.players():
 		_expect(player.bus == SfxBank.BUS, "%s plays on the Effects bus so the Audio sliders apply" % player.name)
 	print("SfxBank generation took %.1f ms" % bank.generation_ms)
-	_expect(bank.generation_ms < 250.0, "all clips generate inside the startup budget (took %.1f ms)" % bank.generation_ms)
+	# The spec budget is about 50 ms; it measures near 16 ms on an M1 Pro, and the 100 ms bound
+	# leaves room for slower CI runners while still catching a recipe that balloons.
+	_expect(bank.generation_ms < 100.0, "all clips generate inside the startup budget (took %.1f ms)" % bank.generation_ms)
 	for clip: StringName in SfxBank.LENGTHS:
 		var wav: AudioStreamWAV = bank.streams.get(clip) as AudioStreamWAV
 		if wav == null:
@@ -53,7 +55,11 @@ func _run() -> void:
 	bank.stop(&"hum")
 	_expect(not loop.playing, "stop() ends a loop by name")
 	_expect(bank.play(&"nothing") == null, "unknown clips are ignored")
+	var hiss: AudioStreamPlayer = bank.play(&"hiss", -10.0)
+	var boom: AudioStreamPlayer = bank.play(&"boom")
+	_expect(hiss != null and hiss.playing and boom != null and boom.playing, "a loop and a one-shot are sounding before the bank is switched off")
 	bank.enabled = false
+	_expect(not hiss.playing and not boom.playing, "switching the bank off stops loops and one-shots already playing")
 	_expect(bank.play(&"boom") == null, "a disabled bank plays nothing")
 	bank.enabled = true
 	game.queue_free()

@@ -14,7 +14,6 @@ const HIT_STOP_SCALE: float = 0.05
 const MAX_HIT_STOP_SECONDS: float = 0.1
 const WHITE_FLASH_ALPHA: float = 0.55
 const RED_WASH_ALPHA: float = 0.3
-const RUMBLE_DEVICE: int = 0
 
 ## Off silences everything; Main ties it to effects_enabled.
 var enabled: bool = true:
@@ -30,6 +29,8 @@ var reduce_motion: bool = false:
 			trauma = 0.0
 			_settle_camera()
 var rumble_enabled: bool = false
+## The joypad that rumbles: Main sets it to the device of the last controller input.
+var rumble_device: int = 0
 var haptics_enabled: bool = false
 var camera: Camera2D
 ## The existing full-screen overlays: IntroFade carries the white flash, IntroAlarm the red wash.
@@ -153,7 +154,7 @@ func rumble(weak: float, strong: float, seconds: float) -> void:
 	if not enabled:
 		return
 	if rumble_enabled:
-		Input.start_joy_vibration(RUMBLE_DEVICE, weak, strong, seconds)
+		Input.start_joy_vibration(rumble_device, weak, strong, seconds)
 	if haptics_enabled:
 		Input.vibrate_handheld(int(seconds * 1000.0), strong)
 

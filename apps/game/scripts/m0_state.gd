@@ -9,6 +9,11 @@ const DISCLOSE: String = "disclose_risk"
 const PRESS: String = "press_without_warning"
 const HUMAN_NAMES = ["Rowan Vale", "Alex Bennett", "Morgan Reed"]
 const MAX_SELECTED_TEXT_LENGTH: int = 200
+## Half the width of each actor's body (28 px engineer, 62 px WOLF), as main.tscn shapes them.
+const HUMAN_HALF_WIDTH: float = 14.0
+const WOLF_HALF_WIDTH: float = 31.0
+## The Service Junction's sealed door face; until the door is blown nobody can stand past it.
+const JUNCTION_DOOR_LEFT_X: float = 452.0
 const CHOICE_TEXT = {
 	"disclose_risk": "The relay may vent coolant. Your call.",
 	"press_without_warning": "Go now. We can talk after.",
@@ -251,6 +256,11 @@ static func from_dict(raw: Variant) -> M0State:
 				return null
 			if data["junction_cleared"] and not data["sentry_down"]:
 				return null
+			# Before the blast the sealed door walls off the right of the room; a save that puts
+			# either actor past it would strand the engineer away from the breaker and valve.
+			if not data["door_blown"]:
+				if float(positions["human"][0]) + HUMAN_HALF_WIDTH > JUNCTION_DOOR_LEFT_X or float(positions["wolf"][0]) + WOLF_HALF_WIDTH > JUNCTION_DOOR_LEFT_X:
+					return null
 		elif data["door_blown"] or data["sentry_down"] or data["junction_cleared"]:
 			return null
 	var state: M0State = M0State.new()

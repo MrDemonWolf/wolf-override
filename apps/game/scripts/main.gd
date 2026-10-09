@@ -21,6 +21,10 @@ const GAMEPLAY_ACTIONS: Array[StringName] = [&"move_left", &"move_right", &"inte
 const FAIL_CONTROLS_OFF_SECONDS: float = 0.7
 const FAIL_FADE_SECONDS: float = 0.4
 const HUMAN_SPRITE_REST: Vector2 = Vector2(0.0, -5.0)
+## Both actors draw at this depth; a knocked-down engineer draws one step above WOLF so the fall
+## is never hidden behind him.
+const ACTOR_Z: int = 2
+const KNOCKDOWN_Z: int = 3
 
 ## One switch for the depth pass (parallax, glows, haze, dust, reflections, grade) and the impact
 ## kit (shake, hit-stop, flash, rumble, particles, generated sound) so a Settings toggle can follow.
@@ -198,11 +202,11 @@ func _ready() -> void:
 	add_child(records_room)
 	junction_room = JunctionRoom.new()
 	junction_room.z_index = 1
+	junction_room.reduce_motion = impact.reduce_motion
 	add_child(junction_room)
-	for hazard: Hazard in [junction_room.vent_hazard, junction_room.blast_hazard]:
-		hazard.contact.connect(func(source: Hazard) -> void: _fail_beat(source.reason))
-	human.z_index = 2
-	wolf.z_index = 2
+	junction_room.vent_hazard.contact.connect(func(source: Hazard) -> void: _fail_beat(source.reason))
+	human.z_index = ACTOR_Z
+	wolf.z_index = ACTOR_Z
 	_setup_particles()
 	corridor_defaults = {"painting": corridor_depth.painting, "lamps": corridor_depth.lamps}
 	for grounded: Sprite2D in [human.body_sprite, wolf.body_sprite, intro_director, breaker_art, relay_art, checkpoint_art, door_art]:
@@ -332,11 +336,17 @@ func _setup_impact() -> void:
 	impact.name = "Impact"
 	impact.setup(intro_camera, intro_fade, intro_alarm)
 	impact.reduce_motion = settings_menu.reduced_motion.button_pressed
-	settings_menu.reduced_motion_changed.connect(func(on: bool) -> void: impact.reduce_motion = on)
+	settings_menu.reduced_motion_changed.connect(_on_reduced_motion_changed)
 	add_child(impact)
 	sfx_bank = SfxBank.new()
 	sfx_bank.name = "SfxBank"
 	add_child(sfx_bank)
+
+
+## Reduced Motion reaches the impact kit and the junction's seam strobe.
+func _on_reduced_motion_changed(on: bool) -> void:
+	impact.reduce_motion = on
+	junction_room.reduce_motion = on
 
 
 ## One-shot particle presets parked at the places that already answer the player: the relay
@@ -471,7 +481,7 @@ func _new_game() -> void:
 	for station: CanvasItem in [breaker_art, relay_art, checkpoint_art, breaker_status_light, relay_status_light, door_visual]:
 		station.hide()
 	wolf.position = Vector2(115.0, 423.0)
-	wolf.z_index = 2
+	wolf.z_index = ACTOR_Z
 	wolf.body_sprite.position = WOLF_SPRITE_REST
 	wolf.body_sprite.modulate = Color("#365263")
 	intro_gate.position = Vector2(115.0, 365.0)
@@ -560,7 +570,7 @@ func _finish_intro(keep_fade: bool = false) -> void:
 	_start_gameplay_camera()
 	wolf.body_sprite.modulate = Color.WHITE
 	wolf.body_sprite.position = WOLF_SPRITE_REST
-	wolf.z_index = 2
+	wolf.z_index = ACTOR_Z
 	wolf.position = state.wolf_position
 	wolf.autonomous_target_x = -1.0
 	_sync_door()
@@ -920,6 +930,8 @@ func _note_input_device(event: InputEvent) -> void:
 	if event is InputEventJoypadButton and event.pressed or event is InputEventJoypadMotion and absf(event.axis_value) > 0.45:
 		use_controller = true
 		navigation_press = true
+		# Rumble goes to the pad that is actually in use, not always the first one connected.
+		impact.rumble_device = event.device
 	elif event is InputEventScreenTouch and event.pressed or event is InputEventScreenDrag or event is InputEventKey and event.pressed or event is InputEventMouseButton and event.pressed:
 		use_controller = false
 		navigation_press = event is InputEventKey
@@ -961,7 +973,7 @@ func _load_game() -> void:
 	intro_alarm.color.a = 0.0
 	human.show()
 	$IntroCage.hide()
-	wolf.z_index = 2
+	wolf.z_index = ACTOR_Z
 	wolf.body_sprite.position = WOLF_SPRITE_REST
 	purge_terminal_art.show()
 	$BreakerLabel.show()
@@ -1333,8 +1345,10 @@ func _wolf_reads_seam() -> void:
 	_update_controls()
 
 
-## BOOM 1: the fuse ends. In the blast zone it is a knockdown and nothing is saved; otherwise the
-## door goes, the rubble lands and autosave B marks the beat.
+## BOOM 1: the fuse ends. PressureLine.is_in_blast is the one test of the outcome: in the zone it
+## is a knockdown back to autosave A with the door still sealed; otherwise the door goes, the
+## rubble lands and autosave B marks the beat. The blast has no hurtbox of its own, so physics
+## overlap can never disagree with this test.
 func _door_blast() -> void:
 	_blast_feedback()
 	if PressureLine.is_in_blast(human.position.x):
@@ -1378,6 +1392,7 @@ func _fail_beat(reason: String) -> void:
 	impact.add_trauma(0.6)
 	impact.rumble(0.5, 0.9, 0.25)
 	sfx_bank.play(&"thud", 0.0, 0.9)
+	human.z_index = KNOCKDOWN_Z
 	_cancel_fail_tween()
 	fail_tween = create_tween()
 	var reaction_seconds: float = 0.0
@@ -1398,9 +1413,11 @@ func _fail_beat(reason: String) -> void:
 func _restore_beat(reason: String) -> void:
 	fail_active = false
 	var restored: bool = false
+	var from_disk: bool = false
 	if state.checkpoint_reached and M0State.load_from_disk(save_path) != null:
 		_load_game()
 		restored = true
+		from_disk = true
 	elif not beat_snapshot.is_empty():
 		var snapshot: M0State = M0State.from_dict(beat_snapshot)
 		if snapshot != null:
@@ -1417,7 +1434,8 @@ func _restore_beat(reason: String) -> void:
 		_sync_scene()
 	# _load_game clears the fade; the knockdown's fade-in starts from black.
 	intro_fade.color.a = 1.0
-	status_line = "%s\nBack at the last autosave." % reason
+	# Before the first checkpoint nothing is on disk; the beat snapshot is the start of this beat.
+	status_line = "%s\n%s" % [reason, "Back at the last autosave." if from_disk else "Back at the start of this beat."]
 	_refresh_ui()
 
 
@@ -1433,6 +1451,7 @@ func _cancel_fail() -> void:
 	fail_active = false
 	human.body_sprite.rotation_degrees = 0.0
 	human.body_sprite.position = HUMAN_SPRITE_REST
+	human.z_index = ACTOR_Z
 
 
 ## The containment gate letting go in the opening: a boom, a kick and dust at its base.
@@ -1461,6 +1480,7 @@ func _sync_scene() -> void:
 	wolf.body_sprite.rotation_degrees = 0.0
 	human.body_sprite.position = HUMAN_SPRITE_REST
 	human.body_sprite.rotation_degrees = 0.0
+	human.z_index = ACTOR_Z
 	relay_spark.hide()
 	impact.reset()
 	human.position = state.human_position
@@ -1750,6 +1770,10 @@ func _junction_hint(x: float) -> String:
 	var fuse_lit: bool = line == &"charged" or line == &"fuse"
 	if state.door_blown:
 		return "The door is down. The lane past the rubble is next."
+	# Standing on the grate while the line builds is the one place that can knock you down, so
+	# that warning wins over the breaker's hint where the two ranges touch.
+	if line == &"building" and PressureLine.is_on_vent(x):
+		return "Relief vent. Move off it before the gauge peaks."
 	if absf(x - JunctionRoom.BREAKER_X) <= 52.0:
 		match line:
 			&"idle":
@@ -1765,7 +1789,7 @@ func _junction_hint(x: float) -> String:
 	if absf(x - JunctionRoom.VALVE_X) <= 52.0:
 		return "The valve is dead. Arm the breaker on the left."
 	if PressureLine.is_on_vent(x):
-		return "Relief vent. Move off it before the gauge peaks." if line == &"building" else "Relief vent. It lets go when the gauge peaks."
+		return "Relief vent. It lets go when the gauge peaks."
 	match line:
 		&"building":
 			return "The line is building. Crank the valve by the door."

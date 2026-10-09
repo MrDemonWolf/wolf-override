@@ -11,11 +11,17 @@ const FUSE_SECONDS: float = 1.0
 const TURNS_NEEDED: int = 3
 ## Seconds of held USE per valve turn.
 const TURN_SECONDS: float = 0.4
-## Room x ranges, in pixels: the door blast and the relief vent.
+## The door blast, as a range of the engineer's x. It is the only test of the blast's outcome:
+## inside it when the fuse ends is a knockdown, outside it the door goes.
 const BLAST_MIN_X: float = 360.0
 const BLAST_MAX_X: float = 540.0
-const VENT_MIN_X: float = 250.0
-const VENT_MAX_X: float = 350.0
+## The relief vent's floor grate, in pixels. The drawn grate and the vent's hurtbox are this span.
+const VENT_GRATE_MIN_X: float = 264.0
+const VENT_GRATE_MAX_X: float = 336.0
+## The engineer counts as on the vent while any part of their body is over the grate, so the
+## engineer's x range is the grate widened by half their body on each side (250..350).
+const VENT_MIN_X: float = VENT_GRATE_MIN_X - M0State.HUMAN_HALF_WIDTH
+const VENT_MAX_X: float = VENT_GRATE_MAX_X + M0State.HUMAN_HALF_WIDTH
 ## Summing many small deltas lands a hair under a round number; boundaries forgive that much.
 const EPSILON: float = 0.00001
 

@@ -26,8 +26,13 @@ const LENGTHS: Dictionary = {
 	&"growl": 0.6,
 }
 
-## Off means play() does nothing; Main ties it to effects_enabled.
-var enabled: bool = true
+## Off means play() does nothing and anything already sounding, loops included, stops;
+## Main ties it to effects_enabled.
+var enabled: bool = true:
+	set(value):
+		enabled = value
+		if not enabled:
+			stop_all()
 var streams: Dictionary = {}
 ## How long generation took, in milliseconds, for the startup budget check.
 var generation_ms: float = 0.0

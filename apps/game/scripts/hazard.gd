@@ -1,14 +1,13 @@
 class_name Hazard
 extends Area2D
-## A hurtbox the engineer can be knocked down by. It sits on the hazard physics layer (which the
-## engineer's body masks and WOLF's does not), scans the actor layer, and reports contact only
-## for the engineer and only while [member armed], so a room arms it from real state (a blown
-## vent, a live blast zone) and never from a timer of its own.
+## A hurtbox the engineer can be knocked down by. Area2D detection depends only on the area's own
+## mask, so it scans the actor layer (both actors' bodies live there) and nothing needs to detect
+## it. WOLF is left out by the actor_id check in _on_body_entered, not by physics layers. It
+## reports contact only for the engineer and only while [member armed], so a room arms it from
+## real state (a blown vent) and never from a timer of its own.
 
 signal contact(hazard: Hazard)
 
-## Physics layer 4; the engineer's collision_mask includes it, WOLF's does not.
-const HAZARD_LAYER_BIT: int = 8
 ## Physics layer 1, where both actors' bodies live.
 const ACTOR_LAYER_BIT: int = 1
 
@@ -24,7 +23,7 @@ var _inside: Array[M0Actor] = []
 
 
 func _init() -> void:
-	collision_layer = HAZARD_LAYER_BIT
+	collision_layer = 0
 	collision_mask = ACTOR_LAYER_BIT
 	monitorable = false
 	body_entered.connect(_on_body_entered)
