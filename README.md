@@ -75,7 +75,9 @@ To launch the game directly, run `godot --path apps/game`.
 ## Usage
 
 The title screen offers New Game. Continue is available when a valid
-checkpoint save exists.
+checkpoint save exists. Credits and Changelog open in the game; the
+changelog screen also has a button that opens the full changelog on the
+website. Esc, controller B or Android Back return to the title.
 
 | Key                | Action                                      |
 | ------------------ | ------------------------------------------- |
@@ -120,6 +122,7 @@ stores the save in its `user://` directory.
 ### Prerequisites
 
 - Godot **4.7.2 stable** for the game.
+- Python 3 (standard library only) for the changelog export check in `bun run game:check`.
 - Bun **1.4.2** for the public docs app only.
 
 ### Setup
@@ -131,7 +134,10 @@ bun run game:check
 ```
 
 This imports the project and runs every headless suite with a temporary user
-data folder, so your own saves are untouched.
+data folder, so your own saves are untouched. It also regenerates the in-game
+changelog text from `apps/docs/content/docs/changelog.mdx` with Python 3 and
+fails if `apps/game/assets/changelog.txt` is out of date; after editing the
+changelog, run `python3 scripts/export_changelog.py` and commit the result.
 
 To work on the public docs site, install its declared dependencies and
 start the local server:

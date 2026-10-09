@@ -569,8 +569,8 @@ offset_top = 459.0
 offset_right = 278.0
 offset_bottom = 513.0
 theme_override_font_sizes/font_size = 18
-text = "CHANGELOG ↗"
-tooltip_text = "Opens development updates in your browser"
+text = "CHANGELOG"
+tooltip_text = "Development updates, in the game and online"
 
 [node name="Credit" type="Label" parent="CanvasLayer/TitleScreen"]
 offset_left = 460.0
@@ -648,6 +648,84 @@ offset_right = 771.0
 offset_bottom = 502.0
 theme_override_font_sizes/font_size = 19
 text = "PAUSE SCROLL"
+
+[node name="ChangelogScreen" type="ColorRect" parent="CanvasLayer/TitleScreen"]
+visible = false
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.025, 0.045, 0.08, 0.76)
+
+[node name="ChangelogPanel" type="Panel" parent="CanvasLayer/TitleScreen/ChangelogScreen"]
+offset_left = 168.0
+offset_top = 19.0
+offset_right = 792.0
+offset_bottom = 521.0
+theme_type_variation = &"MenuPanel"
+
+[node name="Sheen" type="Panel" parent="CanvasLayer/TitleScreen/ChangelogScreen/ChangelogPanel"]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+theme_type_variation = &"CardSheen"
+
+[node name="ChangelogTitle" type="Label" parent="CanvasLayer/TitleScreen/ChangelogScreen"]
+offset_left = 185.0
+offset_top = 35.0
+offset_right = 775.0
+offset_bottom = 80.0
+horizontal_alignment = 1
+theme_override_fonts/font = ExtResource("13_display")
+theme_override_font_sizes/font_size = 28
+text = "DEVELOPMENT UPDATES"
+
+[node name="ChangelogLine" type="ColorRect" parent="CanvasLayer/TitleScreen/ChangelogScreen"]
+offset_left = 340.0
+offset_top = 92.0
+offset_right = 620.0
+offset_bottom = 95.0
+color = Color(0.10, 0.76, 0.92, 1)
+
+[node name="ChangelogNote" type="Label" parent="CanvasLayer/TitleScreen/ChangelogScreen"]
+offset_left = 189.0
+offset_top = 100.0
+offset_right = 771.0
+offset_bottom = 122.0
+theme_override_colors/font_color = Color(0.59, 0.70, 0.77, 1)
+theme_override_font_sizes/font_size = 15
+horizontal_alignment = 1
+text = "Source-build changes by date, not downloadable releases. Scroll with the wheel, a drag or up/down."
+
+[node name="ChangelogBody" type="RichTextLabel" parent="CanvasLayer/TitleScreen/ChangelogScreen"]
+offset_left = 189.0
+offset_top = 130.0
+offset_right = 771.0
+offset_bottom = 433.0
+theme_override_colors/default_color = Color(0.82, 0.89, 0.94, 1)
+theme_override_font_sizes/normal_font_size = 17
+bbcode_enabled = true
+
+[node name="ChangelogBackButton" type="Button" parent="CanvasLayer/TitleScreen/ChangelogScreen"]
+offset_left = 189.0
+offset_top = 453.0
+offset_right = 407.0
+offset_bottom = 502.0
+theme_override_font_sizes/font_size = 19
+text = "BACK TO TITLE"
+
+[node name="ChangelogOnlineButton" type="Button" parent="CanvasLayer/TitleScreen/ChangelogScreen"]
+offset_left = 433.0
+offset_top = 453.0
+offset_right = 771.0
+offset_bottom = 502.0
+theme_override_font_sizes/font_size = 17
+text = "OPEN FULL CHANGELOG ONLINE"
+tooltip_text = "Opens wolfoverride.mrdemonwolf.dev/docs/changelog/ in your browser"
 
 [node name="IntroFade" type="ColorRect" parent="CanvasLayer"]
 offset_right = 960.0

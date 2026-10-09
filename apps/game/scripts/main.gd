@@ -2,6 +2,11 @@ extends Node2D
 
 const SITE_URL: String = "https://wolfoverride.mrdemonwolf.dev"
 const CHANGELOG_URL: String = SITE_URL + "/docs/changelog/"
+## Plain-text export of the public changelog (scripts/export_changelog.py); check-game.sh fails when it drifts.
+const CHANGELOG_PATH: String = "res://assets/changelog.txt"
+const CHANGELOG_UNAVAILABLE: String = "The changelog text is missing from this build. Open the full changelog online."
+## How fast a held up/down input scrolls the changelog, in pixels per second.
+const CHANGELOG_SCROLL_SPEED: float = 260.0
 ## Where WOLF stands to hold the live relay contact.
 const RELAY_CONTACT_X: float = 592.0
 const SAVE_FAILED_HINT: String = "Save failed. Use a station to try again."
@@ -15,6 +20,8 @@ const MENU_NAVIGATION_ACTIONS: Array[StringName] = [&"ui_accept", &"ui_up", &"ui
 		effects_enabled = value
 		if is_node_ready():
 			_apply_effects()
+## Leaving the app or losing window focus mid-play pauses the game; capture and review drivers switch this off.
+@export var auto_pause_on_focus_loss: bool = true
 ## Trial corridor built from three generated plates (far, mid, near) instead of the single painting, for comparison stills.
 @export var corridor_layers_trial: bool = false:
 	set(value):
@@ -82,6 +89,11 @@ const MENU_NAVIGATION_ACTIONS: Array[StringName] = [&"ui_accept", &"ui_up", &"ui
 @onready var credits_body: RichTextLabel = $CanvasLayer/TitleScreen/CreditsScreen/CreditsBody
 @onready var credits_back_button: Button = $CanvasLayer/TitleScreen/CreditsScreen/CreditsBackButton
 @onready var credits_pause_button: Button = $CanvasLayer/TitleScreen/CreditsScreen/CreditsPauseButton
+@onready var changelog_button: Button = $CanvasLayer/TitleScreen/ChangelogButton
+@onready var changelog_screen: ColorRect = $CanvasLayer/TitleScreen/ChangelogScreen
+@onready var changelog_body: RichTextLabel = $CanvasLayer/TitleScreen/ChangelogScreen/ChangelogBody
+@onready var changelog_back_button: Button = $CanvasLayer/TitleScreen/ChangelogScreen/ChangelogBackButton
+@onready var changelog_online_button: Button = $CanvasLayer/TitleScreen/ChangelogScreen/ChangelogOnlineButton
 
 var state: M0State = M0State.new()
 var save_path: String = M0State.SAVE_PATH
@@ -111,6 +123,8 @@ var wolf_reaction_tween: Tween
 var relay_spark_tween: Tween
 var records_room: RecordsRoom
 var credits_paused: bool = false
+## The exported changelog as loaded at title time; empty when the file is missing.
+var changelog_text: String = ""
 var save_error: String = ""
 var save_error_context: String = ""
 var floor_reflections: Array[FloorReflection] = []
@@ -172,10 +186,13 @@ func _ready() -> void:
 	new_game_button.pressed.connect(_new_game)
 	continue_button.pressed.connect(_load_game)
 	credits_button.pressed.connect(_show_credits)
-	$CanvasLayer/TitleScreen/ChangelogButton.pressed.connect(_open_changelog)
 	credits_back_button.pressed.connect(_hide_credits)
 	credits_pause_button.pressed.connect(_toggle_credits_pause)
 	credits_body.gui_input.connect(_on_credits_body_input)
+	changelog_button.pressed.connect(_show_changelog)
+	changelog_back_button.pressed.connect(_hide_changelog)
+	changelog_online_button.pressed.connect(_open_changelog)
+	_load_changelog()
 	_grab_menu_focus(new_game_button)
 	title_mark.modulate = Color(1, 1, 1, 0)
 	title_line.modulate = Color(1, 1, 1, 0)
@@ -196,9 +213,44 @@ func _refresh_continue() -> void:
 	continue_button.tooltip_text = reason
 
 
+## The full changelog lives on the website; the in-game screen shows the same text exported to plain text.
 func _open_changelog() -> void:
 	if OS.shell_open(CHANGELOG_URL) != OK:
-		$CanvasLayer/TitleScreen/ChangelogButton.text = "LINK UNAVAILABLE"
+		changelog_online_button.text = "LINK UNAVAILABLE"
+
+
+func _load_changelog() -> void:
+	changelog_text = ""
+	if FileAccess.file_exists(CHANGELOG_PATH):
+		var file: FileAccess = FileAccess.open(CHANGELOG_PATH, FileAccess.READ)
+		if file != null:
+			changelog_text = file.get_as_text().strip_edges()
+	changelog_body.text = CHANGELOG_UNAVAILABLE if changelog_text.is_empty() else _changelog_bbcode(changelog_text)
+
+
+## "== Heading ==" lines become cyan headings and "-- Heading --" lines bold ones; everything else is shown as written.
+static func _changelog_bbcode(text: String) -> String:
+	var lines: PackedStringArray = PackedStringArray()
+	for raw: String in text.split("\n"):
+		var line: String = raw.replace("[", "[lb]")
+		if line.begins_with("== ") and line.ends_with(" =="):
+			lines.append("[color=#73DDF5][b]%s[/b][/color]" % line.substr(3, line.length() - 6))
+		elif line.begins_with("-- ") and line.ends_with(" --"):
+			lines.append("[b]%s[/b]" % line.substr(3, line.length() - 6))
+		else:
+			lines.append(line)
+	return "\n".join(lines)
+
+
+func _show_changelog() -> void:
+	_show_title_overlay(changelog_screen)
+	changelog_body.get_v_scroll_bar().value = 0.0
+	_grab_menu_focus(changelog_back_button)
+
+
+func _hide_changelog() -> void:
+	_hide_title_overlay(changelog_screen)
+	_grab_menu_focus(changelog_button)
 
 
 func _draw() -> void:
@@ -251,8 +303,6 @@ func _update_gameplay_camera() -> void:
 func _start_gameplay_camera() -> void:
 	intro_camera.zoom = Vector2.ONE * GAMEPLAY_ZOOM
 	_update_gameplay_camera()
-	if wolf_heading_to_relay and absf(wolf.position.x - RELAY_CONTACT_X) <= 4.0:
-		_wolf_takes_relay()
 	intro_camera.position_smoothing_enabled = true
 	intro_camera.position_smoothing_speed = 4.0
 	intro_camera.reset_smoothing()
@@ -262,6 +312,9 @@ func _process(delta: float) -> void:
 	if title_open:
 		if credits_screen.visible and not credits_paused:
 			credits_body.get_v_scroll_bar().value += delta * 18.0
+		elif changelog_screen.visible:
+			# The changelog never scrolls on its own; held up/down (keys, D-pad or stick) reads it at a steady pace.
+			changelog_body.get_v_scroll_bar().value += Input.get_axis(&"ui_up", &"ui_down") * delta * CHANGELOG_SCROLL_SPEED
 		return
 	if intro_active:
 		if Input.is_action_just_pressed(&"interact"):
@@ -432,20 +485,30 @@ func _finish_intro(keep_fade: bool = false) -> void:
 func _show_credits() -> void:
 	credits_paused = false
 	credits_pause_button.text = "PAUSE SCROLL"
-	for child in title_screen.get_children():
-		if child != credits_screen and child != $CanvasLayer/TitleScreen/CorridorArt:
-			child.hide()
-	credits_screen.show()
+	_show_title_overlay(credits_screen)
 	credits_body.get_v_scroll_bar().value = 0.0
 	_grab_menu_focus(credits_back_button)
 
 
 func _hide_credits() -> void:
-	credits_screen.hide()
-	for child in title_screen.get_children():
-		if child != credits_screen:
-			child.show()
+	_hide_title_overlay(credits_screen)
 	_grab_menu_focus(credits_button)
+
+
+## Credits and the changelog replace the title menu over the key art; closing one restores the menu
+## without revealing the other.
+func _show_title_overlay(overlay: Control) -> void:
+	for child: Node in title_screen.get_children():
+		if child is CanvasItem and child != overlay and child != $CanvasLayer/TitleScreen/CorridorArt:
+			(child as CanvasItem).hide()
+	overlay.show()
+
+
+func _hide_title_overlay(overlay: Control) -> void:
+	overlay.hide()
+	for child: Node in title_screen.get_children():
+		if child is CanvasItem and child != credits_screen and child != changelog_screen:
+			(child as CanvasItem).show()
 
 
 func _toggle_credits_pause() -> void:
@@ -637,6 +700,7 @@ func _return_to_title() -> void:
 	choice_context = ""
 	title_open = true
 	_hide_credits()
+	changelog_screen.hide()
 	title_screen.show()
 	_refresh_continue()
 	_update_controls()
@@ -662,13 +726,18 @@ func _menu_focus_target() -> Control:
 	if title_open:
 		if credits_screen.visible:
 			return credits_back_button
+		if changelog_screen.visible:
+			return changelog_back_button
 		return title_focus_return if title_focus_return != null and title_focus_return.is_visible_in_tree() else new_game_button
 	return null
 
 
 func _unhandled_input(event: InputEvent) -> void:
-	if credits_screen.visible and event.is_action_pressed(&"ui_cancel"):
-		_hide_credits()
+	if event.is_action_pressed(&"ui_cancel") and (credits_screen.visible or changelog_screen.visible):
+		if credits_screen.visible:
+			_hide_credits()
+		else:
+			_hide_changelog()
 		get_viewport().set_input_as_handled()
 		return
 	# Pause is event-driven so the press that resumes from PauseOverlay (handled in its _input)
@@ -685,7 +754,7 @@ func _notification(what: int) -> void:
 			_handle_back()
 		NOTIFICATION_APPLICATION_PAUSED, NOTIFICATION_APPLICATION_FOCUS_OUT:
 			# Leaving the app mid-play pauses it so nothing advances unseen.
-			if is_node_ready() and not title_open and not get_tree().paused:
+			if auto_pause_on_focus_loss and is_node_ready() and not title_open and not get_tree().paused:
 				_pause_game()
 
 
@@ -699,6 +768,8 @@ func _handle_back() -> void:
 		_resume_game()
 	elif credits_screen.visible:
 		_hide_credits()
+	elif changelog_screen.visible:
+		_hide_changelog()
 	elif title_open:
 		get_tree().quit()
 	else:

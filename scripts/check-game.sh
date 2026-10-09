@@ -16,6 +16,13 @@ export HOME="$work/home" XDG_DATA_HOME="$work/home/.local/share" XDG_CONFIG_HOME
 cd "$root"
 before="$(git status --porcelain -- apps/game)"
 
+# The in-game changelog is generated from the public changelog; the committed export must match.
+python3 scripts/export_changelog.py --output "$work/changelog.txt"
+if ! cmp -s "$work/changelog.txt" apps/game/assets/changelog.txt; then
+  echo "apps/game/assets/changelog.txt is out of date: run python3 scripts/export_changelog.py and commit the result" >&2
+  exit 1
+fi
+
 # A fresh checkout's first import loads the project theme before its fonts exist; the second must be clean.
 "$godot" --headless --path apps/game --import > "$logs/import-first.log" 2>&1 || true
 "$godot" --headless --path apps/game --import > "$logs/import.log" 2>&1

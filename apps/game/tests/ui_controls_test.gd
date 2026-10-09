@@ -16,8 +16,32 @@ func _run() -> void:
 	game.set("settings_path", path)
 	game.set("save_path", "%s-save.json" % path)
 	root.add_child(game)
+	# The title CHANGELOG button opens the exported changelog in the game; the online button keeps the website link.
 	var changelog: Button = game.get_node("CanvasLayer/TitleScreen/ChangelogButton") as Button
-	_expect(changelog.pressed.is_connected(Callable(game, "_open_changelog")) and str(game.CHANGELOG_URL) == "https://wolfoverride.mrdemonwolf.dev/docs/changelog/" and str(game.SITE_URL).begins_with("https://wolfoverride.mrdemonwolf.dev"), "title changelog points to the public development updates")
+	var changelog_screen: ColorRect = game.get_node("CanvasLayer/TitleScreen/ChangelogScreen") as ColorRect
+	var changelog_body: RichTextLabel = changelog_screen.get_node("ChangelogBody") as RichTextLabel
+	var changelog_back: Button = changelog_screen.get_node("ChangelogBackButton") as Button
+	var changelog_online: Button = changelog_screen.get_node("ChangelogOnlineButton") as Button
+	var title_logo: Label = game.get_node("CanvasLayer/TitleScreen/GameTitle") as Label
+	_expect(changelog.pressed.is_connected(Callable(game, "_show_changelog")) and changelog_online.pressed.is_connected(Callable(game, "_open_changelog")) and str(game.CHANGELOG_URL) == "https://wolfoverride.mrdemonwolf.dev/docs/changelog/" and str(game.SITE_URL).begins_with("https://wolfoverride.mrdemonwolf.dev"), "title changelog opens in the game and the online button points to the public development updates")
+	var changelog_text: String = str(game.get("changelog_text"))
+	var first_heading: String = changelog_text.get_slice("\n", 0)
+	_expect(first_heading.begins_with("== ") and first_heading.ends_with(" ==") and first_heading.contains(", 20") and changelog_text.contains("\n- "), "the exported changelog loads and starts with the newest dated heading")
+	changelog.pressed.emit()
+	_expect(changelog_screen.visible and not title_logo.visible and game.get("title_open") and changelog_back.has_focus(), "CHANGELOG opens the in-game screen over the title without starting a game")
+	_expect(changelog_body.get_parsed_text().begins_with(first_heading.substr(3, first_heading.length() - 6)) and changelog_body.get_v_scroll_bar().value == 0.0, "the changelog screen shows the text from its newest heading")
+	changelog_back.pressed.emit()
+	_expect(not changelog_screen.visible and title_logo.visible and game.get("title_open") and changelog.has_focus() and not (game.get_node("CanvasLayer/TitleScreen/CreditsScreen") as Control).visible, "BACK TO TITLE restores the title menu and returns focus to CHANGELOG")
+	changelog.pressed.emit()
+	await _send_escape(true)
+	await _send_escape(false)
+	_expect(not changelog_screen.visible and title_logo.visible and game.get("title_open") and not paused, "Esc closes the changelog screen without pausing")
+	changelog.pressed.emit()
+	game.notification(Node.NOTIFICATION_WM_GO_BACK_REQUEST)
+	_expect(not changelog_screen.visible and title_logo.visible and game.get("title_open"), "Android Back closes the changelog screen instead of quitting")
+	changelog.pressed.emit()
+	game.call("_handle_back")
+	_expect(not changelog_screen.visible and title_logo.visible and game.get("title_open") and not changelog_online.is_visible_in_tree(), "the Back router closes the changelog screen")
 	_expect(_has_button(&"interact", JOY_BUTTON_A) and _has_button(&"pause_game", JOY_BUTTON_START), "gamepad action buttons are mapped")
 	_expect(_has_button(&"move_left", JOY_BUTTON_DPAD_LEFT) and _has_button(&"move_right", JOY_BUTTON_DPAD_RIGHT), "gamepad D-pad movement is mapped")
 	var project_theme: Theme = ThemeDB.get_project_theme()
@@ -154,6 +178,10 @@ func _run() -> void:
 	game.notification(Node.NOTIFICATION_APPLICATION_FOCUS_OUT)
 	_expect(paused and overlay.visible, "losing app focus during play pauses the game")
 	game.call("_resume_game")
+	game.set("auto_pause_on_focus_loss", false)
+	game.notification(Node.NOTIFICATION_APPLICATION_FOCUS_OUT)
+	_expect(not paused and not overlay.visible, "focus loss does not pause when auto_pause_on_focus_loss is off")
+	game.set("auto_pause_on_focus_loss", true)
 	# Pause during the opening is a real pause; skipping is an explicit menu choice.
 	game.call("_new_game")
 	await process_frame

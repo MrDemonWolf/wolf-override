@@ -1,16 +1,8 @@
----
-title: Changelog
-description: Spoiler-free changes to the WOLF//OVERRIDE source game and website.
----
-
-These are development updates to the source build, not downloadable releases. There is no public game package or automatic updater yet. Original concept, core story and creative vision: Nathanial Henniges.
-
-## October 8, 2026
-
-- The title **CHANGELOG** button now opens these updates inside the game; scroll with the mouse wheel, a drag or up/down, and use **OPEN FULL CHANGELOG ONLINE** for the website version. **BACK TO TITLE**, Esc, controller B or Android Back return to the title.
+== October 8, 2026 ==
+- The title CHANGELOG button now opens these updates inside the game; scroll with the mouse wheel, a drag or up/down, and use OPEN FULL CHANGELOG ONLINE for the website version. BACK TO TITLE, Esc, controller B or Android Back return to the title.
 - After you tell WOLF about the relay risk, he walks to the contact himself; you no longer have to find the exact spot. Using the relay again while he is walking takes the engineer's bypass instead.
 - Removed the N (new run) and L/F9 (load checkpoint) hotkeys, which discarded unsaved progress without warning. Use Pause, then Return to Title, then New Game or Continue.
-- Pause during the opening now pauses instead of skipping; choose **Skip Opening** from Pause to go straight to play.
+- Pause during the opening now pauses instead of skipping; choose Skip Opening from Pause to go straight to play.
 - On Android, Back backs out of menus and pauses play instead of closing the game; it only closes the game from the title screen.
 - Switching away from the game during play pauses it.
 - Returning to the title no longer leaves an unanswered choice that a later key press could answer.
@@ -20,12 +12,11 @@ These are development updates to the source build, not downloadable releases. Th
 - When entering Records Access, copying a trace or securing the exit fails to save, the hint line now says so instead of a character's dialogue, and tells you to use a station to try again; normal hints return once you move on or a later save works.
 - If the checkpoint file is missing or damaged, Continue uses a complete save that was still being written when the game closed, and Continue keeps working with saves made before small wording changes.
 - Continuing in Records Access now tells you which copy is next or that the exit is open.
-- Title, credits and Pause menus now use the same cyan selection outline as Settings, drawn inside each button, and Settings sliders now use it too; Pause menu buttons and the Settings **BACK**, FPS limit and resolution controls also thicken and fill so the selection stands out from their border.
-- Menus opened by touch no longer show a selection outline; the first arrow key or controller press selects a menu item without activating it. With a keyboard or controller, closing title Settings by **BACK**, Esc, controller B or Android Back returns the selection to **SETTINGS**; after closing it by touch, the first arrow key or controller press selects **SETTINGS**.
+- Title, credits and Pause menus now use the same cyan selection outline as Settings, drawn inside each button, and Settings sliders now use it too; Pause menu buttons and the Settings BACK, FPS limit and resolution controls also thicken and fill so the selection stands out from their border.
+- Menus opened by touch no longer show a selection outline; the first arrow key or controller press selects a menu item without activating it. With a keyboard or controller, closing title Settings by BACK, Esc, controller B or Android Back returns the selection to SETTINGS; after closing it by touch, the first arrow key or controller press selects SETTINGS.
 - The opening tutorial now matches the objective card: it marks the nearby display as optional, points toward your first goal instead of sending you back, clears when you reach that goal or interact with anything, and sits clear of the display and station art.
 
-## October 7, 2026
-
+== October 7, 2026 ==
 - Esc and controller Start now resume from Pause; previously they could reopen Pause on the same press.
 - Esc or controller B in in-game Settings returns to the Pause menu instead of resuming; closing Settings from the title returns focus to the title menu.
 - Esc cancels a key rebind without leaving Settings.
@@ -33,35 +24,30 @@ These are development updates to the source build, not downloadable releases. Th
 - Corridor and Records Access backgrounds keep their 16:9 framing, and the provisional Director and WOLF sprites were re-exported.
 - Website: a mobile navigation menu that opens over the page, a restyled landing page, readable hover states on the main buttons, and underlined links in the guide again.
 
-## October 3, 2026
-
+== October 3, 2026 ==
 - Added a spoiler-light first-steps tutorial for movement, interactions, choices, and checkpoints, linked from the homepage and game guide.
 - Fixed the platform picker menu contrast in dark and light themes.
 - Added story, gameplay, downloads, changelog, and guide links; an icon theme control; clearer source-build access; theme-aware scrollbars; and grouped footer links. The glass nav scrolls away instead of covering page content.
 - Put game availability and source-build instructions at the front of the guide, with a direct current-source ZIP link and clear notice that it is not an installer.
 - Added a public development story, clearer links to the full guide, changelog, credits, references, tools, and legal/licensing notes.
 
-## September 30, 2026
-
-### Menus and controls
-
+== September 30, 2026 ==
+-- Menus and controls --
 - Restyled Settings with a terminal theme, clearer section labels and square-edged controls. The title screen keeps its game presentation.
 - Added a closer, smooth horizontal gameplay camera that follows the engineer while keeping the room edges inside view.
-- Added **Return to Title** to Pause for keyboard, controller and touch checkpoint recovery. Returning keeps the last checkpoint; unsaved progress is lost.
+- Added Return to Title to Pause for keyboard, controller and touch checkpoint recovery. Returning keeps the last checkpoint; unsaved progress is lost.
 - Fixed controller confirmation and remapped response conflicts so the intended choice is remembered.
 - Improved settings tab spacing, typography, padding, focus indicators and dropdown styling.
 - Hardened saved preferences against invalid values and conflicting bindings.
 - Fixed interrupted-load transitions and allowed Pause during closing dialogue.
 
-### Scene presentation
-
+-- Scene presentation --
 - Added a framed containment cage, a gate that slides aside, and WOLF stepping forward after it opens.
 - Moved cinematic prompts and response cards clear of characters; adjusted the closing camera to show both actors above dialogue.
 - Corrected nearby checkpoint prompts and callbacks to match the route actually taken.
 - Expanded in-game and website credits with consulted design research, separate from project contributors.
 
-### Website and development
-
+-- Website and development --
 - Reorganized the guide into a short start page, controls/settings and optional chapter walkthrough. Updated setup links and save behavior, kept private campaign drafts out, and clarified code versus asset licensing.
 - Fixed Skip to content to move keyboard focus to the page heading, with a visible focus outline.
 - Added page-specific search and social-sharing metadata, canonical URLs, author credits and an automatically generated sitemap for the public website and guide.
@@ -70,24 +56,21 @@ These are development updates to the source build, not downloadable releases. Th
 - Redesigned the marketing homepage with cinematic key art, story and gameplay sections, and platform suggestions. All six planned download/store channels remain unavailable with visible Coming soon labels and browser tooltips.
 - Added this changelog and a title-screen link that opens it in your browser.
 - Added manual CI runs, bounded job times and downloadable game-check failure logs.
-- Recorded a staged Sparkle plan for direct macOS distribution. Integration is **not implemented or enabled**.
+- Recorded a staged Sparkle plan for direct macOS distribution. Integration is not implemented or enabled.
 
 Five deterministic Godot checks and the docs build passed during the UI review. Agents inspected 44 rendered stills. This does not replace complete hands-on routes, physical-controller testing, touch-device testing or export checks.
 
-## September 29, 2026
-
+== September 29, 2026 ==
 - Added a player-paced Director/WOLF opening before the engineer enters gameplay.
 - Added short-lived location and objective cards, a guided movement/interaction tutorial, and clearer station feedback.
 - Improved speaker labels, response cards and the chapter closing beat.
 - Added controller and touch input, Pause, and saved Display, Audio and Controls settings.
 - Added provisional room and machinery artwork with provenance in the asset register.
 
-## Earlier foundation
-
+== Earlier foundation ==
 The initial source slice established engineer-only movement, WOLF's independent cooperation/refusal, a manual puzzle fallback, remembered choices, checkpoints and save/load across two rooms. The public site added a play guide, development setup, light/dark themes and credits.
 
-## What is next
-
+== What is next ==
 Complete hands-on route testing comes first. Directional character animation, sound, adjustable dialogue presentation and release/device validation remain future work. Story drafts stay private; this page records source changes without campaign spoilers.
 
-See [Testing and deployment](/docs/development/testing/) for test boundaries and [credits](/docs/credits/) for tools, research and asset provenance.
+See Testing and deployment for test boundaries and credits for tools, research and asset provenance.
