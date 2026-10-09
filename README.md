@@ -109,23 +109,25 @@ has the puzzle solutions.
 
 ### Setup
 
-Run the game checks from the repository root:
+1. Run the game checks from the repository root. This imports the
+   project and runs every headless suite in `apps/game/tests` with a
+   temporary user data folder, so your own saves are untouched:
 
-```bash
-bun run game:check
-```
+   ```bash
+   bun run game:check
+   ```
 
-This imports the project and runs every headless suite in
-`apps/game/tests` with a temporary user data folder, so your own saves
-are untouched.
+2. Install the pinned dependencies for the public site:
 
-To work on the public site, install its pinned dependencies and start
-the local server:
+   ```bash
+   bun install --frozen-lockfile
+   ```
 
-```bash
-bun install --frozen-lockfile
-bun run docs:dev
-```
+3. Start the local docs server:
+
+   ```bash
+   bun run docs:dev
+   ```
 
 ### Development Scripts
 
