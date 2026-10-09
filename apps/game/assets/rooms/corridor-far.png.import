@@ -3,19 +3,21 @@
 importer="texture"
 type="CompressedTexture2D"
 uid="uid://dvv1nr8dofbxi"
-path="res://.godot/imported/corridor-far.png-87db07a461cc6d4fd8fdfa802c0b178d.ctex"
+path.s3tc="res://.godot/imported/corridor-far.png-87db07a461cc6d4fd8fdfa802c0b178d.s3tc.ctex"
+path.etc2="res://.godot/imported/corridor-far.png-87db07a461cc6d4fd8fdfa802c0b178d.etc2.ctex"
 metadata={
-"vram_texture": false
+"imported_formats": ["s3tc_bptc", "etc2_astc"],
+"vram_texture": true
 }
 
 [deps]
 
 source_file="res://assets/rooms/corridor-far.png"
-dest_files=["res://.godot/imported/corridor-far.png-87db07a461cc6d4fd8fdfa802c0b178d.ctex"]
+dest_files=["res://.godot/imported/corridor-far.png-87db07a461cc6d4fd8fdfa802c0b178d.s3tc.ctex", "res://.godot/imported/corridor-far.png-87db07a461cc6d4fd8fdfa802c0b178d.etc2.ctex"]
 
 [params]
 
-compress/mode=0
+compress/mode=2
 compress/high_quality=false
 compress/lossy_quality=0.7
 compress/uastc_level=0

@@ -217,7 +217,10 @@ func _apply() -> void:
 
 
 func _draw() -> void:
-	draw_rect(Rect2(-60.0, 0.0, ROOM_WIDTH + 120.0, 680.0), base_color)
+	# The opaque far plate covers every framing (room_depth_test checks it), so the base fill only
+	# shows for a room built without one.
+	if painting == null:
+		draw_rect(Rect2(-60.0, 0.0, ROOM_WIDTH + 120.0, 680.0), base_color)
 
 
 ## Where the far plate is drawn, in the backdrop layer's space (it lines up with the room when the

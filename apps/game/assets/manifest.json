@@ -21,7 +21,7 @@
       "terms_reference": "https://openai.com/policies/terms-of-use/",
       "rights_review_status": "Provisional AI-assisted character art, human reviewed. Final commercial asset-rights review remains open; not covered by the code/docs GPL license.",
       "modifications": "Selected the second, higher-contrast 1774x887 RGBA generation with transparency; extended the canvas by 64 transparent pixels on all sides to 1902x1015 with ImageMagick, preserving every original pixel of that generation exactly. Displayed as a scaled static side-view Sprite2D and flipped when WOLF moves left. 2026-10-08: redrawn with the Codex built-in image_gen tool in edit mode using this file as the reference, on the same 1902x1015 canvas with transparency; Approved for integration by Nathanial Henniges on 2026-10-08 from a review sheet. The redraw replaced this file in place on 2026-10-09 (same path and import settings, so the in-game scale and feet baseline are unchanged).",
-      "implementation_status": "Provisional WOLF sprite used in the corridor and Records Access; animation and final art direction pending. Since 2026-10-08 the Godot import generates mipmaps and the sprite samples them (linear-with-mipmaps filter), so the heavily downscaled sheet no longer aliases; the 2026-10-08 redraw is shown unedited."
+      "implementation_status": "Provisional WOLF sprite used in the corridor, Records Access and the Service Junction; animation and final art direction pending. Since 2026-10-08 the Godot import generates mipmaps and the sprite samples them (linear-with-mipmaps filter), so the heavily downscaled sheet no longer aliases; the 2026-10-08 redraw is shown unedited."
     },
     {
       "asset_id": "rowan-side-right-provisional",
@@ -31,7 +31,7 @@
       "terms_reference": "https://openai.com/policies/terms-of-use/",
       "rights_review_status": "Provisional AI-assisted appearance option, human reviewed. Character appearance and final commercial asset-rights review remain open; not covered by the code/docs GPL license.",
       "modifications": "Selected 1024x1536 RGBA edit of the masculine-presenting Rowan draft: cohesive deep-red hooded field jacket with charcoal trousers and boots, replacing the mixed yellow and silver details. Transparent original is displayed as a scaled static side-view Sprite2D and flipped when Rowan moves left. No pixel edits to that version. 2026-10-08: redrawn with the Codex built-in image_gen tool in edit mode using this file as the reference, on the same 1024x1536 canvas with transparency; Approved for integration by Nathanial Henniges on 2026-10-08 from a review sheet. The redraw replaced this file in place on 2026-10-09 (same path and import settings, so the in-game scale and feet baseline are unchanged).",
-      "implementation_status": "Provisional Rowan appearance used in the corridor and Records Access; animation and appearance options pending. Since 2026-10-08 the Godot import generates mipmaps and the sprite samples them (linear-with-mipmaps filter), so the heavily downscaled sheet no longer aliases; the 2026-10-08 redraw is shown unedited."
+      "implementation_status": "Provisional Rowan appearance used in the corridor, Records Access and the Service Junction; animation and appearance options pending. Since 2026-10-08 the Godot import generates mipmaps and the sprite samples them (linear-with-mipmaps filter), so the heavily downscaled sheet no longer aliases; the 2026-10-08 redraw is shown unedited."
     },
     {
       "asset_id": "director-side-left-provisional",
@@ -62,7 +62,7 @@
       "terms_reference": "https://openai.com/policies/terms-of-use/",
       "rights_review_status": "Provisional AI-generated environment art, human reviewed and approved for integration. Final commercial asset-rights review remains open; not covered by the code/docs GPL license. Approved for integration by Nathanial Henniges on 2026-10-08 from a review sheet.",
       "modifications": "Original 1920x1080 RGB far plate (back wall, three ceiling lamps, wet floor), copied unchanged. First trialled 2026-10-08 as assets/trial/corridor-far-trial.png (same bytes).",
-      "implementation_status": "In use since 2026-10-09. Drawn by RoomDepth as the corridor backdrop: a Parallax2D at 0.9x camera speed, 960 px wide, sitting 27 px lower than the mid plate so its painted ceiling lamps stay in the play view, with additive glows and light shafts on its lamps, two procedurally drawn lockdown beacons, haze and dust. Since 2026-10-09 also the provisional Service Junction backdrop, tinted warmer and darker at runtime (modulate, no pixel edits), until that room has its own approved set."
+      "implementation_status": "In use since 2026-10-09, imported VRAM-compressed. Drawn by RoomDepth as the corridor backdrop: a Parallax2D at 0.9x camera speed, 960 px wide, sitting 27 px lower than the mid plate so its painted ceiling lamps stay in the play view, with additive glows and light shafts on its lamps, two procedurally drawn lockdown beacons, haze and dust. Since 2026-10-09 also the provisional Service Junction backdrop, tinted warmer and darker at runtime (modulate, no pixel edits), until that room has its own approved set."
     },
     {
       "asset_id": "corridor-mid",
@@ -72,7 +72,7 @@
       "terms_reference": "https://openai.com/policies/terms-of-use/",
       "rights_review_status": "Provisional AI-generated environment art, human reviewed and approved for integration. Final commercial asset-rights review remains open; not covered by the code/docs GPL license. Approved for integration by Nathanial Henniges on 2026-10-08 from a review sheet.",
       "modifications": "Original 1920x1080 RGBA mid plate (ceiling pipe run, two pillars, side machines on transparency), copied unchanged. First trialled 2026-10-08 as assets/trial/corridor-mid-trial.png (same bytes).",
-      "implementation_status": "In use since 2026-10-09. The corridor's play plane, drawn 1:1 with the room (960 px wide) with its painted walkway (source row 777) on the floor at y 440, behind the stations and actors; 16 px mirrored slivers continue it past each room edge for camera shake. Also used, tinted, in the Service Junction since 2026-10-09."
+      "implementation_status": "In use since 2026-10-09, imported VRAM-compressed. The corridor's play plane, drawn 1:1 with the room (960 px wide) with its painted walkway (source row 777) on the floor at y 440, behind the stations and actors; 16 px mirrored slivers continue it past each room edge for camera shake. Also used, tinted, in the Service Junction since 2026-10-09."
     },
     {
       "asset_id": "corridor-near",
@@ -81,8 +81,8 @@
       "source_reference": "Reference: maintenance-corridor-background-provisional.png, the earlier single corridor painting (ChatGPT Create in the WOLF//OVERRIDE [Game] project, https://chatgpt.com/g/g-p-6ab60b48c7608191987f04a81b04b5e2-wolf-override-game/c/6abb82fd-5d14-83e9-9332-a78148b708b2), registered here until it was retired on 2026-10-09; generation prompts retained in ignored art notes",
       "terms_reference": "https://openai.com/policies/terms-of-use/",
       "rights_review_status": "Provisional AI-generated environment art, human reviewed and approved for integration. Final commercial asset-rights review remains open; not covered by the code/docs GPL license. Approved for integration by Nathanial Henniges on 2026-10-08 from a review sheet.",
-      "modifications": "Original 1920x1080 RGBA near plate (left pipe column, floor-front rail and cables, right crate stack), copied unchanged. First trialled 2026-10-08 as assets/trial/corridor-near-trial.png (same bytes). The game shows only its left 512 px strip (the pipe column and rail), at the left edge and mirrored at the right edge, so the crate stack never covers a station.",
-      "implementation_status": "In use since 2026-10-09. The left 512 px strip and its mirror drawn in front of the actors at 1.15x camera speed, anchored 56 px past each room edge so no strip edge shows at any framing. Also used, tinted, in the Service Junction since 2026-10-09."
+      "modifications": "Original 1920x1080 RGBA near plate (left pipe column, floor-front rail and cables, right crate stack). First trialled 2026-10-08 as assets/trial/corridor-near-trial.png (same bytes). The game only ever showed its left 512 px strip (the pipe column and rail), so on 2026-10-09 the file was cropped to that strip (512x1080, pixels unchanged, re-encoded as PNG) to stop loading unused texture memory; the uncropped original remains in the Git history (commit 9a52666).",
+      "implementation_status": "In use since 2026-10-09. The strip, at the left edge, and its mirror at the right edge drawn in front of the actors at 1.15x camera speed, anchored 56 px past each room edge so no strip edge shows at any framing and the crate stack never covers a station. Imported VRAM-compressed. Also used, tinted, in the Service Junction since 2026-10-09."
     },
     {
       "asset_id": "records-far",
@@ -92,7 +92,7 @@
       "terms_reference": "https://openai.com/policies/terms-of-use/",
       "rights_review_status": "Provisional AI-generated environment art, human reviewed and approved for integration. Final commercial asset-rights review remains open; not covered by the code/docs GPL license. Approved for integration by Nathanial Henniges on 2026-10-08 from a review sheet.",
       "modifications": "Original 1920x1080 RGB far plate (archive racks, braced pillars, three ceiling lamps, wet floor), copied unchanged.",
-      "implementation_status": "In use since 2026-10-09. Drawn by RoomDepth as the Records Access backdrop: a Parallax2D at 0.9x camera speed, 960 px wide, with additive glows and light shafts on its painted lamps, two procedurally drawn lockdown beacons, haze and dust."
+      "implementation_status": "In use since 2026-10-09, imported VRAM-compressed. Drawn by RoomDepth as the Records Access backdrop: a Parallax2D at 0.9x camera speed, 960 px wide, with additive glows and light shafts on its painted lamps, two procedurally drawn lockdown beacons, haze and dust."
     },
     {
       "asset_id": "records-mid",
@@ -102,7 +102,7 @@
       "terms_reference": "https://openai.com/policies/terms-of-use/",
       "rights_review_status": "Provisional AI-generated environment art, human reviewed and approved for integration. Final commercial asset-rights review remains open; not covered by the code/docs GPL license. Approved for integration by Nathanial Henniges on 2026-10-08 from a review sheet.",
       "modifications": "Original 1920x1080 RGBA mid plate (ceiling pipe run, two braced pillars, side machines on transparency), copied unchanged.",
-      "implementation_status": "In use since 2026-10-09. The Records Access play plane, drawn 1:1 with the room (960 px wide) with its painted walkway (source row 742) on the floor at y 440, behind the stations and actors; 16 px mirrored slivers continue it past each room edge for camera shake."
+      "implementation_status": "In use since 2026-10-09, imported VRAM-compressed. The Records Access play plane, drawn 1:1 with the room (960 px wide) with its painted walkway (source row 742) on the floor at y 440, behind the stations and actors; 16 px mirrored slivers continue it past each room edge for camera shake."
     },
     {
       "asset_id": "records-near",
@@ -111,8 +111,8 @@
       "source_reference": "Reference: records-access-background-provisional.png, the earlier single Records Access painting (ChatGPT Create in the WOLF//OVERRIDE [Game] project, https://chatgpt.com/g/g-p-6ab60b48c7608191987f04a81b04b5e2-wolf-override-game/c/6abb82fd-5d14-83e9-9332-a78148b708b2), registered here until it was retired on 2026-10-09; generation prompts retained in ignored art notes",
       "terms_reference": "https://openai.com/policies/terms-of-use/",
       "rights_review_status": "Provisional AI-generated environment art, human reviewed and approved for integration. Final commercial asset-rights review remains open; not covered by the code/docs GPL license. Approved for integration by Nathanial Henniges on 2026-10-08 from a review sheet.",
-      "modifications": "Original 1920x1080 RGBA near plate (left pipe column, floor-front rail and cables, right crate stack), copied unchanged. The game shows only its left 512 px strip, at the left edge and mirrored at the right edge, so the crate stack never covers a station.",
-      "implementation_status": "In use since 2026-10-09. The left 512 px strip and its mirror drawn in front of the actors at 1.15x camera speed, anchored 56 px past each room edge so no strip edge shows at any framing."
+      "modifications": "Original 1920x1080 RGBA near plate (left pipe column, floor-front rail and cables, right crate stack). The game only ever showed its left 512 px strip, so on 2026-10-09 the file was cropped to that strip (512x1080, pixels unchanged, re-encoded as PNG without its colour-chromaticity chunk) to stop loading unused texture memory; the uncropped original remains in the Git history (commit 9a52666).",
+      "implementation_status": "In use since 2026-10-09. The strip, at the left edge, and its mirror at the right edge drawn in front of the actors at 1.15x camera speed, anchored 56 px past each room edge so no strip edge shows at any framing and the crate stack never covers a station. Imported VRAM-compressed."
     },
     {
       "asset_id": "corridor-purge-display",
@@ -121,8 +121,8 @@
       "source_reference": "Reference: maintenance-props-provisional.png and records-props-provisional.png (the purge-queue region was the corridor display until 2026-10-09), the earlier ChatGPT Create prop sheet (WOLF//OVERRIDE [Game] project, https://chatgpt.com/g/g-p-6ab60b48c7608191987f04a81b04b5e2-wolf-override-game/c/6abb82fd-5d14-83e9-9332-a78148b708b2), registered here until it was retired on 2026-10-09; generation prompts retained in ignored art notes",
       "terms_reference": "https://openai.com/policies/terms-of-use/",
       "rights_review_status": "Provisional AI-generated gameplay prop, human reviewed and approved for integration. Final commercial asset-rights review remains open; not covered by the code/docs GPL license. Approved for integration by Nathanial Henniges on 2026-10-08 from a review sheet.",
-      "modifications": "Original 512x512 RGBA prop, copied unchanged. The game shows the region inside its painted outline (so its floor reflection and contact shadow start at its real base) with mipmaps and linear-with-mipmaps filtering.",
-      "implementation_status": "In use since 2026-10-09 as the Director's purge display on the corridor wall, 0.25x, the same on-screen size as the art it replaced, with its station label, state tint or glow and floor reflection unchanged."
+      "modifications": "Original 512x512 RGBA prop, copied unchanged. The game shows the region inside its painted outline (so the wall mount sits tight to its painted edge) with mipmaps and linear-with-mipmaps filtering.",
+      "implementation_status": "In use since 2026-10-09 as the Director's purge display on the corridor wall, 0.25x, the same on-screen size as the art it replaced. It is wall-mounted (its base at y 345, above the floor), so it has no floor reflection or contact shadow, and it carries no station label; reading it is optional."
     },
     {
       "asset_id": "corridor-breaker",
