@@ -62,7 +62,7 @@
       "terms_reference": "https://openai.com/policies/terms-of-use/",
       "rights_review_status": "Provisional AI-assisted environment art, human review in progress. Final commercial asset-rights review remains open; not covered by the code/docs GPL license.",
       "modifications": "Original 1672x941 RGB image generated without characters, stations or UI. Displayed at 960x540 to preserve the source 16:9 ratio, vertically offset behind live Godot corridor props; source pixels unchanged.",
-      "implementation_status": "Provisional gameplay background for the maintenance corridor. Since 2026-10-08 it is drawn 1.06x larger as a Parallax2D backdrop at 0.9x camera speed with additive glows, light shafts and haze layered over its painted lamps; source pixels remain unchanged."
+      "implementation_status": "Provisional gameplay background for the maintenance corridor. Since 2026-10-08 it is drawn 1.06x larger as a Parallax2D backdrop at 0.9x camera speed with additive glows, light shafts and haze layered over its painted lamps; source pixels remain unchanged. Also reused since 2026-10-08 as the provisional Service Junction backdrop, tinted warmer and darker at runtime (Sprite2D modulate, no pixel edits) under procedurally drawn junction fixtures, until that room has its own painting."
     },
     {
       "asset_id": "records-access-background-provisional",
@@ -82,7 +82,7 @@
       "terms_reference": "https://openai.com/policies/terms-of-use/",
       "rights_review_status": "Provisional AI-assisted gameplay props, human review in progress. Final commercial asset-rights review remains open; not covered by the code/docs GPL license.",
       "modifications": "Original 2172x724 RGBA sprite sheet with four isolated props. Godot Sprite2D regions display the breaker, relay, seal and safe-point art without modifying source pixels; live tint and door motion show gameplay state.",
-      "implementation_status": "Provisional interactive prop art in the maintenance corridor. Since 2026-10-08 the Godot import generates mipmaps and the sprite samples them (linear-with-mipmaps filter), so the heavily downscaled sheet no longer aliases; source pixels remain unchanged."
+      "implementation_status": "Provisional interactive prop art in the maintenance corridor. Since 2026-10-08 the Godot import generates mipmaps and the sprite samples them (linear-with-mipmaps filter), so the heavily downscaled sheet no longer aliases; source pixels remain unchanged. The breaker and seal regions are also reused since 2026-10-08 as the Service Junction's overload breaker and sealed door (the door is crushed by a scale tween when it blows); the valve wheel, gauge, vent, rubble and hatches there are drawn in code."
     },
     {
       "asset_id": "records-props-provisional",
@@ -172,11 +172,11 @@
       "source_reference": "No external source; the recipes in scripts/sfx_bank.gd are the whole origin. Author: Nathanial Henniges (project code).",
       "terms_reference": "GPL-3.0-or-later, the repository code licence (see LICENSE); the clips are an output of that code and ship as no file",
       "rights_review_status": "Original procedural audio with no third-party material; covered by the code licence. If any clip is later replaced by a CC0 or licensed recording, register that file here with its URL and licence before use.",
-      "modifications": "Seven clips: boom (0.5 s), small boom (0.3 s), clank (40 ms), thud (80 ms), hiss loop (0.5 s), hum loop (1.0 s), arc crackle (0.5 s). Played through AudioStreamPlayer nodes on the Effects bus; volume and pitch are set per use.",
-      "implementation_status": "In use since 2026-10-08 for the containment gate boom, the relay contact clank and crackle, the seal landing thud, the knockdown thud and the Records exit arc. Nothing has been ear-tested in a normal window yet; the clips are a first pass."
+      "modifications": "Nine clips: boom (0.5 s), small boom (0.3 s), clank (40 ms), thud (80 ms), hiss loop (0.5 s), hum loop (1.0 s), arc crackle (0.5 s), klaxon (three 120 ms square chirps, 0.5 s), growl (70 Hz saw with tremolo, 0.6 s). Played through AudioStreamPlayer nodes on the Effects bus; volume and pitch are set per use.",
+      "implementation_status": "In use since 2026-10-08 for the containment gate boom, the relay contact clank and crackle, the seal landing thud, the knockdown thud, the Records exit arc, and in the Service Junction for the breaker clunk, the valve clicks, the hiss and pump hum that follow the gauge, the seal-charged klaxon, WOLF's growl, the relief-vent small boom and the door blast. Nothing has been ear-tested in a normal window yet; the clips are a first pass."
     }
   ],
-  "status": "One provisional brand mark, three provisional character images, one title background, two gameplay backgrounds, two prop sheets, three trial corridor depth plates (off by default), two derivative marketing captures, the Roboto and Montserrat font families, one generated changelog text export and one procedural sound-effect set (code, no files) recorded; no audio files acquired. Glows, haze, dust, reflections, particles and the screen grade are procedural built-in nodes and two small shaders, not image assets.",
+  "status": "One provisional brand mark, three provisional character images, one title background, two gameplay backgrounds (the corridor painting is also reused, tinted, for the provisional Service Junction), two prop sheets, three trial corridor depth plates (off by default), two derivative marketing captures, the Roboto and Montserrat font families, one generated changelog text export and one procedural sound-effect set (code, no files) recorded; no audio files acquired. Glows, haze, dust, reflections, particles, the Service Junction fixtures and the screen grade are procedural built-in nodes and two small shaders, not image assets.",
   "merge_warning": "Preserve this populated provenance register when merging future handoffs.",
   "future_entry_fields": [
     "asset_id",

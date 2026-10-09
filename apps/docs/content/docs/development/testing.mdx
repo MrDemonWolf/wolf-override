@@ -18,7 +18,7 @@ bun run docs:build
 
 The same script keeps the in-game changelog in step with this website: it regenerates `apps/game/assets/changelog.txt` from `apps/docs/content/docs/changelog.mdx` with `python3 scripts/export_changelog.py` (Python 3, standard library only) and fails when the committed text differs. After editing the changelog, run that script and commit the result with the docs change. The file is a plain `.txt`, which Godot does not pack by default: any export preset must add `*.txt` to its include filter, or the in-game screen shows its "missing from this build" line.
 
-The Godot commands check import, state logic, both scripted door routes, both Records Access mirror routes, and save/load. Bun checks docs types and builds the static Pages site. Headless checks do not establish how a route feels on screen; exports and devices need separate checks.
+The Godot commands check import, state logic, both scripted door routes, both Records Access mirror routes, the Service Junction's pressure-line timing, held crank, blast, knockdown retry and autosaves, and save/load. Bun checks docs types and builds the static Pages site. Headless checks do not establish how a route feels on screen; exports and devices need separate checks.
 
 ## Continuous integration
 

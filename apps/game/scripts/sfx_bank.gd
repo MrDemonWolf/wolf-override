@@ -22,6 +22,8 @@ const LENGTHS: Dictionary = {
 	&"hiss": 0.5,
 	&"hum": 1.0,
 	&"arc": 0.5,
+	&"klaxon": 0.5,
+	&"growl": 0.6,
 }
 
 ## Off means play() does nothing; Main ties it to effects_enabled.
@@ -103,6 +105,8 @@ func generate() -> void:
 	streams[&"hiss"] = _wav(_hiss(rng, LENGTHS[&"hiss"]), true)
 	streams[&"hum"] = _wav(_hum(LENGTHS[&"hum"]), true)
 	streams[&"arc"] = _wav(_arc(rng, LENGTHS[&"arc"]), false)
+	streams[&"klaxon"] = _wav(_klaxon(LENGTHS[&"klaxon"]), false)
+	streams[&"growl"] = _wav(_growl(rng, LENGTHS[&"growl"]), false)
 	generation_ms = float(Time.get_ticks_usec() - start) / 1000.0
 
 
@@ -217,6 +221,47 @@ static func _arc(rng: RandomNumberGenerator, seconds: float) -> PackedFloat32Arr
 			phase += TAU * lerpf(2400.0, 500.0, t / 0.06) * dt
 			sample += sin(phase) * 0.6 * exp(-t / 0.02)
 		out[i] = sample * minf(t / 0.003, 1.0)
+	return out
+
+
+## Three 120 ms square chirps at 880 Hz, 40 ms apart, low-passed so they bark instead of buzz:
+## the seal-charged warning.
+static func _klaxon(seconds: float) -> PackedFloat32Array:
+	var frames: int = int(seconds * MIX_RATE)
+	var out: PackedFloat32Array = PackedFloat32Array()
+	out.resize(frames)
+	var dt: float = 1.0 / MIX_RATE
+	var alpha: float = dt / (1.0 / (TAU * 2500.0) + dt)
+	var low: float = 0.0
+	for i: int in frames:
+		var t: float = i * dt
+		var cycle: float = fmod(t, 0.16)
+		var gate: float = 1.0 if t < 0.48 and cycle < 0.12 else 0.0
+		var square: float = 1.0 if fmod(t * 880.0, 1.0) < 0.5 else -1.0
+		# A short attack and release on every chirp so none of them clicks.
+		var envelope: float = minf(cycle / 0.004, 1.0) * minf((0.12 - cycle) / 0.008, 1.0) if gate > 0.0 else 0.0
+		low += alpha * (square * envelope - low)
+		out[i] = low
+	return out
+
+
+## A 70 Hz saw with a 9 Hz tremolo under breathy noise, swelling in and dying away: WOLF's growl.
+static func _growl(rng: RandomNumberGenerator, seconds: float) -> PackedFloat32Array:
+	var frames: int = int(seconds * MIX_RATE)
+	var out: PackedFloat32Array = PackedFloat32Array()
+	out.resize(frames)
+	var dt: float = 1.0 / MIX_RATE
+	var alpha: float = dt / (1.0 / (TAU * 900.0) + dt)
+	var low: float = 0.0
+	var phase: float = 0.0
+	for i: int in frames:
+		var t: float = i * dt
+		phase += TAU * (70.0 - 12.0 * t / seconds) * dt
+		var saw: float = fmod(phase / TAU, 1.0) * 2.0 - 1.0
+		low += alpha * (saw + rng.randf_range(-0.35, 0.35) - low)
+		var tremolo: float = 0.7 + 0.3 * sin(TAU * 9.0 * t)
+		var envelope: float = minf(t / 0.08, 1.0) * minf((seconds - t) / 0.2, 1.0)
+		out[i] = low * tremolo * envelope
 	return out
 
 

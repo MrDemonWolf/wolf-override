@@ -1,8 +1,9 @@
 class_name M0State
 extends RefCounted
 
-const SAVE_VERSION: int = 3
+const SAVE_VERSION: int = 4
 const SAVE_PATH: String = "user://m0-save.json"
+const CHAPTER_IDS: Array[String] = ["lockdown", "records", "junction"]
 const EVENT_ID: String = "relay_disagreement"
 const DISCLOSE: String = "disclose_risk"
 const PRESS: String = "press_without_warning"
@@ -27,6 +28,10 @@ var purge_trace_preserved: bool = false
 var mirror_trace_preserved: bool = false
 var mirror_route: String = ""
 var chapter_complete: bool = false
+## Service Junction progress (save v4), in order: the sealed door blown, the sentry down, the exit bolt popped.
+var door_blown: bool = false
+var sentry_down: bool = false
+var junction_cleared: bool = false
 
 
 func human_name() -> String:
@@ -113,6 +118,23 @@ func complete_chapter() -> bool:
 	return true
 
 
+## The Records exit leads into the Service Junction once the first copy is secured.
+func enter_junction() -> bool:
+	if chapter_id != "records" or not chapter_complete:
+		return false
+	chapter_id = "junction"
+	human_position = Vector2(120.0, 410.0)
+	wolf_position = Vector2(64.0, 423.0)
+	return true
+
+
+func blow_door() -> bool:
+	if chapter_id != "junction" or door_blown:
+		return false
+	door_blown = true
+	return true
+
+
 func checkpoint_callback() -> String:
 	if not checkpoint_reached or memory.is_empty():
 		return ""
@@ -141,6 +163,9 @@ func to_dict() -> Dictionary:
 		"mirror_trace_preserved": mirror_trace_preserved,
 		"mirror_route": mirror_route,
 		"chapter_complete": chapter_complete,
+		"door_blown": door_blown,
+		"sentry_down": sentry_down,
+		"junction_cleared": junction_cleared,
 	}
 
 
@@ -196,7 +221,7 @@ static func from_dict(raw: Variant) -> M0State:
 	if data["checkpoint_reached"] and not puzzle["door_open"]:
 		return null
 	if data["version"] >= 3:
-		if data.get("chapter_id") != "lockdown" and data.get("chapter_id") != "records":
+		if not (data.get("chapter_id") in CHAPTER_IDS) or (data["chapter_id"] == "junction" and data["version"] < 4):
 			return null
 		if typeof(data.get("purge_trace_preserved")) != TYPE_BOOL or typeof(data.get("mirror_trace_preserved")) != TYPE_BOOL or typeof(data.get("chapter_complete")) != TYPE_BOOL:
 			return null
@@ -213,6 +238,20 @@ static func from_dict(raw: Variant) -> M0State:
 		elif data["mirror_route"] != "":
 			return null
 		if data["chapter_complete"] and not data["mirror_trace_preserved"]:
+			return null
+	if data["version"] >= 4:
+		for field: String in ["door_blown", "sentry_down", "junction_cleared"]:
+			if typeof(data.get(field)) != TYPE_BOOL:
+				return null
+		if data["chapter_id"] == "junction":
+			# The junction opens only from a secured Records exit, and its beats land in order.
+			if not data["chapter_complete"]:
+				return null
+			if data["sentry_down"] and not data["door_blown"]:
+				return null
+			if data["junction_cleared"] and not data["sentry_down"]:
+				return null
+		elif data["door_blown"] or data["sentry_down"] or data["junction_cleared"]:
 			return null
 	var state: M0State = M0State.new()
 	state.name_index = int(identity["name_index"])
@@ -234,6 +273,10 @@ static func from_dict(raw: Variant) -> M0State:
 		state.mirror_trace_preserved = data["mirror_trace_preserved"]
 		state.mirror_route = data["mirror_route"]
 		state.chapter_complete = data["chapter_complete"]
+	if data["version"] >= 4:
+		state.door_blown = data["door_blown"]
+		state.sentry_down = data["sentry_down"]
+		state.junction_cleared = data["junction_cleared"]
 	return state
 
 

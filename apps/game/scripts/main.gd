@@ -131,6 +131,11 @@ var door_tween: Tween
 var wolf_reaction_tween: Tween
 var relay_spark_tween: Tween
 var records_room: RecordsRoom
+var junction_room: JunctionRoom
+## The Service Junction's coolant line; transient, reset by every scene sync.
+var pressure_line: PressureLine = PressureLine.new()
+## True while WOLF runs ahead to read the junction door seam on entry.
+var wolf_scouting: bool = false
 var impact: Impact
 var sfx_bank: SfxBank
 var relay_sparks: CPUParticles2D
@@ -191,6 +196,11 @@ func _ready() -> void:
 	records_room = RecordsRoom.new()
 	records_room.z_index = 1
 	add_child(records_room)
+	junction_room = JunctionRoom.new()
+	junction_room.z_index = 1
+	add_child(junction_room)
+	for hazard: Hazard in [junction_room.vent_hazard, junction_room.blast_hazard]:
+		hazard.contact.connect(func(source: Hazard) -> void: _fail_beat(source.reason))
 	human.z_index = 2
 	wolf.z_index = 2
 	_setup_particles()
@@ -198,6 +208,7 @@ func _ready() -> void:
 	for grounded: Sprite2D in [human.body_sprite, wolf.body_sprite, intro_director, breaker_art, relay_art, checkpoint_art, door_art]:
 		floor_reflections.append(FloorReflection.attach(grounded))
 	floor_reflections.append_array(records_room.floor_reflections)
+	floor_reflections.append_array(junction_room.floor_reflections)
 	breaker_status_glow = _attach_status_glow(breaker_status_light)
 	relay_status_glow = _attach_status_glow(relay_status_light)
 	if corridor_layers_trial:
@@ -289,10 +300,12 @@ func _apply_effects() -> void:
 	sfx_bank.enabled = effects_enabled
 	corridor_depth.effects_enabled = effects_enabled
 	records_room.depth.effects_enabled = effects_enabled
+	junction_room.depth.effects_enabled = effects_enabled
 	post_grade.visible = effects_enabled
 	for reflection: FloorReflection in floor_reflections:
 		reflection.enabled = effects_enabled
-	for glow: Sprite2D in [breaker_status_glow, relay_status_glow, records_room.purge_glow, records_room.mirror_glow]:
+	# The junction's door seam glow stays: it is the pressure readout, not dressing.
+	for glow: Sprite2D in [breaker_status_glow, relay_status_glow, records_room.purge_glow, records_room.mirror_glow, junction_room.breaker_glow]:
 		glow.visible = effects_enabled
 
 
@@ -394,6 +407,11 @@ func _process(delta: float) -> void:
 		_refresh_ui()
 		return
 	hold_use.advance(delta, human.controlled and Input.is_action_pressed(&"interact"), _hold_station())
+	if state.chapter_id == "junction":
+		_tick_junction(delta)
+		if fail_active:
+			_refresh_ui()
+			return
 	if wolf_heading_to_relay and absf(wolf.position.x - RELAY_CONTACT_X) <= 4.0:
 		_wolf_takes_relay()
 	if tutorial_step == 0 and (Input.is_action_pressed(&"move_left") or Input.is_action_pressed(&"move_right")):
@@ -441,6 +459,7 @@ func _new_game() -> void:
 	choice_context = ""
 	relay_refused = false
 	wolf_heading_to_relay = false
+	wolf_scouting = false
 	_sync_scene()
 	human.hide()
 	intro_director.position = Vector2(255.0, 410.0)
@@ -782,6 +801,9 @@ func _return_to_title() -> void:
 	if chapter_tween != null and chapter_tween.is_running():
 		chapter_tween.kill()
 	_cancel_fail()
+	# The junction's hiss and pump loops never follow the player to the title.
+	sfx_bank.stop(&"hiss")
+	sfx_bank.stop(&"hum")
 	intro_fade.color.a = 0.0
 	chapter_close_active = false
 	waiting_for_choice = false
@@ -953,13 +975,19 @@ func _load_game() -> void:
 	choice_context = ""
 	relay_refused = false
 	wolf_heading_to_relay = false
+	wolf_scouting = false
 	fail_active = false
 	hold_use.reset()
 	_sync_scene()
 	_start_gameplay_camera()
-	if state.chapter_id == "records":
+	if state.chapter_id == "junction":
+		if state.door_blown:
+			status_line = "Service junction restored. The door is down; the lane past the rubble is next."
+		else:
+			status_line = "Service junction restored. Arm the breaker on the left, then crank the valve by the door."
+	elif state.chapter_id == "records":
 		if state.chapter_complete:
-			status_line = "The first copy is safe. The Archive trail is next."
+			status_line = "The first copy is safe. Use the exit to follow the service line."
 		elif state.mirror_trace_preserved:
 			status_line = "Records access restored. Both traces are copied; head for the exit."
 		elif state.purge_trace_preserved:
@@ -975,6 +1003,9 @@ func _interact() -> void:
 	tutorial_step = 2
 	if state.chapter_id == "records":
 		_interact_records(x)
+		return
+	if state.chapter_id == "junction":
+		_interact_junction(x)
 		return
 	if x <= 230.0:
 		status_line = "DIRECTOR / PURGE: Original program logs marked for deletion.\nWOLF: They want the source record gone. We need to preserve it."
@@ -1136,8 +1167,7 @@ func _interact_records(x: float) -> void:
 			chapter_tween.tween_callback(records_room.exit_art.hide)
 			_save_progress()
 		elif state.chapter_complete:
-			status_line = "The first copy is safe. The Archive trail is next."
-			_save_progress()
+			_enter_junction()
 		else:
 			status_line = "Exit sealed until the purge order and mirror timestamp are copied."
 	else:
@@ -1190,10 +1220,142 @@ func _mark_beat() -> void:
 	beat_snapshot = state.to_dict()
 
 
-## The station in reach that takes a held USE, or empty. The corridor and Records have none yet;
-## the junction valve will answer here.
+## The station in reach that takes a held USE, or empty: only the junction valve while its line builds.
 func _hold_station() -> StringName:
+	if state.chapter_id == "junction" and pressure_line.state == &"building" and absf(human.position.x - JunctionRoom.VALVE_X) <= 52.0:
+		return &"valve"
 	return &""
+
+
+## USE at the Records exit once the first copy is secured: the service line to Archive begins.
+func _enter_junction() -> void:
+	if not state.enter_junction():
+		return
+	_sync_scene()
+	wolf_scouting = true
+	_update_controls()
+	status_line = "WOLF runs ahead to read the pressure behind the sealed door.\n%s: The breaker on the left feeds that line. Overload it, crank the valve, and the seal goes." % state.human_name().get_slice(" ", 0).to_upper()
+	# Autosave A: the start of the junction.
+	_save_progress()
+
+
+func _interact_junction(x: float) -> void:
+	if absf(x - JunctionRoom.BREAKER_X) <= 52.0:
+		if pressure_line.arm():
+			sfx_bank.play(&"clank", -4.0, 0.8)
+			impact.rumble(0.15, 0.0, 0.06)
+			junction_room.sync_line(pressure_line)
+			status_line = "The overload breaker catches. The line starts to build; the relief vent lets go at the top of the gauge."
+		elif state.door_blown:
+			status_line = "The breaker is spent. The door is down."
+		elif pressure_line.state == &"building":
+			status_line = "The line is live. Crank the valve by the door before the vent lets go."
+		else:
+			status_line = "Seal charged. Get left of the vent before the fuse ends."
+	elif absf(x - JunctionRoom.VALVE_X) <= 52.0:
+		match pressure_line.state:
+			&"idle":
+				status_line = "The valve is dead. Arm the overload breaker on the left first."
+			&"tripped":
+				status_line = "The vent let go and the breaker tripped. Reset it on the left."
+			&"building":
+				status_line = "The wheel is stiff. Hold USE to crank it; three real turns charge the seal."
+			&"charged", &"fuse":
+				status_line = "Seal charged. Get left of the vent before the fuse ends."
+			_:
+				status_line = "The valve is spent. The door is down."
+	elif PressureLine.is_on_vent(x):
+		status_line = "Relief vent. It lets go when the gauge peaks; don't be standing on it."
+	elif absf(x - JunctionRoom.DOOR_X) <= 40.0 and not state.door_blown:
+		status_line = "The door is sealed from the other side. Something hums behind it."
+	elif absf(x - JunctionRoom.HATCH_X) <= 52.0:
+		status_line = "The exit hatch is bolted. The lane past the door comes first."
+	else:
+		status_line = "No station in reach. The breaker is on the left, the valve by the door."
+
+
+## Runs the pressure line every frame in the junction: held USE at the valve cranks it, the line
+## advances, and its events (vent trip, fuse, blast) answer with real state changes.
+func _tick_junction(delta: float) -> void:
+	pressure_line.paused = waiting_for_choice
+	if hold_use.holding and hold_use.station == &"valve":
+		var gained: int = pressure_line.crank(delta)
+		if gained > 0:
+			_valve_turned()
+	else:
+		pressure_line.release()
+	match pressure_line.advance(delta):
+		&"tripped":
+			_vent_trips()
+		&"blown":
+			_door_blast()
+	if wolf_scouting and absf(wolf.position.x - JunctionRoom.WOLF_SEAM_X) <= 4.0:
+		_wolf_reads_seam()
+	junction_room.sync_line(pressure_line)
+	# Hiss and pump pitch are functions of the gauge, nothing else.
+	if pressure_line.state == &"building":
+		sfx_bank.play(&"hiss", lerpf(-28.0, -8.0, pressure_line.gauge))
+	else:
+		sfx_bank.stop(&"hiss")
+	if state.door_blown:
+		sfx_bank.stop(&"hum")
+	else:
+		sfx_bank.play(&"hum", lerpf(-16.0, -9.0, pressure_line.gauge), 0.5 * (1.0 + 0.6 * pressure_line.gauge))
+
+
+## One real valve turn: a click, a weak rumble, one light; the third turn lights the fuse.
+func _valve_turned() -> void:
+	sfx_bank.play(&"clank", -6.0, 1.4)
+	impact.rumble(0.2, 0.0, 0.08)
+	if pressure_line.state == &"charged":
+		sfx_bank.play(&"klaxon", -4.0)
+		status_line = "SEAL CHARGED. Get left of the vent before the fuse ends."
+	else:
+		status_line = "The valve gives. %d of %d turns." % [pressure_line.turns, PressureLine.TURNS_NEEDED]
+
+
+## The gauge peaked before the third turn: the relief vent lets go and the breaker trips.
+func _vent_trips() -> void:
+	junction_room.vent_blows()
+	sfx_bank.play(&"small_boom", -2.0)
+	impact.add_trauma(0.5)
+	impact.flash(0.0, 0.2)
+	impact.rumble(0.4, 0.6, 0.2)
+	if not fail_active:
+		status_line = "The relief vent lets go and the breaker trips. Reset the breaker and crank faster this time."
+
+
+func _wolf_reads_seam() -> void:
+	wolf_scouting = false
+	_react_as_wolf(false)
+	sfx_bank.play(&"growl", -6.0)
+	status_line = "WOLF: It's live. Don't stand in front of it when it goes."
+	_update_controls()
+
+
+## BOOM 1: the fuse ends. In the blast zone it is a knockdown and nothing is saved; otherwise the
+## door goes, the rubble lands and autosave B marks the beat.
+func _door_blast() -> void:
+	_blast_feedback()
+	if PressureLine.is_in_blast(human.position.x):
+		_fail_beat(JunctionRoom.BLAST_REASON)
+		return
+	if not state.blow_door():
+		return
+	junction_room.door_blast()
+	_update_controls()
+	status_line = "The seal goes. WOLF holds at the rubble and will not cross; something answers from the dark past the door."
+	# Autosave B: the door is down.
+	_save_progress()
+
+
+func _blast_feedback() -> void:
+	sfx_bank.stop(&"hiss")
+	sfx_bank.play(&"boom", 0.0)
+	impact.hit_stop(0.07)
+	impact.flash(0.09, 0.3)
+	impact.add_trauma(1.0)
+	impact.rumble(0.7, 1.0, 0.3)
 
 
 ## One path for every knockdown: a readable reaction (hit-stop, red wash, the engineer tilts and
@@ -1245,6 +1407,7 @@ func _restore_beat(reason: String) -> void:
 			state = snapshot
 			relay_refused = false
 			wolf_heading_to_relay = false
+			wolf_scouting = false
 			last_top_card_key = ""
 			hold_use.reset()
 			_sync_scene()
@@ -1307,6 +1470,21 @@ func _sync_scene() -> void:
 	_update_controls()
 	_sync_door()
 	_sync_records_room()
+	_sync_junction_room()
+
+
+## The junction shows only in its chapter; its line, bursts and hazards go back to rest and its
+## door matches the save, so a reload or a knockdown never carries a half-finished beat over.
+func _sync_junction_room() -> void:
+	var in_junction: bool = state.chapter_id == "junction"
+	junction_room.visible = in_junction
+	junction_room.door_blown = state.door_blown
+	junction_room.set_active(in_junction)
+	pressure_line.reset()
+	junction_room.reset_transient()
+	junction_room.sync_line(pressure_line)
+	sfx_bank.stop(&"hiss")
+	sfx_bank.stop(&"hum")
 
 
 func _react_as_wolf(accepting: bool) -> void:
@@ -1348,11 +1526,12 @@ func _flash_relay_spark(from_wolf: bool) -> void:
 
 func _sync_records_room(animate_exit: bool = false) -> void:
 	records_room.visible = state.chapter_id == "records"
-	breaker_status_light.visible = not records_room.visible
-	relay_status_light.visible = not records_room.visible
-	# The records backdrop sits at the same depth as the corridor's, so corridor-only dressing hides with it.
+	var in_corridor: bool = state.chapter_id == "lockdown"
+	breaker_status_light.visible = in_corridor
+	relay_status_light.visible = in_corridor
+	# Every room's backdrop sits at the same depth as the corridor's, so corridor-only dressing hides with it.
 	for corridor_only: CanvasItem in [corridor_depth, purge_terminal_art, breaker_art, relay_art, checkpoint_art, $BreakerLabel, $RelayLabel, $CheckpointLabel]:
-		corridor_only.visible = not records_room.visible
+		corridor_only.visible = in_corridor
 	records_room.purge_trace_preserved = state.purge_trace_preserved
 	records_room.mirror_trace_preserved = state.mirror_trace_preserved
 	records_room.chapter_complete = state.chapter_complete
@@ -1379,10 +1558,26 @@ func _sync_door(animate: bool = false) -> void:
 func _update_controls() -> void:
 	human.controlled = not title_open and not intro_active and not chapter_close_active and not waiting_for_choice and not fail_active
 	wolf.controlled = false
-	wolf.autonomous_target_x = RELAY_CONTACT_X if wolf_heading_to_relay else (520.0 if state.chapter_id == "records" and not state.mirror_trace_preserved else -1.0)
+	wolf.autonomous_target_x = _wolf_target_x()
 	wolf.follow_target = human if human.controlled and wolf.autonomous_target_x < 0.0 else null
 	human.queue_redraw()
 	wolf.queue_redraw()
+
+
+## Where WOLF goes on his own, or -1 to follow: the relay contact, the Records mirror, the junction
+## door seam on entry, and the rubble line once the door is down (he will not cross it yet).
+func _wolf_target_x() -> float:
+	if wolf_heading_to_relay:
+		return RELAY_CONTACT_X
+	match state.chapter_id:
+		"records":
+			return -1.0 if state.mirror_trace_preserved else 520.0
+		"junction":
+			if wolf_scouting:
+				return JunctionRoom.WOLF_SEAM_X
+			if state.door_blown and not state.sentry_down:
+				return JunctionRoom.WOLF_RUBBLE_X
+	return -1.0
 
 
 func _refresh_ui() -> void:
@@ -1396,7 +1591,7 @@ func _refresh_ui() -> void:
 	touch_left.visible = touch_layout and touch_move
 	touch_right.visible = touch_layout and touch_move
 	touch_use.visible = touch_layout and not waiting_for_choice
-	touch_use.text = "CONTINUE" if intro_active or chapter_close_active else "USE"
+	touch_use.text = "CONTINUE" if intro_active or chapter_close_active else ("CRANK" if _hold_station() == &"valve" else "USE")
 	touch_choice_1.visible = waiting_for_choice
 	touch_choice_2.visible = waiting_for_choice
 	if waiting_for_choice:
@@ -1449,7 +1644,7 @@ func _refresh_ui() -> void:
 	var card_key: String = "%s:%s" % [state.chapter_id, _objective()]
 	if last_top_card_key != card_key:
 		last_top_card_key = card_key
-		var location: String = "RECORDS ACCESS / FIRST COPY" if state.chapter_id == "records" else "MAINTENANCE / LOCKDOWN"
+		var location: String = "SERVICE JUNCTION" if state.chapter_id == "junction" else ("RECORDS ACCESS / FIRST COPY" if state.chapter_id == "records" else "MAINTENANCE / LOCKDOWN")
 		_show_top_card("%s\n%s" % [location, _objective()], 3.4)
 	var context: String = _context_hint()
 	if context != save_error_context:
@@ -1510,9 +1705,14 @@ func _show_top_card(message: String, hold_seconds: float) -> void:
 
 func _context_hint() -> String:
 	var x: float = human.position.x
+	if fail_active:
+		# The status line names the cause and the fix; no station hint competes with it.
+		return ""
+	if state.chapter_id == "junction":
+		return _junction_hint(x)
 	if state.chapter_id == "records":
 		if state.chapter_complete:
-			return "Chapter 1 complete. The preserved trail points toward Archive."
+			return "E: follow the service line toward Archive." if absf(x - 830.0) <= 58.0 else "The exit is open. Head right to follow the service line."
 		if absf(x - 190.0) <= 58.0:
 			return "E: copy the purge-order trace." if not state.purge_trace_preserved else "Purge order copied. Find the mirror port."
 		if absf(x - 520.0) <= 58.0:
@@ -1545,7 +1745,45 @@ func _context_hint() -> String:
 	return "Find the breaker. WOLF will follow your lead."
 
 
+func _junction_hint(x: float) -> String:
+	var line: StringName = pressure_line.state
+	var fuse_lit: bool = line == &"charged" or line == &"fuse"
+	if state.door_blown:
+		return "The door is down. The lane past the rubble is next."
+	if absf(x - JunctionRoom.BREAKER_X) <= 52.0:
+		match line:
+			&"idle":
+				return "E: arm the overload breaker."
+			&"tripped":
+				return "E: reset the breaker. The vent let go."
+			&"building":
+				return "The line is live. Get to the valve by the door."
+	if absf(x - JunctionRoom.VALVE_X) <= 52.0 and line == &"building":
+		return "HOLD E: crank the valve, %d of %d turns." % [pressure_line.turns, PressureLine.TURNS_NEEDED]
+	if fuse_lit:
+		return "Fuse lit. Get left of the vent, away from the door."
+	if absf(x - JunctionRoom.VALVE_X) <= 52.0:
+		return "The valve is dead. Arm the breaker on the left."
+	if PressureLine.is_on_vent(x):
+		return "Relief vent. Move off it before the gauge peaks." if line == &"building" else "Relief vent. It lets go when the gauge peaks."
+	match line:
+		&"building":
+			return "The line is building. Crank the valve by the door."
+		&"tripped":
+			return "The breaker tripped. Reset it on the left."
+	return "Arm the breaker on the left, then crank the valve by the door."
+
+
 func _objective() -> String:
+	if state.chapter_id == "junction":
+		if state.door_blown:
+			return "DOOR DOWN"
+		match pressure_line.state:
+			&"building":
+				return "CHARGE THE SEAL"
+			&"charged", &"fuse", &"blown":
+				return "CLEAR THE DOOR"
+		return "CLEAR THE LINE"
 	if state.chapter_id == "records":
 		if state.chapter_complete:
 			return "FIRST COPY SECURED"
