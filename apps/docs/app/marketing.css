@@ -340,7 +340,8 @@ html:has(.marketing-shell) {
 
 .marketing-story-copy { padding-top: 2rem; }
 
-.marketing-shell :is(.marketing-story-copy, .marketing-section-head, .marketing-progress) p {
+/* Unlayered, so it would beat the @layer components .hud-label eyebrow: keep labels out of it. */
+.marketing-shell :is(.marketing-story-copy, .marketing-section-head, .marketing-progress) p:not(.hud-label) {
   max-width: 58ch;
   margin: 0 0 1.25rem;
   color: var(--mk-muted);
@@ -434,7 +435,7 @@ html:has(.marketing-shell) {
   background: var(--mk-surface);
 }
 
-.marketing-progress-links a > span { color: var(--mk-muted); font-size: .8rem; }
+.marketing-progress-links a > span { color: var(--mk-muted); font-size: 1rem; line-height: 1.5; }
 .marketing-progress-links strong { display: flex; justify-content: space-between; gap: 1rem; font-size: 1.05rem; }
 
 .marketing-footer {
