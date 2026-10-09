@@ -173,6 +173,9 @@ var credits_paused: bool = false
 var changelog_text: String = ""
 var save_error: String = ""
 var save_error_context: String = ""
+## True while the last autosave failed to write. The beat snapshot then holds that autosave: a
+## knockdown restores it instead of the older file on disk, and the next USE retries the write.
+var save_pending: bool = false
 var floor_reflections: Array[FloorReflection] = []
 var breaker_status_glow: Sprite2D
 var relay_status_glow: Sprite2D
@@ -183,6 +186,11 @@ const GAMEPLAY_VIEW_WIDTH: float = 960.0 / GAMEPLAY_ZOOM
 ## The play camera's resting height. At 1.35 it puts the floor (y 440) 27 px above the context hint
 ## (screen y 405) while the ceiling lamps (y ~188) and the junction's arm rail (y 196) stay in view.
 const GAMEPLAY_CAMERA_Y: float = 360.0
+## With the touch arrows and USE on screen (their tops at screen y 345) the play camera sits lower,
+## so feet and station bases on the floor land at screen y 335, above the buttons, instead of
+## behind them. The ceiling lamps leave the top of the view; the far plate still covers it. During
+## a choice the buttons hide and the camera rises back, so the hanging tank clears the answers.
+const GAMEPLAY_CAMERA_Y_TOUCH: float = 392.0
 ## The answer buttons start just under the top card (bottom y 78). The keyboard pair ends at y 174
 ## and the touch pair at y 164, so the junction's hanging tank (JunctionRoom.TANK_REST_Y) stays in
 ## view below them at the play framing.
@@ -382,7 +390,8 @@ func _attach_status_glow(light: ColorRect) -> Sprite2D:
 
 func _update_gameplay_camera() -> void:
 	var half_view: float = GAMEPLAY_VIEW_WIDTH * 0.5
-	intro_camera.position = Vector2(clampf(human.position.x, half_view, 960.0 - half_view), GAMEPLAY_CAMERA_Y)
+	var touch_buttons: bool = touch_enabled and not controller_active and not waiting_for_choice
+	intro_camera.position = Vector2(clampf(human.position.x, half_view, 960.0 - half_view), GAMEPLAY_CAMERA_Y_TOUCH if touch_buttons else GAMEPLAY_CAMERA_Y)
 
 
 func _start_gameplay_camera() -> void:
@@ -456,6 +465,8 @@ func _new_game() -> void:
 	title_screen.hide()
 	state = M0State.new()
 	save_error = ""
+	save_pending = false
+	beat_snapshot = {}
 	intro_active = true
 	intro_step = 0
 	last_top_card_key = ""
@@ -984,6 +995,7 @@ func _load_game() -> void:
 	wolf.body_sprite.modulate = Color.WHITE
 	state = loaded
 	save_error = ""
+	save_pending = false
 	waiting_for_choice = false
 	choice_context = ""
 	relay_refused = false
@@ -993,6 +1005,8 @@ func _load_game() -> void:
 	hold_use.reset()
 	_sync_scene()
 	_start_gameplay_camera()
+	# The loaded save is this beat's start, so a knockdown never falls back past it.
+	_mark_beat()
 	if state.chapter_id == "junction":
 		if state.junction_cleared:
 			status_line = "Service junction restored. The line is clear and the hatch is open."
@@ -1018,6 +1032,9 @@ func _load_game() -> void:
 func _interact() -> void:
 	var x: float = human.position.x
 	tutorial_step = 2
+	# An autosave that failed to write is retried by the next USE anywhere, station or not.
+	if save_pending:
+		_write_beat()
 	if state.chapter_id == "records":
 		_interact_records(x)
 		return
@@ -1125,6 +1142,8 @@ func _interact_checkpoint() -> void:
 	if state.checkpoint_reached:
 		if state.enter_records():
 			_sync_scene()
+			# A new room: cut the camera to the engineer instead of panning across from the safe point.
+			_start_gameplay_camera()
 			var remembered_line: String = "I refused the live relay; I'm still here." if state.memory.get("choice_id") == M0State.PRESS else ("I chose the relay. I'm checking this path too." if state.route == "cooperate" else "You used the manual bypass. I'm checking this path with you.")
 			status_line = "WOLF: %s\nTake the purge queue. I'll inspect the mirror." % remembered_line
 			_save_progress()
@@ -1221,9 +1240,17 @@ func _choose_mirror(route_id: String) -> void:
 
 
 func _save_progress() -> void:
-	_capture_positions()
+	# Every autosave starts a beat: the snapshot matches it even when the write fails.
+	_mark_beat()
+	_write_beat()
+
+
+## Writes the beat snapshot to disk; a failure leaves save_pending set so the next USE retries.
+func _write_beat() -> void:
+	var snapshot: M0State = M0State.from_dict(beat_snapshot)
+	save_pending = snapshot == null or not snapshot.save_to_disk(save_path)
 	# Save errors belong to the system hint, never inside a character's dialogue line.
-	save_error = "" if state.save_to_disk(save_path) else SAVE_FAILED_HINT
+	save_error = SAVE_FAILED_HINT if save_pending else ""
 	# Remember where it failed so the warning gives way to normal guidance once the player moves on.
 	save_error_context = _context_hint()
 
@@ -1242,7 +1269,7 @@ func _mark_beat() -> void:
 
 ## The station in reach that takes a held USE, or empty: only the junction valve while its line builds.
 func _hold_station() -> StringName:
-	if state.chapter_id == "junction" and pressure_line.state == &"building" and absf(human.position.x - JunctionRoom.VALVE_X) <= 52.0:
+	if state.chapter_id == "junction" and not state.door_blown and pressure_line.state == &"building" and absf(human.position.x - JunctionRoom.VALVE_X) <= 52.0:
 		return &"valve"
 	return &""
 
@@ -1252,6 +1279,8 @@ func _enter_junction() -> void:
 	if not state.enter_junction():
 		return
 	_sync_scene()
+	# A new room: cut the camera to the engineer instead of panning across from the Records exit.
+	_start_gameplay_camera()
 	wolf_scouting = true
 	_update_controls()
 	status_line = "WOLF runs ahead to read the pressure behind the sealed door.\n%s: The breaker on the left feeds that line. Overload it, crank the valve, and the seal goes." % state.human_name().get_slice(" ", 0).to_upper()
@@ -1261,17 +1290,19 @@ func _enter_junction() -> void:
 
 func _interact_junction(x: float) -> void:
 	if absf(x - JunctionRoom.BREAKER_X) <= 52.0:
-		if pressure_line.arm():
+		if state.door_blown:
+			status_line = "The breaker is spent. The door is down."
+		elif pressure_line.arm():
 			sfx_bank.play(&"clank", -4.0, 0.8)
 			impact.rumble(0.15, 0.0, 0.06)
 			junction_room.sync_line(pressure_line)
 			status_line = "The overload breaker catches. The line starts to build; the relief vent lets go at the top of the gauge."
-		elif state.door_blown:
-			status_line = "The breaker is spent. The door is down."
 		elif pressure_line.state == &"building":
 			status_line = "The line is live. Crank the valve by the door before the vent lets go."
 		else:
 			status_line = "Seal charged. Get left of the vent before the fuse ends."
+	elif absf(x - JunctionRoom.VALVE_X) <= 52.0 and state.door_blown:
+		status_line = "The valve is spent. The door is down."
 	elif absf(x - JunctionRoom.VALVE_X) <= 52.0:
 		match pressure_line.state:
 			&"idle":
@@ -1284,7 +1315,7 @@ func _interact_junction(x: float) -> void:
 				status_line = "Seal charged. Get left of the vent before the fuse ends."
 			_:
 				status_line = "The valve is spent. The door is down."
-	elif PressureLine.is_on_vent(x):
+	elif PressureLine.is_on_vent(x) and not state.door_blown:
 		status_line = "Relief vent. It lets go when the gauge peaks; don't be standing on it."
 	elif absf(x - JunctionRoom.DOOR_X) <= 40.0 and not state.door_blown:
 		status_line = "The door is sealed from the other side. Something hums behind it."
@@ -1638,6 +1669,9 @@ func _wolf_reads_seam() -> void:
 ## rubble lands and autosave B marks the beat. The blast has no hurtbox of its own, so physics
 ## overlap can never disagree with this test.
 func _door_blast() -> void:
+	# A door that is already down has nothing left to blow: no boom, no knockdown.
+	if state.door_blown:
+		return
 	_blast_feedback()
 	if PressureLine.is_in_blast(human.position.x):
 		_fail_beat(JunctionRoom.BLAST_REASON)
@@ -1703,7 +1737,8 @@ func _restore_beat(reason: String) -> void:
 	fail_active = false
 	var restored: bool = false
 	var from_disk: bool = false
-	if state.checkpoint_reached and M0State.load_from_disk(save_path) != null:
+	# A failed autosave leaves an older file on disk; the snapshot is the beat that failed to write.
+	if state.checkpoint_reached and not save_pending and M0State.load_from_disk(save_path) != null:
 		_load_game()
 		restored = true
 		from_disk = true
@@ -1796,7 +1831,8 @@ func _sync_junction_room() -> void:
 	junction_room.sentry_down = state.sentry_down
 	junction_room.junction_cleared = state.junction_cleared
 	junction_room.set_active(in_junction)
-	pressure_line.reset()
+	# A blown door leaves the line spent, so a reload can never re-arm the breaker or light a fuse.
+	pressure_line.reset(state.door_blown)
 	# The sentry patrols from the far end once the door is down, or lies under the tank on the mark.
 	sentry_brain.reset(state.door_blown, state.sentry_down, DropArm.MARK_X)
 	drop_arm.reset(state.sentry_down)

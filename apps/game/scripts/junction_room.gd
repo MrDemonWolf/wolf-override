@@ -66,8 +66,15 @@ const COOLANT: Color = Color("#7fe8ff")
 const SEAM_RED: Color = Color("#ff6a55")
 ## The VALVE label sits this far left of the wheel so SEAL CHARGED ends before the door art.
 const VALVE_LABEL_SHIFT: float = 22.0
-## The relief vent's painted caption: its baseline start, text and size.
-const VENT_LABEL_POSITION: Vector2 = Vector2(VENT_X - 42.0, 346.0)
+## The relief vent's drop runs down the wall to a nozzle over its grate, ending above the caption.
+const VENT_NOZZLE_Y: float = 404.0
+## The breaker riser stops short of its station label and resumes under it, so it reads as passing
+## behind the caption instead of through it.
+const BREAKER_RISER_GAP: Vector2 = Vector2(306.0, 336.0)
+## The relief vent's painted caption: its baseline start, text and size. It sits just above the
+## grate it names and under the drop's nozzle, so no fixture crosses it, and it ends left of the
+## junction's closing-shot edge.
+const VENT_LABEL_POSITION: Vector2 = Vector2(PressureLine.VENT_GRATE_MIN_X + 3.0, 427.0)
 const VENT_LABEL: String = "RELIEF VENT"
 const VENT_LABEL_FONT_SIZE: int = 11
 ## The gauge dial sits above the pipe run (y 292), clear of the VALVE label below it.
@@ -345,6 +352,11 @@ func _build_lane() -> void:
 	add_child(bolt_sparks)
 
 
+## The font the station labels resolve from the project theme; the painted vent caption uses it too.
+func caption_font() -> Font:
+	return breaker_label.get_theme_font(&"font") if breaker_label != null else ThemeDB.fallback_font
+
+
 func _add_station_label(caption: String, center_x: float, tint: Color, label_y: float = 309.0) -> Label:
 	var label: Label = Label.new()
 	label.text = caption
@@ -604,12 +616,13 @@ func _draw_entry_hatch() -> void:
 func _draw_pressure_line() -> void:
 	var pressure: Color = DIM.lerp(AMBER, gauge) if line_state == &"building" else (SEAM_RED if line_state == &"tripped" else DIM)
 	var y: float = 292.0
-	draw_line(Vector2(BREAKER_X, 330.0), Vector2(BREAKER_X, y), Color("#263540"), 10.0)
+	draw_line(Vector2(BREAKER_X, y), Vector2(BREAKER_X, BREAKER_RISER_GAP.x), Color("#263540"), 10.0)
+	draw_line(Vector2(BREAKER_X, BREAKER_RISER_GAP.y), Vector2(BREAKER_X, 346.0), Color("#263540"), 10.0)
 	draw_line(Vector2(BREAKER_X, y), Vector2(DOOR_X - 24.0, y), Color("#263540"), 10.0)
-	draw_line(Vector2(VENT_X, y), Vector2(VENT_X, 352.0), Color("#263540"), 8.0)
+	draw_line(Vector2(VENT_X, y), Vector2(VENT_X, VENT_NOZZLE_Y), Color("#263540"), 8.0)
 	draw_line(Vector2(VALVE_X, y), Vector2(VALVE_X, 350.0), Color("#263540"), 8.0)
 	draw_line(Vector2(BREAKER_X, y), Vector2(DOOR_X - 24.0, y), pressure, 3.0)
-	draw_line(Vector2(VENT_X, y), Vector2(VENT_X, 352.0), pressure, 2.0)
+	draw_line(Vector2(VENT_X, y), Vector2(VENT_X, VENT_NOZZLE_Y), pressure, 2.0)
 	draw_line(Vector2(VALVE_X, y), Vector2(VALVE_X, 350.0), pressure, 2.0)
 
 
@@ -623,8 +636,8 @@ func _draw_vent() -> void:
 		draw_line(Vector2(x, grate.position.y + 1.0), Vector2(x, grate.end.y - 1.0), Color("#5c707c"), 2.0)
 	draw_rect(grate, STEEL, false, 2.0)
 	var vent_light: Color = SEAM_RED if line_state == &"tripped" else (DIM.lerp(AMBER, gauge) if line_state == &"building" else DIM)
-	draw_rect(Rect2(VENT_X - 13.0, 352.0, 26.0, 5.0), vent_light)
-	draw_string(ThemeDB.fallback_font, VENT_LABEL_POSITION, VENT_LABEL, HORIZONTAL_ALIGNMENT_LEFT, -1, VENT_LABEL_FONT_SIZE, Color("#8fa6b2"))
+	draw_rect(Rect2(VENT_X - 13.0, VENT_NOZZLE_Y, 26.0, 5.0), vent_light)
+	draw_string(caption_font(), VENT_LABEL_POSITION, VENT_LABEL, HORIZONTAL_ALIGNMENT_LEFT, -1, VENT_LABEL_FONT_SIZE, Color("#8fa6b2"))
 
 
 ## A dial mounted above the pipe run beside the valve whose needle is the gauge (above the station

@@ -162,6 +162,16 @@ func _run() -> void:
 	var feet_screen_y: float = (440.0 - gameplay_camera.position.y) * gameplay_camera.zoom.y + 270.0
 	_expect(feet_screen_y <= context_hint.position.y - 24.0, "the actors' feet sit clear above the context hint")
 	_expect(gameplay_camera.position.y - half_view.y <= 170.0 and gameplay_camera.position.y + half_view.y <= 600.0, "play view keeps the ceiling lamps in view and stays on the painting")
+	# With the touch buttons up, the camera sits lower so feet and station bases clear their tops.
+	game.set("touch_enabled", true)
+	game.call("_refresh_ui")
+	game.call("_update_gameplay_camera")
+	var touch_feet_y: float = (440.0 - gameplay_camera.position.y) * gameplay_camera.zoom.y + 270.0
+	var button_top: float = (game.get_node("CanvasLayer/TouchControls/Use") as Control).get_global_rect().position.y
+	_expect(touch_feet_y <= button_top - 8.0 and gameplay_camera.position.y + half_view.y <= 600.0, "with touch buttons the feet sit above them (feet %.0f, buttons from %.0f) and the view stays on the painting" % [touch_feet_y, button_top])
+	game.set("touch_enabled", false)
+	game.call("_refresh_ui")
+	game.call("_update_gameplay_camera")
 	_expect(not wolf.controlled and wolf.position.x > 400.0 and wolf.position.x < human.position.x, "WOLF stays a companion at the relay")
 	_expect(str(game.call("_context_hint")).contains("ask WOLF"), "relay hint offers WOLF the live contact")
 	await _tap(&"interact")

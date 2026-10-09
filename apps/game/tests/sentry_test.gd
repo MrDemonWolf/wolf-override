@@ -414,7 +414,7 @@ func _start_at_b(game: Node2D, choice_id: String) -> Dictionary:
 func _close_cuts_no_label(camera: Camera2D, room: JunctionRoom) -> bool:
 	var half_width: float = 480.0 / camera.zoom.x
 	var edges: Array[float] = [camera.position.x - half_width, camera.position.x + half_width]
-	var font: Font = ThemeDB.fallback_font
+	var font: Font = room.caption_font()
 	var vent_start: float = JunctionRoom.VENT_LABEL_POSITION.x
 	var spans: Array[Vector2] = [Vector2(vent_start, vent_start + font.get_string_size(JunctionRoom.VENT_LABEL, HORIZONTAL_ALIGNMENT_LEFT, -1, JunctionRoom.VENT_LABEL_FONT_SIZE).x)]
 	for child: Node in room.get_children():

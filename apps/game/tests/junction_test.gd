@@ -185,6 +185,7 @@ func _check_scene() -> void:
 		return
 	_expect(room.visible and not (game.get("records_room") as RecordsRoom).visible and not (game.get_node("CorridorDepth") as Node2D).visible, "only the junction is visible after entry")
 	_expect(human.position == Vector2(120.0, 410.0) and human.controlled and not wolf.controlled, "the engineer stands at the entry hatch with controls")
+	_expect(is_equal_approx(camera.get_screen_center_position().x, camera.position.x), "entering the junction cuts the camera to the engineer instead of panning across")
 	var autosave_a: M0State = State.load_from_disk(path)
 	_expect(autosave_a != null and autosave_a.chapter_id == "junction" and not autosave_a.door_blown and autosave_a.memory == state.memory, "autosave A is written on entry with the relay memory")
 	var a_bytes: PackedByteArray = FileAccess.get_file_as_bytes(path)
@@ -291,6 +292,47 @@ func _check_scene() -> void:
 	state = game.get("state") as M0State
 	_expect(state.door_blown and room.visible and room.door_shape.disabled and not room.door_visual.visible and str(game.get("status_line")).contains("door is down"), "Continue restores the blown door and says so")
 	_expect(room.breaker_label.text == "BREAKER SPENT" and room.valve_label.text == "VALVE SPENT", "Continue shows the same spent breaker and valve as the blast did")
+	# The spent line stays spent after Continue: the breaker will not arm, the valve takes no turns
+	# and a stray blast call does nothing.
+	var b_bytes: PackedByteArray = FileAccess.get_file_as_bytes(path)
+	_expect(line.state == &"blown", "Continue from autosave B leaves the line spent, not idle")
+	_expect(await _walk_to(human, JunctionRoom.BREAKER_X), "the engineer walks back to the spent breaker")
+	await _tap(&"interact")
+	_expect(line.state == &"blown" and str(game.get("status_line")).contains("breaker is spent") and not room.vent_steam.emitting, "USE at the spent breaker after Continue arms nothing")
+	for _frame: int in 30:
+		await physics_frame
+	_expect(line.state == &"blown" and line.gauge == 0.0 and not game.get("fail_active"), "no gauge builds and no vent trips after the door is down")
+	_expect(await _walk_to(human, JunctionRoom.VALVE_X), "the engineer walks to the spent valve")
+	_expect(game.call("_hold_station") == &"" and not str(game.call("_context_hint")).contains("valve is dead"), "the spent valve offers no crank and never reads as dead")
+	await _tap(&"interact")
+	_expect(str(game.get("status_line")).contains("valve is spent") and line.turns == 0, "USE at the spent valve says so and takes no turns")
+	game.call("_door_blast")
+	_expect(not game.get("fail_active") and FileAccess.get_file_as_bytes(path) == b_bytes and Engine.time_scale == 1.0, "a blast with the door already down is no knockdown, no save and no hit-stop")
+	# A failed autosave never costs more than the current beat: with an older autosave A on disk and
+	# autosave B unwritten, a knockdown restores B from memory, and the next USE writes it.
+	var disk: FileAccess = FileAccess.open(path, FileAccess.WRITE)
+	disk.store_buffer(a_bytes)
+	disk.close()
+	game.set("save_path", "user://missing-save-folder-%s/save.json" % OS.get_process_id())
+	game.call("_save_progress")
+	game.set("save_path", path)
+	_expect(game.get("save_pending") and str(game.get("save_error")).begins_with("Save failed"), "a failed autosave is flagged and shown")
+	game.call("_fail_beat", "Test knockdown.")
+	_expect(await _wait_until(func() -> bool: return not game.get("fail_active"), 240), "the knockdown after a failed save hands back")
+	state = game.get("state") as M0State
+	_expect(state.door_blown and str(game.get("status_line")).ends_with("Back at the start of this beat."), "the knockdown restores the unwritten beat, not the older autosave on disk")
+	await _tap(&"interact")
+	var retried: M0State = State.load_from_disk(path)
+	_expect(not game.get("save_pending") and retried != null and retried.door_blown, "the next USE retries the save and writes the beat")
+	# An unreadable file mid-room falls back to this beat too, never to an older corridor snapshot.
+	disk = FileAccess.open(path, FileAccess.WRITE)
+	disk.store_string("not a save")
+	disk.close()
+	game.call("_fail_beat", "Test knockdown.")
+	_expect(await _wait_until(func() -> bool: return not game.get("fail_active"), 240), "the knockdown with an unreadable save hands back")
+	state = game.get("state") as M0State
+	_expect(state.chapter_id == "junction" and state.door_blown, "with the save unreadable the knockdown keeps the current beat")
+	game.call("_save_progress")
 	# Reduced Motion holds the charged seam steady instead of strobing.
 	var settings: GameSettings = game.get("settings_menu") as GameSettings
 	settings.reduced_motion_changed.emit(true)

@@ -30,9 +30,12 @@ func _run() -> void:
 		_check_plates(room_name, depth)
 	# The play camera's clamp at zoom 1.35 (Main.GAMEPLAY_ZOOM).
 	var half_play: float = 960.0 / 1.35 * 0.5
+	var touch_y: float = (game.get_script() as Script).get_script_constant_map()["GAMEPLAY_CAMERA_Y_TOUCH"]
 	var framings: Array[Array] = [
 		["play, left end", Vector2(half_play, 360.0), 1.35, SHAKE],
 		["play, right end", Vector2(960.0 - half_play, 360.0), 1.35, SHAKE],
+		["touch play, left end", Vector2(half_play, touch_y), 1.35, SHAKE],
+		["touch play, right end", Vector2(960.0 - half_play, touch_y), 1.35, SHAKE],
 		["opening", Vector2(267.0, 355.0), 1.8, 0.0],
 		["opening, pan", Vector2(300.0, 355.0), 1.95, 0.0],
 		["chapter close", Vector2(960.0 - 480.0 / 1.55, 352.0), 1.55, 0.0],

@@ -108,8 +108,10 @@ static func is_on_vent(x: float) -> bool:
 	return x >= VENT_MIN_X and x <= VENT_MAX_X
 
 
-func reset() -> void:
-	state = &"idle"
+## Back to rest. A [param spent] line is the one a blown door left behind: it reads blown, refuses
+## arm() and crank(), and so can never hiss, vent or light a second fuse after a reload.
+func reset(spent: bool = false) -> void:
+	state = &"blown" if spent else &"idle"
 	gauge = 0.0
 	turns = 0
 	progress = 0.0
