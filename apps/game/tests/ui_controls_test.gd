@@ -30,6 +30,24 @@ func _run() -> void:
 	changelog.pressed.emit()
 	_expect(changelog_screen.visible and not title_logo.visible and game.get("title_open") and changelog_back.has_focus(), "CHANGELOG opens the in-game screen over the title without starting a game")
 	_expect(changelog_body.get_parsed_text().begins_with(first_heading.substr(3, first_heading.length() - 6)) and changelog_body.get_v_scroll_bar().value == 0.0, "the changelog screen shows the text from its newest heading")
+	# The one-line note above the text must stay inside its label; a longer wording once clipped at the panel edge.
+	var changelog_note: Label = changelog_screen.get_node("ChangelogNote") as Label
+	var note_width: float = changelog_note.get_theme_font("font").get_string_size(changelog_note.text, HORIZONTAL_ALIGNMENT_CENTER, -1.0, changelog_note.get_theme_font_size("font_size")).x
+	_expect(changelog_note.text.contains("drag the text") and note_width <= changelog_note.size.x, "the changelog note mentions dragging the text and fits on its one line")
+	# Touch readers have no wheel or keys: dragging the text itself moves the page, as the on-screen note promises.
+	await _settle(4)
+	var body_centre: Vector2 = changelog_body.global_position + changelog_body.size * 0.5
+	var changelog_bar: VScrollBar = changelog_body.get_v_scroll_bar()
+	_expect(changelog_bar.max_value > changelog_bar.page + 200.0, "the exported changelog is taller than one page")
+	await _send_touch_drag(body_centre, -120.0)
+	var after_touch_drag: float = changelog_bar.value
+	_expect(is_equal_approx(after_touch_drag, 120.0), "a 120 px upward touch drag over the changelog text scrolls it 120 px")
+	await _send_mouse_drag(body_centre, -60.0, 0)
+	_expect(is_equal_approx(changelog_bar.value, after_touch_drag + 60.0), "a left-button mouse drag over the changelog text scrolls it too")
+	var before_emulated: float = changelog_bar.value
+	await _send_mouse_drag(body_centre, -60.0, InputEvent.DEVICE_ID_EMULATION)
+	_expect(is_equal_approx(changelog_bar.value, before_emulated), "the mouse motion Godot emulates from a touch is ignored so a finger does not scroll twice")
+	changelog_bar.value = 0.0
 	changelog_back.pressed.emit()
 	_expect(not changelog_screen.visible and title_logo.visible and game.get("title_open") and changelog.has_focus() and not (game.get_node("CanvasLayer/TitleScreen/CreditsScreen") as Control).visible, "BACK TO TITLE restores the title menu and returns focus to CHANGELOG")
 	changelog.pressed.emit()
@@ -248,6 +266,58 @@ func _controller_button(index: JoyButton, pressed: bool) -> InputEventJoypadButt
 
 func _send_escape(pressed: bool) -> void:
 	await _send_key(KEY_ESCAPE, pressed)
+
+
+## A one-finger drag over `pos` that moves `delta_y` pixels in three steps, pushed through the real input path.
+func _send_touch_drag(pos: Vector2, delta_y: float) -> void:
+	var touch: InputEventScreenTouch = InputEventScreenTouch.new()
+	touch.index = 0
+	touch.position = pos
+	touch.pressed = true
+	Input.parse_input_event(touch)
+	await process_frame
+	for i: int in range(1, 4):
+		var drag: InputEventScreenDrag = InputEventScreenDrag.new()
+		drag.index = 0
+		drag.position = pos + Vector2(0.0, delta_y * i / 3.0)
+		drag.relative = Vector2(0.0, delta_y / 3.0)
+		Input.parse_input_event(drag)
+		await process_frame
+	touch.pressed = false
+	touch.position = pos + Vector2(0.0, delta_y)
+	Input.parse_input_event(touch)
+	await process_frame
+
+
+## A left-button mouse drag over `pos` that moves `delta_y` pixels in three steps on the given input device.
+func _send_mouse_drag(pos: Vector2, delta_y: float, device: int) -> void:
+	var press: InputEventMouseButton = InputEventMouseButton.new()
+	press.button_index = MOUSE_BUTTON_LEFT
+	press.pressed = true
+	press.position = pos
+	press.global_position = pos
+	press.device = device
+	Input.parse_input_event(press)
+	await process_frame
+	for i: int in range(1, 4):
+		var motion: InputEventMouseMotion = InputEventMouseMotion.new()
+		motion.position = pos + Vector2(0.0, delta_y * i / 3.0)
+		motion.global_position = motion.position
+		motion.relative = Vector2(0.0, delta_y / 3.0)
+		motion.button_mask = MOUSE_BUTTON_MASK_LEFT
+		motion.device = device
+		Input.parse_input_event(motion)
+		await process_frame
+	press.pressed = false
+	press.position = pos + Vector2(0.0, delta_y)
+	press.global_position = press.position
+	Input.parse_input_event(press)
+	await process_frame
+
+
+func _settle(frames: int) -> void:
+	for _i: int in range(frames):
+		await process_frame
 
 
 func _send_key(code: Key, pressed: bool) -> void:

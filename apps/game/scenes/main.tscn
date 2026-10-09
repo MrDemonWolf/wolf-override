@@ -699,7 +699,7 @@ offset_bottom = 122.0
 theme_override_colors/font_color = Color(0.59, 0.70, 0.77, 1)
 theme_override_font_sizes/font_size = 15
 horizontal_alignment = 1
-text = "Source-build changes by date, not downloadable releases. Scroll with the wheel, a drag or up/down."
+text = "Source-build changes by date, not releases. Scroll with the wheel, drag the text or use up/down."
 
 [node name="ChangelogBody" type="RichTextLabel" parent="CanvasLayer/TitleScreen/ChangelogScreen"]
 offset_left = 189.0

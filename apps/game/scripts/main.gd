@@ -3,6 +3,8 @@ extends Node2D
 const SITE_URL: String = "https://wolfoverride.mrdemonwolf.dev"
 const CHANGELOG_URL: String = SITE_URL + "/docs/changelog/"
 ## Plain-text export of the public changelog (scripts/export_changelog.py); check-game.sh fails when it drifts.
+## A bare .txt is not a Godot resource: an export preset must list *.txt in its include filter or the
+## screen falls back to CHANGELOG_UNAVAILABLE.
 const CHANGELOG_PATH: String = "res://assets/changelog.txt"
 const CHANGELOG_UNAVAILABLE: String = "The changelog text is missing from this build. Open the full changelog online."
 ## How fast a held up/down input scrolls the changelog, in pixels per second.
@@ -192,6 +194,7 @@ func _ready() -> void:
 	changelog_button.pressed.connect(_show_changelog)
 	changelog_back_button.pressed.connect(_hide_changelog)
 	changelog_online_button.pressed.connect(_open_changelog)
+	changelog_body.gui_input.connect(_on_changelog_body_input)
 	_load_changelog()
 	_grab_menu_focus(new_game_button)
 	title_mark.modulate = Color(1, 1, 1, 0)
@@ -520,6 +523,19 @@ func _on_credits_body_input(event: InputEvent) -> void:
 	if event is InputEventMouseButton and event.pressed:
 		credits_paused = true
 		credits_pause_button.text = "RESUME SCROLL"
+
+
+## Dragging the changelog text scrolls it: a touch drag, or the mouse moved with the left button held.
+## Touch also arrives as an emulated mouse motion, which is skipped so one finger does not scroll twice.
+func _on_changelog_body_input(event: InputEvent) -> void:
+	var drag: float = 0.0
+	if event is InputEventScreenDrag:
+		drag = (event as InputEventScreenDrag).relative.y
+	elif event is InputEventMouseMotion and event.device != InputEvent.DEVICE_ID_EMULATION and (event as InputEventMouseMotion).button_mask & MOUSE_BUTTON_MASK_LEFT:
+		drag = (event as InputEventMouseMotion).relative.y
+	if drag != 0.0:
+		changelog_body.get_v_scroll_bar().value -= drag
+		changelog_body.accept_event()
 
 
 func _setup_touch_controls() -> void:

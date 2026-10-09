@@ -1,5 +1,5 @@
 == October 8, 2026 ==
-- The title CHANGELOG button now opens these updates inside the game; scroll with the mouse wheel, a drag or up/down, and use OPEN FULL CHANGELOG ONLINE for the website version. BACK TO TITLE, Esc, controller B or Android Back return to the title.
+- The title CHANGELOG button now opens these updates inside the game; scroll with the mouse wheel, by dragging the text or with up/down, and use OPEN FULL CHANGELOG ONLINE for the website version. BACK TO TITLE, Esc, controller B or Android Back return to the title.
 - After you tell WOLF about the relay risk, he walks to the contact himself; you no longer have to find the exact spot. Using the relay again while he is walking takes the engineer's bypass instead.
 - Removed the N (new run) and L/F9 (load checkpoint) hotkeys, which discarded unsaved progress without warning. Use Pause, then Return to Title, then New Game or Continue.
 - Pause during the opening now pauses instead of skipping; choose Skip Opening from Pause to go straight to play.

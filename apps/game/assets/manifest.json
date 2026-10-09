@@ -163,7 +163,7 @@
       "terms_reference": "GPL-3.0-or-later, the repository code and docs licence (see LICENSE)",
       "rights_review_status": "Derivative of the project's own public changelog text; covered by the repository GPL licence. No third-party content.",
       "modifications": "Front matter and the page intro are dropped; '## ' headings become '== Heading ==', '### ' headings '-- Heading --'; bullets keep '- '; links, bold and code markers are stripped. Regenerate with python3 scripts/export_changelog.py after editing the changelog.",
-      "implementation_status": "Loaded with FileAccess at title time for the in-game CHANGELOG screen since 2026-10-08. scripts/check-game.sh regenerates it to a temp file and fails when the committed copy differs."
+      "implementation_status": "Loaded with FileAccess at title time for the in-game CHANGELOG screen since 2026-10-08. scripts/check-game.sh regenerates it to a temp file and fails when the committed copy differs. Plain .txt files are not packed by default: export presets must add *.txt to their include filter or the screen falls back to its missing-text line."
     }
   ],
   "status": "One provisional brand mark, three provisional character images, one title background, two gameplay backgrounds, two prop sheets, three trial corridor depth plates (off by default), two derivative marketing captures, the Roboto and Montserrat font families, and one generated changelog text export recorded; no audio acquired. Glows, haze, dust, reflections and the screen grade are procedural built-in nodes and two small shaders, not image assets.",
