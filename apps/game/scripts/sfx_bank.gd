@@ -12,7 +12,7 @@ const PEAK: float = 0.5
 const BUS: String = "Effects"
 const VOICES: int = 4
 ## Loops get their own player each so a room can hold and stop them by name.
-const LOOPS: Array[StringName] = [&"hiss", &"hum"]
+const LOOPS: Array[StringName] = [&"hiss", &"hum", &"servo", &"winch"]
 ## Clip lengths in seconds; tests check the buffers against these.
 const LENGTHS: Dictionary = {
 	&"boom": 0.5,
@@ -24,6 +24,9 @@ const LENGTHS: Dictionary = {
 	&"arc": 0.5,
 	&"klaxon": 0.5,
 	&"growl": 0.6,
+	&"servo": 1.0,
+	&"winch": 1.0,
+	&"whine": 0.6,
 }
 
 ## Off means play() does nothing and anything already sounding, loops included, stops;
@@ -112,6 +115,9 @@ func generate() -> void:
 	streams[&"arc"] = _wav(_arc(rng, LENGTHS[&"arc"]), false)
 	streams[&"klaxon"] = _wav(_klaxon(LENGTHS[&"klaxon"]), false)
 	streams[&"growl"] = _wav(_growl(rng, LENGTHS[&"growl"]), false)
+	streams[&"servo"] = _wav(_servo(LENGTHS[&"servo"]), true)
+	streams[&"winch"] = _wav(_winch(LENGTHS[&"winch"]), true)
+	streams[&"whine"] = _wav(_whine(rng, LENGTHS[&"whine"]), false)
 	generation_ms = float(Time.get_ticks_usec() - start) / 1000.0
 
 
@@ -267,6 +273,56 @@ static func _growl(rng: RandomNumberGenerator, seconds: float) -> PackedFloat32A
 		var tremolo: float = 0.7 + 0.3 * sin(TAU * 9.0 * t)
 		var envelope: float = minf(t / 0.08, 1.0) * minf((seconds - t) / 0.2, 1.0)
 		out[i] = low * tremolo * envelope
+	return out
+
+
+## A thin 1.2 kHz servo tone with a 6 Hz vibrato and a soft octave, looped: the sentry's motors.
+## The vibrato and both tones complete whole cycles in one second, so the loop seam is silent; the
+## room raises its pitch when the sentry locks on and lets it fall away when the sentry goes down.
+static func _servo(seconds: float) -> PackedFloat32Array:
+	var frames: int = int(seconds * MIX_RATE)
+	var out: PackedFloat32Array = PackedFloat32Array()
+	out.resize(frames)
+	var dt: float = 1.0 / MIX_RATE
+	for i: int in frames:
+		var t: float = i * dt
+		# Phase of a 1200 Hz carrier swung +/-30 Hz at 6 Hz, integrated so it stays continuous.
+		var phase: float = TAU * 1200.0 * t + (30.0 / 6.0) * sin(TAU * 6.0 * t)
+		out[i] = sin(phase) * 0.7 + sin(phase * 0.5) * 0.3
+	return out
+
+
+## A 90 Hz saw with a 7 Hz wobble, low-passed, looped: the arm's winch hauling the tank back up.
+static func _winch(seconds: float) -> PackedFloat32Array:
+	var frames: int = int(seconds * MIX_RATE)
+	var out: PackedFloat32Array = PackedFloat32Array()
+	out.resize(frames)
+	var dt: float = 1.0 / MIX_RATE
+	var alpha: float = dt / (1.0 / (TAU * 700.0) + dt)
+	var low: float = 0.0
+	for i: int in frames:
+		var t: float = i * dt
+		var saw: float = fmod(t * 90.0, 1.0) * 2.0 - 1.0
+		low += alpha * (saw - low)
+		out[i] = low * (0.75 + 0.25 * sin(TAU * 7.0 * t))
+	return out
+
+
+## A rising electrical whine (a sine sweeping 300 Hz to 1.8 kHz with a buzzing square edge) that
+## swells over 0.6 s and cuts off: the exit bolt charging before it arcs.
+static func _whine(rng: RandomNumberGenerator, seconds: float) -> PackedFloat32Array:
+	var frames: int = int(seconds * MIX_RATE)
+	var out: PackedFloat32Array = PackedFloat32Array()
+	out.resize(frames)
+	var dt: float = 1.0 / MIX_RATE
+	var phase: float = 0.0
+	for i: int in frames:
+		var t: float = i * dt
+		var progress: float = t / seconds
+		phase += TAU * lerpf(300.0, 1800.0, progress * progress) * dt
+		var tone: float = sin(phase) * 0.7 + (1.0 if sin(phase * 0.5) > 0.0 else -1.0) * 0.15
+		var envelope: float = minf(t / 0.02, 1.0) * lerpf(0.3, 1.0, progress) * minf((seconds - t) / 0.01, 1.0)
+		out[i] = (tone + rng.randf_range(-0.08, 0.08)) * envelope
 	return out
 
 

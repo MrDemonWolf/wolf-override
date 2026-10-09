@@ -269,7 +269,7 @@ func _check_scene() -> void:
 	# says outside, so the door blows, nobody is knocked down and autosave B is written.
 	human.position.x = PressureLine.BLAST_MIN_X - 8.0
 	_expect(await _wait_until(func() -> bool: return state.door_blown, 90), "the fuse ends and the door blows")
-	_expect(game.call("_objective") == "DOOR DOWN" and room.door_label.text == "DOOR DOWN" and room.blast_sparks.emitting, "the blast is a real state change with sparks")
+	_expect(game.call("_objective") == "DROP THE TANK" and room.door_label.text == "DOOR DOWN" and room.blast_sparks.emitting, "the blast is a real state change with sparks and the next objective")
 	_expect(room.breaker_label.text == "BREAKER SPENT" and room.valve_label.text == "VALVE SPENT", "the blast spends the breaker and the valve")
 	var knocked: bool = false
 	for _frame: int in 30:
@@ -281,10 +281,11 @@ func _check_scene() -> void:
 	_expect(wolf.autonomous_target_x == JunctionRoom.WOLF_RUBBLE_X, "WOLF holds at the rubble and will not cross")
 	_expect(await _wait_until(func() -> bool: return room.door_shape.disabled, 5), "the door body is gone")
 	_expect(await _wait_until(func() -> bool: return Engine.time_scale == 1.0 and camera.offset == Vector2.ZERO, 90), "time scale and camera settle after the boom")
-	_expect(await _walk_to(human, 600.0), "the engineer can walk through where the door stood")
+	# Through where the door stood, up to just short of the rubble line (the lane beyond is sentry_test's).
+	_expect(await _walk_to(human, JunctionRoom.CHOICE_X - 16.0), "the engineer can walk through where the door stood")
 	_expect(wolf.position.x <= JunctionRoom.WOLF_RUBBLE_X + 12.0, "WOLF stays on the near side of the rubble")
 	await _tap(&"interact")
-	_expect(str(game.get("status_line")).contains("No station"), "the lane past the door has no station yet")
+	_expect(str(game.get("status_line")).contains("ARM PANEL") and not game.get("waiting_for_choice"), "short of the rubble USE points at the arm panel and nothing is asked yet")
 	# A blast with the engineer already past the fuse needs no second save; Continue restores B.
 	game.call("_load_game")
 	state = game.get("state") as M0State

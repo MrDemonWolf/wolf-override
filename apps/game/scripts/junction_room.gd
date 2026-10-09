@@ -2,8 +2,9 @@ extends Node2D
 class_name JunctionRoom
 ## Blowback: the Service Junction, the third 960 px room after the Records exit. The painted
 ## maintenance corridor is reused (tinted) as its provisional backdrop; the pressure line, relief
-## vent, valve wheel, gauge, sealed door, rubble and exit hatch are drawn here from the state the
-## parent mirrors in, so nothing animates on a timer of its own.
+## vent, valve wheel, gauge, sealed door, rubble, the overhead arm and its tank, the floor mark,
+## the ARM PANEL alcove, the exit bolt and the hatch are drawn here from the state the parent
+## mirrors in (PressureLine, DropArm, SentryBrain), so nothing animates on a timer of its own.
 
 const CORRIDOR_BACKGROUND: Texture2D = preload("res://assets/maintenance-corridor-background-provisional.png")
 const MAINTENANCE_PROPS: Texture2D = preload("res://assets/maintenance-props-provisional.png")
@@ -13,23 +14,43 @@ const BREAKER_X: float = 200.0
 const VENT_X: float = 300.0
 const VALVE_X: float = 420.0
 const DOOR_X: float = 480.0
-const RUBBLE_X: float = 540.0
+## The rubble line is the sentry's lane boundary.
+const RUBBLE_X: float = SentryBrain.RUBBLE_X
+## The ARM PANEL sits in the middle of the alcove that hides the engineer from the sentry.
+const ARM_X: float = (SentryBrain.COVER_MIN_X + SentryBrain.COVER_MAX_X) * 0.5
+const BOLT_X: float = 850.0
 const HATCH_X: float = 880.0
 const FLOOR_Y: float = 440.0
 ## Where WOLF stands to read the door seam (his 62 px body stops just short of the door body at
 ## x 452), and where he holds once the door is down.
 const WOLF_SEAM_X: float = 418.0
-const WOLF_RUBBLE_X: float = 500.0
+## (He holds at the near edge of the rubble, so his sprite stays clear of the engineer at CHOICE_X.)
+const WOLF_RUBBLE_X: float = 448.0
+## Where WOLF stands when he chooses to draw the sentry; it parks BAIT_OFFSET short of him, on the mark.
+const WOLF_BAIT_X: float = DropArm.MARK_X + SentryBrain.BAIT_OFFSET
+## The engineer's front foot on the rubble line: where the question of how to drop the tank comes up,
+## still outside the sentry's lane.
+const CHOICE_X: float = RUBBLE_X - M0State.HUMAN_HALF_WIDTH
+## The tank hangs centred here, low enough to stay below the on-screen answers, and lands with its
+## base on the floor.
+const TANK_REST_Y: float = 300.0
+const TANK_SIZE: Vector2 = Vector2(36.0, 56.0)
+const RAIL_Y: float = 196.0
+## The hatch slides open this long after the bolt arcs.
+const HATCH_OPEN_SECONDS: float = 0.5
 ## The sealed door body is this wide; its left face is M0State.JUNCTION_DOOR_LEFT_X.
 const DOOR_WIDTH: float = 56.0
 ## How long the grate stays dangerous after the relief vent lets go.
 const HAZARD_SECONDS: float = 0.4
 const VENT_REASON: String = "The relief vent let go under you. Stand clear of the grate when the gauge peaks."
 const BLAST_REASON: String = "The door blew with you in front of it. Get left of the vent before the fuse ends."
+const SENTRY_REASON: String = "The sentry ran you down in its lane. Cross when it faces away, or get back over the rubble."
+const CLOUD_REASON: String = "The coolant cloud caught you. Let it clear before you cross the mark."
 const AMBER: Color = Color("#f3ae4b")
 const GREEN: Color = Color("#a4f0c4")
 const DIM: Color = Color("#3e4f5a")
 const STEEL: Color = Color("#4a6572")
+const COOLANT: Color = Color("#7fe8ff")
 const SEAM_RED: Color = Color("#ff6a55")
 ## The VALVE label sits this far left of the wheel so SEAL CHARGED ends before the door art.
 const VALVE_LABEL_SHIFT: float = 22.0
@@ -45,6 +66,19 @@ var line_state: StringName = &"idle"
 var gauge: float = 0.0
 var turns: int = 0
 var door_blown: bool = false
+var sentry_down: bool = false
+var junction_cleared: bool = false
+## Mirrored from DropArm: its state and how far down the tank is (0 hanging, 1 on the floor).
+var arm_state: StringName = &"hung"
+var tank_drop: float = 0.0
+## Mirrored from Main's exit bolt: locked, charging (0..1 through the whine) or open.
+var bolt_state: StringName = &"locked"
+var bolt_charge: float = 0.0
+## 0 shut, 1 open; slides once after the bolt arcs.
+var hatch_open: float = 0.0:
+	set(value):
+		hatch_open = value
+		queue_redraw()
 ## Reduced Motion: the charged seam holds a steady glow instead of strobing.
 var reduce_motion: bool = false:
 	set(value):
@@ -64,6 +98,15 @@ var vent_puff: CPUParticles2D
 var blast_sparks: CPUParticles2D
 var blast_dust: CPUParticles2D
 var vent_hazard: Hazard
+var cloud_hazard: Hazard
+var sentry: Sentry
+var tank: TankArt
+var coolant_cloud: CPUParticles2D
+var coolant_burst: CPUParticles2D
+var hit_sparks: CPUParticles2D
+var bolt_sparks: CPUParticles2D
+var arm_label: Label
+var hatch_label: Label
 var breaker_glow: Sprite2D
 var seam_glow: Sprite2D
 var breaker_label: Label
@@ -74,6 +117,7 @@ var _valve_tween: Tween
 var _seam_tween: Tween
 var _door_tween: Tween
 var _hazard_tween: Tween
+var _hatch_tween: Tween
 
 
 ## The valve wheel: a rim, hub and four spokes that turn a quarter per real valve turn.
@@ -89,6 +133,29 @@ class ValveWheel:
 			draw_line(Vector2.ZERO, direction * RADIUS, Color("#9fb6c2"), 3.0, true)
 		draw_circle(Vector2.ZERO, 5.0, Color("#d8e6ec"))
 		draw_circle(Vector2(0.0, -RADIUS), 3.0, Color("#f3ae4b"))
+
+
+## The hanging coolant tank: a banded cylinder with a clamp lug, dented after a missed drop.
+class TankArt:
+	extends Node2D
+	var dented: bool = false:
+		set(value):
+			dented = value
+			queue_redraw()
+
+	func _draw() -> void:
+		var half: Vector2 = JunctionRoom.TANK_SIZE * 0.5
+		var body: Rect2 = Rect2(-half, JunctionRoom.TANK_SIZE)
+		draw_rect(body, Color("#2c4a57"))
+		draw_rect(Rect2(body.position.x + 4.0, body.position.y, 6.0, body.size.y), Color("#3f6a7a"))
+		for band: int in 2:
+			draw_rect(Rect2(body.position.x, body.position.y + 12.0 + band * 26.0, body.size.x, 4.0), Color("#c98a2e"))
+		draw_rect(body, Color("#7fa5b4"), false, 1.5)
+		draw_rect(Rect2(-6.0, -half.y - 6.0, 12.0, 6.0), Color("#4a6572"))
+		draw_string(ThemeDB.fallback_font, Vector2(-half.x + 3.0, 6.0), "COOLANT", HORIZONTAL_ALIGNMENT_LEFT, -1, 7, Color("#bfe8ff"))
+		if dented:
+			var dent: PackedVector2Array = PackedVector2Array([Vector2(half.x, half.y - 18.0), Vector2(half.x - 7.0, half.y - 10.0), Vector2(half.x, half.y - 3.0)])
+			draw_colored_polygon(dent, Color("#14242c"))
 
 
 func _ready() -> void:
@@ -125,7 +192,10 @@ func _ready() -> void:
 	# Centred a little left of the wheel so its longest text (SEAL CHARGED) ends before the door art.
 	valve_label = _add_station_label("VALVE", VALVE_X - VALVE_LABEL_SHIFT, Color("#b0d1de"))
 	door_label = _add_station_label("SEALED DOOR", DOOR_X, Color("#ffc7c7"), 276.0)
-	_add_station_label("EXIT", HATCH_X, DIM, 276.0)
+	arm_label = _add_station_label("ARM PANEL", ARM_X, Color("#b0d1de"))
+	# Centred between the bolt panel and the hatch so both read as one exit.
+	hatch_label = _add_station_label("EXIT BOLTED", (BOLT_X + HATCH_X) * 0.5, Color("#8fa6b2"), 276.0)
+	_build_lane()
 	refresh_state()
 
 
@@ -219,6 +289,60 @@ func _build_particles() -> void:
 	add_child(blast_dust)
 
 
+## The sentry, the tank over the mark and the lane's hazards and bursts. The sentry is added before
+## the tank so a landed tank draws over the machine it came down on.
+func _build_lane() -> void:
+	sentry = Sentry.new()
+	sentry.name = "Sentry"
+	sentry.z_index = 1
+	add_child(sentry)
+	tank = TankArt.new()
+	tank.name = "Tank"
+	tank.position = Vector2(DropArm.MARK_X, TANK_REST_Y)
+	tank.z_index = 1
+	add_child(tank)
+	# The cloud's hurtbox is the cloud: DropArm.CLOUD_HALF_WIDTH either side of the mark, floor to head height.
+	cloud_hazard = Hazard.make("CloudHazard", Rect2(DropArm.MARK_X - DropArm.CLOUD_HALF_WIDTH, 360.0, DropArm.CLOUD_HALF_WIDTH * 2.0, 80.0), CLOUD_REASON)
+	add_child(cloud_hazard)
+	coolant_cloud = FxPresets.steam()
+	coolant_cloud.name = "CoolantCloud"
+	coolant_cloud.position = Vector2(DropArm.MARK_X, FLOOR_Y - 6.0)
+	coolant_cloud.emission_shape = CPUParticles2D.EMISSION_SHAPE_RECTANGLE
+	coolant_cloud.emission_rect_extents = Vector2(DropArm.CLOUD_HALF_WIDTH - 8.0, 4.0)
+	coolant_cloud.initial_velocity_min = 20.0
+	coolant_cloud.initial_velocity_max = 60.0
+	coolant_cloud.spread = 60.0
+	coolant_cloud.scale_amount_min = 10.0
+	coolant_cloud.scale_amount_max = 18.0
+	coolant_cloud.amount = 24
+	coolant_cloud.color = Color(COOLANT, 0.16)
+	# Behind the actors and the sentry, so the vapour never hides who is in it.
+	coolant_cloud.z_index = 0
+	add_child(coolant_cloud)
+	coolant_burst = FxPresets.dust_burst()
+	coolant_burst.name = "CoolantBurst"
+	coolant_burst.position = Vector2(DropArm.MARK_X, FLOOR_Y - 10.0)
+	coolant_burst.color = Color(COOLANT, 0.35)
+	coolant_burst.initial_velocity_min = 110.0
+	coolant_burst.initial_velocity_max = 220.0
+	coolant_burst.amount = 22
+	coolant_burst.z_index = 3
+	add_child(coolant_burst)
+	hit_sparks = FxPresets.sparks(FxPresets.SPARK_CYAN)
+	hit_sparks.name = "HitSparks"
+	hit_sparks.position = Vector2(DropArm.MARK_X, FLOOR_Y - 30.0)
+	hit_sparks.amount = 36
+	hit_sparks.spread = 100.0
+	hit_sparks.z_index = 3
+	add_child(hit_sparks)
+	bolt_sparks = FxPresets.sparks(Color("#c1f4d8"))
+	bolt_sparks.name = "BoltSparks"
+	bolt_sparks.position = Vector2(BOLT_X, 336.0)
+	bolt_sparks.amount = 30
+	bolt_sparks.z_index = 3
+	add_child(bolt_sparks)
+
+
 func _add_station_label(caption: String, center_x: float, tint: Color, label_y: float = 309.0) -> Label:
 	var label: Label = Label.new()
 	label.text = caption
@@ -237,6 +361,8 @@ func set_active(active: bool) -> void:
 	door_shape.set_deferred("disabled", not active or door_blown)
 	vent_hazard.armed = false
 	vent_hazard.set_deferred("monitoring", active)
+	cloud_hazard.armed = false
+	cloud_hazard.set_deferred("monitoring", active)
 
 
 ## Copies the live pressure line in; the gauge needle, steam, seam and labels all follow it.
@@ -258,6 +384,55 @@ func sync_line(line: PressureLine) -> void:
 	if building:
 		seam_glow.modulate = Color(AMBER, 0.25 + 0.5 * gauge)
 	queue_redraw()
+
+
+## Copies the arm in: the tank's height, the cloud and its hurtbox follow DropArm's state.
+func sync_arm(arm: DropArm) -> void:
+	var previous_state: StringName = arm_state
+	arm_state = arm.state
+	tank_drop = arm.drop_amount()
+	tank.position.y = lerpf(TANK_REST_Y, FLOOR_Y - TANK_SIZE.y * 0.5, tank_drop)
+	var cloud: bool = arm.cloud_active() and visible
+	coolant_cloud.emitting = cloud
+	if cloud_hazard.armed != cloud:
+		cloud_hazard.armed = cloud
+	if arm_state != previous_state:
+		refresh_state()
+	queue_redraw()
+
+
+## Copies the exit bolt in; its panel light warms with the charge.
+func sync_bolt(state: StringName, charge: float) -> void:
+	var changed: bool = state != bolt_state
+	bolt_state = state
+	bolt_charge = charge
+	if changed:
+		refresh_state()
+	queue_redraw()
+
+
+## The tank came down on the sentry at [param at_x]: the coolant and spark bursts (fired through the
+## impact kit) are moved there and the sentry keels over.
+func tank_hit(at_x: float) -> void:
+	sentry_down = true
+	coolant_burst.position.x = at_x
+	hit_sparks.position.x = at_x
+	sentry.keel_over()
+	refresh_state()
+
+
+## The tank hit the floor: the coolant burst moves to the mark and the tank is dented.
+func tank_miss() -> void:
+	coolant_burst.position.x = DropArm.MARK_X
+	tank.dented = true
+
+
+## The bolt lets go and the hatch slides open (the parent fires the panel's sparks).
+func bolt_arc() -> void:
+	if _hatch_tween != null and _hatch_tween.is_valid():
+		_hatch_tween.kill()
+	_hatch_tween = create_tween()
+	_hatch_tween.tween_property(self, "hatch_open", 1.0, HATCH_OPEN_SECONDS).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_IN_OUT)
 
 
 func _turn_wheel(to_turns: int) -> void:
@@ -288,6 +463,17 @@ func refresh_state() -> void:
 	breaker_glow.modulate = Color(_breaker_light_color(), 0.75 if line_state in [&"building", &"charged", &"fuse"] and not door_blown else 0.4)
 	door_label.text = "DOOR DOWN" if door_blown else "SEALED DOOR"
 	door_label.add_theme_color_override("font_color", GREEN if door_blown else Color("#ffc7c7"))
+	arm_label.text = "TANK DOWN" if sentry_down else ("ARM REWINDING" if arm_state == &"rewinding" else "ARM PANEL")
+	arm_label.add_theme_color_override("font_color", Color("#8fa6b2") if sentry_down else (AMBER if arm_state == &"rewinding" else Color("#b0d1de")))
+	if junction_cleared or bolt_state == &"open":
+		hatch_label.text = "EXIT OPEN"
+		hatch_label.add_theme_color_override("font_color", GREEN)
+	elif sentry_down:
+		hatch_label.text = "EXIT BOLT"
+		hatch_label.add_theme_color_override("font_color", AMBER)
+	else:
+		hatch_label.text = "EXIT BOLTED"
+		hatch_label.add_theme_color_override("font_color", Color("#8fa6b2"))
 	_sync_seam()
 	queue_redraw()
 
@@ -357,18 +543,26 @@ func _arm_hazard(hazard: Hazard) -> void:
 
 ## Back to the state the save describes: no burst, no fuse, the wheel at rest and the door as saved.
 func reset_transient() -> void:
-	for tween: Tween in [_valve_tween, _seam_tween, _door_tween, _hazard_tween]:
+	for tween: Tween in [_valve_tween, _seam_tween, _door_tween, _hazard_tween, _hatch_tween]:
 		if tween != null and tween.is_valid():
 			tween.kill()
 	_valve_tween = null
 	_seam_tween = null
 	_door_tween = null
 	_hazard_tween = null
+	_hatch_tween = null
 	vent_hazard.armed = false
-	vent_steam.emitting = false
-	vent_puff.emitting = false
-	blast_sparks.emitting = false
-	blast_dust.emitting = false
+	cloud_hazard.armed = false
+	for burst: CPUParticles2D in [vent_steam, vent_puff, blast_sparks, blast_dust, coolant_cloud, coolant_burst, hit_sparks, bolt_sparks]:
+		burst.emitting = false
+	# The tank hangs again (or lies on the downed sentry), undented; the hatch is as the save left it.
+	tank.dented = false
+	arm_state = &"landed" if sentry_down else &"hung"
+	tank_drop = 1.0 if sentry_down else 0.0
+	tank.position.y = lerpf(TANK_REST_Y, FLOOR_Y - TANK_SIZE.y * 0.5, tank_drop)
+	bolt_state = &"open" if junction_cleared else &"locked"
+	bolt_charge = 0.0
+	hatch_open = 1.0 if junction_cleared else 0.0
 	# A blown door left the wheel at its third quarter; a restored save shows it the same way.
 	valve_wheel.rotation_degrees = 90.0 * PressureLine.TURNS_NEEDED if door_blown else 0.0
 	door_visual.scale = Vector2.ONE
@@ -390,7 +584,11 @@ func _draw() -> void:
 	_draw_breaker_light()
 	if door_blown:
 		_draw_rubble()
+	_draw_arm_panel()
+	_draw_arm()
+	_draw_floor_mark()
 	_draw_exit_hatch()
+	_draw_bolt_panel()
 
 
 func _draw_entry_hatch() -> void:
@@ -477,10 +675,92 @@ func _draw_rubble() -> void:
 	draw_line(Vector2(RUBBLE_X - 6.0, 439.0), Vector2(RUBBLE_X + 6.0, 439.0), AMBER, 3.0)
 
 
+## The alcove recessed into the wall behind the panel: the engineer standing in it is out of the
+## sentry's sight. Its width is exactly SentryBrain's cover span widened by half the engineer's body.
+func _draw_arm_panel() -> void:
+	var alcove: Rect2 = Rect2(SentryBrain.COVER_MIN_X - M0State.HUMAN_HALF_WIDTH, 318.0, SentryBrain.COVER_MAX_X - SentryBrain.COVER_MIN_X + M0State.HUMAN_HALF_WIDTH * 2.0, FLOOR_Y - 318.0)
+	draw_rect(alcove, Color(0.02, 0.05, 0.08, 0.72))
+	# A lit lip along the top so it reads as a recess, not a door.
+	draw_rect(Rect2(alcove.position, Vector2(alcove.size.x, 4.0)), Color("#263540"))
+	draw_rect(alcove, STEEL, false, 2.0)
+	var panel: Rect2 = Rect2(ARM_X - 11.0, 346.0, 22.0, 28.0)
+	draw_rect(panel, Color("#1b2630"))
+	draw_rect(panel, Color("#9fb6c2"), false, 1.5)
+	var light: Color = DIM if sentry_down else (GREEN if arm_state == &"hung" else AMBER)
+	draw_rect(Rect2(ARM_X - 6.0, 352.0, 12.0, 5.0), light)
+	draw_line(Vector2(ARM_X, 362.0), Vector2(ARM_X + (0.0 if arm_state == &"hung" else 6.0), 370.0), Color("#d8e6ec"), 2.0)
+	# The control run from the panel up to the arm.
+	draw_line(Vector2(ARM_X + 9.0, 346.0), Vector2(ARM_X + 9.0, RAIL_Y + 6.0), Color("#263540"), 3.0)
+
+
+## The overhead rail, the trolley over the mark and the cable down to the tank. The cable is taut
+## while the tank hangs, falls or winches back up, and lies slack once it has landed.
+func _draw_arm() -> void:
+	draw_line(Vector2(ARM_X + 9.0, RAIL_Y), Vector2(DropArm.MARK_X + 90.0, RAIL_Y), Color("#263540"), 9.0)
+	draw_line(Vector2(ARM_X + 9.0, RAIL_Y - 3.0), Vector2(DropArm.MARK_X + 90.0, RAIL_Y - 3.0), STEEL, 2.0)
+	for hanger_x: float in [ARM_X + 30.0, DropArm.MARK_X + 80.0]:
+		draw_line(Vector2(hanger_x, 120.0), Vector2(hanger_x, RAIL_Y), Color("#263540"), 4.0)
+	draw_rect(Rect2(DropArm.MARK_X - 14.0, RAIL_Y - 4.0, 28.0, 14.0), Color("#33424c"))
+	draw_rect(Rect2(DropArm.MARK_X - 14.0, RAIL_Y - 4.0, 28.0, 14.0), Color("#9fb6c2"), false, 1.5)
+	var cable_top: Vector2 = Vector2(DropArm.MARK_X, RAIL_Y + 10.0)
+	var tank_top: Vector2 = Vector2(DropArm.MARK_X, tank.position.y - TANK_SIZE.y * 0.5 - 6.0)
+	if arm_state == &"landed":
+		var slack: PackedVector2Array = PackedVector2Array()
+		for step: int in 9:
+			var t: float = step / 8.0
+			var point: Vector2 = cable_top.lerp(tank_top, t)
+			point.x += sin(t * PI) * 26.0
+			slack.append(point)
+		draw_polyline(slack, Color("#9fb6c2"), 1.5, true)
+	else:
+		draw_line(cable_top, tank_top, Color("#9fb6c2"), 1.5)
+
+
+## Hazard stripes on the floor exactly as wide as the drop's hit window.
+func _draw_floor_mark() -> void:
+	var left: float = DropArm.MARK_X - DropArm.HIT_RANGE
+	var width: float = DropArm.HIT_RANGE * 2.0
+	var stripes: int = 11
+	for stripe: int in stripes:
+		var segment: Rect2 = Rect2(left + stripe * width / stripes, FLOOR_Y - 4.0, width / stripes, 4.0)
+		draw_rect(segment, AMBER if stripe % 2 == 0 else Color("#1a2229"))
+	draw_line(Vector2(left, FLOOR_Y - 10.0), Vector2(left, FLOOR_Y), AMBER, 2.0)
+	draw_line(Vector2(left + width, FLOOR_Y - 10.0), Vector2(left + width, FLOOR_Y), AMBER, 2.0)
+
+
 func _draw_exit_hatch() -> void:
 	draw_rect(Rect2(HATCH_X - 32.0, 300.0, 64.0, 138.0), Color("#06111a"))
+	if hatch_open > 0.0:
+		# The service line beyond: a faint green work light.
+		draw_rect(Rect2(HATCH_X - 32.0, 300.0, 64.0, 138.0), Color(GREEN, 0.12 * hatch_open))
+	# The hatch door slides up into the frame as it opens.
+	var door_height: float = 138.0 * (1.0 - hatch_open)
+	if door_height > 0.5:
+		draw_rect(Rect2(HATCH_X - 32.0, 300.0, 64.0, door_height), Color("#0b1822"))
+		for bar: int in 3:
+			var y: float = 330.0 + bar * 34.0 - 138.0 * hatch_open
+			if y > 300.0:
+				draw_line(Vector2(HATCH_X - 32.0, y), Vector2(HATCH_X + 32.0, y), Color("#1e2b35"), 3.0)
 	draw_rect(Rect2(HATCH_X - 40.0, 296.0, 80.0, 144.0), STEEL, false, 3.0)
-	for bar: int in 3:
-		var y: float = 330.0 + bar * 34.0
-		draw_line(Vector2(HATCH_X - 32.0, y), Vector2(HATCH_X + 32.0, y), Color("#1e2b35"), 3.0)
-	draw_rect(Rect2(HATCH_X - 9.0, 354.0, 18.0, 5.0), SEAM_RED)
+	# The bolt across the hatch: red while it holds, dropped to the sill once it lets go.
+	if bolt_state == &"open" or junction_cleared:
+		draw_rect(Rect2(HATCH_X - 9.0, 432.0, 18.0, 5.0), DIM)
+	else:
+		draw_rect(Rect2(HATCH_X - 9.0, 354.0, 18.0, 5.0), SEAM_RED)
+
+
+## The exit bolt's junction box on the hatch frame: red and dead while the sentry runs the line,
+## amber once it can take the overload, warming to white through the whine, green once popped.
+func _draw_bolt_panel() -> void:
+	var box: Rect2 = Rect2(BOLT_X - 12.0, 318.0, 24.0, 30.0)
+	draw_rect(box, Color("#1b2630"))
+	draw_rect(box, Color("#9fb6c2"), false, 1.5)
+	var light: Color = SEAM_RED
+	if junction_cleared or bolt_state == &"open":
+		light = GREEN
+	elif bolt_state == &"charging":
+		light = AMBER.lerp(Color.WHITE, bolt_charge)
+	elif sentry_down:
+		light = AMBER
+	draw_rect(Rect2(BOLT_X - 7.0, 324.0, 14.0, 5.0), light)
+	draw_line(Vector2(BOLT_X, 334.0), Vector2(BOLT_X, 344.0), Color("#d8e6ec"), 2.0)

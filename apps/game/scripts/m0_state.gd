@@ -140,6 +140,29 @@ func blow_door() -> bool:
 	return true
 
 
+## The hanging tank came down on the sentry; only after the door is down.
+func drop_sentry() -> bool:
+	if chapter_id != "junction" or not door_blown or sentry_down:
+		return false
+	sentry_down = true
+	return true
+
+
+## The exit bolt is popped and the engineer leaves by the hatch; only once the sentry is down.
+func clear_junction() -> bool:
+	if chapter_id != "junction" or not sentry_down or junction_cleared:
+		return false
+	junction_cleared = true
+	return true
+
+
+## Whether WOLF chooses to draw the sentry under the tank when asked: the same rule as the relay
+## contact. He takes the risk only if he was told about the last one; the engineer can always time
+## the drop alone.
+func wolf_will_bait() -> bool:
+	return memory.get("choice_id") == DISCLOSE
+
+
 func checkpoint_callback() -> String:
 	if not checkpoint_reached or memory.is_empty():
 		return ""
