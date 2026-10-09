@@ -490,11 +490,12 @@ html:has(.marketing-shell) {
 .marketing-shell [id="gameplay"],
 .marketing-shell [id="downloads"] { scroll-margin-top: 7rem; }
 
-@media (max-width: 1000px) {
+@media (max-width: 1000px), (orientation: portrait) {
   /*
-   * Narrow and portrait viewports: cap the hero height at 90% of the width so the
-   * cover-fitted key art scales no wider than about 1.6x the viewport, and anchor it
-   * to the left edge, where both characters sit; past 90vw the engineer is cut off.
+   * Narrow and portrait viewports (including 1024px-wide 13-inch iPads in portrait):
+   * cap the hero height at 90% of the width so the cover-fitted key art scales no
+   * wider than about 1.6x the viewport, and anchor it to the left edge, where both
+   * characters sit; past 90vw the engineer is cut off.
    */
   .marketing-hero { min-height: min(clamp(44rem, 88svh, 54rem), 90vw); }
   .marketing-keyart { object-position: 0% 50%; }

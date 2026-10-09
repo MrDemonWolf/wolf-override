@@ -1,9 +1,12 @@
 #!/usr/bin/env bash
-# Guard the static site export in apps/docs/out after `bun run docs:build`.
+# Guard the static site export in apps/docs/out. `bun run docs:build` runs this right
+# after `next build`, so it always checks a fresh export; `bun run docs:check-export`
+# re-runs it on the last build without rebuilding.
 # Fails when any exported page references the /_next/image optimiser (absent on
 # GitHub Pages), lacks the #main-content skip-link target, carries more than one
 # robots meta tag, or when any page or stylesheet references a .ttf font.
 # Usage: scripts/check-docs-export.sh   (DOCS_OUT_DIR overrides the export directory)
+# Fails when apps/docs/out is missing rather than passing silently.
 set -euo pipefail
 
 root="$(cd "$(dirname "$0")/.." && pwd)"

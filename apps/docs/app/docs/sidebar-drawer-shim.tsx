@@ -4,11 +4,14 @@ import { useEffect } from 'react';
 
 const DRAWER_ID = 'nd-sidebar-mobile';
 const TRIGGER_SELECTOR = 'button[aria-label="Open Sidebar"], button[aria-label="Close Sidebar"]';
+const FOCUSABLE_SELECTOR =
+  'a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])';
 
 /**
  * Fumadocs 16.4 renders the mobile sidebar as a plain aside toggled by an "Open Sidebar" button with no
  * aria-expanded, no focus management and no Escape handling. This renders nothing and patches the DOM:
  * it mirrors the drawer state onto the triggers, labels the drawer, moves focus into it when it opens,
+ * keeps Tab and Shift+Tab inside it while it is open (so the aria-modal claim holds for keyboard users),
  * returns focus to the trigger when it closes, and closes it on Escape. Every step is a no-op when the
  * expected elements are absent, so a Fumadocs upgrade that fixes this cannot break the page.
  */
@@ -50,24 +53,41 @@ export default function SidebarDrawerShim() {
       if (trigger && !drawer()?.contains(trigger)) lastTrigger = trigger;
     };
 
-    const closeOnEscape = (event: KeyboardEvent) => {
-      if (event.key !== 'Escape' || event.defaultPrevented) return;
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.defaultPrevented) return;
       const panel = drawer();
       if (panel?.dataset.state !== 'open') return;
-      event.preventDefault();
-      (lastTrigger ?? headerTrigger(panel))?.click();
+      if (event.key === 'Escape') {
+        event.preventDefault();
+        (lastTrigger ?? headerTrigger(panel))?.click();
+        return;
+      }
+      if (event.key !== 'Tab') return;
+      // Wrap Tab inside the open drawer: nothing behind the overlay is reachable while it claims aria-modal.
+      const focusable = Array.from(panel.querySelectorAll<HTMLElement>(FOCUSABLE_SELECTOR)).filter(
+        (element) => element.getClientRects().length > 0,
+      );
+      const first = focusable[0];
+      const last = focusable[focusable.length - 1];
+      if (!first || !last) return;
+      const active = document.activeElement;
+      const inside = active instanceof HTMLElement && panel.contains(active);
+      if (event.shiftKey ? !inside || active === first : !inside || active === last) {
+        event.preventDefault();
+        (event.shiftKey ? last : first).focus({ preventScroll: true });
+      }
     };
 
     const observer = new MutationObserver(sync);
     observer.observe(document.body, { childList: true, subtree: true, attributes: true, attributeFilter: ['data-state'] });
     document.addEventListener('click', rememberTrigger, true);
-    document.addEventListener('keydown', closeOnEscape);
+    document.addEventListener('keydown', onKeyDown);
     sync();
 
     return () => {
       observer.disconnect();
       document.removeEventListener('click', rememberTrigger, true);
-      document.removeEventListener('keydown', closeOnEscape);
+      document.removeEventListener('keydown', onKeyDown);
     };
   }, []);
 

@@ -151,7 +151,9 @@ The root `package.json` defines these docs commands:
 
 - `bun run docs:dev` - Start the local docs site.
 - `bun run docs:check` - Generate MDX and Next types, then check TypeScript.
-- `bun run docs:build` - Build the static public site.
+- `bun run docs:test` - Run the docs unit tests.
+- `bun run docs:build` - Build the static public site, then check the export (no image optimiser, skip-link target, one robots meta, WOFF2-only fonts).
+- `bun run docs:check-export` - Re-run that export check on the last build.
 
 ### Code Quality
 
