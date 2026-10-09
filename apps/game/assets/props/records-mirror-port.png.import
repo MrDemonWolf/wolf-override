@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://cjppj5ag2ggpi"
-path="res://.godot/imported/maintenance-corridor-background-provisional.png-d2944a5ca498fc2eaa000de29fc8334d.ctex"
+uid="uid://b44yyrk0ej5k0"
+path="res://.godot/imported/records-mirror-port.png-92a4a5d371e9ab1db846c04afbd9dd50.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/maintenance-corridor-background-provisional.png"
-dest_files=["res://.godot/imported/maintenance-corridor-background-provisional.png-d2944a5ca498fc2eaa000de29fc8334d.ctex"]
+source_file="res://assets/props/records-mirror-port.png"
+dest_files=["res://.godot/imported/records-mirror-port.png-92a4a5d371e9ab1db846c04afbd9dd50.ctex"]
 
 [params]
 
@@ -23,7 +23,7 @@ compress/rdo_quality_loss=0.0
 compress/hdr_compression=1
 compress/normal_map=0
 compress/channel_pack=0
-mipmaps/generate=false
+mipmaps/generate=true
 mipmaps/limit=-1
 roughness/mode=0
 roughness/src_normal=""

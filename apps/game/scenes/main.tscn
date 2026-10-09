@@ -1,4 +1,4 @@
-[gd_scene load_steps=21 format=3]
+[gd_scene load_steps=26 format=3]
 
 [ext_resource type="Script" path="res://scripts/main.gd" id="1_main"]
 [ext_resource type="Script" path="res://scripts/m0_actor.gd" id="2_actor"]
@@ -6,15 +6,20 @@
 [ext_resource type="Texture2D" path="res://assets/wolf-side-right-provisional.png" id="4_wolf"]
 [ext_resource type="Texture2D" path="res://assets/rowan-side-right-provisional.png" id="5_rowan"]
 [ext_resource type="Texture2D" path="res://assets/title-corridor-key-art-provisional.png" id="6_title_art"]
-[ext_resource type="Texture2D" path="res://assets/maintenance-props-provisional.png" id="7_props"]
+[ext_resource type="Texture2D" path="res://assets/props/corridor-sealed-door.png" id="7_door"]
 [ext_resource type="Texture2D" path="res://assets/director-side-left-provisional.png" id="8_director"]
-[ext_resource type="Texture2D" path="res://assets/records-props-provisional.png" id="9_records_props"]
+[ext_resource type="Texture2D" path="res://assets/props/corridor-purge-display.png" id="9_purge_display"]
 [ext_resource type="Script" path="res://scripts/pause_overlay.gd" id="10_pause_overlay"]
 [ext_resource type="Script" path="res://scripts/game_settings.gd" id="11_settings"]
 [ext_resource type="Script" path="res://scripts/containment_cage.gd" id="12_cage"]
 [ext_resource type="FontVariation" path="res://assets/fonts/Montserrat-Bold.tres" id="13_display"]
 [ext_resource type="Script" path="res://scripts/room_depth.gd" id="14_depth"]
-[ext_resource type="Texture2D" path="res://assets/maintenance-corridor-background-provisional.png" id="15_corridor_art"]
+[ext_resource type="Texture2D" path="res://assets/rooms/corridor-far.png" id="15_corridor_far"]
+[ext_resource type="Texture2D" path="res://assets/rooms/corridor-mid.png" id="17_corridor_mid"]
+[ext_resource type="Texture2D" path="res://assets/rooms/corridor-near.png" id="18_corridor_near"]
+[ext_resource type="Texture2D" path="res://assets/props/corridor-breaker.png" id="19_breaker"]
+[ext_resource type="Texture2D" path="res://assets/props/corridor-coolant-relay.png" id="20_relay"]
+[ext_resource type="Texture2D" path="res://assets/props/corridor-safe-point.png" id="21_safe_point"]
 [ext_resource type="Shader" path="res://assets/shaders/post_grade.gdshader" id="16_grade"]
 
 [sub_resource type="RectangleShape2D" id="FloorShape"]
@@ -37,11 +42,15 @@ script = ExtResource("1_main")
 
 [node name="CorridorDepth" type="Node2D" parent="."]
 script = ExtResource("14_depth")
-painting = ExtResource("15_corridor_art")
+painting = ExtResource("15_corridor_far")
+mid_painting = ExtResource("17_corridor_mid")
+near_painting = ExtResource("18_corridor_near")
+walkway_y = 777.0
+far_drop = 27.0
 base_color = Color(0.0352941, 0.0823529, 0.2, 1)
-lamps = PackedVector2Array(0.345, 0.251, 0.604, 0.251, 0.87, 0.251)
+lamps = PackedVector2Array(0.144, 0.188, 0.5, 0.188, 0.854, 0.188)
 shaft_lamps = PackedInt32Array(1, 2)
-warning_lamps = PackedVector2Array(0.036, 0.35, 0.79, 0.34)
+warning_lamps = PackedVector2Array(0.341, 0.27, 0.659, 0.27)
 
 [node name="IntroCamera" type="Camera2D" parent="."]
 position = Vector2(480, 270)
@@ -70,11 +79,11 @@ color = Color(0, 0, 0, 0)
 
 [node name="DoorArt" type="Sprite2D" parent="Door/Visual"]
 texture_filter = 4
-position = Vector2(28, 66)
-scale = Vector2(0.22, 0.22)
-texture = ExtResource("7_props")
+position = Vector2(28, 61.5)
+scale = Vector2(0.302, 0.302)
+texture = ExtResource("7_door")
 region_enabled = true
-region_rect = Rect2(1086, 0, 543, 724)
+region_rect = Rect2(120, 18, 273, 467)
 
 [node name="Human" type="CharacterBody2D" parent="."]
 position = Vector2(160, 410)
@@ -147,54 +156,54 @@ texture = ExtResource("8_director")
 
 [node name="PurgeTerminalArt" type="Sprite2D" parent="."]
 texture_filter = 4
-position = Vector2(150, 286)
-scale = Vector2(0.2, 0.2)
-texture = ExtResource("9_records_props")
+position = Vector2(158, 294.5)
+scale = Vector2(0.25, 0.25)
+texture = ExtResource("9_purge_display")
 region_enabled = true
-region_rect = Rect2(0, 0, 724, 724)
+region_rect = Rect2(46, 63, 420, 408)
 
 [node name="BreakerArt" type="Sprite2D" parent="."]
 z_index = 1
 texture_filter = 4
-position = Vector2(350, 372)
-scale = Vector2(0.22, 0.22)
-texture = ExtResource("7_props")
+position = Vector2(350, 391.3)
+scale = Vector2(0.225, 0.225)
+texture = ExtResource("19_breaker")
 region_enabled = true
-region_rect = Rect2(0, 0, 543, 724)
+region_rect = Rect2(81, 46, 342, 433)
 
 [node name="RelayArt" type="Sprite2D" parent="."]
 z_index = 1
 texture_filter = 4
-position = Vector2(605, 372)
-scale = Vector2(0.22, 0.22)
-texture = ExtResource("7_props")
+position = Vector2(605, 395.25)
+scale = Vector2(0.221, 0.221)
+texture = ExtResource("20_relay")
 region_enabled = true
-region_rect = Rect2(543, 0, 543, 724)
+region_rect = Rect2(61, 64, 390, 405)
 
 [node name="CheckpointArt" type="Sprite2D" parent="."]
 z_index = 1
 texture_filter = 4
-position = Vector2(876, 372)
-scale = Vector2(0.22, 0.22)
-texture = ExtResource("7_props")
+position = Vector2(876, 383.9)
+scale = Vector2(0.25, 0.25)
+texture = ExtResource("21_safe_point")
 region_enabled = true
-region_rect = Rect2(1629, 0, 543, 724)
+region_rect = Rect2(116, 31, 280, 449)
 
 [node name="BreakerStatusLight" type="ColorRect" parent="."]
 z_index = 2
-offset_left = 341.0
-offset_top = 354.0
-offset_right = 359.0
-offset_bottom = 359.0
+offset_left = 339.0
+offset_top = 358.0
+offset_right = 357.0
+offset_bottom = 363.0
 mouse_filter = 2
 color = Color(0.72, 0.4, 0.17, 1)
 
 [node name="RelayStatusLight" type="ColorRect" parent="."]
 z_index = 2
-offset_left = 596.0
-offset_top = 355.0
-offset_right = 614.0
-offset_bottom = 360.0
+offset_left = 595.0
+offset_top = 361.0
+offset_right = 613.0
+offset_bottom = 366.0
 mouse_filter = 2
 color = Color(0.33, 0.43, 0.48, 1)
 

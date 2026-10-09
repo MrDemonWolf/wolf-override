@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://d4nnv8qujcpiv"
-path="res://.godot/imported/maintenance-props-provisional.png-b50cacb63874b99988f583e4d706c109.ctex"
+uid="uid://cepxe6lk5nbv"
+path="res://.godot/imported/records-mid.png-eb7386d07559f040782ffef96d6539b3.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/maintenance-props-provisional.png"
-dest_files=["res://.godot/imported/maintenance-props-provisional.png-b50cacb63874b99988f583e4d706c109.ctex"]
+source_file="res://assets/rooms/records-mid.png"
+dest_files=["res://.godot/imported/records-mid.png-eb7386d07559f040782ffef96d6539b3.ctex"]
 
 [params]
 
@@ -23,7 +23,7 @@ compress/rdo_quality_loss=0.0
 compress/hdr_compression=1
 compress/normal_map=0
 compress/channel_pack=0
-mipmaps/generate=true
+mipmaps/generate=false
 mipmaps/limit=-1
 roughness/mode=0
 roughness/src_normal=""

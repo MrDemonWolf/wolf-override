@@ -1,13 +1,24 @@
 extends Node2D
 class_name JunctionRoom
-## Blowback: the Service Junction, the third 960 px room after the Records exit. The painted
-## maintenance corridor is reused (tinted) as its provisional backdrop; the pressure line, relief
+## Blowback: the Service Junction, the third 960 px room after the Records exit. The maintenance
+## corridor's layered set and its breaker and sealed-door props are reused, tinted, until the room
+## has its own art; the pressure line, relief
 ## vent, valve wheel, gauge, sealed door, rubble, the overhead arm and its tank, the floor mark,
 ## the ARM PANEL alcove, the exit bolt and the hatch are drawn here from the state the parent
 ## mirrors in (PressureLine, DropArm, SentryBrain), so nothing animates on a timer of its own.
 
-const CORRIDOR_BACKGROUND: Texture2D = preload("res://assets/maintenance-corridor-background-provisional.png")
-const MAINTENANCE_PROPS: Texture2D = preload("res://assets/maintenance-props-provisional.png")
+const CORRIDOR_FAR: Texture2D = preload("res://assets/rooms/corridor-far.png")
+const CORRIDOR_MID: Texture2D = preload("res://assets/rooms/corridor-mid.png")
+const CORRIDOR_NEAR: Texture2D = preload("res://assets/rooms/corridor-near.png")
+const BREAKER_PROP: Texture2D = preload("res://assets/props/corridor-breaker.png")
+const DOOR_PROP: Texture2D = preload("res://assets/props/corridor-sealed-door.png")
+## The corridor's prop cuts and scales (see main.tscn), so both rooms show the same machines.
+const BREAKER_REGION: Rect2 = Rect2(81.0, 46.0, 342.0, 433.0)
+const BREAKER_SCALE: float = 0.225
+const DOOR_REGION: Rect2 = Rect2(120.0, 18.0, 273.0, 467.0)
+const DOOR_SCALE: float = 0.302
+## The breaker's status light rides on the amber bar painted at the top of its cabinet.
+const BREAKER_LIGHT: Rect2 = Rect2(BREAKER_X - 11.0, 358.0, 18.0, 5.0)
 ## Station centres, left to right.
 const ENTRY_X: float = 80.0
 const BREAKER_X: float = 200.0
@@ -62,9 +73,9 @@ const VENT_LABEL_FONT_SIZE: int = 11
 ## The gauge dial sits above the pipe run (y 292), clear of the VALVE label below it.
 const GAUGE_CENTRE: Vector2 = Vector2(VALVE_X - 48.0, 266.0)
 
-## Lamp centres as fractions of the reused corridor painting.
-var lamps: PackedVector2Array = PackedVector2Array([Vector2(0.345, 0.251), Vector2(0.604, 0.251), Vector2(0.87, 0.251)])
-var warning_lamps: PackedVector2Array = PackedVector2Array([Vector2(0.036, 0.35), Vector2(0.79, 0.34)])
+## Lamp and lockdown-beacon centres as fractions of the reused corridor far plate (as in main.tscn).
+var lamps: PackedVector2Array = PackedVector2Array([Vector2(0.144, 0.188), Vector2(0.5, 0.188), Vector2(0.854, 0.188)])
+var warning_lamps: PackedVector2Array = PackedVector2Array([Vector2(0.341, 0.27), Vector2(0.659, 0.27)])
 
 # Mirrored from the parent's state and PressureLine; the parent calls sync_line()/refresh_state().
 var line_state: StringName = &"idle"
@@ -166,20 +177,27 @@ class TankArt:
 func _ready() -> void:
 	depth = RoomDepth.new()
 	depth.name = "Depth"
-	depth.painting = CORRIDOR_BACKGROUND
+	depth.painting = CORRIDOR_FAR
+	depth.mid_painting = CORRIDOR_MID
+	depth.near_painting = CORRIDOR_NEAR
+	depth.walkway_y = 777.0
+	depth.far_drop = 27.0
+	# The reused corridor set is pulled warmer and darker so the junction reads as its own place.
+	depth.plate_tint = Color("#b7a79c")
 	depth.base_color = Color("#0a0e18")
 	depth.lamps = lamps
 	depth.lamp_color = Color("#ffcf9a")
 	depth.shaft_lamps = PackedInt32Array([0, 2])
 	depth.warning_lamps = warning_lamps
 	add_child(depth)
-	# The reused corridor painting is pulled warmer and darker so the junction reads as its own place.
-	depth.backdrop.modulate = Color("#b7a79c")
-	breaker_art = _add_prop("BreakerArt", BREAKER_X, 0.0)
+	breaker_art = RoomDepth.make_prop("BreakerArt", BREAKER_PROP, BREAKER_REGION, BREAKER_SCALE, BREAKER_X)
+	# One step under this node's own drawing, so the status light drawn in _draw() sits on the art.
+	breaker_art.z_index = -1
+	add_child(breaker_art)
 	floor_reflections.append(FloorReflection.attach(breaker_art))
 	breaker_glow = RoomDepth.make_glow(AMBER, Vector2(64.0, 30.0), 0.5)
 	breaker_glow.name = "BreakerGlow"
-	breaker_glow.position = Vector2(BREAKER_X, 356.5)
+	breaker_glow.position = BREAKER_LIGHT.get_center()
 	breaker_glow.z_index = 1
 	add_child(breaker_glow)
 	_build_door()
@@ -204,20 +222,6 @@ func _ready() -> void:
 	refresh_state()
 
 
-func _add_prop(prop_name: String, center_x: float, source_x: float) -> Sprite2D:
-	var sprite: Sprite2D = Sprite2D.new()
-	sprite.name = prop_name
-	sprite.texture = MAINTENANCE_PROPS
-	sprite.texture_filter = CanvasItem.TEXTURE_FILTER_LINEAR_WITH_MIPMAPS
-	sprite.region_enabled = true
-	sprite.region_rect = Rect2(source_x, 0.0, 543.0, 724.0)
-	sprite.position = Vector2(center_x, 372.0)
-	sprite.scale = Vector2(0.22, 0.22)
-	sprite.z_index = 1
-	add_child(sprite)
-	return sprite
-
-
 ## The sealed door: the corridor's seal art over a 56x132 body on the floor layer, pivoted at the
 ## floor so the blast can crush it downward.
 func _build_door() -> void:
@@ -239,14 +243,7 @@ func _build_door() -> void:
 	door_visual.position = Vector2(DOOR_X, FLOOR_Y)
 	door_visual.z_index = 1
 	add_child(door_visual)
-	door_art = Sprite2D.new()
-	door_art.name = "DoorArt"
-	door_art.texture = MAINTENANCE_PROPS
-	door_art.texture_filter = CanvasItem.TEXTURE_FILTER_LINEAR_WITH_MIPMAPS
-	door_art.region_enabled = true
-	door_art.region_rect = Rect2(1086.0, 0.0, 543.0, 724.0)
-	door_art.position = Vector2(0.0, -66.0)
-	door_art.scale = Vector2(0.22, 0.22)
+	door_art = RoomDepth.make_prop("DoorArt", DOOR_PROP, DOOR_REGION, DOOR_SCALE, 0.0, 0.0)
 	door_visual.add_child(door_art)
 	floor_reflections.append(FloorReflection.attach(door_art))
 	seam_glow = RoomDepth.make_glow(AMBER, Vector2(70.0, 150.0), 0.0)
@@ -581,7 +578,7 @@ func reset_transient() -> void:
 
 
 func _draw() -> void:
-	# The corridor painting itself is the Depth child's parallax backdrop.
+	# The reused corridor plates are the Depth child's layers.
 	_draw_entry_hatch()
 	_draw_pressure_line()
 	_draw_vent()
@@ -649,7 +646,7 @@ func _draw_gauge_and_lights() -> void:
 
 
 func _draw_breaker_light() -> void:
-	draw_rect(Rect2(BREAKER_X - 9.0, 354.0, 18.0, 5.0), _breaker_light_color())
+	draw_rect(BREAKER_LIGHT, _breaker_light_color())
 
 
 func _breaker_light_color() -> Color:

@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://baubwu8s7ugcy"
-path="res://.godot/imported/records-props-provisional.png-578d06287395918a03acc4e35ce45620.ctex"
+uid="uid://bag2jw2mle0co"
+path="res://.godot/imported/records-purge-queue.png-a23d549ea1397c6dc37654b93603c7c4.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/records-props-provisional.png"
-dest_files=["res://.godot/imported/records-props-provisional.png-578d06287395918a03acc4e35ce45620.ctex"]
+source_file="res://assets/props/records-purge-queue.png"
+dest_files=["res://.godot/imported/records-purge-queue.png-a23d549ea1397c6dc37654b93603c7c4.ctex"]
 
 [params]
 

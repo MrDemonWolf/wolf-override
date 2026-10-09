@@ -41,12 +41,6 @@ const LANE_CHOICE_TEXT: Array[String] = ["Draw it under the arm if you can stay 
 			_apply_effects()
 ## Leaving the app or losing window focus mid-play pauses the game; capture and review drivers switch this off.
 @export var auto_pause_on_focus_loss: bool = true
-## Trial corridor built from three generated plates (far, mid, near) instead of the single painting, for comparison stills.
-@export var corridor_layers_trial: bool = false:
-	set(value):
-		corridor_layers_trial = value
-		if is_node_ready():
-			_apply_corridor_variant()
 
 @onready var corridor_depth: RoomDepth = $CorridorDepth
 @onready var post_grade: ColorRect = $PostProcess/Grade
@@ -182,10 +176,6 @@ var save_error_context: String = ""
 var floor_reflections: Array[FloorReflection] = []
 var breaker_status_glow: Sprite2D
 var relay_status_glow: Sprite2D
-## The corridor plates and lamps the scene ships with, restored when the layer trial is switched off.
-var corridor_defaults: Dictionary = {}
-## Ceiling lamp centres of the trial far plate, as fractions of that plate.
-var trial_lamps: PackedVector2Array = PackedVector2Array([Vector2(0.143, 0.188), Vector2(0.507, 0.188), Vector2(0.857, 0.188)])
 
 const WOLF_SPRITE_REST: Vector2 = Vector2(0.0, -15.0)
 const GAMEPLAY_ZOOM: float = 1.35
@@ -205,12 +195,6 @@ const CHAPTER_CLOSE_CAMERA: Vector2 = Vector2(960.0 - 480.0 / CHAPTER_CLOSE_ZOOM
 ## Menu cards fade and slide in over this long; short enough never to hold up input or players who want little motion.
 const MENU_REVEAL_SECONDS: float = 0.12
 const MENU_REVEAL_OFFSET: Vector2 = Vector2(0.0, 10.0)
-## Trial plates load only when the trial is on, so the default build never holds them in memory.
-const TRIAL_FAR_PATH: String = "res://assets/trial/corridor-far-trial.png"
-const TRIAL_MID_PATH: String = "res://assets/trial/corridor-mid-trial.png"
-const TRIAL_NEAR_PATH: String = "res://assets/trial/corridor-near-trial.png"
-## The near plate's crate block would hide the safe point, so only the pipe run to its left is used.
-const TRIAL_NEAR_REGION: Rect2 = Rect2(0.0, 0.0, 1530.0, 1080.0)
 
 
 func _ready() -> void:
@@ -243,15 +227,12 @@ func _ready() -> void:
 	human.z_index = ACTOR_Z
 	wolf.z_index = ACTOR_Z
 	_setup_particles()
-	corridor_defaults = {"painting": corridor_depth.painting, "lamps": corridor_depth.lamps}
 	for grounded: Sprite2D in [human.body_sprite, wolf.body_sprite, intro_director, breaker_art, relay_art, checkpoint_art, door_art]:
 		floor_reflections.append(FloorReflection.attach(grounded))
 	floor_reflections.append_array(records_room.floor_reflections)
 	floor_reflections.append_array(junction_room.floor_reflections)
 	breaker_status_glow = _attach_status_glow(breaker_status_light)
 	relay_status_glow = _attach_status_glow(relay_status_light)
-	if corridor_layers_trial:
-		_apply_corridor_variant()
 	_apply_effects()
 	_sync_scene()
 	_refresh_ui()
@@ -328,12 +309,12 @@ func _hide_changelog() -> void:
 
 
 func _draw() -> void:
-	# The corridor painting itself is CorridorDepth's parallax backdrop.
+	# The corridor's plates are CorridorDepth's layers.
 	if state.door_open and state.chapter_id == "lockdown":
 		draw_line(Vector2(801, 434), Vector2(844, 434), Color("#70d9a7"), 4.0)
 
 
-## Every depth effect hangs off this one switch; the rooms keep their plain paintings when it is off.
+## Every depth effect hangs off this one switch; off, the rooms keep their far and mid plates, unmoving.
 func _apply_effects() -> void:
 	impact.enabled = effects_enabled
 	sfx_bank.enabled = effects_enabled
@@ -346,22 +327,6 @@ func _apply_effects() -> void:
 	# The junction's door seam glow stays: it is the pressure readout, not dressing.
 	for glow: Sprite2D in [breaker_status_glow, relay_status_glow, records_room.purge_glow, records_room.mirror_glow, junction_room.breaker_glow]:
 		glow.visible = effects_enabled
-
-
-func _apply_corridor_variant() -> void:
-	if corridor_layers_trial:
-		corridor_depth.painting = load(TRIAL_FAR_PATH) as Texture2D
-		corridor_depth.mid_painting = load(TRIAL_MID_PATH) as Texture2D
-		corridor_depth.near_painting = load(TRIAL_NEAR_PATH) as Texture2D
-		corridor_depth.near_region = TRIAL_NEAR_REGION
-		corridor_depth.lamps = trial_lamps
-	else:
-		corridor_depth.painting = corridor_defaults["painting"] as Texture2D
-		corridor_depth.mid_painting = null
-		corridor_depth.near_painting = null
-		corridor_depth.near_region = Rect2()
-		corridor_depth.lamps = corridor_defaults["lamps"] as PackedVector2Array
-	corridor_depth.rebuild()
 
 
 ## The impact kit and the generated sound bank. The bank is built after Settings so its players
@@ -1213,7 +1178,7 @@ func _interact_records(x: float) -> void:
 			impact.burst(exit_sparks)
 			chapter_tween = create_tween()
 			_frame_chapter_close()
-			chapter_tween.parallel().tween_property(records_room.exit_art, "position:y", 245.0, 0.5)
+			chapter_tween.parallel().tween_property(records_room.exit_art, "position:y", RecordsRoom.EXIT_REST.y - 130.0, 0.5)
 			chapter_tween.parallel().tween_property(records_room.exit_art, "modulate:a", 0.0, 0.5)
 			chapter_tween.tween_callback(records_room.exit_art.hide)
 			_save_progress()
@@ -1894,7 +1859,7 @@ func _sync_records_room(animate_exit: bool = false) -> void:
 	records_room.purge_trace_preserved = state.purge_trace_preserved
 	records_room.mirror_trace_preserved = state.mirror_trace_preserved
 	records_room.chapter_complete = state.chapter_complete
-	records_room.exit_art.position = Vector2(830.0, 375.0)
+	records_room.exit_art.position = RecordsRoom.EXIT_REST
 	records_room.exit_art.modulate = Color.WHITE
 	records_room.exit_art.visible = not state.chapter_complete or animate_exit
 	records_room.refresh_state()

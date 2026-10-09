@@ -1,40 +1,63 @@
 class_name RoomDepth
 extends Node2D
-## Depth and lighting that every room shares, built over its existing painting with built-in nodes:
-## a parallax backdrop drawn a little larger than the room, additive glows and drifting light shafts
-## over the painted lamps, wall haze, dust motes and a near foreground that scrolls faster than the
-## floor. Source pixels are never edited. A room passes its painting and lamp positions; Main switches
-## the whole pass with [member effects_enabled].
+## A room built from three painted plates that share one 16:9 frame, plus the light every room
+## shares, all with built-in nodes:
+## - far: the back wall and floor, a Parallax2D that lags the camera, with additive glows and
+##   drifting light shafts over its painted lamps, procedurally drawn lockdown beacons, wall haze
+##   and dust;
+## - mid: the play plane, drawn 1:1 with the room so its painted walkway is the floor (y 440) the
+##   actors and stations stand on;
+## - near: the plate's edge pieces only (a left strip and the same strip mirrored on the right),
+##   drawn over the actors and scrolling faster than the floor.
+## Source pixels are never edited. Main switches the depth pass with [member effects_enabled]: off,
+## every plate moves with the floor and the near pieces, glows, haze and dust are hidden.
 
-const ROOM_RECT: Rect2 = Rect2(0.0, 60.0, 960.0, 540.0)
-## The backdrop is drawn this much larger so its edges stay hidden while it lags the camera.
-const BACKDROP_OVERSCAN: float = 1.06
+const ROOM_WIDTH: float = 960.0
+const FLOOR_Y: float = 440.0
 const BACKDROP_SCROLL: Vector2 = Vector2(0.9, 1.0)
-const MID_SCROLL: Vector2 = Vector2(0.95, 1.0)
-const NEAR_SCROLL: Vector2 = Vector2(1.1, 1.0)
+const NEAR_SCROLL: Vector2 = Vector2(1.15, 1.0)
 const Z_BACKDROP: int = -4
+const Z_MID: int = -3
 const Z_ATMOSPHERE: int = -3
 const Z_NEAR: int = 3
+## The near edge strips are anchored past the room edges so their outer edges stay off screen
+## through every framing: Parallax2D shifts a layer by (camera x - 480) * (1 - scroll), which at
+## 1.15 is up to 19 px at play (zoom 1.35), 32 px in the opening (zoom 1.8) and 26 px at the
+## chapter-close shot (zoom 1.55), plus up to 10 px of camera shake. Anchored this far out, the
+## pipe column at each end of the play view only grazes an engineer standing at the 40 / 920 clamp.
+const NEAR_LEFT_X: float = -56.0
+const NEAR_RIGHT_X: float = ROOM_WIDTH + 56.0
+## Mirrored slivers of the mid plate past each room edge, so camera shake at the end of the
+## camera's travel shows a continuation of the plate instead of its cut edge.
+const MID_BLEED: float = 16.0
 const FAR_DUST_COUNT: int = 30
 const NEAR_DUST_COUNT: int = 12
 const GLOW_SIZE: Vector2 = Vector2(250.0, 96.0)
 const SHAFT_SIZE: Vector2 = Vector2(54.0, 240.0)
-const NEAR_DARK: Color = Color("#03070c")
 
+## The far plate: back wall, painted lamps and wet floor (opaque).
 @export var painting: Texture2D
+## The play plane: pillars, pipes and machines on transparency.
+@export var mid_painting: Texture2D
+## Foreground pieces on transparency; only [member near_strip_width] source pixels from its left
+## edge are used, on both sides of the room.
+@export var near_painting: Texture2D
+## The source row where the mid plate's painted walkway meets the floor; it is drawn at FLOOR_Y.
+@export var walkway_y: float = 777.0
+## How far the far plate sits below the mid plate, so its painted ceiling lamps stay in the play view.
+@export var far_drop: float = 0.0
+@export var near_strip_width: float = 512.0
+## Multiplied into every plate, so a room can reuse another room's set in its own light.
+@export var plate_tint: Color = Color.WHITE
 @export var base_color: Color = Color("#091533")
-## Ceiling lamp centres as fractions of the painting, so the glows ride on the parallax backdrop.
+## Ceiling lamp centres as fractions of the far plate, so the glows ride on its parallax.
 @export var lamps: PackedVector2Array = PackedVector2Array()
 @export var lamp_color: Color = Color("#9fe4ff")
 ## Lamps (by index into [member lamps]) that also cast a drifting light shaft.
 @export var shaft_lamps: PackedInt32Array = PackedInt32Array()
+## Lockdown beacons as fractions of the far plate: a small drawn lamp housing with a pulsing glow.
 @export var warning_lamps: PackedVector2Array = PackedVector2Array()
 @export var warning_color: Color = Color("#ff4a46")
-## Trial plates: a mid plate that moves almost with the floor and a near plate drawn in front of the
-## actors. Leave empty to draw the built-in near silhouettes instead.
-@export var mid_painting: Texture2D
-@export var near_painting: Texture2D
-@export var near_region: Rect2 = Rect2()
 
 var effects_enabled: bool = true:
 	set(value):
@@ -44,14 +67,27 @@ var effects_enabled: bool = true:
 
 var backdrop_layer: Parallax2D
 var backdrop: Sprite2D
-var mid_layer: Parallax2D
+var mid_layer: Node2D
 var near_layer: Parallax2D
 var lamp_glows: Array[Sprite2D] = []
+var beacons: Array[Node2D] = []
 var haze: Sprite2D
 var far_dust: CPUParticles2D
 var near_dust: CPUParticles2D
 var _built: Array[Node] = []
 var _tweens: Array[Tween] = []
+
+
+## A lockdown beacon: a dark housing on a short bracket with a red lens.
+class Beacon:
+	extends Node2D
+	var lens: Color = Color("#ff4a46")
+
+	func _draw() -> void:
+		draw_line(Vector2(0.0, -9.0), Vector2(0.0, -4.0), Color("#1b2630"), 2.0)
+		draw_rect(Rect2(-7.0, -4.0, 14.0, 9.0), Color("#141c24"))
+		draw_rect(Rect2(-7.0, -4.0, 14.0, 9.0), Color("#3e4f5a"), false, 1.0)
+		draw_rect(Rect2(-5.0, -2.0, 10.0, 5.0), lens)
 
 
 func _ready() -> void:
@@ -71,11 +107,9 @@ func rebuild() -> void:
 		node.queue_free()
 	_built.clear()
 	lamp_glows.clear()
+	beacons.clear()
 	backdrop_layer = _add_parallax("Backdrop", BACKDROP_SCROLL, Z_BACKDROP)
-	backdrop = Sprite2D.new()
-	backdrop.name = "Painting"
-	backdrop.centered = false
-	backdrop.texture = painting
+	backdrop = _plate("Painting", painting)
 	backdrop_layer.add_child(backdrop)
 	haze = Sprite2D.new()
 	haze.name = "Haze"
@@ -99,67 +133,81 @@ func rebuild() -> void:
 			lamp_glows.append(shaft)
 			_drift(shaft, 0.6 * index)
 	for index: int in warning_lamps.size():
+		var beacon: Beacon = Beacon.new()
+		beacon.name = "Beacon%d" % index
+		beacon.lens = warning_color
+		beacon.z_index = 1
+		backdrop_layer.add_child(beacon)
+		beacons.append(beacon)
 		var glow: Sprite2D = make_glow(warning_color, Vector2(90.0, 90.0), 0.4, additive)
 		glow.name = "WarningGlow%d" % index
-		glow.z_index = 1
+		glow.z_index = 2
 		backdrop_layer.add_child(glow)
 		lamp_glows.append(glow)
 		_pulse(glow, 0.4, 0.5 * index)
+	mid_layer = Node2D.new()
+	mid_layer.name = "MidPlate"
+	mid_layer.z_as_relative = false
+	mid_layer.z_index = Z_MID
+	add_child(mid_layer)
+	_built.append(mid_layer)
+	mid_layer.add_child(_plate("Painting", mid_painting))
 	if mid_painting != null:
-		mid_layer = _add_parallax("MidPlate", MID_SCROLL, Z_ATMOSPHERE)
-		var mid: Sprite2D = Sprite2D.new()
-		mid.name = "Painting"
-		mid.centered = false
-		mid.texture = mid_painting
-		mid_layer.add_child(mid)
-	else:
-		mid_layer = null
+		var bleed_source: float = MID_BLEED / _plate_scale()
+		var width: float = float(mid_painting.get_width())
+		mid_layer.add_child(_plate("LeftBleed", mid_painting, Rect2(0.0, 0.0, bleed_source, mid_painting.get_height()), true))
+		mid_layer.add_child(_plate("RightBleed", mid_painting, Rect2(width - bleed_source, 0.0, bleed_source, mid_painting.get_height()), true))
 	far_dust = _make_dust("FarDust", FAR_DUST_COUNT, 0.18, 0.4, Z_ATMOSPHERE)
 	near_layer = _add_parallax("Near", NEAR_SCROLL, Z_NEAR)
 	if near_painting != null:
-		var near: Sprite2D = Sprite2D.new()
-		near.name = "Plate"
-		near.centered = false
-		near.texture = near_painting
-		near.region_enabled = near_region.has_area()
-		near.region_rect = near_region
-		near_layer.add_child(near)
-	else:
-		_add_silhouettes()
+		var strip: Rect2 = Rect2(0.0, 0.0, minf(near_strip_width, near_painting.get_width()), near_painting.get_height())
+		near_layer.add_child(_plate("LeftEdge", near_painting, strip))
+		near_layer.add_child(_plate("RightEdge", near_painting, strip, true))
 	near_dust = _make_dust("NearDust", NEAR_DUST_COUNT, 0.35, 0.65, Z_NEAR)
 	_apply()
 
 
 func _apply() -> void:
 	var on: bool = effects_enabled
-	var rect: Rect2 = _backdrop_rect()
+	var scale_factor: float = _plate_scale()
+	var mid_top: float = FLOOR_Y - walkway_y * scale_factor
+	var far: Rect2 = far_rect()
 	backdrop_layer.scroll_scale = BACKDROP_SCROLL if on else Vector2.ONE
-	backdrop.position = rect.position
-	backdrop.scale = rect.size / painting.get_size() if painting != null else Vector2.ONE
+	backdrop.position = far.position
+	backdrop.scale = Vector2.ONE * scale_factor
 	haze.visible = on
-	haze.position = Vector2(rect.position.x, rect.position.y + rect.size.y * 0.29)
-	haze.scale = Vector2(rect.size.x, rect.size.y * 0.56) / haze.texture.get_size()
+	haze.position = Vector2(far.position.x, far.position.y + far.size.y * 0.29)
+	haze.scale = Vector2(far.size.x, far.size.y * 0.56) / haze.texture.get_size()
 	for index: int in lamps.size():
 		var glow: Sprite2D = backdrop_layer.get_node("LampGlow%d" % index) as Sprite2D
-		glow.position = rect.position + lamps[index] * rect.size
+		glow.position = far.position + lamps[index] * far.size
 		var shaft: Sprite2D = backdrop_layer.get_node_or_null("LightShaft%d" % index) as Sprite2D
 		if shaft != null:
 			shaft.position = glow.position + Vector2(0.0, 6.0)
 	for index: int in warning_lamps.size():
-		(backdrop_layer.get_node("WarningGlow%d" % index) as Sprite2D).position = rect.position + warning_lamps[index] * rect.size
+		var at: Vector2 = far.position + warning_lamps[index] * far.size
+		beacons[index].position = at
+		(backdrop_layer.get_node("WarningGlow%d" % index) as Sprite2D).position = at
 	for glow: Sprite2D in lamp_glows:
 		glow.visible = on
-	if mid_layer != null:
-		mid_layer.visible = on
-		mid_layer.scroll_scale = MID_SCROLL if on else Vector2.ONE
-		var mid: Sprite2D = mid_layer.get_node("Painting") as Sprite2D
-		mid.position = rect.position
-		mid.scale = rect.size / mid_painting.get_size()
+	var mid: Sprite2D = mid_layer.get_node("Painting") as Sprite2D
+	mid.position = Vector2(0.0, mid_top)
+	mid.scale = Vector2.ONE * scale_factor
+	var left_bleed: Sprite2D = mid_layer.get_node_or_null("LeftBleed") as Sprite2D
+	if left_bleed != null:
+		var right_bleed: Sprite2D = mid_layer.get_node("RightBleed") as Sprite2D
+		left_bleed.scale = Vector2.ONE * scale_factor
+		left_bleed.position = Vector2(-MID_BLEED, mid_top)
+		right_bleed.scale = Vector2.ONE * scale_factor
+		right_bleed.position = Vector2(ROOM_WIDTH, mid_top)
 	near_layer.visible = on
-	var plate: Sprite2D = near_layer.get_node_or_null("Plate") as Sprite2D
-	if plate != null:
-		plate.position = rect.position
-		plate.scale = rect.size / near_painting.get_size()
+	var left_edge: Sprite2D = near_layer.get_node_or_null("LeftEdge") as Sprite2D
+	if left_edge != null:
+		var right_edge: Sprite2D = near_layer.get_node("RightEdge") as Sprite2D
+		left_edge.scale = Vector2.ONE * scale_factor
+		left_edge.position = Vector2(NEAR_LEFT_X, mid_top)
+		right_edge.scale = left_edge.scale
+		right_edge.position = Vector2(NEAR_RIGHT_X - right_edge.region_rect.size.x * scale_factor, mid_top)
 	for dust: CPUParticles2D in [far_dust, near_dust]:
 		dust.visible = on
 		dust.emitting = on
@@ -167,14 +215,33 @@ func _apply() -> void:
 
 
 func _draw() -> void:
-	draw_rect(Rect2(0.0, 0.0, 960.0, 680.0), base_color)
+	draw_rect(Rect2(-60.0, 0.0, ROOM_WIDTH + 120.0, 680.0), base_color)
 
 
-func _backdrop_rect() -> Rect2:
-	if not effects_enabled:
-		return ROOM_RECT
-	var size: Vector2 = ROOM_RECT.size * BACKDROP_OVERSCAN
-	return Rect2(ROOM_RECT.get_center() - size * 0.5, size)
+## Where the far plate is drawn, in the backdrop layer's space (it lines up with the room when the
+## camera is centred on the room).
+func far_rect() -> Rect2:
+	var scale_factor: float = _plate_scale()
+	var size: Vector2 = painting.get_size() * scale_factor if painting != null else Vector2(ROOM_WIDTH, 540.0)
+	return Rect2(Vector2(0.0, FLOOR_Y - walkway_y * scale_factor + far_drop), size)
+
+
+## Every plate is painted at the same size and drawn exactly as wide as the room.
+func _plate_scale() -> float:
+	var reference: Texture2D = mid_painting if mid_painting != null else painting
+	return ROOM_WIDTH / float(reference.get_width()) if reference != null else 1.0
+
+
+func _plate(plate_name: String, texture: Texture2D, region: Rect2 = Rect2(), mirrored: bool = false) -> Sprite2D:
+	var plate: Sprite2D = Sprite2D.new()
+	plate.name = plate_name
+	plate.centered = false
+	plate.texture = texture
+	plate.modulate = plate_tint
+	plate.region_enabled = region.has_area()
+	plate.region_rect = region
+	plate.flip_h = mirrored
+	return plate
 
 
 func _add_parallax(layer_name: String, scroll: Vector2, z: int) -> Parallax2D:
@@ -186,33 +253,6 @@ func _add_parallax(layer_name: String, scroll: Vector2, z: int) -> Parallax2D:
 	add_child(layer)
 	_built.append(layer)
 	return layer
-
-
-## Soft near-edge pillars and a floor-front shade, drawn when a room has no near plate.
-func _add_silhouettes() -> void:
-	var edge: GradientTexture2D = _linear_texture([0.0, 0.55, 1.0], [Color(NEAR_DARK, 0.96), Color(NEAR_DARK, 0.45), Color(NEAR_DARK, 0.0)], true)
-	var left: Sprite2D = Sprite2D.new()
-	left.name = "LeftPillar"
-	left.centered = false
-	left.texture = edge
-	left.position = Vector2(-80.0, 0.0)
-	left.scale = Vector2(112.0, 680.0) / edge.get_size()
-	near_layer.add_child(left)
-	var right: Sprite2D = Sprite2D.new()
-	right.name = "RightPillar"
-	right.centered = false
-	right.texture = edge
-	right.flip_h = true
-	right.position = Vector2(928.0, 0.0)
-	right.scale = left.scale
-	near_layer.add_child(right)
-	var front: Sprite2D = Sprite2D.new()
-	front.name = "FloorFront"
-	front.centered = false
-	front.texture = _linear_texture([0.0, 1.0], [Color(NEAR_DARK, 0.0), Color(NEAR_DARK, 0.8)])
-	front.position = Vector2(-80.0, 452.0)
-	front.scale = Vector2(1120.0, 160.0) / front.texture.get_size()
-	near_layer.add_child(front)
 
 
 func _make_dust(dust_name: String, count: int, scale_min: float, scale_max: float, z: int) -> CPUParticles2D:
@@ -257,6 +297,21 @@ func _make_shaft(additive: CanvasItemMaterial) -> Sprite2D:
 	shaft.z_index = 1
 	shaft.skew = 0.04
 	return shaft
+
+
+## A station prop cut to [param region] of its own image (its painted outline, so the floor
+## reflection mirrors from its real base), [param prop_scale]d, centred on [param center_x] with its
+## base on [param base_y].
+static func make_prop(prop_name: String, texture: Texture2D, region: Rect2, prop_scale: float, center_x: float, base_y: float = FLOOR_Y) -> Sprite2D:
+	var sprite: Sprite2D = Sprite2D.new()
+	sprite.name = prop_name
+	sprite.texture = texture
+	sprite.texture_filter = CanvasItem.TEXTURE_FILTER_LINEAR_WITH_MIPMAPS
+	sprite.region_enabled = true
+	sprite.region_rect = region
+	sprite.scale = Vector2.ONE * prop_scale
+	sprite.position = Vector2(center_x, base_y - region.size.y * prop_scale * 0.5)
+	return sprite
 
 
 ## An additive radial glow; also used by rooms for their station status lights.

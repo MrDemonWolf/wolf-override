@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "design_revision": 4,
+  "design_revision": 5,
   "assets": [
     {
       "asset_id": "wolf-override-logo-mark",
@@ -16,32 +16,32 @@
     {
       "asset_id": "wolf-side-right-provisional",
       "path": "apps/game/assets/wolf-side-right-provisional.png",
-      "source_or_tool": "ChatGPT Create image via Chrome in the MDW WOLF//OVERRIDE [Game] project; ImageMagick used for transparent canvas extension",
+      "source_or_tool": "ChatGPT Create image via Chrome in the MDW WOLF//OVERRIDE [Game] project; ImageMagick used for transparent canvas extension; redrawn 2026-10-08 with the Codex built-in image_gen tool (edit mode)",
       "source_reference": "Create wolf concept sheet chat in the private game project, September 28, 2026; revised game-scale prompt and conversation URL retained in ignored art notes",
       "terms_reference": "https://openai.com/policies/terms-of-use/",
       "rights_review_status": "Provisional AI-assisted character art, human reviewed. Final commercial asset-rights review remains open; not covered by the code/docs GPL license.",
-      "modifications": "Selected the second, higher-contrast 1774x887 RGBA generation with transparency; extended the canvas by 64 transparent pixels on all sides to 1902x1015 with ImageMagick, preserving every original pixel exactly. Displayed as a scaled static side-view Sprite2D and flipped when WOLF moves left.",
-      "implementation_status": "Provisional WOLF sprite used in the corridor and Records Access; animation and final art direction pending. Since 2026-10-08 the Godot import generates mipmaps and the sprite samples them (linear-with-mipmaps filter), so the heavily downscaled sheet no longer aliases; source pixels remain unchanged."
+      "modifications": "Selected the second, higher-contrast 1774x887 RGBA generation with transparency; extended the canvas by 64 transparent pixels on all sides to 1902x1015 with ImageMagick, preserving every original pixel of that generation exactly. Displayed as a scaled static side-view Sprite2D and flipped when WOLF moves left. 2026-10-08: redrawn with the Codex built-in image_gen tool in edit mode using this file as the reference, on the same 1902x1015 canvas with transparency; Approved for integration by Nathanial Henniges on 2026-10-08 from a review sheet. The redraw replaced this file in place on 2026-10-09 (same path and import settings, so the in-game scale and feet baseline are unchanged).",
+      "implementation_status": "Provisional WOLF sprite used in the corridor and Records Access; animation and final art direction pending. Since 2026-10-08 the Godot import generates mipmaps and the sprite samples them (linear-with-mipmaps filter), so the heavily downscaled sheet no longer aliases; the 2026-10-08 redraw is shown unedited."
     },
     {
       "asset_id": "rowan-side-right-provisional",
       "path": "apps/game/assets/rowan-side-right-provisional.png",
-      "source_or_tool": "ChatGPT Create image via Chrome in the MDW WOLF//OVERRIDE [Game] project",
+      "source_or_tool": "ChatGPT Create image via Chrome in the MDW WOLF//OVERRIDE [Game] project; redrawn 2026-10-08 with the Codex built-in image_gen tool (edit mode)",
       "source_reference": "Create wolf concept sheet chat in the private game project, September 28, 2026; edited Rowan design and conversation URL retained in ignored art notes",
       "terms_reference": "https://openai.com/policies/terms-of-use/",
       "rights_review_status": "Provisional AI-assisted appearance option, human reviewed. Character appearance and final commercial asset-rights review remain open; not covered by the code/docs GPL license.",
-      "modifications": "Selected 1024x1536 RGBA edit of the masculine-presenting Rowan draft: cohesive deep-red hooded field jacket with charcoal trousers and boots, replacing the mixed yellow and silver details. Transparent original is displayed as a scaled static side-view Sprite2D and flipped when Rowan moves left. No pixel edits.",
-      "implementation_status": "Provisional Rowan appearance used in the corridor and Records Access; animation and appearance options pending. Since 2026-10-08 the Godot import generates mipmaps and the sprite samples them (linear-with-mipmaps filter), so the heavily downscaled sheet no longer aliases; source pixels remain unchanged."
+      "modifications": "Selected 1024x1536 RGBA edit of the masculine-presenting Rowan draft: cohesive deep-red hooded field jacket with charcoal trousers and boots, replacing the mixed yellow and silver details. Transparent original is displayed as a scaled static side-view Sprite2D and flipped when Rowan moves left. No pixel edits to that version. 2026-10-08: redrawn with the Codex built-in image_gen tool in edit mode using this file as the reference, on the same 1024x1536 canvas with transparency; Approved for integration by Nathanial Henniges on 2026-10-08 from a review sheet. The redraw replaced this file in place on 2026-10-09 (same path and import settings, so the in-game scale and feet baseline are unchanged).",
+      "implementation_status": "Provisional Rowan appearance used in the corridor and Records Access; animation and appearance options pending. Since 2026-10-08 the Godot import generates mipmaps and the sprite samples them (linear-with-mipmaps filter), so the heavily downscaled sheet no longer aliases; the 2026-10-08 redraw is shown unedited."
     },
     {
       "asset_id": "director-side-left-provisional",
       "path": "apps/game/assets/director-side-left-provisional.png",
-      "source_or_tool": "ChatGPT Pro image edit via Chrome in the MDW WOLF//OVERRIDE [Game] project; Remove BG applied to final output",
+      "source_or_tool": "ChatGPT Pro image edit via Chrome in the MDW WOLF//OVERRIDE [Game] project; Remove BG applied to final output; redrawn 2026-10-08 with the Codex built-in image_gen tool (edit mode)",
       "source_reference": "Retained in private art notes (conversation link not published)",
       "terms_reference": "https://openai.com/policies/terms-of-use/",
       "rights_review_status": "Provisional AI-assisted character art, human reviewed. Final commercial asset-rights review remains open; not covered by the code/docs GPL license.",
-      "modifications": "Revised the original photorealistic cutout toward Rowan’s inked, faceted cel-shaded style, then removed the background. Final 1024x1536 RGBA profile sprite.",
-      "implementation_status": "Provisional Director appearance in the opening cutscene. Since 2026-10-08 the Godot import generates mipmaps and the sprite samples them (linear-with-mipmaps filter), so the heavily downscaled sheet no longer aliases; source pixels remain unchanged."
+      "modifications": "Revised the original photorealistic cutout toward Rowan’s inked, faceted cel-shaded style, then removed the background. Final 1024x1536 RGBA profile sprite. 2026-10-08: redrawn with the Codex built-in image_gen tool in edit mode using this file as the reference, on the same 1024x1536 canvas with transparency; Approved for integration by Nathanial Henniges on 2026-10-08 from a review sheet. The redraw replaced this file in place on 2026-10-09 (same path and import settings, so the in-game scale and feet baseline are unchanged).",
+      "implementation_status": "Provisional Director appearance in the opening cutscene. Since 2026-10-08 the Godot import generates mipmaps and the sprite samples them (linear-with-mipmaps filter), so the heavily downscaled sheet no longer aliases; the 2026-10-08 redraw is shown unedited."
     },
     {
       "asset_id": "title-corridor-key-art-provisional",
@@ -55,44 +55,144 @@
       "implementation_status": "Provisional cinematic title background in the Godot title screen and public landing page; a 960x540 renderer-backed title frame was visually inspected."
     },
     {
-      "asset_id": "maintenance-corridor-background-provisional",
-      "path": "apps/game/assets/maintenance-corridor-background-provisional.png",
-      "source_or_tool": "ChatGPT Create image via Chrome in the WOLF//OVERRIDE [Game] project",
-      "source_reference": "https://chatgpt.com/g/g-p-6ab60b48c7608191987f04a81b04b5e2-wolf-override-game/c/6abb82fd-5d14-83e9-9332-a78148b708b2",
+      "asset_id": "corridor-far",
+      "path": "apps/game/assets/rooms/corridor-far.png",
+      "source_or_tool": "Codex built-in image_gen tool in edit mode, 2026-10-08, generated as one of three separate depth plates (far, mid, near) sharing one 16:9 frame",
+      "source_reference": "Reference: maintenance-corridor-background-provisional.png, the earlier single corridor painting (ChatGPT Create in the WOLF//OVERRIDE [Game] project, https://chatgpt.com/g/g-p-6ab60b48c7608191987f04a81b04b5e2-wolf-override-game/c/6abb82fd-5d14-83e9-9332-a78148b708b2), registered here until it was retired on 2026-10-09; generation prompts retained in ignored art notes",
       "terms_reference": "https://openai.com/policies/terms-of-use/",
-      "rights_review_status": "Provisional AI-assisted environment art, human review in progress. Final commercial asset-rights review remains open; not covered by the code/docs GPL license.",
-      "modifications": "Original 1672x941 RGB image generated without characters, stations or UI. Displayed at 960x540 to preserve the source 16:9 ratio, vertically offset behind live Godot corridor props; source pixels unchanged.",
-      "implementation_status": "Provisional gameplay background for the maintenance corridor. Since 2026-10-08 it is drawn 1.06x larger as a Parallax2D backdrop at 0.9x camera speed with additive glows, light shafts and haze layered over its painted lamps; source pixels remain unchanged. Also reused since 2026-10-08 as the provisional Service Junction backdrop, tinted warmer and darker at runtime (Sprite2D modulate, no pixel edits) under procedurally drawn junction fixtures, until that room has its own painting."
+      "rights_review_status": "Provisional AI-generated environment art, human reviewed and approved for integration. Final commercial asset-rights review remains open; not covered by the code/docs GPL license. Approved for integration by Nathanial Henniges on 2026-10-08 from a review sheet.",
+      "modifications": "Original 1920x1080 RGB far plate (back wall, three ceiling lamps, wet floor), copied unchanged. First trialled 2026-10-08 as assets/trial/corridor-far-trial.png (same bytes).",
+      "implementation_status": "In use since 2026-10-09. Drawn by RoomDepth as the corridor backdrop: a Parallax2D at 0.9x camera speed, 960 px wide, sitting 27 px lower than the mid plate so its painted ceiling lamps stay in the play view, with additive glows and light shafts on its lamps, two procedurally drawn lockdown beacons, haze and dust. Since 2026-10-09 also the provisional Service Junction backdrop, tinted warmer and darker at runtime (modulate, no pixel edits), until that room has its own approved set."
     },
     {
-      "asset_id": "records-access-background-provisional",
-      "path": "apps/game/assets/records-access-background-provisional.png",
-      "source_or_tool": "ChatGPT Create image via Chrome in the WOLF//OVERRIDE [Game] project",
-      "source_reference": "https://chatgpt.com/g/g-p-6ab60b48c7608191987f04a81b04b5e2-wolf-override-game/c/6abb82fd-5d14-83e9-9332-a78148b708b2",
+      "asset_id": "corridor-mid",
+      "path": "apps/game/assets/rooms/corridor-mid.png",
+      "source_or_tool": "Codex built-in image_gen tool in edit mode, 2026-10-08, generated as one of three separate depth plates (far, mid, near) sharing one 16:9 frame",
+      "source_reference": "Reference: maintenance-corridor-background-provisional.png, the earlier single corridor painting (ChatGPT Create in the WOLF//OVERRIDE [Game] project, https://chatgpt.com/g/g-p-6ab60b48c7608191987f04a81b04b5e2-wolf-override-game/c/6abb82fd-5d14-83e9-9332-a78148b708b2), registered here until it was retired on 2026-10-09; generation prompts retained in ignored art notes",
       "terms_reference": "https://openai.com/policies/terms-of-use/",
-      "rights_review_status": "Provisional AI-assisted environment art, human review in progress. Final commercial asset-rights review remains open; not covered by the code/docs GPL license.",
-      "modifications": "Original 1672x941 RGB image generated as a matching archival bay without characters, stations or UI. Displayed at 960x540 to preserve the source 16:9 ratio, vertically offset behind live Godot Records props; source pixels unchanged.",
-      "implementation_status": "Provisional gameplay background for Records Access. Since 2026-10-08 it is drawn 1.06x larger as a Parallax2D backdrop at 0.9x camera speed with additive glows, light shafts and haze layered over its painted lamps; source pixels remain unchanged."
+      "rights_review_status": "Provisional AI-generated environment art, human reviewed and approved for integration. Final commercial asset-rights review remains open; not covered by the code/docs GPL license. Approved for integration by Nathanial Henniges on 2026-10-08 from a review sheet.",
+      "modifications": "Original 1920x1080 RGBA mid plate (ceiling pipe run, two pillars, side machines on transparency), copied unchanged. First trialled 2026-10-08 as assets/trial/corridor-mid-trial.png (same bytes).",
+      "implementation_status": "In use since 2026-10-09. The corridor's play plane, drawn 1:1 with the room (960 px wide) with its painted walkway (source row 777) on the floor at y 440, behind the stations and actors; 16 px mirrored slivers continue it past each room edge for camera shake. Also used, tinted, in the Service Junction since 2026-10-09."
     },
     {
-      "asset_id": "maintenance-props-provisional",
-      "path": "apps/game/assets/maintenance-props-provisional.png",
-      "source_or_tool": "ChatGPT Create image via Chrome in the WOLF//OVERRIDE [Game] project",
-      "source_reference": "https://chatgpt.com/g/g-p-6ab60b48c7608191987f04a81b04b5e2-wolf-override-game/c/6abb82fd-5d14-83e9-9332-a78148b708b2",
+      "asset_id": "corridor-near",
+      "path": "apps/game/assets/rooms/corridor-near.png",
+      "source_or_tool": "Codex built-in image_gen tool in edit mode, 2026-10-08, generated as one of three separate depth plates (far, mid, near) sharing one 16:9 frame",
+      "source_reference": "Reference: maintenance-corridor-background-provisional.png, the earlier single corridor painting (ChatGPT Create in the WOLF//OVERRIDE [Game] project, https://chatgpt.com/g/g-p-6ab60b48c7608191987f04a81b04b5e2-wolf-override-game/c/6abb82fd-5d14-83e9-9332-a78148b708b2), registered here until it was retired on 2026-10-09; generation prompts retained in ignored art notes",
       "terms_reference": "https://openai.com/policies/terms-of-use/",
-      "rights_review_status": "Provisional AI-assisted gameplay props, human review in progress. Final commercial asset-rights review remains open; not covered by the code/docs GPL license.",
-      "modifications": "Original 2172x724 RGBA sprite sheet with four isolated props. Godot Sprite2D regions display the breaker, relay, seal and safe-point art without modifying source pixels; live tint and door motion show gameplay state.",
-      "implementation_status": "Provisional interactive prop art in the maintenance corridor. Since 2026-10-08 the Godot import generates mipmaps and the sprite samples them (linear-with-mipmaps filter), so the heavily downscaled sheet no longer aliases; source pixels remain unchanged. The breaker and seal regions are also reused since 2026-10-08 as the Service Junction's overload breaker and sealed door (the door is crushed by a scale tween when it blows); the valve wheel, gauge, vent, rubble and hatches there are drawn in code."
+      "rights_review_status": "Provisional AI-generated environment art, human reviewed and approved for integration. Final commercial asset-rights review remains open; not covered by the code/docs GPL license. Approved for integration by Nathanial Henniges on 2026-10-08 from a review sheet.",
+      "modifications": "Original 1920x1080 RGBA near plate (left pipe column, floor-front rail and cables, right crate stack), copied unchanged. First trialled 2026-10-08 as assets/trial/corridor-near-trial.png (same bytes). The game shows only its left 512 px strip (the pipe column and rail), at the left edge and mirrored at the right edge, so the crate stack never covers a station.",
+      "implementation_status": "In use since 2026-10-09. The left 512 px strip and its mirror drawn in front of the actors at 1.15x camera speed, anchored 56 px past each room edge so no strip edge shows at any framing. Also used, tinted, in the Service Junction since 2026-10-09."
     },
     {
-      "asset_id": "records-props-provisional",
-      "path": "apps/game/assets/records-props-provisional.png",
-      "source_or_tool": "ChatGPT Create image via Chrome in the WOLF//OVERRIDE [Game] project",
-      "source_reference": "https://chatgpt.com/g/g-p-6ab60b48c7608191987f04a81b04b5e2-wolf-override-game/c/6abb82fd-5d14-83e9-9332-a78148b708b2",
+      "asset_id": "records-far",
+      "path": "apps/game/assets/rooms/records-far.png",
+      "source_or_tool": "Codex built-in image_gen tool in edit mode, 2026-10-08, generated as one of three separate depth plates (far, mid, near) sharing one 16:9 frame",
+      "source_reference": "Reference: records-access-background-provisional.png, the earlier single Records Access painting (ChatGPT Create in the WOLF//OVERRIDE [Game] project, https://chatgpt.com/g/g-p-6ab60b48c7608191987f04a81b04b5e2-wolf-override-game/c/6abb82fd-5d14-83e9-9332-a78148b708b2), registered here until it was retired on 2026-10-09; generation prompts retained in ignored art notes",
       "terms_reference": "https://openai.com/policies/terms-of-use/",
-      "rights_review_status": "Provisional AI-assisted gameplay props, human review in progress. Final commercial asset-rights review remains open; not covered by the code/docs GPL license.",
-      "modifications": "Original 2172x724 RGBA sprite sheet with three isolated props. Godot Sprite2D regions display the purge queue, mirror port and exit; source pixels are unchanged. The exit art hides when the chapter is secured.",
-      "implementation_status": "Provisional interactive prop art in Records Access. Since 2026-10-08 the Godot import generates mipmaps and the sprite samples them (linear-with-mipmaps filter), so the heavily downscaled sheet no longer aliases; source pixels remain unchanged."
+      "rights_review_status": "Provisional AI-generated environment art, human reviewed and approved for integration. Final commercial asset-rights review remains open; not covered by the code/docs GPL license. Approved for integration by Nathanial Henniges on 2026-10-08 from a review sheet.",
+      "modifications": "Original 1920x1080 RGB far plate (archive racks, braced pillars, three ceiling lamps, wet floor), copied unchanged.",
+      "implementation_status": "In use since 2026-10-09. Drawn by RoomDepth as the Records Access backdrop: a Parallax2D at 0.9x camera speed, 960 px wide, with additive glows and light shafts on its painted lamps, two procedurally drawn lockdown beacons, haze and dust."
+    },
+    {
+      "asset_id": "records-mid",
+      "path": "apps/game/assets/rooms/records-mid.png",
+      "source_or_tool": "Codex built-in image_gen tool in edit mode, 2026-10-08, generated as one of three separate depth plates (far, mid, near) sharing one 16:9 frame",
+      "source_reference": "Reference: records-access-background-provisional.png, the earlier single Records Access painting (ChatGPT Create in the WOLF//OVERRIDE [Game] project, https://chatgpt.com/g/g-p-6ab60b48c7608191987f04a81b04b5e2-wolf-override-game/c/6abb82fd-5d14-83e9-9332-a78148b708b2), registered here until it was retired on 2026-10-09; generation prompts retained in ignored art notes",
+      "terms_reference": "https://openai.com/policies/terms-of-use/",
+      "rights_review_status": "Provisional AI-generated environment art, human reviewed and approved for integration. Final commercial asset-rights review remains open; not covered by the code/docs GPL license. Approved for integration by Nathanial Henniges on 2026-10-08 from a review sheet.",
+      "modifications": "Original 1920x1080 RGBA mid plate (ceiling pipe run, two braced pillars, side machines on transparency), copied unchanged.",
+      "implementation_status": "In use since 2026-10-09. The Records Access play plane, drawn 1:1 with the room (960 px wide) with its painted walkway (source row 742) on the floor at y 440, behind the stations and actors; 16 px mirrored slivers continue it past each room edge for camera shake."
+    },
+    {
+      "asset_id": "records-near",
+      "path": "apps/game/assets/rooms/records-near.png",
+      "source_or_tool": "Codex built-in image_gen tool in edit mode, 2026-10-08, generated as one of three separate depth plates (far, mid, near) sharing one 16:9 frame",
+      "source_reference": "Reference: records-access-background-provisional.png, the earlier single Records Access painting (ChatGPT Create in the WOLF//OVERRIDE [Game] project, https://chatgpt.com/g/g-p-6ab60b48c7608191987f04a81b04b5e2-wolf-override-game/c/6abb82fd-5d14-83e9-9332-a78148b708b2), registered here until it was retired on 2026-10-09; generation prompts retained in ignored art notes",
+      "terms_reference": "https://openai.com/policies/terms-of-use/",
+      "rights_review_status": "Provisional AI-generated environment art, human reviewed and approved for integration. Final commercial asset-rights review remains open; not covered by the code/docs GPL license. Approved for integration by Nathanial Henniges on 2026-10-08 from a review sheet.",
+      "modifications": "Original 1920x1080 RGBA near plate (left pipe column, floor-front rail and cables, right crate stack), copied unchanged. The game shows only its left 512 px strip, at the left edge and mirrored at the right edge, so the crate stack never covers a station.",
+      "implementation_status": "In use since 2026-10-09. The left 512 px strip and its mirror drawn in front of the actors at 1.15x camera speed, anchored 56 px past each room edge so no strip edge shows at any framing."
+    },
+    {
+      "asset_id": "corridor-purge-display",
+      "path": "apps/game/assets/props/corridor-purge-display.png",
+      "source_or_tool": "Codex built-in image_gen tool in edit mode, 2026-10-08, generated as a separate 512x512 station prop on transparency",
+      "source_reference": "Reference: maintenance-props-provisional.png and records-props-provisional.png (the purge-queue region was the corridor display until 2026-10-09), the earlier ChatGPT Create prop sheet (WOLF//OVERRIDE [Game] project, https://chatgpt.com/g/g-p-6ab60b48c7608191987f04a81b04b5e2-wolf-override-game/c/6abb82fd-5d14-83e9-9332-a78148b708b2), registered here until it was retired on 2026-10-09; generation prompts retained in ignored art notes",
+      "terms_reference": "https://openai.com/policies/terms-of-use/",
+      "rights_review_status": "Provisional AI-generated gameplay prop, human reviewed and approved for integration. Final commercial asset-rights review remains open; not covered by the code/docs GPL license. Approved for integration by Nathanial Henniges on 2026-10-08 from a review sheet.",
+      "modifications": "Original 512x512 RGBA prop, copied unchanged. The game shows the region inside its painted outline (so its floor reflection and contact shadow start at its real base) with mipmaps and linear-with-mipmaps filtering.",
+      "implementation_status": "In use since 2026-10-09 as the Director's purge display on the corridor wall, 0.25x, the same on-screen size as the art it replaced, with its station label, state tint or glow and floor reflection unchanged."
+    },
+    {
+      "asset_id": "corridor-breaker",
+      "path": "apps/game/assets/props/corridor-breaker.png",
+      "source_or_tool": "Codex built-in image_gen tool in edit mode, 2026-10-08, generated as a separate 512x512 station prop on transparency",
+      "source_reference": "Reference: maintenance-props-provisional.png, the earlier ChatGPT Create prop sheet (WOLF//OVERRIDE [Game] project, https://chatgpt.com/g/g-p-6ab60b48c7608191987f04a81b04b5e2-wolf-override-game/c/6abb82fd-5d14-83e9-9332-a78148b708b2), registered here until it was retired on 2026-10-09; generation prompts retained in ignored art notes",
+      "terms_reference": "https://openai.com/policies/terms-of-use/",
+      "rights_review_status": "Provisional AI-generated gameplay prop, human reviewed and approved for integration. Final commercial asset-rights review remains open; not covered by the code/docs GPL license. Approved for integration by Nathanial Henniges on 2026-10-08 from a review sheet.",
+      "modifications": "Original 512x512 RGBA prop, copied unchanged. The game shows the region inside its painted outline (so its floor reflection and contact shadow start at its real base) with mipmaps and linear-with-mipmaps filtering.",
+      "implementation_status": "In use since 2026-10-09 as the corridor BREAKER at x 350 and the Service Junction's OVERLOAD BREAKER at x 200, 0.225x (97 px tall, as before); the status light is drawn on its painted amber bar, with its station label, state tint or glow and floor reflection unchanged."
+    },
+    {
+      "asset_id": "corridor-coolant-relay",
+      "path": "apps/game/assets/props/corridor-coolant-relay.png",
+      "source_or_tool": "Codex built-in image_gen tool in edit mode, 2026-10-08, generated as a separate 512x512 station prop on transparency",
+      "source_reference": "Reference: maintenance-props-provisional.png, the earlier ChatGPT Create prop sheet (WOLF//OVERRIDE [Game] project, https://chatgpt.com/g/g-p-6ab60b48c7608191987f04a81b04b5e2-wolf-override-game/c/6abb82fd-5d14-83e9-9332-a78148b708b2), registered here until it was retired on 2026-10-09; generation prompts retained in ignored art notes",
+      "terms_reference": "https://openai.com/policies/terms-of-use/",
+      "rights_review_status": "Provisional AI-generated gameplay prop, human reviewed and approved for integration. Final commercial asset-rights review remains open; not covered by the code/docs GPL license. Approved for integration by Nathanial Henniges on 2026-10-08 from a review sheet.",
+      "modifications": "Original 512x512 RGBA prop, copied unchanged. The game shows the region inside its painted outline (so its floor reflection and contact shadow start at its real base) with mipmaps and linear-with-mipmaps filtering.",
+      "implementation_status": "In use since 2026-10-09 as the corridor COOLANT RELAY at x 605, 0.221x (89 px tall, as before); the status light is drawn on its painted cyan bar, with its station label, state tint or glow and floor reflection unchanged."
+    },
+    {
+      "asset_id": "corridor-sealed-door",
+      "path": "apps/game/assets/props/corridor-sealed-door.png",
+      "source_or_tool": "Codex built-in image_gen tool in edit mode, 2026-10-08, generated as a separate 512x512 station prop on transparency",
+      "source_reference": "Reference: maintenance-props-provisional.png, the earlier ChatGPT Create prop sheet (WOLF//OVERRIDE [Game] project, https://chatgpt.com/g/g-p-6ab60b48c7608191987f04a81b04b5e2-wolf-override-game/c/6abb82fd-5d14-83e9-9332-a78148b708b2), registered here until it was retired on 2026-10-09; generation prompts retained in ignored art notes",
+      "terms_reference": "https://openai.com/policies/terms-of-use/",
+      "rights_review_status": "Provisional AI-generated gameplay prop, human reviewed and approved for integration. Final commercial asset-rights review remains open; not covered by the code/docs GPL license. Approved for integration by Nathanial Henniges on 2026-10-08 from a review sheet.",
+      "modifications": "Original 512x512 RGBA prop, copied unchanged. The game shows the region inside its painted outline (so its floor reflection and contact shadow start at its real base) with mipmaps and linear-with-mipmaps filtering.",
+      "implementation_status": "In use since 2026-10-09 as the corridor's red seal at x 780 and the Service Junction's SEALED DOOR at x 480, 0.302x (140 px tall, as before), lifted or crushed by the existing scale tweens, with its station label, state tint or glow and floor reflection unchanged."
+    },
+    {
+      "asset_id": "corridor-safe-point",
+      "path": "apps/game/assets/props/corridor-safe-point.png",
+      "source_or_tool": "Codex built-in image_gen tool in edit mode, 2026-10-08, generated as a separate 512x512 station prop on transparency",
+      "source_reference": "Reference: maintenance-props-provisional.png, the earlier ChatGPT Create prop sheet (WOLF//OVERRIDE [Game] project, https://chatgpt.com/g/g-p-6ab60b48c7608191987f04a81b04b5e2-wolf-override-game/c/6abb82fd-5d14-83e9-9332-a78148b708b2), registered here until it was retired on 2026-10-09; generation prompts retained in ignored art notes",
+      "terms_reference": "https://openai.com/policies/terms-of-use/",
+      "rights_review_status": "Provisional AI-generated gameplay prop, human reviewed and approved for integration. Final commercial asset-rights review remains open; not covered by the code/docs GPL license. Approved for integration by Nathanial Henniges on 2026-10-08 from a review sheet.",
+      "modifications": "Original 512x512 RGBA prop, copied unchanged. The game shows the region inside its painted outline (so its floor reflection and contact shadow start at its real base) with mipmaps and linear-with-mipmaps filtering.",
+      "implementation_status": "In use since 2026-10-09 as the corridor SAFE POINT at x 876, 0.25x (112 px tall, as before), with its station label, state tint or glow and floor reflection unchanged."
+    },
+    {
+      "asset_id": "records-purge-queue",
+      "path": "apps/game/assets/props/records-purge-queue.png",
+      "source_or_tool": "Codex built-in image_gen tool in edit mode, 2026-10-08, generated as a separate 512x512 station prop on transparency",
+      "source_reference": "Reference: records-props-provisional.png, the earlier ChatGPT Create prop sheet (WOLF//OVERRIDE [Game] project, https://chatgpt.com/g/g-p-6ab60b48c7608191987f04a81b04b5e2-wolf-override-game/c/6abb82fd-5d14-83e9-9332-a78148b708b2), registered here until it was retired on 2026-10-09; generation prompts retained in ignored art notes",
+      "terms_reference": "https://openai.com/policies/terms-of-use/",
+      "rights_review_status": "Provisional AI-generated gameplay prop, human reviewed and approved for integration. Final commercial asset-rights review remains open; not covered by the code/docs GPL license. Approved for integration by Nathanial Henniges on 2026-10-08 from a review sheet.",
+      "modifications": "Original 512x512 RGBA prop, copied unchanged. The game shows the region inside its painted outline (so its floor reflection and contact shadow start at its real base) with mipmaps and linear-with-mipmaps filtering.",
+      "implementation_status": "In use since 2026-10-09 as the Records PURGE QUEUE at x 190, 0.274x (111 px tall, as before); the status light is drawn on the bar under its screen, with its station label, state tint or glow and floor reflection unchanged."
+    },
+    {
+      "asset_id": "records-mirror-port",
+      "path": "apps/game/assets/props/records-mirror-port.png",
+      "source_or_tool": "Codex built-in image_gen tool in edit mode, 2026-10-08, generated as a separate 512x512 station prop on transparency",
+      "source_reference": "Reference: records-props-provisional.png, the earlier ChatGPT Create prop sheet (WOLF//OVERRIDE [Game] project, https://chatgpt.com/g/g-p-6ab60b48c7608191987f04a81b04b5e2-wolf-override-game/c/6abb82fd-5d14-83e9-9332-a78148b708b2), registered here until it was retired on 2026-10-09; generation prompts retained in ignored art notes",
+      "terms_reference": "https://openai.com/policies/terms-of-use/",
+      "rights_review_status": "Provisional AI-generated gameplay prop, human reviewed and approved for integration. Final commercial asset-rights review remains open; not covered by the code/docs GPL license. Approved for integration by Nathanial Henniges on 2026-10-08 from a review sheet.",
+      "modifications": "Original 512x512 RGBA prop, copied unchanged. The game shows the region inside its painted outline (so its floor reflection and contact shadow start at its real base) with mipmaps and linear-with-mipmaps filtering.",
+      "implementation_status": "In use since 2026-10-09 as the Records MIRROR PORT at x 520, 0.239x (111 px tall, as before); the status light is drawn under its screen, with its station label, state tint or glow and floor reflection unchanged."
+    },
+    {
+      "asset_id": "records-exit-hatch",
+      "path": "apps/game/assets/props/records-exit-hatch.png",
+      "source_or_tool": "Codex built-in image_gen tool in edit mode, 2026-10-08, generated as a separate 512x512 station prop on transparency",
+      "source_reference": "Reference: records-props-provisional.png, the earlier ChatGPT Create prop sheet (WOLF//OVERRIDE [Game] project, https://chatgpt.com/g/g-p-6ab60b48c7608191987f04a81b04b5e2-wolf-override-game/c/6abb82fd-5d14-83e9-9332-a78148b708b2), registered here until it was retired on 2026-10-09; generation prompts retained in ignored art notes",
+      "terms_reference": "https://openai.com/policies/terms-of-use/",
+      "rights_review_status": "Provisional AI-generated gameplay prop, human reviewed and approved for integration. Final commercial asset-rights review remains open; not covered by the code/docs GPL license. Approved for integration by Nathanial Henniges on 2026-10-08 from a review sheet.",
+      "modifications": "Original 512x512 RGBA prop, copied unchanged. The game shows the region inside its painted outline (so its floor reflection and contact shadow start at its real base) with mipmaps and linear-with-mipmaps filtering.",
+      "implementation_status": "In use since 2026-10-09 as the Records EXIT at x 830, 0.291x (139 px tall, as before), lifted and faded by the chapter close, with its station label, state tint or glow and floor reflection unchanged."
     },
     {
       "asset_id": "corridor-source-build-capture",
@@ -126,36 +226,6 @@
       "implementation_status": "Bundled locally for the game and Docs website."
     },
     {
-      "asset_id": "corridor-far-trial",
-      "path": "apps/game/assets/trial/corridor-far-trial.png",
-      "source_or_tool": "Codex built-in image_gen tool, 2026-10-08, generated as three separate depth plates (far, mid, near)",
-      "source_reference": "Reference: apps/game/assets/maintenance-corridor-background-provisional.png (the registered maintenance corridor painting); generation prompts retained in ignored art notes",
-      "terms_reference": "https://openai.com/policies/terms-of-use/",
-      "rights_review_status": "Trial AI-generated environment plates, not yet human reviewed for final use. Commercial asset-rights review open; not covered by the code/docs GPL license.",
-      "modifications": "Original 1920x1080 RGB far plate (wall, floor, three ceiling lamps), copied unchanged.",
-      "implementation_status": "Trial only: loaded when Main.corridor_layers_trial is on, drawn as the corridor parallax backdrop (0.9x camera speed) for comparison stills. Off by default; the single-painting corridor remains the shipped look."
-    },
-    {
-      "asset_id": "corridor-mid-trial",
-      "path": "apps/game/assets/trial/corridor-mid-trial.png",
-      "source_or_tool": "Codex built-in image_gen tool, 2026-10-08, generated as three separate depth plates (far, mid, near)",
-      "source_reference": "Reference: apps/game/assets/maintenance-corridor-background-provisional.png (the registered maintenance corridor painting); generation prompts retained in ignored art notes",
-      "terms_reference": "https://openai.com/policies/terms-of-use/",
-      "rights_review_status": "Trial AI-generated environment plates, not yet human reviewed for final use. Commercial asset-rights review open; not covered by the code/docs GPL license.",
-      "modifications": "Original 1920x1080 RGBA mid plate (ceiling pipe run, two pillars, side tanks on transparency), copied unchanged.",
-      "implementation_status": "Trial only: loaded when Main.corridor_layers_trial is on, drawn at 0.95x camera speed between the backdrop and the props. Off by default."
-    },
-    {
-      "asset_id": "corridor-near-trial",
-      "path": "apps/game/assets/trial/corridor-near-trial.png",
-      "source_or_tool": "Codex built-in image_gen tool, 2026-10-08, generated as three separate depth plates (far, mid, near)",
-      "source_reference": "Reference: apps/game/assets/maintenance-corridor-background-provisional.png (the registered maintenance corridor painting); generation prompts retained in ignored art notes",
-      "terms_reference": "https://openai.com/policies/terms-of-use/",
-      "rights_review_status": "Trial AI-generated environment plates, not yet human reviewed for final use. Commercial asset-rights review open; not covered by the code/docs GPL license.",
-      "modifications": "Original 1920x1080 RGBA near plate (left pipe column, floor-front rail, right crate stack), copied unchanged. The game shows only the region x < 1530 px so the crate stack cannot cover the safe point.",
-      "implementation_status": "Trial only: loaded when Main.corridor_layers_trial is on, drawn in front of the actors at 1.1x camera speed. Off by default."
-    },
-    {
       "asset_id": "changelog-text-export",
       "path": "apps/game/assets/changelog.txt",
       "source_or_tool": "Generated by scripts/export_changelog.py (Python 3 standard library) from apps/docs/content/docs/changelog.mdx",
@@ -176,7 +246,7 @@
       "implementation_status": "In use since 2026-10-08 for the containment gate boom, the relay contact clank and crackle, the seal landing thud, the knockdown thud, the Records exit arc, and in the Service Junction for the breaker clunk, the valve clicks, the hiss and pump hum that follow the gauge, the seal-charged klaxon, WOLF's growl, the relief-vent small boom and the door blast; since 2026-10-09 also the sentry's servo (pitch follows its state and winds down when it goes over), the tank's clamp, landing boom and missed-drop clang, the winch during the arm's rewind, and the exit bolt's whine, arc and clank. Nothing has been ear-tested in a normal window yet; the clips are a first pass."
     }
   ],
-  "status": "One provisional brand mark, three provisional character images, one title background, two gameplay backgrounds (the corridor painting is also reused, tinted, for the provisional Service Junction), two prop sheets, three trial corridor depth plates (off by default), two derivative marketing captures, the Roboto and Montserrat font families, one generated changelog text export and one procedural sound-effect set (code, no files) recorded; no audio files acquired. Glows, haze, dust, reflections, particles, the Service Junction fixtures (including the provisional code-drawn sentry machine, overhead arm and coolant tank) and the screen grade are procedural built-in nodes and two small shaders, not image assets.",
+  "status": "One provisional brand mark, three provisional character images (redrawn 2026-10-08), one title background, two layered gameplay rooms (far, mid and near plates for the corridor and Records Access; the corridor set is also reused, tinted, for the provisional Service Junction), eight station props, two derivative marketing captures, the Roboto and Montserrat font families, one generated changelog text export and one procedural sound-effect set (code, no files) recorded; no audio files acquired. Glows, haze, dust, lockdown beacons, reflections, particles, the Service Junction fixtures (including the provisional code-drawn sentry machine, overhead arm and coolant tank) and the screen grade are procedural built-in nodes and two small shaders, not image assets.",
   "merge_warning": "Preserve this populated provenance register when merging future handoffs.",
   "future_entry_fields": [
     "asset_id",
