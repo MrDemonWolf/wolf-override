@@ -62,8 +62,10 @@ func _run() -> void:
 	game.call("_resume_game")
 	_expect(not paused and Engine.time_scale == 1.0, "resume always restores time_scale, even inside a dip")
 	impact.hit_stop(0.05)
+	var shorter_serial: int = impact.get("_stop_serial")
 	impact.hit_stop(0.09)
-	await create_timer(0.065, true, false, true).timeout
+	# Fire the shorter dip's own timeout by hand: no wall-clock race with the longer one's timer.
+	impact.call("_end_hit_stop", shorter_serial)
 	_expect(is_equal_approx(Engine.time_scale, Impact.HIT_STOP_SCALE), "a longer hit-stop replaces a shorter one instead of ending early")
 	await create_timer(0.1, true, false, true).timeout
 	_expect(Engine.time_scale == 1.0, "the replacing hit-stop still ends")
