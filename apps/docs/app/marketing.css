@@ -4,6 +4,7 @@
  * changes it; the root rule keeps the scrollbar and overscroll area dark too.
  */
 html:has(.marketing-shell) {
+  --color-fd-ring: var(--color-accent);
   color-scheme: dark;
   background: var(--color-ink);
   scrollbar-color: var(--color-line) var(--color-ink);
@@ -112,7 +113,6 @@ html:has(.marketing-shell) {
 }
 
 .marketing-menu-trigger:hover { background: rgba(139, 227, 255, .12); }
-.marketing-menu-trigger:focus-visible { outline: 3px solid var(--mk-accent); outline-offset: 3px; }
 
 .marketing-menu-icon {
   display: grid;
@@ -174,11 +174,6 @@ html:has(.marketing-shell) {
 @layer base {
   :where(.marketing-shell) a { text-decoration: none; }
   :where(.marketing-shell) a:hover { color: var(--mk-accent); }
-}
-
-.marketing-shell :is(a, button):focus-visible {
-  outline: 3px solid var(--mk-accent);
-  outline-offset: 4px;
 }
 
 .marketing-hero {
@@ -401,13 +396,17 @@ html:has(.marketing-shell) {
 
 .marketing-game-frame {
   margin: 3.5rem 0 0;
-  overflow: hidden;
   border: 1px solid var(--mk-line-strong);
   border-radius: var(--mk-card-radius);
   background: var(--mk-surface);
 }
 
-.marketing-game-frame a { display: block; }
+/* The link clips the image to the frame's top corners; the figure itself stays unclipped so the link's focus ring shows. */
+.marketing-game-frame a {
+  display: block;
+  overflow: hidden;
+  border-radius: calc(var(--mk-card-radius) - 1px) calc(var(--mk-card-radius) - 1px) 0 0;
+}
 .marketing-game-frame img { display: block; width: 100%; height: auto; }
 
 .marketing-game-frame figcaption {
@@ -492,7 +491,13 @@ html:has(.marketing-shell) {
 .marketing-shell [id="downloads"] { scroll-margin-top: 7rem; }
 
 @media (max-width: 1000px) {
-  .marketing-hero { min-height: clamp(44rem, 88svh, 54rem); }
+  /*
+   * Narrow and portrait viewports: cap the hero height at 90% of the width so the
+   * cover-fitted key art scales no wider than about 1.6x the viewport, and anchor it
+   * to the left edge, where both characters sit; past 90vw the engineer is cut off.
+   */
+  .marketing-hero { min-height: min(clamp(44rem, 88svh, 54rem), 90vw); }
+  .marketing-keyart { object-position: 0% 50%; }
   .marketing-hero-copy { width: 53%; margin-left: 44%; }
   .marketing-story,
   .marketing-progress { gap: 2.5rem; }
@@ -541,7 +546,7 @@ html:has(.marketing-shell) {
   }
 
   .marketing-hero { display: block; min-height: 0; }
-  .marketing-keyart { height: 20rem; object-position: 15% center; }
+  .marketing-keyart { height: 20rem; object-position: 0% 50%; }
   .marketing-hero::before { background: linear-gradient(0deg, var(--mk-hero-bg) 0%, var(--mk-hero-bg) 38%, rgba(8, 15, 27, .68) 57%, rgba(8, 15, 27, 0) 78%); }
   .marketing-hero-copy { width: 100%; max-width: none; margin: 0; padding: 21.5rem 1.25rem 1.25rem; }
   .marketing-hero h1 { margin-bottom: 1rem; font-size: clamp(3rem, 12.5vw, 4.5rem); }

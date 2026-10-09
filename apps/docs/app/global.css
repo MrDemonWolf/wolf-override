@@ -47,6 +47,21 @@
 }
 
 /*
+ * The one keyboard focus ring for the whole site. --color-fd-ring is the
+ * accent token on dark surfaces (the landing page and the dark guide theme)
+ * and the darker primary on the light guide theme, where plain cyan would
+ * not reach 3:1 against the page. !important lets the ring beat the
+ * focus-visible:outline-none utility on Fumadocs' own buttons (sidebar and
+ * theme toggles) without a per-component rule for each of them.
+ */
+@layer base {
+  :is(a, button, select, summary, [tabindex]):focus-visible {
+    outline: 3px solid var(--color-fd-ring) !important;
+    outline-offset: 2px !important;
+  }
+}
+
+/*
  * Small uppercase label (section eyebrows, hero meta lines, feature indexes).
  * Montserrat with tracking and tabular numerals; the label size never drops
  * below .875rem so it stays readable on phones. Colour defaults to the accent
@@ -115,9 +130,6 @@ body {
 :where(h1, h2, h3, h4, h5, h6, button, [role="button"], select, .site-header, .wordmark) {
   font-family: var(--font-heading);
 }
-a:focus-visible,
-#main-content:focus-visible,
-.theme-toggle:focus-visible { outline: 3px solid var(--color-fd-ring); outline-offset: 4px; }
 .skip-link {
   position: fixed;
   z-index: 100;
