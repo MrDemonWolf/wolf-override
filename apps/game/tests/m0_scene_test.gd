@@ -304,6 +304,8 @@ func _run() -> void:
 	_expect(wolf.follow_target == human, "WOLF returns to following after the bypass")
 	DirAccess.remove_absolute(ProjectSettings.globalize_path(path))
 	game.queue_free()
+	# The bypass clip is still playing; the mixer releases a stopped clip a few steps later, so give it that time before quitting.
+	await create_timer(0.1).timeout
 	if failures == 0:
 		print("M0 scene checks passed")
 	quit(1 if failures > 0 else 0)

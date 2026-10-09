@@ -161,6 +161,8 @@ func _run() -> void:
 	_expect(hint_text.text != "Save failed. Use a station to try again.", "a later successful save clears the failure hint")
 	DirAccess.remove_absolute(ProjectSettings.globalize_path(path))
 	game.queue_free()
+	# The exit arc clip is still playing; the mixer releases a stopped clip a few steps later, so give it that time before quitting.
+	await create_timer(0.1).timeout
 	if failures == 0:
 		print("Chapter scene checks passed")
 	quit(1 if failures > 0 else 0)

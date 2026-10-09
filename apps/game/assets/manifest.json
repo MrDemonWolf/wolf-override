@@ -164,9 +164,19 @@
       "rights_review_status": "Derivative of the project's own public changelog text; covered by the repository GPL licence. No third-party content.",
       "modifications": "Front matter and the page intro are dropped; '## ' headings become '== Heading ==', '### ' headings '-- Heading --'; bullets keep '- '; links, bold and code markers are stripped. Regenerate with python3 scripts/export_changelog.py after editing the changelog.",
       "implementation_status": "Loaded with FileAccess at title time for the in-game CHANGELOG screen since 2026-10-08. scripts/check-game.sh regenerates it to a temp file and fails when the committed copy differs. Plain .txt files are not packed by default: export presets must add *.txt to their include filter or the screen falls back to its missing-text line."
+    },
+    {
+      "asset_id": "procedural-sfx-v1",
+      "path": "apps/game/scripts/sfx_bank.gd",
+      "source_or_tool": "Generated at startup by project code (scripts/sfx_bank.gd, Godot 4.7.2 GDScript): sine, saw and square tones, seeded white noise, one-pole filters and exponential envelopes rendered into AudioStreamWAV buffers (16-bit mono, 22.05 kHz, seed 0x574F4C46, every clip normalised to a -6 dB peak)",
+      "source_reference": "No external source; the recipes in scripts/sfx_bank.gd are the whole origin. Author: Nathanial Henniges (project code).",
+      "terms_reference": "GPL-3.0-or-later, the repository code licence (see LICENSE); the clips are an output of that code and ship as no file",
+      "rights_review_status": "Original procedural audio with no third-party material; covered by the code licence. If any clip is later replaced by a CC0 or licensed recording, register that file here with its URL and licence before use.",
+      "modifications": "Seven clips: boom (0.5 s), small boom (0.3 s), clank (40 ms), thud (80 ms), hiss loop (0.5 s), hum loop (1.0 s), arc crackle (0.5 s). Played through AudioStreamPlayer nodes on the Effects bus; volume and pitch are set per use.",
+      "implementation_status": "In use since 2026-10-08 for the containment gate boom, the relay contact clank and crackle, the seal landing thud, the knockdown thud and the Records exit arc. Nothing has been ear-tested in a normal window yet; the clips are a first pass."
     }
   ],
-  "status": "One provisional brand mark, three provisional character images, one title background, two gameplay backgrounds, two prop sheets, three trial corridor depth plates (off by default), two derivative marketing captures, the Roboto and Montserrat font families, and one generated changelog text export recorded; no audio acquired. Glows, haze, dust, reflections and the screen grade are procedural built-in nodes and two small shaders, not image assets.",
+  "status": "One provisional brand mark, three provisional character images, one title background, two gameplay backgrounds, two prop sheets, three trial corridor depth plates (off by default), two derivative marketing captures, the Roboto and Montserrat font families, one generated changelog text export and one procedural sound-effect set (code, no files) recorded; no audio files acquired. Glows, haze, dust, reflections, particles and the screen grade are procedural built-in nodes and two small shaders, not image assets.",
   "merge_warning": "Preserve this populated provenance register when merging future handoffs.",
   "future_entry_fields": [
     "asset_id",

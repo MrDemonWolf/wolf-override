@@ -78,7 +78,7 @@ region_rect = Rect2(1086, 0, 543, 724)
 
 [node name="Human" type="CharacterBody2D" parent="."]
 position = Vector2(160, 410)
-collision_mask = 2
+collision_mask = 10
 script = ExtResource("2_actor")
 actor_id = &"human"
 

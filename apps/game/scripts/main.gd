@@ -15,8 +15,15 @@ const SAVE_FAILED_HINT: String = "Save failed. Use a station to try again."
 const NO_CHECKPOINT_NOTE: String = "No checkpoint yet. Reach a SAFE POINT to save."
 const UNREADABLE_CHECKPOINT_NOTE: String = "Saved checkpoint could not be read."
 const MENU_NAVIGATION_ACTIONS: Array[StringName] = [&"ui_accept", &"ui_up", &"ui_down", &"ui_left", &"ui_right", &"ui_focus_next", &"ui_focus_prev"]
+## Every gameplay action; pause and a knockdown release them all so nothing stays held.
+const GAMEPLAY_ACTIONS: Array[StringName] = [&"move_left", &"move_right", &"interact", &"choice_1", &"choice_2"]
+## A knockdown keeps the controls off this long before the fade to the last autosave.
+const FAIL_CONTROLS_OFF_SECONDS: float = 0.7
+const FAIL_FADE_SECONDS: float = 0.4
+const HUMAN_SPRITE_REST: Vector2 = Vector2(0.0, -5.0)
 
-## One switch for the depth pass (parallax, glows, haze, dust, reflections, grade) so a Settings toggle can follow.
+## One switch for the depth pass (parallax, glows, haze, dust, reflections, grade) and the impact
+## kit (shake, hit-stop, flash, rumble, particles, generated sound) so a Settings toggle can follow.
 @export var effects_enabled: bool = true:
 	set(value):
 		effects_enabled = value
@@ -124,6 +131,18 @@ var door_tween: Tween
 var wolf_reaction_tween: Tween
 var relay_spark_tween: Tween
 var records_room: RecordsRoom
+var impact: Impact
+var sfx_bank: SfxBank
+var relay_sparks: CPUParticles2D
+var door_dust: CPUParticles2D
+var gate_dust: CPUParticles2D
+var exit_sparks: CPUParticles2D
+## True from a knockdown until the last autosave is back; the engineer has no controls meanwhile.
+var fail_active: bool = false
+var fail_tween: Tween
+## The state at the start of the current beat, for a knockdown before any checkpoint exists.
+var beat_snapshot: Dictionary = {}
+var hold_use: HoldUse = HoldUse.new()
 var credits_paused: bool = false
 ## The exported changelog as loaded at title time; empty when the file is missing.
 var changelog_text: String = ""
@@ -155,6 +174,7 @@ func _ready() -> void:
 	get_window().title = "WOLF//OVERRIDE"
 	_install_inputs()
 	_setup_settings()
+	_setup_impact()
 	_setup_touch_controls()
 	pause_button.pressed.connect(_on_pause_button)
 	pause_overlay.resume_requested.connect(_resume_game)
@@ -173,6 +193,7 @@ func _ready() -> void:
 	add_child(records_room)
 	human.z_index = 2
 	wolf.z_index = 2
+	_setup_particles()
 	corridor_defaults = {"painting": corridor_depth.painting, "lamps": corridor_depth.lamps}
 	for grounded: Sprite2D in [human.body_sprite, wolf.body_sprite, intro_director, breaker_art, relay_art, checkpoint_art, door_art]:
 		floor_reflections.append(FloorReflection.attach(grounded))
@@ -264,6 +285,8 @@ func _draw() -> void:
 
 ## Every depth effect hangs off this one switch; the rooms keep their plain paintings when it is off.
 func _apply_effects() -> void:
+	impact.enabled = effects_enabled
+	sfx_bank.enabled = effects_enabled
 	corridor_depth.effects_enabled = effects_enabled
 	records_room.depth.effects_enabled = effects_enabled
 	post_grade.visible = effects_enabled
@@ -287,6 +310,42 @@ func _apply_corridor_variant() -> void:
 		corridor_depth.near_region = Rect2()
 		corridor_depth.lamps = corridor_defaults["lamps"] as PackedVector2Array
 	corridor_depth.rebuild()
+
+
+## The impact kit and the generated sound bank. The bank is built after Settings so its players
+## land on the Effects bus the sliders drive; Reduced Motion follows the Settings toggle.
+func _setup_impact() -> void:
+	impact = Impact.new()
+	impact.name = "Impact"
+	impact.setup(intro_camera, intro_fade, intro_alarm)
+	impact.reduce_motion = settings_menu.reduced_motion.button_pressed
+	settings_menu.reduced_motion_changed.connect(func(on: bool) -> void: impact.reduce_motion = on)
+	add_child(impact)
+	sfx_bank = SfxBank.new()
+	sfx_bank.name = "SfxBank"
+	add_child(sfx_bank)
+
+
+## One-shot particle presets parked at the places that already answer the player: the relay
+## contact, the seal's landing, the containment gate and the Records exit arc.
+func _setup_particles() -> void:
+	relay_sparks = FxPresets.sparks()
+	relay_sparks.position = Vector2(601.0, 390.0)
+	door_dust = FxPresets.dust_burst()
+	door_dust.position = Vector2(780.0, 436.0)
+	door_dust.emission_shape = CPUParticles2D.EMISSION_SHAPE_RECTANGLE
+	door_dust.emission_rect_extents = Vector2(30.0, 3.0)
+	gate_dust = FxPresets.dust_burst()
+	gate_dust.position = Vector2(115.0, 438.0)
+	gate_dust.emission_shape = CPUParticles2D.EMISSION_SHAPE_RECTANGLE
+	gate_dust.emission_rect_extents = Vector2(70.0, 3.0)
+	for particles: CPUParticles2D in [relay_sparks, door_dust, gate_dust]:
+		particles.z_index = 3
+		add_child(particles)
+	exit_sparks = FxPresets.sparks(Color("#c1f4d8"))
+	exit_sparks.position = Vector2(830.0, 330.0)
+	exit_sparks.z_index = 3
+	records_room.add_child(exit_sparks)
 
 
 ## A small additive glow riding on a station status light; it takes the light's colour each refresh.
@@ -330,6 +389,11 @@ func _process(delta: float) -> void:
 		_refresh_ui()
 		return
 	_update_gameplay_camera()
+	if fail_active:
+		# Knocked down: the reaction plays out and the last autosave returns; nothing else reads input.
+		_refresh_ui()
+		return
+	hold_use.advance(delta, human.controlled and Input.is_action_pressed(&"interact"), _hold_station())
 	if wolf_heading_to_relay and absf(wolf.position.x - RELAY_CONTACT_X) <= 4.0:
 		_wolf_takes_relay()
 	if tutorial_step == 0 and (Input.is_action_pressed(&"move_left") or Input.is_action_pressed(&"move_right")):
@@ -363,6 +427,7 @@ func _new_game() -> void:
 		intro_tween.kill()
 	if chapter_tween != null and chapter_tween.is_running():
 		chapter_tween.kill()
+	_cancel_fail()
 	chapter_close_active = false
 	tutorial_step = 0
 	title_open = false
@@ -423,6 +488,7 @@ func _advance_intro() -> void:
 		wolf.body_sprite.modulate = Color("#9deeff")
 		intro_camera.zoom = Vector2(1.95, 1.95)
 		status_line = "The latch breaks from the inside. The gate slides aside. WOLF steps out under his own power.\nThe Director freezes at the sound of the seal opening."
+		_shutter_boom()
 		intro_tween = create_tween()
 		intro_tween.tween_property(intro_gate, "opening", 1.0, 0.65).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
 		intro_tween.parallel().tween_property(intro_alarm, "color:a", 0.13, 0.18)
@@ -480,6 +546,7 @@ func _finish_intro(keep_fade: bool = false) -> void:
 	wolf.autonomous_target_x = -1.0
 	_sync_door()
 	_update_controls()
+	_mark_beat()
 	status_line = "WOLF: I heard the Director's plan for me. I woke myself. He wants me to hunt people he calls threats.\n%s: Then we get through maintenance before the original logs disappear." % state.human_name().get_slice(" ", 0).to_upper()
 	queue_redraw()
 	_refresh_ui()
@@ -630,8 +697,9 @@ func _on_pause_button() -> void:
 
 
 func _pause_game() -> void:
-	for action: StringName in [&"move_left", &"move_right", &"interact", &"choice_1", &"choice_2"]:
+	for action: StringName in GAMEPLAY_ACTIONS:
 		Input.action_release(action)
+	impact.end_hit_stop()
 	_show_pause_menu()
 	pause_overlay.show()
 	_fade_backdrop()
@@ -645,6 +713,8 @@ func _resume_game() -> void:
 	settings_menu.cancel_capture()
 	get_tree().paused = false
 	pause_overlay.hide()
+	# A pause that landed inside a hit-stop or flash never leaves play slowed or tinted.
+	impact.reset()
 	_refresh_ui()
 
 
@@ -711,6 +781,8 @@ func _return_to_title() -> void:
 		_finish_intro()
 	if chapter_tween != null and chapter_tween.is_running():
 		chapter_tween.kill()
+	_cancel_fail()
+	intro_fade.color.a = 0.0
 	chapter_close_active = false
 	waiting_for_choice = false
 	choice_context = ""
@@ -881,6 +953,8 @@ func _load_game() -> void:
 	choice_context = ""
 	relay_refused = false
 	wolf_heading_to_relay = false
+	fail_active = false
+	hold_use.reset()
 	_sync_scene()
 	_start_gameplay_camera()
 	if state.chapter_id == "records":
@@ -922,6 +996,9 @@ func _interact_breaker() -> void:
 		status_line = "WOLF: You know what 'coolant fault' means. What happens if I touch the live relay?\n1  \"%s\"\n2  \"%s\"" % [M0State.CHOICE_TEXT[M0State.DISCLOSE], M0State.CHOICE_TEXT[M0State.PRESS]]
 	elif state.arm_breaker():
 		status_line = "The breaker catches. Blue light fills the coolant relay; the red seal stays shut."
+		sfx_bank.play(&"clank", -4.0, 0.8)
+		impact.rumble(0.15, 0.0, 0.06)
+		_mark_beat()
 		queue_redraw()
 	else:
 		status_line = "Power is already on. The relay is farther down the hall."
@@ -933,6 +1010,7 @@ func _choose(choice_id: String) -> void:
 	waiting_for_choice = false
 	choice_context = ""
 	_update_controls()
+	_mark_beat()
 	if choice_id == M0State.DISCLOSE:
 		status_line = "WOLF: Thank you for telling me. I'll take the relay. Arm the breaker."
 		_react_as_wolf(true)
@@ -978,6 +1056,7 @@ func _interact_relay() -> void:
 		wolf_heading_to_relay = false
 		_update_controls()
 		_sync_door(true)
+		_mark_beat()
 
 
 func _wolf_takes_relay() -> void:
@@ -987,6 +1066,7 @@ func _wolf_takes_relay() -> void:
 		_react_as_wolf(true)
 		_flash_relay_spark(true)
 		_sync_door(true)
+		_mark_beat()
 	_update_controls()
 
 
@@ -1042,6 +1122,12 @@ func _interact_records(x: float) -> void:
 			intro_camera.position_smoothing_enabled = false
 			_update_controls()
 			_sync_records_room(true)
+			# The exit arc: the bolt lets go with a crackle, a small kick and a spark shower.
+			sfx_bank.play(&"arc", -3.0)
+			impact.add_trauma(0.3)
+			impact.flash(0.06, 0.0)
+			impact.rumble(0.3, 0.4, 0.12)
+			impact.burst(exit_sparks)
 			chapter_tween = create_tween()
 			chapter_tween.tween_property(intro_camera, "position", Vector2(576.0, 330.0), 0.5).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
 			chapter_tween.parallel().tween_property(intro_camera, "zoom", Vector2(1.25, 1.25), 0.5)
@@ -1097,6 +1183,112 @@ func _capture_positions() -> void:
 	state.wolf_position = wolf.position
 
 
+## Remembers the state at the start of a beat. Before the first checkpoint there is no autosave,
+## so a knockdown restores this instead; it carries the relay memory like a save would.
+func _mark_beat() -> void:
+	_capture_positions()
+	beat_snapshot = state.to_dict()
+
+
+## The station in reach that takes a held USE, or empty. The corridor and Records have none yet;
+## the junction valve will answer here.
+func _hold_station() -> StringName:
+	return &""
+
+
+## One path for every knockdown: a readable reaction (hit-stop, red wash, the engineer tilts and
+## slides with a thud and rumble), controls off briefly, a short fade, then the current beat's
+## autosave comes back through _load_game/_sync_scene. Memory and Records flags are never touched.
+## With Reduced Motion the tilt, hit-stop and shake are skipped; the thud, wash and fade remain.
+func _fail_beat(reason: String) -> void:
+	if fail_active or title_open or intro_active or chapter_close_active:
+		return
+	fail_active = true
+	for action: StringName in GAMEPLAY_ACTIONS:
+		Input.action_release(action)
+	waiting_for_choice = false
+	choice_context = ""
+	wolf_heading_to_relay = false
+	human.velocity = Vector2.ZERO
+	_update_controls()
+	impact.hit_stop(0.06)
+	impact.flash(0.0, 0.3)
+	impact.add_trauma(0.6)
+	impact.rumble(0.5, 0.9, 0.25)
+	sfx_bank.play(&"thud", 0.0, 0.9)
+	_cancel_fail_tween()
+	fail_tween = create_tween()
+	var reaction_seconds: float = 0.0
+	if impact.motion_allowed():
+		# Fall away from the facing direction so the hit reads as a shove, not a stumble forward.
+		var facing: float = -1.0 if human.body_sprite.flip_h else 1.0
+		reaction_seconds = 0.22
+		fail_tween.tween_property(human.body_sprite, "rotation_degrees", -70.0 * facing, reaction_seconds).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
+		fail_tween.parallel().tween_property(human.body_sprite, "position", HUMAN_SPRITE_REST + Vector2(-30.0 * facing, 14.0), reaction_seconds).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
+	fail_tween.tween_interval(FAIL_CONTROLS_OFF_SECONDS - reaction_seconds)
+	fail_tween.tween_property(intro_fade, "color:a", 1.0, FAIL_FADE_SECONDS)
+	fail_tween.tween_callback(_restore_beat.bind(reason))
+	fail_tween.tween_property(intro_fade, "color:a", 0.0, 0.35)
+	status_line = reason
+	_refresh_ui()
+
+
+func _restore_beat(reason: String) -> void:
+	fail_active = false
+	var restored: bool = false
+	if state.checkpoint_reached and M0State.load_from_disk(save_path) != null:
+		_load_game()
+		restored = true
+	elif not beat_snapshot.is_empty():
+		var snapshot: M0State = M0State.from_dict(beat_snapshot)
+		if snapshot != null:
+			state = snapshot
+			relay_refused = false
+			wolf_heading_to_relay = false
+			last_top_card_key = ""
+			hold_use.reset()
+			_sync_scene()
+			_start_gameplay_camera()
+			restored = true
+	if not restored:
+		_sync_scene()
+	# _load_game clears the fade; the knockdown's fade-in starts from black.
+	intro_fade.color.a = 1.0
+	status_line = "%s\nBack at the last autosave." % reason
+	_refresh_ui()
+
+
+func _cancel_fail_tween() -> void:
+	if fail_tween != null and fail_tween.is_valid():
+		fail_tween.kill()
+	fail_tween = null
+
+
+## Drops a knockdown in progress (New Game or Return to Title from Pause) without restoring anything.
+func _cancel_fail() -> void:
+	_cancel_fail_tween()
+	fail_active = false
+	human.body_sprite.rotation_degrees = 0.0
+	human.body_sprite.position = HUMAN_SPRITE_REST
+
+
+## The containment gate letting go in the opening: a boom, a kick and dust at its base.
+func _shutter_boom() -> void:
+	sfx_bank.play(&"boom", -2.0)
+	impact.add_trauma(0.6)
+	impact.flash(0.09, 0.0)
+	impact.rumble(0.5, 0.9, 0.25)
+	impact.burst(gate_dust)
+
+
+## The seal finishing its rise into the ceiling.
+func _door_lands() -> void:
+	sfx_bank.play(&"thud", -2.0, 1.1)
+	impact.add_trauma(0.5)
+	impact.rumble(0.4, 0.6, 0.2)
+	impact.burst(door_dust)
+
+
 func _sync_scene() -> void:
 	if wolf_reaction_tween != null and wolf_reaction_tween.is_running():
 		wolf_reaction_tween.kill()
@@ -1104,7 +1296,10 @@ func _sync_scene() -> void:
 		relay_spark_tween.kill()
 	wolf.body_sprite.position = WOLF_SPRITE_REST
 	wolf.body_sprite.rotation_degrees = 0.0
+	human.body_sprite.position = HUMAN_SPRITE_REST
+	human.body_sprite.rotation_degrees = 0.0
 	relay_spark.hide()
+	impact.reset()
 	human.position = state.human_position
 	wolf.position = state.wolf_position
 	human.velocity = Vector2.ZERO
@@ -1142,6 +1337,13 @@ func _flash_relay_spark(from_wolf: bool) -> void:
 	relay_spark_tween = create_tween()
 	relay_spark_tween.tween_property(relay_spark, "modulate:a", 0.0, 0.48)
 	relay_spark_tween.tween_callback(relay_spark.hide)
+	# The contact itself: a clank with a short crackle, a kick and a spark shower in the route's colour.
+	sfx_bank.play(&"clank", 0.0, 1.0 if from_wolf else 0.92)
+	sfx_bank.play(&"arc", -8.0, 1.2)
+	impact.add_trauma(0.35)
+	impact.rumble(0.3, 0.5, 0.15)
+	relay_sparks.color = relay_spark.default_color
+	impact.burst(relay_sparks)
 
 
 func _sync_records_room(animate_exit: bool = false) -> void:
@@ -1170,11 +1372,12 @@ func _sync_door(animate: bool = false) -> void:
 		door_tween = create_tween()
 		door_tween.tween_property(door_visual, "scale:y", 0.0, 0.38).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_IN)
 		door_tween.tween_callback(door_visual.hide)
+		door_tween.tween_callback(_door_lands)
 	queue_redraw()
 
 
 func _update_controls() -> void:
-	human.controlled = not title_open and not intro_active and not chapter_close_active and not waiting_for_choice
+	human.controlled = not title_open and not intro_active and not chapter_close_active and not waiting_for_choice and not fail_active
 	wolf.controlled = false
 	wolf.autonomous_target_x = RELAY_CONTACT_X if wolf_heading_to_relay else (520.0 if state.chapter_id == "records" and not state.mirror_trace_preserved else -1.0)
 	wolf.follow_target = human if human.controlled and wolf.autonomous_target_x < 0.0 else null
@@ -1184,6 +1387,8 @@ func _update_controls() -> void:
 
 func _refresh_ui() -> void:
 	var touch_layout: bool = touch_enabled and not controller_active
+	impact.rumble_enabled = controller_active
+	impact.haptics_enabled = touch_layout
 	pause_button.visible = not title_open and not pause_overlay.visible
 	pause_button.text = "PAUSE"
 	touch_controls.visible = (touch_layout or waiting_for_choice) and not title_open and not pause_overlay.visible
