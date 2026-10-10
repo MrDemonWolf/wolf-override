@@ -32,10 +32,11 @@ if grep -qE '^ERROR:|SCRIPT ERROR|Parse Error' "$logs/import.log"; then
 fi
 
 status=0
+# A suite also fails if it leaks objects at exit, so a leak in the game's own nodes or audio shows up.
 for test in apps/game/tests/*_test.gd; do
   name="$(basename "$test" .gd)"
   if "$godot" --headless --path apps/game --script "res://tests/$name.gd" > "$logs/$name.log" 2>&1 \
-    && ! grep -qE '^ERROR:|SCRIPT ERROR|Parse Error' "$logs/$name.log"; then
+    && ! grep -qE '^ERROR:|SCRIPT ERROR|Parse Error|instances were leaked at exit' "$logs/$name.log"; then
     echo "pass  $name"
   else
     echo "FAIL  $name (see $logs/$name.log)" >&2

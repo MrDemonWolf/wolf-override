@@ -64,8 +64,10 @@ func _run() -> void:
 	_expect(bank.play(&"boom") == null, "a disabled bank plays nothing")
 	bank.enabled = true
 	game.queue_free()
-	# The mixer releases a stopped clip a few steps later; give it that time before quitting.
-	await create_timer(0.1).timeout
+	# The mixer thread releases a stopped clip's playback (and with it the clip) some mix steps later;
+	# quitting sooner leaks them at exit, which check-game.sh treats as a failure. 0.1 s was not
+	# always enough on the headless dummy driver.
+	await create_timer(0.5).timeout
 	if failures == 0:
 		print("SfxBank checks passed")
 	quit(1 if failures > 0 else 0)
