@@ -47,14 +47,16 @@ func _physics_process(delta: float) -> void:
 		velocity.x = Input.get_axis(&"move_left", &"move_right") * WALK_SPEED
 	elif autonomous_target_x >= 0.0:
 		velocity.x = _approach(autonomous_target_x, delta)
+		# Once he has walked off on his own, he picks his side afresh from the engineer's facing.
+		follow_side = 0
 	elif follow_target != null:
 		following = true
 		velocity.x = _approach(follow_x(delta), delta)
 	else:
 		velocity.x = 0.0
 	if not following:
-		# Back to following later, he picks his side afresh from the engineer's facing.
-		follow_side = 0
+		# A pause in following (a choice, a chapter close) keeps his side, so a turn still has to
+		# hold for TURN_SETTLE_SECONDS of play before he crosses.
 		turn_seconds = 0.0
 	if body_sprite != null:
 		if absf(velocity.x) > 1.0:
@@ -114,9 +116,10 @@ func _approach(target_x: float, delta: float) -> float:
 	return clampf(distance / delta, -FOLLOW_SPEED, FOLLOW_SPEED) if absf(distance) > 2.0 else 0.0
 
 
-## True while this body walks across keep_clear_of, close enough that the two drawn bodies overlap.
+## True while this body walks across a shown keep_clear_of, close enough that the two drawn bodies overlap.
 func passing() -> bool:
-	return keep_clear_of != null and absf(velocity.x) > 1.0 and absf(position.x - keep_clear_of.position.x) < CLEAR_GAP
+	return keep_clear_of != null and keep_clear_of.is_visible_in_tree() and absf(velocity.x) > 1.0 \
+		and absf(position.x - keep_clear_of.position.x) < CLEAR_GAP
 
 
 func _tint_pass(delta: float) -> void:

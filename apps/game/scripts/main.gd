@@ -589,6 +589,7 @@ func _finish_intro(keep_fade: bool = false) -> void:
 	wolf.z_index = ACTOR_Z
 	wolf.position = state.wolf_position
 	wolf.autonomous_target_x = -1.0
+	wolf.follow_side = 0
 	_sync_door()
 	_update_controls()
 	_mark_beat()
@@ -1822,6 +1823,8 @@ func _sync_scene() -> void:
 	impact.reset()
 	human.position = state.human_position
 	wolf.position = state.wolf_position
+	# Placed afresh, he picks his side afresh from the engineer's facing.
+	wolf.follow_side = 0
 	human.velocity = Vector2.ZERO
 	wolf.velocity = Vector2.ZERO
 	_update_controls()

@@ -33,8 +33,19 @@ func _run() -> void:
 	_check_reaches(human, wolf)
 	_expect(wolf.get_index() < human.get_index() and wolf.z_index == human.z_index and wolf.keep_clear_of == human, "the engineer draws in front of WOLF at the same depth")
 
-	# The corridor: the opening hands over with WOLF a follow gap behind, clear of the engineer.
+	# The opening: the engineer is hidden, so WOLF walking out past his spot never dims.
 	game.call("_new_game")
+	var intro_dimmed: bool = false
+	var intro_walked: bool = false
+	for _step: int in 4:
+		game.call("_advance_intro")
+		for _frame: int in 60:
+			await physics_frame
+			intro_walked = intro_walked or absf(wolf.velocity.x) > 1.0
+			intro_dimmed = intro_dimmed or wolf.passing() or wolf.body_sprite.self_modulate.v < 0.99
+	_expect(intro_walked and not human.is_visible_in_tree() and not intro_dimmed, "in the opening WOLF walks out undimmed past the hidden engineer")
+
+	# The corridor: the opening hands over with WOLF a follow gap behind, clear of the engineer.
 	game.call("_finish_intro")
 	await _settle()
 	_expect_clear(human, wolf, "corridor start")
@@ -60,9 +71,28 @@ func _run() -> void:
 	await _settle()
 	_expect_clear(human, wolf, "corridor at rest after quick taps")
 
+	# A short turn just before following pauses (a choice prompt) still has to settle once play resumes.
+	await _tap_frames(&"move_left", 8)
+	game.set("waiting_for_choice", true)
+	game.call("_update_controls")
+	for _frame: int in 30:
+		await physics_frame
+	game.set("waiting_for_choice", false)
+	game.call("_update_controls")
+	var held_side: bool = true
+	for _frame: int in 10:
+		await physics_frame
+		held_side = held_side and wolf.follow_side == -1
+	_expect(held_side, "a pause in following does not skip the turn settle")
+	await _tap_frames(&"move_right", 3)
+	await _settle()
+	_expect(wolf.follow_side == -1, "facing right again, WOLF keeps his side behind")
+
 	# A real turn moves him to the other side once, behind the engineer and dimmed while passing.
 	var dimmed: bool = false
+	var reflection_dimmed: bool = false
 	var drawn_behind: bool = true
+	var reflection: FloorReflection = wolf.get_node_or_null("BodySpriteReflection") as FloorReflection
 	Input.action_press(&"move_left")
 	for _frame: int in 40:
 		await physics_frame
@@ -77,9 +107,11 @@ func _run() -> void:
 			last_side = wolf.follow_side
 		if wolf.passing():
 			dimmed = dimmed or wolf.body_sprite.self_modulate.v < 0.95
+			reflection_dimmed = reflection_dimmed or (reflection != null and reflection.modulate.v < 0.95)
 			drawn_behind = drawn_behind and wolf.get_index() < human.get_index() and wolf.z_index <= human.z_index
 	_expect(side_changes == 1 and wolf.follow_side == 1, "turning left moves WOLF to the engineer's right exactly once")
 	_expect(dimmed and drawn_behind, "crossing over, WOLF passes behind the engineer and dims")
+	_expect(reflection_dimmed, "WOLF's floor reflection dims with him")
 	_expect_clear(human, wolf, "corridor at rest after the turn")
 	# He stops within the 2 px of his spot that M0Actor treats as arrived.
 	_expect(absf(wolf.position.x - human.position.x - M0Actor.FOLLOW_GAP) <= 2.5 and wolf.body_sprite.flip_h, "on the right WOLF rests a follow gap away, facing the engineer")

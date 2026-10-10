@@ -68,7 +68,8 @@ func _mirror() -> void:
 	scale = Vector2(source.scale.x, source.scale.y * SQUASH)
 	rotation = -source.rotation
 	flip_h = source.flip_h
-	modulate = source.modulate
+	# self_modulate too, so the reflection dims with WOLF as he passes behind the engineer.
+	modulate = source.modulate * source.self_modulate
 	shadow.position = Vector2(source.position.x, floor_y)
 	shadow.modulate.a = source.modulate.a
 
