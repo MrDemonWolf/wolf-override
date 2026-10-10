@@ -18,6 +18,7 @@ func _run() -> void:
 	corrupt.set_value("controls", "deadzone", "bad")
 	corrupt.set_value("video", "fullscreen", {})
 	corrupt.set_value("video", "vsync", {})
+	corrupt.set_value("video", "reduced_motion", "bad")
 	corrupt.set_value("bindings", "interact_keyboard", {"type": "key", "code": KEY_I})
 	corrupt.set_value("bindings", "choice_1_keyboard", {"type": "key", "code": KEY_I})
 	corrupt.save(path)
@@ -32,7 +33,15 @@ func _run() -> void:
 	(game.get_node("CanvasLayer/TitleScreen/SettingsButton") as Button).pressed.emit()
 	var menu: GameSettings = game.get("settings_menu") as GameSettings
 	_expect(Engine.max_fps == 60 and (menu.volumes["Music"] as HSlider).value == 100.0 and menu.deadzone.value == 0.25, "malformed saved preferences do not interrupt scene setup")
-	_expect(menu.prompt(&"interact", false) == "E" and menu.prompt(&"choice_1", false) == "1" and menu.vsync.button_pressed, "invalid booleans and reserved loaded bindings restore safe defaults")
+	_expect(menu.prompt(&"interact", false) == "E" and menu.prompt(&"choice_1", false) == "1" and menu.vsync.button_pressed and not menu.reduced_motion.button_pressed, "invalid booleans and reserved loaded bindings restore safe defaults")
+	var impact: Impact = game.get("impact") as Impact
+	_expect(impact != null and not impact.reduce_motion and menu.reduced_motion.is_visible_in_tree(), "Reduced Motion is off by default and sits on the Display tab")
+	menu.reduced_motion.button_pressed = true
+	_expect(impact.reduce_motion, "the Reduced Motion toggle reaches the impact kit")
+	impact.add_trauma(1.0)
+	impact.hit_stop(0.09)
+	await process_frame
+	_expect((game.get_node("IntroCamera") as Camera2D).offset == Vector2.ZERO and Engine.time_scale == 1.0, "with Reduced Motion on, a boom leaves the camera still and skips hit-stop")
 	_expect(paused and menu.is_visible_in_tree() and game.get("title_open"), "settings open before starting a game")
 	var navigation_actions: Array[StringName] = [&"ui_left", &"ui_right", &"ui_up", &"ui_down"]
 	var navigation_buttons: Array[JoyButton] = [JOY_BUTTON_DPAD_LEFT, JOY_BUTTON_DPAD_RIGHT, JOY_BUTTON_DPAD_UP, JOY_BUTTON_DPAD_DOWN]
@@ -93,7 +102,7 @@ func _run() -> void:
 	game.call("_on_fps_selected", 0)
 	var config: ConfigFile = ConfigFile.new()
 	config.load(path)
-	_expect(config.get_value("audio", "Music") == 37.0 and config.get_value("video", "msaa_2d") == 2 and config.get_value("video", "fps_limit") == 30, "video saves preserve audio and extra graphics preferences")
+	_expect(config.get_value("audio", "Music") == 37.0 and config.get_value("video", "msaa_2d") == 2 and config.get_value("video", "fps_limit") == 30 and config.get_value("video", "reduced_motion") == true, "video saves preserve audio, Reduced Motion and extra graphics preferences")
 	_expect(root.msaa_2d == Viewport.MSAA_4X, "edge smoothing applies to the game viewport")
 	menu.tabs.current_tab = 2
 	menu.begin_capture(&"interact", "keyboard")
@@ -141,6 +150,8 @@ func _run() -> void:
 	var restored: GameSettings = reloaded.get("settings_menu") as GameSettings
 	_expect(restored.prompt(&"interact", false) == "Q" and restored.prompt(&"choice_1", true) == "B" and restored.prompt(&"move_left", true) == "AXIS 2 −", "reopening restores key, button and stick bindings")
 	_expect((restored.volumes["Music"] as HSlider).value == 37.0 and restored.antialiasing.selected == 2 and Engine.max_fps == 30, "reopening restores volume and graphics preferences")
+	_expect(restored.reduced_motion.button_pressed and (reloaded.get("impact") as Impact).reduce_motion, "reopening restores Reduced Motion and applies it to the impact kit")
+	restored.reduced_motion.button_pressed = false
 	_expect(InputMap.action_get_events(&"move_right").size() == 4, "unmodified movement retains both keyboard keys, D-pad and stick")
 	reloaded.call("_new_game")
 	reloaded.call("_finish_intro")

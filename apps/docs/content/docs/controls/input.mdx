@@ -5,10 +5,13 @@ description: Default keyboard, controller, and touch inputs for the current sour
 
 You control the engineer. WOLF is an independent companion. In-game prompts show the keyboard or controller binding you have set; these are the defaults.
 
+Every room uses the same small set of inputs: move, interact, the two answers and pause. The Service Junction adds no new buttons; its valve is cranked by **holding** interact, and its prompt says **HOLD** when that applies. Each 0.4 seconds held is one turn, and turns already made stay done if you let go or pause.
+
 | Action | Keyboard | Controller | Touch |
 | --- | --- | --- | --- |
 | Move | A / D or ← / → | Left stick or D-pad left / right | Hold ◀ / ▶ |
 | Interact; continue the opening or closing beat | E | A | USE (labelled CONTINUE during the opening and closing beat) |
+| Crank the Service Junction valve | Hold E | Hold A | Hold USE (labelled CRANK there) |
 | Answer 1 / Answer 2 | 1 / 2, or click the response | X / Y | Tap the response |
 | Pause or resume | Esc | Start | PAUSE button; tap RESUME to continue |
 | Back in menus | Esc | B | Android Back |
@@ -23,6 +26,6 @@ Move, Interact, both answers, and Pause can be rebound in [Settings](/docs/contr
 
 **Controller:** the selected menu item shows a cyan outline inside its border. Closing Settings from the title returns the selection to **SETTINGS**.
 
-**Touch:** on iOS and Android builds the direction buttons hide during the opening, the closing beat, and while a choice is waiting. **PAUSE** opens Resume, Settings, and Return to Title (Skip Opening during the opening). On Android, the system Back gesture backs out of menus one step at a time and pauses play; it only closes the game from the title screen. Leaving the app during play pauses the game. Menus opened by touch show no selection outline; the first arrow key or controller press selects a menu item without activating it.
+**Touch:** on iOS and Android builds the direction buttons hide during the opening, the closing beat, and while a choice is waiting. **PAUSE** opens Resume, Settings, and Return to Title (Skip Opening during the opening). On Android, the system Back gesture backs out of menus one step at a time and pauses play; it only closes the game from the title screen. Leaving the app during play pauses the game. Menus opened by touch show no selection outline; the first arrow key or controller press selects a menu item without activating it. At the Service Junction's arm panel **USE** reads **DROP**. While the arrows and **USE** are on screen the camera sits a little lower, so the characters' feet and the machines' bases stay above the buttons; it rises back while answer buttons are shown.
 
 **Status:** controller hardware and physical touch devices have not been playtested; one iOS simulator launch was checked. There is no public mobile download yet. For checkpoint behaviour, see [Saving](/docs/controls/saves/).

@@ -66,6 +66,16 @@ func _run() -> void:
 	_expect(closing_camera.position == paused_camera_position, "pause freezes the closing camera transition")
 	(game.get_node("CanvasLayer/PauseOverlay") as PauseOverlay).resume_requested.emit()
 	_expect(not paused and game.get("chapter_close_active") and not human.controlled, "resume preserves the closing beat until Continue")
+	await create_timer(0.6).timeout
+	_expect(closing_camera.zoom.x >= 1.35, "the closing shot never zooms out past the play view")
+	var close_half: Vector2 = Vector2(960.0, 540.0) * 0.5 / closing_camera.zoom
+	var dialogue_top: float = (game.get_node("CanvasLayer/BottomBar") as Panel).position.y
+	var framed: bool = closing_camera.position.x + close_half.x <= 960.0
+	for actor: M0Actor in [human, wolf]:
+		var screen_x: float = (actor.position.x - closing_camera.position.x) * closing_camera.zoom.x + 480.0
+		framed = framed and screen_x > 40.0 and screen_x < 920.0
+	framed = framed and (440.0 - closing_camera.position.y) * closing_camera.zoom.y + 270.0 <= dialogue_top - 24.0
+	_expect(framed, "the closing shot keeps both actors in view with their feet clear above the dialogue")
 	await _tap(&"interact")
 	_expect(not game.get("chapter_close_active") and human.controlled, "closing beat returns control to the engineer")
 	var saved: Dictionary = state.to_dict()
@@ -161,6 +171,8 @@ func _run() -> void:
 	_expect(hint_text.text != "Save failed. Use a station to try again.", "a later successful save clears the failure hint")
 	DirAccess.remove_absolute(ProjectSettings.globalize_path(path))
 	game.queue_free()
+	# The exit arc clip is still playing; the mixer releases a stopped clip a few steps later, so give it that time before quitting.
+	await create_timer(0.1).timeout
 	if failures == 0:
 		print("Chapter scene checks passed")
 	quit(1 if failures > 0 else 0)

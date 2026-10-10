@@ -1,0 +1,128 @@
+== October 10, 2026 ==
+- In the Service Junction, when WOLF chooses to draw the sentry he now stops just short of the floor mark on the rubble side and the sentry comes to him, so he no longer walks through the machine on the way in. If the sentry turns on you instead, he waits at the rubble until the chase ends.
+- After the door blast, WOLF and the engineer now draw in front of the torn door frame, so WOLF stays in view while he holds at the rubble.
+- Credits in the game and on this website now list Tailwind CSS and the image tools used for the art crops and website images.
+- Website: the landing page, first steps, corridor and Service Junction screenshots are fresh captures of the current build, showing the layered corridor, the raised title menu and the junction door label clear of the wheel.
+- Development: the game checks now fail when a test leaves objects behind at exit, and the asset register covers the shader, font and theme files kept with the art.
+
+== October 9, 2026 ==
+- New provisional art, made with AI assistance and approved by Nathanial Henniges, for the maintenance corridor and Records Access. Each room is now built from far, middle and near painted layers that move at different speeds as the camera follows you, with pillars and machines along the walkway and pipework framing the screen edges. Each of the eight stations has its own machine in the same place and at the same size, with its labels and status lights as before, and the engineer, WOLF and the Director were redrawn.
+- The Service Junction has its own provisional art, made with AI assistance and approved by Nathanial Henniges: far, middle and near painted layers like the other two rooms, and painted machines for the valve, the sealed door, the relief vent, the overhead arm and its coolant tank, the ARM PANEL, the exit bolt, both hatches and the sentry, which now carries a scanner head. The door is left a torn frame after the blast, the tank drops away from an arm that stays put and comes to rest on the crushed sentry when it hits, and the gauge needle, turn lights, door seam and panel lights still show what the room is doing over the art.
+- The Service Junction now runs past the blown door to its exit. A patrolling sentry machine guards the lane beyond the rubble, and a coolant tank hangs over a striped floor mark; drop it from the ARM PANEL in the alcove just past the rubble (the touch button reads DROP there). At the rubble line WOLF asks how to bring the sentry down and decides for himself whether to help; you can always time the drop on your own. With the sentry down, pop the EXIT BOLT and leave through the hatch; a short closing scene returns you to the title. What lies past the hatch is not built yet.
+- A missed drop dents the tank, vents a short coolant cloud over the mark and sends the sentry after you; the arm winches the tank back up for another try a few seconds later.
+- Bringing down the sentry and leaving the junction both autosave, and Continue restores each stage. Being caught by the sentry or walking into the coolant cloud is a knockdown back to the last autosave with your choices intact.
+- New generated sounds for the sentry's motors, the arm's winch, the tank landing and the exit bolt.
+- The sentry's patrol now turns before it reaches the ARM PANEL alcove, so it no longer brushes past an engineer hiding there; after giving up a chase it walks back into its patrol instead of jumping; and when WOLF draws it onto the mark it stops clear of him, with WOLF standing clear of the tank.
+- In the Service Junction, whether the door blast knocks you down now depends only on where you stand when the fuse ends: in front of the door is a knockdown with the door still sealed, anywhere at or left of the relief vent the door goes and the game saves. Standing just short of the vent can no longer do both at once.
+- The relief vent's danger zone now matches its floor grate and the on-screen warning: any part of the engineer over the grate when it lets go is a knockdown, and the hint warns you while you stand there. The grate is drawn wider to show the whole zone.
+- During a knockdown the engineer now draws in front of WOLF, and the vent's steam burst is lighter and see-through.
+- The junction's pressure gauge now sits above the valve's label instead of covering it, and once the door is down the breaker and valve read SPENT, both right after the blast and after Continue.
+- With REDUCED MOTION on, the charged door seam in the Service Junction glows steadily instead of strobing.
+- Controller rumble now goes to the controller you are using, not always the first one connected.
+- A damaged or hand-edited save that places the engineer or WOLF past the junction's sealed door is now rejected instead of loading into a spot with no way back.
+- The play camera now sits closer to the engineer and WOLF in every room and shows them a little higher on screen, so their feet stay clear of the hint bar while the ceiling lamps and station labels remain in view. The Records and Service Junction closing shots move in closer instead of pulling back, without cutting any station label at the edge, and the first movement tip is centred over the room. Answer buttons sit a little higher and the junction's coolant tank hangs a little lower, so the tank stays in view below them when WOLF asks how to bring it down.
+- Credits in the game and on this website now list Claude Code by Anthropic alongside ChatGPT and Codex as AI coding assistants, the Codex image tool for the new art, and the generated sound effects.
+- In the Service Junction, a door that is already down now stays spent after Continue or a knockdown: using the breaker or the valve again no longer builds pressure, vents steam or sets off a second blast.
+- If an automatic save fails to write, a knockdown now returns you to the start of the step you were on instead of an older save, and your next interact press anywhere in the room tries the save again. A save file that becomes unreadable mid-room no longer sends a knockdown back to an earlier room.
+- Entering Records Access or the Service Junction now starts the camera on the engineer instead of panning across the room.
+- On touch play the camera sits a little lower while the arrows and USE are on screen, so the characters' feet and the machines' bases are no longer hidden behind the buttons.
+- The Service Junction's pipes no longer run through the OVERLOAD BREAKER and RELIEF VENT labels; the vent pipe now runs down to its floor grate, with its label beside it in the same font as the other labels.
+- The room art now loads as compressed textures and the unused part of each foreground layer was trimmed, to use less graphics memory. This has not been measured on a device yet.
+- Website: a Service Junction walkthrough with its solutions marked as spoilers, plus updated first steps (holding interact, knockdowns), input, saving, status and credits pages. None of the new room, camera, art or sound has been played through by hand yet; expect tuning after the first playtest.
+
+== October 8, 2026 ==
+- A third room, the Service Junction, begins past the Records exit: after the closing beat, use the open exit again to follow the service line. Arm the OVERLOAD BREAKER, then hold interact at the VALVE (the touch button reads CRANK) for three real turns before the relief vent lets go, and get clear of the door before its one-second fuse ends. The gauge, steam, hiss, pump pitch, wheel and lights all follow the real line; WOLF reads the door seam on his own and holds at the rubble afterwards. The room is in progress: what lies past the door is not built yet.
+- Being knocked down in the Service Junction (standing on the vent when it lets go, or in front of the door when it blows) returns you to the room's last autosave with your choices intact; entering the room and blowing the door both autosave. Saves are now version 4; older checkpoints still load.
+- Menus, buttons and on-screen cards share a raised look with a lit top edge, soft shadows and short hover, focus and press motion; Settings keeps its squared terminal style. On touch builds the PAUSE and USE buttons stay fully on screen.
+- The rooms gained depth: glowing, gently flickering ceiling lamps with soft light shafts, pulsing lockdown beacons, wall haze, drifting dust, soft reflections and contact shadows on the floor under the characters and machines, and a light vignette.
+- Big moments now answer back: the containment gate letting go in the opening, the relay contact, the seal landing and the Records exit each get a short sound, a brief camera shake and a spark or dust burst; the gate and the Records exit also flash the screen. The sounds are generated by the game itself from a fixed recipe (no audio files) and follow the Master and Effects volume sliders.
+- Settings > Display has a new REDUCED MOTION toggle that turns off camera shake and hit-stop and shortens screen flashes. It is saved with the other preferences.
+- Those moments also rumble a controller while one is in use and vibrate a phone or tablet on touch play.
+- The title CHANGELOG button now opens these updates inside the game; scroll with the mouse wheel, by dragging the text or with up/down, and use OPEN FULL CHANGELOG ONLINE for the website version. BACK TO TITLE, Esc, controller B or Android Back return to the title.
+- After you tell WOLF about the relay risk, he walks to the contact himself; you no longer have to find the exact spot. Using the relay again while he is walking takes the engineer's bypass instead.
+- Removed the N (new run) and L/F9 (load checkpoint) hotkeys, which discarded unsaved progress without warning. Use Pause, then Return to Title, then New Game or Continue.
+- Pause during the opening now pauses instead of skipping; choose Skip Opening from Pause to go straight to play.
+- On Android, Back backs out of menus and pauses play instead of closing the game; it only closes the game from the title screen.
+- Switching away from the game during play pauses it.
+- Returning to the title no longer leaves an unanswered choice that a later key press could answer.
+- In-game changelog and credits links point at wolfoverride.mrdemonwolf.dev.
+- Settings files are now read safely: damaged, oversized or unexpected content is ignored and default settings load instead.
+- When Continue is unavailable, a note under it says whether no checkpoint exists yet or the saved checkpoint could not be read.
+- When entering Records Access, copying a trace or securing the exit fails to save, the hint line now says so instead of a character's dialogue, and tells you to use a station to try again; normal hints return once you move on or a later save works.
+- If the checkpoint file is missing or damaged, Continue uses a complete save that was still being written when the game closed, and Continue keeps working with saves made before small wording changes.
+- Continuing in Records Access now tells you which copy is next or that the exit is open.
+- Title, credits and Pause menus now use the same cyan selection outline as Settings, drawn inside each button, and Settings sliders now use it too; Pause menu buttons and the Settings BACK, FPS limit and resolution controls also thicken and fill so the selection stands out from their border.
+- Menus opened by touch no longer show a selection outline; the first arrow key or controller press selects a menu item without activating it. With a keyboard or controller, closing title Settings by BACK, Esc, controller B or Android Back returns the selection to SETTINGS; after closing it by touch, the first arrow key or controller press selects SETTINGS.
+- The opening tutorial now matches the objective card: it marks the nearby display as optional, points toward your first goal instead of sending you back, clears when you reach that goal or interact with anything, and sits clear of the display and station art.
+- Website: the Roboto and Montserrat fonts now load as small Latin-subset WOFF2 files (about 73 KB together instead of 1.2 MB of TTF).
+- Website: the landing key art and the guide screenshots are now WebP files sized for the screen (the key art drops from 1.5 MB to under 80 KB at full size), the gameplay screenshots are fresh October 8 captures of the source build, and the first-steps tutorial shows the title screen again.
+- Website: the landing page's download section is now a single Get the build section with one Get the source build action and a plain list of planned platforms (Windows, macOS, iPhone/iPad, Android), each marked "no release date". The platform picker, the six disabled "Coming soon" buttons and the hover-only hints are gone; the navigation and footer link to it as Get the build. There is still no packaged download.
+- Website: the landing page is dark only and no longer has its own theme toggle; the game guide keeps its light/dark setting. Landing labels use Montserrat instead of a typewriter face, every landing link and button is at least 16 px, and button and card borders use a stronger line that measures at least 3:1 against their background.
+- Website: the The relationship is the game and Follow the build section labels on the landing page now get the same Montserrat label treatment as the other section labels (a page stylesheet rule had been overriding them), and the small captions inside the two progress cards ("Development updates", "For source players & contributors") are now 16 px like the rest of the card text.
+- Website: better keyboard and screen-reader support. The landing page's header, main content and footer are now separate landmarks, every guide page has a main landmark and its sidebar is named "Guide navigation", and one shared 3 px focus ring appears on every link, button and heading target, including the guide's sidebar and theme buttons. The guide's phone menu now tells screen readers whether it is open, moves keyboard focus into it when it opens and back to the menu button when it closes, and closes on Escape. Screenshot links say that they open a full-size image in a new tab, the "page not found" page is titled and links to the guide, and on tablet-sized screens the landing key art keeps both characters in view.
+- Website: while the guide's phone menu is open, Tab and Shift+Tab now stay inside it instead of moving onto the page behind the overlay, and the landing key art keeps both characters in view on any portrait screen, including 1024 px-wide 13-inch iPads that the previous tablet rule missed.
+- Website: the guide sections are now Play and settings (First steps, Input, Settings, Saving, Troubleshooting), Chapter walkthrough and Development, with each section name opening its overview and the same labels on the start page cards and the landing page. Input is one keyboard / controller / touch table that also notes the fixed I name key and the CONTINUE touch caption; Settings lists exactly the six rebindable actions; Saving names the automatic saves in Records Access and the checkpoint folder on macOS, Windows and Linux; the About page no longer promises a 2.5D presentation; the privacy note no longer describes the removed platform suggestion; and repeated "no download yet" notes were trimmed to one status line per page.
+- Website: Troubleshooting gained two rows, I want to go back to my last checkpoint (Pause, Return to Title, then Continue; there are no load or restart hotkeys) and The game closed when I pressed Back on Android, and the relay, objective-card and unexpected-keys rows now say what to do (interact again for the manual bypass, the card only shows briefly when your goal changes, check the Controls tab or RESTORE DEFAULT CONTROLS).
+- Website: the walkthrough now matches the current build. The corridor page says what happens when the safe point cannot save and that entering Records Access saves too; the Records Access page says that the room entry and each successful station save, that E (CONTINUE on touch) ends the closing beat, that Continue reports which copy is next or that the exit is open, and ends with a status line noting that both mirror routes pass headless checks but the room has not been played by hand.
+- Website: the Credits page is now titled Credits and references, and its two website-review notes describe the current plain platform list instead of the removed picker and hover hints. Link previews (Open Graph and Twitter cards) now use a 1200x630 JPEG crop of the provisional key art instead of the full 1.5 MB PNG.
+- README rewritten in the house format: shorter, with one keyboard / controller / touch controls table, setup and check commands, licence, credits and contact, and without the puzzle solutions (those stay in the walkthrough). It states that complete routes have not been played by hand.
+- Website and README: the Input table and the README controls table now say that only Esc, CANCEL REBIND or Android Back cancel a rebind (controller B pressed during a controller capture is bound, not treated as cancel), and that touch players resume from Pause by tapping RESUME because the on-screen PAUSE button is hidden while the menu is open. The README's wolf mark now renders at 160 px instead of the full page width.
+
+== October 7, 2026 ==
+- Esc and controller Start now resume from Pause; previously they could reopen Pause on the same press.
+- Esc or controller B in in-game Settings returns to the Pause menu instead of resuming; closing Settings from the title returns focus to the title menu.
+- Esc cancels a key rebind without leaving Settings.
+- Game and website now use the Roboto and Montserrat typefaces (SIL Open Font License 1.1).
+- Corridor and Records Access backgrounds keep their 16:9 framing, and the provisional Director and WOLF sprites were re-exported.
+- Website: a mobile navigation menu that opens over the page, a restyled landing page, readable hover states on the main buttons, and underlined links in the guide again.
+
+== October 3, 2026 ==
+- Added a spoiler-light first-steps tutorial for movement, interactions, choices, and checkpoints, linked from the homepage and game guide.
+- Fixed the platform picker menu contrast in dark and light themes.
+- Added story, gameplay, downloads, changelog, and guide links; an icon theme control; clearer source-build access; theme-aware scrollbars; and grouped footer links. The glass nav scrolls away instead of covering page content.
+- Put game availability and source-build instructions at the front of the guide, with a direct current-source ZIP link and clear notice that it is not an installer.
+- Added a public development story, clearer links to the full guide, changelog, credits, references, tools, and legal/licensing notes.
+
+== September 30, 2026 ==
+-- Menus and controls --
+- Restyled Settings with a terminal theme, clearer section labels and square-edged controls. The title screen keeps its game presentation.
+- Added a closer, smooth horizontal gameplay camera that follows the engineer while keeping the room edges inside view.
+- Added Return to Title to Pause for keyboard, controller and touch checkpoint recovery. Returning keeps the last checkpoint; unsaved progress is lost.
+- Fixed controller confirmation and remapped response conflicts so the intended choice is remembered.
+- Improved settings tab spacing, typography, padding, focus indicators and dropdown styling.
+- Hardened saved preferences against invalid values and conflicting bindings.
+- Fixed interrupted-load transitions and allowed Pause during closing dialogue.
+
+-- Scene presentation --
+- Added a framed containment cage, a gate that slides aside, and WOLF stepping forward after it opens.
+- Moved cinematic prompts and response cards clear of characters; adjusted the closing camera to show both actors above dialogue.
+- Corrected nearby checkpoint prompts and callbacks to match the route actually taken.
+- Expanded in-game and website credits with consulted design research, separate from project contributors.
+
+-- Website and development --
+- Reorganized the guide into a short start page, controls/settings and optional chapter walkthrough. Updated setup links and save behavior, kept private campaign drafts out, and clarified code versus asset licensing.
+- Fixed Skip to content to move keyboard focus to the page heading, with a visible focus outline.
+- Added page-specific search and social-sharing metadata, canonical URLs, author credits and an automatically generated sitemap for the public website and guide.
+- Updated the public corridor screenshot for the closer camera, labeled as a development capture. Removed the terminal title-menu promotion from the landing page.
+- Refined the landing page after official game-site research: clearer player actions, a labeled source-game frame, a shorter mobile hero and selected-platform downloads with other channels in a disclosure. Unavailable buttons no longer imitate active external links; guide and changelog links stay usable.
+- Redesigned the marketing homepage with cinematic key art, story and gameplay sections, and platform suggestions. All six planned download/store channels remain unavailable with visible Coming soon labels and browser tooltips.
+- Added this changelog and a title-screen link that opens it in your browser.
+- Added manual CI runs, bounded job times and downloadable game-check failure logs.
+- Recorded a staged Sparkle plan for direct macOS distribution. Integration is not implemented or enabled.
+
+Five deterministic Godot checks and the docs build passed during the UI review. Agents inspected 44 rendered stills. This does not replace complete hands-on routes, physical-controller testing, touch-device testing or export checks.
+
+== September 29, 2026 ==
+- Added a player-paced Director/WOLF opening before the engineer enters gameplay.
+- Added short-lived location and objective cards, a guided movement/interaction tutorial, and clearer station feedback.
+- Improved speaker labels, response cards and the chapter closing beat.
+- Added controller and touch input, Pause, and saved Display, Audio and Controls settings.
+- Added provisional room and machinery artwork with provenance in the asset register.
+
+== Earlier foundation ==
+The initial source slice established engineer-only movement, WOLF's independent cooperation/refusal, a manual puzzle fallback, remembered choices, checkpoints and save/load across two rooms. The public site added a play guide, development setup, light/dark themes and credits.
+
+== What is next ==
+Complete hands-on route testing comes first. Directional character animation, sound, adjustable dialogue presentation and release/device validation remain future work. Story drafts stay private; this page records source changes without campaign spoilers.
+
+See Testing and deployment for test boundaries and credits for tools, research and asset provenance.

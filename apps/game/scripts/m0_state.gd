@@ -1,13 +1,19 @@
 class_name M0State
 extends RefCounted
 
-const SAVE_VERSION: int = 3
+const SAVE_VERSION: int = 4
 const SAVE_PATH: String = "user://m0-save.json"
+const CHAPTER_IDS: Array[String] = ["lockdown", "records", "junction"]
 const EVENT_ID: String = "relay_disagreement"
 const DISCLOSE: String = "disclose_risk"
 const PRESS: String = "press_without_warning"
 const HUMAN_NAMES = ["Rowan Vale", "Alex Bennett", "Morgan Reed"]
 const MAX_SELECTED_TEXT_LENGTH: int = 200
+## Half the width of each actor's body (28 px engineer, 62 px WOLF), as main.tscn shapes them.
+const HUMAN_HALF_WIDTH: float = 14.0
+const WOLF_HALF_WIDTH: float = 31.0
+## The Service Junction's sealed door face; until the door is blown nobody can stand past it.
+const JUNCTION_DOOR_LEFT_X: float = 452.0
 const CHOICE_TEXT = {
 	"disclose_risk": "The relay may vent coolant. Your call.",
 	"press_without_warning": "Go now. We can talk after.",
@@ -27,6 +33,10 @@ var purge_trace_preserved: bool = false
 var mirror_trace_preserved: bool = false
 var mirror_route: String = ""
 var chapter_complete: bool = false
+## Service Junction progress (save v4), in order: the sealed door blown, the sentry down, the exit bolt popped.
+var door_blown: bool = false
+var sentry_down: bool = false
+var junction_cleared: bool = false
 
 
 func human_name() -> String:
@@ -113,6 +123,46 @@ func complete_chapter() -> bool:
 	return true
 
 
+## The Records exit leads into the Service Junction once the first copy is secured.
+func enter_junction() -> bool:
+	if chapter_id != "records" or not chapter_complete:
+		return false
+	chapter_id = "junction"
+	human_position = Vector2(120.0, 410.0)
+	wolf_position = Vector2(64.0, 423.0)
+	return true
+
+
+func blow_door() -> bool:
+	if chapter_id != "junction" or door_blown:
+		return false
+	door_blown = true
+	return true
+
+
+## The hanging tank came down on the sentry; only after the door is down.
+func drop_sentry() -> bool:
+	if chapter_id != "junction" or not door_blown or sentry_down:
+		return false
+	sentry_down = true
+	return true
+
+
+## The exit bolt is popped and the engineer leaves by the hatch; only once the sentry is down.
+func clear_junction() -> bool:
+	if chapter_id != "junction" or not sentry_down or junction_cleared:
+		return false
+	junction_cleared = true
+	return true
+
+
+## Whether WOLF chooses to draw the sentry under the tank when asked: the same rule as the relay
+## contact. He takes the risk only if he was told about the last one; the engineer can always time
+## the drop alone.
+func wolf_will_bait() -> bool:
+	return memory.get("choice_id") == DISCLOSE
+
+
 func checkpoint_callback() -> String:
 	if not checkpoint_reached or memory.is_empty():
 		return ""
@@ -141,6 +191,9 @@ func to_dict() -> Dictionary:
 		"mirror_trace_preserved": mirror_trace_preserved,
 		"mirror_route": mirror_route,
 		"chapter_complete": chapter_complete,
+		"door_blown": door_blown,
+		"sentry_down": sentry_down,
+		"junction_cleared": junction_cleared,
 	}
 
 
@@ -196,7 +249,7 @@ static func from_dict(raw: Variant) -> M0State:
 	if data["checkpoint_reached"] and not puzzle["door_open"]:
 		return null
 	if data["version"] >= 3:
-		if data.get("chapter_id") != "lockdown" and data.get("chapter_id") != "records":
+		if not (data.get("chapter_id") in CHAPTER_IDS) or (data["chapter_id"] == "junction" and data["version"] < 4):
 			return null
 		if typeof(data.get("purge_trace_preserved")) != TYPE_BOOL or typeof(data.get("mirror_trace_preserved")) != TYPE_BOOL or typeof(data.get("chapter_complete")) != TYPE_BOOL:
 			return null
@@ -213,6 +266,25 @@ static func from_dict(raw: Variant) -> M0State:
 		elif data["mirror_route"] != "":
 			return null
 		if data["chapter_complete"] and not data["mirror_trace_preserved"]:
+			return null
+	if data["version"] >= 4:
+		for field: String in ["door_blown", "sentry_down", "junction_cleared"]:
+			if typeof(data.get(field)) != TYPE_BOOL:
+				return null
+		if data["chapter_id"] == "junction":
+			# The junction opens only from a secured Records exit, and its beats land in order.
+			if not data["chapter_complete"]:
+				return null
+			if data["sentry_down"] and not data["door_blown"]:
+				return null
+			if data["junction_cleared"] and not data["sentry_down"]:
+				return null
+			# Before the blast the sealed door walls off the right of the room; a save that puts
+			# either actor past it would strand the engineer away from the breaker and valve.
+			if not data["door_blown"]:
+				if float(positions["human"][0]) + HUMAN_HALF_WIDTH > JUNCTION_DOOR_LEFT_X or float(positions["wolf"][0]) + WOLF_HALF_WIDTH > JUNCTION_DOOR_LEFT_X:
+					return null
+		elif data["door_blown"] or data["sentry_down"] or data["junction_cleared"]:
 			return null
 	var state: M0State = M0State.new()
 	state.name_index = int(identity["name_index"])
@@ -234,6 +306,10 @@ static func from_dict(raw: Variant) -> M0State:
 		state.mirror_trace_preserved = data["mirror_trace_preserved"]
 		state.mirror_route = data["mirror_route"]
 		state.chapter_complete = data["chapter_complete"]
+	if data["version"] >= 4:
+		state.door_blown = data["door_blown"]
+		state.sentry_down = data["sentry_down"]
+		state.junction_cleared = data["junction_cleared"]
 	return state
 
 

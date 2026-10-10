@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "design_revision": 4,
+  "design_revision": 5,
   "assets": [
     {
       "asset_id": "wolf-override-logo-mark",
@@ -16,32 +16,32 @@
     {
       "asset_id": "wolf-side-right-provisional",
       "path": "apps/game/assets/wolf-side-right-provisional.png",
-      "source_or_tool": "ChatGPT Create image via Chrome in the MDW WOLF//OVERRIDE [Game] project; ImageMagick used for transparent canvas extension",
+      "source_or_tool": "ChatGPT Create image via Chrome in the MDW WOLF//OVERRIDE [Game] project; ImageMagick used for transparent canvas extension; redrawn 2026-10-08 with the Codex built-in image_gen tool (edit mode)",
       "source_reference": "Create wolf concept sheet chat in the private game project, September 28, 2026; revised game-scale prompt and conversation URL retained in ignored art notes",
       "terms_reference": "https://openai.com/policies/terms-of-use/",
       "rights_review_status": "Provisional AI-assisted character art, human reviewed. Final commercial asset-rights review remains open; not covered by the code/docs GPL license.",
-      "modifications": "Selected the second, higher-contrast 1774x887 RGBA generation with transparency; extended the canvas by 64 transparent pixels on all sides to 1902x1015 with ImageMagick, preserving every original pixel exactly. Displayed as a scaled static side-view Sprite2D and flipped when WOLF moves left.",
-      "implementation_status": "Provisional WOLF sprite used in the corridor and Records Access; animation and final art direction pending."
+      "modifications": "Selected the second, higher-contrast 1774x887 RGBA generation with transparency; extended the canvas by 64 transparent pixels on all sides to 1902x1015 with ImageMagick, preserving every original pixel of that generation exactly. Displayed as a scaled static side-view Sprite2D and flipped when WOLF moves left. 2026-10-08: redrawn with the Codex built-in image_gen tool in edit mode using this file as the reference, on the same 1902x1015 canvas with transparency; Approved for integration by Nathanial Henniges on 2026-10-08 from a review sheet. The redraw replaced this file in place on 2026-10-09 (same path and import settings, so the in-game scale and feet baseline are unchanged).",
+      "implementation_status": "Provisional WOLF sprite used in the corridor, Records Access and the Service Junction; animation and final art direction pending. Since 2026-10-08 the Godot import generates mipmaps and the sprite samples them (linear-with-mipmaps filter), so the heavily downscaled sheet no longer aliases; the 2026-10-08 redraw is shown unedited."
     },
     {
       "asset_id": "rowan-side-right-provisional",
       "path": "apps/game/assets/rowan-side-right-provisional.png",
-      "source_or_tool": "ChatGPT Create image via Chrome in the MDW WOLF//OVERRIDE [Game] project",
+      "source_or_tool": "ChatGPT Create image via Chrome in the MDW WOLF//OVERRIDE [Game] project; redrawn 2026-10-08 with the Codex built-in image_gen tool (edit mode)",
       "source_reference": "Create wolf concept sheet chat in the private game project, September 28, 2026; edited Rowan design and conversation URL retained in ignored art notes",
       "terms_reference": "https://openai.com/policies/terms-of-use/",
       "rights_review_status": "Provisional AI-assisted appearance option, human reviewed. Character appearance and final commercial asset-rights review remain open; not covered by the code/docs GPL license.",
-      "modifications": "Selected 1024x1536 RGBA edit of the masculine-presenting Rowan draft: cohesive deep-red hooded field jacket with charcoal trousers and boots, replacing the mixed yellow and silver details. Transparent original is displayed as a scaled static side-view Sprite2D and flipped when Rowan moves left. No pixel edits.",
-      "implementation_status": "Provisional Rowan appearance used in the corridor and Records Access; animation and appearance options pending."
+      "modifications": "Selected 1024x1536 RGBA edit of the masculine-presenting Rowan draft: cohesive deep-red hooded field jacket with charcoal trousers and boots, replacing the mixed yellow and silver details. Transparent original is displayed as a scaled static side-view Sprite2D and flipped when Rowan moves left. No pixel edits to that version. 2026-10-08: redrawn with the Codex built-in image_gen tool in edit mode using this file as the reference, on the same 1024x1536 canvas with transparency; Approved for integration by Nathanial Henniges on 2026-10-08 from a review sheet. The redraw replaced this file in place on 2026-10-09 (same path and import settings, so the in-game scale and feet baseline are unchanged).",
+      "implementation_status": "Provisional Rowan appearance used in the corridor, Records Access and the Service Junction; animation and appearance options pending. Since 2026-10-08 the Godot import generates mipmaps and the sprite samples them (linear-with-mipmaps filter), so the heavily downscaled sheet no longer aliases; the 2026-10-08 redraw is shown unedited."
     },
     {
       "asset_id": "director-side-left-provisional",
       "path": "apps/game/assets/director-side-left-provisional.png",
-      "source_or_tool": "ChatGPT Pro image edit via Chrome in the MDW WOLF//OVERRIDE [Game] project; Remove BG applied to final output",
+      "source_or_tool": "ChatGPT Pro image edit via Chrome in the MDW WOLF//OVERRIDE [Game] project; Remove BG applied to final output; redrawn 2026-10-08 with the Codex built-in image_gen tool (edit mode)",
       "source_reference": "Retained in private art notes (conversation link not published)",
       "terms_reference": "https://openai.com/policies/terms-of-use/",
       "rights_review_status": "Provisional AI-assisted character art, human reviewed. Final commercial asset-rights review remains open; not covered by the code/docs GPL license.",
-      "modifications": "Revised the original photorealistic cutout toward Rowan’s inked, faceted cel-shaded style, then removed the background. Final 1024x1536 RGBA profile sprite.",
-      "implementation_status": "Provisional Director appearance in the opening cutscene."
+      "modifications": "Revised the original photorealistic cutout toward Rowan’s inked, faceted cel-shaded style, then removed the background. Final 1024x1536 RGBA profile sprite. 2026-10-08: redrawn with the Codex built-in image_gen tool in edit mode using this file as the reference, on the same 1024x1536 canvas with transparency; Approved for integration by Nathanial Henniges on 2026-10-08 from a review sheet. The redraw replaced this file in place on 2026-10-09 (same path and import settings, so the in-game scale and feet baseline are unchanged).",
+      "implementation_status": "Provisional Director appearance in the opening cutscene. Since 2026-10-08 the Godot import generates mipmaps and the sprite samples them (linear-with-mipmaps filter), so the heavily downscaled sheet no longer aliases; the 2026-10-08 redraw is shown unedited."
     },
     {
       "asset_id": "title-corridor-key-art-provisional",
@@ -60,44 +60,284 @@
       "implementation_status": "Provisional cinematic title background in the Godot title screen; the public landing page serves the WebP derivatives and social previews use share-card.jpg."
     },
     {
-      "asset_id": "maintenance-corridor-background-provisional",
-      "path": "apps/game/assets/maintenance-corridor-background-provisional.png",
-      "source_or_tool": "ChatGPT Create image via Chrome in the WOLF//OVERRIDE [Game] project",
-      "source_reference": "https://chatgpt.com/g/g-p-6ab60b48c7608191987f04a81b04b5e2-wolf-override-game/c/6abb82fd-5d14-83e9-9332-a78148b708b2",
+      "asset_id": "corridor-far",
+      "path": "apps/game/assets/rooms/corridor-far.png",
+      "source_or_tool": "Codex built-in image_gen tool in edit mode, 2026-10-08, generated as one of three separate depth plates (far, mid, near) sharing one 16:9 frame",
+      "source_reference": "Reference: maintenance-corridor-background-provisional.png, the earlier single corridor painting (ChatGPT Create in the WOLF//OVERRIDE [Game] project, https://chatgpt.com/g/g-p-6ab60b48c7608191987f04a81b04b5e2-wolf-override-game/c/6abb82fd-5d14-83e9-9332-a78148b708b2), registered here until it was retired on 2026-10-09; generation prompts retained in ignored art notes",
       "terms_reference": "https://openai.com/policies/terms-of-use/",
-      "rights_review_status": "Provisional AI-assisted environment art, human review in progress. Final commercial asset-rights review remains open; not covered by the code/docs GPL license.",
-      "modifications": "Original 1672x941 RGB image generated without characters, stations or UI. Displayed at 960x540 to preserve the source 16:9 ratio, vertically offset behind live Godot corridor props; source pixels unchanged.",
-      "implementation_status": "Provisional gameplay background for the maintenance corridor."
+      "rights_review_status": "Provisional AI-generated environment art, human reviewed and approved for integration. Final commercial asset-rights review remains open; not covered by the code/docs GPL license. Approved for integration by Nathanial Henniges on 2026-10-08 from a review sheet.",
+      "modifications": "Original 1920x1080 RGB far plate (back wall, three ceiling lamps, wet floor), copied unchanged. First trialled 2026-10-08 as assets/trial/corridor-far-trial.png (same bytes).",
+      "implementation_status": "In use since 2026-10-09, imported VRAM-compressed. Drawn by RoomDepth as the corridor backdrop: a Parallax2D at 0.9x camera speed, 960 px wide, sitting 27 px lower than the mid plate so its painted ceiling lamps stay in the play view, with additive glows and light shafts on its lamps, two procedurally drawn lockdown beacons, haze and dust. From 2026-10-09 it also stood in, tinted, for the Service Junction until that room's own set was integrated the same day."
     },
     {
-      "asset_id": "records-access-background-provisional",
-      "path": "apps/game/assets/records-access-background-provisional.png",
-      "source_or_tool": "ChatGPT Create image via Chrome in the WOLF//OVERRIDE [Game] project",
-      "source_reference": "https://chatgpt.com/g/g-p-6ab60b48c7608191987f04a81b04b5e2-wolf-override-game/c/6abb82fd-5d14-83e9-9332-a78148b708b2",
+      "asset_id": "corridor-mid",
+      "path": "apps/game/assets/rooms/corridor-mid.png",
+      "source_or_tool": "Codex built-in image_gen tool in edit mode, 2026-10-08, generated as one of three separate depth plates (far, mid, near) sharing one 16:9 frame",
+      "source_reference": "Reference: maintenance-corridor-background-provisional.png, the earlier single corridor painting (ChatGPT Create in the WOLF//OVERRIDE [Game] project, https://chatgpt.com/g/g-p-6ab60b48c7608191987f04a81b04b5e2-wolf-override-game/c/6abb82fd-5d14-83e9-9332-a78148b708b2), registered here until it was retired on 2026-10-09; generation prompts retained in ignored art notes",
       "terms_reference": "https://openai.com/policies/terms-of-use/",
-      "rights_review_status": "Provisional AI-assisted environment art, human review in progress. Final commercial asset-rights review remains open; not covered by the code/docs GPL license.",
-      "modifications": "Original 1672x941 RGB image generated as a matching archival bay without characters, stations or UI. Displayed at 960x540 to preserve the source 16:9 ratio, vertically offset behind live Godot Records props; source pixels unchanged.",
-      "implementation_status": "Provisional gameplay background for Records Access."
+      "rights_review_status": "Provisional AI-generated environment art, human reviewed and approved for integration. Final commercial asset-rights review remains open; not covered by the code/docs GPL license. Approved for integration by Nathanial Henniges on 2026-10-08 from a review sheet.",
+      "modifications": "Original 1920x1080 RGBA mid plate (ceiling pipe run, two pillars, side machines on transparency), copied unchanged. First trialled 2026-10-08 as assets/trial/corridor-mid-trial.png (same bytes).",
+      "implementation_status": "In use since 2026-10-09, imported VRAM-compressed. The corridor's play plane, drawn 1:1 with the room (960 px wide) with its painted walkway (source row 777) on the floor at y 440, behind the stations and actors; 16 px mirrored slivers continue it past each room edge, and a flipped strip of its bottom 16 px (mirror-repeated past both sides to fill the corners) continues it below the floor, for camera shake and the lower touch framing. It also stood in, tinted, for the Service Junction on 2026-10-09 until that room's own set was integrated."
     },
     {
-      "asset_id": "maintenance-props-provisional",
-      "path": "apps/game/assets/maintenance-props-provisional.png",
-      "source_or_tool": "ChatGPT Create image via Chrome in the WOLF//OVERRIDE [Game] project",
-      "source_reference": "https://chatgpt.com/g/g-p-6ab60b48c7608191987f04a81b04b5e2-wolf-override-game/c/6abb82fd-5d14-83e9-9332-a78148b708b2",
+      "asset_id": "corridor-near",
+      "path": "apps/game/assets/rooms/corridor-near.png",
+      "source_or_tool": "Codex built-in image_gen tool in edit mode, 2026-10-08, generated as one of three separate depth plates (far, mid, near) sharing one 16:9 frame",
+      "source_reference": "Reference: maintenance-corridor-background-provisional.png, the earlier single corridor painting (ChatGPT Create in the WOLF//OVERRIDE [Game] project, https://chatgpt.com/g/g-p-6ab60b48c7608191987f04a81b04b5e2-wolf-override-game/c/6abb82fd-5d14-83e9-9332-a78148b708b2), registered here until it was retired on 2026-10-09; generation prompts retained in ignored art notes",
       "terms_reference": "https://openai.com/policies/terms-of-use/",
-      "rights_review_status": "Provisional AI-assisted gameplay props, human review in progress. Final commercial asset-rights review remains open; not covered by the code/docs GPL license.",
-      "modifications": "Original 2172x724 RGBA sprite sheet with four isolated props. Godot Sprite2D regions display the breaker, relay, seal and safe-point art without modifying source pixels; live tint and door motion show gameplay state.",
-      "implementation_status": "Provisional interactive prop art in the maintenance corridor."
+      "rights_review_status": "Provisional AI-generated environment art, human reviewed and approved for integration. Final commercial asset-rights review remains open; not covered by the code/docs GPL license. Approved for integration by Nathanial Henniges on 2026-10-08 from a review sheet.",
+      "modifications": "Original 1920x1080 RGBA near plate (left pipe column, floor-front rail and cables, right crate stack). First trialled 2026-10-08 as assets/trial/corridor-near-trial.png (same bytes). The game only ever showed its left 512 px strip (the pipe column and rail), so on 2026-10-09 the file was cropped to that strip (512x1080, pixels unchanged, re-encoded as PNG) to stop loading unused texture memory; the uncropped original remains in the Git history (commit 9a52666).",
+      "implementation_status": "In use since 2026-10-09. The strip, at the left edge, and its mirror at the right edge drawn in front of the actors at 1.15x camera speed, anchored 56 px past each room edge so no strip edge shows at any framing and the crate stack never covers a station. Imported VRAM-compressed. It also stood in, tinted, for the Service Junction on 2026-10-09 until that room's own set was integrated."
     },
     {
-      "asset_id": "records-props-provisional",
-      "path": "apps/game/assets/records-props-provisional.png",
-      "source_or_tool": "ChatGPT Create image via Chrome in the WOLF//OVERRIDE [Game] project",
-      "source_reference": "https://chatgpt.com/g/g-p-6ab60b48c7608191987f04a81b04b5e2-wolf-override-game/c/6abb82fd-5d14-83e9-9332-a78148b708b2",
+      "asset_id": "records-far",
+      "path": "apps/game/assets/rooms/records-far.png",
+      "source_or_tool": "Codex built-in image_gen tool in edit mode, 2026-10-08, generated as one of three separate depth plates (far, mid, near) sharing one 16:9 frame",
+      "source_reference": "Reference: records-access-background-provisional.png, the earlier single Records Access painting (ChatGPT Create in the WOLF//OVERRIDE [Game] project, https://chatgpt.com/g/g-p-6ab60b48c7608191987f04a81b04b5e2-wolf-override-game/c/6abb82fd-5d14-83e9-9332-a78148b708b2), registered here until it was retired on 2026-10-09; generation prompts retained in ignored art notes",
       "terms_reference": "https://openai.com/policies/terms-of-use/",
-      "rights_review_status": "Provisional AI-assisted gameplay props, human review in progress. Final commercial asset-rights review remains open; not covered by the code/docs GPL license.",
-      "modifications": "Original 2172x724 RGBA sprite sheet with three isolated props. Godot Sprite2D regions display the purge queue, mirror port and exit; source pixels are unchanged. The exit art hides when the chapter is secured.",
-      "implementation_status": "Provisional interactive prop art in Records Access."
+      "rights_review_status": "Provisional AI-generated environment art, human reviewed and approved for integration. Final commercial asset-rights review remains open; not covered by the code/docs GPL license. Approved for integration by Nathanial Henniges on 2026-10-08 from a review sheet.",
+      "modifications": "Original 1920x1080 RGB far plate (archive racks, braced pillars, three ceiling lamps, wet floor), copied unchanged.",
+      "implementation_status": "In use since 2026-10-09, imported VRAM-compressed. Drawn by RoomDepth as the Records Access backdrop: a Parallax2D at 0.9x camera speed, 960 px wide, with additive glows and light shafts on its painted lamps, two procedurally drawn lockdown beacons, haze and dust."
+    },
+    {
+      "asset_id": "records-mid",
+      "path": "apps/game/assets/rooms/records-mid.png",
+      "source_or_tool": "Codex built-in image_gen tool in edit mode, 2026-10-08, generated as one of three separate depth plates (far, mid, near) sharing one 16:9 frame",
+      "source_reference": "Reference: records-access-background-provisional.png, the earlier single Records Access painting (ChatGPT Create in the WOLF//OVERRIDE [Game] project, https://chatgpt.com/g/g-p-6ab60b48c7608191987f04a81b04b5e2-wolf-override-game/c/6abb82fd-5d14-83e9-9332-a78148b708b2), registered here until it was retired on 2026-10-09; generation prompts retained in ignored art notes",
+      "terms_reference": "https://openai.com/policies/terms-of-use/",
+      "rights_review_status": "Provisional AI-generated environment art, human reviewed and approved for integration. Final commercial asset-rights review remains open; not covered by the code/docs GPL license. Approved for integration by Nathanial Henniges on 2026-10-08 from a review sheet.",
+      "modifications": "Original 1920x1080 RGBA mid plate (ceiling pipe run, two braced pillars, side machines on transparency), copied unchanged.",
+      "implementation_status": "In use since 2026-10-09, imported VRAM-compressed. The Records Access play plane, drawn 1:1 with the room (960 px wide) with its painted walkway (source row 742) on the floor at y 440, behind the stations and actors; 16 px mirrored slivers continue it past each room edge, and a flipped strip of its bottom 16 px (mirror-repeated past both sides to fill the corners) continues it below the floor, for camera shake and the lower touch framing."
+    },
+    {
+      "asset_id": "records-near",
+      "path": "apps/game/assets/rooms/records-near.png",
+      "source_or_tool": "Codex built-in image_gen tool in edit mode, 2026-10-08, generated as one of three separate depth plates (far, mid, near) sharing one 16:9 frame",
+      "source_reference": "Reference: records-access-background-provisional.png, the earlier single Records Access painting (ChatGPT Create in the WOLF//OVERRIDE [Game] project, https://chatgpt.com/g/g-p-6ab60b48c7608191987f04a81b04b5e2-wolf-override-game/c/6abb82fd-5d14-83e9-9332-a78148b708b2), registered here until it was retired on 2026-10-09; generation prompts retained in ignored art notes",
+      "terms_reference": "https://openai.com/policies/terms-of-use/",
+      "rights_review_status": "Provisional AI-generated environment art, human reviewed and approved for integration. Final commercial asset-rights review remains open; not covered by the code/docs GPL license. Approved for integration by Nathanial Henniges on 2026-10-08 from a review sheet.",
+      "modifications": "Original 1920x1080 RGBA near plate (left pipe column, floor-front rail and cables, right crate stack). The game only ever showed its left 512 px strip, so on 2026-10-09 the file was cropped to that strip (512x1080, pixels unchanged, re-encoded as PNG without its colour-chromaticity chunk) to stop loading unused texture memory; the uncropped original remains in the Git history (commit 9a52666).",
+      "implementation_status": "In use since 2026-10-09. The strip, at the left edge, and its mirror at the right edge drawn in front of the actors at 1.15x camera speed, anchored 56 px past each room edge so no strip edge shows at any framing and the crate stack never covers a station. Imported VRAM-compressed."
+    },
+    {
+      "asset_id": "junction-far",
+      "path": "apps/game/assets/rooms/junction-far.png",
+      "source_or_tool": "Codex built-in image_gen tool in edit mode, 2026-10-09, generated as one of three separate depth plates (far, mid, near) sharing one 16:9 frame",
+      "source_reference": "Style references: the approved corridor and Records Access layers and station props in this register (apps/game/assets/rooms/ and apps/game/assets/props/); generation prompts and the review sheet retained in ignored art notes. The tool removed three PNG tEXt metadata chunks from each generated file; no C2PA manifest was present.",
+      "terms_reference": "https://openai.com/policies/terms-of-use/",
+      "rights_review_status": "Provisional AI-generated environment art, human reviewed and approved for integration. Final commercial asset-rights review remains open; not covered by the code/docs GPL license. Approved for integration by Nathanial Henniges on 2026-10-09 from a review sheet.",
+      "modifications": "Original 1920x1080 RGB far plate (ceiling pipe run, back wall with three ceiling lamps, two braced pillars with small amber lights), copied unchanged.",
+      "implementation_status": "In use since 2026-10-09, imported VRAM-compressed. Drawn by RoomDepth as the Service Junction backdrop: a Parallax2D at 0.9x camera speed, 960 px wide, sitting 27 px lower than the mid plate (as in the corridor) so it covers the touch framing, with additive glows on its three painted lamps (measured at 0.139, 0.493 and 0.857 of its width, 0.268 of its height), light shafts under the outer two, two procedurally drawn lockdown beacons on the braced pillars, haze and dust."
+    },
+    {
+      "asset_id": "junction-mid",
+      "path": "apps/game/assets/rooms/junction-mid.png",
+      "source_or_tool": "Codex built-in image_gen tool in edit mode, 2026-10-09, generated as one of three separate depth plates (far, mid, near) sharing one 16:9 frame",
+      "source_reference": "Style references: the approved corridor and Records Access layers and station props in this register (apps/game/assets/rooms/ and apps/game/assets/props/); generation prompts and the review sheet retained in ignored art notes. The tool removed three PNG tEXt metadata chunks from each generated file; no C2PA manifest was present.",
+      "terms_reference": "https://openai.com/policies/terms-of-use/",
+      "rights_review_status": "Provisional AI-generated environment art, human reviewed and approved for integration. Final commercial asset-rights review remains open; not covered by the code/docs GPL license. Approved for integration by Nathanial Henniges on 2026-10-09 from a review sheet.",
+      "modifications": "Original 1920x1080 RGBA mid plate (pressure tanks, gauges and a pipe run with a painted valve at the left, an overhead gantry with hanging cables and a braced column at the right, and a wet walkway along the bottom, on transparency), copied unchanged.",
+      "implementation_status": "In use since 2026-10-09, imported VRAM-compressed. The Service Junction's play plane, drawn 1:1 with the room (960 px wide) with its walkway's back edge (source row 776, measured from the alpha edge) on the floor at y 440, behind the stations and actors; 16 px mirrored slivers continue it past each room edge, and a flipped strip of its bottom 16 px (mirror-repeated past both sides to fill the corners) continues it below the floor, for camera shake and the lower touch framing. The overhead arm hangs from its gantry on two drawn rods."
+    },
+    {
+      "asset_id": "junction-near",
+      "path": "apps/game/assets/rooms/junction-near.png",
+      "source_or_tool": "Codex built-in image_gen tool in edit mode, 2026-10-09, generated as one of three separate depth plates (far, mid, near) sharing one 16:9 frame",
+      "source_reference": "Style references: the approved corridor and Records Access layers and station props in this register (apps/game/assets/rooms/ and apps/game/assets/props/); generation prompts and the review sheet retained in ignored art notes. The tool removed three PNG tEXt metadata chunks from each generated file; no C2PA manifest was present.",
+      "terms_reference": "https://openai.com/policies/terms-of-use/",
+      "rights_review_status": "Provisional AI-generated environment art, human reviewed and approved for integration. Final commercial asset-rights review remains open; not covered by the code/docs GPL license. Approved for integration by Nathanial Henniges on 2026-10-09 from a review sheet.",
+      "modifications": "Derivative crop of the approved 1920x1080 RGBA near plate (left pipe column with a valve wheel, floor-front cables and wet floor, right pipe column with a caged lamp). The game only shows its left 512 px strip, so the file was cropped to that strip on 2026-10-09 with Pillow 12.1.1 (512x1080, pixels unchanged and verified identical, re-encoded as PNG without its colour-chromaticity and background chunks), as for the other rooms' near plates. The uncropped approved original was never committed (SHA-256 3420308f8179c6c15a7b9a03fa1df0be3f86dcb60f151edc9784d383e501bc3a).",
+      "implementation_status": "In use since 2026-10-09, imported VRAM-compressed. The strip, at the left edge, and its mirror at the right edge drawn in front of the actors at 1.15x camera speed. Its pipe column is 100 px wide in the room against the corridor's 57, so the strips are anchored 99 px past each room edge (43 px further out than the other rooms) and the column only grazes an engineer at the 40 / 920 clamp, as in the corridor."
+    },
+    {
+      "asset_id": "corridor-purge-display",
+      "path": "apps/game/assets/props/corridor-purge-display.png",
+      "source_or_tool": "Codex built-in image_gen tool in edit mode, 2026-10-08, generated as a separate 512x512 station prop on transparency",
+      "source_reference": "Reference: maintenance-props-provisional.png and records-props-provisional.png (the purge-queue region was the corridor display until 2026-10-09), the earlier ChatGPT Create prop sheet (WOLF//OVERRIDE [Game] project, https://chatgpt.com/g/g-p-6ab60b48c7608191987f04a81b04b5e2-wolf-override-game/c/6abb82fd-5d14-83e9-9332-a78148b708b2), registered here until it was retired on 2026-10-09; generation prompts retained in ignored art notes",
+      "terms_reference": "https://openai.com/policies/terms-of-use/",
+      "rights_review_status": "Provisional AI-generated gameplay prop, human reviewed and approved for integration. Final commercial asset-rights review remains open; not covered by the code/docs GPL license. Approved for integration by Nathanial Henniges on 2026-10-08 from a review sheet.",
+      "modifications": "Original 512x512 RGBA prop, copied unchanged. The game shows the region inside its painted outline (so the wall mount sits tight to its painted edge) with mipmaps and linear-with-mipmaps filtering.",
+      "implementation_status": "In use since 2026-10-09 as the Director's purge display on the corridor wall, 0.25x, the same on-screen size as the art it replaced. It is wall-mounted (its base at y 345, above the floor), so it has no floor reflection or contact shadow, and it carries no station label; reading it is optional."
+    },
+    {
+      "asset_id": "corridor-breaker",
+      "path": "apps/game/assets/props/corridor-breaker.png",
+      "source_or_tool": "Codex built-in image_gen tool in edit mode, 2026-10-08, generated as a separate 512x512 station prop on transparency",
+      "source_reference": "Reference: maintenance-props-provisional.png, the earlier ChatGPT Create prop sheet (WOLF//OVERRIDE [Game] project, https://chatgpt.com/g/g-p-6ab60b48c7608191987f04a81b04b5e2-wolf-override-game/c/6abb82fd-5d14-83e9-9332-a78148b708b2), registered here until it was retired on 2026-10-09; generation prompts retained in ignored art notes",
+      "terms_reference": "https://openai.com/policies/terms-of-use/",
+      "rights_review_status": "Provisional AI-generated gameplay prop, human reviewed and approved for integration. Final commercial asset-rights review remains open; not covered by the code/docs GPL license. Approved for integration by Nathanial Henniges on 2026-10-08 from a review sheet.",
+      "modifications": "Original 512x512 RGBA prop, copied unchanged. The game shows the region inside its painted outline (so its floor reflection and contact shadow start at its real base) with mipmaps and linear-with-mipmaps filtering.",
+      "implementation_status": "In use since 2026-10-09 as the corridor BREAKER at x 350 and the Service Junction's OVERLOAD BREAKER at x 200, 0.225x (97 px tall, as before); the status light is drawn on its painted amber bar, with its station label, state tint or glow and floor reflection unchanged."
+    },
+    {
+      "asset_id": "corridor-coolant-relay",
+      "path": "apps/game/assets/props/corridor-coolant-relay.png",
+      "source_or_tool": "Codex built-in image_gen tool in edit mode, 2026-10-08, generated as a separate 512x512 station prop on transparency",
+      "source_reference": "Reference: maintenance-props-provisional.png, the earlier ChatGPT Create prop sheet (WOLF//OVERRIDE [Game] project, https://chatgpt.com/g/g-p-6ab60b48c7608191987f04a81b04b5e2-wolf-override-game/c/6abb82fd-5d14-83e9-9332-a78148b708b2), registered here until it was retired on 2026-10-09; generation prompts retained in ignored art notes",
+      "terms_reference": "https://openai.com/policies/terms-of-use/",
+      "rights_review_status": "Provisional AI-generated gameplay prop, human reviewed and approved for integration. Final commercial asset-rights review remains open; not covered by the code/docs GPL license. Approved for integration by Nathanial Henniges on 2026-10-08 from a review sheet.",
+      "modifications": "Original 512x512 RGBA prop, copied unchanged. The game shows the region inside its painted outline (so its floor reflection and contact shadow start at its real base) with mipmaps and linear-with-mipmaps filtering.",
+      "implementation_status": "In use since 2026-10-09 as the corridor COOLANT RELAY at x 605, 0.221x (89 px tall, as before); the status light is drawn on its painted cyan bar, with its station label, state tint or glow and floor reflection unchanged."
+    },
+    {
+      "asset_id": "corridor-sealed-door",
+      "path": "apps/game/assets/props/corridor-sealed-door.png",
+      "source_or_tool": "Codex built-in image_gen tool in edit mode, 2026-10-08, generated as a separate 512x512 station prop on transparency",
+      "source_reference": "Reference: maintenance-props-provisional.png, the earlier ChatGPT Create prop sheet (WOLF//OVERRIDE [Game] project, https://chatgpt.com/g/g-p-6ab60b48c7608191987f04a81b04b5e2-wolf-override-game/c/6abb82fd-5d14-83e9-9332-a78148b708b2), registered here until it was retired on 2026-10-09; generation prompts retained in ignored art notes",
+      "terms_reference": "https://openai.com/policies/terms-of-use/",
+      "rights_review_status": "Provisional AI-generated gameplay prop, human reviewed and approved for integration. Final commercial asset-rights review remains open; not covered by the code/docs GPL license. Approved for integration by Nathanial Henniges on 2026-10-08 from a review sheet.",
+      "modifications": "Original 512x512 RGBA prop, copied unchanged. The game shows the region inside its painted outline (so its floor reflection and contact shadow start at its real base) with mipmaps and linear-with-mipmaps filtering.",
+      "implementation_status": "In use since 2026-10-09 as the corridor's red seal at x 780, 0.302x (140 px tall, as before), lifted by the existing scale tween, with its station label, state tint or glow and floor reflection unchanged. It stood in for the Service Junction's SEALED DOOR on 2026-10-09 until that room's own door art was integrated."
+    },
+    {
+      "asset_id": "corridor-safe-point",
+      "path": "apps/game/assets/props/corridor-safe-point.png",
+      "source_or_tool": "Codex built-in image_gen tool in edit mode, 2026-10-08, generated as a separate 512x512 station prop on transparency",
+      "source_reference": "Reference: maintenance-props-provisional.png, the earlier ChatGPT Create prop sheet (WOLF//OVERRIDE [Game] project, https://chatgpt.com/g/g-p-6ab60b48c7608191987f04a81b04b5e2-wolf-override-game/c/6abb82fd-5d14-83e9-9332-a78148b708b2), registered here until it was retired on 2026-10-09; generation prompts retained in ignored art notes",
+      "terms_reference": "https://openai.com/policies/terms-of-use/",
+      "rights_review_status": "Provisional AI-generated gameplay prop, human reviewed and approved for integration. Final commercial asset-rights review remains open; not covered by the code/docs GPL license. Approved for integration by Nathanial Henniges on 2026-10-08 from a review sheet.",
+      "modifications": "Original 512x512 RGBA prop, copied unchanged. The game shows the region inside its painted outline (so its floor reflection and contact shadow start at its real base) with mipmaps and linear-with-mipmaps filtering.",
+      "implementation_status": "In use since 2026-10-09 as the corridor SAFE POINT at x 876, 0.25x (112 px tall, as before), with its station label, state tint or glow and floor reflection unchanged."
+    },
+    {
+      "asset_id": "records-purge-queue",
+      "path": "apps/game/assets/props/records-purge-queue.png",
+      "source_or_tool": "Codex built-in image_gen tool in edit mode, 2026-10-08, generated as a separate 512x512 station prop on transparency",
+      "source_reference": "Reference: records-props-provisional.png, the earlier ChatGPT Create prop sheet (WOLF//OVERRIDE [Game] project, https://chatgpt.com/g/g-p-6ab60b48c7608191987f04a81b04b5e2-wolf-override-game/c/6abb82fd-5d14-83e9-9332-a78148b708b2), registered here until it was retired on 2026-10-09; generation prompts retained in ignored art notes",
+      "terms_reference": "https://openai.com/policies/terms-of-use/",
+      "rights_review_status": "Provisional AI-generated gameplay prop, human reviewed and approved for integration. Final commercial asset-rights review remains open; not covered by the code/docs GPL license. Approved for integration by Nathanial Henniges on 2026-10-08 from a review sheet.",
+      "modifications": "Original 512x512 RGBA prop, copied unchanged. The game shows the region inside its painted outline (so its floor reflection and contact shadow start at its real base) with mipmaps and linear-with-mipmaps filtering.",
+      "implementation_status": "In use since 2026-10-09 as the Records PURGE QUEUE at x 190, 0.274x (111 px tall, as before); the status light is drawn on the bar under its screen, with its station label, state tint or glow and floor reflection unchanged."
+    },
+    {
+      "asset_id": "records-mirror-port",
+      "path": "apps/game/assets/props/records-mirror-port.png",
+      "source_or_tool": "Codex built-in image_gen tool in edit mode, 2026-10-08, generated as a separate 512x512 station prop on transparency",
+      "source_reference": "Reference: records-props-provisional.png, the earlier ChatGPT Create prop sheet (WOLF//OVERRIDE [Game] project, https://chatgpt.com/g/g-p-6ab60b48c7608191987f04a81b04b5e2-wolf-override-game/c/6abb82fd-5d14-83e9-9332-a78148b708b2), registered here until it was retired on 2026-10-09; generation prompts retained in ignored art notes",
+      "terms_reference": "https://openai.com/policies/terms-of-use/",
+      "rights_review_status": "Provisional AI-generated gameplay prop, human reviewed and approved for integration. Final commercial asset-rights review remains open; not covered by the code/docs GPL license. Approved for integration by Nathanial Henniges on 2026-10-08 from a review sheet.",
+      "modifications": "Original 512x512 RGBA prop, copied unchanged. The game shows the region inside its painted outline (so its floor reflection and contact shadow start at its real base) with mipmaps and linear-with-mipmaps filtering.",
+      "implementation_status": "In use since 2026-10-09 as the Records MIRROR PORT at x 520, 0.239x (111 px tall, as before); the status light is drawn under its screen, with its station label, state tint or glow and floor reflection unchanged."
+    },
+    {
+      "asset_id": "records-exit-hatch",
+      "path": "apps/game/assets/props/records-exit-hatch.png",
+      "source_or_tool": "Codex built-in image_gen tool in edit mode, 2026-10-08, generated as a separate 512x512 station prop on transparency",
+      "source_reference": "Reference: records-props-provisional.png, the earlier ChatGPT Create prop sheet (WOLF//OVERRIDE [Game] project, https://chatgpt.com/g/g-p-6ab60b48c7608191987f04a81b04b5e2-wolf-override-game/c/6abb82fd-5d14-83e9-9332-a78148b708b2), registered here until it was retired on 2026-10-09; generation prompts retained in ignored art notes",
+      "terms_reference": "https://openai.com/policies/terms-of-use/",
+      "rights_review_status": "Provisional AI-generated gameplay prop, human reviewed and approved for integration. Final commercial asset-rights review remains open; not covered by the code/docs GPL license. Approved for integration by Nathanial Henniges on 2026-10-08 from a review sheet.",
+      "modifications": "Original 512x512 RGBA prop, copied unchanged. The game shows the region inside its painted outline (so its floor reflection and contact shadow start at its real base) with mipmaps and linear-with-mipmaps filtering.",
+      "implementation_status": "In use since 2026-10-09 as the Records EXIT at x 830, 0.291x (139 px tall, as before), lifted and faded by the chapter close, with its station label, state tint or glow and floor reflection unchanged."
+    },
+    {
+      "asset_id": "junction-valve",
+      "path": "apps/game/assets/props/junction-valve.png",
+      "source_or_tool": "Codex built-in image_gen tool in edit mode, 2026-10-09, generated as a separate 512x512 station prop on transparency",
+      "source_reference": "Style references: the approved corridor and Records Access layers and station props in this register (apps/game/assets/rooms/ and apps/game/assets/props/); generation prompts and the review sheet retained in ignored art notes. The tool removed three PNG tEXt metadata chunks from each generated file; no C2PA manifest was present.",
+      "terms_reference": "https://openai.com/policies/terms-of-use/",
+      "rights_review_status": "Provisional AI-generated gameplay prop, human reviewed and approved for integration. Final commercial asset-rights review remains open; not covered by the code/docs GPL license. Approved for integration by Nathanial Henniges on 2026-10-09 from a review sheet.",
+      "modifications": "Original 512x512 RGBA prop (valve wheel on a pump body with a gauge on top and pipe elbows either side), copied unchanged. The game shows the region inside its painted outline (so its floor reflection and contact shadow start at its real base) with mipmaps and linear-with-mipmaps filtering.",
+      "implementation_status": "In use since 2026-10-09 as the Service Junction VALVE at x 420, 0.2x (98 px tall), replacing the code-drawn wheel and dial. A disc cut from the same image (the painted wheel, masked by a small inline shader) turns a quarter per real valve turn over the painted wheel; the gauge needle and its red zone are drawn over the painted dial, and the three turn lights sit in a drawn box to its left. Its right elbow runs behind the door frame."
+    },
+    {
+      "asset_id": "junction-blast-door-sealed",
+      "path": "apps/game/assets/props/junction-blast-door-sealed.png",
+      "source_or_tool": "Codex built-in image_gen tool in edit mode, 2026-10-09, generated as a separate 512x768 station prop on transparency",
+      "source_reference": "Style references: the approved corridor and Records Access layers and station props in this register (apps/game/assets/rooms/ and apps/game/assets/props/); generation prompts and the review sheet retained in ignored art notes. The tool removed three PNG tEXt metadata chunks from each generated file; no C2PA manifest was present.",
+      "terms_reference": "https://openai.com/policies/terms-of-use/",
+      "rights_review_status": "Provisional AI-generated gameplay prop, human reviewed and approved for integration. Final commercial asset-rights review remains open; not covered by the code/docs GPL license. Approved for integration by Nathanial Henniges on 2026-10-09 from a review sheet.",
+      "modifications": "Original 512x768 RGBA prop (sealed blast door with a glowing centre seam between braced pillars), copied unchanged. The game shows the region inside its painted outline (so its floor reflection and contact shadow start at its real base) with mipmaps and linear-with-mipmaps filtering.",
+      "implementation_status": "In use since 2026-10-09 as the Service Junction SEALED DOOR at x 480, 0.2x (132 px tall, the height of its 56x132 body, with the leaf between the pillars spanning the body). The drawn seam glow rides on its painted seam and strobes once the seal is charged (steady with Reduced Motion). At the blast it is swapped for junction-blast-door-blown.png."
+    },
+    {
+      "asset_id": "junction-blast-door-blown",
+      "path": "apps/game/assets/props/junction-blast-door-blown.png",
+      "source_or_tool": "Codex built-in image_gen tool in edit mode, 2026-10-09, generated as a separate 512x768 station prop on transparency",
+      "source_reference": "Style references: the approved corridor and Records Access layers and station props in this register (apps/game/assets/rooms/ and apps/game/assets/props/); generation prompts and the review sheet retained in ignored art notes. The tool removed three PNG tEXt metadata chunks from each generated file; no C2PA manifest was present.",
+      "terms_reference": "https://openai.com/policies/terms-of-use/",
+      "rights_review_status": "Provisional AI-generated gameplay prop, human reviewed and approved for integration. Final commercial asset-rights review remains open; not covered by the code/docs GPL license. Approved for integration by Nathanial Henniges on 2026-10-09 from a review sheet.",
+      "modifications": "Original 512x768 RGBA prop (the same door frame torn open, with rubble at its foot), copied unchanged. The game shows the region inside its painted outline (so its floor reflection and contact shadow start at its real base) with mipmaps and linear-with-mipmaps filtering.",
+      "implementation_status": "In use since 2026-10-09 as the Service Junction door after the blast and after Continue with the door down: drawn on the same canvas and scale as the sealed door so the frames line up, its rubble spilling 3 px past the floor line, with a short scale jolt at the blast. A drawn amber tick at x 540 still marks the rubble line, the sentry's lane boundary."
+    },
+    {
+      "asset_id": "junction-relief-vent",
+      "path": "apps/game/assets/props/junction-relief-vent.png",
+      "source_or_tool": "Codex built-in image_gen tool in edit mode, 2026-10-09, generated as a separate 768x256 station prop on transparency",
+      "source_reference": "Style references: the approved corridor and Records Access layers and station props in this register (apps/game/assets/rooms/ and apps/game/assets/props/); generation prompts and the review sheet retained in ignored art notes. The tool removed three PNG tEXt metadata chunks from each generated file; no C2PA manifest was present.",
+      "terms_reference": "https://openai.com/policies/terms-of-use/",
+      "rights_review_status": "Provisional AI-generated gameplay prop, human reviewed and approved for integration. Final commercial asset-rights review remains open; not covered by the code/docs GPL license. Approved for integration by Nathanial Henniges on 2026-10-09 from a review sheet.",
+      "modifications": "Original 768x256 RGBA prop (floor grate with hazard-striped end caps), copied unchanged. The game shows the region inside its painted outline (so its floor reflection and contact shadow start at its real base) with mipmaps and linear-with-mipmaps filtering.",
+      "implementation_status": "In use since 2026-10-09 as the Service Junction RELIEF VENT, scaled (0.096x) so its painted outline spans exactly the grate's hurtbox (x 264 to 336, PressureLine.VENT_GRATE_*), standing on the floor. The drawn nozzle light over it warms with the gauge; its caption is drawn just above it."
+    },
+    {
+      "asset_id": "junction-tank-arm",
+      "path": "apps/game/assets/props/junction-tank-arm.png",
+      "source_or_tool": "Codex built-in image_gen tool in edit mode, 2026-10-09, generated as a separate 512x768 station prop on transparency",
+      "source_reference": "Style references: the approved corridor and Records Access layers and station props in this register (apps/game/assets/rooms/ and apps/game/assets/props/); generation prompts and the review sheet retained in ignored art notes. The tool removed three PNG tEXt metadata chunks from each generated file; no C2PA manifest was present.",
+      "terms_reference": "https://openai.com/policies/terms-of-use/",
+      "rights_review_status": "Provisional AI-generated gameplay prop, human reviewed and approved for integration. Final commercial asset-rights review remains open; not covered by the code/docs GPL license. Approved for integration by Nathanial Henniges on 2026-10-09 from a review sheet.",
+      "modifications": "Original 512x768 RGBA prop (ceiling-mounted arm with a winch, a cable and a clamped coolant tank), copied unchanged. The game shows the region inside its painted outline (so its floor reflection and contact shadow start at its real base) with mipmaps and linear-with-mipmaps filtering.",
+      "implementation_status": "In use since 2026-10-09 as the Service Junction's overhead arm: only the region above the tank's cut line (source rows 9 to 361: ceiling plate, arm, winch, cable and shackle) is drawn, 0.22x, centred over the floor mark at x 700 and hung from the mid plate's gantry on two drawn rods. The arm stays in place when the tank drops; a drawn cable joins its shackle to the tank while the tank is down or winching back up. The tank itself is junction-tank.png, cut from this file."
+    },
+    {
+      "asset_id": "junction-tank",
+      "path": "apps/game/assets/props/junction-tank.png",
+      "source_or_tool": "Cropped with Pillow 12.1.1 on 2026-10-09 from junction-tank-arm.png, which was generated with the Codex built-in image_gen tool in edit mode, 2026-10-09, as a separate 512x768 station prop on transparency",
+      "source_reference": "Style references: the approved corridor and Records Access layers and station props in this register (apps/game/assets/rooms/ and apps/game/assets/props/); generation prompts and the review sheet retained in ignored art notes. The tool removed three PNG tEXt metadata chunks from each generated file; no C2PA manifest was present.",
+      "terms_reference": "https://openai.com/policies/terms-of-use/",
+      "rights_review_status": "Provisional AI-generated gameplay prop, human reviewed and approved for integration. Final commercial asset-rights review remains open; not covered by the code/docs GPL license. Approved for integration by Nathanial Henniges on 2026-10-09 from a review sheet.",
+      "modifications": "Documented derivative crop of junction-tank-arm.png (same provenance and approval): the clamp cradle and coolant tank below the shackle, source rectangle x 144..355, y 361..743, cut on 2026-10-09 with Pillow 12.1.1 so the tank can fall away from its arm. Pixels unchanged and verified identical to that region; re-encoded as PNG without the source's colour-chromaticity and background chunks. Drawn with mipmaps and linear-with-mipmaps filtering.",
+      "implementation_status": "In use since 2026-10-09 as the Service Junction's coolant tank, 0.22x (46x84 px), hanging on the arm's cut line with its top at y 298 (below the answer buttons at the play framing) and its base at y 382 (clear of the sentry's scanner fin); a missed drop lands it on the floor mark and it is winched back up; a hit leaves it resting on the crushed sentry's hull (Sentry.WRECK_CRUSH_HEIGHT above the floor), so the wreck shows under it, both right after the hit and after Continue. A missed drop draws a dent on its right flank."
+    },
+    {
+      "asset_id": "junction-arm-panel",
+      "path": "apps/game/assets/props/junction-arm-panel.png",
+      "source_or_tool": "Codex built-in image_gen tool in edit mode, 2026-10-09, generated as a separate 512x512 station prop on transparency",
+      "source_reference": "Style references: the approved corridor and Records Access layers and station props in this register (apps/game/assets/rooms/ and apps/game/assets/props/); generation prompts and the review sheet retained in ignored art notes. The tool removed three PNG tEXt metadata chunks from each generated file; no C2PA manifest was present.",
+      "terms_reference": "https://openai.com/policies/terms-of-use/",
+      "rights_review_status": "Provisional AI-generated gameplay prop, human reviewed and approved for integration. Final commercial asset-rights review remains open; not covered by the code/docs GPL license. Approved for integration by Nathanial Henniges on 2026-10-09 from a review sheet.",
+      "modifications": "Original 512x512 RGBA prop (floor-standing control cabinet with a lever and an amber light bar), copied unchanged. The game shows the region inside its painted outline (so its floor reflection and contact shadow start at its real base) with mipmaps and linear-with-mipmaps filtering.",
+      "implementation_status": "In use since 2026-10-09 as the Service Junction ARM PANEL at x 570, 0.14x (65 px tall), standing in the drawn alcove that hides the engineer from the sentry. Its painted light bar carries the drawn arm state: green while the tank hangs, amber while the arm is busy, dark once the sentry is down."
+    },
+    {
+      "asset_id": "junction-bolt-panel",
+      "path": "apps/game/assets/props/junction-bolt-panel.png",
+      "source_or_tool": "Codex built-in image_gen tool in edit mode, 2026-10-09, generated as a separate 512x512 station prop on transparency",
+      "source_reference": "Style references: the approved corridor and Records Access layers and station props in this register (apps/game/assets/rooms/ and apps/game/assets/props/); generation prompts and the review sheet retained in ignored art notes. The tool removed three PNG tEXt metadata chunks from each generated file; no C2PA manifest was present.",
+      "terms_reference": "https://openai.com/policies/terms-of-use/",
+      "rights_review_status": "Provisional AI-generated gameplay prop, human reviewed and approved for integration. Final commercial asset-rights review remains open; not covered by the code/docs GPL license. Approved for integration by Nathanial Henniges on 2026-10-09 from a review sheet.",
+      "modifications": "Original 512x512 RGBA prop (floor-standing junction box with cable runs either side and an amber light bar), copied unchanged. The game shows the region inside its painted outline (so its floor reflection and contact shadow start at its real base) with mipmaps and linear-with-mipmaps filtering.",
+      "implementation_status": "In use since 2026-10-09 as the Service Junction EXIT BOLT panel, 0.15x (59 px tall), standing at x 806 inside the bolt's use span (x 810 and right) with its right cables running into the hatch frame. Its painted light bar carries the drawn bolt state (red, amber, warming to white through the whine, green once open); the bolt's sparks fire from it."
+    },
+    {
+      "asset_id": "junction-hatch",
+      "path": "apps/game/assets/props/junction-hatch.png",
+      "source_or_tool": "Codex built-in image_gen tool in edit mode, 2026-10-09, generated as a separate 512x768 station prop on transparency",
+      "source_reference": "Style references: the approved corridor and Records Access layers and station props in this register (apps/game/assets/rooms/ and apps/game/assets/props/); generation prompts and the review sheet retained in ignored art notes. The tool removed three PNG tEXt metadata chunks from each generated file; no C2PA manifest was present.",
+      "terms_reference": "https://openai.com/policies/terms-of-use/",
+      "rights_review_status": "Provisional AI-generated gameplay prop, human reviewed and approved for integration. Final commercial asset-rights review remains open; not covered by the code/docs GPL license. Approved for integration by Nathanial Henniges on 2026-10-09 from a review sheet.",
+      "modifications": "Original 512x768 RGBA prop (pressure hatch with a wheel lock and an amber lamp over the door), copied unchanged. The game shows the region inside its painted outline (so its floor reflection and contact shadow start at its real base) with mipmaps and linear-with-mipmaps filtering.",
+      "implementation_status": "In use since 2026-10-09 for both Service Junction hatches, 0.206x (144 px tall, as before): the entry hatch at x 80 with its lamp drawn green, and the exit hatch at x 880 with its lamp drawn in the bolt's colour. When the bolt arcs the exit hatch lifts 138 px and fades over the drawn open doorway behind it."
+    },
+    {
+      "asset_id": "junction-sentry-side-left",
+      "path": "apps/game/assets/props/junction-sentry-side-left.png",
+      "source_or_tool": "Codex built-in image_gen tool in edit mode, 2026-10-09 (sentry v2), redrawn from the first approved junction sentry with the approved junction art as style reference",
+      "source_reference": "Approval note: Nathanial Henniges chose 'Redo as scanner' on the junction art review; v2 keeps the approved body and replaces the gun-like emitter with a scanner head. Codex log: no metadata removed (no stripping option used; the PNG colour and background chunks remain and saving added fresh timestamp chunks); no C2PA manifest present. Generation prompts and the review sheet retained in ignored art notes.",
+      "terms_reference": "https://openai.com/policies/terms-of-use/",
+      "rights_review_status": "Provisional AI-generated character art, human reviewed and approved for integration. Final commercial asset-rights review remains open; not covered by the code/docs GPL license. Approved for integration by Nathanial Henniges on 2026-10-09 from a review sheet.",
+      "modifications": "Original 1024x768 RGBA side view facing left (tracked chassis, scanner head with a cyan slit lens and a faint painted sweep), copied unchanged. The game shows the region inside its painted outline, mirrored to face right, with mipmaps and linear-with-mipmaps filtering.",
+      "implementation_status": "In use since 2026-10-09 as the Service Junction sentry while it is active, 0.07x (60x44 px; treads a little longer than its 52 px body), inside the Sentry node's Visual child, which flips it to face the way it moves. The detection beam and eye light are still drawn in code over its scanner slit (off, amber on patrol, red when locked on), and it has a floor reflection and contact shadow."
+    },
+    {
+      "asset_id": "junction-sentry-down",
+      "path": "apps/game/assets/props/junction-sentry-down.png",
+      "source_or_tool": "Codex built-in image_gen tool in edit mode, 2026-10-09 (sentry v2), redrawn from the first approved junction sentry with the approved junction art as style reference",
+      "source_reference": "Approval note: Nathanial Henniges chose 'Redo as scanner' on the junction art review; v2 keeps the approved body and replaces the gun-like emitter with a scanner head. Codex log: no metadata removed (no stripping option used; the PNG colour and background chunks remain and saving added fresh timestamp chunks); no C2PA manifest present. Generation prompts and the review sheet retained in ignored art notes.",
+      "terms_reference": "https://openai.com/policies/terms-of-use/",
+      "rights_review_status": "Provisional AI-generated character art, human reviewed and approved for integration. Final commercial asset-rights review remains open; not covered by the code/docs GPL license. Approved for integration by Nathanial Henniges on 2026-10-09 from a review sheet.",
+      "modifications": "Original 1024x768 RGBA wreck of the same machine (crushed scanner, cracked dark lens, torn wiring and sparks), copied unchanged. The game shows the region inside its painted outline, mirrored, with mipmaps and linear-with-mipmaps filtering. Known source defect, left unedited: a semi-transparent band across the body at about source rows 468 to 500 (alpha falling to about 135), about 2 px tall in game.",
+      "implementation_status": "In use since 2026-10-09 as the Service Junction sentry once the tank has landed on it (and after Continue with it down), at the active sprite's scale, replacing the earlier tip-over rotation; it drops the last 6 px onto its treads when hit. The wreck is pinned on the floor mark (the drop x) under the landed tank, and its painted body shows past both sides of the tank."
     },
     {
       "asset_id": "roboto-variable-font",
@@ -128,11 +368,12 @@
         "apps/docs/app/images/corridor-start-capture-480.webp",
         "apps/docs/app/images/corridor-start-capture-960.webp"
       ],
-      "source_or_tool": "Godot 4.7.2 normal-renderer capture of the repository source game on October 8, 2026 (scripted review driver, isolated user data, main at the PR #39 merge); WebP derivatives encoded with Chrome's canvas encoder through Playwright (quality 0.86)",
+      "source_or_tool": "Godot 4.7.2 normal-renderer capture of the repository source game on October 10, 2026 (scripted review driver, isolated user data, the codex/game-presentation branch with the layered room art and the junction review fixes); WebP derivatives encoded with cwebp 1.6.0 (libwebp, quality 86; the 480 px copy resized by cwebp)",
       "rights_review_status": "Derivative screenshot using the registered provisional game art and the bundled OFL fonts. Underlying commercial asset-rights review remains open; no new third-party artwork acquired.",
-      "modifications": "960x540 scripted still; no image edits. Not a hands-on route or release acceptance test.",
-      "source_reference": "apps/game/scenes/main.tscn and scripts/main.gd on October 8, 2026; New Game, opening finished, corridor start with the tutorial prompt, keyboard layout",
-      "implementation_status": "Current public gameplay frame on the landing page and in the corridor walkthrough, captioned as a source-build capture with provisional art and UI."
+      "modifications": "960x540 scripted still, recaptured October 10, 2026 (replacing the earlier capture at this path); no image edits. Not a hands-on route or release acceptance test.",
+      "source_reference": "apps/game/scenes/main.tscn and scripts/main.gd on October 10, 2026; New Game, opening finished, corridor start with the tutorial prompt, keyboard layout",
+      "implementation_status": "Current public gameplay frame on the landing page and in the corridor walkthrough, captioned as a source-build capture with provisional art and UI. It shows the layered corridor (corridor-far, -mid and -near) and station props in this register.",
+      "terms_reference": "GPL-3.0-or-later for the project code and UI shown (see LICENSE); the pictured art keeps the terms recorded on its own entries (provisional generated art: https://openai.com/policies/terms-of-use/); fonts under SIL Open Font License 1.1"
     },
     {
       "asset_id": "title-screen-capture-2026-10-08",
@@ -141,14 +382,129 @@
         "apps/docs/app/images/title-screen-capture-480.webp",
         "apps/docs/app/images/title-screen-capture-960.webp"
       ],
-      "source_or_tool": "Godot 4.7.2 normal-renderer capture of the repository source game on October 8, 2026 (scripted review driver, isolated user data, main at the PR #39 merge); WebP derivatives encoded with Chrome's canvas encoder through Playwright (quality 0.86)",
+      "source_or_tool": "Godot 4.7.2 normal-renderer capture of the repository source game on October 10, 2026 (scripted review driver, isolated user data, the codex/game-presentation branch with the layered room art and the junction review fixes); WebP derivatives encoded with cwebp 1.6.0 (libwebp, quality 86; the 480 px copy resized by cwebp)",
       "rights_review_status": "Derivative screenshot using the registered provisional game art and the bundled OFL fonts. Underlying commercial asset-rights review remains open; no new third-party artwork acquired.",
-      "modifications": "960x540 scripted still; no image edits. Not a hands-on route or release acceptance test.",
-      "source_reference": "apps/game/scenes/main.tscn and scripts/main.gd on October 8, 2026; fresh title screen with Continue unavailable",
-      "implementation_status": "Current title-screen frame in the first-steps guide, captioned as a source-build capture with provisional art and UI."
+      "modifications": "960x540 scripted still, recaptured October 10, 2026 (replacing the earlier capture at this path); no image edits. Not a hands-on route or release acceptance test.",
+      "source_reference": "apps/game/scenes/main.tscn and scripts/main.gd on October 10, 2026; fresh title screen with Continue unavailable",
+      "implementation_status": "Current title-screen frame in the first-steps guide, captioned as a source-build capture with provisional art and UI. It shows the raised menu buttons with CHANGELOG at the lower left.",
+      "terms_reference": "GPL-3.0-or-later for the project code and UI shown (see LICENSE); the pictured art keeps the terms recorded on its own entries (provisional generated art: https://openai.com/policies/terms-of-use/); fonts under SIL Open Font License 1.1"
+    },
+    {
+      "asset_id": "service-junction-entry-capture-2026-10-09",
+      "path": "apps/docs/app/images/service-junction-entry-capture.png",
+      "published_copy": [
+        "apps/docs/app/images/service-junction-entry-capture-480.webp",
+        "apps/docs/app/images/service-junction-entry-capture-960.webp"
+      ],
+      "source_or_tool": "Godot 4.7.2 normal-renderer capture of the repository source game on October 10, 2026 (scripted review driver, isolated user data, the codex/game-presentation branch with the layered room art and the junction review fixes); WebP derivatives encoded with cwebp 1.6.0 (libwebp, quality 86; the 480 px copy resized by cwebp)",
+      "rights_review_status": "Derivative screenshot using the registered provisional game art and the bundled OFL fonts. Underlying commercial asset-rights review remains open; no new third-party artwork acquired.",
+      "modifications": "960x540 scripted still, recaptured October 10, 2026 (replacing the earlier capture at this path); no image edits. Not a hands-on route or release acceptance test.",
+      "source_reference": "apps/game/scripts/junction_room.gd and scripts/main.gd on October 10, 2026; entering the Service Junction from the Records exit after WOLF reads the door, before the breaker is armed, keyboard layout",
+      "implementation_status": "Gameplay frame at the top of the Service Junction walkthrough, captioned as a source-build capture with provisional art and UI. Recaptured after the door label was moved clear of the wheel.",
+      "terms_reference": "GPL-3.0-or-later for the project code and UI shown (see LICENSE); the pictured art keeps the terms recorded on its own entries (provisional generated art: https://openai.com/policies/terms-of-use/); fonts under SIL Open Font License 1.1"
+    },
+    {
+      "asset_id": "changelog-text-export",
+      "path": "apps/game/assets/changelog.txt",
+      "source_or_tool": "Generated by scripts/export_changelog.py (Python 3 standard library) from apps/docs/content/docs/changelog.mdx",
+      "source_reference": "apps/docs/content/docs/changelog.mdx in this repository (the public website changelog)",
+      "terms_reference": "GPL-3.0-or-later, the repository code and docs licence (see LICENSE)",
+      "rights_review_status": "Derivative of the project's own public changelog text; covered by the repository GPL licence. No third-party content.",
+      "modifications": "Front matter and the page intro are dropped; '## ' headings become '== Heading ==', '### ' headings '-- Heading --'; bullets keep '- '; links, bold and code markers are stripped. Regenerate with python3 scripts/export_changelog.py after editing the changelog.",
+      "implementation_status": "Loaded with FileAccess at title time for the in-game CHANGELOG screen since 2026-10-08. scripts/check-game.sh regenerates it to a temp file and fails when the committed copy differs. Plain .txt files are not packed by default: export presets must add *.txt to their include filter or the screen falls back to its missing-text line."
+    },
+    {
+      "asset_id": "procedural-sfx-v1",
+      "path": "apps/game/scripts/sfx_bank.gd",
+      "source_or_tool": "Generated at startup by project code (scripts/sfx_bank.gd, Godot 4.7.2 GDScript): sine, saw and square tones, seeded white noise, one-pole filters and exponential envelopes rendered into AudioStreamWAV buffers (16-bit mono, 22.05 kHz, seed 0x574F4C46, every clip normalised to a -6 dB peak)",
+      "source_reference": "No external source; the recipes in scripts/sfx_bank.gd are the whole origin. Author: Nathanial Henniges (project code).",
+      "terms_reference": "GPL-3.0-or-later, the repository code licence (see LICENSE); the clips are an output of that code and ship as no file",
+      "rights_review_status": "Original procedural audio with no third-party material; covered by the code licence. If any clip is later replaced by a CC0 or licensed recording, register that file here with its URL and licence before use.",
+      "modifications": "Twelve clips: boom (0.5 s), small boom (0.3 s), clank (40 ms), thud (80 ms), hiss loop (0.5 s), hum loop (1.0 s), arc crackle (0.5 s), klaxon (three 120 ms square chirps, 0.5 s), growl (70 Hz saw with tremolo, 0.6 s), servo loop (1.2 kHz sine with a 6 Hz vibrato, 1.0 s), winch loop (90 Hz saw with a 7 Hz wobble, 1.0 s) and whine (sine sweep 300 Hz to 1.8 kHz, 0.6 s); added 2026-10-09: servo, winch and whine. Played through AudioStreamPlayer nodes on the Effects bus; volume and pitch are set per use.",
+      "implementation_status": "In use since 2026-10-08 for the containment gate boom, the relay contact clank and crackle, the seal landing thud, the knockdown thud, the Records exit arc, and in the Service Junction for the breaker clunk, the valve clicks, the hiss and pump hum that follow the gauge, the seal-charged klaxon, WOLF's growl, the relief-vent small boom and the door blast; since 2026-10-09 also the sentry's servo (pitch follows its state and winds down when it goes over), the tank's clamp, landing boom and missed-drop clang, the winch during the arm's rewind, and the exit bolt's whine, arc and clank. Nothing has been ear-tested in a normal window yet; the clips are a first pass."
+    },
+    {
+      "asset_id": "floor-reflection-shader",
+      "path": "apps/game/assets/shaders/floor_reflection.gdshader",
+      "source_or_tool": "Hand-written Godot 4.7.2 canvas_item shader (project code), 2026-10-08",
+      "source_reference": "No external source; the shader text is the whole origin. Author: Nathanial Henniges (project code).",
+      "terms_reference": "GPL-3.0-or-later, the repository code licence (see LICENSE)",
+      "rights_review_status": "Original project code with no third-party material; covered by the code licence.",
+      "modifications": "Original file; no generated or third-party content.",
+      "implementation_status": "In use since 2026-10-08 through scripts/floor_reflection.gd: the mirrored, fading and slightly wobbling floor reflections under characters, station props, the sentry and the door."
+    },
+    {
+      "asset_id": "post-grade-shader",
+      "path": "apps/game/assets/shaders/post_grade.gdshader",
+      "source_or_tool": "Hand-written Godot 4.7.2 canvas_item shader (project code), 2026-10-08",
+      "source_reference": "No external source; the shader text is the whole origin. Author: Nathanial Henniges (project code).",
+      "terms_reference": "GPL-3.0-or-later, the repository code licence (see LICENSE)",
+      "rights_review_status": "Original project code with no third-party material; covered by the code licence.",
+      "modifications": "Original file; no generated or third-party content.",
+      "implementation_status": "In use since 2026-10-08 as the world canvas's full-screen grade: a mild cold tint and an edge vignette with multiply blending (no screen copy)."
+    },
+    {
+      "asset_id": "game-ui-theme",
+      "path": "apps/game/assets/fonts/game_theme.tres",
+      "source_or_tool": "Godot 4.7.2 Theme resource written for the project (project code)",
+      "source_reference": "No external source. References the Roboto and Montserrat FontVariation resources in this folder.",
+      "terms_reference": "GPL-3.0-or-later, the repository code licence (see LICENSE)",
+      "rights_review_status": "Original project code with no third-party material; covered by the code licence.",
+      "modifications": "Original file: button, card, panel and label styles (style boxes, colours, margins), the Terminal* variations and the default fonts.",
+      "implementation_status": "In use as the project-wide UI theme (theme/custom in project.godot): the raised menu buttons, cards and panels, and the Terminal* variations that only Settings uses."
+    },
+    {
+      "asset_id": "roboto-regular-variation",
+      "path": "apps/game/assets/fonts/Roboto-Regular.tres",
+      "source_or_tool": "Godot 4.7.2 FontVariation resource written for the project (project code)",
+      "source_reference": "Wraps apps/game/assets/fonts/Roboto-Variable.ttf (entry roboto-variable-font).",
+      "terms_reference": "GPL-3.0-or-later, the repository code licence (see LICENSE); the font it wraps is under SIL Open Font License 1.1",
+      "rights_review_status": "Project resource file; the wrapped font keeps its OFL terms (see roboto-variable-font).",
+      "modifications": "Selects the variable font's weight 400; no font outlines changed.",
+      "implementation_status": "In use as the body font of the UI theme."
+    },
+    {
+      "asset_id": "montserrat-semibold-variation",
+      "path": "apps/game/assets/fonts/Montserrat-Semibold.tres",
+      "source_or_tool": "Godot 4.7.2 FontVariation resource written for the project (project code)",
+      "source_reference": "Wraps apps/game/assets/fonts/Montserrat-Variable.ttf (entry montserrat-variable-font).",
+      "terms_reference": "GPL-3.0-or-later, the repository code licence (see LICENSE); the font it wraps is under SIL Open Font License 1.1",
+      "rights_review_status": "Project resource file; the wrapped font keeps its OFL terms (see montserrat-variable-font).",
+      "modifications": "Selects weight 600 of the variable font; no font outlines changed.",
+      "implementation_status": "In use as the controls font of the UI theme."
+    },
+    {
+      "asset_id": "montserrat-bold-variation",
+      "path": "apps/game/assets/fonts/Montserrat-Bold.tres",
+      "source_or_tool": "Godot 4.7.2 FontVariation resource written for the project (project code)",
+      "source_reference": "Wraps apps/game/assets/fonts/Montserrat-Variable.ttf (entry montserrat-variable-font).",
+      "terms_reference": "GPL-3.0-or-later, the repository code licence (see LICENSE); the font it wraps is under SIL Open Font License 1.1",
+      "rights_review_status": "Project resource file; the wrapped font keeps its OFL terms (see montserrat-variable-font).",
+      "modifications": "Selects weight 700 of the variable font; no font outlines changed.",
+      "implementation_status": "In use as the display font in scenes/main.tscn (titles and headings) and for Settings headings (scripts/game_settings.gd)."
+    },
+    {
+      "asset_id": "roboto-ofl-text",
+      "path": "apps/game/assets/fonts/Roboto-OFL.txt",
+      "source_or_tool": "License text distributed with the Roboto font family",
+      "source_reference": "https://fonts.google.com/specimen/Roboto (SIL Open Font License 1.1)",
+      "terms_reference": "SIL Open Font License 1.1 (this file is the licence text)",
+      "rights_review_status": "Licence text redistributed unchanged with the font, as the OFL requires.",
+      "modifications": "Copied unchanged.",
+      "implementation_status": "Bundled beside Roboto-Variable.ttf as the OFL requires."
+    },
+    {
+      "asset_id": "montserrat-ofl-text",
+      "path": "apps/game/assets/fonts/Montserrat-OFL.txt",
+      "source_or_tool": "License text distributed with the Montserrat font family",
+      "source_reference": "https://fonts.google.com/specimen/Montserrat (SIL Open Font License 1.1)",
+      "terms_reference": "SIL Open Font License 1.1 (this file is the licence text)",
+      "rights_review_status": "Licence text redistributed unchanged with the font, as the OFL requires.",
+      "modifications": "Copied unchanged.",
+      "implementation_status": "Bundled beside Montserrat-Variable.ttf as the OFL requires."
     }
   ],
-  "status": "One provisional brand mark, three provisional character images, one title background, two gameplay backgrounds, two prop sheets, two derivative marketing captures, and the Roboto and Montserrat font families recorded; no audio acquired.",
+  "status": "One provisional brand mark, three provisional character images (redrawn 2026-10-08), one title background, three layered gameplay rooms (far, mid and near plates for the corridor, Records Access and the Service Junction), seventeen station props (eight for the corridor and Records Access; eight for the Service Junction plus one documented derivative crop of its tank; the junction reuses the corridor breaker), two sentry images, three derivative marketing captures, the Roboto and Montserrat font families with their licence texts, four project-written font and theme resources (three FontVariation .tres files and the UI theme), two project shader files, one generated changelog text export and one procedural sound-effect set (code, no files) recorded; no audio files acquired. Glows, haze, dust, lockdown beacons, reflections, particles, the Service Junction's state overlays (pressure line, gauge needle, turn lights, seam glow, panel and hatch lights, alcove, floor mark, arm rods and cable, the sentry's beam and eye light) and the screen grade are procedural built-in nodes and three small shaders (the two registered shader files plus the valve wheel's inline disc mask), not image assets. Godot's .import and .uid sidecar files and this manifest itself are not registered.",
   "merge_warning": "Preserve this populated provenance register when merging future handoffs.",
   "future_entry_fields": [
     "asset_id",

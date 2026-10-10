@@ -3,21 +3,29 @@ title: Current status
 description: Implemented source-game features, limits, and future work.
 ---
 
-WOLF//OVERRIDE is an early source prototype. It contains two connected playable rooms, not a complete investigation or campaign. There is no public download, release date, or announced price.
+WOLF//OVERRIDE is an early source prototype. It contains three connected playable rooms, not a complete investigation or campaign. There is no public download, release date, or announced price.
 
 ## In the source build
 
-- The engineer is the sole playable character. WOLF accompanies them independently; both have provisional static art.
+- The engineer is the sole playable character. WOLF accompanies them independently; both have provisional static art, redrawn in October 2026 with AI assistance and approved by Nathanial Henniges.
 - The corridor has a power and door puzzle with a cooperative route and a manual route if WOLF refuses.
 - One authored disagreement is remembered, with a later callback and safe checkpoint.
 - The opening, purge display, station feedback, and objective cards guide the first steps.
 - Records Access lets the engineer copy a purge-order trace, then preserve a timestamp through WOLF's independent readout or a manual maintenance port.
-- New Game and versioned save/load cover both rooms, positions, and chapter progress.
+- The Service Junction, past the Records exit, turns the building into the engineer's only tool: overload a breaker, crank a valve with a held interact and blow a sealed door on a one-second fuse; then drop a hanging coolant tank on a patrolling sentry machine (WOLF may choose to draw it onto the mark, or the engineer times the drop alone) and pop the exit bolt. Knockdowns (the relief vent, the blast, the sentry, the coolant cloud) return to the room's last autosave. The short lights-out scene planned after the bolt is not built. What lies past the exit hatch is not built yet.
+- All three rooms are built from provisional AI-assisted painted layers (far, middle and near) that move at different speeds as the camera follows, with each station drawn as its own machine (the Service Junction's sentry, arm and tank included), lamp glows, haze, drifting dust and soft floor reflections. The play camera sits close (1.35x) and follows the engineer.
+- Big moments answer with short sounds the game generates itself, a brief camera shake, sparks or dust, controller rumble or phone vibration and, for the biggest, a screen flash. Settings has a Reduced Motion toggle for the shake, hit-stop and flashes.
+- The title screen's **CHANGELOG** opens these development updates inside the game, generated from the website [changelog](/docs/changelog/).
+- New Game and versioned save/load cover all three rooms, positions, and chapter progress, including four automatic saves in the Service Junction.
 - Controller mappings, mobile on-screen controls, and saved Display, Audio, and Controls preferences are present. [Play and settings](/docs/controls/) explains them.
+
+## Not yet played by hand
+
+No complete route has been played by hand. The Service Junction, the closer camera, the new room, prop and character art, and the generated sounds have been checked only by headless automated tests and rendered still frames. How they feel, how their timing and pacing read, how readable they are on screen and how the sounds land are unproven until a hands-on playtest; timings may change after it. See [Testing and deployment](/docs/development/testing/).
 
 ## Still to come
 
-Final character art and animation, audio, the wider story, public export packages, complete touch/controller playtests, and physical-device testing remain future work. The corridor key art on the landing page is provisional and is not a gameplay capture. Its source and rights-review status are in the [asset register](https://github.com/MrDemonWolf/wolf-override/blob/main/apps/game/assets/manifest.json).
+Hands-on play of every route, final character art and animation, music and recorded audio (the current effects are generated in code), the wider story, public export packages, complete touch/controller playtests, and physical-device testing remain future work. The corridor key art on the landing page is provisional and is not a gameplay capture. Its source and rights-review status are in the [asset register](https://github.com/MrDemonWolf/wolf-override/blob/main/apps/game/assets/manifest.json).
 
 ## Direct macOS updater
 

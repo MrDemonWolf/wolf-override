@@ -7,10 +7,24 @@ description: How the safe point, automatic saves, Continue, New Game, and Pause 
 
 - **Safe point.** Use the green **SAFE POINT** beyond the sealed door. This is the first save in a run.
 - **Records Access.** Entering Records Access from the safe point, copying the purge-order trace, preserving the mirror timestamp, and securing the exit each save automatically.
+- **Service Junction.** Entering the room, blowing the sealed door, bringing down the sentry, and leaving through the exit hatch each save automatically (see the table below).
 
 A save stores the room, both characters' positions, puzzle state, the engineer's display name, and the remembered choice. There is one checkpoint file, not multiple save slots, and each save replaces it.
 
-If an automatic save fails, the hint line shows **Save failed. Use a station to try again.** until you move to another spot or a later save works. Using a station again retries the save; if entering Records Access did not save, the first station there does. If the first safe-point save fails, the safe point stays unused so you can use it again.
+If an automatic save fails, the hint line shows **Save failed. Use a station to try again.** until you move to another spot or a later save works. Your next interact press, at a station or anywhere else in the room, tries the save again, and progress since the last successful save is stored once a later save works. If the first safe-point save fails, the safe point stays unused so you can use it again.
+
+The Service Junction saves automatically four times, and Continue restores each stage:
+
+| Save | Continue restores |
+| --- | --- |
+| Entering the room | The door still sealed and the breaker ready to arm; the valve's turns start again from zero |
+| Blowing the door | The door down, the breaker and valve spent, the sentry patrolling from the far end of its lane and the tank hung over the mark |
+| Bringing down the sentry | The sentry down under the tank and the exit bolt still to pop |
+| Leaving through the exit hatch | The bolt popped and the hatch open |
+
+## Knockdowns
+
+Being knocked down in the Service Junction (by the relief vent, the door blast, the sentry or the coolant cloud) returns you to the most recent of its saves, so you lose at most the step you were on. If that save failed to write, or the file cannot be read, the knockdown still returns you to the start of the step you were on, kept in memory, rather than to an older save, and the line after it reads **Back at the start of this beat.** The knockdown itself never writes the file, and your earlier choices and Records progress are kept. A blown door stays blown through every reload: the spent breaker and valve cannot be used again.
 
 ## Continue and New Game
 

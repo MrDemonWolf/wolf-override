@@ -9,10 +9,14 @@ const ACTION_NAMES: Array[String] = ["Move left", "Move right", "Interact / cont
 const BUSES: Array[String] = ["Master", "Music", "Effects", "Voice"]
 const MAX_SETTINGS_BYTES: int = 65536
 
+## Reduced Motion changed; Main hands it to the impact kit (no shake or hit-stop, shorter flashes).
+signal reduced_motion_changed(enabled: bool)
+
 var settings_path: String
 var tabs: TabBar
 var vsync: CheckButton
 var antialiasing: OptionButton
+var reduced_motion: CheckButton
 var volumes: Dictionary = {}
 var binding_buttons: Dictionary = {}
 var defaults: Dictionary = {}
@@ -33,6 +37,7 @@ func configure(path: String) -> void:
 	var config: ConfigFile = load_config(settings_path)
 	vsync.set_pressed_no_signal(boolean(config, "video", "vsync", true))
 	antialiasing.select(clampi(int(number(config, "video", "msaa_2d", 0)), 0, 3))
+	reduced_motion.set_pressed_no_signal(boolean(config, "video", "reduced_motion", false))
 	_apply_graphics()
 	for bus: String in BUSES:
 		if AudioServer.get_bus_index(bus) < 0:
@@ -122,11 +127,7 @@ func _build_menu() -> void:
 	surface.position = Vector2(24, 126)
 	surface.size = Vector2(712, 240)
 	surface.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	var surface_style: StyleBoxFlat = StyleBoxFlat.new()
-	surface_style.bg_color = Color("#0b1b29")
-	surface_style.border_color = Color("#416779")
-	surface_style.set_border_width_all(1)
-	surface.add_theme_stylebox_override("panel", surface_style)
+	surface.theme_type_variation = &"TerminalPanel"
 	add_child(surface)
 	move_child(surface, 0)
 	var subtitle: Label = _label("THE DEN  /  LOCAL CONFIGURATION", 13)
@@ -138,6 +139,7 @@ func _build_menu() -> void:
 	$Title.add_theme_font_override("font", HEADING_FONT)
 	$Title.add_theme_font_size_override("font_size", 27)
 	tabs = TabBar.new()
+	tabs.theme_type_variation = &"TerminalTabBar"
 	tabs.position = Vector2(32, 81)
 	tabs.size = Vector2(696, 38)
 	for caption: String in ["DISPLAY", "AUDIO", "CONTROLS"]:
@@ -173,6 +175,13 @@ func _build_menu() -> void:
 		antialiasing.add_item(caption)
 	display.add_child(antialiasing)
 	antialiasing.item_selected.connect(func(_index: int) -> void: _apply_graphics(); _save_extra())
+	reduced_motion = CheckButton.new()
+	reduced_motion.text = "REDUCED MOTION"
+	reduced_motion.tooltip_text = "No camera shake or hit-stop; screen flashes are shorter."
+	reduced_motion.position = Vector2(404, 154)
+	reduced_motion.size = Vector2(272, 40)
+	display.add_child(reduced_motion)
+	reduced_motion.toggled.connect(func(value: bool) -> void: reduced_motion_changed.emit(value); _save_extra())
 	var gpu: Label = _label("GPU: %s\nRenderer: Compatibility" % RenderingServer.get_video_adapter_name(), 14)
 	gpu.position = Vector2(8, 194)
 	gpu.size = Vector2(680, 44)
@@ -277,66 +286,33 @@ func _slider_row(parent: Node, caption: String, minimum: float, maximum: float, 
 	return slider
 
 
+## Settings is the one menu that keeps the terminal look (squared corners, label-style controls).
+## Its styles are the Terminal* variations of the project theme (game_theme.tres); a local theme
+## maps them onto the plain Button types so every control built here, now or later, picks them up.
+## CheckButton focus and the TabBar ring still fall through to the shared project entries.
 func apply_theme() -> void:
+	var source: Theme = ThemeDB.get_project_theme()
 	var menu_theme: Theme = Theme.new()
 	menu_theme.default_font = BODY_FONT
 	menu_theme.default_font_size = 16
-	var normal: StyleBoxFlat = StyleBoxFlat.new()
-	normal.bg_color = Color("#182f40")
-	normal.border_color = Color("#345366")
-	normal.set_border_width_all(1)
-	normal.set_corner_radius_all(2)
-	normal.content_margin_left = 12
-	normal.content_margin_right = 12
-	normal.content_margin_top = 8
-	normal.content_margin_bottom = 8
-	var hover: StyleBoxFlat = normal.duplicate() as StyleBoxFlat
-	hover.bg_color = Color("#234859")
-	hover.border_color = Color("#64cce5")
-	# Focus rings come from the shared project theme (game_theme.tres) so every menu matches.
 	for type_name: String in ["Button", "OptionButton", "CheckButton"]:
 		menu_theme.set_font("font", type_name, CONTROL_FONT)
-		menu_theme.set_stylebox("normal", type_name, normal)
-		menu_theme.set_stylebox("hover", type_name, hover)
-		menu_theme.set_stylebox("pressed", type_name, hover)
 		menu_theme.set_font_size("font_size", type_name, 16)
-	var tab_normal: StyleBoxFlat = normal.duplicate() as StyleBoxFlat
-	tab_normal.content_margin_left = 20
-	tab_normal.content_margin_right = 20
-	tab_normal.expand_margin_left = -4
-	tab_normal.expand_margin_right = -4
-	var tab_selected: StyleBoxFlat = tab_normal.duplicate() as StyleBoxFlat
-	tab_selected.bg_color = hover.bg_color
-	tab_selected.border_color = hover.border_color
-	menu_theme.set_stylebox("tab_selected", "TabBar", tab_selected)
-	menu_theme.set_stylebox("tab_unselected", "TabBar", tab_normal)
+		for state: String in ["normal", "hover", "pressed", "disabled"]:
+			menu_theme.set_stylebox(state, type_name, source.get_stylebox(state, "TerminalButton"))
+	# Buttons and option lists get the squared ring. A CheckButton would find the local Button ring first,
+	# so it is pinned to the shared project ring that the title and sliders use.
+	for type_name: String in ["Button", "OptionButton"]:
+		menu_theme.set_stylebox("focus", type_name, source.get_stylebox("focus", "TerminalButton"))
+	menu_theme.set_stylebox("focus", "CheckButton", source.get_stylebox("focus", "CheckButton"))
 	menu_theme.set_font("font", "TabBar", CONTROL_FONT)
 	menu_theme.set_font_size("font_size", "TabBar", 16)
-	menu_theme.set_stylebox("panel", "PopupMenu", normal)
-	menu_theme.set_stylebox("hover", "PopupMenu", hover)
-	menu_theme.set_font("font", "PopupMenu", CONTROL_FONT)
-	menu_theme.set_font_size("font_size", "PopupMenu", 16)
-	menu_theme.set_color("font_color", "PopupMenu", Color("#e2edf2"))
-	menu_theme.set_color("font_hover_color", "PopupMenu", Color.WHITE)
-	var track: StyleBoxFlat = StyleBoxFlat.new()
-	track.bg_color = Color("#345366")
-	track.content_margin_top = 3
-	track.content_margin_bottom = 3
-	track.set_corner_radius_all(3)
-	menu_theme.set_stylebox("slider", "HSlider", track)
-	var fill: StyleBoxFlat = track.duplicate() as StyleBoxFlat
-	fill.bg_color = Color("#64cce5")
-	menu_theme.set_stylebox("grabber_area", "HSlider", fill)
-	menu_theme.set_stylebox("grabber_area_highlight", "HSlider", fill)
 	theme = menu_theme
 	for label: Label in [$FPSLabel, $ResolutionLabel]:
 		label.add_theme_font_size_override("font_size", 16)
 		label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 	for button: Button in [$FPSOptions, $ResolutionOptions, $FullscreenToggle, $BackButton]:
 		button.add_theme_font_size_override("font_size", 16)
-	for node: Button in [$BackButton, $FPSOptions, $ResolutionOptions]:
-		for state: String in ["normal", "hover", "pressed"]:
-			node.remove_theme_stylebox_override(state)
 
 
 func select_tab(index: int) -> void:
@@ -345,7 +321,7 @@ func select_tab(index: int) -> void:
 		pages[page_index].visible = page_index == index
 	for node: CanvasItem in display_nodes:
 		node.visible = index == 0
-	note.text = ["Window size is OS-managed on mobile. V-sync may limit the FPS cap.", "Volume changes apply immediately. Current chapter has no audio tracks yet.", "Select a binding, then press a key, controller button or move a stick."][index]
+	note.text = ["Window size is OS-managed on mobile. V-sync may limit the FPS cap.", "Volume changes apply immediately. Effects carries the generated impact sounds; there is no music or voice yet.", "Select a binding, then press a key, controller button or move a stick."][index]
 
 
 func _apply_graphics() -> void:
@@ -523,6 +499,7 @@ func _save_extra() -> bool:
 	var config: ConfigFile = load_config(settings_path)
 	config.set_value("video", "vsync", vsync.button_pressed)
 	config.set_value("video", "msaa_2d", antialiasing.selected)
+	config.set_value("video", "reduced_motion", reduced_motion.button_pressed)
 	for bus: String in BUSES:
 		config.set_value("audio", bus, (volumes[bus] as HSlider).value)
 	config.set_value("controls", "deadzone", deadzone.value)

@@ -29,13 +29,13 @@ func _run() -> void:
 	var credits_back_button: Button = game.get_node("CanvasLayer/TitleScreen/CreditsScreen/CreditsBackButton") as Button
 	var credits_pause_button: Button = game.get_node("CanvasLayer/TitleScreen/CreditsScreen/CreditsPauseButton") as Button
 	var hud: Label = game.get_node("CanvasLayer/TopBar/HUD") as Label
-	var top_card: ColorRect = game.get_node("CanvasLayer/TopBar") as ColorRect
+	var top_card: Panel = game.get_node("CanvasLayer/TopBar") as Panel
 	var speaker: Label = game.get_node("CanvasLayer/BottomBar/Speaker") as Label
 	var story: Label = game.get_node("CanvasLayer/BottomBar/Story") as Label
-	var context_hint: ColorRect = game.get_node("CanvasLayer/ContextHint") as ColorRect
+	var context_hint: Panel = game.get_node("CanvasLayer/ContextHint") as Panel
 	var choice_1_button: Button = game.get_node("CanvasLayer/TouchControls/Choice1") as Button
 	var choice_2_button: Button = game.get_node("CanvasLayer/TouchControls/Choice2") as Button
-	var tutorial_prompt: ColorRect = game.get_node("CanvasLayer/TutorialPrompt") as ColorRect
+	var tutorial_prompt: Panel = game.get_node("CanvasLayer/TutorialPrompt") as Panel
 	var tutorial_text: Label = game.get_node("CanvasLayer/TutorialPrompt/Text") as Label
 	var human: M0Actor = game.get_node("Human") as M0Actor
 	var wolf: M0Actor = game.get_node("Wolf") as M0Actor
@@ -154,7 +154,24 @@ func _run() -> void:
 	if not _require(await _walk_to(human, 605.0), "engineer reaches relay with WOLF following"):
 		return
 	game.call("_update_gameplay_camera")
-	_expect(gameplay_camera.position.x > 480.0 and gameplay_camera.position.x < 560.0, "camera scrolls toward the engineer without exposing the corridor edge")
+	var half_view: Vector2 = Vector2(960.0, 540.0) * 0.5 / gameplay_camera.zoom
+	_expect(is_equal_approx(gameplay_camera.zoom.x, 1.35), "play view uses the 1.35 gameplay zoom")
+	_expect(gameplay_camera.position.x > 560.0 and gameplay_camera.position.x - half_view.x >= 0.0 and gameplay_camera.position.x + half_view.x <= 960.0, "camera scrolls toward the engineer without exposing the corridor edge")
+	_expect(is_equal_approx(gameplay_camera.position.x, clampf(human.position.x, half_view.x, 960.0 - half_view.x)), "the camera centres on the engineer inside its room clamp")
+	# Feet on the floor (y 440) stay at least 24 px above the context hint, and the ceiling lamps (y ~188) stay in view.
+	var feet_screen_y: float = (440.0 - gameplay_camera.position.y) * gameplay_camera.zoom.y + 270.0
+	_expect(feet_screen_y <= context_hint.position.y - 24.0, "the actors' feet sit clear above the context hint")
+	_expect(gameplay_camera.position.y - half_view.y <= 170.0 and gameplay_camera.position.y + half_view.y <= 600.0, "play view keeps the ceiling lamps in view and stays on the painting")
+	# With the touch buttons up, the camera sits lower so feet and station bases clear their tops.
+	game.set("touch_enabled", true)
+	game.call("_refresh_ui")
+	game.call("_update_gameplay_camera")
+	var touch_feet_y: float = (440.0 - gameplay_camera.position.y) * gameplay_camera.zoom.y + 270.0
+	var button_top: float = (game.get_node("CanvasLayer/TouchControls/Use") as Control).get_global_rect().position.y
+	_expect(touch_feet_y <= button_top - 8.0 and gameplay_camera.position.y + half_view.y <= 600.0, "with touch buttons the feet sit above them (feet %.0f, buttons from %.0f) and the view stays on the painting" % [touch_feet_y, button_top])
+	game.set("touch_enabled", false)
+	game.call("_refresh_ui")
+	game.call("_update_gameplay_camera")
 	_expect(not wolf.controlled and wolf.position.x > 400.0 and wolf.position.x < human.position.x, "WOLF stays a companion at the relay")
 	_expect(str(game.call("_context_hint")).contains("ask WOLF"), "relay hint offers WOLF the live contact")
 	await _tap(&"interact")
@@ -304,6 +321,8 @@ func _run() -> void:
 	_expect(wolf.follow_target == human, "WOLF returns to following after the bypass")
 	DirAccess.remove_absolute(ProjectSettings.globalize_path(path))
 	game.queue_free()
+	# The bypass clip is still playing; the mixer releases a stopped clip a few steps later, so give it that time before quitting.
+	await create_timer(0.1).timeout
 	if failures == 0:
 		print("M0 scene checks passed")
 	quit(1 if failures > 0 else 0)

@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://baubwu8s7ugcy"
-path="res://.godot/imported/records-props-provisional.png-578d06287395918a03acc4e35ce45620.ctex"
+uid="uid://4lsaq2rhvsb5"
+path="res://.godot/imported/corridor-safe-point.png-81af916dc0600b69fd3a5ba73ced662e.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/records-props-provisional.png"
-dest_files=["res://.godot/imported/records-props-provisional.png-578d06287395918a03acc4e35ce45620.ctex"]
+source_file="res://assets/props/corridor-safe-point.png"
+dest_files=["res://.godot/imported/corridor-safe-point.png-81af916dc0600b69fd3a5ba73ced662e.ctex"]
 
 [params]
 
@@ -23,7 +23,7 @@ compress/rdo_quality_loss=0.0
 compress/hdr_compression=1
 compress/normal_map=0
 compress/channel_pack=0
-mipmaps/generate=false
+mipmaps/generate=true
 mipmaps/limit=-1
 roughness/mode=0
 roughness/src_normal=""

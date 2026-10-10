@@ -1,4 +1,4 @@
-[gd_scene load_steps=18 format=3]
+[gd_scene load_steps=26 format=3]
 
 [ext_resource type="Script" path="res://scripts/main.gd" id="1_main"]
 [ext_resource type="Script" path="res://scripts/m0_actor.gd" id="2_actor"]
@@ -6,13 +6,21 @@
 [ext_resource type="Texture2D" path="res://assets/wolf-side-right-provisional.png" id="4_wolf"]
 [ext_resource type="Texture2D" path="res://assets/rowan-side-right-provisional.png" id="5_rowan"]
 [ext_resource type="Texture2D" path="res://assets/title-corridor-key-art-provisional.png" id="6_title_art"]
-[ext_resource type="Texture2D" path="res://assets/maintenance-props-provisional.png" id="7_props"]
+[ext_resource type="Texture2D" path="res://assets/props/corridor-sealed-door.png" id="7_door"]
 [ext_resource type="Texture2D" path="res://assets/director-side-left-provisional.png" id="8_director"]
-[ext_resource type="Texture2D" path="res://assets/records-props-provisional.png" id="9_records_props"]
+[ext_resource type="Texture2D" path="res://assets/props/corridor-purge-display.png" id="9_purge_display"]
 [ext_resource type="Script" path="res://scripts/pause_overlay.gd" id="10_pause_overlay"]
 [ext_resource type="Script" path="res://scripts/game_settings.gd" id="11_settings"]
 [ext_resource type="Script" path="res://scripts/containment_cage.gd" id="12_cage"]
 [ext_resource type="FontVariation" path="res://assets/fonts/Montserrat-Bold.tres" id="13_display"]
+[ext_resource type="Script" path="res://scripts/room_depth.gd" id="14_depth"]
+[ext_resource type="Texture2D" path="res://assets/rooms/corridor-far.png" id="15_corridor_far"]
+[ext_resource type="Texture2D" path="res://assets/rooms/corridor-mid.png" id="17_corridor_mid"]
+[ext_resource type="Texture2D" path="res://assets/rooms/corridor-near.png" id="18_corridor_near"]
+[ext_resource type="Texture2D" path="res://assets/props/corridor-breaker.png" id="19_breaker"]
+[ext_resource type="Texture2D" path="res://assets/props/corridor-coolant-relay.png" id="20_relay"]
+[ext_resource type="Texture2D" path="res://assets/props/corridor-safe-point.png" id="21_safe_point"]
+[ext_resource type="Shader" path="res://assets/shaders/post_grade.gdshader" id="16_grade"]
 
 [sub_resource type="RectangleShape2D" id="FloorShape"]
 size = Vector2(960, 60)
@@ -26,8 +34,23 @@ size = Vector2(28, 60)
 [sub_resource type="RectangleShape2D" id="WolfShape"]
 size = Vector2(62, 34)
 
+[sub_resource type="ShaderMaterial" id="GradeMaterial"]
+shader = ExtResource("16_grade")
+
 [node name="Main" type="Node2D"]
 script = ExtResource("1_main")
+
+[node name="CorridorDepth" type="Node2D" parent="."]
+script = ExtResource("14_depth")
+painting = ExtResource("15_corridor_far")
+mid_painting = ExtResource("17_corridor_mid")
+near_painting = ExtResource("18_corridor_near")
+walkway_y = 777.0
+far_drop = 27.0
+base_color = Color(0.0352941, 0.0823529, 0.2, 1)
+lamps = PackedVector2Array(0.144, 0.188, 0.5, 0.188, 0.854, 0.188)
+shaft_lamps = PackedInt32Array(1, 2)
+warning_lamps = PackedVector2Array(0.341, 0.27, 0.659, 0.27)
 
 [node name="IntroCamera" type="Camera2D" parent="."]
 position = Vector2(480, 270)
@@ -55,11 +78,12 @@ pivot_offset = Vector2(28, 0)
 color = Color(0, 0, 0, 0)
 
 [node name="DoorArt" type="Sprite2D" parent="Door/Visual"]
-position = Vector2(28, 66)
-scale = Vector2(0.22, 0.22)
-texture = ExtResource("7_props")
+texture_filter = 4
+position = Vector2(28, 61.5)
+scale = Vector2(0.302, 0.302)
+texture = ExtResource("7_door")
 region_enabled = true
-region_rect = Rect2(1086, 0, 543, 724)
+region_rect = Rect2(120, 18, 273, 467)
 
 [node name="Human" type="CharacterBody2D" parent="."]
 position = Vector2(160, 410)
@@ -71,6 +95,7 @@ actor_id = &"human"
 shape = SubResource("HumanShape")
 
 [node name="BodySprite" type="Sprite2D" parent="Human"]
+texture_filter = 4
 position = Vector2(0, -5)
 scale = Vector2(0.047, 0.047)
 texture = ExtResource("5_rowan")
@@ -94,6 +119,7 @@ actor_id = &"wolf"
 shape = SubResource("WolfShape")
 
 [node name="BodySprite" type="Sprite2D" parent="Wolf"]
+texture_filter = 4
 position = Vector2(0, -15)
 scale = Vector2(0.0733, 0.0733)
 texture = ExtResource("4_wolf")
@@ -123,56 +149,61 @@ script = ExtResource("12_cage")
 [node name="IntroDirector" type="Sprite2D" parent="."]
 visible = false
 z_index = 2
+texture_filter = 4
 position = Vector2(255, 410)
 scale = Vector2(0.047, 0.047)
 texture = ExtResource("8_director")
 
 [node name="PurgeTerminalArt" type="Sprite2D" parent="."]
-position = Vector2(150, 286)
-scale = Vector2(0.2, 0.2)
-texture = ExtResource("9_records_props")
+texture_filter = 4
+position = Vector2(158, 294.5)
+scale = Vector2(0.25, 0.25)
+texture = ExtResource("9_purge_display")
 region_enabled = true
-region_rect = Rect2(0, 0, 724, 724)
+region_rect = Rect2(46, 63, 420, 408)
 
 [node name="BreakerArt" type="Sprite2D" parent="."]
 z_index = 1
-position = Vector2(350, 372)
-scale = Vector2(0.22, 0.22)
-texture = ExtResource("7_props")
+texture_filter = 4
+position = Vector2(350, 391.3)
+scale = Vector2(0.225, 0.225)
+texture = ExtResource("19_breaker")
 region_enabled = true
-region_rect = Rect2(0, 0, 543, 724)
+region_rect = Rect2(81, 46, 342, 433)
 
 [node name="RelayArt" type="Sprite2D" parent="."]
 z_index = 1
-position = Vector2(605, 372)
-scale = Vector2(0.22, 0.22)
-texture = ExtResource("7_props")
+texture_filter = 4
+position = Vector2(605, 395.25)
+scale = Vector2(0.221, 0.221)
+texture = ExtResource("20_relay")
 region_enabled = true
-region_rect = Rect2(543, 0, 543, 724)
+region_rect = Rect2(61, 64, 390, 405)
 
 [node name="CheckpointArt" type="Sprite2D" parent="."]
 z_index = 1
-position = Vector2(876, 372)
-scale = Vector2(0.22, 0.22)
-texture = ExtResource("7_props")
+texture_filter = 4
+position = Vector2(876, 383.9)
+scale = Vector2(0.25, 0.25)
+texture = ExtResource("21_safe_point")
 region_enabled = true
-region_rect = Rect2(1629, 0, 543, 724)
+region_rect = Rect2(116, 31, 280, 449)
 
 [node name="BreakerStatusLight" type="ColorRect" parent="."]
 z_index = 2
-offset_left = 341.0
-offset_top = 354.0
-offset_right = 359.0
-offset_bottom = 359.0
+offset_left = 339.0
+offset_top = 358.0
+offset_right = 357.0
+offset_bottom = 363.0
 mouse_filter = 2
 color = Color(0.72, 0.4, 0.17, 1)
 
 [node name="RelayStatusLight" type="ColorRect" parent="."]
 z_index = 2
-offset_left = 596.0
-offset_top = 355.0
-offset_right = 614.0
-offset_bottom = 360.0
+offset_left = 595.0
+offset_top = 361.0
+offset_right = 613.0
+offset_bottom = 366.0
 mouse_filter = 2
 color = Color(0.33, 0.43, 0.48, 1)
 
@@ -212,7 +243,20 @@ theme_override_colors/font_color = Color(0.69, 0.82, 0.87, 1)
 theme_override_font_sizes/font_size = 13
 text = "SAFE POINT"
 
+[node name="PostProcess" type="CanvasLayer" parent="."]
+layer = 1
+
+[node name="Grade" type="ColorRect" parent="PostProcess"]
+material = SubResource("GradeMaterial")
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
 [node name="CanvasLayer" type="CanvasLayer" parent="."]
+layer = 2
 
 [node name="IntroAlarm" type="ColorRect" parent="CanvasLayer"]
 offset_right = 960.0
@@ -220,13 +264,22 @@ offset_bottom = 540.0
 mouse_filter = 2
 color = Color(0.35, 0.03, 0.05, 0)
 
-[node name="TopBar" type="ColorRect" parent="CanvasLayer"]
+[node name="TopBar" type="Panel" parent="CanvasLayer"]
 offset_left = 18.0
 offset_top = 16.0
 offset_right = 466.0
 offset_bottom = 78.0
 mouse_filter = 2
-color = Color(0.025, 0.045, 0.08, 0.88)
+theme_type_variation = &"HudCard"
+
+[node name="Sheen" type="Panel" parent="CanvasLayer/TopBar"]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+theme_type_variation = &"CardSheen"
 
 [node name="Accent" type="ColorRect" parent="CanvasLayer/TopBar"]
 offset_right = 4.0
@@ -242,26 +295,30 @@ offset_bottom = 58.0
 theme_override_font_sizes/font_size = 15
 autowrap_mode = 3
 
-[node name="BottomBar" type="ColorRect" parent="CanvasLayer"]
+[node name="BottomBar" type="Panel" parent="CanvasLayer"]
 offset_left = 34.0
 offset_top = 444.0
 offset_right = 926.0
 offset_bottom = 526.0
 mouse_filter = 2
-color = Color(0.018, 0.035, 0.061, 0.94)
+theme_type_variation = &"HudCard"
+
+[node name="Sheen" type="Panel" parent="CanvasLayer/BottomBar"]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+theme_type_variation = &"CardSheen"
 
 [node name="Accent" type="ColorRect" parent="CanvasLayer/BottomBar"]
-offset_right = 3.0
-offset_bottom = 82.0
+offset_left = 1.0
+offset_top = 1.0
+offset_right = 4.0
+offset_bottom = 81.0
 mouse_filter = 2
 color = Color(0.22, 0.78, 0.92, 1)
-
-[node name="TopRule" type="ColorRect" parent="CanvasLayer/BottomBar"]
-offset_left = 3.0
-offset_right = 892.0
-offset_bottom = 2.0
-mouse_filter = 2
-color = Color(0.24, 0.5, 0.62, 0.7)
 
 [node name="Speaker" type="Label" parent="CanvasLayer/BottomBar"]
 offset_left = 20.0
@@ -288,17 +345,19 @@ theme_override_font_sizes/font_size = 17
 autowrap_mode = 3
 vertical_alignment = 1
 
-[node name="ContextHint" type="ColorRect" parent="CanvasLayer"]
+[node name="ContextHint" type="Panel" parent="CanvasLayer"]
 offset_left = 253.0
 offset_top = 405.0
 offset_right = 802.0
 offset_bottom = 440.0
 mouse_filter = 2
-color = Color(0.018, 0.041, 0.073, 0.9)
+theme_type_variation = &"HudCard"
 
 [node name="Accent" type="ColorRect" parent="CanvasLayer/ContextHint"]
-offset_right = 3.0
-offset_bottom = 35.0
+offset_left = 1.0
+offset_top = 1.0
+offset_right = 4.0
+offset_bottom = 34.0
 mouse_filter = 2
 color = Color(0.24, 0.77, 0.9, 1)
 
@@ -312,18 +371,20 @@ theme_override_font_sizes/font_size = 14
 autowrap_mode = 3
 vertical_alignment = 1
 
-[node name="TutorialPrompt" type="ColorRect" parent="CanvasLayer"]
+[node name="TutorialPrompt" type="Panel" parent="CanvasLayer"]
 visible = false
-offset_left = 300.0
+offset_left = 322.0
 offset_top = 96.0
-offset_right = 616.0
+offset_right = 638.0
 offset_bottom = 162.0
 mouse_filter = 2
-color = Color(0.025, 0.06, 0.1, 0.91)
+theme_type_variation = &"HudCard"
 
 [node name="Accent" type="ColorRect" parent="CanvasLayer/TutorialPrompt"]
-offset_right = 4.0
-offset_bottom = 66.0
+offset_left = 1.0
+offset_top = 1.0
+offset_right = 5.0
+offset_bottom = 65.0
 mouse_filter = 2
 color = Color(0.22, 0.78, 0.92, 1)
 
@@ -337,10 +398,12 @@ text = "A / D  MOVE\nE  READ DISPLAY (optional)"
 
 [node name="PauseButton" type="Button" parent="CanvasLayer"]
 visible = false
-offset_left = 873.0
+offset_left = 854.0
 offset_top = 16.0
 offset_right = 942.0
 offset_bottom = 72.0
+grow_horizontal = 0
+theme_type_variation = &"TouchButton"
 theme_override_font_sizes/font_size = 17
 text = "PAUSE"
 
@@ -356,6 +419,7 @@ offset_left = 32.0
 offset_top = 345.0
 offset_right = 128.0
 offset_bottom = 435.0
+theme_type_variation = &"TouchButton"
 theme_override_font_sizes/font_size = 34
 text = "◀"
 
@@ -364,14 +428,17 @@ offset_left = 142.0
 offset_top = 345.0
 offset_right = 238.0
 offset_bottom = 435.0
+theme_type_variation = &"TouchButton"
 theme_override_font_sizes/font_size = 34
 text = "▶"
 
 [node name="Use" type="Button" parent="CanvasLayer/TouchControls"]
-offset_left = 810.0
+offset_left = 773.0
 offset_top = 345.0
 offset_right = 928.0
 offset_bottom = 435.0
+grow_horizontal = 0
+theme_type_variation = &"TouchButton"
 theme_override_font_sizes/font_size = 23
 text = "USE"
 
@@ -410,6 +477,16 @@ grow_vertical = 2
 mouse_filter = 2
 texture = ExtResource("6_title_art")
 expand_mode = 1
+
+[node name="TitleVeil" type="Panel" parent="CanvasLayer/TitleScreen"]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 400.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+theme_type_variation = &"TitleVeil"
 
 [node name="Brand" type="Label" parent="CanvasLayer/TitleScreen"]
 offset_left = 460.0
@@ -501,8 +578,8 @@ offset_top = 459.0
 offset_right = 278.0
 offset_bottom = 513.0
 theme_override_font_sizes/font_size = 18
-text = "CHANGELOG ↗"
-tooltip_text = "Opens development updates in your browser"
+text = "CHANGELOG"
+tooltip_text = "Development updates, in the game and online"
 
 [node name="Credit" type="Label" parent="CanvasLayer/TitleScreen"]
 offset_left = 460.0
@@ -522,12 +599,21 @@ grow_horizontal = 2
 grow_vertical = 2
 color = Color(0.025, 0.045, 0.08, 0.76)
 
-[node name="CreditsPanel" type="ColorRect" parent="CanvasLayer/TitleScreen/CreditsScreen"]
+[node name="CreditsPanel" type="Panel" parent="CanvasLayer/TitleScreen/CreditsScreen"]
 offset_left = 168.0
 offset_top = 19.0
 offset_right = 792.0
 offset_bottom = 521.0
-color = Color(0.018, 0.034, 0.063, 0.89)
+theme_type_variation = &"MenuPanel"
+
+[node name="Sheen" type="Panel" parent="CanvasLayer/TitleScreen/CreditsScreen/CreditsPanel"]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+theme_type_variation = &"CardSheen"
 
 [node name="CreditsTitle" type="Label" parent="CanvasLayer/TitleScreen/CreditsScreen"]
 offset_left = 185.0
@@ -554,7 +640,7 @@ offset_bottom = 425.0
 theme_override_colors/default_color = Color(0.82, 0.89, 0.94, 1)
 theme_override_font_sizes/normal_font_size = 19
 bbcode_enabled = true
-text = "[center][color=#73DDF5]ORIGINAL CONCEPT, CORE STORY & CREATIVE VISION[/color]\n[font_size=30][b]Nathanial Henniges[/b][/font_size]\n\n\n[color=#73DDF5]DEVELOPMENT[/color]\n[font_size=26][b]MrDemonWolf, Inc.[/b][/font_size]\n\n\n[color=#73DDF5]AI-ASSISTED PRODUCTION[/color]\nChatGPT and Codex assisted with research, writing and code.\nNathanial directed and reviewed the work.\n\n\n[color=#73DDF5]PROVISIONAL ART[/color]\nCreated with ChatGPT Create.\nThe WOLF//OVERRIDE mark was redrawn from a generated concept.\n\n\n[color=#73DDF5]TYPEFACES[/color]\nRoboto and Montserrat\nSIL Open Font License 1.1\n\n\n[color=#73DDF5]BUILT WITH[/color]\nGodot 4.7.2  /  GDScript\nNext.js  /  Fumadocs  /  Bun\n\n\n[color=#73DDF5]RESEARCH & CRAFT REFERENCES[/color]\nFumito Ueda / The Last Guardian\nCompanion behavior and visual storytelling\n\nNaughty Dog / The Last of Us Part II\nReviewed controls and readable presentation\n\nGame Accessibility Guidelines\nPlayer-paced text and recognizable interactions\n\nGodot 4.7 Camera2D reference\nCamera follow and smoothing\n\nNielsen Norman Group\nMobile screenshot readability\n\nNIST AI Risk Management Framework\nNational Archives records guidance\n\nReferences inform craft, not the origin of this game.\nOriginal concept, core story and creative vision:\nNathanial Henniges.\nReferenced creators are not project contributors.\n\nFull sources, tools and asset credits:\nwolfoverride.mrdemonwolf.dev/docs/credits/\n\n\n[font_size=24][b]THANK YOU FOR PLAYING[/b][/font_size][/center]"
+text = "[center][color=#73DDF5]ORIGINAL CONCEPT, CORE STORY & CREATIVE VISION[/color]\n[font_size=30][b]Nathanial Henniges[/b][/font_size]\n\n\n[color=#73DDF5]DEVELOPMENT[/color]\n[font_size=26][b]MrDemonWolf, Inc.[/b][/font_size]\n\n\n[color=#73DDF5]AI-ASSISTED PRODUCTION[/color]\nChatGPT and Codex (OpenAI) and Claude Code by Anthropic\nassisted with research, writing and code.\nNathanial directed and reviewed the work.\n\n\n[color=#73DDF5]PROVISIONAL ART[/color]\nCreated with ChatGPT Create and the Codex image generation tool.\nNathanial reviewed and approved each set.\nThe WOLF//OVERRIDE mark was redrawn from a generated concept.\n\n\n[color=#73DDF5]SOUND EFFECTS[/color]\nGenerated by the game's own code.\nNo recorded audio, music or voice yet.\n\n\n[color=#73DDF5]TYPEFACES[/color]\nRoboto and Montserrat\nSIL Open Font License 1.1\n\n\n[color=#73DDF5]BUILT WITH[/color]\nGodot 4.7.2  /  GDScript\nNext.js  /  Fumadocs  /  Tailwind CSS  /  Bun\nPillow  /  ImageMagick  /  cwebp\n\n\n[color=#73DDF5]RESEARCH & CRAFT REFERENCES[/color]\nFumito Ueda / The Last Guardian\nCompanion behavior and visual storytelling\n\nNaughty Dog / The Last of Us Part II\nReviewed controls and readable presentation\n\nGame Accessibility Guidelines\nPlayer-paced text and recognizable interactions\n\nGodot 4.7 Camera2D reference\nCamera follow and smoothing\n\nNielsen Norman Group\nMobile screenshot readability\n\nNIST AI Risk Management Framework\nNational Archives records guidance\n\nReferences inform craft, not the origin of this game.\nOriginal concept, core story and creative vision:\nNathanial Henniges.\nReferenced creators are not project contributors.\n\nFull sources, tools and asset credits:\nwolfoverride.mrdemonwolf.dev/docs/credits/\n\n\n[font_size=24][b]THANK YOU FOR PLAYING[/b][/font_size][/center]"
 
 [node name="CreditsBackButton" type="Button" parent="CanvasLayer/TitleScreen/CreditsScreen"]
 offset_left = 189.0
@@ -572,6 +658,84 @@ offset_bottom = 502.0
 theme_override_font_sizes/font_size = 19
 text = "PAUSE SCROLL"
 
+[node name="ChangelogScreen" type="ColorRect" parent="CanvasLayer/TitleScreen"]
+visible = false
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.025, 0.045, 0.08, 0.76)
+
+[node name="ChangelogPanel" type="Panel" parent="CanvasLayer/TitleScreen/ChangelogScreen"]
+offset_left = 168.0
+offset_top = 19.0
+offset_right = 792.0
+offset_bottom = 521.0
+theme_type_variation = &"MenuPanel"
+
+[node name="Sheen" type="Panel" parent="CanvasLayer/TitleScreen/ChangelogScreen/ChangelogPanel"]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+theme_type_variation = &"CardSheen"
+
+[node name="ChangelogTitle" type="Label" parent="CanvasLayer/TitleScreen/ChangelogScreen"]
+offset_left = 185.0
+offset_top = 35.0
+offset_right = 775.0
+offset_bottom = 80.0
+horizontal_alignment = 1
+theme_override_fonts/font = ExtResource("13_display")
+theme_override_font_sizes/font_size = 28
+text = "DEVELOPMENT UPDATES"
+
+[node name="ChangelogLine" type="ColorRect" parent="CanvasLayer/TitleScreen/ChangelogScreen"]
+offset_left = 340.0
+offset_top = 92.0
+offset_right = 620.0
+offset_bottom = 95.0
+color = Color(0.10, 0.76, 0.92, 1)
+
+[node name="ChangelogNote" type="Label" parent="CanvasLayer/TitleScreen/ChangelogScreen"]
+offset_left = 189.0
+offset_top = 100.0
+offset_right = 771.0
+offset_bottom = 122.0
+theme_override_colors/font_color = Color(0.59, 0.70, 0.77, 1)
+theme_override_font_sizes/font_size = 15
+horizontal_alignment = 1
+text = "Source-build changes by date, not releases. Scroll with the wheel, drag the text or use up/down."
+
+[node name="ChangelogBody" type="RichTextLabel" parent="CanvasLayer/TitleScreen/ChangelogScreen"]
+offset_left = 189.0
+offset_top = 130.0
+offset_right = 771.0
+offset_bottom = 433.0
+theme_override_colors/default_color = Color(0.82, 0.89, 0.94, 1)
+theme_override_font_sizes/normal_font_size = 17
+bbcode_enabled = true
+
+[node name="ChangelogBackButton" type="Button" parent="CanvasLayer/TitleScreen/ChangelogScreen"]
+offset_left = 189.0
+offset_top = 453.0
+offset_right = 407.0
+offset_bottom = 502.0
+theme_override_font_sizes/font_size = 19
+text = "BACK TO TITLE"
+
+[node name="ChangelogOnlineButton" type="Button" parent="CanvasLayer/TitleScreen/ChangelogScreen"]
+offset_left = 433.0
+offset_top = 453.0
+offset_right = 771.0
+offset_bottom = 502.0
+theme_override_font_sizes/font_size = 17
+text = "OPEN FULL CHANGELOG ONLINE"
+tooltip_text = "Opens wolfoverride.mrdemonwolf.dev/docs/changelog/ in your browser"
+
 [node name="IntroFade" type="ColorRect" parent="CanvasLayer"]
 offset_right = 960.0
 offset_bottom = 540.0
@@ -588,12 +752,21 @@ mouse_filter = 0
 color = Color(0.008, 0.018, 0.035, 0.84)
 script = ExtResource("10_pause_overlay")
 
-[node name="Panel" type="ColorRect" parent="CanvasLayer/PauseOverlay"]
+[node name="Panel" type="Panel" parent="CanvasLayer/PauseOverlay"]
 offset_left = 255.0
 offset_top = 78.0
 offset_right = 705.0
 offset_bottom = 467.0
-color = Color(0.025, 0.055, 0.09, 1)
+theme_type_variation = &"MenuPanel"
+
+[node name="Sheen" type="Panel" parent="CanvasLayer/PauseOverlay/Panel"]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+theme_type_variation = &"CardSheen"
 
 [node name="Accent" type="ColorRect" parent="CanvasLayer/PauseOverlay/Panel"]
 offset_left = 30.0

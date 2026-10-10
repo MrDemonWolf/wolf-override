@@ -16,8 +16,50 @@ func _run() -> void:
 	game.set("settings_path", path)
 	game.set("save_path", "%s-save.json" % path)
 	root.add_child(game)
+	# The title CHANGELOG button opens the exported changelog in the game; the online button keeps the website link.
 	var changelog: Button = game.get_node("CanvasLayer/TitleScreen/ChangelogButton") as Button
-	_expect(changelog.pressed.is_connected(Callable(game, "_open_changelog")) and str(game.CHANGELOG_URL) == "https://wolfoverride.mrdemonwolf.dev/docs/changelog/" and str(game.SITE_URL).begins_with("https://wolfoverride.mrdemonwolf.dev"), "title changelog points to the public development updates")
+	var changelog_screen: ColorRect = game.get_node("CanvasLayer/TitleScreen/ChangelogScreen") as ColorRect
+	var changelog_body: RichTextLabel = changelog_screen.get_node("ChangelogBody") as RichTextLabel
+	var changelog_back: Button = changelog_screen.get_node("ChangelogBackButton") as Button
+	var changelog_online: Button = changelog_screen.get_node("ChangelogOnlineButton") as Button
+	var title_logo: Label = game.get_node("CanvasLayer/TitleScreen/GameTitle") as Label
+	_expect(changelog.pressed.is_connected(Callable(game, "_show_changelog")) and changelog_online.pressed.is_connected(Callable(game, "_open_changelog")) and str(game.CHANGELOG_URL) == "https://wolfoverride.mrdemonwolf.dev/docs/changelog/" and str(game.SITE_URL).begins_with("https://wolfoverride.mrdemonwolf.dev"), "title changelog opens in the game and the online button points to the public development updates")
+	var changelog_text: String = str(game.get("changelog_text"))
+	var first_heading: String = changelog_text.get_slice("\n", 0)
+	_expect(first_heading.begins_with("== ") and first_heading.ends_with(" ==") and first_heading.contains(", 20") and changelog_text.contains("\n- "), "the exported changelog loads and starts with the newest dated heading")
+	changelog.pressed.emit()
+	_expect(changelog_screen.visible and not title_logo.visible and game.get("title_open") and changelog_back.has_focus(), "CHANGELOG opens the in-game screen over the title without starting a game")
+	_expect(changelog_body.get_parsed_text().begins_with(first_heading.substr(3, first_heading.length() - 6)) and changelog_body.get_v_scroll_bar().value == 0.0, "the changelog screen shows the text from its newest heading")
+	# The one-line note above the text must stay inside its label; a longer wording once clipped at the panel edge.
+	var changelog_note: Label = changelog_screen.get_node("ChangelogNote") as Label
+	var note_width: float = changelog_note.get_theme_font("font").get_string_size(changelog_note.text, HORIZONTAL_ALIGNMENT_CENTER, -1.0, changelog_note.get_theme_font_size("font_size")).x
+	_expect(changelog_note.text.contains("drag the text") and note_width <= changelog_note.size.x, "the changelog note mentions dragging the text and fits on its one line")
+	# Touch readers have no wheel or keys: dragging the text itself moves the page, as the on-screen note promises.
+	await _settle(4)
+	var body_centre: Vector2 = changelog_body.global_position + changelog_body.size * 0.5
+	var changelog_bar: VScrollBar = changelog_body.get_v_scroll_bar()
+	_expect(changelog_bar.max_value > changelog_bar.page + 200.0, "the exported changelog is taller than one page")
+	await _send_touch_drag(body_centre, -120.0)
+	var after_touch_drag: float = changelog_bar.value
+	_expect(is_equal_approx(after_touch_drag, 120.0), "a 120 px upward touch drag over the changelog text scrolls it 120 px")
+	await _send_mouse_drag(body_centre, -60.0, 0)
+	_expect(is_equal_approx(changelog_bar.value, after_touch_drag + 60.0), "a left-button mouse drag over the changelog text scrolls it too")
+	var before_emulated: float = changelog_bar.value
+	await _send_mouse_drag(body_centre, -60.0, InputEvent.DEVICE_ID_EMULATION)
+	_expect(is_equal_approx(changelog_bar.value, before_emulated), "the mouse motion Godot emulates from a touch is ignored so a finger does not scroll twice")
+	changelog_bar.value = 0.0
+	changelog_back.pressed.emit()
+	_expect(not changelog_screen.visible and title_logo.visible and game.get("title_open") and changelog.has_focus() and not (game.get_node("CanvasLayer/TitleScreen/CreditsScreen") as Control).visible, "BACK TO TITLE restores the title menu and returns focus to CHANGELOG")
+	changelog.pressed.emit()
+	await _send_escape(true)
+	await _send_escape(false)
+	_expect(not changelog_screen.visible and title_logo.visible and game.get("title_open") and not paused, "Esc closes the changelog screen without pausing")
+	changelog.pressed.emit()
+	game.notification(Node.NOTIFICATION_WM_GO_BACK_REQUEST)
+	_expect(not changelog_screen.visible and title_logo.visible and game.get("title_open"), "Android Back closes the changelog screen instead of quitting")
+	changelog.pressed.emit()
+	game.call("_handle_back")
+	_expect(not changelog_screen.visible and title_logo.visible and game.get("title_open") and not changelog_online.is_visible_in_tree(), "the Back router closes the changelog screen")
 	_expect(_has_button(&"interact", JOY_BUTTON_A) and _has_button(&"pause_game", JOY_BUTTON_START), "gamepad action buttons are mapped")
 	_expect(_has_button(&"move_left", JOY_BUTTON_DPAD_LEFT) and _has_button(&"move_right", JOY_BUTTON_DPAD_RIGHT), "gamepad D-pad movement is mapped")
 	var project_theme: Theme = ThemeDB.get_project_theme()
@@ -28,12 +70,19 @@ func _run() -> void:
 	_expect(title_new_game.get_theme_stylebox("focus") == ring and shared_settings.vsync.get_theme_stylebox("focus") == ring and (shared_settings.volumes["Music"] as HSlider).get_theme_stylebox("focus") == ring and shared_settings.deadzone.get_theme_stylebox("focus") == ring, "title and Settings controls, sliders included, share the theme focus ring")
 	var tab_ring: StyleBoxFlat = shared_settings.tabs.get_theme_stylebox("tab_focus") as StyleBoxFlat
 	_expect(tab_ring != null and tab_ring.border_width_left == 2 and tab_ring.expand_margin_left == -4.0, "settings tabs keep their inset focus ring")
-	var resume_focus: StyleBoxFlat = (game.get_node("CanvasLayer/PauseOverlay/Panel/PauseMenu/ResumeButton") as Button).get_theme_stylebox("focus") as StyleBoxFlat
-	var resume_normal: StyleBoxFlat = (game.get_node("CanvasLayer/PauseOverlay/Panel/PauseMenu/ResumeButton") as Button).get_theme_stylebox("normal") as StyleBoxFlat
-	_expect(resume_focus != null and resume_focus.border_width_left > resume_normal.border_width_left and resume_focus.bg_color.a == 1.0, "pause-menu focus is heavier than the pause-menu button border")
+	# The theme pass gave title, pause and HUD buttons one lifted style: the ring rides over the state fill
+	# instead of replacing it, so it stays wider than the button border and keeps a colour hover never uses.
+	var resume: Button = game.get_node("CanvasLayer/PauseOverlay/Panel/PauseMenu/ResumeButton") as Button
+	var resume_normal: StyleBoxFlat = resume.get_theme_stylebox("normal") as StyleBoxFlat
+	var resume_hover: StyleBoxFlat = resume.get_theme_stylebox("hover") as StyleBoxFlat
+	_expect(resume.get_theme_stylebox("focus") == ring and resume_normal != null and resume_hover != null and ring.border_width_left > resume_normal.border_width_left and not ring.border_color.is_equal_approx(resume_hover.border_color) and resume_normal.shadow_size > 0 and resume_normal.corner_radius_top_left > 0, "pause-menu buttons share the inset ring, heavier than their border and distinct from hover")
+	_expect(title_new_game.get_theme_stylebox("normal") == resume_normal, "title and pause buttons wear the same theme style")
+	# Settings alone keeps the terminal identity: squared controls with the same ring colour and width, squared to match.
 	for bordered_path: String in ["CanvasLayer/PauseOverlay/Panel/SettingsMenu/BackButton", "CanvasLayer/PauseOverlay/Panel/SettingsMenu/FPSOptions", "CanvasLayer/PauseOverlay/Panel/SettingsMenu/ResolutionOptions"]:
 		var bordered: Button = game.get_node(bordered_path) as Button
-		_expect(bordered.get_theme_stylebox("focus") == resume_focus and (bordered.get_theme_stylebox("normal") as StyleBoxFlat).border_width_left < resume_focus.border_width_left, "%s uses the heavier focus style over its cyan border" % bordered.name)
+		var bordered_focus: StyleBoxFlat = bordered.get_theme_stylebox("focus") as StyleBoxFlat
+		var bordered_normal: StyleBoxFlat = bordered.get_theme_stylebox("normal") as StyleBoxFlat
+		_expect(bordered_focus != null and bordered_normal != null and bordered_focus.border_color.is_equal_approx(ring.border_color) and bordered_focus.border_width_left == ring.border_width_left and bordered_focus.expand_margin_left == 0.0 and bordered_focus.bg_color.a == 0.0 and bordered_focus.corner_radius_top_left == 0 and bordered_normal.corner_radius_top_left == 0 and bordered_normal.border_width_left < bordered_focus.border_width_left, "%s keeps a squared terminal ring inside its border" % bordered.name)
 	game.call("_new_game")
 	game.call("_finish_intro")
 	game.set("touch_enabled", true)
@@ -51,7 +100,7 @@ func _run() -> void:
 	use.button_down.emit()
 	await process_frame
 	use.button_up.emit()
-	_expect(game.get("tutorial_step") == 2 and not (game.get_node("CanvasLayer/TutorialPrompt") as ColorRect).visible, "touch use reads the display and clears the tutorial")
+	_expect(game.get("tutorial_step") == 2 and not (game.get_node("CanvasLayer/TutorialPrompt") as Control).visible, "touch use reads the display and clears the tutorial")
 	game.set("waiting_for_choice", true)
 	game.call("_refresh_ui")
 	var first_choice: Button = touch.get_node("Choice1") as Button
@@ -147,6 +196,10 @@ func _run() -> void:
 	game.notification(Node.NOTIFICATION_APPLICATION_FOCUS_OUT)
 	_expect(paused and overlay.visible, "losing app focus during play pauses the game")
 	game.call("_resume_game")
+	game.set("auto_pause_on_focus_loss", false)
+	game.notification(Node.NOTIFICATION_APPLICATION_FOCUS_OUT)
+	_expect(not paused and not overlay.visible, "focus loss does not pause when auto_pause_on_focus_loss is off")
+	game.set("auto_pause_on_focus_loss", true)
 	# Pause during the opening is a real pause; skipping is an explicit menu choice.
 	game.call("_new_game")
 	await process_frame
@@ -213,6 +266,58 @@ func _controller_button(index: JoyButton, pressed: bool) -> InputEventJoypadButt
 
 func _send_escape(pressed: bool) -> void:
 	await _send_key(KEY_ESCAPE, pressed)
+
+
+## A one-finger drag over `pos` that moves `delta_y` pixels in three steps, pushed through the real input path.
+func _send_touch_drag(pos: Vector2, delta_y: float) -> void:
+	var touch: InputEventScreenTouch = InputEventScreenTouch.new()
+	touch.index = 0
+	touch.position = pos
+	touch.pressed = true
+	Input.parse_input_event(touch)
+	await process_frame
+	for i: int in range(1, 4):
+		var drag: InputEventScreenDrag = InputEventScreenDrag.new()
+		drag.index = 0
+		drag.position = pos + Vector2(0.0, delta_y * i / 3.0)
+		drag.relative = Vector2(0.0, delta_y / 3.0)
+		Input.parse_input_event(drag)
+		await process_frame
+	touch.pressed = false
+	touch.position = pos + Vector2(0.0, delta_y)
+	Input.parse_input_event(touch)
+	await process_frame
+
+
+## A left-button mouse drag over `pos` that moves `delta_y` pixels in three steps on the given input device.
+func _send_mouse_drag(pos: Vector2, delta_y: float, device: int) -> void:
+	var press: InputEventMouseButton = InputEventMouseButton.new()
+	press.button_index = MOUSE_BUTTON_LEFT
+	press.pressed = true
+	press.position = pos
+	press.global_position = pos
+	press.device = device
+	Input.parse_input_event(press)
+	await process_frame
+	for i: int in range(1, 4):
+		var motion: InputEventMouseMotion = InputEventMouseMotion.new()
+		motion.position = pos + Vector2(0.0, delta_y * i / 3.0)
+		motion.global_position = motion.position
+		motion.relative = Vector2(0.0, delta_y / 3.0)
+		motion.button_mask = MOUSE_BUTTON_MASK_LEFT
+		motion.device = device
+		Input.parse_input_event(motion)
+		await process_frame
+	press.pressed = false
+	press.position = pos + Vector2(0.0, delta_y)
+	press.global_position = press.position
+	Input.parse_input_event(press)
+	await process_frame
+
+
+func _settle(frames: int) -> void:
+	for _i: int in range(frames):
+		await process_frame
 
 
 func _send_key(code: Key, pressed: bool) -> void:
