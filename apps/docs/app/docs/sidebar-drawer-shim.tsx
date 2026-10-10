@@ -8,8 +8,9 @@ const FOCUSABLE_SELECTOR =
   'a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])';
 
 /**
- * Fumadocs 16.4 renders the mobile sidebar as a plain aside toggled by an "Open Sidebar" button with no
- * aria-expanded, no focus management and no Escape handling. This renders nothing and patches the DOM:
+ * Fumadocs 16.16 renders the mobile sidebar as a plain aside toggled by an "Open Sidebar" button. The
+ * trigger carries aria-expanded, but the drawer has no dialog role, no focus management and no Escape
+ * handling (checked against the 16.16.1 static export). This renders nothing and patches the DOM:
  * it mirrors the drawer state onto the triggers, labels the drawer, moves focus into it when it opens,
  * keeps Tab and Shift+Tab inside it while it is open (so the aria-modal claim holds for keyboard users),
  * returns focus to the trigger when it closes, and closes it on Escape. Every step is a no-op when the
