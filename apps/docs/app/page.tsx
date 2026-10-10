@@ -87,6 +87,7 @@ export default function HomePage() {
           <Link href="/docs/development/story/">Development story</Link>
           <Link href="/docs/credits/">Credits &amp; references</Link>
           <Link href="/docs/legal/">Legal &amp; licensing</Link>
+          <Link href="/docs/privacy/">Privacy</Link>
           <a href="https://github.com/MrDemonWolf/wolf-override">Source on GitHub <span aria-hidden="true">↗</span></a>
         </nav>
         <div className="marketing-footer-bottom">
