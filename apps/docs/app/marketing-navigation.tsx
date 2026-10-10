@@ -2,6 +2,18 @@
 
 import Link from 'next/link';
 import { useEffect, useRef, useState } from 'react';
+import { navLink } from './landing-classes';
+
+// Hamburger bars; with the menu open the outer two turn into a cross and the middle one fades out.
+const bar =
+  'block h-0.5 rounded-[2px] bg-current transition-[translate,rotate,opacity] duration-180 ease-[ease] motion-reduce:transition-none';
+
+const menuLinks = [
+  ['#story', 'Story'],
+  ['#gameplay', 'Gameplay'],
+  ['#downloads', 'Get the build'],
+  ['/docs/', 'Game guide'],
+] as const;
 
 export default function MarketingNavigation() {
   const [isOpen, setIsOpen] = useState(false);
@@ -44,7 +56,9 @@ export default function MarketingNavigation() {
   return (
     <div
       ref={containerRef}
-      className="marketing-mobile-navigation"
+      // Shown at 980px and below in place of the desktop navigation. Static there, so the menu panel
+      // below is positioned against the header and spans its width.
+      className="group relative ml-auto hidden flex-none font-heading menu:static menu:block"
       data-open={isOpen}
       onBlurCapture={(event) => {
         const nextTarget = event.relatedTarget;
@@ -55,21 +69,35 @@ export default function MarketingNavigation() {
     >
       <button
         ref={triggerRef}
-        className="marketing-menu-trigger"
+        className="flex min-h-11 min-w-11 cursor-pointer items-center gap-2 rounded-control border border-line-strong bg-accent/6 px-3 py-2 font-bold text-text hover-always:bg-accent/12 phone-xs:w-11 phone-xs:justify-center phone-xs:px-0"
         type="button"
         aria-label={isOpen ? 'Close navigation menu' : 'Open navigation menu'}
         aria-expanded={isOpen}
         aria-controls="marketing-mobile-menu"
         onClick={() => setIsOpen((open) => !open)}
       >
-        <span className="marketing-menu-icon" aria-hidden="true"><span /><span /><span /></span>
-        <span>{isOpen ? 'Close' : 'Menu'}</span>
+        <span className="grid w-4 gap-1" aria-hidden="true">
+          <span className={`${bar} group-data-[open=true]:translate-y-1.5 group-data-[open=true]:rotate-45`} />
+          <span className={`${bar} group-data-[open=true]:opacity-0`} />
+          <span className={`${bar} group-data-[open=true]:-translate-y-1.5 group-data-[open=true]:-rotate-45`} />
+        </span>
+        <span className="phone-xs:hidden">{isOpen ? 'Close' : 'Menu'}</span>
       </button>
-      <nav id="marketing-mobile-menu" aria-label="Main navigation" hidden={!isOpen}>
-        <a href="#story" onClick={handleNavigation}>Story</a>
-        <a href="#gameplay" onClick={handleNavigation}>Gameplay</a>
-        <a href="#downloads" onClick={handleNavigation}>Get the build</a>
-        <Link href="/docs/" onClick={handleNavigation}>Game guide</Link>
+      {/* A dropdown under the trigger; a four-column bar across the header on tablets; one column across it on phones. */}
+      <nav
+        id="marketing-mobile-menu"
+        aria-label="Main navigation"
+        hidden={!isOpen}
+        className="absolute top-[calc(100%+.5rem)] right-0 z-40 grid min-w-52 gap-1 rounded-control border border-line-strong bg-panel/99 p-2 shadow-[0_14px_32px_rgba(0,5,18,.3)] phone:left-2 phone:right-2 phone:min-w-0 phone:grid-cols-[1fr] tablet:left-4 tablet:right-4 tablet:min-w-0 tablet:grid-cols-4"
+      >
+        {menuLinks.map(([href, label]) => {
+          const className = `${navLink} justify-start tablet:justify-center`;
+          return href.startsWith('#') ? (
+            <a key={href} href={href} className={className} onClick={handleNavigation}>{label}</a>
+          ) : (
+            <Link key={href} href={href} className={className} onClick={handleNavigation}>{label}</Link>
+          );
+        })}
       </nav>
     </div>
   );

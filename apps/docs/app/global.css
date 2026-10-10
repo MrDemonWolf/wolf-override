@@ -4,9 +4,10 @@
 
 /*
  * Site design tokens. `static` keeps every variable in the output even when
- * only plain CSS (marketing.css, docs-guide.css) reads it through var().
- * Colours are the dark marketing palette: ink is the page background,
- * surface the raised panel colour, text and muted the two copy colours,
+ * only plain CSS (docs-guide.css) reads it through var().
+ * Colours are the dark landing palette: ink is the page background,
+ * surface the raised panel colour, panel the landing's header bar and phone
+ * menu (used with an opacity modifier), text and muted the two copy colours,
  * line the resting border and line-strong the border for controls.
  */
 @theme static {
@@ -17,10 +18,13 @@
   --color-line: #385363;
   --color-line-strong: #5a7896;
   --color-accent: #8be3ff;
+  --color-panel: #091533;
 
   --text-label: .875rem;
   --text-label--line-height: 1.4;
   --text-label--letter-spacing: .12em;
+  --text-caption: .8rem;
+  --text-caption--line-height: 1.5;
   --text-body: 1rem;
   --text-body--line-height: 1.6;
   --text-lead: clamp(1rem, 1.45vw, 1.2rem);
@@ -31,6 +35,11 @@
   --text-headline--line-height: 1.08;
   --text-display: clamp(3.2rem, 6vw, 6rem);
   --text-display--line-height: 1.02;
+  /* Landing section headings (h2). */
+  --text-section: clamp(2.6rem, 4.5vw, 4.2rem);
+  --text-section--line-height: 1.08;
+  --text-section--letter-spacing: -.045em;
+  --text-section--font-weight: 700;
 
   --radius-control: .75rem;
   --radius-card: 1rem;
@@ -38,6 +47,42 @@
   --shadow-panel: 0 12px 32px rgba(0, 5, 18, .24);
   --shadow-scene: 0 28px 80px rgba(0, 0, 0, .47);
   --shadow-glow: 0 0 16px #8be3ff;
+}
+
+/*
+ * Plain :hover for the landing page. Tailwind's own hover: applies only under
+ * (hover: hover), so a tap on a touch screen never shows it; the landing keeps
+ * the plain :hover it had before the move to utilities, so its hover states
+ * look the same on every device.
+ */
+@custom-variant hover-always (&:hover);
+
+/*
+ * Landing breakpoints. They are custom variants rather than --breakpoint-*
+ * tokens, which would also add steps to the .container utility. Declared
+ * from widest to narrowest so the narrower variant wins where two apply.
+ *   menu      980px and below: the phone menu replaces the desktop navigation
+ *   tablet    701px to 980px: the menu spans the header in four columns
+ *   compact   701px to 1000px, or portrait and wider than a phone (13-inch
+ *             iPads in portrait are 1024px wide): hero and two-column
+ *             sections tighten
+ *   phone     700px and below: single-column phone layout
+ *   phone-xs  360px and below: the narrowest phones
+ */
+@custom-variant menu {
+  @media (max-width: 980px) { @slot; }
+}
+@custom-variant tablet {
+  @media (min-width: 701px) and (max-width: 980px) { @slot; }
+}
+@custom-variant compact {
+  @media (min-width: 701px) and (max-width: 1000px), (min-width: 701px) and (orientation: portrait) { @slot; }
+}
+@custom-variant phone {
+  @media (max-width: 700px) { @slot; }
+}
+@custom-variant phone-xs {
+  @media (max-width: 360px) { @slot; }
 }
 
 /* Font families come from next/font/local in layout.tsx (variables on <html>). */
@@ -143,7 +188,7 @@ html { scroll-behavior: smooth; }
 /*
  * Theme-aware page scrollbar: scrollbar-color for Chrome and Firefox, the
  * ::-webkit-scrollbar rules for Safari. The landing overrides the colours
- * in marketing.css so it stays dark in either theme.
+ * at the end of this file so it stays dark in either theme.
  */
 html {
   scrollbar-width: thin;
@@ -157,3 +202,17 @@ html::-webkit-scrollbar-thumb { border: 3px solid #091533; border-radius: 999px;
 html:not(.dark)::-webkit-scrollbar-thumb { border-color: #e7f1f8; background: #7394a7; }
 html::-webkit-scrollbar-thumb:hover { background: #8be3ff; }
 html:not(.dark)::-webkit-scrollbar-thumb:hover { background: #006a95; }
+
+/*
+ * The landing page is dark only. Its colours are fixed @theme tokens, so the
+ * guide's theme toggle (the .dark class on <html>) never changes it; this
+ * rule keeps the root dark too: the focus ring colour (the skip link sits
+ * outside the landing markup), the scrollbar and the overscroll area. It
+ * stays last so it beats the theme-aware scrollbar rules above.
+ */
+html:has([data-landing]) {
+  --color-fd-ring: var(--color-accent);
+  color-scheme: dark;
+  background: var(--color-ink);
+  scrollbar-color: var(--color-line) var(--color-ink);
+}
