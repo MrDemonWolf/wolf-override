@@ -88,8 +88,9 @@ const FLOOR_Y: float = 440.0
 const WOLF_SEAM_X: float = 418.0
 ## (He holds at the near edge of the rubble, so his sprite stays clear of the engineer at CHOICE_X.)
 const WOLF_RUBBLE_X: float = 448.0
-## Where WOLF stands when he chooses to draw the sentry; it parks BAIT_OFFSET short of him, on the mark.
-const WOLF_BAIT_X: float = DropArm.MARK_X + SentryBrain.BAIT_OFFSET
+## Where WOLF stands when he chooses to draw the sentry: short of the mark, on the rubble side, so he
+## never walks through the machine. It parks BAIT_OFFSET past him, on the mark, facing him.
+const WOLF_BAIT_X: float = DropArm.MARK_X - SentryBrain.BAIT_OFFSET
 ## The engineer's front foot on the rubble line: where the question of how to drop the tank comes up,
 ## still outside the sentry's lane.
 const CHOICE_X: float = RUBBLE_X - M0State.HUMAN_HALF_WIDTH
@@ -106,6 +107,9 @@ const HATCH_OPEN_SECONDS: float = 0.5
 ## The sealed door body is this wide; its left face is M0State.JUNCTION_DOOR_LEFT_X.
 const DOOR_WIDTH: float = 56.0
 const DOOR_HEIGHT: float = 132.0
+## The sealed door draws level with the actors (this node sits at z 1), the torn frame one step under them.
+const SEALED_DOOR_Z: int = 1
+const BLOWN_DOOR_Z: int = 0
 ## How long the grate stays dangerous after the relief vent lets go.
 const HAZARD_SECONDS: float = 0.4
 const VENT_REASON: String = "The relief vent let go under you. Stand clear of the grate when the gauge peaks."
@@ -352,7 +356,7 @@ func _build_door() -> void:
 	door_visual = Node2D.new()
 	door_visual.name = "DoorVisual"
 	door_visual.position = Vector2(DOOR_X, FLOOR_Y)
-	door_visual.z_index = 1
+	door_visual.z_index = SEALED_DOOR_Z
 	add_child(door_visual)
 	door_art = RoomDepth.make_prop("DoorArt", DOOR_SEALED_PROP, DOOR_REGION, DOOR_SCALE, 0.0, 0.0)
 	door_visual.add_child(door_art)
@@ -677,10 +681,12 @@ func door_blast() -> void:
 	refresh_state()
 
 
-## The sealed door until the blast, the blown frame after it.
+## The sealed door until the blast, the blown frame after it. The torn frame drops behind the actors
+## (Main.ACTOR_Z), so WOLF holding at the rubble and anyone walking through stay in view.
 func _show_door() -> void:
 	door_art.visible = not door_blown
 	door_blown_art.visible = door_blown
+	door_visual.z_index = BLOWN_DOOR_Z if door_blown else SEALED_DOOR_Z
 
 
 ## The exit hatch lifts and fades as it opens, over the doorway Recesses draws behind it.

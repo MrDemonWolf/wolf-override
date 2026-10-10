@@ -1469,7 +1469,7 @@ func _tick_lane(delta: float) -> void:
 			if sentry_wake_remaining <= 0.0:
 				sentry_brain.wake()
 		var x: float = human.position.x
-		# WOLF draws it only once he is actually in its lane; it then parks short of his spot, on the mark.
+		# WOLF draws it only once he is actually in its lane; it then parks just past his spot, on the mark.
 		var bait_x: float = JunctionRoom.WOLF_BAIT_X if wolf_baiting and wolf.position.x > SentryBrain.LANE_ENTRY_X else -1.0
 		var before: StringName = sentry_brain.state
 		sentry_brain.tick(delta, x, SentryBrain.is_exposed(x), bait_x)
@@ -1516,6 +1516,8 @@ func _lane_sound() -> void:
 
 
 func _sentry_changed(before: StringName) -> void:
+	# A chase sends a drawing WOLF back to the rubble until it ends.
+	wolf.autonomous_target_x = _wolf_target_x()
 	if fail_active:
 		return
 	match sentry_brain.state:
@@ -1939,8 +1941,9 @@ func _wolf_target_x() -> float:
 			if wolf_scouting:
 				return JunctionRoom.WOLF_SEAM_X
 			if state.door_blown and not state.sentry_down:
-				# He draws the sentry only by his own choice; otherwise he will not cross the rubble.
-				return JunctionRoom.WOLF_BAIT_X if wolf_baiting else JunctionRoom.WOLF_RUBBLE_X
+				# He draws the sentry only by his own choice; otherwise he will not cross the rubble. While it
+				# is chasing the engineer he waits at the rubble rather than walk into it.
+				return JunctionRoom.WOLF_BAIT_X if wolf_baiting and sentry_brain.state != &"chase" else JunctionRoom.WOLF_RUBBLE_X
 	return -1.0
 
 

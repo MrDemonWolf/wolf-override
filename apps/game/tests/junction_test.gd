@@ -285,6 +285,7 @@ func _check_scene() -> void:
 	# Through where the door stood, up to just short of the rubble line (the lane beyond is sentry_test's).
 	_expect(await _walk_to(human, JunctionRoom.CHOICE_X - 16.0), "the engineer can walk through where the door stood")
 	_expect(wolf.position.x <= JunctionRoom.WOLF_RUBBLE_X + 12.0, "WOLF stays on the near side of the rubble")
+	_expect(room.z_index + room.door_visual.z_index < wolf.z_index and room.z_index + room.door_visual.z_index < human.z_index, "the torn door frame draws behind WOLF and the engineer")
 	await _tap(&"interact")
 	_expect(str(game.get("status_line")).contains("ARM PANEL") and not game.get("waiting_for_choice"), "short of the rubble USE points at the arm panel and nothing is asked yet")
 	# A blast with the engineer already past the fuse needs no second save; Continue restores B.

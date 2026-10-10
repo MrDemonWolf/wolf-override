@@ -93,11 +93,13 @@ func _check_brain() -> void:
 	var fixated: SentryBrain = _patrolling_at(SentryBrain.PATROL_MAX_X, -1.0)
 	_expect(fixated.tick(0.1, 100.0, false, JunctionRoom.WOLF_BAIT_X) == &"fixated", "WOLF drawing it fixates it")
 	fixated.tick(2.0, 100.0, false, JunctionRoom.WOLF_BAIT_X)
-	_expect(is_equal_approx(fixated.x, JunctionRoom.WOLF_BAIT_X - SentryBrain.BAIT_OFFSET) and is_equal_approx(fixated.x, DropArm.MARK_X) and fixated.facing > 0.0, "it parks short of WOLF, on the floor mark, facing him")
+	_expect(is_equal_approx(fixated.x, JunctionRoom.WOLF_BAIT_X + SentryBrain.BAIT_OFFSET) and is_equal_approx(fixated.x, DropArm.MARK_X) and fixated.facing < 0.0, "it parks just past WOLF, on the floor mark, facing him")
 	fixated.tick(1.0, 600.0, true, JunctionRoom.WOLF_BAIT_X)
 	_expect(fixated.state == &"fixated" and is_equal_approx(fixated.x, DropArm.MARK_X), "an engineer elsewhere in the lane does not break its hold")
-	_expect(JunctionRoom.WOLF_BAIT_X - M0State.WOLF_HALF_WIDTH >= fixated.x + SentryBrain.HALF_WIDTH, "the parked sentry does not overlap WOLF")
-	_expect(JunctionRoom.WOLF_BAIT_X - M0State.WOLF_HALF_WIDTH > DropArm.MARK_X + JunctionRoom.TANK_SIZE.x * 0.5, "WOLF stands clear of the tank's footprint")
+	_expect(JunctionRoom.WOLF_BAIT_X + M0State.WOLF_HALF_WIDTH <= fixated.x - SentryBrain.HALF_WIDTH, "the parked sentry does not overlap WOLF")
+	_expect(JunctionRoom.WOLF_BAIT_X + M0State.WOLF_HALF_WIDTH < DropArm.MARK_X - JunctionRoom.TANK_SIZE.x * 0.5, "WOLF stands clear of the tank's footprint")
+	_expect(JunctionRoom.WOLF_BAIT_X > JunctionRoom.ARM_X + M0State.HUMAN_HALF_WIDTH + M0State.WOLF_HALF_WIDTH, "WOLF's spot leaves the ARM PANEL to the engineer")
+	_check_bait_walk()
 	var from_left: SentryBrain = _patrolling_at(SentryBrain.PATROL_MIN_X, 1.0)
 	from_left.tick(2.0, 100.0, false, JunctionRoom.WOLF_BAIT_X)
 	_expect(is_equal_approx(from_left.x, DropArm.MARK_X), "it parks on the mark from either side")
@@ -227,7 +229,11 @@ func _check_scene() -> void:
 	_expect(not paused and game.get("waiting_for_choice"), "resume returns to the open question")
 	await _tap(&"choice_1")
 	_expect(game.get("wolf_baiting") and game.get("lane_choice") == "wolf" and wolf.autonomous_target_x == JunctionRoom.WOLF_BAIT_X and str(game.get("status_line")).begins_with("WOLF: I'll draw it"), "with the risk disclosed WOLF chooses to draw it")
-	_expect(await _wait_until(func() -> bool: return brain.state == &"fixated" and absf(brain.x - DropArm.MARK_X) <= 0.5 and absf(wolf.position.x - JunctionRoom.WOLF_BAIT_X) <= 4.0, 300), "WOLF holds past the mark and the sentry parks on it")
+	var walk_in_gap: Array[float] = [INF]
+	_expect(await _wait_until(func() -> bool:
+		walk_in_gap[0] = minf(walk_in_gap[0], absf(wolf.position.x - room.sentry.position.x))
+		return brain.state == &"fixated" and absf(brain.x - DropArm.MARK_X) <= 0.5 and absf(wolf.position.x - JunctionRoom.WOLF_BAIT_X) <= 4.0, 300), "WOLF holds short of the mark and the sentry parks on it")
+	_expect(walk_in_gap[0] >= SentryBrain.HALF_WIDTH + M0State.WOLF_HALF_WIDTH, "WOLF never walks through the sentry on the way in (closest %.1f px)" % walk_in_gap[0])
 	_expect(absf(room.sentry.position.x - brain.x) <= 4.0, "the sentry body follows its brain (%.1f vs %.1f)" % [room.sentry.position.x, brain.x])
 	_expect(await _walk_to(human, JunctionRoom.ARM_X), "the engineer crosses to the panel")
 	_expect(not game.get("fail_active") and brain.state == &"fixated", "crossing while it holds on WOLF is safe")
@@ -405,8 +411,8 @@ func _check_cloud(game: Node2D, path: String) -> void:
 	arm.drop()
 	arm.advance(DropArm.FALL_SECONDS, 0.0)
 	_expect(arm.cloud_active(), "a forced miss vents the cloud")
-	await physics_frame
-	_expect(room.cloud_hazard.armed and room.coolant_cloud.emitting, "the cloud arms its hurtbox")
+	# The room syncs the arm from Main._process, which a single physics frame does not always include.
+	_expect(await _wait_until(func() -> bool: return room.cloud_hazard.armed and room.coolant_cloud.emitting, 5), "the cloud arms its hurtbox")
 	human.position.x = DropArm.MARK_X
 	_expect(await _wait_until(func() -> bool: return game.get("fail_active"), 30), "walking into the coolant cloud is a knockdown")
 	_expect(str(game.get("status_line")).begins_with("The coolant cloud caught you"), "the status line names the cloud")
@@ -520,6 +526,33 @@ func _action_event(action: StringName, pressed: bool) -> InputEventAction:
 	event.action = action
 	event.pressed = pressed
 	return event
+
+
+## WOLF walks in from the rubble at follow speed, answering at many points of the patrol, and backs
+## off to the rubble after a miss while the sentry turns on an engineer over the rubble: the two
+## bodies never overlap on either walk.
+func _check_bait_walk() -> void:
+	var clear: float = SentryBrain.HALF_WIDTH + M0State.WOLF_HALF_WIDTH
+	var step: float = 1.0 / 60.0
+	var closest_in: float = INF
+	var closest_out: float = INF
+	for phase: int in 40:
+		var brain: SentryBrain = SentryBrain.new()
+		brain.reset(true, false, DropArm.MARK_X)
+		# Patrol for a while first so the answer lands at a different point of the patrol each time.
+		brain.tick(phase * 0.12, 500.0, false, -1.0)
+		var wolf_x: float = JunctionRoom.WOLF_RUBBLE_X
+		for _frame: int in 240:
+			wolf_x = move_toward(wolf_x, JunctionRoom.WOLF_BAIT_X, M0Actor.FOLLOW_SPEED * step)
+			brain.tick(step, 500.0, false, JunctionRoom.WOLF_BAIT_X if wolf_x > SentryBrain.LANE_ENTRY_X else -1.0)
+			closest_in = minf(closest_in, absf(wolf_x - brain.x))
+		brain.alert()
+		for _frame: int in 120:
+			wolf_x = move_toward(wolf_x, JunctionRoom.WOLF_RUBBLE_X, M0Actor.FOLLOW_SPEED * step)
+			brain.tick(step, 500.0, false, -1.0)
+			closest_out = minf(closest_out, absf(wolf_x - brain.x))
+	_expect(closest_in >= clear, "WOLF never crosses the sentry walking in to draw it (closest %.1f px)" % closest_in)
+	_expect(closest_out >= clear, "the sentry turning on the panel never runs through WOLF as he backs off (closest %.1f px)" % closest_out)
 
 
 func _wait_until(condition: Callable, frames: int) -> bool:

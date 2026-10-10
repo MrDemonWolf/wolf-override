@@ -2,8 +2,8 @@ class_name SentryBrain
 extends RefCounted
 ## The Service Junction's purge sentry, as pure logic. States: dormant (behind the sealed door,
 ## until the blast wakes it), patrol (bouncing PATROL_MIN_X..PATROL_MAX_X), chase (it saw the
-## engineer in its lane), fixated (WOLF chose to draw it; it parks short of him) and down (the tank
-## landed on it; nothing moves it again). Advanced with real delta so tests are frame-independent;
+## engineer in its lane), fixated (WOLF chose to draw it; it parks just past him, on the mark) and
+## down (the tank landed on it; nothing moves it again). Advanced with real delta so tests are frame-independent;
 ## the room sets [member paused] during a choice and never ticks it while the game is paused or
 ## during a knockdown.
 
@@ -30,9 +30,11 @@ const CHASE_SPEED: float = 230.0
 const CHASE_MIN_X: float = LANE_ENTRY_X + CONTACT_RANGE + 1.0
 ## Seconds an engineer must stay back over the rubble before a chase gives up.
 const LOSE_SECONDS: float = 2.5
-## A fixated sentry parks this far short of the one drawing it: its body and WOLF's clear each other
-## (26 + 31 = 57), and WOLF stands clear of the tank's footprint over the mark.
-const BAIT_OFFSET: float = 60.0
+## A fixated sentry parks this far past the one drawing it, on the far side from the rubble. WOLF comes
+## from the rubble and stops short of the mark, so he never has to cross the machine. Their bodies
+## clear each other (26 + 31 = 57) with room for a sentry that turns on the panel after a miss and
+## gains 10 px/s on WOLF as he backs off to the rubble, and WOLF stays clear of the tank's footprint.
+const BAIT_OFFSET: float = 64.0
 const EPSILON: float = 0.00001
 
 var state: StringName = &"dormant"
@@ -149,9 +151,10 @@ func _patrol(delta: float) -> void:
 			facing = -1.0
 
 
-## Fixated: closes to BAIT_OFFSET short of the one drawing it and keeps facing them.
+## Fixated: closes to BAIT_OFFSET past the one drawing it (on the side away from the rubble) and keeps
+## facing them.
 func _hold_on(bait_x: float, delta: float) -> void:
-	_move_toward(bait_x - BAIT_OFFSET, CHASE_SPEED, delta)
+	_move_toward(bait_x + BAIT_OFFSET, CHASE_SPEED, delta)
 	if absf(bait_x - x) > EPSILON:
 		facing = signf(bait_x - x)
 
