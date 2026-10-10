@@ -5,7 +5,8 @@ export const siteDescription = 'A side-view sci-fi horror adventure by MrDemonWo
 
 export function pageMetadata(title: string, description: string, path: string): Metadata {
   const url = `${siteUrl}${path}`;
-  const image = { url: `${siteUrl}/title-corridor-key-art-provisional.png`, width: 1672, height: 941, alt: 'WOLF//OVERRIDE provisional key art: an engineer and robotic wolf in a research corridor.' };
+  // Social cards get a 1200x630 centre crop of the provisional key art (JPEG for the widest crawler support).
+  const image = { url: `${siteUrl}/share-card.jpg`, width: 1200, height: 630, alt: 'WOLF//OVERRIDE provisional key art: an engineer and robotic wolf in a research corridor.' };
   return {
     title,
     description,

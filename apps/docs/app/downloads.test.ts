@@ -1,13 +1,16 @@
 import assert from 'node:assert/strict';
-import { detectPlatform } from './downloads';
+import { plannedPlatforms, sourceBuildHref } from './downloads';
 
-for (const [ua, platform, touch, expected] of [
-  ['Windows NT 10.0', 'Win32', 0, 'windows'],
-  ['Macintosh; Intel Mac OS X', 'MacIntel', 0, 'macos'],
-  ['iPhone; CPU iPhone OS', 'iPhone', 5, 'ios'],
-  ['iPad; CPU OS', 'iPad', 5, 'ios'],
-  ['Macintosh; Intel Mac OS X', 'MacIntel', 5, 'ios'],
-  ['Linux; Android 15', 'Linux', 5, 'android'],
-  ['Linux x86_64', 'Linux', 0, ''],
-] as const) assert.equal(detectPlatform(ua, platform, touch), expected);
-console.log('Platform suggestion checks passed (including desktop-mode iPad and unknown OS).');
+// The landing page must keep sending players to the source-build guide, not to a package that does not exist.
+assert.equal(sourceBuildHref, '/docs/get-game/');
+
+// Every planned platform stays honest: a plain "no release date" status, no dates, versions or store names.
+assert.deepEqual(
+  plannedPlatforms.map((platform) => platform.name),
+  ['Windows', 'macOS', 'iPhone / iPad', 'Android'],
+);
+for (const platform of plannedPlatforms) {
+  assert.equal(platform.status, 'no release date', `${platform.name} must not announce a release`);
+  assert.doesNotMatch(platform.status, /\b(19|20)\d{2}\b|\bv?\d+\.\d+/, `${platform.name} must not carry a date or version`);
+}
+console.log('Planned-platform checks passed (no release dates; primary action targets /docs/get-game/).');

@@ -1,35 +1,28 @@
 ---
-title: Input guide
+title: Input
 description: Default keyboard, controller, and touch inputs for the current source build.
 ---
 
-You control the engineer. WOLF is an independent companion. The in-game prompts follow your selected keyboard or controller bindings.
+You control the engineer. WOLF is an independent companion. In-game prompts show the keyboard or controller binding you have set; these are the defaults.
 
-## Keyboard and mouse
+| Action | Keyboard | Controller | Touch |
+| --- | --- | --- | --- |
+| Move | A / D or ← / → | Left stick or D-pad left / right | Hold ◀ / ▶ |
+| Interact; continue the opening or closing beat | E | A | USE (labelled CONTINUE during the opening and closing beat) |
+| Answer 1 / Answer 2 | 1 / 2, or click the response | X / Y | Tap the response |
+| Pause or resume | Esc | Start | PAUSE button; tap RESUME to continue |
+| Back in menus | Esc | B | Android Back |
+| Cancel a rebind | Esc or CANCEL REBIND | — | Android Back |
+| Cycle the provisional engineer name | I (fixed; not rebindable) | — | — |
 
-| Input | Action |
-| --- | --- |
-| A / D or left / right arrow | Move |
-| E | Interact; advance the opening or chapter closing beat |
-| 1 / 2 or click a response | Choose the displayed answer |
-| Esc | Pause or resume; during the opening, Pause offers Skip Opening |
-| I | Cycle provisional engineer display names |
+Move, Interact, both answers, and Pause can be rebound in [Settings](/docs/controls/settings/). Controller labels are generic; your controller may name the same buttons differently.
 
-## Controller
+## Notes by device
 
-| Default input | Action |
-| --- | --- |
-| Left stick or D-pad left / right | Move |
-| A | Interact or advance |
-| X / Y | Choose answer 1 / 2 |
-| Start | Pause or resume; during the opening, Pause offers Skip Opening |
+**Keyboard and mouse:** response buttons also appear on screen when a choice is waiting, so you can click them. The title and pause menus take the mouse as well as the keyboard.
 
-These are generic controller labels. Equivalent buttons may have different labels on your controller. Menus support focus navigation and confirmation: the selected item shows a cyan outline inside its border, and Pause menu buttons and the Settings **BACK**, FPS limit and resolution controls also thicken their border and fill. Closing Settings from the title returns the selection to **SETTINGS**. A complete physical-controller playtest remains outstanding.
+**Controller:** the selected menu item shows a cyan outline inside its border. Closing Settings from the title returns the selection to **SETTINGS**.
 
-## Touch
+**Touch:** on iOS and Android builds the direction buttons hide during the opening, the closing beat, and while a choice is waiting. **PAUSE** opens Resume, Settings, and Return to Title (Skip Opening during the opening). On Android, the system Back gesture backs out of menus one step at a time and pauses play; it only closes the game from the title screen. Leaving the app during play pauses the game. Menus opened by touch show no selection outline; the first arrow key or controller press selects a menu item without activating it.
 
-On iOS and Android builds, hold the left/right arrows to move, tap **USE** to interact, and tap the displayed answer. **PAUSE** opens Resume, Settings, and Return to Title (Skip Opening during the opening). On Android, the system Back gesture backs out of menus and pauses play; it only closes the game from the title screen. Leaving the app during play pauses the game. Menus opened by touch show no selection outline; the first arrow key or controller press selects a menu item without activating it.
-
-Touch controls appear in mobile builds. There is no public mobile download yet. A simulator launch has been checked; complete touch gestures and physical devices remain unverified.
-
-Need to change a binding? Open [Settings](/docs/controls/settings/). For checkpoint behavior, see [Saving and resuming](/docs/controls/saves/).
+**Status:** controller hardware and physical touch devices have not been playtested; one iOS simulator launch was checked. There is no public mobile download yet. For checkpoint behaviour, see [Saving](/docs/controls/saves/).

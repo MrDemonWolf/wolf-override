@@ -9,8 +9,9 @@
   "scripts": {
     "docs:dev": "bun run --filter docs dev",
     "docs:check": "bun run --filter docs types:check",
-    "docs:build": "bun run --filter docs build",
+    "docs:build": "bun run --filter docs build && scripts/check-docs-export.sh",
     "docs:test": "bun run --filter docs test",
+    "docs:check-export": "scripts/check-docs-export.sh",
     "game:check": "scripts/check-game.sh"
   }
 }

@@ -1,28 +1,39 @@
 ---
-title: Saving and resuming
-description: How the safe point, Continue, New Game, and Pause affect your chapter progress.
+title: Saving
+description: How the safe point, automatic saves, Continue, New Game, and Pause affect your chapter progress, and where the save file lives.
 ---
 
-## Make a checkpoint
+## When the game saves
 
-Use the green **SAFE POINT** beyond the sealed door. **Continue** on the title screen requires a valid checkpoint and restores the saved room, character positions, puzzle state, display name, and actual remembered choices.
+- **Safe point.** Use the green **SAFE POINT** beyond the sealed door. This is the first save in a run.
+- **Records Access.** Entering Records Access from the safe point, copying the purge-order trace, preserving the mirror timestamp, and securing the exit each save automatically.
 
-There is one checkpoint file, not multiple save slots. Loading a missing or invalid checkpoint leaves the current run unchanged.
+A save stores the room, both characters' positions, puzzle state, the engineer's display name, and the remembered choice. There is one checkpoint file, not multiple save slots, and each save replaces it.
 
-When **Continue** is unavailable, a short note under it says why: **No checkpoint yet** means you have not saved at a safe point, and **Saved checkpoint could not be read** means the checkpoint file is damaged. Reaching the safe point in a new run replaces a damaged file.
+If an automatic save fails, the hint line shows **Save failed. Use a station to try again.** until you move to another spot or a later save works. Using a station again retries the save; if entering Records Access did not save, the first station there does. If the first safe-point save fails, the safe point stays unused so you can use it again.
 
-Entering Records Access, copying a trace there and securing the exit also save your progress. If one of those saves fails, the hint line shows **Save failed. Use a station to try again.** until you move to another spot or a later save works. After the exit fails to save, it stays until a later save works. Using the same station again tries the save again; if entering Records Access did not save, the first station there does. Progress since the last successful save is stored once a later save works. If the first safe-point save fails, the safe point stays unused so you can use it again.
+## Continue and New Game
 
-If the checkpoint file is missing or damaged but a complete save was still being written when the game closed, Continue uses that save instead.
+**Continue** on the title screen resumes a valid checkpoint without replaying the opening. In Records Access it tells you which copy is next or that the exit is open. When Continue is unavailable, a note under it says why: **No checkpoint yet** means no safe point has been used, and **Saved checkpoint could not be read** means the file is damaged; reaching the safe point in a new run replaces it. If the checkpoint file is missing or damaged but a complete save was still being written when the game closed, Continue uses that copy.
 
-## Leave or restart
+**New Game** begins a fresh run with the opening. The old checkpoint remains until the fresh run saves over it.
 
-- **Return to Title** keeps the last checkpoint. Progress made after it is lost.
-- **New Game** begins a fresh run with the opening. The old checkpoint remains until the fresh run saves over it.
-- To restore the last checkpoint during play, open **Pause**, choose **Return to Title** (it warns that unsaved progress is lost), then **Continue**.
+## Pause and Return to Title
 
-## Pause
+During gameplay or the player-paced closing beat, **Esc** opens Pause with **Resume**, **Settings**, and **Return to Title**. During the opening, Pause shows **Skip Opening** in place of Return to Title. Switching away from the game during play also opens Pause; it does not save.
 
-During gameplay or a player-paced closing beat, **Esc** opens Pause. Choose **Resume**, **Settings**, or **Return to Title**. During the opening, Pause shows **Skip Opening** in place of Return to Title. Switching away from the game during play also opens Pause; it does not save, so progress since the last safe point stays unsaved.
+**Return to Title** warns that unsaved progress is lost and keeps the last checkpoint. To restore that checkpoint during play, choose Return to Title, then **Continue**.
 
-For the path to the safe point, see the optional [corridor walkthrough](/docs/walkthrough/corridor/). For other keys, see the [input guide](/docs/controls/input/).
+## Where saves live
+
+The game writes `m0-save.json` (the checkpoint) and `settings.cfg` to Godot's user data folder for the project:
+
+| Platform | Folder |
+| --- | --- |
+| macOS | `~/Library/Application Support/Godot/app_userdata/WOLF--OVERRIDE/` |
+| Windows | `%APPDATA%\Godot\app_userdata\WOLF--OVERRIDE\` |
+| Linux | `~/.local/share/godot/app_userdata/WOLF--OVERRIDE/` |
+
+Godot replaces the slashes in the project name with dashes. A save is written to `m0-save.json.tmp` first and renamed when complete, so a half-written file never replaces a good checkpoint. Deleting the folder removes the checkpoint and your settings. `bun run game:check` uses a temporary folder and never touches these files.
+
+For the path to the safe point, see the optional [corridor walkthrough](/docs/walkthrough/corridor/). For the other keys, see [Input](/docs/controls/input/).

@@ -68,7 +68,7 @@ export default function MarketingNavigation() {
       <nav id="marketing-mobile-menu" aria-label="Main navigation" hidden={!isOpen}>
         <a href="#story" onClick={handleNavigation}>Story</a>
         <a href="#gameplay" onClick={handleNavigation}>Gameplay</a>
-        <a href="#downloads" onClick={handleNavigation}>Downloads</a>
+        <a href="#downloads" onClick={handleNavigation}>Get the build</a>
         <Link href="/docs/" onClick={handleNavigation}>Game guide</Link>
       </nav>
     </div>

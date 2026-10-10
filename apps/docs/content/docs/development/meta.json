@@ -1,4 +1,4 @@
 {
   "title": "Development",
-  "pages": ["index", "story", "setup", "status", "testing"]
+  "pages": ["story", "setup", "status", "testing"]
 }

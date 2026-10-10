@@ -10,7 +10,7 @@
       "source_reference": "Create Logo Mark chat in the private MDW WOLF//OVERRIDE [Game] ChatGPT project; URL retained in private art notes",
       "terms_reference": "https://openai.com/policies/terms-of-use/",
       "rights_review_status": "Provisional branding; trademark and final asset-rights review pending. Not covered by the code/docs GPL license.",
-      "modifications": "Simplified the generated concept into original SVG paths using the public docs navy, cyan and white palette.",
+      "modifications": "Simplified the generated concept into original SVG paths using the public docs navy, cyan and white palette. The published docs copy adds a 160 px intrinsic width and height so Markdown renderers such as GitHub show it at mark size; the game copy keeps the bare 512 viewBox for Godot import.",
       "implementation_status": "Provisional mark used by the game title, README and public landing page."
     },
     {
@@ -46,13 +46,18 @@
     {
       "asset_id": "title-corridor-key-art-provisional",
       "path": "apps/game/assets/title-corridor-key-art-provisional.png",
-      "published_copy": "apps/docs/public/title-corridor-key-art-provisional.png",
+      "published_copy": [
+        "apps/docs/public/title-corridor-key-art-provisional-640.webp",
+        "apps/docs/public/title-corridor-key-art-provisional-1024.webp",
+        "apps/docs/public/title-corridor-key-art-provisional-1672.webp",
+        "apps/docs/public/share-card.jpg"
+      ],
       "source_or_tool": "ChatGPT Create image via Chrome in the MDW WOLF//OVERRIDE [Game] project; 2026-10-07 edit with the Codex built-in image_gen tool (edit mode)",
       "source_reference": "Create wolf concept sheet chat in the private game project, September 28, 2026; title composition prompt and conversation URL retained in ignored art notes",
       "terms_reference": "https://openai.com/policies/terms-of-use/",
       "rights_review_status": "Provisional AI-assisted title art, human reviewed. Final commercial asset-rights review remains open; not covered by the code/docs GPL license.",
-      "modifications": "Original 1672x941 RGB image, with Rowan and WOLF at the left of a research corridor and dark space for live title/menu text at the right. No pixel edits or baked-in lettering. 2026-10-07: WOLF's head redrawn to remove an extra ear; the rest of the composition was kept (about 0.6% of pixels changed).",
-      "implementation_status": "Provisional cinematic title background in the Godot title screen and public landing page; a 960x540 renderer-backed title frame was visually inspected."
+      "modifications": "Original 1672x941 RGB image, with Rowan and WOLF at the left of a research corridor and dark space for live title/menu text at the right. No pixel edits or baked-in lettering. 2026-10-07: WOLF's head redrawn to remove an extra ear; the rest of the composition was kept (about 0.6% of pixels changed). 2026-10-08: website derivatives re-encoded from this file with Chrome's canvas encoder through Playwright: WebP at 640, 1024 and 1672 px wide (quality 0.86; 18,966 / 38,706 / 76,618 B) for the landing hero, and a 1200x630 centre-cropped JPEG (quality 0.85; 73,602 B) as the social share card. The 1.5 MB public PNG copy was removed.",
+      "implementation_status": "Provisional cinematic title background in the Godot title screen; the public landing page serves the WebP derivatives and social previews use share-card.jpg."
     },
     {
       "asset_id": "maintenance-corridor-background-provisional",
@@ -95,35 +100,52 @@
       "implementation_status": "Provisional interactive prop art in Records Access."
     },
     {
-      "asset_id": "corridor-source-build-capture",
-      "path": "apps/docs/public/corridor-source-build.png",
-      "source_or_tool": "Godot 4.7.2 normal-renderer capture of the repository source game on September 30, 2026",
-      "source_reference": "apps/game/scenes/main.tscn and scripts/main.gd on September 30, 2026; New Game, intro finished, purge display read, engineer walked to the relay with isolated save/settings",
-      "rights_review_status": "Derivative screenshot using the registered provisional game art. Underlying commercial asset-rights review remains open; no new third-party artwork acquired.",
-      "modifications": "Updated 960x540 scripted normal-renderer still after the closer following camera and raised gameplay framing. No image edits. Not a full hands-on route or release acceptance test.",
-      "implementation_status": "Archived public gameplay frame, captured September 30, 2026, before the in-game font and theme update. The station layout and route remain representative; control labels may differ. Do not present it as a current interface capture."
-    },
-    {
       "asset_id": "roboto-variable-font",
       "path": "apps/game/assets/fonts/Roboto-Variable.ttf",
-      "published_copy": "apps/docs/public/fonts/Roboto-Variable.ttf",
-      "source_or_tool": "Locally installed Google Fonts variable font, copied byte-for-byte from the developer's font library",
-      "source_reference": "https://fonts.google.com/specimen/Roboto",
-      "terms_reference": "SIL Open Font License 1.1; bundled license text is in apps/game/assets/fonts/Roboto-OFL.txt and apps/docs/public/fonts/Roboto-OFL.txt",
-      "rights_review_status": "Redistributed unchanged under SIL Open Font License 1.1; license text included beside both bundled copies.",
-      "modifications": "No font outlines changed. Used as the game and Docs reading font; Godot selects the regular weight through FontVariation.",
-      "implementation_status": "Bundled locally for the game and Docs website."
+      "published_copy": "apps/docs/app/fonts/roboto-latin-wght400-700.woff2",
+      "source_or_tool": "Game: locally installed Google Fonts variable font, copied byte-for-byte from the developer's font library. Website: Latin-subset WOFF2 build of the same family, fetched 2026-10-08 through the Google Fonts CSS API (Roboto wght 400..700).",
+      "source_reference": "https://fonts.google.com/specimen/Roboto; website WOFF2 from https://fonts.gstatic.com/s/roboto/v51/KFO7CnqEu92Fr1ME7kSn66aGLdTylUAMa3yUBHMdazQ.woff2",
+      "terms_reference": "SIL Open Font License 1.1; bundled license text is in apps/game/assets/fonts/Roboto-OFL.txt and apps/docs/app/fonts/Roboto-OFL.txt",
+      "rights_review_status": "Redistributed under SIL Open Font License 1.1; license text included beside both bundled copies. The website copy is Google's Latin subset of the same OFL family, not a locally modified font.",
+      "modifications": "No font outlines changed. The game keeps the full variable TTF (488,584 B) and selects the regular weight through FontVariation. The website ships the Latin-subset WOFF2 (37,520 B, weights 400..700) through next/font/local; the previous full TTF copy in apps/docs/public/fonts was removed on 2026-10-08 (both site fonts together: 1,233,520 B of TTF to 73,028 B of WOFF2).",
+      "implementation_status": "Bundled locally for the game (TTF) and Docs website (WOFF2)."
     },
     {
       "asset_id": "montserrat-variable-font",
       "path": "apps/game/assets/fonts/Montserrat-Variable.ttf",
-      "published_copy": "apps/docs/public/fonts/Montserrat-Variable.ttf",
-      "source_or_tool": "Locally installed Google Fonts variable font, copied byte-for-byte from the developer's font library",
-      "source_reference": "https://fonts.google.com/specimen/Montserrat",
-      "terms_reference": "SIL Open Font License 1.1; bundled license text is in apps/game/assets/fonts/Montserrat-OFL.txt and apps/docs/public/fonts/Montserrat-OFL.txt",
-      "rights_review_status": "Redistributed unchanged under SIL Open Font License 1.1; license text included beside both bundled copies.",
-      "modifications": "No font outlines changed. Used for headings and controls; Godot selects semibold and bold weights through FontVariation.",
-      "implementation_status": "Bundled locally for the game and Docs website."
+      "published_copy": "apps/docs/app/fonts/montserrat-latin-wght500-800.woff2",
+      "source_or_tool": "Game: locally installed Google Fonts variable font, copied byte-for-byte from the developer's font library. Website: Latin-subset WOFF2 build of the same family, fetched 2026-10-08 through the Google Fonts CSS API (Montserrat wght 500..800).",
+      "source_reference": "https://fonts.google.com/specimen/Montserrat; website WOFF2 from https://fonts.gstatic.com/s/montserrat/v31/JTUSjIg1_i6t8kCHKm459WlhyyTh89Y.woff2",
+      "terms_reference": "SIL Open Font License 1.1; bundled license text is in apps/game/assets/fonts/Montserrat-OFL.txt and apps/docs/app/fonts/Montserrat-OFL.txt",
+      "rights_review_status": "Redistributed under SIL Open Font License 1.1; license text included beside both bundled copies. The website copy is Google's Latin subset of the same OFL family, not a locally modified font.",
+      "modifications": "No font outlines changed. The game keeps the full variable TTF (744,936 B) and selects semibold and bold weights through FontVariation. The website ships the Latin-subset WOFF2 (35,508 B, weights 500..800) through next/font/local for headings and controls; the previous full TTF copy in apps/docs/public/fonts was removed on 2026-10-08 (both site fonts together: 1,233,520 B of TTF to 73,028 B of WOFF2).",
+      "implementation_status": "Bundled locally for the game (TTF) and Docs website (WOFF2)."
+    },
+    {
+      "asset_id": "corridor-start-capture-2026-10-08",
+      "path": "apps/docs/app/images/corridor-start-capture.png",
+      "published_copy": [
+        "apps/docs/app/images/corridor-start-capture-480.webp",
+        "apps/docs/app/images/corridor-start-capture-960.webp"
+      ],
+      "source_or_tool": "Godot 4.7.2 normal-renderer capture of the repository source game on October 8, 2026 (scripted review driver, isolated user data, main at the PR #39 merge); WebP derivatives encoded with Chrome's canvas encoder through Playwright (quality 0.86)",
+      "rights_review_status": "Derivative screenshot using the registered provisional game art and the bundled OFL fonts. Underlying commercial asset-rights review remains open; no new third-party artwork acquired.",
+      "modifications": "960x540 scripted still; no image edits. Not a hands-on route or release acceptance test.",
+      "source_reference": "apps/game/scenes/main.tscn and scripts/main.gd on October 8, 2026; New Game, opening finished, corridor start with the tutorial prompt, keyboard layout",
+      "implementation_status": "Current public gameplay frame on the landing page and in the corridor walkthrough, captioned as a source-build capture with provisional art and UI."
+    },
+    {
+      "asset_id": "title-screen-capture-2026-10-08",
+      "path": "apps/docs/app/images/title-screen-capture.png",
+      "published_copy": [
+        "apps/docs/app/images/title-screen-capture-480.webp",
+        "apps/docs/app/images/title-screen-capture-960.webp"
+      ],
+      "source_or_tool": "Godot 4.7.2 normal-renderer capture of the repository source game on October 8, 2026 (scripted review driver, isolated user data, main at the PR #39 merge); WebP derivatives encoded with Chrome's canvas encoder through Playwright (quality 0.86)",
+      "rights_review_status": "Derivative screenshot using the registered provisional game art and the bundled OFL fonts. Underlying commercial asset-rights review remains open; no new third-party artwork acquired.",
+      "modifications": "960x540 scripted still; no image edits. Not a hands-on route or release acceptance test.",
+      "source_reference": "apps/game/scenes/main.tscn and scripts/main.gd on October 8, 2026; fresh title screen with Continue unavailable",
+      "implementation_status": "Current title-screen frame in the first-steps guide, captioned as a source-build capture with provisional art and UI."
     }
   ],
   "status": "One provisional brand mark, three provisional character images, one title background, two gameplay backgrounds, two prop sheets, two derivative marketing captures, and the Roboto and Montserrat font families recorded; no audio acquired.",
