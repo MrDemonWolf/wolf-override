@@ -1,3 +1,10 @@
+== October 10, 2026 ==
+- In the Service Junction, when WOLF chooses to draw the sentry he now stops just short of the floor mark on the rubble side and the sentry comes to him, so he no longer walks through the machine on the way in. If the sentry turns on you instead, he waits at the rubble until the chase ends.
+- After the door blast, WOLF and the engineer now draw in front of the torn door frame, so WOLF stays in view while he holds at the rubble.
+- Credits in the game and on this website now list Tailwind CSS and the image tools used for the art crops and website images.
+- Website: the landing page, first steps, corridor and Service Junction screenshots are fresh captures of the current build, showing the layered corridor, the raised title menu and the junction door label clear of the wheel.
+- Development: the game checks now fail when a test leaves objects behind at exit, and the asset register covers the shader, font and theme files kept with the art.
+
 == October 9, 2026 ==
 - New provisional art, made with AI assistance and approved by Nathanial Henniges, for the maintenance corridor and Records Access. Each room is now built from far, middle and near painted layers that move at different speeds as the camera follows you, with pillars and machines along the walkway and pipework framing the screen edges. Each of the eight stations has its own machine in the same place and at the same size, with its labels and status lights as before, and the engineer, WOLF and the Director were redrawn.
 - The Service Junction has its own provisional art, made with AI assistance and approved by Nathanial Henniges: far, middle and near painted layers like the other two rooms, and painted machines for the valve, the sealed door, the relief vent, the overhead arm and its coolant tank, the ARM PANEL, the exit bolt, both hatches and the sentry, which now carries a scanner head. The door is left a torn frame after the blast, the tank drops away from an arm that stays put and comes to rest on the crushed sentry when it hits, and the gauge needle, turn lights, door seam and panel lights still show what the room is doing over the art.
