@@ -45,7 +45,8 @@ export default function RootLayout({ children }: { children: ReactNode }) {
     <html lang="en" className={`${roboto.variable} ${montserrat.variable}`} suppressHydrationWarning>
       <body>
         <a className="skip-link" href="#main-content">Skip to content</a>
-        <RootProvider search={{ enabled: false }} theme={{ defaultTheme: 'dark', enableSystem: false }}>
+        {/* Fumadocs 16.13+ toggles the theme on a bare "D" key press; single-character shortcuts are switched off (WCAG 2.1.4). */}
+        <RootProvider search={{ enabled: false }} theme={{ defaultTheme: 'dark', enableSystem: false, hotKey: false }}>
           {children}
         </RootProvider>
       </body>
