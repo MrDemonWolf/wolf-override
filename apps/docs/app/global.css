@@ -2,28 +2,89 @@
 @import "fumadocs-ui/css/ocean.css";
 @import "fumadocs-ui/css/preset.css";
 
-@font-face {
-  font-family: "Roboto";
-  src: url("/fonts/Roboto-Variable.ttf") format("truetype");
-  font-style: normal;
-  font-weight: 100 900;
-  font-display: swap;
+/*
+ * Site design tokens. `static` keeps every variable in the output even when
+ * only plain CSS (marketing.css, docs-guide.css) reads it through var().
+ * Colours are the dark marketing palette: ink is the page background,
+ * surface the raised panel colour, text and muted the two copy colours,
+ * line the resting border and line-strong the border for controls.
+ */
+@theme static {
+  --color-ink: #080f1b;
+  --color-surface: #101e2c;
+  --color-text: #edf5f7;
+  --color-muted: #b2c5cd;
+  --color-line: #385363;
+  --color-line-strong: #5a7896;
+  --color-accent: #8be3ff;
+
+  --text-label: .875rem;
+  --text-label--line-height: 1.4;
+  --text-label--letter-spacing: .12em;
+  --text-body: 1rem;
+  --text-body--line-height: 1.6;
+  --text-lead: clamp(1rem, 1.45vw, 1.2rem);
+  --text-lead--line-height: 1.7;
+  --text-title: clamp(1.6rem, 2.6vw, 2.2rem);
+  --text-title--line-height: 1.15;
+  --text-headline: clamp(2.1rem, 4vw, 3.6rem);
+  --text-headline--line-height: 1.08;
+  --text-display: clamp(3.2rem, 6vw, 6rem);
+  --text-display--line-height: 1.02;
+
+  --radius-control: .75rem;
+  --radius-card: 1rem;
+
+  --shadow-panel: 0 12px 32px rgba(0, 5, 18, .24);
+  --shadow-scene: 0 28px 80px rgba(0, 0, 0, .47);
+  --shadow-glow: 0 0 16px #8be3ff;
 }
 
-@font-face {
-  font-family: "Montserrat";
-  src: url("/fonts/Montserrat-Variable.ttf") format("truetype");
-  font-style: normal;
-  font-weight: 100 900;
-  font-display: swap;
+/* Font families come from next/font/local in layout.tsx (variables on <html>). */
+@theme inline static {
+  --font-sans: var(--font-roboto), Helvetica, Arial, Lucida, sans-serif;
+  --font-heading: var(--font-montserrat), Helvetica, Arial, Lucida, sans-serif;
+}
+
+/*
+ * The one keyboard focus ring for the whole site. --color-fd-ring is the
+ * accent token on dark surfaces (the landing page and the dark guide theme)
+ * and the darker primary on the light guide theme, where plain cyan would
+ * not reach 3:1 against the page. !important lets the ring beat the
+ * focus-visible:outline-none utility on Fumadocs' own buttons (sidebar and
+ * theme toggles) without a per-component rule for each of them.
+ */
+@layer base {
+  :is(a, button, select, summary, [tabindex]):focus-visible {
+    outline: 3px solid var(--color-fd-ring) !important;
+    outline-offset: 2px !important;
+  }
+}
+
+/*
+ * Small uppercase label (section eyebrows, hero meta lines, feature indexes).
+ * Montserrat with tracking and tabular numerals; the label size never drops
+ * below .875rem so it stays readable on phones. Colour defaults to the accent
+ * and can be overridden with a text-* utility.
+ */
+@layer components {
+  .hud-label {
+    margin: 0;
+    color: var(--color-accent);
+    font-family: var(--font-heading);
+    font-size: var(--text-label);
+    font-weight: 600;
+    line-height: var(--text-label--line-height);
+    letter-spacing: var(--text-label--letter-spacing);
+    font-variant-numeric: tabular-nums;
+    text-transform: uppercase;
+  }
 }
 
 :root {
-  --ui-control-radius: .75rem;
-  --ui-card-radius: 1rem;
+  --ui-control-radius: var(--radius-control);
+  --ui-card-radius: var(--radius-card);
   color-scheme: light;
-  --font-sans: "Roboto", Helvetica, Arial, Lucida, sans-serif;
-  --font-heading: "Montserrat", Helvetica, Arial, Lucida, sans-serif;
   --color-fd-background: #f4f9fd;
   --color-fd-foreground: #122540;
   --color-fd-muted: #e7f1f8;
@@ -66,12 +127,9 @@ body {
   color: var(--color-fd-foreground);
   font-family: var(--font-sans);
 }
-:where(h1, h2, h3, h4, h5, h6, button, [role="button"], select, .site-header, .wordmark) {
+:where(h1, h2, h3, h4, h5, h6, button, [role="button"], select) {
   font-family: var(--font-heading);
 }
-a:focus-visible,
-#main-content:focus-visible,
-.theme-toggle:focus-visible { outline: 3px solid var(--color-fd-ring); outline-offset: 4px; }
 .skip-link {
   position: fixed;
   z-index: 100;
@@ -83,254 +141,6 @@ a:focus-visible,
 }
 .skip-link:focus { top: 1rem; }
 
-.site-shell {
-  min-height: 100vh;
-  overflow: hidden;
-  background:
-    radial-gradient(ellipse 50% 38% at 80% 17%, #1a3c63 0%, transparent 72%),
-    linear-gradient(145deg, #071125, #091533 58%, #0b1b33);
-}
-.site-header,
-.site-footer,
-.hero,
-.game-section,
-.stakes-section,
-.closing-cta {
-  width: min(100% - 3rem, 1280px);
-  margin-inline: auto;
-}
-.site-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 1rem;
-  min-height: 5.5rem;
-  border-bottom: 1px solid #42617f66;
-}
-.header-actions { display: flex; align-items: center; gap: 1.25rem; }
-.theme-toggle {
-  padding: .45rem .65rem;
-  border: 1px solid #6d94af;
-  border-radius: var(--ui-control-radius);
-  background: transparent;
-  color: #eaf4ff;
-  font: inherit;
-  font-size: .85rem;
-  font-weight: 700;
-  cursor: pointer;
-}
-.theme-toggle:hover { background: #8be3ff24; }
-.wordmark {
-  display: inline-flex;
-  align-items: center;
-  gap: .65rem;
-  color: #f4faff;
-  font-size: clamp(1rem, 1.5vw, 1.22rem);
-  font-weight: 900;
-  letter-spacing: .07em;
-}
-.wordmark img { display: block; width: 2.5rem; height: 2.5rem; }
-.wordmark span { color: #8be3ff; }
-.header-link {
-  color: #ccdcf1;
-  font-size: .9rem;
-  font-weight: 650;
-}
-.header-link:hover { color: #fff; }
-.header-link span { padding-left: .35rem; color: #8be3ff; }
-.hero {
-  display: grid;
-  grid-template-columns: 1fr 1.05fr;
-  gap: clamp(2rem, 5vw, 5rem);
-  align-items: center;
-  min-height: min(74vh, 710px);
-  padding-block: 5rem;
-}
-.hero-copy { position: relative; z-index: 1; }
-.eyebrow,
-.feature-index,
-.scene-caption,
-.release-note {
-  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
-  font-size: .78rem;
-  letter-spacing: .13em;
-  text-transform: uppercase;
-}
-.eyebrow { display: inline-flex; align-items: center; gap: .7rem; color: #a2def4; }
-.signal-dot {
-  width: .55rem;
-  height: .55rem;
-  border-radius: 50%;
-  background: #8be3ff;
-  box-shadow: 0 0 16px #8be3ff;
-}
-.hero h1 {
-  margin: 1.6rem 0 1.4rem;
-  color: #f4faff;
-  font-size: clamp(3.2rem, 6vw, 6rem);
-  line-height: 1.02;
-  letter-spacing: -.07em;
-}
-.hero h1 em { color: #8be3ff; font-style: normal; }
-.hero p {
-  max-width: 37rem;
-  color: #bdcde1;
-  font-size: clamp(1rem, 1.45vw, 1.2rem);
-  line-height: 1.7;
-}
-.hero-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 1.25rem; margin-top: 2.4rem; }
-.button-primary {
-  display: inline-flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 1.4rem;
-  min-height: 3.3rem;
-  padding: .8rem 1.1rem;
-  border: 1px solid #9de8ff;
-  border-radius: var(--ui-control-radius);
-  background: #8be3ff;
-  color: #061627;
-  font-weight: 800;
-}
-.button-primary:hover { background: #c6f2ff; }
-.text-link {
-  color: #c7eaf7;
-  font-weight: 700;
-  text-decoration: underline;
-  text-decoration-color: #8be3ff88;
-  text-underline-offset: .3rem;
-}
-.text-link:hover { color: #fff; }
-.hero p.release-note { margin-top: 1.3rem; color: #a4b9d0; font-size: .7rem; letter-spacing: .06em; }
-.hero-scene {
-  position: relative;
-  margin: 0;
-  height: clamp(320px, 35vw, 470px);
-  overflow: hidden;
-  border: 1px solid #5572958a;
-  border-radius: .45rem;
-  background: #071421;
-  box-shadow: 0 28px 80px #0007;
-}
-.hero-scene img { display: block; width: 100%; height: 100%; object-fit: cover; object-position: left center; }
-.scene-caption {
-  position: absolute;
-  right: 0;
-  bottom: 0;
-  left: 0;
-  padding: .8rem 1rem;
-  background: #071421d9;
-  color: #d8f2fc;
-  font-size: .62rem;
-}
-.game-section,
-.stakes-section { border-top: 1px solid #42617f66; padding-block: 4rem; }
-.game-section h2,
-.stakes-section h2,
-.closing-cta h2 {
-  max-width: 17ch;
-  margin: 1.1rem 0 0;
-  color: #f4faff;
-  font-size: clamp(2.1rem, 4vw, 3.6rem);
-  line-height: 1.08;
-  letter-spacing: -.045em;
-}
-.section-lead,
-.stakes-copy p,
-.closing-cta p { max-width: 39rem; color: #bdcde1; line-height: 1.7; }
-.section-lead { margin: 1rem 0 0; }
-.feature-strip {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 1rem;
-  margin-top: 2rem;
-}
-.feature-strip > div {
-  padding: 1.5rem;
-  border: 1px solid #42617f66;
-  border-radius: .45rem;
-  background: #11244699;
-}
-.feature-index { display: block; margin-bottom: 1rem; color: #8be3ff; }
-.feature-strip strong { color: #f3f8ff; font-size: 1.08rem; }
-.feature-strip p { max-width: 20rem; margin: .6rem 0 0; color: #aebfd4; line-height: 1.6; }
-.stakes-section { display: grid; grid-template-columns: 1fr 1fr; gap: 3rem; }
-.stakes-copy p:first-child { margin-top: 0; }
-.closing-cta {
-  margin-block: 1rem 4rem;
-  padding: clamp(2rem, 5vw, 4rem);
-  border: 1px solid #427799;
-  border-radius: .6rem;
-  background: radial-gradient(circle at 90% 0%, #20618466, transparent 40%), #10213c;
-}
-.closing-cta p { margin-top: 1rem; }
-.site-footer {
-  display: flex;
-  justify-content: space-between;
-  gap: 1rem;
-  padding-block: 1.5rem 2.5rem;
-  border-top: 1px solid #42617f66;
-  color: #a9bdd3;
-  font-size: .8rem;
-}
-.site-footer a { color: inherit; text-decoration: underline; text-underline-offset: .2em; }
-.footer-divider { padding-inline: .5rem; color: #8be3ff; }
-:root:not(.dark) .site-shell {
-  background:
-    radial-gradient(ellipse 50% 38% at 80% 17%, #d4eaf6 0%, transparent 72%),
-    linear-gradient(145deg, #f9fcff, #f0f7fc 58%, #e9f3fa);
-}
-:root:not(.dark) .site-header,
-:root:not(.dark) .game-section,
-:root:not(.dark) .stakes-section,
-:root:not(.dark) .site-footer { border-color: #b8cad9; }
-:root:not(.dark) .wordmark,
-:root:not(.dark) .hero h1,
-:root:not(.dark) .game-section h2,
-:root:not(.dark) .stakes-section h2,
-:root:not(.dark) .closing-cta h2,
-:root:not(.dark) .feature-strip strong { color: #122540; }
-:root:not(.dark) .wordmark span,
-:root:not(.dark) .header-link span,
-:root:not(.dark) .hero h1 em,
-:root:not(.dark) .feature-index,
-:root:not(.dark) .footer-divider { color: #006a95; }
-:root:not(.dark) .header-link,
-:root:not(.dark) .text-link { color: #005d85; }
-:root:not(.dark) .header-link:hover,
-:root:not(.dark) .text-link:hover { color: #003d61; }
-:root:not(.dark) .theme-toggle { color: #12344e; border-color: #8caec4; }
-:root:not(.dark) .theme-toggle:hover { background: #d9edf8; }
-:root:not(.dark) .eyebrow { color: #165a79; }
-:root:not(.dark) .signal-dot { background: #006a95; box-shadow: 0 0 12px #006a9566; }
-:root:not(.dark) .hero p,
-:root:not(.dark) .section-lead,
-:root:not(.dark) .stakes-copy p,
-:root:not(.dark) .closing-cta p,
-:root:not(.dark) .feature-strip p { color: #34516c; }
-:root:not(.dark) .hero p.release-note,
-:root:not(.dark) .site-footer { color: #435f79; }
-:root:not(.dark) .button-primary { background: #006a95; border-color: #006a95; color: #ffffff; }
-:root:not(.dark) .button-primary:hover { background: #005578; }
-:root:not(.dark) .text-link { text-decoration-color: #006a9588; }
-:root:not(.dark) .feature-strip > div { background: #ffffffcc; border-color: #b8cad9; }
-:root:not(.dark) .closing-cta {
-  background: radial-gradient(circle at 90% 0%, #c5e7f5, transparent 40%), #e7f3fa;
-  border-color: #a7c7d9;
-}
-@media (max-width: 850px) {
-  .hero { grid-template-columns: 1fr; padding-block: 4rem 3rem; }
-  .hero-scene { max-height: 370px; }
-  .feature-strip, .stakes-section { grid-template-columns: 1fr; gap: .8rem; }
-}
-@media (max-width: 540px) {
-  .site-header, .site-footer, .hero, .game-section, .stakes-section, .closing-cta { width: min(100% - 2rem, 1280px); }
-  .site-header { flex-wrap: wrap; padding-block: 1rem; }
-  .header-actions { width: 100%; justify-content: space-between; gap: .65rem; }
-  .theme-toggle { font-size: .75rem; }
-  .hero h1 { font-size: clamp(2.8rem, 12vw, 4rem); }
-  .site-footer { flex-direction: column; }
-}
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
 }

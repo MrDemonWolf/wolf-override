@@ -3,7 +3,7 @@ title: Settings
 description: Display, audio, controls, and saved preferences in the source game.
 ---
 
-Open **Settings** from the title screen or Pause. The terminal theme belongs to this menu. Preferences persist between launches.
+Open **Settings** from the title screen or Pause. Preferences persist between launches in `settings.cfg` beside the [checkpoint file](/docs/controls/saves/#where-saves-live). A damaged or unexpected settings file is ignored and the defaults load instead.
 
 ## Display
 
@@ -16,7 +16,7 @@ Open **Settings** from the title screen or Pause. The terminal theme belongs to 
 | Window size | Desktop: 960×540, 1280×720, or 1920×1080 |
 | Fullscreen | Desktop fullscreen; the OS manages mobile window sizing |
 
-The menu shows the detected GPU and Compatibility renderer. It does not switch renderers or guarantee that a device reaches the selected FPS limit.
+The menu shows the detected GPU and the Compatibility renderer. It does not switch renderers or guarantee that a device reaches the selected FPS limit.
 
 ## Audio
 
@@ -24,8 +24,19 @@ Master, Music, Effects, and Voice each have a volume slider. Effects carries the
 
 ## Controls
 
-Select a keyboard or controller binding, then press the replacement input. Conflicting bindings are rejected. **Esc** or **CANCEL REBIND** cancels capture. **RESTORE DEFAULT CONTROLS** restores the original mappings.
+These six actions have keyboard and controller bindings you can change. Rebinding replaces that action's keyboard defaults (or its controller defaults) with the one input you press:
 
-Stick deadzone sets how far the controller stick must move before movement registers. Increase it if a stick drifts while untouched. Scroll the Controls panel to see its remaining options.
+| Action | Keyboard default | Controller default |
+| --- | --- | --- |
+| Move left | A or ← | D-pad left or left stick |
+| Move right | D or → | D-pad right or left stick |
+| Interact / continue | E | A |
+| Response 1 | 1 | X |
+| Response 2 | 2 | Y |
+| Pause | Esc | Start |
 
-See the [default input guide](/docs/controls/input/) or [troubleshooting](/docs/controls/troubleshooting/) if a control behaves unexpectedly.
+Select a binding, then press the replacement key, button, or stick direction. A binding already used by another action is rejected. **Esc** or **CANCEL REBIND** cancels the capture, and **RESTORE DEFAULT CONTROLS** brings back the mappings above. The **I** key that cycles the provisional engineer name, the controller **B** button for backing out of menus, and the Android Back gesture are fixed.
+
+Stick deadzone sets how far the controller stick must move before movement registers (0.1 to 0.8, default 0.25). Increase it if a stick drifts while untouched. Scroll the Controls panel to see its remaining options.
+
+See [Input](/docs/controls/input/) for the full default table or [Troubleshooting](/docs/controls/troubleshooting/) if a control behaves unexpectedly.
