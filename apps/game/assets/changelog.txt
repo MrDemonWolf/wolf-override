@@ -4,6 +4,7 @@
 - Credits in the game and on this website now list Tailwind CSS and the image tools used for the art crops and website images.
 - Website: the landing page, first steps, corridor and Service Junction screenshots are fresh captures of the current build, showing the layered corridor, the raised title menu and the junction door label clear of the wheel.
 - Development: the game checks now fail when a test leaves objects behind at exit, and the asset register covers the shader, font and theme files kept with the art.
+- Website: a new Privacy page explains what the game stores on your device (the checkpoint and settings files), that the game sends nothing over the network and only opens your browser from the Changelog screen's online button, and that this site stores only your theme choice and loads no analytics or third-party scripts. The legal page now says which art is AI-generated and human-reviewed and which code and docs are AI-assisted, and the repository gains a security policy and a contributing guide.
 
 == October 9, 2026 ==
 - New provisional art, made with AI assistance and approved by Nathanial Henniges, for the maintenance corridor and Records Access. Each room is now built from far, middle and near painted layers that move at different speeds as the camera follows you, with pillars and machines along the walkway and pipework framing the screen edges. Each of the eight stations has its own machine in the same place and at the same size, with its labels and status lights as before, and the engineer, WOLF and the Director were redrawn.
