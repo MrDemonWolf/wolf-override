@@ -494,12 +494,14 @@ html:has(.marketing-shell) {
   /*
    * Narrow and portrait viewports (including 1024px-wide 13-inch iPads in portrait):
    * cap the hero height at 90% of the width so the cover-fitted key art scales no
-   * wider than about 1.6x the viewport, and anchor it to the left edge, where both
-   * characters sit; past 90vw the engineer is cut off.
+   * wider than about 1.6x the viewport, and slide it 22% of the way from its left
+   * edge, which trims the pillar there and keeps the engineer and WOLF (who reaches
+   * a third of the way across the art) left of the copy column; past 90vw the
+   * engineer is cut off.
    */
   .marketing-hero { min-height: min(clamp(44rem, 88svh, 54rem), 90vw); }
-  .marketing-keyart { object-position: 0% 50%; }
-  .marketing-hero-copy { width: 53%; margin-left: 44%; }
+  .marketing-keyart { object-position: 22% 50%; }
+  .marketing-hero-copy { width: 51%; margin-left: 46%; }
   .marketing-story,
   .marketing-progress { gap: 2.5rem; }
 }
