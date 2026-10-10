@@ -92,12 +92,12 @@ has the puzzle solutions.
 
 ## Tech Stack
 
-| Layer          | Technology                                                            |
-| -------------- | --------------------------------------------------------------------- |
-| Game           | Godot 4.7.2 stable, typed GDScript, 2D                                |
-| Game state     | Authored events and versioned JSON saves                              |
-| Public site    | Next.js 16.1.1, Fumadocs UI 16.4.6, Tailwind CSS 4.1, MDX, TypeScript |
-| Docs workspace | Bun 1.4.2                                                             |
+| Layer          | Technology                                                             |
+| -------------- | ---------------------------------------------------------------------- |
+| Game           | Godot 4.7.2 stable, typed GDScript, 2D                                 |
+| Game state     | Authored events and versioned JSON saves                               |
+| Public site    | Next.js 16.3.8, Fumadocs UI 16.16.1, Tailwind CSS 4.3, MDX, TypeScript |
+| Docs workspace | Bun 1.4.2                                                              |
 
 ## Development
 
