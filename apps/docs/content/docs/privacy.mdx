@@ -9,18 +9,20 @@ WOLF//OVERRIDE has no account, sign-in, online service or telemetry. This page s
 
 ### What it stores
 
-The game writes two files to Godot's user data folder for the project and nothing else:
+The game writes two files of its own to Godot's user data folder for the project:
 
 | File | Contents |
 | --- | --- |
 | `m0-save.json` | The checkpoint: the current room, the engineer's and WOLF's positions, puzzle state, which of the three preset engineer names is in use, and the reply WOLF remembers from the corridor choice. There is one checkpoint and each save replaces it; a save is written to `m0-save.json.tmp` first and renamed when complete. |
 | `settings.cfg` | Your settings: FPS limit, window size, fullscreen, V-sync, MSAA, Reduced Motion, the audio slider levels, the controller deadzone and your key bindings. |
 
-The game has no text entry. The engineer's display name is cycled from a fixed list, so nothing you type is stored. The game does not read your account name, hardware identifiers, location or clipboard.
+The Godot engine also writes to the same folder on desktop. A `logs/` folder holds `godot.log` and up to four older copies, each recording the engine version, the graphics driver and GPU model, and any warnings, such as a settings file that could not be read. A `shader_cache/` folder holds compiled graphics shaders so later starts are faster. Neither leaves your device.
+
+The game has no text entry. The engineer's display name is cycled from a fixed list, so nothing you type is stored. The game does not read your account name, location or clipboard. It reads your GPU model only to show it on the Settings screen and does not save it; the engine's log records the same model.
 
 ### Where it lives and how to delete it
 
-[Saving](/docs/controls/saves/) lists the folder for macOS, Windows and Linux (`Godot/app_userdata/WOLF--OVERRIDE/` under the platform's application data directory). Deleting the two files, or the whole folder, removes your checkpoint and settings: Continue then reads **No checkpoint yet** and the settings return to their defaults. `bun run game:check` uses a temporary folder and never touches these files.
+[Saving](/docs/controls/saves/) lists the folder for macOS, Windows and Linux (`Godot/app_userdata/WOLF--OVERRIDE/` under the platform's application data directory). Deleting `m0-save.json` and `settings.cfg` removes your checkpoint and settings: Continue then reads **No checkpoint yet** and the settings return to their defaults. Deleting the whole folder also removes the engine's logs and shader cache; the engine writes a fresh log and cache the next time the game starts. `bun run game:check` uses a temporary folder and never touches these files.
 
 ### What it sends
 
@@ -38,7 +40,7 @@ To remove the stored choice, clear the site data for `wolfoverride.mrdemonwolf.d
 
 ### What it loads
 
-The built site loads no analytics, tracking pixels, third-party scripts, stylesheets or fonts. Roboto and Montserrat are served from the site itself, and the pages and images come from the same address. The export is checked on every build.
+The built site loads no analytics, tracking pixels, third-party scripts, stylesheets or fonts. Roboto and Montserrat are served from the site itself, and the pages and images come from the same address. This was checked by hand against the built export on October 10, 2026; the build's own export check does not test for it.
 
 ### Who sees your visit
 

@@ -219,9 +219,9 @@ props are separate assets with AI-assisted provenance recorded in
 [the asset register](apps/game/assets/manifest.json); they are not
 covered by the code/docs GPL and their final rights review is open.
 
-The game stores only its checkpoint and settings files on your device
-and sends nothing over the network; the website stores only the guide's
-theme choice. The
+The game stores only its checkpoint, settings and Godot's own log and
+shader cache files on your device and sends nothing over the network;
+the website stores only the guide's theme choice. The
 [privacy page](https://wolfoverride.mrdemonwolf.dev/docs/privacy/) lists
 what is stored, what the site loads and how to remove it.
 [SECURITY.md](SECURITY.md) explains how to report a vulnerability
