@@ -3,7 +3,6 @@ import type { ReactNode } from 'react';
 import { RootProvider } from 'fumadocs-ui/provider/next';
 import localFont from 'next/font/local';
 import './global.css';
-import './glass.css';
 import { siteUrl } from '@/lib/seo';
 
 // Latin-subset WOFF2 builds of the OFL fonts; licence texts sit beside them in ./fonts.

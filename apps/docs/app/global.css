@@ -82,8 +82,6 @@
 }
 
 :root {
-  --ui-control-radius: var(--radius-control);
-  --ui-card-radius: var(--radius-card);
   color-scheme: light;
   --color-fd-background: #f4f9fd;
   --color-fd-foreground: #122540;
@@ -119,14 +117,11 @@
   --color-fd-ring: #8be3ff;
 }
 
-* { box-sizing: border-box; }
+/*
+ * Box sizing, body margin and the inherited font come from Tailwind's
+ * preflight; the body background and text colour from Fumadocs' base layer.
+ */
 html { scroll-behavior: smooth; }
-body {
-  margin: 0;
-  background: var(--color-fd-background);
-  color: var(--color-fd-foreground);
-  font-family: var(--font-sans);
-}
 :where(h1, h2, h3, h4, h5, h6, button, [role="button"], select) {
   font-family: var(--font-heading);
 }
@@ -144,3 +139,21 @@ body {
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
 }
+
+/*
+ * Theme-aware page scrollbar: scrollbar-color for Chrome and Firefox, the
+ * ::-webkit-scrollbar rules for Safari. The landing overrides the colours
+ * in marketing.css so it stays dark in either theme.
+ */
+html {
+  scrollbar-width: thin;
+  scrollbar-color: #345070 #091533;
+}
+html:not(.dark) { scrollbar-color: #7394a7 #e7f1f8; }
+html::-webkit-scrollbar { width: .8rem; height: .8rem; }
+html::-webkit-scrollbar-track { background: #091533; }
+html:not(.dark)::-webkit-scrollbar-track { background: #e7f1f8; }
+html::-webkit-scrollbar-thumb { border: 3px solid #091533; border-radius: 999px; background: #345070; }
+html:not(.dark)::-webkit-scrollbar-thumb { border-color: #e7f1f8; background: #7394a7; }
+html::-webkit-scrollbar-thumb:hover { background: #8be3ff; }
+html:not(.dark)::-webkit-scrollbar-thumb:hover { background: #006a95; }

@@ -18,15 +18,15 @@ html:has(.marketing-shell) {
   --mk-line: var(--color-line);
   --mk-line-strong: var(--color-line-strong);
   --mk-accent: var(--color-accent);
-  --mk-control-radius: var(--radius-control, .75rem);
-  --mk-card-radius: var(--radius-card, 1rem);
+  --mk-control-radius: var(--radius-control);
+  --mk-card-radius: var(--radius-card);
   --mk-hero-bg: var(--color-ink);
   display: flow-root;
   overflow: clip;
   background: var(--mk-bg);
   color: var(--mk-text);
+  /* Repeated here because next-themes writes the guide theme's color-scheme inline on <html>. */
   color-scheme: dark;
-  font-family: var(--font-sans);
 }
 
 .marketing-width {
@@ -35,8 +35,6 @@ html:has(.marketing-shell) {
 }
 
 .marketing-header {
-  --mk-accent: var(--color-accent);
-  --mk-text: var(--color-text);
   position: relative;
   z-index: 30;
   display: flex;
@@ -51,7 +49,6 @@ html:has(.marketing-shell) {
   border-radius: var(--mk-control-radius);
   background: rgba(9, 21, 51, .94);
   box-shadow: 0 12px 32px rgba(0, 5, 18, .24);
-  color: #edf5f7;
 }
 
 .marketing-brand {
@@ -67,7 +64,6 @@ html:has(.marketing-shell) {
 }
 
 .marketing-brand img {
-  display: block;
   width: 2.25rem;
   height: 2.25rem;
 }
@@ -91,7 +87,6 @@ html:has(.marketing-shell) {
   position: relative;
   flex: none;
   margin-left: auto;
-  color: #edf5f7;
   font-family: var(--font-heading);
 }
 
@@ -158,7 +153,6 @@ html:has(.marketing-shell) {
   padding: .5rem .75rem;
   border: 1px solid transparent;
   border-radius: var(--mk-control-radius);
-  color: #edf5f7;
   text-decoration: none;
   transition: background-color .18s ease, border-color .18s ease, color .18s ease;
 }
@@ -182,15 +176,7 @@ html:has(.marketing-shell) {
   min-height: clamp(46rem, 92svh, 60rem);
   align-items: center;
   isolation: isolate;
-  --mk-hero-bg: var(--color-ink);
-  --mk-bg: var(--color-ink);
-  --mk-surface: var(--color-surface);
-  --mk-text: var(--color-text);
-  --mk-muted: var(--color-muted);
-  --mk-line: var(--color-line);
-  --mk-accent: var(--color-accent);
   background: var(--mk-hero-bg);
-  color: #edf5f7;
 }
 
 .marketing-keyart {
@@ -222,7 +208,6 @@ html:has(.marketing-shell) {
 
 .marketing-hero h1 {
   margin: 0 0 1.65rem;
-  font-family: var(--font-heading);
   font-size: clamp(4.5rem, 8.8vw, 8.2rem);
   font-weight: 700;
   letter-spacing: -.055em;
@@ -273,12 +258,11 @@ html:has(.marketing-shell) {
 .marketing-primary {
   border-color: var(--mk-accent);
   background: var(--mk-accent);
-  color: var(--mk-primary-text, #081521);
+  color: #081521;
 }
 
 .marketing-primary:hover {
   transform: translateY(-1px);
-  color: var(--mk-primary-text, #081521);
   filter: brightness(1.06);
 }
 
@@ -291,7 +275,6 @@ html:has(.marketing-shell) {
 .marketing-secondary:hover {
   border-color: var(--mk-accent);
   background: color-mix(in srgb, var(--mk-surface) 82%, var(--mk-accent));
-  color: var(--mk-text);
 }
 
 .marketing-status {
@@ -321,7 +304,6 @@ html:has(.marketing-shell) {
 
 .marketing-shell h2 {
   margin: 0 0 1.5rem;
-  font-family: var(--font-heading);
   font-size: clamp(2.6rem, 4.5vw, 4.2rem);
   font-weight: 700;
   letter-spacing: -.045em;
@@ -381,7 +363,6 @@ html:has(.marketing-shell) {
 
 .marketing-features h3 {
   margin: 1.1rem 0 .75rem;
-  font-family: var(--font-heading);
   font-size: 1.25rem;
   font-weight: 700;
   line-height: 1.35;
@@ -407,7 +388,7 @@ html:has(.marketing-shell) {
   overflow: hidden;
   border-radius: calc(var(--mk-card-radius) - 1px) calc(var(--mk-card-radius) - 1px) 0 0;
 }
-.marketing-game-frame img { display: block; width: 100%; height: auto; }
+.marketing-game-frame img { width: 100%; }
 
 .marketing-game-frame figcaption {
   display: flex;
@@ -445,8 +426,6 @@ html:has(.marketing-shell) {
   border-top: 1px solid var(--mk-line);
 }
 
-.marketing-footer-brand .marketing-brand { display: inline-flex; }
-.marketing-footer-brand .marketing-brand img { width: 2.25rem; height: 2.25rem; }
 .marketing-footer p { max-width: 34ch; margin: 1rem 0 0; color: var(--mk-muted); font-size: .85rem; line-height: 1.75; }
 
 .marketing-footer-group {
@@ -483,8 +462,6 @@ html:has(.marketing-shell) {
   color: var(--mk-muted);
   font-size: .78rem;
 }
-
-.marketing-footnote { grid-column: 1 / -1; margin: 0 !important; }
 
 .marketing-shell [id="story"],
 .marketing-shell [id="gameplay"],
@@ -526,20 +503,16 @@ html:has(.marketing-shell) {
   .marketing-width { width: calc(100% - 2rem); }
 
   .marketing-header {
-    display: flex;
     width: calc(100% - 1rem);
     min-height: 0;
     margin: .5rem auto -7.5rem;
     padding: .65rem .75rem;
   }
 
-
   .marketing-header > .marketing-brand { min-width: 0; gap: .45rem; }
   .marketing-header > .marketing-brand img { width: 1.9rem; height: 1.9rem; }
-  .marketing-menu-trigger { gap: .5rem; padding-inline: .75rem; }
   .marketing-mobile-navigation { position: static; }
   .marketing-mobile-navigation > nav {
-    top: calc(100% + .5rem);
     right: .5rem;
     left: .5rem;
     min-width: 0;
@@ -555,7 +528,7 @@ html:has(.marketing-shell) {
   .marketing-pitch { max-width: 42ch; }
   .marketing-actions { gap: .65rem; margin-top: 1.5rem; }
   .marketing-primary,
-  .marketing-secondary { width: 100%; min-height: 3.25rem; }
+  .marketing-secondary { width: 100%; }
   .marketing-hero-foot { position: static; flex-direction: column; gap: .2rem; padding: 0 1.25rem 1.25rem; }
 
   .marketing-story,

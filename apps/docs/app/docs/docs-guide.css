@@ -1,9 +1,12 @@
-.guide-card-grid {
+.guide-card-grid,
+.guide-download-actions {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: .85rem;
-  margin: 1.5rem 0 2.25rem;
 }
+
+.guide-card-grid { margin: 1.5rem 0 2.25rem; }
+.guide-download-actions { margin: 1.25rem 0 1.75rem; }
 
 .guide-card-grid a,
 .guide-download-actions a {
@@ -12,7 +15,7 @@
   gap: .35rem;
   padding: 1.15rem 1.25rem;
   border: 1px solid color-mix(in srgb, var(--color-fd-border) 68%, var(--color-fd-primary) 32%);
-  border-radius: var(--ui-card-radius);
+  border-radius: var(--radius-card);
   background: linear-gradient(145deg, color-mix(in srgb, var(--color-fd-primary) 11%, transparent), transparent 72%), color-mix(in srgb, var(--color-fd-background) 84%, transparent);
   box-shadow: inset 0 1px color-mix(in srgb, white 17%, transparent), 0 10px 24px rgba(0, 8, 26, .08);
   color: var(--color-fd-foreground);
@@ -33,31 +36,21 @@
   transform: translateY(-2px);
 }
 
-.guide-card-grid strong {
-  font-size: 1rem;
-  line-height: 1.35;
-}
+.guide-card-grid strong,
+.guide-download-actions strong { font-size: 1rem; }
+.guide-card-grid strong { line-height: 1.35; }
 
-.guide-card-grid span {
+.guide-card-grid span,
+.guide-download-actions span {
   color: var(--color-fd-muted-foreground);
   font-size: .88rem;
   line-height: 1.45;
 }
 
-.guide-download-actions {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: .85rem;
-  margin: 1.25rem 0 1.75rem;
-}
-
-.guide-download-actions strong { font-size: 1rem; }
-.guide-download-actions span { color: var(--color-fd-muted-foreground); font-size: .88rem; line-height: 1.45; }
-
 .guide-screenshot {
   margin: 1.5rem 0 2rem;
   border: 1px solid var(--color-fd-border);
-  border-radius: var(--ui-card-radius);
+  border-radius: var(--radius-card);
   background: var(--color-fd-card);
 }
 
@@ -65,9 +58,9 @@
 .guide-screenshot a {
   display: block;
   overflow: hidden;
-  border-radius: calc(var(--ui-card-radius) - 1px) calc(var(--ui-card-radius) - 1px) 0 0;
+  border-radius: calc(var(--radius-card) - 1px) calc(var(--radius-card) - 1px) 0 0;
 }
-.guide-screenshot img { display: block; width: 100%; height: auto; }
+.guide-screenshot img { width: 100%; }
 .guide-screenshot figcaption { padding: .8rem 1rem; color: var(--color-fd-muted-foreground); font-size: .85rem; line-height: 1.55; }
 
 @media (max-width: 680px) {
