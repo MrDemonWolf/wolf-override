@@ -203,6 +203,11 @@ const CHAPTER_CLOSE_CAMERA: Vector2 = Vector2(960.0 - 480.0 / CHAPTER_CLOSE_ZOOM
 ## Menu cards fade and slide in over this long; short enough never to hold up input or players who want little motion.
 const MENU_REVEAL_SECONDS: float = 0.12
 const MENU_REVEAL_OFFSET: Vector2 = Vector2(0.0, 10.0)
+## Window sizes offered in Settings, by index. A first launch (no saved size) opens at
+## DEFAULT_RESOLUTION, the same size project.godot gives the first window, so the characters are
+## not drawn at the smallest size. Mobile windows are OS-managed and ignore both.
+const RESOLUTIONS: Array[Vector2i] = [Vector2i(960, 540), Vector2i(1280, 720), Vector2i(1920, 1080)]
+const DEFAULT_RESOLUTION: int = 1
 
 
 func _ready() -> void:
@@ -662,16 +667,15 @@ func _setup_settings() -> void:
 	fps_options.add_item("90 FPS", 90)
 	fps_options.add_item("120 FPS", 120)
 	fps_options.add_item("144 FPS", 144)
-	resolution_options.add_item("960 × 540", 0)
-	resolution_options.add_item("1280 × 720", 1)
-	resolution_options.add_item("1920 × 1080", 2)
+	for index: int in RESOLUTIONS.size():
+		resolution_options.add_item("%d × %d" % [RESOLUTIONS[index].x, RESOLUTIONS[index].y], index)
 	var config: ConfigFile = GameSettings.load_config(settings_path)
 	var fps: int = int(GameSettings.number(config, "video", "fps_limit", 60))
 	if not fps in [0, 30, 60, 90, 120, 144]:
 		fps = 60
 	Engine.max_fps = fps
 	fps_options.select(fps_options.get_item_index(fps))
-	var resolution: int = clampi(int(GameSettings.number(config, "video", "resolution", 0)), 0, 2)
+	var resolution: int = clampi(int(GameSettings.number(config, "video", "resolution", DEFAULT_RESOLUTION)), 0, RESOLUTIONS.size() - 1)
 	resolution_options.select(resolution)
 	var mobile: bool = OS.has_feature("ios") or OS.has_feature("android")
 	resolution_options.disabled = mobile
@@ -691,13 +695,7 @@ func _setup_settings() -> void:
 
 
 func _resolution_size(index: int) -> Vector2i:
-	match index:
-		1:
-			return Vector2i(1280, 720)
-		2:
-			return Vector2i(1920, 1080)
-		_:
-			return Vector2i(960, 540)
+	return RESOLUTIONS[index] if index >= 0 and index < RESOLUTIONS.size() else RESOLUTIONS[DEFAULT_RESOLUTION]
 
 
 func _on_fps_selected(index: int) -> void:

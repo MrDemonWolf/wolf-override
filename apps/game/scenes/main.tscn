@@ -1,4 +1,4 @@
-[gd_scene load_steps=26 format=3]
+[gd_scene load_steps=28 format=3]
 
 [ext_resource type="Script" path="res://scripts/main.gd" id="1_main"]
 [ext_resource type="Script" path="res://scripts/m0_actor.gd" id="2_actor"]
@@ -21,6 +21,7 @@
 [ext_resource type="Texture2D" path="res://assets/props/corridor-coolant-relay.png" id="20_relay"]
 [ext_resource type="Texture2D" path="res://assets/props/corridor-safe-point.png" id="21_safe_point"]
 [ext_resource type="Shader" path="res://assets/shaders/post_grade.gdshader" id="16_grade"]
+[ext_resource type="Shader" path="res://assets/shaders/sharp_sprite.gdshader" id="22_sharp"]
 
 [sub_resource type="RectangleShape2D" id="FloorShape"]
 size = Vector2(960, 60)
@@ -36,6 +37,10 @@ size = Vector2(62, 34)
 
 [sub_resource type="ShaderMaterial" id="GradeMaterial"]
 shader = ExtResource("16_grade")
+
+[sub_resource type="ShaderMaterial" id="SharpSpriteMaterial"]
+shader = ExtResource("22_sharp")
+shader_parameter/lod_bias = -0.5
 
 [node name="Main" type="Node2D"]
 script = ExtResource("1_main")
@@ -96,8 +101,9 @@ shape = SubResource("HumanShape")
 
 [node name="BodySprite" type="Sprite2D" parent="Human"]
 texture_filter = 4
+material = SubResource("SharpSpriteMaterial")
 position = Vector2(0, -5)
-scale = Vector2(0.047, 0.047)
+scale = Vector2(0.188, 0.188)
 texture = ExtResource("5_rowan")
 
 [node name="Tag" type="Label" parent="Human"]
@@ -120,8 +126,9 @@ shape = SubResource("WolfShape")
 
 [node name="BodySprite" type="Sprite2D" parent="Wolf"]
 texture_filter = 4
+material = SubResource("SharpSpriteMaterial")
 position = Vector2(0, -15)
-scale = Vector2(0.0733, 0.0733)
+scale = Vector2(0.18325, 0.18325)
 texture = ExtResource("4_wolf")
 
 [node name="Tag" type="Label" parent="Wolf"]
@@ -150,8 +157,9 @@ script = ExtResource("12_cage")
 visible = false
 z_index = 2
 texture_filter = 4
+material = SubResource("SharpSpriteMaterial")
 position = Vector2(255, 410)
-scale = Vector2(0.047, 0.047)
+scale = Vector2(0.188, 0.188)
 texture = ExtResource("8_director")
 
 [node name="PurgeTerminalArt" type="Sprite2D" parent="."]

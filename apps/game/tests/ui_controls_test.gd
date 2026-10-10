@@ -269,7 +269,10 @@ func _send_escape(pressed: bool) -> void:
 
 
 ## A one-finger drag over `pos` that moves `delta_y` pixels in three steps, pushed through the real input path.
-func _send_touch_drag(pos: Vector2, delta_y: float) -> void:
+## `pos` and `delta_y` are in the 960x540 canvas; the events are sent in window pixels, as the OS sends them.
+func _send_touch_drag(canvas_pos: Vector2, canvas_delta_y: float) -> void:
+	var pos: Vector2 = root.get_final_transform() * canvas_pos
+	var delta_y: float = canvas_delta_y * root.get_final_transform().get_scale().y
 	var touch: InputEventScreenTouch = InputEventScreenTouch.new()
 	touch.index = 0
 	touch.position = pos
@@ -290,7 +293,10 @@ func _send_touch_drag(pos: Vector2, delta_y: float) -> void:
 
 
 ## A left-button mouse drag over `pos` that moves `delta_y` pixels in three steps on the given input device.
-func _send_mouse_drag(pos: Vector2, delta_y: float, device: int) -> void:
+## Canvas coordinates in, window pixels out, as for the touch drag.
+func _send_mouse_drag(canvas_pos: Vector2, canvas_delta_y: float, device: int) -> void:
+	var pos: Vector2 = root.get_final_transform() * canvas_pos
+	var delta_y: float = canvas_delta_y * root.get_final_transform().get_scale().y
 	var press: InputEventMouseButton = InputEventMouseButton.new()
 	press.button_index = MOUSE_BUTTON_LEFT
 	press.pressed = true

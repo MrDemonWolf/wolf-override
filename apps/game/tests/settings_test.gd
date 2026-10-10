@@ -34,6 +34,10 @@ func _run() -> void:
 	var menu: GameSettings = game.get("settings_menu") as GameSettings
 	_expect(Engine.max_fps == 60 and (menu.volumes["Music"] as HSlider).value == 100.0 and menu.deadzone.value == 0.25, "malformed saved preferences do not interrupt scene setup")
 	_expect(menu.prompt(&"interact", false) == "E" and menu.prompt(&"choice_1", false) == "1" and menu.vsync.button_pressed and not menu.reduced_motion.button_pressed, "invalid booleans and reserved loaded bindings restore safe defaults")
+	var resolution_options: OptionButton = game.get("resolution_options") as OptionButton
+	_expect(resolution_options.selected == 1 and resolution_options.get_item_text(1) == "1280 × 720" and game.call("_resolution_size", resolution_options.selected) == Vector2i(1280, 720), "an unreadable window size falls back to the 1280×720 default")
+	_expect(game.call("_resolution_size", 0) == Vector2i(960, 540) and game.call("_resolution_size", 2) == Vector2i(1920, 1080) and game.call("_resolution_size", 7) == Vector2i(1280, 720), "every saved window size keeps its own size; an unknown index opens at the default")
+	_expect(ProjectSettings.get_setting("display/window/size/window_width_override") == 1280 and ProjectSettings.get_setting("display/window/size/window_height_override") == 720 and ProjectSettings.get_setting("display/window/size/viewport_width") == 960, "the first window opens at 1280×720 over the unchanged 960×540 canvas")
 	var impact: Impact = game.get("impact") as Impact
 	_expect(impact != null and not impact.reduce_motion and menu.reduced_motion.is_visible_in_tree(), "Reduced Motion is off by default and sits on the Display tab")
 	menu.reduced_motion.button_pressed = true
@@ -100,9 +104,11 @@ func _run() -> void:
 	menu.antialiasing.item_selected.emit(2)
 	(game.get("fps_options") as OptionButton).select(0)
 	game.call("_on_fps_selected", 0)
+	resolution_options.select(0)
+	game.call("_on_resolution_selected", 0)
 	var config: ConfigFile = ConfigFile.new()
 	config.load(path)
-	_expect(config.get_value("audio", "Music") == 37.0 and config.get_value("video", "msaa_2d") == 2 and config.get_value("video", "fps_limit") == 30 and config.get_value("video", "reduced_motion") == true, "video saves preserve audio, Reduced Motion and extra graphics preferences")
+	_expect(config.get_value("audio", "Music") == 37.0 and config.get_value("video", "msaa_2d") == 2 and config.get_value("video", "fps_limit") == 30 and config.get_value("video", "resolution") == 0 and config.get_value("video", "reduced_motion") == true, "video saves preserve audio, Reduced Motion and extra graphics preferences")
 	_expect(root.msaa_2d == Viewport.MSAA_4X, "edge smoothing applies to the game viewport")
 	menu.tabs.current_tab = 2
 	menu.begin_capture(&"interact", "keyboard")
@@ -150,6 +156,7 @@ func _run() -> void:
 	var restored: GameSettings = reloaded.get("settings_menu") as GameSettings
 	_expect(restored.prompt(&"interact", false) == "Q" and restored.prompt(&"choice_1", true) == "B" and restored.prompt(&"move_left", true) == "AXIS 2 −", "reopening restores key, button and stick bindings")
 	_expect((restored.volumes["Music"] as HSlider).value == 37.0 and restored.antialiasing.selected == 2 and Engine.max_fps == 30, "reopening restores volume and graphics preferences")
+	_expect((reloaded.get("resolution_options") as OptionButton).selected == 0, "a saved 960×540 window size still wins over the 1280×720 default")
 	_expect(restored.reduced_motion.button_pressed and (reloaded.get("impact") as Impact).reduce_motion, "reopening restores Reduced Motion and applies it to the impact kit")
 	restored.reduced_motion.button_pressed = false
 	_expect(InputMap.action_get_events(&"move_right").size() == 4, "unmodified movement retains both keyboard keys, D-pad and stick")

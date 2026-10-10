@@ -82,6 +82,7 @@ func _run() -> void:
 	_expect(absf(tank.position.y - arm.end.y) < 0.01 and absf(tank.get_center().x - DropArm.MARK_X) < 0.01, "the hung tank sits on the arm's cut line, centred over the mark")
 	_expect(is_equal_approx(records.exit_art.position.y, RecordsRoom.EXIT_REST.y), "the exit hatch rests where the chapter close resets it")
 	_expect(records.exit_art.z_index >= 0 and records.exit_art.z_as_relative, "the exit hatch draws over the open doorway the records room paints, so its lift-away shows")
+	_check_characters(game)
 	game.queue_free()
 	await process_frame
 	for leftover: String in [path, "%s-settings.cfg" % path]:
@@ -118,6 +119,31 @@ func _check_coverage(label: String, depth: RoomDepth, view: Rect2) -> void:
 	var left: Rect2 = _global_rect(depth.near_layer.get_node("LeftEdge") as Sprite2D)
 	var right: Rect2 = _global_rect(depth.near_layer.get_node("RightEdge") as Sprite2D)
 	_expect(left.position.x < view.position.x and right.end.x > view.end.x, "%s: the near strips' outer edges are off screen" % label)
+
+
+## The engineer, WOLF and the Director use art downscaled from the masters in art-source/characters,
+## drawn at the masters' world size (1536 x 0.047 and 1015 x 0.0733 world px tall), sampled through
+## the shared sharp_sprite material; each floor reflection samples with the same mip bias.
+func _check_characters(game: Node2D) -> void:
+	var characters: Dictionary = {
+		"engineer": [game.get_node("Human/BodySprite"), Vector2i(256, 384), 1536.0 * 0.047],
+		"WOLF": [game.get_node("Wolf/BodySprite"), Vector2i(761, 406), 1015.0 * 0.0733],
+		"Director": [game.get_node("IntroDirector"), Vector2i(256, 384), 1536.0 * 0.047],
+	}
+	var shared: Material = null
+	for label: String in characters:
+		var sprite: Sprite2D = characters[label][0]
+		var shader_material: ShaderMaterial = sprite.material as ShaderMaterial
+		_expect(Vector2i(sprite.texture.get_size()) == characters[label][1], "the %s texture is the downscaled %s (got %s)" % [label, characters[label][1], sprite.texture.get_size()])
+		_expect(absf(sprite.texture.get_height() * sprite.scale.y - float(characters[label][2])) < 0.01, "the %s keeps its world height (%.2f px)" % [label, sprite.texture.get_height() * sprite.scale.y])
+		_expect(sprite.texture_filter == CanvasItem.TEXTURE_FILTER_LINEAR_WITH_MIPMAPS and sprite.texture.get_image().has_mipmaps(), "the %s samples a mipmapped texture" % label)
+		_expect(shader_material != null and shader_material.shader.resource_path == "res://assets/shaders/sharp_sprite.gdshader" and is_equal_approx(FloorReflection.lod_bias_of(sprite), -0.5), "the %s draws through the sharp sprite material at a -0.5 mip bias" % label)
+		_expect(shared == null or shared == shader_material, "the characters share one sharp sprite material")
+		shared = shader_material
+		var reflection: FloorReflection = sprite.get_parent().get_node(NodePath(sprite.name + "Reflection")) as FloorReflection
+		_expect(reflection != null and is_equal_approx(float((reflection.material as ShaderMaterial).get_shader_parameter("lod_bias")), -0.5), "the %s's floor reflection samples with the same mip bias" % label)
+	var breaker: Sprite2D = game.get_node("BreakerArt") as Sprite2D
+	_expect(FloorReflection.lod_bias_of(breaker) == 0.0 and is_equal_approx(float((breaker.get_parent().get_node("BreakerArtReflection").material as ShaderMaterial).get_shader_parameter("lod_bias")), 0.0), "props keep the default mip selection, and so do their reflections")
 
 
 func _global_rect(sprite: Sprite2D) -> Rect2:
