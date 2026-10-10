@@ -77,7 +77,7 @@
       "terms_reference": "https://openai.com/policies/terms-of-use/",
       "rights_review_status": "Provisional AI-generated environment art, human reviewed and approved for integration. Final commercial asset-rights review remains open; not covered by the code/docs GPL license. Approved for integration by Nathanial Henniges on 2026-10-08 from a review sheet.",
       "modifications": "Original 1920x1080 RGBA mid plate (ceiling pipe run, two pillars, side machines on transparency), copied unchanged. First trialled 2026-10-08 as assets/trial/corridor-mid-trial.png (same bytes).",
-      "implementation_status": "In use since 2026-10-09, imported VRAM-compressed. The corridor's play plane, drawn 1:1 with the room (960 px wide) with its painted walkway (source row 777) on the floor at y 440, behind the stations and actors; 16 px mirrored slivers continue it past each room edge for camera shake. It also stood in, tinted, for the Service Junction on 2026-10-09 until that room's own set was integrated."
+      "implementation_status": "In use since 2026-10-09, imported VRAM-compressed. The corridor's play plane, drawn 1:1 with the room (960 px wide) with its painted walkway (source row 777) on the floor at y 440, behind the stations and actors; 16 px mirrored slivers continue it past each room edge, and a flipped strip of its bottom 16 px (mirror-repeated past both sides to fill the corners) continues it below the floor, for camera shake and the lower touch framing. It also stood in, tinted, for the Service Junction on 2026-10-09 until that room's own set was integrated."
     },
     {
       "asset_id": "corridor-near",
@@ -107,7 +107,7 @@
       "terms_reference": "https://openai.com/policies/terms-of-use/",
       "rights_review_status": "Provisional AI-generated environment art, human reviewed and approved for integration. Final commercial asset-rights review remains open; not covered by the code/docs GPL license. Approved for integration by Nathanial Henniges on 2026-10-08 from a review sheet.",
       "modifications": "Original 1920x1080 RGBA mid plate (ceiling pipe run, two braced pillars, side machines on transparency), copied unchanged.",
-      "implementation_status": "In use since 2026-10-09, imported VRAM-compressed. The Records Access play plane, drawn 1:1 with the room (960 px wide) with its painted walkway (source row 742) on the floor at y 440, behind the stations and actors; 16 px mirrored slivers continue it past each room edge for camera shake."
+      "implementation_status": "In use since 2026-10-09, imported VRAM-compressed. The Records Access play plane, drawn 1:1 with the room (960 px wide) with its painted walkway (source row 742) on the floor at y 440, behind the stations and actors; 16 px mirrored slivers continue it past each room edge, and a flipped strip of its bottom 16 px (mirror-repeated past both sides to fill the corners) continues it below the floor, for camera shake and the lower touch framing."
     },
     {
       "asset_id": "records-near",
@@ -137,7 +137,7 @@
       "terms_reference": "https://openai.com/policies/terms-of-use/",
       "rights_review_status": "Provisional AI-generated environment art, human reviewed and approved for integration. Final commercial asset-rights review remains open; not covered by the code/docs GPL license. Approved for integration by Nathanial Henniges on 2026-10-09 from a review sheet.",
       "modifications": "Original 1920x1080 RGBA mid plate (pressure tanks, gauges and a pipe run with a painted valve at the left, an overhead gantry with hanging cables and a braced column at the right, and a wet walkway along the bottom, on transparency), copied unchanged.",
-      "implementation_status": "In use since 2026-10-09, imported VRAM-compressed. The Service Junction's play plane, drawn 1:1 with the room (960 px wide) with its walkway's back edge (source row 776, measured from the alpha edge) on the floor at y 440, behind the stations and actors; 16 px mirrored slivers continue it past each room edge for camera shake. The overhead arm hangs from its gantry on two drawn rods."
+      "implementation_status": "In use since 2026-10-09, imported VRAM-compressed. The Service Junction's play plane, drawn 1:1 with the room (960 px wide) with its walkway's back edge (source row 776, measured from the alpha edge) on the floor at y 440, behind the stations and actors; 16 px mirrored slivers continue it past each room edge, and a flipped strip of its bottom 16 px (mirror-repeated past both sides to fill the corners) continues it below the floor, for camera shake and the lower touch framing. The overhead arm hangs from its gantry on two drawn rods."
     },
     {
       "asset_id": "junction-near",
@@ -287,7 +287,7 @@
       "terms_reference": "https://openai.com/policies/terms-of-use/",
       "rights_review_status": "Provisional AI-generated gameplay prop, human reviewed and approved for integration. Final commercial asset-rights review remains open; not covered by the code/docs GPL license. Approved for integration by Nathanial Henniges on 2026-10-09 from a review sheet.",
       "modifications": "Documented derivative crop of junction-tank-arm.png (same provenance and approval): the clamp cradle and coolant tank below the shackle, source rectangle x 144..355, y 361..743, cut on 2026-10-09 with Pillow 12.1.1 so the tank can fall away from its arm. Pixels unchanged and verified identical to that region; re-encoded as PNG without the source's colour-chromaticity and background chunks. Drawn with mipmaps and linear-with-mipmaps filtering.",
-      "implementation_status": "In use since 2026-10-09 as the Service Junction's coolant tank, 0.22x (46x84 px), hanging on the arm's cut line with its top at y 298 (below the answer buttons at the play framing) and its base at y 382 (clear of the sentry's scanner fin); it falls onto the floor mark and is winched back up. A missed drop draws a dent on its right flank."
+      "implementation_status": "In use since 2026-10-09 as the Service Junction's coolant tank, 0.22x (46x84 px), hanging on the arm's cut line with its top at y 298 (below the answer buttons at the play framing) and its base at y 382 (clear of the sentry's scanner fin); a missed drop lands it on the floor mark and it is winched back up; a hit leaves it resting on the crushed sentry's hull (Sentry.WRECK_CRUSH_HEIGHT above the floor), so the wreck shows under it, both right after the hit and after Continue. A missed drop draws a dent on its right flank."
     },
     {
       "asset_id": "junction-arm-panel",
@@ -337,7 +337,7 @@
       "terms_reference": "https://openai.com/policies/terms-of-use/",
       "rights_review_status": "Provisional AI-generated character art, human reviewed and approved for integration. Final commercial asset-rights review remains open; not covered by the code/docs GPL license. Approved for integration by Nathanial Henniges on 2026-10-09 from a review sheet.",
       "modifications": "Original 1024x768 RGBA wreck of the same machine (crushed scanner, cracked dark lens, torn wiring and sparks), copied unchanged. The game shows the region inside its painted outline, mirrored, with mipmaps and linear-with-mipmaps filtering. Known source defect, left unedited: a semi-transparent band across the body at about source rows 468 to 500 (alpha falling to about 135), about 2 px tall in game.",
-      "implementation_status": "In use since 2026-10-09 as the Service Junction sentry once the tank has landed on it (and after Continue with it down), at the active sprite's scale, replacing the earlier tip-over rotation; it drops the last 6 px onto its treads when hit."
+      "implementation_status": "In use since 2026-10-09 as the Service Junction sentry once the tank has landed on it (and after Continue with it down), at the active sprite's scale, replacing the earlier tip-over rotation; it drops the last 6 px onto its treads when hit. The wreck is pinned on the floor mark (the drop x) under the landed tank, and its painted body shows past both sides of the tank."
     },
     {
       "asset_id": "roboto-variable-font",
@@ -368,11 +368,12 @@
         "apps/docs/app/images/corridor-start-capture-480.webp",
         "apps/docs/app/images/corridor-start-capture-960.webp"
       ],
-      "source_or_tool": "Godot 4.7.2 normal-renderer capture of the repository source game on October 8, 2026 (scripted review driver, isolated user data, main at the PR #39 merge); WebP derivatives encoded with Chrome's canvas encoder through Playwright (quality 0.86)",
+      "source_or_tool": "Godot 4.7.2 normal-renderer capture of the repository source game on October 10, 2026 (scripted review driver, isolated user data, the codex/game-presentation branch with the layered room art and the junction review fixes); WebP derivatives encoded with cwebp 1.6.0 (libwebp, quality 86; the 480 px copy resized by cwebp)",
       "rights_review_status": "Derivative screenshot using the registered provisional game art and the bundled OFL fonts. Underlying commercial asset-rights review remains open; no new third-party artwork acquired.",
-      "modifications": "960x540 scripted still; no image edits. Not a hands-on route or release acceptance test.",
-      "source_reference": "apps/game/scenes/main.tscn and scripts/main.gd on October 8, 2026; New Game, opening finished, corridor start with the tutorial prompt, keyboard layout",
-      "implementation_status": "Current public gameplay frame on the landing page and in the corridor walkthrough, captioned as a source-build capture with provisional art and UI."
+      "modifications": "960x540 scripted still, recaptured October 10, 2026 (replacing the earlier capture at this path); no image edits. Not a hands-on route or release acceptance test.",
+      "source_reference": "apps/game/scenes/main.tscn and scripts/main.gd on October 10, 2026; New Game, opening finished, corridor start with the tutorial prompt, keyboard layout",
+      "implementation_status": "Current public gameplay frame on the landing page and in the corridor walkthrough, captioned as a source-build capture with provisional art and UI. It shows the layered corridor (corridor-far, -mid and -near) and station props in this register.",
+      "terms_reference": "GPL-3.0-or-later for the project code and UI shown (see LICENSE); the pictured art keeps the terms recorded on its own entries (provisional generated art: https://openai.com/policies/terms-of-use/); fonts under SIL Open Font License 1.1"
     },
     {
       "asset_id": "title-screen-capture-2026-10-08",
@@ -381,11 +382,12 @@
         "apps/docs/app/images/title-screen-capture-480.webp",
         "apps/docs/app/images/title-screen-capture-960.webp"
       ],
-      "source_or_tool": "Godot 4.7.2 normal-renderer capture of the repository source game on October 8, 2026 (scripted review driver, isolated user data, main at the PR #39 merge); WebP derivatives encoded with Chrome's canvas encoder through Playwright (quality 0.86)",
+      "source_or_tool": "Godot 4.7.2 normal-renderer capture of the repository source game on October 10, 2026 (scripted review driver, isolated user data, the codex/game-presentation branch with the layered room art and the junction review fixes); WebP derivatives encoded with cwebp 1.6.0 (libwebp, quality 86; the 480 px copy resized by cwebp)",
       "rights_review_status": "Derivative screenshot using the registered provisional game art and the bundled OFL fonts. Underlying commercial asset-rights review remains open; no new third-party artwork acquired.",
-      "modifications": "960x540 scripted still; no image edits. Not a hands-on route or release acceptance test.",
-      "source_reference": "apps/game/scenes/main.tscn and scripts/main.gd on October 8, 2026; fresh title screen with Continue unavailable",
-      "implementation_status": "Current title-screen frame in the first-steps guide, captioned as a source-build capture with provisional art and UI."
+      "modifications": "960x540 scripted still, recaptured October 10, 2026 (replacing the earlier capture at this path); no image edits. Not a hands-on route or release acceptance test.",
+      "source_reference": "apps/game/scenes/main.tscn and scripts/main.gd on October 10, 2026; fresh title screen with Continue unavailable",
+      "implementation_status": "Current title-screen frame in the first-steps guide, captioned as a source-build capture with provisional art and UI. It shows the raised menu buttons with CHANGELOG at the lower left.",
+      "terms_reference": "GPL-3.0-or-later for the project code and UI shown (see LICENSE); the pictured art keeps the terms recorded on its own entries (provisional generated art: https://openai.com/policies/terms-of-use/); fonts under SIL Open Font License 1.1"
     },
     {
       "asset_id": "service-junction-entry-capture-2026-10-09",
@@ -394,11 +396,12 @@
         "apps/docs/app/images/service-junction-entry-capture-480.webp",
         "apps/docs/app/images/service-junction-entry-capture-960.webp"
       ],
-      "source_or_tool": "Godot 4.7.2 normal-renderer capture of the repository source game on October 9, 2026 (scripted review driver, isolated user data, the codex/game-presentation branch with the junction art integrated); WebP derivatives encoded with cwebp 1.6.0 (libwebp, quality 86; the 480 px copy resized by cwebp)",
+      "source_or_tool": "Godot 4.7.2 normal-renderer capture of the repository source game on October 10, 2026 (scripted review driver, isolated user data, the codex/game-presentation branch with the layered room art and the junction review fixes); WebP derivatives encoded with cwebp 1.6.0 (libwebp, quality 86; the 480 px copy resized by cwebp)",
       "rights_review_status": "Derivative screenshot using the registered provisional game art and the bundled OFL fonts. Underlying commercial asset-rights review remains open; no new third-party artwork acquired.",
-      "modifications": "960x540 scripted still; no image edits. Not a hands-on route or release acceptance test.",
-      "source_reference": "apps/game/scripts/junction_room.gd and scripts/main.gd on October 9, 2026; entering the Service Junction from the Records exit after WOLF reads the door, before the breaker is armed, keyboard layout",
-      "implementation_status": "Gameplay frame at the top of the Service Junction walkthrough, captioned as a source-build capture with provisional art and UI."
+      "modifications": "960x540 scripted still, recaptured October 10, 2026 (replacing the earlier capture at this path); no image edits. Not a hands-on route or release acceptance test.",
+      "source_reference": "apps/game/scripts/junction_room.gd and scripts/main.gd on October 10, 2026; entering the Service Junction from the Records exit after WOLF reads the door, before the breaker is armed, keyboard layout",
+      "implementation_status": "Gameplay frame at the top of the Service Junction walkthrough, captioned as a source-build capture with provisional art and UI. Recaptured after the door label was moved clear of the wheel.",
+      "terms_reference": "GPL-3.0-or-later for the project code and UI shown (see LICENSE); the pictured art keeps the terms recorded on its own entries (provisional generated art: https://openai.com/policies/terms-of-use/); fonts under SIL Open Font License 1.1"
     },
     {
       "asset_id": "changelog-text-export",
@@ -419,9 +422,89 @@
       "rights_review_status": "Original procedural audio with no third-party material; covered by the code licence. If any clip is later replaced by a CC0 or licensed recording, register that file here with its URL and licence before use.",
       "modifications": "Twelve clips: boom (0.5 s), small boom (0.3 s), clank (40 ms), thud (80 ms), hiss loop (0.5 s), hum loop (1.0 s), arc crackle (0.5 s), klaxon (three 120 ms square chirps, 0.5 s), growl (70 Hz saw with tremolo, 0.6 s), servo loop (1.2 kHz sine with a 6 Hz vibrato, 1.0 s), winch loop (90 Hz saw with a 7 Hz wobble, 1.0 s) and whine (sine sweep 300 Hz to 1.8 kHz, 0.6 s); added 2026-10-09: servo, winch and whine. Played through AudioStreamPlayer nodes on the Effects bus; volume and pitch are set per use.",
       "implementation_status": "In use since 2026-10-08 for the containment gate boom, the relay contact clank and crackle, the seal landing thud, the knockdown thud, the Records exit arc, and in the Service Junction for the breaker clunk, the valve clicks, the hiss and pump hum that follow the gauge, the seal-charged klaxon, WOLF's growl, the relief-vent small boom and the door blast; since 2026-10-09 also the sentry's servo (pitch follows its state and winds down when it goes over), the tank's clamp, landing boom and missed-drop clang, the winch during the arm's rewind, and the exit bolt's whine, arc and clank. Nothing has been ear-tested in a normal window yet; the clips are a first pass."
+    },
+    {
+      "asset_id": "floor-reflection-shader",
+      "path": "apps/game/assets/shaders/floor_reflection.gdshader",
+      "source_or_tool": "Hand-written Godot 4.7.2 canvas_item shader (project code), 2026-10-08",
+      "source_reference": "No external source; the shader text is the whole origin. Author: Nathanial Henniges (project code).",
+      "terms_reference": "GPL-3.0-or-later, the repository code licence (see LICENSE)",
+      "rights_review_status": "Original project code with no third-party material; covered by the code licence.",
+      "modifications": "Original file; no generated or third-party content.",
+      "implementation_status": "In use since 2026-10-08 through scripts/floor_reflection.gd: the mirrored, fading and slightly wobbling floor reflections under characters, station props, the sentry and the door."
+    },
+    {
+      "asset_id": "post-grade-shader",
+      "path": "apps/game/assets/shaders/post_grade.gdshader",
+      "source_or_tool": "Hand-written Godot 4.7.2 canvas_item shader (project code), 2026-10-08",
+      "source_reference": "No external source; the shader text is the whole origin. Author: Nathanial Henniges (project code).",
+      "terms_reference": "GPL-3.0-or-later, the repository code licence (see LICENSE)",
+      "rights_review_status": "Original project code with no third-party material; covered by the code licence.",
+      "modifications": "Original file; no generated or third-party content.",
+      "implementation_status": "In use since 2026-10-08 as the world canvas's full-screen grade: a mild cold tint and an edge vignette with multiply blending (no screen copy)."
+    },
+    {
+      "asset_id": "game-ui-theme",
+      "path": "apps/game/assets/fonts/game_theme.tres",
+      "source_or_tool": "Godot 4.7.2 Theme resource written for the project (project code)",
+      "source_reference": "No external source. References the Roboto and Montserrat FontVariation resources in this folder.",
+      "terms_reference": "GPL-3.0-or-later, the repository code licence (see LICENSE)",
+      "rights_review_status": "Original project code with no third-party material; covered by the code licence.",
+      "modifications": "Original file: button, card, panel and label styles (style boxes, colours, margins), the Terminal* variations and the default fonts.",
+      "implementation_status": "In use as the project-wide UI theme (theme/custom in project.godot): the raised menu buttons, cards and panels, and the Terminal* variations that only Settings uses."
+    },
+    {
+      "asset_id": "roboto-regular-variation",
+      "path": "apps/game/assets/fonts/Roboto-Regular.tres",
+      "source_or_tool": "Godot 4.7.2 FontVariation resource written for the project (project code)",
+      "source_reference": "Wraps apps/game/assets/fonts/Roboto-Variable.ttf (entry roboto-variable-font).",
+      "terms_reference": "GPL-3.0-or-later, the repository code licence (see LICENSE); the font it wraps is under SIL Open Font License 1.1",
+      "rights_review_status": "Project resource file; the wrapped font keeps its OFL terms (see roboto-variable-font).",
+      "modifications": "Selects the variable font's weight 400; no font outlines changed.",
+      "implementation_status": "In use as the body font of the UI theme."
+    },
+    {
+      "asset_id": "montserrat-semibold-variation",
+      "path": "apps/game/assets/fonts/Montserrat-Semibold.tres",
+      "source_or_tool": "Godot 4.7.2 FontVariation resource written for the project (project code)",
+      "source_reference": "Wraps apps/game/assets/fonts/Montserrat-Variable.ttf (entry montserrat-variable-font).",
+      "terms_reference": "GPL-3.0-or-later, the repository code licence (see LICENSE); the font it wraps is under SIL Open Font License 1.1",
+      "rights_review_status": "Project resource file; the wrapped font keeps its OFL terms (see montserrat-variable-font).",
+      "modifications": "Selects weight 600 of the variable font; no font outlines changed.",
+      "implementation_status": "In use as the controls font of the UI theme."
+    },
+    {
+      "asset_id": "montserrat-bold-variation",
+      "path": "apps/game/assets/fonts/Montserrat-Bold.tres",
+      "source_or_tool": "Godot 4.7.2 FontVariation resource written for the project (project code)",
+      "source_reference": "Wraps apps/game/assets/fonts/Montserrat-Variable.ttf (entry montserrat-variable-font).",
+      "terms_reference": "GPL-3.0-or-later, the repository code licence (see LICENSE); the font it wraps is under SIL Open Font License 1.1",
+      "rights_review_status": "Project resource file; the wrapped font keeps its OFL terms (see montserrat-variable-font).",
+      "modifications": "Selects weight 700 of the variable font; no font outlines changed.",
+      "implementation_status": "In use as the display font in scenes/main.tscn (titles and headings) and for Settings headings (scripts/game_settings.gd)."
+    },
+    {
+      "asset_id": "roboto-ofl-text",
+      "path": "apps/game/assets/fonts/Roboto-OFL.txt",
+      "source_or_tool": "License text distributed with the Roboto font family",
+      "source_reference": "https://fonts.google.com/specimen/Roboto (SIL Open Font License 1.1)",
+      "terms_reference": "SIL Open Font License 1.1 (this file is the licence text)",
+      "rights_review_status": "Licence text redistributed unchanged with the font, as the OFL requires.",
+      "modifications": "Copied unchanged.",
+      "implementation_status": "Bundled beside Roboto-Variable.ttf as the OFL requires."
+    },
+    {
+      "asset_id": "montserrat-ofl-text",
+      "path": "apps/game/assets/fonts/Montserrat-OFL.txt",
+      "source_or_tool": "License text distributed with the Montserrat font family",
+      "source_reference": "https://fonts.google.com/specimen/Montserrat (SIL Open Font License 1.1)",
+      "terms_reference": "SIL Open Font License 1.1 (this file is the licence text)",
+      "rights_review_status": "Licence text redistributed unchanged with the font, as the OFL requires.",
+      "modifications": "Copied unchanged.",
+      "implementation_status": "Bundled beside Montserrat-Variable.ttf as the OFL requires."
     }
   ],
-  "status": "One provisional brand mark, three provisional character images (redrawn 2026-10-08), one title background, three layered gameplay rooms (far, mid and near plates for the corridor, Records Access and the Service Junction), seventeen station props (eight for the corridor and Records Access; eight for the Service Junction plus one documented derivative crop of its tank; the junction reuses the corridor breaker), two sentry images, three derivative marketing captures, the Roboto and Montserrat font families, one generated changelog text export and one procedural sound-effect set (code, no files) recorded; no audio files acquired. Glows, haze, dust, lockdown beacons, reflections, particles, the Service Junction's state overlays (pressure line, gauge needle, turn lights, seam glow, panel and hatch lights, alcove, floor mark, arm rods and cable, the sentry's beam and eye light) and the screen grade are procedural built-in nodes and three small shaders (two files plus the valve wheel's inline disc mask), not image assets.",
+  "status": "One provisional brand mark, three provisional character images (redrawn 2026-10-08), one title background, three layered gameplay rooms (far, mid and near plates for the corridor, Records Access and the Service Junction), seventeen station props (eight for the corridor and Records Access; eight for the Service Junction plus one documented derivative crop of its tank; the junction reuses the corridor breaker), two sentry images, three derivative marketing captures, the Roboto and Montserrat font families with their licence texts, four project-written font and theme resources (three FontVariation .tres files and the UI theme), two project shader files, one generated changelog text export and one procedural sound-effect set (code, no files) recorded; no audio files acquired. Glows, haze, dust, lockdown beacons, reflections, particles, the Service Junction's state overlays (pressure line, gauge needle, turn lights, seam glow, panel and hatch lights, alcove, floor mark, arm rods and cable, the sentry's beam and eye light) and the screen grade are procedural built-in nodes and three small shaders (the two registered shader files plus the valve wheel's inline disc mask), not image assets. Godot's .import and .uid sidecar files and this manifest itself are not registered.",
   "merge_warning": "Preserve this populated provenance register when merging future handoffs.",
   "future_entry_fields": [
     "asset_id",
