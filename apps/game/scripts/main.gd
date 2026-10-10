@@ -11,6 +11,8 @@ const CHANGELOG_UNAVAILABLE: String = "The changelog text is missing from this b
 const CHANGELOG_SCROLL_SPEED: float = 260.0
 ## Where WOLF stands to hold the live relay contact.
 const RELAY_CONTACT_X: float = 592.0
+## The corridor seal's face (Door at x 780, 56 px wide); while it is shut WOLF follows no closer than his reach.
+const CORRIDOR_DOOR_LEFT_X: float = 752.0
 const SAVE_FAILED_HINT: String = "Save failed. Use a station to try again."
 const NO_CHECKPOINT_NOTE: String = "No checkpoint yet. Reach a SAFE POINT to save."
 const UNREADABLE_CHECKPOINT_NOTE: String = "Saved checkpoint could not be read."
@@ -239,6 +241,10 @@ func _ready() -> void:
 	junction_room.cloud_hazard.contact.connect(func(source: Hazard) -> void: _fail_beat(source.reason))
 	human.z_index = ACTOR_Z
 	wolf.z_index = ACTOR_Z
+	# At the same depth the later sibling draws on top: WOLF goes first so the engineer is always in
+	# front, and a WOLF walking past him (dimmed by M0Actor) reads as passing behind.
+	move_child(wolf, human.get_index())
+	wolf.keep_clear_of = human
 	_setup_particles()
 	for grounded: Sprite2D in [human.body_sprite, wolf.body_sprite, intro_director, breaker_art, relay_art, checkpoint_art, door_art]:
 		floor_reflections.append(FloorReflection.attach(grounded))
@@ -1922,6 +1928,7 @@ func _update_controls() -> void:
 	wolf.controlled = false
 	wolf.autonomous_target_x = _wolf_target_x()
 	wolf.follow_target = human if human.controlled and wolf.autonomous_target_x < 0.0 else null
+	wolf.follow_max_x = _wolf_follow_max_x()
 	human.queue_redraw()
 	wolf.queue_redraw()
 
@@ -1943,6 +1950,16 @@ func _wolf_target_x() -> float:
 				# is chasing the engineer he waits at the rubble rather than walk into it.
 				return JunctionRoom.WOLF_BAIT_X if wolf_baiting and sentry_brain.state != &"chase" else JunctionRoom.WOLF_RUBBLE_X
 	return -1.0
+
+
+## The furthest right WOLF follows to: short of a shut door by his drawn reach, so he never noses
+## into it and the engineer always has room in front of it. His authored spots ignore this.
+func _wolf_follow_max_x() -> float:
+	if state.chapter_id == "lockdown" and not state.door_open:
+		return CORRIDOR_DOOR_LEFT_X - M0Actor.WOLF_REACH
+	if state.chapter_id == "junction" and not state.door_blown:
+		return M0State.JUNCTION_DOOR_LEFT_X - M0Actor.WOLF_REACH
+	return M0Actor.MAX_X
 
 
 func _refresh_ui() -> void:

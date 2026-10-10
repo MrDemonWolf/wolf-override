@@ -97,7 +97,7 @@ func _run() -> void:
 	_expect(gameplay_camera.zoom.x > 1.0 and gameplay_camera.position_smoothing_enabled, "play view is closer and follows the engineer after the opening")
 	var state: M0State = game.get("state") as M0State
 	_expect(state.memory.is_empty() and not state.door_open and state.active_actor == "human", "New Game button starts clean")
-	_expect(wolf.position.x < human.position.x and is_equal_approx(human.position.x - wolf.position.x, 64.0), "WOLF starts beside, not inside, the engineer")
+	_expect(wolf.position.x < human.position.x and is_equal_approx(human.position.x - wolf.position.x, M0Actor.FOLLOW_GAP), "WOLF starts one follow gap behind, not inside, the engineer")
 	_expect(human.controlled and not wolf.controlled and not InputMap.has_action(&"switch_actor"), "only the engineer has movement controls")
 	_expect(game.call("_objective") == "CHECK THE BREAKER", "opening points to the first corridor objective")
 	_expect(top_card.visible and hud.text.contains("CHECK THE BREAKER"), "new gameplay objective appears as a short card")
@@ -133,7 +133,8 @@ func _run() -> void:
 		return
 	for _frame in range(40):
 		await physics_frame
-	_expect(absf(human.position.x - wolf.position.x - 64.0) <= 5.0, "WOLF settles behind the engineer after backtracking")
+	# Backtracking turns the engineer left, so WOLF crosses to his right and settles a follow gap away.
+	_expect(absf(wolf.position.x - human.position.x - M0Actor.FOLLOW_GAP) <= 5.0, "WOLF settles behind the engineer after backtracking")
 	await _tap(&"interact")
 	if not _require(game.get("waiting_for_choice"), "breaker opens authored disagreement"):
 		return

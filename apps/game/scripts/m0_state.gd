@@ -22,7 +22,8 @@ const CHOICE_TEXT = {
 var active_actor: String = "human"
 var name_index: int = 0
 var human_position: Vector2 = Vector2(160.0, 410.0)
-var wolf_position: Vector2 = Vector2(96.0, 423.0)
+## WOLF starts one follow gap (M0Actor.FOLLOW_GAP) behind the engineer, clear of his body.
+var wolf_position: Vector2 = Vector2(72.0, 423.0)
 var memory: Dictionary = {}
 var breaker_armed: bool = false
 var door_open: bool = false
@@ -96,8 +97,10 @@ func enter_records() -> bool:
 	if not checkpoint_reached or chapter_id != "lockdown":
 		return false
 	chapter_id = "records"
+	# WOLF comes in one follow gap ahead: he heads straight for the mirror, so he never starts by
+	# walking through the engineer.
 	human_position = Vector2(128.0, 410.0)
-	wolf_position = Vector2(64.0, 423.0)
+	wolf_position = Vector2(216.0, 423.0)
 	return true
 
 
@@ -128,8 +131,9 @@ func enter_junction() -> bool:
 	if chapter_id != "records" or not chapter_complete:
 		return false
 	chapter_id = "junction"
+	# WOLF comes in one follow gap ahead, already on his way to read the door seam.
 	human_position = Vector2(120.0, 410.0)
-	wolf_position = Vector2(64.0, 423.0)
+	wolf_position = Vector2(208.0, 423.0)
 	return true
 
 
@@ -291,7 +295,7 @@ static func from_dict(raw: Variant) -> M0State:
 	state.active_actor = "human"
 	var human_x: float = float(positions["wolf"][0]) if legacy_wolf_save else float(positions["human"][0])
 	state.human_position = Vector2(human_x, float(positions["human"][1]))
-	var wolf_x: float = clampf(human_x - 64.0, 40.0, 920.0) if legacy_wolf_save else float(positions["wolf"][0])
+	var wolf_x: float = clampf(human_x - M0Actor.FOLLOW_GAP, 40.0, 920.0) if legacy_wolf_save else float(positions["wolf"][0])
 	state.wolf_position = Vector2(wolf_x, float(positions["wolf"][1]))
 	state.memory = loaded_memory.duplicate(true)
 	if not state.memory.is_empty():

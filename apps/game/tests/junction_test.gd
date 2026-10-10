@@ -83,7 +83,7 @@ func _check_save_format() -> void:
 	_expect(not incomplete.enter_junction(), "the junction waits for the secured first copy")
 	_expect(not records.blow_door(), "the door cannot blow before entering the junction")
 	_expect(records.enter_junction() and not records.enter_junction() and records.chapter_id == "junction", "the Records exit enters the junction once")
-	_expect(records.human_position == Vector2(120.0, 410.0) and records.wolf_position == Vector2(64.0, 423.0), "the junction begins with both actors at its entry hatch")
+	_expect(records.human_position == Vector2(120.0, 410.0) and records.wolf_position == Vector2(208.0, 423.0), "the junction begins with the engineer at its entry hatch and WOLF a follow gap ahead")
 	_expect(not records.door_blown and not records.sentry_down and not records.junction_cleared, "entry sets no junction flags")
 	var entry: Dictionary = records.to_dict()
 	_expect(entry["version"] == 4 and entry["chapter_id"] == "junction", "junction saves are version 4")
