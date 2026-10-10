@@ -4,33 +4,42 @@ extends CharacterBody2D
 ## node follows that x with the same velocity mover M0Actor uses for an autonomous target, so it
 ## moves through move_and_slide like the actors. It runs on its lane's rail: no gravity, and it
 ## sits on no physics layer and scans none, so it never pushes or blocks anyone; contact is the
-## brain's test. All of its drawing lives in the one Visual child, so a painted texture can replace
-## it later without touching the mover. Provisional art: a code-drawn tracked machine.
+## brain's test. All of its drawing lives in the one Visual child: the painted machine (a wreck
+## once the tank lands on it) with its scanner beam and eye light drawn over the art in code.
 
 ## Origin is the middle of its treads on the floor.
 const FLOOR_Y: float = 440.0
-## The drawing below is laid out for a 44 px body and scaled to the brain's real width.
-const DRAW_SCALE: float = SentryBrain.HALF_WIDTH / 22.0
-const BODY_SIZE: Vector2 = Vector2(SentryBrain.HALF_WIDTH * 2.0, 40.0 * DRAW_SCALE)
-## How far the drawing reaches above the floor: the top of the sensor mast's ball.
-const DRAWN_HEIGHT: float = 62.0 * DRAW_SCALE
-## How far it keels over when the tank lands on it.
-const DOWN_DEGREES: float = 78.0
+const ACTIVE_ART: Texture2D = preload("res://assets/props/junction-sentry-side-left.png")
+const WRECK_ART: Texture2D = preload("res://assets/props/junction-sentry-down.png")
+## Each image is cut to its painted outline; both face left and share one scale, chosen so the
+## treads are a little longer than the brain's body (SentryBrain.HALF_WIDTH).
+const ACTIVE_REGION: Rect2 = Rect2(113.0, 57.0, 855.0, 626.0)
+const WRECK_REGION: Rect2 = Rect2(143.0, 80.0, 844.0, 623.0)
+const ART_SCALE: float = 0.07
+## The source column under the middle of each machine's treads (the node's origin).
+const ACTIVE_TREAD_X: float = 516.0
+const WRECK_TREAD_X: float = 545.0
+## The scanner slit on the active art (source pixels): the beam and eye light are drawn over it.
+const LENS: Rect2 = Rect2(370.0, 166.0, 145.0, 28.0)
+const BODY_SIZE: Vector2 = Vector2(SentryBrain.HALF_WIDTH * 2.0, 30.0)
+## How far the drawing reaches above the floor: the top of the scanner's fin.
+const DRAWN_HEIGHT: float = ACTIVE_REGION.size.y * ART_SCALE
+## How far the beam reaches ahead of the lens, and how wide it opens.
+const BEAM_LENGTH: float = 34.0
+const BEAM_SPREAD: float = 7.0
 
 ## The x the brain wants; the mover closes on it at up to CHASE_SPEED.
 var target_x: float = SentryBrain.PATROL_MAX_X
 var visual: SentryVisual
+var floor_reflections: Array[FloorReflection] = []
 var _down_tween: Tween
 
 
-## The drawn machine: treads, a squat armoured chassis, a sensor mast and an eye strip whose colour
-## is the brain's state (off, amber patrol, red when locked on).
+## The painted machine, drawn facing +x (the left-facing art is mirrored); the parent flips the
+## whole node to face the way the brain does. Over the scanner slit it draws the eye light and a
+## short beam in the brain's colour (off, amber patrol, red when locked on); the wreck has neither.
 class SentryVisual:
 	extends Node2D
-	const TREAD: Color = Color("#141b21")
-	const HULL: Color = Color("#33424c")
-	const HULL_EDGE: Color = Color("#6a808c")
-	const STRIPE: Color = Color("#c98a2e")
 	const EYE_OFF: Color = Color("#2b1d1d")
 	const EYE_PATROL: Color = Color("#f3ae4b")
 	const EYE_LOCKED: Color = Color("#ff4a3d")
@@ -39,28 +48,52 @@ class SentryVisual:
 		set(value):
 			eye = value
 			queue_redraw()
+	var wrecked: bool = false:
+		set(value):
+			wrecked = value
+			if body != null:
+				body.visible = not wrecked
+				wreck.visible = wrecked
+			queue_redraw()
+	var body: Sprite2D
+	var wreck: Sprite2D
+
+	func _init() -> void:
+		body = _art("Body", Sentry.ACTIVE_ART, Sentry.ACTIVE_REGION, Sentry.ACTIVE_TREAD_X)
+		wreck = _art("Wreck", Sentry.WRECK_ART, Sentry.WRECK_REGION, Sentry.WRECK_TREAD_X)
+		wreck.visible = false
+
+	## A mirrored cut of [param texture] with its base on the floor and [param tread_x] at x 0. It
+	## draws behind this node's own lens drawing.
+	func _art(art_name: String, texture: Texture2D, region: Rect2, tread_x: float) -> Sprite2D:
+		var sprite: Sprite2D = Sprite2D.new()
+		sprite.name = art_name
+		sprite.texture = texture
+		sprite.texture_filter = CanvasItem.TEXTURE_FILTER_LINEAR_WITH_MIPMAPS
+		sprite.region_enabled = true
+		sprite.region_rect = region
+		sprite.flip_h = true
+		sprite.scale = Vector2.ONE * Sentry.ART_SCALE
+		sprite.position = Vector2(-(region.get_center().x - tread_x), -region.size.y * 0.5) * Sentry.ART_SCALE
+		sprite.show_behind_parent = true
+		add_child(sprite)
+		return sprite
 
 	func _draw() -> void:
-		draw_set_transform(Vector2.ZERO, 0.0, Vector2.ONE * Sentry.DRAW_SCALE)
-		draw_rect(Rect2(-22.0, -12.0, 44.0, 12.0), TREAD)
-		for wheel: int in 3:
-			draw_circle(Vector2(-14.0 + wheel * 14.0, -6.0), 5.0, Color("#26323a"))
-			draw_circle(Vector2(-14.0 + wheel * 14.0, -6.0), 2.0, HULL_EDGE)
-		var hull: PackedVector2Array = PackedVector2Array([Vector2(-20.0, -12.0), Vector2(20.0, -12.0), Vector2(15.0, -34.0), Vector2(-17.0, -34.0)])
-		draw_colored_polygon(hull, HULL)
-		draw_polyline(hull + PackedVector2Array([hull[0]]), HULL_EDGE, 1.5, true)
-		for stripe: int in 3:
-			var x: float = -12.0 + stripe * 9.0
-			draw_line(Vector2(x, -14.0), Vector2(x + 6.0, -22.0), STRIPE, 2.0)
-		# The sensor head sits forward on the chassis; the eye strip faces the way it moves.
-		draw_rect(Rect2(-4.0, -48.0, 20.0, 14.0), Color("#26323a"))
-		draw_rect(Rect2(-4.0, -48.0, 20.0, 14.0), HULL_EDGE, false, 1.5)
-		draw_line(Vector2(-2.0, -48.0), Vector2(-7.0, -60.0), HULL_EDGE, 1.5)
-		draw_circle(Vector2(-7.0, -60.0), 2.0, eye.darkened(0.2))
-		if eye != EYE_OFF:
-			draw_rect(Rect2(1.0, -46.0, 16.0, 9.0), Color(eye, 0.25))
-		draw_rect(Rect2(4.0, -44.0, 4.0, 4.0), eye)
-		draw_rect(Rect2(10.0, -44.0, 4.0, 4.0), eye)
+		if wrecked or eye == EYE_OFF:
+			return
+		var lens: Rect2 = Sentry.lens_rect()
+		var front: Vector2 = Vector2(lens.end.x, lens.get_center().y)
+		var beam: PackedVector2Array = PackedVector2Array([front + Vector2(0.0, -lens.size.y * 0.5), front + Vector2(Sentry.BEAM_LENGTH, -Sentry.BEAM_SPREAD), front + Vector2(Sentry.BEAM_LENGTH, Sentry.BEAM_SPREAD), front + Vector2(0.0, lens.size.y * 0.5)])
+		draw_polygon(beam, PackedColorArray([Color(eye, 0.32), Color(eye, 0.0), Color(eye, 0.0), Color(eye, 0.32)]))
+		draw_rect(lens, Color(eye, 0.9))
+
+
+## The scanner slit in the visual's space (facing +x), from the active art's LENS.
+static func lens_rect() -> Rect2:
+	var left: float = -(LENS.end.x - ACTIVE_TREAD_X) * ART_SCALE
+	var top: float = -(ACTIVE_REGION.end.y - LENS.position.y) * ART_SCALE
+	return Rect2(left, top, LENS.size.x * ART_SCALE, LENS.size.y * ART_SCALE)
 
 
 func _init() -> void:
@@ -79,6 +112,8 @@ func _ready() -> void:
 	visual = SentryVisual.new()
 	visual.name = "Visual"
 	add_child(visual)
+	for art: Sprite2D in [visual.body, visual.wreck]:
+		floor_reflections.append(FloorReflection.attach(art))
 	position = Vector2(target_x, FLOOR_Y)
 
 
@@ -103,7 +138,7 @@ func follow(brain: SentryBrain) -> void:
 			visual.eye = SentryVisual.EYE_OFF
 
 
-## Puts it straight where a restored brain says it is, upright unless it is down.
+## Puts it straight where a restored brain says it is, a wreck if it is down.
 func place(brain: SentryBrain) -> void:
 	_kill_tween()
 	var down: bool = brain.state == &"down"
@@ -112,25 +147,21 @@ func place(brain: SentryBrain) -> void:
 	target_x = x
 	position = Vector2(x, FLOOR_Y)
 	velocity = Vector2.ZERO
-	visual.rotation_degrees = DOWN_DEGREES * visual.scale.x if down else 0.0
-	visual.position = _down_offset() if down else Vector2.ZERO
+	visual.position = Vector2.ZERO
+	visual.wrecked = down
 	if down:
 		visual.eye = SentryVisual.EYE_OFF
 
 
-## The tank lands: it tips forward onto its sensor head and its eyes die.
+## The tank lands: the machine is crushed into its wreck, which drops the last few pixels onto its
+## treads, and its eye dies.
 func keel_over() -> void:
 	_kill_tween()
 	visual.eye = SentryVisual.EYE_OFF
+	visual.wrecked = true
+	visual.position = Vector2(0.0, -6.0)
 	_down_tween = create_tween()
-	_down_tween.tween_property(visual, "rotation_degrees", DOWN_DEGREES * visual.scale.x, 0.35).set_trans(Tween.TRANS_BOUNCE).set_ease(Tween.EASE_OUT)
-	_down_tween.parallel().tween_property(visual, "position", _down_offset(), 0.35)
-
-
-## Keeling over pivots on the front tread corner, so the body tips onto the floor instead of into it.
-func _down_offset() -> Vector2:
-	var corner: Vector2 = Vector2(BODY_SIZE.x * 0.5 * visual.scale.x, 0.0)
-	return corner - corner.rotated(deg_to_rad(DOWN_DEGREES * visual.scale.x))
+	_down_tween.tween_property(visual, "position", Vector2.ZERO, 0.3).set_trans(Tween.TRANS_BOUNCE).set_ease(Tween.EASE_OUT)
 
 
 func _kill_tween() -> void:

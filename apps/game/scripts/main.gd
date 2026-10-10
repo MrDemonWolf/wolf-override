@@ -197,7 +197,7 @@ const GAMEPLAY_CAMERA_Y_TOUCH: float = 392.0
 const CHOICE_ROW_TOP: float = 88.0
 ## The chapter-close shots frame the room's right end closer than play, both actors above the
 ## dialogue card. At 1.55 the left edge (x ~341) falls in the gap between the junction's relief vent
-## (its label and grate end by x 336) and the gauge and VALVE label (from x ~354), so no label is cut.
+## (its label and grate end by x 336) and the VALVE label (from x ~354), so no label is cut.
 const CHAPTER_CLOSE_ZOOM: float = 1.55
 const CHAPTER_CLOSE_CAMERA: Vector2 = Vector2(960.0 - 480.0 / CHAPTER_CLOSE_ZOOM, 352.0)
 ## Menu cards fade and slide in over this long; short enough never to hold up input or players who want little motion.

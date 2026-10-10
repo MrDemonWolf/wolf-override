@@ -22,13 +22,11 @@ const Z_MID: int = -3
 ## behind the mid plate's pillars and pipes.
 const Z_ATMOSPHERE: int = -4
 const Z_NEAR: int = 3
-## The near edge strips are anchored past the room edges so their outer edges stay off screen
-## through every framing: Parallax2D shifts a layer by (camera x - 480) * (1 - scroll), which at
-## 1.15 is up to 19 px at play (zoom 1.35), 32 px in the opening (zoom 1.8) and 26 px at the
-## chapter-close shot (zoom 1.55), plus up to 10 px of camera shake. Anchored this far out, the
-## pipe column at each end of the play view only grazes an engineer standing at the 40 / 920 clamp.
-const NEAR_LEFT_X: float = -56.0
-const NEAR_RIGHT_X: float = ROOM_WIDTH + 56.0
+## The near edge strips are anchored at least this far past the room edges so their outer edges
+## stay off screen through every framing: Parallax2D shifts a layer by (camera x - 480) *
+## (1 - scroll), which at 1.15 is up to 19 px at play (zoom 1.35), 32 px in the opening (zoom 1.8)
+## and 26 px at the chapter-close shot (zoom 1.55), plus up to 10 px of camera shake.
+const NEAR_OVERHANG: float = 56.0
 ## Mirrored slivers of the mid plate past each room edge, so camera shake at the end of the
 ## camera's travel shows a continuation of the plate instead of its cut edge.
 const MID_BLEED: float = 16.0
@@ -49,8 +47,11 @@ const SHAFT_SIZE: Vector2 = Vector2(54.0, 240.0)
 ## How far the far plate sits below the mid plate, so its painted ceiling lamps stay in the play view.
 @export var far_drop: float = 0.0
 @export var near_strip_width: float = 512.0
-## Multiplied into every plate, so a room can reuse another room's set in its own light.
-@export var plate_tint: Color = Color.WHITE
+## How far past each room edge the near strips are anchored (at least NEAR_OVERHANG). A room whose
+## painted pipe column is wider than the corridor's (57 px) anchors it further out by the
+## difference, so the column at each end of the play view only grazes an engineer standing at the
+## 40 / 920 clamp.
+@export var near_overhang: float = NEAR_OVERHANG
 @export var base_color: Color = Color("#091533")
 ## Ceiling lamp centres as fractions of the far plate, so the glows ride on its parallax.
 @export var lamps: PackedVector2Array = PackedVector2Array()
@@ -207,9 +208,9 @@ func _apply() -> void:
 	if left_edge != null:
 		var right_edge: Sprite2D = near_layer.get_node("RightEdge") as Sprite2D
 		left_edge.scale = Vector2.ONE * scale_factor
-		left_edge.position = Vector2(NEAR_LEFT_X, mid_top)
+		left_edge.position = Vector2(-near_overhang, mid_top)
 		right_edge.scale = left_edge.scale
-		right_edge.position = Vector2(NEAR_RIGHT_X - right_edge.region_rect.size.x * scale_factor, mid_top)
+		right_edge.position = Vector2(ROOM_WIDTH + near_overhang - right_edge.region_rect.size.x * scale_factor, mid_top)
 	for dust: CPUParticles2D in [far_dust, near_dust]:
 		dust.visible = on
 		dust.emitting = on
@@ -242,7 +243,6 @@ func _plate(plate_name: String, texture: Texture2D, region: Rect2 = Rect2(), mir
 	plate.name = plate_name
 	plate.centered = false
 	plate.texture = texture
-	plate.modulate = plate_tint
 	plate.region_enabled = region.has_area()
 	plate.region_rect = region
 	plate.flip_h = mirrored

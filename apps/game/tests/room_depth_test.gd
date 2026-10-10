@@ -62,6 +62,12 @@ func _run() -> void:
 		"mirror port": records.get_node("MirrorArt"),
 		"exit": records.exit_art,
 		"junction breaker": junction.breaker_art,
+		"junction relief vent": junction.vent_art,
+		"junction valve": junction.valve_art,
+		"junction arm panel": junction.arm_panel_art,
+		"junction bolt panel": junction.bolt_panel_art,
+		"junction entry hatch": junction.entry_hatch_art,
+		"junction exit hatch": junction.hatch_art,
 	}
 	for prop_name: String in floor_props:
 		var prop: Sprite2D = floor_props[prop_name]
@@ -69,6 +75,11 @@ func _run() -> void:
 	var door: Sprite2D = game.get_node("Door/Visual/DoorArt") as Sprite2D
 	_expect(absf(door.get_global_transform().origin.y + door.region_rect.size.y * door.scale.y * 0.5 - 440.0) < 0.5, "the corridor seal stands on the floor")
 	_expect(absf(junction.door_art.get_global_transform().origin.y + junction.door_art.region_rect.size.y * junction.door_art.scale.y * 0.5 - 440.0) < 0.5, "the junction door stands on the floor")
+	var vent: Rect2 = _global_rect(junction.vent_art)
+	_expect(absf(vent.position.x - PressureLine.VENT_GRATE_MIN_X) < 0.01 and absf(vent.end.x - PressureLine.VENT_GRATE_MAX_X) < 0.01, "the relief vent art spans exactly the grate's hurtbox (%s)" % vent)
+	var tank: Rect2 = _global_rect(junction.tank)
+	var arm: Rect2 = _global_rect(junction.arm_art)
+	_expect(absf(tank.position.y - arm.end.y) < 0.01 and absf(tank.get_center().x - DropArm.MARK_X) < 0.01, "the hung tank sits on the arm's cut line, centred over the mark")
 	_expect(is_equal_approx(records.exit_art.position.y, RecordsRoom.EXIT_REST.y), "the exit hatch rests where the chapter close resets it")
 	_expect(records.exit_art.z_index >= 0 and records.exit_art.z_as_relative, "the exit hatch draws over the open doorway the records room paints, so its lift-away shows")
 	game.queue_free()

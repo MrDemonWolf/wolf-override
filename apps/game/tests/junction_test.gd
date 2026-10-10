@@ -252,7 +252,7 @@ func _check_scene() -> void:
 	state = game.get("state") as M0State
 	_expect(state.to_dict() == autosave_a.to_dict() and human.position == state.human_position and human.controlled, "the engineer is back at autosave A with controls")
 	_expect(line.state == &"idle" and room.turns == 0 and not room.vent_hazard.armed, "the restore resets the line, the wheel and the vent")
-	_expect(await _wait_until(func() -> bool: return not room.door_shape.disabled and room.door_visual.visible, 5), "the door stands again after the restore")
+	_expect(await _wait_until(func() -> bool: return not room.door_shape.disabled and room.door_art.visible and not room.door_blown_art.visible, 5), "the door stands sealed again after the restore")
 	_expect(state.memory.get("choice_id") == State.DISCLOSE and state.chapter_complete, "memory and the Records result survive the knockdown")
 	_expect(await _wait_until(func() -> bool: return Engine.time_scale == 1.0 and camera.offset == Vector2.ZERO and (game.get_node("CanvasLayer/IntroFade") as ColorRect).color.a == 0.0, 90), "time scale, camera and fade are at rest after the restore")
 	# A clean run: arm, crank, clear the zone, and the door goes.
@@ -290,7 +290,7 @@ func _check_scene() -> void:
 	# A blast with the engineer already past the fuse needs no second save; Continue restores B.
 	game.call("_load_game")
 	state = game.get("state") as M0State
-	_expect(state.door_blown and room.visible and room.door_shape.disabled and not room.door_visual.visible and str(game.get("status_line")).contains("door is down"), "Continue restores the blown door and says so")
+	_expect(state.door_blown and room.visible and room.door_shape.disabled and not room.door_art.visible and room.door_blown_art.visible and str(game.get("status_line")).contains("door is down"), "Continue restores the blown door and says so")
 	_expect(room.breaker_label.text == "BREAKER SPENT" and room.valve_label.text == "VALVE SPENT", "Continue shows the same spent breaker and valve as the blast did")
 	# The spent line stays spent after Continue: the breaker will not arm, the valve takes no turns
 	# and a stray blast call does nothing.
