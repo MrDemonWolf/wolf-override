@@ -5,7 +5,8 @@ extends CharacterBody2D
 ## moves through move_and_slide like the actors. It runs on its lane's rail: no gravity, and it
 ## sits on no physics layer and scans none, so it never pushes or blocks anyone; contact is the
 ## brain's test. All of its drawing lives in the one Visual child: the painted machine (a wreck
-## once the tank lands on it) with its scanner beam and eye light drawn over the art in code.
+## once the tank lands on it) with its scanner beam, eye light and a soft lens glow drawn over the
+## art in code. The beam is drawn as far as the brain actually sees (see [method beam_tip_x]).
 
 ## Origin is the middle of its treads on the floor.
 const FLOOR_Y: float = 440.0
@@ -28,9 +29,15 @@ const LENS: Rect2 = Rect2(370.0, 166.0, 145.0, 28.0)
 const BODY_SIZE: Vector2 = Vector2(SentryBrain.HALF_WIDTH * 2.0, 30.0)
 ## How far the drawing reaches above the floor: the top of the scanner's fin.
 const DRAWN_HEIGHT: float = ACTIVE_REGION.size.y * ART_SCALE
-## How far the beam reaches ahead of the lens, and how wide it opens.
-const BEAM_LENGTH: float = 34.0
-const BEAM_SPREAD: float = 7.0
+## The beam opens to this half-height at its tip and fades from BEAM_ALPHA at the lens to
+## BEAM_TIP_ALPHA there, where a faint edge marks the end of its sight.
+const BEAM_SPREAD: float = 12.0
+const BEAM_ALPHA: float = 0.34
+const BEAM_TIP_ALPHA: float = 0.08
+const BEAM_EDGE_ALPHA: float = 0.24
+## The soft additive glow over the lens slit.
+const LENS_GLOW_SIZE: Vector2 = Vector2(30.0, 16.0)
+const LENS_GLOW_ALPHA: float = 0.7
 
 ## The x the brain wants; the mover closes on it at up to CHASE_SPEED.
 var target_x: float = SentryBrain.PATROL_MAX_X
@@ -40,8 +47,9 @@ var _down_tween: Tween
 
 
 ## The painted machine, drawn facing +x (the left-facing art is mirrored); the parent flips the
-## whole node to face the way the brain does. Over the scanner slit it draws the eye light and a
-## short beam in the brain's colour (off, amber patrol, red when locked on); the wreck has neither.
+## whole node to face the way the brain does. Over the scanner slit it draws the eye light, a soft
+## lens glow and the beam in the brain's colour (off, amber patrol, red when locked on), reaching
+## [member reach] px ahead of the machine's origin; the wreck has none of them.
 class SentryVisual:
 	extends Node2D
 	const EYE_OFF: Color = Color("#2b1d1d")
@@ -51,6 +59,7 @@ class SentryVisual:
 	var eye: Color = EYE_OFF:
 		set(value):
 			eye = value
+			_sync_glow()
 			queue_redraw()
 	var wrecked: bool = false:
 		set(value):
@@ -58,14 +67,42 @@ class SentryVisual:
 			if body != null:
 				body.visible = not wrecked
 				wreck.visible = wrecked
+			_sync_glow()
 			queue_redraw()
+	## How far ahead of the origin the beam ends, in px (set by the parent from beam_tip_x).
+	var reach: float = SentryBrain.SIGHT_RANGE:
+		set(value):
+			if not is_equal_approx(value, reach):
+				reach = value
+				queue_redraw()
+	## Main's effects switch: off, the lens glow (dressing) hides; the beam and eye stay.
+	var glow_allowed: bool = true:
+		set(value):
+			glow_allowed = value
+			_sync_glow()
 	var body: Sprite2D
 	var wreck: Sprite2D
+	var lens_glow: Sprite2D
 
 	func _init() -> void:
 		body = _art("Body", Sentry.ACTIVE_ART, Sentry.ACTIVE_REGION, Sentry.ACTIVE_TREAD_X)
 		wreck = _art("Wreck", Sentry.WRECK_ART, Sentry.WRECK_REGION, Sentry.WRECK_TREAD_X)
 		wreck.visible = false
+		var lens: Rect2 = Sentry.lens_rect()
+		lens_glow = RoomDepth.make_glow(EYE_PATROL, Sentry.LENS_GLOW_SIZE, Sentry.LENS_GLOW_ALPHA)
+		lens_glow.name = "LensGlow"
+		lens_glow.position = Vector2(lens.end.x - 2.0, lens.get_center().y)
+		add_child(lens_glow)
+		_sync_glow()
+
+	func is_lit() -> bool:
+		return not wrecked and eye != EYE_OFF
+
+	func _sync_glow() -> void:
+		if lens_glow == null:
+			return
+		lens_glow.visible = glow_allowed and is_lit()
+		lens_glow.modulate = Color(eye, Sentry.LENS_GLOW_ALPHA)
 
 	## A mirrored cut of [param texture] with its base on the floor and [param tread_x] at x 0. It
 	## draws behind this node's own lens drawing.
@@ -84,13 +121,26 @@ class SentryVisual:
 		return sprite
 
 	func _draw() -> void:
-		if wrecked or eye == EYE_OFF:
+		if not is_lit():
 			return
 		var lens: Rect2 = Sentry.lens_rect()
 		var front: Vector2 = Vector2(lens.end.x, lens.get_center().y)
-		var beam: PackedVector2Array = PackedVector2Array([front + Vector2(0.0, -lens.size.y * 0.5), front + Vector2(Sentry.BEAM_LENGTH, -Sentry.BEAM_SPREAD), front + Vector2(Sentry.BEAM_LENGTH, Sentry.BEAM_SPREAD), front + Vector2(0.0, lens.size.y * 0.5)])
-		draw_polygon(beam, PackedColorArray([Color(eye, 0.32), Color(eye, 0.0), Color(eye, 0.0), Color(eye, 0.32)]))
+		if reach > front.x:
+			var tip: float = reach
+			var half: float = lens.size.y * 0.5
+			var beam: PackedVector2Array = PackedVector2Array([front + Vector2(0.0, -half), Vector2(tip, front.y - Sentry.BEAM_SPREAD), Vector2(tip, front.y + Sentry.BEAM_SPREAD), front + Vector2(0.0, half)])
+			draw_polygon(beam, PackedColorArray([Color(eye, Sentry.BEAM_ALPHA), Color(eye, Sentry.BEAM_TIP_ALPHA), Color(eye, Sentry.BEAM_TIP_ALPHA), Color(eye, Sentry.BEAM_ALPHA)]))
+			# A brighter core along the middle, and a faint edge where its sight ends.
+			draw_line(front, Vector2(tip, front.y), Color(eye, Sentry.BEAM_TIP_ALPHA * 1.5), 1.0, true)
+			draw_line(Vector2(tip, front.y - Sentry.BEAM_SPREAD), Vector2(tip, front.y + Sentry.BEAM_SPREAD), Color(eye, Sentry.BEAM_EDGE_ALPHA), 1.0, true)
 		draw_rect(lens, Color(eye, 0.9))
+
+
+## Where the drawn beam ends for a sentry at [param x] facing [param facing]: SIGHT_RANGE ahead,
+## as far as SentryBrain sees, but never past the rubble line, where nobody can be seen.
+static func beam_tip_x(x: float, facing: float) -> float:
+	var tip: float = x + signf(facing) * SentryBrain.SIGHT_RANGE
+	return maxf(tip, SentryBrain.LANE_ENTRY_X) if facing < 0.0 else tip
 
 
 ## The scanner slit in the visual's space (facing +x), from the active art's LENS.
@@ -126,6 +176,7 @@ func _physics_process(delta: float) -> void:
 	velocity = Vector2(clampf(distance / delta, -SentryBrain.CHASE_SPEED, SentryBrain.CHASE_SPEED) if absf(distance) > 0.5 and delta > 0.0 else 0.0, 0.0)
 	move_and_slide()
 	position.y = FLOOR_Y
+	_sync_reach()
 
 
 ## Mirrors the brain: where it wants to be, which way it faces and what its eyes say.
@@ -133,6 +184,7 @@ func follow(brain: SentryBrain) -> void:
 	target_x = brain.x
 	if brain.state != &"down":
 		visual.scale.x = brain.facing
+		_sync_reach()
 	match brain.state:
 		&"patrol":
 			visual.eye = SentryVisual.EYE_PATROL
@@ -155,6 +207,13 @@ func place(brain: SentryBrain) -> void:
 	visual.wrecked = down
 	if down:
 		visual.eye = SentryVisual.EYE_OFF
+	_sync_reach()
+
+
+## The beam ends where beam_tip_x puts the brain's sight (target_x is the brain's x; the body can
+## trail it by a few pixels), drawn from where the body is and the way it faces.
+func _sync_reach() -> void:
+	visual.reach = absf(beam_tip_x(target_x, visual.scale.x) - position.x)
 
 
 ## The tank lands on it at [param at_x]: the machine is pinned there and crushed into its wreck,

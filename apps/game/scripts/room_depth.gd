@@ -11,6 +11,10 @@ extends Node2D
 ##   drawn over the actors and scrolling faster than the floor.
 ## Source pixels are never edited. Main switches the depth pass with [member effects_enabled]: off,
 ## every plate moves with the floor and the near pieces, glows, haze and dust are hidden.
+## The light moves only while the room is on screen: a hidden room (Main hides the rooms it is not
+## in) stops its dust and its lamp, shaft and beacon tweens, and starts them again when it shows.
+## Main settles the lockdown beacons from the save state once the room's route is cleared
+## ([method set_lockdown_cleared]).
 
 const ROOM_WIDTH: float = 960.0
 const FLOOR_Y: float = 440.0
@@ -36,6 +40,29 @@ const FAR_DUST_COUNT: int = 30
 const NEAR_DUST_COUNT: int = 12
 const GLOW_SIZE: Vector2 = Vector2(250.0, 96.0)
 const SHAFT_SIZE: Vector2 = Vector2(54.0, 240.0)
+const LAMP_ALPHA: float = 0.5
+## Each lamp waits a random FLICKER_WAIT_MIN..FLICKER_WAIT_MAX seconds between flickers, so the
+## lamps never fall into a shared rhythm.
+const FLICKER_WAIT_MIN: float = 4.0
+const FLICKER_WAIT_MAX: float = 15.0
+## How often a flicker is a double blink (never with Reduced Motion).
+const DOUBLE_BLINK_CHANCE: float = 0.3
+## The two blinks of a double start this far apart, so no lamp ever flashes faster than about
+## 2.8 times a second (under the 3 Hz flash guideline).
+const BLINK_SPACING: float = 0.36
+const BLINK_DOWN_SECONDS: float = 0.07
+const BLINK_UP_SECONDS: float = 0.17
+## Reduced Motion: one shallow, slower dip and no double blink.
+const GENTLE_DOWN_SECONDS: float = 0.18
+const GENTLE_UP_SECONDS: float = 0.35
+const BEACON_ALPHA: float = 0.4
+## One beacon pulse dims and recovers over twice this.
+const BEACON_PULSE_SECONDS: float = 1.3
+## A cleared room's beacons hold this steady, dim glow, their lenses darkened by SETTLED_LENS_DARKEN.
+const SETTLED_BEACON_ALPHA: float = 0.1
+const SETTLED_LENS_DARKEN: float = 0.6
+## How long the beacons take to settle when the route is cleared in play.
+const SETTLE_SECONDS: float = 1.2
 
 ## The far plate: back wall, painted lamps and wet floor (opaque).
 @export var painting: Texture2D
@@ -69,6 +96,11 @@ var effects_enabled: bool = true:
 		effects_enabled = value
 		if is_node_ready():
 			_apply()
+## Reduced Motion: the lamps flicker with one shallow, slower dip and never double blink. Read at
+## each flicker, so a change applies from the next one.
+var reduce_motion: bool = false
+## True once Main says the room's route is cleared; see [method set_lockdown_cleared].
+var lockdown_cleared: bool = false
 
 var backdrop_layer: Parallax2D
 var backdrop: Sprite2D
@@ -80,13 +112,24 @@ var haze: Sprite2D
 var far_dust: CPUParticles2D
 var near_dust: CPUParticles2D
 var _built: Array[Node] = []
+## The lamp flickers and shaft drifts, and separately the beacon pulses (or their settle).
 var _tweens: Array[Tween] = []
+var _beacon_tweens: Array[Tween] = []
+var _lamp_lights: Array[Sprite2D] = []
+var _shafts: Array[Sprite2D] = []
+var _warning_glows: Array[Sprite2D] = []
+## True while the lamps, shafts and beacons are animating (effects on and the room on screen).
+var _motion_running: bool = false
+var _rng: RandomNumberGenerator = RandomNumberGenerator.new()
 
 
 ## A lockdown beacon: a dark housing on a short bracket with a red lens.
 class Beacon:
 	extends Node2D
-	var lens: Color = Color("#ff4a46")
+	var lens: Color = Color("#ff4a46"):
+		set(value):
+			lens = value
+			queue_redraw()
 
 	func _draw() -> void:
 		draw_line(Vector2(0.0, -9.0), Vector2(0.0, -4.0), Color("#1b2630"), 2.0)
@@ -99,20 +142,28 @@ func _ready() -> void:
 	# The base fill drawn here must sit under the backdrop whatever the owning room's own z-index is.
 	z_as_relative = false
 	z_index = Z_BACKDROP
+	_rng.randomize()
 	rebuild()
+
+
+func _notification(what: int) -> void:
+	# Main shows only the room in play; the others stop moving until they show again.
+	if what == NOTIFICATION_VISIBILITY_CHANGED and is_node_ready():
+		_sync_motion()
 
 
 ## Rebuilds every layer from the current exports; call after swapping plates at runtime.
 func rebuild() -> void:
-	for tween: Tween in _tweens:
-		tween.kill()
-	_tweens.clear()
+	_stop_motion()
 	for node: Node in _built:
 		remove_child(node)
 		node.queue_free()
 	_built.clear()
 	lamp_glows.clear()
 	beacons.clear()
+	_lamp_lights.clear()
+	_shafts.clear()
+	_warning_glows.clear()
 	backdrop_layer = _add_parallax("Backdrop", BACKDROP_SCROLL, Z_BACKDROP)
 	backdrop = _plate("Painting", painting)
 	backdrop_layer.add_child(backdrop)
@@ -125,18 +176,18 @@ func rebuild() -> void:
 	var additive: CanvasItemMaterial = CanvasItemMaterial.new()
 	additive.blend_mode = CanvasItemMaterial.BLEND_MODE_ADD
 	for index: int in lamps.size():
-		var glow: Sprite2D = make_glow(lamp_color, GLOW_SIZE, 0.5, additive)
+		var glow: Sprite2D = make_glow(lamp_color, GLOW_SIZE, LAMP_ALPHA, additive)
 		glow.name = "LampGlow%d" % index
 		glow.z_index = 1
 		backdrop_layer.add_child(glow)
 		lamp_glows.append(glow)
-		_flicker(glow, 0.5, 0.9 + 0.7 * index)
+		_lamp_lights.append(glow)
 		if index in shaft_lamps:
 			var shaft: Sprite2D = _make_shaft(additive)
 			shaft.name = "LightShaft%d" % index
 			backdrop_layer.add_child(shaft)
 			lamp_glows.append(shaft)
-			_drift(shaft, 0.6 * index)
+			_shafts.append(shaft)
 	for index: int in warning_lamps.size():
 		var beacon: Beacon = Beacon.new()
 		beacon.name = "Beacon%d" % index
@@ -144,12 +195,13 @@ func rebuild() -> void:
 		beacon.z_index = 1
 		backdrop_layer.add_child(beacon)
 		beacons.append(beacon)
-		var glow: Sprite2D = make_glow(warning_color, Vector2(90.0, 90.0), 0.4, additive)
+		var glow: Sprite2D = make_glow(warning_color, Vector2(90.0, 90.0), BEACON_ALPHA, additive)
 		glow.name = "WarningGlow%d" % index
 		glow.z_index = 2
 		backdrop_layer.add_child(glow)
 		lamp_glows.append(glow)
-		_pulse(glow, 0.4, 0.5 * index)
+		_warning_glows.append(glow)
+	_settle_beacons(false)
 	mid_layer = Node2D.new()
 	mid_layer.name = "MidPlate"
 	mid_layer.z_as_relative = false
@@ -223,8 +275,92 @@ func _apply() -> void:
 		right_edge.position = Vector2(ROOM_WIDTH + near_overhang - right_edge.region_rect.size.x * scale_factor, mid_top)
 	for dust: CPUParticles2D in [far_dust, near_dust]:
 		dust.visible = on
-		dust.emitting = on
+	_sync_motion()
 	queue_redraw()
+
+
+## True while the room's light is animating: the effects are on and the room is on screen.
+func is_animating() -> bool:
+	return _motion_running
+
+
+## Starts the dust and the lamp, shaft and beacon tweens while the room is on screen with effects
+## on, and stops them otherwise. A hidden room's dust stops simulating at once and refills the room
+## (its preprocess) when it shows again.
+func _sync_motion() -> void:
+	var run: bool = effects_enabled and is_visible_in_tree()
+	for dust: CPUParticles2D in [far_dust, near_dust]:
+		if run:
+			dust.process_mode = Node.PROCESS_MODE_INHERIT
+			if not dust.emitting:
+				dust.restart()
+		else:
+			dust.emitting = false
+			dust.process_mode = Node.PROCESS_MODE_DISABLED
+	if run == _motion_running:
+		return
+	if run:
+		_motion_running = true
+		for glow: Sprite2D in _lamp_lights:
+			_flicker(glow)
+		for index: int in _shafts.size():
+			_drift(_shafts[index], 0.6 * index)
+		_settle_beacons(false)
+	else:
+		_stop_motion()
+
+
+## Kills every light tween and puts the lamps, shafts and beacons back at rest.
+func _stop_motion() -> void:
+	_motion_running = false
+	for tween: Tween in _tweens:
+		if tween.is_valid():
+			tween.kill()
+	for tween: Tween in _beacon_tweens:
+		if tween.is_valid():
+			tween.kill()
+	_tweens.clear()
+	_beacon_tweens.clear()
+	for glow: Sprite2D in _lamp_lights:
+		glow.modulate.a = LAMP_ALPHA
+	for shaft: Sprite2D in _shafts:
+		shaft.skew = 0.04
+		shaft.modulate.a = 1.0
+	_settle_beacons(false)
+
+
+## Main calls this from the save state: [param cleared] once the room's route is cleared (the
+## corridor's safe point reached, the first copy secured, the service line cleared). The beacons
+## stop pulsing and hold a steady dim glow; [param animate] fades them there instead of cutting.
+## Clearing it (a new game or an earlier save) brings the pulse back.
+func set_lockdown_cleared(cleared: bool, animate: bool = false) -> void:
+	if cleared == lockdown_cleared:
+		return
+	lockdown_cleared = cleared
+	_settle_beacons(animate)
+
+
+## Puts the beacons in the state [member lockdown_cleared] describes: pulsing (while the room is
+## animating) or settled.
+func _settle_beacons(animate: bool) -> void:
+	for tween: Tween in _beacon_tweens:
+		if tween.is_valid():
+			tween.kill()
+	_beacon_tweens.clear()
+	var lens: Color = warning_color.darkened(SETTLED_LENS_DARKEN) if lockdown_cleared else warning_color
+	var alpha: float = SETTLED_BEACON_ALPHA if lockdown_cleared else BEACON_ALPHA
+	if animate and lockdown_cleared and _motion_running:
+		var settle: Tween = create_tween().set_parallel(true)
+		_beacon_tweens.append(settle)
+		for index: int in beacons.size():
+			settle.tween_property(beacons[index], "lens", lens, SETTLE_SECONDS)
+			settle.tween_property(_warning_glows[index], "modulate:a", alpha, SETTLE_SECONDS).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
+		return
+	for index: int in beacons.size():
+		(beacons[index] as Beacon).lens = lens
+		_warning_glows[index].modulate.a = alpha
+		if not lockdown_cleared and _motion_running:
+			_pulse(_warning_glows[index], 0.5 * index)
 
 
 func _draw() -> void:
@@ -342,21 +478,45 @@ static func make_glow(color: Color, size: Vector2, alpha: float, material: Canva
 	return glow
 
 
-func _flicker(glow: Sprite2D, base: float, phase: float) -> void:
-	var tween: Tween = _loop()
-	tween.tween_interval(phase)
-	tween.tween_property(glow, "modulate:a", base * 0.7, 0.06)
-	tween.tween_property(glow, "modulate:a", base, 0.14)
-	tween.tween_interval(2.3 + phase * 0.6)
-	tween.tween_property(glow, "modulate:a", base * 0.86, 0.05)
-	tween.tween_property(glow, "modulate:a", base, 0.4)
+## One lamp's next flicker as (brightness factor, seconds) steps from rest: a random wait, a dip
+## and the recovery, sometimes a second dip BLINK_SPACING after the first. [param gentle] (Reduced
+## Motion) makes it one shallow, slower dip.
+static func flicker_steps(rng: RandomNumberGenerator, gentle: bool) -> Array[Vector2]:
+	var steps: Array[Vector2] = [Vector2(1.0, rng.randf_range(FLICKER_WAIT_MIN, FLICKER_WAIT_MAX))]
+	if gentle:
+		steps.append(Vector2(rng.randf_range(0.84, 0.9), GENTLE_DOWN_SECONDS))
+		steps.append(Vector2(1.0, GENTLE_UP_SECONDS))
+		return steps
+	steps.append(Vector2(rng.randf_range(0.6, 0.75), BLINK_DOWN_SECONDS))
+	steps.append(Vector2(1.0, BLINK_UP_SECONDS))
+	if rng.randf() < DOUBLE_BLINK_CHANCE:
+		steps.append(Vector2(1.0, BLINK_SPACING - BLINK_DOWN_SECONDS - BLINK_UP_SECONDS))
+		steps.append(Vector2(rng.randf_range(0.72, 0.85), BLINK_DOWN_SECONDS))
+		steps.append(Vector2(1.0, BLINK_UP_SECONDS + 0.2))
+	return steps
 
 
-func _pulse(glow: Sprite2D, base: float, phase: float) -> void:
-	var tween: Tween = _loop()
+## Plays one flicker on [param glow], then schedules the next with a fresh random wait.
+func _flicker(glow: Sprite2D) -> void:
+	# Drop the finished flickers so the list stays as long as the room has lights.
+	var live: Array[Tween] = []
+	for previous: Tween in _tweens:
+		if previous.is_valid():
+			live.append(previous)
+	_tweens = live
+	var tween: Tween = create_tween()
+	_tweens.append(tween)
+	for step: Vector2 in flicker_steps(_rng, reduce_motion):
+		tween.tween_property(glow, "modulate:a", LAMP_ALPHA * step.x, step.y)
+	tween.tween_callback(_flicker.bind(glow))
+
+
+func _pulse(glow: Sprite2D, phase: float) -> void:
+	var tween: Tween = create_tween().set_loops()
+	_beacon_tweens.append(tween)
 	tween.tween_interval(phase)
-	tween.tween_property(glow, "modulate:a", base * 0.55, 1.3).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
-	tween.tween_property(glow, "modulate:a", base, 1.3).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
+	tween.tween_property(glow, "modulate:a", BEACON_ALPHA * 0.55, BEACON_PULSE_SECONDS).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
+	tween.tween_property(glow, "modulate:a", BEACON_ALPHA, BEACON_PULSE_SECONDS).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
 
 
 func _drift(shaft: Sprite2D, phase: float) -> void:

@@ -237,6 +237,8 @@ func _ready() -> void:
 	junction_room.z_index = 1
 	junction_room.reduce_motion = impact.reduce_motion
 	add_child(junction_room)
+	for depth: RoomDepth in _room_depths():
+		depth.reduce_motion = impact.reduce_motion
 	junction_room.vent_hazard.contact.connect(func(source: Hazard) -> void: _fail_beat(source.reason))
 	junction_room.cloud_hazard.contact.connect(func(source: Hazard) -> void: _fail_beat(source.reason))
 	human.z_index = ACTOR_Z
@@ -346,6 +348,22 @@ func _apply_effects() -> void:
 	# The junction's door seam glow stays: it is the pressure readout, not dressing.
 	for glow: Sprite2D in [breaker_status_glow, relay_status_glow, records_room.purge_glow, records_room.mirror_glow, junction_room.breaker_glow]:
 		glow.visible = effects_enabled
+	junction_room.sentry.visual.glow_allowed = effects_enabled
+
+
+## Every room's layered set, corridor first.
+func _room_depths() -> Array[RoomDepth]:
+	return [corridor_depth, records_room.depth, junction_room.depth]
+
+
+## Each room's lockdown beacons settle once its route is cleared (the safe point reached, the first
+## copy secured, the service line cleared) and pulse again for a save from before that. Driven by
+## the state alone, so Continue and a knockdown show the same lights; [param animate] fades them
+## when the route is cleared in play.
+func _sync_room_lights(animate: bool = false) -> void:
+	corridor_depth.set_lockdown_cleared(state.checkpoint_reached, animate)
+	records_room.depth.set_lockdown_cleared(state.chapter_complete, animate)
+	junction_room.depth.set_lockdown_cleared(state.junction_cleared, animate)
 
 
 ## The impact kit and the generated sound bank. The bank is built after Settings so its players
@@ -362,10 +380,12 @@ func _setup_impact() -> void:
 	add_child(sfx_bank)
 
 
-## Reduced Motion reaches the impact kit and the junction's seam strobe.
+## Reduced Motion reaches the impact kit, the junction's seam strobe and the rooms' lamp flicker.
 func _on_reduced_motion_changed(on: bool) -> void:
 	impact.reduce_motion = on
 	junction_room.reduce_motion = on
+	for depth: RoomDepth in _room_depths():
+		depth.reduce_motion = on
 
 
 ## One-shot particle presets parked at the places that already answer the player: the relay
@@ -1163,6 +1183,7 @@ func _interact_checkpoint() -> void:
 		return
 	save_error = ""
 	if first_visit:
+		_sync_room_lights(true)
 		status_line = "Safe point saved. " + state.checkpoint_callback()
 	else:
 		status_line = "Safe point saved. WOLF remembers the same choice."
@@ -1194,6 +1215,7 @@ func _interact_records(x: float) -> void:
 			intro_camera.position_smoothing_enabled = false
 			_update_controls()
 			_sync_records_room(true)
+			_sync_room_lights(true)
 			# The exit arc: the bolt lets go with a crackle, a small kick and a spark shower.
 			sfx_bank.play(&"arc", -3.0)
 			impact.add_trauma(0.3)
@@ -1415,6 +1437,7 @@ func _leave_junction() -> void:
 		return
 	# Autosave D: the service line is clear.
 	_save_progress()
+	_sync_room_lights(true)
 	chapter_close_active = true
 	intro_camera.position_smoothing_enabled = false
 	_update_controls()
@@ -1831,6 +1854,7 @@ func _sync_scene() -> void:
 	_sync_door()
 	_sync_records_room()
 	_sync_junction_room()
+	_sync_room_lights()
 
 
 ## The junction shows only in its chapter; its line, bursts and hazards go back to rest and its
