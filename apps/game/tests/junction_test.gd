@@ -235,7 +235,7 @@ func _check_scene() -> void:
 		return
 	for _frame: int in 12:
 		await physics_frame
-	_expect(line.turns == 1 and room.turns == 1 and line.progress == 0.0, "releasing keeps the turn and the room shows it")
+	_expect(line.turns == 1 and room.turns == 1 and line.progress == 0.0 and room.valve_label.text == "VALVE  1 / %d" % PressureLine.TURNS_NEEDED, "releasing keeps the turn and the room and its VALVE label show it")
 	Input.action_press(&"interact")
 	var charged: bool = await _wait_until(func() -> bool: return line.turns >= 3, 90)
 	Input.action_release(&"interact")

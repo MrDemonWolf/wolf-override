@@ -1562,8 +1562,10 @@ func _choose_lane(response: int) -> void:
 
 ## BOOM 2: the tank comes down on the sentry. Autosave C.
 func _tank_hit() -> void:
-	var at_x: float = sentry_brain.x
+	# The tank pins the machine on the mark, where Continue from autosave C also puts it.
+	var at_x: float = DropArm.MARK_X
 	sentry_brain.knock_down()
+	sentry_brain.x = at_x
 	if not state.drop_sentry():
 		return
 	wolf_baiting = false
@@ -1580,7 +1582,7 @@ func _tank_hit() -> void:
 	impact.burst(junction_room.hit_sparks)
 	_fade_servo()
 	_update_controls()
-	status_line = "The tank comes down square. The sentry keels over and its eyes go dark.\nWOLF: It's down. The bolt by the hatch is next."
+	status_line = "The tank comes down square and crushes the sentry flat. Its eyes go dark.\nWOLF: It's down. The bolt by the hatch is next."
 	# Autosave C: the sentry is down.
 	_save_progress()
 

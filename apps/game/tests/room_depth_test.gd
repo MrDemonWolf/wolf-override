@@ -104,13 +104,17 @@ func _check_plates(room_name: String, depth: RoomDepth) -> void:
 		_expect(lamp_y >= 168.0, "%s: ceiling lamp %d (y %.0f) is inside the play view" % [room_name, index, lamp_y])
 
 
-## The far plate fills the view and the near strips' outer edges stay outside it.
+## The far plate fills the view, the mid plate (with its bleeds) reaches both sides and the bottom
+## of it, and the near strips' outer edges stay outside it. The bottom matters where the floor is
+## painted on the mid plate (the junction): past its end the far plate's wall would show instead.
 func _check_coverage(label: String, depth: RoomDepth, view: Rect2) -> void:
 	var far: Rect2 = _global_rect(depth.backdrop)
 	_expect(far.encloses(view), "%s: the far plate fills the view (%s vs %s)" % [label, far, view])
 	var mid_span: Rect2 = _global_rect(depth.mid_layer.get_node("Painting") as Sprite2D)
 	mid_span = mid_span.merge(_global_rect(depth.mid_layer.get_node("LeftBleed") as Sprite2D)).merge(_global_rect(depth.mid_layer.get_node("RightBleed") as Sprite2D))
 	_expect(mid_span.position.x <= view.position.x and mid_span.end.x >= view.end.x, "%s: the mid plate reaches both view edges" % label)
+	var bottom: Rect2 = _global_rect(depth.mid_layer.get_node("BottomBleed") as Sprite2D)
+	_expect(bottom.position.x <= view.position.x and bottom.end.x >= view.end.x and bottom.end.y >= view.end.y and is_equal_approx(bottom.position.y, mid_span.end.y), "%s: the mid plate's bottom bleed spans the view's width and reaches its bottom (%s vs %s)" % [label, bottom, view])
 	var left: Rect2 = _global_rect(depth.near_layer.get_node("LeftEdge") as Sprite2D)
 	var right: Rect2 = _global_rect(depth.near_layer.get_node("RightEdge") as Sprite2D)
 	_expect(left.position.x < view.position.x and right.end.x > view.end.x, "%s: the near strips' outer edges are off screen" % label)

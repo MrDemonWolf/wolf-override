@@ -19,6 +19,10 @@ const ART_SCALE: float = 0.07
 ## The source column under the middle of each machine's treads (the node's origin).
 const ACTIVE_TREAD_X: float = 516.0
 const WRECK_TREAD_X: float = 545.0
+## The source row of the crushed hull's top either side of the bent mast on the wreck art. A tank
+## that lands on the sentry rests this high, so the wreck's treads and hull show under it.
+const WRECK_HULL_TOP: float = 340.0
+const WRECK_CRUSH_HEIGHT: float = (WRECK_REGION.end.y - WRECK_HULL_TOP) * ART_SCALE
 ## The scanner slit on the active art (source pixels): the beam and eye light are drawn over it.
 const LENS: Rect2 = Rect2(370.0, 166.0, 145.0, 28.0)
 const BODY_SIZE: Vector2 = Vector2(SentryBrain.HALF_WIDTH * 2.0, 30.0)
@@ -153,10 +157,13 @@ func place(brain: SentryBrain) -> void:
 		visual.eye = SentryVisual.EYE_OFF
 
 
-## The tank lands: the machine is crushed into its wreck, which drops the last few pixels onto its
-## treads, and its eye dies.
-func keel_over() -> void:
+## The tank lands on it at [param at_x]: the machine is pinned there and crushed into its wreck,
+## which drops the last few pixels onto its treads, and its eye dies.
+func keel_over(at_x: float) -> void:
 	_kill_tween()
+	target_x = at_x
+	position.x = at_x
+	velocity = Vector2.ZERO
 	visual.eye = SentryVisual.EYE_OFF
 	visual.wrecked = true
 	visual.position = Vector2(0.0, -6.0)

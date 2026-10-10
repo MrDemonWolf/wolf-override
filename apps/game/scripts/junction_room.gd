@@ -120,6 +120,8 @@ const COOLANT: Color = Color("#7fe8ff")
 const SEAM_RED: Color = Color("#ff6a55")
 ## The VALVE label sits this far left of the wheel so SEAL CHARGED ends before the door art.
 const VALVE_LABEL_SHIFT: float = 22.0
+## The door's label sits between the mid plate's gauge box and the wheel painted over the door frame.
+const DOOR_LABEL_Y: float = 271.0
 ## The relief vent's drop runs down the wall to a nozzle over its grate, ending above the caption.
 const VENT_NOZZLE_Y: float = 397.0
 ## The breaker riser stops short of its station label and resumes under it, so it reads as passing
@@ -307,7 +309,7 @@ func _ready() -> void:
 	breaker_label = _add_station_label("OVERLOAD BREAKER", BREAKER_X, Color("#b0d1de"))
 	# Centred a little left of the wheel so its longest text (SEAL CHARGED) ends before the door art.
 	valve_label = _add_station_label("VALVE", VALVE_X - VALVE_LABEL_SHIFT, Color("#b0d1de"))
-	door_label = _add_station_label("SEALED DOOR", DOOR_X, Color("#ffc7c7"), 276.0)
+	door_label = _add_station_label("SEALED DOOR", DOOR_X, Color("#ffc7c7"), DOOR_LABEL_Y)
 	arm_label = _add_station_label("ARM PANEL", ARM_X, Color("#b0d1de"))
 	# Centred between the bolt panel and the hatch so both read as one exit.
 	hatch_label = _add_station_label("EXIT BOLTED", (BOLT_PANEL_X + HATCH_X) * 0.5, Color("#8fa6b2"), 276.0)
@@ -512,7 +514,8 @@ func sync_line(line: PressureLine) -> void:
 	turns = line.turns
 	if turns != previous_turns:
 		_turn_wheel(turns)
-	if line_state != previous_state:
+	# The VALVE label counts the turns, so a crank refreshes it as well as a phase change.
+	if line_state != previous_state or turns != previous_turns:
 		refresh_state()
 	var building: bool = line_state == &"building"
 	vent_steam.emitting = building and visible
@@ -529,7 +532,9 @@ func sync_arm(arm: DropArm) -> void:
 	var previous_state: StringName = arm_state
 	arm_state = arm.state
 	tank_drop = arm.drop_amount()
-	tank.position.y = lerpf(TANK_REST_Y, FLOOR_Y - TANK_SIZE.y * 0.5, tank_drop)
+	# A tank coming down on the sentry stops on its crushed hull, so the wreck shows under it.
+	var on_sentry: bool = arm.state == &"landed" or (arm.state == &"falling" and DropArm.is_hit(sentry.target_x))
+	tank.position.y = lerpf(TANK_REST_Y, landed_tank_y(on_sentry), tank_drop)
 	var cloud: bool = arm.cloud_active() and visible
 	coolant_cloud.emitting = cloud
 	if cloud_hazard.armed != cloud:
@@ -549,13 +554,18 @@ func sync_bolt(state: StringName, charge: float) -> void:
 	queue_redraw()
 
 
+## Where the tank's centre comes to rest: on the floor, or on top of the crushed sentry.
+static func landed_tank_y(on_sentry: bool) -> float:
+	return FLOOR_Y - TANK_SIZE.y * 0.5 - (Sentry.WRECK_CRUSH_HEIGHT if on_sentry else 0.0)
+
+
 ## The tank came down on the sentry at [param at_x]: the coolant and spark bursts (fired through the
-## impact kit) are moved there and the sentry keels over.
+## impact kit) are moved there and the sentry is crushed into its wreck under the tank.
 func tank_hit(at_x: float) -> void:
 	sentry_down = true
 	coolant_burst.position.x = at_x
 	hit_sparks.position.x = at_x
-	sentry.keel_over()
+	sentry.keel_over(at_x)
 	refresh_state()
 
 
@@ -711,7 +721,7 @@ func reset_transient() -> void:
 	tank.dented = false
 	arm_state = &"landed" if sentry_down else &"hung"
 	tank_drop = 1.0 if sentry_down else 0.0
-	tank.position.y = lerpf(TANK_REST_Y, FLOOR_Y - TANK_SIZE.y * 0.5, tank_drop)
+	tank.position.y = lerpf(TANK_REST_Y, landed_tank_y(sentry_down), tank_drop)
 	bolt_state = &"open" if junction_cleared else &"locked"
 	bolt_charge = 0.0
 	hatch_open = 1.0 if junction_cleared else 0.0

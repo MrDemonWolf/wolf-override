@@ -27,8 +27,10 @@ const Z_NEAR: int = 3
 ## (1 - scroll), which at 1.15 is up to 19 px at play (zoom 1.35), 32 px in the opening (zoom 1.8)
 ## and 26 px at the chapter-close shot (zoom 1.55), plus up to 10 px of camera shake.
 const NEAR_OVERHANG: float = 56.0
-## Mirrored slivers of the mid plate past each room edge, so camera shake at the end of the
-## camera's travel shows a continuation of the plate instead of its cut edge.
+## Mirrored slivers of the mid plate past each room edge and below its bottom, so camera shake at
+## the end of the camera's travel (or under the touch framing, whose view ends at the plate's
+## bottom) shows a continuation of the plate instead of its cut edge. The bottom one matters where
+## the floor is painted on the mid plate (the junction); elsewhere that strip is transparent.
 const MID_BLEED: float = 16.0
 const FAR_DUST_COUNT: int = 30
 const NEAR_DUST_COUNT: int = 12
@@ -160,6 +162,11 @@ func rebuild() -> void:
 		var width: float = float(mid_painting.get_width())
 		mid_layer.add_child(_plate("LeftBleed", mid_painting, Rect2(0.0, 0.0, bleed_source, mid_painting.get_height()), true))
 		mid_layer.add_child(_plate("RightBleed", mid_painting, Rect2(width - bleed_source, 0.0, bleed_source, mid_painting.get_height()), true))
+		# The bottom rows flipped down, running past both sides (mirror repeat) to fill the corners.
+		var bottom_bleed: Sprite2D = _plate("BottomBleed", mid_painting, Rect2(-bleed_source, mid_painting.get_height() - bleed_source, width + bleed_source * 2.0, bleed_source))
+		bottom_bleed.flip_v = true
+		bottom_bleed.texture_repeat = CanvasItem.TEXTURE_REPEAT_MIRROR
+		mid_layer.add_child(bottom_bleed)
 	far_dust = _make_dust("FarDust", FAR_DUST_COUNT, 0.18, 0.4, Z_ATMOSPHERE)
 	near_layer = _add_parallax("Near", NEAR_SCROLL, Z_NEAR)
 	if near_painting != null:
@@ -203,6 +210,9 @@ func _apply() -> void:
 		left_bleed.position = Vector2(-MID_BLEED, mid_top)
 		right_bleed.scale = Vector2.ONE * scale_factor
 		right_bleed.position = Vector2(ROOM_WIDTH, mid_top)
+		var bottom_bleed: Sprite2D = mid_layer.get_node("BottomBleed") as Sprite2D
+		bottom_bleed.scale = Vector2.ONE * scale_factor
+		bottom_bleed.position = Vector2(-MID_BLEED, mid_top + mid.texture.get_height() * scale_factor)
 	near_layer.visible = on
 	var left_edge: Sprite2D = near_layer.get_node_or_null("LeftEdge") as Sprite2D
 	if left_edge != null:

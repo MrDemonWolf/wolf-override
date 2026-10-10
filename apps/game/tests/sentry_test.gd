@@ -241,12 +241,15 @@ func _check_scene() -> void:
 	_expect(arm.state == &"falling", "USE at the panel lets the tank go")
 	_expect(await _wait_until(func() -> bool: return (game.get("state") as M0State).sentry_down, 60), "the tank lands on the parked sentry")
 	_expect(brain.state == &"down" and room.sentry_down and room.arm_label.text == "TANK DOWN" and room.coolant_burst.emitting and room.hit_sparks.emitting, "the hit is a real state change with coolant and sparks")
+	await physics_frame
+	_check_crushed(room, brain, "the hit")
 	_expect(game.call("_objective") == "POP THE EXIT BOLT" and not game.get("wolf_baiting") and wolf.follow_target == human, "the bolt is next and WOLF follows again")
 	var autosave_c: M0State = State.load_from_disk(path)
 	_expect(autosave_c != null and autosave_c.sentry_down and autosave_c.door_blown and autosave_c.memory.get("choice_id") == State.DISCLOSE, "autosave C records the sentry down with the relay memory")
 	_expect(await _wait_until(func() -> bool: return Engine.time_scale == 1.0 and camera.offset == Vector2.ZERO, 90), "time scale and camera settle after BOOM 2")
 	game.call("_load_game")
 	_expect(brain.state == &"down" and brain.x == DropArm.MARK_X and arm.state == &"landed" and room.sentry.visual.wrecked and room.tank.position.y > JunctionRoom.TANK_REST_Y and str(game.get("status_line")).contains("sentry is down"), "Continue from autosave C shows the sentry down under the tank")
+	_check_crushed(room, brain, "Continue from autosave C")
 	_expect(await _walk_to(human, JunctionRoom.BOLT_X), "the engineer reaches the exit bolt")
 	_expect(str(game.call("_context_hint")).contains("pop the exit bolt"), "the bolt panel offers USE")
 	await _tap(&"interact")
@@ -352,6 +355,7 @@ func _check_engineer_alone(game: Node2D, path: String) -> void:
 	await _tap(&"interact")
 	_expect(await _wait_until(func() -> bool: return arm.state == &"rewinding", 60), "the drop misses")
 	_expect(arm.cloud_active() and room.coolant_cloud.emitting and room.tank.dented and brain.state == &"chase" and room.arm_label.text == "ARM REWINDING", "a miss dents the tank, vents the cloud and turns the sentry on the panel")
+	_expect(arm.drop_amount() > 0.99 and room.tank.position.y + JunctionRoom.TANK_SIZE.y * 0.5 > Sentry.FLOOR_Y - 1.0, "a missed tank comes down to the floor, not to the sentry's height")
 	await physics_frame
 	_expect(room.cloud_hazard.armed, "the cloud's hurtbox is live while it vents")
 	await _tap(&"interact")
@@ -367,8 +371,24 @@ func _check_engineer_alone(game: Node2D, path: String) -> void:
 	_expect(await _wait_until(func() -> bool: return brain.facing < 0.0 and brain.x <= DropArm.MARK_X + lead + 8.0 and brain.x >= DropArm.MARK_X + lead - 8.0, 400), "the sentry comes toward the mark")
 	await _tap(&"interact")
 	_expect(await _wait_until(func() -> bool: return (game.get("state") as M0State).sentry_down, 60), "a drop timed on the patrol lands on it")
+	await physics_frame
+	_check_crushed(room, brain, "the timed hit")
 	var autosave_c: M0State = State.load_from_disk(path)
 	_expect(autosave_c != null and autosave_c.sentry_down and autosave_c.memory.get("choice_id") == State.PRESS, "the engineer-only route writes autosave C too")
+
+
+## The landed tank rests on the crushed hull of a wreck pinned under the mark, so the wreck's treads
+## and hull show below it and past both of its sides.
+func _check_crushed(room: JunctionRoom, brain: SentryBrain, label: String) -> void:
+	var tank_base: float = room.tank.position.y + JunctionRoom.TANK_SIZE.y * 0.5
+	var wreck: Sprite2D = room.sentry.visual.wreck
+	# Measured where the wreck settles: keel_over drops it the last few pixels onto its treads.
+	var wreck_rect: Rect2 = wreck.get_global_transform() * wreck.get_rect()
+	wreck_rect.position.y -= room.sentry.visual.position.y
+	_expect(is_equal_approx(brain.x, DropArm.MARK_X) and absf(room.sentry.position.x - DropArm.MARK_X) < 0.01, "%s: the wreck is pinned on the mark under the tank" % label)
+	_expect(is_equal_approx(room.tank.position.y, JunctionRoom.landed_tank_y(true)) and absf(tank_base - (Sentry.FLOOR_Y - Sentry.WRECK_CRUSH_HEIGHT)) < 0.01, "%s: the tank rests on the crushed hull (base y %.1f), not on the floor" % [label, tank_base])
+	_expect(Sentry.WRECK_CRUSH_HEIGHT >= 20.0 and is_equal_approx(wreck_rect.end.y, Sentry.FLOOR_Y) and wreck_rect.end.y - tank_base >= 20.0, "%s: at least 20 px of the wreck shows under the tank, down to the floor" % label)
+	_expect(wreck_rect.position.x < DropArm.MARK_X - JunctionRoom.TANK_SIZE.x * 0.5 and wreck_rect.end.x > DropArm.MARK_X + JunctionRoom.TANK_SIZE.x * 0.5, "%s: the wreck shows past both sides of the tank" % label)
 
 
 ## The coolant cloud is its own knockdown back to autosave B.
