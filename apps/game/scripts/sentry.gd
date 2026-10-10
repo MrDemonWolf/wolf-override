@@ -6,7 +6,8 @@ extends CharacterBody2D
 ## sits on no physics layer and scans none, so it never pushes or blocks anyone; contact is the
 ## brain's test. All of its drawing lives in the one Visual child: the painted machine (a wreck
 ## once the tank lands on it) with its scanner beam, eye light and a soft lens glow drawn over the
-## art in code. The beam is drawn as far as the brain actually sees (see [method beam_tip_x]).
+## art in code. The beam is drawn as far as the brain actually sees (see [method beam_tip_x]), with
+## a break over the ARM PANEL alcove, where it cannot see anyone (see [method beam_gap]).
 
 ## Origin is the middle of its treads on the floor.
 const FLOOR_Y: float = 440.0
@@ -75,6 +76,14 @@ class SentryVisual:
 			if not is_equal_approx(value, reach):
 				reach = value
 				queue_redraw()
+	## The stretch ahead of the origin (near, far, in px) where the beam is not drawn because the
+	## alcove hides anyone there; an empty span (far <= near) when the beam does not cross it (set by
+	## the parent from beam_gap).
+	var gap: Vector2 = Vector2.ZERO:
+		set(value):
+			if not value.is_equal_approx(gap):
+				gap = value
+				queue_redraw()
 	## Main's effects switch: off, the lens glow (dressing) hides; the beam and eye stay.
 	var glow_allowed: bool = true:
 		set(value):
@@ -124,23 +133,62 @@ class SentryVisual:
 		if not is_lit():
 			return
 		var lens: Rect2 = Sentry.lens_rect()
-		var front: Vector2 = Vector2(lens.end.x, lens.get_center().y)
-		if reach > front.x:
-			var tip: float = reach
-			var half: float = lens.size.y * 0.5
-			var beam: PackedVector2Array = PackedVector2Array([front + Vector2(0.0, -half), Vector2(tip, front.y - Sentry.BEAM_SPREAD), Vector2(tip, front.y + Sentry.BEAM_SPREAD), front + Vector2(0.0, half)])
-			draw_polygon(beam, PackedColorArray([Color(eye, Sentry.BEAM_ALPHA), Color(eye, Sentry.BEAM_TIP_ALPHA), Color(eye, Sentry.BEAM_TIP_ALPHA), Color(eye, Sentry.BEAM_ALPHA)]))
-			# A brighter core along the middle, and a faint edge where its sight ends.
-			draw_line(front, Vector2(tip, front.y), Color(eye, Sentry.BEAM_TIP_ALPHA * 1.5), 1.0, true)
-			draw_line(Vector2(tip, front.y - Sentry.BEAM_SPREAD), Vector2(tip, front.y + Sentry.BEAM_SPREAD), Color(eye, Sentry.BEAM_EDGE_ALPHA), 1.0, true)
+		var front: float = lens.end.x
+		if reach > front:
+			var gapped: bool = gap.y > gap.x and gap.x < reach and gap.y > front
+			if gapped:
+				_draw_beam(front, clampf(gap.x, front, reach), lens)
+				_draw_beam(clampf(gap.y, front, reach), reach, lens)
+				# A faint edge where the alcove cuts its sight off.
+				if gap.x > front:
+					_draw_edge(gap.x, lens)
+			else:
+				_draw_beam(front, reach, lens)
+			# The faint edge at the end of its sight, unless that end is inside the alcove's gap.
+			if not gapped or reach > gap.y:
+				_draw_edge(reach, lens)
 		draw_rect(lens, Color(eye, 0.9))
+
+	## The part of the beam from [param from] to [param to] px ahead of the origin, cut from the one
+	## cone that opens from the lens slit to BEAM_SPREAD at [member reach] and fades as it goes.
+	func _draw_beam(from: float, to: float, lens: Rect2) -> void:
+		if to - from < 0.5:
+			return
+		var y: float = lens.get_center().y
+		var near: Vector2 = _beam_section(from, lens)
+		var far: Vector2 = _beam_section(to, lens)
+		var beam: PackedVector2Array = PackedVector2Array([Vector2(from, y - near.x), Vector2(to, y - far.x), Vector2(to, y + far.x), Vector2(from, y + near.x)])
+		draw_polygon(beam, PackedColorArray([Color(eye, near.y), Color(eye, far.y), Color(eye, far.y), Color(eye, near.y)]))
+		# A brighter core along the middle.
+		draw_line(Vector2(from, y), Vector2(to, y), Color(eye, Sentry.BEAM_TIP_ALPHA * 1.5), 1.0, true)
+
+	## The cone's half-height (x) and opacity (y) at [param at] px ahead of the origin.
+	func _beam_section(at: float, lens: Rect2) -> Vector2:
+		var t: float = clampf(inverse_lerp(lens.end.x, reach, at), 0.0, 1.0) if reach > lens.end.x else 1.0
+		return Vector2(lerpf(lens.size.y * 0.5, Sentry.BEAM_SPREAD, t), lerpf(Sentry.BEAM_ALPHA, Sentry.BEAM_TIP_ALPHA, t))
+
+	func _draw_edge(at: float, lens: Rect2) -> void:
+		var y: float = lens.get_center().y
+		var half: float = _beam_section(at, lens).x
+		draw_line(Vector2(at, y - half), Vector2(at, y + half), Color(eye, Sentry.BEAM_EDGE_ALPHA), 1.0, true)
 
 
 ## Where the drawn beam ends for a sentry at [param x] facing [param facing]: SIGHT_RANGE ahead,
-## as far as SentryBrain sees, but never past the rubble line, where nobody can be seen.
+## as far as SentryBrain sees, but never past the rubble line, where nobody can be seen, nor past
+## the furthest right the engineer can stand (M0Actor.MAX_X), so it stays inside the room.
 static func beam_tip_x(x: float, facing: float) -> float:
 	var tip: float = x + signf(facing) * SentryBrain.SIGHT_RANGE
-	return maxf(tip, SentryBrain.LANE_ENTRY_X) if facing < 0.0 else tip
+	return maxf(tip, SentryBrain.LANE_ENTRY_X) if facing < 0.0 else minf(tip, M0Actor.MAX_X)
+
+
+## The world-x span (from, to) of the ARM PANEL alcove that the beam of a sentry at [param x] facing
+## [param facing] would cross. SentryBrain.is_exposed hides an engineer centred anywhere in it, so the
+## beam is not drawn there. Vector2.ZERO when the beam does not reach the alcove.
+static func beam_gap(x: float, facing: float) -> Vector2:
+	var tip: float = beam_tip_x(x, facing)
+	var from: float = maxf(SentryBrain.COVER_MIN_X, minf(x, tip))
+	var to: float = minf(SentryBrain.COVER_MAX_X, maxf(x, tip))
+	return Vector2(from, to) if to > from else Vector2.ZERO
 
 
 ## The scanner slit in the visual's space (facing +x), from the active art's LENS.
@@ -210,10 +258,18 @@ func place(brain: SentryBrain) -> void:
 	_sync_reach()
 
 
-## The beam ends where beam_tip_x puts the brain's sight (target_x is the brain's x; the body can
-## trail it by a few pixels), drawn from where the body is and the way it faces.
+## The beam ends where beam_tip_x puts the brain's sight and breaks where beam_gap says (target_x is
+## the brain's x; the body can trail it by a few pixels), drawn from where the body is and the way it
+## faces.
 func _sync_reach() -> void:
-	visual.reach = absf(beam_tip_x(target_x, visual.scale.x) - position.x)
+	var facing: float = visual.scale.x
+	visual.reach = absf(beam_tip_x(target_x, facing) - position.x)
+	var span: Vector2 = beam_gap(target_x, facing)
+	if span.y > span.x:
+		var ends: Vector2 = Vector2((span.x - position.x) * facing, (span.y - position.x) * facing)
+		visual.gap = Vector2(minf(ends.x, ends.y), maxf(ends.x, ends.y))
+	else:
+		visual.gap = Vector2.ZERO
 
 
 ## The tank lands on it at [param at_x]: the machine is pinned there and crushed into its wreck,

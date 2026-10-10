@@ -2,7 +2,7 @@ extends SceneTree
 ## The rooms' light: the lamp flicker's random rhythm (never faster than 3 blinks a second, gentler
 ## with Reduced Motion), lockdown beacons that settle once a room's route is cleared and come back
 ## the same way on Continue, hidden rooms that stop their dust and light tweens, and a sentry beam
-## drawn as far as the sentry actually sees.
+## drawn as far as the sentry actually sees, broken over the alcove where it cannot.
 
 const GAME_SCENE: PackedScene = preload("res://scenes/main.tscn")
 const State = preload("res://scripts/m0_state.gd")
@@ -67,7 +67,8 @@ func _check_flicker_plan() -> void:
 	_expect(gentle_doubles == 0 and shallowest <= 0.16, "Reduced Motion never double blinks and dims the lamp by at most 16%% (%.2f)" % shallowest)
 
 
-## The beam ends where the brain's sight does: SIGHT_RANGE ahead, cut at the rubble line.
+## The beam ends where the brain's sight does: SIGHT_RANGE ahead, cut at the rubble line and at the
+## furthest right the engineer can stand, and broken over the alcove, where nobody can be seen.
 func _check_beam_rule() -> void:
 	var far_end: float = Sentry.beam_tip_x(SentryBrain.PATROL_MAX_X, -1.0)
 	_expect(is_equal_approx(far_end, SentryBrain.PATROL_MAX_X - SentryBrain.SIGHT_RANGE), "from the far end the beam reaches the full 180 px of sight")
@@ -76,6 +77,30 @@ func _check_beam_rule() -> void:
 	_expect(is_equal_approx(Sentry.beam_tip_x(700.0, 1.0), 880.0), "facing right it reaches 180 px the other way")
 	_expect(is_equal_approx(Sentry.beam_tip_x(SentryBrain.PATROL_MIN_X, -1.0), SentryBrain.LANE_ENTRY_X), "the beam stops at the rubble line, where nobody can be seen")
 	_expect(not SentryBrain.is_exposed(SentryBrain.LANE_ENTRY_X) and SentryBrain.is_exposed(SentryBrain.LANE_ENTRY_X + 1.0), "the rubble line is the edge of what it can see")
+	_expect(is_equal_approx(Sentry.beam_tip_x(SentryBrain.PATROL_MAX_X, 1.0), M0Actor.MAX_X), "facing right from the far end the beam stops where the engineer can stand furthest, inside the room")
+	# Just short of the end, so the tick does not bounce it round first.
+	_expect(_patrolling_at(SentryBrain.PATROL_MAX_X - 1.0, 1.0).tick(0.0001, M0Actor.MAX_X, true, -1.0) == &"chase", "an engineer at that right-hand tip is seen")
+	# Every x the patrol and chase can put it at, both ways: the beam never covers the alcove, and
+	# every lane x between the alcove and the rubble that it sees is still under the beam.
+	var gaps_ok: bool = true
+	var x: float = SentryBrain.CHASE_MIN_X
+	while x <= SentryBrain.PATROL_MAX_X:
+		for facing: float in [-1.0, 1.0]:
+			var tip: float = Sentry.beam_tip_x(x, facing)
+			var gap: Vector2 = Sentry.beam_gap(x, facing)
+			var crosses: bool = facing < 0.0 and tip < SentryBrain.COVER_MAX_X
+			if crosses != (gap.y > gap.x):
+				gaps_ok = false
+			elif crosses and (not is_equal_approx(gap.x, maxf(tip, SentryBrain.COVER_MIN_X)) or not is_equal_approx(gap.y, SentryBrain.COVER_MAX_X)):
+				gaps_ok = false
+		x += 4.0
+	_expect(gaps_ok, "the beam breaks over exactly the part of the alcove it would cross, and nowhere else")
+	var at_turn: Vector2 = Sentry.beam_gap(SentryBrain.PATROL_MIN_X, -1.0)
+	_expect(at_turn.is_equal_approx(Vector2(SentryBrain.COVER_MIN_X, SentryBrain.COVER_MAX_X)), "at the patrol's turn the whole alcove is out of the beam")
+	_expect(not SentryBrain.is_exposed(at_turn.x) and not SentryBrain.is_exposed(at_turn.y) and not SentryBrain.is_exposed((at_turn.x + at_turn.y) * 0.5), "the gap is where an engineer is hidden")
+	var strip: float = (SentryBrain.LANE_ENTRY_X + SentryBrain.COVER_MIN_X) * 0.5
+	_expect(_patrolling_at(SentryBrain.PATROL_MIN_X + 1.0, -1.0).tick(0.0001, strip, SentryBrain.is_exposed(strip), -1.0) == &"chase" and strip >= Sentry.beam_tip_x(SentryBrain.PATROL_MIN_X + 1.0, -1.0) and strip < Sentry.beam_gap(SentryBrain.PATROL_MIN_X + 1.0, -1.0).x, "between the alcove and the rubble it still sees you, and the beam is drawn there")
+	_expect(Sentry.beam_gap(SentryBrain.PATROL_MAX_X, -1.0) == Vector2.ZERO, "from the far end the beam stops short of the alcove, with no break")
 
 
 func _check_scene() -> void:
@@ -206,6 +231,18 @@ func _check_sentry_beam(game: Node2D) -> void:
 	var tip: float = Sentry.beam_tip_x(brain.x, sentry.visual.scale.x)
 	_expect(brain.state == &"patrol" and sentry.visual.is_lit() and sentry.visual.lens_glow.visible, "the patrolling sentry's lens is lit with a soft glow")
 	_expect(is_equal_approx(sentry.visual.reach, absf(tip - sentry.position.x)) and sentry.visual.reach > 100.0, "the drawn beam reaches the sentry's sight (%.0f px)" % sentry.visual.reach)
+	var span: Vector2 = Sentry.beam_gap(brain.x, sentry.visual.scale.x)
+	var expected_gap: Vector2 = Vector2.ZERO
+	if span.y > span.x:
+		var ends: Vector2 = (Vector2(span.x, span.y) - Vector2.ONE * sentry.position.x) * sentry.visual.scale.x
+		expected_gap = Vector2(minf(ends.x, ends.y), maxf(ends.x, ends.y))
+	_expect(sentry.visual.gap.is_equal_approx(expected_gap), "the drawn beam breaks where beam_gap says (%s)" % sentry.visual.gap)
+	sentry.target_x = SentryBrain.PATROL_MIN_X
+	sentry.position.x = SentryBrain.PATROL_MIN_X
+	sentry.visual.scale.x = -1.0
+	sentry.call("_sync_reach")
+	_expect(sentry.visual.gap.is_equal_approx(Vector2(SentryBrain.PATROL_MIN_X - SentryBrain.COVER_MAX_X, SentryBrain.PATROL_MIN_X - SentryBrain.COVER_MIN_X)), "turning at the alcove, the drawn beam skips it (%s)" % sentry.visual.gap)
+	sentry.follow(brain)
 	_expect(sentry.visual.lens_glow.modulate.is_equal_approx(Color(Sentry.SentryVisual.EYE_PATROL, Sentry.LENS_GLOW_ALPHA)), "the glow takes the patrol colour")
 	game.set("effects_enabled", false)
 	_expect(not sentry.visual.lens_glow.visible and sentry.visual.is_lit(), "effects off hides the glow but keeps the eye and beam")
