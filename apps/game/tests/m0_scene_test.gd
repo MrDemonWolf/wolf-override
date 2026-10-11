@@ -191,6 +191,7 @@ func _run() -> void:
 	var door_visual: ColorRect = game.get_node("Door/Visual") as ColorRect
 	_expect(not door_visual.visible, "door retracts after cooperation")
 	_expect((game.get("door_open_art") as Sprite2D).visible and (game.get("door_lip") as Sprite2D).visible and (game.get("door_lip") as Sprite2D).z_index > human.z_index, "the bulkhead stands open behind the engineer, its front pillar drawn over him")
+	_expect((game.get("corridor_depth") as RoomDepth).pillars.has(game.get("door_lip")), "the corridor's front pillar fades back while it covers the engineer or WOLF")
 	_expect(not relay_spark.visible and wolf.body_sprite.position == Vector2(0.0, -15.0), "contact reaction settles after the seal opens")
 	await _tap(&"interact")
 	_expect(not door_visual.visible, "reusing the open relay does not replay the door seal")

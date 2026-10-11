@@ -197,6 +197,7 @@ func _check_scene() -> void:
 	_expect(await _wait_until(func() -> bool: return not room.door_shape.disabled, 5), "the junction door body is live in its room")
 	_check_presentation(room, human, wolf)
 	await _check_near_fade(room)
+	await _check_pillar_fade(room)
 	# The sealed door physically blocks the engineer.
 	_expect(await _walk_to(human, 420.0), "the engineer walks to the valve")
 	Input.action_press(&"move_right")
@@ -481,10 +482,25 @@ func _check_presentation(room: JunctionRoom, human: M0Actor, wolf: M0Actor) -> v
 	_expect(body_z < human.z_index and body_z < wolf.z_index and lip_z > human.z_index and lip_z > wolf.z_index, "the bulkhead draws behind the actors and its front pillar in front of them")
 	var row: bool = true
 	for label: Label in room.station_labels:
-		if label != room.vent_label:
-			row = row and is_equal_approx(label.position.y, JunctionRoom.LABEL_Y) and label.get_theme_font_size(&"font_size") == JunctionRoom.LABEL_FONT_SIZE
-	_expect(row and room.station_labels.size() == 6, "the five station plates share one row and size, with the vent's caption on the floor")
+		row = row and is_equal_approx(label.position.y, JunctionRoom.LABEL_Y) and label.get_theme_font_size(&"font_size") == JunctionRoom.LABEL_FONT_SIZE
+	_expect(row and room.station_labels.size() == 6 and room.station_labels.has(room.vent_label), "all six station plates, RELIEF VENT among them, share one row and size")
 	_expect(_labels_clear(room), "no two station plates overlap")
+	# RELIEF VENT sits between the breaker and valve plates: it must clear their longest texts too.
+	var breaker_text: String = room.breaker_label.text
+	var valve_text: String = room.valve_label.text
+	var widest_clear: bool = true
+	for breaker_caption: String in ["OVERLOAD BREAKER", "BREAKER LIVE", "BREAKER TRIPPED", "BREAKER SPENT"]:
+		for valve_caption: String in ["VALVE", "VALVE  0 / %d" % PressureLine.TURNS_NEEDED, "SEAL CHARGED", "VALVE SPENT"]:
+			room.breaker_label.text = breaker_caption
+			room.valve_label.text = valve_caption
+			room.call("_fit_label", room.breaker_label)
+			room.call("_fit_label", room.valve_label)
+			widest_clear = widest_clear and _labels_clear(room)
+	room.breaker_label.text = breaker_text
+	room.valve_label.text = valve_text
+	room.call("_fit_label", room.breaker_label)
+	room.call("_fit_label", room.valve_label)
+	_expect(widest_clear, "RELIEF VENT clears every breaker and valve text in the row")
 
 
 ## True when no two visible station plates overlap.
@@ -519,6 +535,27 @@ func _check_near_fade(room: JunctionRoom) -> void:
 	_expect(not room.depth.near_covers(left), "mid-room nobody is under the column")
 	await create_timer(0.4).timeout
 	_expect(left.modulate.a >= 0.99, "the column comes back once nobody is behind it")
+	room.depth.occluders.erase(stand_in)
+	stand_in.queue_free()
+
+
+## The bulkhead's front pillar fades back while someone stands in the doorway behind it, and is solid
+## again once they step clear; it still draws in front of them.
+func _check_pillar_fade(room: JunctionRoom) -> void:
+	_expect(room.depth.pillars.has(room.door_lip), "the junction's front pillar is one of the room's fading pillars")
+	var stand_in: Sprite2D = Sprite2D.new()
+	stand_in.texture = preload("res://assets/rowan-side-right-provisional.png")
+	stand_in.scale = Vector2.ONE * 0.188
+	stand_in.position = Vector2(M0State.JUNCTION_DOOR_LEFT_X + 11.0, 405.0)
+	room.add_child(stand_in)
+	room.depth.occluders.append(stand_in)
+	_expect(room.depth.pillar_covers(room.door_lip), "a body in the doorway is behind the front pillar")
+	await create_timer(0.4).timeout
+	_expect(room.door_lip.modulate.a <= RoomDepth.PILLAR_FADE_ALPHA + 0.01, "the pillar fades back while it covers someone (alpha %.2f)" % room.door_lip.modulate.a)
+	stand_in.position.x = 300.0
+	_expect(not room.depth.pillar_covers(room.door_lip), "nobody by the vent is behind the pillar")
+	await create_timer(0.4).timeout
+	_expect(room.door_lip.modulate.a >= 0.99, "the pillar is solid again once nobody is behind it")
 	room.depth.occluders.erase(stand_in)
 	stand_in.queue_free()
 

@@ -27,6 +27,11 @@ const TANK_PROP: Texture2D = preload("res://assets/props/junction-tank.png")
 const ARM_PANEL_PROP: Texture2D = preload("res://assets/props/junction-arm-panel.png")
 const BOLT_PANEL_PROP: Texture2D = preload("res://assets/props/junction-bolt-panel.png")
 const HATCH_PROP: Texture2D = preload("res://assets/props/junction-hatch.png")
+## The open exit hatch shows a painted service passage: this cut of the open corridor bulkhead's
+## doorway (its floor, wall lamps and the light far down the line), drawn a little darker.
+const HATCH_PASSAGE_PROP: Texture2D = preload("res://assets/props/corridor-bulkhead-open.png")
+const HATCH_PASSAGE: Rect2 = Rect2(172.0, 300.0, 110.0, 253.0)
+const HATCH_PASSAGE_TINT: Color = Color(0.78, 0.84, 0.86)
 ## The source row where the mid plate's walkway meets the back wall; it is drawn at the floor (y 440).
 const WALKWAY_Y: float = 776.0
 ## The far plate sits this much lower than the mid plate, as in the corridor, so it still covers
@@ -141,6 +146,10 @@ const LABEL_Y: float = 320.0
 const LABEL_FONT_SIZE: int = 12
 ## The VALVE plate sits this far left of the wheel so SEAL CHARGED ends well before the bulkhead.
 const VALVE_LABEL_SHIFT: float = 28.0
+## The breaker's plate sits this far left of the breaker, and the RELIEF VENT plate this far left of
+## the grate's centre, so the vent's name fits between the longest breaker and valve texts.
+const BREAKER_LABEL_SHIFT: float = 12.0
+const VENT_LABEL_SHIFT: float = 3.0
 ## The door's placard sits across the bulkhead's leaf, this far right of its centre, over its pillar.
 const DOOR_LABEL_SHIFT: float = 7.0
 ## The ARM PANEL plate sits right of the panel, clear of the bulkhead's frame and the door's placard.
@@ -151,11 +160,7 @@ const EXIT_LABEL_X: float = 792.0
 const LABEL_EDGE_FADE: float = 14.0
 const LABEL_PLATE: Color = Color(0.035, 0.06, 0.08, 0.8)
 const LABEL_PLATE_EDGE: Color = Color(0.29, 0.4, 0.45, 0.55)
-## The relief vent's floor caption, on the same kind of plate just above the grate it names: its
-## baseline start, text and size. It ends left of the junction's closing-shot edge.
-const VENT_LABEL_POSITION: Vector2 = Vector2(PressureLine.VENT_GRATE_MIN_X + 3.0, 418.0)
 const VENT_LABEL: String = "RELIEF VENT"
-const VENT_LABEL_FONT_SIZE: int = 11
 ## The glow over the vent grate, warming with the gauge (red once it has tripped).
 const VENT_GLOW_SIZE: Vector2 = Vector2(96.0, 22.0)
 ## Cuts the turning wheel out of the valve image as a disc, so only the wheel turns over the
@@ -284,10 +289,10 @@ class Recesses:
 		room.draw_recesses(self)
 
 
-## The exit hatch's doorway over its painted leaf: once the hatch starts to open it draws the dark
-## passage beyond, with a faint green work light, and the leaf (cut from the same art) slides up
-## inside it into the frame's header, clipped to the doorway. Shut, it draws nothing, so the hatch art
-## shows as painted.
+## The exit hatch's doorway over its painted leaf: once the hatch starts to open it draws the painted
+## passage beyond (HATCH_PASSAGE), with a faint green work light, and the leaf (cut from the same art
+## as the hatch) slides up inside it into the frame's header, clipped to the doorway. Shut, it draws
+## nothing, so the hatch art shows as painted.
 class HatchDoorway:
 	extends Node2D
 	var size: Vector2
@@ -297,12 +302,12 @@ class HatchDoorway:
 			leaf.position.y = size.y * 0.5 - open * size.y
 			queue_redraw()
 	var leaf: Sprite2D
-	var passage: StyleBoxFlat
 	var light: GradientTexture2D
 
 	func _init(texture: Texture2D, region: Rect2, leaf_scale: float) -> void:
 		size = region.size * leaf_scale
 		clip_children = CanvasItem.CLIP_CHILDREN_AND_DRAW
+		texture_filter = CanvasItem.TEXTURE_FILTER_LINEAR_WITH_MIPMAPS
 		leaf = Sprite2D.new()
 		leaf.name = "Leaf"
 		leaf.texture = texture
@@ -312,19 +317,13 @@ class HatchDoorway:
 		leaf.scale = Vector2.ONE * leaf_scale
 		leaf.position = Vector2(size.x * 0.5, size.y * 0.5)
 		add_child(leaf)
-		passage = StyleBoxFlat.new()
-		passage.bg_color = Color("#06111a")
-		passage.set_corner_radius_all(6)
 		light = JunctionRoom.soft_texture(GradientTexture2D.FILL_RADIAL)
 
 	func _draw() -> void:
 		if open <= 0.0:
 			return
-		var rect: Rect2 = Rect2(Vector2.ZERO, size)
-		draw_style_box(passage, rect)
-		# Floor plates receding into the dark, and the work light far down the line.
-		draw_rect(Rect2(0.0, size.y * 0.78, size.x, size.y * 0.22), Color("#0b1c26"))
-		draw_texture_rect(light, Rect2(size.x * 0.05, size.y * 0.1, size.x * 0.9, size.y * 0.7), false, Color(JunctionRoom.GREEN, 0.22 * open))
+		draw_texture_rect_region(JunctionRoom.HATCH_PASSAGE_PROP, Rect2(Vector2.ZERO, size), JunctionRoom.HATCH_PASSAGE, JunctionRoom.HATCH_PASSAGE_TINT)
+		draw_texture_rect(light, Rect2(size.x * 0.05, size.y * 0.1, size.x * 0.9, size.y * 0.7), false, Color(JunctionRoom.GREEN, 0.12 * open))
 
 
 func _ready() -> void:
@@ -408,7 +407,9 @@ func _ready() -> void:
 	label_plate.content_margin_right = 5.0
 	label_plate.content_margin_top = 0.0
 	label_plate.content_margin_bottom = 0.0
-	breaker_label = _add_station_label("OVERLOAD BREAKER", BREAKER_X, Color("#b0d1de"))
+	breaker_label = _add_station_label("OVERLOAD BREAKER", BREAKER_X - BREAKER_LABEL_SHIFT, Color("#b0d1de"))
+	# In the row above the grate, where nobody standing on the floor covers it.
+	vent_label = _add_station_label(VENT_LABEL, VENT_X - VENT_LABEL_SHIFT, Color("#8fa6b2"))
 	# A little left of the wheel so its longest text (SEAL CHARGED) ends before the bulkhead.
 	valve_label = _add_station_label("VALVE", VALVE_X - VALVE_LABEL_SHIFT, Color("#b0d1de"))
 	# A placard across the bulkhead's face, over its front pillar.
@@ -417,13 +418,6 @@ func _ready() -> void:
 	arm_label = _add_station_label("ARM PANEL", ARM_X + ARM_LABEL_SHIFT, Color("#b0d1de"))
 	# Over the bolt panel, beside the hatch, so both read as one exit.
 	hatch_label = _add_station_label("EXIT BOLTED", EXIT_LABEL_X, Color("#8fa6b2"))
-	# The vent's caption keeps its own place on the floor: its text starts at VENT_LABEL_POSITION.
-	vent_label = _add_station_label(VENT_LABEL, VENT_X, Color("#8fa6b2"))
-	vent_label.add_theme_font_size_override("font_size", VENT_LABEL_FONT_SIZE)
-	vent_label.set_meta(&"text_start", VENT_LABEL_POSITION)
-	# On the floor, under anyone standing on the grate.
-	vent_label.z_index = 0
-	_fit_label(vent_label)
 	_build_lane()
 	refresh_state()
 
@@ -592,11 +586,6 @@ func _build_lane() -> void:
 	add_child(bolt_sparks)
 
 
-## The font the station labels (the vent's floor caption among them) resolve from the project theme.
-func caption_font() -> Font:
-	return breaker_label.get_theme_font(&"font") if breaker_label != null else ThemeDB.fallback_font
-
-
 ## A station name on its plate, centred on [param center_x] in the label row. It draws over the
 ## bulkhead and under the actors.
 func _add_station_label(caption: String, center_x: float, tint: Color) -> Label:
@@ -614,17 +603,10 @@ func _add_station_label(caption: String, center_x: float, tint: Color) -> Label:
 	return label
 
 
-## Shrinks [param label]'s plate to its text and centres it on its station again (the vent caption
-## instead puts its text's baseline start on its "text_start").
+## Shrinks [param label]'s plate to its text and centres it on its station again.
 func _fit_label(label: Label) -> void:
 	label.size = Vector2.ZERO
 	label.size = label.get_combined_minimum_size()
-	if label.has_meta(&"text_start"):
-		var start: Vector2 = label.get_meta(&"text_start")
-		var font: Font = label.get_theme_font(&"font")
-		var font_size: int = label.get_theme_font_size(&"font_size")
-		label.position = Vector2(start.x - label_plate.content_margin_left, start.y - font.get_ascent(font_size) - label_plate.content_margin_top)
-		return
 	label.position = Vector2(float(label.get_meta(&"center_x")) - label.size.x * 0.5, LABEL_Y)
 
 

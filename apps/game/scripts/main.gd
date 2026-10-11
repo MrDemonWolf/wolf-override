@@ -266,6 +266,9 @@ func _ready() -> void:
 	# Each room's near edge pieces fade back while they cover the engineer or WOLF.
 	for depth: RoomDepth in _room_depths():
 		depth.occluders = [human.body_sprite, wolf.body_sprite]
+	# So do the bulkheads' front pillars, which otherwise hide whoever stands in a doorway.
+	corridor_depth.pillars = [door_lip]
+	junction_room.depth.pillars = [junction_room.door_lip]
 	breaker_status_glow = _attach_status_glow(breaker_status_light)
 	relay_status_glow = _attach_status_glow(relay_status_light)
 	_apply_effects()

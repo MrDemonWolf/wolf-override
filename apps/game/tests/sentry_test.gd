@@ -500,14 +500,12 @@ func _start_at_b(game: Node2D, choice_id: String) -> Dictionary:
 	return State.load_from_disk(game.get("save_path")).to_dict()
 
 
-## True when neither edge of the settled closing shot falls inside a station label or the painted
-## RELIEF VENT caption.
+## True when neither edge of the settled closing shot falls inside a station label (RELIEF VENT among
+## them).
 func _close_cuts_no_label(camera: Camera2D, room: JunctionRoom) -> bool:
 	var half_width: float = 480.0 / camera.zoom.x
 	var edges: Array[float] = [camera.position.x - half_width, camera.position.x + half_width]
-	var font: Font = room.caption_font()
-	var vent_start: float = JunctionRoom.VENT_LABEL_POSITION.x
-	var spans: Array[Vector2] = [Vector2(vent_start, vent_start + font.get_string_size(JunctionRoom.VENT_LABEL, HORIZONTAL_ALIGNMENT_LEFT, -1, JunctionRoom.VENT_LABEL_FONT_SIZE).x)]
+	var spans: Array[Vector2] = []
 	for child: Node in room.get_children():
 		var label: Label = child as Label
 		if label == null or not label.visible:

@@ -69,9 +69,14 @@ const NEAR_FADE_ALPHA: float = 0.35
 const NEAR_FADE_SPEED: float = 4.0
 ## The pressure bulkheads (design A) shared by the corridor seal and the junction door: their import
 ## copies share one canvas per door whose bottom row is the floor, drawn at this scale, and the front
-## pillar's outer edge sits this many canvas pixels in from the left.
+## pillar's outer edge sits this many canvas pixels in from the left, its column BULKHEAD_PILLAR_WIDTH
+## canvas pixels wide at body height.
 const BULKHEAD_SCALE: float = 0.3
 const BULKHEAD_PILLAR_X: float = 83.0
+const BULKHEAD_PILLAR_WIDTH: float = 76.0
+## A bulkhead's front pillar (see [member pillars]) fades to this opacity while it covers an actor,
+## keeping more of the doorway than a near edge piece does.
+const PILLAR_FADE_ALPHA: float = 0.5
 
 ## The far plate: back wall, painted lamps and wet floor (opaque).
 @export var painting: Texture2D
@@ -115,6 +120,9 @@ var reduce_motion: bool = false
 var lockdown_cleared: bool = false
 ## Sprites (the actors' bodies) the near edge pieces fade back from while they cover them.
 var occluders: Array[Sprite2D] = []
+## Bulkhead front lips (made with [method make_bulkhead]'s cut) drawn over the actors in this room;
+## each fades back to PILLAR_FADE_ALPHA while its pillar covers one of the [member occluders].
+var pillars: Array[Sprite2D] = []
 
 var backdrop_layer: Parallax2D
 var backdrop: Sprite2D
@@ -161,7 +169,14 @@ func _ready() -> void:
 
 
 func _process(delta: float) -> void:
-	if near_layer == null or not near_layer.visible or not is_visible_in_tree():
+	if not is_visible_in_tree():
+		return
+	# The pillars fade whether or not the depth pass is on: they draw over the actors either way.
+	for pillar: Sprite2D in pillars:
+		if is_instance_valid(pillar):
+			var pillar_target: float = PILLAR_FADE_ALPHA if pillar_covers(pillar) else 1.0
+			pillar.modulate.a = move_toward(pillar.modulate.a, pillar_target, NEAR_FADE_SPEED * delta)
+	if near_layer == null or not near_layer.visible:
 		return
 	for edge_name: String in ["LeftEdge", "RightEdge"]:
 		var edge: Sprite2D = near_layer.get_node_or_null(edge_name) as Sprite2D
@@ -181,6 +196,21 @@ func near_covers(edge: Sprite2D) -> bool:
 		if is_instance_valid(sprite) and sprite.is_visible_in_tree():
 			var body: Rect2 = sprite.get_global_transform_with_canvas() * sprite.get_rect()
 			if body.position.x < screen.end.x and body.end.x > screen.position.x:
+				return true
+	return false
+
+
+## True when [param pillar]'s front pillar column (BULKHEAD_PILLAR_X, BULKHEAD_PILLAR_WIDTH wide, floor
+## to header) overlaps any visible occluder's body on screen.
+func pillar_covers(pillar: Sprite2D) -> bool:
+	if not pillar.is_visible_in_tree():
+		return false
+	var cut: Rect2 = pillar.get_rect()
+	var local: Rect2 = Rect2(cut.position.x + BULKHEAD_PILLAR_X - pillar.region_rect.position.x, cut.position.y, BULKHEAD_PILLAR_WIDTH, cut.size.y)
+	var screen: Rect2 = pillar.get_global_transform_with_canvas() * local
+	for sprite: Sprite2D in occluders:
+		if is_instance_valid(sprite) and sprite.is_visible_in_tree():
+			if screen.intersects(sprite.get_global_transform_with_canvas() * sprite.get_rect()):
 				return true
 	return false
 
