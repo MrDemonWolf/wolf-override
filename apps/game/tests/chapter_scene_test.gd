@@ -46,6 +46,10 @@ func _run() -> void:
 	_expect(await _wait_until(func() -> bool: return float(game.get("engineer_step_x")) < 0.0, 40) and human.position.x + M0Actor.HUMAN_REACH <= 190.0 - 56.0 + 18.0 and not human.body_sprite.flip_h and human.controlled, "after copying the purge order the engineer stands beside the purge queue, facing it (x %.0f)" % human.position.x)
 	var purge_save: M0State = State.load_from_disk(path)
 	_expect(purge_save != null and absf(purge_save.human_position.x - human.position.x) <= 0.5, "the purge-copy autosave keeps the spot the engineer stepped out to, not the middle of the purge queue")
+	if not await _walk_to(human, 350.0):
+		_fail("engineer can walk between the Records stations")
+		return
+	_expect(str(game.call("_context_hint")) == "Follow the station lights: mirror port, then exit.", "between stations after the purge copy the hint names only what is left (%s)" % game.call("_context_hint"))
 	if not await _walk_to(human, 520.0):
 		_fail("engineer can walk to the mirror port")
 		return
@@ -60,12 +64,16 @@ func _run() -> void:
 	_expect(state.mirror_trace_preserved and state.mirror_route == "wolf" and not game.get("waiting_for_choice"), "WOLF readout preserves timestamp once")
 	_expect(state.memory.get("choice_id") == State.DISCLOSE and state.memory.get("event_id") == State.EVENT_ID, "chapter preserves the actual relay memory")
 	_expect(str(game.call("_context_hint")) == "Mirror copied. Head for the exit.", "once the mirror timestamp is copied the mirror port's hint says so instead of offering it again")
+	if not await _walk_to(human, 700.0):
+		_fail("engineer can walk on from the mirror port")
+		return
+	_expect(str(game.call("_context_hint")) == "Mirror copied. Head for the exit.", "walking on after both copies the hint names only the exit, never a finished station (%s)" % game.call("_context_hint"))
 	if not await _walk_to(human, 830.0):
 		_fail("engineer can reach the records exit")
 		return
 	await _tap(&"interact")
 	_expect(state.chapter_complete and game.call("_objective") == "FIRST COPY SECURED", "first chapter resolves after two traces")
-	_expect(str(game.get("status_line")).contains("A list doesn't tell me who's a threat"), "WOLF questions the Director's target labels after the first copy")
+	_expect(str(game.get("status_line")).contains("An order and a timestamp don't tell me who's a threat"), "WOLF names what was copied when he questions the Director's target labels")
 	_expect(game.get("chapter_close_active") and not human.controlled, "first copy opens a player-paced closing beat")
 	_expect((game.get_node("CanvasLayer/PauseButton") as Button).visible, "closing beat keeps the pause button available")
 	await _tap(&"pause_game")

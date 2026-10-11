@@ -403,6 +403,16 @@ func _run() -> void:
 	await _tap(&"interact")
 	if not _require(state.breaker_armed, "breaker arms on the disclose-then-bypass route"):
 		return
+	# No spot between the relay and the MANUAL BYPASS falls back to "go to the relay".
+	var armed_x: float = human.position.x
+	var gap_hints: Array[String] = []
+	for probe_x: int in range(553, 670, 4):
+		human.position.x = probe_x
+		var probe_hint: String = str(game.call("_context_hint"))
+		if probe_hint != "E: signal WOLF to take the contact.":
+			gap_hints.append("%d: %s" % [probe_x, probe_hint])
+	human.position.x = armed_x
+	_expect(gap_hints.is_empty(), "from the relay's left edge up to the bypass's reach the hint is the relay's own (%s)" % ", ".join(gap_hints))
 	if not _require(await _walk_to(human, 700.0), "engineer reaches the bypass after disclosing"):
 		return
 	await process_frame

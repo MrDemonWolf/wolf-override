@@ -1433,7 +1433,7 @@ func _interact() -> void:
 		_interact_bypass()
 	elif absf(x - 350.0) <= 52.0:
 		_interact_breaker()
-	elif absf(x - RELAY_X) <= RELAY_REACH:
+	elif _at_relay(x):
 		_interact_relay()
 	elif absf(x - 876.0) <= 52.0:
 		_interact_checkpoint()
@@ -1441,10 +1441,16 @@ func _interact() -> void:
 		status_line = "No station in reach. Follow the labeled breaker, relay, bypass or safe point."
 
 
-## True within reach of the MANUAL BYPASS. Its reach (x 670 to 730) starts just past the relay's (553
-## to 657), so the two never share a spot.
+## True within reach of the MANUAL BYPASS (x 670 to 730), just past the relay's, so the two never
+## share a spot.
 func _at_bypass(x: float) -> bool:
 	return absf(x - BYPASS_WHEEL.x) <= BYPASS_REACH
+
+
+## True within reach of the coolant relay: from RELAY_REACH left of it right up to where the MANUAL
+## BYPASS's reach starts, so no spot between the two machines falls back to "go to the relay".
+func _at_relay(x: float) -> bool:
+	return x >= RELAY_X - RELAY_REACH and x < BYPASS_WHEEL.x - BYPASS_REACH
 
 
 ## WOLF said no to the live contact: he refused at the breaker (the engineer pressed without warning)
@@ -1651,7 +1657,7 @@ func _interact_records(x: float) -> void:
 			status_line = "WOLF: I found the mirror index. We can use my readout or your maintenance port.\n1  USE WOLF'S READOUT     2  USE MANUAL PORT"
 	elif absf(x - 830.0) <= 58.0:
 		if state.complete_chapter():
-			status_line = "FIRST COPY SECURED. WOLF: A list doesn't tell me who's a threat. I want the source.\n%s: Then Archive is next." % state.human_name().get_slice(" ", 0).to_upper()
+			status_line = "FIRST COPY SECURED. WOLF: An order and a timestamp don't tell me who's a threat. I want the source.\n%s: Then Archive is next." % state.human_name().get_slice(" ", 0).to_upper()
 			chapter_close_active = true
 			intro_camera.position_smoothing_enabled = false
 			_update_controls()
@@ -1674,7 +1680,17 @@ func _interact_records(x: float) -> void:
 		else:
 			status_line = "Exit sealed until the purge order and mirror timestamp are copied."
 	else:
-		status_line = "Follow the station lights: purge queue, mirror port, then exit."
+		status_line = _records_route_hint()
+
+
+## Between Records stations: the stations still to do, in order, so a finished one is never named
+## again (both copied leaves only the exit).
+func _records_route_hint() -> String:
+	if state.mirror_trace_preserved:
+		return "Mirror copied. Head for the exit."
+	if state.purge_trace_preserved:
+		return "Follow the station lights: mirror port, then exit."
+	return "Follow the station lights: purge queue, mirror port, then exit."
 
 
 func _finish_chapter_close() -> void:
@@ -2867,7 +2883,7 @@ func _context_hint() -> String:
 			return "E: examine the mirror port." if state.purge_trace_preserved else "Copy the purge order first."
 		if absf(x - 830.0) <= 58.0:
 			return "E: secure the first copy." if state.mirror_trace_preserved else "Preserve both traces before leaving."
-		return "Follow the station lights: purge queue, mirror port, then exit."
+		return _records_route_hint()
 	if state.checkpoint_reached:
 		return "E: enter records access. The Director's purge is still running." if absf(x - 876.0) <= 52.0 else ("E: read the Director's purge display." if x <= 230.0 else "Return to the safe point to enter records access.")
 	if state.door_open:
@@ -2890,7 +2906,7 @@ func _context_hint() -> String:
 		if state.breaker_armed:
 			return "The breaker is live. Go to the MANUAL BYPASS by the relay." if _relay_refused() else "The breaker is live. Go to the coolant relay."
 		return "E: talk to WOLF about the relay." if state.memory.is_empty() else "E: arm the breaker."
-	if absf(x - RELAY_X) <= RELAY_REACH:
+	if _at_relay(x):
 		if not state.breaker_armed:
 			return "The relay is dark. Return to the breaker first."
 		return "WOLF refused the live contact. Use the MANUAL BYPASS beside it." if _relay_refused() else "E: signal WOLF to take the contact."
