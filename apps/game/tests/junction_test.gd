@@ -109,6 +109,23 @@ func _check_save_format() -> void:
 	bad = records.to_dict()
 	bad["chapter_id"] = "records"
 	_expect(State.from_dict(bad) == null, "v4 rejects junction flags outside the junction")
+	# How the sentry came down is saved for the END OF SLICE recap, and is optional for older v4 saves.
+	var fallen: Dictionary = records.to_dict()
+	fallen["sentry_down"] = true
+	for lane: String in ["wolf", "refused", "alone"]:
+		fallen["lane_recap"] = lane
+		var fallen_loaded: M0State = State.from_dict(JSON.parse_string(JSON.stringify(fallen)))
+		_expect(fallen_loaded != null and fallen_loaded.lane_recap == lane and fallen_loaded.to_dict()["lane_recap"] == lane, "a sentry-down save keeps the lane recap \"%s\"" % lane)
+	fallen.erase("lane_recap")
+	var older: M0State = State.from_dict(fallen)
+	_expect(older != null and older.lane_recap == "", "a v4 save without a lane recap still loads, with none")
+	fallen["lane_recap"] = "sideways"
+	_expect(State.from_dict(fallen) == null, "v4 rejects an unknown lane recap")
+	fallen["lane_recap"] = 3
+	_expect(State.from_dict(fallen) == null, "v4 rejects a non-string lane recap")
+	bad = records.to_dict()
+	bad["lane_recap"] = "wolf"
+	_expect(State.from_dict(bad) == null, "v4 rejects a lane recap before the sentry is down")
 	bad = records.to_dict()
 	bad["door_blown"] = "yes"
 	_expect(State.from_dict(bad) == null, "v4 rejects a non-boolean junction flag")

@@ -366,6 +366,7 @@ func _check_scene() -> void:
 	_expect(game.call("_objective") == "POP THE EXIT BOLT" and not game.get("wolf_baiting") and wolf.follow_target == human, "the bolt is next and WOLF follows again")
 	var autosave_c: M0State = State.load_from_disk(path)
 	_expect(autosave_c != null and autosave_c.sentry_down and autosave_c.door_blown and autosave_c.memory.get("choice_id") == State.DISCLOSE, "autosave C records the sentry down with the relay memory")
+	_expect(autosave_c != null and autosave_c.lane_recap == "wolf", "autosave C keeps how the sentry came down for the END OF SLICE recap")
 	_expect(await _wait_until(func() -> bool: return Engine.time_scale == 1.0 and camera.offset == Vector2.ZERO, 90), "time scale and camera settle after BOOM 2")
 	game.call("_load_game")
 	_expect(brain.state == &"down" and brain.x == DropArm.MARK_X and arm.state == &"landed" and room.sentry.visual.wrecked and room.tank.position.y > JunctionRoom.TANK_REST_Y and str(game.get("status_line")).contains("sentry is down"), "Continue from autosave C shows the sentry down under the tank")
@@ -396,7 +397,14 @@ func _check_scene() -> void:
 	await _tap(&"pause_game")
 	_expect(paused, "pause works during the closing beat")
 	(game.get_node("CanvasLayer/PauseOverlay") as PauseOverlay).resume_requested.emit()
+	var hatch_start_x: float = human.position.x
 	await _tap(&"interact")
+	# The two leave through the open hatch before the card: they walk into it and fade out.
+	_expect(game.get("hatch_exit_walking") and not game.get("end_card_active") and not human.controlled, "Continue on the closing beat walks them out through the hatch first")
+	await _tap(&"interact")
+	_expect(game.get("hatch_exit_walking") and not game.get("end_card_active"), "a second press does not cut the walk short")
+	_expect(await _wait_until(func() -> bool: return bool(game.get("end_card_active")), 120), "the END OF SLICE card follows the walk")
+	_expect(human.position.x > hatch_start_x and absf(human.position.x - JunctionRoom.HATCH_X) <= 12.0 and absf(wolf.position.x - JunctionRoom.HATCH_X) <= 40.0 and human.modulate.a < 0.05 and wolf.modulate.a < 0.05, "both walked into the hatch and faded out (engineer x %.0f, WOLF x %.0f)" % [human.position.x, wolf.position.x])
 	# Decision D: the closing beat leads to the END OF SLICE card with this run's choices, then the title.
 	var end_card: Control = game.get_node("CanvasLayer/EndCard") as Control
 	var end_button: Button = end_card.get_node("EndCardContinue") as Button
@@ -417,11 +425,20 @@ func _check_scene() -> void:
 	await _tap(&"pause_game")
 	_expect(not paused and game.get("title_open"), "Pause (or Back) on the card goes on to the title instead of pausing")
 	_expect(not continue_button.disabled and continue_button.text == "PLAY AGAIN" and (game.get_node("CanvasLayer/TitleScreen/ContinueNote") as Label).text == "Slice complete. PLAY AGAIN starts a fresh run.", "on a finished save the title offers PLAY AGAIN and says why")
+	var new_game_button: Button = game.get_node("CanvasLayer/TitleScreen/NewGameButton") as Button
+	_expect(not new_game_button.visible and is_equal_approx(continue_button.offset_left, new_game_button.offset_left) and game.call("_title_first_button") == continue_button, "NEW GAME would do the same, so PLAY AGAIN stands alone across the row and takes the first focus")
+	var finished_path: String = str(game.get("save_path"))
+	game.set("save_path", finished_path + ".missing")
+	game.call("_refresh_continue")
+	_expect(new_game_button.visible and continue_button.text == "CONTINUE" and continue_button.offset_left > new_game_button.offset_right and game.call("_title_first_button") == new_game_button, "without a finished save NEW GAME and CONTINUE sit side by side again")
+	game.set("save_path", finished_path)
+	game.call("_refresh_continue")
 	var finished_bytes: PackedByteArray = FileAccess.get_file_as_bytes(path)
 	continue_button.pressed.emit()
 	await physics_frame
 	state = game.get("state") as M0State
 	_expect(not game.get("title_open") and game.get("intro_active") and state.chapter_id == "lockdown" and state.memory.is_empty(), "PLAY AGAIN starts a fresh run with the opening")
+	_expect(human.modulate.a == 1.0 and wolf.modulate.a == 1.0 and not game.get("hatch_exit_walking"), "a fresh run shows both again after they faded out through the hatch")
 	_expect(FileAccess.get_file_as_bytes(path) == finished_bytes, "like New Game, a fresh run keeps the finished save until it saves over it")
 	# Only a hand-made save could reopen the cleared junction; it never calls the line unbuilt.
 	game.call("_finish_intro")
@@ -435,7 +452,7 @@ func _check_scene() -> void:
 	for way: String in ["interact", "button", "back"]:
 		game.set("chapter_close_active", true)
 		game.call("_finish_chapter_close")
-		_expect(game.get("end_card_active"), "the card is up again (%s)" % way)
+		_expect(await _wait_until(func() -> bool: return bool(game.get("end_card_active")), 120), "the card is up again (%s)" % way)
 		match way:
 			"interact":
 				await _tap(&"interact")

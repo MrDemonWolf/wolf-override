@@ -18,6 +18,8 @@ const CHOICE_TEXT = {
 	"disclose_risk": "The relay may vent coolant. Your call.",
 	"press_without_warning": "Go now. We can talk after.",
 }
+## The saved ways the junction's sentry can have come down (lane_recap), empty before it falls.
+const LANE_RECAPS: Array[String] = ["", "wolf", "refused", "alone"]
 
 var active_actor: String = "human"
 var name_index: int = 0
@@ -38,6 +40,10 @@ var chapter_complete: bool = false
 var door_blown: bool = false
 var sentry_down: bool = false
 var junction_cleared: bool = false
+## How the sentry came down, for the END OF SLICE recap: "wolf" (he drew it onto the mark), "refused"
+## (he would not, so the engineer timed it), "alone" (he held at the rubble while the engineer timed
+## it), or empty before the fall. Optional in the file, so v4 saves without it still load.
+var lane_recap: String = ""
 
 
 func human_name() -> String:
@@ -199,6 +205,7 @@ func to_dict() -> Dictionary:
 		"door_blown": door_blown,
 		"sentry_down": sentry_down,
 		"junction_cleared": junction_cleared,
+		"lane_recap": lane_recap,
 	}
 
 
@@ -291,6 +298,12 @@ static func from_dict(raw: Variant) -> M0State:
 					return null
 		elif data["door_blown"] or data["sentry_down"] or data["junction_cleared"]:
 			return null
+	# The lane recap is optional (older v4 saves lack it) and only describes a fallen sentry.
+	var raw_lane_recap: Variant = data.get("lane_recap", "")
+	if typeof(raw_lane_recap) != TYPE_STRING or not (raw_lane_recap in LANE_RECAPS):
+		return null
+	if raw_lane_recap != "" and not data.get("sentry_down", false):
+		return null
 	var state: M0State = M0State.new()
 	state.name_index = int(identity["name_index"])
 	state.active_actor = "human"
@@ -315,6 +328,7 @@ static func from_dict(raw: Variant) -> M0State:
 		state.door_blown = data["door_blown"]
 		state.sentry_down = data["sentry_down"]
 		state.junction_cleared = data["junction_cleared"]
+	state.lane_recap = raw_lane_recap
 	return state
 
 

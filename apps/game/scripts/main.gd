@@ -88,6 +88,12 @@ const INTRO_LINES: Array[String] = [
 	"DIRECTOR: Lock down maintenance. WOLF does not leave this site.",
 	"WOLF turns from the Director and takes the only open route.",
 ]
+## Leaving the cleared junction, the engineer and WOLF walk into the open hatch's doorway (centred on
+## JunctionRoom.HATCH_X; WOLF a step behind), fading out after a moment, then the END OF SLICE card.
+const HATCH_EXIT_X: float = JunctionRoom.HATCH_X + 6.0
+const WOLF_HATCH_EXIT_X: float = JunctionRoom.HATCH_X - 24.0
+const HATCH_EXIT_FADE_DELAY: float = 0.3
+const HATCH_EXIT_FADE_SECONDS: float = 0.5
 ## The end of the built route (decision D): the END OF SLICE card with this run's choices, then the title.
 const END_CARD_TITLE: String = "END OF SLICE"
 const END_CARD_THANKS: String = "Thank you for playing this early slice."
@@ -103,6 +109,8 @@ const RECAP_LANE_ALONE: String = "LANE  WOLF held at the rubble while {name} tim
 const RECAP_LANE_UNKNOWN: String = "LANE  The tank came down on the sentry."
 ## On a finished save the title's Continue starts a fresh run instead.
 const PLAY_AGAIN_TEXT: String = "PLAY AGAIN"
+## The title's Continue button's left edge beside NEW GAME (main.tscn); alone it spans the row.
+const TITLE_CONTINUE_LEFT: float = 718.0
 const CONTINUE_TEXT: String = "CONTINUE"
 const FINISHED_NOTE: String = "Slice complete. PLAY AGAIN starts a fresh run."
 ## Only a hand-made save can reopen the cleared junction; it says where the line goes, not that it is unbuilt.
@@ -325,9 +333,9 @@ var engineer_step_x: float = -1.0
 var engineer_face_x: float = -1.0
 ## Seconds the "Checkpoint saved." hint has left; 0 when none.
 var checkpoint_toast_remaining: float = 0.0
-## How the sentry came down this run, for the end card: "wolf" (he drew it), "refused" (he would
-## not), "alone" (the engineer timed it), or empty when this session did not see it.
-var recap_lane: String = ""
+## True while the engineer and WOLF walk out through the hatch, between the closing beat and the
+## END OF SLICE card.
+var hatch_exit_walking: bool = false
 ## True while the END OF SLICE card is up; any confirm, Back or Pause goes on to the title.
 var end_card_active: bool = false
 var end_card: ColorRect
@@ -444,7 +452,7 @@ func _ready() -> void:
 	changelog_online_button.pressed.connect(_open_changelog)
 	changelog_body.gui_input.connect(_on_changelog_body_input)
 	_load_changelog()
-	_grab_menu_focus(new_game_button)
+	_grab_menu_focus(_title_first_button())
 	title_mark.modulate = Color(1, 1, 1, 0)
 	title_line.modulate = Color(1, 1, 1, 0)
 	title_logo.modulate = Color(1, 1, 1, 0)
@@ -459,13 +467,23 @@ func _refresh_continue() -> void:
 	var saved: bool = loaded != null
 	var finished: bool = saved and loaded.junction_cleared
 	continue_button.disabled = not saved
-	# A finished slice has nothing left to continue: the button offers a fresh run (decision D).
+	# A finished slice has nothing left to continue: the button offers a fresh run (decision D). NEW GAME
+	# would do the same, so PLAY AGAIN stands alone across both buttons' row.
 	continue_button.text = PLAY_AGAIN_TEXT if finished else CONTINUE_TEXT
+	new_game_button.visible = not finished
+	continue_button.offset_left = new_game_button.offset_left if finished else TITLE_CONTINUE_LEFT
+	if finished and new_game_button.has_focus():
+		_grab_menu_focus(continue_button)
 	var reason: String = FINISHED_NOTE if finished else ""
 	if not saved:
 		reason = UNREADABLE_CHECKPOINT_NOTE if FileAccess.file_exists(save_path) else NO_CHECKPOINT_NOTE
 	continue_note.text = reason
 	continue_button.tooltip_text = reason
+
+
+## The title's first button: NEW GAME, or PLAY AGAIN when a finished slice has hidden NEW GAME.
+func _title_first_button() -> Button:
+	return new_game_button if new_game_button.visible else continue_button
 
 
 ## The title's Continue: the saved checkpoint, or on a finished slice (PLAY AGAIN) a fresh run, which,
@@ -475,7 +493,6 @@ func _on_continue_pressed() -> void:
 	if loaded != null and loaded.junction_cleared:
 		_new_game()
 		return
-	recap_lane = ""
 	_load_game()
 
 
@@ -833,7 +850,6 @@ func _new_game() -> void:
 	_cancel_fail()
 	chapter_close_active = false
 	_hide_end_card()
-	recap_lane = ""
 	checkpoint_toast_remaining = 0.0
 	tutorial_step = 0
 	title_open = false
@@ -1198,6 +1214,7 @@ func _return_to_title() -> void:
 	_stop_bypass_vent()
 	intro_fade.color.a = 0.0
 	chapter_close_active = false
+	hatch_exit_walking = false
 	_hide_end_card()
 	checkpoint_toast_remaining = 0.0
 	waiting_for_choice = false
@@ -1209,7 +1226,7 @@ func _return_to_title() -> void:
 	_refresh_continue()
 	_update_controls()
 	_refresh_ui()
-	_grab_menu_focus(new_game_button)
+	_grab_menu_focus(_title_first_button())
 
 
 ## Keyboard and controller players need a focused menu control; pure touch play shows no focus ring.
@@ -1234,7 +1251,7 @@ func _menu_focus_target() -> Control:
 			return credits_back_button
 		if changelog_screen.visible:
 			return changelog_back_button
-		return title_focus_return if title_focus_return != null and title_focus_return.is_visible_in_tree() else new_game_button
+		return title_focus_return if title_focus_return != null and title_focus_return.is_visible_in_tree() else _title_first_button()
 	return null
 
 
@@ -1707,16 +1724,32 @@ func _records_route_hint() -> String:
 
 
 func _finish_chapter_close() -> void:
+	if hatch_exit_walking:
+		# Already on their way out; the card follows on its own.
+		return
 	if chapter_tween != null and chapter_tween.is_running():
 		chapter_tween.kill()
 	if state.chapter_id == "junction" and state.junction_cleared:
-		# The end of the built route: the END OF SLICE card, then the title (decision D).
-		_show_end_card()
+		# The end of the built route: out through the hatch, the END OF SLICE card, then the title
+		# (decision D).
+		_walk_out_through_hatch()
 		return
 	chapter_close_active = false
 	_start_gameplay_camera()
 	_sync_records_room()
 	_update_controls()
+
+
+## The two leave through the open hatch together: they walk into it and fade, then the END OF SLICE
+## card comes up.
+func _walk_out_through_hatch() -> void:
+	hatch_exit_walking = true
+	_update_controls()
+	chapter_tween = create_tween()
+	chapter_tween.tween_interval(HATCH_EXIT_FADE_DELAY)
+	chapter_tween.tween_property(human, "modulate:a", 0.0, HATCH_EXIT_FADE_SECONDS)
+	chapter_tween.parallel().tween_property(wolf, "modulate:a", 0.0, HATCH_EXIT_FADE_SECONDS)
+	chapter_tween.tween_callback(_show_end_card)
 
 
 ## The END OF SLICE card over the closing shot: the thanks line, this run's choices and one CONTINUE
@@ -1783,14 +1816,14 @@ func _end_card_label(text: String, rect: Rect2, font_size: int, tint: Color) -> 
 
 
 ## This run's three choices as the end card shows them: the relay, the mirror and the lane. The lane
-## is only known to the session that saw the tank fall; a run continued from a later checkpoint says
-## only that it came down.
+## is saved with the sentry's fall (autosave C); a save from a build that did not store it says only
+## that the tank came down.
 func end_card_recap() -> Array[String]:
 	var first_name: String = state.human_name().get_slice(" ", 0)
 	var relay: String = RECAP_RELAY_PRESS if state.memory.get("choice_id") == M0State.PRESS else (RECAP_RELAY_COOPERATE if state.route == "cooperate" else RECAP_RELAY_DISCLOSE_BYPASS)
 	var mirror: String = RECAP_MIRROR_WOLF if state.mirror_route == "wolf" else RECAP_MIRROR_MANUAL
 	var lane: String = RECAP_LANE_UNKNOWN
-	match recap_lane:
+	match state.lane_recap:
 		"wolf":
 			lane = RECAP_LANE_WOLF
 		"refused":
@@ -1807,6 +1840,7 @@ func _show_end_card() -> void:
 	if chapter_tween != null and chapter_tween.is_running():
 		chapter_tween.kill()
 	chapter_close_active = false
+	hatch_exit_walking = false
 	end_card_active = true
 	_stop_junction_loops()
 	for child: Node in end_card_rows.get_children():
@@ -2272,9 +2306,9 @@ func _tank_hit() -> void:
 	sentry_brain.knock_down()
 	if not state.drop_sentry():
 		return
-	# For the end card: WOLF drew it only if he still was when it fell; after breaking off he held at
-	# the rubble while the engineer timed it.
-	recap_lane = "wolf" if wolf_baiting else ("refused" if lane_choice == "refused" else "alone")
+	# For the end card, saved with autosave C: WOLF drew it only if he still was when it fell; after
+	# breaking off he held at the rubble while the engineer timed it.
+	state.lane_recap = "wolf" if wolf_baiting else ("refused" if lane_choice == "refused" else "alone")
 	wolf_baiting = false
 	junction_room.sentry_down = true
 	junction_room.tank_hit(at_x)
@@ -2516,6 +2550,10 @@ func _door_lands() -> void:
 
 
 func _sync_scene() -> void:
+	# Walked out through the hatch, the actors faded; any new scene shows them again.
+	hatch_exit_walking = false
+	human.modulate.a = 1.0
+	wolf.modulate.a = 1.0
 	# The corridor's relay staging and bypass crank belong to the moment, not the save.
 	wolf_holding_relay = false
 	engineer_step_x = -1.0
@@ -2674,7 +2712,7 @@ func _sync_door(animate: bool = false) -> void:
 func _update_controls() -> void:
 	human.controlled = not title_open and not intro_active and not chapter_close_active and not end_card_active and not waiting_for_choice and not fail_active and engineer_step_x < 0.0
 	# Stepping back from the relay, the engineer walks on their own for a moment.
-	human.autonomous_target_x = engineer_step_x
+	human.autonomous_target_x = HATCH_EXIT_X if hatch_exit_walking else engineer_step_x
 	wolf.controlled = false
 	wolf.autonomous_target_x = _wolf_target_x()
 	wolf.follow_target = human if human.controlled and wolf.autonomous_target_x < 0.0 else null
@@ -2685,9 +2723,12 @@ func _update_controls() -> void:
 
 ## Where WOLF goes on his own, or -1 to follow: the relay contact (held until the seal lands), off
 ## the relay while the engineer works the bypass (_wolf_off_relay), the Records mirror, the junction door seam on entry, clear of the vent and the blast while the line is
-## live, and the rubble line once the door is down (he will not cross it unless he chooses to draw the
-## sentry onto the mark).
+## live, the rubble line once the door is down (he will not cross it unless he chooses to draw the
+## sentry onto the mark), and out through the hatch at the end.
 func _wolf_target_x() -> float:
+	if hatch_exit_walking:
+		# Into the hatch's doorway, behind the engineer.
+		return WOLF_HATCH_EXIT_X
 	if wolf_heading_to_relay or wolf_holding_relay:
 		return RELAY_CONTACT_X
 	if _wolf_off_relay():
