@@ -93,28 +93,43 @@ const VALVE_X: float = 420.0
 const DOOR_X: float = 480.0
 ## The rubble line is the sentry's lane boundary.
 const RUBBLE_X: float = SentryBrain.RUBBLE_X
-## The TANK RELEASE sits in the middle of the alcove that hides the engineer from the sentry.
-const ARM_X: float = (SentryBrain.COVER_MIN_X + SentryBrain.COVER_MAX_X) * 0.5
-## The bolt is used from BOLT_X - 40 rightward; its panel stands on the floor in that span, its right
-## cables running into the hatch frame.
-const BOLT_X: float = 850.0
+## Half the drawn width of the machines the actors must not stand inside.
+const BREAKER_HALF_WIDTH: float = BREAKER_REGION.size.x * BREAKER_SCALE * 0.5
+const VALVE_HALF_WIDTH: float = VALVE_REGION.size.x * VALVE_SCALE * 0.5
+const ARM_PANEL_HALF_WIDTH: float = ARM_PANEL_REGION.size.x * ARM_PANEL_SCALE * 0.5
+const BOLT_PANEL_HALF_WIDTH: float = BOLT_PANEL_REGION.size.x * BOLT_PANEL_SCALE * 0.5
+## The TANK RELEASE stands at the left end of the alcove that hides the engineer from the sentry, just
+## inside its left post, so the engineer works it from beside it, inside the cover (Main's
+## JUNCTION_STATIONS).
+const ARM_X: float = SentryBrain.COVER_MIN_X + ARM_PANEL_HALF_WIDTH + 2.0
+## The exit bolt's panel stands on the floor left of the hatch, its right cables running into the
+## hatch frame. The engineer works it from its left, facing it (BOLT_X), clear of the downed sentry;
+## its USE reaches from BOLT_REACH_MIN_X rightward, the hatch included.
 const BOLT_PANEL_X: float = 806.0
+## (6 px: the engineer's front hand over the panel's edge, Main.STATION_OVERLAP.)
+const BOLT_X: float = BOLT_PANEL_X - BOLT_PANEL_HALF_WIDTH - M0Actor.HUMAN_REACH + 6.0
+const BOLT_REACH_MIN_X: float = BOLT_X - 16.0
 const HATCH_X: float = 880.0
 const FLOOR_Y: float = 440.0
-## Where WOLF stands to read the door seam (his 62 px body stops just short of the door body at
-## x 452), and where he holds once the door is down.
-const WOLF_SEAM_X: float = 418.0
-## (He holds at the near edge of the rubble, so his sprite stays clear of the engineer at CHOICE_X.)
+## Where WOLF stands to read the pressure behind the door: on the valve's left, facing it, his snout at
+## the valve's edge where its LINE gauge reads the line, so he never stands inside the machine. (There
+## is no floor beside the door itself: the valve stands right in front of it.)
+const WOLF_SEAM_X: float = VALVE_X - VALVE_HALF_WIDTH - M0Actor.WOLF_REACH - 2.0
+## (He holds at the near edge of the rubble, so his sprite stays clear of the engineer at CHOICE_X.
+## Between the valve and the release alcove there is no floor as long as he is, so his rear stands
+## over the valve's right side here.)
 const WOLF_RUBBLE_X: float = 448.0
 ## Where WOLF stands when he chooses to draw the sentry: at the lip of the rubble with only his front
 ## over the lane line, so he never walks through the machine and his drawn body stays clear of the
 ## engineer at the TANK RELEASE, the floor brackets and the tank. It parks BAIT_OFFSET
 ## past him, on the mark, facing him.
 const WOLF_BAIT_X: float = DropArm.MARK_X - SentryBrain.BAIT_OFFSET
-## Where WOLF waits while the line builds and the fuse burns: back by the entrance, his drawn body
-## (M0Actor.WOLF_REACH) clear of the engineer at the breaker, so it is nowhere near the relief vent's
-## grate, its steam or the door's blast zone.
-const WOLF_CLEAR_X: float = BREAKER_X - M0Actor.HUMAN_REACH - M0Actor.WOLF_REACH - 2.0
+## Where WOLF waits while the line builds and the fuse burns: back by the entrance hatch, his snout at
+## the breaker's left edge (his painted front is a few px inside M0Actor.WOLF_REACH), so he is not
+## inside the breaker, his drawn body is clear of the engineer working it from its right, his tail
+## stays in view while they crank the valve, and he is nowhere near the relief vent's grate, its
+## steam or the door's blast zone.
+const WOLF_CLEAR_X: float = 100.0
 ## The engineer's front foot on the rubble line: where the question of how to drop the tank comes up,
 ## still outside the sentry's lane.
 const CHOICE_X: float = RUBBLE_X - M0State.HUMAN_HALF_WIDTH
@@ -139,11 +154,12 @@ const DOOR_Z: int = 0
 const DOOR_LIP_Z: int = 2
 ## How long the grate stays dangerous after the relief vent lets go.
 const HAZARD_SECONDS: float = 0.4
-const VENT_REASON: String = "The relief vent let go under you. Stand clear of the grate when the gauge peaks."
-## Formatted with the engineer's first name.
+## The knockdown cards, in the third person like the narration; each is formatted with the engineer's
+## first name.
+const VENT_REASON: String = "The relief vent let go under %s. When the gauge peaks, stay off the grate."
 const BLAST_REASON: String = "The door went with %s in front of it. When the fuse lights, back away past the valve."
-const SENTRY_REASON: String = "The sentry ran you down in its lane. Cross when it faces away, or get back over the rubble."
-const CLOUD_REASON: String = "The coolant cloud caught you. Let it clear before you cross the mark."
+const SENTRY_REASON: String = "The sentry ran %s down in its lane. Stay between the alcove's posts, or get back over the rubble."
+const CLOUD_REASON: String = "The coolant cloud caught %s. Let it clear before crossing the mark."
 const AMBER: Color = Color("#f3ae4b")
 const GREEN: Color = Color("#a4f0c4")
 const DIM: Color = Color("#3e4f5a")
@@ -433,12 +449,14 @@ func _ready() -> void:
 	breaker_glow = RoomDepth.make_glow(AMBER, Vector2(64.0, 30.0), 0.5)
 	breaker_glow.name = "BreakerGlow"
 	breaker_glow.position = BREAKER_LIGHT.get_center()
-	breaker_glow.z_index = 1
+	# Station lights, glows, plates and captions sit at this node's own depth (z 1), under the actors
+	# (Main.ACTOR_Z): someone standing at a machine is always drawn in front of all of it.
+	breaker_glow.z_index = 0
 	add_child(breaker_glow)
 	vent_glow = RoomDepth.make_glow(AMBER, VENT_GLOW_SIZE, 0.0)
 	vent_glow.name = "VentGlow"
 	vent_glow.position = Vector2(VENT_X, FLOOR_Y - 6.0)
-	vent_glow.z_index = 1
+	vent_glow.z_index = 0
 	add_child(vent_glow)
 	_build_door()
 	_build_particles()
@@ -472,7 +490,7 @@ func _ready() -> void:
 	line_caption.add_theme_font_size_override("font_size", LINE_CAPTION_FONT_SIZE)
 	line_caption.add_theme_color_override("font_color", Color("#b0d1de"))
 	line_caption.add_theme_stylebox_override("normal", label_plate)
-	line_caption.z_index = 1
+	line_caption.z_index = 0
 	add_child(line_caption)
 	line_caption.size = line_caption.get_combined_minimum_size()
 	# Just left of the dial, level with it.
@@ -536,7 +554,8 @@ func _build_door() -> void:
 	seam_glow = RoomDepth.make_glow(AMBER, Vector2(40.0, leaf_height), 0.0)
 	seam_glow.name = "SeamGlow"
 	seam_glow.position = Vector2(door_visual.position.x + (DOOR_SEAM_X - DOOR_REGION.get_center().x) * DOOR_SCALE, FLOOR_Y - DOOR_REGION.size.y * DOOR_SCALE * 0.5)
-	seam_glow.z_index = 2
+	# On the sealed leaf, under the actors and the front pillar.
+	seam_glow.z_index = DOOR_Z
 	add_child(seam_glow)
 
 
@@ -657,7 +676,7 @@ func _add_station_label(caption: String, center_x: float, tint: Color) -> Label:
 	label.add_theme_font_size_override("font_size", LABEL_FONT_SIZE)
 	label.add_theme_color_override("font_color", tint)
 	label.add_theme_stylebox_override("normal", label_plate)
-	label.z_index = 1
+	label.z_index = 0
 	label.set_meta(&"center_x", center_x)
 	add_child(label)
 	station_labels.append(label)
@@ -676,12 +695,23 @@ func _fit_label(label: Label) -> void:
 func _process(_delta: float) -> void:
 	if not visible:
 		return
-	var viewport: Viewport = get_viewport()
+	fade_at_view_edge(station_labels, get_viewport())
+
+
+## Fades each of [param labels] out over LABEL_EDGE_FADE px as it reaches the edge of [param viewport]'s
+## view, so a name the edge would cut never shows in part. Every room's station names and the corridor's
+## bypass plates use it; a label sized to its text fades by its text.
+static func fade_at_view_edge(labels: Array, viewport: Viewport) -> void:
 	var view: Rect2 = viewport.get_canvas_transform().affine_inverse() * viewport.get_visible_rect()
-	for label: Label in station_labels:
-		var rect: Rect2 = label.get_global_rect()
-		var margin: float = minf(rect.position.x - view.position.x, view.end.x - rect.end.x)
-		label.modulate.a = clampf(margin / LABEL_EDGE_FADE, 0.0, 1.0)
+	for label: Control in labels:
+		label.modulate.a = edge_alpha(label.get_global_rect(), view)
+
+
+## How opaque a plate covering [param rect] is in [param view]: 1 well inside, falling to 0 as either
+## end reaches the view's edge.
+static func edge_alpha(rect: Rect2, view: Rect2) -> float:
+	var margin: float = minf(rect.position.x - view.position.x, view.end.x - rect.end.x)
+	return clampf(margin / LABEL_EDGE_FADE, 0.0, 1.0)
 
 
 ## Enables the door body and hazards only while this is the room in play, so the junction's

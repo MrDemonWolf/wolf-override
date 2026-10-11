@@ -154,10 +154,14 @@ func _run() -> void:
 		return
 	if not _require(await _walk_to(human, 350.0), "engineer can backtrack to the breaker"):
 		return
-	for _frame in range(40):
-		await physics_frame
-	# Backtracking turns the engineer left, so WOLF crosses to his right and settles a follow gap away.
-	_expect(absf(wolf.position.x - human.position.x - M0Actor.FOLLOW_GAP) <= 5.0, "WOLF settles behind the engineer after backtracking")
+	# Stopped over the breaker's cabinet, the engineer sidesteps out beside it, still facing left and in
+	# its reach, instead of standing inside the machine.
+	_expect(await _wait_until(func() -> bool: return absf(human.position.x - 350.0) >= 38.0 + M0Actor.HUMAN_REACH - 6.0 - 2.0 and absf(human.velocity.x) < 1.0, 60), "stopped over the breaker the engineer steps out beside it (x %.0f)" % human.position.x)
+	_expect(human.body_sprite.flip_h and absf(human.position.x - 350.0) <= 52.0, "the sidestep keeps the engineer's facing and the breaker in reach")
+	# Backtracking turns the engineer left, so WOLF crosses to his right and settles a follow gap away,
+	# or a little further back where that gap would stand him over the breaker.
+	_expect(await _wait_until(func() -> bool: return wolf.position.x > human.position.x and absf(wolf.velocity.x) < 1.0 and wolf.position.x - human.position.x >= M0Actor.FOLLOW_GAP - 5.0 and wolf.position.x - human.position.x <= M0Actor.FOLLOW_GAP + M0Actor.AVOID_DETOUR, 150), "WOLF settles behind the engineer after backtracking")
+	_expect(wolf.position.x - M0Actor.WOLF_REACH + M0Actor.AVOID_TOLERANCE >= 350.0 + 38.0 - 3.0, "resting behind the engineer at the breaker, WOLF stands clear of its cabinet (x %.0f)" % wolf.position.x)
 	await _tap(&"interact")
 	if not _require(game.get("waiting_for_choice"), "breaker opens authored disagreement"):
 		return
@@ -246,11 +250,14 @@ func _run() -> void:
 	state = game.get("state") as M0State
 	_expect(state.memory.is_empty() and not state.door_open and human.position == state.human_position, "New Game clears current play")
 	game.call("_load_game")
+	# Read where the load put them before a physics step can move WOLF on towards his follow spot.
+	var loaded_human: Vector2 = human.position
+	var loaded_wolf: Vector2 = wolf.position
 	await process_frame
 	state = game.get("state") as M0State
 	if not _require(state.to_dict() == saved and state.active_actor == "human" and human.controlled and not wolf.controlled, "load restores cooperative scene with engineer control"):
 		return
-	_expect(human.position == state.human_position and wolf.position == state.wolf_position and state.checkpoint_callback().contains(State.CHOICE_TEXT[State.DISCLOSE]), "load restores positions and actual callback")
+	_expect(loaded_human == state.human_position and loaded_wolf == state.wolf_position and state.checkpoint_callback().contains(State.CHOICE_TEXT[State.DISCLOSE]), "load restores positions and actual callback (engineer %s of %s, WOLF %s of %s)" % [loaded_human, state.human_position, loaded_wolf, state.wolf_position])
 
 	game.call("_new_game")
 	game.call("_finish_intro")
@@ -398,7 +405,12 @@ func _run() -> void:
 		return
 	await _tap(&"interact")
 	_expect(str(game.get("status_line")).begins_with("WOLF: That purge takes") and not game.get("waiting_for_choice"), "the stakes line comes before the breaker question on every new run")
+	# The relay prompt never shares the screen with the stakes: the hint only offers to go on.
+	for _frame in range(200):
+		await physics_frame
+	_expect(str(game.call("_context_hint")) == "E: continue." and not game.get("waiting_for_choice") and str(game.get("status_line")).begins_with("WOLF: That purge takes"), "with WOLF's stakes up at the breaker the hint offers only to go on, never the relay prompt, and nothing opens the question on a timer")
 	await _tap(&"interact")
+	_expect(game.get("waiting_for_choice") and str(game.get("status_line")).begins_with("WOLF: That relay's tagged COOLANT FAULT"), "going on from the stakes, WOLF asks about the relay")
 	await _tap(&"choice_1")
 	await _tap(&"interact")
 	if not _require(state.breaker_armed, "breaker arms on the disclose-then-bypass route"):
@@ -417,8 +429,16 @@ func _run() -> void:
 		return
 	await process_frame
 	_expect(bypass.bypass_label.modulate.a == 1.0, "in full view the MANUAL BYPASS plate shows whole")
-	_expect(wolf.autonomous_target_x < 0.0, "before the engineer touches the bypass on the honest route, WOLF follows as usual")
+	var ready_x: float = float((game.get_script() as Script).get_script_constant_map()["WOLF_BYPASS_CLEAR_X"])
+	_expect(wolf.autonomous_target_x == ready_x and ready_x + M0Actor.WOLF_REACH <= 605.0 - 43.0, "at the bypass on the honest route WOLF waits off the relay, ready to take it, instead of following onto the machine")
 	_expect(str(game.call("_context_hint")) == "HOLD E: crank it yourself, or let WOLF take the relay.", "after WOLF offered, the bypass still offers the engineer-only way")
+	# Part cranked, letting WOLF take the relay is still on offer, and the hint keeps saying so.
+	Input.action_press(&"interact")
+	var part_cranked: bool = await _wait_until(func() -> bool: return int(game.get("bypass_ticks")) >= 2, 120)
+	Input.action_release(&"interact")
+	await physics_frame
+	var part_ticks: int = int(game.get("bypass_ticks"))
+	_expect(part_cranked and not state.door_open and str(game.call("_context_hint")) == "HOLD E: crank on, %d of 8, or let WOLF take the relay." % part_ticks, "part cranked on the honest route, the hint counts the turns and still offers WOLF the relay")
 	Input.action_press(&"interact")
 	var cranked: bool = await _wait_until(func() -> bool: return state.door_open, 300)
 	Input.action_release(&"interact")

@@ -113,8 +113,14 @@ func _run() -> void:
 	_expect(dimmed and drawn_behind, "crossing over, WOLF passes behind the engineer and dims")
 	_expect(reflection_dimmed, "WOLF's floor reflection dims with him")
 	_expect_clear(human, wolf, "corridor at rest after the turn")
-	# He stops within the 2 px of his spot that M0Actor treats as arrived.
-	_expect(absf(wolf.position.x - human.position.x - M0Actor.FOLLOW_GAP) <= 2.5 and wolf.body_sprite.flip_h, "on the right WOLF rests a follow gap away, facing the engineer")
+	# He stops within the 2 px of his spot that M0Actor treats as arrived: a follow gap away, or, where
+	# that would stand him over a machine (here the breaker the engineer stopped by), the first clear
+	# floor a little further back.
+	var rest_x: float = wolf.off_machines(human.position.x + M0Actor.FOLLOW_GAP, 1)
+	_expect(absf(wolf.position.x - rest_x) <= 2.5 and rest_x - human.position.x <= M0Actor.FOLLOW_GAP + M0Actor.AVOID_DETOUR and wolf.body_sprite.flip_h, "on the right WOLF rests a follow gap away or just clear of the nearest machine, facing the engineer (x %.0f, spot %.0f)" % [wolf.position.x, rest_x])
+	for span: Vector2 in wolf.avoid_spans:
+		# (Within the 2.5 px M0Actor treats as arrived.)
+		_expect(wolf.position.x + M0Actor.WOLF_REACH - M0Actor.AVOID_TOLERANCE <= span.x + 2.5 or wolf.position.x - M0Actor.WOLF_REACH + M0Actor.AVOID_TOLERANCE >= span.y - 2.5 or absf(rest_x - human.position.x - M0Actor.FOLLOW_GAP) < 0.5, "resting there WOLF stands clear of the machine at %.0f..%.0f" % [span.x, span.y])
 	_expect(await _wait_until(func() -> bool: return wolf.body_sprite.self_modulate.is_equal_approx(Color.WHITE), 120), "WOLF's dim clears once he is past")
 
 	# At the left wall there is no room behind a right-facing engineer, so WOLF stays in front.
@@ -181,12 +187,108 @@ func _run() -> void:
 	await _settle()
 	_expect_clear(human, wolf, "junction lane at rest after walking")
 
+	# Nobody rests inside a machine, in any room: stopped over a station's body the engineer sidesteps
+	# out beside it, and WOLF's own spots keep him off the machines where there is floor.
+	var corridor: M0State = State.new()
+	corridor.record_choice(State.DISCLOSE)
+	corridor.arm_breaker()
+	corridor.activate_power("wolf")
+	await _check_stations(game, human, corridor, Main.CORRIDOR_STATIONS, "corridor")
+	var corridor_labels: Array[Label] = [game.get_node("BreakerLabel"), game.get_node("RelayLabel"), game.get_node("CheckpointLabel")]
+	await _check_label_edges(game, human, corridor_labels, "corridor")
+	var records: M0State = _completed_records_state()
+	records.chapter_complete = false
+	await _check_stations(game, human, records, Main.RECORDS_STATIONS, "records")
+	await _check_label_edges(game, human, (game.get("records_room") as RecordsRoom).station_labels, "records")
+	var junction: M0State = _completed_records_state()
+	junction.enter_junction()
+	junction.door_blown = true
+	junction.sentry_down = true
+	await _check_stations(game, human, junction, Main.JUNCTION_STATIONS, "junction")
+	var release: Vector4 = Main.JUNCTION_STATIONS[2]
+	var release_spot: float = release.x + release.y + M0Actor.HUMAN_REACH - Main.STATION_OVERLAP
+	_expect(release_spot - M0Actor.HUMAN_REACH >= SentryBrain.COVER_MIN_X and release_spot + M0Actor.HUMAN_REACH <= SentryBrain.COVER_MAX_X, "beside the TANK RELEASE the engineer's whole body is between the alcove's posts")
+	_expect(JunctionRoom.WOLF_SEAM_X + M0Actor.WOLF_REACH <= JunctionRoom.VALVE_X - JunctionRoom.VALVE_HALF_WIDTH and JunctionRoom.WOLF_SEAM_X - M0Actor.WOLF_REACH >= JunctionRoom.BREAKER_X + JunctionRoom.BREAKER_HALF_WIDTH - 6.0, "WOLF reads the line from the floor between the breaker and the valve, not from inside the valve")
+	_expect(JunctionRoom.BOLT_X + M0Actor.HUMAN_REACH - Main.STATION_OVERLAP <= JunctionRoom.BOLT_PANEL_X - JunctionRoom.BOLT_PANEL_HALF_WIDTH + 0.5 and JunctionRoom.BOLT_X >= JunctionRoom.BOLT_REACH_MIN_X, "the exit bolt is worked from beside its panel, inside its reach")
+	_check_draw_order(game, human, wolf)
+
 	DirAccess.remove_absolute(ProjectSettings.globalize_path(path))
 	game.queue_free()
 	await create_timer(0.1).timeout
 	if failures == 0:
 		print("Follow spacing checks passed")
 	quit(1 if failures > 0 else 0)
+
+
+## Places the engineer, facing right, at the middle of every station in [param stations] of the room
+## [param state] is in and checks that, with no input held, they sidestep out beside the machine (its
+## own side, else the left from the middle) without turning, still inside its reach.
+func _check_stations(game: Node2D, human: M0Actor, state: M0State, stations: Array[Vector4], room: String) -> void:
+	game.set("state", state)
+	game.call("_sync_scene")
+	await physics_frame
+	await physics_frame
+	for station: Vector4 in stations:
+		human.position.x = station.x
+		human.velocity = Vector2.ZERO
+		human.body_sprite.flip_h = false
+		var offset: float = minf(station.y + M0Actor.HUMAN_REACH - Main.STATION_OVERLAP, station.z - 2.0)
+		var spot: float = clampf(station.x + (station.w if station.w != 0.0 else -1.0) * offset, M0Actor.MIN_X, M0Actor.MAX_X)
+		var settled: bool = await _wait_until(func() -> bool: return absf(human.position.x - spot) <= 2.5 and absf(human.velocity.x) < 1.0, 90)
+		_expect(settled and human.controlled, "%s: stopped over the machine at %.0f the engineer steps out to %.0f (at %.0f)" % [room, station.x, spot, human.position.x])
+		_expect(not human.body_sprite.flip_h and absf(human.position.x - station.x) <= station.z, "%s: the step out at %.0f keeps the engineer's facing and the machine in reach" % [room, station.x])
+
+
+## With the view on the middle of the room, a station name the view's edge cuts fades out like the
+## junction's plates instead of showing in part, and every name is sized to its text.
+func _check_label_edges(game: Node2D, human: M0Actor, labels: Array[Label], room: String) -> void:
+	human.position.x = 480.0
+	await _settle()
+	var viewport: Viewport = game.get_viewport()
+	var view: Rect2 = viewport.get_canvas_transform().affine_inverse() * viewport.get_visible_rect()
+	var faded: int = 0
+	for label: Label in labels:
+		var rect: Rect2 = label.get_global_rect()
+		_expect(is_equal_approx(label.size.x, label.get_combined_minimum_size().x), "%s: %s is sized to its text" % [room, label.text])
+		_expect(is_equal_approx(label.modulate.a, JunctionRoom.edge_alpha(rect, view)), "%s: %s fades by how close it is to the view's edge (alpha %.2f)" % [room, label.text, label.modulate.a])
+		if rect.position.x < view.position.x or rect.end.x > view.end.x:
+			_expect(label.modulate.a == 0.0, "%s: %s, cut by the view's edge, is hidden" % [room, label.text])
+		if label.modulate.a < 1.0:
+			faded += 1
+	_expect(faded > 0, "%s: from the middle of the room at least one name reaches the view's edge, so the fade is exercised" % room)
+
+
+## The machines' lights, glows, plates and captions all draw under the two actors, so someone standing
+## at a machine is in front of everything on it. (The door's placard rides over the bulkhead's front
+## pillar, above head height.)
+func _check_draw_order(game: Node2D, human: M0Actor, wolf: M0Actor) -> void:
+	var actor_z: int = _effective_z(human)
+	_expect(actor_z == _effective_z(wolf), "both actors draw at one depth")
+	var room: JunctionRoom = game.get("junction_room") as JunctionRoom
+	var records: RecordsRoom = game.get("records_room") as RecordsRoom
+	var bypass: BypassHandle = game.get("bypass_handle") as BypassHandle
+	var parts: Array[CanvasItem] = [game.get_node("BreakerStatusLight"), game.get_node("RelayStatusLight"), game.get("breaker_status_glow"), game.get("relay_status_glow"), game.get_node("BreakerArt"), game.get_node("RelayArt"), game.get_node("CheckpointArt"), game.get_node("BreakerLabel"), game.get_node("RelayLabel"), game.get_node("CheckpointLabel"), bypass, bypass.bypass_label, bypass.fault_tag, records.purge_glow, records.mirror_glow, room.breaker_glow, room.vent_glow, room.seam_glow, room.line_caption, room.breaker_art, room.valve_art, room.arm_panel_art, room.bolt_panel_art]
+	for label: Label in records.station_labels:
+		parts.append(label)
+	for label: Label in room.station_labels:
+		if label != room.door_label:
+			parts.append(label)
+	var over: Array[String] = []
+	for part: CanvasItem in parts:
+		if _effective_z(part) >= actor_z:
+			over.append("%s (z %d)" % [part.name, _effective_z(part)])
+	_expect(over.is_empty(), "every machine's light, glow and plate draws under the actors (over: %s)" % ", ".join(over))
+
+
+func _effective_z(item: CanvasItem) -> int:
+	var z: int = 0
+	var node: Node = item
+	while node is CanvasItem:
+		z += (node as CanvasItem).z_index
+		if not (node as CanvasItem).z_as_relative:
+			break
+		node = node.get_parent()
+	return z
 
 
 ## WOLF_REACH and HUMAN_REACH must cover the visible art, or FOLLOW_GAP would not keep them apart.

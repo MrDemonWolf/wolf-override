@@ -201,7 +201,8 @@ func _check_scene() -> void:
 	if not _require(state.chapter_id == "junction" and not state.door_blown, "USE at the secured exit enters the junction"):
 		return
 	_expect(room.visible and not (game.get("records_room") as RecordsRoom).visible and not (game.get_node("CorridorDepth") as Node2D).visible, "only the junction is visible after entry")
-	_expect(human.position == Vector2(120.0, 410.0) and human.controlled and not wolf.controlled, "the engineer stands at the entry hatch with controls")
+	# A physics step may already have settled the body onto the floor by its safe margin.
+	_expect(human.position.distance_to(Vector2(120.0, 410.0)) < 0.05 and human.controlled and not wolf.controlled, "the engineer stands at the entry hatch with controls (%s)" % human.position)
 	_expect(is_equal_approx(camera.get_screen_center_position().x, camera.position.x), "entering the junction cuts the camera to the engineer instead of panning across")
 	var autosave_a: M0State = State.load_from_disk(path)
 	_expect(autosave_a != null and autosave_a.chapter_id == "junction" and not autosave_a.door_blown and autosave_a.memory == state.memory, "autosave A is written on entry with the relay memory")
@@ -327,7 +328,7 @@ func _check_scene() -> void:
 	for _frame: int in 30:
 		await physics_frame
 		knocked = knocked or game.get("fail_active")
-	_expect(not knocked and human.controlled and str(game.get("status_line")) == "The door goes. WOLF stops at the rubble and waits for %s's call. In the lane beyond, something whirs awake." % state.human_name().get_slice(" ", 0), "clear of the zone the blast is not a knockdown, even at its edge, and WOLF waits for the engineer's call at the rubble")
+	_expect(not knocked and human.controlled and str(game.get("status_line")) == "The door goes. WOLF heads for the rubble to wait for %s's call. In the lane beyond, something whirs awake." % state.human_name().get_slice(" ", 0), "clear of the zone the blast is not a knockdown, even at its edge, and the line says WOLF is heading for the rubble to wait for the engineer's call")
 	_expect(await _wait_until(func() -> bool: return room.door_blown_art.visible and not room.door_breaking_art.visible, 30), "then it stands blown open on the passage beyond")
 	_expect(await _wait_until(func() -> bool: return not room.sentry.visual.dormant and room.sentry.visual.is_lit() and room.sentry.visual.body.modulate == Color.WHITE, 90), "the blast wakes the sentry: it powers up and its eye lights")
 	_expect(_labels_clear(room), "after the blast the station plates still sit apart in their row")
@@ -441,6 +442,7 @@ func _check_vent_edges(game: Node2D, human: M0Actor, wolf: M0Actor, room: Juncti
 	_expect(await _wait_until(func() -> bool: return absf(wolf.position.x - JunctionRoom.WOLF_CLEAR_X) <= 4.0, 180), "while the line builds WOLF waits at his spot")
 	_expect(JunctionRoom.WOLF_CLEAR_X + M0Actor.WOLF_REACH < PressureLine.VENT_GRATE_MIN_X and JunctionRoom.WOLF_CLEAR_X + M0Actor.WOLF_REACH < PressureLine.BLAST_MIN_X, "his spot keeps all of his drawn body off the grate and out of the blast zone")
 	_expect(JunctionRoom.WOLF_CLEAR_X + M0Actor.WOLF_REACH < JunctionRoom.BREAKER_X - M0Actor.HUMAN_REACH and JunctionRoom.WOLF_CLEAR_X - M0Actor.WOLF_REACH >= 0.0, "his spot is clear of the engineer at the breaker and inside the room")
+	_expect(JunctionRoom.WOLF_CLEAR_X + M0Actor.WOLF_REACH <= JunctionRoom.BREAKER_X - JunctionRoom.BREAKER_HALF_WIDTH + 6.0, "his snout stops at the breaker's edge: he never stands inside the machine")
 	line.gauge = PressureLine.STEAM_GAUGE + 0.05
 	_expect(await _wait_until(func() -> bool: return room.vent_steam.emitting, 5), "near the top of the gauge the vent steams")
 	line.gauge = 0.999
@@ -465,7 +467,7 @@ func _check_vent_edges(game: Node2D, human: M0Actor, wolf: M0Actor, room: Juncti
 	_expect(str(game.call("_context_hint")) == "The vent is about to blow. Get off the grate now." and Color(room.vent_glow.modulate, 1.0).is_equal_approx(Color(JunctionRoom.SEAM_RED, 1.0)), "in the last moments the hint and the grate give the hard warning")
 	line.gauge = 0.999
 	_expect(await _wait_until(func() -> bool: return game.get("fail_active"), 10), "with a foot on the grate the vent trip is a knockdown")
-	_expect(str(game.get("status_line")).begins_with("The relief vent let go under you"), "the status line names the vent")
+	_expect(str(game.get("status_line")).begins_with("The relief vent let go under %s. When the gauge peaks, stay off the grate." % (game.get("state") as M0State).human_name().get_slice(" ", 0)), "the status line names the vent and the engineer, in the third person like the blast's")
 	_expect(room.display_gauge == 1.0 and room.gauge_tripped and line.gauge == 0.0, "the needle stays pinned at the top, red, as the vent knocks the engineer down")
 	await create_timer(JunctionRoom.HAZARD_SECONDS + 0.2).timeout
 	_expect(game.get("fail_active") and room.display_gauge == 1.0, "and holds there through the knockdown")

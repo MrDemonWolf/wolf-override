@@ -131,12 +131,7 @@ func _process(delta: float) -> void:
 		fault_tag.modulate = Color(1.0, glow, glow * 0.9)
 	# Like the junction's plates, a plate the edge of the view cuts fades out rather than show part of
 	# its name.
-	var viewport: Viewport = get_viewport()
-	var view: Rect2 = viewport.get_canvas_transform().affine_inverse() * viewport.get_visible_rect()
-	for plate: Label in [bypass_label, fault_tag]:
-		var rect: Rect2 = plate.get_global_rect()
-		var margin: float = minf(rect.position.x - view.position.x, view.end.x - rect.end.x)
-		plate.modulate.a = clampf(margin / JunctionRoom.LABEL_EDGE_FADE, 0.0, 1.0)
+	JunctionRoom.fade_at_view_edge([bypass_label, fault_tag], get_viewport())
 
 
 ## A name plate like the junction's; [param wrap_width] above 0 wraps the caption onto rows that wide,

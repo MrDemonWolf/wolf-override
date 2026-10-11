@@ -13,16 +13,18 @@ const RUBBLE_X: float = 540.0
 const LANE_ENTRY_X: float = RUBBLE_X + 5.0
 ## The TANK RELEASE alcove, exactly as JunctionRoom draws it: it starts at the rubble line, so there is
 ## no exposed strip between the two, and an engineer centred anywhere in it is out of the sentry's
-## sight, though a sentry that is already chasing still runs them down at the release.
+## sight, though a sentry that is already chasing still runs them down at the release. It is wide
+## enough for the release panel at its left end and the engineer standing beside it, facing it, with
+## their whole drawn body inside the posts (JunctionRoom.ARM_X, Main's JUNCTION_STATIONS).
 const COVER_MIN_X: float = LANE_ENTRY_X
-const COVER_MAX_X: float = 598.0
+const COVER_MAX_X: float = 626.0
 ## How far ahead it sees, in the direction it faces.
 const SIGHT_RANGE: float = 180.0
 ## Half the sentry's body. Bodies touching (this plus half the engineer) is contact.
 const HALF_WIDTH: float = 26.0
 const CONTACT_RANGE: float = HALF_WIDTH + M0State.HUMAN_HALF_WIDTH
 ## The patrol turns where its front edge meets an engineer standing at the alcove's right end, so a
-## patrolling sentry never runs into someone hiding there (638; the patrol still crosses the mark).
+## patrolling sentry never runs into someone hiding there (666; the patrol still crosses the mark).
 const PATROL_MIN_X: float = COVER_MAX_X + CONTACT_RANGE
 const PATROL_MAX_X: float = 840.0
 const PATROL_SPEED: float = 140.0

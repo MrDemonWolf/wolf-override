@@ -321,8 +321,6 @@ func _check_scene() -> void:
 	_expect(not brain.is_holding(JunctionRoom.WOLF_BAIT_X) and str(game.call("_context_hint")) == "Wait for WOLF to park it on the mark." and not game.call("_drop_ready"), "at the release before WOLF has it on the mark the hint says to wait")
 	await _tap(&"interact")
 	_expect(arm.state == &"hung" and str(game.get("status_line")) == "Wait. WOLF hasn't got it on the mark yet.", "USE at the release before it is parked leaves the tank hanging")
-	var wait_pressed_ms: int = Time.get_ticks_msec()
-	var wait_seen_ms: Array[int] = [wait_pressed_ms]
 	# Once it is after the engineer WOLF has backed off, so the release no longer waits for him.
 	var drawing_state: StringName = brain.state
 	for hunting: StringName in [&"lock", &"chase"]:
@@ -330,15 +328,23 @@ func _check_scene() -> void:
 		_expect(not game.call("_drop_waits_for_wolf") and game.call("_drop_ready") and wolf.autonomous_target_x == JunctionRoom.WOLF_BAIT_X, "with the sentry %s the release drops without waiting for WOLF" % ("locking on" if hunting == &"lock" else "chasing"))
 	brain.state = drawing_state
 	var walk_in_gap: Array[float] = [INF]
+	# Box, hint and picture agree on every frame: the "Wait" and the wait hint stay up exactly until the
+	# sentry is parked, and on that frame the line says it has stopped and the hint offers the drop.
+	var agreed: Array[bool] = [true]
 	_expect(await _wait_until(func() -> bool:
 		walk_in_gap[0] = minf(walk_in_gap[0], absf(wolf.position.x - room.sentry.position.x))
-		if str(game.get("status_line")) == "Wait. WOLF hasn't got it on the mark yet.":
-			wait_seen_ms[0] = Time.get_ticks_msec()
+		var parked: bool = brain.is_holding(JunctionRoom.WOLF_BAIT_X)
+		var line: String = str(game.get("status_line"))
+		var hint: String = str(game.call("_context_hint"))
+		if parked:
+			agreed[0] = agreed[0] and line == "The sentry stops on the mark, its eyes on WOLF. Drop the tank now." and hint == "E: drop the tank. It's parked on the mark."
+		else:
+			agreed[0] = agreed[0] and line == "Wait. WOLF hasn't got it on the mark yet." and hint == "Wait for WOLF to park it on the mark."
 		return brain.state == &"fixated" and absf(brain.x - DropArm.MARK_X) <= 0.5 and absf(wolf.position.x - JunctionRoom.WOLF_BAIT_X) <= 4.0, 300), "WOLF holds short of the mark and the sentry parks on it")
-	# The answer to the early press stays up long enough to read, even if it parks a moment later.
-	var wait_line_up: bool = str(game.get("status_line")) == "Wait. WOLF hasn't got it on the mark yet."
-	_expect(wait_line_up or wait_seen_ms[0] - wait_pressed_ms >= 1400, "the \"Wait\" stays up at least about 1.5 s after the early press (%d ms)" % (wait_seen_ms[0] - wait_pressed_ms))
-	_expect(await _wait_until(func() -> bool: return str(game.get("status_line")).begins_with("WOLF: You told me the truth at the relay."), 120), "once it is parked and the \"Wait\" has been read, WOLF's line comes back")
+	_expect(agreed[0], "after an early press the \"Wait\" and its hint hold until the sentry parks, then the line and the hint both say it is on the mark")
+	for _frame: int in 60:
+		await physics_frame
+	_expect(str(game.get("status_line")) == "The sentry stops on the mark, its eyes on WOLF. Drop the tank now." and str(game.call("_context_hint")).contains("drop the tank. It's parked"), "parked, the go line stays up beside the drop hint; nothing brings back the wait")
 	# While WOLF holds it, its beam watches only him: it ends short of the alcove, never on the engineer.
 	await physics_frame
 	var fixated_tip: float = Sentry.beam_tip_x(brain.x, room.sentry.visual.scale.x, true)
@@ -359,6 +365,7 @@ func _check_scene() -> void:
 	await _tap(&"interact")
 	_expect(arm.state == &"falling", "USE at the panel lets the tank go")
 	_expect(await _wait_until(func() -> bool: return (game.get("state") as M0State).sentry_down, 60), "the tank lands on the parked sentry")
+	_expect(str(game.get("status_line")).begins_with("The tank comes down square and crushes the sentry flat.") and absf(brain.x - DropArm.MARK_X) <= 8.0, "a hit on the mark is told as square")
 	_expect(brain.state == &"down" and room.sentry_down and room.coolant_burst.emitting and room.hit_sparks.emitting, "the hit is a real state change with coolant and sparks")
 	_expect(room.arm_label.text == "RELEASE SPENT" and room.tank_label.visible and room.tank_label.text == "TANK DOWN" and absf(room.tank_label.position.x + room.tank_label.size.x * 0.5 - DropArm.MARK_X) < 0.5, "the release reads spent and TANK DOWN sits over the tank")
 	await physics_frame
@@ -402,6 +409,13 @@ func _check_scene() -> void:
 	await _tap(&"interact")
 	# The two leave through the open hatch before the card: they walk into it and fade out.
 	_expect(game.get("hatch_exit_walking") and not game.get("end_card_active") and not human.controlled, "Continue on the closing beat walks them out through the hatch first")
+	# Nothing waits on a press during the walk, so no CONTINUE prompt shows, in any layout.
+	_expect(not (game.get_node("CanvasLayer/ContextHint") as Control).visible, "walking out through the hatch shows no CONTINUE prompt")
+	game.set("touch_enabled", true)
+	game.call("_refresh_ui")
+	_expect(not touch_use.visible and not (game.get_node("CanvasLayer/ContextHint") as Control).visible, "nor does the touch CONTINUE button show during the walk")
+	game.set("touch_enabled", false)
+	game.call("_refresh_ui")
 	await _tap(&"interact")
 	_expect(game.get("hatch_exit_walking") and not game.get("end_card_active"), "a second press does not cut the walk short")
 	_expect(await _wait_until(func() -> bool: return bool(game.get("end_card_active")), 120), "the END OF SLICE card follows the walk")
@@ -446,6 +460,9 @@ func _check_scene() -> void:
 	game.call("_load_game")
 	state = game.get("state") as M0State
 	_expect(state.junction_cleared and room.hatch_open == 1.0 and human.controlled and game.call("_objective") == "SERVICE LINE CLEARED" and str(game.get("status_line")) == "The service line runs on toward Archive.", "a restored cleared junction says where the line goes")
+	# The corridor seal's body (switched off outside the corridor at the end of the restore's frame)
+	# shares these coordinates, so the engineer is placed once that has happened.
+	await physics_frame
 	human.position.x = JunctionRoom.BOLT_X
 	await _tap(&"interact")
 	_expect(str(game.get("status_line")) == "The service line runs on toward Archive." and str(game.call("_context_hint")) == "The hatch is open.", "the open hatch has no developer note in the dialogue or the hint")
@@ -530,7 +547,7 @@ func _check_engineer_alone(game: Node2D, path: String) -> void:
 	_expect(brain.state == &"lock" and brain.x == locked_x and absf(room.sentry.position.x - locked_x) <= 4.0 and not game.get("fail_active"), "through the lock-on beat it stands still")
 	_expect(str(game.call("_context_hint")).contains("after you"), "the hint warns the engineer as soon as it locks on")
 	_expect(await _wait_until(func() -> bool: return game.get("fail_active"), 90), "sentry contact in the lane is a knockdown")
-	_expect(str(game.get("status_line")).begins_with(JunctionRoom.SENTRY_REASON.left(20)), "the status line names the sentry")
+	_expect(str(game.get("status_line")).begins_with(JunctionRoom.SENTRY_REASON % (game.get("state") as M0State).human_name().get_slice(" ", 0)) and str(game.get("status_line")).contains("Stay between the alcove's posts"), "the status line names the sentry and the engineer, and points at the alcove or the rubble")
 	_expect(await _wait_until(func() -> bool: return not game.get("fail_active"), 240), "the knockdown hands back")
 	var state: M0State = game.get("state") as M0State
 	_expect(FileAccess.get_file_as_bytes(path) == b_bytes and state.to_dict() == b_dict and state.memory.get("choice_id") == State.PRESS, "it restores autosave B with the relay memory intact and saves nothing")
@@ -623,11 +640,29 @@ func _check_cloud(game: Node2D, path: String) -> void:
 	_expect(arm.cloud_active(), "a forced miss vents the cloud")
 	# The room syncs the arm from Main._process, which a single physics frame does not always include.
 	_expect(await _wait_until(func() -> bool: return room.cloud_hazard.armed and room.coolant_cloud.emitting, 5), "the cloud arms its hurtbox")
+	# Stopped over the exit bolt's box, the engineer's usual sidestep to its left would end in the cloud:
+	# it never carries them into a hazard they are not already in.
+	var beside_cloud_x: float = DropArm.MARK_X + DropArm.CLOUD_HALF_WIDTH + M0State.HUMAN_HALF_WIDTH + 20.0
+	human.position.x = beside_cloud_x
+	# One frame for the game to see where the engineer now stands (the sidestep is decided each frame).
+	await process_frame
+	await process_frame
+	var stopped_x: float = human.position.x
+	for _frame: int in 30:
+		await physics_frame
+	_expect(absf(human.position.x - stopped_x) < 0.5 and not DropArm.in_cloud(human.position.x) and not game.get("fail_active"), "the sidestep out of a machine never walks the engineer into the coolant cloud (x %.1f)" % human.position.x)
 	human.position.x = DropArm.MARK_X
 	_expect(await _wait_until(func() -> bool: return game.get("fail_active"), 30), "walking into the coolant cloud is a knockdown")
-	_expect(str(game.get("status_line")).begins_with("The coolant cloud caught you"), "the status line names the cloud")
+	_expect(str(game.get("status_line")).begins_with("The coolant cloud caught %s. Let it clear before crossing the mark." % (game.get("state") as M0State).human_name().get_slice(" ", 0)), "the status line names the cloud and the engineer")
 	_expect(await _wait_until(func() -> bool: return not game.get("fail_active"), 240), "the cloud knockdown hands back")
 	_expect((game.get("state") as M0State).to_dict() == b_dict and not arm.cloud_active() and not room.cloud_hazard.armed and brain.state == &"patrol", "it restores autosave B with the cloud gone")
+	# A hit well off the mark is told as one: the tank catches the sentry off centre, not square.
+	brain.state = &"dormant"
+	brain.x = DropArm.MARK_X + DropArm.HIT_REACH - 4.0
+	game.set("lane_choice", "alone")
+	arm.drop()
+	_expect(await _wait_until(func() -> bool: return (game.get("state") as M0State).sentry_down, 60) and absf(brain.x - DropArm.MARK_X) > 8.0, "a drop on a sentry near the bracket's edge still hits")
+	_expect(str(game.get("status_line")).begins_with("The tank catches the sentry off centre and pins it to the floor.") and str(game.get("status_line")).ends_with("WOLF: It's down. The bolt by the hatch is next."), "an off-centre hit is told as off centre, not square")
 
 
 ## Autosave B: the door is down, the engineer just left of the old door line, WOLF at the rubble.

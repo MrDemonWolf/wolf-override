@@ -198,7 +198,7 @@ region_enabled = true
 region_rect = Rect2(116, 31, 280, 449)
 
 [node name="BreakerStatusLight" type="ColorRect" parent="."]
-z_index = 2
+z_index = 1
 offset_left = 339.0
 offset_top = 358.0
 offset_right = 357.0
@@ -207,7 +207,7 @@ mouse_filter = 2
 color = Color(0.72, 0.4, 0.17, 1)
 
 [node name="RelayStatusLight" type="ColorRect" parent="."]
-z_index = 2
+z_index = 1
 offset_left = 595.0
 offset_top = 361.0
 offset_right = 613.0

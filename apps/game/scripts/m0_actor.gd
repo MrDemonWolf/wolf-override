@@ -16,9 +16,18 @@ var keep_clear_of: M0Actor
 var follow_side: int = 0
 ## How long the engineer has faced the way that would put WOLF on his other side.
 var turn_seconds: float = 0.0
+## Where a controlled body eases to while no move input is held (main sets it beside a machine the
+## engineer stopped over), or -1. It is a sidestep: the body keeps the way it faces, so WOLF, who
+## follows on the side it faces away from, stays where he is. Any move input wins.
+var settle_x: float = -1.0
+## The room's machines as x spans (from, to); a follower rests clear of them when clear floor is at
+## most AVOID_DETOUR further back from the engineer (main sets them per room).
+var avoid_spans: Array[Vector2] = []
 
 const WALK_SPEED: float = 190.0
 const FOLLOW_SPEED: float = 220.0
+## The unhurried step out from over a machine (settle_x).
+const SETTLE_SPEED: float = 140.0
 ## Horizontal reach of each drawn body from its origin, rounded up from the sprites' visible pixels
 ## (WOLF's run about -64..66 px, the engineer's about -16..15; flipping mirrors them).
 ## follow_spacing_test measures the art against these.
@@ -32,6 +41,11 @@ const CLEAR_GAP: float = WOLF_REACH + HUMAN_REACH
 ## The engineer has to face a new way this long before WOLF crosses to his other side, so a tap
 ## back and forth never sets him weaving.
 const TURN_SETTLE_SECONDS: float = 0.3
+## How much further back than FOLLOW_GAP a follower goes to stand clear of a machine; with no clear
+## floor that close he keeps the usual gap.
+const AVOID_DETOUR: float = 100.0
+## WOLF_REACH is rounded up past his painted nose and tail tip, so this much of it may touch a machine.
+const AVOID_TOLERANCE: float = 4.0
 const MIN_X: float = 40.0
 const MAX_X: float = 920.0
 ## While walking past the engineer WOLF draws behind him (main orders him first) and dims a little,
@@ -43,8 +57,13 @@ const GRAVITY: float = 900.0
 
 func _physics_process(delta: float) -> void:
 	var following: bool = false
+	var settling: bool = false
 	if controlled:
-		velocity.x = Input.get_axis(&"move_left", &"move_right") * WALK_SPEED
+		var axis: float = Input.get_axis(&"move_left", &"move_right")
+		velocity.x = axis * WALK_SPEED
+		if axis == 0.0 and settle_x >= 0.0:
+			velocity.x = clampf(_approach(settle_x, delta), -SETTLE_SPEED, SETTLE_SPEED)
+			settling = true
 	elif autonomous_target_x >= 0.0:
 		velocity.x = _approach(autonomous_target_x, delta)
 		# Once he has walked off on his own, he picks his side afresh from the engineer's facing.
@@ -59,7 +78,7 @@ func _physics_process(delta: float) -> void:
 		# hold for TURN_SETTLE_SECONDS of play before he crosses.
 		turn_seconds = 0.0
 	if body_sprite != null:
-		if absf(velocity.x) > 1.0:
+		if absf(velocity.x) > 1.0 and not settling:
 			body_sprite.flip_h = velocity.x < 0.0
 		elif following:
 			# At rest beside the engineer he faces him.
@@ -77,6 +96,8 @@ func _physics_process(delta: float) -> void:
 ## target faces, so the engineer walks into open floor rather than into WOLF. A turn has to hold for
 ## TURN_SETTLE_SECONDS before he changes sides; a side without room for both bodies (a wall, a
 ## sealed door) sends him to the other side, and he returns only once the preferred side has the full gap.
+## Where his spot would stand him over a machine and clear floor is a little further back, he rests
+## there instead (off_machines).
 func follow_x(delta: float) -> float:
 	var target_x: float = follow_target.position.x
 	var away: int = -facing_of(follow_target)
@@ -96,7 +117,25 @@ func follow_x(delta: float) -> float:
 		if wanted != follow_side:
 			follow_side = wanted
 			turn_seconds = 0.0
-	return clampf(target_x + follow_side * FOLLOW_GAP, follow_min_x, follow_max_x)
+	return off_machines(clampf(target_x + follow_side * FOLLOW_GAP, follow_min_x, follow_max_x), follow_side)
+
+
+## [param x], or, when a follower's body there would stand over one of avoid_spans, the nearest spot
+## further from the engineer (on [param side]) that is clear of every span, if that is no more than
+## AVOID_DETOUR away and inside the follow range.
+func off_machines(x: float, side: int) -> float:
+	var spot: float = x
+	for _pass: int in avoid_spans.size() + 1:
+		var moved: bool = false
+		for span: Vector2 in avoid_spans:
+			if spot + WOLF_REACH - AVOID_TOLERANCE > span.x and spot - WOLF_REACH + AVOID_TOLERANCE < span.y:
+				spot = span.x - WOLF_REACH + AVOID_TOLERANCE if side < 0 else span.y + WOLF_REACH - AVOID_TOLERANCE
+				moved = true
+		if not moved:
+			break
+	if absf(spot - x) > AVOID_DETOUR or spot < follow_min_x or spot > follow_max_x:
+		return x
+	return spot
 
 
 ## True when standing FOLLOW_GAP to [param side] of [param target_x], held inside the follow range,
