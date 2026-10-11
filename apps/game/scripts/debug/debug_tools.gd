@@ -13,7 +13,13 @@ extends Node
 ##
 ## Cost: while the tools are unavailable, or available with the overlay off, this node neither
 ## processes nor draws; it only looks at input events as they arrive. The overlay refreshes its text
-## REFRESH_SECONDS apart while it is shown, never every frame.
+## REFRESH_SECONDS apart while it is shown, never every frame, and reads the save on disk at most
+## SAVE_INFO_SECONDS apart.
+##
+## The game's own cards come first: while Pause, Settings, the END OF SLICE card or the title's
+## Credits or Changelog is up, the overlay and the DEBUG button step aside (and stop refreshing), and
+## the overlay steps aside for an answer button that would sit under it (the touch layout's choice
+## row). A pause without a card, such as the debug menu's, keeps the overlay up and refreshing.
 
 ## The tools became available or were hidden (unlock, lock, or a debug_build change).
 signal availability_changed(available: bool)
@@ -45,12 +51,22 @@ const CAPTURE_FAILED_NOTE: String = "Bug capture could not be saved."
 const NOTE_SECONDS: float = 3.0
 const CAPTURE_DIR: String = "user://debug-captures"
 const REFRESH_SECONDS: float = 0.25
+## The overlay's view of the save on disk is read again after this long, or when the file's
+## existence or modified time changes; captures and dump() always read it fresh.
+const SAVE_INFO_SECONDS: float = 1.0
+## Main's full-screen cards (by property name) that the overlay and the DEBUG button step aside for.
+const CARDS: Array[StringName] = [&"pause_overlay", &"end_card", &"credits_screen", &"changelog_screen"]
+## Main's answer buttons (by property name); the overlay hides while one would sit under it.
+const CHOICES: Array[StringName] = [&"touch_choice_1", &"touch_choice_2"]
 ## Above the game's HUD, menus and pause overlay.
 const LAYER: int = 100
-## The touch DEBUG button, in the 960x540 canvas: top right, left of PAUSE (main.tscn's PauseButton
-## spans x 854..942) and above the title's logo mark (from y 48), so it never covers PAUSE, USE, the
-## arrows or the actors lower down.
+## The touch DEBUG button, in the 960x540 canvas: top right, ending BUTTON_GAP left of PAUSE (main.tscn's
+## PauseButton spans x 854..942) and above the title's logo mark (from y 48), so it never covers PAUSE,
+## USE, the arrows or the actors lower down. Its width is at least the TouchButton theme's minimum,
+## which can be wider than asked for, so the button grows to the left, never into the gap.
 const BUTTON_RECT: Rect2 = Rect2(760.0, 10.0, 72.0, 34.0)
+const PAUSE_LEFT: float = 854.0
+const BUTTON_GAP: float = 14.0
 ## The short note ("Debug tools unlocked", a capture's path): near the top in play, below the top
 ## card; on the title over the key art's floor, above CHANGELOG, clear of the title text and menu.
 const NOTE_RECT: Rect2 = Rect2(200.0, 92.0, 560.0, 32.0)
@@ -75,7 +91,7 @@ var menu_open: bool = false:
 	set(value):
 		menu_open = value
 		if game != null:
-			_refresh_button()
+			_refresh_view()
 var capture_dir: String = CAPTURE_DIR
 ## The last bug capture's paths ("json", "png"), or empty.
 var last_capture: Dictionary = {}
@@ -97,6 +113,14 @@ var _sticks: Dictionary = {}
 var _swallow_release: int = -1
 var _refresh_left: float = 0.0
 var _note_tween: Tween
+var _view_queued: bool = false
+## The overlay's cached view of the save on disk, and the file's existence and modified time it was
+## read at.
+var _save_info: Dictionary = {}
+var _save_info_stamp: String = ""
+var _save_info_msec: int = 0
+## How many times the save file was opened and parsed (tests check the overlay's refresh caches it).
+var save_reads: int = 0
 
 
 ## Hooks the tools onto Main: reads the stored unlock from Main's settings file, builds the hidden
@@ -114,9 +138,10 @@ func setup(main: Node2D) -> void:
 		# The mark is otherwise decoration; it takes taps (and clicks) for the touch code.
 		logo.mouse_filter = Control.MOUSE_FILTER_STOP
 		logo.gui_input.connect(_on_logo_input)
-	var pause_overlay: CanvasItem = main.get(&"pause_overlay") as CanvasItem
-	if pause_overlay != null:
-		pause_overlay.visibility_changed.connect(_refresh_button)
+	for property: StringName in CARDS + CHOICES:
+		var item: CanvasItem = main.get(property) as CanvasItem
+		if item != null:
+			item.visibility_changed.connect(_queue_view)
 	_apply()
 
 
@@ -151,14 +176,18 @@ func _build() -> void:
 	debug_button.text = "DEBUG"
 	debug_button.theme_type_variation = &"TouchButton"
 	debug_button.add_theme_font_size_override("font_size", 13)
-	debug_button.position = BUTTON_RECT.position
-	debug_button.size = BUTTON_RECT.size
 	# A touch control: keyboard and controller focus never lands on it.
 	debug_button.focus_mode = Control.FOCUS_NONE
 	debug_button.hide()
 	debug_button.pressed.connect(open_menu)
-	UIMotion.attach(debug_button)
 	layer.add_child(debug_button)
+	# In the tree the theme's minimum size is known; the button keeps its right edge clear of PAUSE.
+	var button_size: Vector2 = BUTTON_RECT.size.max(debug_button.get_combined_minimum_size())
+	debug_button.size = button_size
+	debug_button.position = Vector2(PAUSE_LEFT - BUTTON_GAP - button_size.x, BUTTON_RECT.position.y)
+	# If the theme's minimum grows later (a font or theme change), the button grows to the left.
+	debug_button.grow_horizontal = Control.GROW_DIRECTION_BEGIN
+	UIMotion.attach(debug_button)
 
 
 ## Recomputes availability from the build, the stored unlock and a session lock.
@@ -173,30 +202,60 @@ func _apply() -> void:
 		availability_changed.emit(available)
 
 
-## Shows what is on and processes only while the overlay is up.
+## The overlay page or availability changed: shows the new page at once.
 func _sync() -> void:
-	var showing: bool = available and overlay_mode != Overlay.OFF
+	_refresh_view(true)
+
+
+## Shows what is on, and processes only while the overlay is up: the overlay while it has a page and
+## no card or answer button needs its space, the DEBUG button for touch play while no menu or card is
+## up. [param redraw] refreshes the overlay's text now even if it was already showing.
+func _refresh_view(redraw: bool = false) -> void:
+	_view_queued = false
+	if game == null:
+		return
+	var card_up: bool = _card_up()
+	var showing: bool = available and overlay_mode != Overlay.OFF and not card_up and not _choice_under_overlay()
+	var was: bool = overlay.visible
 	overlay.visible = showing
 	set_process(showing)
-	if showing:
-		_refresh_left = 0.0
+	if showing and (redraw or not was):
+		_refresh_left = REFRESH_SECONDS
 		_refresh_overlay()
-	_refresh_button()
+	var touch_layout: bool = bool(game.get(&"touch_enabled")) and not bool(game.get(&"controller_active"))
+	debug_button.visible = available and touch_layout and not menu_open and not card_up
+	_sync_layer()
+
+
+## Once per frame at most, after Main has laid out whatever just changed.
+func _queue_view() -> void:
+	if _view_queued:
+		return
+	_view_queued = true
+	_refresh_view.call_deferred()
 
 
 func _sync_layer() -> void:
 	layer.visible = overlay.visible or debug_button.visible or note.visible
 
 
-## The DEBUG button shows for touch play while the tools are available and no menu is up.
-func _refresh_button() -> void:
-	if game == null:
-		return
-	var touch_layout: bool = bool(game.get(&"touch_enabled")) and not bool(game.get(&"controller_active"))
-	var pause_overlay: CanvasItem = game.get(&"pause_overlay") as CanvasItem
-	var menu_up: bool = menu_open or (pause_overlay != null and pause_overlay.visible)
-	debug_button.visible = available and touch_layout and not menu_up
-	_sync_layer()
+## True while one of Main's full-screen cards is up.
+func _card_up() -> bool:
+	for property: StringName in CARDS:
+		var card: CanvasItem = game.get(property) as CanvasItem
+		if card != null and card.is_visible_in_tree():
+			return true
+	return false
+
+
+## True while an answer button is shown where the current page would be drawn.
+func _choice_under_overlay() -> bool:
+	var area: Rect2 = DebugOverlay.footprint(overlay_mode == Overlay.PERFORMANCE)
+	for property: StringName in CHOICES:
+		var choice: Control = game.get(property) as Control
+		if choice != null and choice.is_visible_in_tree() and area.intersects(choice.get_global_rect()):
+			return true
+	return false
 
 
 func _process(delta: float) -> void:
@@ -210,7 +269,7 @@ func _refresh_overlay() -> void:
 	if overlay_mode == Overlay.PERFORMANCE:
 		overlay.show_performance(performance())
 	elif overlay_mode != Overlay.OFF:
-		overlay.show_state(dump(), overlay_mode == Overlay.ZONES)
+		overlay.show_state(dump(false), overlay_mode == Overlay.ZONES)
 
 
 func _input(event: InputEvent) -> void:
@@ -226,7 +285,7 @@ func _input(event: InputEvent) -> void:
 		return
 	# The touch layout follows the last device Main saw; Main notes it after this node has the event.
 	if event is InputEventJoypadButton or event is InputEventScreenTouch or event is InputEventKey:
-		_refresh_button.call_deferred()
+		_queue_view()
 	if _rebinding():
 		return
 	if event is InputEventKey and event.pressed and not event.is_echo():
@@ -425,11 +484,12 @@ static func _timestamp() -> String:
 ## Everything the overlay shows and a bug capture saves, in one dictionary of plain values: Main's
 ## debug_snapshot() (room, beat, actors, machines, hazards, memory and choices, flags and the full
 ## save state) plus performance, the save on disk, the build and the tools' own flags. Capture drivers
-## call this to log state beside each screenshot.
-func dump() -> Dictionary:
+## call this to log state beside each screenshot. The overlay's refresh passes [param full] false: no
+## full save state, and the save on disk as last read (see SAVE_INFO_SECONDS).
+func dump(full: bool = true) -> Dictionary:
 	var data: Dictionary = {}
 	if game != null and game.has_method(&"debug_snapshot"):
-		data = game.call(&"debug_snapshot")
+		data = game.call(&"debug_snapshot", full)
 	data["time"] = Time.get_datetime_string_from_system(false, true)
 	var window: Vector2i = get_window().size
 	data["build"] = {
@@ -440,7 +500,7 @@ func dump() -> Dictionary:
 		"window": [window.x, window.y],
 	}
 	data["performance"] = performance()
-	data["save"] = save_info()
+	data["save"] = save_info(full)
 	data["debug"] = {
 		"available": available,
 		"unlocked": unlocked,
@@ -451,14 +511,18 @@ func dump() -> Dictionary:
 	return data
 
 
-static func performance() -> Dictionary:
+## Frame rate and times, memory and counts. Godot reports static memory only in debug builds
+## (Performance.MEMORY_STATIC), so elsewhere, as in an unlocked release build, memory_mb is null
+## ("n/a"), never 0; video memory is reported in every build.
+static func performance(static_memory: bool = OS.is_debug_build()) -> Dictionary:
 	var fps: float = Engine.get_frames_per_second()
 	return {
 		"fps": fps,
 		"frame_ms": 1000.0 / fps if fps > 0.0 else 0.0,
 		"process_ms": Performance.get_monitor(Performance.TIME_PROCESS) * 1000.0,
 		"physics_ms": Performance.get_monitor(Performance.TIME_PHYSICS_PROCESS) * 1000.0,
-		"memory_mb": Performance.get_monitor(Performance.MEMORY_STATIC) / 1048576.0,
+		"memory_mb": Performance.get_monitor(Performance.MEMORY_STATIC) / 1048576.0 if static_memory else null,
+		"video_mb": Performance.get_monitor(Performance.RENDER_VIDEO_MEM_USED) / 1048576.0,
 		"nodes": int(Performance.get_monitor(Performance.OBJECT_NODE_COUNT)),
 		"objects": int(Performance.get_monitor(Performance.OBJECT_COUNT)),
 		"draw_calls": int(Performance.get_monitor(Performance.RENDER_TOTAL_DRAW_CALLS_IN_FRAME)),
@@ -467,11 +531,27 @@ static func performance() -> Dictionary:
 
 ## The save on disk, read without side effects (M0State.load_from_disk can promote a leftover
 ## .tmp file; this never writes): the format version, whether a file exists and the checkpoint it holds.
-func save_info() -> Dictionary:
+## With [param fresh] false (the overlay's refresh) the last reading is reused for SAVE_INFO_SECONDS
+## unless the file appeared, went or was modified since.
+func save_info(fresh: bool = true) -> Dictionary:
 	var path: String = str(game.get(&"save_path")) if game != null else M0State.SAVE_PATH
-	var info: Dictionary = {"version": M0State.SAVE_VERSION, "path": path, "exists": FileAccess.file_exists(path), "checkpoint": "none"}
-	if not info["exists"]:
+	var exists: bool = FileAccess.file_exists(path)
+	var stamp: String = "%s:%d" % [path, FileAccess.get_modified_time(path)] if exists else path
+	var now: int = Time.get_ticks_msec()
+	if not fresh and not _save_info.is_empty() and stamp == _save_info_stamp and now - _save_info_msec < int(SAVE_INFO_SECONDS * 1000.0):
+		return _save_info.duplicate()
+	var info: Dictionary = _read_save_info(path, exists)
+	_save_info = info
+	_save_info_stamp = stamp
+	_save_info_msec = now
+	return info.duplicate()
+
+
+func _read_save_info(path: String, exists: bool) -> Dictionary:
+	var info: Dictionary = {"version": M0State.SAVE_VERSION, "path": path, "exists": exists, "checkpoint": "none"}
+	if not exists:
 		return info
+	save_reads += 1
 	var json: JSON = JSON.new()
 	var file: FileAccess = FileAccess.open(path, FileAccess.READ)
 	if file == null or json.parse(file.get_as_text()) != OK:

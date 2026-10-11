@@ -19,6 +19,11 @@ const ORIGIN: Vector2 = Vector2(12.0, 80.0)
 ## The performance page stays narrow enough to clear the corridor's tutorial card (from x 322).
 const PERFORMANCE_WIDTH: float = 260.0
 const STATE_WIDTH: float = 360.0
+## The text's side and top/bottom margins inside the card.
+const MARGIN_X: int = 10
+const MARGIN_Y: int = 5
+## Room for the HudCard frame around the margins when working out where a page lands.
+const FRAME_SLACK: float = 4.0
 const NONE: String = "—"
 const HEADER_FONT: FontVariation = preload("res://assets/fonts/Montserrat-Semibold.tres")
 
@@ -33,9 +38,9 @@ func _init() -> void:
 	var margin: MarginContainer = MarginContainer.new()
 	margin.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	for side: String in ["left", "right"]:
-		margin.add_theme_constant_override("margin_%s" % side, 10)
+		margin.add_theme_constant_override("margin_%s" % side, MARGIN_X)
 	for side: String in ["top", "bottom"]:
-		margin.add_theme_constant_override("margin_%s" % side, 5)
+		margin.add_theme_constant_override("margin_%s" % side, MARGIN_Y)
 	add_child(margin)
 	body = RichTextLabel.new()
 	body.name = "Body"
@@ -53,6 +58,13 @@ func _init() -> void:
 	margin.add_child(body)
 
 
+## Where a page can be drawn in the 960x540 canvas: its width, from ORIGIN down to the bottom edge
+## (every page is shorter), so a control in that column would be under it.
+static func footprint(performance_page: bool) -> Rect2:
+	var width: float = (PERFORMANCE_WIDTH if performance_page else STATE_WIDTH) + MARGIN_X * 2.0 + FRAME_SLACK
+	return Rect2(ORIGIN, Vector2(width, 540.0 - ORIGIN.y))
+
+
 ## The performance page: frame rate and time, memory, node and draw-call counts.
 func show_performance(performance: Dictionary) -> void:
 	_show(PERFORMANCE_WIDTH, "%s\n%s" % [_header("PERFORMANCE"), performance_text(performance)])
@@ -65,18 +77,25 @@ func show_state(data: Dictionary, zones: bool) -> void:
 
 ## One line of performance numbers.
 static func performance_text(performance: Dictionary) -> String:
-	return "%s  %d fps · %.1f ms frame · %.1f ms process\n%s  %.0f MB · %d nodes · %d objects\n%s  %d draw calls" % [
+	return "%s  %d fps · %.1f ms frame · %.1f ms process\n%s  %s · video %.0f MB\n%s  %d nodes · %d objects · %d draw calls" % [
 		_key("PERF"), int(performance.get("fps", 0)), float(performance.get("frame_ms", 0.0)), float(performance.get("process_ms", 0.0)),
-		_key("MEM"), float(performance.get("memory_mb", 0.0)), int(performance.get("nodes", 0)), int(performance.get("objects", 0)),
-		_key("DRAW"), int(performance.get("draw_calls", 0)),
+		_key("MEM"), memory_text(performance), float(performance.get("video_mb", 0.0)),
+		_key("COUNT"), int(performance.get("nodes", 0)), int(performance.get("objects", 0)), int(performance.get("draw_calls", 0)),
 	]
+
+
+## Static memory in MB, or "n/a" where Godot does not report it (release builds).
+static func memory_text(performance: Dictionary) -> String:
+	var memory: Variant = performance.get("memory_mb")
+	return "n/a" if memory == null else "%.0f MB" % float(memory)
 
 
 ## The state page's rows, from a DebugTools.dump().
 static func state_text(data: Dictionary) -> String:
 	var rows: PackedStringArray = PackedStringArray()
 	var performance: Dictionary = data.get("performance", {})
-	rows.append("%s  %d fps · %.1f ms · %.0f MB · %d nodes · %d draws" % [_key("PERF"), int(performance.get("fps", 0)), float(performance.get("frame_ms", 0.0)), float(performance.get("memory_mb", 0.0)), int(performance.get("nodes", 0)), int(performance.get("draw_calls", 0))])
+	var memory_used: String = memory_text(performance) if performance.get("memory_mb") != null else "video %.0f MB" % float(performance.get("video_mb", 0.0))
+	rows.append("%s  %d fps · %.1f ms · %s · %d nodes · %d draws" % [_key("PERF"), int(performance.get("fps", 0)), float(performance.get("frame_ms", 0.0)), memory_used, int(performance.get("nodes", 0)), int(performance.get("draw_calls", 0))])
 	rows.append("%s  %s · %s · %s" % [_key("ROOM"), data.get("room", NONE), data.get("beat", NONE), data.get("objective", NONE)])
 	var engineer: Dictionary = data.get("engineer", {})
 	rows.append("%s  x %.0f %s · %s" % [_key("ENGINEER"), float(engineer.get("x", 0.0)), engineer.get("facing", NONE), engineer.get("state", NONE)])

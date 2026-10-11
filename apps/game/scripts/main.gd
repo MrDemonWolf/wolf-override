@@ -3325,15 +3325,16 @@ func _setup_debug_tools() -> void:
 
 
 ## What the game is doing right now, as plain values for the debug overlay and bug captures
-## (DebugTools.dump adds performance, the save on disk and the build).
-func debug_snapshot() -> Dictionary:
+## (DebugTools.dump adds performance, the save on disk and the build). The overlay's frequent refresh
+## leaves out the full save state ([param include_state] false); captures and scripts keep it.
+func debug_snapshot(include_state: bool = true) -> Dictionary:
 	var in_junction: bool = state.chapter_id == "junction"
 	var fixated_on: String = "WOLF" if sentry_brain.state == &"fixated" else ("engineer" if _sentry_hunting() else "—")
 	var relay: String = "—"
 	if not state.memory.is_empty():
 		var told: bool = state.memory.get("choice_id") == M0State.DISCLOSE
 		relay = ("disclose" if told else "press") + (" → WOLF" if state.route == "cooperate" else (" → bypass" if state.route == "fallback" else ""))
-	return {
+	var snapshot: Dictionary = {
 		"room": state.chapter_id,
 		"beat": _debug_beat(),
 		"objective": "" if title_open else _objective(),
@@ -3359,10 +3360,12 @@ func debug_snapshot() -> Dictionary:
 			"end_card_active": end_card_active, "touch_layout": touch_enabled and not controller_active, "controller_active": controller_active,
 			"save_pending": save_pending, "seal_opening": seal_opening, "wolf_baiting": wolf_baiting, "bypass_ticks": bypass_ticks,
 		},
-		"state": state.to_dict(),
 		"save_path": save_path,
 		"settings_path": settings_path,
 	}
+	if include_state:
+		snapshot["state"] = state.to_dict()
+	return snapshot
 
 
 func _debug_beat() -> String:

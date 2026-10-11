@@ -19,6 +19,7 @@ func _run() -> void:
 	await _check_controller_code()
 	await _check_logo_code()
 	await _check_overlay()
+	await _check_overlay_steps_aside()
 	await _check_snapshot()
 	await _check_capture()
 	await _check_touch_button_and_menu_inputs()
@@ -48,7 +49,7 @@ func _check_release_gating() -> void:
 	tools.open_menu()
 	_expect(tools.overlay_mode == DebugTools.Overlay.OFF and not tools.is_processing(), "the overlay cannot be forced on while the tools are hidden")
 	game.set("touch_enabled", true)
-	tools.call("_refresh_button")
+	tools.call("_refresh_view")
 	_expect(not tools.debug_button.visible and not tools.layer.visible, "touch play shows no DEBUG button while the tools are hidden")
 	game.set("touch_enabled", false)
 	game.call("_new_game")
@@ -175,6 +176,14 @@ func _check_overlay() -> void:
 	var tutorial: Control = game.get_node("CanvasLayer/TutorialPrompt") as Control
 	_expect(tutorial.visible and not tools.overlay.get_global_rect().intersects(tutorial.get_global_rect()), "the performance page clears the corridor's tutorial card (%s)" % tools.overlay.get_global_rect())
 	_expect(text.contains("PERFORMANCE") and text.contains("fps") and text.contains("ms frame") and text.contains("MB") and text.contains("nodes") and text.contains("draw calls"), "the performance page shows fps, frame time, memory, nodes and draw calls")
+	var debug_numbers: Dictionary = DebugTools.performance(true)
+	_expect(debug_numbers["memory_mb"] is float and float(debug_numbers["memory_mb"]) > 0.0 and debug_numbers.has("video_mb"), "a debug build reports static memory, and video memory too")
+	var release_numbers: Dictionary = DebugTools.performance(false)
+	_expect(release_numbers["memory_mb"] == null and release_numbers["video_mb"] is float, "where Godot has no static memory figure (release builds) memory is null, not 0, and video memory is still reported")
+	var release_text: String = DebugOverlay.performance_text(release_numbers)
+	_expect(release_text.contains("MEM[/color]  n/a · video") and not release_text.contains(" 0 MB ·"), "the performance page says static memory is unavailable instead of 0 MB")
+	var release_state: String = DebugOverlay.state_text({"performance": release_numbers})
+	_expect(release_state.contains("video") and not release_state.contains("· 0 MB ·"), "the state page shows video memory when static memory is unavailable")
 	await _send_key(KEY_F3)
 	text = tools.overlay.body.get_parsed_text()
 	_expect(tools.overlay_mode == DebugTools.Overlay.STATE and text.contains("STATE") and not text.contains("ZONES"), "F3 again shows the state page")
@@ -183,12 +192,15 @@ func _check_overlay() -> void:
 	var overlay_rect: Rect2 = tools.overlay.get_global_rect()
 	_expect(overlay_rect.position.x >= 0.0 and overlay_rect.end.x <= 480.0 and overlay_rect.position.y >= 78.0 and overlay_rect.end.y <= 340.0, "the state page fits in the upper left, below the top card and above the touch arrows (%s)" % overlay_rect)
 	_expect(not overlay_rect.intersects((game.get_node("CanvasLayer/PauseButton") as Control).get_global_rect()) and not overlay_rect.intersects((game.get_node("CanvasLayer/TouchControls/Use") as Control).get_global_rect()), "the overlay never covers PAUSE or USE")
-	game.call("_pause_game")
-	_expect(paused and tools.can_process() and tools.is_processing(), "the overlay keeps refreshing while the game is paused")
+	# A pause with no card over the game (the debug menu's, a frame step's) keeps the overlay up.
+	paused = true
+	await process_frame
+	_expect(paused and tools.overlay.visible and tools.can_process() and tools.is_processing(), "the overlay keeps refreshing while the game is paused")
 	(game.get_node("Human") as M0Actor).position.x = 512.0
 	await create_timer(DebugTools.REFRESH_SECONDS * 2.0, true).timeout
 	_expect(tools.overlay.body.get_parsed_text().contains("ENGINEER  x 512"), "the paused state page follows what changes")
-	game.call("_resume_game")
+	paused = false
+	await process_frame
 	await _send_key(KEY_F3)
 	_expect(tools.overlay_mode == DebugTools.Overlay.ZONES and tools.overlay.body.get_parsed_text().contains("STATE + ZONES"), "F3 a third time shows the state page with zones")
 	await _send_key(KEY_F3)
@@ -201,6 +213,85 @@ func _check_overlay() -> void:
 	tools.set_overlay_mode(DebugTools.Overlay.STATE)
 	tools.debug_build = false
 	_expect(not tools.available and _idle(tools), "hiding the tools turns a shown overlay off")
+	await _free(game)
+
+
+## The game's own cards come first: Pause, Settings, the END OF SLICE card and the title's Credits and
+## Changelog hide the overlay (which stops refreshing) until they close, and so does an answer button
+## that would sit under it (the touch layout's choice row); the keyboard layout's answers stay clear.
+func _check_overlay_steps_aside() -> void:
+	var game: Node2D = await _spawn(true)
+	var tools: DebugTools = _tools(game)
+	tools.set_overlay_mode(DebugTools.Overlay.STATE)
+	_expect(tools.overlay.visible and tools.is_processing(), "the overlay shows on the title")
+	for card: Array in [["_show_credits", "credits_screen", "Credits"], ["_show_changelog", "changelog_screen", "Changelog"]]:
+		game.call(card[0])
+		await process_frame
+		_expect(not tools.overlay.visible and not tools.is_processing() and tools.overlay_mode == DebugTools.Overlay.STATE, "the title's %s card hides the overlay, which stops refreshing" % card[2])
+		game.call("_hide_title_overlay", game.get(card[1]))
+		await process_frame
+		_expect(tools.overlay.visible and tools.is_processing(), "the overlay comes back when %s closes" % card[2])
+	game.call("_show_title_settings")
+	await process_frame
+	_expect(not tools.overlay.visible and not tools.is_processing(), "the title's Settings hides the overlay")
+	game.call("_on_settings_back")
+	await process_frame
+	_expect(tools.overlay.visible, "the overlay comes back after the title's Settings")
+	game.call("_new_game")
+	game.call("_finish_intro")
+	await _settle(3)
+	_expect(tools.overlay.visible and tools.is_processing(), "the overlay shows in play")
+	game.call("_pause_game")
+	await process_frame
+	_expect(not tools.overlay.visible and not tools.is_processing() and not tools.layer.visible, "the Pause menu hides the overlay, which stops refreshing")
+	game.call("_show_settings")
+	await process_frame
+	_expect(not tools.overlay.visible and not tools.is_processing(), "Settings hides the overlay")
+	game.call("_on_settings_back")
+	await process_frame
+	game.call("_resume_game")
+	await process_frame
+	_expect(tools.overlay.visible and tools.is_processing() and tools.overlay_mode == DebugTools.Overlay.STATE, "resuming brings the same page back")
+	game.call("_ask_relay")
+	await _settle(2)
+	var choices: Array[Control] = [game.get("touch_choice_1") as Control, game.get("touch_choice_2") as Control]
+	_expect(choices[0].visible and choices[1].visible, "the relay question shows its answers")
+	_expect(tools.overlay.visible, "in the keyboard layout the overlay stays up during a question")
+	for choice: Control in choices:
+		_expect(not tools.overlay.get_global_rect().intersects(choice.get_global_rect()), "in the keyboard layout the overlay leaves %s clear (%s vs %s)" % [choice.name, tools.overlay.get_global_rect(), choice.get_global_rect()])
+	# A phone build: the answers move into the touch row, and the next tap reaches the tools as it would.
+	game.set("touch_enabled", true)
+	game.call("_refresh_ui")
+	await _touch(Vector2(480.0, 230.0))
+	await _settle(2)
+	_expect(game.get("waiting_for_choice"), "the tap answered nothing")
+	_expect(choices[0].get_global_rect().position.x < DebugOverlay.footprint(false).end.x, "the touch layout's first answer sits in the overlay's column")
+	_expect(not tools.overlay.visible and not tools.is_processing(), "in the touch layout the overlay steps aside for the answers instead of covering answer 1")
+	_expect(tools.debug_button.visible, "the DEBUG button stays during a touch question")
+	for choice: Control in choices:
+		_expect(not tools.debug_button.get_global_rect().grow(8.0).intersects(choice.get_global_rect()), "the DEBUG button leaves %s clear" % choice.name)
+	game.set("waiting_for_choice", false)
+	game.call("_update_controls")
+	await _settle(2)
+	_expect(tools.overlay.visible and tools.is_processing(), "once answered the overlay comes back")
+	tools.set_overlay_mode(DebugTools.Overlay.PERFORMANCE)
+	game.set("waiting_for_choice", true)
+	game.call("_update_controls")
+	await _settle(2)
+	_expect(not tools.overlay.visible, "the performance page steps aside for the touch answers too")
+	game.set("waiting_for_choice", false)
+	game.call("_update_controls")
+	game.set("touch_enabled", false)
+	tools.set_overlay_mode(DebugTools.Overlay.STATE)
+	await _settle(2)
+	game.call("_show_end_card")
+	await process_frame
+	_expect(not tools.overlay.visible and not tools.is_processing(), "the END OF SLICE card hides the overlay")
+	game.call("_hide_end_card")
+	await process_frame
+	_expect(tools.overlay.visible and tools.is_processing(), "the overlay comes back after the card")
+	tools.set_overlay_mode(DebugTools.Overlay.OFF)
+	_expect(_idle(tools), "turned off, the overlay costs nothing again")
 	await _free(game)
 
 
@@ -242,6 +333,15 @@ func _check_snapshot() -> void:
 	var save: Dictionary = dump["save"]
 	_expect(save["exists"] == true and save["checkpoint"] == "junction, door blown" and save["version"] == M0State.SAVE_VERSION and save["file_version"] == M0State.SAVE_VERSION, "the dump reads the checkpoint on disk")
 	_expect(not FileAccess.file_exists(str(game.get("save_path")) + ".tmp"), "reading the save writes nothing")
+	_expect(not (tools.dump(false) as Dictionary).has("state") and (dump["state"] as Dictionary).has("door_blown"), "the overlay's refresh leaves out the full save state; dump() keeps it")
+	tools.set_overlay_mode(DebugTools.Overlay.STATE)
+	var reads: int = tools.save_reads
+	await create_timer(DebugTools.REFRESH_SECONDS * 3.5, true).timeout
+	_expect(tools.save_reads - reads <= 1, "the shown overlay reads the save on disk at most once a second, not on every refresh (%d reads)" % (tools.save_reads - reads))
+	reads = tools.save_reads
+	tools.dump()
+	_expect(tools.save_reads == reads + 1, "dump() and captures always read the save fresh")
+	tools.set_overlay_mode(DebugTools.Overlay.OFF)
 	var round_trip: Variant = JSON.parse_string(JSON.stringify(dump))
 	_expect(round_trip is Dictionary and (round_trip as Dictionary).get("room") == "junction" and ((round_trip as Dictionary).get("state") as Dictionary).get("door_blown") == true, "the dump survives a JSON round trip")
 	tools.set_overlay_mode(DebugTools.Overlay.STATE)
@@ -304,12 +404,28 @@ func _check_touch_button_and_menu_inputs() -> void:
 	_expect(not button.visible, "no DEBUG button without touch")
 	await _touch(Vector2(120.0, 300.0))
 	game.set("touch_enabled", true)
-	tools.call("_refresh_button")
+	tools.call("_refresh_view")
 	_expect(button.visible and tools.layer.visible and button.focus_mode == Control.FOCUS_NONE, "touch play shows the DEBUG button, which keyboard and controller focus skip")
 	var rect: Rect2 = button.get_global_rect()
 	_expect(Rect2(0.0, 0.0, 960.0, 540.0).encloses(rect), "the DEBUG button is on screen")
 	for path: String in ["CanvasLayer/PauseButton", "CanvasLayer/TouchControls/Use", "CanvasLayer/TouchControls/Left", "CanvasLayer/TouchControls/Right", "CanvasLayer/TitleScreen/LogoMark", "CanvasLayer/TitleScreen/NewGameButton", "CanvasLayer/TopBar"]:
 		_expect(not rect.intersects((game.get_node(path) as Control).get_global_rect()), "the DEBUG button never covers %s" % path.get_file())
+	var pause_rect: Rect2 = (game.get_node("CanvasLayer/PauseButton") as Control).get_global_rect()
+	_expect(not rect.grow(8.0).intersects(pause_rect), "the DEBUG button leaves a real gap before PAUSE, at its theme's full size (%s, PAUSE %s)" % [rect, pause_rect])
+	_expect(rect.size.x >= button.get_combined_minimum_size().x and rect.size.y >= button.get_combined_minimum_size().y, "the DEBUG button's laid-out size already includes the theme's minimum")
+	button.add_theme_font_size_override("font_size", 20)
+	await process_frame
+	_expect(not button.get_global_rect().grow(8.0).intersects(pause_rect) and is_equal_approx(button.get_global_rect().end.x, rect.end.x), "a larger theme minimum grows the DEBUG button to the left, keeping the gap before PAUSE (%s)" % button.get_global_rect())
+	button.add_theme_font_size_override("font_size", 13)
+	button.size = rect.size
+	button.position = rect.position
+	await process_frame
+	game.call("_show_credits")
+	await process_frame
+	_expect(not button.visible, "the DEBUG button steps aside while the title's Credits card is up")
+	game.call("_hide_title_overlay", game.get("credits_screen"))
+	await process_frame
+	_expect(button.visible, "it comes back when Credits closes")
 	_expect(rect.end.y < 260.0, "the DEBUG button sits above where the actors stand")
 	game.call("_new_game")
 	game.call("_finish_intro")
