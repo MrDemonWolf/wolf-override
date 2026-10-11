@@ -506,13 +506,14 @@
       "path": "apps/docs/app/images/corridor-start-capture.png",
       "published_copy": [
         "apps/docs/app/images/corridor-start-capture-480.webp",
-        "apps/docs/app/images/corridor-start-capture-960.webp"
+        "apps/docs/app/images/corridor-start-capture-960.webp",
+        "apps/docs/app/images/corridor-start-capture-1600.webp"
       ],
-      "source_or_tool": "Godot 4.7.2 normal-renderer capture of the repository source game on October 10, 2026 (scripted review driver, isolated user data, the codex/game-presentation branch with the layered room art and the junction review fixes); WebP derivatives encoded with cwebp 1.6.0 (libwebp, quality 86; the 480 px copy resized by cwebp)",
+      "source_or_tool": "Godot 4.7.2 normal-renderer capture of the repository source game on October 11, 2026 at a 1600x900 window (scripted review driver, isolated user data, the codex/polish-look branch with the sharper character sprites, WOLF's follow spacing and the pressure bulkheads); WebP derivatives encoded with cwebp 1.6.0 (libwebp, quality 86; the 960 and 480 px copies resized by cwebp)",
       "rights_review_status": "Derivative screenshot using the registered provisional game art and the bundled OFL fonts. Underlying commercial asset-rights review remains open; no new third-party artwork acquired.",
-      "modifications": "960x540 scripted still, recaptured October 10, 2026 (replacing the earlier capture at this path); no image edits. Not a hands-on route or release acceptance test.",
-      "source_reference": "apps/game/scenes/main.tscn and scripts/main.gd on October 10, 2026; New Game, opening finished, corridor start with the tutorial prompt, keyboard layout",
-      "implementation_status": "Current public gameplay frame on the landing page and in the corridor walkthrough, captioned as a source-build capture with provisional art and UI. It shows the layered corridor (corridor-far, -mid and -near) and station props in this register.",
+      "modifications": "1600x900 scripted still, recaptured October 11, 2026 (replacing the earlier 960x540 captures at this path, the last of which showed WOLF drawn over the engineer); no image edits (SHA-256 3e4461a232fe52c5...). Published as 480, 960 and 1600 px WebP copies. Not a hands-on route or release acceptance test.",
+      "source_reference": "apps/game/scenes/main.tscn and scripts/main.gd on October 11, 2026; New Game, opening finished, corridor start with the objective CHECK THE BREAKER and the tutorial prompt, keyboard layout, WOLF at rest clear of the engineer",
+      "implementation_status": "Current public gameplay frame on the landing page (480/960/1600 srcset sized to the frame) and in the corridor walkthrough, captioned as a source-build capture with provisional art and UI. It shows the layered corridor (corridor-far, -mid and -near), the station props and the downscaled character sprites in this register.",
       "terms_reference": "GPL-3.0-or-later for the project code and UI shown (see LICENSE); the pictured art keeps the terms recorded on its own entries (provisional generated art: https://openai.com/policies/terms-of-use/); fonts under SIL Open Font License 1.1"
     },
     {
