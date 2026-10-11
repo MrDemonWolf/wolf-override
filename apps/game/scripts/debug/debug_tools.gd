@@ -1,9 +1,10 @@
 class_name DebugTools
 extends Node
 ## Debug tools and cheat codes, so a tester or a capture driver can see what the game is doing: the
-## F3 overlay (performance, then state), F12 bug captures (a screenshot and a JSON state dump), and a
-## small DEBUG button for touch. Main builds one in _ready (_setup_debug_tools) and gives it its
-## debug_snapshot().
+## F3 overlay (performance, then state, then state with the world's zones, hitboxes and render boxes
+## drawn over the game: DebugZones), F12 bug captures (a screenshot and a JSON state dump with all of
+## that geometry as numbers), and a small DEBUG button for touch. Main builds one in _ready
+## (_setup_debug_tools) and gives it its debug_snapshot().
 ##
 ## Gating: always available in a debug build. In any other build the tools stay hidden until a cheat
 ## code on the title screen unlocks them (WOLFDEN typed on a keyboard; Up Up Down Down Left Right Left
@@ -11,10 +12,10 @@ extends Node
 ## unlock is stored with the settings. lock() hides them again and forgets the unlock, for the rest of
 ## the session even in a debug build.
 ##
-## Cost: while the tools are unavailable, or available with the overlay off, this node neither
-## processes nor draws; it only looks at input events as they arrive. The overlay refreshes its text
-## REFRESH_SECONDS apart while it is shown, never every frame, and reads the save on disk at most
-## SAVE_INFO_SECONDS apart.
+## Cost: while the tools are unavailable, or available with the overlay off, this node and its zone
+## drawing neither process nor draw; it only looks at input events as they arrive. The overlay
+## refreshes its text REFRESH_SECONDS apart while it is shown, never every frame, and reads the save
+## on disk at most SAVE_INFO_SECONDS apart; the zones page redraws every frame while it is up.
 ##
 ## The game's own cards come first: while Pause, Settings, the END OF SLICE card or the title's
 ## Credits or Changelog is up, the overlay and the DEBUG button step aside (and stop refreshing), and
@@ -26,7 +27,8 @@ signal availability_changed(available: bool)
 ## Backquote, both sticks pressed (L3 + R3) or the DEBUG button asked for the debug menu.
 signal menu_requested
 signal overlay_mode_changed(mode: int)
-## A bug capture was written; [param paths] holds "json" and "png" (empty when no screenshot exists).
+## A bug capture was written; [param paths] holds "json" and "png" (empty when no screenshot exists)
+## and "with_boxes" (whether every zone, hitbox and render box was drawn into the screenshot).
 signal captured(paths: Dictionary)
 
 ## The overlay pages F3 cycles through, in order.
@@ -99,6 +101,8 @@ var game: Node2D
 var settings_path: String = ""
 var layer: CanvasLayer
 var overlay: DebugOverlay
+## The zones page's drawing and its legend (F5 zones, F6 hitboxes, F7 render boxes).
+var zones: DebugZones
 var debug_button: Button
 var note: Panel
 var note_label: Label
@@ -121,6 +125,8 @@ var _save_info_stamp: String = ""
 var _save_info_msec: int = 0
 ## How many times the save file was opened and parsed (tests check the overlay's refresh caches it).
 var save_reads: int = 0
+## True while capture_with_boxes() has every box drawn for its screenshot.
+var _capturing_boxes: bool = false
 
 
 ## Hooks the tools onto Main: reads the stored unlock from Main's settings file, builds the hidden
@@ -151,6 +157,10 @@ func _build() -> void:
 	layer.layer = LAYER
 	layer.visible = false
 	add_child(layer)
+	# Under the overlay card and the note, over the game and its HUD.
+	zones = DebugZones.new()
+	layer.add_child(zones)
+	zones.setup(game, self)
 	overlay = DebugOverlay.new()
 	overlay.hide()
 	layer.add_child(overlay)
@@ -222,6 +232,9 @@ func _refresh_view(redraw: bool = false) -> void:
 	if showing and (redraw or not was):
 		_refresh_left = REFRESH_SECONDS
 		_refresh_overlay()
+	# The zones page draws over the whole view, so it steps aside for the game's cards (not for the
+	# answers: its legend is clear of them); a capture with boxes draws it whatever is up.
+	zones.set_shown(available and (_capturing_boxes or (overlay_mode == Overlay.ZONES and not card_up)))
 	var touch_layout: bool = bool(game.get(&"touch_enabled")) and not bool(game.get(&"controller_active"))
 	debug_button.visible = available and touch_layout and not menu_open and not card_up
 	_sync_layer()
@@ -236,7 +249,7 @@ func _queue_view() -> void:
 
 
 func _sync_layer() -> void:
-	layer.visible = overlay.visible or debug_button.visible or note.visible
+	layer.visible = overlay.visible or debug_button.visible or note.visible or zones.visible
 
 
 ## True while one of Main's full-screen cards is up.
@@ -299,6 +312,13 @@ func _input(event: InputEvent) -> void:
 				capture()
 			KEY_QUOTELEFT:
 				open_menu()
+			KEY_F5, KEY_F6, KEY_F7:
+				# On the zones page: zones, hitboxes, render boxes on or off.
+				if overlay_mode != Overlay.ZONES:
+					return
+				for category: StringName in DebugZones.CATEGORIES:
+					if DebugZones.CATEGORY_KEYS[category] == key:
+						zones.toggle_layer(category)
 			_:
 				return
 		get_viewport().set_input_as_handled()
@@ -440,8 +460,38 @@ func open_menu() -> void:
 
 ## F12: writes a screenshot and a JSON state dump to capture_dir/<timestamp>.png and .json, shows
 ## the path, and returns the paths ("json", and "png" or empty when there is no rendered frame, as
-## in a headless run). Empty when the tools are hidden or the dump could not be written.
+## in a headless run). The dump holds every zone, hitbox and render box as numbers; the screenshot
+## shows what was on screen (the boxes only if the zones page was up). Empty when the tools are
+## hidden or the dump could not be written.
 func capture() -> Dictionary:
+	return _write_capture(false)
+
+
+## For capture drivers: draws every zone, hitbox and render box (whatever page or card is up), waits
+## for that frame to render, writes the capture with them in the screenshot, then puts the view back.
+## Await it: `var paths: Dictionary = await debug_tools.capture_with_boxes()`.
+func capture_with_boxes() -> Dictionary:
+	if not available:
+		return {}
+	var drawn: Dictionary = zones.layers.duplicate()
+	_capturing_boxes = true
+	for category: StringName in DebugZones.CATEGORIES:
+		zones.set_layer(true, category)
+	_refresh_view()
+	zones.refresh_now()
+	if DisplayServer.get_name() == "headless":
+		await get_tree().process_frame
+	else:
+		await RenderingServer.frame_post_draw
+	var paths: Dictionary = _write_capture(true)
+	_capturing_boxes = false
+	for category: StringName in DebugZones.CATEGORIES:
+		zones.set_layer(bool(drawn[category]), category)
+	_refresh_view()
+	return paths
+
+
+func _write_capture(with_boxes: bool) -> Dictionary:
 	if not available:
 		return {}
 	DirAccess.make_dir_recursive_absolute(ProjectSettings.globalize_path(capture_dir))
@@ -454,7 +504,7 @@ func capture() -> Dictionary:
 	var image: Image = _screenshot()
 	if image != null and image.save_png(base + ".png") == OK:
 		png = base + ".png"
-	var paths: Dictionary = {"json": base + ".json", "png": png}
+	var paths: Dictionary = {"json": base + ".json", "png": png, "with_boxes": with_boxes}
 	var data: Dictionary = dump()
 	data["capture"] = paths
 	var file: FileAccess = FileAccess.open(base + ".json", FileAccess.WRITE)
@@ -483,9 +533,11 @@ static func _timestamp() -> String:
 
 ## Everything the overlay shows and a bug capture saves, in one dictionary of plain values: Main's
 ## debug_snapshot() (room, beat, actors, machines, hazards, memory and choices, flags and the full
-## save state) plus performance, the save on disk, the build and the tools' own flags. Capture drivers
-## call this to log state beside each screenshot. The overlay's refresh passes [param full] false: no
-## full save state, and the save on disk as last read (see SAVE_INFO_SECONDS).
+## save state) plus performance, the save on disk, the build, the tools' own flags and "geometry"
+## (DebugZones.geometry: the camera and every zone, hitbox and render box with its node path, world
+## and screen rects, z-index, canvas layer and visibility). Capture drivers call this to log state
+## beside each screenshot. The overlay's refresh passes [param full] false: no full save state and no
+## geometry, and the save on disk as last read (see SAVE_INFO_SECONDS).
 func dump(full: bool = true) -> Dictionary:
 	var data: Dictionary = {}
 	if game != null and game.has_method(&"debug_snapshot"):
@@ -507,7 +559,10 @@ func dump(full: bool = true) -> Dictionary:
 		"debug_build": debug_build,
 		"overlay": OVERLAY_NAMES[overlay_mode],
 		"cheats_used": cheats_used,
+		"drawn": {"shown": zones.visible, "zones": zones.layers[DebugZones.ZONES], "hitboxes": zones.layers[DebugZones.HITBOXES], "render": zones.layers[DebugZones.RENDER]},
 	}
+	if full:
+		data["geometry"] = zones.geometry()
 	return data
 
 

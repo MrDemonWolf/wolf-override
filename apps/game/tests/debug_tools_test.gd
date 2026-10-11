@@ -22,6 +22,10 @@ func _run() -> void:
 	await _check_overlay_steps_aside()
 	await _check_snapshot()
 	await _check_capture()
+	await _check_zones_corridor()
+	await _check_zones_records()
+	await _check_zones_junction()
+	await _check_capture_with_boxes()
 	await _check_touch_button_and_menu_inputs()
 	_clean()
 	if failures == 0:
@@ -469,6 +473,330 @@ func _check_touch_button_and_menu_inputs() -> void:
 	game.set("touch_enabled", false)
 	await _free(game)
 
+## The zones page in the corridor: it draws only on that page and only while shown; every collision
+## shape is drawn from its real shape and every render box from its sprite's or control's rect, in the
+## world and on screen, following the camera; the use ranges match the rules that answer USE; the
+## legend, F5, F6 and F7 turn each category on and off; and none of it costs anything once hidden.
+func _check_zones_corridor() -> void:
+	var game: Node2D = await _spawn(true)
+	var tools: DebugTools = _tools(game)
+	var zones: DebugZones = tools.zones
+	_expect(zones.get_parent() == tools.layer and not zones.visible and not zones.is_processing(), "the zone drawing starts hidden and idle")
+	game.call("_new_game")
+	game.call("_finish_intro")
+	await _settle(3)
+	for page: int in [DebugTools.Overlay.PERFORMANCE, DebugTools.Overlay.STATE]:
+		tools.set_overlay_mode(page)
+		_expect(not zones.visible and not zones.is_processing(), "the %s page draws no zones" % DebugTools.OVERLAY_NAMES[page])
+	tools.set_overlay_mode(DebugTools.Overlay.ZONES)
+	await process_frame
+	_expect(zones.visible and zones.is_processing() and tools.layer.visible and zones.legend.is_visible_in_tree(), "the zones page draws the zones, hitboxes and render boxes with their legend, redrawing every frame")
+	_expect(tools.overlay.visible and tools.overlay.get_index() > zones.get_index(), "the state card stays up and draws over the boxes")
+	var legend_rect: Rect2 = zones.legend.get_global_rect()
+	_expect(Rect2(0.0, 0.0, 960.0, 540.0).encloses(legend_rect), "the legend is on screen (%s)" % legend_rect)
+	for path: String in ["CanvasLayer/TopBar", "CanvasLayer/PauseButton", "CanvasLayer/TutorialPrompt", "CanvasLayer/TitleScreen/LogoMark", "CanvasLayer/TitleScreen/Brand"]:
+		_expect(not legend_rect.intersects((game.get_node(path) as Control).get_global_rect()), "the legend leaves %s clear" % path.get_file())
+	_expect(not legend_rect.intersects(tools.overlay.get_global_rect()), "the legend leaves the state card clear")
+	for choice: String in ["touch_choice_1", "touch_choice_2"]:
+		var button: Control = game.get(choice) as Control
+		for layout: Array in [[Vector2(42.0, 88.0), Vector2(428.0, 76.0)], [Vector2(396.0, 88.0), Vector2(522.0, 40.0)]]:
+			_expect(not legend_rect.intersects(Rect2(layout[0], layout[1])), "the legend leaves the answer row clear (%s)" % button.name)
+	game.set("touch_enabled", true)
+	tools.call("_refresh_view")
+	_expect(not legend_rect.grow(6.0).intersects(tools.debug_button.get_global_rect()), "the legend leaves a gap before the DEBUG button (%s vs %s)" % [legend_rect, tools.debug_button.get_global_rect()])
+	game.set("touch_enabled", false)
+	tools.call("_refresh_view")
+	var geometry: Dictionary = tools.dump()["geometry"]
+	for key: String in ["camera", "zones", "hitboxes", "render_boxes", "legend", "rect_format", "screen_to_window"]:
+		_expect(geometry.has(key), "the dump's geometry has '%s'" % key)
+	_expect(not (tools.dump(false) as Dictionary).has("geometry"), "the overlay's frequent refresh leaves the geometry out")
+	# Hitboxes: the real shapes, in the world and on screen.
+	for path: String in ["Human/CollisionShape2D", "Wolf/CollisionShape2D", "Door/CollisionShape2D", "Floor/CollisionShape2D"]:
+		var shape: CollisionShape2D = game.get_node(path) as CollisionShape2D
+		var entry: Dictionary = _entry(geometry["hitboxes"], "path", path)
+		var local: Rect2 = shape.shape.get_rect()
+		_expect(not entry.is_empty() and _same_rect(entry["world_rect"], shape.get_global_transform() * local) and _same_rect(entry["screen_rect"], shape.get_global_transform_with_canvas() * local), "the %s hitbox is its real shape, in the world and on screen (%s)" % [path.get_slice("/", 0), entry.get("world_rect")])
+	var human_box: Dictionary = _entry(geometry["hitboxes"], "path", "Human/CollisionShape2D")
+	_expect(is_equal_approx(float(human_box["world_rect"][2]), M0State.HUMAN_HALF_WIDTH * 2.0) and is_equal_approx(float(_entry(geometry["hitboxes"], "path", "Wolf/CollisionShape2D")["world_rect"][2]), M0State.WOLF_HALF_WIDTH * 2.0), "the actors' hitboxes are as wide as the bodies the rules use")
+	var seal: Dictionary = _entry(geometry["hitboxes"], "path", "Door/CollisionShape2D")
+	_expect(seal["active"] == true and is_equal_approx(float(seal["world_rect"][0]), float(game.get_script().get_script_constant_map()["CORRIDOR_DOOR_LEFT_X"])), "the shut seal's hitbox starts at its face")
+	var junction_door: String = str(game.get_path_to((game.get("junction_room") as JunctionRoom).door_shape))
+	_expect(_entry(geometry["hitboxes"], "path", junction_door).get("active", true) == false, "the junction's door, out of play, is reported but not in force")
+	# Render boxes: the sprite's and the control's own rects, with z-index and canvas layer.
+	var sprite: Sprite2D = game.get_node("Human/BodySprite") as Sprite2D
+	var sprite_box: Dictionary = _entry(geometry["render_boxes"], "path", "Human/BodySprite")
+	_expect(not sprite_box.is_empty() and _same_rect(sprite_box["world_rect"], sprite.get_global_transform() * sprite.get_rect()) and _same_rect(sprite_box["screen_rect"], sprite.get_global_transform_with_canvas() * sprite.get_rect()), "the engineer's render box is the sprite's drawn rect, in the world and on screen")
+	_expect(int(sprite_box.get("z_index", -99)) == 2 and int(sprite_box.get("layer", -1)) == 0 and sprite_box.get("visible") == true and sprite_box.get("active") == true, "the engineer's render box has the actors' z-index, the world layer and is drawn")
+	var hint: Control = game.get_node("CanvasLayer/ContextHint") as Control
+	var hint_box: Dictionary = _entry(geometry["render_boxes"], "path", "CanvasLayer/ContextHint")
+	_expect(not hint_box.is_empty() and _same_rect(hint_box["world_rect"], hint.get_global_rect()) and _same_rect(hint_box["screen_rect"], hint.get_global_transform_with_canvas() * Rect2(Vector2.ZERO, hint.size)) and int(hint_box["layer"]) == 2, "the hint panel's render box is its control rect on canvas layer 2")
+	var hint_text: Dictionary = _entry(geometry["render_boxes"], "path", "CanvasLayer/ContextHint/Text")
+	_expect(str(hint_text.get("text", "")) == (game.get_node("CanvasLayer/ContextHint/Text") as Label).text, "a label's render box carries its text")
+	var plate: Sprite2D = null
+	for node: Node in game.get_node("CorridorDepth").find_children("*", "Sprite2D", true, false):
+		if (node as Sprite2D).is_visible_in_tree() and (node as Sprite2D).texture != null:
+			plate = node as Sprite2D
+			break
+	var plate_box: Dictionary = _entry(geometry["render_boxes"], "path", str(game.get_path_to(plate))) if plate != null else {}
+	_expect(not plate_box.is_empty() and _same_rect(plate_box["screen_rect"], plate.get_global_transform_with_canvas() * plate.get_rect()), "a plate layer's render box is where it draws through its parallax")
+	var missing: int = 0
+	for box: Dictionary in geometry["render_boxes"]:
+		for key: String in ["path", "name", "kind", "world_rect", "screen_rect", "z_index", "layer", "visible", "alpha", "draw_order"]:
+			if not box.has(key):
+				missing += 1
+	_expect(missing == 0 and (geometry["render_boxes"] as Array).size() > 50, "every render box gives its path, rects, z-index, layer and visibility (%d boxes, %d gaps)" % [(geometry["render_boxes"] as Array).size(), missing])
+	_expect(_entry(geometry["render_boxes"], "path", "DebugTools/DebugLayer/DebugZones").is_empty() and _entry(geometry["render_boxes"], "name", "DrawLegend").is_empty(), "the debug tools leave themselves out of the render boxes")
+	# Zones from the rules' own constants: each use range ends where the rule stops answering.
+	var relay: Dictionary = _entry(geometry["zones"], "name", "use: relay")
+	var bypass: Dictionary = _entry(geometry["zones"], "name", "use: bypass")
+	var breaker: Dictionary = _entry(geometry["zones"], "name", "use: breaker")
+	_expect(not relay.is_empty() and not bypass.is_empty() and not breaker.is_empty() and not _entry(geometry["zones"], "name", "use: safe point").is_empty() and not _entry(geometry["zones"], "name", "use: purge display").is_empty(), "the corridor shows every station's use range")
+	_expect(_edges_match(game, "_at_relay", relay["x_range"], true), "the relay's drawn range is exactly where USE reaches the relay (%s)" % [relay["x_range"]])
+	_expect(_edges_match(game, "_at_bypass", bypass["x_range"], false), "the bypass's drawn range is exactly where USE reaches the bypass (%s)" % [bypass["x_range"]])
+	_expect(_edges_match(game, "_at_breaker", breaker["x_range"], false), "the breaker's drawn range is exactly where USE reaches the breaker (%s)" % [breaker["x_range"]])
+	_expect(is_equal_approx(float(_entry(geometry["zones"], "name", "seal face")["x"]), float(seal["world_rect"][0])), "the seal's limit is drawn at its hitbox's face")
+	var wolf: M0Actor = game.get_node("Wolf") as M0Actor
+	_expect(is_equal_approx(float(_entry(geometry["zones"], "name", "WOLF follow limit").get("x", -1.0)), wolf.follow_max_x), "WOLF's follow limit is drawn where it holds him")
+	var gap: Dictionary = _entry(geometry["zones"], "name", "follow gap")
+	var human: M0Actor = game.get_node("Human") as M0Actor
+	_expect(not gap.is_empty() and is_equal_approx(float(gap["x_range"][1]) - float(gap["x_range"][0]), M0Actor.FOLLOW_GAP * 2.0) and is_equal_approx(float(gap["x_range"][0]), human.position.x - M0Actor.FOLLOW_GAP), "WOLF's follow gap is drawn around the engineer")
+	var camera_limits: Dictionary = _entry(geometry["zones"], "name", "camera centre limits")
+	var view_width: float = float(game.get_script().get_script_constant_map()["GAMEPLAY_VIEW_WIDTH"])
+	_expect(not camera_limits.is_empty() and is_equal_approx(float(camera_limits["x_range"][0]), view_width * 0.5) and is_equal_approx(float(camera_limits["x_range"][1]), 960.0 - view_width * 0.5), "the camera's centre limits come from the play view's width")
+	# They follow the camera: on screen each range starts where the canvas puts its world x.
+	human.position.x = 700.0
+	await create_timer(1.5).timeout
+	geometry = tools.dump()["geometry"]
+	var canvas: Transform2D = root.get_canvas_transform()
+	bypass = _entry(geometry["zones"], "name", "use: bypass")
+	_expect(is_equal_approx(float(bypass["screen_rect"][0]), (canvas * Vector2(float(bypass["x_range"][0]), RoomDepth.FLOOR_Y)).x) and float(bypass["screen_rect"][1]) > (canvas * Vector2(0.0, RoomDepth.FLOOR_Y)).y, "after the camera moves, the ranges are drawn where the world now is, under the floor line")
+	sprite_box = _entry(geometry["render_boxes"], "path", "Human/BodySprite")
+	_expect(_same_rect(sprite_box["screen_rect"], sprite.get_global_transform_with_canvas() * sprite.get_rect()), "the render boxes follow the camera too")
+	# Within a row, no two ranges or names overlap.
+	var overlaps: int = 0
+	var rule_items: Array = (geometry["zones"] as Array) + (geometry["hitboxes"] as Array)
+	for a: Dictionary in rule_items:
+		for b: Dictionary in rule_items:
+			if a == b or a.get("kind") != "x_range" or b.get("kind") != "x_range" or a.get("quiet", false) or b.get("quiet", false):
+				continue
+			var ra: Array = a["screen_rect"]
+			var rb: Array = b["screen_rect"]
+			if is_equal_approx(float(ra[1]), float(rb[1])) and float(ra[0]) < float(rb[0]) + float(rb[2]) and float(rb[0]) < float(ra[0]) + float(ra[2]):
+				overlaps += 1
+	_expect(overlaps == 0, "ranges sharing a lane never overlap (%d)" % overlaps)
+	# Toggles: F5, F6, F7 and the legend.
+	await _send_key(KEY_F6)
+	_expect(zones.layers[DebugZones.HITBOXES] == false and not (zones.legend_buttons[DebugZones.HITBOXES] as Button).button_pressed and zones.layers[DebugZones.ZONES] and zones.layers[DebugZones.RENDER], "F6 turns the hitboxes off, and its legend button follows")
+	_expect((tools.dump()["debug"] as Dictionary)["drawn"]["hitboxes"] == false and not (tools.dump()["geometry"]["hitboxes"] as Array).is_empty(), "the dump says the hitboxes are not drawn and still reports them")
+	(zones.legend_buttons[DebugZones.HITBOXES] as Button).button_pressed = true
+	_expect(zones.layers[DebugZones.HITBOXES] == true, "the legend's button turns them back on (a tap or click)")
+	await _send_key(KEY_F5)
+	await _send_key(KEY_F7)
+	_expect(not zones.layers[DebugZones.ZONES] and not zones.layers[DebugZones.RENDER], "F5 and F7 turn the zones and the render boxes off")
+	await _send_key(KEY_F5)
+	await _send_key(KEY_F7)
+	_expect(zones.layers[DebugZones.ZONES] and zones.layers[DebugZones.RENDER], "and on again")
+	tools.set_overlay_mode(DebugTools.Overlay.STATE)
+	await _send_key(KEY_F7)
+	_expect(zones.layers[DebugZones.RENDER], "F7 does nothing off the zones page")
+	# Pause steps aside; the title shows only what is on it.
+	tools.set_overlay_mode(DebugTools.Overlay.ZONES)
+	game.call("_pause_game")
+	await process_frame
+	_expect(not zones.visible and not zones.is_processing(), "the Pause menu hides the zone drawing, which stops redrawing")
+	game.call("_resume_game")
+	await process_frame
+	_expect(zones.visible and zones.is_processing(), "it comes back on resume")
+	game.call("_return_to_title")
+	await _settle(2)
+	geometry = tools.dump()["geometry"]
+	var covered_world: bool = _entry(geometry["render_boxes"], "path", "Human/BodySprite").get("covered") == true and _entry(geometry["render_boxes"], "path", "Human/BodySprite").get("active") == false
+	_expect((geometry["zones"] as Array).is_empty() and (geometry["hitboxes"] as Array).is_empty() and covered_world and _entry(geometry["render_boxes"], "path", "CanvasLayer/TitleScreen/NewGameButton").get("active") == true, "on the title only the title's own boxes are drawn; the world under it is reported as covered")
+	tools.set_overlay_mode(DebugTools.Overlay.OFF)
+	_expect(_idle(tools), "turned off, the zone drawing costs nothing")
+	tools.set_overlay_mode(DebugTools.Overlay.ZONES)
+	tools.debug_build = false
+	_expect(_idle(tools), "hiding the tools hides the zone drawing too")
+	await _free(game)
+
+
+## Records Access: its three stations' use ranges and WOLF's spot at the mirror, from Main's constants.
+func _check_zones_records() -> void:
+	var game: Node2D = await _spawn(true)
+	var tools: DebugTools = _tools(game)
+	var state: M0State = M0State.new()
+	state.record_choice(M0State.DISCLOSE)
+	state.arm_breaker()
+	state.activate_power("wolf")
+	state.reach_checkpoint()
+	state.enter_records()
+	_expect(state.save_to_disk(str(game.get("save_path"))), "a Records save is written")
+	game.call("_load_game")
+	await _settle(3)
+	tools.set_overlay_mode(DebugTools.Overlay.ZONES)
+	var geometry: Dictionary = tools.dump()["geometry"]
+	var constants: Dictionary = game.get_script().get_script_constant_map()
+	var stations: Array = constants["RECORDS_STATIONS"]
+	var names: Array[String] = ["use: purge queue", "use: mirror port", "use: exit"]
+	for index: int in names.size():
+		var entry: Dictionary = _entry(geometry["zones"], "name", names[index])
+		var station: Vector4 = stations[index]
+		_expect(not entry.is_empty() and is_equal_approx(float(entry["x_range"][0]), station.x - station.z) and is_equal_approx(float(entry["x_range"][1]), station.x + station.z), "Records shows '%s' from its station's reach" % names[index])
+	# The Records rules test a station by the same centre and reach the hint uses.
+	var human: M0Actor = game.get_node("Human") as M0Actor
+	var purge: Dictionary = _entry(geometry["zones"], "name", "use: purge queue")
+	human.position.x = float(purge["x_range"][1])
+	_expect(str(game.call("_context_hint")).contains("purge"), "at the purge queue range's edge the hint offers the purge queue")
+	human.position.x = float(purge["x_range"][1]) + 1.0
+	_expect(not str(game.call("_context_hint")).contains("E: copy the purge"), "just past it the purge queue is out of reach")
+	_expect(is_equal_approx(float(_entry(geometry["zones"], "name", "WOLF: mirror").get("x", -1.0)), float(constants["WOLF_MIRROR_X"])), "WOLF's mirror spot is drawn")
+	_expect(_entry(geometry["zones"], "name", "use: relay").is_empty() and _entry(geometry["hitboxes"], "name", "blast").is_empty(), "nothing from the other rooms is drawn")
+	_expect(_entry(geometry["hitboxes"], "path", "Door/CollisionShape2D").get("active") == false, "the corridor seal, out of play, is not in force here")
+	tools.set_overlay_mode(DebugTools.Overlay.OFF)
+	await _free(game)
+
+
+## The Service Junction: its hurtboxes and door from their real shapes, the blast, vent, cloud, sentry
+## contact and tank ranges from the rules' constants and tests, the sentry's sight from its brain,
+## the tank's footprint from the tank, and each range in force exactly while its rule is.
+func _check_zones_junction() -> void:
+	var game: Node2D = await _spawn(true)
+	var tools: DebugTools = _tools(game)
+	_expect(_junction_state(false).save_to_disk(str(game.get("save_path"))), "a junction entry save is written")
+	game.call("_load_game")
+	await _settle(3)
+	tools.set_overlay_mode(DebugTools.Overlay.ZONES)
+	var room: JunctionRoom = game.get("junction_room") as JunctionRoom
+	var vent_path: String = str(game.get_path_to(room.vent_hazard.get_child(0)))
+	var door_path: String = str(game.get_path_to(room.door_shape))
+	var cloud_path: String = str(game.get_path_to(room.cloud_hazard.get_child(0)))
+	var sentry_path: String = ""
+	for child: Node in room.sentry.get_children():
+		if child is CollisionShape2D:
+			sentry_path = str(game.get_path_to(child))
+	var geometry: Dictionary = tools.dump()["geometry"]
+	var vent: Dictionary = _entry(geometry["hitboxes"], "path", vent_path)
+	_expect(not vent.is_empty() and is_equal_approx(float(vent["world_rect"][0]), PressureLine.VENT_GRATE_MIN_X) and is_equal_approx(float(vent["world_rect"][0]) + float(vent["world_rect"][2]), PressureLine.VENT_GRATE_MAX_X) and vent["active"] == true and vent["armed"] == false, "the vent's hurtbox is drawn over its grate, monitoring and not armed")
+	var door: Dictionary = _entry(geometry["hitboxes"], "path", door_path)
+	_expect(not door.is_empty() and door["active"] == true and is_equal_approx(float(door["world_rect"][0]), M0State.JUNCTION_DOOR_LEFT_X), "the sealed door's hitbox starts at its face")
+	_expect(is_equal_approx(float(_entry(geometry["zones"], "name", "door face").get("x", -1.0)), M0State.JUNCTION_DOOR_LEFT_X), "the door's limit is drawn at its face")
+	var sentry_body: Dictionary = _entry(geometry["hitboxes"], "path", sentry_path)
+	_expect(not sentry_body.is_empty() and is_equal_approx(float(sentry_body["world_rect"][2]), SentryBrain.HALF_WIDTH * 2.0), "the sentry's body is drawn as wide as the body its brain uses")
+	var cloud_box: Dictionary = _entry(geometry["hitboxes"], "path", cloud_path)
+	_expect(not cloud_box.is_empty() and is_equal_approx(float(cloud_box["world_rect"][0]), DropArm.MARK_X - DropArm.CLOUD_HALF_WIDTH) and is_equal_approx(float(cloud_box["world_rect"][2]), DropArm.CLOUD_HALF_WIDTH * 2.0), "the cloud's hurtbox is drawn as wide as the cloud")
+	var on_vent: Dictionary = _entry(geometry["hitboxes"], "name", "vent (engineer x)")
+	_expect(_edges_match_static(PressureLine.is_on_vent, on_vent["x_range"]) and on_vent["active"] == false, "the vent's engineer range is exactly where is_on_vent holds, idle before the line builds")
+	var blast: Dictionary = _entry(geometry["hitboxes"], "name", "blast")
+	_expect(_edges_match_static(PressureLine.is_in_blast, blast["x_range"]) and blast["active"] == false, "the blast range is exactly where is_in_blast holds, idle before the fuse")
+	_expect(_edges_match(game, "_at_arm_panel", _entry(geometry["zones"], "name", "use: tank release")["x_range"], false), "the tank release's range is exactly where USE reaches it")
+	_expect(is_equal_approx(float(_entry(geometry["zones"], "name", "use: exit bolt")["x_range"][0]), JunctionRoom.BOLT_REACH_MIN_X), "the exit bolt's range starts at its reach")
+	var line: PressureLine = game.get("pressure_line") as PressureLine
+	line.arm()
+	geometry = tools.dump()["geometry"]
+	_expect(_entry(geometry["hitboxes"], "name", "vent (engineer x)")["active"] == true and _entry(geometry["hitboxes"], "name", "blast")["active"] == false, "once the line builds the vent range is live and the blast is not")
+	line.crank(PressureLine.TURN_SECONDS * PressureLine.TURNS_NEEDED + 0.01)
+	geometry = tools.dump()["geometry"]
+	_expect(_entry(geometry["hitboxes"], "name", "blast")["active"] == true and _entry(geometry["hitboxes"], "name", "vent (engineer x)")["active"] == false, "with the fuse lit the blast range is live")
+	var blast_area: Array = _entry(geometry["hitboxes"], "name", "blast").get("screen_area", [])
+	_expect(blast_area.size() == 4 and float(blast_area[3]) > 0.0, "the blast also shades the room above its range")
+	# The lane, door blown.
+	_expect(_junction_state(true).save_to_disk(str(game.get("save_path"))), "a door-blown save is written")
+	game.call("_load_game")
+	await _settle(3)
+	var brain: SentryBrain = game.get("sentry_brain") as SentryBrain
+	geometry = tools.dump()["geometry"]
+	var contact: Dictionary = _entry(geometry["hitboxes"], "name", "sentry contact")
+	_expect(not contact.is_empty() and is_equal_approx(float(contact["x_range"][0]), brain.x - SentryBrain.CONTACT_RANGE) and is_equal_approx(float(contact["x_range"][1]), brain.x + SentryBrain.CONTACT_RANGE) and contact["active"] == false, "the sentry's contact range is drawn around it, idle while it patrols")
+	var sight: Dictionary = _entry(geometry["zones"], "name", "sight %.0f" % SentryBrain.SIGHT_RANGE)
+	var tip: float = brain.x + brain.facing * SentryBrain.SIGHT_RANGE
+	_expect(not sight.is_empty() and sight["kind"] == "ray" and is_equal_approx(float(sight["x_range"][0]), minf(brain.x, tip)) and is_equal_approx(float(sight["x_range"][1]), maxf(brain.x, tip)) and is_equal_approx(float(sight["facing"]), brain.facing), "the sentry's sight is drawn from it, the way it faces, as far as it sees")
+	var hit: Dictionary = _entry(geometry["hitboxes"], "name", "tank hit range")
+	_expect(_edges_match_static(DropArm.is_hit, hit["x_range"]), "the tank's hit range is exactly where is_hit holds (the brackets)")
+	var cloud: Dictionary = _entry(geometry["hitboxes"], "name", "cloud (engineer x)")
+	_expect(_edges_match_static(DropArm.in_cloud, cloud["x_range"]) and cloud["active"] == false, "the cloud's engineer range is exactly where in_cloud holds, idle with no cloud")
+	var footprint: Dictionary = _entry(geometry["hitboxes"], "name", "tank footprint")
+	_expect(not footprint.is_empty() and _same_rect(footprint["world_rect"], Rect2(room.tank.global_position - JunctionRoom.TANK_SIZE * 0.5, JunctionRoom.TANK_SIZE)), "the tank's footprint is drawn where the tank hangs, at its size")
+	var alcove: Dictionary = _entry(geometry["zones"], "name", "alcove (out of sight)")
+	_expect(not SentryBrain.is_exposed(float(alcove["x_range"][0])) and not SentryBrain.is_exposed(float(alcove["x_range"][1])) and SentryBrain.is_exposed(float(alcove["x_range"][1]) + 0.5), "the alcove is drawn exactly where the sentry cannot see the engineer")
+	_expect(is_equal_approx(float(_entry(geometry["zones"], "name", "chase limit").get("x", -1.0)), SentryBrain.CHASE_MIN_X) and not _entry(geometry["zones"], "name", "WOLF: bait").is_empty() and not _entry(geometry["zones"], "name", "WOLF: rubble").is_empty(), "the chase limit and WOLF's bait and rubble spots are drawn")
+	var target: Dictionary = {}
+	for zone: Dictionary in geometry["zones"]:
+		if zone.get("target", false):
+			target = zone
+	_expect(not target.is_empty() and is_equal_approx(float(target["x"]), JunctionRoom.WOLF_RUBBLE_X) and str(target["why"]) == "hold: at the rubble", "WOLF's current target and why are drawn")
+	_expect(_entry(geometry["zones"], "name", "door face").is_empty() and _entry(geometry["hitboxes"], "path", door_path).get("active") == false, "a blown door blocks nothing and draws no limit")
+	# A miss arms the cloud: its hurtbox and range are in force while it hangs there.
+	var arm: DropArm = game.get("drop_arm") as DropArm
+	arm.drop()
+	arm.advance(DropArm.FALL_SECONDS, DropArm.MARK_X + 200.0)
+	room.sync_arm(arm)
+	geometry = tools.dump()["geometry"]
+	_expect(_entry(geometry["hitboxes"], "name", "cloud (engineer x)")["active"] == true and _entry(geometry["hitboxes"], "path", cloud_path).get("armed") == true, "after a miss the cloud's range and hurtbox are in force")
+	tools.set_overlay_mode(DebugTools.Overlay.OFF)
+	_expect(_idle(tools), "turned off in the junction, the tools are idle")
+	await _free(game)
+
+
+## For capture drivers: a capture with boxes draws every category into its screenshot whatever page
+## is up, writes the dump with the geometry, then puts the view back as it was.
+func _check_capture_with_boxes() -> void:
+	var game: Node2D = await _spawn(true)
+	var tools: DebugTools = _tools(game)
+	tools.capture_dir = base + "-captures"
+	game.call("_new_game")
+	game.call("_finish_intro")
+	await _settle(3)
+	tools.zones.set_layer(false, DebugZones.RENDER)
+	var shown_during: Array[bool] = []
+	tools.captured.connect(func(_paths: Dictionary) -> void: shown_during.append(tools.zones.visible and tools.zones.layers[DebugZones.RENDER] and tools.zones.layers[DebugZones.HITBOXES]))
+	var paths: Dictionary = await tools.capture_with_boxes()
+	_expect(paths.get("with_boxes") == true and FileAccess.file_exists(str(paths.get("json", ""))), "a capture with boxes is written")
+	_expect(shown_during == [true], "every category was drawn while it was taken")
+	var data: Dictionary = JSON.parse_string(FileAccess.get_file_as_string(str(paths["json"])))
+	var geometry: Dictionary = data.get("geometry", {})
+	_expect((data.get("capture") as Dictionary).get("with_boxes") == true and geometry.get("drawn") == true and not (geometry.get("hitboxes", []) as Array).is_empty() and not (geometry.get("render_boxes", []) as Array).is_empty() and not (geometry.get("zones", []) as Array).is_empty(), "its dump has the zones, hitboxes and render boxes, drawn")
+	_expect(tools.overlay_mode == DebugTools.Overlay.OFF and not tools.zones.visible and not tools.zones.layers[DebugZones.RENDER] and tools.zones.layers[DebugZones.ZONES], "afterwards the page and the categories are as they were")
+	await _send_key(KEY_F12)
+	var plain: Dictionary = JSON.parse_string(FileAccess.get_file_as_string(str(tools.last_capture["json"])))
+	_expect(tools.last_capture.get("with_boxes") == false and (plain.get("geometry", {}) as Dictionary).get("drawn") == false and not ((plain.get("geometry", {}) as Dictionary).get("render_boxes", []) as Array).is_empty(), "F12 with the overlay off reports the boxes as numbers without drawing them")
+	tools.hide_note()
+	_expect(_idle(tools), "after both captures the tools are idle again")
+	tools.debug_build = false
+	_expect((await tools.capture_with_boxes()).is_empty(), "hidden tools write no capture with boxes")
+	await _free(game)
+
+
+## The entry in [param list] whose [param key] is [param value], or empty.
+func _entry(list: Variant, key: String, value: Variant) -> Dictionary:
+	for item: Variant in list:
+		if item is Dictionary and (item as Dictionary).get(key) == value:
+			return item
+	return {}
+
+
+## True when a dumped [x, y, w, h] array is [param rect].
+func _same_rect(values: Variant, rect: Rect2) -> bool:
+	if not values is Array or (values as Array).size() != 4:
+		return false
+	var array: Array = values
+	return absf(float(array[0]) - rect.position.x) < 0.01 and absf(float(array[1]) - rect.position.y) < 0.01 and absf(float(array[2]) - rect.size.x) < 0.01 and absf(float(array[3]) - rect.size.y) < 0.01
+
+
+## True when Main's [param rule] holds at both ends of [param range] (just inside the right end when
+## [param half_open]) and not just outside them.
+func _edges_match(game: Node2D, rule: StringName, range: Variant, half_open: bool) -> bool:
+	var low: float = float(range[0])
+	var high: float = float(range[1])
+	var inside_high: float = high - 0.01 if half_open else high
+	var outside_high: float = high if half_open else high + 0.5
+	return bool(game.call(rule, low)) and bool(game.call(rule, inside_high)) and not bool(game.call(rule, low - 0.5)) and not bool(game.call(rule, outside_high))
+
+
+func _edges_match_static(rule: Callable, range: Variant) -> bool:
+	var low: float = float(range[0])
+	var high: float = float(range[1])
+	return rule.call(low) and rule.call(high) and not rule.call(low - 0.5) and not rule.call(high + 0.5)
+
 
 func _on_menu_requested() -> void:
 	menu_requests += 1
@@ -500,9 +828,10 @@ func _settings_path() -> String:
 	return base + ".cfg"
 
 
-## True when the tools neither process nor draw anything.
+## True when the tools neither process nor draw anything, the zone drawing and its legend included.
 func _idle(tools: DebugTools) -> bool:
-	return not tools.is_processing() and not tools.is_physics_processing() and not tools.layer.visible and not tools.overlay.visible and not tools.debug_button.visible and not tools.note.visible
+	return not tools.is_processing() and not tools.is_physics_processing() and not tools.layer.visible and not tools.overlay.visible and not tools.debug_button.visible and not tools.note.visible \
+		and not tools.zones.visible and not tools.zones.is_processing() and not tools.zones.legend.is_visible_in_tree()
 
 
 ## A completed Records run (disclose, WOLF's readout) carried into the junction, with the door blown or not.
