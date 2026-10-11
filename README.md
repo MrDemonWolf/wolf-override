@@ -176,7 +176,7 @@ the docs type check, tests and Pages build before deployment. Headless
 checks cover both door routes, both mirror routes, the Service Junction
 stages and knockdowns, settings validation and Continue; they do not
 establish how a route feels. The Service Junction, the closer camera, the
-layered room art and the generated sounds are covered by headless suites
+layered room art and the sounds are covered by headless suites
 and rendered stills only; no route has been played by hand.
 
 ## Project Structure

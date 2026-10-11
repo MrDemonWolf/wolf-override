@@ -358,8 +358,14 @@ const MAINS_HZ: float = 60.0
 const BUZZ_HZ: float = 120.0
 ## Depth of the 120 Hz reignition pulse on recipe A's buzz and sizzle.
 const PULSE_DEPTH: float = 0.6
-## Send from recipe B's N-wave crackle to its two Q 9 housing resonators.
+## Send from recipe B's N-wave crackle to its two Q 9 housing resonators (a plan's "ring_send"
+## overrides it).
 const RING_SEND: float = 0.4
+## Recipe B's housing modes struck by a crack: [Hz, level, decay seconds]. Short decays (6-12 ms) knock
+## instead of ringing; a plan with "long_ring" keeps the 20-50 ms decays of the bolt clip that was
+## auditioned, together with its 0.8 ring send.
+const HOUSING_MODES: Array = [[520.0, 0.3, 0.012], [1150.0, 0.45, 0.010], [1730.0, 0.5, 0.008], [2650.0, 0.45, 0.007], [3900.0, 0.3, 0.006]]
+const HOUSING_MODES_LONG: Array = [[520.0, 0.3, 0.05], [1150.0, 0.45, 0.04], [1730.0, 0.5, 0.035], [2650.0, 0.45, 0.03], [3900.0, 0.3, 0.02]]
 
 enum { LOWPASS, HIGHPASS, BANDPASS, HIGHSHELF, PEAKING }
 
@@ -369,7 +375,8 @@ enum { LOWPASS, HIGHPASS, BANDPASS, HIGHSHELF, PEAKING }
 ## buzz_pre: buzz level reached at the end of the build. buzz_post / buzz_hold / buzz_tau: buzz
 ## after the strike. zap_seconds / zap: the falling high-voltage sweep. tail / tail_tau: sizzle.
 ## drive: the tanh bus drive. crackle_fade: [start, end] seconds over which the crackle level falls
-## to 0 (a raised cosine), so no lone late spit stands above a dying tail.
+## to 0 (a raised cosine), so no lone late spit stands above a dying tail. ring_send / long_ring:
+## recipe B's housing ring (see RING_SEND and HOUSING_MODES).
 const ARC_PLANS: Dictionary = {
 	&"relay_spark": {
 		"seconds": 0.34, "crack_at": 0.004, "crack": 0.65, "restrike_at": 0.055, "restrike": 0.3,
@@ -385,11 +392,13 @@ const ARC_PLANS: Dictionary = {
 		"crackle_fade": [0.36, 0.48],
 	},
 	# Buzz and crackle build under the end of the whine for 0.5 s (BOLT_CRACK_SECONDS), then it cracks.
+	# It keeps the longer housing ring of the auditioned clip (synth recipe B, before the refine pass).
 	&"bolt_arc": {
 		"seconds": 0.8, "crack_at": BOLT_CRACK_SECONDS, "crack": 1.0, "restrike_at": 0.585, "restrike": 0.45,
 		"build_rate": [15.0, 230.0], "post_rate": 320.0, "post_tau": 0.085,
 		"buzz_pre": 0.7, "buzz_post": 0.8, "buzz_hold": 0.05, "buzz_tau": 0.07,
 		"zap_seconds": 0.09, "zap": 0.6, "tail": 0.35, "tail_tau": 0.1, "drive": 3.0,
+		"ring_send": 0.8, "long_ring": true,
 	},
 }
 
@@ -499,8 +508,7 @@ static func _a_snap(rng: RandomNumberGenerator, out: PackedFloat32Array, at: flo
 
 
 ## Recipe B: each micro-discharge is an acoustic N-wave whose width grows with its energy; the crack
-## is a big N-wave that strikes the housing's modes (520-3900 Hz, short decays so it knocks instead
-## of ringing); the body is noise reignited on every mains half-cycle plus a faint 120 Hz hum; the
+## is a big N-wave that strikes the housing's modes (520-3900 Hz, HOUSING_MODES); the body is noise reignited on every mains half-cycle plus a faint 120 Hz hum; the
 ## zap is noise through a resonant band-pass sweeping 4.5 kHz to 450 Hz; the tail still pulses.
 static func _arc_b(rng: RandomNumberGenerator, plan: Dictionary) -> PackedFloat32Array:
 	var n: int = int(plan["seconds"] * DETAIL_RATE)
@@ -534,13 +542,14 @@ static func _arc_b(rng: RandomNumberGenerator, plan: Dictionary) -> PackedFloat3
 	crackle = _biquad(crackle, PEAKING, 2200.0, 0.9, 5.0)
 	var ring: PackedFloat32Array = _biquad(crackle, BANDPASS, 1730.0, 9.0)
 	_mix(ring, _biquad(crackle, BANDPASS, 2650.0, 9.0), 1.0)
-	_mix(crackle, ring, RING_SEND)
+	_mix(crackle, ring, float(plan.get("ring_send", RING_SEND)))
 	crackle = _biquad(crackle, HIGHPASS, 350.0, 0.707)
 	_mix(out, crackle, 1.3)
 
-	_b_crack(rng, out, crack_at, plan["crack"])
+	var modes: Array = HOUSING_MODES_LONG if plan.get("long_ring", false) else HOUSING_MODES
+	_b_crack(rng, out, crack_at, plan["crack"], modes)
 	if plan["restrike_at"] > 0.0:
-		_b_crack(rng, out, plan["restrike_at"], plan["restrike"])
+		_b_crack(rng, out, plan["restrike_at"], plan["restrike"], modes)
 
 	var zap_seconds: float = plan["zap_seconds"]
 	var start_zap: int = int(crack_at * DETAIL_RATE)
@@ -567,11 +576,10 @@ static func _n_wave(out: PackedFloat32Array, at: float, amp: float, width: float
 		out[start + k] += amp * (1.0 - 2.0 * float(k) / float(w - 1))
 
 
-static func _b_crack(rng: RandomNumberGenerator, out: PackedFloat32Array, at: float, amp: float) -> void:
+static func _b_crack(rng: RandomNumberGenerator, out: PackedFloat32Array, at: float, amp: float, modes: Array) -> void:
 	_n_wave(out, at, amp * 1.4, 0.0009)
 	var start: int = int(at * DETAIL_RATE)
 	var dt: float = 1.0 / DETAIL_RATE
-	var modes: Array = [[520.0, 0.3, 0.012], [1150.0, 0.45, 0.010], [1730.0, 0.5, 0.008], [2650.0, 0.45, 0.007], [3900.0, 0.3, 0.006]]
 	for k: int in mini(int(0.3 * DETAIL_RATE), out.size() - start):
 		var tt: float = k * dt
 		var s: float = rng.randf_range(-1.0, 1.0) * exp(-tt / 0.005) * 0.7

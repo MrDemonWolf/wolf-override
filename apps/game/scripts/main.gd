@@ -1498,8 +1498,8 @@ func _tick_junction(delta: float) -> void:
 		_wolf_reads_seam()
 	junction_room.sync_line(pressure_line)
 	_tick_lane(delta)
-	# Hiss and pump pitch are functions of the gauge, nothing else: the recorded steam crossfades from
-	# its low-gauge loop to its high-gauge loop as the gauge climbs, and gets louder.
+	# The hiss and the pump's pitch are functions of the gauge, nothing else: the recorded steam keeps
+	# its pitch but crossfades from its low-gauge loop to its high-gauge loop and gets louder.
 	if pressure_line.state == &"building":
 		sfx_bank.play_blend(SfxBank.HISS_GAUGE, pressure_line.gauge, lerpf(-28.0, -6.0, pressure_line.gauge))
 	else:

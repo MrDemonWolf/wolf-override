@@ -55,6 +55,10 @@ func _run() -> void:
 	for clip: StringName in SfxBank.HISS_GAUGE:
 		_expect((bank.streams[clip] as AudioStreamWAV).data.size() == (bank.streams[SfxBank.HISS_GAUGE[0]] as AudioStreamWAV).data.size(), "%s shares the gauge set's length, so the set loops in step" % clip)
 	_expect(float(SfxBank.ARC_PLANS[&"bolt_arc"]["crack_at"]) == SfxBank.BOLT_CRACK_SECONDS and SfxBank.BOLT_CRACK_SECONDS < float(game.get_script().get_script_constant_map()["BOLT_WHINE_SECONDS"]), "the bolt arc's build fits inside the whine")
+	var bolt_plan: Dictionary = SfxBank.ARC_PLANS[&"bolt_arc"]
+	var records_plan: Dictionary = SfxBank.ARC_PLANS[&"records_arc"]
+	_expect(bool(bolt_plan.get("long_ring", false)) and float(bolt_plan.get("ring_send", SfxBank.RING_SEND)) == 0.8 and float(bolt_plan["drive"]) == 3.0, "the bolt arc keeps the housing ring and drive of the clip that was auditioned")
+	_expect(not records_plan.get("long_ring", false) and float(records_plan.get("ring_send", SfxBank.RING_SEND)) == 0.4, "the Records exit keeps the refined short housing ring")
 	# Same seeds, same bytes: a second bank rendered on this thread is identical, so the worker thread
 	# changes nothing either.
 	var again: SfxBank = SfxBank.new()
