@@ -736,7 +736,12 @@ func _setup_settings() -> void:
 	if mobile:
 		$CanvasLayer/PauseOverlay/Panel/PauseMenu/PauseHint.text = "TAP RESUME TO RETURN"
 	if not mobile:
-		get_window().size = _resolution_size(resolution)
+		# The OS centres the first window at the project's 1280x720 override; a different saved size
+		# is applied here, so centre again rather than leave it anchored to the 1280x720 corner.
+		var saved_size: Vector2i = _resolution_size(resolution)
+		if get_window().size != saved_size:
+			get_window().size = saved_size
+			get_window().move_to_center()
 		fullscreen_toggle.button_pressed = GameSettings.boolean(config, "video", "fullscreen", false)
 		if fullscreen_toggle.button_pressed:
 			get_window().mode = Window.MODE_FULLSCREEN
