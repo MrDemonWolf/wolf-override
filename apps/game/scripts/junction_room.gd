@@ -158,7 +158,10 @@ const HAZARD_SECONDS: float = 0.4
 ## first name.
 const VENT_REASON: String = "The relief vent let go under %s. When the gauge peaks, stay off the grate."
 const BLAST_REASON: String = "The door went with %s in front of it. When the fuse lights, back away past the valve."
+## SENTRY_REASON is for an engineer it saw and ran down out in the lane; once it has turned on them
+## after a miss, or reaches them inside the alcove, the alcove is no help and SENTRY_CHASED_REASON says so.
 const SENTRY_REASON: String = "The sentry ran %s down in its lane. Stay between the alcove's posts, or get back over the rubble."
+const SENTRY_CHASED_REASON: String = "The sentry ran %s down. Once its eyes go red, only the rubble is safe."
 const CLOUD_REASON: String = "The coolant cloud caught %s. Let it clear before crossing the mark."
 const AMBER: Color = Color("#f3ae4b")
 const GREEN: Color = Color("#a4f0c4")

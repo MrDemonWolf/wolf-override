@@ -144,7 +144,19 @@ func _check_brain() -> void:
 	_expect(alerted.alert() and alerted.state == &"lock" and is_equal_approx(alerted.lock_remaining, SentryBrain.LOCK_SECONDS - 0.2), "a second alert does not restart the beat")
 	alerted.tick(SentryBrain.LOCK_SECONDS, SentryBrain.COVER_MIN_X, false, -1.0)
 	_expect(alerted.state == &"chase" and alerted.alert() and alerted.state == &"chase", "once the beat is over it chases, and an alert keeps it chasing")
+	_expect(alerted.turned_by_miss, "a chase a missed drop started stays marked as one, through the lock-on beat and a second alert")
+	alerted.tick(SentryBrain.LOSE_SECONDS, SentryBrain.RUBBLE_X, false, -1.0)
+	_expect(alerted.state == &"patrol" and not alerted.turned_by_miss, "losing the engineer behind the rubble clears the mark")
+	# Seen first: the chase is the sentry's own, and a miss during it does not relabel it.
+	var spotter: SentryBrain = _patrolling_at(700.0, -1.0)
+	spotter.tick(0.001, 640.0, true, -1.0)
+	_expect(spotter.state == &"lock" and not spotter.turned_by_miss, "a sentry that sees the engineer is not marked as turned by a miss")
+	_expect(spotter.alert() and not spotter.turned_by_miss, "a miss during its own lock-on beat leaves it unmarked")
+	spotter.tick(SentryBrain.LOCK_SECONDS, 640.0, true, -1.0)
+	_expect(spotter.state == &"chase" and spotter.alert() and not spotter.turned_by_miss, "nor does a miss during its own chase")
+	alerted.alert()
 	alerted.reset(true, false, DropArm.MARK_X)
+	_expect(not alerted.turned_by_miss, "reset clears the mark")
 	_expect(alerted.state == &"patrol" and alerted.x == SentryBrain.PATROL_MAX_X and alerted.facing < 0.0, "reset after the blast patrols from the far end")
 	alerted.reset(false, false, DropArm.MARK_X)
 	_expect(alerted.state == &"dormant", "reset before the blast is dormant")
@@ -497,6 +509,7 @@ func _check_scene() -> void:
 	_expect(str(game.call("_context_hint")).contains("WOLF has broken off"), "then the hint says WOLF has stepped back")
 	await _check_engineer_alone(game, path)
 	await _check_cloud(game, path)
+	await _check_chased_cards(game, path)
 	# A crafted v4 save with the sentry down but the door still sealed is rejected.
 	var crafted: Dictionary = b_dict.duplicate(true)
 	crafted["positions"]["human"] = [120.0, 410.0]
@@ -663,6 +676,37 @@ func _check_cloud(game: Node2D, path: String) -> void:
 	arm.drop()
 	_expect(await _wait_until(func() -> bool: return (game.get("state") as M0State).sentry_down, 60) and absf(brain.x - DropArm.MARK_X) > 8.0, "a drop on a sentry near the bracket's edge still hits")
 	_expect(str(game.get("status_line")).begins_with("The tank catches the sentry off centre and pins it to the floor.") and str(game.get("status_line")).ends_with("WOLF: It's down. The bolt by the hatch is next."), "an off-centre hit is told as off centre, not square")
+
+
+## The sentry card follows the cause. Seen and caught out in the lane, it points at the alcove or
+## the rubble (_check_engineer_alone); turned on the engineer by a miss, or reaching them inside the
+## alcove, it points only at the rubble, since a chase reaches anywhere between the posts.
+func _check_chased_cards(game: Node2D, path: String) -> void:
+	var human: M0Actor = game.get_node("Human") as M0Actor
+	var brain: SentryBrain = game.get("sentry_brain") as SentryBrain
+	var arm: DropArm = game.get("drop_arm") as DropArm
+	var b_dict: Dictionary = await _start_at_b(game, State.PRESS)
+	var chased: String = JunctionRoom.SENTRY_CHASED_REASON % (game.get("state") as M0State).human_name().get_slice(" ", 0)
+	# A miss with the sentry at the far end, and the engineer stays at the release.
+	game.set("lane_choice", "alone")
+	human.position.x = JunctionRoom.ARM_X
+	_expect(brain.state == &"patrol" and brain.x >= 830.0 and arm.drop(), "the drop goes with the sentry at the far end")
+	_expect(await _wait_until(func() -> bool: return arm.state == &"rewinding", 60) and brain.turned_by_miss, "the miss turns the sentry on the release")
+	_expect(await _wait_until(func() -> bool: return game.get("fail_active"), 120), "a chase after a miss runs down an engineer who stays at the release")
+	var status: String = str(game.get("status_line"))
+	_expect(not SentryBrain.is_exposed(human.position.x) and status.begins_with(chased) and not status.contains("alcove's posts") and not status.contains("in its lane"), "caught between the posts after a miss, the card points only at the rubble (%s)" % status)
+	_expect(await _wait_until(func() -> bool: return not game.get("fail_active"), 240), "the knockdown after a miss hands back")
+	_expect((game.get("state") as M0State).to_dict() == b_dict and not brain.turned_by_miss, "it restores autosave B with the sentry patrolling again")
+	# Seen out in the lane, then caught after ducking into the alcove: the alcove advice would be wrong.
+	game.set("lane_choice", "alone")
+	_expect(await _wait_until(func() -> bool: return brain.facing < 0.0 and brain.x <= 780.0 and brain.x >= 720.0, 300), "the sentry comes back down the lane")
+	human.position.x = 640.0
+	_expect(await _wait_until(func() -> bool: return brain.state == &"lock", 5) and not brain.turned_by_miss, "it sees the engineer in the lane")
+	human.position.x = JunctionRoom.ARM_X
+	_expect(await _wait_until(func() -> bool: return game.get("fail_active"), 120), "the chase reaches the engineer in the alcove")
+	status = str(game.get("status_line"))
+	_expect(not SentryBrain.is_exposed(human.position.x) and status.begins_with(chased) and not status.contains("alcove's posts"), "caught inside the alcove, the card points only at the rubble (%s)" % status)
+	_expect(await _wait_until(func() -> bool: return not game.get("fail_active"), 240), "that knockdown hands back too")
 
 
 ## Autosave B: the door is down, the engineer just left of the old door line, WOLF at the rubble.

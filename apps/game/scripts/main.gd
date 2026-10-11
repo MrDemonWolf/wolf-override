@@ -2343,7 +2343,15 @@ func _tick_lane(delta: float) -> void:
 	if lane_choice.is_empty() and not waiting_for_choice and human.controlled and human.position.x >= JunctionRoom.CHOICE_X:
 		_ask_lane()
 	elif sentry_brain.touches(human.position.x):
-		_fail_beat(JunctionRoom.SENTRY_REASON % _first_name())
+		_fail_beat(_sentry_reason())
+
+
+## The sentry's knockdown card. The alcove advice is only for an engineer it saw out in the lane and
+## caught there; after a miss turned it, or with the engineer caught inside the alcove, the card
+## points only at the rubble, because a chase reaches anywhere in the alcove.
+func _sentry_reason() -> String:
+	var seen_in_lane: bool = not sentry_brain.turned_by_miss and SentryBrain.is_exposed(human.position.x)
+	return (JunctionRoom.SENTRY_REASON if seen_in_lane else JunctionRoom.SENTRY_CHASED_REASON) % _first_name()
 
 
 ## The servo follows the sentry's state (it idles low through the lock-on beat and runs higher in a

@@ -58,6 +58,9 @@ var facing: float = -1.0
 var lost_seconds: float = 0.0
 ## Seconds left in the lock-on beat.
 var lock_remaining: float = 0.0
+## True while the current lock-on or chase began with a missed drop rather than with it seeing the
+## engineer; the knockdown card tells the two apart.
+var turned_by_miss: bool = false
 var paused: bool = false
 
 
@@ -83,6 +86,7 @@ func alert() -> bool:
 		lost_seconds = 0.0
 	elif state != &"lock":
 		_lock_on()
+		turned_by_miss = true
 	return true
 
 
@@ -137,6 +141,7 @@ func tick(delta: float, engineer_x: float, engineer_exposed: bool, bait_x: float
 				if lost_seconds >= LOSE_SECONDS - EPSILON:
 					state = &"patrol"
 					lost_seconds = 0.0
+					turned_by_miss = false
 			else:
 				lost_seconds = 0.0
 	return state
@@ -161,6 +166,7 @@ func reset(door_blown: bool, down: bool, down_x: float) -> void:
 	facing = -1.0
 	lost_seconds = 0.0
 	lock_remaining = 0.0
+	turned_by_miss = false
 	paused = false
 
 
@@ -168,6 +174,7 @@ func _lock_on() -> void:
 	state = &"lock"
 	lock_remaining = LOCK_SECONDS
 	lost_seconds = 0.0
+	turned_by_miss = false
 
 
 func _patrol(delta: float) -> void:
