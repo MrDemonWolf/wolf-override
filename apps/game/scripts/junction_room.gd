@@ -170,6 +170,10 @@ const DOOR_LABEL_SHIFT: float = 7.0
 const ARM_LABEL_SHIFT: float = 20.0
 ## The EXIT plate sits over the bolt panel, left of the hatch it also names.
 const EXIT_LABEL_X: float = 792.0
+## The feed from the TANK RELEASE to the exit bolt panel: a conduit along the wall at this height,
+## behind the props and the actors. Dead while the winch holds the tank; once the tank is down its
+## power runs to the bolt (amber), warming to white through the whine and green once the bolt drops.
+const BOLT_FEED_Y: float = 404.0
 ## A plate fades out over this many px as it reaches the edge of the view.
 const LABEL_EDGE_FADE: float = 14.0
 const LABEL_PLATE: Color = Color(0.035, 0.06, 0.08, 0.8)
@@ -320,8 +324,8 @@ class TankSprite:
 		add_child(dent)
 
 
-## What sits behind the stations: the shadow of the TANK RELEASE alcove, drawn under the props (the
-## room's own drawing sits over them).
+## What sits behind the stations: the shadow of the TANK RELEASE alcove and the release's feed to the
+## exit bolt, drawn under the props (the room's own drawing sits over them).
 class Recesses:
 	extends Node2D
 	var room: JunctionRoom
@@ -780,6 +784,8 @@ func sync_bolt(state: StringName, charge: float) -> void:
 	if changed:
 		refresh_state()
 	queue_redraw()
+	# The feed to the bolt warms with the charge.
+	recesses.queue_redraw()
 
 
 ## Where the tank's centre comes to rest: on the floor, or on top of the crushed sentry.
@@ -863,6 +869,7 @@ func refresh_state() -> void:
 	_sync_seam()
 	_sync_vent_glow()
 	queue_redraw()
+	recesses.queue_redraw()
 
 
 ## True once the door is down, whether it just went or a save brought it back.
@@ -1010,6 +1017,33 @@ func _draw() -> void:
 func draw_recesses(canvas: CanvasItem) -> void:
 	var alcove: Rect2 = alcove_rect()
 	canvas.draw_texture_rect(alcove_shadow, alcove.grow_individual(14.0, 10.0, 14.0, 8.0), false, Color(0.0, 0.02, 0.04, 0.85))
+	_draw_bolt_feed(canvas)
+
+
+## The conduit from the TANK RELEASE panel's side to the exit bolt panel's (bolt_feed_span), with a
+## clamp box at each end. Its core is lit only while it carries power to the bolt (bolt_feed_color).
+func _draw_bolt_feed(canvas: CanvasItem) -> void:
+	var span: Vector2 = bolt_feed_span()
+	canvas.draw_line(Vector2(span.x, BOLT_FEED_Y), Vector2(span.y, BOLT_FEED_Y), Color("#0d1419"), 6.0)
+	canvas.draw_line(Vector2(span.x, BOLT_FEED_Y - 1.5), Vector2(span.y, BOLT_FEED_Y - 1.5), STEEL, 1.0)
+	canvas.draw_line(Vector2(span.x, BOLT_FEED_Y + 0.5), Vector2(span.y, BOLT_FEED_Y + 0.5), bolt_feed_color(), 2.0)
+	for end_x: float in [span.x, span.y]:
+		canvas.draw_rect(Rect2(end_x - 4.0, BOLT_FEED_Y - 6.0, 8.0, 12.0), Color("#1b2630"))
+		canvas.draw_rect(Rect2(end_x - 4.0, BOLT_FEED_Y - 6.0, 8.0, 12.0), STEEL, false, 1.0)
+
+
+## Where the feed runs: from just inside the release panel's right edge to just inside the bolt panel's
+## left edge, so each end disappears behind its machine.
+func bolt_feed_span() -> Vector2:
+	var release: Rect2 = Rect2(prop_point(arm_panel_art, ARM_PANEL_REGION.position), ARM_PANEL_REGION.size * ARM_PANEL_SCALE)
+	var bolt: Rect2 = Rect2(prop_point(bolt_panel_art, BOLT_PANEL_REGION.position), BOLT_PANEL_REGION.size * BOLT_PANEL_SCALE)
+	return Vector2(release.end.x - 6.0, bolt.position.x + 6.0)
+
+
+## The feed's core: dead until the tank is down, then the bolt's own light (amber, warming to white
+## through the whine, green once it has dropped).
+func bolt_feed_color() -> Color:
+	return DIM if not sentry_down and not junction_cleared else _bolt_light_color()
 
 
 ## The alcove's core: exactly SentryBrain's cover span, up to the label row.

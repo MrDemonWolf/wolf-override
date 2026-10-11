@@ -189,8 +189,19 @@ func _check_scene() -> void:
 	var autosave_a: M0State = State.load_from_disk(path)
 	_expect(autosave_a != null and autosave_a.chapter_id == "junction" and not autosave_a.door_blown and autosave_a.memory == state.memory, "autosave A is written on entry with the relay memory")
 	var a_bytes: PackedByteArray = FileAccess.get_file_as_bytes(path)
+	# Audit 15: a save that worked says so in the hint bar, briefly, in the same word the title uses.
+	var hint_text: Label = game.get_node("CanvasLayer/ContextHint/Text") as Label
+	game.call("_refresh_ui")
+	_expect(hint_text.text == "Checkpoint saved." and (game.get_node("CanvasLayer/ContextHint") as Control).visible, "autosave A says Checkpoint saved. in the hint bar")
+	game.set("waiting_for_choice", true)
+	game.call("_refresh_ui")
+	_expect(not (game.get_node("CanvasLayer/ContextHint") as Control).visible, "the checkpoint note never shows over an open choice")
+	game.set("waiting_for_choice", false)
+	game.call("_refresh_ui")
+	game.call("_process", 2.1)
+	_expect(hint_text.text != "Checkpoint saved.", "the checkpoint note gives way to the room's own hint after about two seconds")
 	_expect(room.sentry.visual.dormant and room.sentry.visual.body.modulate == Sentry.DORMANT_TINT and not room.sentry.visual.is_lit(), "behind the sealed door the sentry stands powered down: dimmed, eye dark")
-	_expect(game.call("_objective") == "CLEAR THE LINE" and (game.get_node("CanvasLayer/TopBar/HUD") as Label).text.contains("SERVICE JUNCTION"), "entry shows the junction card and first objective")
+	_expect(game.call("_objective") == "ARM THE BREAKER" and (game.get_node("CanvasLayer/TopBar/HUD") as Label).text.contains("SERVICE JUNCTION"), "entry shows the junction card and first objective")
 	_expect(game.get("wolf_scouting") and wolf.autonomous_target_x == JunctionRoom.WOLF_SEAM_X, "WOLF runs ahead to the door seam on his own")
 	_expect(await _wait_until(func() -> bool: return not game.get("wolf_scouting"), 200), "WOLF reaches the seam and reads it")
 	_expect(absf(wolf.position.x - JunctionRoom.WOLF_SEAM_X) <= 6.0 and wolf.follow_target == human and str(game.get("status_line")).contains("It's live"), "after the read WOLF returns to following and says what he found")
@@ -217,7 +228,7 @@ func _check_scene() -> void:
 	_expect(await _walk_to(human, 200.0), "the engineer is back at the breaker after the vent checks")
 	_expect(str(game.call("_context_hint")).contains("arm the overload breaker"), "the breaker offers USE")
 	await _tap(&"interact")
-	if not _require(line.state == &"building" and game.call("_objective") == "CHARGE THE SEAL", "USE at the breaker arms the line"):
+	if not _require(line.state == &"building" and game.call("_objective") == "CRANK THE VALVE", "USE at the breaker arms the line"):
 		return
 	_expect(str(game.get("status_line")).contains("LINE gauge"), "arming names the LINE gauge")
 	_expect(not room.vent_steam.emitting and room.breaker_label.text == "BREAKER LIVE", "an armed line lights the breaker, and the vent stays quiet at the bottom of the gauge")
@@ -241,6 +252,8 @@ func _check_scene() -> void:
 	Input.action_release(&"interact")
 	if not _require(first_turn and line.turns == 1 and line.state == &"building", "0.4 s of held USE is one real turn"):
 		return
+	var valve_crank_x: float = (game.get_script() as Script).get_script_constant_map()["VALVE_CRANK_X"]
+	_expect(absf(human.position.x - valve_crank_x) <= 4.0 and human.position.x < JunctionRoom.VALVE_X and not human.body_sprite.flip_h, "the engineer cranks from just left of the wheel, facing it, not from inside the valve")
 	for _frame: int in 12:
 		await physics_frame
 	_expect(line.turns == 1 and room.turns == 1 and line.progress == 0.0 and room.valve_label.text == "VALVE  1 / %d" % PressureLine.TURNS_NEEDED, "releasing keeps the turn and the room and its VALVE label show it")
@@ -280,19 +293,19 @@ func _check_scene() -> void:
 	human.position.x = PressureLine.BLAST_MIN_X - 8.0
 	_expect(await _wait_until(func() -> bool: return state.door_blown, 90), "the fuse ends and the door blows")
 	_expect(room.door_breaking_art.visible and not room.door_art.visible and not room.door_blown_art.visible, "at the blast the bulkhead shows breaking first")
-	_expect(game.call("_objective") == "DROP THE TANK" and room.door_label.text == "DOOR DOWN" and room.blast_sparks.emitting, "the blast is a real state change with sparks and the next objective")
+	_expect(game.call("_objective") == "CHECK THE LANE" and room.door_label.text == "DOOR DOWN" and room.blast_sparks.emitting, "the blast is a real state change with sparks, and the card names the lane before anyone mentions the tank")
 	_expect(room.breaker_label.text == "BREAKER SPENT" and room.valve_label.text == "VALVE SPENT", "the blast spends the breaker and the valve")
 	var knocked: bool = false
 	for _frame: int in 30:
 		await physics_frame
 		knocked = knocked or game.get("fail_active")
-	_expect(not knocked and human.controlled and str(game.get("status_line")).begins_with("The seal goes"), "clear of the zone the blast is not a knockdown, even at its edge")
+	_expect(not knocked and human.controlled and str(game.get("status_line")) == "The door goes. WOLF stops at the rubble and waits for %s's call. In the lane beyond, something whirs awake." % state.human_name().get_slice(" ", 0), "clear of the zone the blast is not a knockdown, even at its edge, and WOLF waits for the engineer's call at the rubble")
 	_expect(await _wait_until(func() -> bool: return room.door_blown_art.visible and not room.door_breaking_art.visible, 30), "then it stands blown open on the passage beyond")
 	_expect(await _wait_until(func() -> bool: return not room.sentry.visual.dormant and room.sentry.visual.is_lit() and room.sentry.visual.body.modulate == Color.WHITE, 90), "the blast wakes the sentry: it powers up and its eye lights")
 	_expect(_labels_clear(room), "after the blast the station plates still sit apart in their row")
 	var autosave_b: M0State = State.load_from_disk(path)
 	_expect(autosave_b != null and autosave_b.door_blown and autosave_b.chapter_id == "junction", "autosave B records the blown door")
-	_expect(wolf.autonomous_target_x == JunctionRoom.WOLF_RUBBLE_X, "WOLF holds at the rubble and will not cross")
+	_expect(wolf.autonomous_target_x == JunctionRoom.WOLF_RUBBLE_X, "WOLF stops at the rubble until he is asked")
 	_expect(await _wait_until(func() -> bool: return room.door_shape.disabled, 5), "the door body is gone")
 	_expect(await _wait_until(func() -> bool: return Engine.time_scale == 1.0 and camera.offset == Vector2.ZERO, 90), "time scale and camera settle after the boom")
 	# Through where the door stood, up to just short of the rubble line (the lane beyond is sentry_test's).
@@ -334,7 +347,7 @@ func _check_scene() -> void:
 	game.call("_fail_beat", "Test knockdown.")
 	_expect(await _wait_until(func() -> bool: return not game.get("fail_active"), 240), "the knockdown after a failed save hands back")
 	state = game.get("state") as M0State
-	_expect(state.door_blown and str(game.get("status_line")).ends_with("Back at the start of this beat."), "the knockdown restores the unwritten beat, not the older autosave on disk")
+	_expect(state.door_blown and str(game.get("status_line")).ends_with("Back at the start of this stretch."), "the knockdown restores the unwritten beat, not the older autosave on disk")
 	await _tap(&"interact")
 	var retried: M0State = State.load_from_disk(path)
 	_expect(not game.get("save_pending") and retried != null and retried.door_blown, "the next USE retries the save and writes the beat")
@@ -429,7 +442,7 @@ func _check_vent_edges(game: Node2D, human: M0Actor, wolf: M0Actor, room: Juncti
 	_expect(human.z_index > wolf.z_index and room.vent_puff.color.a <= 0.35, "the knocked-down engineer draws above WOLF and the steam burst is translucent")
 	_expect(await _wait_until(func() -> bool: return not game.get("fail_active"), 240), "the vent knockdown hands back")
 	_expect(FileAccess.get_file_as_bytes(game.get("save_path")) == a_bytes and human.position == Vector2(120.0, 410.0) and human.z_index == wolf.z_index, "the vent knockdown restores autosave A and the usual draw order")
-	_expect(str(game.get("status_line")).ends_with("Back at the last autosave."), "the restore line names the autosave it came from")
+	_expect(str(game.get("status_line")).ends_with("Back at the last checkpoint."), "the restore line names the checkpoint it came from")
 	_expect(room.display_gauge == 0.0 and not room.gauge_tripped, "the restore puts the needle back at empty")
 	# Off the grate the needle still shows the peak for a moment after the trip, then falls back.
 	human.position.x = JunctionRoom.BREAKER_X

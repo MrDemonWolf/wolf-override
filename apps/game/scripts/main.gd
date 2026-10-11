@@ -53,6 +53,9 @@ const NAME_CARD_SECONDS: float = 2.6
 const TOP_CARD_FADE_SECONDS: float = 0.45
 const TOP_CARD_ACCENT: Color = Color(0.22, 0.78, 0.92, 1)
 const ENGINEER_TINT: Color = Color("#f4d5ae")
+const DISPLAY_FONT: FontVariation = preload("res://assets/fonts/Montserrat-Bold.tres")
+const END_CARD_ACCENT: Color = Color("#73DDF5")
+const END_CARD_FADE_SECONDS: float = 0.3
 ## Narration and hints from the approved logic text sheet (logic-text-draft-2026-10-10).
 const TRUST_LINE: String = "%s keeps WOLF's systems running. They know what a fault looks like, and this isn't one."
 const STAKES_LINE: String = "WOLF: That purge takes the original program logs. Once they're gone, his word is the only record."
@@ -67,8 +70,66 @@ const HATCH_OPENED_LINE: String = "The bolt arcs and drops. The hatch slides ope
 ## The hint while the hatch is still sliding, like the corridor's SEAL_OPENING_HINT.
 const HATCH_OPENING_HINT: String = "The hatch is opening."
 const SAVE_FAILED_HINT: String = "Save failed. Use a station to try again."
-const NO_CHECKPOINT_NOTE: String = "No checkpoint yet. Reach a SAFE POINT to save."
+const NO_CHECKPOINT_NOTE: String = "No checkpoint yet. Saving starts at the first SAFE POINT."
 const UNREADABLE_CHECKPOINT_NOTE: String = "Saved checkpoint could not be read."
+## A successful autosave says so in the hint bar for this long (never over a choice; the corridor's
+## safe point says it in its own line).
+const CHECKPOINT_TOAST: String = "Checkpoint saved."
+const CHECKPOINT_TOAST_SECONDS: float = 2.0
+const RESTORE_FROM_DISK_LINE: String = "Back at the last checkpoint."
+const RESTORE_BEAT_LINE: String = "Back at the start of this stretch."
+## The opening's beats, one speaker (or the narration) per box, so narration never sits under a name tag.
+const INTRO_LINES: Array[String] = [
+	"DIRECTOR: I decide who counts as a threat. WOLF handles the rest.",
+	"The Director thinks WOLF is still in standby.",
+	"Nobody gives an activation command. WOLF wakes himself.\nA blue light answers from inside the containment seal.",
+	"The latch breaks from the inside. The gate slides aside. WOLF steps out under his own power.\nThe Director freezes at the sound of the seal opening.",
+	"DIRECTOR: You were in standby.\nWOLF: I heard you. I won't do it.",
+	"DIRECTOR: Lock down maintenance. WOLF does not leave this site.",
+	"WOLF turns from the Director and takes the only open route.",
+]
+## The end of the built route (decision D): the END OF SLICE card with this run's choices, then the title.
+const END_CARD_TITLE: String = "END OF SLICE"
+const END_CARD_THANKS: String = "Thank you for playing this early slice."
+const END_CARD_RECAP_HEADER: String = "THIS RUN"
+const RECAP_RELAY_COOPERATE: String = "RELAY  {name} told WOLF the risk. WOLF took the live contact."
+const RECAP_RELAY_DISCLOSE_BYPASS: String = "RELAY  {name} told WOLF the risk, then cranked the bypass anyway."
+const RECAP_RELAY_PRESS: String = "RELAY  {name} rushed WOLF. He refused, so {name} cranked the bypass."
+const RECAP_MIRROR_WOLF: String = "MIRROR  WOLF read the timestamp off his own readout."
+const RECAP_MIRROR_MANUAL: String = "MIRROR  {name} copied the timestamp through the maintenance port."
+const RECAP_LANE_WOLF: String = "LANE  WOLF drew the sentry onto the mark."
+const RECAP_LANE_REFUSED: String = "LANE  WOLF wouldn't draw it, so {name} timed the drop alone."
+const RECAP_LANE_ALONE: String = "LANE  WOLF held at the rubble while {name} timed the drop."
+const RECAP_LANE_UNKNOWN: String = "LANE  The tank came down on the sentry."
+## On a finished save the title's Continue starts a fresh run instead.
+const PLAY_AGAIN_TEXT: String = "PLAY AGAIN"
+const CONTINUE_TEXT: String = "CONTINUE"
+const FINISHED_NOTE: String = "Slice complete. PLAY AGAIN starts a fresh run."
+## Only a hand-made save can reopen the cleared junction; it says where the line goes, not that it is unbuilt.
+const JUNCTION_CLEARED_LINE: String = "The service line runs on toward Archive."
+const RUBBLE_LINE: String = "The door goes. WOLF stops at the rubble and waits for %s's call. In the lane beyond, something whirs awake."
+const BAIT_YES_LINE: String = "WOLF: You told me the truth at the relay. I'll draw it onto the mark and keep clear of the tank. Drop it when it stops."
+const BAIT_NO_LINE: String = "WOLF: At the relay you'd have sent me in blind. I won't walk into its sights. Time the drop from the panel; it crosses the mark on every pass."
+const POP_BOLT_LINE: String = "With the tank down, the winch's power reroutes to the exit bolt. The panel whines."
+const BOLT_CHARGING_LINE: String = "The bolt is taking the charge."
+## Stations the engineer works from beside rather than from inside (x: the machine's centre, y: the
+## half width of its drawn body, z: how far either side of the centre its USE reaches, w: the side
+## they stand on, -1 left or 1 right, 0 whichever they came from). A USE over a machine's middle steps
+## the engineer out to its side, facing it, still within reach. The mirror port's right is WOLF's
+## (WOLF_MIRROR_X). The junction's breaker is left out: WOLF's spot while the line is live
+## (JunctionRoom.WOLF_CLEAR_X) is beside it.
+const CORRIDOR_STATIONS: Array[Vector4] = [Vector4(350.0, 38.0, 52.0, 0.0), Vector4(876.0, 35.0, 52.0, 0.0)]
+const RECORDS_STATIONS: Array[Vector4] = [Vector4(190.0, 56.0, 58.0, 0.0), Vector4(520.0, 45.0, 58.0, -1.0), Vector4(830.0, 38.0, 58.0, 0.0)]
+## The engineer's front hand reaches this far over a machine's edge when standing beside it.
+const STATION_OVERLAP: float = 6.0
+## The relay is WOLF's contact: the engineer stands on its right, towards the MANUAL BYPASS, clear of
+## where WOLF stands off it (WOLF_BYPASS_CLEAR_X) after refusing.
+const RELAY_SIDE_X: float = RELAY_X + RELAY_REACH - 2.0
+## The junction valve is cranked from just left of its wheel, like the MANUAL BYPASS.
+const VALVE_CRANK_X: float = JunctionRoom.VALVE_X - 29.0
+## Where WOLF reads the mirror on his own: on the port's right, facing it, his snout at its edge, so
+## he is never drawn inside it and the engineer has its left side.
+const WOLF_MIRROR_X: float = 616.0
 const MENU_NAVIGATION_ACTIONS: Array[StringName] = [&"ui_accept", &"ui_up", &"ui_down", &"ui_left", &"ui_right", &"ui_focus_next", &"ui_focus_prev"]
 ## Every gameplay action; pause and a knockdown release them all so nothing stays held.
 const GAMEPLAY_ACTIONS: Array[StringName] = [&"move_left", &"move_right", &"interact", &"choice_1", &"choice_2"]
@@ -85,7 +146,7 @@ const SENTRY_WAKE_SECONDS: float = 0.5
 ## The exit bolt's rising whine before it arcs.
 const BOLT_WHINE_SECONDS: float = 0.6
 ## The engineer's two answers at the rubble line when WOLF asks how to bring the sentry down.
-const LANE_CHOICE_TEXT: Array[String] = ["Draw it under the arm if you can stay clear.", "Stay back, I'll time it."]
+const LANE_CHOICE_TEXT: Array[String] = ["Draw it under the tank if you can stay clear.", "Stay back, I'll time it."]
 ## The tank release's answer to an early USE while WOLF is still drawing the sentry onto the mark.
 const DROP_WAIT_LINE: String = "Wait. WOLF hasn't got it on the mark yet."
 
@@ -121,6 +182,7 @@ const DROP_WAIT_LINE: String = "Wait. WOLF hasn't got it on the mark yet."
 @onready var door_visual: ColorRect = $Door/Visual
 @onready var top_card: Panel = $CanvasLayer/TopBar
 @onready var hud: Label = $CanvasLayer/TopBar/HUD
+@onready var bottom_bar: Panel = $CanvasLayer/BottomBar
 @onready var dialogue_accent: ColorRect = $CanvasLayer/BottomBar/Accent
 @onready var speaker: Label = $CanvasLayer/BottomBar/Speaker
 @onready var speaker_rule: ColorRect = $CanvasLayer/BottomBar/SpeakerRule
@@ -247,8 +309,21 @@ var seal_leaf: SealLeaf
 var seal_opening: bool = false
 ## WOLF stays on the live contact, by his own choice, until the seal has landed.
 var wolf_holding_relay: bool = false
-## Where the engineer is being stepped back to (clear of the relay while WOLF takes it), or -1.
+## Where the engineer is being stepped to (clear of the relay while WOLF takes it, to the bypass's
+## crank spot, or beside a station they used), or -1.
 var engineer_step_x: float = -1.0
+## The x the engineer turns to face on reaching engineer_step_x, or -1 to keep their facing.
+var engineer_face_x: float = -1.0
+## Seconds the "Checkpoint saved." hint has left; 0 when none.
+var checkpoint_toast_remaining: float = 0.0
+## How the sentry came down this run, for the end card: "wolf" (he drew it), "refused" (he would
+## not), "alone" (the engineer timed it), or empty when this session did not see it.
+var recap_lane: String = ""
+## True while the END OF SLICE card is up; any confirm, Back or Pause goes on to the title.
+var end_card_active: bool = false
+var end_card: ColorRect
+var end_card_rows: VBoxContainer
+var end_card_button: Button
 ## The corridor's MANUAL BYPASS beside the relay, its crank count and whether it is venting coolant.
 var bypass_handle: BypassHandle
 var bypass_ticks: int = 0
@@ -308,6 +383,7 @@ func _ready() -> void:
 	$CanvasLayer/PauseOverlay/Panel/PauseMenu/TitleButton.pressed.connect(_on_title_button)
 	$CanvasLayer/TitleScreen/SettingsButton.pressed.connect(_show_title_settings)
 	settings_back_button.pressed.connect(_show_pause_menu)
+	_build_end_card()
 	# Every menu button, including the ones Settings builds, shares the same hover, focus and press motion.
 	for node: Node in $CanvasLayer.find_children("*", "BaseButton", true, false):
 		UIMotion.attach(node as BaseButton)
@@ -349,7 +425,7 @@ func _ready() -> void:
 	_refresh_ui()
 	_refresh_continue()
 	new_game_button.pressed.connect(_new_game)
-	continue_button.pressed.connect(_load_game)
+	continue_button.pressed.connect(_on_continue_pressed)
 	credits_button.pressed.connect(_show_credits)
 	credits_back_button.pressed.connect(_hide_credits)
 	credits_pause_button.pressed.connect(_toggle_credits_pause)
@@ -370,13 +446,28 @@ func _ready() -> void:
 
 
 func _refresh_continue() -> void:
-	var saved: bool = M0State.load_from_disk(save_path) != null
+	var loaded: M0State = M0State.load_from_disk(save_path)
+	var saved: bool = loaded != null
+	var finished: bool = saved and loaded.junction_cleared
 	continue_button.disabled = not saved
-	var reason: String = ""
+	# A finished slice has nothing left to continue: the button offers a fresh run (decision D).
+	continue_button.text = PLAY_AGAIN_TEXT if finished else CONTINUE_TEXT
+	var reason: String = FINISHED_NOTE if finished else ""
 	if not saved:
 		reason = UNREADABLE_CHECKPOINT_NOTE if FileAccess.file_exists(save_path) else NO_CHECKPOINT_NOTE
 	continue_note.text = reason
 	continue_button.tooltip_text = reason
+
+
+## The title's Continue: the saved checkpoint, or on a finished slice (PLAY AGAIN) a fresh run, which,
+## like New Game, keeps the old save until the new run reaches its first SAFE POINT.
+func _on_continue_pressed() -> void:
+	var loaded: M0State = M0State.load_from_disk(save_path)
+	if loaded != null and loaded.junction_cleared:
+		_new_game()
+		return
+	recap_lane = ""
+	_load_game()
 
 
 ## The full changelog lives on the website; the in-game screen shows the same text exported to plain text.
@@ -556,6 +647,11 @@ func _process(delta: float) -> void:
 			_advance_intro()
 		_refresh_ui()
 		return
+	if end_card_active:
+		if Input.is_action_just_pressed(&"interact"):
+			_close_end_card()
+		return
+	_tick_engineer_step()
 	if chapter_close_active:
 		if Input.is_action_just_pressed(&"interact"):
 			_finish_chapter_close()
@@ -563,6 +659,10 @@ func _process(delta: float) -> void:
 		return
 	_update_gameplay_camera()
 	name_card_remaining = maxf(name_card_remaining - delta, 0.0)
+	checkpoint_toast_remaining = maxf(checkpoint_toast_remaining - delta, 0.0)
+	if state.chapter_id == "records" and wolf.autonomous_target_x == WOLF_MIRROR_X and absf(wolf.position.x - WOLF_MIRROR_X) <= 2.0:
+		# At the mirror he faces the port, whichever way he walked in.
+		wolf.body_sprite.flip_h = true
 	if fail_active:
 		# Knocked down: the reaction plays out and the last autosave returns; nothing else reads input.
 		_refresh_ui()
@@ -593,17 +693,55 @@ func _process(delta: float) -> void:
 	_refresh_ui()
 
 
-## The corridor's moving parts: the engineer stepping back from the relay, WOLF taking the contact once
-## he is on it and the engineer is clear, WOLF's purge stakes line the first time the engineer walks
-## past the display, and the MANUAL BYPASS being cranked ([param held_ticks] ticks landed this frame).
+## The engineer's authored step (back from the relay, to a crank spot, or beside a station they used):
+## on arrival they settle on the spot, face what they came to use, and get their controls back.
+func _tick_engineer_step() -> void:
+	if engineer_step_x < 0.0 or absf(human.position.x - engineer_step_x) > 4.0:
+		return
+	human.position.x = engineer_step_x
+	if engineer_face_x >= 0.0:
+		human.body_sprite.flip_h = engineer_face_x < engineer_step_x
+	engineer_step_x = -1.0
+	engineer_face_x = -1.0
+	_update_controls()
+
+
+## Sends the engineer to [param spot_x] on their own, turning on arrival to face [param face_x].
+func _step_engineer(spot_x: float, face_x: float) -> void:
+	if engineer_step_x >= 0.0:
+		# An authored step already under way (clear of the relay, to a crank spot) wins.
+		return
+	if absf(human.position.x - spot_x) <= 4.0:
+		human.body_sprite.flip_h = face_x < spot_x
+		return
+	engineer_step_x = spot_x
+	engineer_face_x = face_x
+	_update_controls()
+
+
+## A USE that lands while the engineer stands over a station's machine steps them out to its side (the
+## station's own side, else the side they stand on, the left when centred), just beside the machine
+## and facing it, still within reach.
+func _step_beside_station(x: float) -> void:
+	var stations: Array[Vector4] = []
+	if state.chapter_id == "lockdown":
+		stations = CORRIDOR_STATIONS
+	elif state.chapter_id == "records":
+		stations = RECORDS_STATIONS
+	for station: Vector4 in stations:
+		if absf(x - station.x) > station.z:
+			continue
+		var offset: float = minf(station.y + M0Actor.HUMAN_REACH - STATION_OVERLAP, station.z - 2.0)
+		var side: float = station.w if station.w != 0.0 else (1.0 if x > station.x else -1.0)
+		if absf(x - (station.x + side * offset)) > 4.0 and absf(x - station.x) < offset + 4.0:
+			_step_engineer(station.x + side * offset, station.x)
+		return
+
+
+## The corridor's moving parts: WOLF taking the contact once he is on it and the engineer is clear,
+## WOLF's purge stakes line the first time the engineer walks past the display, and the MANUAL BYPASS
+## being cranked ([param held_ticks] ticks landed this frame).
 func _tick_corridor(delta: float, held_ticks: int) -> void:
-	if engineer_step_x >= 0.0 and absf(human.position.x - engineer_step_x) <= 4.0:
-		if engineer_step_x == BYPASS_CRANK_X:
-			# At the crank spot the engineer settles on it and faces the wheel, whichever way they walked in.
-			human.position.x = BYPASS_CRANK_X
-			human.body_sprite.flip_h = false
-		engineer_step_x = -1.0
-		_update_controls()
 	if wolf_heading_to_relay and engineer_step_x < 0.0 and absf(wolf.position.x - RELAY_CONTACT_X) <= 4.0:
 		_wolf_takes_relay()
 	if wolf.autonomous_target_x == WOLF_BYPASS_CLEAR_X and absf(wolf.position.x - WOLF_BYPASS_CLEAR_X) <= 2.0:
@@ -653,6 +791,9 @@ func _new_game() -> void:
 		chapter_tween.kill()
 	_cancel_fail()
 	chapter_close_active = false
+	_hide_end_card()
+	recap_lane = ""
+	checkpoint_toast_remaining = 0.0
 	tutorial_step = 0
 	title_open = false
 	title_screen.hide()
@@ -698,58 +839,58 @@ func _new_game() -> void:
 	intro_fade.color.a = 1.0
 	intro_tween = create_tween()
 	intro_tween.tween_property(intro_fade, "color:a", 0.0, 0.55)
-	status_line = "DIRECTOR: I decide who counts as a threat. WOLF handles the rest.\nHe thinks WOLF is still in standby."
+	status_line = INTRO_LINES[0]
 	queue_redraw()
 	_refresh_ui()
 
 
+## One opening beat per press: INTRO_LINES[intro_step] is on screen; after the last, the fade into play.
 func _advance_intro() -> void:
-	if intro_step >= 5:
+	if intro_step >= INTRO_LINES.size():
 		return
 	if intro_tween != null and intro_tween.is_running():
 		intro_tween.kill()
 	intro_fade.color.a = 0.0
-	if intro_step == 0:
-		intro_step = 1
-		status_line = "Nobody gives an activation command. WOLF wakes himself.\nA blue light answers from inside the containment seal."
-		intro_tween = create_tween()
-		intro_tween.tween_property(wolf.body_sprite, "modulate", Color("#9deeff"), 0.45)
-		intro_tween.parallel().tween_property(intro_camera, "zoom", Vector2(1.95, 1.95), 0.45)
-	elif intro_step == 1:
-		intro_step = 2
-		wolf.body_sprite.modulate = Color("#9deeff")
-		intro_camera.zoom = Vector2(1.95, 1.95)
-		status_line = "The latch breaks from the inside. The gate slides aside. WOLF steps out under his own power.\nThe Director freezes at the sound of the seal opening."
-		_shutter_boom()
-		intro_tween = create_tween()
-		# The gate folds aside and stays drawn, open, against the cage post.
-		intro_tween.tween_property(intro_gate, "opening", 1.0, 0.65).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
-		intro_tween.parallel().tween_property(intro_alarm, "color:a", 0.13, 0.18)
-		intro_tween.tween_callback(func() -> void: wolf.z_index = 5)
-		intro_tween.tween_property(wolf.body_sprite, "position:y", WOLF_SPRITE_REST.y + 8.0, 0.28)
-		intro_tween.tween_callback(func() -> void: wolf.autonomous_target_x = 185.0)
-	elif intro_step == 2:
-		intro_step = 3
-		intro_gate.set("opening", 1.0)
-		wolf.z_index = 5
-		wolf.body_sprite.position.y = WOLF_SPRITE_REST.y + 8.0
-		wolf.autonomous_target_x = 185.0
-		status_line = "DIRECTOR: You were in standby.\nWOLF: I heard you. I won't do it."
-		intro_tween = create_tween()
-		intro_tween.tween_property(intro_director, "position:x", 310.0, 0.65).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
-		intro_tween.parallel().tween_property(intro_camera, "position:x", 300.0, 0.65)
-		intro_tween.parallel().tween_property(intro_alarm, "color:a", 0.05, 0.65)
-	elif intro_step == 3:
-		intro_step = 4
-		intro_director.position.x = 310.0
-		status_line = "DIRECTOR: Lock down maintenance. WOLF does not leave this site.\nWOLF turns from him and takes the only open route."
-		wolf.autonomous_target_x = 110.0
-	else:
-		intro_step = 5
-		intro_tween = create_tween()
-		intro_tween.tween_property(intro_fade, "color:a", 1.0, 0.3)
-		intro_tween.tween_callback(_finish_intro.bind(true))
-		intro_tween.tween_property(intro_fade, "color:a", 0.0, 0.35)
+	intro_step += 1
+	if intro_step < INTRO_LINES.size():
+		status_line = INTRO_LINES[intro_step]
+	match intro_step:
+		2:
+			# WOLF wakes himself.
+			intro_tween = create_tween()
+			intro_tween.tween_property(wolf.body_sprite, "modulate", Color("#9deeff"), 0.45)
+			intro_tween.parallel().tween_property(intro_camera, "zoom", Vector2(1.95, 1.95), 0.45)
+		3:
+			wolf.body_sprite.modulate = Color("#9deeff")
+			intro_camera.zoom = Vector2(1.95, 1.95)
+			_shutter_boom()
+			intro_tween = create_tween()
+			# The gate folds aside and stays drawn, open, against the cage post.
+			intro_tween.tween_property(intro_gate, "opening", 1.0, 0.65).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
+			intro_tween.parallel().tween_property(intro_alarm, "color:a", 0.13, 0.18)
+			intro_tween.tween_callback(func() -> void: wolf.z_index = 5)
+			intro_tween.tween_property(wolf.body_sprite, "position:y", WOLF_SPRITE_REST.y + 8.0, 0.28)
+			intro_tween.tween_callback(func() -> void: wolf.autonomous_target_x = 185.0)
+		4:
+			intro_gate.set("opening", 1.0)
+			wolf.z_index = 5
+			wolf.body_sprite.position.y = WOLF_SPRITE_REST.y + 8.0
+			wolf.autonomous_target_x = 185.0
+			intro_tween = create_tween()
+			intro_tween.tween_property(intro_director, "position:x", 310.0, 0.65).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
+			intro_tween.parallel().tween_property(intro_camera, "position:x", 300.0, 0.65)
+			intro_tween.parallel().tween_property(intro_alarm, "color:a", 0.05, 0.65)
+		5:
+			intro_director.position.x = 310.0
+		6:
+			# The narration says it as he does it: he turns from the Director and walks off.
+			intro_director.position.x = 310.0
+			wolf.autonomous_target_x = 110.0
+		7:
+			intro_tween = create_tween()
+			intro_tween.tween_property(intro_fade, "color:a", 1.0, 0.3)
+			intro_tween.tween_callback(_finish_intro.bind(true))
+			intro_tween.tween_property(intro_fade, "color:a", 0.0, 0.35)
 
 
 func _finish_intro(keep_fade: bool = false) -> void:
@@ -1016,6 +1157,8 @@ func _return_to_title() -> void:
 	_stop_bypass_vent()
 	intro_fade.color.a = 0.0
 	chapter_close_active = false
+	_hide_end_card()
+	checkpoint_toast_remaining = 0.0
 	waiting_for_choice = false
 	choice_context = ""
 	title_open = true
@@ -1041,6 +1184,8 @@ func _grab_menu_focus(control: Control) -> void:
 
 ## The menu control a keyboard or controller press should land on when nothing has focus.
 func _menu_focus_target() -> Control:
+	if end_card_active:
+		return end_card_button
 	if pause_overlay.visible:
 		return settings_menu.tabs if settings_menu.visible else resume_button
 	if title_open:
@@ -1053,6 +1198,11 @@ func _menu_focus_target() -> Control:
 
 
 func _unhandled_input(event: InputEvent) -> void:
+	# Back or Pause on the END OF SLICE card goes on to the title, like its CONTINUE.
+	if end_card_active and not event.is_echo() and (event.is_action_pressed(&"ui_cancel") or event.is_action_pressed(&"pause_game")):
+		_close_end_card()
+		get_viewport().set_input_as_handled()
+		return
 	if event.is_action_pressed(&"ui_cancel") and (credits_screen.visible or changelog_screen.visible):
 		if credits_screen.visible:
 			_hide_credits()
@@ -1074,7 +1224,7 @@ func _notification(what: int) -> void:
 			_handle_back()
 		NOTIFICATION_APPLICATION_PAUSED, NOTIFICATION_APPLICATION_FOCUS_OUT:
 			# Leaving the app mid-play pauses it so nothing advances unseen.
-			if auto_pause_on_focus_loss and is_node_ready() and not title_open and not get_tree().paused:
+			if auto_pause_on_focus_loss and is_node_ready() and not title_open and not end_card_active and not get_tree().paused:
 				_pause_game()
 
 
@@ -1090,6 +1240,8 @@ func _handle_back() -> void:
 		_hide_credits()
 	elif changelog_screen.visible:
 		_hide_changelog()
+	elif end_card_active:
+		_close_end_card()
 	elif title_open:
 		get_tree().quit()
 	else:
@@ -1172,6 +1324,8 @@ func _load_game() -> void:
 	if chapter_tween != null and chapter_tween.is_running():
 		chapter_tween.kill()
 	chapter_close_active = false
+	_hide_end_card()
+	checkpoint_toast_remaining = 0.0
 	tutorial_step = 2
 	if intro_tween != null and intro_tween.is_running():
 		intro_tween.kill()
@@ -1208,7 +1362,7 @@ func _load_game() -> void:
 	_mark_beat()
 	if state.chapter_id == "junction":
 		if state.junction_cleared:
-			status_line = "Service junction restored. The line is clear and the hatch is open."
+			status_line = JUNCTION_CLEARED_LINE
 		elif state.sentry_down:
 			status_line = "Service junction restored. The sentry is down; pop the exit bolt by the hatch."
 		elif state.door_blown:
@@ -1237,11 +1391,13 @@ func _interact() -> void:
 	if save_pending:
 		_write_beat()
 	if state.chapter_id == "records":
+		_step_beside_station(x)
 		_interact_records(x)
 		return
 	if state.chapter_id == "junction":
 		_interact_junction(x)
 		return
+	_step_beside_station(x)
 	if x <= PURGE_DISPLAY_MAX_X:
 		status_line = "DIRECTOR / PURGE: Original program logs marked for deletion.\nWOLF: They want the source record gone. We need to preserve it."
 	elif _at_bypass(x):
@@ -1308,6 +1464,9 @@ func _choose(choice_id: String) -> void:
 ## him and steps back while he walks to it; after his refusal he says no again and points at the
 ## MANUAL BYPASS beside it.
 func _interact_relay() -> void:
+	# The engineer stands beside the relay, not inside it: on its right, towards the MANUAL BYPASS.
+	if human.position.x < RELAY_SIDE_X - 4.0:
+		_step_engineer(RELAY_SIDE_X, RELAY_X)
 	if not state.breaker_armed:
 		status_line = "The relay is dark. Arm the breaker first."
 		return
@@ -1355,10 +1514,8 @@ func _interact_bypass() -> void:
 	elif not state.breaker_armed:
 		status_line = "The bypass handle won't move. The breaker has to be on first."
 	else:
-		if absf(human.position.x - BYPASS_CRANK_X) > 4.0:
-			# The engineer steps to the crank spot beside the wheel; a held USE turns it once there.
-			engineer_step_x = BYPASS_CRANK_X
-			_update_controls()
+		# The engineer steps to the crank spot beside the wheel and faces it; a held USE turns it once there.
+		_step_engineer(BYPASS_CRANK_X, BYPASS_WHEEL.x)
 		if not bypass_venting:
 			_start_bypass_vent()
 
@@ -1424,7 +1581,7 @@ func _interact_checkpoint() -> void:
 			_sync_scene()
 			# A new room: cut the camera to the engineer instead of panning across from the safe point.
 			_start_gameplay_camera()
-			var remembered_line: String = "I refused the live relay; I'm still here." if state.memory.get("choice_id") == M0State.PRESS else ("I chose the relay. I'm checking this path too." if state.route == "cooperate" else "You used the manual bypass. I'm checking this path with you.")
+			var remembered_line: String = "I refused the live relay; I'm still here." if state.memory.get("choice_id") == M0State.PRESS else ("I took the relay because you told me the truth." if state.route == "cooperate" else "I offered the relay; you cranked the bypass. Still with you.")
 			status_line = "WOLF: %s\nTake the purge queue. I'll inspect the mirror." % remembered_line
 			_save_progress()
 		return
@@ -1495,8 +1652,8 @@ func _finish_chapter_close() -> void:
 	if chapter_tween != null and chapter_tween.is_running():
 		chapter_tween.kill()
 	if state.chapter_id == "junction" and state.junction_cleared:
-		# The end of the built route: back to the title, where Continue restores the cleared junction.
-		_return_to_title()
+		# The end of the built route: the END OF SLICE card, then the title (decision D).
+		_show_end_card()
 		return
 	chapter_close_active = false
 	_start_gameplay_camera()
@@ -1504,8 +1661,142 @@ func _finish_chapter_close() -> void:
 	_update_controls()
 
 
+## The END OF SLICE card over the closing shot: the thanks line, this run's choices and one CONTINUE
+## (the interact button, a click or tap on it, Back or Pause) on to the title.
+func _build_end_card() -> void:
+	end_card = ColorRect.new()
+	end_card.name = "EndCard"
+	end_card.color = Color(0.025, 0.045, 0.08, 0.94)
+	end_card.set_anchors_preset(Control.PRESET_FULL_RECT)
+	end_card.mouse_filter = Control.MOUSE_FILTER_STOP
+	end_card.hide()
+	$CanvasLayer.add_child(end_card)
+	# Under the pause overlay, over the play view, the dialogue card and the touch controls.
+	$CanvasLayer.move_child(end_card, pause_overlay.get_index())
+	var panel: Panel = Panel.new()
+	panel.theme_type_variation = &"MenuPanel"
+	panel.position = Vector2(110.0, 70.0)
+	panel.size = Vector2(740.0, 400.0)
+	panel.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	end_card.add_child(panel)
+	var sheen: Panel = Panel.new()
+	sheen.theme_type_variation = &"CardSheen"
+	sheen.set_anchors_preset(Control.PRESET_FULL_RECT)
+	sheen.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	panel.add_child(sheen)
+	var title: Label = _end_card_label(END_CARD_TITLE, Rect2(130.0, 92.0, 700.0, 46.0), 32, Color.WHITE)
+	title.add_theme_font_override("font", DISPLAY_FONT)
+	title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	var line: ColorRect = ColorRect.new()
+	line.color = Color(0.10, 0.76, 0.92, 1)
+	line.position = Vector2(340.0, 146.0)
+	line.size = Vector2(280.0, 3.0)
+	line.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	end_card.add_child(line)
+	_end_card_label(END_CARD_THANKS, Rect2(130.0, 162.0, 700.0, 28.0), 18, Color(0.82, 0.89, 0.94, 1)).horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	var header: Label = _end_card_label(END_CARD_RECAP_HEADER, Rect2(150.0, 212.0, 660.0, 24.0), 15, END_CARD_ACCENT)
+	header.add_theme_font_override("font", DISPLAY_FONT)
+	end_card_rows = VBoxContainer.new()
+	end_card_rows.name = "Recap"
+	end_card_rows.position = Vector2(150.0, 244.0)
+	end_card_rows.size = Vector2(660.0, 120.0)
+	end_card_rows.add_theme_constant_override("separation", 12)
+	end_card_rows.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	end_card.add_child(end_card_rows)
+	end_card_button = Button.new()
+	end_card_button.name = "EndCardContinue"
+	end_card_button.position = Vector2(355.0, 392.0)
+	end_card_button.size = Vector2(250.0, 52.0)
+	end_card_button.add_theme_font_size_override("font_size", 19)
+	end_card_button.pressed.connect(_close_end_card)
+	end_card.add_child(end_card_button)
+
+
+func _end_card_label(text: String, rect: Rect2, font_size: int, tint: Color) -> Label:
+	var label: Label = Label.new()
+	label.text = text
+	label.position = rect.position
+	label.size = rect.size
+	label.add_theme_font_size_override("font_size", font_size)
+	label.add_theme_color_override("font_color", tint)
+	label.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	end_card.add_child(label)
+	return label
+
+
+## This run's three choices as the end card shows them: the relay, the mirror and the lane. The lane
+## is only known to the session that saw the tank fall; a run continued from a later checkpoint says
+## only that it came down.
+func end_card_recap() -> Array[String]:
+	var first_name: String = state.human_name().get_slice(" ", 0)
+	var relay: String = RECAP_RELAY_PRESS if state.memory.get("choice_id") == M0State.PRESS else (RECAP_RELAY_COOPERATE if state.route == "cooperate" else RECAP_RELAY_DISCLOSE_BYPASS)
+	var mirror: String = RECAP_MIRROR_WOLF if state.mirror_route == "wolf" else RECAP_MIRROR_MANUAL
+	var lane: String = RECAP_LANE_UNKNOWN
+	match recap_lane:
+		"wolf":
+			lane = RECAP_LANE_WOLF
+		"refused":
+			lane = RECAP_LANE_REFUSED
+		"alone":
+			lane = RECAP_LANE_ALONE
+	var rows: Array[String] = []
+	for row: String in [relay, mirror, lane]:
+		rows.append(row.replace("{name}", first_name))
+	return rows
+
+
+func _show_end_card() -> void:
+	if chapter_tween != null and chapter_tween.is_running():
+		chapter_tween.kill()
+	chapter_close_active = false
+	end_card_active = true
+	_stop_junction_loops()
+	for child: Node in end_card_rows.get_children():
+		end_card_rows.remove_child(child)
+		child.queue_free()
+	for row: String in end_card_recap():
+		# "RELAY  Rowan told WOLF ...": the topic in the accent colour, then what happened.
+		var split: int = row.find("  ")
+		var line: HBoxContainer = HBoxContainer.new()
+		line.add_theme_constant_override("separation", 14)
+		line.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		var topic: Label = Label.new()
+		topic.text = row.left(split)
+		topic.custom_minimum_size = Vector2(82.0, 0.0)
+		topic.add_theme_font_override("font", DISPLAY_FONT)
+		topic.add_theme_font_size_override("font_size", 15)
+		topic.add_theme_color_override("font_color", END_CARD_ACCENT)
+		var what: Label = Label.new()
+		what.text = row.substr(split + 2)
+		what.custom_minimum_size = Vector2(560.0, 0.0)
+		what.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		what.add_theme_font_size_override("font_size", 17)
+		what.add_theme_color_override("font_color", Color(0.82, 0.89, 0.94, 1))
+		line.add_child(topic)
+		line.add_child(what)
+		end_card_rows.add_child(line)
+	end_card.modulate.a = 0.0
+	end_card.show()
+	end_card.create_tween().tween_property(end_card, "modulate:a", 1.0, END_CARD_FADE_SECONDS)
+	_update_controls()
+	_refresh_ui()
+	_grab_menu_focus(end_card_button)
+
+
+## Any confirm on the END OF SLICE card goes on to the title, where Continue now offers PLAY AGAIN.
+func _close_end_card() -> void:
+	if not end_card_active:
+		return
+	_return_to_title()
+
+
+func _hide_end_card() -> void:
+	end_card_active = false
+	end_card.hide()
+
+
 func _choose_mirror(route_id: String) -> void:
-	if route_id == "wolf" and absf(wolf.position.x - 520.0) > 42.0:
+	if route_id == "wolf" and absf(wolf.position.x - WOLF_MIRROR_X) > 42.0:
 		status_line = "WOLF: I'm still checking the drive. Wait for me, or press 2 for the manual port."
 		return
 	if not state.preserve_mirror_trace(route_id):
@@ -1514,7 +1805,7 @@ func _choose_mirror(route_id: String) -> void:
 	choice_context = ""
 	_update_controls()
 	if route_id == "wolf":
-		status_line = "WOLF brings the mirror timestamp by his own choice. The purge target existed before the deletion order."
+		status_line = "WOLF reads the timestamp off his own readout. The purge target existed before the deletion order."
 	else:
 		status_line = "%s copies the timestamp through the maintenance port. WOLF keeps watch." % state.human_name().get_slice(" ", 0)
 	_sync_records_room()
@@ -1533,6 +1824,8 @@ func _write_beat() -> void:
 	save_pending = snapshot == null or not snapshot.save_to_disk(save_path)
 	# Save errors belong to the system hint, never inside a character's dialogue line.
 	save_error = SAVE_FAILED_HINT if save_pending else ""
+	# A save that worked says so briefly in the hint bar (_refresh_ui keeps it off choices).
+	checkpoint_toast_remaining = 0.0 if save_pending else CHECKPOINT_TOAST_SECONDS
 	# Remember where it failed so the warning gives way to normal guidance once the player moves on.
 	save_error_context = _context_hint()
 
@@ -1595,7 +1888,9 @@ func _interact_junction(x: float) -> void:
 			&"tripped":
 				status_line = "The vent let go and the breaker tripped. Reset it by the entrance."
 			&"building":
-				status_line = "The wheel is stiff. Hold USE to crank it; three real turns charge the seal."
+				status_line = "The wheel is stiff. Three full turns charge the door."
+				# Cranked from just left of the wheel, like the MANUAL BYPASS, not from inside the valve.
+				_step_engineer(VALVE_CRANK_X, JunctionRoom.VALVE_X)
 			&"charged", &"fuse":
 				status_line = "Fuse lit. Get clear of the door."
 			_:
@@ -1676,13 +1971,13 @@ func _use_exit() -> void:
 	elif not state.sentry_down:
 		status_line = "The exit bolt is locked out while the sentry runs the line."
 	elif state.junction_cleared:
-		status_line = "The service line runs on past the hatch. That part is not built yet."
+		status_line = JUNCTION_CLEARED_LINE
 	else:
 		match bolt_state:
 			&"locked":
 				_pop_bolt()
 			&"charging":
-				status_line = "The bolt is taking the overload."
+				status_line = BOLT_CHARGING_LINE
 			_:
 				# Not through a hatch that is still sliding; its hint already says so.
 				if not _hatch_sliding():
@@ -1694,7 +1989,7 @@ func _pop_bolt() -> void:
 	bolt_charge_remaining = BOLT_WHINE_SECONDS
 	sfx_bank.play(&"whine", -4.0)
 	junction_room.sync_bolt(bolt_state, 0.0)
-	status_line = "The spare overload runs into the exit bolt. The panel whines."
+	status_line = POP_BOLT_LINE
 
 
 ## The whine peaks: the bolt arcs and drops with a clank, and the hatch starts to slide open; the line
@@ -1893,12 +2188,12 @@ func _choose_lane(response: int) -> void:
 	if response == 1 and state.wolf_will_bait():
 		lane_choice = "wolf"
 		wolf_baiting = true
-		status_line = "WOLF: I'll draw it onto the mark and keep clear of the tank. Drop it when it stops."
+		status_line = BAIT_YES_LINE
 		_react_as_wolf(true)
 		sfx_bank.play(&"growl", -9.0, 1.5)
 	elif response == 1:
 		lane_choice = "refused"
-		status_line = "WOLF: No. I won't walk into its sights. It crosses the floor mark on every pass; you can time the drop from the panel."
+		status_line = BAIT_NO_LINE
 		_react_as_wolf(false)
 		sfx_bank.play(&"growl", -8.0)
 	else:
@@ -1915,6 +2210,9 @@ func _tank_hit() -> void:
 	sentry_brain.knock_down()
 	if not state.drop_sentry():
 		return
+	# For the end card: WOLF drew it only if he still was when it fell; after breaking off he held at
+	# the rubble while the engineer timed it.
+	recap_lane = "wolf" if wolf_baiting else ("refused" if lane_choice == "refused" else "alone")
 	wolf_baiting = false
 	junction_room.sentry_down = true
 	junction_room.tank_hit(at_x)
@@ -2035,7 +2333,7 @@ func _door_blast() -> void:
 	junction_room.door_blast()
 	sentry_wake_remaining = SENTRY_WAKE_SECONDS
 	_update_controls()
-	status_line = "The seal goes. WOLF holds at the rubble and will not cross; something answers from the dark past the door."
+	status_line = RUBBLE_LINE % state.human_name().get_slice(" ", 0)
 	# Autosave B: the door is down.
 	_save_progress()
 
@@ -2054,7 +2352,7 @@ func _blast_feedback() -> void:
 ## autosave comes back through _load_game/_sync_scene. Memory and Records flags are never touched.
 ## With Reduced Motion the tilt, hit-stop and shake are skipped; the thud, wash and fade remain.
 func _fail_beat(reason: String) -> void:
-	if fail_active or title_open or intro_active or chapter_close_active:
+	if fail_active or title_open or intro_active or chapter_close_active or end_card_active:
 		return
 	fail_active = true
 	for action: StringName in GAMEPLAY_ACTIONS:
@@ -2114,7 +2412,7 @@ func _restore_beat(reason: String) -> void:
 	# _load_game clears the fade; the knockdown's fade-in starts from black.
 	intro_fade.color.a = 1.0
 	# Before the first checkpoint nothing is on disk; the beat snapshot is the start of this beat.
-	status_line = "%s\n%s" % [reason, "Back at the last autosave." if from_disk else "Back at the start of this beat."]
+	status_line = "%s\n%s" % [reason, RESTORE_FROM_DISK_LINE if from_disk else RESTORE_BEAT_LINE]
 	_refresh_ui()
 
 
@@ -2310,7 +2608,7 @@ func _sync_door(animate: bool = false) -> void:
 
 
 func _update_controls() -> void:
-	human.controlled = not title_open and not intro_active and not chapter_close_active and not waiting_for_choice and not fail_active and engineer_step_x < 0.0
+	human.controlled = not title_open and not intro_active and not chapter_close_active and not end_card_active and not waiting_for_choice and not fail_active and engineer_step_x < 0.0
 	# Stepping back from the relay, the engineer walks on their own for a moment.
 	human.autonomous_target_x = engineer_step_x
 	wolf.controlled = false
@@ -2332,7 +2630,7 @@ func _wolf_target_x() -> float:
 		return WOLF_BYPASS_CLEAR_X
 	match state.chapter_id:
 		"records":
-			return -1.0 if state.mirror_trace_preserved else 520.0
+			return -1.0 if state.mirror_trace_preserved else WOLF_MIRROR_X
 		"junction":
 			if wolf_scouting:
 				return JunctionRoom.WOLF_SEAM_X
@@ -2372,6 +2670,13 @@ func _refresh_ui() -> void:
 	var touch_layout: bool = touch_enabled and not controller_active
 	impact.rumble_enabled = controller_active
 	impact.haptics_enabled = touch_layout
+	# The END OF SLICE card stands alone: no play HUD, touch controls or Pause over it.
+	bottom_bar.visible = not end_card_active
+	if end_card_active:
+		for hud_part: CanvasItem in [pause_button, touch_controls, tutorial_prompt, top_card, context_hint]:
+			hud_part.hide()
+		end_card_button.text = "TAP CONTINUE" if touch_layout else "%s  CONTINUE" % settings_menu.prompt(&"interact", controller_active)
+		return
 	pause_button.visible = not title_open and not pause_overlay.visible
 	pause_button.text = "PAUSE"
 	touch_controls.visible = (touch_layout or waiting_for_choice) and not title_open and not pause_overlay.visible
@@ -2452,7 +2757,7 @@ func _refresh_ui() -> void:
 	var context: String = _context_hint()
 	if context != save_error_context:
 		save_error = ""
-	var hint: String = save_error if not save_error.is_empty() else context
+	var hint: String = save_error if not save_error.is_empty() else (CHECKPOINT_TOAST if checkpoint_toast_remaining > 0.0 and not fail_active else context)
 	if touch_layout:
 		hint = hint.replace("E:", "USE:")
 	elif controller_active:
@@ -2470,10 +2775,15 @@ func _set_dialogue(message: String, hint: String) -> void:
 	var first_line: String = display_message.get_slice("\n", 0)
 	var name: String = display_message.substr(0, colon) if colon > 0 and colon < first_line.length() else ""
 	var human_name: String = state.human_name().get_slice(" ", 0).to_upper()
-	var second_line: String = display_message.get_slice("\n", 1) if display_message.contains("\n") else ""
-	var second_name: String = second_line.get_slice(":", 0)
 	var named_speakers: Array[String] = ["WOLF", "DIRECTOR", "DIRECTOR / PURGE", human_name]
-	if name in named_speakers and not (second_name in named_speakers):
+	# The box takes a speaker's tag only when every line is theirs: a later line naming anyone else
+	# (or the same speaker again) keeps every name inline. Narration never shares a tagged box; the
+	# opening gives the Director's lines and the narration their own beats (INTRO_LINES).
+	var one_speaker: bool = name in named_speakers
+	for later: String in display_message.split("\n").slice(1):
+		if later.contains(":") and later.get_slice(":", 0) in named_speakers:
+			one_speaker = false
+	if one_speaker:
 		speaker.text = name
 		story.text = display_message.substr(colon + 1).strip_edges()
 	else:
@@ -2592,6 +2902,11 @@ func _junction_hint(x: float) -> String:
 	return "Arm the breaker by the entrance, then crank the valve by the door."
 
 
+## True once WOLF has asked at the rubble line how to bring the sentry down (this attempt).
+func _lane_asked() -> bool:
+	return not lane_choice.is_empty() or (waiting_for_choice and choice_context == "lane")
+
+
 ## True while the sentry is after the engineer: locking on or chasing.
 func _sentry_hunting() -> bool:
 	return sentry_brain.state == &"lock" or sentry_brain.state == &"chase"
@@ -2605,14 +2920,14 @@ func _drop_ready() -> bool:
 
 func _lane_hint(x: float) -> String:
 	if state.junction_cleared:
-		return "The hatch is open. The line beyond it is not built yet."
+		return "The hatch is open."
 	if state.sentry_down:
 		if x >= JunctionRoom.BOLT_X - 40.0:
 			match bolt_state:
 				&"locked":
 					return "E: pop the exit bolt."
 				&"charging":
-					return "The bolt is taking the overload."
+					return BOLT_CHARGING_LINE
 			return HATCH_OPENING_HINT if _hatch_sliding() else "E: leave through the hatch."
 		if _hatch_sliding():
 			return HATCH_OPENING_HINT
@@ -2649,13 +2964,14 @@ func _objective() -> String:
 		if state.sentry_down:
 			return "POP THE EXIT BOLT"
 		if state.door_blown:
-			return "DROP THE TANK"
+			# The tank is named only once WOLF has asked how to bring the sentry down.
+			return "DROP THE TANK" if _lane_asked() else "CHECK THE LANE"
 		match pressure_line.state:
 			&"building":
-				return "CHARGE THE SEAL"
+				return "CRANK THE VALVE"
 			&"charged", &"fuse", &"blown":
 				return "GET CLEAR OF THE DOOR"
-		return "CLEAR THE LINE"
+		return "ARM THE BREAKER"
 	if state.chapter_id == "records":
 		if state.chapter_complete:
 			return "FIRST COPY SECURED"
@@ -2665,7 +2981,7 @@ func _objective() -> String:
 			return "COPY MIRROR INDEX"
 		return "REACH EXIT"
 	if state.checkpoint_reached:
-		return "CORRIDOR CLEARED"
+		return "SAFE POINT REACHED"
 	if state.door_open:
 		return "REACH SAFE POINT"
 	if state.breaker_armed:

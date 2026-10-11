@@ -287,12 +287,13 @@ func _check_scene() -> void:
 	# Route 1: the relay risk was disclosed, so WOLF chooses to draw the sentry onto the mark.
 	var b_dict: Dictionary = await _start_at_b(game, State.DISCLOSE)
 	_expect(brain.state == &"patrol" and brain.x > SentryBrain.PATROL_MAX_X - 60.0 and brain.facing < 0.0 and arm.state == &"hung" and room.tank.position.y == JunctionRoom.TANK_REST_Y and not room.mark_lit(), "autosave B: the sentry patrols from the far end under a hung tank, outside the brackets")
-	_expect(game.call("_objective") == "DROP THE TANK", "the objective is the tank")
+	_expect(game.call("_objective") == "CHECK THE LANE", "before WOLF mentions the tank the card says to check the lane")
 	game.call("_load_game")
 	_expect((game.get("state") as M0State).door_blown and brain.state == &"patrol" and brain.x == SentryBrain.PATROL_MAX_X and str(game.get("status_line")).contains("door is down"), "Continue from autosave B restores the live lane")
 	_expect(await _walk_until_choice(game), "stepping onto the rubble line brings up the question")
 	_expect(game.get("choice_context") == "lane" and human.position.x < SentryBrain.LANE_ENTRY_X and not human.controlled, "the question comes up before the engineer is in the lane")
-	_expect(touch_choice_1.visible and touch_choice_1.text.contains("Draw it under the arm"), "the answers are on screen")
+	_expect(touch_choice_1.visible and touch_choice_1.text.contains("Draw it under the tank"), "the answers are on screen")
+	_expect(game.call("_objective") == "DROP THE TANK", "once WOLF has asked about the tank the card names it")
 	# The tank WOLF is asking about hangs in view below the answers in both layouts at the play framing.
 	var touch_choice_2: Button = game.get_node("CanvasLayer/TouchControls/Choice2") as Button
 	var tank_top_screen: float = (room.tank.position.y - JunctionRoom.TANK_SIZE.y * 0.5 - camera.position.y) * camera.zoom.y + 270.0
@@ -313,7 +314,7 @@ func _check_scene() -> void:
 	(game.get_node("CanvasLayer/PauseOverlay") as PauseOverlay).resume_requested.emit()
 	_expect(not paused and game.get("waiting_for_choice"), "resume returns to the open question")
 	await _tap(&"choice_1")
-	_expect(game.get("wolf_baiting") and game.get("lane_choice") == "wolf" and wolf.autonomous_target_x == JunctionRoom.WOLF_BAIT_X and str(game.get("status_line")).begins_with("WOLF: I'll draw it"), "with the risk disclosed WOLF chooses to draw it")
+	_expect(game.get("wolf_baiting") and game.get("lane_choice") == "wolf" and wolf.autonomous_target_x == JunctionRoom.WOLF_BAIT_X and str(game.get("status_line")) == "WOLF: You told me the truth at the relay. I'll draw it onto the mark and keep clear of the tank. Drop it when it stops.", "with the risk disclosed WOLF chooses to draw it, and says it is because of the relay")
 	# "Drop it when it stops": until he has it stopped on the mark the release waits.
 	human.position.x = JunctionRoom.ARM_X
 	await physics_frame
@@ -384,15 +385,56 @@ func _check_scene() -> void:
 	_expect(paused, "pause works during the closing beat")
 	(game.get_node("CanvasLayer/PauseOverlay") as PauseOverlay).resume_requested.emit()
 	await _tap(&"interact")
-	_expect(game.get("title_open") and (game.get_node("CanvasLayer/TitleScreen") as Control).visible and not game.get("chapter_close_active"), "the closing beat returns to the title")
-	_expect(not continue_button.disabled, "Continue is offered after the junction")
+	# Decision D: the closing beat leads to the END OF SLICE card with this run's choices, then the title.
+	var end_card: Control = game.get_node("CanvasLayer/EndCard") as Control
+	var end_button: Button = end_card.get_node("EndCardContinue") as Button
+	_expect(game.get("end_card_active") and end_card.visible and not game.get("title_open") and not game.get("chapter_close_active") and not human.controlled, "the closing beat leads to the END OF SLICE card, not straight to the title")
+	var recap_text: String = ""
+	for label: Label in end_card.find_children("*", "Label", true, false):
+		recap_text += label.text + "\n"
+	var first_name: String = state.human_name().get_slice(" ", 0)
+	_expect(recap_text.contains("END OF SLICE") and recap_text.contains("Thank you for playing this early slice.") and recap_text.contains("THIS RUN"), "the card thanks the player under END OF SLICE")
+	_expect(recap_text.contains("%s told WOLF the risk. WOLF took the live contact." % first_name) and recap_text.contains("WOLF read the timestamp off his own readout.") and recap_text.contains("WOLF drew the sentry onto the mark."), "the recap names this run's relay, mirror and lane choices")
+	_expect(not (game.get_node("CanvasLayer/BottomBar") as Control).visible and not (game.get_node("CanvasLayer/PauseButton") as Control).visible and not (game.get_node("CanvasLayer/TouchControls") as Control).visible, "nothing of the play HUD shows over the card")
+	_expect(end_button.text == "E  CONTINUE", "the card's prompt names the interact key")
+	game.set("touch_enabled", true)
+	game.call("_refresh_ui")
+	_expect(end_button.text == "TAP CONTINUE" and end_button.is_visible_in_tree(), "on touch the card's button says TAP CONTINUE")
+	game.set("touch_enabled", false)
+	game.call("_refresh_ui")
+	await _tap(&"pause_game")
+	_expect(not paused and game.get("title_open"), "Pause (or Back) on the card goes on to the title instead of pausing")
+	_expect(not continue_button.disabled and continue_button.text == "PLAY AGAIN" and (game.get_node("CanvasLayer/TitleScreen/ContinueNote") as Label).text == "Slice complete. PLAY AGAIN starts a fresh run.", "on a finished save the title offers PLAY AGAIN and says why")
+	var finished_bytes: PackedByteArray = FileAccess.get_file_as_bytes(path)
 	continue_button.pressed.emit()
 	await physics_frame
 	state = game.get("state") as M0State
-	_expect(not game.get("title_open") and state.chapter_id == "junction" and state.junction_cleared and room.visible and room.hatch_open == 1.0 and game.get("bolt_state") == &"open" and human.controlled and not game.get("chapter_close_active"), "Continue from autosave D restores the cleared junction")
-	_expect(game.call("_objective") == "SERVICE LINE CLEARED" and str(game.get("status_line")).contains("line is clear"), "the restored junction says the line is clear")
+	_expect(not game.get("title_open") and game.get("intro_active") and state.chapter_id == "lockdown" and state.memory.is_empty(), "PLAY AGAIN starts a fresh run with the opening")
+	_expect(FileAccess.get_file_as_bytes(path) == finished_bytes, "like New Game, a fresh run keeps the finished save until it saves over it")
+	# Only a hand-made save could reopen the cleared junction; it never calls the line unbuilt.
+	game.call("_finish_intro")
+	game.call("_load_game")
+	state = game.get("state") as M0State
+	_expect(state.junction_cleared and room.hatch_open == 1.0 and human.controlled and game.call("_objective") == "SERVICE LINE CLEARED" and str(game.get("status_line")) == "The service line runs on toward Archive.", "a restored cleared junction says where the line goes")
+	human.position.x = JunctionRoom.BOLT_X
 	await _tap(&"interact")
-	_expect(not game.get("chapter_close_active") and str(game.get("status_line")).contains("not built yet"), "the open hatch says the line beyond is not built yet")
+	_expect(str(game.get("status_line")) == "The service line runs on toward Archive." and str(game.call("_context_hint")) == "The hatch is open.", "the open hatch has no developer note in the dialogue or the hint")
+	# The card answers the interact key, its own button and Back too.
+	for way: String in ["interact", "button", "back"]:
+		game.set("chapter_close_active", true)
+		game.call("_finish_chapter_close")
+		_expect(game.get("end_card_active"), "the card is up again (%s)" % way)
+		match way:
+			"interact":
+				await _tap(&"interact")
+			"button":
+				end_button.pressed.emit()
+			"back":
+				game.call("_handle_back")
+		_expect(game.get("title_open") and not game.get("end_card_active") and not end_card.visible, "%s on the END OF SLICE card goes on to the title" % way)
+		game.call("_new_game")
+		game.call("_finish_intro")
+		game.call("_load_game")
 	# WOLF breaks off after a miss while drawing the sentry.
 	await _start_at_b(game, State.DISCLOSE)
 	_expect(await _walk_until_choice(game), "the question comes up again on a new attempt")
@@ -442,7 +484,7 @@ func _check_engineer_alone(game: Node2D, path: String) -> void:
 	await _tap(&"choice_1")
 	var refusal: String = str(game.get("status_line"))
 	_expect(game.get("lane_choice") == "refused" and not game.get("wolf_baiting") and wolf.autonomous_target_x == JunctionRoom.WOLF_RUBBLE_X, "with the risk withheld WOLF refuses to draw it")
-	_expect(refusal.begins_with("WOLF: No.") and refusal.contains("time the drop") and not refusal.contains("blind") and not refusal.contains("You said"), "his refusal points at the engineer's way through without blame")
+	_expect(refusal.begins_with("WOLF: At the relay") and refusal.contains("Time the drop from the panel") and not refusal.contains("You said"), "his refusal names the relay choice openly and points at the engineer's way through")
 	for _frame: int in 60:
 		await physics_frame
 	_expect(wolf.position.x <= JunctionRoom.WOLF_RUBBLE_X + 6.0 and brain.state == &"patrol", "WOLF stays at the rubble and the sentry keeps patrolling")

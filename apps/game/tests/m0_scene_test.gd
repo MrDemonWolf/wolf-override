@@ -45,7 +45,7 @@ func _run() -> void:
 	if not _require(game.get("title_open") and title_screen.visible and continue_button.disabled, "fresh title disables Continue without a test checkpoint"):
 		return
 	var continue_note: Label = game.get_node("CanvasLayer/TitleScreen/ContinueNote") as Label
-	_expect(continue_note.text == "No checkpoint yet. Reach a SAFE POINT to save." and continue_button.tooltip_text == continue_note.text, "disabled Continue explains that no checkpoint exists yet")
+	_expect(continue_note.text == "No checkpoint yet. Saving starts at the first SAFE POINT." and continue_button.tooltip_text == continue_note.text, "disabled Continue explains that no checkpoint exists yet")
 	var note_width: float = continue_note.get_theme_font("font").get_string_size(continue_note.text, HORIZONTAL_ALIGNMENT_LEFT, -1, continue_note.get_theme_font_size("font_size")).x
 	_expect(note_width <= continue_note.size.x and continue_note.position.y >= continue_button.position.y + continue_button.size.y and continue_note.position.y + continue_note.size.y <= credits_button.position.y, "Continue caption fits between the title button rows")
 	if not _require(title_art.texture != null and title_art.texture.resource_path == "res://assets/title-corridor-key-art-provisional.png", "title shows the corridor artwork"):
@@ -82,17 +82,23 @@ func _run() -> void:
 	await create_timer(3.2).timeout
 	game.call("_refresh_ui")
 	_expect(not top_card.visible, "opening slate fades away and does not reappear each frame")
+	# Audit 12: the Director's lines carry his tag; the narration has its own untagged boxes.
+	_expect(speaker.visible and speaker.text == "DIRECTOR" and story.text == "I decide who counts as a threat. WOLF handles the rest.", "the Director's first line sits alone under his tag")
 	await _tap(&"interact")
-	_expect(game.get("intro_step") == 1 and str(game.get("status_line")).contains("wakes himself"), "WOLF wakes himself and opens containment")
+	_expect(game.get("intro_step") == 1 and not speaker.visible and story.text == "The Director thinks WOLF is still in standby.", "the narration after it gets its own untagged box, naming the Director")
 	await _tap(&"interact")
-	_expect(game.get("intro_step") == 2 and str(game.get("status_line")).contains("gate slides aside"), "WOLF opens containment from inside through a sliding gate")
+	_expect(game.get("intro_step") == 2 and str(game.get("status_line")).contains("wakes himself") and not speaker.visible, "WOLF wakes himself and opens containment")
+	await _tap(&"interact")
+	_expect(game.get("intro_step") == 3 and str(game.get("status_line")).contains("gate slides aside"), "WOLF opens containment from inside through a sliding gate")
 	await create_timer(1.2).timeout
 	_expect(intro_gate.visible and is_equal_approx(float(intro_gate.get("opening")), 1.0), "the opened gate stays drawn, folded aside, instead of vanishing")
 	await _tap(&"interact")
-	_expect(game.get("intro_step") == 3 and str(game.get("status_line")).contains("I won't do it"), "WOLF refuses the Director before the engineer arrives")
+	_expect(game.get("intro_step") == 4 and str(game.get("status_line")).contains("I won't do it") and not speaker.visible and story.text.begins_with("DIRECTOR: ") and story.text.contains("\nWOLF: "), "WOLF refuses the Director before the engineer arrives, both names inline")
 	_expect(intro_gate.visible and is_equal_approx(float(intro_gate.get("opening")), 1.0), "the gate is still standing open in the next beat")
 	await _tap(&"interact")
-	_expect(game.get("intro_step") == 4 and str(game.get("status_line")).contains("Lock down maintenance"), "Director orders lockdown as WOLF leaves")
+	_expect(game.get("intro_step") == 5 and speaker.text == "DIRECTOR" and story.text == "Lock down maintenance. WOLF does not leave this site.", "Director orders lockdown under his own tag")
+	await _tap(&"interact")
+	_expect(game.get("intro_step") == 6 and not speaker.visible and story.text == "WOLF turns from the Director and takes the only open route." and wolf.autonomous_target_x == 110.0, "the narration says WOLF turns away as he walks off")
 	await _tap(&"interact")
 	await create_timer(0.8).timeout
 	_expect(not game.get("intro_active") and not intro_gate.visible and not intro_director.visible and human.visible and purge_terminal_art.visible and human.controlled and intro_fade.color.a < 0.01, "opening fades into engineer control and gameplay stations")
@@ -230,7 +236,7 @@ func _run() -> void:
 	await _tap(&"interact")
 	if not _require(state.checkpoint_reached and FileAccess.file_exists(path), "cooperative checkpoint saves"):
 		return
-	_expect(game.call("_objective") == "CORRIDOR CLEARED", "checkpoint closes the first scene")
+	_expect(game.call("_objective") == "SAFE POINT REACHED", "checkpoint closes the first scene")
 	_expect(str(game.get("status_line")).contains(State.CHOICE_TEXT[State.DISCLOSE]), "cooperative checkpoint displays the selected choice")
 	var saved: Dictionary = state.to_dict()
 	game.call("_new_game")

@@ -260,6 +260,43 @@ func _run() -> void:
 	Input.parse_input_event(_controller_button(JOY_BUTTON_B, false))
 	await process_frame
 	_expect(not paused and not overlay.visible, "controller B on a touch-opened pause menu resumes play like any cancel press")
+	# The END OF SLICE card (decision D) answers touch, controller and keyboard through the real input path.
+	var end_card: Control = game.get_node("CanvasLayer/EndCard") as Control
+	var end_button: Button = end_card.get_node("EndCardContinue") as Button
+	game.set("controller_active", false)
+	game.call("_show_end_card")
+	await process_frame
+	_expect(end_card.visible and end_button.text == "TAP CONTINUE" and not (game.get_node("CanvasLayer/TouchControls") as Control).visible and not (game.get_node("CanvasLayer/PauseButton") as Control).visible, "on touch the END OF SLICE card shows TAP CONTINUE with no play buttons over it")
+	var tap_at: Vector2 = root.get_final_transform() * end_button.get_global_rect().get_center()
+	var tap: InputEventScreenTouch = InputEventScreenTouch.new()
+	tap.index = 0
+	tap.position = tap_at
+	tap.pressed = true
+	Input.parse_input_event(tap)
+	await process_frame
+	tap.pressed = false
+	Input.parse_input_event(tap)
+	await _settle(2)
+	_expect(game.get("title_open") and not end_card.visible, "a tap on the card's button goes on to the title")
+	game.set("touch_enabled", false)
+	new_game.pressed.emit()
+	game.call("_finish_intro")
+	game.set("controller_active", true)
+	game.call("_show_end_card")
+	await process_frame
+	_expect(end_card.visible and end_button.has_focus() and end_button.text.ends_with("  CONTINUE") and not end_button.text.begins_with("E "), "with a controller the card's button has focus and its prompt names the controller button (%s)" % end_button.text)
+	Input.parse_input_event(_controller_button(JOY_BUTTON_A, true))
+	await _settle(2)
+	Input.parse_input_event(_controller_button(JOY_BUTTON_A, false))
+	await process_frame
+	_expect(game.get("title_open") and not end_card.visible, "controller A on the card goes on to the title")
+	new_game.pressed.emit()
+	game.call("_finish_intro")
+	game.call("_show_end_card")
+	await process_frame
+	await _send_escape(true)
+	await _send_escape(false)
+	_expect(game.get("title_open") and not end_card.visible and not paused, "Esc on the card goes on to the title instead of pausing")
 	game.set("touch_enabled", false)
 	Engine.max_fps = old_fps
 	DirAccess.remove_absolute(ProjectSettings.globalize_path(path))

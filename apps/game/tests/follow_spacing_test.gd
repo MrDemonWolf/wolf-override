@@ -37,7 +37,7 @@ func _run() -> void:
 	game.call("_new_game")
 	var intro_dimmed: bool = false
 	var intro_walked: bool = false
-	for _step: int in 4:
+	for _step: int in 6:
 		game.call("_advance_intro")
 		for _frame: int in 60:
 			await physics_frame

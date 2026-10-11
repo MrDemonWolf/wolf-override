@@ -188,7 +188,9 @@ func _check_scene() -> void:
 	var settled_junction_pulsing: bool = await _beacons_pulse(junction)
 	_expect(_beacons_settled(junction) and not settled_junction_pulsing, "the junction's beacons settle once the line is cleared")
 	game.call("_finish_chapter_close")
-	_expect(game.get("title_open"), "the closing beat returns to the title")
+	_expect(game.get("end_card_active") and not game.get("title_open"), "the closing beat leads to the END OF SLICE card")
+	game.call("_close_end_card")
+	_expect(game.get("title_open") and not game.get("end_card_active"), "the END OF SLICE card goes on to the title")
 	# A new game puts the junction back to pulsing; Continue from autosave D settles it again.
 	game.call("_new_game")
 	game.call("_finish_intro")

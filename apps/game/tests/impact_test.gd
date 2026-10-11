@@ -161,7 +161,7 @@ func _run() -> void:
 	_expect(state.memory.get("choice_id") == State.DISCLOSE and state.route == "cooperate", "the relay memory and route survive the knockdown")
 	_expect(human.controlled and human.position == state.human_position and wolf.position == state.wolf_position, "the engineer stands at the checkpoint with controls back")
 	_expect(human.body_sprite.rotation_degrees == 0.0 and human.body_sprite.position == Vector2(0.0, -5.0), "the sprite is upright again")
-	_expect(str(game.get("status_line")).contains("Wait for the hiss") and str(game.get("status_line")).contains("last autosave"), "the status line keeps the cause and says where play resumed")
+	_expect(str(game.get("status_line")).contains("Wait for the hiss") and str(game.get("status_line")).contains("Back at the last checkpoint."), "the status line keeps the cause and says where play resumed")
 	_expect(await _wait_until(func() -> bool: return Engine.time_scale == 1.0 and camera.offset == Vector2.ZERO and intro_fade.color.a == 0.0, 90), "time scale, camera and fade are all at rest after the restore")
 	# Walking into the armed hazard is the other contact path.
 	_expect(await _walk_to(human, 760.0), "the engineer walks toward the vent again")
@@ -195,7 +195,7 @@ func _run() -> void:
 	state = game.get("state") as M0State
 	_expect(state.to_dict() == pre_save and state.memory.get("choice_id") == State.PRESS and not state.checkpoint_reached and state.chapter_id == "lockdown", "without a checkpoint the beat snapshot restores the choice, not an older save")
 	_expect(human.controlled and human.position == state.human_position, "the engineer is back at the beat start")
-	_expect(str(game.get("status_line")).ends_with("Back at the start of this beat."), "without a checkpoint the restore line does not claim an autosave")
+	_expect(str(game.get("status_line")).ends_with("Back at the start of this stretch."), "without a checkpoint the restore line does not claim a checkpoint")
 
 	# Reduced Motion knockdown: no tilt, no dip, still a restore.
 	impact.reduce_motion = true
@@ -209,8 +209,8 @@ func _run() -> void:
 	game.call("_new_game")
 	game.call("_fail_beat", "Test knockdown.")
 	_expect(not game.get("fail_active"), "the opening ignores knockdowns")
-	game.call("_advance_intro")
-	game.call("_advance_intro")
+	for _step: int in 3:
+		game.call("_advance_intro")
 	_expect(impact.trauma > 0.0 and intro_fade.color.r == 1.0, "the containment gate boom shakes and flashes")
 	game.call("_finish_intro")
 	_expect(await _wait_until(func() -> bool: return impact.trauma == 0.0 and camera.offset == Vector2.ZERO, 90), "the gate boom settles")
