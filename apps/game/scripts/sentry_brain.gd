@@ -1,9 +1,10 @@
 class_name SentryBrain
 extends RefCounted
 ## The Service Junction's purge sentry, as pure logic. States: dormant (behind the sealed door,
-## until the blast wakes it), patrol (bouncing PATROL_MIN_X..PATROL_MAX_X), chase (it saw the
-## engineer in its lane), fixated (WOLF chose to draw it; it parks just past him, on the mark) and
-## down (the tank landed on it; nothing moves it again). Advanced with real delta so tests are frame-independent;
+## until the blast wakes it), patrol (bouncing PATROL_MIN_X..PATROL_MAX_X), lock (it has just
+## seen the engineer, or a missed drop turned it: it stops and turns to them for LOCK_SECONDS before
+## it moves), chase (running the engineer down in its lane), fixated (WOLF chose to draw it; it
+## parks just past him, on the mark) and down (the tank landed on it; nothing moves it again). Advanced with real delta so tests are frame-independent;
 ## the room sets [member paused] during a choice and never ticks it while the game is paused or
 ## during a knockdown.
 
@@ -28,6 +29,9 @@ const CHASE_SPEED: float = 230.0
 ## The closest it comes to the rubble while chasing: one pixel more than contact range past the lane
 ## edge, so an engineer anywhere out of the lane is out of reach.
 const CHASE_MIN_X: float = LANE_ENTRY_X + CONTACT_RANGE + 1.0
+## The lock-on beat between seeing the engineer and chasing them: it holds still, facing them, for
+## this long, so a chase never starts on the frame it first sees someone.
+const LOCK_SECONDS: float = 0.5
 ## Seconds an engineer must stay back over the rubble before a chase gives up.
 const LOSE_SECONDS: float = 2.5
 ## A fixated sentry parks this far past the one drawing it, on the far side from the rubble. WOLF comes
@@ -43,6 +47,8 @@ var x: float = PATROL_MAX_X
 var facing: float = -1.0
 ## Seconds the chased engineer has been back over the rubble.
 var lost_seconds: float = 0.0
+## Seconds left in the lock-on beat.
+var lock_remaining: float = 0.0
 var paused: bool = false
 
 
@@ -59,12 +65,15 @@ func wake() -> bool:
 	return true
 
 
-## A dropped tank missed: whatever it was doing, it turns on the engineer.
+## A dropped tank missed: whatever it was doing, it turns on the engineer, locking on before it
+## chases (a sentry already locking on or chasing carries on).
 func alert() -> bool:
 	if state == &"dormant" or state == &"down":
 		return false
-	state = &"chase"
-	lost_seconds = 0.0
+	if state == &"chase":
+		lost_seconds = 0.0
+	elif state != &"lock":
+		_lock_on()
 	return true
 
 
@@ -90,18 +99,28 @@ func tick(delta: float, engineer_x: float, engineer_exposed: bool, bait_x: float
 			else:
 				_patrol(delta)
 				if _sees(engineer_x, engineer_exposed):
-					state = &"chase"
-					lost_seconds = 0.0
+					_lock_on()
 		&"fixated":
 			if bait_x < 0.0:
 				state = &"patrol"
 				_patrol(delta)
 			elif engineer_exposed and absf(engineer_x - x) <= CONTACT_RANGE:
 				# Walking into it breaks the hold, bait or not.
-				state = &"chase"
-				lost_seconds = 0.0
+				_lock_on()
 			else:
 				_hold_on(bait_x, delta)
+		&"lock":
+			# Stopped, it turns to the engineer; time left over after the beat goes into the chase.
+			if absf(engineer_x - x) > EPSILON:
+				facing = signf(engineer_x - x)
+			lock_remaining -= delta
+			if lock_remaining <= EPSILON:
+				var spare: float = -lock_remaining
+				lock_remaining = 0.0
+				state = &"chase"
+				lost_seconds = 0.0
+				if spare > EPSILON:
+					return tick(spare, engineer_x, engineer_exposed, bait_x)
 		&"chase":
 			_move_toward(engineer_x, CHASE_SPEED, delta)
 			if engineer_x <= LANE_ENTRY_X:
@@ -126,7 +145,14 @@ func reset(door_blown: bool, down: bool, down_x: float) -> void:
 	x = down_x if down else PATROL_MAX_X
 	facing = -1.0
 	lost_seconds = 0.0
+	lock_remaining = 0.0
 	paused = false
+
+
+func _lock_on() -> void:
+	state = &"lock"
+	lock_remaining = LOCK_SECONDS
+	lost_seconds = 0.0
 
 
 func _patrol(delta: float) -> void:

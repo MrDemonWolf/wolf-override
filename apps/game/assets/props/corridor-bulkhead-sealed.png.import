@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://cu7xg0thns12a"
-path="res://.godot/imported/junction-blast-door-sealed.png-6db4a901225e0ec2ad0c49e9c21ad430.ctex"
+uid="uid://brcmtk50pm3s2"
+path="res://.godot/imported/corridor-bulkhead-sealed.png-5a92b8ccaad3f110d8202c58531dc322.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/props/junction-blast-door-sealed.png"
-dest_files=["res://.godot/imported/junction-blast-door-sealed.png-6db4a901225e0ec2ad0c49e9c21ad430.ctex"]
+source_file="res://assets/props/corridor-bulkhead-sealed.png"
+dest_files=["res://.godot/imported/corridor-bulkhead-sealed.png-5a92b8ccaad3f110d8202c58531dc322.ctex"]
 
 [params]
 

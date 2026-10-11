@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://cp7xt2162tiut"
-path="res://.godot/imported/corridor-sealed-door.png-20dadfebf74fe948d87ce2706f6afbd7.ctex"
+uid="uid://vp7s1eo2c8h2"
+path="res://.godot/imported/junction-bulkhead-front-lip.png-f42929a2989ac3f64ced10efca04a571.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/props/corridor-sealed-door.png"
-dest_files=["res://.godot/imported/corridor-sealed-door.png-20dadfebf74fe948d87ce2706f6afbd7.ctex"]
+source_file="res://assets/props/junction-bulkhead-front-lip.png"
+dest_files=["res://.godot/imported/junction-bulkhead-front-lip.png-f42929a2989ac3f64ced10efca04a571.ctex"]
 
 [params]
 

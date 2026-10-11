@@ -49,7 +49,7 @@ var _down_tween: Tween
 
 ## The painted machine, drawn facing +x (the left-facing art is mirrored); the parent flips the
 ## whole node to face the way the brain does. Over the scanner slit it draws the eye light, a soft
-## lens glow and the beam in the brain's colour (off, amber patrol, red when locked on), reaching
+## lens glow and the beam in the brain's colour (off, amber patrol, red from the moment it locks on), reaching
 ## [member reach] px ahead of the machine's origin; the wreck has none of them.
 class SentryVisual:
 	extends Node2D
@@ -236,7 +236,7 @@ func follow(brain: SentryBrain) -> void:
 	match brain.state:
 		&"patrol":
 			visual.eye = SentryVisual.EYE_PATROL
-		&"chase", &"fixated":
+		&"lock", &"chase", &"fixated":
 			visual.eye = SentryVisual.EYE_LOCKED
 		_:
 			visual.eye = SentryVisual.EYE_OFF

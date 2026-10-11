@@ -195,6 +195,8 @@ func _check_scene() -> void:
 	_expect(absf(wolf.position.x - JunctionRoom.WOLF_SEAM_X) <= 6.0 and wolf.follow_target == human and str(game.get("status_line")).contains("It's live"), "after the read WOLF returns to following and says what he found")
 	await physics_frame
 	_expect(await _wait_until(func() -> bool: return not room.door_shape.disabled, 5), "the junction door body is live in its room")
+	_check_presentation(room, human, wolf)
+	await _check_near_fade(room)
 	# The sealed door physically blocks the engineer.
 	_expect(await _walk_to(human, 420.0), "the engineer walks to the valve")
 	Input.action_press(&"move_right")
@@ -270,6 +272,7 @@ func _check_scene() -> void:
 	# says outside, so the door blows, nobody is knocked down and autosave B is written.
 	human.position.x = PressureLine.BLAST_MIN_X - 8.0
 	_expect(await _wait_until(func() -> bool: return state.door_blown, 90), "the fuse ends and the door blows")
+	_expect(room.door_breaking_art.visible and not room.door_art.visible and not room.door_blown_art.visible, "at the blast the bulkhead shows breaking first")
 	_expect(game.call("_objective") == "DROP THE TANK" and room.door_label.text == "DOOR DOWN" and room.blast_sparks.emitting, "the blast is a real state change with sparks and the next objective")
 	_expect(room.breaker_label.text == "BREAKER SPENT" and room.valve_label.text == "VALVE SPENT", "the blast spends the breaker and the valve")
 	var knocked: bool = false
@@ -277,6 +280,8 @@ func _check_scene() -> void:
 		await physics_frame
 		knocked = knocked or game.get("fail_active")
 	_expect(not knocked and human.controlled and str(game.get("status_line")).begins_with("The seal goes"), "clear of the zone the blast is not a knockdown, even at its edge")
+	_expect(await _wait_until(func() -> bool: return room.door_blown_art.visible and not room.door_breaking_art.visible, 30), "then it stands blown open on the passage beyond")
+	_expect(_labels_clear(room), "after the blast the station plates still sit apart in their row")
 	var autosave_b: M0State = State.load_from_disk(path)
 	_expect(autosave_b != null and autosave_b.door_blown and autosave_b.chapter_id == "junction", "autosave B records the blown door")
 	_expect(wolf.autonomous_target_x == JunctionRoom.WOLF_RUBBLE_X, "WOLF holds at the rubble and will not cross")
@@ -458,6 +463,64 @@ func _walk_to(actor: M0Actor, target_x: float) -> bool:
 			break
 	Input.action_release(action)
 	return reached
+
+
+## The bulkhead shares one cut across its states, stands with its front pillar on the door body's
+## face and draws that pillar over the actors and the rest under them; the station plates share one
+## row and size and never overlap.
+func _check_presentation(room: JunctionRoom, human: M0Actor, wolf: M0Actor) -> void:
+	var arts: Array[Sprite2D] = [room.door_art, room.door_breaking_art, room.door_blown_art, room.door_lip]
+	var shared: bool = true
+	for art: Sprite2D in arts:
+		shared = shared and art.region_rect == JunctionRoom.DOOR_REGION and art.position == room.door_art.position and art.scale == room.door_art.scale
+	_expect(shared, "every bulkhead image and its front lip share one registered cut")
+	var pillar_x: float = room.door_visual.position.x + (RoomDepth.BULKHEAD_PILLAR_X - JunctionRoom.DOOR_REGION.get_center().x) * JunctionRoom.DOOR_SCALE
+	_expect(is_equal_approx(pillar_x, M0State.JUNCTION_DOOR_LEFT_X), "the bulkhead's front pillar stands on the door body's face (%.1f)" % pillar_x)
+	var body_z: int = room.z_index + room.door_visual.z_index
+	var lip_z: int = body_z + room.door_lip.z_index
+	_expect(body_z < human.z_index and body_z < wolf.z_index and lip_z > human.z_index and lip_z > wolf.z_index, "the bulkhead draws behind the actors and its front pillar in front of them")
+	var row: bool = true
+	for label: Label in room.station_labels:
+		if label != room.vent_label:
+			row = row and is_equal_approx(label.position.y, JunctionRoom.LABEL_Y) and label.get_theme_font_size(&"font_size") == JunctionRoom.LABEL_FONT_SIZE
+	_expect(row and room.station_labels.size() == 6, "the five station plates share one row and size, with the vent's caption on the floor")
+	_expect(_labels_clear(room), "no two station plates overlap")
+
+
+## True when no two visible station plates overlap.
+func _labels_clear(room: JunctionRoom) -> bool:
+	var rects: Array[Rect2] = []
+	for label: Label in room.station_labels:
+		if label.visible:
+			rects.append(label.get_global_rect())
+	for i: int in rects.size():
+		for j: int in range(i + 1, rects.size()):
+			if rects[i].intersects(rects[j]):
+				push_error("station plates overlap: %s and %s" % [rects[i], rects[j]])
+				return false
+	return true
+
+
+## The near pipe column fades back while it covers an actor at either end of the room, and comes back
+## once nobody is behind it.
+func _check_near_fade(room: JunctionRoom) -> void:
+	var left: Sprite2D = room.depth.near_layer.get_node("LeftEdge") as Sprite2D
+	var stand_in: Sprite2D = Sprite2D.new()
+	stand_in.texture = preload("res://assets/rowan-side-right-provisional.png")
+	stand_in.scale = Vector2.ONE * 0.188
+	stand_in.position = Vector2(-40.0, 405.0)
+	room.add_child(stand_in)
+	room.depth.occluders.append(stand_in)
+	_expect(room.depth.near_covers(left), "a body behind the left pipe column is covered by it")
+	# Real time, not frames: headless frames can be far shorter than a rendered one.
+	await create_timer(0.4).timeout
+	_expect(left.modulate.a <= RoomDepth.NEAR_FADE_ALPHA + 0.01, "the column fades back while it covers someone (alpha %.2f)" % left.modulate.a)
+	stand_in.position.x = 480.0
+	_expect(not room.depth.near_covers(left), "mid-room nobody is under the column")
+	await create_timer(0.4).timeout
+	_expect(left.modulate.a >= 0.99, "the column comes back once nobody is behind it")
+	room.depth.occluders.erase(stand_in)
+	stand_in.queue_free()
 
 
 func _expect(condition: bool, label: String) -> void:

@@ -72,14 +72,14 @@ func _check_flicker_plan() -> void:
 func _check_beam_rule() -> void:
 	var far_end: float = Sentry.beam_tip_x(SentryBrain.PATROL_MAX_X, -1.0)
 	_expect(is_equal_approx(far_end, SentryBrain.PATROL_MAX_X - SentryBrain.SIGHT_RANGE), "from the far end the beam reaches the full 180 px of sight")
-	_expect(_patrolling_at(SentryBrain.PATROL_MAX_X, -1.0).tick(0.0001, far_end, true, -1.0) == &"chase", "an engineer at the beam's tip is seen")
+	_expect(_patrolling_at(SentryBrain.PATROL_MAX_X, -1.0).tick(0.0001, far_end, true, -1.0) == &"lock", "an engineer at the beam's tip is seen")
 	_expect(_patrolling_at(SentryBrain.PATROL_MAX_X, -1.0).tick(0.0001, far_end - 2.0, true, -1.0) == &"patrol", "an engineer just past the beam's tip is not")
 	_expect(is_equal_approx(Sentry.beam_tip_x(700.0, 1.0), 880.0), "facing right it reaches 180 px the other way")
 	_expect(is_equal_approx(Sentry.beam_tip_x(SentryBrain.PATROL_MIN_X, -1.0), SentryBrain.LANE_ENTRY_X), "the beam stops at the rubble line, where nobody can be seen")
 	_expect(not SentryBrain.is_exposed(SentryBrain.LANE_ENTRY_X) and SentryBrain.is_exposed(SentryBrain.LANE_ENTRY_X + 1.0), "the rubble line is the edge of what it can see")
 	_expect(is_equal_approx(Sentry.beam_tip_x(SentryBrain.PATROL_MAX_X, 1.0), M0Actor.MAX_X), "facing right from the far end the beam stops where the engineer can stand furthest, inside the room")
 	# Just short of the end, so the tick does not bounce it round first.
-	_expect(_patrolling_at(SentryBrain.PATROL_MAX_X - 1.0, 1.0).tick(0.0001, M0Actor.MAX_X, true, -1.0) == &"chase", "an engineer at that right-hand tip is seen")
+	_expect(_patrolling_at(SentryBrain.PATROL_MAX_X - 1.0, 1.0).tick(0.0001, M0Actor.MAX_X, true, -1.0) == &"lock", "an engineer at that right-hand tip is seen")
 	# Every x the patrol and chase can put it at, both ways: the beam never covers the alcove, and
 	# every lane x between the alcove and the rubble that it sees is still under the beam.
 	var gaps_ok: bool = true
@@ -99,7 +99,7 @@ func _check_beam_rule() -> void:
 	_expect(at_turn.is_equal_approx(Vector2(SentryBrain.COVER_MIN_X, SentryBrain.COVER_MAX_X)), "at the patrol's turn the whole alcove is out of the beam")
 	_expect(not SentryBrain.is_exposed(at_turn.x) and not SentryBrain.is_exposed(at_turn.y) and not SentryBrain.is_exposed((at_turn.x + at_turn.y) * 0.5), "the gap is where an engineer is hidden")
 	var strip: float = (SentryBrain.LANE_ENTRY_X + SentryBrain.COVER_MIN_X) * 0.5
-	_expect(_patrolling_at(SentryBrain.PATROL_MIN_X + 1.0, -1.0).tick(0.0001, strip, SentryBrain.is_exposed(strip), -1.0) == &"chase" and strip >= Sentry.beam_tip_x(SentryBrain.PATROL_MIN_X + 1.0, -1.0) and strip < Sentry.beam_gap(SentryBrain.PATROL_MIN_X + 1.0, -1.0).x, "between the alcove and the rubble it still sees you, and the beam is drawn there")
+	_expect(_patrolling_at(SentryBrain.PATROL_MIN_X + 1.0, -1.0).tick(0.0001, strip, SentryBrain.is_exposed(strip), -1.0) == &"lock" and strip >= Sentry.beam_tip_x(SentryBrain.PATROL_MIN_X + 1.0, -1.0) and strip < Sentry.beam_gap(SentryBrain.PATROL_MIN_X + 1.0, -1.0).x, "between the alcove and the rubble it still sees you, and the beam is drawn there")
 	_expect(Sentry.beam_gap(SentryBrain.PATROL_MAX_X, -1.0) == Vector2.ZERO, "from the far end the beam stops short of the alcove, with no break")
 
 

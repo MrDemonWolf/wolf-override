@@ -13,6 +13,13 @@ const CHANGELOG_SCROLL_SPEED: float = 260.0
 const RELAY_CONTACT_X: float = 592.0
 ## The corridor seal's face (Door at x 780, 56 px wide); while it is shut WOLF follows no closer than his reach.
 const CORRIDOR_DOOR_LEFT_X: float = 752.0
+## The corridor's pressure bulkhead (design A): the scene's DoorArt is the sealed image; the open one
+## and the front pillar (drawn over the actors) share its registered canvas and cut.
+const CORRIDOR_DOOR_OPEN: Texture2D = preload("res://assets/props/corridor-bulkhead-open.png")
+const CORRIDOR_DOOR_LIP: Texture2D = preload("res://assets/props/corridor-bulkhead-front-lip.png")
+const CORRIDOR_DOOR_REGION: Rect2 = Rect2(0.0, 42.0, 384.0, 606.0)
+## The sealed image fades over this long when the seal opens, uncovering the open bulkhead.
+const CORRIDOR_DOOR_OPEN_SECONDS: float = 0.3
 const SAVE_FAILED_HINT: String = "Save failed. Use a station to try again."
 const NO_CHECKPOINT_NOTE: String = "No checkpoint yet. Reach a SAFE POINT to save."
 const UNREADABLE_CHECKPOINT_NOTE: String = "Saved checkpoint could not be read."
@@ -181,6 +188,9 @@ var save_pending: bool = false
 var floor_reflections: Array[FloorReflection] = []
 var breaker_status_glow: Sprite2D
 var relay_status_glow: Sprite2D
+## The corridor bulkhead standing open, and its front pillar drawn over the actors.
+var door_open_art: Sprite2D
+var door_lip: Sprite2D
 
 const WOLF_SPRITE_REST: Vector2 = Vector2(0.0, -15.0)
 const GAMEPLAY_ZOOM: float = 1.35
@@ -247,11 +257,15 @@ func _ready() -> void:
 	# front, and a WOLF walking past him (dimmed by M0Actor) reads as passing behind.
 	move_child(wolf, human.get_index())
 	wolf.keep_clear_of = human
+	_setup_corridor_door()
 	_setup_particles()
-	for grounded: Sprite2D in [human.body_sprite, wolf.body_sprite, intro_director, breaker_art, relay_art, checkpoint_art, door_art]:
+	for grounded: Sprite2D in [human.body_sprite, wolf.body_sprite, intro_director, breaker_art, relay_art, checkpoint_art, door_art, door_open_art]:
 		floor_reflections.append(FloorReflection.attach(grounded))
 	floor_reflections.append_array(records_room.floor_reflections)
 	floor_reflections.append_array(junction_room.floor_reflections)
+	# Each room's near edge pieces fade back while they cover the engineer or WOLF.
+	for depth: RoomDepth in _room_depths():
+		depth.occluders = [human.body_sprite, wolf.body_sprite]
 	breaker_status_glow = _attach_status_glow(breaker_status_light)
 	relay_status_glow = _attach_status_glow(relay_status_light)
 	_apply_effects()
@@ -329,10 +343,15 @@ func _hide_changelog() -> void:
 	_grab_menu_focus(changelog_button)
 
 
-func _draw() -> void:
-	# The corridor's plates are CorridorDepth's layers.
-	if state.door_open and state.chapter_id == "lockdown":
-		draw_line(Vector2(801, 434), Vector2(844, 434), Color("#70d9a7"), 4.0)
+## The open bulkhead behind the scene's sealed DoorArt (same canvas, so the frames line up), and the
+## front pillar, which draws over the actors so they pass through the doorway.
+func _setup_corridor_door() -> void:
+	door_open_art = RoomDepth.make_bulkhead("CorridorDoorOpen", CORRIDOR_DOOR_OPEN, CORRIDOR_DOOR_REGION, CORRIDOR_DOOR_LEFT_X)
+	door_lip = RoomDepth.make_bulkhead("CorridorDoorLip", CORRIDOR_DOOR_LIP, CORRIDOR_DOOR_REGION, CORRIDOR_DOOR_LEFT_X)
+	door_lip.z_index = KNOCKDOWN_Z
+	for art: Sprite2D in [door_open_art, door_lip]:
+		art.visible = false
+		add_child(art)
 
 
 ## Every depth effect hangs off this one switch; off, the rooms keep their far and mid plates, unmoving.
@@ -514,7 +533,7 @@ func _new_game() -> void:
 	$BreakerLabel.hide()
 	$RelayLabel.hide()
 	$CheckpointLabel.hide()
-	for station: CanvasItem in [breaker_art, relay_art, checkpoint_art, breaker_status_light, relay_status_light, door_visual]:
+	for station: CanvasItem in [breaker_art, relay_art, checkpoint_art, breaker_status_light, relay_status_light, door_visual, door_open_art, door_lip]:
 		station.hide()
 	wolf.position = Vector2(115.0, 423.0)
 	wolf.z_index = ACTOR_Z
@@ -1132,11 +1151,11 @@ func _interact_relay() -> void:
 			_react_as_wolf(false)
 			queue_redraw()
 		"cooperate":
-			status_line = "WOLF holds the live contact by choice. %s keeps the breaker on; the red seal rises." % state.human_name().get_slice(" ", 0)
+			status_line = "WOLF holds the live contact by choice. %s keeps the breaker on; the red seal opens." % state.human_name().get_slice(" ", 0)
 			_react_as_wolf(true)
 			_flash_relay_spark(true)
 		"fallback":
-			status_line = "%s takes the bypass. WOLF reads the rising seal: \"Open. I'm with you.\"" % state.human_name().get_slice(" ", 0)
+			status_line = "%s takes the bypass. WOLF reads the opening seal: \"Open. I'm with you.\"" % state.human_name().get_slice(" ", 0)
 			_flash_relay_spark(false)
 		"already_open":
 			status_line = "The seal is open. The safe point is just beyond it."
@@ -1152,7 +1171,7 @@ func _interact_relay() -> void:
 func _wolf_takes_relay() -> void:
 	wolf_heading_to_relay = false
 	if state.activate_power("wolf") == "cooperate":
-		status_line = "WOLF holds the live contact by choice. %s keeps the breaker on; the red seal rises." % state.human_name().get_slice(" ", 0)
+		status_line = "WOLF holds the live contact by choice. %s keeps the breaker on; the red seal opens." % state.human_name().get_slice(" ", 0)
 		_react_as_wolf(true)
 		_flash_relay_spark(true)
 		_sync_door(true)
@@ -1484,7 +1503,7 @@ func _tick_junction(delta: float) -> void:
 		sfx_bank.play(&"hum", lerpf(-16.0, -9.0, pressure_line.gauge), 0.5 * (1.0 + 0.6 * pressure_line.gauge))
 
 
-## The lane past the door: the sentry wakes, patrols, chases or holds on WOLF; the arm falls,
+## The lane past the door: the sentry wakes, patrols, locks on and chases, or holds on WOLF; the arm falls,
 ## rewinds and vents; the bolt charges. None of it runs during a choice (paused) or a knockdown or
 ## while the game is paused (_process does not reach here). Contact with a chasing sentry is a
 ## knockdown back to autosave B.
@@ -1526,11 +1545,14 @@ func _tick_lane(delta: float) -> void:
 		_fail_beat(JunctionRoom.SENTRY_REASON)
 
 
-## The servo follows the sentry's state (higher when it locks on); the winch runs while the arm rewinds.
+## The servo follows the sentry's state (it idles low through the lock-on beat and runs higher in a
+## chase); the winch runs while the arm rewinds.
 func _lane_sound() -> void:
 	match sentry_brain.state:
 		&"patrol":
 			sfx_bank.play(&"servo", -22.0, 1.0)
+		&"lock":
+			sfx_bank.play(&"servo", -24.0, 0.8)
 		&"fixated":
 			sfx_bank.play(&"servo", -19.0, 1.15)
 		&"chase":
@@ -1544,17 +1566,24 @@ func _lane_sound() -> void:
 
 
 func _sentry_changed(before: StringName) -> void:
-	# A chase sends a drawing WOLF back to the rubble until it ends.
+	# Locking on sends a drawing WOLF back to the rubble until the chase ends.
 	wolf.autonomous_target_x = _wolf_target_x()
+	if sentry_brain.state == &"lock":
+		_sentry_alarm()
 	if fail_active:
 		return
 	match sentry_brain.state:
-		&"chase":
+		&"lock":
 			if before == &"patrol" or before == &"fixated":
-				status_line = "The sentry's eyes snap red. It has you; get back over the rubble."
+				status_line = "The sentry stops and its eyes snap red. It has you; get back over the rubble."
 		&"patrol":
 			if before == &"chase":
 				status_line = "It lost you and goes back to its patrol. The ARM PANEL alcove hides you from it."
+
+
+## The lock-on cue: a short, high klaxon chirp from the sound bank as the sentry's eye goes red.
+func _sentry_alarm() -> void:
+	sfx_bank.play(&"klaxon", -8.0, 1.6)
 
 
 ## At the rubble line WOLF asks how to bring the sentry down; the brain and the arm hold still until
@@ -1626,7 +1655,10 @@ func _tank_miss() -> void:
 	impact.add_trauma(0.3)
 	impact.rumble(0.3, 0.5, 0.15)
 	impact.burst(junction_room.coolant_burst)
+	var was: StringName = sentry_brain.state
 	sentry_brain.alert()
+	if sentry_brain.state == &"lock" and was != &"lock":
+		_sentry_alarm()
 	var broke_off: bool = wolf_baiting
 	if broke_off:
 		wolf_baiting = false
@@ -1666,7 +1698,7 @@ func _stop_junction_loops() -> void:
 		sfx_bank.stop(loop_name)
 
 
-## One real valve turn: a click, a weak rumble, one light; the third turn lights the fuse.
+## One real valve turn: a click, a weak rumble and the VALVE plate counts it; the third turn lights the fuse.
 func _valve_turned() -> void:
 	sfx_bank.play(&"clank", -6.0, 1.4)
 	impact.rumble(0.2, 0.0, 0.08)
@@ -1819,7 +1851,7 @@ func _shutter_boom() -> void:
 	impact.burst(gate_dust)
 
 
-## The seal finishing its rise into the ceiling.
+## The seal finishing opening: the bulkhead stands open.
 func _door_lands() -> void:
 	sfx_bank.play(&"thud", -2.0, 1.1)
 	impact.add_trauma(0.5)
@@ -1936,18 +1968,24 @@ func _sync_records_room(animate_exit: bool = false) -> void:
 	records_room.refresh_state()
 
 
+## The corridor bulkhead: sealed, or standing open on the passage beyond; opening in play fades the
+## sealed image off the open one, then the seal lands with its thud and dust. Its front pillar shows
+## either way.
 func _sync_door(animate: bool = false) -> void:
 	if door_tween != null and door_tween.is_running():
 		door_tween.kill()
+	var in_corridor: bool = state.chapter_id == "lockdown"
 	door_shape.set_deferred("disabled", state.door_open)
 	door_visual.scale = Vector2.ONE
-	door_visual.visible = state.chapter_id == "lockdown" and (not state.door_open or animate)
+	door_visual.modulate = Color.WHITE
+	door_visual.visible = in_corridor and (not state.door_open or animate)
+	door_open_art.visible = in_corridor and state.door_open
+	door_lip.visible = in_corridor
 	if state.door_open and animate:
 		door_tween = create_tween()
-		door_tween.tween_property(door_visual, "scale:y", 0.0, 0.38).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_IN)
+		door_tween.tween_property(door_visual, "modulate:a", 0.0, CORRIDOR_DOOR_OPEN_SECONDS).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_IN)
 		door_tween.tween_callback(door_visual.hide)
 		door_tween.tween_callback(_door_lands)
-	queue_redraw()
 
 
 func _update_controls() -> void:
@@ -1974,8 +2012,8 @@ func _wolf_target_x() -> float:
 				return JunctionRoom.WOLF_SEAM_X
 			if state.door_blown and not state.sentry_down:
 				# He draws the sentry only by his own choice; otherwise he will not cross the rubble. While it
-				# is chasing the engineer he waits at the rubble rather than walk into it.
-				return JunctionRoom.WOLF_BAIT_X if wolf_baiting and sentry_brain.state != &"chase" else JunctionRoom.WOLF_RUBBLE_X
+				# is locked on to the engineer or chasing them he waits at the rubble rather than walk into it.
+				return JunctionRoom.WOLF_BAIT_X if wolf_baiting and not _sentry_hunting() else JunctionRoom.WOLF_RUBBLE_X
 	return -1.0
 
 
@@ -2192,6 +2230,11 @@ func _junction_hint(x: float) -> String:
 	return "Arm the breaker on the left, then crank the valve by the door."
 
 
+## True while the sentry is after the engineer: locking on or chasing.
+func _sentry_hunting() -> bool:
+	return sentry_brain.state == &"lock" or sentry_brain.state == &"chase"
+
+
 ## The tank can drop now: the engineer is at the ARM PANEL with the tank hanging over a live sentry.
 func _drop_ready() -> bool:
 	return state.chapter_id == "junction" and state.door_blown and not state.sentry_down and drop_arm.state == &"hung" and _at_arm_panel(human.position.x)
@@ -2211,7 +2254,7 @@ func _lane_hint(x: float) -> String:
 		return "The hatch is open. Leave through it." if bolt_state == &"open" else "The sentry is down. Pop the exit bolt by the hatch."
 	if drop_arm.cloud_active() and DropArm.in_cloud(x):
 		return "Coolant cloud. Get out of it."
-	if sentry_brain.state == &"chase" and x > SentryBrain.LANE_ENTRY_X:
+	if _sentry_hunting() and x > SentryBrain.LANE_ENTRY_X:
 		return "It's after you. Get back over the rubble."
 	if _at_arm_panel(x):
 		match drop_arm.state:
@@ -2221,7 +2264,7 @@ func _lane_hint(x: float) -> String:
 				return "The tank is falling."
 			&"rewinding":
 				return "The arm is rewinding. Wait for the clamp."
-	if sentry_brain.state == &"chase":
+	if _sentry_hunting():
 		return "Stay back over the rubble until it gives up."
 	if SentryBrain.is_exposed(x):
 		return "You're in its lane. Get into the panel alcove or back over the rubble."

@@ -8,7 +8,8 @@ extends Node2D
 ## - mid: the play plane, drawn 1:1 with the room so its painted walkway is the floor (y 440) the
 ##   actors and stations stand on;
 ## - near: the plate's edge pieces only (a left strip and the same strip mirrored on the right),
-##   drawn over the actors and scrolling faster than the floor.
+##   drawn over the actors and scrolling faster than the floor; a piece fades back while it covers
+##   one of the [member occluders] (the actors), so nobody is hidden at either end of the room.
 ## Source pixels are never edited. Main switches the depth pass with [member effects_enabled]: off,
 ## every plate moves with the floor and the near pieces, glows, haze and dust are hidden.
 ## The light moves only while the room is on screen: a hidden room (Main hides the rooms it is not
@@ -63,6 +64,14 @@ const SETTLED_BEACON_ALPHA: float = 0.1
 const SETTLED_LENS_DARKEN: float = 0.6
 ## How long the beacons take to settle when the route is cleared in play.
 const SETTLE_SECONDS: float = 1.2
+## A near edge piece fades to this opacity while it covers an actor, at NEAR_FADE_SPEED per second.
+const NEAR_FADE_ALPHA: float = 0.35
+const NEAR_FADE_SPEED: float = 4.0
+## The pressure bulkheads (design A) shared by the corridor seal and the junction door: their import
+## copies share one canvas per door whose bottom row is the floor, drawn at this scale, and the front
+## pillar's outer edge sits this many canvas pixels in from the left.
+const BULKHEAD_SCALE: float = 0.3
+const BULKHEAD_PILLAR_X: float = 83.0
 
 ## The far plate: back wall, painted lamps and wet floor (opaque).
 @export var painting: Texture2D
@@ -81,6 +90,9 @@ const SETTLE_SECONDS: float = 1.2
 ## difference, so the column at each end of the play view only grazes an engineer standing at the
 ## 40 / 920 clamp.
 @export var near_overhang: float = NEAR_OVERHANG
+## How many source pixels of each near strip, from the room's edge inward, are the painted column
+## that can cover an actor (the corridor's 57 px column; the junction's is 100 px).
+@export var near_column_width: float = 114.0
 @export var base_color: Color = Color("#091533")
 ## Ceiling lamp centres as fractions of the far plate, so the glows ride on its parallax.
 @export var lamps: PackedVector2Array = PackedVector2Array()
@@ -101,6 +113,8 @@ var effects_enabled: bool = true:
 var reduce_motion: bool = false
 ## True once Main says the room's route is cleared; see [method set_lockdown_cleared].
 var lockdown_cleared: bool = false
+## Sprites (the actors' bodies) the near edge pieces fade back from while they cover them.
+var occluders: Array[Sprite2D] = []
 
 var backdrop_layer: Parallax2D
 var backdrop: Sprite2D
@@ -144,6 +158,31 @@ func _ready() -> void:
 	z_index = Z_BACKDROP
 	_rng.randomize()
 	rebuild()
+
+
+func _process(delta: float) -> void:
+	if near_layer == null or not near_layer.visible or not is_visible_in_tree():
+		return
+	for edge_name: String in ["LeftEdge", "RightEdge"]:
+		var edge: Sprite2D = near_layer.get_node_or_null(edge_name) as Sprite2D
+		if edge == null:
+			continue
+		var target: float = NEAR_FADE_ALPHA if near_covers(edge) else 1.0
+		edge.modulate.a = move_toward(edge.modulate.a, target, NEAR_FADE_SPEED * delta)
+
+
+## True when [param edge]'s painted column covers any visible occluder on screen.
+func near_covers(edge: Sprite2D) -> bool:
+	var width: float = edge.region_rect.size.x
+	var column: float = minf(near_column_width, width)
+	var local: Rect2 = Rect2(width - column if edge.flip_h else 0.0, 0.0, column, edge.region_rect.size.y)
+	var screen: Rect2 = edge.get_global_transform_with_canvas() * local
+	for sprite: Sprite2D in occluders:
+		if is_instance_valid(sprite) and sprite.is_visible_in_tree():
+			var body: Rect2 = sprite.get_global_transform_with_canvas() * sprite.get_rect()
+			if body.position.x < screen.end.x and body.end.x > screen.position.x:
+				return true
+	return false
 
 
 func _notification(what: int) -> void:
@@ -463,6 +502,17 @@ static func make_prop(prop_name: String, texture: Texture2D, region: Rect2, prop
 	sprite.scale = Vector2.ONE * prop_scale
 	sprite.position = Vector2(center_x, base_y - region.size.y * prop_scale * 0.5)
 	return sprite
+
+
+## A bulkhead image (BULKHEAD_SCALE, its canvas bottom on the floor) placed so its front pillar's
+## outer edge is at [param face_x], the face of the door's collision body.
+static func make_bulkhead(prop_name: String, texture: Texture2D, region: Rect2, face_x: float) -> Sprite2D:
+	return make_prop(prop_name, texture, region, BULKHEAD_SCALE, bulkhead_center_x(region, face_x))
+
+
+## The centre x of a bulkhead drawn from [param region] with its front pillar's edge at [param face_x].
+static func bulkhead_center_x(region: Rect2, face_x: float) -> float:
+	return face_x + (region.get_center().x - BULKHEAD_PILLAR_X) * BULKHEAD_SCALE
 
 
 ## An additive radial glow; also used by rooms for their station status lights.
