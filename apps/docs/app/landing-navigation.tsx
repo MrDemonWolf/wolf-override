@@ -15,7 +15,7 @@ const menuLinks = [
   ['/docs/', 'Game guide'],
 ] as const;
 
-export default function MarketingNavigation() {
+export default function LandingNavigation() {
   const [isOpen, setIsOpen] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
   const triggerRef = useRef<HTMLButtonElement>(null);
@@ -73,7 +73,7 @@ export default function MarketingNavigation() {
         type="button"
         aria-label={isOpen ? 'Close navigation menu' : 'Open navigation menu'}
         aria-expanded={isOpen}
-        aria-controls="marketing-mobile-menu"
+        aria-controls="landing-mobile-menu"
         onClick={() => setIsOpen((open) => !open)}
       >
         <span className="grid w-4 gap-1" aria-hidden="true">
@@ -85,7 +85,7 @@ export default function MarketingNavigation() {
       </button>
       {/* A dropdown under the trigger; a four-column bar across the header on tablets; one column across it on phones. */}
       <nav
-        id="marketing-mobile-menu"
+        id="landing-mobile-menu"
         aria-label="Main navigation"
         hidden={!isOpen}
         className="absolute top-[calc(100%+.5rem)] right-0 z-40 grid min-w-52 gap-1 rounded-control border border-line-strong bg-panel/99 p-2 shadow-[0_14px_32px_rgba(0,5,18,.3)] phone:left-2 phone:right-2 phone:min-w-0 phone:grid-cols-[1fr] tablet:left-4 tablet:right-4 tablet:min-w-0 tablet:grid-cols-4"

@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import MarketingNavigation from './marketing-navigation';
+import LandingNavigation from './landing-navigation';
 import BrandLockup from './brand-lockup';
 import Downloads, { ArrowIcon, sourceBuildHref } from './downloads';
 import { card, inlineLink, landingWidth, navLink, sectionAnchor, sectionCopy, sectionTitle } from './landing-classes';
@@ -77,7 +77,7 @@ export default function HomePage() {
           <a className={navLink} href="#downloads">Get the build</a>
           <Link className={navLink} href="/docs/">Game guide</Link>
         </nav>
-        <MarketingNavigation />
+        <LandingNavigation />
       </header>
       <main id="landing-main">
         <section
