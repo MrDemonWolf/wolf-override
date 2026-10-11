@@ -22,8 +22,9 @@ touch devices and export packages are untested.
 
 - **One playable engineer** - Move through three side-view rooms while
   WOLF follows and takes his own tasks.
-- **Cooperation with a fallback** - Open a powered door together, or use
-  the engineer's bypass when WOLF refuses or you would rather not wait.
+- **Cooperation with a fallback** - Open a powered door together, or hold
+  interact to crank the engineer's manual bypass when WOLF refuses or you
+  would rather do it yourself.
 - **A remembered choice** - One authored disagreement records your reply
   and WOLF recalls it at the safe point.
 - **A first records objective** - Copy a purge-order trace and a mirror
@@ -85,7 +86,7 @@ opening is player-paced; Pause offers Skip Opening during it. Defaults:
 | -------------------------- | -------------------- | ------------------- | ---------------------------- |
 | Move                       | A / D or arrow keys  | Left stick or D-pad | Hold the on-screen arrows    |
 | Interact / continue a beat | E                    | A                   | USE (CONTINUE during a beat) |
-| Crank the junction valve   | Hold E               | Hold A              | Hold CRANK                   |
+| Crank the bypass or valve  | Hold E               | Hold A              | Hold CRANK                   |
 | Answer 1 / Answer 2        | 1 / 2 or click       | X / Y               | Tap the response             |
 | Pause or resume            | Esc                  | Start               | PAUSE; tap RESUME to return  |
 | Back in menus              | Esc                  | B                   | Android Back                 |

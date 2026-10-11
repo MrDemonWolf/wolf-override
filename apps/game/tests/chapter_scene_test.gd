@@ -50,6 +50,7 @@ func _run() -> void:
 	await _tap(&"choice_1")
 	_expect(state.mirror_trace_preserved and state.mirror_route == "wolf" and not game.get("waiting_for_choice"), "WOLF readout preserves timestamp once")
 	_expect(state.memory.get("choice_id") == State.DISCLOSE and state.memory.get("event_id") == State.EVENT_ID, "chapter preserves the actual relay memory")
+	_expect(str(game.call("_context_hint")) == "Mirror copied. Head for the exit.", "once the mirror timestamp is copied the mirror port's hint says so instead of offering it again")
 	if not await _walk_to(human, 830.0):
 		_fail("engineer can reach the records exit")
 		return
@@ -117,6 +118,7 @@ func _run() -> void:
 	await _tap(&"interact")
 	await _tap(&"choice_2")
 	_expect(state.mirror_trace_preserved and state.mirror_route == "manual", "manual port preserves the required timestamp")
+	_expect(str(game.call("_context_hint")) == "Mirror copied. Head for the exit.", "the manual copy also leaves the mirror port reading as copied")
 	_expect(state.memory.get("choice_id") == State.PRESS, "manual route retains accurate earlier choice")
 	_expect(not (game.get_node("Wolf") as M0Actor).controlled, "fallback never transfers control to WOLF")
 	if not await _walk_to(human, 830.0):

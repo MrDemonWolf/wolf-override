@@ -86,8 +86,11 @@ func _run() -> void:
 	_expect(game.get("intro_step") == 1 and str(game.get("status_line")).contains("wakes himself"), "WOLF wakes himself and opens containment")
 	await _tap(&"interact")
 	_expect(game.get("intro_step") == 2 and str(game.get("status_line")).contains("gate slides aside"), "WOLF opens containment from inside through a sliding gate")
+	await create_timer(1.2).timeout
+	_expect(intro_gate.visible and is_equal_approx(float(intro_gate.get("opening")), 1.0), "the opened gate stays drawn, folded aside, instead of vanishing")
 	await _tap(&"interact")
 	_expect(game.get("intro_step") == 3 and str(game.get("status_line")).contains("I won't do it"), "WOLF refuses the Director before the engineer arrives")
+	_expect(intro_gate.visible and is_equal_approx(float(intro_gate.get("opening")), 1.0), "the gate is still standing open in the next beat")
 	await _tap(&"interact")
 	_expect(game.get("intro_step") == 4 and str(game.get("status_line")).contains("Lock down maintenance"), "Director orders lockdown as WOLF leaves")
 	await _tap(&"interact")
@@ -100,8 +103,20 @@ func _run() -> void:
 	_expect(wolf.position.x < human.position.x and is_equal_approx(human.position.x - wolf.position.x, M0Actor.FOLLOW_GAP), "WOLF starts one follow gap behind, not inside, the engineer")
 	_expect(human.controlled and not wolf.controlled and not InputMap.has_action(&"switch_actor"), "only the engineer has movement controls")
 	_expect(game.call("_objective") == "CHECK THE BREAKER", "opening points to the first corridor objective")
-	_expect(top_card.visible and hud.text.contains("CHECK THE BREAKER"), "new gameplay objective appears as a short card")
-	_expect(speaker.text.is_empty() and story.text.begins_with("WOLF:") and story.text.contains("\n%s:" % state.human_name().get_slice(" ", 0).to_upper()), "two speakers keep their own names in the opening exchange")
+	var name_card: String = "%s\nMAINTENANCE ENGINEER" % state.human_name().to_upper()
+	var card_accent: ColorRect = game.get_node("CanvasLayer/TopBar/Accent") as ColorRect
+	_expect(top_card.visible and hud.text == name_card and card_accent.color == Color("#f4d5ae") and human.controlled, "control starts with the engineer's name card, in their colour, without taking the controls")
+	_expect(_widest_line(hud) <= hud.size.x, "the name card fits its card")
+	state.cycle_name()
+	game.call("_refresh_ui")
+	_expect(hud.text == "ALEX BENNETT\nMAINTENANCE ENGINEER", "cycling the provisional name updates the name card while it is up")
+	state.cycle_name()
+	state.cycle_name()
+	game.call("_refresh_ui")
+	_expect(speaker.text.is_empty() and story.text.begins_with("Rowan keeps WOLF's systems running. They know what a fault looks like, and this isn't one.\nWOLF:") and story.text.contains("\n%s:" % state.human_name().get_slice(" ", 0).to_upper()), "the opening box says why the engineer trusts WOLF, then both speakers keep their own names")
+	await create_timer(3.3).timeout
+	game.call("_refresh_ui")
+	_expect(top_card.visible and hud.text.contains("CHECK THE BREAKER") and card_accent.color == Color(0.22, 0.78, 0.92, 1), "the objective card follows the name card")
 	await create_timer(3.9).timeout
 	game.call("_refresh_ui")
 	_expect(not top_card.visible, "gameplay objective card fades without returning each frame")
@@ -127,6 +142,7 @@ func _run() -> void:
 	if not _require(await _walk_to(human, 350.0), "active engineer reaches breaker by moving right"):
 		return
 	_expect(human.position.x > start_x and wolf.position.x > 225.0 and wolf.position.x < human.position.x, "WOLF follows the engineer autonomously")
+	_expect(str(game.get("status_line")) == "WOLF: That purge takes the original program logs. Once they're gone, his word is the only record.", "walking past the purge display, WOLF says what the purge takes")
 	if not _require(await _walk_to(human, 450.0), "engineer can move beyond the breaker"):
 		return
 	if not _require(await _walk_to(human, 350.0), "engineer can backtrack to the breaker"):
@@ -138,7 +154,9 @@ func _run() -> void:
 	await _tap(&"interact")
 	if not _require(game.get("waiting_for_choice"), "breaker opens authored disagreement"):
 		return
-	_expect(speaker.text == "WOLF" and story.text.contains("coolant fault") and not story.text.contains("\n1  "), "dialogue identifies WOLF and keeps response text out of the question")
+	_expect(speaker.text == "WOLF" and story.text.contains("COOLANT FAULT") and not story.text.contains("\n1  "), "dialogue identifies WOLF, points at the relay's fault tag and keeps response text out of the question")
+	var bypass_handle: BypassHandle = game.get("bypass_handle") as BypassHandle
+	_expect(bypass_handle.visible and bypass_handle.fault_tag.text == "COOLANT FAULT" and bypass_handle.bypass_label.text == "MANUAL BYPASS", "the relay wears a COOLANT FAULT tag and the bypass its own name plate")
 	_expect(not context_hint.visible and choice_1_button.visible and choice_2_button.visible, "disagreement offers visible choices without a competing interaction hint")
 	_expect(choice_1_button.text.contains(State.CHOICE_TEXT[State.DISCLOSE]) and choice_2_button.text.contains(State.CHOICE_TEXT[State.PRESS]), "choice buttons show the complete response text")
 	_expect(choice_1_button.size.y == 40.0 and choice_2_button.size.y == 40.0 and choice_1_button.text.begins_with("1  "), "keyboard choices use compact cards with number prompts")
@@ -174,27 +192,38 @@ func _run() -> void:
 	game.call("_refresh_ui")
 	game.call("_update_gameplay_camera")
 	_expect(not wolf.controlled and wolf.position.x > 400.0 and wolf.position.x < human.position.x, "WOLF stays a companion at the relay")
-	_expect(str(game.call("_context_hint")).contains("ask WOLF"), "relay hint offers WOLF the live contact")
+	_expect(str(game.call("_context_hint")) == "E: signal WOLF to take the contact.", "after WOLF offered, the relay hint signals him instead of asking again")
 	await _tap(&"interact")
 	if not _require(not state.door_open and game.get("wolf_heading_to_relay") and str(game.get("status_line")).contains("I've got the contact"), "WOLF sets off for the contact himself and the seal stays closed until he arrives"):
 		return
-	_expect(str(game.call("_context_hint")).contains("manual bypass"), "the engineer keeps a bypass while WOLF walks")
+	_expect(not human.controlled and is_equal_approx(float(game.get("engineer_step_x")), 736.0) and str(game.call("_context_hint")) == "WOLF is moving to the contact.", "the engineer steps back from the relay while WOLF walks to it")
 	if not _require(await _wait_until(func() -> bool: return not game.get("wolf_heading_to_relay"), 120), "WOLF reaches the contact by himself"):
 		return
 	if not _require(state.door_open and state.route == "cooperate", "WOLF cooperation opens door"):
 		return
+	_expect(human.controlled and human.position.x - M0Actor.HUMAN_REACH >= 592.0 + M0Actor.WOLF_REACH, "the engineer is clear of WOLF on the contact before he takes it")
+	_expect(str(game.get("status_line")) == "WOLF takes the surge through the live contact. The red seal opens.", "the payoff line says what the screen shows")
 	_expect(relay_status_light.color == Color("#a4f0c4"), "open relay changes from live cyan to completed green")
 	_expect(relay_spark.visible and relay_spark.default_color == Color("#8be3ff"), "WOLF's contact produces a visible cyan relay spark")
 	_expect(game.call("_objective") == "REACH SAFE POINT", "open seal points to safety")
-	_expect(str(game.call("_context_hint")).contains("Move to the safe point"), "open-door hint no longer sends the player back to the breaker")
-	await create_timer(0.68).timeout
+	_expect(str(game.call("_context_hint")) == "The seal is opening." and wolf.autonomous_target_x == 592.0, "while the seal rises the hint says it is opening and WOLF stays on the contact")
+	var door_shape: CollisionShape2D = game.get_node("Door/CollisionShape2D") as CollisionShape2D
+	var seal_leaf: SealLeaf = game.get("seal_leaf") as SealLeaf
+	await create_timer(0.45).timeout
+	_expect(seal_leaf.visible and seal_leaf.open > 0.05 and seal_leaf.open < 0.95 and not door_shape.disabled and wolf.autonomous_target_x == 592.0 and absf(wolf.position.x - 592.0) <= 4.0, "half way the seal's leaf is rising into the header, the doorway is still shut and WOLF still holds the contact")
+	if not _require(await _wait_until(func() -> bool: return not game.get("seal_opening"), 90), "the seal finishes opening"):
+		return
+	await physics_frame
 	var door_visual: ColorRect = game.get_node("Door/Visual") as ColorRect
-	_expect(not door_visual.visible, "door retracts after cooperation")
+	_expect(not door_visual.visible and not seal_leaf.visible and door_shape.disabled, "door retracts after cooperation and the doorway opens once it lands")
+	_expect(str(game.call("_context_hint")).contains("Move to the safe point") and wolf.follow_target == human, "once the seal has landed the hint says it is open and WOLF lets go of the contact")
 	_expect((game.get("door_open_art") as Sprite2D).visible and (game.get("door_lip") as Sprite2D).visible and (game.get("door_lip") as Sprite2D).z_index > human.z_index, "the bulkhead stands open behind the engineer, its front pillar drawn over him")
 	_expect((game.get("corridor_depth") as RoomDepth).pillars.has(game.get("door_lip")), "the corridor's front pillar fades back while it covers the engineer or WOLF")
 	_expect(not relay_spark.visible and wolf.body_sprite.position == Vector2(0.0, -15.0), "contact reaction settles after the seal opens")
+	if not _require(await _walk_to(human, 605.0), "the engineer can walk back to the open relay"):
+		return
 	await _tap(&"interact")
-	_expect(not door_visual.visible, "reusing the open relay does not replay the door seal")
+	_expect(not door_visual.visible and not seal_leaf.visible, "reusing the open relay does not replay the door seal")
 	if not _require(await _walk_to(human, 876.0), "engineer walks through opened door to checkpoint"):
 		return
 	await _tap(&"interact")
@@ -228,13 +257,18 @@ func _run() -> void:
 		return
 	await process_frame
 	_expect(game.get("tutorial_step") == 2 and not tutorial_prompt.visible and not str(game.get("status_line")).contains("Original program logs"), "reaching the breaker clears the tutorial without reading the display")
+	_expect(str(game.get("status_line")).begins_with("WOLF: That purge takes the original program logs."), "skipping the display, the engineer still hears what the purge takes")
+	game.set("status_line", "WOLF: Quiet.")
+	if not _require(await _walk_to(human, 200.0) and await _walk_to(human, 350.0), "engineer walks back past the display and returns"):
+		return
+	_expect(str(game.get("status_line")) == "WOLF: Quiet.", "the stakes line is said once per run, not every pass")
 	await _tap(&"interact")
 	if not _require(game.get("waiting_for_choice"), "fallback opens authored disagreement"):
 		return
 	await _tap(&"choice_2")
 	if not _require(state.memory.get("choice_id") == State.PRESS, "second dialogue key records pressed risk"):
 		return
-	_expect(str(game.get("status_line")).contains("I won't take that risk blind"), "WOLF refuses the live contact")
+	_expect(str(game.get("status_line")) == "WOLF: No. I won't take that risk blind. Use the manual bypass.", "WOLF refuses the live contact and names the manual bypass")
 	await create_timer(0.1).timeout
 	_expect(wolf.body_sprite.position.x < -2.0, "WOLF visibly steps back from the unwarned request")
 	await _tap(&"interact")
@@ -242,24 +276,48 @@ func _run() -> void:
 		return
 	if not _require(await _walk_to(human, 605.0), "engineer reaches manual bypass on fallback play"):
 		return
-	_expect(not state.door_open and str(game.call("_context_hint")).contains("ask WOLF"), "relay first offers WOLF a choice")
+	_expect(not state.door_open and str(game.call("_context_hint")) == "WOLF refused the live contact. Use the MANUAL BYPASS beside it.", "after WOLF's refusal at the breaker the relay points at the bypass at once instead of asking him again")
+	_expect(relay_status_light.color == Color("#f3ae4b"), "refused relay shows an amber state")
 	await _tap(&"interact")
 	if not _require(not state.door_open and state.route.is_empty() and game.get("relay_refused"), "WOLF refuses and keeps the seal closed"):
 		return
-	_expect(relay_status_light.color == Color("#f3ae4b"), "refused relay shows an amber state")
-	_expect(str(game.get("status_line")).contains("I said no") and str(game.call("_context_hint")).contains("manual bypass"), "refusal clearly offers the engineer's bypass")
+	_expect(str(game.get("status_line")) == "WOLF: I said no. I won't touch it blind. The bypass is right beside it." and str(game.call("_context_hint")).contains("MANUAL BYPASS"), "refusal points at the bypass without a key name in WOLF's voice")
+	await _tap(&"interact")
+	_expect(not state.door_open and str(game.get("status_line")).begins_with("WOLF: I said no."), "a second USE at the relay repeats his refusal; the relay is never the bypass")
 	Input.action_press(&"move_right")
 	for _frame in range(180):
 		await physics_frame
 	Input.action_release(&"move_right")
 	_expect(human.position.x < 760.0, "locked door physically blocks the engineer")
-	if not _require(await _walk_to(human, 605.0), "engineer can return to manual bypass after refusal"):
+	if not _require(await _walk_to(human, 700.0), "engineer walks to the manual bypass after refusal"):
 		return
+	_expect(str(game.call("_context_hint")) == "HOLD E: crank the manual bypass, 0 of 8." and game.call("_hold_station") == &"bypass", "the bypass asks for a held USE and counts the turns")
+	game.set("touch_enabled", true)
+	game.call("_refresh_ui")
+	_expect((game.get_node("CanvasLayer/TouchControls/Use") as Button).text == "CRANK", "on touch the USE button reads CRANK at the bypass")
+	game.set("touch_enabled", false)
+	game.call("_refresh_ui")
 	await _tap(&"interact")
-	if not _require(state.door_open and state.route == "fallback", "engineer bypass opens door"):
+	_expect(not state.door_open and game.get("bypass_venting") and bypass_handle.venting and bypass_handle.coolant_hiss.emitting and str(game.get("status_line")) == "The bypass handle is stiff. Coolant hisses from the relay housing and an alarm starts to wail.", "touching the live bypass starts the coolant hiss and the alarm without opening anything")
+	var crank_start: int = Time.get_ticks_msec()
+	Input.action_press(&"interact")
+	var halfway: bool = await _wait_until(func() -> bool: return int(game.get("bypass_ticks")) >= 4, 150)
+	Input.action_release(&"interact")
+	_expect(halfway and str(game.get("status_line")) == "Halfway. The hiss gets louder; the alarm keeps wailing." and bypass_handle.ticks == int(game.get("bypass_ticks")), "half way through the crank the hiss gets louder and the handle shows the count")
+	await physics_frame
+	await process_frame
+	var kept: int = int(game.get("bypass_ticks"))
+	_expect(not state.door_open and kept >= 4 and str(game.get("status_line")) == "The handle holds where Rowan left it. The alarm keeps going." and str(game.call("_context_hint")) == "HOLD E: crank the manual bypass, %d of 8." % kept, "letting go keeps the turns made; the alarm keeps going")
+	Input.action_press(&"interact")
+	var opened: bool = await _wait_until(func() -> bool: return state.door_open, 150)
+	Input.action_release(&"interact")
+	if not _require(opened and state.route == "fallback", "cranking the bypass to the end opens the seal on the engineer's own work"):
 		return
+	_expect(Time.get_ticks_msec() - crank_start >= int(8 * HoldUse.TICK_SECONDS * 1000.0) - 50 and int(game.get("bypass_ticks")) == 8, "the bypass takes about three seconds of held USE")
+	_expect(not game.get("bypass_venting") and not bypass_handle.coolant_hiss.emitting and bypass_handle.done and str(game.get("status_line")) == "The bypass locks over and the alarm cuts out. The red seal opens.\nWOLF: Open. I'm with you.", "the bypass locks over, the alarm cuts out and WOLF answers")
 	_expect(relay_spark.visible and relay_spark.default_color == Color("#f3ae4b"), "manual bypass produces a distinct amber relay spark")
-	_expect(str(game.call("_context_hint")).contains("Move to the safe point"), "fallback hint points through the open seal")
+	_expect(str(game.call("_context_hint")) == "The seal is opening.", "the hint says the seal is opening while it rises")
+	_expect(await _wait_until(func() -> bool: return not game.get("seal_opening"), 90) and str(game.call("_context_hint")).contains("Move to the safe point"), "fallback hint points through the open seal once it has landed")
 	if not _require(await _walk_to(human, 876.0), "engineer walks through opened door to checkpoint"):
 		return
 	await _tap(&"cycle_name")
@@ -269,7 +327,7 @@ func _run() -> void:
 	await _tap(&"interact")
 	if not _require(state.checkpoint_reached, "fallback reaches checkpoint"):
 		return
-	_expect(str(game.get("status_line")).contains(State.CHOICE_TEXT[State.PRESS]), "fallback checkpoint displays the selected choice")
+	_expect(str(game.get("status_line")).contains(State.CHOICE_TEXT[State.PRESS]) and str(game.get("status_line")).ends_with("Next time, tell me what it costs."), "fallback checkpoint displays the selected choice and WOLF's follow-up")
 	saved = state.to_dict()
 	game.call("_load_game")
 	await process_frame
@@ -286,6 +344,8 @@ func _run() -> void:
 	continue_button = game.get_node("CanvasLayer/TitleScreen/ContinueButton") as Button
 	human = game.get_node("Human") as M0Actor
 	wolf = game.get_node("Wolf") as M0Actor
+	top_card = game.get_node("CanvasLayer/TopBar") as Panel
+	hud = game.get_node("CanvasLayer/TopBar/HUD") as Label
 	if not _require(game.get("title_open") and title_screen.visible and not continue_button.disabled, "fresh title enables Continue for the test checkpoint"):
 		return
 	continue_note = game.get_node("CanvasLayer/TitleScreen/ContinueNote") as Label
@@ -303,10 +363,16 @@ func _run() -> void:
 	game.call("_refresh_continue")
 	_expect(continue_button.disabled and continue_note.text == "Saved checkpoint could not be read." and continue_button.tooltip_text == continue_note.text, "disabled Continue explains an unreadable checkpoint")
 
-	# Disclosed risk, but the engineer takes the bypass while WOLF is still walking.
+	# Disclosed risk, but the engineer cranks the bypass instead of signalling WOLF.
 	game.call("_new_game")
 	game.call("_finish_intro")
 	state = game.get("state") as M0State
+	var bypass: BypassHandle = game.get("bypass_handle") as BypassHandle
+	_expect(int(game.get("bypass_ticks")) == 0 and bypass.ticks == 0 and not bypass.done, "a new run starts with the bypass uncranked")
+	_expect(top_card.visible and hud.text.contains("MAINTENANCE ENGINEER"), "every new run opens on the name card")
+	await _tap(&"interact")
+	await process_frame
+	_expect(float(game.get("name_card_remaining")) == 0.0 and hud.text.contains("MAINTENANCE / LOCKDOWN"), "the first USE skips the name card and the location card follows")
 	if not _require(await _walk_to(human, 350.0), "engineer reaches breaker on the disclose-then-bypass route"):
 		return
 	await _tap(&"interact")
@@ -314,14 +380,16 @@ func _run() -> void:
 	await _tap(&"interact")
 	if not _require(state.breaker_armed, "breaker arms on the disclose-then-bypass route"):
 		return
-	if not _require(await _walk_to(human, 605.0), "engineer reaches the relay after disclosing"):
+	if not _require(await _walk_to(human, 700.0), "engineer reaches the bypass after disclosing"):
 		return
-	await _tap(&"interact")
-	if not _require(game.get("wolf_heading_to_relay"), "WOLF heads for the contact after the risk is disclosed"):
-		return
-	await _tap(&"interact")
-	_expect(state.door_open and state.route == "fallback" and not game.get("wolf_heading_to_relay") and str(game.get("status_line")).contains("takes the bypass"), "a second use while WOLF walks is the engineer's bypass")
-	_expect(wolf.follow_target == human, "WOLF returns to following after the bypass")
+	_expect(str(game.call("_context_hint")) == "HOLD E: crank it yourself, or let WOLF take the relay.", "after WOLF offered, the bypass still offers the engineer-only way")
+	Input.action_press(&"interact")
+	var cranked: bool = await _wait_until(func() -> bool: return state.door_open, 300)
+	Input.action_release(&"interact")
+	_expect(cranked and state.route == "fallback" and not game.get("wolf_heading_to_relay") and str(game.get("status_line")).begins_with("The bypass locks over"), "the engineer can crank the bypass even after WOLF offered")
+	_expect(wolf.follow_target == human or wolf.autonomous_target_x < 0.0, "WOLF keeps following while the engineer works the bypass")
+	state.reach_checkpoint()
+	_expect(state.checkpoint_callback().ends_with("I made my call. You cranked the bypass anyway. I stayed."), "the safe point remembers that WOLF offered and the engineer cranked the bypass anyway")
 	DirAccess.remove_absolute(ProjectSettings.globalize_path(path))
 	game.queue_free()
 	# The bypass clip is still playing; the mixer releases a stopped clip a few steps later, so give it that time before quitting.

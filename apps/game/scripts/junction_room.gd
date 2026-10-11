@@ -11,6 +11,9 @@ class_name JunctionRoom
 ## plate cut by the edge of the view fades out rather than show part of its name. What pulses follows
 ## the mirrored state (the fuse, the gauge), not a timer of its own.
 
+## The exit hatch has finished sliding open after the bolt arcs (bolt_arc).
+signal hatch_opened
+
 const JUNCTION_FAR: Texture2D = preload("res://assets/rooms/junction-far.png")
 const JUNCTION_MID: Texture2D = preload("res://assets/rooms/junction-mid.png")
 const JUNCTION_NEAR: Texture2D = preload("res://assets/rooms/junction-near.png")
@@ -800,12 +803,14 @@ func tank_miss() -> void:
 	tank.dented = true
 
 
-## The bolt lets go and the hatch slides open (the parent fires the panel's sparks).
+## The bolt lets go and the hatch slides open (the parent fires the panel's sparks); hatch_opened
+## follows once it is open.
 func bolt_arc() -> void:
 	if _hatch_tween != null and _hatch_tween.is_valid():
 		_hatch_tween.kill()
 	_hatch_tween = create_tween()
 	_hatch_tween.tween_property(self, "hatch_open", 1.0, HATCH_OPEN_SECONDS).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_IN_OUT)
+	_hatch_tween.tween_callback(func() -> void: hatch_opened.emit())
 
 
 func _turn_wheel(to_turns: int) -> void:

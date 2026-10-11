@@ -11,13 +11,14 @@ func _draw() -> void:
 	var steel: Color = Color("#24323a")
 	var edge: Color = Color("#6b7e86")
 	if shutter:
-		var right: float = 80.0 - opening * 160.0
-		if right <= -80.0:
-			return
+		# A folding gate: the bars slide aside and stack against the left post, so once open the gate
+		# still stands there, folded, instead of vanishing.
+		var index: int = 0
+		var right: float = 80.0
 		for rest_x: int in range(-72, 73, 18):
-			var x: float = rest_x - opening * 160.0
-			if x < -77.0:
-				continue
+			var x: float = lerpf(rest_x, -74.0 + index * 3.5, opening)
+			right = x + 3.0
+			index += 1
 			draw_rect(Rect2(x - 3, -53, 6, 125), Color("#111a20"))
 			draw_line(Vector2(x - 2, -53), Vector2(x - 2, 72), Color("#52616a"), 1.0)
 			draw_line(Vector2(x + 2, -53), Vector2(x + 2, 72), Color("#080e13"), 2.0)

@@ -172,10 +172,11 @@ func checkpoint_callback() -> String:
 		return ""
 	var said: String = str(memory.get("selected_text", ""))
 	if memory.get("choice_id") == PRESS:
-		return "WOLF: You said \"%s\"\nI refused. You found another way." % said
+		return "WOLF: You said \"%s\"\nI refused. You found another way. Next time, tell me what it costs." % said
 	if route == "cooperate":
 		return "WOLF: You said \"%s\"\nI chose the relay. We made it." % said
-	return "WOLF: You said \"%s\"\nYou took the bypass. I stayed with you." % said
+	# Told the risk, he offered the contact; the engineer cranked the manual bypass instead.
+	return "WOLF: You said \"%s\"\nI made my call. You cranked the bypass anyway. I stayed." % said
 
 
 func to_dict() -> Dictionary:

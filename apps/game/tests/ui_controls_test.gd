@@ -101,6 +101,23 @@ func _run() -> void:
 	await process_frame
 	use.button_up.emit()
 	_expect(game.get("tutorial_step") == 2 and not (game.get_node("CanvasLayer/TutorialPrompt") as Control).visible, "touch use reads the display and clears the tutorial")
+	# Holding the touch USE button cranks the corridor's MANUAL BYPASS; Pause lets go and keeps the turns made.
+	var crank_state: M0State = game.get("state") as M0State
+	crank_state.record_choice(M0State.PRESS)
+	crank_state.arm_breaker()
+	(game.get_node("Human") as M0Actor).position.x = 700.0
+	game.call("_refresh_ui")
+	_expect(use.text == "CRANK", "touch USE reads CRANK at the live bypass")
+	use.button_down.emit()
+	await create_timer(1.0).timeout
+	var held_turns: int = int(game.get("bypass_ticks"))
+	_expect(held_turns >= 2 and not crank_state.door_open, "holding touch USE cranks the bypass (%d turns after a second)" % held_turns)
+	game.call("_pause_game")
+	_expect(paused and not Input.is_action_pressed(&"interact"), "Pause lets go of a held USE")
+	use.button_up.emit()
+	game.call("_resume_game")
+	await create_timer(0.5).timeout
+	_expect(int(game.get("bypass_ticks")) == held_turns and not crank_state.door_open, "the turns made before Pause stay, and nothing cranks without the button held")
 	game.set("waiting_for_choice", true)
 	game.call("_refresh_ui")
 	var first_choice: Button = touch.get_node("Choice1") as Button
