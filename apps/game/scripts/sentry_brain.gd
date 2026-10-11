@@ -4,41 +4,48 @@ extends RefCounted
 ## until the blast wakes it), patrol (bouncing PATROL_MIN_X..PATROL_MAX_X), lock (it has just
 ## seen the engineer, or a missed drop turned it: it stops and turns to them for LOCK_SECONDS before
 ## it moves), chase (running the engineer down in its lane), fixated (WOLF chose to draw it; it
-## parks just past him, on the mark) and down (the tank landed on it; nothing moves it again). Advanced with real delta so tests are frame-independent;
+## parks BAIT_OFFSET past him, on the mark) and down (the tank landed on it; nothing moves it again). Advanced with real delta so tests are frame-independent;
 ## the room sets [member paused] during a choice and never ticks it while the game is paused or
 ## during a knockdown.
 
 ## The rubble line the sentry never crosses; an engineer at or left of LANE_ENTRY_X is out of its lane.
 const RUBBLE_X: float = 540.0
 const LANE_ENTRY_X: float = RUBBLE_X + 5.0
-## The ARM PANEL alcove: an engineer centred in it is out of the sentry's sight, though a sentry that
-## is already chasing still runs them down there.
-const COVER_MIN_X: float = 556.0
-const COVER_MAX_X: float = 584.0
+## The TANK RELEASE alcove, exactly as JunctionRoom draws it: it starts at the rubble line, so there is
+## no exposed strip between the two, and an engineer centred anywhere in it is out of the sentry's
+## sight, though a sentry that is already chasing still runs them down at the release.
+const COVER_MIN_X: float = LANE_ENTRY_X
+const COVER_MAX_X: float = 598.0
 ## How far ahead it sees, in the direction it faces.
 const SIGHT_RANGE: float = 180.0
 ## Half the sentry's body. Bodies touching (this plus half the engineer) is contact.
 const HALF_WIDTH: float = 26.0
 const CONTACT_RANGE: float = HALF_WIDTH + M0State.HUMAN_HALF_WIDTH
 ## The patrol turns where its front edge meets an engineer standing at the alcove's right end, so a
-## patrolling sentry never runs into someone hiding there (624; the patrol still crosses the mark).
+## patrolling sentry never runs into someone hiding there (638; the patrol still crosses the mark).
 const PATROL_MIN_X: float = COVER_MAX_X + CONTACT_RANGE
 const PATROL_MAX_X: float = 840.0
 const PATROL_SPEED: float = 140.0
 const CHASE_SPEED: float = 230.0
-## The closest it comes to the rubble while chasing: one pixel more than contact range past the lane
-## edge, so an engineer anywhere out of the lane is out of reach.
+## The closest it comes to the rubble while chasing an engineer in its lane (the alcove included): one
+## pixel more than contact range past the lane edge, so it runs down anyone in the alcove while an
+## engineer anywhere out of the lane is out of reach.
 const CHASE_MIN_X: float = LANE_ENTRY_X + CONTACT_RANGE + 1.0
+## Once the chased engineer is back over the rubble it waits here instead, at the alcove's mouth with
+## its body clear of the alcove, so a chase that loses them never leaves it parked inside.
+const WATCH_X: float = COVER_MAX_X + HALF_WIDTH + 4.0
 ## The lock-on beat between seeing the engineer and chasing them: it holds still, facing them, for
 ## this long, so a chase never starts on the frame it first sees someone.
 const LOCK_SECONDS: float = 0.5
 ## Seconds an engineer must stay back over the rubble before a chase gives up.
 const LOSE_SECONDS: float = 2.5
 ## A fixated sentry parks this far past the one drawing it, on the far side from the rubble. WOLF comes
-## from the rubble and stops short of the mark, so he never has to cross the machine. Their bodies
-## clear each other (26 + 31 = 57) with room for a sentry that turns on the panel after a miss and
-## gains 10 px/s on WOLF as he backs off to the rubble, and WOLF stays clear of the tank's footprint.
-const BAIT_OFFSET: float = 64.0
+## from the rubble and stops short of the mark, so he never has to cross the machine. 116 is the floor
+## brackets' half width (DropArm.HIT_RANGE, 24) plus WOLF's drawn reach (M0Actor.WOLF_REACH, 67) plus
+## 25 px of air, so all of his drawn body stays outside the brackets and the tank's footprint while he
+## holds it on the mark; the bodies clear each other by far more than contact, and a sentry that turns
+## on the release after a miss never catches WOLF backing off to the rubble.
+const BAIT_OFFSET: float = 116.0
 const EPSILON: float = 0.00001
 
 var state: StringName = &"dormant"
@@ -122,7 +129,7 @@ func tick(delta: float, engineer_x: float, engineer_exposed: bool, bait_x: float
 				if spare > EPSILON:
 					return tick(spare, engineer_x, engineer_exposed, bait_x)
 		&"chase":
-			_move_toward(engineer_x, CHASE_SPEED, delta)
+			_move_toward(engineer_x, CHASE_SPEED, delta, CHASE_MIN_X if engineer_x > LANE_ENTRY_X else WATCH_X)
 			if engineer_x <= LANE_ENTRY_X:
 				lost_seconds += delta
 				if lost_seconds >= LOSE_SECONDS - EPSILON:
@@ -131,6 +138,12 @@ func tick(delta: float, engineer_x: float, engineer_exposed: bool, bait_x: float
 			else:
 				lost_seconds = 0.0
 	return state
+
+
+## True when it is fixated on WOLF drawing it from [param bait_x] and has stopped where it holds,
+## BAIT_OFFSET past him (on the mark): the moment the tank can be dropped on it.
+func is_holding(bait_x: float) -> bool:
+	return state == &"fixated" and absf(x - clampf(bait_x + BAIT_OFFSET, CHASE_MIN_X, PATROL_MAX_X)) <= EPSILON
 
 
 ## True when a chasing sentry has reached the engineer.
@@ -185,8 +198,8 @@ func _hold_on(bait_x: float, delta: float) -> void:
 		facing = signf(bait_x - x)
 
 
-func _move_toward(target_x: float, speed: float, delta: float) -> void:
-	var goal: float = clampf(target_x, CHASE_MIN_X, PATROL_MAX_X)
+func _move_toward(target_x: float, speed: float, delta: float, min_x: float = CHASE_MIN_X) -> void:
+	var goal: float = clampf(target_x, min_x, PATROL_MAX_X)
 	var step: float = speed * delta
 	if absf(goal - x) <= step:
 		x = goal

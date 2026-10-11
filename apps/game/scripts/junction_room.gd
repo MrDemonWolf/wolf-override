@@ -3,11 +3,13 @@ class_name JunctionRoom
 ## Blowback: the Service Junction, the third 960 px room after the Records exit, built from its own
 ## layered set (RoomDepth) and painted station props, with the corridor's breaker and a pressure
 ## bulkhead for its door. What the art cannot show is drawn over it here from the state the parent
-## mirrors in (PressureLine, DropArm, SentryBrain): the gauge needle, the vent and seam glows, the
-## panel and hatch lights, the alcove's shadow, the passage behind the exit hatch, the floor mark,
-## the rubble line and the tank's cable. Station names sit on small plates in one row of clear wall
-## (the vent's on the floor by its grate), and a plate cut by the edge of the view fades out rather
-## than show part of its name. Nothing animates on a timer of its own.
+## mirrors in (PressureLine, DropArm, SentryBrain): the LINE gauge's needle, the vent and seam glows,
+## the hazard stripes over the door's blast zone while the fuse burns, the panel and hatch lights, the
+## alcove's shadow and floor, the passage behind the exit hatch, the floor brackets (lit while the
+## sentry's body is inside them) with the tank's shadow, the rubble line and the winch cable. Station
+## names sit on small plates in one row of clear wall (the vent's on the floor by its grate), and a
+## plate cut by the edge of the view fades out rather than show part of its name. What pulses follows
+## the mirrored state (the fuse, the gauge), not a timer of its own.
 
 const JUNCTION_FAR: Texture2D = preload("res://assets/rooms/junction-far.png")
 const JUNCTION_MID: Texture2D = preload("res://assets/rooms/junction-mid.png")
@@ -88,7 +90,7 @@ const VALVE_X: float = 420.0
 const DOOR_X: float = 480.0
 ## The rubble line is the sentry's lane boundary.
 const RUBBLE_X: float = SentryBrain.RUBBLE_X
-## The ARM PANEL sits in the middle of the alcove that hides the engineer from the sentry.
+## The TANK RELEASE sits in the middle of the alcove that hides the engineer from the sentry.
 const ARM_X: float = (SentryBrain.COVER_MIN_X + SentryBrain.COVER_MAX_X) * 0.5
 ## The bolt is used from BOLT_X - 40 rightward; its panel stands on the floor in that span, its right
 ## cables running into the hatch frame.
@@ -102,8 +104,13 @@ const WOLF_SEAM_X: float = 418.0
 ## (He holds at the near edge of the rubble, so his sprite stays clear of the engineer at CHOICE_X.)
 const WOLF_RUBBLE_X: float = 448.0
 ## Where WOLF stands when he chooses to draw the sentry: short of the mark, on the rubble side, so he
-## never walks through the machine. It parks BAIT_OFFSET past him, on the mark, facing him.
+## never walks through the machine, with all of his drawn body outside the floor brackets and the
+## tank's footprint. It parks BAIT_OFFSET past him, on the mark, facing him.
 const WOLF_BAIT_X: float = DropArm.MARK_X - SentryBrain.BAIT_OFFSET
+## Where WOLF waits while the line builds and the fuse burns: left of the relief vent's grate (his
+## body clear of it) and well outside the door's blast zone, so he never stands where the engineer is
+## warned off.
+const WOLF_CLEAR_X: float = PressureLine.VENT_GRATE_MIN_X - M0State.WOLF_HALF_WIDTH - 1.0
 ## The engineer's front foot on the rubble line: where the question of how to drop the tank comes up,
 ## still outside the sentry's lane.
 const CHOICE_X: float = RUBBLE_X - M0State.HUMAN_HALF_WIDTH
@@ -127,7 +134,8 @@ const DOOR_LIP_Z: int = 2
 ## How long the grate stays dangerous after the relief vent lets go.
 const HAZARD_SECONDS: float = 0.4
 const VENT_REASON: String = "The relief vent let go under you. Stand clear of the grate when the gauge peaks."
-const BLAST_REASON: String = "The door blew with you in front of it. Get left of the vent before the fuse ends."
+## Formatted with the engineer's first name.
+const BLAST_REASON: String = "The door went with %s in front of it. When the fuse lights, back away past the valve."
 const SENTRY_REASON: String = "The sentry ran you down in its lane. Cross when it faces away, or get back over the rubble."
 const CLOUD_REASON: String = "The coolant cloud caught you. Let it clear before you cross the mark."
 const AMBER: Color = Color("#f3ae4b")
@@ -144,7 +152,7 @@ const CABLE_SHEEN: Color = Color(0.55, 0.64, 0.7, 0.55)
 ## and the machines' tops, and their text size.
 const LABEL_Y: float = 320.0
 const LABEL_FONT_SIZE: int = 12
-## The VALVE plate sits this far left of the wheel so SEAL CHARGED ends well before the bulkhead.
+## The VALVE plate sits this far left of the wheel so its longest text ends well before the bulkhead.
 const VALVE_LABEL_SHIFT: float = 28.0
 ## The breaker's plate sits this far left of the breaker, and the RELIEF VENT plate this far left of
 ## the grate's centre, so the vent's name fits between the longest breaker and valve texts.
@@ -152,7 +160,7 @@ const BREAKER_LABEL_SHIFT: float = 12.0
 const VENT_LABEL_SHIFT: float = 3.0
 ## The door's placard sits across the bulkhead's leaf, this far right of its centre, over its pillar.
 const DOOR_LABEL_SHIFT: float = 7.0
-## The ARM PANEL plate sits right of the panel, clear of the bulkhead's frame and the door's placard.
+## The TANK RELEASE plate sits right of the panel, clear of the bulkhead's frame and the door's placard.
 const ARM_LABEL_SHIFT: float = 20.0
 ## The EXIT plate sits over the bolt panel, left of the hatch it also names.
 const EXIT_LABEL_X: float = 792.0
@@ -161,8 +169,24 @@ const LABEL_EDGE_FADE: float = 14.0
 const LABEL_PLATE: Color = Color(0.035, 0.06, 0.08, 0.8)
 const LABEL_PLATE_EDGE: Color = Color(0.29, 0.4, 0.45, 0.55)
 const VENT_LABEL: String = "RELIEF VENT"
-## The glow over the vent grate, warming with the gauge (red once it has tripped).
+## The glow over the vent grate, warming with the gauge, flashing red through its hard warning and red
+## once it has tripped.
 const VENT_GLOW_SIZE: Vector2 = Vector2(96.0, 22.0)
+## The vent's hard warning flashes this many times a second (steady with Reduced Motion).
+const VENT_FLASH_HZ: float = 5.0
+## After the vent lets go the needle stays pinned at the top, red, for HAZARD_SECONDS (and through a
+## knockdown, when nothing advances it), then falls back to empty over this long.
+const GAUGE_FALL_SECONDS: float = 0.8
+## The caption beside the valve's dial, the gauge the narration names.
+const LINE_CAPTION: String = "LINE"
+const LINE_CAPTION_FONT_SIZE: int = 8
+## The hazard stripes over the door's blast zone pulse this many times a second while the fuse burns
+## (steady with Reduced Motion).
+const BLAST_STRIPE_HZ: float = 4.0
+## The floor brackets glow this colour while the sentry's body is inside them.
+const MARK_LIT: Color = Color("#ffe9a8")
+## The alcove's floor is tinted over exactly the span that hides the engineer.
+const ALCOVE_FLOOR: Color = Color(0.25, 0.55, 0.62, 0.16)
 ## Cuts the turning wheel out of the valve image as a disc, so only the wheel turns over the
 ## painted one.
 const WHEEL_MASK: String = """shader_type canvas_item;
@@ -188,6 +212,13 @@ var junction_cleared: bool = false
 ## Mirrored from DropArm: its state and how far down the tank is (0 hanging, 1 on the floor).
 var arm_state: StringName = &"hung"
 var tank_drop: float = 0.0
+## Mirrored from PressureLine: seconds left on the fuse, which drives the blast stripes' pulse.
+var fuse_remaining: float = 0.0
+## The needle's reading: the gauge while it builds, pinned at the top for a while after the vent lets
+## go (gauge_hold seconds left), then falling back; gauge_tripped draws it red meanwhile.
+var display_gauge: float = 0.0
+var gauge_hold: float = 0.0
+var gauge_tripped: bool = false
 ## Mirrored from Main's exit bolt: locked, charging (0..1 through the whine) or open.
 var bolt_state: StringName = &"locked"
 var bolt_charge: float = 0.0
@@ -238,6 +269,10 @@ var coolant_burst: CPUParticles2D
 var hit_sparks: CPUParticles2D
 var bolt_sparks: CPUParticles2D
 var arm_label: Label
+## TANK DOWN, over the tank once it lies on the sentry.
+var tank_label: Label
+## The LINE caption beside the valve's dial.
+var line_caption: Label
 var hatch_label: Label
 var breaker_glow: Sprite2D
 var seam_glow: Sprite2D
@@ -279,7 +314,7 @@ class TankSprite:
 		add_child(dent)
 
 
-## What sits behind the stations: the shadow of the ARM PANEL alcove, drawn under the props (the
+## What sits behind the stations: the shadow of the TANK RELEASE alcove, drawn under the props (the
 ## room's own drawing sits over them).
 class Recesses:
 	extends Node2D
@@ -410,12 +445,26 @@ func _ready() -> void:
 	breaker_label = _add_station_label("OVERLOAD BREAKER", BREAKER_X - BREAKER_LABEL_SHIFT, Color("#b0d1de"))
 	# In the row above the grate, where nobody standing on the floor covers it.
 	vent_label = _add_station_label(VENT_LABEL, VENT_X - VENT_LABEL_SHIFT, Color("#8fa6b2"))
-	# A little left of the wheel so its longest text (SEAL CHARGED) ends before the bulkhead.
+	# A little left of the wheel so its longest text ends before the bulkhead.
 	valve_label = _add_station_label("VALVE", VALVE_X - VALVE_LABEL_SHIFT, Color("#b0d1de"))
 	# A placard across the bulkhead's face, over its front pillar.
 	door_label = _add_station_label("SEALED DOOR", door_visual.position.x + DOOR_LABEL_SHIFT, Color("#ffc7c7"))
 	door_label.z_index = DOOR_LIP_Z + 1
-	arm_label = _add_station_label("ARM PANEL", ARM_X + ARM_LABEL_SHIFT, Color("#b0d1de"))
+	arm_label = _add_station_label("TANK RELEASE", ARM_X + ARM_LABEL_SHIFT, Color("#b0d1de"))
+	# Over the landed tank, shown only once it lies on the sentry.
+	tank_label = _add_station_label("TANK DOWN", DropArm.MARK_X, Color("#8fa6b2"))
+	line_caption = Label.new()
+	line_caption.name = "LineCaption"
+	line_caption.text = LINE_CAPTION
+	line_caption.add_theme_font_size_override("font_size", LINE_CAPTION_FONT_SIZE)
+	line_caption.add_theme_color_override("font_color", Color("#b0d1de"))
+	line_caption.add_theme_stylebox_override("normal", label_plate)
+	line_caption.z_index = 1
+	add_child(line_caption)
+	line_caption.size = line_caption.get_combined_minimum_size()
+	# Just left of the dial, level with it.
+	var dial: Vector2 = prop_point(valve_art, VALVE_DIAL_CENTRE)
+	line_caption.position = Vector2(dial.x - VALVE_DIAL_RADIUS * VALVE_SCALE - 2.0 - line_caption.size.x, dial.y - line_caption.size.y * 0.5)
 	# Over the bolt panel, beside the hatch, so both read as one exit.
 	hatch_label = _add_station_label("EXIT BOLTED", EXIT_LABEL_X, Color("#8fa6b2"))
 	_build_lane()
@@ -639,27 +688,61 @@ func sync_line(line: PressureLine) -> void:
 	line_state = line.state
 	gauge = line.gauge
 	turns = line.turns
+	fuse_remaining = line.fuse_remaining
+	if line_state == &"building":
+		display_gauge = gauge
+		gauge_tripped = false
+		gauge_hold = 0.0
+	elif line_state == &"tripped" and previous_state == &"building":
+		# The vent let go at the top of the gauge: the needle stays there, red, while the grate hurts.
+		display_gauge = 1.0
+		gauge_tripped = true
+		gauge_hold = HAZARD_SECONDS
+	elif not gauge_tripped:
+		display_gauge = gauge
 	if turns != previous_turns:
 		_turn_wheel(turns)
 	# The VALVE label counts the turns, so a crank refreshes it as well as a phase change.
 	if line_state != previous_state or turns != previous_turns:
 		refresh_state()
 	var building: bool = line_state == &"building"
-	vent_steam.emitting = building and visible
-	vent_steam.initial_velocity_max = lerpf(60.0, 220.0, gauge)
-	vent_steam.scale_amount_max = lerpf(6.0, 16.0, gauge)
-	vent_steam.modulate.a = lerpf(0.3, 1.0, gauge)
+	# Steam only near the top of the gauge, thickening toward the peak.
+	var steam: float = inverse_lerp(PressureLine.STEAM_GAUGE, 1.0, gauge)
+	vent_steam.emitting = building and steam >= 0.0 and visible
+	vent_steam.initial_velocity_max = lerpf(60.0, 220.0, clampf(steam, 0.0, 1.0))
+	vent_steam.scale_amount_max = lerpf(6.0, 16.0, clampf(steam, 0.0, 1.0))
+	vent_steam.modulate.a = lerpf(0.45, 1.0, clampf(steam, 0.0, 1.0))
 	if building:
 		seam_glow.modulate = Color(AMBER, 0.25 + 0.5 * gauge)
 	_sync_vent_glow()
 	queue_redraw()
 
 
-## The grate glows as the line builds, hotter toward the gauge's peak, and red once it has let go.
+## Advances the needle's fall after the vent lets go; the parent calls it every junction frame, so it
+## holds still through a knockdown, when nothing does.
+func advance_display(delta: float) -> void:
+	if not gauge_tripped:
+		return
+	if gauge_hold > 0.0:
+		gauge_hold = maxf(gauge_hold - delta, 0.0)
+		return
+	display_gauge = move_toward(display_gauge, gauge, delta / GAUGE_FALL_SECONDS)
+	if display_gauge <= gauge:
+		gauge_tripped = false
+	queue_redraw()
+
+
+## The grate glows as the line builds, hotter toward the gauge's peak, flashing red through the hard
+## warning, and red once it has let go.
 func _sync_vent_glow() -> void:
 	match line_state:
 		&"building":
-			vent_glow.modulate = Color(AMBER.lerp(SEAM_RED, gauge * gauge), 0.12 + 0.55 * gauge)
+			if gauge >= PressureLine.WARN_GAUGE:
+				# The flash follows the gauge itself, so it runs at the same rate whatever the frame rate.
+				var flash: float = 1.0 if reduce_motion else 0.5 + 0.5 * cos(gauge * PressureLine.BUILD_SECONDS * VENT_FLASH_HZ * TAU)
+				vent_glow.modulate = Color(SEAM_RED, lerpf(0.35, 0.95, flash))
+			else:
+				vent_glow.modulate = Color(AMBER.lerp(SEAM_RED, gauge * gauge), 0.12 + 0.55 * gauge)
 		&"tripped":
 			vent_glow.modulate = Color(SEAM_RED, 0.35)
 		_:
@@ -698,8 +781,8 @@ static func landed_tank_y(on_sentry: bool) -> float:
 	return FLOOR_Y - TANK_SIZE.y * 0.5 - (Sentry.WRECK_CRUSH_HEIGHT if on_sentry else 0.0)
 
 
-## The tank came down on the sentry at [param at_x]: the coolant and spark bursts (fired through the
-## impact kit) are moved there and the sentry is crushed into its wreck under the tank.
+## The tank came down on the sentry at [param at_x] (the mark): the coolant and spark bursts (fired
+## through the impact kit) are moved there and the sentry is crushed into its wreck under the tank.
 func tank_hit(at_x: float) -> void:
 	sentry_down = true
 	coolant_burst.position.x = at_x
@@ -708,7 +791,7 @@ func tank_hit(at_x: float) -> void:
 	refresh_state()
 
 
-## The tank hit the floor: the coolant burst moves to the mark and the tank is dented.
+## The tank hit the empty mark: the coolant burst moves there and the tank is dented.
 func tank_miss() -> void:
 	coolant_burst.position.x = DropArm.MARK_X
 	tank.dented = true
@@ -745,12 +828,13 @@ func refresh_state() -> void:
 		var armed: bool = line_state != &"idle" and line_state != &"tripped"
 		breaker_label.text = "BREAKER TRIPPED" if line_state == &"tripped" else ("BREAKER LIVE" if armed else "OVERLOAD BREAKER")
 		breaker_label.add_theme_color_override("font_color", SEAM_RED if line_state == &"tripped" else (Color("#8be3ff") if armed else Color("#b0d1de")))
-		valve_label.text = "SEAL CHARGED" if line_state in [&"charged", &"fuse", &"blown"] else ("VALVE  %d / %d" % [turns, PressureLine.TURNS_NEEDED] if armed else "VALVE")
+		valve_label.text = "FUSE LIT" if line_state in [&"charged", &"fuse", &"blown"] else ("VALVE  %d / %d" % [turns, PressureLine.TURNS_NEEDED] if armed else "VALVE")
 		valve_label.add_theme_color_override("font_color", GREEN if turns >= PressureLine.TURNS_NEEDED else Color("#b0d1de"))
 	breaker_glow.modulate = Color(_breaker_light_color(), 0.75 if line_state in [&"building", &"charged", &"fuse"] and not door_blown else 0.4)
 	door_label.text = "DOOR DOWN" if door_blown else "SEALED DOOR"
 	door_label.add_theme_color_override("font_color", GREEN if door_blown else Color("#ffc7c7"))
-	arm_label.text = "TANK DOWN" if sentry_down else ("ARM REWINDING" if arm_state == &"rewinding" else "ARM PANEL")
+	arm_label.text = "RELEASE SPENT" if sentry_down else ("WINCHING UP" if arm_state == &"rewinding" else "TANK RELEASE")
+	tank_label.visible = sentry_down
 	arm_label.add_theme_color_override("font_color", Color("#8fa6b2") if sentry_down else (AMBER if arm_state == &"rewinding" else Color("#b0d1de")))
 	if junction_cleared or bolt_state == &"open":
 		hatch_label.text = "EXIT OPEN"
@@ -871,6 +955,10 @@ func reset_transient() -> void:
 	arm_state = &"landed" if sentry_down else &"hung"
 	tank_drop = 1.0 if sentry_down else 0.0
 	tank.position.y = lerpf(TANK_REST_Y, landed_tank_y(sentry_down), tank_drop)
+	fuse_remaining = 0.0
+	display_gauge = 0.0
+	gauge_hold = 0.0
+	gauge_tripped = false
 	bolt_state = &"open" if junction_cleared else &"locked"
 	bolt_charge = 0.0
 	hatch_open = 1.0 if junction_cleared else 0.0
@@ -891,8 +979,10 @@ func _draw() -> void:
 	_draw_hatch_lamp(entry_hatch_art, GREEN, 1.0)
 	_draw_gauge()
 	_draw_breaker_light()
+	_draw_blast_zone()
 	if door_blown:
 		draw_line(Vector2(RUBBLE_X - 6.0, 439.0), Vector2(RUBBLE_X + 6.0, 439.0), AMBER, 3.0)
+	draw_rect(Rect2(SentryBrain.COVER_MIN_X, FLOOR_Y - 3.0, SentryBrain.COVER_MAX_X - SentryBrain.COVER_MIN_X, 6.0), ALCOVE_FLOOR)
 	_draw_arm_panel_light()
 	_draw_arm()
 	_draw_floor_mark()
@@ -900,19 +990,19 @@ func _draw() -> void:
 	draw_rect(prop_rect(bolt_panel_art, BOLT_PANEL_LIGHT), _bolt_light_color())
 
 
-## The shadow of the alcove behind the ARM PANEL, drawn on [param canvas] (Recesses, under the
+## The shadow of the alcove behind the TANK RELEASE, drawn on [param canvas] (Recesses, under the
 ## props): a soft-edged dark recess in the wall, deepest in the middle, with no outline, so it reads
-## as part of the painted wall. The engineer standing in it is out of the
-## sentry's sight; its core is exactly SentryBrain's cover span widened by half the engineer's body.
+## as part of the painted wall. Its core is exactly SentryBrain's cover span, the x range where an
+## engineer is out of the sentry's sight, and the floor under it is tinted over the same span.
 func draw_recesses(canvas: CanvasItem) -> void:
 	var alcove: Rect2 = alcove_rect()
 	canvas.draw_texture_rect(alcove_shadow, alcove.grow_individual(14.0, 10.0, 14.0, 8.0), false, Color(0.0, 0.02, 0.04, 0.85))
 
 
-## The alcove's core: SentryBrain's cover span widened by half the engineer's body, up to the label row.
+## The alcove's core: exactly SentryBrain's cover span, up to the label row.
 static func alcove_rect() -> Rect2:
 	var top: float = LABEL_Y + 24.0
-	return Rect2(SentryBrain.COVER_MIN_X - M0State.HUMAN_HALF_WIDTH, top, SentryBrain.COVER_MAX_X - SentryBrain.COVER_MIN_X + M0State.HUMAN_HALF_WIDTH * 2.0, FLOOR_Y - top)
+	return Rect2(SentryBrain.COVER_MIN_X, top, SentryBrain.COVER_MAX_X - SentryBrain.COVER_MIN_X, FLOOR_Y - top)
 
 
 ## A white texture that is opaque in the middle and fades softly to clear at its edges ([param fill]
@@ -938,17 +1028,38 @@ func _draw_hatch_lamp(hatch: Sprite2D, color: Color, alpha: float) -> void:
 		draw_rect(prop_rect(hatch, HATCH_LAMP), Color(color, alpha))
 
 
-## The needle over the valve's painted gauge is the gauge (left at empty, right at the vent's
-## peak). The VALVE plate counts the real turns.
+## The needle over the valve's painted gauge is the LINE gauge (left at empty, right at the vent's
+## peak): red through the hard warning, and pinned red at the top for a while after the vent lets go
+## (display_gauge). The VALVE plate counts the real turns.
 func _draw_gauge() -> void:
 	var centre: Vector2 = prop_point(valve_art, VALVE_DIAL_CENTRE)
 	var face: float = VALVE_DIAL_RADIUS * VALVE_SCALE
 	# A fresh face over the painted one, so its painted needle never reads as a second reading.
 	draw_circle(centre, face - 0.6, Color("#d9d3c4"))
 	draw_arc(centre, face - 1.6, PI + PI * 0.78, TAU, 8, SEAM_RED, 1.6, true)
-	var angle: float = PI + PI * gauge
-	draw_line(centre, centre + Vector2.RIGHT.rotated(angle) * (face - 1.2), Color("#1a1c20"), 1.4, true)
-	draw_circle(centre, 1.2, Color("#1a1c20"))
+	var angle: float = PI + PI * display_gauge
+	var red: bool = gauge_tripped or (line_state == &"building" and gauge >= PressureLine.WARN_GAUGE)
+	var needle: Color = Color("#d0261c") if red else Color("#1a1c20")
+	draw_line(centre, centre + Vector2.RIGHT.rotated(angle) * (face - 1.2), needle, 1.4, true)
+	draw_circle(centre, 1.2, needle)
+
+
+## Hazard stripes on the floor over exactly the door's blast zone (PressureLine.BLAST_MIN_X..
+## BLAST_MAX_X) while the fuse burns, pulsing with the fuse (steady with Reduced Motion).
+func _draw_blast_zone() -> void:
+	if door_blown or not (line_state == &"charged" or line_state == &"fuse"):
+		return
+	var pulse: float = 1.0 if reduce_motion else 0.5 + 0.5 * cos(fuse_remaining * BLAST_STRIPE_HZ * TAU)
+	var left: float = PressureLine.BLAST_MIN_X
+	var width: float = PressureLine.BLAST_MAX_X - PressureLine.BLAST_MIN_X
+	var stripes: int = 15
+	# A red wash over the walkway in front, then the stripes along the floor line, over its whole span.
+	draw_rect(Rect2(left, FLOOR_Y, width, 9.0), Color(SEAM_RED, lerpf(0.12, 0.3, pulse)))
+	for stripe: int in stripes:
+		var segment: Rect2 = Rect2(left + stripe * width / stripes, FLOOR_Y - 2.0, width / stripes, 7.0)
+		draw_rect(segment, Color(SEAM_RED, lerpf(0.55, 1.0, pulse)) if stripe % 2 == 0 else Color(0.1, 0.03, 0.03, 0.85))
+	for edge: float in [left, left + width]:
+		draw_line(Vector2(edge, FLOOR_Y - 12.0), Vector2(edge, FLOOR_Y + 9.0), Color(SEAM_RED, lerpf(0.7, 1.0, pulse)), 2.0)
 
 
 func _draw_breaker_light() -> void:
@@ -974,48 +1085,54 @@ func _draw_arm_panel_light() -> void:
 	draw_rect(prop_rect(arm_panel_art, ARM_PANEL_LIGHT), light)
 
 
-## The rods that hang the arm's ceiling plate from the gantry, and the steel cable from its shackle
-## down to the tank once the clamp has let go (a dark braided body with a faint sheen, in the
-## painted winch cable's tones): taut while the tank falls or winches back up, slack once it has
-## landed.
+## The rods that hang the arm's ceiling plate from the gantry, and, only while the winch hauls a
+## missed tank back up, the steel cable from its shackle down to the tank (a dark braided body with a
+## faint sheen, in the painted winch cable's tones). A released tank falls free and lies free: no
+## cable while it falls or once it is down.
 func _draw_arm() -> void:
 	var plate_top: float = arm_art.position.y - ARM_REGION.size.y * TANK_ART_SCALE * 0.5 + 2.0
 	for rod_x: float in [DropArm.MARK_X - 26.0, DropArm.MARK_X + 34.0]:
 		draw_line(Vector2(rod_x, GANTRY_Y), Vector2(rod_x, plate_top), Color("#1b2630"), 5.0)
 		draw_line(Vector2(rod_x - 1.5, GANTRY_Y), Vector2(rod_x - 1.5, plate_top), STEEL, 1.0)
-	if tank_drop <= 0.0:
+	if tank_drop <= 0.0 or arm_state != &"rewinding":
 		return
 	var cable_top: Vector2 = Vector2(DropArm.MARK_X, TANK_REST_Y - TANK_SIZE.y * 0.5)
 	var tank_top: Vector2 = Vector2(DropArm.MARK_X, tank.position.y - TANK_SIZE.y * 0.5)
-	if arm_state == &"landed":
-		var slack: PackedVector2Array = PackedVector2Array()
-		for step: int in 9:
-			var t: float = step / 8.0
-			var point: Vector2 = cable_top.lerp(tank_top, t)
-			point.x += sin(t * PI) * 26.0
-			slack.append(point)
-		draw_polyline(slack, CABLE_SHADOW, 4.0, true)
-		draw_polyline(slack, CABLE_BODY, 2.5, true)
-		var sheen: PackedVector2Array = PackedVector2Array()
-		for point: Vector2 in slack:
-			sheen.append(point + Vector2(-0.6, -0.4))
-		draw_polyline(sheen, CABLE_SHEEN, 0.8, true)
-	else:
-		draw_line(cable_top, tank_top, CABLE_SHADOW, 4.0)
-		draw_line(cable_top, tank_top, CABLE_BODY, 2.5)
-		draw_line(cable_top + Vector2(-0.6, 0.0), tank_top + Vector2(-0.6, 0.0), CABLE_SHEEN, 0.8)
+	draw_line(cable_top, tank_top, CABLE_SHADOW, 4.0)
+	draw_line(cable_top, tank_top, CABLE_BODY, 2.5)
+	draw_line(cable_top + Vector2(-0.6, 0.0), tank_top + Vector2(-0.6, 0.0), CABLE_SHEEN, 0.8)
 
 
-## Hazard stripes on the floor exactly as wide as the drop's hit window.
+## True while the floor brackets are lit: a live sentry's body is over them, so a tank landing now
+## would hit it.
+func mark_lit() -> bool:
+	return door_blown and not sentry_down and sentry.visual.is_lit() and DropArm.is_hit(sentry.target_x)
+
+
+## The tank's shadow and the floor brackets, both exactly as wide as the tank (DropArm.HIT_RANGE
+## either side of the mark). The shadow darkens and tightens as the tank comes down; the brackets light
+## up while the sentry's body is inside them, which is the hit rule (DropArm.is_hit).
 func _draw_floor_mark() -> void:
 	var left: float = DropArm.MARK_X - DropArm.HIT_RANGE
 	var width: float = DropArm.HIT_RANGE * 2.0
-	var stripes: int = 11
+	if arm_state != &"landed":
+		var shadow: PackedVector2Array = PackedVector2Array()
+		var half: Vector2 = Vector2(DropArm.HIT_RANGE * lerpf(1.25, 1.0, tank_drop), lerpf(3.0, 4.5, tank_drop))
+		for step: int in 20:
+			shadow.append(Vector2(DropArm.MARK_X, FLOOR_Y - 2.0) + Vector2(cos(step * TAU / 20.0) * half.x, sin(step * TAU / 20.0) * half.y))
+		draw_colored_polygon(shadow, Color(0.0, 0.0, 0.0, lerpf(0.35, 0.65, tank_drop)))
+	var lit: bool = mark_lit()
+	var stripe_color: Color = MARK_LIT if lit else AMBER
+	# The stripes run along the floor line and down onto the walkway in front of it, so a machine
+	# standing on the mark covers only their top and the brackets still read below its treads.
+	if lit:
+		draw_rect(Rect2(left - 2.0, FLOOR_Y, width + 4.0, 10.0), Color(MARK_LIT, 0.28))
+	var stripes: int = 7
 	for stripe: int in stripes:
-		var segment: Rect2 = Rect2(left + stripe * width / stripes, FLOOR_Y - 4.0, width / stripes, 4.0)
-		draw_rect(segment, AMBER if stripe % 2 == 0 else Color("#1a2229"))
-	draw_line(Vector2(left, FLOOR_Y - 10.0), Vector2(left, FLOOR_Y), AMBER, 2.0)
-	draw_line(Vector2(left + width, FLOOR_Y - 10.0), Vector2(left + width, FLOOR_Y), AMBER, 2.0)
+		var segment: Rect2 = Rect2(left + stripe * width / stripes, FLOOR_Y - 3.0, width / stripes, 7.0)
+		draw_rect(segment, stripe_color if stripe % 2 == 0 else Color("#1a2229"))
+	for edge: float in [left, left + width]:
+		draw_line(Vector2(edge, FLOOR_Y - 10.0), Vector2(edge, FLOOR_Y + 10.0), stripe_color, 2.0)
 
 
 ## The exit bolt's light, on its panel and over the hatch: red and dead while the sentry runs the

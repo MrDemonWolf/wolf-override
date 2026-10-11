@@ -76,7 +76,7 @@ func _check_beam_rule() -> void:
 	_expect(_patrolling_at(SentryBrain.PATROL_MAX_X, -1.0).tick(0.0001, far_end - 2.0, true, -1.0) == &"patrol", "an engineer just past the beam's tip is not")
 	_expect(is_equal_approx(Sentry.beam_tip_x(700.0, 1.0), 880.0), "facing right it reaches 180 px the other way")
 	_expect(is_equal_approx(Sentry.beam_tip_x(SentryBrain.PATROL_MIN_X, -1.0), SentryBrain.LANE_ENTRY_X), "the beam stops at the rubble line, where nobody can be seen")
-	_expect(not SentryBrain.is_exposed(SentryBrain.LANE_ENTRY_X) and SentryBrain.is_exposed(SentryBrain.LANE_ENTRY_X + 1.0), "the rubble line is the edge of what it can see")
+	_expect(not SentryBrain.is_exposed(SentryBrain.LANE_ENTRY_X) and not SentryBrain.is_exposed(SentryBrain.LANE_ENTRY_X + 1.0) and SentryBrain.is_exposed(SentryBrain.COVER_MAX_X + 1.0), "nobody is seen from the rubble line to the alcove's right end, the edge of what it can see")
 	_expect(is_equal_approx(Sentry.beam_tip_x(SentryBrain.PATROL_MAX_X, 1.0), M0Actor.MAX_X), "facing right from the far end the beam stops where the engineer can stand furthest, inside the room")
 	# Just short of the end, so the tick does not bounce it round first.
 	_expect(_patrolling_at(SentryBrain.PATROL_MAX_X - 1.0, 1.0).tick(0.0001, M0Actor.MAX_X, true, -1.0) == &"lock", "an engineer at that right-hand tip is seen")
@@ -88,18 +88,25 @@ func _check_beam_rule() -> void:
 		for facing: float in [-1.0, 1.0]:
 			var tip: float = Sentry.beam_tip_x(x, facing)
 			var gap: Vector2 = Sentry.beam_gap(x, facing)
-			var crosses: bool = facing < 0.0 and tip < SentryBrain.COVER_MAX_X
+			# The beam spans from the sentry to its tip; the break is that span's overlap with the alcove
+			# (a sentry chasing someone into the alcove can stand inside its right end).
+			var near: float = maxf(minf(x, tip), SentryBrain.COVER_MIN_X)
+			var far: float = minf(maxf(x, tip), SentryBrain.COVER_MAX_X)
+			var crosses: bool = far > near
 			if crosses != (gap.y > gap.x):
 				gaps_ok = false
-			elif crosses and (not is_equal_approx(gap.x, maxf(tip, SentryBrain.COVER_MIN_X)) or not is_equal_approx(gap.y, SentryBrain.COVER_MAX_X)):
+			elif crosses and (not is_equal_approx(gap.x, near) or not is_equal_approx(gap.y, far)):
 				gaps_ok = false
 		x += 4.0
 	_expect(gaps_ok, "the beam breaks over exactly the part of the alcove it would cross, and nowhere else")
 	var at_turn: Vector2 = Sentry.beam_gap(SentryBrain.PATROL_MIN_X, -1.0)
 	_expect(at_turn.is_equal_approx(Vector2(SentryBrain.COVER_MIN_X, SentryBrain.COVER_MAX_X)), "at the patrol's turn the whole alcove is out of the beam")
 	_expect(not SentryBrain.is_exposed(at_turn.x) and not SentryBrain.is_exposed(at_turn.y) and not SentryBrain.is_exposed((at_turn.x + at_turn.y) * 0.5), "the gap is where an engineer is hidden")
-	var strip: float = (SentryBrain.LANE_ENTRY_X + SentryBrain.COVER_MIN_X) * 0.5
-	_expect(_patrolling_at(SentryBrain.PATROL_MIN_X + 1.0, -1.0).tick(0.0001, strip, SentryBrain.is_exposed(strip), -1.0) == &"lock" and strip >= Sentry.beam_tip_x(SentryBrain.PATROL_MIN_X + 1.0, -1.0) and strip < Sentry.beam_gap(SentryBrain.PATROL_MIN_X + 1.0, -1.0).x, "between the alcove and the rubble it still sees you, and the beam is drawn there")
+	# The alcove starts at the rubble line, so from its turn the beam has nothing left to draw past it.
+	var near_turn: float = SentryBrain.PATROL_MIN_X + 1.0
+	_expect(is_equal_approx(Sentry.beam_gap(near_turn, -1.0).x, Sentry.beam_tip_x(near_turn, -1.0)) and is_equal_approx(Sentry.beam_tip_x(near_turn, -1.0), SentryBrain.COVER_MIN_X), "there is no seen strip between the alcove and the rubble, and no beam drawn there")
+	var just_out: float = SentryBrain.COVER_MAX_X + 1.0
+	_expect(_patrolling_at(near_turn + 30.0, -1.0).tick(0.0001, just_out, SentryBrain.is_exposed(just_out), -1.0) == &"lock" and just_out > Sentry.beam_gap(near_turn + 30.0, -1.0).y, "a step out of the alcove into the lane it sees you, under the drawn beam")
 	_expect(Sentry.beam_gap(SentryBrain.PATROL_MAX_X, -1.0) == Vector2.ZERO, "from the far end the beam stops short of the alcove, with no break")
 
 

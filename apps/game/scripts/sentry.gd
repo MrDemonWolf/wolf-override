@@ -7,7 +7,8 @@ extends CharacterBody2D
 ## brain's test. All of its drawing lives in the one Visual child: the painted machine (a wreck
 ## once the tank lands on it) with its scanner beam, eye light and a soft lens glow drawn over the
 ## art in code. The beam is drawn as far as the brain actually sees (see [method beam_tip_x]), with
-## a break over the ARM PANEL alcove, where it cannot see anyone (see [method beam_gap]).
+## a break over the TANK RELEASE alcove, where it cannot see anyone (see [method beam_gap]). Dormant
+## behind the sealed door it stands powered down: dark eye, no beam, the machine dimmed.
 
 ## Origin is the middle of its treads on the floor.
 const FLOOR_Y: float = 440.0
@@ -39,6 +40,10 @@ const BEAM_EDGE_ALPHA: float = 0.24
 ## The soft additive glow over the lens slit.
 const LENS_GLOW_SIZE: Vector2 = Vector2(30.0, 16.0)
 const LENS_GLOW_ALPHA: float = 0.7
+## Powered down until the blast wakes it, the machine is drawn this dark; it brightens over
+## WAKE_SECONDS as it powers up.
+const DORMANT_TINT: Color = Color(0.42, 0.47, 0.54)
+const WAKE_SECONDS: float = 0.35
 
 ## The x the brain wants; the mover closes on it at up to CHASE_SPEED.
 var target_x: float = SentryBrain.PATROL_MAX_X
@@ -92,6 +97,9 @@ class SentryVisual:
 	var body: Sprite2D
 	var wreck: Sprite2D
 	var lens_glow: Sprite2D
+	## True while it is powered down (dormant): the body is drawn at DORMANT_TINT.
+	var dormant: bool = false
+	var _wake_tween: Tween
 
 	func _init() -> void:
 		body = _art("Body", Sentry.ACTIVE_ART, Sentry.ACTIVE_REGION, Sentry.ACTIVE_TREAD_X)
@@ -106,6 +114,19 @@ class SentryVisual:
 
 	func is_lit() -> bool:
 		return not wrecked and eye != EYE_OFF
+
+	## Powers the machine down or up; [param animate] brightens it over WAKE_SECONDS as it wakes.
+	func set_dormant(value: bool, animate: bool) -> void:
+		if _wake_tween != null and _wake_tween.is_valid():
+			_wake_tween.kill()
+		_wake_tween = null
+		dormant = value
+		var tint: Color = Sentry.DORMANT_TINT if dormant else Color.WHITE
+		if animate and not dormant and is_inside_tree() and body.modulate != tint:
+			_wake_tween = create_tween()
+			_wake_tween.tween_property(body, "modulate", tint, Sentry.WAKE_SECONDS)
+		else:
+			body.modulate = tint
 
 	func _sync_glow() -> void:
 		if lens_glow == null:
@@ -181,7 +202,7 @@ static func beam_tip_x(x: float, facing: float) -> float:
 	return maxf(tip, SentryBrain.LANE_ENTRY_X) if facing < 0.0 else minf(tip, M0Actor.MAX_X)
 
 
-## The world-x span (from, to) of the ARM PANEL alcove that the beam of a sentry at [param x] facing
+## The world-x span (from, to) of the TANK RELEASE alcove that the beam of a sentry at [param x] facing
 ## [param facing] would cross. SentryBrain.is_exposed hides an engineer centred anywhere in it, so the
 ## beam is not drawn there. Vector2.ZERO when the beam does not reach the alcove.
 static func beam_gap(x: float, facing: float) -> Vector2:
@@ -240,6 +261,9 @@ func follow(brain: SentryBrain) -> void:
 			visual.eye = SentryVisual.EYE_LOCKED
 		_:
 			visual.eye = SentryVisual.EYE_OFF
+	var dormant: bool = brain.state == &"dormant"
+	if dormant != visual.dormant:
+		visual.set_dormant(dormant, true)
 
 
 ## Puts it straight where a restored brain says it is, a wreck if it is down.
@@ -255,6 +279,7 @@ func place(brain: SentryBrain) -> void:
 	visual.wrecked = down
 	if down:
 		visual.eye = SentryVisual.EYE_OFF
+	visual.set_dormant(brain.state == &"dormant", false)
 	_sync_reach()
 
 

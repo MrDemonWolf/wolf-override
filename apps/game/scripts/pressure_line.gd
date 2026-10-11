@@ -22,6 +22,10 @@ const VENT_GRATE_MAX_X: float = 336.0
 ## engineer's x range is the grate widened by half their body on each side (250..350).
 const VENT_MIN_X: float = VENT_GRATE_MIN_X - M0State.HUMAN_HALF_WIDTH
 const VENT_MAX_X: float = VENT_GRATE_MAX_X + M0State.HUMAN_HALF_WIDTH
+## The relief vent shows steam only from this gauge up, so a steaming vent always means the peak is
+## near; from WARN_GAUGE it gives its hard warning (a hiss spike and a red flash on the grate).
+const STEAM_GAUGE: float = 0.6
+const WARN_GAUGE: float = 0.85
 ## Summing many small deltas lands a hair under a round number; boundaries forgive that much.
 const EPSILON: float = 0.00001
 
@@ -93,6 +97,11 @@ func crank(held_delta: float) -> int:
 ## Letting go of USE drops the part turn in progress.
 func release() -> void:
 	progress = 0.0
+
+
+## True in the last moments before the relief vent lets go.
+func is_warning() -> bool:
+	return state == &"building" and gauge >= WARN_GAUGE - EPSILON
 
 
 ## True while the fuse is lit and the door is about to go.
