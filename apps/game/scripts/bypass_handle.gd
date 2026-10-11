@@ -4,8 +4,8 @@ extends Node2D
 ## the relay's housing. The wheel is the junction valve's own disc (the same cut JunctionRoom turns),
 ## and a row of crank lights along the bottom of its name plate, above the head of the engineer
 ## cranking it and clear of WOLF beside them, counts the held-USE ticks. It also carries the relay's
-## COOLANT FAULT tag and the coolant that hisses from the housing while the bypass is cranked. Main
-## owns the rules; this only shows them.
+## COOLANT FAULT tag and the coolant that hisses from the housing while the bypass is cranked. A plate
+## the edge of the view cuts fades out, as in the junction. Main owns the rules; this only shows them.
 
 ## Crank lights in the readout, one per held-USE tick.
 const TICKS_NEEDED: int = 8
@@ -122,12 +122,21 @@ func place(wheel_centre: Vector2, relay_x: float) -> void:
 
 
 func _process(delta: float) -> void:
-	if not venting or not is_visible_in_tree():
+	if not is_visible_in_tree():
 		return
-	# The tag throbs in step with the alarm; Reduced Motion keeps it lit amber instead.
-	_pulse = fmod(_pulse + delta, PULSE_SECONDS)
-	var glow: float = 1.0 if reduce_motion else 0.6 + 0.4 * cos(_pulse / PULSE_SECONDS * TAU)
-	fault_tag.modulate = Color(1.0, glow, glow * 0.9)
+	if venting:
+		# The tag throbs in step with the alarm; Reduced Motion keeps it lit amber instead.
+		_pulse = fmod(_pulse + delta, PULSE_SECONDS)
+		var glow: float = 1.0 if reduce_motion else 0.6 + 0.4 * cos(_pulse / PULSE_SECONDS * TAU)
+		fault_tag.modulate = Color(1.0, glow, glow * 0.9)
+	# Like the junction's plates, a plate the edge of the view cuts fades out rather than show part of
+	# its name.
+	var viewport: Viewport = get_viewport()
+	var view: Rect2 = viewport.get_canvas_transform().affine_inverse() * viewport.get_visible_rect()
+	for plate: Label in [bypass_label, fault_tag]:
+		var rect: Rect2 = plate.get_global_rect()
+		var margin: float = minf(rect.position.x - view.position.x, view.end.x - rect.end.x)
+		plate.modulate.a = clampf(margin / JunctionRoom.LABEL_EDGE_FADE, 0.0, 1.0)
 
 
 ## A name plate like the junction's; [param wrap_width] above 0 wraps the caption onto rows that wide,

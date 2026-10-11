@@ -18,6 +18,12 @@ const RELAY_REACH: float = 52.0
 ## it the engineer can crank it. It sits on the relay's right, clear of WOLF's contact.
 const BYPASS_WHEEL: Vector2 = Vector2(700.0, 405.0)
 const BYPASS_REACH: float = 30.0
+## Where the engineer stands to crank: just left of the wheel and facing it, so their body covers
+## no more than the wheel's rim (inside the bypass reach, past the relay's).
+const BYPASS_CRANK_X: float = BYPASS_WHEEL.x - 26.0
+## While the engineer works the bypass, WOLF stands off the relay he refused (or was not asked to
+## take), back towards the breaker, until the seal has opened.
+const WOLF_BYPASS_CLEAR_X: float = 490.0
 ## Held-USE ticks the bypass takes (HoldUse.TICK_SECONDS each, about three seconds in all).
 const BYPASS_TICKS: int = BypassHandle.TICKS_NEEDED
 ## While the bypass vents coolant its alarm sounds this often.
@@ -26,6 +32,11 @@ const BYPASS_ALARM_SECONDS: float = 1.1
 const RELAY_STEP_BACK_X: float = 736.0
 ## The purge display's reach; walking past it the first time WOLF says what the purge takes.
 const PURGE_DISPLAY_MAX_X: float = 230.0
+## The stakes line waits until the box it would replace has been up long enough to read: this long
+## per word, within these bounds (the opening box's three rows take the longest).
+const READ_SECONDS_PER_WORD: float = 0.15
+const READ_SECONDS_MIN: float = 2.5
+const READ_SECONDS_MAX: float = 7.0
 ## The corridor seal's face (Door at x 780, 56 px wide); while it is shut WOLF follows no closer than his reach.
 const CORRIDOR_DOOR_LEFT_X: float = 752.0
 ## The corridor's pressure bulkhead (design A): the scene's DoorArt is the sealed image; the open one
@@ -53,6 +64,8 @@ const BYPASS_RELEASED_LINE: String = "The handle holds where %s left it. The ala
 const BYPASS_HOLD_HINT: String = "HOLD E: crank the manual bypass, %d of %d."
 const BOLT_ARC_LINE: String = "The bolt arcs and drops."
 const HATCH_OPENED_LINE: String = "The bolt arcs and drops. The hatch slides open."
+## The hint while the hatch is still sliding, like the corridor's SEAL_OPENING_HINT.
+const HATCH_OPENING_HINT: String = "The hatch is opening."
 const SAVE_FAILED_HINT: String = "Save failed. Use a station to try again."
 const NO_CHECKPOINT_NOTE: String = "No checkpoint yet. Reach a SAFE POINT to save."
 const UNREADABLE_CHECKPOINT_NOTE: String = "Saved checkpoint could not be read."
@@ -246,6 +259,9 @@ var bypass_was_holding: bool = false
 var name_card_remaining: float = 0.0
 ## WOLF's purge stakes line has been said this run.
 var stakes_spoken: bool = false
+## The corridor box last seen and how long it has been up (the stakes line waits for it to be read).
+var shown_line: String = ""
+var shown_line_age: float = 0.0
 
 const WOLF_SPRITE_REST: Vector2 = Vector2(0.0, -15.0)
 const GAMEPLAY_ZOOM: float = 1.35
@@ -582,18 +598,30 @@ func _process(delta: float) -> void:
 ## past the display, and the MANUAL BYPASS being cranked ([param held_ticks] ticks landed this frame).
 func _tick_corridor(delta: float, held_ticks: int) -> void:
 	if engineer_step_x >= 0.0 and absf(human.position.x - engineer_step_x) <= 4.0:
+		if engineer_step_x == BYPASS_CRANK_X:
+			# At the crank spot the engineer settles on it and faces the wheel, whichever way they walked in.
+			human.position.x = BYPASS_CRANK_X
+			human.body_sprite.flip_h = false
 		engineer_step_x = -1.0
 		_update_controls()
 	if wolf_heading_to_relay and engineer_step_x < 0.0 and absf(wolf.position.x - RELAY_CONTACT_X) <= 4.0:
 		_wolf_takes_relay()
-	# Decision C: the stakes are said on the main path, once, before the breaker conversation.
-	if not stakes_spoken and not waiting_for_choice and state.memory.is_empty() and human.position.x > PURGE_DISPLAY_MAX_X:
-		stakes_spoken = true
-		status_line = STAKES_LINE
+	if wolf.autonomous_target_x == WOLF_BYPASS_CLEAR_X and absf(wolf.position.x - WOLF_BYPASS_CLEAR_X) <= 2.0:
+		# Standing off the relay he still faces the engineer at the bypass.
+		wolf.body_sprite.flip_h = false
+	if status_line != shown_line:
+		shown_line = status_line
+		shown_line_age = 0.0
+	else:
+		shown_line_age += delta
+	# Decision C: the stakes are said on the main path, once, before the breaker conversation, and only
+	# once the box they replace (the opening's three rows, say) has been up long enough to read.
+	if not stakes_spoken and not waiting_for_choice and state.memory.is_empty() and human.position.x > PURGE_DISPLAY_MAX_X and shown_line_age >= _read_seconds(shown_line):
+		_speak_stakes()
 	if hold_use.station == &"bypass":
 		if held_ticks > 0:
 			_bypass_cranked()
-		elif bypass_was_holding and not hold_use.holding and bypass_ticks > 0 and not state.door_open:
+		elif bypass_was_holding and not hold_use.holding and bypass_ticks > 0 and not state.door_open and engineer_step_x < 0.0:
 			# Let go part way: what is cranked stays cranked (time, never progress).
 			status_line = BYPASS_RELEASED_LINE % state.human_name().get_slice(" ", 0)
 	bypass_was_holding = hold_use.holding and hold_use.station == &"bypass"
@@ -604,6 +632,16 @@ func _tick_corridor(delta: float, held_ticks: int) -> void:
 		if bypass_alarm_remaining <= 0.0:
 			bypass_alarm_remaining = BYPASS_ALARM_SECONDS
 			sfx_bank.play(&"klaxon", -10.0, 1.2)
+
+
+## How long [param line] needs on screen to be read before the stakes line may replace it.
+static func _read_seconds(line: String) -> float:
+	return clampf(line.split(" ", false).size() * READ_SECONDS_PER_WORD, READ_SECONDS_MIN, READ_SECONDS_MAX)
+
+
+func _speak_stakes() -> void:
+	stakes_spoken = true
+	status_line = STAKES_LINE
 
 
 func _new_game() -> void:
@@ -631,6 +669,8 @@ func _new_game() -> void:
 	wolf_heading_to_relay = false
 	wolf_scouting = false
 	stakes_spoken = false
+	shown_line = ""
+	shown_line_age = 0.0
 	name_card_remaining = 0.0
 	hold_use.reset()
 	_sync_scene()
@@ -1229,7 +1269,10 @@ func _relay_refused() -> bool:
 
 
 func _interact_breaker() -> void:
-	if state.memory.is_empty():
+	if state.memory.is_empty() and not stakes_spoken:
+		# Reached before the opening box was read: the stakes come first (decision C), then the question.
+		_speak_stakes()
+	elif state.memory.is_empty():
 		waiting_for_choice = true
 		choice_context = "relay"
 		_update_controls()
@@ -1238,6 +1281,8 @@ func _interact_breaker() -> void:
 		status_line = "The breaker catches. Blue light fills the coolant relay; the red seal stays shut."
 		sfx_bank.play(&"clank", -4.0, 0.8)
 		impact.rumble(0.15, 0.0, 0.06)
+		# After a refusal WOLF stands off the now-live relay (_wolf_target_x).
+		_update_controls()
 		_mark_beat()
 		queue_redraw()
 	else:
@@ -1309,8 +1354,13 @@ func _interact_bypass() -> void:
 		status_line = "The seal is open. The safe point is just beyond it."
 	elif not state.breaker_armed:
 		status_line = "The bypass handle won't move. The breaker has to be on first."
-	elif not bypass_venting:
-		_start_bypass_vent()
+	else:
+		if absf(human.position.x - BYPASS_CRANK_X) > 4.0:
+			# The engineer steps to the crank spot beside the wheel; a held USE turns it once there.
+			engineer_step_x = BYPASS_CRANK_X
+			_update_controls()
+		if not bypass_venting:
+			_start_bypass_vent()
 
 
 ## The bypass handle gives: coolant hisses from the relay housing and the alarm starts. It is the
@@ -1320,6 +1370,8 @@ func _start_bypass_vent() -> void:
 	bypass_alarm_remaining = 0.0
 	bypass_handle.venting = true
 	status_line = BYPASS_START_LINE
+	# WOLF stands off the relay while the engineer works the bypass (_wolf_target_x).
+	_update_controls()
 
 
 func _stop_bypass_vent() -> void:
@@ -1357,8 +1409,9 @@ func _finish_bypass() -> void:
 	bypass_handle.done = true
 	status_line = "The bypass locks over and the alarm cuts out. The red seal opens.\nWOLF: Open. I'm with you."
 	_flash_relay_spark(false)
-	_update_controls()
+	# The seal starts to slide before control updates, so WOLF stays off the relay until it lands.
 	_sync_door(true)
+	_update_controls()
 	_mark_beat()
 
 
@@ -1631,7 +1684,9 @@ func _use_exit() -> void:
 			&"charging":
 				status_line = "The bolt is taking the overload."
 			_:
-				_leave_junction()
+				# Not through a hatch that is still sliding; its hint already says so.
+				if not _hatch_sliding():
+					_leave_junction()
 
 
 func _pop_bolt() -> void:
@@ -1657,6 +1712,11 @@ func _bolt_arc() -> void:
 	junction_room.bolt_arc()
 	if not fail_active:
 		status_line = BOLT_ARC_LINE
+
+
+## The bolt has dropped and the hatch is still sliding open; it is not a way out until it has.
+func _hatch_sliding() -> bool:
+	return bolt_state == &"open" and not state.junction_cleared and junction_room.hatch_open < 1.0
 
 
 ## The hatch art has finished opening.
@@ -2173,13 +2233,26 @@ func _react_as_wolf(accepting: bool) -> void:
 	wolf_reaction_tween.parallel().tween_property(wolf.body_sprite, "rotation_degrees", 0.0, 0.24)
 
 
+## The arc and spark burst as the seal's power goes through: on the relay's contact when WOLF takes it
+## ([param from_wolf]), on the MANUAL BYPASS wheel when the engineer's crank locks over.
 func _flash_relay_spark(from_wolf: bool) -> void:
 	if relay_spark_tween != null and relay_spark_tween.is_running():
 		relay_spark_tween.kill()
-	relay_spark.points = PackedVector2Array([
-		Vector2(583.0, 393.0), Vector2(592.0, 381.0), Vector2(600.0, 398.0),
-		Vector2(610.0, 380.0), Vector2(620.0, 393.0),
-	])
+	if from_wolf:
+		# Across WOLF's contact on the relay's face.
+		relay_spark.points = PackedVector2Array([
+			Vector2(583.0, 393.0), Vector2(592.0, 381.0), Vector2(600.0, 398.0),
+			Vector2(610.0, 380.0), Vector2(620.0, 393.0),
+		])
+		relay_sparks.position = Vector2(601.0, 390.0)
+	else:
+		# The bypass locking over: across the top of its wheel, in front of the engineer cranking it.
+		var hub: Vector2 = BYPASS_WHEEL
+		relay_spark.points = PackedVector2Array([
+			hub + Vector2(-12.0, -13.0), hub + Vector2(-5.0, -21.0), hub + Vector2(2.0, -12.0),
+			hub + Vector2(9.0, -20.0), hub + Vector2(16.0, -10.0),
+		])
+		relay_sparks.position = hub + Vector2(4.0, -14.0)
 	relay_spark.default_color = Color("#8be3ff") if from_wolf else Color("#f3ae4b")
 	relay_spark.modulate.a = 1.0
 	relay_spark.show()
@@ -2248,13 +2321,15 @@ func _update_controls() -> void:
 	wolf.queue_redraw()
 
 
-## Where WOLF goes on his own, or -1 to follow: the relay contact (held until the seal lands), the
-## Records mirror, the junction door seam on entry, clear of the vent and the blast while the line is
+## Where WOLF goes on his own, or -1 to follow: the relay contact (held until the seal lands), off
+## the relay while the engineer works the bypass (_wolf_off_relay), the Records mirror, the junction door seam on entry, clear of the vent and the blast while the line is
 ## live, and the rubble line once the door is down (he will not cross it unless he chooses to draw the
 ## sentry onto the mark).
 func _wolf_target_x() -> float:
 	if wolf_heading_to_relay or wolf_holding_relay:
 		return RELAY_CONTACT_X
+	if _wolf_off_relay():
+		return WOLF_BYPASS_CLEAR_X
 	match state.chapter_id:
 		"records":
 			return -1.0 if state.mirror_trace_preserved else 520.0
@@ -2270,6 +2345,17 @@ func _wolf_target_x() -> float:
 				# is locked on to the engineer or chasing them he waits at the rubble rather than walk into it.
 				return JunctionRoom.WOLF_BAIT_X if wolf_baiting and not _sentry_hunting() else JunctionRoom.WOLF_RUBBLE_X
 	return -1.0
+
+
+## WOLF keeps off the live relay, back towards the breaker: once he has refused it, or while the
+## engineer works the bypass instead, until the seal they opened has landed. So the bypass route
+## never shows him on the contact he did not take.
+func _wolf_off_relay() -> bool:
+	if state.chapter_id != "lockdown" or not state.breaker_armed:
+		return false
+	if state.door_open:
+		return seal_opening and state.route == "fallback"
+	return _relay_refused() or bypass_venting or bypass_ticks > 0
 
 
 ## The furthest right WOLF follows to: short of a shut door by his drawn reach, so he never noses
@@ -2527,7 +2613,9 @@ func _lane_hint(x: float) -> String:
 					return "E: pop the exit bolt."
 				&"charging":
 					return "The bolt is taking the overload."
-			return "E: leave through the hatch."
+			return HATCH_OPENING_HINT if _hatch_sliding() else "E: leave through the hatch."
+		if _hatch_sliding():
+			return HATCH_OPENING_HINT
 		return "The hatch is open. Leave through it." if bolt_state == &"open" else "The sentry is down. Pop the exit bolt by the hatch."
 	if drop_arm.cloud_active() and DropArm.in_cloud(x):
 		return "Coolant cloud. Get out of it."

@@ -365,10 +365,14 @@ func _check_scene() -> void:
 		await physics_frame
 	_expect(game.get("bolt_state") == &"charging" and room.bolt_charge > 0.0 and room.bolt_charge < 1.0, "the whine rises before the arc")
 	_expect(await _wait_until(func() -> bool: return game.get("bolt_state") == &"open", 60), "the bolt arcs after the whine")
-	_expect(room.hatch_label.text == "EXIT OPEN" and room.bolt_sparks.emitting and (game.get("impact") as Impact).trauma > 0.0, "the arc throws sparks, shakes the view and opens the exit")
+	_expect(room.bolt_sparks.emitting and (game.get("impact") as Impact).trauma > 0.0, "the arc throws sparks and shakes the view")
 	_expect(room.hatch_open < 1.0 and str(game.get("status_line")) == "The bolt arcs and drops.", "while the hatch is still opening the line says only that the bolt dropped")
+	_expect(room.hatch_label.text == "EXIT OPENING" and str(game.call("_context_hint")) == "The hatch is opening.", "while the hatch slides its plate and hint say it is opening, not open")
+	await _tap(&"interact")
+	_expect(not game.get("chapter_close_active") and not (game.get("state") as M0State).junction_cleared, "USE at a hatch still sliding does not leave through it")
 	_expect(await _wait_until(func() -> bool: return room.hatch_open >= 1.0 and Engine.time_scale == 1.0, 60), "the hatch slides open")
 	_expect(await _wait_until(func() -> bool: return str(game.get("status_line")) == "The bolt arcs and drops. The hatch slides open.", 6), "the line says the hatch slid open once it has")
+	_expect(room.hatch_label.text == "EXIT OPEN" and str(game.call("_context_hint")) == "E: leave through the hatch.", "once the hatch is open its plate reads EXIT OPEN and the hint offers the way out")
 	await _tap(&"interact")
 	var state: M0State = game.get("state") as M0State
 	_expect(state.junction_cleared and game.get("chapter_close_active") and not human.controlled and (game.get_node("CanvasLayer/TopBar/HUD") as Label).text.contains("SERVICE LINE CLEARED"), "USE at the open hatch clears the junction into a closing beat")

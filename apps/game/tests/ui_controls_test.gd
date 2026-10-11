@@ -183,6 +183,8 @@ func _run() -> void:
 	await process_frame
 	game.call("_finish_intro")
 	(game.get_node("Human") as M0Actor).position.x = 350.0
+	# The first USE at the breaker says the purge stakes (decision C); the second asks the question.
+	game.call("_interact")
 	game.call("_interact")
 	first_choice.grab_focus()
 	await process_frame
@@ -229,6 +231,7 @@ func _run() -> void:
 	# A choice left open when returning to the title cannot be committed from the title.
 	(game.get_node("Human") as M0Actor).position.x = 350.0
 	game.call("_interact")
+	game.call("_interact")
 	game.call("_pause_game")
 	title_button.pressed.emit()
 	Input.parse_input_event(_controller_button(JOY_BUTTON_X, true))
@@ -261,7 +264,9 @@ func _run() -> void:
 	Engine.max_fps = old_fps
 	DirAccess.remove_absolute(ProjectSettings.globalize_path(path))
 	game.queue_free()
-	await process_frame
+	# The bypass alarm from the touch crank may still be sounding; the mixer releases a stopped clip a
+	# few steps later, so give it that time before quitting.
+	await create_timer(0.1).timeout
 	if failures == 0:
 		print("UI and controls checks passed")
 	quit(1 if failures > 0 else 0)

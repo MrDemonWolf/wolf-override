@@ -810,6 +810,7 @@ func bolt_arc() -> void:
 		_hatch_tween.kill()
 	_hatch_tween = create_tween()
 	_hatch_tween.tween_property(self, "hatch_open", 1.0, HATCH_OPEN_SECONDS).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_IN_OUT)
+	_hatch_tween.tween_callback(refresh_state)
 	_hatch_tween.tween_callback(func() -> void: hatch_opened.emit())
 
 
@@ -844,9 +845,13 @@ func refresh_state() -> void:
 	arm_label.text = "RELEASE SPENT" if sentry_down else ("WINCHING UP" if arm_state == &"rewinding" else "TANK RELEASE")
 	tank_label.visible = sentry_down
 	arm_label.add_theme_color_override("font_color", Color("#8fa6b2") if sentry_down else (AMBER if arm_state == &"rewinding" else Color("#b0d1de")))
-	if junction_cleared or bolt_state == &"open":
+	if junction_cleared or (bolt_state == &"open" and hatch_open >= 1.0):
 		hatch_label.text = "EXIT OPEN"
 		hatch_label.add_theme_color_override("font_color", GREEN)
+	elif bolt_state == &"open":
+		# The bolt has dropped but the hatch is still sliding: it says open only once it is.
+		hatch_label.text = "EXIT OPENING"
+		hatch_label.add_theme_color_override("font_color", AMBER)
 	elif sentry_down:
 		hatch_label.text = "EXIT BOLT"
 		hatch_label.add_theme_color_override("font_color", AMBER)
