@@ -4,7 +4,8 @@
 
 /*
  * Site design tokens. `static` keeps every variable in the output even when
- * only plain CSS (docs-guide.css) reads it through var().
+ * only plain CSS (such as .hud-label below) or an arbitrary value reads it
+ * through var().
  * Colours are the dark landing palette: ink is the page background,
  * surface the raised panel colour, panel the landing's header bar and phone
  * menu (used with an opacity modifier), text and muted the two copy colours,
@@ -68,6 +69,8 @@
  *             sections tighten
  *   phone     700px and below: single-column phone layout
  *   phone-xs  360px and below: the narrowest phones
+ * The guide has one of its own:
+ *   guide-phone  680px and below: the guide's link cards stack in one column
  */
 @custom-variant menu {
   @media (max-width: 980px) { @slot; }
@@ -80,6 +83,9 @@
 }
 @custom-variant phone {
   @media (max-width: 700px) { @slot; }
+}
+@custom-variant guide-phone {
+  @media (max-width: 680px) { @slot; }
 }
 @custom-variant phone-xs {
   @media (max-width: 360px) { @slot; }
