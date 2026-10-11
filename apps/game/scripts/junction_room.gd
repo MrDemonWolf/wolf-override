@@ -103,14 +103,15 @@ const FLOOR_Y: float = 440.0
 const WOLF_SEAM_X: float = 418.0
 ## (He holds at the near edge of the rubble, so his sprite stays clear of the engineer at CHOICE_X.)
 const WOLF_RUBBLE_X: float = 448.0
-## Where WOLF stands when he chooses to draw the sentry: short of the mark, on the rubble side, so he
-## never walks through the machine, with all of his drawn body outside the floor brackets and the
-## tank's footprint. It parks BAIT_OFFSET past him, on the mark, facing him.
+## Where WOLF stands when he chooses to draw the sentry: at the lip of the rubble with only his front
+## over the lane line, so he never walks through the machine and his drawn body stays clear of the
+## engineer at the TANK RELEASE, the floor brackets and the tank. It parks BAIT_OFFSET
+## past him, on the mark, facing him.
 const WOLF_BAIT_X: float = DropArm.MARK_X - SentryBrain.BAIT_OFFSET
-## Where WOLF waits while the line builds and the fuse burns: left of the relief vent's grate (his
-## body clear of it) and well outside the door's blast zone, so he never stands where the engineer is
-## warned off.
-const WOLF_CLEAR_X: float = PressureLine.VENT_GRATE_MIN_X - M0State.WOLF_HALF_WIDTH - 1.0
+## Where WOLF waits while the line builds and the fuse burns: back by the entrance, his drawn body
+## (M0Actor.WOLF_REACH) clear of the engineer at the breaker, so it is nowhere near the relief vent's
+## grate, its steam or the door's blast zone.
+const WOLF_CLEAR_X: float = BREAKER_X - M0Actor.HUMAN_REACH - M0Actor.WOLF_REACH - 2.0
 ## The engineer's front foot on the rubble line: where the question of how to drop the tank comes up,
 ## still outside the sentry's lane.
 const CHOICE_X: float = RUBBLE_X - M0State.HUMAN_HALF_WIDTH
@@ -120,6 +121,8 @@ const CHOICE_X: float = RUBBLE_X - M0State.HUMAN_HALF_WIDTH
 ## as it patrols underneath.
 const TANK_REST_Y: float = 340.0
 const TANK_SIZE: Vector2 = TANK_REGION.size * TANK_ART_SCALE
+## The middle of the tank's shadow: on the floor stripes under it.
+const SHADOW_Y: float = FLOOR_Y + 1.0
 ## The arm's ceiling plate hangs on two rods from the mid plate's overhead gantry (its underside).
 const GANTRY_Y: float = 120.0
 ## The hatch slides open this long after the bolt arcs.
@@ -1109,18 +1112,13 @@ func mark_lit() -> bool:
 	return door_blown and not sentry_down and sentry.visual.is_lit() and DropArm.is_hit(sentry.target_x)
 
 
-## The tank's shadow and the floor brackets, both exactly as wide as the tank (DropArm.HIT_RANGE
-## either side of the mark). The shadow darkens and tightens as the tank comes down; the brackets light
-## up while the sentry's body is inside them, which is the hit rule (DropArm.is_hit).
+## The floor brackets and the tank's shadow, both as wide as the tank (DropArm.HIT_RANGE either side
+## of the mark). The shadow is laid over the stripes, dimming them and spilling onto the floor either
+## side, and darkens and tightens as the tank comes down; the bracket posts stay on top of it. The
+## brackets light up while the sentry is in them far enough to be hit (DropArm.is_hit).
 func _draw_floor_mark() -> void:
 	var left: float = DropArm.MARK_X - DropArm.HIT_RANGE
 	var width: float = DropArm.HIT_RANGE * 2.0
-	if arm_state != &"landed":
-		var shadow: PackedVector2Array = PackedVector2Array()
-		var half: Vector2 = Vector2(DropArm.HIT_RANGE * lerpf(1.25, 1.0, tank_drop), lerpf(3.0, 4.5, tank_drop))
-		for step: int in 20:
-			shadow.append(Vector2(DropArm.MARK_X, FLOOR_Y - 2.0) + Vector2(cos(step * TAU / 20.0) * half.x, sin(step * TAU / 20.0) * half.y))
-		draw_colored_polygon(shadow, Color(0.0, 0.0, 0.0, lerpf(0.35, 0.65, tank_drop)))
 	var lit: bool = mark_lit()
 	var stripe_color: Color = MARK_LIT if lit else AMBER
 	# The stripes run along the floor line and down onto the walkway in front of it, so a machine
@@ -1131,6 +1129,13 @@ func _draw_floor_mark() -> void:
 	for stripe: int in stripes:
 		var segment: Rect2 = Rect2(left + stripe * width / stripes, FLOOR_Y - 3.0, width / stripes, 7.0)
 		draw_rect(segment, stripe_color if stripe % 2 == 0 else Color("#1a2229"))
+	if arm_state != &"landed":
+		var shadow: PackedVector2Array = PackedVector2Array()
+		var half: Vector2 = Vector2(DropArm.HIT_RANGE * lerpf(1.35, 1.05, tank_drop), lerpf(5.0, 10.0, tank_drop))
+		var centre: Vector2 = Vector2(DropArm.MARK_X, SHADOW_Y)
+		for step: int in 24:
+			shadow.append(centre + Vector2(cos(step * TAU / 24.0) * half.x, sin(step * TAU / 24.0) * half.y))
+		draw_colored_polygon(shadow, Color(0.0, 0.0, 0.0, lerpf(0.25, 0.85, tank_drop)))
 	for edge: float in [left, left + width]:
 		draw_line(Vector2(edge, FLOOR_Y - 10.0), Vector2(edge, FLOOR_Y + 10.0), stripe_color, 2.0)
 

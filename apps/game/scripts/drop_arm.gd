@@ -6,14 +6,16 @@ extends RefCounted
 ## its hanging height in LIFT_SECONDS, then the clamp takes the rest of REWIND_SECONDS to latch, while
 ## the split line sprays a coolant cloud for CLOUD_SECONDS). The hit is decided where the tank lands,
 ## against the sentry's real position: the drawn floor brackets are the tank's footprint, and a hit is
-## the sentry's body overlapping them.
+## at least half of the sentry's body over them, so the tank always comes down on the machine where it
+## stands and a graze at the edge of the brackets is a miss.
 
 const MARK_X: float = 700.0
 ## Half the floor brackets, which are drawn this wide either side of the mark: the tank's own
 ## footprint (JunctionRoom.TANK_SIZE.x is 46.4 px), so what lands inside them is under the tank.
 const HIT_RANGE: float = 24.0
-## A sentry centred this close to the mark has its body (SentryBrain.HALF_WIDTH) over the brackets.
-const HIT_REACH: float = HIT_RANGE + SentryBrain.HALF_WIDTH
+## A sentry centred this close to the mark (its middle inside the brackets) has at least half of its
+## body (SentryBrain.HALF_WIDTH either side) over them, under the tank.
+const HIT_REACH: float = HIT_RANGE
 const FALL_SECONDS: float = 0.45
 const REWIND_SECONDS: float = 6.0
 ## After a miss the winch has the tank off the floor and back at its hanging height this fast, before
@@ -31,7 +33,7 @@ var cloud_remaining: float = 0.0
 var paused: bool = false
 
 
-## True when a sentry centred at [param target_x] has its body over the floor brackets.
+## True when a sentry centred at [param target_x] has at least half of its body over the floor brackets.
 static func is_hit(target_x: float) -> bool:
 	return absf(target_x - MARK_X) <= HIT_REACH + EPSILON
 

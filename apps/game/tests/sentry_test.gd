@@ -113,7 +113,8 @@ func _check_brain() -> void:
 	_expect(JunctionRoom.WOLF_BAIT_X + M0Actor.WOLF_REACH < DropArm.MARK_X - JunctionRoom.TANK_SIZE.x * 0.5, "all of WOLF's drawn body stands clear of the tank's footprint")
 	_expect(JunctionRoom.WOLF_BAIT_X + M0Actor.WOLF_REACH + 2.0 < DropArm.MARK_X - DropArm.HIT_RANGE, "all of WOLF's drawn body stands outside the floor brackets")
 	_expect(JunctionRoom.WOLF_BAIT_X + M0Actor.WOLF_REACH < fixated.x - SentryBrain.HALF_WIDTH, "WOLF's drawn body stops short of the parked sentry")
-	_expect(JunctionRoom.WOLF_BAIT_X > SentryBrain.LANE_ENTRY_X, "WOLF's spot is in the lane, so drawing it is a move he can be seen to make")
+	_expect(JunctionRoom.WOLF_BAIT_X + M0Actor.WOLF_REACH > SentryBrain.LANE_ENTRY_X and JunctionRoom.WOLF_BAIT_X > JunctionRoom.WOLF_RUBBLE_X, "WOLF steps up from the rubble until his front is over the lane line, so drawing it is a move he can be seen to make")
+	_expect(JunctionRoom.WOLF_BAIT_X + M0Actor.WOLF_REACH < JunctionRoom.ARM_X - M0Actor.HUMAN_REACH, "WOLF's drawn body stays clear of the engineer at the TANK RELEASE")
 	_check_bait_walk()
 	var from_left: SentryBrain = _patrolling_at(SentryBrain.PATROL_MIN_X, 1.0)
 	from_left.tick(2.0, 100.0, false, JunctionRoom.WOLF_BAIT_X)
@@ -201,13 +202,15 @@ func _check_arm() -> void:
 	# One rule the floor shows: the brackets are the tank's footprint, and a hit is the sentry's body
 	# over them when the tank lands.
 	_expect(absf(DropArm.HIT_RANGE - JunctionRoom.TANK_SIZE.x * 0.5) <= 1.0, "the floor brackets are as wide as the tank")
-	_expect(is_equal_approx(DropArm.HIT_REACH, DropArm.HIT_RANGE + SentryBrain.HALF_WIDTH), "a hit reaches as far as the sentry's body overlaps the brackets")
-	_expect(DropArm.is_hit(DropArm.MARK_X - DropArm.HIT_REACH) and DropArm.is_hit(DropArm.MARK_X + DropArm.HIT_REACH) and not DropArm.is_hit(DropArm.MARK_X - DropArm.HIT_REACH - 1.0) and not DropArm.is_hit(DropArm.MARK_X + DropArm.HIT_REACH + 1.0), "the hit window is the mark +/- the brackets plus half the sentry's body")
+	var edge_overlap: float = (DropArm.MARK_X + DropArm.HIT_RANGE) - (DropArm.MARK_X + DropArm.HIT_REACH - SentryBrain.HALF_WIDTH)
+	_expect(edge_overlap >= SentryBrain.HALF_WIDTH, "at the edge of the hit window at least half of the sentry's body is over the brackets (%.0f px)" % edge_overlap)
+	_expect(DropArm.is_hit(DropArm.MARK_X - DropArm.HIT_REACH) and DropArm.is_hit(DropArm.MARK_X + DropArm.HIT_REACH) and not DropArm.is_hit(DropArm.MARK_X - DropArm.HIT_REACH - 1.0) and not DropArm.is_hit(DropArm.MARK_X + DropArm.HIT_REACH + 1.0), "the hit window is the sentry's middle inside the brackets")
+	_expect(not DropArm.is_hit(DropArm.MARK_X + DropArm.HIT_RANGE + SentryBrain.HALF_WIDTH - 3.0) and not DropArm.is_hit(DropArm.MARK_X - DropArm.HIT_RANGE - SentryBrain.HALF_WIDTH + 3.0), "a graze, a few pixels of the body over a bracket, is a miss")
 	var arm: DropArm = DropArm.new()
 	_expect(arm.state == &"hung" and arm.drop_amount() == 0.0 and arm.advance(1.0, 700.0) == &"", "a hung tank waits")
 	_expect(arm.drop() and arm.state == &"falling" and not arm.drop(), "the clamp lets go once")
 	_expect(arm.advance(0.44, 700.0) == &"" and arm.drop_amount() > 0.5 and arm.drop_amount() < 1.0, "0.44 s into the fall it is still falling")
-	_expect(arm.advance(0.02, DropArm.MARK_X + DropArm.HIT_REACH) == &"hit" and arm.state == &"landed" and arm.drop_amount() == 1.0, "it lands at 0.45 s on a sentry whose body just reaches the brackets")
+	_expect(arm.advance(0.02, DropArm.MARK_X + DropArm.HIT_REACH) == &"hit" and arm.state == &"landed" and arm.drop_amount() == 1.0, "it lands at 0.45 s on a sentry with half its body in the brackets")
 	_expect(not arm.drop() and arm.advance(10.0, 700.0) == &"", "a landed tank is final")
 	var sliced: DropArm = DropArm.new()
 	sliced.drop()
@@ -317,6 +320,12 @@ func _check_scene() -> void:
 	_expect(not brain.is_holding(JunctionRoom.WOLF_BAIT_X) and str(game.call("_context_hint")) == "Wait for WOLF to park it on the mark." and not game.call("_drop_ready"), "at the release before WOLF has it on the mark the hint says to wait")
 	await _tap(&"interact")
 	_expect(arm.state == &"hung" and str(game.get("status_line")) == "Wait. WOLF hasn't got it on the mark yet.", "USE at the release before it is parked leaves the tank hanging")
+	# Once it is after the engineer WOLF has backed off, so the release no longer waits for him.
+	var drawing_state: StringName = brain.state
+	for hunting: StringName in [&"lock", &"chase"]:
+		brain.state = hunting
+		_expect(not game.call("_drop_waits_for_wolf") and game.call("_drop_ready") and wolf.autonomous_target_x == JunctionRoom.WOLF_BAIT_X, "with the sentry %s the release drops without waiting for WOLF" % ("locking on" if hunting == &"lock" else "chasing"))
+	brain.state = drawing_state
 	var walk_in_gap: Array[float] = [INF]
 	_expect(await _wait_until(func() -> bool:
 		walk_in_gap[0] = minf(walk_in_gap[0], absf(wolf.position.x - room.sentry.position.x))
@@ -325,6 +334,7 @@ func _check_scene() -> void:
 	_expect(absf(room.sentry.position.x - brain.x) <= 4.0, "the sentry body follows its brain (%.1f vs %.1f)" % [room.sentry.position.x, brain.x])
 	_expect(await _walk_to(human, JunctionRoom.ARM_X), "the engineer crosses to the panel")
 	_expect(not game.get("fail_active") and brain.state == &"fixated", "crossing while it holds on WOLF is safe")
+	_expect(absf(human.position.x - wolf.position.x) >= M0Actor.WOLF_REACH + M0Actor.HUMAN_REACH, "WOLF drawing it stands clear of the engineer at the release (%.1f px apart)" % absf(human.position.x - wolf.position.x))
 	_expect(str(game.call("_context_hint")).contains("drop the tank. It's parked") and game.call("_drop_ready"), "with it parked the release offers the drop")
 	await physics_frame
 	_expect(room.mark_lit(), "the floor brackets light up with the sentry's body inside them")
@@ -485,25 +495,38 @@ func _check_engineer_alone(game: Node2D, path: String) -> void:
 	var lead: float = SentryBrain.PATROL_SPEED * DropArm.FALL_SECONDS
 	_expect(await _wait_until(func() -> bool: return brain.facing < 0.0 and brain.x <= DropArm.MARK_X + lead + 8.0 and brain.x >= DropArm.MARK_X + lead - 8.0, 400), "the sentry comes toward the mark")
 	await _tap(&"interact")
-	_expect(await _wait_until(func() -> bool: return (game.get("state") as M0State).sentry_down, 60), "a drop timed on the patrol lands on it")
+	var last_live_x: Array[float] = [brain.x]
+	_expect(await _wait_until(func() -> bool:
+		if brain.state != &"down":
+			last_live_x[0] = brain.x
+		return (game.get("state") as M0State).sentry_down, 60), "a drop timed on the patrol lands on it")
 	await physics_frame
+	# The tank lands before the sentry moves each frame, so the wreck is where it was last seen moving.
+	_expect(absf(brain.x - last_live_x[0]) <= SentryBrain.PATROL_SPEED * 2.0 / 60.0, "the wreck stays where the tank caught it, no jump onto the mark (%.1f, last seen %.1f)" % [brain.x, last_live_x[0]])
 	_check_crushed(room, brain, "the timed hit")
 	var autosave_c: M0State = State.load_from_disk(path)
 	_expect(autosave_c != null and autosave_c.sentry_down and autosave_c.memory.get("choice_id") == State.PRESS, "the engineer-only route writes autosave C too")
 
 
-## The landed tank rests on the crushed hull of a wreck pinned under the mark, so the wreck's treads
-## and hull show below it and past both of its sides.
+## The landed tank rests on the crushed hull of a wreck pinned where the tank caught it, which is
+## within the hit window, so the wreck's treads and hull show below it; a wreck on the mark (WOLF's
+## hold, or Continue) shows past both of the tank's sides, and one caught off centre still has at
+## least half the tank's footprint over it.
 func _check_crushed(room: JunctionRoom, brain: SentryBrain, label: String) -> void:
 	var tank_base: float = room.tank.position.y + JunctionRoom.TANK_SIZE.y * 0.5
 	var wreck: Sprite2D = room.sentry.visual.wreck
 	# Measured where the wreck settles: keel_over drops it the last few pixels onto its treads.
 	var wreck_rect: Rect2 = wreck.get_global_transform() * wreck.get_rect()
 	wreck_rect.position.y -= room.sentry.visual.position.y
-	_expect(is_equal_approx(brain.x, DropArm.MARK_X) and absf(room.sentry.position.x - DropArm.MARK_X) < 0.01, "%s: the wreck is pinned on the mark under the tank" % label)
+	_expect(DropArm.is_hit(brain.x) and absf(room.sentry.position.x - brain.x) < 0.01, "%s: the wreck lies under the tank where it was caught (%.1f)" % [label, brain.x])
 	_expect(is_equal_approx(room.tank.position.y, JunctionRoom.landed_tank_y(true)) and absf(tank_base - (Sentry.FLOOR_Y - Sentry.WRECK_CRUSH_HEIGHT)) < 0.01, "%s: the tank rests on the crushed hull (base y %.1f), not on the floor" % [label, tank_base])
 	_expect(Sentry.WRECK_CRUSH_HEIGHT >= 20.0 and is_equal_approx(wreck_rect.end.y, Sentry.FLOOR_Y) and wreck_rect.end.y - tank_base >= 20.0, "%s: at least 20 px of the wreck shows under the tank, down to the floor" % label)
-	_expect(wreck_rect.position.x < DropArm.MARK_X - JunctionRoom.TANK_SIZE.x * 0.5 and wreck_rect.end.x > DropArm.MARK_X + JunctionRoom.TANK_SIZE.x * 0.5, "%s: the wreck shows past both sides of the tank" % label)
+	var tank_left: float = DropArm.MARK_X - JunctionRoom.TANK_SIZE.x * 0.5
+	var tank_right: float = DropArm.MARK_X + JunctionRoom.TANK_SIZE.x * 0.5
+	var covered: float = minf(wreck_rect.end.x, tank_right) - maxf(wreck_rect.position.x, tank_left)
+	_expect(covered >= JunctionRoom.TANK_SIZE.x * 0.5, "%s: at least half of the tank's footprint rests on the wreck (%.1f px)" % [label, covered])
+	if absf(brain.x - DropArm.MARK_X) < 0.5:
+		_expect(wreck_rect.position.x < tank_left and wreck_rect.end.x > tank_right, "%s: the wreck shows past both sides of the tank" % label)
 
 
 ## The coolant cloud is its own knockdown back to autosave B.
@@ -651,7 +674,7 @@ func _check_bait_walk() -> void:
 		var wolf_x: float = JunctionRoom.WOLF_RUBBLE_X
 		for _frame: int in 240:
 			wolf_x = move_toward(wolf_x, JunctionRoom.WOLF_BAIT_X, M0Actor.FOLLOW_SPEED * step)
-			brain.tick(step, 500.0, false, JunctionRoom.WOLF_BAIT_X if wolf_x > SentryBrain.LANE_ENTRY_X else -1.0)
+			brain.tick(step, 500.0, false, JunctionRoom.WOLF_BAIT_X if wolf_x + M0Actor.WOLF_REACH > SentryBrain.LANE_ENTRY_X else -1.0)
 			closest_in = minf(closest_in, absf(wolf_x - brain.x))
 		brain.alert()
 		for _frame: int in 120:

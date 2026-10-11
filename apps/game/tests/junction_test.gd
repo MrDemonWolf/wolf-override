@@ -398,7 +398,8 @@ func _check_vent_edges(game: Node2D, human: M0Actor, wolf: M0Actor, room: Juncti
 	_expect(not str(game.call("_context_hint")).begins_with("Relief vent"), "just left of the vent span there is no vent warning")
 	_expect(not room.vent_steam.emitting, "low on the gauge the vent shows no steam")
 	_expect(await _wait_until(func() -> bool: return absf(wolf.position.x - JunctionRoom.WOLF_CLEAR_X) <= 4.0, 180), "while the line builds WOLF waits at his spot")
-	_expect(JunctionRoom.WOLF_CLEAR_X + M0State.WOLF_HALF_WIDTH < PressureLine.VENT_GRATE_MIN_X and not PressureLine.is_in_blast(JunctionRoom.WOLF_CLEAR_X), "his spot keeps his body off the grate and out of the blast zone")
+	_expect(JunctionRoom.WOLF_CLEAR_X + M0Actor.WOLF_REACH < PressureLine.VENT_GRATE_MIN_X and JunctionRoom.WOLF_CLEAR_X + M0Actor.WOLF_REACH < PressureLine.BLAST_MIN_X, "his spot keeps all of his drawn body off the grate and out of the blast zone")
+	_expect(JunctionRoom.WOLF_CLEAR_X + M0Actor.WOLF_REACH < JunctionRoom.BREAKER_X - M0Actor.HUMAN_REACH and JunctionRoom.WOLF_CLEAR_X - M0Actor.WOLF_REACH >= 0.0, "his spot is clear of the engineer at the breaker and inside the room")
 	line.gauge = PressureLine.STEAM_GAUGE + 0.05
 	_expect(await _wait_until(func() -> bool: return room.vent_steam.emitting, 5), "near the top of the gauge the vent steams")
 	line.gauge = 0.999

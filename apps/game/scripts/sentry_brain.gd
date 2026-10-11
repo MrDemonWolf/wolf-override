@@ -39,13 +39,13 @@ const WATCH_X: float = COVER_MAX_X + HALF_WIDTH + 4.0
 const LOCK_SECONDS: float = 0.5
 ## Seconds an engineer must stay back over the rubble before a chase gives up.
 const LOSE_SECONDS: float = 2.5
-## A fixated sentry parks this far past the one drawing it, on the far side from the rubble. WOLF comes
-## from the rubble and stops short of the mark, so he never has to cross the machine. 116 is the floor
-## brackets' half width (DropArm.HIT_RANGE, 24) plus WOLF's drawn reach (M0Actor.WOLF_REACH, 67) plus
-## 25 px of air, so all of his drawn body stays outside the brackets and the tank's footprint while he
-## holds it on the mark; the bodies clear each other by far more than contact, and a sentry that turns
-## on the release after a miss never catches WOLF backing off to the rubble.
-const BAIT_OFFSET: float = 116.0
+## A fixated sentry parks this far past the one drawing it, on the far side from the rubble. WOLF draws
+## it from the lip of the rubble and never has to cross the machine. 216 puts him (JunctionRoom.WOLF_BAIT_X,
+## 484) with his drawn front (M0Actor.WOLF_REACH, 67) just over the lane line, yet clear of an engineer
+## at the TANK RELEASE (JunctionRoom.ARM_X less M0Actor.HUMAN_REACH) and far outside the floor brackets
+## and the tank's footprint while he holds it on the mark; a sentry that turns on the release after a
+## miss never catches WOLF backing off to the rubble.
+const BAIT_OFFSET: float = 216.0
 const EPSILON: float = 0.00001
 
 var state: StringName = &"dormant"

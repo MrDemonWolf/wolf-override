@@ -1336,7 +1336,7 @@ func _enter_junction() -> void:
 	_start_gameplay_camera()
 	wolf_scouting = true
 	_update_controls()
-	status_line = "WOLF runs ahead to read the pressure behind the sealed door.\n%s: The breaker on the left feeds that line. Overload it, crank the valve, and the seal goes." % state.human_name().get_slice(" ", 0).to_upper()
+	status_line = "WOLF runs ahead to read the pressure behind the sealed door.\n%s: The breaker by the entrance feeds that line. Overload it, crank the valve, and the door goes." % state.human_name().get_slice(" ", 0).to_upper()
 	# Autosave A: the start of the junction.
 	_save_progress()
 
@@ -1359,9 +1359,9 @@ func _interact_junction(x: float) -> void:
 	elif absf(x - JunctionRoom.VALVE_X) <= 52.0:
 		match pressure_line.state:
 			&"idle":
-				status_line = "The valve is dead. Arm the overload breaker on the left first."
+				status_line = "The valve is dead. Arm the overload breaker by the entrance first."
 			&"tripped":
-				status_line = "The vent let go and the breaker tripped. Reset it on the left."
+				status_line = "The vent let go and the breaker tripped. Reset it by the entrance."
 			&"building":
 				status_line = "The wheel is stiff. Hold USE to crank it; three real turns charge the seal."
 			&"charged", &"fuse":
@@ -1381,7 +1381,7 @@ func _interact_junction(x: float) -> void:
 	elif state.door_blown:
 		status_line = "No station in reach. The TANK RELEASE is in the alcove past the rubble."
 	else:
-		status_line = "No station in reach. The breaker is on the left, the valve by the door."
+		status_line = "No station in reach. The breaker is by the entrance, the valve by the door."
 
 
 ## True in the TANK RELEASE alcove, the one spot that drops the tank (and hides the engineer).
@@ -1395,13 +1395,25 @@ func _bait_holding() -> bool:
 	return sentry_brain.is_holding(JunctionRoom.WOLF_BAIT_X)
 
 
+## True while the release has to wait for WOLF: he is drawing the sentry and has not got it stopped on
+## the mark yet. Once it is after the engineer he has backed off to the rubble, so the release works
+## as it does on the patrol.
+func _drop_waits_for_wolf() -> bool:
+	return wolf_baiting and not _sentry_hunting() and not _bait_holding()
+
+
+## WOLF draws the sentry once his drawn front is over the rubble line into its lane.
+func _wolf_drawing_x() -> float:
+	return JunctionRoom.WOLF_BAIT_X if wolf_baiting and wolf.position.x + M0Actor.WOLF_REACH > SentryBrain.LANE_ENTRY_X else -1.0
+
+
 func _use_arm_panel() -> void:
 	if state.sentry_down:
 		status_line = "The tank is down on the sentry. The exit bolt is by the hatch."
 		return
 	match drop_arm.state:
 		&"hung":
-			if wolf_baiting and not _bait_holding():
+			if _drop_waits_for_wolf():
 				if status_line != DROP_WAIT_LINE:
 					drop_wait_return_line = status_line
 				status_line = DROP_WAIT_LINE
@@ -1548,8 +1560,9 @@ func _tick_lane(delta: float) -> void:
 				_tank_miss()
 			&"rehung":
 				_tank_rehung()
-		# WOLF draws it only once he is actually in its lane; it then parks just past his spot, on the mark.
-		var bait_x: float = JunctionRoom.WOLF_BAIT_X if wolf_baiting and wolf.position.x > SentryBrain.LANE_ENTRY_X else -1.0
+		# WOLF draws it only once his front is over the rubble line; it then parks BAIT_OFFSET past his
+		# spot, on the mark.
+		var bait_x: float = _wolf_drawing_x()
 		var before: StringName = sentry_brain.state
 		var was_holding: bool = _bait_holding()
 		sentry_brain.tick(delta, x, SentryBrain.is_exposed(x), bait_x)
@@ -1650,10 +1663,10 @@ func _choose_lane(response: int) -> void:
 
 ## BOOM 2: the tank comes down on the sentry. Autosave C.
 func _tank_hit() -> void:
-	# The tank pins the machine on the mark, where Continue from autosave C also puts it.
-	var at_x: float = DropArm.MARK_X
+	# The tank pins the machine where it stands (at most HIT_REACH off the mark, with half its body or
+	# more under the tank), so the wreck never jumps; Continue from autosave C lays it on the mark.
+	var at_x: float = sentry_brain.x
 	sentry_brain.knock_down()
-	sentry_brain.x = at_x
 	if not state.drop_sentry():
 		return
 	wolf_baiting = false
@@ -2254,15 +2267,15 @@ func _junction_hint(x: float) -> String:
 	if fuse_lit:
 		return "Fuse lit. Get clear of the door."
 	if absf(x - JunctionRoom.VALVE_X) <= 52.0:
-		return "The valve is dead. Arm the breaker on the left."
+		return "The valve is dead. Arm the breaker by the entrance."
 	if PressureLine.is_on_vent(x):
 		return "Relief vent. It lets go when the gauge peaks."
 	match line:
 		&"building":
 			return "The line is building. Crank the valve by the door."
 		&"tripped":
-			return "The breaker tripped. Reset it on the left."
-	return "Arm the breaker on the left, then crank the valve by the door."
+			return "The breaker tripped. Reset it by the entrance."
+	return "Arm the breaker by the entrance, then crank the valve by the door."
 
 
 ## True while the sentry is after the engineer: locking on or chasing.
@@ -2271,9 +2284,9 @@ func _sentry_hunting() -> bool:
 
 
 ## The tank can drop now: the engineer is at the TANK RELEASE with the tank hanging over a live
-## sentry, and, if WOLF is drawing it, he has it stopped on the mark.
+## sentry, and, if WOLF is drawing it, he has it stopped on the mark (_drop_waits_for_wolf).
 func _drop_ready() -> bool:
-	return state.chapter_id == "junction" and state.door_blown and not state.sentry_down and drop_arm.state == &"hung" and _at_arm_panel(human.position.x) and (not wolf_baiting or _bait_holding())
+	return state.chapter_id == "junction" and state.door_blown and not state.sentry_down and drop_arm.state == &"hung" and _at_arm_panel(human.position.x) and not _drop_waits_for_wolf()
 
 
 func _lane_hint(x: float) -> String:
@@ -2296,7 +2309,7 @@ func _lane_hint(x: float) -> String:
 		match drop_arm.state:
 			&"hung":
 				if wolf_baiting:
-					return "E: drop the tank. It's parked on the mark." if _bait_holding() else "Wait for WOLF to park it on the mark."
+					return "Wait for WOLF to park it on the mark." if _drop_waits_for_wolf() else "E: drop the tank. It's parked on the mark."
 				return "E: drop the tank. It must land with the sentry in the brackets."
 			&"falling":
 				return "The tank is falling."
