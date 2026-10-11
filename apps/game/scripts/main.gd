@@ -120,6 +120,10 @@ const BOLT_CHARGING_LINE: String = "The bolt is taking the charge."
 ## (JunctionRoom.WOLF_CLEAR_X) is beside it.
 const CORRIDOR_STATIONS: Array[Vector4] = [Vector4(350.0, 38.0, 52.0, 0.0), Vector4(876.0, 35.0, 52.0, 0.0)]
 const RECORDS_STATIONS: Array[Vector4] = [Vector4(190.0, 56.0, 58.0, 0.0), Vector4(520.0, 45.0, 58.0, -1.0), Vector4(830.0, 38.0, 58.0, 0.0)]
+## The junction's overload breaker is worked from its right, towards the valve: its left is where WOLF
+## waits while the line builds (JunctionRoom.WOLF_CLEAR_X), and the spot stays just off the relief
+## vent (PressureLine.VENT_MIN_X).
+const JUNCTION_STATIONS: Array[Vector4] = [Vector4(JunctionRoom.BREAKER_X, 37.0, 52.0, 1.0)]
 ## The engineer's front hand reaches this far over a machine's edge when standing beside it.
 const STATION_OVERLAP: float = 6.0
 ## The relay is WOLF's contact: the engineer stands on its right, towards the MANUAL BYPASS, clear of
@@ -149,6 +153,9 @@ const BOLT_WHINE_SECONDS: float = 0.6
 const LANE_CHOICE_TEXT: Array[String] = ["Draw it under the tank if you can stay clear.", "Stay back, I'll time it."]
 ## The tank release's answer to an early USE while WOLF is still drawing the sentry onto the mark.
 const DROP_WAIT_LINE: String = "Wait. WOLF hasn't got it on the mark yet."
+## The "Wait" stays up at least this long, even when the sentry stops on the mark a moment after the
+## press, so the answer to that press can be read.
+const DROP_WAIT_MIN_SECONDS: float = 1.5
 
 ## One switch for the depth pass (parallax, glows, haze, dust, reflections, grade) and the impact
 ## kit (shake, hit-stop, flash, rumble, particles, generated sound) so a Settings toggle can follow.
@@ -271,6 +278,8 @@ var wolf_baiting: bool = false
 var wolf_broke_off: bool = false
 ## The line the release's "Wait" replaced, said again once the sentry stops on the mark.
 var drop_wait_return_line: String = ""
+## Seconds the "Wait" must still stay up (DROP_WAIT_MIN_SECONDS from the last early press).
+var drop_wait_remaining: float = 0.0
 ## Seconds until the blast wakes the sentry, or 0.
 var sentry_wake_remaining: float = 0.0
 ## The exit bolt: locked until the sentry is down, charging through its whine, then open.
@@ -746,12 +755,15 @@ func _clear_station_body() -> void:
 		return
 
 
-## The stations of the current room the engineer works from beside (CORRIDOR_STATIONS, RECORDS_STATIONS).
+## The stations of the current room the engineer works from beside (CORRIDOR_STATIONS,
+## RECORDS_STATIONS, JUNCTION_STATIONS).
 func _room_stations() -> Array[Vector4]:
 	if state.chapter_id == "lockdown":
 		return CORRIDOR_STATIONS
 	if state.chapter_id == "records":
 		return RECORDS_STATIONS
+	if state.chapter_id == "junction":
+		return JUNCTION_STATIONS
 	return []
 
 
@@ -1424,6 +1436,7 @@ func _interact() -> void:
 		_interact_records(x)
 		return
 	if state.chapter_id == "junction":
+		_step_beside_station(x)
 		_interact_junction(x)
 		return
 	_step_beside_station(x)
@@ -1991,6 +2004,7 @@ func _use_arm_panel() -> void:
 				if status_line != DROP_WAIT_LINE:
 					drop_wait_return_line = status_line
 				status_line = DROP_WAIT_LINE
+				drop_wait_remaining = DROP_WAIT_MIN_SECONDS
 				return
 			_drop_tank()
 		&"rewinding":
@@ -2152,12 +2166,13 @@ func _tick_lane(delta: float) -> void:
 		# spot, on the mark.
 		var bait_x: float = _wolf_drawing_x()
 		var before: StringName = sentry_brain.state
-		var was_holding: bool = _bait_holding()
 		sentry_brain.tick(delta, x, SentryBrain.is_exposed(x), bait_x)
 		if sentry_brain.state != before:
 			_sentry_changed(before)
-		# Once it stops on the mark, "Wait" gives way to what was said before it.
-		if not was_holding and _bait_holding() and status_line == DROP_WAIT_LINE:
+		# Once it stops on the mark, and the "Wait" has been up long enough to read, it gives way to
+		# what was said before it.
+		drop_wait_remaining = maxf(drop_wait_remaining - delta, 0.0)
+		if status_line == DROP_WAIT_LINE and drop_wait_remaining <= 0.0 and _bait_holding():
 			status_line = drop_wait_return_line
 		if bolt_state == &"charging":
 			bolt_charge_remaining = maxf(bolt_charge_remaining - delta, 0.0)
@@ -2513,6 +2528,7 @@ func _sync_scene() -> void:
 	lane_choice = ""
 	wolf_baiting = false
 	wolf_broke_off = false
+	drop_wait_remaining = 0.0
 	sentry_wake_remaining = 0.0
 	if wolf_reaction_tween != null and wolf_reaction_tween.is_running():
 		wolf_reaction_tween.kill()

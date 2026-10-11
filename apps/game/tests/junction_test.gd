@@ -231,6 +231,8 @@ func _check_scene() -> void:
 	if not _require(line.state == &"building" and game.call("_objective") == "CRANK THE VALVE", "USE at the breaker arms the line"):
 		return
 	_expect(str(game.get("status_line")).contains("LINE gauge"), "arming names the LINE gauge")
+	# Audit 23: the engineer works the breaker from its right, beside the cabinet, facing it, off the grate.
+	_expect(await _wait_until(func() -> bool: return float(game.get("engineer_step_x")) < 0.0, 40) and human.position.x - M0Actor.HUMAN_REACH >= JunctionRoom.BREAKER_X + 37.0 - 6.0 - 0.5 and not PressureLine.is_on_vent(human.position.x) and human.body_sprite.flip_h and human.controlled, "after arming, the engineer stands beside the breaker, facing it, off the vent (x %.0f)" % human.position.x)
 	_expect(not room.vent_steam.emitting and room.breaker_label.text == "BREAKER LIVE", "an armed line lights the breaker, and the vent stays quiet at the bottom of the gauge")
 	await _tap(&"pause_game")
 	_expect(paused, "pause works in the junction")

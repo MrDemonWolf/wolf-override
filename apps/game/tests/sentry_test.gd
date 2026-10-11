@@ -321,6 +321,8 @@ func _check_scene() -> void:
 	_expect(not brain.is_holding(JunctionRoom.WOLF_BAIT_X) and str(game.call("_context_hint")) == "Wait for WOLF to park it on the mark." and not game.call("_drop_ready"), "at the release before WOLF has it on the mark the hint says to wait")
 	await _tap(&"interact")
 	_expect(arm.state == &"hung" and str(game.get("status_line")) == "Wait. WOLF hasn't got it on the mark yet.", "USE at the release before it is parked leaves the tank hanging")
+	var wait_pressed_ms: int = Time.get_ticks_msec()
+	var wait_seen_ms: Array[int] = [wait_pressed_ms]
 	# Once it is after the engineer WOLF has backed off, so the release no longer waits for him.
 	var drawing_state: StringName = brain.state
 	for hunting: StringName in [&"lock", &"chase"]:
@@ -330,7 +332,17 @@ func _check_scene() -> void:
 	var walk_in_gap: Array[float] = [INF]
 	_expect(await _wait_until(func() -> bool:
 		walk_in_gap[0] = minf(walk_in_gap[0], absf(wolf.position.x - room.sentry.position.x))
+		if str(game.get("status_line")) == "Wait. WOLF hasn't got it on the mark yet.":
+			wait_seen_ms[0] = Time.get_ticks_msec()
 		return brain.state == &"fixated" and absf(brain.x - DropArm.MARK_X) <= 0.5 and absf(wolf.position.x - JunctionRoom.WOLF_BAIT_X) <= 4.0, 300), "WOLF holds short of the mark and the sentry parks on it")
+	# The answer to the early press stays up long enough to read, even if it parks a moment later.
+	var wait_line_up: bool = str(game.get("status_line")) == "Wait. WOLF hasn't got it on the mark yet."
+	_expect(wait_line_up or wait_seen_ms[0] - wait_pressed_ms >= 1400, "the \"Wait\" stays up at least about 1.5 s after the early press (%d ms)" % (wait_seen_ms[0] - wait_pressed_ms))
+	_expect(await _wait_until(func() -> bool: return str(game.get("status_line")).begins_with("WOLF: You told me the truth at the relay."), 120), "once it is parked and the \"Wait\" has been read, WOLF's line comes back")
+	# While WOLF holds it, its beam watches only him: it ends short of the alcove, never on the engineer.
+	await physics_frame
+	var fixated_tip: float = Sentry.beam_tip_x(brain.x, room.sentry.visual.scale.x, true)
+	_expect(room.sentry.fixated and fixated_tip >= SentryBrain.COVER_MAX_X + SentryBrain.CONTACT_RANGE and is_equal_approx(room.sentry.visual.reach, absf(fixated_tip - room.sentry.position.x)) and room.sentry.visual.gap == Vector2.ZERO, "the fixated sentry's beam stops short of the TANK RELEASE alcove (tip %.0f)" % fixated_tip)
 	_expect(walk_in_gap[0] >= SentryBrain.HALF_WIDTH + M0State.WOLF_HALF_WIDTH, "WOLF never walks through the sentry on the way in (closest %.1f px)" % walk_in_gap[0])
 	_expect(absf(room.sentry.position.x - brain.x) <= 4.0, "the sentry body follows its brain (%.1f vs %.1f)" % [room.sentry.position.x, brain.x])
 	_expect(await _walk_to(human, JunctionRoom.ARM_X), "the engineer crosses to the panel")

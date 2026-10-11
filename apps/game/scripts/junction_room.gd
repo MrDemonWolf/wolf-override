@@ -195,8 +195,11 @@ const LINE_CAPTION_FONT_SIZE: int = 8
 const BLAST_STRIPE_HZ: float = 4.0
 ## The floor brackets glow this colour while the sentry's body is inside them.
 const MARK_LIT: Color = Color("#ffe9a8")
-## The alcove's floor is tinted over exactly the span that hides the engineer.
-const ALCOVE_FLOOR: Color = Color(0.25, 0.55, 0.62, 0.16)
+## The alcove's floor is tinted over exactly the span that hides the engineer, down onto the walkway
+## like the floor mark's stripes, and a post stands at each end of it, so where cover stops (the
+## right post) shows beside an engineer at the TANK RELEASE.
+const ALCOVE_FLOOR: Color = Color(0.25, 0.62, 0.72, 0.3)
+const ALCOVE_EDGE: Color = Color(0.5, 0.86, 0.94, 0.85)
 ## Cuts the turning wheel out of the valve image as a disc, so only the wheel turns over the
 ## painted one.
 const WHEEL_MASK: String = """shader_type canvas_item;
@@ -1002,12 +1005,23 @@ func _draw() -> void:
 	_draw_blast_zone()
 	if door_blown:
 		draw_line(Vector2(RUBBLE_X - 6.0, 439.0), Vector2(RUBBLE_X + 6.0, 439.0), AMBER, 3.0)
-	draw_rect(Rect2(SentryBrain.COVER_MIN_X, FLOOR_Y - 3.0, SentryBrain.COVER_MAX_X - SentryBrain.COVER_MIN_X, 6.0), ALCOVE_FLOOR)
+	_draw_alcove_floor()
 	_draw_arm_panel_light()
 	_draw_arm()
 	_draw_floor_mark()
 	_draw_hatch_lamp(hatch_art, _bolt_light_color(), 1.0)
 	draw_rect(prop_rect(bolt_panel_art, BOLT_PANEL_LIGHT), _bolt_light_color())
+
+
+## The alcove's floor: a tint over exactly the cover span, on the floor line and the walkway in front
+## of it, and an upright post at each end (the right one is where the sentry can see the engineer
+## again).
+func _draw_alcove_floor() -> void:
+	var left: float = SentryBrain.COVER_MIN_X
+	var right: float = SentryBrain.COVER_MAX_X
+	draw_rect(Rect2(left, FLOOR_Y - 3.0, right - left, 13.0), ALCOVE_FLOOR)
+	for edge: float in [left, right]:
+		draw_line(Vector2(edge, FLOOR_Y - 10.0), Vector2(edge, FLOOR_Y + 10.0), ALCOVE_EDGE, 2.0)
 
 
 ## The shadow of the alcove behind the TANK RELEASE, drawn on [param canvas] (Recesses, under the
