@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://crb7qd1wmx02r"
-path="res://.godot/imported/junction-blast-door-blown.png-16b18fd9fc1e64dc35e52d20ddc098f6.ctex"
+uid="uid://mhyt2uw8nb6"
+path="res://.godot/imported/junction-bulkhead-breaking.png-6eba61c513f7bdf46fd17c85c0ec6533.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/props/junction-blast-door-blown.png"
-dest_files=["res://.godot/imported/junction-blast-door-blown.png-16b18fd9fc1e64dc35e52d20ddc098f6.ctex"]
+source_file="res://assets/props/junction-bulkhead-breaking.png"
+dest_files=["res://.godot/imported/junction-bulkhead-breaking.png-6eba61c513f7bdf46fd17c85c0ec6533.ctex"]
 
 [params]
 

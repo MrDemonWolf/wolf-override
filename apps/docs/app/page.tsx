@@ -5,6 +5,7 @@ import Downloads, { ArrowIcon, sourceBuildHref } from './downloads';
 import { card, inlineLink, landingWidth, navLink, sectionAnchor, sectionCopy, sectionTitle } from './landing-classes';
 import corridorCapture480 from './images/corridor-start-capture-480.webp';
 import corridorCapture960 from './images/corridor-start-capture-960.webp';
+import corridorCapture1600 from './images/corridor-start-capture-1600.webp';
 import { pageMetadata, siteDescription } from '@/lib/seo';
 
 // Static export has no image optimiser, so the hero ships hand-encoded WebP sizes of the key art.
@@ -84,9 +85,9 @@ export default function HomePage() {
           className="relative isolate flex min-h-[clamp(46rem,92svh,60rem)] items-center bg-ink before:absolute before:inset-0 before:-z-1 before:bg-[linear-gradient(90deg,rgba(8,15,27,.04)_7%,rgba(8,15,27,.62)_40%,var(--color-ink)_69%),linear-gradient(0deg,var(--color-ink),transparent_27%)] compact:min-h-[min(clamp(44rem,88svh,54rem),90vw)] phone:block phone:min-h-0 phone:before:bg-[linear-gradient(0deg,var(--color-ink)_0%,var(--color-ink)_38%,rgba(8,15,27,.68)_57%,rgba(8,15,27,0)_78%)]"
           aria-labelledby="main-content"
         >
-          {/* Narrow and portrait screens anchor the cover-fitted art to the left edge, where both characters stand. */}
+          {/* Narrow and portrait screens slide the cover-fitted art 22% of the way from its left edge, which trims the pillar there and keeps the engineer and WOLF left of the copy column; phones anchor it to the left edge. */}
           <img
-            className="absolute inset-0 -z-2 size-full object-cover object-[25%_center] compact:object-[0%_50%] phone:h-80 phone:object-[0%_50%]"
+            className="absolute inset-0 -z-2 size-full object-cover object-[25%_center] compact:object-[22%_50%] phone:h-80 phone:object-[0%_50%]"
             src="/title-corridor-key-art-provisional-1024.webp"
             srcSet={keyArtSrcSet}
             sizes="100vw"
@@ -96,7 +97,7 @@ export default function HomePage() {
             fetchPriority="high"
             decoding="async"
           />
-          <div className="ml-[48%] w-[min(48%,660px)] max-w-[660px] pt-32 pr-8 pb-20 compact:ml-[44%] compact:w-[53%] phone:m-0 phone:w-full phone:max-w-none phone:px-5 phone:pt-86 phone:pb-5">
+          <div className="ml-[48%] w-[min(48%,660px)] max-w-[660px] pt-32 pr-8 pb-20 compact:ml-[46%] compact:w-[51%] phone:m-0 phone:w-full phone:max-w-none phone:px-5 phone:pt-86 phone:pb-5">
             <p className="hud-label mb-5">Sci-fi horror · In development</p>
             <h1 id="main-content" tabIndex={-1} className="mb-[1.65rem] text-[clamp(4.5rem,8.8vw,8.2rem)] leading-[.95] font-bold tracking-[-.055em] phone:mb-4 phone:text-[clamp(3rem,12.5vw,4.5rem)]">
               WOLF<span className="text-accent">//</span><br />OVERRIDE
@@ -133,8 +134,8 @@ export default function HomePage() {
           </div>
           <figure className={`${card} mt-14 phone:mt-10`}>
             {/* The link clips the image to the frame's top corners; the figure stays unclipped so the link's focus ring shows. */}
-            <a className="block overflow-hidden rounded-t-[calc(var(--radius-card)-1px)] hover-always:text-accent" href={corridorCapture960.src} target="_blank" rel="noopener noreferrer">
-              <img className="w-full" src={corridorCapture960.src} srcSet={`${corridorCapture480.src} 480w, ${corridorCapture960.src} 960w`} sizes="(min-width: 680px) 960px, 100vw" alt="Gameplay frame at the start of the maintenance corridor: the engineer and WOLF stand by the purge display while the objective card reads CHECK THE BREAKER and a tutorial box lists the move and read controls." width={corridorCapture960.width} height={corridorCapture960.height} loading="lazy" decoding="async" />
+            <a className="block overflow-hidden rounded-t-[calc(var(--radius-card)-1px)] hover-always:text-accent" href={corridorCapture1600.src} target="_blank" rel="noopener noreferrer">
+              <img className="w-full" src={corridorCapture960.src} srcSet={`${corridorCapture480.src} 480w, ${corridorCapture960.src} 960w, ${corridorCapture1600.src} 1600w`} sizes="(max-width: 700px) calc(100vw - 2rem), min(100vw - 4rem, 1200px)" alt="Gameplay frame at the start of the maintenance corridor: the engineer and WOLF stand by the purge display while the objective card reads CHECK THE BREAKER and a tutorial box lists the move and read controls." width={corridorCapture960.width} height={corridorCapture960.height} loading="lazy" decoding="async" />
               <span className="sr-only">(full-size image, opens in a new tab)</span>
             </a>
             <figcaption className="flex flex-wrap justify-between gap-x-4 gap-y-2 px-5 py-4 text-caption text-muted phone:flex-col">

@@ -9,7 +9,7 @@ description: How the safe point, automatic saves, Continue, New Game, and Pause 
 - **Records Access.** Entering Records Access from the safe point, copying the purge-order trace, preserving the mirror timestamp, and securing the exit each save automatically.
 - **Service Junction.** Entering the room, blowing the sealed door, bringing down the sentry, and leaving through the exit hatch each save automatically (see the table below).
 
-A save stores the room, both characters' positions, puzzle state, the engineer's display name, and the remembered choice. There is one checkpoint file, not multiple save slots, and each save replaces it.
+Each automatic save that works shows **Checkpoint saved.** in the hint line for about two seconds (never over a choice); the safe point says it in its own line. A save stores the room, both characters' positions, puzzle state, the engineer's display name, and the remembered choice. There is one checkpoint file, not multiple save slots, and each save replaces it.
 
 If an automatic save fails, the hint line shows **Save failed. Use a station to try again.** until you move to another spot or a later save works. Your next interact press, at a station or anywhere else in the room, tries the save again, and progress since the last successful save is stored once a later save works. If the first safe-point save fails, the safe point stays unused so you can use it again.
 
@@ -20,17 +20,19 @@ The Service Junction saves automatically four times, and Continue restores each 
 | Entering the room | The door still sealed and the breaker ready to arm; the valve's turns start again from zero |
 | Blowing the door | The door down, the breaker and valve spent, the sentry patrolling from the far end of its lane and the tank hung over the mark |
 | Bringing down the sentry | The sentry down under the tank and the exit bolt still to pop |
-| Leaving through the exit hatch | The bolt popped and the hatch open |
+| Leaving through the exit hatch | Nothing to continue: the slice is finished, and the title offers **PLAY AGAIN** instead (see below) |
 
 ## Knockdowns
 
-Being knocked down in the Service Junction (by the relief vent, the door blast, the sentry or the coolant cloud) returns you to the most recent of its saves, so you lose at most the step you were on. If that save failed to write, or the file cannot be read, the knockdown still returns you to the start of the step you were on, kept in memory, rather than to an older save, and the line after it reads **Back at the start of this beat.** The knockdown itself never writes the file, and your earlier choices and Records progress are kept. A blown door stays blown through every reload: the spent breaker and valve cannot be used again.
+Being knocked down in the Service Junction (by the relief vent, the door blast, the sentry or the coolant cloud) returns you to the most recent of its saves, so you lose at most the step you were on. If that save failed to write, or the file cannot be read, the knockdown still returns you to the start of the step you were on, kept in memory, rather than to an older save, and the line after it reads **Back at the start of this stretch.** instead of **Back at the last checkpoint.** The knockdown itself never writes the file, and your earlier choices and Records progress are kept. A blown door stays blown through every reload: the spent breaker and valve cannot be used again.
 
 ## Continue and New Game
 
-**Continue** on the title screen resumes a valid checkpoint without replaying the opening. In Records Access it tells you which copy is next or that the exit is open. When Continue is unavailable, a note under it says why: **No checkpoint yet** means no safe point has been used, and **Saved checkpoint could not be read** means the file is damaged; reaching the safe point in a new run replaces it. If the checkpoint file is missing or damaged but a complete save was still being written when the game closed, Continue uses that copy.
+**Continue** on the title screen resumes a valid checkpoint without replaying the opening. In Records Access it tells you which copy is next or that the exit is open. When Continue is unavailable, a note under it says why: **No checkpoint yet. Saving starts at the first SAFE POINT.** means no safe point has been used, and **Saved checkpoint could not be read** means the file is damaged; reaching the safe point in a new run replaces it. If the checkpoint file is missing or damaged but a complete save was still being written when the game closed, Continue uses that copy.
 
 **New Game** begins a fresh run with the opening. The old checkpoint remains until the fresh run saves over it.
+
+After the end of the slice the title shows one **PLAY AGAIN** button in place of New Game and Continue, with the note **Slice complete. PLAY AGAIN starts a fresh run.** It works like New Game: the opening plays, and the finished save stays until the new run saves over it.
 
 ## Pause and Return to Title
 

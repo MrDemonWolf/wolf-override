@@ -7,10 +7,11 @@ import type { StaticImageData } from 'next/image';
  * margin-top and margin-bottom ones, so margins here use separate top and bottom utilities.
  */
 
-/** Wide screenshot (960px) with its half-size (480px) variant. */
+/** Wide screenshot (960px) with its half-size (480px) variant and, optionally, a larger copy the link opens. */
 type ScreenshotProps = {
   image: StaticImageData;
   small: StaticImageData;
+  large?: StaticImageData;
   alt: string;
   caption: string;
 };
@@ -22,14 +23,15 @@ type ScreenshotProps = {
  * focus ring shows. The image and caption reset the typography margins (2em and .857em) that
  * otherwise open gaps above and below the image inside the frame.
  */
-export function Screenshot({ image, small, alt, caption }: ScreenshotProps) {
+export function Screenshot({ image, small, large, alt, caption }: ScreenshotProps) {
+  const full = large ?? image;
   return (
     <figure className="mt-6 mb-8 rounded-card border border-fd-border bg-fd-card">
-      <a className="block overflow-hidden rounded-t-[calc(var(--radius-card)-1px)]" href={image.src} target="_blank" rel="noopener noreferrer">
+      <a className="block overflow-hidden rounded-t-[calc(var(--radius-card)-1px)]" href={full.src} target="_blank" rel="noopener noreferrer">
         <img
           className="mt-0 mb-0 w-full"
           src={image.src}
-          srcSet={`${small.src} ${small.width}w, ${image.src} ${image.width}w`}
+          srcSet={`${small.src} ${small.width}w, ${image.src} ${image.width}w${large ? `, ${large.src} ${large.width}w` : ''}`}
           sizes="(min-width: 680px) 680px, 100vw"
           alt={alt}
           width={image.width}

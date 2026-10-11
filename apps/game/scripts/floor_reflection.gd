@@ -40,6 +40,7 @@ static func attach(target: Sprite2D, strength: float = 0.32) -> FloorReflection:
 	material.shader = SHADER
 	material.set_shader_parameter("strength", strength)
 	material.set_shader_parameter("wobble_px", 1.2 / maxf(absf(target.scale.y), 0.001))
+	material.set_shader_parameter("lod_bias", lod_bias_of(target))
 	if target.region_enabled and target.texture != null:
 		var texture_height: float = float(target.texture.get_height())
 		material.set_shader_parameter("uv_span", Vector2(target.region_rect.position.y, target.region_rect.end.y) / texture_height)
@@ -67,9 +68,19 @@ func _mirror() -> void:
 	scale = Vector2(source.scale.x, source.scale.y * SQUASH)
 	rotation = -source.rotation
 	flip_h = source.flip_h
-	modulate = source.modulate
+	# self_modulate too, so the reflection dims with WOLF as he passes behind the engineer.
+	modulate = source.modulate * source.self_modulate
 	shadow.position = Vector2(source.position.x, floor_y)
 	shadow.modulate.a = source.modulate.a
+
+
+## The mipmap LOD bias a sprite samples with: its sharp_sprite material's lod_bias, or 0.0.
+static func lod_bias_of(sprite: Sprite2D) -> float:
+	var shader_material: ShaderMaterial = sprite.material as ShaderMaterial
+	if shader_material == null:
+		return 0.0
+	var bias: Variant = shader_material.get_shader_parameter("lod_bias")
+	return float(bias) if bias is float or bias is int else 0.0
 
 
 static func _half_height(sprite: Sprite2D) -> float:

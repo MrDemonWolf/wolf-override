@@ -51,7 +51,7 @@ func _initialize() -> void:
 	_expect(migrated != null, "legacy WOLF-controlled checkpoint loads")
 	if migrated != null:
 		_expect(migrated.active_actor == "human" and migrated.human_position == Vector2(876.0, 410.0), "legacy checkpoint restores engineer at safe point without wolf-height floor overlap")
-		_expect(migrated.wolf_position == Vector2(812.0, 423.0) and migrated.to_dict()["version"] == State.SAVE_VERSION, "legacy companion restores one follow gap left of engineer")
+		_expect(migrated.wolf_position == Vector2(876.0 - M0Actor.FOLLOW_GAP, 423.0) and migrated.to_dict()["version"] == State.SAVE_VERSION, "legacy companion restores one follow gap left of engineer")
 	var invalid_new_save: Dictionary = state.to_dict()
 	invalid_new_save["active_actor"] = "wolf"
 	_expect(State.from_dict(invalid_new_save) == null, "new saves cannot restore WOLF control")
@@ -73,7 +73,7 @@ func _initialize() -> void:
 	records.activate_power("wolf")
 	records.reach_checkpoint()
 	_expect(records.enter_records() and not records.enter_records() and records.chapter_id == "records", "checkpoint enters records once")
-	_expect(records.human_position == Vector2(128.0, 410.0) and records.wolf_position == Vector2(64.0, 423.0), "records begins with both actors at its entrance")
+	_expect(records.human_position == Vector2(128.0, 410.0) and records.wolf_position == Vector2(216.0, 423.0), "records begins with the engineer at its entrance and WOLF a follow gap ahead")
 	_expect(not records.preserve_mirror_trace("wolf") and not records.complete_chapter(), "mirror and completion wait for the purge trace")
 	_expect(records.preserve_purge_trace() and not records.preserve_purge_trace(), "purge trace records once")
 	_expect(not records.preserve_mirror_trace("unknown") and records.preserve_mirror_trace("manual") and not records.preserve_mirror_trace("wolf"), "mirror accepts one valid route")

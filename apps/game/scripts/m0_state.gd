@@ -18,11 +18,14 @@ const CHOICE_TEXT = {
 	"disclose_risk": "The relay may vent coolant. Your call.",
 	"press_without_warning": "Go now. We can talk after.",
 }
+## The saved ways the junction's sentry can have come down (lane_recap), empty before it falls.
+const LANE_RECAPS: Array[String] = ["", "wolf", "refused", "alone"]
 
 var active_actor: String = "human"
 var name_index: int = 0
 var human_position: Vector2 = Vector2(160.0, 410.0)
-var wolf_position: Vector2 = Vector2(96.0, 423.0)
+## WOLF starts one follow gap (M0Actor.FOLLOW_GAP) behind the engineer, clear of his body.
+var wolf_position: Vector2 = Vector2(72.0, 423.0)
 var memory: Dictionary = {}
 var breaker_armed: bool = false
 var door_open: bool = false
@@ -37,6 +40,10 @@ var chapter_complete: bool = false
 var door_blown: bool = false
 var sentry_down: bool = false
 var junction_cleared: bool = false
+## How the sentry came down, for the END OF SLICE recap: "wolf" (he drew it onto the mark), "refused"
+## (he would not, so the engineer timed it), "alone" (he held at the rubble while the engineer timed
+## it), or empty before the fall. Optional in the file, so v4 saves without it still load.
+var lane_recap: String = ""
 
 
 func human_name() -> String:
@@ -96,8 +103,10 @@ func enter_records() -> bool:
 	if not checkpoint_reached or chapter_id != "lockdown":
 		return false
 	chapter_id = "records"
+	# WOLF comes in one follow gap ahead: he heads straight for the mirror, so he never starts by
+	# walking through the engineer.
 	human_position = Vector2(128.0, 410.0)
-	wolf_position = Vector2(64.0, 423.0)
+	wolf_position = Vector2(216.0, 423.0)
 	return true
 
 
@@ -128,8 +137,9 @@ func enter_junction() -> bool:
 	if chapter_id != "records" or not chapter_complete:
 		return false
 	chapter_id = "junction"
+	# WOLF comes in one follow gap ahead, already on his way to read the door seam.
 	human_position = Vector2(120.0, 410.0)
-	wolf_position = Vector2(64.0, 423.0)
+	wolf_position = Vector2(208.0, 423.0)
 	return true
 
 
@@ -168,10 +178,11 @@ func checkpoint_callback() -> String:
 		return ""
 	var said: String = str(memory.get("selected_text", ""))
 	if memory.get("choice_id") == PRESS:
-		return "WOLF: You said \"%s\"\nI refused. You found another way." % said
+		return "WOLF: You said \"%s\"\nI refused. You found another way. Next time, tell me what it costs." % said
 	if route == "cooperate":
 		return "WOLF: You said \"%s\"\nI chose the relay. We made it." % said
-	return "WOLF: You said \"%s\"\nYou took the bypass. I stayed with you." % said
+	# Told the risk, he offered the contact; the engineer cranked the manual bypass instead.
+	return "WOLF: You said \"%s\"\nI made my call. You cranked the bypass anyway. I stayed." % said
 
 
 func to_dict() -> Dictionary:
@@ -194,6 +205,7 @@ func to_dict() -> Dictionary:
 		"door_blown": door_blown,
 		"sentry_down": sentry_down,
 		"junction_cleared": junction_cleared,
+		"lane_recap": lane_recap,
 	}
 
 
@@ -286,12 +298,18 @@ static func from_dict(raw: Variant) -> M0State:
 					return null
 		elif data["door_blown"] or data["sentry_down"] or data["junction_cleared"]:
 			return null
+	# The lane recap is optional (older v4 saves lack it) and only describes a fallen sentry.
+	var raw_lane_recap: Variant = data.get("lane_recap", "")
+	if typeof(raw_lane_recap) != TYPE_STRING or not (raw_lane_recap in LANE_RECAPS):
+		return null
+	if raw_lane_recap != "" and not data.get("sentry_down", false):
+		return null
 	var state: M0State = M0State.new()
 	state.name_index = int(identity["name_index"])
 	state.active_actor = "human"
 	var human_x: float = float(positions["wolf"][0]) if legacy_wolf_save else float(positions["human"][0])
 	state.human_position = Vector2(human_x, float(positions["human"][1]))
-	var wolf_x: float = clampf(human_x - 64.0, 40.0, 920.0) if legacy_wolf_save else float(positions["wolf"][0])
+	var wolf_x: float = clampf(human_x - M0Actor.FOLLOW_GAP, 40.0, 920.0) if legacy_wolf_save else float(positions["wolf"][0])
 	state.wolf_position = Vector2(wolf_x, float(positions["wolf"][1]))
 	state.memory = loaded_memory.duplicate(true)
 	if not state.memory.is_empty():
@@ -310,6 +328,7 @@ static func from_dict(raw: Variant) -> M0State:
 		state.door_blown = data["door_blown"]
 		state.sentry_down = data["sentry_down"]
 		state.junction_cleared = data["junction_cleared"]
+	state.lane_recap = raw_lane_recap
 	return state
 
 

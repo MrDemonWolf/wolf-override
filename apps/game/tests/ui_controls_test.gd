@@ -101,6 +101,23 @@ func _run() -> void:
 	await process_frame
 	use.button_up.emit()
 	_expect(game.get("tutorial_step") == 2 and not (game.get_node("CanvasLayer/TutorialPrompt") as Control).visible, "touch use reads the display and clears the tutorial")
+	# Holding the touch USE button cranks the corridor's MANUAL BYPASS; Pause lets go and keeps the turns made.
+	var crank_state: M0State = game.get("state") as M0State
+	crank_state.record_choice(M0State.PRESS)
+	crank_state.arm_breaker()
+	(game.get_node("Human") as M0Actor).position.x = 700.0
+	game.call("_refresh_ui")
+	_expect(use.text == "CRANK", "touch USE reads CRANK at the live bypass")
+	use.button_down.emit()
+	await create_timer(1.0).timeout
+	var held_turns: int = int(game.get("bypass_ticks"))
+	_expect(held_turns >= 2 and not crank_state.door_open, "holding touch USE cranks the bypass (%d turns after a second)" % held_turns)
+	game.call("_pause_game")
+	_expect(paused and not Input.is_action_pressed(&"interact"), "Pause lets go of a held USE")
+	use.button_up.emit()
+	game.call("_resume_game")
+	await create_timer(0.5).timeout
+	_expect(int(game.get("bypass_ticks")) == held_turns and not crank_state.door_open, "the turns made before Pause stay, and nothing cranks without the button held")
 	game.set("waiting_for_choice", true)
 	game.call("_refresh_ui")
 	var first_choice: Button = touch.get_node("Choice1") as Button
@@ -166,6 +183,8 @@ func _run() -> void:
 	await process_frame
 	game.call("_finish_intro")
 	(game.get_node("Human") as M0Actor).position.x = 350.0
+	# The first USE at the breaker says the purge stakes (decision C); the second asks the question.
+	game.call("_interact")
 	game.call("_interact")
 	first_choice.grab_focus()
 	await process_frame
@@ -212,6 +231,7 @@ func _run() -> void:
 	# A choice left open when returning to the title cannot be committed from the title.
 	(game.get_node("Human") as M0Actor).position.x = 350.0
 	game.call("_interact")
+	game.call("_interact")
 	game.call("_pause_game")
 	title_button.pressed.emit()
 	Input.parse_input_event(_controller_button(JOY_BUTTON_X, true))
@@ -240,11 +260,50 @@ func _run() -> void:
 	Input.parse_input_event(_controller_button(JOY_BUTTON_B, false))
 	await process_frame
 	_expect(not paused and not overlay.visible, "controller B on a touch-opened pause menu resumes play like any cancel press")
+	# The END OF SLICE card (decision D) answers touch, controller and keyboard through the real input path.
+	var end_card: Control = game.get_node("CanvasLayer/EndCard") as Control
+	var end_button: Button = end_card.get_node("EndCardContinue") as Button
+	game.set("controller_active", false)
+	game.call("_show_end_card")
+	await process_frame
+	_expect(end_card.visible and end_button.text == "TAP CONTINUE" and not (game.get_node("CanvasLayer/TouchControls") as Control).visible and not (game.get_node("CanvasLayer/PauseButton") as Control).visible, "on touch the END OF SLICE card shows TAP CONTINUE with no play buttons over it")
+	var tap_at: Vector2 = root.get_final_transform() * end_button.get_global_rect().get_center()
+	var tap: InputEventScreenTouch = InputEventScreenTouch.new()
+	tap.index = 0
+	tap.position = tap_at
+	tap.pressed = true
+	Input.parse_input_event(tap)
+	await process_frame
+	tap.pressed = false
+	Input.parse_input_event(tap)
+	await _settle(2)
+	_expect(game.get("title_open") and not end_card.visible, "a tap on the card's button goes on to the title")
+	game.set("touch_enabled", false)
+	new_game.pressed.emit()
+	game.call("_finish_intro")
+	game.set("controller_active", true)
+	game.call("_show_end_card")
+	await process_frame
+	_expect(end_card.visible and end_button.has_focus() and end_button.text.ends_with("  CONTINUE") and not end_button.text.begins_with("E "), "with a controller the card's button has focus and its prompt names the controller button (%s)" % end_button.text)
+	Input.parse_input_event(_controller_button(JOY_BUTTON_A, true))
+	await _settle(2)
+	Input.parse_input_event(_controller_button(JOY_BUTTON_A, false))
+	await process_frame
+	_expect(game.get("title_open") and not end_card.visible, "controller A on the card goes on to the title")
+	new_game.pressed.emit()
+	game.call("_finish_intro")
+	game.call("_show_end_card")
+	await process_frame
+	await _send_escape(true)
+	await _send_escape(false)
+	_expect(game.get("title_open") and not end_card.visible and not paused, "Esc on the card goes on to the title instead of pausing")
 	game.set("touch_enabled", false)
 	Engine.max_fps = old_fps
 	DirAccess.remove_absolute(ProjectSettings.globalize_path(path))
 	game.queue_free()
-	await process_frame
+	# The bypass alarm from the touch crank may still be sounding; the mixer releases a stopped clip a
+	# few steps later, so give it that time before quitting.
+	await create_timer(0.1).timeout
 	if failures == 0:
 		print("UI and controls checks passed")
 	quit(1 if failures > 0 else 0)
@@ -269,7 +328,10 @@ func _send_escape(pressed: bool) -> void:
 
 
 ## A one-finger drag over `pos` that moves `delta_y` pixels in three steps, pushed through the real input path.
-func _send_touch_drag(pos: Vector2, delta_y: float) -> void:
+## `pos` and `delta_y` are in the 960x540 canvas; the events are sent in window pixels, as the OS sends them.
+func _send_touch_drag(canvas_pos: Vector2, canvas_delta_y: float) -> void:
+	var pos: Vector2 = root.get_final_transform() * canvas_pos
+	var delta_y: float = canvas_delta_y * root.get_final_transform().get_scale().y
 	var touch: InputEventScreenTouch = InputEventScreenTouch.new()
 	touch.index = 0
 	touch.position = pos
@@ -290,7 +352,10 @@ func _send_touch_drag(pos: Vector2, delta_y: float) -> void:
 
 
 ## A left-button mouse drag over `pos` that moves `delta_y` pixels in three steps on the given input device.
-func _send_mouse_drag(pos: Vector2, delta_y: float, device: int) -> void:
+## Canvas coordinates in, window pixels out, as for the touch drag.
+func _send_mouse_drag(canvas_pos: Vector2, canvas_delta_y: float, device: int) -> void:
+	var pos: Vector2 = root.get_final_transform() * canvas_pos
+	var delta_y: float = canvas_delta_y * root.get_final_transform().get_scale().y
 	var press: InputEventMouseButton = InputEventMouseButton.new()
 	press.button_index = MOUSE_BUTTON_LEFT
 	press.pressed = true

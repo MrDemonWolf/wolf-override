@@ -33,6 +33,8 @@ var chapter_complete: bool = false
 var exit_art: Sprite2D
 var purge_label: Label
 var mirror_label: Label
+## Every station name; each fades out as it reaches the edge of the view, like the junction's.
+var station_labels: Array[Label] = []
 var depth: RoomDepth
 var purge_glow: Sprite2D
 var mirror_glow: Sprite2D
@@ -70,26 +72,43 @@ func _ready() -> void:
 	refresh_state()
 
 
-## An additive glow over a drawn machine light; refresh_state() tints it with the light's colour.
+## An additive glow over a drawn machine light; refresh_state() tints it with the light's colour. It
+## sits at this node's own depth, under the actors, so someone at the machine is drawn in front of it.
 func _add_glow(glow_name: String, at: Vector2) -> Sprite2D:
 	var glow: Sprite2D = RoomDepth.make_glow(Color.WHITE, Vector2(72.0, 32.0), 0.6)
 	glow.name = glow_name
 	glow.position = at
-	glow.z_index = 1
+	glow.z_index = 0
 	add_child(glow)
 	return glow
 
 
+## A station name centred on [param center_x], sized to its text so it fades by the text itself.
 func _add_station_label(caption: String, center_x: float, tint: Color, label_y: float = 309.0) -> Label:
 	var label: Label = Label.new()
 	label.text = caption
-	label.position = Vector2(center_x - 90.0, label_y)
-	label.size = Vector2(180.0, 30.0)
 	label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	label.add_theme_font_size_override("font_size", 13)
 	label.add_theme_color_override("font_color", tint)
+	label.set_meta(&"center", Vector2(center_x, label_y))
 	add_child(label)
+	station_labels.append(label)
+	_fit_label(label)
 	return label
+
+
+## Shrinks [param label] to its text and centres it on its station again.
+func _fit_label(label: Label) -> void:
+	var center: Vector2 = label.get_meta(&"center")
+	label.size = Vector2.ZERO
+	label.size = label.get_combined_minimum_size()
+	label.position = Vector2(center.x - label.size.x * 0.5, center.y)
+
+
+## A name the edge of the view would cut fades out instead (JunctionRoom.fade_at_view_edge).
+func _process(_delta: float) -> void:
+	if visible:
+		JunctionRoom.fade_at_view_edge(station_labels, get_viewport())
 
 
 func refresh_state() -> void:
@@ -99,6 +118,8 @@ func refresh_state() -> void:
 	mirror_label.add_theme_color_override("font_color", Color("#a4f0c4") if mirror_trace_preserved else Color("#b6edff"))
 	purge_glow.modulate = Color(_purge_light_color(), 0.6)
 	mirror_glow.modulate = Color(_mirror_light_color(), 0.6)
+	for label: Label in station_labels:
+		_fit_label(label)
 	queue_redraw()
 
 

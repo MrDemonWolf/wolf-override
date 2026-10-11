@@ -29,16 +29,27 @@ func _run() -> void:
 	_expect(str(game.call("_context_hint")).contains("enter records"), "checkpoint entry hint appears at the safe point")
 	game.call("_interact_checkpoint")
 	_expect(state.chapter_id == "records" and FileAccess.file_exists(path), "checkpoint opens and saves a second room")
-	_expect(str(game.get("status_line")).contains("I chose the relay"), "second room remembers the cooperative choice")
+	game.call("_refresh_ui")
+	_expect(str(game.get("status_line")).begins_with("WOLF: I took the relay because you told me the truth.") and (game.get_node("CanvasLayer/BottomBar/Speaker") as Label).text == "WOLF", "second room remembers the cooperative choice, under WOLF's tag")
 	_expect((game.get("records_room") as RecordsRoom).visible and game.call("_objective") == "COPY PURGE ORDER", "records room and first objective are visible")
 	var human: M0Actor = game.get_node("Human") as M0Actor
 	var wolf: M0Actor = game.get_node("Wolf") as M0Actor
-	_expect(human.controlled and not wolf.controlled and wolf.autonomous_target_x == 520.0, "only engineer is playable while WOLF starts his own mirror check")
+	var main_constants: Dictionary = (game.get_script() as Script).get_script_constant_map()
+	var wolf_mirror_x: float = main_constants["WOLF_MIRROR_X"]
+	_expect(human.controlled and not wolf.controlled and wolf.autonomous_target_x == wolf_mirror_x, "only engineer is playable while WOLF starts his own mirror check")
 	if not await _walk_to(human, 190.0):
 		_fail("engineer can walk to the purge queue")
 		return
 	await _tap(&"interact")
 	_expect(state.purge_trace_preserved and game.call("_objective") == "COPY MIRROR INDEX", "purge trace advances objective")
+	# Audit 23: a USE over the middle of a machine steps the engineer out beside it, facing it.
+	_expect(await _wait_until(func() -> bool: return float(game.get("engineer_step_x")) < 0.0, 40) and human.position.x + M0Actor.HUMAN_REACH <= 190.0 - 56.0 + 18.0 and not human.body_sprite.flip_h and human.controlled, "after copying the purge order the engineer stands beside the purge queue, facing it (x %.0f)" % human.position.x)
+	var purge_save: M0State = State.load_from_disk(path)
+	_expect(purge_save != null and absf(purge_save.human_position.x - human.position.x) <= 0.5, "the purge-copy autosave keeps the spot the engineer stepped out to, not the middle of the purge queue")
+	if not await _walk_to(human, 350.0):
+		_fail("engineer can walk between the Records stations")
+		return
+	_expect(str(game.call("_context_hint")) == "Follow the station lights: mirror port, then exit.", "between stations after the purge copy the hint names only what is left (%s)" % game.call("_context_hint"))
 	if not await _walk_to(human, 520.0):
 		_fail("engineer can walk to the mirror port")
 		return
@@ -46,16 +57,23 @@ func _run() -> void:
 	_expect(game.get("waiting_for_choice"), "mirror presents both preservation routes")
 	for _frame in range(45):
 		await physics_frame
-	_expect(absf(wolf.position.x - 520.0) <= 42.0, "WOLF autonomously reaches the mirror")
+	_expect(absf(wolf.position.x - wolf_mirror_x) <= 42.0, "WOLF autonomously reaches the mirror")
+	_expect(await _wait_until(func() -> bool: return absf(wolf.position.x - wolf_mirror_x) <= 2.0 and wolf.body_sprite.flip_h, 120), "WOLF stops on the mirror port's right, facing it")
+	_expect(wolf.position.x - M0Actor.WOLF_REACH >= 520.0 + 45.0 - 18.0 and human.position.x + M0Actor.HUMAN_REACH < 520.0 - 45.0 + 18.0 and not human.body_sprite.flip_h, "neither WOLF nor the engineer is drawn inside the mirror port: he reads it from its right, they stand on its left (engineer x %.0f, WOLF x %.0f)" % [human.position.x, wolf.position.x])
 	await _tap(&"choice_1")
 	_expect(state.mirror_trace_preserved and state.mirror_route == "wolf" and not game.get("waiting_for_choice"), "WOLF readout preserves timestamp once")
 	_expect(state.memory.get("choice_id") == State.DISCLOSE and state.memory.get("event_id") == State.EVENT_ID, "chapter preserves the actual relay memory")
+	_expect(str(game.call("_context_hint")) == "Mirror copied. Head for the exit.", "once the mirror timestamp is copied the mirror port's hint says so instead of offering it again")
+	if not await _walk_to(human, 700.0):
+		_fail("engineer can walk on from the mirror port")
+		return
+	_expect(str(game.call("_context_hint")) == "Mirror copied. Head for the exit.", "walking on after both copies the hint names only the exit, never a finished station (%s)" % game.call("_context_hint"))
 	if not await _walk_to(human, 830.0):
 		_fail("engineer can reach the records exit")
 		return
 	await _tap(&"interact")
 	_expect(state.chapter_complete and game.call("_objective") == "FIRST COPY SECURED", "first chapter resolves after two traces")
-	_expect(str(game.get("status_line")).contains("A list doesn't tell me who's a threat"), "WOLF questions the Director's target labels after the first copy")
+	_expect(str(game.get("status_line")).contains("An order and a timestamp don't tell me who's a threat"), "WOLF names what was copied when he questions the Director's target labels")
 	_expect(game.get("chapter_close_active") and not human.controlled, "first copy opens a player-paced closing beat")
 	_expect((game.get_node("CanvasLayer/PauseButton") as Button).visible, "closing beat keeps the pause button available")
 	await _tap(&"pause_game")
@@ -80,7 +98,7 @@ func _run() -> void:
 	_expect(not game.get("chapter_close_active") and human.controlled, "closing beat returns control to the engineer")
 	var saved: Dictionary = state.to_dict()
 	game.call("_new_game")
-	for _step in range(5):
+	for _step in range((main_constants["INTRO_LINES"] as Array).size()):
 		game.call("_advance_intro")
 	var ending_intro_tween: Tween = game.get("intro_tween") as Tween
 	ending_intro_tween.custom_step(0.4)
@@ -92,6 +110,26 @@ func _run() -> void:
 	_expect(intro_fade.color.a == 0.0 and (game.get_node("CanvasLayer/IntroAlarm") as ColorRect).color.a == 0.0 and not ending_intro_tween.is_running(), "Continue cancels the remaining intro transition and clears fade and alarm overlays")
 	state = game.get("state") as M0State
 	_expect(state.to_dict() == saved and human.position == state.human_position and wolf.position == state.wolf_position, "Continue restores progress and both positions")
+	# Audit 23: a save taken over a machine's body (an earlier build's) restores the engineer beside it,
+	# facing it and still within reach, in the corridor and in Records.
+	var over_safe_point: M0State = _checkpoint_state(State.PRESS)
+	over_safe_point.human_position = Vector2(873.5, 410.0)
+	over_safe_point.save_to_disk(path)
+	game.call("_load_game")
+	_expect(absf(human.position.x - (876.0 - 35.0 - M0Actor.HUMAN_REACH + 6.0)) <= 0.5 and not human.body_sprite.flip_h and str(game.call("_context_hint")).contains("enter records"), "Continue over the SAFE POINT console puts the engineer beside it, facing it and in reach (x %.1f)" % human.position.x)
+	var over_queue: M0State = _checkpoint_state(State.PRESS)
+	over_queue.enter_records()
+	over_queue.preserve_purge_trace()
+	over_queue.human_position = Vector2(188.2, 410.0)
+	over_queue.save_to_disk(path)
+	game.call("_load_game")
+	_expect(absf(human.position.x - (190.0 - 56.0)) <= 0.5 and not human.body_sprite.flip_h, "Continue over the PURGE QUEUE puts the engineer beside it, facing it (x %.1f)" % human.position.x)
+	var beside_port: M0State = _checkpoint_state(State.PRESS)
+	beside_port.enter_records()
+	beside_port.human_position = Vector2(464.0, 410.0)
+	beside_port.save_to_disk(path)
+	game.call("_load_game")
+	_expect(human.position == beside_port.human_position, "a save already clear of every machine restores exactly")
 	game.queue_free()
 	await process_frame
 
@@ -117,6 +155,7 @@ func _run() -> void:
 	await _tap(&"interact")
 	await _tap(&"choice_2")
 	_expect(state.mirror_trace_preserved and state.mirror_route == "manual", "manual port preserves the required timestamp")
+	_expect(str(game.call("_context_hint")) == "Mirror copied. Head for the exit.", "the manual copy also leaves the mirror port reading as copied")
 	_expect(state.memory.get("choice_id") == State.PRESS, "manual route retains accurate earlier choice")
 	_expect(not (game.get_node("Wolf") as M0Actor).controlled, "fallback never transfers control to WOLF")
 	if not await _walk_to(human, 830.0):
@@ -141,7 +180,7 @@ func _run() -> void:
 	game.set("state", state)
 	game.call("_sync_scene")
 	game.call("_interact_checkpoint")
-	_expect(str(game.get("status_line")).contains("manual bypass") and not str(game.get("status_line")).contains("I chose the relay"), "Records entry remembers the actual manual route even when the risk was disclosed")
+	_expect(str(game.get("status_line")).begins_with("WOLF: I offered the relay; you cranked the bypass. Still with you.") and not str(game.get("status_line")).contains("I took the relay"), "Records entry remembers the actual manual route even when the risk was disclosed")
 	state.preserve_purge_trace()
 	state.save_to_disk(path)
 	game.call("_load_game")
@@ -207,6 +246,14 @@ func _action_event(action: StringName, pressed: bool) -> InputEventAction:
 	event.action = action
 	event.pressed = pressed
 	return event
+
+
+func _wait_until(condition: Callable, max_frames: int) -> bool:
+	for _frame in range(max_frames):
+		if condition.call():
+			return true
+		await physics_frame
+	return bool(condition.call())
 
 
 func _walk_to(actor: M0Actor, target_x: float) -> bool:
