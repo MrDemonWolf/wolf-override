@@ -50,7 +50,8 @@ touch devices and export packages are untested.
   changelog online.
 
 The rooms use provisional layered art (far, middle and near painted
-plates with station machines) and generated sound effects with no music.
+plates with station machines) and sound effects, mostly generated in code
+with a few processed CC0 recordings, with no music.
 This is one chapter slice, not the full investigation or campaign.
 
 ## Getting Started
@@ -176,7 +177,7 @@ the docs type check, tests and Pages build before deployment. Headless
 checks cover both door routes, both mirror routes, the Service Junction
 stages and knockdowns, settings validation and Continue; they do not
 establish how a route feels. The Service Junction, the closer camera, the
-layered room art and the generated sounds are covered by headless suites
+layered room art and the sounds are covered by headless suites
 and rendered stills only; no route has been played by hand.
 
 ## Project Structure
@@ -216,7 +217,8 @@ the SIL Open Font License 1.1, with the license text beside each copy.
 The provisional logo, sprites, title art, layered room plates and station
 props are separate assets with AI-assisted provenance recorded in
 [the asset register](apps/game/assets/manifest.json); they are not
-covered by the code/docs GPL and their final rights review is open.
+covered by the code/docs GPL and their final rights review is open. The
+processed sound recordings are CC0, credited on the credits page.
 
 ## Contact
 

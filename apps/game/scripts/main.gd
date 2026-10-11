@@ -155,8 +155,11 @@ const ACTOR_Z: int = 2
 const KNOCKDOWN_Z: int = 3
 ## The blast wakes the sentry this long after the door goes, so cause and effect read in order.
 const SENTRY_WAKE_SECONDS: float = 0.5
-## The exit bolt's rising whine before it arcs.
+## The exit bolt's rising whine before it arcs; it must outlast SfxBank.BOLT_CRACK_SECONDS, the
+## build that leads into the arc's crack.
 const BOLT_WHINE_SECONDS: float = 0.6
+## The coolant cloud's hiss fades out over the cloud's last this many seconds.
+const COOLANT_FADE_SECONDS: float = 0.5
 ## The engineer's two answers at the rubble line when WOLF asks how to bring the sentry down.
 const LANE_CHOICE_TEXT: Array[String] = ["Draw it under the tank if you can stay clear.", "Stay back, I'll time it."]
 ## The tank release's answer to an early USE while WOLF is still drawing the sentry onto the mark.
@@ -165,8 +168,9 @@ const DROP_WAIT_LINE: String = "Wait. WOLF hasn't got it on the mark yet."
 ## press, so the answer to that press can be read.
 const DROP_WAIT_MIN_SECONDS: float = 1.5
 
-## One switch for the depth pass (parallax, glows, haze, dust, reflections, grade) and the impact
-## kit (shake, hit-stop, flash, rumble, particles, generated sound) so a Settings toggle can follow.
+## One switch for the visual effects: the depth pass (parallax, glows, haze, dust, reflections,
+## grade) and the impact kit (shake, hit-stop, flash, rumble, particles), so a Settings toggle can
+## follow. Sound is not on it: the sound bank always plays and the Audio sliders set its level.
 @export var effects_enabled: bool = true:
 	set(value):
 		effects_enabled = value
@@ -563,7 +567,6 @@ func _setup_bypass() -> void:
 ## Every depth effect hangs off this one switch; off, the rooms keep their far and mid plates, unmoving.
 func _apply_effects() -> void:
 	impact.enabled = effects_enabled
-	sfx_bank.enabled = effects_enabled
 	corridor_depth.effects_enabled = effects_enabled
 	records_room.depth.effects_enabled = effects_enabled
 	junction_room.depth.effects_enabled = effects_enabled
@@ -591,8 +594,8 @@ func _sync_room_lights(animate: bool = false) -> void:
 	junction_room.depth.set_lockdown_cleared(state.junction_cleared, animate)
 
 
-## The impact kit and the generated sound bank. The bank is built after Settings so its players
-## land on the Effects bus the sliders drive; Reduced Motion follows the Settings toggle.
+## The impact kit and the sound bank. The bank is built after Settings so its players land on the
+## Effects bus the sliders drive; Reduced Motion follows the Settings toggle.
 func _setup_impact() -> void:
 	impact = Impact.new()
 	impact.name = "Impact"
@@ -1079,7 +1082,12 @@ func _setup_settings() -> void:
 	if mobile:
 		$CanvasLayer/PauseOverlay/Panel/PauseMenu/PauseHint.text = "TAP RESUME TO RETURN"
 	if not mobile:
-		get_window().size = _resolution_size(resolution)
+		# The OS centres the first window at the project's 1280x720 override; a different saved size
+		# is applied here, so centre again rather than leave it anchored to the 1280x720 corner.
+		var saved_size: Vector2i = _resolution_size(resolution)
+		if get_window().size != saved_size:
+			get_window().size = saved_size
+			get_window().move_to_center()
 		fullscreen_toggle.button_pressed = GameSettings.boolean(config, "video", "fullscreen", false)
 		if fullscreen_toggle.button_pressed:
 			get_window().mode = Window.MODE_FULLSCREEN
@@ -1694,7 +1702,7 @@ func _interact_records(x: float) -> void:
 			_sync_records_room(true)
 			_sync_room_lights(true)
 			# The exit arc: the bolt lets go with a crackle, a small kick and a spark shower.
-			sfx_bank.play(&"arc", -3.0)
+			sfx_bank.play(&"records_arc", -3.0)
 			impact.add_trauma(0.3)
 			impact.flash(0.06, 0.0)
 			impact.rumble(0.3, 0.4, 0.12)
@@ -2092,7 +2100,7 @@ func _pop_bolt() -> void:
 func _bolt_arc() -> void:
 	bolt_state = &"open"
 	bolt_charge_remaining = 0.0
-	sfx_bank.play(&"arc", 0.0)
+	# The bolt's arc started under the end of the whine (_tick_lane); its crack lands now.
 	sfx_bank.play(&"clank", -2.0, 0.7)
 	impact.flash(0.12, 0.0)
 	impact.add_trauma(0.8)
@@ -2162,12 +2170,13 @@ func _tick_junction(delta: float) -> void:
 		_update_controls()
 	junction_room.sync_line(pressure_line)
 	_tick_lane(delta)
-	# Hiss and pump pitch are functions of the gauge, nothing else; the hiss spikes through the vent's
-	# hard warning.
+	# The hiss and the pump's pitch are functions of the gauge, nothing else: the recorded steam keeps
+	# its pitch but crossfades from its low-gauge loop to its high-gauge loop and gets louder, and it
+	# spikes through the vent's hard warning.
 	if pressure_line.state == &"building":
-		sfx_bank.play(&"hiss", -2.0 if pressure_line.is_warning() else lerpf(-28.0, -8.0, pressure_line.gauge))
+		sfx_bank.play_blend(SfxBank.HISS_GAUGE, pressure_line.gauge, -2.0 if pressure_line.is_warning() else lerpf(-28.0, -6.0, pressure_line.gauge))
 	else:
-		sfx_bank.stop(&"hiss")
+		sfx_bank.stop_each(SfxBank.HISS_GAUGE)
 	if state.door_blown:
 		sfx_bank.stop(&"hum")
 	else:
@@ -2209,7 +2218,11 @@ func _tick_lane(delta: float) -> void:
 		if status_line == DROP_WAIT_LINE and drop_wait_remaining <= 0.0 and _bait_holding():
 			status_line = drop_wait_return_line
 		if bolt_state == &"charging":
+			var charge_before: float = bolt_charge_remaining
 			bolt_charge_remaining = maxf(bolt_charge_remaining - delta, 0.0)
+			# The arc's buzz and crackle build under the end of the whine, so its crack lands on the drop.
+			if charge_before > SfxBank.BOLT_CRACK_SECONDS and bolt_charge_remaining <= SfxBank.BOLT_CRACK_SECONDS:
+				sfx_bank.play(&"bolt_arc", 0.0)
 			if bolt_charge_remaining <= 0.0:
 				_bolt_arc()
 	junction_room.sentry.follow(sentry_brain)
@@ -2225,7 +2238,8 @@ func _tick_lane(delta: float) -> void:
 
 
 ## The servo follows the sentry's state (it idles low through the lock-on beat and runs higher in a
-## chase); the winch runs while the arm rewinds.
+## chase); the winch runs while the arm rewinds, and the coolant cloud hisses while it hangs there,
+## fading over its last COOLANT_FADE_SECONDS.
 func _lane_sound() -> void:
 	match sentry_brain.state:
 		&"patrol":
@@ -2242,6 +2256,10 @@ func _lane_sound() -> void:
 		sfx_bank.play(&"winch", -14.0)
 	else:
 		sfx_bank.stop(&"winch")
+	if drop_arm.cloud_active():
+		sfx_bank.play(&"coolant_cloud", -6.0 + linear_to_db(clampf(drop_arm.cloud_remaining / COOLANT_FADE_SECONDS, 0.0001, 1.0)))
+	else:
+		sfx_bank.stop(&"coolant_cloud")
 
 
 func _sentry_changed(before: StringName) -> void:
@@ -2286,12 +2304,12 @@ func _choose_lane(response: int) -> void:
 		wolf_baiting = true
 		status_line = BAIT_YES_LINE
 		_react_as_wolf(true)
-		sfx_bank.play(&"growl", -9.0, 1.5)
+		sfx_bank.play(&"growl_warning", -5.0)
 	elif response == 1:
 		lane_choice = "refused"
 		status_line = BAIT_NO_LINE
 		_react_as_wolf(false)
-		sfx_bank.play(&"growl", -8.0)
+		sfx_bank.play(&"growl_refusal", -3.5)
 	else:
 		lane_choice = "alone"
 		status_line = "WOLF: I'll hold at the rubble. It crosses the floor mark on every pass; the tank takes a moment to fall."
@@ -2376,8 +2394,7 @@ func _kill_servo_tween() -> void:
 
 func _stop_junction_loops() -> void:
 	_kill_servo_tween()
-	for loop_name: StringName in [&"hiss", &"hum", &"servo", &"winch"]:
-		sfx_bank.stop(loop_name)
+	sfx_bank.stop_each(SfxBank.LOOPS)
 
 
 ## One real valve turn: a click, a weak rumble and the VALVE plate counts it; the third turn lights the fuse.
@@ -2391,10 +2408,12 @@ func _valve_turned() -> void:
 		status_line = "The valve gives. %d of %d turns." % [pressure_line.turns, PressureLine.TURNS_NEEDED]
 
 
-## The gauge peaked before the third turn: the relief vent lets go and the breaker trips.
+## The gauge peaked before the third turn: the relief vent lets go (a thump under a burst of
+## steam) and the breaker trips.
 func _vent_trips() -> void:
 	junction_room.vent_blows()
 	sfx_bank.play(&"small_boom", -2.0)
+	sfx_bank.play(&"vent_burst", -1.0)
 	impact.add_trauma(0.5)
 	impact.flash(0.0, 0.2)
 	impact.rumble(0.4, 0.6, 0.2)
@@ -2405,7 +2424,7 @@ func _vent_trips() -> void:
 func _wolf_reads_seam() -> void:
 	wolf_scouting = false
 	_react_as_wolf(false)
-	sfx_bank.play(&"growl", -6.0)
+	sfx_bank.play(&"growl_seam", -3.0)
 	status_line = "WOLF: It's live. Don't stand in front of it when it goes."
 	_update_controls()
 
@@ -2435,7 +2454,7 @@ func _door_blast() -> void:
 
 
 func _blast_feedback() -> void:
-	sfx_bank.stop(&"hiss")
+	sfx_bank.stop_each(SfxBank.HISS_GAUGE)
 	sfx_bank.play(&"boom", 0.0)
 	impact.hit_stop(0.07)
 	impact.flash(0.09, 0.3)
@@ -2659,9 +2678,9 @@ func _flash_relay_spark(from_wolf: bool) -> void:
 	relay_spark_tween = create_tween()
 	relay_spark_tween.tween_property(relay_spark, "modulate:a", 0.0, 0.48)
 	relay_spark_tween.tween_callback(relay_spark.hide)
-	# The contact itself: a clank with a short crackle, a kick and a spark shower in the route's colour.
+	# The contact itself: a clank with a short spark, a kick and a spark shower in the route's colour.
 	sfx_bank.play(&"clank", 0.0, 1.0 if from_wolf else 0.92)
-	sfx_bank.play(&"arc", -8.0, 1.2)
+	sfx_bank.play(&"relay_spark", -5.0)
 	impact.add_trauma(0.35)
 	impact.rumble(0.3, 0.5, 0.15)
 	relay_sparks.color = relay_spark.default_color

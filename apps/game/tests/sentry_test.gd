@@ -378,6 +378,7 @@ func _check_scene() -> void:
 	for _frame: int in 12:
 		await physics_frame
 	_expect(game.get("bolt_state") == &"charging" and room.bolt_charge > 0.0 and room.bolt_charge < 1.0, "the whine rises before the arc")
+	_expect(_sounding(game, &"whine") and _sounding(game, &"bolt_arc"), "the arc's build starts under the whine, so its crack lands on the drop")
 	_expect(await _wait_until(func() -> bool: return game.get("bolt_state") == &"open", 60), "the bolt arcs after the whine")
 	_expect(room.bolt_sparks.emitting and (game.get("impact") as Impact).trauma > 0.0, "the arc throws sparks and shakes the view")
 	_expect(room.hatch_open < 1.0 and str(game.get("status_line")) == "The bolt arcs and drops.", "while the hatch is still opening the line says only that the bolt dropped")
@@ -512,6 +513,7 @@ func _check_engineer_alone(game: Node2D, path: String) -> void:
 	_expect(await _walk_until_choice(game), "the PRESS route gets the same question")
 	await _tap(&"choice_1")
 	var refusal: String = str(game.get("status_line"))
+	_expect(_sounding(game, &"growl_refusal"), "WOLF's refusal comes with his recorded growl")
 	_expect(game.get("lane_choice") == "refused" and not game.get("wolf_baiting") and wolf.autonomous_target_x == JunctionRoom.WOLF_RUBBLE_X, "with the risk withheld WOLF refuses to draw it")
 	_expect(refusal.begins_with("WOLF: At the relay") and refusal.contains("Time the drop from the panel") and not refusal.contains("You said"), "his refusal names the relay choice openly and points at the engineer's way through")
 	for _frame: int in 60:
@@ -522,11 +524,7 @@ func _check_engineer_alone(game: Node2D, path: String) -> void:
 	human.position.x = 640.0
 	_expect(await _wait_until(func() -> bool: return brain.state == &"lock", 5), "it sees the engineer and locks on")
 	var locked_x: float = brain.x
-	var sfx: SfxBank = game.get("sfx_bank") as SfxBank
-	var alarm: bool = false
-	for player: AudioStreamPlayer in sfx.players():
-		alarm = alarm or (player.playing and player.stream == sfx.streams[&"klaxon"])
-	_expect(alarm and room.sentry.visual.eye == Sentry.SentryVisual.EYE_LOCKED, "locking on turns its eye red with a short alarm")
+	_expect(_sounding(game, &"klaxon") and room.sentry.visual.eye == Sentry.SentryVisual.EYE_LOCKED, "locking on turns its eye red with a short alarm")
 	for _frame: int in 12:
 		await physics_frame
 	_expect(brain.state == &"lock" and brain.x == locked_x and absf(room.sentry.position.x - locked_x) <= 4.0 and not game.get("fail_active"), "through the lock-on beat it stands still")
@@ -559,6 +557,7 @@ func _check_engineer_alone(game: Node2D, path: String) -> void:
 	_expect(lowest_base[0] > Sentry.FLOOR_Y - 8.0 and lowest_base[0] > Sentry.FLOOR_Y - Sentry.WRECK_CRUSH_HEIGHT + 8.0, "a missed tank comes down to the floor, not to the sentry's height (base %.1f)" % lowest_base[0])
 	await physics_frame
 	_expect(room.cloud_hazard.armed, "the cloud's hurtbox is live while it vents")
+	_expect(_sounding(game, &"coolant_cloud"), "the cloud hisses while it vents")
 	_expect(await _wait_until(func() -> bool: return room.tank.position.y == JunctionRoom.TANK_REST_Y, 40) and arm.state == &"rewinding" and brain.state in [&"lock", &"chase"], "the winch has the tank back up before the sentry turns into the lane")
 	await _tap(&"interact")
 	_expect(arm.state == &"rewinding" and str(game.get("status_line")).contains("still hauling"), "the panel refuses a second drop during the rewind")
@@ -566,6 +565,8 @@ func _check_engineer_alone(game: Node2D, path: String) -> void:
 	_expect(not game.get("fail_active"), "getting back over the rubble in time avoids the knockdown")
 	_expect(await _wait_until(func() -> bool: return brain.state == &"patrol", 200), "the sentry gives up and patrols again")
 	_expect(await _wait_until(func() -> bool: return not arm.cloud_active() and not room.cloud_hazard.armed, 200), "the cloud clears")
+	await process_frame
+	_expect(not _sounding(game, &"coolant_cloud"), "its hiss stops with it")
 	_expect(await _wait_until(func() -> bool: return arm.state == &"hung", 400), "the rewind re-hangs the tank")
 	# The timed hit: tap as it closes on the mark, leading it by the 0.45 s fall.
 	_expect(await _cross_to_panel(game), "the engineer is back in the alcove")
@@ -760,6 +761,15 @@ func _check_bait_walk() -> void:
 			closest_out = minf(closest_out, absf(wolf_x - brain.x))
 	_expect(closest_in >= clear, "WOLF never crosses the sentry walking in to draw it (closest %.1f px)" % closest_in)
 	_expect(closest_out >= clear, "the sentry turning on the panel never runs through WOLF as he backs off (closest %.1f px)" % closest_out)
+
+
+## True while some player in the sound bank is playing [param clip].
+func _sounding(game: Node2D, clip: StringName) -> bool:
+	var sfx: SfxBank = game.get("sfx_bank") as SfxBank
+	for player: AudioStreamPlayer in sfx.players():
+		if player.playing and player.stream == sfx.streams.get(clip):
+			return true
+	return false
 
 
 func _wait_until(condition: Callable, frames: int) -> bool:
