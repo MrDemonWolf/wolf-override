@@ -1,0 +1,537 @@
+class_name DebugTools
+extends Node
+## Debug tools and cheat codes, so a tester or a capture driver can see what the game is doing: the
+## F3 overlay (performance, then state), F12 bug captures (a screenshot and a JSON state dump), and a
+## small DEBUG button for touch. Main builds one in _ready (_setup_debug_tools) and gives it its
+## debug_snapshot().
+##
+## Gating: always available in a debug build. In any other build the tools stay hidden until a cheat
+## code on the title screen unlocks them (WOLFDEN typed on a keyboard; Up Up Down Down Left Right Left
+## Right B A on a controller's D-pad and face buttons; seven quick taps on the logo mark), and the
+## unlock is stored with the settings. lock() hides them again and forgets the unlock, for the rest of
+## the session even in a debug build.
+##
+## Cost: while the tools are unavailable, or available with the overlay off, this node neither
+## processes nor draws; it only looks at input events as they arrive. The overlay refreshes its text
+## REFRESH_SECONDS apart while it is shown, never every frame.
+
+## The tools became available or were hidden (unlock, lock, or a debug_build change).
+signal availability_changed(available: bool)
+## Backquote, both sticks pressed (L3 + R3) or the DEBUG button asked for the debug menu.
+signal menu_requested
+signal overlay_mode_changed(mode: int)
+## A bug capture was written; [param paths] holds "json" and "png" (empty when no screenshot exists).
+signal captured(paths: Dictionary)
+
+## The overlay pages F3 cycles through, in order.
+enum Overlay { OFF, PERFORMANCE, STATE, ZONES }
+const OVERLAY_NAMES: Array[String] = ["off", "performance", "state", "state and zones"]
+## Where the unlock is stored in the settings file (GameSettings keeps other sections as they are).
+const SETTINGS_SECTION: String = "debug"
+const SETTINGS_KEY: String = "unlocked"
+## The unlock codes.
+const KEY_CODE: String = "WOLFDEN"
+const PAD_CODE: Array[JoyButton] = [
+	JOY_BUTTON_DPAD_UP, JOY_BUTTON_DPAD_UP, JOY_BUTTON_DPAD_DOWN, JOY_BUTTON_DPAD_DOWN,
+	JOY_BUTTON_DPAD_LEFT, JOY_BUTTON_DPAD_RIGHT, JOY_BUTTON_DPAD_LEFT, JOY_BUTTON_DPAD_RIGHT,
+	JOY_BUTTON_B, JOY_BUTTON_A,
+]
+const LOGO_TAPS: int = 7
+## Logo taps further apart than this start the count again.
+const LOGO_TAP_GAP_MSEC: int = 1000
+const UNLOCKED_NOTE: String = "Debug tools unlocked"
+const LOCKED_NOTE: String = "Debug tools locked"
+const CAPTURE_FAILED_NOTE: String = "Bug capture could not be saved."
+const NOTE_SECONDS: float = 3.0
+const CAPTURE_DIR: String = "user://debug-captures"
+const REFRESH_SECONDS: float = 0.25
+## Above the game's HUD, menus and pause overlay.
+const LAYER: int = 100
+## The touch DEBUG button, in the 960x540 canvas: top right, left of PAUSE (main.tscn's PauseButton
+## spans x 854..942) and above the title's logo mark (from y 48), so it never covers PAUSE, USE, the
+## arrows or the actors lower down.
+const BUTTON_RECT: Rect2 = Rect2(760.0, 10.0, 72.0, 34.0)
+## The short note ("Debug tools unlocked", a capture's path): near the top in play, below the top
+## card; on the title over the key art's floor, above CHANGELOG, clear of the title text and menu.
+const NOTE_RECT: Rect2 = Rect2(200.0, 92.0, 560.0, 32.0)
+const TITLE_NOTE_RECT: Rect2 = Rect2(48.0, 412.0, 408.0, 32.0)
+
+## Debug builds always have the tools; tests set this false to check a release build's gating.
+var debug_build: bool = OS.is_debug_build():
+	set(value):
+		debug_build = value
+		if game != null:
+			_apply()
+## The stored unlock from a cheat code.
+var unlocked: bool = false
+## lock() was used this session: hidden even in a debug build until a code unlocks them again.
+var session_locked: bool = false
+var available: bool = false
+var overlay_mode: int = Overlay.OFF
+## Set by cheats (invincibility, jumps and the like); shown on the state page and in every dump.
+var cheats_used: bool = false
+## A debug menu that wants the menu request sets this while it is open, so the DEBUG button hides.
+var menu_open: bool = false:
+	set(value):
+		menu_open = value
+		if game != null:
+			_refresh_button()
+var capture_dir: String = CAPTURE_DIR
+## The last bug capture's paths ("json", "png"), or empty.
+var last_capture: Dictionary = {}
+var game: Node2D
+var settings_path: String = ""
+var layer: CanvasLayer
+var overlay: DebugOverlay
+var debug_button: Button
+var note: Panel
+var note_label: Label
+
+var _typed: String = ""
+var _pad: Array[int] = []
+var _logo_taps: int = 0
+var _last_logo_tap_msec: int = -LOGO_TAP_GAP_MSEC * 10
+## Stick buttons held per device, for L3 + R3.
+var _sticks: Dictionary = {}
+## The pad code's last button, whose release must not reach a focused button either, or -1.
+var _swallow_release: int = -1
+var _refresh_left: float = 0.0
+var _note_tween: Tween
+
+
+## Hooks the tools onto Main: reads the stored unlock from Main's settings file, builds the hidden
+## overlay, note and DEBUG button, and listens for the logo taps.
+func setup(main: Node2D) -> void:
+	game = main
+	process_mode = Node.PROCESS_MODE_ALWAYS
+	set_process(false)
+	set_physics_process(false)
+	settings_path = str(main.get(&"settings_path"))
+	unlocked = GameSettings.boolean(GameSettings.load_config(settings_path), SETTINGS_SECTION, SETTINGS_KEY, false)
+	_build()
+	var logo: Control = main.get(&"title_mark") as Control
+	if logo != null:
+		# The mark is otherwise decoration; it takes taps (and clicks) for the touch code.
+		logo.mouse_filter = Control.MOUSE_FILTER_STOP
+		logo.gui_input.connect(_on_logo_input)
+	var pause_overlay: CanvasItem = main.get(&"pause_overlay") as CanvasItem
+	if pause_overlay != null:
+		pause_overlay.visibility_changed.connect(_refresh_button)
+	_apply()
+
+
+func _build() -> void:
+	layer = CanvasLayer.new()
+	layer.name = "DebugLayer"
+	layer.layer = LAYER
+	layer.visible = false
+	add_child(layer)
+	overlay = DebugOverlay.new()
+	overlay.hide()
+	layer.add_child(overlay)
+	note = Panel.new()
+	note.name = "DebugNote"
+	note.theme_type_variation = &"HudCard"
+	note.position = NOTE_RECT.position
+	note.size = NOTE_RECT.size
+	note.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	note.hide()
+	layer.add_child(note)
+	note_label = Label.new()
+	note_label.set_anchors_preset(Control.PRESET_FULL_RECT)
+	note_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	note_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	note_label.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
+	note_label.add_theme_font_size_override("font_size", 14)
+	note_label.add_theme_color_override("font_color", Color("#73DDF5"))
+	note_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	note.add_child(note_label)
+	debug_button = Button.new()
+	debug_button.name = "DebugButton"
+	debug_button.text = "DEBUG"
+	debug_button.theme_type_variation = &"TouchButton"
+	debug_button.add_theme_font_size_override("font_size", 13)
+	debug_button.position = BUTTON_RECT.position
+	debug_button.size = BUTTON_RECT.size
+	# A touch control: keyboard and controller focus never lands on it.
+	debug_button.focus_mode = Control.FOCUS_NONE
+	debug_button.hide()
+	debug_button.pressed.connect(open_menu)
+	UIMotion.attach(debug_button)
+	layer.add_child(debug_button)
+
+
+## Recomputes availability from the build, the stored unlock and a session lock.
+func _apply() -> void:
+	var was: bool = available
+	available = unlocked or (debug_build and not session_locked)
+	if not available:
+		overlay_mode = Overlay.OFF
+		menu_open = false
+	_sync()
+	if was != available:
+		availability_changed.emit(available)
+
+
+## Shows what is on and processes only while the overlay is up.
+func _sync() -> void:
+	var showing: bool = available and overlay_mode != Overlay.OFF
+	overlay.visible = showing
+	set_process(showing)
+	if showing:
+		_refresh_left = 0.0
+		_refresh_overlay()
+	_refresh_button()
+
+
+func _sync_layer() -> void:
+	layer.visible = overlay.visible or debug_button.visible or note.visible
+
+
+## The DEBUG button shows for touch play while the tools are available and no menu is up.
+func _refresh_button() -> void:
+	if game == null:
+		return
+	var touch_layout: bool = bool(game.get(&"touch_enabled")) and not bool(game.get(&"controller_active"))
+	var pause_overlay: CanvasItem = game.get(&"pause_overlay") as CanvasItem
+	var menu_up: bool = menu_open or (pause_overlay != null and pause_overlay.visible)
+	debug_button.visible = available and touch_layout and not menu_up
+	_sync_layer()
+
+
+func _process(delta: float) -> void:
+	_refresh_left -= delta
+	if _refresh_left <= 0.0:
+		_refresh_left = REFRESH_SECONDS
+		_refresh_overlay()
+
+
+func _refresh_overlay() -> void:
+	if overlay_mode == Overlay.PERFORMANCE:
+		overlay.show_performance(performance())
+	elif overlay_mode != Overlay.OFF:
+		overlay.show_state(dump(), overlay_mode == Overlay.ZONES)
+
+
+func _input(event: InputEvent) -> void:
+	if game == null:
+		return
+	if event is InputEventJoypadButton and not event.pressed and (event as InputEventJoypadButton).button_index == _swallow_release:
+		_swallow_release = -1
+		get_viewport().set_input_as_handled()
+		return
+	if _title_listening():
+		_watch_codes(event)
+	if not available:
+		return
+	# The touch layout follows the last device Main saw; Main notes it after this node has the event.
+	if event is InputEventJoypadButton or event is InputEventScreenTouch or event is InputEventKey:
+		_refresh_button.call_deferred()
+	if _rebinding():
+		return
+	if event is InputEventKey and event.pressed and not event.is_echo():
+		var key: Key = (event as InputEventKey).physical_keycode
+		if key == KEY_NONE:
+			key = (event as InputEventKey).keycode
+		match key:
+			KEY_F3:
+				cycle_overlay()
+			KEY_F12:
+				capture()
+			KEY_QUOTELEFT:
+				open_menu()
+			_:
+				return
+		get_viewport().set_input_as_handled()
+	elif event is InputEventJoypadButton:
+		var button: InputEventJoypadButton = event as InputEventJoypadButton
+		if button.button_index != JOY_BUTTON_LEFT_STICK and button.button_index != JOY_BUTTON_RIGHT_STICK:
+			return
+		var held: int = int(_sticks.get(button.device, 0))
+		var bit: int = 1 if button.button_index == JOY_BUTTON_LEFT_STICK else 2
+		held = held | bit if button.pressed else held & ~bit
+		_sticks[button.device] = held
+		if button.pressed and held == 3:
+			open_menu()
+			get_viewport().set_input_as_handled()
+
+
+## Codes are entered on the title screen, with no menu over it.
+func _title_listening() -> bool:
+	return bool(game.get(&"title_open")) and not get_tree().paused
+
+
+## True while Settings waits for a new binding, so F3 or F12 can be bound without side effects.
+func _rebinding() -> bool:
+	var settings: GameSettings = game.get(&"settings_menu") as GameSettings
+	return settings != null and not settings.capture_action.is_empty()
+
+
+func _watch_codes(event: InputEvent) -> void:
+	if event is InputEventKey and event.pressed and not event.is_echo():
+		var letter: String = _letter(event as InputEventKey)
+		if letter.is_empty():
+			_typed = ""
+			return
+		_typed = (_typed + letter).right(KEY_CODE.length())
+		if _typed == KEY_CODE:
+			_typed = ""
+			unlock()
+	elif event is InputEventJoypadButton and event.pressed:
+		_pad.append((event as InputEventJoypadButton).button_index)
+		if _pad.size() > PAD_CODE.size():
+			_pad.remove_at(0)
+		if _pad_code_entered():
+			_pad.clear()
+			unlock()
+			# The code's last button is A: neither its press nor its release may press the focused title
+			# button.
+			_swallow_release = PAD_CODE[-1]
+			get_viewport().set_input_as_handled()
+
+
+func _pad_code_entered() -> bool:
+	if _pad.size() != PAD_CODE.size():
+		return false
+	for index: int in PAD_CODE.size():
+		if _pad[index] != PAD_CODE[index]:
+			return false
+	return true
+
+
+## The letter a key typed, from its text or (for synthetic events) its key code, or empty.
+static func _letter(event: InputEventKey) -> String:
+	if event.unicode != 0:
+		var typed: String = String.chr(event.unicode).to_upper()
+		return typed if typed >= "A" and typed <= "Z" else ""
+	var key: Key = event.keycode if event.keycode != KEY_NONE else event.physical_keycode
+	if key >= KEY_A and key <= KEY_Z:
+		return String.chr(key)
+	return ""
+
+
+func _on_logo_input(event: InputEvent) -> void:
+	# A tap on a phone arrives here as the mouse click Godot emulates from the touch.
+	if not (event is InputEventMouseButton and event.pressed and (event as InputEventMouseButton).button_index == MOUSE_BUTTON_LEFT):
+		return
+	if not _title_listening():
+		return
+	var now: int = Time.get_ticks_msec()
+	_logo_taps = _logo_taps + 1 if now - _last_logo_tap_msec <= LOGO_TAP_GAP_MSEC else 1
+	_last_logo_tap_msec = now
+	if _logo_taps >= LOGO_TAPS:
+		_logo_taps = 0
+		unlock()
+
+
+## A cheat code was entered: the tools show from now on and the unlock is stored with the settings.
+func unlock() -> void:
+	unlocked = true
+	session_locked = false
+	_store_unlock()
+	_apply()
+	show_note(UNLOCKED_NOTE)
+
+
+## The menu's 'Lock debug tools': hides the tools, forgets the stored unlock and keeps them hidden
+## for the rest of this session (a debug build has them again on its next launch).
+func lock() -> void:
+	unlocked = false
+	session_locked = true
+	_store_unlock()
+	_apply()
+	show_note(LOCKED_NOTE)
+
+
+func _store_unlock() -> void:
+	if settings_path.is_empty():
+		return
+	var config: ConfigFile = GameSettings.load_config(settings_path)
+	if unlocked:
+		config.set_value(SETTINGS_SECTION, SETTINGS_KEY, true)
+	elif config.has_section_key(SETTINGS_SECTION, SETTINGS_KEY):
+		config.erase_section_key(SETTINGS_SECTION, SETTINGS_KEY)
+	if config.save(settings_path) != OK:
+		push_warning("The debug unlock could not be saved with the settings.")
+
+
+## F3: off, performance, state, state and zones, then off again.
+func cycle_overlay() -> void:
+	set_overlay_mode((overlay_mode + 1) % OVERLAY_NAMES.size())
+
+
+func set_overlay_mode(mode: int) -> void:
+	if not available:
+		return
+	overlay_mode = clampi(mode, Overlay.OFF, Overlay.ZONES)
+	_sync()
+	overlay_mode_changed.emit(overlay_mode)
+
+
+## Backquote, L3 + R3 or the DEBUG button. Until a debug menu answers menu_requested, the request
+## steps the overlay on instead, so every input still shows something.
+func open_menu() -> void:
+	if not available:
+		return
+	if menu_requested.get_connections().is_empty():
+		cycle_overlay()
+	else:
+		menu_requested.emit()
+
+
+## F12: writes a screenshot and a JSON state dump to capture_dir/<timestamp>.png and .json, shows
+## the path, and returns the paths ("json", and "png" or empty when there is no rendered frame, as
+## in a headless run). Empty when the tools are hidden or the dump could not be written.
+func capture() -> Dictionary:
+	if not available:
+		return {}
+	DirAccess.make_dir_recursive_absolute(ProjectSettings.globalize_path(capture_dir))
+	var base: String = "%s/%s" % [capture_dir, _timestamp()]
+	var suffix: int = 1
+	while FileAccess.file_exists(base + ".json"):
+		suffix += 1
+		base = "%s/%s-%d" % [capture_dir, _timestamp(), suffix]
+	var png: String = ""
+	var image: Image = _screenshot()
+	if image != null and image.save_png(base + ".png") == OK:
+		png = base + ".png"
+	var paths: Dictionary = {"json": base + ".json", "png": png}
+	var data: Dictionary = dump()
+	data["capture"] = paths
+	var file: FileAccess = FileAccess.open(base + ".json", FileAccess.WRITE)
+	if file == null:
+		show_note(CAPTURE_FAILED_NOTE)
+		return {}
+	file.store_string(JSON.stringify(data, "\t"))
+	file.close()
+	last_capture = paths
+	show_note("Saved %s" % (png if not png.is_empty() else paths["json"]))
+	captured.emit(paths)
+	return paths
+
+
+## The frame on screen, or null with no rendered frame (a headless run).
+func _screenshot() -> Image:
+	if DisplayServer.get_name() == "headless":
+		return null
+	var image: Image = get_viewport().get_texture().get_image()
+	return image if image != null and not image.is_empty() else null
+
+
+static func _timestamp() -> String:
+	return "%s-%03d" % [Time.get_datetime_string_from_system(false, false).replace(":", "-"), Time.get_ticks_msec() % 1000]
+
+
+## Everything the overlay shows and a bug capture saves, in one dictionary of plain values: Main's
+## debug_snapshot() (room, beat, actors, machines, hazards, memory and choices, flags and the full
+## save state) plus performance, the save on disk, the build and the tools' own flags. Capture drivers
+## call this to log state beside each screenshot.
+func dump() -> Dictionary:
+	var data: Dictionary = {}
+	if game != null and game.has_method(&"debug_snapshot"):
+		data = game.call(&"debug_snapshot")
+	data["time"] = Time.get_datetime_string_from_system(false, true)
+	var window: Vector2i = get_window().size
+	data["build"] = {
+		"debug_build": OS.is_debug_build(),
+		"godot": str(Engine.get_version_info().get("string", "")),
+		"os": OS.get_name(),
+		"display": DisplayServer.get_name(),
+		"window": [window.x, window.y],
+	}
+	data["performance"] = performance()
+	data["save"] = save_info()
+	data["debug"] = {
+		"available": available,
+		"unlocked": unlocked,
+		"debug_build": debug_build,
+		"overlay": OVERLAY_NAMES[overlay_mode],
+		"cheats_used": cheats_used,
+	}
+	return data
+
+
+static func performance() -> Dictionary:
+	var fps: float = Engine.get_frames_per_second()
+	return {
+		"fps": fps,
+		"frame_ms": 1000.0 / fps if fps > 0.0 else 0.0,
+		"process_ms": Performance.get_monitor(Performance.TIME_PROCESS) * 1000.0,
+		"physics_ms": Performance.get_monitor(Performance.TIME_PHYSICS_PROCESS) * 1000.0,
+		"memory_mb": Performance.get_monitor(Performance.MEMORY_STATIC) / 1048576.0,
+		"nodes": int(Performance.get_monitor(Performance.OBJECT_NODE_COUNT)),
+		"objects": int(Performance.get_monitor(Performance.OBJECT_COUNT)),
+		"draw_calls": int(Performance.get_monitor(Performance.RENDER_TOTAL_DRAW_CALLS_IN_FRAME)),
+	}
+
+
+## The save on disk, read without side effects (M0State.load_from_disk can promote a leftover
+## .tmp file; this never writes): the format version, whether a file exists and the checkpoint it holds.
+func save_info() -> Dictionary:
+	var path: String = str(game.get(&"save_path")) if game != null else M0State.SAVE_PATH
+	var info: Dictionary = {"version": M0State.SAVE_VERSION, "path": path, "exists": FileAccess.file_exists(path), "checkpoint": "none"}
+	if not info["exists"]:
+		return info
+	var json: JSON = JSON.new()
+	var file: FileAccess = FileAccess.open(path, FileAccess.READ)
+	if file == null or json.parse(file.get_as_text()) != OK:
+		info["checkpoint"] = "unreadable"
+		return info
+	var saved: M0State = M0State.from_dict(json.data)
+	if saved == null or not saved.checkpoint_reached:
+		info["checkpoint"] = "unreadable"
+		return info
+	if json.data is Dictionary:
+		info["file_version"] = int((json.data as Dictionary).get("version", 0))
+	info["checkpoint"] = checkpoint_label(saved)
+	return info
+
+
+## Where a saved state stands, in a few words.
+static func checkpoint_label(saved: M0State) -> String:
+	match saved.chapter_id:
+		"records":
+			if saved.chapter_complete:
+				return "Records, first copy secured"
+			if saved.mirror_trace_preserved:
+				return "Records, both traces copied"
+			if saved.purge_trace_preserved:
+				return "Records, purge order copied"
+			return "Records entry"
+		"junction":
+			if saved.junction_cleared:
+				return "junction cleared"
+			if saved.sentry_down:
+				return "junction, tank down"
+			if saved.door_blown:
+				return "junction, door blown"
+			return "junction entry"
+	return "corridor safe point"
+
+
+## A short note near the top of the screen for NOTE_SECONDS.
+func show_note(text: String) -> void:
+	var rect: Rect2 = TITLE_NOTE_RECT if game != null and bool(game.get(&"title_open")) else NOTE_RECT
+	note.position = rect.position
+	note.size = rect.size
+	note_label.text = text
+	note.show()
+	_sync_layer()
+	if _note_tween != null and _note_tween.is_valid():
+		_note_tween.kill()
+	# Notes come up over Pause and the debug menu too, so the timer runs while the tree is paused.
+	_note_tween = create_tween().set_pause_mode(Tween.TWEEN_PAUSE_PROCESS)
+	_note_tween.tween_interval(NOTE_SECONDS)
+	_note_tween.tween_callback(_note_done)
+
+
+func hide_note() -> void:
+	if _note_tween != null and _note_tween.is_valid():
+		_note_tween.kill()
+	_note_done()
+
+
+func _note_done() -> void:
+	_note_tween = null
+	note.hide()
+	_sync_layer()

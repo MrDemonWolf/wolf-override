@@ -498,6 +498,7 @@ func _ready() -> void:
 	reveal.tween_property(title_mark, "modulate", Color.WHITE, 0.4)
 	reveal.tween_property(title_line, "modulate", Color.WHITE, 0.25)
 	reveal.tween_property(title_logo, "modulate", Color.WHITE, 0.35)
+	_setup_debug_tools()
 
 
 func _refresh_continue() -> void:
@@ -3308,3 +3309,131 @@ func _add_joy_axis(action: StringName, value: float) -> void:
 	event.axis_value = value
 	if not InputMap.action_has_event(action, event):
 		InputMap.action_add_event(action, event)
+
+
+# --- Debug tools hooks (scripts/debug). Kept together so they move as one when Main is split. ---
+
+## The debug tools and cheat codes (DebugTools): idle and hidden unless available.
+var debug_tools: DebugTools
+
+
+func _setup_debug_tools() -> void:
+	debug_tools = DebugTools.new()
+	debug_tools.name = "DebugTools"
+	add_child(debug_tools)
+	debug_tools.setup(self)
+
+
+## What the game is doing right now, as plain values for the debug overlay and bug captures
+## (DebugTools.dump adds performance, the save on disk and the build).
+func debug_snapshot() -> Dictionary:
+	var in_junction: bool = state.chapter_id == "junction"
+	var fixated_on: String = "WOLF" if sentry_brain.state == &"fixated" else ("engineer" if _sentry_hunting() else "—")
+	var relay: String = "—"
+	if not state.memory.is_empty():
+		var told: bool = state.memory.get("choice_id") == M0State.DISCLOSE
+		relay = ("disclose" if told else "press") + (" → WOLF" if state.route == "cooperate" else (" → bypass" if state.route == "fallback" else ""))
+	return {
+		"room": state.chapter_id,
+		"beat": _debug_beat(),
+		"objective": "" if title_open else _objective(),
+		"line": status_line,
+		"hint": "" if title_open else _context_hint(),
+		"engineer": {"x": human.position.x, "y": human.position.y, "facing": "left" if human.body_sprite.flip_h else "right", "state": _debug_engineer_state()},
+		"wolf": {"x": wolf.position.x, "y": wolf.position.y, "facing": "left" if wolf.body_sprite.flip_h else "right", "target_x": _debug_wolf_target(), "why": _debug_wolf_why()},
+		"sentry": {"active": in_junction, "state": str(sentry_brain.state), "x": sentry_brain.x, "facing": "left" if sentry_brain.facing < 0.0 else "right", "sight_range": SentryBrain.SIGHT_RANGE, "fixated_on": fixated_on},
+		"pressure_line": {"state": str(pressure_line.state), "gauge": pressure_line.gauge, "turns": pressure_line.turns, "turns_needed": PressureLine.TURNS_NEEDED, "fuse": pressure_line.fuse_remaining},
+		"drop_arm": {"state": str(drop_arm.state), "drop": drop_arm.drop_amount(), "cloud": drop_arm.cloud_remaining},
+		"bolt": {"state": str(bolt_state), "charge": bolt_charge_remaining},
+		"hazards": {
+			"vent": in_junction and junction_room.vent_hazard.armed,
+			"cloud": in_junction and junction_room.cloud_hazard.armed,
+			"blast": _fuse_lit(),
+			"sentry contact": in_junction and sentry_brain.state == &"chase",
+		},
+		"memory": state.memory.duplicate(true),
+		"choices": {"relay": relay, "mirror": state.mirror_route, "lane": lane_choice if not lane_choice.is_empty() else state.lane_recap},
+		"flags": {
+			"title_open": title_open, "intro_active": intro_active, "paused": get_tree().paused, "waiting_for_choice": waiting_for_choice,
+			"choice_context": choice_context, "fail_active": fail_active, "chapter_close_active": chapter_close_active,
+			"end_card_active": end_card_active, "touch_layout": touch_enabled and not controller_active, "controller_active": controller_active,
+			"save_pending": save_pending, "seal_opening": seal_opening, "wolf_baiting": wolf_baiting, "bypass_ticks": bypass_ticks,
+		},
+		"state": state.to_dict(),
+		"save_path": save_path,
+		"settings_path": settings_path,
+	}
+
+
+func _debug_beat() -> String:
+	if title_open:
+		return "title"
+	if intro_active:
+		return "opening %d/%d" % [intro_step + 1, INTRO_LINES.size()]
+	if end_card_active:
+		return "END OF SLICE card"
+	if hatch_exit_walking:
+		return "walking out"
+	if chapter_close_active:
+		return "chapter close"
+	if fail_active:
+		return "knockdown"
+	if waiting_for_choice:
+		return "choice (%s)" % (choice_context if not choice_context.is_empty() else "relay")
+	return "play"
+
+
+func _debug_engineer_state() -> String:
+	if not human.visible:
+		return "hidden"
+	if fail_active:
+		return "knocked down"
+	if hold_use.holding:
+		return "cranking the %s" % hold_use.station
+	if engineer_step_x >= 0.0 or hatch_exit_walking:
+		return "walking on their own"
+	if not human.controlled:
+		return "no control"
+	if absf(human.velocity.x) > 1.0:
+		return "walking"
+	return "stepping out of a machine" if human.settle_x >= 0.0 else "standing"
+
+
+## Where WOLF is heading: his own spot, or his follow spot worked out the way M0Actor.follow_x does
+## without changing his side, or -1.
+func _debug_wolf_target() -> float:
+	if wolf.autonomous_target_x >= 0.0:
+		return wolf.autonomous_target_x
+	if wolf.follow_target == null or wolf.follow_side == 0:
+		return -1.0
+	return wolf.off_machines(clampf(wolf.follow_target.position.x + wolf.follow_side * M0Actor.FOLLOW_GAP, wolf.follow_min_x, wolf.follow_max_x), wolf.follow_side)
+
+
+## Why WOLF is where he is: following, scouting, baiting, holding a spot or refusing.
+func _debug_wolf_why() -> String:
+	if not wolf.visible or title_open:
+		return "—"
+	if hatch_exit_walking:
+		return "leaving through the hatch"
+	if wolf_holding_relay:
+		return "hold: on the relay contact"
+	if wolf_heading_to_relay:
+		return "hold: going to the relay contact"
+	if _wolf_off_relay():
+		return "refuse: off the relay he refused" if _relay_refused() else "hold: back from the relay"
+	match state.chapter_id:
+		"records":
+			if not state.mirror_trace_preserved:
+				return "scout: the mirror port"
+		"junction":
+			if wolf_scouting:
+				return "scout: the door seam"
+			if wolf.autonomous_target_x == JunctionRoom.WOLF_CLEAR_X:
+				return "hold: clear of the vent and blast"
+			if wolf.autonomous_target_x == JunctionRoom.WOLF_BAIT_X:
+				return "bait: drawing the sentry"
+			if wolf.autonomous_target_x == JunctionRoom.WOLF_RUBBLE_X:
+				return "refuse: holding at the rubble" if lane_choice == "refused" else "hold: at the rubble"
+	if wolf.autonomous_target_x >= 0.0:
+		return "hold: his own spot"
+	return "follow" if wolf.follow_target != null else "waiting"

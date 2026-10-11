@@ -18,7 +18,34 @@ bun run docs:build
 
 The same script keeps the in-game changelog in step with this website: it regenerates `apps/game/assets/changelog.txt` from `apps/docs/content/docs/changelog.mdx` with `python3 scripts/export_changelog.py` (Python 3, standard library only) and fails when the committed text differs. After editing the changelog, run that script and commit the result with the docs change. The file is a plain `.txt`, which Godot does not pack by default: any export preset must add `*.txt` to its include filter, or the in-game screen shows its "missing from this build" line.
 
-The Godot commands check import, state logic, both scripted door routes, both Records Access mirror routes, the Service Junction's pressure-line timing, held crank, blast, the sentry's patrol, sight, lock-on pause, chase and hold on WOLF, the tank's hit window, miss cloud and rewind, both answers at the rubble line with either relay memory, the exit bolt and closing scene, every knockdown's retry, all four autosaves and Continue from each, save/load, the lamp flicker's timing limits, lockdown beacons that settle from the save state, hidden rooms that stop their dust and light, a sentry beam drawn to its real sight range, with a gap over the alcove where it cannot see, the pressure bulkheads' shared cut and draw order, station name plates (the relief vent's among them) that share one row without overlapping in any state, station names in every room that fade at the edge of the view, an engineer who sidesteps out of any machine they stop over, machine lights and plates drawn behind both characters, and near pipe columns and bulkhead pillars that fade back from a character behind them. Bun checks docs types and builds the static Pages site. Headless checks do not establish how a route feels on screen; exports and devices need separate checks.
+The Godot commands check import, state logic, both scripted door routes, both Records Access mirror routes, the Service Junction's pressure-line timing, held crank, blast, the sentry's patrol, sight, lock-on pause, chase and hold on WOLF, the tank's hit window, miss cloud and rewind, both answers at the rubble line with either relay memory, the exit bolt and closing scene, every knockdown's retry, all four autosaves and Continue from each, save/load, the lamp flicker's timing limits, lockdown beacons that settle from the save state, hidden rooms that stop their dust and light, a sentry beam drawn to its real sight range, with a gap over the alcove where it cannot see, the pressure bulkheads' shared cut and draw order, station name plates (the relief vent's among them) that share one row without overlapping in any state, station names in every room that fade at the edge of the view, an engineer who sidesteps out of any machine they stop over, machine lights and plates drawn behind both characters, near pipe columns and bulkhead pillars that fade back from a character behind them, and the debug tools' gating, unlock codes, overlay, state dump and bug capture. Bun checks docs types and builds the static Pages site. Headless checks do not establish how a route feels on screen; exports and devices need separate checks.
+
+## Debug tools and cheat codes
+
+The game has debug tools for anyone testing it, so you can see what it is doing and keep a record of a problem. In a debug build (the editor, or a source run with the standard Godot binary) they are always available. In any other build they stay hidden until you enter a code on the title screen:
+
+| Input | Code |
+| --- | --- |
+| Keyboard | Type `WOLFDEN`. |
+| Controller | On the D-pad: Up, Up, Down, Down, Left, Right, Left, Right, then B (the east face button), then A (the south face button). The final A does not press the focused menu button. |
+| Touch | Tap the WOLF//OVERRIDE logo mark at the top right seven times, each tap within a second of the last. |
+
+A short **Debug tools unlocked** note confirms it. The unlock is saved with your settings, so the tools stay available on later launches until they are locked again; locking also forgets the saved unlock.
+
+Once the tools are available:
+
+| Input | What it does |
+| --- | --- |
+| **F3** | Cycles the overlay: off, performance, state, state and zones. |
+| **F12** | Saves a bug capture. |
+| `` ` `` (backquote), both sticks pressed together (L3 + R3), or the **DEBUG** button | Asks for the debug menu. Until the menu is built, this steps the overlay to its next page. |
+
+- **Performance page:** frames per second, frame and process time, memory, and node, object and draw-call counts.
+- **State page:** the room, the current beat and objective; the engineer's position, facing and what they are doing; WOLF's position, where he is heading and why (following, scouting, holding a spot, drawing the sentry or refusing); in the Service Junction the sentry's state, position, facing, sight range and who it is fixed on, the pressure line's state, gauge, turns and fuse, the tank arm, the exit bolt and which hazards are armed; the run's relay, mirror and lane choices and WOLF's memory; the save format version, whether a checkpoint is on disk and where it stands; and whether cheats were used. The overlay keeps updating while the game is paused. The world zone drawing for the fourth page is still to come.
+- **Bug capture:** writes a screenshot and a JSON file with the same data, plus positions and flags, to `user://debug-captures/` (Godot's user data folder for the game), named by date and time, and shows the path. A headless run writes the JSON only. Capture scripts can call `debug_tools.dump()` on the game's main node to log the same data beside their own screenshots.
+- **DEBUG button:** in touch play a small **DEBUG** button sits at the top right, left of **PAUSE**, clear of the characters, **USE** and the arrows. It hides while Pause is open or a controller is in use.
+
+While the tools are hidden, or available with the overlay off, they do no work each frame and draw nothing.
 
 ## Continuous integration
 
