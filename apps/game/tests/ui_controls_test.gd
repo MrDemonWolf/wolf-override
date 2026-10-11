@@ -219,15 +219,25 @@ func _run() -> void:
 	game.notification(Node.NOTIFICATION_APPLICATION_FOCUS_OUT)
 	_expect(not paused and not overlay.visible, "focus loss does not pause when auto_pause_on_focus_loss is off")
 	game.set("auto_pause_on_focus_loss", true)
-	# Pause during the opening is a real pause; skipping is an explicit menu choice.
+	# Pause during the opening is a real pause; skipping is an explicit menu choice. Taken while WOLF is
+	# slipping into the maintenance hatch, it puts him and the hatch back.
 	game.call("_new_game")
 	await process_frame
+	var opening_wolf: M0Actor = game.get_node("Wolf") as M0Actor
+	var rest_scale: Vector2 = opening_wolf.body_sprite.scale
+	for _step: int in 6:
+		game.call("_advance_intro")
+	await create_timer(1.35).timeout
+	var opening_hatch: OpeningHatch = game.get("opening_hatch") as OpeningHatch
+	_expect(game.get("intro_step") == 6 and opening_hatch.visible and opening_hatch.open > 0.0, "the hatch is open as WOLF heads for it")
 	await _send_escape(true)
 	await _send_escape(false)
 	var title_button: Button = game.get_node("CanvasLayer/PauseOverlay/Panel/PauseMenu/TitleButton") as Button
 	_expect(paused and game.get("intro_active") and title_button.text == "SKIP OPENING", "Pause during the opening keeps the opening and offers Skip Opening")
 	title_button.pressed.emit()
 	_expect(not paused and not game.get("intro_active"), "Skip Opening resumes into play")
+	await create_timer(1.5).timeout
+	_expect(not opening_hatch.visible and opening_hatch.open == 0.0 and opening_wolf.body_sprite.scale == rest_scale and opening_wolf.body_sprite.modulate == Color.WHITE and opening_wolf.z_index == 2, "skipping mid-slip leaves no hatch and WOLF whole, at his usual depth")
 	# A choice left open when returning to the title cannot be committed from the title.
 	(game.get_node("Human") as M0Actor).position.x = 350.0
 	game.call("_interact")

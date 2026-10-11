@@ -97,11 +97,40 @@ func _run() -> void:
 	_expect(intro_gate.visible and is_equal_approx(float(intro_gate.get("opening")), 1.0), "the gate is still standing open in the next beat")
 	await _tap(&"interact")
 	_expect(game.get("intro_step") == 5 and speaker.text == "DIRECTOR" and story.text == "Lock down maintenance. WOLF does not leave this site.", "Director orders lockdown under his own tag")
+	# Round 3 item 8 (Nathanial's decision): a maintenance hatch low on the wall behind the cage, on the
+	# left; as the lockdown is ordered its lamp turns and it opens.
+	var hatch: OpeningHatch = game.get("opening_hatch") as OpeningHatch
+	_expect(hatch != null and hatch.visible and hatch.position.x < intro_director.position.x and hatch.opening_rect().end.y < 440.0 and hatch.opening_rect().position.y > 360.0, "the maintenance hatch sits low on the wall on the left, the Director on its right")
+	var cage: Node2D = game.get_node("IntroCage") as Node2D
+	_expect(hatch.z_index + OpeningHatch.FRAME_Z < cage.z_index and hatch.z_index + OpeningHatch.FRAME_Z < intro_gate.z_index and hatch.position.x - OpeningHatch.OPENING.size.x * OpeningHatch.ART_SCALE * 0.5 > cage.position.x - 88.0, "it is on the wall behind the cage, drawn under the cage and its folded gate")
+	_expect(await _wait_until(func() -> bool: return is_equal_approx(hatch.open, 1.0) and hatch.lamp == OpeningHatch.LAMP_OPEN, 120), "as the lockdown is ordered the hatch's lamp turns green and its leaf slides up")
+	var wolf_rest_scale: Vector2 = wolf.body_sprite.scale
+	var wolf_start_x: float = wolf.position.x
 	await _tap(&"interact")
-	_expect(game.get("intro_step") == 6 and not speaker.visible and story.text == "WOLF turns from the Director and takes the only open route." and wolf.autonomous_target_x == 110.0, "the narration says WOLF turns away as he walks off")
+	_expect(game.get("intro_step") == 6 and not speaker.visible and story.text == "WOLF turns from the Director and heads for maintenance." and wolf.autonomous_target_x < 0.0, "the narration says WOLF turns from the Director and heads for maintenance")
+	_expect(await _wait_until(func() -> bool: return wolf.position.x < wolf_start_x - 8.0, 30) and not wolf.body_sprite.flip_h, "he backs away from the Director first, still facing him")
+	_expect(await _wait_until(func() -> bool: return wolf.body_sprite.flip_h, 60), "then turns from him, toward the hatch")
+	# Pause holds the move where it is.
+	await _tap(&"pause_game")
+	var held_x: float = wolf.position.x
+	var held_open: float = hatch.open
+	await create_timer(0.4).timeout
+	_expect(paused and wolf.position.x == held_x and hatch.open == held_open, "Pause holds WOLF and the hatch mid-move")
+	(game.get_node("CanvasLayer/PauseOverlay") as PauseOverlay).resume_requested.emit()
+	var slipped: Array[bool] = [false]
+	_expect(await _wait_until(func() -> bool:
+		if wolf.z_index == OpeningHatch.SLIP_Z and wolf.body_sprite.scale.x < wolf_rest_scale.x * 0.8:
+			# Slipping in he is drawn between the duct and the frame, and fits inside the opening.
+			var duct: Rect2 = hatch.opening_rect()
+			var half: float = 60.0 * wolf.body_sprite.scale.x / wolf_rest_scale.x
+			slipped[0] = hatch.z_index + OpeningHatch.DUCT_Z < wolf.z_index and wolf.z_index < hatch.z_index + OpeningHatch.FRAME_Z and wolf.position.x - half > duct.position.x and wolf.position.x + half < duct.end.x
+		return wolf.body_sprite.modulate.a < 0.02 and is_equal_approx(hatch.open, 0.0) and hatch.lamp == OpeningHatch.LAMP_LOCKED, 240), "WOLF slips into the dark duct and the hatch shuts behind him, its lamp red again")
+	_expect(slipped[0], "slipping in, WOLF shrinks inside the opening, between the duct and the frame")
+	_expect(absf(wolf.position.x - hatch.position.x) <= 2.0 and intro_gate.visible and is_equal_approx(float(intro_gate.get("opening")), 1.0), "he went through the hatch, and the gate still stands open")
 	await _tap(&"interact")
 	await create_timer(0.8).timeout
 	_expect(not game.get("intro_active") and not intro_gate.visible and not intro_director.visible and human.visible and purge_terminal_art.visible and human.controlled and intro_fade.color.a < 0.01, "opening fades into engineer control and gameplay stations")
+	_expect(not hatch.visible and wolf.body_sprite.scale == wolf_rest_scale and wolf.body_sprite.modulate == Color.WHITE and wolf.z_index == 2, "the corridor shows WOLF whole again and no opening hatch")
 	var gameplay_camera: Camera2D = game.get_node("IntroCamera") as Camera2D
 	_expect(gameplay_camera.zoom.x > 1.0 and gameplay_camera.position_smoothing_enabled, "play view is closer and follows the engineer after the opening")
 	var state: M0State = game.get("state") as M0State

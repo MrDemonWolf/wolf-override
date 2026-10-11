@@ -2,12 +2,13 @@ class_name DropArm
 extends RefCounted
 ## The overhead arm over the sentry lane and its hanging coolant tank, as pure logic. States: hung
 ## (ready at the TANK RELEASE), falling (FALL_SECONDS from the clamp letting go to the floor), landed
-## (it came down on the sentry; final) and rewinding (it missed: the winch snaps the tank back up to
-## its hanging height in LIFT_SECONDS, then the clamp takes the rest of REWIND_SECONDS to latch, while
-## the split line sprays a coolant cloud for CLOUD_SECONDS). The hit is decided where the tank lands,
-## against the sentry's real position: the drawn floor brackets are the tank's footprint, and a hit is
-## at least half of the sentry's body over them, so the tank always comes down on the machine where it
-## stands and a graze at the edge of the brackets is a miss.
+## (it came down on the sentry; final) and rewinding (it missed: the tank lies on the empty mark for
+## FLOOR_SECONDS while its split line sprays, then the winch hauls it back up to its hanging height in
+## LIFT_SECONDS and the clamp takes the rest of REWIND_SECONDS to latch; the cloud lasts CLOUD_SECONDS
+## from the landing). Until it is back up, the tank blocks the sentry's lane (blocks_lane). The hit is
+## decided where the tank lands, against the sentry's real position: the drawn floor brackets are the
+## tank's footprint, and a hit is at least half of the sentry's body over them, so the tank always
+## comes down on the machine where it stands and a graze at the edge of the brackets is a miss.
 
 const MARK_X: float = 700.0
 ## Half the floor brackets, which are drawn this wide either side of the mark: the tank's own
@@ -18,8 +19,10 @@ const HIT_RANGE: float = 24.0
 const HIT_REACH: float = HIT_RANGE
 const FALL_SECONDS: float = 0.45
 const REWIND_SECONDS: float = 6.0
-## After a miss the winch has the tank off the floor and back at its hanging height this fast, before
-## the sentry it turned can reach the mark, so nothing ever drives through a tank on the floor.
+## After a miss the tank lies on the empty mark this long, spraying from its split line, so the
+## landing, the spray and the line that says so are on screen together before the winch takes it.
+const FLOOR_SECONDS: float = 0.7
+## Then the winch has it off the floor and back at its hanging height this fast.
 const LIFT_SECONDS: float = 0.3
 const CLOUD_SECONDS: float = 3.0
 ## The coolant cloud's reach either side of the mark.
@@ -85,10 +88,36 @@ func drop_amount() -> float:
 		&"landed":
 			return 1.0
 		&"rewinding":
-			# Off the floor fast (easing out), then it hangs while the clamp latches.
-			var lifted: float = clampf((REWIND_SECONDS - rewind_remaining) / LIFT_SECONDS, 0.0, 1.0)
+			# On the floor through the spray, then off it fast (easing out), then it hangs while the
+			# clamp latches.
+			var lifted: float = clampf((_rewind_elapsed() - FLOOR_SECONDS) / LIFT_SECONDS, 0.0, 1.0)
 			return (1.0 - lifted) * (1.0 - lifted)
 	return 0.0
+
+
+## True while a missed tank lies on the floor, before the winch starts to haul it up.
+func on_floor() -> bool:
+	return state == &"rewinding" and _rewind_elapsed() < FLOOR_SECONDS - EPSILON
+
+
+## True while the winch hauls a missed tank back up or the clamp latches it.
+func winching() -> bool:
+	return state == &"rewinding" and not on_floor()
+
+
+## True while a missed tank is anywhere below its hanging height: on the floor or on its way up. The
+## sentry's lane is blocked by it meanwhile (SentryBrain.obstacle).
+func blocks_lane() -> bool:
+	return state == &"rewinding" and _rewind_elapsed() < FLOOR_SECONDS + LIFT_SECONDS - EPSILON
+
+
+## The x span (from, to) the tank's footprint covers on the floor, the floor brackets.
+static func footprint() -> Vector2:
+	return Vector2(MARK_X - HIT_RANGE, MARK_X + HIT_RANGE)
+
+
+func _rewind_elapsed() -> float:
+	return REWIND_SECONDS - rewind_remaining
 
 
 func cloud_active() -> bool:
