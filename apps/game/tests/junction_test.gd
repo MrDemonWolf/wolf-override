@@ -193,6 +193,7 @@ func _check_scene() -> void:
 	_expect(game.get("wolf_scouting") and wolf.autonomous_target_x == JunctionRoom.WOLF_SEAM_X, "WOLF runs ahead to the door seam on his own")
 	_expect(await _wait_until(func() -> bool: return not game.get("wolf_scouting"), 200), "WOLF reaches the seam and reads it")
 	_expect(absf(wolf.position.x - JunctionRoom.WOLF_SEAM_X) <= 6.0 and wolf.follow_target == human and str(game.get("status_line")).contains("It's live"), "after the read WOLF returns to following and says what he found")
+	_expect(_player_for(game, &"growl_seam") != null, "WOLF growls at the seam")
 	await physics_frame
 	_expect(await _wait_until(func() -> bool: return not room.door_shape.disabled, 5), "the junction door body is live in its room")
 	_check_presentation(room, human, wolf)
@@ -216,6 +217,13 @@ func _check_scene() -> void:
 	if not _require(line.state == &"building" and game.call("_objective") == "CHARGE THE SEAL", "USE at the breaker arms the line"):
 		return
 	_expect(room.vent_steam.emitting and room.breaker_label.text == "BREAKER LIVE", "an armed line steams at the vent and lights the breaker")
+	await process_frame
+	var hiss_low: AudioStreamPlayer = _player_for(game, &"hiss_low")
+	var hiss_mid: AudioStreamPlayer = _player_for(game, &"hiss_mid")
+	var hiss_high: AudioStreamPlayer = _player_for(game, &"hiss_high")
+	_expect(hiss_low != null and hiss_mid != null and hiss_high != null, "the armed line runs all three gauge loops together")
+	if hiss_low != null and hiss_mid != null and hiss_high != null:
+		_expect(hiss_low.volume_db > hiss_mid.volume_db and hiss_mid.volume_db > hiss_high.volume_db and hiss_high.volume_db <= -70.0, "low on the gauge the low-gauge hiss leads and the high one is silent")
 	await _tap(&"pause_game")
 	_expect(paused, "pause works in the junction")
 	var gauge_before: float = line.gauge
@@ -273,6 +281,7 @@ func _check_scene() -> void:
 	# says outside, so the door blows, nobody is knocked down and autosave B is written.
 	human.position.x = PressureLine.BLAST_MIN_X - 8.0
 	_expect(await _wait_until(func() -> bool: return state.door_blown, 90), "the fuse ends and the door blows")
+	_expect(_player_for(game, &"hiss_mid") == null and _player_for(game, &"hum") == null, "the line's hiss and pump stop when the door goes")
 	_expect(room.door_breaking_art.visible and not room.door_art.visible and not room.door_blown_art.visible, "at the blast the bulkhead shows breaking first")
 	_expect(game.call("_objective") == "DROP THE TANK" and room.door_label.text == "DOOR DOWN" and room.blast_sparks.emitting, "the blast is a real state change with sparks and the next objective")
 	_expect(room.breaker_label.text == "BREAKER SPENT" and room.valve_label.text == "VALVE SPENT", "the blast spends the breaker and the valve")
@@ -394,6 +403,8 @@ func _check_vent_edges(game: Node2D, human: M0Actor, wolf: M0Actor, room: Juncti
 	for _frame: int in 4:
 		await physics_frame
 	_expect(not game.get("fail_active") and str(game.get("status_line")).begins_with("The relief vent lets go"), "just off the grate a vent trip is not a knockdown")
+	_expect(_player_for(game, &"vent_burst") != null and _player_for(game, &"small_boom") != null, "the vent trip bursts steam over its thump")
+	_expect(_player_for(game, &"hiss_low") == null and _player_for(game, &"hiss_high") == null, "a tripped line stops hissing")
 	human.position.x = JunctionRoom.BREAKER_X
 	await _tap(&"interact")
 	_expect(line.state == &"building", "the breaker re-arms after the trip")
@@ -443,6 +454,15 @@ func _action_event(action: StringName, pressed: bool) -> InputEventAction:
 	event.action = action
 	event.pressed = pressed
 	return event
+
+
+## The sound bank's player now playing [param clip], or null.
+func _player_for(game: Node2D, clip: StringName) -> AudioStreamPlayer:
+	var sfx: SfxBank = game.get("sfx_bank") as SfxBank
+	for player: AudioStreamPlayer in sfx.players():
+		if player.playing and player.stream == sfx.streams.get(clip):
+			return player
+	return null
 
 
 func _wait_until(condition: Callable, frames: int) -> bool:

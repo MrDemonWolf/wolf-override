@@ -1,7 +1,7 @@
 class_name Impact
 extends Node
 ## The impact kit every spark, boom and knockdown routes through: camera shake, hit-stop, screen
-## flash, rumble and haptics. One node under Main owns all of it, so one switch silences it and
+## flash, rumble and haptics. One node under Main owns all of it, so one switch turns it off and
 ## Engine.time_scale always comes back to 1.0, even when the game pauses in the middle of a dip.
 ## Shake lives on Camera2D.offset, so the camera's position clamp and smoothing are untouched.
 
@@ -15,7 +15,7 @@ const MAX_HIT_STOP_SECONDS: float = 0.1
 const WHITE_FLASH_ALPHA: float = 0.55
 const RED_WASH_ALPHA: float = 0.3
 
-## Off silences everything; Main ties it to effects_enabled.
+## Off stops all of it; Main ties it to effects_enabled. Sound is not part of the kit (SfxBank).
 var enabled: bool = true:
 	set(value):
 		enabled = value

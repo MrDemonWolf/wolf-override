@@ -321,7 +321,7 @@ func select_tab(index: int) -> void:
 		pages[page_index].visible = page_index == index
 	for node: CanvasItem in display_nodes:
 		node.visible = index == 0
-	note.text = ["Window size is OS-managed on mobile. V-sync may limit the FPS cap.", "Volume changes apply immediately. Effects carries the generated impact sounds; there is no music or voice yet.", "Select a binding, then press a key, controller button or move a stick."][index]
+	note.text = ["Window size is OS-managed on mobile. V-sync may limit the FPS cap.", "Volume changes apply immediately. Effects carries every sound effect; there is no music or voice yet.", "Select a binding, then press a key, controller button or move a stick."][index]
 
 
 func _apply_graphics() -> void:
