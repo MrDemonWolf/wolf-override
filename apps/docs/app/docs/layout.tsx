@@ -4,7 +4,6 @@ import type { LinkItemType } from 'fumadocs-ui/layouts/shared';
 import { source } from '@/lib/source';
 import BrandLink from './brand-link';
 import SidebarDrawerShim from './sidebar-drawer-shim';
-import './docs-guide.css';
 
 // Fumadocs 16.16 draws the sidebar theme switch inside a bordered bar meant for icon links; without one it renders an empty pill.
 const links: LinkItemType[] = [

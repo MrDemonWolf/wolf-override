@@ -11,10 +11,14 @@ The current source chapter has three rooms, an opening scene, a cooperation or m
 
 **Status:** there is no packaged installer or public release yet. You can try the current development build by downloading its source and opening it with Godot 4.7.2; the source archive is a development snapshot, not a ready-to-run app.
 
-<nav className="guide-download-actions" aria-label="Get the game">
-  <a href="https://github.com/MrDemonWolf/wolf-override/archive/refs/heads/main.zip"><strong>Download source ZIP</strong><span>Current development snapshot from GitHub</span></a>
-  <a href="/docs/get-game/"><strong>How to run it</strong><span>Install Godot and open the project</span></a>
-</nav>
+<LinkCards
+  label="Get the game"
+  variant="actions"
+  links={[
+    { href: 'https://github.com/MrDemonWolf/wolf-override/archive/refs/heads/main.zip', title: 'Download source ZIP', description: 'Current development snapshot from GitHub' },
+    { href: '/docs/get-game/', title: 'How to run it', description: 'Install Godot and open the project' },
+  ]}
+/>
 
 For the full guide, including controls, chapter help, development history, credits, and licensing, use the sections in the sidebar below.
 
@@ -47,16 +51,20 @@ Use the green **SAFE POINT** beyond the door; Records Access and the Service Jun
 
 ## Explore the guide
 
-<nav className="guide-card-grid" aria-label="Guide sections">
-  <a href="/docs/controls/"><strong>Play and settings</strong><span>Inputs, preferences, checkpoints, and quick fixes</span></a>
-  <a href="/docs/walkthrough/"><strong>Chapter walkthrough</strong><span>Optional solutions, split by room</span></a>
-  <a href="/docs/about/"><strong>About the game</strong><span>Premise and current gameplay direction</span></a>
-  <a href="/docs/development/story/"><strong>Development story</strong><span>How the concept became the current prototype</span></a>
-  <a href="/docs/development/"><strong>Development</strong><span>Source setup, status, and testing</span></a>
-  <a href="/docs/changelog/"><strong>Changelog</strong><span>Public source changes by date</span></a>
-  <a href="/docs/credits/"><strong>Credits and references</strong><span>Creators, tools, research, and asset rights</span></a>
-  <a href="/docs/legal/"><strong>Legal and licensing</strong><span>Code license, asset rights, and website privacy</span></a>
-</nav>
+<LinkCards
+  label="Guide sections"
+  links={[
+    { href: '/docs/controls/', title: 'Play and settings', description: 'Inputs, preferences, checkpoints, and quick fixes' },
+    { href: '/docs/walkthrough/', title: 'Chapter walkthrough', description: 'Optional solutions, split by room' },
+    { href: '/docs/about/', title: 'About the game', description: 'Premise and current gameplay direction' },
+    { href: '/docs/development/story/', title: 'Development story', description: 'How the concept became the current prototype' },
+    { href: '/docs/development/', title: 'Development', description: 'Source setup, status, and testing' },
+    { href: '/docs/changelog/', title: 'Changelog', description: 'Public source changes by date' },
+    { href: '/docs/credits/', title: 'Credits and references', description: 'Creators, tools, research, and asset rights' },
+    { href: '/docs/legal/', title: 'Legal and licensing', description: 'Code license, asset rights, and third-party names' },
+    { href: '/docs/privacy/', title: 'Privacy', description: 'What the game and this site store and send' },
+  ]}
+/>
 
 ## What to expect
 

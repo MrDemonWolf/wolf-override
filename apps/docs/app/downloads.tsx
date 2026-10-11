@@ -1,5 +1,6 @@
 import { Fragment } from 'react';
 import Link from 'next/link';
+import { landingWidth, sectionAnchor, sectionTitle } from './landing-classes';
 
 /** The one place the landing page sends players for the current source build. */
 export const sourceBuildHref = '/docs/get-game/';
@@ -25,18 +26,18 @@ export default function Downloads() {
     <section
       id="downloads"
       aria-labelledby="downloads-title"
-      className="border-y border-line bg-surface bg-[radial-gradient(circle_at_85%_8%,rgba(67,162,201,.14),transparent_42%)] py-18 min-[701px]:py-24"
+      className={`border-y border-line bg-surface bg-[radial-gradient(circle_at_85%_8%,rgba(67,162,201,.14),transparent_42%)] py-18 min-[701px]:py-24 ${sectionAnchor}`}
     >
-      <div className="marketing-width grid gap-10 min-[701px]:grid-cols-[minmax(0,1.2fr)_minmax(0,1fr)] min-[701px]:items-start min-[701px]:gap-16">
+      <div className={`${landingWidth} grid gap-10 min-[701px]:grid-cols-[minmax(0,1.2fr)_minmax(0,1fr)] min-[701px]:items-start min-[701px]:gap-16`}>
         <div>
           <p className="hud-label mb-5">Get the build</p>
-          <h2 id="downloads-title" tabIndex={-1}>Try the source build.</h2>
+          <h2 id="downloads-title" tabIndex={-1} className={sectionTitle}>Try the source build.</h2>
           <p className="m-0 max-w-[50ch] text-body text-muted">
             There is no packaged game download yet. The current development build runs from source in Godot; it is not an installer and has no release date.
           </p>
           <Link
             href={sourceBuildHref}
-            className="mt-8 inline-flex min-h-13 items-center justify-between gap-5 rounded-control border border-accent bg-accent px-5 py-3 font-heading text-body font-bold text-ink transition-[filter,transform] hover:-translate-y-px hover:text-ink hover:brightness-105 motion-reduce:transition-none motion-reduce:hover:translate-y-0 max-[700px]:w-full"
+            className="mt-8 inline-flex min-h-13 items-center justify-between gap-5 rounded-control border border-accent bg-accent px-5 py-3 font-heading text-body font-bold text-ink transition-[filter,transform] hover:-translate-y-px hover:text-ink hover:brightness-105 motion-reduce:transition-none motion-reduce:hover:translate-y-0 phone:w-full"
           >
             Get the source build
             <ArrowIcon />

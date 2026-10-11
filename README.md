@@ -179,6 +179,8 @@ stages and knockdowns, settings validation and Continue; they do not
 establish how a route feels. The Service Junction, the closer camera, the
 layered room art and the sounds are covered by headless suites
 and rendered stills only; no route has been played by hand.
+[CONTRIBUTING.md](CONTRIBUTING.md) has the branch and pull request rules,
+the licence of contributions and the asset provenance requirements.
 
 ## Project Structure
 
@@ -220,9 +222,18 @@ props are separate assets with AI-assisted provenance recorded in
 covered by the code/docs GPL and their final rights review is open. The
 processed sound recordings are CC0, credited on the credits page.
 
+The game stores only its checkpoint, settings and Godot's own log and
+shader cache files on your device and sends nothing over the network;
+the website stores only the guide's theme choice. The
+[privacy page](https://wolfoverride.mrdemonwolf.dev/docs/privacy/) lists
+what is stored, what the site loads and how to remove it.
+[SECURITY.md](SECURITY.md) explains how to report a vulnerability
+privately.
+
 ## Contact
 
 - [Open an issue](https://github.com/MrDemonWolf/wolf-override/issues)
+- [Report a security problem privately](SECURITY.md)
 - [Join my server](https://mrdwolf.net/discord)
 - [MrDemonWolf, Inc.](https://www.mrdemonwolf.com)
 

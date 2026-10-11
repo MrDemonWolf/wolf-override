@@ -1,0 +1,55 @@
+---
+title: Privacy
+description: What the WOLF//OVERRIDE source game and this website store on your device, what they send, and how to remove it.
+---
+
+WOLF//OVERRIDE has no account, sign-in, online service or telemetry. This page says in plain terms what the source game and this website keep on your device and what leaves it. It describes the current source build and was checked against the code on October 10, 2026; it is a description, not legal advice.
+
+## The game
+
+### What it stores
+
+The game writes two files of its own to Godot's user data folder for the project:
+
+| File | Contents |
+| --- | --- |
+| `m0-save.json` | The checkpoint: the current room, the engineer's and WOLF's positions, puzzle state, which of the three preset engineer names is in use, and the reply WOLF remembers from the corridor choice. There is one checkpoint and each save replaces it; a save is written to `m0-save.json.tmp` first and renamed when complete. |
+| `settings.cfg` | Your settings: FPS limit, window size, fullscreen, V-sync, MSAA, Reduced Motion, the audio slider levels, the controller deadzone and your key bindings. |
+
+The Godot engine also writes to the same folder on desktop. A `logs/` folder holds `godot.log` and up to four older copies, each recording the engine version, the graphics driver and GPU model, and any warnings, such as a settings file that could not be read. A `shader_cache/` folder holds compiled graphics shaders so later starts are faster. Neither leaves your device.
+
+The game has no text entry. The engineer's display name is cycled from a fixed list, so nothing you type is stored. The game does not read your account name, location or clipboard. It reads your GPU model only to show it on the Settings screen and does not save it; the engine's log records the same model.
+
+### Where it lives and how to delete it
+
+[Saving](/docs/controls/saves/) lists the folder for macOS, Windows and Linux (`Godot/app_userdata/WOLF--OVERRIDE/` under the platform's application data directory). Deleting `m0-save.json` and `settings.cfg` removes your checkpoint and settings: Continue then reads **No checkpoint yet** and the settings return to their defaults. Deleting the whole folder also removes the engine's logs and shader cache; the engine writes a fresh log and cache the next time the game starts. `bun run game:check` uses a temporary folder and never touches these files.
+
+### What it sends
+
+Nothing. The game makes no network requests: no crash reports, update checks, analytics or accounts. The only outward action is the **Changelog** screen's online button, which asks your operating system to open [the changelog on this website](/docs/changelog/) in your browser; the changelog text shown inside the game is bundled with it. The Credits screen is shown in the game and opens nothing. Once you are in the browser, the website section below applies.
+
+The Godot editor you use to run the source has its own settings and behaviour, documented by the Godot project; they are not part of this game.
+
+## This website
+
+### What it stores
+
+The game guide's light or dark switch saves your choice in your browser's local storage under the key `theme`, and only once you use the switch; the site starts dark. The landing page stores nothing. The site sets no cookies and has no account, contact form, newsletter, search or comments.
+
+To remove the stored choice, clear the site data for `wolfoverride.mrdemonwolf.dev` in your browser.
+
+### What it loads
+
+The built site loads no analytics, tracking pixels, third-party scripts, stylesheets or fonts. Roboto and Montserrat are served from the site itself, and the pages and images come from the same address. This was checked by hand against the built export on October 10, 2026; the build's own export check does not test for it.
+
+### Who sees your visit
+
+GitHub Pages hosts the site, so GitHub receives the normal web request for each page (your IP address, browser details and the page you asked for) under [GitHub's privacy statement](https://docs.github.com/en/site-policy/privacy-policies/github-general-privacy-statement). The project runs no server of its own and receives no visitor logs.
+
+Links to GitHub, the Godot downloads, the Discord server and the research references leave this site; those providers' own terms and privacy practices apply.
+
+## Questions
+
+Ask through the public contacts in the [repository README](https://github.com/MrDemonWolf/wolf-override#contact): open a GitHub issue for the game or this site, or join the Discord server. For a security problem, follow [SECURITY.md](https://github.com/MrDemonWolf/wolf-override/blob/main/SECURITY.md) instead of a public issue.
+
+This page changes when the stored files or the site's behaviour change; dated updates appear in [the changelog](/docs/changelog/). For licences and asset rights, see [Legal and licensing](/docs/legal/).
