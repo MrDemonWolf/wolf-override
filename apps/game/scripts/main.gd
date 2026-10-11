@@ -723,19 +723,48 @@ func _step_engineer(spot_x: float, face_x: float) -> void:
 ## station's own side, else the side they stand on, the left when centred), just beside the machine
 ## and facing it, still within reach.
 func _step_beside_station(x: float) -> void:
-	var stations: Array[Vector4] = []
-	if state.chapter_id == "lockdown":
-		stations = CORRIDOR_STATIONS
-	elif state.chapter_id == "records":
-		stations = RECORDS_STATIONS
-	for station: Vector4 in stations:
+	for station: Vector4 in _room_stations():
 		if absf(x - station.x) > station.z:
 			continue
-		var offset: float = minf(station.y + M0Actor.HUMAN_REACH - STATION_OVERLAP, station.z - 2.0)
-		var side: float = station.w if station.w != 0.0 else (1.0 if x > station.x else -1.0)
-		if absf(x - (station.x + side * offset)) > 4.0 and absf(x - station.x) < offset + 4.0:
-			_step_engineer(station.x + side * offset, station.x)
+		var offset: float = _station_offset(station)
+		var spot_x: float = _station_side_x(station, x)
+		if absf(x - spot_x) > 4.0 and absf(x - station.x) < offset + 4.0:
+			_step_engineer(spot_x, station.x)
 		return
+
+
+## A restored engineer never stands inside a station's machine: a save or snapshot taken over its
+## drawn body (by an earlier build, or a USE whose step out had not finished) places them at its side,
+## facing it, still within reach.
+func _clear_station_body() -> void:
+	for station: Vector4 in _room_stations():
+		if absf(human.position.x - station.x) >= station.y:
+			continue
+		var spot_x: float = _station_side_x(station, human.position.x)
+		human.position.x = spot_x
+		human.body_sprite.flip_h = station.x < spot_x
+		return
+
+
+## The stations of the current room the engineer works from beside (CORRIDOR_STATIONS, RECORDS_STATIONS).
+func _room_stations() -> Array[Vector4]:
+	if state.chapter_id == "lockdown":
+		return CORRIDOR_STATIONS
+	if state.chapter_id == "records":
+		return RECORDS_STATIONS
+	return []
+
+
+## How far from a station's centre the engineer stands beside it, still within its reach.
+func _station_offset(station: Vector4) -> float:
+	return minf(station.y + M0Actor.HUMAN_REACH - STATION_OVERLAP, station.z - 2.0)
+
+
+## The spot beside [param station] for an engineer at [param x]: the station's own side, else the side
+## they stand on, the left when centred.
+func _station_side_x(station: Vector4, x: float) -> float:
+	var side: float = station.w if station.w != 0.0 else (1.0 if x > station.x else -1.0)
+	return station.x + side * _station_offset(station)
 
 
 ## The corridor's moving parts: WOLF taking the contact once he is on it and the engineer is clear,
@@ -1831,7 +1860,9 @@ func _write_beat() -> void:
 
 
 func _capture_positions() -> void:
-	state.human_position = human.position
+	# A save taken as the engineer steps out (beside a station, clear of the relay, to a crank spot)
+	# keeps the spot they are stepping to, so Continue never puts them back over the machine.
+	state.human_position = human.position if engineer_step_x < 0.0 else Vector2(engineer_step_x, human.position.y)
 	state.wolf_position = wolf.position
 
 
@@ -2479,6 +2510,7 @@ func _sync_scene() -> void:
 	relay_spark.hide()
 	impact.reset()
 	human.position = state.human_position
+	_clear_station_body()
 	wolf.position = state.wolf_position
 	# Placed afresh, he picks his side afresh from the engineer's facing.
 	wolf.follow_side = 0

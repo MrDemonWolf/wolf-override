@@ -44,6 +44,8 @@ func _run() -> void:
 	_expect(state.purge_trace_preserved and game.call("_objective") == "COPY MIRROR INDEX", "purge trace advances objective")
 	# Audit 23: a USE over the middle of a machine steps the engineer out beside it, facing it.
 	_expect(await _wait_until(func() -> bool: return float(game.get("engineer_step_x")) < 0.0, 40) and human.position.x + M0Actor.HUMAN_REACH <= 190.0 - 56.0 + 18.0 and not human.body_sprite.flip_h and human.controlled, "after copying the purge order the engineer stands beside the purge queue, facing it (x %.0f)" % human.position.x)
+	var purge_save: M0State = State.load_from_disk(path)
+	_expect(purge_save != null and absf(purge_save.human_position.x - human.position.x) <= 0.5, "the purge-copy autosave keeps the spot the engineer stepped out to, not the middle of the purge queue")
 	if not await _walk_to(human, 520.0):
 		_fail("engineer can walk to the mirror port")
 		return
@@ -100,6 +102,26 @@ func _run() -> void:
 	_expect(intro_fade.color.a == 0.0 and (game.get_node("CanvasLayer/IntroAlarm") as ColorRect).color.a == 0.0 and not ending_intro_tween.is_running(), "Continue cancels the remaining intro transition and clears fade and alarm overlays")
 	state = game.get("state") as M0State
 	_expect(state.to_dict() == saved and human.position == state.human_position and wolf.position == state.wolf_position, "Continue restores progress and both positions")
+	# Audit 23: a save taken over a machine's body (an earlier build's) restores the engineer beside it,
+	# facing it and still within reach, in the corridor and in Records.
+	var over_safe_point: M0State = _checkpoint_state(State.PRESS)
+	over_safe_point.human_position = Vector2(873.5, 410.0)
+	over_safe_point.save_to_disk(path)
+	game.call("_load_game")
+	_expect(absf(human.position.x - (876.0 - 35.0 - M0Actor.HUMAN_REACH + 6.0)) <= 0.5 and not human.body_sprite.flip_h and str(game.call("_context_hint")).contains("enter records"), "Continue over the SAFE POINT console puts the engineer beside it, facing it and in reach (x %.1f)" % human.position.x)
+	var over_queue: M0State = _checkpoint_state(State.PRESS)
+	over_queue.enter_records()
+	over_queue.preserve_purge_trace()
+	over_queue.human_position = Vector2(188.2, 410.0)
+	over_queue.save_to_disk(path)
+	game.call("_load_game")
+	_expect(absf(human.position.x - (190.0 - 56.0)) <= 0.5 and not human.body_sprite.flip_h, "Continue over the PURGE QUEUE puts the engineer beside it, facing it (x %.1f)" % human.position.x)
+	var beside_port: M0State = _checkpoint_state(State.PRESS)
+	beside_port.enter_records()
+	beside_port.human_position = Vector2(464.0, 410.0)
+	beside_port.save_to_disk(path)
+	game.call("_load_game")
+	_expect(human.position == beside_port.human_position, "a save already clear of every machine restores exactly")
 	game.queue_free()
 	await process_frame
 

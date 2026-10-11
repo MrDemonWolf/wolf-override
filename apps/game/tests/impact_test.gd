@@ -131,7 +131,9 @@ func _run() -> void:
 	_expect(await _wait_until(func() -> bool: return impact.trauma == 0.0 and camera.offset == Vector2.ZERO, 120), "the corridor settles after the seal opens")
 
 	# Knockdown: the current checkpoint comes back byte for byte, memory included.
-	human.position.x = 876.0
+	# Beside the SAFE POINT console, where a USE steps the engineer out to (a restore never leaves them
+	# inside the machine).
+	human.position.x = 830.0
 	game.call("_interact_checkpoint")
 	if not _require(state.checkpoint_reached and FileAccess.file_exists(path), "the safe point saves the checkpoint the knockdown restores"):
 		return
@@ -185,7 +187,8 @@ func _run() -> void:
 	game.call("_new_game")
 	game.call("_finish_intro")
 	state = game.get("state") as M0State
-	human.position.x = 350.0
+	# Beside the breaker, where a USE steps the engineer out to.
+	human.position.x = 306.0
 	game.call("_interact_breaker")
 	game.call("_choose", State.PRESS)
 	var pre_save: Dictionary = (game.get("beat_snapshot") as Dictionary).duplicate(true)
