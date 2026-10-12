@@ -36,7 +36,7 @@ const CLEAR_CONFIRM_TEXT: String = "PRESS AGAIN TO DELETE"
 
 var tools: DebugTools
 var actions: DebugActions
-var game: Node2D
+var game: Main
 var is_open: bool = false
 var page: StringName = &"jump"
 var backdrop: ColorRect
@@ -67,7 +67,7 @@ func _init() -> void:
 	visible = false
 
 
-func setup(main: Node2D, owner_tools: DebugTools, owner_actions: DebugActions) -> void:
+func setup(main: Main, owner_tools: DebugTools, owner_actions: DebugActions) -> void:
 	game = main
 	tools = owner_tools
 	actions = owner_actions
@@ -370,7 +370,7 @@ func toggle() -> void:
 func open() -> void:
 	if is_open or tools == null or not tools.available:
 		return
-	if (game.get(&"pause_overlay") as CanvasItem).visible:
+	if game.pause_overlay.visible:
 		tools.show_note("Close the pause menu first.")
 		return
 	is_open = true
@@ -402,11 +402,7 @@ func close(settle: bool = true) -> void:
 	_sync_visible()
 	refresh_step_bar()
 	# Back to the title's own focus there; in play nothing keeps focus.
-	var target: Control = game.call(&"_menu_focus_target") as Control
-	if target != null and target.is_visible_in_tree():
-		game.call(&"_grab_menu_focus", target)
-	else:
-		get_viewport().gui_release_focus()
+	game.debug_restore_focus()
 	closed.emit()
 
 
@@ -418,7 +414,7 @@ func _focus_first() -> void:
 
 
 func _touch_layout() -> bool:
-	return bool(game.get(&"touch_enabled")) and not bool(game.get(&"controller_active"))
+	return game.touch_enabled and not game.controller_active
 
 
 func show_page(id: StringName) -> void:
@@ -562,8 +558,8 @@ func _on_actions_changed() -> void:
 func refresh() -> void:
 	if actions == null:
 		return
-	var state: M0State = game.get(&"state") as M0State
-	var beat: String = str(game.call(&"_debug_beat"))
+	var state: M0State = game.state
+	var beat: String = game.debug_beat()
 	status_label.text = "%s · %s%s" % [state.chapter_id, beat, " · CHEATS USED" if tools.cheats_used else ""]
 	status_label.add_theme_color_override("font_color", WARN if tools.cheats_used else MUTED)
 	for option: StringName in DebugActions.RELAY_OPTIONS:
@@ -602,7 +598,7 @@ func refresh() -> void:
 	_switch("view:effects", "VISUAL EFFECTS", actions.effects_on)
 	_switch("view:shake", "CAMERA SHAKE", actions.shake_on)
 	_switch("view:flash", "SCREEN FLASH", actions.flash_on)
-	var controller: bool = bool(game.get(&"controller_active"))
+	var controller: bool = game.controller_active
 	hint_label.text = "TAP OUTSIDE TO CLOSE" if _touch_layout() else ("B  CLOSE   LB / RB  PAGE" if controller else "ESC  CLOSE   `  TOGGLE")
 
 
@@ -627,9 +623,8 @@ func refresh_step_bar() -> void:
 	if step_bar.visible:
 		step_label.text = "FRAME STEP  %d" % actions.frames_stepped
 		var choice_up: bool = false
-		for property: StringName in DebugTools.CHOICES:
-			var choice: Control = game.get(property) as Control
-			choice_up = choice_up or (choice != null and choice.is_visible_in_tree())
+		for choice: Control in tools.answer_buttons():
+			choice_up = choice_up or choice.is_visible_in_tree()
 		step_bar.position.y = STEP_BAR_BELOW_CHOICES_Y if choice_up else STEP_BAR_RECT.position.y
 	_sync_visible()
 

@@ -1,3 +1,4 @@
+class_name Main
 extends Node2D
 
 const SITE_URL: String = "https://wolfoverride.mrdemonwolf.dev"
@@ -3342,6 +3343,107 @@ func _debug_takes_back() -> bool:
 	return debug_tools != null and debug_tools.handle_back()
 
 
+# The debug menu's way into play (DebugActions, DebugMenu): small public calls onto Main's own steps,
+# so the tools (typed against Main) never call its private methods, and a rename here fails when the
+# scripts are parsed rather than when a menu button is pressed.
+
+## A fresh run from the opening or, with [param skip_intro], from the corridor's first control.
+func debug_new_game(skip_intro: bool) -> void:
+	_cancel_fail()
+	_new_game()
+	if skip_intro:
+		_finish_intro()
+
+
+## Back to the checkpoint on disk, as the title's Continue does.
+func debug_load_checkpoint() -> void:
+	_cancel_fail()
+	_load_game()
+
+
+## The engineer's interact, as the key, button or USE does it.
+func debug_interact() -> void:
+	_interact()
+
+
+## WOLF asks how to bring the sentry down, and [param response] answers (1: he draws it, 2: alone).
+func debug_answer_lane(response: int) -> void:
+	_ask_lane()
+	_choose_lane(response)
+
+
+func debug_show_end_card() -> void:
+	_show_end_card()
+
+
+## Where the engineer stands beside [param station] (x: centre, w: its side) coming from [param x].
+func debug_station_side_x(station: Vector4, x: float) -> float:
+	return _station_side_x(station, x)
+
+
+## The engineer at [param human_x] and WOLF at [param wolf_x], standing still, the controls updated.
+func debug_place(human_x: float, wolf_x: float) -> void:
+	human.position.x = human_x
+	wolf.position.x = wolf_x
+	human.velocity = Vector2.ZERO
+	wolf.velocity = Vector2.ZERO
+	_update_controls()
+
+
+## Knocks the engineer down through the one knockdown path with [param kind]'s card: vent, blast,
+## cloud, or sentry (worded by how it caught them).
+func debug_knock_down(kind: StringName) -> void:
+	var reason: String = _sentry_reason()
+	match kind:
+		&"vent":
+			reason = JunctionRoom.VENT_REASON % _first_name()
+		&"blast":
+			reason = JunctionRoom.BLAST_REASON % _first_name()
+		&"cloud":
+			reason = JunctionRoom.CLOUD_REASON % _first_name()
+	_fail_beat(reason)
+
+
+## The valve's last turn has landed (the fuse is lit), as the crank lands it.
+func debug_valve_turned() -> void:
+	_valve_turned()
+	_update_controls()
+
+
+## The TANK RELEASE lets the tank go.
+func debug_drop_tank() -> void:
+	_drop_tank()
+
+
+## The game's own autosave at this beat.
+func debug_save_progress() -> void:
+	_save_progress()
+
+
+## The save on disk changed: the title's buttons follow it.
+func debug_save_changed() -> void:
+	if title_open:
+		_refresh_continue()
+
+
+func debug_refresh_ui() -> void:
+	_refresh_ui()
+
+
+## The station interact is being held at ("valve", "bypass"), or empty.
+func debug_hold_station() -> StringName:
+	return _hold_station()
+
+
+## The debug menu closed: focus goes back where the game's own menus keep it (the title's), or nowhere.
+func debug_restore_focus() -> void:
+	var target: Control = _menu_focus_target()
+	if target != null and target.is_visible_in_tree():
+		_grab_menu_focus(target)
+	else:
+		get_viewport().gui_release_focus()
+
+
 ## What the game is doing right now, as plain values for the debug overlay and bug captures
 ## (DebugTools.dump adds performance, the save on disk and the build). The overlay's frequent refresh
 ## leaves out the full save state ([param include_state] false); captures and scripts keep it.
@@ -3354,12 +3456,12 @@ func debug_snapshot(include_state: bool = true) -> Dictionary:
 		relay = ("disclose" if told else "press") + (" → WOLF" if state.route == "cooperate" else (" → bypass" if state.route == "fallback" else ""))
 	var snapshot: Dictionary = {
 		"room": state.chapter_id,
-		"beat": _debug_beat(),
+		"beat": debug_beat(),
 		"objective": "" if title_open else _objective(),
 		"line": status_line,
 		"hint": "" if title_open else _context_hint(),
 		"engineer": {"x": human.position.x, "y": human.position.y, "facing": "left" if human.body_sprite.flip_h else "right", "state": _debug_engineer_state()},
-		"wolf": {"x": wolf.position.x, "y": wolf.position.y, "facing": "left" if wolf.body_sprite.flip_h else "right", "target_x": _debug_wolf_target(), "why": _debug_wolf_why()},
+		"wolf": {"x": wolf.position.x, "y": wolf.position.y, "facing": "left" if wolf.body_sprite.flip_h else "right", "target_x": debug_wolf_target(), "why": debug_wolf_why()},
 		"sentry": {"active": in_junction, "state": str(sentry_brain.state), "x": sentry_brain.x, "facing": "left" if sentry_brain.facing < 0.0 else "right", "sight_range": SentryBrain.SIGHT_RANGE, "fixated_on": fixated_on},
 		"pressure_line": {"state": str(pressure_line.state), "gauge": pressure_line.gauge, "turns": pressure_line.turns, "turns_needed": PressureLine.TURNS_NEEDED, "fuse": pressure_line.fuse_remaining},
 		"drop_arm": {"state": str(drop_arm.state), "drop": drop_arm.drop_amount(), "cloud": drop_arm.cloud_remaining},
@@ -3386,7 +3488,7 @@ func debug_snapshot(include_state: bool = true) -> Dictionary:
 	return snapshot
 
 
-func _debug_beat() -> String:
+func debug_beat() -> String:
 	if title_open:
 		return "title"
 	if intro_active:
@@ -3422,7 +3524,7 @@ func _debug_engineer_state() -> String:
 
 ## Where WOLF is heading: his own spot, or his follow spot worked out the way M0Actor.follow_x does
 ## without changing his side, or -1.
-func _debug_wolf_target() -> float:
+func debug_wolf_target() -> float:
 	if wolf.autonomous_target_x >= 0.0:
 		return wolf.autonomous_target_x
 	if wolf.follow_target == null or wolf.follow_side == 0:
@@ -3431,7 +3533,7 @@ func _debug_wolf_target() -> float:
 
 
 ## Why WOLF is where he is: following, scouting, baiting, holding a spot or refusing.
-func _debug_wolf_why() -> String:
+func debug_wolf_why() -> String:
 	if not wolf.visible or title_open:
 		return "—"
 	if hatch_exit_walking:

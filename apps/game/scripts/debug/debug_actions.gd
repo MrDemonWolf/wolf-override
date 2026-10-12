@@ -9,8 +9,9 @@ extends Node
 ## Jumps build the run through M0State's own steps (record_choice, arm_breaker, activate_power,
 ## reach_checkpoint, enter_records, ...) from the presets, so a jumped state is one real play can
 ## reach. A jump to a beat the game autosaves at writes that checkpoint, as play does on reaching it,
-## and Main's own _load_game puts it on screen; the beats before the first SAFE POINT go through
-## _new_game, _finish_intro and the breaker's own interact, and leave the save on disk alone.
+## and Main's own load puts it on screen; the beats before the first SAFE POINT go through a new game,
+## the end of the opening and the breaker's own interact, and leave the save on disk alone. Main is
+## reached only through its typed public debug_* calls and fields, never its private methods.
 ##
 ## Cost: it processes only while instant crank or slow motion is on (it runs before Main each frame,
 ## process_priority PROCESS_FIRST), and its frame stepper only for the one frame a step lets through.
@@ -69,7 +70,7 @@ class Stepper:
 		on_frame.call()
 
 
-var game: Node2D
+var game: Main
 var tools: DebugTools
 ## The earlier choices a jump builds the run from.
 var relay: StringName = &"disclose_wolf"
@@ -104,7 +105,7 @@ func _ready() -> void:
 	_update_processing()
 
 
-func setup(main: Node2D, owner_tools: DebugTools) -> void:
+func setup(main: Main, owner_tools: DebugTools) -> void:
 	game = main
 	tools = owner_tools
 	stepper = Stepper.new()
@@ -168,29 +169,29 @@ func jump(id: StringName) -> String:
 	if not JUMPS.has(id):
 		return ""
 	tools.cheats_used = true
-	game.call(&"_cancel_fail")
 	match id:
 		&"opening":
-			game.call(&"_new_game")
+			game.debug_new_game(false)
 		&"corridor_start":
-			_corridor_start()
+			game.debug_new_game(true)
 		&"relay_question":
-			_corridor_start()
+			game.debug_new_game(true)
 			# Beside the breaker, as play arrives there; its interact gives WOLF's purge stakes, the next
 			# one his question about the relay.
-			var breaker: Vector4 = _constant(&"CORRIDOR_STATIONS")[0]
-			var spot: float = float(game.call(&"_station_side_x", breaker, breaker.x - 1.0))
-			_place(spot, spot - M0Actor.FOLLOW_GAP)
-			game.call(&"_interact")
-			game.call(&"_interact")
+			var breaker: Vector4 = Main.CORRIDOR_STATIONS[0]
+			var spot: float = game.debug_station_side_x(breaker, breaker.x - 1.0)
+			game.debug_place(spot, spot - M0Actor.FOLLOW_GAP)
+			game.debug_interact()
+			game.debug_interact()
 		_:
-			if not build_state(id).save_to_disk(str(game.get(&"save_path"))):
+			if not build_state(id).save_to_disk(game.save_path):
 				return "The checkpoint for %s could not be written." % JUMP_NAMES[id]
-			game.call(&"_load_game")
+			game.debug_load_checkpoint()
 			if id == &"lane":
 				_answer_lane()
 			elif id == &"end_of_slice":
-				game.call(&"_show_end_card")
+				game.debug_show_end_card()
+	_hold_if_stepping()
 	changed.emit()
 	return "Jumped to %s%s." % [JUMP_NAMES[id], " (checkpoint written)" if CHECKPOINT_JUMPS.has(id) else ""]
 
@@ -204,7 +205,7 @@ func build_state(id: StringName) -> M0State:
 	state.activate_power("wolf" if relay == &"disclose_wolf" else "human")
 	state.reach_checkpoint()
 	# At the safe point, beside it on the left as its interact leaves the engineer.
-	_set_positions(state, _side_spot(_constant(&"CORRIDOR_STATIONS")[2], -1.0))
+	_set_positions(state, _side_spot(Main.CORRIDOR_STATIONS[2], -1.0))
 	if id == &"safe_point":
 		return state
 	state.enter_records()
@@ -213,8 +214,8 @@ func build_state(id: StringName) -> M0State:
 	state.preserve_purge_trace()
 	state.preserve_mirror_trace(String(mirror))
 	# Beside the mirror port; WOLF on its right where he read it, or following.
-	var port: float = _side_spot(_constant(&"RECORDS_STATIONS")[1], -1.0)
-	_set_positions(state, port, float(_constant(&"WOLF_MIRROR_X")) if mirror == &"wolf" else port - M0Actor.FOLLOW_GAP)
+	var port: float = _side_spot(Main.RECORDS_STATIONS[1], -1.0)
+	_set_positions(state, port, Main.WOLF_MIRROR_X if mirror == &"wolf" else port - M0Actor.FOLLOW_GAP)
 	if id == &"records_mirror":
 		return state
 	state.complete_chapter()
@@ -229,7 +230,7 @@ func build_state(id: StringName) -> M0State:
 	state.drop_sentry()
 	state.lane_recap = String(lane)
 	# At the TANK RELEASE; WOLF where he drew the sentry, or at the rubble.
-	var release: Vector4 = _constant(&"JUNCTION_STATIONS")[2]
+	var release: Vector4 = Main.JUNCTION_STATIONS[2]
 	_set_positions(state, _side_spot(release, release.w), JunctionRoom.WOLF_BAIT_X if lane == &"wolf" else JunctionRoom.WOLF_RUBBLE_X)
 	if id == &"tank_down":
 		return state
@@ -238,17 +239,11 @@ func build_state(id: StringName) -> M0State:
 	return state
 
 
-func _corridor_start() -> void:
-	game.call(&"_new_game")
-	game.call(&"_finish_intro")
-
-
 ## After the blast: the engineer walks up to the rubble line, WOLF asks how to bring the sentry down,
 ## and the lane preset answers through the game's own answer (he decides by the relay memory).
 func _answer_lane() -> void:
-	_place(JunctionRoom.CHOICE_X, JunctionRoom.WOLF_RUBBLE_X)
-	game.call(&"_ask_lane")
-	game.call(&"_choose_lane", 2 if lane == &"alone" else 1)
+	game.debug_place(JunctionRoom.CHOICE_X, JunctionRoom.WOLF_RUBBLE_X)
+	game.debug_answer_lane(2 if lane == &"alone" else 1)
 
 
 func _set_positions(state: M0State, human_x: float, wolf_x: float = -1.0) -> void:
@@ -258,21 +253,7 @@ func _set_positions(state: M0State, human_x: float, wolf_x: float = -1.0) -> voi
 
 ## The spot beside a Main station (x: centre, w: its side) on [param side], as Main works it out.
 func _side_spot(station: Vector4, side: float) -> float:
-	return float(game.call(&"_station_side_x", station, station.x + side))
-
-
-func _place(human_x: float, wolf_x: float) -> void:
-	var human: M0Actor = game.get(&"human") as M0Actor
-	var wolf: M0Actor = game.get(&"wolf") as M0Actor
-	human.position.x = human_x
-	wolf.position.x = wolf_x
-	human.velocity = Vector2.ZERO
-	wolf.velocity = Vector2.ZERO
-	game.call(&"_update_controls")
-
-
-func _constant(key: StringName) -> Variant:
-	return (game.get_script() as Script).get_script_constant_map().get(key)
+	return game.debug_station_side_x(station, station.x + side)
 
 
 # --- Cheats -------------------------------------------------------------------------------------
@@ -367,17 +348,17 @@ func _process(_delta: float) -> void:
 ## With interact held at a crank station, leaves the valve or the bypass one held moment from done,
 ## so Main's own crank this frame lands the last turn (its line, sound and seal or fuse).
 func _prime_crank() -> void:
-	var human: M0Actor = game.get(&"human") as M0Actor
+	var human: M0Actor = game.human
 	if human == null or not human.controlled or not Input.is_action_pressed(&"interact"):
 		return
-	match StringName(game.call(&"_hold_station")):
+	match game.debug_hold_station():
 		&"valve":
-			var line: PressureLine = game.get(&"pressure_line") as PressureLine
+			var line: PressureLine = game.pressure_line
 			if line.state == &"building":
 				line.turns = maxi(line.turns, PressureLine.TURNS_NEEDED - 1)
 				line.progress = maxf(line.progress, PressureLine.TURN_SECONDS)
 		&"bypass":
-			var hold: HoldUse = game.get(&"hold_use") as HoldUse
+			var hold: HoldUse = game.hold_use
 			if hold.station != &"bypass":
 				hold.station = &"bypass"
 				hold.ticks = 0
@@ -389,28 +370,36 @@ func _prime_crank() -> void:
 
 ## Holds the game still like Pause does: held actions released, any hit-stop ended.
 func hold_pause() -> void:
-	for action: StringName in _constant(&"GAMEPLAY_ACTIONS"):
+	for action: StringName in Main.GAMEPLAY_ACTIONS:
 		Input.action_release(action)
-	(game.get(&"impact") as Impact).end_hit_stop()
+	game.impact.end_hit_stop()
 	get_tree().paused = true
+
+
+## Holds the game still again after a jump or a reload while the menu is open or frame stepping is
+## on: Main's own new game and load let the tree run, and with frame stepping nothing would pause it
+## again until the next step (closing the menu leaves the pause as it finds it).
+func _hold_if_stepping() -> void:
+	if tools.menu_open or (frame_step and not _step_pending):
+		get_tree().paused = true
 
 
 ## Lets the game run again unless the menu is open, frame stepping is on or the game's own Pause is up.
 ## With [param settle] false, a hit-stop, shake or flash an action from the menu just started (a forced
 ## knockdown's) plays on; the caller settles the ones from before the menu first (settle_impact).
 func release_pause(settle: bool = true) -> void:
-	if frame_step or tools.menu_open or (game.get(&"pause_overlay") as CanvasItem).visible:
+	if frame_step or tools.menu_open or game.pause_overlay.visible:
 		return
 	get_tree().paused = false
 	# Like resuming from Pause: a dip or flash never outlasts the menu.
 	if settle:
 		settle_impact()
-	game.call(&"_refresh_ui")
+	game.debug_refresh_ui()
 
 
 ## Ends any hit-stop, shake and flash under way, as resuming from Pause does.
 func settle_impact() -> void:
-	(game.get(&"impact") as Impact).reset()
+	game.impact.reset()
 
 
 # --- Forcing ------------------------------------------------------------------------------------
@@ -420,7 +409,7 @@ func knockdown_blocked() -> String:
 	var why: String = _play_blocked()
 	if not why.is_empty():
 		return why
-	if str(game.get(&"state").chapter_id) != "junction":
+	if game.state.chapter_id != "junction":
 		return "Knockdowns are the Service Junction's hazards."
 	return ""
 
@@ -431,18 +420,9 @@ func force_knockdown(kind: StringName) -> String:
 	var why: String = knockdown_blocked()
 	if not why.is_empty() or not KNOCKDOWNS.has(kind):
 		return why
-	var first: String = str(game.call(&"_first_name"))
-	var reason: String = str(game.call(&"_sentry_reason"))
-	match kind:
-		&"vent":
-			reason = JunctionRoom.VENT_REASON % first
-		&"blast":
-			reason = JunctionRoom.BLAST_REASON % first
-		&"cloud":
-			reason = JunctionRoom.CLOUD_REASON % first
 	tools.cheats_used = true
 	_forcing = true
-	game.call(&"_fail_beat", reason)
+	game.debug_knock_down(kind)
 	_forcing = false
 	changed.emit()
 	return "Forced the %s knockdown." % kind
@@ -453,9 +433,9 @@ func blast_blocked() -> String:
 	var why: String = knockdown_blocked()
 	if not why.is_empty():
 		return "The door blast is in the Service Junction." if why.begins_with("Knockdowns") else why
-	if (game.get(&"state") as M0State).door_blown:
+	if game.state.door_blown:
 		return "The door is already down."
-	if (game.get(&"pressure_line") as PressureLine).state in [&"charged", &"fuse", &"blown"]:
+	if game.pressure_line.state in [&"charged", &"fuse", &"blown"]:
 		return "The fuse is already lit."
 	return ""
 
@@ -467,12 +447,11 @@ func trigger_blast() -> String:
 	var why: String = blast_blocked()
 	if not why.is_empty():
 		return why
-	var line: PressureLine = game.get(&"pressure_line") as PressureLine
+	var line: PressureLine = game.pressure_line
 	if line.state != &"building":
 		line.arm()
 	line.crank(PressureLine.TURN_SECONDS * PressureLine.TURNS_NEEDED + PressureLine.EPSILON)
-	game.call(&"_valve_turned")
-	game.call(&"_update_controls")
+	game.debug_valve_turned()
 	tools.cheats_used = true
 	changed.emit()
 	return "Fuse lit: the door goes %.0f s after play resumes." % PressureLine.FUSE_SECONDS
@@ -483,14 +462,14 @@ func drop_blocked() -> String:
 	var why: String = knockdown_blocked()
 	if not why.is_empty():
 		return "The tank is in the Service Junction." if why.begins_with("Knockdowns") else why
-	var state: M0State = game.get(&"state") as M0State
+	var state: M0State = game.state
 	if not state.door_blown:
 		return "The tank hangs past the door; blow the door first."
 	if state.sentry_down:
 		return "The tank is already down."
-	if bool(game.get(&"waiting_for_choice")):
+	if game.waiting_for_choice:
 		return "Answer WOLF first."
-	var arm: DropArm = game.get(&"drop_arm") as DropArm
+	var arm: DropArm = game.drop_arm
 	if arm.state != &"hung":
 		return "The tank is %s; wait for the clamp." % arm.state
 	return ""
@@ -502,18 +481,18 @@ func trigger_drop() -> String:
 	var why: String = drop_blocked()
 	if not why.is_empty():
 		return why
-	game.call(&"_drop_tank")
+	game.debug_drop_tank()
 	tools.cheats_used = true
 	changed.emit()
 	return "The clamp lets go."
 
 
 func _play_blocked() -> String:
-	if bool(game.get(&"title_open")) or bool(game.get(&"intro_active")):
+	if game.title_open or game.intro_active:
 		return "Start play first (jump to a beat)."
-	if bool(game.get(&"chapter_close_active")) or bool(game.get(&"end_card_active")):
+	if game.chapter_close_active or game.end_card_active:
 		return "Not during a closing scene."
-	if bool(game.get(&"fail_active")):
+	if game.fail_active:
 		return "A knockdown is already playing."
 	return ""
 
@@ -525,8 +504,8 @@ func save_blocked() -> String:
 	var why: String = _play_blocked()
 	if not why.is_empty():
 		return why
-	if not (game.get(&"state") as M0State).checkpoint_reached:
-		return str(_constant(&"NO_CHECKPOINT_NOTE"))
+	if not game.state.checkpoint_reached:
+		return Main.NO_CHECKPOINT_NOTE
 	return ""
 
 
@@ -535,8 +514,8 @@ func save_now() -> String:
 	var why: String = save_blocked()
 	if not why.is_empty():
 		return why
-	game.call(&"_save_progress")
-	return str(_constant(&"SAVE_FAILED_HINT")) if bool(game.get(&"save_pending")) else str(_constant(&"CHECKPOINT_TOAST"))
+	game.debug_save_progress()
+	return Main.SAVE_FAILED_HINT if game.save_pending else Main.CHECKPOINT_TOAST
 
 
 ## True when the save on disk holds a checkpoint Continue can load (read without side effects).
@@ -547,22 +526,21 @@ func has_checkpoint() -> bool:
 ## Back to the checkpoint on disk, as the title's Continue does.
 func reload_checkpoint() -> String:
 	if not has_checkpoint():
-		return str(_constant(&"UNREADABLE_CHECKPOINT_NOTE")) if FileAccess.file_exists(str(game.get(&"save_path"))) else "No checkpoint to reload."
-	game.call(&"_cancel_fail")
-	game.call(&"_load_game")
+		return Main.UNREADABLE_CHECKPOINT_NOTE if FileAccess.file_exists(game.save_path) else "No checkpoint to reload."
+	game.debug_load_checkpoint()
+	_hold_if_stepping()
 	changed.emit()
-	return str(_constant(&"RESTORE_FROM_DISK_LINE"))
+	return Main.RESTORE_FROM_DISK_LINE
 
 
 ## Deletes the checkpoint (and a leftover temporary copy); the title's buttons follow.
 func clear_save() -> String:
-	var path: String = str(game.get(&"save_path"))
+	var path: String = game.save_path
 	var removed: bool = false
 	for file: String in [path, path + ".tmp"]:
 		if FileAccess.file_exists(file):
 			removed = DirAccess.remove_absolute(ProjectSettings.globalize_path(file)) == OK or removed
-	if bool(game.get(&"title_open")):
-		game.call(&"_refresh_continue")
+	game.debug_save_changed()
 	changed.emit()
 	return "Checkpoint deleted." if removed else "No checkpoint on disk."
 
@@ -572,23 +550,23 @@ func clear_save() -> String:
 ## Main's one switch for the visual effects (depth pass, glows, reflections, grade and the impact kit).
 func set_effects(on: bool) -> String:
 	if _effects_before == null:
-		_effects_before = game.get(&"effects_enabled")
+		_effects_before = game.effects_enabled
 	effects_on = on
-	game.set(&"effects_enabled", on)
+	game.effects_enabled = on
 	changed.emit()
 	return "Visual effects %s." % ("on" if on else "off")
 
 
 func set_shake(on: bool) -> String:
 	shake_on = on
-	(game.get(&"impact") as Impact).shake_enabled = on
+	game.impact.shake_enabled = on
 	changed.emit()
 	return "Camera shake %s." % ("on" if on else "off")
 
 
 func set_flash(on: bool) -> String:
 	flash_on = on
-	(game.get(&"impact") as Impact).flash_enabled = on
+	game.impact.flash_enabled = on
 	changed.emit()
 	return "Screen flashes %s." % ("on" if on else "off")
 
@@ -610,12 +588,12 @@ func reset_all() -> void:
 		stepper.set_process(false)
 	_step_pending = false
 	if _effects_before != null:
-		game.set(&"effects_enabled", bool(_effects_before))
+		game.effects_enabled = bool(_effects_before)
 		_effects_before = null
-	effects_on = bool(game.get(&"effects_enabled"))
+	effects_on = game.effects_enabled
 	shake_on = true
 	flash_on = true
-	var impact: Impact = game.get(&"impact") as Impact
+	var impact: Impact = game.impact
 	if impact != null:
 		impact.shake_enabled = true
 		impact.flash_enabled = true

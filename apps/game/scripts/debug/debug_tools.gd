@@ -5,7 +5,8 @@ extends Node
 ## drawn over the game: DebugZones), F12 bug captures (a screenshot and a JSON state dump with all of
 ## that geometry as numbers), the debug menu (DebugMenu over DebugActions: jumps, choices, cheats,
 ## forced knockdowns, saves and effect switches) and a small DEBUG button for touch. Main builds one
-## in _ready (_setup_debug_tools) and gives it its debug_snapshot().
+## in _ready (_setup_debug_tools) and gives it its debug_snapshot(). The tools are typed against Main
+## and reach it only through its fields and public debug_* calls, never its private methods.
 ##
 ## Gating: always available in a debug build. In any other build the tools stay hidden until a cheat
 ## code on the title screen unlocks them (WOLFDEN typed on a keyboard; Up Up Down Down Left Right Left
@@ -22,7 +23,8 @@ extends Node
 ## The game's own cards come first: while Pause, Settings, the END OF SLICE card or the title's
 ## Credits or Changelog is up, the overlay and the DEBUG button step aside (and stop refreshing), and
 ## the overlay steps aside for an answer button that would sit under it (the touch layout's choice
-## row). A pause without a card, such as the debug menu's, keeps the overlay up and refreshing.
+## row). A pause without a card, such as the debug menu's, keeps the overlay up and refreshing. While
+## the corridor's tutorial prompt is up the state pages narrow to end left of it (state_width).
 
 ## The tools became available or were hidden (unlock, lock, or a debug_build change).
 signal availability_changed(available: bool)
@@ -50,6 +52,9 @@ const PAD_CODE: Array[JoyButton] = [
 	JOY_BUTTON_DPAD_LEFT, JOY_BUTTON_DPAD_RIGHT, JOY_BUTTON_DPAD_LEFT, JOY_BUTTON_DPAD_RIGHT,
 	JOY_BUTTON_B, JOY_BUTTON_A,
 ]
+## Keys that only change what the next key types (Shift for a capital, Caps Lock and the like): they
+## neither type a letter nor break the code.
+const MODIFIER_KEYS: Array[Key] = [KEY_SHIFT, KEY_CAPSLOCK, KEY_CTRL, KEY_ALT, KEY_META]
 const LOGO_TAPS: int = 7
 ## Logo taps further apart than this start the count again.
 const LOGO_TAP_GAP_MSEC: int = 1000
@@ -62,10 +67,6 @@ const REFRESH_SECONDS: float = 0.25
 ## The overlay's view of the save on disk is read again after this long, or when the file's
 ## existence or modified time changes; captures and dump() always read it fresh.
 const SAVE_INFO_SECONDS: float = 1.0
-## Main's full-screen cards (by property name) that the overlay and the DEBUG button step aside for.
-const CARDS: Array[StringName] = [&"pause_overlay", &"end_card", &"credits_screen", &"changelog_screen"]
-## Main's answer buttons (by property name); the overlay hides while one would sit under it.
-const CHOICES: Array[StringName] = [&"touch_choice_1", &"touch_choice_2"]
 ## Above the game's HUD, menus and pause overlay.
 const LAYER: int = 100
 ## capture_with_boxes() waits at most this many frames for the boxes to be drawn: a window that
@@ -78,11 +79,16 @@ const FRAME_WAIT_LIMIT: int = 10
 const BUTTON_RECT: Rect2 = Rect2(760.0, 10.0, 72.0, 34.0)
 const PAUSE_LEFT: float = 854.0
 const BUTTON_GAP: float = 14.0
-## The short note ("Debug tools unlocked", a jump's result, a capture's path): in play at the top
-## right, under PAUSE and the frame-step bar (DebugMenu.STEP_BAR_RECT), right of the overlay's column
-## and the tutorial card, above USE, wrapping to two lines; the menu hides it (it has its own status
-## line). On the title over the key art's floor, above CHANGELOG, clear of the title text and menu.
-const NOTE_RECT: Rect2 = Rect2(650.0, 132.0, 296.0, 52.0)
+## The short note ("Debug tools unlocked", a jump's result, a capture's path), wrapping to two lines;
+## the menu hides it (it has its own status line). In play it sits in the top band between the top
+## card (ends x 466) and the DEBUG button (from x 768), above the frame-step bar, over nothing but the
+## ceiling, so it never covers an actor or a machine being debugged. The zones page's legend takes
+## that band, so there the note takes the first of NOTE_ZONES_SLOTS that covers neither an actor nor
+## the junction's tank: right of the overlay's column below the answer row and the tutorial card, or
+## under PAUSE and the frame-step bar; both are above the actors' heads. On the title it sits over the
+## key art's floor, above CHANGELOG, clear of the title text and menu.
+const NOTE_RECT: Rect2 = Rect2(474.0, 16.0, 280.0, 52.0)
+const NOTE_ZONES_SLOTS: Array[Rect2] = [Rect2(410.0, 168.0, 260.0, 52.0), Rect2(650.0, 132.0, 296.0, 52.0)]
 const TITLE_NOTE_RECT: Rect2 = Rect2(48.0, 412.0, 408.0, 32.0)
 
 ## Debug builds always have the tools; tests set this false to check a release build's gating.
@@ -108,7 +114,7 @@ var menu_open: bool = false:
 var capture_dir: String = CAPTURE_DIR
 ## The last bug capture's paths ("json", "png"), or empty.
 var last_capture: Dictionary = {}
-var game: Node2D
+var game: Main
 var settings_path: String = ""
 var layer: CanvasLayer
 var overlay: DebugOverlay
@@ -148,23 +154,25 @@ var frame_drawn_signal: Signal = Signal()
 
 ## Hooks the tools onto Main: reads the stored unlock from Main's settings file, builds the hidden
 ## overlay, note and DEBUG button, and listens for the logo taps.
-func setup(main: Node2D) -> void:
+func setup(main: Main) -> void:
 	game = main
 	process_mode = Node.PROCESS_MODE_ALWAYS
 	set_process(false)
 	set_physics_process(false)
-	settings_path = str(main.get(&"settings_path"))
+	settings_path = main.settings_path
 	unlocked = GameSettings.boolean(GameSettings.load_config(settings_path), SETTINGS_SECTION, SETTINGS_KEY, false)
 	_build()
-	var logo: Control = main.get(&"title_mark") as Control
+	var logo: Control = main.title_mark
 	if logo != null:
 		# The mark is otherwise decoration; it takes taps (and clicks) for the touch code.
 		logo.mouse_filter = Control.MOUSE_FILTER_STOP
 		logo.gui_input.connect(_on_logo_input)
-	for property: StringName in CARDS + CHOICES:
-		var item: CanvasItem = main.get(property) as CanvasItem
-		if item != null:
-			item.visibility_changed.connect(_queue_view)
+	var watched: Array[CanvasItem] = []
+	watched.append_array(cards())
+	watched.append_array(answer_buttons())
+	watched.append(main.tutorial_prompt)
+	for item: CanvasItem in watched:
+		item.visibility_changed.connect(_queue_view)
 	_apply()
 
 
@@ -259,18 +267,22 @@ func _refresh_view(redraw: bool = false) -> void:
 	var was: bool = overlay.visible
 	overlay.visible = showing
 	set_process(showing)
-	if showing and (redraw or not was):
+	# The tutorial prompt came or went: the state page narrows or widens now, not at its next refresh.
+	var width_changed: bool = overlay_mode != Overlay.PERFORMANCE and not is_equal_approx(overlay.body.custom_minimum_size.x, state_width())
+	if showing and (redraw or not was or width_changed):
 		_refresh_left = REFRESH_SECONDS
 		_refresh_overlay()
 	# The zones page draws over the whole view, so it steps aside for the game's cards (not for the
 	# answers: its legend is clear of them); a capture with boxes draws it whatever is up.
 	zones.set_shown(available and (_capturing_boxes or (overlay_mode == Overlay.ZONES and not card_up)))
-	var controller: bool = bool(game.get(&"controller_active"))
-	var touch_layout: bool = bool(game.get(&"touch_enabled")) and not controller
+	var controller: bool = game.controller_active
+	var touch_layout: bool = game.touch_enabled and not controller
 	zones.set_device("controller" if controller else ("touch" if touch_layout else "keyboard"))
 	debug_button.visible = available and touch_layout and not menu_open and not card_up
+	if note.visible:
+		_place_note()
 	# The game's own Pause opened over frame stepping (its pause wins): stepping ends, Pause stays.
-	if actions.frame_step and (game.get(&"pause_overlay") as CanvasItem).visible:
+	if actions.frame_step and game.pause_overlay.visible:
 		actions.set_frame_step(false)
 	menu.refresh_step_bar()
 	sync_layer()
@@ -290,21 +302,45 @@ func sync_layer() -> void:
 		layer.visible = overlay.visible or debug_button.visible or note.visible or zones.visible or menu.visible
 
 
+## Main's full-screen cards that the overlay and the DEBUG button step aside for: Pause (and the
+## Settings in it), the END OF SLICE card (built when first shown), the title's Credits and Changelog.
+func cards() -> Array[CanvasItem]:
+	var found: Array[CanvasItem] = [game.pause_overlay, game.credits_screen, game.changelog_screen]
+	if game.end_card != null:
+		found.append(game.end_card)
+	return found
+
+
+## Main's answer buttons (the touch layout's choice row); the overlay hides while one would sit under it.
+func answer_buttons() -> Array[Control]:
+	return [game.touch_choice_1, game.touch_choice_2]
+
+
 ## True while one of Main's full-screen cards is up.
 func _card_up() -> bool:
-	for property: StringName in CARDS:
-		var card: CanvasItem = game.get(property) as CanvasItem
-		if card != null and card.is_visible_in_tree():
+	for card: CanvasItem in cards():
+		if card.is_visible_in_tree():
 			return true
 	return false
 
 
+## The state pages' text width: DebugOverlay.STATE_WIDTH, or narrower so the page ends left of the
+## corridor's tutorial prompt while it is up in the page's column (its control instructions stay
+## readable; the performance page is narrow enough already).
+func state_width() -> float:
+	var prompt: Control = game.tutorial_prompt
+	if prompt.is_visible_in_tree():
+		var rect: Rect2 = prompt.get_global_rect()
+		if DebugOverlay.footprint(false).intersects(rect):
+			return minf(DebugOverlay.STATE_WIDTH, DebugOverlay.width_left_of(rect.position.x))
+	return DebugOverlay.STATE_WIDTH
+
+
 ## True while an answer button is shown where the current page would be drawn.
 func _choice_under_overlay() -> bool:
-	var area: Rect2 = DebugOverlay.footprint(overlay_mode == Overlay.PERFORMANCE)
-	for property: StringName in CHOICES:
-		var choice: Control = game.get(property) as Control
-		if choice != null and choice.is_visible_in_tree() and area.intersects(choice.get_global_rect()):
+	var area: Rect2 = DebugOverlay.footprint(overlay_mode == Overlay.PERFORMANCE, state_width())
+	for choice: Control in answer_buttons():
+		if choice.is_visible_in_tree() and area.intersects(choice.get_global_rect()):
 			return true
 	return false
 
@@ -320,7 +356,7 @@ func _refresh_overlay() -> void:
 	if overlay_mode == Overlay.PERFORMANCE:
 		overlay.show_performance(performance())
 	elif overlay_mode != Overlay.OFF:
-		overlay.show_state(dump(false), overlay_mode == Overlay.ZONES)
+		overlay.show_state(dump(false), overlay_mode == Overlay.ZONES, state_width())
 
 
 func _input(event: InputEvent) -> void:
@@ -426,17 +462,19 @@ func _pad_toggle(button: InputEventJoypadButton) -> bool:
 
 ## Codes are entered on the title screen, with no menu over it.
 func _title_listening() -> bool:
-	return bool(game.get(&"title_open")) and not get_tree().paused
+	return game.title_open and not get_tree().paused
 
 
 ## True while Settings waits for a new binding, so F3 or F12 can be bound without side effects.
 func _rebinding() -> bool:
-	var settings: GameSettings = game.get(&"settings_menu") as GameSettings
+	var settings: GameSettings = game.settings_menu
 	return settings != null and not settings.capture_action.is_empty()
 
 
 func _watch_codes(event: InputEvent) -> void:
 	if event is InputEventKey and event.pressed and not event.is_echo():
+		if _is_modifier(event as InputEventKey):
+			return
 		var letter: String = _letter(event as InputEventKey)
 		if letter.is_empty():
 			_typed = ""
@@ -465,6 +503,10 @@ func _pad_code_entered() -> bool:
 		if _pad[index] != PAD_CODE[index]:
 			return false
 	return true
+
+
+static func _is_modifier(event: InputEventKey) -> bool:
+	return MODIFIER_KEYS.has(event.keycode) or MODIFIER_KEYS.has(event.physical_keycode)
 
 
 ## The letter a key typed, from its text or (for synthetic events) its key code, or empty.
@@ -561,6 +603,8 @@ func capture_with_boxes() -> Dictionary:
 	if not available:
 		return {}
 	var drawn: Dictionary = zones.layers.duplicate()
+	# The tools' own note (a previous capture's path, a jump's result) stays out of the screenshot.
+	hide_note()
 	_capturing_boxes = true
 	for category: StringName in DebugZones.CATEGORIES:
 		zones.set_layer(true, category)
@@ -645,8 +689,8 @@ static func _timestamp() -> String:
 ## geometry, and the save on disk as last read (see SAVE_INFO_SECONDS).
 func dump(full: bool = true) -> Dictionary:
 	var data: Dictionary = {}
-	if game != null and game.has_method(&"debug_snapshot"):
-		data = game.call(&"debug_snapshot", full)
+	if game != null:
+		data = game.debug_snapshot(full)
 	data["time"] = Time.get_datetime_string_from_system(false, true)
 	var window: Vector2i = get_window().size
 	data["build"] = {
@@ -696,7 +740,7 @@ static func performance(static_memory: bool = OS.is_debug_build()) -> Dictionary
 ## With [param fresh] false (the overlay's refresh) the last reading is reused for SAVE_INFO_SECONDS
 ## unless the file appeared, went or was modified since.
 func save_info(fresh: bool = true) -> Dictionary:
-	var path: String = str(game.get(&"save_path")) if game != null else M0State.SAVE_PATH
+	var path: String = game.save_path if game != null else M0State.SAVE_PATH
 	var exists: bool = FileAccess.file_exists(path)
 	var stamp: String = "%s:%d" % [path, FileAccess.get_modified_time(path)] if exists else path
 	var now: int = Time.get_ticks_msec()
@@ -751,14 +795,10 @@ static func checkpoint_label(saved: M0State) -> String:
 	return "corridor safe point"
 
 
-## A short note near the top of the screen for NOTE_SECONDS.
+## A short note for NOTE_SECONDS, placed by note_rect().
 func show_note(text: String) -> void:
-	var rect: Rect2 = TITLE_NOTE_RECT if game != null and bool(game.get(&"title_open")) else NOTE_RECT
-	note.position = rect.position
-	note.size = rect.size
-	# Play's taller note wraps (a capture's path breaks inside the word); the title's stays one line.
-	note_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART if rect == NOTE_RECT else TextServer.AUTOWRAP_OFF
 	note_label.text = text
+	_place_note()
 	note.show()
 	sync_layer()
 	if _note_tween != null and _note_tween.is_valid():
@@ -767,6 +807,37 @@ func show_note(text: String) -> void:
 	_note_tween = create_tween().set_pause_mode(Tween.TWEEN_PAUSE_PROCESS)
 	_note_tween.tween_interval(NOTE_SECONDS)
 	_note_tween.tween_callback(_note_done)
+
+
+## The title's slot, play's top band, or (while the zones page's legend has the band) the first zones
+## slot clear of the actors and the junction's tank.
+func note_rect() -> Rect2:
+	if game != null and game.title_open:
+		return TITLE_NOTE_RECT
+	if not (zones.visible and zones.legend.visible):
+		return NOTE_RECT
+	var avoid: Array[Rect2] = note_avoids()
+	for slot: Rect2 in NOTE_ZONES_SLOTS:
+		if not avoid.any(func(rect: Rect2) -> bool: return rect.intersects(slot)):
+			return slot
+	return NOTE_ZONES_SLOTS[0]
+
+
+## What the note keeps off, in the 960x540 canvas: the actors and, in the Service Junction, the tank.
+func note_avoids() -> Array[Rect2]:
+	var rects: Array[Rect2] = zones.actor_rects()
+	var room: JunctionRoom = game.junction_room
+	if game.state.chapter_id == "junction" and room != null and room.tank != null:
+		rects.append(get_viewport().get_canvas_transform() * Rect2(room.tank.global_position - JunctionRoom.TANK_SIZE * 0.5, JunctionRoom.TANK_SIZE))
+	return rects
+
+
+func _place_note() -> void:
+	var rect: Rect2 = note_rect()
+	note.position = rect.position
+	note.size = rect.size
+	# Play's taller note wraps (a capture's path breaks inside the word); the title's stays one line.
+	note_label.autowrap_mode = TextServer.AUTOWRAP_OFF if rect == TITLE_NOTE_RECT else TextServer.AUTOWRAP_WORD_SMART
 
 
 func hide_note() -> void:

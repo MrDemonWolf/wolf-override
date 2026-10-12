@@ -16,6 +16,7 @@ func _run() -> void:
 	_clean()
 	await _check_release_gating()
 	await _check_keyboard_code_and_storage()
+	await _check_keyboard_code_with_modifiers()
 	await _check_controller_code()
 	await _check_logo_code()
 	await _check_overlay()
@@ -133,6 +134,32 @@ func _check_keyboard_code_and_storage() -> void:
 	await _free(game)
 
 
+## WOLFDEN typed in capitals as the docs print it, pressing Shift for each letter, unlocks too; so does
+## Caps Lock before it. Modifier keys neither type a letter nor break the code; any other key does.
+func _check_keyboard_code_with_modifiers() -> void:
+	var game: Node2D = await _spawn(false)
+	var tools: DebugTools = _tools(game)
+	await _type_shifted("WOL")
+	await _send_key(KEY_1)
+	await _type_shifted("FDEN")
+	_expect(not tools.available, "a key other than a modifier between the letters still breaks the code")
+	await _type_shifted("WOLFDEN")
+	_expect(tools.available and tools.unlocked, "WOLFDEN typed with Shift pressed for each capital unlocks the tools")
+	tools.lock()
+	tools.hide_note()
+	_expect(not tools.available, "locked again before the next try")
+	await _send_key(KEY_CAPSLOCK)
+	for letter: String in "WOLFDEN":
+		await _send_letter(letter, false)
+		await _send_key(KEY_CTRL)
+		await _send_key(KEY_ALT)
+		await _send_key(KEY_META)
+	_expect(tools.available and tools.unlocked, "Caps Lock, Ctrl, Alt and Meta between the letters do not break the code")
+	tools.lock()
+	tools.hide_note()
+	await _free(game)
+
+
 ## Up Up Down Down Left Right Left Right, B, A on a controller unlocks them; the last A presses nothing.
 func _check_controller_code() -> void:
 	var game: Node2D = await _spawn(false)
@@ -214,6 +241,41 @@ func _check_overlay() -> void:
 	var overlay_rect: Rect2 = tools.overlay.get_global_rect()
 	_expect(overlay_rect.position.x >= 0.0 and overlay_rect.end.x <= 480.0 and overlay_rect.position.y >= 78.0 and overlay_rect.end.y <= 340.0, "the state page fits in the upper left, below the top card and above the touch arrows (%s)" % overlay_rect)
 	_expect(not overlay_rect.intersects((game.get_node("CanvasLayer/PauseButton") as Control).get_global_rect()) and not overlay_rect.intersects((game.get_node("CanvasLayer/TouchControls/Use") as Control).get_global_rect()), "the overlay never covers PAUSE or USE")
+	# The corridor's tutorial prompt sits in the state pages' top rows: they narrow to end left of it in
+	# both layouts, every row still shown, ending above the actors at the touch framing, and widen again
+	# once the prompt has gone.
+	var prompt_rect: Rect2 = tutorial.get_global_rect()
+	for touch: bool in [false, true]:
+		game.set("touch_enabled", touch)
+		game.call("_refresh_ui")
+		if touch:
+			game.call("_start_gameplay_camera")
+			await _settle(2)
+		var layout: String = "touch" if touch else "keyboard"
+		for mode: int in [DebugTools.Overlay.STATE, DebugTools.Overlay.ZONES]:
+			tools.set_overlay_mode(mode)
+			await process_frame
+			var page: Rect2 = tools.overlay.get_global_rect()
+			_expect(tutorial.visible and not page.intersects(prompt_rect), "the %s page leaves the tutorial prompt's instructions clear in the %s layout (%s)" % [DebugTools.OVERLAY_NAMES[mode], layout, page])
+			var narrow: String = tools.overlay.body.get_parsed_text()
+			for row: String in ["PERF", "ROOM  lockdown", "ENGINEER", "WOLF", "SENTRY", "CHOICES", "MEMORY", "CHEATS", "SAVE  v"]:
+				_expect(narrow.contains(row), "the narrowed %s page still shows '%s'" % [DebugTools.OVERLAY_NAMES[mode], row])
+			if touch:
+				for actor_path: String in ["Human", "Wolf"]:
+					var actor_sprite: Sprite2D = (game.get_node(actor_path) as M0Actor).body_sprite
+					var top: float = (actor_sprite.get_global_transform_with_canvas() * actor_sprite.get_rect().position).y
+					_expect(page.end.y < top, "the narrowed %s page (bottom %.0f) ends above %s's sprite (top %.0f) at the touch framing" % [DebugTools.OVERLAY_NAMES[mode], page.end.y, actor_path, top])
+	var step_before: int = int(game.get("tutorial_step"))
+	game.set("tutorial_step", 2)
+	game.call("_refresh_ui")
+	await process_frame
+	await process_frame
+	_expect(not tutorial.visible and is_equal_approx(tools.overlay.body.custom_minimum_size.x, DebugOverlay.STATE_WIDTH), "once the tutorial prompt has gone the state page is full width again (%.0f)" % tools.overlay.body.custom_minimum_size.x)
+	game.set("tutorial_step", step_before)
+	game.set("touch_enabled", false)
+	game.call("_refresh_ui")
+	tools.set_overlay_mode(DebugTools.Overlay.STATE)
+	await process_frame
 	# A pause with no card over the game (the debug menu's, a frame step's) keeps the overlay up.
 	paused = true
 	await process_frame
@@ -1016,6 +1078,14 @@ func _check_capture_with_boxes() -> void:
 	var geometry: Dictionary = data.get("geometry", {})
 	_expect((data.get("capture") as Dictionary).get("with_boxes") == true and geometry.get("drawn") == true and not (geometry.get("hitboxes", []) as Array).is_empty() and not (geometry.get("render_boxes", []) as Array).is_empty() and not (geometry.get("zones", []) as Array).is_empty(), "its dump has the zones, hitboxes and render boxes, drawn")
 	_expect(tools.overlay_mode == DebugTools.Overlay.OFF and not tools.zones.visible and not tools.zones.layers[DebugZones.RENDER] and tools.zones.layers[DebugZones.ZONES], "afterwards the page and the categories are as they were")
+	# A driver capturing every second or two: the previous capture's note is off screen for the next
+	# screenshot, and the new capture's path shows afterwards.
+	_expect(tools.note.visible and tools.note_label.text.contains(str(paths["json"]).get_file().get_basename()), "the capture's note shows its path")
+	var note_during: Array[bool] = []
+	process_frame.connect(func() -> void: note_during.append(tools.note.visible), CONNECT_ONE_SHOT)
+	var next: Dictionary = await tools.capture_with_boxes()
+	_expect(note_during == [false], "the previous capture's note is hidden while the next capture's frame is drawn (%s)" % [note_during])
+	_expect(tools.note.visible and tools.note_label.text.contains(str(next["json"]).get_file().get_basename()) and tools.note.get_global_rect().is_equal_approx(DebugTools.NOTE_RECT), "then the new capture's path shows in the top band, the zones page being off again")
 	await _send_key(KEY_F12)
 	var plain: Dictionary = JSON.parse_string(FileAccess.get_file_as_string(str(tools.last_capture["json"])))
 	_expect(tools.last_capture.get("with_boxes") == false and (plain.get("geometry", {}) as Dictionary).get("drawn") == false and not ((plain.get("geometry", {}) as Dictionary).get("render_boxes", []) as Array).is_empty(), "F12 with the overlay off reports the boxes as numbers without drawing them")
@@ -1195,6 +1265,44 @@ func _check_note_placement() -> void:
 		for answers: Array in [[Vector2(42.0, 88.0), Vector2(428.0, 76.0)], [Vector2(396.0, 88.0), Vector2(522.0, 40.0)]]:
 			_expect(not rect.intersects(Rect2(answers[0], answers[1])), "the %s note leaves the answer row clear" % layout)
 		_expect(tools.note_label.get_line_count() <= 2 and tools.note_label.get_visible_line_count() == tools.note_label.get_line_count(), "a capture's path fits the note's two lines (%d)" % tools.note_label.get_line_count())
+	# Without the zones page the note keeps to the top band, clear of the HUD and the tools' own cards.
+	tools.set_overlay_mode(DebugTools.Overlay.STATE)
+	for touch: bool in [false, true]:
+		game.set("touch_enabled", touch)
+		game.call("_refresh_ui")
+		tools.call("_refresh_view")
+		tools.show_note("Saved user://debug-captures/2026-10-11_12-34-56.png")
+		await process_frame
+		var band: Rect2 = tools.note.get_global_rect()
+		var layout: String = "touch" if touch else "keyboard"
+		_expect(band.is_equal_approx(DebugTools.NOTE_RECT) and band.end.y <= 78.0, "with no zones legend the %s note sits in the top band (%s)" % [layout, band])
+		for path: String in ["CanvasLayer/TopBar", "CanvasLayer/PauseButton", "CanvasLayer/TutorialPrompt", "CanvasLayer/ContextHint", "CanvasLayer/BottomBar", "CanvasLayer/TouchControls/Left", "CanvasLayer/TouchControls/Right", "CanvasLayer/TouchControls/Use"]:
+			_expect(not band.intersects((game.get_node(path) as Control).get_global_rect()), "the %s band note leaves %s clear" % [layout, path.get_file()])
+		for other: Rect2 in [tools.overlay.get_global_rect(), DebugOverlay.footprint(false), DebugMenu.STEP_BAR_RECT, tools.debug_button.get_global_rect()]:
+			_expect(not band.intersects(other), "the %s band note leaves %s clear (%s)" % [layout, other, band])
+		_expect(tools.note_label.get_line_count() <= 2 and tools.note_label.get_visible_line_count() == tools.note_label.get_line_count(), "a capture's path fits the band note's two lines (%d)" % tools.note_label.get_line_count())
+	# A jump's note never covers the actors or the junction's tank, with or without the zones page.
+	for touch: bool in [false, true]:
+		game.set("touch_enabled", touch)
+		game.call("_refresh_ui")
+		for id: StringName in [&"lane", &"tank_down"]:
+			for mode: int in [DebugTools.Overlay.STATE, DebugTools.Overlay.ZONES]:
+				tools.set_overlay_mode(mode)
+				tools.show_note(tools.actions.jump(id))
+				await _settle(3)
+				var placed: Rect2 = tools.note.get_global_rect()
+				var room: JunctionRoom = game.get("junction_room") as JunctionRoom
+				var tank: Rect2 = game.get_viewport().get_canvas_transform() * Rect2(room.tank.global_position - JunctionRoom.TANK_SIZE * 0.5, JunctionRoom.TANK_SIZE)
+				var what: String = "%s, %s, %s" % [id, DebugTools.OVERLAY_NAMES[mode], "touch" if touch else "keyboard"]
+				_expect(tools.note.visible and not placed.intersects(tank), "the note after the %s jump leaves the tank clear (%s vs %s)" % [what, placed, tank])
+				for actor: Rect2 in tools.zones.actor_rects():
+					_expect(not placed.intersects(actor), "the note after the %s jump leaves the actors clear (%s vs %s)" % [what, placed, actor])
+				tools.hide_note()
+	game.set("touch_enabled", false)
+	game.call("_refresh_ui")
+	tools.actions.jump(&"corridor_start")
+	tools.set_overlay_mode(DebugTools.Overlay.ZONES)
+	await _settle(2)
 	tools.open_menu()
 	_expect(tools.menu.is_open and not tools.note.visible, "opening the menu hides the note")
 	(tools.menu.buttons["jump:corridor_start"] as Button).pressed.emit()
@@ -1506,6 +1614,30 @@ func _check_frame_step() -> void:
 	_expect(not actions.frame_step and not paused, "RUN plays on")
 	actions.set_frame_step(true)
 	_expect(tools.handle_back() and not actions.frame_step and not paused, "Android Back plays on too")
+	# A jump or a checkpoint reload runs the game's own new game or load, which lets the tree run; frame
+	# stepping holds it still again, so nothing moves until the next step.
+	actions.set_frame_step(true)
+	tools.open_menu()
+	(menu.buttons["jump:lane"] as Button).pressed.emit()
+	var brain: SentryBrain = game.get("sentry_brain") as SentryBrain
+	var held: int = int(probe.get("frames"))
+	var sentry_x: float = brain.x
+	await _settle(30)
+	_expect(not menu.is_open and actions.frame_step and paused and menu.step_bar.visible and int(probe.get("frames")) == held and brain.x == sentry_x, "a jump from the menu while frame stepping stays held (%d frames ran, sentry moved %.1f px)" % [int(probe.get("frames")) - held, brain.x - sentry_x])
+	actions.step_frame()
+	await _settle(2)
+	_expect(int(probe.get("frames")) == held + 1 and paused, "after a jump the next step lets one frame through")
+	tools.open_menu()
+	(menu.buttons["save:reload"] as Button).pressed.emit()
+	held = int(probe.get("frames"))
+	await _settle(10)
+	_expect(not menu.is_open and actions.frame_step and paused and menu.step_bar.visible and int(probe.get("frames")) == held, "RELOAD CHECKPOINT while frame stepping stays held too")
+	actions.jump(&"tank_down")
+	held = int(probe.get("frames"))
+	await _settle(10)
+	_expect(actions.frame_step and paused and int(probe.get("frames")) == held, "a script's jump while frame stepping stays held")
+	actions.set_frame_step(false)
+	_expect(not paused, "frame step off plays on after a jump")
 	tools.cheats_used = false
 	tools.hide_note()
 	probe.free()
@@ -1802,6 +1934,38 @@ func _junction_state(door_blown: bool) -> M0State:
 func _type(word: String) -> void:
 	for letter: String in word:
 		await _send_key(OS.find_keycode_from_string(letter))
+
+
+## Each letter as a capital: Shift down, the letter (with its capital's text), the letter up, Shift up.
+func _type_shifted(word: String) -> void:
+	for letter: String in word:
+		var shift: InputEventKey = InputEventKey.new()
+		shift.keycode = KEY_SHIFT
+		shift.physical_keycode = KEY_SHIFT
+		shift.shift_pressed = true
+		shift.pressed = true
+		Input.parse_input_event(shift)
+		await process_frame
+		await _send_letter(letter, true)
+		var release: InputEventKey = shift.duplicate() as InputEventKey
+		release.pressed = false
+		release.shift_pressed = false
+		Input.parse_input_event(release)
+		await process_frame
+
+
+## One letter key pressed and released, carrying its typed text as a real keyboard does.
+func _send_letter(letter: String, shift: bool) -> void:
+	var code: Key = OS.find_keycode_from_string(letter)
+	for pressed: bool in [true, false]:
+		var event: InputEventKey = InputEventKey.new()
+		event.keycode = code
+		event.physical_keycode = code
+		event.unicode = letter.to_upper().unicode_at(0) if pressed else 0
+		event.shift_pressed = shift
+		event.pressed = pressed
+		Input.parse_input_event(event)
+		await process_frame
 
 
 func _send_key(code: Key) -> void:

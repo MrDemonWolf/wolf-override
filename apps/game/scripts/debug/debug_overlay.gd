@@ -18,7 +18,11 @@ const FONT_SIZE: int = 11
 const ORIGIN: Vector2 = Vector2(12.0, 80.0)
 ## The performance page stays narrow enough to clear the corridor's tutorial card (from x 322).
 const PERFORMANCE_WIDTH: float = 260.0
+## The state pages' text width; narrower (width_left_of) while a HUD card in their column's top rows,
+## the corridor's tutorial prompt, is up, so its control instructions stay readable.
 const STATE_WIDTH: float = 360.0
+## Between a narrowed state page and the HUD card it ends left of.
+const CLEAR_GAP: float = 6.0
 ## The text's side and top/bottom margins inside the card.
 const MARGIN_X: int = 10
 const MARGIN_Y: int = 5
@@ -59,10 +63,16 @@ func _init() -> void:
 
 
 ## Where a page can be drawn in the 960x540 canvas: its width, from ORIGIN down to the bottom edge
-## (every page is shorter), so a control in that column would be under it.
-static func footprint(performance_page: bool) -> Rect2:
-	var width: float = (PERFORMANCE_WIDTH if performance_page else STATE_WIDTH) + MARGIN_X * 2.0 + FRAME_SLACK
+## (every page is shorter), so a control in that column would be under it. [param state_width] is the
+## state pages' text width (STATE_WIDTH, or narrowed by width_left_of).
+static func footprint(performance_page: bool, state_width: float = STATE_WIDTH) -> Rect2:
+	var width: float = (PERFORMANCE_WIDTH if performance_page else state_width) + MARGIN_X * 2.0 + FRAME_SLACK
 	return Rect2(ORIGIN, Vector2(width, 540.0 - ORIGIN.y))
+
+
+## The widest a state page's text can be and still end CLEAR_GAP left of canvas x [param left].
+static func width_left_of(left: float) -> float:
+	return left - CLEAR_GAP - ORIGIN.x - MARGIN_X * 2.0 - FRAME_SLACK
 
 
 ## The performance page: frame rate and time, memory, node and draw-call counts.
@@ -70,9 +80,10 @@ func show_performance(performance: Dictionary) -> void:
 	_show(PERFORMANCE_WIDTH, "%s\n%s" % [_header("PERFORMANCE"), performance_text(performance)])
 
 
-## The state page (with [param zones] the header says the world zones are drawn too).
-func show_state(data: Dictionary, zones: bool) -> void:
-	_show(STATE_WIDTH, "%s\n%s" % [_header("STATE + ZONES" if zones else "STATE"), state_text(data)])
+## The state page (with [param zones] the header says the world zones are drawn too), its text
+## [param width] wide.
+func show_state(data: Dictionary, zones: bool, width: float = STATE_WIDTH) -> void:
+	_show(width, "%s\n%s" % [_header("STATE + ZONES" if zones else "STATE"), state_text(data)])
 
 
 ## One line of performance numbers.

@@ -68,13 +68,6 @@ const REFRESH_SECONDS: float = 0.25
 const LEGEND_RECT: Rect2 = Rect2(474.0, 10.0, 262.0, 58.0)
 ## The legend buttons keep the theme's button look with tighter padding, so all three fit.
 const LEGEND_BUTTON_PADDING: Vector2 = Vector2(6.0, 2.0)
-## Main's controls (by property name) that nothing drawn may cover.
-const KEEP_CLEAR_CONTROLS: Array[StringName] = [&"touch_left", &"touch_right", &"touch_use", &"touch_choice_1", &"touch_choice_2", &"pause_button"]
-## Main's labels (by property name) whose text nothing drawn may cover: the hint, the dialogue's
-## speaker and line, the tutorial prompt and the top card.
-const KEEP_CLEAR_TEXT: Array[StringName] = [&"context_hint_text", &"speaker", &"story", &"tutorial_text", &"hud"]
-## Main's actors (by property name; the sentry is the junction room's). Names stay off them.
-const ACTORS: Array[StringName] = [&"human", &"wolf"]
 ## Sprites under an actor that are not its body (its floor shadow and reflection, its glows).
 const NOT_BODY: Array[String] = ["Shadow", "Reflection", "Glow"]
 ## Controls that only lay out their children draw nothing of their own, so they get no render box.
@@ -160,7 +153,7 @@ class LabelSpace:
 
 ## Which categories are drawn; all of them are always reported.
 var layers: Dictionary = {ZONES: true, HITBOXES: true, RENDER: true}
-var game: Node2D
+var game: Main
 ## Nodes left out of the render boxes (the debug tools' own).
 var skip_root: Node
 ## The debug tools' own cards over this drawing (the state card, the DEBUG button, the note); names
@@ -169,7 +162,6 @@ var own_controls: Array[Control] = []
 var legend: PanelContainer
 var legend_caption: Label
 var legend_buttons: Dictionary = {}
-var _constants: Dictionary = {}
 var _candidates: Array[CanvasItem] = []
 var _refresh_left: float = 0.0
 ## The screen y under the last rule lane, where the limit lines end.
@@ -196,11 +188,9 @@ func _init() -> void:
 	set_process(false)
 
 
-func setup(main: Node2D, skip: Node) -> void:
+func setup(main: Main, skip: Node) -> void:
 	game = main
 	skip_root = skip
-	if main.get_script() != null:
-		_constants = (main.get_script() as Script).get_script_constant_map()
 	_build_legend()
 
 
@@ -377,7 +367,7 @@ func geometry() -> Dictionary:
 
 ## The play camera: where it is, its zoom, the world it shows and the limits it is held to.
 func camera_info() -> Dictionary:
-	var camera: Camera2D = game.get(&"intro_camera") as Camera2D if game != null else null
+	var camera: Camera2D = game.intro_camera if game != null else null
 	var view: Rect2 = _world_view()
 	var info: Dictionary = {"view_world_rect": rect_array(view)}
 	if camera != null:
@@ -399,25 +389,16 @@ func _world_view() -> Rect2:
 ## Where Main holds the play camera's centre (Main._update_gameplay_camera): half its view in from
 ## each end of the 960 px room.
 func _camera_centre_limits() -> Vector2:
-	var half_view: float = float(_const(&"GAMEPLAY_VIEW_WIDTH", 960.0)) * 0.5
+	var half_view: float = Main.GAMEPLAY_VIEW_WIDTH * 0.5
 	return Vector2(half_view, 960.0 - half_view)
 
 
 func _title_open() -> bool:
-	return game == null or bool(game.get(&"title_open"))
-
-
-## A constant of Main's script, or [param fallback] when it has none.
-func _const(key: StringName, fallback: Variant = null) -> Variant:
-	if _constants.has(key):
-		return _constants[key]
-	if _constants.has(String(key)):
-		return _constants[String(key)]
-	return fallback
+	return game == null or game.title_open
 
 
 func _state() -> M0State:
-	return game.get(&"state") as M0State
+	return game.state
 
 
 # --- Zones ------------------------------------------------------------------------------------
@@ -430,35 +411,35 @@ func zone_items() -> Array[Item]:
 	var state: M0State = _state()
 	if state == null:
 		return list
-	var human: M0Actor = game.get(&"human") as M0Actor
-	var wolf: M0Actor = game.get(&"wolf") as M0Actor
+	var human: M0Actor = game.human
+	var wolf: M0Actor = game.wolf
 	match state.chapter_id:
 		"lockdown":
-			var stations: Array = _const(&"CORRIDOR_STATIONS", [])
-			var relay_x: float = _const(&"RELAY_X", 0.0)
-			var relay_reach: float = _const(&"RELAY_REACH", 0.0)
-			var wheel: Vector2 = _const(&"BYPASS_WHEEL", Vector2.ZERO)
-			var bypass_reach: float = _const(&"BYPASS_REACH", 0.0)
-			list.append(_range(ZONES, "use: purge display", M0Actor.MIN_X, _const(&"PURGE_DISPLAY_MAX_X", 0.0), Row.USE, "M0Actor.MIN_X..PURGE_DISPLAY_MAX_X"))
+			var stations: Array[Vector4] = Main.CORRIDOR_STATIONS
+			var relay_x: float = Main.RELAY_X
+			var relay_reach: float = Main.RELAY_REACH
+			var wheel: Vector2 = Main.BYPASS_WHEEL
+			var bypass_reach: float = Main.BYPASS_REACH
+			list.append(_range(ZONES, "use: purge display", M0Actor.MIN_X, Main.PURGE_DISPLAY_MAX_X, Row.USE, "M0Actor.MIN_X..PURGE_DISPLAY_MAX_X"))
 			if stations.size() >= 3:
 				list.append(_station(stations[0], "use: breaker", "CORRIDOR_STATIONS[0] (_at_breaker)"))
 			list.append(_range(ZONES, "use: relay", relay_x - relay_reach, wheel.x - bypass_reach, Row.USE, "RELAY_X - RELAY_REACH .. BYPASS_WHEEL.x - BYPASS_REACH (_at_relay)"))
 			list.append(_range(ZONES, "use: bypass", wheel.x - bypass_reach, wheel.x + bypass_reach, Row.USE, "BYPASS_WHEEL.x ± BYPASS_REACH (_at_bypass)"))
 			if stations.size() >= 3:
 				list.append(_station(stations[2], "use: safe point", "CORRIDOR_STATIONS[2]"))
-			list.append(_spot(ZONES, "stand: relay", _const(&"RELAY_SIDE_X", 0.0), Row.USE, "RELAY_SIDE_X"))
-			list.append(_spot(ZONES, "crank: bypass", _const(&"BYPASS_CRANK_X", 0.0), Row.USE, "BYPASS_CRANK_X"))
-			list.append(_spot(ZONES, "step back", _const(&"RELAY_STEP_BACK_X", 0.0), Row.USE, "RELAY_STEP_BACK_X"))
-			list.append(_spot(ZONES, "WOLF: relay contact", _const(&"RELAY_CONTACT_X", 0.0), Row.WOLF, "RELAY_CONTACT_X"))
-			list.append(_spot(ZONES, "WOLF: off relay", _const(&"WOLF_BYPASS_CLEAR_X", 0.0), Row.WOLF, "WOLF_BYPASS_CLEAR_X"))
+			list.append(_spot(ZONES, "stand: relay", Main.RELAY_SIDE_X, Row.USE, "RELAY_SIDE_X"))
+			list.append(_spot(ZONES, "crank: bypass", Main.BYPASS_CRANK_X, Row.USE, "BYPASS_CRANK_X"))
+			list.append(_spot(ZONES, "step back", Main.RELAY_STEP_BACK_X, Row.USE, "RELAY_STEP_BACK_X"))
+			list.append(_spot(ZONES, "WOLF: relay contact", Main.RELAY_CONTACT_X, Row.WOLF, "RELAY_CONTACT_X"))
+			list.append(_spot(ZONES, "WOLF: off relay", Main.WOLF_BYPASS_CLEAR_X, Row.WOLF, "WOLF_BYPASS_CLEAR_X"))
 			if not state.door_open:
-				list.append(_limit(ZONES, "seal face", _const(&"CORRIDOR_DOOR_LEFT_X", 0.0), "CORRIDOR_DOOR_LEFT_X"))
+				list.append(_limit(ZONES, "seal face", Main.CORRIDOR_DOOR_LEFT_X, "CORRIDOR_DOOR_LEFT_X"))
 		"records":
-			var stations: Array = _const(&"RECORDS_STATIONS", [])
+			var stations: Array[Vector4] = Main.RECORDS_STATIONS
 			var names: Array[String] = ["use: purge queue", "use: mirror port", "use: exit"]
 			for index: int in mini(stations.size(), names.size()):
 				list.append(_station(stations[index], names[index], "RECORDS_STATIONS[%d]" % index))
-			list.append(_spot(ZONES, "WOLF: mirror", _const(&"WOLF_MIRROR_X", 0.0), Row.WOLF, "WOLF_MIRROR_X"))
+			list.append(_spot(ZONES, "WOLF: mirror", Main.WOLF_MIRROR_X, Row.WOLF, "WOLF_MIRROR_X"))
 		"junction":
 			list.append_array(_junction_zones(state))
 	# Walk limits, WOLF's follow limit, his follow gap and the machines he rests clear of.
@@ -479,17 +460,17 @@ func zone_items() -> Array[Item]:
 			var gap: Item = _range(ZONES, "follow gap", human.position.x - M0Actor.FOLLOW_GAP, human.position.x + M0Actor.FOLLOW_GAP, Row.WOLF, "engineer x ± M0Actor.FOLLOW_GAP")
 			gap.extra["side"] = wolf.follow_side
 			list.append(gap)
-		var target: float = float(game.call(&"_debug_wolf_target")) if game.has_method(&"_debug_wolf_target") else wolf.autonomous_target_x
+		var target: float = game.debug_wolf_target()
 		if target >= 0.0:
-			var why: String = str(game.call(&"_debug_wolf_why")) if game.has_method(&"_debug_wolf_why") else ""
-			var heading: Item = _spot(ZONES, "WOLF → %s" % why, target, Row.WOLF, "Main._debug_wolf_target")
+			var why: String = game.debug_wolf_why()
+			var heading: Item = _spot(ZONES, "WOLF → %s" % why, target, Row.WOLF, "Main.debug_wolf_target")
 			heading.extra["why"] = why
 			heading.extra["target"] = true
 			list.append(heading)
 	# The camera's centre is held between these; the marker is where it is now.
 	var limits: Vector2 = _camera_centre_limits()
 	list.append(_range(ZONES, "camera centre limits", limits.x, limits.y, Row.CAMERA, "GAMEPLAY_VIEW_WIDTH / 2 .. 960 - GAMEPLAY_VIEW_WIDTH / 2", false))
-	var camera: Camera2D = game.get(&"intro_camera") as Camera2D
+	var camera: Camera2D = game.intro_camera
 	if camera != null:
 		var centre: Item = _spot(ZONES, "camera x%.2f" % camera.zoom.x, camera.get_screen_center_position().x, Row.CAMERA, "IntroCamera screen centre")
 		# Not a floor position: a tick in its lane, no line up to the floor.
@@ -503,17 +484,17 @@ func zone_items() -> Array[Item]:
 ## door's face.
 func _junction_zones(state: M0State) -> Array[Item]:
 	var list: Array[Item] = []
-	var stations: Array = _const(&"JUNCTION_STATIONS", [])
+	var stations: Array[Vector4] = Main.JUNCTION_STATIONS
 	if stations.size() >= 2:
 		list.append(_station(stations[0], "use: overload breaker", "JUNCTION_STATIONS[0]"))
 		list.append(_station(stations[1], "use: valve", "JUNCTION_STATIONS[1]"))
 	# USE answers at the TANK RELEASE only once the door is down (Main._interact_junction).
 	list.append(_range(ZONES, "use: tank release", SentryBrain.COVER_MIN_X, SentryBrain.COVER_MAX_X, Row.USE, "SentryBrain.COVER_MIN_X..COVER_MAX_X (_at_arm_panel, door blown)", state.door_blown))
 	list.append(_range(ZONES, "use: exit bolt", JunctionRoom.BOLT_REACH_MIN_X, M0Actor.MAX_X, Row.USE, "JunctionRoom.BOLT_REACH_MIN_X.. (_use_exit)"))
-	list.append(_spot(ZONES, "crank: valve", _const(&"VALVE_CRANK_X", 0.0), Row.USE, "VALVE_CRANK_X"))
+	list.append(_spot(ZONES, "crank: valve", Main.VALVE_CRANK_X, Row.USE, "VALVE_CRANK_X"))
 	list.append(_range(ZONES, "alcove (out of sight)", SentryBrain.COVER_MIN_X, SentryBrain.COVER_MAX_X, Row.LANE, "SentryBrain.COVER_MIN_X..COVER_MAX_X"))
 	list.append(_range(ZONES, "patrol", SentryBrain.PATROL_MIN_X, SentryBrain.PATROL_MAX_X, Row.LANE, "SentryBrain.PATROL_MIN_X..PATROL_MAX_X", false))
-	var brain: SentryBrain = game.get(&"sentry_brain") as SentryBrain
+	var brain: SentryBrain = game.sentry_brain
 	if brain != null and brain.state != &"down":
 		var awake: bool = brain.state != &"dormant"
 		var tip: float = brain.x + brain.facing * SentryBrain.SIGHT_RANGE
@@ -550,9 +531,9 @@ func hitbox_items() -> Array[Item]:
 	var state: M0State = _state()
 	if state == null or state.chapter_id != "junction":
 		return list
-	var line: PressureLine = game.get(&"pressure_line") as PressureLine
-	var arm: DropArm = game.get(&"drop_arm") as DropArm
-	var brain: SentryBrain = game.get(&"sentry_brain") as SentryBrain
+	var line: PressureLine = game.pressure_line
+	var arm: DropArm = game.drop_arm
+	var brain: SentryBrain = game.sentry_brain
 	var building: bool = line != null and line.state == &"building" and not state.door_blown
 	list.append(_range(HITBOXES, "vent (engineer x)", PressureLine.VENT_MIN_X, PressureLine.VENT_MAX_X, Row.HURT, "PressureLine.VENT_MIN_X..VENT_MAX_X (is_on_vent)", building))
 	var fuse_lit: bool = line != null and not state.door_blown and line.state in [&"charged", &"fuse"]
@@ -564,7 +545,7 @@ func hitbox_items() -> Array[Item]:
 		list.append(_range(HITBOXES, "sentry contact", brain.x - SentryBrain.CONTACT_RANGE, brain.x + SentryBrain.CONTACT_RANGE, Row.HURT, "sentry x ± SentryBrain.CONTACT_RANGE (touches)", brain.state == &"chase"))
 	if not state.sentry_down:
 		list.append(_range(HITBOXES, "tank hit range", DropArm.MARK_X - DropArm.HIT_REACH, DropArm.MARK_X + DropArm.HIT_REACH, Row.HURT, "DropArm.MARK_X ± HIT_REACH (is_hit, the floor brackets)", arm != null and arm.state == &"falling"))
-	var room: JunctionRoom = game.get(&"junction_room") as JunctionRoom
+	var room: JunctionRoom = game.junction_room
 	if room != null and room.tank != null:
 		var centre: Vector2 = room.tank.global_position
 		var footprint: Item = _rect(HITBOXES, "tank footprint", Rect2(centre - JunctionRoom.TANK_SIZE * 0.5, JunctionRoom.TANK_SIZE), "Tank position, JunctionRoom.TANK_SIZE", arm != null and arm.state == &"falling")
@@ -606,6 +587,20 @@ func shape_item(shape_node: CollisionShape2D) -> Item:
 
 # --- Protected areas ----------------------------------------------------------------------------
 
+## Main's controls that nothing drawn may cover, by name: the touch arrows, USE, the answers and PAUSE.
+func keep_clear_controls() -> Dictionary:
+	return {
+		"touch_left": game.touch_left, "touch_right": game.touch_right, "touch_use": game.touch_use,
+		"touch_choice_1": game.touch_choice_1, "touch_choice_2": game.touch_choice_2, "pause_button": game.pause_button,
+	}
+
+
+## Main's labels whose text nothing drawn may cover, by name: the hint, the dialogue's speaker and
+## line, the tutorial prompt and the top card.
+func keep_clear_text() -> Dictionary:
+	return {"context_hint_text": game.context_hint_text, "speaker": game.speaker, "story": game.story, "tutorial_text": game.tutorial_text, "hud": game.hud}
+
+
 ## Works out this pass's protected rectangles: Main's controls and HUD text on screen (_clear, which
 ## drawing is cut around), plus the debug tools' own cards and the actors (_blockers, which names
 ## stay off).
@@ -614,16 +609,18 @@ func _begin_pass() -> void:
 	_clear_names.clear()
 	_clear_nodes.clear()
 	if game != null:
-		for property: StringName in KEEP_CLEAR_CONTROLS:
-			var control: Control = game.get(property) as Control
+		var controls: Dictionary = keep_clear_controls()
+		for property: String in controls:
+			var control: Control = controls[property] as Control
 			if control != null and control.is_visible_in_tree() and effective_alpha(control) >= MIN_ALPHA:
-				_add_clear(control, control.get_global_transform_with_canvas() * Rect2(Vector2.ZERO, control.size), String(property))
-		for property: StringName in KEEP_CLEAR_TEXT:
-			var label: Label = game.get(property) as Label
+				_add_clear(control, control.get_global_transform_with_canvas() * Rect2(Vector2.ZERO, control.size), property)
+		var labels: Dictionary = keep_clear_text()
+		for property: String in labels:
+			var label: Label = labels[property] as Label
 			if label != null and label.is_visible_in_tree() and effective_alpha(label) >= MIN_ALPHA:
 				var text: Rect2 = text_rect(label)
 				if text.has_area():
-					_add_clear(label, text, String(property) + " text")
+					_add_clear(label, text, property + " text")
 	_actor_rects = actor_rects()
 	_blockers = _clear.duplicate()
 	_blockers.append_array(_actor_rects)
@@ -671,10 +668,8 @@ func actor_rects() -> Array[Rect2]:
 	var rects: Array[Rect2] = []
 	if game == null:
 		return rects
-	var actors: Array[Node] = []
-	for property: StringName in ACTORS:
-		actors.append(game.get(property) as Node)
-	var room: JunctionRoom = game.get(&"junction_room") as JunctionRoom
+	var actors: Array[Node] = [game.human, game.wolf]
+	var room: JunctionRoom = game.junction_room
 	if room != null and room.sentry != null:
 		actors.append(room.sentry)
 	for actor: Node in actors:
@@ -828,8 +823,7 @@ static func _text_of(item: CanvasItem) -> String:
 ## Main's opaque full-screen cards that are up: the title screen, the END OF SLICE card.
 func _covers() -> Array[CanvasItem]:
 	var found: Array[CanvasItem] = []
-	for property: StringName in [&"title_screen", &"end_card"]:
-		var card: CanvasItem = game.get(property) as CanvasItem
+	for card: CanvasItem in [game.title_screen, game.end_card]:
 		if card != null and card.is_visible_in_tree() and effective_alpha(card) >= 0.9:
 			found.append(card)
 	return found
