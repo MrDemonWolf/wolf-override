@@ -1,5 +1,7 @@
 version: 2
 updates:
+  # Each group takes only minor and patch updates, so a major version (a likely breaking
+  # change, like TypeScript 5 to 7) arrives as its own pull request instead of hiding in a group.
   - package-ecosystem: github-actions
     directory: /
     schedule:
@@ -7,6 +9,7 @@ updates:
     groups:
       actions:
         patterns: ['*']
+        update-types: [minor, patch]
   - package-ecosystem: bun
     directory: /
     schedule:
@@ -14,3 +17,4 @@ updates:
     groups:
       bun:
         patterns: ['*']
+        update-types: [minor, patch]
