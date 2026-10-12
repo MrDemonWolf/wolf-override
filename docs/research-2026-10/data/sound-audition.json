@@ -1,0 +1,1124 @@
+{
+ "render": {
+  "clips": [
+   {
+    "group": "current",
+    "name": "boom",
+    "wav": "/private/tmp/claude-501/-Users-nathanialhenniges-Developer-mrdemonwolf-wolf-override/eb713cd4-8931-48d7-8c83-5b0b0d1e9cf3/scratchpad/sound-audition/wav/current/boom.wav",
+    "png": "/private/tmp/claude-501/-Users-nathanialhenniges-Developer-mrdemonwolf-wolf-override/eb713cd4-8931-48d7-8c83-5b0b0d1e9cf3/scratchpad/sound-audition/wav/current/boom.png",
+    "seconds": 0.5,
+    "peak_db": -6.02,
+    "recipe": "Sine sub sweeping 55->30 Hz (tau 0.18 s) under a 0.25 s noise burst low-passed 1400->110 Hz, tanh soft-clip.",
+    "used_for": "Tank shell hit (0 dB), door blast (0 dB), containment gate shutter boom (-2 dB)."
+   },
+   {
+    "group": "current",
+    "name": "small_boom",
+    "wav": "/private/tmp/claude-501/-Users-nathanialhenniges-Developer-mrdemonwolf-wolf-override/eb713cd4-8931-48d7-8c83-5b0b0d1e9cf3/scratchpad/sound-audition/wav/current/small_boom.wav",
+    "png": "/private/tmp/claude-501/-Users-nathanialhenniges-Developer-mrdemonwolf-wolf-override/eb713cd4-8931-48d7-8c83-5b0b0d1e9cf3/scratchpad/sound-audition/wav/current/small_boom.png",
+    "seconds": 0.3,
+    "peak_db": -6.02,
+    "recipe": "The _boom recipe, smaller: sub 90->48 Hz tau 0.09 s, 0.16 s noise low-passed 900->160 Hz.",
+    "used_for": "Relief vent letting go when the junction gauge peaks and the breaker trips (-2 dB)."
+   },
+   {
+    "group": "current",
+    "name": "clank",
+    "wav": "/private/tmp/claude-501/-Users-nathanialhenniges-Developer-mrdemonwolf-wolf-override/eb713cd4-8931-48d7-8c83-5b0b0d1e9cf3/scratchpad/sound-audition/wav/current/clank.wav",
+    "png": "/private/tmp/claude-501/-Users-nathanialhenniges-Developer-mrdemonwolf-wolf-override/eb713cd4-8931-48d7-8c83-5b0b0d1e9cf3/scratchpad/sound-audition/wav/current/clank.png",
+    "seconds": 0.04,
+    "peak_db": -6.02,
+    "recipe": "40 ms 420 Hz square ring (tau 12 ms) plus a 5 ms noise tick.",
+    "used_for": "Breaker, junction autosave, clamp release, bolt arc, tank hit/miss/rehung, valve turn and relay spark contact, at pitches 0.55-2.2."
+   },
+   {
+    "group": "current",
+    "name": "thud",
+    "wav": "/private/tmp/claude-501/-Users-nathanialhenniges-Developer-mrdemonwolf-wolf-override/eb713cd4-8931-48d7-8c83-5b0b0d1e9cf3/scratchpad/sound-audition/wav/current/thud.wav",
+    "png": "/private/tmp/claude-501/-Users-nathanialhenniges-Developer-mrdemonwolf-wolf-override/eb713cd4-8931-48d7-8c83-5b0b0d1e9cf3/scratchpad/sound-audition/wav/current/thud.png",
+    "seconds": 0.08,
+    "peak_db": -6.02,
+    "recipe": "80 ms 60 Hz sine (tau 30 ms) plus a 300 Hz low-passed noise knock (tau 10 ms).",
+    "used_for": "Tank miss landing (-3 dB, 0.8), fail-beat knockdown (0 dB, 0.9), seal door landing (-2 dB, 1.1)."
+   },
+   {
+    "group": "current",
+    "name": "hiss",
+    "wav": "/private/tmp/claude-501/-Users-nathanialhenniges-Developer-mrdemonwolf-wolf-override/eb713cd4-8931-48d7-8c83-5b0b0d1e9cf3/scratchpad/sound-audition/wav/current/hiss.wav",
+    "png": "/private/tmp/claude-501/-Users-nathanialhenniges-Developer-mrdemonwolf-wolf-override/eb713cd4-8931-48d7-8c83-5b0b0d1e9cf3/scratchpad/sound-audition/wav/current/hiss.png",
+    "seconds": 0.5,
+    "peak_db": -6.02,
+    "recipe": "0.5 s loop of white noise low-passed at 3 kHz with one 2 Hz amplitude wobble per loop. Seam check: no click, but the 0.5 s noise pattern repeats twice a second.",
+    "used_for": "Junction pressure-line loop, -28 to -8 dB with the gauge; stopped by the door blast."
+   },
+   {
+    "group": "current",
+    "name": "hiss_loop10s",
+    "wav": "/private/tmp/claude-501/-Users-nathanialhenniges-Developer-mrdemonwolf-wolf-override/eb713cd4-8931-48d7-8c83-5b0b0d1e9cf3/scratchpad/sound-audition/wav/current/hiss_loop10s.wav",
+    "png": "/private/tmp/claude-501/-Users-nathanialhenniges-Developer-mrdemonwolf-wolf-override/eb713cd4-8931-48d7-8c83-5b0b0d1e9cf3/scratchpad/sound-audition/wav/current/hiss_loop10s.png",
+    "seconds": 10,
+    "peak_db": -6.02,
+    "recipe": "The in-game hiss loop buffer tiled to 10 s, with seams marked yellow in the PNG. Seam check: no click, but the 0.5 s noise pattern repeats twice a second.",
+    "used_for": "Seam audition for the junction pressure-line hiss loop."
+   },
+   {
+    "group": "current",
+    "name": "hum",
+    "wav": "/private/tmp/claude-501/-Users-nathanialhenniges-Developer-mrdemonwolf-wolf-override/eb713cd4-8931-48d7-8c83-5b0b0d1e9cf3/scratchpad/sound-audition/wav/current/hum.wav",
+    "png": "/private/tmp/claude-501/-Users-nathanialhenniges-Developer-mrdemonwolf-wolf-override/eb713cd4-8931-48d7-8c83-5b0b0d1e9cf3/scratchpad/sound-audition/wav/current/hum.png",
+    "seconds": 1,
+    "peak_db": -6.02,
+    "recipe": "1 s loop: 110 Hz + 113 Hz saws through a 500 Hz one-pole low-pass. Seam check: CLICKS once per loop (seam jump 0.567 against a 0.0055 median sample step) because the low-pass state restarts at 0.",
+    "used_for": "Junction pump loop, -16 to -9 dB, pitch 0.5-0.8 with the gauge."
+   },
+   {
+    "group": "current",
+    "name": "hum_loop10s",
+    "wav": "/private/tmp/claude-501/-Users-nathanialhenniges-Developer-mrdemonwolf-wolf-override/eb713cd4-8931-48d7-8c83-5b0b0d1e9cf3/scratchpad/sound-audition/wav/current/hum_loop10s.wav",
+    "png": "/private/tmp/claude-501/-Users-nathanialhenniges-Developer-mrdemonwolf-wolf-override/eb713cd4-8931-48d7-8c83-5b0b0d1e9cf3/scratchpad/sound-audition/wav/current/hum_loop10s.png",
+    "seconds": 10,
+    "peak_db": -6.02,
+    "recipe": "The in-game hum loop buffer tiled to 10 s. The broadband seam click shows as a vertical line every second in the PNG.",
+    "used_for": "Seam audition for the junction pump hum loop."
+   },
+   {
+    "group": "current",
+    "name": "arc",
+    "wav": "/private/tmp/claude-501/-Users-nathanialhenniges-Developer-mrdemonwolf-wolf-override/eb713cd4-8931-48d7-8c83-5b0b0d1e9cf3/scratchpad/sound-audition/wav/current/arc.wav",
+    "png": "/private/tmp/claude-501/-Users-nathanialhenniges-Developer-mrdemonwolf-wolf-override/eb713cd4-8931-48d7-8c83-5b0b0d1e9cf3/scratchpad/sound-audition/wav/current/arc.png",
+    "seconds": 0.5,
+    "peak_db": -6.02,
+    "recipe": "0.5 s of randomly gated crackle, high-passed at 1.2 kHz and decaying over 0.12 s, plus a 60 ms zap falling from 2.4 kHz to 500 Hz.",
+    "used_for": "Records exit arc (-3 dB), exit bolt arc (0 dB), relay spark crackle (-8 dB, 1.2)."
+   },
+   {
+    "group": "current",
+    "name": "klaxon",
+    "wav": "/private/tmp/claude-501/-Users-nathanialhenniges-Developer-mrdemonwolf-wolf-override/eb713cd4-8931-48d7-8c83-5b0b0d1e9cf3/scratchpad/sound-audition/wav/current/klaxon.wav",
+    "png": "/private/tmp/claude-501/-Users-nathanialhenniges-Developer-mrdemonwolf-wolf-override/eb713cd4-8931-48d7-8c83-5b0b0d1e9cf3/scratchpad/sound-audition/wav/current/klaxon.png",
+    "seconds": 0.5,
+    "peak_db": -6.02,
+    "recipe": "Three 120 ms 880 Hz square chirps 40 ms apart, with 4 ms and 8 ms ramps, low-passed at 2.5 kHz.",
+    "used_for": "Seal-charged warning on a junction valve turn (-4 dB)."
+   },
+   {
+    "group": "current",
+    "name": "growl",
+    "wav": "/private/tmp/claude-501/-Users-nathanialhenniges-Developer-mrdemonwolf-wolf-override/eb713cd4-8931-48d7-8c83-5b0b0d1e9cf3/scratchpad/sound-audition/wav/current/growl.wav",
+    "png": "/private/tmp/claude-501/-Users-nathanialhenniges-Developer-mrdemonwolf-wolf-override/eb713cd4-8931-48d7-8c83-5b0b0d1e9cf3/scratchpad/sound-audition/wav/current/growl.png",
+    "seconds": 0.6,
+    "peak_db": -6.02,
+    "recipe": "A saw falling 70->58 Hz plus breath noise, through a 900 Hz low-pass, with a 9 Hz tremolo, an 80 ms swell and a 0.2 s die-away.",
+    "used_for": "WOLF's growl at the lane choice (-9 dB at pitch 1.5, or -8 dB) and when he reads the seam (-6 dB)."
+   },
+   {
+    "group": "current",
+    "name": "servo",
+    "wav": "/private/tmp/claude-501/-Users-nathanialhenniges-Developer-mrdemonwolf-wolf-override/eb713cd4-8931-48d7-8c83-5b0b0d1e9cf3/scratchpad/sound-audition/wav/current/servo.wav",
+    "png": "/private/tmp/claude-501/-Users-nathanialhenniges-Developer-mrdemonwolf-wolf-override/eb713cd4-8931-48d7-8c83-5b0b0d1e9cf3/scratchpad/sound-audition/wav/current/servo.png",
+    "seconds": 1,
+    "peak_db": -6.02,
+    "recipe": "1 s loop: 1.2 kHz sine with a +/-30 Hz vibrato at 6 Hz plus a sub-octave at 0.3; whole cycles per second. Seam check: clean (the seam step equals a normal sample step).",
+    "used_for": "Sentry motor loop at -22/-19/-16 dB and pitch 1.0/1.15/1.4 by sentry state; faded out after the tank hit."
+   },
+   {
+    "group": "current",
+    "name": "servo_loop10s",
+    "wav": "/private/tmp/claude-501/-Users-nathanialhenniges-Developer-mrdemonwolf-wolf-override/eb713cd4-8931-48d7-8c83-5b0b0d1e9cf3/scratchpad/sound-audition/wav/current/servo_loop10s.wav",
+    "png": "/private/tmp/claude-501/-Users-nathanialhenniges-Developer-mrdemonwolf-wolf-override/eb713cd4-8931-48d7-8c83-5b0b0d1e9cf3/scratchpad/sound-audition/wav/current/servo_loop10s.png",
+    "seconds": 10,
+    "peak_db": -6.02,
+    "recipe": "The in-game servo loop buffer tiled to 10 s. Seamless.",
+    "used_for": "Seam audition for the sentry servo loop."
+   },
+   {
+    "group": "current",
+    "name": "winch",
+    "wav": "/private/tmp/claude-501/-Users-nathanialhenniges-Developer-mrdemonwolf-wolf-override/eb713cd4-8931-48d7-8c83-5b0b0d1e9cf3/scratchpad/sound-audition/wav/current/winch.wav",
+    "png": "/private/tmp/claude-501/-Users-nathanialhenniges-Developer-mrdemonwolf-wolf-override/eb713cd4-8931-48d7-8c83-5b0b0d1e9cf3/scratchpad/sound-audition/wav/current/winch.png",
+    "seconds": 1,
+    "peak_db": -6.02,
+    "recipe": "1 s loop: 90 Hz saw through a 700 Hz one-pole low-pass with a 7 Hz, 25% wobble. Seam check: CLICKS once per loop (seam jump 0.440 against a 0.0032 median sample step) because the low-pass state restarts at 0.",
+    "used_for": "Arm winch loop while the tank is hauled back up (-14 dB)."
+   },
+   {
+    "group": "current",
+    "name": "winch_loop10s",
+    "wav": "/private/tmp/claude-501/-Users-nathanialhenniges-Developer-mrdemonwolf-wolf-override/eb713cd4-8931-48d7-8c83-5b0b0d1e9cf3/scratchpad/sound-audition/wav/current/winch_loop10s.wav",
+    "png": "/private/tmp/claude-501/-Users-nathanialhenniges-Developer-mrdemonwolf-wolf-override/eb713cd4-8931-48d7-8c83-5b0b0d1e9cf3/scratchpad/sound-audition/wav/current/winch_loop10s.png",
+    "seconds": 10,
+    "peak_db": -6.02,
+    "recipe": "The in-game winch loop buffer tiled to 10 s, with a click at every 1 s seam.",
+    "used_for": "Seam audition for the arm winch loop."
+   },
+   {
+    "group": "current",
+    "name": "whine",
+    "wav": "/private/tmp/claude-501/-Users-nathanialhenniges-Developer-mrdemonwolf-wolf-override/eb713cd4-8931-48d7-8c83-5b0b0d1e9cf3/scratchpad/sound-audition/wav/current/whine.wav",
+    "png": "/private/tmp/claude-501/-Users-nathanialhenniges-Developer-mrdemonwolf-wolf-override/eb713cd4-8931-48d7-8c83-5b0b0d1e9cf3/scratchpad/sound-audition/wav/current/whine.png",
+    "seconds": 0.6,
+    "peak_db": -6.02,
+    "recipe": "0.6 s sine sweeping 300 Hz->1.8 kHz (quadratic) with a 15% sub-octave square edge and light noise, swelling from 0.3 to 1.0, with a 10 ms cut.",
+    "used_for": "Exit bolt charging before it arcs (-4 dB)."
+   },
+   {
+    "group": "footsteps",
+    "name": "engineer_plate_1",
+    "wav": "/private/tmp/claude-501/-Users-nathanialhenniges-Developer-mrdemonwolf-wolf-override/eb713cd4-8931-48d7-8c83-5b0b0d1e9cf3/scratchpad/sound-audition/wav/draft/footsteps/engineer_plate_1.wav",
+    "png": "/private/tmp/claude-501/-Users-nathanialhenniges-Developer-mrdemonwolf-wolf-override/eb713cd4-8931-48d7-8c83-5b0b0d1e9cf3/scratchpad/sound-audition/wav/draft/footsteps/engineer_plate_1.png",
+    "seconds": 0.25,
+    "peak_db": -6.02,
+    "recipe": "Boot heel, then a toe 45-70 ms later: a 95 Hz pitch-dropping thump, plate modes at 232/611/1270 Hz and a 0.3-2.5 kHz scuff; each variant detuned up to +/-5%.",
+    "used_for": "Engineer footstep on plate decking (corridor)."
+   },
+   {
+    "group": "footsteps",
+    "name": "engineer_plate_2",
+    "wav": "/private/tmp/claude-501/-Users-nathanialhenniges-Developer-mrdemonwolf-wolf-override/eb713cd4-8931-48d7-8c83-5b0b0d1e9cf3/scratchpad/sound-audition/wav/draft/footsteps/engineer_plate_2.wav",
+    "png": "/private/tmp/claude-501/-Users-nathanialhenniges-Developer-mrdemonwolf-wolf-override/eb713cd4-8931-48d7-8c83-5b0b0d1e9cf3/scratchpad/sound-audition/wav/draft/footsteps/engineer_plate_2.png",
+    "seconds": 0.25,
+    "peak_db": -6.02,
+    "recipe": "Same plate boot recipe, variant 2 (seeded heel/toe gap, detune and noise).",
+    "used_for": "Engineer footstep on plate decking (corridor)."
+   },
+   {
+    "group": "footsteps",
+    "name": "engineer_plate_3",
+    "wav": "/private/tmp/claude-501/-Users-nathanialhenniges-Developer-mrdemonwolf-wolf-override/eb713cd4-8931-48d7-8c83-5b0b0d1e9cf3/scratchpad/sound-audition/wav/draft/footsteps/engineer_plate_3.wav",
+    "png": "/private/tmp/claude-501/-Users-nathanialhenniges-Developer-mrdemonwolf-wolf-override/eb713cd4-8931-48d7-8c83-5b0b0d1e9cf3/scratchpad/sound-audition/wav/draft/footsteps/engineer_plate_3.png",
+    "seconds": 0.25,
+    "peak_db": -6.02,
+    "recipe": "Same plate boot recipe, variant 3.",
+    "used_for": "Engineer footstep on plate decking (corridor)."
+   },
+   {
+    "group": "footsteps",
+    "name": "engineer_plate_4",
+    "wav": "/private/tmp/claude-501/-Users-nathanialhenniges-Developer-mrdemonwolf-wolf-override/eb713cd4-8931-48d7-8c83-5b0b0d1e9cf3/scratchpad/sound-audition/wav/draft/footsteps/engineer_plate_4.wav",
+    "png": "/private/tmp/claude-501/-Users-nathanialhenniges-Developer-mrdemonwolf-wolf-override/eb713cd4-8931-48d7-8c83-5b0b0d1e9cf3/scratchpad/sound-audition/wav/draft/footsteps/engineer_plate_4.png",
+    "seconds": 0.25,
+    "peak_db": -6.02,
+    "recipe": "Same plate boot recipe, variant 4.",
+    "used_for": "Engineer footstep on plate decking (corridor)."
+   },
+   {
+    "group": "footsteps",
+    "name": "engineer_plate_walk6",
+    "wav": "/private/tmp/claude-501/-Users-nathanialhenniges-Developer-mrdemonwolf-wolf-override/eb713cd4-8931-48d7-8c83-5b0b0d1e9cf3/scratchpad/sound-audition/wav/draft/footsteps/engineer_plate_walk6.wav",
+    "png": "/private/tmp/claude-501/-Users-nathanialhenniges-Developer-mrdemonwolf-wolf-override/eb713cd4-8931-48d7-8c83-5b0b0d1e9cf3/scratchpad/sound-audition/wav/draft/footsteps/engineer_plate_walk6.png",
+    "seconds": 1.696,
+    "peak_db": -6.02,
+    "recipe": "6 steps every 242 ms (46 px stride at 190 px/s), never the same variant twice in a row, +/-6% pitch, +/-2 dB. Picks (variant 0-3, pitch, dB): [3,1.025,0.31] [1,0.975,-0.01] [2,0.944,-0.72] [3,0.989,0.71] [1,1.008,1.35] [3,1.046,-1.52].",
+    "used_for": "Walking audition: engineer on plate with the planned jitter."
+   },
+   {
+    "group": "footsteps",
+    "name": "engineer_grating_1",
+    "wav": "/private/tmp/claude-501/-Users-nathanialhenniges-Developer-mrdemonwolf-wolf-override/eb713cd4-8931-48d7-8c83-5b0b0d1e9cf3/scratchpad/sound-audition/wav/draft/footsteps/engineer_grating_1.wav",
+    "png": "/private/tmp/claude-501/-Users-nathanialhenniges-Developer-mrdemonwolf-wolf-override/eb713cd4-8931-48d7-8c83-5b0b0d1e9cf3/scratchpad/sound-audition/wav/draft/footsteps/engineer_grating_1.png",
+    "seconds": 0.32,
+    "peak_db": -6.02,
+    "recipe": "Boot heel and toe: a lighter 120 Hz thump, ringing bar modes at 780/1460/2310/3350 Hz (tau 35-90 ms), a neighbouring bar rattling 12-22 ms later and a 0.8-4 kHz crunch.",
+    "used_for": "Engineer footstep on grating and the hollow vent grate."
+   },
+   {
+    "group": "footsteps",
+    "name": "engineer_grating_2",
+    "wav": "/private/tmp/claude-501/-Users-nathanialhenniges-Developer-mrdemonwolf-wolf-override/eb713cd4-8931-48d7-8c83-5b0b0d1e9cf3/scratchpad/sound-audition/wav/draft/footsteps/engineer_grating_2.wav",
+    "png": "/private/tmp/claude-501/-Users-nathanialhenniges-Developer-mrdemonwolf-wolf-override/eb713cd4-8931-48d7-8c83-5b0b0d1e9cf3/scratchpad/sound-audition/wav/draft/footsteps/engineer_grating_2.png",
+    "seconds": 0.32,
+    "peak_db": -6.02,
+    "recipe": "Same grating boot recipe, variant 2.",
+    "used_for": "Engineer footstep on grating."
+   },
+   {
+    "group": "footsteps",
+    "name": "engineer_grating_3",
+    "wav": "/private/tmp/claude-501/-Users-nathanialhenniges-Developer-mrdemonwolf-wolf-override/eb713cd4-8931-48d7-8c83-5b0b0d1e9cf3/scratchpad/sound-audition/wav/draft/footsteps/engineer_grating_3.wav",
+    "png": "/private/tmp/claude-501/-Users-nathanialhenniges-Developer-mrdemonwolf-wolf-override/eb713cd4-8931-48d7-8c83-5b0b0d1e9cf3/scratchpad/sound-audition/wav/draft/footsteps/engineer_grating_3.png",
+    "seconds": 0.32,
+    "peak_db": -6.02,
+    "recipe": "Same grating boot recipe, variant 3.",
+    "used_for": "Engineer footstep on grating."
+   },
+   {
+    "group": "footsteps",
+    "name": "engineer_grating_4",
+    "wav": "/private/tmp/claude-501/-Users-nathanialhenniges-Developer-mrdemonwolf-wolf-override/eb713cd4-8931-48d7-8c83-5b0b0d1e9cf3/scratchpad/sound-audition/wav/draft/footsteps/engineer_grating_4.wav",
+    "png": "/private/tmp/claude-501/-Users-nathanialhenniges-Developer-mrdemonwolf-wolf-override/eb713cd4-8931-48d7-8c83-5b0b0d1e9cf3/scratchpad/sound-audition/wav/draft/footsteps/engineer_grating_4.png",
+    "seconds": 0.32,
+    "peak_db": -6.02,
+    "recipe": "Same grating boot recipe, variant 4.",
+    "used_for": "Engineer footstep on grating."
+   },
+   {
+    "group": "footsteps",
+    "name": "engineer_grating_walk6",
+    "wav": "/private/tmp/claude-501/-Users-nathanialhenniges-Developer-mrdemonwolf-wolf-override/eb713cd4-8931-48d7-8c83-5b0b0d1e9cf3/scratchpad/sound-audition/wav/draft/footsteps/engineer_grating_walk6.wav",
+    "png": "/private/tmp/claude-501/-Users-nathanialhenniges-Developer-mrdemonwolf-wolf-override/eb713cd4-8931-48d7-8c83-5b0b0d1e9cf3/scratchpad/sound-audition/wav/draft/footsteps/engineer_grating_walk6.png",
+    "seconds": 1.771,
+    "peak_db": -6.02,
+    "recipe": "6 steps every 242 ms, no-repeat pick, +/-6% pitch, +/-2 dB. Picks: [2,1.017,-0.65] [3,1.031,0.21] [1,0.994,-0.26] [3,1.047,0.11] [1,1.005,-1.45] [0,0.944,-1.42].",
+    "used_for": "Walking audition: engineer on grating."
+   },
+   {
+    "group": "footsteps",
+    "name": "engineer_wet_1",
+    "wav": "/private/tmp/claude-501/-Users-nathanialhenniges-Developer-mrdemonwolf-wolf-override/eb713cd4-8931-48d7-8c83-5b0b0d1e9cf3/scratchpad/sound-audition/wav/draft/footsteps/engineer_wet_1.wav",
+    "png": "/private/tmp/claude-501/-Users-nathanialhenniges-Developer-mrdemonwolf-wolf-override/eb713cd4-8931-48d7-8c83-5b0b0d1e9cf3/scratchpad/sound-audition/wav/draft/footsteps/engineer_wet_1.png",
+    "seconds": 0.28,
+    "peak_db": -6.02,
+    "recipe": "Boot heel and toe: a 90 Hz thump, a damped plate, a 100-900 Hz squelch, a 1.5-6 kHz splash and 8-14 rising droplet chirps (1.5-3.8 kHz) on the heel (3-6 on the toe).",
+    "used_for": "Engineer footstep on the Junction wet-deck span."
+   },
+   {
+    "group": "footsteps",
+    "name": "engineer_wet_2",
+    "wav": "/private/tmp/claude-501/-Users-nathanialhenniges-Developer-mrdemonwolf-wolf-override/eb713cd4-8931-48d7-8c83-5b0b0d1e9cf3/scratchpad/sound-audition/wav/draft/footsteps/engineer_wet_2.wav",
+    "png": "/private/tmp/claude-501/-Users-nathanialhenniges-Developer-mrdemonwolf-wolf-override/eb713cd4-8931-48d7-8c83-5b0b0d1e9cf3/scratchpad/sound-audition/wav/draft/footsteps/engineer_wet_2.png",
+    "seconds": 0.28,
+    "peak_db": -6.02,
+    "recipe": "Same wet-deck boot recipe, variant 2.",
+    "used_for": "Engineer footstep on wet deck."
+   },
+   {
+    "group": "footsteps",
+    "name": "engineer_wet_3",
+    "wav": "/private/tmp/claude-501/-Users-nathanialhenniges-Developer-mrdemonwolf-wolf-override/eb713cd4-8931-48d7-8c83-5b0b0d1e9cf3/scratchpad/sound-audition/wav/draft/footsteps/engineer_wet_3.wav",
+    "png": "/private/tmp/claude-501/-Users-nathanialhenniges-Developer-mrdemonwolf-wolf-override/eb713cd4-8931-48d7-8c83-5b0b0d1e9cf3/scratchpad/sound-audition/wav/draft/footsteps/engineer_wet_3.png",
+    "seconds": 0.28,
+    "peak_db": -6.02,
+    "recipe": "Same wet-deck boot recipe, variant 3.",
+    "used_for": "Engineer footstep on wet deck."
+   },
+   {
+    "group": "footsteps",
+    "name": "engineer_wet_4",
+    "wav": "/private/tmp/claude-501/-Users-nathanialhenniges-Developer-mrdemonwolf-wolf-override/eb713cd4-8931-48d7-8c83-5b0b0d1e9cf3/scratchpad/sound-audition/wav/draft/footsteps/engineer_wet_4.wav",
+    "png": "/private/tmp/claude-501/-Users-nathanialhenniges-Developer-mrdemonwolf-wolf-override/eb713cd4-8931-48d7-8c83-5b0b0d1e9cf3/scratchpad/sound-audition/wav/draft/footsteps/engineer_wet_4.png",
+    "seconds": 0.28,
+    "peak_db": -6.02,
+    "recipe": "Same wet-deck boot recipe, variant 4.",
+    "used_for": "Engineer footstep on wet deck."
+   },
+   {
+    "group": "footsteps",
+    "name": "engineer_wet_walk6",
+    "wav": "/private/tmp/claude-501/-Users-nathanialhenniges-Developer-mrdemonwolf-wolf-override/eb713cd4-8931-48d7-8c83-5b0b0d1e9cf3/scratchpad/sound-audition/wav/draft/footsteps/engineer_wet_walk6.wav",
+    "png": "/private/tmp/claude-501/-Users-nathanialhenniges-Developer-mrdemonwolf-wolf-override/eb713cd4-8931-48d7-8c83-5b0b0d1e9cf3/scratchpad/sound-audition/wav/draft/footsteps/engineer_wet_walk6.png",
+    "seconds": 1.728,
+    "peak_db": -6.02,
+    "recipe": "6 steps every 242 ms, no-repeat pick, +/-6% pitch, +/-2 dB. Picks: [0,0.953,-0.62] [2,1.014,0.42] [3,1.019,-0.48] [0,1.053,-0.44] [3,1.034,-1.12] [0,0.993,-1.52].",
+    "used_for": "Walking audition: engineer on wet deck."
+   },
+   {
+    "group": "footsteps",
+    "name": "engineer_rubble_1",
+    "wav": "/private/tmp/claude-501/-Users-nathanialhenniges-Developer-mrdemonwolf-wolf-override/eb713cd4-8931-48d7-8c83-5b0b0d1e9cf3/scratchpad/sound-audition/wav/draft/footsteps/engineer_rubble_1.wav",
+    "png": "/private/tmp/claude-501/-Users-nathanialhenniges-Developer-mrdemonwolf-wolf-override/eb713cd4-8931-48d7-8c83-5b0b0d1e9cf3/scratchpad/sound-audition/wav/draft/footsteps/engineer_rubble_1.png",
+    "seconds": 0.26,
+    "peak_db": -6.02,
+    "recipe": "Boot heel and toe: a dull 75 Hz knock, a 0.2-3 kHz crunch and 20-35 grit grains (0.9-4.2 kHz, 1.5-5 ms) scattered over 120 ms.",
+    "used_for": "Engineer footstep on rubble spans."
+   },
+   {
+    "group": "footsteps",
+    "name": "engineer_rubble_2",
+    "wav": "/private/tmp/claude-501/-Users-nathanialhenniges-Developer-mrdemonwolf-wolf-override/eb713cd4-8931-48d7-8c83-5b0b0d1e9cf3/scratchpad/sound-audition/wav/draft/footsteps/engineer_rubble_2.wav",
+    "png": "/private/tmp/claude-501/-Users-nathanialhenniges-Developer-mrdemonwolf-wolf-override/eb713cd4-8931-48d7-8c83-5b0b0d1e9cf3/scratchpad/sound-audition/wav/draft/footsteps/engineer_rubble_2.png",
+    "seconds": 0.26,
+    "peak_db": -6.02,
+    "recipe": "Same rubble boot recipe, variant 2.",
+    "used_for": "Engineer footstep on rubble."
+   },
+   {
+    "group": "footsteps",
+    "name": "engineer_rubble_3",
+    "wav": "/private/tmp/claude-501/-Users-nathanialhenniges-Developer-mrdemonwolf-wolf-override/eb713cd4-8931-48d7-8c83-5b0b0d1e9cf3/scratchpad/sound-audition/wav/draft/footsteps/engineer_rubble_3.wav",
+    "png": "/private/tmp/claude-501/-Users-nathanialhenniges-Developer-mrdemonwolf-wolf-override/eb713cd4-8931-48d7-8c83-5b0b0d1e9cf3/scratchpad/sound-audition/wav/draft/footsteps/engineer_rubble_3.png",
+    "seconds": 0.26,
+    "peak_db": -6.02,
+    "recipe": "Same rubble boot recipe, variant 3.",
+    "used_for": "Engineer footstep on rubble."
+   },
+   {
+    "group": "footsteps",
+    "name": "engineer_rubble_4",
+    "wav": "/private/tmp/claude-501/-Users-nathanialhenniges-Developer-mrdemonwolf-wolf-override/eb713cd4-8931-48d7-8c83-5b0b0d1e9cf3/scratchpad/sound-audition/wav/draft/footsteps/engineer_rubble_4.wav",
+    "png": "/private/tmp/claude-501/-Users-nathanialhenniges-Developer-mrdemonwolf-wolf-override/eb713cd4-8931-48d7-8c83-5b0b0d1e9cf3/scratchpad/sound-audition/wav/draft/footsteps/engineer_rubble_4.png",
+    "seconds": 0.26,
+    "peak_db": -6.02,
+    "recipe": "Same rubble boot recipe, variant 4.",
+    "used_for": "Engineer footstep on rubble."
+   },
+   {
+    "group": "footsteps",
+    "name": "engineer_rubble_walk6",
+    "wav": "/private/tmp/claude-501/-Users-nathanialhenniges-Developer-mrdemonwolf-wolf-override/eb713cd4-8931-48d7-8c83-5b0b0d1e9cf3/scratchpad/sound-audition/wav/draft/footsteps/engineer_rubble_walk6.wav",
+    "png": "/private/tmp/claude-501/-Users-nathanialhenniges-Developer-mrdemonwolf-wolf-override/eb713cd4-8931-48d7-8c83-5b0b0d1e9cf3/scratchpad/sound-audition/wav/draft/footsteps/engineer_rubble_walk6.png",
+    "seconds": 1.707,
+    "peak_db": -6.02,
+    "recipe": "6 steps every 242 ms, no-repeat pick, +/-6% pitch, +/-2 dB. Picks: [1,1.019,0.81] [0,0.972,-0.38] [3,1.031,-1.76] [2,1.044,-1.76] [0,0.945,0.25] [2,0.948,-1.98].",
+    "used_for": "Walking audition: engineer on rubble."
+   },
+   {
+    "group": "footsteps",
+    "name": "wolf_plate_1",
+    "wav": "/private/tmp/claude-501/-Users-nathanialhenniges-Developer-mrdemonwolf-wolf-override/eb713cd4-8931-48d7-8c83-5b0b0d1e9cf3/scratchpad/sound-audition/wav/draft/footsteps/wolf_plate_1.wav",
+    "png": "/private/tmp/claude-501/-Users-nathanialhenniges-Developer-mrdemonwolf-wolf-override/eb713cd4-8931-48d7-8c83-5b0b0d1e9cf3/scratchpad/sound-audition/wav/draft/footsteps/wolf_plate_1.png",
+    "seconds": 0.16,
+    "peak_db": -6.02,
+    "recipe": "Metal paw pair (front, then hind 18-35 ms later): claw ticks at 3.15/4.72 kHz, a ringing metal pad at 523/1347 Hz, a light 165 Hz thump and a faint plate ring.",
+    "used_for": "WOLF footstep on plate decking."
+   },
+   {
+    "group": "footsteps",
+    "name": "wolf_plate_2",
+    "wav": "/private/tmp/claude-501/-Users-nathanialhenniges-Developer-mrdemonwolf-wolf-override/eb713cd4-8931-48d7-8c83-5b0b0d1e9cf3/scratchpad/sound-audition/wav/draft/footsteps/wolf_plate_2.wav",
+    "png": "/private/tmp/claude-501/-Users-nathanialhenniges-Developer-mrdemonwolf-wolf-override/eb713cd4-8931-48d7-8c83-5b0b0d1e9cf3/scratchpad/sound-audition/wav/draft/footsteps/wolf_plate_2.png",
+    "seconds": 0.16,
+    "peak_db": -6.02,
+    "recipe": "Same plate paw recipe, variant 2.",
+    "used_for": "WOLF footstep on plate decking."
+   },
+   {
+    "group": "footsteps",
+    "name": "wolf_plate_3",
+    "wav": "/private/tmp/claude-501/-Users-nathanialhenniges-Developer-mrdemonwolf-wolf-override/eb713cd4-8931-48d7-8c83-5b0b0d1e9cf3/scratchpad/sound-audition/wav/draft/footsteps/wolf_plate_3.wav",
+    "png": "/private/tmp/claude-501/-Users-nathanialhenniges-Developer-mrdemonwolf-wolf-override/eb713cd4-8931-48d7-8c83-5b0b0d1e9cf3/scratchpad/sound-audition/wav/draft/footsteps/wolf_plate_3.png",
+    "seconds": 0.16,
+    "peak_db": -6.02,
+    "recipe": "Same plate paw recipe, variant 3.",
+    "used_for": "WOLF footstep on plate decking."
+   },
+   {
+    "group": "footsteps",
+    "name": "wolf_plate_4",
+    "wav": "/private/tmp/claude-501/-Users-nathanialhenniges-Developer-mrdemonwolf-wolf-override/eb713cd4-8931-48d7-8c83-5b0b0d1e9cf3/scratchpad/sound-audition/wav/draft/footsteps/wolf_plate_4.wav",
+    "png": "/private/tmp/claude-501/-Users-nathanialhenniges-Developer-mrdemonwolf-wolf-override/eb713cd4-8931-48d7-8c83-5b0b0d1e9cf3/scratchpad/sound-audition/wav/draft/footsteps/wolf_plate_4.png",
+    "seconds": 0.16,
+    "peak_db": -6.02,
+    "recipe": "Same plate paw recipe, variant 4.",
+    "used_for": "WOLF footstep on plate decking."
+   },
+   {
+    "group": "footsteps",
+    "name": "wolf_plate_walk6",
+    "wav": "/private/tmp/claude-501/-Users-nathanialhenniges-Developer-mrdemonwolf-wolf-override/eb713cd4-8931-48d7-8c83-5b0b0d1e9cf3/scratchpad/sound-audition/wav/draft/footsteps/wolf_plate_walk6.wav",
+    "png": "/private/tmp/claude-501/-Users-nathanialhenniges-Developer-mrdemonwolf-wolf-override/eb713cd4-8931-48d7-8c83-5b0b0d1e9cf3/scratchpad/sound-audition/wav/draft/footsteps/wolf_plate_walk6.png",
+    "seconds": 1.18,
+    "peak_db": -6.02,
+    "recipe": "6 steps every 158 ms (30 px stride at 190 px/s), no-repeat pick, +/-6% pitch, +/-2 dB. Picks: [2,1.0,-0.23] [3,1.044,1.77] [0,0.961,-1.7] [3,1.018,0.77] [0,1.026,0.51] [3,0.945,-0.62].",
+    "used_for": "Walking audition: WOLF on plate."
+   },
+   {
+    "group": "footsteps",
+    "name": "wolf_grating_1",
+    "wav": "/private/tmp/claude-501/-Users-nathanialhenniges-Developer-mrdemonwolf-wolf-override/eb713cd4-8931-48d7-8c83-5b0b0d1e9cf3/scratchpad/sound-audition/wav/draft/footsteps/wolf_grating_1.wav",
+    "png": "/private/tmp/claude-501/-Users-nathanialhenniges-Developer-mrdemonwolf-wolf-override/eb713cd4-8931-48d7-8c83-5b0b0d1e9cf3/scratchpad/sound-audition/wav/draft/footsteps/wolf_grating_1.png",
+    "seconds": 0.22,
+    "peak_db": -6.02,
+    "recipe": "Metal paw pair: claw ticks, metal pad and thump, plus a grate ring at 780/2310 Hz and an extra 3.6 kHz claw catch 10-20 ms later.",
+    "used_for": "WOLF footstep on grating."
+   },
+   {
+    "group": "footsteps",
+    "name": "wolf_grating_2",
+    "wav": "/private/tmp/claude-501/-Users-nathanialhenniges-Developer-mrdemonwolf-wolf-override/eb713cd4-8931-48d7-8c83-5b0b0d1e9cf3/scratchpad/sound-audition/wav/draft/footsteps/wolf_grating_2.wav",
+    "png": "/private/tmp/claude-501/-Users-nathanialhenniges-Developer-mrdemonwolf-wolf-override/eb713cd4-8931-48d7-8c83-5b0b0d1e9cf3/scratchpad/sound-audition/wav/draft/footsteps/wolf_grating_2.png",
+    "seconds": 0.22,
+    "peak_db": -6.02,
+    "recipe": "Same grating paw recipe, variant 2.",
+    "used_for": "WOLF footstep on grating."
+   },
+   {
+    "group": "footsteps",
+    "name": "wolf_grating_3",
+    "wav": "/private/tmp/claude-501/-Users-nathanialhenniges-Developer-mrdemonwolf-wolf-override/eb713cd4-8931-48d7-8c83-5b0b0d1e9cf3/scratchpad/sound-audition/wav/draft/footsteps/wolf_grating_3.wav",
+    "png": "/private/tmp/claude-501/-Users-nathanialhenniges-Developer-mrdemonwolf-wolf-override/eb713cd4-8931-48d7-8c83-5b0b0d1e9cf3/scratchpad/sound-audition/wav/draft/footsteps/wolf_grating_3.png",
+    "seconds": 0.22,
+    "peak_db": -6.02,
+    "recipe": "Same grating paw recipe, variant 3.",
+    "used_for": "WOLF footstep on grating."
+   },
+   {
+    "group": "footsteps",
+    "name": "wolf_grating_4",
+    "wav": "/private/tmp/claude-501/-Users-nathanialhenniges-Developer-mrdemonwolf-wolf-override/eb713cd4-8931-48d7-8c83-5b0b0d1e9cf3/scratchpad/sound-audition/wav/draft/footsteps/wolf_grating_4.wav",
+    "png": "/private/tmp/claude-501/-Users-nathanialhenniges-Developer-mrdemonwolf-wolf-override/eb713cd4-8931-48d7-8c83-5b0b0d1e9cf3/scratchpad/sound-audition/wav/draft/footsteps/wolf_grating_4.png",
+    "seconds": 0.22,
+    "peak_db": -6.02,
+    "recipe": "Same grating paw recipe, variant 4.",
+    "used_for": "WOLF footstep on grating."
+   },
+   {
+    "group": "footsteps",
+    "name": "wolf_grating_walk6",
+    "wav": "/private/tmp/claude-501/-Users-nathanialhenniges-Developer-mrdemonwolf-wolf-override/eb713cd4-8931-48d7-8c83-5b0b0d1e9cf3/scratchpad/sound-audition/wav/draft/footsteps/wolf_grating_walk6.wav",
+    "png": "/private/tmp/claude-501/-Users-nathanialhenniges-Developer-mrdemonwolf-wolf-override/eb713cd4-8931-48d7-8c83-5b0b0d1e9cf3/scratchpad/sound-audition/wav/draft/footsteps/wolf_grating_walk6.png",
+    "seconds": 1.244,
+    "peak_db": -6.02,
+    "recipe": "6 steps every 158 ms, no-repeat pick, +/-6% pitch, +/-2 dB. Picks: [0,0.944,-1.13] [3,0.967,-0.19] [1,1.0,0.12] [2,1.04,-0.8] [1,1.026,-0.01] [0,0.994,-0.47].",
+    "used_for": "Walking audition: WOLF on grating."
+   },
+   {
+    "group": "footsteps",
+    "name": "wolf_wet_1",
+    "wav": "/private/tmp/claude-501/-Users-nathanialhenniges-Developer-mrdemonwolf-wolf-override/eb713cd4-8931-48d7-8c83-5b0b0d1e9cf3/scratchpad/sound-audition/wav/draft/footsteps/wolf_wet_1.wav",
+    "png": "/private/tmp/claude-501/-Users-nathanialhenniges-Developer-mrdemonwolf-wolf-override/eb713cd4-8931-48d7-8c83-5b0b0d1e9cf3/scratchpad/sound-audition/wav/draft/footsteps/wolf_wet_1.png",
+    "seconds": 0.2,
+    "peak_db": -6.02,
+    "recipe": "Metal paw pair with softened claws, metal pad and thump, plus a small 1.5-6 kHz splash and 3-6 droplets (2-4.2 kHz).",
+    "used_for": "WOLF footstep on wet deck."
+   },
+   {
+    "group": "footsteps",
+    "name": "wolf_wet_2",
+    "wav": "/private/tmp/claude-501/-Users-nathanialhenniges-Developer-mrdemonwolf-wolf-override/eb713cd4-8931-48d7-8c83-5b0b0d1e9cf3/scratchpad/sound-audition/wav/draft/footsteps/wolf_wet_2.wav",
+    "png": "/private/tmp/claude-501/-Users-nathanialhenniges-Developer-mrdemonwolf-wolf-override/eb713cd4-8931-48d7-8c83-5b0b0d1e9cf3/scratchpad/sound-audition/wav/draft/footsteps/wolf_wet_2.png",
+    "seconds": 0.2,
+    "peak_db": -6.02,
+    "recipe": "Same wet paw recipe, variant 2.",
+    "used_for": "WOLF footstep on wet deck."
+   },
+   {
+    "group": "footsteps",
+    "name": "wolf_wet_3",
+    "wav": "/private/tmp/claude-501/-Users-nathanialhenniges-Developer-mrdemonwolf-wolf-override/eb713cd4-8931-48d7-8c83-5b0b0d1e9cf3/scratchpad/sound-audition/wav/draft/footsteps/wolf_wet_3.wav",
+    "png": "/private/tmp/claude-501/-Users-nathanialhenniges-Developer-mrdemonwolf-wolf-override/eb713cd4-8931-48d7-8c83-5b0b0d1e9cf3/scratchpad/sound-audition/wav/draft/footsteps/wolf_wet_3.png",
+    "seconds": 0.2,
+    "peak_db": -6.02,
+    "recipe": "Same wet paw recipe, variant 3.",
+    "used_for": "WOLF footstep on wet deck."
+   },
+   {
+    "group": "footsteps",
+    "name": "wolf_wet_4",
+    "wav": "/private/tmp/claude-501/-Users-nathanialhenniges-Developer-mrdemonwolf-wolf-override/eb713cd4-8931-48d7-8c83-5b0b0d1e9cf3/scratchpad/sound-audition/wav/draft/footsteps/wolf_wet_4.wav",
+    "png": "/private/tmp/claude-501/-Users-nathanialhenniges-Developer-mrdemonwolf-wolf-override/eb713cd4-8931-48d7-8c83-5b0b0d1e9cf3/scratchpad/sound-audition/wav/draft/footsteps/wolf_wet_4.png",
+    "seconds": 0.2,
+    "peak_db": -6.02,
+    "recipe": "Same wet paw recipe, variant 4.",
+    "used_for": "WOLF footstep on wet deck."
+   },
+   {
+    "group": "footsteps",
+    "name": "wolf_wet_walk6",
+    "wav": "/private/tmp/claude-501/-Users-nathanialhenniges-Developer-mrdemonwolf-wolf-override/eb713cd4-8931-48d7-8c83-5b0b0d1e9cf3/scratchpad/sound-audition/wav/draft/footsteps/wolf_wet_walk6.wav",
+    "png": "/private/tmp/claude-501/-Users-nathanialhenniges-Developer-mrdemonwolf-wolf-override/eb713cd4-8931-48d7-8c83-5b0b0d1e9cf3/scratchpad/sound-audition/wav/draft/footsteps/wolf_wet_walk6.png",
+    "seconds": 1.222,
+    "peak_db": -6.02,
+    "recipe": "6 steps every 158 ms, no-repeat pick, +/-6% pitch, +/-2 dB. Picks: [2,1.012,1.82] [0,0.954,1.42] [1,1.02,-0.61] [3,1.05,-1.68] [0,0.947,-0.59] [1,1.039,-0.15].",
+    "used_for": "Walking audition: WOLF on wet deck."
+   },
+   {
+    "group": "footsteps",
+    "name": "wolf_rubble_1",
+    "wav": "/private/tmp/claude-501/-Users-nathanialhenniges-Developer-mrdemonwolf-wolf-override/eb713cd4-8931-48d7-8c83-5b0b0d1e9cf3/scratchpad/sound-audition/wav/draft/footsteps/wolf_rubble_1.wav",
+    "png": "/private/tmp/claude-501/-Users-nathanialhenniges-Developer-mrdemonwolf-wolf-override/eb713cd4-8931-48d7-8c83-5b0b0d1e9cf3/scratchpad/sound-audition/wav/draft/footsteps/wolf_rubble_1.png",
+    "seconds": 0.18,
+    "peak_db": -6.02,
+    "recipe": "Metal paw pair with softened claws, metal pad and thump, plus a 0.3-3 kHz crunch and 8-14 grit grains (1.2-4.5 kHz).",
+    "used_for": "WOLF footstep on rubble."
+   },
+   {
+    "group": "footsteps",
+    "name": "wolf_rubble_2",
+    "wav": "/private/tmp/claude-501/-Users-nathanialhenniges-Developer-mrdemonwolf-wolf-override/eb713cd4-8931-48d7-8c83-5b0b0d1e9cf3/scratchpad/sound-audition/wav/draft/footsteps/wolf_rubble_2.wav",
+    "png": "/private/tmp/claude-501/-Users-nathanialhenniges-Developer-mrdemonwolf-wolf-override/eb713cd4-8931-48d7-8c83-5b0b0d1e9cf3/scratchpad/sound-audition/wav/draft/footsteps/wolf_rubble_2.png",
+    "seconds": 0.18,
+    "peak_db": -6.02,
+    "recipe": "Same rubble paw recipe, variant 2.",
+    "used_for": "WOLF footstep on rubble."
+   },
+   {
+    "group": "footsteps",
+    "name": "wolf_rubble_3",
+    "wav": "/private/tmp/claude-501/-Users-nathanialhenniges-Developer-mrdemonwolf-wolf-override/eb713cd4-8931-48d7-8c83-5b0b0d1e9cf3/scratchpad/sound-audition/wav/draft/footsteps/wolf_rubble_3.wav",
+    "png": "/private/tmp/claude-501/-Users-nathanialhenniges-Developer-mrdemonwolf-wolf-override/eb713cd4-8931-48d7-8c83-5b0b0d1e9cf3/scratchpad/sound-audition/wav/draft/footsteps/wolf_rubble_3.png",
+    "seconds": 0.18,
+    "peak_db": -6.02,
+    "recipe": "Same rubble paw recipe, variant 3.",
+    "used_for": "WOLF footstep on rubble."
+   },
+   {
+    "group": "footsteps",
+    "name": "wolf_rubble_4",
+    "wav": "/private/tmp/claude-501/-Users-nathanialhenniges-Developer-mrdemonwolf-wolf-override/eb713cd4-8931-48d7-8c83-5b0b0d1e9cf3/scratchpad/sound-audition/wav/draft/footsteps/wolf_rubble_4.wav",
+    "png": "/private/tmp/claude-501/-Users-nathanialhenniges-Developer-mrdemonwolf-wolf-override/eb713cd4-8931-48d7-8c83-5b0b0d1e9cf3/scratchpad/sound-audition/wav/draft/footsteps/wolf_rubble_4.png",
+    "seconds": 0.18,
+    "peak_db": -6.02,
+    "recipe": "Same rubble paw recipe, variant 4.",
+    "used_for": "WOLF footstep on rubble."
+   },
+   {
+    "group": "footsteps",
+    "name": "wolf_rubble_walk6",
+    "wav": "/private/tmp/claude-501/-Users-nathanialhenniges-Developer-mrdemonwolf-wolf-override/eb713cd4-8931-48d7-8c83-5b0b0d1e9cf3/scratchpad/sound-audition/wav/draft/footsteps/wolf_rubble_walk6.wav",
+    "png": "/private/tmp/claude-501/-Users-nathanialhenniges-Developer-mrdemonwolf-wolf-override/eb713cd4-8931-48d7-8c83-5b0b0d1e9cf3/scratchpad/sound-audition/wav/draft/footsteps/wolf_rubble_walk6.png",
+    "seconds": 1.201,
+    "peak_db": -6.02,
+    "recipe": "6 steps every 158 ms, no-repeat pick, +/-6% pitch, +/-2 dB. Picks: [0,1.003,1.62] [3,0.977,-0.23] [1,0.955,-1.68] [3,1.005,0.86] [2,1.054,-0.3] [1,0.965,1.01].",
+    "used_for": "Walking audition: WOLF on rubble."
+   },
+   {
+    "group": "roomtone",
+    "name": "corridor_bed10s",
+    "wav": "/private/tmp/claude-501/-Users-nathanialhenniges-Developer-mrdemonwolf-wolf-override/eb713cd4-8931-48d7-8c83-5b0b0d1e9cf3/scratchpad/sound-audition/wav/draft/roomtone/corridor_bed10s.wav",
+    "png": "/private/tmp/claude-501/-Users-nathanialhenniges-Developer-mrdemonwolf-wolf-override/eb713cd4-8931-48d7-8c83-5b0b0d1e9cf3/scratchpad/sound-audition/wav/draft/roomtone/corridor_bed10s.png",
+    "seconds": 10,
+    "peak_db": -6.02,
+    "recipe": "Ventilation noise (900 Hz low-pass, a 2.5 kHz air band and a 320 Hz duct band-pass at Q 1.5, +/-20% drift) under 60/120 Hz mains and an 87.5+88 Hz fan blade-pass beating at 0.5 Hz. Built from 5 chunks of 2 s, played from a shuffle bag (order 1,4,2,3,0,1) with 0.25 s equal-power crossfades; the tail wraps into the head. Generation took 380 ms.",
+    "used_for": "Corridor room tone bed."
+   },
+   {
+    "group": "roomtone",
+    "name": "records_bed10s",
+    "wav": "/private/tmp/claude-501/-Users-nathanialhenniges-Developer-mrdemonwolf-wolf-override/eb713cd4-8931-48d7-8c83-5b0b0d1e9cf3/scratchpad/sound-audition/wav/draft/roomtone/records_bed10s.wav",
+    "png": "/private/tmp/claude-501/-Users-nathanialhenniges-Developer-mrdemonwolf-wolf-override/eb713cd4-8931-48d7-8c83-5b0b0d1e9cf3/scratchpad/sound-audition/wav/draft/roomtone/records_bed10s.png",
+    "seconds": 10,
+    "peak_db": -6.02,
+    "recipe": "Dry electrical hush: a soft 1.5-6 kHz hiss, a trace of brown noise and sparse 3-5.5 kHz micro-crackle (+/-10% drift), over a 60/120/180/240/360 Hz transformer buzz with a 120.5 Hz beat. 5 chunks of 2 s from a shuffle bag with 0.25 s crossfades. Generation took 356 ms.",
+    "used_for": "Records Access room tone bed."
+   },
+   {
+    "group": "roomtone",
+    "name": "junction_bed10s",
+    "wav": "/private/tmp/claude-501/-Users-nathanialhenniges-Developer-mrdemonwolf-wolf-override/eb713cd4-8931-48d7-8c83-5b0b0d1e9cf3/scratchpad/sound-audition/wav/draft/roomtone/junction_bed10s.wav",
+    "png": "/private/tmp/claude-501/-Users-nathanialhenniges-Developer-mrdemonwolf-wolf-override/eb713cd4-8931-48d7-8c83-5b0b0d1e9cf3/scratchpad/sound-audition/wav/draft/roomtone/junction_bed10s.png",
+    "seconds": 10,
+    "peak_db": -6.02,
+    "recipe": "Big metal drone: brown rumble with a 220 Hz low-pass and 140 Hz (Q 4) and 660 Hz (Q 8) bands through a 29 ms feedback comb at 0.55 (+/-25% drift), plus 41+41.5 Hz and 82.5 Hz tones and metal partials at 137.5/211/389.5/523 Hz. 5 chunks of 2 s from a shuffle bag with 0.25 s crossfades. Generation took 472 ms.",
+    "used_for": "Service Junction room tone bed."
+   },
+   {
+    "group": "ambient",
+    "name": "distant_bang",
+    "wav": "/private/tmp/claude-501/-Users-nathanialhenniges-Developer-mrdemonwolf-wolf-override/eb713cd4-8931-48d7-8c83-5b0b0d1e9cf3/scratchpad/sound-audition/wav/draft/ambient/distant_bang.wav",
+    "png": "/private/tmp/claude-501/-Users-nathanialhenniges-Developer-mrdemonwolf-wolf-override/eb713cd4-8931-48d7-8c83-5b0b0d1e9cf3/scratchpad/sound-audition/wav/draft/ambient/distant_bang.png",
+    "seconds": 1.8,
+    "peak_db": -6.02,
+    "recipe": "Hull modes at 48/71/113/167/239 Hz (tau 0.25-0.9 s) plus a low noise knock, low-passed at 600 Hz, with reflections at 140 and 310 ms.",
+    "used_for": "Distant hull bang for the ambient scheduler (corridor hull knocks)."
+   },
+   {
+    "group": "ambient",
+    "name": "drip",
+    "wav": "/private/tmp/claude-501/-Users-nathanialhenniges-Developer-mrdemonwolf-wolf-override/eb713cd4-8931-48d7-8c83-5b0b0d1e9cf3/scratchpad/sound-audition/wav/draft/ambient/drip.wav",
+    "png": "/private/tmp/claude-501/-Users-nathanialhenniges-Developer-mrdemonwolf-wolf-override/eb713cd4-8931-48d7-8c83-5b0b0d1e9cf3/scratchpad/sound-audition/wav/draft/ambient/drip.png",
+    "seconds": 0.5,
+    "peak_db": -6.02,
+    "recipe": "An impact tick and a bubble chirp rising about 1.1->2.4 kHz (tau 18 ms), a quieter repeat at 112 ms and a faint wash.",
+    "used_for": "Junction drips near the wet deck."
+   },
+   {
+    "group": "ambient",
+    "name": "pipe_creak",
+    "wav": "/private/tmp/claude-501/-Users-nathanialhenniges-Developer-mrdemonwolf-wolf-override/eb713cd4-8931-48d7-8c83-5b0b0d1e9cf3/scratchpad/sound-audition/wav/draft/ambient/pipe_creak.wav",
+    "png": "/private/tmp/claude-501/-Users-nathanialhenniges-Developer-mrdemonwolf-wolf-override/eb713cd4-8931-48d7-8c83-5b0b0d1e9cf3/scratchpad/sound-audition/wav/draft/ambient/pipe_creak.png",
+    "seconds": 1.2,
+    "peak_db": -6.02,
+    "recipe": "A stick-slip pulse train wandering 38->70->45 Hz through band-passes at 420 Hz (Q 12), 1.15 kHz (Q 15) and 2.3 kHz (Q 10), swelling in and out.",
+    "used_for": "Junction pipe and pressure creaks (designed to thin out after door_blown)."
+   },
+   {
+    "group": "ambient",
+    "name": "cooling_tick",
+    "wav": "/private/tmp/claude-501/-Users-nathanialhenniges-Developer-mrdemonwolf-wolf-override/eb713cd4-8931-48d7-8c83-5b0b0d1e9cf3/scratchpad/sound-audition/wav/draft/ambient/cooling_tick.wav",
+    "png": "/private/tmp/claude-501/-Users-nathanialhenniges-Developer-mrdemonwolf-wolf-override/eb713cd4-8931-48d7-8c83-5b0b0d1e9cf3/scratchpad/sound-audition/wav/draft/ambient/cooling_tick.png",
+    "seconds": 0.6,
+    "peak_db": -6.02,
+    "recipe": "Three irregular ticks, each a 0.6 ms noise click with modes at 2.9/4.1/6.3 kHz over a 900 Hz body.",
+    "used_for": "Metal cooling ticks, for example after the blast or near warm machinery."
+   },
+   {
+    "group": "ambient",
+    "name": "vent_flutter",
+    "wav": "/private/tmp/claude-501/-Users-nathanialhenniges-Developer-mrdemonwolf-wolf-override/eb713cd4-8931-48d7-8c83-5b0b0d1e9cf3/scratchpad/sound-audition/wav/draft/ambient/vent_flutter.wav",
+    "png": "/private/tmp/claude-501/-Users-nathanialhenniges-Developer-mrdemonwolf-wolf-override/eb713cd4-8931-48d7-8c83-5b0b0d1e9cf3/scratchpad/sound-audition/wav/draft/ambient/vent_flutter.png",
+    "seconds": 1,
+    "peak_db": -6.02,
+    "recipe": "Noise low-passed at 1.4 kHz, chopped by a flap rate falling from 22 to 14 Hz, with a 500 Hz body and a 980 Hz tin knock on each beat.",
+    "used_for": "Vent flutter in the corridor or Junction."
+   },
+   {
+    "group": "ambient",
+    "name": "relay_click",
+    "wav": "/private/tmp/claude-501/-Users-nathanialhenniges-Developer-mrdemonwolf-wolf-override/eb713cd4-8931-48d7-8c83-5b0b0d1e9cf3/scratchpad/sound-audition/wav/draft/ambient/relay_click.wav",
+    "png": "/private/tmp/claude-501/-Users-nathanialhenniges-Developer-mrdemonwolf-wolf-override/eb713cd4-8931-48d7-8c83-5b0b0d1e9cf3/scratchpad/sound-audition/wav/draft/ambient/relay_click.png",
+    "seconds": 0.35,
+    "peak_db": -6.02,
+    "recipe": "An armature click with bounces at 6 and 9 ms (1.8/3.3 kHz modes) and a 160 ms 120 Hz coil buzz, low-passed at 3.5 kHz for distance.",
+    "used_for": "Records relay ticks (designed to stop once the corridor relay is set)."
+   },
+   {
+    "group": "case",
+    "name": "rustle",
+    "wav": "/private/tmp/claude-501/-Users-nathanialhenniges-Developer-mrdemonwolf-wolf-override/eb713cd4-8931-48d7-8c83-5b0b0d1e9cf3/scratchpad/sound-audition/wav/draft/case/rustle.wav",
+    "png": "/private/tmp/claude-501/-Users-nathanialhenniges-Developer-mrdemonwolf-wolf-override/eb713cd4-8931-48d7-8c83-5b0b0d1e9cf3/scratchpad/sound-audition/wav/draft/case/rustle.png",
+    "seconds": 0.6,
+    "peak_db": -6.02,
+    "recipe": "Two handling gestures of dense 1.2-7 kHz noise grains (0.5-3 ms each, sine-shaped density) over a soft friction hiss.",
+    "used_for": "A paper or evidence sheet taken from or put into the case."
+   },
+   {
+    "group": "case",
+    "name": "clack",
+    "wav": "/private/tmp/claude-501/-Users-nathanialhenniges-Developer-mrdemonwolf-wolf-override/eb713cd4-8931-48d7-8c83-5b0b0d1e9cf3/scratchpad/sound-audition/wav/draft/case/clack.wav",
+    "png": "/private/tmp/claude-501/-Users-nathanialhenniges-Developer-mrdemonwolf-wolf-override/eb713cd4-8931-48d7-8c83-5b0b0d1e9cf3/scratchpad/sound-audition/wav/draft/case/clack.png",
+    "seconds": 0.14,
+    "peak_db": -6.02,
+    "recipe": "An insert click, then a louder seat click 45-60 ms later: a hard tick, plastic modes at 1.05/2.35/3.9 kHz and a 260 Hz body.",
+    "used_for": "A data cartridge seated in the case slot."
+   },
+   {
+    "group": "case",
+    "name": "clink",
+    "wav": "/private/tmp/claude-501/-Users-nathanialhenniges-Developer-mrdemonwolf-wolf-override/eb713cd4-8931-48d7-8c83-5b0b0d1e9cf3/scratchpad/sound-audition/wav/draft/case/clink.wav",
+    "png": "/private/tmp/claude-501/-Users-nathanialhenniges-Developer-mrdemonwolf-wolf-override/eb713cd4-8931-48d7-8c83-5b0b0d1e9cf3/scratchpad/sound-audition/wav/draft/case/clink.png",
+    "seconds": 0.7,
+    "peak_db": -6.02,
+    "recipe": "Free-bar modes at 1 : 2.756 : 5.404 : 8.933 from about 1.1 kHz (tau 0.35-0.05 s) struck, then two smaller detuned bounces.",
+    "used_for": "A metal tag or tool set down in the case."
+   },
+   {
+    "group": "case",
+    "name": "ratchet",
+    "wav": "/private/tmp/claude-501/-Users-nathanialhenniges-Developer-mrdemonwolf-wolf-override/eb713cd4-8931-48d7-8c83-5b0b0d1e9cf3/scratchpad/sound-audition/wav/draft/case/ratchet.wav",
+    "png": "/private/tmp/claude-501/-Users-nathanialhenniges-Developer-mrdemonwolf-wolf-override/eb713cd4-8931-48d7-8c83-5b0b0d1e9cf3/scratchpad/sound-audition/wav/draft/case/ratchet.png",
+    "seconds": 0.5,
+    "peak_db": -6.02,
+    "recipe": "Six pawl clicks about 65 ms apart: a noise tick and modes at 1.65/2.6/4.3 kHz climbing 2% per tick, with a faint 5.2 kHz spring ring.",
+    "used_for": "Ratchet clicks, one per hold tick, when a tool is used at a station or the case latch is worked."
+   }
+  ],
+  "tools": [
+   "godot 4.7.2.stable.official.ed1daf0bf (headless): import ran twice on the scratch copy, and both runs exited 0",
+   "SceneTree tool /private/tmp/claude-501/-Users-nathanialhenniges-Developer-mrdemonwolf-wolf-override/eb713cd4-8931-48d7-8c83-5b0b0d1e9cf3/scratchpad/sound-audition/tools/dump_current.gd: creates the bank the way Main does (SfxBank.new(), named, add_child, so _ready() runs generate()) on the first frame, then calls save_to_wav() for each stream and tiles each loop to 10 s",
+   "Draft recipes /private/tmp/claude-501/-Users-nathanialhenniges-Developer-mrdemonwolf-wolf-override/eb713cd4-8931-48d7-8c83-5b0b0d1e9cf3/scratchpad/sound-audition/tools/sfx_drafts.gd: written in the same style as sfx_bank.gd (static functions that take a seeded RNG, the same SEED, MIX_RATE and PEAK, and an identical _wav), ready to move into the game later",
+   "SceneTree tool /private/tmp/claude-501/-Users-nathanialhenniges-Developer-mrdemonwolf-wolf-override/eb713cd4-8931-48d7-8c83-5b0b0d1e9cf3/scratchpad/sound-audition/tools/render_drafts.gd: renders every draft with save_to_wav() and writes manifest.json with the walk picks, chunk orders and generation times",
+   "Renderer /private/tmp/claude-501/-Users-nathanialhenniges-Developer-mrdemonwolf-wolf-override/eb713cd4-8931-48d7-8c83-5b0b0d1e9cf3/scratchpad/sound-audition/tools/render_png.mjs: ChatGPT-bundled node plus Playwright, driving the cached chromium_headless_shell-1248 (Playwright's default build 1200 was missing, so the script passes executablePath). It draws a waveform and a log-frequency spectrogram per clip on a canvas and writes /private/tmp/claude-501/-Users-nathanialhenniges-Developer-mrdemonwolf-wolf-override/eb713cd4-8931-48d7-8c83-5b0b0d1e9cf3/scratchpad/sound-audition/analysis.json (peak, RMS, seam jump, median and p99 sample step)",
+   "Python 3 stdlib (wave, struct): format checks, level checks across bed crossfades and determinism hashing (md5)"
+  ],
+  "notes": "Rerun from scratch on 2026-10-10. The earlier run's output in sound-audition was moved to /private/tmp/claude-501/-Users-nathanialhenniges-Developer-mrdemonwolf-wolf-override/eb713cd4-8931-48d7-8c83-5b0b0d1e9cf3/scratchpad/sound-audition/old-run-1316 and nothing from it was reused. The repo was only read, and git status is clean. Main has moved to e54c338 (PR #43), but that change only touches apps/game/assets/changelog.txt, so sfx_bank.gd and main.gd match 975047d and the scratch copy is byte-identical to the repo's sfx_bank.gd.\n\nOutput: 69 clips, each with a PNG of the same name beside it.\n- 16 from the current bank in wav/current/: 12 clips plus 4 loops tiled to 10 s.\n- 53 drafts in wav/draft/:\n  - footsteps: 32 variants and 8 six-step walks.\n  - roomtone: 3 beds of 10 s.\n  - ambient: 6 one-shots.\n  - case: 4 handling sounds.\n\nEvery file is 16-bit mono 22.05 kHz with a -6.02 dBFS peak. Manifests are at wav/current/manifest.json and wav/draft/manifest.json, and measurements at analysis.json. A second render of all 53 drafts and all 16 current clips was byte-identical to the first, so the output is deterministic.\n\nWhat was checked: headless rendering plus numeric and visual (PNG) checks only. Nobody has listened to any clip, nothing has been played in the game, and nothing has been tested on a device.\n\nKEY FINDING ABOUT THE CURRENT BANK: the hum and winch loops click once per loop. At the seam the signal jumps 0.567 (hum) and 0.440 (winch), against median sample steps of 0.0055 and 0.0032. The click shows as a vertical broadband line every second in hum_loop10s.png and winch_loop10s.png. The cause is that _hum and _winch start the one-pole low-pass at low = 0, while the end of the buffer is at steady state. The sfx_bank.gd comment says \"the loop seam is silent\", but that only holds for the raw oscillators. A suggested fix is to run the filter for one loop length before writing samples. In game the hum plays at pitch 0.5-0.8, so the click comes about every 1.25-2 s.\n\nThe servo seam is clean. The hiss seam has no click, but its 0.5 s noise pattern repeats twice a second.\n\nDrafts:\n- Room tone beds:\n  - Each bed is 5 chunks of 2 s, played from a shuffle bag with 0.25 s equal-power crossfades, plus a tonal layer on multiples of 0.5 Hz. The 10 s file also loops cleanly.\n  - Seam jumps are corridor 0.0011, records 0.071 and junction 0.0079, all at or below the median sample step.\n  - The 100 ms RMS around crossfades is within 0.4 dB of the RMS elsewhere.\n  - Generating each bed took 356-472 ms in GDScript, against 38-40 ms for the whole current bank. Building beds at startup would blow the generation_ms budget, so they would need to be built lazily on room entry, use fewer or shorter chunks, or be split across frames.\n- Footsteps:\n  - All 32 variants plus the walks took about 300 ms to generate.\n  - Walk step spacing comes from the stride figures in the design notes: 46 px for the engineer and 30 px for WOLF at 190 px/s, which gives 242 ms and 158 ms per step.\n  - In the walk recipes, picks are 0-based: variant 0 is the file ending _1.wav.\n  - I raised the wet-deck splash once from the spectrogram view so it stands apart from plate. It has not been heard.\n- Low frequencies: most of the boot thump, the Junction drone's 41 Hz fundamental, distant_bang and the current boom sit below 150 Hz, which phone speakers barely reproduce. The surface cues sit above 500 Hz, so they should still read, but this needs a device listen.\n- Mix levels: everything is normalised to -6 dB, as in the bank. In-game levels (beds around -20 dB, footsteps quieter than effects) still need to be set by ear."
+ },
+ "crit": {
+  "per_clip": [
+   {
+    "name": "boom",
+    "verdict": "tweak",
+    "why": "Truncated tail. The last sample is 0.050 and the sub is still ringing at 500 ms, so the spectrogram shows a broadband click at the end. The energy is 83% at 40-100 Hz and 7.4% below 40 Hz. Above roughly 300 Hz the clip is about 10 dB below its total RMS, so on phone and laptop speakers this boom is mostly the 0.25 s noise burst, which carries only about 10% of the energy. It is used at 0 dB for the tank hit and the door blast, so it has to read on small speakers.",
+    "suggestion": "Add a 30-50 ms fade to zero, or extend the clip to about 0.9 s so the 0.18 s tau decays fully. High-pass at 35 Hz. Drive the sub harder through tanh so 2x and 3x harmonics (90-180 Hz) imply the low end. Add a 200-600 Hz band-passed noise crunch at about -8 dB under the burst, so the hit has a body phones can play."
+   },
+   {
+    "name": "small_boom",
+    "verdict": "tweak",
+    "why": "Ends at -0.0154, a small end click. 55% of the energy is at 40-100 Hz. For a relief vent letting go, the recipe is only a pop; it has no gas-release component, and the junction already has a hiss loop it could match.",
+    "suggestion": "Fade the last 20 ms. After the pop, add a 0.3-0.5 s decaying band-passed hiss (1-4 kHz, falling) so it reads as a vent venting rather than a small explosion. High-pass at 40 Hz."
+   },
+   {
+    "name": "clank",
+    "verdict": "tweak",
+    "why": "At 40 ms the 12 ms-tau ring has fallen only to about -29 dB, and the clip ends at -0.011, a truncation click. The square ring puts 79% of the energy at 300-1000 Hz with harmonic partials, so pitched to 0.55-2.2 across about eight call sites it sounds like a buzzer blip rather than metal. It is the most reused clip in the bank.",
+    "suggestion": "Extend to 90-120 ms with a 5 ms fade. Replace the square with 3-4 inharmonic sine modes (for example 420, 1130, 2210 and 3480 Hz with decreasing tau) plus the noise tick. Consider 2-3 seeded variants with a no-repeat pick, as the footsteps use, because it fires so often."
+   },
+   {
+    "name": "thud",
+    "verdict": "redo",
+    "why": "99.2% of the energy is at 40-100 Hz (centroid 61 Hz), which is effectively inaudible on phone speakers and weak on laptops. The tail is truncated at 80 ms: it ends at -0.036 and the spectrogram shows a vertical click line. DC offset is 0.010 (-40 dBFS) on an 80 ms clip, an asymmetric pressure pulse. It is the 0 dB fail-beat knockdown, so the player must hear it.",
+    "suggestion": "Rebuild it as a 180->110 Hz pitch-dropping body (tau 40 ms) plus a 400-900 Hz band-passed knock (tau 15 ms) and a short 2 kHz contact tick. Make it 150 ms with a 10 ms fade. Add a one-pole DC blocker or a 40 Hz high-pass."
+   },
+   {
+    "name": "hiss",
+    "verdict": "tweak",
+    "why": "No seam click (wrap step 0.099 against a 0.111 median step), but the 0.5 s noise buffer repeats twice a second, and the 2 Hz wobble is locked to the same period, so it pulses audibly. About 50% of the energy is above 2 kHz despite the '3 kHz low-pass' (a one-pole filter is only 6 dB/oct). That is a little harsh at -8 dB when the gauge is high.",
+    "suggestion": "Build a 4-6 s buffer from 3-5 noise chunks joined with equal-power crossfades (the corridor-bed method), or stream noise from an AudioStreamGenerator. Make the wobble period non-integer against the loop. Use a 2-pole low-pass at 3 kHz to tame the 2-5 kHz band."
+   },
+   {
+    "name": "hiss_loop10s",
+    "verdict": "tweak",
+    "why": "Audition tiling confirms what the base loop shows: there is no click, but the same 0.5 s grain recurs 20 times in 10 s. The spectrogram texture repeats at the yellow seams.",
+    "suggestion": "Same fix as hiss: a longer chunked buffer, with the wobble decoupled from the loop length."
+   },
+   {
+    "name": "hum",
+    "verdict": "tweak",
+    "why": "The seam clicks once per loop: a 0.567 jump against a 0.0055 median step. The last sample is 0.4995 and the first is -0.068 because the one-pole low-pass state starts at 0. The spectrogram shows a broadband vertical line every second. Otherwise it is good: 110 and 113 Hz are whole cycles, the 3 Hz beat is seamless, and harmonics to about 500 Hz survive small speakers.",
+    "suggestion": "Pre-roll the filter: run the oscillator and filter over one full loop, discard it, then record the second pass, so the state at the end matches the start. Alternatively, generate the saws band-limited (additive harmonics up to 500 Hz) with no IIR state."
+   },
+   {
+    "name": "hum_loop10s",
+    "verdict": "tweak",
+    "why": "A click every 1 s seam, visible as ten vertical broadband lines. This would be audible throughout the junction pump scene.",
+    "suggestion": "Same filter pre-roll fix as hum."
+   },
+   {
+    "name": "arc",
+    "verdict": "tweak",
+    "why": "Very bright: 54% of the energy is above 5 kHz and the centroid is 5.4 kHz. There is almost nothing below 1 kHz (2.4%), so the arc lacks body. Crest is 20.8 dB (RMS -26.8 dBFS), so at the same peak it will play about 12-17 dB quieter in perceived loudness than klaxon or hum, while its fizz sits in the harsh band. The clip edges are clean.",
+    "suggestion": "Add a 100/120 Hz-gated buzz band-passed at 300-1500 Hz under the crackle for the first 150 ms (the 'zzt' body), and roll off the crackle above 6 kHz by a few dB. Raise the call-site gains, or normalise the bank by RMS rather than peak."
+   },
+   {
+    "name": "klaxon",
+    "verdict": "tweak",
+    "why": "The 2.5 kHz low-pass leaves 93% of the energy at the 880 Hz fundamental, so it reads as a clean microwave-timer beep rather than an industrial warning. Crest is 3.2 dB (RMS -9.2 dBFS), making it by far the loudest clip by RMS, about 17 dB above arc at the same peak, and it plays at -4 dB. The ramps are clean and there are no clicks.",
+    "suggestion": "Make it a two-tone or slightly detuned pair (for example 880 Hz plus 1046 or 660 Hz, or a 5-cent detuned second square), keep some third harmonic (raise the low-pass to about 3.5 kHz), and drop the call-site gain to about -10 dB."
+   },
+   {
+    "name": "growl",
+    "verdict": "tweak",
+    "why": "65% of the energy is at 40-100 Hz (the 70->58 Hz saw fundamental) behind a 900 Hz low-pass, with only 7.8% at 300-1000 Hz. On phone speakers WOLF's growl will be thin and quiet, yet it is a character beat. The envelope (80 ms swell, 0.2 s die-away, ends at 0) and the 9 Hz tremolo are good.",
+    "suggestion": "Raise the low-pass to about 1.8 kHz and add a formant band-pass around 450-700 Hz (Q 2-3) on the saw, about +6 dB, so the growl's identity lives where small speakers play. Add light tanh grit for a metallic edge. Keep the sub, but high-pass at 45 Hz."
+   },
+   {
+    "name": "servo",
+    "verdict": "tweak",
+    "why": "The loop is seamless (whole cycles; the seam step equals a normal step). But 84.5% of the energy is in a single 1.2 kHz sine with vibrato, so it reads as a test-tone whistle or theremin rather than a sentry motor. A pure tone at 1.2 kHz also cuts through every speaker and can fatigue over a long sentry encounter.",
+    "suggestion": "Keep the seamless whole-cycle design, but add gear texture: a 2.4 kHz harmonic at about 0.2, a 3-5% amplitude ripple at an integer gear-tooth rate (for example 40 Hz), and a faint band-passed noise (1-3 kHz) whose envelope also loops in whole cycles. Drop the fundamental 3 dB."
+   },
+   {
+    "name": "servo_loop10s",
+    "verdict": "tweak",
+    "why": "Tiled 10 s confirms it is seamless. The only issue is timbre: the pure whistle.",
+    "suggestion": "Same harmonic and gear-ripple additions as servo, keeping whole cycles per loop."
+   },
+   {
+    "name": "winch",
+    "verdict": "tweak",
+    "why": "Clicks once per loop: a 0.440 jump against a 0.0032 median step (last 0.375, first -0.066), from the same one-pole filter state restart as hum. Timbre is OK: a 90 Hz saw with a 7 Hz wobble, 50% at 40-100 Hz and 41% at 100-300 Hz.",
+    "suggestion": "Pre-roll the filter one loop as for hum. Add a faint integer-rate (for example 14 Hz) ratchet or tick layer at 1-2 kHz so it reads as a winch on phones."
+   },
+   {
+    "name": "winch_loop10s",
+    "verdict": "tweak",
+    "why": "A click at every 1 s seam in the tiled audition.",
+    "suggestion": "Same filter pre-roll fix as winch."
+   },
+   {
+    "name": "whine",
+    "verdict": "keep",
+    "why": "A clean charge-up: 300 Hz to 1.8 kHz with energy at 300-2000 Hz (97%), so it plays well on phones. It swells toward the end as intended. Starts at 0 and the last sample is -0.0007 after the 10 ms cut, so there is no click. It fits a bolt charging before an arc.",
+    "suggestion": "No change needed. Optionally add a little 2x harmonic in the last 150 ms so the peak feels more electrical before the arc."
+   },
+   {
+    "name": "engineer_plate_1",
+    "verdict": "tweak",
+    "why": "94% of the energy is below 300 Hz (36% at 40-100 Hz, 58% at 100-300 Hz) and only 4% at 300-1000 Hz. The 611 and 1270 Hz plate modes are visible but faint, so on phones a heavy boot on steel plate will be a soft dull pat or vanish. DC is 0.003. Heel and toe timing (about 50 ms) and the clean edges are good.",
+    "suggestion": "Raise the 611 and 1270 Hz plate modes by 8-10 dB with tau of about 40-60 ms, raise the 232 Hz mode a little, shorten the 95 Hz thump tau, and high-pass at 50 Hz with a DC blocker."
+   },
+   {
+    "name": "engineer_plate_2",
+    "verdict": "tweak",
+    "why": "Same balance as variant 1: 93% below 300 Hz, 5% at 300-1000 Hz, RMS -22.2 dBFS. It differs from the others enough in thump weighting.",
+    "suggestion": "Same as engineer_plate_1: lift the plate modes 8-10 dB and high-pass at 50 Hz."
+   },
+   {
+    "name": "engineer_plate_3",
+    "verdict": "tweak",
+    "why": "92% below 300 Hz (67.5% at 100-300 Hz); the plate ring is too weak for small speakers.",
+    "suggestion": "Same as engineer_plate_1."
+   },
+   {
+    "name": "engineer_plate_4",
+    "verdict": "tweak",
+    "why": "93% below 300 Hz; 300-1000 Hz is 5.3%. Same issue as the other plate variants.",
+    "suggestion": "Same as engineer_plate_1."
+   },
+   {
+    "name": "engineer_plate_walk6",
+    "verdict": "tweak",
+    "why": "Per-step peaks are -7.1, -7.4, -8.1, -6.6, -6.0 and -8.9 dB. The jitter and no-repeat pick work and there is no machine-gun effect in level. But the walk centroid is 198 Hz, so on a phone the corridor walk will be nearly silent.",
+    "suggestion": "Re-render after lifting the plate modes. Keep the jitter scheme."
+   },
+   {
+    "name": "engineer_grating_1",
+    "verdict": "keep",
+    "why": "Well balanced for small speakers: 52% at 300-1000 Hz, 23% at 1-2 kHz and 11% at 2-5 kHz, with the thump only about 14%. The ringing bars and rattle give clear 'hollow grate' identity. It ends at 0. The ring tail (t-40 dB about 310 ms) overlaps the next step at a 242 ms cadence, which suits grating.",
+    "suggestion": "No change. Optionally trim bar tau by 15% if a fast run sounds smeared in play."
+   },
+   {
+    "name": "engineer_grating_2",
+    "verdict": "keep",
+    "why": "Same healthy balance as variant 1 (52% at 300-1000 Hz, RMS -22.7 dBFS) with clean edges.",
+    "suggestion": "No change."
+   },
+   {
+    "name": "engineer_grating_3",
+    "verdict": "keep",
+    "why": "Same healthy balance (53% at 300-1000 Hz, RMS -22.3 dBFS).",
+    "suggestion": "No change."
+   },
+   {
+    "name": "engineer_grating_4",
+    "verdict": "keep",
+    "why": "Slightly brighter (29% at 1-2 kHz) and about 1 dB quieter than the others, which is good variety.",
+    "suggestion": "No change."
+   },
+   {
+    "name": "engineer_grating_walk6",
+    "verdict": "keep",
+    "why": "Step peaks are -7.1, -6.0, -6.7, -6.3, -8.1 and -8.3 dB, a natural spread, and the band balance survives the mix. This is the best-translating engineer surface.",
+    "suggestion": "No change."
+   },
+   {
+    "name": "engineer_wet_1",
+    "verdict": "tweak",
+    "why": "81% of the energy is below 300 Hz and only 1.4% at 300-1000 Hz, so the '100-900 Hz squelch' layer is effectively missing. The splash and droplets (13% at 2-5 kHz) are there, so on phones it will sound like a thin hiss-tick rather than a boot in water.",
+    "suggestion": "Raise the squelch layer about 10 dB and centre it at 250-700 Hz with a short (20-40 ms) wobbling band-pass. Cut the 90 Hz thump about 4 dB and high-pass at 50 Hz."
+   },
+   {
+    "name": "engineer_wet_2",
+    "verdict": "tweak",
+    "why": "Even heavier low end (53% at 40-100 Hz) with 1.4% at 300-1000 Hz; the splash is quieter (10% at 2-5 kHz).",
+    "suggestion": "Same as engineer_wet_1."
+   },
+   {
+    "name": "engineer_wet_3",
+    "verdict": "tweak",
+    "why": "Same balance problem: 82% below 300 Hz, 1.4% at 300-1000 Hz.",
+    "suggestion": "Same as engineer_wet_1."
+   },
+   {
+    "name": "engineer_wet_4",
+    "verdict": "tweak",
+    "why": "Same balance problem: 83% below 300 Hz, 1.4% at 300-1000 Hz.",
+    "suggestion": "Same as engineer_wet_1."
+   },
+   {
+    "name": "engineer_wet_walk6",
+    "verdict": "tweak",
+    "why": "Step peaks are -7.1, -6.0, -7.0, -7.2, -7.6 and -8.2 dB, so the jitter is fine. The walk centroid is 452 Hz with a hole in the mids, so wet deck will not read as distinct from plate on small speakers.",
+    "suggestion": "Re-render after the squelch lift."
+   },
+   {
+    "name": "engineer_rubble_1",
+    "verdict": "tweak",
+    "why": "The 75 Hz knock dominates (68% at 40-100 Hz), with a hollow middle (300-1000 Hz only 0.8%) and grit at 1-5 kHz. The spectrogram shows grains as narrow tonal pings (for example an isolated 3.5 kHz ping at 165 ms) rather than broadband crunch, which can sound like tiny bells.",
+    "suggestion": "Add a 200-800 Hz crunch layer (noise bursts, 5-15 ms) about 8 dB up. Make the grit grains band-passed noise (Q 2-4) rather than sines, or shorten them to under 2 ms. High-pass the knock at 50 Hz."
+   },
+   {
+    "name": "engineer_rubble_2",
+    "verdict": "tweak",
+    "why": "Same mid hole: 65% at 40-100 Hz, 1.2% at 300-1000 Hz.",
+    "suggestion": "Same as engineer_rubble_1."
+   },
+   {
+    "name": "engineer_rubble_3",
+    "verdict": "tweak",
+    "why": "Same mid hole: 61% at 40-100 Hz, 1.4% at 300-1000 Hz; the grit is a bit brighter (17.5% at 2-5 kHz).",
+    "suggestion": "Same as engineer_rubble_1."
+   },
+   {
+    "name": "engineer_rubble_4",
+    "verdict": "tweak",
+    "why": "Same mid hole: 60% at 40-100 Hz, 1.5% at 300-1000 Hz.",
+    "suggestion": "Same as engineer_rubble_1."
+   },
+   {
+    "name": "engineer_rubble_walk6",
+    "verdict": "tweak",
+    "why": "Step peaks are -6.0, -7.1, -8.6, -8.5, -6.6 and -8.5 dB, a fine spread. Spectrally it is boom plus grit with no crunch body.",
+    "suggestion": "Re-render after adding the 200-800 Hz crunch."
+   },
+   {
+    "name": "wolf_plate_1",
+    "verdict": "tweak",
+    "why": "Good small-speaker balance (44% at 100-300 Hz, 24% at 300-1000 Hz, 30% above 1 kHz), light and short (t-40 dB about 100 ms), clean edges, and about 2 dB quieter than the engineer, as designed. But the claw lines (3.15/4.72 kHz) and pad modes (523/1347 Hz) sit at identical frequencies in every variant. The walk spectrogram shows six near-identical stacks, so at a 158 ms cadence it risks a machine-gun effect.",
+    "suggestion": "Per variant, randomise the claw frequencies by +/-10%, the number of claw ticks (1-3) and the front/hind level ratio (0.6-1.0), and detune the pad modes by +/-4% on top of the pitch jitter."
+   },
+   {
+    "name": "wolf_plate_2",
+    "verdict": "tweak",
+    "why": "Similar balance (36% at 300-1000 Hz, RMS -22.7 dBFS) with the same fixed claw and pad partials as the other variants.",
+    "suggestion": "Same variant diversification as wolf_plate_1."
+   },
+   {
+    "name": "wolf_plate_3",
+    "verdict": "tweak",
+    "why": "Nearly identical to variant 1 (same band split to within 2%).",
+    "suggestion": "Same as wolf_plate_1."
+   },
+   {
+    "name": "wolf_plate_4",
+    "verdict": "tweak",
+    "why": "Its peak is at 517 Hz instead of 172 Hz, so it is a bit different, but it has the same fixed claw lines.",
+    "suggestion": "Same as wolf_plate_1."
+   },
+   {
+    "name": "wolf_plate_walk6",
+    "verdict": "tweak",
+    "why": "Step peaks are -8.0, -6.0, -9.5, -7.3, -7.3 and -8.4 dB. The level jitter works, but the spectrogram shows six identical horizontal-line stacks; only the pitch jitter separates them.",
+    "suggestion": "Re-render after diversifying the variants."
+   },
+   {
+    "name": "wolf_grating_1",
+    "verdict": "keep",
+    "why": "66% at 300-1000 Hz with the grate ring and a claw catch: reads as metal paws on grating and translates well to small speakers. Clean edges, RMS -23.6 dBFS.",
+    "suggestion": "No change. Optionally randomise the 3.6 kHz claw catch frequency per variant."
+   },
+   {
+    "name": "wolf_grating_2",
+    "verdict": "keep",
+    "why": "Same balance and about 1.5 dB quieter, which is good variety.",
+    "suggestion": "No change."
+   },
+   {
+    "name": "wolf_grating_3",
+    "verdict": "keep",
+    "why": "The most distinct variant (25% at 100-300 Hz, 22% at 2-5 kHz).",
+    "suggestion": "No change."
+   },
+   {
+    "name": "wolf_grating_4",
+    "verdict": "keep",
+    "why": "Healthy balance, consistent with the set.",
+    "suggestion": "No change."
+   },
+   {
+    "name": "wolf_grating_walk6",
+    "verdict": "keep",
+    "why": "Step peaks are -7.1, -6.7, -6.0, -6.9, -6.3 and -6.7 dB, steady, with good mid content.",
+    "suggestion": "No change. Widen the dB jitter slightly if it sounds too even in play."
+   },
+   {
+    "name": "wolf_wet_1",
+    "verdict": "keep",
+    "why": "Light (RMS -25.1 dBFS) and short (t-40 dB about 100 ms), with balanced mids (33% at 300-1000 Hz) and a small splash. It ends fully silent.",
+    "suggestion": "No change. Optionally raise the droplet layer 2-3 dB so it differs more from plate."
+   },
+   {
+    "name": "wolf_wet_2",
+    "verdict": "keep",
+    "why": "Same profile (RMS -24.8 dBFS, 25% at 300-1000 Hz, 14% at 2-5 kHz).",
+    "suggestion": "No change."
+   },
+   {
+    "name": "wolf_wet_3",
+    "verdict": "keep",
+    "why": "Same profile (RMS -23.7 dBFS).",
+    "suggestion": "No change."
+   },
+   {
+    "name": "wolf_wet_4",
+    "verdict": "keep",
+    "why": "Same profile, with more mids (42% at 300-1000 Hz).",
+    "suggestion": "No change."
+   },
+   {
+    "name": "wolf_wet_walk6",
+    "verdict": "keep",
+    "why": "Step peaks are -6.0, -6.4, -8.7, -9.5, -8.4 and -8.1 dB, which is fine.",
+    "suggestion": "No change."
+   },
+   {
+    "name": "wolf_rubble_1",
+    "verdict": "keep",
+    "why": "Balanced (33% at 300-1000 Hz, 21% at 2-5 kHz), short and clean, reads as light grit.",
+    "suggestion": "No change."
+   },
+   {
+    "name": "wolf_rubble_2",
+    "verdict": "tweak",
+    "why": "Fine spectrally, but RMS is -26.1 dBFS against -22.9 for variant 4. A 3.2 dB variant spread plus the +/-2 dB jitter gives about 7 dB step-to-step swings.",
+    "suggestion": "Gain-match the four variants to within 1 dB RMS before jitter, by raising this one about 2 dB."
+   },
+   {
+    "name": "wolf_rubble_3",
+    "verdict": "keep",
+    "why": "Balanced, RMS -25.7 dBFS (slightly quiet; see variant 2).",
+    "suggestion": "Raise about 1.5 dB when gain-matching the set."
+   },
+   {
+    "name": "wolf_rubble_4",
+    "verdict": "keep",
+    "why": "Balanced and the loudest variant at RMS -22.9 dBFS.",
+    "suggestion": "Drop about 1 dB when gain-matching the set."
+   },
+   {
+    "name": "wolf_rubble_walk6",
+    "verdict": "keep",
+    "why": "Step peaks are -6.0, -7.8, -9.3, -6.7, -8.2 and -6.6 dB. The swing is a little wide but acceptable.",
+    "suggestion": "Re-render after gain-matching the variants."
+   },
+   {
+    "name": "corridor_bed10s",
+    "verdict": "keep",
+    "why": "The best of the three beds. The loop wrap step is 0.0011 against a 0.047 median step, and the head and tail 50 ms differ by only 0.6 dB. Level drifts gently within +/-1.5 dB with no dips at the chunk crossfades. Centroid is a steady about 1.2 kHz, the energy is spread across bands (30% at 300-1000 Hz), and the 320 Hz duct band and 175 Hz tone carry it on small speakers.",
+    "suggestion": "No change. Mix it at about -30 dBFS RMS in game and high-pass at 40 Hz to save headroom (1.4% is below 40 Hz)."
+   },
+   {
+    "name": "records_bed10s",
+    "verdict": "tweak",
+    "why": "It is not a 'soft hush'. 76% of the energy is above 2 kHz (36% at 2-5 kHz, 40% above 5 kHz), the hiss is flat to 10 kHz and the centroid is about 4.5 kHz. At peak normalisation it is the loudest bed (RMS -16 dBFS), and this fizz is fatiguing on phone speakers. Seams are fine: the wrap is noise-level, the head and tail match at -17.5 dB, and there are no crossfade dips. The 120/240/360 Hz transformer lines are a good identity.",
+    "suggestion": "Low-pass the hiss with a 2-pole filter at about 3.5 kHz plus a pink tilt, and drop it 10-12 dB against the transformer buzz so the buzz carries the room. Keep the micro-crackle sparse. Target about -32 dBFS RMS in game."
+   },
+   {
+    "name": "junction_bed10s",
+    "verdict": "tweak",
+    "why": "35% of the energy is below 40 Hz and 77% below 100 Hz (centroid 118 Hz). Above about 300 Hz it is about 10 dB below the total, so on phones and laptops the 'big metal drone' collapses to faint partials. The brown rumble also makes the level jump around (100 ms windows swing between 0% and 73% sub-40 Hz content and about +/-3 dB), wastes headroom and adds DC 0.0017. The seam is acceptable: wrap step 0.008, with a 3 dB head/tail difference from the LF swing.",
+    "suggestion": "High-pass at 40 Hz and cut the brown rumble about 10 dB. Soft-saturate the 41 Hz drone so its 82/123/164 Hz harmonics imply the fundamental. Lift the metal partials (137/211/389/523 Hz) and the 660 Hz Q8 band 6-8 dB. Add a slow-beating pair near 260 Hz for size. Re-check with a 100 ms RMS profile."
+   },
+   {
+    "name": "distant_bang",
+    "verdict": "tweak",
+    "why": "Good distance cues (hull modes, reflections at 140 and 310 ms, clean decay to 0, t-40 dB about 1.75 s). But 80% of the energy is below 100 Hz (6.5% below 40 Hz) and the centroid is 69 Hz with a 600 Hz low-pass, so on phones it will be nearly silent. That is a problem for a horror sting meant to make the player look up.",
+    "suggestion": "Add a 150-400 Hz metallic hull-ring layer about 10 dB up, plus a faint 1-2 kHz rattle of loose fittings at about -20 dB in the first 200 ms. High-pass at 35 Hz. Keep the 600 Hz low-pass on the main knock for distance."
+   },
+   {
+    "name": "drip",
+    "verdict": "keep",
+    "why": "90% of the energy is at 1-2 kHz with a rising bubble chirp: crisp, plays everywhere, starts and ends clean, and the quiet repeat at 112 ms adds realism.",
+    "suggestion": "No change. Vary the chirp start and end by +/-15% per trigger in the scheduler."
+   },
+   {
+    "name": "pipe_creak",
+    "verdict": "keep",
+    "why": "The stick-slip train through resonant band-passes spreads across 300 Hz-5 kHz (centroid about 1.5 kHz), swells in and out cleanly (start and end at 0) and reads as stressed metal. That suits the horror tone.",
+    "suggestion": "No change. Randomise the stick-slip rate path per trigger."
+   },
+   {
+    "name": "cooling_tick",
+    "verdict": "keep",
+    "why": "Short, sparse ticks (crest 24 dB) with 82% of the energy at 2-5 kHz. Bright, but the transients are tiny, so they will not fatigue, and they read clearly as cooling metal.",
+    "suggestion": "No change. Play it quietly (about -18 dB) and with random spacing."
+   },
+   {
+    "name": "vent_flutter",
+    "verdict": "keep",
+    "why": "66% of the energy is at 300-1000 Hz with a 980 Hz tin knock per flap: it translates well to small speakers. The falling flap rate gives motion and the edges are clean.",
+    "suggestion": "No change."
+   },
+   {
+    "name": "relay_click",
+    "verdict": "tweak",
+    "why": "The armature click and bounces are good, but 67% of the energy is the 160 ms, 120 Hz coil buzz at 100-300 Hz, which is a pure low tone that phones will mostly drop, leaving only the click.",
+    "suggestion": "Make the buzz a clipped or square 120 Hz (harmonics at 240/360/480 Hz) at about -6 dB, so the 'energised relay' character survives on small speakers."
+   },
+   {
+    "name": "rustle",
+    "verdict": "keep",
+    "why": "Dense 1.2-7 kHz grains in two gestures (centroid 4.8 kHz), with soft swells in and out and clean edges. Paper is naturally bright, and the gestures read as handling.",
+    "suggestion": "No change. Optionally shelve down above 6 kHz by 2-3 dB for phone harshness."
+   },
+   {
+    "name": "clack",
+    "verdict": "keep",
+    "why": "Insert click then a louder seat click 45-60 ms later, with 46% of the energy at 1-2 kHz plus a 260 Hz body: an unmistakable cartridge seat that plays on any speaker. Clean edges.",
+    "suggestion": "No change."
+   },
+   {
+    "name": "clink",
+    "verdict": "keep",
+    "why": "Free-bar inharmonic modes from 1.1 kHz with natural decay (t-40 dB about 680 ms) and two detuned bounces: a convincing metal tag. Ends at 0.",
+    "suggestion": "No change."
+   },
+   {
+    "name": "ratchet",
+    "verdict": "keep",
+    "why": "Six evenly spaced pawl clicks with modes rising 2% per tick, which gives tension. 58% of the energy is at 2-5 kHz, but the clicks are short (crest 21 dB).",
+    "suggestion": "No change. Add +/-5 ms timing jitter per tick so it reads less mechanical-perfect."
+   }
+  ],
+  "overall": "I judged all 69 clips from measurements, not by ear. A stdlib Python analyser checked RMS, crest, DC, start and end samples, the loop wrap step, head versus tail 50 ms, the band split and a 100 ms time profile for the beds. I also inspected the PNGs. Nothing is hard-clipped (0 samples at full scale), and DC is negligible everywhere except current thud (0.010) and a small offset in the footsteps and the Junction bed (about 0.002-0.004).\n\nFive recurring problems:\n\n1. **Small speakers.** The bank leans heavily on sub-100 Hz content that phone and laptop speakers cannot play. Affected clips: thud (99% at 40-100 Hz), boom (90% below 100 Hz), growl, distant_bang, junction_bed (35% below 40 Hz), and the engineer plate, wet and rubble steps, which are over 80% below 300 Hz with a 300-1000 Hz hole. The fix in each recipe is to high-pass at 35-50 Hz, saturate the lows so their harmonics imply the fundamental, and add a 200-1000 Hz body layer. Thud needs a full redo because its fail-beat role must be audible.\n\n2. **Loop seams.** hum and winch click every loop because the one-pole low-pass state restarts at 0 (jumps of 0.567 and 0.440). Pre-rolling the filter for one loop fixes both. The 0.5 s hiss is click-free but audibly repeats twice a second, so it should use the chunked crossfade method the drafts already use. servo and all three draft beds are seamless.\n\n3. **Truncated tails.** boom, small_boom, clank and thud end on non-zero samples, which shows as end clicks in the spectrograms. They need 10-50 ms fades. All the draft one-shots start and end at exactly 0, which is good.\n\n4. **Peak normalisation.** Normalising everything to -6 dBFS peak gives a 17 dB RMS spread: klaxon is at -9 dBFS RMS, while arc and the ticks are at -27 to -30. Either normalise by RMS or short-term loudness, or compensate at the call sites. The klaxon, a near-pure 880 Hz beep at -4 dB, will be the loudest thing in the game.\n\n5. **Variety and beds.** WOLF's plate paws use identical claw and pad partials in every variant, so the walk spectrogram shows six identical stacks and only the pitch jitter separates them; the frequencies should be randomised per variant. The wolf_rubble variants need gain-matching (3.2 dB spread). Among the beds, corridor is ready. Records is a bright 4.5 kHz-centroid fizz rather than a hush and needs a low-pass with the hiss dropped under the transformer buzz. Junction needs its rumble swapped for audible metal partials.\n\nThe grating steps for both characters, all WOLF wet and rubble steps, the evidence-case set (rustle, clack, clink, ratchet), drip, pipe_creak, cooling_tick, vent_flutter and whine are keep. The walk renders confirm the no-repeat pick and the +/-6% pitch and +/-2 dB jitter behave: per-step peaks spread about 2-3 dB.\n\nNone of this has been listened to, so any keep is provisional until someone hears the clips on a laptop and a phone. The measurement scripts are in /private/tmp/claude-501/-Users-nathanialhenniges-Developer-mrdemonwolf-wolf-override/eb713cd4-8931-48d7-8c83-5b0b0d1e9cf3/scratchpad/critic (an.py, with results in m.json). The repository was not touched."
+ }
+}

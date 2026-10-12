@@ -1,0 +1,10 @@
+DOCUMENT VALIDATION — REVISION 4
+PASS: 14 required documentation/provenance files are nonempty UTF-8.
+PASS: Asset manifest parses as JSON; no game assets falsely listed.
+PASS: Relative Markdown links resolve and fenced blocks are balanced.
+PASS: Core documents retain all three endings with provisional status.
+PASS: Route-test checkboxes remain unchecked.
+PASS: No project.godot or playable game is supplied.
+PASS: ZIP integrity checked after creation.
+These are documentation checks only. No Godot, graphical, export, device,
+TTS or game-route tests were executed. No repository/settings sync occurred.

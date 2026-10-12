@@ -1,0 +1,138 @@
+{
+ "eng-idle": {
+  "src": "frames/eng-idle",
+  "n": 8,
+  "cell": [
+   256,
+   320
+  ],
+  "specks_removed": [
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0
+  ],
+  "opaque_height_median": 277.0,
+  "opaque_length_median": 73.0
+ },
+ "eng-walk": {
+  "src": "frames/eng-walk",
+  "n": 12,
+  "cell": [
+   256,
+   320
+  ],
+  "specks_removed": [
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0
+  ],
+  "opaque_height_median": 264.5,
+  "opaque_length_median": 137.5
+ },
+ "eng-jog": {
+  "src": "frames/eng-jog",
+  "n": 12,
+  "cell": [
+   256,
+   320
+  ],
+  "specks_removed": [
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0
+  ],
+  "opaque_height_median": 267.5,
+  "opaque_length_median": 183.0
+ },
+ "wolf-idle": {
+  "src": "frames/wolf-idle-v3",
+  "n": 8,
+  "cell": [
+   512,
+   272
+  ],
+  "specks_removed": [
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0
+  ],
+  "opaque_height_median": 240.0,
+  "opaque_length_median": 441.0
+ },
+ "wolf-walk": {
+  "src": "frames/wolf-walk-G4",
+  "n": 12,
+  "cell": [
+   512,
+   272
+  ],
+  "specks_removed": [
+   0,
+   1,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0
+  ],
+  "opaque_height_median": 231.0,
+  "opaque_length_median": 435.0
+ },
+ "wolf-trot": {
+  "src": "frames/wolf-trot",
+  "n": 12,
+  "cell": [
+   512,
+   272
+  ],
+  "specks_removed": [
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0
+  ],
+  "opaque_height_median": 233.0,
+  "opaque_length_median": 440.0
+ }
+}

@@ -2,12 +2,11 @@
 /node_modules/
 .DS_Store
 
-# Internal Revision 4 design and handoff files live in Notion.
-/PRIVATE_AGENTS.md
-/PROJECT_CONTEXT.md
-/CHATGPT_PROJECT_INSTRUCTIONS.md
-/CODEX_HANDOFF.md
-/PROJECT_INSTRUCTIONS.txt
-/PACKAGE_VALIDATION.txt
-/docs/
 /*.zip
+
+# Design notes and research are tracked; leave out their tool caches, run logs and
+# downloaded third-party documents (the notes link to those instead).
+__pycache__/
+*.pyc
+/docs/**/*.log
+/docs/**/dl/

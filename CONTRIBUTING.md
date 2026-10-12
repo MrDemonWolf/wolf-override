@@ -96,12 +96,11 @@ invent credits for people, music or tools that were not involved.
 
 ## Private story material
 
-Detailed story drafts, future plot decisions and private planning notes
-live outside this repository (`PRIVATE_AGENTS.md`, `PROJECT_CONTEXT.md`,
-`docs/next-session.md` and private notes are ignored locally). Never
-commit them, quote them in public docs, issues, pull requests or build
-output, or copy spoiler-heavy material into agent files. Public copy
-describes what is playable today.
+Detailed story drafts, future plot decisions and planning notes live in
+`PRIVATE_AGENTS.md`, `PROJECT_CONTEXT.md` and under `docs/`. They are
+tracked in this repository, so they contain spoilers. Keep that material
+out of the website, in-game text and build output; public copy describes
+what is playable today.
 
 ## Credit
 

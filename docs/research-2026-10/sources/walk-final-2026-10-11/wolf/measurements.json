@@ -1,0 +1,212 @@
+{
+ "wolf-idle": {
+  "source": "frames/wolf-idle-v3-graded",
+  "frames": 8,
+  "game_scale_1080p": 0.7029,
+  "anchor_drift": {
+   "head": {
+    "max_cell": 5.77,
+    "mean_cell": 1.86,
+    "seam_cell": 1.05,
+    "max_game1080": 4.06
+   },
+   "withers": {
+    "max_cell": 0.67,
+    "mean_cell": 0.36,
+    "seam_cell": 0.21,
+    "max_game1080": 0.47
+   },
+   "flank": {
+    "max_cell": 1.53,
+    "mean_cell": 0.81,
+    "seam_cell": 0.03,
+    "max_game1080": 1.08
+   },
+   "croup": {
+    "max_cell": 1.17,
+    "mean_cell": 0.46,
+    "seam_cell": 0.16,
+    "max_game1080": 0.82
+   }
+  },
+  "foot_slide_guide_aware_cell": {
+   "max": 0.21,
+   "p90": 0.02,
+   "mean": 0.02,
+   "max_game1080": 0.15
+  },
+  "foot_slide_guide_free_cell": {
+   "max": 0.0,
+   "p90": 0.0,
+   "mean": 0.0,
+   "max_game1080": 0.0
+  },
+  "contact_gap_max_px": 15,
+  "loop_seam": {
+   "iou_last_first": 0.9744,
+   "mean_consecutive_iou": 0.9456,
+   "min_consecutive_iou": 0.9052
+  },
+  "opaque_height_px": {
+   "min": 239,
+   "max": 241
+  },
+  "height_cv": 0.0042,
+  "edge_colour": {
+   "mean_ab_shift": 11.79,
+   "mean_da": -3.67,
+   "mean_db": -4.16,
+   "note": "mean a*b* difference of semi-transparent edge pixels from the opaque ring 2-4 px inside; negative db = toward blue/cyan, positive da = toward magenta"
+  },
+  "magenta_spill_share_of_edge_px": 0.0,
+  "playback": {
+   "frames": 8,
+   "fps": null,
+   "loop_s": 3.15,
+   "world_speed_px_s": 0,
+   "ground_cell_px_per_frame": null,
+   "game_scale": 0.7029,
+   "size_game": null
+  }
+ },
+ "wolf-walk": {
+  "source": "frames/wolf-walk-v3-graded",
+  "frames": 12,
+  "game_scale_1080p": 0.7029,
+  "anchor_drift": {
+   "head": {
+    "max_cell": 2.04,
+    "mean_cell": 0.47,
+    "seam_cell": 0.28,
+    "max_game1080": 1.43
+   },
+   "withers": {
+    "max_cell": 2.55,
+    "mean_cell": 0.99,
+    "seam_cell": 1.46,
+    "max_game1080": 1.79
+   },
+   "flank": {
+    "max_cell": 0.55,
+    "mean_cell": 0.33,
+    "seam_cell": 0.36,
+    "max_game1080": 0.39
+   },
+   "croup": {
+    "max_cell": 2.2,
+    "mean_cell": 0.9,
+    "seam_cell": 1.77,
+    "max_game1080": 1.55
+   }
+  },
+  "foot_slide_guide_aware_cell": {
+   "max": 3.0,
+   "p90": 2.1,
+   "mean": 0.54,
+   "max_game1080": 2.11
+  },
+  "foot_slide_guide_free_cell": {
+   "max": 1.55,
+   "p90": 1.49,
+   "mean": 0.54,
+   "max_game1080": 1.09
+  },
+  "contact_gap_max_px": 3,
+  "loop_seam": {
+   "iou_last_first": 0.6909,
+   "mean_consecutive_iou": 0.6928,
+   "min_consecutive_iou": 0.6141
+  },
+  "opaque_height_px": {
+   "min": 225,
+   "max": 235
+  },
+  "height_cv": 0.0128,
+  "edge_colour": {
+   "mean_ab_shift": 11.52,
+   "mean_da": -5.02,
+   "mean_db": -2.56,
+   "note": "mean a*b* difference of semi-transparent edge pixels from the opaque ring 2-4 px inside; negative db = toward blue/cyan, positive da = toward magenta"
+  },
+  "magenta_spill_share_of_edge_px": 0.0001,
+  "playback": {
+   "frames": 12,
+   "fps": 19.76,
+   "loop_s": 0.607,
+   "world_speed_px_s": 80.0,
+   "ground_cell_px_per_frame": 15.552,
+   "game_scale": 0.7029,
+   "size_game": null
+  }
+ },
+ "wolf-trot": {
+  "source": "frames/wolf-trot-v7-graded",
+  "frames": 12,
+  "game_scale_1080p": 0.7029,
+  "anchor_drift": {
+   "head": {
+    "max_cell": 1.06,
+    "mean_cell": 0.36,
+    "seam_cell": 1.06,
+    "max_game1080": 0.75
+   },
+   "withers": {
+    "max_cell": 2.92,
+    "mean_cell": 1.27,
+    "seam_cell": 1.61,
+    "max_game1080": 2.05
+   },
+   "flank": {
+    "max_cell": 0.44,
+    "mean_cell": 0.26,
+    "seam_cell": 0.19,
+    "max_game1080": 0.31
+   },
+   "croup": {
+    "max_cell": 2.61,
+    "mean_cell": 1.28,
+    "seam_cell": 1.94,
+    "max_game1080": 1.83
+   }
+  },
+  "foot_slide_guide_aware_cell": {
+   "max": 1.16,
+   "p90": 0.28,
+   "mean": 0.14,
+   "max_game1080": 0.82
+  },
+  "foot_slide_guide_free_cell": {
+   "max": 4.07,
+   "p90": 3.5,
+   "mean": 1.22,
+   "max_game1080": 2.86
+  },
+  "contact_gap_max_px": 3,
+  "loop_seam": {
+   "iou_last_first": 0.6425,
+   "mean_consecutive_iou": 0.6867,
+   "min_consecutive_iou": 0.6238
+  },
+  "opaque_height_px": {
+   "min": 229,
+   "max": 237
+  },
+  "height_cv": 0.0098,
+  "edge_colour": {
+   "mean_ab_shift": 11.51,
+   "mean_da": -4.89,
+   "mean_db": -3.1,
+   "note": "mean a*b* difference of semi-transparent edge pixels from the opaque ring 2-4 px inside; negative db = toward blue/cyan, positive da = toward magenta"
+  },
+  "magenta_spill_share_of_edge_px": 0.0001,
+  "playback": {
+   "frames": 12,
+   "fps": 29.83,
+   "loop_s": 0.402,
+   "world_speed_px_s": 190.0,
+   "ground_cell_px_per_frame": 24.467,
+   "game_scale": 0.7029,
+   "size_game": null
+  }
+ }
+}

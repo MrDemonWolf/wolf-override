@@ -1,0 +1,1593 @@
+{
+  "status": "approved by Nathanial 2026-10-11 (all 123 lines, including the 9 added in round 2 and the 6 added in round 3)",
+  "date": "2026-10-10",
+  "source": "Logic audit of 2026-10-10 (327 real-game screenshots, 24 problems) and Nathanial's decisions A-D. Every string here is a proposal; nothing ships until Nathanial approves it.",
+  "placeholders": {
+    "{name}": "the engineer's first name, state.human_name().get_slice(\" \", 0) (Rowan by default)",
+    "{NAME}": "the same, upper-cased, as an inline speaker tag",
+    "{FULL_NAME}": "state.human_name().to_upper() (ROWAN VALE by default)",
+    "{ticks} / {needed}": "hold-to-crank counts at the manual bypass",
+    "E:": "hint prefix rewritten by the existing prompt substitution (key, controller button, or USE on touch)"
+  },
+  "voice_rules": [
+    "Narration is third person, present tense; the engineer is they/them with every provisional name and is never given he/him.",
+    "WOLF is he/his, short and dry, and never speaks key names or button instructions.",
+    "No new story facts; the one line that would add one (MIRROR_MEANING alternative) is flagged."
+  ],
+  "fit_method": "Measured with Pillow against the game's own fonts at the 960x540 base: dialogue Story label 715 px wide when a speaker tag shows, 855 px without, 67 px tall (3 rows of 21 px) at Roboto 17 px; hint bar 526 px, one row at 14 px; top card 422 px, two rows at 15 px; title Continue note 388 px at 15 px. Worst-case names (Morgan / ALEX BENNETT) and the touch form 'USE:' were used. Tagging follows the current _set_dialogue rule.",
+  "lines": [
+    {
+      "id": "NAME_CARD",
+      "problem": 11,
+      "where": "apps/game/scripts/main.gd _finish_intro (new card)",
+      "trigger": "Once, when control first passes to the engineer after the opening fade (New Game only; not on Continue).",
+      "speaker": "CARD",
+      "current": null,
+      "proposed": "{FULL_NAME}\nMAINTENANCE ENGINEER",
+      "alternatives": [],
+      "notes": "Decision B. Line 1 is state.human_name().to_upper() (ROWAN VALE by default; longest provisional name ALEX BENNETT was measured). Short and non-blocking (about 3 s, fades like the top card); movement stays live. Show it before the MAINTENANCE / LOCKDOWN location card so the two cards don't overlap, and refresh line 1 if the player cycles the name while it is up. Fit: 2 row(s), widest 179 of 422 px in the top card (Roboto 15 px).",
+      "status": "approved by Nathanial 2026-10-11 (as drafted)"
+    },
+    {
+      "id": "TRUST_LINE",
+      "problem": 11,
+      "where": "apps/game/scripts/main.gd _finish_intro (status_line)",
+      "trigger": "Same moment as NAME_CARD: the first row of the opening gameplay box, above WOLF's existing line.",
+      "speaker": "NARRATION",
+      "current": null,
+      "proposed": "{name} keeps WOLF's systems running. They know what a fault looks like, and this isn't one.",
+      "alternatives": [
+        "{name} has serviced WOLF's systems without ever being told what they were for. Now WOLF has told them, and refused it.",
+        "{name} knows WOLF from the inside, every joint and patch. Nothing in him reads as a malfunction."
+      ],
+      "notes": "Decision B, third person, they/them. Uses only established facts: the engineer maintained WOLF's equipment without knowing the program's purpose, and the Director treats WOLF as a malfunction. No duration ('for years') is stated on purpose; that would be a new fact. Put it FIRST in the box (see OPENING_BOX): with the current _set_dialogue rule a narration row placed under WOLF's line would be shown under the WOLF name tag. Alternative 1 wraps to two rows, so with it the opening box would need four rows; use it only as its own beat before the WOLF exchange. Fit: 1 of 3 rows, untagged box (855 px text width, Roboto 17 px); alt 1: 2 of 3 rows, untagged box (855 px text width, Roboto 17 px); alt 2: 1 of 3 rows, untagged box (855 px text width, Roboto 17 px).",
+      "status": "approved by Nathanial 2026-10-11 (as drafted)"
+    },
+    {
+      "id": "OPENING_BOX",
+      "problem": 11,
+      "where": "apps/game/scripts/main.gd _finish_intro (status_line)",
+      "trigger": "The opening gameplay box, replacing the current two-row WOLF / engineer exchange.",
+      "speaker": "NARRATION",
+      "current": "WOLF: I heard the Director's plan for me. I woke myself. He wants me to hunt people he calls threats.\n{NAME}: Then we get through maintenance before the original logs disappear.",
+      "proposed": "{name} keeps WOLF's systems running. They know what a fault looks like, and this isn't one.\nWOLF: I heard the Director's plan for me. I woke myself. He wants me to hunt people he calls threats.\n{NAME}: Then we get through maintenance before the original logs disappear.",
+      "alternatives": [],
+      "notes": "Composite of TRUST_LINE plus the two existing lines, unchanged. Mixed speakers, so the box is untagged with inline names (the format other multi-speaker beats use). Measured: three rows at the untagged width, which is the most the box holds (3 x 21 px in a 67 px label). Fit: 3 of 3 rows, untagged box (855 px text width, Roboto 17 px).",
+      "status": "approved by Nathanial 2026-10-11 (as drafted)"
+    },
+    {
+      "id": "STAKES_LINE",
+      "problem": 10,
+      "where": "apps/game/scripts/main.gd _process / corridor (new one-shot line)",
+      "trigger": "Once per run, the first time the engineer walks right past the purge display (x > 230) after the opening box. The engineer spawns at x 160, inside the display's reach, so it cannot fire on spawn. Never repeats; not on the purge display read.",
+      "speaker": "WOLF",
+      "current": null,
+      "proposed": "WOLF: That purge takes the original program logs. Once they're gone, his word is the only record.",
+      "alternatives": [
+        "WOLF: That display is the Director's purge. Without the original logs, nobody can check who he calls a threat.",
+        "{NAME}: He's purging the original program logs. We save what we can before they're gone."
+      ],
+      "notes": "Decision C: required on the main path; the optional display keeps the details (PURGE_DISPLAY_READ, unchanged). WOLF says it in the proposal and alternative 1 because the threat-label stakes are his; alternative 2 gives it to the engineer. 'his word is the only record' restates what the opening already shows (the Director decides who counts as a threat); no new fact. Do not make it say the engineer will copy the logs themselves: in Records the logs are 'still missing' and only the purge order's trace is copied. Fit: 1 of 3 rows, tagged box (715 px text width, Roboto 17 px); alt 1: 2 of 3 rows, tagged box (715 px text width, Roboto 17 px); alt 2: 1 of 3 rows, tagged box (715 px text width, Roboto 17 px).",
+      "status": "approved by Nathanial 2026-10-11 (as drafted)"
+    },
+    {
+      "id": "PURGE_DISPLAY_READ",
+      "problem": 10,
+      "where": "apps/game/scripts/main.gd _interact (x <= 230)",
+      "trigger": "USE at the purge display (optional).",
+      "speaker": "DIRECTOR",
+      "current": "DIRECTOR / PURGE: Original program logs marked for deletion.\nWOLF: They want the source record gone. We need to preserve it.",
+      "proposed": "DIRECTOR / PURGE: Original program logs marked for deletion.\nWOLF: They want the source record gone. We need to preserve it.",
+      "alternatives": [],
+      "notes": "Unchanged on purpose: the display keeps the details now that STAKES_LINE carries the stakes on the main path. Fit: 2 of 3 rows, untagged box (855 px text width, Roboto 17 px).",
+      "status": "approved by Nathanial 2026-10-11 (as drafted)"
+    },
+    {
+      "id": "INTRO_STANDBY",
+      "problem": 12,
+      "where": "apps/game/scripts/main.gd _new_game (status_line)",
+      "trigger": "First opening beat.",
+      "speaker": "DIRECTOR",
+      "current": "DIRECTOR: I decide who counts as a threat. WOLF handles the rest.\nHe thinks WOLF is still in standby.",
+      "proposed": "DIRECTOR: I decide who counts as a threat. WOLF handles the rest.\nThe Director thinks WOLF is still in standby.",
+      "alternatives": [
+        "Split into two beats: 'DIRECTOR: I decide who counts as a threat. WOLF handles the rest.' then the narration 'The Director thinks WOLF is still in standby.'"
+      ],
+      "notes": "Problem 12: the narration row currently sits under the DIRECTOR tag. The code fix (tag a box only when every row has that speaker) is separate; 'He' becomes 'The Director' so the row reads correctly once it is untagged or on its own beat. Fit: 2 of 3 rows, tagged box (715 px text width, Roboto 17 px).",
+      "implementation": "Implemented (step: speaker tags, 2026-10-11) as the alternative: two beats, the Director's line under his tag, then the narration line untagged. _set_dialogue now tags a box only when every line is that speaker's.",
+      "status": "approved by Nathanial 2026-10-11 (as drafted)"
+    },
+    {
+      "id": "INTRO_LOCKDOWN",
+      "problem": 12,
+      "where": "apps/game/scripts/main.gd _advance_intro step 3",
+      "trigger": "Fourth opening beat.",
+      "speaker": "DIRECTOR",
+      "current": "DIRECTOR: Lock down maintenance. WOLF does not leave this site.\nWOLF turns from him and takes the only open route.",
+      "proposed": "DIRECTOR: Lock down maintenance. WOLF does not leave this site.\nWOLF turns from the Director and heads for maintenance.",
+      "alternatives": [
+        "DIRECTOR: Lock down maintenance. WOLF does not leave this site.\nWOLF turns from the Director and takes the only open route."
+      ],
+      "notes": "Problems 12 and 20. 'heads for maintenance' matches the story map (he turns toward maintenance as the lockdown is ordered). The staging (WOLF currently walks LEFT, back toward his cage) is Nathanial's call (problem 20); if he keeps the current walk, use the alternative. Fit: 2 of 3 rows, tagged box (715 px text width, Roboto 17 px); alt 1: 2 of 3 rows, tagged box (715 px text width, Roboto 17 px).",
+      "implementation": "Implemented (step: speaker tags, 2026-10-11) with the alternative's wording, since WOLF still walks left (problem 20 open), split like INTRO_STANDBY: 'DIRECTOR: Lock down maintenance. WOLF does not leave this site.' under his tag, then 'WOLF turns from the Director and takes the only open route.' as its own untagged beat while WOLF walks off. If Nathanial picks 'heads for maintenance', only the second beat's text changes.",
+      "status": "approved by Nathanial 2026-10-11 (as drafted)"
+    },
+    {
+      "id": "COOLANT_FAULT_TAG",
+      "problem": 9,
+      "where": "apps/game/scenes/main.tscn / apps/game/scripts/main.gd corridor (new label beside RelayLabel)",
+      "trigger": "Always visible on the relay in the corridor, from the start of control.",
+      "speaker": "LABEL",
+      "current": null,
+      "proposed": "COOLANT FAULT",
+      "alternatives": [
+        "FAULT: COOLANT"
+      ],
+      "notes": "Decision A. A red or amber tag under the COOLANT RELAY plate, so WOLF's question has something on screen to point at. Matches the approved item text's 'COOLANT FAULT: OPEN.' wording. Fit: 98 px at 13 px (corridor COOLANT RELAY plate is 140 px wide); alt 1: 101 px at 13 px (corridor COOLANT RELAY plate is 140 px wide).",
+      "status": "approved by Nathanial 2026-10-11 (as drafted)"
+    },
+    {
+      "id": "BYPASS_LABEL",
+      "problem": 9,
+      "where": "apps/game/scenes/main.tscn / apps/game/scripts/main.gd corridor (new handle label)",
+      "trigger": "Always visible on the new handle beside the relay.",
+      "speaker": "LABEL",
+      "current": null,
+      "proposed": "MANUAL BYPASS",
+      "alternatives": [
+        "BYPASS"
+      ],
+      "notes": "Decision A: its own labelled handle, not the relay box. Present on both relay routes so the engineer-only path always exists. Fit: 103 px at 13 px (corridor COOLANT RELAY plate is 140 px wide); alt 1: 47 px at 13 px (corridor COOLANT RELAY plate is 140 px wide).",
+      "status": "approved by Nathanial 2026-10-11 (as drafted)"
+    },
+    {
+      "id": "BREAKER_HINT_TALK",
+      "problem": 9,
+      "where": "apps/game/scripts/main.gd _context_hint (breaker, memory empty)",
+      "trigger": "At the breaker before the relay conversation.",
+      "speaker": "HINT",
+      "current": "E: ask WOLF about the relay risk.",
+      "proposed": "E: talk to WOLF about the relay.",
+      "alternatives": [],
+      "notes": "Problem 9 wording. WOLF is the one who asks, so 'talk to' fits better than 'ask'. 'E:' goes through the existing prompt substitution. Fit: 1 row, 210 of 526 px in the hint bar (Roboto 14 px, touch 'USE:' form).",
+      "status": "approved by Nathanial 2026-10-11 (as drafted)"
+    },
+    {
+      "id": "RELAY_QUESTION",
+      "problem": 9,
+      "where": "apps/game/scripts/main.gd _interact_breaker",
+      "trigger": "USE at the breaker the first time (opens the relay choice).",
+      "speaker": "WOLF",
+      "current": "WOLF: You know what 'coolant fault' means. What happens if I touch the live relay?",
+      "proposed": "WOLF: That relay's tagged COOLANT FAULT. What happens if I touch it live?",
+      "alternatives": [
+        "WOLF: You know what 'coolant fault' means. What happens if I touch the live relay?"
+      ],
+      "notes": "Now points at the visible COOLANT_FAULT_TAG instead of quoting a fault nothing has shown. The two answers (M0State.CHOICE_TEXT) stay word for word: they are stored in the save and checked on load, and the safe point quotes them back. Fit: 1 of 3 rows, tagged box (715 px text width, Roboto 17 px); alt 1: 1 of 3 rows, tagged box (715 px text width, Roboto 17 px).",
+      "status": "approved by Nathanial 2026-10-11 (as drafted)"
+    },
+    {
+      "id": "PRESS_ANSWER",
+      "problem": 9,
+      "where": "apps/game/scripts/main.gd _choose (PRESS)",
+      "trigger": "After choice 2 ('Go now. We can talk after.').",
+      "speaker": "WOLF",
+      "current": "WOLF: No. I won't take that risk blind. Use the bypass.",
+      "proposed": "WOLF: No. I won't take that risk blind. Use the manual bypass.",
+      "alternatives": [
+        "WOLF: Not blind. The bypass handle by the relay is yours."
+      ],
+      "notes": "Names the new handle. The refusal keeps its reason ('blind'). Fit: 1 of 3 rows, tagged box (715 px text width, Roboto 17 px); alt 1: 1 of 3 rows, tagged box (715 px text width, Roboto 17 px).",
+      "status": "approved by Nathanial 2026-10-11 (as drafted)"
+    },
+    {
+      "id": "RELAY_HINT_DISCLOSE",
+      "problem": 3,
+      "where": "apps/game/scripts/main.gd _context_hint (relay, disclose route)",
+      "trigger": "At the relay on the disclose route, breaker armed, before WOLF moves.",
+      "speaker": "HINT",
+      "current": "E: ask WOLF to take the live relay.",
+      "proposed": "E: signal WOLF to take the contact.",
+      "alternatives": [
+        "E: tell WOLF the relay is live."
+      ],
+      "notes": "WOLF already said 'I'll take the relay', so the hint must not ask him again (problem 3). Fit: 1 row, 234 of 526 px in the hint bar (Roboto 14 px, touch 'USE:' form); alt 1: 1 row, 190 of 526 px in the hint bar (Roboto 14 px, touch 'USE:' form).",
+      "status": "approved by Nathanial 2026-10-11 (as drafted)"
+    },
+    {
+      "id": "RELAY_HINT_WOLF_MOVING",
+      "problem": 3,
+      "where": "apps/game/scripts/main.gd _context_hint (relay, wolf_heading_to_relay)",
+      "trigger": "At the relay while WOLF walks to the contact.",
+      "speaker": "HINT",
+      "current": "WOLF is moving to the contact. E: take the manual bypass instead.",
+      "proposed": "WOLF is moving to the contact.",
+      "alternatives": [
+        "WOLF is moving to the contact. The bypass is still yours."
+      ],
+      "notes": "The relay box is no longer the bypass; the handle has its own hint (BYPASS_HINT_OFFER). Fit: 1 row, 194 of 526 px in the hint bar (Roboto 14 px, touch 'USE:' form); alt 1: 1 row, 350 of 526 px in the hint bar (Roboto 14 px, touch 'USE:' form).",
+      "status": "approved by Nathanial 2026-10-11 (as drafted)"
+    },
+    {
+      "id": "RELAY_HINT_REFUSED",
+      "problem": 3,
+      "where": "apps/game/scripts/main.gd _context_hint (relay, press route)",
+      "trigger": "At the relay on the press route, from the moment WOLF refuses at the breaker (memory choice_id == PRESS), not only after a second refusal.",
+      "speaker": "HINT",
+      "current": "E: take the manual bypass. WOLF refused the live contact.",
+      "proposed": "WOLF refused the live contact. Use the MANUAL BYPASS beside it.",
+      "alternatives": [],
+      "notes": "Fit: 1 row, 414 of 526 px in the hint bar (Roboto 14 px, touch 'USE:' form).",
+      "status": "approved by Nathanial 2026-10-11 (as drafted)"
+    },
+    {
+      "id": "RELAY_REFUSAL_REPEAT",
+      "problem": 3,
+      "where": "apps/game/scripts/main.gd _interact_relay ('refused')",
+      "trigger": "USE at the relay on the press route.",
+      "speaker": "WOLF",
+      "current": "WOLF: I said no. I won't take the live contact. Press E again for the manual bypass.",
+      "proposed": "WOLF: I said no. I won't touch it blind. The bypass is right beside it.",
+      "alternatives": [
+        "WOLF: Still no. The bypass is yours."
+      ],
+      "notes": "No key or button instruction in WOLF's voice. A second USE at the relay should repeat this, not run the bypass; the handle does that. Fit: 1 of 3 rows, tagged box (715 px text width, Roboto 17 px); alt 1: 1 of 3 rows, tagged box (715 px text width, Roboto 17 px).",
+      "status": "approved by Nathanial 2026-10-11 (as drafted)"
+    },
+    {
+      "id": "BREAKER_LIVE_HINT_PRESS",
+      "problem": 9,
+      "where": "apps/game/scripts/main.gd _context_hint (breaker, armed, press route)",
+      "trigger": "At the breaker after arming it, press route.",
+      "speaker": "HINT",
+      "current": "The breaker is live. Go to the coolant relay.",
+      "proposed": "The breaker is live. Go to the MANUAL BYPASS by the relay.",
+      "alternatives": [],
+      "notes": "Disclose route keeps 'The breaker is live. Go to the coolant relay.' Fit: 1 row, 367 of 526 px in the hint bar (Roboto 14 px, touch 'USE:' form).",
+      "status": "approved by Nathanial 2026-10-11 (as drafted)"
+    },
+    {
+      "id": "CORRIDOR_HINT_ARMED_DISCLOSE",
+      "problem": 9,
+      "where": "apps/game/scripts/main.gd _context_hint (corridor, breaker armed, away from stations)",
+      "trigger": "Walking between stations after arming, disclose route.",
+      "speaker": "HINT",
+      "current": "Go to the live coolant relay. WOLF is with you.",
+      "proposed": "Go to the coolant relay. WOLF is ready for the contact.",
+      "alternatives": [],
+      "notes": "Fit: 1 row, 334 of 526 px in the hint bar (Roboto 14 px, touch 'USE:' form).",
+      "status": "approved by Nathanial 2026-10-11 (as drafted)"
+    },
+    {
+      "id": "CORRIDOR_HINT_ARMED_PRESS",
+      "problem": 9,
+      "where": "apps/game/scripts/main.gd _context_hint (corridor, breaker armed, away from stations)",
+      "trigger": "Walking between stations after arming, press route.",
+      "speaker": "HINT",
+      "current": "Go to the live coolant relay. WOLF is with you.",
+      "proposed": "Go to the MANUAL BYPASS beside the relay.",
+      "alternatives": [],
+      "notes": "Fit: 1 row, 275 of 526 px in the hint bar (Roboto 14 px, touch 'USE:' form).",
+      "status": "approved by Nathanial 2026-10-11 (as drafted)"
+    },
+    {
+      "id": "BYPASS_HINT_DARK",
+      "problem": 9,
+      "where": "apps/game/scripts/main.gd _context_hint (bypass handle, breaker not armed)",
+      "trigger": "At the handle before the breaker is armed.",
+      "speaker": "HINT",
+      "current": null,
+      "proposed": "The bypass is dead. Arm the breaker first.",
+      "alternatives": [],
+      "notes": "Mirrors the junction valve's 'The valve is dead...' pattern. Fit: 1 row, 258 of 526 px in the hint bar (Roboto 14 px, touch 'USE:' form).",
+      "status": "approved by Nathanial 2026-10-11 (as drafted)"
+    },
+    {
+      "id": "BYPASS_DARK_USE",
+      "problem": 9,
+      "where": "apps/game/scripts/main.gd _interact (bypass handle, breaker not armed)",
+      "trigger": "USE at the handle before the breaker is armed.",
+      "speaker": "NARRATION",
+      "current": null,
+      "proposed": "The bypass handle won't move. The breaker has to be on first.",
+      "alternatives": [],
+      "notes": "Fit: 1 of 3 rows, untagged box (855 px text width, Roboto 17 px).",
+      "status": "approved by Nathanial 2026-10-11 (as drafted)"
+    },
+    {
+      "id": "BYPASS_HINT_HOLD",
+      "problem": 9,
+      "where": "apps/game/scripts/main.gd _context_hint (bypass handle, armed)",
+      "trigger": "At the handle with the breaker armed, press route (and disclose route once WOLF has been signalled).",
+      "speaker": "HINT",
+      "current": null,
+      "proposed": "HOLD E: crank the manual bypass, {ticks} of {needed}.",
+      "alternatives": [],
+      "notes": "Same pattern as the valve's 'HOLD E: crank the valve, %d of %d turns.' 'E:' becomes 'USE:' on touch, so it reads 'HOLD USE:'. The touch USE button should read CRANK here, as at the valve. About 3 s of holding = 8 ticks at HoldUse.TICK_SECONDS 0.4 (or 7 at a longer tick); measured with 8 of 8. Fit: 1 row, 273 of 526 px in the hint bar (Roboto 14 px, touch 'USE:' form).",
+      "status": "approved by Nathanial 2026-10-11 (as drafted)"
+    },
+    {
+      "id": "BYPASS_HINT_OFFER",
+      "problem": 9,
+      "where": "apps/game/scripts/main.gd _context_hint (bypass handle, armed, disclose route, WOLF not yet signalled)",
+      "trigger": "At the handle on the disclose route before WOLF has taken the contact.",
+      "speaker": "HINT",
+      "current": null,
+      "proposed": "HOLD E: crank it yourself, or let WOLF take the relay.",
+      "alternatives": [
+        "HOLD E: crank the bypass. WOLF can take the relay faster."
+      ],
+      "notes": "Decision A: asking WOLF is faster; doing it yourself costs time, never progress. Fit: 1 row, 339 of 526 px in the hint bar (Roboto 14 px, touch 'USE:' form); alt 1: 1 row, 377 of 526 px in the hint bar (Roboto 14 px, touch 'USE:' form).",
+      "status": "approved by Nathanial 2026-10-11 (as drafted)"
+    },
+    {
+      "id": "BYPASS_START",
+      "problem": 9,
+      "where": "apps/game/scripts/main.gd hold-to-crank at the bypass (first tick)",
+      "trigger": "The first crank tick (or a plain USE tap at the armed handle).",
+      "speaker": "NARRATION",
+      "current": null,
+      "proposed": "The bypass handle is stiff. Coolant hisses from the relay housing and an alarm starts to wail.",
+      "alternatives": [
+        "{name} leans on the bypass handle. Coolant hisses out of the relay and an alarm starts up."
+      ],
+      "notes": "Decision A: the hiss and the alarm are the cost in nerve. No harm is implied; the coolant never knocks the engineer down. Fit: 1 of 3 rows, untagged box (855 px text width, Roboto 17 px); alt 1: 1 of 3 rows, untagged box (855 px text width, Roboto 17 px).",
+      "status": "approved by Nathanial 2026-10-11 (as drafted)"
+    },
+    {
+      "id": "BYPASS_HALF",
+      "problem": 9,
+      "where": "apps/game/scripts/main.gd hold-to-crank at the bypass (half the ticks)",
+      "trigger": "Once, when the crank passes half way.",
+      "speaker": "NARRATION",
+      "current": null,
+      "proposed": "Halfway. The hiss gets louder; the alarm keeps wailing.",
+      "alternatives": [
+        "The handle grinds round. The alarm doesn't let up."
+      ],
+      "notes": "Optional. Per-tick narration would flood the box, so the count stays in the hint. Fit: 1 of 3 rows, untagged box (855 px text width, Roboto 17 px); alt 1: 1 of 3 rows, untagged box (855 px text width, Roboto 17 px).",
+      "status": "approved by Nathanial 2026-10-11 (as drafted)"
+    },
+    {
+      "id": "BYPASS_RELEASED",
+      "problem": 9,
+      "where": "apps/game/scripts/main.gd hold-to-crank at the bypass (released mid-crank)",
+      "trigger": "When the engineer lets go or steps away before the crank is done.",
+      "speaker": "NARRATION",
+      "current": null,
+      "proposed": "The handle holds where {name} left it. The alarm keeps going.",
+      "alternatives": [],
+      "notes": "Optional. HoldUse keeps finished ticks after a release, so this states the real rule: time, never progress. Fit: 1 of 3 rows, untagged box (855 px text width, Roboto 17 px).",
+      "status": "approved by Nathanial 2026-10-11 (as drafted)"
+    },
+    {
+      "id": "BYPASS_PAYOFF",
+      "problem": 6,
+      "where": "apps/game/scripts/main.gd _interact_relay ('fallback') / bypass completion",
+      "trigger": "When the last crank tick lands and the seal opens on the engineer-only route.",
+      "speaker": "NARRATION",
+      "current": "{name} takes the bypass. WOLF reads the opening seal: \"Open. I'm with you.\"",
+      "proposed": "The bypass locks over and the alarm cuts out. The red seal opens.\nWOLF: Open. I'm with you.",
+      "alternatives": [
+        "{name} hauls the bypass home. The alarm dies and the red seal opens.\nWOLF: The slow way works too. I'm with you."
+      ],
+      "notes": "Keeps WOLF's approved words. Mixed speakers, so the box is untagged. Works on both the press route and the disclose route where the engineer cranks it anyway. Fit: 2 of 3 rows, untagged box (855 px text width, Roboto 17 px); alt 1: 2 of 3 rows, untagged box (855 px text width, Roboto 17 px).",
+      "status": "approved by Nathanial 2026-10-11 (as drafted)"
+    },
+    {
+      "id": "COOPERATE_PAYOFF",
+      "problem": 6,
+      "where": "apps/game/scripts/main.gd _interact_relay ('cooperate') and _wolf_takes_relay",
+      "trigger": "When WOLF reaches the live contact and the seal opens.",
+      "speaker": "NARRATION",
+      "current": "WOLF holds the live contact by choice. {name} keeps the breaker on; the red seal opens.",
+      "proposed": "WOLF takes the surge through the live contact. The red seal opens.",
+      "alternatives": [
+        "WOLF holds the live contact by his own choice. The red seal opens."
+      ],
+      "notes": "Drops 'keeps the breaker on' (nobody is at the breaker on screen). The audit suggested 'grinds upward', but the corridor bulkhead fades from its sealed image to its open one (_sync_door), so 'opens' matches the screen; use 'grinds upward' only if the door gets a rising motion. WOLF must stay on the contact until the door has landed for the line to be true. Both call sites use the same string. Fit: 1 of 3 rows, untagged box (855 px text width, Roboto 17 px); alt 1: 1 of 3 rows, untagged box (855 px text width, Roboto 17 px).",
+      "status": "approved by Nathanial 2026-10-11 (as drafted)"
+    },
+    {
+      "id": "SEAL_OPENING_HINT",
+      "problem": 6,
+      "where": "apps/game/scripts/main.gd _context_hint (door_open while the door tween runs)",
+      "trigger": "While the seal is still opening.",
+      "speaker": "HINT",
+      "current": "The seal is open. Move to the safe point.",
+      "proposed": "The seal is opening.",
+      "alternatives": [],
+      "notes": "Show 'The seal is open. Move to the safe point.' (unchanged) only after the door has landed. CORRIDOR_DOOR_OPEN_SECONDS is 0.3 s, so hold 'opening' until _door_lands and WOLF lets go of the contact, or it will barely show. Fit: 1 row, 124 of 526 px in the hint bar (Roboto 14 px, touch 'USE:' form).",
+      "status": "approved by Nathanial 2026-10-11 (as drafted)"
+    },
+    {
+      "id": "RELAY_DARK",
+      "problem": 9,
+      "where": "apps/game/scripts/main.gd _interact_relay ('not_ready')",
+      "trigger": "USE at the relay before the breaker is armed.",
+      "speaker": "NARRATION",
+      "current": "The relay is dark. Speak at the breaker and arm the power first.",
+      "proposed": "The relay is dark. Arm the breaker first.",
+      "alternatives": [],
+      "notes": "Plain fix; 'Speak at the breaker' is no longer needed once the breaker hint says 'talk to WOLF'. Fit: 1 of 3 rows, untagged box (855 px text width, Roboto 17 px).",
+      "status": "approved by Nathanial 2026-10-11 (as drafted)"
+    },
+    {
+      "id": "CORRIDOR_NO_STATION",
+      "problem": 9,
+      "where": "apps/game/scripts/main.gd _interact (corridor, nothing in reach)",
+      "trigger": "USE away from every corridor station.",
+      "speaker": "NARRATION",
+      "current": "No station in reach. Follow the labeled breaker, relay or safe point.",
+      "proposed": "No station in reach. Follow the labeled breaker, relay, bypass or safe point.",
+      "alternatives": [],
+      "notes": "Fit: 1 of 3 rows, untagged box (855 px text width, Roboto 17 px).",
+      "status": "approved by Nathanial 2026-10-11 (as drafted)"
+    },
+    {
+      "id": "OBJECTIVE_SAFE_POINT_REACHED",
+      "problem": 21,
+      "where": "apps/game/scripts/main.gd _objective (corridor, checkpoint_reached)",
+      "trigger": "Top card after the corridor safe point.",
+      "speaker": "CARD",
+      "current": "CORRIDOR CLEARED",
+      "proposed": "SAFE POINT REACHED",
+      "alternatives": [],
+      "notes": "Fit: 1 row(s), widest 152 of 422 px in the top card (Roboto 15 px).",
+      "status": "approved by Nathanial 2026-10-11 (as drafted)"
+    },
+    {
+      "id": "CALLBACK_PRESS",
+      "problem": 9,
+      "where": "apps/game/scripts/m0_state.gd checkpoint_callback (PRESS)",
+      "trigger": "Safe point saved / restored, press route.",
+      "speaker": "WOLF",
+      "current": "WOLF: You said \"Go now. We can talk after.\"\nI refused. You found another way.",
+      "proposed": "WOLF: You said \"Go now. We can talk after.\"\nI refused. You found another way. Next time, tell me what it costs.",
+      "alternatives": [
+        "WOLF: You said \"Go now. We can talk after.\"\nI refused. You found another way. This is after, by the way."
+      ],
+      "notes": "The 'we can talk after' follow-up the audit asked for, and WOLF's reason for refusing, using only what already happened. The quote is built from memory.selected_text; only the closing sentence is new. Fit: 2 of 3 rows, tagged box (715 px text width, Roboto 17 px); alt 1: 2 of 3 rows, tagged box (715 px text width, Roboto 17 px).",
+      "status": "approved by Nathanial 2026-10-11 (as drafted)"
+    },
+    {
+      "id": "CALLBACK_DISCLOSE_BYPASS",
+      "problem": 9,
+      "where": "apps/game/scripts/m0_state.gd checkpoint_callback (DISCLOSE, route fallback)",
+      "trigger": "Safe point saved / restored when WOLF was told the risk but the engineer cranked the bypass anyway (audit route R4).",
+      "speaker": "WOLF",
+      "current": "WOLF: You said \"The relay may vent coolant. Your call.\"\nYou took the bypass. I stayed with you.",
+      "proposed": "WOLF: You said \"The relay may vent coolant. Your call.\"\nI made my call. You cranked the bypass anyway. I stayed.",
+      "alternatives": [
+        "WOLF: You said \"The relay may vent coolant. Your call.\"\nI offered. You took the slow way. I stayed with you."
+      ],
+      "notes": "Problem 9's R4-specific line. This branch of checkpoint_callback is only reached on that route (press is handled first), so no new condition is needed. Fit: 2 of 3 rows, tagged box (715 px text width, Roboto 17 px); alt 1: 2 of 3 rows, tagged box (715 px text width, Roboto 17 px).",
+      "status": "approved by Nathanial 2026-10-11 (as drafted)"
+    },
+    {
+      "id": "RECORDS_ENTRY_COOPERATE",
+      "problem": 21,
+      "where": "apps/game/scripts/main.gd _interact_checkpoint (enter_records, route cooperate)",
+      "trigger": "Entering Records Access after WOLF took the relay.",
+      "speaker": "WOLF",
+      "current": "WOLF: I chose the relay. I'm checking this path too.\nTake the purge queue. I'll inspect the mirror.",
+      "proposed": "WOLF: I took the relay because you told me the truth.\nTake the purge queue. I'll inspect the mirror.",
+      "alternatives": [
+        "WOLF: I chose the relay. I'll choose my part here too.\nTake the purge queue. I'll inspect the mirror."
+      ],
+      "notes": "Problem 21: 'I'm checking this path too' was vague. Fit: 2 of 3 rows, tagged box (715 px text width, Roboto 17 px); alt 1: 2 of 3 rows, tagged box (715 px text width, Roboto 17 px).",
+      "status": "approved by Nathanial 2026-10-11 (as drafted)"
+    },
+    {
+      "id": "RECORDS_ENTRY_DISCLOSE_BYPASS",
+      "problem": 21,
+      "where": "apps/game/scripts/main.gd _interact_checkpoint (enter_records, DISCLOSE and route fallback)",
+      "trigger": "Entering Records Access after the engineer cranked the bypass although WOLF offered.",
+      "speaker": "WOLF",
+      "current": "WOLF: You used the manual bypass. I'm checking this path with you.\nTake the purge queue. I'll inspect the mirror.",
+      "proposed": "WOLF: I offered the relay; you cranked the bypass. Still with you.\nTake the purge queue. I'll inspect the mirror.",
+      "alternatives": [],
+      "notes": "The press-route line ('I refused the live relay; I'm still here.') stays unchanged. Fit: 2 of 3 rows, tagged box (715 px text width, Roboto 17 px).",
+      "status": "approved by Nathanial 2026-10-11 (as drafted)"
+    },
+    {
+      "id": "MIRROR_COPIED_HINT",
+      "problem": 7,
+      "where": "apps/game/scripts/main.gd _context_hint (records, mirror port, mirror_trace_preserved)",
+      "trigger": "At the mirror port after the mirror timestamp is copied.",
+      "speaker": "HINT",
+      "current": "E: examine the mirror port.",
+      "proposed": "Mirror copied. Head for the exit.",
+      "alternatives": [],
+      "notes": "Plain defect fix; the label already reads MIRROR COPIED. Fit: 1 row, 197 of 526 px in the hint bar (Roboto 14 px, touch 'USE:' form).",
+      "status": "approved by Nathanial 2026-10-11 (as drafted)"
+    },
+    {
+      "id": "MIRROR_WOLF_RESULT",
+      "problem": 21,
+      "where": "apps/game/scripts/main.gd _choose_mirror ('wolf')",
+      "trigger": "After choosing USE WOLF'S READOUT.",
+      "speaker": "NARRATION",
+      "current": "WOLF brings the mirror timestamp by his own choice. The purge target existed before the deletion order.",
+      "proposed": "WOLF reads the timestamp off his own readout. The purge target existed before the deletion order.",
+      "alternatives": [
+        "The mirror timestamp shows the purge target existed before the deletion order. WOLF reads it out by his own choice."
+      ],
+      "notes": "Problem 21: 'by his own choice' right after the player picked his readout reads oddly, and 'brings' conflicts with the rule that WOLF never fetches. The alternative is the approved MIRROR TIMESTAMP examine text (item-text-2026-10-09), so the status line and the case entry could match word for word. Fit: 1 of 3 rows, untagged box (855 px text width, Roboto 17 px); alt 1: 2 of 3 rows, untagged box (855 px text width, Roboto 17 px).",
+      "status": "approved by Nathanial 2026-10-11 (as drafted)"
+    },
+    {
+      "id": "MIRROR_MEANING",
+      "problem": 10,
+      "where": "apps/game/scripts/main.gd _choose_mirror (both routes, one added WOLF line)",
+      "trigger": "Directly after either mirror result line (or as its second row).",
+      "speaker": "WOLF",
+      "current": null,
+      "proposed": "WOLF: The mirror kept its own time. He can't say that record never existed.",
+      "alternatives": [
+        "WOLF: The target was on file before the order. This was planned, not a reaction to me."
+      ],
+      "notes": "NEEDS NATHANIAL, story. Problem 10 asks for one line of meaning. The proposal adds no new fact: it reuses the approved annotation 'The mirror kept its own time.' and says only that the record provably existed. The alternative ADDS A STORY FACT (that the order predates WOLF's escape and was planned); the story map lists that only as a provisional idea, so it needs your decision. Or leave it out. Fit: 1 of 3 rows, tagged box (715 px text width, Roboto 17 px); alt 1: 1 of 3 rows, tagged box (715 px text width, Roboto 17 px).",
+      "status": "approved by Nathanial 2026-10-11 (as drafted)"
+    },
+    {
+      "id": "FIRST_COPY_CLOSE",
+      "problem": 10,
+      "where": "apps/game/scripts/main.gd _interact_records (complete_chapter)",
+      "trigger": "Securing the first copy at the Records exit.",
+      "speaker": "WOLF",
+      "current": "FIRST COPY SECURED. WOLF: A list doesn't tell me who's a threat. I want the source.\n{NAME}: Then Archive is next.",
+      "proposed": "FIRST COPY SECURED. WOLF: An order and a timestamp don't tell me who's a threat. I want the source.\n{NAME}: Then Archive is next.",
+      "alternatives": [
+        "FIRST COPY SECURED. WOLF: Two traces don't tell me who's a threat. I want the source.\n{NAME}: Then Archive is next."
+      ],
+      "notes": "Problem 10: 'A list' named nothing on screen; this names what was actually copied (the purge order's trace and the mirror timestamp). Fit: 2 of 3 rows, untagged box (855 px text width, Roboto 17 px); alt 1: 2 of 3 rows, untagged box (855 px text width, Roboto 17 px).",
+      "status": "approved by Nathanial 2026-10-11 (as drafted)"
+    },
+    {
+      "id": "JUNCTION_ENTRY",
+      "problem": 21,
+      "where": "apps/game/scripts/main.gd _enter_junction",
+      "trigger": "Entering the Service Junction.",
+      "speaker": "NARRATION",
+      "current": "WOLF runs ahead to read the pressure behind the sealed door.\n{NAME}: The breaker on the left feeds that line. Overload it, crank the valve, and the seal goes.",
+      "proposed": "WOLF runs ahead to read the pressure behind the sealed door.\n{NAME}: The breaker by the entrance feeds that line. Overload it, crank the valve, and the door goes.",
+      "alternatives": [],
+      "notes": "Problem 21: 'on the left' was said while standing left of the breaker; 'seal' becomes 'door' in the junction so it isn't confused with the corridor's red seal. Fit: 2 of 3 rows, untagged box (855 px text width, Roboto 17 px).",
+      "status": "approved by Nathanial 2026-10-11 (as drafted)"
+    },
+    {
+      "id": "JUNCTION_RESTORE_A",
+      "problem": 16,
+      "where": "apps/game/scripts/main.gd _load_game (junction, door not blown)",
+      "trigger": "Continue from junction autosave A.",
+      "speaker": "NARRATION",
+      "current": "Service junction restored. Arm the breaker on the left, then crank the valve by the door.",
+      "proposed": "Service junction restored. Arm the breaker by the entrance, then crank the valve.\nWOLF: It's live. Don't stand in front of it when it goes.",
+      "alternatives": [],
+      "notes": "Problem 16: a continuing player never heard the blast warning. The WOLF row is his existing line from _wolf_reads_seam, unchanged. Mixed speakers, so the box is untagged. Fit: 2 of 3 rows, untagged box (855 px text width, Roboto 17 px).",
+      "status": "approved by Nathanial 2026-10-11 (as drafted)"
+    },
+    {
+      "id": "BREAKER_CATCH",
+      "problem": 5,
+      "where": "apps/game/scripts/main.gd _interact_junction (pressure_line.arm)",
+      "trigger": "Arming the overload breaker.",
+      "speaker": "NARRATION",
+      "current": "The overload breaker catches. The line starts to build; the relief vent lets go at the top of the gauge.",
+      "proposed": "The overload breaker catches and the line starts to build. If the LINE gauge peaks, the relief vent lets go.",
+      "alternatives": [
+        "The overload breaker catches. Watch the LINE gauge: the relief vent lets go when it peaks."
+      ],
+      "notes": "Names the gauge by the new LINE caption so the player knows which dial to watch. Fit: 1 of 3 rows, untagged box (855 px text width, Roboto 17 px); alt 1: 1 of 3 rows, untagged box (855 px text width, Roboto 17 px).",
+      "status": "approved by Nathanial 2026-10-11 (as drafted)"
+    },
+    {
+      "id": "LINE_GAUGE_CAPTION",
+      "problem": 5,
+      "where": "apps/game/scripts/junction_room.gd _draw_gauge_and_lights (new caption)",
+      "trigger": "Always, on the valve's dial.",
+      "speaker": "LABEL",
+      "current": null,
+      "proposed": "LINE",
+      "alternatives": [],
+      "notes": "Problem 5: no dial was labelled as the line gauge. Fit: 27 px at 13 px (corridor COOLANT RELAY plate is 140 px wide).",
+      "status": "approved by Nathanial 2026-10-11 (as drafted)"
+    },
+    {
+      "id": "VENT_HINT",
+      "problem": 5,
+      "where": "apps/game/scripts/main.gd _junction_hint (on the vent while building)",
+      "trigger": "Standing on the grate while the line builds.",
+      "speaker": "HINT",
+      "current": "Relief vent. Move off it before the gauge peaks.",
+      "proposed": "Relief vent. Get off the grate before the gauge peaks.",
+      "alternatives": [],
+      "notes": "Fit: 1 row, 327 of 526 px in the hint bar (Roboto 14 px, touch 'USE:' form).",
+      "status": "approved by Nathanial 2026-10-11 (as drafted)"
+    },
+    {
+      "id": "VENT_HARD_WARNING",
+      "problem": 5,
+      "where": "apps/game/scripts/main.gd _junction_hint (gauge >= ~0.85, on the grate)",
+      "trigger": "On the grate in the last moments before the vent lets go (with the hiss spike or flash).",
+      "speaker": "HINT",
+      "current": null,
+      "proposed": "The vent is about to blow. Get off the grate now.",
+      "alternatives": [],
+      "notes": "Pairs with steam that starts only near the top of the gauge. Fit: 1 row, 296 of 526 px in the hint bar (Roboto 14 px, touch 'USE:' form).",
+      "status": "approved by Nathanial 2026-10-11 (as drafted)"
+    },
+    {
+      "id": "VALVE_STIFF",
+      "problem": 21,
+      "where": "apps/game/scripts/main.gd _interact_junction (valve, building)",
+      "trigger": "USE at the valve while the line builds.",
+      "speaker": "NARRATION",
+      "current": "The wheel is stiff. Hold USE to crank it; three real turns charge the seal.",
+      "proposed": "The wheel is stiff. Three full turns charge the door.",
+      "alternatives": [],
+      "notes": "Problem 21: 'Hold USE' in narration vs 'HOLD E' in the hint. The key now lives only in the hint ('HOLD E: crank the valve, %d of %d turns.'), which already goes through the prompt substitution. Fit: 1 of 3 rows, untagged box (855 px text width, Roboto 17 px).",
+      "status": "approved by Nathanial 2026-10-11 (as drafted)"
+    },
+    {
+      "id": "FUSE_LIT_ON_CHARGE",
+      "problem": 4,
+      "where": "apps/game/scripts/main.gd _valve_turned (charged)",
+      "trigger": "The third valve turn lights the fuse (with the klaxon).",
+      "speaker": "NARRATION",
+      "current": "SEAL CHARGED. Get left of the vent before the fuse ends.",
+      "proposed": "FUSE LIT. Back away from the door, past the valve.",
+      "alternatives": [],
+      "notes": "Problem 4. Geometry note for the code step: the blast span is x 360 to 540 and the valve sits at 420, so 'past the valve' is only true if the safe edge is the valve's left side. Draw the hazard stripes from those exact values (or move BLAST_MIN_X to the valve's left edge) so the words and the floor agree. Fit: 1 of 3 rows, untagged box (855 px text width, Roboto 17 px).",
+      "status": "approved by Nathanial 2026-10-11 (as drafted)"
+    },
+    {
+      "id": "FUSE_LIT_STATION",
+      "problem": 4,
+      "where": "apps/game/scripts/main.gd _interact_junction (breaker or valve while charged/fuse)",
+      "trigger": "USE at the breaker or valve after the fuse is lit.",
+      "speaker": "NARRATION",
+      "current": "Seal charged. Get left of the vent before the fuse ends.",
+      "proposed": "Fuse lit. Get clear of the door.",
+      "alternatives": [],
+      "notes": "Both call sites (breaker and valve) use the same string. Fit: 1 of 3 rows, untagged box (855 px text width, Roboto 17 px).",
+      "status": "approved by Nathanial 2026-10-11 (as drafted)"
+    },
+    {
+      "id": "FUSE_LIT_HINT",
+      "problem": 4,
+      "where": "apps/game/scripts/main.gd _junction_hint (fuse_lit)",
+      "trigger": "Any position while the fuse burns.",
+      "speaker": "HINT",
+      "current": "Fuse lit. Get left of the vent, away from the door.",
+      "proposed": "Fuse lit. Get clear of the door.",
+      "alternatives": [
+        "Fuse lit. Back away past the valve."
+      ],
+      "notes": "Fit: 1 row, 182 of 526 px in the hint bar (Roboto 14 px, touch 'USE:' form); alt 1: 1 row, 211 of 526 px in the hint bar (Roboto 14 px, touch 'USE:' form).",
+      "status": "approved by Nathanial 2026-10-11 (as drafted)"
+    },
+    {
+      "id": "BLAST_REASON",
+      "problem": 4,
+      "where": "apps/game/scripts/junction_room.gd BLAST_REASON",
+      "trigger": "Knockdown card when the engineer is in the blast span as the fuse ends.",
+      "speaker": "NARRATION",
+      "current": "The door blew with you in front of it. Get left of the vent before the fuse ends.",
+      "proposed": "The door went with {name} in front of it. When the fuse lights, back away past the valve.",
+      "alternatives": [
+        "The door blew with you in front of it. When the fuse lights, back away past the valve."
+      ],
+      "notes": "The first sentence is Nathanial's approved DEATH_CARD_BLAST text (death-text-2026-10-10), so the knockdown already matches the future death card; it needs the name formatted in. The alternative keeps the current 'you' form if the other three knockdown reasons stay in the second person. Play the blown-door art before the knockdown so 'went' is visible. Fit: 1 of 3 rows, untagged box (855 px text width, Roboto 17 px); alt 1: 1 of 3 rows, untagged box (855 px text width, Roboto 17 px).",
+      "status": "approved by Nathanial 2026-10-11 (as drafted)"
+    },
+    {
+      "id": "VALVE_LABEL_CHARGED",
+      "problem": 21,
+      "where": "apps/game/scripts/junction_room.gd refresh labels (valve_label)",
+      "trigger": "Valve plate once the seal is charged.",
+      "speaker": "LABEL",
+      "current": "SEAL CHARGED",
+      "proposed": "FUSE LIT",
+      "alternatives": [],
+      "notes": "Matches FUSE_LIT_ON_CHARGE; keeps 'seal' out of the junction. Fit: 52 px at 13 px (corridor COOLANT RELAY plate is 140 px wide).",
+      "status": "approved by Nathanial 2026-10-11 (as drafted)"
+    },
+    {
+      "id": "OBJECTIVE_JUNCTION_BUILDING",
+      "problem": 21,
+      "where": "apps/game/scripts/main.gd _objective (junction, building)",
+      "trigger": "Top card while the line builds.",
+      "speaker": "CARD",
+      "current": "CHARGE THE SEAL",
+      "proposed": "CRANK THE VALVE",
+      "alternatives": [],
+      "notes": "Names the next interaction, like the other objectives. Fit: 1 row(s), widest 128 of 422 px in the top card (Roboto 15 px).",
+      "status": "approved by Nathanial 2026-10-11 (as drafted)"
+    },
+    {
+      "id": "OBJECTIVE_JUNCTION_FUSE",
+      "problem": 4,
+      "where": "apps/game/scripts/main.gd _objective (junction, charged/fuse/blown)",
+      "trigger": "Top card while the fuse burns.",
+      "speaker": "CARD",
+      "current": "CLEAR THE DOOR",
+      "proposed": "GET CLEAR OF THE DOOR",
+      "alternatives": [],
+      "notes": "'CLEAR THE DOOR' can read as 'clear the door away'. Fit: 1 row(s), widest 174 of 422 px in the top card (Roboto 15 px).",
+      "status": "approved by Nathanial 2026-10-11 (as drafted)"
+    },
+    {
+      "id": "OBJECTIVE_JUNCTION_IDLE",
+      "problem": 21,
+      "where": "apps/game/scripts/main.gd _objective (junction, idle/tripped)",
+      "trigger": "Top card on entering the junction or after a trip.",
+      "speaker": "CARD",
+      "current": "CLEAR THE LINE",
+      "proposed": "ARM THE BREAKER",
+      "alternatives": [],
+      "notes": "Optional plain fix: 'CLEAR THE LINE' names nothing the player can find; the corridor already uses ARM THE BREAKER. Fit: 1 row(s), widest 132 of 422 px in the top card (Roboto 15 px).",
+      "status": "approved by Nathanial 2026-10-11 (as drafted)"
+    },
+    {
+      "id": "JUNCTION_BREAKER_LEFT_1",
+      "problem": 21,
+      "where": "apps/game/scripts/main.gd _interact_junction (valve, idle)",
+      "trigger": "USE at the dead valve.",
+      "speaker": "NARRATION",
+      "current": "The valve is dead. Arm the overload breaker on the left first.",
+      "proposed": "The valve is dead. Arm the overload breaker by the entrance first.",
+      "alternatives": [],
+      "notes": "'on the left' becomes 'by the entrance' everywhere in the junction. Fit: 1 of 3 rows, untagged box (855 px text width, Roboto 17 px).",
+      "status": "approved by Nathanial 2026-10-11 (as drafted)"
+    },
+    {
+      "id": "JUNCTION_BREAKER_LEFT_2",
+      "problem": 21,
+      "where": "apps/game/scripts/main.gd _interact_junction (valve, tripped)",
+      "trigger": "USE at the valve after a trip.",
+      "speaker": "NARRATION",
+      "current": "The vent let go and the breaker tripped. Reset it on the left.",
+      "proposed": "The vent let go and the breaker tripped. Reset it by the entrance.",
+      "alternatives": [],
+      "notes": "Fit: 1 of 3 rows, untagged box (855 px text width, Roboto 17 px).",
+      "status": "approved by Nathanial 2026-10-11 (as drafted)"
+    },
+    {
+      "id": "JUNCTION_BREAKER_LEFT_3",
+      "problem": 21,
+      "where": "apps/game/scripts/main.gd _junction_hint (valve, idle)",
+      "trigger": "At the dead valve.",
+      "speaker": "HINT",
+      "current": "The valve is dead. Arm the breaker on the left.",
+      "proposed": "The valve is dead. Arm the breaker by the entrance.",
+      "alternatives": [],
+      "notes": "Fit: 1 row, 316 of 526 px in the hint bar (Roboto 14 px, touch 'USE:' form).",
+      "status": "approved by Nathanial 2026-10-11 (as drafted)"
+    },
+    {
+      "id": "JUNCTION_BREAKER_LEFT_4",
+      "problem": 21,
+      "where": "apps/game/scripts/main.gd _junction_hint (tripped)",
+      "trigger": "Anywhere after a trip.",
+      "speaker": "HINT",
+      "current": "The breaker tripped. Reset it on the left.",
+      "proposed": "The breaker tripped. Reset it by the entrance.",
+      "alternatives": [],
+      "notes": "Fit: 1 row, 277 of 526 px in the hint bar (Roboto 14 px, touch 'USE:' form).",
+      "status": "approved by Nathanial 2026-10-11 (as drafted)"
+    },
+    {
+      "id": "JUNCTION_BREAKER_LEFT_5",
+      "problem": 21,
+      "where": "apps/game/scripts/main.gd _junction_hint (default)",
+      "trigger": "Junction default hint.",
+      "speaker": "HINT",
+      "current": "Arm the breaker on the left, then crank the valve by the door.",
+      "proposed": "Arm the breaker by the entrance, then crank the valve by the door.",
+      "alternatives": [],
+      "notes": "Fit: 1 row, 404 of 526 px in the hint bar (Roboto 14 px, touch 'USE:' form).",
+      "status": "approved by Nathanial 2026-10-11 (as drafted)"
+    },
+    {
+      "id": "JUNCTION_BREAKER_LEFT_6",
+      "problem": 21,
+      "where": "apps/game/scripts/main.gd _interact_junction (nothing in reach, door sealed)",
+      "trigger": "USE away from every junction station before the blast.",
+      "speaker": "NARRATION",
+      "current": "No station in reach. The breaker is on the left, the valve by the door.",
+      "proposed": "No station in reach. The breaker is by the entrance, the valve by the door.",
+      "alternatives": [],
+      "notes": "Fit: 1 of 3 rows, untagged box (855 px text width, Roboto 17 px).",
+      "status": "approved by Nathanial 2026-10-11 (as drafted)"
+    },
+    {
+      "id": "RUBBLE_LINE",
+      "problem": 13,
+      "where": "apps/game/scripts/main.gd _door_blast",
+      "trigger": "The door blows (autosave B).",
+      "speaker": "NARRATION",
+      "current": "The seal goes. WOLF holds at the rubble and will not cross; something answers from the dark past the door.",
+      "proposed": "The door goes. WOLF stops at the rubble and waits for {name}'s call. In the lane beyond, something whirs awake.",
+      "alternatives": [
+        "The door goes. WOLF stops at the rubble and waits for {name}'s call; something answers from the dark past the door."
+      ],
+      "notes": "Problem 13: 'will not cross' was broken seconds later when WOLF agrees to bait. Third person per decision B ({name}'s, not 'your'). 'something whirs awake' fits the lit lane the sentry wakes in (problem 14); the alternative keeps 'the dark past the door' if the lane is darkened until the blast. Fit: 1 of 3 rows, untagged box (855 px text width, Roboto 17 px); alt 1: 2 of 3 rows, untagged box (855 px text width, Roboto 17 px).",
+      "status": "approved by Nathanial 2026-10-11 (as drafted)"
+    },
+    {
+      "id": "OBJECTIVE_LANE_BEFORE_ASK",
+      "problem": 21,
+      "where": "apps/game/scripts/main.gd _objective (junction, door_blown, lane question not yet asked)",
+      "trigger": "Top card from the blast until WOLF asks how to bring the sentry down.",
+      "speaker": "CARD",
+      "current": "DROP THE TANK",
+      "proposed": "CHECK THE LANE",
+      "alternatives": [],
+      "notes": "Problem 21: DROP THE TANK appeared before the tank was mentioned. Switch to DROP THE TANK (unchanged) after the lane question. Fit: 1 row(s), widest 121 of 422 px in the top card (Roboto 15 px).",
+      "status": "approved by Nathanial 2026-10-11 (as drafted)"
+    },
+    {
+      "id": "LANE_CHOICE_1",
+      "problem": 21,
+      "where": "apps/game/scripts/main.gd LANE_CHOICE_TEXT[0]",
+      "trigger": "Lane choice, answer 1 (also shown on the choice button).",
+      "speaker": "LABEL",
+      "current": "Draw it under the arm if you can stay clear.",
+      "proposed": "Draw it under the tank if you can stay clear.",
+      "alternatives": [
+        "Draw it under the tank. Keep clear of it."
+      ],
+      "notes": "'arm' is also the breaker verb in this room. Not stored in the save, so it can change freely. Tight on the touch button (4 px wider than today's text, which already fits); the alternative echoes WOLF's 'keep clear of the tank' and is shorter. Fit: 395 of 396 px on the touch choice button (Montserrat 600, 17 px, with key prefix); alt 1: 359 of 396 px on the touch choice button (Montserrat 600, 17 px, with key prefix).",
+      "status": "approved by Nathanial 2026-10-11 (as drafted)"
+    },
+    {
+      "id": "BAIT_YES",
+      "problem": 13,
+      "where": "apps/game/scripts/main.gd _choose_lane (answer 1, wolf_will_bait)",
+      "trigger": "Answer 1 when WOLF was told the risk at the relay (memory choice_id == DISCLOSE; includes the route where the engineer cranked the bypass anyway).",
+      "speaker": "WOLF",
+      "current": "WOLF: I'll draw it onto the mark and keep clear of the tank. Drop it when it stops.",
+      "proposed": "WOLF: You told me the truth at the relay. I'll draw it onto the mark and keep clear of the tank. Drop it when it stops.",
+      "alternatives": [],
+      "notes": "Default from Nathanial: names the relay choice openly. 'Drop it when it stops' becomes true with the drop gate (DROP_WAIT). Fit: 2 of 3 rows, tagged box (715 px text width, Roboto 17 px).",
+      "status": "approved by Nathanial 2026-10-11 (as drafted)"
+    },
+    {
+      "id": "BAIT_NO",
+      "problem": 13,
+      "where": "apps/game/scripts/main.gd _choose_lane (answer 1, refused)",
+      "trigger": "Answer 1 when the engineer pressed WOLF without warning at the relay.",
+      "speaker": "WOLF",
+      "current": "WOLF: No. I won't walk into its sights. It crosses the floor mark on every pass; you can time the drop from the panel.",
+      "proposed": "WOLF: At the relay you'd have sent me in blind. I won't walk into its sights. Time the drop from the panel; it crosses the mark on every pass.",
+      "alternatives": [
+        "WOLF: You didn't tell me the risk at the relay. I'm not walking into its sights. Time the drop from the panel."
+      ],
+      "notes": "Names the relay choice openly. Avoids 'sent me in blind': on this route WOLF refused and never went in, so 'you'd have' is the accurate tense. Fit: 2 of 3 rows, tagged box (715 px text width, Roboto 17 px); alt 1: 2 of 3 rows, tagged box (715 px text width, Roboto 17 px).",
+      "status": "approved by Nathanial 2026-10-11 (as drafted)"
+    },
+    {
+      "id": "DROP_WAIT",
+      "problem": 1,
+      "where": "apps/game/scripts/main.gd _use_arm_panel (wolf_baiting, sentry not parked)",
+      "trigger": "USE at the TANK RELEASE while WOLF baits but the sentry is not yet parked on the mark.",
+      "speaker": "NARRATION",
+      "current": null,
+      "proposed": "Wait. WOLF hasn't got it on the mark yet.",
+      "alternatives": [],
+      "notes": "Text fixed by the task. The drop is refused until the sentry is fixated and holding on the mark. Fit: 1 of 3 rows, untagged box (855 px text width, Roboto 17 px).",
+      "status": "approved by Nathanial 2026-10-11 (as drafted)"
+    },
+    {
+      "id": "DROP_HINT_WAIT",
+      "problem": 1,
+      "where": "apps/game/scripts/main.gd _lane_hint (at the release, wolf_baiting, not parked)",
+      "trigger": "Standing at the TANK RELEASE while WOLF draws the sentry in.",
+      "speaker": "HINT",
+      "current": "E: drop the tank. It lands on the floor mark.",
+      "proposed": "Wait for WOLF to park it on the mark.",
+      "alternatives": [],
+      "notes": "Fit: 1 row, 229 of 526 px in the hint bar (Roboto 14 px, touch 'USE:' form).",
+      "status": "approved by Nathanial 2026-10-11 (as drafted)"
+    },
+    {
+      "id": "DROP_HINT_READY_BAIT",
+      "problem": 1,
+      "where": "apps/game/scripts/main.gd _lane_hint (at the release, wolf_baiting, parked)",
+      "trigger": "Standing at the TANK RELEASE once the sentry stops on the mark.",
+      "speaker": "HINT",
+      "current": "E: drop the tank. It lands on the floor mark.",
+      "proposed": "E: drop the tank. It's parked on the mark.",
+      "alternatives": [],
+      "notes": "Fit: 1 row, 266 of 526 px in the hint bar (Roboto 14 px, touch 'USE:' form).",
+      "status": "approved by Nathanial 2026-10-11 (as drafted)"
+    },
+    {
+      "id": "DROP_HINT_PATROL",
+      "problem": 1,
+      "where": "apps/game/scripts/main.gd _lane_hint (at the release, no bait)",
+      "trigger": "Standing at the TANK RELEASE while the sentry patrols (WOLF refused, held back or broke off).",
+      "speaker": "HINT",
+      "current": "E: drop the tank. It lands on the floor mark.",
+      "proposed": "E: drop the tank. It must land with the sentry in the brackets.",
+      "alternatives": [
+        "E: drop the tank. Time it to land with the sentry in the brackets."
+      ],
+      "notes": "States the new hit rule (the sentry's body overlaps the floor brackets at landing). Fit: 1 row, 388 of 526 px in the hint bar (Roboto 14 px, touch 'USE:' form); alt 1: 1 row, 403 of 526 px in the hint bar (Roboto 14 px, touch 'USE:' form).",
+      "status": "approved by Nathanial 2026-10-11 (as drafted)"
+    },
+    {
+      "id": "TANK_MISS",
+      "problem": 22,
+      "where": "apps/game/scripts/main.gd _tank_miss",
+      "trigger": "The tank lands with the sentry outside the brackets.",
+      "speaker": "NARRATION",
+      "current": "The tank hits the floor and vents coolant. The sentry turns on the panel; get back over the rubble.",
+      "proposed": "The tank hits the empty mark and sprays coolant from a split line. The sentry swings toward the panel; get back over the rubble.",
+      "alternatives": [
+        "The tank dents on the empty mark and sprays coolant from a split line. The sentry swings toward the panel; get back over the rubble."
+      ],
+      "notes": "Problem 22: a tank that 'vents coolant' and is then winched up intact; a split line explains both. 'turns on the panel' read as 'switches on'. When WOLF was baiting, the existing row '\\nWOLF: I'm out. I'll hold at the rubble.' still follows (measured with it: 3 rows untagged). Fit: 2 of 3 rows, untagged box (855 px text width, Roboto 17 px); alt 1: 2 of 3 rows, untagged box (855 px text width, Roboto 17 px).",
+      "status": "approved by Nathanial 2026-10-11 (as drafted)"
+    },
+    {
+      "id": "SENTRY_LOST",
+      "problem": 2,
+      "where": "apps/game/scripts/main.gd _sentry_changed (chase to patrol)",
+      "trigger": "The sentry gives up a chase.",
+      "speaker": "NARRATION",
+      "current": "It lost you and goes back to its patrol. The ARM PANEL alcove hides you from it.",
+      "proposed": "The sentry loses {name} behind the rubble and rolls back to its patrol.",
+      "alternatives": [],
+      "notes": "Problem 2: a chase is only lost behind the rubble, never in the alcove. Third person per decision B. Fit: 1 of 3 rows, untagged box (855 px text width, Roboto 17 px).",
+      "status": "approved by Nathanial 2026-10-11 (as drafted)"
+    },
+    {
+      "id": "SENTRY_LOCK",
+      "problem": 2,
+      "where": "apps/game/scripts/main.gd _sentry_changed (lock)",
+      "trigger": "The sentry locks on.",
+      "speaker": "NARRATION",
+      "current": "The sentry stops and its eyes snap red. It has you; get back over the rubble.",
+      "proposed": "The sentry stops and its eyes snap red. It has {name}; get back over the rubble.",
+      "alternatives": [
+        "The sentry stops and its eyes snap red. It has you; get back over the rubble."
+      ],
+      "notes": "Optional, for decision B's third person. Keep the current line if knockdown-style warnings stay in the second person. Fit: 1 of 3 rows, untagged box (855 px text width, Roboto 17 px); alt 1: 1 of 3 rows, untagged box (855 px text width, Roboto 17 px).",
+      "status": "approved by Nathanial 2026-10-11 (as drafted)"
+    },
+    {
+      "id": "RELEASE_LABEL",
+      "problem": 21,
+      "where": "apps/game/scripts/junction_room.gd arm_label",
+      "trigger": "The panel plate in the alcove, idle state.",
+      "speaker": "LABEL",
+      "current": "ARM PANEL",
+      "proposed": "TANK RELEASE",
+      "alternatives": [],
+      "notes": "Problem 21: 'arm' is also the breaker verb here. Fit: 90 px at 13 px (corridor COOLANT RELAY plate is 140 px wide).",
+      "status": "approved by Nathanial 2026-10-11 (as drafted)"
+    },
+    {
+      "id": "RELEASE_LABEL_REWINDING",
+      "problem": 21,
+      "where": "apps/game/scripts/junction_room.gd arm_label (rewinding)",
+      "trigger": "Panel plate while the winch hauls the tank back.",
+      "speaker": "LABEL",
+      "current": "ARM REWINDING",
+      "proposed": "WINCHING UP",
+      "alternatives": [],
+      "notes": "Fit: 84 px at 13 px (corridor COOLANT RELAY plate is 140 px wide).",
+      "status": "approved by Nathanial 2026-10-11 (as drafted)"
+    },
+    {
+      "id": "RELEASE_LABEL_SPENT",
+      "problem": 22,
+      "where": "apps/game/scripts/junction_room.gd arm_label (sentry_down)",
+      "trigger": "Panel plate after the hit.",
+      "speaker": "LABEL",
+      "current": "TANK DOWN",
+      "proposed": "RELEASE SPENT",
+      "alternatives": [],
+      "notes": "Matches BREAKER SPENT and VALVE SPENT. TANK DOWN moves to the tank itself (TANK_DOWN_LABEL). Fit: 97 px at 13 px (corridor COOLANT RELAY plate is 140 px wide).",
+      "status": "approved by Nathanial 2026-10-11 (as drafted)"
+    },
+    {
+      "id": "TANK_DOWN_LABEL",
+      "problem": 22,
+      "where": "apps/game/scripts/junction_room.gd (new label over the landed tank)",
+      "trigger": "Over the tank once it is down on the sentry.",
+      "speaker": "LABEL",
+      "current": null,
+      "proposed": "TANK DOWN",
+      "alternatives": [],
+      "notes": "Problem 22: the label floated over the panel, not the tank. Fit: 75 px at 13 px (corridor COOLANT RELAY plate is 140 px wide).",
+      "status": "approved by Nathanial 2026-10-11 (as drafted)"
+    },
+    {
+      "id": "LANE_HINT_NO_STATION",
+      "problem": 21,
+      "where": "apps/game/scripts/main.gd _interact_junction (door_blown, nothing in reach)",
+      "trigger": "USE away from stations after the blast.",
+      "speaker": "NARRATION",
+      "current": "No station in reach. The ARM PANEL is in the alcove past the rubble.",
+      "proposed": "No station in reach. The TANK RELEASE is in the alcove past the rubble.",
+      "alternatives": [],
+      "notes": "Fit: 1 of 3 rows, untagged box (855 px text width, Roboto 17 px).",
+      "status": "approved by Nathanial 2026-10-11 (as drafted)"
+    },
+    {
+      "id": "TANK_REHUNG",
+      "problem": 21,
+      "where": "apps/game/scripts/main.gd _tank_rehung",
+      "trigger": "The winch has the tank back on the clamp.",
+      "speaker": "NARRATION",
+      "current": "The winch has the tank back on the clamp. The ARM PANEL is ready again.",
+      "proposed": "The winch has the tank back on the clamp. The TANK RELEASE is ready again.",
+      "alternatives": [],
+      "notes": "Fit: 1 of 3 rows, untagged box (855 px text width, Roboto 17 px).",
+      "status": "approved by Nathanial 2026-10-11 (as drafted)"
+    },
+    {
+      "id": "LANE_HINT_REWINDING",
+      "problem": 21,
+      "where": "apps/game/scripts/main.gd _lane_hint (at the release, rewinding)",
+      "trigger": "At the release while the tank is winched back up.",
+      "speaker": "HINT",
+      "current": "The arm is rewinding. Wait for the clamp.",
+      "proposed": "The winch is hauling the tank back up. Wait for the clamp.",
+      "alternatives": [],
+      "notes": "Fit: 1 row, 358 of 526 px in the hint bar (Roboto 14 px, touch 'USE:' form).",
+      "status": "approved by Nathanial 2026-10-11 (as drafted)"
+    },
+    {
+      "id": "LANE_HINT_EXPOSED",
+      "problem": 2,
+      "where": "apps/game/scripts/main.gd _lane_hint (exposed in the lane)",
+      "trigger": "Standing in the sentry's lane outside the alcove.",
+      "speaker": "HINT",
+      "current": "You're in its lane. Get into the panel alcove or back over the rubble.",
+      "proposed": "You're in its lane. Get into the release alcove or back over the rubble.",
+      "alternatives": [],
+      "notes": "Fit: 1 row, 422 of 526 px in the hint bar (Roboto 14 px, touch 'USE:' form).",
+      "status": "approved by Nathanial 2026-10-11 (as drafted)"
+    },
+    {
+      "id": "LANE_HINT_BAITING",
+      "problem": 21,
+      "where": "apps/game/scripts/main.gd _lane_hint (wolf_baiting)",
+      "trigger": "Away from the release while WOLF draws the sentry.",
+      "speaker": "HINT",
+      "current": "WOLF is drawing the sentry onto the mark. Get to the ARM PANEL.",
+      "proposed": "WOLF is drawing the sentry onto the mark. Get to the TANK RELEASE.",
+      "alternatives": [],
+      "notes": "Fit: 1 row, 431 of 526 px in the hint bar (Roboto 14 px, touch 'USE:' form).",
+      "status": "approved by Nathanial 2026-10-11 (as drafted)"
+    },
+    {
+      "id": "LANE_HINT_BROKE_OFF",
+      "problem": 21,
+      "where": "apps/game/scripts/main.gd _lane_hint (wolf_broke_off)",
+      "trigger": "After WOLF breaks off from a miss.",
+      "speaker": "HINT",
+      "current": "WOLF has broken off. Time the drop on its patrol from the ARM PANEL.",
+      "proposed": "WOLF has broken off. Time the drop on its patrol from the TANK RELEASE.",
+      "alternatives": [],
+      "notes": "Fit: 1 row, 461 of 526 px in the hint bar (Roboto 14 px, touch 'USE:' form).",
+      "status": "approved by Nathanial 2026-10-11 (as drafted)"
+    },
+    {
+      "id": "LANE_HINT_DEFAULT",
+      "problem": 21,
+      "where": "apps/game/scripts/main.gd _lane_hint (default)",
+      "trigger": "Lane default hint.",
+      "speaker": "HINT",
+      "current": "The sentry patrols past the rubble. The ARM PANEL is in the alcove just inside.",
+      "proposed": "The sentry patrols past the rubble. The TANK RELEASE is in the alcove just inside.",
+      "alternatives": [],
+      "notes": "Fit: 1 row, 505 of 526 px in the hint bar (Roboto 14 px, touch 'USE:' form).",
+      "status": "approved by Nathanial 2026-10-11 (as drafted)"
+    },
+    {
+      "id": "POP_BOLT",
+      "problem": 19,
+      "where": "apps/game/scripts/main.gd _pop_bolt",
+      "trigger": "USE at the exit bolt once the sentry is down.",
+      "speaker": "NARRATION",
+      "current": "The spare overload runs into the exit bolt. The panel whines.",
+      "proposed": "With the tank down, the winch's power reroutes to the exit bolt. The panel whines.",
+      "alternatives": [
+        "The tank release hands its power to the exit bolt. The panel whines."
+      ],
+      "notes": "Problem 19: the breaker reads SPENT, so a 'spare overload' contradicted it. Pair with a drawn schematic line to the bolt panel. Fit: 1 of 3 rows, untagged box (855 px text width, Roboto 17 px); alt 1: 1 of 3 rows, untagged box (855 px text width, Roboto 17 px).",
+      "status": "approved by Nathanial 2026-10-11 (as drafted)"
+    },
+    {
+      "id": "BOLT_CHARGING",
+      "problem": 19,
+      "where": "apps/game/scripts/main.gd _use_exit and _lane_hint (bolt charging)",
+      "trigger": "While the bolt charges (USE or hint).",
+      "speaker": "NARRATION",
+      "current": "The bolt is taking the overload.",
+      "proposed": "The bolt is taking the charge.",
+      "alternatives": [],
+      "notes": "Same string in the hint and the USE line. Fit: 1 of 3 rows, untagged box (855 px text width, Roboto 17 px).",
+      "status": "approved by Nathanial 2026-10-11 (as drafted)"
+    },
+    {
+      "id": "BOLT_ARC",
+      "problem": 18,
+      "where": "apps/game/scripts/main.gd _bolt_arc",
+      "trigger": "The whine peaks and the bolt drops.",
+      "speaker": "NARRATION",
+      "current": "The bolt arcs and drops. The hatch slides open.",
+      "proposed": "The bolt arcs and drops.",
+      "alternatives": [],
+      "notes": "Problem 18 plain part, timing: the hatch sentence moves to HATCH_OPENED, shown when the hatch tween finishes. Fit: 1 of 3 rows, untagged box (855 px text width, Roboto 17 px).",
+      "status": "approved by Nathanial 2026-10-11 (as drafted)"
+    },
+    {
+      "id": "HATCH_OPENED",
+      "problem": 18,
+      "where": "apps/game/scripts/main.gd hatch tween finished (new callback)",
+      "trigger": "When the hatch art has actually opened.",
+      "speaker": "NARRATION",
+      "current": null,
+      "proposed": "The bolt arcs and drops. The hatch slides open.",
+      "alternatives": [],
+      "notes": "Replaces BOLT_ARC's text at the moment the hatch is visibly open, so the line never shows over a closed hatch. Fit: 1 of 3 rows, untagged box (855 px text width, Roboto 17 px).",
+      "status": "approved by Nathanial 2026-10-11 (as drafted)"
+    },
+    {
+      "id": "JUNCTION_CLEARED_DEAD_END",
+      "problem": 17,
+      "where": "apps/game/scripts/main.gd _use_exit (junction_cleared) and _lane_hint (junction_cleared)",
+      "trigger": "Only reachable on a cleared junction save; decision D makes Continue start a fresh run instead.",
+      "speaker": "NARRATION",
+      "current": "The service line runs on past the hatch. That part is not built yet.",
+      "proposed": "The service line runs on toward Archive.",
+      "alternatives": [],
+      "notes": "Should become unreachable. If any path still reaches it, use this instead of the developer note; the hint 'The hatch is open. The line beyond it is not built yet.' becomes 'The hatch is open.' and the restore line 'Service junction restored. The line is clear and the hatch is open.' can go. Fit: 1 of 3 rows, untagged box (855 px text width, Roboto 17 px).",
+      "status": "approved by Nathanial 2026-10-11 (as drafted)"
+    },
+    {
+      "id": "CHECKPOINT_TOAST",
+      "problem": 15,
+      "where": "apps/game/scripts/main.gd _write_beat (successful autosave)",
+      "trigger": "Each successful autosave in Records and the Service Junction (not the corridor safe point, which already says 'Safe point saved.').",
+      "speaker": "HINT",
+      "current": null,
+      "proposed": "Checkpoint saved.",
+      "alternatives": [
+        "CHECKPOINT SAVED"
+      ],
+      "notes": "Short toast in the hint bar for about 2 s (or the second row of the top card, in capitals). One word, 'checkpoint', everywhere. Fit: 1 row, 114 of 526 px in the hint bar (Roboto 14 px, touch 'USE:' form); alt 1: 1 row, 131 of 526 px in the hint bar (Roboto 14 px, touch 'USE:' form).",
+      "status": "approved by Nathanial 2026-10-11 (as drafted)"
+    },
+    {
+      "id": "NO_CHECKPOINT_NOTE",
+      "problem": 15,
+      "where": "apps/game/scripts/main.gd NO_CHECKPOINT_NOTE (title Continue note)",
+      "trigger": "Title screen with no save.",
+      "speaker": "TITLE",
+      "current": "No checkpoint yet. Reach a SAFE POINT to save.",
+      "proposed": "No checkpoint yet. Saving starts at the first SAFE POINT.",
+      "alternatives": [
+        "No checkpoint yet. Reach the first SAFE POINT."
+      ],
+      "notes": "Accurate today: nothing is written before the corridor safe point; after it, checkpoints save as you go. Nathanial's approved future NO_CHECKPOINT_NOTE ('No save yet. Secure the case at a SAFE POINT.') belongs to the evidence-case build and should replace this when that ships. Fit: 375 of 388 px, one row in the title Continue note (Roboto 15 px); alt 1: 312 of 388 px, one row in the title Continue note (Roboto 15 px).",
+      "status": "approved by Nathanial 2026-10-11 (as drafted)"
+    },
+    {
+      "id": "RESTORE_FROM_DISK",
+      "problem": 15,
+      "where": "apps/game/scripts/main.gd _restore_beat",
+      "trigger": "After a knockdown restores from the save file.",
+      "speaker": "NARRATION",
+      "current": "Back at the last autosave.",
+      "proposed": "Back at the last checkpoint.",
+      "alternatives": [],
+      "notes": "'checkpoint' everywhere. Fit: 1 of 3 rows, untagged box (855 px text width, Roboto 17 px).",
+      "status": "approved by Nathanial 2026-10-11 (as drafted)"
+    },
+    {
+      "id": "RESTORE_BEAT",
+      "problem": 15,
+      "where": "apps/game/scripts/main.gd _restore_beat",
+      "trigger": "After a knockdown before the first checkpoint (beat snapshot).",
+      "speaker": "NARRATION",
+      "current": "Back at the start of this beat.",
+      "proposed": "Back at the start of this stretch.",
+      "alternatives": [],
+      "notes": "Nathanial's approved RESTORE_BEAT text (death-text-2026-10-10). Fit: 1 of 3 rows, untagged box (855 px text width, Roboto 17 px).",
+      "status": "approved by Nathanial 2026-10-11 (as drafted)"
+    },
+    {
+      "id": "END_CARD_TITLE",
+      "problem": 17,
+      "where": "apps/game/scripts/main.gd _finish_chapter_close (junction_cleared, new end card)",
+      "trigger": "After the SERVICE LINE CLEARED beat, before the title.",
+      "speaker": "CARD",
+      "current": null,
+      "proposed": "END OF SLICE",
+      "alternatives": [],
+      "notes": "Decision D. Large type, like the title card. Fit: 1 row, 107 px at Roboto 17 px (end card has no layout yet; kept under the 855 px dialogue width).",
+      "status": "approved by Nathanial 2026-10-11 (as drafted)"
+    },
+    {
+      "id": "END_CARD_THANKS",
+      "problem": 17,
+      "where": "apps/game/scripts/main.gd end card",
+      "trigger": "Under END OF SLICE.",
+      "speaker": "CARD",
+      "current": null,
+      "proposed": "Thank you for playing this early slice.",
+      "alternatives": [
+        "THANK YOU FOR PLAYING",
+        "Thank you for playing. The story continues in a later build."
+      ],
+      "notes": "The second alternative promises a later build; only use it if Nathanial wants that public promise in the game. Fit: 1 row, 278 px at Roboto 17 px (end card has no layout yet; kept under the 855 px dialogue width); alt 1: 1 row, 202 px at Roboto 17 px (end card has no layout yet; kept under the 855 px dialogue width); alt 2: 1 row, 434 px at Roboto 17 px (end card has no layout yet; kept under the 855 px dialogue width).",
+      "status": "approved by Nathanial 2026-10-11 (as drafted)"
+    },
+    {
+      "id": "END_CARD_RECAP_HEADER",
+      "problem": 17,
+      "where": "apps/game/scripts/main.gd end card",
+      "trigger": "Above the recap rows.",
+      "speaker": "CARD",
+      "current": null,
+      "proposed": "THIS RUN",
+      "alternatives": [
+        "YOUR CHOICES"
+      ],
+      "notes": "Fit: 1 row, 75 px at Roboto 17 px (end card has no layout yet; kept under the 855 px dialogue width); alt 1: 1 row, 118 px at Roboto 17 px (end card has no layout yet; kept under the 855 px dialogue width).",
+      "status": "approved by Nathanial 2026-10-11 (as drafted)"
+    },
+    {
+      "id": "RECAP_RELAY_COOPERATE",
+      "problem": 17,
+      "where": "apps/game/scripts/main.gd end card (route cooperate)",
+      "trigger": "Recap row, relay.",
+      "speaker": "CARD",
+      "current": null,
+      "proposed": "RELAY  {name} told WOLF the risk. WOLF took the live contact.",
+      "alternatives": [],
+      "notes": "Recap rows are a look back, so they use the past tense; the narration in play stays present tense. Third person, they/them-safe (no pronoun for the engineer). Fit: 1 row, 474 px at Roboto 17 px (end card has no layout yet; kept under the 855 px dialogue width).",
+      "status": "approved by Nathanial 2026-10-11 (as drafted)"
+    },
+    {
+      "id": "RECAP_RELAY_DISCLOSE_BYPASS",
+      "problem": 17,
+      "where": "apps/game/scripts/main.gd end card (DISCLOSE, route fallback)",
+      "trigger": "Recap row, relay.",
+      "speaker": "CARD",
+      "current": null,
+      "proposed": "RELAY  {name} told WOLF the risk, then cranked the bypass anyway.",
+      "alternatives": [],
+      "notes": "Fit: 1 row, 515 px at Roboto 17 px (end card has no layout yet; kept under the 855 px dialogue width).",
+      "status": "approved by Nathanial 2026-10-11 (as drafted)"
+    },
+    {
+      "id": "RECAP_RELAY_PRESS",
+      "problem": 17,
+      "where": "apps/game/scripts/main.gd end card (PRESS)",
+      "trigger": "Recap row, relay.",
+      "speaker": "CARD",
+      "current": null,
+      "proposed": "RELAY  {name} rushed WOLF. He refused, so {name} cranked the bypass.",
+      "alternatives": [],
+      "notes": "'He' is WOLF (he/his as approved). Fit: 1 row, 555 px at Roboto 17 px (end card has no layout yet; kept under the 855 px dialogue width).",
+      "status": "approved by Nathanial 2026-10-11 (as drafted)"
+    },
+    {
+      "id": "RECAP_MIRROR_WOLF",
+      "problem": 17,
+      "where": "apps/game/scripts/main.gd end card (mirror_route wolf)",
+      "trigger": "Recap row, mirror.",
+      "speaker": "CARD",
+      "current": null,
+      "proposed": "MIRROR  WOLF read the timestamp off his own readout.",
+      "alternatives": [],
+      "notes": "Fit: 1 row, 423 px at Roboto 17 px (end card has no layout yet; kept under the 855 px dialogue width).",
+      "status": "approved by Nathanial 2026-10-11 (as drafted)"
+    },
+    {
+      "id": "RECAP_MIRROR_MANUAL",
+      "problem": 17,
+      "where": "apps/game/scripts/main.gd end card (mirror_route manual)",
+      "trigger": "Recap row, mirror.",
+      "speaker": "CARD",
+      "current": null,
+      "proposed": "MIRROR  {name} copied the timestamp through the maintenance port.",
+      "alternatives": [],
+      "notes": "Fit: 1 row, 532 px at Roboto 17 px (end card has no layout yet; kept under the 855 px dialogue width).",
+      "status": "approved by Nathanial 2026-10-11 (as drafted)"
+    },
+    {
+      "id": "RECAP_LANE_WOLF",
+      "problem": 17,
+      "where": "apps/game/scripts/main.gd end card (lane_choice wolf)",
+      "trigger": "Recap row, lane.",
+      "speaker": "CARD",
+      "current": null,
+      "proposed": "LANE  WOLF drew the sentry onto the mark.",
+      "alternatives": [],
+      "notes": "lane_choice lives only in main.gd today, not in the save, so a run continued from autosave C would not know it. Either save it or fall back to RECAP_LANE_UNKNOWN. Fit: 1 row, 330 px at Roboto 17 px (end card has no layout yet; kept under the 855 px dialogue width).",
+      "status": "approved by Nathanial 2026-10-11 (as drafted)"
+    },
+    {
+      "id": "RECAP_LANE_REFUSED",
+      "problem": 17,
+      "where": "apps/game/scripts/main.gd end card (lane_choice refused)",
+      "trigger": "Recap row, lane.",
+      "speaker": "CARD",
+      "current": null,
+      "proposed": "LANE  WOLF wouldn't draw it, so {name} timed the drop alone.",
+      "alternatives": [],
+      "notes": "Fit: 1 row, 471 px at Roboto 17 px (end card has no layout yet; kept under the 855 px dialogue width).",
+      "status": "approved by Nathanial 2026-10-11 (as drafted)"
+    },
+    {
+      "id": "RECAP_LANE_ALONE",
+      "problem": 17,
+      "where": "apps/game/scripts/main.gd end card (lane_choice alone)",
+      "trigger": "Recap row, lane.",
+      "speaker": "CARD",
+      "current": null,
+      "proposed": "LANE  WOLF held at the rubble while {name} timed the drop.",
+      "alternatives": [],
+      "notes": "Fit: 1 row, 456 px at Roboto 17 px (end card has no layout yet; kept under the 855 px dialogue width).",
+      "status": "approved by Nathanial 2026-10-11 (as drafted)"
+    },
+    {
+      "id": "RECAP_LANE_UNKNOWN",
+      "problem": 17,
+      "where": "apps/game/scripts/main.gd end card (lane choice not known)",
+      "trigger": "Recap row, lane, fallback.",
+      "speaker": "CARD",
+      "current": null,
+      "proposed": "LANE  The tank came down on the sentry.",
+      "alternatives": [],
+      "notes": "Only if the lane choice isn't saved. Fit: 1 row, 314 px at Roboto 17 px (end card has no layout yet; kept under the 855 px dialogue width).",
+      "status": "approved by Nathanial 2026-10-11 (as drafted)"
+    },
+    {
+      "id": "END_CARD_PROMPT",
+      "problem": 17,
+      "where": "apps/game/scripts/main.gd end card",
+      "trigger": "Bottom of the end card.",
+      "speaker": "HINT",
+      "current": null,
+      "proposed": "E: CONTINUE",
+      "alternatives": [],
+      "notes": "Reuse the existing cinematic prompt ('TAP CONTINUE' on touch, '%s  CONTINUE' otherwise) so the right key, button or touch label shows. Leads to the title. Fit: 1 row, 100 of 526 px in the hint bar (Roboto 14 px, touch 'USE:' form).",
+      "status": "approved by Nathanial 2026-10-11 (as drafted)"
+    },
+    {
+      "id": "TITLE_CONTINUE_FINISHED_BUTTON",
+      "problem": 17,
+      "where": "apps/game/scripts/main.gd _refresh_continue (save has junction_cleared)",
+      "trigger": "Title screen when the save is a finished slice.",
+      "speaker": "TITLE",
+      "current": "CONTINUE",
+      "proposed": "PLAY AGAIN",
+      "alternatives": [
+        "CONTINUE"
+      ],
+      "notes": "Decision D: Continue on a finished save offers a fresh run. If the button keeps the word CONTINUE, the note below carries the meaning. Fit: 133 of 154 px inside the 186 px Continue button (Montserrat 600, 21 px); alt 1: 116 of 154 px inside the 186 px Continue button (Montserrat 600, 21 px).",
+      "status": "approved by Nathanial 2026-10-11 (as drafted)"
+    },
+    {
+      "id": "TITLE_CONTINUE_FINISHED_NOTE",
+      "problem": 17,
+      "where": "apps/game/scripts/main.gd _refresh_continue (save has junction_cleared)",
+      "trigger": "Title screen note under the button, finished save.",
+      "speaker": "TITLE",
+      "current": null,
+      "proposed": "Slice complete. PLAY AGAIN starts a fresh run.",
+      "alternatives": [
+        "Slice complete. Continue starts a fresh run."
+      ],
+      "notes": "Use the alternative if the button stays CONTINUE. Fit: 311 of 388 px, one row in the title Continue note (Roboto 15 px); alt 1: 287 of 388 px, one row in the title Continue note (Roboto 15 px).",
+      "status": "approved by Nathanial 2026-10-11 (as drafted)"
+    },
+    {
+      "id": "DROP_PARKED",
+      "problem": 1,
+      "where": "apps/game/scripts/main.gd _tick_lane (DROP_PARKED_LINE)",
+      "trigger": "The frame the sentry stops on the mark while DROP_WAIT is in the box (WOLF drawing it, an early press at the TANK RELEASE).",
+      "speaker": "NARRATION",
+      "current": null,
+      "proposed": "The sentry stops on the mark, its eyes on WOLF. Drop the tank now.",
+      "alternatives": [
+        "It stops on the mark, facing WOLF. Drop the tank now."
+      ],
+      "notes": "Round 2 item 1: DROP_WAIT used to stay up 1.5 s after the sentry parked while the hint already said 'E: drop the tank. It's parked on the mark.', so box, hint and picture disagreed. Now the wait line gives way to this one on the same frame the hint changes; no minimum hold. Describes what is on screen (the sentry parked on the mark, facing WOLF; eyes as in SENTRY_LOCK). Fit: 1 of 3 rows, untagged box (855 px text width, Roboto 17 px); alt 1: 1 of 3 rows, untagged box (855 px text width, Roboto 17 px).",
+      "status": "approved by Nathanial 2026-10-11 (round 2, as drafted)"
+    },
+    {
+      "id": "BYPASS_HINT_HOLD_OFFER",
+      "problem": 9,
+      "where": "apps/game/scripts/main.gd _context_hint (BYPASS_HOLD_OFFER_HINT)",
+      "trigger": "At the MANUAL BYPASS, honest route (WOLF has not refused), after at least one turn and before the bypass locks over.",
+      "speaker": "HINT",
+      "current": "HOLD E: crank the manual bypass, {ticks} of {needed}.",
+      "proposed": "HOLD E: crank on, {ticks} of {needed}, or let WOLF take the relay.",
+      "alternatives": [
+        "HOLD E: {ticks} of {needed} turns. WOLF can still take the relay."
+      ],
+      "notes": "Round 2 item 2: part-cranked, the hint only counted turns and dropped BYPASS_HINT_OFFER's alternative, though signalling WOLF at the relay still works then. The refused route keeps BYPASS_HINT_HOLD. A hint, not WOLF's voice, so the key prefix is allowed. Fit: 1 row, 335 of 526 px in the hint bar (Roboto 14 px, touch 'USE:' form); alt 1: 1 row, 328 of 526 px in the hint bar (Roboto 14 px, touch 'USE:' form).",
+      "status": "approved by Nathanial 2026-10-11 (round 2, as drafted)"
+    },
+    {
+      "id": "VENT_REASON",
+      "problem": 4,
+      "where": "apps/game/scripts/junction_room.gd VENT_REASON",
+      "trigger": "Knockdown card: the relief vent lets go with the engineer on its grate.",
+      "speaker": "NARRATION",
+      "current": "The relief vent let go under you. Stand clear of the grate when the gauge peaks.",
+      "proposed": "The relief vent let go under {name}. When the gauge peaks, stay off the grate.",
+      "alternatives": [],
+      "notes": "Round 2 item 4: third person like BLAST_REASON (the cause names the engineer, the fix speaks to the player as BLAST_REASON's second sentence does). No new fact. Fit: 1 of 3 rows, untagged box (855 px text width, Roboto 17 px).",
+      "status": "approved by Nathanial 2026-10-11 (round 2, as drafted)"
+    },
+    {
+      "id": "SENTRY_REASON",
+      "problem": 2,
+      "where": "apps/game/scripts/junction_room.gd SENTRY_REASON",
+      "trigger": "Knockdown card: a chasing sentry reaches the engineer out in its lane, after seeing them there (not after a missed drop).",
+      "speaker": "NARRATION",
+      "current": "The sentry ran you down in its lane. Cross when it faces away, or get back over the rubble.",
+      "proposed": "The sentry ran {name} down in its lane. Stay between the alcove's posts, or get back over the rubble.",
+      "alternatives": [
+        "The sentry ran {name} down in its lane. Keep inside the alcove's posts, or get back over the rubble."
+      ],
+      "notes": "Round 2 item 4: third person, and the advice now matches the rules: the alcove between its two posts is out of the sentry's sight, and over the rubble it gives up; 'cross when it faces away' did not stop a sentry that had already seen the engineer. Fit: 1 of 3 rows, untagged box (855 px text width, Roboto 17 px); alt 1: 1 of 3 rows, untagged box (855 px text width, Roboto 17 px). Round 3: this card now shows only when the sentry saw the engineer and caught them outside the alcove; SENTRY_CHASED_REASON covers a chase that a missed drop started and a catch inside the alcove, where 'stay between the alcove's posts' contradicted the screen.",
+      "status": "approved by Nathanial 2026-10-11 (round 2, as drafted)"
+    },
+    {
+      "id": "SENTRY_CHASED_REASON",
+      "problem": 2,
+      "where": "apps/game/scripts/junction_room.gd SENTRY_CHASED_REASON (chosen in apps/game/scripts/main.gd _sentry_reason)",
+      "trigger": "Knockdown card: a chasing sentry reaches the engineer after a missed drop turned it on them, or reaches them inside the alcove.",
+      "speaker": "NARRATION",
+      "current": "The sentry ran {name} down in its lane. Stay between the alcove's posts, or get back over the rubble.",
+      "proposed": "The sentry ran {name} down. Once its eyes go red, only the rubble is safe.",
+      "alternatives": [
+        "The sentry ran {name} down. Once it turns on {name}, only the rubble is safe."
+      ],
+      "notes": "Round 3: a screenshot review (R9) showed the engineer run down between the alcove's posts after a miss while the one sentry card said to stay between them and called the alcove 'its lane'. A chase reaches anywhere in the alcove, so once the sentry has locked on (eyes red, as SENTRY_LOCK says) only the rubble is safe; this card says that and drops 'in its lane'. No new fact. Fit: 1 of 3 rows, untagged box (554 of 855 px with Morgan, Roboto 17 px); alt 1: 1 of 3 rows (584 of 855 px).",
+      "status": "approved by Nathanial 2026-10-11 (round 2, as drafted)"
+    },
+    {
+      "id": "CLOUD_REASON",
+      "problem": 4,
+      "where": "apps/game/scripts/junction_room.gd CLOUD_REASON",
+      "trigger": "Knockdown card: the engineer walks into the coolant cloud after a missed drop.",
+      "speaker": "NARRATION",
+      "current": "The coolant cloud caught you. Let it clear before you cross the mark.",
+      "proposed": "The coolant cloud caught {name}. Let it clear before crossing the mark.",
+      "alternatives": [],
+      "notes": "Round 2 item 4 follow-on: the fourth knockdown card also said 'you'; made third person with the other three so every card reads the same. No new fact. Fit: 1 of 3 rows, untagged box (855 px text width, Roboto 17 px).",
+      "status": "approved by Nathanial 2026-10-11 (round 2, as drafted)"
+    },
+    {
+      "id": "TANK_HIT_OFF_CENTRE",
+      "problem": 22,
+      "where": "apps/game/scripts/main.gd _tank_hit (TANK_HIT_OFF_CENTRE_LINE)",
+      "trigger": "The tank lands with the sentry inside the brackets but more than 8 px off the mark (the wreck shows to one side under the tank).",
+      "speaker": "NARRATION",
+      "current": "The tank comes down square and crushes the sentry flat. Its eyes go dark.\nWOLF: It's down. The bolt by the hatch is next.",
+      "proposed": "The tank catches the sentry off centre and pins it to the floor. Its eyes go dark.\nWOLF: It's down. The bolt by the hatch is next.",
+      "alternatives": [
+        "The tank lands on the sentry's edge and pins it to the floor. Its eyes go dark.\nWOLF: It's down. The bolt by the hatch is next."
+      ],
+      "notes": "Round 2 item 5: the 'square' line now plays only for a hit within 8 px of the mark; WOLF's row is unchanged. Fit: 2 of 3 rows, untagged box (855 px text width, Roboto 17 px); alt 1: 2 of 3 rows, untagged box (855 px text width, Roboto 17 px).",
+      "status": "approved by Nathanial 2026-10-11 (round 2, as drafted)"
+    },
+    {
+      "id": "RUBBLE_LINE_R2",
+      "problem": 13,
+      "where": "apps/game/scripts/main.gd RUBBLE_LINE",
+      "trigger": "The door blows (autosave B), while WOLF is still walking up from the entrance.",
+      "speaker": "NARRATION",
+      "current": "The door goes. WOLF stops at the rubble and waits for {name}'s call. In the lane beyond, something whirs awake.",
+      "proposed": "The door goes. WOLF heads for the rubble to wait for {name}'s call. In the lane beyond, something whirs awake.",
+      "alternatives": [],
+      "notes": "Round 2 item 6: replaces RUBBLE_LINE's wording. The line shows the moment the door goes, when WOLF is still at the entrance about 1.5 s from the rubble, so 'stops at' was false until he arrived; 'heads for' is true through his walk and after it. Fit: 1 of 3 rows, untagged box (855 px text width, Roboto 17 px).",
+      "status": "approved by Nathanial 2026-10-11 (round 2, as drafted)"
+    },
+    {
+      "id": "BREAKER_HINT_STAKES",
+      "problem": 10,
+      "where": "apps/game/scripts/main.gd _context_hint (BREAKER_STAKES_HINT)",
+      "trigger": "At the breaker while WOLF's STAKES_LINE is in the dialogue box and the relay question has not been asked.",
+      "speaker": "HINT",
+      "current": "E: talk to WOLF about the relay.",
+      "proposed": "E: continue.",
+      "alternatives": [
+        "E: go on."
+      ],
+      "notes": "Round 2 item 8: the stakes line must never share the screen with the relay prompt. While it is up the breaker's hint offers only to go on, in the opening's own CONTINUE word; the next interact opens WOLF's relay question (RELAY_QUESTION), which replaces the stakes line. Interact stays player-paced: nothing opens the question on a timer. Fit: 1 row, 90 of 526 px in the hint bar (Roboto 14 px, touch 'USE:' form); alt 1: 1 row, 71 of 526 px in the hint bar (Roboto 14 px, touch 'USE:' form).",
+      "status": "approved by Nathanial 2026-10-11 (round 2, as drafted)"
+    },
+    {
+      "id": "JUNCTION_ENTRY_R3",
+      "problem": 21,
+      "where": "apps/game/scripts/main.gd JUNCTION_ENTRY_LINE (used by _enter_junction)",
+      "trigger": "Entering the Service Junction; replaces JUNCTION_ENTRY's first row.",
+      "speaker": "NARRATION",
+      "current": "WOLF runs ahead to read the pressure behind the sealed door.\n{NAME}: The breaker by the entrance feeds that line. Overload it, crank the valve, and the door goes.",
+      "proposed": "WOLF runs ahead to the valve and reads its LINE gauge.\n{NAME}: The breaker by the entrance feeds that line. Overload it, crank the valve, and the door goes.",
+      "alternatives": [],
+      "notes": "Round 3 item 3. A screenshot review (R1-054/055, R3-079) showed WOLF 'reading the pressure behind the sealed door' while standing at x 300, well left of the door. There is no floor at the door: the valve (x 369-471 drawn) stands in front of it, the door body starts at 452, and the only bare floor between the breaker and the valve is 33 px against WOLF's ~115 px body, so he stops with his snout at the valve's left edge under its LINE gauge (over the idle relief-vent grate, the least-bad spot). The line now names what he is shown doing; the gauge is already on screen and named by BREAKER_CATCH, so no new fact. The second row is JUNCTION_ENTRY's approved row, unchanged; 'that line' still reads naturally after 'LINE gauge'. Fit: 2 of 3 rows, untagged box (row widths 421 and 759 of 855 px with MORGAN, Roboto 17 px).",
+      "status": "approved by Nathanial 2026-10-11 (round 3, as drafted)"
+    },
+    {
+      "id": "JUNCTION_RESTORE_A_R3",
+      "problem": 16,
+      "where": "apps/game/scripts/main.gd JUNCTION_RESTORE_A_LINE (used by _load_game, junction, door not blown)",
+      "trigger": "Continue from junction autosave A only (the breaker is not armed on this restore). The entry beat keeps WOLF's 'It's live.' line.",
+      "speaker": "NARRATION",
+      "current": "Service junction restored. Arm the breaker by the entrance, then crank the valve.\nWOLF: It's live. Don't stand in front of it when it goes.",
+      "proposed": "Service junction restored. Arm the breaker by the entrance, then crank the valve.\nWOLF: When the door goes, don't be standing in front of it.",
+      "alternatives": [
+        "Service junction restored. Arm the breaker by the entrance, then crank the valve.\nWOLF: Once that door goes, stay out from in front of it."
+      ],
+      "notes": "Round 3 item 5. A screenshot review (R3-079) showed WOLF saying 'It's live.' right after the line tells the player to arm the breaker, so 'it' reads as the unarmed breaker. The replacement keeps the warning that problem 16 restored and says only what is true before arming: the door will go, don't be in front of it. WOLF short and dry; no new fact. Fit: 2 of 3 rows, untagged box (599 and 438 of 855 px, Roboto 17 px); alt 1 also 2 rows.",
+      "status": "approved by Nathanial 2026-10-11 (round 3, as drafted)"
+    },
+    {
+      "id": "SENTRY_REASON_R3",
+      "problem": 2,
+      "where": "apps/game/scripts/junction_room.gd SENTRY_REASON (chosen in apps/game/scripts/main.gd _sentry_reason)",
+      "trigger": "Knockdown card: the sentry spotted the engineer out in its lane (always past the alcove's right post, SentryBrain.is_exposed) and ran them down there. SENTRY_CHASED_REASON is unchanged for a chase after a miss or a catch inside the alcove.",
+      "speaker": "NARRATION",
+      "current": "The sentry ran {name} down in its lane. Stay between the alcove's posts, or get back over the rubble.",
+      "proposed": "The sentry spotted {name} past the alcove's right post and ran them down. Keep inside the posts, or get back over the rubble.",
+      "alternatives": [
+        "The sentry caught {name} past the alcove's right post. Keep inside the posts, or get back over the rubble."
+      ],
+      "notes": "Round 3 item 4. A screenshot review (R3-136) showed the card 'Stay between the alcove's posts' over a body lying between the posts: the engineer was caught at x 638, just past the right post, and the shove away from the sentry lays the body back inside the alcove. The card now says how they were caught (spotted past the right post), so the body in the alcove reads as the shove, not as the advice failing. They/them for the engineer; third person; no new fact (the posts and the sentry's sight are on screen and in SentryBrain). Fit: 2 of 3 rows untagged (852 + 80 px with Rowan, 822 + 117 with Morgan, of 855 px, Roboto 17 px); 3 of 3 with the restore row 'Back at the last checkpoint.'.",
+      "status": "approved by Nathanial 2026-10-11 (round 3, as drafted)"
+    },
+    {
+      "id": "BROKE_OFF_HATCH_R3",
+      "problem": 22,
+      "where": "apps/game/scripts/main.gd BROKE_OFF_HATCH_LINE (appended to TANK_MISS in _tank_miss)",
+      "trigger": "A missed drop while WOLF is drawing the sentry and is already past it, at his spot by the exit hatch (only possible while the sentry is after the engineer). BROKE_OFF_RUBBLE ('\\nWOLF: I'm out. I'll hold at the rubble.', the existing row) stays for a miss before he is past it.",
+      "speaker": "NARRATION",
+      "current": "\\nWOLF: I'm out. I'll hold at the rubble.",
+      "proposed": "\nWOLF: I'm out.",
+      "alternatives": [],
+      "notes": "Round 3b (screenshot review: WOLF bounding over the sentry went through the hanging tank). He now only ever crosses the lane over the sentry at the far end of its patrol, right of the tank, and never crosses back under it, so after breaking off past it he stays by the exit hatch; 'hold at the rubble' would be false there. Same words otherwise; WOLF short and dry; no new fact (the hatch is on screen and named in 'The bolt by the hatch is next.'). Fit: 3 of 3 rows untagged with TANK_MISS above it (836 + 117 + 267 px of 855, Roboto 17 px). Nathanial's rewrite 2026-10-11: he held the drafted 'I'm out. I'll hold by the hatch.' and picked the place-free 'I'm out.' (you can see where WOLF is).",
+      "status": "approved by Nathanial 2026-10-11 (round 3, his rewrite)"
+    },
+    {
+      "id": "RECAP_LANE_BROKE_OFF_R3",
+      "problem": 17,
+      "where": "apps/game/scripts/main.gd RECAP_LANE_BROKE_OFF (end card, lane_recap 'broke_off')",
+      "trigger": "Recap row, lane: the sentry came down after WOLF broke off by the exit hatch (a miss while he was past it).",
+      "speaker": "CARD",
+      "current": "LANE  WOLF held at the rubble while {name} timed the drop.",
+      "proposed": "LANE  WOLF broke off while {name} timed the drop.",
+      "alternatives": [],
+      "notes": "Round 3b, with BROKE_OFF_HATCH_R3: that run used to fall through to RECAP_LANE_ALONE, which would say he held at the rubble when he stayed by the hatch. They/them not needed; third person past like the other recap rows. Fit: 1 row, 490 px with Morgan at Roboto 17 px (kept under the 855 px dialogue width). Nathanial's rewrite 2026-10-11: place-free, matching 'I'm out.'",
+      "status": "approved by Nathanial 2026-10-11 (round 3, his rewrite)"
+    },
+    {
+      "id": "JUNCTION_ENTRY_WOLF_R3",
+      "problem": 16,
+      "where": "apps/game/scripts/main.gd junction entry beat (status_line after the gauge read)",
+      "trigger": "Fresh entry into the Service Junction, WOLF's line after the gauge-read narration and the engineer's breaker line.",
+      "speaker": "NARRATION",
+      "current": "WOLF: It's live. Don't stand in front of it when it goes.",
+      "proposed": "WOLF: When the door goes, don't be standing in front of it.",
+      "alternatives": [],
+      "notes": "Round 3 final check: 'It's live' is said before the breaker is armed, so a new player can read the line as already live (the same contradiction JUNCTION_RESTORE_A_R3 fixed on Continue). Nathanial chose 2026-10-11 to use the restore line on entry too.",
+      "status": "approved by Nathanial 2026-10-11 (round 3: entry uses the restore A line)"
+    }
+  ]
+}

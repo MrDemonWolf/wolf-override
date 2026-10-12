@@ -1,0 +1,70 @@
+{
+ "wolf-idle": {
+  "src": "frames/wolf-idle-v3-graded",
+  "n": 8,
+  "cell": [
+   512,
+   272
+  ],
+  "specks_removed": [
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0
+  ],
+  "opaque_height_median": 240.0,
+  "opaque_length_median": 441.0
+ },
+ "wolf-walk": {
+  "src": "frames/wolf-walk-v3-graded",
+  "n": 12,
+  "cell": [
+   512,
+   272
+  ],
+  "specks_removed": [
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   1,
+   0,
+   0,
+   0
+  ],
+  "opaque_height_median": 231.0,
+  "opaque_length_median": 433.5
+ },
+ "wolf-trot": {
+  "src": "frames/wolf-trot-v7-graded",
+  "n": 12,
+  "cell": [
+   512,
+   272
+  ],
+  "specks_removed": [
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   1,
+   0,
+   0,
+   0
+  ],
+  "opaque_height_median": 233.5,
+  "opaque_length_median": 440.0
+ }
+}
