@@ -1,3 +1,4 @@
+class_name Main
 extends Node2D
 
 const SITE_URL: String = "https://wolfoverride.mrdemonwolf.dev"
@@ -548,6 +549,7 @@ func _ready() -> void:
 	reveal.tween_property(title_mark, "modulate", Color.WHITE, 0.4)
 	reveal.tween_property(title_line, "modulate", Color.WHITE, 0.25)
 	reveal.tween_property(title_logo, "modulate", Color.WHITE, 0.35)
+	_setup_debug_tools()
 
 
 func _refresh_continue() -> void:
@@ -1459,6 +1461,8 @@ func _notification(what: int) -> void:
 
 ## Android Back walks out of nested menus one step at a time; it only quits from the bare title.
 func _handle_back() -> void:
+	if _debug_takes_back():
+		return
 	if not settings_menu.capture_action.is_empty():
 		settings_menu.cancel_capture()
 	elif pause_overlay.visible and settings_menu.visible:
@@ -2375,7 +2379,7 @@ func _tick_junction(delta: float) -> void:
 ## while the game is paused (_process does not reach here). Contact with a chasing sentry is a
 ## knockdown back to autosave B.
 func _tick_lane(delta: float) -> void:
-	sentry_brain.paused = waiting_for_choice
+	sentry_brain.paused = waiting_for_choice or _debug_sentry_frozen()
 	drop_arm.paused = waiting_for_choice
 	if state.door_blown and not waiting_for_choice:
 		if sentry_wake_remaining > 0.0:
@@ -2682,7 +2686,7 @@ func _door_blast() -> void:
 	if state.door_blown:
 		return
 	_blast_feedback()
-	if PressureLine.is_in_blast(human.position.x):
+	if PressureLine.is_in_blast(human.position.x) and not _debug_spares_knockdown():
 		junction_room.door_blast()
 		_fail_beat(JunctionRoom.BLAST_REASON % state.human_name().get_slice(" ", 0))
 		return
@@ -2711,7 +2715,7 @@ func _blast_feedback() -> void:
 ## With Reduced Motion the tilt, hit-stop and shake are skipped; the thud, wash and fade remain.
 ## [param in_lane]: the sentry ran the engineer down out in its lane (_lane_fall).
 func _fail_beat(reason: String, in_lane: bool = false) -> void:
-	if fail_active or title_open or intro_active or chapter_close_active or end_card_active:
+	if fail_active or title_open or intro_active or chapter_close_active or end_card_active or _debug_spares_knockdown():
 		return
 	fail_active = true
 	for action: StringName in GAMEPLAY_ACTIONS:
@@ -3495,3 +3499,252 @@ func _add_joy_axis(action: StringName, value: float) -> void:
 	event.axis_value = value
 	if not InputMap.action_has_event(action, event):
 		InputMap.action_add_event(action, event)
+
+
+# --- Debug tools hooks (scripts/debug). Kept together so they move as one when Main is split. ---
+
+## The debug tools and cheat codes (DebugTools): idle and hidden unless available.
+var debug_tools: DebugTools
+
+
+func _setup_debug_tools() -> void:
+	debug_tools = DebugTools.new()
+	debug_tools.name = "DebugTools"
+	add_child(debug_tools)
+	debug_tools.setup(self)
+
+
+## The debug menu's invincibility cheat: no knockdown lands (the door still blows as if the engineer
+## were clear). A knockdown the menu forces still lands. Always false while the tools are hidden.
+func _debug_spares_knockdown() -> bool:
+	return debug_tools != null and debug_tools.actions.spares_knockdown()
+
+
+## The debug menu's freeze-sentry cheat: the sentry's brain does not tick.
+func _debug_sentry_frozen() -> bool:
+	return debug_tools != null and debug_tools.actions.sentry_frozen
+
+
+## Android Back closes the debug menu (or ends frame stepping) before it reaches the game's menus.
+func _debug_takes_back() -> bool:
+	return debug_tools != null and debug_tools.handle_back()
+
+
+# The debug menu's way into play (DebugActions, DebugMenu): small public calls onto Main's own steps,
+# so the tools (typed against Main) never call its private methods, and a rename here fails when the
+# scripts are parsed rather than when a menu button is pressed.
+
+## A fresh run from the opening or, with [param skip_intro], from the corridor's first control.
+func debug_new_game(skip_intro: bool) -> void:
+	_cancel_fail()
+	_new_game()
+	if skip_intro:
+		_finish_intro()
+
+
+## Back to the checkpoint on disk, as the title's Continue does.
+func debug_load_checkpoint() -> void:
+	_cancel_fail()
+	_load_game()
+
+
+## The engineer's interact, as the key, button or USE does it.
+func debug_interact() -> void:
+	_interact()
+
+
+## WOLF asks how to bring the sentry down, and [param response] answers (1: he draws it, 2: alone).
+func debug_answer_lane(response: int) -> void:
+	_ask_lane()
+	_choose_lane(response)
+
+
+func debug_show_end_card() -> void:
+	_show_end_card()
+
+
+## Where the engineer stands beside [param station] (x: centre, w: its side) coming from [param x].
+func debug_station_side_x(station: Vector4, x: float) -> float:
+	return _station_side_x(station, x)
+
+
+## The engineer at [param human_x] and WOLF at [param wolf_x], standing still, the controls updated.
+func debug_place(human_x: float, wolf_x: float) -> void:
+	human.position.x = human_x
+	wolf.position.x = wolf_x
+	human.velocity = Vector2.ZERO
+	wolf.velocity = Vector2.ZERO
+	_update_controls()
+
+
+## Knocks the engineer down through the one knockdown path with [param kind]'s card: vent, blast,
+## cloud, or sentry (worded by how it caught them).
+func debug_knock_down(kind: StringName) -> void:
+	var reason: String = _sentry_reason()
+	var in_lane: bool = kind == &"sentry" and _seen_in_lane()
+	match kind:
+		&"vent":
+			reason = JunctionRoom.VENT_REASON % _first_name()
+		&"blast":
+			reason = JunctionRoom.BLAST_REASON % _first_name()
+		&"cloud":
+			reason = JunctionRoom.CLOUD_REASON % _first_name()
+	_fail_beat(reason, in_lane)
+
+
+## The valve's last turn has landed (the fuse is lit), as the crank lands it.
+func debug_valve_turned() -> void:
+	_valve_turned()
+	_update_controls()
+
+
+## The TANK RELEASE lets the tank go.
+func debug_drop_tank() -> void:
+	_drop_tank()
+
+
+## The game's own autosave at this beat.
+func debug_save_progress() -> void:
+	_save_progress()
+
+
+## The save on disk changed: the title's buttons follow it.
+func debug_save_changed() -> void:
+	if title_open:
+		_refresh_continue()
+
+
+func debug_refresh_ui() -> void:
+	_refresh_ui()
+
+
+## The station interact is being held at ("valve", "bypass"), or empty.
+func debug_hold_station() -> StringName:
+	return _hold_station()
+
+
+## The debug menu closed: focus goes back where the game's own menus keep it (the title's), or nowhere.
+func debug_restore_focus() -> void:
+	var target: Control = _menu_focus_target()
+	if target != null and target.is_visible_in_tree():
+		_grab_menu_focus(target)
+	else:
+		get_viewport().gui_release_focus()
+
+
+## What the game is doing right now, as plain values for the debug overlay and bug captures
+## (DebugTools.dump adds performance, the save on disk and the build). The overlay's frequent refresh
+## leaves out the full save state ([param include_state] false); captures and scripts keep it.
+func debug_snapshot(include_state: bool = true) -> Dictionary:
+	var in_junction: bool = state.chapter_id == "junction"
+	var fixated_on: String = "WOLF" if sentry_brain.state == &"fixated" else ("engineer" if _sentry_hunting() else "—")
+	var relay: String = "—"
+	if not state.memory.is_empty():
+		var told: bool = state.memory.get("choice_id") == M0State.DISCLOSE
+		relay = ("disclose" if told else "press") + (" → WOLF" if state.route == "cooperate" else (" → bypass" if state.route == "fallback" else ""))
+	var snapshot: Dictionary = {
+		"room": state.chapter_id,
+		"beat": debug_beat(),
+		"objective": "" if title_open else _objective(),
+		"line": status_line,
+		"hint": "" if title_open else _context_hint(),
+		"engineer": {"x": human.position.x, "y": human.position.y, "facing": "left" if human.body_sprite.flip_h else "right", "state": _debug_engineer_state()},
+		"wolf": {"x": wolf.position.x, "y": wolf.position.y, "facing": "left" if wolf.body_sprite.flip_h else "right", "target_x": debug_wolf_target(), "why": debug_wolf_why()},
+		"sentry": {"active": in_junction, "state": str(sentry_brain.state), "x": sentry_brain.x, "facing": "left" if sentry_brain.facing < 0.0 else "right", "sight_range": SentryBrain.SIGHT_RANGE, "fixated_on": fixated_on},
+		"pressure_line": {"state": str(pressure_line.state), "gauge": pressure_line.gauge, "turns": pressure_line.turns, "turns_needed": PressureLine.TURNS_NEEDED, "fuse": pressure_line.fuse_remaining},
+		"drop_arm": {"state": str(drop_arm.state), "drop": drop_arm.drop_amount(), "cloud": drop_arm.cloud_remaining},
+		"bolt": {"state": str(bolt_state), "charge": bolt_charge_remaining},
+		"hazards": {
+			"vent": in_junction and junction_room.vent_hazard.armed,
+			"cloud": in_junction and junction_room.cloud_hazard.armed,
+			"blast": _fuse_lit(),
+			"sentry contact": in_junction and sentry_brain.state == &"chase",
+		},
+		"memory": state.memory.duplicate(true),
+		"choices": {"relay": relay, "mirror": state.mirror_route, "lane": lane_choice if not lane_choice.is_empty() else state.lane_recap},
+		"flags": {
+			"title_open": title_open, "intro_active": intro_active, "paused": get_tree().paused, "waiting_for_choice": waiting_for_choice,
+			"choice_context": choice_context, "fail_active": fail_active, "chapter_close_active": chapter_close_active,
+			"end_card_active": end_card_active, "touch_layout": touch_enabled and not controller_active, "controller_active": controller_active,
+			"save_pending": save_pending, "seal_opening": seal_opening, "wolf_baiting": wolf_baiting, "bypass_ticks": bypass_ticks,
+		},
+		"save_path": save_path,
+		"settings_path": settings_path,
+	}
+	if include_state:
+		snapshot["state"] = state.to_dict()
+	return snapshot
+
+
+func debug_beat() -> String:
+	if title_open:
+		return "title"
+	if intro_active:
+		return "opening %d/%d" % [intro_step + 1, INTRO_LINES.size()]
+	if end_card_active:
+		return "END OF SLICE card"
+	if hatch_exit_walking:
+		return "walking out"
+	if chapter_close_active:
+		return "chapter close"
+	if fail_active:
+		return "knockdown"
+	if waiting_for_choice:
+		return "choice (%s)" % (choice_context if not choice_context.is_empty() else "relay")
+	return "play"
+
+
+func _debug_engineer_state() -> String:
+	if not human.visible:
+		return "hidden"
+	if fail_active:
+		return "knocked down"
+	if hold_use.holding:
+		return "cranking the %s" % hold_use.station
+	if engineer_step_x >= 0.0 or hatch_exit_walking:
+		return "walking on their own"
+	if not human.controlled:
+		return "no control"
+	if absf(human.velocity.x) > 1.0:
+		return "walking"
+	return "stepping out of a machine" if human.settle_x >= 0.0 else "standing"
+
+
+## Where WOLF is heading: his own spot, or his follow spot worked out the way M0Actor.follow_x does
+## without changing his side, or -1.
+func debug_wolf_target() -> float:
+	if wolf.autonomous_target_x >= 0.0:
+		return wolf.autonomous_target_x
+	if wolf.follow_target == null or wolf.follow_side == 0:
+		return -1.0
+	return wolf.off_machines(clampf(wolf.follow_target.position.x + wolf.follow_side * M0Actor.FOLLOW_GAP, wolf.follow_min_x, wolf.follow_max_x), wolf.follow_side)
+
+
+## Why WOLF is where he is: following, scouting, baiting, holding a spot or refusing.
+func debug_wolf_why() -> String:
+	if not wolf.visible or title_open:
+		return "—"
+	if hatch_exit_walking:
+		return "leaving through the hatch"
+	if wolf_holding_relay:
+		return "hold: on the relay contact"
+	if wolf_heading_to_relay:
+		return "hold: going to the relay contact"
+	if _wolf_off_relay():
+		return "refuse: off the relay he refused" if _relay_refused() else "hold: back from the relay"
+	match state.chapter_id:
+		"records":
+			if not state.mirror_trace_preserved:
+				return "scout: the mirror port"
+		"junction":
+			if wolf_scouting:
+				return "scout: the door seam"
+			if wolf.autonomous_target_x == JunctionRoom.WOLF_CLEAR_X:
+				return "hold: clear of the vent and blast"
+			if wolf.autonomous_target_x == JunctionRoom.WOLF_BAIT_X:
+				return "bait: drawing the sentry"
+			if wolf.autonomous_target_x == JunctionRoom.WOLF_RUBBLE_X:
+				return "refuse: holding at the rubble" if lane_choice == "refused" else "hold: at the rubble"
+	if wolf.autonomous_target_x >= 0.0:
+		return "hold: his own spot"
+	return "follow" if wolf.follow_target != null else "waiting"
