@@ -154,18 +154,21 @@ const DUCK_CLEAR: float = 34.0
 const DUCK_RAMP: float = 24.0
 const WOLF_HEAD_X: float = 45.0
 ## Once the tank is down on the sentry, WOLF crossing from the rubble to his spot by the hatch bounds
-## clean over the crushed tank and the wreck under it (wolf_tank_leap_height): TANK_LEAP_HEIGHT, held
-## while any of his drawn body (M0Actor.WOLF_REACH either side) could be over the tank (its half width
-## and a 4 px margin), so his painted feet (y 438) pass over the tank's top (y 331, on the crushed
-## hull) with room to spare, easing out over TANK_LEAP_RAMP either side, where only his snout or tail
-## passes the wreck's low hull. He runs LEAP_SPEED_SCALE times faster while he is up. The empty arm
-## hangs too low over the tank for him to pass under it, so it winches up into its ceiling plate as
-## the tank lands for good (ARM_PARK_RISE over ARM_PARK_SECONDS), and he waits at the rubble until it
-## is up. sentry_test measures his painted body against the tank's, the wreck's and the arm's images
-## on every frame of the crossing (3 px clear).
-const TANK_LEAP_HEIGHT: float = 114.0
-const TANK_LEAP_CLEAR: float = M0Actor.WOLF_REACH + TANK_REGION.size.x * TANK_ART_SCALE * 0.5 + 4.0
-const TANK_LEAP_RAMP: float = 80.0
+## clean over the crushed tank and the wreck under it in one arc (wolf_tank_leap_height): a parabola in
+## x, so at his steady LEAP_SPEED_SCALE speed it is a fall under constant gravity, TANK_LEAP_HEIGHT at
+## its top over TANK_LEAP_PEAK_X and back on the floor TANK_LEAP_HALF_SPAN either side. He is 134 px
+## long, the tank stands 107 px over the floor about 60 px past the engineer working the release, and
+## the parked arm's claw hangs only some 10 px above the height that clears the tank, so there is no
+## room for a short hop: he takes off a few px before his snout reaches the engineer's back, passes
+## over them on the way up and lands just short of his spot. His painted feet (y 438) pass over the
+## tank's top (y 331, on the crushed hull) and his back under the claw. The empty arm hangs too low over
+## the tank for him to pass under it, so it winches up into its ceiling plate as the tank lands for good
+## (ARM_PARK_RISE over ARM_PARK_SECONDS), and he waits at the rubble until it is up. sentry_test measures
+## his painted body against the tank's, the wreck's and the arm's images on every frame of the crossing
+## and at every x (3 px clear).
+const TANK_LEAP_HEIGHT: float = 122.0
+const TANK_LEAP_PEAK_X: float = DropArm.MARK_X - 5.0
+const TANK_LEAP_HALF_SPAN: float = 180.0
 const ARM_PARK_RISE: float = 44.0
 const ARM_PARK_SECONDS: float = 0.3
 ## Where WOLF waits while the line builds and the fuse burns: back by the entrance hatch, his snout at
@@ -897,10 +900,11 @@ static func wolf_leap_height(wolf_x: float, sentry_x: float) -> float:
 
 
 ## How high WOLF's drawn body is lifted crossing the crushed tank on the mark with his centre at
-## [param wolf_x]: TANK_LEAP_HEIGHT while any of him could be over the tank, easing to nothing
-## TANK_LEAP_RAMP further out.
+## [param wolf_x]: one parabolic arc, TANK_LEAP_HEIGHT over TANK_LEAP_PEAK_X and nothing from
+## TANK_LEAP_HALF_SPAN either side of it.
 static func wolf_tank_leap_height(wolf_x: float) -> float:
-	return TANK_LEAP_HEIGHT * (1.0 - smoothstep(TANK_LEAP_CLEAR, TANK_LEAP_CLEAR + TANK_LEAP_RAMP, absf(wolf_x - DropArm.MARK_X)))
+	var along: float = (wolf_x - TANK_LEAP_PEAK_X) / TANK_LEAP_HALF_SPAN
+	return TANK_LEAP_HEIGHT * maxf(1.0 - along * along, 0.0)
 
 
 ## How far WOLF ducks (px off the top of his drawn body, feet on the floor) with his centre at

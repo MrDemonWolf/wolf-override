@@ -9,6 +9,11 @@ const State = preload("res://scripts/m0_state.gd")
 const MainScript = preload("res://scripts/main.gd")
 ## How far WOLF's painted body stays from the hung tank's on his way down the lane, in px.
 const TANK_CLEARANCE: float = 3.0
+## The bound over the crushed tank (_check_tank_leap_shape): its steepest rise or fall in px up per px
+## along, how far along it stays within 2 px of its top, and how far short of his spot it lands.
+const TANK_LEAP_MAX_SLOPE: float = 1.4
+const TANK_LEAP_TOP_SPAN: float = 60.0
+const TANK_LEAP_LANDING: float = 20.0
 
 var failures: int = 0
 var _wolf_pixel_cache: Dictionary = {}
@@ -825,7 +830,7 @@ func _check_engineer_alone(game: Node2D, path: String) -> void:
 	await _check_tank_crossing(game)
 	# Round 3c item 2: autosave C was written as the tank landed, with WOLF still at the rubble; Continue
 	# starts him at his spot by the hatch, not back across the tank.
-	_expect(autosave_c != null and autosave_c.wolf_position.x < DropArm.MARK_X - JunctionRoom.TANK_LEAP_CLEAR, "autosave C has WOLF on the rubble side of the tank (x %.0f)" % (autosave_c.wolf_position.x if autosave_c != null else -1.0))
+	_expect(autosave_c != null and autosave_c.wolf_position.x < JunctionRoom.TANK_LEAP_PEAK_X - JunctionRoom.TANK_LEAP_HALF_SPAN, "autosave C has WOLF on the rubble side of the tank (x %.0f)" % (autosave_c.wolf_position.x if autosave_c != null else -1.0))
 	game.call("_load_game")
 	_expect(wolf.position.x == JunctionRoom.WOLF_DOWN_X and wolf.body_sprite.flip_h and room.arm_parked == 1.0, "Continue from autosave C starts WOLF at his spot by the hatch, facing back down the lane, with the arm up (x %.1f)" % wolf.position.x)
 	var placed_x: float = wolf.position.x
@@ -938,9 +943,12 @@ func _check_tank_crossing(game: Node2D) -> void:
 	var wolf: M0Actor = game.get_node("Wolf") as M0Actor
 	var room: JunctionRoom = game.get("junction_room") as JunctionRoom
 	var rest_scale: Vector2 = game.get("wolf_sprite_scale") as Vector2
-	_expect(wolf.position.x < DropArm.MARK_X - JunctionRoom.TANK_LEAP_CLEAR - JunctionRoom.TANK_LEAP_RAMP and wolf.autonomous_target_x >= 0.0, "with the tank down WOLF starts the crossing from the rubble side (x %.0f)" % wolf.position.x)
+	_expect(wolf.position.x < JunctionRoom.TANK_LEAP_PEAK_X - JunctionRoom.TANK_LEAP_HALF_SPAN and wolf.autonomous_target_x >= 0.0, "with the tank down WOLF starts the crossing from the rubble side (x %.0f)" % wolf.position.x)
+	var human: M0Actor = game.get_node("Human") as M0Actor
 	var waited: Array[bool] = [true]
 	var start_x: float = wolf.position.x
+	# His feet as he passes over the engineer's centre (the lowest of the frames there).
+	var over_engineer: Array[float] = [-INF]
 	var highest: Array[float] = [0.0]
 	var frames: Dictionary = {}
 	var steady: Array[bool] = [true]
@@ -952,6 +960,8 @@ func _check_tank_crossing(game: Node2D) -> void:
 		steady[0] = steady[0] and wolf.body_sprite.scale == rest_scale and is_zero_approx(wolf.body_sprite.rotation_degrees)
 		var feet: float = wolf.position.y + wolf.body_sprite.position.y + MainScript.WOLF_FEET_BELOW_CENTRE * wolf.body_sprite.scale.y - lift
 		frames[Vector4i(roundi(wolf.position.x), roundi(feet), 1 if wolf.body_sprite.flip_h else 0, roundi(room.arm_art.position.y))] = true
+		if absf(wolf.position.x - human.position.x) <= M0Actor.HUMAN_REACH:
+			over_engineer[0] = maxf(over_engineer[0], feet)
 		return absf(wolf.position.x - JunctionRoom.WOLF_DOWN_X) <= 2.0 and wolf.body_sprite.offset == Vector2.ZERO, 300)
 	_expect(arrived and waited[0], "WOLF holds where he is until the empty arm has winched up, then crosses to his spot by the hatch")
 	_expect(steady[0] and highest[0] >= JunctionRoom.TANK_LEAP_HEIGHT - 0.5, "he bounds over the crushed tank at full height (highest %.1f px), unsquashed" % highest[0])
@@ -969,9 +979,16 @@ func _check_tank_crossing(game: Node2D) -> void:
 				touching.append("x %d feet %d" % [key.x, key.y])
 				break
 	_expect(touching.is_empty(), "WOLF's painted body stays %.0f px clear of the crushed tank, the wreck and the arm on every frame of the crossing (%d frames checked; touching at %s)" % [TANK_CLEARANCE, frames.size(), ", ".join(touching.slice(0, 4))])
+	# Round 3c fix: one bound, not a launch beside the engineer and a hover. Working the release, the
+	# engineer stands between the rubble and the tank, so he goes up over them, well clear of their head.
+	var head_y: float = INF
+	for pixel: Vector2i in _sprite_pixels(human.body_sprite, 0.0):
+		head_y = minf(head_y, pixel.y)
+	_expect(human.position.x >= SentryBrain.COVER_MIN_X and human.position.x <= SentryBrain.COVER_MAX_X and over_engineer[0] > -INF and over_engineer[0] <= head_y - TANK_CLEARANCE, "with the engineer at the release he passes over them on the way up, his feet (y %.0f) clear of their head (y %.0f)" % [over_engineer[0], head_y])
 	# The leap at every x of the crossing, with the wreck pinned anywhere the tank can catch it.
 	var feet_rest: float = 423.0 - 15.0 + MainScript.WOLF_FEET_BELOW_CENTRE * rest_scale.y
 	_expect(JunctionRoom.wolf_tank_leap_height(JunctionRoom.WOLF_RUBBLE_X) == 0.0 and JunctionRoom.wolf_tank_leap_height(JunctionRoom.WOLF_DOWN_X) == 0.0, "at the rubble and at his spot by the hatch he is on the floor")
+	_check_tank_leap_shape()
 	for at_x: float in [DropArm.MARK_X - DropArm.HIT_REACH, DropArm.MARK_X, DropArm.MARK_X + DropArm.HIT_REACH]:
 		for facing: float in [-1.0, 1.0]:
 			room.sentry.keel_over(at_x)
@@ -992,6 +1009,39 @@ func _check_tank_crossing(game: Node2D) -> void:
 	# check, so its physics frames are not spent catching up inside one process frame.
 	for _frame: int in 6:
 		await process_frame
+
+
+## Round 3c fix: the bound over the crushed tank is one arc. It leaves the floor once and comes back
+## once, rising and then falling with no flat top (every step up is smaller than the one before it, as
+## under gravity), never steeper than TANK_LEAP_MAX_SLOPE px up per px along (the earlier plateau's
+## ramps rose 2.1), within 2 px of its top for no more than TANK_LEAP_TOP_SPAN px along, and down on
+## the floor at least TANK_LEAP_LANDING px short of his spot by the hatch, so he does not drop onto it.
+func _check_tank_leap_shape() -> void:
+	var take_off: float = -1.0
+	var landing: float = -1.0
+	var concave: bool = true
+	var steepest: float = 0.0
+	var near_top: float = 0.0
+	var previous_step: float = INF
+	for x: int in range(roundi(JunctionRoom.WOLF_RUBBLE_X), roundi(JunctionRoom.WOLF_DOWN_X)):
+		var here: float = JunctionRoom.wolf_tank_leap_height(x)
+		var next: float = JunctionRoom.wolf_tank_leap_height(x + 1)
+		if here == 0.0 and next > 0.0:
+			_expect(take_off < 0.0, "the bound leaves the floor only once (again at x %d)" % x)
+			take_off = x
+		if here > 0.0 and next == 0.0:
+			landing = x + 1
+		if here > 0.0 and next > 0.0:
+			var step: float = next - here
+			concave = concave and step < previous_step
+			previous_step = step
+			steepest = maxf(steepest, absf(step))
+		if here >= JunctionRoom.TANK_LEAP_HEIGHT - 2.0:
+			near_top += 1.0
+	_expect(take_off > JunctionRoom.WOLF_RUBBLE_X and landing > take_off and concave, "the bound over the tank is one arc, from x %.0f to x %.0f, rising and falling with no flat top" % [take_off, landing])
+	_expect(steepest <= TANK_LEAP_MAX_SLOPE, "it rises and falls no steeper than %.1f px per px (steepest %.2f)" % [TANK_LEAP_MAX_SLOPE, steepest])
+	_expect(near_top <= TANK_LEAP_TOP_SPAN, "it is within 2 px of its top for %.0f px along, not a hover" % near_top)
+	_expect(landing <= JunctionRoom.WOLF_DOWN_X - TANK_LEAP_LANDING, "he lands at x %.0f, at least %.0f px short of his spot by the hatch" % [landing, TANK_LEAP_LANDING])
 
 
 ## [param sprite]'s painted pixels (alpha over half) where the scene draws it, in world pixels, grown
