@@ -121,6 +121,18 @@ class SentryVisual:
 	func is_lit() -> bool:
 		return not wrecked and eye != EYE_OFF
 
+	## What _draw covers, in this node's space: the lens and the beam out to [member reach] at its
+	## widest, or nothing while it is unlit. The debug tools' render box uses it in an exported build,
+	## where the renderer cannot report what was drawn.
+	func debug_draw_rect() -> Rect2:
+		if not is_lit():
+			return Rect2()
+		var lens: Rect2 = Sentry.lens_rect()
+		if reach <= lens.end.x:
+			return lens
+		var half: float = maxf(_beam_section(reach, lens).x, lens.size.y * 0.5)
+		return lens.merge(Rect2(lens.end.x, lens.get_center().y - half, reach - lens.end.x, half * 2.0))
+
 	## Powers the machine down or up; [param animate] brightens it over WAKE_SECONDS as it wakes.
 	func set_dormant(value: bool, animate: bool) -> void:
 		if _wake_tween != null and _wake_tween.is_valid():

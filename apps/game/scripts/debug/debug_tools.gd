@@ -31,6 +31,9 @@ signal overlay_mode_changed(mode: int)
 ## and "with_boxes" (whether every zone, hitbox and render box was drawn into the screenshot).
 signal captured(paths: Dictionary)
 
+## On the zones page the categories also toggle on a controller: LB zones, RB hitboxes, View (Select)
+## render boxes (DebugZones.CATEGORY_PAD_BUTTONS), unless the player bound that button to a game action.
+##
 ## The overlay pages F3 cycles through, in order.
 enum Overlay { OFF, PERFORMANCE, STATE, ZONES }
 const OVERLAY_NAMES: Array[String] = ["off", "performance", "state", "state and zones"]
@@ -62,6 +65,9 @@ const CARDS: Array[StringName] = [&"pause_overlay", &"end_card", &"credits_scree
 const CHOICES: Array[StringName] = [&"touch_choice_1", &"touch_choice_2"]
 ## Above the game's HUD, menus and pause overlay.
 const LAYER: int = 100
+## capture_with_boxes() waits at most this many frames for the boxes to be drawn: a window that
+## presents nothing (hidden, occluded or minimised) never holds a capture driver up.
+const FRAME_WAIT_LIMIT: int = 10
 ## The touch DEBUG button, in the 960x540 canvas: top right, ending BUTTON_GAP left of PAUSE (main.tscn's
 ## PauseButton spans x 854..942) and above the title's logo mark (from y 48), so it never covers PAUSE,
 ## USE, the arrows or the actors lower down. Its width is at least the TouchButton theme's minimum,
@@ -127,6 +133,9 @@ var _save_info_msec: int = 0
 var save_reads: int = 0
 ## True while capture_with_boxes() has every box drawn for its screenshot.
 var _capturing_boxes: bool = false
+## The signal capture_with_boxes() waits on for a drawn frame; unset, the renderer's frame_post_draw
+## (none in a headless run). Tests set one that never fires to check the bounded wait.
+var frame_drawn_signal: Signal = Signal()
 
 
 ## Hooks the tools onto Main: reads the stored unlock from Main's settings file, builds the hidden
@@ -198,6 +207,8 @@ func _build() -> void:
 	# If the theme's minimum grows later (a font or theme change), the button grows to the left.
 	debug_button.grow_horizontal = Control.GROW_DIRECTION_BEGIN
 	UIMotion.attach(debug_button)
+	# The zone drawing keeps its names off the tools' own cards.
+	zones.own_controls = [overlay, debug_button, note]
 
 
 ## Recomputes availability from the build, the stored unlock and a session lock.
@@ -235,7 +246,9 @@ func _refresh_view(redraw: bool = false) -> void:
 	# The zones page draws over the whole view, so it steps aside for the game's cards (not for the
 	# answers: its legend is clear of them); a capture with boxes draws it whatever is up.
 	zones.set_shown(available and (_capturing_boxes or (overlay_mode == Overlay.ZONES and not card_up)))
-	var touch_layout: bool = bool(game.get(&"touch_enabled")) and not bool(game.get(&"controller_active"))
+	var controller: bool = bool(game.get(&"controller_active"))
+	var touch_layout: bool = bool(game.get(&"touch_enabled")) and not controller
+	zones.set_device("controller" if controller else ("touch" if touch_layout else "keyboard"))
 	debug_button.visible = available and touch_layout and not menu_open and not card_up
 	_sync_layer()
 
@@ -324,6 +337,9 @@ func _input(event: InputEvent) -> void:
 		get_viewport().set_input_as_handled()
 	elif event is InputEventJoypadButton:
 		var button: InputEventJoypadButton = event as InputEventJoypadButton
+		# Unbound buttons: left unhandled, so Main still notes the controller is in use.
+		if button.pressed and overlay_mode == Overlay.ZONES and zones.visible and _pad_toggle(button):
+			return
 		if button.button_index != JOY_BUTTON_LEFT_STICK and button.button_index != JOY_BUTTON_RIGHT_STICK:
 			return
 		var held: int = int(_sticks.get(button.device, 0))
@@ -333,6 +349,20 @@ func _input(event: InputEvent) -> void:
 		if button.pressed and held == 3:
 			open_menu()
 			get_viewport().set_input_as_handled()
+
+
+## On the zones page, LB, RB or View turns a category on or off; false (and nothing changes) for any
+## other button, or one the player bound to a game action.
+func _pad_toggle(button: InputEventJoypadButton) -> bool:
+	for category: StringName in DebugZones.CATEGORIES:
+		if DebugZones.CATEGORY_PAD_BUTTONS[category] != button.button_index:
+			continue
+		for action: StringName in InputMap.get_actions():
+			if not String(action).begins_with("ui_") and InputMap.event_is_action(button, action, true):
+				return false
+		zones.toggle_layer(category)
+		return true
+	return false
 
 
 ## Codes are entered on the title screen, with no menu over it.
@@ -468,7 +498,9 @@ func capture() -> Dictionary:
 
 
 ## For capture drivers: draws every zone, hitbox and render box (whatever page or card is up), waits
-## for that frame to render, writes the capture with them in the screenshot, then puts the view back.
+## for that frame to render (at most FRAME_WAIT_LIMIT frames), writes the capture with them in the
+## screenshot, then puts the view back. If no frame was drawn in time (a window that presents
+## nothing) it still writes the dump, with no screenshot and "with_boxes" false.
 ## Await it: `var paths: Dictionary = await debug_tools.capture_with_boxes()`.
 func capture_with_boxes() -> Dictionary:
 	if not available:
@@ -479,11 +511,11 @@ func capture_with_boxes() -> Dictionary:
 		zones.set_layer(true, category)
 	_refresh_view()
 	zones.refresh_now()
-	if DisplayServer.get_name() == "headless":
-		await get_tree().process_frame
-	else:
-		await RenderingServer.frame_post_draw
-	var paths: Dictionary = _write_capture(true)
+	var frame_signal: Signal = frame_drawn_signal
+	if frame_signal.is_null() and DisplayServer.get_name() != "headless":
+		frame_signal = RenderingServer.frame_post_draw
+	var rendered: bool = await await_drawn_frame(frame_signal, FRAME_WAIT_LIMIT)
+	var paths: Dictionary = _write_capture(rendered, rendered)
 	_capturing_boxes = false
 	for category: StringName in DebugZones.CATEGORIES:
 		zones.set_layer(bool(drawn[category]), category)
@@ -491,7 +523,25 @@ func capture_with_boxes() -> Dictionary:
 	return paths
 
 
-func _write_capture(with_boxes: bool) -> Dictionary:
+## Waits for [param drawn] (a frame was rendered), but at most [param frames] process frames; with
+## no signal (a headless run, nothing to wait for) one frame. True unless the wait ran out.
+func await_drawn_frame(drawn: Signal, frames: int) -> bool:
+	if drawn.is_null():
+		await get_tree().process_frame
+		return true
+	var came: Array[bool] = [false]
+	var mark: Callable = func() -> void: came[0] = true
+	drawn.connect(mark, CONNECT_ONE_SHOT)
+	for _frame: int in frames:
+		await get_tree().process_frame
+		if came[0]:
+			break
+	if drawn.is_connected(mark):
+		drawn.disconnect(mark)
+	return came[0]
+
+
+func _write_capture(with_boxes: bool, screenshot: bool = true) -> Dictionary:
 	if not available:
 		return {}
 	DirAccess.make_dir_recursive_absolute(ProjectSettings.globalize_path(capture_dir))
@@ -501,7 +551,7 @@ func _write_capture(with_boxes: bool) -> Dictionary:
 		suffix += 1
 		base = "%s/%s-%d" % [capture_dir, _timestamp(), suffix]
 	var png: String = ""
-	var image: Image = _screenshot()
+	var image: Image = _screenshot() if screenshot else null
 	if image != null and image.save_png(base + ".png") == OK:
 		png = base + ".png"
 	var paths: Dictionary = {"json": base + ".json", "png": png, "with_boxes": with_boxes}

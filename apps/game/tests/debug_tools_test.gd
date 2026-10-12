@@ -25,7 +25,11 @@ func _run() -> void:
 	await _check_zones_corridor()
 	await _check_zones_records()
 	await _check_zones_junction()
+	await _check_zones_keep_clear()
+	await _check_custom_draw_boxes()
+	await _check_zones_controller_toggles()
 	await _check_capture_with_boxes()
+	await _check_capture_bounded_wait()
 	await _check_touch_button_and_menu_inputs()
 	_clean()
 	if failures == 0:
@@ -689,6 +693,7 @@ func _check_zones_junction() -> void:
 	var blast: Dictionary = _entry(geometry["hitboxes"], "name", "blast")
 	_expect(_edges_match_static(PressureLine.is_in_blast, blast["x_range"]) and blast["active"] == false, "the blast range is exactly where is_in_blast holds, idle before the fuse")
 	_expect(_edges_match(game, "_at_arm_panel", _entry(geometry["zones"], "name", "use: tank release")["x_range"], false), "the tank release's range is exactly where USE reaches it")
+	_expect(_entry(geometry["zones"], "name", "use: tank release")["active"] == false, "before the door is blown the tank release's range is drawn as not answering USE")
 	_expect(is_equal_approx(float(_entry(geometry["zones"], "name", "use: exit bolt")["x_range"][0]), JunctionRoom.BOLT_REACH_MIN_X), "the exit bolt's range starts at its reach")
 	var line: PressureLine = game.get("pressure_line") as PressureLine
 	line.arm()
@@ -705,6 +710,7 @@ func _check_zones_junction() -> void:
 	await _settle(3)
 	var brain: SentryBrain = game.get("sentry_brain") as SentryBrain
 	geometry = tools.dump()["geometry"]
+	_expect(_entry(geometry["zones"], "name", "use: tank release")["active"] == true, "with the door blown the tank release's range answers USE")
 	var contact: Dictionary = _entry(geometry["hitboxes"], "name", "sentry contact")
 	_expect(not contact.is_empty() and is_equal_approx(float(contact["x_range"][0]), brain.x - SentryBrain.CONTACT_RANGE) and is_equal_approx(float(contact["x_range"][1]), brain.x + SentryBrain.CONTACT_RANGE) and contact["active"] == false, "the sentry's contact range is drawn around it, idle while it patrols")
 	var sight: Dictionary = _entry(geometry["zones"], "name", "sight %.0f" % SentryBrain.SIGHT_RANGE)
@@ -735,6 +741,225 @@ func _check_zones_junction() -> void:
 	tools.set_overlay_mode(DebugTools.Overlay.OFF)
 	_expect(_idle(tools), "turned off in the junction, the tools are idle")
 	await _free(game)
+
+
+## Nothing drawn covers the touch arrows, USE, PAUSE or the hint and dialogue text, and no name sits
+## on an actor or on another name, in the keyboard and the touch layout, in the corridor and the lane.
+## A range wholly off screen is reported, not drawn.
+func _check_zones_keep_clear() -> void:
+	var game: Node2D = await _spawn(true)
+	var tools: DebugTools = _tools(game)
+	game.call("_new_game")
+	game.call("_finish_intro")
+	await _settle(3)
+	tools.set_overlay_mode(DebugTools.Overlay.ZONES)
+	for layout: String in ["keyboard", "touch"]:
+		game.set("touch_enabled", layout == "touch")
+		game.call("_refresh_ui")
+		tools.call("_refresh_view")
+		await _settle(2)
+		var geometry: Dictionary = tools.dump()["geometry"]
+		var clear: Dictionary = geometry["keep_clear"]
+		var names: Array[String] = []
+		for entry: Dictionary in clear["controls_and_text"]:
+			names.append(str(entry["name"]))
+		var expected: Array[String] = ["pause_button", "context_hint_text text", "story text"]
+		if layout == "touch":
+			expected.append_array(["touch_left", "touch_right", "touch_use"])
+		_expect(expected.all(func(name: String) -> bool: return names.has(name)), "the %s layout protects PAUSE, the hint and dialogue text%s (%s)" % [layout, " and the touch controls" if layout == "touch" else "", names])
+		var hint_text: Rect2 = DebugZones.text_rect(game.get_node("CanvasLayer/ContextHint/Text") as Label)
+		var hint_box: Rect2 = (game.get_node("CanvasLayer/ContextHint/Text") as Control).get_global_rect()
+		_expect(hint_text.has_area() and hint_text.size.x < hint_box.size.x, "the hint's protected area is its text, not its whole box (%s in %s)" % [hint_text, hint_box])
+		_expect(_labels_clear(geometry).is_empty(), "corridor, %s layout: %s" % [layout, _labels_clear(geometry) if not _labels_clear(geometry).is_empty() else "every name is clear"])
+		_expect(_drawn_names(geometry) >= (18 if layout == "keyboard" else 14), "corridor, %s layout: most names still find room (%d)" % [layout, _drawn_names(geometry)])
+		var camera_tick: Dictionary = _entry(geometry["zones"], "name", "camera x%.2f" % (game.get("intro_camera") as Camera2D).zoom.x)
+		_expect(camera_tick.has("label_rect"), "corridor, %s layout: the camera's centre is named on the bottom edge" % layout)
+	# The engineer at the bypass: the purge display's range is wholly off screen.
+	game.set("touch_enabled", false)
+	game.call("_refresh_ui")
+	(game.get_node("Human") as Node2D).position.x = 760.0
+	await create_timer(1.5).timeout
+	var far: Dictionary = tools.dump()["geometry"]
+	var purge: Dictionary = _entry(far["zones"], "name", "use: purge display")
+	_expect(not purge.is_empty() and purge.get("on_screen") == false and int(purge.get("lane", 0)) == -1 and not purge.has("label_rect"), "a range wholly off screen is reported but not drawn, and its name takes no room (%s)" % [purge.get("screen_rect")])
+	_expect(_labels_clear(far).is_empty(), "with the camera moved: %s" % [_labels_clear(far) if not _labels_clear(far).is_empty() else "every name is clear"])
+	# Cutting: whatever is left of a bar, line or box overlaps no protected rectangle.
+	var cuts: Array[Rect2] = [Rect2(10.0, 10.0, 20.0, 20.0), Rect2(25.0, 0.0, 10.0, 50.0)]
+	var pieces: Array[Rect2] = DebugZones.clip(Rect2(0.0, 15.0, 60.0, 4.0), cuts)
+	var area: float = 0.0
+	var crossing: int = 0
+	for piece: Rect2 in pieces:
+		area += piece.get_area()
+		for cut: Rect2 in cuts:
+			if piece.intersects(cut):
+				crossing += 1
+	_expect(crossing == 0 and is_equal_approx(area, 60.0 * 4.0 - 25.0 * 4.0), "a bar cut around two controls keeps exactly the parts outside them (%s)" % [pieces])
+	# The lane, door blown, touch layout: the busiest still.
+	_expect(_junction_state(true).save_to_disk(str(game.get("save_path"))), "a door-blown save is written")
+	game.call("_load_game")
+	await _settle(3)
+	game.set("touch_enabled", true)
+	game.call("_refresh_ui")
+	tools.call("_refresh_view")
+	await _settle(2)
+	var lane: Dictionary = tools.dump()["geometry"]
+	_expect(_labels_clear(lane).is_empty(), "the lane, touch layout: %s" % [_labels_clear(lane) if not _labels_clear(lane).is_empty() else "every name is clear"])
+	var limit: DebugZones.Item = null
+	for item: DebugZones.Item in tools.zones.items(true):
+		if item.name == "chase limit":
+			limit = item
+	var use_rect: Rect2 = (game.get("touch_use") as Control).get_global_rect()
+	_expect(limit != null and tools.zones.limit_bottom(limit) >= limit.screen.end.y, "a limit's line reaches the floor")
+	game.set("touch_enabled", false)
+	tools.set_overlay_mode(DebugTools.Overlay.OFF)
+	_expect(use_rect.has_area() and _idle(tools), "turned off, the tools are idle")
+	await _free(game)
+
+
+## Props drawn by their own _draw (the sentry's beam, the hatch doorway, the bypass pipe, the room
+## lights and beacons) get render boxes from what was drawn, and the sentry's beam also declares its
+## box for exported builds.
+func _check_custom_draw_boxes() -> void:
+	var game: Node2D = await _spawn(true)
+	var tools: DebugTools = _tools(game)
+	_expect(_junction_state(true).save_to_disk(str(game.get("save_path"))), "a door-blown save is written")
+	game.call("_load_game")
+	await _settle(4)
+	tools.set_overlay_mode(DebugTools.Overlay.ZONES)
+	await _settle(2)
+	var geometry: Dictionary = tools.dump()["geometry"]
+	var room: JunctionRoom = game.get("junction_room") as JunctionRoom
+	var visual: Node2D = room.sentry.get_node("Visual") as Node2D
+	var beam: Dictionary = _entry(geometry["render_boxes"], "path", str(game.get_path_to(visual)))
+	var drawn: Rect2 = RenderingServer.debug_canvas_item_get_rect(visual.get_canvas_item())
+	_expect(drawn.has_area() and not beam.is_empty() and beam.get("custom_draw") == true and beam.get("bounds") == "renderer" and _same_rect(beam["screen_rect"], visual.get_global_transform_with_canvas() * drawn), "the sentry's beam has a render box from what it drew (%s)" % [beam.get("screen_rect")])
+	var declared: Rect2 = visual.call("debug_draw_rect")
+	_expect(declared.grow(2.0).encloses(drawn) and drawn.grow(2.0).encloses(declared), "the beam's declared box matches what it drew (%s vs %s)" % [declared, drawn])
+	var boxed: Dictionary = {}
+	for box: Dictionary in geometry["render_boxes"]:
+		boxed[str(box["path"])] = true
+	var missing: Array[String] = []
+	for node: Node in game.find_children("*", "Node2D", true, false):
+		var item: Node2D = node as Node2D
+		if not item.is_visible_in_tree() or str(game.get_path_to(item)).begins_with("DebugTools"):
+			continue
+		var script: Script = item.get_script() as Script
+		if script == null or not script.get_script_method_list().any(func(method: Dictionary) -> bool: return method["name"] == "_draw"):
+			continue
+		if RenderingServer.debug_canvas_item_get_rect(item.get_canvas_item()).has_area() and not boxed.has(str(game.get_path_to(item))):
+			missing.append(str(game.get_path_to(item)))
+	_expect(missing.is_empty(), "every visible prop that draws by itself has a render box (missing %s)" % [missing])
+	for path: String in [str(game.get_path_to(room)) + "/HatchDoorway", "BypassHandle"]:
+		var node: CanvasItem = game.get_node_or_null(path) as CanvasItem
+		_expect(node != null and not _entry(geometry["render_boxes"], "path", path).is_empty(), "%s has a render box" % path)
+	tools.set_overlay_mode(DebugTools.Overlay.OFF)
+	await _free(game)
+
+
+## On a controller the zones page's categories toggle with LB, RB and View, like F5 to F7, unless the
+## button is bound to a game action; the legend names the buttons for the device in use.
+func _check_zones_controller_toggles() -> void:
+	var game: Node2D = await _spawn(true)
+	var tools: DebugTools = _tools(game)
+	var zones: DebugZones = tools.zones
+	game.call("_new_game")
+	game.call("_finish_intro")
+	await _settle(3)
+	tools.set_overlay_mode(DebugTools.Overlay.ZONES)
+	await _tap_pad(JOY_BUTTON_LEFT_SHOULDER)
+	_expect(not zones.layers[DebugZones.ZONES] and zones.layers[DebugZones.HITBOXES] and zones.layers[DebugZones.RENDER], "LB turns the zones off")
+	await _tap_pad(JOY_BUTTON_RIGHT_SHOULDER)
+	await _tap_pad(JOY_BUTTON_BACK)
+	_expect(not zones.layers[DebugZones.HITBOXES] and not zones.layers[DebugZones.RENDER] and not (zones.legend_buttons[DebugZones.RENDER] as Button).button_pressed, "RB and View turn the hitboxes and the render boxes off, and the legend follows")
+	for button: JoyButton in [JOY_BUTTON_LEFT_SHOULDER, JOY_BUTTON_RIGHT_SHOULDER, JOY_BUTTON_BACK]:
+		await _tap_pad(button)
+	_expect(zones.layers.values().all(func(on: bool) -> bool: return on), "and on again")
+	_expect(zones.legend_caption.text == DebugZones.CAPTIONS["controller"], "after a controller press the legend names LB, RB and View (%s)" % zones.legend_caption.text)
+	var bound: InputEventJoypadButton = InputEventJoypadButton.new()
+	bound.button_index = JOY_BUTTON_LEFT_SHOULDER
+	InputMap.action_add_event(&"interact", bound)
+	await _tap_pad(JOY_BUTTON_LEFT_SHOULDER)
+	InputMap.action_erase_event(&"interact", bound)
+	_expect(zones.layers[DebugZones.ZONES], "a button the player bound to a game action does not toggle anything")
+	tools.set_overlay_mode(DebugTools.Overlay.STATE)
+	await _tap_pad(JOY_BUTTON_RIGHT_SHOULDER)
+	_expect(zones.layers[DebugZones.HITBOXES], "off the zones page RB does nothing")
+	game.set("controller_active", false)
+	game.set("touch_enabled", true)
+	tools.call("_refresh_view")
+	_expect(zones.legend_caption.text == DebugZones.CAPTIONS["touch"], "in the touch layout the legend says to tap")
+	game.set("touch_enabled", false)
+	tools.call("_refresh_view")
+	_expect(zones.legend_caption.text == DebugZones.CAPTIONS["keyboard"], "on a keyboard it names F5 to F7")
+	tools.set_overlay_mode(DebugTools.Overlay.OFF)
+	await _free(game)
+
+
+## A window that presents no frame never holds a capture with boxes up: after FRAME_WAIT_LIMIT frames
+## it writes the dump without a screenshot, says the boxes are not in one, and puts the view back.
+func _check_capture_bounded_wait() -> void:
+	var game: Node2D = await _spawn(true)
+	var tools: DebugTools = _tools(game)
+	tools.capture_dir = base + "-captures"
+	game.call("_new_game")
+	game.call("_finish_intro")
+	await _settle(3)
+	tools.zones.set_layer(false, DebugZones.RENDER)
+	var silent: Node = Node.new()
+	silent.add_user_signal("never")
+	tools.frame_drawn_signal = Signal(silent, "never")
+	var start: int = get_frame()
+	var paths: Dictionary = await tools.capture_with_boxes()
+	var waited: int = get_frame() - start
+	_expect(waited <= DebugTools.FRAME_WAIT_LIMIT + 2, "the capture gives up waiting for a drawn frame after %d frames (%d)" % [DebugTools.FRAME_WAIT_LIMIT, waited])
+	_expect(paths.get("with_boxes") == false and str(paths.get("png", "x")).is_empty() and FileAccess.file_exists(str(paths.get("json", ""))), "it still writes the dump, with no stale screenshot and with_boxes false (%s)" % [paths])
+	_expect(not tools.zones.visible and not tools.zones.layers[DebugZones.RENDER] and tools.zones.layers[DebugZones.ZONES] and not tools.get("_capturing_boxes"), "and puts the page and the categories back")
+	tools.frame_drawn_signal = Signal()
+	tools.hide_note()
+	silent.free()
+	await _free(game)
+
+
+## The first problem with the drawn names in [param geometry], or empty: a name over a protected
+## control or text, over an actor, off screen, or over another name.
+func _labels_clear(geometry: Dictionary) -> String:
+	var clear: Array[Rect2] = []
+	for entry: Dictionary in geometry["keep_clear"]["controls_and_text"]:
+		clear.append(_rect(entry["screen_rect"]))
+	for actor: Array in geometry["keep_clear"]["actors"]:
+		clear.append(_rect(actor))
+	var view: Rect2 = Rect2(Vector2.ZERO, root.get_visible_rect().size)
+	var labels: Array[Rect2] = []
+	var names: Array[String] = []
+	for list: String in ["zones", "hitboxes", "render_boxes"]:
+		for item: Dictionary in geometry[list]:
+			if not item.has("label_rect"):
+				continue
+			var rect: Rect2 = _rect(item["label_rect"])
+			if not view.encloses(rect):
+				return "'%s' is drawn off screen at %s" % [item["name"], rect]
+			for index: int in clear.size():
+				if rect.intersects(clear[index]):
+					return "'%s' at %s covers a protected area %s" % [item["name"], rect, clear[index]]
+			for index: int in labels.size():
+				if rect.intersects(labels[index]):
+					return "'%s' at %s overlaps '%s' at %s" % [item["name"], rect, names[index], labels[index]]
+			labels.append(rect)
+			names.append(str(item["name"]))
+	return ""
+
+
+func _drawn_names(geometry: Dictionary) -> int:
+	var count: int = 0
+	for list: String in ["zones", "hitboxes"]:
+		for item: Dictionary in geometry[list]:
+			if item.has("label_rect"):
+				count += 1
+	return count
+
+
+func _rect(values: Array) -> Rect2:
+	return Rect2(float(values[0]), float(values[1]), float(values[2]), float(values[3]))
 
 
 ## For capture drivers: a capture with boxes draws every category into its screenshot whatever page
