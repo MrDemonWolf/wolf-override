@@ -52,4 +52,4 @@ Godot 4.7's RenderingServer reference says `--headless` disables rendering and r
 ## Historical and local material
 Older MACHINE//ONLINE terminal mockups/downloads remain historical; they were not overwritten or adopted as current gameplay. Unrelated Library artwork was not used as game assets. These files began as a newly authored Markdown snapshot rather than a byte-for-byte Notion export. They were later copied into this local Git checkout; no older implementation was present here to merge against.
 
-The supplied `PACKAGE_VALIDATION.txt` records documentation, JSON, link, fence and ZIP-integrity checks from package creation. No ZIP is present in this checkout, so that archive check was not repeated here. Current local checks are recorded in [next-session.md](next-session.md). No complete graphical route play, export or device check was run.
+The September 25 package's own validation notes, its Codex handoff prompt and its ChatGPT project instructions were removed on October 11, 2026 as stale. Current local checks are recorded in [next-session.md](next-session.md). No complete graphical route play, export or device check was run.
