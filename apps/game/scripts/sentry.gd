@@ -37,12 +37,6 @@ const BEAM_SPREAD: float = 12.0
 const BEAM_ALPHA: float = 0.34
 const BEAM_TIP_ALPHA: float = 0.08
 const BEAM_EDGE_ALPHA: float = 0.24
-## Fixated on WOLF it watches only him and sees no one else. Facing the rubble its beam ends here,
-## short of anyone at the TANK RELEASE (the patrol's near turn, where its front would meet an engineer
-## at the alcove's edge); facing WOLF at the far end of the lane (JunctionRoom.WOLF_BAIT_X) it ends at
-## his snout (FIXATED_BEAM_FAR_X) rather than run on over him.
-const FIXATED_BEAM_END_X: float = SentryBrain.PATROL_MIN_X
-const FIXATED_BEAM_FAR_X: float = DropArm.MARK_X + SentryBrain.BAIT_OFFSET - M0Actor.WOLF_REACH
 ## The soft additive glow over the lens slit.
 const LENS_GLOW_SIZE: Vector2 = Vector2(30.0, 16.0)
 const LENS_GLOW_ALPHA: float = 0.7
@@ -53,8 +47,11 @@ const WAKE_SECONDS: float = 0.35
 
 ## The x the brain wants; the mover closes on it at up to CHASE_SPEED.
 var target_x: float = SentryBrain.PATROL_MAX_X
-## True while the brain is fixated on WOLF: the beam is drawn short (beam_tip_x).
+## True while the brain is fixated on WOLF: it stops scanning and draws no beam (beam_tip_x).
 var fixated: bool = false
+## Where a beam facing right has to stop, or INF: WOLF's near edge while he holds the far end of the
+## lane without drawing it, so the beam never runs on over him. Main sets it every frame.
+var beam_stop_x: float = INF
 var visual: SentryVisual
 var floor_reflections: Array[FloorReflection] = []
 var _down_tween: Tween
@@ -204,23 +201,25 @@ class SentryVisual:
 
 ## Where the drawn beam ends for a sentry at [param x] facing [param facing]: SIGHT_RANGE ahead,
 ## as far as SentryBrain sees, but never past the rubble line, where nobody can be seen, nor past
-## the furthest right the engineer can stand (M0Actor.MAX_X), so it stays inside the room. A
-## [param fixated] sentry (WOLF is drawing it) sees no one else, so facing the rubble its beam stops
-## at FIXATED_BEAM_END_X, clear of the engineer at the TANK RELEASE, and facing WOLF it stops at his
-## snout (FIXATED_BEAM_FAR_X).
-static func beam_tip_x(x: float, facing: float, fixated: bool = false) -> float:
+## the furthest right the engineer can stand (M0Actor.MAX_X), so it stays inside the room, nor, facing
+## right, past [param stop_x] (WOLF's near edge while he holds the far end). A [param fixated] sentry
+## (WOLF is drawing it) stops scanning: it watches only him, with its red eye, and draws no beam, so
+## nothing is drawn over the engineer at the TANK RELEASE, over WOLF, or across the EXIT BOLT box
+## between it on the mark and WOLF by the hatch.
+static func beam_tip_x(x: float, facing: float, fixated: bool = false, stop_x: float = INF) -> float:
+	if fixated:
+		return x
 	var tip: float = x + signf(facing) * SentryBrain.SIGHT_RANGE
 	if facing < 0.0:
-		# (A fixated sentry already nearer than that end draws no beam at all.)
-		return maxf(tip, minf(FIXATED_BEAM_END_X, x) if fixated else SentryBrain.LANE_ENTRY_X)
-	return minf(tip, maxf(FIXATED_BEAM_FAR_X, x) if fixated else M0Actor.MAX_X)
+		return maxf(tip, SentryBrain.LANE_ENTRY_X)
+	return maxf(x, minf(tip, minf(M0Actor.MAX_X, stop_x)))
 
 
 ## The world-x span (from, to) of the TANK RELEASE alcove that the beam of a sentry at [param x] facing
 ## [param facing] would cross. SentryBrain.is_exposed hides an engineer centred anywhere in it, so the
 ## beam is not drawn there. Vector2.ZERO when the beam does not reach the alcove.
-static func beam_gap(x: float, facing: float, fixated: bool = false) -> Vector2:
-	var tip: float = beam_tip_x(x, facing, fixated)
+static func beam_gap(x: float, facing: float, fixated: bool = false, stop_x: float = INF) -> Vector2:
+	var tip: float = beam_tip_x(x, facing, fixated, stop_x)
 	var from: float = maxf(SentryBrain.COVER_MIN_X, minf(x, tip))
 	var to: float = minf(SentryBrain.COVER_MAX_X, maxf(x, tip))
 	return Vector2(from, to) if to > from else Vector2.ZERO
@@ -304,8 +303,8 @@ func place(brain: SentryBrain) -> void:
 ## faces.
 func _sync_reach() -> void:
 	var facing: float = visual.scale.x
-	visual.reach = absf(beam_tip_x(target_x, facing, fixated) - position.x)
-	var span: Vector2 = beam_gap(target_x, facing, fixated)
+	visual.reach = absf(beam_tip_x(target_x, facing, fixated, beam_stop_x) - position.x)
+	var span: Vector2 = beam_gap(target_x, facing, fixated, beam_stop_x)
 	if span.y > span.x:
 		var ends: Vector2 = Vector2((span.x - position.x) * facing, (span.y - position.x) * facing)
 		visual.gap = Vector2(minf(ends.x, ends.y), maxf(ends.x, ends.y))

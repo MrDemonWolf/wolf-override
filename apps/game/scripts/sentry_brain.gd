@@ -3,9 +3,11 @@ extends RefCounted
 ## The Service Junction's purge sentry, as pure logic. States: dormant (behind the sealed door,
 ## until the blast wakes it), patrol (bouncing PATROL_MIN_X..PATROL_MAX_X), lock (it has just
 ## seen the engineer, or a missed drop turned it: it stops and turns to them for LOCK_SECONDS before
-## it moves), chase (running the engineer down in its lane), fixated (WOLF chose to draw it; it
-## parks BAIT_OFFSET short of him, on the mark) and down (the tank landed on it; nothing moves it
-## again). A missed tank lying on the floor ([member obstacle]) stops it at its edge. Advanced with real
+## it moves), chase (running the engineer down in its lane), fixated (WOLF chose to draw it: it keeps
+## its distance from him until he is past it, then parks BAIT_OFFSET short of him, on the mark) and
+## down (the tank landed on it; nothing moves it again). A missed tank lying on the floor
+## ([member obstacle]) stops it at its edge, and WOLF holding the far end of the lane ([member far_x])
+## turns it short of him. Advanced with real
 ## delta so tests are frame-independent; the room sets [member paused] during a choice and never ticks
 ## it while the game is paused or during a knockdown.
 
@@ -46,7 +48,10 @@ const LOSE_SECONDS: float = 2.5
 ## draws it from the far end of its lane, by the exit hatch (JunctionRoom.WOLF_BAIT_X, 902), so the
 ## parked sentry faces him with its back to the TANK RELEASE: the engineer at the release is behind it,
 ## never between the two. His drawn body (M0Actor.WOLF_REACH, 67) stays far outside the floor brackets
-## and the tank's footprint, and inside the room's right edge (the view ends at x 960).
+## and the tank's footprint, and inside the room's right edge (the view ends at x 960). Until he is
+## past it, it keeps at least this far ahead of him as he comes down the lane and never closes on him,
+## backing off as far as the end of its patrol (PATROL_MAX_X): he catches up with it there and bounds
+## over it right of the hanging tank (JunctionRoom.wolf_leap_height), never under it.
 const BAIT_OFFSET: float = 202.0
 const EPSILON: float = 0.00001
 
@@ -68,9 +73,13 @@ var paused: bool = false
 ## or through it; a patrol turns back there.
 var obstacle: Vector2 = Vector2.ZERO
 ## Where WOLF actually is while he draws it (he is still crossing the lane to his spot), or a negative
-## number: a fixated sentry keeps its eyes on him, not on the spot he is heading for. The room sets it
-## every frame.
+## number: a fixated sentry keeps its eyes on him, not on the spot he is heading for, and keeps its
+## distance from him until he is past it. The room sets it every frame.
 var watch_x: float = -1.0
+## The furthest right its body may go: PATROL_MAX_X, or short of WOLF while he holds the far end of the
+## lane without drawing it (he broke off there after a miss), so its patrol turns before it reaches
+## him. The room sets it every frame.
+var far_x: float = PATROL_MAX_X
 
 
 ## True when the engineer is in the lane and out of the alcove, where the sentry can see them.
@@ -159,9 +168,15 @@ func tick(delta: float, engineer_x: float, engineer_exposed: bool, bait_x: float
 
 
 ## True when it is fixated on WOLF drawing it from [param bait_x] and has stopped where it holds,
-## BAIT_OFFSET short of him (on the mark): the moment the tank can be dropped on it.
+## BAIT_OFFSET short of him (on the mark), with him past it: the moment the tank can be dropped on it.
+## (Backing away from him down the lane it can cross the mark; that is not holding.)
 func is_holding(bait_x: float) -> bool:
-	return state == &"fixated" and absf(x - hold_x(bait_x)) <= EPSILON
+	return state == &"fixated" and not wolf_ahead() and absf(x - hold_x(bait_x)) <= EPSILON
+
+
+## True while WOLF, drawing it, is still on the rubble side of it, not yet past it (watch_x).
+func wolf_ahead() -> bool:
+	return watch_x >= 0.0 and watch_x < x
 
 
 ## Where a sentry fixated on WOLF drawing it from [param bait_x] parks: BAIT_OFFSET short of him, on
@@ -187,6 +202,7 @@ func reset(door_blown: bool, down: bool, down_x: float) -> void:
 	paused = false
 	obstacle = Vector2.ZERO
 	watch_x = -1.0
+	far_x = PATROL_MAX_X
 
 
 func _lock_on() -> void:
@@ -199,42 +215,54 @@ func _lock_on() -> void:
 func _patrol(delta: float) -> void:
 	# Outside the patrol range (a chase parked it short of the rubble): face back into it and walk
 	# there at patrol speed rather than jumping in.
+	var far_end: float = _far_end()
 	var below: bool = x < PATROL_MIN_X
-	var above: bool = x > PATROL_MAX_X
+	var above: bool = x > far_end
 	if below:
 		facing = 1.0
 	elif above:
 		facing = -1.0
 	x += facing * PATROL_SPEED * delta
-	if (below and x <= PATROL_MIN_X) or (above and x >= PATROL_MAX_X):
+	if (below and x <= PATROL_MIN_X) or (above and x >= far_end):
 		return
 	# Bounce off either end, keeping any overshoot so sliced and whole deltas land the same.
-	while x < PATROL_MIN_X or x > PATROL_MAX_X:
+	while x < PATROL_MIN_X or x > far_end:
 		if x < PATROL_MIN_X:
 			x = PATROL_MIN_X + (PATROL_MIN_X - x)
 			facing = 1.0
 		else:
-			x = PATROL_MAX_X - (x - PATROL_MAX_X)
+			x = far_end - (x - far_end)
 			facing = -1.0
 
 
-## Fixated: closes to BAIT_OFFSET short of the one drawing it (on the side toward the rubble) and keeps
-## facing them where they are (watch_x), or the spot they draw it from.
+## Fixated: keeps facing the one drawing it where they are (watch_x), or the spot they draw it from.
+## While WOLF is still coming down the lane toward it, it never closes on him: it holds, or backs off to
+## stay BAIT_OFFSET ahead of him, as far as the end of its patrol. Once he is past it, it parks
+## BAIT_OFFSET short of his spot (on the side toward the rubble).
 func _hold_on(bait_x: float, delta: float) -> void:
-	_move_toward(hold_x(bait_x), CHASE_SPEED, delta)
+	var goal: float = hold_x(bait_x)
+	if wolf_ahead():
+		goal = clampf(maxf(x, watch_x + BAIT_OFFSET), CHASE_MIN_X, PATROL_MAX_X)
+	_move_toward(goal, CHASE_SPEED, delta)
 	var look: float = watch_x if watch_x >= 0.0 else bait_x
 	if absf(look - x) > EPSILON:
 		facing = signf(look - x)
 
 
 func _move_toward(target_x: float, speed: float, delta: float, min_x: float = CHASE_MIN_X) -> void:
-	var goal: float = clampf(target_x, min_x, PATROL_MAX_X)
+	var goal: float = clampf(target_x, min_x, maxf(min_x, _far_end()))
 	var step: float = speed * delta
 	if absf(goal - x) <= step:
 		x = goal
 	else:
 		facing = signf(goal - x)
 		x += facing * step
+
+
+## The far turn of its patrol and the furthest right any move takes it: PATROL_MAX_X, or short of WOLF
+## holding the far end (far_x).
+func _far_end() -> float:
+	return clampf(far_x, PATROL_MIN_X, PATROL_MAX_X)
 
 
 ## A move from [param from_x] that would take its body into the tank lying on the floor stops at the

@@ -112,7 +112,7 @@ func _check_save_format() -> void:
 	# How the sentry came down is saved for the END OF SLICE recap, and is optional for older v4 saves.
 	var fallen: Dictionary = records.to_dict()
 	fallen["sentry_down"] = true
-	for lane: String in ["wolf", "refused", "alone"]:
+	for lane: String in ["wolf", "refused", "alone", "broke_off"]:
 		fallen["lane_recap"] = lane
 		var fallen_loaded: M0State = State.from_dict(JSON.parse_string(JSON.stringify(fallen)))
 		_expect(fallen_loaded != null and fallen_loaded.lane_recap == lane and fallen_loaded.to_dict()["lane_recap"] == lane, "a sentry-down save keeps the lane recap \"%s\"" % lane)

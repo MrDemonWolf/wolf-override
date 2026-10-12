@@ -11,13 +11,16 @@ const FRAME_ART: Texture2D = preload("res://assets/props/opening-hatch-frame.png
 const LEAF_ART: Texture2D = preload("res://assets/props/opening-hatch-leaf.png")
 const DUCT_ART: Texture2D = preload("res://assets/props/opening-hatch-duct.png")
 ## World px per art px: the opening is 41.5 px tall, enough for WOLF crouched low and shrinking into
-## the duct (Main._slip_into_hatch).
+## the duct (Main._wolf_slips_into_hatch).
 const ART_SCALE: float = 0.21
 ## In art px: the opening (x, y, w, h) and the unlit lens on the top bar, and the art's bottom row (the
 ## sill, on the floor), all measured on the 640x387 layers.
 const OPENING: Rect2 = Rect2(113.4, 98.5, 415.2, 197.5)
 const LAMP: Rect2 = Rect2(279.8, 35.4, 79.4, 14.8)
 const SILL_ROW: float = 380.3
+## The row (art px) where the duct's painted floor meets its far wall: deeper into the duct is higher
+## on screen, so WOLF's feet rise toward it as he crawls away (floor_y_at_depth).
+const FAR_FLOOR_ROW: float = 234.0
 ## Shut and locked, the lamp is red like the cage's; it turns green as the hatch opens.
 const LAMP_LOCKED: Color = Color("#db4f39")
 const LAMP_OPEN: Color = Color("#56dc69")
@@ -88,6 +91,14 @@ func place(x: float, floor_y: float) -> void:
 ## The opening in the world, for WOLF to slip into.
 func opening_rect() -> Rect2:
 	return Rect2(position + (OPENING.position - FRAME_ART.get_size() * 0.5) * ART_SCALE, OPENING.size * ART_SCALE)
+
+
+## The world y of the duct's floor at [param depth] (0 its front edge, the opening's bottom; 1 the foot
+## of its far wall), in its painted perspective.
+func floor_y_at_depth(depth: float) -> float:
+	var front: float = opening_rect().end.y
+	var far: float = position.y + (FAR_FLOOR_ROW - FRAME_ART.get_size().y * 0.5) * ART_SCALE
+	return lerpf(front, far, clampf(depth, 0.0, 1.0))
 
 
 ## Shut and locked, as the scene starts.

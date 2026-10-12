@@ -118,7 +118,17 @@ func _run() -> void:
 	_expect(paused and wolf.position.x == held_x and hatch.open == held_open, "Pause holds WOLF and the hatch mid-move")
 	(game.get_node("CanvasLayer/PauseOverlay") as PauseOverlay).resume_requested.emit()
 	var slipped: Array[bool] = [false]
+	# Round 3b: the crouch at the opening is held long enough to be seen, and going in he darkens early
+	# and his feet rise toward the duct's far floor, so he reads as crawling away, not lying in it lit.
+	var crouch_frames: Array[int] = [0]
+	var dark_going_in: Array[bool] = [true]
+	var deepest_feet: Array[float] = [INF]
 	_expect(await _wait_until(func() -> bool:
+		if wolf.z_index != OpeningHatch.SLIP_Z and is_equal_approx(wolf.body_sprite.scale.x, wolf_rest_scale.x) and wolf.body_sprite.scale.y < wolf_rest_scale.y * 0.9:
+			crouch_frames[0] += 1
+		if wolf.z_index == OpeningHatch.SLIP_Z and wolf.body_sprite.scale.x < wolf_rest_scale.x * 0.75:
+			dark_going_in[0] = dark_going_in[0] and wolf.body_sprite.modulate.r < 0.45
+			deepest_feet[0] = minf(deepest_feet[0], wolf.position.y + wolf.body_sprite.position.y + 164.0 * wolf.body_sprite.scale.y)
 		if wolf.z_index == OpeningHatch.SLIP_Z and wolf.body_sprite.scale.x < wolf_rest_scale.x * 0.8:
 			# Slipping in he is drawn between the duct and the frame, and fits inside the opening.
 			var duct: Rect2 = hatch.opening_rect()
@@ -126,6 +136,8 @@ func _run() -> void:
 			slipped[0] = hatch.z_index + OpeningHatch.DUCT_Z < wolf.z_index and wolf.z_index < hatch.z_index + OpeningHatch.FRAME_Z and wolf.position.x - half > duct.position.x and wolf.position.x + half < duct.end.x
 		return wolf.body_sprite.modulate.a < 0.02 and is_equal_approx(hatch.open, 0.0) and hatch.lamp == OpeningHatch.LAMP_LOCKED, 240), "WOLF slips into the dark duct and the hatch shuts behind him, its lamp red again")
 	_expect(slipped[0], "slipping in, WOLF shrinks inside the opening, between the duct and the frame")
+	_expect(crouch_frames[0] >= 12, "he crouches at the opening and holds it before going in (%d frames)" % crouch_frames[0])
+	_expect(dark_going_in[0] and deepest_feet[0] < hatch.opening_rect().end.y - 4.0 and deepest_feet[0] >= hatch.floor_y_at_depth(1.0) - 0.5, "going in he is already dark by the time he has shrunk, and his feet rise from the sill toward the duct's far floor (feet y %.1f, sill %.1f)" % [deepest_feet[0], hatch.opening_rect().end.y])
 	_expect(absf(wolf.position.x - hatch.position.x) <= 2.0 and intro_gate.visible and is_equal_approx(float(intro_gate.get("opening")), 1.0), "he went through the hatch, and the gate still stands open")
 	await _tap(&"interact")
 	await create_timer(0.8).timeout

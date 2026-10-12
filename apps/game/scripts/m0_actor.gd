@@ -24,7 +24,8 @@ var settle_x: float = -1.0
 ## most AVOID_DETOUR further back from the engineer (main sets them per room).
 var avoid_spans: Array[Vector2] = []
 ## Scales the speed of a body walking on its own or following (main speeds WOLF up for the moment he
-## bounds over the junction's sentry, JunctionRoom.wolf_leap_height).
+## bounds over the junction's sentry, JunctionRoom.wolf_leap_height, and while he dashes past the
+## engineer waiting for him at the rubble line).
 var speed_scale: float = 1.0
 
 const WALK_SPEED: float = 190.0

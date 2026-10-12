@@ -130,17 +130,29 @@ const WOLF_BAIT_X: float = DropArm.MARK_X + SentryBrain.BAIT_OFFSET
 ## Where WOLF waits once the sentry is down, through the bolt and the closing beat: the same spot, in
 ## full view by the hatch he says is next, clear of the crushed sentry and the tank on it.
 const WOLF_DOWN_X: float = WOLF_BAIT_X
-## Crossing the lane to his spot, or back to the rubble after breaking off, WOLF bounds over the live
-## sentry rather than through it (wolf_leap_height): his painted feet (y 438) clear its drawn top
-## (Sentry.FLOOR_Y less Sentry.DRAWN_HEIGHT, y 396) by 6 px at the top of the bound, held while his legs
-## are over its body (LEAP_CLEAR: the two bodies' contact range, SentryBrain.HALF_WIDTH plus
-## M0State.WOLF_HALF_WIDTH, and a 13 px margin) and eased in and out over LEAP_RAMP either side, where
-## only his snout or tail passes its low treads. He runs LEAP_SPEED_SCALE times faster meanwhile, so it
-## reads as a bound, not a hover.
+## Crossing the lane to his spot, WOLF bounds over the live sentry rather than through it
+## (wolf_leap_height): his painted feet (y 438) clear its drawn top (Sentry.FLOOR_Y less
+## Sentry.DRAWN_HEIGHT, y 396) by 6 px at the top of the bound, held while his legs are over its body
+## (LEAP_CLEAR: the two bodies' contact range, SentryBrain.HALF_WIDTH plus M0State.WOLF_HALF_WIDTH, and a
+## 5 px margin) and eased in and out over LEAP_RAMP either side, where only his snout or tail passes its
+## low treads. He runs LEAP_SPEED_SCALE times faster meanwhile, so it reads as a bound, not a hover. The
+## tank's base (y 382 at most) is lower than the top of his head at the bound, so he never bounds under
+## it: the sentry he draws backs off ahead of him to the end of its patrol (SentryBrain.BAIT_OFFSET)
+## and he catches it there, and the bound and both ramps stay clear of the hanging tank's painted body
+## by a few px (sentry_test measures the two images).
 const LEAP_HEIGHT: float = 48.0
-const LEAP_CLEAR: float = SentryBrain.HALF_WIDTH + M0State.WOLF_HALF_WIDTH + 13.0
+const LEAP_CLEAR: float = SentryBrain.HALF_WIDTH + M0State.WOLF_HALF_WIDTH + 5.0
 const LEAP_RAMP: float = 30.0
 const LEAP_SPEED_SCALE: float = 2.0
+## Running under the hung tank on his way down the lane, WOLF ducks: at rest the tips of his ears
+## (y 379) are higher than the tank's rounded base (y 382 at its lowest), so while his head (WOLF_HEAD_X
+## ahead of his centre) is within DUCK_CLEAR of the mark he runs crouched, his drawn body squashed
+## DUCK_DEPTH px lower with his feet on the floor, easing in and out over DUCK_RAMP. His head then
+## passes a few px under the tank's base (sentry_test measures the two images).
+const DUCK_DEPTH: float = 9.0
+const DUCK_CLEAR: float = 34.0
+const DUCK_RAMP: float = 24.0
+const WOLF_HEAD_X: float = 45.0
 ## Where WOLF waits while the line builds and the fuse burns: back by the entrance hatch, his snout at
 ## the breaker's left edge (his painted front is a few px inside M0Actor.WOLF_REACH), so he is not
 ## inside the breaker, his drawn body is clear of the engineer working it from its right, his tail
@@ -855,6 +867,14 @@ func sync_bolt(state: StringName, charge: float) -> void:
 ## out.
 static func wolf_leap_height(wolf_x: float, sentry_x: float) -> float:
 	return LEAP_HEIGHT * (1.0 - smoothstep(LEAP_CLEAR, LEAP_CLEAR + LEAP_RAMP, absf(wolf_x - sentry_x)))
+
+
+## How far WOLF ducks (px off the top of his drawn body, feet on the floor) with his centre at
+## [param wolf_x], facing [param facing] (+1 right), under the hung tank: DUCK_DEPTH while his head is
+## under its base, easing to nothing DUCK_RAMP further out.
+static func wolf_duck_depth(wolf_x: float, facing: float) -> float:
+	var head_x: float = wolf_x + signf(facing) * WOLF_HEAD_X
+	return DUCK_DEPTH * (1.0 - smoothstep(DUCK_CLEAR, DUCK_CLEAR + DUCK_RAMP, absf(head_x - DropArm.MARK_X)))
 
 
 ## Where the tank's centre comes to rest: on the floor, or on top of the crushed sentry.
