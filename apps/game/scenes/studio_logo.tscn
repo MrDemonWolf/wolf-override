@@ -1,0 +1,109 @@
+[gd_scene load_steps=8 format=3]
+
+[ext_resource type="Script" path="res://scripts/studio_logo.gd" id="1_logo"]
+[ext_resource type="Texture2D" path="res://assets/brand/mrdemonwolf-mascot-smirk.png" id="2_smirk"]
+[ext_resource type="Texture2D" path="res://assets/brand/mrdemonwolf-mascot-grin-mouth.png" id="3_grin"]
+[ext_resource type="FontVariation" path="res://assets/fonts/Montserrat-Bold.tres" id="4_display"]
+
+[sub_resource type="Gradient" id="GlowGradient"]
+offsets = PackedFloat32Array(0, 0.25, 0.5, 0.75, 1)
+colors = PackedColorArray(0.18, 0.337, 0.549, 1, 0.18, 0.337, 0.549, 0.844, 0.18, 0.337, 0.549, 0.5, 0.18, 0.337, 0.549, 0.156, 0.18, 0.337, 0.549, 0)
+
+[sub_resource type="GradientTexture2D" id="GlowTexture"]
+gradient = SubResource("GlowGradient")
+width = 128
+height = 128
+fill = 1
+fill_from = Vector2(0.5, 0.5)
+fill_to = Vector2(1, 0.5)
+
+[node name="StudioLogo" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_logo")
+
+[node name="Background" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+color = Color(0.035, 0.082, 0.2, 1)
+
+[node name="Glow" type="TextureRect" parent="."]
+layout_mode = 0
+offset_left = 180.0
+offset_top = -34.0
+offset_right = 780.0
+offset_bottom = 506.0
+mouse_filter = 2
+texture = SubResource("GlowTexture")
+expand_mode = 1
+
+[node name="Mascot" type="TextureRect" parent="."]
+texture_filter = 5
+layout_mode = 0
+offset_left = 408.0
+offset_top = 86.0
+offset_right = 552.0
+offset_bottom = 386.0
+mouse_filter = 2
+texture = ExtResource("2_smirk")
+expand_mode = 1
+
+[node name="GrinMouth" type="TextureRect" parent="Mascot"]
+visible = false
+texture_filter = 5
+layout_mode = 0
+offset_left = 32.0
+offset_top = 90.0
+offset_right = 88.0
+offset_bottom = 124.0
+mouse_filter = 2
+texture = ExtResource("3_grin")
+expand_mode = 1
+
+[node name="CompanyName" type="Label" parent="."]
+modulate = Color(1, 1, 1, 0)
+layout_mode = 0
+offset_top = 398.0
+offset_right = 960.0
+offset_bottom = 434.0
+theme_override_colors/font_color = Color(0.9294118, 0.9607843, 0.9686275, 1)
+theme_override_fonts/font = ExtResource("4_display")
+theme_override_font_sizes/font_size = 26
+text = "MrDemonWolf, Inc."
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="LoadBar" type="ColorRect" parent="."]
+visible = false
+layout_mode = 0
+offset_left = 400.0
+offset_top = 452.0
+offset_right = 560.0
+offset_bottom = 455.0
+mouse_filter = 2
+color = Color(0.61, 0.77, 0.85, 0.18)
+
+[node name="Fill" type="ColorRect" parent="LoadBar"]
+layout_mode = 0
+offset_bottom = 3.0
+mouse_filter = 2
+color = Color(0.1, 0.76, 0.92, 0.85)
+
+[node name="Fade" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+color = Color(0.025, 0.045, 0.08, 0)
