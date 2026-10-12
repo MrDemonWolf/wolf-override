@@ -28,6 +28,19 @@ var reduce_motion: bool = false:
 		if reduce_motion:
 			trauma = 0.0
 			_settle_camera()
+## The debug menu's shake and flash switches: off, add_trauma or flash() does nothing (and the
+## shake or flash already under way settles at once). Everything else in the kit is unchanged.
+var shake_enabled: bool = true:
+	set(value):
+		shake_enabled = value
+		if not shake_enabled:
+			trauma = 0.0
+			_settle_camera()
+var flash_enabled: bool = true:
+	set(value):
+		flash_enabled = value
+		if not flash_enabled:
+			_end_flash()
 var rumble_enabled: bool = false
 ## The joypad that rumbles: Main sets it to the device of the last controller input.
 var rumble_device: int = 0
@@ -87,7 +100,7 @@ func _process(delta: float) -> void:
 
 
 func add_trauma(amount: float) -> void:
-	if not motion_allowed():
+	if not motion_allowed() or not shake_enabled:
 		return
 	trauma = clampf(trauma + amount, 0.0, 1.0)
 
@@ -116,7 +129,7 @@ func end_hit_stop() -> void:
 
 ## A white flash on IntroFade over a red wash on IntroAlarm; either length may be 0 to skip it.
 func flash(white_seconds: float, red_seconds: float) -> void:
-	if not enabled or not is_inside_tree():
+	if not enabled or not flash_enabled or not is_inside_tree():
 		return
 	if reduce_motion:
 		white_seconds *= 0.5

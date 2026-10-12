@@ -1409,6 +1409,8 @@ func _notification(what: int) -> void:
 
 ## Android Back walks out of nested menus one step at a time; it only quits from the bare title.
 func _handle_back() -> void:
+	if _debug_takes_back():
+		return
 	if not settings_menu.capture_action.is_empty():
 		settings_menu.cancel_capture()
 	elif pause_overlay.visible and settings_menu.visible:
@@ -2299,7 +2301,7 @@ func _tick_junction(delta: float) -> void:
 ## while the game is paused (_process does not reach here). Contact with a chasing sentry is a
 ## knockdown back to autosave B.
 func _tick_lane(delta: float) -> void:
-	sentry_brain.paused = waiting_for_choice
+	sentry_brain.paused = waiting_for_choice or _debug_sentry_frozen()
 	drop_arm.paused = waiting_for_choice
 	if state.door_blown and not waiting_for_choice:
 		if sentry_wake_remaining > 0.0:
@@ -2557,7 +2559,7 @@ func _door_blast() -> void:
 	if state.door_blown:
 		return
 	_blast_feedback()
-	if PressureLine.is_in_blast(human.position.x):
+	if PressureLine.is_in_blast(human.position.x) and not _debug_spares_knockdown():
 		junction_room.door_blast()
 		_fail_beat(JunctionRoom.BLAST_REASON % state.human_name().get_slice(" ", 0))
 		return
@@ -2585,7 +2587,7 @@ func _blast_feedback() -> void:
 ## autosave comes back through _load_game/_sync_scene. Memory and Records flags are never touched.
 ## With Reduced Motion the tilt, hit-stop and shake are skipped; the thud, wash and fade remain.
 func _fail_beat(reason: String) -> void:
-	if fail_active or title_open or intro_active or chapter_close_active or end_card_active:
+	if fail_active or title_open or intro_active or chapter_close_active or end_card_active or _debug_spares_knockdown():
 		return
 	fail_active = true
 	for action: StringName in GAMEPLAY_ACTIONS:
@@ -3322,6 +3324,22 @@ func _setup_debug_tools() -> void:
 	debug_tools.name = "DebugTools"
 	add_child(debug_tools)
 	debug_tools.setup(self)
+
+
+## The debug menu's invincibility cheat: no knockdown lands (the door still blows as if the engineer
+## were clear). A knockdown the menu forces still lands. Always false while the tools are hidden.
+func _debug_spares_knockdown() -> bool:
+	return debug_tools != null and debug_tools.actions.spares_knockdown()
+
+
+## The debug menu's freeze-sentry cheat: the sentry's brain does not tick.
+func _debug_sentry_frozen() -> bool:
+	return debug_tools != null and debug_tools.actions.sentry_frozen
+
+
+## Android Back closes the debug menu (or ends frame stepping) before it reaches the game's menus.
+func _debug_takes_back() -> bool:
+	return debug_tools != null and debug_tools.handle_back()
 
 
 ## What the game is doing right now, as plain values for the debug overlay and bug captures

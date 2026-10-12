@@ -118,10 +118,24 @@ static func state_text(data: Dictionary) -> String:
 	rows.append("%s  relay %s · mirror %s · lane %s" % [_key("CHOICES"), choices.get("relay", NONE), _or_none(choices.get("mirror", "")), _or_none(choices.get("lane", ""))])
 	var memory: Dictionary = data.get("memory", {})
 	var debug: Dictionary = data.get("debug", {})
-	rows.append("%s  %s · %s  %s" % [_key("MEMORY"), _or_none(memory.get("choice_id", "")), _key("CHEATS"), "[color=%s]USED[/color]" % WARN if debug.get("cheats_used", false) else "none"])
+	rows.append("%s  %s · %s  %s" % [_key("MEMORY"), _or_none(memory.get("choice_id", "")), _key("CHEATS"), _cheats(debug)])
 	var save: Dictionary = data.get("save", {})
 	rows.append("%s  v%d · %s · %s" % [_key("SAVE"), int(save.get("version", 0)), "on disk" if save.get("exists", false) else "none on disk", save.get("checkpoint", NONE)])
 	return "\n".join(rows)
+
+
+## USED (in red) once any cheat was used, then the ones in force now (DebugActions.info), or none.
+static func _cheats(debug: Dictionary) -> String:
+	var on: PackedStringArray = PackedStringArray()
+	var cheats: Dictionary = debug.get("cheats", {})
+	for pair: Array in [["invincible", "invincible"], ["sentry_frozen", "sentry frozen"], ["instant_crank", "instant crank"], ["frame_step", "frame step"]]:
+		if cheats.get(pair[0], false):
+			on.append(pair[1])
+	var speed: float = float(cheats.get("slow_motion", 1.0))
+	if speed != 1.0:
+		on.append("%sx" % speed)
+	var text: String = "[color=%s]USED[/color]" % WARN if debug.get("cheats_used", false) else "none"
+	return text if on.is_empty() else "%s · [color=%s]%s[/color]" % [text, WARN, " · ".join(on)]
 
 
 ## The armed hazards, named in red, or a dash.

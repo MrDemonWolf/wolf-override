@@ -3,8 +3,9 @@ extends Node
 ## Debug tools and cheat codes, so a tester or a capture driver can see what the game is doing: the
 ## F3 overlay (performance, then state, then state with the world's zones, hitboxes and render boxes
 ## drawn over the game: DebugZones), F12 bug captures (a screenshot and a JSON state dump with all of
-## that geometry as numbers), and a small DEBUG button for touch. Main builds one in _ready
-## (_setup_debug_tools) and gives it its debug_snapshot().
+## that geometry as numbers), the debug menu (DebugMenu over DebugActions: jumps, choices, cheats,
+## forced knockdowns, saves and effect switches) and a small DEBUG button for touch. Main builds one
+## in _ready (_setup_debug_tools) and gives it its debug_snapshot().
 ##
 ## Gating: always available in a debug build. In any other build the tools stay hidden until a cheat
 ## code on the title screen unlocks them (WOLFDEN typed on a keyboard; Up Up Down Down Left Right Left
@@ -12,8 +13,9 @@ extends Node
 ## unlock is stored with the settings. lock() hides them again and forgets the unlock, for the rest of
 ## the session even in a debug build.
 ##
-## Cost: while the tools are unavailable, or available with the overlay off, this node and its zone
-## drawing neither process nor draw; it only looks at input events as they arrive. The overlay
+## Cost: while the tools are unavailable, or available with the overlay off, the menu closed and no
+## per-frame cheat on (instant crank, slow motion), this node, its zone drawing and its actions neither
+## process nor draw; it only looks at input events as they arrive. The overlay
 ## refreshes its text REFRESH_SECONDS apart while it is shown, never every frame, and reads the save
 ## on disk at most SAVE_INFO_SECONDS apart; the zones page redraws every frame while it is up.
 ##
@@ -24,7 +26,8 @@ extends Node
 
 ## The tools became available or were hidden (unlock, lock, or a debug_build change).
 signal availability_changed(available: bool)
-## Backquote, both sticks pressed (L3 + R3) or the DEBUG button asked for the debug menu.
+## Backquote, both sticks pressed (L3 + R3) or the DEBUG button asked for the debug menu (it opens,
+## or closes when open).
 signal menu_requested
 signal overlay_mode_changed(mode: int)
 ## A bug capture was written; [param paths] holds "json" and "png" (empty when no screenshot exists)
@@ -94,7 +97,7 @@ var available: bool = false
 var overlay_mode: int = Overlay.OFF
 ## Set by cheats (invincibility, jumps and the like); shown on the state page and in every dump.
 var cheats_used: bool = false
-## A debug menu that wants the menu request sets this while it is open, so the DEBUG button hides.
+## The debug menu sets this while it is open, so the DEBUG button hides.
 var menu_open: bool = false:
 	set(value):
 		menu_open = value
@@ -109,6 +112,9 @@ var layer: CanvasLayer
 var overlay: DebugOverlay
 ## The zones page's drawing and its legend (F5 zones, F6 hitboxes, F7 render boxes).
 var zones: DebugZones
+## What the debug menu does to the game, and the menu itself (with the frame-step bar).
+var actions: DebugActions
+var menu: DebugMenu
 var debug_button: Button
 var note: Panel
 var note_label: Label
@@ -170,6 +176,14 @@ func _build() -> void:
 	zones = DebugZones.new()
 	layer.add_child(zones)
 	zones.setup(game, self)
+	actions = DebugActions.new()
+	add_child(actions)
+	actions.setup(game, self)
+	# The menu sits beside the overlay's column; the overlay and the note draw over its backdrop.
+	menu = DebugMenu.new()
+	layer.add_child(menu)
+	menu.setup(game, self, actions)
+	menu_requested.connect(menu.toggle)
 	overlay = DebugOverlay.new()
 	overlay.hide()
 	layer.add_child(overlay)
@@ -208,7 +222,7 @@ func _build() -> void:
 	debug_button.grow_horizontal = Control.GROW_DIRECTION_BEGIN
 	UIMotion.attach(debug_button)
 	# The zone drawing keeps its names off the tools' own cards.
-	zones.own_controls = [overlay, debug_button, note]
+	zones.own_controls = [overlay, debug_button, note, menu.panel, menu.step_bar]
 
 
 ## Recomputes availability from the build, the stored unlock and a session lock.
@@ -217,7 +231,9 @@ func _apply() -> void:
 	available = unlocked or (debug_build and not session_locked)
 	if not available:
 		overlay_mode = Overlay.OFF
+		menu.close()
 		menu_open = false
+		actions.reset_all()
 	_sync()
 	if was != available:
 		availability_changed.emit(available)
@@ -250,7 +266,11 @@ func _refresh_view(redraw: bool = false) -> void:
 	var touch_layout: bool = bool(game.get(&"touch_enabled")) and not controller
 	zones.set_device("controller" if controller else ("touch" if touch_layout else "keyboard"))
 	debug_button.visible = available and touch_layout and not menu_open and not card_up
-	_sync_layer()
+	# The game's own Pause opened over frame stepping (its pause wins): stepping ends, Pause stays.
+	if actions.frame_step and (game.get(&"pause_overlay") as CanvasItem).visible:
+		actions.set_frame_step(false)
+	menu.refresh_step_bar()
+	sync_layer()
 
 
 ## Once per frame at most, after Main has laid out whatever just changed.
@@ -261,8 +281,10 @@ func _queue_view() -> void:
 	_refresh_view.call_deferred()
 
 
-func _sync_layer() -> void:
-	layer.visible = overlay.visible or debug_button.visible or note.visible or zones.visible
+## Shows the tools' canvas layer only while something on it is shown.
+func sync_layer() -> void:
+	if layer != null:
+		layer.visible = overlay.visible or debug_button.visible or note.visible or zones.visible or menu.visible
 
 
 ## True while one of Main's full-screen cards is up.
@@ -314,6 +336,9 @@ func _input(event: InputEvent) -> void:
 		_queue_view()
 	if _rebinding():
 		return
+	if actions.frame_step and not menu_open and _frame_step_input(event):
+		get_viewport().set_input_as_handled()
+		return
 	if event is InputEventKey and event.pressed and not event.is_echo():
 		var key: Key = (event as InputEventKey).physical_keycode
 		if key == KEY_NONE:
@@ -337,8 +362,9 @@ func _input(event: InputEvent) -> void:
 		get_viewport().set_input_as_handled()
 	elif event is InputEventJoypadButton:
 		var button: InputEventJoypadButton = event as InputEventJoypadButton
-		# Unbound buttons: left unhandled, so Main still notes the controller is in use.
-		if button.pressed and overlay_mode == Overlay.ZONES and zones.visible and _pad_toggle(button):
+		# Unbound buttons: left unhandled, so Main still notes the controller is in use. The menu uses LB
+		# and RB for its pages while it is open.
+		if button.pressed and not menu_open and overlay_mode == Overlay.ZONES and zones.visible and _pad_toggle(button):
 			return
 		if button.button_index != JOY_BUTTON_LEFT_STICK and button.button_index != JOY_BUTTON_RIGHT_STICK:
 			return
@@ -349,6 +375,36 @@ func _input(event: InputEvent) -> void:
 		if button.pressed and held == 3:
 			open_menu()
 			get_viewport().set_input_as_handled()
+
+
+## While frame stepping (menu closed): period or RB lets one frame through; Esc, B or Pause plays on.
+## True when [param event] was one of those.
+func _frame_step_input(event: InputEvent) -> bool:
+	if event.is_echo() or not event.is_pressed():
+		return false
+	if event.is_action_pressed(&"ui_cancel") or event.is_action_pressed(&"pause_game"):
+		actions.set_frame_step(false)
+		return true
+	var key: InputEventKey = event as InputEventKey
+	if key != null and (key.physical_keycode == KEY_PERIOD or key.keycode == KEY_PERIOD):
+		actions.step_frame()
+		return true
+	var pad: InputEventJoypadButton = event as InputEventJoypadButton
+	if pad != null and pad.button_index == JOY_BUTTON_RIGHT_SHOULDER:
+		actions.step_frame()
+		return true
+	return false
+
+
+## Android Back: closes the debug menu, or ends frame stepping; false when neither is up.
+func handle_back() -> bool:
+	if menu != null and menu.is_open:
+		menu.close()
+		return true
+	if actions != null and actions.frame_step:
+		actions.set_frame_step(false)
+		return true
+	return false
 
 
 ## On the zones page, LB, RB or View turns a category on or off; false (and nothing changes) for any
@@ -477,15 +533,11 @@ func set_overlay_mode(mode: int) -> void:
 	overlay_mode_changed.emit(overlay_mode)
 
 
-## Backquote, L3 + R3 or the DEBUG button. Until a debug menu answers menu_requested, the request
-## steps the overlay on instead, so every input still shows something.
+## Backquote, L3 + R3 or the DEBUG button: opens the debug menu, or closes it when open.
 func open_menu() -> void:
 	if not available:
 		return
-	if menu_requested.get_connections().is_empty():
-		cycle_overlay()
-	else:
-		menu_requested.emit()
+	menu_requested.emit()
 
 
 ## F12: writes a screenshot and a JSON state dump to capture_dir/<timestamp>.png and .json, shows
@@ -609,6 +661,8 @@ func dump(full: bool = true) -> Dictionary:
 		"debug_build": debug_build,
 		"overlay": OVERLAY_NAMES[overlay_mode],
 		"cheats_used": cheats_used,
+		"cheats": actions.info(),
+		"menu_open": menu_open,
 		"drawn": {"shown": zones.visible, "zones": zones.layers[DebugZones.ZONES], "hitboxes": zones.layers[DebugZones.HITBOXES], "render": zones.layers[DebugZones.RENDER]},
 	}
 	if full:
@@ -701,7 +755,7 @@ func show_note(text: String) -> void:
 	note.size = rect.size
 	note_label.text = text
 	note.show()
-	_sync_layer()
+	sync_layer()
 	if _note_tween != null and _note_tween.is_valid():
 		_note_tween.kill()
 	# Notes come up over Pause and the debug menu too, so the timer runs while the tree is paused.
@@ -719,4 +773,4 @@ func hide_note() -> void:
 func _note_done() -> void:
 	_note_tween = null
 	note.hide()
-	_sync_layer()
+	sync_layer()

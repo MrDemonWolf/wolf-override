@@ -31,6 +31,18 @@ func _run() -> void:
 	await _check_capture_with_boxes()
 	await _check_capture_bounded_wait()
 	await _check_touch_button_and_menu_inputs()
+	await _check_menu_keyboard_and_controller()
+	await _check_menu_touch_and_layout()
+	await _check_jumps()
+	await _check_jump_presets()
+	await _check_choice_rules()
+	await _check_invincible()
+	await _check_freeze_and_instant_crank()
+	await _check_slow_motion()
+	await _check_frame_step()
+	await _check_forcing()
+	await _check_saves()
+	await _check_switches_and_lock()
 	_clean()
 	if failures == 0:
 		print("Debug tools checks passed")
@@ -51,7 +63,7 @@ func _check_release_gating() -> void:
 	await _send_pad(JOY_BUTTON_RIGHT_STICK, true)
 	await _send_pad(JOY_BUTTON_RIGHT_STICK, false)
 	await _send_pad(JOY_BUTTON_LEFT_STICK, false)
-	_expect(tools.overlay_mode == DebugTools.Overlay.OFF and _idle(tools), "F3, F12, backquote and both sticks do nothing while the tools are hidden")
+	_expect(tools.overlay_mode == DebugTools.Overlay.OFF and not tools.menu.is_open and not paused and _idle(tools), "F3, F12, backquote and both sticks do nothing while the tools are hidden")
 	_expect(tools.capture().is_empty() and not DirAccess.dir_exists_absolute(ProjectSettings.globalize_path(tools.capture_dir)), "no bug capture is written while the tools are hidden")
 	tools.set_overlay_mode(DebugTools.Overlay.STATE)
 	tools.open_menu()
@@ -449,27 +461,24 @@ func _check_touch_button_and_menu_inputs() -> void:
 	_expect(not button.visible, "controller play hides the DEBUG button")
 	await _touch(Vector2(480.0, 200.0))
 	_expect(button.visible, "touch brings it back")
-	button.pressed.emit()
-	_expect(tools.overlay_mode == DebugTools.Overlay.PERFORMANCE, "with no debug menu to open, DEBUG steps the overlay on")
-	tools.set_overlay_mode(DebugTools.Overlay.OFF)
+	var menu: DebugMenu = tools.menu
 	tools.menu_requested.connect(_on_menu_requested)
 	button.pressed.emit()
-	_expect(menu_requests == 1 and tools.overlay_mode == DebugTools.Overlay.OFF, "DEBUG asks for the debug menu")
+	_expect(menu_requests == 1 and menu.is_open and tools.menu_open and paused and tools.overlay_mode == DebugTools.Overlay.OFF, "DEBUG opens the debug menu, which holds the game still")
+	_expect(not button.visible, "an open debug menu hides the DEBUG button")
 	await _send_key(KEY_QUOTELEFT)
-	_expect(menu_requests == 2, "backquote asks for the debug menu")
+	_expect(menu_requests == 2 and not menu.is_open and not paused, "backquote asks for the menu again, which closes it and lets the game run")
 	await _send_pad(JOY_BUTTON_LEFT_STICK, true)
-	_expect(menu_requests == 2, "one stick press alone does not")
+	_expect(menu_requests == 2 and not menu.is_open, "one stick press alone does not")
 	await _send_pad(JOY_BUTTON_RIGHT_STICK, true)
-	_expect(menu_requests == 3, "pressing both sticks (L3 + R3) asks for the debug menu")
+	_expect(menu_requests == 3 and menu.is_open, "pressing both sticks (L3 + R3) opens the debug menu")
 	await _send_pad(JOY_BUTTON_RIGHT_STICK, false)
 	await _send_pad(JOY_BUTTON_LEFT_STICK, false)
 	await _send_pad(JOY_BUTTON_RIGHT_STICK, true)
 	await _send_pad(JOY_BUTTON_RIGHT_STICK, false)
-	_expect(menu_requests == 3, "a released stick is not still held")
-	tools.menu_open = true
-	await _touch(Vector2(480.0, 200.0))
-	_expect(not button.visible, "an open debug menu hides the DEBUG button")
-	tools.menu_open = false
+	_expect(menu_requests == 3 and menu.is_open, "a released stick is not still held")
+	menu.close()
+	await process_frame
 	tools.debug_build = false
 	_expect(not button.visible and not tools.layer.visible, "hiding the tools hides the DEBUG button")
 	await _send_key(KEY_QUOTELEFT)
@@ -991,6 +1000,629 @@ func _check_capture_with_boxes() -> void:
 	await _free(game)
 
 
+## The debug menu with a keyboard and a controller: backquote, L3 + R3, Esc and B open and close it,
+## it holds the game still like Pause and leaves the overlay readable beside it, focus starts on its
+## page's tab and moves into the page, Enter works its switches, LB and RB turn the pages, Android
+## Back closes it, and it will not open over the game's own Pause.
+func _check_menu_keyboard_and_controller() -> void:
+	var game: Node2D = await _spawn(true)
+	var tools: DebugTools = _tools(game)
+	var menu: DebugMenu = tools.menu
+	game.call("_new_game")
+	game.call("_finish_intro")
+	await _settle(3)
+	tools.set_overlay_mode(DebugTools.Overlay.STATE)
+	await _send_key(KEY_QUOTELEFT)
+	_expect(menu.is_open and paused and menu.panel.is_visible_in_tree() and tools.layer.visible, "backquote opens the debug menu and holds the game still")
+	_expect(tools.overlay.visible and tools.is_processing(), "the overlay stays up and refreshing beside the open menu")
+	await process_frame
+	var card: Rect2 = menu.panel.get_global_rect()
+	_expect(Rect2(0.0, 0.0, 960.0, 540.0).encloses(card) and not card.intersects(tools.overlay.get_global_rect()) and not card.intersects(DebugOverlay.footprint(false)), "the menu card is on screen and clear of the overlay's column (%s)" % card)
+	for path: String in ["CanvasLayer/PauseButton", "CanvasLayer/TopBar"]:
+		_expect(not card.intersects((game.get_node(path) as Control).get_global_rect()), "the menu card leaves %s clear" % path.get_file())
+	var focus: Control = root.gui_get_focus_owner()
+	_expect(focus == menu.tab_buttons[menu.page], "keyboard focus starts on the open page's tab (%s)" % focus)
+	await _send_key(KEY_RIGHT)
+	_expect(menu.page == &"choices" and root.gui_get_focus_owner() == menu.tab_buttons[&"choices"], "moving along the tabs turns the page")
+	var chosen: Array[StringName] = []
+	for id: StringName in DebugMenu.PAGES:
+		if (menu.tab_buttons[id] as Button).button_pressed:
+			chosen.append(id)
+	_expect(chosen == [&"choices"], "only the open page's tab shows as chosen (%s)" % [chosen])
+	await _send_key(KEY_RIGHT)
+	await _send_key(KEY_DOWN)
+	focus = root.gui_get_focus_owner()
+	_expect(menu.page == &"cheats" and focus is Button and (menu.pages[&"cheats"] as Control).is_ancestor_of(focus), "down moves focus into the page (%s)" % focus)
+	(menu.buttons["cheat:invincible"] as Button).grab_focus()
+	await _send_key(KEY_ENTER)
+	_expect(tools.actions.invincible and (menu.buttons["cheat:invincible"] as Button).text.ends_with("ON") and tools.cheats_used, "Enter on a switch turns the cheat on and says so")
+	await _send_key(KEY_ENTER)
+	_expect(not tools.actions.invincible and (menu.buttons["cheat:invincible"] as Button).text.ends_with("OFF"), "and off again")
+	await _send_key(KEY_ESCAPE)
+	_expect(not menu.is_open and not paused and not menu.visible and tools.overlay.visible, "Esc closes the menu and the game runs again; the overlay stays")
+	_expect(not game.get("pause_overlay").visible, "the Esc that closed the menu did not also open Pause")
+	await _send_pad(JOY_BUTTON_LEFT_STICK, true)
+	await _send_pad(JOY_BUTTON_RIGHT_STICK, true)
+	await _send_pad(JOY_BUTTON_RIGHT_STICK, false)
+	await _send_pad(JOY_BUTTON_LEFT_STICK, false)
+	_expect(menu.is_open and paused, "L3 + R3 opens it")
+	var page: StringName = menu.page
+	await _tap_pad(JOY_BUTTON_RIGHT_SHOULDER)
+	_expect(menu.page == DebugMenu.PAGES[(DebugMenu.PAGES.find(page) + 1) % DebugMenu.PAGES.size()] and root.gui_get_focus_owner() == menu.tab_buttons[menu.page], "RB turns to the next page")
+	await _tap_pad(JOY_BUTTON_LEFT_SHOULDER)
+	_expect(menu.page == page, "LB turns back")
+	_expect(tools.zones.layers.values().all(func(on: bool) -> bool: return on), "LB and RB in the menu never toggle the zone drawing")
+	await _tap_pad(JOY_BUTTON_B)
+	_expect(not menu.is_open and not paused, "B closes it")
+	tools.open_menu()
+	_expect(menu.is_open, "open_menu() opens it for scripts")
+	game.call("_handle_back")
+	_expect(not menu.is_open and not paused and not game.get("pause_overlay").visible, "Android Back closes the menu without opening Pause")
+	game.call("_pause_game")
+	await process_frame
+	tools.open_menu()
+	_expect(not menu.is_open and paused and game.get("pause_overlay").visible and tools.note_label.text.contains("pause"), "the menu does not open over the game's own Pause, and says why")
+	game.call("_resume_game")
+	await process_frame
+	game.call("_return_to_title")
+	await _settle(2)
+	var title_button: Control = game.call("_title_first_button")
+	await _send_key(KEY_QUOTELEFT)
+	_expect(menu.is_open and paused and game.get("title_open"), "the menu opens on the title too")
+	await _send_key(KEY_ESCAPE)
+	_expect(not menu.is_open and not paused and root.gui_get_focus_owner() == title_button, "closing it on the title gives focus back to the title (%s)" % root.gui_get_focus_owner())
+	tools.set_overlay_mode(DebugTools.Overlay.OFF)
+	tools.hide_note()
+	_expect(_idle(tools), "closed, the menu costs nothing")
+	await _free(game)
+
+
+## The menu on touch: DEBUG opens it with no focus ring, tabs and buttons answer taps, a tap outside
+## the card or CLOSE closes it; and on every page each button is tall enough to tap and wide enough
+## for its whole label.
+func _check_menu_touch_and_layout() -> void:
+	var game: Node2D = await _spawn(true)
+	var tools: DebugTools = _tools(game)
+	var menu: DebugMenu = tools.menu
+	_clean_save()
+	game.call("_new_game")
+	game.call("_finish_intro")
+	await _settle(2)
+	await _touch(Vector2(480.0, 200.0))
+	game.set("touch_enabled", true)
+	tools.call("_refresh_view")
+	tools.debug_button.pressed.emit()
+	_expect(menu.is_open and root.gui_get_focus_owner() == null, "DEBUG opens the menu with no focus ring in touch play")
+	await process_frame
+	await _touch(menu.tab_buttons[&"save"].get_global_rect().get_center())
+	_expect(menu.page == &"save" and menu.is_open, "tapping a tab turns the page")
+	await _touch(menu.tab_buttons[&"view"].get_global_rect().get_center())
+	await process_frame
+	var overlay_button: Button = menu.buttons["view:overlay"]
+	await _touch(overlay_button.get_global_rect().get_center())
+	_expect(tools.overlay_mode == DebugTools.Overlay.PERFORMANCE and overlay_button.text == "OVERLAY: PERFORMANCE", "tapping OVERLAY steps the overlay's page, for phones with no F3")
+	await _touch(Vector2(200.0, 300.0))
+	_expect(not menu.is_open and not paused, "a tap outside the card closes the menu")
+	tools.debug_button.pressed.emit()
+	await process_frame
+	await _touch(menu.close_button.get_global_rect().get_center())
+	_expect(not menu.is_open and not paused, "CLOSE closes it")
+	tools.set_overlay_mode(DebugTools.Overlay.OFF)
+	game.set("touch_enabled", false)
+	tools.open_menu()
+	var font: Font = menu.close_button.get_theme_font("font")
+	var too_small: Array[String] = []
+	var total: int = 0
+	for id: StringName in DebugMenu.PAGES:
+		menu.show_page(id)
+		await process_frame
+		for key: String in menu.buttons.keys():
+			var button: Button = menu.buttons[key]
+			if not button.is_visible_in_tree():
+				continue
+			total += 1
+			var style: StyleBox = button.get_theme_stylebox("normal")
+			var label_width: float = font.get_string_size(button.text, HORIZONTAL_ALIGNMENT_LEFT, -1, button.get_theme_font_size("font_size")).x + style.get_margin(SIDE_LEFT) + style.get_margin(SIDE_RIGHT)
+			if button.size.y < DebugMenu.BUTTON_HEIGHT or label_width > button.size.x + 0.5 or not menu.scroll.get_global_rect().grow(1.0).encloses(Rect2(button.get_global_rect().position, Vector2(button.size.x, 1.0))):
+				too_small.append("%s (%s, label %.0f)" % [button.text, button.size, label_width])
+	_expect(total == menu.buttons.size() and too_small.is_empty(), "all %d menu buttons are at least %.0f px tall, inside the card and wide enough for their labels (%s)" % [total, DebugMenu.BUTTON_HEIGHT, too_small])
+	menu.show_page(&"save")
+	await process_frame
+	_expect((menu.buttons["save:now"] as Button).disabled and (menu.buttons["save:reload"] as Button).disabled and (menu.buttons["save:clear"] as Button).disabled, "with no checkpoint, the save actions are greyed out")
+	menu.show_page(&"force")
+	_expect((menu.buttons["force:vent"] as Button).disabled and menu.force_reason.text.contains("Service Junction"), "outside the junction the knockdowns are greyed out and say why")
+	tools.capture_dir = base + "-captures"
+	menu.show_page(&"view")
+	(menu.buttons["view:capture"] as Button).pressed.emit()
+	_expect(not menu.is_open and not paused, "BUG CAPTURE closes the menu first, so the capture shows the game")
+	await _settle(4)
+	var json_path: String = str(tools.last_capture.get("json", ""))
+	var data: Variant = JSON.parse_string(FileAccess.get_file_as_string(json_path)) if FileAccess.file_exists(json_path) else null
+	_expect(data is Dictionary and ((data as Dictionary).get("debug") as Dictionary).get("menu_open") == false and ((data as Dictionary).get("debug") as Dictionary).has("cheats"), "then saves the capture, whose dump lists the cheats and presets")
+	tools.hide_note()
+	await _free(game)
+
+
+## Every jump lands on its beat through the game's own steps: the right room, beat, objective and
+## progress, the checkpoint on disk exactly when play would have written one, the game running, and
+## the cheats flag set. A jump from the menu's own button closes the menu so the beat plays.
+func _check_jumps() -> void:
+	var game: Node2D = await _spawn(true)
+	var tools: DebugTools = _tools(game)
+	var actions: DebugActions = tools.actions
+	var save_path: String = str(game.get("save_path"))
+	var expected: Dictionary = {
+		&"opening": ["lockdown", "opening 1/7", false],
+		&"corridor_start": ["lockdown", "play", false],
+		&"relay_question": ["lockdown", "choice (relay)", false],
+		&"safe_point": ["lockdown", "play", true],
+		&"records_entry": ["records", "play", true],
+		&"records_mirror": ["records", "play", true],
+		&"junction_a": ["junction", "play", true],
+		&"lane": ["junction", "play", true],
+		&"tank_down": ["junction", "play", true],
+		&"end_of_slice": ["junction", "END OF SLICE card", true],
+	}
+	for id: StringName in DebugActions.JUMPS:
+		_clean_save()
+		tools.cheats_used = false
+		var note: String = actions.jump(id)
+		await _settle(3)
+		var snapshot: Dictionary = game.call("debug_snapshot")
+		var row: Array = expected[id]
+		var state: M0State = game.get("state") as M0State
+		_expect(note.begins_with("Jumped to %s" % DebugActions.JUMP_NAMES[id]) and snapshot["room"] == row[0] and snapshot["beat"] == row[1], "jump %s lands in %s, %s (%s, %s)" % [id, row[0], row[1], snapshot["room"], snapshot["beat"]])
+		_expect(not game.get("title_open") and not paused and tools.cheats_used, "jump %s leaves the title, runs, and marks cheats used" % id)
+		_expect(FileAccess.file_exists(save_path) == row[2], "jump %s %s the checkpoint" % [id, "writes" if row[2] else "leaves alone"])
+		if row[2]:
+			var saved: M0State = M0State.load_from_disk(save_path)
+			_expect(saved != null and JSON.stringify(saved.to_dict()) == JSON.stringify(M0State.from_dict(game.get("beat_snapshot")).to_dict()) and saved.chapter_id == state.chapter_id, "jump %s's checkpoint is a valid save of the beat on screen" % id)
+	# What each beat holds, with the default choices (told, WOLF takes the relay; WOLF's readout; WOLF draws it).
+	actions.jump(&"opening")
+	await _settle(2)
+	_expect(game.get("intro_active") and int(game.get("intro_step")) == 0, "OPENING starts the opening's first beat")
+	actions.jump(&"corridor_start")
+	await _settle(2)
+	_expect((game.get("state") as M0State).memory.is_empty() and (game.get_node("Human") as M0Actor).controlled and str(game.call("_objective")) == "CHECK THE BREAKER", "CORRIDOR START hands over control at the start of the corridor")
+	actions.jump(&"relay_question")
+	await _settle(2)
+	_expect(game.get("waiting_for_choice") and game.get("choice_context") == "relay" and game.get("stakes_spoken") and str(game.get("status_line")).begins_with(str(game.get_script().get_script_constant_map()["RELAY_QUESTION"])), "RELAY QUESTION has WOLF asking at the breaker, after his purge stakes")
+	game.call("_answer_choice", 1)
+	_expect((game.get("state") as M0State).memory.get("choice_id") == M0State.DISCLOSE, "and the question answers as usual")
+	actions.jump(&"safe_point")
+	await _settle(2)
+	var state: M0State = game.get("state")
+	_expect(state.checkpoint_reached and state.route == "cooperate" and state.memory.get("choice_id") == M0State.DISCLOSE and str(game.call("_objective")) == "SAFE POINT REACHED", "CORRIDOR SAFE POINT: the seal opened by WOLF and the first checkpoint")
+	actions.jump(&"records_mirror")
+	await _settle(2)
+	state = game.get("state")
+	_expect(state.chapter_id == "records" and state.purge_trace_preserved and state.mirror_trace_preserved and state.mirror_route == "wolf" and str(game.call("_objective")) == "REACH EXIT", "RECORDS, MIRROR COPIED: both traces, by WOLF's readout")
+	actions.jump(&"junction_a")
+	await _settle(2)
+	state = game.get("state")
+	_expect(state.chapter_id == "junction" and not state.door_blown and (game.get("pressure_line") as PressureLine).state == &"idle" and (game.get("sentry_brain") as SentryBrain).state == &"dormant", "JUNCTION SAVE A: the sealed door, an idle line and a dormant sentry")
+	actions.jump(&"lane")
+	await _settle(2)
+	state = game.get("state")
+	_expect(state.door_blown and not state.sentry_down and game.get("lane_choice") == "wolf" and game.get("wolf_baiting") and not game.get("waiting_for_choice") and str(game.call("_objective")) == "DROP THE TANK", "AFTER THE BLAST / LANE: the door down, WOLF asked at the rubble and drawing the sentry")
+	_expect(M0State.load_from_disk(save_path).door_blown, "its checkpoint is autosave B")
+	actions.jump(&"tank_down")
+	await _settle(2)
+	state = game.get("state")
+	_expect(state.sentry_down and state.lane_recap == "wolf" and (game.get("sentry_brain") as SentryBrain).state == &"down" and str(game.call("_objective")) == "POP THE EXIT BOLT", "TANK DOWN: the sentry under the tank, drawn there by WOLF")
+	actions.jump(&"end_of_slice")
+	await _settle(2)
+	var recap: Array[String] = game.call("end_card_recap")
+	_expect(game.get("end_card_active") and (game.get("state") as M0State).junction_cleared and recap.size() == 3 and recap[2].contains("WOLF drew the sentry"), "END OF SLICE: the card with this run's recap")
+	# From the menu itself.
+	tools.open_menu()
+	(tools.menu.buttons["jump:junction_a"] as Button).pressed.emit()
+	await _settle(2)
+	_expect(not tools.menu.is_open and not paused and (game.get("state") as M0State).chapter_id == "junction" and not game.get("end_card_active") and tools.note_label.text.begins_with("Jumped to JUNCTION SAVE A"), "the menu's JUNCTION SAVE A button jumps, closes the menu and says so over the game")
+	tools.hide_note()
+	await _free(game)
+
+
+## The presets reach every jump that uses them, through the game's own rules: a rushed relay leaves
+## WOLF refusing and the engineer cranking the bypass, a told one then cranked keeps the bypass route,
+## the manual mirror, and each lane answer (WOLF draws it, alone, or he refuses after a rushed relay).
+func _check_jump_presets() -> void:
+	var game: Node2D = await _spawn(true)
+	var tools: DebugTools = _tools(game)
+	var actions: DebugActions = tools.actions
+	actions.set_relay(&"press")
+	actions.set_mirror(&"manual")
+	_expect(actions.lane == &"refused", "a rushed relay makes the lane preset WOLF REFUSES")
+	actions.jump(&"records_mirror")
+	await _settle(2)
+	var state: M0State = game.get("state")
+	_expect(state.memory.get("choice_id") == M0State.PRESS and state.route == "fallback" and state.mirror_route == "manual", "rushed relay: the engineer cranked the bypass; the mirror copied by hand")
+	actions.jump(&"lane")
+	await _settle(2)
+	_expect(game.get("lane_choice") == "refused" and not game.get("wolf_baiting") and str(game.get("status_line")) == str(game.get_script().get_script_constant_map()["BAIT_NO_LINE"]), "asked to draw the sentry after a rushed relay, WOLF refuses in his own words")
+	actions.jump(&"end_of_slice")
+	await _settle(2)
+	var recap: Array[String] = game.call("end_card_recap")
+	_expect(recap[0].contains("rushed WOLF") and recap[1].contains("maintenance port") and recap[2].contains("wouldn't draw it"), "the END OF SLICE recap tells this run (%s)" % [recap])
+	actions.set_relay(&"disclose_bypass")
+	_expect(actions.lane == &"wolf", "told the risk again, the lane preset goes back to WOLF")
+	actions.set_lane(&"alone")
+	actions.jump(&"safe_point")
+	await _settle(2)
+	state = game.get("state")
+	_expect(state.memory.get("choice_id") == M0State.DISCLOSE and state.route == "fallback" and (game.get("bypass_handle") as BypassHandle).done, "told, then cranked: the bypass route with WOLF told the risk")
+	actions.jump(&"lane")
+	await _settle(2)
+	_expect(game.get("lane_choice") == "alone" and not game.get("wolf_baiting") and (game.call("debug_snapshot")["wolf"] as Dictionary)["why"] == "hold: at the rubble", "ALONE: WOLF holds at the rubble while the engineer times it")
+	actions.jump(&"tank_down")
+	await _settle(2)
+	_expect((game.get("state") as M0State).lane_recap == "alone", "and the fall is saved as timed alone")
+	await _free(game)
+
+
+## WOLF's lane answer follows the relay rule, so presets the rule rules out change with it, and say so.
+func _check_choice_rules() -> void:
+	var game: Node2D = await _spawn(true)
+	var actions: DebugActions = _tools(game).actions
+	_expect(actions.relay == &"disclose_wolf" and actions.mirror == &"wolf" and actions.lane == &"wolf", "the presets start on the told, WOLF route")
+	var note: String = actions.set_lane(&"refused")
+	_expect(actions.relay == &"press" and note.contains("RUSHED"), "WOLF REFUSES sets the relay to rushed, and says why")
+	note = actions.set_lane(&"wolf")
+	_expect(actions.relay == &"disclose_wolf" and note.contains("TOLD"), "WOLF draws it sets the relay to told")
+	note = actions.set_relay(&"press")
+	_expect(actions.lane == &"refused" and note.contains("WOLF REFUSES"), "a rushed relay turns WOLF's lane answer to a refusal")
+	actions.set_lane(&"alone")
+	actions.set_relay(&"disclose_wolf")
+	_expect(actions.lane == &"alone", "ALONE fits either relay and stays")
+	_expect(actions.set_relay(&"nonsense").is_empty() and actions.relay == &"disclose_wolf", "an unknown option changes nothing")
+	var tools: DebugTools = _tools(game)
+	tools.open_menu()
+	tools.menu.show_page(&"choices")
+	(tools.menu.buttons["relay:press"] as Button).pressed.emit()
+	_expect(actions.relay == &"press" and (tools.menu.buttons["relay:press"] as Button).button_pressed and not (tools.menu.buttons["relay:disclose_wolf"] as Button).button_pressed and tools.menu.note_label.text.begins_with("Relay: RUSHED"), "the menu's relay buttons pick one and show the note")
+	_expect(not tools.cheats_used, "choosing presets alone is not a cheat")
+	tools.menu.close()
+	await _free(game)
+
+
+## Invincible: the vent, the cloud, a chasing sentry and the door blast knock nobody down (the door
+## blows as if the engineer were clear), and with it off the same contact knocks down again.
+func _check_invincible() -> void:
+	var game: Node2D = await _spawn(true)
+	var tools: DebugTools = _tools(game)
+	var actions: DebugActions = tools.actions
+	var room: JunctionRoom = game.get("junction_room")
+	actions.jump(&"junction_a")
+	await _settle(2)
+	tools.cheats_used = false
+	actions.set_invincible(true)
+	_expect(tools.cheats_used and game.call("_debug_spares_knockdown"), "invincibility is on, and a cheat")
+	room.vent_hazard.contact.emit(room.vent_hazard)
+	room.cloud_hazard.contact.emit(room.cloud_hazard)
+	_expect(not game.get("fail_active"), "the vent and the cloud knock nobody down")
+	var human: M0Actor = game.get_node("Human") as M0Actor
+	human.position.x = float(game.get_script().get_script_constant_map()["VALVE_CRANK_X"])
+	actions.trigger_blast()
+	await create_timer(PressureLine.FUSE_SECONDS + 0.4).timeout
+	var state: M0State = game.get("state")
+	_expect(state.door_blown and not game.get("fail_active") and PressureLine.is_in_blast(human.position.x), "the door blows with the engineer in front of it and nobody is knocked down")
+	_expect(M0State.load_from_disk(str(game.get("save_path"))).door_blown, "and autosave B is written as usual")
+	actions.set_lane(&"alone")
+	actions.jump(&"lane")
+	await _settle(2)
+	actions.set_invincible(true)
+	human.position.x = 760.0
+	await create_timer(1.6).timeout
+	var brain: SentryBrain = game.get("sentry_brain")
+	_expect(brain.state == &"chase" and brain.touches(human.position.x) and not game.get("fail_active"), "a chasing sentry on the engineer knocks nobody down (%s at %.0f, engineer %.0f)" % [brain.state, brain.x, human.position.x])
+	actions.set_invincible(false)
+	await _settle(3)
+	_expect(game.get("fail_active"), "with invincibility off the same contact knocks down")
+	game.call("_cancel_fail")
+	await _free(game)
+
+
+## Freeze sentry holds the sentry where it is; instant crank finishes the junction valve and the
+## corridor's MANUAL BYPASS through the game's own crank as soon as interact is held at them.
+func _check_freeze_and_instant_crank() -> void:
+	var game: Node2D = await _spawn(true)
+	var tools: DebugTools = _tools(game)
+	var actions: DebugActions = tools.actions
+	actions.set_lane(&"alone")
+	actions.jump(&"lane")
+	await _settle(2)
+	var brain: SentryBrain = game.get("sentry_brain")
+	actions.set_sentry_frozen(true)
+	var at: float = brain.x
+	var was: StringName = brain.state
+	await create_timer(0.5).timeout
+	_expect(is_equal_approx(brain.x, at) and brain.state == was and not actions.is_processing(), "a frozen sentry stays put (and freezing needs no per-frame work)")
+	actions.set_sentry_frozen(false)
+	await create_timer(0.3).timeout
+	_expect(not is_equal_approx(brain.x, at), "unfrozen it patrols on")
+	# The valve.
+	actions.jump(&"junction_a")
+	await _settle(2)
+	actions.set_instant_crank(true)
+	_expect(actions.is_processing(), "instant crank works each frame while it is on")
+	var line: PressureLine = game.get("pressure_line")
+	line.arm()
+	var human: M0Actor = game.get_node("Human") as M0Actor
+	human.position.x = float(game.get_script().get_script_constant_map()["VALVE_CRANK_X"])
+	await _settle(2)
+	Input.action_press(&"interact")
+	await _settle(4)
+	Input.action_release(&"interact")
+	_expect(line.state in [&"charged", &"fuse"] and line.turns == PressureLine.TURNS_NEEDED and str(game.get("status_line")).to_upper().begins_with("FUSE LIT"), "holding interact at the valve lands all three turns at once, and the game says the fuse is lit (%s)" % line.state)
+	human.position.x = 120.0
+	# The bypass, after a rushed relay.
+	actions.jump(&"corridor_start")
+	await _settle(2)
+	var state: M0State = game.get("state")
+	state.record_choice(M0State.PRESS)
+	state.arm_breaker()
+	game.call("_update_controls")
+	human.position.x = float(game.get_script().get_script_constant_map()["BYPASS_CRANK_X"])
+	await _settle(2)
+	Input.action_press(&"interact")
+	await _settle(4)
+	Input.action_release(&"interact")
+	_expect(state.door_open and state.route == "fallback" and (game.get("bypass_handle") as BypassHandle).done, "holding interact at the MANUAL BYPASS cranks it over at once and the seal opens")
+	actions.set_instant_crank(false)
+	_expect(not actions.is_processing(), "off, it stops working each frame")
+	await _free(game)
+
+
+## Slow motion: 0.5x and 0.25x hold Engine.time_scale there (coming back after a hit-stop), 1x puts it
+## back and stops the per-frame work.
+func _check_slow_motion() -> void:
+	var game: Node2D = await _spawn(true)
+	var tools: DebugTools = _tools(game)
+	var actions: DebugActions = tools.actions
+	actions.jump(&"corridor_start")
+	await _settle(2)
+	actions.set_slow_motion(0.5)
+	_expect(is_equal_approx(Engine.time_scale, 0.5) and actions.is_processing() and tools.cheats_used, "0.5x slows the game")
+	(game.get("impact") as Impact).end_hit_stop()
+	_expect(is_equal_approx(Engine.time_scale, 1.0), "(a hit-stop ending puts the speed back for a moment)")
+	await _settle(2)
+	_expect(is_equal_approx(Engine.time_scale, 0.5), "and slow motion takes it again the next frame")
+	actions.set_slow_motion(0.25)
+	_expect(is_equal_approx(Engine.time_scale, 0.25), "0.25x")
+	tools.set_overlay_mode(DebugTools.Overlay.STATE)
+	_expect(tools.overlay.body.get_parsed_text().contains("CHEATS  USED · 0.25x"), "the state page names the speed")
+	tools.open_menu()
+	tools.menu.show_page(&"cheats")
+	_expect((tools.menu.buttons["speed:0.25"] as Button).button_pressed and not (tools.menu.buttons["speed:1"] as Button).button_pressed, "the menu shows the speed in force")
+	(tools.menu.buttons["speed:1"] as Button).pressed.emit()
+	tools.menu.close()
+	_expect(is_equal_approx(Engine.time_scale, 1.0) and not actions.is_processing(), "1x is full speed again with no per-frame work")
+	tools.set_overlay_mode(DebugTools.Overlay.OFF)
+	await _free(game)
+
+
+## Frame step holds the game still and lets exactly one frame through per step: from code, period,
+## RB and the STEP button; Esc (or RUN) plays on. The bar shows only while stepping with the menu shut.
+func _check_frame_step() -> void:
+	var game: Node2D = await _spawn(true)
+	var tools: DebugTools = _tools(game)
+	var actions: DebugActions = tools.actions
+	var menu: DebugMenu = tools.menu
+	actions.jump(&"corridor_start")
+	await _settle(2)
+	var probe: Node = _frame_probe()
+	game.add_child(probe)
+	actions.set_frame_step(true)
+	_expect(paused and menu.step_bar.visible and menu.visible and tools.layer.visible and not actions.is_processing(), "frame step holds the game still and shows its bar, with no per-frame work")
+	var frames: int = int(probe.get("frames"))
+	await _settle(3)
+	_expect(int(probe.get("frames")) == frames, "nothing runs between steps")
+	actions.step_frame()
+	await _settle(4)
+	_expect(int(probe.get("frames")) == frames + 1 and paused and actions.frames_stepped == 1 and menu.step_label.text == "FRAME STEP  1", "one step lets exactly one frame through (%d)" % (int(probe.get("frames")) - frames))
+	await _send_key(KEY_PERIOD)
+	await _settle(2)
+	_expect(int(probe.get("frames")) == frames + 2 and paused, "period steps one frame")
+	await _tap_pad(JOY_BUTTON_RIGHT_SHOULDER)
+	await _settle(2)
+	_expect(int(probe.get("frames")) == frames + 3 and paused, "RB steps one frame")
+	menu.step_button.pressed.emit()
+	await _settle(2)
+	_expect(int(probe.get("frames")) == frames + 4 and paused, "the STEP button steps one frame")
+	var bar: Rect2 = menu.step_bar.get_global_rect()
+	for path: String in ["CanvasLayer/PauseButton", "CanvasLayer/TopBar", "CanvasLayer/TutorialPrompt", "CanvasLayer/ContextHint"]:
+		_expect(not bar.intersects((game.get_node(path) as Control).get_global_rect()), "the step bar leaves %s clear" % path.get_file())
+	tools.open_menu()
+	_expect(menu.is_open and not menu.step_bar.visible and paused, "the menu opens over frame stepping and the bar steps aside")
+	menu.close()
+	_expect(paused and menu.step_bar.visible, "closing the menu goes back to stepping, still held")
+	await _send_key(KEY_ESCAPE)
+	await _settle(2)
+	_expect(not actions.frame_step and not paused and not menu.step_bar.visible and not game.get("pause_overlay").visible and int(probe.get("frames")) > frames + 4, "Esc plays on without opening Pause")
+	actions.set_frame_step(true)
+	menu.run_button.pressed.emit()
+	_expect(not actions.frame_step and not paused, "RUN plays on")
+	actions.set_frame_step(true)
+	_expect(tools.handle_back() and not actions.frame_step and not paused, "Android Back plays on too")
+	tools.cheats_used = false
+	tools.hide_note()
+	probe.free()
+	await _free(game)
+
+
+## Forcing: each knockdown lands with its own card through the one knockdown path, even while
+## invincible, and its checkpoint comes back; none outside the junction; the door fuse and the tank
+## drop run through the room's own rules.
+func _check_forcing() -> void:
+	var game: Node2D = await _spawn(true)
+	var tools: DebugTools = _tools(game)
+	var actions: DebugActions = tools.actions
+	actions.jump(&"corridor_start")
+	await _settle(2)
+	var note: String = actions.force_knockdown(&"vent")
+	_expect(not game.get("fail_active") and note.contains("Service Junction"), "no knockdown is forced outside the junction, and it says why")
+	_expect(not actions.trigger_blast().is_empty() and not game.get("fail_active") and actions.drop_blocked().contains("Service Junction"), "nor the fuse or the tank")
+	actions.set_invincible(true)
+	var cards: Dictionary = {&"vent": JunctionRoom.VENT_REASON, &"blast": JunctionRoom.BLAST_REASON, &"cloud": JunctionRoom.CLOUD_REASON}
+	for kind: StringName in DebugActions.KNOCKDOWNS:
+		actions.jump(&"lane" if kind == &"sentry" else &"junction_a")
+		await _settle(2)
+		var expected: String = str(game.call("_sentry_reason")) if kind == &"sentry" else str(cards[kind]) % str(game.call("_first_name"))
+		note = actions.force_knockdown(kind)
+		_expect(game.get("fail_active") and str(game.get("status_line")) == expected and note == "Forced the %s knockdown." % kind, "forcing the %s knockdown plays it with its own card, even while invincible" % kind)
+		_expect(actions.force_knockdown(kind).contains("already"), "a second force waits for the first")
+	await create_timer(float(game.get_script().get_script_constant_map()["FAIL_CONTROLS_OFF_SECONDS"]) + float(game.get_script().get_script_constant_map()["FAIL_FADE_SECONDS"]) + 0.3).timeout
+	_expect(not game.get("fail_active") and str(game.get("status_line")).contains(str(game.get_script().get_script_constant_map()["RESTORE_FROM_DISK_LINE"])) and (game.get("state") as M0State).chapter_id == "junction" and not (game.get("state") as M0State).door_blown, "the forced knockdown brings back the beat's checkpoint (junction save A)")
+	actions.set_invincible(false)
+	# The door fuse, the engineer clear of the blast.
+	actions.jump(&"junction_a")
+	await _settle(2)
+	note = actions.trigger_blast()
+	var line: PressureLine = game.get("pressure_line")
+	_expect(line.state in [&"charged", &"fuse"] and note.begins_with("Fuse lit") and str(game.get("status_line")).begins_with("FUSE LIT"), "LIGHT THE DOOR FUSE lights it through the pressure line")
+	_expect(actions.trigger_blast() == "The fuse is already lit.", "it will not light twice")
+	await create_timer(PressureLine.FUSE_SECONDS + 0.4).timeout
+	var state: M0State = game.get("state")
+	_expect(state.door_blown and not game.get("fail_active") and M0State.load_from_disk(str(game.get("save_path"))).door_blown, "the door goes as in play, with autosave B")
+	_expect(actions.trigger_blast() == "The door is already down.", "once down it says so")
+	# The tank, on a sentry it misses (the engineer's choice still has to come first).
+	actions.set_lane(&"alone")
+	actions.jump(&"lane")
+	await _settle(2)
+	var brain: SentryBrain = game.get("sentry_brain")
+	brain.x = DropArm.MARK_X + 120.0
+	actions.set_sentry_frozen(true)
+	note = actions.trigger_drop()
+	var arm: DropArm = game.get("drop_arm")
+	_expect(arm.state == &"falling" and note == "The clamp lets go.", "DROP THE TANK lets the clamp go")
+	await create_timer(DropArm.FALL_SECONDS + 0.2).timeout
+	_expect(arm.state == &"rewinding" and not (game.get("state") as M0State).sentry_down, "with the sentry off the brackets it misses, as in play")
+	_expect(actions.trigger_drop().contains("wait for the clamp"), "while it rewinds it waits for the clamp")
+	actions.jump(&"lane")
+	await _settle(2)
+	brain.x = DropArm.MARK_X
+	actions.trigger_drop()
+	await create_timer(DropArm.FALL_SECONDS + 0.2).timeout
+	_expect((game.get("state") as M0State).sentry_down and M0State.load_from_disk(str(game.get("save_path"))).sentry_down, "with the sentry on the mark it comes down on it, with autosave C")
+	actions.set_sentry_frozen(false)
+	tools.open_menu()
+	tools.menu.show_page(&"force")
+	_expect((tools.menu.buttons["trigger:drop"] as Button).disabled and (tools.menu.buttons["trigger:blast"] as Button).disabled and not (tools.menu.buttons["force:sentry"] as Button).disabled, "the menu greys out what cannot happen now")
+	(tools.menu.buttons["force:cloud"] as Button).pressed.emit()
+	_expect(not tools.menu.is_open and not paused and game.get("fail_active"), "a force button closes the menu so the knockdown plays")
+	game.call("_cancel_fail")
+	tools.hide_note()
+	await _free(game)
+
+
+## SAVE NOW writes the beat through the game's own autosave (not before the first checkpoint),
+## RELOAD CHECKPOINT goes back to it, CLEAR SAVE deletes it after a second press, and the title follows.
+func _check_saves() -> void:
+	var game: Node2D = await _spawn(true)
+	var tools: DebugTools = _tools(game)
+	var actions: DebugActions = tools.actions
+	var save_path: String = str(game.get("save_path"))
+	_clean_save()
+	_expect(actions.save_now().begins_with("Start play"), "nothing to save on the title")
+	actions.jump(&"corridor_start")
+	await _settle(2)
+	_expect(actions.save_now() == str(game.get_script().get_script_constant_map()["NO_CHECKPOINT_NOTE"]) and not FileAccess.file_exists(save_path), "before the first SAFE POINT there is no checkpoint to write")
+	actions.jump(&"records_entry")
+	await _settle(2)
+	var human: M0Actor = game.get_node("Human") as M0Actor
+	human.position.x = 400.0
+	(game.get("state") as M0State).preserve_purge_trace()
+	tools.cheats_used = false
+	_expect(actions.save_now() == str(game.get_script().get_script_constant_map()["CHECKPOINT_TOAST"]), "SAVE NOW says the checkpoint is saved")
+	var saved: M0State = M0State.load_from_disk(save_path)
+	_expect(saved != null and saved.purge_trace_preserved and is_equal_approx(saved.human_position.x, 400.0) and not tools.cheats_used, "it writes this beat, where the engineer stands, and is not a cheat")
+	human.position.x = 700.0
+	(game.get("state") as M0State).preserve_mirror_trace("manual")
+	actions.reload_checkpoint()
+	await _settle(2)
+	var state: M0State = game.get("state")
+	_expect(state.purge_trace_preserved and not state.mirror_trace_preserved and is_equal_approx(human.position.x, 400.0), "RELOAD CHECKPOINT goes back to it")
+	tools.open_menu()
+	tools.menu.show_page(&"save")
+	var clear: Button = tools.menu.buttons["save:clear"]
+	_expect(not clear.disabled and not (tools.menu.buttons["save:reload"] as Button).disabled and tools.menu.save_caption.text.contains("Records, purge order copied"), "the SAVE page shows the checkpoint on disk")
+	clear.pressed.emit()
+	_expect(FileAccess.file_exists(save_path) and clear.text == DebugMenu.CLEAR_CONFIRM_TEXT, "the first CLEAR SAVE press only asks to press again")
+	clear.pressed.emit()
+	_expect(not FileAccess.file_exists(save_path) and clear.disabled and tools.menu.note_label.text == "Checkpoint deleted.", "the second deletes it")
+	tools.menu.close()
+	_expect(actions.reload_checkpoint() == "No checkpoint to reload.", "with nothing on disk, reload says so")
+	actions.jump(&"safe_point")
+	await _settle(2)
+	game.call("_return_to_title")
+	await _settle(2)
+	_expect(not (game.get("continue_button") as Button).disabled, "a jump's checkpoint lets the title continue")
+	actions.clear_save()
+	_expect((game.get("continue_button") as Button).disabled, "clearing the save on the title greys out Continue")
+	await _free(game)
+
+
+## The effect switches reach Main's effects switch and the impact kit's shake and flash; locking the
+## tools turns every cheat off, puts speed, pause and effects back, closes the menu and leaves them idle.
+func _check_switches_and_lock() -> void:
+	var game: Node2D = await _spawn(true)
+	var tools: DebugTools = _tools(game)
+	var actions: DebugActions = tools.actions
+	var impact: Impact = game.get("impact")
+	actions.jump(&"corridor_start")
+	await _settle(2)
+	tools.cheats_used = false
+	actions.set_effects(false)
+	_expect(not game.get("effects_enabled") and not (game.get("post_grade") as CanvasItem).visible and not impact.enabled and not tools.cheats_used, "VISUAL EFFECTS off turns off the game's effects switch (not a cheat)")
+	actions.set_effects(true)
+	actions.set_shake(false)
+	impact.add_trauma(1.0)
+	_expect(impact.trauma == 0.0 and impact.enabled, "CAMERA SHAKE off: no shake, the rest of the kit still on")
+	actions.set_flash(false)
+	var fade: ColorRect = game.get("intro_fade")
+	var before: Color = fade.color
+	impact.flash(0.2, 0.2)
+	_expect(fade.color == before, "SCREEN FLASH off: no flash")
+	actions.set_shake(true)
+	actions.set_flash(true)
+	impact.add_trauma(0.5)
+	_expect(impact.trauma > 0.0, "on again, they work")
+	impact.reset()
+	# Everything on, then Lock debug tools.
+	actions.set_invincible(true)
+	actions.set_sentry_frozen(true)
+	actions.set_instant_crank(true)
+	actions.set_slow_motion(0.5)
+	actions.set_effects(false)
+	actions.set_shake(false)
+	actions.set_frame_step(true)
+	tools.open_menu()
+	tools.menu.show_page(&"view")
+	(tools.menu.buttons["view:lock"] as Button).pressed.emit()
+	_expect(not tools.available and not tools.menu.is_open and not paused and is_equal_approx(Engine.time_scale, 1.0), "Lock debug tools closes the menu and lets the game run at full speed")
+	_expect(not actions.invincible and not actions.sentry_frozen and not actions.instant_crank and not actions.frame_step and game.get("effects_enabled") and impact.shake_enabled and impact.flash_enabled, "every cheat is off and the effects are back")
+	_expect(not game.call("_debug_spares_knockdown") and not game.call("_debug_sentry_frozen") and not tools.handle_back(), "Main sees no cheat in force")
+	tools.hide_note()
+	_expect(_idle(tools), "locked, the tools cost nothing per frame")
+	await _free(game)
+
+
+## A node that counts the frames it processes (it pauses with the game).
+func _frame_probe() -> Node:
+	var script: GDScript = GDScript.new()
+	script.source_code = "extends Node\nvar frames: int = 0\n\n\nfunc _process(_delta: float) -> void:\n\tframes += 1\n"
+	script.reload()
+	var probe: Node = Node.new()
+	probe.set_script(script)
+	return probe
+
+
+func _clean_save() -> void:
+	for path: String in [base + "-save.json", base + "-save.json.tmp"]:
+		if FileAccess.file_exists(path):
+			DirAccess.remove_absolute(ProjectSettings.globalize_path(path))
+
+
 ## The entry in [param list] whose [param key] is [param value], or empty.
 func _entry(list: Variant, key: String, value: Variant) -> Dictionary:
 	for item: Variant in list:
@@ -1053,10 +1685,13 @@ func _settings_path() -> String:
 	return base + ".cfg"
 
 
-## True when the tools neither process nor draw anything, the zone drawing and its legend included.
+## True when the tools neither process nor draw anything, the zone drawing and its legend, the menu,
+## the frame-step bar and the actions (with their frame stepper) included.
 func _idle(tools: DebugTools) -> bool:
 	return not tools.is_processing() and not tools.is_physics_processing() and not tools.layer.visible and not tools.overlay.visible and not tools.debug_button.visible and not tools.note.visible \
-		and not tools.zones.visible and not tools.zones.is_processing() and not tools.zones.legend.is_visible_in_tree()
+		and not tools.zones.visible and not tools.zones.is_processing() and not tools.zones.legend.is_visible_in_tree() \
+		and not tools.menu.visible and not tools.menu.is_open and not tools.menu.step_bar.visible and not tools.menu.is_processing() \
+		and not tools.actions.is_processing() and not tools.actions.is_physics_processing() and not tools.actions.stepper.is_processing()
 
 
 ## A completed Records run (disclose, WOLF's readout) carried into the junction, with the door blown or not.
