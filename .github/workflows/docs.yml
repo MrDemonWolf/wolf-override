@@ -14,6 +14,12 @@ on:
 permissions:
   contents: read
 
+# A newer push to a pull request cancels its older run. Main runs queue one behind the other, so an
+# older build can never deploy after a newer one; a run still waiting is replaced by the newest push.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
 jobs:
   build:
     runs-on: ubuntu-24.04

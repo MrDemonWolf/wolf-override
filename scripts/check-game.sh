@@ -1,17 +1,54 @@
 #!/usr/bin/env bash
-# Run the Godot import and every headless suite with an isolated user data directory.
-# Usage: scripts/check-game.sh   (GODOT_BIN overrides the godot binary)
+# Run the Godot import and every headless suite, each suite with its own temporary user data folder.
+# Usage: scripts/check-game.sh
+#   GODOT_BIN      the godot binary (default: godot on PATH)
+#   CHECK_JOBS     how many suites run at once (default: the CPU count, at most 4; 1 runs them in turn)
+#   SUITE_TIMEOUT  seconds a suite or an import pass may take before it counts as hung (default: 240)
+#   CHECK_LOG_DIR  where logs go (CI keeps them); without it they are kept only when a check fails
 set -euo pipefail
 
 root="$(cd "$(dirname "$0")/.." && pwd)"
+# shellcheck source=scripts/godot-helpers.sh
+source "$root/scripts/godot-helpers.sh"
 godot="${GODOT_BIN:-godot}"
+limit="${SUITE_TIMEOUT:-240}"
+
+# Internal: `check-game.sh --suite NAME LOG_DIR WORK_DIR` runs one suite and writes NAME.result.
+if [ "${1:-}" = "--suite" ]; then
+  name="$2" logs="$3" work="$4" rc=0 started="$SECONDS"
+  isolate_godot_home "$work/home-$name"
+  cd "$root"
+  bounded "$limit" "$godot" --headless --path apps/game --script "res://tests/$name.gd" > "$logs/$name.log" 2>&1 || rc=$?
+  if [ "$rc" -eq 124 ]; then
+    echo "FAIL  $name (hung: still running after ${limit}s and was stopped; see $logs/$name.log)" > "$logs/$name.result"
+  elif [ "$rc" -ne 0 ] || grep -qE "$godot_error_lines" "$logs/$name.log"; then
+    echo "FAIL  $name (see $logs/$name.log)" > "$logs/$name.result"
+  elif grep -q 'instances were leaked at exit' "$logs/$name.log"; then
+    # A suite also fails if it leaks objects at exit, so a leak in the game's own nodes or audio shows up.
+    # Run it once more with --verbose so the log names the leaked objects; the suite still fails.
+    bounded "$limit" "$godot" --headless --verbose --path apps/game --script "res://tests/$name.gd" > "$logs/$name.verbose.log" 2>&1 || true
+    echo "FAIL  $name (leaked objects at exit; see $logs/$name.log, and $logs/$name.verbose.log for their names)" > "$logs/$name.result"
+  else
+    echo "pass  $name ($((SECONDS - started))s)" > "$logs/$name.result"
+  fi
+  rm -rf "$work/home-$name"
+  exit 0
+fi
+
 work="$(mktemp -d)"
 logs="${CHECK_LOG_DIR:-$work/logs}"
-mkdir -p "$logs" "$work/home"
-trap 'rm -rf "$work/home"' EXIT
-# Godot resolves user:// from HOME on macOS and XDG_DATA_HOME on Linux; isolate both so
-# checks never touch real saves or editor settings.
-export HOME="$work/home" XDG_DATA_HOME="$work/home/.local/share" XDG_CONFIG_HOME="$work/home/.config"
+mkdir -p "$logs"
+keep_work=0
+cleanup() {
+  if [ "$keep_work" -eq 1 ] && [ -z "${CHECK_LOG_DIR:-}" ]; then
+    echo "Logs kept in $logs" >&2
+    find "$work" -mindepth 1 -maxdepth 1 ! -name logs -exec rm -rf {} +
+  else
+    rm -rf "$work"
+  fi
+}
+trap cleanup EXIT
+isolate_godot_home "$work/home"
 
 cd "$root"
 before="$(git status --porcelain -- apps/game)"
@@ -23,30 +60,38 @@ if ! cmp -s "$work/changelog.txt" apps/game/assets/changelog.txt; then
   exit 1
 fi
 
-# A fresh checkout's first import loads the project theme before its fonts exist; the second must be clean.
-"$godot" --headless --path apps/game --import > "$logs/import-first.log" 2>&1 || true
-"$godot" --headless --path apps/game --import > "$logs/import.log" 2>&1
-if grep -qE '^ERROR:|SCRIPT ERROR|Parse Error' "$logs/import.log"; then
-  echo "Second import reported errors (see $logs/import.log)" >&2
+if ! import_game "$godot" "$logs" "$limit"; then
+  keep_work=1
   exit 1
 fi
 
-status=0
-# A suite also fails if it leaks objects at exit, so a leak in the game's own nodes or audio shows up.
+cpus="$(getconf _NPROCESSORS_ONLN 2>/dev/null || echo 2)"
+jobs="${CHECK_JOBS:-$((cpus < 4 ? cpus : 4))}"
+suites=()
 for test in apps/game/tests/*_test.gd; do
-  name="$(basename "$test" .gd)"
-  if "$godot" --headless --path apps/game --script "res://tests/$name.gd" > "$logs/$name.log" 2>&1 \
-    && ! grep -qE '^ERROR:|SCRIPT ERROR|Parse Error|instances were leaked at exit' "$logs/$name.log"; then
-    echo "pass  $name"
+  suites+=("$(basename "$test" .gd)")
+done
+started="$SECONDS"
+printf '%s\n' "${suites[@]}" | xargs -P "$jobs" -I{} "$root/scripts/check-game.sh" --suite {} "$logs" "$work"
+
+status=0
+for name in "${suites[@]}"; do
+  if [ ! -f "$logs/$name.result" ]; then
+    echo "FAIL  $name (did not report a result; see $logs/$name.log)" >&2
+    status=1
+  elif grep -q '^pass' "$logs/$name.result"; then
+    cat "$logs/$name.result"
   else
-    echo "FAIL  $name (see $logs/$name.log)" >&2
+    cat "$logs/$name.result" >&2
     status=1
   fi
 done
+echo "${#suites[@]} suites in $((SECONDS - started))s, $jobs at a time"
 
 if [ "$(git status --porcelain -- apps/game)" != "$before" ]; then
   echo "Checks changed files under apps/game:" >&2
   git status --porcelain -- apps/game >&2
   status=1
 fi
+[ "$status" -eq 0 ] || keep_work=1
 exit "$status"

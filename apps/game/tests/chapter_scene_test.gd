@@ -209,9 +209,16 @@ func _run() -> void:
 	game.call("_refresh_ui")
 	_expect(hint_text.text != "Save failed. Use a station to try again.", "a later successful save clears the failure hint")
 	DirAccess.remove_absolute(ProjectSettings.globalize_path(path))
-	game.queue_free()
-	# The exit arc clip is still playing; the mixer releases a stopped clip a few steps later, so give it that time before quitting.
+	# The exit arc clip can still be playing. Stop every player first: the mixer releases a stopped clip's
+	# playback a few mix steps later, and a fixed 0.1 s wait after freeing was sometimes too short on a busy
+	# runner, which reported two leaked objects at exit. Then give it frames as well as time before quitting.
+	for player: Node in game.find_children("*", "AudioStreamPlayer", true, false) + game.find_children("*", "AudioStreamPlayer2D", true, false):
+		player.call("stop")
 	await create_timer(0.1).timeout
+	game.queue_free()
+	for frame: int in 10:
+		await process_frame
+	await create_timer(0.2).timeout
 	if failures == 0:
 		print("Chapter scene checks passed")
 	quit(1 if failures > 0 else 0)
