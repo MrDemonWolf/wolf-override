@@ -14,15 +14,15 @@ bun run docs:test
 bun run docs:build
 ```
 
-`bun run game:check` runs the Godot import twice (the second must be error-free) and every `apps/game/tests/*_test.gd` suite with a temporary user data folder, so it never touches your own saves or editor settings. Set `GODOT_BIN` if `godot` is not on your path.
+`bun run game:check` runs the Godot import twice and then every `apps/game/tests/*_test.gd` suite, up to four at a time, each with its own temporary user data folder, so it never touches your own saves or editor settings. The first import may report only the known font errors of a fresh checkout and the second must be error-free. A suite fails if it reports an error, leaks objects at exit (it is then run once more with verbose output, so its log names them) or is still running after 240 seconds, when it is stopped and reported as hung; each import pass has the same limit. This works on macOS without GNU `timeout`. Set `GODOT_BIN` if `godot` is not on your path, `CHECK_JOBS=1` to run the suites one at a time, or `SUITE_TIMEOUT` to change the limit. Logs are kept, and their folder printed, only when a check fails.
 
-The same script keeps the in-game changelog in step with this website: it regenerates `apps/game/assets/changelog.txt` from `apps/docs/content/docs/changelog.mdx` with `python3 scripts/export_changelog.py` (Python 3, standard library only) and fails when the committed text differs. After editing the changelog, run that script and commit the result with the docs change. The file is a plain `.txt`, which Godot does not pack by default: any export preset must add `*.txt` to its include filter, or the in-game screen shows its "missing from this build" line.
+The same script keeps the in-game changelog in step with this website: it regenerates `apps/game/assets/changelog.txt` from `apps/docs/content/docs/changelog.mdx` with `python3 scripts/export_changelog.py` (Python 3, standard library only) and fails when the committed text differs. After editing the changelog, run that script and commit the result with the docs change. The file is a plain `.txt`, which Godot does not pack by default: the export presets in `apps/game/export_presets.cfg` include it (and the two font licences) by name, and any new preset must too, or the in-game screen shows its "missing from this build" line.
 
 The Godot commands check import, state logic, both scripted door routes, both Records Access mirror routes, the Service Junction's pressure-line timing, held crank, blast, the sentry's patrol, sight, lock-on pause, chase and hold on WOLF, the tank's hit window, miss cloud and rewind, both answers at the rubble line with either relay memory, the exit bolt and closing scene, every knockdown's retry, all four autosaves and Continue from each, save/load, the lamp flicker's timing limits, lockdown beacons that settle from the save state, hidden rooms that stop their dust and light, a sentry beam drawn to its real sight range, with a gap over the alcove where it cannot see, the pressure bulkheads' shared cut and draw order, station name plates (the relief vent's among them) that share one row without overlapping in any state, station names in every room that fade at the edge of the view, an engineer who sidesteps out of any machine they stop over, machine lights and plates drawn behind both characters, near pipe columns and bulkhead pillars that fade back from a character behind them, and the debug tools' gating, unlock codes, overlay, state dump, bug capture and zone drawing (each hitbox matches its real shape, each render box its sprite or control, each use range the rule that answers interact, and none of it runs while hidden), and the debug menu with keyboard, controller and touch: every jump, the choice presets, every cheat including slow motion and frame stepping, each forced knockdown, the door fuse and the tank drop, the save actions and the effect switches. Bun checks docs types and builds the static Pages site. Headless checks do not establish how a route feels on screen; exports and devices need separate checks.
 
 ## Debug tools and cheat codes
 
-The game has debug tools for anyone testing it, so you can see what it is doing and keep a record of a problem. In a debug build (the editor, or a source run with the standard Godot binary) they are always available. In any other build they stay hidden until you enter a code on the title screen:
+The game has debug tools for anyone testing it, so you can see what it is doing and keep a record of a problem. In a debug build (the editor, a source run with the standard Godot binary, or one of the [test builds](#test-builds)) they are always available. In any other build they stay hidden until you enter a code on the title screen:
 
 | Input | Code |
 | --- | --- |
@@ -77,9 +77,57 @@ The tools live in `apps/game/scripts/debug/` and reach the game only through the
 
 ## Continuous integration
 
-Every pull request and push to main runs a checksum-verified Godot 4.7.2 import and the scripted headless game checks through `scripts/check-game.sh`. The workflow also supports manual runs. The check step has a 5-minute limit; failing or cancelled check logs are retained as downloadable artifacts for seven days. Log pipelines retain the command's failure status.
+Every pull request and push to main runs a checksum-verified Godot 4.7.2 import and the scripted headless game checks through `scripts/check-game.sh`. The workflow also supports manual runs. The check step has a 10-minute limit on top of each suite's own; failing or cancelled check logs are retained as downloadable artifacts for seven days. Log pipelines retain the command's failure status.
 
-Every pull request runs docs type checks, the docs tests and a production Pages build before merge. Main-branch docs changes then deploy the website to GitHub Pages. Build and deployment jobs have time limits. This pipeline does not create game installers.
+Every pull request runs docs type checks, the docs tests and a production Pages build before merge. Main-branch docs changes then deploy the website to GitHub Pages, one deployment at a time in push order. Build and deployment jobs have time limits. A newer push to a pull request cancels that pull request's older runs; every push to main runs in full.
+
+The **Test builds** workflow exports the macOS and Windows test builds described below. It runs beside the checks rather than after them and is not a required check, so a failed export does not block a merge, and a failed check does not stop the builds. It does not create installers or releases.
+
+## Test builds
+
+Every push to main and every pull request from a branch of this repository builds the game for macOS and Windows, so you can try the current state of the work without installing Godot. Pull requests from forks get no builds, since those would be programs built from code nobody has reviewed yet.
+
+These are **debug** builds of the source game, not releases:
+
+- The debug tools above are on from the start, with no code needed.
+- They are **not signed** with a developer certificate, so macOS and Windows warn the first time you open one.
+- Each is kept for **14 days**, then deleted.
+- The repository is public, so **anyone signed in to GitHub** can download them. You need to be signed in; nothing else is required.
+- Nobody plays a build as part of making it: a green run means the export worked and the package holds what it should, not that the game was played on that system.
+
+### Download a build
+
+1. Open the [Test builds runs](https://github.com/MrDemonWolf/wolf-override/actions/workflows/builds.yml) on GitHub, signed in, and choose the run for the commit or pull request you want (pull requests also link to it under their checks).
+2. The run's summary lists the two downloads with their sizes: `wolf-override-macos-debug-<commit>.zip` and `wolf-override-windows-debug-<commit>.zip`, where `<commit>` is the first seven characters of the commit it was built from. The same files are under **Artifacts** at the bottom of the page.
+
+With the [GitHub CLI](https://cli.github.com/) you can also run `gh run download <run id> --repo MrDemonWolf/wolf-override --name wolf-override-macos-debug-<commit>.zip`.
+
+Each zip has a `licenses` folder beside the game with the notices for Godot Engine, the components inside it and the game's two typefaces, and a short `README.txt` naming the commit it was built from.
+
+### Open it on macOS
+
+The macOS build is one app for both Apple silicon and Intel Macs (macOS 11 or later on Intel, 13 or later on Apple silicon). It is signed ad hoc, which lets it run but does not satisfy Gatekeeper.
+
+1. Unzip the download and open `WOLF--OVERRIDE.app` (the two slashes of the name become dashes).
+2. macOS says it cannot check the app. Click **Done**, not **Move to Trash**.
+3. Open **System Settings → Privacy & Security**, scroll to **Security** and click **Open Anyway** beside the message about the app. The button is there for about an hour after you tried to open it.
+4. Confirm with your password. Later launches open normally.
+
+On macOS 15 and later, Control-clicking the app and choosing **Open** no longer gets past this. Instead of steps 2 to 4 you can run `xattr -dr com.apple.quarantine WOLF--OVERRIDE.app` in Terminal, in the folder you unzipped it to. `WOLF--OVERRIDE.command` beside the app starts the same game from Terminal, so its log shows there.
+
+### Open it on Windows
+
+The Windows build is for 64-bit Windows.
+
+1. Right-click the downloaded zip, choose **Extract All**, and open the extracted folder.
+2. Run `WOLF-OVERRIDE.exe`.
+3. At **Windows protected your PC**, click **More info**, then **Run anyway**.
+
+`WOLF-OVERRIDE.console.exe` runs the same build with its log in a console window, which helps when reporting a crash. If **Smart App Control** is on, Windows blocks unsigned programs outright and offers no way to allow one, so these builds cannot run on that PC.
+
+### Saves and settings
+
+A test build uses the same user data folder as a source run of the game, so it shares its saves, settings and debug unlock: on macOS `~/Library/Application Support/Godot/app_userdata/WOLF--OVERRIDE`, on Windows `%APPDATA%\Godot\app_userdata\WOLF--OVERRIDE`. Move that folder aside first if you want a clean start. Bug captures from **F12** are written to its `debug-captures` folder.
 
 ## What has been observed
 
@@ -89,7 +137,9 @@ The Service Junction, the closer play camera, the layered room art, the station 
 
 A temporary iOS simulator export built and launched on two booted iPhone simulators; the iPhone 17e title screen was inspected. Touch gestures, controller hardware, and physical devices were not tested. Godot's official 4.7.2 iOS template contained only x86_64 simulator code in a slice labeled arm64; the local simulator build used a temporary version-matched arm64 library. No distributable iOS package is published.
 
-Graphical route play, hardware input, exports, signing, and physical devices remain separate gates. A green workflow does not certify a finished game or release package.
+The macOS and Windows test build exports were run headless and their packages checked: the app's executable bit and ad-hoc signature, the embedded Windows pack, the in-game changelog and font licences inside, and no tests or notes. Neither build has been opened on a Mac or a Windows PC as part of this.
+
+Graphical route play, hardware input, opening an export on its system, signing, and physical devices remain separate gates. A green workflow does not certify a finished game or release package.
 
 ## Contributing and reporting problems
 
