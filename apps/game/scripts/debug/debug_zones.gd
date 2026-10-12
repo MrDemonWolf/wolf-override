@@ -1312,8 +1312,12 @@ static func rect_minus(rect: Rect2, cut: Rect2) -> Array[Rect2]:
 
 
 ## [param rect] with every one of [param cuts] taken out.
+## A rectangle with no area (a box thinner than an outline's side) gives no pieces.
 static func clip(rect: Rect2, cuts: Array[Rect2]) -> Array[Rect2]:
-	var pieces: Array[Rect2] = [rect]
+	var pieces: Array[Rect2] = []
+	if not rect.has_area():
+		return pieces
+	pieces.append(rect)
 	for cut: Rect2 in cuts:
 		if not cut.intersects(rect):
 			continue
@@ -1357,6 +1361,8 @@ func _draw_item(item: Item, font: Font) -> void:
 
 ## A filled rectangle, cut around the protected controls and text unless [param whole].
 func _fill(rect: Rect2, color: Color, whole: bool = false) -> void:
+	if not rect.has_area():
+		return
 	if whole:
 		draw_rect(rect, color)
 		return
@@ -1365,13 +1371,18 @@ func _fill(rect: Rect2, color: Color, whole: bool = false) -> void:
 			draw_rect(piece, color)
 
 
-## A rectangle's outline [param width] px wide, as four cut fills.
+## A rectangle's outline [param width] px wide, as four cut fills. A box no taller than the width is
+## all top and bottom bar, so its sides are left out rather than given a negative height.
 func _outline(rect: Rect2, color: Color, width: float, whole: bool = false) -> void:
+	rect = rect.abs()
 	var half: float = width * 0.5
 	_fill(Rect2(rect.position.x - half, rect.position.y - half, rect.size.x + width, width), color, whole)
 	_fill(Rect2(rect.position.x - half, rect.end.y - half, rect.size.x + width, width), color, whole)
-	_fill(Rect2(rect.position.x - half, rect.position.y + half, width, rect.size.y - width), color, whole)
-	_fill(Rect2(rect.end.x - half, rect.position.y + half, width, rect.size.y - width), color, whole)
+	var side: float = rect.size.y - width
+	if side <= 0.0:
+		return
+	_fill(Rect2(rect.position.x - half, rect.position.y + half, width, side), color, whole)
+	_fill(Rect2(rect.end.x - half, rect.position.y + half, width, side), color, whole)
 
 
 ## A small marker, drawn only where it covers no protected control or text.

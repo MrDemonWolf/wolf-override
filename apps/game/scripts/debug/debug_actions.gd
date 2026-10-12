@@ -396,13 +396,21 @@ func hold_pause() -> void:
 
 
 ## Lets the game run again unless the menu is open, frame stepping is on or the game's own Pause is up.
-func release_pause() -> void:
+## With [param settle] false, a hit-stop, shake or flash an action from the menu just started (a forced
+## knockdown's) plays on; the caller settles the ones from before the menu first (settle_impact).
+func release_pause(settle: bool = true) -> void:
 	if frame_step or tools.menu_open or (game.get(&"pause_overlay") as CanvasItem).visible:
 		return
 	get_tree().paused = false
 	# Like resuming from Pause: a dip or flash never outlasts the menu.
-	(game.get(&"impact") as Impact).reset()
+	if settle:
+		settle_impact()
 	game.call(&"_refresh_ui")
+
+
+## Ends any hit-stop, shake and flash under way, as resuming from Pause does.
+func settle_impact() -> void:
+	(game.get(&"impact") as Impact).reset()
 
 
 # --- Forcing ------------------------------------------------------------------------------------

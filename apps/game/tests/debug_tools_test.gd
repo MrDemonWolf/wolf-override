@@ -23,6 +23,7 @@ func _run() -> void:
 	await _check_snapshot()
 	await _check_capture()
 	await _check_zones_corridor()
+	await _check_zones_opening()
 	await _check_zones_records()
 	await _check_zones_junction()
 	await _check_zones_keep_clear()
@@ -33,6 +34,7 @@ func _run() -> void:
 	await _check_touch_button_and_menu_inputs()
 	await _check_menu_keyboard_and_controller()
 	await _check_menu_touch_and_layout()
+	await _check_note_placement()
 	await _check_jumps()
 	await _check_jump_presets()
 	await _check_choice_rules()
@@ -633,6 +635,30 @@ func _check_zones_corridor() -> void:
 	await _free(game)
 
 
+## The zones page over the opening, whose thin render boxes are shorter than an outline is wide: each
+## beat draws without a negative-size rectangle (Godot would log an ERROR: line, which fails the suite),
+## and the cutting gives nothing for a rectangle with no area.
+func _check_zones_opening() -> void:
+	var game: Node2D = await _spawn(true)
+	var tools: DebugTools = _tools(game)
+	tools.actions.jump(&"opening")
+	tools.hide_note()
+	tools.set_overlay_mode(DebugTools.Overlay.ZONES)
+	await _settle(3)
+	_expect(game.get("intro_active") and tools.zones.visible and tools.zones.is_processing(), "the zones page draws over the opening")
+	var beats: int = 0
+	while bool(game.get("intro_active")) and beats < 12:
+		game.call("_advance_intro")
+		beats += 1
+		await _settle(3)
+	_expect(beats > 1 and tools.zones.visible, "the zones page drew every beat of the opening (%d)" % beats)
+	var thin: Array[Rect2] = [Rect2(0.0, 0.0, 40.0, 0.0), Rect2(0.0, 0.0, 40.0, -1.0), Rect2(0.0, 0.0, -3.0, 6.0)]
+	for rect: Rect2 in thin:
+		_expect(DebugZones.clip(rect, [Rect2(0.0, 0.0, 10.0, 10.0)]).is_empty(), "a rectangle with no area cuts to nothing (%s)" % rect)
+	tools.cheats_used = false
+	await _free(game)
+
+
 ## Records Access: its three stations' use ranges and WOLF's spot at the mirror, from Main's constants.
 func _check_zones_records() -> void:
 	var game: Node2D = await _spawn(true)
@@ -1143,6 +1169,42 @@ func _check_menu_touch_and_layout() -> void:
 	await _free(game)
 
 
+## The note a menu action leaves (a jump, a forced knockdown, a capture's path) sits clear of the
+## state card, the menu card, the HUD, the controls and the answers, wraps a long path onto its two
+## lines, and the menu hides it when it opens (its own status line takes over).
+func _check_note_placement() -> void:
+	var game: Node2D = await _spawn(true)
+	var tools: DebugTools = _tools(game)
+	game.call("_new_game")
+	game.call("_finish_intro")
+	await _settle(3)
+	tools.set_overlay_mode(DebugTools.Overlay.ZONES)
+	for touch: bool in [false, true]:
+		game.set("touch_enabled", touch)
+		game.call("_refresh_ui")
+		tools.call("_refresh_view")
+		tools.show_note("Saved user://debug-captures/2026-10-11_12-34-56.png")
+		await process_frame
+		var rect: Rect2 = tools.note.get_global_rect()
+		var layout: String = "touch" if touch else "keyboard"
+		_expect(Rect2(0.0, 0.0, 960.0, 540.0).encloses(rect), "the %s note is on screen (%s)" % [layout, rect])
+		for path: String in ["CanvasLayer/TopBar", "CanvasLayer/PauseButton", "CanvasLayer/TutorialPrompt", "CanvasLayer/ContextHint", "CanvasLayer/BottomBar", "CanvasLayer/TouchControls/Left", "CanvasLayer/TouchControls/Right", "CanvasLayer/TouchControls/Use"]:
+			_expect(not rect.intersects((game.get_node(path) as Control).get_global_rect()), "the %s note leaves %s clear" % [layout, path.get_file()])
+		for other: Rect2 in [DebugOverlay.footprint(false), DebugMenu.STEP_BAR_RECT, DebugZones.LEGEND_RECT, tools.debug_button.get_global_rect()]:
+			_expect(not rect.intersects(other), "the %s note leaves %s clear (%s)" % [layout, other, rect])
+		for answers: Array in [[Vector2(42.0, 88.0), Vector2(428.0, 76.0)], [Vector2(396.0, 88.0), Vector2(522.0, 40.0)]]:
+			_expect(not rect.intersects(Rect2(answers[0], answers[1])), "the %s note leaves the answer row clear" % layout)
+		_expect(tools.note_label.get_line_count() <= 2 and tools.note_label.get_visible_line_count() == tools.note_label.get_line_count(), "a capture's path fits the note's two lines (%d)" % tools.note_label.get_line_count())
+	tools.open_menu()
+	_expect(tools.menu.is_open and not tools.note.visible, "opening the menu hides the note")
+	(tools.menu.buttons["jump:corridor_start"] as Button).pressed.emit()
+	await process_frame
+	_expect(not tools.menu.is_open and tools.note.visible and tools.note_label.text.begins_with("Jumped to") and not tools.note.get_global_rect().intersects(tools.overlay.get_global_rect()), "a jump's note shows beside the state card, not over it")
+	tools.hide_note()
+	tools.cheats_used = false
+	await _free(game)
+
+
 ## Every jump lands on its beat through the game's own steps: the right room, beat, objective and
 ## progress, the checkpoint on disk exactly when play would have written one, the game running, and
 ## the cheats flag set. A jump from the menu's own button closes the menu so the beat plays.
@@ -1508,9 +1570,33 @@ func _check_forcing() -> void:
 	tools.open_menu()
 	tools.menu.show_page(&"force")
 	_expect((tools.menu.buttons["trigger:drop"] as Button).disabled and (tools.menu.buttons["trigger:blast"] as Button).disabled and not (tools.menu.buttons["force:sentry"] as Button).disabled, "the menu greys out what cannot happen now")
+	# The knockdown from the menu looks as in play: a hit-stop, the red wash and the shake survive the
+	# menu closing, while a shake from before the menu is settled first.
+	var impact: Impact = game.get("impact")
+	impact.enabled = true
+	impact.reduce_motion = false
+	impact.shake_enabled = true
+	impact.flash_enabled = true
+	impact.add_trauma(1.0)
 	(tools.menu.buttons["force:cloud"] as Button).pressed.emit()
 	_expect(not tools.menu.is_open and not paused and game.get("fail_active"), "a force button closes the menu so the knockdown plays")
+	_expect(Engine.time_scale < 1.0 and is_equal_approx(impact.trauma, 0.6) and bool(impact.get("_flash_active")), "a knockdown forced from the menu keeps its hit-stop, red wash and shake (time %s, trauma %s, flash %s)" % [Engine.time_scale, impact.trauma, impact.get("_flash_active")])
+	await process_frame
+	_expect(impact.trauma > 0.0 and bool(impact.get("_flash_active")), "a frame later the shake and the red wash still play (trauma %s)" % impact.trauma)
+	# The same through the plain close: a jump settles the effects, as resuming from Pause does.
 	game.call("_cancel_fail")
+	impact.reset()
+	actions.jump(&"junction_a")
+	await _settle(2)
+	tools.open_menu()
+	tools.menu.show_page(&"force")
+	(tools.menu.buttons["force:vent"] as Button).pressed.emit()
+	var forced: Array = [impact.trauma, bool(impact.get("_flash_active")), Engine.time_scale]
+	tools.open_menu()
+	tools.menu.close()
+	_expect(forced[0] > 0.0 and forced[1] and forced[2] < 1.0 and is_zero_approx(impact.trauma) and not bool(impact.get("_flash_active")) and is_equal_approx(Engine.time_scale, 1.0), "the vent button keeps its effects too (%s), and closing the menu again settles them" % [forced])
+	game.call("_cancel_fail")
+	impact.reset()
 	tools.hide_note()
 	await _free(game)
 

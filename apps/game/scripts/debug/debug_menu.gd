@@ -375,6 +375,8 @@ func open() -> void:
 		return
 	is_open = true
 	tools.menu_open = true
+	# The menu's own status line takes over from a note still showing (it would sit on the card).
+	tools.hide_note()
 	actions.hold_pause()
 	_clear_armed = false
 	note_label.text = ""
@@ -387,15 +389,16 @@ func open() -> void:
 	opened.emit()
 
 
-## Closes the menu and lets the game run again (unless frame stepping holds it).
-func close() -> void:
+## Closes the menu and lets the game run again (unless frame stepping holds it). With [param settle]
+## false, effects an action from the menu just started are kept (see DebugActions.release_pause).
+func close(settle: bool = true) -> void:
 	if not is_open:
 		return
 	is_open = false
 	backdrop.hide()
 	panel.hide()
 	tools.menu_open = false
-	actions.release_pause()
+	actions.release_pause(settle)
 	_sync_visible()
 	refresh_step_bar()
 	# Back to the title's own focus there; in play nothing keeps focus.
@@ -509,10 +512,13 @@ func _run(action: Callable) -> void:
 	refresh()
 
 
-## Runs [param action] and closes the menu so the result plays; its note shows over the game.
+## Runs [param action] and closes the menu so the result plays; its note shows over the game. The
+## effects from before the menu are settled first, so the ones the action starts (a forced knockdown's
+## hit-stop, red wash and shake) play as in the game.
 func _run_and_close(action: Callable) -> void:
+	actions.settle_impact()
 	var note: String = str(action.call())
-	close()
+	close(false)
 	if not note.is_empty():
 		tools.show_note(note)
 

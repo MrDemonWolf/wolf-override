@@ -78,9 +78,11 @@ const FRAME_WAIT_LIMIT: int = 10
 const BUTTON_RECT: Rect2 = Rect2(760.0, 10.0, 72.0, 34.0)
 const PAUSE_LEFT: float = 854.0
 const BUTTON_GAP: float = 14.0
-## The short note ("Debug tools unlocked", a capture's path): near the top in play, below the top
-## card; on the title over the key art's floor, above CHANGELOG, clear of the title text and menu.
-const NOTE_RECT: Rect2 = Rect2(200.0, 92.0, 560.0, 32.0)
+## The short note ("Debug tools unlocked", a jump's result, a capture's path): in play at the top
+## right, under PAUSE and the frame-step bar (DebugMenu.STEP_BAR_RECT), right of the overlay's column
+## and the tutorial card, above USE, wrapping to two lines; the menu hides it (it has its own status
+## line). On the title over the key art's floor, above CHANGELOG, clear of the title text and menu.
+const NOTE_RECT: Rect2 = Rect2(650.0, 132.0, 296.0, 52.0)
 const TITLE_NOTE_RECT: Rect2 = Rect2(48.0, 412.0, 408.0, 32.0)
 
 ## Debug builds always have the tools; tests set this false to check a release build's gating.
@@ -200,6 +202,7 @@ func _build() -> void:
 	note_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	note_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 	note_label.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
+	note_label.max_lines_visible = 2
 	note_label.add_theme_font_size_override("font_size", 14)
 	note_label.add_theme_color_override("font_color", Color("#73DDF5"))
 	note_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
@@ -753,6 +756,8 @@ func show_note(text: String) -> void:
 	var rect: Rect2 = TITLE_NOTE_RECT if game != null and bool(game.get(&"title_open")) else NOTE_RECT
 	note.position = rect.position
 	note.size = rect.size
+	# Play's taller note wraps (a capture's path breaks inside the word); the title's stays one line.
+	note_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART if rect == NOTE_RECT else TextServer.AUTOWRAP_OFF
 	note_label.text = text
 	note.show()
 	sync_layer()
