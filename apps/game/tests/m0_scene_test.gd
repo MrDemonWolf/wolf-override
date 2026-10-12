@@ -98,7 +98,9 @@ func _run() -> void:
 	await _tap(&"interact")
 	_expect(game.get("intro_step") == 5 and speaker.text == "DIRECTOR" and story.text == "Lock down maintenance. WOLF does not leave this site.", "Director orders lockdown under his own tag")
 	await _tap(&"interact")
-	_expect(game.get("intro_step") == 6 and not speaker.visible and story.text == "WOLF turns from the Director and takes the only open route." and wolf.autonomous_target_x == 110.0, "the narration says WOLF turns away as he walks off")
+	_expect(game.get("intro_step") == 6 and not speaker.visible and story.text == "WOLF turns from the Director and heads for maintenance." and wolf.autonomous_target_x == 110.0, "the narration says WOLF turns from the Director and heads for maintenance as he walks off")
+	# Round 3c: the opening is main's (76d3a50): nothing is added on the wall behind WOLF's cage.
+	_expect(game.get_node_or_null("OpeningHatch") == null and game.get("opening_hatch") == null, "nothing new stands behind the cage in the opening")
 	await _tap(&"interact")
 	await create_timer(0.8).timeout
 	_expect(not game.get("intro_active") and not intro_gate.visible and not intro_director.visible and human.visible and purge_terminal_art.visible and human.controlled and intro_fade.color.a < 0.01, "opening fades into engineer control and gameplay stations")

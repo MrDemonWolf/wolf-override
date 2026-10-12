@@ -235,7 +235,8 @@ func build_state(id: StringName) -> M0State:
 	if id == &"tank_down":
 		return state
 	state.clear_junction()
-	_set_positions(state, JunctionRoom.BOLT_X)
+	# At the bolt; WOLF at his spot by the hatch, where he waits once the sentry is down.
+	_set_positions(state, JunctionRoom.BOLT_X, JunctionRoom.WOLF_DOWN_X)
 	return state
 
 

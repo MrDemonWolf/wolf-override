@@ -23,6 +23,10 @@ var settle_x: float = -1.0
 ## The room's machines as x spans (from, to); a follower rests clear of them when clear floor is at
 ## most AVOID_DETOUR further back from the engineer (main sets them per room).
 var avoid_spans: Array[Vector2] = []
+## Scales the speed of a body walking on its own or following (main speeds WOLF up for the moment he
+## bounds over the junction's sentry, JunctionRoom.wolf_leap_height, and while he dashes past the
+## engineer waiting for him at the rubble line).
+var speed_scale: float = 1.0
 
 const WALK_SPEED: float = 190.0
 const FOLLOW_SPEED: float = 220.0
@@ -152,7 +156,8 @@ static func facing_of(node: Node2D) -> int:
 
 func _approach(target_x: float, delta: float) -> float:
 	var distance: float = target_x - position.x
-	return clampf(distance / delta, -FOLLOW_SPEED, FOLLOW_SPEED) if absf(distance) > 2.0 else 0.0
+	var speed: float = FOLLOW_SPEED * speed_scale
+	return clampf(distance / delta, -speed, speed) if absf(distance) > 2.0 else 0.0
 
 
 ## True while this body walks across a shown keep_clear_of, close enough that the two drawn bodies overlap.

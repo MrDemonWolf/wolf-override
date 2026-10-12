@@ -94,14 +94,19 @@ const INTRO_LINES: Array[String] = [
 	"The latch breaks from the inside. The gate slides aside. WOLF steps out under his own power.\nThe Director freezes at the sound of the seal opening.",
 	"DIRECTOR: You were in standby.\nWOLF: I heard you. I won't do it.",
 	"DIRECTOR: Lock down maintenance. WOLF does not leave this site.",
-	"WOLF turns from the Director and takes the only open route.",
+	"WOLF turns from the Director and heads for maintenance.",
 ]
-## Leaving the cleared junction, the engineer and WOLF walk into the open hatch's doorway (centred on
-## JunctionRoom.HATCH_X; WOLF a step behind), fading out after a moment, then the END OF SLICE card.
+## Leaving the cleared junction, WOLF goes first: his spot (JunctionRoom.WOLF_DOWN_X) already stands
+## him in the open hatch's doorway (centred on JunctionRoom.HATCH_X), so he fades out there, without a
+## step that would put his snout over the bolt box; only then does the engineer walk into the doorway
+## and fade, so the two are never drawn over each other there. Then the END OF SLICE card.
 const HATCH_EXIT_X: float = JunctionRoom.HATCH_X + 6.0
-const WOLF_HATCH_EXIT_X: float = JunctionRoom.HATCH_X - 24.0
+const WOLF_HATCH_EXIT_X: float = JunctionRoom.WOLF_DOWN_X
 const HATCH_EXIT_FADE_DELAY: float = 0.3
 const HATCH_EXIT_FADE_SECONDS: float = 0.5
+## With WOLF holding the far end of the junction's lane, the sentry's body turns this far short of his
+## drawn body (SentryBrain.far_x).
+const WOLF_SENTRY_GAP: float = 4.0
 ## The end of the built route (decision D): the END OF SLICE card with this run's choices, then the title.
 const END_CARD_TITLE: String = "END OF SLICE"
 const END_CARD_THANKS: String = "Thank you for playing this early slice."
@@ -114,6 +119,9 @@ const RECAP_MIRROR_MANUAL: String = "MIRROR  {name} copied the timestamp through
 const RECAP_LANE_WOLF: String = "LANE  WOLF drew the sentry onto the mark."
 const RECAP_LANE_REFUSED: String = "LANE  WOLF wouldn't draw it, so {name} timed the drop alone."
 const RECAP_LANE_ALONE: String = "LANE  WOLF held at the rubble while {name} timed the drop."
+## After a miss with WOLF already past the sentry: he broke off where he was, by the exit hatch (the
+## row names no place, like his "I'm out.").
+const RECAP_LANE_BROKE_OFF: String = "LANE  WOLF broke off while {name} timed the drop."
 const RECAP_LANE_UNKNOWN: String = "LANE  The tank came down on the sentry."
 ## On a finished save the title's Continue starts a fresh run instead.
 const PLAY_AGAIN_TEXT: String = "PLAY AGAIN"
@@ -127,6 +135,11 @@ const JUNCTION_CLEARED_LINE: String = "The service line runs on toward Archive."
 ## going, so it holds on every frame of his walk and after he arrives.
 const RUBBLE_LINE: String = "The door goes. WOLF heads for the rubble to wait for %s's call. In the lane beyond, something whirs awake."
 const BAIT_YES_LINE: String = "WOLF: You told me the truth at the relay. I'll draw it onto the mark and keep clear of the tank. Drop it when it stops."
+## What WOLF says as he breaks off after a miss, under the miss line: he holds at the rubble if he had
+## not got past the sentry yet; if he had, he stays by the exit hatch, since he never crosses back under
+## the tank (_wolf_target_x), and says only that he is out (where he is shows on screen).
+const BROKE_OFF_RUBBLE_LINE: String = "\nWOLF: I'm out. I'll hold at the rubble."
+const BROKE_OFF_HATCH_LINE: String = "\nWOLF: I'm out."
 const BAIT_NO_LINE: String = "WOLF: At the relay you'd have sent me in blind. I won't walk into its sights. Time the drop from the panel; it crosses the mark on every pass."
 ## A hit on the mark, and one that catches the sentry more than OFF_CENTRE_HIT off it (the tank lands on
 ## the mark and pins the machine where it stands, so the wreck shows to one side under it).
@@ -177,6 +190,15 @@ const HUMAN_SPRITE_REST: Vector2 = Vector2(0.0, -5.0)
 ## is never hidden behind him.
 const ACTOR_Z: int = 2
 const KNOCKDOWN_Z: int = 3
+## A knockdown tips the engineer this far over and lays them this much lower and further along, the way
+## the fall goes.
+const FALL_DEGREES: float = 70.0
+const FALL_SHIFT: Vector2 = Vector2(30.0, 14.0)
+## Run down out in the sentry's lane (SentryBrain.is_exposed, the SENTRY_REASON card), the engineer falls
+## away from the alcove and lies where they were caught: all of their drawn body this far past the
+## alcove's right post (and so clear of the TANK RELEASE), and the sentry rolls back off them to stand
+## this far clear of it.
+const LANE_FALL_CLEAR: float = 4.0
 ## The blast wakes the sentry this long after the door goes, so cause and effect read in order.
 const SENTRY_WAKE_SECONDS: float = 0.5
 ## The exit bolt's rising whine before it arcs; it must outlast SfxBank.BOLT_CRACK_SECONDS, the
@@ -191,6 +213,15 @@ const LANE_CHOICE_TEXT: Array[String] = ["Draw it under the tank if you can stay
 ## picture never disagree.
 const DROP_WAIT_LINE: String = "Wait. WOLF hasn't got it on the mark yet."
 const DROP_PARKED_LINE: String = "The sentry stops on the mark, its eyes on WOLF. Drop the tank now."
+## Entering the junction WOLF runs ahead to the valve, the nearest he can stand to the sealed door
+## (JunctionRoom.WOLF_SEAM_X), and stands facing it, reading its LINE gauge, for WOLF_GAUGE_READ_SECONDS
+## before he says what he found; the line is formatted with the engineer's tag.
+const WOLF_GAUGE_READ_SECONDS: float = 1.0
+const JUNCTION_ENTRY_LINE: String = "WOLF runs ahead to the valve and reads its LINE gauge.\n%s: The breaker by the entrance feeds that line. Overload it, crank the valve, and the door goes."
+## What WOLF says once he has read the gauge on entry, and again on Continue from junction autosave A:
+## the breaker is not armed yet either time, so his warning is about the door, not a live line.
+const WOLF_DOOR_WARNING: String = "WOLF: When the door goes, don't be standing in front of it."
+const JUNCTION_RESTORE_A_LINE: String = "Service junction restored. Arm the breaker by the entrance, then crank the valve.\n" + WOLF_DOOR_WARNING
 
 ## One switch for the visual effects: the depth pass (parallax, glows, haze, dust, reflections,
 ## grade) and the impact kit (shake, hit-stop, flash, rumble, particles), so a Settings toggle can
@@ -300,8 +331,10 @@ var records_room: RecordsRoom
 var junction_room: JunctionRoom
 ## The Service Junction's coolant line; transient, reset by every scene sync.
 var pressure_line: PressureLine = PressureLine.new()
-## True while WOLF runs ahead to read the junction door seam on entry.
+## True while WOLF runs ahead to read the junction's LINE gauge on entry, and how long he has stood
+## reading it.
 var wolf_scouting: bool = false
+var seam_read_seconds: float = 0.0
 ## The junction's purge sentry and the arm over its lane; transient, reset by every scene sync.
 var sentry_brain: SentryBrain = SentryBrain.new()
 var drop_arm: DropArm = DropArm.new()
@@ -312,12 +345,21 @@ var lane_choice: String = ""
 var wolf_baiting: bool = false
 ## A missed drop while he was drawing it: he breaks off and does not offer again this attempt.
 var wolf_broke_off: bool = false
+## He broke off already past the sentry: he holds by the exit hatch rather than cross back under the
+## tank, and the sentry's patrol turns short of him (SentryBrain.far_x).
+var wolf_holding_far_end: bool = false
+## Right after the engineer asks WOLF to draw the sentry, they hold at the rubble line while he dashes
+## past them into the lane, so he never runs through them at the TANK RELEASE.
+var engineer_waits_for_wolf: bool = false
 ## Seconds until the blast wakes the sentry, or 0.
 var sentry_wake_remaining: float = 0.0
 ## The exit bolt: locked until the sentry is down, charging through its whine, then open.
 var bolt_state: StringName = &"locked"
 var bolt_charge_remaining: float = 0.0
 var servo_tween: Tween
+## WOLF's body sprite at rest, as the scene sets it; ducking under the junction's hung tank squashes it
+## for a moment (_sync_wolf_leap).
+var wolf_sprite_scale: Vector2 = Vector2.ONE
 var impact: Impact
 var sfx_bank: SfxBank
 var relay_sparks: CPUParticles2D
@@ -358,8 +400,9 @@ var engineer_face_x: float = -1.0
 ## Seconds the "Checkpoint saved." hint has left; 0 when none.
 var checkpoint_toast_remaining: float = 0.0
 ## True while the engineer and WOLF walk out through the hatch, between the closing beat and the
-## END OF SLICE card.
+## END OF SLICE card; the engineer starts walking (hatch_exit_engineer_walking) once WOLF has gone in.
 var hatch_exit_walking: bool = false
+var hatch_exit_engineer_walking: bool = false
 ## True while the END OF SLICE card is up; any confirm, Back or Pause goes on to the title.
 var end_card_active: bool = false
 var end_card: ColorRect
@@ -382,6 +425,12 @@ var shown_line: String = ""
 var shown_line_age: float = 0.0
 
 const WOLF_SPRITE_REST: Vector2 = Vector2(0.0, -15.0)
+## WOLF's painted feet sit this far below his sprite's centre, in the art's own pixels (its opaque
+## rows end at 367 of 406).
+const WOLF_FEET_BELOW_CENTRE: float = 164.0
+## WOLF's drawn height at rest, from the tips of his ears to his feet, in world px (his art's opaque
+## rows at WOLF's rest scale).
+const WOLF_DRAWN_HEIGHT: float = 59.0
 const GAMEPLAY_ZOOM: float = 1.35
 const GAMEPLAY_VIEW_WIDTH: float = 960.0 / GAMEPLAY_ZOOM
 ## The play camera's resting height. At 1.35 it puts the floor (y 440) 27 px above the context hint
@@ -460,6 +509,7 @@ func _ready() -> void:
 	# front, and a WOLF walking past him (dimmed by M0Actor) reads as passing behind.
 	move_child(wolf, human.get_index())
 	wolf.keep_clear_of = human
+	wolf_sprite_scale = wolf.body_sprite.scale
 	_setup_corridor_door()
 	_setup_bypass()
 	_setup_corridor_labels()
@@ -1337,6 +1387,7 @@ func _return_to_title() -> void:
 	intro_fade.color.a = 0.0
 	chapter_close_active = false
 	hatch_exit_walking = false
+	hatch_exit_engineer_walking = false
 	_hide_end_card()
 	checkpoint_toast_remaining = 0.0
 	waiting_for_choice = false
@@ -1550,7 +1601,7 @@ func _load_game() -> void:
 		elif state.door_blown:
 			status_line = "Service junction restored. The door is down; the sentry patrols the lane past the rubble."
 		else:
-			status_line = "Service junction restored. Arm the breaker by the entrance, then crank the valve.\nWOLF: It's live. Don't stand in front of it when it goes."
+			status_line = JUNCTION_RESTORE_A_LINE
 	elif state.chapter_id == "records":
 		if state.chapter_complete:
 			status_line = "The first copy is safe. Use the exit to follow the service line."
@@ -1862,18 +1913,31 @@ func _finish_chapter_close() -> void:
 	_update_controls()
 
 
-## The two leave through the open hatch together: they walk into it and fade, then the END OF SLICE
-## card comes up.
+## The two leave through the open hatch, WOLF first: he fades out in the doorway while the engineer
+## waits where they are; then the engineer walks into it and fades, and the END OF SLICE
+## card comes up. One at a time, they are never drawn over each other in the doorway.
 func _walk_out_through_hatch() -> void:
 	hatch_exit_walking = true
+	hatch_exit_engineer_walking = false
 	_update_controls()
-	# They fade once the one with further to go (WOLF, from behind the engineer at the bolt) is half a
-	# fade from the doorway, so both are seen to reach it.
-	var walk_seconds: float = maxf(absf(HATCH_EXIT_X - human.position.x), absf(WOLF_HATCH_EXIT_X - wolf.position.x)) / M0Actor.FOLLOW_SPEED
+	var wolf_seconds: float = absf(WOLF_HATCH_EXIT_X - wolf.position.x) / M0Actor.FOLLOW_SPEED
+	chapter_tween = create_tween()
+	chapter_tween.tween_interval(maxf(HATCH_EXIT_FADE_DELAY, wolf_seconds))
+	chapter_tween.tween_property(wolf, "modulate:a", 0.0, HATCH_EXIT_FADE_SECONDS)
+	chapter_tween.tween_callback(_engineer_follows_out)
+
+
+## WOLF is through: the engineer walks into the doorway and fades once they are half a fade from it,
+## so they are seen to reach it, then the END OF SLICE card.
+func _engineer_follows_out() -> void:
+	if not hatch_exit_walking:
+		return
+	hatch_exit_engineer_walking = true
+	_update_controls()
+	var walk_seconds: float = absf(HATCH_EXIT_X - human.position.x) / M0Actor.FOLLOW_SPEED
 	chapter_tween = create_tween()
 	chapter_tween.tween_interval(maxf(HATCH_EXIT_FADE_DELAY, walk_seconds - HATCH_EXIT_FADE_SECONDS * 0.5))
 	chapter_tween.tween_property(human, "modulate:a", 0.0, HATCH_EXIT_FADE_SECONDS)
-	chapter_tween.parallel().tween_property(wolf, "modulate:a", 0.0, HATCH_EXIT_FADE_SECONDS)
 	chapter_tween.tween_callback(_show_end_card)
 
 
@@ -1951,6 +2015,8 @@ func end_card_recap() -> Array[String]:
 	match state.lane_recap:
 		"wolf":
 			lane = RECAP_LANE_WOLF
+		"broke_off":
+			lane = RECAP_LANE_BROKE_OFF
 		"refused":
 			lane = RECAP_LANE_REFUSED
 		"alone":
@@ -1966,6 +2032,7 @@ func _show_end_card() -> void:
 		chapter_tween.kill()
 	chapter_close_active = false
 	hatch_exit_walking = false
+	hatch_exit_engineer_walking = false
 	end_card_active = true
 	_stop_junction_loops()
 	for child: Node in end_card_rows.get_children():
@@ -2079,8 +2146,9 @@ func _enter_junction() -> void:
 	# A new room: cut the camera to the engineer instead of panning across from the Records exit.
 	_start_gameplay_camera()
 	wolf_scouting = true
+	seam_read_seconds = 0.0
 	_update_controls()
-	status_line = "WOLF runs ahead to read the pressure behind the sealed door.\n%s: The breaker by the entrance feeds that line. Overload it, crank the valve, and the door goes." % state.human_name().get_slice(" ", 0).to_upper()
+	status_line = JUNCTION_ENTRY_LINE % state.human_name().get_slice(" ", 0).to_upper()
 	# Autosave A: the start of the junction.
 	_save_progress()
 
@@ -2136,9 +2204,10 @@ func _at_arm_panel(x: float) -> bool:
 
 
 ## While WOLF draws the sentry, the release waits until he has it stopped on the mark ("Drop it when
-## it stops"), so the tank never falls on a sentry still on its way in.
+## it stops") and he stands at his spot by the hatch, so the tank never falls on a sentry still on its
+## way in or on WOLF still crossing the lane to draw it.
 func _bait_holding() -> bool:
-	return sentry_brain.is_holding(JunctionRoom.WOLF_BAIT_X)
+	return sentry_brain.is_holding(JunctionRoom.WOLF_BAIT_X) and absf(wolf.position.x - JunctionRoom.WOLF_BAIT_X) <= 4.0
 
 
 ## True while the release has to wait for WOLF: he is drawing the sentry and has not got it stopped on
@@ -2148,7 +2217,8 @@ func _drop_waits_for_wolf() -> bool:
 	return wolf_baiting and not _sentry_hunting() and not _bait_holding()
 
 
-## WOLF draws the sentry once his drawn front is over the rubble line into its lane.
+## WOLF draws the sentry once his drawn front is over the rubble line into its lane, on his way to his
+## spot at the far end of it.
 func _wolf_drawing_x() -> float:
 	return JunctionRoom.WOLF_BAIT_X if wolf_baiting and wolf.position.x + M0Actor.WOLF_REACH > SentryBrain.LANE_ENTRY_X else -1.0
 
@@ -2278,7 +2348,14 @@ func _tick_junction(delta: float) -> void:
 		&"blown":
 			_door_blast()
 	if wolf_scouting and absf(wolf.position.x - JunctionRoom.WOLF_SEAM_X) <= 4.0:
-		_wolf_reads_seam()
+		# He stands facing the valve, reading its LINE gauge, while the entry line says so; then he speaks.
+		wolf.body_sprite.flip_h = false
+		seam_read_seconds += delta
+		if seam_read_seconds >= WOLF_GAUGE_READ_SECONDS:
+			_wolf_reads_seam()
+	if wolf.autonomous_target_x == JunctionRoom.WOLF_BAIT_X and absf(wolf.position.x - JunctionRoom.WOLF_BAIT_X) <= 2.0:
+		# At the far end of the lane he faces back down it: at the sentry he draws, then at the engineer.
+		wolf.body_sprite.flip_h = true
 	# The line's phase moves WOLF (clear of the vent and the blast while it is live).
 	if not fail_active and wolf.autonomous_target_x != _wolf_target_x():
 		_update_controls()
@@ -2319,9 +2396,19 @@ func _tick_lane(delta: float) -> void:
 				_tank_miss()
 			&"rehung":
 				_tank_rehung()
-		# WOLF draws it only once his front is over the rubble line; it then parks BAIT_OFFSET past his
-		# spot, on the mark.
+		# A missed tank on the floor, or on its way up, stands in the sentry's lane: it stops at its edge.
+		sentry_brain.obstacle = DropArm.footprint() if drop_arm.blocks_lane() else Vector2.ZERO
+		# WOLF draws it only once his front is over the rubble line; it then parks BAIT_OFFSET short of
+		# his spot by the hatch, on the mark.
 		var bait_x: float = _wolf_drawing_x()
+		# It keeps its eyes on WOLF himself while he crosses to his spot.
+		sentry_brain.watch_x = wolf.position.x if bait_x >= 0.0 else -1.0
+		# With all of WOLF's drawn body past it, down the lane by the hatch, it turns short of him and its
+		# beam stops at him.
+		var wolf_near_x: float = wolf.position.x - M0Actor.WOLF_REACH
+		var wolf_beyond: bool = wolf_near_x > sentry_brain.x + SentryBrain.HALF_WIDTH and wolf_near_x > SentryBrain.LANE_ENTRY_X
+		sentry_brain.far_x = wolf_near_x - SentryBrain.HALF_WIDTH - WOLF_SENTRY_GAP if wolf_beyond else SentryBrain.PATROL_MAX_X
+		junction_room.sentry.beam_stop_x = wolf_near_x if wolf_beyond else INF
 		var before: StringName = sentry_brain.state
 		sentry_brain.tick(delta, x, SentryBrain.is_exposed(x), bait_x)
 		if sentry_brain.state != before:
@@ -2339,6 +2426,11 @@ func _tick_lane(delta: float) -> void:
 			if bolt_charge_remaining <= 0.0:
 				_bolt_arc()
 	junction_room.sentry.follow(sentry_brain)
+	if engineer_waits_for_wolf and (not wolf_baiting or wolf.position.x - M0Actor.WOLF_REACH >= human.position.x + M0Actor.HUMAN_REACH):
+		# WOLF is past them: the engineer has their controls back.
+		engineer_waits_for_wolf = false
+		_update_controls()
+	_sync_wolf_leap()
 	junction_room.sync_arm(drop_arm)
 	junction_room.sync_bolt(bolt_state, 1.0 - bolt_charge_remaining / BOLT_WHINE_SECONDS if bolt_state == &"charging" else (1.0 if bolt_state == &"open" else 0.0))
 	_lane_sound()
@@ -2347,20 +2439,48 @@ func _tick_lane(delta: float) -> void:
 	if lane_choice.is_empty() and not waiting_for_choice and human.controlled and human.position.x >= JunctionRoom.CHOICE_X:
 		_ask_lane()
 	elif sentry_brain.touches(human.position.x):
-		_fail_beat(_sentry_reason())
+		_fail_beat(_sentry_reason(), _seen_in_lane())
+
+
+## WOLF bounds over the live sentry when his way along the lane crosses it (to his spot by the hatch),
+## and over the crushed tank once it is down, quicker for the moment he is up, so the bodies never
+## meet; the lift is on his sprite's offset, so his reactions still play on its position. He dashes at
+## the same speed past the engineer, who waits for him at the rubble line (engineer_waits_for_wolf).
+func _sync_wolf_leap() -> void:
+	var lift: float = 0.0
+	var duck: float = 0.0
+	if state.chapter_id == "junction" and state.door_blown and wolf.autonomous_target_x >= 0.0:
+		if state.sentry_down:
+			lift = JunctionRoom.wolf_tank_leap_height(wolf.position.x)
+		else:
+			lift = JunctionRoom.wolf_leap_height(wolf.position.x, sentry_brain.x)
+			if drop_arm.state == &"hung":
+				# Under the hung tank he ducks (JunctionRoom.wolf_duck_depth).
+				duck = JunctionRoom.wolf_duck_depth(wolf.position.x, -1.0 if wolf.body_sprite.flip_h else 1.0)
+	wolf.speed_scale = JunctionRoom.LEAP_SPEED_SCALE if lift > 0.0 or engineer_waits_for_wolf else 1.0
+	# The duck squashes his drawn body from the feet up: the sprite is shorter and shifted down by what
+	# the squash takes off below its centre, so his feet stay on the floor.
+	var squash: float = (WOLF_DRAWN_HEIGHT - duck) / WOLF_DRAWN_HEIGHT
+	wolf.body_sprite.scale = Vector2(wolf_sprite_scale.x, wolf_sprite_scale.y * squash)
+	wolf.body_sprite.offset.y = -lift / wolf.body_sprite.scale.y + WOLF_FEET_BELOW_CENTRE * (1.0 - squash) / squash
 
 
 ## The sentry's knockdown card. The alcove advice is only for an engineer it saw out in the lane and
 ## caught there; after a miss turned it, or with the engineer caught inside the alcove, the card
 ## points only at the rubble, because a chase reaches anywhere in the alcove.
 func _sentry_reason() -> String:
-	var seen_in_lane: bool = not sentry_brain.turned_by_miss and SentryBrain.is_exposed(human.position.x)
-	return (JunctionRoom.SENTRY_REASON if seen_in_lane else JunctionRoom.SENTRY_CHASED_REASON) % _first_name()
+	return (JunctionRoom.SENTRY_REASON if _seen_in_lane() else JunctionRoom.SENTRY_CHASED_REASON) % _first_name()
+
+
+## The sentry saw the engineer out in its lane (past the alcove's right post) and is running them down
+## there, rather than chasing them after a miss or reaching them inside the alcove.
+func _seen_in_lane() -> bool:
+	return not sentry_brain.turned_by_miss and SentryBrain.is_exposed(human.position.x)
 
 
 ## The servo follows the sentry's state (it idles low through the lock-on beat and runs higher in a
-## chase); the winch runs while the arm rewinds, and the coolant cloud hisses while it hangs there,
-## fading over its last COOLANT_FADE_SECONDS.
+## chase); the winch runs once it takes a missed tank off the floor, and the coolant cloud hisses
+## while it hangs there, fading over its last COOLANT_FADE_SECONDS.
 func _lane_sound() -> void:
 	match sentry_brain.state:
 		&"patrol":
@@ -2373,7 +2493,7 @@ func _lane_sound() -> void:
 			sfx_bank.play(&"servo", -16.0, 1.4)
 		&"dormant":
 			sfx_bank.stop(&"servo")
-	if drop_arm.state == &"rewinding":
+	if drop_arm.winching():
 		sfx_bank.play(&"winch", -14.0)
 	else:
 		sfx_bank.stop(&"winch")
@@ -2423,6 +2543,9 @@ func _choose_lane(response: int) -> void:
 	if response == 1 and state.wolf_will_bait():
 		lane_choice = "wolf"
 		wolf_baiting = true
+		# The engineer lets him go first: he dashes past them here, at the rubble line, not later at
+		# the release.
+		engineer_waits_for_wolf = true
 		status_line = BAIT_YES_LINE
 		_react_as_wolf(true)
 		sfx_bank.play(&"growl_warning", -5.0)
@@ -2447,7 +2570,7 @@ func _tank_hit() -> void:
 		return
 	# For the end card, saved with autosave C: WOLF drew it only if he still was when it fell; after
 	# breaking off he held at the rubble while the engineer timed it.
-	state.lane_recap = "wolf" if wolf_baiting else ("refused" if lane_choice == "refused" else "alone")
+	state.lane_recap = "wolf" if wolf_baiting else ("broke_off" if wolf_holding_far_end else ("refused" if lane_choice == "refused" else "alone"))
 	wolf_baiting = false
 	junction_room.sentry_down = true
 	junction_room.tank_hit(at_x)
@@ -2467,8 +2590,9 @@ func _tank_hit() -> void:
 	_save_progress()
 
 
-## The tank hit the empty mark: it dents and sprays coolant from a split line, the winch snaps it back
-## up and the sentry turns on the release. If WOLF was drawing it, he breaks off for this attempt.
+## The tank hit the empty mark: it dents and lies there spraying coolant from a split line until the
+## winch hauls it back up (DropArm.FLOOR_SECONDS), and the sentry turns on the release, held at the
+## tank's edge while it lies in the lane. If WOLF was drawing it, he breaks off for this attempt.
 func _tank_miss() -> void:
 	junction_room.tank_miss()
 	sfx_bank.play(&"clank", -2.0, 0.55)
@@ -2484,9 +2608,11 @@ func _tank_miss() -> void:
 	if broke_off:
 		wolf_baiting = false
 		wolf_broke_off = true
+		# Already past the sentry he stays by the hatch; he will not cross back under the tank.
+		wolf_holding_far_end = wolf.position.x > sentry_brain.x
 		_react_as_wolf(false)
 	_update_controls()
-	status_line = "The tank hits the empty mark and sprays coolant from a split line. The sentry swings toward the panel; get back over the rubble." + ("\nWOLF: I'm out. I'll hold at the rubble." if broke_off else "")
+	status_line = "The tank hits the empty mark and sprays coolant from a split line. The sentry swings toward the panel; get back over the rubble." + ((BROKE_OFF_HATCH_LINE if wolf_holding_far_end else BROKE_OFF_RUBBLE_LINE) if broke_off else "")
 
 
 func _tank_rehung() -> void:
@@ -2546,7 +2672,7 @@ func _wolf_reads_seam() -> void:
 	wolf_scouting = false
 	_react_as_wolf(false)
 	sfx_bank.play(&"growl_seam", -3.0)
-	status_line = "WOLF: It's live. Don't stand in front of it when it goes."
+	status_line = WOLF_DOOR_WARNING
 	_update_controls()
 
 
@@ -2587,7 +2713,8 @@ func _blast_feedback() -> void:
 ## slides with a thud and rumble), controls off briefly, a short fade, then the current beat's
 ## autosave comes back through _load_game/_sync_scene. Memory and Records flags are never touched.
 ## With Reduced Motion the tilt, hit-stop and shake are skipped; the thud, wash and fade remain.
-func _fail_beat(reason: String) -> void:
+## [param in_lane]: the sentry ran the engineer down out in its lane (_lane_fall).
+func _fail_beat(reason: String, in_lane: bool = false) -> void:
 	if fail_active or title_open or intro_active or chapter_close_active or end_card_active or _debug_spares_knockdown():
 		return
 	fail_active = true
@@ -2597,6 +2724,7 @@ func _fail_beat(reason: String) -> void:
 	choice_context = ""
 	wolf_heading_to_relay = false
 	engineer_step_x = -1.0
+	engineer_waits_for_wolf = false
 	human.velocity = Vector2.ZERO
 	_update_controls()
 	impact.hit_stop(0.06)
@@ -2609,17 +2737,42 @@ func _fail_beat(reason: String) -> void:
 	fail_tween = create_tween()
 	var reaction_seconds: float = 0.0
 	if impact.motion_allowed():
-		# Fall away from the facing direction so the hit reads as a shove, not a stumble forward.
+		# Fall away from the facing direction so the hit reads as a shove, not a stumble forward; out in
+		# the sentry's lane, away from the alcove instead (_lane_fall).
 		var facing: float = -1.0 if human.body_sprite.flip_h else 1.0
+		var tilt: float = -FALL_DEGREES * facing
+		var shift: Vector2 = Vector2(-FALL_SHIFT.x * facing, FALL_SHIFT.y)
+		if in_lane:
+			shift = _lane_fall()
+			tilt = FALL_DEGREES
 		reaction_seconds = 0.22
-		fail_tween.tween_property(human.body_sprite, "rotation_degrees", -70.0 * facing, reaction_seconds).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
-		fail_tween.parallel().tween_property(human.body_sprite, "position", HUMAN_SPRITE_REST + Vector2(-30.0 * facing, 14.0), reaction_seconds).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
+		fail_tween.tween_property(human.body_sprite, "rotation_degrees", tilt, reaction_seconds).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
+		fail_tween.parallel().tween_property(human.body_sprite, "position", HUMAN_SPRITE_REST + shift, reaction_seconds).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
 	fail_tween.tween_interval(FAIL_CONTROLS_OFF_SECONDS - reaction_seconds)
 	fail_tween.tween_property(intro_fade, "color:a", 1.0, FAIL_FADE_SECONDS)
 	fail_tween.tween_callback(_restore_beat.bind(reason))
 	fail_tween.tween_property(intro_fade, "color:a", 0.0, 0.35)
 	status_line = reason
 	_refresh_ui()
+
+
+## Caught out in the sentry's lane, the engineer falls to the right, away from the alcove, and lies where
+## they were caught: at least FALL_SHIFT along, and further if that would leave any of their drawn body
+## within LANE_FALL_CLEAR of the alcove's right post. The sentry rolls back off them (Sentry.recoil_to)
+## so its drawn body stands LANE_FALL_CLEAR clear of theirs. Returns the body's shift from rest.
+func _lane_fall() -> Vector2:
+	var half: Vector2 = human.body_sprite.get_rect().size * human.body_sprite.scale * 0.5
+	var angle: float = deg_to_rad(FALL_DEGREES)
+	# How far the lying body reaches either side of its centre.
+	var reach: float = half.y * sin(angle) + half.x * cos(angle)
+	var centre_x: float = maxf(human.position.x + FALL_SHIFT.x, SentryBrain.COVER_MAX_X + LANE_FALL_CLEAR + reach)
+	var sentry: Sentry = junction_room.sentry
+	var sentry_reach: float = Sentry.drawn_half_width()
+	if sentry.position.x >= human.position.x:
+		sentry.recoil_to(maxf(sentry.position.x, centre_x + reach + LANE_FALL_CLEAR + sentry_reach))
+	else:
+		sentry.recoil_to(minf(sentry.position.x, centre_x - reach - LANE_FALL_CLEAR - sentry_reach))
+	return Vector2(centre_x - human.position.x, FALL_SHIFT.y)
 
 
 func _restore_beat(reason: String) -> void:
@@ -2692,9 +2845,13 @@ func _door_lands() -> void:
 func _sync_scene() -> void:
 	# Walked out through the hatch, the actors faded; any new scene shows them again.
 	hatch_exit_walking = false
+	hatch_exit_engineer_walking = false
 	human.modulate.a = 1.0
 	wolf.modulate.a = 1.0
-	# The corridor's relay staging and bypass crank belong to the moment, not the save.
+	# The corridor's relay staging and bypass crank belong to the moment, not the save, and so does
+	# WOLF's read of the junction's gauge on entry (_enter_junction starts it after this sync).
+	wolf_scouting = false
+	seam_read_seconds = 0.0
 	wolf_holding_relay = false
 	engineer_step_x = -1.0
 	_stop_bypass_vent()
@@ -2706,6 +2863,8 @@ func _sync_scene() -> void:
 	lane_choice = ""
 	wolf_baiting = false
 	wolf_broke_off = false
+	wolf_holding_far_end = false
+	engineer_waits_for_wolf = false
 	sentry_wake_remaining = 0.0
 	if wolf_reaction_tween != null and wolf_reaction_tween.is_running():
 		wolf_reaction_tween.kill()
@@ -2713,6 +2872,9 @@ func _sync_scene() -> void:
 		relay_spark_tween.kill()
 	wolf.body_sprite.position = WOLF_SPRITE_REST
 	wolf.body_sprite.rotation_degrees = 0.0
+	wolf.body_sprite.offset = Vector2.ZERO
+	wolf.body_sprite.scale = wolf_sprite_scale
+	wolf.speed_scale = 1.0
 	human.body_sprite.position = HUMAN_SPRITE_REST
 	human.body_sprite.rotation_degrees = 0.0
 	human.z_index = ACTOR_Z
@@ -2723,6 +2885,12 @@ func _sync_scene() -> void:
 	human.settle_x = -1.0
 	_clear_station_body()
 	wolf.position = state.wolf_position
+	if state.chapter_id == "junction" and state.sentry_down:
+		# With the sentry down he waits at his spot by the hatch, facing back down the lane; a save taken
+		# as the tank landed (autosave C) has him wherever he was then, and he never walks back across
+		# the tank to it.
+		wolf.position.x = JunctionRoom.WOLF_DOWN_X
+		wolf.body_sprite.flip_h = true
 	# Placed afresh, he picks his side afresh from the engineer's facing.
 	wolf.follow_side = 0
 	human.velocity = Vector2.ZERO
@@ -2852,9 +3020,13 @@ func _sync_door(animate: bool = false) -> void:
 
 
 func _update_controls() -> void:
-	human.controlled = not title_open and not intro_active and not chapter_close_active and not end_card_active and not waiting_for_choice and not fail_active and engineer_step_x < 0.0
-	# Stepping back from the relay, the engineer walks on their own for a moment.
-	human.autonomous_target_x = HATCH_EXIT_X if hatch_exit_walking else engineer_step_x
+	human.controlled = not title_open and not intro_active and not chapter_close_active and not end_card_active and not waiting_for_choice and not fail_active and engineer_step_x < 0.0 and not engineer_waits_for_wolf
+	# Stepping back from the relay, the engineer walks on their own for a moment; leaving the junction
+	# they wait for WOLF to go through the hatch first.
+	if hatch_exit_walking:
+		human.autonomous_target_x = HATCH_EXIT_X if hatch_exit_engineer_walking else -1.0
+	else:
+		human.autonomous_target_x = engineer_step_x
 	wolf.controlled = false
 	wolf.autonomous_target_x = _wolf_target_x()
 	wolf.follow_target = human if human.controlled and wolf.autonomous_target_x < 0.0 else null
@@ -2865,12 +3037,13 @@ func _update_controls() -> void:
 
 
 ## Where WOLF goes on his own, or -1 to follow: the relay contact (held until the seal lands), off
-## the relay while the engineer works the bypass (_wolf_off_relay), the Records mirror, the junction door seam on entry, clear of the vent and the blast while the line is
-## live, the rubble line once the door is down (he will not cross it unless he chooses to draw the
-## sentry onto the mark), and out through the hatch at the end.
+## the relay while the engineer works the bypass (_wolf_off_relay), the Records mirror, the junction
+## valve on entry, clear of the vent and the blast while the line is live, the rubble line once the
+## door is down (he will not cross it unless he chooses to draw the sentry onto the mark, from the
+## far end of its lane), by the exit hatch once it is down, and out through the hatch at the end.
 func _wolf_target_x() -> float:
 	if hatch_exit_walking:
-		# Into the hatch's doorway, behind the engineer.
+		# He goes through the hatch first, from his spot in its doorway.
 		return WOLF_HATCH_EXIT_X
 	if wolf_heading_to_relay or wolf_holding_relay:
 		return RELAY_CONTACT_X
@@ -2886,10 +3059,24 @@ func _wolf_target_x() -> float:
 				# While the line builds he keeps off the vent's grate, and while the fuse burns he is out of
 				# the blast zone.
 				return JunctionRoom.WOLF_CLEAR_X
-			if state.door_blown and not state.sentry_down:
-				# He draws the sentry only by his own choice; otherwise he will not cross the rubble. While it
-				# is locked on to the engineer or chasing them he waits at the rubble rather than walk into it.
-				return JunctionRoom.WOLF_BAIT_X if wolf_baiting and not _sentry_hunting() else JunctionRoom.WOLF_RUBBLE_X
+			if state.sentry_down:
+				# Once it is down he waits by the hatch he says is next, in full view, clear of the tank. From
+				# the rubble side he bounds over the crushed tank (_sync_wolf_leap), once the empty arm has
+				# winched up out of his way; until then he holds where he is.
+				if wolf.position.x < DropArm.MARK_X and junction_room.arm_parked < 1.0:
+					return wolf.position.x
+				return JunctionRoom.WOLF_DOWN_X
+			if state.door_blown:
+				# He draws the sentry only by his own choice, from the far end of its lane; otherwise he will
+				# not cross the rubble. Once past it he never crosses back under the tank: while it is locked
+				# on to the engineer or chasing them, or after he breaks off there, he keeps to his spot by
+				# the hatch. Should it turn on the engineer before he is past it, he backs off to the rubble
+				# rather than bound over it.
+				if wolf_holding_far_end:
+					return JunctionRoom.WOLF_BAIT_X
+				if wolf_baiting and (not _sentry_hunting() or wolf.position.x > sentry_brain.x):
+					return JunctionRoom.WOLF_BAIT_X
+				return JunctionRoom.WOLF_RUBBLE_X
 	return -1.0
 
 
@@ -3394,6 +3581,7 @@ func debug_place(human_x: float, wolf_x: float) -> void:
 ## cloud, or sentry (worded by how it caught them).
 func debug_knock_down(kind: StringName) -> void:
 	var reason: String = _sentry_reason()
+	var in_lane: bool = kind == &"sentry" and _seen_in_lane()
 	match kind:
 		&"vent":
 			reason = JunctionRoom.VENT_REASON % _first_name()
@@ -3401,7 +3589,7 @@ func debug_knock_down(kind: StringName) -> void:
 			reason = JunctionRoom.BLAST_REASON % _first_name()
 		&"cloud":
 			reason = JunctionRoom.CLOUD_REASON % _first_name()
-	_fail_beat(reason)
+	_fail_beat(reason, in_lane)
 
 
 ## The valve's last turn has landed (the fuse is lit), as the crank lands it.

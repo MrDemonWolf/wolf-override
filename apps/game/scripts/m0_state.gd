@@ -18,8 +18,10 @@ const CHOICE_TEXT = {
 	"disclose_risk": "The relay may vent coolant. Your call.",
 	"press_without_warning": "Go now. We can talk after.",
 }
-## The saved ways the junction's sentry can have come down (lane_recap), empty before it falls.
-const LANE_RECAPS: Array[String] = ["", "wolf", "refused", "alone"]
+## The saved ways the junction's sentry can have come down (lane_recap), empty before it falls:
+## WOLF drew it, he refused, the engineer timed it with WOLF at the rubble, or he broke off by the
+## exit hatch after a miss.
+const LANE_RECAPS: Array[String] = ["", "wolf", "refused", "alone", "broke_off"]
 
 var active_actor: String = "human"
 var name_index: int = 0

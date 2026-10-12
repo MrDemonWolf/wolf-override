@@ -111,19 +111,66 @@ const BOLT_X: float = BOLT_PANEL_X - BOLT_PANEL_HALF_WIDTH - M0Actor.HUMAN_REACH
 const BOLT_REACH_MIN_X: float = BOLT_X - 16.0
 const HATCH_X: float = 880.0
 const FLOOR_Y: float = 440.0
-## Where WOLF stands to read the pressure behind the door: on the valve's left, facing it, his snout at
-## the valve's edge where its LINE gauge reads the line, so he never stands inside the machine. (There
-## is no floor beside the door itself: the valve stands right in front of it.)
+## Where WOLF stands to read the line on entry: on the valve's left, facing it, his snout at the
+## valve's edge below its LINE gauge, so he never stands inside the machine. There is no floor at the
+## door itself: the valve stands right in front of it, and the only gap between the breaker and the
+## valve (the idle relief vent's grate, 33 px of bare floor) is far shorter than his body, so the
+## narration names the gauge he reads, not the door (Main.JUNCTION_ENTRY_LINE).
 const WOLF_SEAM_X: float = VALVE_X - VALVE_HALF_WIDTH - M0Actor.WOLF_REACH - 2.0
 ## (He holds at the near edge of the rubble, so his sprite stays clear of the engineer at CHOICE_X.
 ## Between the valve and the release alcove there is no floor as long as he is, so his rear stands
 ## over the valve's right side here.)
 const WOLF_RUBBLE_X: float = 448.0
-## Where WOLF stands when he chooses to draw the sentry: at the lip of the rubble with only his front
-## over the lane line, so he never walks through the machine and his drawn body stays clear of the
-## engineer at the TANK RELEASE, the floor brackets and the tank. It parks BAIT_OFFSET
-## past him, on the mark, facing him.
-const WOLF_BAIT_X: float = DropArm.MARK_X - SentryBrain.BAIT_OFFSET
+## Where WOLF stands when he chooses to draw the sentry: at the far end of its lane, in front of the
+## exit hatch (a doorway, not a machine), facing back down the lane, his snout at the bolt panel's
+## right edge and his tail inside the room's right edge. It parks BAIT_OFFSET short of him, on the
+## mark, facing him with its back to the TANK RELEASE, so the engineer working the release is behind
+## it and never between the two; his drawn body stays far outside the floor brackets and the tank.
+const WOLF_BAIT_X: float = DropArm.MARK_X + SentryBrain.BAIT_OFFSET
+## Where WOLF waits once the sentry is down, through the bolt and the closing beat: the same spot, in
+## full view by the hatch he says is next, clear of the crushed sentry and the tank on it.
+const WOLF_DOWN_X: float = WOLF_BAIT_X
+## Crossing the lane to his spot, WOLF bounds over the live sentry rather than through it
+## (wolf_leap_height): his painted feet (y 438) clear its drawn top (Sentry.FLOOR_Y less
+## Sentry.DRAWN_HEIGHT, y 396) by 6 px at the top of the bound, held while his legs are over its body
+## (LEAP_CLEAR: the two bodies' contact range, SentryBrain.HALF_WIDTH plus M0State.WOLF_HALF_WIDTH, and a
+## 5 px margin) and eased in and out over LEAP_RAMP either side, where only his snout or tail passes its
+## low treads. He runs LEAP_SPEED_SCALE times faster meanwhile, so it reads as a bound, not a hover. The
+## tank's base (y 382 at most) is lower than the top of his head at the bound, so he never bounds under
+## it: the sentry he draws backs off ahead of him to the end of its patrol (SentryBrain.BAIT_OFFSET)
+## and he catches it there, and the bound and both ramps stay clear of the hanging tank's painted body
+## by a few px (sentry_test measures the two images).
+const LEAP_HEIGHT: float = 48.0
+const LEAP_CLEAR: float = SentryBrain.HALF_WIDTH + M0State.WOLF_HALF_WIDTH + 5.0
+const LEAP_RAMP: float = 30.0
+const LEAP_SPEED_SCALE: float = 2.0
+## Running under the hung tank on his way down the lane, WOLF ducks: at rest the tips of his ears
+## (y 379) are higher than the tank's rounded base (y 382 at its lowest), so while his head (WOLF_HEAD_X
+## ahead of his centre) is within DUCK_CLEAR of the mark he runs crouched, his drawn body squashed
+## DUCK_DEPTH px lower with his feet on the floor, easing in and out over DUCK_RAMP. His head then
+## passes a few px under the tank's base (sentry_test measures the two images).
+const DUCK_DEPTH: float = 9.0
+const DUCK_CLEAR: float = 34.0
+const DUCK_RAMP: float = 24.0
+const WOLF_HEAD_X: float = 45.0
+## Once the tank is down on the sentry, WOLF crossing from the rubble to his spot by the hatch bounds
+## clean over the crushed tank and the wreck under it in one arc (wolf_tank_leap_height): a parabola in
+## x, so at his steady LEAP_SPEED_SCALE speed it is a fall under constant gravity, TANK_LEAP_HEIGHT at
+## its top over TANK_LEAP_PEAK_X and back on the floor TANK_LEAP_HALF_SPAN either side. He is 134 px
+## long, the tank stands 107 px over the floor about 60 px past the engineer working the release, and
+## the parked arm's claw hangs only some 10 px above the height that clears the tank, so there is no
+## room for a short hop: he takes off a few px before his snout reaches the engineer's back, passes
+## over them on the way up and lands just short of his spot. His painted feet (y 438) pass over the
+## tank's top (y 331, on the crushed hull) and his back under the claw. The empty arm hangs too low over
+## the tank for him to pass under it, so it winches up into its ceiling plate as the tank lands for good
+## (ARM_PARK_RISE over ARM_PARK_SECONDS), and he waits at the rubble until it is up. sentry_test measures
+## his painted body against the tank's, the wreck's and the arm's images on every frame of the crossing
+## and at every x (3 px clear).
+const TANK_LEAP_HEIGHT: float = 122.0
+const TANK_LEAP_PEAK_X: float = DropArm.MARK_X - 5.0
+const TANK_LEAP_HALF_SPAN: float = 180.0
+const ARM_PARK_RISE: float = 44.0
+const ARM_PARK_SECONDS: float = 0.3
 ## Where WOLF waits while the line builds and the fuse burns: back by the entrance hatch, his snout at
 ## the breaker's left edge (his painted front is a few px inside M0Actor.WOLF_REACH), so he is not
 ## inside the breaker, his drawn body is clear of the engineer working it from its right, his tail
@@ -158,9 +205,12 @@ const HAZARD_SECONDS: float = 0.4
 ## first name.
 const VENT_REASON: String = "The relief vent let go under %s. When the gauge peaks, stay off the grate."
 const BLAST_REASON: String = "The door went with %s in front of it. When the fuse lights, back away past the valve."
-## SENTRY_REASON is for an engineer it saw and ran down out in the lane; once it has turned on them
-## after a miss, or reaches them inside the alcove, the alcove is no help and SENTRY_CHASED_REASON says so.
-const SENTRY_REASON: String = "The sentry ran %s down in its lane. Stay between the alcove's posts, or get back over the rubble."
+## SENTRY_REASON is for an engineer it spotted and ran down out in the lane, which is always past the
+## alcove's right post (SentryBrain.is_exposed); it says where they were caught, so the shove that lays
+## the body back between the posts never reads as the card's advice failing. Once it has turned on
+## them after a miss, or reaches them inside the alcove, the alcove is no help and
+## SENTRY_CHASED_REASON says so.
+const SENTRY_REASON: String = "The sentry spotted %s past the alcove's right post and ran them down. Keep inside the posts, or get back over the rubble."
 const SENTRY_CHASED_REASON: String = "The sentry ran %s down. Once its eyes go red, only the rubble is safe."
 const CLOUD_REASON: String = "The coolant cloud caught %s. Let it clear before crossing the mark."
 const AMBER: Color = Color("#f3ae4b")
@@ -241,9 +291,11 @@ var turns: int = 0
 var door_blown: bool = false
 var sentry_down: bool = false
 var junction_cleared: bool = false
-## Mirrored from DropArm: its state and how far down the tank is (0 hanging, 1 on the floor).
+## Mirrored from DropArm: its state and how far down the tank is (0 hanging, 1 on the floor), and
+## whether a missed tank still lies on the floor before the winch takes it (DropArm.on_floor).
 var arm_state: StringName = &"hung"
 var tank_drop: float = 0.0
+var tank_on_floor: bool = false
 ## Mirrored from PressureLine: seconds left on the fuse, which drives the blast stripes' pulse.
 var fuse_remaining: float = 0.0
 ## The needle's reading: the gauge while it builds, pinned at the top for a while after the vent lets
@@ -251,6 +303,14 @@ var fuse_remaining: float = 0.0
 var display_gauge: float = 0.0
 var gauge_hold: float = 0.0
 var gauge_tripped: bool = false
+## 0 with the arm hanging where it holds the tank, 1 once it has winched up into its ceiling plate
+## after the tank came down on the sentry (ARM_PARK_RISE).
+var arm_parked: float = 0.0:
+	set(value):
+		arm_parked = value
+		if arm_art != null:
+			arm_art.position.y = arm_rest_y - ARM_PARK_RISE * arm_parked
+			queue_redraw()
 ## Mirrored from Main's exit bolt: locked, charging (0..1 through the whine) or open.
 var bolt_state: StringName = &"locked"
 var bolt_charge: float = 0.0
@@ -271,6 +331,8 @@ var breaker_art: Sprite2D
 var valve_art: Sprite2D
 var vent_art: Sprite2D
 var arm_art: Sprite2D
+## Where the arm hangs while it holds the tank (its centre's y).
+var arm_rest_y: float = 0.0
 var arm_panel_art: Sprite2D
 var bolt_panel_art: Sprite2D
 var entry_hatch_art: Sprite2D
@@ -325,6 +387,7 @@ var _seam_tween: Tween
 var _door_tween: Tween
 var _hazard_tween: Tween
 var _hatch_tween: Tween
+var _arm_tween: Tween
 
 
 ## The hanging coolant tank, cut from the tank-arm art, with a dent drawn on after a missed drop.
@@ -568,7 +631,9 @@ func _build_particles() -> void:
 	vent_steam.position = Vector2(VENT_X, FLOOR_Y - 8.0)
 	vent_steam.emission_shape = CPUParticles2D.EMISSION_SHAPE_RECTANGLE
 	vent_steam.emission_rect_extents = Vector2((PressureLine.VENT_GRATE_MAX_X - PressureLine.VENT_GRATE_MIN_X) * 0.5 - 6.0, 2.0)
-	vent_steam.z_index = 3
+	# Behind the actors, like the coolant cloud: the column rises around an engineer on the grate and
+	# never hides them.
+	vent_steam.z_index = 0
 	add_child(vent_steam)
 	vent_puff = FxPresets.dust_burst()
 	vent_puff.name = "VentPuff"
@@ -626,6 +691,7 @@ func _build_lane() -> void:
 	arm_art.region_rect = ARM_REGION
 	arm_art.scale = Vector2.ONE * TANK_ART_SCALE
 	arm_art.position = tank.position + (ARM_REGION.get_center() - TANK_REGION.get_center()) * TANK_ART_SCALE
+	arm_rest_y = arm_art.position.y
 	arm_art.z_index = 1
 	add_child(arm_art)
 	# The cloud's hurtbox is the cloud: DropArm.CLOUD_HALF_WIDTH either side of the mark, floor to head height.
@@ -798,8 +864,10 @@ func _sync_vent_glow() -> void:
 ## Copies the arm in: the tank's height, the cloud and its hurtbox follow DropArm's state.
 func sync_arm(arm: DropArm) -> void:
 	var previous_state: StringName = arm_state
+	var previous_on_floor: bool = tank_on_floor
 	arm_state = arm.state
 	tank_drop = arm.drop_amount()
+	tank_on_floor = arm.on_floor()
 	# A tank coming down on the sentry stops on its crushed hull, so the wreck shows under it.
 	var on_sentry: bool = arm.state == &"landed" or (arm.state == &"falling" and DropArm.is_hit(sentry.target_x))
 	tank.position.y = lerpf(TANK_REST_Y, landed_tank_y(on_sentry), tank_drop)
@@ -807,7 +875,7 @@ func sync_arm(arm: DropArm) -> void:
 	coolant_cloud.emitting = cloud
 	if cloud_hazard.armed != cloud:
 		cloud_hazard.armed = cloud
-	if arm_state != previous_state:
+	if arm_state != previous_state or tank_on_floor != previous_on_floor:
 		refresh_state()
 	queue_redraw()
 
@@ -824,6 +892,29 @@ func sync_bolt(state: StringName, charge: float) -> void:
 	recesses.queue_redraw()
 
 
+## How high WOLF's drawn body is lifted with his centre at [param wolf_x] and the live sentry's at
+## [param sentry_x]: LEAP_HEIGHT while their bodies could overlap, easing to nothing LEAP_RAMP further
+## out.
+static func wolf_leap_height(wolf_x: float, sentry_x: float) -> float:
+	return LEAP_HEIGHT * (1.0 - smoothstep(LEAP_CLEAR, LEAP_CLEAR + LEAP_RAMP, absf(wolf_x - sentry_x)))
+
+
+## How high WOLF's drawn body is lifted crossing the crushed tank on the mark with his centre at
+## [param wolf_x]: one parabolic arc, TANK_LEAP_HEIGHT over TANK_LEAP_PEAK_X and nothing from
+## TANK_LEAP_HALF_SPAN either side of it.
+static func wolf_tank_leap_height(wolf_x: float) -> float:
+	var along: float = (wolf_x - TANK_LEAP_PEAK_X) / TANK_LEAP_HALF_SPAN
+	return TANK_LEAP_HEIGHT * maxf(1.0 - along * along, 0.0)
+
+
+## How far WOLF ducks (px off the top of his drawn body, feet on the floor) with his centre at
+## [param wolf_x], facing [param facing] (+1 right), under the hung tank: DUCK_DEPTH while his head is
+## under its base, easing to nothing DUCK_RAMP further out.
+static func wolf_duck_depth(wolf_x: float, facing: float) -> float:
+	var head_x: float = wolf_x + signf(facing) * WOLF_HEAD_X
+	return DUCK_DEPTH * (1.0 - smoothstep(DUCK_CLEAR, DUCK_CLEAR + DUCK_RAMP, absf(head_x - DropArm.MARK_X)))
+
+
 ## Where the tank's centre comes to rest: on the floor, or on top of the crushed sentry.
 static func landed_tank_y(on_sentry: bool) -> float:
 	return FLOOR_Y - TANK_SIZE.y * 0.5 - (Sentry.WRECK_CRUSH_HEIGHT if on_sentry else 0.0)
@@ -836,6 +927,11 @@ func tank_hit(at_x: float) -> void:
 	coolant_burst.position.x = at_x
 	hit_sparks.position.x = at_x
 	sentry.keel_over(at_x)
+	# The empty arm winches up into its ceiling plate, clear of WOLF bounding over the tank.
+	if _arm_tween != null and _arm_tween.is_valid():
+		_arm_tween.kill()
+	_arm_tween = create_tween()
+	_arm_tween.tween_property(self, "arm_parked", 1.0, ARM_PARK_SECONDS).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
 	refresh_state()
 
 
@@ -884,7 +980,9 @@ func refresh_state() -> void:
 	breaker_glow.modulate = Color(_breaker_light_color(), 0.75 if line_state in [&"building", &"charged", &"fuse"] and not door_blown else 0.4)
 	door_label.text = "DOOR DOWN" if door_blown else "SEALED DOOR"
 	door_label.add_theme_color_override("font_color", GREEN if door_blown else Color("#ffc7c7"))
-	arm_label.text = "RELEASE SPENT" if sentry_down else ("WINCHING UP" if arm_state == &"rewinding" else "TANK RELEASE")
+	# A missed tank lying on the floor is not being winched yet: the plate says so only once the winch
+	# takes it (it stays amber, busy, meanwhile).
+	arm_label.text = "RELEASE SPENT" if sentry_down else ("WINCHING UP" if arm_state == &"rewinding" and not tank_on_floor else "TANK RELEASE")
 	tank_label.visible = sentry_down
 	arm_label.add_theme_color_override("font_color", Color("#8fa6b2") if sentry_down else (AMBER if arm_state == &"rewinding" else Color("#b0d1de")))
 	if junction_cleared or (bolt_state == &"open" and hatch_open >= 1.0):
@@ -993,9 +1091,10 @@ func _arm_hazard(hazard: Hazard) -> void:
 
 ## Back to the state the save describes: no burst, no fuse, the wheel at rest and the door as saved.
 func reset_transient() -> void:
-	for tween: Tween in [_valve_tween, _seam_tween, _door_tween, _hazard_tween, _hatch_tween]:
+	for tween: Tween in [_valve_tween, _seam_tween, _door_tween, _hazard_tween, _hatch_tween, _arm_tween]:
 		if tween != null and tween.is_valid():
 			tween.kill()
+	_arm_tween = null
 	_valve_tween = null
 	_seam_tween = null
 	_door_tween = null
@@ -1010,7 +1109,10 @@ func reset_transient() -> void:
 	door_breaking = false
 	arm_state = &"landed" if sentry_down else &"hung"
 	tank_drop = 1.0 if sentry_down else 0.0
+	tank_on_floor = false
 	tank.position.y = lerpf(TANK_REST_Y, landed_tank_y(sentry_down), tank_drop)
+	# The arm is up in its plate once the tank is down for good, and holds the tank otherwise.
+	arm_parked = 1.0 if sentry_down else 0.0
 	fuse_remaining = 0.0
 	display_gauge = 0.0
 	gauge_hold = 0.0
@@ -1182,13 +1284,13 @@ func _draw_arm_panel_light() -> void:
 ## The rods that hang the arm's ceiling plate from the gantry, and, only while the winch hauls a
 ## missed tank back up, the steel cable from its shackle down to the tank (a dark braided body with a
 ## faint sheen, in the painted winch cable's tones). A released tank falls free and lies free: no
-## cable while it falls or once it is down.
+## cable while it falls, once it is down, or while a missed one still lies on the floor.
 func _draw_arm() -> void:
 	var plate_top: float = arm_art.position.y - ARM_REGION.size.y * TANK_ART_SCALE * 0.5 + 2.0
 	for rod_x: float in [DropArm.MARK_X - 26.0, DropArm.MARK_X + 34.0]:
 		draw_line(Vector2(rod_x, GANTRY_Y), Vector2(rod_x, plate_top), Color("#1b2630"), 5.0)
 		draw_line(Vector2(rod_x - 1.5, GANTRY_Y), Vector2(rod_x - 1.5, plate_top), STEEL, 1.0)
-	if tank_drop <= 0.0 or arm_state != &"rewinding":
+	if tank_drop <= 0.0 or arm_state != &"rewinding" or tank_on_floor:
 		return
 	var cable_top: Vector2 = Vector2(DropArm.MARK_X, TANK_REST_Y - TANK_SIZE.y * 0.5)
 	var tank_top: Vector2 = Vector2(DropArm.MARK_X, tank.position.y - TANK_SIZE.y * 0.5)
