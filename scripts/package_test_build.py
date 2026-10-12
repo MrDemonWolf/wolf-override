@@ -11,7 +11,8 @@ Checks (any failure exits non-zero):
 - macOS: the app's executable keeps its executable bit and Godot's ad-hoc signature is present;
 - Windows: the pack is embedded in the .exe and the debug console wrapper sits beside it.
 
-The notices go in a licenses/ folder beside the game, never inside the signed .app.
+The notices (the game's GPL licence, Godot's, and the fonts') go in a licenses/ folder beside the
+game, never inside the signed .app.
 Standard library only.
 """
 
@@ -32,6 +33,9 @@ FORBIDDEN_IN_PACK = re.compile(
 )
 TESTING_URL = "https://wolfoverride.mrdemonwolf.dev/docs/development/testing/#test-builds"
 CREDITS_URL = "https://wolfoverride.mrdemonwolf.dev/docs/credits/"
+LEGAL_URL = "https://wolfoverride.mrdemonwolf.dev/docs/legal/"
+SOURCE_URL = "https://github.com/MrDemonWolf/wolf-override/tree/{commit}"
+GAME_LICENSE = Path(__file__).resolve().parent.parent / "LICENSE"
 
 
 def fail(message: str) -> None:
@@ -92,7 +96,15 @@ How to open it and what to report: {TESTING_URL}
 Original concept, core story and creative vision: Nathanial Henniges.
 Credits, references and asset sources: {CREDITS_URL}
 
+The game's code is free software under the GNU General Public License, version 3 or later
+(WOLF-OVERRIDE-LICENSE.txt in this folder). Its source for this exact build:
+{SOURCE_URL.format(commit=commit)}
+
+The art and other media have separate rights from the code. The GPL does not grant a licence to
+reuse them; their sources and status are listed on the legal page: {LEGAL_URL}
+
 This folder holds the licence notices for software and fonts inside the build:
+- WOLF-OVERRIDE-LICENSE.txt: the game's code (GNU GPL version 3 or later)
 - GODOT_LICENSE.txt: Godot Engine (MIT licence), https://godotengine.org/license
 - GODOT_COPYRIGHT.txt: the third-party components inside Godot Engine
 - Roboto-OFL.txt and Montserrat-OFL.txt: the game's typefaces (SIL Open Font License 1.1)
@@ -105,6 +117,9 @@ def add_notices(archive: zipfile.ZipFile, notices: Path, platform: str, commit: 
         if not source.is_file():
             fail(f"missing notice {source}")
         archive.write(source, f"licenses/{name}")
+    if not GAME_LICENSE.is_file():
+        fail(f"missing the game's licence {GAME_LICENSE}")
+    archive.write(GAME_LICENSE, "licenses/WOLF-OVERRIDE-LICENSE.txt")
     info = zipfile.ZipInfo("licenses/README.txt", datetime.now(timezone.utc).timetuple()[:6])
     info.compress_type = zipfile.ZIP_DEFLATED
     info.external_attr = 0o644 << 16

@@ -330,10 +330,12 @@ func _run() -> void:
 	Input.action_release(&"interact")
 	_expect(halfway and str(game.get("status_line")) == "Halfway. The hiss gets louder; the alarm keeps wailing." and bypass_handle.ticks == int(game.get("bypass_ticks")), "half way through the crank the hiss gets louder and the handle shows the count")
 	_expect(absf(wolf.position.x - wolf_clear_x) <= 3.0 and wolf.position.x + M0Actor.WOLF_REACH < float(main_constants["RELAY_X"]) - 20.0 and not wolf.body_sprite.flip_h, "WOLF is off the relay's housing, facing the engineer at the bypass")
-	await physics_frame
-	await process_frame
+	# Wait for the game's own frame to see the release. process_frame fires before nodes process, and a
+	# slow frame can run two physics steps before one, so a fixed physics + process wait can still read
+	# the line from before the release.
+	var let_go: bool = await _wait_until(func() -> bool: return not game.get("bypass_was_holding"), 30)
 	var kept: int = int(game.get("bypass_ticks"))
-	_expect(not state.door_open and kept >= 4 and str(game.get("status_line")) == "The handle holds where Rowan left it. The alarm keeps going." and str(game.call("_context_hint")) == "HOLD E: crank the manual bypass, %d of 8." % kept, "letting go keeps the turns made; the alarm keeps going")
+	_expect(let_go and not state.door_open and kept >= 4 and str(game.get("status_line")) == "The handle holds where Rowan left it. The alarm keeps going." and str(game.call("_context_hint")) == "HOLD E: crank the manual bypass, %d of 8." % kept, "letting go keeps the turns made; the alarm keeps going")
 	Input.action_press(&"interact")
 	var opened: bool = await _wait_until(func() -> bool: return state.door_open, 150)
 	Input.action_release(&"interact")
