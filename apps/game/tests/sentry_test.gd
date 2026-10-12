@@ -661,13 +661,13 @@ func _check_scene() -> void:
 	_expect(str(game.call("_context_hint")).contains("WOLF has broken off"), "then the hint says WOLF has stepped back")
 	# Round 3b: a miss with WOLF already past the sentry, by the hatch. He breaks off where he is, since
 	# he never crosses back under the tank; the sentry's patrol then turns short of him and its beam
-	# stops at him; and the END OF SLICE recap says where he was.
+	# stops at him; and the END OF SLICE recap says he broke off.
 	await _start_at_b(game, State.DISCLOSE)
 	_expect(await _walk_until_choice(game), "the question comes up on another attempt")
 	await _tap(&"choice_1")
 	_expect(await _wait_until(func() -> bool: return game.call("_bait_holding"), 300), "WOLF has it held on the mark from his spot by the hatch")
 	game.call("_tank_miss")
-	_expect(game.get("wolf_holding_far_end") and game.get("wolf_broke_off") and not game.get("wolf_baiting") and wolf.autonomous_target_x == JunctionRoom.WOLF_BAIT_X and str(game.get("status_line")).ends_with("\nWOLF: I'm out. I'll hold by the hatch."), "past it when it missed, WOLF breaks off by the hatch and says so")
+	_expect(game.get("wolf_holding_far_end") and game.get("wolf_broke_off") and not game.get("wolf_baiting") and wolf.autonomous_target_x == JunctionRoom.WOLF_BAIT_X and str(game.get("status_line")).ends_with("\nWOLF: I'm out.") and not str(game.get("status_line")).contains("hold at the rubble"), "past it when it missed, WOLF breaks off where he is, by the hatch, and says only that he is out (Nathanial's rewrite)")
 	human.position.x = 500.0
 	var held_spot: Array[bool] = [true]
 	var furthest: Array[float] = [-INF]
@@ -684,7 +684,7 @@ func _check_scene() -> void:
 	_expect(is_equal_approx(room.sentry.beam_stop_x, JunctionRoom.WOLF_BAIT_X - M0Actor.WOLF_REACH) and beam_end <= JunctionRoom.WOLF_BAIT_X - M0Actor.WOLF_REACH + 0.5, "facing him its beam stops at him instead of running on over him (ends %.1f)" % beam_end)
 	brain.x = DropArm.MARK_X
 	game.call("_tank_hit")
-	_expect((game.get("state") as M0State).lane_recap == "broke_off" and (game.call("end_card_recap") as Array)[2] == "LANE  WOLF broke off by the hatch while Rowan timed the drop.", "the recap says he broke off by the hatch")
+	_expect((game.get("state") as M0State).lane_recap == "broke_off" and (game.call("end_card_recap") as Array)[2] == "LANE  WOLF broke off while Rowan timed the drop.", "the recap says he broke off while the engineer timed the drop")
 	_expect(await _wait_until(func() -> bool: return Engine.time_scale == 1.0, 90), "time scale settles after that hit")
 	await _check_engineer_alone(game, path)
 	await _check_cloud(game, path)
@@ -741,6 +741,16 @@ func _check_engineer_alone(game: Node2D, path: String) -> void:
 	_expect(await _wait_until(func() -> bool: return game.get("fail_active"), 90), "sentry contact in the lane is a knockdown")
 	_expect(str(game.get("status_line")).begins_with(JunctionRoom.SENTRY_REASON % (game.get("state") as M0State).human_name().get_slice(" ", 0)) and str(game.get("status_line")).contains("past the alcove's right post") and str(game.get("status_line")).contains("Keep inside the posts"), "the status line names the sentry and the engineer, says they were caught past the alcove's right post, and points at the alcove or the rubble")
 	_expect(SentryBrain.is_exposed(human.position.x) and human.position.x > SentryBrain.COVER_MAX_X, "and the engineer was indeed caught past the right post (x %.0f)" % human.position.x)
+	# Round 3c item 3: the body lies where the card says they were caught: past the right post, fallen
+	# away from the alcove, clear of the TANK RELEASE and of the sentry, which rolls back off them.
+	for _frame: int in 20:
+		await physics_frame
+	var body_rect: Rect2 = _drawn_rect(human.body_sprite)
+	var sentry_rect: Rect2 = _drawn_rect(room.sentry.visual.body)
+	var release_right: float = JunctionRoom.ARM_X + JunctionRoom.ARM_PANEL_HALF_WIDTH
+	_expect(game.get("fail_active") and is_equal_approx(human.body_sprite.rotation_degrees, MainScript.FALL_DEGREES), "caught out in the lane, the engineer falls to the right, away from the alcove (tilt %.1f)" % human.body_sprite.rotation_degrees)
+	_expect(body_rect.position.x >= SentryBrain.COVER_MAX_X + 3.0 and body_rect.position.x >= release_right + 3.0, "the body lies past the alcove's right post, clear of the TANK RELEASE (body %.1f..%.1f, post %.0f, release ends %.1f)" % [body_rect.position.x, body_rect.end.x, SentryBrain.COVER_MAX_X, release_right])
+	_expect(room.sentry.position.x > human.position.x and sentry_rect.position.x - body_rect.end.x >= 3.0, "the sentry rolls back off the body and stands clear of it (gap %.1f px)" % (sentry_rect.position.x - body_rect.end.x))
 	_expect(await _wait_until(func() -> bool: return not game.get("fail_active"), 240), "the knockdown hands back")
 	var state: M0State = game.get("state") as M0State
 	_expect(FileAccess.get_file_as_bytes(path) == b_bytes and state.to_dict() == b_dict and state.memory.get("choice_id") == State.PRESS, "it restores autosave B with the relay memory intact and saves nothing")
@@ -812,6 +822,15 @@ func _check_engineer_alone(game: Node2D, path: String) -> void:
 	_check_crushed(room, brain, "the timed hit")
 	var autosave_c: M0State = State.load_from_disk(path)
 	_expect(autosave_c != null and autosave_c.sentry_down and autosave_c.memory.get("choice_id") == State.PRESS, "the engineer-only route writes autosave C too")
+	await _check_tank_crossing(game)
+	# Round 3c item 2: autosave C was written as the tank landed, with WOLF still at the rubble; Continue
+	# starts him at his spot by the hatch, not back across the tank.
+	_expect(autosave_c != null and autosave_c.wolf_position.x < DropArm.MARK_X - JunctionRoom.TANK_LEAP_CLEAR, "autosave C has WOLF on the rubble side of the tank (x %.0f)" % (autosave_c.wolf_position.x if autosave_c != null else -1.0))
+	game.call("_load_game")
+	_expect(wolf.position.x == JunctionRoom.WOLF_DOWN_X and wolf.body_sprite.flip_h and room.arm_parked == 1.0, "Continue from autosave C starts WOLF at his spot by the hatch, facing back down the lane, with the arm up (x %.1f)" % wolf.position.x)
+	var placed_x: float = wolf.position.x
+	await physics_frame
+	_expect(absf(wolf.position.x - placed_x) <= 0.01 and wolf.autonomous_target_x == JunctionRoom.WOLF_DOWN_X and wolf.body_sprite.offset == Vector2.ZERO, "and he stays there on the floor, with no walk across the tank")
 
 
 ## The landed tank rests on the crushed hull of a wreck pinned where the tank caught it, which is
@@ -893,6 +912,7 @@ func _check_chased_cards(game: Node2D, path: String) -> void:
 	_expect(await _wait_until(func() -> bool: return game.get("fail_active"), 120), "a chase after a miss runs down an engineer who stays at the release")
 	var status: String = str(game.get("status_line"))
 	_expect(not SentryBrain.is_exposed(human.position.x) and status.begins_with(chased) and not status.contains("alcove's posts") and not status.contains("in its lane"), "caught between the posts after a miss, the card points only at the rubble (%s)" % status)
+	await _expect_shove_fall(game, "after a miss")
 	_expect(await _wait_until(func() -> bool: return not game.get("fail_active"), 240), "the knockdown after a miss hands back")
 	_expect((game.get("state") as M0State).to_dict() == b_dict and not brain.turned_by_miss, "it restores autosave B with the sentry patrolling again")
 	# Seen out in the lane, then caught after ducking into the alcove: the alcove advice would be wrong.
@@ -904,7 +924,129 @@ func _check_chased_cards(game: Node2D, path: String) -> void:
 	_expect(await _wait_until(func() -> bool: return game.get("fail_active"), 120), "the chase reaches the engineer in the alcove")
 	status = str(game.get("status_line"))
 	_expect(not SentryBrain.is_exposed(human.position.x) and status.begins_with(chased) and not status.contains("alcove's posts"), "caught inside the alcove, the card points only at the rubble (%s)" % status)
+	await _expect_shove_fall(game, "inside the alcove")
 	_expect(await _wait_until(func() -> bool: return not game.get("fail_active"), 240), "that knockdown hands back too")
+
+
+## Round 3c item 2: with the tank down on the sentry and WOLF at the rubble, he holds there until the
+## empty arm has winched up, then bounds over the crushed tank to his spot by the hatch. On every frame
+## of that crossing his painted body stays TANK_CLEARANCE px clear of the tank's, the wreck's and the
+## arm's painted bodies (the images, measured where the scene draws them). The leap's shape is then
+## checked at every x of the crossing against the wreck caught anywhere in the hit window, either way
+## round.
+func _check_tank_crossing(game: Node2D) -> void:
+	var wolf: M0Actor = game.get_node("Wolf") as M0Actor
+	var room: JunctionRoom = game.get("junction_room") as JunctionRoom
+	var rest_scale: Vector2 = game.get("wolf_sprite_scale") as Vector2
+	_expect(wolf.position.x < DropArm.MARK_X - JunctionRoom.TANK_LEAP_CLEAR - JunctionRoom.TANK_LEAP_RAMP and wolf.autonomous_target_x >= 0.0, "with the tank down WOLF starts the crossing from the rubble side (x %.0f)" % wolf.position.x)
+	var waited: Array[bool] = [true]
+	var start_x: float = wolf.position.x
+	var highest: Array[float] = [0.0]
+	var frames: Dictionary = {}
+	var steady: Array[bool] = [true]
+	var arrived: bool = await _wait_until(func() -> bool:
+		if room.arm_parked < 1.0:
+			waited[0] = waited[0] and absf(wolf.position.x - start_x) < 0.5
+		var lift: float = -wolf.body_sprite.offset.y * wolf.body_sprite.scale.y
+		highest[0] = maxf(highest[0], lift)
+		steady[0] = steady[0] and wolf.body_sprite.scale == rest_scale and is_zero_approx(wolf.body_sprite.rotation_degrees)
+		var feet: float = wolf.position.y + wolf.body_sprite.position.y + MainScript.WOLF_FEET_BELOW_CENTRE * wolf.body_sprite.scale.y - lift
+		frames[Vector4i(roundi(wolf.position.x), roundi(feet), 1 if wolf.body_sprite.flip_h else 0, roundi(room.arm_art.position.y))] = true
+		return absf(wolf.position.x - JunctionRoom.WOLF_DOWN_X) <= 2.0 and wolf.body_sprite.offset == Vector2.ZERO, 300)
+	_expect(arrived and waited[0], "WOLF holds where he is until the empty arm has winched up, then crosses to his spot by the hatch")
+	_expect(steady[0] and highest[0] >= JunctionRoom.TANK_LEAP_HEIGHT - 0.5, "he bounds over the crushed tank at full height (highest %.1f px), unsquashed" % highest[0])
+	var obstacles: Dictionary = {}
+	var parked_y: int = roundi(room.arm_art.position.y)
+	var fixed: Dictionary = _sprite_pixels(room.tank, TANK_CLEARANCE)
+	fixed.merge(_sprite_pixels(room.sentry.visual.wreck, TANK_CLEARANCE))
+	var arm: Dictionary = _sprite_pixels(room.arm_art, TANK_CLEARANCE)
+	var touching: Array[String] = []
+	for key: Vector4i in frames:
+		var arm_shift: int = key.w - parked_y
+		for offset: Vector2i in _wolf_pixels(0):
+			var pixel: Vector2i = Vector2i(key.x + (-offset.x if key.z == 1 else offset.x), key.y + offset.y)
+			if fixed.has(pixel) or arm.has(pixel - Vector2i(0, arm_shift)):
+				touching.append("x %d feet %d" % [key.x, key.y])
+				break
+	_expect(touching.is_empty(), "WOLF's painted body stays %.0f px clear of the crushed tank, the wreck and the arm on every frame of the crossing (%d frames checked; touching at %s)" % [TANK_CLEARANCE, frames.size(), ", ".join(touching.slice(0, 4))])
+	# The leap at every x of the crossing, with the wreck pinned anywhere the tank can catch it.
+	var feet_rest: float = 423.0 - 15.0 + MainScript.WOLF_FEET_BELOW_CENTRE * rest_scale.y
+	_expect(JunctionRoom.wolf_tank_leap_height(JunctionRoom.WOLF_RUBBLE_X) == 0.0 and JunctionRoom.wolf_tank_leap_height(JunctionRoom.WOLF_DOWN_X) == 0.0, "at the rubble and at his spot by the hatch he is on the floor")
+	for at_x: float in [DropArm.MARK_X - DropArm.HIT_REACH, DropArm.MARK_X, DropArm.MARK_X + DropArm.HIT_REACH]:
+		for facing: float in [-1.0, 1.0]:
+			room.sentry.keel_over(at_x)
+			room.sentry.visual.position = Vector2.ZERO
+			room.sentry.visual.scale.x = facing
+			obstacles.merge(_sprite_pixels(room.sentry.visual.wreck, TANK_CLEARANCE))
+	obstacles.merge(_sprite_pixels(room.tank, TANK_CLEARANCE))
+	obstacles.merge(arm)
+	var swept: Array[String] = []
+	for x: int in range(roundi(JunctionRoom.WOLF_RUBBLE_X), roundi(JunctionRoom.WOLF_DOWN_X) + 1):
+		var feet: int = roundi(feet_rest - JunctionRoom.wolf_tank_leap_height(x))
+		for offset: Vector2i in _wolf_pixels(0):
+			if obstacles.has(Vector2i(x + offset.x, feet + offset.y)):
+				swept.append("x %d" % x)
+				break
+	_expect(swept.is_empty(), "at every x of the crossing the bound clears the tank, the wreck wherever it was caught and the arm by %.0f px (touching at %s)" % [TANK_CLEARANCE, ", ".join(swept.slice(0, 4))])
+	# The pixel checks above hold the frame for a while; let the engine catch up before the next timed
+	# check, so its physics frames are not spent catching up inside one process frame.
+	for _frame: int in 6:
+		await process_frame
+
+
+## [param sprite]'s painted pixels (alpha over half) where the scene draws it, in world pixels, grown
+## by [param grow] px.
+func _sprite_pixels(sprite: Sprite2D, grow: float) -> Dictionary:
+	var image: Image = sprite.texture.get_image()
+	if image.is_compressed():
+		image.decompress()
+	var region: Rect2 = sprite.region_rect if sprite.region_enabled else Rect2(Vector2.ZERO, image.get_size())
+	var local_rect: Rect2 = sprite.get_rect()
+	var xform: Transform2D = sprite.get_global_transform()
+	var inverse: Transform2D = xform.affine_inverse()
+	var bounds: Rect2 = xform * local_rect
+	var painted: Array[Vector2i] = []
+	for wy: int in range(floori(bounds.position.y) - 1, ceili(bounds.end.y) + 1):
+		for wx: int in range(floori(bounds.position.x) - 1, ceili(bounds.end.x) + 1):
+			var local: Vector2 = inverse * Vector2(wx + 0.5, wy + 0.5)
+			if not local_rect.has_point(local):
+				continue
+			var u: float = (local.x - local_rect.position.x) / local_rect.size.x
+			var v: float = (local.y - local_rect.position.y) / local_rect.size.y
+			if sprite.flip_h:
+				u = 1.0 - u
+			var tx: int = clampi(floori(region.position.x + u * region.size.x), 0, image.get_width() - 1)
+			var ty: int = clampi(floori(region.position.y + v * region.size.y), 0, image.get_height() - 1)
+			if image.get_pixel(tx, ty).a > 0.5:
+				painted.append(Vector2i(wx, wy))
+	var reach: int = ceili(grow)
+	var pixels: Dictionary = {}
+	for pixel: Vector2i in painted:
+		for dy: int in range(-reach, reach + 1):
+			for dx: int in range(-reach, reach + 1):
+				if dx * dx + dy * dy <= grow * grow:
+					pixels[pixel + Vector2i(dx, dy)] = true
+	return pixels
+
+
+## Round 3c item 3: a chase card's knockdown (after a miss, or caught inside the alcove) keeps the shove
+## it always had: the engineer falls away from the way they face, and the sentry stays where it caught
+## them.
+func _expect_shove_fall(game: Node2D, label: String) -> void:
+	var human: M0Actor = game.get_node("Human") as M0Actor
+	var room: JunctionRoom = game.get("junction_room") as JunctionRoom
+	var brain: SentryBrain = game.get("sentry_brain") as SentryBrain
+	var facing: float = -1.0 if human.body_sprite.flip_h else 1.0
+	for _frame: int in 20:
+		await physics_frame
+	var rest: Vector2 = Vector2(0.0, -5.0)
+	_expect(game.get("fail_active") and is_equal_approx(human.body_sprite.rotation_degrees, -MainScript.FALL_DEGREES * facing) and human.body_sprite.position.is_equal_approx(rest + Vector2(-MainScript.FALL_SHIFT.x * facing, MainScript.FALL_SHIFT.y)), "caught %s, the engineer still falls away from the way they face (tilt %.1f)" % [label, human.body_sprite.rotation_degrees])
+	_expect(is_equal_approx(room.sentry.target_x, brain.x) and room.sentry.max_speed == SentryBrain.CHASE_SPEED, "caught %s, the sentry stays where it caught them" % label)
+
+
+## The axis-aligned box [param sprite]'s drawn rectangle covers in the world.
+func _drawn_rect(sprite: Sprite2D) -> Rect2:
+	return sprite.get_global_transform() * sprite.get_rect()
 
 
 ## Autosave B: the door is down, the engineer just left of the old door line, WOLF at the rubble.

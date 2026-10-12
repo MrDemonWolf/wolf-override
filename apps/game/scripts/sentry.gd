@@ -44,6 +44,9 @@ const LENS_GLOW_ALPHA: float = 0.7
 ## WAKE_SECONDS as it powers up.
 const DORMANT_TINT: Color = Color(0.42, 0.47, 0.54)
 const WAKE_SECONDS: float = 0.35
+## Having run the engineer down out in its lane, it rolls back off them this fast (recoil_to), so it is
+## clear of the body by the time they are down.
+const RECOIL_SPEED: float = 480.0
 
 ## The x the brain wants; the mover closes on it at up to CHASE_SPEED.
 var target_x: float = SentryBrain.PATROL_MAX_X
@@ -52,6 +55,9 @@ var fixated: bool = false
 ## Where a beam facing right has to stop, or INF: WOLF's near edge while he holds the far end of the
 ## lane without drawing it, so the beam never runs on over him. Main sets it every frame.
 var beam_stop_x: float = INF
+## How fast the mover closes on target_x: CHASE_SPEED, or RECOIL_SPEED while it rolls back off a
+## knocked-down engineer.
+var max_speed: float = SentryBrain.CHASE_SPEED
 var visual: SentryVisual
 var floor_reflections: Array[FloorReflection] = []
 var _down_tween: Tween
@@ -255,7 +261,7 @@ func _ready() -> void:
 
 func _physics_process(delta: float) -> void:
 	var distance: float = target_x - position.x
-	velocity = Vector2(clampf(distance / delta, -SentryBrain.CHASE_SPEED, SentryBrain.CHASE_SPEED) if absf(distance) > 0.5 and delta > 0.0 else 0.0, 0.0)
+	velocity = Vector2(clampf(distance / delta, -max_speed, max_speed) if absf(distance) > 0.5 and delta > 0.0 else 0.0, 0.0)
 	move_and_slide()
 	position.y = FLOOR_Y
 	_sync_reach()
@@ -264,6 +270,7 @@ func _physics_process(delta: float) -> void:
 ## Mirrors the brain: where it wants to be, which way it faces and what its eyes say.
 func follow(brain: SentryBrain) -> void:
 	target_x = brain.x
+	max_speed = SentryBrain.CHASE_SPEED
 	fixated = brain.state == &"fixated"
 	if brain.state != &"down":
 		visual.scale.x = brain.facing
@@ -288,6 +295,7 @@ func place(brain: SentryBrain) -> void:
 	fixated = brain.state == &"fixated"
 	visual.scale.x = brain.facing
 	target_x = x
+	max_speed = SentryBrain.CHASE_SPEED
 	position = Vector2(x, FLOOR_Y)
 	velocity = Vector2.ZERO
 	visual.position = Vector2.ZERO
@@ -310,6 +318,18 @@ func _sync_reach() -> void:
 		visual.gap = Vector2(minf(ends.x, ends.y), maxf(ends.x, ends.y))
 	else:
 		visual.gap = Vector2.ZERO
+
+
+## Having run the engineer down out in its lane it rolls back to [param x], facing them still, so it
+## stands clear of the body (Main._lane_fall); the next restore places it afresh.
+func recoil_to(x: float) -> void:
+	target_x = x
+	max_speed = RECOIL_SPEED
+
+
+## How far its drawn active body reaches from its origin on its longer side, in px.
+static func drawn_half_width() -> float:
+	return maxf(ACTIVE_TREAD_X - ACTIVE_REGION.position.x, ACTIVE_REGION.end.x - ACTIVE_TREAD_X) * ART_SCALE
 
 
 ## The tank lands on it at [param at_x]: the machine is pinned there and crushed into its wreck,

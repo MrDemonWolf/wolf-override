@@ -231,7 +231,12 @@ func _check_scene() -> void:
 		await physics_frame
 	_expect(game.get("wolf_scouting") and not wolf.body_sprite.flip_h and str(game.get("status_line")) == entry_line, "at the valve he stands facing it, reading the gauge, while the line says so")
 	_expect(await _wait_until(func() -> bool: return not game.get("wolf_scouting"), 200), "WOLF reads the gauge and is done")
-	_expect(absf(wolf.position.x - JunctionRoom.WOLF_SEAM_X) <= 6.0 and wolf.follow_target == human and str(game.get("status_line")).contains("It's live"), "after the read WOLF returns to following and says what he found")
+	# Round 3c (Nathanial's choice): before the breaker is armed WOLF warns about the door, not a live
+	# line, in the same words as the Continue-A restore.
+	_expect(absf(wolf.position.x - JunctionRoom.WOLF_SEAM_X) <= 6.0 and wolf.follow_target == human and str(game.get("status_line")) == "WOLF: When the door goes, don't be standing in front of it." and not str(game.get("status_line")).contains("It's live"), "after the read WOLF returns to following and warns about the door, without calling the unarmed line live")
+	await process_frame
+	var entry_story: Label = game.get_node("CanvasLayer/BottomBar/Story") as Label
+	_expect((game.get_node("CanvasLayer/BottomBar/Speaker") as Label).text == "WOLF" and entry_story.text == "When the door goes, don't be standing in front of it." and entry_story.get_line_count() == 1, "his warning sits under his own tag on one row of the box (%d rows)" % entry_story.get_line_count())
 	_expect(_player_for(game, &"growl_seam") != null, "WOLF growls at the seam")
 	await physics_frame
 	_expect(await _wait_until(func() -> bool: return not room.door_shape.disabled, 5), "the junction door body is live in its room")
