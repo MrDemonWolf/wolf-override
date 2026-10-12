@@ -1,0 +1,1133 @@
+{
+ "drafts": [
+  {
+   "entries": [
+    {
+     "id": "DEATH_CARD_BLAST",
+     "where": "Death card, single line, after a door-blast death (standing in the blast span when the fuse ends). Story consequence: the door is blown open on retry.",
+     "text": "The door went with %s in front of it.",
+     "alternative": "The fuse ran out. %s was still in front of the door.",
+     "note": "Names the cause in the narrator's plain register (echoes BLAST_REASON 'The door blew with you in front of it.') without describing harm. 37 characters plus the name. The retry hint lives in the restore status line, not on the card."
+    },
+    {
+     "id": "DEATH_CARD_SENTRY",
+     "where": "Death card, single line, after the sentry catches the engineer during a chase.",
+     "text": "The sentry ran %s down in its lane.",
+     "alternative": "The sentry caught %s short of the rubble.",
+     "note": "Keeps 'ran down' and 'its lane' from SENTRY_REASON so the card and the hint vocabulary agree. The alternative points at the fix (the rubble) without stating it. No contact or injury is described."
+    },
+    {
+     "id": "DEATH_CARD_COOLANT",
+     "where": "Death card, single line, after dwelling in the coolant cloud past the lethal threshold.",
+     "text": "The coolant cloud held %s too long.",
+     "alternative": "The cold set in before %s was clear of the cloud.",
+     "note": "Understatement does the work: 'held' and 'the cold set in' are the whole account. Matches the choke-and-frost warning without naming breathing or frostbite."
+    },
+    {
+     "id": "DEATH_CONTINUE_KEYBOARD",
+     "where": "Death card prompt on keyboard, in the context-hint slot, using settings_menu.prompt(&\"interact\", false) for %s (shows 'E  RETRY' by default).",
+     "text": "%s  RETRY",
+     "alternative": "%s  CONTINUE",
+     "note": "Follows the existing '%s  CONTINUE' prompt shape. RETRY is preferred because CONTINUE is already the title-screen save word and the card should not read as 'continue the game'. Shown only once the card accepts input (2.4 s first death, 0.8 s repeat)."
+    },
+    {
+     "id": "DEATH_CONTINUE_CONTROLLER",
+     "where": "Death card prompt on a controller, using settings_menu.prompt(&\"interact\", true) for %s (shows 'A  RETRY' by default).",
+     "text": "%s  RETRY",
+     "alternative": "%s  CONTINUE",
+     "note": "Same shape as the keyboard prompt so the rebinding path in game_settings.gd renders the real button. Pause keeps working during the card; the card never auto-advances."
+    },
+    {
+     "id": "DEATH_CONTINUE_TOUCH",
+     "where": "Death card prompt on touch, in the context-hint slot; the Use button's label reads RETRY while the card is up.",
+     "text": "TAP RETRY",
+     "alternative": "TAP CONTINUE",
+     "note": "Mirrors the existing 'TAP CONTINUE' phrasing for the intro and chapter close. The Use button label (touch_use.text) becomes RETRY for the card, matching the verb list USE / CRANK / DROP / CONTINUE."
+    },
+    {
+     "id": "DEATH_CASE_DROPPED",
+     "where": "Second line on the death card, only when unsecured evidence dropped at the death spot; sits beside the case-with-a-gap icon.",
+     "text": "The case dropped where %s fell.",
+     "alternative": "Unsecured entries dropped where %s fell.",
+     "note": "States the fact and the place, nothing about the rule. The icon carries the shape; the legend carries the rule. 'Fell' is the only reference to the death. The alternative names the status word for players who have read the legend."
+    },
+    {
+     "id": "CASE_LOST_NOTICE",
+     "where": "Status line after a retry when a second death turned an unrecovered drop into LOST entries.",
+     "text": "The dropped case was not recovered. Its entries are LOST.",
+     "alternative": "A second fall. The first case is gone; its entries read LOST.",
+     "note": "Honest and clinical: names what happened and the status word the case now shows. No count, no 'forever', no blame. The room is given inside the case entry (CASE_IN_ROOM_FORMAT), not repeated here."
+    },
+    {
+     "id": "CAPTION_RINGING",
+     "where": "Caption shown while the death sequence ducks all sound to the ringing tone (a plain Label, never a RichTextLabel, so no brackets are needed or allowed).",
+     "text": "RINGING TONE",
+     "alternative": "A THIN RINGING TONE",
+     "note": "ALL CAPS, plain text, no brackets per the RichTextLabel rule. Short enough to stay readable while the screen drains to grey. The alternative adds one qualifier for players who read captions as sound description."
+    },
+    {
+     "id": "WARN_COOLANT_CHOKE",
+     "where": "Warning label while the engineer is inside the coolant cloud, as the choke and frost build-up rises; replaces the lane hint 'Coolant cloud. Get out of it.' for that span.",
+     "text": "COOLANT CLOUD. GET CLEAR",
+     "alternative": "FROST BUILDING. GET OUT",
+     "note": "ALL CAPS and 24 characters so it fits the hint panel at phone width. Leads with the hazard name the hints already use, then one verb. The alternative names the build-up itself so the player reads the warning as rising, not static."
+    },
+    {
+     "id": "SAFE_POINT_LABEL_RECORDS",
+     "where": "Station label above the new Records Access safe point on the walkway at about x 690-700, in the style of PURGE QUEUE / MIRROR PORT (13 px, 180 px wide).",
+     "text": "SAFE POINT",
+     "alternative": "CASE SECURED",
+     "note": "Keeps the corridor's exact label so the ritual is recognisable in every room. The alternative is the post-hold state label, mirroring how PURGE QUEUE becomes PURGE COPIED: SAFE POINT before a completed hold, CASE SECURED after, tinted green like the other done states."
+    },
+    {
+     "id": "SAFE_POINT_LABEL_JUNCTION",
+     "where": "Station label for the emergency lamp in the blown doorframe at about x 496; the station is unpowered until door_blown.",
+     "text": "SAFE POINT",
+     "alternative": "DOOR LAMP",
+     "note": "Same word as the other two stations once it is lit. If a label is wanted before the blast, the alternative DOOR LAMP in the dim grey used for EXIT BOLTED reads as an unpowered fitting; it switches to SAFE POINT (and optionally CASE SECURED after a hold) when the door is down."
+    },
+    {
+     "id": "SAFE_POINT_HOLD_PROMPT",
+     "where": "Keyboard and controller context hint in reach of any safe point. Uses the existing 'HOLD E:' shape so _refresh_ui swaps 'E:' for the bound button or 'USE:' on touch.",
+     "text": "HOLD E: secure the case and save here.",
+     "alternative": "HOLD E: secure the case. Deaths return here.",
+     "note": "Follows 'HOLD E: crank the valve, 1 of 3 turns.' Names both effects a player needs (secure, save). The alternative states the retry rule outright, which the design wants shown honestly; choose it if the tutorial line is not enough."
+    },
+    {
+     "id": "TOUCH_SECURE",
+     "where": "Touch Use button label while in reach of a safe point (touch_use.text), held for about 1 s; letting go cancels.",
+     "text": "SECURE",
+     "alternative": "SAVE",
+     "note": "One verb, matching USE / CRANK / DROP. SECURE is the design's own word and teaches the status vocabulary. SAVE is plainer but hides the backing-up effect."
+    },
+    {
+     "id": "SECURE_DONE",
+     "where": "Status line when a completed hold secured one or more new entries; the lock chirp plays with it.",
+     "text": "Case secured. Deaths in this room return here.",
+     "alternative": "The case is secured. Nothing in it can drop now.",
+     "note": "Two short declaratives, no count. The main line also states the retry-point effect so the player knows what they just set. The alternative stays on the evidence stake only."
+    },
+    {
+     "id": "SECURE_NOTHING_NEW",
+     "where": "Status line when a completed hold found nothing new to secure; the save and rest still happen.",
+     "text": "Nothing new to secure. Saved here.",
+     "alternative": "The case is already secured. Saved here all the same.",
+     "note": "Confirms that the hold still saved and set the retry point, so a cautious player is never told the use was wasted."
+    },
+    {
+     "id": "SECURE_TUTORIAL_FIRST_USE",
+     "where": "Status line on the corridor safe point's first completed hold, shown above the existing WOLF checkpoint_callback line.",
+     "text": "Safe point secured. The case is backed up here; new finds stay loose until the next one.",
+     "alternative": "Case secured and saved. A fall drops only what was picked up after a safe point.",
+     "note": "Teaches the one rule the player needs (secured versus loose) in two sentences, using 'fall' rather than death. No count, no promise of future items. It replaces 'Safe point saved.' as the prefix to the callback on first_visit."
+    },
+    {
+     "id": "SAFE_POINT_REPEAT_LINE",
+     "where": "Status line for a repeat corridor use, replacing the dead branch 'Safe point saved. WOLF remembers the same choice.' at main.gd:1163; the next USE still enters Records.",
+     "text": "Secured and saved. The next USE opens records access.",
+     "alternative": "Safe point secured again. WOLF stays with the same choice.",
+     "note": "The main line keeps the corridor's hand-off to Records visible, which the old line did not. The alternative preserves the old line's intent (WOLF's memory is stable) in WOLF-voice-safe narrator form."
+    },
+    {
+     "id": "STATUS_SECURED",
+     "where": "Case entry status word (text plus shape) for entries backed up at a safe point or derived traces.",
+     "text": "SECURED",
+     "alternative": "BACKED UP",
+     "note": "The design's word; matches FIRST COPY SECURED. BACKED UP is the plainer synonym if SECURED reads as 'locked away'."
+    },
+    {
+     "id": "STATUS_UNSECURED",
+     "where": "Case entry status word for entries picked up since the last safe point.",
+     "text": "UNSECURED",
+     "alternative": "LOOSE",
+     "note": "Direct negation of SECURED, so the pair reads as one switch. LOOSE is shorter for narrow rows but adds a second vocabulary."
+    },
+    {
+     "id": "STATUS_DROPPED",
+     "where": "Case entry status word for entries lying in the dropped case at the death spot, shown with the room.",
+     "text": "DROPPED",
+     "alternative": "DOWN",
+     "note": "Matches DEATH_CASE_DROPPED and the design's 'dropped case'. The alternative is only for very narrow rows and loses the link to the card line."
+    },
+    {
+     "id": "STATUS_LOST",
+     "where": "Case entry status word for entries that became unrecoverable after a second death, shown with the room.",
+     "text": "LOST",
+     "alternative": "GONE",
+     "note": "The design's word, final and plain. GONE is softer and is offered in case Nathanial chooses the softer twice-dropped rule later."
+    },
+    {
+     "id": "CASE_IN_ROOM_FORMAT",
+     "where": "Detail appended to a DROPPED or LOST status in the case, with the room name in caps (MAINTENANCE CORRIDOR, RECORDS ACCESS, SERVICE JUNCTION).",
+     "text": "in %s",
+     "alternative": "/ %s",
+     "note": "Reads 'DROPPED in SERVICE JUNCTION'. The alternative uses the ' / ' separator the found logs already use ('LOST / SERVICE JUNCTION') if the row is set in all caps."
+    },
+    {
+     "id": "CASE_LEGEND",
+     "where": "One line at the foot of the case view explaining the four status words.",
+     "text": "SECURED is backed up. UNSECURED drops on a fall. DROPPED waits where it fell. LOST is gone.",
+     "alternative": "Secure entries at a SAFE POINT. Unsecured ones drop on a fall; a dropped case can be picked up once.",
+     "note": "Four clauses, one per word, 88 characters, no brackets. The alternative teaches the action (hold at a SAFE POINT) and the once-only recovery rule in place of the LOST definition."
+    },
+    {
+     "id": "DROPPED_CASE_PROMPT",
+     "where": "Context hint in reach of the dropped case prop; 'E:' is swapped for the bound button or USE: as with every station hint.",
+     "text": "E: recover the dropped case.",
+     "alternative": "E: pick up the case.",
+     "note": "Same shape as 'E: copy the purge-order trace.' 'Recover' ties to the card and legend; the alternative is the plainer verb if the prop art reads as a bag or box."
+    },
+    {
+     "id": "DROPPED_CASE_TOAST",
+     "where": "Toast on recovering the dropped case, in the approved 'Stowed: NAME' / 'Logged: NAME' toast format.",
+     "text": "Recovered: CASE",
+     "alternative": "Stowed: CASE",
+     "note": "Uses the approved case name CASE. A follow-up status line can read 'Entries are UNSECURED until the next safe point.' so the player knows recovery is not securing. The alternative reuses the existing tool toast verb if a third verb is unwanted."
+    },
+    {
+     "id": "RESTORE_SAFE_POINT",
+     "where": "Status line after a retry that returns to a used safe point (second line under the cause).",
+     "text": "Back at the safe point.",
+     "alternative": "Back at the last safe point secured.",
+     "note": "The design's own wording; matches 'Safe point restored.' in tone. The alternative says which one when a room has more than one restore point."
+    },
+    {
+     "id": "RESTORE_ROOM_ENTRY",
+     "where": "Status line after a retry that returns to the room's entry autosave (the junction's autosave A or B), replacing 'Back at the last autosave.'",
+     "text": "Back at the room entry.",
+     "alternative": "Back where this room began.",
+     "note": "Drops the word 'autosave', which is file language, and names a place the player recognises. After a blast death the sealed door makes it clear the puzzle is redone; no line needs to say so."
+    },
+    {
+     "id": "RESTORE_BEAT",
+     "where": "Status line after a knockdown before any save exists (the corridor beat snapshot), replacing 'Back at the start of this beat.'",
+     "text": "Back at the start of this stretch.",
+     "alternative": "Back a few steps. Nothing is saved yet.",
+     "note": "'Beat' is authoring jargon; 'stretch' is the player's view. The alternative also tells the player why they went back so little and nudges toward the first safe point."
+    },
+    {
+     "id": "NO_CHECKPOINT_NOTE",
+     "where": "Title-screen Continue note when no save exists, replacing 'No checkpoint yet. Reach a SAFE POINT to save.'",
+     "text": "No save yet. Hold USE at a SAFE POINT to secure and save.",
+     "alternative": "Nothing saved yet. The first SAFE POINT is past the corridor seal.",
+     "note": "Replaces 'checkpoint' with the ritual the game now teaches and the verb it uses on every input. The alternative gives the place instead of the action for players who have already played the corridor once."
+    },
+    {
+     "id": "WOLF_DEATH_REACTION_DISCLOSE",
+     "where": "Narrator gesture shown as the death sequence plays, when the relay memory is DISCLOSE: WOLF rushes in and stays. Presentation only; he never rescues.",
+     "text": "WOLF comes in fast and does not leave.",
+     "alternative": "WOLF closes the distance and stays.",
+     "note": "Narrator action, not speech, so it works under the ringing tone. 'Does not leave' is the whole of the warmth. No touching, carrying or helping is described, keeping the engineer-only route identical under both choices."
+    },
+    {
+     "id": "WOLF_DEATH_REACTION_PRESS",
+     "where": "Narrator gesture during the death sequence when the relay memory is PRESS: WOLF holds at a distance and looks away.",
+     "text": "WOLF holds his distance and looks away.",
+     "alternative": "WOLF stops short. He does not look.",
+     "note": "Cool and pointed, never cruel: he stays in the room and stays present. 'Looks away' mirrors the IGNORE beats already approved for items."
+    },
+    {
+     "id": "WOLF_RESPAWN_DISCLOSE_1",
+     "where": "WOLF's first status line after the first retry in a session, relay memory DISCLOSE.",
+     "text": "WOLF: You went down. I stayed.",
+     "alternative": "WOLF: I'm still here. Go when you're ready.",
+     "note": "Six words, facts not feelings, no name. States his own choice ('I stayed') in his voice. The alternative hands pacing back to the player without advice."
+    },
+    {
+     "id": "WOLF_RESPAWN_DISCLOSE_2",
+     "where": "WOLF's line after the second retry in a session, relay memory DISCLOSE. From the third death on, WOLF_RESPAWN_LOOK is used instead.",
+     "text": "WOLF: Twice now. I'm not going anywhere.",
+     "alternative": "WOLF: Again. I'll stay as long as it takes.",
+     "note": "Counts to two only because he witnessed two; no score is kept or shown. Dry, warm, no exclamation mark. Capping at two keeps the lines from turning into comedy."
+    },
+    {
+     "id": "WOLF_RESPAWN_PRESS_1",
+     "where": "WOLF's first status line after the first retry in a session, relay memory PRESS.",
+     "text": "WOLF: You went down. I kept my distance.",
+     "alternative": "WOLF: That's once. I'm still at the back.",
+     "note": "Reports his own choice plainly, cool but not sulking: he is still in the room and still with the engineer. Never implies he could have helped, which would tie honesty to survival."
+    },
+    {
+     "id": "WOLF_RESPAWN_PRESS_2",
+     "where": "WOLF's line after the second retry in a session, relay memory PRESS. From the third death on, WOLF_RESPAWN_LOOK is used instead.",
+     "text": "WOLF: Twice. I'm still where I was.",
+     "alternative": "WOLF: Again. I won't go first.",
+     "note": "Same shape as the DISCLOSE tier so the contrast is in the stance, not the structure. The alternative restates his refusal boundary ('I won't') without blaming the engineer for the death."
+    },
+    {
+     "id": "WOLF_RESPAWN_LOOK",
+     "where": "Narrator text from the third retry onward in a session, under both relay memories.",
+     "text": "WOLF looks over once, and says nothing.",
+     "alternative": "WOLF glances across the room, then away.",
+     "note": "A single gesture that works for both stances: present under DISCLOSE, distant under PRESS, with no line to wear out. 'Says nothing' makes the silence deliberate rather than a missing line."
+    },
+    {
+     "id": "WOLF_STATION_CORRIDOR_DISCLOSE",
+     "where": "WOLF's station moment at the corridor safe point (x 876) on a completed hold, relay memory DISCLOSE: he settles beside the engineer.",
+     "text": "WOLF lies down beside %s, eyes on the seal.",
+     "alternative": "WOLF: I'll sit with you a moment.",
+     "note": "A gesture so it never competes with the first-use tutorial and the checkpoint callback already shown here. 'Eyes on the seal' keeps him alert, not domestic. The alternative is his one authored line if a voice is wanted at the first station."
+    },
+    {
+     "id": "WOLF_STATION_CORRIDOR_PRESS",
+     "where": "WOLF's station moment at the corridor safe point on a completed hold, relay memory PRESS: he keeps watch from the room edge.",
+     "text": "WOLF keeps watch at the open seal.",
+     "alternative": "WOLF: Save. I'll watch the seal.",
+     "note": "He stays useful and stays apart. No 'back turned' or 'without looking', which would tip from cool into cold at the very first safe point."
+    },
+    {
+     "id": "WOLF_STATION_RECORDS_DISCLOSE",
+     "where": "WOLF's station moment at the Records Access safe point (walkway, about x 690) on a completed hold, relay memory DISCLOSE.",
+     "text": "WOLF settles beside %s, facing the mirror.",
+     "alternative": "WOLF: Keep the copies close. I'll stay.",
+     "note": "'Facing the mirror' places him by the drive he worked, in the room's quiet-unease register. The alternative speaks in his sources-and-proof voice and states his own choice to stay, without saying the case is safe from the purge."
+    },
+    {
+     "id": "WOLF_STATION_RECORDS_PRESS",
+     "where": "WOLF's station moment at the Records Access safe point on a completed hold, relay memory PRESS.",
+     "text": "WOLF keeps watch from the exit, not looking back.",
+     "alternative": "WOLF: Secure it. I'll watch the exit.",
+     "note": "Pointed but practical: he guards the way out. The alternative is a terse order in his voice if a line is preferred; it never withholds help from essential progress."
+    },
+    {
+     "id": "WOLF_STATION_JUNCTION_DISCLOSE",
+     "where": "WOLF's station moment at the junction door lamp (about x 496) on a completed hold, relay memory DISCLOSE; the sentry lane lies beyond.",
+     "text": "WOLF settles close, eyes on the lane.",
+     "alternative": "WOLF: I'll stay in the light with you.",
+     "note": "Close and watchful in the room's most physical register. The alternative is his warmest authored line in the set and should be used only here, after the blast, where it has been earned."
+    },
+    {
+     "id": "WOLF_STATION_JUNCTION_PRESS",
+     "where": "WOLF's station moment at the junction door lamp on a completed hold, relay memory PRESS.",
+     "text": "WOLF keeps watch from the doorframe, outside the light.",
+     "alternative": "WOLF: Secure it. I'll hold the door.",
+     "note": "'Outside the light' is the distance made visible without a word of reproach. Both forms keep him at the door, clear of the lane, so the moment never affects the sentry beat."
+    }
+   ]
+  },
+  {
+   "entries": [
+    {
+     "id": "DEATH_CARD_BLAST",
+     "where": "Death card, cause line, after a door-blast death in the Service Junction (new _die_beat, cause 'blast').",
+     "text": "The door went with you in front of it. It stays down.",
+     "alternative": "The seal let go. The door did not stop for you.",
+     "note": "Cold and physical, 53 characters, no harm described. The second sentence states Nathanial's story choice that a blast death leaves the door blown open. The judged design still says a blast death retries at autosave A with the door sealed; the card line follows the later decision, so that retry rule needs a matching change."
+    },
+    {
+     "id": "DEATH_CARD_SENTRY",
+     "where": "Death card, cause line, after the sentry catches the engineer during a chase.",
+     "text": "The sentry ran you down in its lane. It did not slow.",
+     "alternative": "Caught in the lane. The sentry does not stop for anyone.",
+     "note": "Keeps 'ran you down' and 'its lane' from the existing SENTRY_REASON so the knockdown and death vocabulary match. 'It did not slow' is the machine's indifference, not gore."
+    },
+    {
+     "id": "DEATH_CARD_COOLANT",
+     "where": "Death card, cause line, after dwelling in the coolant cloud past the lethal threshold.",
+     "text": "You stayed in the coolant. Frost closed in; the air went.",
+     "alternative": "Too long in the cloud. The cold does not wait.",
+     "note": "Names the two warned effects (frost, choke) in facility terms without describing injury. Uses the semicolon the way the status lines do. 57 characters."
+    },
+    {
+     "id": "DEATH_CONTINUE_KEYBOARD",
+     "where": "Death card prompt line for keyboard; same format as the existing '%s  CONTINUE' with settings_menu.prompt(&\"interact\", false), so it reads 'E  RETRY' by default.",
+     "text": "%s  RETRY",
+     "alternative": "%s  GET UP",
+     "note": "RETRY is honest about what happens (the design has no rescue and no revive). GET UP has the harder physical edge but softens the death fiction; offered if Nathanial prefers the body language. The prompt appears only after the card's minimum delay, as the design states."
+    },
+    {
+     "id": "DEATH_CONTINUE_CONTROLLER",
+     "where": "Death card prompt line for controller; same format with settings_menu.prompt(&\"interact\", true), so it reads 'A  RETRY' on a default pad.",
+     "text": "%s  RETRY",
+     "alternative": "%s  GET UP",
+     "note": "Identical wording to the keyboard prompt so the card does not change meaning by device; only the glyph changes, matching how PAUSE and CONTINUE already work."
+    },
+    {
+     "id": "DEATH_CONTINUE_TOUCH",
+     "where": "Death card prompt line on touch, plus the touch USE button's text while the card is up (touch_use.text).",
+     "text": "TAP RETRY",
+     "alternative": "TAP GET UP",
+     "note": "Follows the existing 'TAP CONTINUE' pattern. The USE button itself should read RETRY (or GET UP) for the duration of the card, as it reads CONTINUE during the intro."
+    },
+    {
+     "id": "DEATH_CASE_DROPPED",
+     "where": "Death card, second line, shown only when unsecured evidence dropped at the death spot; sits beside the case-with-a-gap icon.",
+     "text": "The case fell where you did. Recover it before the next death.",
+     "alternative": "Unsecured evidence is on the floor where you fell. One chance.",
+     "note": "States the rule in one breath: location and the single-recovery window. 62 characters. No count of entries, so it never reads as a score."
+    },
+    {
+     "id": "CASE_LOST_NOTICE",
+     "where": "Status line (dialogue panel) at the retry after a second death with an unrecovered drop, when those entries become LOST.",
+     "text": "The dropped case is gone for good. Its entries read LOST.",
+     "alternative": "Second fall. The earlier drop is lost; the case says so.",
+     "note": "Honest and final, matching the design's 'shown in the case with its room, never hidden'. Avoids numbers and blame. Pairs with STATUS_LOST and CASE_IN_ROOM_FORMAT in the case list."
+    },
+    {
+     "id": "CAPTION_RINGING",
+     "where": "Caption shown during the death sequence while all sound ducks to the ringing tone (accessibility caption; plain text, no brackets).",
+     "text": "RINGING TONE",
+     "alternative": "THIN RINGING. EVERYTHING ELSE DROPS OUT.",
+     "note": "Plain caps text because the panel is a RichTextLabel and square brackets would be BBCode. The short form is the safest default for small screens; the longer form reads more like a subtitle track if Nathanial wants the duck described."
+    },
+    {
+     "id": "WARN_COOLANT_CHOKE",
+     "where": "Warning label over the engineer while inside the coolant cloud, before the lethal threshold; replaces the plain 'Coolant cloud. Get out of it.' hint during the dwell.",
+     "text": "CHOKING. GET OUT.",
+     "alternative": "FROST BUILDING",
+     "note": "Short caps so it reads in under a second during a 1 s dwell. The primary names the effect and the action; the alternative is the visual cue only. Either should ramp with the frost build-up rather than appear at once."
+    },
+    {
+     "id": "SAFE_POINT_LABEL_RECORDS",
+     "where": "Station label above the new Records Access safe point at about x 690-700 on the walkway to the exit (records_room.gd _add_station_label).",
+     "text": "SAFE POINT",
+     "alternative": "SAFE POINT  /  WALKWAY",
+     "note": "Same label as the corridor station so the ritual is recognisable on sight; the corridor teaches it, Records repeats it. Like PURGE COPIED, the label can flip to CASE SECURED after a hold (proposal, not in this list). The slash form only if two identical labels ever share a screen."
+    },
+    {
+     "id": "SAFE_POINT_LABEL_JUNCTION",
+     "where": "Station label for the emergency lamp in the blown doorframe at about x 496, lit only once door_blown is set (junction_room.gd).",
+     "text": "SAFE POINT",
+     "alternative": "SAFE POINT  /  LAMP",
+     "note": "Consistency over novelty: a player under pressure in the lane should not have to learn a new word. Before door_blown the label stays hidden with the lamp. The alternative names the prop if the plain label reads as a mistake in the doorframe."
+    },
+    {
+     "id": "SAFE_POINT_HOLD_PROMPT",
+     "where": "Contextual hint while in reach of any safe point, keyboard and controller; uses the existing 'HOLD E:' pattern, with 'E:' swapped for the active device's prompt as _hint already does.",
+     "text": "HOLD E: secure the case and save. Retry here.",
+     "alternative": "HOLD E: secure the case. Deaths return you here.",
+     "note": "Mirrors 'HOLD E: crank the valve' so the hold mechanic is recognisable. Lists the three outcomes the player cares about (secure, save, retry point) without numbers. On a controller the replacer yields 'HOLD A:'."
+    },
+    {
+     "id": "TOUCH_SECURE",
+     "where": "touch_use.text while _hold_station() is a safe point (the touch USE button).",
+     "text": "SECURE",
+     "alternative": "HOLD TO SECURE",
+     "note": "One word, as CRANK and DROP are. The longer form is only for a wider button; SECURE alone matches the ~1 s hold-and-release behaviour already explained by the hint."
+    },
+    {
+     "id": "SECURE_DONE",
+     "where": "Status line after a completed hold when at least one entry was unsecured (with the lock chirp).",
+     "text": "Case secured. Retry point set here.",
+     "alternative": "Secured. Nothing in the case can drop now.",
+     "note": "Confirms the two things that matter without counts. The alternative restates the rule for players who skipped the corridor tutorial."
+    },
+    {
+     "id": "SECURE_NOTHING_NEW",
+     "where": "Status line after a completed hold when every entry was already secured (the station still saves and rests).",
+     "text": "Nothing new to secure. Saved; retry point set here.",
+     "alternative": "The case is already secured. Saved here.",
+     "note": "Keeps the design's exact phrase 'Nothing new to secure.' and makes the save visible so the hold never feels wasted."
+    },
+    {
+     "id": "SECURE_TUTORIAL_FIRST_USE",
+     "where": "Status line at the corridor safe point on the first approach, before the first hold (the tutorial; replaces 'E: save at the safe point.').",
+     "text": "Safe point. Hold USE to secure the case and save. Evidence you have not secured drops where you fall.",
+     "alternative": "Hold USE here. Secured evidence stays with you; the rest can be lost.",
+     "note": "Teaches the one rule that has a cost, in the plain narrator voice. 'USE' is replaced per device by the existing 'Press E / Tap USE' substitution. The corridor has no hazards, so the warning lands before it can bite."
+    },
+    {
+     "id": "SAFE_POINT_REPEAT_LINE",
+     "where": "Status line for a repeat use of the corridor safe point; replaces the dead branch at main.gd:1163 ('Safe point saved. WOLF remembers the same choice.').",
+     "text": "Secured and saved. The seal stays open behind you.",
+     "alternative": "Saved again. The route ahead has not changed.",
+     "note": "Drops the trust-sounding 'remembers the same choice', which implied memory could change. States the physical fact instead. When nothing new was secured, SECURE_NOTHING_NEW should win over this line."
+    },
+    {
+     "id": "STATUS_SECURED",
+     "where": "Case list, per-entry status word (text plus a shape).",
+     "text": "SECURED",
+     "alternative": "KEPT",
+     "note": "Matches 'FIRST COPY SECURED' already in the game, so the word carries one meaning everywhere."
+    },
+    {
+     "id": "STATUS_UNSECURED",
+     "where": "Case list, per-entry status word for an entry picked up since the last safe point.",
+     "text": "UNSECURED",
+     "alternative": "AT RISK",
+     "note": "Plain negation of SECURED keeps the pair readable at a glance. AT RISK is more pointed but adds a new term."
+    },
+    {
+     "id": "STATUS_DROPPED",
+     "where": "Case list, per-entry status word for an entry lying in the dropped case; followed by CASE_IN_ROOM_FORMAT.",
+     "text": "DROPPED",
+     "alternative": "ON THE FLOOR",
+     "note": "Matches the design's own term and the death card. The alternative is more physical but too long for the list row on phones."
+    },
+    {
+     "id": "STATUS_LOST",
+     "where": "Case list, per-entry status word after a second death with an unrecovered drop; followed by CASE_IN_ROOM_FORMAT.",
+     "text": "LOST",
+     "alternative": "GONE",
+     "note": "Four letters, final, no softening. The case keeps the entry's name so the loss is visible, never hidden."
+    },
+    {
+     "id": "CASE_IN_ROOM_FORMAT",
+     "where": "Suffix after DROPPED or LOST in the case list; %s is the room label in caps (e.g. 'DROPPED in SERVICE JUNCTION').",
+     "text": "in %s",
+     "alternative": "— %s",
+     "note": "Lowercase 'in' lets the caps status and caps room name stay the two things the eye catches. The dash form is for a narrow column where the preposition wraps badly."
+    },
+    {
+     "id": "CASE_LEGEND",
+     "where": "One-line legend at the foot of the case panel.",
+     "text": "SECURED stays with you. UNSECURED drops where you fall. DROPPED can be recovered once. LOST is gone.",
+     "alternative": "Secure the case at a SAFE POINT. What is not secured drops where you fall, and can be recovered once.",
+     "note": "Four clauses, one per status word, in list order. No brackets, no numbers. The alternative is shorter and points at the fix rather than the states."
+    },
+    {
+     "id": "DROPPED_CASE_PROMPT",
+     "where": "Contextual hint in reach of the dropped case at the death spot (tap USE; the touch button can read TAKE).",
+     "text": "E: recover the dropped case.",
+     "alternative": "E: take the case back.",
+     "note": "Uses the hint's 'E:' pattern so the device swap works. 'Recover' matches the legend and card wording. If the drop sits inside the lane, the sentry hints should still win over this one while a chase is on."
+    },
+    {
+     "id": "DROPPED_CASE_TOAST",
+     "where": "Pickup toast after recovering the dropped case (reuses the pickup tap and toast slot).",
+     "text": "Recovered. Still unsecured.",
+     "alternative": "Stowed: CASE",
+     "note": "The primary warns in two words that recovery is not safety, which is the rule most likely to be misread. The alternative reuses the approved 'Stowed:' format if Nathanial wants one toast style only."
+    },
+    {
+     "id": "RESTORE_SAFE_POINT",
+     "where": "Status line on retry at a safe point (replaces 'Safe point restored.' as the lead when the retry point is a station).",
+     "text": "Back at the safe point. Nothing secured was touched.",
+     "alternative": "Safe point. The case holds what you secured.",
+     "note": "Keeps the design's 'Back at the safe point.' and adds the one reassurance that matters after a loss. The checkpoint callback can still follow it as today."
+    },
+    {
+     "id": "RESTORE_ROOM_ENTRY",
+     "where": "Status line on retry at a room-entry autosave (the lead sentence before the per-state 'Service junction restored...' detail).",
+     "text": "Back at the entry. The room is as it was when you came in.",
+     "alternative": "Room entry. Everything you secured is still with you.",
+     "note": "Replaces the mechanical 'restored' with a physical position. The existing per-state second sentences (arm the breaker, pop the bolt, and so on) can stay appended."
+    },
+    {
+     "id": "RESTORE_BEAT",
+     "where": "Status line when a death or knockdown restores beat_snapshot because no checkpoint exists yet.",
+     "text": "Back where this started. No save yet.",
+     "alternative": "Back at the start of the beat. Reach a SAFE POINT to save.",
+     "note": "Short, since this only happens before the corridor station. The alternative points at the fix, echoing NO_CHECKPOINT_NOTE."
+    },
+    {
+     "id": "NO_CHECKPOINT_NOTE",
+     "where": "Title screen Continue note and the fallback reason text (main.gd NO_CHECKPOINT_NOTE).",
+     "text": "No save yet. Hold USE at a SAFE POINT to secure the case and save.",
+     "alternative": "Nothing saved yet. Reach a SAFE POINT and hold USE.",
+     "note": "Rewords today's note for the hold ritual and names the case so the title screen already teaches the stake. 'USE' is replaced per device by the existing substitution."
+    },
+    {
+     "id": "WOLF_DEATH_REACTION_DISCLOSE",
+     "where": "Narrator gesture during the death sequence when the relay memory is DISCLOSE (he rushes in and stays); shown before the card. Presentation only.",
+     "text": "WOLF is there before the sound goes. He stays.",
+     "alternative": "WOLF: Get up.",
+     "note": "The gesture keeps him silent and close, which reads harder than words. The bark is two words with no exclamation mark; it is grief as an order and must never trigger a rescue."
+    },
+    {
+     "id": "WOLF_DEATH_REACTION_PRESS",
+     "where": "Narrator gesture during the death sequence when the relay memory is PRESS (he holds at a distance and looks away).",
+     "text": "WOLF holds at a distance and turns his head away.",
+     "alternative": "WOLF stops short. He does not look.",
+     "note": "Cool and pointed, not cruel: he does not leave. Both keep him out of reach so there is no mechanical difference between the two memories."
+    },
+    {
+     "id": "WOLF_RESPAWN_DISCLOSE_1",
+     "where": "WOLF's first line after the first death of the session, DISCLOSE memory.",
+     "text": "WOLF: You went down. I'm still here.",
+     "alternative": "WOLF: I watched that. Stay out of it this time.",
+     "note": "36 characters. Names the fact, then his own position, in his dry register. The alternative is more pointed about the hazard without naming it."
+    },
+    {
+     "id": "WOLF_RESPAWN_DISCLOSE_2",
+     "where": "WOLF's first line after the second death of the session, DISCLOSE memory (capped tier).",
+     "text": "WOLF: Twice. I can't carry you out of here.",
+     "alternative": "WOLF: That's twice. Keep off the mark.",
+     "note": "43 characters. States the design rule in his own mouth: he never rescues. The alternative references the floor mark, which the player has already been taught."
+    },
+    {
+     "id": "WOLF_RESPAWN_PRESS_1",
+     "where": "WOLF's first line after the first death of the session, PRESS memory.",
+     "text": "WOLF: I don't go in blind. You did.",
+     "alternative": "WOLF: You wanted it fast. That's what fast costs.",
+     "note": "35 characters. Ties back to his relay refusal ('I won't take that risk blind') so the sting is earned, not sulky. The alternative echoes 'Go now' as a cost."
+    },
+    {
+     "id": "WOLF_RESPAWN_PRESS_2",
+     "where": "WOLF's first line after the second death of the session, PRESS memory (capped tier).",
+     "text": "WOLF: That's twice. We can talk after.",
+     "alternative": "WOLF: Twice now. I'm still not going in blind.",
+     "note": "38 characters. Hands the engineer's own press line ('We can talk after') back, cold but not blocking. From the third death only WOLF_RESPAWN_LOOK plays."
+    },
+    {
+     "id": "WOLF_RESPAWN_LOOK",
+     "where": "Narrator text from the third death of the session onward, either memory.",
+     "text": "WOLF looks over once, then back to the lane.",
+     "alternative": "WOLF watches, and says nothing.",
+     "note": "A look only, so repeat deaths do not turn his lines into comedy. The primary names where his attention goes; the alternative is neutral enough for the pre-lane blast retry too."
+    },
+    {
+     "id": "WOLF_STATION_CORRIDOR_DISCLOSE",
+     "where": "WOLF's moment at the corridor safe point after a completed hold, DISCLOSE memory (he settles beside the engineer). At most one authored line.",
+     "text": "WOLF settles against the wall beside %s.",
+     "alternative": "WOLF: Quiet here. I'll stay close.",
+     "note": "The gesture carries the trust without a speech; %s is the runtime first name. The spoken alternative is 34 characters in his understated register."
+    },
+    {
+     "id": "WOLF_STATION_CORRIDOR_PRESS",
+     "where": "WOLF's moment at the corridor safe point after a completed hold, PRESS memory (he keeps watch from the room edge).",
+     "text": "WOLF keeps watch from the seal and does not sit.",
+     "alternative": "WOLF: I'll watch the seal from here.",
+     "note": "Pointed through posture: he stays useful but apart. Neither version blocks the next USE into Records."
+    },
+    {
+     "id": "WOLF_STATION_RECORDS_DISCLOSE",
+     "where": "WOLF's moment at the Records safe point after a completed hold, DISCLOSE memory.",
+     "text": "WOLF lies down beside %s and watches the exit.",
+     "alternative": "WOLF: It's quiet. I'll stay close.",
+     "note": "Conditioned only on position so it is true whether or not both traces are copied yet. The alternative reuses his established 'It's quiet' understatement."
+    },
+    {
+     "id": "WOLF_STATION_RECORDS_PRESS",
+     "where": "WOLF's moment at the Records safe point after a completed hold, PRESS memory.",
+     "text": "WOLF keeps watch from the hatch, back to %s.",
+     "alternative": "WOLF: I'll keep watch. Do what you need to.",
+     "note": "'Back to %s' is the pointed detail; he is still doing the job. The spoken alternative is cool but practical, never a refusal to continue."
+    },
+    {
+     "id": "WOLF_STATION_JUNCTION_DISCLOSE",
+     "where": "WOLF's moment at the junction door lamp after a completed hold, DISCLOSE memory; the sentry patrols beyond the rubble.",
+     "text": "WOLF settles beside %s under the lamp, eyes on the lane.",
+     "alternative": "WOLF: It's quiet under the lamp. Not past it.",
+     "note": "Close but alert, which fits the only station inside a hazard room. The line (44 characters) warns without pointing at a mechanic or promising cover."
+    },
+    {
+     "id": "WOLF_STATION_JUNCTION_PRESS",
+     "where": "WOLF's moment at the junction door lamp after a completed hold, PRESS memory.",
+     "text": "WOLF holds at the rubble and does not come under the lamp.",
+     "alternative": "WOLF: I'll hold at the rubble. Not here.",
+     "note": "Reuses his existing 'I'll hold at the rubble' so the refusal to settle sounds like him and leaves the lane rules unchanged."
+    }
+   ]
+  }
+ ],
+ "crits": [
+  {
+   "problems": [
+    {
+     "id": "RESTORE_ROOM_ENTRY",
+     "kind": "canon",
+     "issue": "The note says 'After a blast death the sealed door makes it clear the puzzle is redone', which follows the older judged design. The approved 2026-10-10 story choice (and this draft's own DEATH_CARD_BLAST 'where') is that a blast death leaves the door blown open on retry. The draft contradicts itself and the latest user decision.",
+     "fix": "Rewrite the note to the approved rule: the door is down on retry, the station lamp is lit, and no line needs to say the puzzle is redone because it is not."
+    },
+    {
+     "id": "DEATH_CARD_BLAST",
+     "kind": "canon",
+     "issue": "The note says the retry hint lives in the restore status line, which today is BLAST_REASON ('...Get left of the vent before the fuse ends.'). With the door blown open on retry there is no fuse to beat, so that hint is stale and sends the player left for nothing.",
+     "fix": "Propose a blast-death restore cause line that matches the new state, e.g. 'The door blew with you in front of it. It is down now; the sentry patrols past the rubble.' and keep BLAST_REASON only if the blown-door rule is dropped."
+    },
+    {
+     "id": "RESTORE_ROOM_ENTRY",
+     "kind": "clarity",
+     "issue": "'Back at the room entry.' is offered as the replacement for 'Back at the last autosave.' for 'autosave A or B', but autosave B is written after the blast with the engineer near the door and rubble, not at the entry. A vent knockdown or lane death restored to B (or to C) would be told it is at the room entry.",
+     "fix": "Branch the line by restore point: 'Back at the room entry.' only for autosave A; 'Back at the blown door.' (or 'Back where the door came down.') for B; keep the plain fallback 'Back at the last save.' for anything else."
+    },
+    {
+     "id": "SECURE_DONE",
+     "kind": "clarity",
+     "issue": "'Case secured. Deaths in this room return here.' is false at two of the three stations: the corridor and Records Access have no lethal hazards, and a junction death never returns to Records. It also introduces the word 'Deaths' while SECURE_TUTORIAL_FIRST_USE, CASE_LEGEND and the hold-prompt alternative use 'fall' for the same event.",
+     "fix": "Use the alternative ('The case is secured. Nothing in it can drop now.') at the corridor and Records, and a junction-only variant for the door lamp ('Case secured. Retries in this room start here.'). Settle on one word for death across all lines (see CASE_LEGEND)."
+    },
+    {
+     "id": "CASE_LEGEND",
+     "kind": "clarity",
+     "issue": "'Fall' is the draft's stand-in for death (CASE_LEGEND 'drops on a fall', SECURE_TUTORIAL 'A fall drops only...', CASE_LOST_NOTICE alt 'A second fall'), but the relief vent literally knocks the engineer down and costs nothing by design. Players knocked down by the vent will expect a drop, and the legend will read as wrong when nothing drops.",
+     "fix": "Pick a word the vent cannot share. WOLF already says 'You went down.', so 'goes down' works for death: 'UNSECURED drops when %s goes down.' Keep 'knocked down' only for the vent in VENT_REASON and its hint."
+    },
+    {
+     "id": "SECURE_TUTORIAL_FIRST_USE",
+     "kind": "length",
+     "issue": "The 88-character prefix is followed by the two-line checkpoint callback (WOLF: You said \"...\" / I chose the relay. We made it.). The Story label is 715 px at 17 px with 67 px height, about three lines; a wrapped tutorial sentence plus the two callback lines will clip. 'Stay loose' also adds a third vocabulary when the case shows UNSECURED.",
+     "fix": "One short sentence using the status word, e.g. 'Case secured. New finds stay UNSECURED until the next safe point.' and show the callback on the same first use only if it still fits; otherwise move the callback to the second line of the following USE."
+    },
+    {
+     "id": "WOLF_STATION_CORRIDOR_DISCLOSE",
+     "kind": "length",
+     "issue": "At the corridor's first completed hold the tutorial line, the two-line checkpoint callback and this station gesture (same for WOLF_STATION_CORRIDOR_PRESS) all target one three-line dialogue box. The note says the gesture 'never competes' but it still has to be displayed somewhere.",
+     "fix": "State the rule: the corridor gesture is shown only on repeat holds, or only when the tutorial is not shown; at the first hold the callback is WOLF's moment."
+    },
+    {
+     "id": "CASE_LOST_NOTICE",
+     "kind": "length",
+     "issue": "After a retry the draft stacks a cause line (the existing REASON constant, second person), a RESTORE_* line, this LOST notice and a WOLF_RESPAWN_* line: four lines in a three-line box. The cause is also told twice in two registers (card: 'The sentry ran %s down'; restore: 'The sentry ran you down').",
+     "fix": "Show the LOST notice on the death card itself (the loss is committed on the first frame, so it is known there) beside the case icon, and after retry show only the restore line plus WOLF's line; drop the cause repeat on retry."
+    },
+    {
+     "id": "NO_CHECKPOINT_NOTE",
+     "kind": "length",
+     "issue": "'No save yet. Hold USE at a SAFE POINT to secure and save.' is 57 characters in the title's ContinueNote, a single-line 392 px label at 15 px with no autowrap and right alignment; the current 46-character note already fills most of it. 'USE' is also unnamed on keyboard before the tutorial has taught E.",
+     "fix": "Shorten and name the real input through settings_menu.prompt, e.g. 'No save yet. Hold %s at a SAFE POINT.' (keyboard E, controller A, touch USE), or the shorter alternative 'Nothing saved yet. The first SAFE POINT is past the corridor seal.' trimmed to fit."
+    },
+    {
+     "id": "CAPTION_RINGING",
+     "kind": "accessibility",
+     "issue": "'RINGING TONE' names a sound but not the cue that matters to a deaf or hard-of-hearing player: that every other sound has dropped out. The game has no caption system today, so this one label is the only audio information during the sequence, and it must survive the grey-to-dark drain and Reduced Motion.",
+     "fix": "Caption the change, not just the tone: 'SOUND DROPS TO A RINGING TONE' (29 characters), shown for the whole sequence in a high-contrast plain Label that stays legible over the drained screen and is identical under Reduced Motion."
+    },
+    {
+     "id": "WARN_COOLANT_CHOKE",
+     "kind": "accessibility",
+     "issue": "ALL CAPS in the context-hint panel breaks that panel's sentence-case convention ('Relief vent. Move off it before the gauge peaks.') and all-caps prose is slower to read, which matters with a 1.0-1.2 s lethal window. The line also does not say this hazard kills while the vent only knocks down, so it reads like the vent warning.",
+     "fix": "Sentence case, name the stake and tie it to the card: 'Coolant cloud. Get clear before the cold sets in.' Keep ALL CAPS for station labels only."
+    },
+    {
+     "id": "SAFE_POINT_HOLD_PROMPT",
+     "kind": "clarity",
+     "issue": "At the corridor station after checkpoint_reached a tap on USE enters Records and a hold secures and saves. 'HOLD E: secure the case and save here.' names only the hold, so the existing 'E: enter records access.' prompt and the tap input disappear from the hint.",
+     "fix": "A corridor-specific prompt that names both inputs: 'HOLD E: secure and save.  E: enter records access.' (the E: swap handles touch and controller); keep the plain hold prompt for Records and the junction lamp."
+    },
+    {
+     "id": "SAFE_POINT_REPEAT_LINE",
+     "kind": "clarity",
+     "issue": "'The next USE opens records access.' hardcodes USE. _set_dialogue only swaps 'Press E' and 'press 2', so keyboard players see USE (not E or their bound key) and controller players never see A.",
+     "fix": "Use the swapped shape: 'Secured and saved. Press E again to enter records access.' which already renders as Tap USE / Press A."
+    },
+    {
+     "id": "SAFE_POINT_LABEL_RECORDS",
+     "kind": "clarity",
+     "issue": "The alternative done-state label 'CASE SECURED' (also offered for the junction lamp) goes stale: unlike PURGE COPIED, securing is not permanent, and the next pickup makes the case UNSECURED again while the station still says CASE SECURED.",
+     "fix": "Keep SAFE POINT as the only label text and show use through the lamp tint; if a done state is wanted, make it about the station ('SAVED HERE') and clear it when a new entry is picked up."
+    },
+    {
+     "id": "WOLF_RESPAWN_PRESS_2",
+     "kind": "voice",
+     "issue": "The alternative 'WOLF: Again. I won't go first.' reads as his refusal to go ahead being tied to the death, which is the honesty-changes-survival implication the design rejects. The main line is fine.",
+     "fix": "Drop the alternative or use one that only states his position: 'WOLF: Again. I'm staying put.'"
+    },
+    {
+     "id": "SAFE_POINT_LABEL_JUNCTION",
+     "kind": "other",
+     "issue": "A 180 px station label centred at x 496 on the y 309 row sits between VALVE SPENT (centred 398) and ARM PANEL (centred 570); the centred glyphs are roughly 461-531 against 358-438 and 532-608, so the labels nearly touch and any wider font or longer alternative collides.",
+     "fix": "Give the lamp label its own row like the door label (DOOR_LABEL_Y) or a narrower label width, and add it to the geometry test with text extents, not just reach spans."
+    },
+    {
+     "id": "RESTORE_BEAT",
+     "kind": "other",
+     "issue": "The alternative 'Back a few steps. Nothing is saved yet.' is untrue in the one case the beat snapshot is actually used after a save exists: a failed autosave write (save_pending) leaves an older file on disk, so something is saved.",
+     "fix": "Keep the main line 'Back at the start of this stretch.' and drop the alternative, or reword it to 'Back a few steps. The last save did not write.' for the save_pending case only."
+    }
+   ]
+  },
+  {
+   "problems": [
+    {
+     "id": "SECURE_TUTORIAL_FIRST_USE",
+     "kind": "clarity",
+     "issue": "The note claims 'USE' is swapped per device, but _set_dialogue (main.gd:2036-2037) only replaces 'Press E' and 'press 2'. 'Hold USE' would reach keyboard and controller players unchanged, naming a touch button they do not have.",
+     "fix": "Keep the status line input-free ('Safe point. Secure the case here and save. Evidence you have not secured drops where you fall.') and let SAFE_POINT_HOLD_PROMPT carry the input through the hint's 'HOLD E:' replacer, or add a 'Hold USE' substitution built from settings_menu.prompt(&\"interact\", controller_active)."
+    },
+    {
+     "id": "NO_CHECKPOINT_NOTE",
+     "kind": "clarity",
+     "issue": "The title ContinueNote Label receives the constant verbatim (main.gd:274-275) with no device substitution, and the active device is not known on the title screen, so 'Hold USE' names the wrong input for keyboard and pad.",
+     "fix": "Stay input-free as today: 'No save yet. Secure the case at a SAFE POINT to save.' (or the alternative with 'hold USE' removed)."
+    },
+    {
+     "id": "RESTORE_BEAT",
+     "kind": "canon",
+     "issue": "No lethal hazard exists before the corridor station (all three are in the junction), so a death only falls to beat_snapshot when save_pending is set after a failed write. 'No save yet.' is then untrue; a save exists but did not write.",
+     "fix": "Name the real condition: 'Back at the start of this beat. The last save did not write; use a station to try again.' and keep the existing wording for vent knockdowns."
+    },
+    {
+     "id": "RESTORE_ROOM_ENTRY",
+     "kind": "canon",
+     "issue": "Autosave B is written wherever the engineer stood when the door blew (main.gd:1690), not at the entry, so 'Back at the entry' is wrong for sentry and cloud retries before the lamp station. With the approved blast story choice the door is down on a blast retry, so 'The room is as it was when you came in' contradicts the appended 'The door is down; the sentry patrols the lane' sentence.",
+     "fix": "Use 'Room entry. Everything you secured is still with you.' only for autosave A; give B a neutral lead such as 'Back at the last autosave. Everything you secured is still with you.' and drop 'as it was when you came in'."
+    },
+    {
+     "id": "DEATH_CASE_DROPPED",
+     "kind": "clarity",
+     "issue": "'The case fell where you did' says the whole case dropped, but SECURED entries stay with the engineer, and CASE is also the inventory's name (CASE_LEGEND, pause CASE button). The same collision runs through CASE_LOST_NOTICE ('The dropped case is gone for good'), DROPPED_CASE_PROMPT and DROPPED_CASE_TOAST.",
+     "fix": "Name what actually dropped: 'Unsecured evidence fell where you did. Recover it before the next death.', 'E: recover the dropped evidence.', 'The dropped evidence is gone for good. Its entries read LOST.' If Nathanial keeps 'dropped case' as the prop's name, say once in the tutorial that only unsecured entries fall."
+    },
+    {
+     "id": "WOLF_DEATH_REACTION_DISCLOSE",
+     "kind": "voice",
+     "issue": "The alternative 'WOLF: Get up.' is a bark, which the brief rules out, and an order followed by the engineer standing at the retry reads as WOLF causing the revive.",
+     "fix": "Drop the spoken alternative and keep the gesture, or use a statement with no command: 'WOLF: I'm here.'"
+    },
+    {
+     "id": "WOLF_RESPAWN_PRESS_1",
+     "kind": "voice",
+     "issue": "'I don't go in blind. You did.' and the alternative 'You wanted it fast. That's what fast costs.' present the death as the cost of the press choice, which reads as honesty changing survival and as blame over the engineer's body; the brief wants cool, never cruel.",
+     "fix": "Keep the sting on his own boundary: 'WOLF: I said I don't go in blind. Still true.' Alternative: 'WOLF: I hold at the rubble. That hasn't changed.'"
+    },
+    {
+     "id": "WOLF_RESPAWN_DISCLOSE_2",
+     "kind": "other",
+     "issue": "'Twice.', 'That's twice.' and 'Twice now.' (also WOLF_RESPAWN_PRESS_2 and both alternatives) speak the witnessed death count aloud, while the design says no death counter is ever shown.",
+     "fix": "If the no-counter rule is meant to cover dialogue too: 'WOLF: Again. I can't carry you out of here.' and 'WOLF: Again. We can talk after.' Otherwise record that WOLF's two-tier count is an accepted exception."
+    },
+    {
+     "id": "WOLF_STATION_RECORDS_DISCLOSE",
+     "kind": "canon",
+     "issue": "The Records station at x 690-700 is reachable before the mirror is resolved, while WOLF is at the mirror port (wolf_scouting, 'I'm still checking the drive'). 'WOLF lies down beside %s' and WOLF_STATION_RECORDS_PRESS 'keeps watch from the hatch' would pull him off the mirror and break that fiction. Records player text also calls the exit 'the exit', never 'the hatch'.",
+     "fix": "Gate both moments on mirror_trace_preserved (or not wolf_scouting); while he is on the mirror use 'WOLF stays on the mirror.' or no line. Change 'from the hatch' to 'from the exit'."
+    },
+    {
+     "id": "WOLF_STATION_JUNCTION_PRESS",
+     "kind": "canon",
+     "issue": "'WOLF holds at the rubble and does not come under the lamp' is false while he is baiting (wolf_baiting puts him in the lane at WOLF_BAIT_X) and after sentry_down, when he follows again.",
+     "fix": "Condition the line on not wolf_baiting and not state.sentry_down; otherwise stay silent. Apply the same gate to WOLF_STATION_JUNCTION_DISCLOSE's 'eyes on the lane'."
+    },
+    {
+     "id": "CAPTION_RINGING",
+     "kind": "accessibility",
+     "issue": "'RINGING TONE' names a sound but not the duck, so a deaf or hard-of-hearing player never learns that every other sound dropped out, which is the design's cue that this is a death and not a knockdown. The note also says the panel is a RichTextLabel; the dialogue Story node is a plain Label (main.tscn:339), so brackets would render, though keeping them out is still right for consistency.",
+     "fix": "Caption the change, not just the tone: 'ALL SOUND DROPS TO A THIN RINGING'. Keep it on screen for the whole sequence and the card, show it even when the mixer is muted, and correct the node note."
+    },
+    {
+     "id": "DEATH_CARD_SENTRY",
+     "kind": "clarity",
+     "issue": "The death card copies 'ran you down in its lane' word for word from SENTRY_REASON, which remains the knockdown line for non-chase contact (sentry_brain.touches fires on any contact, main.gd:1497-1498). The same words then announce two different outcomes.",
+     "fix": "Use the alternative 'Caught in the lane. The sentry does not stop for anyone.' for the death, or reword the knockdown reason when the chase-only kill is implemented."
+    },
+    {
+     "id": "DEATH_CARD_BLAST",
+     "kind": "canon",
+     "issue": "The alternative 'The seal let go' borrows the relief vent's established 'lets go' (VENT_REASON) and blurs it with the door's 'the seal goes'; 'The door did not stop for you' does not name the blast.",
+     "fix": "Alternative: 'The seal went with you in front of it. It stays down.' Keep the primary."
+    },
+    {
+     "id": "SAFE_POINT_HOLD_PROMPT",
+     "kind": "clarity",
+     "issue": "The fragment 'Retry here.' reads as an instruction to do something now rather than a statement of where deaths return you.",
+     "fix": "Prefer the alternative: 'HOLD E: secure the case. Deaths return you here.'"
+    },
+    {
+     "id": "CASE_LEGEND",
+     "kind": "length",
+     "issue": "About 100 characters for a one-line footer; at the 13 px station-label size on the 960x540 panel it wraps to two or three lines over the list.",
+     "fix": "Trim to one clause per word: 'SECURED stays. UNSECURED drops where you fall. DROPPED: one recovery. LOST is gone.' or use the shorter alternative."
+    },
+    {
+     "id": "DEATH_CONTINUE_KEYBOARD",
+     "kind": "clarity",
+     "issue": "The 'GET UP' alternative (also controller and touch) implies the engineer survives and stands where they fell, when the design returns them to a retry point with evidence dropped behind; it also does not name the action taken.",
+     "fix": "Drop GET UP and keep RETRY on all three devices."
+    },
+    {
+     "id": "DEATH_CARD_COOLANT",
+     "kind": "canon",
+     "issue": "The voice brief still states the sentry is non-lethal toward people on screen and the pair stay non-lethal; the approved design now makes the sentry, blast and cloud lethal. Later item text written from the brief (LOG_LANE and others) will contradict these cards.",
+     "fix": "Update the brief's safe_topics and tone lines to the approved design before any further item or log text is drafted; no change to the card itself."
+    }
+   ]
+  }
+ ],
+ "final": {
+  "entries": [
+   {
+    "id": "DEATH_CARD_BLAST",
+    "where": "Death card, cause line, after standing in the blast span when the fuse ends. On retry the door is blown open (approved 2026-10-10 story choice).",
+    "text": "The door went with %s in front of it.",
+    "alternative": "The seal went with %s in front of it. It stays down.",
+    "note": "Primary is the plain fact (37 chars plus name). The alternative states the story consequence on the card itself. Either way BLAST_REASON ('Get left of the vent before the fuse ends.') must not be shown on a death retry: with the door down there is no fuse to beat, and the existing door_blown detail at main.gd:1016 already tells the player where things stand. Keep BLAST_REASON only if the blast ever reverts to a knockdown."
+   },
+   {
+    "id": "DEATH_CARD_SENTRY",
+    "where": "Death card, cause line, after the sentry catches the engineer during a chase. SENTRY_REASON stays the non-chase knockdown line (sentry_brain.touches fires on any contact, main.gd:1497).",
+    "text": "The sentry caught %s in the lane. It did not slow.",
+    "alternative": "The sentry caught %s short of the rubble.",
+    "note": "'Caught' instead of 'ran down' so the card and the knockdown line (SENTRY_REASON 'ran you down') are not the same words for two outcomes. The alternative points at the fix (the rubble) without stating it. No contact or injury described."
+   },
+   {
+    "id": "DEATH_CARD_COOLANT",
+    "where": "Death card, cause line, after dwelling in the coolant cloud past the lethal threshold.",
+    "text": "The coolant cloud held %s too long.",
+    "alternative": "The cold set in before %s was clear of the cloud.",
+    "note": "Understatement does the work; 'the cold set in' ties to the frost warning without naming breathing or frostbite. Separate action: the voice brief's safe_topics and tone lines still say the sentry and the pair stay non-lethal; update the brief to the approved design before any further item or log text is drafted."
+   },
+   {
+    "id": "DEATH_CONTINUE_KEYBOARD",
+    "where": "Death card prompt on keyboard, context-hint slot, with settings_menu.prompt(&\"interact\", false) for %s (reads 'E  RETRY' by default). Shown only once the card accepts input.",
+    "text": "%s  RETRY",
+    "alternative": "%s  CONTINUE",
+    "note": "RETRY is honest (no rescue, no revive) and keeps CONTINUE for the title screen's save word. GET UP was dropped: it implies the engineer stands where they fell."
+   },
+   {
+    "id": "DEATH_CONTINUE_CONTROLLER",
+    "where": "Death card prompt on a controller, with settings_menu.prompt(&\"interact\", true) for %s (reads 'A  RETRY' on a default pad).",
+    "text": "%s  RETRY",
+    "alternative": "%s  CONTINUE",
+    "note": "Identical wording to keyboard so only the glyph changes by device, as PAUSE and CONTINUE already work."
+   },
+   {
+    "id": "DEATH_CONTINUE_TOUCH",
+    "where": "Death card prompt on touch, context-hint slot; touch_use.text reads RETRY while the card is up (as it reads CONTINUE during the intro).",
+    "text": "TAP RETRY",
+    "alternative": "TAP CONTINUE",
+    "note": "Mirrors 'TAP CONTINUE'. The Use button label joins the verb list USE / CRANK / DROP / CONTINUE / SECURE."
+   },
+   {
+    "id": "DEATH_CASE_DROPPED",
+    "where": "Death card, second line, only when unsecured entries dropped at the death spot; sits beside the case-with-a-gap icon.",
+    "text": "Unsecured evidence dropped where %s went down. Recover it once.",
+    "alternative": "Unsecured evidence dropped where %s went down.",
+    "note": "Names what actually dropped (secured entries stay with the engineer; CASE is the inventory's name) and the one-recovery rule in one breath. About 66 chars with a five-letter name; use the alternative if long display names push past 70 and let the legend carry the rule."
+   },
+   {
+    "id": "CASE_LOST_NOTICE",
+    "where": "Death card, third line (or replacing the dropped line) when a second death before recovery turns the earlier drop LOST. Shown on the card, not after retry, so the retry stack stays at a restore line plus WOLF's line.",
+    "text": "The earlier drop was not recovered. Its entries are LOST.",
+    "alternative": "The earlier drop is gone. The case lists it as LOST.",
+    "note": "Honest and final: no count, no 'forever', no blame. The room is shown inside the case entry (CASE_IN_ROOM_FORMAT), not here. The loss is committed on the first frame, so the card already knows it."
+   },
+   {
+    "id": "CAPTION_RINGING",
+    "where": "Caption shown for the whole death sequence and the card while all sound ducks to the ringing tone. High-contrast plain Label over the drained screen; identical under Reduced Motion; shown even when the mixer is muted.",
+    "text": "SOUND DROPS TO A RINGING TONE",
+    "alternative": "ALL SOUND DROPS TO A THIN RINGING",
+    "note": "Captions the change, not just the tone, so a deaf or hard-of-hearing player gets the cue that separates a death from a knockdown. Plain text, no brackets. Correction to the drafts: the dialogue Story node is a plain Label (main.tscn:339), so brackets would render, but keeping them out stays right for consistency with the case RichTextLabel."
+   },
+   {
+    "id": "WARN_COOLANT_CHOKE",
+    "where": "Context-hint panel text while the engineer is inside the cloud, replacing 'Coolant cloud. Get out of it.' for that span; ramps with the frost build-up.",
+    "text": "Coolant cloud. Get clear before the cold sets in.",
+    "alternative": "FROST BUILDING. GET CLEAR",
+    "note": "Real choice. The hint panel is sentence case ('Relief vent. Move off it before the gauge peaks.') and sentence case reads faster inside a 1.0-1.2 s window; the primary also says this hazard is worse than the vent and ties to the coolant card. Take the ALL-CAPS alternative only if the warning is drawn as a label over the engineer rather than in the hint panel."
+   },
+   {
+    "id": "SAFE_POINT_LABEL_RECORDS",
+    "where": "Station label above the new Records Access safe point at about x 690-700 on the walkway (records_room.gd _add_station_label, 13 px, 180 px wide).",
+    "text": "SAFE POINT",
+    "alternative": "SAVED HERE",
+    "note": "Keep the corridor's exact word so the ritual is recognisable on sight. If a done state is wanted after a hold, make it about the station (the alternative, tinted green like PURGE COPIED) and clear it when a new entry is picked up; CASE SECURED was dropped because it goes stale the moment the case is UNSECURED again."
+   },
+   {
+    "id": "SAFE_POINT_LABEL_JUNCTION",
+    "where": "Station label for the emergency lamp in the blown doorframe at about x 496, shown only once door_blown is set.",
+    "text": "SAFE POINT",
+    "alternative": "DOOR LAMP",
+    "note": "Same word as the other stations. Placement: a 180 px label on the y 309 row at x 496 nearly touches VALVE SPENT (centred 398) and ARM PANEL (570); give it a narrower width or its own row and add text extents to the geometry test. The alternative is only if Nathanial wants an unpowered label visible before the blast (dim grey like EXIT BOLTED), switching to SAFE POINT when the door is down."
+   },
+   {
+    "id": "SAFE_POINT_HOLD_PROMPT",
+    "where": "Context hint in reach of a safe point, keyboard and controller; 'E:' is swapped for the bound button or USE: by _hint. Primary for Records and the junction lamp; alternative for the corridor after checkpoint_reached, where a tap still enters Records.",
+    "text": "HOLD E: secure the case and save.",
+    "alternative": "HOLD E: secure and save.  E: enter records access.",
+    "note": "Both ship, by station. The corridor form keeps the existing 'E: enter records access.' hand-off visible next to the hold, so the tap input never disappears from the hint. The retry-point effect is stated at the junction lamp by SECURE_DONE's junction variant, not here, since no death can return to the corridor or Records."
+   },
+   {
+    "id": "TOUCH_SECURE",
+    "where": "touch_use.text while _hold_station() is a safe point; held about 1 s, letting go cancels.",
+    "text": "SECURE",
+    "alternative": "SAVE",
+    "note": "One verb like CRANK and DROP, and it teaches the status vocabulary. SAVE is plainer but hides the backing-up effect."
+   },
+   {
+    "id": "SECURE_DONE",
+    "where": "Status line after a completed hold that secured at least one new entry, with the lock chirp. Primary at the corridor and Records; alternative at the junction door lamp.",
+    "text": "The case is secured. Nothing in it can drop now.",
+    "alternative": "Case secured. Retries in this room start here.",
+    "note": "Both ship, by station. 'Deaths in this room return here' was false at the corridor and Records (no lethal hazards there), so only the junction lamp states the retry effect. No counts."
+   },
+   {
+    "id": "SECURE_NOTHING_NEW",
+    "where": "Status line after a completed hold with nothing new to secure; the save and rest still happen. At the corridor, append the Records hand-off (see SAFE_POINT_REPEAT_LINE).",
+    "text": "Nothing new to secure. Saved here.",
+    "alternative": "The case is already secured. Saved here all the same.",
+    "note": "Keeps the design's own phrase and makes the save visible so a cautious player is never told the hold was wasted."
+   },
+   {
+    "id": "SECURE_TUTORIAL_FIRST_USE",
+    "where": "Status line on the corridor safe point's first completed hold (first_visit), shown as the prefix above the existing two-line checkpoint callback in the three-line Story label.",
+    "text": "Case secured. New finds stay UNSECURED until the next safe point.",
+    "alternative": "Case secured and saved. Only UNSECURED finds can drop.",
+    "note": "One sentence (65 chars) using the status word, so the callback's two lines still fit the 715 px, three-line box. Input-free on purpose: _set_dialogue only swaps 'Press E' and 'press 2', so 'Hold USE' would reach keyboard and pad unchanged; the hold input lives in SAFE_POINT_HOLD_PROMPT. If play shows the callback clipping, move the callback to the next USE."
+   },
+   {
+    "id": "SAFE_POINT_REPEAT_LINE",
+    "where": "Status line for a repeat corridor hold, replacing the dead branch at main.gd:1163 ('Safe point saved. WOLF remembers the same choice.'). The next tap on USE still enters Records.",
+    "text": "Secured and saved. Press E again to enter records access.",
+    "alternative": "Nothing new to secure. Saved. Press E again to enter records access.",
+    "note": "Both ship: primary when something new was secured, alternative when nothing was. 'Press E' is the shape _set_dialogue already renders as Tap USE / Press A, so the hand-off works on every device. The old 'remembers the same choice' was dropped because it implied his memory could change."
+   },
+   {
+    "id": "STATUS_SECURED",
+    "where": "Case entry status word (text plus shape) for entries backed up at a safe point and for the derived traces.",
+    "text": "SECURED",
+    "alternative": "BACKED UP",
+    "note": "Matches FIRST COPY SECURED so the word carries one meaning everywhere."
+   },
+   {
+    "id": "STATUS_UNSECURED",
+    "where": "Case entry status word for entries picked up since the last safe point.",
+    "text": "UNSECURED",
+    "alternative": "LOOSE",
+    "note": "Direct negation so the pair reads as one switch; LOOSE only if rows are too narrow, at the cost of a second vocabulary."
+   },
+   {
+    "id": "STATUS_DROPPED",
+    "where": "Case entry status word for entries lying in the dropped evidence at the death spot, followed by CASE_IN_ROOM_FORMAT.",
+    "text": "DROPPED",
+    "alternative": "ON FLOOR",
+    "note": "Matches the card line. The alternative is more physical but loses the link to the card."
+   },
+   {
+    "id": "STATUS_LOST",
+    "where": "Case entry status word for entries made unrecoverable by a second death, followed by CASE_IN_ROOM_FORMAT.",
+    "text": "LOST",
+    "alternative": "GONE",
+    "note": "Final and plain; the entry's name stays listed so the loss is visible, never hidden. GONE only if a softer twice-dropped rule is chosen later."
+   },
+   {
+    "id": "CASE_IN_ROOM_FORMAT",
+    "where": "Suffix after DROPPED or LOST in the case list; %s is the room label in caps (MAINTENANCE CORRIDOR, RECORDS ACCESS, SERVICE JUNCTION).",
+    "text": "in %s",
+    "alternative": "/ %s",
+    "note": "Reads 'DROPPED in SERVICE JUNCTION'. The slash form matches the found-log separator if the row is set entirely in caps or the preposition wraps badly."
+   },
+   {
+    "id": "CASE_LEGEND",
+    "where": "One line at the foot of the case view explaining the four status words (RichTextLabel, no brackets).",
+    "text": "SECURED stays. UNSECURED drops when you go down. DROPPED: one recovery. LOST is gone.",
+    "alternative": "Secure the case at a SAFE POINT. UNSECURED finds drop when you go down; one recovery.",
+    "note": "82 chars, one clause per word in list order. 'Go down' is the one word the vent cannot share (a vent knockdown costs nothing), and WOLF uses the same phrase. Second person matches the existing REASON lines. The alternative teaches the action instead of defining LOST."
+   },
+   {
+    "id": "DROPPED_CASE_PROMPT",
+    "where": "Context hint in reach of the dropped-evidence prop at the death spot; 'E:' is swapped per device; the touch button can read TAKE as proposed for items. Sentry hints still win during a chase.",
+    "text": "E: recover the dropped evidence.",
+    "alternative": "E: pick up the dropped evidence.",
+    "note": "'Recover' matches the card and legend. Use the alternative only if 'recover' reads as more than one tap."
+   },
+   {
+    "id": "DROPPED_CASE_TOAST",
+    "where": "Toast on recovering the dropped evidence (reuses the pickup tap and toast slot).",
+    "text": "Recovered. Still UNSECURED.",
+    "alternative": "Stowed: CASE",
+    "note": "Real choice. The primary warns in three words that recovery is not securing, the rule most likely to be misread. The alternative keeps a single toast style ('Stowed: NAME') if that matters more; then SECURE_TUTORIAL_FIRST_USE is the only place the rule is taught."
+   },
+   {
+    "id": "RESTORE_SAFE_POINT",
+    "where": "Status line after a death retry at a used safe point; followed by WOLF's respawn line. The cause is not repeated here (the card carried it).",
+    "text": "Back at the safe point. Everything secured is still with you.",
+    "alternative": "Back at the safe point.",
+    "note": "The second sentence is the one reassurance that matters after a drop. The existing 'Safe point restored.' line at main.gd:1029 stays for Continue from the title."
+   },
+   {
+    "id": "RESTORE_ROOM_ENTRY",
+    "where": "Status line after a death retry at a junction autosave, replacing 'Back at the last autosave.' (main.gd:1766). Primary for autosave A (entry, including a blast retry); alternative for autosave B, which is written wherever the engineer stood when the door blew. The existing per-state detail sentences (main.gd:1012-1018) stay appended.",
+    "text": "Back at the room entry.",
+    "alternative": "Back at the last save.",
+    "note": "Both ship, branched by restore point. With the approved blast rule the door is down on retry and the door_blown detail ('The door is down; the sentry patrols the lane past the rubble.') already says so, so no line claims the puzzle is redone and 'as it was when you came in' was dropped."
+   },
+   {
+    "id": "RESTORE_BEAT",
+    "where": "Status line after a knockdown or death that falls back to beat_snapshot. Primary for a vent knockdown before any save; alternative when the fallback is a failed autosave write (save_pending).",
+    "text": "Back at the start of this stretch.",
+    "alternative": "Back a few steps. The last save did not write.",
+    "note": "Both ship, by condition. 'Beat' is authoring jargon. No lethal hazard exists before the corridor station, so after a death this path only fires on a failed write, where 'No save yet' would be untrue; SAVE_FAILED_HINT still names the retry."
+   },
+   {
+    "id": "NO_CHECKPOINT_NOTE",
+    "where": "Title-screen ContinueNote (single-line 392 px Label at 15 px, right-aligned, no device substitution) and the fallback reason text, replacing 'No checkpoint yet. Reach a SAFE POINT to save.'",
+    "text": "No save yet. Secure the case at a SAFE POINT.",
+    "alternative": "Nothing saved yet. Reach a SAFE POINT.",
+    "note": "45 chars, one short of today's note, and input-free because the title screen does not know the device. The alternative is shorter if the line still clips on a narrow layout."
+   },
+   {
+    "id": "WOLF_DEATH_REACTION_DISCLOSE",
+    "where": "Narrator gesture during the death sequence, relay memory DISCLOSE: WOLF rushes in and stays. Presentation only; he never rescues.",
+    "text": "WOLF comes in fast and does not leave.",
+    "alternative": "WOLF is there before the sound goes. He stays.",
+    "note": "Both are narrator action, so they work under the ringing tone and can never read as him causing the retry. The spoken bark 'Get up.' was dropped: the brief rules out barking and an order followed by the retry reads as a revive. No touching or carrying is described."
+   },
+   {
+    "id": "WOLF_DEATH_REACTION_PRESS",
+    "where": "Narrator gesture during the death sequence, relay memory PRESS: WOLF holds at a distance and looks away.",
+    "text": "WOLF holds his distance and looks away.",
+    "alternative": "WOLF stops short. He does not look.",
+    "note": "Cool and pointed, never cruel: he stays in the room. Both keep him out of reach so the two memories differ only in presentation."
+   },
+   {
+    "id": "WOLF_RESPAWN_DISCLOSE_1",
+    "where": "WOLF's status line after the first retry of a session, relay memory DISCLOSE; shown under the restore line.",
+    "text": "WOLF: You went down. I stayed.",
+    "alternative": "WOLF: I'm still here. Go when you're ready.",
+    "note": "Facts, not feelings, in his register. The alternative hands pacing to the player without advice."
+   },
+   {
+    "id": "WOLF_RESPAWN_DISCLOSE_2",
+    "where": "WOLF's line after the second retry of a session, DISCLOSE. From the third death on, WOLF_RESPAWN_LOOK is used instead.",
+    "text": "WOLF: Again. I'm not going anywhere.",
+    "alternative": "WOLF: Again. I can't carry you out of here.",
+    "note": "'Again' instead of 'Twice' so no death count is ever spoken, in keeping with the no-counter rule. The alternative puts the no-rescue rule in his own mouth. If Nathanial accepts a spoken two-tier count as an exception, 'Twice now.' can replace 'Again.' here and in PRESS_2."
+   },
+   {
+    "id": "WOLF_RESPAWN_PRESS_1",
+    "where": "WOLF's status line after the first retry of a session, relay memory PRESS.",
+    "text": "WOLF: You went down. I kept my distance.",
+    "alternative": "WOLF: I said I don't go in blind. Still true.",
+    "note": "Reports his own choice; never implies he could have helped, which would tie honesty to survival. The alternative keeps the sting on his relay boundary, not on the engineer's body."
+   },
+   {
+    "id": "WOLF_RESPAWN_PRESS_2",
+    "where": "WOLF's line after the second retry of a session, PRESS. From the third death on, WOLF_RESPAWN_LOOK is used instead.",
+    "text": "WOLF: Again. I'm still where I was.",
+    "alternative": "WOLF: Again. We can talk after.",
+    "note": "Same shape as the DISCLOSE tier so the contrast is the stance. The alternative hands the engineer's own press line back, cold but not blocking; 'I won't go first' was dropped because it ties his refusal to the death."
+   },
+   {
+    "id": "WOLF_RESPAWN_LOOK",
+    "where": "Narrator text from the third retry of a session onward, under both relay memories.",
+    "text": "WOLF looks over once, and says nothing.",
+    "alternative": "WOLF looks over once, then back to the lane.",
+    "note": "One gesture for both stances with no line to wear out. The primary is neutral enough for a pre-lane retry; the alternative only fits once the lane is live."
+   },
+   {
+    "id": "WOLF_STATION_CORRIDOR_DISCLOSE",
+    "where": "WOLF's station moment at the corridor safe point (x 876) on a completed hold, DISCLOSE. Shown on repeat holds only: at the first hold the tutorial line and the two-line checkpoint callback fill the box and the callback is his moment.",
+    "text": "WOLF lies down beside %s, eyes on the seal.",
+    "alternative": "WOLF: Quiet here. I'll stay close.",
+    "note": "'Eyes on the seal' keeps him alert, not domestic. The alternative is his one authored line if a voice is wanted here."
+   },
+   {
+    "id": "WOLF_STATION_CORRIDOR_PRESS",
+    "where": "WOLF's station moment at the corridor safe point on a completed hold, PRESS. Repeat holds only, as above.",
+    "text": "WOLF keeps watch at the open seal.",
+    "alternative": "WOLF: I'll watch the seal from here.",
+    "note": "Useful and apart; no 'back turned' at the very first station so cool does not tip into cold."
+   },
+   {
+    "id": "WOLF_STATION_RECORDS_DISCLOSE",
+    "where": "WOLF's station moment at the Records safe point (about x 690) on a completed hold, DISCLOSE. Gate on mirror_trace_preserved (not wolf_scouting); while he is still on the drive show 'WOLF stays on the mirror.' or nothing.",
+    "text": "WOLF settles beside %s, eyes on the exit.",
+    "alternative": "WOLF: Keep the copies close. I'll stay.",
+    "note": "The station is reachable while he is at the mirror port, so the gate keeps 'I'm still checking the drive' true. 'It's quiet' was avoided so his SERVICE LINE CLEARED understatement stays unspent."
+   },
+   {
+    "id": "WOLF_STATION_RECORDS_PRESS",
+    "where": "WOLF's station moment at the Records safe point on a completed hold, PRESS. Same gate as the DISCLOSE moment.",
+    "text": "WOLF keeps watch from the exit, not looking back.",
+    "alternative": "WOLF: I'll watch the exit. Do what you need to.",
+    "note": "'The exit' is the room's own word (never 'the hatch' in Records). Pointed but practical; never a refusal to continue."
+   },
+   {
+    "id": "WOLF_STATION_JUNCTION_DISCLOSE",
+    "where": "WOLF's station moment at the junction door lamp (about x 496) on a completed hold, DISCLOSE. Condition on not wolf_baiting and not state.sentry_down; after the sentry is down drop the lane clause ('WOLF settles close under the lamp.').",
+    "text": "WOLF settles under the lamp, eyes on the lane.",
+    "alternative": "WOLF: I'll stay in the light with you.",
+    "note": "Close and watchful in the room's most physical register. The alternative is the warmest line in the set and belongs only here, after the blast, where it is earned."
+   },
+   {
+    "id": "WOLF_STATION_JUNCTION_PRESS",
+    "where": "WOLF's station moment at the junction door lamp on a completed hold, PRESS. Condition on not wolf_baiting and not state.sentry_down; otherwise silent.",
+    "text": "WOLF holds at the doorframe, out of the light.",
+    "alternative": "WOLF: I'll hold at the rubble. Not here.",
+    "note": "'Out of the light' is the distance made visible without reproach, and keeps him clear of the lane so the moment never touches the sentry beat. The alternative reuses his existing 'I'll hold at the rubble' so the refusal sounds like him."
+   }
+  ]
+ }
+}

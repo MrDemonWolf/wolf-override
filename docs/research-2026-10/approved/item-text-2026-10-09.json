@@ -1,0 +1,1142 @@
+{
+ "brief": {
+  "voice_rules": [
+   "Every line is a DRAFT for Nathanial to approve item by item. Nothing spawns or ships until he signs off (approved=false never spawns).",
+   "ITEM NAMES: ALL CAPS, matching the station labels (PURGE COPIED, MIRROR PORT, ARM PANEL). Use a 2-4 word concrete noun phrase of 24 characters or fewer, so it fits a 64 px list row at 960x540 and on phones. Name the physical thing or record type, never its meaning (e.g. 'BREAKER TAG', not 'PROOF OF ...').",
+   "EXAMINE TEXT: 1-3 short sentences, about 220 characters at most, in present tense and the plain observational narrator voice of the status lines ('The breaker catches. Blue light fills the coolant relay; the red seal stays shut.'). Lead with one concrete physical detail (material, wear, where it sits, what the screen shows). Then give at most one quiet wrong note. Do not stack adjectives, use purple prose or explain the detail.",
+   "Narrator sentences are short and declarative, mostly 12 words or fewer, with semicolons used as the status lines use them. No exclamation marks, rhetorical questions, second-person 'you feel' lines or jokes at anyone's expense.",
+   "FOUND LOGS (LOG_CORRIDOR, LOG_LANE, DATA_RECORDS) read as machine or facility text copied off a screen. Use an ALL-CAPS header with ' / ' separators, like the existing 'DIRECTOR / PURGE', 'RECORDS ACCESS / FIRST COPY' and '03:17 / CONTAINMENT'. Follow it with 2-4 terse system lines (status, queue, retention, fault, patrol and lockdown notices), then at most one narrator sentence on what the engineer notices. Machines report; they never editorialise.",
+   "Times are clock times only (HH:MM, 24-hour), never dates or years, and must stay consistent with the 03:17 containment card. Do not invent the purge order's actual time, the target ID's value or any other canon number. If a value must appear, mask it (for example '••••') and flag it for Nathanial.",
+   "Avoid literal square brackets in shipped text: the case uses a RichTextLabel, where '[' is BBCode and must be escaped. Show removed or redacted content with a word such as 'REMOVED' or 'NO RECORD', or with a dash.",
+   "Hint, never reveal. An item may show that records are being removed, that a time or order does not line up, that a lockdown is out of the ordinary, or that someone left in a hurry. It never says who, why or what happened before. Each item carries one small question and no answer.",
+   "Tone climbs room by room: corridor is strange and procedural; Records Access is quiet unease (absence, deletion, things kept that should not be); Service Junction is more serious and physical (damage, pressure, a machine that hunts). Show horror through concrete wrongness. No gore, bodies or harm to people: the pair stays non-lethal and the sentry is a machine.",
+   "The engineer is 'the engineer' or the runtime name template (state.human_name() first word, written as %s). Never hardcode 'Rowan', never use he/she for them, and avoid pronouns for the engineer where you can.",
+   "Refer to staff only by role (shift crew, maintenance, security, the Director) and never invent names: supporting-cast names are unapproved candidates. Do not attribute a log to a records-keeping or safety worker or to anyone trying to save records (see forbidden reveals).",
+   "Items are never spent, required or counted. No text may promise a future use ('this will matter later'), suggest completion ('1 of 5'), grade the player, or imply a moral score.",
+   "The TOOL_A text describes only the physical object and how it seats on a valve wheel. It must not promise speed, fewer turns or an easier route, because the turn count stays at 3 until the junction has been played.",
+   "WOLF's item reactions are optional flavour, never information the player needs. A NOTICE line is one WOLF line of 60 characters or fewer with the 'WOLF:' prefix. An IGNORE beat is a narrator line describing his action (e.g. 'WOLF keeps his eyes on the hatch.'), never WOLF speech. Neither may hint where an item is (he is not a detector), and he never fetches, carries or touches it.",
+   "Each WOLF reaction needs three states. Before the relay choice (memory empty) he is neutral or silent; this matters for LOG_CORRIDOR, which sits before the relay. After 'disclose' (The relay may vent coolant. Your call.) he NOTICES. After 'press' (Go now. We can talk after.) he POINTEDLY IGNORES, cool but never cruel and never sulky enough to block play.",
+   "The derived records (REC_PURGE, REC_MIRROR) must agree word for word with the existing station copy and status lines: purge-order trace, time and target ID, local copy, original logs still missing, mirror index, mirror timestamp, maintenance port, WOLF's readout, and 'the purge target existed before the deletion order'. Add nothing to these facts. REC_MIRROR may vary its last line by mirror_route ('wolf' or 'manual').",
+   "Deliver each item as: NAME, a kind tag (RECORD / LOG / DATA / PRINT / OBJECT / TOOL), examine text, an optional 'Found in' line (room name in caps, e.g. RECORDS ACCESS), a WOLF NOTICE line and a WOLF IGNORE beat. Offer 2 alternatives per item so Nathanial can choose."
+  ],
+  "established_terms": [
+   "WOLF (always caps; 'he/him'; an independent companion, never 'unit', 'it' or 'the robot' in narration)",
+   "the Director; speaker tag 'DIRECTOR'; terminal header 'DIRECTOR / PURGE'",
+   "the engineer (role); runtime name via %s from state.human_name(); speaker tag is the first name in caps",
+   "threat / threats; 'people he calls threats'; 'I decide who counts as a threat'",
+   "purge, purge display, purge order, purge-order trace, purge queue, 'PURGE QUEUE' / 'PURGE COPIED', deletion order, 'marked for deletion'",
+   "time and target ID; 'the purge target'",
+   "original program logs, original logs, source record, 'the source', local copy",
+   "mirror port, mirror index, mirror drive, mirror timestamp, 'MIRROR PORT' / 'MIRROR COPIED'",
+   "WOLF's readout ('USE WOLF'S READOUT'), maintenance port / manual port ('USE MANUAL PORT')",
+   "first copy, 'FIRST COPY SECURED', 'COPY PURGE ORDER', 'COPY MIRROR INDEX'",
+   "Records Access, 'RECORDS ACCESS / FIRST COPY'",
+   "Archive (the next destination; name only, no contents)",
+   "service line, Service Junction, 'SERVICE LINE CLEARED', 'The service line runs on'",
+   "maintenance, lockdown, 'MAINTENANCE / LOCKDOWN', 'CHAPTER 1 / LOCKDOWN', containment, standby, seal, '03:17 / CONTAINMENT'",
+   "corridor stations: BREAKER, COOLANT RELAY, SAFE POINT; 'coolant fault', live contact, live relay, manual bypass, red seal, safe point, checkpoint",
+   "relay choice texts: 'The relay may vent coolant. Your call.' (disclose) / 'Go now. We can talk after.' (press)",
+   "junction stations: OVERLOAD BREAKER, VALVE ('VALVE n / 3'), SEALED DOOR, ARM PANEL, EXIT BOLTED; states BREAKER LIVE / BREAKER TRIPPED / BREAKER SPENT, SEAL CHARGED, DOOR DOWN, TANK DOWN, ARM REWINDING",
+   "pressure line, gauge, relief vent, 'lets go', fuse, wheel, 'three real turns', crank, 'the wheel is stiff'",
+   "rubble, the sentry (in-game it is just 'the sentry', not 'purge sentry'), its lane, patrol, eyes snap red / go dark, alcove, floor mark",
+   "tank (stencilled COOLANT), clamp, winch, coolant cloud",
+   "exit bolt, hatch, spare overload, 'the panel whines', 'the bolt arcs and drops'",
+   "THE DEN (public facility name); do not add new place names",
+   "Pause labels: SESSION PAUSED, RESUME, SETTINGS, RETURN TO TITLE; proposed CASE button (the name is pending Nathanial's choice)",
+   "Touch verbs: USE, CRANK, DROP, CONTINUE; proposed TAKE / READ / COPY when in reach of an item",
+   "Toast format proposed in the design: 'Logged: NAME'"
+  ],
+  "wolf_voice": "WOLF speaks in first person, in short plain declaratives that average 4-10 words, with contractions (\"I'm\", \"won't\", \"It's\", \"I'll\"). He states his own choices and boundaries outright (\"I won't take that risk blind.\" \"I said no.\" \"I'll hold at the rubble.\") and asks practical questions when he needs information (\"What happens if I touch the live relay?\" \"How do we bring it down?\"). He cares about sources and proof over labels (\"They want the source record gone.\" \"A list doesn't tell me who's a threat. I want the source.\"). His dry understatement carries the feeling (\"It's quiet now.\" \"Open. I'm with you.\"), and he names facts rather than emotions. He addresses the engineer as \"you\" and almost never by name, and he does not flatter, joke, bark, whine or call anyone master or owner. He never uses exclamation marks. He can thank (\"Thank you for telling me.\") and can refuse without apology. A NOTICE line sounds like him registering something useful or troubling in one breath. It names the thing, not its meaning, and stays under 60 characters, for example: \"WOLF: That tag's been signed twice.\" or \"WOLF: Keep that. Someone wanted it gone.\" An IGNORE beat is never WOLF speech. It is a narrator line of action that is cool and pointed but not cruel, showing he is still stung by being pressed, for example: \"WOLF looks past it, toward the hatch.\" or \"WOLF doesn't turn.\" Before the relay choice he has no stance, so stay neutral or silent. He never points out an item's location, picks it up, carries it, or tells the engineer they must take it.",
+  "safe_topics": [
+   "Routine facility maintenance: work orders, breaker tags, lockout cards, coolant handling notices, valve service stamps, shift handover notes written in role-only voice",
+   "The lockdown as procedure: lockdown notices, doors sealing on schedule, a shift interrupted mid-task (abandoned tools, a cooling mug, a jacket left on a hook), with no account of where people went",
+   "The purge as a running machine process: deletion queues, retention flags, 'marked for deletion', progress counters, overwrite notices, plus the fact that original logs are going missing",
+   "Small inconsistencies that raise a question without answering it: an entry with no author, a timestamp out of order, a record copied somewhere it shouldn't be, a field left blank",
+   "The Director's authority as already shown in-game: he decides who counts as a threat and he ordered the lockdown. Use only what the existing lines already say.",
+   "WOLF's containment as a physical place already seen in the opening: the seal, the gate, standby lights. Show these through equipment only, never his internal experience.",
+   "The sentry as a security machine: patrol logs, fault codes, lane boundaries, recalibration notices, servo wear. It is non-lethal toward people on screen, and no victims are shown.",
+   "Coolant, pressure and power hazards: gauge readings, relief vent warnings, overload notices, scorch marks, dents, frost, wet deck",
+   "The engineer's practical competence: maintenance-port access, knowing what a coolant fault means, recognising a valve fitting",
+   "Atmosphere: hum, dust outlines, flickering CRT text, condensation, something humming behind a sealed door (already in-game; keep it undefined)",
+   "Archive and the service line only as directions ('the line runs on toward Archive'), never their contents"
+  ],
+  "forbidden_reveals_abstract": [
+   "The identity, role, fate or even human/non-human nature of the purge target or of anyone on any list. Do not print the actual target ID or the actual time of the purge order; mask any such value and flag it.",
+   "Any earlier incident, prior operation, earlier victim or its outcome, and anything that dates the Director's wrongdoing to before the current night",
+   "How the Director's wrongdoing works: how threat classifications are assigned or altered, any falsified or cleaned-up report, or what the missing original logs actually contain",
+   "Any person who previously saved or protected records, any insider ally or witness, and any first ordered target. Do not write a found log from such a person's point of view.",
+   "The Director's counter-story about WOLF (any framing of WOLF as a rogue or malfunctioning unit responsible for the breach or the corrupted list). Do not seed it in logs.",
+   "The Director's motive and how far beyond the program his targeting reaches",
+   "What WOLF exactly overheard, how his standby sensing works, and his private intentions toward the Director, beyond the existing in-game lines",
+   "WOLF's possible darker trajectory (revenge, collective punishment) and any reading of his changing appearance as evil",
+   "Any ending or late-story beat: voluntary shutdown or sacrifice, takeover, the sunrise or petting payoff, chosen-family resolution, a temporary separation and reunion",
+   "What lies past the junction door or the hatch, and what 'answers from the dark'. Keep it unnamed and unexplained.",
+   "Archive's contents, any investigator or authority who receives evidence, and any accountability outcome",
+   "Unapproved names and canon: supporting-cast name candidates, the WOLF acronym expansion, a final engineer name, a final chapter count. Use role titles and existing labels only.",
+   "Caution, not a hard ban: the engineer's prior history of servicing WOLF's own equipment. Leave it out unless Nathanial approves a hint.",
+   "Any implication that an item is required, that collecting affects WOLF's trust score, or that a choice is morally graded"
+  ],
+  "item_slots": [
+   {
+    "id": "REC_PURGE",
+    "kind": "RECORD (derived, never stored)",
+    "room": "Records Access",
+    "placement": "Appears in the case automatically when purge_trace_preserved is true (copied at the PURGE QUEUE station, x≈190). It has no prop and no pickup. 'Found in' is RECORDS ACCESS.",
+    "purpose": "The first case entry, available with no new story text. NAME must echo the station wording, e.g. 'PURGE-ORDER TRACE' (state it in the PURGE COPIED / 'Copy the purge-order trace' vocabulary). Examine text restates only existing facts: the Director's purge order carries a time and a target ID; the engineer keeps a local copy; the original logs are still missing. It may add one concrete detail about the copy itself (the header line 'DIRECTOR / PURGE', masked fields), but no actual time or ID value and no claim about who or what the target is. WOLF reaction: none on collection (it is part of the critical path). An optional later annotation must stay at the level of 'a list isn't the source'."
+   },
+   {
+    "id": "REC_MIRROR",
+    "kind": "RECORD (derived, never stored)",
+    "room": "Records Access",
+    "placement": "Appears automatically when mirror_trace_preserved is true (MIRROR PORT, x≈520). Text varies by mirror_route: 'wolf' (WOLF's readout, he brought it by his own choice) or 'manual' (copied through the maintenance port while WOLF kept watch). 'Found in' is RECORDS ACCESS.",
+    "purpose": "The second derived entry. NAME echoes the station wording, e.g. 'MIRROR TIMESTAMP' (or 'MIRROR INDEX'). Examine text keeps exactly the established fact: the mirror timestamp shows the purge target existed before the deletion order. It must not explain why that matters, put the timestamp in a wider chronology, or say what existed. Its final line credits the route honestly: WOLF's readout versus the engineer's maintenance port. The route line must not be framed as better or worse."
+   },
+   {
+    "id": "DATA_RECORDS",
+    "kind": "DATA or PRINT (first physical pickup; tap USE)",
+    "room": "Records Access",
+    "placement": "A secondary console or desk span at about x 300-420 (free span 248-462), between the PURGE QUEUE and the MIRROR PORT. It is hazard-free, it is the first pickup to build, and it must not overlap either station's USE reach.",
+    "purpose": "Teaches that the case holds more than the critical path, in the room's 'quiet unease' register. A small physical data object or printout (e.g. a fragment, a printed queue slip, a cartridge) that hints the deletion is not routine or that something was kept that should not have been. It never names the target and never sets a chronology. It carries a NOTICE and an IGNORE variant for WOLF; he is usually nearby here because he works the mirror. It must work as the very first item a player ever examines: self-explanatory and short."
+   },
+   {
+    "id": "LOG_CORRIDOR",
+    "kind": "LOG (copied from a wall screen; hold USE)",
+    "room": "Maintenance corridor",
+    "placement": "A small wall screen in the free span between the BREAKER and the COOLANT RELAY, about x 440-520 (free span 402-553). The relay contact is at x 592. The player often reaches it BEFORE the relay choice, so WOLF's memory may be empty.",
+    "purpose": "The 'strange' register: a procedural lockdown or maintenance screen log that makes the facility feel like a working place interrupted at 03:17-ish. It should include machine lines about the lockdown, the coolant fault or the purge's progress, and at most one quietly odd line. It must sit beside the purge display text without repeating it. Its WOLF reaction needs a neutral or silent pre-choice state, plus the notice and ignore variants if the player returns after the choice. This screen's live readout wording is also story text for Nathanial."
+   },
+   {
+    "id": "OBJECT_CORRIDOR",
+    "kind": "OBJECT (examinable artefact; tap USE)",
+    "room": "Maintenance corridor",
+    "placement": "On the floor or a ledge just before the red seal, about x 690-740, past the relay contact (x 592) and short of the safe point. It is reached after the relay outcome, so WOLF's memory is always set here.",
+    "purpose": "A personal or procedural artefact left behind when the lockdown hit (role-only, no name), adding human texture and the first touch of unease. The WOLF reaction is the clearest relay payoff in the slice: after disclose he notices it with one line; after press he pointedly looks away. No harm to people is implied."
+   },
+   {
+    "id": "OBJECT_JUNCTION",
+    "kind": "OBJECT (examinable artefact; tap USE)",
+    "room": "Service Junction",
+    "placement": "At the junction entry, about x 40-140 (free span to about 148, entry x 80), left of the OVERLOAD BREAKER (x 200), outside the relief vent's reach (x 300). It is collectable before the pressure-line hazard starts.",
+    "purpose": "Shifts the tone toward the junction's more serious, physical register: damage, pressure, evidence that this line was worked hard or left in a hurry, or a hint that the sealed door was sealed deliberately. It must not explain what is behind the door ('something hums behind it' stays undefined). It gets a WOLF notice or ignore variant, but WOLF runs ahead to the seam at the beat start, so keep the reaction optional and short."
+   },
+   {
+    "id": "LOG_LANE",
+    "kind": "LOG (copied from a screen or panel in the lane; hold USE)",
+    "room": "Service Junction",
+    "placement": "Inside the sentry's lane past the rubble. It spawns only once sentry_down is true, so it is never collectable under threat. Its reach must not overlap the ARM PANEL alcove, the floor mark, the coolant-cloud span or the exit bolt (x 850).",
+    "purpose": "The slice's most serious log: the sentry's own patrol or fault record, or a purge or security notice tied to the lane. It may show that the machine was set to act on the purge and lockdown, and it carries one line that unsettles. It must not name targets, show the classification mechanism, frame WOLF as rogue, or mention any person being harmed. It is a reward for having dealt with the sentry, without gloating. It gets a WOLF notice or ignore variant; he holds near the rubble, so keep proximity in mind."
+   },
+   {
+    "id": "TOOL_A",
+    "kind": "TOOL (the one carried tool; permanent; visible on the hip; never spent)",
+    "room": "Maintenance corridor (collected) / Service Junction (used at the VALVE)",
+    "placement": "Proposed on the corridor floor between the BREAKER and the COOLANT RELAY (Option C put it at x≈470 in free span 402-553). That collides with LOG_CORRIDOR's x 440-520, so separate them, e.g. the tool at x≈410-430 and the screen at x≈500-520, and confirm with the pickup-overlap test. At the junction VALVE (x 420) it seats on the wheel, and each hold tick ratchets the 3 turns.",
+    "purpose": "A grounded maintenance hand tool (ratchet or valve-key type) whose name and examine text describe only its physical make, wear and fit on a valve stem. Facility markings are fine, but no owner's name. It must not promise speed or fewer turns, and must not hint that it will be needed. It needs a short in-world line for the first time it seats on the valve, plus the 'Stowed: NAME' or 'Logged: NAME' toast name. WOLF only notices or ignores it; he never hands it over."
+   }
+  ]
+ },
+ "drafts": [
+  {
+   "tone": "TERSE OPERATIONAL. These drafts read as maintenance tickets, lockout tags, queue printouts and sentry panels. Each one leads with a physical detail and gives a single quiet wrong note: no checkout, a print setting reading OFF, a scratched-out signing line, no stand-down code. The horror comes from what the procedure leaves out. The tone builds room by room. The corridor is procedural and odd, Records Access is about deletion and absence, and the Service Junction is about pressure, damage and a machine that cannot be called off. Every line is a draft for Nathanial to approve one item at a time, and approved=false never spawns. There are two options per slot (.A and .B). None of the text uses square brackets, names a person, refers to the engineer with a pronoun, promises a later use or gives a count. WOLF's notice lines are 40 characters or fewer, and his ignore beats are narrator lines, not speech.",
+   "items": [
+    {
+     "id": "REC_PURGE.A",
+     "name": "PURGE-ORDER TRACE",
+     "kind_tag": "RECORD",
+     "examine": "DIRECTOR / PURGE. The Director's purge order has a time and target ID; %s keeps a local copy. The original logs are still missing.",
+     "wolf_notice_disclosed": "WOLF: A list isn't the source.",
+     "wolf_reaction_pressed": "WOLF keeps working the mirror drive.",
+     "why": "Found in: RECORDS ACCESS. Derived from purge_trace_preserved. Apart from the header, the text is the existing status line word for word, and it adds no facts. WOLF does not react on collection because the trace is on the critical path. The two reactions are optional later annotations, at the 'a list isn't the source' level. If the case UI shows the time or ID fields, mask them as •••• and flag them; no real values appear."
+    },
+    {
+     "id": "REC_PURGE.B",
+     "name": "PURGE ORDER COPY",
+     "kind_tag": "RECORD",
+     "examine": "A local copy of the purge-order trace, headed DIRECTOR / PURGE. It carries a time and target ID; the original logs are still missing.",
+     "wolf_notice_disclosed": "WOLF: It's a list. I still want the source.",
+     "wolf_reaction_pressed": "WOLF doesn't look up from the mirror port.",
+     "why": "Found in: RECORDS ACCESS. Alternative framing that describes the copy itself, using the station's 'COPY PURGE ORDER' wording. It states the same three facts as the status line and nothing more. The notice echoes the existing 'I want the source.' Neither reaction fires on collection; both are optional later annotations."
+    },
+    {
+     "id": "REC_MIRROR.A",
+     "name": "MIRROR TIMESTAMP",
+     "kind_tag": "RECORD",
+     "examine": "The mirror timestamp shows the purge target existed before the deletion order. WOLF brings it from his readout by his own choice.",
+     "wolf_notice_disclosed": "WOLF: Keep it next to the order.",
+     "wolf_reaction_pressed": "WOLF says nothing more about it.",
+     "why": "Found in: RECORDS ACCESS. Derived from mirror_trace_preserved. The first sentence is the established fact word for word. The last sentence varies by route. The examine text above is the 'wolf' route. The 'manual' route reads: '%s copies it through the maintenance port; WOLF keeps watch.' Both route lines are neutral and neither is framed as better. The text does not explain why the timestamp matters or set it in any chronology."
+    },
+    {
+     "id": "REC_MIRROR.B",
+     "name": "MIRROR INDEX COPY",
+     "kind_tag": "RECORD",
+     "examine": "Copied from the mirror index. Its timestamp shows the purge target existed before the deletion order.",
+     "wolf_notice_disclosed": "WOLF: That one doesn't depend on a label.",
+     "wolf_reaction_pressed": "WOLF turns back toward the exit.",
+     "why": "Found in: RECORDS ACCESS. A shorter alternative that uses the station's 'COPY MIRROR INDEX' wording. Add one route line: 'wolf' reads 'Read off WOLF's readout, by his own choice.' and 'manual' reads 'Copied through the maintenance port while WOLF kept watch.' The notice line follows his habit of trusting proof over labels."
+    },
+    {
+     "id": "DATA_RECORDS.A",
+     "name": "QUEUE PRINTOUT",
+     "kind_tag": "PRINT",
+     "examine": "A strip of fan-fold paper from the purge queue. Every line reads MARKED FOR DELETION; the queue's print setting reads OFF.",
+     "wolf_notice_disclosed": "WOLF: Paper doesn't get overwritten.",
+     "wolf_reaction_pressed": "WOLF stays at the mirror drive, back turned.",
+     "why": "Found in: RECORDS ACCESS, secondary console at about x 300-420. It is short enough to make sense as the first item a player ever reads. The wrong note is that the printout exists although printing is set to OFF: something was kept that shouldn't have been. No person keeps it, no target is named and no time is given. The printout shows no entry count, which avoids any sense of scale or scope. WOLF is usually at the mirror, so the ignore beat suits where he stands."
+    },
+    {
+     "id": "DATA_RECORDS.B",
+     "name": "DATA CARTRIDGE",
+     "kind_tag": "DATA",
+     "examine": "A grey cartridge still seated in its reader, label scraped off. The reader shows OVERWRITE COMPLETE; the casing is still warm.",
+     "wolf_notice_disclosed": "WOLF: That was wiped tonight.",
+     "wolf_reaction_pressed": "WOLF keeps his eyes on the mirror port.",
+     "why": "Found in: RECORDS ACCESS. An alternative that suggests the deletion is recent and not routine, through a warm casing and a scraped label, without saying what was erased. Unlike a write-locked or rescued cartridge, it does not hint at anyone protecting records."
+    },
+    {
+     "id": "LOG_CORRIDOR.A",
+     "name": "LOCKDOWN SCREEN",
+     "kind_tag": "LOG",
+     "examine": "MAINTENANCE / LOCKDOWN\n03:18 DOORS SEALED.\nCOOLANT FAULT AT RELAY.\nSHIFT CHECKOUT: NONE RECORDED.",
+     "wolf_notice_disclosed": "WOLF: Nobody checked out.",
+     "wolf_reaction_pressed": "WOLF keeps his eyes on the relay.",
+     "why": "Found in: MAINTENANCE CORRIDOR, wall screen at about x 500-520. It is procedural and odd: a working shift was cut off with no record of where anyone went. It does not repeat the purge display. Before the relay choice (memory empty), WOLF has no reaction and keeps following. The notice and ignore lines apply only if the engineer comes back after the choice. FLAG: 03:18 is an invented clock time, placed one minute after the 03:17 containment card. It is not the purge order's time. Nathanial should approve it or replace it with '--:--'."
+    },
+    {
+     "id": "LOG_CORRIDOR.B",
+     "name": "RELAY WORK ORDER",
+     "kind_tag": "LOG",
+     "examine": "WORK ORDER / COOLANT RELAY\nSTATUS: OPEN. ASSIGNED: MAINTENANCE.\nTECH NOTE: REMOVED.\nThe cursor blinks in the empty field.",
+     "wolf_notice_disclosed": "WOLF: The note's gone. The order isn't.",
+     "wolf_reaction_pressed": "WOLF looks past the screen, toward the seal.",
+     "why": "Found in: MAINTENANCE CORRIDOR. An alternative with no clock time. It shows deletion reaching an ordinary ticket, without saying what the note said or who wrote it. Before the relay choice WOLF stays silent and keeps following; the notice and ignore lines apply only after the choice. The screen's live readout wording is story text for Nathanial."
+    },
+    {
+     "id": "OBJECT_CORRIDOR.A",
+     "name": "LOCKOUT TAG",
+     "kind_tag": "OBJECT",
+     "examine": "A red lockout tag hangs from the seal frame, its padlock open. The signature line is blank.",
+     "wolf_notice_disclosed": "WOLF: They didn't finish locking out.",
+     "wolf_reaction_pressed": "WOLF walks on to the seal without looking.",
+     "why": "Found in: MAINTENANCE CORRIDOR, by the seal at about x 690-740. A procedural artefact shows someone left in a hurry: the lockout was started and never finished. No name appears and no harm is implied. It is reached after the relay, so it gives the clearest disclose/press contrast."
+    },
+    {
+     "id": "OBJECT_CORRIDOR.B",
+     "name": "SHIFT MUG",
+     "kind_tag": "OBJECT",
+     "examine": "A maintenance mug on the ledge by the seal, half full and cold. The shift board above it is wiped clean.",
+     "wolf_notice_disclosed": "WOLF: They left in a hurry.",
+     "wolf_reaction_pressed": "WOLF doesn't turn toward the ledge.",
+     "why": "Found in: MAINTENANCE CORRIDOR. A more personal alternative that adds a human touch: a mug left half full. The wiped board links quietly to the deletion theme without saying who was on shift. The notice avoids 'meant to come back', which would suggest the person came to harm."
+    },
+    {
+     "id": "OBJECT_JUNCTION.A",
+     "name": "SEAL ORDER CARD",
+     "kind_tag": "OBJECT",
+     "examine": "A laminated card wired to the entry rail: JUNCTION DOOR SEALED BY ORDER. The signing line is scratched through to bare metal.",
+     "wolf_notice_disclosed": "WOLF: Somebody wanted that door shut.",
+     "wolf_reaction_pressed": "WOLF is already at the seam; he doesn't look back.",
+     "why": "Found in: SERVICE JUNCTION, entry at about x 40-140. It hints that the door was sealed on purpose and that the signer was removed. It does not say who sealed it or what is behind it; 'something hums behind it' stays undefined. WOLF runs to the seam when the beat starts, so both reactions are short and work at a distance."
+    },
+    {
+     "id": "OBJECT_JUNCTION.B",
+     "name": "CRACKED GAUGE",
+     "kind_tag": "OBJECT",
+     "examine": "A pressure gauge on the deck, glass starred, needle pinned past red. Its wall mount above is empty.",
+     "wolf_notice_disclosed": "WOLF: That line's run past red.",
+     "wolf_reaction_pressed": "WOLF keeps reading the seam.",
+     "why": "Found in: SERVICE JUNCTION. A physical alternative that shows pressure damage and a line worked hard. It does not refer to any earlier incident. It is collectable before the pressure-line hazard starts and sits outside the relief vent's reach."
+    },
+    {
+     "id": "LOG_LANE.A",
+     "name": "SENTRY PATROL LOG",
+     "kind_tag": "LOG",
+     "examine": "SENTRY / LANE PATROL\nMODE: LOCKDOWN. AUTHORITY: DIRECTOR.\nSTAND-DOWN CODE: NO RECORD.",
+     "wolf_notice_disclosed": "WOLF: Nobody can call it off.",
+     "wolf_reaction_pressed": "WOLF stays at the rubble and says nothing.",
+     "why": "Found in: SERVICE JUNCTION, lane panel; spawns only once sentry_down is true. It is the most serious log: the machine was set to lockdown under authority already shown in-game, and nothing exists to stand it down. It names no targets, shows no classification method, does not frame WOLF as rogue and mentions no victims. WOLF holds at the rubble, so the reaction works at a distance and he does not move to the item."
+    },
+    {
+     "id": "LOG_LANE.B",
+     "name": "SENTRY FAULT PANEL",
+     "kind_tag": "LOG",
+     "examine": "SENTRY / FAULT\n03:21 RETASKED: PURGE / LOCKDOWN.\nOPTICS: RECALIBRATED.\nRELEASE AUTHORITY: NONE ON FILE.",
+     "wolf_notice_disclosed": "WOLF: Same order. Different machine.",
+     "wolf_reaction_pressed": "WOLF looks toward the hatch, not the panel.",
+     "why": "Found in: SERVICE JUNCTION. An alternative that ties the sentry to the purge and the lockdown, as the slot allows. The notice echoes WOLF's existing 'hunt people he calls threats' without adding anything. FLAG: 03:21 is an invented clock time after 03:17 and is not canon; replace it with '--:--' if unwanted. If 'Same order' feels too pointed, use 'WOLF: It never got a release.'"
+    },
+    {
+     "id": "TOOL_A.A",
+     "name": "VALVE KEY",
+     "kind_tag": "TOOL",
+     "examine": "A steel T-handle valve key, grip wrapped in black tape. The square socket fits a wheel hub; the shaft is stamped DEN MAINTENANCE.",
+     "wolf_notice_disclosed": "WOLF: Good steel. Someone kept it oiled.",
+     "wolf_reaction_pressed": "WOLF doesn't look over.",
+     "why": "Found in: MAINTENANCE CORRIDOR at about x 410-430, kept apart from the screen at x 500-520. The text describes only the tool's make, wear and fit, with no promise of speed or fewer turns and no hint that it will be needed. Toast: 'Stowed: VALVE KEY'. First time it seats at the VALVE: 'The key seats on the hub with a dull clunk. The wheel is still stiff.' This sits before the relay, so before the choice WOLF has no reaction and keeps following. He never hands the tool over or says where it is."
+    },
+    {
+     "id": "TOOL_A.B",
+     "name": "WHEEL RATCHET",
+     "kind_tag": "TOOL",
+     "examine": "A long-handled ratchet, paint worn to bare steel at the grip. Its head is cut for a valve-wheel hub; the pawl clicks clean.",
+     "wolf_notice_disclosed": "WOLF: That pawl's been looked after.",
+     "wolf_reaction_pressed": "WOLF keeps walking, eyes ahead.",
+     "why": "Found in: MAINTENANCE CORRIDOR. An alternative that matches the design's 'valve ratchet' wording, so the hold ticks can read as ratchet clicks while the turn count stays at 3. Toast: 'Stowed: WHEEL RATCHET'. First seat at the VALVE: 'The ratchet head drops over the hub and catches. The wheel is still stiff.' The rule for before the relay choice is the same as for VALVE KEY: no reaction."
+    }
+   ],
+   "case_name_options": [
+    "CASE",
+    "FILE",
+    "EVIDENCE"
+   ]
+  },
+  {
+   "tone": "HUMAN TRACES: every find is a small sign of the shift crew who worked here, like a cold mug, a lunch tin, a jacket or a note promising they would be back in five minutes. On the surface each one is ordinary and warm. Underneath it there is one quiet wrong note: a blank line, an empty ID clip, a handover nobody signed, a crew-notes field the lockdown switched off. Staff appear only as roles and are never named. Nothing says where they went, and no one is harmed. The tone climbs room by room. The corridor is procedural and a little strange, Records Access is uneasy about absence and deletion, and the Service Junction turns physical, with frost, force and a machine that patrols. WOLF never fetches anything and is never a detector. After the engineer discloses the risk he names one plain fact about the item. After the engineer presses him he looks away from it, coolly but not cruelly. Two alternatives are given for each slot, as ids with -a and -b suffixes. Every line is a DRAFT and ships only once Nathanial approves it.",
+   "items": [
+    {
+     "id": "REC_PURGE-a",
+     "name": "PURGE-ORDER TRACE",
+     "kind_tag": "RECORD",
+     "examine": "The Director's purge order has a time and target ID. %s keeps a local copy; the original logs are still missing.",
+     "wolf_notice_disclosed": "WOLF: A list isn't the source.",
+     "wolf_reaction_pressed": "WOLF reads the header and says nothing.",
+     "why": "Found in RECORDS ACCESS. This is the existing status line word for word, with %s filled from state.human_name() first word, so it adds no new facts. WOLF has no reaction on collection because this is the critical path. Both lines are only the optional later annotation, kept at the 'a list isn't the source' level."
+    },
+    {
+     "id": "REC_PURGE-b",
+     "name": "PURGE-ORDER COPY",
+     "kind_tag": "RECORD",
+     "examine": "DIRECTOR / PURGE, copied to a local file. The order has a time and target ID; the original logs are still missing.",
+     "wolf_notice_disclosed": "WOLF: A list doesn't tell me who's a threat.",
+     "wolf_reaction_pressed": "WOLF looks past the copy, toward the exit.",
+     "why": "Found in RECORDS ACCESS. It leads with the terminal header 'DIRECTOR / PURGE' as the copy's one physical detail and shows no time or ID value. The notice reuses WOLF's own FIRST COPY SECURED line, so it adds no new canon. Flag for Nathanial: 'local file' rewords 'local copy'. Use -a if he wants the exact match."
+    },
+    {
+     "id": "REC_MIRROR-a",
+     "name": "MIRROR TIMESTAMP",
+     "kind_tag": "RECORD",
+     "examine": "The mirror timestamp shows the purge target existed before the deletion order. WOLF brought it by his own choice.",
+     "wolf_notice_disclosed": "WOLF: Keep that one close.",
+     "wolf_reaction_pressed": "WOLF watches the exit instead.",
+     "why": "Found in RECORDS ACCESS. Sentence 1 states the established fact and nothing more. Sentence 2 is the 'wolf' route. For the 'manual' route, sentence 2 becomes '%s copied it through the maintenance port. WOLF kept watch.' The two route lines are written in parallel, so neither route reads as better or worse."
+    },
+    {
+     "id": "REC_MIRROR-b",
+     "name": "MIRROR INDEX",
+     "kind_tag": "RECORD",
+     "examine": "The mirror index carries a timestamp: the purge target existed before the deletion order. Read off WOLF's readout.",
+     "wolf_notice_disclosed": "WOLF: That's from the mirror, not the list.",
+     "wolf_reaction_pressed": "WOLF keeps his eyes on the mirror drive.",
+     "why": "Found in RECORDS ACCESS. Its terms match the station label COPY MIRROR INDEX. For the 'manual' route the last sentence becomes 'Copied through the maintenance port.' It gives no chronology beyond the established fact. The notice names only where the record came from, not why that matters."
+    },
+    {
+     "id": "DATA_RECORDS-a",
+     "name": "PURGE QUEUE PRINTOUT",
+     "kind_tag": "PRINT",
+     "examine": "A purge-queue printout sits under a cold mug. Each line reads MARKED FOR DELETION; the last line is blank.",
+     "wolf_notice_disclosed": "WOLF: The last line's blank.",
+     "wolf_reaction_pressed": "WOLF keeps his eyes on the mirror drive.",
+     "why": "Found in RECORDS ACCESS. A good first item: a plain object explained in one breath. The cold mug is the warm human detail and the blank line is the one question. It never names the target and gives no time. No author is given, so it is not tied to a records or safety worker. WOLF is usually at the mirror here, so the ignore beat fits where he already stands."
+    },
+    {
+     "id": "DATA_RECORDS-b",
+     "name": "CONSOLE NOTE",
+     "kind_tag": "PRINT",
+     "examine": "A note on the console bezel reads BACK IN 5, underlined twice. The chair is still turned toward the door.",
+     "wolf_notice_disclosed": "WOLF: Five minutes was a while ago.",
+     "wolf_reaction_pressed": "WOLF doesn't look at the chair.",
+     "why": "Found in RECORDS ACCESS. This is the purest human-trace option: someone stepped away mid-shift and never came back. It implies no harm and says nothing about the purge. It is weaker than -a at hinting that the deletion is not routine. Choose -a if this room's first find should carry a purge hint."
+    },
+    {
+     "id": "LOG_CORRIDOR-a",
+     "name": "HANDOVER SCREEN",
+     "kind_tag": "LOG",
+     "examine": "MAINTENANCE / HANDOVER\nCOOLANT FAULT: OPEN\nCREW NOTE: CAKE IN THE BREAK ROOM\nLOCKDOWN ACTIVE. HANDOVER NOT SIGNED",
+     "wolf_notice_disclosed": "WOLF: Nobody signed the handover.",
+     "wolf_reaction_pressed": "WOLF reads past it to the relay.",
+     "why": "Found in MAINTENANCE / LOCKDOWN corridor. It uses the corridor's 'strange, procedural' register, with a crew joke typed into a system log. It invents no clock time and does not repeat the purge display. Before the relay choice (memory empty) WOLF is silent. The notice and ignore lines apply only if the engineer comes back after the choice. This is also live readout wording for Nathanial."
+    },
+    {
+     "id": "LOG_CORRIDOR-b",
+     "name": "SHIFT LOG SCREEN",
+     "kind_tag": "LOG",
+     "examine": "MAINTENANCE / SHIFT LOG\n03:09 RELAY CHECK: PASS\n03:14 KETTLE ON, BREAK ROOM\n03:17 LOCKDOWN. CHECK-OUT: NO ENTRY",
+     "wolf_notice_disclosed": "WOLF: Nobody signed out.",
+     "wolf_reaction_pressed": "WOLF keeps walking toward the relay.",
+     "why": "Found in MAINTENANCE / LOCKDOWN corridor. FLAG: 03:09 and 03:14 are new clock times, and this ties the lockdown itself to 03:17. All three stay consistent with the containment card, but Nathanial must approve them. It gives no purge time. The blank check-out field is the one question. WOLF is silent before the relay choice."
+    },
+    {
+     "id": "OBJECT_CORRIDOR-a",
+     "name": "LUNCH TIN",
+     "kind_tag": "OBJECT",
+     "examine": "A lunch tin sits by the seal, lid latched, a paper-boat sticker on top. It is set down neatly, as if for a minute.",
+     "wolf_notice_disclosed": "WOLF: They meant to come back for it.",
+     "wolf_reaction_pressed": "WOLF steps around it without looking down.",
+     "why": "Found in MAINTENANCE / LOCKDOWN corridor. This is the clearest relay payoff, since WOLF's memory is always set here. It is warm (a sticker, a careful hand) with one uneasy note (it was never picked up). There is no owner name and nothing says where they went. The sticker is a neutral motif, deliberately not a sun or a canine, so it does not echo the ending or WOLF."
+    },
+    {
+     "id": "OBJECT_CORRIDOR-b",
+     "name": "FOLDED HI-VIS JACKET",
+     "kind_tag": "OBJECT",
+     "examine": "A hi-vis jacket lies folded on the ledge, gloves tucked in one pocket. The ID clip on the chest is empty.",
+     "wolf_notice_disclosed": "WOLF: The badge clip's empty.",
+     "wolf_reaction_pressed": "WOLF keeps facing the red seal.",
+     "why": "Found in MAINTENANCE / LOCKDOWN corridor. The folded jacket and tucked gloves are care. The empty ID clip is the wrong note, and it asks a question without naming anyone. It is a slightly sharper hint than -a. Flag: if a missing badge reads too close to someone being removed from a list, prefer -a."
+    },
+    {
+     "id": "OBJECT_JUNCTION-a",
+     "name": "FROZEN WORK GLOVE",
+     "kind_tag": "OBJECT",
+     "examine": "A work glove is frozen to the wet deck by the entry. It comes loose with a crack; there is no second glove.",
+     "wolf_notice_disclosed": "WOLF: Coolant got here before we did.",
+     "wolf_reaction_pressed": "WOLF is already at the seam. He doesn't turn.",
+     "why": "Found in SERVICE JUNCTION. It moves to the junction's physical register (frost, wet deck, the coolant hazard already in the room). The tone is haste, not injury: there is no burn or blood, only a missing pair. The ignore beat suits WOLF running ahead to the seam at the beat start. Nothing points at the door."
+    },
+    {
+     "id": "OBJECT_JUNCTION-b",
+     "name": "ENTRY CLIPBOARD",
+     "kind_tag": "OBJECT",
+     "examine": "A checklist hangs by the entry, ticked to the last line. The last line reads SEAL DOOR; that tick goes through the paper.",
+     "wolf_notice_disclosed": "WOLF: That tick went through the page.",
+     "wolf_reaction_pressed": "WOLF watches the door, not the clipboard.",
+     "why": "Found in SERVICE JUNCTION. It hints that the door was sealed on purpose and in a hurry, without saying why or what hums behind it. A routine checklist is the human surface, and the force of one pen stroke is the unease. Flag: this is the stronger hint about the door. Choose -a to keep the door fully undefined."
+    },
+    {
+     "id": "LOG_LANE-a",
+     "name": "SENTRY LANE LOG",
+     "kind_tag": "LOG",
+     "examine": "SENTRY / LANE LOG\nCREW NOTE: LEFT SERVO SQUEAKS. OILED\n03:17 MODE: LOCKDOWN. AUTH: DIRECTOR\nCREW NOTES: DISABLED",
+     "wolf_notice_disclosed": "WOLF: Somebody used to look after it.",
+     "wolf_reaction_pressed": "WOLF stays at the rubble, turned away.",
+     "why": "Found in SERVICE JUNCTION. It spawns only after sentry_down. The crew once cared for the machine, then the lockdown switched their notes off; this is the slice's most serious unease. It uses only established authority (the Director ordered the lockdown). It does not link the sentry to the purge list, show how targets are classified, mention people being harmed or call WOLF a rogue. FLAG: '03:17 MODE: LOCKDOWN' ties the lockdown to the containment time."
+    },
+    {
+     "id": "LOG_LANE-b",
+     "name": "SENTRY PATROL PANEL",
+     "kind_tag": "LOG",
+     "examine": "SENTRY / PATROL\nAUTHORISED CROSSINGS: 0\nDOOR WATCH: ON. REASON: NO RECORD\nSomeone has written THANKS on its casing in marker.",
+     "wolf_notice_disclosed": "WOLF: Somebody thanked it.",
+     "wolf_reaction_pressed": "WOLF doesn't look at the casing.",
+     "why": "Found in SERVICE JUNCTION. The machine reports a watch with no recorded reason; the crew's marker THANKS is the warm surface. It has no time stamps and doesn't explain the door. It is reached only after the sentry is down and doesn't gloat. Its reach must stay clear of the ARM PANEL alcove, the floor mark, the cloud span and the exit bolt at x 850."
+    },
+    {
+     "id": "TOOL_A-a",
+     "name": "RATCHET VALVE KEY",
+     "kind_tag": "TOOL",
+     "examine": "A steel valve key stamped MAINT, its jaw cut for a square stem. Red tape wraps the grip, worn pale where a thumb rests.",
+     "wolf_notice_disclosed": "WOLF: That tape's worn. It got used.",
+     "wolf_reaction_pressed": "WOLF waits by the relay, facing away.",
+     "why": "Collected in the MAINTENANCE / LOCKDOWN corridor (place it at about x 410-430, away from the screen at about x 500-520). Its first seating line at the VALVE: 'The key seats on the wheel with a click.' Toast: 'Stowed: RATCHET VALVE KEY'. It describes only make, wear and fit. It promises no speed and no fewer turns, and gives no hint it will be needed. It may be found before the relay choice, so WOLF is silent while his memory is empty. He never hands it over."
+    },
+    {
+     "id": "TOOL_A-b",
+     "name": "SPRUNG WHEEL WRENCH",
+     "kind_tag": "TOOL",
+     "examine": "A wheel wrench with a sprung pawl, stamped SERVICE LINE. Tape on the handle reads RETURN ME in marker.",
+     "wolf_notice_disclosed": "WOLF: Someone wanted that back.",
+     "wolf_reaction_pressed": "WOLF looks on down the corridor.",
+     "why": "Collected in the MAINTENANCE / LOCKDOWN corridor, used at the junction VALVE. Its first seating line: 'The wrench jaw closes on the wheel rim.' Toast: 'Stowed: SPRUNG WHEEL WRENCH'. RETURN ME is a warm crew habit with an uneasy echo, and it uses no owner name. WOLF is silent before the relay choice. Flag: the SERVICE LINE stamp loosely points at the junction. Use -a if that reads as a hint the tool is needed."
+    }
+   ],
+   "case_name_options": [
+    "CASE",
+    "FILE",
+    "FINDS"
+   ]
+  },
+  {
+   "tone": "Quiet wrongness. Each item is an ordinary maintenance or records object with one detail that does not fit, and it never explains that detail. The corridor stays procedural and only slightly off, with a warm mug and a field that was wiped rather than left empty. Records Access holds absences: a cartridge the queue calls erased, and a slip that only says MARKED FOR DELETION. The Service Junction turns physical, with a weld on the far side, a gauge reading past red and a sentry whose servicing was put off. Machines report and never comment. The narrator gives facts. Each WOLF NOTICE line names the thing he sees, not what it means. Each IGNORE beat is a cool action and never a line of speech. The text uses no square brackets, since the case renders as a RichTextLabel, and no dates, real target values or names. The only times are the canon 03:17. Items 0 to 1 below are the derived records. Their text is taken word for word from the existing station lines. Every item has two alternatives (.A / .B), and all of them are drafts that need Nathanial's approval.",
+   "items": [
+    {
+     "id": "REC_PURGE.A",
+     "name": "PURGE-ORDER TRACE",
+     "kind_tag": "RECORD",
+     "examine": "The Director's purge order has a time and target ID. %s keeps a local copy; the original logs are still missing.",
+     "wolf_notice_disclosed": "None when it is collected (critical path). Optional later annotation: \"WOLF: A list isn't the source.\"",
+     "wolf_reaction_pressed": "None when it is collected. WOLF is already at the mirror drive.",
+     "why": "Found in RECORDS ACCESS. This is the existing line 1169 of main.gd, word for word, with %s set to the first name from state.human_name(). It adds no new facts and needs no new story approval beyond the name."
+    },
+    {
+     "id": "REC_PURGE.B",
+     "name": "PURGE COPY",
+     "kind_tag": "RECORD",
+     "examine": "DIRECTOR / PURGE\nTIME: ••••  TARGET ID: ••••\nA local copy. The original logs are still missing.",
+     "wolf_notice_disclosed": "None when it is collected. Optional later annotation: \"WOLF: A list isn't the source.\"",
+     "wolf_reaction_pressed": "None when it is collected.",
+     "why": "Found in RECORDS ACCESS. It shows the copy as it looks on screen, using the existing DIRECTOR / PURGE header. FLAG: both values are masked with •••• on purpose. The real purge time and target ID are canon Nathanial has not set, so they must stay masked."
+    },
+    {
+     "id": "REC_MIRROR.WOLF",
+     "name": "MIRROR TIMESTAMP",
+     "kind_tag": "RECORD",
+     "examine": "WOLF brings the mirror timestamp by his own choice. The purge target existed before the deletion order.",
+     "wolf_notice_disclosed": "WOLF: Before the order. Keep it.",
+     "wolf_reaction_pressed": "WOLF hands nothing over; he is already watching the exit.",
+     "why": "Found in RECORDS ACCESS, mirror_route 'wolf'. These are the existing line 1235 sentences, word for word. The route line gives WOLF credit and is not framed as the better route. Alternative NAME if preferred: MIRROR INDEX."
+    },
+    {
+     "id": "REC_MIRROR.MANUAL",
+     "name": "MIRROR TIMESTAMP",
+     "kind_tag": "RECORD",
+     "examine": "The purge target existed before the deletion order. %s copies the timestamp through the maintenance port. WOLF keeps watch.",
+     "wolf_notice_disclosed": "WOLF: Before the order. Keep it.",
+     "wolf_reaction_pressed": "WOLF keeps watch on the door and says nothing about it.",
+     "why": "Found in RECORDS ACCESS, mirror_route 'manual'. The sentences come from lines 1235 and 1237 unchanged, so it runs to three short sentences rather than two. The engineer's route is credited as plainly as WOLF's."
+    },
+    {
+     "id": "DATA_RECORDS.A",
+     "name": "BLANK CARTRIDGE",
+     "kind_tag": "DATA",
+     "examine": "A grey cartridge sits half-ejected in the drive tray, label blank. The purge queue lists it as ERASED; its activity light still blinks.",
+     "wolf_notice_disclosed": "WOLF: The queue says that's gone. It isn't.",
+     "wolf_reaction_pressed": "WOLF keeps his eyes on the mirror drive.",
+     "why": "Quiet unease: something the purge reports as erased is still here. A machine kept it, not a person, so it does not suggest anyone protected records. It never says what is on the cartridge or who it concerns, and it works as the first item a player examines."
+    },
+    {
+     "id": "DATA_RECORDS.B",
+     "name": "QUEUE SLIP",
+     "kind_tag": "PRINT",
+     "examine": "A thermal slip hangs from the printer, torn mid-line. Every row reads MARKED FOR DELETION; the printer is still warm.",
+     "wolf_notice_disclosed": "WOLF: That printer's still warm.",
+     "wolf_reaction_pressed": "WOLF works the mirror and doesn't look up.",
+     "why": "It uses the established 'marked for deletion' wording. The slip torn mid-line and the warm printer suggest someone left in a hurry and the deletion is ongoing. No row is readable, so no target is shown. This is the shortest option for a player's first item."
+    },
+    {
+     "id": "LOG_CORRIDOR.A",
+     "name": "SHIFT BOARD",
+     "kind_tag": "LOG",
+     "examine": "SHIFT BOARD / MAINTENANCE\n03:17 LOCKDOWN. WORK ORDERS HELD.\nCOOLANT FAULT / RELAY. ASSIGNED: NO RECORD.\nThe field has been cleared, not left blank.",
+     "wolf_notice_disclosed": "WOLF: Someone cleared that field.",
+     "wolf_reaction_pressed": "WOLF reads the screen and says nothing.",
+     "why": "Strange and procedural: a working shift interrupted at 03:17, consistent with the containment card. The one wrong note is that a record was wiped, not missed. Before the relay choice (empty memory) WOLF stays silent, with no line and no turn."
+    },
+    {
+     "id": "LOG_CORRIDOR.B",
+     "name": "OVERWRITE SCREEN",
+     "kind_tag": "LOG",
+     "examine": "RECORDS / OVERWRITE\nPASS 2 RUNNING. 03:17 LOCKDOWN: NO PAUSE.\nOPERATOR: NO RECORD.",
+     "wolf_notice_disclosed": "WOLF: It doesn't stop for the lockdown.",
+     "wolf_reaction_pressed": "WOLF keeps walking toward the relay.",
+     "why": "It shows the purge as a running machine process without repeating the purge display's 'marked for deletion' line. The single question is the missing operator. Before the relay choice WOLF stays silent. FLAG: 'PASS 2' is an invented, non-canon counter with no total, so it does not read as a completion count."
+    },
+    {
+     "id": "OBJECT_CORRIDOR.A",
+     "name": "STEEL MUG",
+     "kind_tag": "OBJECT",
+     "examine": "A dented steel mug sits on the ledge by the seal, half full. It is still warm; the seal has been shut since 03:17.",
+     "wolf_notice_disclosed": "WOLF: Still warm. Someone left fast.",
+     "wolf_reaction_pressed": "WOLF steps past it without a glance.",
+     "why": "Human texture without a name or any harm. The one wrong note is the timing: it should have gone cold behind a seal shut since 03:17. This is the clearest payoff of the relay choice: WOLF turns toward the ledge after disclose and looks away after press."
+    },
+    {
+     "id": "OBJECT_CORRIDOR.B",
+     "name": "LOCKOUT TAG",
+     "kind_tag": "OBJECT",
+     "examine": "A red lockout tag hangs on a hook by the seal, signed by maintenance. Its padlock is closed on an empty hasp.",
+     "wolf_notice_disclosed": "WOLF: That lock isn't holding anything.",
+     "wolf_reaction_pressed": "WOLF looks at the seal, not the hook.",
+     "why": "A procedural artefact that is wrong in a small way: a lockout that locks nothing. It is signed by role only. It plays on the engineer knowing maintenance procedure, and it implies no person and no harm."
+    },
+    {
+     "id": "OBJECT_JUNCTION.A",
+     "name": "SEAL PERMIT",
+     "kind_tag": "OBJECT",
+     "examine": "A laminated permit is zip-tied to the entry rail, stamped SEALED. The weld it lists is on the far side of the door.",
+     "wolf_notice_disclosed": "WOLF: That weld wasn't done from here.",
+     "wolf_reaction_pressed": "WOLF stays at the seam; he doesn't look back.",
+     "why": "More serious and physical: it suggests the door was sealed on purpose and backs up the existing line 'The door is sealed from the other side.' It never says what or who is past the door, and the hum stays undefined. WOLF has already run to the seam, so his reaction is short and optional."
+    },
+    {
+     "id": "OBJECT_JUNCTION.B",
+     "name": "GAUGE CARD",
+     "kind_tag": "OBJECT",
+     "examine": "A gauge card is taped by the breaker, readings pencilled in a column. The last one is past the red line; the next row is blank.",
+     "wolf_notice_disclosed": "WOLF: Last reading's past red. Then nothing.",
+     "wolf_reaction_pressed": "WOLF keeps his ear to the door.",
+     "why": "The line was worked hard, then abandoned mid-reading. It ties into the pressure line and gauge terms already in the room, and it explains nothing. It must sit left of the OVERLOAD BREAKER at x 200 and outside the vent's reach."
+    },
+    {
+     "id": "LOG_LANE.A",
+     "name": "PATROL SCREEN",
+     "kind_tag": "LOG",
+     "examine": "SENTRY / PATROL\nMODE: LOCKDOWN. LANE HELD SINCE 03:17.\nORDER SOURCE: NO RECORD.",
+     "wolf_notice_disclosed": "WOLF: An order with no source.",
+     "wolf_reaction_pressed": "WOLF stays at the rubble, facing the hatch.",
+     "why": "The most serious log: it shows the machine was set to act on the lockdown and that the order's source was removed. It deliberately has no target list and no link to the purge queue, so the nature of the purge target and the classification mechanism stay hidden. It does not mention WOLF or harm to anyone, and it does not gloat."
+    },
+    {
+     "id": "LOG_LANE.B",
+     "name": "SENTRY FAULT LOG",
+     "kind_tag": "LOG",
+     "examine": "SENTRY / FAULT\nSERVO WEAR: HIGH. SERVICE DUE.\nSERVICE DEFERRED: LOCKDOWN. PATROL CONTINUES.",
+     "wolf_notice_disclosed": "WOLF: It was overdue for service.",
+     "wolf_reaction_pressed": "WOLF keeps his distance from the screen.",
+     "why": "Physical horror through equipment: the lockdown put the patrol ahead of the machine's own maintenance. This option is safer if A's 'order source' wording comes too close to the Director plot. It spawns only once sentry_down is true."
+    },
+    {
+     "id": "TOOL_A.A",
+     "name": "VALVE KEY",
+     "kind_tag": "TOOL",
+     "examine": "A forked steel valve key, grip wrapped in worn tape. The jaws close on a wheel spoke; the stores number is ground off.",
+     "wolf_notice_disclosed": "WOLF: Somebody ground the number off.",
+     "wolf_reaction_pressed": "WOLF doesn't turn.",
+     "why": "It describes only the make, the wear and the fit on a spoke, with no promise of speed or fewer turns. First line when it seats on the valve: 'The key's jaws close on a spoke. The wheel takes the weight.' Toast: 'Stowed: VALVE KEY'. It sits between the breaker and the relay, so a player can pick it up before the choice. With memory empty WOLF stays silent."
+    },
+    {
+     "id": "TOOL_A.B",
+     "name": "SPOKE RATCHET",
+     "kind_tag": "TOOL",
+     "examine": "A short ratchet with a forked head, its pawl worn bright. The tag reads RETURN TO STORES; the sign-out line is blank.",
+     "wolf_notice_disclosed": "WOLF: Stores never got that one back.",
+     "wolf_reaction_pressed": "WOLF watches the relay, not the floor.",
+     "why": "A grounded maintenance tool with no owner. The blank sign-out line is the one quiet wrong note. First line when it seats on the valve: 'The fork seats on the spoke. The pawl clicks once.' Toast: 'Stowed: SPOKE RATCHET'. Before the relay choice WOLF stays silent. Turns stay at 3."
+    }
+   ],
+   "case_name_options": [
+    "CASE",
+    "FILE",
+    "KEPT"
+   ]
+  }
+ ],
+ "crits": [
+  {
+   "problems": [
+    {
+     "id": "LOG_LANE.B",
+     "field": "examine + wolf_notice_disclosed",
+     "issue": "Near-reveal of the private provisional mechanism. 'RETASKED: PURGE / LOCKDOWN' turns the purge from deleting records into a machine hunting people. 'OPTICS: RECALIBRATED' hints at altered target classification. 'Same order. Different machine.' tells the player that WOLF was meant to carry out the purge himself. That goes well past the public line 'He wants me to hunt people he calls threats.' The fallback 'It never got a release.' is safe. 03:21 is also an invented clock time.",
+     "kind": "spoiler",
+     "fix": "Drop LOG_LANE.B and ship LOG_LANE.A. If B stays, use 'SENTRY / FAULT\\n--:-- MODE: LOCKDOWN.\\nRELEASE AUTHORITY: NONE ON FILE.' and the notice 'WOLF: It never got a release.' Remove PURGE, OPTICS and the clock time."
+    },
+    {
+     "id": "DATA_RECORDS.A",
+     "field": "examine",
+     "issue": "The wrong note ('print setting reads OFF' on a printout that exists) only makes sense if someone deliberately kept a copy of the deletion queue. Together with 'Paper doesn't get overwritten.', it points at an insider preserving the original record, which is a private, unlocked story mechanism. The 'why' text claims 'no person keeps it', but the logic says otherwise.",
+     "kind": "spoiler",
+     "fix": "Keep the paper and lose the hidden keeper: 'A strip of fan-fold paper from the purge queue. Every line reads MARKED FOR DELETION. The printer is still feeding blank sheets.' Notice: 'WOLF: It's still printing to nobody.' (30 chars after the prefix)."
+    },
+    {
+     "id": "REC_MIRROR.B",
+     "field": "wolf_notice_disclosed",
+     "issue": "'That one doesn't depend on a label.' brings 'label' into WOLF's vocabulary. That word is the closest public echo of the private false-label mechanism. The 'why' also claims a 'habit of trusting proof over labels', which is not established in the game. The line is 41 characters with the 'WOLF: ' prefix, over the 40-character limit.",
+     "kind": "spoiler",
+     "fix": "'WOLF: Harder to argue with a timestamp.' (39 chars with prefix), or 'WOLF: The mirror wasn't told to lie.' Drop the 'habit' rationale."
+    },
+    {
+     "id": "OBJECT_JUNCTION.A",
+     "field": "examine",
+     "issue": "A signing line scratched off a seal order makes the player infer an authorizer who hid his name. If LOG_LANE.A ships in the same room with 'AUTHORITY: DIRECTOR', the two items together read as the Director erasing his own authorization. That mirrors the private, unlocked 'report omitted his override' mechanism. Also, a laminated card cannot be scratched 'through to bare metal'.",
+     "kind": "spoiler",
+     "fix": "Replace the scratched signer with a non-authorial wrong note: 'A laminated card wired to the entry rail: JUNCTION DOOR SEALED BY ORDER. DO NOT OPEN. The wire ties are new; the old ones lie cut on the deck.' Keep the notice 'Somebody wanted that door shut.'"
+    },
+    {
+     "id": "LOG_CORRIDOR.A",
+     "field": "examine + flag",
+     "issue": "'SHIFT CHECKOUT: NONE RECORDED' / 'Nobody checked out.' sets up a missing maintenance shift: other staff on site whose fate is unknown. That is new canon. It also commits to a night shift while overnight framing is still an open private decision. It can read as being about the engineer, who is maintenance and also hasn't checked out. '03:18' invites players to compare times with the masked purge time and the mirror timestamp, which the REC drafts deliberately avoid.",
+     "kind": "canon",
+     "fix": "'MAINTENANCE / LOCKDOWN\\n--:-- DOORS SEALED.\\nCOOLANT FAULT AT RELAY.\\nFAULT ACKNOWLEDGED: NO.' Notice: 'WOLF: Nobody answered the fault.' Prefer LOG_CORRIDOR.B for this slot anyway."
+    },
+    {
+     "id": "LOG_LANE.A",
+     "field": "wolf_reaction_pressed",
+     "issue": "'WOLF stays at the rubble' is not true on every route. If WOLF chose to draw the sentry onto the mark, he may be near the mark rather than the rubble after sentry_down. Pinned positions in reaction text break across routes.",
+     "kind": "canon",
+     "fix": "'WOLF looks toward the hatch and says nothing.' This works from any position."
+    },
+    {
+     "id": "OBJECT_JUNCTION.A/.B",
+     "field": "wolf_notice_disclosed / wolf_reaction_pressed",
+     "issue": "The item sits at the entry (x 40-140), but WOLF runs to WOLF_SEAM_X 418 when the junction beat starts, so he is far beyond the design's roughly 120 px notice radius. As written, neither reaction can fire. The 'works at a distance' rationale contradicts the design's gating rule.",
+     "kind": "clarity",
+     "fix": "Either move the item to about x 330-360, away from the vent grate and within 120 px of the seam, or state that its reaction is 'none' and drop both lines. Check the vent-grate span before moving it."
+    },
+    {
+     "id": "TOOL_A.A/.B, LOG_CORRIDOR",
+     "field": "wolf_notice_disclosed / wolf_reaction_pressed",
+     "issue": "These sit between the breaker (350) and the relay (605), and the relay choice is made at the breaker. A player usually reaches them before the choice, when WOLF has no reaction, and collects them then. The notice and ignore lines only fire if the item is skipped and the engineer comes back later. TOOL_A.A at x 410-430 is only about 8 px outside the breaker's 52 px reach, so the interact prompts could compete.",
+     "kind": "clarity",
+     "fix": "Put the tool at about x 470, as the design specifies, and LOG_CORRIDOR at about x 520. Check that pickup reach doesn't overlap the breaker or relay. State in the catalog that before the choice the reaction is 'none', and accept that most players will never see these lines."
+    },
+    {
+     "id": "OBJECT_CORRIDOR.A",
+     "field": "why + wolf_reaction_pressed",
+     "issue": "The claim 'reached after the relay' is false. The relay choice is made at the breaker (x 350), and nothing stops the engineer from walking to x 690-740 before choosing. 'WOLF walks on to the seal' also describes movement the design forbids, since he never detours from his follow position.",
+     "kind": "clarity",
+     "fix": "Gate the item's reaction on memory being set rather than on position. Pressed reaction: 'WOLF looks at the seal, not the tag.'"
+    },
+    {
+     "id": "REC_PURGE.A/.B, REC_MIRROR.A/.B",
+     "field": "wolf_notice_disclosed / wolf_reaction_pressed",
+     "issue": "Derived records are never an uncollected item near WOLF, so these lines can only appear as annotations in the case UI. Present-tense staging ('keeps working the mirror drive', 'doesn't look up from the mirror port', 'turns back toward the exit') goes wrong when the case is opened later in the Junction. On the wolf route of REC_MIRROR.A, WOLF 'saying nothing more' about a timestamp he chose to bring clashes with his agency.",
+     "kind": "clarity",
+     "fix": "Make the pressed reaction for the derived records 'none', with no line. Keep disclosed annotations in past tense or timeless, e.g. 'WOLF: A list isn't the source.' and 'WOLF: Keep it next to the order.'"
+    },
+    {
+     "id": "REC_PURGE.B",
+     "field": "wolf_notice_disclosed",
+     "issue": "43 characters with the 'WOLF: ' prefix, over the 40-character limit. It also nearly repeats the chapter-close line ('A list doesn't tell me who's a threat. I want the source.'), so it adds nothing.",
+     "kind": "length",
+     "fix": "'WOLF: A list isn't the source.' (30)."
+    },
+    {
+     "id": "DATA_RECORDS.B",
+     "field": "wolf_notice_disclosed",
+     "issue": "'tonight' commits to overnight framing, which is still an open private decision. The only clock shown in the game is the 03:17 card.",
+     "kind": "canon",
+     "fix": "'WOLF: That was wiped minutes ago.'"
+    },
+    {
+     "id": "DATA_RECORDS.A, REC_PURGE.B",
+     "field": "wolf_reaction_pressed",
+     "issue": "'back turned' and 'doesn't look up' read as sulking. After a press, his established line is 'I refused the live relay; I'm still here.', so he is present, not hostile. Canon says one rude reply has no automatic moral penalty. Pointedly ignoring should read as cool rather than punitive.",
+     "kind": "voice",
+     "fix": "'WOLF stays at the mirror drive.' / 'WOLF keeps to the mirror port.'"
+    },
+    {
+     "id": "OBJECT_CORRIDOR.B",
+     "field": "examine + wolf_notice_disclosed",
+     "issue": "A half-full cold mug plus a wiped shift board raises the same unestablished missing-shift question as LOG_CORRIDOR.A ('They left in a hurry.'). If both ship, they imply that staff vanished.",
+     "kind": "canon",
+     "fix": "Prefer OBJECT_CORRIDOR.A. If B ships, don't pair it with LOG_CORRIDOR.A, and get Nathanial to confirm that other maintenance staff existed that night."
+    },
+    {
+     "id": "REC_PURGE.A",
+     "field": "examine",
+     "issue": "The header uses 'DIRECTOR / PURGE.' with a period. The corridor display's established format is 'DIRECTOR / PURGE:'.",
+     "kind": "voice",
+     "fix": "'DIRECTOR / PURGE: The Director's purge order has a time and target ID; %s keeps a local copy. The original logs are still missing.'"
+    },
+    {
+     "id": "TOOL_A.A",
+     "field": "wolf_notice_disclosed",
+     "issue": "Exactly 40 characters with the prefix, right at the limit. 'Good steel.' is a little folksy next to WOLF's plain operational voice.",
+     "kind": "voice",
+     "fix": "'WOLF: Someone kept that oiled.' (30)."
+    }
+   ],
+   "strongest_items": [
+    "LOG_LANE.A (SENTRY PATROL LOG): the most serious log. It uses only authority the game already shows, and 'Nobody can call it off.' lands hard. Just fix the reaction so it doesn't pin WOLF at the rubble.",
+    "OBJECT_CORRIDOR.A (LOCKOUT TAG): physical and procedural, with a single wrong note and no person named. Gate its reaction on memory being set.",
+    "LOG_CORRIDOR.B (RELAY WORK ORDER): no clock time, no missing staff, and deletion shown reaching an ordinary ticket. 'The note's gone. The order isn't.' is strong.",
+    "OBJECT_JUNCTION.B (CRACKED GAUGE): quietly teaches the pressure-line rule, and 'WOLF keeps reading the seam.' matches where he actually stands.",
+    "TOOL_A.B (WHEEL RATCHET): matches the design's ratchet clicks and keeps the turn count at 3. The first-seat line 'The wheel is still stiff.' echoes the existing valve text without promising anything.",
+    "REC_PURGE.A and REC_MIRROR.A: built almost word for word from shipped status lines, so they add no new facts. Use a 'none' pressed reaction for both.",
+    "DATA_RECORDS.B (DATA CARTRIDGE), with 'minutes ago' instead of 'tonight': a good first pickup with no hint that anyone is protecting records."
+   ]
+  },
+  {
+   "problems": [
+    {
+     "id": "DATA_RECORDS-b",
+     "field": "examine",
+     "kind": "spoiler",
+     "issue": "A worker who stepped away from a Records Access console and never came back, in the same room where the purge order shows a 'target ID', lets a player infer the private provisional plan for who the purge concerns. Of all the drafts, this comes closest to a reveal.",
+     "fix": "Don't place it in Records Access. Use DATA_RECORDS-a there. If Nathanial wants the BACK IN 5 note, move it to the corridor as an OBJECT, with no console or chair: 'A note taped to the breaker housing reads BACK IN 5, underlined twice.' Also change its kind_tag from PRINT to OBJECT, because it is handwritten."
+    },
+    {
+     "id": "OBJECT_CORRIDOR-b",
+     "field": "examine / wolf_notice_disclosed",
+     "kind": "spoiler",
+     "issue": "An empty ID clip echoes the established 'target ID' wording and suggests a person was struck from the system, which is a near-reveal of what the purge targets. Also, the examine says 'ID clip' but WOLF says 'badge clip'.",
+     "fix": "Use OBJECT_CORRIDOR-a. If -b is kept, swap the wrong note to 'One glove is missing from the pocket.' with WOLF: 'Only one glove.' Don't use the word ID or badge anywhere in a find."
+    },
+    {
+     "id": "OBJECT_JUNCTION-b",
+     "field": "examine",
+     "kind": "canon",
+     "issue": "In the game, 'The door is sealed from the other side.' A checklist on this side, ticked SEAL DOOR, contradicts that. It also points at a deliberate reason to wall off what is behind the door, which is a stronger hint than the 'Something hums behind it' line.",
+     "fix": "Use OBJECT_JUNCTION-a. If a clipboard is wanted, make it a routine list with no door step: 'A checklist hangs by the entry: VENT CHECK, GAUGE CHECK, BREAKER CHECK. The last tick goes through the paper.' WOLF: 'That last tick went through the page.'"
+    },
+    {
+     "id": "REC_MIRROR-a",
+     "field": "examine",
+     "kind": "canon",
+     "issue": "'WOLF brought it by his own choice' copies the current status line at main.gd:1235, but Nathanial's 2026-10-09 rule says WOLF never fetches or carries. Shown as a stored record, it states that he fetched it.",
+     "fix": "WOLF route: 'Read off WOLF's readout, by his own choice.' Manual route: '%s copied it through the maintenance port. WOLF kept watch.' Also flag main.gd:1235 ('WOLF brings the mirror timestamp') to Nathanial as possibly needing the same wording change."
+    },
+    {
+     "id": "REC_MIRROR-a",
+     "field": "wolf_notice_disclosed",
+     "kind": "voice",
+     "issue": "'Keep that one close.' is advice, not the one plain fact the disclose rule asks for. It also gives this record a value that the never-required case should not imply.",
+     "fix": "WOLF: 'That's from the mirror, not the list.' This is the -b line, which states only where the record came from."
+    },
+    {
+     "id": "REC_PURGE-a",
+     "field": "wolf_reaction_pressed",
+     "kind": "voice",
+     "issue": "'WOLF reads the header and says nothing' shows him engaging with the item. The pressed beat should be a pointed look away.",
+     "fix": "'WOLF doesn't look at the copy.'"
+    },
+    {
+     "id": "REC_PURGE-b",
+     "field": "wolf_notice_disclosed",
+     "kind": "voice",
+     "issue": "This reuses the FIRST COPY SECURED line almost word for word ('A list doesn't tell me who's a threat'). Read back in Pause, it repeats the chapter's closing line and weakens it.",
+     "fix": "Use -a's 'WOLF: A list isn't the source.' Keep -b's examine if wanted, but say 'local copy' to match main.gd:1169."
+    },
+    {
+     "id": "LOG_CORRIDOR-a/-b, TOOL_A-a",
+     "field": "wolf_reaction_pressed",
+     "kind": "canon",
+     "issue": "On the pressed route WOLF refuses the live relay ('I won't take that risk blind'). Pressed reactions that send him toward it or have him wait by it ('reads past it to the relay', 'keeps walking toward the relay', 'waits by the relay') contradict that refusal and blur the remembered choice.",
+     "fix": "LOG_CORRIDOR-a: 'WOLF reads nothing on it. He watches the seal.' LOG_CORRIDOR-b: 'WOLF looks down the corridor instead.' TOOL_A-a: 'WOLF waits by the seal, facing away.'"
+    },
+    {
+     "id": "LOG_CORRIDOR-a",
+     "field": "examine",
+     "kind": "voice",
+     "issue": "'CAKE IN THE BREAK ROOM' reads as a joke borrowed from a well-known puzzle game, not original world texture. It undercuts the grounded military register and Nathanial's original voice.",
+     "fix": "'CREW NOTE: KETTLE'S ON. BRING YOUR OWN MUG'. Or, to keep the find set from repeating food and drink, 'CREW NOTE: RELAY 2 STICKS. KICK IT GENTLY'."
+    },
+    {
+     "id": "LOG_CORRIDOR-b",
+     "field": "examine",
+     "kind": "canon",
+     "issue": "This invents new clock canon: 03:09 and 03:14, and lockdown at exactly 03:17, which is the containment card time. The Director orders lockdown after WOLF escapes, so exactly 03:17 is a guess. '03:09 RELAY CHECK: PASS' also suggests the coolant fault began with the lockdown, which is a new causal claim.",
+     "fix": "Prefer -a. If -b is kept, remove the times ('RELAY CHECK: PASS / KETTLE ON, BREAK ROOM / LOCKDOWN. CHECK-OUT: NO ENTRY') or get Nathanial's sign-off on every time stamp. Drop 'RELAY CHECK: PASS' if the fault's cause should stay open."
+    },
+    {
+     "id": "LOG_LANE-a",
+     "field": "examine",
+     "kind": "canon",
+     "issue": "'03:17 MODE: LOCKDOWN' ties the lockdown to the containment card time, which is the same unapproved clock claim. The rest of the readout is good.",
+     "fix": "'MODE: LOCKDOWN. AUTH: DIRECTOR' with no time, unless Nathanial approves 03:17 for the lockdown."
+    },
+    {
+     "id": "LOG_LANE-b",
+     "field": "examine",
+     "kind": "clarity",
+     "issue": "A system readout and a prose line are mixed in one block. 'AUTHORISED' uses British spelling while the other player-facing text uses US forms. 'REASON: NO RECORD' with 'DOOR WATCH' also points directly at the door. That is acceptable as a hint, but it overlaps the hum line.",
+     "fix": "Make the readout 'SENTRY / PATROL / AUTHORIZED CROSSINGS: 0 / DOOR WATCH: ON'. Put the prose on its own line: 'THANKS is written on its casing in marker.' Keep REASON: NO RECORD only if Nathanial wants the door hint."
+    },
+    {
+     "id": "DATA_RECORDS-a",
+     "field": "examine / wolf_notice_disclosed",
+     "kind": "clarity",
+     "issue": "'Each line reads MARKED FOR DELETION' makes the list sound like one phrase repeated with no entries. WOLF's notice repeats the examine instead of adding a plain fact.",
+     "fix": "Examine: 'A purge-queue printout sits under a cold mug. Every entry ends MARKED FOR DELETION; the last line is blank.' WOLF: 'The blank line still has a number.'"
+    },
+    {
+     "id": "OBJECT_CORRIDOR-a",
+     "field": "wolf_notice_disclosed",
+     "kind": "voice",
+     "issue": "'They meant to come back for it.' guesses at someone's intent instead of naming a plain fact. 'They' could also be misread as the engineer, who uses they/them.",
+     "fix": "WOLF: 'It's still full.' This is a plain fact, keeps the unease, and has no ambiguous pronoun."
+    },
+    {
+     "id": "TOOL_A-a",
+     "field": "examine",
+     "kind": "canon",
+     "issue": "'jaw cut for a square stem' doesn't match the junction VALVE, which is a wheel (valve_wheel, 'The wheel is stiff'). It also clashes with the draft's own seating line 'seats on the wheel'.",
+     "fix": "'A steel valve key stamped MAINT, its jaw cut to fit a valve wheel. Red tape wraps the grip, worn pale where a thumb rests.'"
+    },
+    {
+     "id": "TOOL_A-b",
+     "field": "name / wolf_notice_disclosed",
+     "kind": "clarity",
+     "issue": "'SPRUNG WHEEL WRENCH' is clunky jargon. 'RETURN ME' plus 'Someone wanted that back' repeats the come-back-later motif already carried by the lunch tin and BACK IN 5.",
+     "fix": "Name it 'VALVE WHEEL WRENCH'. If -b is chosen, change the tape to 'a crew number in marker, half scratched off', with WOLF: 'The number's been scratched off.' Prefer -a either way."
+    },
+    {
+     "id": "OBJECT_JUNCTION-a",
+     "field": "wolf_notice_disclosed",
+     "kind": "canon",
+     "issue": "Coolant fog in the junction is currently caused by the tank drop or the vent. Saying it reached the entry deck before the engineer did needs the wet-deck span from the realism step to exist first.",
+     "fix": "Ship this only after the wet-deck surface span is in, or use WOLF: 'The deck's frozen here.'"
+    },
+    {
+     "id": "REC_MIRROR-b / DATA_RECORDS-a",
+     "field": "wolf_reaction_pressed",
+     "kind": "other",
+     "issue": "Both use the same line, 'WOLF keeps his eyes on the mirror drive.' Both are in Records Access, so a player can see it twice.",
+     "fix": "Keep it for DATA_RECORDS-a. For REC_MIRROR-b use 'WOLF looks past the record, toward the exit.'"
+    },
+    {
+     "id": "DATA_RECORDS-a, LOG_LANE-a, LOG_LANE-b",
+     "field": "why",
+     "kind": "spoiler",
+     "issue": "Some rationale text paraphrases private story planning. One note names the kind of worker the private draft concerns. Another names the scapegoat framing. A third mentions how targets are classified. These notes go into the design JSON, and from there could reach a commit, PR text or comments.",
+     "fix": "Before this design leaves the scratchpad, cut every 'why' to public-safe wording: 'no author or role given', 'no link between the sentry and the purge', 'adds no new story facts'."
+    },
+    {
+     "id": "tone (all items)",
+     "field": "tone",
+     "kind": "other",
+     "issue": "Food and drink, and stepping away 'for a minute', recur across finds: mug, lunch tin, kettle, cake, BACK IN 5, RETURN ME. A full set picked from these options would repeat one note.",
+     "fix": "Allow at most one food or drink find and at most one 'back soon' find in the shipped set. Recommended set: DATA_RECORDS-a (mug), OBJECT_CORRIDOR-a (tin), LOG_CORRIDOR-a with the kettle swapped for the RELAY 2 STICKS crew note."
+    },
+    {
+     "id": "case_name_options",
+     "field": "case_name_options",
+     "kind": "clarity",
+     "issue": "'FILE' collides with save-file language in Settings and Continue. 'FINDS' is too casual next to grounded military terms like DIRECTOR / PURGE.",
+     "fix": "Use 'CASE'. The build order already calls this screen CASE/KIT."
+    }
+   ],
+   "strongest_items": [
+    "OBJECT_CORRIDOR-a LUNCH TIN (with WOLF: 'It's still full.'): the cleanest relay payoff, warm with one wrong note, spoiler-free",
+    "LOG_LANE-a SENTRY LANE LOG (drop '03:17'): the crew cared for a machine, then the Director's lockdown switched their notes off. Seriously uneasy and uses only established authority; it also mirrors the engineer's past care for WOLF's equipment",
+    "DATA_RECORDS-a PURGE QUEUE PRINTOUT (with 'Every entry ends...'): a good first Records find that hints the deletion isn't routine without naming the target",
+    "LOG_CORRIDOR-a HANDOVER SCREEN (swap the cake line): procedural, a little strange, matches the COOLANT FAULT wording",
+    "OBJECT_JUNCTION-a FROZEN WORK GLOVE: a physical junction register with haste and no injury, and the door stays undefined",
+    "TOOL_A-a RATCHET VALVE KEY (fix 'square stem' to fit a wheel): describes only make and wear, and gives no hint it is needed",
+    "REC_PURGE-a and REC_MIRROR-b: the derived records add no new canon, as long as WOLF's 'brings' is replaced by 'readout'"
+   ]
+  },
+  {
+   "problems": [
+    {
+     "id": "DATA_RECORDS.A",
+     "field": "examine + wolf_notice_disclosed",
+     "issue": "A surviving copy of something the purge reports as ERASED, plus WOLF's line \"It isn't\" gone, tells the player the purge failed and the source survives here. That is the strongest near-reveal in the set: it sits very close to a private, unapproved thread about who preserves what. It also breaks canon logic. Line 1169 says the original logs are still missing, and the chapter closes on \"I want the source... Archive is next\". An optional, inert item that is the source undercuts the chapter's goal. The 'why' says a machine kept it, but nothing on screen says so.",
+     "kind": "spoiler",
+     "fix": "Drop A and ship DATA_RECORDS.B. To keep a cartridge, make it plainly an absence: \"A grey cartridge sits in the drive tray, label peeled off. The purge queue lists the slot as EMPTY.\" WOLF notice: \"The label's gone.\" Nothing should imply the data survives."
+    },
+    {
+     "id": "LOG_LANE.A",
+     "field": "examine + wolf_notice_disclosed",
+     "issue": "\"ORDER SOURCE: NO RECORD\" with \"An order with no source\" points straight at deniable, unattributed orders. That is the core of an unapproved private mechanism, so it is too close. It also contradicts the opening, where the player watches the Director order the lockdown. The pressed beat \"WOLF stays at the rubble, facing the hatch\" is wrong for the state: the log spawns only once sentry_down is true, and _wolf_target_x then returns -1, so WOLF follows the engineer and is no longer holding at the rubble.",
+     "kind": "spoiler",
+     "fix": "Use LOG_LANE.B instead. If A is kept, replace the source line with \"ORDER: LOCKDOWN / MAINTENANCE.\" Drop the WOLF line or use \"It's still set to lockdown.\" Pressed beat: \"WOLF walks on toward the hatch without looking.\""
+    },
+    {
+     "id": "LOG_LANE.B",
+     "field": "examine",
+     "issue": "\"PATROL CONTINUES\" is false whenever the screen can be read. The log spawns only after sentry_down, when the sentry is lying under the coolant tank. The design's wall screens are driven by real state through readout(state), so this would show a contradiction.",
+     "kind": "canon",
+     "fix": "SENTRY / FAULT\\nSERVO WEAR: HIGH. SERVICE DUE.\\nSERVICE DEFERRED: LOCKDOWN.\\nSTATUS: DOWN / IMPACT."
+    },
+    {
+     "id": "LOG_CORRIDOR.B",
+     "field": "examine + wolf_reaction_pressed",
+     "issue": "\"OPERATOR: NO RECORD\" contradicts established text: the corridor purge display is headed DIRECTOR / PURGE and line 1169 calls it the Director's purge order. A hidden operator also comes close to the same private concealment thread. Putting 03:17 on a RECORDS / OVERWRITE screen ties the purge's timing to 03:17, but the purge time is unset canon (REC_PURGE.B masks it for that reason). The pressed beat \"WOLF keeps walking toward the relay\" is wrong on the press route, where WOLF has refused the relay (\"Use the bypass\"). It also duplicates the purge display a few metres away.",
+     "kind": "canon",
+     "fix": "Prefer LOG_CORRIDOR.A. If B is kept: \"RECORDS / OVERWRITE\\nRUNNING. LOCKDOWN: NO PAUSE.\" Remove the operator line and the time. Pressed beat: \"WOLF passes the screen without reading it.\""
+    },
+    {
+     "id": "LOG_CORRIDOR.A",
+     "field": "examine + wolf_reaction_pressed",
+     "issue": "\"COOLANT FAULT / RELAY. ASSIGNED: NO RECORD\" with a wiped field puts the erasure on the very job the engineer is doing. Players may read that as the engineer being written out of the records, which implies something about the engineer that Nathanial has not decided. The pressed beat \"WOLF reads the screen and says nothing\" is a notice, not an ignore.",
+     "kind": "canon",
+     "fix": "Move the wiped field off the assignee: \"COOLANT FAULT / RELAY. STATUS: OPEN.\\nSIGN-OFF: —\\nThe sign-off field has been cleared, not left blank.\" WOLF notice: \"Someone cleared the sign-off.\" Pressed: \"WOLF passes the board without reading it.\""
+    },
+    {
+     "id": "OBJECT_CORRIDOR.A",
+     "field": "examine + wolf_notice_disclosed",
+     "issue": "\"the seal has been shut since 03:17\" becomes false once the relay raises the seal, and the mug sits at x 690–740 by the seal, so a player can pick it up after the seal is open. The logic is also muddled: the mug is on the engineer's side of the seal, so the shut seal does not explain why warmth is wrong. \"Someone left fast\" is interpretation, which breaks the draft's own rule that WOLF names what he sees and not what it means.",
+     "kind": "clarity",
+     "fix": "\"A dented steel mug sits on the ledge by the seal, half full. It is still warm. Nobody has signed into this corridor since the lockdown.\" WOLF notice: \"Still warm.\""
+    },
+    {
+     "id": "DATA_RECORDS.B + OBJECT_CORRIDOR.A",
+     "field": "examine (set level)",
+     "issue": "Two items rely on residual warmth (the printer and the mug), and both WOLF notices point to an unseen person who just left. Together they invent another human moving through the locked sections, which is an unapproved witness/NPC thread. The slip \"torn mid-line\" adds that someone took the top half away. With DATA_RECORDS.A that would triangulate the private preserved-record thread.",
+     "kind": "canon",
+     "fix": "Use warmth once. If the mug ships, make the slip: \"A thermal slip curls from the printer. Every legible row reads MARKED FOR DELETION; the rest is smeared.\" WOLF notice: \"Every row says the same thing.\" Do not ship DATA_RECORDS.A with a torn slip."
+    },
+    {
+     "id": "REC_MIRROR.WOLF",
+     "field": "wolf_reaction_pressed + examine",
+     "issue": "\"WOLF hands nothing over\" contradicts this record's own route. On mirror_route 'wolf', WOLF supplied the timestamp by his own choice, and the relay outcome does not gate his mirror help. Separately, the examine line's word \"brings\" sits awkwardly against Nathanial's rule that WOLF never fetches or carries, because a case entry reads as a physical handover.",
+     "kind": "canon",
+     "fix": "Pressed: \"WOLF gives the readout and turns to the exit.\" Optional examine variant, which should stay in sync with line 1235 if changed: \"WOLF reads out the mirror timestamp by his own choice. The purge target existed before the deletion order.\""
+    },
+    {
+     "id": "REC_PURGE.A / REC_PURGE.B",
+     "field": "wolf_notice_disclosed (annotation)",
+     "issue": "\"WOLF: A list isn't the source\" nearly repeats WOLF's closing line (1187), which already says \"A list doesn't tell me who's a threat. I want the source.\" Repeating \"list\" in the case strengthens the target-list reading of the purge more than needed. The annotation also adds nothing new.",
+     "kind": "voice",
+     "fix": "Drop the annotation, or use \"WOLF: That's the order. Not the source.\""
+    },
+    {
+     "id": "REC_PURGE.B",
+     "field": "examine",
+     "issue": "The •••• masks would ship as in-world redaction, which creates a new fact: someone redacted the engineer's own copy. That conflicts with A and with line 1169, where the copy has a time and target ID. The bullet glyph may also be missing from the UI font.",
+     "kind": "clarity",
+     "fix": "Ship REC_PURGE.A. If an on-screen layout is wanted: \"DIRECTOR / PURGE\\nTIME AND TARGET ID: COPIED.\\nA local copy. The original logs are still missing.\""
+    },
+    {
+     "id": "OBJECT_JUNCTION.A / OBJECT_JUNCTION.B",
+     "field": "wolf_notice_disclosed / wolf_reaction_pressed",
+     "issue": "On entry WOLF runs straight to the seam (WOLF_SEAM_X 418), then holds at the rubble (448) until sentry_down. Items at x 40–200 are about 220–380 px away, beyond the design's ~120 px notice range, so the notice almost never fires (only after a late backtrack). \"WOLF keeps his ear to the door\" and \"stays at the seam\" are wrong once the door is down.",
+     "kind": "other",
+     "fix": "Treat both notices as rare backtrack beats and make the pressed lines state-neutral: A \"WOLF doesn't look back.\" B \"WOLF keeps his eyes on the line.\" Alternatively, place the gauge card by the valve (x ~380–410, outside the vent span) so WOLF at the seam is in range."
+    },
+    {
+     "id": "SET:03:17",
+     "field": "examine (LOG_CORRIDOR.A/B, OBJECT_CORRIDOR.A, LOG_LANE.A)",
+     "issue": "In game, 03:17 appears only on the opening card (03:17 / CONTAINMENT). Four items turn it into the exact lockdown start, which Nathanial has not set. Repeating it next to purge screens invites players to read it as the purge order's time, which is deliberately unset.",
+     "kind": "canon",
+     "fix": "Use 03:17 at most once, on the corridor shift board (\"03:17 LOCKDOWN\"), and confirm that reading with Nathanial. Elsewhere use \"since the lockdown\" or \"LOCKDOWN\" without a time."
+    },
+    {
+     "id": "SET:erasure",
+     "field": "examine (set level)",
+     "issue": "Too many items carry the same wrong note of a wiped identity or source: label blank, field cleared, operator NO RECORD, order source NO RECORD, number ground off, sign-out blank. Repeated across three rooms it becomes a loud signal about concealment, which is closer to the private plot than single hints, and it flattens the strange-to-unease-to-horror progression.",
+     "kind": "spoiler",
+     "fix": "Cap the erasure motif at two items, for example LOG_CORRIDOR.A (fixed) and TOOL_A.B. Give the rest physical wrong notes instead: warmth, pressure, wear, a lock holding nothing, a weld on the wrong side."
+    },
+    {
+     "id": "TOOL_A.A",
+     "field": "examine + wolf_notice_disclosed",
+     "issue": "\"the stores number is ground off\" adds a deliberate-concealment beat to the one tool. That pushes the erasure motif further and implies a tool thief or saboteur, an unapproved human thread.",
+     "kind": "other",
+     "fix": "Prefer TOOL_A.B. If A is kept: \"A forked steel valve key, grip wrapped in worn tape. The jaws are bright where they bite a spoke.\" WOLF notice: \"Somebody used that hard.\""
+    },
+    {
+     "id": "OBJECT_CORRIDOR.B",
+     "field": "examine",
+     "issue": "\"Its padlock is closed on an empty hasp\" is physically hard to picture: a padlock closes through the hasp, so a player may not see what is wrong.",
+     "kind": "clarity",
+     "fix": "\"A red lockout tag hangs on a hook by the seal, signed by maintenance. Its padlock is locked shut around nothing.\""
+    },
+    {
+     "id": "case_name_options",
+     "field": "case_name_options",
+     "issue": "FILE reads as a save or file menu next to Continue and Load. KEPT is unclear as a Pause button label. The approved design already names the button CASE.",
+     "kind": "clarity",
+     "fix": "Use CASE."
+    },
+    {
+     "id": "DATA_RECORDS.A / REC_PURGE.A",
+     "field": "wolf_reaction_pressed",
+     "issue": "\"mirror drive\" is not an in-game term. The station label is MIRROR PORT, and WOLF says \"mirror index\" and \"I'll inspect the mirror\".",
+     "kind": "voice",
+     "fix": "\"WOLF keeps his eyes on the mirror port.\" / \"WOLF is already at the mirror port.\""
+    }
+   ],
+   "strongest_items": [
+    "REC_PURGE.A: word-for-word line 1169 with the in-game name PURGE-ORDER TRACE; zero new canon",
+    "REC_MIRROR.MANUAL: credits the engineer-only route as plainly as WOLF's and uses existing sentences",
+    "OBJECT_CORRIDOR.B LOCKOUT TAG (with the clarity fix): procedural, signed by role only, quietly echoes WOLF breaking his own latch without saying so; best WOLF notice line",
+    "OBJECT_JUNCTION.B GAUGE CARD: ties into the pressure line, gauge and relief vent the player is about to use; abandoned mid-reading is serious without explaining anything",
+    "OBJECT_JUNCTION.A SEAL PERMIT: backs up the existing 'sealed from the other side' line; 'That weld wasn't done from here.' names what he sees",
+    "LOG_LANE.B SENTRY FAULT LOG (with the STATUS: DOWN fix): physical horror through equipment, safer than A, no orders or targets",
+    "TOOL_A.B SPOKE RATCHET: grounded, ownerless, no gameplay promise; 'Stores never got that one back.' is in WOLF's plain voice",
+    "DATA_RECORDS.B QUEUE SLIP (with the untorn fix): reuses established MARKED FOR DELETION wording, no readable target",
+    "No engineer gendering anywhere in the draft; WOLF he/him only"
+   ]
+  }
+ ],
+ "final": {
+  "case_name": "CASE",
+  "case_name_alternatives": [
+   "EVIDENCE",
+   "CASE FILE"
+  ],
+  "items": [
+   {
+    "id": "REC_PURGE",
+    "room": "RECORDS ACCESS",
+    "placement": "Derived record with no prop and no pickup. It appears automatically when purge_trace_preserved is true (PURGE QUEUE station, x about 190). Found in: RECORDS ACCESS.",
+    "kind_tag": "RECORD",
+    "name": "PURGE-ORDER TRACE",
+    "examine": "The Director's purge order has a time and target ID. %s keeps a local copy; the original logs are still missing.",
+    "wolf_notice_disclosed": "None on collection (critical path). Optional case annotation, timeless: \"WOLF: That's the order. Not the source.\"",
+    "wolf_reaction_pressed": "None. Derived records get no ignore beat, because staging such as 'keeps working the mirror' is wrong when the case is opened later in the Junction.",
+    "alternative_name": "PURGE ORDER COPY",
+    "alternative_examine": "DIRECTOR / PURGE\nTIME AND TARGET ID: COPIED.\nA local copy. The original logs are still missing."
+   },
+   {
+    "id": "REC_MIRROR",
+    "room": "RECORDS ACCESS",
+    "placement": "Derived record with no prop. It appears automatically when mirror_trace_preserved is true (MIRROR PORT, x about 520). The last sentence varies by mirror_route. The examine text below is the 'wolf' route. The 'manual' route reads: 'The mirror timestamp shows the purge target existed before the deletion order. %s copies it through the maintenance port; WOLF keeps watch.' Found in: RECORDS ACCESS.",
+    "kind_tag": "RECORD",
+    "name": "MIRROR TIMESTAMP",
+    "examine": "The mirror timestamp shows the purge target existed before the deletion order. WOLF reads it out by his own choice.",
+    "wolf_notice_disclosed": "None on collection. Optional case annotation, timeless: \"WOLF: The mirror kept its own time.\"",
+    "wolf_reaction_pressed": "None. WOLF helped at the mirror whatever happened at the relay, so a cold beat here would contradict his own choice.",
+    "alternative_name": "MIRROR INDEX COPY",
+    "alternative_examine": "Copied from the mirror index. Its timestamp shows the purge target existed before the deletion order. Read off WOLF's readout, by his own choice. (Manual route: Copied through the maintenance port while WOLF kept watch.)"
+   },
+   {
+    "id": "DATA_RECORDS",
+    "room": "RECORDS ACCESS",
+    "placement": "Secondary console reader at about x 330-400 (free span 248-462), clear of the reach of both PURGE QUEUE (190) and MIRROR PORT (520). Hazard-free first pickup: tap USE. Found in: RECORDS ACCESS.",
+    "kind_tag": "DATA",
+    "name": "DATA CARTRIDGE",
+    "examine": "A grey cartridge sits in its reader. The reader shows OVERWRITE COMPLETE; the casing is still warm.",
+    "wolf_notice_disclosed": "WOLF: The casing's still warm.",
+    "wolf_reaction_pressed": "WOLF lets it pass without a glance.",
+    "alternative_name": "QUEUE SLIP",
+    "alternative_examine": "A thermal slip curls from the printer. Every legible row reads MARKED FOR DELETION; the rest is smeared."
+   },
+   {
+    "id": "LOG_CORRIDOR",
+    "room": "MAINTENANCE CORRIDOR",
+    "placement": "Small wall screen at about x 520-530. The tool sits at about x 460, the breaker reach ends at about 402 and the relay contact is at 592; confirm with the pickup-overlap test. It is usually reached BEFORE the relay choice. With WOLF's memory empty he has no reaction and keeps following. Notice and ignore fire only if the engineer returns after the choice. Hold USE to copy. Found in: MAINTENANCE CORRIDOR.",
+    "kind_tag": "LOG",
+    "name": "RELAY WORK ORDER",
+    "examine": "WORK ORDER / COOLANT RELAY\nSTATUS: OPEN. ASSIGNED: MAINTENANCE.\nTECH NOTE: REMOVED.\nThe cursor blinks in the empty field.",
+    "wolf_notice_disclosed": "WOLF: The note's gone. The order isn't.",
+    "wolf_reaction_pressed": "WOLF looks down the corridor instead.",
+    "alternative_name": "HANDOVER SCREEN",
+    "alternative_examine": "MAINTENANCE / HANDOVER\nCOOLANT FAULT: OPEN.\nCREW NOTE: RELAY HOUSING RUNS HOT. GLOVES ON.\nLOCKDOWN ACTIVE. HANDOVER NOT SIGNED."
+   },
+   {
+    "id": "OBJECT_CORRIDOR",
+    "room": "MAINTENANCE CORRIDOR",
+    "placement": "On a hook on the near side of the red seal, about x 690-740, past the relay contact (592) and short of the safe point. Tap USE. Gate the reaction on WOLF's memory being set, not on position: a player can reach it before choosing, and then WOLF has no reaction. Found in: MAINTENANCE CORRIDOR.",
+    "kind_tag": "OBJECT",
+    "name": "LOCKOUT TAG",
+    "examine": "A red lockout tag hangs on a hook by the seal, signed by maintenance. Its padlock is locked shut around nothing.",
+    "wolf_notice_disclosed": "WOLF: That lock isn't holding anything.",
+    "wolf_reaction_pressed": "WOLF looks at the seal, not the hook.",
+    "alternative_name": "LUNCH TIN",
+    "alternative_examine": "A lunch tin sits on the ledge by the seal, lid latched, a paper-boat sticker on top. It is still full."
+   },
+   {
+    "id": "OBJECT_JUNCTION",
+    "room": "SERVICE JUNCTION",
+    "placement": "On the deck at the junction entry, about x 60-130, left of the OVERLOAD BREAKER (200) and outside the relief vent (300). Collectable before the pressure line starts. Tap USE. WOLF runs to the seam (x 418) when the beat starts, beyond the roughly 120 px notice radius, so both reactions are rare backtrack beats and are written to work in any door state. Found in: SERVICE JUNCTION.",
+    "kind_tag": "OBJECT",
+    "name": "CRACKED GAUGE",
+    "examine": "A pressure gauge lies on the deck, glass starred, needle pinned past red. Its wall mount above is empty.",
+    "wolf_notice_disclosed": "WOLF: That line's run past red.",
+    "wolf_reaction_pressed": "WOLF keeps his eyes on the line.",
+    "alternative_name": "GAUGE CARD",
+    "alternative_examine": "A gauge card is wired to the entry rail, readings pencilled in a column. The last one is past the red line; the next row is blank."
+   },
+   {
+    "id": "LOG_LANE",
+    "room": "SERVICE JUNCTION",
+    "placement": "Lane panel past the rubble. It spawns only once sentry_down is true. Its reach must stay clear of the ARM PANEL alcove, the floor mark, the coolant-cloud span and the exit bolt (850). Hold USE to copy. The STATUS line comes from readout(state), so it always matches the downed sentry. After sentry_down WOLF follows rather than holding at the rubble, so no reaction pins his position. Found in: SERVICE JUNCTION.",
+    "kind_tag": "LOG",
+    "name": "SENTRY PATROL LOG",
+    "examine": "SENTRY / LANE PATROL\nMODE: LOCKDOWN. AUTHORITY: DIRECTOR.\nSTAND-DOWN CODE: NO RECORD.\nSTATUS: DOWN.",
+    "wolf_notice_disclosed": "WOLF: Nobody could have called it off.",
+    "wolf_reaction_pressed": "WOLF looks toward the hatch and says nothing.",
+    "alternative_name": "SENTRY FAULT LOG",
+    "alternative_examine": "SENTRY / FAULT\nSERVO WEAR: HIGH. SERVICE DUE.\nSERVICE DEFERRED: LOCKDOWN.\nSTATUS: DOWN / IMPACT."
+   },
+   {
+    "id": "TOOL_A",
+    "room": "MAINTENANCE CORRIDOR (collected) / SERVICE JUNCTION (used at the VALVE)",
+    "placement": "Corridor floor at about x 460, between the breaker (reach ends at about 402) and the screen (about 520-530); confirm with the overlap test. It is usually collected before the relay choice, so WOLF has no reaction and keeps following. Toast: 'Stowed: WHEEL RATCHET'. First seat at the junction VALVE (x 420): 'The ratchet head drops over the hub and catches. The wheel is still stiff.' Each hold tick reads as a ratchet click, and the turn count stays at 3.",
+    "kind_tag": "TOOL",
+    "name": "WHEEL RATCHET",
+    "examine": "A long-handled ratchet, paint worn to bare steel at the grip. Its head is cut for a valve-wheel hub; the pawl clicks clean.",
+    "wolf_notice_disclosed": "WOLF: That pawl's been looked after.",
+    "wolf_reaction_pressed": "WOLF doesn't look over.",
+    "alternative_name": "VALVE KEY",
+    "alternative_examine": "A steel T-handle valve key, grip wrapped in black tape. Its socket is cut to fit a wheel hub; the shaft is stamped MAINT."
+   }
+  ],
+  "notes_for_nathanial": [
+   "Nothing ships until you approve it item by item; approved=false never spawns. No files were edited. This set exists only as this output.",
+   "No clock times appear anywhere in the set. 03:17 stays on the containment card only, so nothing invites players to line up times against the unset purge time. No masked values (••••) either: the PURGE ORDER COPY alternative says 'TIME AND TARGET ID: COPIED.' instead, because masking would read as someone redacting the engineer's own copy.",
+   "Decide on the mirror wording: main.gd:1235 says 'WOLF brings the mirror timestamp by his own choice.' That conflicts with your rule that WOLF never fetches or carries. The case uses 'WOLF reads it out by his own choice.' If you approve that, consider updating the status line to match so the record stays word for word. The manual-route line matches 1237 except for the opening fact sentence.",
+   "Derived records (PURGE-ORDER TRACE, MIRROR TIMESTAMP) get no WOLF reaction when collected and no ignore beat at all. The optional disclose annotations avoid the word 'list' so they don't echo the FIRST COPY close twice or push a target-list reading.",
+   "Set-level motif caps: one 'still warm' item (cartridge), one removed-text item (the work order's TECH NOTE), no food or drink, no 'back in 5', no ID or badge, and no 'label' in any item. Most wrong notes are physical (a lock holding nothing, a gauge past red, no stand-down code).",
+   "Question for you: 'TECH NOTE: REMOVED' on the coolant relay order may make players wonder whether the fault was deliberate. If you don't want that question seeded, use the HANDOVER SCREEN alternative. But 'HANDOVER NOT SIGNED' implies other maintenance crew were on shift, which is not established canon. The LUNCH TIN alternative raises the same question.",
+   "LOG_LANE uses 'AUTHORITY: DIRECTOR', which only restates the lockdown order already shown in the opening. If you want no Director tie in the Junction, take SENTRY FAULT LOG, which is purely equipment.",
+   "Placement: the tool at about x 460 and the corridor screen at about x 520-530 keep them apart and clear of the breaker reach. Both sit before the relay choice, so most players will see WOLF stay silent there, and the notice and ignore lines only fire on a return trip. OBJECT_JUNCTION is out of WOLF's notice range at the seam. Either accept rare backtrack reactions or move it toward the valve after checking the vent span.",
+   "The WHEEL RATCHET text describes only the tool's make, wear and fit. It promises no speed or fewer turns, and the 3 turns stay until the junction has been played. The toast uses 'Stowed:' for the tool and 'Logged:' for case entries.",
+   "Case name: CASE is recommended (it is short and matches the build order's CASE/KIT). EVIDENCE is the more explicit alternative. CASE FILE is offered, but FILE on its own was dropped because it reads as save-file language.",
+   "The draft 'why' rationales in the scratchpad JSON paraphrase private planning. Keep them out of commits, PR text and the public docs.",
+   "WOLF notice lines are all 40 characters or fewer, examine text is all 140 characters or fewer, and there are no square brackets (RichTextLabel-safe). All spelling is US; the engineer is never gendered."
+  ]
+ }
+}

@@ -1,0 +1,123 @@
+{
+ "eng-collapse": {
+  "src": "frames/eng-collapse-1",
+  "src_frames": [
+   0,
+   1,
+   2,
+   3,
+   4
+  ],
+  "n": 5,
+  "cell": [
+   576,
+   320
+  ],
+  "specks_removed": [
+   0,
+   0,
+   0,
+   0,
+   0
+  ],
+  "x_lock_px": {
+   "2": -10,
+   "3": -6,
+   "4": -3
+  },
+  "durations_ms": [
+   90,
+   90,
+   135,
+   135,
+   null
+  ],
+  "note": "knees 0.00-0.18 s (frames 0-1), slump onto the side 0.18-0.45 s (frames 2-3), frame 4 holds from 0.45 s until RETRY. Reduced Motion: cut straight to frame 4."
+ },
+ "wolf-liedown": {
+  "src": "frames/wolf-liedown-1-graded",
+  "src_frames": [
+   0,
+   1,
+   2,
+   3
+  ],
+  "n": 4,
+  "cell": [
+   640,
+   272
+  ],
+  "specks_removed": [
+   0,
+   0,
+   0,
+   0
+  ],
+  "x_lock_px": {
+   "1": -6
+  },
+  "durations_ms": [
+   120,
+   120,
+   120,
+   null
+  ],
+  "note": "frame 0 is the delivered walk3 wolf-idle frame_00 (standing; all WOLF death frames carry the walk3 grade); the WOLF reaction starts about 0.5 s after the hit; once he has walked in and stopped 40-48 px from the engineer, the lie-down takes 0.36 s and frame 3 holds until RETRY. Repeat death: straight to frame 3."
+ },
+ "wolf-lookaway": {
+  "src": "frames/wolf-lookaway-1-graded",
+  "src_frames": [
+   0
+  ],
+  "n": 1,
+  "cell": [
+   640,
+   272
+  ],
+  "specks_removed": [
+   0
+  ],
+  "x_lock_px": {},
+  "durations_ms": [
+   null
+  ],
+  "note": "one still pose, held until RETRY"
+ },
+ "wolf-lookaway-alt": {
+  "src": "frames/wolf-lookaway-1-graded",
+  "src_frames": [
+   1,
+   2
+  ],
+  "n": 2,
+  "cell": [
+   640,
+   272
+  ],
+  "specks_removed": [
+   0,
+   0
+  ],
+  "x_lock_px": {},
+  "durations_ms": [
+   null,
+   null
+  ],
+  "note": "alternates: the same pose with the head lower (not part of the row)"
+ },
+ "_cells": {
+  "eng": {
+   "W": 576,
+   "H": 320,
+   "baseline_row": 311,
+   "pivot_x": 288
+  },
+  "wolf": {
+   "W": 640,
+   "H": 272,
+   "baseline_row": 263,
+   "pivot_x": 357
+  },
+  "note": "Same height, baseline row and pivot-to-centre offset as the walk rows (engineer 256x320, base 311, pivot 128 = centre; WOLF 512x272, base 263, pivot 293 = centre + 37); wider so the lying poses fit. Engineer pivot 288 = centre; WOLF pivot 357 = centre + 37."
+ }
+}

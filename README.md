@@ -220,7 +220,9 @@ The provisional logo, sprites, title art, layered room plates and station
 props are separate assets with AI-assisted provenance recorded in
 [the asset register](apps/game/assets/manifest.json); they are not
 covered by the code/docs GPL and their final rights review is open. The
-processed sound recordings are CC0, credited on the credits page.
+concept art, mock-ups and game captures in the design notes under `docs/`
+have the same status. The processed sound recordings are CC0, credited on
+the credits page.
 
 The game stores only its checkpoint, settings and Godot's own log and
 shader cache files on your device and sends nothing over the network;
