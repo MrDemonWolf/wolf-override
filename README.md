@@ -75,7 +75,10 @@ no packaged release; run the game from source.
    ```
 
 After the first import, `godot --path apps/game` launches the game
-directly.
+directly. It opens on the MrDemonWolf, Inc. logo, which any key, click,
+controller button or tap skips once the title has loaded. Scripts and
+capture tools can pass `-- --skip-logo` to go straight to the title;
+headless runs always do.
 
 ## Usage
 
@@ -222,7 +225,8 @@ props are separate assets with AI-assisted provenance recorded in
 covered by the code/docs GPL and their final rights review is open. The
 concept art, mock-ups and game captures in the design notes under `docs/`
 have the same status. The processed sound recordings are CC0, credited on
-the credits page.
+the credits page. The MrDemonWolf, Inc. logo and mascot are the company's
+branding, all rights reserved, and are not covered by the GPL.
 
 The game stores only its checkpoint, settings and Godot's own log and
 shader cache files on your device and sends nothing over the network;
