@@ -7,6 +7,7 @@ These are development updates to the source build, not downloadable releases. Th
 
 ## October 12, 2026
 
+- Test builds now carry the game's own licence (GNU GPL version 3 or later) beside Godot's and the fonts' notices, link the source for the commit they were built from, and say that the art and other media have separate rights the GPL does not cover. One automated check on the corridor's **MANUAL BYPASS** that could fail on a busy machine now waits for the game to register letting go. Website: the Testing page notes that the GitHub CLI unpacks a test build into a folder for you.
 - Automatic test builds: every change to the main branch, and every pull request from this repository, now builds the game for macOS (one app for Apple silicon and Intel) and 64-bit Windows. They are unsigned debug builds with the debug tools on, kept for 14 days, and anyone signed in to GitHub can download them; macOS and Windows warn the first time one is opened. The Testing page explains where to get them and how to open them. They are not releases, and nobody has opened one by hand as part of making it.
 - Development: the automated game checks now run several test suites at once, stop and report a suite that hangs, and also fail on unexpected errors in the first import. Website: the Testing page covers the test builds and these checks, and Get the game points testers to the builds.
 

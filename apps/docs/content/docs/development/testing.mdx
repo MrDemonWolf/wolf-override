@@ -100,9 +100,9 @@ These are **debug** builds of the source game, not releases:
 1. Open the [Test builds runs](https://github.com/MrDemonWolf/wolf-override/actions/workflows/builds.yml) on GitHub, signed in, and choose the run for the commit or pull request you want (pull requests also link to it under their checks).
 2. The run's summary lists the two downloads with their sizes: `wolf-override-macos-debug-<commit>.zip` and `wolf-override-windows-debug-<commit>.zip`, where `<commit>` is the first seven characters of the commit it was built from. The same files are under **Artifacts** at the bottom of the page.
 
-With the [GitHub CLI](https://cli.github.com/) you can also run `gh run download <run id> --repo MrDemonWolf/wolf-override --name wolf-override-macos-debug-<commit>.zip`.
+With the [GitHub CLI](https://cli.github.com/) you can also run `gh run download <run id> --repo MrDemonWolf/wolf-override --name wolf-override-macos-debug-<commit>.zip`. The CLI unzips it for you into a folder of that name, so there is nothing left to unzip, and macOS does not flag the app it saves: it opens without the Gatekeeper steps below.
 
-Each zip has a `licenses` folder beside the game with the notices for Godot Engine, the components inside it and the game's two typefaces, and a short `README.txt` naming the commit it was built from.
+Each zip has a `licenses` folder beside the game with the game's own licence (GNU GPL version 3 or later), the notices for Godot Engine, the components inside it and the game's two typefaces, and a short `README.txt` naming the commit it was built from and linking its source. The art and other media have separate rights that the GPL does not cover; see [Legal](/docs/legal/).
 
 ### Open it on macOS
 
