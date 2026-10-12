@@ -8,6 +8,11 @@ const ACTIONS: Array[StringName] = [&"move_left", &"move_right", &"interact", &"
 const ACTION_NAMES: Array[String] = ["Move left", "Move right", "Interact / continue", "Response 1", "Response 2", "Pause"]
 const BUSES: Array[String] = ["Master", "Music", "Effects", "Voice"]
 const MAX_SETTINGS_BYTES: int = 65536
+## Window sizes offered in Settings, by index. A first launch (no saved size) opens at
+## DEFAULT_WINDOW_SIZE, the same size project.godot gives the first window, so the characters are
+## not drawn at the smallest size. Mobile windows are OS-managed and ignore both.
+const WINDOW_SIZES: Array[Vector2i] = [Vector2i(960, 540), Vector2i(1280, 720), Vector2i(1920, 1080)]
+const DEFAULT_WINDOW_SIZE: int = 1
 
 ## Reduced Motion changed; Main hands it to the impact kit (no shake or hit-stop, shorter flashes).
 signal reduced_motion_changed(enabled: bool)
@@ -120,6 +125,29 @@ static func number(config: ConfigFile, section: String, key: String, fallback: f
 static func boolean(config: ConfigFile, section: String, key: String, fallback: bool) -> bool:
 	var value: Variant = config.get_value(section, key, fallback)
 	return value if value is bool else fallback
+
+
+## The saved window size's index into WINDOW_SIZES; an unreadable value opens at the default.
+static func saved_window_index(config: ConfigFile) -> int:
+	return clampi(int(number(config, "video", "resolution", DEFAULT_WINDOW_SIZE)), 0, WINDOW_SIZES.size() - 1)
+
+
+static func window_size(index: int) -> Vector2i:
+	return WINDOW_SIZES[index] if index >= 0 and index < WINDOW_SIZES.size() else WINDOW_SIZES[DEFAULT_WINDOW_SIZE]
+
+
+## Applies the saved window size and fullscreen (desktop only). Run at launch by the logo screen and
+## again by the title, so it changes nothing the second time: a fullscreen window keeps its size.
+static func apply_saved_window(window: Window, config: ConfigFile) -> void:
+	if window.mode == Window.MODE_WINDOWED:
+		# The OS centres the first window at the project's 1280x720 override; a different saved size
+		# is applied here, so centre again rather than leave it anchored to the 1280x720 corner.
+		var wanted: Vector2i = window_size(saved_window_index(config))
+		if window.size != wanted:
+			window.size = wanted
+			window.move_to_center()
+	if boolean(config, "video", "fullscreen", false) and window.mode != Window.MODE_FULLSCREEN:
+		window.mode = Window.MODE_FULLSCREEN
 
 
 func _build_menu() -> void:

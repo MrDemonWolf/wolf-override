@@ -453,11 +453,6 @@ const CHAPTER_CLOSE_CAMERA: Vector2 = Vector2(960.0 - 480.0 / CHAPTER_CLOSE_ZOOM
 ## Menu cards fade and slide in over this long; short enough never to hold up input or players who want little motion.
 const MENU_REVEAL_SECONDS: float = 0.12
 const MENU_REVEAL_OFFSET: Vector2 = Vector2(0.0, 10.0)
-## Window sizes offered in Settings, by index. A first launch (no saved size) opens at
-## DEFAULT_RESOLUTION, the same size project.godot gives the first window, so the characters are
-## not drawn at the smallest size. Mobile windows are OS-managed and ignore both.
-const RESOLUTIONS: Array[Vector2i] = [Vector2i(960, 540), Vector2i(1280, 720), Vector2i(1920, 1080)]
-const DEFAULT_RESOLUTION: int = 1
 
 
 ## Fades [member labels] out as they reach the edge of the view (JunctionRoom.fade_at_view_edge) while
@@ -1229,15 +1224,16 @@ func _setup_settings() -> void:
 	fps_options.add_item("90 FPS", 90)
 	fps_options.add_item("120 FPS", 120)
 	fps_options.add_item("144 FPS", 144)
-	for index: int in RESOLUTIONS.size():
-		resolution_options.add_item("%d × %d" % [RESOLUTIONS[index].x, RESOLUTIONS[index].y], index)
+	for index: int in GameSettings.WINDOW_SIZES.size():
+		var option: Vector2i = GameSettings.WINDOW_SIZES[index]
+		resolution_options.add_item("%d × %d" % [option.x, option.y], index)
 	var config: ConfigFile = GameSettings.load_config(settings_path)
 	var fps: int = int(GameSettings.number(config, "video", "fps_limit", 60))
 	if not fps in [0, 30, 60, 90, 120, 144]:
 		fps = 60
 	Engine.max_fps = fps
 	fps_options.select(fps_options.get_item_index(fps))
-	var resolution: int = clampi(int(GameSettings.number(config, "video", "resolution", DEFAULT_RESOLUTION)), 0, RESOLUTIONS.size() - 1)
+	var resolution: int = GameSettings.saved_window_index(config)
 	resolution_options.select(resolution)
 	var mobile: bool = OS.has_feature("ios") or OS.has_feature("android")
 	resolution_options.disabled = mobile
@@ -1246,15 +1242,9 @@ func _setup_settings() -> void:
 	if mobile:
 		$CanvasLayer/PauseOverlay/Panel/PauseMenu/PauseHint.text = "TAP RESUME TO RETURN"
 	if not mobile:
-		# The OS centres the first window at the project's 1280x720 override; a different saved size
-		# is applied here, so centre again rather than leave it anchored to the 1280x720 corner.
-		var saved_size: Vector2i = _resolution_size(resolution)
-		if get_window().size != saved_size:
-			get_window().size = saved_size
-			get_window().move_to_center()
+		# The logo screen normally applied these at launch already; a direct start applies them here.
+		GameSettings.apply_saved_window(get_window(), config)
 		fullscreen_toggle.button_pressed = GameSettings.boolean(config, "video", "fullscreen", false)
-		if fullscreen_toggle.button_pressed:
-			get_window().mode = Window.MODE_FULLSCREEN
 	fps_options.item_selected.connect(_on_fps_selected)
 	resolution_options.item_selected.connect(_on_resolution_selected)
 	fullscreen_toggle.toggled.connect(_on_fullscreen_toggled)
@@ -1262,7 +1252,7 @@ func _setup_settings() -> void:
 
 
 func _resolution_size(index: int) -> Vector2i:
-	return RESOLUTIONS[index] if index >= 0 and index < RESOLUTIONS.size() else RESOLUTIONS[DEFAULT_RESOLUTION]
+	return GameSettings.window_size(index)
 
 
 func _on_fps_selected(index: int) -> void:

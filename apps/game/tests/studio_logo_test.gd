@@ -37,6 +37,14 @@ func _check_skip_rules() -> void:
 	for path: String in warm:
 		loadable = loadable and ResourceLoader.exists(path) and not path.begins_with(StudioLogo.BRAND_DIR) and not path.ends_with(".json")
 	_expect(loadable and warm.has("res://assets/title-corridor-key-art-provisional.png"), "the warm-up lists the game's loadable assets and leaves out the logo's own folder")
+	var chosen: ConfigFile = ConfigFile.new()
+	_expect(not StudioLogo.wants_saved_window(chosen, false), "a first launch keeps the window the engine opened")
+	chosen.set_value("video", "fullscreen", true)
+	_expect(StudioLogo.wants_saved_window(chosen, false), "a saved fullscreen applies on the logo's first frame")
+	_expect(not StudioLogo.wants_saved_window(chosen, true), "a phone's window is left to the OS")
+	chosen = ConfigFile.new()
+	chosen.set_value("video", "resolution", 2)
+	_expect(StudioLogo.wants_saved_window(chosen, false), "a saved window size applies on the logo's first frame")
 
 
 ## Headless, the logo goes straight to the title without starting its own load.
@@ -73,6 +81,17 @@ func _check_timeline() -> void:
 	_expect(is_equal_approx(logo.fade.color.a, 0.5), "everything fades to the title's dark")
 	logo.seek(StudioLogo.FADE_AT, 1.0)
 	_expect(logo.load_bar.visible and logo.load_bar.position.y > logo.company_name.position.y + logo.company_name.size.y, "the loading bar sits under the name")
+	var track: float = logo.load_bar.size.x
+	var starts: Array[float] = []
+	var inside: bool = true
+	for step: int in range(8):
+		logo.bar_time = StudioLogo.BAR_SWEEP_SECONDS * step / 8.0
+		logo.seek(StudioLogo.FADE_AT, 1.0)
+		var fill: ColorRect = logo.load_fill
+		inside = inside and fill.position.x >= 0.0 and fill.position.x + fill.size.x <= track + 0.01 and fill.size.x <= track * StudioLogo.BAR_SEGMENT + 0.01
+		starts.append(fill.position.x)
+	_expect(inside and starts.max() - starts.min() > track * 0.5, "the loading bar sweeps a short segment across its track instead of sitting near full")
+	_expect(not auto_accept_quit and not quit_on_go_back, "closing during the background load waits for it")
 	await _free_logo(logo)
 
 
@@ -98,9 +117,26 @@ func _check_handover() -> void:
 		await process_frame
 	var played: float = (Time.get_ticks_msec() - started) / 1000.0
 	_expect(not is_instance_valid(logo) and _on_title(), "the logo hands over to main.tscn")
+	_expect(auto_accept_quit and quit_on_go_back, "once loaded, closing quits at once again")
 	_expect(played >= StudioLogo.END_AT - 0.05 and played < StudioLogo.END_AT + 1.5, "the logo plays for about two seconds (%.2f s)" % played)
 	var cover: CanvasLayer = root.get_node_or_null("StudioLogoHandover") as CanvasLayer
 	_expect(cover != null, "a cover in the fade colour hides the cut to the title")
+	# A player still pressing to skip: Enter, a click and a controller A on the title's first frames.
+	var title: Node = current_scene
+	var click: InputEventMouseButton = InputEventMouseButton.new()
+	click.button_index = MOUSE_BUTTON_LEFT
+	click.position = Vector2(480, 300)
+	var pad: InputEventJoypadButton = InputEventJoypadButton.new()
+	pad.button_index = JOY_BUTTON_A
+	for frame: int in range(6):
+		for pressed: bool in [true, false]:
+			root.push_input(_key(KEY_ENTER, pressed))
+			click.pressed = pressed
+			root.push_input(click.duplicate())
+			pad.pressed = pressed
+			root.push_input(pad.duplicate())
+		await process_frame
+	_expect(is_instance_valid(title) and title.get("title_open") == true, "presses just after the cut never pick a title option")
 	var waited: int = Time.get_ticks_msec()
 	while is_instance_valid(cover) and Time.get_ticks_msec() - waited < 3000:
 		await process_frame

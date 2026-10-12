@@ -6,10 +6,15 @@ extends Control
 ## scene at t = 0), so launch flows straight into it. Over about two seconds the mascot's smirk holds,
 ## breaks into the grin with a small hop (no hop under Reduced Motion), the company name fades in under
 ## it, and everything fades to the title. The title scene loads on a background thread from the first
-## frame; if it is still loading when the logo has played, a thin bar under the name shows its progress.
+## frame; if it is still loading when the logo has played, a thin bar under the name shows it is still
+## working. The bar sweeps rather than fills: almost all of the wait is the title's scripts compiling,
+## which Godot reports as 0% until it is done, so a filling bar would sit still.
 ## The game's assets load on worker threads first and the title scene after them: in Godot 4.7.2 a scene
 ## whose scripts preload assets while compiling on a worker thread leaks the engine's load tokens at exit.
-## Any key, mouse button, controller button or touch skips to the title as soon as it has loaded.
+## Any key, mouse button, controller button or touch skips to the title as soon as it has loaded, and
+## presses are swallowed for a moment after the cut so a player still mashing to skip never picks a
+## title option unseen. A saved window size and fullscreen apply on the first frame, not at the title.
+## Closing the window while a background load runs waits for it, so no load is cut off mid-way.
 ##
 ## Automation: pass `--skip-logo` as a user argument (`godot --path apps/game -- --skip-logo`) to go
 ## straight to the title; a headless run (tests, CI) always does.
@@ -35,8 +40,14 @@ const END_AT: float = FADE_AT + FADE_SECONDS
 ## A skip runs the closing fade at this speed.
 const SKIP_FADE_RATE: float = 2.0
 const BAR_IN_SECONDS: float = 0.25
+## The loading bar's lit segment: this share of the track, crossing it once every BAR_SWEEP_SECONDS.
+const BAR_SEGMENT: float = 0.3
+const BAR_SWEEP_SECONDS: float = 1.1
 ## On the title, a cover in the fade colour clears over this long.
 const HANDOVER_SECONDS: float = 0.3
+## Key, button and touch presses are swallowed until the title has shown for this long (wall time from
+## its first frame): the cover clears over HANDOVER_SECONDS, then the clear title holds a moment more.
+const INPUT_GUARD_SECONDS: float = 0.6
 ## A long first frame or a stall while the title loads never jumps the animation ahead.
 const MAX_STEP: float = 1.0 / 30.0
 ## The title screen's own base colour (main.tscn TitleScreen), so the fade meets it without a jump.
@@ -55,13 +66,14 @@ var elapsed: float = 0.0
 var skipping: bool = false
 ## The loaded title scene, or null while it loads.
 var main_scene: PackedScene = null
-var load_progress: float = 0.0
 ## The background loads in flight: the assets, then MAIN_SCENE alone.
 var loading: PackedStringArray = []
-var _loads_total: int = 0
-var _loads_done: int = 0
 var _warm: Array[Resource] = []
 var bar_alpha: float = 0.0
+## How long the loading bar has been sweeping.
+var bar_time: float = 0.0
+## The window was closed (or Back pressed) while a background load ran; the game quits once it ends.
+var quit_requested: bool = false
 var handed_over: bool = false
 var _mascot_top: float = 0.0
 
@@ -80,7 +92,8 @@ static func wants_skip(args: PackedStringArray, display_name: String) -> bool:
 
 func _ready() -> void:
 	_mascot_top = mascot.position.y
-	reduce_motion = GameSettings.boolean(GameSettings.load_config(settings_path), "video", "reduced_motion", false)
+	var config: ConfigFile = GameSettings.load_config(settings_path)
+	reduce_motion = GameSettings.boolean(config, "video", "reduced_motion", false)
 	var args: PackedStringArray = OS.get_cmdline_user_args()
 	args.append_array(OS.get_cmdline_args())
 	if honor_launch_skip and wants_skip(args, DisplayServer.get_name()):
@@ -89,20 +102,51 @@ func _ready() -> void:
 		set_process_input(false)
 		get_tree().change_scene_to_file.call_deferred(MAIN_SCENE)
 		return
+	if wants_saved_window(config, OS.has_feature("ios") or OS.has_feature("android")):
+		GameSettings.apply_saved_window(get_window(), config)
 	list_warm_assets(ASSET_DIR, loading)
-	_loads_total = loading.size() + 1
 	for path: String in loading:
 		ResourceLoader.load_threaded_request(path)
+	# A close or Back press now waits for the loads (see _notification) instead of quitting under them.
+	get_tree().auto_accept_quit = false
+	get_tree().quit_on_go_back = false
 	seek(0.0)
+
+
+## True when the logo applies the player's saved window size and fullscreen itself: on desktop, once
+## the player has chosen either. A first launch already opens at the default size.
+static func wants_saved_window(config: ConfigFile, mobile: bool) -> bool:
+	return not mobile and (config.has_section_key("video", "resolution") or config.has_section_key("video", "fullscreen"))
+
+
+func _notification(what: int) -> void:
+	if what == NOTIFICATION_WM_CLOSE_REQUEST or what == NOTIFICATION_WM_GO_BACK_REQUEST:
+		if not get_tree().auto_accept_quit:
+			quit_requested = true
+	elif what == NOTIFICATION_EXIT_TREE:
+		_release_quit()
+
+
+## Gives quitting back to the engine once no background load is in flight.
+func _release_quit() -> void:
+	get_tree().auto_accept_quit = true
+	get_tree().quit_on_go_back = true
 
 
 func _process(delta: float) -> void:
 	if handed_over:
 		return
 	_poll_load()
+	if quit_requested:
+		if loading.is_empty():
+			_release_quit()
+			get_tree().quit()
+		return
 	if manual_clock:
 		return
 	var step: float = minf(delta, MAX_STEP)
+	if bar_alpha > 0.0:
+		bar_time += step
 	var next: float = elapsed + step * (SKIP_FADE_RATE if skipping and elapsed >= FADE_AT else 1.0)
 	if next >= FADE_AT and not is_loaded():
 		next = FADE_AT
@@ -152,7 +196,18 @@ func _apply() -> void:
 	company_name.modulate.a = smoothstep(NAME_IN_AT, NAME_IN_AT + NAME_IN_SECONDS, elapsed)
 	load_bar.visible = bar_alpha > 0.0
 	load_bar.modulate.a = bar_alpha
-	load_fill.size.x = load_bar.size.x * clampf(load_progress, 0.0, 1.0)
+	var width: float = load_bar.size.x
+	if reduce_motion:
+		# Under Reduced Motion the whole track glows gently instead of sweeping.
+		load_fill.position.x = 0.0
+		load_fill.size.x = width
+		load_fill.modulate.a = 0.55 + 0.45 * cos(TAU * bar_time / BAR_SWEEP_SECONDS)
+	else:
+		var head: float = lerpf(-BAR_SEGMENT, 1.0, fposmod(bar_time / BAR_SWEEP_SECONDS, 1.0)) * width
+		var left: float = clampf(head, 0.0, width)
+		load_fill.position.x = left
+		load_fill.size.x = clampf(head + BAR_SEGMENT * width, 0.0, width) - left
+		load_fill.modulate.a = 1.0
 	fade.color.a = clampf((elapsed - FADE_AT) / FADE_SECONDS, 0.0, 1.0)
 
 
@@ -160,19 +215,17 @@ func _poll_load() -> void:
 	if main_scene != null:
 		return
 	if loading.is_empty():
+		if quit_requested:
+			return
 		loading.append(MAIN_SCENE)
 		ResourceLoader.load_threaded_request(MAIN_SCENE)
-	var partial: float = 0.0
 	for path: String in loading.duplicate():
-		var progress: Array = []
-		var status: ResourceLoader.ThreadLoadStatus = ResourceLoader.load_threaded_get_status(path, progress)
+		var status: ResourceLoader.ThreadLoadStatus = ResourceLoader.load_threaded_get_status(path)
 		if status == ResourceLoader.THREAD_LOAD_IN_PROGRESS:
-			partial += float(progress[0]) if not progress.is_empty() else 0.0
 			continue
 		# Every finished request is collected, even a failed one, so none is left pending.
 		var resource: Resource = ResourceLoader.load_threaded_get(path) if status == ResourceLoader.THREAD_LOAD_LOADED else null
 		loading.remove_at(loading.find(path))
-		_loads_done += 1
 		if path != MAIN_SCENE:
 			if resource != null:
 				_warm.append(resource)
@@ -181,10 +234,10 @@ func _poll_load() -> void:
 		else:
 			push_warning("The title scene failed to load in the background; loading it directly.")
 			main_scene = load(MAIN_SCENE) as PackedScene
-	load_progress = maxf(load_progress, (_loads_done + partial) / _loads_total)
 	if main_scene != null:
-		load_progress = 1.0
 		_warm.clear()
+		if not quit_requested:
+			_release_quit()
 
 
 ## The resources under `dir` that are warmed before the title scene.
@@ -206,7 +259,7 @@ func _hand_over() -> void:
 	layer.layer = 128
 	var cover: HandoverCover = HandoverCover.new()
 	cover.color = FADE_COLOR
-	cover.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	cover.mouse_filter = Control.MOUSE_FILTER_STOP
 	cover.set_anchors_preset(Control.PRESET_FULL_RECT)
 	layer.add_child(cover)
 	get_tree().root.add_child(layer)
@@ -214,12 +267,23 @@ func _hand_over() -> void:
 
 
 ## The cover over the cut to the title. It starts clearing once the title is the current scene, and a
-## long frame (the title's first) clears at most one MAX_STEP of it, so it never pops.
+## long frame (the title's first) clears at most one MAX_STEP of it, so it never pops. Until the title
+## has shown for INPUT_GUARD_SECONDS it swallows every key, button and touch press, so a player still
+## pressing to skip the logo cannot pick a title option (or start a New Game) before seeing the title.
 class HandoverCover extends ColorRect:
+	## When the title's first frame ran, in Time.get_ticks_msec(); -1 until then.
+	var title_since: int = -1
+
 	func _process(delta: float) -> void:
 		var scene: Node = get_tree().current_scene
 		if scene == null or scene.scene_file_path != MAIN_SCENE:
 			return
-		color.a -= minf(delta, MAX_STEP) / HANDOVER_SECONDS
-		if color.a <= 0.0:
+		if title_since < 0:
+			title_since = Time.get_ticks_msec()
+		color.a = maxf(color.a - minf(delta, MAX_STEP) / HANDOVER_SECONDS, 0.0)
+		if color.a <= 0.0 and Time.get_ticks_msec() - title_since >= INPUT_GUARD_SECONDS * 1000.0:
 			get_parent().queue_free()
+
+	func _input(event: InputEvent) -> void:
+		if event is InputEventKey or event is InputEventMouseButton or event is InputEventJoypadButton or event is InputEventScreenTouch:
+			get_viewport().set_input_as_handled()
