@@ -18,7 +18,7 @@ The systems engineer is the sole playable viewpoint for the whole game. WOLF is 
 
 The protagonist and supporting humans should have natural personal names. Engineer remains an occupation or internal role. Name/pronouns remain independent of a small cosmetic appearance roster; no full creator or identity-linked morality.
 
-The current playable engineer is masculine-presenting and uses they/them pronouns with every provisional display name. The selected provisional sprite wears a coherent deep-red hooded field jacket with charcoal trousers and boots; the earlier yellow patches and silver knee armor were rejected. This visual does not establish military rank, final character art or a final name.
+The current playable engineer is non-binary (assigned male at birth), masculine-presenting, and uses they/them pronouns with every provisional display name (Nathanial, October 12, 2026). The selected provisional sprite wears a coherent deep-red hooded field jacket with charcoal trousers and boots; the earlier yellow patches and silver knee armor were rejected. This visual does not establish military rank, final character art or a final name.
 
 THE PACK includes the protagonist petting WOLF at sunrise after leaving THE DEN together. Affection is the payoff of the earned relationship, not a timed test or point-farming mechanic.
 

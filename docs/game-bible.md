@@ -16,7 +16,7 @@ Nathanial's current **provisional** direction makes the attempted misuse specifi
 The Director opposes exposure. Proposed pressure comes through restricted access, misleading orders and attempts to erase records. The pair establish intent, events and authorization, protect corroboration and deliver it outside the Director's control. Define the actual wrongdoing before final scripting; do not substitute a pile of collectibles for a case.
 
 ## Cast and agency
-Engineer is a job, not a personal name. Rowan Vale is the user's preferred provisional M0 name, with Alex Bennett and Morgan Reed alternatives; Nathanial Mercer is superseded as default. Adrian Shaw, Elena Park and Mara Ellis remain proposed supporting names/roles. MrDemonWolf may be an optional handle. Names/pronouns are independent of cosmetic appearance; stable actor IDs are independent of both.
+Engineer is a job, not a personal name. Rowan Vale is the user's preferred provisional M0 name, with Alex Bennett and Morgan Reed alternatives; Nathanial Mercer is superseded as default. Adrian Shaw, Elena Park and Mara Ellis remain proposed supporting names/roles. MrDemonWolf may be an optional handle. Names/pronouns are independent of cosmetic appearance; stable actor IDs are independent of both. The engineer is non-binary (assigned male at birth), masculine-presenting, and uses they/them (October 12, 2026); in text, "he" is WOLF and "they" is the engineer.
 
 The engineer is the sole playable viewpoint from first meeting through resolution. WOLF's self-awakening can be conveyed through what the engineer sees, hears or later verifies; it needs no playable WOLF prologue. WOLF remains present as a character, not a second set of controls.
 
