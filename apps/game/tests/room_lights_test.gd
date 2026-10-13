@@ -267,18 +267,22 @@ func _check_sentry_beam(game: Node2D) -> void:
 
 
 ## The room in play animates its light and dust; the hidden rooms stop both and their dust does not
-## simulate.
+## simulate. A room whose light is painted into its plates (ambient_dust off: the corridor) runs no
+## dust at all.
 func _check_running(depths: Dictionary, current: String, label: String) -> void:
 	var emitters: int = 0
+	var expected: int = 0
 	for room_name: String in depths:
 		var depth: RoomDepth = depths[room_name]
 		var shown: bool = room_name == current
+		var drifts: bool = shown and depth.ambient_dust
+		expected += 2 if drifts else 0
 		_expect(depth.is_visible_in_tree() == shown, "%s: only the %s is on screen (%s)" % [label, current, room_name])
 		_expect(depth.is_animating() == shown, "%s: the %s light %s" % [label, room_name, "animates" if shown else "is still"])
 		for dust: CPUParticles2D in [depth.far_dust, depth.near_dust]:
-			_expect(dust.emitting == shown and dust.can_process() == shown, "%s: the %s %s %s" % [label, room_name, dust.name, "drifts" if shown else "is stopped"])
+			_expect(dust.emitting == drifts and dust.can_process() == drifts, "%s: the %s %s %s" % [label, room_name, dust.name, "drifts" if drifts else "is stopped"])
 			emitters += 1 if dust.emitting else 0
-	_expect(emitters == 2, "%s: only the room in play runs its two dust emitters (%d running)" % [label, emitters])
+	_expect(emitters == expected, "%s: only the room in play runs its dust emitters (%d running, %d expected)" % [label, emitters, expected])
 
 
 ## True when a beacon glow's brightness changes over most of a second.

@@ -913,9 +913,9 @@ func _check_zones_keep_clear() -> void:
 	await _free(game)
 
 
-## Props drawn by their own _draw (the sentry's beam, the hatch doorway, the bypass pipe, the room
-## lights and beacons) get render boxes from what was drawn, and the sentry's beam also declares its
-## box for exported builds.
+## Props drawn in code (the sentry's beam, the hatch doorway, the bypass's crank lights and leader,
+## the room lights and beacons) get render boxes from what was drawn, and the sentry's beam also
+## declares its box for exported builds.
 func _check_custom_draw_boxes() -> void:
 	var game: Node2D = await _spawn(true)
 	var tools: DebugTools = _tools(game)
@@ -946,7 +946,7 @@ func _check_custom_draw_boxes() -> void:
 		if RenderingServer.debug_canvas_item_get_rect(item.get_canvas_item()).has_area() and not boxed.has(str(game.get_path_to(item))):
 			missing.append(str(game.get_path_to(item)))
 	_expect(missing.is_empty(), "every visible prop that draws by itself has a render box (missing %s)" % [missing])
-	for path: String in [str(game.get_path_to(room)) + "/HatchDoorway", "BypassHandle"]:
+	for path: String in [str(game.get_path_to(room)) + "/HatchDoorway", "BypassHandle/BypassLabel/CrankReadout"]:
 		var node: CanvasItem = game.get_node_or_null(path) as CanvasItem
 		_expect(node != null and not _entry(geometry["render_boxes"], "path", path).is_empty(), "%s has a render box" % path)
 	tools.set_overlay_mode(DebugTools.Overlay.OFF)

@@ -6,7 +6,7 @@
 [ext_resource type="Texture2D" path="res://assets/wolf-side-right-provisional.png" id="4_wolf"]
 [ext_resource type="Texture2D" path="res://assets/rowan-side-right-provisional.png" id="5_rowan"]
 [ext_resource type="Texture2D" path="res://assets/title-corridor-key-art-provisional.png" id="6_title_art"]
-[ext_resource type="Texture2D" path="res://assets/props/corridor-bulkhead-sealed.png" id="7_door"]
+[ext_resource type="Texture2D" path="res://assets/props/corridor-seal-atlas.png" id="7_door"]
 [ext_resource type="Texture2D" path="res://assets/director-side-left-provisional.png" id="8_director"]
 [ext_resource type="Texture2D" path="res://assets/props/corridor-purge-display.png" id="9_purge_display"]
 [ext_resource type="Script" path="res://scripts/pause_overlay.gd" id="10_pause_overlay"]
@@ -56,6 +56,11 @@ base_color = Color(0.0352941, 0.0823529, 0.2, 1)
 lamps = PackedVector2Array(0.144, 0.188, 0.5, 0.188, 0.854, 0.188)
 shaft_lamps = PackedInt32Array(1, 2)
 warning_lamps = PackedVector2Array(0.341, 0.27, 0.659, 0.27)
+ambient_dust = false
+haze_end = 0.588
+haze_fade = 0.12
+near_right_edge = false
+painted_lamps = PackedInt32Array(2)
 
 [node name="IntroCamera" type="Camera2D" parent="."]
 position = Vector2(480, 270)
@@ -84,11 +89,11 @@ color = Color(0, 0, 0, 0)
 
 [node name="DoorArt" type="Sprite2D" parent="Door/Visual"]
 texture_filter = 4
-position = Vector2(32.7, 41.1)
-scale = Vector2(0.3, 0.3)
+position = Vector2(4.625, 75.875)
+scale = Vector2(0.25, 0.25)
 texture = ExtResource("7_door")
 region_enabled = true
-region_rect = Rect2(0, 42, 384, 606)
+region_rect = Rect2(391, 2, 279, 581)
 
 [node name="Human" type="CharacterBody2D" parent="."]
 position = Vector2(160, 410)
@@ -182,20 +187,20 @@ region_rect = Rect2(81, 46, 342, 433)
 [node name="RelayArt" type="Sprite2D" parent="."]
 z_index = 1
 texture_filter = 4
-position = Vector2(605, 395.25)
-scale = Vector2(0.221, 0.221)
+position = Vector2(607.625, 389)
+scale = Vector2(0.25, 0.25)
 texture = ExtResource("20_relay")
 region_enabled = true
-region_rect = Rect2(61, 64, 390, 405)
+region_rect = Rect2(0, 0, 368, 408)
 
 [node name="CheckpointArt" type="Sprite2D" parent="."]
 z_index = 1
 texture_filter = 4
-position = Vector2(876, 383.9)
+position = Vector2(877, 379)
 scale = Vector2(0.25, 0.25)
 texture = ExtResource("21_safe_point")
 region_enabled = true
-region_rect = Rect2(116, 31, 280, 449)
+region_rect = Rect2(0, 0, 336, 488)
 
 [node name="BreakerStatusLight" type="ColorRect" parent="."]
 z_index = 1
@@ -208,10 +213,10 @@ color = Color(0.72, 0.4, 0.17, 1)
 
 [node name="RelayStatusLight" type="ColorRect" parent="."]
 z_index = 1
-offset_left = 595.0
-offset_top = 361.0
-offset_right = 613.0
-offset_bottom = 366.0
+offset_left = 594.0
+offset_top = 354.0
+offset_right = 615.0
+offset_bottom = 358.0
 mouse_filter = 2
 color = Color(0.33, 0.43, 0.48, 1)
 

@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://brcmtk50pm3s2"
-path="res://.godot/imported/corridor-bulkhead-sealed.png-5a92b8ccaad3f110d8202c58531dc322.ctex"
+uid="uid://i38ch8q6lop5"
+path="res://.godot/imported/corridor-seal-atlas.png-9eba6ea0ead955840379953f9ef1a703.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/props/corridor-bulkhead-sealed.png"
-dest_files=["res://.godot/imported/corridor-bulkhead-sealed.png-5a92b8ccaad3f110d8202c58531dc322.ctex"]
+source_file="res://assets/props/corridor-seal-atlas.png"
+dest_files=["res://.godot/imported/corridor-seal-atlas.png-9eba6ea0ead955840379953f9ef1a703.ctex"]
 
 [params]
 

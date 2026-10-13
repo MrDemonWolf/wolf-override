@@ -1,0 +1,54 @@
+{
+ "paint-far": {
+  "target": "1-edit-target-far.png",
+  "design": "design/far-patch/design.png",
+  "design_size": [
+   808,
+   808
+  ],
+  "target_size": [
+   1024,
+   1024
+  ]
+ },
+ "paint-portal": {
+  "targets": [
+   "1-edit-target-closed.png",
+   "2-edit-target-open.png"
+  ],
+  "design_size": [
+   820,
+   1230
+  ],
+  "target_size": [
+   1024,
+   1536
+  ]
+ },
+ "paint-stations": {
+  "target": "1-edit-target-stations.png",
+  "sheet_size": [
+   720,
+   720
+  ],
+  "target_size": [
+   1024,
+   1024
+  ],
+  "scale": 1.4222222222222223,
+  "placement_in_sheet": {
+   "relay": [
+    8,
+    288,
+    368,
+    424
+   ],
+   "safe-point": [
+    384,
+    208,
+    336,
+    504
+   ]
+  }
+ }
+}

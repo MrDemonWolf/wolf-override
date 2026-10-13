@@ -1,0 +1,42 @@
+{
+ "paint-v3": {
+  "target": "1-edit-target-door-end.png",
+  "canvas": {
+   "name": "paint3",
+   "x0": 640.0,
+   "y0": 286.0,
+   "ppw": 3.065868263473054,
+   "w": 1024,
+   "h": 1024
+  },
+  "new_wall_parts": [
+   "bp_backplate",
+   "bp_anchor0",
+   "bp_anchor1",
+   "bp_anchor2",
+   "bp_anchor3",
+   "bp_gearbox_side",
+   "bp_gearbox",
+   "bp_gearbox_top",
+   "bp_boss",
+   "bp_wallplate0",
+   "bp_wallplate1",
+   "bp_guard",
+   "bp_guard_edge",
+   "bp_sprocket_cover",
+   "bp_guard_flange",
+   "bp_clamp0",
+   "bp_clamp1",
+   "floor_line_wide",
+   "far_col_joint",
+   "far_col_patch"
+  ],
+  "new_front_parts": [
+   "pier_cut",
+   "arris_cut_left",
+   "arris_cut_right"
+  ],
+  "slab": "design/portal3/design-slab-cvd.png",
+  "area_mask": "paint/paint-v3-area.png"
+ }
+}

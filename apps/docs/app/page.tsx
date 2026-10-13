@@ -139,7 +139,7 @@ export default function HomePage() {
               <span className="sr-only">(full-size image, opens in a new tab)</span>
             </a>
             <figcaption className="flex flex-wrap justify-between gap-x-4 gap-y-2 px-5 py-4 text-caption text-muted phone:flex-col">
-              <strong className="text-text">Source build capture, October 10, 2026</strong>
+              <strong className="text-text">Source build capture, October 12, 2026</strong>
               <span>Provisional art and UI</span>
             </figcaption>
           </figure>
