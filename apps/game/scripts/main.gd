@@ -26,7 +26,7 @@ const BYPASS_CRANK_X: float = BYPASS_WHEEL.x - 26.0
 ## asked yet, or not asked at all), back towards the breaker, clear of both machines, until the seal
 ## has opened or he is signalled to take it (_wolf_off_relay).
 const WOLF_BYPASS_CLEAR_X: float = 490.0
-## Held-USE ticks the bypass takes (HoldUse.TICK_SECONDS each, about three seconds in all).
+## Held-USE ticks the bypass takes (BypassHandle.TICK_SECONDS each, 2 s in all).
 const BYPASS_TICKS: int = BypassHandle.TICKS_NEEDED
 ## While the bypass vents coolant its alarm sounds this often.
 const BYPASS_ALARM_SECONDS: float = 1.1
@@ -406,6 +406,11 @@ var fail_tween: Tween
 ## The state at the start of the current beat, for a knockdown before any checkpoint exists.
 var beat_snapshot: Dictionary = {}
 var hold_use: HoldUse = HoldUse.new()
+## Settings' TOGGLE HOLDS: one press of interact at a crank starts it turning and keeps it turning
+## until a second press, a move or the crank is done, on the keyboard, a controller and touch alike.
+var hold_toggle: bool = false
+## With TOGGLE HOLDS on, true while a press has the crank turning.
+var crank_latched: bool = false
 var credits_paused: bool = false
 ## The exported changelog as loaded at title time; empty when the file is missing.
 var changelog_text: String = ""
@@ -781,6 +786,8 @@ func _setup_impact() -> void:
 	impact.setup(intro_camera, intro_fade, intro_alarm)
 	impact.reduce_motion = settings_menu.reduced_motion.button_pressed
 	settings_menu.reduced_motion_changed.connect(_on_reduced_motion_changed)
+	hold_toggle = settings_menu.hold_toggle.button_pressed
+	settings_menu.hold_toggle_changed.connect(_on_hold_toggle_changed)
 	add_child(impact)
 	sfx_bank = SfxBank.new()
 	sfx_bank.name = "SfxBank"
@@ -879,7 +886,10 @@ func _process(delta: float) -> void:
 		# Knocked down: the reaction plays out and the last autosave returns; nothing else reads input.
 		_refresh_ui()
 		return
-	var held_ticks: int = hold_use.advance(delta, human.controlled and Input.is_action_pressed(&"interact"), _hold_station())
+	var hold_station: StringName = _hold_station()
+	var held_ticks: int = hold_use.advance(delta, _crank_held(hold_station), hold_station, _hold_tick_seconds(hold_station))
+	if hold_use.started:
+		_hold_started()
 	_update_settle()
 	if state.chapter_id == "junction":
 		_tick_junction(delta)
@@ -888,6 +898,7 @@ func _process(delta: float) -> void:
 			return
 	elif state.chapter_id == "lockdown":
 		_tick_corridor(delta, held_ticks)
+	_show_hold()
 	if tutorial_step == 0 and (Input.is_action_pressed(&"move_left") or Input.is_action_pressed(&"move_right")):
 		tutorial_step = 1
 	# The purge display is optional; reaching the breaker finishes the tutorial too.
@@ -904,6 +915,46 @@ func _process(delta: float) -> void:
 	elif Input.is_action_just_pressed(&"interact"):
 		_interact()
 	_refresh_ui()
+
+
+## Whether a crank is being worked this frame at [param station]: interact held down, or with TOGGLE
+## HOLDS on, latched by one press and kept turning until a second press, a move, leaving the crank's
+## reach or the crank being done (the station going away).
+func _crank_held(station: StringName) -> bool:
+	if not hold_toggle:
+		crank_latched = false
+		return human.controlled and Input.is_action_pressed(&"interact")
+	if station.is_empty() or waiting_for_choice or Input.is_action_pressed(&"move_left") or Input.is_action_pressed(&"move_right"):
+		crank_latched = false
+	elif Input.is_action_just_pressed(&"interact"):
+		crank_latched = not crank_latched
+	return crank_latched and human.controlled
+
+
+## Seconds of held USE per tick at [param station]: a valve turn, or a notch of the MANUAL BYPASS.
+static func _hold_tick_seconds(station: StringName) -> float:
+	return BypassHandle.TICK_SECONDS if station == &"bypass" else PressureLine.TURN_SECONDS
+
+
+## The press frame of a hold (FEEL-4): before its first tick lands, the ratchet clicks, a little
+## higher and quieter than a full notch, and the wheel gives (_show_hold).
+func _hold_started() -> void:
+	sfx_bank.play(&"clank", -12.0, 1.9)
+
+
+## The wheel being held turns part of its next notch from the press frame on, and springs back on
+## release (BypassHandle.show_hold, JunctionRoom.show_crank).
+func _show_hold() -> void:
+	var at_bypass: bool = hold_use.holding and hold_use.station == &"bypass"
+	bypass_handle.show_hold(hold_use.shown_fraction() if at_bypass else 0.0)
+	var at_valve: bool = hold_use.holding and hold_use.station == &"valve" and pressure_line.state == &"building"
+	junction_room.show_crank(HoldUse.shown(pressure_line.progress / PressureLine.TURN_SECONDS) if at_valve else 0.0)
+
+
+## Settings' TOGGLE HOLDS changed; a crank turning on its own stops when it goes off.
+func _on_hold_toggle_changed(on: bool) -> void:
+	hold_toggle = on
+	crank_latched = false
 
 
 ## The engineer's authored step (back from the relay, to a crank spot, or beside a station they used):
@@ -1378,6 +1429,8 @@ func _on_pause_button() -> void:
 func _pause_game() -> void:
 	for action: StringName in GAMEPLAY_ACTIONS:
 		Input.action_release(action)
+	# Like letting go of a held crank: a toggled crank stops while the game is paused.
+	crank_latched = false
 	impact.end_hit_stop()
 	_show_pause_menu()
 	pause_overlay.show()
@@ -3340,6 +3393,9 @@ func _refresh_ui() -> void:
 	if context != save_error_context:
 		save_error = ""
 	var hint: String = save_error if not save_error.is_empty() else (CHECKPOINT_TOAST if checkpoint_toast_remaining > 0.0 and not fail_active else context)
+	if hold_toggle:
+		# With TOGGLE HOLDS on, one press works a crank: its prompt drops HOLD.
+		hint = hint.replace("HOLD E:", "E:")
 	if touch_layout:
 		hint = hint.replace("E:", "USE:")
 	elif controller_active:

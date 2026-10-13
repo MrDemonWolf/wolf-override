@@ -405,7 +405,7 @@ func _run() -> void:
 	Input.action_release(&"interact")
 	if not _require(opened and state.route == "fallback", "cranking the bypass to the end opens the seal on the engineer's own work"):
 		return
-	_expect(Time.get_ticks_msec() - crank_start >= int(8 * HoldUse.TICK_SECONDS * 1000.0) - 50 and int(game.get("bypass_ticks")) == 8, "the bypass takes about three seconds of held USE")
+	_expect(Time.get_ticks_msec() - crank_start >= int(BypassHandle.TICKS_NEEDED * BypassHandle.TICK_SECONDS * 1000.0) - 50 and int(game.get("bypass_ticks")) == 8, "the bypass takes about two seconds of held USE")
 	_expect(not game.get("bypass_venting") and not bypass_handle.coolant_hiss.emitting and bypass_handle.done and str(game.get("status_line")) == "The bypass locks over and the alarm cuts out. The red seal opens.\nWOLF: Open. I'm with you.", "the bypass locks over, the alarm cuts out and WOLF answers")
 	_expect(relay_spark.visible and relay_spark.default_color == Color("#f3ae4b"), "manual bypass produces a distinct amber relay spark")
 	_expect(relay_spark.points[0].x >= wheel_x - 14.0 and relay_spark.points[relay_spark.points.size() - 1].x <= wheel_x + 18.0, "the bypass arc jumps over the wheel, not across WOLF's contact on the relay")

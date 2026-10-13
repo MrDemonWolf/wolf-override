@@ -13,6 +13,13 @@ extends Node2D
 
 ## Crank lights in the readout, one per held-USE tick.
 const TICKS_NEEDED: int = 8
+## Seconds of held USE per tick, so the eight take 2 s (Nathanial's decision Q1, October 13, 2026; it
+## was 3.2 s). The alarm and the hiss, not the hold, are what the manual route costs.
+const TICK_SECONDS: float = 0.25
+## Degrees the wheel turns per tick: an eighth.
+const TICK_DEGREES: float = 360.0 / TICKS_NEEDED
+## Letting go mid-tick, the wheel springs back to its last notch this fast.
+const SPRING_BACK_SECONDS: float = 0.12
 ## The handwheel art: a region of the door end's atlas (4 source px per world px, centred on the
 ## wheel's axis).
 const WHEEL_ART: Texture2D = preload("res://assets/props/corridor-seal-atlas.png")
@@ -83,6 +90,9 @@ var venting: bool = false:
 			fault_tag.modulate = Color.WHITE
 			_pulse = 0.0
 var reduce_motion: bool = false
+## How far into the next tick the hold has the wheel (HoldUse.shown_fraction), 0 while it is not held.
+## Set through show_hold.
+var hold_fraction: float = 0.0
 ## The relay is dealt with (WOLF took the surge, or the bypass locked over): the COOLANT FAULT tag is
 ## gone (PUZ-7). Set through clear_fault.
 var fault_cleared: bool = false
@@ -198,11 +208,31 @@ func _plate(node_name: String, caption: String, text_color: Color, edge: Color, 
 	return label
 
 
+## The hold under way: from its press frame the wheel turns part of the way to its next notch, by
+## [param fraction] (HoldUse.shown_fraction), and the next crank light warms; at 0 (let go) the part
+## turn springs back to the last notch.
+func show_hold(fraction: float) -> void:
+	if is_equal_approx(fraction, hold_fraction):
+		return
+	var released: bool = fraction <= 0.0
+	hold_fraction = maxf(fraction, 0.0)
+	readout.queue_redraw()
+	if _wheel_tween != null and _wheel_tween.is_valid():
+		_wheel_tween.kill()
+	var target: float = TICK_DEGREES * (ticks + hold_fraction)
+	if released and is_inside_tree():
+		_wheel_tween = create_tween()
+		_wheel_tween.tween_property(wheel, "rotation_degrees", target, SPRING_BACK_SECONDS).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
+	else:
+		wheel.rotation_degrees = target
+
+
 func _turn_wheel() -> void:
 	if _wheel_tween != null and _wheel_tween.is_valid():
 		_wheel_tween.kill()
-	var target: float = 360.0 / TICKS_NEEDED * ticks
-	if ticks == 0 or not is_inside_tree():
+	# Mid-hold the notch just reached is where the wheel is; show_hold adds the next part turn.
+	var target: float = TICK_DEGREES * ticks
+	if ticks == 0 or hold_fraction > 0.0 or not is_inside_tree():
 		wheel.rotation_degrees = target
 		return
 	_wheel_tween = create_tween()
@@ -224,4 +254,7 @@ func _draw_readout() -> void:
 		var cell: Color = LAMP_OFF
 		if live or done:
 			cell = GREEN if done else (AMBER if index < ticks else Color("#4d6370"))
+			if not done and index == ticks and hold_fraction > 0.0:
+				# The notch being cranked warms toward amber as the hold adds up.
+				cell = Color("#4d6370").lerp(AMBER, 0.35 + 0.5 * hold_fraction)
 		readout.draw_rect(Rect2(first + Vector2((CELL_SIZE.x + CELL_GAP) * index, 0.0), CELL_SIZE), cell)

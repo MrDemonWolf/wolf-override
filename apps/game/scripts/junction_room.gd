@@ -289,6 +289,9 @@ var warning_lamps: PackedVector2Array = PackedVector2Array([Vector2(0.294, 0.285
 var line_state: StringName = &"idle"
 var gauge: float = 0.0
 var turns: int = 0
+## How far into the next turn a hold at the valve has its wheel (HoldUse.shown_fraction), 0 while it
+## is not held. Set through show_crank.
+var crank_fraction: float = 0.0
 var door_blown: bool = false
 var sentry_down: bool = false
 var junction_cleared: bool = false
@@ -962,11 +965,29 @@ func bolt_arc() -> void:
 	_hatch_tween.tween_callback(func() -> void: hatch_opened.emit())
 
 
+## A hold at the valve under way: from its press frame the wheel turns part of the way into its next
+## quarter, by [param fraction] (HoldUse.shown_fraction); at 0 (let go) the part turn springs back.
+func show_crank(fraction: float) -> void:
+	if is_equal_approx(fraction, crank_fraction):
+		return
+	var released: bool = fraction <= 0.0
+	crank_fraction = maxf(fraction, 0.0)
+	if _valve_tween != null and _valve_tween.is_valid():
+		_valve_tween.kill()
+	var target: float = 90.0 * (turns + crank_fraction)
+	if released and is_inside_tree():
+		_valve_tween = create_tween()
+		_valve_tween.tween_property(valve_wheel, "rotation_degrees", target, BypassHandle.SPRING_BACK_SECONDS).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
+	else:
+		valve_wheel.rotation_degrees = target
+
+
 func _turn_wheel(to_turns: int) -> void:
 	if _valve_tween != null and _valve_tween.is_valid():
 		_valve_tween.kill()
 	var target: float = 90.0 * to_turns
-	if to_turns == 0:
+	# Mid-hold the quarter just reached is where the wheel is; show_crank adds the next part turn.
+	if to_turns == 0 or crank_fraction > 0.0:
 		valve_wheel.rotation_degrees = target
 		return
 	_valve_tween = create_tween()
@@ -1124,6 +1145,7 @@ func reset_transient() -> void:
 	# The arm is up in its plate once the tank is down for good, and holds the tank otherwise.
 	arm_parked = 1.0 if sentry_down else 0.0
 	fuse_remaining = 0.0
+	crank_fraction = 0.0
 	display_gauge = 0.0
 	gauge_hold = 0.0
 	gauge_tripped = false

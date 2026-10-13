@@ -364,7 +364,7 @@ func _prime_crank() -> void:
 				hold.station = &"bypass"
 				hold.ticks = 0
 			hold.ticks = maxi(hold.ticks, BypassHandle.TICKS_NEEDED - 1)
-			hold.progress = maxf(hold.progress, HoldUse.TICK_SECONDS)
+			hold.progress = maxf(hold.progress, BypassHandle.TICK_SECONDS)
 
 
 # --- Pausing for the menu and frame stepping ------------------------------------------------------
