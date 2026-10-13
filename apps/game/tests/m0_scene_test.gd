@@ -87,9 +87,9 @@ func _run() -> void:
 	await _tap(&"interact")
 	_expect(game.get("intro_step") == 1 and not speaker.visible and story.text == "The Director thinks WOLF is still in standby.", "the narration after it gets its own untagged box, naming the Director")
 	await _tap(&"interact")
-	_expect(game.get("intro_step") == 2 and str(game.get("status_line")).contains("wakes himself") and not speaker.visible, "WOLF wakes himself and opens containment")
+	_expect(game.get("intro_step") == 2 and str(game.get("status_line")) == "Nobody gives an activation command. WOLF wakes himself." and not speaker.visible, "WOLF wakes himself and opens containment, with no line about a blue light the picture does not show")
 	await _tap(&"interact")
-	_expect(game.get("intro_step") == 3 and str(game.get("status_line")).contains("gate slides aside"), "WOLF opens containment from inside through a sliding gate")
+	_expect(game.get("intro_step") == 3 and str(game.get("status_line")) == "The latch breaks from the inside. WOLF steps out under his own power.", "WOLF opens containment from inside; the gate's slide and the Director are shown, not narrated")
 	await create_timer(1.2).timeout
 	_expect(intro_gate.visible and is_equal_approx(float(intro_gate.get("opening")), 1.0), "the opened gate stays drawn, folded aside, instead of vanishing")
 	await _tap(&"interact")
@@ -121,7 +121,7 @@ func _run() -> void:
 	state.cycle_name()
 	state.cycle_name()
 	game.call("_refresh_ui")
-	_expect(speaker.text.is_empty() and story.text.begins_with("Rowan keeps WOLF's systems running. They know what a fault looks like, and this isn't one.\nWOLF:") and story.text.contains("\n%s:" % state.human_name().get_slice(" ", 0).to_upper()), "the opening box says why the engineer trusts WOLF, then both speakers keep their own names")
+	_expect(speaker.text.is_empty() and story.text == "Rowan keeps WOLF's systems running.", "the first box after control says why the engineer trusts WOLF, in its own untagged box")
 	await create_timer(3.3).timeout
 	game.call("_refresh_ui")
 	_expect(top_card.visible and hud.text.contains("CHECK THE BREAKER") and card_accent.color == Color(0.22, 0.78, 0.92, 1), "the objective card follows the name card")

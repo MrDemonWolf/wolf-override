@@ -39,6 +39,13 @@ const PURGE_DISPLAY_MAX_X: float = 230.0
 const READ_SECONDS_PER_WORD: float = 0.15
 const READ_SECONDS_MIN: float = 2.5
 const READ_SECONDS_MAX: float = 7.0
+## A line said as several boxes (_say) holds each box this long before the next: the larger of
+## 1.2 s + 0.05 s per character (at most 7 s) and 1.2 s + 0.33 s per word, the reading time the
+## October 13 wording drafts use. Speaker tags are not counted.
+const BOX_SECONDS_BASE: float = 1.2
+const BOX_SECONDS_PER_CHARACTER: float = 0.05
+const BOX_SECONDS_PER_WORD: float = 0.33
+const BOX_SECONDS_MAX_BY_CHARACTERS: float = 7.0
 ## The corridor seal's face (Door at x 780, 56 px wide); while it is shut WOLF follows no closer than his reach.
 const CORRIDOR_DOOR_LEFT_X: float = 752.0
 ## The corridor seal is a rolling steel door in a cast cross-wall that stands across the corridor
@@ -93,7 +100,12 @@ const DISPLAY_FONT: FontVariation = preload("res://assets/fonts/Montserrat-Bold.
 const END_CARD_ACCENT: Color = Color("#73DDF5")
 const END_CARD_FADE_SECONDS: float = 0.3
 ## Narration and hints from the approved logic text sheet (logic-text-draft-2026-10-10).
-const TRUST_LINE: String = "%s keeps WOLF's systems running. They know what a fault looks like, and this isn't one."
+## Why the engineer trusts WOLF, as two boxes in order after first control (P0-9, approved
+## 2026-10-13): the name is repeated so "They" can never read as "the systems".
+const TRUST_LINE_1: String = "%s keeps WOLF's systems running."
+const TRUST_LINE_2: String = "%s knows what a fault looks like,\nand this isn't one."
+## What follows the trust line in the first box after control, unchanged: WOLF, then the engineer.
+const OPENING_EXCHANGE: String = "WOLF: I heard the Director's plan for me. I woke myself. He wants me to hunt people he calls threats.\n%s: Then we get through maintenance before the original logs disappear."
 const STAKES_LINE: String = "WOLF: That purge takes the original program logs. Once they're gone, his word is the only record."
 ## At the breaker while WOLF's stakes line is in the box: interact goes on to his relay question.
 const BREAKER_STAKES_HINT: String = "E: continue."
@@ -124,8 +136,8 @@ const RESTORE_BEAT_LINE: String = "Back at the start of this stretch."
 const INTRO_LINES: Array[String] = [
 	"DIRECTOR: I decide who counts as a threat. WOLF handles the rest.",
 	"The Director thinks WOLF is still in standby.",
-	"Nobody gives an activation command. WOLF wakes himself.\nA blue light answers from inside the containment seal.",
-	"The latch breaks from the inside. The gate slides aside. WOLF steps out under his own power.\nThe Director freezes at the sound of the seal opening.",
+	"Nobody gives an activation command. WOLF wakes himself.",
+	"The latch breaks from the inside. WOLF steps out under his own power.",
 	"DIRECTOR: You were in standby.\nWOLF: I heard you. I won't do it.",
 	"DIRECTOR: Lock down maintenance. WOLF does not leave this site.",
 	"WOLF turns from the Director and heads for maintenance.",
@@ -471,6 +483,11 @@ var stakes_spoken: bool = false
 ## The corridor box last seen and how long it has been up (the stakes line waits for it to be read).
 var shown_line: String = ""
 var shown_line_age: float = 0.0
+## The boxes still to come of a line said in several boxes (_say), the box now up that leads to them,
+## and how long it stays before the next. Any other line replacing it drops the rest.
+var box_queue: Array[String] = []
+var box_queue_line: String = ""
+var box_queue_seconds: float = 0.0
 
 const WOLF_SPRITE_REST: Vector2 = Vector2(0.0, -15.0)
 ## WOLF's painted feet sit this far below his sprite's centre, in the art's own pixels (its opaque
@@ -876,6 +893,7 @@ func _process(delta: float) -> void:
 		_refresh_ui()
 		return
 	_update_gameplay_camera()
+	_advance_box_queue(delta)
 	name_card_remaining = maxf(name_card_remaining - delta, 0.0)
 	checkpoint_toast_remaining = maxf(checkpoint_toast_remaining - delta, 0.0)
 	if state.chapter_id == "records" and wolf.autonomous_target_x == WOLF_MIRROR_X and absf(wolf.position.x - WOLF_MIRROR_X) <= 2.0:
@@ -1094,7 +1112,7 @@ func _tick_corridor(delta: float, held_ticks: int) -> void:
 		shown_line_age += delta
 	# Decision C: the stakes are said on the main path, once, before the breaker conversation, and only
 	# once the box they replace (the opening's three rows, say) has been up long enough to read.
-	if not stakes_spoken and not waiting_for_choice and state.memory.is_empty() and human.position.x > PURGE_DISPLAY_MAX_X and shown_line_age >= _read_seconds(shown_line):
+	if not stakes_spoken and not waiting_for_choice and box_queue.is_empty() and state.memory.is_empty() and human.position.x > PURGE_DISPLAY_MAX_X and shown_line_age >= _read_seconds(shown_line):
 		_speak_stakes()
 	if hold_use.station == &"bypass":
 		if held_ticks > 0:
@@ -1117,6 +1135,43 @@ func _tick_corridor(delta: float, held_ticks: int) -> void:
 ## How long [param line] needs on screen to be read before the stakes line may replace it.
 static func _read_seconds(line: String) -> float:
 	return clampf(line.split(" ", false).size() * READ_SECONDS_PER_WORD, READ_SECONDS_MIN, READ_SECONDS_MAX)
+
+
+## Shows [param boxes] one after another in the dialogue box, each for its reading time
+## (box_seconds), the last one staying up like any other line.
+func _say(boxes: Array[String]) -> void:
+	status_line = boxes[0]
+	box_queue = boxes.slice(1)
+	box_queue_line = status_line
+	box_queue_seconds = box_seconds(status_line)
+
+
+## Moves a line said in several boxes on to its next box once this one has been up its reading time.
+## Another line taking the box drops the rest (a station's answer, a choice, a knockdown).
+func _advance_box_queue(delta: float) -> void:
+	if box_queue.is_empty():
+		return
+	if status_line != box_queue_line:
+		box_queue.clear()
+		return
+	box_queue_seconds -= delta
+	if box_queue_seconds > 0.0:
+		return
+	status_line = box_queue.pop_front()
+	box_queue_line = status_line
+	box_queue_seconds = box_seconds(status_line)
+
+
+## How long one box of a line said in several boxes stays up (BOX_SECONDS_*), not counting a speaker tag.
+static func box_seconds(box: String) -> float:
+	var text: String = box
+	var colon: int = text.find(": ")
+	if colon > 0 and colon < 20 and text.left(colon) == text.left(colon).to_upper():
+		text = text.substr(colon + 2)
+	text = text.replace("\n", " ")
+	var by_characters: float = minf(BOX_SECONDS_BASE + BOX_SECONDS_PER_CHARACTER * text.length(), BOX_SECONDS_MAX_BY_CHARACTERS)
+	var by_words: float = BOX_SECONDS_BASE + BOX_SECONDS_PER_WORD * text.split(" ", false).size()
+	return maxf(by_characters, by_words)
 
 
 func _speak_stakes() -> void:
@@ -1283,7 +1338,7 @@ func _finish_intro(keep_fade: bool = false) -> void:
 	# Decision B: the engineer's name card as control starts, and why they trust WOLF, in the third person.
 	name_card_remaining = NAME_CARD_SECONDS + TOP_CARD_FADE_SECONDS
 	var first_name: String = state.human_name().get_slice(" ", 0)
-	status_line = (TRUST_LINE % first_name) + "\nWOLF: I heard the Director's plan for me. I woke myself. He wants me to hunt people he calls threats.\n%s: Then we get through maintenance before the original logs disappear." % first_name.to_upper()
+	_say([TRUST_LINE_1 % first_name, TRUST_LINE_2 % first_name, OPENING_EXCHANGE % first_name.to_upper()])
 	queue_redraw()
 	_refresh_ui()
 
@@ -1804,7 +1859,7 @@ func _interact_breaker() -> void:
 		# A USE with the stakes still up means they have been read: WOLF asks now.
 		_ask_relay()
 	elif state.arm_breaker():
-		status_line = "The breaker catches. Blue light fills the coolant relay; the red seal stays shut."
+		status_line = "The breaker catches. Blue light fills the coolant relay."
 		sfx_bank.play(&"clank", -4.0, 0.8)
 		impact.rumble(0.15, 0.0, 0.06)
 		# After a refusal WOLF stands off the now-live relay (_wolf_target_x).
