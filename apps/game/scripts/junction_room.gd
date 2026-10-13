@@ -205,13 +205,13 @@ const HAZARD_SECONDS: float = 0.4
 ## first name.
 const VENT_REASON: String = "The relief vent let go under %s. When the gauge peaks, stay off the grate."
 const BLAST_REASON: String = "The door went with %s in front of it. When the fuse lights, back away past the valve."
-## SENTRY_REASON is for an engineer it spotted and ran down out in the lane, which is always past the
-## alcove's right post (SentryBrain.is_exposed); it says where they were caught, so the shove that lays
-## the body back between the posts never reads as the card's advice failing. Once it has turned on
-## them after a miss, or reaches them inside the alcove, the alcove is no help and
-## SENTRY_CHASED_REASON says so.
-const SENTRY_REASON: String = "The sentry spotted %s past the alcove's right post and ran them down. Keep inside the posts, or get back over the rubble."
-const SENTRY_CHASED_REASON: String = "The sentry ran %s down. Once its eyes go red, only the rubble is safe."
+## SENTRY_REASON is for an engineer it spotted and ran down out in the open, which is always past the
+## cover beside the TANK RELEASE (SentryBrain.is_exposed); it points at the drawn release, not at an
+## alcove or posts the picture does not show (P0-7, approved 2026-10-13). Once it has turned on them
+## after a miss, or reaches them at the release, that cover is no help and SENTRY_CHASED_REASON says
+## so. Both are two rows.
+const SENTRY_REASON: String = "The sentry saw %s out in the open.\nStay close to the TANK RELEASE."
+const SENTRY_CHASED_REASON: String = "The sentry ran %s down. Once its\neyes go red, only the rubble is safe."
 const CLOUD_REASON: String = "The coolant cloud caught %s. Let it clear before crossing the mark."
 const AMBER: Color = Color("#f3ae4b")
 const GREEN: Color = Color("#a4f0c4")
@@ -270,6 +270,16 @@ const MARK_LIT: Color = Color("#ffe9a8")
 ## right post) shows beside an engineer at the TANK RELEASE.
 const ALCOVE_FLOOR: Color = Color(0.25, 0.62, 0.72, 0.3)
 const ALCOVE_EDGE: Color = Color(0.5, 0.86, 0.94, 0.85)
+## A refused press (Main._refuse) or a bump into the sealed door: the station's lamp goes dark for
+## FLICKER_STEP_SECONDS and comes back, twice for a press and once for a bump. The door's seam lamp is
+## barely lit at rest, so its flicker lights it up between the dark steps. With Reduced Motion the lamp
+## goes dark once and comes back, with no repeat.
+const FLICKER_STEP_SECONDS: float = 0.07
+const FLICKER_DARK: Color = Color("#1a2228")
+const SEAM_FLICKER_ALPHA: float = 0.75
+## Hint ladder T1: the breaker's lamp pulses while WOLF looks at it, this many times a second (at most
+## 2 Hz, well under three flashes a second; steady and bright with Reduced Motion).
+const BREAKER_PULSE_HZ: float = 1.5
 ## Cuts the turning wheel out of the valve image as a disc, so only the wheel turns over the
 ## painted one.
 const WHEEL_MASK: String = """shader_type canvas_item;
@@ -391,6 +401,14 @@ var floor_reflections: Array[FloorReflection] = []
 var _drawn_inputs: Array = []
 var _recesses_drawn_inputs: Array = []
 var _redraw_check_queued: bool = false
+## The station whose lamp is flickering (breaker, valve, door, release or bolt), how far into it, and how
+## many times it goes dark.
+var flicker_station: StringName = &""
+var flicker_elapsed: float = 0.0
+var flicker_times: int = 0
+## Seconds the breaker's lamp still pulses for the hint ladder, and how long it has pulsed.
+var breaker_pulse_remaining: float = 0.0
+var breaker_pulse_elapsed: float = 0.0
 var _valve_tween: Tween
 var _seam_tween: Tween
 var _door_tween: Tween
@@ -572,7 +590,7 @@ func _ready() -> void:
 	var dial: Vector2 = prop_point(valve_art, VALVE_DIAL_CENTRE)
 	line_caption.position = Vector2(dial.x - VALVE_DIAL_RADIUS * VALVE_SCALE - 2.0 - line_caption.size.x, dial.y - line_caption.size.y * 0.5)
 	# Over the bolt panel, beside the hatch, so both read as one exit.
-	hatch_label = _add_station_label("EXIT BOLTED", EXIT_LABEL_X, Color("#8fa6b2"))
+	hatch_label = _add_station_label("EXIT LOCKED", EXIT_LABEL_X, Color("#8fa6b2"))
 	_build_lane()
 	refresh_state()
 
@@ -770,10 +788,97 @@ func _fit_label(label: Label) -> void:
 
 
 ## A plate the edge of the view cuts would show part of a name: it fades out as it reaches the edge.
-func _process(_delta: float) -> void:
+func _process(delta: float) -> void:
 	if not visible:
 		return
 	fade_at_view_edge(station_labels, get_viewport())
+	_advance_flicker(delta)
+
+
+## The lamp of [param station] (&"breaker", &"valve", &"door", &"release" or &"bolt") goes dark and
+## comes back [param times] times, from this frame.
+func flicker(station: StringName, times: int) -> void:
+	var was_door: bool = flicker_station == &"door"
+	flicker_station = station
+	flicker_elapsed = 0.0
+	flicker_times = times
+	if was_door and station != &"door":
+		_sync_seam()
+	_sync_flicker()
+
+
+## How lit [param station]'s lamp is this frame: 0 dark in a flicker, 1 otherwise.
+func lamp_level(station: StringName) -> float:
+	if station != flicker_station or flicker_times <= 0:
+		return 1.0
+	if reduce_motion:
+		return 0.0 if flicker_elapsed < FLICKER_STEP_SECONDS * 2.0 else 1.0
+	if flicker_elapsed >= FLICKER_STEP_SECONDS * 2.0 * flicker_times:
+		return 1.0
+	return 0.0 if fmod(flicker_elapsed, FLICKER_STEP_SECONDS * 2.0) < FLICKER_STEP_SECONDS else 1.0
+
+
+## True while [param station]'s lamp is in a flicker (dark or between dark steps).
+func flickering(station: StringName) -> bool:
+	if station != flicker_station or flicker_times <= 0:
+		return false
+	return flicker_elapsed < FLICKER_STEP_SECONDS * 2.0 * (1 if reduce_motion else flicker_times)
+
+
+## The breaker's lamp pulses for [param seconds] (hint ladder T1, while WOLF looks at it).
+func pulse_breaker(seconds: float) -> void:
+	breaker_pulse_remaining = seconds
+	breaker_pulse_elapsed = 0.0
+	queue_redraw()
+
+
+## How far the breaker's lamp is pulsed up this frame, 0..1 (0 when it is not pulsing).
+func breaker_pulse_level() -> float:
+	if breaker_pulse_remaining <= 0.0:
+		return 0.0
+	if reduce_motion:
+		return 1.0
+	return 0.5 - 0.5 * cos(breaker_pulse_elapsed * BREAKER_PULSE_HZ * TAU)
+
+
+func _advance_flicker(delta: float) -> void:
+	if breaker_pulse_remaining > 0.0:
+		breaker_pulse_remaining = maxf(breaker_pulse_remaining - delta, 0.0)
+		breaker_pulse_elapsed += delta
+		_sync_breaker_glow()
+		queue_redraw()
+	if flicker_times <= 0:
+		return
+	flicker_elapsed += delta
+	if not flickering(flicker_station):
+		var station: StringName = flicker_station
+		flicker_times = 0
+		flicker_station = &""
+		if station == &"door":
+			_sync_seam()
+		_sync_breaker_glow()
+		queue_redraw()
+		return
+	_sync_flicker()
+
+
+## Shows the flicker's current step: the drawn lamps follow lamp_level when they draw; the glows and
+## the door's seam lamp are nodes, set here.
+func _sync_flicker() -> void:
+	if flicker_station == &"door" and not door_blown and not (line_state in [&"charged", &"fuse"]):
+		if _seam_tween != null and _seam_tween.is_valid():
+			_seam_tween.kill()
+		seam_glow.modulate = Color(AMBER, SEAM_FLICKER_ALPHA * lamp_level(&"door"))
+	_sync_breaker_glow()
+	queue_redraw()
+
+
+## The breaker's glow: as its phase sets it (refresh_state), dark in a flicker, brighter in a pulse.
+func _sync_breaker_glow() -> void:
+	var lit: bool = line_state in [&"building", &"charged", &"fuse"] and not door_blown
+	var glow: Color = Color(_breaker_light_color(), 0.75 if lit else 0.4)
+	glow.a = lerpf(glow.a, 1.0, breaker_pulse_level()) * lamp_level(&"breaker")
+	breaker_glow.modulate = glow
 
 
 ## Fades each of [param labels] out over LABEL_EDGE_FADE px as it reaches the edge of [param viewport]'s
@@ -924,7 +1029,7 @@ func _redraw_if_changed() -> void:
 
 ## Every value _draw reads that can change after the room is built.
 func draw_inputs() -> Array:
-	return [line_state, gauge, display_gauge, gauge_tripped, fuse_remaining, reduce_motion, door_blown, sentry_down, junction_cleared, arm_state, tank_drop, tank_on_floor, tank.position.y, arm_art.position.y, bolt_state, bolt_charge, mark_lit()]
+	return [line_state, gauge, display_gauge, gauge_tripped, fuse_remaining, reduce_motion, door_blown, sentry_down, junction_cleared, arm_state, tank_drop, tank_on_floor, tank.position.y, arm_art.position.y, bolt_state, bolt_charge, breaker_pulse_level(), lamp_level(&"breaker"), lamp_level(&"valve"), lamp_level(&"release"), lamp_level(&"bolt"), mark_lit()]
 
 
 ## Every value draw_recesses reads that can change after the room is built.
@@ -1032,10 +1137,11 @@ func _turn_wheel(to_turns: int) -> void:
 ## Labels, glows and the seam follow the line's phase; the parent calls this after state changes.
 func refresh_state() -> void:
 	if is_spent():
-		# The blast used the line up: the same labels whether it just went or a save brought it back.
-		breaker_label.text = "BREAKER SPENT"
+		# The blast used the line up: the same labels whether it just went or a save brought it back. State
+		# words on the plates are plain (USED, LOCKED, READY; P0-7, approved 2026-10-13).
+		breaker_label.text = "BREAKER USED"
 		breaker_label.add_theme_color_override("font_color", Color("#8fa6b2"))
-		valve_label.text = "VALVE SPENT"
+		valve_label.text = "VALVE USED"
 		valve_label.add_theme_color_override("font_color", Color("#8fa6b2"))
 	else:
 		var armed: bool = line_state != &"idle" and line_state != &"tripped"
@@ -1043,12 +1149,12 @@ func refresh_state() -> void:
 		breaker_label.add_theme_color_override("font_color", SEAM_RED if line_state == &"tripped" else (Color("#8be3ff") if armed else Color("#b0d1de")))
 		valve_label.text = "FUSE LIT" if line_state in [&"charged", &"fuse", &"blown"] else ("VALVE  %d / %d" % [turns, PressureLine.TURNS_NEEDED] if armed else "VALVE")
 		valve_label.add_theme_color_override("font_color", GREEN if turns >= PressureLine.TURNS_NEEDED else Color("#b0d1de"))
-	breaker_glow.modulate = Color(_breaker_light_color(), 0.75 if line_state in [&"building", &"charged", &"fuse"] and not door_blown else 0.4)
+	_sync_breaker_glow()
 	door_label.text = "DOOR DOWN" if door_blown else "SEALED DOOR"
 	door_label.add_theme_color_override("font_color", GREEN if door_blown else Color("#ffc7c7"))
 	# A missed tank lying on the floor is not being winched yet: the plate says so only once the winch
 	# takes it (it stays amber, busy, meanwhile).
-	arm_label.text = "RELEASE SPENT" if sentry_down else ("WINCHING UP" if arm_state == &"rewinding" and not tank_on_floor else "TANK RELEASE")
+	arm_label.text = "RELEASE USED" if sentry_down else ("WINCHING UP" if arm_state == &"rewinding" and not tank_on_floor else "TANK RELEASE")
 	tank_label.visible = sentry_down
 	arm_label.add_theme_color_override("font_color", Color("#8fa6b2") if sentry_down else (AMBER if arm_state == &"rewinding" else Color("#b0d1de")))
 	if junction_cleared or (bolt_state == &"open" and hatch_open >= 1.0):
@@ -1059,10 +1165,10 @@ func refresh_state() -> void:
 		hatch_label.text = "EXIT OPENING"
 		hatch_label.add_theme_color_override("font_color", AMBER)
 	elif sentry_down:
-		hatch_label.text = "EXIT BOLT"
+		hatch_label.text = "EXIT READY"
 		hatch_label.add_theme_color_override("font_color", AMBER)
 	else:
-		hatch_label.text = "EXIT BOLTED"
+		hatch_label.text = "EXIT LOCKED"
 		hatch_label.add_theme_color_override("font_color", Color("#8fa6b2"))
 	for label: Label in station_labels:
 		_fit_label(label)
@@ -1166,6 +1272,9 @@ func reset_transient() -> void:
 	_door_tween = null
 	_hazard_tween = null
 	_hatch_tween = null
+	flicker_times = 0
+	flicker_station = &""
+	breaker_pulse_remaining = 0.0
 	vent_hazard.armed = false
 	cloud_hazard.armed = false
 	for burst: CPUParticles2D in [vent_steam, vent_puff, blast_sparks, blast_dust, coolant_cloud, coolant_burst, hit_sparks, bolt_sparks]:
@@ -1212,8 +1321,9 @@ func _draw() -> void:
 	_draw_arm_panel_light()
 	_draw_arm()
 	_draw_floor_mark()
-	_draw_hatch_lamp(hatch_art, _bolt_light_color(), 1.0)
-	draw_rect(prop_rect(bolt_panel_art, BOLT_PANEL_LIGHT), _bolt_light_color())
+	var bolt_light: Color = _bolt_light_color().lerp(FLICKER_DARK, 1.0 - lamp_level(&"bolt"))
+	_draw_hatch_lamp(hatch_art, bolt_light, 1.0)
+	draw_rect(prop_rect(bolt_panel_art, BOLT_PANEL_LIGHT), bolt_light)
 
 
 ## The alcove's floor: a tint over exactly the cover span, on the floor line and the walkway in front
@@ -1300,7 +1410,8 @@ func _draw_gauge() -> void:
 	var centre: Vector2 = prop_point(valve_art, VALVE_DIAL_CENTRE)
 	var face: float = VALVE_DIAL_RADIUS * VALVE_SCALE
 	# A fresh face over the painted one, so its painted needle never reads as a second reading.
-	draw_circle(centre, face - 0.6, Color("#d9d3c4"))
+	# The lit face is the valve's lamp: it goes dark in a refusal's flicker.
+	draw_circle(centre, face - 0.6, Color("#d9d3c4").lerp(FLICKER_DARK, 1.0 - lamp_level(&"valve")))
 	draw_arc(centre, face - 1.6, PI + PI * 0.78, TAU, 8, SEAM_RED, 1.6, true)
 	var angle: float = PI + PI * display_gauge
 	var red: bool = gauge_tripped or (line_state == &"building" and gauge >= PressureLine.WARN_GAUGE)
@@ -1328,7 +1439,8 @@ func _draw_blast_zone() -> void:
 
 
 func _draw_breaker_light() -> void:
-	draw_rect(BREAKER_LIGHT, _breaker_light_color())
+	var light: Color = _breaker_light_color().lerp(Color.WHITE, 0.6 * breaker_pulse_level())
+	draw_rect(BREAKER_LIGHT, light.lerp(FLICKER_DARK, 1.0 - lamp_level(&"breaker")))
 
 
 func _breaker_light_color() -> Color:
@@ -1347,7 +1459,7 @@ func _breaker_light_color() -> Color:
 ## the sentry is down.
 func _draw_arm_panel_light() -> void:
 	var light: Color = DIM if sentry_down else (GREEN if arm_state == &"hung" else AMBER)
-	draw_rect(prop_rect(arm_panel_art, ARM_PANEL_LIGHT), light)
+	draw_rect(prop_rect(arm_panel_art, ARM_PANEL_LIGHT), light.lerp(FLICKER_DARK, 1.0 - lamp_level(&"release")))
 
 
 ## The rods that hang the arm's ceiling plate from the gantry, and, only while the winch hauls a

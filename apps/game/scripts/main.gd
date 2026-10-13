@@ -154,6 +154,7 @@ const HATCH_EXIT_FADE_SECONDS: float = 0.5
 ## drawn body (SentryBrain.far_x).
 const WOLF_SENTRY_GAP: float = 4.0
 ## The end of the built route (decision D): the END OF SLICE card with this run's choices, then the title.
+## The third row's topic is SENTRY, the thing on screen, not the lane (P0-7, approved 2026-10-13).
 const END_CARD_TITLE: String = "END OF SLICE"
 const END_CARD_THANKS: String = "Thank you for playing this early slice."
 const END_CARD_RECAP_HEADER: String = "THIS RUN"
@@ -162,13 +163,13 @@ const RECAP_RELAY_DISCLOSE_BYPASS: String = "RELAY  {name} told WOLF the risk, t
 const RECAP_RELAY_PRESS: String = "RELAY  {name} rushed WOLF. He refused, so {name} cranked the bypass."
 const RECAP_MIRROR_WOLF: String = "MIRROR  WOLF read the timestamp off his own readout."
 const RECAP_MIRROR_MANUAL: String = "MIRROR  {name} copied the timestamp through the maintenance port."
-const RECAP_LANE_WOLF: String = "LANE  WOLF drew the sentry onto the mark."
-const RECAP_LANE_REFUSED: String = "LANE  WOLF wouldn't draw it, so {name} timed the drop alone."
-const RECAP_LANE_ALONE: String = "LANE  WOLF held at the rubble while {name} timed the drop."
+const RECAP_LANE_WOLF: String = "SENTRY  WOLF drew the sentry onto the mark."
+const RECAP_LANE_REFUSED: String = "SENTRY  WOLF wouldn't draw it, so {name} timed the drop alone."
+const RECAP_LANE_ALONE: String = "SENTRY  WOLF held at the rubble while {name} timed the drop."
 ## After a miss with WOLF already past the sentry: he broke off where he was, by the exit hatch (the
 ## row names no place, like his "I'm out.").
-const RECAP_LANE_BROKE_OFF: String = "LANE  WOLF broke off while {name} timed the drop."
-const RECAP_LANE_UNKNOWN: String = "LANE  The tank came down on the sentry."
+const RECAP_LANE_BROKE_OFF: String = "SENTRY  WOLF broke off while {name} timed the drop."
+const RECAP_LANE_UNKNOWN: String = "SENTRY  The tank came down on the sentry."
 ## On a finished save the title's Continue starts a fresh run instead.
 const PLAY_AGAIN_TEXT: String = "PLAY AGAIN"
 ## The title's Continue button's left edge beside NEW GAME (main.tscn); alone it spans the row.
@@ -178,15 +179,24 @@ const FINISHED_NOTE: String = "Slice complete. PLAY AGAIN starts a fresh run."
 ## Only a hand-made save can reopen the cleared junction; it says where the line goes, not that it is unbuilt.
 const JUNCTION_CLEARED_LINE: String = "The service line runs on toward Archive."
 ## Said as the door goes, while WOLF is still on his way up from the entrance: it says where he is
-## going, so it holds on every frame of his walk and after he arrives.
-const RUBBLE_LINE: String = "The door goes. WOLF heads for the rubble to wait for %s's call. In the lane beyond, something whirs awake."
+## going, so it holds on every frame of his walk and after he arrives. Then, as its own box, the
+## sentry past the doorway (P0-7, approved 2026-10-13: the lane is not drawn; the doorway is).
+const RUBBLE_LINE: String = "The door goes. WOLF heads for the rubble\nto wait for %s's call."
+const RUBBLE_WAKE_LINE: String = "Past the doorway, something whirs awake."
 const BAIT_YES_LINE: String = "WOLF: You told me the truth at the relay. I'll draw it onto the mark and keep clear of the tank. Drop it when it stops."
-## What WOLF says as he breaks off after a miss, under the miss line: he holds at the rubble if he had
-## not got past the sentry yet; if he had, he stays by the exit hatch, since he never crosses back under
-## the tank (_wolf_target_x), and says only that he is out (where he is shows on screen).
-const BROKE_OFF_RUBBLE_LINE: String = "\nWOLF: I'm out. I'll hold at the rubble."
-const BROKE_OFF_HATCH_LINE: String = "\nWOLF: I'm out."
-const BAIT_NO_LINE: String = "WOLF: At the relay you'd have sent me in blind. I won't walk into its sights. Time the drop from the panel; it crosses the mark on every pass."
+## What WOLF says as he breaks off after a miss, in his own box after the miss line's two: he holds at
+## the rubble if he had not got past the sentry yet; if he had, he stays by the exit hatch, since he
+## never crosses back under the tank (_wolf_target_x), and says only that he is out (where he is shows
+## on screen).
+const BROKE_OFF_RUBBLE_LINE: String = "WOLF: I'm out. I'll hold at the rubble."
+const BROKE_OFF_HATCH_LINE: String = "WOLF: I'm out."
+## A missed drop, in two boxes (P0-7 and P0-19, approved 2026-10-13: no split line is drawn, and the
+## release is the panel's one name).
+const TANK_MISS_LINE: String = "The tank hits the empty mark\nand sprays coolant."
+const TANK_MISS_TURN_LINE: String = "The sentry swings toward the release;\nget back over the rubble."
+const BAIT_NO_LINE: String = "WOLF: At the relay you'd have sent me in blind. I won't walk into its sights. Time the drop from the release; it crosses the mark on every pass."
+## WOLF's answer when the engineer will time the drop alone, in two boxes of his.
+const ALONE_LINES: Array[String] = ["WOLF: I'll hold at the rubble.\nIt crosses the mark on every pass.", "WOLF: The tank takes a moment to fall."]
 ## A hit on the mark, and one that catches the sentry more than OFF_CENTRE_HIT off it (the tank lands on
 ## the mark and pins the machine where it stands, so the wreck shows to one side under it).
 const TANK_HIT_LINE: String = "The tank comes down square and crushes the sentry flat. Its eyes go dark.\nWOLF: It's down. The bolt by the hatch is next."
@@ -258,12 +268,55 @@ const LANE_CHOICE_TEXT: Array[String] = ["Draw it under the tank if you can stay
 ## gives way to DROP_PARKED_LINE the moment the sentry stops there, so the box, the hint and the
 ## picture never disagree.
 const DROP_WAIT_LINE: String = "Wait. WOLF hasn't got it on the mark yet."
+## The sentry turning on the engineer and losing them (P0-7: the same words, two rows).
+const SENTRY_LOCK_LINE: String = "The sentry stops and its eyes snap red.\nIt has %s; get back over the rubble."
+const SENTRY_LOST_LINE: String = "The sentry loses %s behind the rubble\nand rolls back to its patrol."
 const DROP_PARKED_LINE: String = "The sentry stops on the mark, its eyes on WOLF. Drop the tank now."
 ## Entering the junction WOLF runs ahead to the valve, the nearest he can stand to the sealed door
 ## (JunctionRoom.WOLF_SEAM_X), and stands facing it, reading its LINE gauge, for WOLF_GAUGE_READ_SECONDS
-## before he says what he found; the line is formatted with the engineer's tag.
+## before he says what he found, and not before the engineer's entry line has been up its reading time.
+## His run is shown, not narrated. The engineer says only the goal (Q6, approved 2026-10-13); how to
+## open the door comes from the hint ladder if the player stalls (JUNCTION_LADDER_SECONDS).
 const WOLF_GAUGE_READ_SECONDS: float = 1.0
-const JUNCTION_ENTRY_LINE: String = "WOLF runs ahead to the valve and reads its LINE gauge.\n%s: The breaker by the entrance feeds that line. Overload it, crank the valve, and the door goes."
+const JUNCTION_ENTRY_LINE: String = "%s: That door is our way through."
+## The junction's hint bar before the ladder has given the chain: the goal only. Once it has (and on
+## Continue, whose restore line gives it), the approved chain.
+const JUNCTION_GOAL_HINT: String = "Get through the sealed door."
+const JUNCTION_CHAIN_HINT: String = "Arm the breaker by the entrance, then crank the valve by the door."
+## The hint ladder (PUZ-8), in seconds of control in the junction without the breaker ever armed (it
+## stops counting during a choice or a knockdown and while the game is paused). T1: WOLF stops and looks
+## at the breaker, whose lamp pulses for WOLF_LOOK_SECONDS; no text. T2: the engineer names the breaker.
+## T3: the engineer gives the whole approved chain, in two boxes.
+const JUNCTION_LADDER_SECONDS: Array[float] = [45.0, 90.0, 180.0]
+const WOLF_LOOK_SECONDS: float = 2.5
+const LADDER_BREAKER_LINE: String = "%s: The breaker by the entrance\nfeeds that line."
+const LADDER_CHAIN_LINE: String = "%s: Overload it, crank the valve,\nand the door goes."
+## Every refused press in the junction says no (P0-15, approved 2026-10-13): on the press frame the
+## station's lamp flickers twice (JunctionRoom.flicker), a short dull clunk plays (the clank, pitched
+## down) and the line shows in the box; pressing again re-shows it and the box blinks once.
+const REFUSE_VALVE_DEAD: String = "The valve is dead. Arm the breaker first."
+const REFUSE_VALVE_TRIPPED: String = "The vent let go and the breaker tripped. Reset it by the entrance."
+const REFUSE_DOOR: String = "Sealed shut. Something hums behind it.\nThe valve beside it charges it."
+const REFUSE_BREAKER_LIVE: String = "Already live. Crank the valve by the door."
+const REFUSE_FUSE_LIT: String = "Fuse lit. Get clear of the door."
+const REFUSE_SPENT: String = "No charge left. The door is down."
+const REFUSE_REWINDING: String = "Not yet. The tank is still going back up."
+const REFUSE_RELEASE_SPENT: String = "The tank is down on the sentry.\nThe exit bolt is by the hatch."
+const REFUSE_EXIT_SENTRY: String = "Locked out until the sentry is down."
+## Only a hand-made save can press the exit before the door is down: the sealed door blocks the way.
+const REFUSE_EXIT_DOOR: String = "Bolted. The sealed door comes first."
+const REFUSE_CLUNK_DB: float = -8.0
+const REFUSE_CLUNK_PITCH: float = 0.42
+## The box's blink when a refusal is pressed again: down to this opacity and back.
+const BOX_BLINK_ALPHA: float = 0.35
+const BOX_BLINK_SECONDS: float = 0.16
+## Walking into the sealed door: a dull metal thud (the thud, pitched down), and the engineer's body
+## gives this far back and returns. The body counts as against the door within DOOR_BUMP_SLOP of its face.
+const DOOR_THUD_DB: float = -6.0
+const DOOR_THUD_PITCH: float = 0.62
+const DOOR_RECOIL_PX: float = 3.0
+const DOOR_RECOIL_SECONDS: float = 0.14
+const DOOR_BUMP_SLOP: float = 1.5
 ## What WOLF says once he has read the gauge on entry, and again on Continue from junction autosave A:
 ## the breaker is not armed yet either time, so his warning is about the door, not a live line.
 const WOLF_DOOR_WARNING: String = "WOLF: When the door goes, don't be standing in front of it."
@@ -380,6 +433,21 @@ var pressure_line: PressureLine = PressureLine.new()
 ## reading it.
 var wolf_scouting: bool = false
 var seam_read_seconds: float = 0.0
+## How long the engineer's junction entry line still needs before WOLF's warning may replace it.
+var junction_entry_hold: float = 0.0
+## The junction's hint ladder: seconds counted towards it and the steps given (JUNCTION_LADDER_SECONDS);
+## 3 once the chain has been said, the breaker armed, or the room restored from a checkpoint.
+var ladder_seconds: float = 0.0
+var ladder_step: int = 3
+## Ladder step T1: WOLF holds where he stands, looking at the breaker, this much longer.
+var wolf_look_x: float = -1.0
+var wolf_look_remaining: float = 0.0
+## Walking into the sealed door: held against it (one bump until they step off), and whether this visit
+## has said why yet (only the first bump does).
+var door_bump_latched: bool = false
+var door_bump_said: bool = false
+var box_blink_tween: Tween
+var door_recoil_tween: Tween
 ## The junction's purge sentry and the arm over its lane; transient, reset by every scene sync.
 var sentry_brain: SentryBrain = SentryBrain.new()
 var drop_arm: DropArm = DropArm.new()
@@ -1226,6 +1294,10 @@ func _new_game() -> void:
 	stakes_spoken = false
 	shown_line = ""
 	shown_line_age = 0.0
+	box_queue.clear()
+	ladder_step = JUNCTION_LADDER_SECONDS.size()
+	wolf_look_x = -1.0
+	wolf_look_remaining = 0.0
 	name_card_remaining = 0.0
 	hold_use.reset()
 	_sync_scene()
@@ -1781,12 +1853,17 @@ func _load_game() -> void:
 	# The loaded save is this beat's start, so a knockdown never falls back past it.
 	_mark_beat()
 	if state.chapter_id == "junction":
+		# Continue gives the chain in its restore line: no ladder, and the hint bar says the chain.
+		ladder_step = JUNCTION_LADDER_SECONDS.size()
+		wolf_look_x = -1.0
+		wolf_look_remaining = 0.0
+		door_bump_said = false
 		if state.junction_cleared:
 			status_line = JUNCTION_CLEARED_LINE
 		elif state.sentry_down:
 			status_line = "Service junction restored. The sentry is down; pop the exit bolt by the hatch."
 		elif state.door_blown:
-			status_line = "Service junction restored. The door is down; the sentry patrols the lane past the rubble."
+			status_line = "Service junction restored. The door is\ndown. The sentry patrols past the rubble."
 		else:
 			status_line = JUNCTION_RESTORE_A_LINE
 	elif state.chapter_id == "records":
@@ -1815,6 +1892,10 @@ func _interact() -> void:
 		_interact_records(x)
 		return
 	if state.chapter_id == "junction":
+		if _at_door_face(x):
+			# The sealed door answers for itself ahead of the valve's reach (P0-15).
+			_refuse(REFUSE_DOOR, &"door")
+			return
 		_step_beside_station(x)
 		_interact_junction(x)
 		return
@@ -2348,8 +2429,12 @@ func _enter_junction() -> void:
 	_start_gameplay_camera()
 	wolf_scouting = true
 	seam_read_seconds = 0.0
+	ladder_seconds = 0.0
+	ladder_step = 0
+	door_bump_said = false
 	_update_controls()
 	status_line = JUNCTION_ENTRY_LINE % state.human_name().get_slice(" ", 0).to_upper()
+	junction_entry_hold = box_seconds(status_line)
 	# Autosave A: the start of the junction.
 	_save_progress()
 
@@ -2357,36 +2442,39 @@ func _enter_junction() -> void:
 func _interact_junction(x: float) -> void:
 	if absf(x - JunctionRoom.BREAKER_X) <= 52.0:
 		if state.door_blown:
-			status_line = "The breaker is spent. The door is down."
+			_refuse(REFUSE_SPENT, &"breaker")
 		elif pressure_line.arm():
 			sfx_bank.play(&"clank", -4.0, 0.8)
 			impact.rumble(0.15, 0.0, 0.06)
 			junction_room.sync_line(pressure_line)
+			# Armed: the ladder has done its job.
+			ladder_step = 3
+			_end_wolf_look()
 			status_line = "The overload breaker catches and the line starts to build. If the LINE gauge peaks, the relief vent lets go."
 		elif pressure_line.state == &"building":
-			status_line = "The line is live. Crank the valve by the door before the vent lets go."
+			_refuse(REFUSE_BREAKER_LIVE, &"breaker")
 		else:
-			status_line = "Fuse lit. Get clear of the door."
+			_refuse(REFUSE_FUSE_LIT, &"breaker")
 	elif absf(x - JunctionRoom.VALVE_X) <= 52.0 and state.door_blown:
-		status_line = "The valve is spent. The door is down."
+		_refuse(REFUSE_SPENT, &"valve")
 	elif absf(x - JunctionRoom.VALVE_X) <= 52.0:
 		match pressure_line.state:
 			&"idle":
-				status_line = "The valve is dead. Arm the overload breaker by the entrance first."
+				_refuse(REFUSE_VALVE_DEAD, &"valve")
 			&"tripped":
-				status_line = "The vent let go and the breaker tripped. Reset it by the entrance."
+				_refuse(REFUSE_VALVE_TRIPPED, &"valve")
 			&"building":
 				status_line = "The wheel is stiff. Three full turns charge the door."
 				# Cranked from just left of the wheel, like the MANUAL BYPASS, not from inside the valve.
 				_step_engineer(VALVE_CRANK_X, JunctionRoom.VALVE_X)
 			&"charged", &"fuse":
-				status_line = "Fuse lit. Get clear of the door."
+				_refuse(REFUSE_FUSE_LIT, &"valve")
 			_:
-				status_line = "The valve is spent. The door is down."
+				_refuse(REFUSE_SPENT, &"valve")
 	elif PressureLine.is_on_vent(x) and not state.door_blown:
 		status_line = "Relief vent. It lets go when the gauge peaks; don't be standing on it."
 	elif absf(x - JunctionRoom.DOOR_X) <= 40.0 and not state.door_blown:
-		status_line = "The door is sealed from the other side. Something hums behind it."
+		_refuse(REFUSE_DOOR, &"door")
 	elif state.door_blown and _at_arm_panel(x):
 		_use_arm_panel()
 	elif x >= JunctionRoom.BOLT_REACH_MIN_X:
@@ -2394,9 +2482,109 @@ func _interact_junction(x: float) -> void:
 	elif state.sentry_down:
 		status_line = "No station in reach. The exit bolt is by the hatch."
 	elif state.door_blown:
-		status_line = "No station in reach. The TANK RELEASE is in the alcove past the rubble."
+		status_line = "No station in reach. The TANK RELEASE\nis past the rubble."
 	else:
 		status_line = "No station in reach. The breaker is by the entrance, the valve by the door."
+
+
+## True when a USE in the junction is the sealed door's: the engineer faces it and their front is
+## closer to its face than they are to the valve's wheel (P0-15). While the line builds the valve answers
+## (the crank), and while the fuse burns its warning does.
+func _at_door_face(x: float) -> bool:
+	if state.door_blown or human.body_sprite.flip_h or not (pressure_line.state in [&"idle", &"tripped"]):
+		return false
+	var gap: float = M0State.JUNCTION_DOOR_LEFT_X - (x + M0State.HUMAN_HALF_WIDTH)
+	return gap >= -DOOR_BUMP_SLOP and gap < absf(x - JunctionRoom.VALVE_X)
+
+
+## A refused press at [param station] (breaker, valve, door, release or bolt): the station's lamp
+## flickers twice, a short dull clunk plays and [param line] shows; pressing again re-shows it with a
+## blink of the box, so a second press visibly answers too.
+func _refuse(line: String, station: StringName) -> void:
+	sfx_bank.play(&"clank", REFUSE_CLUNK_DB, REFUSE_CLUNK_PITCH)
+	junction_room.flicker(station, 2)
+	if status_line == line:
+		_blink_box()
+	status_line = line
+
+
+## The dialogue box dips and comes back once, so a line shown again reads as a new answer.
+func _blink_box() -> void:
+	if box_blink_tween != null and box_blink_tween.is_valid():
+		box_blink_tween.kill()
+	bottom_bar.modulate.a = BOX_BLINK_ALPHA
+	box_blink_tween = create_tween()
+	box_blink_tween.tween_property(bottom_bar, "modulate:a", 1.0, BOX_BLINK_SECONDS)
+
+
+## Walking into the sealed door bumps it once per push: held against its face with right held, it
+## thuds; stepping off (or letting go) lets the next push bump again.
+func _check_door_bump() -> void:
+	var pushing: bool = human.controlled and not state.door_blown and Input.get_axis(&"move_left", &"move_right") > 0.0 \
+		and human.position.x + M0State.HUMAN_HALF_WIDTH >= M0State.JUNCTION_DOOR_LEFT_X - DOOR_BUMP_SLOP
+	if pushing and not door_bump_latched:
+		_door_bump()
+	door_bump_latched = pushing
+
+
+## The bump: a dull metal thud, the engineer's body gives a little and comes back (not with Reduced
+## Motion), and the door's seam lamp flickers once. Only the first bump of a visit says why, so walking
+## into it never floods the box; USE at the door still says it every time. Not over the fuse's warning.
+func _door_bump() -> void:
+	sfx_bank.play(&"thud", DOOR_THUD_DB, DOOR_THUD_PITCH)
+	junction_room.flicker(&"door", 1)
+	if impact.motion_allowed():
+		if door_recoil_tween != null and door_recoil_tween.is_valid():
+			door_recoil_tween.kill()
+		human.body_sprite.position.x = HUMAN_SPRITE_REST.x - DOOR_RECOIL_PX
+		door_recoil_tween = create_tween()
+		door_recoil_tween.tween_property(human.body_sprite, "position:x", HUMAN_SPRITE_REST.x, DOOR_RECOIL_SECONDS).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
+	if not door_bump_said and not _fuse_lit():
+		door_bump_said = true
+		status_line = REFUSE_DOOR
+
+
+## The junction's hint ladder (PUZ-8): only while the breaker has never been armed this visit and the
+## engineer has control, never during a choice or a knockdown (the game being paused stops it too).
+func _tick_ladder(delta: float) -> void:
+	if wolf_look_remaining > 0.0:
+		wolf_look_remaining = maxf(wolf_look_remaining - delta, 0.0)
+		if absf(wolf.position.x - wolf_look_x) <= 2.0:
+			wolf.body_sprite.flip_h = JunctionRoom.BREAKER_X < wolf.position.x
+		if wolf_look_remaining <= 0.0:
+			_end_wolf_look()
+	if ladder_step >= JUNCTION_LADDER_SECONDS.size():
+		return
+	if state.door_blown or pressure_line.state != &"idle":
+		ladder_step = JUNCTION_LADDER_SECONDS.size()
+		return
+	if not human.controlled or waiting_for_choice or fail_active:
+		return
+	ladder_seconds += delta
+	if ladder_seconds < JUNCTION_LADDER_SECONDS[ladder_step]:
+		return
+	ladder_step += 1
+	var tag: String = _first_name().to_upper()
+	match ladder_step:
+		1:
+			# T1: WOLF stops where he is and looks at the breaker; its lamp pulses. No text.
+			wolf_look_x = wolf.position.x
+			wolf_look_remaining = WOLF_LOOK_SECONDS
+			junction_room.pulse_breaker(WOLF_LOOK_SECONDS)
+			_update_controls()
+		2:
+			status_line = LADDER_BREAKER_LINE % tag
+		3:
+			_say([LADDER_BREAKER_LINE % tag, LADDER_CHAIN_LINE % tag])
+
+
+## WOLF stops looking at the breaker and follows again.
+func _end_wolf_look() -> void:
+	if wolf_look_x < 0.0:
+		return
+	wolf_look_x = -1.0
+	wolf_look_remaining = 0.0
+	_update_controls()
 
 
 ## True in the TANK RELEASE alcove, the one spot that drops the tank (and hides the engineer).
@@ -2426,16 +2614,16 @@ func _wolf_drawing_x() -> float:
 
 func _use_arm_panel() -> void:
 	if state.sentry_down:
-		status_line = "The tank is down on the sentry. The exit bolt is by the hatch."
+		_refuse(REFUSE_RELEASE_SPENT, &"release")
 		return
 	match drop_arm.state:
 		&"hung":
 			if _drop_waits_for_wolf():
-				status_line = DROP_WAIT_LINE
+				_refuse(DROP_WAIT_LINE, &"release")
 				return
 			_drop_tank()
 		&"rewinding":
-			status_line = "The winch is still hauling the tank back up. Wait for the clamp."
+			_refuse(REFUSE_REWINDING, &"release")
 		_:
 			pass
 
@@ -2455,9 +2643,9 @@ func _drop_tank() -> void:
 ## sentry is down, the next leaves through the open hatch.
 func _use_exit() -> void:
 	if not state.door_blown:
-		status_line = "The exit hatch is bolted. The lane past the door comes first."
+		_refuse(REFUSE_EXIT_DOOR, &"bolt")
 	elif not state.sentry_down:
-		status_line = "The exit bolt is locked out while the sentry runs the line."
+		_refuse(REFUSE_EXIT_SENTRY, &"bolt")
 	elif state.junction_cleared:
 		status_line = JUNCTION_CLEARED_LINE
 	else:
@@ -2552,12 +2740,16 @@ func _tick_junction(delta: float) -> void:
 			_fuse_ticked()
 		&"blown":
 			_door_blast()
+	junction_entry_hold = maxf(junction_entry_hold - delta, 0.0)
 	if wolf_scouting and absf(wolf.position.x - JunctionRoom.WOLF_SEAM_X) <= 4.0:
-		# He stands facing the valve, reading its LINE gauge, while the entry line says so; then he speaks.
+		# He stands facing the valve, reading its LINE gauge; once the engineer's entry line has been up
+		# long enough to read, he speaks.
 		wolf.body_sprite.flip_h = false
 		seam_read_seconds += delta
-		if seam_read_seconds >= WOLF_GAUGE_READ_SECONDS:
+		if seam_read_seconds >= WOLF_GAUGE_READ_SECONDS and junction_entry_hold <= 0.0:
 			_wolf_reads_seam()
+	_tick_ladder(delta)
+	_check_door_bump()
 	if wolf.autonomous_target_x == JunctionRoom.WOLF_BAIT_X and absf(wolf.position.x - JunctionRoom.WOLF_BAIT_X) <= 2.0:
 		# At the far end of the lane he faces back down it: at the sentry he draws, then at the engineer.
 		wolf.body_sprite.flip_h = true
@@ -2718,10 +2910,10 @@ func _sentry_changed(before: StringName) -> void:
 	match sentry_brain.state:
 		&"lock":
 			if before == &"patrol" or before == &"fixated":
-				status_line = "The sentry stops and its eyes snap red. It has %s; get back over the rubble." % state.human_name().get_slice(" ", 0)
+				status_line = SENTRY_LOCK_LINE % _first_name()
 		&"patrol":
 			if before == &"chase":
-				status_line = "The sentry loses %s behind the rubble and rolls back to its patrol." % state.human_name().get_slice(" ", 0)
+				status_line = SENTRY_LOST_LINE % _first_name()
 
 
 ## The lock-on cue: a short, high klaxon chirp from the sound bank as the sentry's eye goes red.
@@ -2763,7 +2955,7 @@ func _choose_lane(response: int) -> void:
 		lane_choice = "alone"
 		# He settles to hold at the rubble: a quieter whir than an answer he leans into.
 		sfx_bank.play(&"actuator", -12.0, 0.85)
-		status_line = "WOLF: I'll hold at the rubble. It crosses the floor mark on every pass; the tank takes a moment to fall."
+		_say(ALONE_LINES)
 	_update_controls()
 
 
@@ -2819,7 +3011,10 @@ func _tank_miss() -> void:
 		wolf_holding_far_end = wolf.position.x > sentry_brain.x
 		_react_as_wolf(false)
 	_update_controls()
-	status_line = "The tank hits the empty mark and sprays coolant from a split line. The sentry swings toward the panel; get back over the rubble." + ((BROKE_OFF_HATCH_LINE if wolf_holding_far_end else BROKE_OFF_RUBBLE_LINE) if broke_off else "")
+	var boxes: Array[String] = [TANK_MISS_LINE, TANK_MISS_TURN_LINE]
+	if broke_off:
+		boxes.append(BROKE_OFF_HATCH_LINE if wolf_holding_far_end else BROKE_OFF_RUBBLE_LINE)
+	_say(boxes)
 
 
 func _tank_rehung() -> void:
@@ -2908,7 +3103,7 @@ func _door_blast() -> void:
 	junction_room.door_blast()
 	sentry_wake_remaining = SENTRY_WAKE_SECONDS
 	_update_controls()
-	status_line = RUBBLE_LINE % state.human_name().get_slice(" ", 0)
+	_say([RUBBLE_LINE % _first_name(), RUBBLE_WAKE_LINE])
 	# Autosave B: the door is down.
 	_save_progress()
 
@@ -2946,6 +3141,7 @@ func _fail_beat(reason: String, in_lane: bool = false) -> void:
 	impact.rumble(0.5, 0.9, 0.25)
 	sfx_bank.play(&"thud", 0.0, 0.9)
 	human.z_index = KNOCKDOWN_Z
+	_cancel_door_recoil()
 	_cancel_fail_tween()
 	fail_tween = create_tween()
 	var reaction_seconds: float = 0.0
@@ -3004,6 +3200,8 @@ func _restore_beat(reason: String) -> void:
 			relay_refused = false
 			wolf_heading_to_relay = false
 			wolf_scouting = false
+			wolf_look_x = -1.0
+			wolf_look_remaining = 0.0
 			last_top_card_key = ""
 			hold_use.reset()
 			_sync_scene()
@@ -3018,6 +3216,14 @@ func _restore_beat(reason: String) -> void:
 	_refresh_ui()
 
 
+## Stops the engineer's give against the sealed door (a knockdown or a new scene takes the body over).
+func _cancel_door_recoil() -> void:
+	if door_recoil_tween != null and door_recoil_tween.is_valid():
+		door_recoil_tween.kill()
+	door_recoil_tween = null
+	human.body_sprite.position.x = HUMAN_SPRITE_REST.x
+
+
 func _cancel_fail_tween() -> void:
 	if fail_tween != null and fail_tween.is_valid():
 		fail_tween.kill()
@@ -3027,6 +3233,7 @@ func _cancel_fail_tween() -> void:
 ## Drops a knockdown in progress (New Game or Return to Title from Pause) without restoring anything.
 func _cancel_fail() -> void:
 	_cancel_fail_tween()
+	_cancel_door_recoil()
 	fail_active = false
 	human.body_sprite.rotation_degrees = 0.0
 	human.body_sprite.position = HUMAN_SPRITE_REST
@@ -3286,6 +3493,9 @@ func _wolf_target_x() -> float:
 		"junction":
 			if wolf_scouting:
 				return JunctionRoom.WOLF_SEAM_X
+			if wolf_look_x >= 0.0:
+				# Hint ladder T1: he holds where he is, looking at the breaker.
+				return wolf_look_x
 			if not state.door_blown and pressure_line.state in [&"building", &"charged", &"fuse"]:
 				# While the line builds he keeps off the vent's grate, and while the fuse burns he is out of
 				# the blast zone.
@@ -3629,7 +3839,8 @@ func _junction_hint(x: float) -> String:
 			return "The line is building. Crank the valve by the door."
 		&"tripped":
 			return "The breaker tripped. Reset it by the entrance."
-	return "Arm the breaker by the entrance, then crank the valve by the door."
+	# Before the ladder has given the chain, the bar says only the goal (Q6).
+	return JUNCTION_CHAIN_HINT if ladder_step >= JUNCTION_LADDER_SECONDS.size() else JUNCTION_GOAL_HINT
 
 
 ## True once WOLF has asked at the rubble line how to bring the sentry down (this attempt).
@@ -3671,7 +3882,7 @@ func _lane_hint(x: float) -> String:
 			&"hung":
 				if wolf_baiting:
 					return "Wait for WOLF to park it on the mark." if _drop_waits_for_wolf() else "E: drop the tank. It's parked on the mark."
-				return "E: drop the tank. It must land with the sentry in the brackets."
+				return "E: drop the tank. Land it with the sentry on the mark."
 			&"falling":
 				return "The tank is falling."
 			&"rewinding":
@@ -3679,12 +3890,12 @@ func _lane_hint(x: float) -> String:
 	if _sentry_hunting():
 		return "Stay back over the rubble until it gives up."
 	if SentryBrain.is_exposed(x):
-		return "You're in its lane. Get into the release alcove or back over the rubble."
+		return "You're in its sights. Hide at the TANK RELEASE or the rubble."
 	if wolf_baiting:
 		return "WOLF is drawing the sentry onto the mark. Get to the TANK RELEASE."
 	if wolf_broke_off:
 		return "WOLF has broken off. Time the drop on its patrol from the TANK RELEASE."
-	return "The sentry patrols past the rubble. The TANK RELEASE is in the alcove just inside."
+	return "The sentry patrols past the rubble. The TANK RELEASE hides you from it."
 
 
 func _objective() -> String:
@@ -3695,7 +3906,7 @@ func _objective() -> String:
 			return "POP THE EXIT BOLT"
 		if state.door_blown:
 			# The tank is named only once WOLF has asked how to bring the sentry down.
-			return "DROP THE TANK" if _lane_asked() else "CHECK THE LANE"
+			return "DROP THE TANK" if _lane_asked() else "GO THROUGH THE DOOR"
 		match pressure_line.state:
 			&"building":
 				return "CRANK THE VALVE"
