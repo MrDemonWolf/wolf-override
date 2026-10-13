@@ -1,0 +1,22 @@
+corridor-sealed-skew.png
+Original generated file: [Codex generated-images store]/01a12d4a-876b-7dd1-ac97-5eaac56f89c0/exec-a64ad023-64e9-4630-b671-2e6cb21dec34.png
+SHA256: 25c0133b87d6e43318fa3d6670d8eb7d822108858c3ad9740b2771aa2b88eda8
+Pixel size: 1024x1536
+Exact prompt:
+EDIT MODE. Edit reference 1, the 1024x1536 layout guide, into a finished CLOSED corridor seal shutter. Reference 1 is the exact geometry target; references 2 and 3 supply the exact existing door design and paint; reference 4 supplies angle only. Same design, new angle. Keep the canvas 1024x1536.
+Match guide blocks precisely: far column x234-309 foot y1366; near column x651-790 foot y1488, lighter receding inner left side plane x651-678. Header top flat level y48. Hazard lip lower edge from (309,397) to (651,500). Chevron bottom bar bottom edge from (309,1366) to (651,1468). Caged lamp centered (733,852), unlit dark smoky glass.
+All lines across the shutter face slope DOWN RIGHT about 17 degrees, parallel: every rib/slat, both edges of chevron bottom bar, hazard lip beneath drum, drum housing lower edge. Vertical columns and guide rails perfectly vertical. Far column narrow darker; near column wide closest to camera and lowest foot, with lighter left-facing receding side plane and slanted bottom edge. Header TOP edge flat level.
+COPY references 2/3 design: roll-drum housing with bolted straps and conduit, hazard-striped lip, ribbed steel slats, guide rails, yellow-black chevron bottom bar, bolts/clamps and caged lamp. Adapt all details into guide perspective. Continuous CLOSED curtain from hazard lip to bottom bar, ribs at least 30 pixels vertically, no beam across curtain. Chevron bar full curtain width, chevrons at least 40 pixels.
+STYLE: clean graphic-painterly 2D side-view sci-fi horror game art, flat large value planes, crisp readable silhouettes, painterly only inside light pools, no fine grain, speckle or tiny scratches. NO dark outlines: define edges with values and thin cyan-white rim light on top/back edges. Cold overhead strip lighting, lighter top surfaces, cold blue-black shadows never brown or beige. Cool mid-dark blue-grey steel faces #1d3042 to #2f4d69. Saturated color only hazard paint. Fully opaque crisp edges.
+Everything outside door perfectly flat uniform #FF00FF magenta, INCLUDING triangular wedge below slanted chevron between column feet. No floor, cast shadow, reflection, environment. No text, letters, numbers, logos, labels, UI, watermarks, guide lines or borders. Preserve all output metadata including C2PA content credentials; never strip metadata.
+
+corridor-open-skew.png
+Original generated file: [Codex generated-images store]/01a12d4a-876b-7dd1-ac97-5eaac56f89c0/exec-a6d40b66-0083-4ba7-8744-be073888f7e8.png
+SHA256: da79a050f908af2158721ab67e03654412986458bad10c5e3d13d382828dee5d
+Pixel size: 1024x1536
+Exact prompt:
+EDIT MODE, precise object removal. Edit the attached generated CLOSED shutter image into its OPEN state on the same 1024x1536 canvas. Curtain rolled up into the drum: remove ALL ribbed slats and the entire yellow-black chevron bottom bar. Fill the ENTIRE opening between far column inner edge and near column inner side plane, immediately below the slanted hazard-striped header lip down to the bottom of image, with perfectly flat uniform #FF00FF magenta. This is a see-through hole: no threshold, floor, shadow, reflection, curtain remnants or bottom bar. Keep EVERY OTHER PIXEL exactly unchanged: header, roll drum, bolted straps, conduit, slanted hazard lip, far and near columns, guide rails, lighter inner receding side plane, clamps, bolts, unlit smoky glass caged lamp, silhouettes, positions, angle, colors and lighting. Do not repaint or move the frame. Preserve closed image's clean graphic-painterly game art and cyan-white rims. Outside and opening uniform #FF00FF. No text, letters, numbers, logos, labels, UI, watermarks, guide lines or borders. Preserve all metadata including C2PA content credentials.
+
+Verification: both destination files match their original generated files byte-for-byte (cmp). No image transformations or metadata edits performed.
+Limitations: exact guide coordinates and pixel-for-pixel frame preservation between generated states were not verified.
+

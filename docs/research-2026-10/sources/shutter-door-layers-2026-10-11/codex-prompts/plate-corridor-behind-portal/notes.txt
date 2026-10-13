@@ -1,0 +1,16 @@
+Output file: corridor-far-behind-portal.png
+Original generated file: [Codex generated-images store]/01a12d8e-e323-7a21-adde-c252f628b8e5/exec-d784392f-c68b-4aa5-be3e-2c3d3088d136.png
+SHA256: b5bef4dda6d50d91b3b1e5da2b725b0d1bb3b33495f1e87d5841b2c7fb9c78b5
+Pixel size: 1024x1536
+Copy verification: cmp passed; original output copied byte-for-byte, metadata retained.
+Exact prompt:
+Edit Image 1 only. Use case: precise-object-edit. Output one fully opaque 1024x1536 PNG game background plate, exact same canvas, framing, scale and alignment.
+Image 1 is the edit target. Image 2 is a zoning guide ONLY: NEVER paint its colors, lines or box. Image 3 is machinery-room appearance reference. Image 4 is in-game context ONLY; do not paint any portal/frame, console, actors, labels or foreground pipe. Image 5 is palette only.
+Extend the existing machinery room on the right LEFTWARD into the wall behind the open portal so both areas form ONE continuous room.
+Pixel invariants: keep EVERY pixel left of x300 and EVERY pixel right of x700 exactly unchanged. x300-330 remains the corridor wall unchanged in look. No shifting any original content.
+x330-368: plain heavy steel WALL PIER from ceiling pipes to floor line y990, the thick end of corridor wall opening into machinery room. One flat cool blue-grey value plane slightly lighter at top, thin cyan-white rim on right edge, no rivets or dark outline.
+x368-700 above y990: replace corridor wall with deep machinery room seamlessly continuing the existing content at x700. Tall dark cylindrical tanks and braced steel towers receding behind each other, subtle haze. Hint of grated platform and low yellow rail continuing at same height as right side, but NO yellow within x330-690,y400-1090; keep rail suggestion outside that viewing area. Retain cold white ceiling fixture about x560-650,y270-300; game supplies its glow and shaft. The portal viewing region x330-690,y400-1090 must be calm mid-dark large simple shapes, no bright spots, yellow or busy detail, for readable actors.
+Floor line stays EXACTLY y990 across whole width. Below it preserve the existing wet dark tiled floor continuous left and right, only optional faint soft cold tank reflections in edited strip.
+STYLE: WOLF//OVERRIDE Look 2: clean graphic-painterly 2D side-view sci-fi horror game art. Flat large value planes, crisp readable silhouettes, painterly only inside light pools, NO fine grain, speckle or tiny scratches. NO dark outlines: edges defined by value and thin cyan-white top/back rim light. Cold overhead strip lighting, lighter top surfaces, cold blue-black shadows never brown or grey-beige; cool blue-grey steel; saturated color only practical lights/hazard paint. Match Image 1 overall darkness and low background contrast.
+NO text, letters, numbers, logos, labels, UI, watermarks, guide lines or borders. No magenta. Preserve C2PA content credentials and all output metadata.
+

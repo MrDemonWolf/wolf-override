@@ -1,0 +1,16 @@
+File: beyond-junction.png
+Original generated file: [Codex generated-images store]/01a12d1f-1194-7022-b75e-57a0c210aefd/exec-a0127d20-21e4-4c47-a20e-3c04a74968e1.png
+SHA256: 80562af8ef45621b119e82c0a9901185105d9ef7c744dc5d60c520b8e879ddd8
+Pixel size: 1024x1536
+Copy verification: cmp passed; output is byte-for-byte identical to original, preserving all metadata including C2PA.
+Exact prompt text:
+EDIT MODE — style-transfer using all four attached reference images. Create one NEW fully opaque portrait background painting, exactly 1024x1536 pixels, for the space seen THROUGH an open doorway in WOLF//OVERRIDE, a 2D side-view sci-fi horror game. Image 1 is content and mood reference only: electrical space visible beyond the broken door; do not copy its composition or door. Image 2 is the authoritative painting style, material rendering, level of detail and rim-light reference. Image 3 is lighting and mood only, never its composition or figures. Image 4 supplies colour swatches only.
+
+Paint a genuinely different, deep ELECTRICAL SWITCHGEAR HALL. Rows of large square cool grey-blue switchgear cabinets run along BOTH sides into depth, with a few small unlettered indicator lights. Overhead cable trays and diagonal roof trusses, a few red-painted cable conduits. Its own WARM amber-white worklights pool on the wet steel floor, warm illumination against cool steel, clearly a different space from the cold corridor. Central lower area is open and walkable. No doorway or door frame in the picture; this is solely the interior beyond it.
+
+Camera: side-view game's camera height, looking straight into a deep space, eye level / horizon about 55% down the image. One flat continuous level walkable steel floor extends straight from the very bottom into the distance. Its near edge is at the bottom 4% of the image. No steps, no drop, no raised platform, no railing across the path. Perspective depth but no tilted camera. Large readable shapes; darker, restrained lower contrast than a foreground prop, because this painting is seen through a doorway, while retaining its own visible practical light sources.
+
+STYLE: clean graphic-painterly game art matching Image 2; flat large value planes, crisp readable silhouettes, painterly treatment only inside light pools. No fine grain, speckle or tiny scratches. NO dark outlines: define edges by value and thin cyan-white rim light on top and back edges. Cold overhead strip lighting makes top surfaces lighter. Shadows cold blue-black, NEVER brown or grey-beige. Steel cool blue-grey. Saturated colour only in practical lights and red hazard-painted conduits. Restrained amber-white reflected light on wet steel. No magenta. Fully opaque edge to edge.
+
+ABSOLUTE EXCLUSIONS: no people, robots, creatures, text, letters, numbers, logos, labels, UI, watermarks, guide lines, borders, door frame. Cabinet fronts must have no writing or symbols.
+

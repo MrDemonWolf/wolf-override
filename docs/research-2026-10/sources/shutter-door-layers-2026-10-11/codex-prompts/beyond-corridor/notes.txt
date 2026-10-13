@@ -1,0 +1,14 @@
+File: beyond-corridor.png
+Original generated file: [Codex generated-images store]/01a12d1f-0a58-7a43-a7a3-39d5d9d04f13/exec-36cf4c87-396a-429f-acff-2cad19ee0a75.png
+SHA256: 7661ec0829c362328e6f4a7aa14eea5bfc1fa8687c55ebd1c645c9b745bbbbe7
+Pixel size: 1024x1536
+Copy verification: cmp passed; original bytes and all metadata preserved.
+Exact prompt:
+Use case: style-transfer edit with four attached reference images.
+Create one NEW portrait background painting, exactly 1024x1536 pixels, fully opaque, for the space seen THROUGH an open door in WOLF//OVERRIDE, a 2D side-view sci-fi horror game. Replace the scene/composition with a genuinely different deep MACHINERY SERVICE CHAMBER. No door frame and no border.
+Reference roles: Image 1 approved scene is content and mood ONLY, not composition. Image 2 actual room plate is the authoritative painting style, detail level, cool steel material rendering and rim light; its black empty background is not part of the new painting. Image 3 is lighting, mood and palette ONLY; do not copy composition or figures. Image 4 is colour swatches ONLY.
+CONTENT: tall vertical cylindrical tanks, cross-braced steel trusses, grated side platforms with low yellow rails confined to the sides, recessed cold WHITE worklights in the ceiling, light haze. Cool steel blues and white light. This must read as a deep machinery service chamber, clearly different from a plain corridor.
+CAMERA AND FLOOR: side-view game camera at game height, looking straight into deep space, eye level about 55% down the image. Walkable floor is ONE continuous flat level plane, its near edge at the bottom 4% of the image, receding straight into the distance. No steps, no drop, no railing across the path. Central lower area stays open and walkable. Side platforms and all railings stay out of this central path.
+STYLE: clean graphic-painterly game art, flat large value planes, crisp readable silhouettes, painterly treatment only inside light pools. No fine grain, speckle or tiny scratches. NO dark outlines: define edges by value and thin cyan-white rim light on top and back edges. Cold overhead strip lighting makes top surfaces lighter. Shadows cold blue-black, never brown or grey-beige. Steel cool blue-grey. Saturated colour only from practical lights and yellow hazard paint. Large readable shapes, darker and lower contrast than a foreground prop because the chamber will be viewed through a doorway, while still having its own recessed white light sources.
+ABSOLUTE EXCLUSIONS: no people, robots, text, letters, numbers, logos, labels, UI, watermarks, guide lines, borders, door frame, magenta, stairs, floor drops or rails across the central path. Entire canvas is an opaque painting.
+

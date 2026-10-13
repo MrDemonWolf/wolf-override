@@ -1,0 +1,13 @@
+File: corridor-sealed-v3.png
+Original generated file: [Codex generated-images store]/01a12d27-93e3-7b52-8fc5-a5f83d05ee37/exec-fc7cfaa6-8bfc-4b80-a920-c27a1fec3219.png
+SHA256: 6f9df632b1782e40ad6e870108a0405b24e80a2f9510c1552f728012964ce059
+Pixel size: 1024x1536
+Copy verification: cmp passed; original file copied byte-for-byte with cp, preserving all metadata.
+Exact prompt:
+Use case: precise-object-edit.
+Edit Image 1 (the sealed corridor shutter, 1024x1536). Image 2 is a supporting reference showing the same door open; do not turn the sealed door into an open door.
+Make ONE precise local change: remove the horizontal bolted steel beam crossing the shutter curtain just below the drum housing, including both bolted end plates. This beam spans approximately y=490 to y=650 in the target. Replace only the removed beam and plates with continuation of the existing ribbed horizontal shutter slats, matching their spacing, perspective, cool blue-grey steel, large value planes and lighting. The shutter curtain must be one continuous run of identical horizontal slats from the hazard-striped lip under the drum housing down to the hazard bottom bar.
+Keep EVERY other pixel unchanged: exact 1024x1536 canvas, composition, drum housing, hazard-striped lip, columns, rails, caged lamp housing, all existing slats, hazard bottom bar, lighting, and flat #FF00FF magenta outside. Preserve the original silhouette and all hardware except the specified crossing beam and its two plates. No other redesign or retouching.
+Style: Look 2 art bible for WOLF//OVERRIDE, clean graphic-painterly 2D side-view sci-fi horror game art; flat large value planes; crisp readable silhouettes; painterly only inside light pools; no fine grain, speckle or tiny scratches; no dark outlines, edges defined by value and thin cyan-white rim light on top and back edges; cold overhead strip light, lighter top surfaces; cold blue-black shadows, never brown or grey-beige; cool blue-grey steel; saturated colour only from practical lights and hazard paint.
+No text, letters, numbers, logos, labels, UI, watermarks, guide lines or added borders.
+

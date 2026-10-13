@@ -1,0 +1,13 @@
+main-1280                1280x720  frames 33  flicker RMS 1.959  p99 11.582  (mean L 23.4)
+C-mesh-1280              1280x720  frames 33  flicker RMS 1.797  p99 8.871  (mean L 54.3)
+C-flat-1280              1280x720  frames 33  flicker RMS 1.600  p99 8.014  (mean L 53.9)
+main-534                 533x300  frames 33  flicker RMS 5.061  p99 27.375  (mean L 23.0)
+C-mesh-534               533x300  frames 33  flicker RMS 5.533  p99 27.323  (mean L 53.0)
+C-flat-534               533x300  frames 33  flicker RMS 5.433  p99 27.147  (mean L 53.6)
+REGION=left
+main-1280                1280x720  frames 33  flicker RMS 0.474  p99 1.629  (mean L 10.4)
+C-mesh-1280              1280x720  frames 33  flicker RMS 1.005  p99 3.192  (mean L 49.9)
+C-flat-1280              1280x720  frames 33  flicker RMS 0.799  p99 2.886  (mean L 48.5)
+main-534                 533x300  frames 33  flicker RMS 0.626  p99 2.187  (mean L 10.1)
+C-mesh-534               533x300  frames 33  flicker RMS 1.296  p99 4.152  (mean L 47.4)
+C-flat-534               533x300  frames 33  flicker RMS 1.109  p99 3.791  (mean L 48.1)
