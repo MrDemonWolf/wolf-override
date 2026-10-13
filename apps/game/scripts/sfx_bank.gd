@@ -33,6 +33,8 @@ const LENGTHS: Dictionary = {
 	&"servo": 1.0,
 	&"winch": 1.0,
 	&"whine": 0.6,
+	&"chirp": 0.15,
+	&"actuator": 0.24,
 }
 ## Detailed clip lengths in seconds (DETAIL_RATE), rendered on the worker thread.
 const DETAILED: Dictionary = {
@@ -53,6 +55,10 @@ const RECORDED: Dictionary = {
 }
 ## Where bolt_arc cracks: Main starts it this long before the whine ends so the crack lands on the drop.
 const BOLT_CRACK_SECONDS: float = 0.5
+
+## A clip started on a player (a one-shot, a loop starting, or a blended set restarting); a loop that
+## only has its volume or pitch retuned does not count. Tests use it to check that a press is heard.
+signal clip_started(clip: StringName)
 
 var streams: Dictionary = {}
 ## How long the startup clips took to render on the main thread, in milliseconds.
@@ -92,11 +98,12 @@ func wait_for_detail() -> void:
 
 
 ## Plays [param clip] on a free voice (or that loop's own player) and returns the player, or null
-## when the clip is unknown.
+## when the clip is unknown (a debug build warns, so a misspelt clip is never silently mute).
 func play(clip: StringName, volume_db: float = 0.0, pitch: float = 1.0) -> AudioStreamPlayer:
 	if not streams.has(clip) and DETAILED.has(clip):
 		wait_for_detail()
 	if not streams.has(clip):
+		_warn_unknown(clip)
 		return null
 	var player: AudioStreamPlayer
 	if _loop_players.has(clip):
@@ -112,6 +119,7 @@ func play(clip: StringName, volume_db: float = 0.0, pitch: float = 1.0) -> Audio
 	player.volume_db = volume_db
 	player.pitch_scale = pitch
 	player.play()
+	clip_started.emit(clip)
 	return player
 
 
@@ -131,11 +139,16 @@ func play_blend(clips: Array[StringName], blend: float, volume_db: float) -> voi
 		if restart:
 			player.stream = streams[clips[index]]
 			player.play()
+			clip_started.emit(clips[index])
 
 
+## Stops the loop [param clip]; one-shots end on their own. A debug build warns on a name that is no
+## loop, which would stop nothing.
 func stop(clip: StringName) -> void:
 	if _loop_players.has(clip):
 		(_loop_players[clip] as AudioStreamPlayer).stop()
+	elif not LOOPS.has(clip):
+		_warn_unknown(clip)
 
 
 func stop_each(clips: Array[StringName]) -> void:
@@ -148,6 +161,13 @@ func stop_all() -> void:
 		player.stop()
 	for player: AudioStreamPlayer in _loop_players.values():
 		player.stop()
+
+
+## A clip name the bank does not know (or, for stop, a name that is no loop): warned in debug builds
+## only, so a release build never prints for it.
+func _warn_unknown(clip: StringName) -> void:
+	if OS.is_debug_build():
+		push_warning("SfxBank: no clip or loop named &\"%s\"; nothing plays or stops" % clip)
 
 
 func players() -> Array[AudioStreamPlayer]:
@@ -188,6 +208,9 @@ func _render_startup() -> void:
 	streams[&"servo"] = _wav(_servo(LENGTHS[&"servo"]), true)
 	streams[&"winch"] = _wav(_winch(LENGTHS[&"winch"]), true)
 	streams[&"whine"] = _wav(_whine(rng, LENGTHS[&"whine"]), false)
+	# Pure tones, no noise: they take nothing from rng, so every clip above keeps its bytes.
+	streams[&"chirp"] = _wav(_chirp(LENGTHS[&"chirp"]), false)
+	streams[&"actuator"] = _wav(_actuator(LENGTHS[&"actuator"]), false)
 	for clip: StringName in RECORDED:
 		streams[clip] = RECORDED[clip]
 
@@ -344,6 +367,48 @@ static func _whine(rng: RandomNumberGenerator, seconds: float) -> PackedFloat32A
 		var tone: float = sin(phase) * 0.7 + (1.0 if sin(phase * 0.5) > 0.0 else -1.0) * 0.15
 		var envelope: float = minf(t / 0.02, 1.0) * lerpf(0.3, 1.0, progress) * minf((seconds - t) / 0.01, 1.0)
 		out[i] = (tone + rng.randf_range(-0.08, 0.08)) * envelope
+	return out
+
+
+## Two short soft blips a fifth apart (1.32 kHz for 50 ms, then 1.98 kHz for 70 ms), each a sine
+## with a quiet third harmonic so small speakers keep it: a station accepting a save or a copy.
+static func _chirp(seconds: float) -> PackedFloat32Array:
+	var frames: int = int(seconds * MIX_RATE)
+	var out: PackedFloat32Array = PackedFloat32Array()
+	out.resize(frames)
+	var dt: float = 1.0 / MIX_RATE
+	# [start, length, frequency] per blip.
+	var blips: Array = [[0.0, 0.05, 1320.0], [0.07, 0.07, 1980.0]]
+	for i: int in frames:
+		var t: float = i * dt
+		var sample: float = 0.0
+		for blip: Array in blips:
+			var local: float = t - float(blip[0])
+			if local >= 0.0 and local < float(blip[1]):
+				# A 4 ms attack and a 12 ms release so neither blip clicks.
+				var envelope: float = minf(local / 0.004, 1.0) * minf((float(blip[1]) - local) / 0.012, 1.0)
+				var phase: float = TAU * float(blip[2]) * local
+				sample += (sin(phase) + 0.18 * sin(3.0 * phase)) * envelope
+		out[i] = sample
+	return out
+
+
+## A quarter-second joint motor: a saw gliding 150 Hz up to 230 Hz and back, with a 38 Hz gear ripple,
+## low-passed at 1.6 kHz and swelling in and out: WOLF's body moving as he answers.
+static func _actuator(seconds: float) -> PackedFloat32Array:
+	var frames: int = int(seconds * MIX_RATE)
+	var out: PackedFloat32Array = PackedFloat32Array()
+	out.resize(frames)
+	var dt: float = 1.0 / MIX_RATE
+	var alpha: float = dt / (1.0 / (TAU * 1600.0) + dt)
+	var low: float = 0.0
+	var phase: float = 0.0
+	for i: int in frames:
+		var t: float = i * dt
+		phase += (150.0 + 80.0 * sin(PI * t / seconds)) * dt
+		var saw: float = fmod(phase, 1.0) * 2.0 - 1.0
+		low += alpha * (saw * (0.75 + 0.25 * sin(TAU * 38.0 * t)) - low)
+		out[i] = low * minf(t / 0.015, 1.0) * clampf((seconds - t) / 0.06, 0.0, 1.0)
 	return out
 
 

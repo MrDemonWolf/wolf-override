@@ -1054,8 +1054,10 @@ func _tick_corridor(delta: float, held_ticks: int) -> void:
 			status_line = BYPASS_RELEASED_LINE % state.human_name().get_slice(" ", 0)
 	bypass_was_holding = hold_use.holding and hold_use.station == &"bypass"
 	if bypass_venting:
-		# The hiss builds with the crank; the alarm repeats until the bypass locks over.
-		sfx_bank.play(&"hiss", lerpf(-24.0, -8.0, float(bypass_ticks) / BYPASS_TICKS), 1.15)
+		# The hiss builds with the crank (the pressure-line loops, low to high as the turns add up);
+		# the alarm repeats until the bypass locks over.
+		var cranked: float = float(bypass_ticks) / BYPASS_TICKS
+		sfx_bank.play_blend(SfxBank.HISS_GAUGE, cranked, lerpf(-24.0, -8.0, cranked))
 		bypass_alarm_remaining -= delta
 		if bypass_alarm_remaining <= 0.0:
 			bypass_alarm_remaining = BYPASS_ALARM_SECONDS
@@ -1848,11 +1850,13 @@ func _start_bypass_vent() -> void:
 
 
 func _stop_bypass_vent() -> void:
+	# Only a bypass that was venting owns the hiss loops; the junction's pressure line uses them too.
+	if bypass_venting:
+		sfx_bank.stop_each(SfxBank.HISS_GAUGE)
 	bypass_venting = false
 	bypass_alarm_remaining = 0.0
 	if bypass_handle != null:
 		bypass_handle.venting = false
-	sfx_bank.stop(&"hiss")
 
 
 ## One held-USE tick at the bypass: the wheel turns an eighth with a click and a readout cell lights.
@@ -1894,6 +1898,8 @@ func _interact_checkpoint() -> void:
 		return
 	if state.checkpoint_reached:
 		if state.enter_records():
+			# The safe point accepts: the same chirp as a save, a little lower.
+			sfx_bank.play(&"chirp", -9.0, 0.9)
 			_sync_scene()
 			# A new room: cut the camera to the engineer instead of panning across from the safe point.
 			_start_gameplay_camera()
@@ -1910,7 +1916,11 @@ func _interact_checkpoint() -> void:
 		status_line = "The safe point could not save. Press E here again."
 		return
 	save_error = ""
+	# The safe point takes the save with a chirp; the first time, the corridor's lights switch over
+	# with a contactor's clunk.
+	sfx_bank.play(&"chirp", -8.0)
 	if first_visit:
+		sfx_bank.play(&"clank", -9.0, 0.7)
 		_sync_room_lights(true)
 		status_line = "Safe point saved. " + state.checkpoint_callback()
 	else:
@@ -1920,6 +1930,7 @@ func _interact_checkpoint() -> void:
 func _interact_records(x: float) -> void:
 	if absf(x - 190.0) <= 58.0:
 		if state.preserve_purge_trace():
+			sfx_bank.play(&"chirp", -8.0)
 			status_line = "The Director's purge order has a time and target ID. %s keeps a local copy; the original logs are still missing." % state.human_name().get_slice(" ", 0)
 		else:
 			status_line = "The purge-order trace is already copied. The mirror port may confirm when the source existed."
@@ -1980,6 +1991,9 @@ func _finish_chapter_close() -> void:
 		return
 	if chapter_tween != null and chapter_tween.is_running():
 		chapter_tween.kill()
+	# CONTINUE on a closing shot sounds the same in both rooms, whether it hands control back (Records)
+	# or starts the walk out through the hatch (the junction).
+	sfx_bank.play(&"chirp", -10.0, 0.75)
 	if state.chapter_id == "junction" and state.junction_cleared:
 		# The end of the built route: out through the hatch, the END OF SLICE card, then the title
 		# (decision D).
@@ -2163,6 +2177,8 @@ func _choose_mirror(route_id: String) -> void:
 		return
 	if not state.preserve_mirror_trace(route_id):
 		return
+	# The copy lands with the stations' chirp; off WOLF's own readout it is pitched down.
+	sfx_bank.play(&"chirp", -8.0, 0.8 if route_id == "wolf" else 1.0)
 	waiting_for_choice = false
 	choice_context = ""
 	_update_controls()
@@ -2392,6 +2408,8 @@ func _leave_junction() -> void:
 		return
 	# Autosave D: the service line is clear.
 	_save_progress()
+	# The room's lights switch over with a contactor's clunk, as at the safe point.
+	sfx_bank.play(&"clank", -6.0, 0.65)
 	_sync_room_lights(true)
 	chapter_close_active = true
 	intro_camera.position_smoothing_enabled = false
@@ -2634,6 +2652,8 @@ func _choose_lane(response: int) -> void:
 		sfx_bank.play(&"growl_refusal", -3.5)
 	else:
 		lane_choice = "alone"
+		# He settles to hold at the rubble: a quieter whir than an answer he leans into.
+		sfx_bank.play(&"actuator", -12.0, 0.85)
 		status_line = "WOLF: I'll hold at the rubble. It crosses the floor mark on every pass; the tank takes a moment to fall."
 	_update_controls()
 
@@ -2937,6 +2957,7 @@ func _sync_scene() -> void:
 	bypass_was_holding = false
 	bypass_handle.ticks = 0
 	bypass_handle.done = state.route == "fallback"
+	bypass_handle.clear_fault(state.door_open, false)
 	# The lane's choices and WOLF's part in it belong to the attempt, not the save.
 	lane_choice = ""
 	wolf_baiting = false
@@ -3012,6 +3033,8 @@ func _react_as_wolf(accepting: bool) -> void:
 	wolf.body_sprite.rotation_degrees = 0.0
 	var lean: Vector2 = Vector2(11.0, -24.0) if accepting else Vector2(-13.0, -13.0)
 	var tilt: float = 8.0 if accepting else -9.0
+	# His joints whir as he leans in or pulls back, so every answer he gives with his body is heard.
+	sfx_bank.play(&"actuator", -9.0, 1.08 if accepting else 0.9)
 	wolf_reaction_tween = create_tween()
 	wolf_reaction_tween.tween_property(wolf.body_sprite, "position", lean, 0.18).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
 	wolf_reaction_tween.parallel().tween_property(wolf.body_sprite, "rotation_degrees", tilt, 0.18)
@@ -3285,6 +3308,8 @@ func _refresh_ui() -> void:
 	relay_art.modulate = Color.WHITE if state.breaker_armed else Color("#879ba5")
 	relay_status_light.color = Color("#a4f0c4") if state.door_open else (Color("#f3ae4b") if state.breaker_armed and _relay_refused() else (Color("#8be3ff") if state.breaker_armed else Color("#536e7c")))
 	bypass_handle.live = state.breaker_armed and not state.door_open
+	# Once the seal's power has gone through, by WOLF or by the bypass, the relay is no longer faulted.
+	bypass_handle.clear_fault(state.door_open, true)
 	breaker_status_glow.modulate = Color(breaker_status_light.color, 0.75 if state.breaker_armed else 0.45)
 	relay_status_glow.modulate = Color(relay_status_light.color, 0.75 if state.breaker_armed else 0.3)
 	checkpoint_art.modulate = Color("#d5ffe3") if state.checkpoint_reached else Color.WHITE

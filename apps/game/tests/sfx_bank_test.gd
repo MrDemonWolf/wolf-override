@@ -73,8 +73,9 @@ func _run() -> void:
 	_expect(loop != null and loop == loop_again and loop.playing and loop.volume_db == -4.0, "a loop keeps its own player and a second play only retunes it")
 	bank.stop(&"hum")
 	_expect(not loop.playing, "stop() ends a loop by name")
-	_expect(bank.play(&"nothing") == null, "unknown clips are ignored")
+	_expect(bank.play(&"nothing") == null, "unknown clips are ignored (a debug build warns)")
 	_check_blend(bank)
+	_check_clip_names(bank)
 	# The visual-effects switch leaves sound alone: what is playing keeps playing and new clips start.
 	var hiss: AudioStreamPlayer = bank.play(&"coolant_cloud", -10.0)
 	var boom: AudioStreamPlayer = bank.play(&"boom")
@@ -159,6 +160,51 @@ func _check_blend(bank: SfxBank) -> void:
 	_expect(players[0].playing and players[1].playing and players[2].playing, "if one loop stopped, the set restarts together")
 	bank.stop_each(SfxBank.HISS_GAUGE)
 	_expect(not players[0].playing and not players[1].playing and not players[2].playing, "stop_each() ends the whole set")
+
+
+## SOUND-1 (P0-1): every clip a game script hands the bank by name exists, so no call is silently
+## mute. Scans each script under res://scripts for calls on the sound bank (sfx_bank.play, .stop,
+## .stop.bind, .play_blend, .stop_each) with a literal &"clip" or "clip", or an SfxBank list constant.
+func _check_clip_names(bank: SfxBank) -> void:
+	var pattern: RegEx = RegEx.create_from_string("\\b(\\w*(?:sfx|bank)\\w*)\\.(play_blend|stop_each|play|stop)(?:\\.bind)?\\(\\s*(?:&?\"([^\"]+)\"|SfxBank\\.([A-Z_]+))")
+	var constants: Dictionary = (load("res://scripts/sfx_bank.gd") as Script).get_script_constant_map()
+	var found: int = 0
+	var unknown: Array[String] = []
+	for path: String in _scripts("res://scripts"):
+		var source: String = FileAccess.get_file_as_string(path)
+		for hit: RegExMatch in pattern.search_all(source):
+			found += 1
+			var verb: String = hit.get_string(2)
+			var where: String = "%s: %s" % [path.get_file(), hit.get_string(0)]
+			var clips: Array = []
+			if hit.get_string(3) != "":
+				clips = [StringName(hit.get_string(3))]
+			elif constants.get(hit.get_string(4)) is Array:
+				clips = constants[hit.get_string(4)]
+			else:
+				unknown.append(where + " (no such SfxBank list)")
+				continue
+			for clip: Variant in clips:
+				var known: bool = bank.streams.has(clip)
+				# stop, stop_each and play_blend work only on loops, which have their own players.
+				if verb != "play":
+					known = known and SfxBank.LOOPS.has(clip)
+				if not known:
+					unknown.append("%s (%s)" % [where, clip])
+	# The scan has to find the bank's real calls (the game makes several dozen), or it proves nothing.
+	_expect(found >= 40, "the clip-name scan finds the game's sound calls (%d)" % found)
+	_expect(unknown.is_empty(), "every clip name the scripts pass to the sound bank exists, and every stopped or blended one is a loop (unknown: %s)" % ", ".join(unknown))
+
+
+## Every .gd file under [param dir], recursively.
+func _scripts(dir: String) -> Array[String]:
+	var out: Array[String] = []
+	for file: String in DirAccess.get_files_at(dir):
+		if file.ends_with(".gd"):
+			out.append(dir.path_join(file))
+	for sub: String in DirAccess.get_directories_at(dir):
+		out.append_array(_scripts(dir.path_join(sub)))
+	return out
 
 
 func _expect(condition: bool, label: String) -> bool:
