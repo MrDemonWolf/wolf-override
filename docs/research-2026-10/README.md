@@ -1,6 +1,6 @@
-# Research and approved specs, October 2026 (private)
+# Research and approved specs, October 2026
 
-Private working material from the October 8-10, 2026 sessions. This folder is inside the Git-ignored `docs/` directory and must never be committed or copied into public docs, PR text or build output. The latest explicit decision by Nathanial Henniges wins over anything written here.
+Working material from the October 6-12, 2026 sessions: research, design notes and specs, reviews, audits, decision records and approved texts. `docs/` has been tracked in the public repository since PR #48 (October 11, 2026), by Nathanial Henniges's decision. Spoilers stay in `docs/`: nothing in this folder moves into the website, in-game text or build output. The latest explicit decision by Nathanial Henniges wins over anything written here.
 
 ## Read first
 
@@ -8,7 +8,7 @@ Private working material from the October 8-10, 2026 sessions. This folder is in
 |---|---|
 | `design-reference-25-games.md` | Fact-checked study of 25 shipped games (586 sources, 220 corrections): companion design, levels and camera, death and saves, inventory and evidence, action and impact, presentation and UI, audio, mobile. The 20 changes it supports and the open questions. |
 | `codex-design-review.md` | Codex's second-opinion review of the plans: contradictions found, 10 refinements, risks, cuts, questions. |
-| `art-bible.md` | The high-quality art plan: per-family size and density rules, palette sampled from title art B, matting rules, the automatic QA checks (`qa_asset.py` lived in the session scratchpad), the style-test brief, and the batch order. |
+| `art-bible.md` | The high-quality art plan: per-family size and density rules, palette sampled from title art B, matting rules, the automatic QA checks (`qa_asset.py`, now in `notes/art-audit/bible/`), the style-test brief, and the batch order. |
 | `approved/item-text-2026-10-09.json` | The eight evidence-case items, approved as drafted (key `final`). |
 | `approved/death-text-2026-10-10.json` | Death cards, safe-point prompts, case statuses and WOLF's reaction lines, approved as drafted (key `final`). |
 
@@ -23,6 +23,23 @@ Private working material from the October 8-10, 2026 sessions. This folder is in
 | `game-research.json` | Every dossier, fact-check, synthesis and the gap research behind the design reference. |
 | `sound-audition.json`, `sound-redo.json` | Measurements of every generated sound; the redone hiss, arc and growl candidates with licences. |
 | `action-design.json`, `blowback-spec.md`, `game-finish.json`, `art-bible.json` | Earlier design and review outputs. |
+
+## Notes and source records (`notes/`, `sources/`)
+
+| Folder | What it is |
+|---|---|
+| `notes/` | Audits, reviews, the review pages Nathanial picked from, measurements, pull request and Notion update texts, moved from the session scratch on October 12-13. Index: `notes/README.md`. |
+| `notes/SOURCES.md` | Every outside page, talk, paper and video the research downloaded, cited by title and URL (the files themselves were never kept), and where the other source lists live. |
+| `sources/title-art-b/`, `sources/title-art-a-rejected/` | Title art B (chosen) and A (not chosen, the generated original with its C2PA record). |
+| `sources/sprites-2026-10-08/`, `sources/props-2026-10-08/`, `sources/junction-art/`, `sources/sentry-v2/` | The October 8-9 art batches and approval sheets. |
+| `sources/style-test-look1-rejected/`, `sources/style-test-look2/` | The style test: Look 1 (not chosen) and Look 2 (picked), with their QA results. |
+| `sources/look2-hq/` | The Look 2 asset batch: finals, review sheets, prompts, selection and generation logs. |
+| `sources/walk-first-pass-2026-10-10/`, `sources/walk-rig-rejected-2026-10-10/`, `sources/walk-2026-10-11/`, `sources/walk-final-2026-10-11/` | Walking: the rejected first pass and jointed rigs, the approved painted cycles and the final fixed cycles and death poses. |
+| `sources/doors-A/`, `sources/doors-rejected-rounds/`, `sources/doors-edge-v2-rejected/`, `sources/doors-shutter-approved/`, `sources/shutter-door-layers-2026-10-11/` | Doors: design A, the rejected rounds, the approved round-4 shutter and its layer work (on hold under REAL-LOOK). |
+| `sources/opening-hatch-r3-removed/` | The opening hatch that was tried and removed, with its generation log. |
+| `sources/death-screen-2026-10-11/` | The death screen: looks, storyboards, mocks, art notes and the three selected generated originals. |
+| `sources/cage-design-2026-10-11/`, `sources/pin-codes-2026-10-11/` | WOLF's containment and the PIN codes: research, audits, three options each, the judging and the code-drawn designs. |
+| `sources/sound-picks/` | The picked sounds with licences, their source pages and authors, the code that built them and the measurements. |
 
 ## Decisions recorded (October 8-10, 2026)
 
@@ -43,4 +60,14 @@ Private working material from the October 8-10, 2026 sessions. This folder is in
 - **Near-future military base (October 11, night):** hardened, utilitarian, run by automated systems, grounded in real installations; an AI-defence film franchise is a mood reference only, never its names, logos or designs. Short equipment and hazard stencils are allowed, typeset (never painted by the image tool) and readable on a phone.
 - **PIN codes (October 11, night):** design A plus B's door lamps (`sources/pin-codes-2026-10-11/`): an optional access screen in Records logs the one unchanged hatch override as a case fact; one keypad at the junction exit offers it in one press; a hand-cranked manual release with its own door alarm is the engineer-only route; WOLF only notices. Every door's lamp shows the lockdown by shape. Lines and the real digits wait for Nathanial; the keypad waits for the evidence case.
 - **WOLF's containment (October 11, night):** design C, a standby dock in a guarded bay (`sources/cage-design-2026-10-11/`): a floor-anchored robot stand with a charging umbilical, a dock lamp that goes amber, blue, off, telescoping mesh panels, and a guard lock on a lock pilaster that WOLF visibly tears off by pushing it. The opened, empty bay stays in the room after the opening. Until it is built, today's cage stays exactly as it is.
+- **Options not chosen, kept for the record:** title art A (`sources/title-art-a-rejected/`), Look 1 (`sources/style-test-look1-rejected/`), the first walking pass and the jointed rigs (`sources/walk-first-pass-2026-10-10/`, `sources/walk-rig-rejected-2026-10-10/`).
 - **Commits (October 11):** no Co-Authored-By line in any commit; these notes are tracked in the public repository by Nathanial's choice.
+- **Research notes kept (October 12):** Nathanial asked to keep all the research and notes in this repository with credits; the session scratch records are in `notes/` and `sources/`, and outside sources are cited, never copied.
+
+## Credits
+
+- **WOLF//OVERRIDE, its story, characters and every decision here:** Nathanial Henniges.
+- **Research, design notes, reviews, audits, measurements and drafts:** Claude (Claude Code) and Codex agents working for Nathanial.
+- **Generated art:** Codex's built-in image tool; C2PA records stay in the generated originals (see each `sources/` README).
+- **Sounds:** credits and licences in `sources/sound-picks/LICENCES.md`.
+- **Outside sources:** `notes/SOURCES.md` and the area READMEs.

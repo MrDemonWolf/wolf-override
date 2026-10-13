@@ -7,7 +7,7 @@ Every number here is labelled:
 - **[proposed]**: a target. It must be re-checked against the approved style test.
 - **[sourced]**: taken from a cited document (see section 10).
 
-Working files are in `scratchpad/art-audit/bible/`:
+Working files were in the session scratch (`scratchpad/art-audit/bible/`) and are kept in `notes/art-audit/bible/` (the palette card as `palette-card.webp`):
 - `qa_asset.py` (the automated QA)
 - `palette.py`, `regions.py` (palette samplers)
 - `palette_card.py`, `palette-card.png` (colour reference)
