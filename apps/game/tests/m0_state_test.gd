@@ -28,6 +28,14 @@ func _initialize() -> void:
 		_expect(decoded.door_open and decoded.route == "fallback" and decoded.breaker_armed, "puzzle restores")
 		_expect(decoded.memory == state.memory, "actual choice restores without duplicate memory")
 		_expect(decoded.checkpoint_callback().find(State.CHOICE_TEXT[State.PRESS]) >= 0, "checkpoint callback quotes actual choice")
+	# Q14 (approved 2026-10-13): option 2 says plainly that the engineer skips the risk; option 1 is unchanged.
+	_expect(State.CHOICE_TEXT[State.PRESS] == "Skip the risk talk. Go now." and State.CHOICE_TEXT[State.DISCLOSE] == "The relay may vent coolant. Your call.", "the relay answers read as approved on 2026-10-13")
+	_expect(state.checkpoint_callback() == "WOLF: You said \"Skip the risk talk. Go now.\"\nI refused. You found another way. Next time, tell me what it costs.", "WOLF's callback quotes the new option 2 words")
+	# A save made before the rewording keeps the words its player saw.
+	var old_words: Dictionary = state.to_dict()
+	old_words["memory"]["selected_text"] = "Go now. We can talk after."
+	var old_save: M0State = State.from_dict(old_words)
+	_expect(old_save != null and old_save.checkpoint_callback().begins_with("WOLF: You said \"Go now. We can talk after.\"\n"), "an older save's callback still quotes the old option 2 words")
 
 	var path: String = "user://m0-state-test-%s.json" % OS.get_process_id()
 	var fresh: M0State = State.new()
