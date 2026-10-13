@@ -10,8 +10,10 @@ const CHANGELOG_PATH: String = "res://assets/changelog.txt"
 const CHANGELOG_UNAVAILABLE: String = "The changelog text is missing from this build. Open the full changelog online."
 ## How fast a held up/down input scrolls the changelog, in pixels per second.
 const CHANGELOG_SCROLL_SPEED: float = 260.0
-## Where WOLF stands to hold the live relay contact.
-const RELAY_CONTACT_X: float = 592.0
+## Where WOLF stands to hold the live relay contact: on the relay's left, facing it, his painted snout
+## (M0Actor.WOLF_SNOUT) a pixel short of the relay's painted left edge (x 569), so he is never drawn
+## inside the machine; the engineer has its right, towards the MANUAL BYPASS.
+const RELAY_CONTACT_X: float = 509.0
 ## The coolant relay's centre and how far either side of it the engineer can use it.
 const RELAY_X: float = 605.0
 const RELAY_REACH: float = 52.0
@@ -24,8 +26,10 @@ const BYPASS_REACH: float = 30.0
 const BYPASS_CRANK_X: float = BYPASS_WHEEL.x - 26.0
 ## While the engineer is at the relay or works the bypass, WOLF stands off the relay (refused, not
 ## asked yet, or not asked at all), back towards the breaker, clear of both machines, until the seal
-## has opened or he is signalled to take it (_wolf_off_relay).
-const WOLF_BYPASS_CLEAR_X: float = 490.0
+## has opened or he is signalled to take it (_wolf_off_relay). His tail clears the breaker (painted to
+## x 388) even as he pulls back refusing (_react_as_wolf), and his snout stops well short of the relay,
+## so taking the contact is a step he is seen to make.
+const WOLF_BYPASS_CLEAR_X: float = 462.0
 ## Held-USE ticks the bypass takes (BypassHandle.TICK_SECONDS each, 2 s in all).
 const BYPASS_TICKS: int = BypassHandle.TICKS_NEEDED
 ## While the bypass vents coolant its alarm sounds this often.
@@ -234,9 +238,10 @@ const STATION_OVERLAP: float = 6.0
 const RELAY_SIDE_X: float = RELAY_X + RELAY_REACH - 2.0
 ## The junction valve is cranked from just left of its wheel, like the MANUAL BYPASS.
 const VALVE_CRANK_X: float = JunctionRoom.VALVE_X - 29.0
-## Where WOLF reads the mirror on his own: on the port's right, facing it, his snout at its edge, so
-## he is never drawn inside it and the engineer has its left side.
-const WOLF_MIRROR_X: float = 616.0
+## Where WOLF reads the mirror on his own: on the port's right, facing it, his painted snout
+## (M0Actor.WOLF_SNOUT) just short of its painted right edge (x 564), so he is never drawn inside it
+## and the engineer has its left side.
+const WOLF_MIRROR_X: float = 625.0
 const MENU_NAVIGATION_ACTIONS: Array[StringName] = [&"ui_accept", &"ui_up", &"ui_down", &"ui_left", &"ui_right", &"ui_focus_next", &"ui_focus_prev"]
 ## Every gameplay action; pause and a knockdown release them all so nothing stays held.
 const GAMEPLAY_ACTIONS: Array[StringName] = [&"move_left", &"move_right", &"interact", &"choice_1", &"choice_2"]
@@ -3636,12 +3641,12 @@ func _flash_relay_spark(from_wolf: bool) -> void:
 	if relay_spark_tween != null and relay_spark_tween.is_running():
 		relay_spark_tween.kill()
 	if from_wolf:
-		# Across WOLF's contact on the relay's face.
+		# From WOLF's snout at the relay's left edge across its face.
 		relay_spark.points = PackedVector2Array([
-			Vector2(583.0, 393.0), Vector2(592.0, 381.0), Vector2(600.0, 398.0),
-			Vector2(610.0, 380.0), Vector2(620.0, 393.0),
+			Vector2(569.0, 393.0), Vector2(578.0, 381.0), Vector2(586.0, 398.0),
+			Vector2(596.0, 380.0), Vector2(606.0, 393.0),
 		])
-		relay_sparks.position = Vector2(601.0, 390.0)
+		relay_sparks.position = Vector2(587.0, 390.0)
 	else:
 		# The bypass locking over: across the top of its wheel, in front of the engineer cranking it.
 		var hub: Vector2 = BYPASS_WHEEL + BypassHandle.WHEEL_OFFSET
@@ -3782,8 +3787,19 @@ func _wolf_target_x() -> float:
 					return JunctionRoom.WOLF_BAIT_X
 				if wolf_baiting and (not _sentry_hunting() or wolf.position.x > sentry_brain.x):
 					return JunctionRoom.WOLF_BAIT_X
-				return JunctionRoom.WOLF_RUBBLE_X
+				return _wolf_rubble_x()
 	return -1.0
+
+
+## Where WOLF holds back from the rubble: his spot by the valve (JunctionRoom.WOLF_RUBBLE_X), the only
+## floor on the near side as long as he is. The engineer backing off from the fuse often stops right
+## there, so while they stand where his body would be he keeps to his spot by the entrance
+## (JunctionRoom.WOLF_CLEAR_X), and walks up once they move on towards the rubble.
+func _wolf_rubble_x() -> float:
+	var engineer_in_spot: bool = absf(human.position.x - JunctionRoom.WOLF_RUBBLE_X) < M0Actor.CLEAR_GAP
+	if engineer_in_spot and wolf.position.x < JunctionRoom.WOLF_RUBBLE_X - 2.0:
+		return JunctionRoom.WOLF_CLEAR_X
+	return JunctionRoom.WOLF_RUBBLE_X
 
 
 ## WOLF keeps off the live relay, back towards the breaker: once he has refused it, or while the
@@ -4484,7 +4500,7 @@ func debug_wolf_why() -> String:
 			if wolf_scouting:
 				return "scout: the door seam"
 			if wolf.autonomous_target_x == JunctionRoom.WOLF_CLEAR_X:
-				return "hold: clear of the vent and blast"
+				return "hold: by the entrance until his spot by the valve is clear" if state.door_blown else "hold: clear of the vent and blast"
 			if wolf.autonomous_target_x == JunctionRoom.WOLF_BAIT_X:
 				return "bait: drawing the sentry"
 			if wolf.autonomous_target_x == JunctionRoom.WOLF_RUBBLE_X:

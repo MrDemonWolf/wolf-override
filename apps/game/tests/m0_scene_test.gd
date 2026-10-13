@@ -234,16 +234,16 @@ func _run() -> void:
 		return
 	if not _require(state.door_open and state.route == "cooperate", "WOLF cooperation opens door"):
 		return
-	_expect(human.controlled and human.position.x - M0Actor.HUMAN_REACH >= 592.0 + M0Actor.WOLF_REACH, "the engineer is clear of WOLF on the contact before he takes it")
+	_expect(human.controlled and human.position.x - M0Actor.HUMAN_REACH >= Main.RELAY_CONTACT_X + M0Actor.WOLF_REACH, "the engineer is clear of WOLF on the contact before he takes it")
 	_expect(str(game.get("status_line")) == "WOLF takes the surge through the live contact. The red seal opens.", "the payoff line says what the screen shows")
 	_expect(relay_status_light.color == Color("#a4f0c4"), "open relay changes from live cyan to completed green")
 	_expect(relay_spark.visible and relay_spark.default_color == Color("#8be3ff"), "WOLF's contact produces a visible cyan relay spark")
 	_expect(game.call("_objective") == "REACH SAFE POINT", "open seal points to safety")
-	_expect(str(game.call("_context_hint")) == "The seal is opening." and wolf.autonomous_target_x == 592.0, "while the seal rises the hint says it is opening and WOLF stays on the contact")
+	_expect(str(game.call("_context_hint")) == "The seal is opening." and wolf.autonomous_target_x == Main.RELAY_CONTACT_X, "while the seal rises the hint says it is opening and WOLF stays on the contact")
 	var door_shape: CollisionShape2D = game.get_node("Door/CollisionShape2D") as CollisionShape2D
 	var seal_leaf: SealLeaf = game.get("seal_leaf") as SealLeaf
 	await create_timer(0.45).timeout
-	_expect(seal_leaf.visible and seal_leaf.open > 0.05 and seal_leaf.open < 0.95 and not door_shape.disabled and wolf.autonomous_target_x == 592.0 and absf(wolf.position.x - 592.0) <= 4.0, "half way the seal's leaf is rising into the header, the doorway is still shut and WOLF still holds the contact")
+	_expect(seal_leaf.visible and seal_leaf.open > 0.05 and seal_leaf.open < 0.95 and not door_shape.disabled and wolf.autonomous_target_x == Main.RELAY_CONTACT_X and absf(wolf.position.x - Main.RELAY_CONTACT_X) <= 4.0, "half way the seal's leaf is rising into the header, the doorway is still shut and WOLF still holds the contact")
 	if not _require(await _wait_until(func() -> bool: return not game.get("seal_opening"), 90), "the seal finishes opening"):
 		return
 	await physics_frame

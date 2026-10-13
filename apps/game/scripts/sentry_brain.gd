@@ -57,14 +57,14 @@ const LOCK_SECONDS: float = 0.5
 ## Seconds an engineer must stay back over the rubble before a chase gives up.
 const LOSE_SECONDS: float = 2.5
 ## A fixated sentry parks this far short of the one drawing it, on the side toward the rubble. WOLF
-## draws it from the far end of its lane, by the exit hatch (JunctionRoom.WOLF_BAIT_X, 902), so the
+## draws it from the far end of its lane, by the exit hatch (JunctionRoom.WOLF_BAIT_X, 904), so the
 ## parked sentry faces him with its back to the TANK RELEASE: the engineer at the release is behind it,
 ## never between the two. His drawn body (M0Actor.WOLF_REACH, 67) stays far outside the floor brackets
 ## and the tank's footprint, and inside the room's right edge (the view ends at x 960). Until he is
 ## past it, it keeps at least this far ahead of him as he comes down the lane and never closes on him,
 ## backing off as far as the end of its patrol (PATROL_MAX_X): he catches up with it there and bounds
 ## over it right of the hanging tank (JunctionRoom.wolf_leap_height), never under it.
-const BAIT_OFFSET: float = 202.0
+const BAIT_OFFSET: float = 204.0
 const EPSILON: float = 0.00001
 
 var state: StringName = &"dormant"

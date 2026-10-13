@@ -37,6 +37,11 @@ const SETTLE_SPEED: float = 140.0
 ## follow_spacing_test measures the art against these.
 const WOLF_REACH: float = 67.0
 const HUMAN_REACH: float = 17.0
+## How far WOLF's painted body (pixels more than half opaque) reaches ahead of his origin to his snout
+## and behind it to his tail tip. His authored spots stand him on clear floor by these, and
+## wolf_space_test measures the art against them.
+const WOLF_SNOUT: float = 59.1
+const WOLF_TAIL: float = 56.0
 ## A follower stands this far from the engineer: both reaches plus a little air.
 const FOLLOW_GAP: float = 88.0
 ## The least spacing at which the two drawn bodies still do not touch. A side with less room than
