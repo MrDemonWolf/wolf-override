@@ -34,6 +34,10 @@ var capture_action: StringName = &""
 var capture_kind: String = ""
 var display_nodes: Array[CanvasItem] = []
 var pages: Array[Control] = []
+## prompt() labels by action, for keys and for a controller; the HUD asks for them every frame, so
+## they are worked out once and forgotten whenever this menu changes a binding.
+var _key_prompts: Dictionary = {}
+var _pad_prompts: Dictionary = {}
 @onready var note: Label = $SettingsNote
 
 
@@ -434,6 +438,7 @@ func _binding_conflict(target: StringName, event: InputEvent) -> StringName:
 
 
 func _replace_binding(action: StringName, kind: String, event: InputEvent) -> void:
+	_forget_prompts()
 	for old: InputEvent in InputMap.action_get_events(action):
 		if _event_kind(old) == kind:
 			InputMap.action_erase_event(action, old)
@@ -490,7 +495,18 @@ func binding_label(action: StringName, kind: String) -> String:
 	return " / ".join(labels)
 
 
+## The label of the first key (or controller input) bound to [param action], remembered until a
+## binding changes.
 func prompt(action: StringName, controller: bool) -> String:
+	var known: Dictionary = _pad_prompts if controller else _key_prompts
+	if known.has(action):
+		return known[action]
+	var label: String = _prompt_label(action, controller)
+	known[action] = label
+	return label
+
+
+func _prompt_label(action: StringName, controller: bool) -> String:
 	for event: InputEvent in InputMap.action_get_events(action):
 		if not controller and event is InputEventKey:
 			return OS.get_keycode_string(event.physical_keycode if event.physical_keycode != KEY_NONE else event.keycode)
@@ -513,7 +529,13 @@ func _button_label(index: int) -> String:
 	return "BUTTON %d" % index
 
 
+func _forget_prompts() -> void:
+	_key_prompts.clear()
+	_pad_prompts.clear()
+
+
 func _refresh_bindings() -> void:
+	_forget_prompts()
 	for action: StringName in ACTIONS:
 		for kind: String in ["keyboard", "controller"]:
 			var button: Button = binding_buttons["%s_%s" % [action, kind]]

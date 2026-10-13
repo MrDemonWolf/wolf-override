@@ -297,6 +297,7 @@ func _run() -> void:
 	await _send_escape(true)
 	await _send_escape(false)
 	_expect(game.get("title_open") and not end_card.visible and not paused, "Esc on the card goes on to the title instead of pausing")
+	await _check_hud_writes_on_change(game)
 	game.set("touch_enabled", false)
 	Engine.max_fps = old_fps
 	DirAccess.remove_absolute(ProjectSettings.globalize_path(path))
@@ -307,6 +308,48 @@ func _run() -> void:
 	if failures == 0:
 		print("UI and controls checks passed")
 	quit(1 if failures > 0 else 0)
+
+
+## The HUD refresh runs every frame. With nothing changed it must not set a theme override again
+## (each one notifies every control under it), and a rebind must still reach the prompts at once.
+func _check_hud_writes_on_change(game: Node2D) -> void:
+	game.set("touch_enabled", false)
+	game.set("controller_active", false)
+	game.call("_new_game")
+	game.call("_finish_intro")
+	await _settle(2)
+	var themed: Array[Control] = [game.get_node("CanvasLayer/BottomBar/Speaker") as Control, game.get_node("CanvasLayer/TouchControls/Choice1") as Control, game.get_node("CanvasLayer/TouchControls/Choice2") as Control]
+	var notified: Array[int] = [0]
+	var count: Callable = func() -> void: notified[0] += 1
+	for control: Control in themed:
+		control.theme_changed.connect(count)
+	game.call("_refresh_ui")
+	notified[0] = 0
+	for _i: int in range(3):
+		game.call("_refresh_ui")
+	_expect(notified[0] == 0, "an unchanged HUD refresh in play sets no theme override (%d notifications)" % notified[0])
+	(game.get_node("Human") as M0Actor).position.x = 350.0
+	game.call("_interact")
+	game.call("_interact")
+	game.call("_refresh_ui")
+	notified[0] = 0
+	for _i: int in range(3):
+		game.call("_refresh_ui")
+	_expect(game.get("waiting_for_choice") and notified[0] == 0, "an unchanged HUD refresh with the relay question up sets no theme override (%d notifications)" % notified[0])
+	for control: Control in themed:
+		control.theme_changed.disconnect(count)
+	var first_choice: Button = themed[1] as Button
+	var menu: GameSettings = game.get("settings_menu") as GameSettings
+	var seven: InputEventKey = InputEventKey.new()
+	seven.physical_keycode = KEY_7
+	menu.call("_replace_binding", &"choice_1", "keyboard", seven)
+	game.call("_refresh_ui")
+	_expect(first_choice.text.begins_with("7  "), "a rebound response key shows on the open question at once (%s)" % first_choice.text)
+	menu.reset_controls()
+	game.call("_refresh_ui")
+	_expect(first_choice.text.begins_with("1  "), "and the default key returns with Reset (%s)" % first_choice.text)
+	game.call("_return_to_title")
+	await process_frame
 
 
 func _has_button(action: StringName, index: JoyButton) -> bool:

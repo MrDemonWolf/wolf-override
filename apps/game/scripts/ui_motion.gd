@@ -32,10 +32,12 @@ static func _settle(button: BaseButton) -> void:
 
 
 static func _scale_to(button: BaseButton, target: Vector2, seconds: float) -> void:
-	if button.has_meta(&"ui_motion_tween"):
-		var previous: Tween = button.get_meta(&"ui_motion_tween") as Tween
-		if previous != null and previous.is_running():
-			previous.kill()
+	var previous: Tween = button.get_meta(&"ui_motion_tween") as Tween if button.has_meta(&"ui_motion_tween") else null
+	if previous != null and previous.is_running():
+		previous.kill()
+	elif button.scale == target:
+		# Already there with nothing moving it: no tween to make.
+		return
 	if not button.is_inside_tree():
 		button.scale = target
 		return
