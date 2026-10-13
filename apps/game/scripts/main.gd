@@ -978,7 +978,7 @@ func _settle_safe(from_x: float, to_x: float) -> bool:
 	return not (drop_arm.cloud_active() and DropArm.in_cloud(to_x) and not DropArm.in_cloud(from_x))
 
 
-## True while the junction's fuse burns, the one second to get clear of the door.
+## True while the junction's fuse burns, the seconds (PressureLine.FUSE_SECONDS) to get clear of the door.
 func _fuse_lit() -> bool:
 	return state.chapter_id == "junction" and not state.door_blown and pressure_line.state in [&"charged", &"fuse"]
 
@@ -2441,6 +2441,8 @@ func _tick_junction(delta: float) -> void:
 	match pressure_line.advance(delta):
 		&"tripped":
 			_vent_trips()
+		&"fuse", &"tick":
+			_fuse_ticked()
 		&"blown":
 			_door_blast()
 	if wolf_scouting and absf(wolf.position.x - JunctionRoom.WOLF_SEAM_X) <= 4.0:
@@ -2751,6 +2753,12 @@ func _valve_turned() -> void:
 		status_line = "FUSE LIT. Back away from the door, past the valve."
 	else:
 		status_line = "The valve gives. %d of %d turns." % [pressure_line.turns, PressureLine.TURNS_NEEDED]
+
+
+## The fuse ticks as it lights and every PressureLine.FUSE_TICK_SECONDS after, on the frame the blast
+## stripes peak; each tick is a little higher than the last, so the sound alone says time is running out.
+func _fuse_ticked() -> void:
+	sfx_bank.play(&"fuse_tick", -5.0, 1.0 + 0.08 * (pressure_line.fuse_ticks - 1))
 
 
 ## The gauge peaked before the third turn: the relief vent lets go (a thump under a burst of

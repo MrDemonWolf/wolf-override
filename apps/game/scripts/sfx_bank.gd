@@ -35,6 +35,7 @@ const LENGTHS: Dictionary = {
 	&"whine": 0.6,
 	&"chirp": 0.15,
 	&"actuator": 0.24,
+	&"fuse_tick": 0.07,
 }
 ## Detailed clip lengths in seconds (DETAIL_RATE), rendered on the worker thread.
 const DETAILED: Dictionary = {
@@ -211,6 +212,7 @@ func _render_startup() -> void:
 	# Pure tones, no noise: they take nothing from rng, so every clip above keeps its bytes.
 	streams[&"chirp"] = _wav(_chirp(LENGTHS[&"chirp"]), false)
 	streams[&"actuator"] = _wav(_actuator(LENGTHS[&"actuator"]), false)
+	streams[&"fuse_tick"] = _wav(_fuse_tick(LENGTHS[&"fuse_tick"]), false)
 	for clip: StringName in RECORDED:
 		streams[clip] = RECORDED[clip]
 
@@ -409,6 +411,23 @@ static func _actuator(seconds: float) -> PackedFloat32Array:
 		var saw: float = fmod(phase, 1.0) * 2.0 - 1.0
 		low += alpha * (saw * (0.75 + 0.25 * sin(TAU * 38.0 * t)) - low)
 		out[i] = low * minf(t / 0.015, 1.0) * clampf((seconds - t) / 0.06, 0.0, 1.0)
+	return out
+
+
+## A 70 ms timer tick: a hard 1 ms strike on two inharmonic partials (2.35 and 3.9 kHz, a small steel
+## bell's ratio) that die away in about 15 ms over a 520 Hz body, so it cuts through the pump's hum and
+## the hiss on small speakers without reading as a beep. The junction's lit fuse, once per stripe pulse.
+static func _fuse_tick(seconds: float) -> PackedFloat32Array:
+	var frames: int = int(seconds * MIX_RATE)
+	var out: PackedFloat32Array = PackedFloat32Array()
+	out.resize(frames)
+	var dt: float = 1.0 / MIX_RATE
+	for i: int in frames:
+		var t: float = i * dt
+		var ring: float = (sin(TAU * 2350.0 * t) + 0.6 * sin(TAU * 3900.0 * t)) * exp(-t / 0.006)
+		var body: float = 0.5 * sin(TAU * 520.0 * t) * exp(-t / 0.018)
+		# A 1 ms attack and a 10 ms fade to exactly zero, so the tick never clicks at its edges.
+		out[i] = (ring + body) * minf(t / 0.001, 1.0) * clampf((seconds - t) / 0.01, 0.0, 1.0)
 	return out
 
 

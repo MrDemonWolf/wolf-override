@@ -260,8 +260,9 @@ const GAUGE_FALL_SECONDS: float = 0.8
 const LINE_CAPTION: String = "LINE"
 const LINE_CAPTION_FONT_SIZE: int = 8
 ## The hazard stripes over the door's blast zone pulse this many times a second while the fuse burns
-## (steady with Reduced Motion).
-const BLAST_STRIPE_HZ: float = 4.0
+## (steady with Reduced Motion): once per fuse tick, peaking with it, and at no more than 2 Hz, so even
+## the longer fuse stays well under three flashes a second (A11Y-2).
+const BLAST_STRIPE_HZ: float = 1.0 / PressureLine.FUSE_TICK_SECONDS
 ## The floor brackets glow this colour while the sentry's body is inside them.
 const MARK_LIT: Color = Color("#ffe9a8")
 ## The alcove's floor is tinted over exactly the span that hides the engineer, down onto the walkway

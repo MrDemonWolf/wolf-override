@@ -455,7 +455,7 @@ func trigger_blast() -> String:
 	game.debug_valve_turned()
 	tools.cheats_used = true
 	changed.emit()
-	return "Fuse lit: the door goes %.0f s after play resumes." % PressureLine.FUSE_SECONDS
+	return "Fuse lit: the door goes %.1f s after play resumes." % PressureLine.FUSE_SECONDS
 
 
 ## Why the tank cannot be dropped now, or empty.
