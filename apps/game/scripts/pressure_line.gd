@@ -3,11 +3,19 @@ extends RefCounted
 ## The Service Junction's coolant line, as pure logic: the breaker arms it, the gauge climbs over
 ## BUILD_SECONDS, and three real valve turns charge the sealed door before the relief vent lets go.
 ## States, in order: idle, building (gauge rising), charged (turn 3 landed), fuse (counting down
-## to the blast), blown (the door went); tripped is the vent letting go first. Advanced with real
-## delta so timing tests are frame-independent; a room sets [member paused] during a choice.
+## to the blast, ticking every FUSE_TICK_SECONDS), blown (the door went); tripped is the vent letting
+## go first. Advanced with real delta so timing tests are frame-independent; a room sets
+## [member paused] during a choice.
 
 const BUILD_SECONDS: float = 6.0
-const FUSE_SECONDS: float = 1.0
+## Long enough for someone who starts moving on the klaxon to clear the blast zone (Nathanial's
+## decision Q13, October 13, 2026: about 2.5 s, to be tuned down by play).
+const FUSE_SECONDS: float = 2.5
+## The fuse ticks as it lights and then every this many seconds, so a tick never lands on the blast
+## itself; the blast stripes pulse in step with it (JunctionRoom.BLAST_STRIPE_HZ).
+const FUSE_TICK_SECONDS: float = 0.5
+## Ticks in one fuse: on lighting and at 0.5, 1.0, 1.5 and 2.0 s.
+const FUSE_TICKS: int = int(FUSE_SECONDS / FUSE_TICK_SECONDS + 0.5)
 const TURNS_NEEDED: int = 3
 ## Seconds of held USE per valve turn.
 const TURN_SECONDS: float = 0.4
@@ -36,6 +44,8 @@ var turns: int = 0
 ## Seconds of held USE toward the next turn; springs back on release.
 var progress: float = 0.0
 var fuse_remaining: float = 0.0
+## Fuse ticks sounded so far (1..FUSE_TICKS once the fuse is lit).
+var fuse_ticks: int = 0
 var paused: bool = false
 
 
@@ -51,7 +61,8 @@ func arm() -> bool:
 
 
 ## Advances by [param delta] seconds and returns the event that landed this call, or empty:
-## "tripped" (the vent let go), "fuse" (the fuse started) or "blown" (the fuse ended).
+## "tripped" (the vent let go), "fuse" (the fuse started, with its first tick), "tick" (the fuse
+## ticked again) or "blown" (the fuse ended).
 func advance(delta: float) -> StringName:
 	if paused or delta <= 0.0:
 		return &""
@@ -67,6 +78,7 @@ func advance(delta: float) -> StringName:
 		&"charged":
 			state = &"fuse"
 			fuse_remaining = FUSE_SECONDS
+			fuse_ticks = 1
 			return &"fuse"
 		&"fuse":
 			fuse_remaining = maxf(fuse_remaining - delta, 0.0)
@@ -74,6 +86,10 @@ func advance(delta: float) -> StringName:
 				state = &"blown"
 				gauge = 0.0
 				return &"blown"
+			var due: int = mini(int((FUSE_SECONDS - fuse_remaining) / FUSE_TICK_SECONDS + EPSILON) + 1, FUSE_TICKS)
+			if due > fuse_ticks:
+				fuse_ticks = due
+				return &"tick"
 	return &""
 
 
@@ -125,4 +141,5 @@ func reset(spent: bool = false) -> void:
 	turns = 0
 	progress = 0.0
 	fuse_remaining = 0.0
+	fuse_ticks = 0
 	paused = false

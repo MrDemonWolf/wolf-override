@@ -364,7 +364,7 @@ func _prime_crank() -> void:
 				hold.station = &"bypass"
 				hold.ticks = 0
 			hold.ticks = maxi(hold.ticks, BypassHandle.TICKS_NEEDED - 1)
-			hold.progress = maxf(hold.progress, HoldUse.TICK_SECONDS)
+			hold.progress = maxf(hold.progress, BypassHandle.TICK_SECONDS)
 
 
 # --- Pausing for the menu and frame stepping ------------------------------------------------------
@@ -455,7 +455,7 @@ func trigger_blast() -> String:
 	game.debug_valve_turned()
 	tools.cheats_used = true
 	changed.emit()
-	return "Fuse lit: the door goes %.0f s after play resumes." % PressureLine.FUSE_SECONDS
+	return "Fuse lit: the door goes %.1f s after play resumes." % PressureLine.FUSE_SECONDS
 
 
 ## Why the tank cannot be dropped now, or empty.

@@ -2,6 +2,8 @@ extends SceneTree
 
 const GAME_SCENE: PackedScene = preload("res://scenes/main.tscn")
 const State = preload("res://scripts/m0_state.gd")
+## Frames to wait for the fuse to run out, with a margin.
+const FUSE_FRAMES: int = int(PressureLine.FUSE_SECONDS * 60.0) + 60
 
 var failures: int = 0
 
@@ -42,17 +44,34 @@ func _check_pressure_line() -> void:
 	_expect(line.crank(0.85) == 2 and line.turns == 3 and line.state == &"charged", "two more turns charge the seal")
 	_expect(line.crank(1.0) == 0 and line.turns == 3, "a charged seal takes no more turns")
 	_expect(line.advance(0.016) == &"fuse" and line.state == &"fuse" and is_equal_approx(line.fuse_remaining, PressureLine.FUSE_SECONDS), "the fuse lights on the next step")
+	# P0-6 (FAIL-4, Nathanial's Q13): the fuse lasts about 2.5 s and ticks as it lights and every 0.5 s
+	# after, on the stripes' peaks, never on the blast itself. Stepped at 60 fps from the lit frame.
+	_expect(absf(PressureLine.FUSE_SECONDS - 2.5) < 0.001 and PressureLine.FUSE_TICKS == 5 and absf(JunctionRoom.BLAST_STRIPE_HZ * PressureLine.FUSE_TICK_SECONDS - 1.0) < 0.001 and JunctionRoom.BLAST_STRIPE_HZ <= 2.0, "the fuse is 2.5 s with five ticks, and the blast stripes pulse once per tick, at no more than 2 Hz")
+	_expect(line.fuse_ticks == 1, "lighting the fuse is its first tick")
 	var blown: StringName = &""
-	for _frame: int in 50:
-		var event: StringName = line.advance(0.016)
-		if not event.is_empty():
+	var tick_times: Array[float] = [0.0]
+	var blown_at: float = -1.0
+	var elapsed: float = 0.0
+	for _frame: int in 240:
+		var event: StringName = line.advance(1.0 / 60.0)
+		elapsed += 1.0 / 60.0
+		if event == &"tick":
+			tick_times.append(elapsed)
+		elif event == &"blown":
 			blown = event
-	_expect(blown == &"" and line.state == &"fuse" and line.fuse_remaining > 0.0, "0.8 s into the fuse the door still stands")
-	for _frame: int in 20:
-		var event: StringName = line.advance(0.016)
-		if not event.is_empty():
-			blown = event
-	_expect(blown == &"blown" and line.state == &"blown" and line.gauge == 0.0, "the fuse ends at 1.0 s and the door goes")
+			blown_at = elapsed
+			break
+	var spaced: bool = tick_times.size() == PressureLine.FUSE_TICKS
+	for index: int in tick_times.size():
+		spaced = spaced and absf(tick_times[index] - index * PressureLine.FUSE_TICK_SECONDS) <= 1.5 / 60.0
+	_expect(spaced and line.fuse_ticks == PressureLine.FUSE_TICKS, "the fuse ticks %d times, 0.5 s apart (%s)" % [tick_times.size(), str(tick_times)])
+	_expect(blown == &"blown" and line.state == &"blown" and line.gauge == 0.0 and absf(blown_at - PressureLine.FUSE_SECONDS) <= 1.5 / 60.0, "the fuse ends at 2.5 s and the door goes (%.3f s)" % blown_at)
+	_expect(tick_times[-1] < blown_at - 0.25, "the last tick comes half a second before the blast, not on it")
+	var sliced_fuse: PressureLine = PressureLine.new()
+	sliced_fuse.arm()
+	sliced_fuse.crank(1.2)
+	sliced_fuse.advance(0.016)
+	_expect(sliced_fuse.advance(1.0) == &"tick" and sliced_fuse.fuse_ticks == 3 and sliced_fuse.advance(1.49) == &"tick" and sliced_fuse.fuse_ticks == 5 and sliced_fuse.advance(0.02) == &"blown", "a long frame counts every tick it passes, and the door still goes at 2.5 s")
 	_expect(line.advance(1.0) == &"" and not line.arm(), "a blown line is finished")
 	var whole: PressureLine = PressureLine.new()
 	whole.arm()
@@ -308,7 +327,7 @@ func _check_scene() -> void:
 	_expect(not PressureLine.is_in_blast(JunctionRoom.WOLF_CLEAR_X) and JunctionRoom.WOLF_CLEAR_X + M0Actor.WOLF_REACH < PressureLine.BLAST_MIN_X and wolf.autonomous_target_x == JunctionRoom.WOLF_CLEAR_X, "while the fuse burns WOLF goes clear of the blast zone, drawn body and all")
 	# Stand just inside the blast zone's left edge: the fuse ends on a knockdown that reloads autosave A.
 	human.position.x = PressureLine.BLAST_MIN_X + 2.0
-	_expect(await _wait_until(func() -> bool: return game.get("fail_active"), 90), "the blast knocks down an engineer still in front of the door")
+	_expect(await _wait_until(func() -> bool: return game.get("fail_active"), FUSE_FRAMES), "the blast knocks down an engineer still in front of the door")
 	_expect(room.door_blown and (room.door_breaking_art.visible or room.door_blown_art.visible) and not room.door_art.visible and room.blast_sparks.emitting, "the knockdown shows the door blowing, so the cause is on screen")
 	_expect(not state.door_blown and FileAccess.get_file_as_bytes(path) == a_bytes, "a knockdown blast saves nothing and never really blows the door")
 	_expect(str(game.get("status_line")).begins_with("The door went with %s in front of it." % state.human_name().get_slice(" ", 0)), "the status line names the blast as the cause")
@@ -325,6 +344,12 @@ func _check_scene() -> void:
 	if not _require(line.state == &"building", "the breaker arms again after the knockdown"):
 		return
 	_expect(await _walk_to(human, 420.0), "the engineer reaches the valve again")
+	# Every fuse tick is heard: the bank's fuse_tick clip, once per tick.
+	var fuse_ticks: Array[int] = [0]
+	var count_ticks: Callable = func(clip: StringName) -> void:
+		if clip == &"fuse_tick":
+			fuse_ticks[0] += 1
+	(game.get("sfx_bank") as SfxBank).clip_started.connect(count_ticks)
 	Input.action_press(&"interact")
 	charged = await _wait_until(func() -> bool: return line.turns >= 3, 120)
 	Input.action_release(&"interact")
@@ -333,7 +358,9 @@ func _check_scene() -> void:
 	# Just left of the zone, where the engineer's body still reaches past x 360: the one blast test
 	# says outside, so the door blows, nobody is knocked down and autosave B is written.
 	human.position.x = PressureLine.BLAST_MIN_X - 8.0
-	_expect(await _wait_until(func() -> bool: return state.door_blown, 90), "the fuse ends and the door blows")
+	_expect(await _wait_until(func() -> bool: return state.door_blown, FUSE_FRAMES), "the fuse ends and the door blows")
+	(game.get("sfx_bank") as SfxBank).clip_started.disconnect(count_ticks)
+	_expect(fuse_ticks[0] == PressureLine.FUSE_TICKS, "the fuse's ticks are heard, %d of %d" % [fuse_ticks[0], PressureLine.FUSE_TICKS])
 	_expect(_player_for(game, &"hiss_mid") == null and _player_for(game, &"hum") == null, "the line's hiss and pump stop when the door goes")
 	_expect(room.door_breaking_art.visible and not room.door_art.visible and not room.door_blown_art.visible, "at the blast the bulkhead shows breaking first")
 	_expect(game.call("_objective") == "CHECK THE LANE" and room.door_label.text == "DOOR DOWN" and room.blast_sparks.emitting, "the blast is a real state change with sparks, and the card names the lane before anyone mentions the tank")

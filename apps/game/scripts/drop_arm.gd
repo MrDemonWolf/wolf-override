@@ -7,16 +7,21 @@ extends RefCounted
 ## LIFT_SECONDS and the clamp takes the rest of REWIND_SECONDS to latch; the cloud lasts CLOUD_SECONDS
 ## from the landing). Until it is back up, the tank blocks the sentry's lane (blocks_lane). The hit is
 ## decided where the tank lands, against the sentry's real position: the drawn floor brackets are the
-## tank's footprint, and a hit is at least half of the sentry's body over them, so the tank always
-## comes down on the machine where it stands and a graze at the edge of the brackets is a miss.
+## tank's footprint, and a hit is a quarter or more of the sentry's body over them, so a graze that
+## catches its near end counts (Nathanial's decision Q7, October 13, 2026) while a tank that only
+## brushes it does not.
 
 const MARK_X: float = 700.0
 ## Half the floor brackets, which are drawn this wide either side of the mark: the tank's own
 ## footprint (JunctionRoom.TANK_SIZE.x is 46.4 px), so what lands inside them is under the tank.
 const HIT_RANGE: float = 24.0
-## A sentry centred this close to the mark (its middle inside the brackets) has at least half of its
-## body (SentryBrain.HALF_WIDTH either side) over them, under the tank.
-const HIT_REACH: float = HIT_RANGE
+## How much of the sentry's body must be under the tank's footprint for a graze to count: a quarter of
+## it (half of SentryBrain.HALF_WIDTH), 13 px.
+const GRAZE_OVERLAP: float = SentryBrain.HALF_WIDTH * 0.5
+## A sentry centred this close to the mark has at least GRAZE_OVERLAP of its body over the brackets,
+## under the tank: 37 px either side, so a patrol at 140 px/s spends about 0.53 s over them on each
+## crossing (0.34 s when half its body was needed), and a chase at 230 px/s about 0.32 s.
+const HIT_REACH: float = HIT_RANGE + SentryBrain.HALF_WIDTH - GRAZE_OVERLAP
 const FALL_SECONDS: float = 0.45
 const REWIND_SECONDS: float = 6.0
 ## After a miss the tank lies on the empty mark this long, spraying from its split line, so the
@@ -36,7 +41,8 @@ var cloud_remaining: float = 0.0
 var paused: bool = false
 
 
-## True when a sentry centred at [param target_x] has at least half of its body over the floor brackets.
+## True when a sentry centred at [param target_x] has at least GRAZE_OVERLAP of its body over the floor
+## brackets.
 static func is_hit(target_x: float) -> bool:
 	return absf(target_x - MARK_X) <= HIT_REACH + EPSILON
 

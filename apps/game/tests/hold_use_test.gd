@@ -24,6 +24,24 @@ func _initialize() -> void:
 	var whole: HoldUse = HoldUse.new()
 	whole.advance(1.3, true, &"valve")
 	_expect(sliced.ticks == 3 and whole.ticks == 3, "1.3 s held is three ticks whether sliced or whole")
+	# FEEL-4: a hold answers on its press frame, long before its first tick lands.
+	var pressed: HoldUse = HoldUse.new()
+	_expect(pressed.shown_fraction() == 0.0 and not pressed.started, "nothing shows before the press")
+	pressed.advance(1.0 / 60.0, true, &"bypass")
+	_expect(pressed.started and pressed.ticks == 0 and pressed.shown_fraction() >= HoldUse.FIRST_FRAME_GIVE, "on the press frame the hold has started and already shows progress (%.2f of a tick)" % pressed.shown_fraction())
+	pressed.advance(1.0 / 60.0, true, &"bypass")
+	_expect(not pressed.started and pressed.shown_fraction() > HoldUse.FIRST_FRAME_GIVE, "the next frame is no new start, and the progress keeps growing")
+	pressed.advance(1.0 / 60.0, false, &"bypass")
+	_expect(pressed.shown_fraction() == 0.0 and not pressed.started, "letting go springs the part tick back")
+	pressed.advance(1.0 / 60.0, true, &"bypass")
+	_expect(pressed.started, "pressing again is a new start, with its own click")
+	# A station can take shorter ticks: the MANUAL BYPASS's eight notches take 2 s in all.
+	var bypass: HoldUse = HoldUse.new()
+	var frames: int = 0
+	while bypass.ticks < BypassHandle.TICKS_NEEDED and frames < 600:
+		bypass.advance(1.0 / 60.0, true, &"bypass", BypassHandle.TICK_SECONDS)
+		frames += 1
+	_expect(absf(frames / 60.0 - BypassHandle.TICKS_NEEDED * BypassHandle.TICK_SECONDS) <= 2.0 / 60.0 and absf(BypassHandle.TICKS_NEEDED * BypassHandle.TICK_SECONDS - 2.0) < 0.001, "the bypass's eight notches take about 2 s of held USE (%d frames)" % frames)
 	if failures == 0:
 		print("HoldUse checks passed")
 	quit(1 if failures > 0 else 0)

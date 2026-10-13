@@ -16,6 +16,8 @@ const DEFAULT_WINDOW_SIZE: int = 1
 
 ## Reduced Motion changed; Main hands it to the impact kit (no shake or hit-stop, shorter flashes).
 signal reduced_motion_changed(enabled: bool)
+## TOGGLE HOLDS changed: with it on, one press of interact works a crank until a second press.
+signal hold_toggle_changed(enabled: bool)
 
 var settings_path: String
 var tabs: TabBar
@@ -26,6 +28,7 @@ var volumes: Dictionary = {}
 var binding_buttons: Dictionary = {}
 var defaults: Dictionary = {}
 var deadzone: HSlider
+var hold_toggle: CheckButton
 var cancel_button: Button
 var capture_action: StringName = &""
 var capture_kind: String = ""
@@ -55,6 +58,7 @@ func configure(path: String) -> void:
 		_apply_volume(bus, slider.value)
 	deadzone.set_value_no_signal(clampf(number(config, "controls", "deadzone", 0.25), 0.1, 0.8))
 	_apply_deadzone(deadzone.value)
+	hold_toggle.set_pressed_no_signal(boolean(config, "controls", "hold_toggle", false))
 	var overrides: Dictionary = {}
 	for action: StringName in ACTIONS:
 		for kind: String in ["keyboard", "controller"]:
@@ -254,6 +258,13 @@ func _build_menu() -> void:
 			button.pressed.connect(begin_capture.bind(action, kind))
 	deadzone = _slider_row(controls, "Stick deadzone", 0.1, 0.8, 0.05)
 	deadzone.value_changed.connect(func(value: float) -> void: _apply_deadzone(value); _save_extra())
+	# For every device at once, since every crank goes through the one interact action.
+	hold_toggle = CheckButton.new()
+	hold_toggle.text = "TOGGLE HOLDS"
+	hold_toggle.tooltip_text = "Press interact once to start a crank and again to stop it, instead of holding it down. Keyboard, controller and touch."
+	hold_toggle.custom_minimum_size.y = 44
+	controls.add_child(hold_toggle)
+	hold_toggle.toggled.connect(func(value: bool) -> void: hold_toggle_changed.emit(value); _save_extra())
 	var reset: Button = Button.new()
 	reset.text = "RESTORE DEFAULT CONTROLS"
 	reset.custom_minimum_size.y = 40
@@ -531,6 +542,7 @@ func _save_extra() -> bool:
 	for bus: String in BUSES:
 		config.set_value("audio", bus, (volumes[bus] as HSlider).value)
 	config.set_value("controls", "deadzone", deadzone.value)
+	config.set_value("controls", "hold_toggle", hold_toggle.button_pressed)
 	for action: StringName in ACTIONS:
 		for kind: String in ["keyboard", "controller"]:
 			var key: String = "%s_%s" % [action, kind]

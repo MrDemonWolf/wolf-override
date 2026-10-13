@@ -20,7 +20,7 @@ The menu shows the detected GPU and the Compatibility renderer. It does not swit
 
 ## Audio
 
-Master, Music, Effects, and Voice each have a volume slider. Effects carries every sound effect: the short sounds the game generates itself (the containment gate, the relay contact, the seal landing, the chirp when a station takes a save or a copy, WOLF's joints when he answers, the Records exit, and the Service Junction's pump, blasts, sentry, winch, tank and exit bolt) and a few processed recordings (the steam of the corridor's **MANUAL BYPASS** and the Service Junction, and two of WOLF's growls; see [sound recordings](/docs/credits/#sound-recordings)). Master and Effects are the only controls over those sounds: no display or motion setting mutes them. Music and Voice have no content yet, so those sliders change nothing for now.
+Master, Music, Effects, and Voice each have a volume slider. Effects carries every sound effect: the short sounds the game generates itself (the containment gate, the relay contact, the seal landing, the chirp when a station takes a save or a copy, WOLF's joints when he answers, the soft click as a crank starts to turn, the Records exit, and the Service Junction's pump, fuse tick, blasts, sentry, winch, tank and exit bolt) and a few processed recordings (the steam of the corridor's **MANUAL BYPASS** and the Service Junction, and two of WOLF's growls; see [sound recordings](/docs/credits/#sound-recordings)). Master and Effects are the only controls over those sounds: no display or motion setting mutes them. Music and Voice have no content yet, so those sliders change nothing for now.
 
 ## Controls
 
@@ -38,5 +38,7 @@ These six actions have keyboard and controller bindings you can change. Rebindin
 Select a binding, then press the replacement key, button, or stick direction. A binding already used by another action is rejected. **Esc** or **CANCEL REBIND** cancels the capture, and **RESTORE DEFAULT CONTROLS** brings back the mappings above. The **I** key that cycles the provisional engineer name, the controller **B** button for backing out of menus, and the Android Back gesture are fixed.
 
 Stick deadzone sets how far the controller stick must move before movement registers (0.1 to 0.8, default 0.25). Increase it if a stick drifts while untouched. Scroll the Controls panel to see its remaining options.
+
+**TOGGLE HOLDS** (off by default) changes how the cranks work: the corridor's **MANUAL BYPASS** and the Service Junction's valve. With it on, one press of interact starts the crank and it keeps turning on its own; press interact again, walk away or pause to stop it, and it stops by itself once the crank is done. It works the same with the keyboard, a controller and the touch **CRANK** button, because all three press the one interact action, and while it is on the prompts drop the word **HOLD** (for example **E: crank the valve**). It is saved in `settings.cfg` with your other preferences and stays as it is when you use **RESTORE DEFAULT CONTROLS**.
 
 See [Input](/docs/controls/input/) for the full default table or [Troubleshooting](/docs/controls/troubleshooting/) if a control behaves unexpectedly.

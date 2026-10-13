@@ -260,8 +260,9 @@ const GAUGE_FALL_SECONDS: float = 0.8
 const LINE_CAPTION: String = "LINE"
 const LINE_CAPTION_FONT_SIZE: int = 8
 ## The hazard stripes over the door's blast zone pulse this many times a second while the fuse burns
-## (steady with Reduced Motion).
-const BLAST_STRIPE_HZ: float = 4.0
+## (steady with Reduced Motion): once per fuse tick, peaking with it, and at no more than 2 Hz, so even
+## the longer fuse stays well under three flashes a second (A11Y-2).
+const BLAST_STRIPE_HZ: float = 1.0 / PressureLine.FUSE_TICK_SECONDS
 ## The floor brackets glow this colour while the sentry's body is inside them.
 const MARK_LIT: Color = Color("#ffe9a8")
 ## The alcove's floor is tinted over exactly the span that hides the engineer, down onto the walkway
@@ -288,6 +289,9 @@ var warning_lamps: PackedVector2Array = PackedVector2Array([Vector2(0.294, 0.285
 var line_state: StringName = &"idle"
 var gauge: float = 0.0
 var turns: int = 0
+## How far into the next turn a hold at the valve has its wheel (HoldUse.shown_fraction), 0 while it
+## is not held. Set through show_crank.
+var crank_fraction: float = 0.0
 var door_blown: bool = false
 var sentry_down: bool = false
 var junction_cleared: bool = false
@@ -868,8 +872,9 @@ func sync_arm(arm: DropArm) -> void:
 	arm_state = arm.state
 	tank_drop = arm.drop_amount()
 	tank_on_floor = arm.on_floor()
-	# A tank coming down on the sentry stops on its crushed hull, so the wreck shows under it.
-	var on_sentry: bool = arm.state == &"landed" or (arm.state == &"falling" and DropArm.is_hit(sentry.target_x))
+	# A tank coming down on the sentry stops on its crushed hull, so the wreck shows under it; one that
+	# only catches its end (a graze) comes down past it onto the floor.
+	var on_sentry: bool = (arm.state == &"landed" or (arm.state == &"falling" and DropArm.is_hit(sentry.target_x))) and tank_rests_on_wreck(sentry.target_x)
 	tank.position.y = lerpf(TANK_REST_Y, landed_tank_y(on_sentry), tank_drop)
 	var cloud: bool = arm.cloud_active() and visible
 	coolant_cloud.emitting = cloud
@@ -915,6 +920,14 @@ static func wolf_duck_depth(wolf_x: float, facing: float) -> float:
 	return DUCK_DEPTH * (1.0 - smoothstep(DUCK_CLEAR, DUCK_CLEAR + DUCK_RAMP, absf(head_x - DropArm.MARK_X)))
 
 
+## True when a tank landing on a sentry centred at [param sentry_x] rests on its crushed hull: the
+## sentry's middle is inside the brackets, so at least half of the tank's footprint is over the wreck.
+## A graze further out (DropArm.HIT_REACH) catches only the wreck's end and the tank stands on the
+## floor beside it, over that end.
+static func tank_rests_on_wreck(sentry_x: float) -> bool:
+	return absf(sentry_x - DropArm.MARK_X) <= DropArm.HIT_RANGE + DropArm.EPSILON
+
+
 ## Where the tank's centre comes to rest: on the floor, or on top of the crushed sentry.
 static func landed_tank_y(on_sentry: bool) -> float:
 	return FLOOR_Y - TANK_SIZE.y * 0.5 - (Sentry.WRECK_CRUSH_HEIGHT if on_sentry else 0.0)
@@ -952,11 +965,29 @@ func bolt_arc() -> void:
 	_hatch_tween.tween_callback(func() -> void: hatch_opened.emit())
 
 
+## A hold at the valve under way: from its press frame the wheel turns part of the way into its next
+## quarter, by [param fraction] (HoldUse.shown_fraction); at 0 (let go) the part turn springs back.
+func show_crank(fraction: float) -> void:
+	if is_equal_approx(fraction, crank_fraction):
+		return
+	var released: bool = fraction <= 0.0
+	crank_fraction = maxf(fraction, 0.0)
+	if _valve_tween != null and _valve_tween.is_valid():
+		_valve_tween.kill()
+	var target: float = 90.0 * (turns + crank_fraction)
+	if released and is_inside_tree():
+		_valve_tween = create_tween()
+		_valve_tween.tween_property(valve_wheel, "rotation_degrees", target, BypassHandle.SPRING_BACK_SECONDS).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
+	else:
+		valve_wheel.rotation_degrees = target
+
+
 func _turn_wheel(to_turns: int) -> void:
 	if _valve_tween != null and _valve_tween.is_valid():
 		_valve_tween.kill()
 	var target: float = 90.0 * to_turns
-	if to_turns == 0:
+	# Mid-hold the quarter just reached is where the wheel is; show_crank adds the next part turn.
+	if to_turns == 0 or crank_fraction > 0.0:
 		valve_wheel.rotation_degrees = target
 		return
 	_valve_tween = create_tween()
@@ -1114,6 +1145,7 @@ func reset_transient() -> void:
 	# The arm is up in its plate once the tank is down for good, and holds the tank otherwise.
 	arm_parked = 1.0 if sentry_down else 0.0
 	fuse_remaining = 0.0
+	crank_fraction = 0.0
 	display_gauge = 0.0
 	gauge_hold = 0.0
 	gauge_tripped = false
