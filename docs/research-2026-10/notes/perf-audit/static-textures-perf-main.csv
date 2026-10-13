@@ -1,0 +1,10 @@
+file,variant,source_px,imported_px,compress_mode,mipmaps,ctex_mips,storage,gpu_format,ctex_bytes,est_vram_mb
+assets/director-side-left-provisional.png,lossless(both),1024x1536,1024x1536,0,false,0,WEBP,RGBA8,828260,6.0
+assets/logo-mark.svg,lossless(both),0x0,512x512,0,false,0,WEBP,RGBA8,24606,1.0
+assets/maintenance-corridor-background-provisional.png,lossless(both),1672x941,1672x941,0,false,0,WEBP,RGB8,1460784,4.5
+assets/maintenance-props-provisional.png,lossless(both),2172x724,2172x724,0,false,0,WEBP,RGBA8,852028,6.0
+assets/records-access-background-provisional.png,lossless(both),1672x941,1672x941,0,false,0,WEBP,RGB8,1458290,4.5
+assets/records-props-provisional.png,lossless(both),2172x724,2172x724,0,false,0,WEBP,RGBA8,800306,6.0
+assets/rowan-side-right-provisional.png,lossless(both),1024x1536,1024x1536,0,false,0,WEBP,RGBA8,1003248,6.0
+assets/title-corridor-key-art-provisional.png,lossless(both),1672x941,1672x941,0,false,0,WEBP,RGB8,1099034,4.5
+assets/wolf-side-right-provisional.png,lossless(both),1902x1015,1902x1015,0,false,0,WEBP,RGBA8,719538,7.36

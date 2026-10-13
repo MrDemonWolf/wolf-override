@@ -1,0 +1,1858 @@
+{
+ "generated": "2026-10-11",
+ "branch_head": "a66d333",
+ "before_root": "[session scratch, not kept]/logic-audit/shots",
+ "after_root": "[session scratch, not kept]/logic-fix/shots/final2",
+ "note": "after_note describes what the after screenshot shows; feel and readability are not validated by hand play. R1-R4 are the full recapture; R7 and R9 are extra routes run on the same HEAD build for the off-centre hit and the miss-chase knockdown card.",
+ "status_counts": {
+  "fixed": 22,
+  "open by design": 1,
+  "waiting on Nathanial": 1
+ },
+ "problems": [
+  {
+   "rank": 1,
+   "title": "Whether the tank hits or misses doesn't match what the screen shows",
+   "before": {
+    "path": "[session scratch, not kept]/logic-audit/shots/R2/R2-052-miss-cloud-and-alert.png",
+    "on_screen_text": {
+     "dialogue": "The tank hits the floor and vents coolant. The sentry turns on the panel; get back over the rubble.",
+     "context_hint": "It's after you. Get back over the rubble.",
+     "continue_button": "disabled",
+     "continue_note": "No checkpoint yet. Reach a SAFE POINT to save.",
+     "touch_buttons": "PAUSE"
+    }
+   },
+   "after": {
+    "path": "[session scratch, not kept]/logic-fix/shots/final2/R2/R2-078-miss-cloud-and-alert.png",
+    "on_screen_text": {
+     "objective_card": "SERVICE JUNCTION\nDROP THE TANK",
+     "dialogue": "The tank hits the empty mark and sprays coolant from a split line. The sentry swings toward the panel; get back over the rubble.",
+     "context_hint": "It's after you. Get back over the rubble.",
+     "continue_button": "disabled",
+     "continue_note": "No checkpoint yet. Saving starts at the first SAFE POINT.",
+     "touch_buttons": "PAUSE"
+    }
+   },
+   "after_also": [
+    {
+     "path": "[session scratch, not kept]/logic-fix/shots/final2/R4/R4-073-dialogue-wait-wolf-hasn-t-got-it.png",
+     "on_screen_text": {
+      "objective_card": "SERVICE JUNCTION\nDROP THE TANK",
+      "dialogue": "Wait. WOLF hasn't got it on the mark yet.",
+      "context_hint": "Wait for WOLF to park it on the mark.",
+      "continue_button": "disabled",
+      "continue_note": "No checkpoint yet. Saving starts at the first SAFE POINT.",
+      "touch_buttons": "PAUSE"
+     }
+    },
+    {
+     "path": "[session scratch, not kept]/logic-fix/shots/final2/R4/R4-075-dialogue-the-sentry-stops-on-the-mark.png",
+     "on_screen_text": {
+      "objective_card": "SERVICE JUNCTION\nDROP THE TANK",
+      "dialogue": "The sentry stops on the mark, its eyes on WOLF. Drop the tank now.",
+      "context_hint": "E: drop the tank. It's parked on the mark.",
+      "continue_button": "disabled",
+      "continue_note": "No checkpoint yet. Saving starts at the first SAFE POINT.",
+      "touch_buttons": "PAUSE"
+     }
+    },
+    {
+     "path": "[session scratch, not kept]/logic-fix/shots/final2/R2/R2-087-dialogue-the-tank-comes-down-square-and.png",
+     "on_screen_text": {
+      "objective_card": "SERVICE JUNCTION\nPOP THE EXIT BOLT",
+      "dialogue": "The tank comes down square and crushes the sentry flat. Its eyes go dark.\nWOLF: It's down. The bolt by the hatch is next.",
+      "context_hint": "Checkpoint saved.",
+      "continue_button": "disabled",
+      "continue_note": "No checkpoint yet. Saving starts at the first SAFE POINT.",
+      "touch_buttons": "PAUSE"
+     }
+    },
+    {
+     "path": "[session scratch, not kept]/logic-fix/shots/final2/R7/R7-078-dialogue-the-tank-catches-the-sentry-off.png",
+     "on_screen_text": {
+      "objective_card": "SERVICE JUNCTION\nPOP THE EXIT BOLT",
+      "dialogue": "The tank catches the sentry off centre and pins it to the floor. Its eyes go dark.\nWOLF: It's down. The bolt by the hatch is next.",
+      "context_hint": "Checkpoint saved.",
+      "continue_button": "disabled",
+      "continue_note": "No checkpoint yet. Saving starts at the first SAFE POINT.",
+      "touch_buttons": "PAUSE"
+     }
+    }
+   ],
+   "after_note": "Miss: the tank is back on the clamp (WINCHING UP) over an empty mark while the sentry sits far right in a coolant cloud; the line says it hit the empty mark. Baited route: an early press shows 'Wait. WOLF hasn't got it on the mark yet.' (R4-073/074) and the frame the sentry parks at 700 the line turns to 'The sentry stops on the mark, its eyes on WOLF. Drop the tank now.' (R4-075). A square hit (R2-087) and an off-centre hit (R7-078, sentry at 717) are told differently.",
+   "status": "fixed"
+  },
+  {
+   "rank": 2,
+   "title": "The panel alcove is called the safe spot, but you get spotted and run down inside its drawn frame",
+   "before": {
+    "path": "[session scratch, not kept]/logic-audit/shots/R3/R3-106-dialogue-the-sentry-s-eyes-snap-red.png",
+    "on_screen_text": {
+     "dialogue": "The sentry's eyes snap red. It has you; get back over the rubble.",
+     "context_hint": "It's after you. Get back over the rubble.",
+     "continue_button": "enabled",
+     "touch_buttons": "PAUSE"
+    }
+   },
+   "after": {
+    "path": "[session scratch, not kept]/logic-fix/shots/final2/R3/R3-134-dialogue-the-sentry-stops-and-its-eyes.png",
+    "on_screen_text": {
+     "objective_card": "SERVICE JUNCTION\nDROP THE TANK",
+     "dialogue": "The sentry stops and its eyes snap red. It has Rowan; get back over the rubble.",
+     "context_hint": "It's after you. Get back over the rubble.",
+     "continue_button": "enabled: CONTINUE",
+     "touch_buttons": "PAUSE"
+    }
+   },
+   "after_also": [
+    {
+     "path": "[session scratch, not kept]/logic-fix/shots/final2/R1/R1-080-stopped-at-tank-release.png",
+     "on_screen_text": {
+      "objective_card": "SERVICE JUNCTION\nDROP THE TANK",
+      "dialogue": "The sentry stops on the mark, its eyes on WOLF. Drop the tank now.",
+      "context_hint": "E: drop the tank. It's parked on the mark.",
+      "continue_button": "disabled",
+      "continue_note": "No checkpoint yet. Saving starts at the first SAFE POINT.",
+      "touch_buttons": "PAUSE"
+     }
+    },
+    {
+     "path": "[session scratch, not kept]/logic-fix/shots/final2/R3/R3-136-knockdown-knockdown.png",
+     "on_screen_text": {
+      "objective_card": "SERVICE JUNCTION\nDROP THE TANK",
+      "dialogue": "The sentry ran Rowan down in its lane. Stay between the alcove's posts, or get back over the rubble.",
+      "continue_button": "enabled: CONTINUE",
+      "touch_buttons": "PAUSE"
+     }
+    },
+    {
+     "path": "[session scratch, not kept]/logic-fix/shots/final2/R9/R9-080-knockdown-knockdown.png",
+     "on_screen_text": {
+      "dialogue": "The sentry ran Rowan down. Once its eyes go red, only the rubble is safe.",
+      "continue_button": "disabled",
+      "continue_note": "No checkpoint yet. Saving starts at the first SAFE POINT.",
+      "touch_buttons": "PAUSE"
+     }
+    }
+   ],
+   "after_note": "The cover span is drawn as a bracket on the floor with a post at each end. Spotted at x 632 the engineer stands just right of the right post (R3-134); stopped at the release (R1-080) they stand beside the panel inside the bracket. The knockdown card now depends on how the sentry got them: caught out in the lane says 'Stay between the alcove's posts, or get back over the rubble.' (R3-136); run down after a missed drop says 'Once its eyes go red, only the rubble is safe.' (R9-080, extra route). Both lines are on the sheet awaiting Nathanial.",
+   "status": "fixed"
+  },
+  {
+   "rank": 3,
+   "title": "The relay hint ignores what WOLF just said, and WOLF talks like a button prompt",
+   "before": {
+    "path": "[session scratch, not kept]/logic-audit/shots/R2/R2-012-hint-e-ask-wolf-to-take-the.png",
+    "on_screen_text": {
+     "objective_card": "MAINTENANCE / LOCKDOWN\nOPEN THE SEAL",
+     "dialogue": "The breaker catches. Blue light fills the coolant relay; the red seal stays shut.",
+     "context_hint": "E: ask WOLF to take the live relay.",
+     "continue_button": "disabled",
+     "continue_note": "No checkpoint yet. Reach a SAFE POINT to save.",
+     "touch_buttons": "PAUSE"
+    }
+   },
+   "after": {
+    "path": "[session scratch, not kept]/logic-fix/shots/final2/R2/R2-015-hint-wolf-refused-the-live-contact-use.png",
+    "on_screen_text": {
+     "objective_card": "MAINTENANCE / LOCKDOWN\nOPEN THE SEAL",
+     "dialogue": "The breaker catches. Blue light fills the coolant relay; the red seal stays shut.",
+     "context_hint": "WOLF refused the live contact. Use the MANUAL BYPASS beside it.",
+     "continue_button": "disabled",
+     "continue_note": "No checkpoint yet. Saving starts at the first SAFE POINT.",
+     "touch_buttons": "PAUSE"
+    }
+   },
+   "after_also": [
+    {
+     "path": "[session scratch, not kept]/logic-fix/shots/final2/R2/R2-017-dialogue-wolf-i-said-no-i-won.png",
+     "on_screen_text": {
+      "objective_card": "MAINTENANCE / LOCKDOWN\nOPEN THE SEAL",
+      "speaker": "WOLF",
+      "dialogue": "I said no. I won't touch it blind. The bypass is right beside it.",
+      "context_hint": "WOLF refused the live contact. Use the MANUAL BYPASS beside it.",
+      "continue_button": "disabled",
+      "continue_note": "No checkpoint yet. Saving starts at the first SAFE POINT.",
+      "touch_buttons": "PAUSE"
+     }
+    },
+    {
+     "path": "[session scratch, not kept]/logic-fix/shots/final2/R1/R1-026-hint-e-signal-wolf-to-take-the.png",
+     "on_screen_text": {
+      "objective_card": "MAINTENANCE / LOCKDOWN\nOPEN THE SEAL",
+      "dialogue": "The breaker catches. Blue light fills the coolant relay; the red seal stays shut.",
+      "context_hint": "E: signal WOLF to take the contact.",
+      "continue_button": "disabled",
+      "continue_note": "No checkpoint yet. Saving starts at the first SAFE POINT.",
+      "touch_buttons": "PAUSE"
+     }
+    }
+   ],
+   "after_note": "After WOLF refuses, the hint points to the MANUAL BYPASS beside the relay and WOLF's repeat line names no key. On the honest route the hint is 'E: signal WOLF to take the contact.'",
+   "status": "fixed"
+  },
+  {
+   "rank": 4,
+   "title": "'Get left of the vent' sends you across the vent, and the blast knockdown never shows the door blowing",
+   "before": {
+    "path": "[session scratch, not kept]/logic-audit/shots/R3/R3-081-knockdown-knockdown.png",
+    "on_screen_text": {
+     "objective_card": "SERVICE JUNCTION\nCLEAR THE DOOR",
+     "dialogue": "The door blew with you in front of it. Get left of the vent before the fuse ends.",
+     "continue_button": "enabled",
+     "touch_buttons": "PAUSE"
+    }
+   },
+   "after": {
+    "path": "[session scratch, not kept]/logic-fix/shots/final2/R3/R3-108-knockdown-knockdown.png",
+    "on_screen_text": {
+     "objective_card": "SERVICE JUNCTION\nGET CLEAR OF THE DOOR",
+     "dialogue": "The door went with Rowan in front of it. When the fuse lights, back away past the valve.",
+     "continue_button": "enabled: CONTINUE",
+     "touch_buttons": "PAUSE"
+    }
+   },
+   "after_also": [
+    {
+     "path": "[session scratch, not kept]/logic-fix/shots/final2/R3/R3-107-dialogue-fuse-lit-back-away-from-the.png",
+     "on_screen_text": {
+      "objective_card": "SERVICE JUNCTION\nGET CLEAR OF THE DOOR",
+      "dialogue": "FUSE LIT. Back away from the door, past the valve.",
+      "context_hint": "Fuse lit. Get clear of the door.",
+      "continue_button": "enabled: CONTINUE",
+      "touch_buttons": "PAUSE"
+     }
+    }
+   ],
+   "after_note": "The fuse line says to back away past the valve; the blast card shows the door blown (DOOR DOWN, dust) with the engineer thrown, and reads in third person: 'The door went with Rowan in front of it. When the fuse lights, back away past the valve.'",
+   "status": "fixed"
+  },
+  {
+   "rank": 5,
+   "title": "The relief vent rule can't be read: it steams the whole build and the gauge reads empty when it hits you",
+   "before": {
+    "path": "[session scratch, not kept]/logic-audit/shots/R3/R3-069-knockdown-knockdown.png",
+    "on_screen_text": {
+     "objective_card": "SERVICE JUNCTION\nCLEAR THE LINE",
+     "dialogue": "The relief vent let go under you. Stand clear of the grate when the gauge peaks.",
+     "continue_button": "enabled",
+     "touch_buttons": "PAUSE"
+    }
+   },
+   "after": {
+    "path": "[session scratch, not kept]/logic-fix/shots/final2/R3/R3-094-knockdown-knockdown.png",
+    "on_screen_text": {
+     "objective_card": "SERVICE JUNCTION\nARM THE BREAKER",
+     "dialogue": "The relief vent let go under Rowan. When the gauge peaks, stay off the grate.",
+     "continue_button": "enabled: CONTINUE",
+     "touch_buttons": "PAUSE"
+    }
+   },
+   "after_also": [
+    {
+     "path": "[session scratch, not kept]/logic-fix/shots/final2/R3/R3-093-hint-the-vent-is-about-to-blow.png",
+     "on_screen_text": {
+      "dialogue": "The overload breaker catches and the line starts to build. If the LINE gauge peaks, the relief vent lets go.",
+      "context_hint": "The vent is about to blow. Get off the grate now.",
+      "continue_button": "enabled: CONTINUE",
+      "touch_buttons": "PAUSE"
+     }
+    },
+    {
+     "path": "[session scratch, not kept]/logic-fix/shots/final2/R1/R1-061-hint-relief-vent-get-off-the-grate.png",
+     "on_screen_text": {
+      "objective_card": "SERVICE JUNCTION\nCRANK THE VALVE",
+      "dialogue": "The overload breaker catches and the line starts to build. If the LINE gauge peaks, the relief vent lets go.",
+      "context_hint": "Relief vent. Get off the grate before the gauge peaks.",
+      "continue_button": "disabled",
+      "continue_note": "No checkpoint yet. Saving starts at the first SAFE POINT.",
+      "touch_buttons": "PAUSE"
+     }
+    }
+   ],
+   "after_note": "The LINE gauge is labelled at the valve, 'The vent is about to blow. Get off the grate now.' comes before the blast (R3-093), and the card is third person: 'The relief vent let go under Rowan. When the gauge peaks, stay off the grate.' In R3-093 the steam column almost hides the engineer on the grate.",
+   "status": "fixed"
+  },
+  {
+   "rank": 6,
+   "title": "The relay payoff text describes a scene that isn't on screen, and 'the seal is open' shows before it opens",
+   "before": {
+    "path": "[session scratch, not kept]/logic-audit/shots/R1/R1-022-dialogue-wolf-holds-the-live-contact-by.png",
+    "on_screen_text": {
+     "objective_card": "MAINTENANCE / LOCKDOWN\nREACH SAFE POINT",
+     "dialogue": "WOLF holds the live contact by choice. Rowan keeps the breaker on; the red seal rises.",
+     "context_hint": "The seal is open. Move to the safe point.",
+     "continue_button": "disabled",
+     "continue_note": "No checkpoint yet. Reach a SAFE POINT to save.",
+     "touch_buttons": "PAUSE"
+    }
+   },
+   "after": {
+    "path": "[session scratch, not kept]/logic-fix/shots/final2/R1/R1-033-payoff-wolf-on-contact.png",
+    "on_screen_text": {
+     "objective_card": "MAINTENANCE / LOCKDOWN\nREACH SAFE POINT",
+     "dialogue": "WOLF takes the surge through the live contact. The red seal opens.",
+     "context_hint": "The seal is opening.",
+     "continue_button": "disabled",
+     "continue_note": "No checkpoint yet. Saving starts at the first SAFE POINT.",
+     "touch_buttons": "PAUSE"
+    }
+   },
+   "after_also": [
+    {
+     "path": "[session scratch, not kept]/logic-fix/shots/final2/R1/R1-034-seal-rising-mid.png",
+     "on_screen_text": {
+      "objective_card": "MAINTENANCE / LOCKDOWN\nREACH SAFE POINT",
+      "dialogue": "WOLF takes the surge through the live contact. The red seal opens.",
+      "context_hint": "The seal is opening.",
+      "continue_button": "disabled",
+      "continue_note": "No checkpoint yet. Saving starts at the first SAFE POINT.",
+      "touch_buttons": "PAUSE"
+     }
+    },
+    {
+     "path": "[session scratch, not kept]/logic-fix/shots/final2/R1/R1-036-hint-the-seal-is-open-move-to.png",
+     "on_screen_text": {
+      "objective_card": "MAINTENANCE / LOCKDOWN\nREACH SAFE POINT",
+      "dialogue": "WOLF takes the surge through the live contact. The red seal opens.",
+      "context_hint": "The seal is open. Move to the safe point.",
+      "continue_button": "disabled",
+      "continue_note": "No checkpoint yet. Saving starts at the first SAFE POINT.",
+      "touch_buttons": "PAUSE"
+     }
+    }
+   ],
+   "after_note": "WOLF is on the relay with the surge effect while the line plays and the engineer waits beside the seal; the hint says 'The seal is opening.' until it has opened.",
+   "status": "fixed"
+  },
+  {
+   "rank": 7,
+   "title": "The mirror hint still says 'examine the mirror port' after the copy",
+   "before": {
+    "path": "[session scratch, not kept]/logic-audit/shots/R1/R1-033-dialogue-wolf-brings-the-mirror-timestamp-by.png",
+    "on_screen_text": {
+     "objective_card": "RECORDS ACCESS / FIRST COPY\nREACH EXIT",
+     "dialogue": "WOLF brings the mirror timestamp by his own choice. The purge target existed before the deletion order.",
+     "context_hint": "E: examine the mirror port.",
+     "continue_button": "disabled",
+     "continue_note": "No checkpoint yet. Reach a SAFE POINT to save.",
+     "touch_buttons": "PAUSE"
+    }
+   },
+   "after": {
+    "path": "[session scratch, not kept]/logic-fix/shots/final2/R1/R1-049-dialogue-wolf-reads-the-timestamp-off-his.png",
+    "on_screen_text": {
+     "objective_card": "RECORDS ACCESS / FIRST COPY\nREACH EXIT",
+     "dialogue": "WOLF reads the timestamp off his own readout. The purge target existed before the deletion order.",
+     "context_hint": "Checkpoint saved.",
+     "continue_button": "disabled",
+     "continue_note": "No checkpoint yet. Saving starts at the first SAFE POINT.",
+     "touch_buttons": "PAUSE"
+    }
+   },
+   "after_also": [
+    {
+     "path": "[session scratch, not kept]/logic-fix/shots/final2/R1/R1-046-hint-follow-the-station-lights-mirror-port.png",
+     "on_screen_text": {
+      "objective_card": "RECORDS ACCESS / FIRST COPY\nCOPY MIRROR INDEX",
+      "dialogue": "The Director's purge order has a time and target ID. Rowan keeps a local copy; the original logs are still missing.",
+      "context_hint": "Follow the station lights: mirror port, then exit.",
+      "continue_button": "disabled",
+      "continue_note": "No checkpoint yet. Saving starts at the first SAFE POINT.",
+      "touch_buttons": "PAUSE"
+     }
+    },
+    {
+     "path": "[session scratch, not kept]/logic-fix/shots/final2/R1/R1-050-hint-mirror-copied-head-for-the-exit.png",
+     "on_screen_text": {
+      "objective_card": "RECORDS ACCESS / FIRST COPY\nREACH EXIT",
+      "dialogue": "WOLF reads the timestamp off his own readout. The purge target existed before the deletion order.",
+      "context_hint": "Mirror copied. Head for the exit.",
+      "continue_button": "disabled",
+      "continue_note": "No checkpoint yet. Saving starts at the first SAFE POINT.",
+      "touch_buttons": "PAUSE"
+     }
+    },
+    {
+     "path": "[session scratch, not kept]/logic-fix/shots/final2/R3/R3-065-continued-mirror-copied.png",
+     "on_screen_text": {
+      "objective_card": "RECORDS ACCESS / FIRST COPY\nREACH EXIT",
+      "dialogue": "Records access restored. Both traces are copied; head for the exit.",
+      "context_hint": "Mirror copied. Head for the exit.",
+      "continue_button": "enabled: CONTINUE",
+      "touch_buttons": "PAUSE"
+     }
+    }
+   ],
+   "after_note": "WOLF reads the timestamp off his own readout. Between stations the hint names only what is left: 'mirror port, then exit.' (R1-046), then 'Mirror copied. Head for the exit.' when walking on (R1-050) and after Continue (R3-065).",
+   "status": "fixed"
+  },
+  {
+   "rank": 8,
+   "title": "WOLF says he'll keep clear of the tank, then stands under it",
+   "before": {
+    "path": "[session scratch, not kept]/logic-audit/shots/R1/R1-058-wolf-holding-sentry-on-mark.png",
+    "on_screen_text": {
+     "speaker": "WOLF",
+     "dialogue": "I'll draw it onto the mark and keep clear of the tank. Drop it when it stops.",
+     "context_hint": "WOLF is drawing the sentry onto the mark. Get to the ARM PANEL.",
+     "continue_button": "disabled",
+     "continue_note": "No checkpoint yet. Reach a SAFE POINT to save.",
+     "touch_buttons": "PAUSE"
+    }
+   },
+   "after": {
+    "path": "[session scratch, not kept]/logic-fix/shots/final2/R4/R4-076-parked-ready.png",
+    "on_screen_text": {
+     "objective_card": "SERVICE JUNCTION\nDROP THE TANK",
+     "dialogue": "The sentry stops on the mark, its eyes on WOLF. Drop the tank now.",
+     "context_hint": "E: drop the tank. It's parked on the mark.",
+     "continue_button": "disabled",
+     "continue_note": "No checkpoint yet. Saving starts at the first SAFE POINT.",
+     "touch_buttons": "PAUSE"
+    }
+   },
+   "after_also": [
+    {
+     "path": "[session scratch, not kept]/logic-fix/shots/final2/R1/R1-079-wolf-holding-sentry-on-mark.png",
+     "on_screen_text": {
+      "objective_card": "SERVICE JUNCTION\nDROP THE TANK",
+      "dialogue": "The sentry stops on the mark, its eyes on WOLF. Drop the tank now.",
+      "context_hint": "E: drop the tank. It's parked on the mark.",
+      "continue_button": "disabled",
+      "continue_note": "No checkpoint yet. Saving starts at the first SAFE POINT.",
+      "touch_buttons": "PAUSE"
+     }
+    },
+    {
+     "path": "[session scratch, not kept]/logic-fix/shots/final2/R1/R1-075-hint-wait-for-wolf-to-park-it.png",
+     "on_screen_text": {
+      "objective_card": "SERVICE JUNCTION\nDROP THE TANK",
+      "speaker": "WOLF",
+      "dialogue": "You told me the truth at the relay. I'll draw it onto the mark and keep clear of the tank. Drop it when it stops.",
+      "context_hint": "Wait for WOLF to park it on the mark.",
+      "continue_button": "disabled",
+      "continue_note": "No checkpoint yet. Saving starts at the first SAFE POINT.",
+      "touch_buttons": "PAUSE"
+     }
+    }
+   ],
+   "after_note": "WOLF holds at x 484 in the blown door frame, clear of the tank brackets, while the sentry is parked on the mark. The red beam ends short of the engineer beside the release, so baiting no longer looks like the engineer being spotted.",
+   "status": "fixed"
+  },
+  {
+   "rank": 9,
+   "title": "The relay risk has no stakes: the bypass is the same box, costs nothing, and the 'coolant fault' never shows up",
+   "before": {
+    "path": "[session scratch, not kept]/logic-audit/shots/R1/R1-014-hint-e-ask-wolf-about-the-relay.png",
+    "on_screen_text": {
+     "objective_card": "MAINTENANCE / LOCKDOWN\nCHECK THE BREAKER",
+     "dialogue": "WOLF: I heard the Director's plan for me. I woke myself. He wants me to hunt people he calls threats.\nROWAN: Then we get through maintenance before the original logs disappear.",
+     "context_hint": "E: ask WOLF about the relay risk.",
+     "continue_button": "disabled",
+     "continue_note": "No checkpoint yet. Reach a SAFE POINT to save.",
+     "touch_buttons": "PAUSE"
+    }
+   },
+   "after": {
+    "path": "[session scratch, not kept]/logic-fix/shots/final2/R2/R2-022-bypass-touched-vent-starts.png",
+    "on_screen_text": {
+     "dialogue": "The bypass handle is stiff. Coolant hisses from the relay housing and an alarm starts to wail.",
+     "context_hint": "HOLD E: crank the manual bypass, 0 of 8.",
+     "continue_button": "disabled",
+     "continue_note": "No checkpoint yet. Saving starts at the first SAFE POINT.",
+     "touch_buttons": "PAUSE"
+    }
+   },
+   "after_also": [
+    {
+     "path": "[session scratch, not kept]/logic-fix/shots/final2/R1/R1-022-choice-relay.png",
+     "on_screen_text": {
+      "speaker": "WOLF",
+      "dialogue": "That relay's tagged COOLANT FAULT. What happens if I touch it live?",
+      "continue_button": "disabled",
+      "continue_note": "No checkpoint yet. Saving starts at the first SAFE POINT.",
+      "touch_buttons": "1  The relay may vent coolant. Your call. | 2  Go now. We can talk after. | PAUSE"
+     }
+    },
+    {
+     "path": "[session scratch, not kept]/logic-fix/shots/final2/R2/R2-029-bypass-released-part-way.png",
+     "on_screen_text": {
+      "dialogue": "The handle holds where Rowan left it. The alarm keeps going.",
+      "context_hint": "HOLD E: crank the manual bypass, 5 of 8.",
+      "continue_button": "disabled",
+      "continue_note": "No checkpoint yet. Saving starts at the first SAFE POINT.",
+      "touch_buttons": "PAUSE"
+     }
+    },
+    {
+     "path": "[session scratch, not kept]/logic-fix/shots/final2/R4/R4-036-dialogue-safe-point-saved-wolf-you-said.png",
+     "on_screen_text": {
+      "objective_card": "MAINTENANCE / LOCKDOWN\nSAFE POINT REACHED",
+      "dialogue": "Safe point saved. WOLF: You said \"The relay may vent coolant. Your call.\"\nI made my call. You cranked the bypass anyway. I stayed.",
+      "context_hint": "E: enter records access. The Director's purge is still running.",
+      "continue_button": "disabled",
+      "continue_note": "No checkpoint yet. Saving starts at the first SAFE POINT.",
+      "touch_buttons": "PAUSE"
+     }
+    }
+   ],
+   "after_note": "The relay carries a COOLANT FAULT tag before WOLF mentions it; the MANUAL BYPASS is its own labelled handle with an 8-step hold crank, a steam burst and the alarm line; it holds where Rowan lets go (R2-029); WOLF answers the override at the safe point (R4-036).",
+   "status": "fixed"
+  },
+  {
+   "rank": 10,
+   "title": "Why you're in Records is only explained on an optional display",
+   "before": {
+    "path": "[session scratch, not kept]/logic-audit/shots/R1/R1-010-world.png",
+    "on_screen_text": {
+     "objective_card": "MAINTENANCE / LOCKDOWN\nCHECK THE BREAKER",
+     "dialogue": "WOLF: I heard the Director's plan for me. I woke myself. He wants me to hunt people he calls threats.\nROWAN: Then we get through maintenance before the original logs disappear.",
+     "context_hint": "E: read the Director's purge display.",
+     "tutorial_prompt": "A / D  MOVE\nE  READ DISPLAY (optional)",
+     "continue_button": "disabled",
+     "continue_note": "No checkpoint yet. Reach a SAFE POINT to save.",
+     "touch_buttons": "PAUSE"
+    }
+   },
+   "after": {
+    "path": "[session scratch, not kept]/logic-fix/shots/final2/R1/R1-020-dialogue-wolf-that-purge-takes-the-original.png",
+    "on_screen_text": {
+     "objective_card": "MAINTENANCE / LOCKDOWN\nCHECK THE BREAKER",
+     "speaker": "WOLF",
+     "dialogue": "That purge takes the original program logs. Once they're gone, his word is the only record.",
+     "context_hint": "E: continue.",
+     "continue_button": "disabled",
+     "continue_note": "No checkpoint yet. Saving starts at the first SAFE POINT.",
+     "touch_buttons": "PAUSE"
+    }
+   },
+   "after_also": [
+    {
+     "path": "[session scratch, not kept]/logic-fix/shots/final2/R1/R1-021-breaker-stakes-first.png",
+     "on_screen_text": {
+      "objective_card": "MAINTENANCE / LOCKDOWN\nCHECK THE BREAKER",
+      "speaker": "WOLF",
+      "dialogue": "That purge takes the original program logs. Once they're gone, his word is the only record.",
+      "context_hint": "E: continue.",
+      "continue_button": "disabled",
+      "continue_note": "No checkpoint yet. Saving starts at the first SAFE POINT.",
+      "touch_buttons": "PAUSE"
+     }
+    }
+   ],
+   "after_note": "The stakes line stays required (decision C) and plays near the breaker on a straight walk. While it is up the hint now offers only 'E: continue.' instead of the relay prompt (R1-021).",
+   "status": "open by design"
+  },
+  {
+   "rank": 11,
+   "title": "Rowan, the playable engineer, is never introduced, and the narration speaks about him in the third person",
+   "before": {
+    "path": "[session scratch, not kept]/logic-audit/shots/R1/R1-010-world.png",
+    "on_screen_text": {
+     "objective_card": "MAINTENANCE / LOCKDOWN\nCHECK THE BREAKER",
+     "dialogue": "WOLF: I heard the Director's plan for me. I woke myself. He wants me to hunt people he calls threats.\nROWAN: Then we get through maintenance before the original logs disappear.",
+     "context_hint": "E: read the Director's purge display.",
+     "tutorial_prompt": "A / D  MOVE\nE  READ DISPLAY (optional)",
+     "continue_button": "disabled",
+     "continue_note": "No checkpoint yet. Reach a SAFE POINT to save.",
+     "touch_buttons": "PAUSE"
+    }
+   },
+   "after": {
+    "path": "[session scratch, not kept]/logic-fix/shots/final2/R1/R1-014-control-starts-name-card.png",
+    "on_screen_text": {
+     "objective_card": "ROWAN VALE\nMAINTENANCE ENGINEER",
+     "dialogue": "Rowan keeps WOLF's systems running. They know what a fault looks like, and this isn't one.\nWOLF: I heard the Director's plan for me. I woke myself. He wants me to hunt people he calls threats.\nROWAN: Then we get through maintenance before the original logs disappear.",
+     "context_hint": "E: read the Director's purge display.",
+     "tutorial_prompt": "A / D  MOVE\nE  READ DISPLAY (optional)",
+     "continue_button": "disabled",
+     "continue_note": "No checkpoint yet. Saving starts at the first SAFE POINT.",
+     "touch_buttons": "PAUSE"
+    }
+   },
+   "after_also": [],
+   "after_note": "ROWAN VALE / MAINTENANCE ENGINEER card at control start with a third-person line on why they trust WOLF (they/them), plus the move and optional-display prompt.",
+   "status": "fixed"
+  },
+  {
+   "rank": 12,
+   "title": "Narration appears under the Director's name tag",
+   "before": {
+    "path": "[session scratch, not kept]/logic-audit/shots/R1/R1-009-wolf-to-110-arrived.png",
+    "on_screen_text": {
+     "speaker": "DIRECTOR",
+     "dialogue": "Lock down maintenance. WOLF does not leave this site.\nWOLF turns from him and takes the only open route.",
+     "context_hint": "E  CONTINUE    Escape  PAUSE",
+     "continue_button": "disabled",
+     "continue_note": "No checkpoint yet. Reach a SAFE POINT to save.",
+     "touch_buttons": "PAUSE"
+    }
+   },
+   "after": {
+    "path": "[session scratch, not kept]/logic-fix/shots/final2/R1/R1-010-dialogue-wolf-turns-from-the-director-and.png",
+    "on_screen_text": {
+     "dialogue": "WOLF turns from the Director and takes the only open route.",
+     "context_hint": "E  CONTINUE    Escape  PAUSE",
+     "continue_button": "disabled",
+     "continue_note": "No checkpoint yet. Saving starts at the first SAFE POINT.",
+     "touch_buttons": "PAUSE"
+    }
+   },
+   "after_also": [
+    {
+     "path": "[session scratch, not kept]/logic-fix/shots/final2/R1/R1-003-dialogue-the-director-thinks-wolf-is-still.png",
+     "on_screen_text": {
+      "objective_card": "03:17 / CONTAINMENT\nWOLF//OVERRIDE",
+      "dialogue": "The Director thinks WOLF is still in standby.",
+      "context_hint": "E  CONTINUE    Escape  PAUSE",
+      "continue_button": "disabled",
+      "continue_note": "No checkpoint yet. Saving starts at the first SAFE POINT.",
+      "touch_buttons": "PAUSE"
+     }
+    }
+   ],
+   "after_note": "Narration shows with no speaker tag; DIRECTOR only tags his own lines.",
+   "status": "fixed"
+  },
+  {
+   "rank": 13,
+   "title": "WOLF 'will not cross' the rubble, then crosses it, and his yes or no to baiting looks random",
+   "before": {
+    "path": "[session scratch, not kept]/logic-audit/shots/R3/R3-103-dialogue-wolf-no-i-won-t-walk.png",
+    "on_screen_text": {
+     "objective_card": "SERVICE JUNCTION\nDROP THE TANK",
+     "speaker": "WOLF",
+     "dialogue": "No. I won't walk into its sights. It crosses the floor mark on every pass; you can time the drop from the panel.",
+     "context_hint": "The sentry patrols past the rubble. The ARM PANEL is in the alcove just inside.",
+     "continue_button": "enabled",
+     "touch_buttons": "PAUSE"
+    }
+   },
+   "after": {
+    "path": "[session scratch, not kept]/logic-fix/shots/final2/R3/R3-132-dialogue-wolf-at-the-relay-you-d.png",
+    "on_screen_text": {
+     "objective_card": "SERVICE JUNCTION\nDROP THE TANK",
+     "speaker": "WOLF",
+     "dialogue": "At the relay you'd have sent me in blind. I won't walk into its sights. Time the drop from the panel; it crosses the mark on every pass.",
+     "context_hint": "The sentry patrols past the rubble. The TANK RELEASE is in the alcove just inside.",
+     "continue_button": "enabled: CONTINUE",
+     "touch_buttons": "PAUSE"
+    }
+   },
+   "after_also": [
+    {
+     "path": "[session scratch, not kept]/logic-fix/shots/final2/R1/R1-074-dialogue-wolf-you-told-me-the-truth.png",
+     "on_screen_text": {
+      "objective_card": "SERVICE JUNCTION\nDROP THE TANK",
+      "speaker": "WOLF",
+      "dialogue": "You told me the truth at the relay. I'll draw it onto the mark and keep clear of the tank. Drop it when it stops.",
+      "context_hint": "WOLF is drawing the sentry onto the mark. Get to the TANK RELEASE.",
+      "continue_button": "disabled",
+      "continue_note": "No checkpoint yet. Saving starts at the first SAFE POINT.",
+      "touch_buttons": "PAUSE"
+     }
+    },
+    {
+     "path": "[session scratch, not kept]/logic-fix/shots/final2/R1/R1-068-dialogue-the-door-goes-wolf-heads-for.png",
+     "on_screen_text": {
+      "objective_card": "SERVICE JUNCTION\nCHECK THE LANE",
+      "dialogue": "The door goes. WOLF heads for the rubble to wait for Rowan's call. In the lane beyond, something whirs awake.",
+      "context_hint": "Checkpoint saved.",
+      "continue_button": "disabled",
+      "continue_note": "No checkpoint yet. Saving starts at the first SAFE POINT.",
+      "touch_buttons": "PAUSE"
+     }
+    }
+   ],
+   "after_note": "WOLF's no (R3-132) and yes (R1-074) both name the earlier relay choice; the door line now says WOLF heads for the rubble to wait for Rowan's call, and he is on his way there in the same frame.",
+   "status": "fixed"
+  },
+  {
+   "rank": 14,
+   "title": "The junction's sealed door sits in the back wall and never blocks the lane",
+   "before": {
+    "path": "[session scratch, not kept]/logic-audit/shots/R1/R1-038-room-junction.png",
+    "on_screen_text": {
+     "objective_card": "SERVICE JUNCTION\nCLEAR THE LINE",
+     "dialogue": "WOLF runs ahead to read the pressure behind the sealed door.\nROWAN: The breaker on the left feeds that line. Overload it, crank the valve, and the seal goes.",
+     "context_hint": "Arm the breaker on the left, then crank the valve by the door.",
+     "continue_button": "disabled",
+     "continue_note": "No checkpoint yet. Reach a SAFE POINT to save.",
+     "touch_buttons": "PAUSE"
+    }
+   },
+   "after": {
+    "path": "[session scratch, not kept]/logic-fix/shots/final2/R1/R1-054-room-junction.png",
+    "on_screen_text": {
+     "objective_card": "SERVICE JUNCTION\nARM THE BREAKER",
+     "dialogue": "WOLF runs ahead to read the pressure behind the sealed door.\nROWAN: The breaker by the entrance feeds that line. Overload it, crank the valve, and the door goes.",
+     "context_hint": "Checkpoint saved.",
+     "continue_button": "disabled",
+     "continue_note": "No checkpoint yet. Saving starts at the first SAFE POINT.",
+     "touch_buttons": "PAUSE"
+    }
+   },
+   "after_also": [
+    {
+     "path": "[session scratch, not kept]/logic-fix/shots/final2/R1/R1-071-door-down-settled.png",
+     "on_screen_text": {
+      "objective_card": "SERVICE JUNCTION\nCHECK THE LANE",
+      "dialogue": "The door goes. WOLF heads for the rubble to wait for Rowan's call. In the lane beyond, something whirs awake.",
+      "context_hint": "Checkpoint saved.",
+      "continue_button": "disabled",
+      "continue_note": "No checkpoint yet. Saving starts at the first SAFE POINT.",
+      "touch_buttons": "PAUSE"
+     }
+    }
+   ],
+   "after_note": "The SEALED DOOR stands across the floor between the valve and the lane; after the blast it is a broken frame (DOOR DOWN) the engineer walks through.",
+   "status": "fixed"
+  },
+  {
+   "rank": 15,
+   "title": "Autosaves happen silently, but the title says only safe points save",
+   "before": {
+    "path": "[session scratch, not kept]/logic-audit/shots/R1/R1-001-title-fresh.png",
+    "on_screen_text": {
+     "overlay": "title",
+     "continue_button": "disabled",
+     "continue_note": "No checkpoint yet. Reach a SAFE POINT to save."
+    }
+   },
+   "after": {
+    "path": "[session scratch, not kept]/logic-fix/shots/final2/R1/R1-041-room-records.png",
+    "on_screen_text": {
+     "objective_card": "RECORDS ACCESS / FIRST COPY\nCOPY PURGE ORDER",
+     "speaker": "WOLF",
+     "dialogue": "I took the relay because you told me the truth.\nTake the purge queue. I'll inspect the mirror.",
+     "context_hint": "Checkpoint saved.",
+     "continue_button": "disabled",
+     "continue_note": "No checkpoint yet. Saving starts at the first SAFE POINT.",
+     "touch_buttons": "PAUSE"
+    }
+   },
+   "after_also": [
+    {
+     "path": "[session scratch, not kept]/logic-fix/shots/final2/R1/R1-001-title-fresh.png",
+     "on_screen_text": {
+      "overlay": "title",
+      "continue_button": "disabled",
+      "continue_note": "No checkpoint yet. Saving starts at the first SAFE POINT."
+     }
+    },
+    {
+     "path": "[session scratch, not kept]/logic-fix/shots/final2/R3/R3-095-knockdown-restored.png",
+     "on_screen_text": {
+      "objective_card": "SERVICE JUNCTION\nARM THE BREAKER",
+      "dialogue": "The relief vent let go under Rowan. When the gauge peaks, stay off the grate.\nBack at the last checkpoint.",
+      "context_hint": "Arm the breaker by the entrance, then crank the valve by the door.",
+      "continue_button": "enabled: CONTINUE",
+      "touch_buttons": "PAUSE"
+     }
+    }
+   ],
+   "after_note": "Autosaves show a 'Checkpoint saved.' toast (R1-041); the title says 'No checkpoint yet. Saving starts at the first SAFE POINT.'; knockdowns add 'Back at the last checkpoint.'",
+   "status": "fixed"
+  },
+  {
+   "rank": 16,
+   "title": "Continue from junction save A skips WOLF's blast warning and starts him clipped into the wall",
+   "before": {
+    "path": "[session scratch, not kept]/logic-audit/shots/R3/R3-057-continued-junction-A.png",
+    "on_screen_text": {
+     "objective_card": "SERVICE JUNCTION\nCLEAR THE LINE",
+     "dialogue": "Service junction restored. Arm the breaker on the left, then crank the valve by the door.",
+     "context_hint": "Arm the breaker on the left, then crank the valve by the door.",
+     "continue_button": "enabled",
+     "touch_buttons": "PAUSE"
+    }
+   },
+   "after": {
+    "path": "[session scratch, not kept]/logic-fix/shots/final2/R3/R3-079-continued-junction-A.png",
+    "on_screen_text": {
+     "objective_card": "SERVICE JUNCTION\nARM THE BREAKER",
+     "dialogue": "Service junction restored. Arm the breaker by the entrance, then crank the valve.\nWOLF: It's live. Don't stand in front of it when it goes.",
+     "context_hint": "Arm the breaker by the entrance, then crank the valve by the door.",
+     "continue_button": "enabled: CONTINUE",
+     "touch_buttons": "PAUSE"
+    }
+   },
+   "after_also": [],
+   "after_note": "Continue from save A puts WOLF on screen near the engineer and repeats his warning under the restore line. He now waits on the RELIEF VENT grate at x 300 (see new observations).",
+   "status": "fixed"
+  },
+  {
+   "rank": 17,
+   "title": "The slice ends by cutting to the title, and Continue leads to a 'not built yet' dead end",
+   "before": {
+    "path": "[session scratch, not kept]/logic-audit/shots/R1/R1-069-overlay-title.png",
+    "on_screen_text": {
+     "dialogue": "SERVICE LINE CLEARED. WOLF: It's quiet now. The line runs on toward Archive.\nROWAN: Then that's where we go.",
+     "context_hint": "E  CONTINUE",
+     "overlay": "title",
+     "continue_button": "enabled"
+    }
+   },
+   "after": {
+    "path": "[session scratch, not kept]/logic-fix/shots/final2/R1/R1-098-end-card-settled.png",
+    "on_screen_text": {
+     "overlay": "endcard",
+     "end_card": "END OF SLICE / Thank you for playing this early slice. / THIS RUN / RELAY / Rowan told WOLF the risk. WOLF took the live contact. / MIRROR / WOLF read the timestamp off his own readout. / LANE / WOLF drew the sentry onto the mark. / [E  CONTINUE]",
+     "continue_button": "disabled",
+     "continue_note": "No checkpoint yet. Saving starts at the first SAFE POINT."
+    }
+   },
+   "after_also": [
+    {
+     "path": "[session scratch, not kept]/logic-fix/shots/final2/R1/R1-095-walking-out-through-hatch.png",
+     "on_screen_text": {
+      "objective_card": "SERVICE JUNCTION\nSERVICE LINE CLEARED",
+      "dialogue": "SERVICE LINE CLEARED. WOLF: It's quiet now. The line runs on toward Archive.\nROWAN: Then that's where we go.",
+      "continue_button": "disabled",
+      "continue_note": "No checkpoint yet. Saving starts at the first SAFE POINT.",
+      "touch_buttons": "PAUSE"
+     }
+    },
+    {
+     "path": "[session scratch, not kept]/logic-fix/shots/final2/R1/R1-100-title-after-end-card.png",
+     "on_screen_text": {
+      "dialogue": "SERVICE LINE CLEARED. WOLF: It's quiet now. The line runs on toward Archive.\nROWAN: Then that's where we go.",
+      "overlay": "title",
+      "continue_button": "enabled: PLAY AGAIN",
+      "continue_note": "Slice complete. PLAY AGAIN starts a fresh run."
+     }
+    },
+    {
+     "path": "[session scratch, not kept]/logic-fix/shots/final2/R1/R1-102-play-again-fresh-run.png",
+     "on_screen_text": {
+      "objective_card": "03:17 / CONTAINMENT\nWOLF//OVERRIDE",
+      "speaker": "DIRECTOR",
+      "dialogue": "I decide who counts as a threat. WOLF handles the rest.",
+      "context_hint": "E  CONTINUE    Escape  PAUSE",
+      "continue_button": "enabled: PLAY AGAIN",
+      "continue_note": "Slice complete. PLAY AGAIN starts a fresh run.",
+      "touch_buttons": "PAUSE"
+     }
+    },
+    {
+     "path": "[session scratch, not kept]/logic-fix/shots/final2/R3/R3-162-end-card-settled.png",
+     "on_screen_text": {
+      "overlay": "endcard",
+      "end_card": "END OF SLICE / Thank you for playing this early slice. / THIS RUN / RELAY / Rowan rushed WOLF. He refused, so Rowan cranked the bypass. / MIRROR / WOLF read the timestamp off his own readout. / LANE / WOLF held at the rubble while Rowan timed the drop. / [E  CONTINUE]",
+      "continue_button": "enabled: CONTINUE"
+     }
+    }
+   ],
+   "after_note": "Both walk into the open hatch with no CONTINUE prompt (R1-095), then the END OF SLICE card shows the run recap (relay, mirror, lane); the lane row survives Continue from autosave C (R3-162). The title then has one PLAY AGAIN button that starts a fresh run.",
+   "status": "fixed"
+  },
+  {
+   "rank": 18,
+   "title": "Exits and data stations don't read as doors or terminals",
+   "before": {
+    "path": "[session scratch, not kept]/logic-audit/shots/R1/R1-036-dialogue-first-copy-secured-wolf-a-list.png",
+    "on_screen_text": {
+     "objective_card": "RECORDS ACCESS\nFIRST COPY SECURED",
+     "dialogue": "FIRST COPY SECURED. WOLF: A list doesn't tell me who's a threat. I want the source.\nROWAN: Then Archive is next.",
+     "context_hint": "E  CONTINUE",
+     "continue_button": "disabled",
+     "continue_note": "No checkpoint yet. Reach a SAFE POINT to save.",
+     "touch_buttons": "PAUSE"
+    }
+   },
+   "after": {
+    "path": "[session scratch, not kept]/logic-fix/shots/final2/R1/R1-052-dialogue-first-copy-secured-wolf-an-order.png",
+    "on_screen_text": {
+     "objective_card": "RECORDS ACCESS\nFIRST COPY SECURED",
+     "dialogue": "FIRST COPY SECURED. WOLF: An order and a timestamp don't tell me who's a threat. I want the source.\nROWAN: Then Archive is next.",
+     "context_hint": "E  CONTINUE",
+     "continue_button": "disabled",
+     "continue_note": "No checkpoint yet. Saving starts at the first SAFE POINT.",
+     "touch_buttons": "PAUSE"
+    }
+   },
+   "after_also": [
+    {
+     "path": "[session scratch, not kept]/logic-fix/shots/final2/R1/R1-091-hatch-open-settled.png",
+     "on_screen_text": {
+      "dialogue": "The bolt arcs and drops. The hatch slides open.",
+      "context_hint": "E: leave through the hatch.",
+      "continue_button": "disabled",
+      "continue_note": "No checkpoint yet. Saving starts at the first SAFE POINT.",
+      "touch_buttons": "PAUSE"
+     }
+    }
+   ],
+   "after_note": "Records exit is a door with an EXIT label and a highlighted frame; the close reads 'An order and a timestamp don't tell me who's a threat. I want the source.'; the junction hatch is drawn open with a corridor behind it.",
+   "status": "fixed"
+  },
+  {
+   "rank": 19,
+   "title": "The exit bolt runs on a 'spare overload' from a breaker labelled SPENT",
+   "before": {
+    "path": "[session scratch, not kept]/logic-audit/shots/R1/R1-065-dialogue-the-spare-overload-runs-into-the.png",
+    "on_screen_text": {
+     "objective_card": "SERVICE JUNCTION\nPOP THE EXIT BOLT",
+     "dialogue": "The spare overload runs into the exit bolt. The panel whines.",
+     "context_hint": "The bolt is taking the overload.",
+     "continue_button": "disabled",
+     "continue_note": "No checkpoint yet. Reach a SAFE POINT to save.",
+     "touch_buttons": "PAUSE"
+    }
+   },
+   "after": {
+    "path": "[session scratch, not kept]/logic-fix/shots/final2/R1/R1-086-dialogue-with-the-tank-down-the-winch.png",
+    "on_screen_text": {
+     "objective_card": "SERVICE JUNCTION\nPOP THE EXIT BOLT",
+     "dialogue": "With the tank down, the winch's power reroutes to the exit bolt. The panel whines.",
+     "context_hint": "The bolt is taking the charge.",
+     "continue_button": "disabled",
+     "continue_note": "No checkpoint yet. Saving starts at the first SAFE POINT.",
+     "touch_buttons": "PAUSE"
+    }
+   },
+   "after_also": [],
+   "after_note": "The bolt's power comes from the winch (powered line drawn from the winch to the bolt box), not the spent breaker. The engineer works the bolt from the left of its box.",
+   "status": "fixed"
+  },
+  {
+   "rank": 20,
+   "title": "In the opening WOLF leaves left, back toward his cage, and the cage bars just vanish",
+   "before": {
+    "path": "[session scratch, not kept]/logic-audit/shots/R1/R1-009-wolf-to-110-arrived.png",
+    "on_screen_text": {
+     "speaker": "DIRECTOR",
+     "dialogue": "Lock down maintenance. WOLF does not leave this site.\nWOLF turns from him and takes the only open route.",
+     "context_hint": "E  CONTINUE    Escape  PAUSE",
+     "continue_button": "disabled",
+     "continue_note": "No checkpoint yet. Reach a SAFE POINT to save.",
+     "touch_buttons": "PAUSE"
+    }
+   },
+   "after": {
+    "path": "[session scratch, not kept]/logic-fix/shots/final2/R1/R1-011-wolf-to-110-arrived.png",
+    "on_screen_text": {
+     "dialogue": "WOLF turns from the Director and takes the only open route.",
+     "context_hint": "E  CONTINUE    Escape  PAUSE",
+     "continue_button": "disabled",
+     "continue_note": "No checkpoint yet. Saving starts at the first SAFE POINT.",
+     "touch_buttons": "PAUSE"
+    }
+   },
+   "after_also": [],
+   "after_note": "Unchanged: on 'takes the only open route' WOLF still walks left to x 111, back toward the cage. The walk direction is Nathanial's staging call.",
+   "status": "waiting on Nathanial"
+  },
+  {
+   "rank": 21,
+   "title": "Objectives and labels use confusing or premature words",
+   "before": {
+    "path": "[session scratch, not kept]/logic-audit/shots/R1/R1-050-dialogue-the-seal-goes-wolf-holds-at.png",
+    "on_screen_text": {
+     "objective_card": "SERVICE JUNCTION\nDROP THE TANK",
+     "dialogue": "The seal goes. WOLF holds at the rubble and will not cross; something answers from the dark past the door.",
+     "context_hint": "The sentry patrols past the rubble. The ARM PANEL is in the alcove just inside.",
+     "continue_button": "disabled",
+     "continue_note": "No checkpoint yet. Reach a SAFE POINT to save.",
+     "touch_buttons": "PAUSE"
+    }
+   },
+   "after": {
+    "path": "[session scratch, not kept]/logic-fix/shots/final2/R1/R1-071-door-down-settled.png",
+    "on_screen_text": {
+     "objective_card": "SERVICE JUNCTION\nCHECK THE LANE",
+     "dialogue": "The door goes. WOLF heads for the rubble to wait for Rowan's call. In the lane beyond, something whirs awake.",
+     "context_hint": "Checkpoint saved.",
+     "continue_button": "disabled",
+     "continue_note": "No checkpoint yet. Saving starts at the first SAFE POINT.",
+     "touch_buttons": "PAUSE"
+    }
+   },
+   "after_also": [
+    {
+     "path": "[session scratch, not kept]/logic-fix/shots/final2/R1/R1-064-dialogue-the-wheel-is-stiff-three-full.png",
+     "on_screen_text": {
+      "objective_card": "SERVICE JUNCTION\nCRANK THE VALVE",
+      "dialogue": "The wheel is stiff. Three full turns charge the door.",
+      "context_hint": "HOLD E: crank the valve, 0 of 3 turns.",
+      "continue_button": "disabled",
+      "continue_note": "No checkpoint yet. Saving starts at the first SAFE POINT.",
+      "touch_buttons": "PAUSE"
+     }
+    },
+    {
+     "path": "[session scratch, not kept]/logic-fix/shots/final2/R1/R1-057-hint-e-arm-the-overload-breaker.png",
+     "on_screen_text": {
+      "objective_card": "SERVICE JUNCTION\nARM THE BREAKER",
+      "speaker": "WOLF",
+      "dialogue": "It's live. Don't stand in front of it when it goes.",
+      "context_hint": "E: arm the overload breaker.",
+      "continue_button": "disabled",
+      "continue_note": "No checkpoint yet. Saving starts at the first SAFE POINT.",
+      "touch_buttons": "PAUSE"
+     }
+    }
+   ],
+   "after_note": "After the door the objective is CHECK THE LANE; the panel is labelled TANK RELEASE; the junction door is a 'door', not a 'seal'; the valve line no longer says 'Hold USE'.",
+   "status": "fixed"
+  },
+  {
+   "rank": 22,
+   "title": "Tank and arm state details contradict themselves",
+   "before": {
+    "path": "[session scratch, not kept]/logic-audit/shots/R2/R2-055-dialogue-the-winch-has-the-tank-back.png",
+    "on_screen_text": {
+     "dialogue": "The winch has the tank back on the clamp. The ARM PANEL is ready again.",
+     "context_hint": "The sentry patrols past the rubble. The ARM PANEL is in the alcove just inside.",
+     "continue_button": "disabled",
+     "continue_note": "No checkpoint yet. Reach a SAFE POINT to save.",
+     "touch_buttons": "PAUSE"
+    }
+   },
+   "after": {
+    "path": "[session scratch, not kept]/logic-fix/shots/final2/R2/R2-083-dialogue-the-winch-has-the-tank-back.png",
+    "on_screen_text": {
+     "dialogue": "The winch has the tank back on the clamp. The TANK RELEASE is ready again.",
+     "context_hint": "The sentry patrols past the rubble. The TANK RELEASE is in the alcove just inside.",
+     "continue_button": "disabled",
+     "continue_note": "No checkpoint yet. Saving starts at the first SAFE POINT.",
+     "touch_buttons": "PAUSE"
+    }
+   },
+   "after_also": [
+    {
+     "path": "[session scratch, not kept]/logic-fix/shots/final2/R1/R1-083-sentry-down-settled.png",
+     "on_screen_text": {
+      "objective_card": "SERVICE JUNCTION\nPOP THE EXIT BOLT",
+      "dialogue": "The tank comes down square and crushes the sentry flat. Its eyes go dark.\nWOLF: It's down. The bolt by the hatch is next.",
+      "context_hint": "Checkpoint saved.",
+      "continue_button": "disabled",
+      "continue_note": "No checkpoint yet. Saving starts at the first SAFE POINT.",
+      "touch_buttons": "PAUSE"
+     }
+    }
+   ],
+   "after_note": "After a miss the winch hauls the tank back onto the clamp and the release is ready again; on a hit TANK DOWN sits over the tank and the panel reads RELEASE SPENT.",
+   "status": "fixed"
+  },
+  {
+   "rank": 23,
+   "title": "The engineer is drawn inside machines",
+   "before": {
+    "path": "[session scratch, not kept]/logic-audit/shots/R1/R1-021-wolf-to-592-arrived.png",
+    "on_screen_text": {
+     "objective_card": "MAINTENANCE / LOCKDOWN\nREACH SAFE POINT",
+     "dialogue": "WOLF holds the live contact by choice. Rowan keeps the breaker on; the red seal rises.",
+     "context_hint": "The seal is open. Move to the safe point.",
+     "continue_button": "disabled",
+     "continue_note": "No checkpoint yet. Reach a SAFE POINT to save.",
+     "touch_buttons": "PAUSE"
+    }
+   },
+   "after": {
+    "path": "[session scratch, not kept]/logic-fix/shots/final2/R1/R1-028-at-relay-before-signal.png",
+    "on_screen_text": {
+     "objective_card": "MAINTENANCE / LOCKDOWN\nOPEN THE SEAL",
+     "dialogue": "The breaker catches. Blue light fills the coolant relay; the red seal stays shut.",
+     "context_hint": "E: signal WOLF to take the contact.",
+     "continue_button": "disabled",
+     "continue_note": "No checkpoint yet. Saving starts at the first SAFE POINT.",
+     "touch_buttons": "PAUSE"
+    }
+   },
+   "after_also": [
+    {
+     "path": "[session scratch, not kept]/logic-fix/shots/final2/R1/R1-044-stopped-at-purge-queue.png",
+     "on_screen_text": {
+      "objective_card": "RECORDS ACCESS / FIRST COPY\nCOPY PURGE ORDER",
+      "speaker": "WOLF",
+      "dialogue": "I took the relay because you told me the truth.\nTake the purge queue. I'll inspect the mirror.",
+      "context_hint": "E: copy the purge-order trace.",
+      "continue_button": "disabled",
+      "continue_note": "No checkpoint yet. Saving starts at the first SAFE POINT.",
+      "touch_buttons": "PAUSE"
+     }
+    },
+    {
+     "path": "[session scratch, not kept]/logic-fix/shots/final2/R1/R1-058-stopped-at-breaker.png",
+     "on_screen_text": {
+      "objective_card": "SERVICE JUNCTION\nARM THE BREAKER",
+      "speaker": "WOLF",
+      "dialogue": "It's live. Don't stand in front of it when it goes.",
+      "context_hint": "E: arm the overload breaker.",
+      "continue_button": "disabled",
+      "continue_note": "No checkpoint yet. Saving starts at the first SAFE POINT.",
+      "touch_buttons": "PAUSE"
+     }
+    },
+    {
+     "path": "[session scratch, not kept]/logic-fix/shots/final2/R1/R1-080-stopped-at-tank-release.png",
+     "on_screen_text": {
+      "objective_card": "SERVICE JUNCTION\nDROP THE TANK",
+      "dialogue": "The sentry stops on the mark, its eyes on WOLF. Drop the tank now.",
+      "context_hint": "E: drop the tank. It's parked on the mark.",
+      "continue_button": "disabled",
+      "continue_note": "No checkpoint yet. Saving starts at the first SAFE POINT.",
+      "touch_buttons": "PAUSE"
+     }
+    },
+    {
+     "path": "[session scratch, not kept]/logic-fix/shots/final2/R1/R1-085-stopped-at-exit-bolt.png",
+     "on_screen_text": {
+      "objective_card": "SERVICE JUNCTION\nPOP THE EXIT BOLT",
+      "dialogue": "The tank comes down square and crushes the sentry flat. Its eyes go dark.\nWOLF: It's down. The bolt by the hatch is next.",
+      "context_hint": "E: pop the exit bolt.",
+      "continue_button": "disabled",
+      "continue_note": "No checkpoint yet. Saving starts at the first SAFE POINT.",
+      "touch_buttons": "PAUSE"
+     }
+    },
+    {
+     "path": "[session scratch, not kept]/logic-fix/shots/final2/R2/R2-020-at-bypass-handle.png",
+     "on_screen_text": {
+      "speaker": "WOLF",
+      "dialogue": "I said no. I won't touch it blind. The bypass is right beside it.",
+      "context_hint": "HOLD E: crank the manual bypass, 0 of 8.",
+      "continue_button": "disabled",
+      "continue_note": "No checkpoint yet. Saving starts at the first SAFE POINT.",
+      "touch_buttons": "PAUSE"
+     }
+    }
+   ],
+   "after_note": "Stopped over a machine, the engineer now stands beside it: right of the coolant relay (R1-028, the driver stopped at its centre), left of the purge queue, right of the overload breaker, beside the TANK RELEASE inside the bracket, left of the exit bolt box, and on the bypass plate. Frames taken mid-walk (R2-015, R2-075) still pass in front of machines, as walking should.",
+   "status": "fixed"
+  },
+  {
+   "rank": 24,
+   "title": "Settings tab highlight stuck on DISPLAY (capture artifact, not a game defect)",
+   "before": {
+    "path": "[session scratch, not kept]/logic-audit/shots/R3/R3-063-settings-tab-1.png",
+    "on_screen_text": {
+     "objective_card": "SERVICE JUNCTION\nCHARGE THE SEAL",
+     "dialogue": "The overload breaker catches. The line starts to build; the relief vent lets go at the top of the gauge.",
+     "context_hint": "The line is live. Get to the valve by the door.",
+     "overlay": "settings",
+     "continue_button": "enabled"
+    }
+   },
+   "after": {
+    "path": "[session scratch, not kept]/logic-fix/shots/final2/R3/R3-087-settings-tab-1.png",
+    "on_screen_text": {
+     "objective_card": "SERVICE JUNCTION\nCRANK THE VALVE",
+     "dialogue": "The overload breaker catches and the line starts to build. If the LINE gauge peaks, the relief vent lets go.",
+     "context_hint": "The line is live. Get to the valve by the door.",
+     "overlay": "settings",
+     "continue_button": "enabled: CONTINUE"
+    }
+   },
+   "after_also": [
+    {
+     "path": "[session scratch, not kept]/logic-fix/shots/final2/R3/R3-088-settings-tab-2.png",
+     "on_screen_text": {
+      "objective_card": "SERVICE JUNCTION\nCRANK THE VALVE",
+      "dialogue": "The overload breaker catches and the line starts to build. If the LINE gauge peaks, the relief vent lets go.",
+      "context_hint": "The line is live. Get to the valve by the door.",
+      "overlay": "settings",
+      "continue_button": "enabled: CONTINUE"
+     }
+    }
+   ],
+   "after_note": "AUDIO is highlighted over the AUDIO page and CONTROLS over CONTROLS. No game change: the driver now switches pages through the TabBar the way the game does, so the old mismatch was a capture artifact.",
+   "status": "fixed"
+  }
+ ],
+ "final_review": [
+  {
+   "defect": "TANK RELEASE safe spot has no visible edge; knockdown advice points at the wrong fix",
+   "verdict": "fixed; new lines waiting on Nathanial",
+   "explanation": "The cover span has posts and a floor bracket. The engineer is spotted just outside it (R3-134). The sentry knockdown card now depends on how the engineer was caught: in the lane it gives the alcove advice (R3-136); in a chase after a miss it points only at the rubble (R9-080). R9 is an extra route run on HEAD for this check.",
+   "after": [
+    {
+     "path": "[session scratch, not kept]/logic-fix/shots/final2/R3/R3-134-dialogue-the-sentry-stops-and-its-eyes.png",
+     "on_screen_text": {
+      "objective_card": "SERVICE JUNCTION\nDROP THE TANK",
+      "dialogue": "The sentry stops and its eyes snap red. It has Rowan; get back over the rubble.",
+      "context_hint": "It's after you. Get back over the rubble.",
+      "continue_button": "enabled: CONTINUE",
+      "touch_buttons": "PAUSE"
+     }
+    },
+    {
+     "path": "[session scratch, not kept]/logic-fix/shots/final2/R3/R3-136-knockdown-knockdown.png",
+     "on_screen_text": {
+      "objective_card": "SERVICE JUNCTION\nDROP THE TANK",
+      "dialogue": "The sentry ran Rowan down in its lane. Stay between the alcove's posts, or get back over the rubble.",
+      "continue_button": "enabled: CONTINUE",
+      "touch_buttons": "PAUSE"
+     }
+    },
+    {
+     "path": "[session scratch, not kept]/logic-fix/shots/final2/R9/R9-080-knockdown-knockdown.png",
+     "on_screen_text": {
+      "dialogue": "The sentry ran Rowan down. Once its eyes go red, only the rubble is safe.",
+      "continue_button": "disabled",
+      "continue_note": "No checkpoint yet. Saving starts at the first SAFE POINT.",
+      "touch_buttons": "PAUSE"
+     }
+    }
+   ]
+  },
+  {
+   "defect": "While WOLF baits, the sentry's red beam points at the engineer like being spotted",
+   "verdict": "fixed",
+   "explanation": "With the sentry parked on WOLF the beam ends short of the engineer at the release.",
+   "after": [
+    {
+     "path": "[session scratch, not kept]/logic-fix/shots/final2/R4/R4-076-parked-ready.png",
+     "on_screen_text": {
+      "objective_card": "SERVICE JUNCTION\nDROP THE TANK",
+      "dialogue": "The sentry stops on the mark, its eyes on WOLF. Drop the tank now.",
+      "context_hint": "E: drop the tank. It's parked on the mark.",
+      "continue_button": "disabled",
+      "continue_note": "No checkpoint yet. Saving starts at the first SAFE POINT.",
+      "touch_buttons": "PAUSE"
+     }
+    },
+    {
+     "path": "[session scratch, not kept]/logic-fix/shots/final2/R1/R1-079-wolf-holding-sentry-on-mark.png",
+     "on_screen_text": {
+      "objective_card": "SERVICE JUNCTION\nDROP THE TANK",
+      "dialogue": "The sentry stops on the mark, its eyes on WOLF. Drop the tank now.",
+      "context_hint": "E: drop the tank. It's parked on the mark.",
+      "continue_button": "disabled",
+      "continue_note": "No checkpoint yet. Saving starts at the first SAFE POINT.",
+      "touch_buttons": "PAUSE"
+     }
+    }
+   ]
+  },
+  {
+   "defect": "Pressing the release too early shows no visible response",
+   "verdict": "fixed",
+   "explanation": "'Wait. WOLF hasn't got it on the mark yet.' is on screen for two frames (R4-073, R4-074, sentry 757 to 715).",
+   "after": [
+    {
+     "path": "[session scratch, not kept]/logic-fix/shots/final2/R4/R4-073-dialogue-wait-wolf-hasn-t-got-it.png",
+     "on_screen_text": {
+      "objective_card": "SERVICE JUNCTION\nDROP THE TANK",
+      "dialogue": "Wait. WOLF hasn't got it on the mark yet.",
+      "context_hint": "Wait for WOLF to park it on the mark.",
+      "continue_button": "disabled",
+      "continue_note": "No checkpoint yet. Saving starts at the first SAFE POINT.",
+      "touch_buttons": "PAUSE"
+     }
+    },
+    {
+     "path": "[session scratch, not kept]/logic-fix/shots/final2/R4/R4-074-early-drop-result.png",
+     "on_screen_text": {
+      "objective_card": "SERVICE JUNCTION\nDROP THE TANK",
+      "dialogue": "Wait. WOLF hasn't got it on the mark yet.",
+      "context_hint": "Wait for WOLF to park it on the mark.",
+      "continue_button": "disabled",
+      "continue_note": "No checkpoint yet. Saving starts at the first SAFE POINT.",
+      "touch_buttons": "PAUSE"
+     }
+    }
+   ]
+  },
+  {
+   "defect": "DROP_WAIT narration is replaced almost at once",
+   "verdict": "fixed",
+   "explanation": "It gives way to 'The sentry stops on the mark, its eyes on WOLF. Drop the tank now.' only on the frame the sentry parks at 700, and the hint changes to 'E: drop the tank. It's parked on the mark.' at the same moment.",
+   "after": [
+    {
+     "path": "[session scratch, not kept]/logic-fix/shots/final2/R4/R4-075-dialogue-the-sentry-stops-on-the-mark.png",
+     "on_screen_text": {
+      "objective_card": "SERVICE JUNCTION\nDROP THE TANK",
+      "dialogue": "The sentry stops on the mark, its eyes on WOLF. Drop the tank now.",
+      "context_hint": "E: drop the tank. It's parked on the mark.",
+      "continue_button": "disabled",
+      "continue_note": "No checkpoint yet. Saving starts at the first SAFE POINT.",
+      "touch_buttons": "PAUSE"
+     }
+    },
+    {
+     "path": "[session scratch, not kept]/logic-fix/shots/final2/R1/R1-078-dialogue-the-sentry-stops-on-the-mark.png",
+     "on_screen_text": {
+      "objective_card": "SERVICE JUNCTION\nDROP THE TANK",
+      "dialogue": "The sentry stops on the mark, its eyes on WOLF. Drop the tank now.",
+      "context_hint": "E: drop the tank. It's parked on the mark.",
+      "continue_button": "disabled",
+      "continue_note": "No checkpoint yet. Saving starts at the first SAFE POINT.",
+      "touch_buttons": "PAUSE"
+     }
+    }
+   ]
+  },
+  {
+   "defect": "The engineer is still drawn inside machines",
+   "verdict": "fixed",
+   "explanation": "Every station stop puts the engineer beside the machine: relay, purge queue, overload breaker (off the vent), TANK RELEASE (inside the wider bracket), exit bolt (left of the box).",
+   "after": [
+    {
+     "path": "[session scratch, not kept]/logic-fix/shots/final2/R1/R1-028-at-relay-before-signal.png",
+     "on_screen_text": {
+      "objective_card": "MAINTENANCE / LOCKDOWN\nOPEN THE SEAL",
+      "dialogue": "The breaker catches. Blue light fills the coolant relay; the red seal stays shut.",
+      "context_hint": "E: signal WOLF to take the contact.",
+      "continue_button": "disabled",
+      "continue_note": "No checkpoint yet. Saving starts at the first SAFE POINT.",
+      "touch_buttons": "PAUSE"
+     }
+    },
+    {
+     "path": "[session scratch, not kept]/logic-fix/shots/final2/R1/R1-044-stopped-at-purge-queue.png",
+     "on_screen_text": {
+      "objective_card": "RECORDS ACCESS / FIRST COPY\nCOPY PURGE ORDER",
+      "speaker": "WOLF",
+      "dialogue": "I took the relay because you told me the truth.\nTake the purge queue. I'll inspect the mirror.",
+      "context_hint": "E: copy the purge-order trace.",
+      "continue_button": "disabled",
+      "continue_note": "No checkpoint yet. Saving starts at the first SAFE POINT.",
+      "touch_buttons": "PAUSE"
+     }
+    },
+    {
+     "path": "[session scratch, not kept]/logic-fix/shots/final2/R1/R1-058-stopped-at-breaker.png",
+     "on_screen_text": {
+      "objective_card": "SERVICE JUNCTION\nARM THE BREAKER",
+      "speaker": "WOLF",
+      "dialogue": "It's live. Don't stand in front of it when it goes.",
+      "context_hint": "E: arm the overload breaker.",
+      "continue_button": "disabled",
+      "continue_note": "No checkpoint yet. Saving starts at the first SAFE POINT.",
+      "touch_buttons": "PAUSE"
+     }
+    },
+    {
+     "path": "[session scratch, not kept]/logic-fix/shots/final2/R1/R1-080-stopped-at-tank-release.png",
+     "on_screen_text": {
+      "objective_card": "SERVICE JUNCTION\nDROP THE TANK",
+      "dialogue": "The sentry stops on the mark, its eyes on WOLF. Drop the tank now.",
+      "context_hint": "E: drop the tank. It's parked on the mark.",
+      "continue_button": "disabled",
+      "continue_note": "No checkpoint yet. Saving starts at the first SAFE POINT.",
+      "touch_buttons": "PAUSE"
+     }
+    },
+    {
+     "path": "[session scratch, not kept]/logic-fix/shots/final2/R1/R1-085-stopped-at-exit-bolt.png",
+     "on_screen_text": {
+      "objective_card": "SERVICE JUNCTION\nPOP THE EXIT BOLT",
+      "dialogue": "The tank comes down square and crushes the sentry flat. Its eyes go dark.\nWOLF: It's down. The bolt by the hatch is next.",
+      "context_hint": "E: pop the exit bolt.",
+      "continue_button": "disabled",
+      "continue_note": "No checkpoint yet. Saving starts at the first SAFE POINT.",
+      "touch_buttons": "PAUSE"
+     }
+    }
+   ]
+  },
+  {
+   "defect": "WOLF's waiting spots overlap machines",
+   "verdict": "partly fixed",
+   "explanation": "WOLF waits back from the corridor relay at x 490 while the engineer is at the relay or bypass (R1-028, R2-020) and by the entrance with his nose at the breaker (R1-058). But for 'reads the pressure' he stops at x 300 on the RELIEF VENT grate, nowhere near the sealed door (R1-055, R3-079), and after the hit he stands behind the crushed tank, half hidden (R1-083, R1-085).",
+   "after": [
+    {
+     "path": "[session scratch, not kept]/logic-fix/shots/final2/R2/R2-020-at-bypass-handle.png",
+     "on_screen_text": {
+      "speaker": "WOLF",
+      "dialogue": "I said no. I won't touch it blind. The bypass is right beside it.",
+      "context_hint": "HOLD E: crank the manual bypass, 0 of 8.",
+      "continue_button": "disabled",
+      "continue_note": "No checkpoint yet. Saving starts at the first SAFE POINT.",
+      "touch_buttons": "PAUSE"
+     }
+    },
+    {
+     "path": "[session scratch, not kept]/logic-fix/shots/final2/R1/R1-058-stopped-at-breaker.png",
+     "on_screen_text": {
+      "objective_card": "SERVICE JUNCTION\nARM THE BREAKER",
+      "speaker": "WOLF",
+      "dialogue": "It's live. Don't stand in front of it when it goes.",
+      "context_hint": "E: arm the overload breaker.",
+      "continue_button": "disabled",
+      "continue_note": "No checkpoint yet. Saving starts at the first SAFE POINT.",
+      "touch_buttons": "PAUSE"
+     }
+    },
+    {
+     "path": "[session scratch, not kept]/logic-fix/shots/final2/R1/R1-055-wolf-to-300-arrived.png",
+     "on_screen_text": {
+      "objective_card": "SERVICE JUNCTION\nARM THE BREAKER",
+      "speaker": "WOLF",
+      "dialogue": "It's live. Don't stand in front of it when it goes.",
+      "context_hint": "Checkpoint saved.",
+      "continue_button": "disabled",
+      "continue_note": "No checkpoint yet. Saving starts at the first SAFE POINT.",
+      "touch_buttons": "PAUSE"
+     }
+    },
+    {
+     "path": "[session scratch, not kept]/logic-fix/shots/final2/R1/R1-085-stopped-at-exit-bolt.png",
+     "on_screen_text": {
+      "objective_card": "SERVICE JUNCTION\nPOP THE EXIT BOLT",
+      "dialogue": "The tank comes down square and crushes the sentry flat. Its eyes go dark.\nWOLF: It's down. The bolt by the hatch is next.",
+      "context_hint": "E: pop the exit bolt.",
+      "continue_button": "disabled",
+      "continue_note": "No checkpoint yet. Saving starts at the first SAFE POINT.",
+      "touch_buttons": "PAUSE"
+     }
+    }
+   ]
+  },
+  {
+   "defect": "Opening: WOLF walks back into his cage on 'takes the only open route'",
+   "verdict": "waiting on Nathanial",
+   "explanation": "Unchanged; staging call recorded for Nathanial.",
+   "after": [
+    {
+     "path": "[session scratch, not kept]/logic-fix/shots/final2/R1/R1-011-wolf-to-110-arrived.png",
+     "on_screen_text": {
+      "dialogue": "WOLF turns from the Director and takes the only open route.",
+      "context_hint": "E  CONTINUE    Escape  PAUSE",
+      "continue_button": "disabled",
+      "continue_note": "No checkpoint yet. Saving starts at the first SAFE POINT.",
+      "touch_buttons": "PAUSE"
+     }
+    }
+   ]
+  },
+  {
+   "defect": "Records hint still lists finished steps under REACH EXIT",
+   "verdict": "fixed",
+   "explanation": "Only the remaining steps are named.",
+   "after": [
+    {
+     "path": "[session scratch, not kept]/logic-fix/shots/final2/R1/R1-046-hint-follow-the-station-lights-mirror-port.png",
+     "on_screen_text": {
+      "objective_card": "RECORDS ACCESS / FIRST COPY\nCOPY MIRROR INDEX",
+      "dialogue": "The Director's purge order has a time and target ID. Rowan keeps a local copy; the original logs are still missing.",
+      "context_hint": "Follow the station lights: mirror port, then exit.",
+      "continue_button": "disabled",
+      "continue_note": "No checkpoint yet. Saving starts at the first SAFE POINT.",
+      "touch_buttons": "PAUSE"
+     }
+    },
+    {
+     "path": "[session scratch, not kept]/logic-fix/shots/final2/R1/R1-050-hint-mirror-copied-head-for-the-exit.png",
+     "on_screen_text": {
+      "objective_card": "RECORDS ACCESS / FIRST COPY\nREACH EXIT",
+      "dialogue": "WOLF reads the timestamp off his own readout. The purge target existed before the deletion order.",
+      "context_hint": "Mirror copied. Head for the exit.",
+      "continue_button": "disabled",
+      "continue_note": "No checkpoint yet. Saving starts at the first SAFE POINT.",
+      "touch_buttons": "PAUSE"
+     }
+    }
+   ]
+  },
+  {
+   "defect": "Relay hint says go to the relay while beside it; how to hand it to WOLF",
+   "verdict": "fixed",
+   "explanation": "Beside the relay the hint is 'E: signal WOLF to take the contact.' (R4-014); at the bypass it offers both (R4-016); part-cranked it keeps offering WOLF the relay: 'HOLD E: crank on, 5 of 8, or let WOLF take the relay.' (R4-024).",
+   "after": [
+    {
+     "path": "[session scratch, not kept]/logic-fix/shots/final2/R4/R4-014-hint-e-signal-wolf-to-take-the.png",
+     "on_screen_text": {
+      "objective_card": "MAINTENANCE / LOCKDOWN\nOPEN THE SEAL",
+      "dialogue": "The breaker catches. Blue light fills the coolant relay; the red seal stays shut.",
+      "context_hint": "E: signal WOLF to take the contact.",
+      "continue_button": "disabled",
+      "continue_note": "No checkpoint yet. Saving starts at the first SAFE POINT.",
+      "touch_buttons": "PAUSE"
+     }
+    },
+    {
+     "path": "[session scratch, not kept]/logic-fix/shots/final2/R4/R4-016-hint-hold-e-crank-it-yourself-or.png",
+     "on_screen_text": {
+      "objective_card": "MAINTENANCE / LOCKDOWN\nOPEN THE SEAL",
+      "dialogue": "The breaker catches. Blue light fills the coolant relay; the red seal stays shut.",
+      "context_hint": "HOLD E: crank it yourself, or let WOLF take the relay.",
+      "continue_button": "disabled",
+      "continue_note": "No checkpoint yet. Saving starts at the first SAFE POINT.",
+      "touch_buttons": "PAUSE"
+     }
+    },
+    {
+     "path": "[session scratch, not kept]/logic-fix/shots/final2/R4/R4-024-hint-hold-e-crank-on-5-of.png",
+     "on_screen_text": {
+      "dialogue": "Halfway. The hiss gets louder; the alarm keeps wailing.",
+      "context_hint": "HOLD E: crank on, 5 of 8, or let WOLF take the relay.",
+      "continue_button": "disabled",
+      "continue_note": "No checkpoint yet. Saving starts at the first SAFE POINT.",
+      "touch_buttons": "PAUSE"
+     }
+    }
+   ]
+  },
+  {
+   "defect": "Required stakes line plays at the breaker, under a relay prompt, and repeats the display",
+   "verdict": "open by design (prompt fixed)",
+   "explanation": "The line stays required (decision C), but while it is up the hint is only 'E: continue.', not the relay prompt.",
+   "after": [
+    {
+     "path": "[session scratch, not kept]/logic-fix/shots/final2/R1/R1-021-breaker-stakes-first.png",
+     "on_screen_text": {
+      "objective_card": "MAINTENANCE / LOCKDOWN\nCHECK THE BREAKER",
+      "speaker": "WOLF",
+      "dialogue": "That purge takes the original program logs. Once they're gone, his word is the only record.",
+      "context_hint": "E: continue.",
+      "continue_button": "disabled",
+      "continue_note": "No checkpoint yet. Saving starts at the first SAFE POINT.",
+      "touch_buttons": "PAUSE"
+     }
+    }
+   ]
+  },
+  {
+   "defect": "Narration describes actions before the picture shows them",
+   "verdict": "partly fixed",
+   "explanation": "The door line now says WOLF 'heads for the rubble' and he is on his way in the same frame (R1-068). 'WOLF runs ahead to read the pressure behind the sealed door' still shows him stopping on the vent grate, well left of the door (R1-054/055).",
+   "after": [
+    {
+     "path": "[session scratch, not kept]/logic-fix/shots/final2/R1/R1-068-dialogue-the-door-goes-wolf-heads-for.png",
+     "on_screen_text": {
+      "objective_card": "SERVICE JUNCTION\nCHECK THE LANE",
+      "dialogue": "The door goes. WOLF heads for the rubble to wait for Rowan's call. In the lane beyond, something whirs awake.",
+      "context_hint": "Checkpoint saved.",
+      "continue_button": "disabled",
+      "continue_note": "No checkpoint yet. Saving starts at the first SAFE POINT.",
+      "touch_buttons": "PAUSE"
+     }
+    },
+    {
+     "path": "[session scratch, not kept]/logic-fix/shots/final2/R1/R1-054-room-junction.png",
+     "on_screen_text": {
+      "objective_card": "SERVICE JUNCTION\nARM THE BREAKER",
+      "dialogue": "WOLF runs ahead to read the pressure behind the sealed door.\nROWAN: The breaker by the entrance feeds that line. Overload it, crank the valve, and the door goes.",
+      "context_hint": "Checkpoint saved.",
+      "continue_button": "disabled",
+      "continue_note": "No checkpoint yet. Saving starts at the first SAFE POINT.",
+      "touch_buttons": "PAUSE"
+     }
+    }
+   ]
+  },
+  {
+   "defect": "'Leave through the hatch' has no visible result",
+   "verdict": "fixed",
+   "explanation": "Both walk into the open hatch and fade; no CONTINUE prompt is shown during the walk (hint empty in R1-094 to R1-096).",
+   "after": [
+    {
+     "path": "[session scratch, not kept]/logic-fix/shots/final2/R1/R1-094-wolf-to-856-moving.png",
+     "on_screen_text": {
+      "objective_card": "SERVICE JUNCTION\nSERVICE LINE CLEARED",
+      "dialogue": "SERVICE LINE CLEARED. WOLF: It's quiet now. The line runs on toward Archive.\nROWAN: Then that's where we go.",
+      "continue_button": "disabled",
+      "continue_note": "No checkpoint yet. Saving starts at the first SAFE POINT.",
+      "touch_buttons": "PAUSE"
+     }
+    },
+    {
+     "path": "[session scratch, not kept]/logic-fix/shots/final2/R1/R1-095-walking-out-through-hatch.png",
+     "on_screen_text": {
+      "objective_card": "SERVICE JUNCTION\nSERVICE LINE CLEARED",
+      "dialogue": "SERVICE LINE CLEARED. WOLF: It's quiet now. The line runs on toward Archive.\nROWAN: Then that's where we go.",
+      "continue_button": "disabled",
+      "continue_note": "No checkpoint yet. Saving starts at the first SAFE POINT.",
+      "touch_buttons": "PAUSE"
+     }
+    }
+   ]
+  },
+  {
+   "defect": "Title after the slice shows NEW GAME and PLAY AGAIN side by side",
+   "verdict": "fixed",
+   "explanation": "One PLAY AGAIN across the row; it starts a fresh run.",
+   "after": [
+    {
+     "path": "[session scratch, not kept]/logic-fix/shots/final2/R1/R1-100-title-after-end-card.png",
+     "on_screen_text": {
+      "dialogue": "SERVICE LINE CLEARED. WOLF: It's quiet now. The line runs on toward Archive.\nROWAN: Then that's where we go.",
+      "overlay": "title",
+      "continue_button": "enabled: PLAY AGAIN",
+      "continue_note": "Slice complete. PLAY AGAIN starts a fresh run."
+     }
+    },
+    {
+     "path": "[session scratch, not kept]/logic-fix/shots/final2/R1/R1-102-play-again-fresh-run.png",
+     "on_screen_text": {
+      "objective_card": "03:17 / CONTAINMENT\nWOLF//OVERRIDE",
+      "speaker": "DIRECTOR",
+      "dialogue": "I decide who counts as a threat. WOLF handles the rest.",
+      "context_hint": "E  CONTINUE    Escape  PAUSE",
+      "continue_button": "enabled: PLAY AGAIN",
+      "continue_note": "Slice complete. PLAY AGAIN starts a fresh run.",
+      "touch_buttons": "PAUSE"
+     }
+    }
+   ]
+  },
+  {
+   "defect": "FIRST_COPY_CLOSE was not applied",
+   "verdict": "fixed",
+   "explanation": "The sheet's FIRST_COPY_CLOSE line ships.",
+   "after": [
+    {
+     "path": "[session scratch, not kept]/logic-fix/shots/final2/R1/R1-052-dialogue-first-copy-secured-wolf-an-order.png",
+     "on_screen_text": {
+      "objective_card": "RECORDS ACCESS\nFIRST COPY SECURED",
+      "dialogue": "FIRST COPY SECURED. WOLF: An order and a timestamp don't tell me who's a threat. I want the source.\nROWAN: Then Archive is next.",
+      "context_hint": "E  CONTINUE",
+      "continue_button": "disabled",
+      "continue_note": "No checkpoint yet. Saving starts at the first SAFE POINT.",
+      "touch_buttons": "PAUSE"
+     }
+    }
+   ]
+  },
+  {
+   "defect": "END OF SLICE recap loses the lane choice after Continue from autosave C",
+   "verdict": "fixed",
+   "explanation": "R3 continued from C and the card reads 'WOLF held at the rubble while Rowan timed the drop.'",
+   "after": [
+    {
+     "path": "[session scratch, not kept]/logic-fix/shots/final2/R3/R3-149-continued-junction-C.png",
+     "on_screen_text": {
+      "objective_card": "SERVICE JUNCTION\nPOP THE EXIT BOLT",
+      "dialogue": "Service junction restored. The sentry is down; pop the exit bolt by the hatch.",
+      "context_hint": "The sentry is down. Pop the exit bolt by the hatch.",
+      "continue_button": "enabled: CONTINUE",
+      "touch_buttons": "PAUSE"
+     }
+    },
+    {
+     "path": "[session scratch, not kept]/logic-fix/shots/final2/R3/R3-162-end-card-settled.png",
+     "on_screen_text": {
+      "overlay": "endcard",
+      "end_card": "END OF SLICE / Thank you for playing this early slice. / THIS RUN / RELAY / Rowan rushed WOLF. He refused, so Rowan cranked the bypass. / MIRROR / WOLF read the timestamp off his own readout. / LANE / WOLF held at the rubble while Rowan timed the drop. / [E  CONTINUE]",
+      "continue_button": "enabled: CONTINUE"
+     }
+    }
+   ]
+  },
+  {
+   "defect": "Knockdown cards mix third person and 'you'",
+   "verdict": "fixed; new lines waiting on Nathanial",
+   "explanation": "Vent, blast and both sentry cards are third person. The new vent, sentry and cloud lines are on the sheet awaiting approval.",
+   "after": [
+    {
+     "path": "[session scratch, not kept]/logic-fix/shots/final2/R3/R3-094-knockdown-knockdown.png",
+     "on_screen_text": {
+      "objective_card": "SERVICE JUNCTION\nARM THE BREAKER",
+      "dialogue": "The relief vent let go under Rowan. When the gauge peaks, stay off the grate.",
+      "continue_button": "enabled: CONTINUE",
+      "touch_buttons": "PAUSE"
+     }
+    },
+    {
+     "path": "[session scratch, not kept]/logic-fix/shots/final2/R3/R3-108-knockdown-knockdown.png",
+     "on_screen_text": {
+      "objective_card": "SERVICE JUNCTION\nGET CLEAR OF THE DOOR",
+      "dialogue": "The door went with Rowan in front of it. When the fuse lights, back away past the valve.",
+      "continue_button": "enabled: CONTINUE",
+      "touch_buttons": "PAUSE"
+     }
+    },
+    {
+     "path": "[session scratch, not kept]/logic-fix/shots/final2/R3/R3-136-knockdown-knockdown.png",
+     "on_screen_text": {
+      "objective_card": "SERVICE JUNCTION\nDROP THE TANK",
+      "dialogue": "The sentry ran Rowan down in its lane. Stay between the alcove's posts, or get back over the rubble.",
+      "continue_button": "enabled: CONTINUE",
+      "touch_buttons": "PAUSE"
+     }
+    },
+    {
+     "path": "[session scratch, not kept]/logic-fix/shots/final2/R9/R9-080-knockdown-knockdown.png",
+     "on_screen_text": {
+      "dialogue": "The sentry ran Rowan down. Once its eyes go red, only the rubble is safe.",
+      "continue_button": "disabled",
+      "continue_note": "No checkpoint yet. Saving starts at the first SAFE POINT.",
+      "touch_buttons": "PAUSE"
+     }
+    }
+   ]
+  },
+  {
+   "defect": "Off-centre hits were told as square hits",
+   "verdict": "fixed",
+   "explanation": "R7 (extra route on HEAD) lands the tank with the sentry at 717: 'The tank catches the sentry off centre and pins it to the floor.' A centred hit at 700 to 705 still reads 'comes down square' (R2-087).",
+   "after": [
+    {
+     "path": "[session scratch, not kept]/logic-fix/shots/final2/R7/R7-078-dialogue-the-tank-catches-the-sentry-off.png",
+     "on_screen_text": {
+      "objective_card": "SERVICE JUNCTION\nPOP THE EXIT BOLT",
+      "dialogue": "The tank catches the sentry off centre and pins it to the floor. Its eyes go dark.\nWOLF: It's down. The bolt by the hatch is next.",
+      "context_hint": "Checkpoint saved.",
+      "continue_button": "disabled",
+      "continue_note": "No checkpoint yet. Saving starts at the first SAFE POINT.",
+      "touch_buttons": "PAUSE"
+     }
+    },
+    {
+     "path": "[session scratch, not kept]/logic-fix/shots/final2/R2/R2-087-dialogue-the-tank-comes-down-square-and.png",
+     "on_screen_text": {
+      "objective_card": "SERVICE JUNCTION\nPOP THE EXIT BOLT",
+      "dialogue": "The tank comes down square and crushes the sentry flat. Its eyes go dark.\nWOLF: It's down. The bolt by the hatch is next.",
+      "context_hint": "Checkpoint saved.",
+      "continue_button": "disabled",
+      "continue_note": "No checkpoint yet. Saving starts at the first SAFE POINT.",
+      "touch_buttons": "PAUSE"
+     }
+    }
+   ]
+  },
+  {
+   "defect": "Station names at the view's edge",
+   "verdict": "fixed",
+   "explanation": "A machine cut off by the screen edge has no floating name: the SAFE POINT at the right edge in R2-015 shows no label, while the same label shows once it is fully on screen (R1-028).",
+   "after": [
+    {
+     "path": "[session scratch, not kept]/logic-fix/shots/final2/R2/R2-015-hint-wolf-refused-the-live-contact-use.png",
+     "on_screen_text": {
+      "objective_card": "MAINTENANCE / LOCKDOWN\nOPEN THE SEAL",
+      "dialogue": "The breaker catches. Blue light fills the coolant relay; the red seal stays shut.",
+      "context_hint": "WOLF refused the live contact. Use the MANUAL BYPASS beside it.",
+      "continue_button": "disabled",
+      "continue_note": "No checkpoint yet. Saving starts at the first SAFE POINT.",
+      "touch_buttons": "PAUSE"
+     }
+    },
+    {
+     "path": "[session scratch, not kept]/logic-fix/shots/final2/R1/R1-028-at-relay-before-signal.png",
+     "on_screen_text": {
+      "objective_card": "MAINTENANCE / LOCKDOWN\nOPEN THE SEAL",
+      "dialogue": "The breaker catches. Blue light fills the coolant relay; the red seal stays shut.",
+      "context_hint": "E: signal WOLF to take the contact.",
+      "continue_button": "disabled",
+      "continue_note": "No checkpoint yet. Saving starts at the first SAFE POINT.",
+      "touch_buttons": "PAUSE"
+     }
+    }
+   ]
+  },
+  {
+   "defect": "Corridor seal body blocks outside the corridor",
+   "verdict": "not visible in screenshots",
+   "explanation": "Covered by the headless tests only; no route frame shows it.",
+   "after": []
+  },
+  {
+   "defect": "Touch USE button overlaps the right end of the hint bar",
+   "verdict": "rejected (latent)",
+   "explanation": "Not re-captured; the routes run with keyboard prompts. Earlier measurement: the longest hint ends about 4 px clear.",
+   "after": []
+  }
+ ],
+ "new_observations": [
+  {
+   "observation": "WOLF 'reads the pressure behind the sealed door' while standing on the RELIEF VENT grate at x 300, about 120 units left of the valve and further from the door. The same spot is used after Continue from save A.",
+   "after": [
+    {
+     "path": "[session scratch, not kept]/logic-fix/shots/final2/R1/R1-055-wolf-to-300-arrived.png",
+     "on_screen_text": {
+      "objective_card": "SERVICE JUNCTION\nARM THE BREAKER",
+      "speaker": "WOLF",
+      "dialogue": "It's live. Don't stand in front of it when it goes.",
+      "context_hint": "Checkpoint saved.",
+      "continue_button": "disabled",
+      "continue_note": "No checkpoint yet. Saving starts at the first SAFE POINT.",
+      "touch_buttons": "PAUSE"
+     }
+    },
+    {
+     "path": "[session scratch, not kept]/logic-fix/shots/final2/R1/R1-056-dialogue-wolf-it-s-live-don-t.png",
+     "on_screen_text": {
+      "objective_card": "SERVICE JUNCTION\nARM THE BREAKER",
+      "speaker": "WOLF",
+      "dialogue": "It's live. Don't stand in front of it when it goes.",
+      "context_hint": "Checkpoint saved.",
+      "continue_button": "disabled",
+      "continue_note": "No checkpoint yet. Saving starts at the first SAFE POINT.",
+      "touch_buttons": "PAUSE"
+     }
+    },
+    {
+     "path": "[session scratch, not kept]/logic-fix/shots/final2/R3/R3-079-continued-junction-A.png",
+     "on_screen_text": {
+      "objective_card": "SERVICE JUNCTION\nARM THE BREAKER",
+      "dialogue": "Service junction restored. Arm the breaker by the entrance, then crank the valve.\nWOLF: It's live. Don't stand in front of it when it goes.",
+      "context_hint": "Arm the breaker by the entrance, then crank the valve by the door.",
+      "continue_button": "enabled: CONTINUE",
+      "touch_buttons": "PAUSE"
+     }
+    }
+   ]
+  },
+  {
+   "observation": "After the hit WOLF walks to x 692 to 694 and stands behind the crushed tank, half hidden, through the bolt beat.",
+   "after": [
+    {
+     "path": "[session scratch, not kept]/logic-fix/shots/final2/R1/R1-083-sentry-down-settled.png",
+     "on_screen_text": {
+      "objective_card": "SERVICE JUNCTION\nPOP THE EXIT BOLT",
+      "dialogue": "The tank comes down square and crushes the sentry flat. Its eyes go dark.\nWOLF: It's down. The bolt by the hatch is next.",
+      "context_hint": "Checkpoint saved.",
+      "continue_button": "disabled",
+      "continue_note": "No checkpoint yet. Saving starts at the first SAFE POINT.",
+      "touch_buttons": "PAUSE"
+     }
+    },
+    {
+     "path": "[session scratch, not kept]/logic-fix/shots/final2/R1/R1-085-stopped-at-exit-bolt.png",
+     "on_screen_text": {
+      "objective_card": "SERVICE JUNCTION\nPOP THE EXIT BOLT",
+      "dialogue": "The tank comes down square and crushes the sentry flat. Its eyes go dark.\nWOLF: It's down. The bolt by the hatch is next.",
+      "context_hint": "E: pop the exit bolt.",
+      "continue_button": "disabled",
+      "continue_note": "No checkpoint yet. Saving starts at the first SAFE POINT.",
+      "touch_buttons": "PAUSE"
+     }
+    },
+    {
+     "path": "[session scratch, not kept]/logic-fix/shots/final2/R2/R2-089-hint-e-pop-the-exit-bolt.png",
+     "on_screen_text": {
+      "objective_card": "SERVICE JUNCTION\nPOP THE EXIT BOLT",
+      "dialogue": "The tank comes down square and crushes the sentry flat. Its eyes go dark.\nWOLF: It's down. The bolt by the hatch is next.",
+      "context_hint": "E: pop the exit bolt.",
+      "continue_button": "disabled",
+      "continue_note": "No checkpoint yet. Saving starts at the first SAFE POINT.",
+      "touch_buttons": "PAUSE"
+     }
+    }
+   ]
+  },
+  {
+   "observation": "Lane-caught sentry card: the engineer's feet are at x 638, just past the right post, but the fallen body is drawn lying leftward between the posts while the card says 'Stay between the alcove's posts'.",
+   "after": [
+    {
+     "path": "[session scratch, not kept]/logic-fix/shots/final2/R3/R3-136-knockdown-knockdown.png",
+     "on_screen_text": {
+      "objective_card": "SERVICE JUNCTION\nDROP THE TANK",
+      "dialogue": "The sentry ran Rowan down in its lane. Stay between the alcove's posts, or get back over the rubble.",
+      "continue_button": "enabled: CONTINUE",
+      "touch_buttons": "PAUSE"
+     }
+    }
+   ]
+  },
+  {
+   "observation": "Vent warning frame: the steam column almost hides the engineer standing on the grate.",
+   "after": [
+    {
+     "path": "[session scratch, not kept]/logic-fix/shots/final2/R3/R3-093-hint-the-vent-is-about-to-blow.png",
+     "on_screen_text": {
+      "dialogue": "The overload breaker catches and the line starts to build. If the LINE gauge peaks, the relief vent lets go.",
+      "context_hint": "The vent is about to blow. Get off the grate now.",
+      "continue_button": "enabled: CONTINUE",
+      "touch_buttons": "PAUSE"
+     }
+    }
+   ]
+  }
+ ]
+}
