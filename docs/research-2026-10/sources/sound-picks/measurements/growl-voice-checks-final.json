@@ -1,0 +1,50 @@
+[
+ {
+  "file": "docs/research-2026-10/sources/sound-picks/growl-rec-seam.wav",
+  "f0_median_hz": 96.7,
+  "f0_range_hz": [
+   49.4,
+   149.0
+  ],
+  "voiced_frames": 21,
+  "am_peak_hz_15_45": 21.7,
+  "am_peak_db_over_median": 11.0,
+  "centroid_thirds_hz": [
+   443.0,
+   687.0,
+   871.0
+  ]
+ },
+ {
+  "file": "docs/research-2026-10/sources/sound-picks/growl-synth-C-warning.wav",
+  "f0_median_hz": 75.0,
+  "f0_range_hz": [
+   73.5,
+   84.8
+  ],
+  "voiced_frames": 20,
+  "am_peak_hz_15_45": 27.0,
+  "am_peak_db_over_median": 15.7,
+  "centroid_thirds_hz": [
+   800.0,
+   1029.0,
+   1031.0
+  ]
+ },
+ {
+  "file": "docs/research-2026-10/sources/sound-picks/growl-rec-assertive.wav",
+  "f0_median_hz": 119.8,
+  "f0_range_hz": [
+   66.4,
+   162.1
+  ],
+  "voiced_frames": 12,
+  "am_peak_hz_15_45": 16.8,
+  "am_peak_db_over_median": 13.3,
+  "centroid_thirds_hz": [
+   961.0,
+   832.0,
+   880.0
+  ]
+ }
+]

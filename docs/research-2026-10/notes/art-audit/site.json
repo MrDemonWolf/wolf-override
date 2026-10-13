@@ -1,0 +1,81 @@
+{
+ "keyart-1672.webp": {
+  "size": [
+   1672,
+   941
+  ],
+  "bytes": 76618,
+  "psnr_vs_source": 41.26
+ },
+ "keyart-1024.webp": {
+  "size": [
+   1024,
+   576
+  ],
+  "bytes": 38706,
+  "psnr_vs_source": 38.1
+ },
+ "keyart-640.webp": {
+  "size": [
+   640,
+   360
+  ],
+  "bytes": 18966,
+  "psnr_vs_source": 36.97
+ },
+ "corridor-start-capture-960.webp": {
+  "size": [
+   960,
+   540
+  ],
+  "bytes": 68372,
+  "psnr_vs_png": 37.81
+ },
+ "corridor-start-capture-480.webp": {
+  "size": [
+   480,
+   270
+  ],
+  "bytes": 23362,
+  "psnr_vs_png": 36.79
+ },
+ "service-junction-entry-capture-960.webp": {
+  "size": [
+   960,
+   540
+  ],
+  "bytes": 90222,
+  "psnr_vs_png": 35.92
+ },
+ "service-junction-entry-capture-480.webp": {
+  "size": [
+   480,
+   270
+  ],
+  "bytes": 30270,
+  "psnr_vs_png": 34.79
+ },
+ "title-screen-capture-960.webp": {
+  "size": [
+   960,
+   540
+  ],
+  "bytes": 53452,
+  "psnr_vs_png": 36.86
+ },
+ "title-screen-capture-480.webp": {
+  "size": [
+   480,
+   270
+  ],
+  "bytes": 19670,
+  "psnr_vs_png": 36.19
+ },
+ "share-card.jpg": {
+  "size": [
+   1200,
+   630
+  ],
+  "bytes": 73602
+ }
+}

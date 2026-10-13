@@ -1,0 +1,131 @@
+{
+ "file": "docs/research-2026-10/sources/style-test-look2/breaker.png",
+ "family": "prop",
+ "size": [
+  288,
+  416
+ ],
+ "checks": {
+  "A_alpha_body": {
+   "value": 1.0,
+   "threshold": 0.99,
+   "ok": true,
+   "max_alpha": 255
+  },
+  "B_holes_share": {
+   "value": 0.0,
+   "threshold": 0.005,
+   "ok": true
+  },
+  "B_interior_band_rows": {
+   "value": 0,
+   "threshold": 3,
+   "ok": true,
+   "band_span": null
+  },
+  "B_edge_fade_rows": {
+   "value": 0,
+   "threshold": 6,
+   "ok": true,
+   "band_span": null,
+   "note": "soft fade at the top or bottom of the silhouette (baked contact shadow or wisps)"
+  },
+  "C_fringe_dark": {
+   "value": 0.0432,
+   "threshold": 0.1,
+   "ok": true,
+   "edge_px": 1110
+  },
+  "C_fringe_halo": {
+   "value": 0.0,
+   "threshold": 0.1,
+   "ok": true
+  },
+  "C_edge_chroma_shift": {
+   "value": 0.12,
+   "threshold": 4.0,
+   "ok": true,
+   "mean_da_db": [
+    0.12,
+    0.02
+   ]
+  },
+  "C_outline_dL": {
+   "value": -1.4,
+   "threshold": -8.0,
+   "ok": true,
+   "note": "median L* of the 1-3 px rim minus the core; strongly negative = dark outline"
+  },
+  "C_top_light_dL": {
+   "value": 47.1,
+   "threshold": 0.0,
+   "ok": true,
+   "bottom_dL": -13.1,
+   "target": 10.0,
+   "note": "top-facing rim vs core; the bible asks for a top/rim light (target +10)"
+  },
+  "D_baseline": {
+   "value": 407,
+   "threshold": 407,
+   "ok": true
+  },
+  "E_density_1080_maxzoom": {
+   "value": 1.111,
+   "threshold": 1.0,
+   "ok": true
+  },
+  "E_density_960_minzoom": {
+   "value": 2.963,
+   "threshold": 4.5,
+   "ok": true
+  },
+  "F_cool_neutrals_b": {
+   "value": -7.2,
+   "threshold": -1.0,
+   "ok": true
+  },
+  "F_accent_dE_p90": {
+   "value": 12.6,
+   "threshold": 18.0,
+   "ok": true,
+   "n_sat": 3066
+  },
+  "G_noise_display": {
+   "value": 1.6,
+   "threshold": 6.0,
+   "ok": true
+  },
+  "G_hf_share": {
+   "value": 0.083,
+   "threshold": 0.3,
+   "ok": true
+  }
+ },
+ "opaque_bbox": [
+  13,
+  20,
+  274,
+  407
+ ],
+ "opaque_fill_pct": 69.3,
+ "baseline_row": 407,
+ "density": {
+  "540p@z1.35": 2.963,
+  "720p@z1.35": 2.222,
+  "1080p@z1.35": 1.481,
+  "1440p@z1.35": 1.111,
+  "540p@z1.8": 2.222,
+  "720p@z1.8": 1.667,
+  "1080p@z1.8": 1.111,
+  "1440p@z1.8": 0.833
+ },
+ "L_med": 15.4,
+ "L_p99": 86.6,
+ "accent_share": 0.0381,
+ "noise_sigma_src": 1.56,
+ "display_size": [
+  259,
+  374
+ ],
+ "pass": true
+}

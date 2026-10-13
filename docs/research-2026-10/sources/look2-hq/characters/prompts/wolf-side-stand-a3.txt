@@ -1,0 +1,25 @@
+PRECISE EDIT (repair: proportions drifted in the previous attempt). References, in order:
+- Image 1 = docs/research-2026-10/sources/sprites-2026-10-08/wolf-side-right.png (EDIT TARGET: the approved WOLF design sprite; keep its silhouette and proportions exactly)
+- Image 2 = CHARDIR/refs/ref-v2-wolf-source.png (the approved Look 2 render of WOLF from the style test: rendering only)
+- Image 3 = CHARDIR/refs/ref-style-test-v2.png (the approved Look 2 style test: rendering and edges)
+- Image 4 = apps/game/assets/title-corridor-key-art-provisional.png (mood, light and palette)
+- Image 5 = CHARDIR/refs/palette-card.png (colour swatches)
+
+IMAGE PROMPT:
+~~~text
+USE CASE: precise-object-edit, style-transfer re-render of an approved design. Change ONLY the rendering; keep the silhouette, pose and proportions of Image 1 exactly.
+ASSET: canonical identity cut-out of WOLF, the robotic wolf companion in WOLF//OVERRIDE, a 2D side-view sci-fi horror game; clean graphic-painterly game art readable at small size.
+OUTPUT: one wide landscape PNG with a genuinely transparent background (real alpha). WOLF fills about 85% of the canvas width, centred, fully inside the frame with a clear margin on every side. Final game size will be exactly 460 px long nose-to-tail-tip after one downscale. No text, letters, numbers, logos, UI, watermark, guide lines or borders.
+REFERENCE ROLES:
+Image 1 = EDIT TARGET and shape lock. Trace it: the same outline, the same pose, the same leg length, the same head size and head height, the same neck angle, the same tail angle and length, the same armour plate layout, joint positions and paw positions. Its overall height is about 0.53 of its nose-to-tail length (ear tips to paws vs nose tip to tail tip) and the result must keep that ratio: long legs that lift the body well off the ground, a raised neck and a head that sits clearly above the line of the back, ear tips the highest point, and the tail sweeping down and back at the same angle as Image 1, not held straight out level. Do not lengthen the tail, shorten the legs, lower the head or flatten the back.
+Image 2 = the approved Look 2 rendering of this same WOLF: copy its rendering only (flat grey-blue plate values, top light, cyan rim, clean edges, no texture). Ignore its pose and its turned head.
+Image 3 = the approved Look 2 style test: rendering, value structure and edge treatment only. Do not copy its composition, background or props.
+Image 4 = mood, lighting and palette only (cold blue-black, cyan rim); do not copy its composition or figures.
+Image 5 = colour swatches only.
+SUBJECT: exactly one fully robotic wolf in a strict orthographic side view facing screen-right, standing still exactly as in Image 1, head forward in profile looking right, ears up. All four paws on one level baseline, near and far legs staggered as in Image 1 so all four legs and four paws are countable.
+DESIGN LOCKS: exactly 2 triangular ears; exactly 4 mechanical legs with exactly 4 paws; circular mechanical joints at shoulders, hips, elbows and hocks; grey-blue angular armour plates of low chroma (lit about #656a72, mid about #292f37); one articulated, segmented armoured tail; one cyan eye; restrained cyan seam lights (#4f8ab8 to #30d0fc) only on a few plate seams. Fully robotic: no fur, no organic anatomy, no harness, no collar.
+CHANGE ONLY THE RENDERING: replace Image 1's stone-like surface texture, speckle and dark inked outlines with Look 2 shape-first graphic painting: flat value planes with 3-4 value steps per material; large simplified armour plates; minimal texture; crisp shape-designed silhouette; broad rim shapes; painterly soft blending only inside the lit top planes. No dark outline or inked contour anywhere, on the silhouette or between plates: separate plates with adjacent flat values. No grain, speckle, scratches, tiny bolts or details smaller than 6 px at the final 460 px length.
+LIGHTING: cold overhead top light, so the back, head top and top faces of plates are clearly lighter than the body core; a broad cyan-white rim (#82c3e6 to #c3c5d7) along the top edge of the head, neck, back and tail, kept fairly even so the sprite can be mirrored. Shadows cool blue-black (#07101a, #121f2c), never brown or warm.
+TRANSPARENCY: fully opaque body; crisp 1-2 px anti-aliased edge; no matte, no dark fringe, no halo or glow outside the silhouette.
+DO NOT: change the silhouette or proportions of Image 1, head turned back or toward the viewer, floor, cast or contact shadow, reflection, background, extra ears, legs, paws or tails, fur, motion lines, magenta or pink, text.
+~~~

@@ -1,0 +1,29 @@
+{
+ "wolf-idle": {
+  "frames": 8,
+  "fps": null,
+  "loop_s": 3.15,
+  "world_speed_px_s": 0,
+  "ground_cell_px_per_frame": null,
+  "game_scale": 0.7029,
+  "size_game": null
+ },
+ "wolf-walk": {
+  "frames": 12,
+  "fps": 19.76,
+  "loop_s": 0.607,
+  "world_speed_px_s": 80.0,
+  "ground_cell_px_per_frame": 15.552,
+  "game_scale": 0.7029,
+  "size_game": null
+ },
+ "wolf-trot": {
+  "frames": 12,
+  "fps": 29.83,
+  "loop_s": 0.402,
+  "world_speed_px_s": 190.0,
+  "ground_cell_px_per_frame": 24.467,
+  "game_scale": 0.7029,
+  "size_game": null
+ }
+}

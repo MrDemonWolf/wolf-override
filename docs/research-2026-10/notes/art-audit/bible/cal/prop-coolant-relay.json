@@ -1,0 +1,122 @@
+{
+ "file": "apps/game/assets/props/corridor-coolant-relay.png",
+ "family": "prop",
+ "size": [
+  512,
+  512
+ ],
+ "checks": {
+  "A_alpha_body": {
+   "value": 0.0011,
+   "threshold": 0.99,
+   "ok": false,
+   "max_alpha": 255
+  },
+  "B_holes_share": {
+   "value": 0.0006,
+   "threshold": 0.005,
+   "ok": true
+  },
+  "B_interior_band_rows": {
+   "value": 0,
+   "threshold": 3,
+   "ok": true,
+   "band_span": null
+  },
+  "B_edge_fade_rows": {
+   "value": 0,
+   "threshold": 6,
+   "ok": true,
+   "band_span": null,
+   "note": "soft fade at the top or bottom of the silhouette (baked contact shadow or wisps)"
+  },
+  "C_fringe_dark": {
+   "value": 0.4262,
+   "threshold": 0.1,
+   "ok": false,
+   "edge_px": 1572
+  },
+  "C_fringe_halo": {
+   "value": 0.0013,
+   "threshold": 0.1,
+   "ok": true
+  },
+  "C_edge_chroma_shift": {
+   "value": 3.55,
+   "threshold": 4.0,
+   "ok": true,
+   "mean_da_db": [
+    2.82,
+    2.15
+   ]
+  },
+  "C_outline_dL": {
+   "value": -8.8,
+   "threshold": -8.0,
+   "ok": false,
+   "note": "median L* of the 1-3 px rim minus the core; strongly negative = dark outline"
+  },
+  "C_top_light_dL": {
+   "value": 3.9,
+   "threshold": 0.0,
+   "ok": true,
+   "bottom_dL": -19.5,
+   "target": 10.0,
+   "note": "top-facing rim vs core; the bible asks for a top/rim light (target +10)"
+  },
+  "E_density_1080_maxzoom": {
+   "value": 1.676,
+   "threshold": 1.0,
+   "ok": true
+  },
+  "E_density_960_minzoom": {
+   "value": 3.352,
+   "threshold": 4.5,
+   "ok": true
+  },
+  "F_cool_neutrals_b": {
+   "value": -0.86,
+   "threshold": -1.0,
+   "ok": false
+  },
+  "F_accent_dE_p90": {
+   "value": 27.6,
+   "threshold": 18.0,
+   "ok": false,
+   "n_sat": 5493
+  },
+  "G_noise_display": {
+   "value": 6.28,
+   "threshold": 6.0,
+   "ok": false
+  },
+  "G_hf_share": {
+   "value": 0.291,
+   "threshold": 0.3,
+   "ok": true
+  }
+ },
+ "opaque_bbox": [
+  63,
+  67,
+  447,
+  467
+ ],
+ "opaque_fill_pct": 48.18,
+ "baseline_row": 467,
+ "density": {
+  "540p@z1.35": 3.352,
+  "720p@z1.35": 2.514,
+  "1080p@z1.35": 1.676,
+  "1440p@z1.35": 1.257
+ },
+ "L_med": 19.5,
+ "L_p99": 91.3,
+ "accent_share": 0.0439,
+ "noise_sigma_src": 5.43,
+ "display_size": [
+  306,
+  306
+ ],
+ "pass": false
+}

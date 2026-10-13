@@ -1,0 +1,692 @@
+[
+{
+"group": "current",
+"name": "boom",
+"wav": "[session scratch, not kept]/sound-audition/wav/current/boom.wav",
+"png": "[session scratch, not kept]/sound-audition/wav/current/boom.png",
+"seconds": 0.5,
+"peak_db": -6.02,
+"recipe": "Sine sub sweeping 55->30 Hz (tau 0.18 s) under a 0.25 s noise burst low-passed 1400->110 Hz, tanh soft-clip.",
+"used_for": "Tank shell hit (0 dB), door blast (0 dB), containment gate shutter boom (-2 dB)."
+},
+{
+"group": "current",
+"name": "small_boom",
+"wav": "[session scratch, not kept]/sound-audition/wav/current/small_boom.wav",
+"png": "[session scratch, not kept]/sound-audition/wav/current/small_boom.png",
+"seconds": 0.3,
+"peak_db": -6.02,
+"recipe": "Same _boom recipe smaller: sub 90->48 Hz tau 0.09 s, 0.16 s noise low-passed 900->160 Hz.",
+"used_for": "Relief vent letting go when the junction gauge peaks and the breaker trips (-2 dB)."
+},
+{
+"group": "current",
+"name": "clank",
+"wav": "[session scratch, not kept]/sound-audition/wav/current/clank.wav",
+"png": "[session scratch, not kept]/sound-audition/wav/current/clank.png",
+"seconds": 0.04,
+"peak_db": -6.02,
+"recipe": "40 ms 420 Hz square ring (tau 12 ms) plus a 5 ms noise tick.",
+"used_for": "Breaker, junction autosave, clamp release, bolt arc, tank hit/miss/rehung, valve turn and relay spark contact, at pitches 0.55-2.2."
+},
+{
+"group": "current",
+"name": "thud",
+"wav": "[session scratch, not kept]/sound-audition/wav/current/thud.wav",
+"png": "[session scratch, not kept]/sound-audition/wav/current/thud.png",
+"seconds": 0.08,
+"peak_db": -6.02,
+"recipe": "80 ms 60 Hz sine (tau 30 ms) plus a 300 Hz low-passed noise knock (tau 10 ms).",
+"used_for": "Tank miss landing (-3 dB, 0.8), fail-beat knockdown (0 dB, 0.9), seal door landing (-2 dB, 1.1)."
+},
+{
+"group": "current",
+"name": "hiss",
+"wav": "[session scratch, not kept]/sound-audition/wav/current/hiss.wav",
+"png": "[session scratch, not kept]/sound-audition/wav/current/hiss.png",
+"seconds": 0.5,
+"peak_db": -6.02,
+"recipe": "0.5 s loop of white noise low-passed at 3 kHz with one 2 Hz amplitude wobble per loop. Seam check: no click, but the 0.5 s noise pattern repeats twice a second.",
+"used_for": "Junction pressure-line loop, -28 to -8 dB with the gauge; stopped by the door blast."
+},
+{
+"group": "current",
+"name": "hiss_loop10s",
+"wav": "[session scratch, not kept]/sound-audition/wav/current/hiss_loop10s.wav",
+"png": "[session scratch, not kept]/sound-audition/wav/current/hiss_loop10s.png",
+"seconds": 10,
+"peak_db": -6.02,
+"recipe": "The in-game hiss loop buffer tiled to 10 s (seams marked yellow in the PNG). Seam check: no click, but the 0.5 s noise pattern repeats twice a second.",
+"used_for": "Seam audition for: Junction pressure-line loop, -28 to -8 dB with the gauge; stopped by the door blast."
+},
+{
+"group": "current",
+"name": "hum",
+"wav": "[session scratch, not kept]/sound-audition/wav/current/hum.wav",
+"png": "[session scratch, not kept]/sound-audition/wav/current/hum.png",
+"seconds": 1,
+"peak_db": -6.02,
+"recipe": "1 s loop: 110 Hz + 113 Hz saws through a 500 Hz one-pole low-pass. Seam check: CLICKS once per loop (jump 0.567 vs 0.0055 median step) because the low-pass state restarts at 0.",
+"used_for": "Junction pump loop, -16 to -9 dB and pitch 0.5-0.8 with the gauge."
+},
+{
+"group": "current",
+"name": "hum_loop10s",
+"wav": "[session scratch, not kept]/sound-audition/wav/current/hum_loop10s.wav",
+"png": "[session scratch, not kept]/sound-audition/wav/current/hum_loop10s.png",
+"seconds": 10,
+"peak_db": -6.02,
+"recipe": "The in-game hum loop buffer tiled to 10 s (seams marked yellow in the PNG). Seam check: CLICKS once per loop (jump 0.567 vs 0.0055 median step) because the low-pass state restarts at 0.",
+"used_for": "Seam audition for: Junction pump loop, -16 to -9 dB and pitch 0.5-0.8 with the gauge."
+},
+{
+"group": "current",
+"name": "arc",
+"wav": "[session scratch, not kept]/sound-audition/wav/current/arc.wav",
+"png": "[session scratch, not kept]/sound-audition/wav/current/arc.png",
+"seconds": 0.5,
+"peak_db": -6.02,
+"recipe": "0.5 s randomly gated high-passed (1.2 kHz) crackle decaying 0.12 s plus a 60 ms zap falling 2.4 kHz->500 Hz.",
+"used_for": "Records exit arc (-3 dB), exit bolt arc (0 dB), relay spark crackle (-8 dB, 1.2)."
+},
+{
+"group": "current",
+"name": "klaxon",
+"wav": "[session scratch, not kept]/sound-audition/wav/current/klaxon.wav",
+"png": "[session scratch, not kept]/sound-audition/wav/current/klaxon.png",
+"seconds": 0.5,
+"peak_db": -6.02,
+"recipe": "Three 120 ms 880 Hz square chirps 40 ms apart with 4/8 ms ramps, low-passed at 2.5 kHz.",
+"used_for": "Seal-charged warning on a junction valve turn (-4 dB)."
+},
+{
+"group": "current",
+"name": "growl",
+"wav": "[session scratch, not kept]/sound-audition/wav/current/growl.wav",
+"png": "[session scratch, not kept]/sound-audition/wav/current/growl.png",
+"seconds": 0.6,
+"peak_db": -6.02,
+"recipe": "70->58 Hz saw plus breath noise, 900 Hz low-pass, 9 Hz tremolo, 80 ms swell and 0.2 s die-away.",
+"used_for": "WOLF's growl at the lane choice (-9 dB at 1.5 or -8 dB) and when he reads the seam (-6 dB)."
+},
+{
+"group": "current",
+"name": "servo",
+"wav": "[session scratch, not kept]/sound-audition/wav/current/servo.wav",
+"png": "[session scratch, not kept]/sound-audition/wav/current/servo.png",
+"seconds": 1,
+"peak_db": -6.02,
+"recipe": "1 s loop: 1.2 kHz sine with +/-30 Hz 6 Hz vibrato plus a 0.3 sub-octave; whole cycles per second. Seam check: clean (seam step equals a normal sample step).",
+"used_for": "Sentry motor loop, -22/-19/-16 dB at pitch 1.0/1.15/1.4 by sentry state; faded after the tank hit."
+},
+{
+"group": "current",
+"name": "servo_loop10s",
+"wav": "[session scratch, not kept]/sound-audition/wav/current/servo_loop10s.wav",
+"png": "[session scratch, not kept]/sound-audition/wav/current/servo_loop10s.png",
+"seconds": 10,
+"peak_db": -6.02,
+"recipe": "The in-game servo loop buffer tiled to 10 s (seams marked yellow in the PNG). Seam check: clean (seam step equals a normal sample step).",
+"used_for": "Seam audition for: Sentry motor loop, -22/-19/-16 dB at pitch 1.0/1.15/1.4 by sentry state; faded after the tank hit."
+},
+{
+"group": "current",
+"name": "winch",
+"wav": "[session scratch, not kept]/sound-audition/wav/current/winch.wav",
+"png": "[session scratch, not kept]/sound-audition/wav/current/winch.png",
+"seconds": 1,
+"peak_db": -6.02,
+"recipe": "1 s loop: 90 Hz saw through a 700 Hz one-pole low-pass with a 7 Hz 25% wobble. Seam check: CLICKS once per loop (jump 0.440 vs 0.0032 median step) because the low-pass state restarts at 0.",
+"used_for": "Arm winch loop while the tank is hauled back up (-14 dB)."
+},
+{
+"group": "current",
+"name": "winch_loop10s",
+"wav": "[session scratch, not kept]/sound-audition/wav/current/winch_loop10s.wav",
+"png": "[session scratch, not kept]/sound-audition/wav/current/winch_loop10s.png",
+"seconds": 10,
+"peak_db": -6.02,
+"recipe": "The in-game winch loop buffer tiled to 10 s (seams marked yellow in the PNG). Seam check: CLICKS once per loop (jump 0.440 vs 0.0032 median step) because the low-pass state restarts at 0.",
+"used_for": "Seam audition for: Arm winch loop while the tank is hauled back up (-14 dB)."
+},
+{
+"group": "current",
+"name": "whine",
+"wav": "[session scratch, not kept]/sound-audition/wav/current/whine.wav",
+"png": "[session scratch, not kept]/sound-audition/wav/current/whine.png",
+"seconds": 0.6,
+"peak_db": -6.02,
+"recipe": "0.6 s sine sweeping 300 Hz->1.8 kHz (quadratic) with a 15% sub-octave square edge and light noise, swelling 0.3->1.0, 10 ms cut.",
+"used_for": "Exit bolt charging before it arcs (-4 dB)."
+},
+{
+"group": "footsteps",
+"name": "engineer_plate_1",
+"wav": "[session scratch, not kept]/sound-audition/wav/draft/footsteps/engineer_plate_1.wav",
+"png": "[session scratch, not kept]/sound-audition/wav/draft/footsteps/engineer_plate_1.png",
+"seconds": 0.25,
+"peak_db": -6.02,
+"recipe": "Engineer boot (heel, then toe 45-70 ms later); plate: 95 Hz thump + plate modes 232/611/1270 Hz + 0.3-2.5 kHz scuff; per-variant +/-5% detune from the seeded RNG.",
+"used_for": "Engineer footstep variant on corridor plate decking."
+},
+{
+"group": "footsteps",
+"name": "engineer_plate_2",
+"wav": "[session scratch, not kept]/sound-audition/wav/draft/footsteps/engineer_plate_2.wav",
+"png": "[session scratch, not kept]/sound-audition/wav/draft/footsteps/engineer_plate_2.png",
+"seconds": 0.25,
+"peak_db": -6.02,
+"recipe": "Engineer boot (heel, then toe 45-70 ms later); plate: 95 Hz thump + plate modes 232/611/1270 Hz + 0.3-2.5 kHz scuff; per-variant +/-5% detune from the seeded RNG.",
+"used_for": "Engineer footstep variant on corridor plate decking."
+},
+{
+"group": "footsteps",
+"name": "engineer_plate_3",
+"wav": "[session scratch, not kept]/sound-audition/wav/draft/footsteps/engineer_plate_3.wav",
+"png": "[session scratch, not kept]/sound-audition/wav/draft/footsteps/engineer_plate_3.png",
+"seconds": 0.25,
+"peak_db": -6.02,
+"recipe": "Engineer boot (heel, then toe 45-70 ms later); plate: 95 Hz thump + plate modes 232/611/1270 Hz + 0.3-2.5 kHz scuff; per-variant +/-5% detune from the seeded RNG.",
+"used_for": "Engineer footstep variant on corridor plate decking."
+},
+{
+"group": "footsteps",
+"name": "engineer_plate_4",
+"wav": "[session scratch, not kept]/sound-audition/wav/draft/footsteps/engineer_plate_4.wav",
+"png": "[session scratch, not kept]/sound-audition/wav/draft/footsteps/engineer_plate_4.png",
+"seconds": 0.25,
+"peak_db": -6.02,
+"recipe": "Engineer boot (heel, then toe 45-70 ms later); plate: 95 Hz thump + plate modes 232/611/1270 Hz + 0.3-2.5 kHz scuff; per-variant +/-5% detune from the seeded RNG.",
+"used_for": "Engineer footstep variant on corridor plate decking."
+},
+{
+"group": "footsteps",
+"name": "engineer_plate_walk6",
+"wav": "[session scratch, not kept]/sound-audition/wav/draft/footsteps/engineer_plate_walk6.wav",
+"png": "[session scratch, not kept]/sound-audition/wav/draft/footsteps/engineer_plate_walk6.png",
+"seconds": 1.6964,
+"peak_db": -6.02,
+"recipe": "6 steps every 242 ms (stride 46 px at 190 px/s), no-repeat variant pick, +/-6% pitch, +/-2 dB; picks [variant,pitch,dB]=[[3, 1.025, 0.31], [1, 0.975, -0.01], [2, 0.944, -0.72], [3, 0.989, 0.71], [1, 1.008, 1.35], [3, 1.046, -1.52]].",
+"used_for": "Walk-cycle audition of engineer footsteps on corridor plate decking with the planned jitter."
+},
+{
+"group": "footsteps",
+"name": "engineer_grating_1",
+"wav": "[session scratch, not kept]/sound-audition/wav/draft/footsteps/engineer_grating_1.wav",
+"png": "[session scratch, not kept]/sound-audition/wav/draft/footsteps/engineer_grating_1.png",
+"seconds": 0.32,
+"peak_db": -6.02,
+"recipe": "Engineer boot (heel, then toe 45-70 ms later); grating: lighter 120 Hz thump + ringing bar modes 780/1460/2310/3350 Hz + a second bar rattling 12-22 ms later; per-variant +/-5% detune from the seeded RNG.",
+"used_for": "Engineer footstep variant on corridor/junction grating and the hollow vent grate."
+},
+{
+"group": "footsteps",
+"name": "engineer_grating_2",
+"wav": "[session scratch, not kept]/sound-audition/wav/draft/footsteps/engineer_grating_2.wav",
+"png": "[session scratch, not kept]/sound-audition/wav/draft/footsteps/engineer_grating_2.png",
+"seconds": 0.32,
+"peak_db": -6.02,
+"recipe": "Engineer boot (heel, then toe 45-70 ms later); grating: lighter 120 Hz thump + ringing bar modes 780/1460/2310/3350 Hz + a second bar rattling 12-22 ms later; per-variant +/-5% detune from the seeded RNG.",
+"used_for": "Engineer footstep variant on corridor/junction grating and the hollow vent grate."
+},
+{
+"group": "footsteps",
+"name": "engineer_grating_3",
+"wav": "[session scratch, not kept]/sound-audition/wav/draft/footsteps/engineer_grating_3.wav",
+"png": "[session scratch, not kept]/sound-audition/wav/draft/footsteps/engineer_grating_3.png",
+"seconds": 0.32,
+"peak_db": -6.02,
+"recipe": "Engineer boot (heel, then toe 45-70 ms later); grating: lighter 120 Hz thump + ringing bar modes 780/1460/2310/3350 Hz + a second bar rattling 12-22 ms later; per-variant +/-5% detune from the seeded RNG.",
+"used_for": "Engineer footstep variant on corridor/junction grating and the hollow vent grate."
+},
+{
+"group": "footsteps",
+"name": "engineer_grating_4",
+"wav": "[session scratch, not kept]/sound-audition/wav/draft/footsteps/engineer_grating_4.wav",
+"png": "[session scratch, not kept]/sound-audition/wav/draft/footsteps/engineer_grating_4.png",
+"seconds": 0.32,
+"peak_db": -6.02,
+"recipe": "Engineer boot (heel, then toe 45-70 ms later); grating: lighter 120 Hz thump + ringing bar modes 780/1460/2310/3350 Hz + a second bar rattling 12-22 ms later; per-variant +/-5% detune from the seeded RNG.",
+"used_for": "Engineer footstep variant on corridor/junction grating and the hollow vent grate."
+},
+{
+"group": "footsteps",
+"name": "engineer_grating_walk6",
+"wav": "[session scratch, not kept]/sound-audition/wav/draft/footsteps/engineer_grating_walk6.wav",
+"png": "[session scratch, not kept]/sound-audition/wav/draft/footsteps/engineer_grating_walk6.png",
+"seconds": 1.7709,
+"peak_db": -6.02,
+"recipe": "6 steps every 242 ms (stride 46 px at 190 px/s), no-repeat variant pick, +/-6% pitch, +/-2 dB; picks [variant,pitch,dB]=[[2, 1.017, -0.65], [3, 1.031, 0.21], [1, 0.994, -0.26], [3, 1.047, 0.11], [1, 1.005, -1.45], [0, 0.944, -1.42]].",
+"used_for": "Walk-cycle audition of engineer footsteps on corridor/junction grating and the hollow vent grate with the planned jitter."
+},
+{
+"group": "footsteps",
+"name": "engineer_wet_1",
+"wav": "[session scratch, not kept]/sound-audition/wav/draft/footsteps/engineer_wet_1.wav",
+"png": "[session scratch, not kept]/sound-audition/wav/draft/footsteps/engineer_wet_1.png",
+"seconds": 0.28,
+"peak_db": -6.02,
+"recipe": "Engineer boot (heel, then toe 45-70 ms later); wet deck: damped plate + 100-900 Hz squelch + 1.5-6 kHz splash + 8-14 droplet chirps; per-variant +/-5% detune from the seeded RNG.",
+"used_for": "Engineer footstep variant on the Junction's wet-deck span."
+},
+{
+"group": "footsteps",
+"name": "engineer_wet_2",
+"wav": "[session scratch, not kept]/sound-audition/wav/draft/footsteps/engineer_wet_2.wav",
+"png": "[session scratch, not kept]/sound-audition/wav/draft/footsteps/engineer_wet_2.png",
+"seconds": 0.28,
+"peak_db": -6.02,
+"recipe": "Engineer boot (heel, then toe 45-70 ms later); wet deck: damped plate + 100-900 Hz squelch + 1.5-6 kHz splash + 8-14 droplet chirps; per-variant +/-5% detune from the seeded RNG.",
+"used_for": "Engineer footstep variant on the Junction's wet-deck span."
+},
+{
+"group": "footsteps",
+"name": "engineer_wet_3",
+"wav": "[session scratch, not kept]/sound-audition/wav/draft/footsteps/engineer_wet_3.wav",
+"png": "[session scratch, not kept]/sound-audition/wav/draft/footsteps/engineer_wet_3.png",
+"seconds": 0.28,
+"peak_db": -6.02,
+"recipe": "Engineer boot (heel, then toe 45-70 ms later); wet deck: damped plate + 100-900 Hz squelch + 1.5-6 kHz splash + 8-14 droplet chirps; per-variant +/-5% detune from the seeded RNG.",
+"used_for": "Engineer footstep variant on the Junction's wet-deck span."
+},
+{
+"group": "footsteps",
+"name": "engineer_wet_4",
+"wav": "[session scratch, not kept]/sound-audition/wav/draft/footsteps/engineer_wet_4.wav",
+"png": "[session scratch, not kept]/sound-audition/wav/draft/footsteps/engineer_wet_4.png",
+"seconds": 0.28,
+"peak_db": -6.02,
+"recipe": "Engineer boot (heel, then toe 45-70 ms later); wet deck: damped plate + 100-900 Hz squelch + 1.5-6 kHz splash + 8-14 droplet chirps; per-variant +/-5% detune from the seeded RNG.",
+"used_for": "Engineer footstep variant on the Junction's wet-deck span."
+},
+{
+"group": "footsteps",
+"name": "engineer_wet_walk6",
+"wav": "[session scratch, not kept]/sound-audition/wav/draft/footsteps/engineer_wet_walk6.wav",
+"png": "[session scratch, not kept]/sound-audition/wav/draft/footsteps/engineer_wet_walk6.png",
+"seconds": 1.7284,
+"peak_db": -6.02,
+"recipe": "6 steps every 242 ms (stride 46 px at 190 px/s), no-repeat variant pick, +/-6% pitch, +/-2 dB; picks [variant,pitch,dB]=[[0, 0.953, -0.62], [2, 1.014, 0.42], [3, 1.019, -0.48], [0, 1.053, -0.44], [3, 1.034, -1.12], [0, 0.993, -1.52]].",
+"used_for": "Walk-cycle audition of engineer footsteps on the Junction's wet-deck span with the planned jitter."
+},
+{
+"group": "footsteps",
+"name": "engineer_rubble_1",
+"wav": "[session scratch, not kept]/sound-audition/wav/draft/footsteps/engineer_rubble_1.wav",
+"png": "[session scratch, not kept]/sound-audition/wav/draft/footsteps/engineer_rubble_1.png",
+"seconds": 0.26,
+"peak_db": -6.02,
+"recipe": "Engineer boot (heel, then toe 45-70 ms later); rubble: dull 75 Hz knock + 20-35 grit grains (0.9-4.2 kHz, 1.5-5 ms) scattered over 120 ms; per-variant +/-5% detune from the seeded RNG.",
+"used_for": "Engineer footstep variant on rubble spans (post door-blast debris)."
+},
+{
+"group": "footsteps",
+"name": "engineer_rubble_2",
+"wav": "[session scratch, not kept]/sound-audition/wav/draft/footsteps/engineer_rubble_2.wav",
+"png": "[session scratch, not kept]/sound-audition/wav/draft/footsteps/engineer_rubble_2.png",
+"seconds": 0.26,
+"peak_db": -6.02,
+"recipe": "Engineer boot (heel, then toe 45-70 ms later); rubble: dull 75 Hz knock + 20-35 grit grains (0.9-4.2 kHz, 1.5-5 ms) scattered over 120 ms; per-variant +/-5% detune from the seeded RNG.",
+"used_for": "Engineer footstep variant on rubble spans (post door-blast debris)."
+},
+{
+"group": "footsteps",
+"name": "engineer_rubble_3",
+"wav": "[session scratch, not kept]/sound-audition/wav/draft/footsteps/engineer_rubble_3.wav",
+"png": "[session scratch, not kept]/sound-audition/wav/draft/footsteps/engineer_rubble_3.png",
+"seconds": 0.26,
+"peak_db": -6.02,
+"recipe": "Engineer boot (heel, then toe 45-70 ms later); rubble: dull 75 Hz knock + 20-35 grit grains (0.9-4.2 kHz, 1.5-5 ms) scattered over 120 ms; per-variant +/-5% detune from the seeded RNG.",
+"used_for": "Engineer footstep variant on rubble spans (post door-blast debris)."
+},
+{
+"group": "footsteps",
+"name": "engineer_rubble_4",
+"wav": "[session scratch, not kept]/sound-audition/wav/draft/footsteps/engineer_rubble_4.wav",
+"png": "[session scratch, not kept]/sound-audition/wav/draft/footsteps/engineer_rubble_4.png",
+"seconds": 0.26,
+"peak_db": -6.02,
+"recipe": "Engineer boot (heel, then toe 45-70 ms later); rubble: dull 75 Hz knock + 20-35 grit grains (0.9-4.2 kHz, 1.5-5 ms) scattered over 120 ms; per-variant +/-5% detune from the seeded RNG.",
+"used_for": "Engineer footstep variant on rubble spans (post door-blast debris)."
+},
+{
+"group": "footsteps",
+"name": "engineer_rubble_walk6",
+"wav": "[session scratch, not kept]/sound-audition/wav/draft/footsteps/engineer_rubble_walk6.wav",
+"png": "[session scratch, not kept]/sound-audition/wav/draft/footsteps/engineer_rubble_walk6.png",
+"seconds": 1.7071,
+"peak_db": -6.02,
+"recipe": "6 steps every 242 ms (stride 46 px at 190 px/s), no-repeat variant pick, +/-6% pitch, +/-2 dB; picks [variant,pitch,dB]=[[1, 1.019, 0.81], [0, 0.972, -0.38], [3, 1.031, -1.76], [2, 1.044, -1.76], [0, 0.945, 0.25], [2, 0.948, -1.98]].",
+"used_for": "Walk-cycle audition of engineer footsteps on rubble spans (post door-blast debris) with the planned jitter."
+},
+{
+"group": "footsteps",
+"name": "wolf_plate_1",
+"wav": "[session scratch, not kept]/sound-audition/wav/draft/footsteps/wolf_plate_1.wav",
+"png": "[session scratch, not kept]/sound-audition/wav/draft/footsteps/wolf_plate_1.png",
+"seconds": 0.16,
+"peak_db": -6.02,
+"recipe": "WOLF metal paw (front/hind pair 18-35 ms apart); plate: claw ticks 3.15/4.72 kHz + metal pad 523/1347 Hz + 165 Hz thump + faint plate ring; per-variant +/-5% detune from the seeded RNG.",
+"used_for": "WOLF footstep variant on corridor plate decking."
+},
+{
+"group": "footsteps",
+"name": "wolf_plate_2",
+"wav": "[session scratch, not kept]/sound-audition/wav/draft/footsteps/wolf_plate_2.wav",
+"png": "[session scratch, not kept]/sound-audition/wav/draft/footsteps/wolf_plate_2.png",
+"seconds": 0.16,
+"peak_db": -6.02,
+"recipe": "WOLF metal paw (front/hind pair 18-35 ms apart); plate: claw ticks 3.15/4.72 kHz + metal pad 523/1347 Hz + 165 Hz thump + faint plate ring; per-variant +/-5% detune from the seeded RNG.",
+"used_for": "WOLF footstep variant on corridor plate decking."
+},
+{
+"group": "footsteps",
+"name": "wolf_plate_3",
+"wav": "[session scratch, not kept]/sound-audition/wav/draft/footsteps/wolf_plate_3.wav",
+"png": "[session scratch, not kept]/sound-audition/wav/draft/footsteps/wolf_plate_3.png",
+"seconds": 0.16,
+"peak_db": -6.02,
+"recipe": "WOLF metal paw (front/hind pair 18-35 ms apart); plate: claw ticks 3.15/4.72 kHz + metal pad 523/1347 Hz + 165 Hz thump + faint plate ring; per-variant +/-5% detune from the seeded RNG.",
+"used_for": "WOLF footstep variant on corridor plate decking."
+},
+{
+"group": "footsteps",
+"name": "wolf_plate_4",
+"wav": "[session scratch, not kept]/sound-audition/wav/draft/footsteps/wolf_plate_4.wav",
+"png": "[session scratch, not kept]/sound-audition/wav/draft/footsteps/wolf_plate_4.png",
+"seconds": 0.16,
+"peak_db": -6.02,
+"recipe": "WOLF metal paw (front/hind pair 18-35 ms apart); plate: claw ticks 3.15/4.72 kHz + metal pad 523/1347 Hz + 165 Hz thump + faint plate ring; per-variant +/-5% detune from the seeded RNG.",
+"used_for": "WOLF footstep variant on corridor plate decking."
+},
+{
+"group": "footsteps",
+"name": "wolf_plate_walk6",
+"wav": "[session scratch, not kept]/sound-audition/wav/draft/footsteps/wolf_plate_walk6.wav",
+"png": "[session scratch, not kept]/sound-audition/wav/draft/footsteps/wolf_plate_walk6.png",
+"seconds": 1.1797,
+"peak_db": -6.02,
+"recipe": "6 steps every 158 ms (stride 30 px at 190 px/s), no-repeat variant pick, +/-6% pitch, +/-2 dB; picks [variant,pitch,dB]=[[2, 1.0, -0.23], [3, 1.044, 1.77], [0, 0.961, -1.7], [3, 1.018, 0.77], [0, 1.026, 0.51], [3, 0.945, -0.62]].",
+"used_for": "Walk-cycle audition of wolf footsteps on corridor plate decking with the planned jitter."
+},
+{
+"group": "footsteps",
+"name": "wolf_grating_1",
+"wav": "[session scratch, not kept]/sound-audition/wav/draft/footsteps/wolf_grating_1.wav",
+"png": "[session scratch, not kept]/sound-audition/wav/draft/footsteps/wolf_grating_1.png",
+"seconds": 0.22,
+"peak_db": -6.02,
+"recipe": "WOLF metal paw (front/hind pair 18-35 ms apart); grating: claw ticks + metal pad + grate ring 780/2310 Hz + an extra claw catch; per-variant +/-5% detune from the seeded RNG.",
+"used_for": "WOLF footstep variant on corridor/junction grating and the hollow vent grate."
+},
+{
+"group": "footsteps",
+"name": "wolf_grating_2",
+"wav": "[session scratch, not kept]/sound-audition/wav/draft/footsteps/wolf_grating_2.wav",
+"png": "[session scratch, not kept]/sound-audition/wav/draft/footsteps/wolf_grating_2.png",
+"seconds": 0.22,
+"peak_db": -6.02,
+"recipe": "WOLF metal paw (front/hind pair 18-35 ms apart); grating: claw ticks + metal pad + grate ring 780/2310 Hz + an extra claw catch; per-variant +/-5% detune from the seeded RNG.",
+"used_for": "WOLF footstep variant on corridor/junction grating and the hollow vent grate."
+},
+{
+"group": "footsteps",
+"name": "wolf_grating_3",
+"wav": "[session scratch, not kept]/sound-audition/wav/draft/footsteps/wolf_grating_3.wav",
+"png": "[session scratch, not kept]/sound-audition/wav/draft/footsteps/wolf_grating_3.png",
+"seconds": 0.22,
+"peak_db": -6.02,
+"recipe": "WOLF metal paw (front/hind pair 18-35 ms apart); grating: claw ticks + metal pad + grate ring 780/2310 Hz + an extra claw catch; per-variant +/-5% detune from the seeded RNG.",
+"used_for": "WOLF footstep variant on corridor/junction grating and the hollow vent grate."
+},
+{
+"group": "footsteps",
+"name": "wolf_grating_4",
+"wav": "[session scratch, not kept]/sound-audition/wav/draft/footsteps/wolf_grating_4.wav",
+"png": "[session scratch, not kept]/sound-audition/wav/draft/footsteps/wolf_grating_4.png",
+"seconds": 0.22,
+"peak_db": -6.02,
+"recipe": "WOLF metal paw (front/hind pair 18-35 ms apart); grating: claw ticks + metal pad + grate ring 780/2310 Hz + an extra claw catch; per-variant +/-5% detune from the seeded RNG.",
+"used_for": "WOLF footstep variant on corridor/junction grating and the hollow vent grate."
+},
+{
+"group": "footsteps",
+"name": "wolf_grating_walk6",
+"wav": "[session scratch, not kept]/sound-audition/wav/draft/footsteps/wolf_grating_walk6.wav",
+"png": "[session scratch, not kept]/sound-audition/wav/draft/footsteps/wolf_grating_walk6.png",
+"seconds": 1.2435,
+"peak_db": -6.02,
+"recipe": "6 steps every 158 ms (stride 30 px at 190 px/s), no-repeat variant pick, +/-6% pitch, +/-2 dB; picks [variant,pitch,dB]=[[0, 0.944, -1.13], [3, 0.967, -0.19], [1, 1.0, 0.12], [2, 1.04, -0.8], [1, 1.026, -0.01], [0, 0.994, -0.47]].",
+"used_for": "Walk-cycle audition of wolf footsteps on corridor/junction grating and the hollow vent grate with the planned jitter."
+},
+{
+"group": "footsteps",
+"name": "wolf_wet_1",
+"wav": "[session scratch, not kept]/sound-audition/wav/draft/footsteps/wolf_wet_1.wav",
+"png": "[session scratch, not kept]/sound-audition/wav/draft/footsteps/wolf_wet_1.png",
+"seconds": 0.2,
+"peak_db": -6.02,
+"recipe": "WOLF metal paw (front/hind pair 18-35 ms apart); wet deck: softer claws + metal pad + small splash and 3-6 droplets; per-variant +/-5% detune from the seeded RNG.",
+"used_for": "WOLF footstep variant on the Junction's wet-deck span."
+},
+{
+"group": "footsteps",
+"name": "wolf_wet_2",
+"wav": "[session scratch, not kept]/sound-audition/wav/draft/footsteps/wolf_wet_2.wav",
+"png": "[session scratch, not kept]/sound-audition/wav/draft/footsteps/wolf_wet_2.png",
+"seconds": 0.2,
+"peak_db": -6.02,
+"recipe": "WOLF metal paw (front/hind pair 18-35 ms apart); wet deck: softer claws + metal pad + small splash and 3-6 droplets; per-variant +/-5% detune from the seeded RNG.",
+"used_for": "WOLF footstep variant on the Junction's wet-deck span."
+},
+{
+"group": "footsteps",
+"name": "wolf_wet_3",
+"wav": "[session scratch, not kept]/sound-audition/wav/draft/footsteps/wolf_wet_3.wav",
+"png": "[session scratch, not kept]/sound-audition/wav/draft/footsteps/wolf_wet_3.png",
+"seconds": 0.2,
+"peak_db": -6.02,
+"recipe": "WOLF metal paw (front/hind pair 18-35 ms apart); wet deck: softer claws + metal pad + small splash and 3-6 droplets; per-variant +/-5% detune from the seeded RNG.",
+"used_for": "WOLF footstep variant on the Junction's wet-deck span."
+},
+{
+"group": "footsteps",
+"name": "wolf_wet_4",
+"wav": "[session scratch, not kept]/sound-audition/wav/draft/footsteps/wolf_wet_4.wav",
+"png": "[session scratch, not kept]/sound-audition/wav/draft/footsteps/wolf_wet_4.png",
+"seconds": 0.2,
+"peak_db": -6.02,
+"recipe": "WOLF metal paw (front/hind pair 18-35 ms apart); wet deck: softer claws + metal pad + small splash and 3-6 droplets; per-variant +/-5% detune from the seeded RNG.",
+"used_for": "WOLF footstep variant on the Junction's wet-deck span."
+},
+{
+"group": "footsteps",
+"name": "wolf_wet_walk6",
+"wav": "[session scratch, not kept]/sound-audition/wav/draft/footsteps/wolf_wet_walk6.wav",
+"png": "[session scratch, not kept]/sound-audition/wav/draft/footsteps/wolf_wet_walk6.png",
+"seconds": 1.2222,
+"peak_db": -6.02,
+"recipe": "6 steps every 158 ms (stride 30 px at 190 px/s), no-repeat variant pick, +/-6% pitch, +/-2 dB; picks [variant,pitch,dB]=[[2, 1.012, 1.82], [0, 0.954, 1.42], [1, 1.02, -0.61], [3, 1.05, -1.68], [0, 0.947, -0.59], [1, 1.039, -0.15]].",
+"used_for": "Walk-cycle audition of wolf footsteps on the Junction's wet-deck span with the planned jitter."
+},
+{
+"group": "footsteps",
+"name": "wolf_rubble_1",
+"wav": "[session scratch, not kept]/sound-audition/wav/draft/footsteps/wolf_rubble_1.wav",
+"png": "[session scratch, not kept]/sound-audition/wav/draft/footsteps/wolf_rubble_1.png",
+"seconds": 0.18,
+"peak_db": -6.02,
+"recipe": "WOLF metal paw (front/hind pair 18-35 ms apart); rubble: softer claws + metal pad + 8-14 grit grains; per-variant +/-5% detune from the seeded RNG.",
+"used_for": "WOLF footstep variant on rubble spans (post door-blast debris)."
+},
+{
+"group": "footsteps",
+"name": "wolf_rubble_2",
+"wav": "[session scratch, not kept]/sound-audition/wav/draft/footsteps/wolf_rubble_2.wav",
+"png": "[session scratch, not kept]/sound-audition/wav/draft/footsteps/wolf_rubble_2.png",
+"seconds": 0.18,
+"peak_db": -6.02,
+"recipe": "WOLF metal paw (front/hind pair 18-35 ms apart); rubble: softer claws + metal pad + 8-14 grit grains; per-variant +/-5% detune from the seeded RNG.",
+"used_for": "WOLF footstep variant on rubble spans (post door-blast debris)."
+},
+{
+"group": "footsteps",
+"name": "wolf_rubble_3",
+"wav": "[session scratch, not kept]/sound-audition/wav/draft/footsteps/wolf_rubble_3.wav",
+"png": "[session scratch, not kept]/sound-audition/wav/draft/footsteps/wolf_rubble_3.png",
+"seconds": 0.18,
+"peak_db": -6.02,
+"recipe": "WOLF metal paw (front/hind pair 18-35 ms apart); rubble: softer claws + metal pad + 8-14 grit grains; per-variant +/-5% detune from the seeded RNG.",
+"used_for": "WOLF footstep variant on rubble spans (post door-blast debris)."
+},
+{
+"group": "footsteps",
+"name": "wolf_rubble_4",
+"wav": "[session scratch, not kept]/sound-audition/wav/draft/footsteps/wolf_rubble_4.wav",
+"png": "[session scratch, not kept]/sound-audition/wav/draft/footsteps/wolf_rubble_4.png",
+"seconds": 0.18,
+"peak_db": -6.02,
+"recipe": "WOLF metal paw (front/hind pair 18-35 ms apart); rubble: softer claws + metal pad + 8-14 grit grains; per-variant +/-5% detune from the seeded RNG.",
+"used_for": "WOLF footstep variant on rubble spans (post door-blast debris)."
+},
+{
+"group": "footsteps",
+"name": "wolf_rubble_walk6",
+"wav": "[session scratch, not kept]/sound-audition/wav/draft/footsteps/wolf_rubble_walk6.wav",
+"png": "[session scratch, not kept]/sound-audition/wav/draft/footsteps/wolf_rubble_walk6.png",
+"seconds": 1.201,
+"peak_db": -6.02,
+"recipe": "6 steps every 158 ms (stride 30 px at 190 px/s), no-repeat variant pick, +/-6% pitch, +/-2 dB; picks [variant,pitch,dB]=[[0, 1.003, 1.62], [3, 0.977, -0.23], [1, 0.955, -1.68], [3, 1.005, 0.86], [2, 1.054, -0.3], [1, 0.965, 1.01]].",
+"used_for": "Walk-cycle audition of wolf footsteps on rubble spans (post door-blast debris) with the planned jitter."
+},
+{
+"group": "roomtone",
+"name": "corridor_bed10s",
+"wav": "[session scratch, not kept]/sound-audition/wav/draft/roomtone/corridor_bed10s.wav",
+"png": "[session scratch, not kept]/sound-audition/wav/draft/roomtone/corridor_bed10s.png",
+"seconds": 10,
+"peak_db": -6.02,
+"recipe": "Ventilation: 900 Hz LP noise + 2.5k air band + 320 Hz duct band-pass (Q1.5), +/-20% drift; tones 60/120 Hz mains, 87.5+88 Hz fan blade-pass beating at 0.5 Hz, 175 Hz. 5 chunks x 2 s chained from a shuffle bag (order [1, 4, 2, 3, 0, 1]) with 0.25 s equal-power crossfades; tail wraps into head; generated in 380 ms.",
+"used_for": "Corridor room tone bed."
+},
+{
+"group": "roomtone",
+"name": "records_bed10s",
+"wav": "[session scratch, not kept]/sound-audition/wav/draft/roomtone/records_bed10s.wav",
+"png": "[session scratch, not kept]/sound-audition/wav/draft/roomtone/records_bed10s.png",
+"seconds": 10,
+"peak_db": -6.02,
+"recipe": "Dry electrical hush: 1.5-6 kHz soft hiss + trace brown noise + sparse 3-5.5 kHz micro-crackle, +/-10% drift; transformer buzz 60/120/180/240/360 Hz with 120.5 Hz beat. 5 chunks x 2 s chained from a shuffle bag (order [1, 0, 3, 2, 4, 1]) with 0.25 s equal-power crossfades; tail wraps into head; generated in 356 ms.",
+"used_for": "Records Access room tone bed (dead, dry room)."
+},
+{
+"group": "roomtone",
+"name": "junction_bed10s",
+"wav": "[session scratch, not kept]/sound-audition/wav/draft/roomtone/junction_bed10s.wav",
+"png": "[session scratch, not kept]/sound-audition/wav/draft/roomtone/junction_bed10s.png",
+"seconds": 10,
+"peak_db": -6.02,
+"recipe": "Big metal drone: brown rumble + 220 Hz LP + 140 Hz (Q4) and 660 Hz (Q8) bands through a 29 ms feedback comb (0.55), +/-25% drift; tones 41+41.5/82.5 Hz and metal partials 137.5/211/389.5/523 Hz. 5 chunks x 2 s chained from a shuffle bag (order [1, 0, 3, 2, 4, 1]) with 0.25 s equal-power crossfades; tail wraps into head; generated in 472 ms.",
+"used_for": "Service Junction room tone bed."
+},
+{
+"group": "ambient",
+"name": "distant_bang",
+"wav": "[session scratch, not kept]/sound-audition/wav/draft/ambient/distant_bang.wav",
+"png": "[session scratch, not kept]/sound-audition/wav/draft/ambient/distant_bang.png",
+"seconds": 1.8,
+"peak_db": -6.02,
+"recipe": "Hull modes 48/71/113/167/239 Hz (tau 0.25-0.9 s) + low noise knock, low-passed 600 Hz, reflections at 140 and 310 ms.",
+"used_for": "Distant hull bang one-shot for any room's scheduler (corridor hull knocks)."
+},
+{
+"group": "ambient",
+"name": "drip",
+"wav": "[session scratch, not kept]/sound-audition/wav/draft/ambient/drip.wav",
+"png": "[session scratch, not kept]/sound-audition/wav/draft/ambient/drip.png",
+"seconds": 0.5,
+"peak_db": -6.02,
+"recipe": "Impact tick + bubble chirp rising ~1.1->2.4 kHz (tau 18 ms) + quieter repeat at 112 ms + faint wash.",
+"used_for": "Junction drips near the wet deck."
+},
+{
+"group": "ambient",
+"name": "pipe_creak",
+"wav": "[session scratch, not kept]/sound-audition/wav/draft/ambient/pipe_creak.wav",
+"png": "[session scratch, not kept]/sound-audition/wav/draft/ambient/pipe_creak.png",
+"seconds": 1.2,
+"peak_db": -6.02,
+"recipe": "Stick-slip pulse train wandering 38->70->45 Hz through band-passes at 420 Hz (Q12), 1.15 kHz (Q15), 2.3 kHz (Q10), swell in/out.",
+"used_for": "Junction pipe/pressure creaks (thin out after door_blown)."
+},
+{
+"group": "ambient",
+"name": "cooling_tick",
+"wav": "[session scratch, not kept]/sound-audition/wav/draft/ambient/cooling_tick.wav",
+"png": "[session scratch, not kept]/sound-audition/wav/draft/ambient/cooling_tick.png",
+"seconds": 0.6,
+"peak_db": -6.02,
+"recipe": "Three irregular ticks: 0.6 ms noise click + modes 2.9/4.1/6.3 kHz and a 900 Hz body.",
+"used_for": "Metal cooling ticks, e.g. after the blast or near warm machinery."
+},
+{
+"group": "ambient",
+"name": "vent_flutter",
+"wav": "[session scratch, not kept]/sound-audition/wav/draft/ambient/vent_flutter.wav",
+"png": "[session scratch, not kept]/sound-audition/wav/draft/ambient/vent_flutter.png",
+"seconds": 1,
+"peak_db": -6.02,
+"recipe": "1.4 kHz low-passed noise chopped by a flap rate falling 22->14 Hz, 500 Hz body, 980 Hz tin knock per beat.",
+"used_for": "Corridor/junction vent flutter."
+},
+{
+"group": "ambient",
+"name": "relay_click",
+"wav": "[session scratch, not kept]/sound-audition/wav/draft/ambient/relay_click.wav",
+"png": "[session scratch, not kept]/sound-audition/wav/draft/ambient/relay_click.png",
+"seconds": 0.35,
+"peak_db": -6.02,
+"recipe": "Armature click with bounces at 6 and 9 ms (1.8/3.3 kHz modes) + 160 ms 120 Hz coil buzz, low-passed 3.5 kHz for distance.",
+"used_for": "Records relay ticks; stop once the corridor relay is set."
+},
+{
+"group": "case",
+"name": "rustle",
+"wav": "[session scratch, not kept]/sound-audition/wav/draft/case/rustle.wav",
+"png": "[session scratch, not kept]/sound-audition/wav/draft/case/rustle.png",
+"seconds": 0.6,
+"peak_db": -6.02,
+"recipe": "Two handling gestures of dense 1.2-7 kHz noise grains (0.5-3 ms, sine-shaped density) over soft friction hiss.",
+"used_for": "Paper/evidence sheet taken or put into the case."
+},
+{
+"group": "case",
+"name": "clack",
+"wav": "[session scratch, not kept]/sound-audition/wav/draft/case/clack.wav",
+"png": "[session scratch, not kept]/sound-audition/wav/draft/case/clack.png",
+"seconds": 0.14,
+"peak_db": -6.02,
+"recipe": "Insert click then louder seat click 45-60 ms later: hard tick + plastic modes 1.05/2.35/3.9 kHz + 260 Hz body.",
+"used_for": "Data cartridge seated in the case slot."
+},
+{
+"group": "case",
+"name": "clink",
+"wav": "[session scratch, not kept]/sound-audition/wav/draft/case/clink.wav",
+"png": "[session scratch, not kept]/sound-audition/wav/draft/case/clink.png",
+"seconds": 0.7,
+"peak_db": -6.02,
+"recipe": "Free-bar modes 1:2.756:5.404:8.933 from ~1.1 kHz (tau 0.35-0.05 s) struck, then two smaller detuned bounces.",
+"used_for": "Metal tag or tool set down in the case."
+},
+{
+"group": "case",
+"name": "ratchet",
+"wav": "[session scratch, not kept]/sound-audition/wav/draft/case/ratchet.wav",
+"png": "[session scratch, not kept]/sound-audition/wav/draft/case/ratchet.png",
+"seconds": 0.5,
+"peak_db": -6.02,
+"recipe": "Six pawl clicks ~65 ms apart: noise tick + modes 1.65/2.6/4.3 kHz climbing 2% per tick + faint 5.2 kHz spring ring.",
+"used_for": "Ratchet clicks per hold tick when a tool is used at a station / case latch."
+}
+]

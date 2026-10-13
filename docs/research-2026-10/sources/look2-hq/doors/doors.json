@@ -1,0 +1,537 @@
+{
+ "corridor-seal": {
+  "canvas": [
+   368,
+   576
+  ],
+  "world_size": [
+   92.0,
+   144.0
+  ],
+  "density": "D = 4 (scale 0.25)",
+  "baseline_row": 567,
+  "opening_bbox": [
+   123,
+   148,
+   261,
+   507
+  ],
+  "near_jamb": "left",
+  "front_lip_cut_x": 123,
+  "lamp_boxes": [
+   [
+    127,
+    40,
+    144,
+    75
+   ],
+   [
+    62,
+    61,
+    83,
+    94
+   ],
+   [
+    155,
+    81,
+    195,
+    109
+   ],
+   [
+    312,
+    258,
+    327,
+    283
+   ],
+   [
+    312,
+    361,
+    328,
+    386
+   ]
+  ],
+  "lamp_states": {
+   "sealed": "red",
+   "open": "green"
+  },
+  "draw_order_back_to_front": [
+   "passage",
+   "leaf",
+   "frame-<state>",
+   "(actors)",
+   "front-lip[-<state>]"
+  ],
+  "files": {
+   "frame-sealed": {
+    "file": "corridor-seal-frame-sealed.png",
+    "baseline": 567,
+    "opaque_bbox": [
+     15,
+     7,
+     352,
+     567
+    ],
+    "qa_pass": true
+   },
+   "front-lip-sealed": {
+    "file": "corridor-seal-front-lip-sealed.png",
+    "baseline": 567,
+    "opaque_bbox": [
+     15,
+     7,
+     122,
+     567
+    ],
+    "qa_pass": true
+   },
+   "frame-open": {
+    "file": "corridor-seal-frame-open.png",
+    "baseline": 567,
+    "opaque_bbox": [
+     15,
+     7,
+     352,
+     567
+    ],
+    "qa_pass": true
+   },
+   "front-lip-open": {
+    "file": "corridor-seal-front-lip-open.png",
+    "baseline": 567,
+    "opaque_bbox": [
+     15,
+     7,
+     122,
+     567
+    ],
+    "qa_pass": true
+   },
+   "passage": {
+    "file": "corridor-seal-passage.png",
+    "baseline": 510,
+    "opaque_bbox": [
+     120,
+     145,
+     264,
+     510
+    ],
+    "qa_pass": true
+   },
+   "leaf": {
+    "file": "corridor-seal-leaf.png",
+    "baseline": 510,
+    "opaque_bbox": [
+     120,
+     145,
+     264,
+     510
+    ],
+    "qa_pass": true
+   }
+  },
+  "note": "All layers share one canvas and origin; stack them at the same position. The leaf is cut to the opening grown by 3 px and sits behind the frame; to open, slide it up and clip it at opening_bbox top."
+ },
+ "archive-lift-hatch": {
+  "canvas": [
+   416,
+   576
+  ],
+  "world_size": [
+   104.0,
+   144.0
+  ],
+  "density": "D = 4 (scale 0.25)",
+  "baseline_row": 567,
+  "opening_bbox": [
+   112,
+   165,
+   320,
+   525
+  ],
+  "near_jamb": "left",
+  "front_lip_cut_x": 112,
+  "lamp_boxes": [
+   [
+    224,
+    127,
+    260,
+    156
+   ]
+  ],
+  "lamp_states": {
+   "sealed": "red",
+   "open": "green",
+   "idle": "cyan"
+  },
+  "draw_order_back_to_front": [
+   "passage",
+   "leaf",
+   "frame-<state>",
+   "(actors)",
+   "front-lip[-<state>]"
+  ],
+  "files": {
+   "frame-sealed": {
+    "file": "archive-lift-hatch-frame-sealed.png",
+    "baseline": 567,
+    "opaque_bbox": [
+     8,
+     8,
+     407,
+     567
+    ],
+    "qa_pass": true
+   },
+   "frame-open": {
+    "file": "archive-lift-hatch-frame-open.png",
+    "baseline": 567,
+    "opaque_bbox": [
+     8,
+     8,
+     407,
+     567
+    ],
+    "qa_pass": true
+   },
+   "frame-idle": {
+    "file": "archive-lift-hatch-frame-idle.png",
+    "baseline": 567,
+    "opaque_bbox": [
+     8,
+     8,
+     407,
+     567
+    ],
+    "qa_pass": true
+   },
+   "front-lip": {
+    "file": "archive-lift-hatch-front-lip.png",
+    "baseline": 567,
+    "opaque_bbox": [
+     8,
+     52,
+     111,
+     567
+    ],
+    "qa_pass": true
+   },
+   "passage": {
+    "file": "archive-lift-hatch-passage.png",
+    "baseline": 528,
+    "opaque_bbox": [
+     109,
+     162,
+     323,
+     528
+    ],
+    "qa_pass": true
+   },
+   "leaf": {
+    "file": "archive-lift-hatch-leaf.png",
+    "baseline": 528,
+    "opaque_bbox": [
+     109,
+     162,
+     323,
+     528
+    ],
+    "qa_pass": true
+   }
+  },
+  "note": "All layers share one canvas and origin; stack them at the same position. The leaf is cut to the opening grown by 3 px and sits behind the frame; to open, slide it up and clip it at opening_bbox top."
+ },
+ "junction-blast-door": {
+  "canvas": [
+   384,
+   576
+  ],
+  "world_size": [
+   96.0,
+   144.0
+  ],
+  "density": "D = 4 (scale 0.25)",
+  "baseline_row": 567,
+  "opening_bbox": [
+   115,
+   144,
+   263,
+   514
+  ],
+  "near_jamb": "left",
+  "front_lip_cut_x": 115,
+  "lamp_boxes": [
+   [
+    114,
+    39,
+    132,
+    79
+   ],
+   [
+    53,
+    54,
+    74,
+    92
+   ],
+   [
+    43,
+    197,
+    55,
+    225
+   ],
+   [
+    322,
+    266,
+    340,
+    293
+   ],
+   [
+    43,
+    370,
+    55,
+    394
+   ],
+   [
+    324,
+    371,
+    341,
+    399
+   ]
+  ],
+  "lamp_states": {
+   "armed": "amber",
+   "off": null
+  },
+  "draw_order_back_to_front": [
+   "passage",
+   "leaf-sealed",
+   "leaf-breaking",
+   "blown-debris",
+   "frame-<state>",
+   "(actors)",
+   "front-lip[-<state>]"
+  ],
+  "files": {
+   "frame-armed": {
+    "file": "junction-blast-door-frame-armed.png",
+    "baseline": 567,
+    "opaque_bbox": [
+     11,
+     8,
+     374,
+     568
+    ],
+    "qa_pass": true
+   },
+   "front-lip-armed": {
+    "file": "junction-blast-door-front-lip-armed.png",
+    "baseline": 567,
+    "opaque_bbox": [
+     11,
+     8,
+     114,
+     568
+    ],
+    "qa_pass": true
+   },
+   "frame-off": {
+    "file": "junction-blast-door-frame-off.png",
+    "baseline": 567,
+    "opaque_bbox": [
+     11,
+     8,
+     374,
+     568
+    ],
+    "qa_pass": true
+   },
+   "front-lip-off": {
+    "file": "junction-blast-door-front-lip-off.png",
+    "baseline": 567,
+    "opaque_bbox": [
+     11,
+     8,
+     114,
+     568
+    ],
+    "qa_pass": true
+   },
+   "passage": {
+    "file": "junction-blast-door-passage.png",
+    "baseline": 517,
+    "opaque_bbox": [
+     112,
+     141,
+     266,
+     517
+    ],
+    "qa_pass": true
+   },
+   "leaf-sealed": {
+    "file": "junction-blast-door-leaf-sealed.png",
+    "baseline": 517,
+    "opaque_bbox": [
+     112,
+     141,
+     266,
+     517
+    ],
+    "qa_pass": true
+   },
+   "leaf-breaking": {
+    "file": "junction-blast-door-leaf-breaking.png",
+    "baseline": 517,
+    "opaque_bbox": [
+     112,
+     141,
+     266,
+     517
+    ],
+    "qa_pass": true
+   },
+   "blown-debris": {
+    "file": "junction-blast-door-blown-debris.png",
+    "baseline": 517,
+    "opaque_bbox": [
+     112,
+     141,
+     266,
+     517
+    ],
+    "qa_pass": true
+   }
+  },
+  "note": "All layers share one canvas and origin; stack them at the same position. The leaf is cut to the opening grown by 3 px and sits behind the frame; to open, slide it up and clip it at opening_bbox top."
+ },
+ "records-west-door": {
+  "canvas": [
+   368,
+   576
+  ],
+  "world_size": [
+   92.0,
+   144.0
+  ],
+  "density": "D = 4 (scale 0.25)",
+  "baseline_row": 567,
+  "opening_bbox": [
+   107,
+   150,
+   243,
+   507
+  ],
+  "near_jamb": "right",
+  "front_lip_cut_x": 243,
+  "lamp_boxes": [
+   [
+    222,
+    43,
+    240,
+    78
+   ],
+   [
+    284,
+    63,
+    305,
+    96
+   ],
+   [
+    171,
+    83,
+    212,
+    111
+   ],
+   [
+    40,
+    260,
+    56,
+    284
+   ],
+   [
+    39,
+    362,
+    55,
+    387
+   ]
+  ],
+  "lamp_states": {
+   "sealed": "red",
+   "open": "green"
+  },
+  "draw_order_back_to_front": [
+   "passage",
+   "leaf",
+   "frame-<state>",
+   "(actors)",
+   "front-lip[-<state>]"
+  ],
+  "files": {
+   "frame-sealed": {
+    "file": "records-west-door-frame-sealed.png",
+    "baseline": 567,
+    "opaque_bbox": [
+     15,
+     9,
+     351,
+     567
+    ],
+    "qa_pass": true
+   },
+   "front-lip-sealed": {
+    "file": "records-west-door-front-lip-sealed.png",
+    "baseline": 567,
+    "opaque_bbox": [
+     244,
+     9,
+     351,
+     567
+    ],
+    "qa_pass": true
+   },
+   "frame-open": {
+    "file": "records-west-door-frame-open.png",
+    "baseline": 567,
+    "opaque_bbox": [
+     15,
+     9,
+     351,
+     567
+    ],
+    "qa_pass": true
+   },
+   "front-lip-open": {
+    "file": "records-west-door-front-lip-open.png",
+    "baseline": 567,
+    "opaque_bbox": [
+     244,
+     9,
+     351,
+     567
+    ],
+    "qa_pass": true
+   },
+   "passage": {
+    "file": "records-west-door-passage.png",
+    "baseline": 510,
+    "opaque_bbox": [
+     104,
+     147,
+     246,
+     510
+    ],
+    "qa_pass": true
+   },
+   "leaf": {
+    "file": "records-west-door-leaf.png",
+    "baseline": 510,
+    "opaque_bbox": [
+     104,
+     147,
+     246,
+     510
+    ],
+    "qa_pass": true
+   }
+  },
+  "note": "All layers share one canvas and origin; stack them at the same position. The leaf is cut to the opening grown by 3 px and sits behind the frame; to open, slide it up and clip it at opening_bbox top."
+ }
+}

@@ -1,0 +1,93 @@
+{
+ "eng-collapse-game1080": {
+  "file": "eng-collapse-game1080",
+  "frames": 6,
+  "durations_ms": [
+   500,
+   90,
+   90,
+   135,
+   135,
+   1200
+  ],
+  "size": [
+   443,
+   267
+  ],
+  "scale_from_cell": 0.6859
+ },
+ "eng-collapse-2x": {
+  "file": "eng-collapse-2x",
+  "frames": 6,
+  "durations_ms": [
+   500,
+   90,
+   90,
+   135,
+   135,
+   1200
+  ],
+  "size": [
+   886,
+   535
+  ],
+  "scale_from_cell": 1.3718
+ },
+ "wolf-liedown-game1080": {
+  "file": "wolf-liedown-game1080",
+  "frames": 4,
+  "durations_ms": [
+   500,
+   120,
+   120,
+   1200
+  ],
+  "size": [
+   498,
+   239
+  ],
+  "scale_from_cell": 0.7029
+ },
+ "wolf-liedown-2x": {
+  "file": "wolf-liedown-2x",
+  "frames": 4,
+  "durations_ms": [
+   500,
+   120,
+   120,
+   1200
+  ],
+  "size": [
+   996,
+   478
+  ],
+  "scale_from_cell": 1.4059
+ },
+ "wolf-lookaway-game1080": {
+  "file": "wolf-lookaway-game1080",
+  "frames": 2,
+  "durations_ms": [
+   500,
+   1200
+  ],
+  "size": [
+   498,
+   239
+  ],
+  "scale_from_cell": 0.7029
+ },
+ "wolf-lookaway-2x": {
+  "file": "wolf-lookaway-2x",
+  "frames": 2,
+  "durations_ms": [
+   500,
+   1200
+  ],
+  "size": [
+   996,
+   478
+  ],
+  "scale_from_cell": 1.4059
+ },
+ "_note": "Previews start from the delivered standing frame (500 ms) and hold the end pose for 1200 ms before looping. Rendered offline; not played in Godot."
+}

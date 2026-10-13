@@ -1,0 +1,135 @@
+{
+ "wolf-liedown/00": {
+  "before": {
+   "hue_deg": 207.0,
+   "a_mean": -5.89,
+   "b_mean": -3.0,
+   "L_p50": 23.2,
+   "C_median": 7.52
+  },
+  "after": {
+   "hue_deg": 254.4,
+   "a_mean": -1.65,
+   "b_mean": -5.89,
+   "L_p50": 22.0,
+   "C_median": 5.48
+  }
+ },
+ "wolf-liedown/01": {
+  "before": {
+   "hue_deg": 215.7,
+   "a_mean": -5.33,
+   "b_mean": -3.83,
+   "L_p50": 23.6,
+   "C_median": 7.31
+  },
+  "after": {
+   "hue_deg": 257.9,
+   "a_mean": -1.41,
+   "b_mean": -6.6,
+   "L_p50": 22.3,
+   "C_median": 6.23
+  }
+ },
+ "wolf-liedown/02": {
+  "before": {
+   "hue_deg": 219.3,
+   "a_mean": -4.93,
+   "b_mean": -4.03,
+   "L_p50": 22.6,
+   "C_median": 6.97
+  },
+  "after": {
+   "hue_deg": 259.6,
+   "a_mean": -1.25,
+   "b_mean": -6.78,
+   "L_p50": 21.5,
+   "C_median": 6.35
+  }
+ },
+ "wolf-liedown/03": {
+  "before": {
+   "hue_deg": 220.4,
+   "a_mean": -4.8,
+   "b_mean": -4.09,
+   "L_p50": 22.7,
+   "C_median": 6.83
+  },
+  "after": {
+   "hue_deg": 259.9,
+   "a_mean": -1.22,
+   "b_mean": -6.83,
+   "L_p50": 21.6,
+   "C_median": 6.39
+  }
+ },
+ "wolf-lookaway/00": {
+  "before": {
+   "hue_deg": 226.4,
+   "a_mean": -4.55,
+   "b_mean": -4.77,
+   "L_p50": 23.5,
+   "C_median": 7.26
+  },
+  "after": {
+   "hue_deg": 261.8,
+   "a_mean": -1.07,
+   "b_mean": -7.39,
+   "L_p50": 22.1,
+   "C_median": 7.35
+  }
+ },
+ "wolf-lookaway-alt/00": {
+  "before": {
+   "hue_deg": 226.0,
+   "a_mean": -4.6,
+   "b_mean": -4.77,
+   "L_p50": 22.7,
+   "C_median": 7.24
+  },
+  "after": {
+   "hue_deg": 261.6,
+   "a_mean": -1.1,
+   "b_mean": -7.41,
+   "L_p50": 21.5,
+   "C_median": 7.23
+  }
+ },
+ "wolf-lookaway-alt/01": {
+  "before": {
+   "hue_deg": 228.3,
+   "a_mean": -4.49,
+   "b_mean": -5.04,
+   "L_p50": 23.0,
+   "C_median": 7.23
+  },
+  "after": {
+   "hue_deg": 262.2,
+   "a_mean": -1.05,
+   "b_mean": -7.64,
+   "L_p50": 21.8,
+   "C_median": 7.43
+  }
+ },
+ "ref wolf-idle": {
+  "hue_deg": 257.2,
+  "a_mean": -1.44,
+  "b_mean": -6.32,
+  "L_p50": 22.1,
+  "C_median": 5.81
+ },
+ "ref wolf-walk": {
+  "hue_deg": 260.9,
+  "a_mean": -1.2,
+  "b_mean": -7.5,
+  "L_p50": 23.5,
+  "C_median": 7.28
+ },
+ "ref wolf-trot": {
+  "hue_deg": 261.4,
+  "a_mean": -1.09,
+  "b_mean": -7.19,
+  "L_p50": 22.9,
+  "C_median": 6.91
+ }
+}

@@ -1,0 +1,34 @@
+{
+ "file": "docs/research-2026-10/sources/style-test-look2/composite-1280.png",
+ "family": "site",
+ "size": [
+  1280,
+  720
+ ],
+ "checks": {
+  "F_cool_neutrals_b": {
+   "value": -6.0,
+   "threshold": -1.0,
+   "ok": true
+  },
+  "F_accent_dE_p90": {
+   "value": 10.5,
+   "threshold": 18.0,
+   "ok": true,
+   "n_sat": 62715
+  }
+ },
+ "opaque_bbox": [
+  0,
+  0,
+  1279,
+  719
+ ],
+ "opaque_fill_pct": 100.0,
+ "baseline_row": 719,
+ "L_med": 5.8,
+ "L_p99": 64.5,
+ "accent_share": 0.0681,
+ "noise_sigma_src": 0.85,
+ "pass": true
+}

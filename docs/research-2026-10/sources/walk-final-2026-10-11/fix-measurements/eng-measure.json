@@ -1,0 +1,202 @@
+{
+ "eng-walk": {
+  "before": {
+   "torso": 0.73,
+   "head": 0.12,
+   "guide_slide": 0.32,
+   "v_fit": 20.58,
+   "sole_slide": 1.42,
+   "sole_p90": 0.98,
+   "gap": 3,
+   "gaps_nonzero": [
+    [
+     1,
+     "far",
+     -2
+    ],
+    [
+     2,
+     "near",
+     -3
+    ],
+    [
+     3,
+     "near",
+     1
+    ],
+    [
+     7,
+     "near",
+     1
+    ],
+    [
+     7,
+     "far",
+     1
+    ],
+    [
+     9,
+     "far",
+     1
+    ]
+   ],
+   "seam": 0.6457,
+   "height_cv": 0.008,
+   "edge": {
+    "mean_ab_shift": 14.02,
+    "mean_da": -5.4,
+    "mean_db": -3.31,
+    "note": "mean a*b* difference of semi-transparent edge pixels from the opaque ring 2-4 px inside; negative db = toward blue/cyan, positive da = toward magenta"
+   }
+  },
+  "after": {
+   "torso": 0.72,
+   "head": 0.12,
+   "guide_slide": 0.38,
+   "v_fit": 20.621,
+   "sole_slide": 1.42,
+   "sole_p90": 0.98,
+   "gap": 1,
+   "gaps_nonzero": [
+    [
+     3,
+     "near",
+     1
+    ],
+    [
+     7,
+     "near",
+     1
+    ],
+    [
+     7,
+     "far",
+     1
+    ],
+    [
+     9,
+     "far",
+     1
+    ]
+   ],
+   "seam": 0.6457,
+   "height_cv": 0.0087,
+   "edge": {
+    "mean_ab_shift": 13.6,
+    "mean_da": -5.12,
+    "mean_db": -3.23,
+    "note": "mean a*b* difference of semi-transparent edge pixels from the opaque ring 2-4 px inside; negative db = toward blue/cyan, positive da = toward magenta"
+   }
+  }
+ },
+ "eng-jog": {
+  "before": {
+   "torso": 1.9,
+   "head": 0.19,
+   "guide_slide": 0.61,
+   "v_fit": 32.766,
+   "sole_slide": 0.23,
+   "sole_p90": 0.23,
+   "gap": 7,
+   "gaps_nonzero": [
+    [
+     1,
+     "near",
+     1
+    ],
+    [
+     2,
+     "near",
+     1
+    ],
+    [
+     3,
+     "near",
+     1
+    ],
+    [
+     6,
+     "far",
+     2
+    ],
+    [
+     7,
+     "far",
+     1
+    ],
+    [
+     8,
+     "far",
+     1
+    ],
+    [
+     10,
+     "far",
+     7
+    ]
+   ],
+   "seam": 0.6318,
+   "height_cv": 0.023,
+   "edge": {
+    "mean_ab_shift": 15.05,
+    "mean_da": -7.33,
+    "mean_db": -4.37,
+    "note": "mean a*b* difference of semi-transparent edge pixels from the opaque ring 2-4 px inside; negative db = toward blue/cyan, positive da = toward magenta"
+   }
+  },
+  "after": {
+   "torso": 1.9,
+   "head": 0.19,
+   "guide_slide": 0.61,
+   "v_fit": 32.766,
+   "sole_slide": 0.23,
+   "sole_p90": 0.23,
+   "gap": 7,
+   "gaps_nonzero": [
+    [
+     1,
+     "near",
+     1
+    ],
+    [
+     2,
+     "near",
+     1
+    ],
+    [
+     3,
+     "near",
+     1
+    ],
+    [
+     6,
+     "far",
+     2
+    ],
+    [
+     7,
+     "far",
+     1
+    ],
+    [
+     8,
+     "far",
+     1
+    ],
+    [
+     10,
+     "far",
+     7
+    ]
+   ],
+   "seam": 0.6318,
+   "height_cv": 0.023,
+   "edge": {
+    "mean_ab_shift": 14.74,
+    "mean_da": -7.04,
+    "mean_db": -4.32,
+    "note": "mean a*b* difference of semi-transparent edge pixels from the opaque ring 2-4 px inside; negative db = toward blue/cyan, positive da = toward magenta"
+   }
+  }
+ }
+}

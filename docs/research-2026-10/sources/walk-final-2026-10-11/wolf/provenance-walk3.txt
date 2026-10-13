@@ -1,0 +1,28 @@
+wolf-walk-aJ <- 01a12bf3-600b-7d01-80d2-b91480ba0833 ac88b39b2c8991337e6196a849edf35155de4eb6fbfeaf7bf85aaca19af0953c src=[Codex generated-images store]/01a12bf3-600b-7d01-80d2-b91480ba0833/exec-c7537b0a-a068-4419-b194-434a9baf06be.png
+wolf-walk-aJ archived 01a12bf3-600b-7d01-80d2-b91480ba0833
+wolf-trot-aF <- 01a12bf3-5083-7820-ad13-50dc27c83d84 c7d96644e2b9d86d384e84457461dbf63f806996dc011a2cab8ff563b6826341 src=[Codex generated-images store]/01a12bf3-5083-7820-ad13-50dc27c83d84/exec-9eecb7dd-2938-4b55-b5e4-c5349cb3a384.png
+wolf-trot-aF archived 01a12bf3-5083-7820-ad13-50dc27c83d84
+wolf-trot-aE <- 01a12bf3-4113-7dd2-a1a6-3bbd2ec89c79 71cff5bd025cbcb1108a345095d3cf1fb2ea0c55f211fcabc9005185c4abe2f2 src=[Codex generated-images store]/01a12bf3-4113-7dd2-a1a6-3bbd2ec89c79/exec-9727bde9-6d0b-4971-b787-c2f9d18145e3.png
+wolf-trot-aE archived 01a12bf3-4113-7dd2-a1a6-3bbd2ec89c79
+wolf-trot-aG <- 01a12bfe-2959-77e3-b5fa-14df1cfef1d4 94a97faed91dc59265e739b54cb2193d4647fdc5fd1d85bf2e326caf293fdba0 src=[Codex generated-images store]/01a12bfe-2959-77e3-b5fa-14df1cfef1d4/exec-6c687505-efac-4453-ab0d-886c5b4decee.png
+wolf-trot-aH <- 01a12bfe-394d-7f61-be54-1e9c5f2839f9 dd26af3f59ca354a9784a477b9d7119c30054babe186c9cc8cc8adb98382a8ef src=[Codex generated-images store]/01a12bfe-394d-7f61-be54-1e9c5f2839f9/exec-eaf79110-67ce-40e6-93e2-ae7aa2227f7e.png
+wolf-trot-aG archived 01a12bfe-2959-77e3-b5fa-14df1cfef1d4
+wolf-trot-aH archived 01a12bfe-394d-7f61-be54-1e9c5f2839f9
+wolf-trot-h07 <- 01a12c06-c2a0-7831-940f-a9f7f792bc47 a92a111d187b6d326efd532ddf6db6c7528c02a80ac35db2a6c05d1b9b992479 src=[Codex generated-images store]/01a12c06-c2a0-7831-940f-a9f7f792bc47/exec-7afa5870-12fb-454d-8316-98f084af93b7.png
+wolf-trot-h07 archived 01a12c06-c2a0-7831-940f-a9f7f792bc47
+wolf-trot-h08 <- 01a12c06-d5ba-79a1-9a43-33355ca4187e 4e83dd5a693d9ebfa9d02f5bc16cfe088572a0b6d99679b2c568fd58fd0121b3 src=[Codex generated-images store]/01a12c06-d5ba-79a1-9a43-33355ca4187e/exec-fc3e8ed2-cc7e-4ca4-9b40-ceacc2c313a2.png
+wolf-trot-h08 archived 01a12c06-d5ba-79a1-9a43-33355ca4187e
+wolf-trot-h09 <- 01a12c06-ea1d-7b51-95f8-f7904e99469e 26bcec8d37183389b527faf7c580d2b8363932606fe793bed968676adf17e929 src=[Codex generated-images store]/01a12c06-ea1d-7b51-95f8-f7904e99469e/exec-539522bf-c192-40f6-ae73-7bcd72cee884.png
+wolf-trot-h09 archived 01a12c06-ea1d-7b51-95f8-f7904e99469e
+wolf-trot-h10 <- 01a12c06-ff1a-7342-a49d-275c554364e1 f756f8c3c734149bb0b4f6ff062925e68af5a9895b2b78d49a87b6cad491edb8 src=[Codex generated-images store]/01a12c06-ff1a-7342-a49d-275c554364e1/exec-8265ed50-f2fc-4220-932f-1a4ab94149b4.png
+wolf-trot-h10 archived 01a12c06-ff1a-7342-a49d-275c554364e1
+wolf-trot-h11 <- 01a12c07-1207-7572-967a-4dad7c9a6cbf ebc916ca31f06badd9009db19e6cf9f5b089eceef57ee933cf559a13a333c0e9 src=[Codex generated-images store]/01a12c07-1207-7572-967a-4dad7c9a6cbf/exec-0947942e-bb46-4396-8091-7788cf0158f7.png
+wolf-trot-h11 archived 01a12c07-1207-7572-967a-4dad7c9a6cbf
+wolf-trot-f02 <- 01a12c07-39bf-7d23-9ad3-e360d977b8bf 1a01193df940af940f0e57ccd1fb085123c8d7df349ce9ce74f580e8b9a989aa src=[Codex generated-images store]/01a12c07-39bf-7d23-9ad3-e360d977b8bf/exec-33de22f1-4a37-4380-8d7b-4dcd86c131cb.png
+wolf-trot-f02 archived 01a12c07-39bf-7d23-9ad3-e360d977b8bf
+wolf-trot-f01 <- 01a12c07-2658-72e1-8086-9a393d5a81be 06fa2aa3a9ed636cd994eee9da2916102769cb1691ff6341c98eee28af8dfaef src=[Codex generated-images store]/01a12c07-2658-72e1-8086-9a393d5a81be/exec-ddcf0ccd-2a2e-4493-a292-3733c106395c.png
+wolf-trot-f01 archived 01a12c07-2658-72e1-8086-9a393d5a81be
+# derived (not new generations): raw/wolf-trot-cA.png = approved walk2 paintings wolf-trot-aC/aD (frames 7-10) with the front legs below the chest taken from raw/wolf-trot-aE.png (session 01a12bf3-4113-7dd2-a1a6-3bbd2ec89c79); tools/composite.py, jobs/wolf-trot-cA.json
+# derived: raw/wolf-trot-cB.png = frame 11 (approved wolf-trot-aD + front legs of raw/wolf-trot-aF.png, session 01a12bf3-5083-7820-ad13-50dc27c83d84), frame 0 whole from raw/wolf-trot-aF.png, anchors 6 and 1 unchanged; jobs/wolf-trot-cB.json
+# not used in the delivered rows (tried, rejected after measurement): wolf-trot-aG, wolf-trot-aH, wolf-trot-h07..h11, wolf-trot-f01, wolf-trot-f02
+# derived (fix pass 2026-10-11, no new generation, no Codex session): frames/wolf-trot-v7(-graded) frame 0 = legs of the aF repaint (session 01a12bf3-5083-7820-ad13-50dc27c83d84) under the body, head and tail of the approved walk2 painting frames/wolf-trot/frame_00, then the walk3 grade; fix/tools/wolf_trot0.py, edit/wolf-trot-v7-frame0.json

@@ -1,0 +1,45 @@
+{
+ "engineer-side-idle": {
+  "family": "human",
+  "raw": "engineer-side-idle-a2",
+  "rim": 0.35
+ },
+ "engineer-side-stride": {
+  "family": "human",
+  "raw": "engineer-side-stride-a1",
+  "rim": 0.35
+ },
+ "engineer-three-quarter": {
+  "family": "human",
+  "raw": "engineer-three-quarter-a3",
+  "rim": 0.35
+ },
+ "director-stand-left": {
+  "family": "human",
+  "raw": "director-stand-left-a1-2"
+ },
+ "director-turn-away": {
+  "family": "human",
+  "raw": "director-turn-away-a1"
+ },
+ "wolf-side-stand": {
+  "family": "wolf",
+  "raw": "wolf-side-stand-a3"
+ },
+ "wolf-side-walk": {
+  "family": "wolf",
+  "raw": "wolf-side-walk-a3",
+  "rel_scale": 0.9
+ },
+ "wolf-sit": {
+  "family": "wolf",
+  "raw": "wolf-sit-a3",
+  "pick": "right",
+  "scale_from": "left"
+ },
+ "wolf-side-lookback": {
+  "family": "wolf",
+  "raw": "wolf-side-lookback-a3",
+  "rel_scale": 0.87
+ }
+}
