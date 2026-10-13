@@ -27,7 +27,7 @@ The Story page is design authority; the Build Plan reports implementation. Later
 - The opening contains the Director and WOLF only. The engineer enters afterward; a noninteractive WOLF scene is allowed, a playable WOLF prologue is not.
 - The Director treats WOLF as property and conceals wrongdoing. The pair protect people, preserve corroborating evidence, expose the program, seek accountability and prevent catastrophe.
 - WOLF is a person-like independent companion and possible chosen family. Affection and welcome petting can coexist with his intelligence and boundaries. Belonging with someone is not ownership.
-- Rowan Vale is the preferred provisional engineer name, not final. The engineer is masculine-presenting, uses they/them pronouns, and wears a deep-red hooded field jacket with charcoal trousers/boots and minimal cyan equipment light. No yellow patches or shiny silver knees. Names, identity and pronouns do not determine morality.
+- Rowan Vale is the preferred provisional engineer name, not final. The engineer is non-binary (assigned male at birth), masculine-presenting, uses they/them pronouns, and wears a deep-red hooded field jacket with charcoal trousers/boots and minimal cyan equipment light. No yellow patches or shiny silver knees. Names, identity and pronouns do not determine morality.
 - Natural human names are the direction. Supporting names and the W.O.L.F. expansion remain candidates.
 
 ## Director plan — preferred draft, specifics still open
