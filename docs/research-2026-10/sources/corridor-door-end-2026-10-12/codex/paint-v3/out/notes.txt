@@ -1,0 +1,15 @@
+File: door-end-v3-painted.png
+Original generated file copied: ~/.codex/generated_images/01a1318b-1601-76e2-8de2-0c19430d2c42/exec-92e0a057-e445-48ea-bfbc-69063019f2c6.png
+SHA-256: 44ec168a6169025801ce1d4059c30e6fdcf06ffeefe7e73178bd5a4f8ad587a8
+Pixel size: 1254x1254
+Exact prompt:
+EDIT the first reference image, using the second reference strictly as a white paint mask. Return one 1024x1024 image with identical framing. Paint ONLY pixels under WHITE in the mask; every pixel under BLACK must remain exactly unchanged from the first image. Preserve all existing silhouettes, edges, lines, joints, positions, and values. Add only realistic material and existing designed light; do not add, remove, move, resize, reshape, rotate, or invent any part. No text, letters, numbers, logos, labels, signs, UI, watermark, guide lines, or borders.
+
+Paint the white areas as follows:
+1) Left wall, left of rolling door: wall-mounted manual bypass override, 10 mm steel backplate with four anchor nuts, gunship-grey worm gearbox carrying the already-painted round handwheel (leave the handwheel unchanged), and narrow enclosed steel chain guard running straight up wall from gearbox to door operator box under hood, held by two U-clamps on stand-off brackets. Matte gunship grey paint (#5B5E6A), crisp folded edges, gearbox softly lit from corridor light on left, small soft shadow on wall to right of guard and gearbox. No glow.
+2) Thin diagonal floor stripe in front of door: matte safety yellow, scuffed and worn thin in middle where feet cross it. Preserve its exact existing width and position.
+3) Tall narrow vertical band at right, from bottom of near concrete pier to bottom frame: cut end of cast-concrete cross-wall, about 75 px wide, matte board-formed concrete, quite dark, faintly lit from above and falling darker toward bottom; thin steel corner angle down each edge, slightly brighter on edges; damp and darker at foot. No repeating texture.
+4) Bottom-right block: plant room dry sealed-concrete floor slab in front of room, viewed from above at shallow angle, with each drawn saw-cut joint line exactly in place. Dry, matte, darker than wet corridor floor at left, soft pool of cold ceiling light brighter toward top right and falling dark toward bottom, faint scuffed walking path toward door, no reflections or puddles. At top edge where it meets plant room floor behind, paint a steel floor joint expansion cover strip, not a soft blend.
+5) Small flat patches on concrete column just left of top of door: seamless same concrete as surrounding column, plus the thin horizontal pour joint line already drawn across the column.
+
+Grounded realism: near-future hardened military installation, cast concrete and painted steel, matte, calm large surfaces. Wear only where use and water would put it. No grunge speckle, drip streaks, rust spots, extra rivets/bolts, greebles, glowing seams, sci-fi panels, edge rim light, haze, or light shafts. Keep the drawing's value plan exactly; do not brighten/darken whole areas or add light where dark. Construction drawing paint-over; shapes and canvas size are fixed.
