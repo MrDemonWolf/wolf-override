@@ -10,15 +10,19 @@
 #       stills, shots.json, text.log and audio.log to <out dir>/<route>/<variant>/<size>/.
 #       Defaults: routes "R1 R2 R3 R4", sizes "960x540 1280x720 2340x1080" (2340x1080 is the phone
 #       landscape aspect), variants "kb-fx kb-calm touch-fx" (keyboard with effects on, keyboard
-#       with effects off and Reduced Motion, touch layout with effects on). Each route also takes
-#       controller-prompt stills. Routes run side by side, PARITY_JOBS at a time (default 2).
+#       with effects off and Reduced Motion, touch layout with effects on). Every route also takes
+#       controller-prompt stills, and R2-R4 switch input devices mid-play (see capture.gd). The
+#       2340x1080 window letterboxes the 16:9 game (stretch aspect "keep"), so its stills are the
+#       1920x1080 picture inside the bars. Routes run side by side, PARITY_JOBS at a time (default 2).
 #   scripts/parity/run.sh ui <out file>
-#       Headless resolved-property dump of every visible HUD and menu control in 14 states.
+#       Headless resolved-property dump of every visible HUD and menu control in 13 states.
 #   scripts/parity/run.sh perf <out dir> <label>
-#       Headless CPU-side performance probe (startup, per-state script time, _refresh_ui and the
-#       junction _draw in microseconds, node and object counts) into <out dir>/<label>.json.
-#   Compare captures with scripts/parity/compare.py, UI dumps with diff, and perf runs with
-#   scripts/parity/perf_summary.py.
+#       Headless CPU-side performance probe (startup including load(main.tscn), per-state frame and
+#       _process time, _refresh_ui, and the junction room's and its Recesses' _draw in microseconds,
+#       node and object counts) into <out dir>/<label>.json. Texture memory is 0 headless; the
+#       capture driver records RENDER_TEXTURE_MEM_USED per still in the render container instead.
+#   Compare captures with scripts/parity/compare.py (exact changed-pixel counts; --self-test checks
+#   it), UI dumps with diff, and perf runs with scripts/parity/perf_summary.py.
 #
 # Environment:
 #   PARITY_HOME   HOME (and XDG dirs) for headless Godot; required for ui and perf, so the real
@@ -28,7 +32,8 @@
 #   PARITY_WORK   scratch folder for the headless game copy (default: $TMPDIR/wolf-parity).
 #   PARITY_GAME   game folder to use (default: apps/game in this checkout).
 #   PARITY_JOBS   routes captured at once (default 2).
-#   PARITY_TIMEOUT  seconds one render run may take (default 1500).
+#   PARITY_TIMEOUT  seconds one render run may take (default 2700; a 2340x1080 R2 or R4 run takes
+#                 well over 1500 s when several render jobs share the machine).
 #   GODOT_BIN     headless godot binary (default: godot).
 set -euo pipefail
 
@@ -70,7 +75,7 @@ capture_route() {
       mkdir -p "$dir"
       w="${size%x*}" h="${size#*x}"
       "$root/tools/render/render.sh" --name "${PARITY_NAME:-lighter-parity}-$route" --driver "$driver" \
-          --screen 2560x1440 --timeout "${PARITY_TIMEOUT:-1500}" "$game_src" "$dir" -- \
+          --screen 2560x1440 --timeout "${PARITY_TIMEOUT:-2700}" "$game_src" "$dir" -- \
           --fixed-fps 60 --resolution "${w}x${h}" --script res://review_capture/capture.gd -- \
           --route="$route" --variant="$variant" --size="$size" --out=/work/out > "$dir/godot.log" 2>&1 || true
       if [ -f "$dir/shots.json" ] && grep -q '"failed": false' "$dir/shots.json" && ! grep -qE "$errors" "$dir/godot.log"; then
@@ -135,7 +140,7 @@ case "$cmd" in
     echo "ok    perf $label"
     ;;
   *)
-    sed -n '2,32p' "$0" >&2
+    sed -n '2,37p' "$0" >&2
     exit 2
     ;;
 esac

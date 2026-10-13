@@ -7,10 +7,15 @@ extends SceneTree
 ## - per state (title, corridor start, the relay question, Records, junction entry, the lane question,
 ##   the lane with WOLF drawing the sentry): the whole frame's wall time (run with --fixed-fps 60, so
 ##   every frame is one physics step and one process step of 1/60 s, unthrottled), the span of every
-##   node's _process (a first and a last node), how often the junction room redraws, and the cost of
-##   one _refresh_ui call in microseconds. (Performance's TIME_PROCESS is a once-a-second maximum, so
-##   it is not used.)
+##   node's _process (a first and a last node), how often the junction room redraws, the cost of
+##   one _refresh_ui call in microseconds, and, while the junction is on screen, the cost of one
+##   junction room _draw and one Recesses _draw in microseconds (timed from the item's draw signal,
+##   which fires just before _draw, to a deferred call queued right behind the redraw, which runs
+##   just after it; about 7 us of that is the redraw call itself). (Performance's TIME_PROCESS is a
+##   once-a-second maximum, so it is not used.)
 ## - node, object and resource counts and static memory.
+## Texture memory (RENDER_TEXTURE_MEM_USED) is 0 with the headless dummy renderer, so it is not taken
+## here: the capture driver records it per still in the render container, and compare.py reports it.
 ## The states are reached through fixture saves and Main's debug surface, unthrottled (fps limit off).
 ## Usage: scripts/parity/run.sh perf <out dir> <label>  (godot --headless ... -- --out=<file.json>)
 
@@ -20,12 +25,15 @@ const HOLD_FRAMES: int = 240
 const WARM_FRAMES: int = 30
 const REFRESH_CALLS: int = 400
 const REFRESH_BATCHES: int = 5
+const DRAW_SAMPLES: int = 120
 
 var game: Node2D
 var head: Head
 var tail: Tail
 var junction_draws: int = 0
 var result: Dictionary = {}
+var draw_started: int = 0
+var draw_samples: PackedFloat64Array = []
 
 
 ## Runs first in every frame: records the whole previous frame and starts the _process span.
@@ -172,16 +180,53 @@ func _hold() -> Dictionary:
 			game.call("_refresh_ui")
 		batches.append(float(Time.get_ticks_usec() - start) / REFRESH_CALLS)
 	batches.sort()
+	var junction: CanvasItem = game.get("junction_room") as CanvasItem
 	var out: Dictionary = {
 		"frames": tail.spans.size(),
 		"frame_ms": _stats(head.frame_ms),
 		"node_process_span_ms": _stats(tail.spans),
 		"junction_redraws_per_frame": float(draws) / float(maxi(tail.spans.size(), 1)),
 		"refresh_ui_us": batches[REFRESH_BATCHES / 2],
+		"junction_draw_us": await _draw_us(junction),
+		"recesses_draw_us": await _draw_us(junction.get("recesses") as CanvasItem),
 		"beat": str(game.call("debug_beat")),
 	}
 	out.merge(_counts())
 	return out
+
+
+## The median cost of one _draw of item over DRAW_SAMPLES frames, in microseconds; -1 when the item is
+## not on screen (a hidden item does not draw). Each frame, right after process_frame, it queues the
+## item's redraw and then a deferred stamp, so the message queue runs the redraw (draw signal, then
+## _draw) and the stamp back to back.
+func _draw_us(item: CanvasItem) -> float:
+	if item == null or not item.is_visible_in_tree():
+		return -1.0
+	draw_samples.clear()
+	item.draw.connect(_on_timed_draw)
+	for _i: int in range(DRAW_SAMPLES):
+		await process_frame
+		draw_started = 0
+		item.queue_redraw()
+		_end_timed_draw.call_deferred()
+	await process_frame
+	item.draw.disconnect(_on_timed_draw)
+	if draw_samples.size() < DRAW_SAMPLES / 2:
+		push_error("perf: only %d of %d timed draws of %s" % [draw_samples.size(), DRAW_SAMPLES, item.name])
+		return -1.0
+	var sorted: Array = Array(draw_samples)
+	sorted.sort()
+	return snappedf(float(sorted[sorted.size() / 2]), 0.1)
+
+
+func _on_timed_draw() -> void:
+	draw_started = Time.get_ticks_usec()
+
+
+func _end_timed_draw() -> void:
+	if draw_started > 0:
+		draw_samples.append(float(Time.get_ticks_usec() - draw_started))
+	draw_started = 0
 
 
 func _counts() -> Dictionary:

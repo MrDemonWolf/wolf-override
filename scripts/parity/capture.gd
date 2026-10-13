@@ -7,12 +7,19 @@ extends SceneTree
 ##
 ## Determinism: run with --fixed-fps 60; each room's lamp flicker gets a fixed seed and restarts,
 ## and every CPUParticles2D that enters the tree is given a fixed seed. The container's virtual screen
-## has no other input. Each still checks that a new frame was drawn first, so a stalled renderer fails
-## the run instead of recording stale frames.
+## has no other input. Each still checks that a new frame was drawn first and that the renderer drew
+## something in it (draw calls above 0), so a stalled renderer fails the run instead of recording
+## stale frames. (Equal draw-call counts on consecutive stills are normal on a still screen, so the
+## count itself is not required to change.)
 ##
-## Writes into --out: NNN-slug.png stills, shots.json (per still: frame, draw calls, masks), text.log
-## (every change of the narration, hints, objective, cards and buttons, by frame) and audio.log
-## (every SfxBank play, play_blend and stop, by frame).
+## Every route takes controller-prompt stills, and R2-R4 switch input devices mid-play at a station
+## (keyboard or touch, then a controller, then a screen touch, then a key) and fail the run unless
+## the context hint changes to the controller prompts and back, and in the touch run the USE button
+## hides and returns.
+##
+## Writes into --out: NNN-slug.png stills, shots.json (per still: frame, draw calls, texture memory,
+## masks), text.log (every change of the narration, hints, objective, cards and buttons, by frame)
+## and audio.log (every SfxBank play, play_blend and stop, by frame).
 ##
 ## Usage (inside render.sh): godot --fixed-fps 60 --script res://review_capture/capture.gd --
 ##        --route=R1|R2|R3|R4 --out=/work/out --size=1280x720 --variant=kb-fx|kb-calm|touch-fx
@@ -251,6 +258,8 @@ func _route_1() -> void:
 	await _walk_to(350.0)
 	await _raw(30)
 	await _shot("hint-rebound-key")
+	if variant != "touch-fx" and not _hint().begins_with("F"):
+		_fail("the rebound USE key (F) is not in the hint: %s" % _hint())
 	await _action_event(&"pause_game")
 	await _raw(40)
 	await _shot("pause-play")
@@ -276,7 +285,8 @@ func _route_1() -> void:
 
 
 ## R2: the corridor. The opening beat by beat, first control (and Pause while the objective card
-## slides in), a camera pan, the breaker, the relay question (resized, and with controller prompts),
+## slides in), a camera pan, the breaker (with a device switch), the relay question (resized, and with
+## controller prompts),
 ## then the three outcomes: disclose and signal WOLF (the seal at 0, mid and open, the safe point and
 ## the cut to Records), press and the manual bypass (released part way), and disclose with the bypass.
 func _route_2() -> void:
@@ -303,6 +313,7 @@ func _route_2() -> void:
 	await _walk_to(350.0)
 	await _raw(30)
 	await _shot("at-breaker")
+	await _device_switch("breaker")
 	await _tap(&"interact")
 	await _raw(30)
 	if not game.get("waiting_for_choice"):
@@ -371,7 +382,8 @@ func _route_2() -> void:
 	await _crank_bypass("disclose")
 
 
-## R3: Records from its entry save. The purge copy, the mirror question (WOLF's readout), the copy,
+## R3: Records from its entry save. The purge copy (with a device switch at the purge queue), the
+## mirror question (also with controller prompts) and WOLF's readout, the copy,
 ## Continue from a save just after the purge copy, the question again and the manual answer, the
 ## exit lift, the chapter close (paused while it frames) and the cut to the junction.
 func _route_3() -> void:
@@ -382,6 +394,7 @@ func _route_3() -> void:
 	await _walk_to(190.0)
 	await _raw(40)
 	await _shot("at-purge-queue")
+	await _device_switch("purge-queue")
 	await _tap(&"interact")
 	await _raw(40)
 	await _shot("purge-copied")
@@ -391,6 +404,7 @@ func _route_3() -> void:
 	await _tap(&"interact")
 	await _raw(30)
 	await _shot("mirror-question")
+	await _controller_shot("mirror-question-controller")
 	await _answer(1)
 	await _raw(40)
 	await _shot("mirror-wolf-readout")
@@ -441,8 +455,9 @@ func _route_3() -> void:
 
 
 ## R4: the junction from its entry save to the end. The vent knockdown (paused mid-fall) and the
-## restore, the breaker and the line, the crank, the fuse and the blast as frame sequences, the lane
-## question, WOLF drawing the sentry, the tank drop as a frame sequence, the bolt, the hatch, the walk
+## restore, the breaker and the line, a device switch at the valve, the crank, the fuse (32 consecutive
+## frames) and the blast as frame sequences, the lane question (also with controller prompts), WOLF
+## drawing the sentry, the tank drop (30 consecutive frames), the bolt, the hatch, the walk
 ## out and the END OF SLICE card; then Continue from the post-blast save, the engineer alone, the
 ## sentry's chase and its knockdown.
 func _route_4() -> void:
@@ -475,6 +490,7 @@ func _route_4() -> void:
 	await _walk_to(JunctionRoom.VALVE_X)
 	await _raw(10)
 	await _shot("at-valve")
+	await _device_switch("valve")
 	Input.action_press(&"interact")
 	await _raw(40)
 	await _shot("valve-cranking")
@@ -483,7 +499,7 @@ func _route_4() -> void:
 	await _raw(2)
 	await _shot("valve-charged")
 	await _walk_to(PressureLine.BLAST_MIN_X - 16.0)
-	await _burst("fuse", 8, 4)
+	await _burst("fuse", 32, 1)
 	if not await _wait_until(func() -> bool: return (game.get("state") as M0State).door_blown or bool(game.get("fail_active")), 200):
 		_fail("the door never blew")
 	await _burst("blast", 8, 2)
@@ -492,6 +508,7 @@ func _route_4() -> void:
 	await _walk_to(600.0)
 	await _raw(10)
 	await _shot("lane-question")
+	await _controller_shot("lane-question-controller")
 	await _answer(1)
 	await _raw(30)
 	await _shot("wolf-draws-sentry")
@@ -503,7 +520,7 @@ func _route_4() -> void:
 	await _raw(30)
 	await _shot("at-tank-release")
 	await _tap(&"interact")
-	await _burst("tank-drop", 10, 2)
+	await _burst("tank-drop", 30, 1)
 	await _raw(60)
 	await _shot("sentry-down")
 	await _walk_to(JunctionRoom.BOLT_PANEL_X)
@@ -627,19 +644,67 @@ func _answer(response: int) -> void:
 
 ## A still with controller prompts (a trigger pull), then back to keyboard (an unbound key).
 func _controller_shot(slug: String) -> void:
-	var pull: InputEventJoypadMotion = InputEventJoypadMotion.new()
-	pull.axis = JOY_AXIS_TRIGGER_LEFT
-	pull.axis_value = 1.0
-	Input.parse_input_event(pull)
-	await _raw(2)
-	var rest: InputEventJoypadMotion = InputEventJoypadMotion.new()
-	rest.axis = JOY_AXIS_TRIGGER_LEFT
-	rest.axis_value = 0.0
-	Input.parse_input_event(rest)
+	await _trigger_pull()
 	await _raw(10)
 	await _shot(slug)
 	await _key(KEY_SHIFT)
 	await _raw(10)
+
+
+## Switches input device mid-play (critique C6): from the variant's own layout to a controller, then
+## a screen touch, then a key, with a still after the first two. The context hint must change to the
+## controller prompts and come back unchanged; in the touch run the USE button must hide for the
+## controller and return for the touch. (The game has touch buttons only where touch_enabled is set,
+## on phones; in the keyboard runs a screen touch brings back the keyboard prompts.)
+func _device_switch(slug: String) -> void:
+	var start: String = _hint()
+	var use_button: Control = game.get_node("CanvasLayer/TouchControls/Use") as Control
+	var use_shown: bool = use_button.is_visible_in_tree()
+	if bool(game.get("controller_active")):
+		_fail("%s: a controller was already active before the device switch" % slug)
+	await _trigger_pull()
+	await _raw(10)
+	await _shot("%s-device-controller" % slug)
+	if not bool(game.get("controller_active")) or _hint() == start:
+		_fail("%s: the hint kept its %s prompts after a controller input (%s)" % [slug, variant, _hint()])
+	if use_shown and use_button.is_visible_in_tree():
+		_fail("%s: the touch USE button stayed on screen with a controller" % slug)
+	await _screen_touch()
+	await _raw(10)
+	await _shot("%s-device-touch" % slug)
+	if bool(game.get("controller_active")) or _hint() != start:
+		_fail("%s: after a screen touch the hint reads %s, not %s" % [slug, _hint(), start])
+	if use_button.is_visible_in_tree() != use_shown:
+		_fail("%s: the touch USE button did not return after a screen touch" % slug)
+	await _key(KEY_SHIFT)
+	await _raw(10)
+	if _hint() != start:
+		_fail("%s: after a key the hint reads %s, not %s" % [slug, _hint(), start])
+
+
+func _hint() -> String:
+	return (game.get_node("CanvasLayer/ContextHint/Text") as Label).text
+
+
+## A left-trigger pull and release (the trigger is bound to no action, so it only switches prompts).
+func _trigger_pull() -> void:
+	for value: float in [1.0, 0.0]:
+		var ev: InputEventJoypadMotion = InputEventJoypadMotion.new()
+		ev.axis = JOY_AXIS_TRIGGER_LEFT
+		ev.axis_value = value
+		Input.parse_input_event(ev)
+		await _raw(2)
+
+
+## A tap in the empty upper middle of the view, clear of the HUD and the touch buttons.
+func _screen_touch() -> void:
+	for pressed: bool in [true, false]:
+		var ev: InputEventScreenTouch = InputEventScreenTouch.new()
+		ev.index = 0
+		ev.position = Vector2(root.size) * Vector2(0.5, 0.35)
+		ev.pressed = pressed
+		Input.parse_input_event(ev)
+		await _raw(1)
 
 
 # ---------------------------------------------------------------- saves for R1, R3 and R4
@@ -789,6 +854,9 @@ func _shot(slug: String) -> void:
 	if drawn <= last_drawn:
 		_fail("no new frame was drawn before %s (frames drawn %d)" % [slug, drawn])
 	last_drawn = drawn
+	var draw_calls: int = int(Performance.get_monitor(Performance.RENDER_TOTAL_DRAW_CALLS_IN_FRAME))
+	if draw_calls <= 0:
+		_fail("the renderer drew nothing before %s (0 draw calls)" % slug)
 	var img: Image = root.get_texture().get_image()
 	var file: String = "%03d-%s.png" % [shots.size() + 1, slug]
 	img.save_png(out_dir.path_join(file))
@@ -796,8 +864,9 @@ func _shot(slug: String) -> void:
 		"file": file,
 		"frame": frame,
 		"image": [img.get_width(), img.get_height()],
-		"draw_calls": int(Performance.get_monitor(Performance.RENDER_TOTAL_DRAW_CALLS_IN_FRAME)),
+		"draw_calls": draw_calls,
 		"objects": int(Performance.get_monitor(Performance.RENDER_TOTAL_OBJECTS_IN_FRAME)),
+		"texture_mem_mb": snappedf(Performance.get_monitor(Performance.RENDER_TEXTURE_MEM_USED) / 1048576.0, 0.01),
 		"chapter": str((game.get("state") as M0State).chapter_id),
 		"engineer_x": snappedf(human.position.x, 0.01),
 		"wolf_x": snappedf(wolf.position.x, 0.01),

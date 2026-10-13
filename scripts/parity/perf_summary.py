@@ -24,6 +24,9 @@ def figures(run: dict) -> dict[str, float]:
         out[f"{state} _process span p50 ms"] = s["node_process_span_ms"]["p50"]
         out[f"{state} _refresh_ui us"] = s["refresh_ui_us"]
         out[f"{state} junction redraws per frame"] = s["junction_redraws_per_frame"]
+        for key in ("junction_draw_us", "recesses_draw_us"):
+            if s.get(key, -1.0) >= 0.0:
+                out[f"{state} {key.replace('_draw_us', ' _draw us')}"] = s[key]
     final = run["final"]
     for key in ("nodes", "objects", "resources", "static_mb"):
         out[f"final {key}"] = float(final[key])
