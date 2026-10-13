@@ -50,6 +50,10 @@ const CLEAR_GAP: float = WOLF_REACH + HUMAN_REACH
 ## The engineer has to face a new way this long before WOLF crosses to his other side, so a tap
 ## back and forth never sets him weaving.
 const TURN_SETTLE_SECONDS: float = 0.3
+## A step at most this long to a follower's spot beside an engineer who is standing still is an edge:
+## he keeps the way he faces rather than mirroring round for the two or three frames it takes (the
+## seal landing, where follow_max_x draws him a few px back off the relay contact).
+const FOLLOW_EDGE: float = 12.0
 ## How much further back than FOLLOW_GAP a follower goes to stand clear of a machine; with no clear
 ## floor that close he keeps the usual gap.
 const AVOID_DETOUR: float = 100.0
@@ -67,6 +71,7 @@ const GRAVITY: float = 900.0
 func _physics_process(delta: float) -> void:
 	var following: bool = false
 	var settling: bool = false
+	var edging: bool = false
 	if controlled:
 		var axis: float = Input.get_axis(&"move_left", &"move_right")
 		velocity.x = axis * WALK_SPEED
@@ -79,7 +84,10 @@ func _physics_process(delta: float) -> void:
 		follow_side = 0
 	elif follow_target != null:
 		following = true
-		velocity.x = _approach(follow_x(delta), delta)
+		var spot: float = follow_x(delta)
+		velocity.x = _approach(spot, delta)
+		var target_body: CharacterBody2D = follow_target as CharacterBody2D
+		edging = absf(spot - position.x) <= FOLLOW_EDGE and (target_body == null or absf(target_body.velocity.x) <= 1.0)
 	else:
 		velocity.x = 0.0
 	if not following:
@@ -87,9 +95,10 @@ func _physics_process(delta: float) -> void:
 		# hold for TURN_SETTLE_SECONDS of play before he crosses.
 		turn_seconds = 0.0
 	if body_sprite != null:
-		if absf(velocity.x) > 1.0 and not settling:
+		var moving: bool = absf(velocity.x) > 1.0
+		if moving and not settling and not edging:
 			body_sprite.flip_h = velocity.x < 0.0
-		elif following:
+		elif following and not moving:
 			# At rest beside the engineer he faces him, even where follow_max_x holds him back on the
 			# other side of them from follow_side.
 			body_sprite.flip_h = follow_target.position.x < position.x

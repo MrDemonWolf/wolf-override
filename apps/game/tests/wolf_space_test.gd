@@ -125,7 +125,17 @@ func _corridor(game: Main, actions: DebugActions, relay: StringName) -> void:
 ## side, so he never stands in the MANUAL BYPASS or the seal's frame, while the engineer waits by the
 ## seal, walks to the safe point and saves there. At rest he faces the engineer.
 func _safe_point(game: Main, relay: StringName) -> void:
+	var facing: bool = game.wolf.body_sprite.flip_h
 	_require(await _wait_until(func() -> bool: return not game.seal_opening, 240), "%s: the seal finishes opening" % relay)
+	if relay == &"disclose_wolf":
+		# Letting go of the contact, he edges the few px back to the open-seal limit without mirroring round.
+		var turns: int = 0
+		for _frame: int in 30:
+			await physics_frame
+			if game.wolf.body_sprite.flip_h != facing:
+				turns += 1
+				facing = game.wolf.body_sprite.flip_h
+		_expect(turns == 0, "told: WOLF keeps facing the relay as the seal lands and he edges back (%d turns)" % turns)
 	await _settle(game)
 	await _check_rest(game, "%s: corridor, the seal open and the engineer by it (WOLF %s)" % [relay, game.debug_wolf_why()], false)
 	_require(await _walk_to(game.human, 830.0), "%s: the engineer walks to the safe point" % relay)
@@ -136,6 +146,9 @@ func _safe_point(game: Main, relay: StringName) -> void:
 	await _tap(&"interact")
 	_require(game.state.checkpoint_reached and game.state.chapter_id == "lockdown", "%s: the safe point saves" % relay)
 	await _tap_frames(&"move_left", 4)
+	# He takes the engineer's other side only after the turn has held for TURN_SETTLE_SECONDS; check
+	# once it has, so the facing rule is tested against the side he would now choose.
+	_expect(await _wait_until(func() -> bool: return game.wolf.follow_side > 0, 60), "%s: once the engineer's turn holds, WOLF's follow side is their right (side %d)" % [relay, game.wolf.follow_side])
 	await _settle(game)
 	_expect(absf(game.wolf.position.x - Main.WOLF_FOLLOW_OPEN_MAX_X) <= 2.5 and not game.wolf.body_sprite.flip_h, "%s: the engineer turning round at the safe point leaves WOLF where he is, facing them (x %.1f)" % [relay, game.wolf.position.x])
 	await _check_rest(game, "%s: corridor, saved at the safe point" % relay, false)
