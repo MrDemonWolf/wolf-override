@@ -9,6 +9,7 @@ Working material from the October 6-12, 2026 sessions: research, design notes an
 | `design-reference-25-games.md` | Fact-checked study of 25 shipped games (586 sources, 220 corrections): companion design, levels and camera, death and saves, inventory and evidence, action and impact, presentation and UI, audio, mobile. The 20 changes it supports and the open questions. |
 | `codex-design-review.md` | Codex's second-opinion review of the plans: contradictions found, 10 refinements, risks, cuts, questions. |
 | `art-bible.md` | The high-quality art plan: per-family size and density rules, palette sampled from title art B, matting rules, the automatic QA checks (`qa_asset.py`, now in `notes/art-audit/bible/`), the style-test brief, and the batch order. |
+| `how-it-should-play/` | What the game should and needs to play like (October 12-13): 193 sourced needs with measurable targets, a first-time-player audit of the slice (48 findings), an ordered fix plan (P0-P2), 19 questions for Nathanial, 406 credited sources, thirteen topic notes and the 60 capture frames the audit cites. Start with its `README.md`, then `NEEDS.md`. |
 | `approved/item-text-2026-10-09.json` | The eight evidence-case items, approved as drafted (key `final`). |
 | `approved/death-text-2026-10-10.json` | Death cards, safe-point prompts, case statuses and WOLF's reaction lines, approved as drafted (key `final`). |
 
