@@ -90,8 +90,9 @@ func _physics_process(delta: float) -> void:
 		if absf(velocity.x) > 1.0 and not settling:
 			body_sprite.flip_h = velocity.x < 0.0
 		elif following:
-			# At rest beside the engineer he faces him.
-			body_sprite.flip_h = follow_side > 0
+			# At rest beside the engineer he faces him, even where follow_max_x holds him back on the
+			# other side of them from follow_side.
+			body_sprite.flip_h = follow_target.position.x < position.x
 	if is_on_floor():
 		velocity.y = 0.0
 	else:

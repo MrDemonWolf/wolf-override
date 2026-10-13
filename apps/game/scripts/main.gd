@@ -17,6 +17,11 @@ const RELAY_CONTACT_X: float = 509.0
 ## The coolant relay's centre and how far either side of it the engineer can use it.
 const RELAY_X: float = 605.0
 const RELAY_REACH: float = 52.0
+## Half the relay's drawn width, as WOLF's follow spots keep clear of it (_machine_spans).
+const RELAY_HALF_WIDTH: float = 43.1
+## Once the seal is open WOLF follows no further right than this: the last follow spot clear of the
+## relay on its left (M0Actor.off_machines would move him no further), so past it he waits there.
+const WOLF_FOLLOW_OPEN_MAX_X: float = RELAY_X - RELAY_HALF_WIDTH - M0Actor.WOLF_REACH + M0Actor.AVOID_TOLERANCE
 ## The MANUAL BYPASS beside the relay (Nathanial's decision A): its wheel, and how far either side of
 ## it the engineer can crank it. It sits on the relay's right, clear of WOLF's contact.
 const BYPASS_WHEEL: Vector2 = Vector2(700.0, 398.0)
@@ -242,6 +247,9 @@ const VALVE_CRANK_X: float = JunctionRoom.VALVE_X - 29.0
 ## (M0Actor.WOLF_SNOUT) just short of its painted right edge (x 564), so he is never drawn inside it
 ## and the engineer has its left side.
 const WOLF_MIRROR_X: float = 625.0
+## How far either side of M0Actor.CLEAR_GAP the engineer has to go before WOLF changes his mind about
+## walking up to his spot by the valve after the blast (_wolf_rubble_x).
+const WOLF_RUBBLE_HYSTERESIS: float = 24.0
 const MENU_NAVIGATION_ACTIONS: Array[StringName] = [&"ui_accept", &"ui_up", &"ui_down", &"ui_left", &"ui_right", &"ui_focus_next", &"ui_focus_prev"]
 ## Every gameplay action; pause and a knockdown release them all so nothing stays held.
 const GAMEPLAY_ACTIONS: Array[StringName] = [&"move_left", &"move_right", &"interact", &"choice_1", &"choice_2"]
@@ -1016,6 +1024,10 @@ func _process(delta: float) -> void:
 	if state.chapter_id == "records" and wolf.autonomous_target_x == WOLF_MIRROR_X and absf(wolf.position.x - WOLF_MIRROR_X) <= 2.0:
 		# At the mirror he faces the port, whichever way he walked in.
 		wolf.body_sprite.flip_h = true
+	if state.chapter_id == "junction" and state.door_blown and wolf.autonomous_target_x == JunctionRoom.WOLF_CLEAR_X and absf(wolf.position.x - JunctionRoom.WOLF_CLEAR_X) <= 2.0:
+		# Held by the entrance after the blast until the engineer leaves his spot by the valve, he faces
+		# them and the rubble: waiting, not leaving.
+		wolf.body_sprite.flip_h = human.position.x < wolf.position.x
 	if fail_active:
 		# Knocked down: the reaction plays out and the last autosave returns; nothing else reads input.
 		_refresh_ui()
@@ -3795,11 +3807,16 @@ func _wolf_target_x() -> float:
 ## floor on the near side as long as he is. The engineer backing off from the fuse often stops right
 ## there, so while they stand where his body would be he keeps to his spot by the entrance
 ## (JunctionRoom.WOLF_CLEAR_X), and walks up once they move on towards the rubble.
+## Once he has set off for his spot the engineer has to come back well inside it to send him back, and
+## once he is holding by the entrance they have to be well clear of it before he sets off
+## (WOLF_RUBBLE_HYSTERESIS), so an engineer edging about near the valve never sets him running to and fro.
 func _wolf_rubble_x() -> float:
-	var engineer_in_spot: bool = absf(human.position.x - JunctionRoom.WOLF_RUBBLE_X) < M0Actor.CLEAR_GAP
-	if engineer_in_spot and wolf.position.x < JunctionRoom.WOLF_RUBBLE_X - 2.0:
-		return JunctionRoom.WOLF_CLEAR_X
-	return JunctionRoom.WOLF_RUBBLE_X
+	if wolf.position.x >= JunctionRoom.WOLF_RUBBLE_X - 2.0:
+		return JunctionRoom.WOLF_RUBBLE_X
+	var gap: float = absf(human.position.x - JunctionRoom.WOLF_RUBBLE_X)
+	if wolf.autonomous_target_x == JunctionRoom.WOLF_RUBBLE_X:
+		return JunctionRoom.WOLF_CLEAR_X if gap < M0Actor.CLEAR_GAP - WOLF_RUBBLE_HYSTERESIS else JunctionRoom.WOLF_RUBBLE_X
+	return JunctionRoom.WOLF_CLEAR_X if gap < M0Actor.CLEAR_GAP + WOLF_RUBBLE_HYSTERESIS else JunctionRoom.WOLF_RUBBLE_X
 
 
 ## WOLF keeps off the live relay, back towards the breaker: once he has refused it, or while the
@@ -3821,7 +3838,7 @@ func _machine_spans() -> Array[Vector2]:
 	var halves: Array[Vector2] = []
 	match state.chapter_id:
 		"lockdown":
-			halves = [Vector2(350.0, 38.5), Vector2(RELAY_X, 43.1), Vector2(BYPASS_WHEEL.x, BypassHandle.COLLAR_RADIUS), Vector2(876.0, 35.0)]
+			halves = [Vector2(350.0, 38.5), Vector2(RELAY_X, RELAY_HALF_WIDTH), Vector2(BYPASS_WHEEL.x, BypassHandle.COLLAR_RADIUS), Vector2(876.0, 35.0)]
 		"records":
 			halves = [Vector2(190.0, 57.1), Vector2(520.0, 44.6), Vector2(RecordsRoom.EXIT_REST.x, 37.8)]
 		"junction":
@@ -3835,10 +3852,13 @@ func _machine_spans() -> Array[Vector2]:
 
 
 ## The furthest right WOLF follows to: short of a shut door by his drawn reach, so he never noses
-## into it and the engineer always has room in front of it. His authored spots ignore this.
+## into it and the engineer always has room in front of it. Once the corridor's seal is open, the
+## floor past the relay (the MANUAL BYPASS, the seal's frame and the safe point) has no gap as long
+## as he is, so he follows no further than the relay's left side (WOLF_FOLLOW_OPEN_MAX_X) and waits
+## there while the engineer goes on to the safe point. His authored spots ignore this.
 func _wolf_follow_max_x() -> float:
-	if state.chapter_id == "lockdown" and not state.door_open:
-		return CORRIDOR_DOOR_LEFT_X - M0Actor.WOLF_REACH
+	if state.chapter_id == "lockdown":
+		return WOLF_FOLLOW_OPEN_MAX_X if state.door_open else CORRIDOR_DOOR_LEFT_X - M0Actor.WOLF_REACH
 	if state.chapter_id == "junction" and not state.door_blown:
 		return M0State.JUNCTION_DOOR_LEFT_X - M0Actor.WOLF_REACH
 	return M0Actor.MAX_X
