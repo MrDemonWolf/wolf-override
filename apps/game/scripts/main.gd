@@ -285,7 +285,6 @@ const JUNCTION_RESTORE_A_LINE: String = "Service junction restored. Arm the brea
 @onready var breaker_status_light: ColorRect = $BreakerStatusLight
 @onready var relay_status_light: ColorRect = $RelayStatusLight
 @onready var door_art: Sprite2D = $Door/Visual/DoorArt
-@onready var human_tag: Label = $Human/Tag
 @onready var door_shape: CollisionShape2D = $Door/CollisionShape2D
 @onready var door_visual: ColorRect = $Door/Visual
 @onready var top_card: Panel = $CanvasLayer/TopBar
@@ -3324,8 +3323,8 @@ func _refresh_ui() -> void:
 		touch_choice_2.position = Vector2(490.0, CHOICE_ROW_TOP) if touch_layout else Vector2(396.0, CHOICE_ROW_TOP + 46.0)
 		touch_choice_1.size = Vector2(428.0, 76.0) if touch_layout else Vector2(522.0, 40.0)
 		touch_choice_2.size = Vector2(428.0, 76.0) if touch_layout else Vector2(522.0, 40.0)
-		touch_choice_1.add_theme_font_size_override("font_size", 17 if touch_layout else 16)
-		touch_choice_2.add_theme_font_size_override("font_size", 17 if touch_layout else 16)
+		_set_font_size(touch_choice_1, 17 if touch_layout else 16)
+		_set_font_size(touch_choice_2, 17 if touch_layout else 16)
 		var choice_1_key: String = settings_menu.prompt(&"choice_1", controller_active)
 		var choice_2_key: String = settings_menu.prompt(&"choice_2", controller_active)
 		var answers: Array[String] = [M0State.CHOICE_TEXT[M0State.DISCLOSE], M0State.CHOICE_TEXT[M0State.PRESS]]
@@ -3364,17 +3363,19 @@ func _refresh_ui() -> void:
 		# Walking out through the hatch nothing waits on a press, so no CONTINUE prompt shows.
 		_set_dialogue(status_line, "" if hatch_exit_walking else ("TAP CONTINUE" if touch_layout else "%s  CONTINUE" % settings_menu.prompt(&"interact", controller_active)))
 		return
-	breaker_art.modulate = Color.WHITE if state.breaker_armed else Color("#879ba5")
-	breaker_status_light.color = Color("#8be3ff") if state.breaker_armed else Color("#d48954")
-	relay_art.modulate = Color.WHITE if state.breaker_armed else Color("#879ba5")
-	relay_status_light.color = Color("#a4f0c4") if state.door_open else (Color("#f3ae4b") if state.breaker_armed and _relay_refused() else (Color("#8be3ff") if state.breaker_armed else Color("#536e7c")))
-	bypass_handle.live = state.breaker_armed and not state.door_open
+	# The corridor stations' tints and lamps are written only when they change: this runs every frame.
+	_set_modulate(breaker_art, Color.WHITE if state.breaker_armed else Color("#879ba5"))
+	_set_color(breaker_status_light, Color("#8be3ff") if state.breaker_armed else Color("#d48954"))
+	_set_modulate(relay_art, Color.WHITE if state.breaker_armed else Color("#879ba5"))
+	_set_color(relay_status_light, Color("#a4f0c4") if state.door_open else (Color("#f3ae4b") if state.breaker_armed and _relay_refused() else (Color("#8be3ff") if state.breaker_armed else Color("#536e7c"))))
+	var bypass_live: bool = state.breaker_armed and not state.door_open
+	if bypass_handle.live != bypass_live:
+		bypass_handle.live = bypass_live
 	# Once the seal's power has gone through, by WOLF or by the bypass, the relay is no longer faulted.
 	bypass_handle.clear_fault(state.door_open, true)
-	breaker_status_glow.modulate = Color(breaker_status_light.color, 0.75 if state.breaker_armed else 0.45)
-	relay_status_glow.modulate = Color(relay_status_light.color, 0.75 if state.breaker_armed else 0.3)
-	checkpoint_art.modulate = Color("#d5ffe3") if state.checkpoint_reached else Color.WHITE
-	human_tag.text = state.human_name().get_slice(" ", 0).to_upper()
+	_set_modulate(breaker_status_glow, Color(breaker_status_light.color, 0.75 if state.breaker_armed else 0.45))
+	_set_modulate(relay_status_glow, Color(relay_status_light.color, 0.75 if state.breaker_armed else 0.3))
+	_set_modulate(checkpoint_art, Color("#d5ffe3") if state.checkpoint_reached else Color.WHITE)
 	var card_key: String = "%s:%s" % [state.chapter_id, _objective()]
 	if name_card_remaining > 0.0 and state.chapter_id == "lockdown":
 		# The name card comes first; the location card follows once it has faded or been skipped.
@@ -3430,16 +3431,46 @@ func _set_dialogue(message: String, hint: String) -> void:
 	var has_speaker: bool = not speaker.text.is_empty()
 	speaker.visible = has_speaker
 	speaker_rule.visible = has_speaker
-	story.offset_left = 160.0 if has_speaker else 20.0
+	var story_left: float = 160.0 if has_speaker else 20.0
+	if story.offset_left != story_left:
+		story.offset_left = story_left
 	var tint: Color = Color("#8be3ff") if name == "WOLF" else (Color("#ff9a9f") if name.begins_with("DIRECTOR") else (Color("#f4d5ae") if name == human_name else Color("#9fc3d2")))
-	dialogue_accent.color = tint
-	speaker.add_theme_color_override("font_color", tint)
+	_set_color(dialogue_accent, tint)
+	_set_font_color(speaker, tint)
 	context_hint.visible = not hint.is_empty()
 	var cinematic: bool = intro_active or chapter_close_active
-	context_hint.position = Vector2(650, 94) if cinematic else Vector2(253, 405)
-	context_hint.size = Vector2(278, 35) if cinematic else Vector2(549, 35)
-	context_hint_text.size.x = 252 if cinematic else 526
+	var hint_position: Vector2 = Vector2(650, 94) if cinematic else Vector2(253, 405)
+	var hint_size: Vector2 = Vector2(278, 35) if cinematic else Vector2(549, 35)
+	var hint_width: float = 252.0 if cinematic else 526.0
+	if context_hint.position != hint_position:
+		context_hint.position = hint_position
+	if context_hint.size != hint_size:
+		context_hint.size = hint_size
+	if context_hint_text.size.x != hint_width:
+		context_hint_text.size.x = hint_width
 	context_hint_text.text = hint
+
+
+## The HUD is refreshed every frame, so these write a value only when it differs. A theme override
+## notifies every control under it even when the value is the same.
+static func _set_font_size(control: Control, font_size: int) -> void:
+	if not control.has_theme_font_size_override(&"font_size") or control.get_theme_font_size(&"font_size") != font_size:
+		control.add_theme_font_size_override(&"font_size", font_size)
+
+
+static func _set_font_color(control: Control, color: Color) -> void:
+	if not control.has_theme_color_override(&"font_color") or control.get_theme_color(&"font_color") != color:
+		control.add_theme_color_override(&"font_color", color)
+
+
+static func _set_modulate(item: CanvasItem, tint: Color) -> void:
+	if item.modulate != tint:
+		item.modulate = tint
+
+
+static func _set_color(rect: ColorRect, color: Color) -> void:
+	if rect.color != color:
+		rect.color = color
 
 
 func _show_top_card(message: String, hold_seconds: float, accent: Color = TOP_CARD_ACCENT) -> void:
