@@ -673,12 +673,13 @@ func _check_scene() -> void:
 		log_box.call()
 		return brain.state == &"patrol", 240), "the chase ends with the engineer over the rubble")
 	_expect(str(game.call("_context_hint")).contains("WOLF has broken off"), "then the hint says WOLF has stepped back")
-	# The sentry giving up cuts into the miss's boxes; the rest still follow once that line is read.
+	# Back over the rubble before the sentry swung, the order to get back over it is dropped (it would
+	# be stale); the sentry giving up cuts in, and WOLF breaking off still follows once that line is read.
 	await _wait_until(func() -> bool:
 		log_box.call()
 		return miss_boxes.back() == "WOLF: I'm out. I'll hold at the rubble.", 1200)
-	var turn_at: int = miss_boxes.find("The sentry swings toward the release;\nget back over the rubble.")
-	_expect(miss_boxes.has("The sentry loses Rowan behind the rubble\nand rolls back to its patrol.") and turn_at > 0 and miss_boxes.find("WOLF: I'm out. I'll hold at the rubble.") > turn_at, "retreating over the rubble mid-miss still shows the sentry's turn and WOLF breaking off, in order (seen %s)" % str(miss_boxes).c_escape())
+	var lost_at: int = miss_boxes.find("The sentry loses Rowan behind the rubble\nand rolls back to its patrol.")
+	_expect(not miss_boxes.has("The sentry swings toward the release;\nget back over the rubble.") and lost_at > 0 and miss_boxes.find("WOLF: I'm out. I'll hold at the rubble.") > lost_at, "retreating over the rubble before the sentry swings drops the order to do so and still shows WOLF breaking off, after the sentry gives up (seen %s)" % str(miss_boxes).c_escape())
 	# Round 3b: a miss with WOLF already past the sentry, by the hatch. He breaks off where he is, since
 	# he never crosses back under the tank; the sentry's patrol then turns short of him and its beam
 	# stops at him; and the END OF SLICE recap says he broke off.

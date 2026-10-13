@@ -77,6 +77,9 @@ func _run() -> void:
 	await _check_door_bump()
 	await _check_after_blast()
 	await _check_knockdown_boxes()
+	await _check_blast_boxes()
+	await _check_story_moves_on()
+	await _check_miss_boxes()
 	bank.stop_all()
 	game.queue_free()
 	_remove(path)
@@ -448,6 +451,126 @@ func _check_knockdown_boxes() -> void:
 	var c: Dictionary = (MainScript as GDScript).get_script_constant_map()
 	var queue: Array = game.get("box_queue")
 	_expect(str(game.get("status_line")) == reason and queue.size() == 1 and (queue[0] == c["RESTORE_FROM_DISK_LINE"] or queue[0] == c["RESTORE_BEAT_LINE"]), "after restore the two-row card keeps its box and the restore line comes next (box \"%s\", then %s)" % [str(game.get("status_line")).c_escape(), str(queue)])
+
+
+## Item 3 S6 in play: walking straight to the rubble line after the blast still shows "Past the
+## doorway, something whirs awake.". Reaching the line brings it up at once and holds the engineer
+## there; WOLF's question waits until it has been up its reading time. Waiting at the door first, it
+## comes on its own and the question still waits out the rest of its time.
+func _check_blast_boxes() -> void:
+	var c: Dictionary = (MainScript as GDScript).get_script_constant_map()
+	var box_1: String = c["RUBBLE_LINE"] % "Rowan"
+	var wake: String = c["RUBBLE_WAKE_LINE"]
+	for wait_ms: int in [0, 6000]:
+		await _start_at(false)
+		game.call("_say", [box_1, wake] as Array[String])
+		var seen: Array[String] = [box_1]
+		var wake_at: Array[int] = [-1]
+		var held: Array[bool] = [false]
+		var log_box: Callable = func() -> void:
+			var line: String = str(game.get("status_line"))
+			if seen.back() != line:
+				seen.append(line)
+				if line == wake:
+					wake_at[0] = Time.get_ticks_msec()
+			held[0] = held[0] or bool(game.get("lane_question_held"))
+		var started_at: int = Time.get_ticks_msec()
+		while Time.get_ticks_msec() - started_at < wait_ms:
+			await process_frame
+			log_box.call()
+		Input.action_press(&"move_right")
+		var asked: bool = await _wait_until(func() -> bool:
+			log_box.call()
+			return bool(game.get("waiting_for_choice")), 900)
+		Input.action_release(&"move_right")
+		var wake_ms: int = Time.get_ticks_msec() - wake_at[0]
+		var label: String = "walking to the rubble line at once" if wait_ms == 0 else "waiting at the door first"
+		_expect(asked and seen.size() >= 2 and seen[seen.size() - 2] == wake and seen.find(wake) == seen.size() - 2 and str(seen.back()).begins_with("WOLF: It passes under that tank"), "%s: the sentry waking is shown before WOLF's question replaces it (seen %s)" % [label, str(seen).c_escape()])
+		_expect(wake_at[0] >= 0 and wake_ms >= int(MainScript.box_seconds(wake) * 1000.0) - 50, "%s: the question waits until that box has been up its reading time (%d ms of %.2f s)" % [label, wake_ms, MainScript.box_seconds(wake)])
+		_expect(not held[0] or human.position.x <= JunctionRoom.CHOICE_X + 4.0, "%s: the engineer holds at the rubble line meanwhile (x %.1f)" % [label, human.position.x])
+		game.call("_choose_lane", 2)
+		await physics_frame
+		_expect(human.controlled and not bool(game.get("lane_question_held")), "%s: answering hands the controls back" % label)
+
+
+## A line that moves the story on drops the boxes still to come of an earlier one: WOLF's "The tank
+## takes a moment to fall." never comes back after the clamp lets go or the tank lands on the sentry.
+func _check_story_moves_on() -> void:
+	var c: Dictionary = (MainScript as GDScript).get_script_constant_map()
+	var alone: Array = c["ALONE_LINES"]
+	await _start_at(false)
+	await _answer_lane(2)
+	_expect(str(game.get("status_line")) == alone[0] and game.get("box_queue") == [alone[1]], "answer 2: WOLF's first box, the second to come")
+	game.call("_drop_tank")
+	_expect(str(game.get("status_line")) == "The clamp lets go." and (game.get("box_queue") as Array).is_empty(), "the clamp letting go drops WOLF's second box")
+	await _start_at(false)
+	await _answer_lane(2)
+	(game.get("sentry_brain") as SentryBrain).x = DropArm.MARK_X
+	game.call("_tank_hit")
+	var hit: String = str(game.get("status_line"))
+	game.call("_advance_box_queue", 30.0)
+	_expect(hit.contains("It's down.") and str(game.get("status_line")) == hit and (game.get("box_queue") as Array).is_empty(), "a hit within WOLF's first box stays up; \"%s\" never comes back over the crushed sentry" % str(alone[1]))
+	_expect(await _wait_until(func() -> bool: return Engine.time_scale == 1.0, 90), "time scale settles after the hit")
+
+
+## Item 3 S15 in play: the order to get back over the rubble comes as the sentry swings into its chase,
+## while the engineer is still at the release, before it can reach them; back over the rubble before
+## it swings, the order is dropped, and it never shows after the sentry has given up or the tank is
+## back up.
+func _check_miss_boxes() -> void:
+	var c: Dictionary = (MainScript as GDScript).get_script_constant_map()
+	var miss: String = c["TANK_MISS_LINE"]
+	var turn: String = c["TANK_MISS_TURN_LINE"]
+	var lost: String = c["SENTRY_LOST_LINE"] % "Rowan"
+	var brain: SentryBrain = game.get("sentry_brain") as SentryBrain
+	for how: String in ["stay", "back at once", "back after the swing"]:
+		await _start_at(false)
+		await _answer_lane(2)
+		await _place(float(game.call("debug_station_side_x", (c["JUNCTION_STATIONS"] as Array)[2], JunctionRoom.ARM_X + 1.0)), false)
+		brain.x = SentryBrain.PATROL_MAX_X
+		brain.facing = 1.0
+		# A real drop, far from the sentry: the tank misses and the winch has it back up later.
+		game.call("_drop_tank")
+		_expect(await _wait_until(func() -> bool: return (game.get("drop_arm") as DropArm).state == &"rewinding", 60), "%s: the drop misses" % how)
+		if how == "back at once":
+			human.position.x = 500.0
+		var seen: Array[String] = [str(game.get("status_line"))]
+		var turn_ms: Array[int] = [-1]
+		var started_at: int = Time.get_ticks_msec()
+		var swung: Array[bool] = [false]
+		var ended: bool = await _wait_until(func() -> bool:
+			var line: String = str(game.get("status_line"))
+			if seen.back() != line:
+				seen.append(line)
+				if line == turn:
+					turn_ms[0] = Time.get_ticks_msec() - started_at
+			if how == "back after the swing" and line == turn and not swung[0]:
+				swung[0] = true
+				human.position.x = 500.0
+			if how == "stay":
+				return bool(game.get("fail_active"))
+			return (game.get("drop_arm") as DropArm).state == &"hung" and (game.get("box_queue") as Array).is_empty() and str(game.get("status_line")).contains("back on the clamp"), 1500)
+		var turn_at: int = seen.find(turn)
+		match how:
+			"stay":
+				_expect(ended and seen[0] == miss and turn_at == 1, "staying at the release: the miss, then the order to get back over the rubble before the sentry reaches them (seen %s)" % str(seen).c_escape())
+				_expect(turn_ms[0] >= 0 and turn_ms[0] <= int((SentryBrain.LOCK_SECONDS + 0.3) * 1000.0), "the order comes as the sentry swings, after its %.1f s lock-on beat (%d ms)" % [SentryBrain.LOCK_SECONDS, turn_ms[0]])
+				_expect(await _wait_until(func() -> bool: return not bool(game.get("fail_active")), 300), "the knockdown restores")
+			"back at once":
+				_expect(ended and seen[0] == miss and turn_at < 0 and seen.has(lost), "back over the rubble before it swings: no stale order, then the sentry giving up (seen %s)" % str(seen).c_escape())
+			_:
+				_expect(ended and seen[0] == miss and turn_at == 1 and seen.find(lost) > turn_at and seen.rfind(turn) == turn_at, "back over the rubble after it swings: the order once, then the sentry giving up, and the order never again (seen %s)" % str(seen).c_escape())
+		_expect(seen.back().contains("back on the clamp") or how == "stay", "%s: the winch's line comes last, after the miss's boxes (seen %s)" % [how, str(seen).c_escape()])
+
+
+## Walks to the rubble line and answers WOLF's question with [param response].
+func _answer_lane(response: int) -> void:
+	Input.action_press(&"move_right")
+	var asked: bool = await _wait_until(func() -> bool: return bool(game.get("waiting_for_choice")), 300)
+	Input.action_release(&"move_right")
+	_expect(asked, "WOLF asks at the rubble line")
+	game.call("_choose_lane", response)
+	await physics_frame
 
 
 ## A fresh run into the junction's entry, as USE at the Records exit makes it (autosave A).
