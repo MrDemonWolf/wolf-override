@@ -215,7 +215,7 @@ That is 2 of the room's 4 allowed persistent glows. There is no new full-screen 
 
 ## Files
 
-All paths are under `/private/tmp/claude-501/-Users-nathanialhenniges-Developer-mrdemonwolf-wolf-override/eb713cd4-8931-48d7-8c83-5b0b0d1e9cf3/scratchpad/cage-design/option-a/`.
+All paths are under `[session scratch, not kept]/cage-design/option-a/`.
 
 - `strip.png` and `construction-drawing.png`
 - `renders/beat1-standby.png`, `renders/beat3-latch-fails.png`, `renders/beat3-open-wolf-steps-out.png`, the extra `renders/beat2-wake-extra.png`, `renders/beat1-standby-no-text-no-keypad.png` and `renders/phone-check.png` (revision 2, built by `tools/renders_r2.py`)

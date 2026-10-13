@@ -107,7 +107,7 @@ Build the shared foundation first and prove it in the rooms that already exist (
 ## Research: Codebase capability audit
 # WOLF//OVERRIDE action-foundation audit (read-only, 2026-10-08)
 
-Source audited in full: `/private/tmp/claude-501/-Users-nathanialhenniges-Developer-mrdemonwolf-wolf-override/eb713cd4-8931-48d7-8c83-5b0b0d1e9cf3/scratchpad/wt-game/apps/game/{scripts/main.gd (1244 lines), scripts/m0_actor.gd, scripts/m0_state.gd, scripts/records_room.gd, scripts/containment_cage.gd, scripts/game_settings.gd, scripts/ui_motion.gd, scripts/pause_overlay.gd, scenes/main.tscn, project.godot, tests/*_test.gd}`, plus `/Users/nathanialhenniges/Developer/mrdemonwolf/wolf-override/{AGENT.md, scripts/check-game.sh, apps/game/assets/manifest.json}`. Private context was read and is referred to only abstractly. Worktree HEAD is `097e4db` (one theme commit past `main`'s `f56b0a7`); gameplay logic is identical to `main`.
+Source audited in full: `[session scratch, not kept]/wt-game/apps/game/{scripts/main.gd (1244 lines), scripts/m0_actor.gd, scripts/m0_state.gd, scripts/records_room.gd, scripts/containment_cage.gd, scripts/game_settings.gd, scripts/ui_motion.gd, scripts/pause_overlay.gd, scenes/main.tscn, project.godot, tests/*_test.gd}`, plus `{AGENT.md, scripts/check-game.sh, apps/game/assets/manifest.json}`. Private context was read and is referred to only abstractly. Worktree HEAD is `097e4db` (one theme commit past `main`'s `f56b0a7`); gameplay logic is identical to `main`.
 
 ## 1. What the slice is today
 
@@ -188,7 +188,7 @@ Each step is a bounded PR with headless coverage and a short hands-on note. Step
 ## Research: Feedback and audio catalogue
 # WOLF//OVERRIDE: "impact" pass and a bounded action slice (read-only research, 2026-10-08)
 
-No files were edited. Code was read from the worktree at `/private/tmp/claude-501/-Users-nathanialhenniges-Developer-mrdemonwolf-wolf-override/eb713cd4-8931-48d7-8c83-5b0b0d1e9cf3/scratchpad/wt-game/apps/game`; rules from `/Users/nathanialhenniges/Developer/mrdemonwolf/wolf-override/AGENT.md`; private context was read and is referred to only abstractly.
+No files were edited. Code was read from the worktree at `[session scratch, not kept]/wt-game/apps/game`; rules from `AGENT.md`; private context was read and is referred to only abstractly.
 
 ## 1. What exists today (the hooks any impact pass plugs into)
 
@@ -293,7 +293,7 @@ Caveats: nothing above is validated by play; every feel claim needs the route pl
 ## Research: Reference rules
 # Research: action, pressure and impact for a narrative 2D companion game
 
-Read-only pass. No files were edited. Code read in the worktree `.../scratchpad/wt-game/apps/game` (main.gd 1244 lines, m0_state.gd, m0_actor.gd, records_room.gd, containment_cage.gd, project.godot, assets/manifest.json, test function lists). Public rules read from `/Users/nathanialhenniges/Developer/mrdemonwolf/wolf-override/AGENT.md`. Private context read but only referred to abstractly below.
+Read-only pass. No files were edited. Code read in the worktree `.../scratchpad/wt-game/apps/game` (main.gd 1244 lines, m0_state.gd, m0_actor.gd, records_room.gd, containment_cage.gd, project.godot, assets/manifest.json, test function lists). Public rules read from `AGENT.md`. Private context read but only referred to abstractly below.
 
 ## 1. What the current build already gives us to build pressure on
 

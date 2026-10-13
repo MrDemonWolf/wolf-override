@@ -1,7 +1,7 @@
 #!/bin/bash
 # Renders option B's stills on main at cfe304f (shared scratch export ../../export-cfe304f).
 set -e
-S=/private/tmp/claude-501/-Users-nathanialhenniges-Developer-mrdemonwolf-wolf-override/eb713cd4-8931-48d7-8c83-5b0b0d1e9cf3/scratchpad
+S=${SESSION_SCRATCH:?session scratch, not kept}
 B=$S/pin-design/option-b
 G=$S/pin-design/export-cfe304f/apps/game
 mkdir -p $G/pin_mock_b $B/shots $B/logs

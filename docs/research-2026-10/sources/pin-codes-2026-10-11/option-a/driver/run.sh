@@ -1,6 +1,6 @@
 #!/bin/bash
 # Renders option A's stills on main at cfe304f (export in ../export-cfe304f, imported twice headless first).
-S=/private/tmp/claude-501/-Users-nathanialhenniges-Developer-mrdemonwolf-wolf-override/eb713cd4-8931-48d7-8c83-5b0b0d1e9cf3/scratchpad
+S=${SESSION_SCRATCH:?session scratch, not kept}
 A=$S/pin-design/option-a
 G=$S/pin-design/export-cfe304f/apps/game
 rm -rf $A/shots/mock

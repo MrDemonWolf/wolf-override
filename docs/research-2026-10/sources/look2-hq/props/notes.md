@@ -292,17 +292,17 @@ SHARED STYLE — "Look 2, graphic-painterly" (approved by the art director on 20
 
 REFERENCE ROLES (attach in this order unless the job says otherwise):
 Image 1 = the job's design reference or edit target (keep its silhouette, layout, function and colour coding; re-render it, do not redesign unless told).
-Image 2 = /private/tmp/claude-501/-Users-nathanialhenniges-Developer-mrdemonwolf-wolf-override/eb713cd4-8931-48d7-8c83-5b0b0d1e9cf3/scratchpad/hq/props/refs/ref-look2-board.png: rendering, value structure, edge treatment and cool grading only — match exactly how the breaker and coolant relay on that board are rendered. Do not copy its objects or figures.
-Image 3 = /private/tmp/claude-501/-Users-nathanialhenniges-Developer-mrdemonwolf-wolf-override/eb713cd4-8931-48d7-8c83-5b0b0d1e9cf3/scratchpad/hq/props/refs/keyart-b.png: mood, light and palette only; do not copy its composition or figures.
-Image 4 = /private/tmp/claude-501/-Users-nathanialhenniges-Developer-mrdemonwolf-wolf-override/eb713cd4-8931-48d7-8c83-5b0b0d1e9cf3/scratchpad/hq/props/refs/palette-card.png: colour swatches only.
+Image 2 = [session scratch, not kept]/hq/props/refs/ref-look2-board.png: rendering, value structure, edge treatment and cool grading only — match exactly how the breaker and coolant relay on that board are rendered. Do not copy its objects or figures.
+Image 3 = [session scratch, not kept]/hq/props/refs/keyart-b.png: mood, light and palette only; do not copy its composition or figures.
+Image 4 = [session scratch, not kept]/hq/props/refs/palette-card.png: colour swatches only.
 ~~~
 
 ### Job breaker (jobs/breaker.txt)
 
 ~~~text
 JOB: corridor BREAKER station, precise edit of the approved Look 2 breaker.
-Image 1 (edit target) = /private/tmp/claude-501/-Users-nathanialhenniges-Developer-mrdemonwolf-wolf-override/eb713cd4-8931-48d7-8c83-5b0b0d1e9cf3/scratchpad/hq/props/refs/styletest-breaker-raw.png — this is the APPROVED Look 2 breaker. Keep it identical in every respect.
-Image 5 = /private/tmp/claude-501/-Users-nathanialhenniges-Developer-mrdemonwolf-wolf-override/eb713cd4-8931-48d7-8c83-5b0b0d1e9cf3/scratchpad/hq/props/refs/design-corridor-breaker.png — the original breaker design, for identity only.
+Image 1 (edit target) = [session scratch, not kept]/hq/props/refs/styletest-breaker-raw.png — this is the APPROVED Look 2 breaker. Keep it identical in every respect.
+Image 5 = [session scratch, not kept]/hq/props/refs/design-corridor-breaker.png — the original breaker design, for identity only.
 IMAGE breaker.png:
 USE CASE: precise-object-edit. Change ONLY the status lamp: the small horizontal amber lamp window near the top of the cabinet becomes an UNLIT lamp socket — the same shape, size and position, now dark cool glass (#121f2c to #1d3042) with a faint cool top highlight and no glow at all, because the game draws the lit lamp as a separate sprite on top. Keep the cabinet, the lever, the right-hand pipe, the feet, the silhouette, the framing, the size on the canvas, the rendering, the rim light and the transparent background exactly as they are. After the edit the object has no saturated colour at all.
 ~~~
@@ -312,7 +312,7 @@ USE CASE: precise-object-edit. Change ONLY the status lamp: the small horizontal
 ~~~text
 JOB: the PURGE QUEUE terminal (Records room) and its twin, the corridor PURGE DISPLAY. Two images.
 IMAGE purge-queue.png:
-Image 1 = /private/tmp/claude-501/-Users-nathanialhenniges-Developer-mrdemonwolf-wolf-override/eb713cd4-8931-48d7-8c83-5b0b0d1e9cf3/scratchpad/hq/props/refs/design-records-purge-queue.png (design reference). Image 5 = /private/tmp/claude-501/-Users-nathanialhenniges-Developer-mrdemonwolf-wolf-override/eb713cd4-8931-48d7-8c83-5b0b0d1e9cf3/scratchpad/hq/props/refs/design-corridor-purge-display.png (same machine family, for identity).
+Image 1 = [session scratch, not kept]/hq/props/refs/design-records-purge-queue.png (design reference). Image 5 = [session scratch, not kept]/hq/props/refs/design-corridor-purge-display.png (same machine family, for identity).
 SUBJECT: re-render the purge-queue terminal in Look 2: a wide low console on short feet, a large tilted-back screen housing on the upper left, a block of three vertical cartridge/drive modules on the upper right, lower cabinet with a vented door and a side pipe loop. Keep that silhouette and layout. The screen face is the one accent: a glowing red screen (#a01e29 / #ad252d with a #ca452f inner glow) showing only a few broad horizontal bars of slightly lighter red, no text, no numbers. Directly under the screen, on the bar below it, put ONE small horizontal lamp socket (about 4% of the object width, a short slot) that is UNLIT dark cool glass with no glow — the game draws that light separately. Remove the old small red lights on the drive modules and cabinet (make them dark steel). Everything except the screen is cool dark steel.
 IMAGE purge-display.png:
 Same references, plus attach your kept purge-queue.png as Image 5 instead of the corridor design (so both stay one family). Edit the purge-queue result: keep the same machine and rendering, but the lamp socket under the screen is now a LIT small red indicator (#ad252d core, no glow beyond the socket). Change nothing else.
@@ -322,7 +322,7 @@ Same references, plus attach your kept purge-queue.png as Image 5 instead of the
 
 ~~~text
 JOB: corridor SAFE POINT station.
-Image 1 = /private/tmp/claude-501/-Users-nathanialhenniges-Developer-mrdemonwolf-wolf-override/eb713cd4-8931-48d7-8c83-5b0b0d1e9cf3/scratchpad/hq/props/refs/design-corridor-safe-point.png (design reference).
+Image 1 = [session scratch, not kept]/hq/props/refs/design-corridor-safe-point.png (design reference).
 IMAGE safe-point.png:
 SUBJECT: re-render the safe-point station in Look 2: a narrow upright pedestal cabinet on a stepped base, a cylindrical green glass beacon lamp on top in a steel cage cap, a tilted front control panel with a round green target-ring screen and a small vertical bar of green segments beside it, a lower cabinet with a vent, and a pipe running down the right side. Keep that silhouette and layout. The one accent is safe-point green: the beacon glass lit green (#56dc69 core, #228237 mid, #17632f shadow) and the green target-ring screen (rings and crosshair as broad shapes, no text, no numbers). The beacon glow stays inside the glass. All steel is cool dark blue-grey.
 ~~~
@@ -331,7 +331,7 @@ SUBJECT: re-render the safe-point station in Look 2: a narrow upright pedestal c
 
 ~~~text
 JOB: Records MIRROR PORT station.
-Image 1 = /private/tmp/claude-501/-Users-nathanialhenniges-Developer-mrdemonwolf-wolf-override/eb713cd4-8931-48d7-8c83-5b0b0d1e9cf3/scratchpad/hq/props/refs/design-records-mirror-port.png (design reference).
+Image 1 = [session scratch, not kept]/hq/props/refs/design-records-mirror-port.png (design reference).
 IMAGE mirror-port.png:
 SUBJECT: re-render the mirror port in Look 2: an upright machine on a wide stepped plinth, two tall vertical drive bays side by side (each with two broad latch blocks), curved grab handles on both sides, and a small cyan screen in a hooded housing on top. Keep that silhouette and layout. The one accent is cyan: the top screen face (#30d0fc / #2091ca, a few broad horizontal bars, no text) and the restrained cyan seam light down each drive bay (#4f8ab8 to #30d0fc, thin but at least 1/60 of the object height). Directly under the top screen put ONE small horizontal lamp socket that is UNLIT dark cool glass with no glow — the game draws that light separately. All steel is cool dark blue-grey.
 ~~~
@@ -341,10 +341,10 @@ SUBJECT: re-render the mirror port in Look 2: an upright machine on a wide stepp
 ~~~text
 JOB: Service Junction VALVE, rendered as a master and then split into separate stateful parts (body, handwheel, gauge face, gauge needle). Five images, in order; each later image uses the kept master as its edit target so all parts match.
 IMAGE valve-master.png:
-Image 1 = /private/tmp/claude-501/-Users-nathanialhenniges-Developer-mrdemonwolf-wolf-override/eb713cd4-8931-48d7-8c83-5b0b0d1e9cf3/scratchpad/hq/props/refs/design-junction-valve.png (design reference).
+Image 1 = [session scratch, not kept]/hq/props/refs/design-junction-valve.png (design reference).
 SUBJECT: re-render the valve in Look 2: a central valve body on a squat stand with two legs and a base plate, large elbow pipes leaving left and right and turning down to flanged ends, a big front HANDWHEEL (round rim, five spokes, central hub), a round pressure GAUGE on a short stem on top, and a small riser pipe on the right with a narrow amber sight glass. Keep that silhouette and layout. The one accent hue is amber: the handwheel in amber metal (#82510e lit to #6e4824 shadow, worn but flat-shaded, no rust texture), the sight glass dim amber glow (#e0936e), and one broad diagonal hazard band on each stand leg (#82510e alternating with dark steel). The gauge face is plain cool off-white (#c3c5d7) with an empty face: no needle, no ticks, no numbers. All other steel is cool dark blue-grey.
 IMAGE valve-body.png:
-Image 1 = your kept valve-master.png (edit target). Images 2-4 as usual. Image 5 = /private/tmp/claude-501/-Users-nathanialhenniges-Developer-mrdemonwolf-wolf-override/eb713cd4-8931-48d7-8c83-5b0b0d1e9cf3/scratchpad/hq/props/refs/design-junction-valve.png.
+Image 1 = your kept valve-master.png (edit target). Images 2-4 as usual. Image 5 = [session scratch, not kept]/hq/props/refs/design-junction-valve.png.
 USE CASE: precise-object-edit. Remove ONLY the handwheel (rim and spokes) so the body behind it shows: the round hub boss and the stem socket where the wheel mounts, the valve body face and the pipes, all in the same rendering. Keep the gauge with its empty off-white face (no needle). Keep the canvas framing, scale and position of everything else identical.
 IMAGE valve-wheel.png:
 Image 1 = your kept valve-master.png. Images 2-4 as usual.
@@ -362,10 +362,10 @@ SUBJECT: ONLY a single gauge needle, lying perfectly horizontal and pointing to 
 ~~~text
 JOB: Service Junction VALVE, second pass: a darker, matte master, then the separate stateful parts (body, handwheel, gauge face, gauge needle). Five images, in order; each part uses the kept master as its edit target so all parts match.
 IMAGE valve-master.png:
-Image 1 = /private/tmp/claude-501/-Users-nathanialhenniges-Developer-mrdemonwolf-wolf-override/eb713cd4-8931-48d7-8c83-5b0b0d1e9cf3/scratchpad/hq/props/refs/design-junction-valve.png (design reference). Image 5 = /private/tmp/claude-501/-Users-nathanialhenniges-Developer-mrdemonwolf-wolf-override/eb713cd4-8931-48d7-8c83-5b0b0d1e9cf3/scratchpad/hq/props/refs/valve-attempt-2.png (a first Look-2 pass: keep its layout and simplification, but it is too light, too glossy and too saturated blue, and the wheel is too bright orange).
+Image 1 = [session scratch, not kept]/hq/props/refs/design-junction-valve.png (design reference). Image 5 = [session scratch, not kept]/hq/props/refs/valve-attempt-2.png (a first Look-2 pass: keep its layout and simplification, but it is too light, too glossy and too saturated blue, and the wheel is too bright orange).
 SUBJECT: re-render the valve in Look 2: a central valve body on a squat stand with two legs and a base plate, large elbow pipes leaving left and right and turning down to flanged ends, a big front HANDWHEEL (round rim, five spokes, central hub), a round pressure GAUGE on a short stem on top, and a small riser pipe on the right with a narrow sight glass. Steel: dark matte blue-grey like the Look 2 breaker (mostly #121f2c-#2f4d69, lit tops #4175a0, low chroma), pipes as 3 flat value bands, no gloss. Accent hue amber ONLY: the handwheel in MUTED amber metal (#82510e lit, #6e4824 mid, #3a2810 shadow — a dark ochre, never bright orange or yellow), the sight glass a dim amber glow (#e0936e core), and one broad diagonal hazard band on each stand leg (#82510e alternating with dark steel). The gauge face is plain cool off-white (#c3c5d7) and EMPTY: no needle, no ticks, no numbers.
 IMAGE valve-body.png:
-Image 1 = your kept valve-master.png (edit target). Images 2-4 as usual. Image 5 = /private/tmp/claude-501/-Users-nathanialhenniges-Developer-mrdemonwolf-wolf-override/eb713cd4-8931-48d7-8c83-5b0b0d1e9cf3/scratchpad/hq/props/refs/design-junction-valve.png.
+Image 1 = your kept valve-master.png (edit target). Images 2-4 as usual. Image 5 = [session scratch, not kept]/hq/props/refs/design-junction-valve.png.
 USE CASE: precise-object-edit. Remove ONLY the handwheel (rim and spokes) so the body behind it shows: the round hub boss and the stem socket where the wheel mounts, the valve body face and the pipes, in the same rendering. Keep the gauge with its empty off-white face (no needle). Keep the canvas framing, scale and position of everything else identical.
 IMAGE valve-wheel.png:
 Image 1 = your kept valve-master.png. Images 2-4 as usual.
@@ -383,13 +383,13 @@ SUBJECT: ONLY a single gauge needle, perfectly horizontal and pointing to the RI
 ~~~text
 JOB: Service Junction TANK ARM and COOLANT TANK, rendered together as a master, then split into two separate sprites. Three images, in order.
 IMAGE tank-master.png:
-Image 1 = /private/tmp/claude-501/-Users-nathanialhenniges-Developer-mrdemonwolf-wolf-override/eb713cd4-8931-48d7-8c83-5b0b0d1e9cf3/scratchpad/hq/props/refs/design-junction-tank-arm.png (design reference). Image 5 = /private/tmp/claude-501/-Users-nathanialhenniges-Developer-mrdemonwolf-wolf-override/eb713cd4-8931-48d7-8c83-5b0b0d1e9cf3/scratchpad/hq/props/refs/design-junction-tank.png (the tank part, for identity).
+Image 1 = [session scratch, not kept]/hq/props/refs/design-junction-tank-arm.png (design reference). Image 5 = [session scratch, not kept]/hq/props/refs/design-junction-tank.png (the tank part, for identity).
 SUBJECT: re-render the ceiling tank arm holding its coolant tank, in Look 2, in a tall portrait canvas: at the top a wide flat ceiling mounting plate; under it a pivot column and a short articulated arm reaching right to a cable winch drum; a vertical cable and a shackle hook hanging down from the column; the shackle holds the top lug of a CRADLE (a hinged steel frame hugging the tank's sides, top and bottom); inside it an upright capsule coolant tank (rounded ends) with two broad hazard bands. Keep that silhouette and layout. Accents: the hazard bands in amber metal (#82510e alternating with dark steel) and a few small restrained cyan lights on the ceiling plate and cradle sides (#4f8ab8 to #30d0fc, small). Tank metal is cool blue steel, flat-shaded, no droplets, no rust.
 IMAGE tank-arm.png:
 Image 1 = your kept tank-master.png (edit target). Images 2-4 as usual.
 USE CASE: precise-object-edit. Remove ONLY the tank and its cradle. Keep the ceiling plate, column, arm, winch, cable and the shackle hook hanging EMPTY and closed at the bottom of the cable, in the same place, scale and rendering. Nothing below the shackle.
 IMAGE tank.png:
-Image 1 = your kept tank-master.png (edit target). Image 5 = /private/tmp/claude-501/-Users-nathanialhenniges-Developer-mrdemonwolf-wolf-override/eb713cd4-8931-48d7-8c83-5b0b0d1e9cf3/scratchpad/hq/props/refs/design-junction-tank.png.
+Image 1 = your kept tank-master.png (edit target). Image 5 = [session scratch, not kept]/hq/props/refs/design-junction-tank.png.
 USE CASE: precise-object-edit. Remove ONLY the ceiling plate, arm, winch, column, cable and shackle. Keep the tank inside its cradle, including the cradle's top lug, exactly as in the master (same size, same rendering), centred in the canvas.
 ~~~
 
@@ -398,10 +398,10 @@ USE CASE: precise-object-edit. Remove ONLY the ceiling plate, arm, winch, column
 ~~~text
 JOB: Service Junction TANK ARM and COOLANT TANK as two separate sprites, split from an existing Look 2 master. Two images, in order.
 IMAGE tank-arm.png:
-Image 1 (edit target) = /private/tmp/claude-501/-Users-nathanialhenniges-Developer-mrdemonwolf-wolf-override/eb713cd4-8931-48d7-8c83-5b0b0d1e9cf3/scratchpad/hq/props/refs/tank-master.png (the kept master: ceiling plate, column, articulated arm, winch, cable, shackle, cradle and tank). Images 2-4 as usual. Image 5 = /private/tmp/claude-501/-Users-nathanialhenniges-Developer-mrdemonwolf-wolf-override/eb713cd4-8931-48d7-8c83-5b0b0d1e9cf3/scratchpad/hq/props/refs/design-junction-tank-arm.png.
+Image 1 (edit target) = [session scratch, not kept]/hq/props/refs/tank-master.png (the kept master: ceiling plate, column, articulated arm, winch, cable, shackle, cradle and tank). Images 2-4 as usual. Image 5 = [session scratch, not kept]/hq/props/refs/design-junction-tank-arm.png.
 USE CASE: precise-object-edit. Remove ONLY the tank and its cradle (including the cradle's top lug and its small amber light). Keep the ceiling plate, column, arm, winch, cable and the shackle hook hanging EMPTY and closed at the bottom of the cable, exactly where they are, same scale, same rendering. Nothing below the shackle. Transparent background, no haze around the silhouette.
 IMAGE tank.png:
-Image 1 (edit target) = /private/tmp/claude-501/-Users-nathanialhenniges-Developer-mrdemonwolf-wolf-override/eb713cd4-8931-48d7-8c83-5b0b0d1e9cf3/scratchpad/hq/props/refs/tank-master.png. Images 2-4 as usual. Image 5 = /private/tmp/claude-501/-Users-nathanialhenniges-Developer-mrdemonwolf-wolf-override/eb713cd4-8931-48d7-8c83-5b0b0d1e9cf3/scratchpad/hq/props/refs/design-junction-tank.png.
+Image 1 (edit target) = [session scratch, not kept]/hq/props/refs/tank-master.png. Images 2-4 as usual. Image 5 = [session scratch, not kept]/hq/props/refs/design-junction-tank.png.
 USE CASE: precise-object-edit. Remove ONLY the ceiling plate, column, arm, winch, cable and the shackle hook and chain. Keep the tank inside its cradle, including the cradle's top lug, exactly as in the master (same size, same rendering, same hazard bands and small cyan side lights). Transparent background, no haze around the silhouette.
 ~~~
 
@@ -409,7 +409,7 @@ USE CASE: precise-object-edit. Remove ONLY the ceiling plate, column, arm, winch
 
 ~~~text
 JOB: Service Junction ARM PANEL (control cabinet for the tank arm).
-Image 1 = /private/tmp/claude-501/-Users-nathanialhenniges-Developer-mrdemonwolf-wolf-override/eb713cd4-8931-48d7-8c83-5b0b0d1e9cf3/scratchpad/hq/props/refs/design-junction-arm-panel.png (design reference).
+Image 1 = [session scratch, not kept]/hq/props/refs/design-junction-arm-panel.png (design reference).
 IMAGE arm-panel.png:
 SUBJECT: re-render the arm panel in Look 2: an upright cabinet on stepped feet, a pipe running up the left side, a ribbed conduit on the right side, a recessed front bay with a large pull lever whose handle has broad diagonal hazard bands, and a vented lower door. Keep that silhouette and layout. Near the top of the front put ONE horizontal lamp socket (about 25% of the cabinet width, a slot) that is UNLIT dark cool glass with no glow — the game draws that light separately. The one accent is the lever's hazard bands in amber metal (#82510e alternating with dark steel). Everything else cool dark steel.
 ~~~
@@ -418,7 +418,7 @@ SUBJECT: re-render the arm panel in Look 2: an upright cabinet on stepped feet, 
 
 ~~~text
 JOB: Service Junction BOLT PANEL (powers the hatch bolt).
-Image 1 = /private/tmp/claude-501/-Users-nathanialhenniges-Developer-mrdemonwolf-wolf-override/eb713cd4-8931-48d7-8c83-5b0b0d1e9cf3/scratchpad/hq/props/refs/design-junction-bolt-panel.png (design reference).
+Image 1 = [session scratch, not kept]/hq/props/refs/design-junction-bolt-panel.png (design reference).
 IMAGE bolt-panel.png:
 SUBJECT: re-render the bolt panel in Look 2: a squat central cabinet standing on the floor with a heavy bolt-throw mechanism on its face (a big sliding bolt block in a guide), a vented lower door, and bundles of three thick cables leaving BOTH sides and curving outward and down. Keep that silhouette and layout (wide, with the cables). Near the top of the cabinet front put ONE horizontal lamp socket (about 20% of the cabinet width) that is UNLIT dark cool glass with no glow — the game draws that light separately. The one accent: thin amber-metal hazard edges on the bolt block (#82510e). Everything else cool dark steel.
 ~~~
@@ -427,8 +427,8 @@ SUBJECT: re-render the bolt panel in Look 2: a squat central cabinet standing on
 
 ~~~text
 JOB: Service Junction RELIEF VENT — a REDESIGN (the old one was a flat floor slot that does not read at game size).
-Image 1 = /private/tmp/claude-501/-Users-nathanialhenniges-Developer-mrdemonwolf-wolf-override/eb713cd4-8931-48d7-8c83-5b0b0d1e9cf3/scratchpad/hq/props/refs/design-junction-relief-vent.png (the old flat vent: keep its identity cues — the slatted grate, short hazard-striped end caps, small pressure fittings — but not its flat shape).
-Image 5 = /private/tmp/claude-501/-Users-nathanialhenniges-Developer-mrdemonwolf-wolf-override/eb713cd4-8931-48d7-8c83-5b0b0d1e9cf3/scratchpad/hq/props/refs/guide-relief-vent.png (layout and proportion guide only: the engineer for scale and the grey blockout of the new housing; ignore its colours and flat drawing, and ignore the old vent pictured at the top).
+Image 1 = [session scratch, not kept]/hq/props/refs/design-junction-relief-vent.png (the old flat vent: keep its identity cues — the slatted grate, short hazard-striped end caps, small pressure fittings — but not its flat shape).
+Image 5 = [session scratch, not kept]/hq/props/refs/guide-relief-vent.png (layout and proportion guide only: the engineer for scale and the grey blockout of the new housing; ignore its colours and flat drawing, and ignore the old vent pictured at the top).
 IMAGE relief-vent.png:
 SUBJECT: a RAISED relief-vent housing standing on the deck, proportion exactly 3 wide : 2 tall (it will be 72 x 48 world px, about two thirds of the engineer's height): a squat heavy steel box with a thick overhanging top lip, its front face almost entirely a large GRATE of 5-6 broad horizontal louvre slats with dark gaps between them (where steam vents out), two bolted feet/end caps at the bottom corners carrying short hazard-striped bands (#82510e alternating with dark steel), and on the centre of the top lip ONE horizontal lamp socket (about 35% of the width) that is UNLIT dark cool glass with no glow — the game draws that light separately. Simple, chunky, readable at small size. No steam, no glow from the grate. Everything except the hazard bands is cool dark steel.
 ~~~
@@ -437,8 +437,8 @@ SUBJECT: a RAISED relief-vent housing standing on the deck, proportion exactly 3
 
 ~~~text
 JOB: Service Junction RELIEF VENT — REDESIGN, second pass. A first pass produced a good design that is too wide; this pass fixes the proportion.
-Image 1 (edit target) = /private/tmp/claude-501/-Users-nathanialhenniges-Developer-mrdemonwolf-wolf-override/eb713cd4-8931-48d7-8c83-5b0b0d1e9cf3/scratchpad/hq/props/refs/vent-attempt-2.png — keep this design, rendering and colours: overhanging top lip with a central lamp socket, louvred grate face, side pipe elbows, hazard-striped corner feet.
-Image 5 = /private/tmp/claude-501/-Users-nathanialhenniges-Developer-mrdemonwolf-wolf-override/eb713cd4-8931-48d7-8c83-5b0b0d1e9cf3/scratchpad/hq/props/refs/guide-relief-vent.png (proportion guide only: the grey blockout is the target proportion; ignore its colours, the engineer is for scale, ignore the old vent pictured at the top).
+Image 1 (edit target) = [session scratch, not kept]/hq/props/refs/vent-attempt-2.png — keep this design, rendering and colours: overhanging top lip with a central lamp socket, louvred grate face, side pipe elbows, hazard-striped corner feet.
+Image 5 = [session scratch, not kept]/hq/props/refs/guide-relief-vent.png (proportion guide only: the grey blockout is the target proportion; ignore its colours, the engineer is for scale, ignore the old vent pictured at the top).
 IMAGE relief-vent.png:
 USE CASE: precise-object-edit, one change: make the whole object TALLER so its full silhouette (lip to feet) is exactly 3 wide : 2 tall (height = 0.67 x width), like the blockout in Image 5. Do it by making the grate taller (6 broad louvre slats instead of 5) and the feet slightly taller; keep the width of the louvres broad and the gaps dark. Keep the lamp socket UNLIT dark glass, keep the hazard-striped feet (#82510e alternating with dark steel), keep it matte and as dark as the Look 2 breaker. Transparent background with NO haze or glow around the silhouette.
 ~~~
@@ -447,7 +447,7 @@ USE CASE: precise-object-edit, one change: make the whole object TALLER so its f
 
 ~~~text
 JOB: separate STATUS LAMP sprite (the game tints it per state, so it is drawn near-white).
-Image 1 = /private/tmp/claude-501/-Users-nathanialhenniges-Developer-mrdemonwolf-wolf-override/eb713cd4-8931-48d7-8c83-5b0b0d1e9cf3/scratchpad/hq/props/refs/ref-look2-board.png (look at the breaker's amber lamp window: that is the size and role of this lamp). Images 2-4 as usual (Image 2 may repeat the board).
+Image 1 = [session scratch, not kept]/hq/props/refs/ref-look2-board.png (look at the breaker's amber lamp window: that is the size and role of this lamp). Images 2-4 as usual (Image 2 may repeat the board).
 IMAGE status-lamp.png:
 SUBJECT: ONLY the glowing glass lens of a small horizontal indicator lamp: a rounded-rectangle pill exactly 4 times as wide as it is tall, centred in a wide canvas with 10% margin. Lit pale cool white: core #e3f6fe, edges #ade4fb, a slightly brighter soft highlight band along the top third, flat graphic shading. NO bezel, NO dark outline, NO housing, NO glow or bloom outside the pill, fully opaque lens. Nothing else in the image.
 ~~~
@@ -456,7 +456,7 @@ SUBJECT: ONLY the glowing glass lens of a small horizontal indicator lamp: a rou
 
 ~~~text
 JOB: four small PICKUP objects (evidence items). Each is shown in the game only 20-32 world px tall/long, so design them chunky: few large shapes, strong silhouette, no detail smaller than 1/20 of the object. Four images. There is no older design for these; they must look like they belong with the Look 2 stations.
-Image 1 for these = /private/tmp/claude-501/-Users-nathanialhenniges-Developer-mrdemonwolf-wolf-override/eb713cd4-8931-48d7-8c83-5b0b0d1e9cf3/scratchpad/hq/props/refs/ref-look2-board.png (rendering), Image 2 = /private/tmp/claude-501/-Users-nathanialhenniges-Developer-mrdemonwolf-wolf-override/eb713cd4-8931-48d7-8c83-5b0b0d1e9cf3/scratchpad/hq/props/refs/keyart-b.png, Image 3 = /private/tmp/claude-501/-Users-nathanialhenniges-Developer-mrdemonwolf-wolf-override/eb713cd4-8931-48d7-8c83-5b0b0d1e9cf3/scratchpad/hq/props/refs/palette-card.png, Image 4 = /private/tmp/claude-501/-Users-nathanialhenniges-Developer-mrdemonwolf-wolf-override/eb713cd4-8931-48d7-8c83-5b0b0d1e9cf3/scratchpad/hq/props/refs/design-junction-valve.png (only for the WHEEL RATCHET and CRACKED GAUGE: the valve-wheel hub and gauge they relate to; ignore it for the others).
+Image 1 for these = [session scratch, not kept]/hq/props/refs/ref-look2-board.png (rendering), Image 2 = [session scratch, not kept]/hq/props/refs/keyart-b.png, Image 3 = [session scratch, not kept]/hq/props/refs/palette-card.png, Image 4 = [session scratch, not kept]/hq/props/refs/design-junction-valve.png (only for the WHEEL RATCHET and CRACKED GAUGE: the valve-wheel hub and gauge they relate to; ignore it for the others).
 IMAGE pickup-data-cartridge.png:
 SUBJECT: a compact cartridge READER unit (a small dark cool-steel block, wider than tall) with a horizontal slot on its front; a GREY cartridge (cool light-grey, #8a96a6 lit to #4a5666 shadow) sits seated in the slot with its back third sticking out; the cartridge's label area is a plain scraped blank patch (no text). One tiny cyan activity light on the reader (#30d0fc). Side elevation, object fills a 3:2 landscape canvas.
 IMAGE pickup-lockout-tag.png:
@@ -472,7 +472,7 @@ SUBJECT: a long-handled RATCHET wrench lying flat on the deck, side elevation, h
 ~~~text
 JOB: one precise correction to the CRACKED GAUGE pickup (an evidence item). One image.
 IMAGE pickup-cracked-gauge.png:
-Image 1 (edit target) = /private/tmp/claude-501/-Users-nathanialhenniges-Developer-mrdemonwolf-wolf-override/eb713cd4-8931-48d7-8c83-5b0b0d1e9cf3/scratchpad/hq/props/refs/cracked-gauge-attempt-2.png. Images 2-4 as usual.
+Image 1 (edit target) = [session scratch, not kept]/hq/props/refs/cracked-gauge-attempt-2.png. Images 2-4 as usual.
 USE CASE: precise-object-edit, change ONLY the needle. The red zone is the arc on the upper right of the face. The needle must point clearly PAST the clockwise end of the red zone: pinned beyond the red, at about the 4 to 5 o'clock position (pointing down-right), so a player reads "the pressure ran past red". Make the needle a bold dark blue-black shape (#121f2c) with a round hub, easy to read at small size. Keep the starred cracked glass, the bezel, the off-white face, the red zone, the threaded stem, the tilt, the framing and the transparent background exactly as they are. No numbers, no letters.
 ~~~
 
@@ -481,7 +481,7 @@ USE CASE: precise-object-edit, change ONLY the needle. The red zone is the arc o
 ~~~text
 JOB: one more correction to the CRACKED GAUGE pickup. It is shown only 24-30 world px tall in game, so it must read as one bright object with very few broad marks. One image.
 IMAGE pickup-cracked-gauge.png:
-Image 1 (edit target) = /private/tmp/claude-501/-Users-nathanialhenniges-Developer-mrdemonwolf-wolf-override/eb713cd4-8931-48d7-8c83-5b0b0d1e9cf3/scratchpad/hq/props/refs/cracked-gauge-fixed.png. Images 2-4 as usual.
+Image 1 (edit target) = [session scratch, not kept]/hq/props/refs/cracked-gauge-fixed.png. Images 2-4 as usual.
 USE CASE: precise-object-edit, two changes only:
 1. The bezel ring and the threaded stem become BRIGHT polished pale steel catching the overhead light: pale cool silver (#9fb0c0 mid, #c3c5d7 lit, top edge near-white #e3f6fe), with only a slim mid-grey-blue shade (#6f8396) on the lower outer edge. The bezel must not be darker than the face; no dark ring around the silhouette.
 2. Simplify the starred glass to 4-5 BROAD crack shapes (wide pale wedges radiating from one impact point on the left of the face), no thin hairlines, no fine shards.
@@ -492,7 +492,7 @@ Keep: the cool off-white face, the broad red zone arc on the upper right, the bo
 
 ~~~text
 JOB: two small wall-mounted SCREEN HOUSINGS for log pickups. The game draws the text in code, so the screen face stays DARK. Each is about 32 x 24 world px in game: chunky, few large shapes. Two images.
-Image 1 = /private/tmp/claude-501/-Users-nathanialhenniges-Developer-mrdemonwolf-wolf-override/eb713cd4-8931-48d7-8c83-5b0b0d1e9cf3/scratchpad/hq/props/refs/design-corridor-purge-display.png (screen-housing design language only; do not copy the console).
+Image 1 = [session scratch, not kept]/hq/props/refs/design-corridor-purge-display.png (screen-housing design language only; do not copy the console).
 IMAGE pickup-screen-work-order.png:
 SUBJECT: a compact maintenance wall terminal, front elevation, landscape 4:3: a cool dark-steel housing with a thick bezel, a wall-mount bracket at the back edges, a large rectangular SCREEN face that is dark unlit glass (#07101a to #121f2c with one faint cool diagonal reflection band, no text, no UI, no glow), and under the screen a short strip of four cyan keypad keys (#2091ca). The cyan keys are the only accent.
 IMAGE pickup-screen-patrol-log.png:
@@ -505,7 +505,7 @@ SUBJECT: a rugged armoured LANE PANEL screen for the sentry lane, front elevatio
 ~~~text
 JOB: one more correction to the CRACKED GAUGE pickup. It is shown only 24-30 world px tall in game (about 110 px in the final sprite, so the raw is shrunk about 10x): the crack star must be big, DARK and broad enough to survive that. One image.
 IMAGE pickup-cracked-gauge.png:
-Image 1 (edit target) = /private/tmp/claude-501/-Users-nathanialhenniges-Developer-mrdemonwolf-wolf-override/eb713cd4-8931-48d7-8c83-5b0b0d1e9cf3/scratchpad/hq/props/raw/pickfix2/raw/pickup-cracked-gauge.png. Images 2-4 as usual.
+Image 1 (edit target) = [session scratch, not kept]/hq/props/raw/pickfix2/raw/pickup-cracked-gauge.png. Images 2-4 as usual.
 USE CASE: precise-object-edit, three changes only:
 1. CRACKS: replace the pale crack shapes with a star break of 4-5 DARK cool wedges (#4a5666 core, #6f8396 edges) radiating from ONE impact point on the left half of the face. Each wedge is a solid tapered shape at least 1/12 of the face diameter wide near the impact point and long enough to cross most of the face; a small dark chipped pit at the impact point. No thin hairlines, no fine shards, no pale or white crack lines. The broken glass must read clearly even when the whole gauge is a small icon.
 2. BEZEL AND STEM: MATTE cool steel, NOT chrome, NOT polished, no mirror reflections and no specular hot-spots. Exactly three flat value bands: shadow #626c76 on the lower outer part, mid #7b8590, lit #949faa on the upper part, plus a broad cyan-white top rim (#c3c5d7 to #82c3e6) along the top edge of the bezel. The threaded stem uses the same three matte bands.
@@ -518,7 +518,7 @@ Keep exactly: the broad red zone arc on the upper right (signal red #a01e29 / #a
 ~~~text
 JOB: repaint the Service Junction VALVE HANDWHEEL (a separate rotating sprite) so it matches the matte, low-chroma valve body. One image.
 IMAGE valve-wheel.png:
-Image 1 (edit target) = /private/tmp/claude-501/-Users-nathanialhenniges-Developer-mrdemonwolf-wolf-override/eb713cd4-8931-48d7-8c83-5b0b0d1e9cf3/scratchpad/hq/props/raw/valve2/raw/valve-wheel.png. Images 2-4 as usual. Image 5 = /private/tmp/claude-501/-Users-nathanialhenniges-Developer-mrdemonwolf-wolf-override/eb713cd4-8931-48d7-8c83-5b0b0d1e9cf3/scratchpad/hq/props/junction-valve.png (the finished valve body this wheel mounts on: match its steel values and matte rendering exactly).
+Image 1 (edit target) = [session scratch, not kept]/hq/props/raw/valve2/raw/valve-wheel.png. Images 2-4 as usual. Image 5 = [session scratch, not kept]/hq/props/junction-valve.png (the finished valve body this wheel mounts on: match its steel values and matte rendering exactly).
 USE CASE: precise-object-edit, a repaint only. The wheel ROTATES in game around the canvas centre, so keep the silhouette, the round rim, the five spokes, the hub size, the exact face-on circle, the centring and the framing IDENTICAL to Image 1. Change only the paint:
 1. RIM AND SPOKES: flat matte amber paint in exactly THREE flat value bands, no lengthwise streaks, no gradients along the rim or spokes, no gloss, no wood grain, no brushed texture: mid #82510e on most of every face; shadow #6e4824 on the lower, down-facing side of the rim and of each spoke; a lit band #a5682a on the upper, top-facing edge of the rim and the upper edges of the spokes. Plus a broad cyan-white rim light (#82c3e6 to #c3c5d7) along the top outer edge of the rim only.
 2. HUB: replace the saturated navy-blue hub with the SAME low-chroma cool steel as the valve body in Image 5: a flange ring and a raised round cap, each in three flat bands (shadow #1a2430, mid #2b3644, lit #455569 on the top), with a thin cyan-white top rim. The hub must be grey-blue steel of LOW saturation, never a saturated or navy blue.
@@ -530,7 +530,7 @@ Nothing else in the image; fully transparent background between the spokes and a
 ~~~text
 JOB: one correction to the Service Junction VALVE GAUGE FACE (a separate sprite drawn over the valve's gauge). One image.
 IMAGE valve-gauge.png:
-Image 1 (edit target) = /private/tmp/claude-501/-Users-nathanialhenniges-Developer-mrdemonwolf-wolf-override/eb713cd4-8931-48d7-8c83-5b0b0d1e9cf3/scratchpad/hq/props/raw/valve2/raw/valve-gauge.png. Images 2-4 as usual. Image 5 = /private/tmp/claude-501/-Users-nathanialhenniges-Developer-mrdemonwolf-wolf-override/eb713cd4-8931-48d7-8c83-5b0b0d1e9cf3/scratchpad/hq/props/junction-valve.png (the valve body it sits on, for context).
+Image 1 (edit target) = [session scratch, not kept]/hq/props/raw/valve2/raw/valve-gauge.png. Images 2-4 as usual. Image 5 = [session scratch, not kept]/hq/props/junction-valve.png (the valve body it sits on, for context).
 USE CASE: precise-object-edit, change ONLY the red zone. The game shows this face only about 13 world px across, so the current thin red sliver at the very edge of the face disappears. Replace it with a BROAD red zone band (signal red #a01e29, lit edge #ad252d) on the UPPER RIGHT of the face: an arc band whose radial thickness is about ONE QUARTER of the face radius, lying fully INSIDE the off-white face (its outer edge a little inside the face's outer edge, not touching the steel bezel), sweeping about 80 degrees, from roughly the 12:30 position clockwise to roughly the 3 o'clock position. The tick bars that fall inside the band can stay as short dark bars on top of it or be removed. Keep everything else exactly as it is: the cool off-white face (#c3c5d7), the other broad tick bars, the dark centre pivot cap, the steel bezel ring, the exact face-on circle, the centring, the framing and the transparent background. NO needle, no numbers, no letters.
 ~~~
 
@@ -539,7 +539,7 @@ USE CASE: precise-object-edit, change ONLY the red zone. The game shows this fac
 ~~~text
 JOB: one more value correction to the CRACKED GAUGE pickup (an evidence item lying on the deck). It shows only 24-30 world px tall in game, in a DARK room; it is currently the brightest object in the scene and must sit inside the room's values. One image.
 IMAGE pickup-cracked-gauge.png:
-Image 1 (edit target) = /private/tmp/claude-501/-Users-nathanialhenniges-Developer-mrdemonwolf-wolf-override/eb713cd4-8931-48d7-8c83-5b0b0d1e9cf3/scratchpad/hq/props/raw/pickfix3/raw/pickup-cracked-gauge.png. Images 2-4 as usual. Image 5 = /private/tmp/claude-501/-Users-nathanialhenniges-Developer-mrdemonwolf-wolf-override/eb713cd4-8931-48d7-8c83-5b0b0d1e9cf3/scratchpad/hq/props/junction-valve.png (a finished Look 2 prop from the same room: match its matte steel values).
+Image 1 (edit target) = [session scratch, not kept]/hq/props/raw/pickfix3/raw/pickup-cracked-gauge.png. Images 2-4 as usual. Image 5 = [session scratch, not kept]/hq/props/junction-valve.png (a finished Look 2 prop from the same room: match its matte steel values).
 USE CASE: precise-object-edit, darken and matte the values only; keep the design:
 1. FACE: a dim cool grey, clearly darker than now: #8a94a1 over most of the face, a slightly lighter #97a1ae in the upper part where the top light falls, and a shaded band #64707e just inside the bezel. No white or near-white anywhere on the face.
 2. CRACKS: keep the 4-5 broad star-break wedges radiating from the one impact point on the left half and the small chipped pit, but make them DARKER so they still stand out on the darker face: #2c3846 core, #435265 edges. Each wedge stays a solid tapered shape, at least 1/10 of the face diameter wide near the impact point. No hairlines, no fine shards, no pale crack lines.
@@ -552,7 +552,7 @@ Keep exactly: the broad red zone arc on the upper right (#a01e29 / #ad252d), the
 ~~~text
 JOB: one last correction to the CRACKED GAUGE pickup: broader crack wedges. One image. IMPORTANT: other Codex jobs may write to generated_images at the same time, so copy ONLY the image your own image_gen call returned (the file inside your own session's folder under generated_images), never just the newest file.
 IMAGE pickup-cracked-gauge.png:
-Image 1 (edit target) = /private/tmp/claude-501/-Users-nathanialhenniges-Developer-mrdemonwolf-wolf-override/eb713cd4-8931-48d7-8c83-5b0b0d1e9cf3/scratchpad/hq/props/raw/pickfix4/raw/pickup-cracked-gauge.png. Images 2-4 as usual. Image 5 = /private/tmp/claude-501/-Users-nathanialhenniges-Developer-mrdemonwolf-wolf-override/eb713cd4-8931-48d7-8c83-5b0b0d1e9cf3/scratchpad/hq/props/junction-valve.png (a finished Look 2 prop from the same room, for matte steel values).
+Image 1 (edit target) = [session scratch, not kept]/hq/props/raw/pickfix4/raw/pickup-cracked-gauge.png. Images 2-4 as usual. Image 5 = [session scratch, not kept]/hq/props/junction-valve.png (a finished Look 2 prop from the same room, for matte steel values).
 USE CASE: precise-object-edit, change ONLY the crack star. The gauge shows only about 28 world px tall in game, so the cracks must be fewer and much BROADER: exactly 5 dark solid tapered wedges radiating from the one impact point on the left half of the face, in the same dark cool values as now (#2c3846 core, #435265 edges). Each wedge must be at least ONE SEVENTH of the face diameter wide at its broad end and reach most of the way to the bezel; leave clear grey face between neighbouring wedges so each wedge reads as a separate shape. Keep the small dark chipped pit at the impact point. No hairlines, no fine shards, no thin cracks, no pale lines.
 Keep EXACTLY as in Image 1: the dim cool-grey face values, the matte three-band steel bezel and threaded stem with the cyan-white top rim, the broad red zone arc on the upper right, the bold dark needle pointing past the red zone toward 4-5 o'clock with its round hub, the silhouette, the diagonal tilt, the framing and the transparent background. No numbers or letters, no glow outside the silhouette, no dark outline.
 ~~~

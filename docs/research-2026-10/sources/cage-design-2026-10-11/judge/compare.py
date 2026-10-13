@@ -1,6 +1,6 @@
 import sys, os
 from PIL import Image, ImageDraw, ImageFont
-S = '/private/tmp/claude-501/-Users-nathanialhenniges-Developer-mrdemonwolf-wolf-override/eb713cd4-8931-48d7-8c83-5b0b0d1e9cf3/scratchpad/cage-design'
+S = '[session scratch, not kept]/cage-design'
 rows = {
  'main': (S+'/audit/shots', ['02-beat1-standby-noui','04-beat2-wake-settled-noui','06-beat3-latch-f006','10-beat3-latch-f030','18-beat3-settled-noui','23-beat6-only-open-route-noui']),
  'A':    (S+'/option-a/shots/final', ['02-beat1-standby-noui','04-beat2-wake-settled-noui','09-beat3-f006','13-beat3-f030','24-beat3-f150-noui','27-beat6-only-open-route-noui']),
