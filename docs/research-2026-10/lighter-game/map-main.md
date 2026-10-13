@@ -1,6 +1,6 @@
 # main.gd map (WOLF//OVERRIDE, main at 76d3a50)
 
-File: /Users/nathanialhenniges/Developer/mrdemonwolf/wolf-override/apps/game/scripts/main.gd
+File: apps/game/scripts/main.gd
 Read-only analysis. Nothing in the repo was changed.
 
 ## 1. Shape

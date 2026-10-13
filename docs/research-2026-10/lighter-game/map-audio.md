@@ -98,12 +98,12 @@ Factor the repeats in section 5 (shared `_render(seconds, rate, fn)` frame loop,
 
 ## 8. Files
 
-- `/Users/nathanialhenniges/Developer/mrdemonwolf/wolf-override/apps/game/scripts/sfx_bank.gd` (bank, recipes, DSP)
-- `/Users/nathanialhenniges/Developer/mrdemonwolf/wolf-override/apps/game/scripts/main.gd` (all 47 call sites; `_setup_impact` 653-656 builds the bank; `_lane_sound` 2360-2378; bypass vent 921-927, 1716-1722)
-- `/Users/nathanialhenniges/Developer/mrdemonwolf/wolf-override/apps/game/tests/sfx_bank_test.gd` (timing budget 400 ms, lengths, -6 dB peaks, determinism, recorded format asserts)
-- `/Users/nathanialhenniges/Developer/mrdemonwolf/wolf-override/apps/game/assets/audio/*.wav(.import)` (7 recorded, `compress/mode=0`)
-- `/Users/nathanialhenniges/Developer/mrdemonwolf/wolf-override/apps/game/assets/manifest.json` (procedural entry ~line 560 says the generated clips "ship as no file"; recorded entries 569-629)
-- `/Users/nathanialhenniges/Developer/mrdemonwolf/wolf-override/scripts/check-game.sh` (where a render-and-compare sync step would go; it already fails if checks modify apps/game)
-- Measurement scripts and logs: `/private/tmp/claude-501/-Users-nathanialhenniges-Developer-mrdemonwolf-wolf-override/eb713cd4-8931-48d7-8c83-5b0b0d1e9cf3/scratchpad/lighter/audio/` (exported generated WAVs in `wav-out/`)
+- `apps/game/scripts/sfx_bank.gd` (bank, recipes, DSP)
+- `apps/game/scripts/main.gd` (all 47 call sites; `_setup_impact` 653-656 builds the bank; `_lane_sound` 2360-2378; bypass vent 921-927, 1716-1722)
+- `apps/game/tests/sfx_bank_test.gd` (timing budget 400 ms, lengths, -6 dB peaks, determinism, recorded format asserts)
+- `apps/game/assets/audio/*.wav(.import)` (7 recorded, `compress/mode=0`)
+- `apps/game/assets/manifest.json` (procedural entry ~line 560 says the generated clips "ship as no file"; recorded entries 569-629)
+- `scripts/check-game.sh` (where a render-and-compare sync step would go; it already fails if checks modify apps/game)
+- Measurement scripts and logs: `[session scratch, not kept]` (exported generated WAVs in `wav-out/`)
 
 The r3 worktree does not touch sfx_bank.gd or assets/audio.
