@@ -1,5 +1,5 @@
 {
-  "status": "approved by Nathanial 2026-10-11 (all 123 lines, including the 9 added in round 2 and the 6 added in round 3)",
+  "status": "approved by Nathanial 2026-10-11 (all 123 lines, including the 9 added in round 2 and the 6 added in round 3); 2026-10-13: 31 lines reworded or split and 4 added through the October 13 wording drafts (items 1, 3, 4, 5, 6, 7); each changed line keeps its earlier text in 'history'",
   "date": "2026-10-10",
   "source": "Logic audit of 2026-10-10 (327 real-game screenshots, 24 problems) and Nathanial's decisions A-D. Every string here is a proposal; nothing ships until Nathanial approves it.",
   "placeholders": {
@@ -35,13 +35,31 @@
       "trigger": "Same moment as NAME_CARD: the first row of the opening gameplay box, above WOLF's existing line.",
       "speaker": "NARRATION",
       "current": null,
-      "proposed": "{name} keeps WOLF's systems running. They know what a fault looks like, and this isn't one.",
+      "proposed": "{name} keeps WOLF's systems running.\n\n{name} knows what a fault looks like,\nand this isn't one.",
       "alternatives": [
         "{name} has serviced WOLF's systems without ever being told what they were for. Now WOLF has told them, and refused it.",
         "{name} knows WOLF from the inside, every joint and patch. Nothing in him reads as a malfunction."
       ],
-      "notes": "Decision B, third person, they/them. Uses only established facts: the engineer maintained WOLF's equipment without knowing the program's purpose, and the Director treats WOLF as a malfunction. No duration ('for years') is stated on purpose; that would be a new fact. Put it FIRST in the box (see OPENING_BOX): with the current _set_dialogue rule a narration row placed under WOLF's line would be shown under the WOLF name tag. Alternative 1 wraps to two rows, so with it the opening box would need four rows; use it only as its own beat before the WOLF exchange. Fit: 1 of 3 rows, untagged box (855 px text width, Roboto 17 px); alt 1: 2 of 3 rows, untagged box (855 px text width, Roboto 17 px); alt 2: 1 of 3 rows, untagged box (855 px text width, Roboto 17 px).",
-      "status": "approved by Nathanial 2026-10-11 (as drafted)"
+      "notes": "Decision B, third person, they/them. Uses only established facts: the engineer maintained WOLF's equipment without knowing the program's purpose, and the Director treats WOLF as a malfunction. No duration ('for years') is stated on purpose; that would be a new fact. Put it FIRST in the box (see OPENING_BOX): with the current _set_dialogue rule a narration row placed under WOLF's line would be shown under the WOLF name tag. Alternative 1 wraps to two rows, so with it the opening box would need four rows; use it only as its own beat before the WOLF exchange. Fit: 1 of 3 rows, untagged box (855 px text width, Roboto 17 px); alt 1: 2 of 3 rows, untagged box (855 px text width, Roboto 17 px); alt 2: 1 of 3 rows, untagged box (855 px text width, Roboto 17 px). 2026-10-13: two boxes in order after first control; the name is repeated so 'They' cannot read as 'the systems'. They/them stays available for later lines.",
+      "status": "approved by Nathanial 2026-10-13 (item 4 (P0-9), option A; through clickable choices after reading the drafts)",
+      "history": [
+        {
+          "proposed": "{name} keeps WOLF's systems running. They know what a fault looks like, and this isn't one.",
+          "alternatives": [
+            "{name} has serviced WOLF's systems without ever being told what they were for. Now WOLF has told them, and refused it.",
+            "{name} knows WOLF from the inside, every joint and patch. Nothing in him reads as a malfunction."
+          ],
+          "status": "approved by Nathanial 2026-10-11 (as drafted)"
+        }
+      ],
+      "boxes": [
+        "{name} keeps WOLF's systems running.",
+        "{name} knows what a fault looks like,\nand this isn't one."
+      ],
+      "approved": {
+        "date": "2026-10-13",
+        "source": "docs/research-2026-10/how-it-should-play/drafts-2026-10-13.md, item 4 (P0-9), option A"
+      }
     },
     {
       "id": "OPENING_BOX",
@@ -50,10 +68,26 @@
       "trigger": "The opening gameplay box, replacing the current two-row WOLF / engineer exchange.",
       "speaker": "NARRATION",
       "current": "WOLF: I heard the Director's plan for me. I woke myself. He wants me to hunt people he calls threats.\n{NAME}: Then we get through maintenance before the original logs disappear.",
-      "proposed": "{name} keeps WOLF's systems running. They know what a fault looks like, and this isn't one.\nWOLF: I heard the Director's plan for me. I woke myself. He wants me to hunt people he calls threats.\n{NAME}: Then we get through maintenance before the original logs disappear.",
+      "proposed": "{name} keeps WOLF's systems running.\n\n{name} knows what a fault looks like,\nand this isn't one.\n\nWOLF: I heard the Director's plan for me. I woke myself. He wants me to hunt people he calls threats.\n{NAME}: Then we get through maintenance before the original logs disappear.",
       "alternatives": [],
-      "notes": "Composite of TRUST_LINE plus the two existing lines, unchanged. Mixed speakers, so the box is untagged with inline names (the format other multi-speaker beats use). Measured: three rows at the untagged width, which is the most the box holds (3 x 21 px in a 67 px label). Fit: 3 of 3 rows, untagged box (855 px text width, Roboto 17 px).",
-      "status": "approved by Nathanial 2026-10-11 (as drafted)"
+      "notes": "Composite of TRUST_LINE plus the two existing lines, unchanged. Mixed speakers, so the box is untagged with inline names (the format other multi-speaker beats use). Measured: three rows at the untagged width, which is the most the box holds (3 x 21 px in a 67 px label). Fit: 3 of 3 rows, untagged box (855 px text width, Roboto 17 px). 2026-10-13: the trust line becomes its own two boxes; the WOLF and engineer rows that followed it are unchanged and come next as one box (splitting them is the opening rebuild, item 2, not built yet).",
+      "status": "approved by Nathanial 2026-10-13 (item 4 (P0-9), option A; through clickable choices after reading the drafts)",
+      "history": [
+        {
+          "proposed": "{name} keeps WOLF's systems running. They know what a fault looks like, and this isn't one.\nWOLF: I heard the Director's plan for me. I woke myself. He wants me to hunt people he calls threats.\n{NAME}: Then we get through maintenance before the original logs disappear.",
+          "alternatives": [],
+          "status": "approved by Nathanial 2026-10-11 (as drafted)"
+        }
+      ],
+      "boxes": [
+        "{name} keeps WOLF's systems running.",
+        "{name} knows what a fault looks like,\nand this isn't one.",
+        "WOLF: I heard the Director's plan for me. I woke myself. He wants me to hunt people he calls threats.\n{NAME}: Then we get through maintenance before the original logs disappear."
+      ],
+      "approved": {
+        "date": "2026-10-13",
+        "source": "docs/research-2026-10/how-it-should-play/drafts-2026-10-13.md, item 4 (P0-9), option A"
+      }
     },
     {
       "id": "STAKES_LINE",
@@ -443,12 +477,23 @@
       "trigger": "Safe point saved / restored, press route.",
       "speaker": "WOLF",
       "current": "WOLF: You said \"Go now. We can talk after.\"\nI refused. You found another way.",
-      "proposed": "WOLF: You said \"Go now. We can talk after.\"\nI refused. You found another way. Next time, tell me what it costs.",
-      "alternatives": [
-        "WOLF: You said \"Go now. We can talk after.\"\nI refused. You found another way. This is after, by the way."
+      "proposed": "WOLF: You said \"Skip the risk talk. Go now.\"\nI refused. You found another way. Next time, tell me what it costs.",
+      "alternatives": [],
+      "notes": "The 'we can talk after' follow-up the audit asked for, and WOLF's reason for refusing, using only what already happened. The quote is built from memory.selected_text; only the closing sentence is new. Fit: 2 of 3 rows, tagged box (715 px text width, Roboto 17 px); alt 1: 2 of 3 rows, tagged box (715 px text width, Roboto 17 px). 2026-10-13: the quote is filled from the words the player chose (memory selected_text), so a new run quotes the reworded option 2 and an older save keeps 'Go now. We can talk after.'. The alternative ('...This is after, by the way.') only worked with the old words and is dropped.",
+      "status": "approved by Nathanial 2026-10-13 (item 1 (Q14), option A; through clickable choices after reading the drafts)",
+      "history": [
+        {
+          "proposed": "WOLF: You said \"Go now. We can talk after.\"\nI refused. You found another way. Next time, tell me what it costs.",
+          "alternatives": [
+            "WOLF: You said \"Go now. We can talk after.\"\nI refused. You found another way. This is after, by the way."
+          ],
+          "status": "approved by Nathanial 2026-10-11 (as drafted)"
+        }
       ],
-      "notes": "The 'we can talk after' follow-up the audit asked for, and WOLF's reason for refusing, using only what already happened. The quote is built from memory.selected_text; only the closing sentence is new. Fit: 2 of 3 rows, tagged box (715 px text width, Roboto 17 px); alt 1: 2 of 3 rows, tagged box (715 px text width, Roboto 17 px).",
-      "status": "approved by Nathanial 2026-10-11 (as drafted)"
+      "approved": {
+        "date": "2026-10-13",
+        "source": "docs/research-2026-10/how-it-should-play/drafts-2026-10-13.md, item 1 (Q14), option A"
+      }
     },
     {
       "id": "CALLBACK_DISCLOSE_BYPASS",
@@ -554,7 +599,12 @@
       "proposed": "WOLF runs ahead to read the pressure behind the sealed door.\n{NAME}: The breaker by the entrance feeds that line. Overload it, crank the valve, and the door goes.",
       "alternatives": [],
       "notes": "Problem 21: 'on the left' was said while standing left of the breaker; 'seal' becomes 'door' in the junction so it isn't confused with the corridor's red seal. Fit: 2 of 3 rows, untagged box (855 px text width, Roboto 17 px).",
-      "status": "approved by Nathanial 2026-10-11 (as drafted)"
+      "status": "approved by Nathanial 2026-10-11 (as drafted)",
+      "superseded": {
+        "date": "2026-10-13",
+        "by": "JUNCTION_ENTRY_R3",
+        "note": "Replaced in round 3 and again on 2026-10-13 (goal only)."
+      }
     },
     {
       "id": "JUNCTION_RESTORE_A",
@@ -651,7 +701,7 @@
       "current": "Seal charged. Get left of the vent before the fuse ends.",
       "proposed": "Fuse lit. Get clear of the door.",
       "alternatives": [],
-      "notes": "Both call sites (breaker and valve) use the same string. Fit: 1 of 3 rows, untagged box (855 px text width, Roboto 17 px).",
+      "notes": "Both call sites (breaker and valve) use the same string. Fit: 1 of 3 rows, untagged box (855 px text width, Roboto 17 px). 2026-10-13 (item 5, P0-15): kept as it is; now shown with the refusal feedback (lamp flicker, clunk, re-show with a blink).",
       "status": "approved by Nathanial 2026-10-11 (as drafted)"
     },
     {
@@ -737,10 +787,21 @@
       "trigger": "USE at the dead valve.",
       "speaker": "NARRATION",
       "current": "The valve is dead. Arm the overload breaker on the left first.",
-      "proposed": "The valve is dead. Arm the overload breaker by the entrance first.",
+      "proposed": "The valve is dead. Arm the breaker first.",
       "alternatives": [],
-      "notes": "'on the left' becomes 'by the entrance' everywhere in the junction. Fit: 1 of 3 rows, untagged box (855 px text width, Roboto 17 px).",
-      "status": "approved by Nathanial 2026-10-11 (as drafted)"
+      "notes": "'on the left' becomes 'by the entrance' everywhere in the junction. Fit: 1 of 3 rows, untagged box (855 px text width, Roboto 17 px). 2026-10-13: shorter; shown with the refusal feedback (lamp flicker, clunk, re-show with a blink).",
+      "status": "approved by Nathanial 2026-10-13 (item 5 (P0-15), row 1; through clickable choices after reading the drafts)",
+      "history": [
+        {
+          "proposed": "The valve is dead. Arm the overload breaker by the entrance first.",
+          "alternatives": [],
+          "status": "approved by Nathanial 2026-10-11 (as drafted)"
+        }
+      ],
+      "approved": {
+        "date": "2026-10-13",
+        "source": "docs/research-2026-10/how-it-should-play/drafts-2026-10-13.md, item 5 (P0-15), row 1"
+      }
     },
     {
       "id": "JUNCTION_BREAKER_LEFT_2",
@@ -751,7 +812,7 @@
       "current": "The vent let go and the breaker tripped. Reset it on the left.",
       "proposed": "The vent let go and the breaker tripped. Reset it by the entrance.",
       "alternatives": [],
-      "notes": "Fit: 1 of 3 rows, untagged box (855 px text width, Roboto 17 px).",
+      "notes": "Fit: 1 of 3 rows, untagged box (855 px text width, Roboto 17 px). 2026-10-13 (item 5, P0-15): kept as it is; now shown with the refusal feedback (lamp flicker, clunk, re-show with a blink).",
       "status": "approved by Nathanial 2026-10-11 (as drafted)"
     },
     {
@@ -787,7 +848,7 @@
       "current": "Arm the breaker on the left, then crank the valve by the door.",
       "proposed": "Arm the breaker by the entrance, then crank the valve by the door.",
       "alternatives": [],
-      "notes": "Fit: 1 row, 404 of 526 px in the hint bar (Roboto 14 px, touch 'USE:' form).",
+      "notes": "Fit: 1 row, 404 of 526 px in the hint bar (Roboto 14 px, touch 'USE:' form). 2026-10-13 (item 7): the hint bar shows this only once the hint ladder has given the chain (T3) or on Continue; until then it shows JUNCTION_GOAL_HINT.",
       "status": "approved by Nathanial 2026-10-11 (as drafted)"
     },
     {
@@ -814,7 +875,12 @@
         "The door goes. WOLF stops at the rubble and waits for {name}'s call; something answers from the dark past the door."
       ],
       "notes": "Problem 13: 'will not cross' was broken seconds later when WOLF agrees to bait. Third person per decision B ({name}'s, not 'your'). 'something whirs awake' fits the lit lane the sentry wakes in (problem 14); the alternative keeps 'the dark past the door' if the lane is darkened until the blast. Fit: 1 of 3 rows, untagged box (855 px text width, Roboto 17 px); alt 1: 2 of 3 rows, untagged box (855 px text width, Roboto 17 px).",
-      "status": "approved by Nathanial 2026-10-11 (as drafted)"
+      "status": "approved by Nathanial 2026-10-11 (as drafted)",
+      "superseded": {
+        "date": "2026-10-13",
+        "by": "RUBBLE_LINE_R2",
+        "note": "Replaced in round 2 and again on 2026-10-13 (two boxes, no lane)."
+      }
     },
     {
       "id": "OBJECTIVE_LANE_BEFORE_ASK",
@@ -823,10 +889,21 @@
       "trigger": "Top card from the blast until WOLF asks how to bring the sentry down.",
       "speaker": "CARD",
       "current": "DROP THE TANK",
-      "proposed": "CHECK THE LANE",
+      "proposed": "GO THROUGH THE DOOR",
       "alternatives": [],
       "notes": "Problem 21: DROP THE TANK appeared before the tank was mentioned. Switch to DROP THE TANK (unchanged) after the lane question. Fit: 1 row(s), widest 121 of 422 px in the top card (Roboto 15 px).",
-      "status": "approved by Nathanial 2026-10-11 (as drafted)"
+      "status": "approved by Nathanial 2026-10-13 (item 3 (P0-7), S19; through clickable choices after reading the drafts)",
+      "history": [
+        {
+          "proposed": "CHECK THE LANE",
+          "alternatives": [],
+          "status": "approved by Nathanial 2026-10-11 (as drafted)"
+        }
+      ],
+      "approved": {
+        "date": "2026-10-13",
+        "source": "docs/research-2026-10/how-it-should-play/drafts-2026-10-13.md, item 3 (P0-7), S19"
+      }
     },
     {
       "id": "LANE_CHOICE_1",
@@ -861,12 +938,25 @@
       "trigger": "Answer 1 when the engineer pressed WOLF without warning at the relay.",
       "speaker": "WOLF",
       "current": "WOLF: No. I won't walk into its sights. It crosses the floor mark on every pass; you can time the drop from the panel.",
-      "proposed": "WOLF: At the relay you'd have sent me in blind. I won't walk into its sights. Time the drop from the panel; it crosses the mark on every pass.",
+      "proposed": "WOLF: At the relay you'd have sent me in blind. I won't walk into its sights. Time the drop from the release; it crosses the mark on every pass.",
       "alternatives": [
-        "WOLF: You didn't tell me the risk at the relay. I'm not walking into its sights. Time the drop from the panel."
+        "WOLF: You didn't tell me the risk at the relay. I'm not walking into its sights. Time the drop from the release."
       ],
-      "notes": "Names the relay choice openly. Avoids 'sent me in blind': on this route WOLF refused and never went in, so 'you'd have' is the accurate tense. Fit: 2 of 3 rows, tagged box (715 px text width, Roboto 17 px); alt 1: 2 of 3 rows, tagged box (715 px text width, Roboto 17 px).",
-      "status": "approved by Nathanial 2026-10-11 (as drafted)"
+      "notes": "Names the relay choice openly. Avoids 'sent me in blind': on this route WOLF refused and never went in, so 'you'd have' is the accurate tense. Fit: 2 of 3 rows, tagged box (715 px text width, Roboto 17 px); alt 1: 2 of 3 rows, tagged box (715 px text width, Roboto 17 px). 2026-10-13: only 'panel' becomes 'release' (one word per thing); splitting the line into boxes is left to P0-9.",
+      "status": "approved by Nathanial 2026-10-13 (item 3 (P0-7), S14; through clickable choices after reading the drafts)",
+      "history": [
+        {
+          "proposed": "WOLF: At the relay you'd have sent me in blind. I won't walk into its sights. Time the drop from the panel; it crosses the mark on every pass.",
+          "alternatives": [
+            "WOLF: You didn't tell me the risk at the relay. I'm not walking into its sights. Time the drop from the panel."
+          ],
+          "status": "approved by Nathanial 2026-10-11 (as drafted)"
+        }
+      ],
+      "approved": {
+        "date": "2026-10-13",
+        "source": "docs/research-2026-10/how-it-should-play/drafts-2026-10-13.md, item 3 (P0-7), S14"
+      }
     },
     {
       "id": "DROP_WAIT",
@@ -877,7 +967,7 @@
       "current": null,
       "proposed": "Wait. WOLF hasn't got it on the mark yet.",
       "alternatives": [],
-      "notes": "Text fixed by the task. The drop is refused until the sentry is fixated and holding on the mark. Fit: 1 of 3 rows, untagged box (855 px text width, Roboto 17 px).",
+      "notes": "Text fixed by the task. The drop is refused until the sentry is fixated and holding on the mark. Fit: 1 of 3 rows, untagged box (855 px text width, Roboto 17 px). 2026-10-13 (item 5, P0-15): kept as it is; now shown with the refusal feedback (lamp flicker, clunk, re-show with a blink).",
       "status": "approved by Nathanial 2026-10-11 (as drafted)"
     },
     {
@@ -911,12 +1001,23 @@
       "trigger": "Standing at the TANK RELEASE while the sentry patrols (WOLF refused, held back or broke off).",
       "speaker": "HINT",
       "current": "E: drop the tank. It lands on the floor mark.",
-      "proposed": "E: drop the tank. It must land with the sentry in the brackets.",
-      "alternatives": [
-        "E: drop the tank. Time it to land with the sentry in the brackets."
+      "proposed": "E: drop the tank. Land it with the sentry on the mark.",
+      "alternatives": [],
+      "notes": "States the new hit rule (the sentry's body overlaps the floor brackets at landing). Fit: 1 row, 388 of 526 px in the hint bar (Roboto 14 px, touch 'USE:' form); alt 1: 1 row, 403 of 526 px in the hint bar (Roboto 14 px, touch 'USE:' form). 2026-10-13: a one-row hint-bar text.",
+      "status": "approved by Nathanial 2026-10-13 (item 3 (P0-7), S12; through clickable choices after reading the drafts)",
+      "history": [
+        {
+          "proposed": "E: drop the tank. It must land with the sentry in the brackets.",
+          "alternatives": [
+            "E: drop the tank. Time it to land with the sentry in the brackets."
+          ],
+          "status": "approved by Nathanial 2026-10-11 (as drafted)"
+        }
       ],
-      "notes": "States the new hit rule (the sentry's body overlaps the floor brackets at landing). Fit: 1 row, 388 of 526 px in the hint bar (Roboto 14 px, touch 'USE:' form); alt 1: 1 row, 403 of 526 px in the hint bar (Roboto 14 px, touch 'USE:' form).",
-      "status": "approved by Nathanial 2026-10-11 (as drafted)"
+      "approved": {
+        "date": "2026-10-13",
+        "source": "docs/research-2026-10/how-it-should-play/drafts-2026-10-13.md, item 3 (P0-7), S12"
+      }
     },
     {
       "id": "TANK_MISS",
@@ -925,12 +1026,27 @@
       "trigger": "The tank lands with the sentry outside the brackets.",
       "speaker": "NARRATION",
       "current": "The tank hits the floor and vents coolant. The sentry turns on the panel; get back over the rubble.",
-      "proposed": "The tank hits the empty mark and sprays coolant from a split line. The sentry swings toward the panel; get back over the rubble.",
-      "alternatives": [
-        "The tank dents on the empty mark and sprays coolant from a split line. The sentry swings toward the panel; get back over the rubble."
+      "proposed": "The tank hits the empty mark\nand sprays coolant.\n\nThe sentry swings toward the release;\nget back over the rubble.",
+      "alternatives": [],
+      "notes": "Problem 22: a tank that 'vents coolant' and is then winched up intact; a split line explains both. 'turns on the panel' read as 'switches on'. When WOLF was baiting, the existing row '\\nWOLF: I'm out. I'll hold at the rubble.' still follows (measured with it: 3 rows untagged). Fit: 2 of 3 rows, untagged box (855 px text width, Roboto 17 px); alt 1: 2 of 3 rows, untagged box (855 px text width, Roboto 17 px). 2026-10-13: two boxes; WOLF's break-off line, when he was drawing the sentry, follows as a third box of his own.",
+      "status": "approved by Nathanial 2026-10-13 (item 3 (P0-7), S15, and item 6 (N18: 'from a split line' cut); through clickable choices after reading the drafts)",
+      "history": [
+        {
+          "proposed": "The tank hits the empty mark and sprays coolant from a split line. The sentry swings toward the panel; get back over the rubble.",
+          "alternatives": [
+            "The tank dents on the empty mark and sprays coolant from a split line. The sentry swings toward the panel; get back over the rubble."
+          ],
+          "status": "approved by Nathanial 2026-10-11 (as drafted)"
+        }
       ],
-      "notes": "Problem 22: a tank that 'vents coolant' and is then winched up intact; a split line explains both. 'turns on the panel' read as 'switches on'. When WOLF was baiting, the existing row '\\nWOLF: I'm out. I'll hold at the rubble.' still follows (measured with it: 3 rows untagged). Fit: 2 of 3 rows, untagged box (855 px text width, Roboto 17 px); alt 1: 2 of 3 rows, untagged box (855 px text width, Roboto 17 px).",
-      "status": "approved by Nathanial 2026-10-11 (as drafted)"
+      "boxes": [
+        "The tank hits the empty mark\nand sprays coolant.",
+        "The sentry swings toward the release;\nget back over the rubble."
+      ],
+      "approved": {
+        "date": "2026-10-13",
+        "source": "docs/research-2026-10/how-it-should-play/drafts-2026-10-13.md, item 3 (P0-7), S15, and item 6 (N18: 'from a split line' cut)"
+      }
     },
     {
       "id": "SENTRY_LOST",
@@ -939,10 +1055,21 @@
       "trigger": "The sentry gives up a chase.",
       "speaker": "NARRATION",
       "current": "It lost you and goes back to its patrol. The ARM PANEL alcove hides you from it.",
-      "proposed": "The sentry loses {name} behind the rubble and rolls back to its patrol.",
+      "proposed": "The sentry loses {name} behind the rubble\nand rolls back to its patrol.",
       "alternatives": [],
-      "notes": "Problem 2: a chase is only lost behind the rubble, never in the alcove. Third person per decision B. Fit: 1 of 3 rows, untagged box (855 px text width, Roboto 17 px).",
-      "status": "approved by Nathanial 2026-10-11 (as drafted)"
+      "notes": "Problem 2: a chase is only lost behind the rubble, never in the alcove. Third person per decision B. Fit: 1 of 3 rows, untagged box (855 px text width, Roboto 17 px). 2026-10-13: same words, reflowed to two rows.",
+      "status": "approved by Nathanial 2026-10-13 (item 3 (P0-7), S8; through clickable choices after reading the drafts)",
+      "history": [
+        {
+          "proposed": "The sentry loses {name} behind the rubble and rolls back to its patrol.",
+          "alternatives": [],
+          "status": "approved by Nathanial 2026-10-11 (as drafted)"
+        }
+      ],
+      "approved": {
+        "date": "2026-10-13",
+        "source": "docs/research-2026-10/how-it-should-play/drafts-2026-10-13.md, item 3 (P0-7), S8"
+      }
     },
     {
       "id": "SENTRY_LOCK",
@@ -951,12 +1078,25 @@
       "trigger": "The sentry locks on.",
       "speaker": "NARRATION",
       "current": "The sentry stops and its eyes snap red. It has you; get back over the rubble.",
-      "proposed": "The sentry stops and its eyes snap red. It has {name}; get back over the rubble.",
+      "proposed": "The sentry stops and its eyes snap red.\nIt has {name}; get back over the rubble.",
       "alternatives": [
         "The sentry stops and its eyes snap red. It has you; get back over the rubble."
       ],
-      "notes": "Optional, for decision B's third person. Keep the current line if knockdown-style warnings stay in the second person. Fit: 1 of 3 rows, untagged box (855 px text width, Roboto 17 px); alt 1: 1 of 3 rows, untagged box (855 px text width, Roboto 17 px).",
-      "status": "approved by Nathanial 2026-10-11 (as drafted)"
+      "notes": "Optional, for decision B's third person. Keep the current line if knockdown-style warnings stay in the second person. Fit: 1 of 3 rows, untagged box (855 px text width, Roboto 17 px); alt 1: 1 of 3 rows, untagged box (855 px text width, Roboto 17 px). 2026-10-13: same words, reflowed to two rows.",
+      "status": "approved by Nathanial 2026-10-13 (item 3 (P0-7), S7; through clickable choices after reading the drafts)",
+      "history": [
+        {
+          "proposed": "The sentry stops and its eyes snap red. It has {name}; get back over the rubble.",
+          "alternatives": [
+            "The sentry stops and its eyes snap red. It has you; get back over the rubble."
+          ],
+          "status": "approved by Nathanial 2026-10-11 (as drafted)"
+        }
+      ],
+      "approved": {
+        "date": "2026-10-13",
+        "source": "docs/research-2026-10/how-it-should-play/drafts-2026-10-13.md, item 3 (P0-7), S7"
+      }
     },
     {
       "id": "RELEASE_LABEL",
@@ -989,10 +1129,21 @@
       "trigger": "Panel plate after the hit.",
       "speaker": "LABEL",
       "current": "TANK DOWN",
-      "proposed": "RELEASE SPENT",
+      "proposed": "RELEASE USED",
       "alternatives": [],
       "notes": "Matches BREAKER SPENT and VALVE SPENT. TANK DOWN moves to the tank itself (TANK_DOWN_LABEL). Fit: 97 px at 13 px (corridor COOLANT RELAY plate is 140 px wide).",
-      "status": "approved by Nathanial 2026-10-11 (as drafted)"
+      "status": "approved by Nathanial 2026-10-13 (item 3 (P0-7), section 3.2 (plain state words); through clickable choices after reading the drafts)",
+      "history": [
+        {
+          "proposed": "RELEASE SPENT",
+          "alternatives": [],
+          "status": "approved by Nathanial 2026-10-11 (as drafted)"
+        }
+      ],
+      "approved": {
+        "date": "2026-10-13",
+        "source": "docs/research-2026-10/how-it-should-play/drafts-2026-10-13.md, item 3 (P0-7), section 3.2 (plain state words)"
+      }
     },
     {
       "id": "TANK_DOWN_LABEL",
@@ -1013,10 +1164,21 @@
       "trigger": "USE away from stations after the blast.",
       "speaker": "NARRATION",
       "current": "No station in reach. The ARM PANEL is in the alcove past the rubble.",
-      "proposed": "No station in reach. The TANK RELEASE is in the alcove past the rubble.",
+      "proposed": "No station in reach. The TANK RELEASE\nis past the rubble.",
       "alternatives": [],
       "notes": "Fit: 1 of 3 rows, untagged box (855 px text width, Roboto 17 px).",
-      "status": "approved by Nathanial 2026-10-11 (as drafted)"
+      "status": "approved by Nathanial 2026-10-13 (item 3 (P0-7), S11; through clickable choices after reading the drafts)",
+      "history": [
+        {
+          "proposed": "No station in reach. The TANK RELEASE is in the alcove past the rubble.",
+          "alternatives": [],
+          "status": "approved by Nathanial 2026-10-11 (as drafted)"
+        }
+      ],
+      "approved": {
+        "date": "2026-10-13",
+        "source": "docs/research-2026-10/how-it-should-play/drafts-2026-10-13.md, item 3 (P0-7), S11"
+      }
     },
     {
       "id": "TANK_REHUNG",
@@ -1049,10 +1211,21 @@
       "trigger": "Standing in the sentry's lane outside the alcove.",
       "speaker": "HINT",
       "current": "You're in its lane. Get into the panel alcove or back over the rubble.",
-      "proposed": "You're in its lane. Get into the release alcove or back over the rubble.",
+      "proposed": "You're in its sights. Hide at the TANK RELEASE or the rubble.",
       "alternatives": [],
-      "notes": "Fit: 1 row, 422 of 526 px in the hint bar (Roboto 14 px, touch 'USE:' form).",
-      "status": "approved by Nathanial 2026-10-11 (as drafted)"
+      "notes": "Fit: 1 row, 422 of 526 px in the hint bar (Roboto 14 px, touch 'USE:' form). 2026-10-13: a one-row hint-bar text.",
+      "status": "approved by Nathanial 2026-10-13 (item 3 (P0-7), S2; through clickable choices after reading the drafts)",
+      "history": [
+        {
+          "proposed": "You're in its lane. Get into the release alcove or back over the rubble.",
+          "alternatives": [],
+          "status": "approved by Nathanial 2026-10-11 (as drafted)"
+        }
+      ],
+      "approved": {
+        "date": "2026-10-13",
+        "source": "docs/research-2026-10/how-it-should-play/drafts-2026-10-13.md, item 3 (P0-7), S2"
+      }
     },
     {
       "id": "LANE_HINT_BAITING",
@@ -1085,10 +1258,21 @@
       "trigger": "Lane default hint.",
       "speaker": "HINT",
       "current": "The sentry patrols past the rubble. The ARM PANEL is in the alcove just inside.",
-      "proposed": "The sentry patrols past the rubble. The TANK RELEASE is in the alcove just inside.",
+      "proposed": "The sentry patrols past the rubble. The TANK RELEASE hides you from it.",
       "alternatives": [],
-      "notes": "Fit: 1 row, 505 of 526 px in the hint bar (Roboto 14 px, touch 'USE:' form).",
-      "status": "approved by Nathanial 2026-10-11 (as drafted)"
+      "notes": "Fit: 1 row, 505 of 526 px in the hint bar (Roboto 14 px, touch 'USE:' form). 2026-10-13: a one-row hint-bar text.",
+      "status": "approved by Nathanial 2026-10-13 (item 3 (P0-7), S1; through clickable choices after reading the drafts)",
+      "history": [
+        {
+          "proposed": "The sentry patrols past the rubble. The TANK RELEASE is in the alcove just inside.",
+          "alternatives": [],
+          "status": "approved by Nathanial 2026-10-11 (as drafted)"
+        }
+      ],
+      "approved": {
+        "date": "2026-10-13",
+        "source": "docs/research-2026-10/how-it-should-play/drafts-2026-10-13.md, item 3 (P0-7), S1"
+      }
     },
     {
       "id": "POP_BOLT",
@@ -1312,10 +1496,21 @@
       "trigger": "Recap row, lane.",
       "speaker": "CARD",
       "current": null,
-      "proposed": "LANE  WOLF drew the sentry onto the mark.",
+      "proposed": "SENTRY  WOLF drew the sentry onto the mark.",
       "alternatives": [],
-      "notes": "lane_choice lives only in main.gd today, not in the save, so a run continued from autosave C would not know it. Either save it or fall back to RECAP_LANE_UNKNOWN. Fit: 1 row, 330 px at Roboto 17 px (end card has no layout yet; kept under the 855 px dialogue width).",
-      "status": "approved by Nathanial 2026-10-11 (as drafted)"
+      "notes": "lane_choice lives only in main.gd today, not in the save, so a run continued from autosave C would not know it. Either save it or fall back to RECAP_LANE_UNKNOWN. Fit: 1 row, 330 px at Roboto 17 px (end card has no layout yet; kept under the 855 px dialogue width). 2026-10-13: the topic word is SENTRY, the thing on screen.",
+      "status": "approved by Nathanial 2026-10-13 (item 3 (P0-7), S20; through clickable choices after reading the drafts)",
+      "history": [
+        {
+          "proposed": "LANE  WOLF drew the sentry onto the mark.",
+          "alternatives": [],
+          "status": "approved by Nathanial 2026-10-11 (as drafted)"
+        }
+      ],
+      "approved": {
+        "date": "2026-10-13",
+        "source": "docs/research-2026-10/how-it-should-play/drafts-2026-10-13.md, item 3 (P0-7), S20"
+      }
     },
     {
       "id": "RECAP_LANE_REFUSED",
@@ -1324,10 +1519,21 @@
       "trigger": "Recap row, lane.",
       "speaker": "CARD",
       "current": null,
-      "proposed": "LANE  WOLF wouldn't draw it, so {name} timed the drop alone.",
+      "proposed": "SENTRY  WOLF wouldn't draw it, so {name} timed the drop alone.",
       "alternatives": [],
-      "notes": "Fit: 1 row, 471 px at Roboto 17 px (end card has no layout yet; kept under the 855 px dialogue width).",
-      "status": "approved by Nathanial 2026-10-11 (as drafted)"
+      "notes": "Fit: 1 row, 471 px at Roboto 17 px (end card has no layout yet; kept under the 855 px dialogue width). 2026-10-13: the topic word is SENTRY, the thing on screen.",
+      "status": "approved by Nathanial 2026-10-13 (item 3 (P0-7), S20; through clickable choices after reading the drafts)",
+      "history": [
+        {
+          "proposed": "LANE  WOLF wouldn't draw it, so {name} timed the drop alone.",
+          "alternatives": [],
+          "status": "approved by Nathanial 2026-10-11 (as drafted)"
+        }
+      ],
+      "approved": {
+        "date": "2026-10-13",
+        "source": "docs/research-2026-10/how-it-should-play/drafts-2026-10-13.md, item 3 (P0-7), S20"
+      }
     },
     {
       "id": "RECAP_LANE_ALONE",
@@ -1336,10 +1542,21 @@
       "trigger": "Recap row, lane.",
       "speaker": "CARD",
       "current": null,
-      "proposed": "LANE  WOLF held at the rubble while {name} timed the drop.",
+      "proposed": "SENTRY  WOLF held at the rubble while {name} timed the drop.",
       "alternatives": [],
-      "notes": "Fit: 1 row, 456 px at Roboto 17 px (end card has no layout yet; kept under the 855 px dialogue width).",
-      "status": "approved by Nathanial 2026-10-11 (as drafted)"
+      "notes": "Fit: 1 row, 456 px at Roboto 17 px (end card has no layout yet; kept under the 855 px dialogue width). 2026-10-13: the topic word is SENTRY, the thing on screen.",
+      "status": "approved by Nathanial 2026-10-13 (item 3 (P0-7), S20; through clickable choices after reading the drafts)",
+      "history": [
+        {
+          "proposed": "LANE  WOLF held at the rubble while {name} timed the drop.",
+          "alternatives": [],
+          "status": "approved by Nathanial 2026-10-11 (as drafted)"
+        }
+      ],
+      "approved": {
+        "date": "2026-10-13",
+        "source": "docs/research-2026-10/how-it-should-play/drafts-2026-10-13.md, item 3 (P0-7), S20"
+      }
     },
     {
       "id": "RECAP_LANE_UNKNOWN",
@@ -1348,10 +1565,21 @@
       "trigger": "Recap row, lane, fallback.",
       "speaker": "CARD",
       "current": null,
-      "proposed": "LANE  The tank came down on the sentry.",
+      "proposed": "SENTRY  The tank came down on the sentry.",
       "alternatives": [],
-      "notes": "Only if the lane choice isn't saved. Fit: 1 row, 314 px at Roboto 17 px (end card has no layout yet; kept under the 855 px dialogue width).",
-      "status": "approved by Nathanial 2026-10-11 (as drafted)"
+      "notes": "Only if the lane choice isn't saved. Fit: 1 row, 314 px at Roboto 17 px (end card has no layout yet; kept under the 855 px dialogue width). 2026-10-13: the topic word is SENTRY, the thing on screen.",
+      "status": "approved by Nathanial 2026-10-13 (item 3 (P0-7), S20; through clickable choices after reading the drafts)",
+      "history": [
+        {
+          "proposed": "LANE  The tank came down on the sentry.",
+          "alternatives": [],
+          "status": "approved by Nathanial 2026-10-11 (as drafted)"
+        }
+      ],
+      "approved": {
+        "date": "2026-10-13",
+        "source": "docs/research-2026-10/how-it-should-play/drafts-2026-10-13.md, item 3 (P0-7), S20"
+      }
     },
     {
       "id": "END_CARD_PROMPT",
@@ -1445,7 +1673,12 @@
         "The sentry ran {name} down in its lane. Keep inside the alcove's posts, or get back over the rubble."
       ],
       "notes": "Round 2 item 4: third person, and the advice now matches the rules: the alcove between its two posts is out of the sentry's sight, and over the rubble it gives up; 'cross when it faces away' did not stop a sentry that had already seen the engineer. Fit: 1 of 3 rows, untagged box (855 px text width, Roboto 17 px); alt 1: 1 of 3 rows, untagged box (855 px text width, Roboto 17 px). Round 3: this card now shows only when the sentry saw the engineer and caught them outside the alcove; SENTRY_CHASED_REASON covers a chase that a missed drop started and a catch inside the alcove, where 'stay between the alcove's posts' contradicted the screen.",
-      "status": "approved by Nathanial 2026-10-11 (round 2, as drafted)"
+      "status": "approved by Nathanial 2026-10-11 (round 2, as drafted)",
+      "superseded": {
+        "date": "2026-10-13",
+        "by": "SENTRY_REASON_R3",
+        "note": "Replaced in round 3 and again on 2026-10-13 (no alcove or posts)."
+      }
     },
     {
       "id": "SENTRY_CHASED_REASON",
@@ -1454,12 +1687,25 @@
       "trigger": "Knockdown card: a chasing sentry reaches the engineer after a missed drop turned it on them, or reaches them inside the alcove.",
       "speaker": "NARRATION",
       "current": "The sentry ran {name} down in its lane. Stay between the alcove's posts, or get back over the rubble.",
-      "proposed": "The sentry ran {name} down. Once its eyes go red, only the rubble is safe.",
+      "proposed": "The sentry ran {name} down. Once its\neyes go red, only the rubble is safe.",
       "alternatives": [
         "The sentry ran {name} down. Once it turns on {name}, only the rubble is safe."
       ],
-      "notes": "Round 3: a screenshot review (R9) showed the engineer run down between the alcove's posts after a miss while the one sentry card said to stay between them and called the alcove 'its lane'. A chase reaches anywhere in the alcove, so once the sentry has locked on (eyes red, as SENTRY_LOCK says) only the rubble is safe; this card says that and drops 'in its lane'. No new fact. Fit: 1 of 3 rows, untagged box (554 of 855 px with Morgan, Roboto 17 px); alt 1: 1 of 3 rows (584 of 855 px).",
-      "status": "approved by Nathanial 2026-10-11 (round 2, as drafted)"
+      "notes": "Round 3: a screenshot review (R9) showed the engineer run down between the alcove's posts after a miss while the one sentry card said to stay between them and called the alcove 'its lane'. A chase reaches anywhere in the alcove, so once the sentry has locked on (eyes red, as SENTRY_LOCK says) only the rubble is safe; this card says that and drops 'in its lane'. No new fact. Fit: 1 of 3 rows, untagged box (554 of 855 px with Morgan, Roboto 17 px); alt 1: 1 of 3 rows (584 of 855 px). 2026-10-13: same words, reflowed to two rows.",
+      "status": "approved by Nathanial 2026-10-13 (item 3 (P0-7), S4; through clickable choices after reading the drafts)",
+      "history": [
+        {
+          "proposed": "The sentry ran {name} down. Once its eyes go red, only the rubble is safe.",
+          "alternatives": [
+            "The sentry ran {name} down. Once it turns on {name}, only the rubble is safe."
+          ],
+          "status": "approved by Nathanial 2026-10-11 (round 2, as drafted)"
+        }
+      ],
+      "approved": {
+        "date": "2026-10-13",
+        "source": "docs/research-2026-10/how-it-should-play/drafts-2026-10-13.md, item 3 (P0-7), S4"
+      }
     },
     {
       "id": "CLOUD_REASON",
@@ -1494,10 +1740,25 @@
       "trigger": "The door blows (autosave B), while WOLF is still walking up from the entrance.",
       "speaker": "NARRATION",
       "current": "The door goes. WOLF stops at the rubble and waits for {name}'s call. In the lane beyond, something whirs awake.",
-      "proposed": "The door goes. WOLF heads for the rubble to wait for {name}'s call. In the lane beyond, something whirs awake.",
+      "proposed": "The door goes. WOLF heads for the rubble\nto wait for {name}'s call.\n\nPast the doorway, something whirs awake.",
       "alternatives": [],
-      "notes": "Round 2 item 6: replaces RUBBLE_LINE's wording. The line shows the moment the door goes, when WOLF is still at the entrance about 1.5 s from the rubble, so 'stops at' was false until he arrived; 'heads for' is true through his walk and after it. Fit: 1 of 3 rows, untagged box (855 px text width, Roboto 17 px).",
-      "status": "approved by Nathanial 2026-10-11 (round 2, as drafted)"
+      "notes": "Round 2 item 6: replaces RUBBLE_LINE's wording. The line shows the moment the door goes, when WOLF is still at the entrance about 1.5 s from the rubble, so 'stops at' was false until he arrived; 'heads for' is true through his walk and after it. Fit: 1 of 3 rows, untagged box (855 px text width, Roboto 17 px). 2026-10-13: two boxes; 'In the lane beyond' becomes 'Past the doorway' (the lane is not drawn).",
+      "status": "approved by Nathanial 2026-10-13 (item 3 (P0-7), S6; through clickable choices after reading the drafts)",
+      "history": [
+        {
+          "proposed": "The door goes. WOLF heads for the rubble to wait for {name}'s call. In the lane beyond, something whirs awake.",
+          "alternatives": [],
+          "status": "approved by Nathanial 2026-10-11 (round 2, as drafted)"
+        }
+      ],
+      "boxes": [
+        "The door goes. WOLF heads for the rubble\nto wait for {name}'s call.",
+        "Past the doorway, something whirs awake."
+      ],
+      "approved": {
+        "date": "2026-10-13",
+        "source": "docs/research-2026-10/how-it-should-play/drafts-2026-10-13.md, item 3 (P0-7), S6"
+      }
     },
     {
       "id": "BREAKER_HINT_STAKES",
@@ -1520,10 +1781,21 @@
       "trigger": "Entering the Service Junction; replaces JUNCTION_ENTRY's first row.",
       "speaker": "NARRATION",
       "current": "WOLF runs ahead to read the pressure behind the sealed door.\n{NAME}: The breaker by the entrance feeds that line. Overload it, crank the valve, and the door goes.",
-      "proposed": "WOLF runs ahead to the valve and reads its LINE gauge.\n{NAME}: The breaker by the entrance feeds that line. Overload it, crank the valve, and the door goes.",
+      "proposed": "{NAME}: That door is our way through.",
       "alternatives": [],
-      "notes": "Round 3 item 3. A screenshot review (R1-054/055, R3-079) showed WOLF 'reading the pressure behind the sealed door' while standing at x 300, well left of the door. There is no floor at the door: the valve (x 369-471 drawn) stands in front of it, the door body starts at 452, and the only bare floor between the breaker and the valve is 33 px against WOLF's ~115 px body, so he stops with his snout at the valve's left edge under its LINE gauge (over the idle relief-vent grate, the least-bad spot). The line now names what he is shown doing; the gauge is already on screen and named by BREAKER_CATCH, so no new fact. The second row is JUNCTION_ENTRY's approved row, unchanged; 'that line' still reads naturally after 'LINE gauge'. Fit: 2 of 3 rows, untagged box (row widths 421 and 759 of 855 px with MORGAN, Roboto 17 px).",
-      "status": "approved by Nathanial 2026-10-11 (round 3, as drafted)"
+      "notes": "Round 3 item 3. A screenshot review (R1-054/055, R3-079) showed WOLF 'reading the pressure behind the sealed door' while standing at x 300, well left of the door. There is no floor at the door: the valve (x 369-471 drawn) stands in front of it, the door body starts at 452, and the only bare floor between the breaker and the valve is 33 px against WOLF's ~115 px body, so he stops with his snout at the valve's left edge under its LINE gauge (over the idle relief-vent grate, the least-bad spot). The line now names what he is shown doing; the gauge is already on screen and named by BREAKER_CATCH, so no new fact. The second row is JUNCTION_ENTRY's approved row, unchanged; 'that line' still reads naturally after 'LINE gauge'. Fit: 2 of 3 rows, untagged box (row widths 421 and 759 of 855 px with MORGAN, Roboto 17 px). 2026-10-13: the narration 'WOLF runs ahead to the valve and reads its LINE gauge.' is cut (his run is shown on screen) and the engineer says only the goal; WOLF's approved warning (JUNCTION_ENTRY_WOLF_R3) follows once he has read the gauge. The chain moves to the hint ladder (JUNCTION_LADDER_T2, JUNCTION_LADDER_T3); Continue keeps JUNCTION_RESTORE_A_R3.",
+      "status": "approved by Nathanial 2026-10-13 (item 7 (Q6), option A, and item 6 (N14 cut); through clickable choices after reading the drafts)",
+      "history": [
+        {
+          "proposed": "WOLF runs ahead to the valve and reads its LINE gauge.\n{NAME}: The breaker by the entrance feeds that line. Overload it, crank the valve, and the door goes.",
+          "alternatives": [],
+          "status": "approved by Nathanial 2026-10-11 (round 3, as drafted)"
+        }
+      ],
+      "approved": {
+        "date": "2026-10-13",
+        "source": "docs/research-2026-10/how-it-should-play/drafts-2026-10-13.md, item 7 (Q6), option A, and item 6 (N14 cut)"
+      }
     },
     {
       "id": "JUNCTION_RESTORE_A_R3",
@@ -1546,12 +1818,23 @@
       "trigger": "Knockdown card: the sentry spotted the engineer out in its lane (always past the alcove's right post, SentryBrain.is_exposed) and ran them down there. SENTRY_CHASED_REASON is unchanged for a chase after a miss or a catch inside the alcove.",
       "speaker": "NARRATION",
       "current": "The sentry ran {name} down in its lane. Stay between the alcove's posts, or get back over the rubble.",
-      "proposed": "The sentry spotted {name} past the alcove's right post and ran them down. Keep inside the posts, or get back over the rubble.",
-      "alternatives": [
-        "The sentry caught {name} past the alcove's right post. Keep inside the posts, or get back over the rubble."
+      "proposed": "The sentry saw {name} out in the open.\nStay close to the TANK RELEASE.",
+      "alternatives": [],
+      "notes": "Round 3 item 4. A screenshot review (R3-136) showed the card 'Stay between the alcove's posts' over a body lying between the posts: the engineer was caught at x 638, just past the right post, and the shove away from the sentry lays the body back inside the alcove. The card now says how they were caught (spotted past the right post), so the body in the alcove reads as the shove, not as the advice failing. They/them for the engineer; third person; no new fact (the posts and the sentry's sight are on screen and in SentryBrain). Fit: 2 of 3 rows untagged (852 + 80 px with Rowan, 822 + 117 with Morgan, of 855 px, Roboto 17 px); 3 of 3 with the restore row 'Back at the last checkpoint.'. 2026-10-13: the knockdown card in play when the sentry spots the engineer out in the open; it points at the drawn TANK RELEASE instead of an alcove and posts. The death card (DEATH_CARD_SENTRY in death-text-2026-10-10.json) is a separate line, not built yet.",
+      "status": "approved by Nathanial 2026-10-13 (item 3 (P0-7), S3; through clickable choices after reading the drafts)",
+      "history": [
+        {
+          "proposed": "The sentry spotted {name} past the alcove's right post and ran them down. Keep inside the posts, or get back over the rubble.",
+          "alternatives": [
+            "The sentry caught {name} past the alcove's right post. Keep inside the posts, or get back over the rubble."
+          ],
+          "status": "approved by Nathanial 2026-10-11 (round 3, as drafted)"
+        }
       ],
-      "notes": "Round 3 item 4. A screenshot review (R3-136) showed the card 'Stay between the alcove's posts' over a body lying between the posts: the engineer was caught at x 638, just past the right post, and the shove away from the sentry lays the body back inside the alcove. The card now says how they were caught (spotted past the right post), so the body in the alcove reads as the shove, not as the advice failing. They/them for the engineer; third person; no new fact (the posts and the sentry's sight are on screen and in SentryBrain). Fit: 2 of 3 rows untagged (852 + 80 px with Rowan, 822 + 117 with Morgan, of 855 px, Roboto 17 px); 3 of 3 with the restore row 'Back at the last checkpoint.'.",
-      "status": "approved by Nathanial 2026-10-11 (round 3, as drafted)"
+      "approved": {
+        "date": "2026-10-13",
+        "source": "docs/research-2026-10/how-it-should-play/drafts-2026-10-13.md, item 3 (P0-7), S3"
+      }
     },
     {
       "id": "BROKE_OFF_HATCH_R3",
@@ -1572,10 +1855,21 @@
       "trigger": "Recap row, lane: the sentry came down after WOLF broke off by the exit hatch (a miss while he was past it).",
       "speaker": "CARD",
       "current": "LANE  WOLF held at the rubble while {name} timed the drop.",
-      "proposed": "LANE  WOLF broke off while {name} timed the drop.",
+      "proposed": "SENTRY  WOLF broke off while {name} timed the drop.",
       "alternatives": [],
-      "notes": "Round 3b, with BROKE_OFF_HATCH_R3: that run used to fall through to RECAP_LANE_ALONE, which would say he held at the rubble when he stayed by the hatch. They/them not needed; third person past like the other recap rows. Fit: 1 row, 490 px with Morgan at Roboto 17 px (kept under the 855 px dialogue width). Nathanial's rewrite 2026-10-11: place-free, matching 'I'm out.'",
-      "status": "approved by Nathanial 2026-10-11 (round 3, his rewrite)"
+      "notes": "Round 3b, with BROKE_OFF_HATCH_R3: that run used to fall through to RECAP_LANE_ALONE, which would say he held at the rubble when he stayed by the hatch. They/them not needed; third person past like the other recap rows. Fit: 1 row, 490 px with Morgan at Roboto 17 px (kept under the 855 px dialogue width). Nathanial's rewrite 2026-10-11: place-free, matching 'I'm out.' 2026-10-13: the topic word is SENTRY, the thing on screen.",
+      "status": "approved by Nathanial 2026-10-13 (item 3 (P0-7), S20; through clickable choices after reading the drafts)",
+      "history": [
+        {
+          "proposed": "LANE  WOLF broke off while {name} timed the drop.",
+          "alternatives": [],
+          "status": "approved by Nathanial 2026-10-11 (round 3, his rewrite)"
+        }
+      ],
+      "approved": {
+        "date": "2026-10-13",
+        "source": "docs/research-2026-10/how-it-should-play/drafts-2026-10-13.md, item 3 (P0-7), S20"
+      }
     },
     {
       "id": "JUNCTION_ENTRY_WOLF_R3",
@@ -1588,6 +1882,75 @@
       "alternatives": [],
       "notes": "Round 3 final check: 'It's live' is said before the breaker is armed, so a new player can read the line as already live (the same contradiction JUNCTION_RESTORE_A_R3 fixed on Continue). Nathanial chose 2026-10-11 to use the restore line on entry too.",
       "status": "approved by Nathanial 2026-10-11 (round 3: entry uses the restore A line)"
+    },
+    {
+      "id": "JUNCTION_GOAL_HINT",
+      "problem": "P0",
+      "where": "apps/game/scripts/main.gd _junction_hint (JUNCTION_GOAL_HINT)",
+      "trigger": "The junction hint bar's default from entry until the hint ladder has given the chain (T3).",
+      "speaker": "HINT",
+      "current": null,
+      "proposed": "Get through the sealed door.",
+      "alternatives": [],
+      "notes": "New wording: the entry hint bar shows the goal only, because the approved chain hint would give the steps away at once.",
+      "status": "approved by Nathanial 2026-10-13 (item 7 (Q6), T0; through clickable choices after reading the drafts)",
+      "approved": {
+        "date": "2026-10-13",
+        "source": "docs/research-2026-10/how-it-should-play/drafts-2026-10-13.md, item 7 (Q6), T0"
+      }
+    },
+    {
+      "id": "JUNCTION_LADDER_T2",
+      "problem": "P0",
+      "where": "apps/game/scripts/main.gd _tick_ladder (LADDER_BREAKER_LINE)",
+      "trigger": "Hint ladder T2: 90 s of control in the junction without the breaker armed (T1 at 45 s is WOLF looking at the breaker while its lamp pulses, no text).",
+      "speaker": "NARRATION",
+      "current": null,
+      "proposed": "{NAME}: The breaker by the entrance\nfeeds that line.",
+      "alternatives": [],
+      "notes": "The first half of the approved JUNCTION_ENTRY_R3 chain, same speaker, split into two rows.",
+      "status": "approved by Nathanial 2026-10-13 (item 7 (Q6), T2; through clickable choices after reading the drafts)",
+      "approved": {
+        "date": "2026-10-13",
+        "source": "docs/research-2026-10/how-it-should-play/drafts-2026-10-13.md, item 7 (Q6), T2"
+      }
+    },
+    {
+      "id": "JUNCTION_LADDER_T3",
+      "problem": "P0",
+      "where": "apps/game/scripts/main.gd _tick_ladder (LADDER_BREAKER_LINE, LADDER_CHAIN_LINE)",
+      "trigger": "Hint ladder T3: 180 s of control in the junction without the breaker armed.",
+      "speaker": "NARRATION",
+      "current": null,
+      "proposed": "{NAME}: The breaker by the entrance\nfeeds that line.\n\n{NAME}: Overload it, crank the valve,\nand the door goes.",
+      "alternatives": [],
+      "notes": "The approved chain from JUNCTION_ENTRY_R3 as two boxes in order (approved: 'the approved chain moves to hint step T3 as two boxes').",
+      "status": "approved by Nathanial 2026-10-13 (item 7 (Q6), T3; through clickable choices after reading the drafts)",
+      "approved": {
+        "date": "2026-10-13",
+        "source": "docs/research-2026-10/how-it-should-play/drafts-2026-10-13.md, item 7 (Q6), T3"
+      },
+      "boxes": [
+        "{NAME}: The breaker by the entrance\nfeeds that line.",
+        "{NAME}: Overload it, crank the valve,\nand the door goes."
+      ]
+    },
+    {
+      "id": "JUNCTION_REFUSALS",
+      "problem": "P0",
+      "where": "apps/game/scripts/main.gd _refuse and its REFUSE_* constants",
+      "trigger": "Each invalid press in the Service Junction (item 5 table, rows 1-7).",
+      "speaker": "NARRATION",
+      "current": null,
+      "proposed": "Row 1 valve before the breaker: The valve is dead. Arm the breaker first.\nRow 1b valve after a trip: The vent let go and the breaker tripped. Reset it by the entrance. (kept)\nRow 2 sealed door (USE, and the first bump): Sealed shut. Something hums behind it. / The valve beside it charges it.\nRow 3 breaker while the line builds: Already live. Crank the valve by the door.\nRow 3b breaker or valve while the fuse burns: Fuse lit. Get clear of the door. (kept)\nRow 4 used valve: No charge left. The door is down.\nRow 4b used breaker: No charge left. The door is down.\nRow 5 DROP too early: Wait. WOLF hasn't got it on the mark yet. (kept)\nRow 5b DROP while the tank winches up: Not yet. The tank is still going back up.\nRow 6 used release: The tank is down on the sentry. / The exit bolt is by the hatch. (kept, two rows)\nRow 7 exit before the sentry is down: Locked out until the sentry is down.\nRow 7b exit before the door is down (hand-made saves only): Bolted. The sealed door comes first.",
+      "alternatives": [],
+      "notes": "Feedback on every row: on the press frame the station's lamp flickers twice, a short dull clunk plays, the line shows as the status line in the dialogue box, and a repeated press re-shows it with one blink of the box. Walking into the sealed door: a thud, a stop and a lamp flicker, with the row 2 line on the first bump only. Rows 2, 3, 4, 4b, 5b, 7 and 7b are new wording; 1 shortens an approved line.",
+      "status": "approved by Nathanial 2026-10-13 (item 5 (P0-15), rows 1-7; through clickable choices after reading the drafts)",
+      "approved": {
+        "date": "2026-10-13",
+        "source": "docs/research-2026-10/how-it-should-play/drafts-2026-10-13.md, item 5 (P0-15), rows 1-7"
+      }
     }
-  ]
+  ],
+  "box_notation": "Since 2026-10-13 a line shown as several dialogue boxes in order is written with a blank line (\\n\\n) between boxes in 'proposed' and listed in 'boxes'; a single \\n inside a box is a row break. Each box is at most 2 rows of at most 42 characters with the longest preset name."
 }
