@@ -18,6 +18,7 @@ func _run() -> void:
 	base = "user://crank-hold-test-%s" % OS.get_process_id()
 	_clean()
 	await _check_bypass_first_frame()
+	await _check_bypass_held_time()
 	await _check_bypass_toggle()
 	await _check_valve()
 	await _check_setting_saved()
@@ -57,6 +58,41 @@ func _check_bypass_first_frame() -> void:
 	await _until(func() -> bool: return not hold.holding, 5)
 	await _frames(20)
 	_expect(handle.hold_fraction == 0.0 and is_equal_approx(handle.wheel.rotation_degrees, BypassHandle.TICK_DEGREES * handle.ticks), "letting go springs the part turn back to the last notch (%.1f degrees, %d notches)" % [handle.wheel.rotation_degrees, handle.ticks])
+	await _free(game)
+
+
+## Holding interact at the bypass from no notches opens the seal after 2 s of held game time
+## (Nathanial's decision Q1), summed from the frames Main runs with the press down, so a slip back to
+## the old 3.2 s, or any other length, fails here.
+func _check_bypass_held_time() -> void:
+	_clean()
+	var game: Node2D = await _spawn()
+	await _at_bypass(game)
+	var state: M0State = game.get("state") as M0State
+	var handle: BypassHandle = game.get("bypass_handle") as BypassHandle
+	_expect(handle.ticks == 0 and int(game.get("bypass_ticks")) == 0 and not state.door_open, "the bypass starts from no notches")
+	var held: Array[float] = [0.0, 0.0]
+	var counting: Array[bool] = [true]
+	# process_frame fires before the nodes process, with that frame's delta already set: add the delta
+	# of every frame Main runs with interact down, up to the frame the last notch lands (the seal can
+	# open on that frame, and the wait below can then end before another frame begins).
+	var sum_frame: Callable = func() -> void:
+		if not counting[0]:
+			return
+		if int(game.get("bypass_ticks")) >= BypassHandle.TICKS_NEEDED:
+			counting[0] = false
+			return
+		var delta: float = root.get_process_delta_time()
+		held[0] += delta
+		held[1] = maxf(held[1], delta)
+	Input.action_press(&"interact")
+	process_frame.connect(sum_frame)
+	var opened: bool = await _until(func() -> bool: return state.door_open, 240)
+	Input.action_release(&"interact")
+	process_frame.disconnect(sum_frame)
+	var expected: float = BypassHandle.TICKS_NEEDED * BypassHandle.TICK_SECONDS
+	_expect(absf(expected - 2.0) < 0.001, "the bypass is eight notches of a quarter second, 2 s in all")
+	_expect(opened and int(game.get("bypass_ticks")) == BypassHandle.TICKS_NEEDED and held[0] >= 2.0 - 0.001 and held[0] <= 2.0 + held[1] + 0.001, "holding interact from no notches opens the seal after 2 s held (%.3f s, longest frame %.3f s, opened %s, notches %d)" % [held[0], held[1], opened, int(game.get("bypass_ticks"))])
 	await _free(game)
 
 
