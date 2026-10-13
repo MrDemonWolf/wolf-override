@@ -1155,12 +1155,14 @@ func _cross_to_panel(game: Node2D) -> bool:
 
 
 ## P0-21 (PUZ-6, FAIL-6, Nathanial's Q7): the tank window is at least about half a second on patrol.
+## The patrol turns at PATROL_MIN_X, inside the window, so each patrol pass (in past the mark and
+## back out) measures about 1.0 s; a straight crossing at patrol speed would be about 0.53 s.
 ## Measured two ways at 60 fps, as Main runs them (the tank lands against where the sentry stands at
 ## the start of the frame): the frames the sentry's body is far enough over the brackets on each
 ## pass, and the press times of a drop that lands as a hit.
 func _check_drop_window() -> void:
 	var straight: float = 2.0 * DropArm.HIT_REACH / SentryBrain.PATROL_SPEED
-	_expect(straight >= 0.5, "a patrol crossing the whole hit window takes %.2f s (at least 0.5 s; 0.34 s before)" % straight)
+	_expect(straight >= 0.5, "a straight crossing of the whole hit window takes %.2f s (at least 0.5 s; 0.34 s before)" % straight)
 	for far_x: float in [SentryBrain.PATROL_MAX_X, 805.0]:
 		var brain: SentryBrain = _patrolling_at(far_x, -1.0)
 		brain.far_x = far_x
@@ -1174,7 +1176,7 @@ func _check_drop_window() -> void:
 				passes.append(run / 60.0)
 				run = 0
 		passes.sort()
-		_expect(passes.size() >= 3 and passes[0] >= 0.5, "on patrol (far end %.0f) every pass keeps the sentry over the brackets at least 0.5 s (shortest %.2f s of %d passes)" % [far_x, passes[0] if not passes.is_empty() else 0.0, passes.size()])
+		_expect(passes.size() >= 3 and passes[0] >= 0.5, "on patrol (far end %.0f) every pass, in past the mark and back out, keeps the sentry over the brackets at least 0.5 s (shortest %.2f s of %d passes)" % [far_x, passes[0] if not passes.is_empty() else 0.0, passes.size()])
 	# Press windows: for every frame of a patrol cycle, drop then and see whether it lands as a hit.
 	var hits: Array[bool] = []
 	for start: int in 240:
@@ -1198,7 +1200,7 @@ func _check_drop_window() -> void:
 			length = 0
 	windows.sort()
 	_expect(not windows.is_empty() and windows[0] >= 0.5, "pressed at any moment of a patrol pass, the drop hits through a window of at least 0.5 s (%s)" % str(windows))
-	print("Tank window: %.2f s per straight patrol pass, %.2f s per chase pass, press windows %s" % [straight, 2.0 * DropArm.HIT_REACH / SentryBrain.CHASE_SPEED, str(windows)])
+	print("Tank window: %.2f s per straight crossing at patrol speed, %.2f s at chase speed, press windows on patrol %s" % [straight, 2.0 * DropArm.HIT_REACH / SentryBrain.CHASE_SPEED, str(windows)])
 
 
 func _patrolling_at(x: float, facing: float) -> SentryBrain:

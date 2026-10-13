@@ -125,9 +125,15 @@ func _check_valve() -> void:
 	var line: PressureLine = game.get("pressure_line") as PressureLine
 	await _at_valve(game)
 	var resting: float = room.valve_wheel.rotation_degrees
+	var clicks: Array[int] = []
+	(game.get("sfx_bank") as SfxBank).clip_started.connect(func(clip: StringName) -> void:
+		if clip == &"clank":
+			clicks.append(Engine.get_process_frames()))
 	Input.action_press(&"interact")
 	await process_frame
 	await process_frame
+	var answered_at: int = Engine.get_process_frames()
+	_expect(not clicks.is_empty() and clicks[0] <= answered_at, "the valve's ratchet clicks on the press frame")
 	_expect((game.get("hold_use") as HoldUse).started and line.turns == 0 and room.crank_fraction >= HoldUse.FIRST_FRAME_GIVE and room.valve_wheel.rotation_degrees - resting >= 90.0 * HoldUse.FIRST_FRAME_GIVE - 0.01, "the valve wheel turns on the press frame, before its first quarter (%.1f degrees)" % (room.valve_wheel.rotation_degrees - resting))
 	Input.action_release(&"interact")
 	await _frames(20)
