@@ -26,6 +26,7 @@ func _initialize() -> void:
 func _run() -> void:
 	_check_brain()
 	_check_arm()
+	_check_drop_window()
 	_check_state_guards()
 	await _check_scene()
 	if failures == 0:
@@ -55,7 +56,7 @@ func _check_brain() -> void:
 	brain.tick(1.0, 100.0, false, -1.0)
 	_expect(is_equal_approx(brain.x, SentryBrain.PATROL_MIN_X * 2.0 - 560.0) and brain.facing > 0.0, "it bounces off its near end and comes back")
 	_expect(is_equal_approx(SentryBrain.PATROL_MIN_X - SentryBrain.HALF_WIDTH, SentryBrain.COVER_MAX_X + M0State.HUMAN_HALF_WIDTH), "the patrol turns where its front edge meets an engineer at the alcove's right end")
-	_expect(SentryBrain.PATROL_MIN_X < DropArm.MARK_X - DropArm.HIT_REACH and SentryBrain.PATROL_MAX_X > DropArm.MARK_X + DropArm.HIT_REACH, "the patrol still crosses the whole hit window")
+	_expect(SentryBrain.PATROL_MIN_X < DropArm.MARK_X and SentryBrain.PATROL_MAX_X > DropArm.MARK_X + DropArm.HIT_REACH, "the patrol crosses the mark and leaves the hit window at its far end on every pass")
 	var sliced: SentryBrain = _patrolling_at(SentryBrain.PATROL_MAX_X, -1.0)
 	var whole: SentryBrain = _patrolling_at(SentryBrain.PATROL_MAX_X, -1.0)
 	var lowest: float = INF
@@ -224,7 +225,7 @@ func _check_keeps_distance() -> void:
 		held_off.tick(1.0 / 60.0, 100.0, false, -1.0)
 		lowest = minf(lowest, held_off.x)
 		highest = maxf(highest, held_off.x)
-	_expect(highest <= 805.01 and highest >= 800.0 and lowest <= DropArm.MARK_X - DropArm.HIT_REACH, "with WOLF holding the far end its patrol turns short of him and still crosses the whole hit window (%.1f..%.1f)" % [lowest, highest])
+	_expect(highest <= 805.01 and highest >= 800.0 and highest > DropArm.MARK_X + DropArm.HIT_REACH and lowest < DropArm.MARK_X, "with WOLF holding the far end its patrol turns short of him and still crosses the mark and the whole far side of the hit window (%.1f..%.1f)" % [lowest, highest])
 	var outside: SentryBrain = _patrolling_at(SentryBrain.PATROL_MAX_X, 1.0)
 	outside.far_x = 805.0
 	outside.tick(0.1, 100.0, false, -1.0)
@@ -327,14 +328,16 @@ func _check_arm() -> void:
 	# over them when the tank lands.
 	_expect(absf(DropArm.HIT_RANGE - JunctionRoom.TANK_SIZE.x * 0.5) <= 1.0, "the floor brackets are as wide as the tank")
 	var edge_overlap: float = (DropArm.MARK_X + DropArm.HIT_RANGE) - (DropArm.MARK_X + DropArm.HIT_REACH - SentryBrain.HALF_WIDTH)
-	_expect(edge_overlap >= SentryBrain.HALF_WIDTH, "at the edge of the hit window at least half of the sentry's body is over the brackets (%.0f px)" % edge_overlap)
-	_expect(DropArm.is_hit(DropArm.MARK_X - DropArm.HIT_REACH) and DropArm.is_hit(DropArm.MARK_X + DropArm.HIT_REACH) and not DropArm.is_hit(DropArm.MARK_X - DropArm.HIT_REACH - 1.0) and not DropArm.is_hit(DropArm.MARK_X + DropArm.HIT_REACH + 1.0), "the hit window is the sentry's middle inside the brackets")
-	_expect(not DropArm.is_hit(DropArm.MARK_X + DropArm.HIT_RANGE + SentryBrain.HALF_WIDTH - 3.0) and not DropArm.is_hit(DropArm.MARK_X - DropArm.HIT_RANGE - SentryBrain.HALF_WIDTH + 3.0), "a graze, a few pixels of the body over a bracket, is a miss")
+	_expect(is_equal_approx(edge_overlap, DropArm.GRAZE_OVERLAP) and is_equal_approx(DropArm.GRAZE_OVERLAP, SentryBrain.HALF_WIDTH * 0.5), "at the edge of the hit window a quarter of the sentry's body is over the brackets: a graze counts (%.0f px)" % edge_overlap)
+	_expect(DropArm.is_hit(DropArm.MARK_X - DropArm.HIT_REACH) and DropArm.is_hit(DropArm.MARK_X + DropArm.HIT_REACH) and not DropArm.is_hit(DropArm.MARK_X - DropArm.HIT_REACH - 1.0) and not DropArm.is_hit(DropArm.MARK_X + DropArm.HIT_REACH + 1.0), "the hit window is a quarter or more of the sentry's body over the brackets")
+	_expect(DropArm.is_hit(DropArm.MARK_X + DropArm.HIT_RANGE) and DropArm.is_hit(DropArm.MARK_X - DropArm.HIT_RANGE), "a sentry centred on a bracket, half its body under the tank, is a hit")
+	_expect(JunctionRoom.tank_rests_on_wreck(DropArm.MARK_X + DropArm.HIT_RANGE) and JunctionRoom.tank_rests_on_wreck(DropArm.MARK_X - DropArm.HIT_RANGE) and not JunctionRoom.tank_rests_on_wreck(DropArm.MARK_X + DropArm.HIT_RANGE + 1.0) and not JunctionRoom.tank_rests_on_wreck(DropArm.MARK_X - DropArm.HIT_REACH), "the tank rests on the wreck while the sentry's middle is in the brackets, and a graze's tank stands on the floor over the wreck's end")
+	_expect(not DropArm.is_hit(DropArm.MARK_X + DropArm.HIT_RANGE + SentryBrain.HALF_WIDTH - 3.0) and not DropArm.is_hit(DropArm.MARK_X - DropArm.HIT_RANGE - SentryBrain.HALF_WIDTH + 3.0), "a brush, a few pixels of the body over a bracket, is still a miss")
 	var arm: DropArm = DropArm.new()
 	_expect(arm.state == &"hung" and arm.drop_amount() == 0.0 and arm.advance(1.0, 700.0) == &"", "a hung tank waits")
 	_expect(arm.drop() and arm.state == &"falling" and not arm.drop(), "the clamp lets go once")
 	_expect(arm.advance(0.44, 700.0) == &"" and arm.drop_amount() > 0.5 and arm.drop_amount() < 1.0, "0.44 s into the fall it is still falling")
-	_expect(arm.advance(0.02, DropArm.MARK_X + DropArm.HIT_REACH) == &"hit" and arm.state == &"landed" and arm.drop_amount() == 1.0, "it lands at 0.45 s on a sentry with half its body in the brackets")
+	_expect(arm.advance(0.02, DropArm.MARK_X + DropArm.HIT_REACH) == &"hit" and arm.state == &"landed" and arm.drop_amount() == 1.0, "it lands at 0.45 s on a sentry with a quarter of its body in the brackets")
 	_expect(not arm.drop() and arm.advance(10.0, 700.0) == &"", "a landed tank is final")
 	var sliced: DropArm = DropArm.new()
 	sliced.drop()
@@ -1149,6 +1152,53 @@ func _cross_to_panel(game: Node2D) -> bool:
 	if not await _wait_until(func() -> bool: return brain.state == &"patrol" and brain.facing > 0.0 and brain.x >= 700.0, 400):
 		return false
 	return await _walk_to(human, JunctionRoom.ARM_X) and not game.get("fail_active")
+
+
+## P0-21 (PUZ-6, FAIL-6, Nathanial's Q7): the tank window is at least about half a second on patrol.
+## Measured two ways at 60 fps, as Main runs them (the tank lands against where the sentry stands at
+## the start of the frame): the frames the sentry's body is far enough over the brackets on each
+## pass, and the press times of a drop that lands as a hit.
+func _check_drop_window() -> void:
+	var straight: float = 2.0 * DropArm.HIT_REACH / SentryBrain.PATROL_SPEED
+	_expect(straight >= 0.5, "a patrol crossing the whole hit window takes %.2f s (at least 0.5 s; 0.34 s before)" % straight)
+	for far_x: float in [SentryBrain.PATROL_MAX_X, 805.0]:
+		var brain: SentryBrain = _patrolling_at(far_x, -1.0)
+		brain.far_x = far_x
+		var passes: Array[float] = []
+		var run: int = 0
+		for _frame: int in 1200:
+			brain.tick(1.0 / 60.0, 100.0, false, -1.0)
+			if DropArm.is_hit(brain.x):
+				run += 1
+			elif run > 0:
+				passes.append(run / 60.0)
+				run = 0
+		passes.sort()
+		_expect(passes.size() >= 3 and passes[0] >= 0.5, "on patrol (far end %.0f) every pass keeps the sentry over the brackets at least 0.5 s (shortest %.2f s of %d passes)" % [far_x, passes[0] if not passes.is_empty() else 0.0, passes.size()])
+	# Press windows: for every frame of a patrol cycle, drop then and see whether it lands as a hit.
+	var hits: Array[bool] = []
+	for start: int in 240:
+		var sentry: SentryBrain = _patrolling_at(SentryBrain.PATROL_MAX_X, -1.0)
+		for _frame: int in start:
+			sentry.tick(1.0 / 60.0, 100.0, false, -1.0)
+		var arm: DropArm = DropArm.new()
+		arm.drop()
+		var landed: StringName = &""
+		while landed.is_empty():
+			landed = arm.advance(1.0 / 60.0, sentry.x)
+			sentry.tick(1.0 / 60.0, 100.0, false, -1.0)
+		hits.append(landed == &"hit")
+	var windows: Array[float] = []
+	var length: int = 0
+	for index: int in hits.size():
+		if hits[index]:
+			length += 1
+		if (not hits[index] or index == hits.size() - 1) and length > 0:
+			windows.append(length / 60.0)
+			length = 0
+	windows.sort()
+	_expect(not windows.is_empty() and windows[0] >= 0.5, "pressed at any moment of a patrol pass, the drop hits through a window of at least 0.5 s (%s)" % str(windows))
+	print("Tank window: %.2f s per straight patrol pass, %.2f s per chase pass, press windows %s" % [straight, 2.0 * DropArm.HIT_REACH / SentryBrain.CHASE_SPEED, str(windows)])
 
 
 func _patrolling_at(x: float, facing: float) -> SentryBrain:

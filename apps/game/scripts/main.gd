@@ -2662,8 +2662,8 @@ func _choose_lane(response: int) -> void:
 
 ## BOOM 2: the tank comes down on the sentry. Autosave C.
 func _tank_hit() -> void:
-	# The tank pins the machine where it stands (at most HIT_REACH off the mark, with half its body or
-	# more under the tank), so the wreck never jumps; Continue from autosave C lays it on the mark.
+	# The tank pins the machine where it stands (at most HIT_REACH off the mark, with a quarter of its
+	# body or more under the tank), so the wreck never jumps; Continue from autosave C lays it on the mark.
 	var at_x: float = sentry_brain.x
 	sentry_brain.knock_down()
 	if not state.drop_sentry():

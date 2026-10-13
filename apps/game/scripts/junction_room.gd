@@ -869,8 +869,9 @@ func sync_arm(arm: DropArm) -> void:
 	arm_state = arm.state
 	tank_drop = arm.drop_amount()
 	tank_on_floor = arm.on_floor()
-	# A tank coming down on the sentry stops on its crushed hull, so the wreck shows under it.
-	var on_sentry: bool = arm.state == &"landed" or (arm.state == &"falling" and DropArm.is_hit(sentry.target_x))
+	# A tank coming down on the sentry stops on its crushed hull, so the wreck shows under it; one that
+	# only catches its end (a graze) comes down past it onto the floor.
+	var on_sentry: bool = (arm.state == &"landed" or (arm.state == &"falling" and DropArm.is_hit(sentry.target_x))) and tank_rests_on_wreck(sentry.target_x)
 	tank.position.y = lerpf(TANK_REST_Y, landed_tank_y(on_sentry), tank_drop)
 	var cloud: bool = arm.cloud_active() and visible
 	coolant_cloud.emitting = cloud
@@ -914,6 +915,14 @@ static func wolf_tank_leap_height(wolf_x: float) -> float:
 static func wolf_duck_depth(wolf_x: float, facing: float) -> float:
 	var head_x: float = wolf_x + signf(facing) * WOLF_HEAD_X
 	return DUCK_DEPTH * (1.0 - smoothstep(DUCK_CLEAR, DUCK_CLEAR + DUCK_RAMP, absf(head_x - DropArm.MARK_X)))
+
+
+## True when a tank landing on a sentry centred at [param sentry_x] rests on its crushed hull: the
+## sentry's middle is inside the brackets, so at least half of the tank's footprint is over the wreck.
+## A graze further out (DropArm.HIT_REACH) catches only the wreck's end and the tank stands on the
+## floor beside it, over that end.
+static func tank_rests_on_wreck(sentry_x: float) -> bool:
+	return absf(sentry_x - DropArm.MARK_X) <= DropArm.HIT_RANGE + DropArm.EPSILON
 
 
 ## Where the tank's centre comes to rest: on the floor, or on top of the crushed sentry.
