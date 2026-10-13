@@ -164,9 +164,9 @@ func _check_blend(bank: SfxBank) -> void:
 
 ## SOUND-1 (P0-1): every clip a game script hands the bank by name exists, so no call is silently
 ## mute. Scans each script under res://scripts for calls on the sound bank (sfx_bank.play, .stop,
-## .stop.bind, .play_blend, .stop_each) with a literal &"clip" or an SfxBank list constant.
+## .stop.bind, .play_blend, .stop_each) with a literal &"clip" or "clip", or an SfxBank list constant.
 func _check_clip_names(bank: SfxBank) -> void:
-	var pattern: RegEx = RegEx.create_from_string("\\b(\\w*(?:sfx|bank)\\w*)\\.(play_blend|stop_each|play|stop)(?:\\.bind)?\\(\\s*(?:&\"([^\"]+)\"|SfxBank\\.([A-Z_]+))")
+	var pattern: RegEx = RegEx.create_from_string("\\b(\\w*(?:sfx|bank)\\w*)\\.(play_blend|stop_each|play|stop)(?:\\.bind)?\\(\\s*(?:&?\"([^\"]+)\"|SfxBank\\.([A-Z_]+))")
 	var constants: Dictionary = (load("res://scripts/sfx_bank.gd") as Script).get_script_constant_map()
 	var found: int = 0
 	var unknown: Array[String] = []
