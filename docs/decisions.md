@@ -41,3 +41,14 @@ Release work requires a final privacy/data inventory, suitable pre-install licen
 ## Presentation decisions (October 2026)
 - The terminal look belongs only to the in-game Settings menu; the title screen and the public landing page keep their game presentation.
 - 2026-10-07: the public docs and landing site should mostly use Tailwind CSS (Tailwind 4 `@theme` tokens and utilities), keeping only a small custom CSS layer.
+
+## Play decisions (October 13, 2026)
+Nathanial's answers to the play research questions (docs/research-2026-10/how-it-should-play/NEEDS.md, Q1-Q19). Questions not listed here are still open.
+- **Q13 fuse:** the junction fuse lasts about 2.5 s with a tick sound, then is tuned down by play if it proves too easy.
+- **Q7 tank drop:** a graze counts as a hit, and the drop window widens to about 0.5 s.
+- **Q1 manual bypass:** the crank hold drops from 3.2 s to about 2 s, with a hold-toggle option for keyboard, controller and touch. The alarm and hiss still make the manual route cost time and nerve.
+- **Q16 sentry death card:** use the already-approved alternative, "The sentry caught %s short of the rubble." The rubble is drawn; the lane is not.
+- **Q2 opening:** the engineer is shown watching from the bay doorway as WOLF wakes. Design C's standby dock stays, and first control comes in 30-45 s. Any cut or rewritten lines are drafted for his approval first.
+- **Q4 station labels:** floating labels over machines are replaced by real mounted name plates plus a prompt when in range. The floating labels become an optional Settings switch.
+- **Q8 corridor door size:** the corridor's roller door is a freight/blast door and keeps its size (about 3 m).
+- **Q14 relay choice wording:** option 2 is reworded so it says plainly what the engineer does (for example "Skip the risk talk. Go now."). The exact line is drafted for his approval.
