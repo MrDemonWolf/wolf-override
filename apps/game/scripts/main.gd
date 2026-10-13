@@ -2941,6 +2941,7 @@ func _sync_scene() -> void:
 	bypass_was_holding = false
 	bypass_handle.ticks = 0
 	bypass_handle.done = state.route == "fallback"
+	bypass_handle.clear_fault(state.door_open, false)
 	# The lane's choices and WOLF's part in it belong to the attempt, not the save.
 	lane_choice = ""
 	wolf_baiting = false
@@ -3289,6 +3290,8 @@ func _refresh_ui() -> void:
 	relay_art.modulate = Color.WHITE if state.breaker_armed else Color("#879ba5")
 	relay_status_light.color = Color("#a4f0c4") if state.door_open else (Color("#f3ae4b") if state.breaker_armed and _relay_refused() else (Color("#8be3ff") if state.breaker_armed else Color("#536e7c")))
 	bypass_handle.live = state.breaker_armed and not state.door_open
+	# Once the seal's power has gone through, by WOLF or by the bypass, the relay is no longer faulted.
+	bypass_handle.clear_fault(state.door_open, true)
 	breaker_status_glow.modulate = Color(breaker_status_light.color, 0.75 if state.breaker_armed else 0.45)
 	relay_status_glow.modulate = Color(relay_status_light.color, 0.75 if state.breaker_armed else 0.3)
 	checkpoint_art.modulate = Color("#d5ffe3") if state.checkpoint_reached else Color.WHITE

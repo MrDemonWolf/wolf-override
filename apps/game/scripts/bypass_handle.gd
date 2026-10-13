@@ -7,7 +7,8 @@ extends Node2D
 ## can turn. Its hub sits WHEEL_OFFSET from the gameplay point (Main's BYPASS_WHEEL), under the hand
 ## of the engineer's crank pose. A row of crank lights along the bottom of its name plate, above the
 ## head of the engineer cranking it and clear of WOLF beside them, counts the held-USE ticks. It also carries the relay's
-## COOLANT FAULT tag and the coolant that hisses from the housing while the bypass is cranked. A plate
+## COOLANT FAULT tag, until WOLF takes the surge or the bypass locks over, and the coolant that hisses
+## from the housing while the bypass is cranked. A plate
 ## the edge of the view cuts fades out, as in the junction. Main owns the rules; this only shows them.
 
 ## Crank lights in the readout, one per held-USE tick.
@@ -52,6 +53,8 @@ const FAULT_TAG_TOP: float = 331.0
 const HISS_OFFSET: Vector2 = Vector2(-56.0, 1.0)
 ## The fault tag pulses with the alarm while the bypass vents.
 const PULSE_SECONDS: float = 1.1
+## How long the COOLANT FAULT tag takes to fade once the relay is dealt with.
+const FAULT_CLEAR_SECONDS: float = 0.35
 
 ## Ticks cranked so far (0..TICKS_NEEDED); each turns the wheel an eighth and lights a cell.
 var ticks: int = 0:
@@ -80,12 +83,16 @@ var venting: bool = false:
 			fault_tag.modulate = Color.WHITE
 			_pulse = 0.0
 var reduce_motion: bool = false
+## The relay is dealt with (WOLF took the surge, or the bypass locked over): the COOLANT FAULT tag is
+## gone (PUZ-7). Set through clear_fault.
+var fault_cleared: bool = false
 var wheel: Sprite2D
 var bypass_label: Label
 var fault_tag: Label
 var coolant_hiss: CPUParticles2D
 var readout: Node2D
 var _wheel_tween: Tween
+var _fault_tween: Tween
 var _pulse: float = 0.0
 
 
@@ -127,6 +134,28 @@ func place(wheel_centre: Vector2, relay_x: float) -> void:
 	bypass_label.position = Vector2(-bypass_label.size.x * 0.5 + LABEL_SHIFT_X, LABEL_TOP)
 	readout.queue_redraw()
 	fault_tag.position = Vector2(relay_x - wheel_centre.x - fault_tag.size.x * 0.5, FAULT_TAG_TOP - wheel_centre.y)
+
+
+## Shows the COOLANT FAULT tag while the relay is still faulted and takes it away once
+## [param cleared]; with [param animate] it fades over FAULT_CLEAR_SECONDS (the moment the seal's power
+## goes through), otherwise it goes at once (a reload). Its own self_modulate carries the fade, since
+## the alarm pulse and the view-edge fade drive its modulate.
+func clear_fault(cleared: bool, animate: bool) -> void:
+	if cleared == fault_cleared:
+		return
+	fault_cleared = cleared
+	if _fault_tween != null and _fault_tween.is_valid():
+		_fault_tween.kill()
+	if not cleared:
+		fault_tag.self_modulate.a = 1.0
+		fault_tag.show()
+	elif animate and is_inside_tree():
+		_fault_tween = create_tween()
+		_fault_tween.tween_property(fault_tag, "self_modulate:a", 0.0, FAULT_CLEAR_SECONDS)
+		_fault_tween.tween_callback(fault_tag.hide)
+	else:
+		fault_tag.self_modulate.a = 0.0
+		fault_tag.hide()
 
 
 func _process(delta: float) -> void:
