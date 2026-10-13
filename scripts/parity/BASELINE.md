@@ -204,6 +204,27 @@ higher and 2.7 px narrower than drawn), which then passed twice on its own. No f
 real-time fade and `sentry_test`'s leaked objects seen at `b98bc94`. Re-run a failing suite alone
 before blaming a step.
 
+## Re-baseline on 9c7371d (ship of S00)
+
+Taken on October 13, 2026, after PR #58 (the rebuilt corridor door end) changed `apps/game`. The
+later docs-only `c6fbb11` (PR #60) leaves `apps/game` byte-identical, so this baseline holds for it.
+Later steps compare against these folders, not the `baffea4` ones.
+
+- **Stills.** Scratch folder `parity/baseline-9c7371d/`, from a copy of `9c7371d`'s `apps/game`,
+  same driver (`capture.gd` `c1746c4c`): 16 runs, 848 stills (R1-R4 `kb-fx` at 960x540 and
+  1280x720, `kb-calm` and `touch-fx` at 960x540, and R2 `kb-fx` at 1280x720). The S00 branch,
+  captured into `parity/after-s00-9c7371d/`, compares `ALL IDENTICAL: 16 run folders, 848 stills`,
+  with every text and audio log the same. Frame counts are unchanged from `baffea4`: R1 1,480;
+  R2 3,160; R3 1,498; R4 2,339 (`kb-fx`), 2,333 (`kb-calm`), 2,337 (`touch-fx`). The 2340x1080
+  runs were not re-taken; take them from the step's starting commit when a step needs them.
+- **UI dump.** `parity/baseline-ui-9c7371d.txt`, 363 lines over 13 states; the S00 branch's dump
+  diffs empty against it.
+- **Perf "before".** `parity/perf-before-9c7371d/` (five runs of the copy), interleaved with five of
+  the branch (`parity/perf-after-ship00/`) in one session on a busy machine; table in
+  `parity/perf-table-9c7371d.md`. Final counts on both sides: 554 nodes, 3,455 objects,
+  120 resources, 129.24 MB static memory; the other figures moved within the noise floor above.
+- **Headless suites.** `bun run game:check` (isolated HOME): all 15 suites passed (109 s).
+
 ## S00a: maps refreshed on 9c7371d
 
 Figures from `python3 -I scripts/parity/surface.py` at `9c7371d` (the critique's maps were taken at
