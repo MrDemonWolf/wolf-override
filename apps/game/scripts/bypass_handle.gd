@@ -1,27 +1,31 @@
 class_name BypassHandle
 extends Node2D
-## The corridor's MANUAL BYPASS: a small wheel on its own bracket beside the coolant relay, piped into
-## the relay's housing. The wheel is the junction valve's own disc (the same cut JunctionRoom turns),
-## and a row of crank lights along the bottom of its name plate, above the head of the engineer
-## cranking it and clear of WOLF beside them, counts the held-USE ticks. It also carries the relay's
+## The corridor's MANUAL BYPASS: a 0.525 m handwheel on a worm gearbox, on a steel backplate anchored
+## to the corridor wall at the cross-wall's corner, with its hub at 1.0 m; an enclosed chain guard
+## runs straight up the wall in two clamp brackets to the door operator's manual input. The backplate,
+## gearbox and guard are painted into the corridor's mid plate; only the wheel is drawn here, so it
+## can turn. Its hub sits WHEEL_OFFSET from the gameplay point (Main's BYPASS_WHEEL), under the hand
+## of the engineer's crank pose. A row of crank lights along the bottom of its name plate, above the
+## head of the engineer cranking it and clear of WOLF beside them, counts the held-USE ticks. It also carries the relay's
 ## COOLANT FAULT tag and the coolant that hisses from the housing while the bypass is cranked. A plate
 ## the edge of the view cuts fades out, as in the junction. Main owns the rules; this only shows them.
 
 ## Crank lights in the readout, one per held-USE tick.
 const TICKS_NEEDED: int = 8
-const WHEEL_SCALE: float = 0.15
-## The dark collar the wheel turns on, just outside its rim.
+## The handwheel art: a region of the door end's atlas (4 source px per world px, centred on the
+## wheel's axis).
+const WHEEL_ART: Texture2D = preload("res://assets/props/corridor-seal-atlas.png")
+const WHEEL_REGION: Rect2 = Rect2(730.0, 619.0, 88.0, 88.0)
+const WHEEL_SCALE: float = 0.25
+## The wheel's hub from the gameplay point, on the wall gearbox at 1.0 m: the crank pose's glove
+## (the engineer at BYPASS_CRANK_X) lands on its rim at 8 o'clock.
+const WHEEL_OFFSET: Vector2 = Vector2(-6.0, 2.0)
+## How far either side of the wheel's centre the bypass mount reaches (WOLF rests clear of it).
 const COLLAR_RADIUS: float = 17.5
 ## The crank readout along the bottom of the name plate: one cell per tick, in a strip this tall.
 const READOUT_HEIGHT: float = 12.0
 const CELL_SIZE: Vector2 = Vector2(5.0, 6.0)
 const CELL_GAP: float = 1.5
-## The bracket: a pipe from the relay's side pipe into the wheel's hub, and a post down to the floor.
-const PIPE_FROM_X: float = -58.0
-const POST_BOTTOM: float = 35.0
-const STEEL_DARK: Color = Color("#1b2630")
-const STEEL: Color = Color("#4a6572")
-const STEEL_LIGHT: Color = Color("#6b7e86")
 const LAMP_OFF: Color = Color("#24333c")
 const AMBER: Color = Color("#f3ae4b")
 const GREEN: Color = Color("#a4f0c4")
@@ -29,14 +33,23 @@ const LABEL_TEXT: Color = Color(0.69, 0.82, 0.87, 1)
 const FAULT_TEXT: Color = Color("#ffb36b")
 const FAULT_EDGE: Color = Color(0.78, 0.33, 0.2, 0.8)
 const LABEL_FONT_SIZE: int = 13
-## The MANUAL BYPASS plate, wrapped to two rows so it fits between the relay and the seal: its width
-## and its top edge above the wheel's centre, high enough to clear the head of an engineer cranking it.
+## The MANUAL BYPASS plate, wrapped to two rows: its width, its top edge above the gameplay point and
+## its sideways shift. It stands over the wheel's hub: its right edge stops just left of the chain
+## guard rising to the door operator, and its bottom just above the corridor's label line (y 313, the
+## COOLANT RELAY name), which with the COOLANT FAULT tag under it and the head of the engineer cranking
+## it is why it cannot sit lower.
 const LABEL_WIDTH: float = 64.0
-const LABEL_TOP: float = -87.0
+const LABEL_TOP: float = -136.0
+const LABEL_SHIFT_X: float = -32.5
+## A leader from the plate's bottom edge straight down to the top of the wheel's backplate, at the
+## hub's x, so the plate and its crank lights read as the wheel's (relative to the gameplay point).
+const LEADER_X: float = -6.0
+const LEADER_END_Y: float = -14.0
+const LEADER_WIDTH: float = 1.0
 ## The COOLANT FAULT tag sits under the COOLANT RELAY name, centred on the relay.
 const FAULT_TAG_TOP: float = 331.0
 ## Where the coolant leaks from the relay's housing, from the wheel's centre.
-const HISS_OFFSET: Vector2 = Vector2(-56.0, -6.0)
+const HISS_OFFSET: Vector2 = Vector2(-56.0, 1.0)
 ## The fault tag pulses with the alarm while the bypass vents.
 const PULSE_SECONDS: float = 1.1
 
@@ -80,18 +93,12 @@ func _init() -> void:
 	name = "BypassHandle"
 	wheel = Sprite2D.new()
 	wheel.name = "Wheel"
-	wheel.texture = JunctionRoom.VALVE_PROP
-	wheel.texture_filter = CanvasItem.TEXTURE_FILTER_LINEAR_WITH_MIPMAPS
+	wheel.texture = WHEEL_ART
 	wheel.region_enabled = true
-	wheel.region_rect = Rect2(JunctionRoom.VALVE_WHEEL_CENTRE - Vector2.ONE * JunctionRoom.VALVE_WHEEL_RADIUS, Vector2.ONE * JunctionRoom.VALVE_WHEEL_RADIUS * 2.0)
+	wheel.region_rect = WHEEL_REGION
+	wheel.texture_filter = CanvasItem.TEXTURE_FILTER_LINEAR_WITH_MIPMAPS
 	wheel.scale = Vector2.ONE * WHEEL_SCALE
-	var mask: Shader = Shader.new()
-	mask.code = JunctionRoom.WHEEL_MASK
-	var wheel_material: ShaderMaterial = ShaderMaterial.new()
-	wheel_material.shader = mask
-	wheel_material.set_shader_parameter("centre", JunctionRoom.VALVE_WHEEL_CENTRE / JunctionRoom.VALVE_PROP.get_size())
-	wheel_material.set_shader_parameter("radius", JunctionRoom.VALVE_WHEEL_RADIUS / JunctionRoom.VALVE_PROP.get_size().x)
-	wheel.material = wheel_material
+	wheel.position = WHEEL_OFFSET
 	add_child(wheel)
 	bypass_label = _plate("BypassLabel", "MANUAL BYPASS", LABEL_TEXT, Color(0.29, 0.4, 0.45, 0.55), LABEL_WIDTH, READOUT_HEIGHT)
 	readout = Node2D.new()
@@ -117,7 +124,8 @@ func _init() -> void:
 ## [param relay_x].
 func place(wheel_centre: Vector2, relay_x: float) -> void:
 	position = wheel_centre
-	bypass_label.position = Vector2(-bypass_label.size.x * 0.5, LABEL_TOP)
+	bypass_label.position = Vector2(-bypass_label.size.x * 0.5 + LABEL_SHIFT_X, LABEL_TOP)
+	readout.queue_redraw()
 	fault_tag.position = Vector2(relay_x - wheel_centre.x - fault_tag.size.x * 0.5, FAULT_TAG_TOP - wheel_centre.y)
 
 
@@ -172,24 +180,15 @@ func _turn_wheel() -> void:
 	_wheel_tween.tween_property(wheel, "rotation_degrees", target, 0.18).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
 
 
-func _draw() -> void:
-	# The pipe from the relay's housing into the hub, with a flange at each end.
-	draw_rect(Rect2(PIPE_FROM_X, -4.0, -PIPE_FROM_X, 8.0), STEEL_DARK)
-	draw_line(Vector2(PIPE_FROM_X, -3.0), Vector2(0.0, -3.0), STEEL_LIGHT, 1.0)
-	for flange_x: float in [PIPE_FROM_X, -16.0]:
-		draw_rect(Rect2(flange_x, -6.5, 4.0, 13.0), STEEL)
-	# The post to the floor and its foot plate.
-	draw_rect(Rect2(-4.0, 8.0, 8.0, POST_BOTTOM - 8.0), STEEL_DARK)
-	draw_line(Vector2(-3.0, 8.0), Vector2(-3.0, POST_BOTTOM - 3.0), STEEL_LIGHT, 1.0)
-	draw_rect(Rect2(-13.0, POST_BOTTOM - 4.0, 26.0, 4.0), STEEL)
-	# The dark collar the wheel turns on.
-	draw_circle(Vector2.ZERO, COLLAR_RADIUS, STEEL_DARK)
-	draw_arc(Vector2.ZERO, COLLAR_RADIUS, 0.0, TAU, 40, STEEL, 1.5)
-
-
 ## The crank readout, drawn in the plate's foot: dark until the breaker is on, then one cell lights
 ## amber per tick, and all go green once the bypass has opened the seal.
 func _draw_readout() -> void:
+	# The leader, in the plate's edge colour, from its bottom edge down to the wheel's backplate.
+	var leader_x: float = LEADER_X - bypass_label.position.x
+	var leader_top: float = bypass_label.size.y
+	var leader_bottom: float = LEADER_END_Y - bypass_label.position.y
+	if leader_bottom > leader_top:
+		readout.draw_rect(Rect2(leader_x - LEADER_WIDTH * 0.5, leader_top, LEADER_WIDTH, leader_bottom - leader_top), Color(0.29, 0.4, 0.45, 0.55))
 	var row: float = CELL_SIZE.x * TICKS_NEEDED + CELL_GAP * (TICKS_NEEDED - 1)
 	var first: Vector2 = Vector2((bypass_label.size.x - row) * 0.5, bypass_label.size.y - READOUT_HEIGHT * 0.5 - CELL_SIZE.y * 0.5 - 1.0)
 	for index: int in TICKS_NEEDED:

@@ -73,7 +73,15 @@ func _run() -> void:
 		var prop: Sprite2D = floor_props[prop_name]
 		_expect(is_equal_approx(snappedf(_bottom(prop), 0.5), 440.0), "the %s's base is on the floor (y 440, got %.2f)" % [prop_name, _bottom(prop)])
 	var door: Sprite2D = game.get_node("Door/Visual/DoorArt") as Sprite2D
-	_expect(absf(door.get_global_transform().origin.y + door.region_rect.size.y * door.scale.y * 0.5 - 440.0) < 0.5, "the corridor seal stands on the floor")
+	# The corridor's curtain stands across the corridor in the cross-wall's turned face: it crosses the
+	# walk line (y 440) at the collision face, and its art ends at its near-jamb corner, in front of it.
+	_expect(absf(door.get_global_transform().origin.y + door.region_rect.size.y * door.scale.y * 0.5 - float(game.get("CORRIDOR_SEAL_FOOT_Y"))) < 0.5, "the corridor seal's curtain ends at its near-jamb foot")
+	var foot_a: Vector3 = SealLeaf.COLUMNS[4]
+	var foot_b: Vector3 = SealLeaf.COLUMNS[5]
+	var crossing_x: float = foot_a.x + (foot_b.x - foot_a.x) * (440.0 - foot_a.y) / (foot_b.y - foot_a.y)
+	# The curtain hangs 70 mm in front of the wall's face, so it meets the walk line 3 px before the
+	# collision face: the engineer stopped there stands against it.
+	_expect(absf(crossing_x - 752.0) < 3.5, "the corridor seal's curtain meets the walk line at the collision face (x %.1f)" % crossing_x)
 	_expect(absf(junction.door_art.get_global_transform().origin.y + junction.door_art.region_rect.size.y * junction.door_art.scale.y * 0.5 - 440.0) < 0.5, "the junction door stands on the floor")
 	var vent: Rect2 = _global_rect(junction.vent_art)
 	_expect(absf(vent.position.x - PressureLine.VENT_GRATE_MIN_X) < 0.01 and absf(vent.end.x - PressureLine.VENT_GRATE_MAX_X) < 0.01, "the relief vent art spans exactly the grate's hurtbox (%s)" % vent)
@@ -117,8 +125,13 @@ func _check_coverage(label: String, depth: RoomDepth, view: Rect2) -> void:
 	var bottom: Rect2 = _global_rect(depth.mid_layer.get_node("BottomBleed") as Sprite2D)
 	_expect(bottom.position.x <= view.position.x and bottom.end.x >= view.end.x and bottom.end.y >= view.end.y and is_equal_approx(bottom.position.y, mid_span.end.y), "%s: the mid plate's bottom bleed spans the view's width and reaches its bottom (%s vs %s)" % [label, bottom, view])
 	var left: Rect2 = _global_rect(depth.near_layer.get_node("LeftEdge") as Sprite2D)
-	var right: Rect2 = _global_rect(depth.near_layer.get_node("RightEdge") as Sprite2D)
-	_expect(left.position.x < view.position.x and right.end.x > view.end.x, "%s: the near strips' outer edges are off screen" % label)
+	_expect(left.position.x < view.position.x, "%s: the left near strip's outer edge is off screen" % label)
+	# A room may leave its mirrored right strip out (the corridor, whose right end opens into the
+	# machinery room past the seal); where it has one, its outer edge is off screen too.
+	var right_edge: Sprite2D = depth.near_layer.get_node_or_null("RightEdge") as Sprite2D
+	_expect((right_edge == null) == (not depth.near_right_edge), "%s: the right near strip is there only if the room asks for it" % label)
+	if right_edge != null:
+		_expect(_global_rect(right_edge).end.x > view.end.x, "%s: the right near strip's outer edge is off screen" % label)
 
 
 ## The engineer, WOLF and the Director use art downscaled from the masters in art-source/characters,

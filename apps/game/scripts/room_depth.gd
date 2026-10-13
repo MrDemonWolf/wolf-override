@@ -40,6 +40,8 @@ const MID_BLEED: float = 16.0
 const FAR_DUST_COUNT: int = 30
 const NEAR_DUST_COUNT: int = 12
 const GLOW_SIZE: Vector2 = Vector2(250.0, 96.0)
+## Columns of the faded haze texture (see haze_fade): about one per far-plate pixel.
+const HAZE_FADE_COLUMNS: int = 512
 const SHAFT_SIZE: Vector2 = Vector2(54.0, 240.0)
 const LAMP_ALPHA: float = 0.5
 ## Each lamp waits a random FLICKER_WAIT_MIN..FLICKER_WAIT_MAX seconds between flickers, so the
@@ -107,6 +109,22 @@ const PILLAR_FADE_ALPHA: float = 0.5
 ## Lockdown beacons as fractions of the far plate: a small drawn lamp housing with a pulsing glow.
 @export var warning_lamps: PackedVector2Array = PackedVector2Array()
 @export var warning_color: Color = Color("#ff4a46")
+## Ambient dust drifting in the room. Off where the room's light is painted into its plates and
+## nothing in the air needs to move (the corridor since the door end was rebuilt).
+@export var ambient_dust: bool = true
+## How far across the far plate (a fraction of its width) the wall haze band reaches at full
+## strength, and over how much more of it (haze_fade) it then fades out to nothing. The corridor
+## keeps it untouched over everything the opening frames and fades it out over the door end's first
+## bay, where the painted light takes over, so no straight edge shows on the floor. The fade is part
+## of the haze's own texture (one sprite, one draw call).
+@export var haze_end: float = 1.0
+@export var haze_fade: float = 0.0
+## Whether the near strip is mirrored on the room's right edge too. The corridor's right edge now
+## opens into the machinery room past the seal, so its mirrored pipe column is not drawn there.
+@export var near_right_edge: bool = true
+## Lamps (by index into [member lamps]) whose light is painted into the plate: their glow and shaft
+## stay hidden. They keep their place in the flicker sequence, so the other lamps flicker as before.
+@export var painted_lamps: PackedInt32Array = PackedInt32Array()
 
 var effects_enabled: bool = true:
 	set(value):
@@ -241,6 +259,8 @@ func rebuild() -> void:
 	haze.centered = false
 	haze.z_index = 1
 	haze.texture = _linear_texture([0.0, 0.62, 1.0], [Color(0.37, 0.54, 0.65, 0.0), Color(0.37, 0.54, 0.65, 0.14), Color(0.37, 0.54, 0.65, 0.0)])
+	if haze_fade > 0.0:
+		haze.texture = _faded_haze(haze.texture as GradientTexture2D, haze_end, haze_fade)
 	backdrop_layer.add_child(haze)
 	var additive: CanvasItemMaterial = CanvasItemMaterial.new()
 	additive.blend_mode = CanvasItemMaterial.BLEND_MODE_ADD
@@ -293,7 +313,8 @@ func rebuild() -> void:
 	if near_painting != null:
 		var strip: Rect2 = Rect2(0.0, 0.0, minf(near_strip_width, near_painting.get_width()), near_painting.get_height())
 		near_layer.add_child(_plate("LeftEdge", near_painting, strip))
-		near_layer.add_child(_plate("RightEdge", near_painting, strip, true))
+		if near_right_edge:
+			near_layer.add_child(_plate("RightEdge", near_painting, strip, true))
 	near_dust = _make_dust("NearDust", NEAR_DUST_COUNT, 0.35, 0.65, Z_NEAR)
 	_apply()
 
@@ -308,7 +329,7 @@ func _apply() -> void:
 	backdrop.scale = Vector2.ONE * scale_factor
 	haze.visible = on
 	haze.position = Vector2(far.position.x, far.position.y + far.size.y * 0.29)
-	haze.scale = Vector2(far.size.x, far.size.y * 0.56) / haze.texture.get_size()
+	haze.scale = Vector2(far.size.x * (haze_end + haze_fade), far.size.y * 0.56) / haze.texture.get_size()
 	for index: int in lamps.size():
 		var glow: Sprite2D = backdrop_layer.get_node("LampGlow%d" % index) as Sprite2D
 		glow.position = far.position + lamps[index] * far.size
@@ -321,6 +342,11 @@ func _apply() -> void:
 		(backdrop_layer.get_node("WarningGlow%d" % index) as Sprite2D).position = at
 	for glow: Sprite2D in lamp_glows:
 		glow.visible = on
+	for index: int in painted_lamps:
+		(backdrop_layer.get_node("LampGlow%d" % index) as Sprite2D).visible = false
+		var painted_shaft: Sprite2D = backdrop_layer.get_node_or_null("LightShaft%d" % index) as Sprite2D
+		if painted_shaft != null:
+			painted_shaft.visible = false
 	var mid: Sprite2D = mid_layer.get_node("Painting") as Sprite2D
 	mid.position = Vector2(0.0, mid_top)
 	mid.scale = Vector2.ONE * scale_factor
@@ -337,13 +363,14 @@ func _apply() -> void:
 	near_layer.visible = on
 	var left_edge: Sprite2D = near_layer.get_node_or_null("LeftEdge") as Sprite2D
 	if left_edge != null:
-		var right_edge: Sprite2D = near_layer.get_node("RightEdge") as Sprite2D
 		left_edge.scale = Vector2.ONE * scale_factor
 		left_edge.position = Vector2(-near_overhang, mid_top)
-		right_edge.scale = left_edge.scale
+	var right_edge: Sprite2D = near_layer.get_node_or_null("RightEdge") as Sprite2D
+	if right_edge != null:
+		right_edge.scale = Vector2.ONE * scale_factor
 		right_edge.position = Vector2(ROOM_WIDTH + near_overhang - right_edge.region_rect.size.x * scale_factor, mid_top)
 	for dust: CPUParticles2D in [far_dust, near_dust]:
-		dust.visible = on
+		dust.visible = on and ambient_dust
 	_sync_motion()
 	queue_redraw()
 
@@ -353,13 +380,34 @@ func is_animating() -> bool:
 	return _motion_running
 
 
+## The haze band with its fade-out baked in: every column of the band's own gradient image (so its
+## vertical profile is the same, byte for byte, as the plain band's), full strength up to [param end]
+## and fading linearly to nothing over the next [param fade] (both fractions of the far plate's
+## width), at HAZE_FADE_COLUMNS columns over the whole band.
+static func _faded_haze(band: GradientTexture2D, end: float, fade: float) -> ImageTexture:
+	var column: Image = band.get_image()
+	var height: int = column.get_height()
+	var image: Image = Image.create_empty(HAZE_FADE_COLUMNS, height, false, column.get_format())
+	for x: int in HAZE_FADE_COLUMNS:
+		# Three columns' grace, so no column the linear filter blends into the full-strength band is
+		# dimmed (the fade starts about 4 far-plate pixels past [param end]).
+		var at: float = (float(x) - 2.5) / float(HAZE_FADE_COLUMNS) * (end + fade)
+		var strength: float = clampf(1.0 - (at - end) / fade, 0.0, 1.0)
+		for y: int in height:
+			var texel: Color = column.get_pixel(0, y)
+			if strength < 1.0:
+				texel.a *= strength
+			image.set_pixel(x, y, texel)
+	return ImageTexture.create_from_image(image)
+
+
 ## Starts the dust and the lamp, shaft and beacon tweens while the room is on screen with effects
 ## on, and stops them otherwise. A hidden room's dust stops simulating at once and refills the room
 ## (its preprocess) when it shows again.
 func _sync_motion() -> void:
 	var run: bool = effects_enabled and is_visible_in_tree()
 	for dust: CPUParticles2D in [far_dust, near_dust]:
-		if run:
+		if run and ambient_dust:
 			dust.process_mode = Node.PROCESS_MODE_INHERIT
 			if not dust.emitting:
 				dust.restart()

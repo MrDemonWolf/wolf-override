@@ -1,9 +1,14 @@
 #!/usr/bin/env python3
 """Rebuild the game's import copies of the approved design A bulkhead art.
 
-For each door family the states and the front lip are registered onto one canvas whose bottom row
-is the floor, the black matte fringe is removed (alpha decontamination), and the result is
+For each door family the states (and, for the junction, the front lip) are registered onto one
+canvas whose bottom row is the floor, the black matte fringe is removed (alpha decontamination), and the result is
 downscaled by half in premultiplied alpha. The originals are not modified.
+
+The corridor family keeps only its open image: since 2026-10-12 the corridor's door end is the
+rolling steel door (corridor-seal-atlas.png), and the open bulkhead's doorway is still the passage
+in the Service Junction's exit hatch. The corridor's sealed and front-lip images and their
+originals were deleted then (they are in the Git history); the open image never depended on them.
 
 Usage (needs NumPy and Pillow; the committed copies were made with NumPy 2.5 and Pillow 12.3, and
 these versions reproduce them byte for byte):
@@ -40,9 +45,7 @@ FAMILIES = {
 	"corridor": {
 		"height": 1296,
 		"images": {
-			"sealed": ("corridor-sealed.png", (0, 0)),
 			"open": ("corridor-open.png", (1, 15)),
-			"front-lip": ("corridor-front-lip.png", (99, 44)),
 		},
 	},
 }
@@ -120,13 +123,6 @@ for family, spec in FAMILIES.items():
 	for state, (name, offset) in spec["images"].items():
 		raw = np.asarray(Image.open(SRC / name).convert("RGBA"))
 		placed[state] = place(defringe(raw), offset, spec["height"])
-	if family == "corridor":
-		# The sealed image's base is cut off by its canvas; the open image (same frame, registered
-		# 15 px lower) supplies the rows below that cut so both stand on the same floor row.
-		sealed = placed["sealed"]
-		cut = 1280
-		fill = placed["open"][cut:]
-		sealed[cut:] = np.where(sealed[cut:, :, 3:4] > 0, sealed[cut:], fill)
 	for state, arr in placed.items():
 		out = OUT / f"{family}-bulkhead-{state}.png"
 		downscale(arr).save(out, optimize=True)

@@ -721,8 +721,8 @@ static func _draws_box(item: CanvasItem) -> bool:
 
 
 ## True for a node that draws by itself: its script has a _draw (the sentry's beam, the hatch
-## doorway, the bypass pipe, the room lights and beacons), something draws into it on its draw
-## signal, or it declares what it draws (debug_draw_rect).
+## doorway, the room lights and beacons), something draws into it on its draw signal (the bypass's
+## crank lights and leader), or it declares what it draws (debug_draw_rect).
 func _custom_draw(item: CanvasItem) -> bool:
 	if item is Control:
 		return false

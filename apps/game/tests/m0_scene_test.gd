@@ -170,6 +170,13 @@ func _run() -> void:
 	_expect(speaker.text == "WOLF" and story.text.contains("COOLANT FAULT") and not story.text.contains("\n1  "), "dialogue identifies WOLF, points at the relay's fault tag and keeps response text out of the question")
 	var bypass_handle: BypassHandle = game.get("bypass_handle") as BypassHandle
 	_expect(bypass_handle.visible and bypass_handle.fault_tag.text == "COOLANT FAULT" and bypass_handle.bypass_label.text == "MANUAL BYPASS", "the relay wears a COOLANT FAULT tag and the bypass its own name plate")
+	var bypass_plate: Rect2 = Rect2(bypass_handle.global_position + bypass_handle.bypass_label.position, bypass_handle.bypass_label.size)
+	var fault_plate: Rect2 = Rect2(bypass_handle.global_position + bypass_handle.fault_tag.position, bypass_handle.fault_tag.size)
+	var hub: Vector2 = bypass_handle.global_position + BypassHandle.WHEEL_OFFSET
+	var relay_name: Rect2 = (game.get_node("RelayLabel") as Label).get_global_rect()
+	_expect(not bypass_plate.intersects(relay_name), "the MANUAL BYPASS plate stays clear of the COOLANT RELAY name (plate %s, name %s)" % [bypass_plate, relay_name])
+	_expect(not bypass_plate.intersects(fault_plate) and bypass_plate.end.x <= 702.0 and bypass_plate.position.x <= hub.x and bypass_plate.end.x >= hub.x and bypass_plate.end.y < hub.y - 50.0, "the MANUAL BYPASS plate stands over its wheel's hub, clear of the COOLANT FAULT tag and left of the chain guard (x 702)")
+	_expect(bypass_handle.global_position.y + BypassHandle.LEADER_END_Y > bypass_plate.end.y and absf(bypass_handle.global_position.x + BypassHandle.LEADER_X - hub.x) < 0.01, "a leader runs from the plate straight down to the wheel's backplate")
 	_expect(not context_hint.visible and choice_1_button.visible and choice_2_button.visible, "disagreement offers visible choices without a competing interaction hint")
 	_expect(choice_1_button.text.contains(State.CHOICE_TEXT[State.DISCLOSE]) and choice_2_button.text.contains(State.CHOICE_TEXT[State.PRESS]), "choice buttons show the complete response text")
 	_expect(choice_1_button.size.y == 40.0 and choice_2_button.size.y == 40.0 and choice_1_button.text.begins_with("1  "), "keyboard choices use compact cards with number prompts")
@@ -231,7 +238,61 @@ func _run() -> void:
 	_expect(not door_visual.visible and not seal_leaf.visible and door_shape.disabled, "door retracts after cooperation and the doorway opens once it lands")
 	_expect(str(game.call("_context_hint")).contains("Move to the safe point") and wolf.follow_target == human, "once the seal has landed the hint says it is open and WOLF lets go of the contact")
 	_expect((game.get("door_open_art") as Sprite2D).visible and (game.get("door_lip") as Sprite2D).visible and (game.get("door_lip") as Sprite2D).z_index > human.z_index, "the bulkhead stands open behind the engineer, its front pillar drawn over him")
-	_expect((game.get("corridor_depth") as RoomDepth).pillars.has(game.get("door_lip")), "the corridor's front pillar fades back while it covers the engineer or WOLF")
+	# The corridor's near column is solid (it never fades and nothing is drawn over it), and slim:
+	# its art ends left of where the engineer can use the safe point.
+	var column: Sprite2D = game.get("door_lip") as Sprite2D
+	_expect(not (game.get("corridor_depth") as RoomDepth).pillars.has(column) and column.modulate.a == 1.0, "the corridor's near column stays opaque")
+	# Its art has no see-through gap: on every row over the guide's height above its foot (where the
+	# chamfer meets the stub and its contact shadow), from its first fully
+	# opaque pixel to its last, every pixel is fully opaque, but for the live lamp's glass.
+	var column_art: Image = column.texture.get_image()
+	if column_art.is_compressed():
+		column_art.decompress()
+	var gaps: int = 0
+	var lamp: Vector2 = (game.get_script() as Script).get_script_constant_map()["CORRIDOR_SEAL_LAMP"]
+	for row: int in range(int((330.0 - 150.0) / column.scale.y), int((446.0 - 150.0) / column.scale.y)):
+		var world_y: float = column.get_global_transform().origin.y + row * column.scale.y
+		var opaque: Array[int] = []
+		for x: int in int(column.region_rect.size.x):
+			if column_art.get_pixel(int(column.region_rect.position.x) + x, int(column.region_rect.position.y) + row).a >= 0.999:
+				opaque.append(x)
+		if opaque.is_empty():
+			continue
+		for x: int in range(opaque[0], opaque[-1] + 1):
+			var world_x: float = column.get_global_transform().origin.x + x * column.scale.x
+			if absf(world_x - lamp.x) <= 3.5 and absf(world_y - lamp.y) <= 3.5:
+				continue
+			if column_art.get_pixel(int(column.region_rect.position.x) + x, int(column.region_rect.position.y) + row).a < 0.999:
+				gaps += 1
+	_expect(gaps == 0, "the near column's art has no see-through gap between the guide and the column (%d px)" % gaps)
+	# The status lamp's conduit has a real top end: up the end face from the lamp box, through a
+	# 90-degree elbow, across the face at 4.41 m and round the arris into the camera's wall plate,
+	# whose edge is at world x 795.3. Every sample on that path is lit steel, brighter than the bare
+	# concrete beside it (on the arris strips, x < 796, only the steel's own value: the strips are as
+	# light), and the run carries on to the plate's edge without a break.
+	var conduit_path: Array[Vector2] = []
+	var beside: Array[Vector2] = []
+	for i: int in 9:
+		conduit_path.append(Vector2(806.0, 290.0 - i * 2.0))
+		beside.append(Vector2(-2.5, 0.0))
+	for p: Vector2 in [Vector2(806.0, 272.5), Vector2(805.5, 271.5), Vector2(805.0, 270.5), Vector2(804.5, 270.0)]:
+		conduit_path.append(p)
+		beside.append(Vector2(-2.0, 1.5))
+	for i: int in 18:
+		conduit_path.append(Vector2(803.5 - i * 0.5, 269.5))
+		beside.append(Vector2(0.0, -2.0))
+	var conduit_breaks: Array[String] = []
+	var origin: Vector2 = column.get_global_transform().origin
+	for i: int in conduit_path.size():
+		var at: Vector2 = conduit_path[i]
+		var here: Color = column_art.get_pixelv(Vector2i(column.region_rect.position + ((at - origin) / column.scale).floor()))
+		var side: Color = column_art.get_pixelv(Vector2i(column.region_rect.position + ((at + beside[i] - origin) / column.scale).floor()))
+		if here.a < 0.999 or here.get_luminance() < 0.12 or (at.x >= 796.0 and here.get_luminance() < side.get_luminance() + 0.02):
+			conduit_breaks.append("%s (%.3f beside %.3f)" % [at, here.get_luminance(), side.get_luminance()])
+	_expect(conduit_breaks.is_empty() and conduit_path[-1].x <= 795.3 + 0.5, "the lamp conduit runs unbroken from the lamp box through its elbow into the camera's wall plate (breaks: %s)" % [conduit_breaks])
+	var column_right: float = column.get_global_transform().origin.x + column.region_rect.size.x * column.scale.x
+	# The safe point answers from x 824 (its station at 876, reach 52): the column ends before that.
+	_expect(column_right <= 876.0 - 52.0, "the near column ends clear of where the safe point is used (right edge %.1f)" % column_right)
 	_expect(not relay_spark.visible and wolf.body_sprite.position == Vector2(0.0, -15.0), "contact reaction settles after the seal opens")
 	if not _require(await _walk_to(human, 605.0), "the engineer can walk back to the open relay"):
 		return
@@ -319,10 +380,13 @@ func _run() -> void:
 	_expect(not state.door_open and game.get("bypass_venting") and bypass_handle.venting and bypass_handle.coolant_hiss.emitting and str(game.get("status_line")) == "The bypass handle is stiff. Coolant hisses from the relay housing and an alarm starts to wail.", "touching the live bypass starts the coolant hiss and the alarm without opening anything")
 	var main_constants: Dictionary = (game.get_script() as Script).get_script_constant_map()
 	var crank_x: float = main_constants["BYPASS_CRANK_X"]
-	var wheel_x: float = (main_constants["BYPASS_WHEEL"] as Vector2).x
+	# The drawn wheel's hub (the gameplay point plus the art's offset, under the crank pose's hand).
+	var wheel_x: float = (main_constants["BYPASS_WHEEL"] as Vector2).x + BypassHandle.WHEEL_OFFSET.x
 	var wolf_clear_x: float = main_constants["WOLF_BYPASS_CLEAR_X"]
 	_expect(await _wait_until(func() -> bool: return float(game.get("engineer_step_x")) < 0.0, 30) and absf(human.position.x - crank_x) <= 2.0 and not human.body_sprite.flip_h and human.controlled, "the engineer steps to the crank spot beside the wheel, faces it and has control back")
-	_expect(human.position.x + M0Actor.HUMAN_REACH <= wheel_x - 6.0, "cranking, the engineer covers no more than the wheel's rim")
+	# The 0.525 m wheel (10.5 px radius) puts its rim under the crank pose's hand: the engineer's reach
+	# may lie over the rim and spokes, never over the hub (2.7 px radius).
+	_expect(human.position.x + M0Actor.HUMAN_REACH <= wheel_x - 3.0, "cranking, the engineer's hand is on the wheel's rim and leaves its hub clear (%.1f vs hub %.1f)" % [human.position.x + M0Actor.HUMAN_REACH, wheel_x])
 	_expect(wolf.autonomous_target_x == wolf_clear_x, "after his refusal WOLF stands off the live relay while the engineer works the bypass")
 	var crank_start: int = Time.get_ticks_msec()
 	Input.action_press(&"interact")
@@ -400,7 +464,9 @@ func _run() -> void:
 	var bypass: BypassHandle = game.get("bypass_handle") as BypassHandle
 	_expect(int(game.get("bypass_ticks")) == 0 and bypass.ticks == 0 and not bypass.done, "a new run starts with the bypass uncranked")
 	await process_frame
-	_expect(bypass.bypass_label.modulate.a < 1.0, "where the opening view cuts the MANUAL BYPASS plate, the plate fades out instead of showing half its name")
+	var start_view: Rect2 = game.get_viewport().get_canvas_transform().affine_inverse() * game.get_viewport().get_visible_rect()
+	var plate_rect: Rect2 = bypass.bypass_label.get_global_rect()
+	_expect(is_equal_approx(bypass.bypass_label.modulate.a, JunctionRoom.edge_alpha(plate_rect, start_view)) and (plate_rect.end.x <= start_view.end.x or bypass.bypass_label.modulate.a < 1.0), "where the opening view cuts the MANUAL BYPASS plate, the plate fades out instead of showing half its name")
 	_expect(top_card.visible and hud.text.contains("MAINTENANCE ENGINEER"), "every new run opens on the name card")
 	await _tap(&"interact")
 	await process_frame
