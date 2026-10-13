@@ -15,6 +15,7 @@ Most of the research cites its sources next to the claims they back. Start there
 | [`reviews/README.md`](reviews/README.md) | The full review and the 2.5D presentation research (131 sources) |
 | [`art-audit/README.md`](art-audit/README.md) | Godot and Android texture docs, rendering talks and papers (23 sources) |
 | [`../sources/sound-picks/README.md`](../sources/sound-picks/README.md) and [`../sources/sound-picks/LICENCES.md`](../sources/sound-picks/LICENCES.md) | The CC0 recordings used in the game, their authors and licences, and the papers the sound code follows |
+| [`../sources/corridor-door-end-2026-10-12/README.md`](../sources/corridor-door-end-2026-10-12/README.md), section "Credits: outside sources" | The corridor's door end: real rolling-door, enclosure, cable-tray, lighting, drain and signage hardware and standards; what makes an image read as AI-made; how shipped games look real; rendering on phones and in Godot (about 90 sources, summary-only pages marked) |
 
 ## Pages downloaded during the sessions
 

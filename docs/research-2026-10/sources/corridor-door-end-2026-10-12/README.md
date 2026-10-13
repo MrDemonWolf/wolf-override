@@ -64,7 +64,7 @@ The full record (every output including Codex's own discarded first tries, and w
 
 ## Review history
 
-`review/REVIEW-round1.md` to `REVIEW-round6.md` are the independent reviews, kept as written; `SLICE.md` is the final round's report with the earlier rounds' reports below it. Every review looked at rendered stills from `tools/render/render.sh`; nothing was played by hand, so none of them makes a claim about how the game feels.
+`review/REVIEW-round1.md` to `REVIEW-round6.md` are the independent reviews, kept as written; `SLICE.md` is the last build report (fix round 5, which review round 6 passed) with the round-4 report kept below it. Every review looked at rendered stills from `tools/render/render.sh`; nothing was played by hand, so none of them makes a claim about how the game feels.
 
 **Round 1 (fix needed).** The doorway was a real hole onto a painted machinery room and the door was built like a real rolling door, but eight problems remained: the door did not read as blocking the way (a door in a back-wall pier), a purple key-colour fringe outlined the bulkhead, a hard seam ran down the floor, the new wall light stopped dead at a column, contact shadows were weaker than main's, the floor-stand bypass did not read and the crank pose did not touch it, the catwalk was drawn through the tank, and the pier was an airbrush-smooth slab with no light source.
 
