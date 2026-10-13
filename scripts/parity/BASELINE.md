@@ -225,6 +225,34 @@ Later steps compare against these folders, not the `baffea4` ones.
   120 resources, 129.24 MB static memory; the other figures moved within the noise floor above.
 - **Headless suites.** `bun run game:check` (isolated HOME): all 15 suites passed (109 s).
 
+## Re-baseline on 4bb15b0 and cec75f6 (ship of S01)
+
+Taken on October 13, 2026. S01 was first proven against `db9df1d` (its `apps/game` is
+byte-identical to `9c7371d`'s). PR #63 (the press sounds and the COOLANT FAULT tag) then changed
+`main.gd`, `bypass_handle.gd`, `sfx_bank.gd` and the audio calls, so S01 was rebased onto `4bb15b0`
+and proven again against a full baseline from it (`parity/baseline-4bb15b0/`, all 36 runs
+identical). While that ran, PR #65 (the 2 s bypass, the longer fuse, TOGGLE HOLDS and the tank
+window) changed `main.gd`, `game_settings.gd`, `bypass_handle.gd` and the junction scripts, so S01
+was rebased again onto `cec75f6` and proven a third time. **Later steps compare against the
+`cec75f6` folders.**
+
+- **Stills.** Scratch folder `parity/baseline-cec75f6/`, from a `git archive` of `cec75f6`'s
+  `apps/game`, same driver (`capture.gd` `c1746c4c`, `parity_sfx_bank.gd` `57cc689b`, git blob
+  hashes): all 36 runs, 1,908 stills. Frame counts changed with #65: R1 1,480; R2 3,016; R3 1,498;
+  R4 2,430 (`kb-fx`), 2,424 (`kb-calm`), 2,428 (`touch-fx`). The S01 branch, captured into
+  `parity/after-s01c/`, compares `ALL IDENTICAL: 36 run folders, 1908 stills compared`, with every
+  text and audio log and frame count the same.
+- **Render cache failures.** With eight render jobs and other agents' jobs in the 6 GB Colima VM,
+  the kernel OOM-killed Godot during some cache imports. A run on a half-imported cache logs missing
+  `.ctex`/`.sample` files and then a `SCRIPT ERROR` every frame until its timeout. Those runs were
+  killed, their caches wiped and the runs re-taken with at most four render jobs of this harness at
+  once; no failed run is in the compared folders.
+- **UI dump.** `parity/s01c/ui-base-cec75f6.txt`, 364 lines over 13 states (#65 adds the TOGGLE
+  HOLDS row); the S01 branch's dump diffs empty against it.
+- **Perf "before".** `parity/s01c/perf-before/` (five runs of the copy), interleaved with five of
+  the S01 branch (`parity/s01c/perf-after/`) in one session on a busy machine (load about 18);
+  table in `parity/s01c/perf-table.md`.
+
 ## S00a: maps refreshed on 9c7371d
 
 Figures from `python3 -I scripts/parity/surface.py` at `9c7371d` (the critique's maps were taken at
