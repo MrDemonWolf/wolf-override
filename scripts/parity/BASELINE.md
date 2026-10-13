@@ -11,7 +11,10 @@ launch"). Every baseline below (stills, text and audio logs, UI dump, perf "befo
 maps were taken from `apps/game` at that commit (a copy for the perf "before", the identical
 working tree for the rest). `origin/main` then gained `da5c14e` (PR #55), which changes
 only Markdown under `docs/` and the root notes, so `apps/game` is byte-identical and the baseline
-holds for it. The first harness commit was measured on `b98bc94`; `baffea4` moved `RESOLUTIONS` and
+holds for it. `origin/main` then gained PR #58 (the rebuilt corridor door end, which changes
+pixels and the UI dump) and the notes-only #56, #57 and #59, so before shipping S00 the stills, UI
+dump and perf were re-taken from `9c7371d` (see "Re-baseline on 9c7371d" below); later steps start
+from that baseline. The first harness commit was measured on `b98bc94`; `baffea4` moved `RESOLUTIONS` and
 `DEFAULT_RESOLUTION` into `GameSettings` and changed the changelog, so everything was re-taken.
 Before each later step, if `origin/main` has gained commits that could change pixels, UI text or
 sound calls, re-take the baseline from the step's starting commit with this same harness (the
@@ -176,7 +179,9 @@ working tree, `parity/perf-after-s00/`). Medians of the five "before" runs:
 | junction, lane question up | 0.455 | 1.835 | 0.176 | 89.5 | 1 | 23 | 7 |
 | junction lane, WOLF drawing the sentry | 0.319 | 0.813 | 0.128 | 29.4 | 1 | 21 | 6 |
 
-At the end of a run: 558 nodes, 3,474 objects, 121 resources, 127.0 MB static memory. A `_draw`
+At the end of a run: 558 nodes, about 3,474 objects, 121 resources, 127.0 MB static memory. Nodes,
+resources and static memory are exact between runs of the same code; the object count moves by up
+to about 10 (3,471-3,480 in the S00 verifier's pair), so treat it as noise within ±10. A `_draw`
 time runs from the item's `draw` signal (just before `_draw`) to a deferred call queued behind the
 redraw (just after it), so about 7 µs of it is the redraw call itself, and the tick is 1 µs; the
 junction and Recesses only draw while the junction is on screen. Texture memory is 0 headless; see
@@ -199,29 +204,33 @@ higher and 2.7 px narrower than drawn), which then passed twice on its own. No f
 real-time fade and `sentry_test`'s leaked objects seen at `b98bc94`. Re-run a failing suite alone
 before blaming a step.
 
-## S00a: maps refreshed on baffea4
+## S00a: maps refreshed on 9c7371d
 
-Figures from `python3 -I scripts/parity/surface.py` at `baffea4` (the critique's maps were taken at
+Figures from `python3 -I scripts/parity/surface.py` at `9c7371d` (the critique's maps were taken at
 76d3a50 and are stale). The script now also counts members tests and the debug tools name directly
 (`game.SITE_URL`), methods named as strings (`Callable(game, "_show_changelog")`,
 `game.has_method(...)`), and what `debug_tools.gd` reads through its `main` parameter.
 
 What changed against the critique's lists:
-- main.gd is 3,740 lines (not 3,310) with 200 top-level functions and 126 constants; `scripts/*.gd`
-  is 10,261 lines (not about 9,270), including `studio_logo.gd` (289). Since `b98bc94`, `baffea4`
+- main.gd is 3,842 lines (not 3,310) with 202 top-level functions and 145 constants; `scripts/*.gd`
+  is 10,440 lines (not about 9,270), including `studio_logo.gd` (289). Since `b98bc94`, `baffea4`
   moved `RESOLUTIONS` and `DEFAULT_RESOLUTION` from Main to `GameSettings` (no test or debug tool
-  reads them on Main).
-- Tests read **29** constants from Main, not 15. All of the critique's 15 are still defined;
+  reads them on Main), and PR #58 (the rebuilt corridor door end) added the `CORRIDOR_SEAL_*`
+  constants (main.gd 3,740 to 3,842 lines, `seal_leaf.gd` 58 to 88, `room_depth.gd` 642 to 690).
+- Tests read **31** constants from Main, not 15. All of the critique's 15 are still defined;
   `GAMEPLAY_ZOOM` is now only named in a comment (room_depth_test 31), so 14 of them are read, plus
-  15 added since: `WOLF_FEET_BELOW_CENTRE`, `WOLF_DRAWN_HEIGHT`, `WOLF_SENTRY_GAP`, `FALL_DEGREES`,
+  17 added since: `WOLF_FEET_BELOW_CENTRE`, `WOLF_DRAWN_HEIGHT`, `WOLF_SENTRY_GAP`, `FALL_DEGREES`,
   `FALL_SHIFT`, `BAIT_NO_LINE`, `CHECKPOINT_TOAST`, `FAIL_CONTROLS_OFF_SECONDS`,
   `FAIL_FADE_SECONDS`, `GAMEPLAY_VIEW_WIDTH`, `NO_CHECKPOINT_NOTE`, `RELAY_QUESTION`,
-  `RESTORE_FROM_DISK_LINE`, and `SITE_URL` and `CHANGELOG_URL` (read as `game.SITE_URL` and
-  `game.CHANGELOG_URL`, ui_controls_test 26). Keep all 29, and `GAMEPLAY_ZOOM`, readable on Main
-  (`get_script_constant_map()`, `Main.X` or a member read on the instance).
+  `RESTORE_FROM_DISK_LINE`, `CORRIDOR_SEAL_LAMP` (m0_scene_test 252), `SITE_URL` and
+  `CHANGELOG_URL` (read as `game.SITE_URL` and `game.CHANGELOG_URL`, ui_controls_test 26), and
+  `CORRIDOR_SEAL_FOOT_Y` (read with `game.get`, room_depth_test 78, so the script lists it under
+  properties). Keep all 31, and `GAMEPLAY_ZOOM`, readable on Main (`get_script_constant_map()`,
+  `Main.X`, `game.get` or a member read on the instance).
 - Tests use 64 methods on Main (62 private: 62 through `game.call`, plus `_show_changelog` and
-  `_open_changelog` named in `Callable(game, ...)`), read 68 properties and set 13 (the plan said
-  44, 51 and 12), and use 64 node paths under Main.
+  `_open_changelog` named in `Callable(game, ...)`), read 69 properties (68 plus the constant
+  `CORRIDOR_SEAL_FOOT_Y`) and set 13 (the plan said 44, 51 and 12), and use 64 node paths under
+  Main.
 - `opening_hatch` and `OpeningHatch` appear only in m0_scene_test 103, which checks they are gone
   (round 3's trial opening hatch was removed), so the critique's opening-hatch items are moot.
 - The debug tools (`scripts/debug/`, 3,771 lines) use 60 members of Main (through `game.` and,
@@ -232,7 +241,7 @@ What changed against the critique's lists:
 
 | File | Lines |
 |---|---:|
-| `scripts/bypass_handle.gd` | 199 |
+| `scripts/bypass_handle.gd` | 198 |
 | `scripts/containment_cage.gd` | 40 |
 | `scripts/drop_arm.gd` | 138 |
 | `scripts/floor_reflection.gd` | 115 |
@@ -244,24 +253,24 @@ What changed against the critique's lists:
 | `scripts/junction_room.gd` | 1345 |
 | `scripts/m0_actor.gd` | 179 |
 | `scripts/m0_state.gd` | 395 |
-| `scripts/main.gd` | 3740 |
+| `scripts/main.gd` | 3842 |
 | `scripts/pause_overlay.gd` | 23 |
 | `scripts/pressure_line.gd` | 128 |
 | `scripts/records_room.gd` | 149 |
-| `scripts/room_depth.gd` | 642 |
-| `scripts/seal_leaf.gd` | 58 |
+| `scripts/room_depth.gd` | 690 |
+| `scripts/seal_leaf.gd` | 88 |
 | `scripts/sentry.gd` | 364 |
 | `scripts/sentry_brain.gd` | 287 |
 | `scripts/sfx_bank.gd` | 1179 |
 | `scripts/studio_logo.gd` | 289 |
 | `scripts/ui_motion.gd` | 45 |
-| **`scripts/*.gd` total** | **10261** |
+| **`scripts/*.gd` total** | **10440** |
 | `scripts/debug/*.gd` (5 files) | 3771 |
-| `tests/*_test.gd` (15 files) | 7355 |
-| `scenes/main.tscn` | 911 |
+| `tests/*_test.gd` (15 files) | 7438 |
+| `scenes/main.tscn` | 916 |
 | `scenes/studio_logo.tscn` | 109 |
 
-main.gd: 3740 lines, 200 top-level functions, 126 const, 153 var (including @onready and @export), `status_line =` assigned 94 times, `state.chapter_id` read 40 times.
+main.gd: 3842 lines, 202 top-level functions, 145 const, 159 var (including @onready and @export), `status_line =` assigned 94 times, `state.chapter_id` read 40 times.
 
 ### Tests: what they use on Main
 
@@ -273,11 +282,11 @@ Members of Main used directly as `game.<name>` (2): `CHANGELOG_URL` (1), `SITE_U
 
 Methods tests use on Main, by either route: 64 (62 private)
 
-Properties read with `game.get` (68): `status_line` (92), `state` (67), `fail_active` (47), `title_open` (38), `intro_active` (16), `save_path` (16), `waiting_for_choice` (16), `junction_room` (15), `sentry_brain` (14), `end_card_active` (10), `bypass_ticks` (9), `impact` (8), `intro_step` (8), `wolf_baiting` (8), `chapter_close_active` (7), `lane_choice` (7), `records_room` (7), `drop_arm` (6), `pause_overlay` (6), `pressure_line` (6), `bypass_handle` (5), `tutorial_step` (5), `wolf_scouting` (5), `engineer_step_x` (4), `seal_opening` (4), `settings_menu` (4), `sfx_bank` (4), `bolt_state` (3), `controller_active` (3), `door_lip` (3), `engineer_waits_for_wolf` (3), `hatch_exit_walking` (3), `wolf_heading_to_relay` (3), `beat_snapshot` (2), `bypass_venting` (2), `choice_context` (2), `continue_button` (2), `credits_paused` (2), `effects_enabled` (2), `relay_refused` (2), `save_pending` (2), `stakes_spoken` (2), `wolf_broke_off` (2), `wolf_holding_far_end` (2), `wolf_sprite_scale` (2), `breaker_status_glow` (1), `bypass_was_holding` (1), `changelog_text` (1), `corridor_depth` (1), `credits_screen` (1), `debug_tools` (1), `door_dust` (1), `door_open_art` (1), `fps_options` (1), `intro_camera` (1), `intro_fade` (1), `intro_tween` (1), `name_card_remaining` (1), `opening_hatch` (1), `post_grade` (1), `relay_sparks` (1), `relay_status_glow` (1), `resolution_options` (1), `save_error` (1), `seal_leaf` (1), `touch_choice_1` (1), `touch_choice_2` (1), `touch_use` (1)
+Properties read with `game.get` (69): `status_line` (92), `state` (67), `fail_active` (47), `title_open` (38), `intro_active` (16), `save_path` (16), `waiting_for_choice` (16), `junction_room` (15), `sentry_brain` (14), `end_card_active` (10), `bypass_ticks` (9), `impact` (8), `intro_step` (8), `wolf_baiting` (8), `chapter_close_active` (7), `lane_choice` (7), `records_room` (7), `drop_arm` (6), `pause_overlay` (6), `pressure_line` (6), `bypass_handle` (5), `tutorial_step` (5), `wolf_scouting` (5), `engineer_step_x` (4), `seal_opening` (4), `settings_menu` (4), `sfx_bank` (4), `bolt_state` (3), `controller_active` (3), `door_lip` (3), `engineer_waits_for_wolf` (3), `hatch_exit_walking` (3), `wolf_heading_to_relay` (3), `beat_snapshot` (2), `bypass_venting` (2), `choice_context` (2), `continue_button` (2), `credits_paused` (2), `effects_enabled` (2), `relay_refused` (2), `save_pending` (2), `stakes_spoken` (2), `wolf_broke_off` (2), `wolf_holding_far_end` (2), `wolf_sprite_scale` (2), `CORRIDOR_SEAL_FOOT_Y` (1), `breaker_status_glow` (1), `bypass_was_holding` (1), `changelog_text` (1), `corridor_depth` (1), `credits_screen` (1), `debug_tools` (1), `door_dust` (1), `door_open_art` (1), `fps_options` (1), `intro_camera` (1), `intro_fade` (1), `intro_tween` (1), `name_card_remaining` (1), `opening_hatch` (1), `post_grade` (1), `relay_sparks` (1), `relay_status_glow` (1), `resolution_options` (1), `save_error` (1), `seal_leaf` (1), `touch_choice_1` (1), `touch_choice_2` (1), `touch_use` (1)
 
 Properties set with `game.set` (13): `touch_enabled` (46), `save_path` (21), `settings_path` (15), `state` (11), `waiting_for_choice` (9), `auto_pause_on_focus_loss` (6), `controller_active` (6), `effects_enabled` (6), `lane_choice` (4), `status_line` (2), `tutorial_step` (2), `bolt_state` (1), `chapter_close_active` (1)
 
-Main constants read (29): `WOLF_FEET_BELOW_CENTRE` (4), `STATION_OVERLAP` (3), `VALVE_CRANK_X` (3), `WOLF_BYPASS_CLEAR_X` (3), `WOLF_DRAWN_HEIGHT` (3), `WOLF_SENTRY_GAP` (3), `BYPASS_CRANK_X` (2), `CORRIDOR_DOOR_LEFT_X` (2), `FALL_DEGREES` (2), `FALL_SHIFT` (2), `JUNCTION_STATIONS` (2), `RECORDS_STATIONS` (2), `WOLF_MIRROR_X` (2), `BAIT_NO_LINE` (1), `BOLT_WHINE_SECONDS` (1), `BYPASS_WHEEL` (1), `CHANGELOG_URL` (1), `CHECKPOINT_TOAST` (1), `CORRIDOR_STATIONS` (1), `FAIL_CONTROLS_OFF_SECONDS` (1), `FAIL_FADE_SECONDS` (1), `GAMEPLAY_CAMERA_Y_TOUCH` (1), `GAMEPLAY_VIEW_WIDTH` (1), `INTRO_LINES` (1), `NO_CHECKPOINT_NOTE` (1), `RELAY_QUESTION` (1), `RELAY_X` (1), `RESTORE_FROM_DISK_LINE` (1), `SITE_URL` (1)
+Main constants read (30): `WOLF_FEET_BELOW_CENTRE` (4), `STATION_OVERLAP` (3), `VALVE_CRANK_X` (3), `WOLF_BYPASS_CLEAR_X` (3), `WOLF_DRAWN_HEIGHT` (3), `WOLF_SENTRY_GAP` (3), `BYPASS_CRANK_X` (2), `CORRIDOR_DOOR_LEFT_X` (2), `FALL_DEGREES` (2), `FALL_SHIFT` (2), `JUNCTION_STATIONS` (2), `RECORDS_STATIONS` (2), `WOLF_MIRROR_X` (2), `BAIT_NO_LINE` (1), `BOLT_WHINE_SECONDS` (1), `BYPASS_WHEEL` (1), `CHANGELOG_URL` (1), `CHECKPOINT_TOAST` (1), `CORRIDOR_SEAL_LAMP` (1), `CORRIDOR_STATIONS` (1), `FAIL_CONTROLS_OFF_SECONDS` (1), `FAIL_FADE_SECONDS` (1), `GAMEPLAY_CAMERA_Y_TOUCH` (1), `GAMEPLAY_VIEW_WIDTH` (1), `INTRO_LINES` (1), `NO_CHECKPOINT_NOTE` (1), `RELAY_QUESTION` (1), `RELAY_X` (1), `RESTORE_FROM_DISK_LINE` (1), `SITE_URL` (1)
 
 Node paths under Main (64 unique, `game.get_node`): `BreakerArt`, `BreakerLabel`, `BreakerStatusLight`, `CanvasLayer/BottomBar`, `CanvasLayer/BottomBar/Speaker`, `CanvasLayer/BottomBar/Story`, `CanvasLayer/ContextHint`, `CanvasLayer/ContextHint/Text`, `CanvasLayer/EndCard`, `CanvasLayer/IntroAlarm`, `CanvasLayer/IntroFade`, `CanvasLayer/PauseButton`, `CanvasLayer/PauseOverlay`, `CanvasLayer/PauseOverlay/Panel/PauseMenu`, `CanvasLayer/PauseOverlay/Panel/PauseMenu/ResumeButton`, `CanvasLayer/PauseOverlay/Panel/PauseMenu/SettingsButton`, `CanvasLayer/PauseOverlay/Panel/PauseMenu/TitleButton`, `CanvasLayer/PauseOverlay/Panel/SettingsMenu`, `CanvasLayer/PauseOverlay/Panel/SettingsMenu/BackButton`, `CanvasLayer/PauseOverlay/Panel/SettingsMenu/FPSOptions`, `CanvasLayer/TitleScreen`, `CanvasLayer/TitleScreen/ChangelogButton`, `CanvasLayer/TitleScreen/ChangelogScreen`, `CanvasLayer/TitleScreen/ContinueButton`, `CanvasLayer/TitleScreen/ContinueNote`, `CanvasLayer/TitleScreen/CorridorArt`, `CanvasLayer/TitleScreen/CreditsButton`, `CanvasLayer/TitleScreen/CreditsScreen`, `CanvasLayer/TitleScreen/CreditsScreen/CreditsBackButton`, `CanvasLayer/TitleScreen/CreditsScreen/CreditsPauseButton`, `CanvasLayer/TitleScreen/GameTitle`, `CanvasLayer/TitleScreen/LogoMark`, `CanvasLayer/TitleScreen/NewGameButton`, `CanvasLayer/TitleScreen/SettingsButton`, `CanvasLayer/TopBar`, `CanvasLayer/TopBar/Accent`, `CanvasLayer/TopBar/HUD`, `CanvasLayer/TouchControls`, `CanvasLayer/TouchControls/Choice1`, `CanvasLayer/TouchControls/Choice2`, `CanvasLayer/TouchControls/Use`, `CanvasLayer/TutorialPrompt`, `CanvasLayer/TutorialPrompt/Text`, `CheckpointArt`, `CheckpointLabel`, `CorridorDepth`, `Door/CollisionShape2D`, `Door/Visual`, `Door/Visual/DoorArt`, `Human`, `Human/BodySprite`, `Human/CollisionShape2D`, `IntroCamera`, `IntroDirector`, `IntroGate`, `OpeningHatch`, `PurgeTerminalArt`, `RelayArt`, `RelayLabel`, `RelaySpark`, `RelayStatusLight`, `Wolf`, `Wolf/BodySprite`, `Wolf/CollisionShape2D`
 
@@ -299,203 +308,205 @@ The public debug surface on Main: `debug_answer_lane`, `debug_beat`, `debug_drop
 
 | Function | Lines | Length |
 |---|---|---:|
-| `_ready` | 469-547 | 79 |
-| `_refresh_continue` | 550-566 | 17 |
-| `_title_first_button` | 570-571 | 2 |
-| `_on_continue_pressed` | 576-581 | 6 |
-| `_open_changelog` | 585-587 | 3 |
-| `_load_changelog` | 590-596 | 7 |
-| `_changelog_bbcode` | 600-610 | 11 |
-| `_show_changelog` | 613-616 | 4 |
-| `_hide_changelog` | 619-621 | 3 |
-| `_setup_corridor_door` | 626-635 | 10 |
-| `_setup_bypass` | 640-645 | 6 |
-| `_setup_corridor_labels` | 650-659 | 10 |
-| `_apply_effects` | 663-674 | 12 |
-| `_room_depths` | 678-679 | 2 |
-| `_sync_room_lights` | 686-689 | 4 |
-| `_setup_impact` | 694-703 | 10 |
-| `_on_reduced_motion_changed` | 708-713 | 6 |
-| `_setup_particles` | 718-735 | 18 |
-| `_attach_status_glow` | 739-744 | 6 |
-| `_update_gameplay_camera` | 747-750 | 4 |
-| `_start_gameplay_camera` | 753-758 | 6 |
-| `_process` | 761-818 | 58 |
-| `_tick_engineer_step` | 823-831 | 9 |
-| `_step_engineer` | 835-844 | 10 |
-| `_step_beside_station` | 851-861 | 11 |
-| `_update_settle` | 868-878 | 11 |
-| `_settle_safe` | 883-890 | 8 |
-| `_fuse_lit` | 894-895 | 2 |
-| `_first_name` | 899-900 | 2 |
-| `_clear_station_body` | 906-913 | 8 |
-| `_room_stations` | 918-925 | 8 |
-| `_station_offset` | 929-930 | 2 |
-| `_station_side_x` | 935-937 | 3 |
-| `_tick_corridor` | 943-974 | 32 |
-| `_read_seconds` | 978-979 | 2 |
-| `_speak_stakes` | 982-984 | 3 |
-| `_stakes_up` | 988-989 | 2 |
-| `_at_breaker` | 993-994 | 2 |
-| `_ask_relay` | 998-1002 | 5 |
-| `_new_game` | 1005-1063 | 59 |
-| `_advance_intro` | 1067-1112 | 46 |
-| `_finish_intro` | 1115-1148 | 34 |
-| `_show_credits` | 1151-1156 | 6 |
-| `_hide_credits` | 1159-1161 | 3 |
-| `_show_title_overlay` | 1166-1170 | 5 |
-| `_hide_title_overlay` | 1173-1177 | 5 |
-| `_toggle_credits_pause` | 1180-1182 | 3 |
-| `_on_credits_body_input` | 1185-1188 | 4 |
-| `_on_changelog_body_input` | 1193-1201 | 9 |
-| `_setup_touch_controls` | 1204-1212 | 9 |
-| `_bind_touch_button` | 1215-1217 | 3 |
-| `_setup_settings` | 1220-1251 | 32 |
-| `_resolution_size` | 1254-1255 | 2 |
-| `_on_fps_selected` | 1258-1260 | 3 |
-| `_on_resolution_selected` | 1263-1266 | 4 |
-| `_on_fullscreen_toggled` | 1269-1272 | 4 |
-| `_save_settings` | 1275-1281 | 7 |
-| `_on_pause_button` | 1284-1285 | 2 |
-| `_pause_game` | 1288-1298 | 11 |
-| `_resume_game` | 1301-1307 | 7 |
-| `_show_settings` | 1310-1317 | 8 |
-| `_show_title_settings` | 1320-1324 | 5 |
-| `_fade_backdrop` | 1329-1334 | 6 |
-| `_reveal_menu` | 1337-1345 | 9 |
-| `_show_pause_menu` | 1348-1364 | 17 |
-| `_return_to_title` | 1367-1392 | 26 |
-| `_grab_menu_focus` | 1397-1403 | 7 |
-| `_menu_focus_target` | 1407-1418 | 12 |
-| `_unhandled_input` | 1421-1439 | 19 |
-| `_notification` | 1442-1449 | 8 |
-| `_handle_back` | 1453-1471 | 19 |
-| `_on_title_button` | 1474-1479 | 6 |
-| `_on_settings_back` | 1482-1485 | 4 |
-| `_input` | 1488-1495 | 8 |
-| `_answer_choice` | 1499-1506 | 8 |
-| `_note_input_device` | 1510-1533 | 24 |
-| `_load_game` | 1536-1605 | 70 |
-| `_interact` | 1608-1636 | 29 |
-| `_at_bypass` | 1641-1642 | 2 |
-| `_at_relay` | 1647-1648 | 2 |
-| `_relay_refused` | 1653-1654 | 2 |
-| `_interact_breaker` | 1657-1673 | 17 |
-| `_choose` | 1676-1688 | 13 |
-| `_interact_relay` | 1694-1719 | 26 |
-| `_wolf_takes_relay` | 1724-1734 | 11 |
-| `_interact_bypass` | 1739-1748 | 10 |
-| `_start_bypass_vent` | 1753-1759 | 7 |
-| `_stop_bypass_vent` | 1762-1767 | 6 |
-| `_bypass_cranked` | 1773-1785 | 13 |
-| `_finish_bypass` | 1788-1800 | 13 |
-| `_interact_checkpoint` | 1803-1829 | 27 |
-| `_interact_records` | 1832-1876 | 45 |
-| `_records_route_hint` | 1881-1886 | 6 |
-| `_finish_chapter_close` | 1889-1903 | 15 |
-| `_walk_out_through_hatch` | 1909-1917 | 9 |
-| `_engineer_follows_out` | 1922-1931 | 10 |
-| `_build_end_card` | 1936-1982 | 47 |
-| `_end_card_label` | 1985-1994 | 10 |
-| `end_card_recap` | 2000-2017 | 18 |
-| `_show_end_card` | 2020-2057 | 38 |
-| `_close_end_card` | 2061-2064 | 4 |
-| `_hide_end_card` | 2067-2069 | 3 |
-| `_choose_mirror` | 2072-2086 | 15 |
-| `_save_progress` | 2089-2092 | 4 |
-| `_write_beat` | 2096-2104 | 9 |
-| `_capture_positions` | 2107-2111 | 5 |
-| `_mark_beat` | 2116-2118 | 3 |
-| `_hold_station` | 2123-2128 | 6 |
-| `_enter_junction` | 2132-2143 | 12 |
-| `_interact_junction` | 2146-2188 | 43 |
-| `_at_arm_panel` | 2192-2193 | 2 |
-| `_bait_holding` | 2199-2200 | 2 |
-| `_drop_waits_for_wolf` | 2206-2207 | 2 |
-| `_wolf_drawing_x` | 2212-2213 | 2 |
-| `_use_arm_panel` | 2216-2229 | 14 |
-| `_drop_tank` | 2234-2240 | 7 |
-| `_use_exit` | 2245-2261 | 17 |
-| `_pop_bolt` | 2264-2269 | 6 |
-| `_bolt_arc` | 2274-2286 | 13 |
-| `_hatch_sliding` | 2290-2291 | 2 |
-| `_hatch_opened` | 2295-2297 | 3 |
-| `_leave_junction` | 2302-2314 | 13 |
-| `_frame_chapter_close` | 2319-2321 | 3 |
-| `_tick_junction` | 2326-2364 | 39 |
-| `_tick_lane` | 2371-2432 | 62 |
-| `_sync_wolf_leap` | 2439-2455 | 17 |
-| `_sentry_reason` | 2461-2462 | 2 |
-| `_seen_in_lane` | 2467-2468 | 2 |
-| `_lane_sound` | 2474-2493 | 20 |
-| `_sentry_changed` | 2496-2509 | 14 |
-| `_sentry_alarm` | 2513-2514 | 2 |
-| `_ask_lane` | 2519-2523 | 5 |
-| `_choose_lane` | 2528-2550 | 23 |
-| `_tank_hit` | 2554-2580 | 27 |
-| `_tank_miss` | 2586-2605 | 20 |
-| `_tank_rehung` | 2608-2611 | 4 |
-| `_fade_servo` | 2615-2623 | 9 |
-| `_kill_servo_tween` | 2626-2629 | 4 |
-| `_stop_junction_loops` | 2632-2634 | 3 |
-| `_valve_turned` | 2638-2645 | 8 |
-| `_vent_trips` | 2650-2658 | 9 |
-| `_wolf_reads_seam` | 2661-2666 | 6 |
-| `_door_blast` | 2674-2690 | 17 |
-| `_blast_feedback` | 2693-2699 | 7 |
-| `_fail_beat` | 2707-2746 | 40 |
-| `_lane_fall` | 2753-2765 | 13 |
-| `_restore_beat` | 2768-2795 | 28 |
-| `_cancel_fail_tween` | 2798-2801 | 4 |
-| `_cancel_fail` | 2805-2810 | 6 |
-| `_shutter_boom` | 2814-2819 | 6 |
-| `_door_lands` | 2824-2832 | 9 |
-| `_sync_scene` | 2835-2892 | 58 |
-| `_sync_junction_room` | 2897-2917 | 21 |
-| `_react_as_wolf` | 2920-2932 | 13 |
-| `_flash_relay_spark` | 2937-2967 | 31 |
-| `_sync_records_room` | 2970-2984 | 15 |
-| `_sync_door` | 2990-3009 | 20 |
-| `_update_controls` | 3012-3026 | 15 |
-| `_wolf_target_x` | 3034-3070 | 37 |
-| `_wolf_off_relay` | 3077-3082 | 6 |
-| `_machine_spans` | 3088-3102 | 15 |
-| `_wolf_follow_max_x` | 3107-3112 | 6 |
-| `_refresh_ui` | 3115-3214 | 100 |
-| `_set_dialogue` | 3217-3251 | 35 |
-| `_show_top_card` | 3254-3264 | 11 |
-| `_context_hint` | 3267-3321 | 55 |
-| `_junction_hint` | 3324-3354 | 31 |
-| `_lane_asked` | 3358-3359 | 2 |
-| `_sentry_hunting` | 3363-3364 | 2 |
-| `_drop_ready` | 3369-3370 | 2 |
-| `_lane_hint` | 3373-3409 | 37 |
-| `_objective` | 3412-3443 | 32 |
-| `_install_inputs` | 3446-3463 | 18 |
-| `_add_action` | 3466-3476 | 11 |
-| `_add_joy_button` | 3479-3483 | 5 |
-| `_add_joy_axis` | 3486-3497 | 12 |
-| `_setup_debug_tools` | 3500-3504 | 5 |
-| `_debug_spares_knockdown` | 3509-3510 | 2 |
-| `_debug_sentry_frozen` | 3514-3515 | 2 |
-| `_debug_takes_back` | 3519-3525 | 7 |
-| `debug_new_game` | 3528-3532 | 5 |
-| `debug_load_checkpoint` | 3536-3538 | 3 |
-| `debug_interact` | 3542-3543 | 2 |
-| `debug_answer_lane` | 3547-3549 | 3 |
-| `debug_show_end_card` | 3552-3553 | 2 |
-| `debug_station_side_x` | 3557-3558 | 2 |
-| `debug_place` | 3562-3567 | 6 |
-| `debug_knock_down` | 3572-3582 | 11 |
-| `debug_valve_turned` | 3586-3588 | 3 |
-| `debug_drop_tank` | 3592-3593 | 2 |
-| `debug_save_progress` | 3597-3598 | 2 |
-| `debug_save_changed` | 3602-3604 | 3 |
-| `debug_refresh_ui` | 3607-3608 | 2 |
-| `debug_hold_station` | 3612-3613 | 2 |
-| `debug_restore_focus` | 3617-3622 | 6 |
-| `debug_snapshot` | 3628-3666 | 39 |
-| `debug_beat` | 3669-3684 | 16 |
-| `_debug_engineer_state` | 3687-3700 | 14 |
-| `debug_wolf_target` | 3705-3710 | 6 |
-| `debug_wolf_why` | 3714-3740 | 27 |
+| `_ready` | 513-593 | 81 |
+| `_refresh_continue` | 596-612 | 17 |
+| `_title_first_button` | 616-617 | 2 |
+| `_on_continue_pressed` | 622-627 | 6 |
+| `_open_changelog` | 631-633 | 3 |
+| `_load_changelog` | 636-642 | 7 |
+| `_changelog_bbcode` | 646-656 | 11 |
+| `_show_changelog` | 659-662 | 4 |
+| `_hide_changelog` | 665-667 | 3 |
+| `_setup_corridor_door` | 674-706 | 33 |
+| `_seal_sprite` | 709-719 | 11 |
+| `_setup_bypass` | 724-729 | 6 |
+| `_setup_corridor_labels` | 734-743 | 10 |
+| `_apply_effects` | 747-758 | 12 |
+| `_room_depths` | 762-763 | 2 |
+| `_sync_room_lights` | 770-773 | 4 |
+| `_setup_impact` | 778-787 | 10 |
+| `_on_reduced_motion_changed` | 792-797 | 6 |
+| `_setup_particles` | 802-819 | 18 |
+| `_attach_status_glow` | 823-828 | 6 |
+| `_update_gameplay_camera` | 831-834 | 4 |
+| `_start_gameplay_camera` | 837-842 | 6 |
+| `_process` | 845-906 | 62 |
+| `_tick_engineer_step` | 911-919 | 9 |
+| `_step_engineer` | 923-932 | 10 |
+| `_step_beside_station` | 939-949 | 11 |
+| `_update_settle` | 956-966 | 11 |
+| `_settle_safe` | 971-978 | 8 |
+| `_fuse_lit` | 982-983 | 2 |
+| `_first_name` | 987-988 | 2 |
+| `_clear_station_body` | 994-1001 | 8 |
+| `_room_stations` | 1006-1013 | 8 |
+| `_station_offset` | 1017-1018 | 2 |
+| `_station_side_x` | 1023-1025 | 3 |
+| `_tick_corridor` | 1031-1062 | 32 |
+| `_read_seconds` | 1066-1067 | 2 |
+| `_speak_stakes` | 1070-1072 | 3 |
+| `_stakes_up` | 1076-1077 | 2 |
+| `_at_breaker` | 1081-1082 | 2 |
+| `_ask_relay` | 1086-1090 | 5 |
+| `_new_game` | 1093-1151 | 59 |
+| `_advance_intro` | 1155-1200 | 46 |
+| `_finish_intro` | 1203-1236 | 34 |
+| `_show_credits` | 1239-1244 | 6 |
+| `_hide_credits` | 1247-1249 | 3 |
+| `_show_title_overlay` | 1254-1258 | 5 |
+| `_hide_title_overlay` | 1261-1265 | 5 |
+| `_toggle_credits_pause` | 1268-1270 | 3 |
+| `_on_credits_body_input` | 1273-1276 | 4 |
+| `_on_changelog_body_input` | 1281-1289 | 9 |
+| `_setup_touch_controls` | 1292-1300 | 9 |
+| `_bind_touch_button` | 1303-1305 | 3 |
+| `_setup_settings` | 1308-1339 | 32 |
+| `_resolution_size` | 1342-1343 | 2 |
+| `_on_fps_selected` | 1346-1348 | 3 |
+| `_on_resolution_selected` | 1351-1354 | 4 |
+| `_on_fullscreen_toggled` | 1357-1360 | 4 |
+| `_save_settings` | 1363-1369 | 7 |
+| `_on_pause_button` | 1372-1373 | 2 |
+| `_pause_game` | 1376-1386 | 11 |
+| `_resume_game` | 1389-1395 | 7 |
+| `_show_settings` | 1398-1405 | 8 |
+| `_show_title_settings` | 1408-1412 | 5 |
+| `_fade_backdrop` | 1417-1422 | 6 |
+| `_reveal_menu` | 1425-1433 | 9 |
+| `_show_pause_menu` | 1436-1452 | 17 |
+| `_return_to_title` | 1455-1480 | 26 |
+| `_grab_menu_focus` | 1485-1491 | 7 |
+| `_menu_focus_target` | 1495-1506 | 12 |
+| `_unhandled_input` | 1509-1527 | 19 |
+| `_notification` | 1530-1537 | 8 |
+| `_handle_back` | 1541-1559 | 19 |
+| `_on_title_button` | 1562-1567 | 6 |
+| `_on_settings_back` | 1570-1573 | 4 |
+| `_input` | 1576-1583 | 8 |
+| `_answer_choice` | 1587-1594 | 8 |
+| `_note_input_device` | 1598-1621 | 24 |
+| `_load_game` | 1624-1693 | 70 |
+| `_interact` | 1696-1724 | 29 |
+| `_at_bypass` | 1729-1730 | 2 |
+| `_at_relay` | 1735-1736 | 2 |
+| `_relay_refused` | 1741-1742 | 2 |
+| `_interact_breaker` | 1745-1761 | 17 |
+| `_choose` | 1764-1776 | 13 |
+| `_interact_relay` | 1782-1807 | 26 |
+| `_wolf_takes_relay` | 1812-1822 | 11 |
+| `_interact_bypass` | 1827-1836 | 10 |
+| `_start_bypass_vent` | 1841-1847 | 7 |
+| `_stop_bypass_vent` | 1850-1855 | 6 |
+| `_bypass_cranked` | 1861-1873 | 13 |
+| `_finish_bypass` | 1876-1888 | 13 |
+| `_interact_checkpoint` | 1891-1917 | 27 |
+| `_interact_records` | 1920-1964 | 45 |
+| `_records_route_hint` | 1969-1974 | 6 |
+| `_finish_chapter_close` | 1977-1991 | 15 |
+| `_walk_out_through_hatch` | 1997-2005 | 9 |
+| `_engineer_follows_out` | 2010-2019 | 10 |
+| `_build_end_card` | 2024-2070 | 47 |
+| `_end_card_label` | 2073-2082 | 10 |
+| `end_card_recap` | 2088-2105 | 18 |
+| `_show_end_card` | 2108-2145 | 38 |
+| `_close_end_card` | 2149-2152 | 4 |
+| `_hide_end_card` | 2155-2157 | 3 |
+| `_choose_mirror` | 2160-2174 | 15 |
+| `_save_progress` | 2177-2180 | 4 |
+| `_write_beat` | 2184-2192 | 9 |
+| `_capture_positions` | 2195-2199 | 5 |
+| `_mark_beat` | 2204-2206 | 3 |
+| `_hold_station` | 2211-2216 | 6 |
+| `_enter_junction` | 2220-2231 | 12 |
+| `_interact_junction` | 2234-2276 | 43 |
+| `_at_arm_panel` | 2280-2281 | 2 |
+| `_bait_holding` | 2287-2288 | 2 |
+| `_drop_waits_for_wolf` | 2294-2295 | 2 |
+| `_wolf_drawing_x` | 2300-2301 | 2 |
+| `_use_arm_panel` | 2304-2317 | 14 |
+| `_drop_tank` | 2322-2328 | 7 |
+| `_use_exit` | 2333-2349 | 17 |
+| `_pop_bolt` | 2352-2357 | 6 |
+| `_bolt_arc` | 2362-2374 | 13 |
+| `_hatch_sliding` | 2378-2379 | 2 |
+| `_hatch_opened` | 2383-2385 | 3 |
+| `_leave_junction` | 2390-2402 | 13 |
+| `_frame_chapter_close` | 2407-2409 | 3 |
+| `_tick_junction` | 2414-2452 | 39 |
+| `_tick_lane` | 2459-2520 | 62 |
+| `_sync_wolf_leap` | 2527-2543 | 17 |
+| `_sentry_reason` | 2549-2550 | 2 |
+| `_seen_in_lane` | 2555-2556 | 2 |
+| `_lane_sound` | 2562-2581 | 20 |
+| `_sentry_changed` | 2584-2597 | 14 |
+| `_sentry_alarm` | 2601-2602 | 2 |
+| `_ask_lane` | 2607-2611 | 5 |
+| `_choose_lane` | 2616-2638 | 23 |
+| `_tank_hit` | 2642-2668 | 27 |
+| `_tank_miss` | 2674-2693 | 20 |
+| `_tank_rehung` | 2696-2699 | 4 |
+| `_fade_servo` | 2703-2711 | 9 |
+| `_kill_servo_tween` | 2714-2717 | 4 |
+| `_stop_junction_loops` | 2720-2722 | 3 |
+| `_valve_turned` | 2726-2733 | 8 |
+| `_vent_trips` | 2738-2746 | 9 |
+| `_wolf_reads_seam` | 2749-2754 | 6 |
+| `_door_blast` | 2762-2778 | 17 |
+| `_blast_feedback` | 2781-2787 | 7 |
+| `_fail_beat` | 2795-2834 | 40 |
+| `_lane_fall` | 2841-2853 | 13 |
+| `_restore_beat` | 2856-2883 | 28 |
+| `_cancel_fail_tween` | 2886-2889 | 4 |
+| `_cancel_fail` | 2893-2898 | 6 |
+| `_shutter_boom` | 2902-2907 | 6 |
+| `_door_lands` | 2912-2920 | 9 |
+| `_sync_scene` | 2923-2980 | 58 |
+| `_sync_junction_room` | 2985-3005 | 21 |
+| `_react_as_wolf` | 3008-3020 | 13 |
+| `_flash_relay_spark` | 3025-3055 | 31 |
+| `_sync_records_room` | 3058-3072 | 15 |
+| `_sync_door` | 3078-3104 | 27 |
+| `_set_seal_lamp` | 3109-3111 | 3 |
+| `_update_controls` | 3114-3128 | 15 |
+| `_wolf_target_x` | 3136-3172 | 37 |
+| `_wolf_off_relay` | 3179-3184 | 6 |
+| `_machine_spans` | 3190-3204 | 15 |
+| `_wolf_follow_max_x` | 3209-3214 | 6 |
+| `_refresh_ui` | 3217-3316 | 100 |
+| `_set_dialogue` | 3319-3353 | 35 |
+| `_show_top_card` | 3356-3366 | 11 |
+| `_context_hint` | 3369-3423 | 55 |
+| `_junction_hint` | 3426-3456 | 31 |
+| `_lane_asked` | 3460-3461 | 2 |
+| `_sentry_hunting` | 3465-3466 | 2 |
+| `_drop_ready` | 3471-3472 | 2 |
+| `_lane_hint` | 3475-3511 | 37 |
+| `_objective` | 3514-3545 | 32 |
+| `_install_inputs` | 3548-3565 | 18 |
+| `_add_action` | 3568-3578 | 11 |
+| `_add_joy_button` | 3581-3585 | 5 |
+| `_add_joy_axis` | 3588-3599 | 12 |
+| `_setup_debug_tools` | 3602-3606 | 5 |
+| `_debug_spares_knockdown` | 3611-3612 | 2 |
+| `_debug_sentry_frozen` | 3616-3617 | 2 |
+| `_debug_takes_back` | 3621-3627 | 7 |
+| `debug_new_game` | 3630-3634 | 5 |
+| `debug_load_checkpoint` | 3638-3640 | 3 |
+| `debug_interact` | 3644-3645 | 2 |
+| `debug_answer_lane` | 3649-3651 | 3 |
+| `debug_show_end_card` | 3654-3655 | 2 |
+| `debug_station_side_x` | 3659-3660 | 2 |
+| `debug_place` | 3664-3669 | 6 |
+| `debug_knock_down` | 3674-3684 | 11 |
+| `debug_valve_turned` | 3688-3690 | 3 |
+| `debug_drop_tank` | 3694-3695 | 2 |
+| `debug_save_progress` | 3699-3700 | 2 |
+| `debug_save_changed` | 3704-3706 | 3 |
+| `debug_refresh_ui` | 3709-3710 | 2 |
+| `debug_hold_station` | 3714-3715 | 2 |
+| `debug_restore_focus` | 3719-3724 | 6 |
+| `debug_snapshot` | 3730-3768 | 39 |
+| `debug_beat` | 3771-3786 | 16 |
+| `_debug_engineer_state` | 3789-3802 | 14 |
+| `debug_wolf_target` | 3807-3812 | 6 |
+| `debug_wolf_why` | 3816-3842 | 27 |
