@@ -1,0 +1,9 @@
+Mode: Codex built-in imagegen only; no API key or API/CLI generation.
+References: style-test/v2/plate.png (background), composite-1920.png (Look 2), hq/characters/engineer-side-idle.png (engineer).
+Shared prompt: strict 2D side view, horizontal left-to-right walkway, engineer left of narrow edge-on vertical barrier; upward sliding ceiling housing, tiny floor sill, uninterrupted room wall behind. Flat steel value planes, crisp silhouettes, painterly lighting only. No front-facing doorway, portal, passage into screen, text or watermark. Landscape 1672x941.
+junction-closed: narrow steel junction slab across walkway, floor to ceiling housing, about 2.6 times engineer height.
+junction-opening: same slab half raised upward into ceiling, clear space below, blue light spilling onto floor. Final correction: bottom of slab around y=395 with floor y=695.
+junction-blown: upper torn slab bent to right along walkway above engineer head, small flat floor debris, clear route right.
+corridor-closed: thinner steel shutter, narrow housing, small red lamp lit, flush floor sill.
+corridor-open: fully retract thin shutter upward into same narrow housing, lamp off, no blade or posts beneath, same continuous background.
+compare.png: deterministic composition of final five scenes with captions outside art.

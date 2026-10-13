@@ -1,0 +1,197 @@
+{
+ "browser": "154.0.8037.98",
+ "fonts": [
+  true,
+  true
+ ],
+ "frames": {
+  "look-a-blast-honest-1280.png": [
+   {
+    "label": "cause line",
+    "canvas_px": 26,
+    "device_px": 34.7,
+    "fg": "#e3f6fe",
+    "ratio_p95": 16.43,
+    "ratio_mean": 17.64,
+    "ratio_worst_pixel": 15.38
+   },
+   {
+    "label": "WOLF line",
+    "canvas_px": 18,
+    "device_px": 24,
+    "fg": "#82c3e6",
+    "ratio_p95": 9.82,
+    "ratio_mean": 10.21,
+    "ratio_worst_pixel": 9.5
+   },
+   {
+    "label": "caption",
+    "canvas_px": 16,
+    "device_px": 21.3,
+    "fg": "#c3c5d7",
+    "ratio_p95": 10.66,
+    "ratio_mean": 11.19,
+    "ratio_worst_pixel": 10.15
+   },
+   {
+    "label": "keycap glyph",
+    "canvas_px": 18,
+    "device_px": 24,
+    "fg": "#82c3e6",
+    "ratio_p95": 9.17,
+    "ratio_mean": 10.04,
+    "ratio_worst_pixel": 8.89
+   },
+   {
+    "label": "prompt RETRY",
+    "canvas_px": 18,
+    "device_px": 24,
+    "fg": "#e3f6fe",
+    "ratio_p95": 16.46,
+    "ratio_mean": 17.38,
+    "ratio_worst_pixel": 14.86
+   }
+  ],
+  "look-a-blast-honest-1080p.png": [
+   {
+    "label": "cause line",
+    "canvas_px": 26,
+    "device_px": 52,
+    "fg": "#e3f6fe",
+    "ratio_p95": 16.46,
+    "ratio_mean": 17.64,
+    "ratio_worst_pixel": 15.24
+   },
+   {
+    "label": "WOLF line",
+    "canvas_px": 18,
+    "device_px": 36,
+    "fg": "#82c3e6",
+    "ratio_p95": 9.82,
+    "ratio_mean": 10.21,
+    "ratio_worst_pixel": 9.42
+   },
+   {
+    "label": "caption",
+    "canvas_px": 16,
+    "device_px": 32,
+    "fg": "#c3c5d7",
+    "ratio_p95": 10.73,
+    "ratio_mean": 11.19,
+    "ratio_worst_pixel": 10.05
+   },
+   {
+    "label": "keycap glyph",
+    "canvas_px": 18,
+    "device_px": 36,
+    "fg": "#82c3e6",
+    "ratio_p95": 9.25,
+    "ratio_mean": 10.06,
+    "ratio_worst_pixel": 8.8
+   },
+   {
+    "label": "prompt RETRY",
+    "canvas_px": 18,
+    "device_px": 36,
+    "fg": "#e3f6fe",
+    "ratio_p95": 16.47,
+    "ratio_mean": 17.37,
+    "ratio_worst_pixel": 14.56
+   }
+  ],
+  "look-a-sentry-pressed-1280.png": [
+   {
+    "label": "cause line",
+    "canvas_px": 26,
+    "device_px": 34.7,
+    "fg": "#e3f6fe",
+    "ratio_p95": 16.47,
+    "ratio_mean": 17.73,
+    "ratio_worst_pixel": 15.38
+   },
+   {
+    "label": "WOLF line",
+    "canvas_px": 18,
+    "device_px": 24,
+    "fg": "#82c3e6",
+    "ratio_p95": 9.82,
+    "ratio_mean": 10.22,
+    "ratio_worst_pixel": 9.5
+   },
+   {
+    "label": "caption",
+    "canvas_px": 16,
+    "device_px": 21.3,
+    "fg": "#c3c5d7",
+    "ratio_p95": 10.66,
+    "ratio_mean": 11.19,
+    "ratio_worst_pixel": 10.15
+   },
+   {
+    "label": "keycap glyph",
+    "canvas_px": 18,
+    "device_px": 24,
+    "fg": "#82c3e6",
+    "ratio_p95": 9.17,
+    "ratio_mean": 10.04,
+    "ratio_worst_pixel": 8.89
+   },
+   {
+    "label": "prompt RETRY",
+    "canvas_px": 18,
+    "device_px": 24,
+    "fg": "#e3f6fe",
+    "ratio_p95": 16.46,
+    "ratio_mean": 17.38,
+    "ratio_worst_pixel": 14.86
+   }
+  ],
+  "look-a-sentry-pressed-1080p.png": [
+   {
+    "label": "cause line",
+    "canvas_px": 26,
+    "device_px": 52,
+    "fg": "#e3f6fe",
+    "ratio_p95": 16.47,
+    "ratio_mean": 17.73,
+    "ratio_worst_pixel": 15.24
+   },
+   {
+    "label": "WOLF line",
+    "canvas_px": 18,
+    "device_px": 36,
+    "fg": "#82c3e6",
+    "ratio_p95": 9.82,
+    "ratio_mean": 10.22,
+    "ratio_worst_pixel": 9.42
+   },
+   {
+    "label": "caption",
+    "canvas_px": 16,
+    "device_px": 32,
+    "fg": "#c3c5d7",
+    "ratio_p95": 10.73,
+    "ratio_mean": 11.19,
+    "ratio_worst_pixel": 10.05
+   },
+   {
+    "label": "keycap glyph",
+    "canvas_px": 18,
+    "device_px": 36,
+    "fg": "#82c3e6",
+    "ratio_p95": 9.25,
+    "ratio_mean": 10.06,
+    "ratio_worst_pixel": 8.8
+   },
+   {
+    "label": "prompt RETRY",
+    "canvas_px": 18,
+    "device_px": 36,
+    "fg": "#e3f6fe",
+    "ratio_p95": 16.47,
+    "ratio_mean": 17.37,
+    "ratio_worst_pixel": 14.56
+   }
+  ]
+ }
+}

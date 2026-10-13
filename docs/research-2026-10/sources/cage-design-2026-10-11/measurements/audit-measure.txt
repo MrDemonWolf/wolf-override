@@ -1,0 +1,25 @@
+== lamp centre (right post lamp, world 199,339) across beats
+01-beat0-director-line-noui.png ([204.0, 77.0, 57.0], (477, 322))
+02-beat1-standby-noui.png ([204.0, 77.0, 57.0], (477, 322))
+04-beat2-wake-settled-noui.png ([204.0, 77.0, 57.0], (463, 318))
+18-beat3-settled-noui.png ([204.0, 77.0, 57.0], (463, 318))
+20-beat4-standby-line-noui.png ([204.0, 77.0, 57.0], (377, 318))
+23-beat6-only-open-route-noui.png ([204.0, 77.0, 57.0], (377, 318))
+== left lamp (world 31,339)
+01-beat0-director-line-noui.png ([193.0, 73.0, 54.0], (74, 322))
+04-beat2-wake-settled-noui.png ([184.0, 69.0, 51.0], (26, 318))
+18-beat3-settled-noui.png ([184.0, 69.0, 51.0], (26, 318))
+== contact shadow test (REAL-LOOK item 4): floor right under the base (y 452-454) vs 8-12 px further (y 460-463), x 60..170
+02-beat1-standby-noui.png near 49.7 far 60.6 ratio near/far 0.82
+== WOLF body colour, standby vs woken (world box 95..165 x 395..430), and bars beside him (gate bar at x 133, y 420)
+02-beat1-standby-noui.png wolf box mean [18.2, 31.5, 39.4] | bar [15.0, 25.0, 32.0] | floor in front of cage (115,456) [65.0, 126.0, 155.0]
+04-beat2-wake-settled-noui.png wolf box mean [25.8, 45.0, 53.8] | bar [15.0, 25.0, 31.0] | floor in front of cage (115,456) [61.0, 119.0, 147.0]
+== screen positions of key world points at each framing
+01-beat0-director-line.png zoom 1.79999995231628 centre [267.0, 355.0] cage outer L/T [64, 209] cage R/B [486, 590] view world x 0.3 .. 533.7 y 205.0 .. 505.0
+   dialogue top (screen y 592) = world y 451.7; top card (screen 24..620 x, 22..102 y) = world x 10.3..258.7, y 214.2..247.5; hint panel (screen 868..1236, 126..172) = world x 362.0..515.3 y 257.5..276.7
+04-beat2-wake-settled.png zoom 1.95000004768372 centre [267.0, 355.0] cage outer L/T [16, 196] cage R/B [474, 610] view world x 20.8 .. 513.2 y 216.5 .. 493.5
+   dialogue top (screen y 592) = world y 444.2; top card (screen 24..620 x, 22..102 y) = world x 30.1..259.3, y 225.0..255.8; hint panel (screen 868..1236, 126..172) = world x 354.7..496.2 y 265.0..282.7
+20-beat4-standby-line.png zoom 1.95000004768372 centre [300.0, 355.0] cage outer L/T [-70, 196] cage R/B [388, 610] view world x 53.8 .. 546.2 y 216.5 .. 493.5
+   dialogue top (screen y 592) = world y 444.2; top card (screen 24..620 x, 22..102 y) = world x 63.1..292.3, y 225.0..255.8; hint panel (screen 868..1236, 126..172) = world x 387.7..529.2 y 265.0..282.7
+25-control-starts.png zoom 1.35000002384186 centre [355.555541992188, 360.0] cage outer L/T [49, 238] cage R/B [365, 524] view world x -0.0 .. 711.1 y 160.0 .. 560.0
+   dialogue top (screen y 592) = world y 488.9; top card (screen 24..620 x, 22..102 y) = world x 13.3..344.4, y 172.2..216.7; hint panel (screen 868..1236, 126..172) = world x 482.2..686.7 y 230.0..255.6

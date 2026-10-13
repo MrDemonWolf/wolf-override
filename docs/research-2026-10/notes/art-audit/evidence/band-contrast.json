@@ -1,0 +1,38 @@
+{
+ "corridor": {
+  "band_world_y": "300-440",
+  "L_p50": 8.5,
+  "L_p90": 26.3,
+  "L_p99": 73.3
+ },
+ "junction": {
+  "band_world_y": "300-440",
+  "L_p50": 12.2,
+  "L_p90": 27.6,
+  "L_p99": 59.3
+ },
+ "records": {
+  "band_world_y": "300-440",
+  "L_p50": 11.7,
+  "L_p90": 38.0,
+  "L_p99": 79.3
+ },
+ "rowan-side-right-provisional": {
+  "rim_L_p50": 2.6,
+  "rim_L_p10": 0.2,
+  "body_L_p50": 19.8,
+  "body_L_p10": 2.7
+ },
+ "wolf-side-right-provisional": {
+  "rim_L_p50": 0.8,
+  "rim_L_p10": 0.0,
+  "body_L_p50": 16.3,
+  "body_L_p10": 0.5
+ },
+ "director-side-left-provisional": {
+  "rim_L_p50": 0.5,
+  "rim_L_p10": 0.0,
+  "body_L_p50": 17.3,
+  "body_L_p10": 2.4
+ }
+}

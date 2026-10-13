@@ -1,0 +1,11126 @@
+{
+ "rowan": {
+  "id": "rowan",
+  "family": "characters",
+  "used": true,
+  "path": "apps/game/assets/rowan-side-right-provisional.png",
+  "src": "main.tscn:100 (Human/BodySprite 0.047)",
+  "size": [
+   1024,
+   1536
+  ],
+  "file_bytes": 1762968,
+  "region": [
+   0,
+   0,
+   1024,
+   1536
+  ],
+  "scale": 0.047,
+  "zoom": 1.35,
+  "mip": true,
+  "vram": {
+   "rgba8_with_mips": 8388608
+  },
+  "display": {
+   "960x540": {
+    "opaque_w_px": 36.9,
+    "opaque_h_px": 93.8,
+    "density": 15.76
+   },
+   "1280x720": {
+    "opaque_w_px": 49.2,
+    "opaque_h_px": 125,
+    "density": 11.82
+   },
+   "1920x1080": {
+    "opaque_w_px": 73.7,
+    "opaque_h_px": 187.6,
+    "density": 7.88
+   }
+  },
+  "static": {
+   "alpha_hist": {
+    "max": 254,
+    "body_alpha_mode": [
+     [
+      253,
+      382657
+     ],
+     [
+      252,
+      65609
+     ],
+     [
+      251,
+      9769
+     ]
+    ],
+    "body_below_250_pct": 2.9,
+    "body_below_240_pct": 1.11
+   },
+   "alpha": {
+    "transparent_pct": 68.15,
+    "opaque_pct": 0,
+    "semi_pct": 31.85,
+    "body_px": 478558
+   },
+   "opaque_bbox": [
+    247,
+    29,
+    581,
+    1478
+   ],
+   "islands": {
+    "parts": 1,
+    "stray_count": 0,
+    "stray_px": 0,
+    "specks_under_16px": 0,
+    "largest_strays": []
+   },
+   "holes": {
+    "count": 4,
+    "count_over_9px": 4,
+    "px": 11277,
+    "largest": [
+     {
+      "px": 9942,
+      "bbox": [
+       347,
+       538,
+       89,
+       273
+      ]
+     },
+     {
+      "px": 890,
+      "bbox": [
+       687,
+       739,
+       32,
+       123
+      ]
+     },
+     {
+      "px": 435,
+      "bbox": [
+       354,
+       833,
+       20,
+       51
+      ]
+     },
+     {
+      "px": 10,
+      "bbox": [
+       459,
+       200,
+       4,
+       4
+      ]
+     }
+    ]
+   },
+   "inner_translucency": {
+    "px": 16,
+    "pct_of_body": 0.003,
+    "samples": [
+     [
+      486,
+      57,
+      203
+     ]
+    ]
+   },
+   "fringe": {
+    "semi_edge_px": 9308,
+    "mean_dL": -1.43,
+    "p10_dL": -17.11,
+    "p90_dL": 10.43,
+    "light_halo_pct": 3.52,
+    "dark_fringe_pct": 11.93,
+    "mean_dRGB": [
+     0.1,
+     -3.1,
+     -4.1
+    ],
+    "green_spill": -1.1
+   },
+   "edge_hardness": {
+    "boundary_px": 6314,
+    "hard_pct": 0
+   },
+   "rim": {
+    "inner_L": 22.6,
+    "left": {
+     "n": 7362,
+     "dL": -14.1,
+     "bright15_L": 28.6,
+     "bright15_ab": [
+      -4.4,
+      -24.8
+     ]
+    },
+    "right": {
+     "n": 7574,
+     "dL": -19.4,
+     "bright15_L": 13.2,
+     "bright15_ab": [
+      0.9,
+      -11.4
+     ]
+    },
+    "top": {
+     "n": 4141,
+     "dL": -9.9,
+     "bright15_L": 37.4,
+     "bright15_ab": [
+      -5.4,
+      -22.9
+     ]
+    },
+    "bottom": {
+     "n": 4234,
+     "dL": -21.4,
+     "bright15_L": 5.3,
+     "bright15_ab": [
+      -0.6,
+      -5.9
+     ]
+    }
+   },
+   "palette": {
+    "L_p1": 0,
+    "L_p5": 0.6,
+    "L_p50": 20.6,
+    "L_p99": 72.2,
+    "C_mean": 13.8,
+    "C_p95": 45.6,
+    "a_mean": 7.8,
+    "b_mean": 0.9,
+    "hue_deg": 7,
+    "light_offset_x": -0.007,
+    "light_offset_y": -0.031
+   },
+   "noise_sigma": 2.3,
+   "subpixel_detail": {
+    "window_src_px": 17,
+    "rms_luma": 18.47,
+    "share_of_variance_pct": 34
+   }
+  },
+  "emulation": {
+   "960x540": {
+    "screen_px_per_src_px": 0.0635,
+    "density": 15.76,
+    "magnified": false,
+    "out_px": [
+     65,
+     97
+    ],
+    "alias_rmse": 3.81,
+    "phase_shimmer": 2.93,
+    "sharpness_vs_ideal": 0.641,
+    "grad_energy": 3
+   },
+   "1280x720": {
+    "screen_px_per_src_px": 0.0846,
+    "density": 11.82,
+    "magnified": false,
+    "out_px": [
+     87,
+     130
+    ],
+    "alias_rmse": 3.51,
+    "phase_shimmer": 2.37,
+    "sharpness_vs_ideal": 0.697,
+    "grad_energy": 3.08
+   },
+   "1920x1080": {
+    "screen_px_per_src_px": 0.1269,
+    "density": 7.88,
+    "magnified": false,
+    "out_px": [
+     130,
+     195
+    ],
+    "alias_rmse": 3.68,
+    "phase_shimmer": 2.65,
+    "sharpness_vs_ideal": 0.734,
+    "grad_energy": 3.08
+   }
+  }
+ },
+ "wolf": {
+  "id": "wolf",
+  "family": "characters",
+  "used": true,
+  "path": "apps/game/assets/wolf-side-right-provisional.png",
+  "src": "main.tscn:124 (Wolf/BodySprite 0.0733)",
+  "size": [
+   1902,
+   1015
+  ],
+  "file_bytes": 1299320,
+  "region": [
+   0,
+   0,
+   1902,
+   1015
+  ],
+  "scale": 0.0733,
+  "zoom": 1.35,
+  "mip": true,
+  "vram": {
+   "rgba8_with_mips": 10296160
+  },
+  "display": {
+   "960x540": {
+    "opaque_w_px": 155.3,
+    "opaque_h_px": 82.8,
+    "density": 10.11
+   },
+   "1280x720": {
+    "opaque_w_px": 207,
+    "opaque_h_px": 110.4,
+    "density": 7.58
+   },
+   "1920x1080": {
+    "opaque_w_px": 310.5,
+    "opaque_h_px": 165.7,
+    "density": 5.05
+   }
+  },
+  "static": {
+   "alpha_hist": {
+    "max": 255,
+    "body_alpha_mode": [
+     [
+      253,
+      390633
+     ],
+     [
+      252,
+      61380
+     ],
+     [
+      251,
+      11380
+     ]
+    ],
+    "body_below_250_pct": 3.91,
+    "body_below_240_pct": 1.71
+   },
+   "alpha": {
+    "transparent_pct": 72.87,
+    "opaque_pct": 0.03,
+    "semi_pct": 27.1,
+    "body_px": 491096
+   },
+   "opaque_bbox": [
+    187,
+    84,
+    1569,
+    837
+   ],
+   "islands": {
+    "parts": 1,
+    "stray_count": 0,
+    "stray_px": 0,
+    "specks_under_16px": 0,
+    "largest_strays": []
+   },
+   "holes": {
+    "count": 0,
+    "count_over_9px": 0,
+    "px": 0,
+    "largest": []
+   },
+   "inner_translucency": {
+    "px": 96,
+    "pct_of_body": 0.02,
+    "samples": [
+     [
+      1437,
+      198,
+      233
+     ],
+     [
+      1556,
+      431,
+      232
+     ]
+    ]
+   },
+   "fringe": {
+    "semi_edge_px": 14913,
+    "mean_dL": -0.75,
+    "p10_dL": -13.52,
+    "p90_dL": 9.65,
+    "light_halo_pct": 4.08,
+    "dark_fringe_pct": 8.65,
+    "mean_dRGB": [
+     0.9,
+     -1.3,
+     -2.7
+    ],
+    "green_spill": -0.4
+   },
+   "edge_hardness": {
+    "boundary_px": 7046,
+    "hard_pct": 0
+   },
+   "rim": {
+    "inner_L": 20.6,
+    "left": {
+     "n": 5137,
+     "dL": -19.3,
+     "bright15_L": 5.3,
+     "bright15_ab": [
+      -2.5,
+      -5.1
+     ]
+    },
+    "right": {
+     "n": 5808,
+     "dL": -19.7,
+     "bright15_L": 3.4,
+     "bright15_ab": [
+      -1.1,
+      -3.8
+     ]
+    },
+    "top": {
+     "n": 6115,
+     "dL": -15.6,
+     "bright15_L": 15.9,
+     "bright15_ab": [
+      -5.9,
+      -12.1
+     ]
+    },
+    "bottom": {
+     "n": 6246,
+     "dL": -20.2,
+     "bright15_L": 1.1,
+     "bright15_ab": [
+      -0.3,
+      -0.2
+     ]
+    }
+   },
+   "palette": {
+    "L_p1": 0,
+    "L_p5": 0.1,
+    "L_p50": 16.4,
+    "L_p99": 79.7,
+    "C_mean": 4.4,
+    "C_p95": 13.3,
+    "a_mean": -1.9,
+    "b_mean": -3.1,
+    "hue_deg": -121,
+    "light_offset_x": 0.012,
+    "light_offset_y": -0.028
+   },
+   "noise_sigma": 2.18,
+   "subpixel_detail": {
+    "window_src_px": 11,
+    "rms_luma": 23.64,
+    "share_of_variance_pct": 26.4
+   }
+  },
+  "emulation": {
+   "960x540": {
+    "screen_px_per_src_px": 0.099,
+    "density": 10.11,
+    "magnified": false,
+    "out_px": [
+     188,
+     100
+    ],
+    "alias_rmse": 8.55,
+    "phase_shimmer": 5.14,
+    "sharpness_vs_ideal": 0.7,
+    "grad_energy": 3.96
+   },
+   "1280x720": {
+    "screen_px_per_src_px": 0.1319,
+    "density": 7.58,
+    "magnified": false,
+    "out_px": [
+     251,
+     134
+    ],
+    "alias_rmse": 8.89,
+    "phase_shimmer": 5.42,
+    "sharpness_vs_ideal": 0.717,
+    "grad_energy": 3.89
+   },
+   "1920x1080": {
+    "screen_px_per_src_px": 0.1979,
+    "density": 5.05,
+    "magnified": false,
+    "out_px": [
+     376,
+     201
+    ],
+    "alias_rmse": 7.43,
+    "phase_shimmer": 4.3,
+    "sharpness_vs_ideal": 0.717,
+    "grad_energy": 3.55
+   }
+  }
+ },
+ "director": {
+  "id": "director",
+  "family": "characters",
+  "used": true,
+  "path": "apps/game/assets/director-side-left-provisional.png",
+  "src": "main.tscn:154 (IntroDirector 0.047); opening zoom 1.95 main.gd:519",
+  "size": [
+   1024,
+   1536
+  ],
+  "file_bytes": 1445196,
+  "region": [
+   0,
+   0,
+   1024,
+   1536
+  ],
+  "scale": 0.047,
+  "zoom": 1.95,
+  "mip": true,
+  "vram": {
+   "rgba8_with_mips": 8388608
+  },
+  "display": {
+   "960x540": {
+    "opaque_w_px": 39.7,
+    "opaque_h_px": 135.6,
+    "density": 10.91
+   },
+   "1280x720": {
+    "opaque_w_px": 52.9,
+    "opaque_h_px": 180.7,
+    "density": 8.18
+   },
+   "1920x1080": {
+    "opaque_w_px": 79.4,
+    "opaque_h_px": 271.1,
+    "density": 5.46
+   }
+  },
+  "static": {
+   "alpha_hist": {
+    "max": 254,
+    "body_alpha_mode": [
+     [
+      253,
+      343704
+     ],
+     [
+      252,
+      24141
+     ],
+     [
+      254,
+      7098
+     ]
+    ],
+    "body_below_250_pct": 2.17,
+    "body_below_240_pct": 0.85
+   },
+   "alpha": {
+    "transparent_pct": 74.46,
+    "opaque_pct": 0,
+    "semi_pct": 25.54,
+    "body_px": 390170
+   },
+   "opaque_bbox": [
+    319,
+    37,
+    433,
+    1479
+   ],
+   "islands": {
+    "parts": 1,
+    "stray_count": 0,
+    "stray_px": 0,
+    "specks_under_16px": 0,
+    "largest_strays": []
+   },
+   "holes": {
+    "count": 1,
+    "count_over_9px": 1,
+    "px": 25,
+    "largest": [
+     {
+      "px": 25,
+      "bbox": [
+       385,
+       136,
+       3,
+       11
+      ]
+     }
+    ]
+   },
+   "inner_translucency": {
+    "px": 101,
+    "pct_of_body": 0.026,
+    "samples": [
+     [
+      492,
+      41,
+      222
+     ],
+     [
+      386,
+      136,
+      99
+     ],
+     [
+      575,
+      186,
+      235
+     ]
+    ]
+   },
+   "fringe": {
+    "semi_edge_px": 5588,
+    "mean_dL": 1.77,
+    "p10_dL": -9.73,
+    "p90_dL": 14.69,
+    "light_halo_pct": 9.57,
+    "dark_fringe_pct": 7.89,
+    "mean_dRGB": [
+     3.9,
+     5.8,
+     7.7
+    ],
+    "green_spill": 0
+   },
+   "edge_hardness": {
+    "boundary_px": 3809,
+    "hard_pct": 0
+   },
+   "rim": {
+    "inner_L": 30.4,
+    "left": {
+     "n": 3930,
+     "dL": -29.4,
+     "bright15_L": 5.3,
+     "bright15_ab": [
+      0.3,
+      -0.3
+     ]
+    },
+    "right": {
+     "n": 4242,
+     "dL": -29.3,
+     "bright15_L": 4.1,
+     "bright15_ab": [
+      -0.7,
+      -2.2
+     ]
+    },
+    "top": {
+     "n": 1782,
+     "dL": -28,
+     "bright15_L": 11.7,
+     "bright15_ab": [
+      -1,
+      -3
+     ]
+    },
+    "bottom": {
+     "n": 2185,
+     "dL": -29.4,
+     "bright15_L": 5.4,
+     "bright15_ab": [
+      0.9,
+      0.3
+     ]
+    }
+   },
+   "palette": {
+    "L_p1": 0,
+    "L_p5": 0.5,
+    "L_p50": 18.1,
+    "L_p99": 78.3,
+    "C_mean": 6,
+    "C_p95": 21.9,
+    "a_mean": -0.4,
+    "b_mean": -4.2,
+    "hue_deg": -95,
+    "light_offset_x": -0.007,
+    "light_offset_y": -0.063
+   },
+   "noise_sigma": 2.49,
+   "subpixel_detail": {
+    "window_src_px": 11,
+    "rms_luma": 18.64,
+    "share_of_variance_pct": 25.2
+   }
+  },
+  "emulation": {
+   "960x540": {
+    "screen_px_per_src_px": 0.0917,
+    "density": 10.91,
+    "magnified": false,
+    "out_px": [
+     94,
+     141
+    ],
+    "alias_rmse": 3.57,
+    "phase_shimmer": 2.43,
+    "sharpness_vs_ideal": 0.673,
+    "grad_energy": 2.43
+   },
+   "1280x720": {
+    "screen_px_per_src_px": 0.1222,
+    "density": 8.18,
+    "magnified": false,
+    "out_px": [
+     125,
+     188
+    ],
+    "alias_rmse": 3.72,
+    "phase_shimmer": 2.56,
+    "sharpness_vs_ideal": 0.729,
+    "grad_energy": 2.58
+   },
+   "1920x1080": {
+    "screen_px_per_src_px": 0.1833,
+    "density": 5.46,
+    "magnified": false,
+    "out_px": [
+     188,
+     282
+    ],
+    "alias_rmse": 3.35,
+    "phase_shimmer": 2.15,
+    "sharpness_vs_ideal": 0.721,
+    "grad_energy": 2.34
+   }
+  }
+ },
+ "corridor-purge-display": {
+  "id": "corridor-purge-display",
+  "family": "props-corridor",
+  "used": true,
+  "path": "apps/game/assets/props/corridor-purge-display.png",
+  "src": "main.tscn:160",
+  "size": [
+   512,
+   512
+  ],
+  "file_bytes": 357021,
+  "region": [
+   46,
+   63,
+   420,
+   408
+  ],
+  "scale": 0.25,
+  "zoom": 1.35,
+  "mip": true,
+  "vram": {
+   "rgba8_with_mips": 1398101
+  },
+  "display": {
+   "960x540": {
+    "opaque_w_px": 139.7,
+    "opaque_h_px": 136.4,
+    "density": 2.96
+   },
+   "1280x720": {
+    "opaque_w_px": 186.3,
+    "opaque_h_px": 181.8,
+    "density": 2.22
+   },
+   "1920x1080": {
+    "opaque_w_px": 279.5,
+    "opaque_h_px": 272.7,
+    "density": 1.48
+   }
+  },
+  "static": {
+   "alpha_hist": {
+    "max": 255,
+    "body_alpha_mode": [
+     [
+      253,
+      73981
+     ],
+     [
+      252,
+      65978
+     ],
+     [
+      251,
+      2264
+     ]
+    ],
+    "body_below_250_pct": 1.15,
+    "body_below_240_pct": 1
+   },
+   "alpha": {
+    "transparent_pct": 13.82,
+    "opaque_pct": 0.64,
+    "semi_pct": 85.54,
+    "body_px": 145772
+   },
+   "opaque_bbox": [
+    3,
+    3,
+    414,
+    404
+   ],
+   "islands": {
+    "parts": 1,
+    "stray_count": 0,
+    "stray_px": 0,
+    "specks_under_16px": 0,
+    "largest_strays": []
+   },
+   "holes": {
+    "count": 1,
+    "count_over_9px": 1,
+    "px": 756,
+    "largest": [
+     {
+      "px": 756,
+      "bbox": [
+       21,
+       156,
+       17,
+       108
+      ]
+     }
+    ]
+   },
+   "inner_translucency": {
+    "px": 0,
+    "pct_of_body": 0,
+    "samples": []
+   },
+   "fringe": {
+    "semi_edge_px": 2117,
+    "mean_dL": -1.01,
+    "p10_dL": -9.3,
+    "p90_dL": 10.05,
+    "light_halo_pct": 7.09,
+    "dark_fringe_pct": 2.27,
+    "mean_dRGB": [
+     -13.3,
+     -2.6,
+     3.7
+    ],
+    "green_spill": 2.2
+   },
+   "edge_hardness": {
+    "boundary_px": 1789,
+    "hard_pct": 0
+   },
+   "rim": {
+    "inner_L": 18.7,
+    "left": {
+     "n": 1335,
+     "dL": -7.7,
+     "bright15_L": 34.4,
+     "bright15_ab": [
+      -1.8,
+      -11.7
+     ]
+    },
+    "right": {
+     "n": 1379,
+     "dL": -7.2,
+     "bright15_L": 44.1,
+     "bright15_ab": [
+      -9,
+      -26.2
+     ]
+    },
+    "top": {
+     "n": 1206,
+     "dL": 0.8,
+     "bright15_L": 47.1,
+     "bright15_ab": [
+      -9.1,
+      -18.3
+     ]
+    },
+    "bottom": {
+     "n": 1076,
+     "dL": -18.2,
+     "bright15_L": 3.4,
+     "bright15_ab": [
+      0,
+      -1.1
+     ]
+    }
+   },
+   "palette": {
+    "L_p1": 0,
+    "L_p5": 0,
+    "L_p50": 15.5,
+    "L_p99": 74.7,
+    "C_mean": 10.2,
+    "C_p95": 62.4,
+    "a_mean": 6.9,
+    "b_mean": 3.1,
+    "hue_deg": 24,
+    "light_offset_x": -0.015,
+    "light_offset_y": -0.043
+   },
+   "noise_sigma": 4.6,
+   "subpixel_detail": {
+    "window_src_px": 3,
+    "rms_luma": 15.88,
+    "share_of_variance_pct": 18
+   }
+  },
+  "emulation": {
+   "960x540": {
+    "screen_px_per_src_px": 0.3375,
+    "density": 2.96,
+    "magnified": false,
+    "out_px": [
+     142,
+     138
+    ],
+    "alias_rmse": 6.78,
+    "phase_shimmer": 4.47,
+    "sharpness_vs_ideal": 0.737,
+    "grad_energy": 8.17
+   },
+   "1280x720": {
+    "screen_px_per_src_px": 0.45,
+    "density": 2.22,
+    "magnified": false,
+    "out_px": [
+     189,
+     184
+    ],
+    "alias_rmse": 6.25,
+    "phase_shimmer": 4.38,
+    "sharpness_vs_ideal": 0.792,
+    "grad_energy": 8.37
+   },
+   "1920x1080": {
+    "screen_px_per_src_px": 0.675,
+    "density": 1.48,
+    "magnified": false,
+    "out_px": [
+     284,
+     275
+    ],
+    "alias_rmse": 4.22,
+    "phase_shimmer": 2.64,
+    "sharpness_vs_ideal": 0.842,
+    "grad_energy": 7.85
+   }
+  }
+ },
+ "corridor-breaker": {
+  "id": "corridor-breaker",
+  "family": "props-corridor",
+  "used": true,
+  "path": "apps/game/assets/props/corridor-breaker.png",
+  "src": "main.tscn:169; junction_room.gd:34-35 (same scale)",
+  "size": [
+   512,
+   512
+  ],
+  "file_bytes": 295111,
+  "region": [
+   81,
+   46,
+   342,
+   433
+  ],
+  "scale": 0.225,
+  "zoom": 1.35,
+  "mip": true,
+  "vram": {
+   "rgba8_with_mips": 1398101
+  },
+  "display": {
+   "960x540": {
+    "opaque_w_px": 102.1,
+    "opaque_h_px": 130.9,
+    "density": 3.29
+   },
+   "1280x720": {
+    "opaque_w_px": 136.1,
+    "opaque_h_px": 174.6,
+    "density": 2.47
+   },
+   "1920x1080": {
+    "opaque_w_px": 204.1,
+    "opaque_h_px": 261.8,
+    "density": 1.65
+   }
+  },
+  "static": {
+   "alpha_hist": {
+    "max": 255,
+    "body_alpha_mode": [
+     [
+      253,
+      74563
+     ],
+     [
+      252,
+      30861
+     ],
+     [
+      251,
+      1881
+     ]
+    ],
+    "body_below_250_pct": 1.42,
+    "body_below_240_pct": 1.1
+   },
+   "alpha": {
+    "transparent_pct": 23.81,
+    "opaque_pct": 0.66,
+    "semi_pct": 75.53,
+    "body_px": 110620
+   },
+   "opaque_bbox": [
+    3,
+    2,
+    336,
+    431
+   ],
+   "islands": {
+    "parts": 1,
+    "stray_count": 0,
+    "stray_px": 0,
+    "specks_under_16px": 0,
+    "largest_strays": []
+   },
+   "holes": {
+    "count": 2,
+    "count_over_9px": 2,
+    "px": 1058,
+    "largest": [
+     {
+      "px": 1021,
+      "bbox": [
+       278,
+       114,
+       15,
+       197
+      ]
+     },
+     {
+      "px": 37,
+      "bbox": [
+       289,
+       320,
+       17,
+       15
+      ]
+     }
+    ]
+   },
+   "inner_translucency": {
+    "px": 478,
+    "pct_of_body": 0.432,
+    "samples": [
+     [
+      305,
+      318,
+      231
+     ],
+     [
+      121,
+      431,
+      222
+     ],
+     [
+      171,
+      431,
+      226
+     ],
+     [
+      221,
+      431,
+      219
+     ],
+     [
+      52,
+      432,
+      122
+     ]
+    ]
+   },
+   "fringe": {
+    "semi_edge_px": 2473,
+    "mean_dL": -10.07,
+    "p10_dL": -23.75,
+    "p90_dL": 0,
+    "light_halo_pct": 0,
+    "dark_fringe_pct": 29.92,
+    "mean_dRGB": [
+     -15.3,
+     -24.4,
+     -26
+    ],
+    "green_spill": -3.7
+   },
+   "edge_hardness": {
+    "boundary_px": 1903,
+    "hard_pct": 0
+   },
+   "rim": {
+    "inner_L": 18.7,
+    "left": {
+     "n": 1642,
+     "dL": -8.7,
+     "bright15_L": 28,
+     "bright15_ab": [
+      -2.5,
+      -4
+     ]
+    },
+    "right": {
+     "n": 1809,
+     "dL": 3.5,
+     "bright15_L": 56,
+     "bright15_ab": [
+      -20.4,
+      -25.5
+     ]
+    },
+    "top": {
+     "n": 1191,
+     "dL": 8,
+     "bright15_L": 65.1,
+     "bright15_ab": [
+      -15,
+      -14.7
+     ]
+    },
+    "bottom": {
+     "n": 791,
+     "dL": -14.2,
+     "bright15_L": 20.5,
+     "bright15_ab": [
+      -6.3,
+      -14.9
+     ]
+    }
+   },
+   "palette": {
+    "L_p1": 0,
+    "L_p5": 0.3,
+    "L_p50": 17.5,
+    "L_p99": 87.4,
+    "C_mean": 7.6,
+    "C_p95": 35.9,
+    "a_mean": 1.7,
+    "b_mean": 4.2,
+    "hue_deg": 68,
+    "light_offset_x": -0.009,
+    "light_offset_y": -0.049
+   },
+   "noise_sigma": 4.77,
+   "subpixel_detail": {
+    "window_src_px": 5,
+    "rms_luma": 21.43,
+    "share_of_variance_pct": 25.8
+   }
+  },
+  "emulation": {
+   "960x540": {
+    "screen_px_per_src_px": 0.3038,
+    "density": 3.29,
+    "magnified": false,
+    "out_px": [
+     104,
+     132
+    ],
+    "alias_rmse": 6.66,
+    "phase_shimmer": 4.74,
+    "sharpness_vs_ideal": 0.762,
+    "grad_energy": 8.67
+   },
+   "1280x720": {
+    "screen_px_per_src_px": 0.405,
+    "density": 2.47,
+    "magnified": false,
+    "out_px": [
+     139,
+     175
+    ],
+    "alias_rmse": 5.92,
+    "phase_shimmer": 4.24,
+    "sharpness_vs_ideal": 0.788,
+    "grad_energy": 8.38
+   },
+   "1920x1080": {
+    "screen_px_per_src_px": 0.6075,
+    "density": 1.65,
+    "magnified": false,
+    "out_px": [
+     208,
+     263
+    ],
+    "alias_rmse": 4.92,
+    "phase_shimmer": 3.17,
+    "sharpness_vs_ideal": 0.834,
+    "grad_energy": 7.9
+   }
+  }
+ },
+ "corridor-coolant-relay": {
+  "id": "corridor-coolant-relay",
+  "family": "props-corridor",
+  "used": true,
+  "path": "apps/game/assets/props/corridor-coolant-relay.png",
+  "src": "main.tscn:178",
+  "size": [
+   512,
+   512
+  ],
+  "file_bytes": 333373,
+  "region": [
+   61,
+   64,
+   390,
+   405
+  ],
+  "scale": 0.221,
+  "zoom": 1.35,
+  "mip": true,
+  "vram": {
+   "rgba8_with_mips": 1398101
+  },
+  "display": {
+   "960x540": {
+    "opaque_w_px": 114.9,
+    "opaque_h_px": 119.6,
+    "density": 3.35
+   },
+   "1280x720": {
+    "opaque_w_px": 153.2,
+    "opaque_h_px": 159.5,
+    "density": 2.51
+   },
+   "1920x1080": {
+    "opaque_w_px": 229.7,
+    "opaque_h_px": 239.3,
+    "density": 1.68
+   }
+  },
+  "static": {
+   "alpha_hist": {
+    "max": 255,
+    "body_alpha_mode": [
+     [
+      253,
+      74590
+     ],
+     [
+      252,
+      47781
+     ],
+     [
+      251,
+      1440
+     ]
+    ],
+    "body_below_250_pct": 0.86,
+    "body_below_240_pct": 0.63
+   },
+   "alpha": {
+    "transparent_pct": 18.93,
+    "opaque_pct": 0.42,
+    "semi_pct": 80.65,
+    "body_px": 126303
+   },
+   "opaque_bbox": [
+    2,
+    3,
+    385,
+    401
+   ],
+   "islands": {
+    "parts": 1,
+    "stray_count": 0,
+    "stray_px": 0,
+    "specks_under_16px": 0,
+    "largest_strays": []
+   },
+   "holes": {
+    "count": 2,
+    "count_over_9px": 2,
+    "px": 96,
+    "largest": [
+     {
+      "px": 83,
+      "bbox": [
+       321,
+       129,
+       14,
+       15
+      ]
+     },
+     {
+      "px": 13,
+      "bbox": [
+       313,
+       134,
+       2,
+       10
+      ]
+     }
+    ]
+   },
+   "inner_translucency": {
+    "px": 170,
+    "pct_of_body": 0.135,
+    "samples": [
+     [
+      313,
+      68,
+      230
+     ],
+     [
+      46,
+      403,
+      214
+     ],
+     [
+      19,
+      404,
+      30
+     ],
+     [
+      69,
+      404,
+      18
+     ]
+    ]
+   },
+   "fringe": {
+    "semi_edge_px": 1947,
+    "mean_dL": -12.73,
+    "p10_dL": -32.38,
+    "p90_dL": -0.55,
+    "light_halo_pct": 0,
+    "dark_fringe_pct": 31.84,
+    "mean_dRGB": [
+     -24,
+     -30.6,
+     -31.3
+    ],
+    "green_spill": -3
+   },
+   "edge_hardness": {
+    "boundary_px": 1558,
+    "hard_pct": 0
+   },
+   "rim": {
+    "inner_L": 21.5,
+    "left": {
+     "n": 1149,
+     "dL": -8,
+     "bright15_L": 30.2,
+     "bright15_ab": [
+      -1.4,
+      -2.5
+     ]
+    },
+    "right": {
+     "n": 1138,
+     "dL": -3.5,
+     "bright15_L": 47.2,
+     "bright15_ab": [
+      -17.6,
+      -15.4
+     ]
+    },
+    "top": {
+     "n": 1283,
+     "dL": 9.3,
+     "bright15_L": 70.2,
+     "bright15_ab": [
+      -14.3,
+      -12
+     ]
+    },
+    "bottom": {
+     "n": 1260,
+     "dL": -18.5,
+     "bright15_L": 10.4,
+     "bright15_ab": [
+      -1.5,
+      -0.8
+     ]
+    }
+   },
+   "palette": {
+    "L_p1": 0,
+    "L_p5": 0.3,
+    "L_p50": 19.5,
+    "L_p99": 91.3,
+    "C_mean": 5.8,
+    "C_p95": 23.3,
+    "a_mean": -2.8,
+    "b_mean": -2.5,
+    "hue_deg": -139,
+    "light_offset_x": -0.008,
+    "light_offset_y": -0.044
+   },
+   "noise_sigma": 5.42,
+   "subpixel_detail": {
+    "window_src_px": 5,
+    "rms_luma": 20.19,
+    "share_of_variance_pct": 21.9
+   }
+  },
+  "emulation": {
+   "960x540": {
+    "screen_px_per_src_px": 0.2984,
+    "density": 3.35,
+    "magnified": false,
+    "out_px": [
+     116,
+     121
+    ],
+    "alias_rmse": 6.62,
+    "phase_shimmer": 4.56,
+    "sharpness_vs_ideal": 0.76,
+    "grad_energy": 9.79
+   },
+   "1280x720": {
+    "screen_px_per_src_px": 0.3978,
+    "density": 2.51,
+    "magnified": false,
+    "out_px": [
+     155,
+     161
+    ],
+    "alias_rmse": 5.6,
+    "phase_shimmer": 3.68,
+    "sharpness_vs_ideal": 0.802,
+    "grad_energy": 9.4
+   },
+   "1920x1080": {
+    "screen_px_per_src_px": 0.5967,
+    "density": 1.68,
+    "magnified": false,
+    "out_px": [
+     233,
+     242
+    ],
+    "alias_rmse": 4.63,
+    "phase_shimmer": 3.11,
+    "sharpness_vs_ideal": 0.846,
+    "grad_energy": 8.7
+   }
+  }
+ },
+ "corridor-sealed-door": {
+  "id": "corridor-sealed-door",
+  "family": "props-corridor",
+  "used": true,
+  "path": "apps/game/assets/props/corridor-sealed-door.png",
+  "src": "main.tscn:83-86",
+  "size": [
+   512,
+   512
+  ],
+  "file_bytes": 253905,
+  "region": [
+   120,
+   18,
+   273,
+   467
+  ],
+  "scale": 0.302,
+  "zoom": 1.35,
+  "mip": true,
+  "vram": {
+   "rgba8_with_mips": 1398101
+  },
+  "display": {
+   "960x540": {
+    "opaque_w_px": 109.3,
+    "opaque_h_px": 188.8,
+    "density": 2.45
+   },
+   "1280x720": {
+    "opaque_w_px": 145.7,
+    "opaque_h_px": 251.7,
+    "density": 1.84
+   },
+   "1920x1080": {
+    "opaque_w_px": 218.5,
+    "opaque_h_px": 377.5,
+    "density": 1.23
+   }
+  },
+  "static": {
+   "alpha_hist": {
+    "max": 255,
+    "body_alpha_mode": [
+     [
+      253,
+      60584
+     ],
+     [
+      252,
+      26578
+     ],
+     [
+      251,
+      1877
+     ]
+    ],
+    "body_below_250_pct": 1.22,
+    "body_below_240_pct": 0.85
+   },
+   "alpha": {
+    "transparent_pct": 26.55,
+    "opaque_pct": 0.64,
+    "semi_pct": 72.81,
+    "body_px": 91703
+   },
+   "opaque_bbox": [
+    2,
+    3,
+    268,
+    463
+   ],
+   "islands": {
+    "parts": 1,
+    "stray_count": 0,
+    "stray_px": 0,
+    "specks_under_16px": 0,
+    "largest_strays": []
+   },
+   "holes": {
+    "count": 0,
+    "count_over_9px": 0,
+    "px": 0,
+    "largest": []
+   },
+   "inner_translucency": {
+    "px": 141,
+    "pct_of_body": 0.154,
+    "samples": [
+     [
+      17,
+      465,
+      214
+     ],
+     [
+      263,
+      465,
+      228
+     ],
+     [
+      223,
+      466,
+      53
+     ]
+    ]
+   },
+   "fringe": {
+    "semi_edge_px": 1692,
+    "mean_dL": -16.11,
+    "p10_dL": -27.62,
+    "p90_dL": -2.66,
+    "light_halo_pct": 0.06,
+    "dark_fringe_pct": 57.92,
+    "mean_dRGB": [
+     -23,
+     -38.1,
+     -43.2
+    ],
+    "green_spill": -5
+   },
+   "edge_hardness": {
+    "boundary_px": 1335,
+    "hard_pct": 0
+   },
+   "rim": {
+    "inner_L": 23.9,
+    "left": {
+     "n": 1315,
+     "dL": 1.9,
+     "bright15_L": 52.7,
+     "bright15_ab": [
+      -12.7,
+      -23
+     ]
+    },
+    "right": {
+     "n": 1275,
+     "dL": -2.4,
+     "bright15_L": 43.7,
+     "bright15_ab": [
+      -10,
+      -22.5
+     ]
+    },
+    "top": {
+     "n": 834,
+     "dL": 9.4,
+     "bright15_L": 62,
+     "bright15_ab": [
+      -6.7,
+      -10.4
+     ]
+    },
+    "bottom": {
+     "n": 858,
+     "dL": -15.9,
+     "bright15_L": 26.3,
+     "bright15_ab": [
+      0,
+      -3.9
+     ]
+    }
+   },
+   "palette": {
+    "L_p1": 0,
+    "L_p5": 0.6,
+    "L_p50": 23.9,
+    "L_p99": 84.7,
+    "C_mean": 14.5,
+    "C_p95": 71.2,
+    "a_mean": 9.3,
+    "b_mean": 6.7,
+    "hue_deg": 36,
+    "light_offset_x": -0.002,
+    "light_offset_y": -0.019
+   },
+   "noise_sigma": 4.99,
+   "subpixel_detail": {
+    "window_src_px": 3,
+    "rms_luma": 14.35,
+    "share_of_variance_pct": 15.8
+   }
+  },
+  "emulation": {
+   "960x540": {
+    "screen_px_per_src_px": 0.4077,
+    "density": 2.45,
+    "magnified": false,
+    "out_px": [
+     111,
+     190
+    ],
+    "alias_rmse": 5.93,
+    "phase_shimmer": 3.75,
+    "sharpness_vs_ideal": 0.776,
+    "grad_energy": 7.71
+   },
+   "1280x720": {
+    "screen_px_per_src_px": 0.5436,
+    "density": 1.84,
+    "magnified": false,
+    "out_px": [
+     148,
+     254
+    ],
+    "alias_rmse": 5.57,
+    "phase_shimmer": 3.56,
+    "sharpness_vs_ideal": 0.831,
+    "grad_energy": 7.63
+   },
+   "1920x1080": {
+    "screen_px_per_src_px": 0.8154,
+    "density": 1.23,
+    "magnified": false,
+    "out_px": [
+     223,
+     381
+    ],
+    "alias_rmse": 2.28,
+    "phase_shimmer": 1.31,
+    "sharpness_vs_ideal": 0.899,
+    "grad_energy": 7.17
+   }
+  }
+ },
+ "corridor-safe-point": {
+  "id": "corridor-safe-point",
+  "family": "props-corridor",
+  "used": true,
+  "path": "apps/game/assets/props/corridor-safe-point.png",
+  "src": "main.tscn:187",
+  "size": [
+   512,
+   512
+  ],
+  "file_bytes": 226355,
+  "region": [
+   116,
+   31,
+   280,
+   449
+  ],
+  "scale": 0.25,
+  "zoom": 1.35,
+  "mip": true,
+  "vram": {
+   "rgba8_with_mips": 1398101
+  },
+  "display": {
+   "960x540": {
+    "opaque_w_px": 92.5,
+    "opaque_h_px": 150.5,
+    "density": 2.96
+   },
+   "1280x720": {
+    "opaque_w_px": 123.3,
+    "opaque_h_px": 200.7,
+    "density": 2.22
+   },
+   "1920x1080": {
+    "opaque_w_px": 185,
+    "opaque_h_px": 301.1,
+    "density": 1.48
+   }
+  },
+  "static": {
+   "alpha_hist": {
+    "max": 255,
+    "body_alpha_mode": [
+     [
+      253,
+      52517
+     ],
+     [
+      252,
+      24496
+     ],
+     [
+      251,
+      1582
+     ]
+    ],
+    "body_below_250_pct": 1.6,
+    "body_below_240_pct": 1.28
+   },
+   "alpha": {
+    "transparent_pct": 33.66,
+    "opaque_pct": 0.65,
+    "semi_pct": 65.69,
+    "body_px": 81417
+   },
+   "opaque_bbox": [
+    3,
+    3,
+    274,
+    446
+   ],
+   "islands": {
+    "parts": 1,
+    "stray_count": 0,
+    "stray_px": 0,
+    "specks_under_16px": 0,
+    "largest_strays": []
+   },
+   "holes": {
+    "count": 3,
+    "count_over_9px": 3,
+    "px": 364,
+    "largest": [
+     {
+      "px": 213,
+      "bbox": [
+       243,
+       261,
+       4,
+       58
+      ]
+     },
+     {
+      "px": 117,
+      "bbox": [
+       242,
+       350,
+       5,
+       27
+      ]
+     },
+     {
+      "px": 34,
+      "bbox": [
+       243,
+       234,
+       3,
+       14
+      ]
+     }
+    ]
+   },
+   "inner_translucency": {
+    "px": 131,
+    "pct_of_body": 0.161,
+    "samples": [
+     [
+      242,
+      249,
+      235
+     ],
+     [
+      39,
+      448,
+      145
+     ],
+     [
+      229,
+      448,
+      147
+     ]
+    ]
+   },
+   "fringe": {
+    "semi_edge_px": 1994,
+    "mean_dL": -9.4,
+    "p10_dL": -21.48,
+    "p90_dL": 0.69,
+    "light_halo_pct": 2.16,
+    "dark_fringe_pct": 27.68,
+    "mean_dRGB": [
+     -18.8,
+     -23.1,
+     -22.3
+    ],
+    "green_spill": -2.6
+   },
+   "edge_hardness": {
+    "boundary_px": 1585,
+    "hard_pct": 0
+   },
+   "rim": {
+    "inner_L": 20.1,
+    "left": {
+     "n": 1545,
+     "dL": -8.8,
+     "bright15_L": 33.6,
+     "bright15_ab": [
+      -1.7,
+      1.1
+     ]
+    },
+    "right": {
+     "n": 1475,
+     "dL": 3.9,
+     "bright15_L": 63.1,
+     "bright15_ab": [
+      -26.6,
+      -19.1
+     ]
+    },
+    "top": {
+     "n": 953,
+     "dL": 12.9,
+     "bright15_L": 72.8,
+     "bright15_ab": [
+      -25.1,
+      -13.7
+     ]
+    },
+    "bottom": {
+     "n": 558,
+     "dL": -16.6,
+     "bright15_L": 13,
+     "bright15_ab": [
+      -2.5,
+      -3.7
+     ]
+    }
+   },
+   "palette": {
+    "L_p1": 0,
+    "L_p5": 0.3,
+    "L_p50": 20.8,
+    "L_p99": 94.4,
+    "C_mean": 9.8,
+    "C_p95": 51.3,
+    "a_mean": -6.5,
+    "b_mean": 4.2,
+    "hue_deg": 147,
+    "light_offset_x": -0.006,
+    "light_offset_y": -0.065
+   },
+   "noise_sigma": 5.44,
+   "subpixel_detail": {
+    "window_src_px": 3,
+    "rms_luma": 16.85,
+    "share_of_variance_pct": 12.1
+   }
+  },
+  "emulation": {
+   "960x540": {
+    "screen_px_per_src_px": 0.3375,
+    "density": 2.96,
+    "magnified": false,
+    "out_px": [
+     95,
+     152
+    ],
+    "alias_rmse": 6.51,
+    "phase_shimmer": 4.42,
+    "sharpness_vs_ideal": 0.757,
+    "grad_energy": 7.79
+   },
+   "1280x720": {
+    "screen_px_per_src_px": 0.45,
+    "density": 2.22,
+    "magnified": false,
+    "out_px": [
+     126,
+     202
+    ],
+    "alias_rmse": 6.39,
+    "phase_shimmer": 4.63,
+    "sharpness_vs_ideal": 0.798,
+    "grad_energy": 8.07
+   },
+   "1920x1080": {
+    "screen_px_per_src_px": 0.675,
+    "density": 1.48,
+    "magnified": false,
+    "out_px": [
+     189,
+     303
+    ],
+    "alias_rmse": 4.4,
+    "phase_shimmer": 2.69,
+    "sharpness_vs_ideal": 0.838,
+    "grad_energy": 7.35
+   }
+  }
+ },
+ "records-purge-queue": {
+  "id": "records-purge-queue",
+  "family": "props-records",
+  "used": true,
+  "path": "apps/game/assets/props/records-purge-queue.png",
+  "src": "records_room.gd:14-15",
+  "size": [
+   512,
+   512
+  ],
+  "file_bytes": 355297,
+  "region": [
+   51,
+   54,
+   417,
+   409
+  ],
+  "scale": 0.274,
+  "zoom": 1.35,
+  "mip": true,
+  "vram": {
+   "rgba8_with_mips": 1398101
+  },
+  "display": {
+   "960x540": {
+    "opaque_w_px": 152,
+    "opaque_h_px": 149.8,
+    "density": 2.7
+   },
+   "1280x720": {
+    "opaque_w_px": 202.7,
+    "opaque_h_px": 199.7,
+    "density": 2.03
+   },
+   "1920x1080": {
+    "opaque_w_px": 304.1,
+    "opaque_h_px": 299.6,
+    "density": 1.35
+   }
+  },
+  "static": {
+   "alpha_hist": {
+    "max": 255,
+    "body_alpha_mode": [
+     [
+      253,
+      74110
+     ],
+     [
+      252,
+      64194
+     ],
+     [
+      251,
+      2836
+     ]
+    ],
+    "body_below_250_pct": 1.25,
+    "body_below_240_pct": 0.68
+   },
+   "alpha": {
+    "transparent_pct": 13.99,
+    "opaque_pct": 0.34,
+    "semi_pct": 85.67,
+    "body_px": 144537
+   },
+   "opaque_bbox": [
+    3,
+    3,
+    411,
+    405
+   ],
+   "islands": {
+    "parts": 1,
+    "stray_count": 0,
+    "stray_px": 0,
+    "specks_under_16px": 0,
+    "largest_strays": []
+   },
+   "holes": {
+    "count": 1,
+    "count_over_9px": 1,
+    "px": 741,
+    "largest": [
+     {
+      "px": 741,
+      "bbox": [
+       23,
+       161,
+       11,
+       104
+      ]
+     }
+    ]
+   },
+   "inner_translucency": {
+    "px": 437,
+    "pct_of_body": 0.302,
+    "samples": [
+     [
+      24,
+      265,
+      218
+     ],
+     [
+      21,
+      408,
+      74
+     ],
+     [
+      71,
+      408,
+      60
+     ],
+     [
+      121,
+      408,
+      63
+     ],
+     [
+      171,
+      408,
+      57
+     ]
+    ]
+   },
+   "fringe": {
+    "semi_edge_px": 2197,
+    "mean_dL": -3.23,
+    "p10_dL": -10.71,
+    "p90_dL": 2.79,
+    "light_halo_pct": 0.86,
+    "dark_fringe_pct": 4.51,
+    "mean_dRGB": [
+     -12.3,
+     -7.6,
+     -5.2
+    ],
+    "green_spill": 1.1
+   },
+   "edge_hardness": {
+    "boundary_px": 1768,
+    "hard_pct": 0
+   },
+   "rim": {
+    "inner_L": 16.7,
+    "left": {
+     "n": 1444,
+     "dL": -1.8,
+     "bright15_L": 41.4,
+     "bright15_ab": [
+      -7.6,
+      -15
+     ]
+    },
+    "right": {
+     "n": 1227,
+     "dL": -9.4,
+     "bright15_L": 24.3,
+     "bright15_ab": [
+      -3.2,
+      -9.3
+     ]
+    },
+    "top": {
+     "n": 1186,
+     "dL": 5.6,
+     "bright15_L": 53.9,
+     "bright15_ab": [
+      -10.1,
+      -17.4
+     ]
+    },
+    "bottom": {
+     "n": 1389,
+     "dL": -16.2,
+     "bright15_L": 2.4,
+     "bright15_ab": [
+      -0.3,
+      -0.3
+     ]
+    }
+   },
+   "palette": {
+    "L_p1": 0,
+    "L_p5": 0,
+    "L_p50": 14.6,
+    "L_p99": 72.9,
+    "C_mean": 9,
+    "C_p95": 53.1,
+    "a_mean": 5.7,
+    "b_mean": 2.6,
+    "hue_deg": 24,
+    "light_offset_x": -0.021,
+    "light_offset_y": -0.037
+   },
+   "noise_sigma": 4.17,
+   "subpixel_detail": {
+    "window_src_px": 3,
+    "rms_luma": 15.14,
+    "share_of_variance_pct": 16.3
+   }
+  },
+  "emulation": {
+   "960x540": {
+    "screen_px_per_src_px": 0.3699,
+    "density": 2.7,
+    "magnified": false,
+    "out_px": [
+     154,
+     151
+    ],
+    "alias_rmse": 5.8,
+    "phase_shimmer": 3.77,
+    "sharpness_vs_ideal": 0.775,
+    "grad_energy": 8.33
+   },
+   "1280x720": {
+    "screen_px_per_src_px": 0.4932,
+    "density": 2.03,
+    "magnified": false,
+    "out_px": [
+     206,
+     202
+    ],
+    "alias_rmse": 5.61,
+    "phase_shimmer": 3.92,
+    "sharpness_vs_ideal": 0.838,
+    "grad_energy": 8.42
+   },
+   "1920x1080": {
+    "screen_px_per_src_px": 0.7398,
+    "density": 1.35,
+    "magnified": false,
+    "out_px": [
+     308,
+     303
+    ],
+    "alias_rmse": 2.99,
+    "phase_shimmer": 1.86,
+    "sharpness_vs_ideal": 0.877,
+    "grad_energy": 7.66
+   }
+  }
+ },
+ "records-mirror-port": {
+  "id": "records-mirror-port",
+  "family": "props-records",
+  "used": true,
+  "path": "apps/game/assets/props/records-mirror-port.png",
+  "src": "records_room.gd:16-17",
+  "size": [
+   512,
+   512
+  ],
+  "file_bytes": 335442,
+  "region": [
+   69,
+   31,
+   373,
+   468
+  ],
+  "scale": 0.239,
+  "zoom": 1.35,
+  "mip": true,
+  "vram": {
+   "rgba8_with_mips": 1398101
+  },
+  "display": {
+   "960x540": {
+    "opaque_w_px": 118.7,
+    "opaque_h_px": 149.7,
+    "density": 3.1
+   },
+   "1280x720": {
+    "opaque_w_px": 158.3,
+    "opaque_h_px": 199.6,
+    "density": 2.32
+   },
+   "1920x1080": {
+    "opaque_w_px": 237.5,
+    "opaque_h_px": 299.4,
+    "density": 1.55
+   }
+  },
+  "static": {
+   "alpha_hist": {
+    "max": 255,
+    "body_alpha_mode": [
+     [
+      253,
+      66296
+     ],
+     [
+      252,
+      58043
+     ],
+     [
+      251,
+      2316
+     ]
+    ],
+    "body_below_250_pct": 1.39,
+    "body_below_240_pct": 0.99
+   },
+   "alpha": {
+    "transparent_pct": 23.9,
+    "opaque_pct": 0.57,
+    "semi_pct": 75.53,
+    "body_px": 130171
+   },
+   "opaque_bbox": [
+    3,
+    3,
+    368,
+    464
+   ],
+   "islands": {
+    "parts": 1,
+    "stray_count": 0,
+    "stray_px": 0,
+    "specks_under_16px": 0,
+    "largest_strays": []
+   },
+   "holes": {
+    "count": 6,
+    "count_over_9px": 4,
+    "px": 4890,
+    "largest": [
+     {
+      "px": 2281,
+      "bbox": [
+       318,
+       144,
+       21,
+       122
+      ]
+     },
+     {
+      "px": 2176,
+      "bbox": [
+       35,
+       144,
+       20,
+       122
+      ]
+     },
+     {
+      "px": 217,
+      "bbox": [
+       328,
+       305,
+       14,
+       24
+      ]
+     },
+     {
+      "px": 213,
+      "bbox": [
+       32,
+       305,
+       14,
+       24
+      ]
+     },
+     {
+      "px": 2,
+      "bbox": [
+       329,
+       284,
+       1,
+       2
+      ]
+     }
+    ]
+   },
+   "inner_translucency": {
+    "px": 92,
+    "pct_of_body": 0.071,
+    "samples": [
+     [
+      44,
+      283,
+      221
+     ],
+     [
+      86,
+      467,
+      92
+     ]
+    ]
+   },
+   "fringe": {
+    "semi_edge_px": 2903,
+    "mean_dL": -4.13,
+    "p10_dL": -13.39,
+    "p90_dL": 3.39,
+    "light_halo_pct": 1.86,
+    "dark_fringe_pct": 7.75,
+    "mean_dRGB": [
+     -10.7,
+     -10.6,
+     -10
+    ],
+    "green_spill": -0.2
+   },
+   "edge_hardness": {
+    "boundary_px": 2198,
+    "hard_pct": 0
+   },
+   "rim": {
+    "inner_L": 18.9,
+    "left": {
+     "n": 2056,
+     "dL": -15.2,
+     "bright15_L": 19.4,
+     "bright15_ab": [
+      0.5,
+      0.3
+     ]
+    },
+    "right": {
+     "n": 2005,
+     "dL": -8.4,
+     "bright15_L": 37.1,
+     "bright15_ab": [
+      -5.1,
+      -27.3
+     ]
+    },
+    "top": {
+     "n": 1392,
+     "dL": -8.9,
+     "bright15_L": 34.8,
+     "bright15_ab": [
+      -3.7,
+      -14
+     ]
+    },
+    "bottom": {
+     "n": 1470,
+     "dL": -17.6,
+     "bright15_L": 6.7,
+     "bright15_ab": [
+      -0.8,
+      -2.1
+     ]
+    }
+   },
+   "palette": {
+    "L_p1": 0,
+    "L_p5": 0,
+    "L_p50": 17,
+    "L_p99": 88.2,
+    "C_mean": 5,
+    "C_p95": 22.9,
+    "a_mean": -2,
+    "b_mean": -3,
+    "hue_deg": -124,
+    "light_offset_x": -0.005,
+    "light_offset_y": -0.054
+   },
+   "noise_sigma": 4.95,
+   "subpixel_detail": {
+    "window_src_px": 5,
+    "rms_luma": 23.36,
+    "share_of_variance_pct": 25.3
+   }
+  },
+  "emulation": {
+   "960x540": {
+    "screen_px_per_src_px": 0.3227,
+    "density": 3.1,
+    "magnified": false,
+    "out_px": [
+     120,
+     151
+    ],
+    "alias_rmse": 7.24,
+    "phase_shimmer": 4.97,
+    "sharpness_vs_ideal": 0.749,
+    "grad_energy": 9.56
+   },
+   "1280x720": {
+    "screen_px_per_src_px": 0.4302,
+    "density": 2.32,
+    "magnified": false,
+    "out_px": [
+     160,
+     201
+    ],
+    "alias_rmse": 6.43,
+    "phase_shimmer": 4.57,
+    "sharpness_vs_ideal": 0.777,
+    "grad_energy": 9.43
+   },
+   "1920x1080": {
+    "screen_px_per_src_px": 0.6453,
+    "density": 1.55,
+    "magnified": false,
+    "out_px": [
+     241,
+     302
+    ],
+    "alias_rmse": 4.76,
+    "phase_shimmer": 3.1,
+    "sharpness_vs_ideal": 0.847,
+    "grad_energy": 9.02
+   }
+  }
+ },
+ "records-exit-hatch": {
+  "id": "records-exit-hatch",
+  "family": "props-records",
+  "used": true,
+  "path": "apps/game/assets/props/records-exit-hatch.png",
+  "src": "records_room.gd:18-19",
+  "size": [
+   512,
+   512
+  ],
+  "file_bytes": 253361,
+  "region": [
+   126,
+   21,
+   260,
+   481
+  ],
+  "scale": 0.291,
+  "zoom": 1.35,
+  "mip": true,
+  "vram": {
+   "rgba8_with_mips": 1398101
+  },
+  "display": {
+   "960x540": {
+    "opaque_w_px": 99.8,
+    "opaque_h_px": 188.2,
+    "density": 2.55
+   },
+   "1280x720": {
+    "opaque_w_px": 133,
+    "opaque_h_px": 250.9,
+    "density": 1.91
+   },
+   "1920x1080": {
+    "opaque_w_px": 199.6,
+    "opaque_h_px": 376.4,
+    "density": 1.27
+   }
+  },
+  "static": {
+   "alpha_hist": {
+    "max": 255,
+    "body_alpha_mode": [
+     [
+      253,
+      53977
+     ],
+     [
+      252,
+      37722
+     ],
+     [
+      251,
+      1712
+     ]
+    ],
+    "body_below_250_pct": 1.25,
+    "body_below_240_pct": 0.99
+   },
+   "alpha": {
+    "transparent_pct": 21.86,
+    "opaque_pct": 0.47,
+    "semi_pct": 77.67,
+    "body_px": 95944
+   },
+   "opaque_bbox": [
+    3,
+    2,
+    254,
+    479
+   ],
+   "islands": {
+    "parts": 1,
+    "stray_count": 0,
+    "stray_px": 0,
+    "specks_under_16px": 0,
+    "largest_strays": []
+   },
+   "holes": {
+    "count": 0,
+    "count_over_9px": 0,
+    "px": 0,
+    "largest": []
+   },
+   "inner_translucency": {
+    "px": 64,
+    "pct_of_body": 0.067,
+    "samples": [
+     [
+      40,
+      479,
+      213
+     ],
+     [
+      206,
+      480,
+      130
+     ]
+    ]
+   },
+   "fringe": {
+    "semi_edge_px": 1794,
+    "mean_dL": -4.65,
+    "p10_dL": -17.07,
+    "p90_dL": 7.4,
+    "light_halo_pct": 4.4,
+    "dark_fringe_pct": 13.6,
+    "mean_dRGB": [
+     -15.5,
+     -11.5,
+     -9
+    ],
+    "green_spill": 0.7
+   },
+   "edge_hardness": {
+    "boundary_px": 1376,
+    "hard_pct": 0
+   },
+   "rim": {
+    "inner_L": 17.1,
+    "left": {
+     "n": 1310,
+     "dL": 8.8,
+     "bright15_L": 67.9,
+     "bright15_ab": [
+      -15.3,
+      -21.4
+     ]
+    },
+    "right": {
+     "n": 1275,
+     "dL": -9.4,
+     "bright15_L": 28.7,
+     "bright15_ab": [
+      -3,
+      -11
+     ]
+    },
+    "top": {
+     "n": 812,
+     "dL": 13.6,
+     "bright15_L": 68.6,
+     "bright15_ab": [
+      -10.8,
+      -14.6
+     ]
+    },
+    "bottom": {
+     "n": 676,
+     "dL": -15.2,
+     "bright15_L": 6.8,
+     "bright15_ab": [
+      0.5,
+      -0.2
+     ]
+    }
+   },
+   "palette": {
+    "L_p1": 0,
+    "L_p5": 0.1,
+    "L_p50": 19.4,
+    "L_p99": 91.8,
+    "C_mean": 17.6,
+    "C_p95": 75.8,
+    "a_mean": 12.7,
+    "b_mean": 7.4,
+    "hue_deg": 30,
+    "light_offset_x": -0.007,
+    "light_offset_y": -0.023
+   },
+   "noise_sigma": 4.06,
+   "subpixel_detail": {
+    "window_src_px": 3,
+    "rms_luma": 14.52,
+    "share_of_variance_pct": 10
+   }
+  },
+  "emulation": {
+   "960x540": {
+    "screen_px_per_src_px": 0.3928,
+    "density": 2.55,
+    "magnified": false,
+    "out_px": [
+     102,
+     189
+    ],
+    "alias_rmse": 6.8,
+    "phase_shimmer": 4.46,
+    "sharpness_vs_ideal": 0.763,
+    "grad_energy": 8.22
+   },
+   "1280x720": {
+    "screen_px_per_src_px": 0.5238,
+    "density": 1.91,
+    "magnified": false,
+    "out_px": [
+     136,
+     252
+    ],
+    "alias_rmse": 5.77,
+    "phase_shimmer": 4.08,
+    "sharpness_vs_ideal": 0.837,
+    "grad_energy": 8.07
+   },
+   "1920x1080": {
+    "screen_px_per_src_px": 0.7857,
+    "density": 1.27,
+    "magnified": false,
+    "out_px": [
+     204,
+     378
+    ],
+    "alias_rmse": 2.62,
+    "phase_shimmer": 1.56,
+    "sharpness_vs_ideal": 0.908,
+    "grad_energy": 7.56
+   }
+  }
+ },
+ "junction-valve": {
+  "id": "junction-valve",
+  "family": "props-junction",
+  "used": true,
+  "path": "apps/game/assets/props/junction-valve.png",
+  "src": "junction_room.gd:36-37",
+  "size": [
+   512,
+   512
+  ],
+  "file_bytes": 334044,
+  "region": [
+   3,
+   11,
+   506,
+   490
+  ],
+  "scale": 0.2,
+  "zoom": 1.35,
+  "mip": true,
+  "vram": {
+   "rgba8_with_mips": 1398101
+  },
+  "display": {
+   "960x540": {
+    "opaque_w_px": 136.6,
+    "opaque_h_px": 132,
+    "density": 3.7
+   },
+   "1280x720": {
+    "opaque_w_px": 182.2,
+    "opaque_h_px": 176,
+    "density": 2.78
+   },
+   "1920x1080": {
+    "opaque_w_px": 273.2,
+    "opaque_h_px": 264.1,
+    "density": 1.85
+   }
+  },
+  "static": {
+   "alpha_hist": {
+    "max": 255,
+    "body_alpha_mode": [
+     [
+      252,
+      74528
+     ],
+     [
+      253,
+      36825
+     ],
+     [
+      251,
+      6105
+     ]
+    ],
+    "body_below_250_pct": 2.81,
+    "body_below_240_pct": 2.09
+   },
+   "alpha": {
+    "transparent_pct": 49.14,
+    "opaque_pct": 0.01,
+    "semi_pct": 50.86,
+    "body_px": 121964
+   },
+   "opaque_bbox": [
+    0,
+    0,
+    506,
+    489
+   ],
+   "islands": {
+    "parts": 1,
+    "stray_count": 0,
+    "stray_px": 0,
+    "specks_under_16px": 0,
+    "largest_strays": []
+   },
+   "holes": {
+    "count": 5,
+    "count_over_9px": 4,
+    "px": 7138,
+    "largest": [
+     {
+      "px": 3655,
+      "bbox": [
+       267,
+       91,
+       61,
+       109
+      ]
+     },
+     {
+      "px": 1817,
+      "bbox": [
+       282,
+       328,
+       33,
+       102
+      ]
+     },
+     {
+      "px": 1653,
+      "bbox": [
+       192,
+       340,
+       32,
+       90
+      ]
+     },
+     {
+      "px": 12,
+      "bbox": [
+       207,
+       312,
+       5,
+       4
+      ]
+     },
+     {
+      "px": 1,
+      "bbox": [
+       171,
+       217,
+       1,
+       1
+      ]
+     }
+    ]
+   },
+   "inner_translucency": {
+    "px": 386,
+    "pct_of_body": 0.316,
+    "samples": [
+     [
+      247,
+      0,
+      76
+     ],
+     [
+      505,
+      341,
+      156
+     ],
+     [
+      127,
+      488,
+      193
+     ],
+     [
+      339,
+      488,
+      229
+     ],
+     [
+      389,
+      488,
+      208
+     ]
+    ]
+   },
+   "fringe": {
+    "semi_edge_px": 5113,
+    "mean_dL": -9.78,
+    "p10_dL": -23.41,
+    "p90_dL": -0.98,
+    "light_halo_pct": 0,
+    "dark_fringe_pct": 25.03,
+    "mean_dRGB": [
+     -16.1,
+     -24.6,
+     -26.6
+    ],
+    "green_spill": -3.2
+   },
+   "edge_hardness": {
+    "boundary_px": 3110,
+    "hard_pct": 0
+   },
+   "rim": {
+    "inner_L": 22.6,
+    "left": {
+     "n": 2543,
+     "dL": -15.6,
+     "bright15_L": 29.4,
+     "bright15_ab": [
+      -1.7,
+      -3.8
+     ]
+    },
+    "right": {
+     "n": 2548,
+     "dL": -9.3,
+     "bright15_L": 43.8,
+     "bright15_ab": [
+      -13.9,
+      -19.2
+     ]
+    },
+    "top": {
+     "n": 2304,
+     "dL": -1.9,
+     "bright15_L": 55.7,
+     "bright15_ab": [
+      -10.3,
+      -7.5
+     ]
+    },
+    "bottom": {
+     "n": 2071,
+     "dL": -19.8,
+     "bright15_L": 10.7,
+     "bright15_ab": [
+      -2.3,
+      -2.5
+     ]
+    }
+   },
+   "palette": {
+    "L_p1": 0,
+    "L_p5": 0.5,
+    "L_p50": 21,
+    "L_p99": 88.5,
+    "C_mean": 9.7,
+    "C_p95": 56.4,
+    "a_mean": 1.4,
+    "b_mean": 5.5,
+    "hue_deg": 76,
+    "light_offset_x": -0.002,
+    "light_offset_y": -0.048
+   },
+   "noise_sigma": 5.19,
+   "subpixel_detail": {
+    "window_src_px": 5,
+    "rms_luma": 21.68,
+    "share_of_variance_pct": 17.3
+   }
+  },
+  "emulation": {
+   "960x540": {
+    "screen_px_per_src_px": 0.27,
+    "density": 3.7,
+    "magnified": false,
+    "out_px": [
+     137,
+     132
+    ],
+    "alias_rmse": 6.41,
+    "phase_shimmer": 4.51,
+    "sharpness_vs_ideal": 0.773,
+    "grad_energy": 7.73
+   },
+   "1280x720": {
+    "screen_px_per_src_px": 0.36,
+    "density": 2.78,
+    "magnified": false,
+    "out_px": [
+     182,
+     176
+    ],
+    "alias_rmse": 5.28,
+    "phase_shimmer": 3.41,
+    "sharpness_vs_ideal": 0.78,
+    "grad_energy": 7.11
+   },
+   "1920x1080": {
+    "screen_px_per_src_px": 0.54,
+    "density": 1.85,
+    "magnified": false,
+    "out_px": [
+     273,
+     265
+    ],
+    "alias_rmse": 4.33,
+    "phase_shimmer": 3,
+    "sharpness_vs_ideal": 0.837,
+    "grad_energy": 6.69
+   }
+  }
+ },
+ "junction-blast-door-sealed": {
+  "id": "junction-blast-door-sealed",
+  "family": "props-junction",
+  "used": true,
+  "path": "apps/game/assets/props/junction-blast-door-sealed.png",
+  "src": "junction_room.gd:45,48",
+  "size": [
+   512,
+   768
+  ],
+  "file_bytes": 634952,
+  "region": [
+   17,
+   53,
+   478,
+   660
+  ],
+  "scale": 0.2,
+  "zoom": 1.35,
+  "mip": true,
+  "vram": {
+   "rgba8_with_mips": 2097152
+  },
+  "display": {
+   "960x540": {
+    "opaque_w_px": 128.5,
+    "opaque_h_px": 177.9,
+    "density": 3.7
+   },
+   "1280x720": {
+    "opaque_w_px": 171.4,
+    "opaque_h_px": 237.2,
+    "density": 2.78
+   },
+   "1920x1080": {
+    "opaque_w_px": 257,
+    "opaque_h_px": 355.9,
+    "density": 1.85
+   }
+  },
+  "static": {
+   "alpha_hist": {
+    "max": 254,
+    "body_alpha_mode": [
+     [
+      253,
+      132777
+     ],
+     [
+      252,
+      127462
+     ],
+     [
+      251,
+      3786
+     ]
+    ],
+    "body_below_250_pct": 1.12,
+    "body_below_240_pct": 0.7
+   },
+   "alpha": {
+    "transparent_pct": 13.76,
+    "opaque_pct": 0,
+    "semi_pct": 86.24,
+    "body_px": 268098
+   },
+   "opaque_bbox": [
+    1,
+    1,
+    476,
+    659
+   ],
+   "islands": {
+    "parts": 1,
+    "stray_count": 0,
+    "stray_px": 0,
+    "specks_under_16px": 0,
+    "largest_strays": []
+   },
+   "holes": {
+    "count": 0,
+    "count_over_9px": 0,
+    "px": 0,
+    "largest": []
+   },
+   "inner_translucency": {
+    "px": 355,
+    "pct_of_body": 0.132,
+    "samples": [
+     [
+      83,
+      0,
+      59
+     ],
+     [
+      389,
+      0,
+      47
+     ],
+     [
+      382,
+      1,
+      219
+     ],
+     [
+      0,
+      654,
+      31
+     ],
+     [
+      51,
+      659,
+      104
+     ]
+    ]
+   },
+   "fringe": {
+    "semi_edge_px": 3520,
+    "mean_dL": -6.68,
+    "p10_dL": -15.71,
+    "p90_dL": 4.88,
+    "light_halo_pct": 1.65,
+    "dark_fringe_pct": 13.15,
+    "mean_dRGB": [
+     -12.9,
+     -16.9,
+     -7.5
+    ],
+    "green_spill": -6.7
+   },
+   "edge_hardness": {
+    "boundary_px": 2141,
+    "hard_pct": 0
+   },
+   "rim": {
+    "inner_L": 17,
+    "left": {
+     "n": 1648,
+     "dL": -5.9,
+     "bright15_L": 36.3,
+     "bright15_ab": [
+      -10.1,
+      -17.5
+     ]
+    },
+    "right": {
+     "n": 1717,
+     "dL": -5.8,
+     "bright15_L": 36.8,
+     "bright15_ab": [
+      -11.2,
+      -18.6
+     ]
+    },
+    "top": {
+     "n": 1264,
+     "dL": 6.5,
+     "bright15_L": 47.9,
+     "bright15_ab": [
+      -8.1,
+      -11.2
+     ]
+    },
+    "bottom": {
+     "n": 1152,
+     "dL": -12.5,
+     "bright15_L": 16.7,
+     "bright15_ab": [
+      1,
+      3.2
+     ]
+    }
+   },
+   "palette": {
+    "L_p1": 0,
+    "L_p5": 0.3,
+    "L_p50": 20.3,
+    "L_p99": 81.2,
+    "C_mean": 7.7,
+    "C_p95": 40.4,
+    "a_mean": 1.6,
+    "b_mean": 3.8,
+    "hue_deg": 68,
+    "light_offset_x": -0.002,
+    "light_offset_y": -0.013
+   },
+   "noise_sigma": 4.4,
+   "subpixel_detail": {
+    "window_src_px": 5,
+    "rms_luma": 17.23,
+    "share_of_variance_pct": 19.8
+   }
+  },
+  "emulation": {
+   "960x540": {
+    "screen_px_per_src_px": 0.27,
+    "density": 3.7,
+    "magnified": false,
+    "out_px": [
+     129,
+     178
+    ],
+    "alias_rmse": 7.47,
+    "phase_shimmer": 5.37,
+    "sharpness_vs_ideal": 0.74,
+    "grad_energy": 9.17
+   },
+   "1280x720": {
+    "screen_px_per_src_px": 0.36,
+    "density": 2.78,
+    "magnified": false,
+    "out_px": [
+     172,
+     238
+    ],
+    "alias_rmse": 5.88,
+    "phase_shimmer": 3.77,
+    "sharpness_vs_ideal": 0.759,
+    "grad_energy": 8.84
+   },
+   "1920x1080": {
+    "screen_px_per_src_px": 0.54,
+    "density": 1.85,
+    "magnified": false,
+    "out_px": [
+     258,
+     356
+    ],
+    "alias_rmse": 4.74,
+    "phase_shimmer": 3.2,
+    "sharpness_vs_ideal": 0.85,
+    "grad_energy": 8.68
+   }
+  }
+ },
+ "junction-blast-door-blown": {
+  "id": "junction-blast-door-blown",
+  "family": "props-junction",
+  "used": true,
+  "path": "apps/game/assets/props/junction-blast-door-blown.png",
+  "src": "junction_room.gd:46,48",
+  "size": [
+   512,
+   768
+  ],
+  "file_bytes": 629839,
+  "region": [
+   12,
+   44,
+   487,
+   685
+  ],
+  "scale": 0.2,
+  "zoom": 1.35,
+  "mip": true,
+  "vram": {
+   "rgba8_with_mips": 2097152
+  },
+  "display": {
+   "960x540": {
+    "opaque_w_px": 131.2,
+    "opaque_h_px": 184.7,
+    "density": 3.7
+   },
+   "1280x720": {
+    "opaque_w_px": 175,
+    "opaque_h_px": 246.2,
+    "density": 2.78
+   },
+   "1920x1080": {
+    "opaque_w_px": 262.4,
+    "opaque_h_px": 369.4,
+    "density": 1.85
+   }
+  },
+  "static": {
+   "alpha_hist": {
+    "max": 255,
+    "body_alpha_mode": [
+     [
+      252,
+      127599
+     ],
+     [
+      253,
+      83604
+     ],
+     [
+      251,
+      8988
+     ]
+    ],
+    "body_below_250_pct": 3.95,
+    "body_below_240_pct": 1.8
+   },
+   "alpha": {
+    "transparent_pct": 26.28,
+    "opaque_pct": 0,
+    "semi_pct": 73.72,
+    "body_px": 232793
+   },
+   "opaque_bbox": [
+    0,
+    0,
+    486,
+    684
+   ],
+   "islands": {
+    "parts": 1,
+    "stray_count": 2,
+    "stray_px": 35,
+    "specks_under_16px": 1,
+    "largest_strays": [
+     {
+      "px": 24,
+      "bbox": [
+       205,
+       440,
+       6,
+       6
+      ]
+     },
+     {
+      "px": 11,
+      "bbox": [
+       197,
+       449,
+       5,
+       5
+      ]
+     }
+    ]
+   },
+   "holes": {
+    "count": 2,
+    "count_over_9px": 2,
+    "px": 50473,
+    "largest": [
+     {
+      "px": 50412,
+      "bbox": [
+       175,
+       96,
+       164,
+       521
+      ]
+     },
+     {
+      "px": 61,
+      "bbox": [
+       301,
+       538,
+       11,
+       8
+      ]
+     }
+    ]
+   },
+   "inner_translucency": {
+    "px": 316,
+    "pct_of_body": 0.136,
+    "samples": [
+     [
+      80,
+      0,
+      118
+     ],
+     [
+      393,
+      0,
+      122
+     ],
+     [
+      304,
+      286,
+      239
+     ],
+     [
+      315,
+      483,
+      226
+     ],
+     [
+      485,
+      645,
+      208
+     ]
+    ]
+   },
+   "fringe": {
+    "semi_edge_px": 6797,
+    "mean_dL": -0.8,
+    "p10_dL": -13.9,
+    "p90_dL": 11.28,
+    "light_halo_pct": 6.08,
+    "dark_fringe_pct": 8.39,
+    "mean_dRGB": [
+     -10.4,
+     -1.7,
+     6.1
+    ],
+    "green_spill": 0.5
+   },
+   "edge_hardness": {
+    "boundary_px": 4309,
+    "hard_pct": 0
+   },
+   "rim": {
+    "inner_L": 20.1,
+    "left": {
+     "n": 3774,
+     "dL": -4.1,
+     "bright15_L": 40,
+     "bright15_ab": [
+      1.8,
+      2.2
+     ]
+    },
+    "right": {
+     "n": 3785,
+     "dL": -1.9,
+     "bright15_L": 46.9,
+     "bright15_ab": [
+      3.3,
+      5
+     ]
+    },
+    "top": {
+     "n": 2770,
+     "dL": 6.7,
+     "bright15_L": 51.8,
+     "bright15_ab": [
+      -0.7,
+      0
+     ]
+    },
+    "bottom": {
+     "n": 2762,
+     "dL": -8.3,
+     "bright15_L": 33.5,
+     "bright15_ab": [
+      6.9,
+      12.7
+     ]
+    }
+   },
+   "palette": {
+    "L_p1": 0,
+    "L_p5": 0.3,
+    "L_p50": 18.1,
+    "L_p99": 78.5,
+    "C_mean": 6.2,
+    "C_p95": 24.7,
+    "a_mean": 1.6,
+    "b_mean": 3.2,
+    "hue_deg": 63,
+    "light_offset_x": -0.007,
+    "light_offset_y": -0.001
+   },
+   "noise_sigma": 4.73,
+   "subpixel_detail": {
+    "window_src_px": 5,
+    "rms_luma": 19.85,
+    "share_of_variance_pct": 22.4
+   }
+  },
+  "emulation": {
+   "960x540": {
+    "screen_px_per_src_px": 0.27,
+    "density": 3.7,
+    "magnified": false,
+    "out_px": [
+     131,
+     185
+    ],
+    "alias_rmse": 6.82,
+    "phase_shimmer": 4.57,
+    "sharpness_vs_ideal": 0.775,
+    "grad_energy": 9.93
+   },
+   "1280x720": {
+    "screen_px_per_src_px": 0.36,
+    "density": 2.78,
+    "magnified": false,
+    "out_px": [
+     175,
+     247
+    ],
+    "alias_rmse": 5.7,
+    "phase_shimmer": 3.68,
+    "sharpness_vs_ideal": 0.776,
+    "grad_energy": 9.23
+   },
+   "1920x1080": {
+    "screen_px_per_src_px": 0.54,
+    "density": 1.85,
+    "magnified": false,
+    "out_px": [
+     263,
+     370
+    ],
+    "alias_rmse": 4.87,
+    "phase_shimmer": 3.31,
+    "sharpness_vs_ideal": 0.841,
+    "grad_energy": 8.7
+   }
+  }
+ },
+ "junction-relief-vent": {
+  "id": "junction-relief-vent",
+  "family": "props-junction",
+  "used": true,
+  "path": "apps/game/assets/props/junction-relief-vent.png",
+  "src": "junction_room.gd:51,326 (72/743)",
+  "size": [
+   768,
+   256
+  ],
+  "file_bytes": 262829,
+  "region": [
+   8,
+   35,
+   743,
+   183
+  ],
+  "scale": 0.09690444145356662,
+  "zoom": 1.35,
+  "mip": true,
+  "vram": {
+   "rgba8_with_mips": 1048576
+  },
+  "display": {
+   "960x540": {
+    "opaque_w_px": 97.1,
+    "opaque_h_px": 22,
+    "density": 7.64
+   },
+   "1280x720": {
+    "opaque_w_px": 129.4,
+    "opaque_h_px": 29.3,
+    "density": 5.73
+   },
+   "1920x1080": {
+    "opaque_w_px": 194.1,
+    "opaque_h_px": 44,
+    "density": 3.82
+   }
+  },
+  "static": {
+   "alpha_hist": {
+    "max": 254,
+    "body_alpha_mode": [
+     [
+      252,
+      76507
+     ],
+     [
+      253,
+      15719
+     ],
+     [
+      251,
+      8545
+     ]
+    ],
+    "body_below_250_pct": 1.98,
+    "body_below_240_pct": 1.67
+   },
+   "alpha": {
+    "transparent_pct": 19.92,
+    "opaque_pct": 0,
+    "semi_pct": 80.08,
+    "body_px": 103495
+   },
+   "opaque_bbox": [
+    1,
+    14,
+    742,
+    168
+   ],
+   "islands": {
+    "parts": 1,
+    "stray_count": 0,
+    "stray_px": 0,
+    "specks_under_16px": 0,
+    "largest_strays": []
+   },
+   "holes": {
+    "count": 0,
+    "count_over_9px": 0,
+    "px": 0,
+    "largest": []
+   },
+   "inner_translucency": {
+    "px": 1440,
+    "pct_of_body": 1.391,
+    "samples": [
+     [
+      361,
+      0,
+      23
+     ],
+     [
+      444,
+      6,
+      30
+     ],
+     [
+      363,
+      9,
+      61
+     ],
+     [
+      357,
+      11,
+      96
+     ],
+     [
+      442,
+      12,
+      63
+     ]
+    ]
+   },
+   "fringe": {
+    "semi_edge_px": 2892,
+    "mean_dL": -13.2,
+    "p10_dL": -29.7,
+    "p90_dL": -1.97,
+    "light_halo_pct": 0,
+    "dark_fringe_pct": 41.46,
+    "mean_dRGB": [
+     -29.7,
+     -33.5,
+     -32
+    ],
+    "green_spill": -2.6
+   },
+   "edge_hardness": {
+    "boundary_px": 1617,
+    "hard_pct": 0
+   },
+   "rim": {
+    "inner_L": 23.3,
+    "left": {
+     "n": 432,
+     "dL": -7.8,
+     "bright15_L": 33,
+     "bright15_ab": [
+      -0.1,
+      2.3
+     ]
+    },
+    "right": {
+     "n": 206,
+     "dL": 2.5,
+     "bright15_L": 55.8,
+     "bright15_ab": [
+      -14.9,
+      -23
+     ]
+    },
+    "top": {
+     "n": 1541,
+     "dL": 30.8,
+     "bright15_L": 78.3,
+     "bright15_ab": [
+      -13.4,
+      -10.5
+     ]
+    },
+    "bottom": {
+     "n": 1725,
+     "dL": -21.5,
+     "bright15_L": 6.8,
+     "bright15_ab": [
+      0.3,
+      2
+     ]
+    }
+   },
+   "palette": {
+    "L_p1": 0,
+    "L_p5": 0.3,
+    "L_p50": 19.6,
+    "L_p99": 71.8,
+    "C_mean": 5.4,
+    "C_p95": 21.8,
+    "a_mean": 0.7,
+    "b_mean": 1.7,
+    "hue_deg": 68,
+    "light_offset_x": 0.003,
+    "light_offset_y": -0.029
+   },
+   "noise_sigma": 4.47,
+   "subpixel_detail": {
+    "window_src_px": 9,
+    "rms_luma": 26.99,
+    "share_of_variance_pct": 35.5
+   }
+  },
+  "emulation": {
+   "960x540": {
+    "screen_px_per_src_px": 0.1308,
+    "density": 7.64,
+    "magnified": false,
+    "out_px": [
+     97,
+     24
+    ],
+    "alias_rmse": 10.51,
+    "phase_shimmer": 7.56,
+    "sharpness_vs_ideal": 0.718,
+    "grad_energy": 13.9
+   },
+   "1280x720": {
+    "screen_px_per_src_px": 0.1744,
+    "density": 5.73,
+    "magnified": false,
+    "out_px": [
+     130,
+     32
+    ],
+    "alias_rmse": 8.98,
+    "phase_shimmer": 5.86,
+    "sharpness_vs_ideal": 0.738,
+    "grad_energy": 13.27
+   },
+   "1920x1080": {
+    "screen_px_per_src_px": 0.2616,
+    "density": 3.82,
+    "magnified": false,
+    "out_px": [
+     194,
+     48
+    ],
+    "alias_rmse": 7.91,
+    "phase_shimmer": 5.14,
+    "sharpness_vs_ideal": 0.825,
+    "grad_energy": 13.26
+   }
+  }
+ },
+ "junction-tank-arm": {
+  "id": "junction-tank-arm",
+  "family": "props-junction",
+  "used": true,
+  "path": "apps/game/assets/props/junction-tank-arm.png",
+  "src": "junction_room.gd:52,55",
+  "size": [
+   512,
+   768
+  ],
+  "file_bytes": 365781,
+  "region": [
+   88,
+   9,
+   388,
+   352
+  ],
+  "scale": 0.22,
+  "zoom": 1.35,
+  "mip": true,
+  "vram": {
+   "rgba8_with_mips": 2097152
+  },
+  "display": {
+   "960x540": {
+    "opaque_w_px": 114.9,
+    "opaque_h_px": 104.2,
+    "density": 3.37
+   },
+   "1280x720": {
+    "opaque_w_px": 153.3,
+    "opaque_h_px": 139,
+    "density": 2.53
+   },
+   "1920x1080": {
+    "opaque_w_px": 229.9,
+    "opaque_h_px": 208.5,
+    "density": 1.68
+   }
+  },
+  "static": {
+   "alpha_hist": {
+    "max": 254,
+    "body_alpha_mode": [
+     [
+      252,
+      30276
+     ],
+     [
+      253,
+      20302
+     ],
+     [
+      251,
+      4774
+     ]
+    ],
+    "body_below_250_pct": 7.72,
+    "body_below_240_pct": 3.68
+   },
+   "alpha": {
+    "transparent_pct": 50.9,
+    "opaque_pct": 0,
+    "semi_pct": 49.1,
+    "body_px": 62171
+   },
+   "opaque_bbox": [
+    1,
+    1,
+    387,
+    351
+   ],
+   "islands": {
+    "parts": 1,
+    "stray_count": 0,
+    "stray_px": 0,
+    "specks_under_16px": 0,
+    "largest_strays": []
+   },
+   "holes": {
+    "count": 9,
+    "count_over_9px": 9,
+    "px": 4237,
+    "largest": [
+     {
+      "px": 2963,
+      "bbox": [
+       164,
+       170,
+       94,
+       67
+      ]
+     },
+     {
+      "px": 539,
+      "bbox": [
+       102,
+       71,
+       31,
+       29
+      ]
+     },
+     {
+      "px": 234,
+      "bbox": [
+       214,
+       173,
+       39,
+       20
+      ]
+     },
+     {
+      "px": 146,
+      "bbox": [
+       316,
+       150,
+       7,
+       36
+      ]
+     },
+     {
+      "px": 99,
+      "bbox": [
+       156,
+       317,
+       11,
+       12
+      ]
+     }
+    ]
+   },
+   "inner_translucency": {
+    "px": 417,
+    "pct_of_body": 0.671,
+    "samples": [
+     [
+      35,
+      0,
+      20
+     ],
+     [
+      292,
+      1,
+      186
+     ],
+     [
+      238,
+      129,
+      183
+     ],
+     [
+      254,
+      134,
+      52
+     ],
+     [
+      279,
+      140,
+      214
+     ]
+    ]
+   },
+   "fringe": {
+    "semi_edge_px": 3981,
+    "mean_dL": -11.46,
+    "p10_dL": -28.7,
+    "p90_dL": 0.33,
+    "light_halo_pct": 0.13,
+    "dark_fringe_pct": 30.65,
+    "mean_dRGB": [
+     -23.9,
+     -26.7,
+     -27.6
+    ],
+    "green_spill": -0.9
+   },
+   "edge_hardness": {
+    "boundary_px": 2471,
+    "hard_pct": 0
+   },
+   "rim": {
+    "inner_L": 18.1,
+    "left": {
+     "n": 1478,
+     "dL": -7.8,
+     "bright15_L": 27.3,
+     "bright15_ab": [
+      2.5,
+      5.9
+     ]
+    },
+    "right": {
+     "n": 1487,
+     "dL": -2.4,
+     "bright15_L": 43.2,
+     "bright15_ab": [
+      -7.3,
+      -10.3
+     ]
+    },
+    "top": {
+     "n": 1960,
+     "dL": 10.3,
+     "bright15_L": 60.4,
+     "bright15_ab": [
+      -4.7,
+      -5.8
+     ]
+    },
+    "bottom": {
+     "n": 2162,
+     "dL": -11.1,
+     "bright15_L": 18.9,
+     "bright15_ab": [
+      2.3,
+      8
+     ]
+    }
+   },
+   "palette": {
+    "L_p1": 0,
+    "L_p5": 0.7,
+    "L_p50": 15,
+    "L_p99": 77.7,
+    "C_mean": 6.1,
+    "C_p95": 21.9,
+    "a_mean": -0.9,
+    "b_mean": -1.5,
+    "hue_deg": -123,
+    "light_offset_x": 0.014,
+    "light_offset_y": -0.013
+   },
+   "noise_sigma": 4.63,
+   "subpixel_detail": {
+    "window_src_px": 5,
+    "rms_luma": 21.13,
+    "share_of_variance_pct": 28.8
+   }
+  },
+  "emulation": {
+   "960x540": {
+    "screen_px_per_src_px": 0.297,
+    "density": 3.37,
+    "magnified": false,
+    "out_px": [
+     115,
+     105
+    ],
+    "alias_rmse": 5.68,
+    "phase_shimmer": 3.9,
+    "sharpness_vs_ideal": 0.736,
+    "grad_energy": 5.7
+   },
+   "1280x720": {
+    "screen_px_per_src_px": 0.396,
+    "density": 2.53,
+    "magnified": false,
+    "out_px": [
+     154,
+     139
+    ],
+    "alias_rmse": 4.79,
+    "phase_shimmer": 3.15,
+    "sharpness_vs_ideal": 0.771,
+    "grad_energy": 5.84
+   },
+   "1920x1080": {
+    "screen_px_per_src_px": 0.594,
+    "density": 1.68,
+    "magnified": false,
+    "out_px": [
+     230,
+     209
+    ],
+    "alias_rmse": 3.81,
+    "phase_shimmer": 2.49,
+    "sharpness_vs_ideal": 0.826,
+    "grad_energy": 5.6
+   }
+  }
+ },
+ "junction-tank": {
+  "id": "junction-tank",
+  "family": "props-junction",
+  "used": true,
+  "path": "apps/game/assets/props/junction-tank.png",
+  "src": "junction_room.gd:54-55",
+  "size": [
+   211,
+   382
+  ],
+  "file_bytes": 165450,
+  "region": [
+   0,
+   0,
+   211,
+   382
+  ],
+  "scale": 0.22,
+  "zoom": 1.35,
+  "mip": true,
+  "vram": {
+   "rgba8_with_mips": 429877
+  },
+  "display": {
+   "960x540": {
+    "opaque_w_px": 62.1,
+    "opaque_h_px": 113.5,
+    "density": 3.37
+   },
+   "1280x720": {
+    "opaque_w_px": 82.8,
+    "opaque_h_px": 151.3,
+    "density": 2.53
+   },
+   "1920x1080": {
+    "opaque_w_px": 124.1,
+    "opaque_h_px": 226.9,
+    "density": 1.68
+   }
+  },
+  "static": {
+   "alpha_hist": {
+    "max": 254,
+    "body_alpha_mode": [
+     [
+      252,
+      36909
+     ],
+     [
+      253,
+      14906
+     ],
+     [
+      251,
+      4743
+     ]
+    ],
+    "body_below_250_pct": 3.54,
+    "body_below_240_pct": 2.04
+   },
+   "alpha": {
+    "transparent_pct": 22.84,
+    "opaque_pct": 0,
+    "semi_pct": 77.16,
+    "body_px": 59639
+   },
+   "opaque_bbox": [
+    1,
+    0,
+    209,
+    382
+   ],
+   "islands": {
+    "parts": 1,
+    "stray_count": 0,
+    "stray_px": 0,
+    "specks_under_16px": 0,
+    "largest_strays": []
+   },
+   "holes": {
+    "count": 4,
+    "count_over_9px": 4,
+    "px": 1788,
+    "largest": [
+     {
+      "px": 687,
+      "bbox": [
+       43,
+       34,
+       48,
+       43
+      ]
+     },
+     {
+      "px": 681,
+      "bbox": [
+       120,
+       33,
+       48,
+       44
+      ]
+     },
+     {
+      "px": 210,
+      "bbox": [
+       42,
+       329,
+       28,
+       22
+      ]
+     },
+     {
+      "px": 210,
+      "bbox": [
+       141,
+       329,
+       27,
+       22
+      ]
+     }
+    ]
+   },
+   "inner_translucency": {
+    "px": 95,
+    "pct_of_body": 0.159,
+    "samples": [
+     [
+      78,
+      0,
+      84
+     ],
+     [
+      209,
+      116,
+      226
+     ]
+    ]
+   },
+   "fringe": {
+    "semi_edge_px": 2311,
+    "mean_dL": -8.2,
+    "p10_dL": -19.87,
+    "p90_dL": -0.36,
+    "light_halo_pct": 0,
+    "dark_fringe_pct": 17.52,
+    "mean_dRGB": [
+     -10,
+     -21.3,
+     -24.4
+    ],
+    "green_spill": -4.1
+   },
+   "edge_hardness": {
+    "boundary_px": 1312,
+    "hard_pct": 0
+   },
+   "rim": {
+    "inner_L": 20.7,
+    "left": {
+     "n": 1247,
+     "dL": -13.2,
+     "bright15_L": 25.6,
+     "bright15_ab": [
+      -4.5,
+      -7.3
+     ]
+    },
+    "right": {
+     "n": 1268,
+     "dL": -11.7,
+     "bright15_L": 29.4,
+     "bright15_ab": [
+      -10.7,
+      -15.1
+     ]
+    },
+    "top": {
+     "n": 912,
+     "dL": -4.3,
+     "bright15_L": 43.8,
+     "bright15_ab": [
+      -12.7,
+      -15.4
+     ]
+    },
+    "bottom": {
+     "n": 985,
+     "dL": -17.2,
+     "bright15_L": 14.1,
+     "bright15_ab": [
+      -4.3,
+      -4.7
+     ]
+    }
+   },
+   "palette": {
+    "L_p1": 0,
+    "L_p5": 0.9,
+    "L_p50": 21.2,
+    "L_p99": 75.5,
+    "C_mean": 9,
+    "C_p95": 34.2,
+    "a_mean": -0.4,
+    "b_mean": 0.6,
+    "hue_deg": 122,
+    "light_offset_x": 0.004,
+    "light_offset_y": -0.037
+   },
+   "noise_sigma": 5.51,
+   "subpixel_detail": {
+    "window_src_px": 5,
+    "rms_luma": 19.23,
+    "share_of_variance_pct": 22.5
+   }
+  },
+  "emulation": {
+   "960x540": {
+    "screen_px_per_src_px": 0.297,
+    "density": 3.37,
+    "magnified": false,
+    "out_px": [
+     63,
+     113
+    ],
+    "alias_rmse": 9.67,
+    "phase_shimmer": 5.36,
+    "sharpness_vs_ideal": 0.736,
+    "grad_energy": 8.37
+   },
+   "1280x720": {
+    "screen_px_per_src_px": 0.396,
+    "density": 2.53,
+    "magnified": false,
+    "out_px": [
+     84,
+     151
+    ],
+    "alias_rmse": 7.69,
+    "phase_shimmer": 4.5,
+    "sharpness_vs_ideal": 0.758,
+    "grad_energy": 8.28
+   },
+   "1920x1080": {
+    "screen_px_per_src_px": 0.594,
+    "density": 1.68,
+    "magnified": false,
+    "out_px": [
+     125,
+     227
+    ],
+    "alias_rmse": 5.73,
+    "phase_shimmer": 3.37,
+    "sharpness_vs_ideal": 0.803,
+    "grad_energy": 8.06
+   }
+  }
+ },
+ "junction-arm-panel": {
+  "id": "junction-arm-panel",
+  "family": "props-junction",
+  "used": true,
+  "path": "apps/game/assets/props/junction-arm-panel.png",
+  "src": "junction_room.gd:56-57",
+  "size": [
+   512,
+   512
+  ],
+  "file_bytes": 323190,
+  "region": [
+   79,
+   26,
+   354,
+   463
+  ],
+  "scale": 0.14,
+  "zoom": 1.35,
+  "mip": true,
+  "vram": {
+   "rgba8_with_mips": 1398101
+  },
+  "display": {
+   "960x540": {
+    "opaque_w_px": 66.5,
+    "opaque_h_px": 87.1,
+    "density": 5.29
+   },
+   "1280x720": {
+    "opaque_w_px": 88.7,
+    "opaque_h_px": 116.2,
+    "density": 3.97
+   },
+   "1920x1080": {
+    "opaque_w_px": 133.1,
+    "opaque_h_px": 174.3,
+    "density": 2.65
+   }
+  },
+  "static": {
+   "alpha_hist": {
+    "max": 255,
+    "body_alpha_mode": [
+     [
+      252,
+      78450
+     ],
+     [
+      253,
+      45388
+     ],
+     [
+      251,
+      4271
+     ]
+    ],
+    "body_below_250_pct": 1.66,
+    "body_below_240_pct": 1.1
+   },
+   "alpha": {
+    "transparent_pct": 18.47,
+    "opaque_pct": 0.1,
+    "semi_pct": 81.42,
+    "body_px": 131239
+   },
+   "opaque_bbox": [
+    1,
+    1,
+    352,
+    461
+   ],
+   "islands": {
+    "parts": 1,
+    "stray_count": 0,
+    "stray_px": 0,
+    "specks_under_16px": 0,
+    "largest_strays": []
+   },
+   "holes": {
+    "count": 3,
+    "count_over_9px": 3,
+    "px": 335,
+    "largest": [
+     {
+      "px": 206,
+      "bbox": [
+       55,
+       122,
+       10,
+       37
+      ]
+     },
+     {
+      "px": 86,
+      "bbox": [
+       52,
+       323,
+       8,
+       15
+      ]
+     },
+     {
+      "px": 43,
+      "bbox": [
+       292,
+       327,
+       2,
+       22
+      ]
+     }
+    ]
+   },
+   "inner_translucency": {
+    "px": 302,
+    "pct_of_body": 0.23,
+    "samples": [
+     [
+      98,
+      0,
+      56
+     ],
+     [
+      292,
+      331,
+      115
+     ],
+     [
+      294,
+      347,
+      227
+     ],
+     [
+      353,
+      442,
+      89
+     ],
+     [
+      315,
+      461,
+      238
+     ]
+    ]
+   },
+   "fringe": {
+    "semi_edge_px": 2636,
+    "mean_dL": -14.07,
+    "p10_dL": -31.08,
+    "p90_dL": -0.97,
+    "light_halo_pct": 0,
+    "dark_fringe_pct": 41.5,
+    "mean_dRGB": [
+     -11.8,
+     -34.3,
+     -35.3
+    ],
+    "green_spill": -10.8
+   },
+   "edge_hardness": {
+    "boundary_px": 1787,
+    "hard_pct": 0
+   },
+   "rim": {
+    "inner_L": 21,
+    "left": {
+     "n": 1343,
+     "dL": -8.4,
+     "bright15_L": 38.6,
+     "bright15_ab": [
+      -13.8,
+      -16.6
+     ]
+    },
+    "right": {
+     "n": 1383,
+     "dL": 3.9,
+     "bright15_L": 59.6,
+     "bright15_ab": [
+      -25.5,
+      -21.1
+     ]
+    },
+    "top": {
+     "n": 1227,
+     "dL": 6.5,
+     "bright15_L": 67,
+     "bright15_ab": [
+      -20,
+      -12.7
+     ]
+    },
+    "bottom": {
+     "n": 1091,
+     "dL": -17.5,
+     "bright15_L": 16.1,
+     "bright15_ab": [
+      -6.7,
+      -10.8
+     ]
+    }
+   },
+   "palette": {
+    "L_p1": 0,
+    "L_p5": 0.3,
+    "L_p50": 19.4,
+    "L_p99": 85.9,
+    "C_mean": 8.4,
+    "C_p95": 38.2,
+    "a_mean": 1.3,
+    "b_mean": 4.6,
+    "hue_deg": 74,
+    "light_offset_x": 0.002,
+    "light_offset_y": -0.041
+   },
+   "noise_sigma": 4.4,
+   "subpixel_detail": {
+    "window_src_px": 7,
+    "rms_luma": 26.5,
+    "share_of_variance_pct": 35
+   }
+  },
+  "emulation": {
+   "960x540": {
+    "screen_px_per_src_px": 0.189,
+    "density": 5.29,
+    "magnified": false,
+    "out_px": [
+     67,
+     88
+    ],
+    "alias_rmse": 8,
+    "phase_shimmer": 5.23,
+    "sharpness_vs_ideal": 0.728,
+    "grad_energy": 10.76
+   },
+   "1280x720": {
+    "screen_px_per_src_px": 0.252,
+    "density": 3.97,
+    "magnified": false,
+    "out_px": [
+     89,
+     117
+    ],
+    "alias_rmse": 8.44,
+    "phase_shimmer": 6.05,
+    "sharpness_vs_ideal": 0.748,
+    "grad_energy": 10.69
+   },
+   "1920x1080": {
+    "screen_px_per_src_px": 0.378,
+    "density": 2.65,
+    "magnified": false,
+    "out_px": [
+     134,
+     175
+    ],
+    "alias_rmse": 6.66,
+    "phase_shimmer": 4.56,
+    "sharpness_vs_ideal": 0.765,
+    "grad_energy": 10.25
+   }
+  }
+ },
+ "junction-bolt-panel": {
+  "id": "junction-bolt-panel",
+  "family": "props-junction",
+  "used": true,
+  "path": "apps/game/assets/props/junction-bolt-panel.png",
+  "src": "junction_room.gd:59-60",
+  "size": [
+   512,
+   512
+  ],
+  "file_bytes": 341364,
+  "region": [
+   0,
+   68,
+   512,
+   393
+  ],
+  "scale": 0.15,
+  "zoom": 1.35,
+  "mip": true,
+  "vram": {
+   "rgba8_with_mips": 1398101
+  },
+  "display": {
+   "960x540": {
+    "opaque_w_px": 103.7,
+    "opaque_h_px": 79.2,
+    "density": 4.94
+   },
+   "1280x720": {
+    "opaque_w_px": 138.2,
+    "opaque_h_px": 105.6,
+    "density": 3.7
+   },
+   "1920x1080": {
+    "opaque_w_px": 207.4,
+    "opaque_h_px": 158.4,
+    "density": 2.47
+   }
+  },
+  "static": {
+   "alpha_hist": {
+    "max": 255,
+    "body_alpha_mode": [
+     [
+      252,
+      73501
+     ],
+     [
+      253,
+      52250
+     ],
+     [
+      251,
+      4845
+     ]
+    ],
+    "body_below_250_pct": 2.46,
+    "body_below_240_pct": 1.59
+   },
+   "alpha": {
+    "transparent_pct": 30.46,
+    "opaque_pct": 0.02,
+    "semi_pct": 69.53,
+    "body_px": 135290
+   },
+   "opaque_bbox": [
+    0,
+    1,
+    512,
+    391
+   ],
+   "islands": {
+    "parts": 1,
+    "stray_count": 0,
+    "stray_px": 0,
+    "specks_under_16px": 0,
+    "largest_strays": []
+   },
+   "holes": {
+    "count": 4,
+    "count_over_9px": 4,
+    "px": 7024,
+    "largest": [
+     {
+      "px": 1920,
+      "bbox": [
+       395,
+       171,
+       97,
+       42
+      ]
+     },
+     {
+      "px": 1871,
+      "bbox": [
+       20,
+       171,
+       96,
+       42
+      ]
+     },
+     {
+      "px": 1629,
+      "bbox": [
+       396,
+       127,
+       96,
+       34
+      ]
+     },
+     {
+      "px": 1604,
+      "bbox": [
+       20,
+       128,
+       94,
+       34
+      ]
+     }
+    ]
+   },
+   "inner_translucency": {
+    "px": 318,
+    "pct_of_body": 0.235,
+    "samples": [
+     [
+      171,
+      0,
+      27
+     ],
+     [
+      94,
+      391,
+      219
+     ],
+     [
+      153,
+      391,
+      225
+     ],
+     [
+      388,
+      391,
+      233
+     ],
+     [
+      108,
+      392,
+      43
+     ]
+    ]
+   },
+   "fringe": {
+    "semi_edge_px": 4149,
+    "mean_dL": -9.58,
+    "p10_dL": -22.68,
+    "p90_dL": -0.33,
+    "light_halo_pct": 0.34,
+    "dark_fringe_pct": 26.68,
+    "mean_dRGB": [
+     -14.2,
+     -24.2,
+     -26.9
+    ],
+    "green_spill": -3.6
+   },
+   "edge_hardness": {
+    "boundary_px": 2519,
+    "hard_pct": 0
+   },
+   "rim": {
+    "inner_L": 22.1,
+    "left": {
+     "n": 1208,
+     "dL": -9,
+     "bright15_L": 39.7,
+     "bright15_ab": [
+      -7.1,
+      -16.3
+     ]
+    },
+    "right": {
+     "n": 1244,
+     "dL": -5.2,
+     "bright15_L": 48.1,
+     "bright15_ab": [
+      -15.5,
+      -22.8
+     ]
+    },
+    "top": {
+     "n": 2726,
+     "dL": 3.9,
+     "bright15_L": 63.5,
+     "bright15_ab": [
+      -14.6,
+      -15.6
+     ]
+    },
+    "bottom": {
+     "n": 2570,
+     "dL": -15.9,
+     "bright15_L": 20.6,
+     "bright15_ab": [
+      -4,
+      -14.8
+     ]
+    }
+   },
+   "palette": {
+    "L_p1": 0,
+    "L_p5": 0.3,
+    "L_p50": 17.6,
+    "L_p99": 84.9,
+    "C_mean": 7.5,
+    "C_p95": 29,
+    "a_mean": 1.8,
+    "b_mean": 4,
+    "hue_deg": 66,
+    "light_offset_x": -0.002,
+    "light_offset_y": -0.038
+   },
+   "noise_sigma": 4.34,
+   "subpixel_detail": {
+    "window_src_px": 5,
+    "rms_luma": 21.51,
+    "share_of_variance_pct": 22.4
+   }
+  },
+  "emulation": {
+   "960x540": {
+    "screen_px_per_src_px": 0.2025,
+    "density": 4.94,
+    "magnified": false,
+    "out_px": [
+     104,
+     80
+    ],
+    "alias_rmse": 6.97,
+    "phase_shimmer": 4.81,
+    "sharpness_vs_ideal": 0.766,
+    "grad_energy": 9.49
+   },
+   "1280x720": {
+    "screen_px_per_src_px": 0.27,
+    "density": 3.7,
+    "magnified": false,
+    "out_px": [
+     138,
+     106
+    ],
+    "alias_rmse": 7.09,
+    "phase_shimmer": 4.86,
+    "sharpness_vs_ideal": 0.792,
+    "grad_energy": 9.19
+   },
+   "1920x1080": {
+    "screen_px_per_src_px": 0.405,
+    "density": 2.47,
+    "magnified": false,
+    "out_px": [
+     207,
+     159
+    ],
+    "alias_rmse": 5.69,
+    "phase_shimmer": 4.06,
+    "sharpness_vs_ideal": 0.788,
+    "grad_energy": 8.41
+   }
+  }
+ },
+ "junction-hatch": {
+  "id": "junction-hatch",
+  "family": "props-junction",
+  "used": true,
+  "path": "apps/game/assets/props/junction-hatch.png",
+  "src": "junction_room.gd:62,64",
+  "size": [
+   512,
+   768
+  ],
+  "file_bytes": 595185,
+  "region": [
+   54,
+   34,
+   403,
+   700
+  ],
+  "scale": 0.206,
+  "zoom": 1.35,
+  "mip": true,
+  "vram": {
+   "rgba8_with_mips": 2097152
+  },
+  "display": {
+   "960x540": {
+    "opaque_w_px": 111.5,
+    "opaque_h_px": 194.1,
+    "density": 3.6
+   },
+   "1280x720": {
+    "opaque_w_px": 148.7,
+    "opaque_h_px": 258.8,
+    "density": 2.7
+   },
+   "1920x1080": {
+    "opaque_w_px": 223,
+    "opaque_h_px": 388.2,
+    "density": 1.8
+   }
+  },
+  "static": {
+   "alpha_hist": {
+    "max": 254,
+    "body_alpha_mode": [
+     [
+      252,
+      172703
+     ],
+     [
+      253,
+      62400
+     ],
+     [
+      251,
+      7081
+     ]
+    ],
+    "body_below_250_pct": 1.47,
+    "body_below_240_pct": 0.69
+   },
+   "alpha": {
+    "transparent_pct": 10.35,
+    "opaque_pct": 0,
+    "semi_pct": 89.65,
+    "body_px": 247983
+   },
+   "opaque_bbox": [
+    1,
+    1,
+    401,
+    698
+   ],
+   "islands": {
+    "parts": 1,
+    "stray_count": 0,
+    "stray_px": 0,
+    "specks_under_16px": 0,
+    "largest_strays": []
+   },
+   "holes": {
+    "count": 0,
+    "count_over_9px": 0,
+    "px": 0,
+    "largest": []
+   },
+   "inner_translucency": {
+    "px": 289,
+    "pct_of_body": 0.117,
+    "samples": [
+     [
+      72,
+      0,
+      34
+     ],
+     [
+      328,
+      0,
+      35
+     ],
+     [
+      324,
+      1,
+      181
+     ],
+     [
+      402,
+      684,
+      97
+     ],
+     [
+      46,
+      699,
+      116
+     ]
+    ]
+   },
+   "fringe": {
+    "semi_edge_px": 3547,
+    "mean_dL": -15.94,
+    "p10_dL": -27.62,
+    "p90_dL": -2.4,
+    "light_halo_pct": 0,
+    "dark_fringe_pct": 57.29,
+    "mean_dRGB": [
+     -13.1,
+     -39.2,
+     -49
+    ],
+    "green_spill": -8.1
+   },
+   "edge_hardness": {
+    "boundary_px": 2067,
+    "hard_pct": 0
+   },
+   "rim": {
+    "inner_L": 22.4,
+    "left": {
+     "n": 1645,
+     "dL": -4.4,
+     "bright15_L": 43.7,
+     "bright15_ab": [
+      -13.9,
+      -19.2
+     ]
+    },
+    "right": {
+     "n": 1689,
+     "dL": -7.6,
+     "bright15_L": 36.1,
+     "bright15_ab": [
+      -11.9,
+      -18.9
+     ]
+    },
+    "top": {
+     "n": 1102,
+     "dL": 10.7,
+     "bright15_L": 55.3,
+     "bright15_ab": [
+      -15.7,
+      -19.5
+     ]
+    },
+    "bottom": {
+     "n": 1141,
+     "dL": -19.2,
+     "bright15_L": 8.9,
+     "bright15_ab": [
+      -3.6,
+      -3.7
+     ]
+    }
+   },
+   "palette": {
+    "L_p1": 0,
+    "L_p5": 0.4,
+    "L_p50": 18.7,
+    "L_p99": 72.4,
+    "C_mean": 4.7,
+    "C_p95": 14.7,
+    "a_mean": -0.5,
+    "b_mean": 1.1,
+    "hue_deg": 115,
+    "light_offset_x": -0.005,
+    "light_offset_y": -0.032
+   },
+   "noise_sigma": 4.19,
+   "subpixel_detail": {
+    "window_src_px": 5,
+    "rms_luma": 16.94,
+    "share_of_variance_pct": 22.7
+   }
+  },
+  "emulation": {
+   "960x540": {
+    "screen_px_per_src_px": 0.2781,
+    "density": 3.6,
+    "magnified": false,
+    "out_px": [
+     112,
+     195
+    ],
+    "alias_rmse": 5.94,
+    "phase_shimmer": 4.18,
+    "sharpness_vs_ideal": 0.767,
+    "grad_energy": 9.25
+   },
+   "1280x720": {
+    "screen_px_per_src_px": 0.3708,
+    "density": 2.7,
+    "magnified": false,
+    "out_px": [
+     149,
+     260
+    ],
+    "alias_rmse": 5.17,
+    "phase_shimmer": 3.54,
+    "sharpness_vs_ideal": 0.781,
+    "grad_energy": 8.68
+   },
+   "1920x1080": {
+    "screen_px_per_src_px": 0.5562,
+    "density": 1.8,
+    "magnified": false,
+    "out_px": [
+     224,
+     389
+    ],
+    "alias_rmse": 4.64,
+    "phase_shimmer": 3.21,
+    "sharpness_vs_ideal": 0.822,
+    "grad_energy": 8.1
+   }
+  }
+ },
+ "junction-sentry-side-left": {
+  "id": "junction-sentry-side-left",
+  "family": "sentry",
+  "used": true,
+  "path": "apps/game/assets/props/junction-sentry-side-left.png",
+  "src": "sentry.gd:16,18",
+  "size": [
+   1024,
+   768
+  ],
+  "file_bytes": 882897,
+  "region": [
+   113,
+   57,
+   855,
+   626
+  ],
+  "scale": 0.07,
+  "zoom": 1.35,
+  "mip": true,
+  "vram": {
+   "rgba8_with_mips": 4194304
+  },
+  "display": {
+   "960x540": {
+    "opaque_w_px": 80.7,
+    "opaque_h_px": 59.1,
+    "density": 10.58
+   },
+   "1280x720": {
+    "opaque_w_px": 107.6,
+    "opaque_h_px": 78.8,
+    "density": 7.94
+   },
+   "1920x1080": {
+    "opaque_w_px": 161.4,
+    "opaque_h_px": 118.1,
+    "density": 5.29
+   }
+  },
+  "static": {
+   "alpha_hist": {
+    "max": 255,
+    "body_alpha_mode": [
+     [
+      252,
+      226537
+     ],
+     [
+      253,
+      87904
+     ],
+     [
+      251,
+      14315
+     ]
+    ],
+    "body_below_250_pct": 2.71,
+    "body_below_240_pct": 0.99
+   },
+   "alpha": {
+    "transparent_pct": 29.55,
+    "opaque_pct": 1.96,
+    "semi_pct": 68.49,
+    "body_px": 358587
+   },
+   "opaque_bbox": [
+    0,
+    0,
+    854,
+    625
+   ],
+   "islands": {
+    "parts": 1,
+    "stray_count": 0,
+    "stray_px": 0,
+    "specks_under_16px": 0,
+    "largest_strays": []
+   },
+   "holes": {
+    "count": 5,
+    "count_over_9px": 4,
+    "px": 3238,
+    "largest": [
+     {
+      "px": 2755,
+      "bbox": [
+       513,
+       153,
+       82,
+       51
+      ]
+     },
+     {
+      "px": 424,
+      "bbox": [
+       557,
+       226,
+       65,
+       24
+      ]
+     },
+     {
+      "px": 29,
+      "bbox": [
+       663,
+       246,
+       8,
+       6
+      ]
+     },
+     {
+      "px": 21,
+      "bbox": [
+       616,
+       246,
+       8,
+       4
+      ]
+     },
+     {
+      "px": 9,
+      "bbox": [
+       803,
+       303,
+       4,
+       3
+      ]
+     }
+    ]
+   },
+   "inner_translucency": {
+    "px": 2172,
+    "pct_of_body": 0.606,
+    "samples": [
+     [
+      492,
+      0,
+      44
+     ],
+     [
+      222,
+      108,
+      18
+     ],
+     [
+      228,
+      110,
+      19
+     ],
+     [
+      242,
+      111,
+      22
+     ],
+     [
+      219,
+      113,
+      17
+     ]
+    ]
+   },
+   "fringe": {
+    "semi_edge_px": 5831,
+    "mean_dL": -1.1,
+    "p10_dL": -13.55,
+    "p90_dL": 12.77,
+    "light_halo_pct": 8.59,
+    "dark_fringe_pct": 8.57,
+    "mean_dRGB": [
+     -7.3,
+     -2.9,
+     -0.1
+    ],
+    "green_spill": 0.8
+   },
+   "edge_hardness": {
+    "boundary_px": 3410,
+    "hard_pct": 1.09
+   },
+   "rim": {
+    "inner_L": 20.9,
+    "left": {
+     "n": 2152,
+     "dL": -15.5,
+     "bright15_L": 25.4,
+     "bright15_ab": [
+      -5.5,
+      -4.9
+     ]
+    },
+    "right": {
+     "n": 2099,
+     "dL": -12.2,
+     "bright15_L": 40,
+     "bright15_ab": [
+      -11.3,
+      -25.2
+     ]
+    },
+    "top": {
+     "n": 3140,
+     "dL": -9,
+     "bright15_L": 45.1,
+     "bright15_ab": [
+      -9.7,
+      -15.9
+     ]
+    },
+    "bottom": {
+     "n": 3014,
+     "dL": -19.7,
+     "bright15_L": 6.2,
+     "bright15_ab": [
+      -0.6,
+      -1.2
+     ]
+    }
+   },
+   "palette": {
+    "L_p1": 0,
+    "L_p5": 0.1,
+    "L_p50": 18.9,
+    "L_p99": 87.3,
+    "C_mean": 5,
+    "C_p95": 21.3,
+    "a_mean": 0.9,
+    "b_mean": 2,
+    "hue_deg": 66,
+    "light_offset_x": -0.005,
+    "light_offset_y": -0.036
+   },
+   "noise_sigma": 3.56,
+   "subpixel_detail": {
+    "window_src_px": 11,
+    "rms_luma": 30.42,
+    "share_of_variance_pct": 45.9
+   }
+  },
+  "emulation": {
+   "960x540": {
+    "screen_px_per_src_px": 0.0945,
+    "density": 10.58,
+    "magnified": false,
+    "out_px": [
+     81,
+     59
+    ],
+    "alias_rmse": 7.75,
+    "phase_shimmer": 5.51,
+    "sharpness_vs_ideal": 0.676,
+    "grad_energy": 9.04
+   },
+   "1280x720": {
+    "screen_px_per_src_px": 0.126,
+    "density": 7.94,
+    "magnified": false,
+    "out_px": [
+     108,
+     79
+    ],
+    "alias_rmse": 8.79,
+    "phase_shimmer": 6.81,
+    "sharpness_vs_ideal": 0.713,
+    "grad_energy": 9.71
+   },
+   "1920x1080": {
+    "screen_px_per_src_px": 0.189,
+    "density": 5.29,
+    "magnified": false,
+    "out_px": [
+     162,
+     118
+    ],
+    "alias_rmse": 7.4,
+    "phase_shimmer": 5.02,
+    "sharpness_vs_ideal": 0.723,
+    "grad_energy": 9.55
+   }
+  }
+ },
+ "junction-sentry-down": {
+  "id": "junction-sentry-down",
+  "family": "sentry",
+  "used": true,
+  "path": "apps/game/assets/props/junction-sentry-down.png",
+  "src": "sentry.gd:17-18",
+  "size": [
+   1024,
+   768
+  ],
+  "file_bytes": 817912,
+  "region": [
+   143,
+   80,
+   844,
+   623
+  ],
+  "scale": 0.07,
+  "zoom": 1.35,
+  "mip": true,
+  "vram": {
+   "rgba8_with_mips": 4194304
+  },
+  "display": {
+   "960x540": {
+    "opaque_w_px": 79.6,
+    "opaque_h_px": 58.8,
+    "density": 10.58
+   },
+   "1280x720": {
+    "opaque_w_px": 106.1,
+    "opaque_h_px": 78.4,
+    "density": 7.94
+   },
+   "1920x1080": {
+    "opaque_w_px": 159.1,
+    "opaque_h_px": 117.6,
+    "density": 5.29
+   }
+  },
+  "static": {
+   "alpha_hist": {
+    "max": 255,
+    "body_alpha_mode": [
+     [
+      253,
+      153146
+     ],
+     [
+      252,
+      106608
+     ],
+     [
+      251,
+      8856
+     ]
+    ],
+    "body_below_250_pct": 10.91,
+    "body_below_240_pct": 7.8
+   },
+   "alpha": {
+    "transparent_pct": 37.61,
+    "opaque_pct": 0.03,
+    "semi_pct": 62.36,
+    "body_px": 312009
+   },
+   "opaque_bbox": [
+    1,
+    1,
+    842,
+    622
+   ],
+   "islands": {
+    "parts": 1,
+    "stray_count": 0,
+    "stray_px": 0,
+    "specks_under_16px": 0,
+    "largest_strays": []
+   },
+   "holes": {
+    "count": 4,
+    "count_over_9px": 4,
+    "px": 3067,
+    "largest": [
+     {
+      "px": 2185,
+      "bbox": [
+       480,
+       133,
+       93,
+       70
+      ]
+     },
+     {
+      "px": 718,
+      "bbox": [
+       524,
+       234,
+       48,
+       27
+      ]
+     },
+     {
+      "px": 111,
+      "bbox": [
+       493,
+       555,
+       16,
+       10
+      ]
+     },
+     {
+      "px": 53,
+      "bbox": [
+       569,
+       177,
+       9,
+       12
+      ]
+     }
+    ]
+   },
+   "inner_translucency": {
+    "px": 21396,
+    "pct_of_body": 6.857,
+    "samples": [
+     [
+      416,
+      64,
+      235
+     ],
+     [
+      518,
+      165,
+      217
+     ],
+     [
+      568,
+      180,
+      146
+     ],
+     [
+      572,
+      185,
+      41
+     ],
+     [
+      576,
+      190,
+      226
+     ]
+    ]
+   },
+   "fringe": {
+    "semi_edge_px": 9446,
+    "mean_dL": -1.94,
+    "p10_dL": -17.67,
+    "p90_dL": 13.36,
+    "light_halo_pct": 8.55,
+    "dark_fringe_pct": 13.17,
+    "mean_dRGB": [
+     -3.9,
+     -5,
+     -5.6
+    ],
+    "green_spill": -0.2
+   },
+   "edge_hardness": {
+    "boundary_px": 5220,
+    "hard_pct": 0.11
+   },
+   "rim": {
+    "inner_L": 21.3,
+    "left": {
+     "n": 2351,
+     "dL": -9.9,
+     "bright15_L": 33.3,
+     "bright15_ab": [
+      8.3,
+      11.1
+     ]
+    },
+    "right": {
+     "n": 2498,
+     "dL": -5.9,
+     "bright15_L": 45.1,
+     "bright15_ab": [
+      -10.2,
+      -14
+     ]
+    },
+    "top": {
+     "n": 3354,
+     "dL": -2.6,
+     "bright15_L": 49.4,
+     "bright15_ab": [
+      -6.5,
+      -7.7
+     ]
+    },
+    "bottom": {
+     "n": 3051,
+     "dL": -15.7,
+     "bright15_L": 18.1,
+     "bright15_ab": [
+      2.9,
+      5.6
+     ]
+    }
+   },
+   "palette": {
+    "L_p1": 0,
+    "L_p5": 0,
+    "L_p50": 15,
+    "L_p99": 81.2,
+    "C_mean": 6,
+    "C_p95": 22.9,
+    "a_mean": 2.6,
+    "b_mean": 4.2,
+    "hue_deg": 58,
+    "light_offset_x": 0.002,
+    "light_offset_y": -0.015
+   },
+   "noise_sigma": 4.23,
+   "subpixel_detail": {
+    "window_src_px": 11,
+    "rms_luma": 31.29,
+    "share_of_variance_pct": 46.5
+   }
+  },
+  "emulation": {
+   "960x540": {
+    "screen_px_per_src_px": 0.0945,
+    "density": 10.58,
+    "magnified": false,
+    "out_px": [
+     80,
+     59
+    ],
+    "alias_rmse": 7.55,
+    "phase_shimmer": 5.3,
+    "sharpness_vs_ideal": 0.659,
+    "grad_energy": 9.21
+   },
+   "1280x720": {
+    "screen_px_per_src_px": 0.126,
+    "density": 7.94,
+    "magnified": false,
+    "out_px": [
+     106,
+     78
+    ],
+    "alias_rmse": 8.41,
+    "phase_shimmer": 6.73,
+    "sharpness_vs_ideal": 0.638,
+    "grad_energy": 9.14
+   },
+   "1920x1080": {
+    "screen_px_per_src_px": 0.189,
+    "density": 5.29,
+    "magnified": false,
+    "out_px": [
+     160,
+     118
+    ],
+    "alias_rmse": 7.18,
+    "phase_shimmer": 4.84,
+    "sharpness_vs_ideal": 0.713,
+    "grad_energy": 9.74
+   }
+  }
+ },
+ "corridor-far": {
+  "id": "corridor-far",
+  "family": "plates",
+  "used": true,
+  "path": "apps/game/assets/rooms/corridor-far.png",
+  "src": "room_depth.gd:246-248 (960/1920); .import compress/mode=2, mipmaps off",
+  "size": [
+   1920,
+   1080
+  ],
+  "file_bytes": 2683776,
+  "region": [
+   0,
+   0,
+   1920,
+   1080
+  ],
+  "scale": 0.5,
+  "zoom": 1.35,
+  "mip": false,
+  "vram": {
+   "desktop_BCn": 1036800,
+   "raw_rgba8": 8294400
+  },
+  "display": {
+   "960x540": {
+    "opaque_w_px": 1296,
+    "opaque_h_px": 729,
+    "density": 1.48
+   },
+   "1280x720": {
+    "opaque_w_px": 1728,
+    "opaque_h_px": 972,
+    "density": 1.11
+   },
+   "1920x1080": {
+    "opaque_w_px": 2592,
+    "opaque_h_px": 1458,
+    "density": 0.74
+   }
+  },
+  "static": {
+   "alpha_hist": {
+    "max": 255,
+    "body_alpha_mode": [
+     [
+      255,
+      2073600
+     ],
+     [
+      128,
+      0
+     ],
+     [
+      129,
+      0
+     ]
+    ],
+    "body_below_250_pct": 0,
+    "body_below_240_pct": 0
+   },
+   "alpha": {
+    "transparent_pct": 0,
+    "opaque_pct": 100,
+    "semi_pct": 0,
+    "body_px": 2073600
+   },
+   "opaque_bbox": [
+    0,
+    0,
+    1920,
+    1080
+   ],
+   "palette": {
+    "L_p1": 0,
+    "L_p5": 0.1,
+    "L_p50": 6.1,
+    "L_p99": 65.1,
+    "C_mean": 6.5,
+    "C_p95": 17.3,
+    "a_mean": -2.8,
+    "b_mean": -5.8,
+    "hue_deg": -116,
+    "light_offset_x": 0.006,
+    "light_offset_y": 0.043
+   },
+   "noise_sigma": 0.61,
+   "subpixel_detail": {
+    "window_src_px": 3,
+    "rms_luma": 3.45,
+    "share_of_variance_pct": 1.4
+   }
+  },
+  "emulation": {
+   "960x540": {
+    "screen_px_per_src_px": 0.675,
+    "density": 1.48,
+    "magnified": false,
+    "out_px": [
+     1296,
+     729
+    ],
+    "alias_rmse": 0.98,
+    "phase_shimmer": 0.8,
+    "sharpness_vs_ideal": 1.072,
+    "grad_energy": 3.04
+   },
+   "1280x720": {
+    "screen_px_per_src_px": 0.9,
+    "density": 1.11,
+    "magnified": false,
+    "out_px": [
+     1728,
+     972
+    ],
+    "alias_rmse": 0.47,
+    "phase_shimmer": 0.33,
+    "sharpness_vs_ideal": 1.013,
+    "grad_energy": 2.38
+   },
+   "1920x1080": {
+    "screen_px_per_src_px": 1.35,
+    "density": 0.74,
+    "magnified": true,
+    "out_px": [
+     2592,
+     1458
+    ],
+    "alias_rmse": 0,
+    "phase_shimmer": 0,
+    "sharpness_vs_ideal": null,
+    "grad_energy": 1.67
+   }
+  }
+ },
+ "corridor-mid": {
+  "id": "corridor-mid",
+  "family": "plates",
+  "used": true,
+  "path": "apps/game/assets/rooms/corridor-mid.png",
+  "src": "room_depth.gd:246-248 (960/1920); .import compress/mode=2, mipmaps off",
+  "size": [
+   1920,
+   1080
+  ],
+  "file_bytes": 1038487,
+  "region": [
+   0,
+   0,
+   1920,
+   1080
+  ],
+  "scale": 0.5,
+  "zoom": 1.35,
+  "mip": false,
+  "vram": {
+   "desktop_BCn": 2073600,
+   "raw_rgba8": 8294400
+  },
+  "display": {
+   "960x540": {
+    "opaque_w_px": 1296,
+    "opaque_h_px": 524.5,
+    "density": 1.48
+   },
+   "1280x720": {
+    "opaque_w_px": 1728,
+    "opaque_h_px": 699.3,
+    "density": 1.11
+   },
+   "1920x1080": {
+    "opaque_w_px": 2592,
+    "opaque_h_px": 1049,
+    "density": 0.74
+   }
+  },
+  "static": {
+   "alpha_hist": {
+    "max": 255,
+    "body_alpha_mode": [
+     [
+      252,
+      191356
+     ],
+     [
+      253,
+      77737
+     ],
+     [
+      251,
+      74140
+     ]
+    ],
+    "body_below_250_pct": 21.39,
+    "body_below_240_pct": 6.57
+   },
+   "alpha": {
+    "transparent_pct": 72.02,
+    "opaque_pct": 0.07,
+    "semi_pct": 27.92,
+    "body_px": 484322
+   },
+   "opaque_bbox": [
+    0,
+    0,
+    1920,
+    777
+   ],
+   "palette": {
+    "L_p1": 0,
+    "L_p5": 0.3,
+    "L_p50": 5.2,
+    "L_p99": 34,
+    "C_mean": 6.2,
+    "C_p95": 13.6,
+    "a_mean": -2.4,
+    "b_mean": -5.6,
+    "hue_deg": -113,
+    "light_offset_x": -0.003,
+    "light_offset_y": 0.038
+   },
+   "noise_sigma": 0.55,
+   "subpixel_detail": {
+    "window_src_px": 3,
+    "rms_luma": 3.35,
+    "share_of_variance_pct": 4.1
+   }
+  },
+  "emulation": {
+   "960x540": {
+    "screen_px_per_src_px": 0.675,
+    "density": 1.48,
+    "magnified": false,
+    "out_px": [
+     1296,
+     729
+    ],
+    "alias_rmse": 0.43,
+    "phase_shimmer": 0.37,
+    "sharpness_vs_ideal": 1.046,
+    "grad_energy": 1.01
+   },
+   "1280x720": {
+    "screen_px_per_src_px": 0.9,
+    "density": 1.11,
+    "magnified": false,
+    "out_px": [
+     1728,
+     972
+    ],
+    "alias_rmse": 0.18,
+    "phase_shimmer": 0.13,
+    "sharpness_vs_ideal": 1.009,
+    "grad_energy": 0.78
+   },
+   "1920x1080": {
+    "screen_px_per_src_px": 1.35,
+    "density": 0.74,
+    "magnified": true,
+    "out_px": [
+     2592,
+     1458
+    ],
+    "alias_rmse": 0,
+    "phase_shimmer": 0,
+    "sharpness_vs_ideal": null,
+    "grad_energy": 0.53
+   }
+  }
+ },
+ "corridor-near": {
+  "id": "corridor-near",
+  "family": "plates",
+  "used": true,
+  "path": "apps/game/assets/rooms/corridor-near.png",
+  "src": "room_depth.gd:246-248 (960/1920); .import compress/mode=2, mipmaps off",
+  "size": [
+   512,
+   1080
+  ],
+  "file_bytes": 267408,
+  "region": [
+   0,
+   0,
+   512,
+   1080
+  ],
+  "scale": 0.5,
+  "zoom": 1.35,
+  "mip": false,
+  "vram": {
+   "desktop_BCn": 552960,
+   "raw_rgba8": 2211840
+  },
+  "display": {
+   "960x540": {
+    "opaque_w_px": 345.6,
+    "opaque_h_px": 729,
+    "density": 1.48
+   },
+   "1280x720": {
+    "opaque_w_px": 460.8,
+    "opaque_h_px": 972,
+    "density": 1.11
+   },
+   "1920x1080": {
+    "opaque_w_px": 691.2,
+    "opaque_h_px": 1458,
+    "density": 0.74
+   }
+  },
+  "static": {
+   "alpha_hist": {
+    "max": 255,
+    "body_alpha_mode": [
+     [
+      253,
+      127211
+     ],
+     [
+      252,
+      26633
+     ],
+     [
+      251,
+      7055
+     ]
+    ],
+    "body_below_250_pct": 5.63,
+    "body_below_240_pct": 1.87
+   },
+   "alpha": {
+    "transparent_pct": 65.36,
+    "opaque_pct": 0,
+    "semi_pct": 34.63,
+    "body_px": 178629
+   },
+   "opaque_bbox": [
+    0,
+    0,
+    512,
+    1080
+   ],
+   "palette": {
+    "L_p1": 0,
+    "L_p5": 0,
+    "L_p50": 2,
+    "L_p99": 39.9,
+    "C_mean": 3.7,
+    "C_p95": 12.8,
+    "a_mean": -1.1,
+    "b_mean": -3.5,
+    "hue_deg": -108,
+    "light_offset_x": 0.009,
+    "light_offset_y": -0.057
+   },
+   "noise_sigma": 0.55,
+   "subpixel_detail": {
+    "window_src_px": 3,
+    "rms_luma": 3.63,
+    "share_of_variance_pct": 4.6
+   }
+  },
+  "emulation": {
+   "960x540": {
+    "screen_px_per_src_px": 0.675,
+    "density": 1.48,
+    "magnified": false,
+    "out_px": [
+     346,
+     729
+    ],
+    "alias_rmse": 0.79,
+    "phase_shimmer": 0.55,
+    "sharpness_vs_ideal": 1.059,
+    "grad_energy": 1.2
+   },
+   "1280x720": {
+    "screen_px_per_src_px": 0.9,
+    "density": 1.11,
+    "magnified": false,
+    "out_px": [
+     461,
+     972
+    ],
+    "alias_rmse": 0.47,
+    "phase_shimmer": 0.29,
+    "sharpness_vs_ideal": 1.013,
+    "grad_energy": 0.95
+   },
+   "1920x1080": {
+    "screen_px_per_src_px": 1.35,
+    "density": 0.74,
+    "magnified": true,
+    "out_px": [
+     691,
+     1458
+    ],
+    "alias_rmse": 0,
+    "phase_shimmer": 0,
+    "sharpness_vs_ideal": null,
+    "grad_energy": 0.66
+   }
+  }
+ },
+ "records-far": {
+  "id": "records-far",
+  "family": "plates",
+  "used": true,
+  "path": "apps/game/assets/rooms/records-far.png",
+  "src": "room_depth.gd:246-248 (960/1920); .import compress/mode=2, mipmaps off",
+  "size": [
+   1920,
+   1080
+  ],
+  "file_bytes": 2388741,
+  "region": [
+   0,
+   0,
+   1920,
+   1080
+  ],
+  "scale": 0.5,
+  "zoom": 1.35,
+  "mip": false,
+  "vram": {
+   "desktop_BCn": 1036800,
+   "raw_rgba8": 8294400
+  },
+  "display": {
+   "960x540": {
+    "opaque_w_px": 1296,
+    "opaque_h_px": 729,
+    "density": 1.48
+   },
+   "1280x720": {
+    "opaque_w_px": 1728,
+    "opaque_h_px": 972,
+    "density": 1.11
+   },
+   "1920x1080": {
+    "opaque_w_px": 2592,
+    "opaque_h_px": 1458,
+    "density": 0.74
+   }
+  },
+  "static": {
+   "alpha_hist": {
+    "max": 255,
+    "body_alpha_mode": [
+     [
+      255,
+      2073600
+     ],
+     [
+      128,
+      0
+     ],
+     [
+      129,
+      0
+     ]
+    ],
+    "body_below_250_pct": 0,
+    "body_below_240_pct": 0
+   },
+   "alpha": {
+    "transparent_pct": 0,
+    "opaque_pct": 100,
+    "semi_pct": 0,
+    "body_px": 2073600
+   },
+   "opaque_bbox": [
+    0,
+    0,
+    1920,
+    1080
+   ],
+   "palette": {
+    "L_p1": 0,
+    "L_p5": 0,
+    "L_p50": 6,
+    "L_p99": 72.1,
+    "C_mean": 6.6,
+    "C_p95": 19.1,
+    "a_mean": -2.7,
+    "b_mean": -5.8,
+    "hue_deg": -115,
+    "light_offset_x": 0.012,
+    "light_offset_y": 0.087
+   },
+   "noise_sigma": 0.59,
+   "subpixel_detail": {
+    "window_src_px": 3,
+    "rms_luma": 4.21,
+    "share_of_variance_pct": 1.6
+   }
+  },
+  "emulation": {
+   "960x540": {
+    "screen_px_per_src_px": 0.675,
+    "density": 1.48,
+    "magnified": false,
+    "out_px": [
+     1296,
+     729
+    ],
+    "alias_rmse": 1.14,
+    "phase_shimmer": 0.94,
+    "sharpness_vs_ideal": 1.064,
+    "grad_energy": 4.28
+   },
+   "1280x720": {
+    "screen_px_per_src_px": 0.9,
+    "density": 1.11,
+    "magnified": false,
+    "out_px": [
+     1728,
+     972
+    ],
+    "alias_rmse": 0.49,
+    "phase_shimmer": 0.37,
+    "sharpness_vs_ideal": 1.012,
+    "grad_energy": 3.34
+   },
+   "1920x1080": {
+    "screen_px_per_src_px": 1.35,
+    "density": 0.74,
+    "magnified": true,
+    "out_px": [
+     2592,
+     1458
+    ],
+    "alias_rmse": 0,
+    "phase_shimmer": 0,
+    "sharpness_vs_ideal": null,
+    "grad_energy": 2.32
+   }
+  }
+ },
+ "records-mid": {
+  "id": "records-mid",
+  "family": "plates",
+  "used": true,
+  "path": "apps/game/assets/rooms/records-mid.png",
+  "src": "room_depth.gd:246-248 (960/1920); .import compress/mode=2, mipmaps off",
+  "size": [
+   1920,
+   1080
+  ],
+  "file_bytes": 1051421,
+  "region": [
+   0,
+   0,
+   1920,
+   1080
+  ],
+  "scale": 0.5,
+  "zoom": 1.35,
+  "mip": false,
+  "vram": {
+   "desktop_BCn": 2073600,
+   "raw_rgba8": 8294400
+  },
+  "display": {
+   "960x540": {
+    "opaque_w_px": 1296,
+    "opaque_h_px": 501.5,
+    "density": 1.48
+   },
+   "1280x720": {
+    "opaque_w_px": 1728,
+    "opaque_h_px": 668.7,
+    "density": 1.11
+   },
+   "1920x1080": {
+    "opaque_w_px": 2592,
+    "opaque_h_px": 1003.1,
+    "density": 0.74
+   }
+  },
+  "static": {
+   "alpha_hist": {
+    "max": 255,
+    "body_alpha_mode": [
+     [
+      252,
+      261778
+     ],
+     [
+      253,
+      183830
+     ],
+     [
+      251,
+      46428
+     ]
+    ],
+    "body_below_250_pct": 11.34,
+    "body_below_240_pct": 3.93
+   },
+   "alpha": {
+    "transparent_pct": 68.92,
+    "opaque_pct": 0.01,
+    "semi_pct": 31.08,
+    "body_px": 576313
+   },
+   "opaque_bbox": [
+    0,
+    0,
+    1920,
+    743
+   ],
+   "palette": {
+    "L_p1": 0,
+    "L_p5": 0,
+    "L_p50": 7.6,
+    "L_p99": 53.4,
+    "C_mean": 6,
+    "C_p95": 16.5,
+    "a_mean": -2.3,
+    "b_mean": -5.1,
+    "hue_deg": -114,
+    "light_offset_x": -0.013,
+    "light_offset_y": 0.069
+   },
+   "noise_sigma": 0.61,
+   "subpixel_detail": {
+    "window_src_px": 3,
+    "rms_luma": 5.19,
+    "share_of_variance_pct": 3.7
+   }
+  },
+  "emulation": {
+   "960x540": {
+    "screen_px_per_src_px": 0.675,
+    "density": 1.48,
+    "magnified": false,
+    "out_px": [
+     1296,
+     729
+    ],
+    "alias_rmse": 0.66,
+    "phase_shimmer": 0.56,
+    "sharpness_vs_ideal": 1.052,
+    "grad_energy": 1.72
+   },
+   "1280x720": {
+    "screen_px_per_src_px": 0.9,
+    "density": 1.11,
+    "magnified": false,
+    "out_px": [
+     1728,
+     972
+    ],
+    "alias_rmse": 0.24,
+    "phase_shimmer": 0.2,
+    "sharpness_vs_ideal": 1.01,
+    "grad_energy": 1.34
+   },
+   "1920x1080": {
+    "screen_px_per_src_px": 1.35,
+    "density": 0.74,
+    "magnified": true,
+    "out_px": [
+     2592,
+     1458
+    ],
+    "alias_rmse": 0,
+    "phase_shimmer": 0,
+    "sharpness_vs_ideal": null,
+    "grad_energy": 0.92
+   }
+  }
+ },
+ "records-near": {
+  "id": "records-near",
+  "family": "plates",
+  "used": true,
+  "path": "apps/game/assets/rooms/records-near.png",
+  "src": "room_depth.gd:246-248 (960/1920); .import compress/mode=2, mipmaps off",
+  "size": [
+   512,
+   1080
+  ],
+  "file_bytes": 270902,
+  "region": [
+   0,
+   0,
+   512,
+   1080
+  ],
+  "scale": 0.5,
+  "zoom": 1.35,
+  "mip": false,
+  "vram": {
+   "desktop_BCn": 552960,
+   "raw_rgba8": 2211840
+  },
+  "display": {
+   "960x540": {
+    "opaque_w_px": 345.6,
+    "opaque_h_px": 721.6,
+    "density": 1.48
+   },
+   "1280x720": {
+    "opaque_w_px": 460.8,
+    "opaque_h_px": 962.1,
+    "density": 1.11
+   },
+   "1920x1080": {
+    "opaque_w_px": 691.2,
+    "opaque_h_px": 1443.2,
+    "density": 0.74
+   }
+  },
+  "static": {
+   "alpha_hist": {
+    "max": 255,
+    "body_alpha_mode": [
+     [
+      253,
+      125488
+     ],
+     [
+      252,
+      24560
+     ],
+     [
+      251,
+      7361
+     ]
+    ],
+    "body_below_250_pct": 5.53,
+    "body_below_240_pct": 2.41
+   },
+   "alpha": {
+    "transparent_pct": 65.96,
+    "opaque_pct": 0.04,
+    "semi_pct": 34.01,
+    "body_px": 171161
+   },
+   "opaque_bbox": [
+    0,
+    0,
+    512,
+    1069
+   ],
+   "palette": {
+    "L_p1": 0,
+    "L_p5": 0,
+    "L_p50": 3,
+    "L_p99": 62.4,
+    "C_mean": 7.5,
+    "C_p95": 29.7,
+    "a_mean": -1.2,
+    "b_mean": -7.3,
+    "hue_deg": -99,
+    "light_offset_x": 0.001,
+    "light_offset_y": -0.073
+   },
+   "noise_sigma": 0.48,
+   "subpixel_detail": {
+    "window_src_px": 3,
+    "rms_luma": 4.95,
+    "share_of_variance_pct": 3.2
+   }
+  },
+  "emulation": {
+   "960x540": {
+    "screen_px_per_src_px": 0.675,
+    "density": 1.48,
+    "magnified": false,
+    "out_px": [
+     346,
+     729
+    ],
+    "alias_rmse": 0.81,
+    "phase_shimmer": 0.64,
+    "sharpness_vs_ideal": 1.042,
+    "grad_energy": 1.76
+   },
+   "1280x720": {
+    "screen_px_per_src_px": 0.9,
+    "density": 1.11,
+    "magnified": false,
+    "out_px": [
+     461,
+     972
+    ],
+    "alias_rmse": 0.35,
+    "phase_shimmer": 0.25,
+    "sharpness_vs_ideal": 1.007,
+    "grad_energy": 1.37
+   },
+   "1920x1080": {
+    "screen_px_per_src_px": 1.35,
+    "density": 0.74,
+    "magnified": true,
+    "out_px": [
+     691,
+     1458
+    ],
+    "alias_rmse": 0,
+    "phase_shimmer": 0,
+    "sharpness_vs_ideal": null,
+    "grad_energy": 0.94
+   }
+  }
+ },
+ "junction-far": {
+  "id": "junction-far",
+  "family": "plates",
+  "used": true,
+  "path": "apps/game/assets/rooms/junction-far.png",
+  "src": "room_depth.gd:246-248 (960/1920); .import compress/mode=2, mipmaps off",
+  "size": [
+   1920,
+   1080
+  ],
+  "file_bytes": 2337859,
+  "region": [
+   0,
+   0,
+   1920,
+   1080
+  ],
+  "scale": 0.5,
+  "zoom": 1.35,
+  "mip": false,
+  "vram": {
+   "desktop_BCn": 1036800,
+   "raw_rgba8": 8294400
+  },
+  "display": {
+   "960x540": {
+    "opaque_w_px": 1296,
+    "opaque_h_px": 729,
+    "density": 1.48
+   },
+   "1280x720": {
+    "opaque_w_px": 1728,
+    "opaque_h_px": 972,
+    "density": 1.11
+   },
+   "1920x1080": {
+    "opaque_w_px": 2592,
+    "opaque_h_px": 1458,
+    "density": 0.74
+   }
+  },
+  "static": {
+   "alpha_hist": {
+    "max": 255,
+    "body_alpha_mode": [
+     [
+      255,
+      2073600
+     ],
+     [
+      128,
+      0
+     ],
+     [
+      129,
+      0
+     ]
+    ],
+    "body_below_250_pct": 0,
+    "body_below_240_pct": 0
+   },
+   "alpha": {
+    "transparent_pct": 0,
+    "opaque_pct": 100,
+    "semi_pct": 0,
+    "body_px": 2073600
+   },
+   "opaque_bbox": [
+    0,
+    0,
+    1920,
+    1080
+   ],
+   "palette": {
+    "L_p1": 0,
+    "L_p5": 0,
+    "L_p50": 5.7,
+    "L_p99": 60.5,
+    "C_mean": 6,
+    "C_p95": 16,
+    "a_mean": -3,
+    "b_mean": -5.1,
+    "hue_deg": -120,
+    "light_offset_x": 0.001,
+    "light_offset_y": 0.031
+   },
+   "noise_sigma": 0.53,
+   "subpixel_detail": {
+    "window_src_px": 3,
+    "rms_luma": 3.9,
+    "share_of_variance_pct": 2.1
+   }
+  },
+  "emulation": {
+   "960x540": {
+    "screen_px_per_src_px": 0.675,
+    "density": 1.48,
+    "magnified": false,
+    "out_px": [
+     1296,
+     729
+    ],
+    "alias_rmse": 1.07,
+    "phase_shimmer": 0.86,
+    "sharpness_vs_ideal": 1.061,
+    "grad_energy": 3.58
+   },
+   "1280x720": {
+    "screen_px_per_src_px": 0.9,
+    "density": 1.11,
+    "magnified": false,
+    "out_px": [
+     1728,
+     972
+    ],
+    "alias_rmse": 0.51,
+    "phase_shimmer": 0.37,
+    "sharpness_vs_ideal": 1.011,
+    "grad_energy": 2.8
+   },
+   "1920x1080": {
+    "screen_px_per_src_px": 1.35,
+    "density": 0.74,
+    "magnified": true,
+    "out_px": [
+     2592,
+     1458
+    ],
+    "alias_rmse": 0,
+    "phase_shimmer": 0,
+    "sharpness_vs_ideal": null,
+    "grad_energy": 1.94
+   }
+  }
+ },
+ "junction-mid": {
+  "id": "junction-mid",
+  "family": "plates",
+  "used": true,
+  "path": "apps/game/assets/rooms/junction-mid.png",
+  "src": "room_depth.gd:246-248 (960/1920); .import compress/mode=2, mipmaps off",
+  "size": [
+   1920,
+   1080
+  ],
+  "file_bytes": 2242853,
+  "region": [
+   0,
+   0,
+   1920,
+   1080
+  ],
+  "scale": 0.5,
+  "zoom": 1.35,
+  "mip": false,
+  "vram": {
+   "desktop_BCn": 2073600,
+   "raw_rgba8": 8294400
+  },
+  "display": {
+   "960x540": {
+    "opaque_w_px": 1296,
+    "opaque_h_px": 721.6,
+    "density": 1.48
+   },
+   "1280x720": {
+    "opaque_w_px": 1728,
+    "opaque_h_px": 962.1,
+    "density": 1.11
+   },
+   "1920x1080": {
+    "opaque_w_px": 2592,
+    "opaque_h_px": 1443.2,
+    "density": 0.74
+   }
+  },
+  "static": {
+   "alpha_hist": {
+    "max": 255,
+    "body_alpha_mode": [
+     [
+      252,
+      651830
+     ],
+     [
+      253,
+      205893
+     ],
+     [
+      251,
+      117398
+     ]
+    ],
+    "body_below_250_pct": 8.36,
+    "body_below_240_pct": 2.3
+   },
+   "alpha": {
+    "transparent_pct": 33.92,
+    "opaque_pct": 0.06,
+    "semi_pct": 66.02,
+    "body_px": 1103578
+   },
+   "opaque_bbox": [
+    0,
+    11,
+    1920,
+    1069
+   ],
+   "palette": {
+    "L_p1": 0,
+    "L_p5": 0.2,
+    "L_p50": 8.7,
+    "L_p99": 61.9,
+    "C_mean": 5.5,
+    "C_p95": 17.7,
+    "a_mean": -2,
+    "b_mean": -3.4,
+    "hue_deg": -121,
+    "light_offset_x": -0.01,
+    "light_offset_y": -0.039
+   },
+   "noise_sigma": 0.95,
+   "subpixel_detail": {
+    "window_src_px": 3,
+    "rms_luma": 6.8,
+    "share_of_variance_pct": 5.1
+   }
+  },
+  "emulation": {
+   "960x540": {
+    "screen_px_per_src_px": 0.675,
+    "density": 1.48,
+    "magnified": false,
+    "out_px": [
+     1296,
+     729
+    ],
+    "alias_rmse": 1.24,
+    "phase_shimmer": 1.03,
+    "sharpness_vs_ideal": 1.063,
+    "grad_energy": 4.21
+   },
+   "1280x720": {
+    "screen_px_per_src_px": 0.9,
+    "density": 1.11,
+    "magnified": false,
+    "out_px": [
+     1728,
+     972
+    ],
+    "alias_rmse": 0.49,
+    "phase_shimmer": 0.38,
+    "sharpness_vs_ideal": 1.011,
+    "grad_energy": 3.3
+   },
+   "1920x1080": {
+    "screen_px_per_src_px": 1.35,
+    "density": 0.74,
+    "magnified": true,
+    "out_px": [
+     2592,
+     1458
+    ],
+    "alias_rmse": 0,
+    "phase_shimmer": 0,
+    "sharpness_vs_ideal": null,
+    "grad_energy": 2.3
+   }
+  }
+ },
+ "junction-near": {
+  "id": "junction-near",
+  "family": "plates",
+  "used": true,
+  "path": "apps/game/assets/rooms/junction-near.png",
+  "src": "room_depth.gd:246-248 (960/1920); .import compress/mode=2, mipmaps off",
+  "size": [
+   512,
+   1080
+  ],
+  "file_bytes": 470648,
+  "region": [
+   0,
+   0,
+   512,
+   1080
+  ],
+  "scale": 0.5,
+  "zoom": 1.35,
+  "mip": false,
+  "vram": {
+   "desktop_BCn": 552960,
+   "raw_rgba8": 2211840
+  },
+  "display": {
+   "960x540": {
+    "opaque_w_px": 345.6,
+    "opaque_h_px": 729,
+    "density": 1.48
+   },
+   "1280x720": {
+    "opaque_w_px": 460.8,
+    "opaque_h_px": 972,
+    "density": 1.11
+   },
+   "1920x1080": {
+    "opaque_w_px": 691.2,
+    "opaque_h_px": 1458,
+    "density": 0.74
+   }
+  },
+  "static": {
+   "alpha_hist": {
+    "max": 255,
+    "body_alpha_mode": [
+     [
+      252,
+      122205
+     ],
+     [
+      253,
+      79395
+     ],
+     [
+      251,
+      18938
+     ]
+    ],
+    "body_below_250_pct": 5.55,
+    "body_below_240_pct": 2.29
+   },
+   "alpha": {
+    "transparent_pct": 51.59,
+    "opaque_pct": 0.02,
+    "semi_pct": 48.38,
+    "body_px": 240385
+   },
+   "opaque_bbox": [
+    0,
+    0,
+    512,
+    1080
+   ],
+   "palette": {
+    "L_p1": 0,
+    "L_p5": 0,
+    "L_p50": 4.4,
+    "L_p99": 65,
+    "C_mean": 5.2,
+    "C_p95": 21.5,
+    "a_mean": -1.2,
+    "b_mean": -4.1,
+    "hue_deg": -106,
+    "light_offset_x": -0.004,
+    "light_offset_y": -0.089
+   },
+   "noise_sigma": 0.83,
+   "subpixel_detail": {
+    "window_src_px": 3,
+    "rms_luma": 6.11,
+    "share_of_variance_pct": 4.6
+   }
+  },
+  "emulation": {
+   "960x540": {
+    "screen_px_per_src_px": 0.675,
+    "density": 1.48,
+    "magnified": false,
+    "out_px": [
+     346,
+     729
+    ],
+    "alias_rmse": 1.14,
+    "phase_shimmer": 0.91,
+    "sharpness_vs_ideal": 1.056,
+    "grad_energy": 3.22
+   },
+   "1280x720": {
+    "screen_px_per_src_px": 0.9,
+    "density": 1.11,
+    "magnified": false,
+    "out_px": [
+     461,
+     972
+    ],
+    "alias_rmse": 0.48,
+    "phase_shimmer": 0.36,
+    "sharpness_vs_ideal": 1.01,
+    "grad_energy": 2.51
+   },
+   "1920x1080": {
+    "screen_px_per_src_px": 1.35,
+    "density": 0.74,
+    "magnified": true,
+    "out_px": [
+     691,
+     1458
+    ],
+    "alias_rmse": 0,
+    "phase_shimmer": 0,
+    "sharpness_vs_ideal": null,
+    "grad_energy": 1.73
+   }
+  }
+ },
+ "title-key-art": {
+  "id": "title-key-art",
+  "family": "title",
+  "used": true,
+  "path": "apps/game/assets/title-corridor-key-art-provisional.png",
+  "src": "main.tscn:470-479 (TextureRect 960x540, expand)",
+  "size": [
+   1672,
+   941
+  ],
+  "file_bytes": 1546087,
+  "region": [
+   0,
+   0,
+   1672,
+   941
+  ],
+  "scale": 0.5741626794258373,
+  "zoom": 1,
+  "mip": false,
+  "vram": {
+   "rgba8_with_mips": 6293408
+  },
+  "display": {
+   "960x540": {
+    "opaque_w_px": 960,
+    "opaque_h_px": 540.3,
+    "density": 1.74
+   },
+   "1280x720": {
+    "opaque_w_px": 1280,
+    "opaque_h_px": 720.4,
+    "density": 1.31
+   },
+   "1920x1080": {
+    "opaque_w_px": 1920,
+    "opaque_h_px": 1080.6,
+    "density": 0.87
+   }
+  },
+  "static": {
+   "alpha_hist": {
+    "max": 255,
+    "body_alpha_mode": [
+     [
+      255,
+      1573352
+     ],
+     [
+      128,
+      0
+     ],
+     [
+      129,
+      0
+     ]
+    ],
+    "body_below_250_pct": 0,
+    "body_below_240_pct": 0
+   },
+   "alpha": {
+    "transparent_pct": 0,
+    "opaque_pct": 100,
+    "semi_pct": 0,
+    "body_px": 1573352
+   },
+   "opaque_bbox": [
+    0,
+    0,
+    1672,
+    941
+   ],
+   "palette": {
+    "L_p1": 0,
+    "L_p5": 0,
+    "L_p50": 1.3,
+    "L_p99": 67.7,
+    "C_mean": 6.4,
+    "C_p95": 23.3,
+    "a_mean": -0.2,
+    "b_mean": -5.7,
+    "hue_deg": -92,
+    "light_offset_x": -0.229,
+    "light_offset_y": 0.022
+   },
+   "noise_sigma": 0.52,
+   "subpixel_detail": {
+    "window_src_px": 3,
+    "rms_luma": 3.83,
+    "share_of_variance_pct": 1.6
+   }
+  },
+  "emulation": {
+   "960x540": {
+    "screen_px_per_src_px": 0.5742,
+    "density": 1.74,
+    "magnified": false,
+    "out_px": [
+     960,
+     540
+    ],
+    "alias_rmse": 1.41,
+    "phase_shimmer": 1.16,
+    "sharpness_vs_ideal": 1.098,
+    "grad_energy": 2.3
+   },
+   "1280x720": {
+    "screen_px_per_src_px": 0.7656,
+    "density": 1.31,
+    "magnified": false,
+    "out_px": [
+     1280,
+     720
+    ],
+    "alias_rmse": 0.78,
+    "phase_shimmer": 0.63,
+    "sharpness_vs_ideal": 1.045,
+    "grad_energy": 1.84
+   },
+   "1920x1080": {
+    "screen_px_per_src_px": 1.1483,
+    "density": 0.87,
+    "magnified": true,
+    "out_px": [
+     1920,
+     1081
+    ],
+    "alias_rmse": 0,
+    "phase_shimmer": 0,
+    "sharpness_vs_ideal": null,
+    "grad_energy": 1.3
+   }
+  }
+ },
+ "logo-mark-512-raster": {
+  "id": "logo-mark-512-raster",
+  "family": "ui",
+  "used": true,
+  "path": "[session scratch, not kept]/art-audit/raster/logo-mark-512.png",
+  "src": "main.tscn:500-507 (88x88 TextureRect); logo-mark.svg.import svg/scale 1.0, mipmaps off",
+  "size": [
+   512,
+   512
+  ],
+  "file_bytes": 17335,
+  "region": [
+   0,
+   0,
+   512,
+   512
+  ],
+  "scale": 0.171875,
+  "zoom": 1,
+  "mip": false,
+  "vram": {
+   "rgba8_with_mips": 1048576
+  },
+  "display": {
+   "960x540": {
+    "opaque_w_px": 61.2,
+    "opaque_h_px": 70.5,
+    "density": 5.82
+   },
+   "1280x720": {
+    "opaque_w_px": 81.6,
+    "opaque_h_px": 94,
+    "density": 4.36
+   },
+   "1920x1080": {
+    "opaque_w_px": 122.4,
+    "opaque_h_px": 140.9,
+    "density": 2.91
+   }
+  },
+  "static": {
+   "alpha_hist": {
+    "max": 255,
+    "body_alpha_mode": [
+     [
+      255,
+      90577
+     ],
+     [
+      128,
+      755
+     ],
+     [
+      191,
+      409
+     ]
+    ],
+    "body_below_250_pct": 1.27,
+    "body_below_240_pct": 1.27
+   },
+   "alpha": {
+    "transparent_pct": 64.86,
+    "opaque_pct": 34.55,
+    "semi_pct": 0.59,
+    "body_px": 91741
+   },
+   "opaque_bbox": [
+    79,
+    63,
+    356,
+    410
+   ],
+   "islands": {
+    "parts": 1,
+    "stray_count": 0,
+    "stray_px": 0,
+    "specks_under_16px": 0,
+    "largest_strays": []
+   },
+   "holes": {
+    "count": 3,
+    "count_over_9px": 3,
+    "px": 9952,
+    "largest": [
+     {
+      "px": 9197,
+      "bbox": [
+       176,
+       108,
+       163,
+       91
+      ]
+     },
+     {
+      "px": 655,
+      "bbox": [
+       396,
+       191,
+       17,
+       73
+      ]
+     },
+     {
+      "px": 100,
+      "bbox": [
+       106,
+       215,
+       8,
+       37
+      ]
+     }
+    ]
+   },
+   "inner_translucency": {
+    "px": 1,
+    "pct_of_body": 0.001,
+    "samples": [
+     [
+      114,
+      211,
+      191
+     ]
+    ]
+   },
+   "fringe": {
+    "semi_edge_px": 1553,
+    "mean_dL": 0.17,
+    "p10_dL": -0.3,
+    "p90_dL": 0.48,
+    "light_halo_pct": 3.67,
+    "dark_fringe_pct": 3.73,
+    "mean_dRGB": [
+     0.4,
+     1.1,
+     1.4
+    ],
+    "green_spill": 0.2
+   },
+   "edge_hardness": {
+    "boundary_px": 1917,
+    "hard_pct": 18.78
+   },
+   "rim": {
+    "inner_L": 35.7,
+    "left": {
+     "n": 2140,
+     "dL": 5.7,
+     "bright15_L": 87.1,
+     "bright15_ab": [
+      -17,
+      -19.8
+     ]
+    },
+    "right": {
+     "n": 2197,
+     "dL": 8.8,
+     "bright15_L": 87,
+     "bright15_ab": [
+      -17.1,
+      -20
+     ]
+    },
+    "top": {
+     "n": 1760,
+     "dL": 18.3,
+     "bright15_L": 89.5,
+     "bright15_ab": [
+      -12.7,
+      -16.2
+     ]
+    },
+    "bottom": {
+     "n": 1891,
+     "dL": 9.6,
+     "bright15_L": 85.8,
+     "bright15_ab": [
+      -19.3,
+      -21.8
+     ]
+    }
+   },
+   "palette": {
+    "L_p1": 7.5,
+    "L_p5": 7.5,
+    "L_p50": 85.8,
+    "L_p99": 95.8,
+    "C_mean": 17.7,
+    "C_p95": 29.2,
+    "a_mean": -0.6,
+    "b_mean": -15.8,
+    "hue_deg": -92,
+    "light_offset_x": 0.005,
+    "light_offset_y": -0.026
+   },
+   "noise_sigma": 3.25,
+   "subpixel_detail": {
+    "window_src_px": 7,
+    "rms_luma": 26.01,
+    "share_of_variance_pct": 6.1
+   }
+  },
+  "emulation": {
+   "960x540": {
+    "screen_px_per_src_px": 0.1719,
+    "density": 5.82,
+    "magnified": false,
+    "out_px": [
+     88,
+     88
+    ],
+    "alias_rmse": 12.37,
+    "phase_shimmer": 10.74,
+    "sharpness_vs_ideal": 1.057,
+    "grad_energy": 12.53
+   },
+   "1280x720": {
+    "screen_px_per_src_px": 0.2292,
+    "density": 4.36,
+    "magnified": false,
+    "out_px": [
+     117,
+     117
+    ],
+    "alias_rmse": 9.48,
+    "phase_shimmer": 8.17,
+    "sharpness_vs_ideal": 1.033,
+    "grad_energy": 9.6
+   },
+   "1920x1080": {
+    "screen_px_per_src_px": 0.3438,
+    "density": 2.91,
+    "magnified": false,
+    "out_px": [
+     176,
+     176
+    ],
+    "alias_rmse": 5.98,
+    "phase_shimmer": 5.04,
+    "sharpness_vs_ideal": 1.014,
+    "grad_energy": 6.41
+   }
+  }
+ },
+ "scratch-keyart-a": {
+  "id": "scratch-keyart-a",
+  "family": "title",
+  "used": false,
+  "path": "docs/research-2026-10/sources/title-art-a-rejected/keyart-a.png",
+  "src": "candidate for title-key-art",
+  "size": [
+   1672,
+   941
+  ],
+  "file_bytes": 1604981,
+  "region": [
+   0,
+   0,
+   1672,
+   941
+  ],
+  "scale": 0.5741626794258373,
+  "zoom": 1,
+  "mip": false,
+  "vram": {
+   "rgba8_with_mips": 6293408
+  },
+  "display": {
+   "960x540": {
+    "opaque_w_px": 960,
+    "opaque_h_px": 540.3,
+    "density": 1.74
+   },
+   "1280x720": {
+    "opaque_w_px": 1280,
+    "opaque_h_px": 720.4,
+    "density": 1.31
+   },
+   "1920x1080": {
+    "opaque_w_px": 1920,
+    "opaque_h_px": 1080.6,
+    "density": 0.87
+   }
+  },
+  "static": {
+   "alpha_hist": {
+    "max": 255,
+    "body_alpha_mode": [
+     [
+      255,
+      1573352
+     ],
+     [
+      128,
+      0
+     ],
+     [
+      129,
+      0
+     ]
+    ],
+    "body_below_250_pct": 0,
+    "body_below_240_pct": 0
+   },
+   "alpha": {
+    "transparent_pct": 0,
+    "opaque_pct": 100,
+    "semi_pct": 0,
+    "body_px": 1573352
+   },
+   "opaque_bbox": [
+    0,
+    0,
+    1672,
+    941
+   ],
+   "palette": {
+    "L_p1": 0,
+    "L_p5": 0,
+    "L_p50": 1.2,
+    "L_p99": 64.3,
+    "C_mean": 7,
+    "C_p95": 27.6,
+    "a_mean": 0,
+    "b_mean": -6.2,
+    "hue_deg": -90,
+    "light_offset_x": -0.244,
+    "light_offset_y": 0.021
+   },
+   "noise_sigma": 0.62,
+   "subpixel_detail": {
+    "window_src_px": 3,
+    "rms_luma": 4.49,
+    "share_of_variance_pct": 2
+   }
+  },
+  "emulation": {
+   "960x540": {
+    "screen_px_per_src_px": 0.5742,
+    "density": 1.74,
+    "magnified": false,
+    "out_px": [
+     960,
+     540
+    ],
+    "alias_rmse": 1.62,
+    "phase_shimmer": 1.35,
+    "sharpness_vs_ideal": 1.103,
+    "grad_energy": 2.69
+   },
+   "1280x720": {
+    "screen_px_per_src_px": 0.7656,
+    "density": 1.31,
+    "magnified": false,
+    "out_px": [
+     1280,
+     720
+    ],
+    "alias_rmse": 0.88,
+    "phase_shimmer": 0.72,
+    "sharpness_vs_ideal": 1.048,
+    "grad_energy": 2.15
+   },
+   "1920x1080": {
+    "screen_px_per_src_px": 1.1483,
+    "density": 0.87,
+    "magnified": true,
+    "out_px": [
+     1920,
+     1081
+    ],
+    "alias_rmse": 0,
+    "phase_shimmer": 0,
+    "sharpness_vs_ideal": null,
+    "grad_energy": 1.52
+   }
+  }
+ },
+ "scratch-keyart-b": {
+  "id": "scratch-keyart-b",
+  "family": "title",
+  "used": false,
+  "path": "apps/game/assets/title-corridor-key-art-provisional.png",
+  "src": "candidate for title-key-art",
+  "size": [
+   1672,
+   941
+  ],
+  "file_bytes": 1801160,
+  "region": [
+   0,
+   0,
+   1672,
+   941
+  ],
+  "scale": 0.5741626794258373,
+  "zoom": 1,
+  "mip": false,
+  "vram": {
+   "rgba8_with_mips": 6293408
+  },
+  "display": {
+   "960x540": {
+    "opaque_w_px": 960,
+    "opaque_h_px": 540.3,
+    "density": 1.74
+   },
+   "1280x720": {
+    "opaque_w_px": 1280,
+    "opaque_h_px": 720.4,
+    "density": 1.31
+   },
+   "1920x1080": {
+    "opaque_w_px": 1920,
+    "opaque_h_px": 1080.6,
+    "density": 0.87
+   }
+  },
+  "static": {
+   "alpha_hist": {
+    "max": 255,
+    "body_alpha_mode": [
+     [
+      255,
+      1573352
+     ],
+     [
+      128,
+      0
+     ],
+     [
+      129,
+      0
+     ]
+    ],
+    "body_below_250_pct": 0,
+    "body_below_240_pct": 0
+   },
+   "alpha": {
+    "transparent_pct": 0,
+    "opaque_pct": 100,
+    "semi_pct": 0,
+    "body_px": 1573352
+   },
+   "opaque_bbox": [
+    0,
+    0,
+    1672,
+    941
+   ],
+   "palette": {
+    "L_p1": 0,
+    "L_p5": 0,
+    "L_p50": 1.8,
+    "L_p99": 76.7,
+    "C_mean": 6.9,
+    "C_p95": 26.9,
+    "a_mean": -0.3,
+    "b_mean": -6.1,
+    "hue_deg": -93,
+    "light_offset_x": -0.191,
+    "light_offset_y": 0.053
+   },
+   "noise_sigma": 0.83,
+   "subpixel_detail": {
+    "window_src_px": 3,
+    "rms_luma": 6,
+    "share_of_variance_pct": 2.8
+   }
+  },
+  "emulation": {
+   "960x540": {
+    "screen_px_per_src_px": 0.5742,
+    "density": 1.74,
+    "magnified": false,
+    "out_px": [
+     960,
+     540
+    ],
+    "alias_rmse": 2.14,
+    "phase_shimmer": 1.81,
+    "sharpness_vs_ideal": 1.112,
+    "grad_energy": 4.03
+   },
+   "1280x720": {
+    "screen_px_per_src_px": 0.7656,
+    "density": 1.31,
+    "magnified": false,
+    "out_px": [
+     1280,
+     720
+    ],
+    "alias_rmse": 1.1,
+    "phase_shimmer": 0.94,
+    "sharpness_vs_ideal": 1.051,
+    "grad_energy": 3.24
+   },
+   "1920x1080": {
+    "screen_px_per_src_px": 1.1483,
+    "density": 0.87,
+    "magnified": true,
+    "out_px": [
+     1920,
+     1081
+    ],
+    "alias_rmse": 0,
+    "phase_shimmer": 0,
+    "sharpness_vs_ideal": null,
+    "grad_energy": 2.29
+   }
+  }
+ },
+ "scratch-sentry-v1-active": {
+  "id": "scratch-sentry-v1-active",
+  "family": "sentry",
+  "used": false,
+  "path": "[session scratch, not kept]/art/sentry/sentry-side-left.png",
+  "src": "superseded by sentry-v2 (approved)",
+  "size": [
+   1024,
+   768
+  ],
+  "file_bytes": 935014,
+  "region": [
+   113,
+   57,
+   855,
+   626
+  ],
+  "scale": 0.07,
+  "zoom": 1.35,
+  "mip": true,
+  "vram": {
+   "rgba8_with_mips": 4194304
+  },
+  "display": {
+   "960x540": {
+    "opaque_w_px": 80.7,
+    "opaque_h_px": 55.8,
+    "density": 10.58
+   },
+   "1280x720": {
+    "opaque_w_px": 107.6,
+    "opaque_h_px": 74.3,
+    "density": 7.94
+   },
+   "1920x1080": {
+    "opaque_w_px": 161.4,
+    "opaque_h_px": 111.5,
+    "density": 5.29
+   }
+  },
+  "static": {
+   "alpha_hist": {
+    "max": 254,
+    "body_alpha_mode": [
+     [
+      252,
+      271025
+     ],
+     [
+      253,
+      75542
+     ],
+     [
+      251,
+      19024
+     ]
+    ],
+    "body_below_250_pct": 3.3,
+    "body_below_240_pct": 1.06
+   },
+   "alpha": {
+    "transparent_pct": 25.53,
+    "opaque_pct": 0,
+    "semi_pct": 74.47,
+    "body_px": 384048
+   },
+   "opaque_bbox": [
+    0,
+    35,
+    854,
+    590
+   ],
+   "islands": {
+    "parts": 1,
+    "stray_count": 0,
+    "stray_px": 0,
+    "specks_under_16px": 0,
+    "largest_strays": []
+   },
+   "holes": {
+    "count": 5,
+    "count_over_9px": 4,
+    "px": 4195,
+    "largest": [
+     {
+      "px": 2864,
+      "bbox": [
+       527,
+       146,
+       89,
+       52
+      ]
+     },
+     {
+      "px": 1205,
+      "bbox": [
+       556,
+       198,
+       90,
+       53
+      ]
+     },
+     {
+      "px": 75,
+      "bbox": [
+       645,
+       157,
+       5,
+       29
+      ]
+     },
+     {
+      "px": 42,
+      "bbox": [
+       377,
+       165,
+       5,
+       9
+      ]
+     },
+     {
+      "px": 9,
+      "bbox": [
+       803,
+       303,
+       4,
+       3
+      ]
+     }
+    ]
+   },
+   "inner_translucency": {
+    "px": 841,
+    "pct_of_body": 0.219,
+    "samples": [
+     [
+      644,
+      151,
+      234
+     ],
+     [
+      648,
+      165,
+      91
+     ],
+     [
+      650,
+      174,
+      214
+     ],
+     [
+      368,
+      179,
+      69
+     ],
+     [
+      644,
+      184,
+      182
+     ]
+    ]
+   },
+   "fringe": {
+    "semi_edge_px": 6262,
+    "mean_dL": -0.78,
+    "p10_dL": -12.65,
+    "p90_dL": 13.12,
+    "light_halo_pct": 8.11,
+    "dark_fringe_pct": 7.19,
+    "mean_dRGB": [
+     -8.7,
+     -2.3,
+     2.7
+    ],
+    "green_spill": 0.7
+   },
+   "edge_hardness": {
+    "boundary_px": 3909,
+    "hard_pct": 0
+   },
+   "rim": {
+    "inner_L": 22.1,
+    "left": {
+     "n": 1941,
+     "dL": -17.3,
+     "bright15_L": 20.1,
+     "bright15_ab": [
+      -3.1,
+      -6.8
+     ]
+    },
+    "right": {
+     "n": 2136,
+     "dL": -11.8,
+     "bright15_L": 43.2,
+     "bright15_ab": [
+      -11.8,
+      -27.2
+     ]
+    },
+    "top": {
+     "n": 3469,
+     "dL": -9.7,
+     "bright15_L": 40.3,
+     "bright15_ab": [
+      -10.8,
+      -21.5
+     ]
+    },
+    "bottom": {
+     "n": 3627,
+     "dL": -20.6,
+     "bright15_L": 6.7,
+     "bright15_ab": [
+      -1.2,
+      -3
+     ]
+    }
+   },
+   "palette": {
+    "L_p1": 0,
+    "L_p5": 0.1,
+    "L_p50": 19.7,
+    "L_p99": 90.2,
+    "C_mean": 5.4,
+    "C_p95": 24.1,
+    "a_mean": 0.2,
+    "b_mean": 1.3,
+    "hue_deg": 82,
+    "light_offset_x": -0.018,
+    "light_offset_y": -0.053
+   },
+   "noise_sigma": 3.3,
+   "subpixel_detail": {
+    "window_src_px": 11,
+    "rms_luma": 30.42,
+    "share_of_variance_pct": 42.4
+   }
+  },
+  "emulation": {
+   "960x540": {
+    "screen_px_per_src_px": 0.0945,
+    "density": 10.58,
+    "magnified": false,
+    "out_px": [
+     81,
+     59
+    ],
+    "alias_rmse": 7.94,
+    "phase_shimmer": 5.68,
+    "sharpness_vs_ideal": 0.702,
+    "grad_energy": 10.15
+   },
+   "1280x720": {
+    "screen_px_per_src_px": 0.126,
+    "density": 7.94,
+    "magnified": false,
+    "out_px": [
+     108,
+     79
+    ],
+    "alias_rmse": 9.08,
+    "phase_shimmer": 6.91,
+    "sharpness_vs_ideal": 0.726,
+    "grad_energy": 10.53
+   },
+   "1920x1080": {
+    "screen_px_per_src_px": 0.189,
+    "density": 5.29,
+    "magnified": false,
+    "out_px": [
+     162,
+     118
+    ],
+    "alias_rmse": 7.6,
+    "phase_shimmer": 5.3,
+    "sharpness_vs_ideal": 0.717,
+    "grad_energy": 10.03
+   }
+  }
+ },
+ "scratch-sentry-v1-down": {
+  "id": "scratch-sentry-v1-down",
+  "family": "sentry",
+  "used": false,
+  "path": "[session scratch, not kept]/art/sentry/sentry-down.png",
+  "src": "superseded by sentry-v2 (approved)",
+  "size": [
+   1024,
+   768
+  ],
+  "file_bytes": 887933,
+  "region": [
+   143,
+   80,
+   844,
+   623
+  ],
+  "scale": 0.07,
+  "zoom": 1.35,
+  "mip": true,
+  "vram": {
+   "rgba8_with_mips": 4194304
+  },
+  "display": {
+   "960x540": {
+    "opaque_w_px": 79.8,
+    "opaque_h_px": 52.8,
+    "density": 10.58
+   },
+   "1280x720": {
+    "opaque_w_px": 106.3,
+    "opaque_h_px": 70.4,
+    "density": 7.94
+   },
+   "1920x1080": {
+    "opaque_w_px": 159.5,
+    "opaque_h_px": 105.7,
+    "density": 5.29
+   }
+  },
+  "static": {
+   "alpha_hist": {
+    "max": 255,
+    "body_alpha_mode": [
+     [
+      252,
+      181116
+     ],
+     [
+      253,
+      120945
+     ],
+     [
+      251,
+      12782
+     ]
+    ],
+    "body_below_250_pct": 3.32,
+    "body_below_240_pct": 1.39
+   },
+   "alpha": {
+    "transparent_pct": 34.29,
+    "opaque_pct": 0,
+    "semi_pct": 65.71,
+    "body_px": 329826
+   },
+   "opaque_bbox": [
+    0,
+    64,
+    844,
+    559
+   ],
+   "islands": {
+    "parts": 1,
+    "stray_count": 0,
+    "stray_px": 0,
+    "specks_under_16px": 0,
+    "largest_strays": []
+   },
+   "holes": {
+    "count": 6,
+    "count_over_9px": 5,
+    "px": 1635,
+    "largest": [
+     {
+      "px": 903,
+      "bbox": [
+       539,
+       231,
+       48,
+       33
+      ]
+     },
+     {
+      "px": 405,
+      "bbox": [
+       221,
+       261,
+       64,
+       24
+      ]
+     },
+     {
+      "px": 128,
+      "bbox": [
+       612,
+       240,
+       8,
+       22
+      ]
+     },
+     {
+      "px": 111,
+      "bbox": [
+       493,
+       555,
+       16,
+       10
+      ]
+     },
+     {
+      "px": 87,
+      "bbox": [
+       201,
+       275,
+       19,
+       8
+      ]
+     }
+    ]
+   },
+   "inner_translucency": {
+    "px": 690,
+    "pct_of_body": 0.209,
+    "samples": [
+     [
+      598,
+      149,
+      235
+     ],
+     [
+      559,
+      153,
+      233
+     ],
+     [
+      567,
+      156,
+      157
+     ],
+     [
+      578,
+      160,
+      239
+     ],
+     [
+      580,
+      168,
+      236
+     ]
+    ]
+   },
+   "fringe": {
+    "semi_edge_px": 6031,
+    "mean_dL": -2.66,
+    "p10_dL": -18.44,
+    "p90_dL": 13.19,
+    "light_halo_pct": 8.27,
+    "dark_fringe_pct": 13.33,
+    "mean_dRGB": [
+     -11.6,
+     -5.8,
+     -4.8
+    ],
+    "green_spill": 2.4
+   },
+   "edge_hardness": {
+    "boundary_px": 3538,
+    "hard_pct": 0
+   },
+   "rim": {
+    "inner_L": 20.4,
+    "left": {
+     "n": 1906,
+     "dL": -4.1,
+     "bright15_L": 47.1,
+     "bright15_ab": [
+      -11,
+      -8.9
+     ]
+    },
+    "right": {
+     "n": 2098,
+     "dL": -1.3,
+     "bright15_L": 53.1,
+     "bright15_ab": [
+      -19.6,
+      -16.4
+     ]
+    },
+    "top": {
+     "n": 3343,
+     "dL": 6.5,
+     "bright15_L": 56.3,
+     "bright15_ab": [
+      -19.2,
+      -16.2
+     ]
+    },
+    "bottom": {
+     "n": 3177,
+     "dL": -14.3,
+     "bright15_L": 19.6,
+     "bright15_ab": [
+      1.3,
+      4
+     ]
+    }
+   },
+   "palette": {
+    "L_p1": 0,
+    "L_p5": 0.1,
+    "L_p50": 15.3,
+    "L_p99": 80.5,
+    "C_mean": 5.1,
+    "C_p95": 19.5,
+    "a_mean": 1.8,
+    "b_mean": 3.3,
+    "hue_deg": 62,
+    "light_offset_x": 0.004,
+    "light_offset_y": -0.017
+   },
+   "noise_sigma": 4.26,
+   "subpixel_detail": {
+    "window_src_px": 11,
+    "rms_luma": 31.25,
+    "share_of_variance_pct": 47.4
+   }
+  },
+  "emulation": {
+   "960x540": {
+    "screen_px_per_src_px": 0.0945,
+    "density": 10.58,
+    "magnified": false,
+    "out_px": [
+     80,
+     59
+    ],
+    "alias_rmse": 7.89,
+    "phase_shimmer": 5.55,
+    "sharpness_vs_ideal": 0.656,
+    "grad_energy": 9.86
+   },
+   "1280x720": {
+    "screen_px_per_src_px": 0.126,
+    "density": 7.94,
+    "magnified": false,
+    "out_px": [
+     106,
+     78
+    ],
+    "alias_rmse": 8.65,
+    "phase_shimmer": 6.96,
+    "sharpness_vs_ideal": 0.636,
+    "grad_energy": 9.78
+   },
+   "1920x1080": {
+    "screen_px_per_src_px": 0.189,
+    "density": 5.29,
+    "magnified": false,
+    "out_px": [
+     160,
+     118
+    ],
+    "alias_rmse": 7.43,
+    "phase_shimmer": 5.05,
+    "sharpness_vs_ideal": 0.712,
+    "grad_energy": 10.47
+   }
+  }
+ },
+ "scratch-corridor-near-1920": {
+  "id": "scratch-corridor-near-1920",
+  "family": "plates",
+  "used": false,
+  "path": "[session scratch, not kept]/art/layers/corridor-near.png",
+  "src": "uncropped near layer the committed 512 px strip was cut from",
+  "size": [
+   1920,
+   1080
+  ],
+  "file_bytes": 725305,
+  "region": [
+   0,
+   0,
+   1920,
+   1080
+  ],
+  "scale": 0.5,
+  "zoom": 1.35,
+  "mip": false,
+  "vram": {
+   "rgba8_with_mips": 8294400
+  },
+  "display": {
+   "960x540": {
+    "opaque_w_px": 1296,
+    "opaque_h_px": 729,
+    "density": 1.48
+   },
+   "1280x720": {
+    "opaque_w_px": 1728,
+    "opaque_h_px": 972,
+    "density": 1.11
+   },
+   "1920x1080": {
+    "opaque_w_px": 2592,
+    "opaque_h_px": 1458,
+    "density": 0.74
+   }
+  },
+  "static": {
+   "alpha_hist": {
+    "max": 255,
+    "body_alpha_mode": [
+     [
+      253,
+      262013
+     ],
+     [
+      252,
+      61980
+     ],
+     [
+      251,
+      15532
+     ]
+    ],
+    "body_below_250_pct": 5.6,
+    "body_below_240_pct": 1.86
+   },
+   "alpha": {
+    "transparent_pct": 80.55,
+    "opaque_pct": 0,
+    "semi_pct": 19.45,
+    "body_px": 375420
+   },
+   "opaque_bbox": [
+    0,
+    0,
+    1920,
+    1080
+   ],
+   "palette": {
+    "L_p1": 0,
+    "L_p5": 0,
+    "L_p50": 2.2,
+    "L_p99": 36.9,
+    "C_mean": 3.9,
+    "C_p95": 13.3,
+    "a_mean": -1.1,
+    "b_mean": -3.6,
+    "hue_deg": -107,
+    "light_offset_x": -0.006,
+    "light_offset_y": -0.017
+   },
+   "noise_sigma": 0.56,
+   "subpixel_detail": {
+    "window_src_px": 3,
+    "rms_luma": 3.86,
+    "share_of_variance_pct": 5.4
+   }
+  },
+  "emulation": null
+ },
+ "scratch-records-near-1920": {
+  "id": "scratch-records-near-1920",
+  "family": "plates",
+  "used": false,
+  "path": "[session scratch, not kept]/art/layers-records/records-near.png",
+  "src": "uncropped near layer the committed 512 px strip was cut from",
+  "size": [
+   1920,
+   1080
+  ],
+  "file_bytes": 581161,
+  "region": [
+   0,
+   0,
+   1920,
+   1080
+  ],
+  "scale": 0.5,
+  "zoom": 1.35,
+  "mip": false,
+  "vram": {
+   "rgba8_with_mips": 8294400
+  },
+  "display": {
+   "960x540": {
+    "opaque_w_px": 1296,
+    "opaque_h_px": 729,
+    "density": 1.48
+   },
+   "1280x720": {
+    "opaque_w_px": 1728,
+    "opaque_h_px": 972,
+    "density": 1.11
+   },
+   "1920x1080": {
+    "opaque_w_px": 2592,
+    "opaque_h_px": 1458,
+    "density": 0.74
+   }
+  },
+  "static": {
+   "alpha_hist": {
+    "max": 255,
+    "body_alpha_mode": [
+     [
+      253,
+      247686
+     ],
+     [
+      252,
+      55543
+     ],
+     [
+      251,
+      16150
+     ]
+    ],
+    "body_below_250_pct": 5.83,
+    "body_below_240_pct": 2.5
+   },
+   "alpha": {
+    "transparent_pct": 81.39,
+    "opaque_pct": 0.03,
+    "semi_pct": 18.59,
+    "body_px": 348666
+   },
+   "opaque_bbox": [
+    0,
+    0,
+    1920,
+    1080
+   ],
+   "palette": {
+    "L_p1": 0,
+    "L_p5": 0,
+    "L_p50": 3.3,
+    "L_p99": 58,
+    "C_mean": 7.7,
+    "C_p95": 27.7,
+    "a_mean": -1.1,
+    "b_mean": -7.5,
+    "hue_deg": -98,
+    "light_offset_x": -0.01,
+    "light_offset_y": -0.05
+   },
+   "noise_sigma": 0.5,
+   "subpixel_detail": {
+    "window_src_px": 3,
+    "rms_luma": 4.99,
+    "share_of_variance_pct": 3.6
+   }
+  },
+  "emulation": null
+ },
+ "scratch-junction-near-1920": {
+  "id": "scratch-junction-near-1920",
+  "family": "plates",
+  "used": false,
+  "path": "docs/research-2026-10/sources/junction-art/layers-junction/junction-near.png",
+  "src": "uncropped near layer the committed 512 px strip was cut from",
+  "size": [
+   1920,
+   1080
+  ],
+  "file_bytes": 1224609,
+  "region": [
+   0,
+   0,
+   1920,
+   1080
+  ],
+  "scale": 0.5,
+  "zoom": 1.35,
+  "mip": false,
+  "vram": {
+   "rgba8_with_mips": 8294400
+  },
+  "display": {
+   "960x540": {
+    "opaque_w_px": 1296,
+    "opaque_h_px": 729,
+    "density": 1.48
+   },
+   "1280x720": {
+    "opaque_w_px": 1728,
+    "opaque_h_px": 972,
+    "density": 1.11
+   },
+   "1920x1080": {
+    "opaque_w_px": 2592,
+    "opaque_h_px": 1458,
+    "density": 0.74
+   }
+  },
+  "static": {
+   "alpha_hist": {
+    "max": 255,
+    "body_alpha_mode": [
+     [
+      252,
+      270964
+     ],
+     [
+      253,
+      116762
+     ],
+     [
+      251,
+      70158
+     ]
+    ],
+    "body_below_250_pct": 14.67,
+    "body_below_240_pct": 8.87
+   },
+   "alpha": {
+    "transparent_pct": 66.23,
+    "opaque_pct": 0.01,
+    "semi_pct": 33.77,
+    "body_px": 559228
+   },
+   "opaque_bbox": [
+    0,
+    0,
+    1920,
+    1080
+   ],
+   "palette": {
+    "L_p1": 0,
+    "L_p5": 0,
+    "L_p50": 4.8,
+    "L_p99": 61.1,
+    "C_mean": 5.6,
+    "C_p95": 22.1,
+    "a_mean": -0.9,
+    "b_mean": -4,
+    "hue_deg": -103,
+    "light_offset_x": -0.014,
+    "light_offset_y": -0.036
+   },
+   "noise_sigma": 0.86,
+   "subpixel_detail": {
+    "window_src_px": 3,
+    "rms_luma": 6.01,
+    "share_of_variance_pct": 4.7
+   }
+  },
+  "emulation": null
+ },
+ "scratch-anim-engineer-idle-0": {
+  "id": "scratch-anim-engineer-idle-0",
+  "family": "characters",
+  "used": false,
+  "path": "[session scratch, not kept]/art/anim/engineer/idle/frame_00.png",
+  "src": "anim job (Codex image_gen + hatch-pet chroma extraction)",
+  "size": [
+   256,
+   384
+  ],
+  "file_bytes": 31784,
+  "region": [
+   0,
+   0,
+   256,
+   384
+  ],
+  "scale": 0.3695212765957447,
+  "zoom": 1.35,
+  "mip": true,
+  "vram": {
+   "rgba8_with_mips": 524288
+  },
+  "display": {
+   "960x540": {
+    "opaque_w_px": 37.4,
+    "opaque_h_px": 93.8,
+    "density": 2
+   },
+   "1280x720": {
+    "opaque_w_px": 49.9,
+    "opaque_h_px": 125,
+    "density": 1.5
+   },
+   "1920x1080": {
+    "opaque_w_px": 74.8,
+    "opaque_h_px": 187.6,
+    "density": 1
+   }
+  },
+  "static": {
+   "alpha_hist": {
+    "max": 255,
+    "body_alpha_mode": [
+     [
+      255,
+      6467
+     ],
+     [
+      254,
+      292
+     ],
+     [
+      252,
+      172
+     ]
+    ],
+    "body_below_250_pct": 9.66,
+    "body_below_240_pct": 6.14
+   },
+   "alpha": {
+    "transparent_pct": 90.21,
+    "opaque_pct": 6.58,
+    "semi_pct": 3.21,
+    "body_px": 8170
+   },
+   "opaque_bbox": [
+    97,
+    177,
+    75,
+    188
+   ],
+   "islands": {
+    "parts": 1,
+    "stray_count": 0,
+    "stray_px": 0,
+    "specks_under_16px": 0,
+    "largest_strays": []
+   },
+   "holes": {
+    "count": 3,
+    "count_over_9px": 1,
+    "px": 153,
+    "largest": [
+     {
+      "px": 149,
+      "bbox": [
+       110,
+       245,
+       10,
+       32
+      ]
+     },
+     {
+      "px": 2,
+      "bbox": [
+       153,
+       270,
+       1,
+       2
+      ]
+     },
+     {
+      "px": 2,
+      "bbox": [
+       112,
+       285,
+       1,
+       2
+      ]
+     }
+    ]
+   },
+   "inner_translucency": {
+    "px": 37,
+    "pct_of_body": 0.453,
+    "samples": [
+     [
+      152,
+      267,
+      237
+     ]
+    ]
+   },
+   "fringe": {
+    "semi_edge_px": 1022,
+    "mean_dL": 2.93,
+    "p10_dL": -11.14,
+    "p90_dL": 17.88,
+    "light_halo_pct": 14.58,
+    "dark_fringe_pct": 5.38,
+    "mean_dRGB": [
+     -8.7,
+     10.5,
+     12.7
+    ],
+    "green_spill": 8.5
+   },
+   "edge_hardness": {
+    "boundary_px": 770,
+    "hard_pct": 0.13
+   },
+   "rim": {
+    "inner_L": 23.8,
+    "left": {
+     "n": 865,
+     "dL": 2.5,
+     "bright15_L": 49.2,
+     "bright15_ab": [
+      2.1,
+      -9.2
+     ]
+    },
+    "right": {
+     "n": 848,
+     "dL": 2.9,
+     "bright15_L": 57.5,
+     "bright15_ab": [
+      15.7,
+      15.5
+     ]
+    },
+    "top": {
+     "n": 404,
+     "dL": 9,
+     "bright15_L": 56.7,
+     "bright15_ab": [
+      -4,
+      -10.8
+     ]
+    },
+    "bottom": {
+     "n": 416,
+     "dL": -1,
+     "bright15_L": 43.5,
+     "bright15_ab": [
+      1.3,
+      -1.5
+     ]
+    }
+   },
+   "palette": {
+    "L_p1": 1.9,
+    "L_p5": 4.9,
+    "L_p50": 23.4,
+    "L_p99": 74.2,
+    "C_mean": 16.3,
+    "C_p95": 54.3,
+    "a_mean": 10.2,
+    "b_mean": 2.7,
+    "hue_deg": 15,
+    "light_offset_x": -0.005,
+    "light_offset_y": -0.024
+   },
+   "noise_sigma": 5.33,
+   "subpixel_detail": {
+    "window_src_px": 3,
+    "rms_luma": 12.81,
+    "share_of_variance_pct": 17.4
+   }
+  },
+  "emulation": {
+   "960x540": {
+    "screen_px_per_src_px": 0.4989,
+    "density": 2,
+    "magnified": false,
+    "out_px": [
+     128,
+     192
+    ],
+    "alias_rmse": 1.8,
+    "phase_shimmer": 1.09,
+    "sharpness_vs_ideal": 0.828,
+    "grad_energy": 1.15
+   },
+   "1280x720": {
+    "screen_px_per_src_px": 0.6651,
+    "density": 1.5,
+    "magnified": false,
+    "out_px": [
+     170,
+     255
+    ],
+    "alias_rmse": 1.28,
+    "phase_shimmer": 0.82,
+    "sharpness_vs_ideal": 0.846,
+    "grad_energy": 1.1
+   },
+   "1920x1080": {
+    "screen_px_per_src_px": 0.9977,
+    "density": 1,
+    "magnified": false,
+    "out_px": [
+     255,
+     383
+    ],
+    "alias_rmse": 0.2,
+    "phase_shimmer": 0.13,
+    "sharpness_vs_ideal": 0.998,
+    "grad_energy": 0.99
+   }
+  }
+ },
+ "scratch-anim-engineer-walk-0": {
+  "id": "scratch-anim-engineer-walk-0",
+  "family": "characters",
+  "used": false,
+  "path": "[session scratch, not kept]/art/anim/engineer/walk/frame_00.png",
+  "src": "anim job (Codex image_gen + hatch-pet chroma extraction)",
+  "size": [
+   256,
+   384
+  ],
+  "file_bytes": 36056,
+  "region": [
+   0,
+   0,
+   256,
+   384
+  ],
+  "scale": 0.3695212765957447,
+  "zoom": 1.35,
+  "mip": true,
+  "vram": {
+   "rgba8_with_mips": 524288
+  },
+  "display": {
+   "960x540": {
+    "opaque_w_px": 61.4,
+    "opaque_h_px": 93.8,
+    "density": 2
+   },
+   "1280x720": {
+    "opaque_w_px": 81.8,
+    "opaque_h_px": 125,
+    "density": 1.5
+   },
+   "1920x1080": {
+    "opaque_w_px": 122.7,
+    "opaque_h_px": 187.6,
+    "density": 1
+   }
+  },
+  "static": {
+   "alpha_hist": {
+    "max": 255,
+    "body_alpha_mode": [
+     [
+      255,
+      7182
+     ],
+     [
+      254,
+      334
+     ],
+     [
+      253,
+      201
+     ]
+    ],
+    "body_below_250_pct": 9.85,
+    "body_below_240_pct": 6.08
+   },
+   "alpha": {
+    "transparent_pct": 89,
+    "opaque_pct": 7.31,
+    "semi_pct": 3.7,
+    "body_px": 9036
+   },
+   "opaque_bbox": [
+    71,
+    177,
+    123,
+    188
+   ],
+   "islands": {
+    "parts": 1,
+    "stray_count": 0,
+    "stray_px": 0,
+    "specks_under_16px": 0,
+    "largest_strays": []
+   },
+   "holes": {
+    "count": 0,
+    "count_over_9px": 0,
+    "px": 0,
+    "largest": []
+   },
+   "inner_translucency": {
+    "px": 0,
+    "pct_of_body": 0,
+    "samples": []
+   },
+   "fringe": {
+    "semi_edge_px": 1117,
+    "mean_dL": 1.29,
+    "p10_dL": -10.85,
+    "p90_dL": 14.58,
+    "light_halo_pct": 9.04,
+    "dark_fringe_pct": 4.92,
+    "mean_dRGB": [
+     -13.6,
+     6.3,
+     10.2
+    ],
+    "green_spill": 8
+   },
+   "edge_hardness": {
+    "boundary_px": 820,
+    "hard_pct": 0.24
+   },
+   "rim": {
+    "inner_L": 23.3,
+    "left": {
+     "n": 960,
+     "dL": 3.3,
+     "bright15_L": 51.8,
+     "bright15_ab": [
+      -7.3,
+      -18.1
+     ]
+    },
+    "right": {
+     "n": 947,
+     "dL": -0.2,
+     "bright15_L": 51.7,
+     "bright15_ab": [
+      12.7,
+      12.1
+     ]
+    },
+    "top": {
+     "n": 668,
+     "dL": 10.2,
+     "bright15_L": 56.6,
+     "bright15_ab": [
+      -6.1,
+      -13.8
+     ]
+    },
+    "bottom": {
+     "n": 666,
+     "dL": -3.6,
+     "bright15_L": 43.1,
+     "bright15_ab": [
+      5.5,
+      3.4
+     ]
+    }
+   },
+   "palette": {
+    "L_p1": 1.2,
+    "L_p5": 3.9,
+    "L_p50": 22.4,
+    "L_p99": 75.1,
+    "C_mean": 15.1,
+    "C_p95": 52.1,
+    "a_mean": 9.2,
+    "b_mean": 3,
+    "hue_deg": 18,
+    "light_offset_x": 0.001,
+    "light_offset_y": -0.025
+   },
+   "noise_sigma": 6.29,
+   "subpixel_detail": {
+    "window_src_px": 3,
+    "rms_luma": 12.95,
+    "share_of_variance_pct": 17.2
+   }
+  },
+  "emulation": {
+   "960x540": {
+    "screen_px_per_src_px": 0.4989,
+    "density": 2,
+    "magnified": false,
+    "out_px": [
+     128,
+     192
+    ],
+    "alias_rmse": 1.78,
+    "phase_shimmer": 1.07,
+    "sharpness_vs_ideal": 0.834,
+    "grad_energy": 1.24
+   },
+   "1280x720": {
+    "screen_px_per_src_px": 0.6651,
+    "density": 1.5,
+    "magnified": false,
+    "out_px": [
+     170,
+     255
+    ],
+    "alias_rmse": 1.27,
+    "phase_shimmer": 0.81,
+    "sharpness_vs_ideal": 0.839,
+    "grad_energy": 1.18
+   },
+   "1920x1080": {
+    "screen_px_per_src_px": 0.9977,
+    "density": 1,
+    "magnified": false,
+    "out_px": [
+     255,
+     383
+    ],
+    "alias_rmse": 0.2,
+    "phase_shimmer": 0.14,
+    "sharpness_vs_ideal": 0.997,
+    "grad_energy": 1.08
+   }
+  }
+ },
+ "scratch-anim-engineer-walk-4": {
+  "id": "scratch-anim-engineer-walk-4",
+  "family": "characters",
+  "used": false,
+  "path": "[session scratch, not kept]/art/anim/engineer/walk/frame_04.png",
+  "src": "anim job (Codex image_gen + hatch-pet chroma extraction)",
+  "size": [
+   256,
+   384
+  ],
+  "file_bytes": 36909,
+  "region": [
+   0,
+   0,
+   256,
+   384
+  ],
+  "scale": 0.36756613756613754,
+  "zoom": 1.35,
+  "mip": true,
+  "vram": {
+   "rgba8_with_mips": 524288
+  },
+  "display": {
+   "960x540": {
+    "opaque_w_px": 65.5,
+    "opaque_h_px": 93.8,
+    "density": 2.02
+   },
+   "1280x720": {
+    "opaque_w_px": 87.3,
+    "opaque_h_px": 125,
+    "density": 1.51
+   },
+   "1920x1080": {
+    "opaque_w_px": 131,
+    "opaque_h_px": 187.6,
+    "density": 1.01
+   }
+  },
+  "static": {
+   "alpha_hist": {
+    "max": 255,
+    "body_alpha_mode": [
+     [
+      255,
+      7328
+     ],
+     [
+      254,
+      354
+     ],
+     [
+      253,
+      219
+     ]
+    ],
+    "body_below_250_pct": 9.8,
+    "body_below_240_pct": 6.3
+   },
+   "alpha": {
+    "transparent_pct": 88.78,
+    "opaque_pct": 7.45,
+    "semi_pct": 3.77,
+    "body_px": 9204
+   },
+   "opaque_bbox": [
+    84,
+    176,
+    132,
+    189
+   ],
+   "islands": {
+    "parts": 1,
+    "stray_count": 0,
+    "stray_px": 0,
+    "specks_under_16px": 0,
+    "largest_strays": []
+   },
+   "holes": {
+    "count": 1,
+    "count_over_9px": 0,
+    "px": 1,
+    "largest": [
+     {
+      "px": 1,
+      "bbox": [
+       138,
+       201,
+       1,
+       1
+      ]
+     }
+    ]
+   },
+   "inner_translucency": {
+    "px": 0,
+    "pct_of_body": 0,
+    "samples": []
+   },
+   "fringe": {
+    "semi_edge_px": 1171,
+    "mean_dL": 1.2,
+    "p10_dL": -11.76,
+    "p90_dL": 15.54,
+    "light_halo_pct": 11.27,
+    "dark_fringe_pct": 6.15,
+    "mean_dRGB": [
+     -13,
+     6.1,
+     10.2
+    ],
+    "green_spill": 7.5
+   },
+   "edge_hardness": {
+    "boundary_px": 830,
+    "hard_pct": 0.12
+   },
+   "rim": {
+    "inner_L": 22.8,
+    "left": {
+     "n": 954,
+     "dL": 3.5,
+     "bright15_L": 52.2,
+     "bright15_ab": [
+      -5.4,
+      -16
+     ]
+    },
+    "right": {
+     "n": 948,
+     "dL": 0.7,
+     "bright15_L": 51.5,
+     "bright15_ab": [
+      10.9,
+      9.9
+     ]
+    },
+    "top": {
+     "n": 708,
+     "dL": 10.7,
+     "bright15_L": 57.5,
+     "bright15_ab": [
+      -5.6,
+      -13.5
+     ]
+    },
+    "bottom": {
+     "n": 700,
+     "dL": -3.5,
+     "bright15_L": 43,
+     "bright15_ab": [
+      6.9,
+      6.1
+     ]
+    }
+   },
+   "palette": {
+    "L_p1": 1.3,
+    "L_p5": 4.1,
+    "L_p50": 22.2,
+    "L_p99": 74.6,
+    "C_mean": 14.9,
+    "C_p95": 52,
+    "a_mean": 9.1,
+    "b_mean": 2.9,
+    "hue_deg": 18,
+    "light_offset_x": 0,
+    "light_offset_y": -0.023
+   },
+   "noise_sigma": 6.52,
+   "subpixel_detail": {
+    "window_src_px": 3,
+    "rms_luma": 12.73,
+    "share_of_variance_pct": 16.9
+   }
+  },
+  "emulation": {
+   "960x540": {
+    "screen_px_per_src_px": 0.4962,
+    "density": 2.02,
+    "magnified": false,
+    "out_px": [
+     127,
+     191
+    ],
+    "alias_rmse": 1.81,
+    "phase_shimmer": 1.36,
+    "sharpness_vs_ideal": 0.784,
+    "grad_energy": 1.23
+   },
+   "1280x720": {
+    "screen_px_per_src_px": 0.6616,
+    "density": 1.51,
+    "magnified": false,
+    "out_px": [
+     169,
+     254
+    ],
+    "alias_rmse": 1.3,
+    "phase_shimmer": 0.83,
+    "sharpness_vs_ideal": 0.832,
+    "grad_energy": 1.2
+   },
+   "1920x1080": {
+    "screen_px_per_src_px": 0.9924,
+    "density": 1.01,
+    "magnified": false,
+    "out_px": [
+     254,
+     381
+    ],
+    "alias_rmse": 0.21,
+    "phase_shimmer": 0.15,
+    "sharpness_vs_ideal": 0.994,
+    "grad_energy": 1.18
+   }
+  }
+ },
+ "scratch-anim-engineer-jog-2": {
+  "id": "scratch-anim-engineer-jog-2",
+  "family": "characters",
+  "used": false,
+  "path": "[session scratch, not kept]/art/anim/engineer/jog/frame_02.png",
+  "src": "anim job (Codex image_gen + hatch-pet chroma extraction)",
+  "size": [
+   256,
+   384
+  ],
+  "file_bytes": 35585,
+  "region": [
+   0,
+   0,
+   256,
+   384
+  ],
+  "scale": 0.36756613756613754,
+  "zoom": 1.35,
+  "mip": true,
+  "vram": {
+   "rgba8_with_mips": 524288
+  },
+  "display": {
+   "960x540": {
+    "opaque_w_px": 61,
+    "opaque_h_px": 93.8,
+    "density": 2.02
+   },
+   "1280x720": {
+    "opaque_w_px": 81.4,
+    "opaque_h_px": 125,
+    "density": 1.51
+   },
+   "1920x1080": {
+    "opaque_w_px": 122.1,
+    "opaque_h_px": 187.6,
+    "density": 1.01
+   }
+  },
+  "static": {
+   "alpha_hist": {
+    "max": 255,
+    "body_alpha_mode": [
+     [
+      255,
+      7228
+     ],
+     [
+      254,
+      285
+     ],
+     [
+      253,
+      199
+     ]
+    ],
+    "body_below_250_pct": 9.81,
+    "body_below_240_pct": 6.06
+   },
+   "alpha": {
+    "transparent_pct": 89.04,
+    "opaque_pct": 7.35,
+    "semi_pct": 3.61,
+    "body_px": 9000
+   },
+   "opaque_bbox": [
+    85,
+    176,
+    123,
+    189
+   ],
+   "islands": {
+    "parts": 1,
+    "stray_count": 0,
+    "stray_px": 0,
+    "specks_under_16px": 0,
+    "largest_strays": []
+   },
+   "holes": {
+    "count": 0,
+    "count_over_9px": 0,
+    "px": 0,
+    "largest": []
+   },
+   "inner_translucency": {
+    "px": 0,
+    "pct_of_body": 0,
+    "samples": []
+   },
+   "fringe": {
+    "semi_edge_px": 1143,
+    "mean_dL": -0.14,
+    "p10_dL": -12.62,
+    "p90_dL": 14.1,
+    "light_halo_pct": 9.36,
+    "dark_fringe_pct": 6.74,
+    "mean_dRGB": [
+     -12.6,
+     2.9,
+     6.4
+    ],
+    "green_spill": 6
+   },
+   "edge_hardness": {
+    "boundary_px": 797,
+    "hard_pct": 0
+   },
+   "rim": {
+    "inner_L": 22.1,
+    "left": {
+     "n": 915,
+     "dL": 3.6,
+     "bright15_L": 52.4,
+     "bright15_ab": [
+      1.5,
+      -10.2
+     ]
+    },
+    "right": {
+     "n": 898,
+     "dL": 0.6,
+     "bright15_L": 50.4,
+     "bright15_ab": [
+      12.4,
+      11
+     ]
+    },
+    "top": {
+     "n": 642,
+     "dL": 10.7,
+     "bright15_L": 58.3,
+     "bright15_ab": [
+      -0.2,
+      -8.8
+     ]
+    },
+    "bottom": {
+     "n": 662,
+     "dL": -3.6,
+     "bright15_L": 41.2,
+     "bright15_ab": [
+      8.3,
+      6.7
+     ]
+    }
+   },
+   "palette": {
+    "L_p1": 1.5,
+    "L_p5": 3.9,
+    "L_p50": 21.5,
+    "L_p99": 74.3,
+    "C_mean": 15.1,
+    "C_p95": 51.9,
+    "a_mean": 9.3,
+    "b_mean": 2.3,
+    "hue_deg": 14,
+    "light_offset_x": 0.002,
+    "light_offset_y": -0.024
+   },
+   "noise_sigma": 6.06,
+   "subpixel_detail": {
+    "window_src_px": 3,
+    "rms_luma": 12.35,
+    "share_of_variance_pct": 15.7
+   }
+  },
+  "emulation": {
+   "960x540": {
+    "screen_px_per_src_px": 0.4962,
+    "density": 2.02,
+    "magnified": false,
+    "out_px": [
+     127,
+     191
+    ],
+    "alias_rmse": 1.8,
+    "phase_shimmer": 1.38,
+    "sharpness_vs_ideal": 0.786,
+    "grad_energy": 1.17
+   },
+   "1280x720": {
+    "screen_px_per_src_px": 0.6616,
+    "density": 1.51,
+    "magnified": false,
+    "out_px": [
+     169,
+     254
+    ],
+    "alias_rmse": 1.3,
+    "phase_shimmer": 0.83,
+    "sharpness_vs_ideal": 0.838,
+    "grad_energy": 1.15
+   },
+   "1920x1080": {
+    "screen_px_per_src_px": 0.9924,
+    "density": 1.01,
+    "magnified": false,
+    "out_px": [
+     254,
+     381
+    ],
+    "alias_rmse": 0.21,
+    "phase_shimmer": 0.14,
+    "sharpness_vs_ideal": 0.994,
+    "grad_energy": 1.1
+   }
+  }
+ },
+ "scratch-anim-wolf-idle-0": {
+  "id": "scratch-anim-wolf-idle-0",
+  "family": "characters",
+  "used": false,
+  "path": "[session scratch, not kept]/art/anim/wolf/idle/frame_00.png",
+  "src": "anim job (Codex image_gen + hatch-pet chroma extraction)",
+  "size": [
+   384,
+   208
+  ],
+  "file_bytes": 14938,
+  "region": [
+   0,
+   0,
+   384,
+   208
+  ],
+  "scale": 0.9738428571428571,
+  "zoom": 1.35,
+  "mip": true,
+  "vram": {
+   "rgba8_with_mips": 425984
+  },
+  "display": {
+   "960x540": {
+    "opaque_w_px": 153.8,
+    "opaque_h_px": 82.8,
+    "density": 0.76
+   },
+   "1280x720": {
+    "opaque_w_px": 205.1,
+    "opaque_h_px": 110.4,
+    "density": 0.57
+   },
+   "1920x1080": {
+    "opaque_w_px": 307.6,
+    "opaque_h_px": 165.7,
+    "density": 0.38
+   }
+  },
+  "static": {
+   "alpha_hist": {
+    "max": 255,
+    "body_alpha_mode": [
+     [
+      255,
+      2057
+     ],
+     [
+      254,
+      180
+     ],
+     [
+      252,
+      143
+     ]
+    ],
+    "body_below_250_pct": 12.05,
+    "body_below_240_pct": 9.76
+   },
+   "alpha": {
+    "transparent_pct": 95.2,
+    "opaque_pct": 2.58,
+    "semi_pct": 2.22,
+    "body_px": 2972
+   },
+   "opaque_bbox": [
+    127,
+    135,
+    117,
+    63
+   ],
+   "islands": {
+    "parts": 1,
+    "stray_count": 0,
+    "stray_px": 0,
+    "specks_under_16px": 0,
+    "largest_strays": []
+   },
+   "holes": {
+    "count": 0,
+    "count_over_9px": 0,
+    "px": 0,
+    "largest": []
+   },
+   "inner_translucency": {
+    "px": 0,
+    "pct_of_body": 0,
+    "samples": []
+   },
+   "fringe": {
+    "semi_edge_px": 601,
+    "mean_dL": -2.45,
+    "p10_dL": -18.2,
+    "p90_dL": 16.7,
+    "light_halo_pct": 11.65,
+    "dark_fringe_pct": 15.97,
+    "mean_dRGB": [
+     -16,
+     -3.4,
+     1
+    ],
+    "green_spill": 4.1
+   },
+   "edge_hardness": {
+    "boundary_px": 487,
+    "hard_pct": 0
+   },
+   "rim": {
+    "inner_L": 25.6,
+    "left": {
+     "n": 482,
+     "dL": -3.5,
+     "bright15_L": 47.3,
+     "bright15_ab": [
+      -4.1,
+      -11.9
+     ]
+    },
+    "right": {
+     "n": 505,
+     "dL": -0.7,
+     "bright15_L": 58.3,
+     "bright15_ab": [
+      -2.5,
+      -5.7
+     ]
+    },
+    "top": {
+     "n": 540,
+     "dL": 1.5,
+     "bright15_L": 56.6,
+     "bright15_ab": [
+      -5,
+      -11.9
+     ]
+    },
+    "bottom": {
+     "n": 539,
+     "dL": -5.9,
+     "bright15_L": 44.6,
+     "bright15_ab": [
+      -1,
+      -3.1
+     ]
+    }
+   },
+   "palette": {
+    "L_p1": 0.1,
+    "L_p5": 1.6,
+    "L_p50": 19.3,
+    "L_p99": 72.6,
+    "C_mean": 5.4,
+    "C_p95": 16.8,
+    "a_mean": -1.3,
+    "b_mean": -4.6,
+    "hue_deg": -106,
+    "light_offset_x": 0.013,
+    "light_offset_y": -0.017
+   },
+   "noise_sigma": 15.42,
+   "subpixel_detail": {
+    "window_src_px": 3,
+    "rms_luma": 24.31,
+    "share_of_variance_pct": 31.3
+   }
+  },
+  "emulation": {
+   "960x540": {
+    "screen_px_per_src_px": 1.3147,
+    "density": 0.76,
+    "magnified": true,
+    "out_px": [
+     505,
+     273
+    ],
+    "alias_rmse": 0,
+    "phase_shimmer": 0,
+    "sharpness_vs_ideal": null,
+    "grad_energy": 0.63
+   },
+   "1280x720": {
+    "screen_px_per_src_px": 1.7529,
+    "density": 0.57,
+    "magnified": true,
+    "out_px": [
+     673,
+     365
+    ],
+    "alias_rmse": 0,
+    "phase_shimmer": 0,
+    "sharpness_vs_ideal": null,
+    "grad_energy": 0.49
+   },
+   "1920x1080": {
+    "screen_px_per_src_px": 2.6294,
+    "density": 0.38,
+    "magnified": true,
+    "out_px": [
+     1010,
+     547
+    ],
+    "alias_rmse": 0,
+    "phase_shimmer": 0,
+    "sharpness_vs_ideal": null,
+    "grad_energy": 0.34
+   }
+  }
+ },
+ "scratch-anim-wolf-walk-0": {
+  "id": "scratch-anim-wolf-walk-0",
+  "family": "characters",
+  "used": false,
+  "path": "[session scratch, not kept]/art/anim/wolf/walk/frame_00.png",
+  "src": "anim job (Codex image_gen + hatch-pet chroma extraction)",
+  "size": [
+   384,
+   208
+  ],
+  "file_bytes": 16999,
+  "region": [
+   0,
+   0,
+   384,
+   208
+  ],
+  "scale": 0.9586265625,
+  "zoom": 1.35,
+  "mip": true,
+  "vram": {
+   "rgba8_with_mips": 425984
+  },
+  "display": {
+   "960x540": {
+    "opaque_w_px": 182.5,
+    "opaque_h_px": 82.8,
+    "density": 0.77
+   },
+   "1280x720": {
+    "opaque_w_px": 243.3,
+    "opaque_h_px": 110.4,
+    "density": 0.58
+   },
+   "1920x1080": {
+    "opaque_w_px": 364.9,
+    "opaque_h_px": 165.7,
+    "density": 0.39
+   }
+  },
+  "static": {
+   "alpha_hist": {
+    "max": 255,
+    "body_alpha_mode": [
+     [
+      255,
+      2526
+     ],
+     [
+      254,
+      155
+     ],
+     [
+      253,
+      151
+     ]
+    ],
+    "body_below_250_pct": 12.14,
+    "body_below_240_pct": 9.63
+   },
+   "alpha": {
+    "transparent_pct": 94.31,
+    "opaque_pct": 3.16,
+    "semi_pct": 2.53,
+    "body_px": 3542
+   },
+   "opaque_bbox": [
+    119,
+    134,
+    141,
+    64
+   ],
+   "islands": {
+    "parts": 1,
+    "stray_count": 0,
+    "stray_px": 0,
+    "specks_under_16px": 0,
+    "largest_strays": []
+   },
+   "holes": {
+    "count": 1,
+    "count_over_9px": 0,
+    "px": 1,
+    "largest": [
+     {
+      "px": 1,
+      "bbox": [
+       131,
+       177,
+       1,
+       1
+      ]
+     }
+    ]
+   },
+   "inner_translucency": {
+    "px": 0,
+    "pct_of_body": 0,
+    "samples": []
+   },
+   "fringe": {
+    "semi_edge_px": 692,
+    "mean_dL": -4.42,
+    "p10_dL": -17.58,
+    "p90_dL": 10.13,
+    "light_halo_pct": 4.34,
+    "dark_fringe_pct": 15.32,
+    "mean_dRGB": [
+     -14.2,
+     -8.7,
+     -7.4
+    ],
+    "green_spill": 2.1
+   },
+   "edge_hardness": {
+    "boundary_px": 522,
+    "hard_pct": 0
+   },
+   "rim": {
+    "inner_L": 24.5,
+    "left": {
+     "n": 423,
+     "dL": -5.4,
+     "bright15_L": 42.5,
+     "bright15_ab": [
+      -1.6,
+      -11.4
+     ]
+    },
+    "right": {
+     "n": 466,
+     "dL": 1,
+     "bright15_L": 59.7,
+     "bright15_ab": [
+      -1.1,
+      -4.6
+     ]
+    },
+    "top": {
+     "n": 600,
+     "dL": 3.4,
+     "bright15_L": 60.1,
+     "bright15_ab": [
+      -2.2,
+      -6.6
+     ]
+    },
+    "bottom": {
+     "n": 628,
+     "dL": -6.2,
+     "bright15_L": 42.6,
+     "bright15_ab": [
+      -0.5,
+      -4.5
+     ]
+    }
+   },
+   "palette": {
+    "L_p1": 0,
+    "L_p5": 1.3,
+    "L_p50": 18.4,
+    "L_p99": 74.5,
+    "C_mean": 5.3,
+    "C_p95": 15.6,
+    "a_mean": -0.7,
+    "b_mean": -4.6,
+    "hue_deg": -99,
+    "light_offset_x": 0.014,
+    "light_offset_y": -0.015
+   },
+   "noise_sigma": 14.75,
+   "subpixel_detail": {
+    "window_src_px": 3,
+    "rms_luma": 25.45,
+    "share_of_variance_pct": 29.3
+   }
+  },
+  "emulation": {
+   "960x540": {
+    "screen_px_per_src_px": 1.2941,
+    "density": 0.77,
+    "magnified": true,
+    "out_px": [
+     497,
+     269
+    ],
+    "alias_rmse": 0,
+    "phase_shimmer": 0,
+    "sharpness_vs_ideal": null,
+    "grad_energy": 0.73
+   },
+   "1280x720": {
+    "screen_px_per_src_px": 1.7255,
+    "density": 0.58,
+    "magnified": true,
+    "out_px": [
+     663,
+     359
+    ],
+    "alias_rmse": 0,
+    "phase_shimmer": 0,
+    "sharpness_vs_ideal": null,
+    "grad_energy": 0.56
+   },
+   "1920x1080": {
+    "screen_px_per_src_px": 2.5883,
+    "density": 0.39,
+    "magnified": true,
+    "out_px": [
+     994,
+     538
+    ],
+    "alias_rmse": 0,
+    "phase_shimmer": 0,
+    "sharpness_vs_ideal": null,
+    "grad_energy": 0.39
+   }
+  }
+ },
+ "scratch-anim-wolf-trot-3": {
+  "id": "scratch-anim-wolf-trot-3",
+  "family": "characters",
+  "used": false,
+  "path": "[session scratch, not kept]/art/anim/wolf/trot/frame_03.png",
+  "src": "anim job (Codex image_gen + hatch-pet chroma extraction)",
+  "size": [
+   384,
+   208
+  ],
+  "file_bytes": 16128,
+  "region": [
+   0,
+   0,
+   384,
+   208
+  ],
+  "scale": 1.0955732142857142,
+  "zoom": 1.35,
+  "mip": true,
+  "vram": {
+   "rgba8_with_mips": 425984
+  },
+  "display": {
+   "960x540": {
+    "opaque_w_px": 217.4,
+    "opaque_h_px": 82.8,
+    "density": 0.68
+   },
+   "1280x720": {
+    "opaque_w_px": 289.9,
+    "opaque_h_px": 110.4,
+    "density": 0.51
+   },
+   "1920x1080": {
+    "opaque_w_px": 434.8,
+    "opaque_h_px": 165.7,
+    "density": 0.34
+   }
+  },
+  "static": {
+   "alpha_hist": {
+    "max": 255,
+    "body_alpha_mode": [
+     [
+      255,
+      2490
+     ],
+     [
+      254,
+      151
+     ],
+     [
+      252,
+      136
+     ]
+    ],
+    "body_below_250_pct": 12.07,
+    "body_below_240_pct": 9.13
+   },
+   "alpha": {
+    "transparent_pct": 94.47,
+    "opaque_pct": 3.12,
+    "semi_pct": 2.41,
+    "body_px": 3472
+   },
+   "opaque_bbox": [
+    112,
+    140,
+    147,
+    56
+   ],
+   "islands": {
+    "parts": 1,
+    "stray_count": 0,
+    "stray_px": 0,
+    "specks_under_16px": 0,
+    "largest_strays": []
+   },
+   "holes": {
+    "count": 0,
+    "count_over_9px": 0,
+    "px": 0,
+    "largest": []
+   },
+   "inner_translucency": {
+    "px": 0,
+    "pct_of_body": 0,
+    "samples": []
+   },
+   "fringe": {
+    "semi_edge_px": 649,
+    "mean_dL": -3.15,
+    "p10_dL": -16.07,
+    "p90_dL": 11.66,
+    "light_halo_pct": 6.32,
+    "dark_fringe_pct": 12.94,
+    "mean_dRGB": [
+     -13.9,
+     -5.7,
+     -3.2
+    ],
+    "green_spill": 2.8
+   },
+   "edge_hardness": {
+    "boundary_px": 512,
+    "hard_pct": 0.39
+   },
+   "rim": {
+    "inner_L": 24.3,
+    "left": {
+     "n": 333,
+     "dL": -4.8,
+     "bright15_L": 43.3,
+     "bright15_ab": [
+      -1.9,
+      -13.4
+     ]
+    },
+    "right": {
+     "n": 378,
+     "dL": -3.5,
+     "bright15_L": 48.3,
+     "bright15_ab": [
+      -2.3,
+      -8.7
+     ]
+    },
+    "top": {
+     "n": 620,
+     "dL": 3.6,
+     "bright15_L": 57,
+     "bright15_ab": [
+      -3.4,
+      -13.2
+     ]
+    },
+    "bottom": {
+     "n": 636,
+     "dL": -6.2,
+     "bright15_L": 42.8,
+     "bright15_ab": [
+      -0.5,
+      -6.1
+     ]
+    }
+   },
+   "palette": {
+    "L_p1": 0,
+    "L_p5": 1.4,
+    "L_p50": 18.6,
+    "L_p99": 73.1,
+    "C_mean": 6,
+    "C_p95": 18.2,
+    "a_mean": -0.8,
+    "b_mean": -5.4,
+    "hue_deg": -98,
+    "light_offset_x": 0.005,
+    "light_offset_y": -0.017
+   },
+   "noise_sigma": 12.53,
+   "subpixel_detail": {
+    "window_src_px": 3,
+    "rms_luma": 21.96,
+    "share_of_variance_pct": 25.4
+   }
+  },
+  "emulation": {
+   "960x540": {
+    "screen_px_per_src_px": 1.479,
+    "density": 0.68,
+    "magnified": true,
+    "out_px": [
+     568,
+     308
+    ],
+    "alias_rmse": 0,
+    "phase_shimmer": 0,
+    "sharpness_vs_ideal": null,
+    "grad_energy": 0.59
+   },
+   "1280x720": {
+    "screen_px_per_src_px": 1.972,
+    "density": 0.51,
+    "magnified": true,
+    "out_px": [
+     757,
+     410
+    ],
+    "alias_rmse": 0,
+    "phase_shimmer": 0,
+    "sharpness_vs_ideal": null,
+    "grad_energy": 0.46
+   },
+   "1920x1080": {
+    "screen_px_per_src_px": 2.958,
+    "density": 0.34,
+    "magnified": true,
+    "out_px": [
+     1136,
+     615
+    ],
+    "alias_rmse": 0,
+    "phase_shimmer": 0,
+    "sharpness_vs_ideal": null,
+    "grad_energy": 0.31
+   }
+  }
+ },
+ "scratch-door-A-corridor-sealed": {
+  "id": "scratch-door-A-corridor-sealed",
+  "family": "props-corridor",
+  "used": false,
+  "path": "docs/research-2026-10/sources/doors-A/corridor-sealed.png",
+  "src": "door redraw job",
+  "size": [
+   768,
+   1280
+  ],
+  "file_bytes": 1115489,
+  "region": [
+   0,
+   0,
+   768,
+   1280
+  ],
+  "scale": 0.11838790931989925,
+  "zoom": 1.35,
+  "mip": true,
+  "vram": {
+   "rgba8_with_mips": 5242880
+  },
+  "display": {
+   "960x540": {
+    "opaque_w_px": 99.1,
+    "opaque_h_px": 190.4,
+    "density": 6.26
+   },
+   "1280x720": {
+    "opaque_w_px": 132.1,
+    "opaque_h_px": 253.8,
+    "density": 4.69
+   },
+   "1920x1080": {
+    "opaque_w_px": 198.2,
+    "opaque_h_px": 380.7,
+    "density": 3.13
+   }
+  },
+  "static": {
+   "alpha_hist": {
+    "max": 255,
+    "body_alpha_mode": [
+     [
+      253,
+      526552
+     ],
+     [
+      252,
+      12384
+     ],
+     [
+      254,
+      5857
+     ]
+    ],
+    "body_below_250_pct": 1.07,
+    "body_below_240_pct": 0.57
+   },
+   "alpha": {
+    "transparent_pct": 42.56,
+    "opaque_pct": 0,
+    "semi_pct": 57.44,
+    "body_px": 555194
+   },
+   "opaque_bbox": [
+    112,
+    89,
+    620,
+    1191
+   ],
+   "islands": {
+    "parts": 1,
+    "stray_count": 0,
+    "stray_px": 0,
+    "specks_under_16px": 0,
+    "largest_strays": []
+   },
+   "holes": {
+    "count": 0,
+    "count_over_9px": 0,
+    "px": 0,
+    "largest": []
+   },
+   "inner_translucency": {
+    "px": 26,
+    "pct_of_body": 0.005,
+    "samples": [
+     [
+      180,
+      1278,
+      179
+     ]
+    ]
+   },
+   "fringe": {
+    "semi_edge_px": 6044,
+    "mean_dL": 0.73,
+    "p10_dL": -14.05,
+    "p90_dL": 11.85,
+    "light_halo_pct": 4.3,
+    "dark_fringe_pct": 8.6,
+    "mean_dRGB": [
+     4.1,
+     1.4,
+     7.1
+    ],
+    "green_spill": -4.3
+   },
+   "edge_hardness": {
+    "boundary_px": 3003,
+    "hard_pct": 0
+   },
+   "rim": {
+    "inner_L": 21.7,
+    "left": {
+     "n": 2488,
+     "dL": -19.2,
+     "bright15_L": 9.1,
+     "bright15_ab": [
+      0.2,
+      -16.6
+     ]
+    },
+    "right": {
+     "n": 2769,
+     "dL": -17.6,
+     "bright15_L": 14.2,
+     "bright15_ab": [
+      6.4,
+      -25
+     ]
+    },
+    "top": {
+     "n": 1854,
+     "dL": -15.8,
+     "bright15_L": 16.2,
+     "bright15_ab": [
+      4.4,
+      -25.7
+     ]
+    },
+    "bottom": {
+     "n": 1480,
+     "dL": -21.4,
+     "bright15_L": 1.2,
+     "bright15_ab": [
+      0.1,
+      -0.9
+     ]
+    }
+   },
+   "palette": {
+    "L_p1": 0,
+    "L_p5": 0.2,
+    "L_p50": 20.2,
+    "L_p99": 84.6,
+    "C_mean": 10.7,
+    "C_p95": 58,
+    "a_mean": 6.5,
+    "b_mean": 4.8,
+    "hue_deg": 36,
+    "light_offset_x": -0.046,
+    "light_offset_y": -0.007
+   },
+   "noise_sigma": 1.71,
+   "subpixel_detail": {
+    "window_src_px": 7,
+    "rms_luma": 21.19,
+    "share_of_variance_pct": 23.9
+   }
+  },
+  "emulation": {
+   "960x540": {
+    "screen_px_per_src_px": 0.1598,
+    "density": 6.26,
+    "magnified": false,
+    "out_px": [
+     123,
+     205
+    ],
+    "alias_rmse": 6.69,
+    "phase_shimmer": 4.45,
+    "sharpness_vs_ideal": 0.721,
+    "grad_energy": 7.47
+   },
+   "1280x720": {
+    "screen_px_per_src_px": 0.2131,
+    "density": 4.69,
+    "magnified": false,
+    "out_px": [
+     164,
+     273
+    ],
+    "alias_rmse": 6.19,
+    "phase_shimmer": 4.32,
+    "sharpness_vs_ideal": 0.746,
+    "grad_energy": 7.35
+   },
+   "1920x1080": {
+    "screen_px_per_src_px": 0.3196,
+    "density": 3.13,
+    "magnified": false,
+    "out_px": [
+     245,
+     409
+    ],
+    "alias_rmse": 5.45,
+    "phase_shimmer": 3.42,
+    "sharpness_vs_ideal": 0.777,
+    "grad_energy": 6.81
+   }
+  }
+ },
+ "scratch-door-A-junction-sealed": {
+  "id": "scratch-door-A-junction-sealed",
+  "family": "props-junction",
+  "used": false,
+  "path": "docs/research-2026-10/sources/doors-A/junction-sealed.png",
+  "src": "door redraw job",
+  "size": [
+   768,
+   1280
+  ],
+  "file_bytes": 1170581,
+  "region": [
+   0,
+   0,
+   768,
+   1280
+  ],
+  "scale": 0.10981697171381032,
+  "zoom": 1.35,
+  "mip": true,
+  "vram": {
+   "rgba8_with_mips": 5242880
+  },
+  "display": {
+   "960x540": {
+    "opaque_w_px": 91.2,
+    "opaque_h_px": 178.2,
+    "density": 6.75
+   },
+   "1280x720": {
+    "opaque_w_px": 121.6,
+    "opaque_h_px": 237.6,
+    "density": 5.06
+   },
+   "1920x1080": {
+    "opaque_w_px": 182.4,
+    "opaque_h_px": 356.4,
+    "density": 3.37
+   }
+  },
+  "static": {
+   "alpha_hist": {
+    "max": 255,
+    "body_alpha_mode": [
+     [
+      252,
+      276409
+     ],
+     [
+      253,
+      237469
+     ],
+     [
+      251,
+      13545
+     ]
+    ],
+    "body_below_250_pct": 1.87,
+    "body_below_240_pct": 0.81
+   },
+   "alpha": {
+    "transparent_pct": 43.49,
+    "opaque_pct": 0,
+    "semi_pct": 56.5,
+    "body_px": 542043
+   },
+   "opaque_bbox": [
+    112,
+    78,
+    615,
+    1202
+   ],
+   "islands": {
+    "parts": 1,
+    "stray_count": 0,
+    "stray_px": 0,
+    "specks_under_16px": 0,
+    "largest_strays": []
+   },
+   "holes": {
+    "count": 1,
+    "count_over_9px": 1,
+    "px": 7890,
+    "largest": [
+     {
+      "px": 7890,
+      "bbox": [
+       514,
+       550,
+       24,
+       499
+      ]
+     }
+    ]
+   },
+   "inner_translucency": {
+    "px": 31,
+    "pct_of_body": 0.006,
+    "samples": [
+     [
+      536,
+      1050,
+      238
+     ]
+    ]
+   },
+   "fringe": {
+    "semi_edge_px": 7751,
+    "mean_dL": -10.56,
+    "p10_dL": -29.43,
+    "p90_dL": 4.73,
+    "light_halo_pct": 0.88,
+    "dark_fringe_pct": 34.74,
+    "mean_dRGB": [
+     -6.4,
+     -26,
+     -28.6
+    ],
+    "green_spill": -8.5
+   },
+   "edge_hardness": {
+    "boundary_px": 4198,
+    "hard_pct": 0
+   },
+   "rim": {
+    "inner_L": 20.1,
+    "left": {
+     "n": 3602,
+     "dL": -17.3,
+     "bright15_L": 9.6,
+     "bright15_ab": [
+      2.7,
+      -16.3
+     ]
+    },
+    "right": {
+     "n": 3791,
+     "dL": -10.3,
+     "bright15_L": 35.9,
+     "bright15_ab": [
+      -2.5,
+      -32.4
+     ]
+    },
+    "top": {
+     "n": 2007,
+     "dL": -10,
+     "bright15_L": 28.6,
+     "bright15_ab": [
+      4.4,
+      -34.3
+     ]
+    },
+    "bottom": {
+     "n": 1998,
+     "dL": -19.5,
+     "bright15_L": 2.6,
+     "bright15_ab": [
+      0.1,
+      -1.1
+     ]
+    }
+   },
+   "palette": {
+    "L_p1": 0,
+    "L_p5": 0.3,
+    "L_p50": 18.9,
+    "L_p99": 87.9,
+    "C_mean": 9.6,
+    "C_p95": 48,
+    "a_mean": 3.1,
+    "b_mean": 4.9,
+    "hue_deg": 57,
+    "light_offset_x": -0.048,
+    "light_offset_y": -0.009
+   },
+   "noise_sigma": 1.97,
+   "subpixel_detail": {
+    "window_src_px": 7,
+    "rms_luma": 21.12,
+    "share_of_variance_pct": 22.2
+   }
+  },
+  "emulation": {
+   "960x540": {
+    "screen_px_per_src_px": 0.1483,
+    "density": 6.75,
+    "magnified": false,
+    "out_px": [
+     114,
+     190
+    ],
+    "alias_rmse": 6.71,
+    "phase_shimmer": 4.67,
+    "sharpness_vs_ideal": 0.725,
+    "grad_energy": 7.07
+   },
+   "1280x720": {
+    "screen_px_per_src_px": 0.1977,
+    "density": 5.06,
+    "magnified": false,
+    "out_px": [
+     152,
+     253
+    ],
+    "alias_rmse": 6.02,
+    "phase_shimmer": 4.14,
+    "sharpness_vs_ideal": 0.731,
+    "grad_energy": 6.92
+   },
+   "1920x1080": {
+    "screen_px_per_src_px": 0.2965,
+    "density": 3.37,
+    "magnified": false,
+    "out_px": [
+     228,
+     380
+    ],
+    "alias_rmse": 5.49,
+    "phase_shimmer": 3.57,
+    "sharpness_vs_ideal": 0.761,
+    "grad_energy": 6.54
+   }
+  }
+ },
+ "scratch-door-A-junction-blown": {
+  "id": "scratch-door-A-junction-blown",
+  "family": "props-junction",
+  "used": false,
+  "path": "docs/research-2026-10/sources/doors-A/junction-blown.png",
+  "src": "door redraw job",
+  "size": [
+   768,
+   1280
+  ],
+  "file_bytes": 1248814,
+  "region": [
+   0,
+   0,
+   768,
+   1280
+  ],
+  "scale": 0.10972568578553615,
+  "zoom": 1.35,
+  "mip": true,
+  "vram": {
+   "rgba8_with_mips": 5242880
+  },
+  "display": {
+   "960x540": {
+    "opaque_w_px": 91.7,
+    "opaque_h_px": 178.2,
+    "density": 6.75
+   },
+   "1280x720": {
+    "opaque_w_px": 122.3,
+    "opaque_h_px": 237.6,
+    "density": 5.06
+   },
+   "1920x1080": {
+    "opaque_w_px": 183.4,
+    "opaque_h_px": 356.4,
+    "density": 3.38
+   }
+  },
+  "static": {
+   "alpha_hist": {
+    "max": 254,
+    "body_alpha_mode": [
+     [
+      253,
+      352042
+     ],
+     [
+      252,
+      182082
+     ],
+     [
+      251,
+      11408
+     ]
+    ],
+    "body_below_250_pct": 1.64,
+    "body_below_240_pct": 0.73
+   },
+   "alpha": {
+    "transparent_pct": 41.79,
+    "opaque_pct": 0,
+    "semi_pct": 58.21,
+    "body_px": 557495
+   },
+   "opaque_bbox": [
+    110,
+    77,
+    619,
+    1203
+   ],
+   "islands": {
+    "parts": 1,
+    "stray_count": 0,
+    "stray_px": 0,
+    "specks_under_16px": 0,
+    "largest_strays": []
+   },
+   "holes": {
+    "count": 0,
+    "count_over_9px": 0,
+    "px": 0,
+    "largest": []
+   },
+   "inner_translucency": {
+    "px": 49,
+    "pct_of_body": 0.009,
+    "samples": [
+     [
+      682,
+      607,
+      236
+     ]
+    ]
+   },
+   "fringe": {
+    "semi_edge_px": 6778,
+    "mean_dL": -2.38,
+    "p10_dL": -21.88,
+    "p90_dL": 12.81,
+    "light_halo_pct": 5.65,
+    "dark_fringe_pct": 19.05,
+    "mean_dRGB": [
+     5.1,
+     -6.5,
+     -2.5
+    ],
+    "green_spill": -7.8
+   },
+   "edge_hardness": {
+    "boundary_px": 3190,
+    "hard_pct": 0
+   },
+   "rim": {
+    "inner_L": 21.2,
+    "left": {
+     "n": 2187,
+     "dL": -18.4,
+     "bright15_L": 10.2,
+     "bright15_ab": [
+      -2.2,
+      -12.3
+     ]
+    },
+    "right": {
+     "n": 2548,
+     "dL": -16.9,
+     "bright15_L": 16.6,
+     "bright15_ab": [
+      4.3,
+      -26
+     ]
+    },
+    "top": {
+     "n": 1626,
+     "dL": -15.9,
+     "bright15_L": 17.8,
+     "bright15_ab": [
+      5.6,
+      -28.8
+     ]
+    },
+    "bottom": {
+     "n": 1711,
+     "dL": -20.5,
+     "bright15_L": 2.7,
+     "bright15_ab": [
+      1,
+      0.4
+     ]
+    }
+   },
+   "palette": {
+    "L_p1": 0,
+    "L_p5": 0.3,
+    "L_p50": 16.6,
+    "L_p99": 83.9,
+    "C_mean": 11,
+    "C_p95": 48.1,
+    "a_mean": 4.3,
+    "b_mean": 6,
+    "hue_deg": 54,
+    "light_offset_x": -0.024,
+    "light_offset_y": 0.002
+   },
+   "noise_sigma": 2.44,
+   "subpixel_detail": {
+    "window_src_px": 7,
+    "rms_luma": 21.81,
+    "share_of_variance_pct": 24.9
+   }
+  },
+  "emulation": {
+   "960x540": {
+    "screen_px_per_src_px": 0.1481,
+    "density": 6.75,
+    "magnified": false,
+    "out_px": [
+     114,
+     190
+    ],
+    "alias_rmse": 6.32,
+    "phase_shimmer": 4.28,
+    "sharpness_vs_ideal": 0.727,
+    "grad_energy": 7.26
+   },
+   "1280x720": {
+    "screen_px_per_src_px": 0.1975,
+    "density": 5.06,
+    "magnified": false,
+    "out_px": [
+     152,
+     253
+    ],
+    "alias_rmse": 5.85,
+    "phase_shimmer": 3.98,
+    "sharpness_vs_ideal": 0.73,
+    "grad_energy": 7.06
+   },
+   "1920x1080": {
+    "screen_px_per_src_px": 0.2963,
+    "density": 3.38,
+    "magnified": false,
+    "out_px": [
+     228,
+     379
+    ],
+    "alias_rmse": 5.61,
+    "phase_shimmer": 3.73,
+    "sharpness_vs_ideal": 0.751,
+    "grad_energy": 6.81
+   }
+  }
+ },
+ "scratch-door-B-corridor-sealed": {
+  "id": "scratch-door-B-corridor-sealed",
+  "family": "props-corridor",
+  "used": false,
+  "path": "[session scratch, not kept]/art/doors/B/corridor-sealed.png",
+  "src": "door redraw job",
+  "size": [
+   768,
+   1280
+  ],
+  "file_bytes": 1267528,
+  "region": [
+   0,
+   0,
+   768,
+   1280
+  ],
+  "scale": 0.11614497528830313,
+  "zoom": 1.35,
+  "mip": true,
+  "vram": {
+   "rgba8_with_mips": 5242880
+  },
+  "display": {
+   "960x540": {
+    "opaque_w_px": 115.7,
+    "opaque_h_px": 190.4,
+    "density": 6.38
+   },
+   "1280x720": {
+    "opaque_w_px": 154.3,
+    "opaque_h_px": 253.8,
+    "density": 4.78
+   },
+   "1920x1080": {
+    "opaque_w_px": 231.4,
+    "opaque_h_px": 380.7,
+    "density": 3.19
+   }
+  },
+  "static": {
+   "alpha_hist": {
+    "max": 255,
+    "body_alpha_mode": [
+     [
+      253,
+      605039
+     ],
+     [
+      252,
+      23657
+     ],
+     [
+      251,
+      6542
+     ]
+    ],
+    "body_below_250_pct": 1.54,
+    "body_below_240_pct": 0.75
+   },
+   "alpha": {
+    "transparent_pct": 31.64,
+    "opaque_pct": 0.01,
+    "semi_pct": 68.35,
+    "body_px": 651353
+   },
+   "opaque_bbox": [
+    15,
+    65,
+    738,
+    1214
+   ],
+   "islands": {
+    "parts": 1,
+    "stray_count": 0,
+    "stray_px": 0,
+    "specks_under_16px": 0,
+    "largest_strays": []
+   },
+   "holes": {
+    "count": 1,
+    "count_over_9px": 1,
+    "px": 18937,
+    "largest": [
+     {
+      "px": 18937,
+      "bbox": [
+       204,
+       174,
+       360,
+       69
+      ]
+     }
+    ]
+   },
+   "inner_translucency": {
+    "px": 154,
+    "pct_of_body": 0.024,
+    "samples": [
+     [
+      132,
+      1278,
+      204
+     ],
+     [
+      608,
+      1278,
+      184
+     ],
+     [
+      155,
+      1279,
+      43
+     ],
+     [
+      631,
+      1279,
+      36
+     ]
+    ]
+   },
+   "fringe": {
+    "semi_edge_px": 9281,
+    "mean_dL": -5.98,
+    "p10_dL": -17.02,
+    "p90_dL": 3.7,
+    "light_halo_pct": 0.09,
+    "dark_fringe_pct": 14.93,
+    "mean_dRGB": [
+     -0.5,
+     -14.2,
+     -20.8
+    ],
+    "green_spill": -3.5
+   },
+   "edge_hardness": {
+    "boundary_px": 4808,
+    "hard_pct": 0
+   },
+   "rim": {
+    "inner_L": 16.5,
+    "left": {
+     "n": 2923,
+     "dL": -9.7,
+     "bright15_L": 22,
+     "bright15_ab": [
+      -4.3,
+      -19.5
+     ]
+    },
+    "right": {
+     "n": 2907,
+     "dL": -9.5,
+     "bright15_L": 23.3,
+     "bright15_ab": [
+      -4.3,
+      -20.7
+     ]
+    },
+    "top": {
+     "n": 2772,
+     "dL": -0.2,
+     "bright15_L": 36.5,
+     "bright15_ab": [
+      -8.7,
+      -22.2
+     ]
+    },
+    "bottom": {
+     "n": 2706,
+     "dL": -13.4,
+     "bright15_L": 11.4,
+     "bright15_ab": [
+      -1.2,
+      -8.8
+     ]
+    }
+   },
+   "palette": {
+    "L_p1": 0,
+    "L_p5": 0.3,
+    "L_p50": 23.8,
+    "L_p99": 72.8,
+    "C_mean": 12.4,
+    "C_p95": 64.6,
+    "a_mean": 7.7,
+    "b_mean": 6.7,
+    "hue_deg": 41,
+    "light_offset_x": -0.003,
+    "light_offset_y": 0.004
+   },
+   "noise_sigma": 1.68,
+   "subpixel_detail": {
+    "window_src_px": 7,
+    "rms_luma": 15.84,
+    "share_of_variance_pct": 19.2
+   }
+  },
+  "emulation": {
+   "960x540": {
+    "screen_px_per_src_px": 0.1568,
+    "density": 6.38,
+    "magnified": false,
+    "out_px": [
+     120,
+     201
+    ],
+    "alias_rmse": 6.29,
+    "phase_shimmer": 4.21,
+    "sharpness_vs_ideal": 0.73,
+    "grad_energy": 7.28
+   },
+   "1280x720": {
+    "screen_px_per_src_px": 0.2091,
+    "density": 4.78,
+    "magnified": false,
+    "out_px": [
+     161,
+     268
+    ],
+    "alias_rmse": 5.16,
+    "phase_shimmer": 3.32,
+    "sharpness_vs_ideal": 0.775,
+    "grad_energy": 7.09
+   },
+   "1920x1080": {
+    "screen_px_per_src_px": 0.3136,
+    "density": 3.19,
+    "magnified": false,
+    "out_px": [
+     241,
+     401
+    ],
+    "alias_rmse": 4.28,
+    "phase_shimmer": 2.82,
+    "sharpness_vs_ideal": 0.807,
+    "grad_energy": 6.47
+   }
+  }
+ },
+ "scratch-door-B-junction-sealed": {
+  "id": "scratch-door-B-junction-sealed",
+  "family": "props-junction",
+  "used": false,
+  "path": "[session scratch, not kept]/art/doors/B/junction-sealed.png",
+  "src": "door redraw job",
+  "size": [
+   768,
+   1280
+  ],
+  "file_bytes": 1337135,
+  "region": [
+   0,
+   0,
+   768,
+   1280
+  ],
+  "scale": 0.10954356846473029,
+  "zoom": 1.35,
+  "mip": true,
+  "vram": {
+   "rgba8_with_mips": 5242880
+  },
+  "display": {
+   "960x540": {
+    "opaque_w_px": 108.5,
+    "opaque_h_px": 178.2,
+    "density": 6.76
+   },
+   "1280x720": {
+    "opaque_w_px": 144.7,
+    "opaque_h_px": 237.6,
+    "density": 5.07
+   },
+   "1920x1080": {
+    "opaque_w_px": 217.1,
+    "opaque_h_px": 356.4,
+    "density": 3.38
+   }
+  },
+  "static": {
+   "alpha_hist": {
+    "max": 255,
+    "body_alpha_mode": [
+     [
+      253,
+      317240
+     ],
+     [
+      252,
+      290880
+     ],
+     [
+      251,
+      13190
+     ]
+    ],
+    "body_below_250_pct": 2.24,
+    "body_below_240_pct": 0.8
+   },
+   "alpha": {
+    "transparent_pct": 32.32,
+    "opaque_pct": 0,
+    "semi_pct": 67.68,
+    "body_px": 641721
+   },
+   "opaque_bbox": [
+    17,
+    75,
+    734,
+    1205
+   ],
+   "islands": {
+    "parts": 1,
+    "stray_count": 0,
+    "stray_px": 0,
+    "specks_under_16px": 0,
+    "largest_strays": []
+   },
+   "holes": {
+    "count": 1,
+    "count_over_9px": 1,
+    "px": 20148,
+    "largest": [
+     {
+      "px": 20148,
+      "bbox": [
+       198,
+       178,
+       369,
+       71
+      ]
+     }
+    ]
+   },
+   "inner_translucency": {
+    "px": 189,
+    "pct_of_body": 0.029,
+    "samples": [
+     [
+      113,
+      91,
+      239
+     ],
+     [
+      161,
+      1278,
+      239
+     ],
+     [
+      633,
+      1278,
+      232
+     ],
+     [
+      598,
+      1279,
+      128
+     ]
+    ]
+   },
+   "fringe": {
+    "semi_edge_px": 8374,
+    "mean_dL": -10.98,
+    "p10_dL": -23.74,
+    "p90_dL": -0.02,
+    "light_halo_pct": 0.33,
+    "dark_fringe_pct": 36.82,
+    "mean_dRGB": [
+     -7.4,
+     -26.3,
+     -35
+    ],
+    "green_spill": -5.1
+   },
+   "edge_hardness": {
+    "boundary_px": 4817,
+    "hard_pct": 0
+   },
+   "rim": {
+    "inner_L": 15.6,
+    "left": {
+     "n": 2794,
+     "dL": -0.2,
+     "bright15_L": 37.8,
+     "bright15_ab": [
+      -7.2,
+      -27.9
+     ]
+    },
+    "right": {
+     "n": 2798,
+     "dL": 0.3,
+     "bright15_L": 39.2,
+     "bright15_ab": [
+      -7.4,
+      -28
+     ]
+    },
+    "top": {
+     "n": 2637,
+     "dL": 16.5,
+     "bright15_L": 58.7,
+     "bright15_ab": [
+      -15.1,
+      -25.9
+     ]
+    },
+    "bottom": {
+     "n": 2618,
+     "dL": -9.4,
+     "bright15_L": 16.9,
+     "bright15_ab": [
+      -2.2,
+      -6.4
+     ]
+    }
+   },
+   "palette": {
+    "L_p1": 0,
+    "L_p5": 0.3,
+    "L_p50": 22,
+    "L_p99": 83.5,
+    "C_mean": 9.1,
+    "C_p95": 52,
+    "a_mean": 2.8,
+    "b_mean": 6.2,
+    "hue_deg": 65,
+    "light_offset_x": -0.003,
+    "light_offset_y": 0.002
+   },
+   "noise_sigma": 2.1,
+   "subpixel_detail": {
+    "window_src_px": 7,
+    "rms_luma": 16.81,
+    "share_of_variance_pct": 18.5
+   }
+  },
+  "emulation": {
+   "960x540": {
+    "screen_px_per_src_px": 0.1479,
+    "density": 6.76,
+    "magnified": false,
+    "out_px": [
+     114,
+     189
+    ],
+    "alias_rmse": 6.31,
+    "phase_shimmer": 4.16,
+    "sharpness_vs_ideal": 0.734,
+    "grad_energy": 7.33
+   },
+   "1280x720": {
+    "screen_px_per_src_px": 0.1972,
+    "density": 5.07,
+    "magnified": false,
+    "out_px": [
+     151,
+     252
+    ],
+    "alias_rmse": 5.32,
+    "phase_shimmer": 3.46,
+    "sharpness_vs_ideal": 0.763,
+    "grad_energy": 7.08
+   },
+   "1920x1080": {
+    "screen_px_per_src_px": 0.2958,
+    "density": 3.38,
+    "magnified": false,
+    "out_px": [
+     227,
+     379
+    ],
+    "alias_rmse": 4.63,
+    "phase_shimmer": 3.06,
+    "sharpness_vs_ideal": 0.789,
+    "grad_energy": 6.44
+   }
+  }
+ },
+ "scratch-door-B-junction-blown": {
+  "id": "scratch-door-B-junction-blown",
+  "family": "props-junction",
+  "used": false,
+  "path": "[session scratch, not kept]/art/doors/B/junction-blown.png",
+  "src": "door redraw job",
+  "size": [
+   768,
+   1280
+  ],
+  "file_bytes": 1447799,
+  "region": [
+   0,
+   0,
+   768,
+   1280
+  ],
+  "scale": 0.10653753026634383,
+  "zoom": 1.35,
+  "mip": true,
+  "vram": {
+   "rgba8_with_mips": 5242880
+  },
+  "display": {
+   "960x540": {
+    "opaque_w_px": 106.1,
+    "opaque_h_px": 178.2,
+    "density": 6.95
+   },
+   "1280x720": {
+    "opaque_w_px": 141.5,
+    "opaque_h_px": 237.6,
+    "density": 5.21
+   },
+   "1920x1080": {
+    "opaque_w_px": 212.3,
+    "opaque_h_px": 356.4,
+    "density": 3.48
+   }
+  },
+  "static": {
+   "alpha_hist": {
+    "max": 255,
+    "body_alpha_mode": [
+     [
+      252,
+      335222
+     ],
+     [
+      253,
+      301079
+     ],
+     [
+      251,
+      33277
+     ]
+    ],
+    "body_below_250_pct": 1.54,
+    "body_below_240_pct": 0.7
+   },
+   "alpha": {
+    "transparent_pct": 28.21,
+    "opaque_pct": 0,
+    "semi_pct": 71.79,
+    "body_px": 684055
+   },
+   "opaque_bbox": [
+    15,
+    41,
+    738,
+    1239
+   ],
+   "islands": {
+    "parts": 1,
+    "stray_count": 0,
+    "stray_px": 0,
+    "specks_under_16px": 0,
+    "largest_strays": []
+   },
+   "holes": {
+    "count": 1,
+    "count_over_9px": 1,
+    "px": 4265,
+    "largest": [
+     {
+      "px": 4265,
+      "bbox": [
+       251,
+       151,
+       266,
+       22
+      ]
+     }
+    ]
+   },
+   "inner_translucency": {
+    "px": 797,
+    "pct_of_body": 0.117,
+    "samples": [
+     [
+      435,
+      150,
+      239
+     ],
+     [
+      434,
+      153,
+      24
+     ],
+     [
+      433,
+      156,
+      32
+     ],
+     [
+      264,
+      158,
+      25
+     ],
+     [
+      441,
+      159,
+      34
+     ]
+    ]
+   },
+   "fringe": {
+    "semi_edge_px": 8485,
+    "mean_dL": -1.05,
+    "p10_dL": -10.96,
+    "p90_dL": 7.3,
+    "light_halo_pct": 1.53,
+    "dark_fringe_pct": 4.82,
+    "mean_dRGB": [
+     -1.7,
+     -2.1,
+     -2.3
+    ],
+    "green_spill": -0.1
+   },
+   "edge_hardness": {
+    "boundary_px": 4552,
+    "hard_pct": 0
+   },
+   "rim": {
+    "inner_L": 18.1,
+    "left": {
+     "n": 2789,
+     "dL": -12,
+     "bright15_L": 18.1,
+     "bright15_ab": [
+      -4.6,
+      -15.5
+     ]
+    },
+    "right": {
+     "n": 2792,
+     "dL": -11.5,
+     "bright15_L": 19.9,
+     "bright15_ab": [
+      -4,
+      -17.1
+     ]
+    },
+    "top": {
+     "n": 2511,
+     "dL": -0.2,
+     "bright15_L": 44.5,
+     "bright15_ab": [
+      -5,
+      -10.9
+     ]
+    },
+    "bottom": {
+     "n": 2538,
+     "dL": -14.5,
+     "bright15_L": 11,
+     "bright15_ab": [
+      -1.1,
+      -4.3
+     ]
+    }
+   },
+   "palette": {
+    "L_p1": 0,
+    "L_p5": 0.5,
+    "L_p50": 15.1,
+    "L_p99": 78.8,
+    "C_mean": 9.3,
+    "C_p95": 35.8,
+    "a_mean": 2.6,
+    "b_mean": 3.4,
+    "hue_deg": 52,
+    "light_offset_x": -0.002,
+    "light_offset_y": -0.014
+   },
+   "noise_sigma": 2.07,
+   "subpixel_detail": {
+    "window_src_px": 7,
+    "rms_luma": 19.65,
+    "share_of_variance_pct": 23.1
+   }
+  },
+  "emulation": {
+   "960x540": {
+    "screen_px_per_src_px": 0.1438,
+    "density": 6.95,
+    "magnified": false,
+    "out_px": [
+     110,
+     184
+    ],
+    "alias_rmse": 6.89,
+    "phase_shimmer": 4.82,
+    "sharpness_vs_ideal": 0.72,
+    "grad_energy": 7.98
+   },
+   "1280x720": {
+    "screen_px_per_src_px": 0.1918,
+    "density": 5.21,
+    "magnified": false,
+    "out_px": [
+     147,
+     245
+    ],
+    "alias_rmse": 5.93,
+    "phase_shimmer": 3.77,
+    "sharpness_vs_ideal": 0.754,
+    "grad_energy": 7.94
+   },
+   "1920x1080": {
+    "screen_px_per_src_px": 0.2877,
+    "density": 3.48,
+    "magnified": false,
+    "out_px": [
+     221,
+     368
+    ],
+    "alias_rmse": 5.46,
+    "phase_shimmer": 3.77,
+    "sharpness_vs_ideal": 0.764,
+    "grad_energy": 7.5
+   }
+  }
+ }
+}

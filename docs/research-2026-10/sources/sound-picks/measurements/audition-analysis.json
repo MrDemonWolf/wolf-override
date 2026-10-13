@@ -1,0 +1,1382 @@
+[
+ {
+  "set": "current",
+  "group": "current",
+  "name": "boom",
+  "wav": "[session scratch, not kept]/sound-audition/wav/current/boom.wav",
+  "png": "[session scratch, not kept]/sound-audition/wav/current/boom.png",
+  "seconds": 0.5,
+  "format": {
+   "format": 1,
+   "channels": 1,
+   "rate": 22050,
+   "bits": 16
+  },
+  "peak_db": -6.02,
+  "rms_db": -14.37,
+  "seam_jump": 0.0503,
+  "median_step": 0.0016,
+  "p99_step": 0.2,
+  "note": ""
+ },
+ {
+  "set": "current",
+  "group": "current",
+  "name": "small_boom",
+  "wav": "[session scratch, not kept]/sound-audition/wav/current/small_boom.wav",
+  "png": "[session scratch, not kept]/sound-audition/wav/current/small_boom.png",
+  "seconds": 0.3,
+  "format": {
+   "format": 1,
+   "channels": 1,
+   "rate": 22050,
+   "bits": 16
+  },
+  "peak_db": -6.02,
+  "rms_db": -17.81,
+  "seam_jump": 0.0154,
+  "median_step": 0.0033,
+  "p99_step": 0.1901,
+  "note": ""
+ },
+ {
+  "set": "current",
+  "group": "current",
+  "name": "clank",
+  "wav": "[session scratch, not kept]/sound-audition/wav/current/clank.wav",
+  "png": "[session scratch, not kept]/sound-audition/wav/current/clank.png",
+  "seconds": 0.04,
+  "format": {
+   "format": 1,
+   "channels": 1,
+   "rate": 22050,
+   "bits": 16
+  },
+  "peak_db": -6.02,
+  "rms_db": -18.78,
+  "seam_jump": 0.0112,
+  "median_step": 0.0049,
+  "p99_step": 0.355,
+  "note": ""
+ },
+ {
+  "set": "current",
+  "group": "current",
+  "name": "thud",
+  "wav": "[session scratch, not kept]/sound-audition/wav/current/thud.wav",
+  "png": "[session scratch, not kept]/sound-audition/wav/current/thud.png",
+  "seconds": 0.08,
+  "format": {
+   "format": 1,
+   "channels": 1,
+   "rate": 22050,
+   "bits": 16
+  },
+  "peak_db": -6.02,
+  "rms_db": -16.23,
+  "seam_jump": 0.0356,
+  "median_step": 0.0013,
+  "p99_step": 0.0202,
+  "note": ""
+ },
+ {
+  "set": "current",
+  "group": "current",
+  "name": "hiss",
+  "wav": "[session scratch, not kept]/sound-audition/wav/current/hiss.wav",
+  "png": "[session scratch, not kept]/sound-audition/wav/current/hiss.png",
+  "seconds": 0.5,
+  "format": {
+   "format": 1,
+   "channels": 1,
+   "rate": 22050,
+   "bits": 16
+  },
+  "peak_db": -6.02,
+  "rms_db": -16.14,
+  "seam_jump": 0.0986,
+  "median_step": 0.1111,
+  "p99_step": 0.3535,
+  "note": ""
+ },
+ {
+  "set": "current",
+  "group": "current",
+  "name": "hiss_loop10s",
+  "wav": "[session scratch, not kept]/sound-audition/wav/current/hiss_loop10s.wav",
+  "png": "[session scratch, not kept]/sound-audition/wav/current/hiss_loop10s.png",
+  "seconds": 10,
+  "format": {
+   "format": 1,
+   "channels": 1,
+   "rate": 22050,
+   "bits": 16
+  },
+  "peak_db": -6.02,
+  "rms_db": -16.14,
+  "seam_jump": 0.0986,
+  "median_step": 0.1111,
+  "p99_step": 0.3535,
+  "note": "loop seams every 0.5s (yellow)"
+ },
+ {
+  "set": "current",
+  "group": "current",
+  "name": "hum",
+  "wav": "[session scratch, not kept]/sound-audition/wav/current/hum.wav",
+  "png": "[session scratch, not kept]/sound-audition/wav/current/hum.png",
+  "seconds": 1,
+  "format": {
+   "format": 1,
+   "channels": 1,
+   "rate": 22050,
+   "bits": 16
+  },
+  "peak_db": -6.02,
+  "rms_db": -14.09,
+  "seam_jump": 0.5673,
+  "median_step": 0.0055,
+  "p99_step": 0.0623,
+  "note": ""
+ },
+ {
+  "set": "current",
+  "group": "current",
+  "name": "hum_loop10s",
+  "wav": "[session scratch, not kept]/sound-audition/wav/current/hum_loop10s.wav",
+  "png": "[session scratch, not kept]/sound-audition/wav/current/hum_loop10s.png",
+  "seconds": 10,
+  "format": {
+   "format": 1,
+   "channels": 1,
+   "rate": 22050,
+   "bits": 16
+  },
+  "peak_db": -6.02,
+  "rms_db": -14.09,
+  "seam_jump": 0.5673,
+  "median_step": 0.0055,
+  "p99_step": 0.0623,
+  "note": "loop seams every 1s (yellow)"
+ },
+ {
+  "set": "current",
+  "group": "current",
+  "name": "arc",
+  "wav": "[session scratch, not kept]/sound-audition/wav/current/arc.wav",
+  "png": "[session scratch, not kept]/sound-audition/wav/current/arc.png",
+  "seconds": 0.5,
+  "format": {
+   "format": 1,
+   "channels": 1,
+   "rate": 22050,
+   "bits": 16
+  },
+  "peak_db": -6.02,
+  "rms_db": -26.8,
+  "seam_jump": 0.0008,
+  "median_step": 0,
+  "p99_step": 0.2866,
+  "note": ""
+ },
+ {
+  "set": "current",
+  "group": "current",
+  "name": "klaxon",
+  "wav": "[session scratch, not kept]/sound-audition/wav/current/klaxon.wav",
+  "png": "[session scratch, not kept]/sound-audition/wav/current/klaxon.png",
+  "seconds": 0.5,
+  "format": {
+   "format": 1,
+   "channels": 1,
+   "rate": 22050,
+   "bits": 16
+  },
+  "peak_db": -6.02,
+  "rms_db": -9.17,
+  "seam_jump": 0,
+  "median_step": 0.0056,
+  "p99_step": 0.4164,
+  "note": ""
+ },
+ {
+  "set": "current",
+  "group": "current",
+  "name": "growl",
+  "wav": "[session scratch, not kept]/sound-audition/wav/current/growl.wav",
+  "png": "[session scratch, not kept]/sound-audition/wav/current/growl.png",
+  "seconds": 0.6,
+  "format": {
+   "format": 1,
+   "channels": 1,
+   "rate": 22050,
+   "bits": 16
+  },
+  "peak_db": -6.02,
+  "rms_db": -16.08,
+  "seam_jump": 0,
+  "median_step": 0.0077,
+  "p99_step": 0.049,
+  "note": ""
+ },
+ {
+  "set": "current",
+  "group": "current",
+  "name": "servo",
+  "wav": "[session scratch, not kept]/sound-audition/wav/current/servo.wav",
+  "png": "[session scratch, not kept]/sound-audition/wav/current/servo.png",
+  "seconds": 1,
+  "format": {
+   "format": 1,
+   "channels": 1,
+   "rate": 22050,
+   "bits": 16
+  },
+  "peak_db": -6.02,
+  "rms_db": -10.67,
+  "seam_jump": 0.1591,
+  "median_step": 0.0888,
+  "p99_step": 0.1582,
+  "note": ""
+ },
+ {
+  "set": "current",
+  "group": "current",
+  "name": "servo_loop10s",
+  "wav": "[session scratch, not kept]/sound-audition/wav/current/servo_loop10s.wav",
+  "png": "[session scratch, not kept]/sound-audition/wav/current/servo_loop10s.png",
+  "seconds": 10,
+  "format": {
+   "format": 1,
+   "channels": 1,
+   "rate": 22050,
+   "bits": 16
+  },
+  "peak_db": -6.02,
+  "rms_db": -10.67,
+  "seam_jump": 0.1591,
+  "median_step": 0.0888,
+  "p99_step": 0.1582,
+  "note": "loop seams every 1s (yellow)"
+ },
+ {
+  "set": "current",
+  "group": "current",
+  "name": "winch",
+  "wav": "[session scratch, not kept]/sound-audition/wav/current/winch.wav",
+  "png": "[session scratch, not kept]/sound-audition/wav/current/winch.png",
+  "seconds": 1,
+  "format": {
+   "format": 1,
+   "channels": 1,
+   "rate": 22050,
+   "bits": 16
+  },
+  "peak_db": -6.02,
+  "rms_db": -13.21,
+  "seam_jump": 0.4404,
+  "median_step": 0.0032,
+  "p99_step": 0.0859,
+  "note": ""
+ },
+ {
+  "set": "current",
+  "group": "current",
+  "name": "winch_loop10s",
+  "wav": "[session scratch, not kept]/sound-audition/wav/current/winch_loop10s.wav",
+  "png": "[session scratch, not kept]/sound-audition/wav/current/winch_loop10s.png",
+  "seconds": 10,
+  "format": {
+   "format": 1,
+   "channels": 1,
+   "rate": 22050,
+   "bits": 16
+  },
+  "peak_db": -6.02,
+  "rms_db": -13.21,
+  "seam_jump": 0.4404,
+  "median_step": 0.0032,
+  "p99_step": 0.0859,
+  "note": "loop seams every 1s (yellow)"
+ },
+ {
+  "set": "current",
+  "group": "current",
+  "name": "whine",
+  "wav": "[session scratch, not kept]/sound-audition/wav/current/whine.wav",
+  "png": "[session scratch, not kept]/sound-audition/wav/current/whine.png",
+  "seconds": 0.6,
+  "format": {
+   "format": 1,
+   "channels": 1,
+   "rate": 22050,
+   "bits": 16
+  },
+  "peak_db": -6.02,
+  "rms_db": -14.37,
+  "seam_jump": 0.0007,
+  "median_step": 0.0294,
+  "p99_step": 0.2241,
+  "note": ""
+ },
+ {
+  "set": "draft",
+  "group": "footsteps",
+  "name": "engineer_plate_1",
+  "wav": "[session scratch, not kept]/sound-audition/wav/draft/footsteps/engineer_plate_1.wav",
+  "png": "[session scratch, not kept]/sound-audition/wav/draft/footsteps/engineer_plate_1.png",
+  "seconds": 0.25,
+  "format": {
+   "format": 1,
+   "channels": 1,
+   "rate": 22050,
+   "bits": 16
+  },
+  "peak_db": -6.02,
+  "rms_db": -21.21,
+  "seam_jump": 0,
+  "median_step": 0.0008,
+  "p99_step": 0.0589,
+  "note": ""
+ },
+ {
+  "set": "draft",
+  "group": "footsteps",
+  "name": "engineer_plate_2",
+  "wav": "[session scratch, not kept]/sound-audition/wav/draft/footsteps/engineer_plate_2.wav",
+  "png": "[session scratch, not kept]/sound-audition/wav/draft/footsteps/engineer_plate_2.png",
+  "seconds": 0.25,
+  "format": {
+   "format": 1,
+   "channels": 1,
+   "rate": 22050,
+   "bits": 16
+  },
+  "peak_db": -6.02,
+  "rms_db": -22.2,
+  "seam_jump": 0,
+  "median_step": 0.001,
+  "p99_step": 0.0577,
+  "note": ""
+ },
+ {
+  "set": "draft",
+  "group": "footsteps",
+  "name": "engineer_plate_3",
+  "wav": "[session scratch, not kept]/sound-audition/wav/draft/footsteps/engineer_plate_3.wav",
+  "png": "[session scratch, not kept]/sound-audition/wav/draft/footsteps/engineer_plate_3.png",
+  "seconds": 0.25,
+  "format": {
+   "format": 1,
+   "channels": 1,
+   "rate": 22050,
+   "bits": 16
+  },
+  "peak_db": -6.02,
+  "rms_db": -22.39,
+  "seam_jump": 0,
+  "median_step": 0.0007,
+  "p99_step": 0.0591,
+  "note": ""
+ },
+ {
+  "set": "draft",
+  "group": "footsteps",
+  "name": "engineer_plate_4",
+  "wav": "[session scratch, not kept]/sound-audition/wav/draft/footsteps/engineer_plate_4.wav",
+  "png": "[session scratch, not kept]/sound-audition/wav/draft/footsteps/engineer_plate_4.png",
+  "seconds": 0.25,
+  "format": {
+   "format": 1,
+   "channels": 1,
+   "rate": 22050,
+   "bits": 16
+  },
+  "peak_db": -6.02,
+  "rms_db": -22.1,
+  "seam_jump": 0,
+  "median_step": 0.0009,
+  "p99_step": 0.0563,
+  "note": ""
+ },
+ {
+  "set": "draft",
+  "group": "footsteps",
+  "name": "engineer_plate_walk6",
+  "wav": "[session scratch, not kept]/sound-audition/wav/draft/footsteps/engineer_plate_walk6.wav",
+  "png": "[session scratch, not kept]/sound-audition/wav/draft/footsteps/engineer_plate_walk6.png",
+  "seconds": 1.6964,
+  "format": {
+   "format": 1,
+   "channels": 1,
+   "rate": 22050,
+   "bits": 16
+  },
+  "peak_db": -6.02,
+  "rms_db": -23.84,
+  "seam_jump": 0,
+  "median_step": 0.0005,
+  "p99_step": 0.0377,
+  "note": "steps every 242 ms (yellow)"
+ },
+ {
+  "set": "draft",
+  "group": "footsteps",
+  "name": "engineer_grating_1",
+  "wav": "[session scratch, not kept]/sound-audition/wav/draft/footsteps/engineer_grating_1.wav",
+  "png": "[session scratch, not kept]/sound-audition/wav/draft/footsteps/engineer_grating_1.png",
+  "seconds": 0.32,
+  "format": {
+   "format": 1,
+   "channels": 1,
+   "rate": 22050,
+   "bits": 16
+  },
+  "peak_db": -6.02,
+  "rms_db": -22.95,
+  "seam_jump": 0,
+  "median_step": 0.0059,
+  "p99_step": 0.1027,
+  "note": ""
+ },
+ {
+  "set": "draft",
+  "group": "footsteps",
+  "name": "engineer_grating_2",
+  "wav": "[session scratch, not kept]/sound-audition/wav/draft/footsteps/engineer_grating_2.wav",
+  "png": "[session scratch, not kept]/sound-audition/wav/draft/footsteps/engineer_grating_2.png",
+  "seconds": 0.32,
+  "format": {
+   "format": 1,
+   "channels": 1,
+   "rate": 22050,
+   "bits": 16
+  },
+  "peak_db": -6.02,
+  "rms_db": -22.72,
+  "seam_jump": 0,
+  "median_step": 0.005,
+  "p99_step": 0.1057,
+  "note": ""
+ },
+ {
+  "set": "draft",
+  "group": "footsteps",
+  "name": "engineer_grating_3",
+  "wav": "[session scratch, not kept]/sound-audition/wav/draft/footsteps/engineer_grating_3.wav",
+  "png": "[session scratch, not kept]/sound-audition/wav/draft/footsteps/engineer_grating_3.png",
+  "seconds": 0.32,
+  "format": {
+   "format": 1,
+   "channels": 1,
+   "rate": 22050,
+   "bits": 16
+  },
+  "peak_db": -6.02,
+  "rms_db": -22.27,
+  "seam_jump": 0,
+  "median_step": 0.0058,
+  "p99_step": 0.1131,
+  "note": ""
+ },
+ {
+  "set": "draft",
+  "group": "footsteps",
+  "name": "engineer_grating_4",
+  "wav": "[session scratch, not kept]/sound-audition/wav/draft/footsteps/engineer_grating_4.wav",
+  "png": "[session scratch, not kept]/sound-audition/wav/draft/footsteps/engineer_grating_4.png",
+  "seconds": 0.32,
+  "format": {
+   "format": 1,
+   "channels": 1,
+   "rate": 22050,
+   "bits": 16
+  },
+  "peak_db": -6.02,
+  "rms_db": -23.69,
+  "seam_jump": 0,
+  "median_step": 0.0055,
+  "p99_step": 0.1031,
+  "note": ""
+ },
+ {
+  "set": "draft",
+  "group": "footsteps",
+  "name": "engineer_grating_walk6",
+  "wav": "[session scratch, not kept]/sound-audition/wav/draft/footsteps/engineer_grating_walk6.wav",
+  "png": "[session scratch, not kept]/sound-audition/wav/draft/footsteps/engineer_grating_walk6.png",
+  "seconds": 1.7709,
+  "format": {
+   "format": 1,
+   "channels": 1,
+   "rate": 22050,
+   "bits": 16
+  },
+  "peak_db": -6.02,
+  "rms_db": -23.52,
+  "seam_jump": 0,
+  "median_step": 0.0058,
+  "p99_step": 0.0923,
+  "note": "steps every 242 ms (yellow)"
+ },
+ {
+  "set": "draft",
+  "group": "footsteps",
+  "name": "engineer_wet_1",
+  "wav": "[session scratch, not kept]/sound-audition/wav/draft/footsteps/engineer_wet_1.wav",
+  "png": "[session scratch, not kept]/sound-audition/wav/draft/footsteps/engineer_wet_1.png",
+  "seconds": 0.28,
+  "format": {
+   "format": 1,
+   "channels": 1,
+   "rate": 22050,
+   "bits": 16
+  },
+  "peak_db": -6.02,
+  "rms_db": -21.06,
+  "seam_jump": 0,
+  "median_step": 0.0039,
+  "p99_step": 0.1315,
+  "note": ""
+ },
+ {
+  "set": "draft",
+  "group": "footsteps",
+  "name": "engineer_wet_2",
+  "wav": "[session scratch, not kept]/sound-audition/wav/draft/footsteps/engineer_wet_2.wav",
+  "png": "[session scratch, not kept]/sound-audition/wav/draft/footsteps/engineer_wet_2.png",
+  "seconds": 0.28,
+  "format": {
+   "format": 1,
+   "channels": 1,
+   "rate": 22050,
+   "bits": 16
+  },
+  "peak_db": -6.02,
+  "rms_db": -22.99,
+  "seam_jump": 0,
+  "median_step": 0.0027,
+  "p99_step": 0.1125,
+  "note": ""
+ },
+ {
+  "set": "draft",
+  "group": "footsteps",
+  "name": "engineer_wet_3",
+  "wav": "[session scratch, not kept]/sound-audition/wav/draft/footsteps/engineer_wet_3.wav",
+  "png": "[session scratch, not kept]/sound-audition/wav/draft/footsteps/engineer_wet_3.png",
+  "seconds": 0.28,
+  "format": {
+   "format": 1,
+   "channels": 1,
+   "rate": 22050,
+   "bits": 16
+  },
+  "peak_db": -6.02,
+  "rms_db": -21.88,
+  "seam_jump": 0,
+  "median_step": 0.0034,
+  "p99_step": 0.1105,
+  "note": ""
+ },
+ {
+  "set": "draft",
+  "group": "footsteps",
+  "name": "engineer_wet_4",
+  "wav": "[session scratch, not kept]/sound-audition/wav/draft/footsteps/engineer_wet_4.wav",
+  "png": "[session scratch, not kept]/sound-audition/wav/draft/footsteps/engineer_wet_4.png",
+  "seconds": 0.28,
+  "format": {
+   "format": 1,
+   "channels": 1,
+   "rate": 22050,
+   "bits": 16
+  },
+  "peak_db": -6.02,
+  "rms_db": -21.14,
+  "seam_jump": 0,
+  "median_step": 0.0047,
+  "p99_step": 0.1301,
+  "note": ""
+ },
+ {
+  "set": "draft",
+  "group": "footsteps",
+  "name": "engineer_wet_walk6",
+  "wav": "[session scratch, not kept]/sound-audition/wav/draft/footsteps/engineer_wet_walk6.wav",
+  "png": "[session scratch, not kept]/sound-audition/wav/draft/footsteps/engineer_wet_walk6.png",
+  "seconds": 1.7284,
+  "format": {
+   "format": 1,
+   "channels": 1,
+   "rate": 22050,
+   "bits": 16
+  },
+  "peak_db": -6.02,
+  "rms_db": -22.42,
+  "seam_jump": 0,
+  "median_step": 0.0023,
+  "p99_step": 0.0942,
+  "note": "steps every 242 ms (yellow)"
+ },
+ {
+  "set": "draft",
+  "group": "footsteps",
+  "name": "engineer_rubble_1",
+  "wav": "[session scratch, not kept]/sound-audition/wav/draft/footsteps/engineer_rubble_1.wav",
+  "png": "[session scratch, not kept]/sound-audition/wav/draft/footsteps/engineer_rubble_1.png",
+  "seconds": 0.26,
+  "format": {
+   "format": 1,
+   "channels": 1,
+   "rate": 22050,
+   "bits": 16
+  },
+  "peak_db": -6.02,
+  "rms_db": -21.54,
+  "seam_jump": 0,
+  "median_step": 0.0063,
+  "p99_step": 0.1158,
+  "note": ""
+ },
+ {
+  "set": "draft",
+  "group": "footsteps",
+  "name": "engineer_rubble_2",
+  "wav": "[session scratch, not kept]/sound-audition/wav/draft/footsteps/engineer_rubble_2.wav",
+  "png": "[session scratch, not kept]/sound-audition/wav/draft/footsteps/engineer_rubble_2.png",
+  "seconds": 0.26,
+  "format": {
+   "format": 1,
+   "channels": 1,
+   "rate": 22050,
+   "bits": 16
+  },
+  "peak_db": -6.02,
+  "rms_db": -23.16,
+  "seam_jump": 0,
+  "median_step": 0.0026,
+  "p99_step": 0.1092,
+  "note": ""
+ },
+ {
+  "set": "draft",
+  "group": "footsteps",
+  "name": "engineer_rubble_3",
+  "wav": "[session scratch, not kept]/sound-audition/wav/draft/footsteps/engineer_rubble_3.wav",
+  "png": "[session scratch, not kept]/sound-audition/wav/draft/footsteps/engineer_rubble_3.png",
+  "seconds": 0.26,
+  "format": {
+   "format": 1,
+   "channels": 1,
+   "rate": 22050,
+   "bits": 16
+  },
+  "peak_db": -6.02,
+  "rms_db": -22.2,
+  "seam_jump": 0,
+  "median_step": 0.0019,
+  "p99_step": 0.1349,
+  "note": ""
+ },
+ {
+  "set": "draft",
+  "group": "footsteps",
+  "name": "engineer_rubble_4",
+  "wav": "[session scratch, not kept]/sound-audition/wav/draft/footsteps/engineer_rubble_4.wav",
+  "png": "[session scratch, not kept]/sound-audition/wav/draft/footsteps/engineer_rubble_4.png",
+  "seconds": 0.26,
+  "format": {
+   "format": 1,
+   "channels": 1,
+   "rate": 22050,
+   "bits": 16
+  },
+  "peak_db": -6.02,
+  "rms_db": -23.61,
+  "seam_jump": 0,
+  "median_step": 0.0031,
+  "p99_step": 0.1039,
+  "note": ""
+ },
+ {
+  "set": "draft",
+  "group": "footsteps",
+  "name": "engineer_rubble_walk6",
+  "wav": "[session scratch, not kept]/sound-audition/wav/draft/footsteps/engineer_rubble_walk6.wav",
+  "png": "[session scratch, not kept]/sound-audition/wav/draft/footsteps/engineer_rubble_walk6.png",
+  "seconds": 1.7071,
+  "format": {
+   "format": 1,
+   "channels": 1,
+   "rate": 22050,
+   "bits": 16
+  },
+  "peak_db": -6.02,
+  "rms_db": -23.88,
+  "seam_jump": 0,
+  "median_step": 0.0016,
+  "p99_step": 0.0891,
+  "note": "steps every 242 ms (yellow)"
+ },
+ {
+  "set": "draft",
+  "group": "footsteps",
+  "name": "wolf_plate_1",
+  "wav": "[session scratch, not kept]/sound-audition/wav/draft/footsteps/wolf_plate_1.wav",
+  "png": "[session scratch, not kept]/sound-audition/wav/draft/footsteps/wolf_plate_1.png",
+  "seconds": 0.16,
+  "format": {
+   "format": 1,
+   "channels": 1,
+   "rate": 22050,
+   "bits": 16
+  },
+  "peak_db": -6.02,
+  "rms_db": -23.3,
+  "seam_jump": 0,
+  "median_step": 0.0003,
+  "p99_step": 0.1593,
+  "note": ""
+ },
+ {
+  "set": "draft",
+  "group": "footsteps",
+  "name": "wolf_plate_2",
+  "wav": "[session scratch, not kept]/sound-audition/wav/draft/footsteps/wolf_plate_2.wav",
+  "png": "[session scratch, not kept]/sound-audition/wav/draft/footsteps/wolf_plate_2.png",
+  "seconds": 0.16,
+  "format": {
+   "format": 1,
+   "channels": 1,
+   "rate": 22050,
+   "bits": 16
+  },
+  "peak_db": -6.02,
+  "rms_db": -22.69,
+  "seam_jump": 0,
+  "median_step": 0.0005,
+  "p99_step": 0.155,
+  "note": ""
+ },
+ {
+  "set": "draft",
+  "group": "footsteps",
+  "name": "wolf_plate_3",
+  "wav": "[session scratch, not kept]/sound-audition/wav/draft/footsteps/wolf_plate_3.wav",
+  "png": "[session scratch, not kept]/sound-audition/wav/draft/footsteps/wolf_plate_3.png",
+  "seconds": 0.16,
+  "format": {
+   "format": 1,
+   "channels": 1,
+   "rate": 22050,
+   "bits": 16
+  },
+  "peak_db": -6.02,
+  "rms_db": -23.49,
+  "seam_jump": 0,
+  "median_step": 0.0004,
+  "p99_step": 0.1568,
+  "note": ""
+ },
+ {
+  "set": "draft",
+  "group": "footsteps",
+  "name": "wolf_plate_4",
+  "wav": "[session scratch, not kept]/sound-audition/wav/draft/footsteps/wolf_plate_4.wav",
+  "png": "[session scratch, not kept]/sound-audition/wav/draft/footsteps/wolf_plate_4.png",
+  "seconds": 0.16,
+  "format": {
+   "format": 1,
+   "channels": 1,
+   "rate": 22050,
+   "bits": 16
+  },
+  "peak_db": -6.02,
+  "rms_db": -23.49,
+  "seam_jump": 0,
+  "median_step": 0.0005,
+  "p99_step": 0.1416,
+  "note": ""
+ },
+ {
+  "set": "draft",
+  "group": "footsteps",
+  "name": "wolf_plate_walk6",
+  "wav": "[session scratch, not kept]/sound-audition/wav/draft/footsteps/wolf_plate_walk6.wav",
+  "png": "[session scratch, not kept]/sound-audition/wav/draft/footsteps/wolf_plate_walk6.png",
+  "seconds": 1.1797,
+  "format": {
+   "format": 1,
+   "channels": 1,
+   "rate": 22050,
+   "bits": 16
+  },
+  "peak_db": -6.02,
+  "rms_db": -25.95,
+  "seam_jump": 0,
+  "median_step": 0.0001,
+  "p99_step": 0.1041,
+  "note": "steps every 158 ms (yellow)"
+ },
+ {
+  "set": "draft",
+  "group": "footsteps",
+  "name": "wolf_grating_1",
+  "wav": "[session scratch, not kept]/sound-audition/wav/draft/footsteps/wolf_grating_1.wav",
+  "png": "[session scratch, not kept]/sound-audition/wav/draft/footsteps/wolf_grating_1.png",
+  "seconds": 0.22,
+  "format": {
+   "format": 1,
+   "channels": 1,
+   "rate": 22050,
+   "bits": 16
+  },
+  "peak_db": -6.02,
+  "rms_db": -23.6,
+  "seam_jump": 0,
+  "median_step": 0.0048,
+  "p99_step": 0.124,
+  "note": ""
+ },
+ {
+  "set": "draft",
+  "group": "footsteps",
+  "name": "wolf_grating_2",
+  "wav": "[session scratch, not kept]/sound-audition/wav/draft/footsteps/wolf_grating_2.wav",
+  "png": "[session scratch, not kept]/sound-audition/wav/draft/footsteps/wolf_grating_2.png",
+  "seconds": 0.22,
+  "format": {
+   "format": 1,
+   "channels": 1,
+   "rate": 22050,
+   "bits": 16
+  },
+  "peak_db": -6.02,
+  "rms_db": -25.17,
+  "seam_jump": 0,
+  "median_step": 0.0033,
+  "p99_step": 0.1133,
+  "note": ""
+ },
+ {
+  "set": "draft",
+  "group": "footsteps",
+  "name": "wolf_grating_3",
+  "wav": "[session scratch, not kept]/sound-audition/wav/draft/footsteps/wolf_grating_3.wav",
+  "png": "[session scratch, not kept]/sound-audition/wav/draft/footsteps/wolf_grating_3.png",
+  "seconds": 0.22,
+  "format": {
+   "format": 1,
+   "channels": 1,
+   "rate": 22050,
+   "bits": 16
+  },
+  "peak_db": -6.02,
+  "rms_db": -24.45,
+  "seam_jump": 0,
+  "median_step": 0.002,
+  "p99_step": 0.1423,
+  "note": ""
+ },
+ {
+  "set": "draft",
+  "group": "footsteps",
+  "name": "wolf_grating_4",
+  "wav": "[session scratch, not kept]/sound-audition/wav/draft/footsteps/wolf_grating_4.wav",
+  "png": "[session scratch, not kept]/sound-audition/wav/draft/footsteps/wolf_grating_4.png",
+  "seconds": 0.22,
+  "format": {
+   "format": 1,
+   "channels": 1,
+   "rate": 22050,
+   "bits": 16
+  },
+  "peak_db": -6.02,
+  "rms_db": -23.91,
+  "seam_jump": 0,
+  "median_step": 0.0049,
+  "p99_step": 0.1391,
+  "note": ""
+ },
+ {
+  "set": "draft",
+  "group": "footsteps",
+  "name": "wolf_grating_walk6",
+  "wav": "[session scratch, not kept]/sound-audition/wav/draft/footsteps/wolf_grating_walk6.wav",
+  "png": "[session scratch, not kept]/sound-audition/wav/draft/footsteps/wolf_grating_walk6.png",
+  "seconds": 1.2435,
+  "format": {
+   "format": 1,
+   "channels": 1,
+   "rate": 22050,
+   "bits": 16
+  },
+  "peak_db": -6.02,
+  "rms_db": -24.47,
+  "seam_jump": 0,
+  "median_step": 0.0041,
+  "p99_step": 0.1134,
+  "note": "steps every 158 ms (yellow)"
+ },
+ {
+  "set": "draft",
+  "group": "footsteps",
+  "name": "wolf_wet_1",
+  "wav": "[session scratch, not kept]/sound-audition/wav/draft/footsteps/wolf_wet_1.wav",
+  "png": "[session scratch, not kept]/sound-audition/wav/draft/footsteps/wolf_wet_1.png",
+  "seconds": 0.2,
+  "format": {
+   "format": 1,
+   "channels": 1,
+   "rate": 22050,
+   "bits": 16
+  },
+  "peak_db": -6.02,
+  "rms_db": -25.05,
+  "seam_jump": 0,
+  "median_step": 0.0005,
+  "p99_step": 0.1085,
+  "note": ""
+ },
+ {
+  "set": "draft",
+  "group": "footsteps",
+  "name": "wolf_wet_2",
+  "wav": "[session scratch, not kept]/sound-audition/wav/draft/footsteps/wolf_wet_2.wav",
+  "png": "[session scratch, not kept]/sound-audition/wav/draft/footsteps/wolf_wet_2.png",
+  "seconds": 0.2,
+  "format": {
+   "format": 1,
+   "channels": 1,
+   "rate": 22050,
+   "bits": 16
+  },
+  "peak_db": -6.02,
+  "rms_db": -24.76,
+  "seam_jump": 0,
+  "median_step": 0.0004,
+  "p99_step": 0.1128,
+  "note": ""
+ },
+ {
+  "set": "draft",
+  "group": "footsteps",
+  "name": "wolf_wet_3",
+  "wav": "[session scratch, not kept]/sound-audition/wav/draft/footsteps/wolf_wet_3.wav",
+  "png": "[session scratch, not kept]/sound-audition/wav/draft/footsteps/wolf_wet_3.png",
+  "seconds": 0.2,
+  "format": {
+   "format": 1,
+   "channels": 1,
+   "rate": 22050,
+   "bits": 16
+  },
+  "peak_db": -6.02,
+  "rms_db": -23.73,
+  "seam_jump": 0,
+  "median_step": 0.0009,
+  "p99_step": 0.1119,
+  "note": ""
+ },
+ {
+  "set": "draft",
+  "group": "footsteps",
+  "name": "wolf_wet_4",
+  "wav": "[session scratch, not kept]/sound-audition/wav/draft/footsteps/wolf_wet_4.wav",
+  "png": "[session scratch, not kept]/sound-audition/wav/draft/footsteps/wolf_wet_4.png",
+  "seconds": 0.2,
+  "format": {
+   "format": 1,
+   "channels": 1,
+   "rate": 22050,
+   "bits": 16
+  },
+  "peak_db": -6.02,
+  "rms_db": -24.69,
+  "seam_jump": 0,
+  "median_step": 0.0007,
+  "p99_step": 0.1076,
+  "note": ""
+ },
+ {
+  "set": "draft",
+  "group": "footsteps",
+  "name": "wolf_wet_walk6",
+  "wav": "[session scratch, not kept]/sound-audition/wav/draft/footsteps/wolf_wet_walk6.wav",
+  "png": "[session scratch, not kept]/sound-audition/wav/draft/footsteps/wolf_wet_walk6.png",
+  "seconds": 1.2222,
+  "format": {
+   "format": 1,
+   "channels": 1,
+   "rate": 22050,
+   "bits": 16
+  },
+  "peak_db": -6.02,
+  "rms_db": -26.35,
+  "seam_jump": 0,
+  "median_step": 0.0003,
+  "p99_step": 0.0812,
+  "note": "steps every 158 ms (yellow)"
+ },
+ {
+  "set": "draft",
+  "group": "footsteps",
+  "name": "wolf_rubble_1",
+  "wav": "[session scratch, not kept]/sound-audition/wav/draft/footsteps/wolf_rubble_1.wav",
+  "png": "[session scratch, not kept]/sound-audition/wav/draft/footsteps/wolf_rubble_1.png",
+  "seconds": 0.18,
+  "format": {
+   "format": 1,
+   "channels": 1,
+   "rate": 22050,
+   "bits": 16
+  },
+  "peak_db": -6.02,
+  "rms_db": -23.91,
+  "seam_jump": 0,
+  "median_step": 0.0022,
+  "p99_step": 0.1245,
+  "note": ""
+ },
+ {
+  "set": "draft",
+  "group": "footsteps",
+  "name": "wolf_rubble_2",
+  "wav": "[session scratch, not kept]/sound-audition/wav/draft/footsteps/wolf_rubble_2.wav",
+  "png": "[session scratch, not kept]/sound-audition/wav/draft/footsteps/wolf_rubble_2.png",
+  "seconds": 0.18,
+  "format": {
+   "format": 1,
+   "channels": 1,
+   "rate": 22050,
+   "bits": 16
+  },
+  "peak_db": -6.02,
+  "rms_db": -26.13,
+  "seam_jump": 0,
+  "median_step": 0.0002,
+  "p99_step": 0.1125,
+  "note": ""
+ },
+ {
+  "set": "draft",
+  "group": "footsteps",
+  "name": "wolf_rubble_3",
+  "wav": "[session scratch, not kept]/sound-audition/wav/draft/footsteps/wolf_rubble_3.wav",
+  "png": "[session scratch, not kept]/sound-audition/wav/draft/footsteps/wolf_rubble_3.png",
+  "seconds": 0.18,
+  "format": {
+   "format": 1,
+   "channels": 1,
+   "rate": 22050,
+   "bits": 16
+  },
+  "peak_db": -6.02,
+  "rms_db": -25.69,
+  "seam_jump": 0,
+  "median_step": 0.0005,
+  "p99_step": 0.1149,
+  "note": ""
+ },
+ {
+  "set": "draft",
+  "group": "footsteps",
+  "name": "wolf_rubble_4",
+  "wav": "[session scratch, not kept]/sound-audition/wav/draft/footsteps/wolf_rubble_4.wav",
+  "png": "[session scratch, not kept]/sound-audition/wav/draft/footsteps/wolf_rubble_4.png",
+  "seconds": 0.18,
+  "format": {
+   "format": 1,
+   "channels": 1,
+   "rate": 22050,
+   "bits": 16
+  },
+  "peak_db": -6.02,
+  "rms_db": -22.94,
+  "seam_jump": 0,
+  "median_step": 0.0004,
+  "p99_step": 0.1463,
+  "note": ""
+ },
+ {
+  "set": "draft",
+  "group": "footsteps",
+  "name": "wolf_rubble_walk6",
+  "wav": "[session scratch, not kept]/sound-audition/wav/draft/footsteps/wolf_rubble_walk6.wav",
+  "png": "[session scratch, not kept]/sound-audition/wav/draft/footsteps/wolf_rubble_walk6.png",
+  "seconds": 1.201,
+  "format": {
+   "format": 1,
+   "channels": 1,
+   "rate": 22050,
+   "bits": 16
+  },
+  "peak_db": -6.02,
+  "rms_db": -26.08,
+  "seam_jump": 0,
+  "median_step": 0.0001,
+  "p99_step": 0.0973,
+  "note": "steps every 158 ms (yellow)"
+ },
+ {
+  "set": "draft",
+  "group": "roomtone",
+  "name": "corridor_bed10s",
+  "wav": "[session scratch, not kept]/sound-audition/wav/draft/roomtone/corridor_bed10s.wav",
+  "png": "[session scratch, not kept]/sound-audition/wav/draft/roomtone/corridor_bed10s.png",
+  "seconds": 10,
+  "format": {
+   "format": 1,
+   "channels": 1,
+   "rate": 22050,
+   "bits": 16
+  },
+  "peak_db": -6.02,
+  "rms_db": -19.23,
+  "seam_jump": 0.0011,
+  "median_step": 0.0473,
+  "p99_step": 0.1282,
+  "note": "chunk crossfades (yellow), order 1,4,2,3,0,1; file loops at 10 s"
+ },
+ {
+  "set": "draft",
+  "group": "roomtone",
+  "name": "records_bed10s",
+  "wav": "[session scratch, not kept]/sound-audition/wav/draft/roomtone/records_bed10s.wav",
+  "png": "[session scratch, not kept]/sound-audition/wav/draft/roomtone/records_bed10s.png",
+  "seconds": 10,
+  "format": {
+   "format": 1,
+   "channels": 1,
+   "rate": 22050,
+   "bits": 16
+  },
+  "peak_db": -6.02,
+  "rms_db": -16.07,
+  "seam_jump": 0.0713,
+  "median_step": 0.1389,
+  "p99_step": 0.4495,
+  "note": "chunk crossfades (yellow), order 1,0,3,2,4,1; file loops at 10 s"
+ },
+ {
+  "set": "draft",
+  "group": "roomtone",
+  "name": "junction_bed10s",
+  "wav": "[session scratch, not kept]/sound-audition/wav/draft/roomtone/junction_bed10s.wav",
+  "png": "[session scratch, not kept]/sound-audition/wav/draft/roomtone/junction_bed10s.png",
+  "seconds": 10,
+  "format": {
+   "format": 1,
+   "channels": 1,
+   "rate": 22050,
+   "bits": 16
+  },
+  "peak_db": -6.02,
+  "rms_db": -18.18,
+  "seam_jump": 0.0079,
+  "median_step": 0.0105,
+  "p99_step": 0.0337,
+  "note": "chunk crossfades (yellow), order 1,0,3,2,4,1; file loops at 10 s"
+ },
+ {
+  "set": "draft",
+  "group": "ambient",
+  "name": "distant_bang",
+  "wav": "[session scratch, not kept]/sound-audition/wav/draft/ambient/distant_bang.wav",
+  "png": "[session scratch, not kept]/sound-audition/wav/draft/ambient/distant_bang.png",
+  "seconds": 1.8,
+  "format": {
+   "format": 1,
+   "channels": 1,
+   "rate": 22050,
+   "bits": 16
+  },
+  "peak_db": -6.02,
+  "rms_db": -20.19,
+  "seam_jump": 0,
+  "median_step": 0.0007,
+  "p99_step": 0.009,
+  "note": ""
+ },
+ {
+  "set": "draft",
+  "group": "ambient",
+  "name": "drip",
+  "wav": "[session scratch, not kept]/sound-audition/wav/draft/ambient/drip.wav",
+  "png": "[session scratch, not kept]/sound-audition/wav/draft/ambient/drip.png",
+  "seconds": 0.5,
+  "format": {
+   "format": 1,
+   "channels": 1,
+   "rate": 22050,
+   "bits": 16
+  },
+  "peak_db": -6.02,
+  "rms_db": -26.18,
+  "seam_jump": 0,
+  "median_step": 0.0002,
+  "p99_step": 0.0992,
+  "note": ""
+ },
+ {
+  "set": "draft",
+  "group": "ambient",
+  "name": "pipe_creak",
+  "wav": "[session scratch, not kept]/sound-audition/wav/draft/ambient/pipe_creak.wav",
+  "png": "[session scratch, not kept]/sound-audition/wav/draft/ambient/pipe_creak.png",
+  "seconds": 1.2,
+  "format": {
+   "format": 1,
+   "channels": 1,
+   "rate": 22050,
+   "bits": 16
+  },
+  "peak_db": -6.02,
+  "rms_db": -26.15,
+  "seam_jump": 0,
+  "median_step": 0.0027,
+  "p99_step": 0.0934,
+  "note": ""
+ },
+ {
+  "set": "draft",
+  "group": "ambient",
+  "name": "cooling_tick",
+  "wav": "[session scratch, not kept]/sound-audition/wav/draft/ambient/cooling_tick.wav",
+  "png": "[session scratch, not kept]/sound-audition/wav/draft/ambient/cooling_tick.png",
+  "seconds": 0.6,
+  "format": {
+   "format": 1,
+   "channels": 1,
+   "rate": 22050,
+   "bits": 16
+  },
+  "peak_db": -6.02,
+  "rms_db": -30.03,
+  "seam_jump": 0,
+  "median_step": 0,
+  "p99_step": 0.1381,
+  "note": ""
+ },
+ {
+  "set": "draft",
+  "group": "ambient",
+  "name": "vent_flutter",
+  "wav": "[session scratch, not kept]/sound-audition/wav/draft/ambient/vent_flutter.wav",
+  "png": "[session scratch, not kept]/sound-audition/wav/draft/ambient/vent_flutter.png",
+  "seconds": 1,
+  "format": {
+   "format": 1,
+   "channels": 1,
+   "rate": 22050,
+   "bits": 16
+  },
+  "peak_db": -6.02,
+  "rms_db": -20.81,
+  "seam_jump": 0.0001,
+  "median_step": 0.024,
+  "p99_step": 0.1302,
+  "note": ""
+ },
+ {
+  "set": "draft",
+  "group": "ambient",
+  "name": "relay_click",
+  "wav": "[session scratch, not kept]/sound-audition/wav/draft/ambient/relay_click.wav",
+  "png": "[session scratch, not kept]/sound-audition/wav/draft/ambient/relay_click.png",
+  "seconds": 0.35,
+  "format": {
+   "format": 1,
+   "channels": 1,
+   "rate": 22050,
+   "bits": 16
+  },
+  "peak_db": -6.02,
+  "rms_db": -29.82,
+  "seam_jump": 0,
+  "median_step": 0,
+  "p99_step": 0.0784,
+  "note": ""
+ },
+ {
+  "set": "draft",
+  "group": "case",
+  "name": "rustle",
+  "wav": "[session scratch, not kept]/sound-audition/wav/draft/case/rustle.wav",
+  "png": "[session scratch, not kept]/sound-audition/wav/draft/case/rustle.png",
+  "seconds": 0.6,
+  "format": {
+   "format": 1,
+   "channels": 1,
+   "rate": 22050,
+   "bits": 16
+  },
+  "peak_db": -6.02,
+  "rms_db": -25.88,
+  "seam_jump": 0,
+  "median_step": 0.017,
+  "p99_step": 0.2536,
+  "note": ""
+ },
+ {
+  "set": "draft",
+  "group": "case",
+  "name": "clack",
+  "wav": "[session scratch, not kept]/sound-audition/wav/draft/case/clack.wav",
+  "png": "[session scratch, not kept]/sound-audition/wav/draft/case/clack.png",
+  "seconds": 0.14,
+  "format": {
+   "format": 1,
+   "channels": 1,
+   "rate": 22050,
+   "bits": 16
+  },
+  "peak_db": -6.02,
+  "rms_db": -23.2,
+  "seam_jump": 0,
+  "median_step": 0.0017,
+  "p99_step": 0.1302,
+  "note": ""
+ },
+ {
+  "set": "draft",
+  "group": "case",
+  "name": "clink",
+  "wav": "[session scratch, not kept]/sound-audition/wav/draft/case/clink.wav",
+  "png": "[session scratch, not kept]/sound-audition/wav/draft/case/clink.png",
+  "seconds": 0.7,
+  "format": {
+   "format": 1,
+   "channels": 1,
+   "rate": 22050,
+   "bits": 16
+  },
+  "peak_db": -6.02,
+  "rms_db": -20.76,
+  "seam_jump": 0,
+  "median_step": 0.0168,
+  "p99_step": 0.2213,
+  "note": ""
+ },
+ {
+  "set": "draft",
+  "group": "case",
+  "name": "ratchet",
+  "wav": "[session scratch, not kept]/sound-audition/wav/draft/case/ratchet.wav",
+  "png": "[session scratch, not kept]/sound-audition/wav/draft/case/ratchet.png",
+  "seconds": 0.5,
+  "format": {
+   "format": 1,
+   "channels": 1,
+   "rate": 22050,
+   "bits": 16
+  },
+  "peak_db": -6.02,
+  "rms_db": -27.04,
+  "seam_jump": 0,
+  "median_step": 0.0008,
+  "p99_step": 0.1666,
+  "note": ""
+ }
+]

@@ -1,0 +1,54 @@
+{
+ "file": "apps/game/assets/rooms/junction-mid.png",
+ "family": "plate-mid",
+ "size": [
+  1920,
+  1080
+ ],
+ "checks": {
+  "E_density_1080_maxzoom": {
+   "value": 0.556,
+   "threshold": 1.0,
+   "ok": false
+  },
+  "E_density_960_minzoom": {
+   "value": 1.481,
+   "threshold": 4.5,
+   "ok": true
+  },
+  "F_cool_neutrals_b": {
+   "value": -1.91,
+   "threshold": -1.0,
+   "ok": true
+  },
+  "F_accent_dE_p90": {
+   "value": 19.2,
+   "threshold": 18.0,
+   "ok": false,
+   "n_sat": 3458
+  }
+ },
+ "opaque_bbox": [
+  0,
+  11,
+  1919,
+  1079
+ ],
+ "opaque_fill_pct": 53.22,
+ "baseline_row": 1079,
+ "density": {
+  "540p@z1.35": 1.481,
+  "720p@z1.35": 1.111,
+  "1080p@z1.35": 0.741,
+  "1440p@z1.35": 0.556,
+  "540p@z1.8": 1.111,
+  "720p@z1.8": 0.833,
+  "1080p@z1.8": 0.556,
+  "1440p@z1.8": 0.417
+ },
+ "L_med": 8.7,
+ "L_p99": 61.9,
+ "accent_share": 0.0137,
+ "noise_sigma_src": 0.95,
+ "pass": false
+}

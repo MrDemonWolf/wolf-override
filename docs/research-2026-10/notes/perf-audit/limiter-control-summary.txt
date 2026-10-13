@@ -1,0 +1,6 @@
+empty scene max_fps=60 vsync=0 n=493 avg=20.32 ms (49.2 FPS) p5=18.32 p50=20.04 p95=23.04
+empty scene max_fps=60 vsync=1 n=492 avg=20.35 ms (49.1 FPS) p5=18.37 p50=20.11 p95=23.36
+empty scene max_fps=0 vsync=1 n=14332 avg=0.70 ms (1433.1 FPS) p5=0.61 p50=0.67 p95=0.89
+empty scene max_fps=0 vsync=0 n=14070 avg=0.71 ms (1406.9 FPS) p5=0.61 p50=0.67 p95=0.93
+empty scene max_fps=120 vsync=0 n=868 avg=11.52 ms (86.8 FPS) p5=9.87 p50=11.45 p95=13.55
+Sat Oct 10 04:14:04 CDT 2026  4:14  up 5 days, 14:28, 27 users, load averages: 4.57 5.29 5.32

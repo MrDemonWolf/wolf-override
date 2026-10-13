@@ -2,7 +2,7 @@
 # using the sprite's own alpha as the mask (canvas_xform from each _log.json).
 import json, os, numpy as np
 from PIL import Image, ImageFilter
-S='/private/tmp/claude-501/-Users-nathanialhenniges-Developer-mrdemonwolf-wolf-override/eb713cd4-8931-48d7-8c83-5b0b0d1e9cf3/scratchpad/cage-design'
+S='[session scratch, not kept]/cage-design'
 tex=Image.open(S+'/audit/game-main/apps/game/assets/wolf-side-right-provisional.png').convert('RGBA')
 def mask_for(xf, wolf_pos=(115,423), spr_y=-15, flip=False):
     sx, _, _, sy, ox, oy = xf  # canvas xform at base res

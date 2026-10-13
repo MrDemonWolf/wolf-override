@@ -1,0 +1,143 @@
+{
+ "file": "docs/research-2026-10/sources/style-test-look2/wolf.png",
+ "family": "character",
+ "size": [
+  480,
+  272
+ ],
+ "checks": {
+  "A_alpha_body": {
+   "value": 1.0,
+   "threshold": 0.99,
+   "ok": true,
+   "max_alpha": 255
+  },
+  "B_holes_share": {
+   "value": 0.0,
+   "threshold": 0.005,
+   "ok": true
+  },
+  "B_interior_band_rows": {
+   "value": 0,
+   "threshold": 3,
+   "ok": true,
+   "band_span": null
+  },
+  "B_edge_fade_rows": {
+   "value": 0,
+   "threshold": 6,
+   "ok": true,
+   "band_span": null,
+   "note": "soft fade at the top or bottom of the silhouette (baked contact shadow or wisps)"
+  },
+  "C_fringe_dark": {
+   "value": 0.0137,
+   "threshold": 0.1,
+   "ok": true,
+   "edge_px": 1829
+  },
+  "C_fringe_halo": {
+   "value": 0.0213,
+   "threshold": 0.1,
+   "ok": true
+  },
+  "C_edge_chroma_shift": {
+   "value": 0.14,
+   "threshold": 4.0,
+   "ok": true,
+   "mean_da_db": [
+    -0.13,
+    -0.03
+   ]
+  },
+  "C_outline_dL": {
+   "value": 0.5,
+   "threshold": -8.0,
+   "ok": true,
+   "note": "median L* of the 1-3 px rim minus the core; strongly negative = dark outline"
+  },
+  "C_top_light_dL": {
+   "value": 35.4,
+   "threshold": 0.0,
+   "ok": true,
+   "bottom_dL": -3.5,
+   "target": 10.0,
+   "note": "top-facing rim vs core; the bible asks for a top/rim light (target +10)"
+  },
+  "D_baseline": {
+   "value": 263,
+   "threshold": 263,
+   "ok": true
+  },
+  "E_density_1080_maxzoom": {
+   "value": 1.111,
+   "threshold": 1.0,
+   "ok": true
+  },
+  "E_density_960_minzoom": {
+   "value": 2.963,
+   "threshold": 4.5,
+   "ok": true
+  },
+  "F_cool_neutrals_b": {
+   "value": -5.36,
+   "threshold": -1.0,
+   "ok": true
+  },
+  "F_accent_dE_p90": {
+   "value": 12.3,
+   "threshold": 18.0,
+   "ok": true,
+   "n_sat": 1138
+  },
+  "G_noise_display": {
+   "value": 4.65,
+   "threshold": 6.0,
+   "ok": true
+  },
+  "G_hf_share": {
+   "value": 0.099,
+   "threshold": 0.3,
+   "ok": true
+  },
+  "H_lost_share": {
+   "value": 0.205,
+   "threshold": 0.35,
+   "ok": true,
+   "perimeter_px": 576
+  },
+  "H_contrast_median": {
+   "value": 1.76,
+   "threshold": 1.6,
+   "ok": true,
+   "share_ge_3": 0.297
+  }
+ },
+ "opaque_bbox": [
+  10,
+  23,
+  469,
+  263
+ ],
+ "opaque_fill_pct": 31.87,
+ "baseline_row": 263,
+ "density": {
+  "540p@z1.35": 2.963,
+  "720p@z1.35": 2.222,
+  "1080p@z1.35": 1.481,
+  "1440p@z1.35": 1.111,
+  "540p@z1.8": 2.222,
+  "720p@z1.8": 1.667,
+  "1080p@z1.8": 1.111,
+  "1440p@z1.8": 0.833
+ },
+ "L_med": 21.9,
+ "L_p99": 86.8,
+ "accent_share": 0.0284,
+ "noise_sigma_src": 4.48,
+ "display_size": [
+  432,
+  245
+ ],
+ "pass": true
+}

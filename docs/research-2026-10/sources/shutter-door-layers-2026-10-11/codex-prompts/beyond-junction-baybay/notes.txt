@@ -1,0 +1,16 @@
+File: beyond-junction-baybay.png
+Original generated file: [Codex generated-images store]/01a12d56-fa23-7a23-af02-067793898f3a/exec-a5267660-f0d7-406d-9945-efcda1a54d2b.png
+SHA256: 7f4c92aef23ab2343a3de0495f86130db3e2240b5cd7d02e8dc81c3d02c224e1
+Pixel size: 1024x1536
+Copy verification: cmp confirmed byte-for-byte identical.
+Exact image tool prompt:
+Edit the attached reference images to produce one NEW fully opaque portrait painting, exactly 1024x1536 pixels, for the view through a torn blast shutter in WOLF//OVERRIDE, a 2D side-view sci-fi horror game. Use Image 3 as the edit target for CAMERA AND COMPOSITION ONLY: looking straight into a deep space, eye level about 55% down, floor plane with near edge at bottom. Replace ALL of its warm switchgear hall content with a deeper view of the cool PIPE BAY in Image 1. Image 1 defines actual room architecture and hanging tank apparatus; ignore its text label, console, cyan/yellow floor markers, and black bottom band. Image 2 defines room plate painting style, detail level and rim lighting. Image 4 is palette reference only; never reproduce swatches.
+
+CONTENT: looking straight down the length of the same cool PIPE BAY. Both side walls have dark blue riveted steel panels, vertical pipes, tall X-braced steel pillars, and horizontal pipe runs with clamps receding into depth. In the mid-distance, a cylindrical steel tank with yellow-black hazard bands is held by a mechanical claw hanging from an overhead rail carriage, clearly like Image 1. Keep the central lower area open for walking. The floor is wet dark steel with grated walkway surfaces reflecting cold cyan light, one flat level plane receding straight inward, its near edge in the bottom 4% of the image. No steps, no drop, no railing across the path.
+
+STYLE: Look 2 art bible: clean graphic-painterly game art, flat large value planes, crisp readable silhouettes; painterly treatment only inside light pools. No fine grain, speckle or tiny scratches. NO dark outlines: edges defined by value and thin cyan-white rim light on top and back edges. Cold overhead strip light from above makes top surfaces lighter. Shadows cold blue-black, never brown or grey-beige. Steel cool blue-grey. Saturated colour only from practical lights and hazard paint. Darker and lower contrast than a foreground prop because this is seen through a doorway.
+
+LIGHT: cold cyan-white overhead strip lights, cool blue haze, one or two tiny red alarm lamps and a few tiny amber indicator dots only. NO warm light pools, NO orange or amber floor glow. Cold cyan reflections only on the floor.
+
+ABSOLUTE CONSTRAINTS: no text, letters, numbers, logos, labels, UI, watermarks, guide lines or borders. No magenta, no door frame, no people, no robots. Full canvas painting, fully opaque. Preserve all generated metadata including C2PA content credentials; do not strip metadata.
+

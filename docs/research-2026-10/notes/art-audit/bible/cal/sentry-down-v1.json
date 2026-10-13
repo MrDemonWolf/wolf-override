@@ -1,0 +1,125 @@
+{
+ "file": "[session scratch, not kept]/art-audit/bible/../../art/sentry/sentry-down.png",
+ "family": "sentry",
+ "size": [
+  1024,
+  768
+ ],
+ "checks": {
+  "A_alpha_body": {
+   "value": 0.0,
+   "threshold": 0.99,
+   "ok": false,
+   "max_alpha": 255
+  },
+  "B_holes_share": {
+   "value": 0.0185,
+   "threshold": 0.005,
+   "ok": false
+  },
+  "B_interior_band_rows": {
+   "value": 3,
+   "threshold": 3,
+   "ok": true,
+   "band_span": [
+    234,
+    236
+   ]
+  },
+  "B_edge_fade_rows": {
+   "value": 0,
+   "threshold": 6,
+   "ok": true,
+   "band_span": null,
+   "note": "soft fade at the top or bottom of the silhouette (baked contact shadow or wisps)"
+  },
+  "C_fringe_dark": {
+   "value": 0.1674,
+   "threshold": 0.1,
+   "ok": false,
+   "edge_px": 5037
+  },
+  "C_fringe_halo": {
+   "value": 0.079,
+   "threshold": 0.1,
+   "ok": true
+  },
+  "C_edge_chroma_shift": {
+   "value": 0.34,
+   "threshold": 4.0,
+   "ok": true,
+   "mean_da_db": [
+    0.09,
+    0.32
+   ]
+  },
+  "C_outline_dL": {
+   "value": -5.6,
+   "threshold": -8.0,
+   "ok": true,
+   "note": "median L* of the 1-3 px rim minus the core; strongly negative = dark outline"
+  },
+  "C_top_light_dL": {
+   "value": 11.0,
+   "threshold": 0.0,
+   "ok": true,
+   "bottom_dL": -11.8,
+   "target": 10.0,
+   "note": "top-facing rim vs core; the bible asks for a top/rim light (target +10)"
+  },
+  "E_density_1080_maxzoom": {
+   "value": 5.291,
+   "threshold": 1.0,
+   "ok": true
+  },
+  "E_density_960_minzoom": {
+   "value": 10.582,
+   "threshold": 4.5,
+   "ok": false
+  },
+  "F_cool_neutrals_b": {
+   "value": 0.94,
+   "threshold": -1.0,
+   "ok": false
+  },
+  "F_accent_dE_p90": {
+   "value": 19.6,
+   "threshold": 18.0,
+   "ok": false,
+   "n_sat": 9489
+  },
+  "G_noise_display": {
+   "value": 12.34,
+   "threshold": 6.0,
+   "ok": false
+  },
+  "G_hf_share": {
+   "value": 0.436,
+   "threshold": 0.3,
+   "ok": false
+  }
+ },
+ "opaque_bbox": [
+  34,
+  144,
+  989,
+  702
+ ],
+ "opaque_fill_pct": 43.0,
+ "baseline_row": 701,
+ "density": {
+  "540p@z1.35": 10.582,
+  "720p@z1.35": 7.937,
+  "1080p@z1.35": 5.291,
+  "1440p@z1.35": 3.968
+ },
+ "L_med": 15.4,
+ "L_p99": 80.5,
+ "accent_share": 0.0294,
+ "noise_sigma_src": 4.25,
+ "display_size": [
+  194,
+  145
+ ],
+ "pass": false
+}

@@ -1,6 +1,6 @@
 # Opening maintenance hatch (round 3), pulled 2026-10-11
 
-Private, git-ignored archive. Nothing here ships.
+Archive, tracked in the public repository since PR #48 (2026-10-11) by Nathanial's decision. Nothing here ships.
 
 ## What this is
 
@@ -13,8 +13,9 @@ and slipped into the duct before it shut.
   originals, byte for byte as the tool wrote them, C2PA content credentials (caBX chunk) intact.
   Made with the Codex built-in image generation tool (edit/reference mode), Codex session
   01a12cf0-6478-7731-aa2a-ce12cb405970 (archived afterwards). SHA-256 00ae3ff4591e389d... (closed)
-  and 323750bb50512fbe... (open). Prompts, the per-attempt log and review images stay in the
-  session scratchpad art notes (r3-art/raw/log.md).
+  and 323750bb50512fbe... (open). The exact prompts and the per-attempt log (every attempt's
+  file id, SHA-256, size and why it was rejected or selected) are in `generation-log.md`, imported
+  from the session scratch on 2026-10-12; the review images of the attempts were not kept.
 - `game-layers/opening-hatch-{frame,leaf,duct}.png`: the three aligned 640x387 layers the game
   used, cut from the originals by `prepare_opening_hatch.py` (kept here, reproduces them byte for
   byte from `art-source/`).
@@ -36,3 +37,10 @@ maintenance.").
 
 With the shutter doors (their own PR), at a spot that does not change the cage: not behind it.
 Recheck the cage pixel-for-pixel against main's opening when it returns.
+
+## Credits
+
+Game, story and every decision here: Nathanial Henniges. The hatch art was generated with Codex's
+built-in image tool (C2PA records inside the two `art-source/` PNGs; the attempts' file ids and
+SHA-256 values in `generation-log.md`); layering script, node and notes by Claude (Claude Code) and
+Codex agents working for him. No third-party material is used.

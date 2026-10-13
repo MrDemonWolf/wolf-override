@@ -1,0 +1,61 @@
+{
+ "engineer_box_1080p": [
+  759,
+  700,
+  987,
+  757
+ ],
+ "sentry_clearance": {
+  "before_scene_px": -7.0,
+  "after_scene_px": 12.0,
+  "after_world_px": 5.1
+ },
+ "blast-honest": {
+  "before": {
+   "eng_mean_rel_lum": 0.0222,
+   "eng_p95_rel_lum": 0.0565,
+   "eng_cyan_tint_share": 0.0,
+   "wolf_eye_most_saturated_rgb": [
+    115,
+    145,
+    148
+   ],
+   "wolf_eye_chroma": 33
+  },
+  "after": {
+   "eng_mean_rel_lum": 0.0243,
+   "eng_p95_rel_lum": 0.0661,
+   "eng_cyan_tint_share": 0.0131,
+   "wolf_eye_most_saturated_rgb": [
+    80,
+    203,
+    213
+   ],
+   "wolf_eye_chroma": 133
+  }
+ },
+ "sentry-pressed": {
+  "before": {
+   "eng_mean_rel_lum": 0.0249,
+   "eng_p95_rel_lum": 0.0697,
+   "eng_cyan_tint_share": 0.0009,
+   "wolf_eye_most_saturated_rgb": [
+    121,
+    151,
+    157
+   ],
+   "wolf_eye_chroma": 36
+  },
+  "after": {
+   "eng_mean_rel_lum": 0.0248,
+   "eng_p95_rel_lum": 0.0696,
+   "eng_cyan_tint_share": 0.0009,
+   "wolf_eye_most_saturated_rgb": [
+    82,
+    207,
+    222
+   ],
+   "wolf_eye_chroma": 140
+  }
+ }
+}

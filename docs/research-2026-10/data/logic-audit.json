@@ -1,7 +1,7 @@
 {
  "shots": {
-  "shots_dir": "/private/tmp/claude-501/-Users-nathanialhenniges-Developer-mrdemonwolf-wolf-override/eb713cd4-8931-48d7-8c83-5b0b0d1e9cf3/scratchpad/logic-audit/shots",
-  "log_json": "/private/tmp/claude-501/-Users-nathanialhenniges-Developer-mrdemonwolf-wolf-override/eb713cd4-8931-48d7-8c83-5b0b0d1e9cf3/scratchpad/logic-audit/logic-audit-log.json",
+  "shots_dir": "[session scratch, not kept]/logic-audit/shots",
+  "log_json": "[session scratch, not kept]/logic-audit/logic-audit-log.json",
   "routes": [
    {
     "name": "R1: disclose at the relay, WOLF reads the mirror, WOLF baits the sentry, tank hit, full clear, then Continue from the cleared save",
@@ -29,10 +29,10 @@
    }
   ],
   "contact_sheets": [
-   "/private/tmp/claude-501/-Users-nathanialhenniges-Developer-mrdemonwolf-wolf-override/eb713cd4-8931-48d7-8c83-5b0b0d1e9cf3/scratchpad/logic-audit/contact-sheets/R1-contact-sheet.png",
-   "/private/tmp/claude-501/-Users-nathanialhenniges-Developer-mrdemonwolf-wolf-override/eb713cd4-8931-48d7-8c83-5b0b0d1e9cf3/scratchpad/logic-audit/contact-sheets/R2-contact-sheet.png",
-   "/private/tmp/claude-501/-Users-nathanialhenniges-Developer-mrdemonwolf-wolf-override/eb713cd4-8931-48d7-8c83-5b0b0d1e9cf3/scratchpad/logic-audit/contact-sheets/R3-contact-sheet.png",
-   "/private/tmp/claude-501/-Users-nathanialhenniges-Developer-mrdemonwolf-wolf-override/eb713cd4-8931-48d7-8c83-5b0b0d1e9cf3/scratchpad/logic-audit/contact-sheets/R4-contact-sheet.png"
+   "[session scratch, not kept]/logic-audit/contact-sheets/R1-contact-sheet.png",
+   "[session scratch, not kept]/logic-audit/contact-sheets/R2-contact-sheet.png",
+   "[session scratch, not kept]/logic-audit/contact-sheets/R3-contact-sheet.png",
+   "[session scratch, not kept]/logic-audit/contact-sheets/R4-contact-sheet.png"
   ],
   "gaps": [
    "All requested R1, R2 and R3 steps were reached. Final runs logged no driver failures, and all three routes reach the title screen with Continue enabled.",

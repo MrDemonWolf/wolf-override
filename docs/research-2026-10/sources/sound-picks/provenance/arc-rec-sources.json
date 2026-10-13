@@ -1,0 +1,14 @@
+[
+ {"n": 1, "title": "Electric Buzz", "page": "https://opengameart.org/content/electric-buzz", "file": "https://opengameart.org/sites/default/files/buzz_0.ogg",
+  "author": "themightyglider (OpenGameArt submitter), from soundtracvkradio's Freesound recording 'electric effects_.wav'", "upstream": "https://freesound.org/people/soundtracvkradio/sounds/394679/",
+  "licence": "CC0 (OpenGameArt page: 'CC0'); upstream Freesound page: 'Creative Commons 0'", "sha256": "4427905b12e7dbd35613a45ab3cf6b74b10816888db3446b3acbadbe36829dd8",
+  "used": "crackle, buzz body and zap source in all three clips"},
+ {"n": 2, "title": "Sci-fi Sounds (1.0)", "page": "https://kenney.nl/assets/sci-fi-sounds", "file": "https://kenney.nl/media/pages/assets/sci-fi-sounds/6b296f9ecf-1677589334/kenney_sci-fi-sounds.zip",
+  "author": "Kenney (www.kenney.nl)", "licence": "Creative Commons CC0 (License.txt: 'License: (Creative Commons Zero, CC0) http://creativecommons.org/publicdomain/zero/1.0/ ... free to use in personal, educational and commercial projects')",
+  "sha256": "119340f351a5098ad814f78719438c0da355a9ce8a4c8a3af6a8d48aa3d49e04", "used": "Audio/forceField_000.ogg: a quiet swelling hum (300 Hz+ only) under the exit-bolt build"},
+ {"n": 3, "title": "50 CC0 Sci-Fi SFX", "page": "https://opengameart.org/content/50-cc0-sci-fi-sfx", "file": "https://opengameart.org/sites/default/files/sci-fi-sfx.zip",
+  "author": "rubberduck", "licence": "CC0 (OpenGameArt page)", "sha256": "7824c08e54b5b68d6c70ced9d8fe9e47f86ce19c1d8d47d093e1dc1b579f78ec",
+  "used": "misc_05.ogg (the snap on every clip), weird_05.ogg (sizzle tail on exit bolt and Records exit)"},
+ {"n": 4, "title": "Digital Audio", "page": "https://kenney.nl/assets/digital-audio", "author": "Kenney", "licence": "CC0", "sha256": "24e6ce28b76a6d8c89cff4d331e0965ff5c3de8a73c612028e9d363cc64e4f06",
+  "used": "downloaded and surveyed only; its zaps are tonal synth sweeps (95% energy 200-1000 Hz), not used"}
+]

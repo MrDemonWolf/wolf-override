@@ -1,0 +1,685 @@
+{
+ "research": {
+  "godot": {
+   "findings_markdown": "# 2.5D presentation techniques for WOLF//OVERRIDE on Godot 4.7 GL Compatibility\n\nRead-only research. No files were edited. All doc citations are the official 4.7 pages fetched today; where a page is silent on Compatibility I say so instead of guessing.\n\n## 1. What the project does today (baseline)\n\nSource: `apps/game/scripts/main.gd`, `scenes/main.tscn`, `project.godot`.\n\n- Renderer: `renderer/rendering_method=\"gl_compatibility\"` for desktop and mobile; viewport 960x540, `canvas_items` stretch; `textures/vram_compression/import_etc2_astc=true` but every PNG imports with `compress/mode=0` (Lossless) and `mipmaps/generate=false`, so no VRAM compression is actually in play.\n- Scene graph is flat: `Main` (Node2D) draws the room painting itself in `_draw()` via `draw_texture_rect(CORRIDOR_BACKGROUND, Rect2(0, 60, 960, 540))` (main.gd:158-160); `records_room.gd:57-59` does the same for the records plate. The 1672x941 paintings are stretched to 960x540 and move 1:1 with the world, so there is no parallax, no lighting, no CanvasModulate, no shaders, no particles, and no Parallax2D anywhere.\n- Layering already uses `z_index`: props 1, actors 2, intro gate 3, cage 4, WOLF pushed to 5 during the intro (main.tscn:112-171, main.gd:119-122, 293).\n- One `Camera2D` (`IntroCamera`) does all the work: gameplay zoom `GAMEPLAY_ZOOM = 1.18`, X clamped manually to `[half_view, 960 - half_view]` at fixed Y 330 (`_update_gameplay_camera`, main.gd:165-167), `position_smoothing_speed = 4.0`; intro uses zoom 1.8 -> 1.95 and a tweened pan; chapter close tweens to zoom 1.25 (main.gd:870-875). Camera travel in gameplay is only about 960 - 960/1.18 = ~146 px, which caps how much parallax can ever show in these rooms.\n- All UI lives on one `CanvasLayer` (default layer 1); the world canvas is below it. Status lights are `ColorRect`s, the relay spark is a `Line2D`.\n\n## 2. Renderer facts that constrain every choice (verified)\n\nFrom the renderers page (https://docs.godotengine.org/en/4.7/tutorials/rendering/renderers.html), Compatibility column:\n- \"2D rendering features\" - Yes. \"MSAA 2D\" - Not supported. \"2D HDR Viewport\" - Not supported. Compute shaders, particle trails, CompositorEffects, depth-of-field blur (3D), TAA/FXAA/SMAA, debanding - Not supported. Recommended when targeting \"older mobile devices, or older desktop devices\" and the only choice for web.\n- Compositor page: \"The compositor is currently a feature that is only supported by the Mobile and Forward+ renderers\" and \"Currently we only have access to the stages of the 3D rendering pipeline!\" (https://docs.godotengine.org/en/4.7/tutorials/rendering/compositor.html). So there is no engine post-processing stack for 2D on Compatibility; post effects must be CanvasItem shaders.\n- Environment glow: \"When using the Compatibility rendering method, glow uses a different implementation with some properties being unavailable... optimized to run on low-end devices\" (https://docs.godotengine.org/en/4.7/classes/class_environment.html), and 2D glow needs `use_hdr_2d` (\"enables effects like 2D glow\", https://docs.godotengine.org/en/4.7/classes/class_viewport.html) which Compatibility does not support. Fake glow must be additive sprites.\n- 2D lights and shadows page (https://docs.godotengine.org/en/4.7/tutorials/2d/2d_lights_and_shadows.html) contains no Compatibility restriction at all; 2D lights, shadows, CanvasModulate and CanvasTexture normal/specular maps are part of \"2D rendering features\". ProjectSettings exposes `rendering/2d/shadow_atlas/size` default 2048 and `rendering/2d/sdf/*` for all renderers (https://docs.godotengine.org/en/4.7/classes/class_projectsettings.html). Note the `rendering/limits/opengl/max_renderable_lights = 32` / `max_lights_per_object = 8` settings describe positional 3D lights (\"omnilights and spotlights\"), not Light2D; the docs publish no 2D light cap for Compatibility, so keep counts small by design.\n- GPUParticles2D runs on Compatibility except: \"emit_particle() is only supported on the Forward+ and Mobile rendering methods, not Compatibility\" and trails are unsupported (https://docs.godotengine.org/en/4.7/classes/class_gpuparticles2d.html, renderers page). CPUParticles2D notes GPUParticles2D \"may not run on older devices\" (https://docs.godotengine.org/en/4.7/classes/class_cpuparticles2d.html).\n- Screen-reading shaders work in 2D on every renderer: \"If a node uses hint_screen_texture, the entire screen is copied to the back buffer before drawing that node\"; only `hint_normal_roughness_texture` is \"Only supported in the Forward+ rendering method\" (https://docs.godotengine.org/en/4.7/tutorials/shaders/screen-reading_shaders.html). Blur via `textureLod` needs a `filter_*_mipmap` hint; the docs do not state whether Compatibility builds mipmaps for the 2D back buffer, so treat runtime screen blur as unverified on this renderer.\n- Mobile cost model (https://docs.godotengine.org/en/4.7/tutorials/performance/gpu_optimization.html): \"Overdraw occurs when the same pixel on the screen is being rendered more than once\"; \"Transparency is particularly expensive where multiple transparent objects overlap\"; \"most Android devices do not support texture compression of textures with transparency (only opaque)\". Import page (https://docs.godotengine.org/en/4.7/tutorials/assets_pipeline/importing_images.html): Lossless \"is the default and most common compression mode for 2D assets\"; VRAM Compressed \"should be avoided for 2D as it exhibits noticeable artifacts\"; mipmaps cost ~33% more memory; mobile/web \"usually can't display textures larger than 4096x4096\" (all current assets are below that).\n- Texture memory today: each 1672x941 plate is ~6.0 MiB RGBA8 in VRAM uncompressed, each 2172x724 prop sheet ~6.0 MiB; three character sheets are drawn at scale 0.047-0.073 (so they are ~14-21x larger than displayed) with mipmaps off, which the import docs flag as the graininess case mipmaps exist to fix. Whole scene is roughly 30-50 MiB of texture: fine for phones, but every new full-screen plate adds ~6 MiB and one full-screen fill per frame.\n\n## 3. Ranked techniques\n\nRanking weighs: effect on \"reads as 3D\", Compatibility support, mobile fill cost, and how much it fits the existing single-scene structure (rules: no scene-specific systems; presentation layers that apply to every room are fine).\n\n### Do now\n\n1. **Parallax2D plates (far / room / near)** - `Parallax2D.scroll_scale`, `scroll_offset`, `limit_begin/limit_end`, `follow_viewport` (https://docs.godotengine.org/en/4.7/classes/class_parallax2d.html, tutorial https://docs.godotengine.org/en/4.7/tutorials/2d/2d_parallax.html: scroll_scale \"values below 1 make layers appear distant (slower scrolling), while values above 1 make them appear closer\"). ParallaxBackground/ParallaxLayer are \"deprecated... Use the Parallax2D node instead\" (https://docs.godotengine.org/en/4.7/classes/class_parallaxbackground.html). Fit: move the two `draw_texture_rect` plates out of `_draw()` into `Parallax2D > Sprite2D` nodes (scroll_scale ~0.85-0.9) and add one near layer (scroll_scale ~1.15-1.25) with a dark pipe/cage silhouette strip and `z_index` above the actors. Because gameplay camera travel is only ~146 px, each plate shifts ~15-35 px; this is the honest ceiling unless rooms get wider or the camera gets look-ahead (item 3). Cost: one extra opaque full-screen fill per plate; keep to 3 plates on mobile. Art implication: the flat AI paintings must be split into at least a back plate and a foreground silhouette (two derived assets, each needing a manifest entry with source and rights). Zoom is always >= 1.18 here so the `repeat_times` zoom caveat does not apply; set `limit_begin/limit_end` so plates never show their edge at zoom 1.18.\n2. **CanvasModulate + a few PointLight2D (no shadows) with Tween flicker** - \"CanvasModulate is used to darken the scene by specifying a color that will act as the base 'ambient' color\"; PointLight2D \"shape is defined by a (usually grayscale) texture\", \"The texture's size determines the size of the light. The texture may have an alpha channel, which is useful when using Light2D's Mix blend mode\" (2D lights page; https://docs.godotengine.org/en/4.7/classes/class_pointlight2d.html, https://docs.godotengine.org/en/4.7/classes/class_light2d.html). Fit: one CanvasModulate on the world canvas (UI is on its own CanvasLayer, and \"CanvasLayers can be used to render things independently\" per https://docs.godotengine.org/en/4.7/classes/class_canvasmodulate.html, so the HUD stays untinted), 3-5 lights per room: breaker/relay status lights (tie `energy`/`color` to the existing status ColorRects), WOLF's blue core in the intro, exit glow. Flicker: `create_tween().set_loops()` on `energy`; tweens default to `TWEEN_PAUSE_BOUND` so they stop with the pause menu (https://docs.godotengine.org/en/4.7/classes/class_tween.html). Use a `GradientTexture2D` radial texture (built-in resource, no new asset). Cost: each light re-shades the pixels it covers for each lit CanvasItem; without normal maps `height` \"only makes a visible difference on surfaces that use normal mapping\", so skip it for now. Keep `shadow_enabled = false` in this pass.\n3. **Camera2D: limits, look-ahead offset, tiny push-ins** - `offset` is for \"looking around or camera shake animations\"; `limit_*` plus `limit_smoothed`; `drag_*_margin`; `position_smoothing_*` already in use (https://docs.godotengine.org/en/4.7/classes/class_camera2d.html). Fit: replace the manual clamp in `_update_gameplay_camera` with `limit_left/right`, add a 12-24 px look-ahead `offset` in the facing direction (tweened) and a 2-3% zoom push during station interactions. More camera travel directly amplifies item 1. Do not enable `snap_2d_transforms_to_pixel` (the Viewport docs say it fights \"smoother movement, particularly with Camera2D smoothing\"). Cost: none. Code-only; `tests/m0_scene_test.gd` may assert camera positions, so update with care.\n4. **Full-screen vignette + colour tint overlay on the UI CanvasLayer, as the first child (under HUD)** - A `ColorRect` with a CanvasItem shader that outputs an alpha-blended or multiplicative vignette/grade needs no `hint_screen_texture`, therefore no back-buffer copy: one translucent full-screen quad, the cheapest possible cinematic framing. Custom post-processing page confirms the CanvasLayer + ColorRect approach and `SCREEN_UV` (https://docs.godotengine.org/en/4.7/tutorials/shaders/custom_postprocessing.html). Placing it as the first child of the existing `CanvasLayer` keeps the HUD, pause menu and title crisp above it (draw order within a layer follows tree order) and needs no new CanvasLayer. Film grain with `TIME` can live in the same shader. Cost: one full-screen transparent fill; acceptable on mobile.\n5. **Asset pipeline hygiene for the existing AI art (no new generation)** - Downsample the three character sheets to roughly 2x display size (or enable `mipmaps/generate` on them: \"prevent graininess when scaling down\", +33% memory) so sprites stop shimmering; keep plates Lossless (import docs); keep everything under 4096 px; split the plates into layers for item 1. Each resized/derived file is a changed asset and needs its `assets/manifest.json` entry updated with source and rights. Cost: reduces VRAM and bandwidth.\n6. **CPUParticles2D dust motes / sparks** - CPU particles run everywhere; a few dozen slow motes in the light cones and a short spark burst on the relay reads strongly as volume. GPUParticles2D also works on Compatibility except `emit_particle()` and trails, but for <100 particles CPU is simpler and behaves identically headless. Cost: negligible; use `CanvasItemMaterial` additive blend for sparks.\n\n### Later\n\n7. **Floor reflections by mirrored sprite** - A second `Sprite2D` per actor with `flip_v`, `scale.y` ~ -0.35 under the feet, `modulate.a` ~0.25 and a small CanvasItem shader (or `GradientTexture2D` mask via `clip_children` on CanvasItem) that fades alpha with UV.y. Pure sprite drawing, works on every renderer. \"Later\" only because `m0_actor.gd` draws the body with a custom `_draw()`/sprite offset and the floor in the paintings is matte; test on a still first. Avoid the screen-texture version (one back-buffer copy per frame for a subtle effect).\n8. **LightOccluder2D hard shadows from cage/props** - `shadow_enabled`, `SHADOW_FILTER_NONE` \"fastest to render\", PCF5 \"slower\", PCF13 \"slowest... should be used sparingly\" (Light2D page); `occluder_light_mask`, `sdf_collision` (https://docs.godotengine.org/en/4.7/classes/class_lightoccluder2d.html); atlas via `rendering/2d/shadow_atlas/size` (2048 default). Strong on the containment-cage intro (WOLF's blue light through bars). Hold until lights exist and the painted plates' baked shadows are checked for conflicts; cap at 1-2 shadow-casting lights, `NONE` or `PCF5` on mobile.\n9. **Normal/specular maps on props via CanvasTexture** - \"allows using normal maps and specular maps in any node that inherits from CanvasItem\"; \"Godot expects the normal map to use X+, Y+, and Z+\"; `specular_shininess` for a \"wet\" look (https://docs.godotengine.org/en/4.7/classes/class_canvastexture.html); generate with Laigter per the lights tutorial, then raise light `height`. Doubles texture memory per sheet and the AI paintings have baked lighting that will fight it; worth it only for the prop sheets (breaker/relay/checkpoint) and only after item 2 lands. Derived maps need manifest provenance.\n10. **Screen-reading colour grade (LUT) via hint_screen_texture** - Works on Compatibility; costs one full-screen back-buffer copy plus a full-screen pass per frame. Use `BackBufferCopy` with `COPY_MODE_VIEWPORT` if two screen-reading nodes ever overlap (\"the second one will not use the result of the first one\", screen-reading page; https://docs.godotengine.org/en/4.7/classes/class_backbuffercopy.html). Prefer item 4's overlay until a grade is actually needed.\n11. **CanvasLayer `follow_viewport_enabled` + `follow_viewport_scale`** - Doc-endorsed \"pseudo-3D effects, with increasing scales for foreground layers and decreasing scales for background layers\" (https://docs.godotengine.org/en/4.7/classes/class_canvaslayer.html). Alternative to Parallax2D for whole-layer scaling; Parallax2D is simpler and keeps lights on one canvas (lights and CanvasModulate do not reach other canvases), so only use this if a layer must be outside the lit canvas.\n12. **Depth-of-field on the near layer** - Pre-blur the foreground silhouette in the art tool (free at runtime, just another plate) rather than a runtime screen blur; Compatibility has no engine DoF and back-buffer mipmap blur is undocumented for it.\n\n### Avoid for this project\n\n13. **Environment glow / HDR 2D for bloom** - needs \"2D HDR Viewport\", unsupported on Compatibility; Compatibility's glow is a reduced 3D path. Use additive sprites: \"Additive sprites are much faster to render, since they don't need to go through a separate rendering pipeline\" (lights page).\n14. **MSAA 2D for smoother Line2D/polygons** - \"MSAA 2D: Not supported\" on Compatibility; use `Line2D.antialiased`/textured lines instead for the relay spark.\n15. **CompositorEffects / compute-based post** - Mobile/Forward+ and 3D only.\n16. **Runtime screen-texture blur or reflections on mobile** - extra full-screen copies and overlapping transparency, the exact cost the GPU optimization page warns about, for subtle gains.\n17. **`y_sort_enabled`** - correct tool for top-down depth (\"higher Y position are rendered in front\", https://docs.godotengine.org/en/4.7/classes/class_canvasitem.html) but a side-view corridor is already ordered by explicit `z_index`; adding Y-sort would reorder WOLF/human unpredictably.\n18. **GPUParticles2D `emit_particle()` or trails** - unsupported on Compatibility; design effects without them.\n\n## 4. Mobile budget to hold while doing the above\n\nBase viewport 960x540 scales to native phone resolution with `canvas_items`, so every full-screen layer is a native-resolution fill. Suggested caps: 3 opaque parallax plates + 1 translucent overlay (item 4) + at most 1 screen-reading pass (item 10, if ever); 3-5 PointLight2D per room, 0-2 with shadows, no PCF13; particles under ~100 CPU particles; keep plates Lossless and under 4096 px; add mipmaps only to sheets drawn well below 50% scale. Measure on a device before claiming anything about frame rate: rendered stills prove appearance only.\n\n## 5. Notes on evidence quality\n\n- Pages that 404'd: `tutorials/performance/optimizing_for_mobile.html` (replaced by the GPU optimization page) and the old `contributing/.../internal_rendering_architecture.html` (found at `engine_details/architecture/internal_rendering_architecture.html`, which confirms \"All rendering methods feature 2D batching\" and that a 2D SDF for LightOccluder2D is generated on demand).\n- Unverified from docs: whether Compatibility generates mipmaps for the 2D back buffer (needed for `textureLod` blur); any numeric cap on Light2D count on Compatibility. Both are flagged in the ranking rather than assumed.\n- Nothing here has been played; all \"effect\" judgments are about what the techniques render, not about feel or readability.",
+   "techniques": [
+    {
+     "name": "Parallax2D depth plates (back plate, room, near silhouette)",
+     "api": "Parallax2D.scroll_scale / scroll_offset / limit_begin / limit_end / follow_viewport; Sprite2D children; ParallaxBackground is deprecated",
+     "compatibility_renderer": "Supported (plain CanvasItem drawing; 2D rendering features: Yes on Compatibility). https://docs.godotengine.org/en/4.7/classes/class_parallax2d.html, https://docs.godotengine.org/en/4.7/tutorials/2d/2d_parallax.html, https://docs.godotengine.org/en/4.7/tutorials/rendering/renderers.html",
+     "cost": "One extra opaque full-screen fill and ~6 MiB VRAM per 1672x941 plate; cap at 3 plates on mobile. Requires splitting the existing AI paintings into 2-3 layered assets (manifest entries).",
+     "effect": "The single biggest 2.5D cue; limited here by ~146 px of gameplay camera travel (plates shift 15-35 px), so pair with camera look-ahead.",
+     "recommendation": "do-now"
+    },
+    {
+     "name": "Ambient darkness plus a few PointLight2D with Tween flicker",
+     "api": "CanvasModulate.color; PointLight2D.texture (GradientTexture2D), energy, color, blend_mode ADD/MIX, texture_scale; Tween.set_loops on energy",
+     "compatibility_renderer": "Supported; the 2D lights page has no Compatibility restriction. https://docs.godotengine.org/en/4.7/tutorials/2d/2d_lights_and_shadows.html, https://docs.godotengine.org/en/4.7/classes/class_light2d.html, https://docs.godotengine.org/en/4.7/classes/class_canvasmodulate.html",
+     "cost": "Each light re-shades the pixels it covers for every lit item; 3-5 lights per room is cheap. No shadows in this pass. UI on its own CanvasLayer stays untinted.",
+     "effect": "Pools of light, status glow tied to breaker/relay state, WOLF's blue core; sells volume and the dark painterly horror brief.",
+     "recommendation": "do-now"
+    },
+    {
+     "name": "Camera2D limits, look-ahead offset and small zoom push-ins",
+     "api": "Camera2D.limit_left/right, limit_smoothed, offset, zoom, drag margins, position_smoothing_enabled/speed",
+     "compatibility_renderer": "Renderer-independent. https://docs.godotengine.org/en/4.7/classes/class_camera2d.html",
+     "cost": "Zero GPU cost; code-only in main.gd _update_gameplay_camera; scene tests may assert camera positions.",
+     "effect": "More camera travel amplifies parallax; subtle push-ins at stations read cinematic. Do not enable snap_2d_transforms_to_pixel with smoothing.",
+     "recommendation": "do-now"
+    },
+    {
+     "name": "Vignette, tint and grain overlay (non-screen-reading shader)",
+     "api": "ColorRect + ShaderMaterial (canvas_item shader using SCREEN_UV/TIME, alpha or multiply blend) as first child of the existing UI CanvasLayer",
+     "compatibility_renderer": "Supported; no hint_screen_texture so no back-buffer copy. https://docs.godotengine.org/en/4.7/tutorials/shaders/custom_postprocessing.html, https://docs.godotengine.org/en/4.7/tutorials/shaders/shader_reference/canvas_item_shader.html",
+     "cost": "One translucent full-screen fill per frame; fine on mobile.",
+     "effect": "Cinematic framing and unified palette across every room; HUD stays crisp above it.",
+     "recommendation": "do-now"
+    },
+    {
+     "name": "Asset hygiene for existing AI art (downsample/mipmap sprites, split plates, keep Lossless)",
+     "api": "Texture import: compress/mode Lossless, mipmaps/generate, process/size_limit; assets/manifest.json provenance",
+     "compatibility_renderer": "Renderer-independent. https://docs.godotengine.org/en/4.7/tutorials/assets_pipeline/importing_images.html, https://docs.godotengine.org/en/4.7/tutorials/performance/gpu_optimization.html",
+     "cost": "Reduces VRAM/bandwidth; mipmaps add ~33% per texture if used instead of resizing.",
+     "effect": "Removes shimmer on sprites drawn at 5-7% scale; enables the layered plates parallax needs.",
+     "recommendation": "do-now"
+    },
+    {
+     "name": "CPUParticles2D dust motes and relay sparks",
+     "api": "CPUParticles2D (or GPUParticles2D without emit_particle/trails), CanvasItemMaterial additive blend",
+     "compatibility_renderer": "CPUParticles2D fully supported; GPUParticles2D supported except emit_particle() and trails. https://docs.godotengine.org/en/4.7/classes/class_cpuparticles2d.html, https://docs.godotengine.org/en/4.7/classes/class_gpuparticles2d.html",
+     "cost": "Negligible under ~100 particles.",
+     "effect": "Air in the light cones and a spark hit on the relay read as physical space.",
+     "recommendation": "do-now"
+    },
+    {
+     "name": "Floor reflections via mirrored sprites with gradient alpha",
+     "api": "Second Sprite2D with flip_v, negative scale.y, modulate.a, UV-faded shader or clip_children mask",
+     "compatibility_renderer": "Supported (ordinary sprites). https://docs.godotengine.org/en/4.7/classes/class_canvasitem.html",
+     "cost": "One extra translucent sprite per actor.",
+     "effect": "Grounds characters on the floor plane; strongest on glossy floors. Check against painted matte floors on a still first.",
+     "recommendation": "later"
+    },
+    {
+     "name": "LightOccluder2D hard shadows from cage and props",
+     "api": "Light2D.shadow_enabled, shadow_filter NONE/PCF5, shadow_item_cull_mask; LightOccluder2D + OccluderPolygon2D; rendering/2d/shadow_atlas/size",
+     "compatibility_renderer": "Supported (2D shadow atlas setting applies to all renderers; no Compatibility exclusion documented). https://docs.godotengine.org/en/4.7/classes/class_lightoccluder2d.html, https://docs.godotengine.org/en/4.7/classes/class_projectsettings.html",
+     "cost": "Per shadow-casting light; NONE fastest, PCF13 'should be used sparingly'. Cap at 1-2 casters on mobile.",
+     "effect": "Cage-bar shadows in the intro are a strong 3D cue; may conflict with baked shadows in the paintings.",
+     "recommendation": "later"
+    },
+    {
+     "name": "Normal and specular maps on prop sheets via CanvasTexture",
+     "api": "CanvasTexture.normal_texture / specular_texture / specular_shininess; PointLight2D.height, DirectionalLight2D.height",
+     "compatibility_renderer": "Supported (CanvasTexture works on any CanvasItem). https://docs.godotengine.org/en/4.7/classes/class_canvastexture.html, https://docs.godotengine.org/en/4.7/classes/class_pointlight2d.html",
+     "cost": "Doubles texture memory per sheet; needs generated maps (Laigter) with manifest provenance.",
+     "effect": "Lit relief on breaker/relay/checkpoint props; painted plates have baked lighting that may fight it.",
+     "recommendation": "later"
+    },
+    {
+     "name": "Screen-reading colour grade (LUT) and multi-pass effects",
+     "api": "sampler2D with hint_screen_texture, SCREEN_UV; BackBufferCopy COPY_MODE_VIEWPORT for overlapping readers",
+     "compatibility_renderer": "Supported; only hint_normal_roughness_texture is Forward+-only. Back-buffer mipmap blur on Compatibility is not documented. https://docs.godotengine.org/en/4.7/tutorials/shaders/screen-reading_shaders.html, https://docs.godotengine.org/en/4.7/classes/class_backbuffercopy.html",
+     "cost": "One full-screen back-buffer copy plus a full-screen pass per frame.",
+     "effect": "True grading; prefer the cheaper overlay until a LUT is needed.",
+     "recommendation": "later"
+    },
+    {
+     "name": "CanvasLayer follow_viewport pseudo-3D scaling",
+     "api": "CanvasLayer.follow_viewport_enabled, follow_viewport_scale",
+     "compatibility_renderer": "Supported. https://docs.godotengine.org/en/4.7/classes/class_canvaslayer.html",
+     "cost": "Same as extra plates; lights/CanvasModulate do not cross canvases.",
+     "effect": "Doc-endorsed pseudo-3D layer scaling; Parallax2D is simpler and keeps everything lit on one canvas.",
+     "recommendation": "later"
+    },
+    {
+     "name": "Depth-of-field on the near layer",
+     "api": "Pre-blurred foreground plate (art-side); runtime screen blur not recommended",
+     "compatibility_renderer": "Pre-blur is renderer-independent; engine DoF is 3D-only and 'Not supported' on Compatibility. https://docs.godotengine.org/en/4.7/tutorials/rendering/renderers.html",
+     "cost": "Free at runtime when baked into the plate.",
+     "effect": "Soft near silhouettes sell camera focus depth.",
+     "recommendation": "later"
+    },
+    {
+     "name": "Environment glow / HDR 2D bloom",
+     "api": "Viewport.use_hdr_2d, Environment.glow_*",
+     "compatibility_renderer": "2D HDR Viewport: Not supported on Compatibility; glow uses a reduced implementation. https://docs.godotengine.org/en/4.7/tutorials/rendering/renderers.html, https://docs.godotengine.org/en/4.7/classes/class_environment.html",
+     "cost": "n/a",
+     "effect": "Use additive sprites instead for glow.",
+     "recommendation": "avoid"
+    },
+    {
+     "name": "MSAA 2D for smoother Line2D/polygons",
+     "api": "Viewport.msaa_2d",
+     "compatibility_renderer": "Not supported on Compatibility. https://docs.godotengine.org/en/4.7/tutorials/rendering/renderers.html",
+     "cost": "n/a",
+     "effect": "Use Line2D.antialiased or textured lines for the relay spark.",
+     "recommendation": "avoid"
+    },
+    {
+     "name": "CompositorEffects / compute post-processing",
+     "api": "Compositor, CompositorEffect",
+     "compatibility_renderer": "Mobile and Forward+ only, and 3D pipeline stages only. https://docs.godotengine.org/en/4.7/tutorials/rendering/compositor.html",
+     "cost": "n/a",
+     "effect": "Not applicable to this 2D Compatibility project.",
+     "recommendation": "avoid"
+    },
+    {
+     "name": "Runtime screen-texture reflections or blur on mobile",
+     "api": "hint_screen_texture with textureLod / mirrored sampling",
+     "compatibility_renderer": "Technically runs, but mipmap blur on Compatibility is undocumented and it adds full-screen copies. https://docs.godotengine.org/en/4.7/tutorials/shaders/screen-reading_shaders.html, https://docs.godotengine.org/en/4.7/tutorials/performance/gpu_optimization.html",
+     "cost": "Extra full-screen copies plus overlapping transparency, the costs the GPU optimization page warns about.",
+     "effect": "Subtle gain for a high mobile cost; mirrored sprites do the job.",
+     "recommendation": "avoid"
+    },
+    {
+     "name": "Y-sort for depth ordering",
+     "api": "CanvasItem.y_sort_enabled",
+     "compatibility_renderer": "Supported but inappropriate for a side view. https://docs.godotengine.org/en/4.7/classes/class_canvasitem.html",
+     "cost": "None",
+     "effect": "Would reorder WOLF/human by feet Y; explicit z_index already does the right thing.",
+     "recommendation": "avoid"
+    },
+    {
+     "name": "GPUParticles2D emit_particle() and trails",
+     "api": "GPUParticles2D.emit_particle, trail_enabled",
+     "compatibility_renderer": "emit_particle 'only supported on the Forward+ and Mobile rendering methods, not Compatibility'; particle trails Not supported. https://docs.godotengine.org/en/4.7/classes/class_gpuparticles2d.html",
+     "cost": "n/a",
+     "effect": "Design effects without them.",
+     "recommendation": "avoid"
+    }
+   ],
+   "sources": [
+    "https://docs.godotengine.org/en/4.7/tutorials/rendering/renderers.html",
+    "https://docs.godotengine.org/en/4.7/classes/class_parallax2d.html",
+    "https://docs.godotengine.org/en/4.7/classes/class_parallaxbackground.html",
+    "https://docs.godotengine.org/en/4.7/tutorials/2d/2d_parallax.html",
+    "https://docs.godotengine.org/en/4.7/tutorials/2d/2d_lights_and_shadows.html",
+    "https://docs.godotengine.org/en/4.7/classes/class_light2d.html",
+    "https://docs.godotengine.org/en/4.7/classes/class_pointlight2d.html",
+    "https://docs.godotengine.org/en/4.7/classes/class_directionallight2d.html",
+    "https://docs.godotengine.org/en/4.7/classes/class_lightoccluder2d.html",
+    "https://docs.godotengine.org/en/4.7/classes/class_canvasmodulate.html",
+    "https://docs.godotengine.org/en/4.7/classes/class_canvastexture.html",
+    "https://docs.godotengine.org/en/4.7/classes/class_camera2d.html",
+    "https://docs.godotengine.org/en/4.7/classes/class_canvasitem.html",
+    "https://docs.godotengine.org/en/4.7/classes/class_canvaslayer.html",
+    "https://docs.godotengine.org/en/4.7/classes/class_viewport.html",
+    "https://docs.godotengine.org/en/4.7/classes/class_environment.html",
+    "https://docs.godotengine.org/en/4.7/classes/class_gpuparticles2d.html",
+    "https://docs.godotengine.org/en/4.7/classes/class_cpuparticles2d.html",
+    "https://docs.godotengine.org/en/4.7/classes/class_backbuffercopy.html",
+    "https://docs.godotengine.org/en/4.7/classes/class_tween.html",
+    "https://docs.godotengine.org/en/4.7/classes/class_projectsettings.html",
+    "https://docs.godotengine.org/en/4.7/tutorials/shaders/screen-reading_shaders.html",
+    "https://docs.godotengine.org/en/4.7/tutorials/shaders/custom_postprocessing.html",
+    "https://docs.godotengine.org/en/4.7/tutorials/shaders/advanced_postprocessing.html",
+    "https://docs.godotengine.org/en/4.7/tutorials/shaders/shader_reference/canvas_item_shader.html",
+    "https://docs.godotengine.org/en/4.7/tutorials/shaders/shader_reference/shading_language.html",
+    "https://docs.godotengine.org/en/4.7/tutorials/rendering/compositor.html",
+    "https://docs.godotengine.org/en/4.7/tutorials/performance/gpu_optimization.html",
+    "https://docs.godotengine.org/en/4.7/tutorials/assets_pipeline/importing_images.html",
+    "https://docs.godotengine.org/en/4.7/engine_details/architecture/internal_rendering_architecture.html",
+    "apps/game/scripts/main.gd",
+    "apps/game/scripts/records_room.gd",
+    "apps/game/scenes/main.tscn",
+    "apps/game/project.godot",
+    "apps/game/assets/maintenance-corridor-background-provisional.png.import"
+   ]
+  },
+  "refs": {
+   "findings_markdown": "# Research: depth in 2D side-scrollers and a dimensional UI spec for WOLF//OVERRIDE\n\nRead-only pass. No files were edited. Everything below is grounded in the fetched sources listed at the end and in the current worktree (`apps/game/scenes/main.tscn`, `scripts/main.gd`, `scripts/game_settings.gd`, `assets/fonts/game_theme.tres`, `tests/ui_controls_test.gd`). Appearance judgements come from the baseline stills in `scratchpad/evidence/game-p3/`; no hands-on play happened, so nothing here claims feel or readability was validated.\n\n## 0. Things found in the repo that shape the spec\n\n- **Baseline in-world stills are not clean.** The JSON dumps show `paused: true` for 12-*, 20-*, 21-*, 22, 23, 30-*, 31-*, 32, 33 (the focus-loss auto-pause in `main.gd:597-601` fired during capture) and `title_open: true` for 34-37 and 50-records-entry. So the only usable appearance evidence today is the title, settings and pause frames; the corridor and Records Access are only visible dimmed behind the pause card. A presentation pass needs to fix capture (keep the window focused, or have `capture.gd` resume after focus loss outside deliberate pause shots - its `allow_pause` guard at line 248 is not catching these) before it can show before/after for rooms.\n- **Current UI construction** (what the spec replaces): HUD, dialogue, context hint, tutorial prompt and the pause card are plain `ColorRect`s with a 3-4 px cyan accent strip (`main.tscn` TopBar 18,16-466,78; BottomBar 34,444-926,526; ContextHint 253,405-802,440; TutorialPrompt 300,96-616,162; PauseOverlay/Panel 255,78-705,467). Buttons get one `StyleBoxFlat` per state built in `main.gd:387-407` (bg `#0a203680`, 2 px `#52c6e8` border, radius 6) and settings builds its own `Theme` in `game_settings.gd:280-330` (bg `#182f40`, 1 px `#345366` border, radius 2, margins 12/8). The title buttons use the default theme styleboxes (grey fill in `01-title-fresh.png`). No shadow, gradient, skew, light or parallax exists anywhere; backgrounds are single flat 1672x941 paintings and props are region-cut `Sprite2D`s from 2172x724 sheets.\n- **Test contract to keep** (`tests/ui_controls_test.gd:23-36`): project-theme `Button/focus` must be a `StyleBoxFlat` with `border_color #8de5f5`, `border_width_left == 2`, `expand_margin_left == 0`, `bg_color.a == 0`; `TabBar/tab_focus` keeps `border_width 2` and `expand_margin_left == -4`; pause-menu buttons' `focus` must have `bg_color.a == 1` and a border wider than their `normal` border, and the test casts `normal` to `StyleBoxFlat`. Consequence: per-state button styles must stay `StyleBoxFlat` (a `StyleBoxTexture` normal would make the cast return null and crash the assertion). Shadow, skew, `border_blend`, corner radii and `content_margin_*` are not asserted, so depth can be added inside those styleboxes without touching the tests.\n- **Renderer limits** (GL Compatibility on desktop and mobile): no 2D HDR viewport and no 2D MSAA (Godot renderers page), so engine glow/bloom is not available for the UI or the world; glow has to be faked with additive sprites or stylebox shadows. 2D lights work, but community reports put a hard cap of about 15 `PointLight2D`s per object in Compatibility. `hint_screen_texture` with mipmaps works in canvas shaders (blur for a frosted pause backdrop) and `BackBufferCopy` is needed if two such shaders overlap. `Parallax2D` exists from 4.3, so it is available in this 4.7.2 project. Use `CPUParticles2D`, not GPU particles, to stay safe on every target (the 4.3 notes call Compatibility feature-complete but do not spell out GPUParticles2D).\n- **Palette contrast (WCAG, computed):** `#edf5f7` on `#080f1b` 17.4:1, on `#101e2c` 15.3:1, on hover `#174461` 9.3:1, on `#234859` 8.9:1; `#8be3ff` on `#101e2c` 11.7:1, on `#174461` 7.1:1; `#73ddf5` on `#101e2c` 10.8:1; `#080f1b` on `#73ddf5` 12.2:1 (navy text on a filled primary button); amber `#f3ae4b` on `#101e2c` 8.8:1; green `#a4f0c4` on `#101e2c` 12.7:1; focus ring `#8de5f5` against `#0a2036` 11.5:1, against `#174461` 7.2:1, against `#234859` 6.8:1 (non-text minimum is 3:1); disabled text `#7f93a2` on `#101e2c` 5.3:1 (still AA); the **current settings border `#345366` on `#182f40` is 1.7:1 and `#416779` on `#0b1b29` is 2.9:1**, both under the 3:1 non-text floor - the borders are too faint to carry any depth; `#3f7590` on `#101e2c` is about 3.3:1 and is the proposed border colour.\n\n## 1. How acclaimed 2D side-scrollers make flat art read as deep space\n\nWhat the sources actually say (only claims the fetched pages support):\n\n- **Ori and the Blind Forest** - Moon Studios and Airborn describe \"a layered painterly look that has depth to it and doesn't look as flat as 2D games often do\"; work started from black-and-white silhouette block-outs, then over 7,000 hand-painted graphics (90+ tree graphics with leaf/branch variants) were combined so \"we can give each graphic different lighting, color, and movement sets\". Ori is deliberately small on screen so \"you can see further ahead, and have more time to react\" and to convey insignificance in a huge world.\n- **Hollow Knight** - Team Cherry's Unity case study: hand-drawn PNGs \"layered in a 3D environment\", lighting handled \"with soft transparent shapes\" rather than a lighting system, plus the particle system; the 80.lv Silksong piece confirms \"the world ... is actually composed of multiple layers\" producing the parallax effect.\n- **Dead Cells** - Motion Twin (80.lv): pixel backgrounds converted to normal maps so \"a torch on the left of a statue will light up the statue from the correct direction while respecting its base colours\", which lets them re-light a biome without redrawing; \"lots of particles, an emphasis on motion and special effects, a 3D lighting system, and lots of shaders\"; art direction pillars are a saturated palette, Celtic architecture and alchemy, and Gwena\u00ebl Mass\u00e9's deep dive argues saturated backgrounds and characters keep \"the attention of the eye to any new element appearing on the screen\".\n- **INSIDE / Limbo** - Playdead's GDC session: \"local shadowed volumetrics\", lighting authored as separate diffuse, specular and bounce-light entities, analytic primitive-based ambient occlusion, screen-space reflections used \"to establish a sense of depth\", and dithering \"to get rid of distracting artifacts\" (colour banding) - all in service of minimal colour.\n- **Trine 2** - Frozenbyte (PCGH interview): deferred renderer with \"50 to 100 visible dynamic lights\" per scene, plus depth of field, screen-space reflections, wrap light, bloom and colour correction; \"our renderer allows artists to use many dynamic lights per frame\".\n- **Rayman Legends** - UbiArt lets artists work \"without thinking about polygons or textures or sizes\" (GDC Vault, Chris McEntee).\n- **Little Nightmares** - fixed 2.5D side-on camera, with towering scale making the player \"feel every bit as tiny as Six truly is\" and a single warm key (the Zippo / yellow raincoat) cutting \"through the gloom\"; off-screen audio cues matter because the camera does not show everything (Unreal interview, fetch blocked; summary via search).\n- **Katana ZERO** - neon lighting was used deliberately to \"blend the artists' different styles\"; VHS grain; Sin City / John Wick as references.\n- **Signalis** - a \"minimalist colour palette, modern effects and a dash of anime\" over PS1-era graphics (DCP jury), dark grey/brown base with sharp red reserved for cutscenes.\n- **Blasphemous** - interviews reached only cover influences (Goya, Murillo, Vel\u00e1zquez; Castlevania, Souls), not technique; not used for rules.\n\n### Transferable rules for a 960x540 painterly military sci-fi corridor\n\n1. **Five planes, not one painting.** Far (the existing painting, scroll 0.85), mid (machinery/props, 0.95), play plane (actors and stations, 1.0), near foreground (pipes, rails, grates cut from the props sheet, 1.2-1.3), and an atmosphere plane (fog/shafts) between far and mid. Hollow Knight and Silksong are literally \"multiple layers\"; Ori's depth comes from layered painted graphics. On single-screen rooms the parallax only shows during the intro camera moves (pan 300 to 576, zoom 1.95 to 1.25) and future follow-camera moves, which is fine: those are the moments where depth is noticed.\n2. **Value structure by plane.** Highest contrast and saturation on the play plane and interactables (Dead Cells' saturation-draws-the-eye rule), lower contrast and cooler tint on far planes (atmospheric perspective: modulate the far layer towards `#0d1b2a`, about `Color(0.78, 0.86, 0.95)`), near silhouettes nearly black (`#050a12` at 0.85-0.95 alpha).\n3. **Few lights, strong direction.** Author 2-4 light sources per room matching what the painting already shows (cold overhead lamp, cyan door light, amber breaker/relay) and make every added effect agree with them - the Dead Cells normal-map point is about light direction consistency; Hollow Knight shows soft additive shapes are enough. Keep real `PointLight2D`s under ~8 per room given the Compatibility cap.\n4. **Light shafts and fog as the atmosphere plane.** Two or three elongated, skewed additive gradients at 8-15% alpha with a 6-10 s alpha drift (INSIDE's volumetrics in cheap form), plus a flat fog gradient at 15-25% over the far plane.\n5. **Foreground silhouettes frame, never block.** Place dark, slightly blurred (lower-resolution region) cutouts at the screen edges and along the bottom; never over the actor path, stations, labels or the choice buttons. Ori's lesson: the player must see ahead.\n6. **Particles sell air.** 30-60 slow dust motes (1-2 px, 4-10 px/s, 0.15-0.3 alpha, additive) across the whole room; a handful of warm embers near the breaker when armed. Dead Cells and Hollow Knight both lean on particle systems.\n7. **Reflections anchor the floor.** A flipped, squashed, cyan-tinted copy of the actors at ~0.18 alpha fading downward reads as a wet deck and ties the sprites to the ground (INSIDE's SSR \"to establish a sense of depth\"; the title key art already paints a wet floor).\n8. **Camera as a depth instrument.** Smooth follow with look-ahead and room limits, a small zoom-in (1.0 to 1.06-1.08, 0.5 s cubic ease-out) when dialogue or a choice opens, zoom-out to show the route; Ori's \"small character, more reaction time\" argues against a tight zoom during movement. Feel must be validated by play; this is the one rule that cannot be judged from stills.\n9. **One cold base, one warm accent, red reserved.** Navy/teal world light with amber only for warnings and armed states, red only for alarm/story beats (Signalis' red; Returnal's teal from CRT and night-vision gear). Match UI cyan to the world's door/lamp cyan so the HUD looks lit by the same room.\n10. **Grain hides banding.** Large soft gradients on 8-bit Compatibility output band; a 3-5% animated noise overlay (INSIDE's dithering, Alien: Isolation's VHS) hides it and adds film texture. Keep it under the UI layer.\n11. **Vignette for lens depth.** A radial darkening (transparent centre to `#02060c` at 0.5-0.6 at the corners) between the world and the HUD.\n12. **Regenerate AI art as layers, not paintings.** Ask the image tool for separate far wall / mid machinery / foreground pipes with alpha, a stated light rig (overhead cold lamp left, cyan door glow, amber panel), lower contrast in the far plane, a clean floor band for reflections, and 1920x1080-plus resolution so the 1080p stills stop softening (the current 1672x941 paintings are displayed at 0.574x at 960 and upscaled at 1080p). Every regenerated file keeps its provisional manifest entry with source, terms and rights status.\n\n## 2. Dimensional, non-terminal menu and HUD design\n\nWhat the references give:\n\n- **Dead Space** - Dino Ignacio's goal was to \"remove a wall of safety between the player and the game\"; the remake keeps turquoise on interactables and \"a glowing light\" on everything of interest, but the UX case study warns that low-contrast blue holographic text with blur \"made the texts blurry\" - glow must not touch body text.\n- **Returnal** - \"gameplay first\"; palette is \"a haunting teal\" from monochrome CRTs and night-vision gear; the UI is \"chunky and clunky ... no gradients or elaborate transitions\", \"little to no directional motion, everything flickers on and off\"; critical data sits near the focus point and peripheral content stays peripheral; colour-blind palettes and intensity sliders.\n- **Destiny** - flat \"Metro\"-like layers brought alive by motion that \"provides meaning\": cursor slows over clickable targets, an \"animated glimmer\" marks updated items, cursor position moves \"a number of parallax layers\" but \"overuse becomes fatiguing\"; \"the bigger the text, the more important\", \"colour equals expandability\".\n- **Alien: Isolation** - the 1979-set rule: nothing that could not have existed on the original set; the aesthetic lives in material (beige plastic, bevels, VHS softness) rather than in effects.\n- **Control** - a \"limited palette of utilitarian typefaces\" (Basic Commercial, Interstate, ITC Avant Garde Gothic bold for area titles) makes the uncanny feel institutional; type does the atmosphere.\n- **Hades** - menus are illustrated art plus After-Effects-built screen transitions and looping menu backgrounds rendered as PNG sequences; \"hundreds of icons in a stylistically consistent way\".\n- **Mass Effect Legendary Edition** - unify the later games' UI improvements into the first without erasing its distinct feel (the lesson for Settings keeping its terminal identity).\n- **Craft references** - NN/g: 100 ms for simple feedback, 200-300 ms for modals, enter slightly longer than exit, never 500 ms+, respect reduced-motion; NN/g glassmorphism: more blur is better over busy backgrounds, verify text contrast, give users a transparency control; Josh Comeau: one light source for every shadow, vertical offset about 2x horizontal, layered shadows, tinted (not black) shadows, lower opacity as blur grows; WebAIM: 4.5:1 text, 3:1 large text (18 pt / 14 pt bold) and 3:1 for component boundaries and focus indicators, no rounding.\n\n### UI style spec (implementable in a day, test-safe)\n\n**Identity.** Cold hangar glass: navy slabs lit from above, one cyan edge-light, Montserrat 600/700 uppercase for anything you can press, Roboto for anything you read. Settings keeps squared corners and labels (its terminal identity) but gets the same shadow/sheen so it belongs to the same material family.\n\n**Tokens.**\n- Surfaces: `panel` `#0b1826` @0.96 (pause card, settings surface), `chip` `#080f1b` @0.92 (HUD, dialogue, hints), `well` `#101e2c` (button fill), `well_lit` `#1f3b50` (top sheen), `hover` `#174461`, `pressed` `#0a1a2a`, `primary` `#73ddf5`, `primary_hover` `#8be3ff`.\n- Lines: `border` `#3f7590` (about 3.3:1 on `#101e2c`), `border_hover` `#73ddf5`, `border_quiet` `#24404f` (disabled/decorative only), focus `#8de5f5` (unchanged).\n- Text: `#edf5f7` body; `#8be3ff` eyebrow/labels; `#080f1b` on primary; disabled `#7f93a2`; warning `#f3ae4b`; done `#a4f0c4`.\n- Shadow colour: `#02060c` (navy-black, never pure black). Elevation tiers: chip 4 px blur, offset (0,2), alpha 0.45; button 6 px, (0,3), 0.5; card 24-28 px, (0,10-12), 0.6-0.65.\n- Type: eyebrow Montserrat 600 13 px, +1.5 px letter spacing; button Montserrat 600 16-21 px (sizes already in the scene); title Montserrat 700 42 px; body Roboto 16-17 px.\n\n**Panel construction A - all StyleBoxFlat (do first; keeps every test green).**\n```\nvar slab := StyleBoxFlat.new()\nslab.bg_color = Color(\"#101e2c\")\nslab.border_color = Color(\"#3f7590\")\nslab.set_border_width_all(1)\nslab.border_width_top = 12          # with border_blend this fades into bg: a lit top edge\nslab.border_blend = true\nslab.set_corner_radius_all(4)       # 0-2 inside Settings\nslab.shadow_color = Color(\"#02060c\", 0.5)\nslab.shadow_size = 6\nslab.shadow_offset = Vector2(0, 3)\nslab.content_margin_top = 8         # explicit: StyleBoxFlat uses border width as margin when margin is -1\nslab.content_margin_bottom = 8\nslab.content_margin_left = 14\nslab.content_margin_right = 14\n```\n`border_blend` makes the thick top border fade into the fill, giving a top-lit sheen with a single colour; the 1 px sides/bottom read as a bevel. For the title and pause buttons add `slab.skew = Vector2(0.08, 0)` (StyleBoxFlat docs: raise content margins when skewing); never skew in Settings or on text-reading panels.\n\n**Panel construction B - gradient fill (optional, later).** `StyleBoxTexture` with `texture = GradientTexture2D` (fill LINEAR, `fill_from (0,0)` to `fill_to (0,1)`, stops `#1f3b50` -> `#0f2234`, width 8, height 48), `texture_margin_* = 4`, `modulate_color` per state. It cannot round corners or draw a border by itself, so pair it with a child `Panel` using `draw_center = false` for the border, or keep it for the pause card background only. Because `ui_controls_test.gd` casts button `normal` to `StyleBoxFlat`, do not put B on buttons unless the assertion is updated with care.\n\n**Per-state styles (buttons).**\n- normal: fill `#101e2c`, border `#3f7590`, text `#edf5f7` (15.3:1).\n- hover: fill `#174461`, border `#73ddf5`, text `#edf5f7` (9.3:1); scale 1.02.\n- pressed: fill `#0a1a2a`, border `#73ddf5`, `shadow_size 0`, text offset +1 px via `content_margin_top += 1` (tactile sink); scale 0.98.\n- focus (project theme, unchanged assertions): 2 px `#8de5f5` inset ring, transparent fill, `expand_margin 0`; **add** `shadow_size 10`, `shadow_color Color(\"#73ddf5\", 0.35)`, `shadow_offset Vector2.ZERO` for an outer glow - not asserted, and the ring stays inside the control's bounds. Pause/touch buttons keep their heavier 3 px ring with opaque `#234859` fill (test requires `bg alpha 1` and a wider border than normal); ring vs fill 6.8:1.\n- disabled: fill `#0b1520`, border `#24404f`, text `#7f93a2` (5.3:1), no shadow, no sheen.\n- primary (NEW GAME, RESUME): fill `#73ddf5`, hover `#8be3ff`, pressed `#52c6e8`, text `#080f1b` (12.2:1), border none, shadow tier \"button\" tinted `#0a3a4a`.\n\n**Motion (Tween, cubic ease-out unless noted).**\n- hover in 100 ms scale 1.0 to 1.02 (`pivot_offset = size / 2`), hover out 120 ms; pressed 60 ms to 0.98 then 120 ms back with `TRANS_BACK` ease-out; focus glow alpha 0 to 1 in 150 ms.\n- panel open: 220 ms, scale 0.96 to 1.0 plus modulate alpha 0 to 1; close 160 ms (exit shorter than enter, per NN/g); overlay dim 0 to 0.84 in 180 ms.\n- objective change: slide 8 px up plus fade, 200 ms; \"done\" state tints green over 250 ms; warnings use a 2-pulse amber border blink, 120 ms each, once (Returnal's flicker-not-slide).\n- settings tabs: underline/sheen crossfade 120 ms; no scale.\n- cursor/stick parallax on the title: art 4 px, fog 8 px, panel 0 px, max; nothing on in-game HUD (Destiny's fatigue warning).\n- hard rule: nothing over 300 ms, no looping idle motion on controls; a Reduce Motion toggle in Settings can zero the durations later.\n\n**Per-screen.**\n- *Title menu* (buttons 188x50 at 21 px, 188x44 at 18 px): NEW GAME primary filled cyan; CONTINUE secondary slab, disabled style when no checkpoint; CREDITS / SETTINGS / CHANGELOG secondary slabs with skew 0.08; title label gets `font_shadow_color #73ddf5 @0.45, shadow_offset (0,0), shadow_outline_size 6` as pseudo-bloom; the key art gets a 20 s scale drift 1.0 to 1.04, a radial vignette, 40 dust motes and one additive glow sprite on the door light; the eyebrow \"MRDEMONWOLF, INC. PRESENTS\" stays `#8be3ff` 13-18 px tracked.\n- *Pause menu* (card 450x389 at 255,78): card = panel style with 28 px shadow (0,12) @0.65, 1 px `#3f7590` border, radius 6, 2 px cyan accent rule kept; backdrop `#020509` @0.84 plus optional frosted blur (screen-texture shader, LOD 2.5) behind the card only; RESUME primary, SETTINGS and RETURN TO TITLE secondary; the return warning stays Roboto 14 px `#f3ae4b`; open/close tweens as above.\n- *Settings* (surface 712x240 inside the card): keep squared corners (radius 0-2), 1 px border now `#3f7590`, labels and the \"THE DEN / LOCAL CONFIGURATION\" eyebrow; add the same shadow tier and a top sheen (`border_blend`, 8 px) on the surface; tabs: selected tab gets a 2 px cyan bottom rule and `#174461` fill, unselected `#101e2c`, both 16 px Montserrat 600 with 20/8 margins (keeps the inset `-4` tab focus ring); sliders: track `#24404f`, fill `#73ddf5`, grabber 14 px circle `#edf5f7` with 1 px `#3f7590` border; OptionButton popups use the slab style; all control font sizes stay 16 and content margins 12/8 across the three tabs.\n- *Touch buttons* (96x90 pads, 118x90 USE, 428x76 choices): glass pads: fill `#0a2036` @0.55, 2 px `#52c6e8` border, radius 12, shadow tier \"button\"; pressed flips to `#73ddf5` @0.9 with `#080f1b` glyphs (12.2:1) for a visible press; choices get a left key-glyph chip (\"1\", \"2\") 22x22 `#8be3ff` with navy text; keep the 3 px heavier focus ring.\n- *Dialogue panel* (892x82): chip style with left 3 px cyan accent kept, 1 px `#2a4a60` edge, shadow tier \"chip\", top sheen 10 px; speaker name Montserrat 600 15 px `#8be3ff` uppercase; story Roboto 17 px `#edf5f7`; corner radius 3; never translucent below 0.9 over the art (glass risk from NN/g).\n- *Objective card* (448x62 top-left): same chip; eyebrow \"MAINTENANCE / LOCKDOWN\" 13 px `#8be3ff`; objective Roboto 15 px `#edf5f7`; `done` state green text with a 2 px green left accent; `warning` amber accent with the single double-blink.\n- *Context hint* (549x35): pill (radius 17), fill `#0a1620` @0.9, 1 px `#3f7590`, key glyph chip inside, text Roboto 14 px `#c2d2db` (10.9:1); appears with 150 ms fade and 6 px rise, exits 100 ms.\n- *Tutorial prompt* (316x66): same chip as dialogue, no sheen, 17 px text, amber eyebrow when it is a warning.\n\n**Day plan (order).** 1) Add a shared `UiStyles` helper (static functions returning the slab/primary/chip styleboxes with tier parameters) and route `main.gd:387-407`, the title buttons and `game_settings.gd:apply_theme` through it; add shadow/glow to the two theme focus boxes in `game_theme.tres`. 2) Replace the five `ColorRect` chips/cards with `PanelContainer`/`Panel` using the chip/card styles (keep node paths and names so tests and capture dumps still resolve). 3) Add hover/press/open tweens in one `_animate_button(button)` helper. 4) Add a `PresentationLayer` scene (vignette, fog gradient, dust `CPUParticles2D`, two additive glow sprites, two light shafts) instanced by both rooms. 5) Foreground silhouettes and Parallax2D wrappers for corridor and Records. 6) Re-render stills at 960 and 1920 with the capture fixed so in-world frames are unpaused; compare to game-p3. Reflections, real `PointLight2D`s, frosted blur and the camera follow are \"later\" and the camera one needs hands-on play before any claim.\n",
+   "techniques": [
+    {
+     "name": "Five-plane Parallax2D stack (far 0.85 / mid 0.95 / play 1.0 / near 1.2-1.3)",
+     "api": "Parallax2D (scroll_scale, limit_begin/end, follow_viewport) wrapping existing Sprite2D/TextureRect art; z_index per plane",
+     "compatibility_renderer": "Supported (Parallax2D is core since 4.3; no renderer dependency)",
+     "cost": "Low: scene restructure only, no new draw cost",
+     "effect": "Rooms read as volume whenever the camera pans or zooms (intro camera moves, future follow camera); matches Hollow Knight/Ori layered construction",
+     "recommendation": "do-now"
+    },
+    {
+     "name": "Foreground silhouette plane",
+     "api": "Sprite2D region cuts from the props sheets, modulate #050a12 @0.85-0.95, scale 1.4-1.8, high z_index, inside the near Parallax2D",
+     "compatibility_renderer": "Supported",
+     "cost": "Low: reuses existing sheets, 2-4 sprites per room",
+     "effect": "Framing and occlusion at the screen edges that sells depth without new art; must never cover the actor path, stations or choice buttons",
+     "recommendation": "do-now"
+    },
+    {
+     "name": "Atmospheric tint and fog gradient on far planes",
+     "api": "modulate on the far layer (about Color(0.78,0.86,0.95)) plus a ColorRect/TextureRect with GradientTexture2D (linear, alpha 0.15-0.25) between far and mid",
+     "compatibility_renderer": "Supported",
+     "cost": "Low: one full-screen quad",
+     "effect": "Far plane recedes (lower contrast, cooler), play plane pops; the Dead Cells saturation-on-the-gameplay-plane rule",
+     "recommendation": "do-now"
+    },
+    {
+     "name": "Additive glow sprites as fake lights",
+     "api": "Sprite2D with GradientTexture2D (FILL_RADIAL, 256 px) and CanvasItemMaterial blend_mode = BLEND_MODE_ADD, alpha 0.2-0.5, placed on the painting's lamp, door light and breaker/relay",
+     "compatibility_renderer": "Supported; Godot docs call additive sprites much faster than PointLight2D",
+     "cost": "Low",
+     "effect": "Light sources that visibly agree with the painting; Hollow Knight's soft transparent shapes",
+     "recommendation": "do-now"
+    },
+    {
+     "name": "Skewed additive light shafts with slow alpha drift",
+     "api": "Sprite2D with a linear GradientTexture2D, skew via Node2D.skew, BLEND_MODE_ADD, alpha 0.08-0.15, Tween alpha over 6-10 s looping",
+     "compatibility_renderer": "Supported",
+     "cost": "Low: 2-3 sprites",
+     "effect": "Cheap stand-in for INSIDE-style volumetrics; gives the corridor an atmosphere plane",
+     "recommendation": "do-now"
+    },
+    {
+     "name": "Dust motes and armed-state embers",
+     "api": "CPUParticles2D (30-60 motes, lifetime 6-10 s, 4-10 px/s, 1-2 px, alpha 0.15-0.3, additive); a second small emitter near the breaker when armed",
+     "compatibility_renderer": "Supported (CPU particles run everywhere; GPUParticles2D on Compatibility is not confirmed by the fetched 4.3 notes)",
+     "cost": "Low-medium on mobile; keep counts under 60",
+     "effect": "Air between planes; Dead Cells/Hollow Knight particle density in miniature",
+     "recommendation": "do-now"
+    },
+    {
+     "name": "Vignette and film grain overlay",
+     "api": "ColorRect/TextureRect with radial GradientTexture2D (transparent centre to #02060c @0.5-0.6) under the HUD CanvasLayer; grain via NoiseTexture2D (FastNoiseLite) tiled at 3-5% alpha with animated offset",
+     "compatibility_renderer": "Supported",
+     "cost": "Low (vignette) / low-medium (grain, one more full-screen quad)",
+     "effect": "Lens depth and banding suppression on 8-bit Compatibility output (INSIDE dithering, Alien: Isolation VHS)",
+     "recommendation": "do-now"
+    },
+    {
+     "name": "Wet-floor actor reflections",
+     "api": "Flipped Sprite2D copy (flip_v, scale.y about -0.35, modulate cyan @0.18) with a downward alpha fade via a small canvas_item shader or an overlaid dark gradient",
+     "compatibility_renderer": "Supported",
+     "cost": "Low-medium: two extra sprites plus a tiny shader",
+     "effect": "Anchors sprites to the deck; INSIDE used reflections to establish depth",
+     "recommendation": "later"
+    },
+    {
+     "name": "Real 2D lighting with CanvasModulate + PointLight2D",
+     "api": "CanvasModulate ambient (#2a3a4a range) on the world canvas, 2-6 PointLight2D with radial textures, BLEND_MODE_ADD, energy 0.8-1.2; no LightOccluder2D shadows",
+     "compatibility_renderer": "Supported with a per-object light cap (community reports about 15); 2D shadows add cost",
+     "cost": "Medium: every lit pixel is re-shaded; needs sprite modulate re-tuning",
+     "effect": "Unified light direction across planes (the Dead Cells principle) but only after the cheap glows are in; UI in its own CanvasLayer is unaffected",
+     "recommendation": "later"
+    },
+    {
+     "name": "Follow camera with look-ahead and dialogue zoom punch",
+     "api": "Camera2D position_smoothing_enabled, limit_*, Tween zoom 1.0 to 1.06-1.08 over 0.5 s (TRANS_CUBIC, EASE_OUT) on dialogue/choice open",
+     "compatibility_renderer": "Supported",
+     "cost": "Low",
+     "effect": "Parallax becomes visible during play and the room gains cinematic framing; feel cannot be judged from stills and needs hands-on play before any claim",
+     "recommendation": "later"
+    },
+    {
+     "name": "Frosted-glass backdrop behind the pause card",
+     "api": "ColorRect with a canvas_item shader using hint_screen_texture + filter_linear_mipmap and textureLod(SCREEN_UV, 2.5); BackBufferCopy if another screen-reading shader overlaps",
+     "compatibility_renderer": "Supported (screen texture works in Compatibility; only normal-roughness is Forward+-only)",
+     "cost": "Medium on mobile (full-screen read with mipmaps)",
+     "effect": "NN/g glassmorphism guidance: heavy blur keeps the card legible over busy art; purely cosmetic so it can wait",
+     "recommendation": "later"
+    },
+    {
+     "name": "Layered StyleBoxFlat slab (shadow + bevel + lit top)",
+     "api": "StyleBoxFlat: bg #101e2c, border #3f7590 1 px with border_width_top 8-12 and border_blend = true, corner radius 4 (0-2 in Settings), shadow_color #02060c @0.5, shadow_size 6, shadow_offset (0,3), explicit content_margin_* so the thick top border does not push content",
+     "compatibility_renderer": "Supported (pure 2D vector draw)",
+     "cost": "Very low",
+     "effect": "Panels and buttons read as lit, raised slabs with one light source (Comeau: tinted, offset-down shadows); keeps every current test assertion",
+     "recommendation": "do-now"
+    },
+    {
+     "name": "Gradient fill via StyleBoxTexture over GradientTexture2D",
+     "api": "StyleBoxTexture.texture = GradientTexture2D (FILL_LINEAR, fill_from (0,0) to (0,1), #1f3b50 to #0f2234), texture_margin_* 4, modulate_color per state; pair with a child Panel (draw_center = false) for the border",
+     "compatibility_renderer": "Supported",
+     "cost": "Low",
+     "effect": "Smoother sheen than border_blend; but ui_controls_test.gd casts button normal styles to StyleBoxFlat, so use only on the pause card/settings surface or update the assertion deliberately",
+     "recommendation": "later"
+    },
+    {
+     "name": "Skewed chevron buttons",
+     "api": "StyleBoxFlat.skew = Vector2(0.08, 0) on title and pause buttons only, with content margins raised per the docs",
+     "compatibility_renderer": "Supported",
+     "cost": "Very low",
+     "effect": "Military-hardware read on the game-presentation menus while Settings stays squared (user decision)",
+     "recommendation": "do-now"
+    },
+    {
+     "name": "Focus glow on top of the inset ring",
+     "api": "Add shadow_size 10, shadow_color #73ddf5 @0.35, shadow_offset Vector2.ZERO to the existing theme focus StyleBoxFlats (ring stays 2 px #8de5f5, bg alpha 0, expand_margin 0; tab ring keeps -4)",
+     "compatibility_renderer": "Supported",
+     "cost": "Very low",
+     "effect": "Focus becomes visible at a glance from across the room without changing the asserted ring geometry; ring contrast 6.8-11.5:1 against every fill",
+     "recommendation": "do-now"
+    },
+    {
+     "name": "Per-state button tweens (hover scale, pressed sink)",
+     "api": "Tween on Control.scale with pivot_offset = size / 2: hover 100 ms to 1.02, out 120 ms; pressed 60 ms to 0.98 then 120 ms TRANS_BACK EASE_OUT back; pressed stylebox drops shadow_size to 0 and adds 1 px top margin",
+     "compatibility_renderer": "Supported",
+     "cost": "Very low",
+     "effect": "NN/g 100 ms feedback band; Hades-style juice without animation assets",
+     "recommendation": "do-now"
+    },
+    {
+     "name": "Panel open/close transitions",
+     "api": "Tween scale 0.96 to 1.0 plus modulate alpha 0 to 1 over 220 ms (open), 160 ms (close); overlay dim 0 to 0.84 over 180 ms",
+     "compatibility_renderer": "Supported",
+     "cost": "Very low",
+     "effect": "Modal-sized motion per NN/g (200-300 ms, exit shorter than enter); keeps Returnal's no-long-slides restraint",
+     "recommendation": "do-now"
+    },
+    {
+     "name": "Button hierarchy: primary / secondary / disabled with contrast floors",
+     "api": "Primary fill #73ddf5 with #080f1b text (12.2:1), secondary slab with #edf5f7 (15.3:1), disabled #7f93a2 on #0b1520 with #24404f border and no shadow",
+     "compatibility_renderer": "Supported",
+     "cost": "Very low",
+     "effect": "Destiny's size/colour-as-hierarchy; one obvious default action per screen",
+     "recommendation": "do-now"
+    },
+    {
+     "name": "Key-glyph chips in hints and choices",
+     "api": "Small Label/Panel with a 22x22 StyleBoxFlat (#8be3ff fill, radius 4) and #080f1b Montserrat 600 glyph, placed inside the context hint pill and touch choice buttons",
+     "compatibility_renderer": "Supported",
+     "cost": "Very low",
+     "effect": "Input prompts read as hardware keys rather than text; works with the existing prompt() strings",
+     "recommendation": "do-now"
+    },
+    {
+     "name": "Objective state tinting with single double-blink warnings",
+     "api": "Objective card accent and text tween to #a4f0c4 (done) over 250 ms; warnings pulse border to #f3ae4b twice at 120 ms then hold",
+     "compatibility_renderer": "Supported",
+     "cost": "Very low",
+     "effect": "Returnal-style flicker signalling in the periphery without continuous motion",
+     "recommendation": "do-now"
+    },
+    {
+     "name": "Cursor/stick parallax on the title only",
+     "api": "On mouse motion or stick input move the title art by up to 4 px and the fog layer by 8 px (lerp 0.1), panel fixed",
+     "compatibility_renderer": "Supported",
+     "cost": "Very low",
+     "effect": "Destiny-style responsiveness; restraint keeps it from fatiguing, and it stays off the in-game HUD",
+     "recommendation": "do-now"
+    },
+    {
+     "name": "Reduce Motion toggle",
+     "api": "CheckButton in Settings that scales all UI tween durations to 0 and stops the light-shaft drift and title Ken Burns",
+     "compatibility_renderer": "Supported",
+     "cost": "Low",
+     "effect": "NN/g and WCAG motion guidance; needed once tweens exist",
+     "recommendation": "later"
+    },
+    {
+     "name": "Engine glow / 2D HDR bloom",
+     "api": "Environment glow with a 2D HDR viewport",
+     "compatibility_renderer": "Not available: Compatibility has no 2D HDR viewport, so 2D glow does not render",
+     "cost": "n/a",
+     "effect": "Would not show on the shipped renderer; fake it with additive sprites, font shadows and stylebox shadows instead",
+     "recommendation": "avoid"
+    },
+    {
+     "name": "CRT scanlines or terminal chrome outside Settings",
+     "api": "Scanline shaders, monospace labels, blinking cursors on title, pause, HUD or dialogue",
+     "compatibility_renderer": "Supported but contrary to the user decision",
+     "cost": "n/a",
+     "effect": "Terminal identity is reserved for the Settings menu; everything else uses the game presentation",
+     "recommendation": "avoid"
+    },
+    {
+     "name": "Translucent glass panels without blur over the art",
+     "api": "Panels under alpha 0.9 over busy backgrounds with no screen blur",
+     "compatibility_renderer": "Supported",
+     "cost": "n/a",
+     "effect": "NN/g glassmorphism and the Dead Space remake case study both flag unpredictable text contrast; keep chips at 0.9+ or add the blur",
+     "recommendation": "avoid"
+    },
+    {
+     "name": "Real-time 2D shadows and many PointLight2Ds",
+     "api": "LightOccluder2D shadows, more than about 8 PointLight2D per room",
+     "compatibility_renderer": "Supported but capped (about 15 lights per object reported) and costly on mobile",
+     "cost": "High",
+     "effect": "Little visible gain over additive glows for single-screen rooms",
+     "recommendation": "avoid"
+    }
+   ],
+   "sources": [
+    "https://80.lv/articles/interview-with-the-developers-of-dead-cells",
+    "https://gonintendo.com/archives/280488-dead-cells-dev-blog-art-design-deep-dive-giving-back-colors-to-cryptic-worlds",
+    "https://news.xbox.com/en-us/?p=4339",
+    "https://airborn-studios.com/projects/ori",
+    "https://gdcvault.com/play/1027035/The-Art-of-Ori-and",
+    "https://unity.com/case-study/hollow-knight",
+    "https://80.lv/articles/check-out-how-game-devs-trick-players-using-simple-layers",
+    "https://80.lv/articles/breakdown-hollow-knights-art-style",
+    "https://gdcvault.com/play/1023783/Low-Complexity-High-Fidelity-INSIDE",
+    "https://gameranx.com/updates/id/86066/article/playdead-provides-details-on-the-techniques-used-to-render-inside/",
+    "https://www.pcgameshardware.de/Trine-2-Spiel-39851/Specials/Trine-2-Exklusives-Technik-Interview-mit-Frozenbyte-Grandioses-Art-Design-trifft-auf-detailverliebte-Engine-866092/",
+    "https://gdcvault.com/play/1021191/Rayman-Legends-The-Design-Process",
+    "https://www.unrealengine.com/en-US/developer-interviews/how-little-nightmares-ii-plumbs-the-depths-of-adolescent-angst",
+    "https://www.thumbsticks.com/little-nightmares-review/",
+    "https://en.wikipedia.org/wiki/Katana_Zero",
+    "https://deutscher-computerspielpreis.de/chronik/signalis/?lang=en",
+    "https://pczone.co.uk/?p=12693",
+    "https://gamedeveloper.com/design/video-designing-i-dead-space-i-s-immersive-user-interface",
+    "https://questforux.beehiiv.com/p/game-ux-case-study-dead-space-remake-422b",
+    "https://www.gfinityesports.com/article/the-unsung-hero-of-dead-space-why-diegetic-hud-design-is-crucial-for-ultimate-immersion",
+    "https://blog.playstation.com/?p=348960",
+    "https://www.gamedeveloper.com/design/what-to-steal-from-destiny-s-ui",
+    "https://hudsandguis.com/home/2015/5/25/destiny-ui",
+    "https://www.gdcvault.com/play/1023460/",
+    "https://hudsandguis.com/home/2014/06/04/alien-isolation",
+    "https://kotaku.com/the-fonts-in-control-make-its-world-feel-way-creepier-1837714580",
+    "https://fontsinuse.com/uses/48689/control-video-game",
+    "https://www.workwithindies.com/careers/supergiant-games-ui-animator-hades-ii",
+    "https://www.supergiantgames.com/blog/job-opportunity-ui-illustrator-for-hades-ii",
+    "https://www.denofgeek.com/games/mass-effect-legendary-edition-changes-problems-details-controversies",
+    "https://www.nngroup.com/articles/animation-duration/",
+    "https://www.nngroup.com/articles/glassmorphism/",
+    "https://www.joshwcomeau.com/css/designing-shadows/",
+    "https://webaim.org/articles/contrast/",
+    "https://docs.godotengine.org/en/4.3/classes/class_styleboxflat.html",
+    "https://docs.godotengine.org/en/4.3/classes/class_styleboxtexture.html",
+    "https://docs.godotengine.org/en/4.3/classes/class_gradienttexture2d.html",
+    "https://docs.godotengine.org/en/4.3/classes/class_parallax2d.html",
+    "https://docs.godotengine.org/en/4.3/tutorials/2d/2d_lights_and_shadows.html",
+    "https://docs.godotengine.org/en/4.3/tutorials/shaders/screen-reading_shaders.html",
+    "https://docs.godotengine.org/en/stable/tutorials/rendering/renderers.html",
+    "https://docs.godotengine.org/en/4.3/classes/class_tween.html",
+    "https://godotengine.org/releases/4.3/",
+    "https://forum.godotengine.org/t/i-think-i-found-a-godot-bug/125307"
+   ]
+  },
+  "assets": {
+   "findings_markdown": "# Art depth audit \u2014 WOLF//OVERRIDE (read-only, 2026-10-08)\n\nWorktree audited: `apps/game`. No files were edited.\n\n## 0. Evidence caveat (read this first)\n\nThe `evidence/game-p3/` baseline is **not usable as a gameplay reference**: every corridor still (`20-corridor-start-keyboard`, `22-purge-display-read`, `33-breaker-armed`) has the pause overlay or settings panel on top, the JSON dumps say `\"paused\": true`, the run stops at 62 files (no `50-records-entry`), and `35-relay-cooperate-door.png` is actually the title screen. The capture run clearly got stuck with the pause overlay open. Use `evidence/game-p2/960x540/` and `evidence/game-p2/2340x1080/` (clean `20`, `37-checkpoint-saved`, `50-records-entry`) and today's `scratchpad/art/corridor-capture.png` instead. Whoever renders new stills for the presentation pass should check `flags.paused` in the JSON before trusting a frame.\n\n## 1. Inventory (apps/game/assets)\n\n| File | Size | Alpha | Role / placement |\n|---|---|---|---|\n| maintenance-corridor-background-provisional.png | 1672x941 | no | `main.gd _draw()`: `draw_texture_rect(..., Rect2(0, 60, 960, 540))` under everything, over a `#091533` fill of `Rect2(0,0,960,680)` |\n| records-access-background-provisional.png | 1672x941 | no | `records_room.gd _draw()`: same rect, over `#071221`; RecordsRoom node is `z_index = 1` |\n| maintenance-props-provisional.png | 2172x724 | yes | 4 props, 543 px columns, Sprite2D regions, `scale 0.22`, centred y=372 (breaker x=350, relay x=605, safe point x=876, seal/door at 780) |\n| records-props-provisional.png | 2172x724 | yes | 3 props, 724 px columns, `scale 0.22`, y=375 (purge x=190, mirror x=520, exit x=830); also reused as the corridor's PurgeTerminalArt at (150,286) `scale 0.2` |\n| rowan-side-right-provisional.png | 1024x1536 | yes | Sprite2D `scale 0.047` -> ~72 px tall, inked cel shading |\n| wolf-side-right-provisional.png | 1902x1015 | yes | Sprite2D `scale 0.0733` -> ~74 px tall / 139 wide, painted-ink |\n| director-side-left-provisional.png | 1024x1536 | yes | intro only, `scale 0.047` |\n| title-corridor-key-art-provisional.png | 1672x941 | no | TextureRect full-bleed on the title CanvasLayer, characters baked in |\n| logo-mark.svg | vector | - | title, not relevant to depth |\n\nCamera facts that matter for parallax: `GAMEPLAY_ZOOM = 1.18`, camera y locked at 330, x clamped to `[406.8, 553.2]` (total horizontal travel **146 world px**), smoothing speed 4. Intro camera: zoom 1.8 -> 1.95, y=355, x 267 -> 300. Visible world window at gameplay zoom: 813.6 x 457.6 px, i.e. world y 101..559 of a background that spans y 60..600. Floor collision top is y=440; actors stand with feet at y\u2248440. The painted wall/floor seam sits at ~64% of the painting height = world y\u2248405, so actors stand a little in front of the seam on the floor plane, which is correct.\n\nResolution headroom today: at a 1920x1080 window the gameplay view is 2.36 screen px per world px, so a 960-world-px background needs **~2266 px** of source width to be 1:1; the 1672 px paintings are upscaled ~1.36x in gameplay and ~2.2x during the 1.95 intro close-up. That is the concrete reason for \"1920x1080 or larger\" below (2560x1440 is the sensible target; 1920x1080 is only 0.85x of 1:1 at 1080p gameplay).\n\n## 2. Maintenance corridor\n\n**What already suggests depth**\n- Three ceiling lamps at ~35%, 61%, 87% of the width (plus a small one at ~17%) paint cool light cones down the wall and leave vertical reflection streaks on the wet floor: the strongest depth cue in the image, and it already reads as a lit volume.\n- The floor tiles converge toward a single vanishing point roughly at the centre of the wall/floor seam (one-point perspective, eye-level camera). A grate strip at ~73% of height and an under-deck of pipes below it make the walkway read as a raised platform with a pit in the foreground.\n- Red emergency lamps on both ends (the lockdown mood), a large fan and a dense pipe ceiling with I-beams dividing the wall into bays every ~26% of width, atmospheric haze low-left and low-right.\n\n**What blocks a parallax treatment**\n- Single flat RGB raster: wall, lamps, floor and under-deck are one image. The floor must move 1:1 with the actors, so nothing in this image can move at a different rate without the seam tearing.\n- Lamps are baked, so light cannot react to state (breaker armed, relay refusing) except by sprites drawn on top.\n- The red lamp at x\u22481320/1672 and the vent door at x\u22481250 sit where the game draws the coolant relay (605) and the sealed door (780); the painting's own features and the live props overlap and compete at 960 px.\n\n**Cheap tricks that apply with this art** (all built-in, all fine on GL Compatibility)\n1. Floor reflections for actors and props: a second Sprite2D under each actor (`flip_v`, `scale.y ~ -0.55`, `modulate.a ~ 0.22`, z below the actor) with a canvas_item shader that multiplies alpha by `1.0 - UV.y`; the painting already has wet-floor streaks so reflected sprites look native. Should also be applied to the four station props.\n2. Contact drop shadows: a soft ellipse (ImageMagick-generated 128x48 radial PNG, or `draw_circle` scaled) under feet at `modulate.a ~ 0.35`, tiny squash when moving. Grounds the inked characters on the painterly floor, which is the main style clash today.\n3. Additive glow over painted lamps and prop lights: Sprite2D with `CanvasItemMaterial.blend_mode = BLEND_MODE_ADD` using a built-in `GradientTexture2D` (radial fill), placed at the three lamp x positions and over the breaker/relay/safe-point lamps; tint and alpha driven by the same state code that already sets `breaker_art.modulate`. This replaces the 18x5 `ColorRect` status lights visually. Note: the Compatibility renderer has no 2D glow post-process, so additive sprites are the only honest way to get bloom.\n4. Slow fog/dust: one or two `Sprite2D`s with a `NoiseTexture2D` (FastNoiseLite, built-in, no asset) at `modulate.a ~ 0.08`, scrolled by `_process` or a uv offset; drawn above the background, below actors, with a top fade so it pools on the floor. Same for a second layer above actors at ~0.04 for foreground haze.\n5. Foreground vignette: a `TextureRect` with a radial `GradientTexture2D` (transparent centre to `#02050a`) in the CanvasLayer under the HUD, alpha ~0.5. Cheapest \"cinematic\" cue; no asset needed.\n6. Subtle camera parallax with the existing painting: draw it at `Rect2(-28.8 - (camera.x - 480.0) * 0.1, 56, 1017.6, 572.4)` (1.06x scale, 0.9x camera speed) and `queue_redraw()` from `_update_gameplay_camera`; or wrap it in a `Parallax2D` with `scroll_scale = Vector2(0.9, 1.0)`. Across the full 146 px camera travel the wall drifts ~15 px relative to the actors. Caveat: this moves the painted floor too, so actors appear to slide ~15 px on the floor over a full pan; it is subtle but it is a real artefact, which is why the layered regeneration is the proper fix.\n7. Optional near layer from the same painting: a Sprite2D region of the under-deck strip (source rows ~690..941) drawn at `scroll_scale 1.08` over the base. The strip overdraws its own copy shifted at most ~12 px, which is invisible on a repetitive pipe pattern, and gives a cheap foreground cue without new art.\n\n## 3. Records Access\n\n**What already suggests depth**: same camera, same seam height (64%), same three-lamp rhythm (~20%, 61%, 87%) and the same under-deck, so the two rooms already cut together. Extra cues: server racks with rows of red LEDs recede in bays, railings in front of the racks, red lamps at both ends, haze low-left. The red LED rows are the best mid-layer candidate in either room.\n\n**What blocks parallax**: identical to the corridor (one flat RGB raster). Additionally the live `_draw_exit()` and `_draw_machine_lights()` rectangles are flat colour rects on a painterly floor and look pasted on; they should become additive sprites in the same pass as the corridor lights.\n\n**Cheap tricks**: all seven above apply unchanged; the reflection trick is even more effective here because the floor has stronger painted streaks. Red LED rows are a natural target for a slow additive flicker sprite (alpha noise, not a new system).\n\n## 4. Title key art\n\nSingle flat painting with Rowan and WOLF baked in at the left, a distant gantry/bridge upper-left, the door mid-ground and crate silhouettes bottom. There is no camera on the title, so parallax here would be a slow time-based drift (\u00b13 px, far layer only) or pointer-based. Fog, vignette and an additive pulse on the door lamp apply today. Proper layering needs an edit-mode pass that returns far (gantry, haze), mid (door wall), near (crates), plus the pair as a separate transparent cutout; the characters in the key art are the same designs as the sprites, so a cutout is consistent.\n\n## 5. Characters and props (style notes for the regeneration)\n\n- Rowan and the Director are hard-inked cel art with faceted shading; WOLF is painted-ink; the backgrounds are photoreal-painterly. The mismatch is tolerable at 72 px but it is what makes them look \"stuck on\". Drop shadow + reflection is the cheap fix; a future character pass should ask for softer, thinner line weight and painterly rendering so they match the environment.\n- Rowan's sheet shows a baked red radial glow behind him (manifest says RGBA; the glow is not visible in the in-game captures, so it is in the transparent region, but worth a check before any re-export).\n- Props are front-facing with a slight top-down view that matches the eye-level backgrounds; they have no cast shadows and no ground contact, which the shadow/reflection tricks fix. Resolution is fine: 543 px source -> ~120 world px -> ~280 screen px at 1080p.\n\n## 6. Trial parallax set: `scratchpad/art/layers/`\n\nOnly **`corridor-far.png` exists (1920x1080, RGB, no alpha)**. `corridor-mid.png` and `corridor-near.png` **do not exist**, so the set cannot be judged or used as three Parallax2D layers yet.\n\nJudgement of `corridor-far.png` against the current corridor:\n- Consistent: eye-level one-point perspective, seam at the same 64% height, wall bays with I-beams, horizontal pipe runs, cool cyan lamp light, wet floor reflections. Mean colour srgb(6.8%, 12.2%, 15.1%) vs the current corridor's (7.3%, 10.7%, 12.7%): slightly brighter and bluer, within tint-correctable range (`modulate` or a one-off ImageMagick level match).\n- Not a \"far\" layer: it contains the floor (which must scroll at 1.0) and the wall with lamps, so it is really a full base plate. If used as the far layer at 0.9x, the floor would slide under the actors.\n- Lost content vs the current corridor: the fan, both red emergency lamps, the under-deck pipes and grate, railings, the vent door, the dense ceiling pipe run and most grime. It reads cleaner and more \"clean concrete\" than \"grounded military sci-fi + dark painterly horror\"; the red accent that carries the lockdown mood is gone.\n- Lamp positions moved to ~14%, 50%, 86%. The breaker (x=350/960 = 36%) and relay (63%) currently sit inside lamp pools; with this plate they would sit in the dark between lamps, so either the lamps must stay at the original positions or the props move.\n- Verdict: good as a **reference/base plate** for a cleaner regeneration, not a drop-in replacement. Generate mid and near with alpha from it, keep the lamp x positions of the original, and restore the red lamps and under-deck.\n\n## 7. Prompt plan: layered regeneration with Codex image_gen (edit mode, existing paintings as references)\n\nCommon constraints for every prompt:\n- \"Side-view game backdrop, eye-level camera, strict one-point perspective, vanishing point at the exact horizontal centre on the wall/floor seam at 64% of the image height. No characters, no text, no UI, no lens distortion. Grounded military sci-fi research station, dark painterly horror, wet concrete and steel, cool cyan key light from ceiling fixtures, red emergency accents, heavy grime.\" Attach the existing room painting and `corridor-far.png` as references and say \"match this palette, lamp colour and seam height exactly\".\n- Size: request the largest 16:9 the tool returns (today it returned 1920x1080); target **2560x1440** for far/mid/base; if the tool cannot exceed 1920x1080, upscale 2x with Lanczos in ImageMagick and record that step in `modifications`. Compose with ~6% safe bleed on the left and right so layers can be displayed at 1.06x and scrolled.\n- Transparent layers: ask for \"PNG with real alpha, nothing else in the frame, no drop shadow onto empty areas, no white fringe\"; verify with `magick layer.png -alpha extract` that empty regions are fully transparent.\n- Props: 1024x1024 per prop on transparency, same three-quarter-front angle as the existing sheets, with a soft baked contact shadow that does not extend past the base, lamp regions in a flat saturated colour so additive glow sprites can sit on top.\n\n### Maintenance corridor \u2014 layer list\n1. `corridor-far.png` (RGB, scroll 0.90): back wall only, the wall ending at the seam, lamps at 35%/61%/87% (plus the small one at 17%), light cones painted, red lamp left end, fan, vent door; the floor region filled with the plain dark floor tone (it will be covered by the floor layer).\n2. `corridor-mid.png` (RGBA, scroll 0.95): the I-beams, the pipe runs, railings and the ceiling pipe mass that sit in front of the wall; nothing below the seam.\n3. `corridor-floor.png` (RGB, scroll 1.00): the wet floor from the seam down to the grate, with the lamp reflection streaks at the far layer's lamp x positions, nothing above the seam. This is the layer actors stand on.\n4. `corridor-near.png` (RGBA, scroll 1.08): the under-deck pipes and grate edge plus a low fog band; the top edge is the grate line.\n5. `corridor-props-v2.png` or four individual PNGs: breaker, relay, seal door, safe point, matching the existing sheet designs (attach it as reference) at 1024 px per prop.\n\n### Records Access \u2014 layer list\nSame five roles with records content: far = rack wall with red LED rows and lamps at 20%/61%/87%, red lamps both ends; mid = railings, I-beams, pipe runs; floor = wet floor with reflections; near = under-deck; props = purge queue, mirror port, exit, matching the existing records sheet.\n\n### Title \u2014 layer list\nfar = gantry, distant lights, haze (RGB); mid = the door wall and console (RGBA); near = crate silhouettes (RGBA); characters = Rowan and WOLF pair as a transparent cutout matching the current key-art pose. All at 2560x1440.\n\n### Consistency checks before a layer enters the repo\n- Seam at 64% \u00b11% of height in far/floor; vanishing point within 2% of centre; lamp x positions match the room table above (compare column brightness profiles with `magick -crop` + `-format %[mean]`).\n- Composite far+mid+floor+near at zero offset and compare to the reference with `magick compare -metric SSIM`; accept only when the flattened set reads as the same room (target SSIM \u2265 0.6 against the old painting, higher against `corridor-far`).\n- Composite again at -15 / 0 / +15 px far offset and 0 / \u00b112 px near offset and inspect the seam for gaps or doubled edges.\n- Mean colour per channel within \u00b13 percentage points of the current room painting; red accent present in both rooms.\n- Alpha check: `-alpha extract` shows no haze or fringe outside the intended silhouettes; no baked shadows on transparent ground.\n- Render a 960x540 and 1920x1080 still with the capture script and confirm the JSON `paused` flag is false before judging it.\n\n### Manifest / provenance per output\nKeep the seven required `future_entry_fields` and add the layer fields:\n- `asset_id`, `path` (e.g. `apps/game/assets/layers/corridor-far.png`)\n- `source_or_tool`: \"Codex built-in image_gen tool, edit mode, 2026-10-08\" (plus ImageMagick steps if any)\n- `source_reference`: path of the prompt text in the ignored art notes, plus `references_used`: array of the asset_ids attached as references (e.g. `[\"maintenance-corridor-background-provisional\", \"corridor-far-trial-2026-10-08\"]`)\n- `generated_on`: \"2026-10-08\"\n- `terms_reference`: https://openai.com/policies/terms-of-use/\n- `rights_review_status`: \"Provisional AI-assisted environment layer, human reviewed. Final commercial asset-rights review remains open; not covered by the code/docs GPL license.\"\n- `modifications`: exact size returned, any upscale (method and factor), alpha cleanup, crops; otherwise \"no pixel edits\"\n- `layer_role` (far/mid/floor/near/prop) and `layer_scroll_scale` (0.90/0.95/1.00/1.08)\n- `replaces`: the asset_id it supersedes, and `implementation_status`: which node draws it and in which rooms.\nUpdate the top-level `status` sentence when the set lands and keep `merge_warning` intact.\n\n## 8. Suggested order for the implementation pass\n1. Vignette + fog + drop shadows + reflections + additive lamp/prop glows: no new art, apply to both rooms through the same small helper so it is a presentation layer, not a per-scene dressing. Rendered stills are evidence of appearance only; no feel claims.\n2. Camera parallax on the existing painting at 0.9x/1.06x (accept the ~15 px floor slide for now) or the under-deck strip at 1.08x.\n3. Regenerate the layered sets per section 7; swap to `Parallax2D` nodes with the scroll scales above and remove the slide.\n",
+   "techniques": [
+    {
+     "name": "Reflected actors and props on the wet floor",
+     "api": "Second Sprite2D per actor/prop with flip_v, scale.y about -0.55, modulate.a about 0.22, z below the actor; optional 6-line canvas_item shader fading alpha by UV.y",
+     "compatibility_renderer": "Works on GL Compatibility; plain sprite or canvas_item shader, no lights",
+     "cost": "One extra textured quad per actor/prop, negligible",
+     "effect": "Seats the inked sprites on the painted wet floor, which already has lamp reflection streaks; strongest cheap depth cue available with current art",
+     "recommendation": "do-now"
+    },
+    {
+     "name": "Contact drop shadows",
+     "api": "Soft radial PNG (ImageMagick-generated, original) or draw_circle ellipse under feet, modulate.a about 0.35, slight squash while moving",
+     "compatibility_renderer": "Works on GL Compatibility",
+     "cost": "One small alpha quad per actor/prop",
+     "effect": "Grounds characters and station props; removes the pasted-on look",
+     "recommendation": "do-now"
+    },
+    {
+     "name": "Additive glow sprites over painted lamps and prop lights",
+     "api": "Sprite2D + GradientTexture2D (radial) with CanvasItemMaterial.blend_mode = BLEND_MODE_ADD; tint/alpha driven by existing state code (breaker_armed, door_open)",
+     "compatibility_renderer": "Additive blending works; Compatibility has no 2D glow post-process so this is the correct substitute",
+     "cost": "A handful of additive quads, overdraw only",
+     "effect": "Lamps and prop lights bloom and react to game state; replaces the flat ColorRect status lights",
+     "recommendation": "do-now"
+    },
+    {
+     "name": "Slow fog and dust layers",
+     "api": "Sprite2D with built-in NoiseTexture2D (FastNoiseLite), modulate.a 0.04-0.08, scrolled in _process or via uv offset; one layer below actors, one above",
+     "compatibility_renderer": "Works on GL Compatibility",
+     "cost": "One or two near-full-screen alpha quads; fine on mobile",
+     "effect": "Atmospheric separation between floor, actors and foreground",
+     "recommendation": "do-now"
+    },
+    {
+     "name": "Foreground vignette",
+     "api": "TextureRect with radial GradientTexture2D (transparent centre to near-black edge) in the CanvasLayer under the HUD, alpha about 0.5",
+     "compatibility_renderer": "Works on GL Compatibility",
+     "cost": "One full-screen alpha quad",
+     "effect": "Cinematic framing and darker edges; cheapest 2.5D cue",
+     "recommendation": "do-now"
+    },
+    {
+     "name": "Subtle camera parallax on the existing flat painting (1.06x scale, 0.9x camera speed)",
+     "api": "draw_texture_rect at Rect2(-28.8 - (camera.x - 480) * 0.1, 56, 1017.6, 572.4) with queue_redraw from the camera update, or wrap in Parallax2D with scroll_scale (0.9, 1.0)",
+     "compatibility_renderer": "Works on GL Compatibility; Parallax2D is available in Godot 4.7.2",
+     "cost": "Zero extra draw cost; one redraw per camera move",
+     "effect": "About 15 px wall drift over the full 146 px camera travel; note the painted floor drifts too so actors slide slightly on it",
+     "recommendation": "later"
+    },
+    {
+     "name": "Under-deck strip as a near layer cut from the current painting",
+     "api": "Sprite2D region of the painting's bottom rows (about 690-941 source) drawn over the base at scroll_scale 1.08",
+     "compatibility_renderer": "Works on GL Compatibility",
+     "cost": "One extra textured strip",
+     "effect": "Foreground pipe deck moves faster than the room; doubled content is at most about 12 px on a repetitive pattern",
+     "recommendation": "later"
+    },
+    {
+     "name": "Full layered regeneration as Parallax2D set (far 0.90, mid 0.95, floor 1.00, near 1.08, props separate)",
+     "api": "Parallax2D nodes with per-layer scroll_scale; layers generated with image_gen edit mode at 2560x1440 using existing paintings as references; provenance in manifest.json",
+     "compatibility_renderer": "Works on GL Compatibility; texture memory about 4 x 2560x1440 RGBA per room (VRAM compression on for mobile)",
+     "cost": "Art generation time and review; runtime cost is four large quads per room",
+     "effect": "True parallax without floor slide; proper fix for the single-flat-painting limitation",
+     "recommendation": "later"
+    },
+    {
+     "name": "PointLight2D dynamic lighting with normal maps",
+     "api": "PointLight2D / Light2D with normal-mapped CanvasTexture",
+     "compatibility_renderer": "Supported on GL Compatibility but adds per-light passes; normal maps would need generation for painted art",
+     "cost": "Per-light overdraw on every lit item, noticeable on mobile; extra asset work",
+     "effect": "Real relighting, but the painted lamps are baked so it would fight the art",
+     "recommendation": "avoid"
+    },
+    {
+     "name": "Screen-space glow / bloom post-process for 2D",
+     "api": "WorldEnvironment glow",
+     "compatibility_renderer": "Not available for 2D on the Compatibility renderer",
+     "cost": "n/a",
+     "effect": "n/a; use additive sprites instead",
+     "recommendation": "avoid"
+    }
+   ],
+   "sources": [
+    "apps/game/assets/manifest.json",
+    "apps/game/assets/maintenance-corridor-background-provisional.png",
+    "apps/game/assets/records-access-background-provisional.png",
+    "apps/game/assets/maintenance-props-provisional.png",
+    "apps/game/assets/records-props-provisional.png",
+    "apps/game/assets/title-corridor-key-art-provisional.png",
+    "apps/game/assets/rowan-side-right-provisional.png",
+    "apps/game/assets/wolf-side-right-provisional.png",
+    "apps/game/assets/director-side-left-provisional.png",
+    "apps/game/scenes/main.tscn",
+    "apps/game/scripts/main.gd",
+    "apps/game/scripts/records_room.gd",
+    "apps/game/scripts/m0_actor.gd",
+    "apps/game/scripts/containment_cage.gd",
+    "apps/game/project.godot",
+    "[session scratch, not kept]/art/layers/corridor-far.png",
+    "[session scratch, not kept]/art/corridor-capture.png",
+    "[session scratch, not kept]/evidence/game-p3/20-corridor-start-keyboard.json",
+    "[session scratch, not kept]/evidence/game-p3/01-title-fresh.png",
+    "[session scratch, not kept]/evidence/game-p3/11-intro-step0-keyboard.png",
+    "[session scratch, not kept]/evidence/game-p2/960x540/50-records-entry.png",
+    "[session scratch, not kept]/evidence/game-p2/2340x1080/50-records-entry.png",
+    "[session scratch, not kept]/evidence/game-p2/960x540/37-checkpoint-saved.png",
+    "[session scratch, not kept]/game/review_capture/capture.gd"
+   ]
+  }
+ },
+ "results": [
+  {
+   "pass": "ui-theme",
+   "impl": {
+    "committed": true,
+    "commit_sha": "097e4db",
+    "summary": "UI theme pass committed on codex/game-presentation in the worktree (not pushed). All button, card and panel looks now live in apps/game/assets/fonts/game_theme.tres as one style system: Button normal/hover/pressed/disabled are StyleBoxFlat with a drop shadow, a 2 px lit top border (border_blend), radius 6 and a cyan hover glow; the shared focus ring stays a transparent 2 px #8de5f5 inset ring drawn over the state fill. Theme type variations cover the rest: TouchButton (translucent, radius 12) for the HUD PAUSE and touch \u25c0/\u25b6/USE buttons, TerminalButton/TerminalTabBar/TerminalPanel (squared, same lift and glow, squared copy of the ring) for Settings only, HudCard (top card, dialogue panel, context hint, tutorial prompt), MenuPanel (pause/settings card and credits panel with a deep shadow), CardSheen and TitleVeil (StyleBoxTexture over GradientTexture2D sheens; a horizontal veil behind the title column), plus global PopupMenu and HSlider styles. main.gd lost its per-button stylebox/colour overrides in _setup_touch_controls; game_settings.gd no longer builds styleboxes in code and instead maps the Terminal* variations onto Button/OptionButton/CheckButton in its local theme (CheckButton focus pinned to the shared project ring, TabBar and HSlider rings fall through). HUD ColorRect containers became Panel nodes with the variations set in main.tscn (BottomBar's TopRule removed; accents inset 1 px). New scripts/ui_motion.gd (UIMotion, static) attaches to every BaseButton under CanvasLayer: hover/focus lift to 1.025 and press to 0.965 via 0.06-0.1 s scale tweens with pivot at the control centre, TWEEN_PAUSE_PROCESS so menus animate while paused. Pause and Settings cards fade and slide in (10 px, 0.12 s) and the backdrop fades separately; nothing blocks input. Test changes (explained in comments): ui_controls_test now asserts the pause buttons share the project ring (bg alpha 0) that is wider than their border, differs in colour from hover, and that normal has a shadow and rounded corners and equals the title button style; the three bordered Settings controls assert a squared ring with the ring's colour/width/inset and squared normal; TutorialPrompt cast changed to Control; m0_scene_test casts TopBar/ContextHint/TutorialPrompt as Panel. No new asset files (gradients are procedural resources), so assets/manifest.json is unchanged.",
+    "checks": "`bun run game:check` from the worktree: second import clean; pass chapter_scene_test, m0_scene_test, m0_state_test, settings_test, ui_controls_test (only the hostile-settings test's expected push_warnings in logs); working tree unchanged by checks. Rendered stills (appearance evidence only, no hands-on play): before pass from `git archive HEAD` (pristine main) and after pass from the committed worktree, each at --size=960x540 and --size=1920x1080, 50 PNGs + JSON dumps per run, via the existing review capture.gd driven by scratchpad/presentation-tools/capture.sh. The runner launches Godot with --always-on-top --position 40,40 (a fully occluded window never reaches frame_post_draw on macOS, which stalled the first attempt) and patches the scratch copy of capture.gd so every settle waits at least 12 frames (so no still catches a mid-fade card). The 1920x1080 request is clamped by the 1080p screen to a 1920x937 window, giving 1665x937 images. Capture notes: after/960 clean; after/1080 resumed five stray focus-loss pauses (another job was driving its own Godot window) and 'refusal: walk to breaker failed' (shots 70-72 only); before/960 had two stray pauses and 'walk to mirror failed'. No stray-paused frames remain among the listed stills.",
+    "stills": [
+     "[session scratch, not kept]/evidence/presentation/before/960x540/01-title-fresh.png",
+     "[session scratch, not kept]/evidence/presentation/after/960x540/01-title-fresh.png",
+     "[session scratch, not kept]/evidence/presentation/before/960x540/40-pause-keyboard.png",
+     "[session scratch, not kept]/evidence/presentation/after/960x540/40-pause-keyboard.png",
+     "[session scratch, not kept]/evidence/presentation/after/1920x1080/40-pause-keyboard.png",
+     "[session scratch, not kept]/evidence/presentation/before/960x540/42-pause-settings-tab0.png",
+     "[session scratch, not kept]/evidence/presentation/after/960x540/42-pause-settings-tab0.png",
+     "[session scratch, not kept]/evidence/presentation/after/960x540/42-pause-settings-tab2.png",
+     "[session scratch, not kept]/evidence/presentation/before/960x540/30-relay-choice-keyboard.png",
+     "[session scratch, not kept]/evidence/presentation/after/960x540/30-relay-choice-keyboard.png",
+     "[session scratch, not kept]/evidence/presentation/after/960x540/31-relay-choice-touch.png",
+     "[session scratch, not kept]/evidence/presentation/after/960x540/21-corridor-start-touch.png",
+     "[session scratch, not kept]/evidence/presentation/before/960x540/56-chapter-close-keyboard.png",
+     "[session scratch, not kept]/evidence/presentation/after/960x540/56-chapter-close-keyboard.png"
+    ],
+    "open_issues": [
+     "No hands-on play happened: the hover/press scale, card slide and overall feel are unvalidated; stills only show appearance.",
+     "Buttons use StyleBoxFlat (shadow, lit top border, glow) rather than gradient fills, because the test contract casts button 'normal' to StyleBoxFlat and Godot draws a single stylebox per state; GradientTexture2D sheens are applied to panels (pause, credits, HUD top card, dialogue card) and the title veil instead.",
+     "Test contract changed on purpose: the pause-menu focus is no longer an opaque fill (bg alpha 1) but the shared transparent inset ring over the state fill, and the Settings Back/FPS/Resolution controls assert a squared copy of that ring; CheckButton inside Settings keeps the rounded shared ring (radius 6 inside a square control) to preserve the existing vsync-ring assertion.",
+     "1920x1080 stills are 1665x937 because the 1080p screen clamps a windowed capture to 1920x937; a fullscreen capture would be needed for exact 1080p frames.",
+     "The capture script's focus-loss pauses still fire when another Godot window is open (another job was capturing from this scratchpad); the after/1080 run resumed five such pauses and its refusal-route walk failed (shots 70-72 only). The Settings tab bar never highlights the selected tab in capture stills (tab0/tab1/tab2 all show DISPLAY) because capture.gd calls select_tab() without setting current_tab; this predates the pass.",
+     "Unrelated: the sibling job's zoom captures rsync from this worktree, so any of its stills rendered after this commit include the new theme."
+    ]
+   },
+   "verify": {
+    "verdict": "fix-needed",
+    "defects": [
+     {
+      "title": "PAUSE button now overflows the right edge of the viewport",
+      "location": "apps/game/scenes/main.tscn lines 355-363 (PauseButton offset_left 873 / offset_right 942 with theme_type_variation TouchButton) and apps/game/assets/fonts/game_theme.tres TouchButton_normal content_margin_left/right = 14",
+      "detail": "The TouchButton variation adds 14 px content margins on each side, so the 'PAUSE' label at font size 17 forces the button's minimum width to 88 px; Godot grows the control rightward from offset_left 873, giving rect [873,16,88,56] in the after UI dumps (right edge x=961 on a 960-wide viewport). Before the commit the rect was [873,16,69,56]. In the after stills (960x540 30-relay-choice-keyboard, 21-corridor-start-touch; 1920x1080 03-title-settings-tab0) the button's right border is clipped by the screen edge, which is the only on-screen control that lost its full border. Fix by moving offset_left to about 854 (keeping the 18 px right gutter) or lowering TouchButton content margins so the 69 px scene width still fits. No gameplay impact; the tap target still works.",
+      "severity": 2
+     }
+    ],
+    "checks": "Reviewed commit 097e4db in the worktree (git show --stat and full diff of game_theme.tres, main.tscn, main.gd, game_settings.gd, new ui_motion.gd, m0_scene_test.gd, ui_controls_test.gd). Re-ran `bun run game:check` in the worktree: double import plus all five suites pass (chapter_scene_test, m0_scene_test, m0_state_test, settings_test, ui_controls_test; exit 0; log at scratchpad/review-game-check.log). Worktree is clean, no new asset files (only game_theme.tres under assets changed), so no manifest entry is required. Renderer: project.godot uses gl_compatibility on desktop and mobile; every new feature is Panel + StyleBoxFlat (shadows/borders/corners), StyleBoxTexture over a 4x64 / 64x4 GradientTexture2D, and property tweens, all CPU-built CanvasItem draws supported by GL Compatibility; mobile cost is a handful of extra quads per card and short 0.06-0.12 s scale/alpha tweens, plausible. Gameplay logic: main.gd diff only swaps ColorRect types for Panel, removes the per-button stylebox overrides, adds _fade_backdrop/_reveal_menu tweens (created on PauseOverlay which has process_mode = 3, so they run while paused) and attaches UIMotion to BaseButtons found under CanvasLayer at _ready (Settings builds all its buttons in its own _ready, which runs first, so they are covered; no scripts build buttons later). Terminal look: TerminalButton/TerminalTabBar/TerminalPanel variations are applied only in game_settings.gd; title, pause, credits and HUD use the rounded lifted Button/TouchButton/MenuPanel/HudCard styles. Focus: Button_focus/TouchButton_focus/TerminalButton_focus all have expand_margin 0, 2 px borders and transparent fill, so the ring sits inside each control's rect; tests assert ring width > normal border width and a ring colour distinct from hover, plus the squared terminal ring in Settings. Tests were rewritten, not weakened: the old assertion that focus had an opaque fill (bg_color.a == 1.0) was replaced by assertions matching the new transparent ring-over-fill design, and a new assertion checks title and pause buttons share one normal style. Settings typography: JSON dumps show Montserrat-Semibold 16 on BackButton, FPSOptions, V-SYNC and FULLSCREEN both before and after, with identical rects (BackButton grew 1 px tall), and tab0/tab1/tab2 stills share the same panel, tab bar and padding. UI dumps confirmed PauseButton rect [873,16,88,56] after vs [873,16,69,56] before (the defect above). Note: the 1920x1080 run's 01-title-fresh and 03-title-settings-tab* captures show the intro (flags intro_active true, title_open false) rather than the title or Settings, so 1080p evidence only covers gameplay and pause; the 960x540 set covers every screen. No hands-on play happened; stills are evidence of appearance only.",
+    "visual_notes": "The pass does read as more dimensional while staying readable. Pause menu (960 and 1080): the card now has a rounded border, a deep drop shadow and a top-lit sheen, buttons show a lit top edge and soft shadow, and the focused Resume button keeps a bright 2 px cyan ring inside its border; white label text over the #132a3d fills has strong contrast. Title: the right-side veil gradient darkens the key art only behind the menu column, leaving Rowan and WOLF untouched; the lifted buttons sit better on the art than the former flat cards, and Continue reads as disabled. Credits panel gained the same card treatment. Settings keeps its squared terminal identity consistently across Display/Audio/Controls tabs (same tab bar, panel, padding and fonts); sliders, option buttons and the Back button show focus rings inside their borders. The one inconsistency is that CheckButtons (V-SYNC, FULLSCREEN) borrow the shared rounded 6 px ring on squared controls, which is faintly visible at 960x540; cosmetic only. HUD: top card, dialogue bar, context hint and tutorial prompt now have a thin border, shadow and sheen, which lifts them off the room; speaker and story text stay high-contrast and the cards keep their previous rects, so they cover nothing new (the touch Left/Right buttons overlapping the characters at the corridor start is pre-existing and unchanged). Choice cards in keyboard mode look identical for choice 1 and 2 because neither has focus in that capture state, same as before. Dialogue choice cards and the touch controls use the rounded TouchButton look with a semi-transparent fill that still lets the room through. Only visible regression is the clipped PAUSE button edge noted in defects.",
+    "fix": {
+     "committed": true,
+     "commit_sha": "f2a4809",
+     "summary": "Reviewer defect confirmed against the code and the after dumps: the TouchButton variation's 14 px content margins raised PauseButton's minimum width to 88 px, so it grew rightward from offset_left 873 to x=961 on the 960-wide viewport ([873,16,88,56]) and lost its right border. Scanning every after dump for out-of-viewport rects found the same root cause on the USE touch button (TouchControls/Use grew 118 -> 155 px wide, right edge 965) which the reviewer had not listed. Fix (one commit, apps/game/scenes/main.tscn only): PauseButton offset_left 873 -> 854 (right edge stays 942, 18 px gutter), Use offset_left 810 -> 773 (right edge stays 928), and grow_horizontal = 0 on both so any future minimum-size growth extends leftward from the fixed right edge instead of off-screen. No theme change, so the focus-stylebox test assertions are untouched. Re-rendered stills now report PauseButton [854,16,88,56] and Use [773,345,155,90] at both 960x540 and 1920x1080, with zero controls outside the viewport (ScrollContainer children excluded, as they clip and scroll). Stills show the full right border and gutter on PAUSE, USE and CONTINUE. Appearance evidence only; no hands-on play happened.",
+     "checks": "`bun run game:check` in the worktree: pass chapter_scene_test, m0_scene_test, m0_state_test, settings_test, ui_controls_test (import twice with isolated HOME, all suites). Rendered stills via review_capture/capture.gd at 960x540 and 1920x1080 into scratchpad/evidence/presentation/fix1/<size>/ (101 files each, capture notes empty, exit 0). Scanned all fix1 UI dumps with scratchpad/scan_overflow.py: no rect outside the viewport. Note: the first render attempt stalled after 12-intro-step2 (Godot idle, no files for 11 min) and had to be killed; the rerun completed in about a minute with identical results, so the stall was environmental, not the scene change.",
+     "stills": [
+      "[session scratch, not kept]/evidence/presentation/after/960x540/10-intro-step0-touch.png",
+      "[session scratch, not kept]/evidence/presentation/fix1/960x540/10-intro-step0-touch.png",
+      "[session scratch, not kept]/evidence/presentation/fix1/960x540/21-corridor-start-touch.png",
+      "[session scratch, not kept]/evidence/presentation/fix1/960x540/30-relay-choice-keyboard.png",
+      "[session scratch, not kept]/evidence/presentation/fix1/1920x1080/03-title-settings-tab0.png"
+     ],
+     "open_issues": [
+      "No hands-on play has happened on this branch; stills are appearance evidence only.",
+      "The reviewer's cited 1920x1080 03-title-settings-tab0 frame is the title settings screen, where PauseButton is hidden; the overflow was visible in gameplay/touch frames instead. The fix covers it regardless.",
+      "Still capture can stall when the Godot window sits idle after a frame (observed once, reproduced clean on rerun); if it recurs, kill the godot process and rerun the capture as its own background job."
+     ]
+    }
+   }
+  },
+  {
+   "pass": "depth-pass",
+   "impl": {
+    "committed": true,
+    "commit_sha": "98106cb",
+    "summary": "Presentation pass committed on codex/game-presentation in the worktree (98106cb, not pushed). Shared structure, not per-room dressing: new `apps/game/scripts/room_depth.gd` (RoomDepth, Node2D) that each room builds over its untouched painting: (1) Parallax2D backdrop drawn 1.06x larger at scroll 0.9x (Parallax2D confirmed on this 4.7.2 Compatibility build by a headless probe: position = (camera-480)*(1-scroll_scale), zoom-independent, vertical scroll kept at 1.0 so intro/close zooms don't shift the floor) plus a near Parallax2D strip at 1.1x (soft edge pillars + floor-front shade, drawn above actors at z 3); (2) `floor_reflection.gd` (FloorReflection, Sprite2D) mirrors a source sprite under its resting bottom edge, squashed 0.55, fading via `assets/shaders/floor_reflection.gdshader` (fade along height, ~1 px wobble, region-aware) with a radial contact shadow; attached to Rowan, WOLF, the Director, breaker/relay/safe-point/door art and the three records props; (3) additive GradientTexture2D glows with looping flicker tweens on the measured painted ceiling lamps (corridor 0.345/0.604/0.87, records 0.203/0.604/0.87 of the plate), pulsing red lockdown lamps, plus tinted status-light glows that follow the existing breaker/relay/purge/mirror state colours (PointLight2D/CanvasModulate deliberately not used: additive sprites are the cheap, deterministic option); (4) wall haze gradient at the floor seam, far (30) and near (12) CPUParticles2D dust motes with preprocess, two drifting half-radial light shafts per room; (5) `PostProcess` CanvasLayer (layer 1) with `post_grade.gdshader` (blend_mul: mild cold grade + vignette, no screen copy) under the UI CanvasLayer (now layer 2), verified untouched on title and pause stills; (6) optional trial corridor: `Main.corridor_layers_trial` (default false) runtime-loads `assets/trial/corridor-{far,mid,near}-trial.png` as far 0.9x / mid 0.95x / near 1.1x plates (near region x<1530 so the crate stack cannot cover the safe point), registered in manifest.json as Codex image_gen trial assets dated 2026-10-08, reference the corridor background, rights review open; existing art untouched. `Main.effects_enabled` (exported, default true) switches the whole pass; off restores the plain paintings at the original Rect2(0,60,960,540) (verified by still). Backgrounds moved out of Main/RecordsRoom `_draw()` into RoomDepth at absolute z -4 (fill), -3 (atmosphere), -2 (reflections); corridor-only props/labels now hide while Records is visible since the records backdrop no longer paints over them; the door-open line is chapter-gated. Also, per the user's ask to make the AI art look better: character and prop sheets now import mipmaps and their sprites use linear-with-mipmaps filtering, which visibly removes the aliasing on the 14-21x downscaled sprites (compare probe/crops/before-actors.png vs after-actors.png). Gameplay positions, reach distances, camera limits and dialogue unchanged; test assertions unchanged.",
+    "checks": "`bun run game:check` from the worktree (imports twice with isolated HOME, then all suites): pass chapter_scene_test, pass m0_scene_test, pass m0_state_test, pass settings_test, pass ui_controls_test; run twice (logs: scratchpad/logs/depth-check1 and depth-check2) with no ERROR/SCRIPT ERROR lines beyond the settings suite's intentional \"Settings file ...\" warnings; the script's git-status guard confirmed imports leave the tree unchanged. After the final cosmetic var move, headless import + chapter_scene_test + m0_scene_test re-run and passed. Headless Parallax2D probe (scratchpad/probe/parallax_probe.gd) confirmed offset semantics. Rendered stills (appearance only, no hands-on play): review capture at 960x540 and 1920x1080 with effects on (all ~62 frames, _run.json notes empty, no stray pauses), 960x540 with the trial corridor flag, and a short effects-off capture; capture stdout showed no script errors.",
+    "stills": [
+     "[session scratch, not kept]/evidence/presentation/after/960x540/20-corridor-start-keyboard.png",
+     "[session scratch, not kept]/evidence/presentation/depth-after/960x540/20-corridor-start-keyboard.png",
+     "[session scratch, not kept]/evidence/presentation/after/960x540/37-checkpoint-saved.png",
+     "[session scratch, not kept]/evidence/presentation/depth-after/960x540/37-checkpoint-saved.png",
+     "[session scratch, not kept]/evidence/presentation/depth-after/960x540/35-relay-cooperate-door.png",
+     "[session scratch, not kept]/evidence/presentation/depth-after/960x540/30-relay-choice-keyboard.png",
+     "[session scratch, not kept]/evidence/presentation/after/960x540/50-records-entry.png",
+     "[session scratch, not kept]/evidence/presentation/depth-after/960x540/50-records-entry.png",
+     "[session scratch, not kept]/evidence/presentation/after/960x540/56-chapter-close-keyboard.png",
+     "[session scratch, not kept]/evidence/presentation/depth-after/960x540/56-chapter-close-keyboard.png",
+     "[session scratch, not kept]/evidence/presentation/depth-after/960x540/12-intro-step2.png",
+     "[session scratch, not kept]/evidence/presentation/depth-after/960x540/40-pause-keyboard.png",
+     "[session scratch, not kept]/evidence/presentation/depth-after/1920x1080/20-corridor-start-keyboard.png",
+     "[session scratch, not kept]/evidence/presentation/depth-after/1920x1080/50-records-entry.png",
+     "[session scratch, not kept]/evidence/presentation/depth-trial/960x540/20-corridor-start-keyboard.png",
+     "[session scratch, not kept]/evidence/presentation/depth-trial/960x540/37-checkpoint-saved.png",
+     "[session scratch, not kept]/evidence/presentation/depth-off/960x540/20-corridor-start-effects-off.png",
+     "[session scratch, not kept]/probe/crops/before-actors.png",
+     "[session scratch, not kept]/probe/crops/after-actors.png"
+    ],
+    "open_issues": [
+     "No hands-on play has happened: parallax drift, lamp flicker, shaft drift, dust motion and reflection wobble were judged from stills only; feel, pacing and readability remain unvalidated and the task's rules forbid claiming otherwise.",
+     "Baseline caveat: evidence/game-p3 is unusable as a before (pause overlay open, run stops at 62 files), so the previous pass's clean set evidence/presentation/after/{960x540,1920x1080} (the branch state before this commit) served as the before for this pass.",
+     "Inherent single-plate parallax artefact: the painted floor slides about 15 px relative to the actors across the full 146 px camera travel (backdrop at 0.9x); only a split floor plate would remove it.",
+     "Trial corridor (corridor_layers_trial) is a different painting whose lamp rhythm and mid pillars do not line up with the station layout, the near plate's region cut leaves its rail ending near world x 780 beside the relay, and it adds about 4.4 MB of binaries to the repo; it is off by default and rendered only at 960x540 (depth-trial). Recommend keeping the single-painting pass as the shipped look.",
+     "Mobile cost is estimated (about three full-screen layers plus small sprites, 42 CPU particles, +33% texture memory for the five mipmapped sheets) and not measured on a device or export.",
+     "Settings toggle for effects_enabled was not added (only the exported bool on Main, as scoped); effects_enabled also leaves the looping flicker/drift tweens running on hidden sprites, which is negligible but could be stopped if a toggle ships.",
+     "PointLight2D, CanvasModulate and normal maps were not used; glows are additive sprites, so actors do not receive real light as they pass under lamps.",
+     "Glow, haze, vignette and reflection strengths (0.5 / 0.14 / 0.42 / 0.32) are first-pass values tuned from stills and will likely want adjustment after play."
+    ]
+   },
+   "verify": {
+    "verdict": "pass",
+    "defects": [
+     {
+      "title": "Trial depth plates (4.3 MB) are committed with no export exclusion",
+      "location": "apps/game/assets/trial/ (corridor-far/mid/near-trial.png)",
+      "detail": "Non-blocking. The three off-by-default trial plates are only load()-ed when Main.corridor_layers_trial is true, so they cost nothing at runtime, but the project has no export_presets.cfg yet, so whenever exports are set up these 4.3 MB of comparison-only PNGs will ship unless an exclude filter for assets/trial/* is added. Manifest entries exist and mark them trial-only, rights review open.",
+      "severity": 1
+     },
+     {
+      "title": "Pre-existing: settings tab bar highlight stays on DISPLAY in the per-tab stills",
+      "location": "apps/game/scripts/game_settings.gd:306 (select_tab)",
+      "detail": "Non-blocking and not introduced by this commit (the before stills show the same). The review capture drives tabs through select_tab(i), which swaps pages and the note text but does not move the TabBar's current tab, so 42-pause-settings-tab1/tab2 show AUDIO/CONTROLS content under a highlighted DISPLAY tab. Page typography, padding and the Back button are consistent across the three tabs. Worth a one-line fix (set tabs.current_tab in select_tab, or have the capture click the tab) in a later pass.",
+      "severity": 1
+     }
+    ],
+    "checks": "Reviewed commit 98106cb (\"Give both rooms parallax depth, lamp light and floor reflections\") in the worktree; working tree clean. Diff touches only presentation: new room_depth.gd (RoomDepth, Node2D), floor_reflection.gd (Sprite2D + shader), two canvas_item shaders, main.tscn (CorridorDepth node, PostProcess CanvasLayer at layer 1 with a blend_mul ColorRect, UI CanvasLayer moved to layer 2, texture_filter=4 on sprites), main.gd (+85: effects_enabled/corridor_layers_trial exports, reflections, status glows, corridor-only visibility while in Records, door-open line now gated to the lockdown chapter), records_room.gd (depth child, glows, reflections, light-colour helpers), five .import files (mipmaps/generate=true), manifest.json (three trial-plate entries plus implementation_status notes on seven existing entries, status line updated), trial PNGs + imports. No tests, theme (.tres) or settings scripts changed, so the terminal look stays in Settings and the focus-stylebox assertions are untouched. Indentation is tabs throughout (grep for leading spaces in the four scripts returned nothing); all code is typed GDScript with built-in nodes. bun run game:check re-run in the worktree: pass on chapter_scene_test, m0_scene_test, m0_state_test, settings_test, ui_controls_test, exit 0. Re-rendered HEAD myself at 960x540 into evidence/presentation/review-head/960x540 (101 files, capture notes=[], no script/shader errors in the Godot log, Compatibility renderer); ImageMagick RMSE against the implementer's depth-after stills is 0.0002-0.017, i.e. identical apart from dust/flicker animation, so the listed after stills do represent HEAD. Renderer support: Parallax2D (4.3+), CPUParticles2D, CanvasItemMaterial BLEND_MODE_ADD, GradientTexture2D, canvas_item shaders using TIME/TEXTURE_PIXEL_SIZE and render_mode blend_mul,unshaded, LINEAR_WITH_MIPMAPS filtering on lossless imports all work on gl_compatibility (project.godot sets gl_compatibility for desktop and mobile). Mobile cost is plausible: ~10 one-texture-read reflection sprites, 42 CPU particles, ~12 small additive gradient sprites, one multiply quad; mipmaps add roughly a third more VRAM on the five large sheets (about 10 MB). Gameplay logic unchanged: state, input, movement, choices and save code untouched; _sync_records_room only toggles visibility of corridor-only dressing, which the Records painting previously covered by z-order. Ready ordering is sound (records_room._ready builds depth/glows/reflections inside add_child before Main reads them; glows exist before the first _refresh_ui). Parallax lag is at most about 7 px over the 146 px camera range against a 29 px overscan, and the right-extreme still (37-checkpoint-saved) shows no base-colour strip at the edge. Rebuild/cleanup of RoomDepth kills tweens and frees built nodes correctly; FloorReflection follows source position/scale/flip/modulate/visibility each frame and sits at absolute z -2 under props. Baseline note: evidence/game-p3 is unreliable for 20/37/50 (its JSON shows paused=true and the PNGs are a pause menu and title screens), so evidence/presentation/before/960x540 was used as the real before.",
+    "visual_notes": "Appearance only; no hands-on play has happened. Corridor (20, 30, 33, 35, 37, 72): the room reads noticeably more dimensional than before - cold additive glows and soft drifting shafts sit exactly on the painted ceiling lamps, a mild wall haze pushes the back wall away, actors and the four stations now have squashed fading reflections and contact shadows on the wet floor, the vignette and cold grade deepen the corners and the near edge pillars/floor-front shade frame the scene without touching the actors (the shade starts below their feet; the SAFE POINT art at the right edge is fully visible). Status lights on the breaker/relay and the Records machines gain tinted glows that follow state (orange to blue when armed, green when done). Records (50, 53, 56, 58): same treatment, lamps and lockdown lamps glow in the right places, PURGE QUEUE/MIRROR PORT/EXIT labels stay readable, nothing overlaps the stations; the open-exit dark doorway rectangle is pre-existing drawing, not from this commit. Intro (11, 12): the Director and cage scene gets the same floor contact and a visible shaft; the cage stays uncovered. UI over the world: HUD, hint, dialogue, choice and pause cards keep strong contrast because the grade is multiplied under the UI layer; focus rings remain inside control borders (RESUME, NEW GAME, FPS LIMIT, V-SYNC in the focus stills); title screen unchanged. 1920x1080 stills scale cleanly, reflections and glows do not band. Actor crops: with mipmaps the heavily downscaled wolf and Rowan sheets lose the crunchy aliasing of the before crop and the wolf's reflection reads as attached; the wolf sprite's transparent padding puts its reflection ~5 px below the paws, which is faint and only visible in the crop. Effects-off still shows the plain paintings, confirming the single switch. Trial corridor plates (depth-trial) place the lamps differently and look flatter than the painted room; keeping them off by default is the right call. Subtle but honest: the parallax shift itself is only a few pixels and will read mainly as motion in play, so the dimensional gain in stills comes from lighting, reflections and vignette rather than layer separation."
+   }
+  }
+ ]
+}

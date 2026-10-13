@@ -1,0 +1,29 @@
+{
+ "eng-idle": {
+  "frames": 8,
+  "fps": null,
+  "loop_s": 2.32,
+  "world_speed_px_s": 0,
+  "ground_cell_px_per_frame": null,
+  "game_scale": 0.6859,
+  "size_game": null
+ },
+ "eng-walk": {
+  "frames": 12,
+  "fps": 15.3,
+  "loop_s": 0.784,
+  "world_speed_px_s": 80.0,
+  "ground_cell_px_per_frame": 20.58,
+  "game_scale": 0.6859,
+  "size_game": null
+ },
+ "eng-jog": {
+  "frames": 12,
+  "fps": 22.83,
+  "loop_s": 0.526,
+  "world_speed_px_s": 190.0,
+  "ground_cell_px_per_frame": 32.766,
+  "game_scale": 0.6859,
+  "size_game": null
+ }
+}

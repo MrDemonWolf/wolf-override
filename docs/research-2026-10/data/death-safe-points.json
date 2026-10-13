@@ -129,12 +129,12 @@
     "https://www.hardcoregaming101.net/limbo/",
     "https://fireemblemwiki.org/wiki/Game_over",
     "https://www.gamerguides.com/fire-emblem-awakening/intro-and-gameplay/gameplay",
-    "/private/tmp/claude-501/-Users-nathanialhenniges-Developer-mrdemonwolf-wolf-override/eb713cd4-8931-48d7-8c83-5b0b0d1e9cf3/scratchpad/wt-game/apps/game/scripts/main.gd (lines 1138-1165 _interact_checkpoint, 1242-1268 _save_progress/_write_beat/_mark_beat, 1706-1767 _fail_beat/_restore_beat)",
-    "/private/tmp/claude-501/-Users-nathanialhenniges-Developer-mrdemonwolf-wolf-override/eb713cd4-8931-48d7-8c83-5b0b0d1e9cf3/scratchpad/wt-game/apps/game/scripts/m0_state.gd (SAVE_VERSION 4, DISCLOSE/PRESS)",
-    "/private/tmp/claude-501/-Users-nathanialhenniges-Developer-mrdemonwolf-wolf-override/eb713cd4-8931-48d7-8c83-5b0b0d1e9cf3/scratchpad/wt-game/apps/game/scripts/junction_room.gd, pressure_line.gd, sentry_brain.gd, drop_arm.gd (hazard geometry and timings)",
-    "/private/tmp/claude-501/-Users-nathanialhenniges-Developer-mrdemonwolf-wolf-override/eb713cd4-8931-48d7-8c83-5b0b0d1e9cf3/scratchpad/wt-game/apps/game/tests/impact_test.gd, junction_test.gd, sentry_test.gd (knockdown-restore assertions)",
-    "/private/tmp/claude-501/-Users-nathanialhenniges-Developer-mrdemonwolf-wolf-override/eb713cd4-8931-48d7-8c83-5b0b0d1e9cf3/scratchpad/review/real-inventory-design.json",
-    "/Users/nathanialhenniges/Developer/mrdemonwolf/wolf-override/AGENT.md"
+    "[session scratch, not kept]/wt-game/apps/game/scripts/main.gd (lines 1138-1165 _interact_checkpoint, 1242-1268 _save_progress/_write_beat/_mark_beat, 1706-1767 _fail_beat/_restore_beat)",
+    "[session scratch, not kept]/wt-game/apps/game/scripts/m0_state.gd (SAVE_VERSION 4, DISCLOSE/PRESS)",
+    "[session scratch, not kept]/wt-game/apps/game/scripts/junction_room.gd, pressure_line.gd, sentry_brain.gd, drop_arm.gd (hazard geometry and timings)",
+    "[session scratch, not kept]/wt-game/apps/game/tests/impact_test.gd, junction_test.gd, sentry_test.gd (knockdown-restore assertions)",
+    "[session scratch, not kept]/review/real-inventory-design.json",
+    "AGENT.md"
    ]
   },
   "r3": {
@@ -153,22 +153,22 @@
     "No test covers Android Back or focus loss during a knockdown; add both when death lands."
    ],
    "sources": [
-    "/private/tmp/claude-501/-Users-nathanialhenniges-Developer-mrdemonwolf-wolf-override/eb713cd4-8931-48d7-8c83-5b0b0d1e9cf3/scratchpad/wt-game/apps/game/scripts/main.gd (lines 18-33, 165-178, 269-276, 405-452, 733-915, 965-1029, 1032-1290, 1463-1500, 1566-1690, 1706-1784, 1802-1852, 1922-1948, 2078-2190)",
-    "/private/tmp/claude-501/-Users-nathanialhenniges-Developer-mrdemonwolf-wolf-override/eb713cd4-8931-48d7-8c83-5b0b0d1e9cf3/scratchpad/wt-game/apps/game/scripts/m0_state.gd (SAVE_VERSION 4, from_dict 200-313, save/load 316-359)",
-    "/private/tmp/claude-501/-Users-nathanialhenniges-Developer-mrdemonwolf-wolf-override/eb713cd4-8931-48d7-8c83-5b0b0d1e9cf3/scratchpad/wt-game/apps/game/scripts/junction_room.gd (x constants 71-118, hazards 311 and 444, set_active, sync_arm, reset_transient)",
-    "/private/tmp/claude-501/-Users-nathanialhenniges-Developer-mrdemonwolf-wolf-override/eb713cd4-8931-48d7-8c83-5b0b0d1e9cf3/scratchpad/wt-game/apps/game/scripts/records_room.gd",
-    "/private/tmp/claude-501/-Users-nathanialhenniges-Developer-mrdemonwolf-wolf-override/eb713cd4-8931-48d7-8c83-5b0b0d1e9cf3/scratchpad/wt-game/apps/game/scripts/pressure_line.gd",
-    "/private/tmp/claude-501/-Users-nathanialhenniges-Developer-mrdemonwolf-wolf-override/eb713cd4-8931-48d7-8c83-5b0b0d1e9cf3/scratchpad/wt-game/apps/game/scripts/sentry_brain.gd",
-    "/private/tmp/claude-501/-Users-nathanialhenniges-Developer-mrdemonwolf-wolf-override/eb713cd4-8931-48d7-8c83-5b0b0d1e9cf3/scratchpad/wt-game/apps/game/scripts/drop_arm.gd",
-    "/private/tmp/claude-501/-Users-nathanialhenniges-Developer-mrdemonwolf-wolf-override/eb713cd4-8931-48d7-8c83-5b0b0d1e9cf3/scratchpad/wt-game/apps/game/scripts/hazard.gd",
-    "/private/tmp/claude-501/-Users-nathanialhenniges-Developer-mrdemonwolf-wolf-override/eb713cd4-8931-48d7-8c83-5b0b0d1e9cf3/scratchpad/wt-game/apps/game/scripts/m0_actor.gd (WALK_SPEED 190, FOLLOW_SPEED 220)",
-    "/private/tmp/claude-501/-Users-nathanialhenniges-Developer-mrdemonwolf-wolf-override/eb713cd4-8931-48d7-8c83-5b0b0d1e9cf3/scratchpad/wt-game/apps/game/scripts/impact.gd (flash/reset, PROCESS_MODE_ALWAYS)",
-    "/private/tmp/claude-501/-Users-nathanialhenniges-Developer-mrdemonwolf-wolf-override/eb713cd4-8931-48d7-8c83-5b0b0d1e9cf3/scratchpad/wt-game/apps/game/scripts/sfx_bank.gd and game_settings.gd (Effects bus volume owned by sliders)",
-    "/private/tmp/claude-501/-Users-nathanialhenniges-Developer-mrdemonwolf-wolf-override/eb713cd4-8931-48d7-8c83-5b0b0d1e9cf3/scratchpad/wt-game/apps/game/scenes/main.tscn (corridor station x: breaker 350, relay 605, door 780 w56, safe point 876)",
-    "/private/tmp/claude-501/-Users-nathanialhenniges-Developer-mrdemonwolf-wolf-override/eb713cd4-8931-48d7-8c83-5b0b0d1e9cf3/scratchpad/wt-game/apps/game/tests/impact_test.gd, junction_test.gd, sentry_test.gd, m0_state_test.gd (restore, bytes and Continue asserts)",
-    "/private/tmp/claude-501/-Users-nathanialhenniges-Developer-mrdemonwolf-wolf-override/eb713cd4-8931-48d7-8c83-5b0b0d1e9cf3/scratchpad/wt-game/scripts/check-game.sh",
-    "/private/tmp/claude-501/-Users-nathanialhenniges-Developer-mrdemonwolf-wolf-override/eb713cd4-8931-48d7-8c83-5b0b0d1e9cf3/scratchpad/review/real-inventory-design.json (v5 kit and pickup snapshot rules)",
-    "/Users/nathanialhenniges/Developer/mrdemonwolf/wolf-override/AGENT.md"
+    "[session scratch, not kept]/wt-game/apps/game/scripts/main.gd (lines 18-33, 165-178, 269-276, 405-452, 733-915, 965-1029, 1032-1290, 1463-1500, 1566-1690, 1706-1784, 1802-1852, 1922-1948, 2078-2190)",
+    "[session scratch, not kept]/wt-game/apps/game/scripts/m0_state.gd (SAVE_VERSION 4, from_dict 200-313, save/load 316-359)",
+    "[session scratch, not kept]/wt-game/apps/game/scripts/junction_room.gd (x constants 71-118, hazards 311 and 444, set_active, sync_arm, reset_transient)",
+    "[session scratch, not kept]/wt-game/apps/game/scripts/records_room.gd",
+    "[session scratch, not kept]/wt-game/apps/game/scripts/pressure_line.gd",
+    "[session scratch, not kept]/wt-game/apps/game/scripts/sentry_brain.gd",
+    "[session scratch, not kept]/wt-game/apps/game/scripts/drop_arm.gd",
+    "[session scratch, not kept]/wt-game/apps/game/scripts/hazard.gd",
+    "[session scratch, not kept]/wt-game/apps/game/scripts/m0_actor.gd (WALK_SPEED 190, FOLLOW_SPEED 220)",
+    "[session scratch, not kept]/wt-game/apps/game/scripts/impact.gd (flash/reset, PROCESS_MODE_ALWAYS)",
+    "[session scratch, not kept]/wt-game/apps/game/scripts/sfx_bank.gd and game_settings.gd (Effects bus volume owned by sliders)",
+    "[session scratch, not kept]/wt-game/apps/game/scenes/main.tscn (corridor station x: breaker 350, relay 605, door 780 w56, safe point 876)",
+    "[session scratch, not kept]/wt-game/apps/game/tests/impact_test.gd, junction_test.gd, sentry_test.gd, m0_state_test.gd (restore, bytes and Continue asserts)",
+    "[session scratch, not kept]/wt-game/scripts/check-game.sh",
+    "[session scratch, not kept]/review/real-inventory-design.json (v5 kit and pickup snapshot rules)",
+    "AGENT.md"
    ]
   }
  },

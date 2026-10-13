@@ -1,0 +1,26 @@
+References, in order:
+- Image 1 = [session scratch, not kept]/hq/characters/raw/wolf-side-stand-a3.png (the corrected Look 2 identity and proportion lock)
+- Image 2 = CHARDIR/refs/ref-v2-wolf-source.png (the approved style-test WOLF: head-turn pose guide)
+- Image 3 = CHARDIR/refs/ref-style-test-v2.png
+- Image 4 = apps/game/assets/title-corridor-key-art-provisional.png
+- Image 5 = CHARDIR/refs/palette-card.png
+
+IMAGE PROMPT:
+~~~text
+USE CASE: stylized-concept, identity-preserving new pose (do not redesign)
+ASSET: identity cut-out of WOLF, the robotic wolf companion in WOLF//OVERRIDE, looking back; Look 2 graphic-painterly game art for a 2D side-view sci-fi horror game.
+OUTPUT: one wide landscape PNG with a genuinely transparent background (real alpha). WOLF fills about 85% of the canvas width, centred, fully inside the frame with a clear margin. Final game size will be exactly 460 px long after one downscale. No text, letters, numbers, logos, UI, watermark, guide lines or borders.
+REFERENCE ROLES:
+Image 1 = the canonical identity: the same WOLF, same armour plates, joints, legs, tail, colours, proportions, rendering and lighting. Change only the head and neck pose.
+Image 2 = the approved Look 2 style-test WOLF, which already looks back over its shoulder: copy its head-and-neck turn and its raised head height exactly (muzzle pointing to screen-left, face in three-quarter from the front). Keep Image 1's body, legs, plates and tail.
+Image 3 = the approved Look 2 style test: rendering, value structure and edges only; ignore its composition and props.
+Image 4 = mood, lighting and palette only; its robotic wolf looks back over its shoulder toward the engineer: use that idea for the head turn only, not its composition.
+Image 5 = colour swatches only.
+SUBJECT: exactly one robotic wolf, body and legs in a strict side view facing screen-right, standing still on all four paws on one level baseline, as in Image 1. The neck is raised and bent and the head is turned all the way back over the shoulder: the MUZZLE POINTS TO SCREEN-LEFT, toward the tail, so the nose is to the left of the ears and the face is seen in three-quarter from the front, looking behind itself at someone following. The cyan eye(s) and both ears are visible; the ear tips stay the highest point, as high as in Image 2. The tail sweeps down and back as in Image 1.
+PROPORTION LOCK: keep Image 1's proportions exactly: the same leg length (the legs lift the body well off the ground), the same head size, the same raised neck with the head clearly above the line of the back, the same body depth, and the same tail length with the tail sweeping down and back as in Image 1, never held straight out level. Overall height (ear tips to paws) about 0.53 of the nose-to-tail length, as in Image 1. Do not lengthen the tail, shorten the legs, lower the head or flatten the back.
+DESIGN LOCKS: exactly 2 triangular ears; exactly 4 mechanical legs with exactly 4 paws, all countable; circular mechanical joints; grey-blue low-chroma angular armour plates; one articulated segmented armoured tail; one cyan eye; restrained cyan seam lights only on a few seams. No fur, no harness, no collar.
+LOOK 2 STYLE: identical to Image 1: flat value planes with 3-4 value steps per material, large simplified plates, minimal texture, crisp shape-designed silhouette, broad rim shapes, painterly only inside the lit top planes. No dark outline or inked contour anywhere. No grain, speckle, scratches, tiny bolts or details smaller than 6 px at the final size.
+LIGHTING: identical to Image 1: cold overhead top light, top faces lighter than the core; broad cyan-white rim (#82c3e6 to #c3c5d7) along the top edges; cool blue-black shadows, never brown.
+TRANSPARENCY: fully opaque body; crisp 1-2 px anti-aliased edge; no matte, no dark fringe, no halo.
+DO NOT: head facing forward or to screen-right, floor, cast or contact shadow, reflection, background, extra ears, legs, paws or tails, fur, motion lines, magenta or pink, text.
+~~~

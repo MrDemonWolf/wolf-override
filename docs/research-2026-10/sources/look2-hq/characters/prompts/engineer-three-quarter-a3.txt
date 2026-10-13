@@ -1,0 +1,31 @@
+REPAIR, second pass (engineer-three-quarter-a2 turned only about 30 degrees; this pass must reach a clear 45 degrees). References, in order:
+- Image 1 = [session scratch, not kept]/hq/characters/raw/engineer-side-idle-a2.png (the canonical Look 2 identity, seen in side profile)
+- Image 2 = [session scratch, not kept]/hq/characters/raw/engineer-three-quarter-a2.png (the previous attempt: correct costume and front details, but NOT TURNED ENOUGH; rotate further than this)
+- Image 3 = CHARDIR/refs/ref-style-test-v2.png (the approved Look 2 style test: rendering and edges)
+- Image 4 = apps/game/assets/title-corridor-key-art-provisional.png (mood, light and palette)
+- Image 5 = CHARDIR/refs/palette-card.png (colour swatches)
+
+IMAGE PROMPT:
+~~~text
+USE CASE: stylized-concept, identity-preserving new view for a character turnaround sheet (do not redesign)
+ASSET: front three-quarter (45 degree) turnaround view of the WOLF//OVERRIDE engineer, Look 2 graphic-painterly game art for a 2D side-view sci-fi horror game.
+OUTPUT: one portrait PNG with a genuinely transparent background (real alpha). The full figure fills about 85% of the canvas height, centred, with a clear margin on every side. Final game size will be exactly 280 px tall after one downscale. No text, letters, numbers, logos, UI, watermark, guide lines or borders.
+REFERENCE ROLES:
+Image 1 = the canonical identity: the same engineer, same face, hair, costume, colours, proportions, rendering and lighting. Image 1 is a 90-degree side profile.
+Image 2 = the previous attempt at this view: keep its costume, front details and rendering, but it is turned only about 30 degrees from profile. ROTATE THE WHOLE FIGURE FURTHER TOWARD THE CAMERA, to a true 45 degrees, halfway between the side profile and a frontal view.
+Image 3 = the approved Look 2 style test: rendering, value structure and edges only; ignore its composition and props.
+Image 4 = mood, lighting and palette only; do not copy its composition or figures.
+Image 5 = colour swatches only.
+SUBJECT: exactly one engineer in a true 45-degree FRONT THREE-QUARTER view, facing toward screen-right and toward the camera, quiet idle stance, standing upright, eye level, no perspective distortion. Check every point:
+- Face: a clear three-quarter face, not a profile. BOTH EYES clearly visible; the far eye is about two-thirds the width of the near eye. The nose sits INSIDE the outline of the face and does not stick out past the cheek; the mouth is seen almost from the front; the far cheek and jaw line are visible.
+- Shoulders and chest: both shoulders visible, the chest front clearly broader than the side of the torso, the jacket's centre zip running down the middle of the visible chest; both black harness straps over the front of both shoulders and down the chest; the chest pocket flap visible.
+- Belt: the black utility belt crosses the front of the hips, the one small cyan belt light near the centre, facing the viewer.
+- Arms: both arms relaxed at the sides, one each side of the torso, both gloves fully visible.
+- Legs: both legs visible side by side, slightly apart, feet about shoulder width; both boots flat on one level baseline with the TOES ANGLED TOWARD THE VIEWER'S RIGHT, so the fronts of the boots face the camera at an angle.
+Exactly two arms and two legs.
+IDENTITY LOCKS: short tousled brown hair, hood down; deep-red hooded field jacket (lit #a01e29, shadow #5f0e17) with a chest pocket flap; black shoulder harness straps and black utility belt; one small cyan equipment light on the belt (the only cyan object); black gloves; charcoal cargo trousers with a thigh pocket and dark knee straps; dark boots. No yellow patches, no silver knee armour, no helmet, hood not up.
+LOOK 2 STYLE: identical to Image 1: flat value planes with 3-4 value steps per material, 6-8 large value shapes, minimal texture, crisp shape-designed silhouette, broad rim shapes, painterly only inside the lit top planes. No dark outline or inked contour anywhere. No grain, speckle, scratches or details smaller than 6 px at the final size.
+LIGHTING: identical to Image 1: cold overhead top light, top-facing planes (hair top, shoulders, tops of arms and boots) lighter than the core; broad cyan-white rim (#82c3e6 to #c3c5d7) on the top and back edges; cool blue-black shadows, never brown or grey. Trousers, gloves and boots graded cool blue-charcoal.
+TRANSPARENCY: fully opaque body; crisp 1-2 px anti-aliased edge; no matte, no dark fringe, no halo.
+DO NOT: side profile, profile nose breaking the cheek line, one-eyed face, fully frontal pose, back view, floor, cast or contact shadow, reflection, background, extra figure, extra or missing limbs, magenta or pink, text.
+~~~

@@ -1,0 +1,25 @@
+References for pose 2, in order:
+- Image 1 = [session scratch, not kept]/hq/characters/raw/director-stand-left-a1-2.png (the new Look 2 identity)
+- Image 2 = CHARDIR/refs/ref-identity-director.png
+- Image 3 = CHARDIR/refs/ref-style-test-v2.png
+- Image 4 = apps/game/assets/title-corridor-key-art-provisional.png
+- Image 5 = CHARDIR/refs/palette-card.png
+
+IMAGE PROMPT (pose 2):
+~~~text
+USE CASE: stylized-concept, identity-preserving new pose (do not redesign)
+ASSET: identity cut-out of the Director turning away, Look 2 graphic-painterly game art for a 2D side-view sci-fi horror game.
+OUTPUT: one portrait PNG with a genuinely transparent background (real alpha). The full figure fills about 85% of the canvas height, centred, with a clear margin on every side. Final game size will be exactly 280 px tall after one downscale. No text, letters, numbers, logos, UI, watermark, guide lines or borders.
+REFERENCE ROLES:
+Image 1 = the canonical identity: the same Director, same hair, coat, colours, proportions, rendering and lighting. Change only the pose and viewing angle.
+Image 2 = design source: LEFT panel is the Director; the RIGHT panel is a different character shown only as a rendering example. Do not copy the right panel's clothes or colours.
+Image 3 = the approved Look 2 style test: rendering, value structure and edges only; ignore its composition and props.
+Image 4 = mood, lighting and palette only; do not copy its composition or figures.
+Image 5 = colour swatches only.
+SUBJECT: exactly one person, the Director, caught mid-turn while turning away from the viewer: previously facing screen-left, now rotating toward the back wall, seen in a rear three-quarter view. The back and one shoulder of the long coat dominate the silhouette; the head is turned away so only the ear, the edge of the jaw and the back of the grey hair are visible, no face. Hands stay in the coat pockets; the coat hem swings slightly with the turn; both boots on one level baseline, one heel lifting as the weight shifts. Exactly two arms and two legs.
+IDENTITY LOCKS: swept-back short grey hair; long dark charcoal-blue overcoat to below the knee with wide lapels and cuffed sleeves; dark turtleneck collar; dark trousers; black lace-up boots. The badge may be hidden. Low chroma everywhere.
+LOOK 2 STYLE: identical to Image 1: flat value planes with 3-4 value steps per material, 6-8 large value shapes, the coat as two or three broad planes, minimal texture, crisp shape-designed silhouette, broad rim shapes, painterly only inside the lit top planes. No dark outline or inked contour anywhere. No grain, speckle, scratches or details smaller than 6 px at the final size.
+LIGHTING: identical to Image 1: cold overhead top light, top-facing planes lighter than the core; broad cyan-white rim (#82c3e6 to #c3c5d7) along the top and back edges; cool blue-black shadows, never brown or grey.
+TRANSPARENCY: fully opaque body; crisp 1-2 px anti-aliased edge; no matte, no dark fringe, no halo.
+DO NOT: floor, cast or contact shadow, reflection, background, motion lines, extra figure, extra or missing limbs, visible face, frontal pose, magenta or pink, text.
+~~~

@@ -1,5 +1,5 @@
 #!/bin/bash
-A=/private/tmp/claude-501/-Users-nathanialhenniges-Developer-mrdemonwolf-wolf-override/eb713cd4-8931-48d7-8c83-5b0b0d1e9cf3/scratchpad/walk2/A
+A=${SESSION_SCRATCH:?session scratch, not kept}/walk2/A
 cd $A
 run() { # row tag
   local row=$1 tag=$2 kind=${1#wolf-}

@@ -1,8 +1,8 @@
 #!/bin/bash
 # usage: run_codex.sh <job-name> <guide.png> <out.png> <image-prompt-file> [extra-ref ...]
 set -u
-A=/private/tmp/claude-501/-Users-nathanialhenniges-Developer-mrdemonwolf-wolf-override/eb713cd4-8931-48d7-8c83-5b0b0d1e9cf3/scratchpad/walk2/A
-W=/private/tmp/claude-501/-Users-nathanialhenniges-Developer-mrdemonwolf-wolf-override/eb713cd4-8931-48d7-8c83-5b0b0d1e9cf3/scratchpad/walk2
+A=${SESSION_SCRATCH:?session scratch, not kept}/walk2/A
+W=${SESSION_SCRATCH:?session scratch, not kept}/walk2
 job=$1; guide=$2; out=$3; pfile=$4; shift 4
 ident=$1; shift
 refs="Image 1 (EDIT TARGET and pose guide): $guide
