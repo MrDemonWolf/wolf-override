@@ -197,7 +197,7 @@ Game facts used here come from `docs/research-2026-10/lighter-game/map-perf.md` 
 | Stair riser (≤ 0.24 m) | ≤ 10 |
 | Navy watertight door opening (1.68 × 0.66 m) | ≈ 69 × 27 |
 
-- The navy door opening is shorter than the engineer, so he would duck: real ships really are like that.
+- The navy door opening is shorter than the engineer, so they would duck: real ships really are like that.
 - The camera shows about 711 × 400 world px, roughly 17 × 10 m. A room is 960 px, about 23 m.
 
 **Doors**

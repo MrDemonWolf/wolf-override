@@ -134,7 +134,7 @@ Then re-capture s1 and s2 at 720 and in phone shape.
 ## Should fix (same pass, or put to Nathanial)
 
 1. **The crank still does not read as cranking.**
-   - In s3 the glove sits on the rim at about 8 o'clock (`crops/s3-crank-5x.png`), but the arm hangs straight. In a still he is standing next to a valve.
+   - In s3 the glove sits on the rim at about 8 o'clock (`crops/s3-crank-5x.png`), but the arm hangs straight. In a still they are standing next to a valve.
    - The direction asks for the hand on the rim "while cranking".
    - This needs a 2-frame crank pose, which is Look 2 character art, so it is Nathanial's call. Say so in the hand-off. Do not count it as done.
 2. **The MANUAL BYPASS plate is far from the wheel.**
@@ -219,10 +219,10 @@ The options already listed for Nathanial (a steel armour frame round the opening
 |---|---|---|
 | s1 at rest | A garish red gate standing on the floor, and a gold wheel on a pole | A concrete wall across the way with a grey numbered roller door, a camera, and a dim plant room past it. Believable. The text box says "the red seal", but no red seal is in sight (must-fix 2). |
 | s2 relay beat | The engineer by the red gate | The engineer at the door face, and the relay on its plinth with a real shadow. Good. |
-| s3 crank | The engineer beside a bright gold wheel | A real wall valve with his glove on the rim, but he stands idle. The meter fills on a plate up on the wall. |
+| s3 crank | The engineer beside a bright gold wheel | A real wall valve with their glove on the rim, but they stand idle. The meter fills on a plate up on the wall. |
 | s4 opening | The gate folding | The roller door winding up into its hood with the amber lamp lit, and the room appearing under the bar. Good. |
 | s5 open | A gate frame onto a blue tunnel | A true doorway onto a real, dim room, with the green lamp. The best frame. |
-| s6 walk through | Walking through the gate | Walking through the doorway; at 1x it reads right. Zoomed in, a sliver of his arm shows through the column (must-fix 1). |
+| s6 walk through | Walking through the gate | Walking through the doorway; at 1x it reads right. Zoomed in, a sliver of the engineer's arm shows through the column (must-fix 1). |
 | s7 safe point | The engineer at the safe point | The engineer stands clear at the safe point. WOLF is cut by the column, but a sliver of his head shows through it (must-fix 1). |
 | Seam | - | Hidden by the column, but the two bays read as two finishes (should 3). |
 

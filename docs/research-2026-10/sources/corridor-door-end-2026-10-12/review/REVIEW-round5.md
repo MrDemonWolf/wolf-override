@@ -165,10 +165,10 @@ The roller door has no blast mass and the room beyond is a pump and tank hall, s
 |---|---|---|
 | s1 at rest | A glowing red sci-fi gate standing on the floor, and a gold wheel on a pole | A concrete wall across the way with a grey numbered roller door and a red lamp on its frame, a camera, and a dim plant room past it. Believable, and "the red seal stays shut" now has a red seal lamp. Zoomed in, the lamp's conduit starts from nothing (must 1). |
 | s2 relay beat | The engineer by the red gate | The engineer at the door face, the amber lamp lit, and the relay on its plinth with a real shadow. Good. |
-| s3 crank | The engineer beside a bright gold wheel | A real wall valve with his glove on the rim, but he stands idle (Nathanial's call). The meter fills on the plate, now tied to the wheel by a leader. |
+| s3 crank | The engineer beside a bright gold wheel | A real wall valve with their glove on the rim, but they stand idle (Nathanial's call). The meter fills on the plate, now tied to the wheel by a leader. |
 | s4 opening | The gate folding | The roller door winding up into its hood, stripes on the bar, the room appearing beneath it. Good. |
 | s5 open | A gate frame onto a blue tunnel | A true doorway with a reveal, onto a real, dim room, with the green lamp. The best frame. |
-| s6 walk through | Walking through the gate | Walking through the doorway; the column now hides him cleanly. |
+| s6 walk through | Walking through the gate | Walking through the doorway; the column now hides the engineer cleanly. |
 | s7 safe point | The engineer at the safe point | The engineer at the safe point in the plant room, and WOLF cleanly behind the column. |
 | Seam | - | Hidden by the seam column, and the two bays now read as one finish. |
 

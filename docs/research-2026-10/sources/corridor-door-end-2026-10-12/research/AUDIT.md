@@ -30,7 +30,7 @@ Crops are in `crops/`. The measurements are in `props-measured.json`. The script
 2. **The "computer in the air" is real, and it is the corridor's PURGE display** (`c-01`).
    - It is a floor-standing console, with its own stepped plinth, placed with its base at **y 345.25, 94.75 px (2.4 m) above the floor**.
    - Nothing holds it up: no shelf, bracket, arm or cable. The mid plate's pipe column only passes behind it.
-   - It sits entirely above the engineer's head (his top is at y 370.4).
+   - It sits entirely above the engineer's head (their top is at y 370.4).
    - It has no floor reflection or shadow (it is not in main's `grounded` list).
    - Every other sprite prop's painted base is within 0.3 px of y 440 (table in section 2).
 3. **The other machines are on the floor line, but they don't read as standing on it.**
@@ -60,7 +60,7 @@ Crops are in `crops/`. The measurements are in `props-measured.json`. The script
    - a hatch with a wheel standing in front of a boiler
    - a lattice truss, a junction box and a gauge on the same pipe run
 8. **Scale is wrong against the engineer** (section 4).
-   - The Records purge console is 2.8 m tall, with its work ledge at about 1.7 m, his eye level. A real operator desk is 0.75-0.9 m.
+   - The Records purge console is 2.8 m tall, with its work ledge at about 1.7 m, the engineer's eye level. A real operator desk is 0.75-0.9 m.
    - The corridor seal and junction door frames are 4.5 m tall, and the Records exit is a 3.5 m monolith.
 9. **Parts that could not work** (section 3):
    - a handwheel on a lollipop post wired to the relay by a flat bar (`c-02`)
@@ -157,7 +157,7 @@ AI tells:
 
 Unreal:
 
-- **Purge queue** (`r-01`): 2.8 m tall, screen above the engineer's head, work ledge at his eye level.
+- **Purge queue** (`r-01`): 2.8 m tall, screen above the engineer's head, work ledge at their eye level.
 - **Mirror port** (`r-02`): 2.8 m tall, with grab handles that loop into nothing.
 - **Exit:** a 3.5 m slab with no hinge, guide track, handle or wall opening.
   - At the chapter close it lifts away entirely.

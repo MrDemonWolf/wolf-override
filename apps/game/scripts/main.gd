@@ -81,7 +81,7 @@ const CORRIDOR_SEAL_LAMP: Vector2 = Vector2(807.908, 344.759)
 const SEAL_LAMP_SHUT: Color = Color(0.9, 0.2, 0.17)
 const SEAL_LAMP_MOVING: Color = Color("#f3ae4b")
 const SEAL_LAMP_OPEN: Color = Color("#7dffa8")
-## The seal's leaf slides up into the bulkhead's header over this long, uncovering the open passage.
+## The seal's rolling curtain winds up into its hood over this long, uncovering the open doorway.
 ## WOLF holds the contact and the doorway stays shut until it lands.
 const CORRIDOR_DOOR_OPEN_SECONDS: float = 1.0
 ## The engineer's name card when control starts (decision B): its hold before it fades like the top card.
@@ -430,9 +430,9 @@ var seal_frame: Sprite2D
 ## The seal's live status lamp lens and its small glow (lit only while moving or open).
 var seal_lamp: Sprite2D
 var seal_lamp_glow: Sprite2D
-## The seal's leaf rising into the header while the seal opens.
+## The seal's rolling curtain winding up into its hood while the seal opens.
 var seal_leaf: SealLeaf
-## True from the moment the seal starts to open until it lands in the header.
+## True from the moment the seal starts to open until its curtain is up in the hood.
 var seal_opening: bool = false
 ## WOLF stays on the live contact, by his own choice, until the seal has landed.
 var wolf_holding_relay: bool = false
@@ -1808,7 +1808,7 @@ func _interact_relay() -> void:
 
 
 ## WOLF is on the contact and the engineer is clear: he takes the surge and holds the contact until the
-## seal has risen into its header.
+## seal's curtain is up in its hood.
 func _wolf_takes_relay() -> void:
 	wolf_heading_to_relay = false
 	if state.activate_power("wolf") == "cooperate":
@@ -2907,7 +2907,7 @@ func _shutter_boom() -> void:
 	impact.burst(gate_dust)
 
 
-## The seal finishing opening: the leaf is in the header, the doorway opens and WOLF lets go of the
+## The seal finishing opening: the curtain is up in the hood, the doorway opens and WOLF lets go of the
 ## contact.
 func _door_lands() -> void:
 	seal_opening = false
@@ -3072,9 +3072,9 @@ func _sync_records_room(animate_exit: bool = false) -> void:
 	records_room.refresh_state()
 
 
-## The corridor bulkhead: sealed, or standing open on the passage beyond. Opening in play slides the
-## seal's leaf up into the header over the open bulkhead (SealLeaf), and the doorway stays shut until
-## it lands with its thud and dust. Its front pillar shows either way.
+## The corridor seal: a rolling steel door in the cross-wall, shut, or standing open on the plant room
+## beyond. Opening in play winds the curtain up into its hood (SealLeaf), and the doorway stays shut
+## until it is up, with its thud and dust. Its front pillar shows either way.
 func _sync_door(animate: bool = false) -> void:
 	if door_tween != null and door_tween.is_running():
 		door_tween.kill()

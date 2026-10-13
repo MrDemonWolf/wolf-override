@@ -202,7 +202,7 @@ Nothing is taken from the Terminator films.
 | s3 crank | The hand is on the rim (better than round 1). The wheel stands on a thin pedestal, and its drive vanishes behind the name plate. |
 | s4 opening | It reads as a roller door winding up, with the real room appearing beneath the bar. Good. |
 | s5 open | A real hole with a real room behind it. The best frame. |
-| s6 walk through | He stands in the doorway, which works, but the near pier goes translucent and the green lamp floats in it. |
+| s6 walk through | The engineer stands in the doorway, which works, but the near pier goes translucent and the green lamp floats in it. |
 | s7 safe point | The same ghost pier. WOLF stands on the threshold, and the engineer uses the safe point inside the machinery room. |
 | Seam | Hidden. Values and floor match at the column, and the pipe run continues across it. The old grimy teal wall against the new calm grey still shows as a change of finish, which is acceptable as two different bays. |
 

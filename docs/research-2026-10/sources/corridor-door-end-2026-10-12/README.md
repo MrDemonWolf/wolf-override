@@ -138,6 +138,9 @@ Everything below was read for this piece and is cited, never copied. Pages marke
 - Zurn, *Z415 floor drain* spec sheet (WebstaurantStore copy): https://www.webstaurantstore.com/documents/specsheets/z415s_specs.pdf (summary only)
 - CDC National Center for Health Statistics, *FastStats: Body Measurements*: https://www.cdc.gov/nchs/fastats/body-measurements.htm
 - Applied Technology Council for FEMA, *FEMA E-74, section 6.4.7.1*: https://femae74.atcouncil.org/docman/abbreviated/section-6-4/56-49-femae-74-chapter6-4-7-1
+- Applied Technology Council for FEMA, *FEMA E-74, section 6.6* (wall-mounted items): https://femae74.atcouncil.org/docman/abbreviated/section-6-6/95-femae-74-chapter-6 (summary only)
+- U.S. Access Board, *Guide to the ADA Standards, chapter 3: operable parts* (reach ranges): https://www.access-board.gov/ada/guides/chapter-3-operable-parts/ (summary only)
+- WBParts, listing for navy watertight door NSN 2040-01-369-1660: https://wbparts.com/rfq/2040-01-369-1660.html (summary only; the page returned 403)
 
 ### What reads as AI-made (`research/RESEARCH.md` part A)
 
@@ -147,7 +150,7 @@ Everything below was read for this piece and is cited, never copied. Pages marke
 - 80 Level, *Should you hire an AI artist or a concept artist?* (Miguel Nogueira): https://80.lv/articles/should-you-hire-an-ai-artist-or-a-concept-artist
 - MTG Rocks, *Wizards of the Coast accused of using AI art in MTG promotion again*: https://mtgrocks.com/wizards-of-the-coast-accused-of-using-ai-art-in-mtg-promotion-again/
 - Vice, *Magic: The Gathering publisher denies, then admits using AI art in promo image*: https://vice.com/en/article/magic-the-gathering-publisher-denies-then-admits-using-ai-art-in-promo-image
-- Keith Kisser, *Why does all AI art look like that?* (Vocal Media; also on Medium): https://vocal.media/art/why-does-all-ai-art-look-like-that
+- Keith Kisser, *Why does all AI art look like that?* (Vocal Media; also on Medium): https://vocal.media/art/why-does-all-ai-art-look-like-that and https://medium.com/@keithkisser/why-does-all-ai-art-look-like-that-f74e2a9e1c87
 - Summary only: GameSpot, *Video game concept artists say GenAI isn't making things easier* (https://www.gamespot.com/articles/video-game-concept-artists-say-genai-isnt-making-things-easier/1100-6537107/); an Elder Scrolls Online forum thread on loading-screen art (https://forums.elderscrollsonline.com/en/discussion/681310/concerned-about-the-potential-use-of-ai-on-loading-screen-artwork); Wikipedia, *Greeble* (https://en.wikipedia.org/wiki/Greeble); isitai.com, *How to spot AI art* (https://isitai.com/blog/how-to-spot-ai-art).
 
 ### How shipped games look real (`research/RESEARCH.md` part B)
@@ -162,13 +165,17 @@ Everything below was read for this piece and is cited, never copied. Pages marke
 - TheSixthAxis, *Talking Alien: Isolation with The Creative Assembly's Jude Bond*: https://www.thesixthaxis.com/2014/06/10/talking-alien-isolation-with-the-creative-assemblys-jude-bond/
 - Engadget, *Alien: Isolation* launch interview (2014-10-07): https://www.engadget.com/2014-10-07-alien-isolation-launch-interview.html
 - Heavy Metal, *Ron Cobb, designer of Nostromo and McFly's DeLorean (1937-2020)*: https://www.heavymetal.com/post/ron-cobb-designer-of-nostromo-and-mcflys-delorean-1937-2020
+- Domus, *Alien* and the design of the Nostromo (2025-09-19): https://www.domusweb.it/en/news/2025/09/19/alien-design-nostromo.amp.html (summary only; the page returned 403)
 - EA / Motive, *Inside Dead Space: aboard the Ishimura*: https://www.ea.com/ea-studios/motive/news/inside-dead-space-3-aboard-the-ishimura
 - GamesBeat, *Dead Space interview: fleshing out the USG Ishimura*: https://gamesbeat.com/dead-space-interview-fleshing-out-the-usg-ishimura/
 - GamingBolt, *Little Nightmares interview: Into the Maw*: https://gamingbolt.com/little-nightmares-interview-into-the-maw
+- Unreal Engine, *How Little Nightmares II plumbs the depths of adolescent angst* (developer interview): https://www.unrealengine.com/en-US/developer-interviews/how-little-nightmares-ii-plumbs-the-depths-of-adolescent-angst (not fetched; the page returned 403, so nothing from it is used as a fact)
 - Brendon Chung (Blendo Games), *Skin Deep art* (2025-07-02): https://blendogames.com/news/post/2025-07-02-skindeep_art/
 - Brie Gibson, interviewed by 80 Level, *001AGT: crafting grand, well-balanced environments*: https://80.lv/articles/001agt-crafting-grand-well-balanced-environments
 - Game Developer, *How to reduce visual confusion in your game*: https://www.gamedeveloper.com/design/how-to-reduce-visual-confusion-in-your-game
 - Brooks (newsletter), *Design your values, don't just shade*: https://brooks-newsletter-359c19.beehiiv.com/p/design-your-values-don-t-just-shade
+- David Keister (Grand Valley State University), *Design principles: value structure*: https://faculty.gvsu.edu/KEISTERD/design_principles_art/value_structure.html
+- O'Reilly, *Commercial Photoshop Retouching*, chapter 2.5 (contact shadows): https://oreilly.com/library/view/commercial-photoshop-retouching/059600849X/ch02s05.html (summary only)
 - Scale Model Shop, *Scale model weathering guide: realism*: https://www.scalemodelshop.co.uk/scale-model-weathering-guide-realism/
 
 ### Rendering on phones and in Godot (`research/RESEARCH.md` part C)
@@ -180,6 +187,7 @@ Everything below was read for this piece and is cited, never copied. Pages marke
 - Apple Developer, WWDC20 session 10631 (on Apple GPUs' hidden surface removal and tile memory): https://developer.apple.com/videos/play/wwdc2020/10631/
 - Real Time VFX forum, *Why are additive shaders so heavy for phones?*: https://realtimevfx.com/t/why-are-additive-shaders-so-heavy-for-phones/23998
 - Godot Engine documentation (stable): *Multiple resolutions*, *2D meshes*, *2D lights and shadows*, *Renderers*, *GPU optimization*, *Importing images*, *CanvasGroup*, *Screen-reading shaders*: https://docs.godotengine.org/en/stable/tutorials/rendering/multiple_resolutions.html, https://docs.godotengine.org/en/stable/tutorials/2d/2d_meshes.html, https://docs.godotengine.org/en/stable/tutorials/2d/2d_lights_and_shadows.html, https://docs.godotengine.org/en/stable/tutorials/rendering/renderers.html, https://docs.godotengine.org/en/stable/tutorials/performance/gpu_optimization.html, https://docs.godotengine.org/en/stable/tutorials/assets_pipeline/importing_images.html, https://docs.godotengine.org/en/stable/classes/class_canvasgroup.html, https://docs.godotengine.org/en/stable/tutorials/shaders/screen-reading_shaders.html
+- Godot Engine blog, *GLES2 renderer optimization: 2D batching* (the Godot 3.x article that introduced 2D batching): https://godotengine.org/article/gles2-renderer-optimization-2d-batching (partly summary only)
 - Godot Engine contributors, `ProjectSettings.xml` class reference (4.5-stable): https://raw.githubusercontent.com/godotengine/godot/4.5-stable/doc/classes/ProjectSettings.xml
 - Khronos Group, *Khronos Data Format Specification 1.3*: https://registry.khronos.org/DataFormat/specs/1.3/dataformat.1.3.html
 - Arm, *astc-encoder: ASTC format overview*: https://github.com/ARM-software/astc-encoder/blob/main/Docs/FormatOverview.md

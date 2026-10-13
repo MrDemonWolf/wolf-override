@@ -40,11 +40,11 @@ The doorway is a real hole onto a real, painted machinery room. The door itself 
 
 As a first-time player you see a grey concrete pier standing against the back wall, with a narrow roller door in its face. Open floor runs in front of the pier, and the lit machinery room with the safe point is plainly visible and reachable to its right.
 
-- The engineer stops at the door's left jamb (x 752) with nothing visible stopping him. It reads as an invisible wall.
+- The engineer stops at the door's left jamb (x 752) with nothing visible stopping them. It reads as an invisible wall.
 - DESIGN.md puts the bulkhead's front face "at walkway depth" (world x 680..838), but collision covers only the door's 56 px. So the actors stand inside solid concrete:
   - the engineer at x 736 in s2, s4 and s5;
   - WOLF at x 692 in s6 and x 743 in s7 (s7: his rear half is drawn over the concrete face left of the door).
-- When he "walks through" (s6, s7), he walks past a back-wall door. The corridor's wet walkway floor also continues behind the wall inside the hole.
+- When the engineer "walks through" (s6, s7), they walk past a back-wall door. The corridor's wet walkway floor also continues behind the wall inside the hole.
 - Main's gaudy gate at least stands across the path.
 
 **Fix (a composition decision for Nathanial; SLICE.md already lists the angle question as open):**
@@ -109,7 +109,7 @@ REAL-LOOK names 0.86-1.01 as today's failing range. What is there is a 1 px dark
 ### 6. The bypass does not read, and the crank pose does not touch it
 
 - **Size and value.** The wheel is 18 world px (32 screen px), mid-dark on a dark backplate. It is not the brightest thing on its wall, as REAL-LOOK requires for interactables. Its chain guard reads as a black diagonal stick, mostly hidden under the MANUAL BYPASS plate.
-- **The crank.** In s3 the engineer's hand hangs about 5 world px left of the rim and below it, so nothing touches. In main his hand is on the rim (`crops/crank-main-vs-slice.png`). As a still, "cranking the bypass" reads as standing next to a disc.
+- **The crank.** In s3 the engineer's hand hangs about 5 world px left of the rim and below it, so nothing touches. In main their hand is on the rim (`crops/crank-main-vs-slice.png`). As a still, "cranking the bypass" reads as standing next to a disc.
 
 **Fix:**
 
@@ -178,8 +178,8 @@ A lighter horizontal band crosses the expansion tank at the deck's height (scree
 |---|---|
 | s1 at rest | Before: a garish gate that clearly stands across the floor. After: calmer and more believable materials, but a door in a pier that blocks nothing visible, with a purple edge on the pier and a dark/bright step at the column. |
 | s2 relay beat | The engineer stands over the pier's concrete face. The stations sit on thin plinths with no real shadow. |
-| s3 crank | Before: the hand is on a big wheel. After: he stands beside a small dark disc. The crank no longer reads. |
+| s3 crank | Before: the hand is on a big wheel. After: they stand beside a small dark disc. The crank no longer reads. |
 | s4 opening | It reads as a roller door going up, and a real room appears behind it. Good. The light under the hood goes dark as the slats move. |
 | s5 open | The best frame: a real hole with a real room beyond. |
-| s6 and s7 | He passes the doorway in front of the wall. WOLF is drawn over solid concrete. It does not read as going through. |
+| s6 and s7 | The engineer passes the doorway in front of the wall. WOLF is drawn over solid concrete. It does not read as going through. |
 | Seam | Hidden geometrically by the column, but visible as a value step (20 vs 103), as a straight line down the floor, and as grimy-old against airbrushed-new. |

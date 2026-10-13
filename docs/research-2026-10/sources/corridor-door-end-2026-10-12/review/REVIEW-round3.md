@@ -89,7 +89,7 @@ The silhouettes are 2-3x **brighter** than the concrete they sit on, so `SLICE.m
 **What a first-time player sees:**
 - In s7, WOLF's head turns into a flat pale dog-head cut-out pasted on the wall (`crops/s7-pier-3x.png`).
 - The engineer using the safe point is half red jacket, half grey ghost.
-- In s6, a pale strip runs down his right side.
+- In s6, a pale strip runs down the engineer's right side.
 - It reads even at thumbnail size on the phone pair (`crops/phone-s7-pier-2x.png`).
 
 This is now the strongest compositing tell in the slice. It also goes against the brief, which says the near column is "never faded or see-through" and should be "slim enough that actors stay readable".
@@ -127,7 +127,7 @@ Then lift the near slab a little (it is 13-14) so the corner does not read as a 
 ## Should fix in the same pass
 
 1. **The crank does not read as cranking.**
-   - In s3 the engineer's arm hangs straight and the glove only touches the rim's lower-left edge by about 2 px (`crops/s3-hand-6x.png`). He reads as standing next to a valve while the meter fills.
+   - In s3 the engineer's arm hangs straight and the glove only touches the rim's lower-left edge by about 2 px (`crops/s3-hand-6x.png`). They read as standing next to a valve while the meter fills.
    - Main has the same idle pose, so this is the sprite's limit, but the brief asks for "the engineer's hand on its rim while cranking".
    - Fix: at minimum, move the crank stand point or the wheel 2-3 world px so the glove sits on the rim at about 8 o'clock. Better: a 2-frame crank pose, with the arm raised to the rim.
    - The wheel is right for a real handwheel (0.525 m, grey steel) but small and quiet at 1x. It nearly vanishes in the contact sheet, where main's gold wheel pops. The MANUAL BYPASS plate floats about 150 px above and left of it. A brighter worn-steel rim face (p90 about 110-120) would help it read as the thing you crank.
@@ -191,11 +191,11 @@ Then lift the near slab a little (it is 13-14) so the corner does not read as a 
 | State | Before (main) | After (slice) |
 |---|---|---|
 | s1 at rest | A garish red gate standing on the floor, and a gold wheel on a pole | A believable concrete cross-wall with a grey numbered roller door and a camera, and a dim machinery hall beyond. The wheel on the wall is quiet. The lower-right corner is a dark block with a vertical post. |
-| s2 relay beat | The engineer beside the red gate | He stands at the door face in front of the curtain. The Look 2 relay sits on its plinth with a real shadow. Good. |
+| s2 relay beat | The engineer beside the red gate | The engineer stands at the door face in front of the curtain. The Look 2 relay sits on its plinth with a real shadow. Good. |
 | s3 crank | The engineer beside a bright gold wheel | The engineer beside a grey wall wheel, arm hanging. It reads as "standing at a valve", not cranking. |
 | s4 opening | The gate folding | A roller door winding into its hood, with the room appearing under the bar. Good. |
 | s5 open | An open gate frame onto a blue tunnel | A true hole onto a real, dim room. The best frame. |
-| s6 walk through | Walking through the gate | Walking through the doorway, with a pale ghost stripe down his right side where the column covers him. |
+| s6 walk through | Walking through the gate | Walking through the doorway, with a pale ghost stripe down the engineer's right side where the column covers them. |
 | s7 safe point | The engineer at the safe point | The engineer half hidden by the column and drawn half as a pale ghost. WOLF's head is a pale cut-out on the wall. This frame alone would make Nathanial call it fake. |
 | Seam | - | Hidden by the column. The grimy old bay against the clean new bay reads as two bays. |
 
