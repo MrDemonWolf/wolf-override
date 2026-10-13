@@ -1,5 +1,5 @@
 {
-  "status": "approved by Nathanial 2026-10-11 (all 123 lines, including the 9 added in round 2 and the 6 added in round 3); 2026-10-13: 31 lines reworded or split and 4 added through the October 13 wording drafts (items 1, 3, 4, 5, 6, 7); each changed line keeps its earlier text in 'history'",
+  "status": "approved by Nathanial 2026-10-11 (all 123 lines, including the 9 added in round 2 and the 6 added in round 3); 2026-10-13: 24 lines reworded or split and 4 added through the October 13 wording drafts (items 1, 3, 4, 5, 6, 7), and 7 more given notes or superseded markers only; each reworded or split line keeps its earlier text in 'history'",
   "date": "2026-10-10",
   "source": "Logic audit of 2026-10-10 (327 real-game screenshots, 24 problems) and Nathanial's decisions A-D. Every string here is a proposal; nothing ships until Nathanial approves it.",
   "placeholders": {
@@ -1843,10 +1843,21 @@
       "trigger": "A missed drop while WOLF is drawing the sentry and is already past it, at his spot by the exit hatch (only possible while the sentry is after the engineer). BROKE_OFF_RUBBLE ('\\nWOLF: I'm out. I'll hold at the rubble.', the existing row) stays for a miss before he is past it.",
       "speaker": "NARRATION",
       "current": "\\nWOLF: I'm out. I'll hold at the rubble.",
-      "proposed": "\nWOLF: I'm out.",
+      "proposed": "WOLF: I'm out.",
       "alternatives": [],
-      "notes": "Round 3b (screenshot review: WOLF bounding over the sentry went through the hanging tank). He now only ever crosses the lane over the sentry at the far end of its patrol, right of the tank, and never crosses back under it, so after breaking off past it he stays by the exit hatch; 'hold at the rubble' would be false there. Same words otherwise; WOLF short and dry; no new fact (the hatch is on screen and named in 'The bolt by the hatch is next.'). Fit: 3 of 3 rows untagged with TANK_MISS above it (836 + 117 + 267 px of 855, Roboto 17 px). Nathanial's rewrite 2026-10-11: he held the drafted 'I'm out. I'll hold by the hatch.' and picked the place-free 'I'm out.' (you can see where WOLF is).",
-      "status": "approved by Nathanial 2026-10-11 (round 3, his rewrite)"
+      "notes": "Round 3b (screenshot review: WOLF bounding over the sentry went through the hanging tank). He now only ever crosses the lane over the sentry at the far end of its patrol, right of the tank, and never crosses back under it, so after breaking off past it he stays by the exit hatch; 'hold at the rubble' would be false there. Same words otherwise; WOLF short and dry; no new fact (the hatch is on screen and named in 'The bolt by the hatch is next.'). Fit: 3 of 3 rows untagged with TANK_MISS above it (836 + 117 + 267 px of 855, Roboto 17 px). Nathanial's rewrite 2026-10-11: he held the drafted 'I'm out. I'll hold by the hatch.' and picked the place-free 'I'm out.' (you can see where WOLF is). 2026-10-13: same words, no longer appended to TANK_MISS: with the miss split into two boxes (item 3 S15) it shows in its own box after them, so the leading row break is gone (BROKE_OFF_HATCH_LINE).",
+      "status": "approved by Nathanial 2026-10-11 (round 3, his rewrite); its own box from 2026-10-13 (the item 3 S15 split; words unchanged)",
+      "history": [
+        {
+          "proposed": "\nWOLF: I'm out.",
+          "alternatives": [],
+          "status": "approved by Nathanial 2026-10-11 (round 3, his rewrite); appended to TANK_MISS in the same box"
+        }
+      ],
+      "approved": {
+        "date": "2026-10-13",
+        "source": "docs/research-2026-10/how-it-should-play/drafts-2026-10-13.md, item 3 (P0-7), S15 (the miss in two boxes; this line follows in its own)"
+      }
     },
     {
       "id": "RECAP_LANE_BROKE_OFF_R3",
