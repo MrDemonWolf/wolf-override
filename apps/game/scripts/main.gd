@@ -1054,8 +1054,10 @@ func _tick_corridor(delta: float, held_ticks: int) -> void:
 			status_line = BYPASS_RELEASED_LINE % state.human_name().get_slice(" ", 0)
 	bypass_was_holding = hold_use.holding and hold_use.station == &"bypass"
 	if bypass_venting:
-		# The hiss builds with the crank; the alarm repeats until the bypass locks over.
-		sfx_bank.play(&"hiss", lerpf(-24.0, -8.0, float(bypass_ticks) / BYPASS_TICKS), 1.15)
+		# The hiss builds with the crank (the pressure-line loops, low to high as the turns add up);
+		# the alarm repeats until the bypass locks over.
+		var cranked: float = float(bypass_ticks) / BYPASS_TICKS
+		sfx_bank.play_blend(SfxBank.HISS_GAUGE, cranked, lerpf(-24.0, -8.0, cranked))
 		bypass_alarm_remaining -= delta
 		if bypass_alarm_remaining <= 0.0:
 			bypass_alarm_remaining = BYPASS_ALARM_SECONDS
@@ -1848,11 +1850,13 @@ func _start_bypass_vent() -> void:
 
 
 func _stop_bypass_vent() -> void:
+	# Only a bypass that was venting owns the hiss loops; the junction's pressure line uses them too.
+	if bypass_venting:
+		sfx_bank.stop_each(SfxBank.HISS_GAUGE)
 	bypass_venting = false
 	bypass_alarm_remaining = 0.0
 	if bypass_handle != null:
 		bypass_handle.venting = false
-	sfx_bank.stop(&"hiss")
 
 
 ## One held-USE tick at the bypass: the wheel turns an eighth with a click and a readout cell lights.

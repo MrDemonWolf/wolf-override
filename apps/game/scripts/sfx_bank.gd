@@ -92,11 +92,12 @@ func wait_for_detail() -> void:
 
 
 ## Plays [param clip] on a free voice (or that loop's own player) and returns the player, or null
-## when the clip is unknown.
+## when the clip is unknown (a debug build warns, so a misspelt clip is never silently mute).
 func play(clip: StringName, volume_db: float = 0.0, pitch: float = 1.0) -> AudioStreamPlayer:
 	if not streams.has(clip) and DETAILED.has(clip):
 		wait_for_detail()
 	if not streams.has(clip):
+		_warn_unknown(clip)
 		return null
 	var player: AudioStreamPlayer
 	if _loop_players.has(clip):
@@ -133,9 +134,13 @@ func play_blend(clips: Array[StringName], blend: float, volume_db: float) -> voi
 			player.play()
 
 
+## Stops the loop [param clip]; one-shots end on their own. A debug build warns on a name that is no
+## loop, which would stop nothing.
 func stop(clip: StringName) -> void:
 	if _loop_players.has(clip):
 		(_loop_players[clip] as AudioStreamPlayer).stop()
+	elif not LOOPS.has(clip):
+		_warn_unknown(clip)
 
 
 func stop_each(clips: Array[StringName]) -> void:
@@ -148,6 +153,13 @@ func stop_all() -> void:
 		player.stop()
 	for player: AudioStreamPlayer in _loop_players.values():
 		player.stop()
+
+
+## A clip name the bank does not know (or, for stop, a name that is no loop): warned in debug builds
+## only, so a release build never prints for it.
+func _warn_unknown(clip: StringName) -> void:
+	if OS.is_debug_build():
+		push_warning("SfxBank: no clip or loop named &\"%s\"; nothing plays or stops" % clip)
 
 
 func players() -> Array[AudioStreamPlayer]:
