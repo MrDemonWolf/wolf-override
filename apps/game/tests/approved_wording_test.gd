@@ -76,6 +76,7 @@ func _run() -> void:
 	await _check_refusals()
 	await _check_door_bump()
 	await _check_after_blast()
+	await _check_knockdown_boxes()
 	bank.stop_all()
 	game.queue_free()
 	_remove(path)
@@ -115,7 +116,8 @@ func _check_constants() -> void:
 	var c: Dictionary = (MainScript as GDScript).get_script_constant_map()
 	_expect(State.CHOICE_TEXT[State.PRESS] == "Skip the risk talk. Go now." and State.CHOICE_TEXT[State.DISCLOSE] == "The relay may vent coolant. Your call.", "item 1: the relay's answers")
 	_expect(c["TRUST_LINE_1"] == "%s keeps WOLF's systems running." and c["TRUST_LINE_2"] == "%s knows what a fault looks like,\nand this isn't one.", "item 4: the trust line's two boxes")
-	_expect((c["INTRO_LINES"] as Array)[2] == "Nobody gives an activation command. WOLF wakes himself." and (c["INTRO_LINES"] as Array)[3] == "The latch breaks from the inside. WOLF steps out under his own power.", "item 6: the opening's cut lines are gone")
+	_expect((c["INTRO_LINES"] as Array)[2] == "Nobody gives an activation command.\nWOLF wakes himself." and (c["INTRO_LINES"] as Array)[3] == "The latch breaks from the inside.\nWOLF steps out under his own power.", "item 6: the opening's cut lines are gone")
+	_expect(c["BREAKER_CATCHES_LINE"] == "The breaker catches.\nBlue light fills the coolant relay.", "item 6 N7: the breaker line without the seal clause")
 	_expect(c["JUNCTION_ENTRY_LINE"] == "%s: That door is our way through." and c["JUNCTION_GOAL_HINT"] == "Get through the sealed door." and c["WOLF_DOOR_WARNING"] == "WOLF: When the door goes, don't be standing in front of it.", "item 7: the junction entry says the goal only, then WOLF warns about the door")
 	_expect(c["LADDER_BREAKER_LINE"] == "%s: The breaker by the entrance\nfeeds that line." and c["LADDER_CHAIN_LINE"] == "%s: Overload it, crank the valve,\nand the door goes.", "item 7: the ladder's lines are the approved chain, split")
 	_expect(c["JUNCTION_RESTORE_A_LINE"] == "Service junction restored. Arm the breaker by the entrance, then crank the valve.\nWOLF: When the door goes, don't be standing in front of it.", "item 7: Continue keeps the restore-A line")
@@ -149,6 +151,9 @@ func _check_constants() -> void:
 	boxes.append_array(c["ALONE_LINES"] as Array)
 	boxes.append_array(refusals.values().filter(func(line: String) -> bool: return line != refusals["REFUSE_VALVE_TRIPPED"]))
 	boxes.append_array([JunctionRoom.SENTRY_REASON, JunctionRoom.SENTRY_CHASED_REASON])
+	boxes.append_array([(c["INTRO_LINES"] as Array)[2], (c["INTRO_LINES"] as Array)[3], c["BREAKER_CATCHES_LINE"]])
+	# S11 and S16 are said where they happen; _check_after_blast checks them on screen word for word.
+	boxes.append_array(["No station in reach. The TANK RELEASE\nis past the rubble.", "Service junction restored. The door is\ndown. The sentry patrols past the rubble."])
 	for box: String in boxes:
 		var shown: String = box.replace("%s", "MORGAN" if box.begins_with("%s:") else "Morgan")
 		if shown.begins_with("MORGAN: ") or shown.begins_with("WOLF: "):
@@ -196,11 +201,49 @@ func _check_trust_boxes() -> void:
 	_expect(story.text == box_2 and not (game.get_node("CanvasLayer/BottomBar/Speaker") as Label).visible, "the second box shows as narration, untagged, on two rows")
 	game.call("_advance_box_queue", MainScript.box_seconds(box_2) + 0.05)
 	_expect(str(game.get("status_line")) == box_3 and (game.get("box_queue") as Array).is_empty(), "then the opening exchange, unchanged")
-	# A line said meanwhile (a station, the name key) drops the rest.
+	# A line said meanwhile (a station's answer) only holds the rest back for its own reading time.
 	game.call("debug_new_game", true)
 	game.set("status_line", "WOLF: Quiet.")
 	game.call("_advance_box_queue", 0.01)
-	_expect((game.get("box_queue") as Array).is_empty() and str(game.get("status_line")) == "WOLF: Quiet.", "another line taking the box drops the boxes still to come")
+	_expect(game.get("box_queue") == [box_2, box_3] and str(game.get("status_line")) == "WOLF: Quiet.", "another line taking the box holds the boxes still to come")
+	game.call("_advance_box_queue", MainScript.box_seconds("WOLF: Quiet.") - 0.05)
+	_expect(str(game.get("status_line")) == "WOLF: Quiet.", "the line that cut in stays up its own reading time")
+	game.call("_advance_box_queue", 0.1)
+	_expect(str(game.get("status_line")) == box_2 and game.get("box_queue") == [box_3], "then the trust line's second box comes back")
+	# An open choice holds them; answering it drops them (the story has moved on past them).
+	game.set("status_line", "WOLF: Pick.")
+	game.call("_advance_box_queue", 0.01)
+	game.set("waiting_for_choice", true)
+	game.call("_advance_box_queue", 30.0)
+	_expect(str(game.get("status_line")) == "WOLF: Pick." and game.get("box_queue") == [box_3], "an open choice holds the boxes still to come")
+	game.set("waiting_for_choice", false)
+	game.set("status_line", "WOLF: Picked.")
+	game.call("_advance_box_queue", 30.0)
+	_expect((game.get("box_queue") as Array).is_empty() and str(game.get("status_line")) == "WOLF: Picked.", "answering the choice drops the boxes from before it")
+	# In play: following the hint bar at first control (E at the purge display, during the first box)
+	# still shows the second box and the opening exchange, in order, after the display's own line.
+	for at_breaker: bool in [false, true]:
+		game.call("debug_new_game", true)
+		await process_frame
+		if at_breaker:
+			# E at the breaker within the first box: the stakes line cuts in instead.
+			human.position.x = 350.0
+		for _frame: int in 20:
+			await process_frame
+		var seen: Array[String] = [str(game.get("status_line"))]
+		Input.action_press(&"interact")
+		await process_frame
+		Input.action_release(&"interact")
+		var started_at: int = Time.get_ticks_msec()
+		while Time.get_ticks_msec() - started_at < 25000:
+			var line: String = str(game.get("status_line"))
+			if seen.is_empty() or seen.back() != line:
+				seen.append(line)
+			if line == box_3:
+				break
+			await process_frame
+		var cut_in: String = seen[1] if seen.size() > 1 else ""
+		_expect(seen.size() == 4 and seen[0] == box_1 and cut_in != box_2 and seen[2] == box_2 and seen[3] == box_3, "E at the %s during the first box: its line, then the second box and the exchange, in order (seen %s)" % ["breaker" if at_breaker else "purge display", str(seen).c_escape()])
 
 
 ## A fresh junction entry: the engineer's goal, WOLF's run shown and his warning, the goal-only hint.
@@ -393,6 +436,18 @@ func _check_after_blast() -> void:
 	_expect(room.arm_label.text == "RELEASE USED" and room.hatch_label.text == "EXIT READY", "item 3: the used release and the ready exit")
 	var recap: Array = game.call("end_card_recap")
 	_expect(str(recap[2]).begins_with("SENTRY  "), "item 3 S20: the end card's third topic is SENTRY")
+
+
+## A sentry knockdown card is two rows already, so where play resumed follows in its own box (2 rows a box).
+func _check_knockdown_boxes() -> void:
+	await _start_at(false)
+	var reason: String = JunctionRoom.SENTRY_REASON % "Rowan"
+	game.call("_fail_beat", reason, true)
+	_expect(bool(game.get("fail_active")), "the sentry knockdown starts")
+	_expect(await _wait_until(func() -> bool: return not bool(game.get("fail_active")), 300), "the knockdown restores the checkpoint")
+	var c: Dictionary = (MainScript as GDScript).get_script_constant_map()
+	var queue: Array = game.get("box_queue")
+	_expect(str(game.get("status_line")) == reason and queue.size() == 1 and (queue[0] == c["RESTORE_FROM_DISK_LINE"] or queue[0] == c["RESTORE_BEAT_LINE"]), "after restore the two-row card keeps its box and the restore line comes next (box \"%s\", then %s)" % [str(game.get("status_line")).c_escape(), str(queue)])
 
 
 ## A fresh run into the junction's entry, as USE at the Records exit makes it (autosave A).

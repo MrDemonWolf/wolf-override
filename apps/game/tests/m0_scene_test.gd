@@ -87,9 +87,9 @@ func _run() -> void:
 	await _tap(&"interact")
 	_expect(game.get("intro_step") == 1 and not speaker.visible and story.text == "The Director thinks WOLF is still in standby.", "the narration after it gets its own untagged box, naming the Director")
 	await _tap(&"interact")
-	_expect(game.get("intro_step") == 2 and str(game.get("status_line")) == "Nobody gives an activation command. WOLF wakes himself." and not speaker.visible, "WOLF wakes himself and opens containment, with no line about a blue light the picture does not show")
+	_expect(game.get("intro_step") == 2 and str(game.get("status_line")) == "Nobody gives an activation command.\nWOLF wakes himself." and not speaker.visible, "WOLF wakes himself and opens containment, with no line about a blue light the picture does not show")
 	await _tap(&"interact")
-	_expect(game.get("intro_step") == 3 and str(game.get("status_line")) == "The latch breaks from the inside. WOLF steps out under his own power.", "WOLF opens containment from inside; the gate's slide and the Director are shown, not narrated")
+	_expect(game.get("intro_step") == 3 and str(game.get("status_line")) == "The latch breaks from the inside.\nWOLF steps out under his own power.", "WOLF opens containment from inside; the gate's slide and the Director are shown, not narrated")
 	await create_timer(1.2).timeout
 	_expect(intro_gate.visible and is_equal_approx(float(intro_gate.get("opening")), 1.0), "the opened gate stays drawn, folded aside, instead of vanishing")
 	await _tap(&"interact")
@@ -151,7 +151,13 @@ func _run() -> void:
 		return
 	_expect(human.position.x > start_x and wolf.position.x > 225.0 and wolf.position.x < human.position.x, "WOLF follows the engineer autonomously")
 	_expect(str(game.get("status_line")).contains("Original program logs marked for deletion"), "walking straight on past the display leaves its text up to be read")
-	_expect(await _wait_until(func() -> bool: return str(game.get("status_line")) == "WOLF: That purge takes the original program logs. Once they're gone, his word is the only record.", 240), "once the display's text has been up long enough to read, WOLF says what the purge takes")
+	# The display cut into the opening's boxes; the exchange still to come follows once the display's
+	# text has been read, and the stakes wait for it to be read in turn.
+	var exchange_shown: Array[bool] = [false]
+	_expect(await _wait_until(func() -> bool:
+		exchange_shown[0] = exchange_shown[0] or str(game.get("status_line")).begins_with("WOLF: I heard the Director's plan for me.")
+		return str(game.get("status_line")) == "WOLF: That purge takes the original program logs. Once they're gone, his word is the only record.", 1500), "once the display's text has been up long enough to read, WOLF says what the purge takes")
+	_expect(exchange_shown[0], "the opening exchange the display cut into still shows before the stakes")
 	if not _require(await _walk_to(human, 450.0), "engineer can move beyond the breaker"):
 		return
 	if not _require(await _walk_to(human, 350.0), "engineer can backtrack to the breaker"):

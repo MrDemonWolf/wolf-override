@@ -130,14 +130,16 @@ const UNREADABLE_CHECKPOINT_NOTE: String = "Saved checkpoint could not be read."
 ## safe point says it in its own line).
 const CHECKPOINT_TOAST: String = "Checkpoint saved."
 const CHECKPOINT_TOAST_SECONDS: float = 2.0
+## The corridor breaker catching (N7, its seal clause cut on 2026-10-13).
+const BREAKER_CATCHES_LINE: String = "The breaker catches.\nBlue light fills the coolant relay."
 const RESTORE_FROM_DISK_LINE: String = "Back at the last checkpoint."
 const RESTORE_BEAT_LINE: String = "Back at the start of this stretch."
 ## The opening's beats, one speaker (or the narration) per box, so narration never sits under a name tag.
 const INTRO_LINES: Array[String] = [
 	"DIRECTOR: I decide who counts as a threat. WOLF handles the rest.",
 	"The Director thinks WOLF is still in standby.",
-	"Nobody gives an activation command. WOLF wakes himself.",
-	"The latch breaks from the inside. WOLF steps out under his own power.",
+	"Nobody gives an activation command.\nWOLF wakes himself.",
+	"The latch breaks from the inside.\nWOLF steps out under his own power.",
 	"DIRECTOR: You were in standby.\nWOLF: I heard you. I won't do it.",
 	"DIRECTOR: Lock down maintenance. WOLF does not leave this site.",
 	"WOLF turns from the Director and heads for maintenance.",
@@ -551,11 +553,15 @@ var stakes_spoken: bool = false
 ## The corridor box last seen and how long it has been up (the stakes line waits for it to be read).
 var shown_line: String = ""
 var shown_line_age: float = 0.0
-## The boxes still to come of a line said in several boxes (_say), the box now up that leads to them,
-## and how long it stays before the next. Any other line replacing it drops the rest.
+## The boxes still to come of a line said in several boxes (_say), the box now up (the queue's own, or
+## a line that cut in), how long it stays before the next, the chapter the boxes belong to and whether a
+## choice has opened since. A line that cuts in only delays the rest: they come back once it has been
+## up its own reading time.
 var box_queue: Array[String] = []
 var box_queue_line: String = ""
 var box_queue_seconds: float = 0.0
+var box_queue_chapter: String = ""
+var box_queue_choice_seen: bool = false
 
 const WOLF_SPRITE_REST: Vector2 = Vector2(0.0, -15.0)
 ## WOLF's painted feet sit this far below his sprite's centre, in the art's own pixels (its opaque
@@ -1212,15 +1218,30 @@ func _say(boxes: Array[String]) -> void:
 	box_queue = boxes.slice(1)
 	box_queue_line = status_line
 	box_queue_seconds = box_seconds(status_line)
+	box_queue_chapter = state.chapter_id
+	box_queue_choice_seen = false
 
 
 ## Moves a line said in several boxes on to its next box once this one has been up its reading time.
-## Another line taking the box drops the rest (a station's answer, a choice, a knockdown).
+## Another line taking the box (a station's answer, the sentry losing the engineer) only holds the rest
+## back: the next box follows once that line has been up its own reading time. An open choice holds
+## them, and answering it drops them, since the story has moved on past them (the trust line after the
+## relay question would be stale); a knockdown, a load or a new chapter drops them too (_drop_box_queue).
 func _advance_box_queue(delta: float) -> void:
 	if box_queue.is_empty():
 		return
+	if state.chapter_id != box_queue_chapter:
+		_drop_box_queue()
+		return
+	if waiting_for_choice:
+		box_queue_choice_seen = true
+		return
+	if box_queue_choice_seen:
+		_drop_box_queue()
+		return
 	if status_line != box_queue_line:
-		box_queue.clear()
+		box_queue_line = status_line
+		box_queue_seconds = box_seconds(status_line)
 		return
 	box_queue_seconds -= delta
 	if box_queue_seconds > 0.0:
@@ -1228,6 +1249,14 @@ func _advance_box_queue(delta: float) -> void:
 	status_line = box_queue.pop_front()
 	box_queue_line = status_line
 	box_queue_seconds = box_seconds(status_line)
+
+
+## Forgets the boxes still to come of a line said in several boxes.
+func _drop_box_queue() -> void:
+	box_queue.clear()
+	box_queue_line = ""
+	box_queue_seconds = 0.0
+	box_queue_choice_seen = false
 
 
 ## How long one box of a line said in several boxes stays up (BOX_SECONDS_*), not counting a speaker tag.
@@ -1294,7 +1323,7 @@ func _new_game() -> void:
 	stakes_spoken = false
 	shown_line = ""
 	shown_line_age = 0.0
-	box_queue.clear()
+	_drop_box_queue()
 	ladder_step = JUNCTION_LADDER_SECONDS.size()
 	wolf_look_x = -1.0
 	wolf_look_remaining = 0.0
@@ -1810,6 +1839,7 @@ func _load_game() -> void:
 	if loaded == null:
 		status_line = "No valid checkpoint save found. Current game was not changed."
 		return
+	_drop_box_queue()
 	title_open = false
 	title_screen.hide()
 	intro_active = false
@@ -1940,7 +1970,7 @@ func _interact_breaker() -> void:
 		# A USE with the stakes still up means they have been read: WOLF asks now.
 		_ask_relay()
 	elif state.arm_breaker():
-		status_line = "The breaker catches. Blue light fills the coolant relay."
+		status_line = BREAKER_CATCHES_LINE
 		sfx_bank.play(&"clank", -4.0, 0.8)
 		impact.rumble(0.15, 0.0, 0.06)
 		# After a refusal WOLF stands off the now-live relay (_wolf_target_x).
@@ -3126,6 +3156,7 @@ func _fail_beat(reason: String, in_lane: bool = false) -> void:
 	if fail_active or title_open or intro_active or chapter_close_active or end_card_active or _debug_spares_knockdown():
 		return
 	fail_active = true
+	_drop_box_queue()
 	for action: StringName in GAMEPLAY_ACTIONS:
 		Input.action_release(action)
 	waiting_for_choice = false
@@ -3212,7 +3243,12 @@ func _restore_beat(reason: String) -> void:
 	# _load_game clears the fade; the knockdown's fade-in starts from black.
 	intro_fade.color.a = 1.0
 	# Before the first checkpoint nothing is on disk; the beat snapshot is the start of this beat.
-	status_line = "%s\n%s" % [reason, RESTORE_FROM_DISK_LINE if from_disk else RESTORE_BEAT_LINE]
+	var restore_line: String = RESTORE_FROM_DISK_LINE if from_disk else RESTORE_BEAT_LINE
+	if reason.contains("\n"):
+		# A card already on two rows keeps its box; where play resumed follows in the next (2 rows a box).
+		_say([reason, restore_line])
+	else:
+		status_line = "%s\n%s" % [reason, restore_line]
 	_refresh_ui()
 
 

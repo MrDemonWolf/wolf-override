@@ -663,10 +663,22 @@ func _check_scene() -> void:
 	_expect(not game.get("wolf_baiting") and game.get("wolf_broke_off") and wolf.autonomous_target_x == JunctionRoom.WOLF_RUBBLE_X and brain.state == &"lock", "after a miss WOLF breaks off to the rubble and the sentry turns, locking on first")
 	_expect(str(game.get("status_line")) == "The tank hits the empty mark\nand sprays coolant." and (game.get("box_queue") as Array) == ["The sentry swings toward the release;\nget back over the rubble.", "WOLF: I'm out. I'll hold at the rubble."] and not game.get("wolf_holding_far_end"), "not yet past the sentry, WOLF says in his own box after the miss that he is breaking off to the rubble")
 	human.position.x = 500.0
+	var miss_boxes: Array[String] = [str(game.get("status_line"))]
+	var log_box: Callable = func() -> void:
+		if miss_boxes.back() != str(game.get("status_line")):
+			miss_boxes.append(str(game.get("status_line")))
 	await physics_frame
 	_expect(str(game.call("_context_hint")).contains("until it gives up"), "back over the rubble the hint says to wait out the chase")
-	_expect(await _wait_until(func() -> bool: return brain.state == &"patrol", 240), "the chase ends with the engineer over the rubble")
+	_expect(await _wait_until(func() -> bool:
+		log_box.call()
+		return brain.state == &"patrol", 240), "the chase ends with the engineer over the rubble")
 	_expect(str(game.call("_context_hint")).contains("WOLF has broken off"), "then the hint says WOLF has stepped back")
+	# The sentry giving up cuts into the miss's boxes; the rest still follow once that line is read.
+	await _wait_until(func() -> bool:
+		log_box.call()
+		return miss_boxes.back() == "WOLF: I'm out. I'll hold at the rubble.", 1200)
+	var turn_at: int = miss_boxes.find("The sentry swings toward the release;\nget back over the rubble.")
+	_expect(miss_boxes.has("The sentry loses Rowan behind the rubble\nand rolls back to its patrol.") and turn_at > 0 and miss_boxes.find("WOLF: I'm out. I'll hold at the rubble.") > turn_at, "retreating over the rubble mid-miss still shows the sentry's turn and WOLF breaking off, in order (seen %s)" % str(miss_boxes).c_escape())
 	# Round 3b: a miss with WOLF already past the sentry, by the hatch. He breaks off where he is, since
 	# he never crosses back under the tank; the sentry's patrol then turns short of him and its beam
 	# stops at him; and the END OF SLICE recap says he broke off.
