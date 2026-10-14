@@ -390,19 +390,21 @@ func _check_scene() -> void:
 	for _frame: int in 30:
 		await physics_frame
 		knocked = knocked or game.get("fail_active")
-	_expect(not knocked and human.controlled and str(game.get("status_line")) == "The door goes. WOLF heads for the rubble\nto wait for %s's call." % state.human_name().get_slice(" ", 0), "clear of the zone the blast is not a knockdown, even at its edge, and the line says WOLF is heading for the rubble to wait for the engineer's call")
+	_expect(not knocked and human.controlled and str(game.get("status_line")) == "The door goes. WOLF falls back\nto wait for %s's call." % state.human_name().get_slice(" ", 0), "clear of the zone the blast is not a knockdown, even at its edge, and the line says WOLF falls back to wait for the engineer's call")
 	_expect(game.get("box_queue") == ["Past the doorway, something whirs awake."], "the sentry waking past the doorway is the next box")
 	_expect(await _wait_until(func() -> bool: return room.door_blown_art.visible and not room.door_breaking_art.visible, 30), "then it stands blown open on the passage beyond")
 	_expect(await _wait_until(func() -> bool: return not room.sentry.visual.dormant and room.sentry.visual.is_lit() and room.sentry.visual.body.modulate == Color.WHITE, 90), "the blast wakes the sentry: it powers up and its eye lights")
 	_expect(_labels_clear(room), "after the blast the station plates still sit apart in their row")
 	var autosave_b: M0State = State.load_from_disk(path)
 	_expect(autosave_b != null and autosave_b.door_blown and autosave_b.chapter_id == "junction", "autosave B records the blown door")
-	_expect(wolf.autonomous_target_x == JunctionRoom.WOLF_RUBBLE_X, "WOLF stops at the rubble until he is asked")
+	# P0-4: his spot on the near side of the rubble is the floor by the valve; while the engineer who
+	# backed off past the valve still stands there, he keeps to his spot by the entrance.
+	_expect(wolf.autonomous_target_x == JunctionRoom.WOLF_CLEAR_X, "WOLF keeps by the entrance while the engineer stands in his spot by the valve")
 	_expect(await _wait_until(func() -> bool: return room.door_shape.disabled, 5), "the door body is gone")
 	_expect(await _wait_until(func() -> bool: return Engine.time_scale == 1.0 and camera.offset == Vector2.ZERO, 90), "time scale and camera settle after the boom")
 	# Through where the door stood, up to just short of the rubble line (the lane beyond is sentry_test's).
 	_expect(await _walk_to(human, JunctionRoom.CHOICE_X - 16.0), "the engineer can walk through where the door stood")
-	_expect(wolf.position.x <= JunctionRoom.WOLF_RUBBLE_X + 12.0, "WOLF stays on the near side of the rubble")
+	_expect(wolf.autonomous_target_x == JunctionRoom.WOLF_RUBBLE_X and wolf.position.x <= JunctionRoom.WOLF_RUBBLE_X + 12.0, "once they move on WOLF waits for their call by the valve, on the near side of the rubble")
 	_expect(room.z_index + room.door_visual.z_index < wolf.z_index and room.z_index + room.door_visual.z_index < human.z_index, "the torn door frame draws behind WOLF and the engineer")
 	await _tap(&"interact")
 	_expect(str(game.get("status_line")).contains("TANK RELEASE") and not game.get("waiting_for_choice"), "short of the rubble USE points at the tank release and nothing is asked yet")

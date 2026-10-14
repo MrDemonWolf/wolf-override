@@ -122,13 +122,15 @@ const FLOOR_Y: float = 440.0
 ## valve (the idle relief vent's grate, 33 px of bare floor) is far shorter than his body, so the
 ## narration names the gauge he reads, not the door (Main.JUNCTION_ENTRY_LINE).
 const WOLF_SEAM_X: float = VALVE_X - VALVE_HALF_WIDTH - M0Actor.WOLF_REACH - 2.0
-## (He holds at the near edge of the rubble, so his sprite stays clear of the engineer at CHOICE_X.
-## Between the valve and the release alcove there is no floor as long as he is, so his rear stands
-## over the valve's right side here.)
-const WOLF_RUBBLE_X: float = 448.0
+## Where WOLF holds back from the rubble line while the engineer deals with the lane (or after he breaks
+## off drawing the sentry): the nearest clear floor to it, his reading spot by the valve. Between the
+## valve and the rubble line the valve, the blown bulkhead's frame and the engineer at CHOICE_X leave
+## no floor as long as he is, so any nearer spot would stand him inside them.
+const WOLF_RUBBLE_X: float = WOLF_SEAM_X
 ## Where WOLF stands when he chooses to draw the sentry: at the far end of its lane, in front of the
-## exit hatch (a doorway, not a machine), facing back down the lane, his snout at the bolt panel's
-## right edge and his tail inside the room's right edge. It parks BAIT_OFFSET short of him, on the
+## exit hatch (a doorway in the back wall, not a machine), facing back down the lane, his painted snout
+## (M0Actor.WOLF_SNOUT) just clear of the bolt panel's right edge and his painted tail
+## (M0Actor.WOLF_TAIL) inside the room's right edge. It parks BAIT_OFFSET short of him, on the
 ## mark, facing him with its back to the TANK RELEASE, so the engineer working the release is behind
 ## it and never between the two; his drawn body stays far outside the floor brackets and the tank.
 const WOLF_BAIT_X: float = DropArm.MARK_X + SentryBrain.BAIT_OFFSET
@@ -158,7 +160,7 @@ const DUCK_DEPTH: float = 9.0
 const DUCK_CLEAR: float = 34.0
 const DUCK_RAMP: float = 24.0
 const WOLF_HEAD_X: float = 45.0
-## Once the tank is down on the sentry, WOLF crossing from the rubble to his spot by the hatch bounds
+## Once the tank is down on the sentry, WOLF crossing from his spot by the valve to his spot by the hatch bounds
 ## clean over the crushed tank and the wreck under it in one arc (wolf_tank_leap_height): a parabola in
 ## x, so at his steady LEAP_SPEED_SCALE speed it is a fall under constant gravity, TANK_LEAP_HEIGHT at
 ## its top over TANK_LEAP_PEAK_X and back on the floor TANK_LEAP_HALF_SPAN either side. He is 134 px
@@ -168,7 +170,7 @@ const WOLF_HEAD_X: float = 45.0
 ## over them on the way up and lands just short of his spot. His painted feet (y 438) pass over the
 ## tank's top (y 331, on the crushed hull) and his back under the claw. The empty arm hangs too low over
 ## the tank for him to pass under it, so it winches up into its ceiling plate as the tank lands for good
-## (ARM_PARK_RISE over ARM_PARK_SECONDS), and he waits at the rubble until it is up. sentry_test measures
+## (ARM_PARK_RISE over ARM_PARK_SECONDS), and he waits by the valve until it is up. sentry_test measures
 ## his painted body against the tank's, the wreck's and the arm's images on every frame of the crossing
 ## and at every x (3 px clear).
 const TANK_LEAP_HEIGHT: float = 122.0
@@ -1301,8 +1303,8 @@ func door_blast() -> void:
 
 
 ## The sealed bulkhead until the blast, breaking for a moment, then blown open. All of it draws behind
-## the actors (Main.ACTOR_Z) and its front pillar over them, so WOLF holding at the rubble and anyone
-## walking through stay in the doorway.
+## the actors (Main.ACTOR_Z) and its front pillar over them, so WOLF holding back by the valve and
+## anyone walking through stay in view in front of it.
 func _show_door() -> void:
 	door_art.visible = not door_blown
 	door_breaking_art.visible = door_blown and door_breaking

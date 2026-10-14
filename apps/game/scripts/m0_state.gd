@@ -22,7 +22,7 @@ const CHOICE_TEXT = {
 	"press_without_warning": "Skip the risk talk. Go now.",
 }
 ## The saved ways the junction's sentry can have come down (lane_recap), empty before it falls:
-## WOLF drew it, he refused, the engineer timed it with WOLF at the rubble, or he broke off by the
+## WOLF drew it, he refused, the engineer timed it with WOLF held back by the valve, or he broke off by the
 ## exit hatch after a miss.
 const LANE_RECAPS: Array[String] = ["", "wolf", "refused", "alone", "broke_off"]
 
@@ -46,7 +46,7 @@ var door_blown: bool = false
 var sentry_down: bool = false
 var junction_cleared: bool = false
 ## How the sentry came down, for the END OF SLICE recap: "wolf" (he drew it onto the mark), "refused"
-## (he would not, so the engineer timed it), "alone" (he held at the rubble while the engineer timed
+## (he would not, so the engineer timed it), "alone" (he held back by the valve while the engineer timed
 ## it), or empty before the fall. Optional in the file, so v4 saves without it still load.
 var lane_recap: String = ""
 

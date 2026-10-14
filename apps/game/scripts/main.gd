@@ -10,11 +10,18 @@ const CHANGELOG_PATH: String = "res://assets/changelog.txt"
 const CHANGELOG_UNAVAILABLE: String = "The changelog text is missing from this build. Open the full changelog online."
 ## How fast a held up/down input scrolls the changelog, in pixels per second.
 const CHANGELOG_SCROLL_SPEED: float = 260.0
-## Where WOLF stands to hold the live relay contact.
-const RELAY_CONTACT_X: float = 592.0
+## Where WOLF stands to hold the live relay contact: on the relay's left, facing it, his painted snout
+## (M0Actor.WOLF_SNOUT) a pixel short of the relay's painted left edge (x 569), so he is never drawn
+## inside the machine; the engineer has its right, towards the MANUAL BYPASS.
+const RELAY_CONTACT_X: float = 509.0
 ## The coolant relay's centre and how far either side of it the engineer can use it.
 const RELAY_X: float = 605.0
 const RELAY_REACH: float = 52.0
+## Half the relay's drawn width, as WOLF's follow spots keep clear of it (_machine_spans).
+const RELAY_HALF_WIDTH: float = 43.1
+## Once the seal is open WOLF follows no further right than this: the last follow spot clear of the
+## relay on its left (M0Actor.off_machines would move him no further), so past it he waits there.
+const WOLF_FOLLOW_OPEN_MAX_X: float = RELAY_X - RELAY_HALF_WIDTH - M0Actor.WOLF_REACH + M0Actor.AVOID_TOLERANCE
 ## The MANUAL BYPASS beside the relay (Nathanial's decision A): its wheel, and how far either side of
 ## it the engineer can crank it. It sits on the relay's right, clear of WOLF's contact.
 const BYPASS_WHEEL: Vector2 = Vector2(700.0, 398.0)
@@ -24,8 +31,10 @@ const BYPASS_REACH: float = 30.0
 const BYPASS_CRANK_X: float = BYPASS_WHEEL.x - 26.0
 ## While the engineer is at the relay or works the bypass, WOLF stands off the relay (refused, not
 ## asked yet, or not asked at all), back towards the breaker, clear of both machines, until the seal
-## has opened or he is signalled to take it (_wolf_off_relay).
-const WOLF_BYPASS_CLEAR_X: float = 490.0
+## has opened or he is signalled to take it (_wolf_off_relay). His tail clears the breaker (painted to
+## x 388) even as he pulls back refusing (_react_as_wolf), and his snout stops well short of the relay,
+## so taking the contact is a step he is seen to make.
+const WOLF_BYPASS_CLEAR_X: float = 462.0
 ## Held-USE ticks the bypass takes (BypassHandle.TICK_SECONDS each, 2 s in all).
 const BYPASS_TICKS: int = BypassHandle.TICKS_NEEDED
 ## While the bypass vents coolant its alarm sounds this often.
@@ -167,7 +176,7 @@ const RECAP_MIRROR_WOLF: String = "MIRROR  WOLF read the timestamp off his own r
 const RECAP_MIRROR_MANUAL: String = "MIRROR  {name} copied the timestamp through the maintenance port."
 const RECAP_LANE_WOLF: String = "SENTRY  WOLF drew the sentry onto the mark."
 const RECAP_LANE_REFUSED: String = "SENTRY  WOLF wouldn't draw it, so {name} timed the drop alone."
-const RECAP_LANE_ALONE: String = "SENTRY  WOLF held at the rubble while {name} timed the drop."
+const RECAP_LANE_ALONE: String = "SENTRY  WOLF held back while {name} timed the drop."
 ## After a miss with WOLF already past the sentry: he broke off where he was, by the exit hatch (the
 ## row names no place, like his "I'm out.").
 const RECAP_LANE_BROKE_OFF: String = "SENTRY  WOLF broke off while {name} timed the drop."
@@ -180,25 +189,27 @@ const CONTINUE_TEXT: String = "CONTINUE"
 const FINISHED_NOTE: String = "Slice complete. PLAY AGAIN starts a fresh run."
 ## Only a hand-made save can reopen the cleared junction; it says where the line goes, not that it is unbuilt.
 const JUNCTION_CLEARED_LINE: String = "The service line runs on toward Archive."
-## Said as the door goes, while WOLF is still on his way up from the entrance: it says where he is
-## going, so it holds on every frame of his walk and after he arrives. Then, as its own box, the
-## sentry past the doorway (P0-7, approved 2026-10-13: the lane is not drawn; the doorway is).
-const RUBBLE_LINE: String = "The door goes. WOLF heads for the rubble\nto wait for %s's call."
+## Said as the door goes, while WOLF is still by the entrance: it says he holds back, not where, so
+## it holds on every frame, by the entrance and at his spot by the valve short of the rubble (Draft A,
+## approved 2026-10-14). Then, as its own box, the sentry past the doorway (P0-7, approved
+## 2026-10-13: the lane is not drawn; the doorway is).
+const RUBBLE_LINE: String = "The door goes. WOLF falls back\nto wait for %s's call."
 const RUBBLE_WAKE_LINE: String = "Past the doorway, something whirs awake."
 const BAIT_YES_LINE: String = "WOLF: You told me the truth at the relay. I'll draw it onto the mark and keep clear of the tank. Drop it when it stops."
-## What WOLF says as he breaks off after a miss, in his own box after the miss line's two: he holds at
-## the rubble if he had not got past the sentry yet; if he had, he stays by the exit hatch, since he
-## never crosses back under the tank (_wolf_target_x), and says only that he is out (where he is shows
-## on screen).
-const BROKE_OFF_RUBBLE_LINE: String = "WOLF: I'm out. I'll hold at the rubble."
+## What WOLF says as he breaks off after a miss, in his own box after the miss line's two: he holds
+## back at his spot by the valve if he had not got past the sentry yet (Draft A, approved 2026-10-14);
+## if he had, he stays by the exit hatch, since he never crosses back under the tank (_wolf_target_x),
+## and says only that he is out (where he is shows on screen).
+const BROKE_OFF_RUBBLE_LINE: String = "WOLF: I'm out. I'll hold back."
 const BROKE_OFF_HATCH_LINE: String = "WOLF: I'm out."
 ## A missed drop, in two boxes (P0-7 and P0-19, approved 2026-10-13: no split line is drawn, and the
 ## release is the panel's one name).
 const TANK_MISS_LINE: String = "The tank hits the empty mark\nand sprays coolant."
 const TANK_MISS_TURN_LINE: String = "The sentry swings toward the release;\nget back over the rubble."
 const BAIT_NO_LINE: String = "WOLF: At the relay you'd have sent me in blind. I won't walk into its sights. Time the drop from the release; it crosses the mark on every pass."
-## WOLF's answer when the engineer will time the drop alone, in two boxes of his.
-const ALONE_LINES: Array[String] = ["WOLF: I'll hold at the rubble.\nIt crosses the mark on every pass.", "WOLF: The tank takes a moment to fall."]
+## WOLF's answer when the engineer will time the drop alone, in two boxes of his (the first box's
+## "I'll hold back." is Draft A, approved 2026-10-14: he waits by the valve, short of the rubble).
+const ALONE_LINES: Array[String] = ["WOLF: I'll hold back.\nIt crosses the mark on every pass.", "WOLF: The tank takes a moment to fall."]
 ## A hit on the mark, and one that catches the sentry more than OFF_CENTRE_HIT off it (the tank lands on
 ## the mark and pins the machine where it stands, so the wreck shows to one side under it).
 const TANK_HIT_LINE: String = "The tank comes down square and crushes the sentry flat. Its eyes go dark.\nWOLF: It's down. The bolt by the hatch is next."
@@ -234,9 +245,13 @@ const STATION_OVERLAP: float = 6.0
 const RELAY_SIDE_X: float = RELAY_X + RELAY_REACH - 2.0
 ## The junction valve is cranked from just left of its wheel, like the MANUAL BYPASS.
 const VALVE_CRANK_X: float = JunctionRoom.VALVE_X - 29.0
-## Where WOLF reads the mirror on his own: on the port's right, facing it, his snout at its edge, so
-## he is never drawn inside it and the engineer has its left side.
-const WOLF_MIRROR_X: float = 616.0
+## Where WOLF reads the mirror on his own: on the port's right, facing it, his painted snout
+## (M0Actor.WOLF_SNOUT) just short of its painted right edge (x 564), so he is never drawn inside it
+## and the engineer has its left side.
+const WOLF_MIRROR_X: float = 625.0
+## How far either side of M0Actor.CLEAR_GAP the engineer has to go before WOLF changes his mind about
+## walking up to his spot by the valve after the blast (_wolf_rubble_x).
+const WOLF_RUBBLE_HYSTERESIS: float = 24.0
 const MENU_NAVIGATION_ACTIONS: Array[StringName] = [&"ui_accept", &"ui_up", &"ui_down", &"ui_left", &"ui_right", &"ui_focus_next", &"ui_focus_prev"]
 ## Every gameplay action; pause and a knockdown release them all so nothing stays held.
 const GAMEPLAY_ACTIONS: Array[StringName] = [&"move_left", &"move_right", &"interact", &"choice_1", &"choice_2"]
@@ -1011,6 +1026,14 @@ func _process(delta: float) -> void:
 	if state.chapter_id == "records" and wolf.autonomous_target_x == WOLF_MIRROR_X and absf(wolf.position.x - WOLF_MIRROR_X) <= 2.0:
 		# At the mirror he faces the port, whichever way he walked in.
 		wolf.body_sprite.flip_h = true
+	if state.chapter_id == "junction" and state.door_blown and wolf.autonomous_target_x == JunctionRoom.WOLF_CLEAR_X and absf(wolf.position.x - JunctionRoom.WOLF_CLEAR_X) <= 2.0:
+		# Held by the entrance after the blast until the engineer leaves his spot by the valve, he faces
+		# them and the rubble: waiting, not leaving.
+		wolf.body_sprite.flip_h = human.position.x < wolf.position.x
+	if state.chapter_id == "junction" and state.door_blown and not state.sentry_down and wolf.autonomous_target_x == JunctionRoom.WOLF_RUBBLE_X and absf(wolf.position.x - JunctionRoom.WOLF_RUBBLE_X) <= 2.0:
+		# Holding back by the valve, he faces the engineer, and so the rubble while they deal with the
+		# sentry, even after breaking off, when he walked back in facing the entrance.
+		wolf.body_sprite.flip_h = human.position.x < wolf.position.x
 	if fail_active:
 		# Knocked down: the reaction plays out and the last autosave returns; nothing else reads input.
 		_refresh_ui()
@@ -2720,8 +2743,8 @@ func _bait_holding() -> bool:
 
 
 ## True while the release has to wait for WOLF: he is drawing the sentry and has not got it stopped on
-## the mark yet. Once it is after the engineer he has backed off to the rubble, so the release works
-## as it does on the patrol.
+## the mark yet. Once it is after the engineer he has backed off to his spot by the valve, so the
+## release works as it does on the patrol.
 func _drop_waits_for_wolf() -> bool:
 	return wolf_baiting and not _sentry_hunting() and not _bait_holding()
 
@@ -3031,7 +3054,7 @@ func _lane_sound() -> void:
 
 
 func _sentry_changed(before: StringName) -> void:
-	# Locking on sends a drawing WOLF back to the rubble until the chase ends.
+	# Locking on sends a drawing WOLF back to his spot by the valve until the chase ends.
 	wolf.autonomous_target_x = _wolf_target_x()
 	if sentry_brain.state == &"lock":
 		_sentry_alarm()
@@ -3104,7 +3127,7 @@ func _choose_lane(response: int) -> void:
 		sfx_bank.play(&"growl_refusal", -3.5)
 	else:
 		lane_choice = "alone"
-		# He settles to hold at the rubble: a quieter whir than an answer he leans into.
+		# He settles to hold back by the valve: a quieter whir than an answer he leans into.
 		sfx_bank.play(&"actuator", -12.0, 0.85)
 		_say(ALONE_LINES)
 	_update_controls()
@@ -3119,7 +3142,7 @@ func _tank_hit() -> void:
 	if not state.drop_sentry():
 		return
 	# For the end card, saved with autosave C: WOLF drew it only if he still was when it fell; after
-	# breaking off he held at the rubble while the engineer timed it.
+	# breaking off short of the sentry he held back by the valve while the engineer timed it.
 	state.lane_recap = "wolf" if wolf_baiting else ("broke_off" if wolf_holding_far_end else ("refused" if lane_choice == "refused" else "alone"))
 	wolf_baiting = false
 	junction_room.sentry_down = true
@@ -3636,12 +3659,12 @@ func _flash_relay_spark(from_wolf: bool) -> void:
 	if relay_spark_tween != null and relay_spark_tween.is_running():
 		relay_spark_tween.kill()
 	if from_wolf:
-		# Across WOLF's contact on the relay's face.
+		# From WOLF's snout at the relay's left edge across its face.
 		relay_spark.points = PackedVector2Array([
-			Vector2(583.0, 393.0), Vector2(592.0, 381.0), Vector2(600.0, 398.0),
-			Vector2(610.0, 380.0), Vector2(620.0, 393.0),
+			Vector2(569.0, 393.0), Vector2(578.0, 381.0), Vector2(586.0, 398.0),
+			Vector2(596.0, 380.0), Vector2(606.0, 393.0),
 		])
-		relay_sparks.position = Vector2(601.0, 390.0)
+		relay_sparks.position = Vector2(587.0, 390.0)
 	else:
 		# The bypass locking over: across the top of its wheel, in front of the engineer cranking it.
 		var hub: Vector2 = BYPASS_WHEEL + BypassHandle.WHEEL_OFFSET
@@ -3741,9 +3764,10 @@ func _update_controls() -> void:
 
 ## Where WOLF goes on his own, or -1 to follow: the relay contact (held until the seal lands), off
 ## the relay while the engineer works the bypass (_wolf_off_relay), the Records mirror, the junction
-## valve on entry, clear of the vent and the blast while the line is live, the rubble line once the
-## door is down (he will not cross it unless he chooses to draw the sentry onto the mark, from the
-## far end of its lane), by the exit hatch once it is down, and out through the hatch at the end.
+## valve on entry, clear of the vent and the blast while the line is live, back by the valve, short
+## of the rubble line, once the door is down (he will not cross it unless he chooses to draw the
+## sentry onto the mark, from the far end of its lane), by the exit hatch once it is down, and out
+## through the hatch at the end.
 func _wolf_target_x() -> float:
 	if hatch_exit_walking:
 		# He goes through the hatch first, from his spot in its doorway.
@@ -3776,14 +3800,30 @@ func _wolf_target_x() -> float:
 				# He draws the sentry only by his own choice, from the far end of its lane; otherwise he will
 				# not cross the rubble. Once past it he never crosses back under the tank: while it is locked
 				# on to the engineer or chasing them, or after he breaks off there, he keeps to his spot by
-				# the hatch. Should it turn on the engineer before he is past it, he backs off to the rubble
-				# rather than bound over it.
+				# the hatch. Should it turn on the engineer before he is past it, he backs off to his spot by
+				# the valve rather than bound over it.
 				if wolf_holding_far_end:
 					return JunctionRoom.WOLF_BAIT_X
 				if wolf_baiting and (not _sentry_hunting() or wolf.position.x > sentry_brain.x):
 					return JunctionRoom.WOLF_BAIT_X
-				return JunctionRoom.WOLF_RUBBLE_X
+				return _wolf_rubble_x()
 	return -1.0
+
+
+## Where WOLF holds back from the rubble: his spot by the valve (JunctionRoom.WOLF_RUBBLE_X), the only
+## floor on the near side as long as he is. The engineer backing off from the fuse often stops right
+## there, so while they stand where his body would be he keeps to his spot by the entrance
+## (JunctionRoom.WOLF_CLEAR_X), and walks up once they move on towards the rubble.
+## Once he has set off for his spot the engineer has to come back well inside it to send him back, and
+## once he is holding by the entrance they have to be well clear of it before he sets off
+## (WOLF_RUBBLE_HYSTERESIS), so an engineer edging about near the valve never sets him running to and fro.
+func _wolf_rubble_x() -> float:
+	if wolf.position.x >= JunctionRoom.WOLF_RUBBLE_X - 2.0:
+		return JunctionRoom.WOLF_RUBBLE_X
+	var gap: float = absf(human.position.x - JunctionRoom.WOLF_RUBBLE_X)
+	if wolf.autonomous_target_x == JunctionRoom.WOLF_RUBBLE_X:
+		return JunctionRoom.WOLF_CLEAR_X if gap < M0Actor.CLEAR_GAP - WOLF_RUBBLE_HYSTERESIS else JunctionRoom.WOLF_RUBBLE_X
+	return JunctionRoom.WOLF_CLEAR_X if gap < M0Actor.CLEAR_GAP + WOLF_RUBBLE_HYSTERESIS else JunctionRoom.WOLF_RUBBLE_X
 
 
 ## WOLF keeps off the live relay, back towards the breaker: once he has refused it, or while the
@@ -3805,7 +3845,7 @@ func _machine_spans() -> Array[Vector2]:
 	var halves: Array[Vector2] = []
 	match state.chapter_id:
 		"lockdown":
-			halves = [Vector2(350.0, 38.5), Vector2(RELAY_X, 43.1), Vector2(BYPASS_WHEEL.x, BypassHandle.COLLAR_RADIUS), Vector2(876.0, 35.0)]
+			halves = [Vector2(350.0, 38.5), Vector2(RELAY_X, RELAY_HALF_WIDTH), Vector2(BYPASS_WHEEL.x, BypassHandle.COLLAR_RADIUS), Vector2(876.0, 35.0)]
 		"records":
 			halves = [Vector2(190.0, 57.1), Vector2(520.0, 44.6), Vector2(RecordsRoom.EXIT_REST.x, 37.8)]
 		"junction":
@@ -3819,10 +3859,13 @@ func _machine_spans() -> Array[Vector2]:
 
 
 ## The furthest right WOLF follows to: short of a shut door by his drawn reach, so he never noses
-## into it and the engineer always has room in front of it. His authored spots ignore this.
+## into it and the engineer always has room in front of it. Once the corridor's seal is open, the
+## floor past the relay (the MANUAL BYPASS, the seal's frame and the safe point) has no gap as long
+## as he is, so he follows no further than the relay's left side (WOLF_FOLLOW_OPEN_MAX_X) and waits
+## there while the engineer goes on to the safe point. His authored spots ignore this.
 func _wolf_follow_max_x() -> float:
-	if state.chapter_id == "lockdown" and not state.door_open:
-		return CORRIDOR_DOOR_LEFT_X - M0Actor.WOLF_REACH
+	if state.chapter_id == "lockdown":
+		return WOLF_FOLLOW_OPEN_MAX_X if state.door_open else CORRIDOR_DOOR_LEFT_X - M0Actor.WOLF_REACH
 	if state.chapter_id == "junction" and not state.door_blown:
 		return M0State.JUNCTION_DOOR_LEFT_X - M0Actor.WOLF_REACH
 	return M0Actor.MAX_X
@@ -4484,7 +4527,7 @@ func debug_wolf_why() -> String:
 			if wolf_scouting:
 				return "scout: the door seam"
 			if wolf.autonomous_target_x == JunctionRoom.WOLF_CLEAR_X:
-				return "hold: clear of the vent and blast"
+				return "hold: by the entrance until his spot by the valve is clear" if state.door_blown else "hold: clear of the vent and blast"
 			if wolf.autonomous_target_x == JunctionRoom.WOLF_BAIT_X:
 				return "bait: drawing the sentry"
 			if wolf.autonomous_target_x == JunctionRoom.WOLF_RUBBLE_X:

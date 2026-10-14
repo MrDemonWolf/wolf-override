@@ -39,7 +39,7 @@ const CHECKPOINT_JUMPS: Array[StringName] = [&"safe_point", &"records_entry", &"
 const RELAY_OPTIONS: Array[StringName] = [&"press", &"disclose_wolf", &"disclose_bypass"]
 const MIRROR_OPTIONS: Array[StringName] = [&"wolf", &"manual"]
 ## How the sentry comes down: WOLF draws it (only after the relay was disclosed), the engineer times
-## it while WOLF holds at the rubble, or WOLF is asked and refuses (only after a rushed relay).
+## it while WOLF holds back by the valve, or WOLF is asked and refuses (only after a rushed relay).
 const LANE_OPTIONS: Array[StringName] = [&"wolf", &"alone", &"refused"]
 const OPTION_NAMES: Dictionary = {
 	&"press": "RUSHED, BYPASS", &"disclose_wolf": "TOLD, WOLF", &"disclose_bypass": "TOLD, BYPASS",
@@ -229,7 +229,7 @@ func build_state(id: StringName) -> M0State:
 		return state
 	state.drop_sentry()
 	state.lane_recap = String(lane)
-	# At the TANK RELEASE; WOLF where he drew the sentry, or at the rubble.
+	# At the TANK RELEASE; WOLF where he drew the sentry, or back by the valve.
 	var release: Vector4 = Main.JUNCTION_STATIONS[2]
 	_set_positions(state, _side_spot(release, release.w), JunctionRoom.WOLF_BAIT_X if lane == &"wolf" else JunctionRoom.WOLF_RUBBLE_X)
 	if id == &"tank_down":
