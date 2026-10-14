@@ -107,7 +107,8 @@ static func wrap_width(text: String, font: Font, font_size: int, width: float, m
 			# The row's longest start of whole words within the limit.
 			var space: int = row.left(max_characters + 1).rfind(" ")
 			var keep: String = row.left(space) if space > 0 else row.left(max_characters)
-			narrower = minf(narrower, ceilf(font.get_string_size(keep, HORIZONTAL_ALIGNMENT_LEFT, -1.0, font_size).x) + 1.0)
+			# The space the row breaks at counts towards its width as the text is laid out.
+			narrower = minf(narrower, ceilf(font.get_string_size(keep + " ", HORIZONTAL_ALIGNMENT_LEFT, -1.0, font_size).x) + 1.0)
 		if narrower >= at:
 			return at
 		at = narrower

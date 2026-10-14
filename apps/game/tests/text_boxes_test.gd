@@ -88,6 +88,16 @@ func _check_corpus() -> void:
 	var size: int = story.get_theme_font_size(&"font_size")
 	var width: float = game.call("_dialogue_column_width")
 	_expect(size >= 23, "dialogue is %d px at 540p (at least 23)" % size)
+	# A row that would pass 42 characters breaks one word earlier, never sooner; rows of the approved
+	# two-row boxes keep their written breaks.
+	var stiff: String = "The wheel is stiff. Three full turns charge the door."
+	var stiff_rows: Array[String] = DialogueBoxes.row_texts(stiff, font, size, DialogueBoxes.wrap_width(stiff, font, size, width, DialogueBoxes.MAX_ROW_CHARACTERS))
+	_expect(stiff_rows == ["The wheel is stiff. Three full turns", "charge the door."], "a long row breaks one word earlier, not more (%s)" % [stiff_rows])
+	var lost: String = Main.SENTRY_LOST_LINE % "Morgan"
+	var lost_rows: Array[String] = DialogueBoxes.row_texts(lost, font, size, DialogueBoxes.wrap_width(lost, font, size, width, DialogueBoxes.MAX_ROW_CHARACTERS))
+	var written: Array[String] = []
+	written.assign(lost.split("\n"))
+	_expect(lost_rows == written, "an approved two-row box keeps its rows (%s)" % [lost_rows])
 	var messages: Array[String] = _corpus()
 	_expect(messages.size() >= 90, "the corpus holds the game's lines (%d)" % messages.size())
 	var boxes: int = 0
