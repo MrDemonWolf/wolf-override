@@ -569,7 +569,8 @@ func _check_redraws() -> void:
 		bolt[1] = (frame + 1) / 40.0
 		sync.call()
 		await process_frame
-	_expect(_new_every_frame(room_draws, 30) and _new_every_frame(feed_draws, 30), "while the bolt charges every frame redraws its lights and its feed (%d, %d draws)" % [room_draws.size(), feed_draws.size()])
+	# The feed is drawn with the room; the recesses hold only the alcove's shadow, which never changes.
+	_expect(_new_every_frame(room_draws, 30) and feed_draws.is_empty(), "while the bolt charges every frame redraws its lights and its feed, and never the recesses (%d, %d draws)" % [room_draws.size(), feed_draws.size()])
 	room_draws.clear()
 	feed_draws.clear()
 	for _frame: int in 10:
@@ -610,6 +611,8 @@ func _check_vent_edges(game: Node2D, human: M0Actor, wolf: M0Actor, room: Juncti
 	_expect(await _wait_until(func() -> bool: return room.vent_steam.emitting, 5), "near the top of the gauge the vent steams")
 	# Round 3 item 7: the column rises behind the actors, so it never hides an engineer on the grate.
 	_expect(room.z_index + room.vent_steam.z_index < human.z_index and room.z_index + room.vent_steam.z_index < wolf.z_index, "the vent's steam column draws behind the engineer and WOLF")
+	# P0-16 (FAIL-1): the grate the knockdown card names is drawn over the steam rising out of it.
+	_expect(room.vent_steam.z_index < room.vent_art.z_index and room.vent_puff.z_index < room.vent_art.z_index and room.vent_steam.z_as_relative and room.vent_puff.z_as_relative, "the vent's grate draws over its steam and its burst")
 	line.gauge = 0.999
 	_expect(await _wait_until(func() -> bool: return line.state == &"tripped", 10), "the gauge peaks and the vent lets go")
 	for _frame: int in 4:

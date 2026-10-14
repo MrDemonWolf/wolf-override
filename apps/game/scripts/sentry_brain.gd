@@ -23,11 +23,22 @@ const COVER_MIN_X: float = LANE_ENTRY_X
 const COVER_MAX_X: float = 626.0
 ## How far ahead it sees, in the direction it faces.
 const SIGHT_RANGE: float = 180.0
-## Half the sentry's body. Bodies touching (this plus half the engineer) is contact.
+## Half the sentry's body, as the tank's hit and WOLF's spacing use it.
 const HALF_WIDTH: float = 26.0
-const CONTACT_RANGE: float = HALF_WIDTH + M0State.HUMAN_HALF_WIDTH
+## How far its drawn machine reaches from its origin on its longer side (Sentry.drawn_half_width,
+## 31.6 px, rounded up), and so how far its drawn body reaches either way.
+const DRAWN_HALF_WIDTH: float = 32.0
+## Contact is the two drawn bodies touching: this machine's drawn half and the engineer's
+## (M0Actor.HUMAN_REACH). A knockdown lands at this distance, before the drawings overlap.
+const CONTACT_RANGE: float = DRAWN_HALF_WIDTH + M0Actor.HUMAN_REACH
+## How far ahead of its origin the scanner's lens ends (Sentry.lens_rect): where its sight and beam start.
+const LENS_AHEAD: float = 10.22
+## The exit bolt's panel (JunctionRoom.BOLT_PANEL_X less BOLT_PANEL_HALF_WIDTH) is a solid box standing
+## in the lane, as tall as the scanner: a sentry whose lens is left of this face sees no further right
+## than it, and its beam stops there.
+const PANEL_FACE_X: float = 767.6
 ## The patrol turns where its front edge meets an engineer standing at the alcove's right end, so a
-## patrolling sentry never runs into someone hiding there (666; the patrol still crosses the mark).
+## patrolling sentry never runs into someone hiding there (675; the patrol still crosses the mark).
 const PATROL_MIN_X: float = COVER_MAX_X + CONTACT_RANGE
 const PATROL_MAX_X: float = 840.0
 const PATROL_SPEED: float = 140.0
@@ -37,8 +48,8 @@ const CHASE_SPEED: float = 230.0
 ## engineer anywhere out of the lane is out of reach.
 const CHASE_MIN_X: float = LANE_ENTRY_X + CONTACT_RANGE + 1.0
 ## Once the chased engineer is back over the rubble it waits here instead, at the alcove's mouth with
-## its body clear of the alcove, so a chase that loses them never leaves it parked inside.
-const WATCH_X: float = COVER_MAX_X + HALF_WIDTH + 4.0
+## its drawn body clear of the alcove, so a chase that loses them never leaves it parked inside.
+const WATCH_X: float = COVER_MAX_X + DRAWN_HALF_WIDTH + 4.0
 ## The lock-on beat between seeing the engineer and chasing them: it holds still, facing them, for
 ## this long, so a chase never starts on the frame it first sees someone.
 const LOCK_SECONDS: float = 0.5
@@ -72,6 +83,10 @@ var paused: bool = false
 ## (DropArm.blocks_lane). The sentry stops at its edge on the side it came from and never drives into
 ## or through it; a patrol turns back there.
 var obstacle: Vector2 = Vector2.ZERO
+## The coolant tank's drawn span (from, to) while it stands at the height of its scanner (lying on the floor, or
+## low in its fall or lift), or Vector2.ZERO: it sees no further than the tank's near face
+## (sight_end_x). The room sets it every frame.
+var sight_block: Vector2 = Vector2.ZERO
 ## Where WOLF actually is while he draws it (he is still crossing the lane to his spot), or a negative
 ## number: a fixated sentry keeps its eyes on him, not on the spot he is heading for, and keeps its
 ## distance from him until he is past it. The room sets it every frame.
@@ -154,7 +169,13 @@ func tick(delta: float, engineer_x: float, engineer_exposed: bool, bait_x: float
 				if spare > EPSILON:
 					return tick(spare, engineer_x, engineer_exposed, bait_x)
 		&"chase":
-			_move_toward(engineer_x, CHASE_SPEED, delta, CHASE_MIN_X if engineer_x > LANE_ENTRY_X else WATCH_X)
+			# It runs at the engineer and stops where the bodies touch, never into them; an engineer who
+			# stepped closer than that is not backed away from (the touch is a knockdown).
+			var side: float = signf(x - engineer_x) if absf(x - engineer_x) > EPSILON else -facing
+			var goal_x: float = engineer_x + side * CONTACT_RANGE
+			if (goal_x - x) * side > 0.0:
+				goal_x = x
+			_move_toward(goal_x, CHASE_SPEED, delta, CHASE_MIN_X if engineer_x > LANE_ENTRY_X else WATCH_X)
 			if engineer_x <= LANE_ENTRY_X:
 				lost_seconds += delta
 				if lost_seconds >= LOSE_SECONDS - EPSILON:
@@ -185,9 +206,17 @@ static func hold_x(bait_x: float) -> float:
 	return clampf(bait_x - BAIT_OFFSET, CHASE_MIN_X, PATROL_MAX_X)
 
 
-## True when a chasing sentry has reached the engineer.
+## True when a chasing sentry has reached the engineer: the drawn bodies meet (CONTACT_RANGE). Through
+## the lock-on beat it runs nobody down; the room keeps an engineer who walks into it at that range
+## (Main._keep_off_sentry), so the two never overlap.
 func touches(engineer_x: float) -> bool:
-	return state == &"chase" and absf(engineer_x - x) <= CONTACT_RANGE
+	return state == &"chase" and absf(engineer_x - x) <= CONTACT_RANGE + EPSILON
+
+
+## True while its body stands in the lane as a solid machine the engineer cannot walk through (awake
+## and not crushed).
+func is_solid() -> bool:
+	return state != &"dormant" and state != &"down"
 
 
 ## Back to the state a save describes: dormant behind the door, patrolling from the far end once the
@@ -201,6 +230,7 @@ func reset(door_blown: bool, down: bool, down_x: float) -> void:
 	turned_by_miss = false
 	paused = false
 	obstacle = Vector2.ZERO
+	sight_block = Vector2.ZERO
 	watch_x = -1.0
 	far_x = PATROL_MAX_X
 
@@ -284,4 +314,22 @@ func _sees(engineer_x: float, engineer_exposed: bool) -> bool:
 	if not engineer_exposed:
 		return false
 	var ahead: float = (engineer_x - x) * facing
-	return absf(engineer_x - x) <= CONTACT_RANGE or (ahead >= 0.0 and ahead <= SIGHT_RANGE)
+	return absf(engineer_x - x) <= CONTACT_RANGE or (ahead >= 0.0 and ahead <= absf(sight_end_x(x, facing, sight_block) - x))
+
+
+## Where the sight of a sentry at [param x] facing [param facing] ends: SIGHT_RANGE ahead, cut short
+## at the face of a solid thing standing between its lens and that range: the exit bolt's panel
+## (PANEL_FACE_X) or the coolant tank down at its height ([param tank], its footprint, sight_block;
+## Vector2.ZERO for none).
+## Sentry.beam_tip_x draws the beam to the same point.
+static func sight_end_x(x: float, facing: float, tank: Vector2 = Vector2.ZERO) -> float:
+	var lens: float = x + signf(facing) * LENS_AHEAD
+	var tip: float = x + signf(facing) * SIGHT_RANGE
+	if facing > 0.0:
+		if lens <= PANEL_FACE_X:
+			tip = minf(tip, PANEL_FACE_X)
+		if tank != Vector2.ZERO and lens <= tank.x:
+			tip = minf(tip, tank.x)
+	elif tank != Vector2.ZERO and lens >= tank.y:
+		tip = maxf(tip, tank.y)
+	return tip

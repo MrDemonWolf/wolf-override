@@ -2914,6 +2914,11 @@ func _tick_lane(delta: float) -> void:
 				_tank_rehung()
 		# A missed tank on the floor, or on its way up, stands in the sentry's lane: it stops at its edge.
 		sentry_brain.obstacle = DropArm.footprint() if drop_arm.blocks_lane() else Vector2.ZERO
+		# The tank also hides what is behind it while it stands at the scanner's height: on the floor,
+		# or low in its fall or lift (its base under the beam's top), across its drawn width.
+		var tank_base: float = lerpf(JunctionRoom.TANK_REST_Y, JunctionRoom.landed_tank_y(false), drop_arm.drop_amount()) + JunctionRoom.TANK_SIZE.y * 0.5
+		var tank_half: float = JunctionRoom.TANK_SIZE.x * 0.5
+		sentry_brain.sight_block = Vector2(DropArm.MARK_X - tank_half, DropArm.MARK_X + tank_half) if tank_base > Sentry.beam_top_y() else Vector2.ZERO
 		# WOLF draws it only once his front is over the rubble line; it then parks BAIT_OFFSET short of
 		# his spot by the hatch, on the mark.
 		var bait_x: float = _wolf_drawing_x()
@@ -2925,6 +2930,8 @@ func _tick_lane(delta: float) -> void:
 		var wolf_beyond: bool = wolf_near_x > sentry_brain.x + SentryBrain.HALF_WIDTH and wolf_near_x > SentryBrain.LANE_ENTRY_X
 		sentry_brain.far_x = wolf_near_x - SentryBrain.HALF_WIDTH - WOLF_SENTRY_GAP if wolf_beyond else SentryBrain.PATROL_MAX_X
 		junction_room.sentry.beam_stop_x = wolf_near_x if wolf_beyond else INF
+		_keep_off_sentry()
+		x = human.position.x
 		var before: StringName = sentry_brain.state
 		sentry_brain.tick(delta, x, SentryBrain.is_exposed(x), bait_x)
 		if sentry_brain.state != before:
@@ -3326,7 +3333,8 @@ func _fail_beat(reason: String, by_sentry: bool = false) -> void:
 
 ## Which way and where the engineer goes down. The collapse is a slump forward, so the body turns to
 ## fall away from the way they faced (the hit reads as a shove, not a stumble on), with the boots where
-## they stood. Run down by the sentry, they fall away from it. Caught out in its lane ([param in_lane]) they fall to the right, away from the
+## they stood. Run down by the sentry, they fall away from it, at the distance the bodies touched
+## (_keep_off_sentry). Caught out in its lane ([param in_lane]) they fall to the right, away from the
 ## alcove, and the boots move along as far as it takes to leave all of the lying body LANE_FALL_CLEAR
 ## past the alcove's right post (so the card's advice never reads as failing). Whatever knocked them
 ## down, a live sentry in the junction rolls back off them (Sentry.recoil_to) as far as it takes for its
@@ -3335,6 +3343,7 @@ func _start_collapse(by_sentry: bool, in_lane: bool) -> void:
 	collapse_flip = human.body_sprite.flip_h
 	collapse_fall = 1.0 if collapse_flip else -1.0
 	if by_sentry:
+		_keep_off_sentry()
 		var away: float = signf(human.position.x - sentry_brain.x)
 		if away != 0.0:
 			collapse_fall = away
@@ -3344,7 +3353,7 @@ func _start_collapse(by_sentry: bool, in_lane: bool) -> void:
 		collapse_fall = 1.0
 		collapse_to_x = maxf(human.position.x, SentryBrain.COVER_MAX_X + LANE_FALL_CLEAR - COLLAPSE_SPANS[-1].x * COLLAPSE_SCALE)
 	collapsed = true
-	if state.chapter_id != "junction" or sentry_brain.state == &"dormant" or sentry_brain.state == &"down":
+	if state.chapter_id != "junction" or not sentry_brain.is_solid():
 		return
 	var body: Vector2 = collapse_span(COLLAPSE_SPANS.size() - 1, collapse_fall, collapse_to_x)
 	var sentry: Sentry = junction_room.sentry
@@ -3353,6 +3362,19 @@ func _start_collapse(by_sentry: bool, in_lane: bool) -> void:
 		sentry.recoil_to(maxf(sentry.position.x, body.y + LANE_FALL_CLEAR + sentry_reach))
 	else:
 		sentry.recoil_to(minf(sentry.position.x, body.x - LANE_FALL_CLEAR - sentry_reach))
+
+
+## The sentry is a solid machine: an engineer who walks into it stops where the drawn bodies touch
+## (SentryBrain.CONTACT_RANGE), so the two never overlap, whether it is patrolling, locking on or
+## holding on WOLF; a chase that reaches them there is a knockdown, which lands at that distance too
+## (their last step may have taken them closer; it is checked once a frame).
+func _keep_off_sentry() -> void:
+	if not sentry_brain.is_solid():
+		return
+	var gap: float = human.position.x - sentry_brain.x
+	if absf(gap) < SentryBrain.CONTACT_RANGE and gap != 0.0:
+		human.position.x = sentry_brain.x + signf(gap) * SentryBrain.CONTACT_RANGE
+		human.velocity.x = 0.0
 
 
 ## Frame [param t] seconds into the collapse: the painted frame for that moment, the boots eased from

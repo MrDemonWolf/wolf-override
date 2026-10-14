@@ -199,6 +199,9 @@ const DOOR_HEIGHT: float = 132.0
 ## over them, so they pass through the doorway once it is open.
 const DOOR_Z: int = 0
 const DOOR_LIP_Z: int = 2
+## The vent's steam and its burst draw one step under the props (the grate is a prop), so the grate is
+## drawn over the steam rising out of it.
+const VENT_STEAM_Z: int = -2
 ## How long the grate stays dangerous after the relief vent lets go.
 const HAZARD_SECONDS: float = 0.4
 ## The knockdown cards, in the third person like the narration; each is formatted with the engineer's
@@ -239,10 +242,17 @@ const DOOR_LABEL_SHIFT: float = 7.0
 const ARM_LABEL_SHIFT: float = 20.0
 ## The EXIT plate sits over the bolt panel, left of the hatch it also names.
 const EXIT_LABEL_X: float = 792.0
-## The feed from the TANK RELEASE to the exit bolt panel: a conduit along the wall at this height,
-## behind the props and the actors. Dead while the winch holds the tank; once the tank is down its
-## power runs to the bolt (amber), warming to white through the whine and green once the bolt drops.
+## The feed from the TANK RELEASE to the exit bolt panel runs under the floor and comes up at the
+## bolt panel (_draw_bolt_feed), so nothing runs across the lane where the tank comes down. Its cable
+## box is centred at this height, over the ends of the panel's painted cables. Dead while the winch
+## holds the tank; once the tank is down its power runs to the bolt (amber), warming to white through
+## the whine and green once the bolt drops.
 const BOLT_FEED_Y: float = 404.0
+## The cable box (covering the three painted cable ends) and the floor gland the conduit comes up from.
+const FEED_BOX: Vector2 = Vector2(8.0, 34.0)
+const FEED_GLAND: Vector2 = Vector2(12.0, 3.0)
+## The box's and gland's painted-steel face, a step lighter than the conduit.
+const FEED_STEEL: Color = Color("#2a3741")
 ## A plate fades out over this many px as it reaches the edge of the view.
 const LABEL_EDGE_FADE: float = 14.0
 const LABEL_PLATE: Color = Color(0.035, 0.06, 0.08, 0.8)
@@ -436,8 +446,8 @@ class TankSprite:
 		add_child(dent)
 
 
-## What sits behind the stations: the shadow of the TANK RELEASE alcove and the release's feed to the
-## exit bolt, drawn under the props (the room's own drawing sits over them).
+## What sits behind the stations: the shadow of the TANK RELEASE alcove, drawn under the props (the
+## room's own drawing sits over them).
 class Recesses:
 	extends Node2D
 	var room: JunctionRoom
@@ -658,9 +668,9 @@ func _build_particles() -> void:
 	vent_steam.position = Vector2(VENT_X, FLOOR_Y - 8.0)
 	vent_steam.emission_shape = CPUParticles2D.EMISSION_SHAPE_RECTANGLE
 	vent_steam.emission_rect_extents = Vector2((PressureLine.VENT_GRATE_MAX_X - PressureLine.VENT_GRATE_MIN_X) * 0.5 - 6.0, 2.0)
-	# Behind the actors, like the coolant cloud: the column rises around an engineer on the grate and
-	# never hides them.
-	vent_steam.z_index = 0
+	# Behind the vent's grate (one step under the props) and the actors: the column rises from inside
+	# the grate, which stays drawn over it, so the grate the card names reads through the steam.
+	vent_steam.z_index = VENT_STEAM_Z
 	add_child(vent_steam)
 	vent_puff = FxPresets.dust_burst()
 	vent_puff.name = "VentPuff"
@@ -673,7 +683,8 @@ func _build_particles() -> void:
 	vent_puff.initial_velocity_max = 260.0
 	vent_puff.spread = 30.0
 	vent_puff.amount = 16
-	vent_puff.z_index = 3
+	# Like the column: out of the grate, behind it and the engineer it knocks down.
+	vent_puff.z_index = VENT_STEAM_Z
 	add_child(vent_puff)
 	blast_sparks = FxPresets.sparks(AMBER)
 	blast_sparks.name = "BlastSparks"
@@ -1005,7 +1016,7 @@ func sync_bolt(state: StringName, charge: float) -> void:
 	bolt_charge = charge
 	if changed:
 		refresh_state()
-	# The bolt's lights and its feed (Recesses) warm with the charge.
+	# The bolt's lights and its feed (drawn with the room) warm with the charge.
 	_check_redraw()
 
 
@@ -1032,9 +1043,10 @@ func draw_inputs() -> Array:
 	return [line_state, gauge, display_gauge, gauge_tripped, fuse_remaining, reduce_motion, door_blown, sentry_down, junction_cleared, arm_state, tank_drop, tank_on_floor, tank.position.y, arm_art.position.y, bolt_state, bolt_charge, breaker_pulse_level(), lamp_level(&"breaker"), lamp_level(&"valve"), lamp_level(&"release"), lamp_level(&"bolt"), mark_lit()]
 
 
-## Every value draw_recesses reads that can change after the room is built.
+## Every value draw_recesses reads that can change after the room is built: none, as it draws only
+## the alcove's shadow (the bolt's feed is drawn with the room, from draw_inputs).
 func recesses_inputs() -> Array:
-	return [sentry_down, junction_cleared, bolt_state, bolt_charge]
+	return []
 
 
 ## How high WOLF's drawn body is lifted with his centre at [param wolf_x] and the live sentry's at
@@ -1175,7 +1187,6 @@ func refresh_state() -> void:
 	_sync_seam()
 	_sync_vent_glow()
 	queue_redraw()
-	recesses.queue_redraw()
 
 
 ## True once the door is down, whether it just went or a save brought it back.
@@ -1324,6 +1335,7 @@ func _draw() -> void:
 	var bolt_light: Color = _bolt_light_color().lerp(FLICKER_DARK, 1.0 - lamp_level(&"bolt"))
 	_draw_hatch_lamp(hatch_art, bolt_light, 1.0)
 	draw_rect(prop_rect(bolt_panel_art, BOLT_PANEL_LIGHT), bolt_light)
+	_draw_bolt_feed()
 
 
 ## The alcove's floor: a tint over exactly the cover span, on the floor line and the walkway in front
@@ -1345,27 +1357,41 @@ func draw_recesses(canvas: CanvasItem) -> void:
 	_recesses_drawn_inputs = recesses_inputs()
 	var alcove: Rect2 = alcove_rect()
 	canvas.draw_texture_rect(alcove_shadow, alcove.grow_individual(14.0, 10.0, 14.0, 8.0), false, Color(0.0, 0.02, 0.04, 0.85))
-	_draw_bolt_feed(canvas)
 
 
-## The conduit from the TANK RELEASE panel's side to the exit bolt panel's (bolt_feed_span), with a
-## clamp box at each end. Its core is lit only while it carries power to the bolt (bolt_feed_color).
-func _draw_bolt_feed(canvas: CanvasItem) -> void:
-	var span: Vector2 = bolt_feed_span()
-	canvas.draw_line(Vector2(span.x, BOLT_FEED_Y), Vector2(span.y, BOLT_FEED_Y), Color("#0d1419"), 6.0)
-	canvas.draw_line(Vector2(span.x, BOLT_FEED_Y - 1.5), Vector2(span.y, BOLT_FEED_Y - 1.5), STEEL, 1.0)
-	canvas.draw_line(Vector2(span.x, BOLT_FEED_Y + 0.5), Vector2(span.y, BOLT_FEED_Y + 0.5), bolt_feed_color(), 2.0)
-	for end_x: float in [span.x, span.y]:
-		canvas.draw_rect(Rect2(end_x - 4.0, BOLT_FEED_Y - 6.0, 8.0, 12.0), Color("#1b2630"))
-		canvas.draw_rect(Rect2(end_x - 4.0, BOLT_FEED_Y - 6.0, 8.0, 12.0), STEEL, false, 1.0)
+## The feed comes up out of the floor at the exit bolt's panel: a floor gland, a conduit up the wall and
+## a cable box the panel's painted cables plug into. Its core is lit only while it carries power to the
+## bolt (bolt_feed_color). The TANK RELEASE end needs nothing drawn: the release's own painted pipe runs
+## down into its base, and the run between the two is under the floor, clear of the tank and the lane.
+## Drawn over the props (so the cables end in the box) and under the actors.
+func _draw_bolt_feed() -> void:
+	var parts: Array[Rect2] = bolt_feed_parts()
+	var box: Rect2 = parts[0]
+	var conduit: Rect2 = parts[1]
+	var gland: Rect2 = parts[2]
+	draw_rect(conduit, CABLE_SHADOW)
+	draw_line(Vector2(conduit.position.x + 1.0, conduit.position.y), Vector2(conduit.position.x + 1.0, conduit.end.y), CABLE_SHEEN, 1.0)
+	draw_line(Vector2(conduit.get_center().x + 0.5, conduit.position.y), Vector2(conduit.get_center().x + 0.5, conduit.end.y), bolt_feed_color(), 2.0)
+	for plate: Rect2 in [box, gland]:
+		draw_rect(plate, FEED_STEEL)
+		draw_rect(plate, CABLE_SHADOW, false, 1.0)
+		draw_line(plate.position + Vector2(1.0, 1.0), Vector2(plate.end.x - 1.0, plate.position.y + 1.0), CABLE_SHEEN, 1.0)
 
 
-## Where the feed runs: from just inside the release panel's right edge to just inside the bolt panel's
-## left edge, so each end disappears behind its machine.
-func bolt_feed_span() -> Vector2:
-	var release: Rect2 = Rect2(prop_point(arm_panel_art, ARM_PANEL_REGION.position), ARM_PANEL_REGION.size * ARM_PANEL_SCALE)
-	var bolt: Rect2 = Rect2(prop_point(bolt_panel_art, BOLT_PANEL_REGION.position), BOLT_PANEL_REGION.size * BOLT_PANEL_SCALE)
-	return Vector2(release.end.x - 6.0, bolt.position.x + 6.0)
+## The feed's parts in the room, top to bottom: the cable box over the ends of the bolt panel's left
+## cables, the conduit from it down to the floor, and the floor gland it goes into.
+func bolt_feed_parts() -> Array[Rect2]:
+	var x: float = bolt_feed_x()
+	var box: Rect2 = Rect2(x - FEED_BOX.x * 0.5, BOLT_FEED_Y - FEED_BOX.y * 0.5, FEED_BOX.x, FEED_BOX.y)
+	var gland: Rect2 = Rect2(x - FEED_GLAND.x * 0.5, FLOOR_Y - FEED_GLAND.y, FEED_GLAND.x, FEED_GLAND.y)
+	var conduit: Rect2 = Rect2(x - 2.5, box.end.y, 5.0, gland.position.y - box.end.y)
+	return [box, conduit, gland]
+
+
+## Where the feed comes up: over the bolt panel's left edge, the box taking in the ends of its painted
+## cables.
+func bolt_feed_x() -> float:
+	return prop_point(bolt_panel_art, BOLT_PANEL_REGION.position).x + FEED_BOX.x * 0.5 + 1.0
 
 
 ## The feed's core: dead until the tank is down, then the bolt's own light (amber, warming to white
