@@ -134,7 +134,7 @@ func _check_constants() -> void:
 		_expect(str(c[key]).begins_with("SENTRY  "), "item 3 S20: %s's topic is SENTRY" % key)
 	var refusals: Dictionary = {
 		"REFUSE_VALVE_DEAD": "The valve is dead. Arm the breaker first.",
-		"REFUSE_VALVE_TRIPPED": "The vent let go and the breaker tripped. Reset it by the entrance.",
+		"REFUSE_VALVE_TRIPPED": "The vent let go and the breaker tripped.\nReset it by the entrance.",
 		"REFUSE_DOOR": "Sealed shut. Something hums behind it.\nThe valve beside it charges it.",
 		"REFUSE_BREAKER_LIVE": "Already live. Crank the valve by the door.",
 		"REFUSE_FUSE_LIT": "Fuse lit. Get clear of the door.",
@@ -152,7 +152,7 @@ func _check_constants() -> void:
 	for key: String in ["TRUST_LINE_1", "TRUST_LINE_2", "RUBBLE_LINE", "RUBBLE_WAKE_LINE", "TANK_MISS_LINE", "TANK_MISS_TURN_LINE", "SENTRY_LOCK_LINE", "SENTRY_LOST_LINE", "LADDER_BREAKER_LINE", "LADDER_CHAIN_LINE", "JUNCTION_ENTRY_LINE"]:
 		boxes.append(str(c[key]))
 	boxes.append_array(c["ALONE_LINES"] as Array)
-	boxes.append_array(refusals.values().filter(func(line: String) -> bool: return line != refusals["REFUSE_VALVE_TRIPPED"]))
+	boxes.append_array(refusals.values())
 	boxes.append_array([JunctionRoom.SENTRY_REASON, JunctionRoom.SENTRY_CHASED_REASON])
 	boxes.append_array([(c["INTRO_LINES"] as Array)[2], (c["INTRO_LINES"] as Array)[3], c["BREAKER_CATCHES_LINE"]])
 	# S11 and S16 are said where they happen; _check_after_blast checks them on screen word for word.
@@ -348,7 +348,7 @@ func _check_refusals() -> void:
 	room.sync_line(line)
 	_expect(line.state == &"tripped", "the vent has tripped the breaker")
 	await _place(valve_x, false)
-	await _refused("row 1b, the valve after a trip", &"valve", "The vent let go and the breaker tripped. Reset it by the entrance.", &"clank")
+	await _refused("row 1b, the valve after a trip", &"valve", "The vent let go and the breaker tripped.\nReset it by the entrance.", &"clank")
 	# Row 2: USE at the sealed door, pressed up against it.
 	line.reset()
 	room.sync_line(line)
@@ -365,6 +365,9 @@ func _check_refusals() -> void:
 		await _place(380.0, false)
 		Input.action_press(&"move_right")
 		_expect(await _wait_until(func() -> bool: return human.position.x + M0State.HUMAN_HALF_WIDTH >= M0State.JUNCTION_DOOR_LEFT_X - 1.0, 120), "the engineer walks up against the sealed door again")
+		# Held into the door, as a player does, until a frame has seen the engineer at its face: a slow
+		# frame can run several physics steps, so letting go on the first touch can miss that frame.
+		_expect(await _wait_until(func() -> bool: return bool(game.get("door_faced")), 60), "a frame sees the engineer at the sealed door's face")
 		Input.action_release(&"move_right")
 		_expect(await _wait_until(func() -> bool: return not room.flickering(&"door"), 60), "the bump's flicker is over")
 		for _frame: int in wait:
@@ -419,8 +422,15 @@ func _check_door_bump() -> void:
 	game.set("status_line", "WOLF: Quiet.")
 	started.clear()
 	Input.action_press(&"move_right")
-	_expect(await _wait_until(func() -> bool: return human.position.x + M0State.HUMAN_HALF_WIDTH >= M0State.JUNCTION_DOOR_LEFT_X - 1.0, 120), "the engineer walks into the sealed door")
-	var frames: int = await _frames_until(func() -> bool: return started.has(&"thud") and room.flickering(&"door") and str(game.get("status_line")) == "Sealed shut. Something hums behind it.\nThe valve beside it charges it.")
+	# The bump's flicker lasts 0.14 s; a slow frame can start and end it while the walk is still being
+	# watched, so any frame that sees it counts.
+	var flickered: Array[bool] = [false]
+	_expect(await _wait_until(func() -> bool:
+		flickered[0] = flickered[0] or room.flickering(&"door")
+		return human.position.x + M0State.HUMAN_HALF_WIDTH >= M0State.JUNCTION_DOOR_LEFT_X - 1.0, 120), "the engineer walks into the sealed door")
+	var frames: int = await _frames_until(func() -> bool:
+		flickered[0] = flickered[0] or room.flickering(&"door")
+		return started.has(&"thud") and flickered[0] and str(game.get("status_line")) == "Sealed shut. Something hums behind it.\nThe valve beside it charges it.")
 	_expect(frames <= ANSWER_FRAMES, "the first bump thuds, flickers the door's lamp and says why within %d frames (%d)" % [ANSWER_FRAMES, frames])
 	var stopped_x: float = human.position.x
 	for _frame: int in 20:
@@ -486,13 +496,22 @@ func _check_blast_boxes() -> void:
 		var seen: Array[String] = [box_1]
 		var wake_at: Array[int] = [-1]
 		var held: Array[bool] = [false]
+		var held_x: Array[float] = [INF]
+		# The longest gap between two looks at the box: the wake box can come up that long before it is
+		# seen, so the measured time can come out short by that much.
+		var last_look: Array[int] = [Time.get_ticks_msec(), 0]
 		var log_box: Callable = func() -> void:
+			var now: int = Time.get_ticks_msec()
+			last_look[1] = maxi(last_look[1], now - last_look[0])
+			last_look[0] = now
 			var line: String = str(game.get("status_line"))
 			if seen.back() != line:
 				seen.append(line)
 				if line == wake:
 					wake_at[0] = Time.get_ticks_msec()
-			held[0] = held[0] or bool(game.get("lane_question_held"))
+			if not held[0] and bool(game.get("lane_question_held")):
+				held[0] = true
+				held_x[0] = human.position.x
 		var started_at: int = Time.get_ticks_msec()
 		while Time.get_ticks_msec() - started_at < wait_ms:
 			await process_frame
@@ -505,8 +524,11 @@ func _check_blast_boxes() -> void:
 		var wake_ms: int = Time.get_ticks_msec() - wake_at[0]
 		var label: String = "walking to the rubble line at once" if wait_ms == 0 else "waiting at the door first"
 		_expect(asked and seen.size() >= 2 and seen[seen.size() - 2] == wake and seen.find(wake) == seen.size() - 2 and str(seen.back()).begins_with("WOLF: It passes under that tank"), "%s: the sentry waking is shown before WOLF's question replaces it (seen %s)" % [label, str(seen).c_escape()])
-		_expect(wake_at[0] >= 0 and wake_ms >= int(MainScript.box_seconds(wake) * 1000.0) - 50, "%s: the question waits until that box has been up its reading time (%d ms of %.2f s)" % [label, wake_ms, MainScript.box_seconds(wake)])
-		_expect(not held[0] or human.position.x <= JunctionRoom.CHOICE_X + 4.0, "%s: the engineer holds at the rubble line meanwhile (x %.1f)" % [label, human.position.x])
+		_expect(wake_at[0] >= 0 and wake_ms >= int(MainScript.box_seconds(wake) * 1000.0) - maxi(50, last_look[1]), "%s: the question waits until that box has been up its reading time (%d ms of %.2f s, frames up to %d ms apart)" % [label, wake_ms, MainScript.box_seconds(wake), last_look[1]])
+		# The hold applies in _process, and a slow frame runs up to max_physics_steps_per_frame walk steps
+		# before it, so the engineer can stop that far past the line; once held, they must not move on.
+		var step: float = M0Actor.WALK_SPEED / float(Engine.physics_ticks_per_second)
+		_expect(not held[0] or (held_x[0] <= JunctionRoom.CHOICE_X + Engine.max_physics_steps_per_frame * step + 0.5 and human.position.x <= held_x[0] + step + 0.5), "%s: the engineer holds at the rubble line meanwhile (held at x %.1f, x %.1f)" % [label, held_x[0], human.position.x])
 		game.call("_choose_lane", 2)
 		await physics_frame
 		_expect(human.controlled and not bool(game.get("lane_question_held")), "%s: answering hands the controls back" % label)
@@ -590,6 +612,13 @@ func _answer_lane(response: int) -> void:
 	_expect(asked, "WOLF asks at the rubble line")
 	game.call("_choose_lane", response)
 	await physics_frame
+	# The drop arm and the sentry unpause in main's _process; a slow frame can run several physics steps
+	# before it (and process_frame comes just before it), so wait until it has run, as a player's next
+	# press always does.
+	for _frame: int in 10:
+		if not (game.get("drop_arm") as DropArm).paused:
+			break
+		await process_frame
 
 
 ## A fresh run into the junction's entry, as USE at the Records exit makes it (autosave A).
