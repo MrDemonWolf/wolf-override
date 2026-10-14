@@ -145,7 +145,10 @@ func _check_bypass_toggle() -> void:
 	var opened: bool = await _until(func() -> bool: return state.door_open, 240)
 	var seconds: float = (Engine.get_physics_frames() - started_at) / 60.0
 	_expect(opened and state.route == "fallback" and int(game.get("bypass_ticks")) == BypassHandle.TICKS_NEEDED, "with TOGGLE HOLDS on a single press completes the crank (from %d notches, %.2f s)" % [before, seconds])
-	await _frames(2)
+	# The latch is let go in Main._process, which a physics frame does not always include on a busy
+	# machine; wait for drawn frames.
+	await process_frame
+	await process_frame
 	_expect(not game.get("crank_latched") and not hold.holding, "and the toggle lets go once the crank is done")
 	_expect(not Input.is_action_pressed(&"interact"), "nothing was held down the whole time")
 	await _free(game)
