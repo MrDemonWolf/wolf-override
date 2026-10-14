@@ -148,6 +148,9 @@ func _run() -> void:
 	await physics_frame
 	await physics_frame
 	_expect(not game.get("fail_active"), "an unarmed hazard never knocks the engineer down")
+	# Turned round to face the way they came (the second knockdown below walks in facing left).
+	human.body_sprite.flip_h = false
+	var faced_left: bool = human.body_sprite.flip_h
 	hazard.armed = true
 	if not _require(game.get("fail_active"), "arming a hazard the engineer already stands in knocks them down at once"):
 		return
@@ -159,12 +162,18 @@ func _run() -> void:
 	Input.action_release(&"move_left")
 	_expect(absf(human.position.x - 700.0) <= 12.0, "held movement does nothing during the knockdown")
 	# P0-3: the painted collapse plays, frame by frame, and the body ends up lying on the floor line.
+	# The painted slump is forward, so the body falls the way they faced and never turns round.
 	var seen_frames: Dictionary = {}
+	var turned: Array[bool] = [human.body_sprite.flip_h != faced_left]
 	var lying: bool = await _wait_until(func() -> bool:
+		turned[0] = turned[0] or human.body_sprite.flip_h != faced_left
 		if human.body_sprite.texture == MainScript.COLLAPSE_SHEET:
 			seen_frames[int(human.body_sprite.region_rect.position.x / MainScript.COLLAPSE_FRAME.x)] = true
 		return seen_frames.has(MainScript.COLLAPSE_SPANS.size() - 1), 60)
 	_expect(lying and seen_frames.size() >= 3, "the engineer collapses through the painted frames (%s) and lies down" % str(seen_frames.keys()))
+	_expect(not turned[0] and is_equal_approx(float(game.get("collapse_fall")), -1.0 if faced_left else 1.0), "facing %s, they slump forward that way and never turn round" % ("left" if faced_left else "right"))
+	# The reflection copies its source in _process, which a physics frame does not always include.
+	await process_frame
 	_check_lying(human, "in the corridor")
 	_expect(await _wait_until(func() -> bool: return not game.get("fail_active"), 240), "the knockdown hands back within a few seconds")
 	state = game.get("state") as M0State
@@ -173,6 +182,7 @@ func _run() -> void:
 	_expect(human.controlled and human.position == state.human_position and wolf.position == state.wolf_position, "the engineer stands at the checkpoint with controls back")
 	_expect(human.body_sprite.rotation_degrees == 0.0 and human.body_sprite.position == Vector2(0.0, -5.0) and human.body_sprite.texture != MainScript.COLLAPSE_SHEET and not human.body_sprite.region_enabled and is_equal_approx(human.body_sprite.scale.x, 0.188), "the engineer stands again, as drawn before the knockdown")
 	var reflection: FloorReflection = game.get("human_reflection") as FloorReflection
+	await process_frame
 	_expect(reflection.texture == human.body_sprite.texture and reflection.shadow_span == Vector2.ZERO and is_equal_approx(reflection.floor_y, -5.0 + 192.0 * 0.188), "their reflection and shadow are the standing ones again")
 	_expect(str(game.get("status_line")).contains("Wait for the hiss") and str(game.get("status_line")).contains("Back at the last checkpoint."), "the status line keeps the cause and says where play resumed")
 	_expect(await _wait_until(func() -> bool: return Engine.time_scale == 1.0 and camera.offset == Vector2.ZERO and intro_fade.color.a == 0.0, 90), "time scale, camera and fade are all at rest after the restore")
@@ -182,6 +192,11 @@ func _run() -> void:
 	var tripped: bool = await _wait_until(func() -> bool: return game.get("fail_active"), 120)
 	Input.action_release(&"move_left")
 	_expect(tripped, "walking into an armed hazard knocks the engineer down")
+	var walked_turn: Array[bool] = [not human.body_sprite.flip_h]
+	var walked_down: bool = await _wait_until(func() -> bool:
+		walked_turn[0] = walked_turn[0] or not human.body_sprite.flip_h
+		return human.body_sprite.texture == MainScript.COLLAPSE_SHEET and is_equal_approx(human.body_sprite.region_rect.position.x, MainScript.COLLAPSE_FRAME.x * (MainScript.COLLAPSE_SPANS.size() - 1)), 60)
+	_expect(walked_down and not walked_turn[0], "walking left into it, they slump forward to the left without turning round")
 	_expect(await _wait_until(func() -> bool: return not game.get("fail_active"), 240), "the second knockdown restores too")
 	_expect((game.get("state") as M0State).to_dict() == saved, "the second restore is the same checkpoint")
 	hazard.queue_free()
@@ -251,15 +266,18 @@ func _check_collapse_sheet() -> void:
 	_expect(image.get_width() == frame_size.x * MainScript.COLLAPSE_SPANS.size() and image.get_height() == frame_size.y, "the collapse sheet holds %d frames of %s" % [MainScript.COLLAPSE_SPANS.size(), frame_size])
 	for frame: int in MainScript.COLLAPSE_SPANS.size():
 		var bottom_row: int = 0
+		var top_row: int = frame_size.y
 		var left: int = frame_size.x
 		var right: int = -1
 		for y: int in frame_size.y:
 			for x: int in frame_size.x:
 				if image.get_pixel(frame * frame_size.x + x, y).a >= 0.5:
 					bottom_row = maxi(bottom_row, y)
+					top_row = mini(top_row, y)
 					left = mini(left, x)
 					right = maxi(right, x)
 		_expect(bottom_row == frame_size.y - 1, "collapse frame %d stands its soles on its bottom row (%d)" % [frame, bottom_row])
+		_expect(top_row == int(MainScript.COLLAPSE_TOPS[frame]), "collapse frame %d's painted body starts on row %d, as Main says (%.0f)" % [frame, top_row, MainScript.COLLAPSE_TOPS[frame]])
 		var span: Vector2 = MainScript.COLLAPSE_SPANS[frame]
 		_expect(absf(left - MainScript.COLLAPSE_PIVOT_X - span.x) <= 1.0 and absf(right - MainScript.COLLAPSE_PIVOT_X - span.y) <= 1.0, "collapse frame %d's painted body spans %d..%d from the boots, as Main says (%s)" % [frame, left - int(MainScript.COLLAPSE_PIVOT_X), right - int(MainScript.COLLAPSE_PIVOT_X), span])
 

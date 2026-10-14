@@ -770,6 +770,7 @@ func _check_engineer_alone(game: Node2D, path: String) -> void:
 	# Step into its path: it sees, chases and runs the engineer down.
 	_expect(await _wait_until(func() -> bool: return brain.facing < 0.0 and brain.x <= 780.0 and brain.x >= 720.0, 300), "the sentry comes back down the lane")
 	human.position.x = 640.0
+	human.body_sprite.flip_h = false
 	_expect(await _wait_until(func() -> bool: return brain.state == &"lock", 5), "it sees the engineer and locks on")
 	var locked_x: float = brain.x
 	_expect(_sounding(game, &"klaxon") and room.sentry.visual.eye == Sentry.SentryVisual.EYE_LOCKED, "locking on turns its eye red with a short alarm")
@@ -780,9 +781,10 @@ func _check_engineer_alone(game: Node2D, path: String) -> void:
 	_expect(await _wait_until(func() -> bool: return game.get("fail_active"), 90), "sentry contact in the lane is a knockdown")
 	_expect(str(game.get("status_line")).begins_with(JunctionRoom.SENTRY_REASON % (game.get("state") as M0State).human_name().get_slice(" ", 0)) and str(game.get("status_line")).begins_with("The sentry saw Rowan out in the open.\nStay close to the TANK RELEASE."), "the status line names the sentry and the engineer, says they were caught out in the open, and points at the TANK RELEASE")
 	_expect(SentryBrain.is_exposed(human.position.x) and human.position.x > SentryBrain.COVER_MAX_X, "and the engineer was indeed caught past the right post (x %.0f)" % human.position.x)
-	# Round 3c item 3: the body lies where the card says they were caught: past the right post, fallen
-	# away from the alcove, clear of the TANK RELEASE and of the sentry, which rolls back off them.
-	_expect(await _expect_lying(game, 1.0, "out in the lane"), "caught out in the lane, the engineer falls to the right, away from the alcove, onto the floor")
+	# Round 3c item 3: the body lies where the card says they were caught: past the right post (facing
+	# away from the alcove they slump forward, the way they faced), clear of the TANK RELEASE and of the
+	# sentry, which rolls back off them.
+	_expect(await _expect_lying(game, 1.0, "out in the lane"), "caught out in the lane facing right, the engineer slumps forward to the right, away from the alcove, onto the floor without turning round")
 	var body_rect: Rect2 = _painted_body(human.body_sprite)
 	var sentry_rect: Rect2 = _drawn_rect(room.sentry.visual.body)
 	var release_right: float = JunctionRoom.ARM_X + JunctionRoom.ARM_PANEL_HALF_WIDTH
@@ -918,8 +920,18 @@ func _check_cloud(game: Node2D, path: String) -> void:
 	for _frame: int in 30:
 		await physics_frame
 	_expect(absf(human.position.x - stopped_x) < 0.5 and not DropArm.in_cloud(human.position.x) and not game.get("fail_active"), "the sidestep out of a machine never walks the engineer into the coolant cloud (x %.1f)" % human.position.x)
-	human.position.x = DropArm.MARK_X
-	_expect(await _wait_until(func() -> bool: return game.get("fail_active"), 30), "walking into the coolant cloud is a knockdown")
+	# Walking in from the alcove side, facing the tank: they slump forward, the way they faced, and stagger
+	# back from the tank as they go, so the lying body ends clear of it.
+	human.position.x = DropArm.MARK_X - DropArm.CLOUD_HALF_WIDTH - M0State.HUMAN_HALF_WIDTH - 6.0
+	human.body_sprite.flip_h = false
+	Input.action_press(&"move_right")
+	var walked_in: bool = await _wait_until(func() -> bool: return game.get("fail_active"), 60)
+	Input.action_release(&"move_right")
+	_expect(walked_in, "walking into the coolant cloud is a knockdown")
+	_expect(await _expect_lying(game, 1.0, "in the coolant cloud"), "caught by the cloud facing the tank, the engineer slumps forward towards it onto the floor")
+	var tank_left: float = room.global_position.x + room.tank.position.x - JunctionRoom.TANK_SIZE.x * 0.5
+	var lying_rect: Rect2 = _painted_body(human.body_sprite)
+	_expect(tank_left - lying_rect.end.x >= 3.0, "and the lying body ends clear of the tank on the floor (body ends %.1f, tank starts %.1f)" % [lying_rect.end.x, tank_left])
 	_expect(str(game.get("status_line")).begins_with("The coolant cloud caught %s. Let it clear before crossing the mark." % (game.get("state") as M0State).human_name().get_slice(" ", 0)), "the status line names the cloud and the engineer")
 	_expect(await _wait_until(func() -> bool: return not game.get("fail_active"), 240), "the cloud knockdown hands back")
 	_expect((game.get("state") as M0State).to_dict() == b_dict and not arm.cloud_active() and not room.cloud_hazard.armed and brain.state == &"patrol", "it restores autosave B with the cloud gone")
@@ -944,12 +956,14 @@ func _check_chased_cards(game: Node2D, path: String) -> void:
 	# A miss with the sentry at the far end, and the engineer stays at the release.
 	game.set("lane_choice", "alone")
 	human.position.x = JunctionRoom.ARM_X
+	# Facing the sentry as it comes: they slump forward towards it, and it rolls back off them.
+	human.body_sprite.flip_h = false
 	_expect(brain.state == &"patrol" and brain.x >= 830.0 and arm.drop(), "the drop goes with the sentry at the far end")
 	_expect(await _wait_until(func() -> bool: return arm.state == &"rewinding", 60) and brain.turned_by_miss, "the miss turns the sentry on the release")
 	_expect(await _wait_until(func() -> bool: return game.get("fail_active"), 120), "a chase after a miss runs down an engineer who stays at the release")
 	var status: String = str(game.get("status_line"))
 	_expect(not SentryBrain.is_exposed(human.position.x) and status.begins_with(chased) and not status.contains("alcove's posts") and not status.contains("in its lane"), "caught between the posts after a miss, the card points only at the rubble (%s)" % status)
-	await _expect_shove_fall(game, "after a miss")
+	await _expect_shove_fall(game, "after a miss", false)
 	_expect(await _wait_until(func() -> bool: return not game.get("fail_active"), 240), "the knockdown after a miss hands back")
 	_expect((game.get("state") as M0State).to_dict() == b_dict and not brain.turned_by_miss, "it restores autosave B with the sentry patrolling again")
 	# Seen out in the lane, then caught after ducking into the alcove: the alcove advice would be wrong.
@@ -958,11 +972,26 @@ func _check_chased_cards(game: Node2D, path: String) -> void:
 	human.position.x = 640.0
 	_expect(await _wait_until(func() -> bool: return brain.state == &"lock", 5) and not brain.turned_by_miss, "it sees the engineer in the lane")
 	human.position.x = JunctionRoom.ARM_X
+	# Facing away from it: they slump forward, away from it.
+	human.body_sprite.flip_h = true
 	_expect(await _wait_until(func() -> bool: return game.get("fail_active"), 120), "the chase reaches the engineer in the alcove")
 	status = str(game.get("status_line"))
 	_expect(not SentryBrain.is_exposed(human.position.x) and status.begins_with(chased) and not status.contains("alcove's posts"), "caught inside the alcove, the card points only at the rubble (%s)" % status)
-	await _expect_shove_fall(game, "inside the alcove")
+	await _expect_shove_fall(game, "inside the alcove", true)
 	_expect(await _wait_until(func() -> bool: return not game.get("fail_active"), 240), "that knockdown hands back too")
+	# Out in the lane facing back towards the alcove: they slump forward where they stand, towards it,
+	# never turned round or dragged back against the fall.
+	game.set("lane_choice", "alone")
+	_expect(await _wait_until(func() -> bool: return brain.facing < 0.0 and brain.x <= 780.0 and brain.x >= 720.0, 300), "the sentry comes back down the lane again")
+	human.position.x = 640.0
+	human.body_sprite.flip_h = true
+	_expect(await _wait_until(func() -> bool: return brain.state == &"lock", 5) and not brain.turned_by_miss, "it sees the engineer in the lane, facing the alcove")
+	_expect(await _wait_until(func() -> bool: return game.get("fail_active"), 120), "the chase runs them down in the lane")
+	_expect(str(game.get("status_line")).begins_with(JunctionRoom.SENTRY_REASON % (game.get("state") as M0State).human_name().get_slice(" ", 0)), "the card is the one for being seen out in the lane")
+	var stood_x: float = human.position.x
+	await _expect_shove_fall(game, "in the lane facing the alcove", true)
+	_expect(is_equal_approx(float(game.get("collapse_to_x")), stood_x), "facing the alcove, the boots stay where they stood (x %.1f, lying at %.1f)" % [stood_x, float(game.get("collapse_to_x"))])
+	_expect(await _wait_until(func() -> bool: return not game.get("fail_active"), 240), "the knockdown in the lane hands back")
 
 
 ## Round 3c item 2: with the tank down on the sentry and WOLF at the rubble, he holds there until the
@@ -1111,16 +1140,15 @@ func _sprite_pixels(sprite: Sprite2D, grow: float) -> Dictionary:
 	return pixels
 
 
-## Round 3c item 3 and P0-3: a chase card's knockdown (after a miss, or caught inside the alcove): the
-## sentry stops where the bodies touch, the engineer falls away from it onto the floor, and it stands
-## clear of the lying body.
-func _expect_shove_fall(game: Node2D, label: String) -> void:
+## Round 3c item 3 and P0-3: a chase's knockdown: the sentry stops where the bodies touch, the engineer
+## slumps forward the way they faced ([param facing_left]) onto the floor without turning round, and it
+## stands clear of the lying body, whichever side of it they fell.
+func _expect_shove_fall(game: Node2D, label: String, facing_left: bool) -> void:
 	var human: M0Actor = game.get_node("Human") as M0Actor
 	var room: JunctionRoom = game.get("junction_room") as JunctionRoom
 	var brain: SentryBrain = game.get("sentry_brain") as SentryBrain
-	var away: float = signf(human.position.x - brain.x)
 	_expect(absf(human.position.x - brain.x) >= SentryBrain.CONTACT_RANGE - 0.01, "caught %s, it knocks the engineer down at contact range, not inside them (%.1f px)" % [label, absf(human.position.x - brain.x)])
-	_expect(await _expect_lying(game, away, label), "caught %s, the engineer falls away from the sentry onto the floor" % label)
+	_expect(await _expect_lying(game, -1.0 if facing_left else 1.0, label), "caught %s, the engineer slumps forward the way they faced onto the floor, without turning round" % label)
 	var body_rect: Rect2 = _painted_body(human.body_sprite)
 	var sentry_rect: Rect2 = _drawn_rect(room.sentry.visual.body)
 	var gap: float = sentry_rect.position.x - body_rect.end.x if room.sentry.position.x > human.position.x else body_rect.position.x - sentry_rect.end.x
@@ -1187,6 +1215,15 @@ func _watch_lane(game: Node2D) -> void:
 				lane_faults.append("frame %d: beam to %.1f runs into the solid at %.1f" % [lane_frames, tip, solid.position.x])
 			elif facing < 0.0 and lens >= solid.end.x and tip < solid.end.x - 0.01:
 				lane_faults.append("frame %d: beam to %.1f runs into the solid ending %.1f (block %s, arm %s %.2f, tank y %.1f, choice %s, fail %s)" % [lane_frames, tip, solid.end.x, sentry.sight_block, (game.get("drop_arm") as DropArm).state, (game.get("drop_arm") as DropArm).drop_amount(), room.tank.position.y, game.get("waiting_for_choice"), game.get("fail_active")])
+	if human.body_sprite.texture == MainScript.COLLAPSE_SHEET and room.tank.visible:
+		var drawn: Rect2 = _drawn_rect(human.body_sprite)
+		var span: Vector2 = _painted_collapse(human)
+		var frame: int = roundi(human.body_sprite.region_rect.position.x / MainScript.COLLAPSE_FRAME.x)
+		var top: float = drawn.end.y - (MainScript.COLLAPSE_FRAME.y - MainScript.COLLAPSE_TOPS[frame]) * MainScript.COLLAPSE_SCALE
+		var lying: Rect2 = Rect2(span.x, top, span.y - span.x, drawn.end.y - top)
+		var tank_world: Rect2 = Rect2(tank_rect.position + room.global_position, tank_rect.size)
+		if lying.grow(-0.01).intersects(tank_world):
+			lane_faults.append("frame %d: the lying engineer %s overlaps the tank %s" % [lane_frames, lying, tank_world])
 	for part: Rect2 in room.bolt_feed_parts():
 		if room.tank.visible and part.intersects(tank_rect):
 			lane_faults.append("frame %d: the bolt feed %s crosses the tank %s" % [lane_frames, part, tank_rect])

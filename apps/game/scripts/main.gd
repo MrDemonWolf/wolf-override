@@ -258,6 +258,8 @@ const COLLAPSE_PIVOT_X: float = 98.0
 ## Each frame's painted body as columns from the boots (frame px, facing right): knees, slumping, on
 ## the side. The shadow lies under it and the sentry rolls back clear of it.
 const COLLAPSE_SPANS: Array[Vector2] = [Vector2(-28.0, 67.0), Vector2(-93.0, 96.0), Vector2(-93.0, 164.0), Vector2(-94.0, 209.0), Vector2(-94.0, 228.0)]
+## Each frame's top painted row (frame px): lying on the side, the body is under 19 px tall in the room.
+const COLLAPSE_TOPS: Array[float] = [6.0, 59.0, 110.0, 159.0, 174.0]
 ## When each frame starts (s): knees 0-0.18, the slump onto the side 0.18-0.45; the last one holds.
 ## Reduced Motion shows the last frame at once.
 const COLLAPSE_TIMES: Array[float] = [0.0, 0.09, 0.18, 0.315, 0.45]
@@ -3331,29 +3333,40 @@ func _fail_beat(reason: String, by_sentry: bool = false) -> void:
 	_refresh_ui()
 
 
-## Which way and where the engineer goes down. The collapse is a slump forward, so the body turns to
-## fall away from the way they faced (the hit reads as a shove, not a stumble on), with the boots where
-## they stood. Run down by the sentry, they fall away from it, at the distance the bodies touched
-## (_keep_off_sentry). Caught out in its lane ([param in_lane]) they fall to the right, away from the
-## alcove, and the boots move along as far as it takes to leave all of the lying body LANE_FALL_CLEAR
-## past the alcove's right post (so the card's advice never reads as failing). Whatever knocked them
-## down, a live sentry in the junction rolls back off them (Sentry.recoil_to) as far as it takes for its
-## drawn body to stand LANE_FALL_CLEAR clear of theirs.
+## Which way and where the engineer goes down. The painted collapse is a slump forward, so the body
+## falls the way the engineer faced, with the boots where they stood; the sprite never turns round at
+## the hit. Run down by the sentry, they go down at the distance the bodies touched (_keep_off_sentry).
+## Caught out in its lane ([param in_lane]) facing right, away from the alcove, the boots move on along
+## the fall as far as it takes to leave all of the lying body LANE_FALL_CLEAR past the alcove's right
+## post (so the card's advice never reads as failing); facing back towards the alcove they slump
+## forward where they stand, never dragged back against the fall. Whatever knocked them down, a live
+## sentry in the junction rolls back off them (Sentry.recoil_to) as far as it takes for its drawn body
+## to stand LANE_FALL_CLEAR clear of theirs, and a body that would lie into a missed tank on the floor
+## ends short of it.
 func _start_collapse(by_sentry: bool, in_lane: bool) -> void:
 	collapse_flip = human.body_sprite.flip_h
-	collapse_fall = 1.0 if collapse_flip else -1.0
+	collapse_fall = -1.0 if collapse_flip else 1.0
 	if by_sentry:
 		_keep_off_sentry()
-		var away: float = signf(human.position.x - sentry_brain.x)
-		if away != 0.0:
-			collapse_fall = away
 	collapse_from_x = human.position.x
 	collapse_to_x = human.position.x
-	if in_lane:
-		collapse_fall = 1.0
+	if in_lane and collapse_fall > 0.0:
 		collapse_to_x = maxf(human.position.x, SentryBrain.COVER_MAX_X + LANE_FALL_CLEAR - COLLAPSE_SPANS[-1].x * COLLAPSE_SCALE)
 	collapsed = true
-	if state.chapter_id != "junction" or not sentry_brain.is_solid():
+	if state.chapter_id != "junction":
+		return
+	# A missed tank low on the mark (its base below the top of the lying body; it only rises from there)
+	# is solid too: a slump that would reach it ends LANE_FALL_CLEAR short of its drawn sides, the boots
+	# staggering back from it as the knees go (this wins over the lane's post, as the gap between the
+	# two is shorter than the lying body).
+	var tank_base: float = lerpf(JunctionRoom.TANK_REST_Y, JunctionRoom.landed_tank_y(false), drop_arm.drop_amount()) + JunctionRoom.TANK_SIZE.y * 0.5
+	if tank_base > JunctionRoom.FLOOR_Y - (COLLAPSE_FRAME.y - COLLAPSE_TOPS[-1]) * COLLAPSE_SCALE:
+		var tank_from: float = DropArm.MARK_X - JunctionRoom.TANK_SIZE.x * 0.5 - LANE_FALL_CLEAR
+		var tank_to: float = DropArm.MARK_X + JunctionRoom.TANK_SIZE.x * 0.5 + LANE_FALL_CLEAR
+		var lying: Vector2 = collapse_span(COLLAPSE_SPANS.size() - 1, collapse_fall, collapse_to_x)
+		if lying.y > tank_from and lying.x < tank_to:
+			collapse_to_x += tank_from - lying.y if human.position.x < DropArm.MARK_X else tank_to - lying.x
+	if not sentry_brain.is_solid():
 		return
 	var body: Vector2 = collapse_span(COLLAPSE_SPANS.size() - 1, collapse_fall, collapse_to_x)
 	var sentry: Sentry = junction_room.sentry
