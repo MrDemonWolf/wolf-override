@@ -465,15 +465,18 @@ class Recesses:
 
 ## The exit bolt's panel stands nearer than the sentry's lane: at the far end of its patrol the machine
 ## and its beam pass behind it. Right after the sentry and at its depth, this draws the panel and its
-## light again wherever the sentry's drawing crosses the panel (bolt_panel_cover), so neither is ever
-## drawn over the box, and draws nothing while the sentry is clear of it. Only those spots are drawn,
-## so the engineer working the bolt and WOLF by the hatch still draw over the panel as before.
+## light again wherever the sentry's drawing crosses the panel (bolt_panel_cover), with the bolt's feed
+## under the panel's painted cables there too, so none of them is ever drawn under the machine, and
+## draws nothing while the sentry is clear of it. Only those spots are drawn, so the engineer working the
+## bolt and WOLF by the hatch still draw over the panel as before.
 class PanelFront:
 	extends Node2D
 	var room: JunctionRoom
-	## The room rectangles drawn this frame (bolt_panel_cover) and the light colour they were drawn with.
+	## The room rectangles drawn this frame (bolt_panel_cover) and the colours they were drawn with: the
+	## panel's lamp as it shows (bolt_lamp_color) and the feed's core (bolt_feed_color), so a change to
+	## either redraws them.
 	var cover: Array[Rect2] = []
-	var light: Color = Color.TRANSPARENT
+	var colors: Array[Color] = []
 
 	func _init() -> void:
 		texture_filter = CanvasItem.TEXTURE_FILTER_LINEAR_WITH_MIPMAPS
@@ -482,14 +485,15 @@ class PanelFront:
 
 	func _process(_delta: float) -> void:
 		var now: Array[Rect2] = room.bolt_panel_cover()
-		var color: Color = room.bolt_light_color()
-		if now != cover or (not now.is_empty() and color != light):
+		var look: Array[Color] = [room.bolt_lamp_color(), room.bolt_feed_color()]
+		if now != cover or (not now.is_empty() and look != colors):
 			cover = now
-			light = color
+			colors = look
 			queue_redraw()
 
 	func _draw() -> void:
-		room.draw_panel_front(self, cover, light)
+		if not cover.is_empty():
+			room.draw_panel_front(self, cover, colors[0])
 
 	## What _draw covers: the bounds of [member cover], for the debug tools' render box.
 	func debug_draw_rect() -> Rect2:
@@ -1382,7 +1386,7 @@ func _draw() -> void:
 	_draw_arm_panel_light()
 	_draw_arm()
 	_draw_floor_mark()
-	var bolt_light: Color = bolt_light_color().lerp(FLICKER_DARK, 1.0 - lamp_level(&"bolt"))
+	var bolt_light: Color = bolt_lamp_color()
 	_draw_hatch_lamp(hatch_art, bolt_light, 1.0)
 	draw_rect(prop_rect(bolt_panel_art, BOLT_PANEL_LIGHT), bolt_light)
 
@@ -1416,17 +1420,31 @@ func draw_recesses(canvas: CanvasItem) -> void:
 ## Drawn on [param canvas] (Recesses) under the props, so the panel's painted cables run into the box
 ## in front of it and the flat code-drawn plates show only round the panel's edge.
 func _draw_bolt_feed(canvas: CanvasItem) -> void:
+	for mark: Array in bolt_feed_marks():
+		canvas.draw_rect(mark[0] as Rect2, mark[1] as Color)
+
+
+## What _draw_bolt_feed fills, in order, as [rect, colour] pairs, so PanelFront can draw any part of it
+## again: the conduit with its sheen and its core, then the cable box and the floor gland, each a steel
+## plate with a one-pixel dark rim and a sheen along its top.
+func bolt_feed_marks() -> Array:
 	var parts: Array[Rect2] = bolt_feed_parts()
 	var box: Rect2 = parts[0]
 	var conduit: Rect2 = parts[1]
 	var gland: Rect2 = parts[2]
-	canvas.draw_rect(conduit, CABLE_SHADOW)
-	canvas.draw_line(Vector2(conduit.position.x + 1.0, conduit.position.y), Vector2(conduit.position.x + 1.0, conduit.end.y), CABLE_SHEEN, 1.0)
-	canvas.draw_line(Vector2(conduit.get_center().x + 0.5, conduit.position.y), Vector2(conduit.get_center().x + 0.5, conduit.end.y), bolt_feed_color(), 2.0)
+	var marks: Array = [
+		[conduit, CABLE_SHADOW],
+		[Rect2(conduit.position.x + 0.5, conduit.position.y, 1.0, conduit.size.y), CABLE_SHEEN],
+		[Rect2(conduit.get_center().x - 0.5, conduit.position.y, 2.0, conduit.size.y), bolt_feed_color()],
+	]
 	for plate: Rect2 in [box, gland]:
-		canvas.draw_rect(plate, FEED_STEEL)
-		canvas.draw_rect(plate, CABLE_SHADOW, false, 1.0)
-		canvas.draw_line(plate.position + Vector2(1.0, 1.0), Vector2(plate.end.x - 1.0, plate.position.y + 1.0), CABLE_SHEEN, 1.0)
+		marks.append([plate, FEED_STEEL])
+		marks.append([Rect2(plate.position.x, plate.position.y, plate.size.x, 1.0), CABLE_SHADOW])
+		marks.append([Rect2(plate.position.x, plate.end.y - 1.0, plate.size.x, 1.0), CABLE_SHADOW])
+		marks.append([Rect2(plate.position.x, plate.position.y + 1.0, 1.0, plate.size.y - 2.0), CABLE_SHADOW])
+		marks.append([Rect2(plate.end.x - 1.0, plate.position.y + 1.0, 1.0, plate.size.y - 2.0), CABLE_SHADOW])
+		marks.append([Rect2(plate.position.x + 1.0, plate.position.y + 1.0, plate.size.x - 2.0, 1.0), CABLE_SHEEN])
+	return marks
 
 
 ## The feed's parts in the room, top to bottom: the cable box over the ends of the bolt panel's left
@@ -1452,13 +1470,14 @@ func bolt_feed_color() -> Color:
 
 
 ## Where the sentry's drawing (Sentry.drawn_rects, widened by a pixel for its soft edges) crosses the
-## exit bolt's panel, as rectangles in this room that do not overlap one another: PanelFront draws the
-## panel there again over the machine and its beam. Empty while the sentry is hidden or clear of it.
+## exit bolt's panel or its feed (bolt_front_rect), as rectangles in this room that do not overlap one
+## another: PanelFront draws them there again over the machine and its beam. Empty while the sentry is
+## hidden or clear of them.
 func bolt_panel_cover() -> Array[Rect2]:
 	var cover: Array[Rect2] = []
 	if sentry == null or not sentry.is_visible_in_tree():
 		return cover
-	var panel: Rect2 = prop_rect(bolt_panel_art, BOLT_PANEL_REGION)
+	var panel: Rect2 = bolt_front_rect()
 	for part: Rect2 in sentry.drawn_rects():
 		var over: Rect2 = part.grow(1.0).intersection(panel)
 		if over.has_area():
@@ -1466,12 +1485,30 @@ func bolt_panel_cover() -> Array[Rect2]:
 	return disjoint_rects(cover)
 
 
+## What stands in front of the sentry's lane at the exit bolt: the panel's box and the bolt's feed (whose
+## floor gland reaches a pixel past the panel's left edge).
+func bolt_front_rect() -> Rect2:
+	var front: Rect2 = prop_rect(bolt_panel_art, BOLT_PANEL_REGION)
+	for part: Rect2 in bolt_feed_parts():
+		front = front.merge(part)
+	return front
+
+
 ## The panel's image and its light, drawn on [param canvas] (PanelFront) inside [param cover] only, the
-## light in [param light].
+## light in [param light]; under the image, the bolt's feed (bolt_feed_marks), so the cable box and
+## conduit stay in front of the machine with the painted cables over them.
 func draw_panel_front(canvas: CanvasItem, cover: Array[Rect2], light: Color) -> void:
 	var panel: Rect2 = prop_rect(bolt_panel_art, BOLT_PANEL_REGION)
 	var lamp: Rect2 = prop_rect(bolt_panel_art, BOLT_PANEL_LIGHT)
-	for part: Rect2 in cover:
+	var marks: Array = bolt_feed_marks()
+	for front: Rect2 in cover:
+		for mark: Array in marks:
+			var clipped: Rect2 = (mark[0] as Rect2).intersection(front)
+			if clipped.has_area():
+				canvas.draw_rect(clipped, mark[1] as Color)
+		var part: Rect2 = front.intersection(panel)
+		if not part.has_area():
+			continue
 		var source: Rect2 = Rect2(BOLT_PANEL_REGION.position + (part.position - panel.position) / BOLT_PANEL_SCALE, part.size / BOLT_PANEL_SCALE)
 		# Sampled like the whole sprite (no clamp at the cut), so the redrawn strip matches the art under it.
 		canvas.draw_texture_rect_region(BOLT_PANEL_PROP, part, source, Color.WHITE, false, false)
@@ -1659,6 +1696,12 @@ func _draw_floor_mark() -> void:
 		draw_colored_polygon(shadow, Color(0.0, 0.0, 0.0, lerpf(0.25, 0.85, tank_drop)))
 	for edge: float in [left, left + width]:
 		draw_line(Vector2(edge, FLOOR_Y - 10.0), Vector2(edge, FLOOR_Y + 10.0), stripe_color, 2.0)
+
+
+## The exit bolt's lamp as drawn on its panel and over the hatch: its light (bolt_light_color),
+## dimmed while a refused press flickers it (lamp_level).
+func bolt_lamp_color() -> Color:
+	return bolt_light_color().lerp(FLICKER_DARK, 1.0 - lamp_level(&"bolt"))
 
 
 ## The exit bolt's light, on its panel and over the hatch: red and dead while the sentry runs the

@@ -751,7 +751,7 @@ func _check_scene() -> void:
 	drawn_frames.drawn.disconnect(watch)
 	drawn_frames.queue_free()
 	print("Lane watch: %d junction frames, %d with a beam, %d with the sentry behind the bolt panel" % [lane_frames, lane_beam_frames, lane_panel_frames])
-	_expect(lane_frames > 3000 and lane_beam_frames > 500 and lane_panel_frames > 100 and lane_faults.is_empty(), "on all %d junction frames of these routes (%d with a beam, %d with the sentry behind the bolt panel), the sentry never overlaps the standing or lying engineer, its beam never runs past the bolt panel or the tank, neither is drawn over the bolt panel, and the bolt feed never crosses the tank (%d faults: %s)" % [lane_frames, lane_beam_frames, lane_panel_frames, lane_faults.size(), ", ".join(lane_faults.slice(0, 6))])
+	_expect(lane_frames > 3000 and lane_beam_frames > 500 and lane_panel_frames > 100 and lane_faults.is_empty(), "on all %d junction frames of these routes (%d with a beam, %d with the sentry behind the bolt panel), the sentry never overlaps the standing or lying engineer, its beam never runs past the bolt panel or the tank, neither is drawn over the bolt panel or its feed, and the bolt feed never crosses the tank (%d faults: %s)" % [lane_frames, lane_beam_frames, lane_panel_frames, lane_faults.size(), ", ".join(lane_faults.slice(0, 6))])
 	# A crafted v4 save with the sentry down but the door still sealed is rejected.
 	var crafted: Dictionary = b_dict.duplicate(true)
 	crafted["positions"]["human"] = [120.0, 410.0]
@@ -1327,9 +1327,9 @@ func _watch_lane(game: Node2D) -> void:
 				lane_faults.append("frame %d: beam to %.1f runs into the solid at %.1f" % [lane_frames, tip, solid.position.x])
 			elif facing < 0.0 and lens >= solid.end.x and tip < solid.end.x - 0.01:
 				lane_faults.append("frame %d: beam to %.1f runs into the solid ending %.1f (block %s, arm %s %.2f, tank y %.1f, choice %s, fail %s)" % [lane_frames, tip, solid.end.x, sentry.sight_block, (game.get("drop_arm") as DropArm).state, (game.get("drop_arm") as DropArm).drop_amount(), room.tank.position.y, game.get("waiting_for_choice"), game.get("fail_active")])
-	# (4) The exit bolt's panel stands in front of the lane: wherever the sentry's painted body or its lit
-	# beam crosses the panel's box, the panel is drawn again over them (PanelFront, right after the
-	# sentry at its depth), so neither shows over the box.
+	# (4) The exit bolt's panel and its feed stand in front of the lane: wherever the sentry's painted
+	# body or its lit beam crosses the panel's box or a part of the feed, they are drawn again over them
+	# (PanelFront, right after the sentry at its depth), so neither shows over the box or the feed.
 	if sentry.is_visible_in_tree() and not sentry.visual.wrecked:
 		var panel: Rect2 = JunctionRoom.prop_rect(room.bolt_panel_art, JunctionRoom.BOLT_PANEL_REGION)
 		var art_front: float = (Sentry.ACTIVE_TREAD_X - Sentry.ACTIVE_REGION.position.x) * Sentry.ART_SCALE
@@ -1348,16 +1348,19 @@ func _watch_lane(game: Node2D) -> void:
 				parts["beam"] = Rect2(crossing.x, Sentry.FLOOR_Y + slit.get_center().y - half, crossing.y - crossing.x, half * 2.0)
 		var front_drawn: bool = room.panel_front.is_visible_in_tree() and room.panel_front.z_index == sentry.z_index and room.panel_front.z_as_relative and room.panel_front.get_index() > sentry.get_index()
 		var behind: bool = false
+		var fronts: Array[Rect2] = [panel]
+		fronts.append_array(room.bolt_feed_parts())
 		for key: String in parts:
-			var over: Rect2 = (parts[key] as Rect2).intersection(panel)
-			if not over.has_area():
-				continue
-			behind = true
-			var covered: float = 0.0
-			for piece: Rect2 in room.panel_front.cover:
-				covered += over.intersection(piece).get_area()
-			if not front_drawn or covered < over.get_area() - 0.01:
-				lane_faults.append("frame %d: the sentry's %s %s is drawn over the bolt panel %s (front drawn %s, %.1f of %.1f px² covered)" % [lane_frames, key, parts[key], panel, front_drawn, covered, over.get_area()])
+			for front: Rect2 in fronts:
+				var over: Rect2 = (parts[key] as Rect2).intersection(front)
+				if not over.has_area():
+					continue
+				behind = true
+				var covered: float = 0.0
+				for piece: Rect2 in room.panel_front.cover:
+					covered += over.intersection(piece).get_area()
+				if not front_drawn or covered < over.get_area() - 0.01:
+					lane_faults.append("frame %d: the sentry's %s %s is drawn over %s (front drawn %s, %.1f of %.1f px² covered)" % [lane_frames, key, parts[key], "the bolt panel %s" % panel if front == panel else "the bolt feed's %s" % front, front_drawn, covered, over.get_area()])
 		if behind:
 			lane_panel_frames += 1
 	if human.body_sprite.texture == MainScript.COLLAPSE_SHEET and room.tank.visible:

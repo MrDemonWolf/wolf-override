@@ -17,6 +17,7 @@ func _run() -> void:
 	_check_pressure_line()
 	_check_save_format()
 	await _check_redraws()
+	await _check_panel_front()
 	await _check_scene()
 	if failures == 0:
 		print("Junction checks passed")
@@ -488,6 +489,37 @@ func _check_scene() -> void:
 	# The mixer releases a stopped clip a few steps later; give it that time before quitting.
 	await create_timer(0.1).timeout
 	_expect(Engine.time_scale == 1.0, "freeing the game leaves time_scale at 1.0")
+
+
+## Where the sentry passes behind the exit bolt's panel, PanelFront draws the panel again over it with
+## everything that belongs in front of the machine: the bolt's feed lies wholly inside what it covers
+## (bolt_front_rect, the panel's box and the feed), and the redrawn lamp is
+## the lamp as drawn, flicker and all, redrawn when it flickers.
+func _check_panel_front() -> void:
+	var spare: JunctionRoom = JunctionRoom.new()
+	root.add_child(spare)
+	await process_frame
+	var panel: Rect2 = JunctionRoom.prop_rect(spare.bolt_panel_art, JunctionRoom.BOLT_PANEL_REGION)
+	var front: Rect2 = spare.bolt_front_rect()
+	var outside: Array[Rect2] = []
+	for mark: Array in spare.bolt_feed_marks():
+		if not front.encloses(mark[0] as Rect2):
+			outside.append(mark[0] as Rect2)
+	_expect(spare.bolt_feed_marks().size() == 15 and outside.is_empty() and front.grow(0.01).encloses(panel) and front.get_area() - panel.get_area() < 60.0, "every part of the bolt feed lies inside what PanelFront covers %s, the panel's box %s and little more (outside: %s)" % [front, panel, outside])
+	# Stand the sentry over the panel so PanelFront has something to cover.
+	spare.sentry.position.x = panel.get_center().x
+	spare.sentry.visible = true
+	await process_frame
+	_expect(not spare.panel_front.cover.is_empty() and spare.panel_front.colors.size() == 2 and spare.panel_front.colors[0] == spare.bolt_lamp_color() and spare.panel_front.colors[1] == spare.bolt_feed_color(), "with the sentry over the bolt panel, PanelFront covers it in the lamp and feed colours as drawn")
+	spare.flicker(&"bolt", 2)
+	var dark: bool = false
+	for _frame: int in 30:
+		await process_frame
+		if spare.lamp_level(&"bolt") < 1.0:
+			dark = dark or (spare.panel_front.colors[0] == spare.bolt_lamp_color() and spare.bolt_lamp_color() != spare.bolt_light_color())
+	_expect(dark, "while the bolt's lamp flickers, PanelFront redraws it dimmed with the lamp")
+	spare.queue_free()
+	await process_frame
 
 
 ## The junction redraws only when something it draws has changed (lighter-game S02): at rest the
