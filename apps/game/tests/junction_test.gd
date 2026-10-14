@@ -15,6 +15,7 @@ func _initialize() -> void:
 func _run() -> void:
 	_check_pressure_line()
 	_check_save_format()
+	await _check_redraws()
 	await _check_scene()
 	if failures == 0:
 		print("Junction checks passed")
@@ -212,6 +213,8 @@ func _check_scene() -> void:
 	game.call("_start_gameplay_camera")
 	await physics_frame
 	_expect(not room.visible and room.door_shape.disabled and (game.get("records_room") as RecordsRoom).visible, "a completed Records save shows Records, not the junction")
+	var records: RecordsRoom = game.get("records_room") as RecordsRoom
+	_expect(_mirroring(records.floor_reflections) and _idle(room.floor_reflections), "only the room on screen keeps its floor reflections mirroring")
 	human.position.x = 700.0
 	_expect(str(game.call("_context_hint")).contains("Head right"), "the secured exit points right from across the room")
 	human.position.x = 830.0
@@ -220,6 +223,8 @@ func _check_scene() -> void:
 	if not _require(state.chapter_id == "junction" and not state.door_blown, "USE at the secured exit enters the junction"):
 		return
 	_expect(room.visible and not (game.get("records_room") as RecordsRoom).visible and not (game.get_node("CorridorDepth") as Node2D).visible, "only the junction is visible after entry")
+	_expect(_mirroring(room.floor_reflections) and _idle(records.floor_reflections), "entering the junction moves the mirroring from Records' reflections to the junction's, which match their sources")
+	_expect(not (game.get("exit_sparks") as CPUParticles2D).emitting, "Records' sparks stop emitting once it is hidden")
 	# A physics step may already have settled the body onto the floor by its safe margin.
 	_expect(human.position.distance_to(Vector2(120.0, 410.0)) < 0.05 and human.controlled and not wolf.controlled, "the engineer stands at the entry hatch with controls (%s)" % human.position)
 	_expect(is_equal_approx(camera.get_screen_center_position().x, camera.position.x), "entering the junction cuts the camera to the engineer instead of panning across")
@@ -469,6 +474,113 @@ func _check_scene() -> void:
 	_expect(Engine.time_scale == 1.0, "freeing the game leaves time_scale at 1.0")
 
 
+## The junction redraws only when something it draws has changed (lighter-game S02): at rest the
+## per-frame syncs draw nothing, and through the gauge building, the fuse, the tank's fall and the
+## bolt's charge every frame draws, each time from new values.
+func _check_redraws() -> void:
+	var spare: JunctionRoom = JunctionRoom.new()
+	root.add_child(spare)
+	var room_draws: Array = []
+	var feed_draws: Array = []
+	spare.draw.connect(func() -> void: room_draws.append(spare.draw_inputs()))
+	spare.recesses.draw.connect(func() -> void: feed_draws.append(spare.recesses_inputs()))
+	var line: PressureLine = PressureLine.new()
+	var arm: DropArm = DropArm.new()
+	var bolt: Array = [&"locked", 0.0]
+	# One junction frame as Main runs it: the needle, the line, the arm and the bolt synced in turn.
+	var sync: Callable = func() -> void:
+		spare.advance_display(1.0 / 60.0)
+		spare.sync_line(line)
+		spare.sync_arm(arm)
+		spare.sync_bolt(bolt[0], bolt[1])
+	for _frame: int in 3:
+		sync.call()
+		await process_frame
+	room_draws.clear()
+	feed_draws.clear()
+	for _frame: int in 30:
+		sync.call()
+		await process_frame
+	_expect(room_draws.is_empty() and feed_draws.is_empty(), "at rest the junction and its recesses are not redrawn (%d, %d draws in 30 frames)" % [room_draws.size(), feed_draws.size()])
+	line.arm()
+	room_draws.clear()
+	for _frame: int in 30:
+		line.advance(1.0 / 60.0)
+		sync.call()
+		await process_frame
+	_expect(_new_every_frame(room_draws, 30), "while the line builds every frame redraws the needle from a new gauge (%d draws)" % room_draws.size())
+	line.crank(1.2)
+	line.advance(1.0 / 60.0)
+	sync.call()
+	await process_frame
+	room_draws.clear()
+	for _frame: int in 30:
+		line.advance(1.0 / 60.0)
+		sync.call()
+		await process_frame
+	_expect(line.state == &"fuse" and _new_every_frame(room_draws, 30), "while the fuse burns every frame redraws the blast stripes' pulse (%d draws)" % room_draws.size())
+	room_draws.clear()
+	spare.reduce_motion = true
+	sync.call()
+	await process_frame
+	sync.call()
+	await process_frame
+	_expect(room_draws.size() == 1, "Reduced Motion alone redraws the stripes once (%d draws)" % room_draws.size())
+	spare.reduce_motion = false
+	arm.drop()
+	sync.call()
+	await process_frame
+	room_draws.clear()
+	for _frame: int in 20:
+		arm.advance(1.0 / 60.0, 1200.0)
+		sync.call()
+		await process_frame
+	_expect(arm.state == &"falling" and _new_every_frame(room_draws, 20), "while the tank falls every frame redraws its shadow (%d draws)" % room_draws.size())
+	for _frame: int in 30:
+		arm.advance(1.0 / 60.0, 1200.0)
+	sync.call()
+	await process_frame
+	spare.door_blown = true
+	spare.sentry.visual.eye = Sentry.SentryVisual.EYE_PATROL
+	spare.sentry.target_x = 1200.0
+	sync.call()
+	await process_frame
+	room_draws.clear()
+	spare.sentry.target_x = DropArm.MARK_X
+	sync.call()
+	await process_frame
+	_expect(room_draws.size() == 1 and room_draws[0][-1] == true, "a live sentry rolling onto the mark lights its brackets")
+	bolt[0] = &"charging"
+	sync.call()
+	await process_frame
+	room_draws.clear()
+	feed_draws.clear()
+	for frame: int in 30:
+		bolt[1] = (frame + 1) / 40.0
+		sync.call()
+		await process_frame
+	_expect(_new_every_frame(room_draws, 30) and _new_every_frame(feed_draws, 30), "while the bolt charges every frame redraws its lights and its feed (%d, %d draws)" % [room_draws.size(), feed_draws.size()])
+	room_draws.clear()
+	feed_draws.clear()
+	for _frame: int in 10:
+		sync.call()
+		await process_frame
+	_expect(room_draws.is_empty() and feed_draws.is_empty(), "with nothing changing again the redraws stop")
+	spare.queue_free()
+	await process_frame
+
+
+## True when [param draws] holds one draw per frame for [param frames] frames, each from inputs that
+## differ from the draw before.
+func _new_every_frame(draws: Array, frames: int) -> bool:
+	if draws.size() != frames:
+		return false
+	for index: int in range(1, draws.size()):
+		if draws[index] == draws[index - 1]:
+			return false
+	return true
+
+
 ## The vent's knockdown span is the grate plus half the engineer's body, and the hint agrees: just
 ## off it the trip costs only the attempt, on its edge it is a knockdown back to autosave A.
 func _check_vent_edges(game: Node2D, human: M0Actor, wolf: M0Actor, room: JunctionRoom, line: PressureLine, a_bytes: PackedByteArray) -> void:
@@ -696,6 +808,22 @@ func _expect(condition: bool, label: String) -> void:
 	if not condition:
 		failures += 1
 		push_error("Junction check failed: " + label)
+
+
+## True when every one of [param reflections] processes and shows exactly what its source does.
+func _mirroring(reflections: Array[FloorReflection]) -> bool:
+	for reflection: FloorReflection in reflections:
+		if not reflection.is_processing() or reflection.visible != (reflection.enabled and reflection.source.visible):
+			return false
+	return not reflections.is_empty()
+
+
+## True when none of [param reflections] processes.
+func _idle(reflections: Array[FloorReflection]) -> bool:
+	for reflection: FloorReflection in reflections:
+		if reflection.is_processing():
+			return false
+	return not reflections.is_empty()
 
 
 func _require(condition: bool, label: String) -> bool:

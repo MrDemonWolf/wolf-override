@@ -2,7 +2,8 @@ class_name FloorReflection
 extends Sprite2D
 ## A mirrored, squashed copy of a sprite below its feet, fading with distance, plus a soft contact
 ## shadow, so actors and props sit on the wet painted floor instead of hovering over it.
-## It lives beside its source under the same parent and mirrors the source every frame.
+## It lives beside its source under the same parent and mirrors the source every frame while its
+## room is on screen (active).
 
 const SQUASH: float = 0.55
 ## Drawn above the backdrop and haze, below every prop and actor.
@@ -16,10 +17,20 @@ var shadow: Sprite2D
 var enabled: bool = true:
 	set(value):
 		enabled = value
-		set_process(enabled)
+		set_process(enabled and active)
 		visible = enabled and source != null and source.visible
 		if shadow != null:
 			shadow.visible = visible
+## False while its room is hidden: nothing of it shows, so it stops mirroring until the room is back.
+var active: bool = true:
+	set(value):
+		if value == active:
+			return
+		active = value
+		set_process(enabled and active)
+		if enabled and active:
+			_catch_up.call_deferred()
+var _mirrored_frame: int = -1
 
 
 ## Adds a reflection and shadow for [param target], which must already be in the tree.
@@ -54,7 +65,15 @@ static func attach(target: Sprite2D, strength: float = 0.32) -> FloorReflection:
 
 
 func _process(_delta: float) -> void:
+	_mirrored_frame = Engine.get_process_frames()
 	_mirror()
+
+
+## Back on screen: mirrors the source as it stands once the frame's processing is done, unless this
+## frame's _process already has.
+func _catch_up() -> void:
+	if _mirrored_frame != Engine.get_process_frames():
+		_mirror()
 
 
 func _mirror() -> void:
@@ -72,6 +91,12 @@ func _mirror() -> void:
 	modulate = source.modulate * source.self_modulate
 	shadow.position = Vector2(source.position.x, floor_y)
 	shadow.modulate.a = source.modulate.a
+
+
+## Starts or stops [param reflections] mirroring, as their room shows or hides.
+static func set_all_active(reflections: Array[FloorReflection], value: bool) -> void:
+	for reflection: FloorReflection in reflections:
+		reflection.active = value
 
 
 ## The mipmap LOD bias a sprite samples with: its sharp_sprite material's lod_bias, or 0.0.

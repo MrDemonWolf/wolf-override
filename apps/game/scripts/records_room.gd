@@ -111,6 +111,16 @@ func _process(_delta: float) -> void:
 		JunctionRoom.fade_at_view_edge(station_labels, get_viewport())
 
 
+## Only the room on screen keeps its floor reflections mirroring; hidden, its sparks stop emitting.
+func set_active(active: bool) -> void:
+	FloorReflection.set_all_active(floor_reflections, active)
+	if active:
+		return
+	for child: Node in get_children():
+		if child is CPUParticles2D:
+			(child as CPUParticles2D).emitting = false
+
+
 func refresh_state() -> void:
 	purge_label.text = "PURGE COPIED" if purge_trace_preserved else "PURGE QUEUE"
 	purge_label.add_theme_color_override("font_color", Color("#a4f0c4") if purge_trace_preserved else Color("#ffc7c7"))

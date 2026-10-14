@@ -386,6 +386,11 @@ var label_plate: StyleBoxFlat
 ## The alcove's soft shadow, made once and kept so the drawing that uses it always has it.
 var alcove_shadow: GradientTexture2D = soft_texture(GradientTexture2D.FILL_SQUARE)
 var floor_reflections: Array[FloorReflection] = []
+## What this node's _draw and Recesses last drew from (draw_inputs, recesses_inputs), so the
+## per-frame syncs redraw them only when something they draw has changed.
+var _drawn_inputs: Array = []
+var _recesses_drawn_inputs: Array = []
+var _redraw_check_queued: bool = false
 var _valve_tween: Tween
 var _seam_tween: Tween
 var _door_tween: Tween
@@ -788,8 +793,11 @@ static func edge_alpha(rect: Rect2, view: Rect2) -> float:
 
 
 ## Enables the door body and hazards only while this is the room in play, so the junction's
-## collision never leaks into the corridor or Records, which share the same coordinates.
+## collision never leaks into the corridor or Records, which share the same coordinates. Its floor
+## reflections mirror only while it is in play; its bursts, steam and cloud are stopped by
+## reset_transient, which the parent runs with every sync.
 func set_active(active: bool) -> void:
+	FloorReflection.set_all_active(floor_reflections, active)
 	door_shape.set_deferred("disabled", not active or door_blown)
 	vent_hazard.armed = false
 	vent_hazard.set_deferred("monitoring", active)
@@ -831,7 +839,7 @@ func sync_line(line: PressureLine) -> void:
 	if building:
 		seam_glow.modulate = Color(AMBER, 0.25 + 0.5 * gauge)
 	_sync_vent_glow()
-	queue_redraw()
+	_check_redraw()
 
 
 ## Advances the needle's fall after the vent lets go; the parent calls it every junction frame, so it
@@ -845,7 +853,7 @@ func advance_display(delta: float) -> void:
 	display_gauge = move_toward(display_gauge, gauge, delta / GAUGE_FALL_SECONDS)
 	if display_gauge <= gauge:
 		gauge_tripped = false
-	queue_redraw()
+	_check_redraw()
 
 
 ## The grate glows as the line builds, hotter toward the gauge's peak, flashing red through the hard
@@ -882,7 +890,7 @@ func sync_arm(arm: DropArm) -> void:
 		cloud_hazard.armed = cloud
 	if arm_state != previous_state or tank_on_floor != previous_on_floor:
 		refresh_state()
-	queue_redraw()
+	_check_redraw()
 
 
 ## Copies the exit bolt in; its panel light warms with the charge.
@@ -892,9 +900,36 @@ func sync_bolt(state: StringName, charge: float) -> void:
 	bolt_charge = charge
 	if changed:
 		refresh_state()
-	queue_redraw()
-	# The feed to the bolt warms with the charge.
-	recesses.queue_redraw()
+	# The bolt's lights and its feed (Recesses) warm with the charge.
+	_check_redraw()
+
+
+## The parent syncs the line, the arm and the bolt every junction frame, and most frames nothing drawn
+## changes: once per frame, after the frame's syncs, this redraws the room and its Recesses only when
+## what they draw differs from what they last drew.
+func _check_redraw() -> void:
+	if _redraw_check_queued:
+		return
+	_redraw_check_queued = true
+	_redraw_if_changed.call_deferred()
+
+
+func _redraw_if_changed() -> void:
+	_redraw_check_queued = false
+	if draw_inputs() != _drawn_inputs:
+		queue_redraw()
+	if recesses_inputs() != _recesses_drawn_inputs:
+		recesses.queue_redraw()
+
+
+## Every value _draw reads that can change after the room is built.
+func draw_inputs() -> Array:
+	return [line_state, gauge, display_gauge, gauge_tripped, fuse_remaining, reduce_motion, door_blown, sentry_down, junction_cleared, arm_state, tank_drop, tank_on_floor, tank.position.y, arm_art.position.y, bolt_state, bolt_charge, mark_lit()]
+
+
+## Every value draw_recesses reads that can change after the room is built.
+func recesses_inputs() -> Array:
+	return [sentry_down, junction_cleared, bolt_state, bolt_charge]
 
 
 ## How high WOLF's drawn body is lifted with his centre at [param wolf_x] and the live sentry's at
@@ -1164,6 +1199,7 @@ func reset_transient() -> void:
 
 
 func _draw() -> void:
+	_drawn_inputs = draw_inputs()
 	# The plates are the Depth child's layers and the machines are sprites; this draws what they
 	# cannot show.
 	_draw_hatch_lamp(entry_hatch_art, GREEN, 1.0)
@@ -1196,6 +1232,7 @@ func _draw_alcove_floor() -> void:
 ## as part of the painted wall. Its core is exactly SentryBrain's cover span, the x range where an
 ## engineer is out of the sentry's sight, and the floor under it is tinted over the same span.
 func draw_recesses(canvas: CanvasItem) -> void:
+	_recesses_drawn_inputs = recesses_inputs()
 	var alcove: Rect2 = alcove_rect()
 	canvas.draw_texture_rect(alcove_shadow, alcove.grow_individual(14.0, 10.0, 14.0, 8.0), false, Color(0.0, 0.02, 0.04, 0.85))
 	_draw_bolt_feed(canvas)
