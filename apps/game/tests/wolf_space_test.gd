@@ -251,6 +251,7 @@ func _lane(game: Main, actions: DebugActions, lane: StringName) -> void:
 	else:
 		await _settle(game)
 		_expect(game.wolf.autonomous_target_x == JunctionRoom.WOLF_RUBBLE_X, "%s: WOLF holds back from the rubble" % lane)
+		_expect(game.human.position.x > game.wolf.position.x and not game.wolf.body_sprite.flip_h, "%s: holding back by the valve he faces the engineer and the rubble" % lane)
 		await _check_rest(game, "%s: lane, WOLF holding back while the engineer takes the lane" % lane)
 		actions.jump(&"tank_down")
 		await _frames(5)
