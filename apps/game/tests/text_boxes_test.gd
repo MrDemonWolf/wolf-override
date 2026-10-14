@@ -472,6 +472,20 @@ func _check_station_names() -> void:
 					_expect(label.modulate.a > 0.99, "%d%%: %s is not faded at the corridor's start (alpha %.2f)" % [percent, label.text, label.modulate.a])
 				var relay_name: Rect2 = (game.get_node("RelayLabel") as Label).get_global_rect()
 				_expect(relay_name.end.y <= game.bypass_handle.fault_tag.get_global_rect().position.y + 0.5, "%d%%: COOLANT RELAY stands above its COOLANT FAULT tag" % percent)
+		# The valve's plate changes its words as it is worked ("VALVE  0 / 3" keeps a double space):
+		# each stands on the same line and clears the LINE caption by the dial.
+		game.debug_tools.actions.jump(&"junction_a")
+		await process_frame
+		var room: JunctionRoom = game.junction_room
+		var plate_bottom: float = JunctionRoom.LABEL_Y + room.valve_label.get_theme_font(&"font").get_height(JunctionRoom.LABEL_FONT_SIZE) + room.valve_label.get_theme_stylebox(&"normal").get_minimum_size().y
+		for text: String in ["VALVE", "VALVE  0 / 3", "FUSE LIT", "VALVE SPENT"]:
+			room.valve_label.text = text
+			room.refit_labels()
+			await process_frame
+			await process_frame
+			var plate: Rect2 = Rect2(room.valve_label.position, room.valve_label.size)
+			_expect(absf(plate.end.y - plate_bottom) <= 1.5, "%d%%: the %s plate stands on its line (bottom %.1f, expected %.1f)" % [percent, text.c_escape(), plate.end.y, plate_bottom])
+			_expect(not plate.intersects(Rect2(room.line_caption.position, room.line_caption.size)), "%d%%: the %s plate clears the LINE caption" % [percent, text.c_escape()])
 
 
 func _expect(condition: bool, label: String) -> void:
