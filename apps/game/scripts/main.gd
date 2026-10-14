@@ -1030,6 +1030,10 @@ func _process(delta: float) -> void:
 		# Held by the entrance after the blast until the engineer leaves his spot by the valve, he faces
 		# them and the rubble: waiting, not leaving.
 		wolf.body_sprite.flip_h = human.position.x < wolf.position.x
+	if state.chapter_id == "junction" and state.door_blown and not state.sentry_down and wolf.autonomous_target_x == JunctionRoom.WOLF_RUBBLE_X and absf(wolf.position.x - JunctionRoom.WOLF_RUBBLE_X) <= 2.0:
+		# Holding back by the valve, he faces the engineer, and so the rubble while they deal with the
+		# sentry, even after breaking off, when he walked back in facing the entrance.
+		wolf.body_sprite.flip_h = human.position.x < wolf.position.x
 	if fail_active:
 		# Knocked down: the reaction plays out and the last autosave returns; nothing else reads input.
 		_refresh_ui()

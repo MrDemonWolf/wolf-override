@@ -1,7 +1,7 @@
 extends SceneTree
 ## P0-4 (WOLF-2, AUDIT 7): wherever WOLF goes and stands on his own, his painted body overlaps no
 ## station, no door frame in the walk line and not the engineer, on both relay routes, both mirror
-## routes and every lane answer. Each beat is reached the way play reaches it (the game's own
+## routes, every lane answer and a break-off after a miss. Each beat is reached the way play reaches it (the game's own
 ## interacts, holds and answers, and the debug jumps, which build the run with M0State's own steps),
 ## then WOLF is given time to stop.
 ##
@@ -52,6 +52,7 @@ func _run() -> void:
 	await _lane(game, actions, &"wolf")
 	await _lane(game, actions, &"alone")
 	await _lane(game, actions, &"refused")
+	await _break_off(game, actions)
 	_expect(checked.size() >= 30, "every route reached its rest points (%d checked)" % checked.size())
 	game.queue_free()
 	await process_frame
@@ -259,6 +260,34 @@ func _lane(game: Main, actions: DebugActions, lane: StringName) -> void:
 	_require(await _walk_to(game.human, JunctionRoom.BOLT_X), "%s: the engineer walks to the exit bolt" % lane)
 	await _settle(game)
 	await _check_rest(game, "%s: tank down, WOLF by the hatch with the engineer at the bolt" % lane)
+
+
+## A missed drop while WOLF is drawing the sentry and has not got past it yet: he breaks off, walks
+## back to his spot by the valve ("I'm out. I'll hold back.") and, once there, faces the engineer at
+## the rubble line and the rubble beyond them, not the entrance he walked back towards.
+func _break_off(game: Main, actions: DebugActions) -> void:
+	actions.set_relay(&"disclose_wolf")
+	actions.set_lane(&"wolf")
+	actions.jump(&"lane")
+	_require(game.lane_choice == "wolf" and game.wolf_baiting, "break-off: WOLF sets off to draw the sentry")
+	var brain: SentryBrain = game.sentry_brain
+	_require(await _wait_until(func() -> bool: return brain.state == &"fixated", 240), "break-off: the sentry turns to WOLF")
+	# The tank falls about half a second; the sentry is still backing off far right of the mark and
+	# WOLF still on its rubble side when it lands, so it misses.
+	_require(actions.trigger_drop() == "The clamp lets go.", "break-off: the TANK RELEASE lets the tank go")
+	_require(await _wait_until(func() -> bool: return game.wolf_broke_off, 120), "break-off: the tank misses and WOLF breaks off")
+	_require(not game.state.sentry_down and not game.wolf_holding_far_end, "break-off: he had not got past the sentry, so he goes back, not to the hatch")
+	_expect(await _wait_until(func() -> bool: return game.status_line == Main.BROKE_OFF_RUBBLE_LINE, 1200), "break-off: WOLF says he is out and holds back (%s)" % game.status_line.c_escape())
+	await _settle(game)
+	_expect(game.wolf.autonomous_target_x == JunctionRoom.WOLF_RUBBLE_X and absf(game.wolf.position.x - JunctionRoom.WOLF_RUBBLE_X) <= 2.0, "break-off: WOLF holds back at his spot by the valve (x %.1f)" % game.wolf.position.x)
+	_expect(game.human.position.x > game.wolf.position.x and not game.wolf.body_sprite.flip_h, "break-off: settled there he faces the engineer and the rubble, not the entrance")
+	await _check_rest(game, "wolf: lane, WOLF holding back by the valve after breaking off")
+	# Let the chase, the coolant cloud and the winch finish, then bring the sentry down so its servo
+	# winds down too: no sound is still playing as the run ends.
+	_expect(await _wait_until(func() -> bool: return brain.state == &"patrol" and game.drop_arm.state == &"hung" and not game.drop_arm.cloud_active(), 900), "break-off: the sentry gives up and the tank is wound back up")
+	actions.jump(&"tank_down")
+	await _settle(game)
+	await _frames(60)
 
 
 # --- Measuring ------------------------------------------------------------------------------------
