@@ -708,44 +708,25 @@ func _build_door() -> void:
 
 
 func _build_particles() -> void:
-	vent_steam = FxPresets.steam()
-	vent_steam.name = "VentSteam"
-	vent_steam.position = Vector2(VENT_X, FLOOR_Y - 8.0)
-	vent_steam.emission_shape = CPUParticles2D.EMISSION_SHAPE_RECTANGLE
-	vent_steam.emission_rect_extents = Vector2((PressureLine.VENT_GRATE_MAX_X - PressureLine.VENT_GRATE_MIN_X) * 0.5 - 6.0, 2.0)
 	# Behind the vent's grate (one step under the props) and the actors: the column rises from inside
 	# the grate, which stays drawn over it, so the grate the card names reads through the steam.
-	vent_steam.z_index = VENT_STEAM_Z
-	add_child(vent_steam)
+	vent_steam = FxPresets.place(FxPresets.steam(), self, "VentSteam", Vector2(VENT_X, FLOOR_Y - 8.0), VENT_STEAM_Z, Vector2((PressureLine.VENT_GRATE_MAX_X - PressureLine.VENT_GRATE_MIN_X) * 0.5 - 6.0, 2.0))
 	vent_puff = FxPresets.dust_burst()
-	vent_puff.name = "VentPuff"
-	vent_puff.position = vent_steam.position
 	# Translucent and thin enough that the engineer, the grate and the breaker read through it.
-	vent_puff.emission_shape = CPUParticles2D.EMISSION_SHAPE_RECTANGLE
-	vent_puff.emission_rect_extents = vent_steam.emission_rect_extents
 	vent_puff.color = Color(FxPresets.STEAM, 0.3)
 	vent_puff.initial_velocity_min = 160.0
 	vent_puff.initial_velocity_max = 260.0
 	vent_puff.spread = 30.0
 	vent_puff.amount = 16
 	# Like the column: out of the grate, behind it and the engineer it knocks down.
-	vent_puff.z_index = VENT_STEAM_Z
-	add_child(vent_puff)
+	FxPresets.place(vent_puff, self, "VentPuff", vent_steam.position, VENT_STEAM_Z, vent_steam.emission_rect_extents)
 	blast_sparks = FxPresets.sparks(Palette.AMBER)
-	blast_sparks.name = "BlastSparks"
-	blast_sparks.position = Vector2(DOOR_X, FLOOR_Y - DOOR_HEIGHT * 0.5)
 	blast_sparks.amount = 36
 	blast_sparks.spread = 110.0
-	blast_sparks.z_index = 3
-	add_child(blast_sparks)
+	FxPresets.place(blast_sparks, self, "BlastSparks", Vector2(DOOR_X, FLOOR_Y - DOOR_HEIGHT * 0.5), 3)
 	blast_dust = FxPresets.dust_burst()
-	blast_dust.name = "BlastDust"
-	blast_dust.position = Vector2(DOOR_X + 20.0, FLOOR_Y - 4.0)
-	blast_dust.emission_shape = CPUParticles2D.EMISSION_SHAPE_RECTANGLE
-	blast_dust.emission_rect_extents = Vector2(70.0, 3.0)
 	blast_dust.amount = 30
-	blast_dust.z_index = 3
-	add_child(blast_dust)
+	FxPresets.place(blast_dust, self, "BlastDust", Vector2(DOOR_X + 20.0, FLOOR_Y - 4.0), 3, Vector2(70.0, 3.0))
 
 
 ## The sentry, the tank over the mark and the lane's hazards and bursts. The sentry is added before
@@ -786,10 +767,6 @@ func _build_lane() -> void:
 	cloud_hazard = Hazard.make("CloudHazard", Rect2(DropArm.MARK_X - DropArm.CLOUD_HALF_WIDTH, 360.0, DropArm.CLOUD_HALF_WIDTH * 2.0, 80.0), CLOUD_REASON)
 	add_child(cloud_hazard)
 	coolant_cloud = FxPresets.steam()
-	coolant_cloud.name = "CoolantCloud"
-	coolant_cloud.position = Vector2(DropArm.MARK_X, FLOOR_Y - 6.0)
-	coolant_cloud.emission_shape = CPUParticles2D.EMISSION_SHAPE_RECTANGLE
-	coolant_cloud.emission_rect_extents = Vector2(DropArm.CLOUD_HALF_WIDTH - 8.0, 4.0)
 	coolant_cloud.initial_velocity_min = 20.0
 	coolant_cloud.initial_velocity_max = 60.0
 	coolant_cloud.spread = 60.0
@@ -798,30 +775,20 @@ func _build_lane() -> void:
 	coolant_cloud.amount = 24
 	coolant_cloud.color = Color(COOLANT, 0.16)
 	# Behind the actors and the sentry, so the vapour never hides who is in it.
-	coolant_cloud.z_index = 0
-	add_child(coolant_cloud)
+	FxPresets.place(coolant_cloud, self, "CoolantCloud", Vector2(DropArm.MARK_X, FLOOR_Y - 6.0), 0, Vector2(DropArm.CLOUD_HALF_WIDTH - 8.0, 4.0))
 	coolant_burst = FxPresets.dust_burst()
-	coolant_burst.name = "CoolantBurst"
-	coolant_burst.position = Vector2(DropArm.MARK_X, FLOOR_Y - 10.0)
 	coolant_burst.color = Color(COOLANT, 0.35)
 	coolant_burst.initial_velocity_min = 110.0
 	coolant_burst.initial_velocity_max = 220.0
 	coolant_burst.amount = 22
-	coolant_burst.z_index = 3
-	add_child(coolant_burst)
+	FxPresets.place(coolant_burst, self, "CoolantBurst", Vector2(DropArm.MARK_X, FLOOR_Y - 10.0), 3)
 	hit_sparks = FxPresets.sparks(Palette.CYAN)
-	hit_sparks.name = "HitSparks"
-	hit_sparks.position = Vector2(DropArm.MARK_X, FLOOR_Y - 30.0)
 	hit_sparks.amount = 36
 	hit_sparks.spread = 100.0
-	hit_sparks.z_index = 3
-	add_child(hit_sparks)
+	FxPresets.place(hit_sparks, self, "HitSparks", Vector2(DropArm.MARK_X, FLOOR_Y - 30.0), 3)
 	bolt_sparks = FxPresets.sparks(Palette.EXIT_GREEN)
-	bolt_sparks.name = "BoltSparks"
-	bolt_sparks.position = prop_rect(bolt_panel_art, BOLT_PANEL_LIGHT).get_center()
 	bolt_sparks.amount = 30
-	bolt_sparks.z_index = 3
-	add_child(bolt_sparks)
+	FxPresets.place(bolt_sparks, self, "BoltSparks", prop_rect(bolt_panel_art, BOLT_PANEL_LIGHT).get_center(), 3)
 
 
 ## A station name on its plate, centred on [param center_x] in the label row. It draws over the
@@ -1563,17 +1530,7 @@ static func alcove_rect() -> Rect2:
 ## A white texture that is opaque in the middle and fades softly to clear at its edges ([param fill]
 ## square for a recess, radial for a light); tinted by the colour it is drawn with.
 static func soft_texture(fill: GradientTexture2D.Fill) -> GradientTexture2D:
-	var texture: GradientTexture2D = GradientTexture2D.new()
-	var gradient: Gradient = Gradient.new()
-	gradient.offsets = PackedFloat32Array([0.0, 0.45, 1.0])
-	gradient.colors = PackedColorArray([Color.WHITE, Color(1.0, 1.0, 1.0, 0.75), Color(1.0, 1.0, 1.0, 0.0)])
-	texture.gradient = gradient
-	texture.width = 64
-	texture.height = 64
-	texture.fill = fill
-	texture.fill_from = Vector2(0.5, 0.5)
-	texture.fill_to = Vector2(0.5, 0.0)
-	return texture
+	return FxKit.radial(64, [0.0, 0.45, 1.0], [Color.WHITE, Color(1.0, 1.0, 1.0, 0.75), Color(1.0, 1.0, 1.0, 0.0)], fill)
 
 
 ## A hatch's lamp, painted on the bar over its door, lit in [param color]; it rides and fades with

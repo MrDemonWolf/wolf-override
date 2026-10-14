@@ -124,8 +124,6 @@ func _init() -> void:
 	bypass_label.add_child(readout)
 	fault_tag = _plate("CoolantFaultTag", "COOLANT FAULT", FAULT_TEXT, FAULT_EDGE)
 	coolant_hiss = FxPresets.steam()
-	coolant_hiss.name = "CoolantHiss"
-	coolant_hiss.position = HISS_OFFSET
 	coolant_hiss.amount = 24
 	coolant_hiss.lifetime = 0.75
 	coolant_hiss.direction = Vector2(0.6, -1.0)
@@ -134,7 +132,7 @@ func _init() -> void:
 	coolant_hiss.initial_velocity_max = 45.0
 	coolant_hiss.scale_amount_min = 4.0
 	coolant_hiss.scale_amount_max = 7.0
-	add_child(coolant_hiss)
+	FxPresets.place(coolant_hiss, self, "CoolantHiss", HISS_OFFSET)
 
 
 ## Places the handle with its wheel at [param wheel_centre] and the COOLANT FAULT tag centred on

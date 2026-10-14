@@ -2,7 +2,8 @@ class_name FxPresets
 extends RefCounted
 ## Three reusable CPUParticles2D configurations (they run on every renderer, including GL
 ## Compatibility): a spark shower, a dust burst and a steam column. Bursts are one-shot and fire
-## through Impact.burst(); steam toggles emitting with the state that drives it.
+## through Impact.burst(); steam toggles emitting with the state that drives it. Their dot textures and
+## fade ramp are FxKit's shared ones; place() parks a configured one in its room.
 
 const DUST: Color = Color("#c9b9a0")
 const STEAM: Color = Color("#bfe8ff")
@@ -64,6 +65,21 @@ static func steam() -> CPUParticles2D:
 	return particles
 
 
+## Names [param particles] (an empty [param particles_name] keeps the preset's), parks it at [param at] on
+## [param z] and adds it to [param parent]; a non-zero [param extents] spreads its emission over a
+## rectangle that size. The caller sets anything else on it first. Returns [param particles].
+static func place(particles: CPUParticles2D, parent: Node, particles_name: String, at: Vector2, z: int = 0, extents: Vector2 = Vector2.ZERO) -> CPUParticles2D:
+	if not particles_name.is_empty():
+		particles.name = particles_name
+	particles.position = at
+	if extents != Vector2.ZERO:
+		particles.emission_shape = CPUParticles2D.EMISSION_SHAPE_RECTANGLE
+		particles.emission_rect_extents = extents
+	particles.z_index = z
+	parent.add_child(particles)
+	return particles
+
+
 static func _one_shot(particles_name: String, amount: int, lifetime: float) -> CPUParticles2D:
 	var particles: CPUParticles2D = CPUParticles2D.new()
 	particles.name = particles_name
@@ -76,21 +92,8 @@ static func _one_shot(particles_name: String, amount: int, lifetime: float) -> C
 
 
 static func _fade_ramp() -> Gradient:
-	var ramp: Gradient = Gradient.new()
-	ramp.offsets = PackedFloat32Array([0.0, 0.6, 1.0])
-	ramp.colors = PackedColorArray([Color.WHITE, Color.WHITE, Color(1.0, 1.0, 1.0, 0.0)])
-	return ramp
+	return FxKit.ramp([0.0, 0.6, 1.0], [Color.WHITE, Color.WHITE, Color(1.0, 1.0, 1.0, 0.0)])
 
 
 static func _dot_texture(size: int) -> GradientTexture2D:
-	var gradient: Gradient = Gradient.new()
-	gradient.offsets = PackedFloat32Array([0.0, 0.5, 1.0])
-	gradient.colors = PackedColorArray([Color.WHITE, Color(1.0, 1.0, 1.0, 0.5), Color(1.0, 1.0, 1.0, 0.0)])
-	var texture: GradientTexture2D = GradientTexture2D.new()
-	texture.gradient = gradient
-	texture.width = size
-	texture.height = size
-	texture.fill = GradientTexture2D.FILL_RADIAL
-	texture.fill_from = Vector2(0.5, 0.5)
-	texture.fill_to = Vector2(0.5, 0.0)
-	return texture
+	return FxKit.radial(size, [0.0, 0.5, 1.0], [Color.WHITE, Color(1.0, 1.0, 1.0, 0.5), Color(1.0, 1.0, 1.0, 0.0)])

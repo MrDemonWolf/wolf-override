@@ -465,6 +465,9 @@ var wolf_reaction_tween: Tween
 var relay_spark_tween: Tween
 var records_room: RecordsRoom
 var junction_room: JunctionRoom
+## The shared light, shadow and particle textures every room builds from, open while Main is in the
+## tree.
+var fx_kit: FxKit = FxKit.new()
 ## The Service Junction's coolant line; transient, reset by every scene sync.
 var pressure_line: PressureLine = PressureLine.new()
 ## True while WOLF runs ahead to read the junction's LINE gauge on entry, and how long he has stood
@@ -657,6 +660,16 @@ class EdgeFader:
 	func _process(_delta: float) -> void:
 		if not labels.is_empty() and labels[0].is_visible_in_tree():
 			JunctionRoom.fade_at_view_edge(labels, get_viewport())
+
+
+## The FxKit opens first, so the corridor's RoomDepth (in the scene) builds from its cache in its own
+## _ready, before this one's; it closes, letting go of what it holds, when Main leaves.
+func _enter_tree() -> void:
+	FxKit.open(fx_kit)
+
+
+func _exit_tree() -> void:
+	FxKit.close(fx_kit)
 
 
 func _ready() -> void:
@@ -954,23 +967,10 @@ func _on_reduced_motion_changed(on: bool) -> void:
 ## One-shot particle presets parked at the places that already answer the player: the relay
 ## contact, the seal's landing, the containment gate and the Records exit arc.
 func _setup_particles() -> void:
-	relay_sparks = FxPresets.sparks()
-	relay_sparks.position = Vector2(601.0, 390.0)
-	door_dust = FxPresets.dust_burst()
-	door_dust.position = Vector2(780.0, 436.0)
-	door_dust.emission_shape = CPUParticles2D.EMISSION_SHAPE_RECTANGLE
-	door_dust.emission_rect_extents = Vector2(30.0, 3.0)
-	gate_dust = FxPresets.dust_burst()
-	gate_dust.position = Vector2(115.0, 438.0)
-	gate_dust.emission_shape = CPUParticles2D.EMISSION_SHAPE_RECTANGLE
-	gate_dust.emission_rect_extents = Vector2(70.0, 3.0)
-	for particles: CPUParticles2D in [relay_sparks, door_dust, gate_dust]:
-		particles.z_index = 3
-		add_child(particles)
-	exit_sparks = FxPresets.sparks(Palette.EXIT_GREEN)
-	exit_sparks.position = Vector2(830.0, 330.0)
-	exit_sparks.z_index = 3
-	records_room.add_child(exit_sparks)
+	relay_sparks = FxPresets.place(FxPresets.sparks(), self, "", Vector2(601.0, 390.0), 3)
+	door_dust = FxPresets.place(FxPresets.dust_burst(), self, "", Vector2(780.0, 436.0), 3, Vector2(30.0, 3.0))
+	gate_dust = FxPresets.place(FxPresets.dust_burst(), self, "", Vector2(115.0, 438.0), 3, Vector2(70.0, 3.0))
+	exit_sparks = FxPresets.place(FxPresets.sparks(Palette.EXIT_GREEN), records_room, "", Vector2(830.0, 330.0), 3)
 
 
 ## A small additive glow riding on a station status light; it takes the light's colour each refresh.
