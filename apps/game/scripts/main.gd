@@ -652,6 +652,9 @@ var story_wrap_key: String = ""
 var opening_lines_held: bool = false
 ## The opening lines' boxes after control (the trust line's two, then WOLF and the engineer).
 var opening_lines: Array[String] = []
+## The speaker column's width and the text size and name it was measured for (_speaker_column_width).
+var speaker_column: float = 0.0
+var speaker_column_key: String = ""
 
 const WOLF_SPRITE_REST: Vector2 = Vector2(0.0, -15.0)
 ## WOLF's painted feet sit this far below his sprite's centre, in the art's own pixels (its opaque
@@ -4187,13 +4190,18 @@ func _dialogue_column_width() -> float:
 	return minf(wanted, 960.0 - HUD_SIDE_MARGIN * 2.0 - DIALOGUE_PADDING.x * 2.0)
 
 
-## The speaker column's width: the widest name it shows, at the current text size.
+## The speaker column's width: the widest name it shows, at the current text size (measured once per
+## size and engineer name; the HUD is laid out every frame).
 func _speaker_column_width() -> float:
-	var font: Font = speaker.get_theme_font(&"font")
-	var widest: float = 0.0
-	for tag: String in _speaker_tags():
-		widest = maxf(widest, font.get_string_size(tag, HORIZONTAL_ALIGNMENT_LEFT, -1.0, TextSize.px(SPEAKER_FONT_SIZE)).x)
-	return ceilf(widest)
+	var key: String = "%s|%s" % [TextSize.factor, _first_name()]
+	if key != speaker_column_key:
+		speaker_column_key = key
+		var font: Font = speaker.get_theme_font(&"font")
+		var widest: float = 0.0
+		for tag: String in _speaker_tags():
+			widest = maxf(widest, font.get_string_size(tag, HORIZONTAL_ALIGNMENT_LEFT, -1.0, TextSize.px(SPEAKER_FONT_SIZE)).x)
+		speaker_column = ceilf(widest)
+	return speaker_column
 
 
 ## The width the words on screen wrap at in [param column]: no row longer than
