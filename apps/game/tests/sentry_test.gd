@@ -21,6 +21,21 @@ var _wolf_pixel_cache: Dictionary = {}
 var lane_frames: int = 0
 var lane_beam_frames: int = 0
 var lane_faults: Array[String] = []
+## Emits once a frame after the game's _process (DrawnFrames), so what it shows is what is drawn.
+var drawn_frames: DrawnFrames = null
+
+
+## Processes after every other node (the game included), so whatever listens to [signal drawn] sees
+## each frame as it is drawn. (process_frame comes before the frame's _process, and headless frames
+## outnumber physics steps, so it would see a physics step's move before the game answers it.)
+class DrawnFrames extends Node:
+	signal drawn
+
+	func _init() -> void:
+		process_priority = 1000
+
+	func _process(_delta: float) -> void:
+		drawn.emit()
 
 
 func _initialize() -> void:
@@ -429,7 +444,9 @@ func _check_scene() -> void:
 	game.call("_finish_intro")
 	# P0-16: every frame of the routes below is checked as drawn (_watch_lane).
 	var watch: Callable = _watch_lane.bind(game)
-	process_frame.connect(watch)
+	drawn_frames = DrawnFrames.new()
+	root.add_child(drawn_frames)
+	drawn_frames.drawn.connect(watch)
 	# Route 1: the relay risk was disclosed, so WOLF chooses to draw the sentry onto the mark.
 	var b_dict: Dictionary = await _start_at_b(game, State.DISCLOSE)
 	_expect(brain.state == &"patrol" and brain.x > SentryBrain.PATROL_MAX_X - 60.0 and brain.facing < 0.0 and arm.state == &"hung" and room.tank.position.y == JunctionRoom.TANK_REST_Y and not room.mark_lit(), "autosave B: the sentry patrols from the far end under a hung tank, outside the brackets")
@@ -725,7 +742,9 @@ func _check_scene() -> void:
 	await _check_engineer_alone(game, path)
 	await _check_cloud(game, path)
 	await _check_chased_cards(game, path)
-	process_frame.disconnect(watch)
+	await _check_walk_into(game)
+	drawn_frames.drawn.disconnect(watch)
+	drawn_frames.queue_free()
 	print("Lane watch: %d junction frames, %d with a beam" % [lane_frames, lane_beam_frames])
 	_expect(lane_frames > 3000 and lane_beam_frames > 500 and lane_faults.is_empty(), "on all %d junction frames of these routes (%d with a beam), the sentry never overlaps the standing or lying engineer, its beam never runs past the bolt panel or the tank, and the bolt feed never crosses the tank (%d faults: %s)" % [lane_frames, lane_beam_frames, lane_faults.size(), ", ".join(lane_faults.slice(0, 6))])
 	# A crafted v4 save with the sentry down but the door still sealed is rejected.
@@ -994,6 +1013,55 @@ func _check_chased_cards(game: Node2D, path: String) -> void:
 	_expect(await _wait_until(func() -> bool: return not game.get("fail_active"), 240), "the knockdown in the lane hands back")
 
 
+## The sentry is solid: an engineer who walks into it stops where the drawn bodies touch
+## (SentryBrain.CONTACT_RANGE), into the back of a patrolling sentry and into the front of one locking
+## on, and the chase that follows knocks them down at that range. Checked on every frame as drawn
+## (DrawnFrames).
+func _check_walk_into(game: Node2D) -> void:
+	var human: M0Actor = game.get_node("Human") as M0Actor
+	var brain: SentryBrain = game.get("sentry_brain") as SentryBrain
+	await _start_at_b(game, State.PRESS)
+	game.set("lane_choice", "alone")
+	# Its back: patrolling up the lane, away from the engineer, who walks faster than it.
+	_expect(await _wait_until(func() -> bool: return brain.state == &"patrol" and brain.facing > 0.0 and brain.x >= 690.0 and brain.x <= 720.0, 600), "the sentry patrols up the lane, its back to the alcove")
+	human.position.x = brain.x - SentryBrain.CONTACT_RANGE - 12.0
+	human.body_sprite.flip_h = false
+	var closest: float = await _closest_walking_in(game, &"move_right", 40, &"patrol")
+	_expect(closest >= SentryBrain.CONTACT_RANGE - 0.01 and closest <= SentryBrain.CONTACT_RANGE + 1.0, "walking into its back, the engineer stops where the bodies touch, never inside it (closest %.2f px, contact %.1f)" % [closest, SentryBrain.CONTACT_RANGE])
+	game.call("_load_game")
+	game.set("lane_choice", "alone")
+	# Its front: seen out in the lane, the engineer walks on into it through the lock-on beat.
+	_expect(await _wait_until(func() -> bool: return brain.state == &"patrol" and brain.facing < 0.0 and brain.x <= 780.0 and brain.x >= 720.0, 600), "the sentry comes back down the lane")
+	human.position.x = maxf(640.0, brain.x - 90.0)
+	human.body_sprite.flip_h = false
+	_expect(await _wait_until(func() -> bool: return brain.state == &"lock", 5), "it sees the engineer in the lane and locks on")
+	closest = await _closest_walking_in(game, &"move_right", int(SentryBrain.LOCK_SECONDS * 60.0) + 30, &"lock")
+	_expect(closest >= SentryBrain.CONTACT_RANGE - 0.01 and closest <= SentryBrain.CONTACT_RANGE + 1.0, "walking into its front while it locks on, the engineer stops where the bodies touch (closest %.2f px)" % closest)
+	_expect(await _wait_until(func() -> bool: return game.get("fail_active"), 120), "the chase that follows runs them down")
+	_expect(absf(human.position.x - brain.x) >= SentryBrain.CONTACT_RANGE - 0.01, "it knocks them down at contact range (%.1f px)" % absf(human.position.x - brain.x))
+	_expect(await _wait_until(func() -> bool: return not game.get("fail_active"), 240), "that knockdown hands back")
+
+
+## Holds [param action] for [param frames] physics steps, or until the sentry leaves [param while_state]
+## or a knockdown starts, and returns the closest the engineer came to it on any drawn frame of that
+## time while it was solid (the frame it left that state included).
+func _closest_walking_in(game: Node2D, action: StringName, frames: int, while_state: StringName) -> float:
+	var human: M0Actor = game.get_node("Human") as M0Actor
+	var brain: SentryBrain = game.get("sentry_brain") as SentryBrain
+	var closest: float = INF
+	var until: int = Engine.get_physics_frames() + frames
+	Input.action_press(action)
+	while Engine.get_physics_frames() < until:
+		await drawn_frames.drawn
+		if brain.is_solid() and not game.get("fail_active"):
+			closest = minf(closest, absf(human.position.x - brain.x))
+		if game.get("fail_active") or brain.state != while_state:
+			break
+	Input.action_release(action)
+	print("Walking into the sentry (%s): closest %.2f px, contact %.1f, then %s" % [while_state, closest, SentryBrain.CONTACT_RANGE, brain.state])
+	return closest
+
+
 ## Round 3c item 2: with the tank down on the sentry and WOLF at the rubble, he holds there until the
 ## empty arm has winched up, then bounds over the crushed tank to his spot by the hatch. On every frame
 ## of that crossing his painted body stays TANK_CLEARANCE px clear of the tank's, the wreck's and the
@@ -1173,8 +1241,8 @@ func _expect_lying(game: Node2D, fall: float, label: String) -> bool:
 	return ok
 
 
-## P0-16 and SPACE-8, on one frame as it was drawn (connected to process_frame, so it sees the frame
-## the game finished last): in the junction, (1) the live sentry's drawn body and the engineer's (standing
+## P0-16 and SPACE-8, on one frame as it was drawn (connected to DrawnFrames, so it sees the frame
+## after the game's _process): in the junction, (1) the live sentry's drawn body and the engineer's (standing
 ## at M0Actor.HUMAN_REACH, or lying as painted) do not overlap; (2) a lit beam ends on or before the
 ## near face of the exit bolt's panel and of the tank at the beam's height when they stand ahead of its
 ## lens, and never further than SIGHT_RANGE; (3) the bolt feed's boxes, conduits and glands do not
