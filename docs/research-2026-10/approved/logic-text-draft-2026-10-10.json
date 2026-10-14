@@ -1753,7 +1753,7 @@
       "id": "RUBBLE_LINE_R2",
       "problem": 13,
       "where": "apps/game/scripts/main.gd RUBBLE_LINE",
-      "trigger": "The door blows (autosave B), while WOLF is still walking up from the entrance.",
+      "trigger": "The door blows (autosave B), while WOLF is still by the entrance.",
       "speaker": "NARRATION",
       "current": "The door goes. WOLF stops at the rubble and waits for {name}'s call. In the lane beyond, something whirs awake.",
       "proposed": "The door goes. WOLF falls back\nto wait for {name}'s call.\n\nPast the doorway, something whirs awake.",
