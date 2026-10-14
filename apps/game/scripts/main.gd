@@ -176,7 +176,7 @@ const RECAP_MIRROR_WOLF: String = "MIRROR  WOLF read the timestamp off his own r
 const RECAP_MIRROR_MANUAL: String = "MIRROR  {name} copied the timestamp through the maintenance port."
 const RECAP_LANE_WOLF: String = "SENTRY  WOLF drew the sentry onto the mark."
 const RECAP_LANE_REFUSED: String = "SENTRY  WOLF wouldn't draw it, so {name} timed the drop alone."
-const RECAP_LANE_ALONE: String = "SENTRY  WOLF held at the rubble while {name} timed the drop."
+const RECAP_LANE_ALONE: String = "SENTRY  WOLF held back while {name} timed the drop."
 ## After a miss with WOLF already past the sentry: he broke off where he was, by the exit hatch (the
 ## row names no place, like his "I'm out.").
 const RECAP_LANE_BROKE_OFF: String = "SENTRY  WOLF broke off while {name} timed the drop."
@@ -189,25 +189,27 @@ const CONTINUE_TEXT: String = "CONTINUE"
 const FINISHED_NOTE: String = "Slice complete. PLAY AGAIN starts a fresh run."
 ## Only a hand-made save can reopen the cleared junction; it says where the line goes, not that it is unbuilt.
 const JUNCTION_CLEARED_LINE: String = "The service line runs on toward Archive."
-## Said as the door goes, while WOLF is still on his way up from the entrance: it says where he is
-## going, so it holds on every frame of his walk and after he arrives. Then, as its own box, the
-## sentry past the doorway (P0-7, approved 2026-10-13: the lane is not drawn; the doorway is).
-const RUBBLE_LINE: String = "The door goes. WOLF heads for the rubble\nto wait for %s's call."
+## Said as the door goes, while WOLF is still by the entrance: it says he holds back, not where, so
+## it holds on every frame, by the entrance and at his spot by the valve short of the rubble (Draft A,
+## approved 2026-10-14). Then, as its own box, the sentry past the doorway (P0-7, approved
+## 2026-10-13: the lane is not drawn; the doorway is).
+const RUBBLE_LINE: String = "The door goes. WOLF falls back\nto wait for %s's call."
 const RUBBLE_WAKE_LINE: String = "Past the doorway, something whirs awake."
 const BAIT_YES_LINE: String = "WOLF: You told me the truth at the relay. I'll draw it onto the mark and keep clear of the tank. Drop it when it stops."
-## What WOLF says as he breaks off after a miss, in his own box after the miss line's two: he holds at
-## the rubble if he had not got past the sentry yet; if he had, he stays by the exit hatch, since he
-## never crosses back under the tank (_wolf_target_x), and says only that he is out (where he is shows
-## on screen).
-const BROKE_OFF_RUBBLE_LINE: String = "WOLF: I'm out. I'll hold at the rubble."
+## What WOLF says as he breaks off after a miss, in his own box after the miss line's two: he holds
+## back at his spot by the valve if he had not got past the sentry yet (Draft A, approved 2026-10-14);
+## if he had, he stays by the exit hatch, since he never crosses back under the tank (_wolf_target_x),
+## and says only that he is out (where he is shows on screen).
+const BROKE_OFF_RUBBLE_LINE: String = "WOLF: I'm out. I'll hold back."
 const BROKE_OFF_HATCH_LINE: String = "WOLF: I'm out."
 ## A missed drop, in two boxes (P0-7 and P0-19, approved 2026-10-13: no split line is drawn, and the
 ## release is the panel's one name).
 const TANK_MISS_LINE: String = "The tank hits the empty mark\nand sprays coolant."
 const TANK_MISS_TURN_LINE: String = "The sentry swings toward the release;\nget back over the rubble."
 const BAIT_NO_LINE: String = "WOLF: At the relay you'd have sent me in blind. I won't walk into its sights. Time the drop from the release; it crosses the mark on every pass."
-## WOLF's answer when the engineer will time the drop alone, in two boxes of his.
-const ALONE_LINES: Array[String] = ["WOLF: I'll hold at the rubble.\nIt crosses the mark on every pass.", "WOLF: The tank takes a moment to fall."]
+## WOLF's answer when the engineer will time the drop alone, in two boxes of his (the first box's
+## "I'll hold back." is Draft A, approved 2026-10-14: he waits by the valve, short of the rubble).
+const ALONE_LINES: Array[String] = ["WOLF: I'll hold back.\nIt crosses the mark on every pass.", "WOLF: The tank takes a moment to fall."]
 ## A hit on the mark, and one that catches the sentry more than OFF_CENTRE_HIT off it (the tank lands on
 ## the mark and pins the machine where it stands, so the wreck shows to one side under it).
 const TANK_HIT_LINE: String = "The tank comes down square and crushes the sentry flat. Its eyes go dark.\nWOLF: It's down. The bolt by the hatch is next."
@@ -2737,8 +2739,8 @@ func _bait_holding() -> bool:
 
 
 ## True while the release has to wait for WOLF: he is drawing the sentry and has not got it stopped on
-## the mark yet. Once it is after the engineer he has backed off to the rubble, so the release works
-## as it does on the patrol.
+## the mark yet. Once it is after the engineer he has backed off to his spot by the valve, so the
+## release works as it does on the patrol.
 func _drop_waits_for_wolf() -> bool:
 	return wolf_baiting and not _sentry_hunting() and not _bait_holding()
 
@@ -3048,7 +3050,7 @@ func _lane_sound() -> void:
 
 
 func _sentry_changed(before: StringName) -> void:
-	# Locking on sends a drawing WOLF back to the rubble until the chase ends.
+	# Locking on sends a drawing WOLF back to his spot by the valve until the chase ends.
 	wolf.autonomous_target_x = _wolf_target_x()
 	if sentry_brain.state == &"lock":
 		_sentry_alarm()
@@ -3121,7 +3123,7 @@ func _choose_lane(response: int) -> void:
 		sfx_bank.play(&"growl_refusal", -3.5)
 	else:
 		lane_choice = "alone"
-		# He settles to hold at the rubble: a quieter whir than an answer he leans into.
+		# He settles to hold back by the valve: a quieter whir than an answer he leans into.
 		sfx_bank.play(&"actuator", -12.0, 0.85)
 		_say(ALONE_LINES)
 	_update_controls()
@@ -3136,7 +3138,7 @@ func _tank_hit() -> void:
 	if not state.drop_sentry():
 		return
 	# For the end card, saved with autosave C: WOLF drew it only if he still was when it fell; after
-	# breaking off he held at the rubble while the engineer timed it.
+	# breaking off short of the sentry he held back by the valve while the engineer timed it.
 	state.lane_recap = "wolf" if wolf_baiting else ("broke_off" if wolf_holding_far_end else ("refused" if lane_choice == "refused" else "alone"))
 	wolf_baiting = false
 	junction_room.sentry_down = true
@@ -3758,9 +3760,10 @@ func _update_controls() -> void:
 
 ## Where WOLF goes on his own, or -1 to follow: the relay contact (held until the seal lands), off
 ## the relay while the engineer works the bypass (_wolf_off_relay), the Records mirror, the junction
-## valve on entry, clear of the vent and the blast while the line is live, the rubble line once the
-## door is down (he will not cross it unless he chooses to draw the sentry onto the mark, from the
-## far end of its lane), by the exit hatch once it is down, and out through the hatch at the end.
+## valve on entry, clear of the vent and the blast while the line is live, back by the valve, short
+## of the rubble line, once the door is down (he will not cross it unless he chooses to draw the
+## sentry onto the mark, from the far end of its lane), by the exit hatch once it is down, and out
+## through the hatch at the end.
 func _wolf_target_x() -> float:
 	if hatch_exit_walking:
 		# He goes through the hatch first, from his spot in its doorway.
@@ -3793,8 +3796,8 @@ func _wolf_target_x() -> float:
 				# He draws the sentry only by his own choice, from the far end of its lane; otherwise he will
 				# not cross the rubble. Once past it he never crosses back under the tank: while it is locked
 				# on to the engineer or chasing them, or after he breaks off there, he keeps to his spot by
-				# the hatch. Should it turn on the engineer before he is past it, he backs off to the rubble
-				# rather than bound over it.
+				# the hatch. Should it turn on the engineer before he is past it, he backs off to his spot by
+				# the valve rather than bound over it.
 				if wolf_holding_far_end:
 					return JunctionRoom.WOLF_BAIT_X
 				if wolf_baiting and (not _sentry_hunting() or wolf.position.x > sentry_brain.x):

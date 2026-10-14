@@ -1,6 +1,7 @@
 extends SceneTree
 ## The wording Nathanial approved on 2026-10-13 (docs/research-2026-10/how-it-should-play/
-## drafts-2026-10-13.md, items 1 and 3-7) as the game shows it: every changed line, the trust line as
+## drafts-2026-10-13.md, items 1 and 3-7), with the four lines where WOLF holds back that he chose on
+## 2026-10-14 (drafts-wolf-space-2026-10-14.md, Draft A), as the game shows it: every changed line, the trust line as
 ## two boxes in order, the junction's goal-only entry and its hint ladder (timers and order), every
 ## refused press in the junction answered with a sound, a lamp flicker and a line within 6 frames (and
 ## again, with a blink of the box, when pressed again), the sealed door's own USE answer and its bump,
@@ -36,6 +37,11 @@ const CUT_LINES: Array[String] = [
 	"SPENT",
 	"BOLTED",
 	"\"LANE  ",
+	# Replaced on 2026-10-14 (Draft A): WOLF waits by the valve, short of the rubble, so no line puts
+	# him at it.
+	"heads for the rubble",
+	"hold at the rubble",
+	"held at the rubble",
 ]
 
 var failures: int = 0
@@ -124,10 +130,12 @@ func _check_constants() -> void:
 	_expect(c["JUNCTION_ENTRY_LINE"] == "%s: That door is our way through." and c["JUNCTION_GOAL_HINT"] == "Get through the sealed door." and c["WOLF_DOOR_WARNING"] == "WOLF: When the door goes, don't be standing in front of it.", "item 7: the junction entry says the goal only, then WOLF warns about the door")
 	_expect(c["LADDER_BREAKER_LINE"] == "%s: The breaker by the entrance\nfeeds that line." and c["LADDER_CHAIN_LINE"] == "%s: Overload it, crank the valve,\nand the door goes.", "item 7: the ladder's lines are the approved chain, split")
 	_expect(c["JUNCTION_RESTORE_A_LINE"] == "Service junction restored. Arm the breaker by the entrance, then crank the valve.\nWOLF: When the door goes, don't be standing in front of it.", "item 7: Continue keeps the restore-A line")
-	_expect(c["RUBBLE_LINE"] == "The door goes. WOLF heads for the rubble\nto wait for %s's call." and c["RUBBLE_WAKE_LINE"] == "Past the doorway, something whirs awake.", "item 3 S6: the door going, then the sentry past the doorway")
+	_expect(c["RUBBLE_LINE"] == "The door goes. WOLF falls back\nto wait for %s's call." and c["RUBBLE_WAKE_LINE"] == "Past the doorway, something whirs awake.", "item 3 S6 with Draft A (2026-10-14): the door going, WOLF falling back, then the sentry past the doorway")
 	_expect(c["TANK_MISS_LINE"] == "The tank hits the empty mark\nand sprays coolant." and c["TANK_MISS_TURN_LINE"] == "The sentry swings toward the release;\nget back over the rubble.", "items 3 S15 and 6 N18: the miss in two boxes, with no split line")
 	_expect(c["BAIT_NO_LINE"] == "WOLF: At the relay you'd have sent me in blind. I won't walk into its sights. Time the drop from the release; it crosses the mark on every pass.", "item 3 S14: WOLF says release, not panel")
-	_expect(c["ALONE_LINES"] == ["WOLF: I'll hold at the rubble.\nIt crosses the mark on every pass.", "WOLF: The tank takes a moment to fall."], "item 3 S13: WOLF's two boxes when the engineer times it alone")
+	_expect(c["ALONE_LINES"] == ["WOLF: I'll hold back.\nIt crosses the mark on every pass.", "WOLF: The tank takes a moment to fall."], "item 3 S13 with Draft A (2026-10-14): WOLF's two boxes when the engineer times it alone")
+	_expect(c["BROKE_OFF_RUBBLE_LINE"] == "WOLF: I'm out. I'll hold back." and c["BROKE_OFF_HATCH_LINE"] == "WOLF: I'm out.", "Draft A (2026-10-14): WOLF breaking off short of the sentry holds back; past it he is only out")
+	_expect(c["RECAP_LANE_ALONE"] == "SENTRY  WOLF held back while {name} timed the drop.", "Draft A (2026-10-14): the end card's row when the engineer timed it alone")
 	_expect(c["SENTRY_LOCK_LINE"] == "The sentry stops and its eyes snap red.\nIt has %s; get back over the rubble." and c["SENTRY_LOST_LINE"] == "The sentry loses %s behind the rubble\nand rolls back to its patrol.", "item 3 S7 and S8: the same words on two rows")
 	_expect(JunctionRoom.SENTRY_REASON == "The sentry saw %s out in the open.\nStay close to the TANK RELEASE." and JunctionRoom.SENTRY_CHASED_REASON == "The sentry ran %s down. Once its\neyes go red, only the rubble is safe.", "item 3 S3 and S4: the sentry's knockdown cards")
 	for key: String in ["RECAP_LANE_WOLF", "RECAP_LANE_REFUSED", "RECAP_LANE_ALONE", "RECAP_LANE_BROKE_OFF", "RECAP_LANE_UNKNOWN"]:
@@ -149,7 +157,7 @@ func _check_constants() -> void:
 		_expect(c[key] == refusals[key], "item 5: %s reads as approved" % key)
 	# Line rules: at most 42 characters a row (with the longest preset name) and 2 rows a box.
 	var boxes: Array[String] = []
-	for key: String in ["TRUST_LINE_1", "TRUST_LINE_2", "RUBBLE_LINE", "RUBBLE_WAKE_LINE", "TANK_MISS_LINE", "TANK_MISS_TURN_LINE", "SENTRY_LOCK_LINE", "SENTRY_LOST_LINE", "LADDER_BREAKER_LINE", "LADDER_CHAIN_LINE", "JUNCTION_ENTRY_LINE"]:
+	for key: String in ["TRUST_LINE_1", "TRUST_LINE_2", "RUBBLE_LINE", "RUBBLE_WAKE_LINE", "BROKE_OFF_RUBBLE_LINE", "TANK_MISS_LINE", "TANK_MISS_TURN_LINE", "SENTRY_LOCK_LINE", "SENTRY_LOST_LINE", "LADDER_BREAKER_LINE", "LADDER_CHAIN_LINE", "JUNCTION_ENTRY_LINE"]:
 		boxes.append(str(c[key]))
 	boxes.append_array(c["ALONE_LINES"] as Array)
 	boxes.append_array(refusals.values())

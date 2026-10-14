@@ -698,7 +698,7 @@ func _check_scene() -> void:
 	_expect(await _wait_until(func() -> bool: return brain.state == &"fixated", 120), "WOLF is drawing the sentry")
 	game.call("_tank_miss")
 	_expect(not game.get("wolf_baiting") and game.get("wolf_broke_off") and wolf.autonomous_target_x == JunctionRoom.WOLF_RUBBLE_X and brain.state == &"lock", "after a miss WOLF breaks off to the rubble and the sentry turns, locking on first")
-	_expect(str(game.get("status_line")) == "The tank hits the empty mark\nand sprays coolant." and (game.get("box_queue") as Array) == ["The sentry swings toward the release;\nget back over the rubble.", "WOLF: I'm out. I'll hold at the rubble."] and not game.get("wolf_holding_far_end"), "not yet past the sentry, WOLF says in his own box after the miss that he is breaking off to the rubble")
+	_expect(str(game.get("status_line")) == "The tank hits the empty mark\nand sprays coolant." and (game.get("box_queue") as Array) == ["The sentry swings toward the release;\nget back over the rubble.", "WOLF: I'm out. I'll hold back."] and not game.get("wolf_holding_far_end"), "not yet past the sentry, WOLF says in his own box after the miss that he is breaking off to the rubble")
 	human.position.x = 500.0
 	var miss_boxes: Array[String] = [str(game.get("status_line"))]
 	var log_box: Callable = func() -> void:
@@ -714,9 +714,9 @@ func _check_scene() -> void:
 	# be stale); the sentry giving up cuts in, and WOLF breaking off still follows once that line is read.
 	await _wait_until(func() -> bool:
 		log_box.call()
-		return miss_boxes.back() == "WOLF: I'm out. I'll hold at the rubble.", 1200)
+		return miss_boxes.back() == "WOLF: I'm out. I'll hold back.", 1200)
 	var lost_at: int = miss_boxes.find("The sentry loses Rowan behind the rubble\nand rolls back to its patrol.")
-	_expect(not miss_boxes.has("The sentry swings toward the release;\nget back over the rubble.") and lost_at > 0 and miss_boxes.find("WOLF: I'm out. I'll hold at the rubble.") > lost_at, "retreating over the rubble before the sentry swings drops the order to do so and still shows WOLF breaking off, after the sentry gives up (seen %s)" % str(miss_boxes).c_escape())
+	_expect(not miss_boxes.has("The sentry swings toward the release;\nget back over the rubble.") and lost_at > 0 and miss_boxes.find("WOLF: I'm out. I'll hold back.") > lost_at, "retreating over the rubble before the sentry swings drops the order to do so and still shows WOLF breaking off, after the sentry gives up (seen %s)" % str(miss_boxes).c_escape())
 	# Round 3b: a miss with WOLF already past the sentry, by the hatch. He breaks off where he is, since
 	# he never crosses back under the tank; the sentry's patrol then turns short of him and its beam
 	# stops at him; and the END OF SLICE recap says he broke off.
@@ -821,7 +821,7 @@ func _check_engineer_alone(game: Node2D, path: String) -> void:
 	_expect(await _wait_until(func() -> bool: return Engine.time_scale == 1.0 and (game.get_node("IntroCamera") as Camera2D).offset == Vector2.ZERO, 90), "time scale and camera are at rest after the restore")
 	_expect(await _walk_until_choice(game), "the question comes up again after the restore")
 	await _tap(&"choice_2")
-	_expect(game.get("lane_choice") == "alone" and str(game.get("status_line")).contains("hold at the rubble"), "answer 2 leaves the drop to the engineer")
+	_expect(game.get("lane_choice") == "alone" and str(game.get("status_line")).contains("I'll hold back."), "answer 2 leaves the drop to the engineer")
 	_expect(await _cross_to_panel(game), "the engineer slips into the alcove behind the sentry")
 	for _frame: int in 240:
 		await physics_frame

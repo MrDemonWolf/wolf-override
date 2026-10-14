@@ -160,7 +160,7 @@ const DUCK_DEPTH: float = 9.0
 const DUCK_CLEAR: float = 34.0
 const DUCK_RAMP: float = 24.0
 const WOLF_HEAD_X: float = 45.0
-## Once the tank is down on the sentry, WOLF crossing from the rubble to his spot by the hatch bounds
+## Once the tank is down on the sentry, WOLF crossing from his spot by the valve to his spot by the hatch bounds
 ## clean over the crushed tank and the wreck under it in one arc (wolf_tank_leap_height): a parabola in
 ## x, so at his steady LEAP_SPEED_SCALE speed it is a fall under constant gravity, TANK_LEAP_HEIGHT at
 ## its top over TANK_LEAP_PEAK_X and back on the floor TANK_LEAP_HALF_SPAN either side. He is 134 px
@@ -170,7 +170,7 @@ const WOLF_HEAD_X: float = 45.0
 ## over them on the way up and lands just short of his spot. His painted feet (y 438) pass over the
 ## tank's top (y 331, on the crushed hull) and his back under the claw. The empty arm hangs too low over
 ## the tank for him to pass under it, so it winches up into its ceiling plate as the tank lands for good
-## (ARM_PARK_RISE over ARM_PARK_SECONDS), and he waits at the rubble until it is up. sentry_test measures
+## (ARM_PARK_RISE over ARM_PARK_SECONDS), and he waits by the valve until it is up. sentry_test measures
 ## his painted body against the tank's, the wreck's and the arm's images on every frame of the crossing
 ## and at every x (3 px clear).
 const TANK_LEAP_HEIGHT: float = 122.0
@@ -1303,8 +1303,8 @@ func door_blast() -> void:
 
 
 ## The sealed bulkhead until the blast, breaking for a moment, then blown open. All of it draws behind
-## the actors (Main.ACTOR_Z) and its front pillar over them, so WOLF holding at the rubble and anyone
-## walking through stay in the doorway.
+## the actors (Main.ACTOR_Z) and its front pillar over them, so WOLF holding back by the valve and
+## anyone walking through stay in view in front of it.
 func _show_door() -> void:
 	door_art.visible = not door_blown
 	door_breaking_art.visible = door_blown and door_breaking

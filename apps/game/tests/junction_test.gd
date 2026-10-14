@@ -390,7 +390,7 @@ func _check_scene() -> void:
 	for _frame: int in 30:
 		await physics_frame
 		knocked = knocked or game.get("fail_active")
-	_expect(not knocked and human.controlled and str(game.get("status_line")) == "The door goes. WOLF heads for the rubble\nto wait for %s's call." % state.human_name().get_slice(" ", 0), "clear of the zone the blast is not a knockdown, even at its edge, and the line says WOLF is heading for the rubble to wait for the engineer's call")
+	_expect(not knocked and human.controlled and str(game.get("status_line")) == "The door goes. WOLF falls back\nto wait for %s's call." % state.human_name().get_slice(" ", 0), "clear of the zone the blast is not a knockdown, even at its edge, and the line says WOLF falls back to wait for the engineer's call")
 	_expect(game.get("box_queue") == ["Past the doorway, something whirs awake."], "the sentry waking past the doorway is the next box")
 	_expect(await _wait_until(func() -> bool: return room.door_blown_art.visible and not room.door_breaking_art.visible, 30), "then it stands blown open on the passage beyond")
 	_expect(await _wait_until(func() -> bool: return not room.sentry.visual.dormant and room.sentry.visual.is_lit() and room.sentry.visual.body.modulate == Color.WHITE, 90), "the blast wakes the sentry: it powers up and its eye lights")

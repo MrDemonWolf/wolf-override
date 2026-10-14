@@ -1,5 +1,5 @@
 {
-  "status": "approved by Nathanial 2026-10-11 (all 123 lines, including the 9 added in round 2 and the 6 added in round 3); 2026-10-13: 24 lines reworded or split and 4 added through the October 13 wording drafts (items 1, 3, 4, 5, 6, 7), and 7 more given notes or superseded markers only; each reworded or split line keeps its earlier text in 'history'",
+  "status": "approved by Nathanial 2026-10-11 (all 123 lines, including the 9 added in round 2 and the 6 added in round 3); 2026-10-13: 24 lines reworded or split and 4 added through the October 13 wording drafts (items 1, 3, 4, 5, 6, 7), and 7 more given notes or superseded markers only; each reworded or split line keeps its earlier text in 'history'; 2026-10-14: 2 lines reworded and 2 added (the lines that put WOLF 'at the rubble', Draft A in the WOLF-space drafts), with their earlier text in 'history'",
   "date": "2026-10-10",
   "source": "Logic audit of 2026-10-10 (327 real-game screenshots, 24 problems) and Nathanial's decisions A-D. Every string here is a proposal; nothing ships until Nathanial approves it.",
   "placeholders": {
@@ -1039,7 +1039,7 @@
       "current": "The tank hits the floor and vents coolant. The sentry turns on the panel; get back over the rubble.",
       "proposed": "The tank hits the empty mark\nand sprays coolant.\n\nThe sentry swings toward the release;\nget back over the rubble.",
       "alternatives": [],
-      "notes": "Problem 22: a tank that 'vents coolant' and is then winched up intact; a split line explains both. 'turns on the panel' read as 'switches on'. When WOLF was baiting, the existing row '\\nWOLF: I'm out. I'll hold at the rubble.' still follows (measured with it: 3 rows untagged). Fit: 2 of 3 rows, untagged box (855 px text width, Roboto 17 px); alt 1: 2 of 3 rows, untagged box (855 px text width, Roboto 17 px). 2026-10-13: two boxes; WOLF's break-off line, when he was drawing the sentry, follows as a third box of his own.",
+      "notes": "Problem 22: a tank that 'vents coolant' and is then winched up intact; a split line explains both. 'turns on the panel' read as 'switches on'. When WOLF was baiting, the existing row '\\nWOLF: I'm out. I'll hold at the rubble.' still follows (measured with it: 3 rows untagged). Fit: 2 of 3 rows, untagged box (855 px text width, Roboto 17 px); alt 1: 2 of 3 rows, untagged box (855 px text width, Roboto 17 px). 2026-10-13: two boxes; WOLF's break-off line, when he was drawing the sentry, follows as a third box of his own. 2026-10-14: the break-off box short of the sentry now reads 'WOLF: I'm out. I'll hold back.' (BROKE_OFF_RUBBLE_A).",
       "status": "approved by Nathanial 2026-10-13 (item 3 (P0-7), S15, and item 6 (N18: 'from a split line' cut); through clickable choices after reading the drafts)",
       "history": [
         {
@@ -1553,20 +1553,25 @@
       "trigger": "Recap row, lane.",
       "speaker": "CARD",
       "current": null,
-      "proposed": "SENTRY  WOLF held at the rubble while {name} timed the drop.",
+      "proposed": "SENTRY  WOLF held back while {name} timed the drop.",
       "alternatives": [],
-      "notes": "Fit: 1 row, 456 px at Roboto 17 px (end card has no layout yet; kept under the 855 px dialogue width). 2026-10-13: the topic word is SENTRY, the thing on screen.",
-      "status": "approved by Nathanial 2026-10-13 (item 3 (P0-7), S20; through clickable choices after reading the drafts)",
+      "notes": "Fit: 1 row, 456 px at Roboto 17 px (end card has no layout yet; kept under the 855 px dialogue width). 2026-10-13: the topic word is SENTRY, the thing on screen. 2026-10-14: WOLF now waits on the floor beside the valve, short of the rubble (P0-4: the only floor on that side clear of the valve, the blown door frame and the engineer), so 'at the rubble' no longer matched the picture; Draft A says what he does without naming a place. Fit: 1 row, 57 characters with a 12-character name (an end card row, not a dialogue box; 9 shorter than before).",
+      "status": "approved by Nathanial 2026-10-14 (Draft A, \"holds back\", in the WOLF-space drafts; a clickable choice after reading them)",
       "history": [
         {
           "proposed": "LANE  WOLF held at the rubble while {name} timed the drop.",
           "alternatives": [],
           "status": "approved by Nathanial 2026-10-11 (as drafted)"
+        },
+        {
+          "proposed": "SENTRY  WOLF held at the rubble while {name} timed the drop.",
+          "alternatives": [],
+          "status": "approved by Nathanial 2026-10-13 (item 3 (P0-7), S20; through clickable choices after reading the drafts)"
         }
       ],
       "approved": {
-        "date": "2026-10-13",
-        "source": "docs/research-2026-10/how-it-should-play/drafts-2026-10-13.md, item 3 (P0-7), S20"
+        "date": "2026-10-14",
+        "source": "docs/research-2026-10/how-it-should-play/drafts-wolf-space-2026-10-14.md, Draft A (\"holds back\")"
       }
     },
     {
@@ -1751,24 +1756,33 @@
       "trigger": "The door blows (autosave B), while WOLF is still walking up from the entrance.",
       "speaker": "NARRATION",
       "current": "The door goes. WOLF stops at the rubble and waits for {name}'s call. In the lane beyond, something whirs awake.",
-      "proposed": "The door goes. WOLF heads for the rubble\nto wait for {name}'s call.\n\nPast the doorway, something whirs awake.",
+      "proposed": "The door goes. WOLF falls back\nto wait for {name}'s call.\n\nPast the doorway, something whirs awake.",
       "alternatives": [],
-      "notes": "Round 2 item 6: replaces RUBBLE_LINE's wording. The line shows the moment the door goes, when WOLF is still at the entrance about 1.5 s from the rubble, so 'stops at' was false until he arrived; 'heads for' is true through his walk and after it. Fit: 1 of 3 rows, untagged box (855 px text width, Roboto 17 px). 2026-10-13: two boxes; 'In the lane beyond' becomes 'Past the doorway' (the lane is not drawn).",
-      "status": "approved by Nathanial 2026-10-13 (item 3 (P0-7), S6; through clickable choices after reading the drafts)",
+      "notes": "Round 2 item 6: replaces RUBBLE_LINE's wording. The line shows the moment the door goes, when WOLF is still at the entrance about 1.5 s from the rubble, so 'stops at' was false until he arrived; 'heads for' is true through his walk and after it. Fit: 1 of 3 rows, untagged box (855 px text width, Roboto 17 px). 2026-10-13: two boxes; 'In the lane beyond' becomes 'Past the doorway' (the lane is not drawn). 2026-10-14: WOLF now waits on the floor beside the valve, short of the rubble (P0-4: the only floor on that side clear of the valve, the blown door frame and the engineer), so 'at the rubble' no longer matched the picture; Draft A says what he does without naming a place. Only the first box changes. Fit: 2 rows, widest 32 characters with a 12-character name.",
+      "status": "approved by Nathanial 2026-10-14 (Draft A, \"holds back\", in the WOLF-space drafts; a clickable choice after reading them)",
       "history": [
         {
           "proposed": "The door goes. WOLF heads for the rubble to wait for {name}'s call. In the lane beyond, something whirs awake.",
           "alternatives": [],
           "status": "approved by Nathanial 2026-10-11 (round 2, as drafted)"
+        },
+        {
+          "proposed": "The door goes. WOLF heads for the rubble\nto wait for {name}'s call.\n\nPast the doorway, something whirs awake.",
+          "alternatives": [],
+          "boxes": [
+            "The door goes. WOLF heads for the rubble\nto wait for {name}'s call.",
+            "Past the doorway, something whirs awake."
+          ],
+          "status": "approved by Nathanial 2026-10-13 (item 3 (P0-7), S6; through clickable choices after reading the drafts)"
         }
       ],
       "boxes": [
-        "The door goes. WOLF heads for the rubble\nto wait for {name}'s call.",
+        "The door goes. WOLF falls back\nto wait for {name}'s call.",
         "Past the doorway, something whirs awake."
       ],
       "approved": {
-        "date": "2026-10-13",
-        "source": "docs/research-2026-10/how-it-should-play/drafts-2026-10-13.md, item 3 (P0-7), S6"
+        "date": "2026-10-14",
+        "source": "docs/research-2026-10/how-it-should-play/drafts-wolf-space-2026-10-14.md, Draft A (\"holds back\")"
       }
     },
     {
@@ -1856,7 +1870,7 @@
       "current": "\\nWOLF: I'm out. I'll hold at the rubble.",
       "proposed": "WOLF: I'm out.",
       "alternatives": [],
-      "notes": "Round 3b (screenshot review: WOLF bounding over the sentry went through the hanging tank). He now only ever crosses the lane over the sentry at the far end of its patrol, right of the tank, and never crosses back under it, so after breaking off past it he stays by the exit hatch; 'hold at the rubble' would be false there. Same words otherwise; WOLF short and dry; no new fact (the hatch is on screen and named in 'The bolt by the hatch is next.'). Fit: 3 of 3 rows untagged with TANK_MISS above it (836 + 117 + 267 px of 855, Roboto 17 px). Nathanial's rewrite 2026-10-11: he held the drafted 'I'm out. I'll hold by the hatch.' and picked the place-free 'I'm out.' (you can see where WOLF is). 2026-10-13: same words, no longer appended to TANK_MISS: with the miss split into two boxes (item 3 S15) it shows in its own box after them, so the leading row break is gone (BROKE_OFF_HATCH_LINE).",
+      "notes": "Round 3b (screenshot review: WOLF bounding over the sentry went through the hanging tank). He now only ever crosses the lane over the sentry at the far end of its patrol, right of the tank, and never crosses back under it, so after breaking off past it he stays by the exit hatch; 'hold at the rubble' would be false there. Same words otherwise; WOLF short and dry; no new fact (the hatch is on screen and named in 'The bolt by the hatch is next.'). Fit: 3 of 3 rows untagged with TANK_MISS above it (836 + 117 + 267 px of 855, Roboto 17 px). Nathanial's rewrite 2026-10-11: he held the drafted 'I'm out. I'll hold by the hatch.' and picked the place-free 'I'm out.' (you can see where WOLF is). 2026-10-13: same words, no longer appended to TANK_MISS: with the miss split into two boxes (item 3 S15) it shows in its own box after them, so the leading row break is gone (BROKE_OFF_HATCH_LINE). 2026-10-14: the line for a miss before he is past the sentry is now 'WOLF: I'm out. I'll hold back.' (BROKE_OFF_RUBBLE_A).",
       "status": "approved by Nathanial 2026-10-11 (round 3, his rewrite); its own box from 2026-10-13 (the item 3 S15 split; words unchanged)",
       "history": [
         {
@@ -1971,6 +1985,61 @@
       "approved": {
         "date": "2026-10-13",
         "source": "docs/research-2026-10/how-it-should-play/drafts-2026-10-13.md, item 5 (P0-15), rows 1-7"
+      }
+    },
+    {
+      "id": "ALONE_LINES_A",
+      "problem": "P0-4",
+      "where": "apps/game/scripts/main.gd ALONE_LINES (said by _choose_lane)",
+      "trigger": "Answer 2 at the rubble line, \"Stay back, I'll time it.\": WOLF's two boxes as he holds back by the valve.",
+      "speaker": "WOLF",
+      "current": "WOLF: I'll hold at the rubble.\nIt crosses the mark on every pass.\n\nWOLF: The tank takes a moment to fall.",
+      "proposed": "WOLF: I'll hold back.\nIt crosses the mark on every pass.\n\nWOLF: The tank takes a moment to fall.",
+      "alternatives": [],
+      "boxes": [
+        "WOLF: I'll hold back.\nIt crosses the mark on every pass.",
+        "WOLF: The tank takes a moment to fall."
+      ],
+      "notes": "2026-10-14: WOLF now waits on the floor beside the valve, short of the rubble (P0-4: the only floor on that side clear of the valve, the blown door frame and the engineer), so 'at the rubble' no longer matched the picture; Draft A says what he does without naming a place. Only the first row of the first box changes; the second box is unchanged. Not in this file before: the line predates the 2026-10-10 audit and was split into two boxes on 2026-10-13. Fit: box 1 is 2 rows, widest 34 characters.",
+      "status": "approved by Nathanial 2026-10-14 (Draft A, \"holds back\", in the WOLF-space drafts; a clickable choice after reading them)",
+      "history": [
+        {
+          "proposed": "WOLF: I'll hold at the rubble.\nIt crosses the mark on every pass.\n\nWOLF: The tank takes a moment to fall.",
+          "alternatives": [],
+          "status": "approved by Nathanial 2026-10-13 (item 3 (P0-7), S13: the line in two boxes; through clickable choices after reading the drafts)"
+        },
+        {
+          "proposed": "WOLF: I'll hold at the rubble. It crosses the floor mark on every pass; the tank takes a moment to fall.",
+          "alternatives": [],
+          "status": "the game's line before the 2026-10-10 audit (not drafted in this file)"
+        }
+      ],
+      "approved": {
+        "date": "2026-10-14",
+        "source": "docs/research-2026-10/how-it-should-play/drafts-wolf-space-2026-10-14.md, Draft A (\"holds back\")"
+      }
+    },
+    {
+      "id": "BROKE_OFF_RUBBLE_A",
+      "problem": "P0-4",
+      "where": "apps/game/scripts/main.gd BROKE_OFF_RUBBLE_LINE (said by _tank_miss after the miss's boxes)",
+      "trigger": "A missed drop while WOLF is drawing the sentry and has not got past it yet: he breaks off and goes back to his spot by the valve. Past it, BROKE_OFF_HATCH_R3 ('WOLF: I'm out.') shows instead.",
+      "speaker": "WOLF",
+      "current": "WOLF: I'm out. I'll hold at the rubble.",
+      "proposed": "WOLF: I'm out. I'll hold back.",
+      "alternatives": [],
+      "notes": "2026-10-14: WOLF now waits on the floor beside the valve, short of the rubble (P0-4: the only floor on that side clear of the valve, the blown door frame and the engineer), so 'at the rubble' no longer matched the picture; Draft A says what he does without naming a place. Not in this file before: the row predates the 2026-10-10 audit (see TANK_MISS and BROKE_OFF_HATCH_R3); since 2026-10-13 it shows as its own box after the miss. Fit: 1 row, 30 characters.",
+      "status": "approved by Nathanial 2026-10-14 (Draft A, \"holds back\", in the WOLF-space drafts; a clickable choice after reading them)",
+      "history": [
+        {
+          "proposed": "WOLF: I'm out. I'll hold at the rubble.",
+          "alternatives": [],
+          "status": "the game's row before the 2026-10-10 audit (not drafted in this file); its own box from 2026-10-13 (the item 3 S15 split)"
+        }
+      ],
+      "approved": {
+        "date": "2026-10-14",
+        "source": "docs/research-2026-10/how-it-should-play/drafts-wolf-space-2026-10-14.md, Draft A (\"holds back\")"
       }
     }
   ],
