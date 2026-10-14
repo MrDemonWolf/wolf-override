@@ -1391,10 +1391,8 @@ func _ask_relay() -> void:
 func _new_game() -> void:
 	get_tree().paused = false
 	pause_overlay.hide()
-	if intro_tween != null and intro_tween.is_running():
-		intro_tween.kill()
-	if chapter_tween != null and chapter_tween.is_running():
-		chapter_tween.kill()
+	Tweens.kill(intro_tween)
+	Tweens.kill(chapter_tween)
 	_cancel_fail()
 	chapter_close_active = false
 	_hide_end_card()
@@ -1457,8 +1455,7 @@ func _new_game() -> void:
 func _advance_intro() -> void:
 	if intro_step >= INTRO_LINES.size():
 		return
-	if intro_tween != null and intro_tween.is_running():
-		intro_tween.kill()
+	Tweens.kill(intro_tween)
 	intro_fade.color.a = 0.0
 	intro_step += 1
 	if intro_step < INTRO_LINES.size():
@@ -1505,9 +1502,8 @@ func _advance_intro() -> void:
 func _finish_intro(keep_fade: bool = false) -> void:
 	intro_active = false
 	intro_step = 0
-	if not keep_fade and intro_tween != null and intro_tween.is_running():
-		intro_tween.kill()
 	if not keep_fade:
+		Tweens.kill(intro_tween)
 		intro_fade.color.a = 0.0
 	intro_alarm.color.a = 0.0
 	intro_gate.hide()
@@ -1719,16 +1715,14 @@ func _show_title_settings() -> void:
 ## The dimmed backdrop fades in when the overlay opens; the card slides in separately so Settings
 ## and the pause menu each arrive with the same short motion.
 func _fade_backdrop() -> void:
-	if backdrop_tween != null and backdrop_tween.is_running():
-		backdrop_tween.kill()
+	Tweens.kill(backdrop_tween)
 	pause_overlay.modulate.a = 0.0
 	backdrop_tween = pause_overlay.create_tween()
 	backdrop_tween.tween_property(pause_overlay, "modulate:a", 1.0, MENU_REVEAL_SECONDS)
 
 
 func _reveal_menu() -> void:
-	if menu_tween != null and menu_tween.is_running():
-		menu_tween.kill()
+	Tweens.kill(menu_tween)
 	var resting: Vector2 = menu_panel.position
 	menu_panel.position = resting + MENU_REVEAL_OFFSET
 	menu_panel.modulate.a = 0.0
@@ -1760,8 +1754,7 @@ func _return_to_title() -> void:
 	_resume_game()
 	if intro_active:
 		_finish_intro()
-	if chapter_tween != null and chapter_tween.is_running():
-		chapter_tween.kill()
+	Tweens.kill(chapter_tween)
 	_cancel_fail()
 	# The junction's loops and the bypass alarm never follow the player to the title.
 	_stop_junction_loops()
@@ -1937,14 +1930,12 @@ func _load_game() -> void:
 	title_open = false
 	title_screen.hide()
 	intro_active = false
-	if chapter_tween != null and chapter_tween.is_running():
-		chapter_tween.kill()
+	Tweens.kill(chapter_tween)
 	chapter_close_active = false
 	_hide_end_card()
 	checkpoint_toast_remaining = 0.0
 	tutorial_step = 2
-	if intro_tween != null and intro_tween.is_running():
-		intro_tween.kill()
+	Tweens.kill(intro_tween)
 	intro_gate.hide()
 	intro_director.hide()
 	intro_fade.color.a = 0.0
@@ -2302,8 +2293,7 @@ func _finish_chapter_close() -> void:
 	if hatch_exit_walking:
 		# Already on their way out; the card follows on its own.
 		return
-	if chapter_tween != null and chapter_tween.is_running():
-		chapter_tween.kill()
+	Tweens.kill(chapter_tween)
 	# CONTINUE on a closing shot sounds the same in both rooms, whether it hands control back (Records)
 	# or starts the walk out through the hatch (the junction).
 	sfx_bank.play(&"chirp", -10.0, 0.75)
@@ -2433,8 +2423,7 @@ func end_card_recap() -> Array[String]:
 
 
 func _show_end_card() -> void:
-	if chapter_tween != null and chapter_tween.is_running():
-		chapter_tween.kill()
+	Tweens.kill(chapter_tween)
 	chapter_close_active = false
 	hatch_exit_walking = false
 	hatch_exit_engineer_walking = false
@@ -2657,8 +2646,7 @@ func _refuse(line: String, station: StringName) -> void:
 
 ## The dialogue box dips and comes back once, so a line shown again reads as a new answer.
 func _blink_box() -> void:
-	if box_blink_tween != null and box_blink_tween.is_valid():
-		box_blink_tween.kill()
+	Tweens.kill(box_blink_tween)
 	bottom_bar.modulate.a = BOX_BLINK_ALPHA
 	box_blink_tween = create_tween()
 	box_blink_tween.tween_property(bottom_bar, "modulate:a", 1.0, BOX_BLINK_SECONDS)
@@ -2681,8 +2669,7 @@ func _door_bump() -> void:
 	sfx_bank.play(&"thud", DOOR_THUD_DB, DOOR_THUD_PITCH)
 	junction_room.flicker(&"door", 1)
 	if impact.motion_allowed():
-		if door_recoil_tween != null and door_recoil_tween.is_valid():
-			door_recoil_tween.kill()
+		Tweens.kill(door_recoil_tween)
 		human.body_sprite.position.x = HUMAN_SPRITE_REST.x - DOOR_RECOIL_PX
 		door_recoil_tween = create_tween()
 		door_recoil_tween.tween_property(human.body_sprite, "position:x", HUMAN_SPRITE_REST.x, DOOR_RECOIL_SECONDS).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
@@ -3233,8 +3220,7 @@ func _fade_servo() -> void:
 
 
 func _kill_servo_tween() -> void:
-	if servo_tween != null and servo_tween.is_valid():
-		servo_tween.kill()
+	Tweens.kill(servo_tween)
 	servo_tween = null
 
 
@@ -3511,15 +3497,13 @@ func _restore_beat(reason: String) -> void:
 
 ## Stops the engineer's give against the sealed door (a knockdown or a new scene takes the body over).
 func _cancel_door_recoil() -> void:
-	if door_recoil_tween != null and door_recoil_tween.is_valid():
-		door_recoil_tween.kill()
+	Tweens.kill(door_recoil_tween)
 	door_recoil_tween = null
 	human.body_sprite.position.x = HUMAN_SPRITE_REST.x
 
 
 func _cancel_fail_tween() -> void:
-	if fail_tween != null and fail_tween.is_valid():
-		fail_tween.kill()
+	Tweens.kill(fail_tween)
 	fail_tween = null
 
 
@@ -3580,10 +3564,8 @@ func _sync_scene() -> void:
 	engineer_waits_for_wolf = false
 	lane_question_held = false
 	sentry_wake_remaining = 0.0
-	if wolf_reaction_tween != null and wolf_reaction_tween.is_running():
-		wolf_reaction_tween.kill()
-	if relay_spark_tween != null and relay_spark_tween.is_running():
-		relay_spark_tween.kill()
+	Tweens.kill(wolf_reaction_tween)
+	Tweens.kill(relay_spark_tween)
 	wolf.body_sprite.position = WOLF_SPRITE_REST
 	wolf.body_sprite.rotation_degrees = 0.0
 	wolf.body_sprite.offset = Vector2.ZERO
@@ -3641,8 +3623,7 @@ func _sync_junction_room() -> void:
 
 
 func _react_as_wolf(accepting: bool) -> void:
-	if wolf_reaction_tween != null and wolf_reaction_tween.is_running():
-		wolf_reaction_tween.kill()
+	Tweens.kill(wolf_reaction_tween)
 	wolf.body_sprite.position = WOLF_SPRITE_REST
 	wolf.body_sprite.rotation_degrees = 0.0
 	var lean: Vector2 = Vector2(11.0, -24.0) if accepting else Vector2(-13.0, -13.0)
@@ -3660,8 +3641,7 @@ func _react_as_wolf(accepting: bool) -> void:
 ## The arc and spark burst as the seal's power goes through: on the relay's contact when WOLF takes it
 ## ([param from_wolf]), on the MANUAL BYPASS wheel when the engineer's crank locks over.
 func _flash_relay_spark(from_wolf: bool) -> void:
-	if relay_spark_tween != null and relay_spark_tween.is_running():
-		relay_spark_tween.kill()
+	Tweens.kill(relay_spark_tween)
 	if from_wolf:
 		# From WOLF's snout at the relay's left edge across its face.
 		relay_spark.points = PackedVector2Array([
@@ -3714,8 +3694,7 @@ func _sync_records_room(animate_exit: bool = false) -> void:
 ## beyond. Opening in play winds the curtain up into its hood (SealLeaf), and the doorway stays shut
 ## until it is up, with its thud and dust. Its front pillar shows either way.
 func _sync_door(animate: bool = false) -> void:
-	if door_tween != null and door_tween.is_running():
-		door_tween.kill()
+	Tweens.kill(door_tween)
 	var in_corridor: bool = state.chapter_id == "lockdown"
 	var sliding: bool = in_corridor and state.door_open and animate
 	seal_opening = sliding
@@ -4052,8 +4031,7 @@ static func _set_color(rect: ColorRect, color: Color) -> void:
 
 
 func _show_top_card(message: String, hold_seconds: float, accent: Color = TOP_CARD_ACCENT) -> void:
-	if top_card_tween != null and top_card_tween.is_running():
-		top_card_tween.kill()
+	Tweens.kill(top_card_tween)
 	hud.text = message
 	($CanvasLayer/TopBar/Accent as ColorRect).color = accent
 	top_card.modulate.a = 1.0

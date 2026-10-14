@@ -894,8 +894,7 @@ func _advance_flicker(delta: float) -> void:
 ## the door's seam lamp are nodes, set here.
 func _sync_flicker() -> void:
 	if flicker_station == &"door" and not door_blown and not (line_state in [&"charged", &"fuse"]):
-		if _seam_tween != null and _seam_tween.is_valid():
-			_seam_tween.kill()
+		Tweens.kill(_seam_tween)
 		seam_glow.modulate = Color(Palette.AMBER, SEAM_FLICKER_ALPHA * lamp_level(&"door"))
 	_sync_breaker_glow()
 	queue_redraw()
@@ -1109,9 +1108,7 @@ func tank_hit(at_x: float) -> void:
 	hit_sparks.position.x = at_x
 	sentry.keel_over(at_x)
 	# The empty arm winches up into its ceiling plate, clear of WOLF bounding over the tank.
-	if _arm_tween != null and _arm_tween.is_valid():
-		_arm_tween.kill()
-	_arm_tween = create_tween()
+	_arm_tween = Tweens.restart(self, _arm_tween)
 	_arm_tween.tween_property(self, "arm_parked", 1.0, ARM_PARK_SECONDS).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
 	refresh_state()
 
@@ -1125,9 +1122,7 @@ func tank_miss() -> void:
 ## The bolt lets go and the hatch slides open (the parent fires the panel's sparks); hatch_opened
 ## follows once it is open.
 func bolt_arc() -> void:
-	if _hatch_tween != null and _hatch_tween.is_valid():
-		_hatch_tween.kill()
-	_hatch_tween = create_tween()
+	_hatch_tween = Tweens.restart(self, _hatch_tween)
 	_hatch_tween.tween_property(self, "hatch_open", 1.0, HATCH_OPEN_SECONDS).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_IN_OUT)
 	_hatch_tween.tween_callback(refresh_state)
 	_hatch_tween.tween_callback(func() -> void: hatch_opened.emit())
@@ -1140,8 +1135,7 @@ func show_crank(fraction: float) -> void:
 		return
 	var released: bool = fraction <= 0.0
 	crank_fraction = maxf(fraction, 0.0)
-	if _valve_tween != null and _valve_tween.is_valid():
-		_valve_tween.kill()
+	Tweens.kill(_valve_tween)
 	var target: float = 90.0 * (turns + crank_fraction)
 	if released and is_inside_tree():
 		_valve_tween = create_tween()
@@ -1151,8 +1145,7 @@ func show_crank(fraction: float) -> void:
 
 
 func _turn_wheel(to_turns: int) -> void:
-	if _valve_tween != null and _valve_tween.is_valid():
-		_valve_tween.kill()
+	Tweens.kill(_valve_tween)
 	var target: float = 90.0 * to_turns
 	# Mid-hold the quarter just reached is where the wheel is; show_crank adds the next part turn.
 	if to_turns == 0 or crank_fraction > 0.0:
@@ -1212,8 +1205,7 @@ func is_spent() -> bool:
 
 
 func _sync_seam() -> void:
-	if _seam_tween != null and _seam_tween.is_valid():
-		_seam_tween.kill()
+	Tweens.kill(_seam_tween)
 	_seam_tween = null
 	seam_glow.visible = not door_blown
 	match line_state:
@@ -1250,8 +1242,7 @@ func door_blast() -> void:
 	door_shape.set_deferred("disabled", true)
 	blast_sparks.restart()
 	blast_dust.restart()
-	if _door_tween != null and _door_tween.is_valid():
-		_door_tween.kill()
+	Tweens.kill(_door_tween)
 	_show_door()
 	door_visual.scale = Vector2(1.04, 0.94)
 	_door_tween = create_tween()
@@ -1281,8 +1272,7 @@ func _sync_hatch() -> void:
 
 
 func _arm_hazard(hazard: Hazard) -> void:
-	if _hazard_tween != null and _hazard_tween.is_valid():
-		_hazard_tween.kill()
+	Tweens.kill(_hazard_tween)
 	hazard.armed = true
 	_hazard_tween = create_tween()
 	_hazard_tween.tween_interval(HAZARD_SECONDS)
@@ -1292,8 +1282,7 @@ func _arm_hazard(hazard: Hazard) -> void:
 ## Back to the state the save describes: no burst, no fuse, the wheel at rest and the door as saved.
 func reset_transient() -> void:
 	for tween: Tween in [_valve_tween, _seam_tween, _door_tween, _hazard_tween, _hatch_tween, _arm_tween]:
-		if tween != null and tween.is_valid():
-			tween.kill()
+		Tweens.kill(tween)
 	_arm_tween = null
 	_valve_tween = null
 	_seam_tween = null

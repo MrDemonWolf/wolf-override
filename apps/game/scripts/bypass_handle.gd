@@ -152,8 +152,7 @@ func clear_fault(cleared: bool, animate: bool) -> void:
 	if cleared == fault_cleared:
 		return
 	fault_cleared = cleared
-	if _fault_tween != null and _fault_tween.is_valid():
-		_fault_tween.kill()
+	Tweens.kill(_fault_tween)
 	if not cleared:
 		fault_tag.self_modulate.a = 1.0
 		fault_tag.show()
@@ -215,8 +214,7 @@ func show_hold(fraction: float) -> void:
 	var released: bool = fraction <= 0.0
 	hold_fraction = maxf(fraction, 0.0)
 	readout.queue_redraw()
-	if _wheel_tween != null and _wheel_tween.is_valid():
-		_wheel_tween.kill()
+	Tweens.kill(_wheel_tween)
 	var target: float = TICK_DEGREES * (ticks + hold_fraction)
 	if released and is_inside_tree():
 		_wheel_tween = create_tween()
@@ -226,8 +224,7 @@ func show_hold(fraction: float) -> void:
 
 
 func _turn_wheel() -> void:
-	if _wheel_tween != null and _wheel_tween.is_valid():
-		_wheel_tween.kill()
+	Tweens.kill(_wheel_tween)
 	# Mid-hold the notch just reached is where the wheel is; show_hold adds the next part turn.
 	var target: float = TICK_DEGREES * ticks
 	if ticks == 0 or hold_fraction > 0.0 or not is_inside_tree():

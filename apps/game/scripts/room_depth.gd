@@ -431,11 +431,9 @@ func _sync_motion() -> void:
 func _stop_motion() -> void:
 	_motion_running = false
 	for tween: Tween in _tweens:
-		if tween.is_valid():
-			tween.kill()
+		Tweens.kill(tween)
 	for tween: Tween in _beacon_tweens:
-		if tween.is_valid():
-			tween.kill()
+		Tweens.kill(tween)
 	_tweens.clear()
 	_beacon_tweens.clear()
 	for glow: Sprite2D in _lamp_lights:
@@ -461,8 +459,7 @@ func set_lockdown_cleared(cleared: bool, animate: bool = false) -> void:
 ## animating) or settled.
 func _settle_beacons(animate: bool) -> void:
 	for tween: Tween in _beacon_tweens:
-		if tween.is_valid():
-			tween.kill()
+		Tweens.kill(tween)
 	_beacon_tweens.clear()
 	var lens: Color = warning_color.darkened(SETTLED_LENS_DARKEN) if lockdown_cleared else warning_color
 	var alpha: float = SETTLED_BEACON_ALPHA if lockdown_cleared else BEACON_ALPHA
