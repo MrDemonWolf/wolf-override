@@ -2,6 +2,7 @@ extends SceneTree
 
 const GAME_SCENE: PackedScene = preload("res://scenes/main.tscn")
 const State = preload("res://scripts/m0_state.gd")
+const MainScript = preload("res://scripts/main.gd")
 ## Frames to wait for the fuse to run out, with a margin.
 const FUSE_FRAMES: int = int(PressureLine.FUSE_SECONDS * 60.0) + 60
 
@@ -16,6 +17,7 @@ func _run() -> void:
 	_check_pressure_line()
 	_check_save_format()
 	await _check_redraws()
+	await _check_panel_front()
 	await _check_scene()
 	if failures == 0:
 		print("Junction checks passed")
@@ -352,6 +354,11 @@ func _check_scene() -> void:
 	_expect(await _wait_until(func() -> bool: return not room.door_shape.disabled and room.door_art.visible and not room.door_blown_art.visible and not room.door_blown and room.breaker_label.text != "BREAKER SPENT", 5), "the door stands sealed again after the restore")
 	_expect(state.memory.get("choice_id") == State.DISCLOSE and state.chapter_complete, "memory and the Records result survive the knockdown")
 	_expect(await _wait_until(func() -> bool: return Engine.time_scale == 1.0 and camera.offset == Vector2.ZERO and (game.get_node("CanvasLayer/IntroFade") as ColorRect).color.a == 0.0, 90), "time scale, camera and fade are at rest after the restore")
+	# Facing the door when it blows, cranking at the valve or right up against the door: the slump
+	# towards it ends short of the front lip's foot, so the lip hides no part of the lying body.
+	await _check_blast_facing_door(game, room, human, valve_crank_x, "at the valve")
+	await _check_blast_facing_door(game, room, human, M0State.JUNCTION_DOOR_LEFT_X - M0State.HUMAN_HALF_WIDTH, "against the door")
+	state = game.get("state") as M0State
 	# A clean run: arm, crank, clear the zone, and the door goes.
 	_expect(await _walk_to(human, 200.0), "the engineer returns to the breaker")
 	await _tap(&"interact")
@@ -484,6 +491,37 @@ func _check_scene() -> void:
 	_expect(Engine.time_scale == 1.0, "freeing the game leaves time_scale at 1.0")
 
 
+## Where the sentry passes behind the exit bolt's panel, PanelFront draws the panel again over it with
+## everything that belongs in front of the machine: the bolt's feed lies wholly inside what it covers
+## (bolt_front_rect, the panel's box and the feed), and the redrawn lamp is
+## the lamp as drawn, flicker and all, redrawn when it flickers.
+func _check_panel_front() -> void:
+	var spare: JunctionRoom = JunctionRoom.new()
+	root.add_child(spare)
+	await process_frame
+	var panel: Rect2 = JunctionRoom.prop_rect(spare.bolt_panel_art, JunctionRoom.BOLT_PANEL_REGION)
+	var front: Rect2 = spare.bolt_front_rect()
+	var outside: Array[Rect2] = []
+	for mark: Array in spare.bolt_feed_marks():
+		if not front.encloses(mark[0] as Rect2):
+			outside.append(mark[0] as Rect2)
+	_expect(spare.bolt_feed_marks().size() == 15 and outside.is_empty() and front.grow(0.01).encloses(panel) and front.get_area() - panel.get_area() < 60.0, "every part of the bolt feed lies inside what PanelFront covers %s, the panel's box %s and little more (outside: %s)" % [front, panel, outside])
+	# Stand the sentry over the panel so PanelFront has something to cover.
+	spare.sentry.position.x = panel.get_center().x
+	spare.sentry.visible = true
+	await process_frame
+	_expect(not spare.panel_front.cover.is_empty() and spare.panel_front.colors.size() == 2 and spare.panel_front.colors[0] == spare.bolt_lamp_color() and spare.panel_front.colors[1] == spare.bolt_feed_color(), "with the sentry over the bolt panel, PanelFront covers it in the lamp and feed colours as drawn")
+	spare.flicker(&"bolt", 2)
+	var dark: bool = false
+	for _frame: int in 30:
+		await process_frame
+		if spare.lamp_level(&"bolt") < 1.0:
+			dark = dark or (spare.panel_front.colors[0] == spare.bolt_lamp_color() and spare.bolt_lamp_color() != spare.bolt_light_color())
+	_expect(dark, "while the bolt's lamp flickers, PanelFront redraws it dimmed with the lamp")
+	spare.queue_free()
+	await process_frame
+
+
 ## The junction redraws only when something it draws has changed (lighter-game S02): at rest the
 ## per-frame syncs draw nothing, and through the gauge building, the fuse, the tank's fall and the
 ## bolt's charge every frame draws, each time from new values.
@@ -569,6 +607,7 @@ func _check_redraws() -> void:
 		bolt[1] = (frame + 1) / 40.0
 		sync.call()
 		await process_frame
+	# The feed is drawn with the recesses, under the props, so the bolt panel's cables run in front of it.
 	_expect(_new_every_frame(room_draws, 30) and _new_every_frame(feed_draws, 30), "while the bolt charges every frame redraws its lights and its feed (%d, %d draws)" % [room_draws.size(), feed_draws.size()])
 	room_draws.clear()
 	feed_draws.clear()
@@ -610,6 +649,8 @@ func _check_vent_edges(game: Node2D, human: M0Actor, wolf: M0Actor, room: Juncti
 	_expect(await _wait_until(func() -> bool: return room.vent_steam.emitting, 5), "near the top of the gauge the vent steams")
 	# Round 3 item 7: the column rises behind the actors, so it never hides an engineer on the grate.
 	_expect(room.z_index + room.vent_steam.z_index < human.z_index and room.z_index + room.vent_steam.z_index < wolf.z_index, "the vent's steam column draws behind the engineer and WOLF")
+	# P0-16 (FAIL-1): the grate the knockdown card names is drawn over the steam rising out of it.
+	_expect(room.vent_steam.z_index < room.vent_art.z_index and room.vent_puff.z_index < room.vent_art.z_index and room.vent_steam.z_as_relative and room.vent_puff.z_as_relative, "the vent's grate draws over its steam and its burst")
 	line.gauge = 0.999
 	_expect(await _wait_until(func() -> bool: return line.state == &"tripped", 10), "the gauge peaks and the vent lets go")
 	for _frame: int in 4:
@@ -733,6 +774,19 @@ func _check_presentation(room: JunctionRoom, human: M0Actor, wolf: M0Actor) -> v
 	var body_z: int = room.z_index + room.door_visual.z_index
 	var lip_z: int = body_z + room.door_lip.z_index
 	_expect(body_z < human.z_index and body_z < wolf.z_index and lip_z > human.z_index and lip_z > wolf.z_index, "the bulkhead draws behind the actors and its front pillar in front of them")
+	# The lip's foot: in the canvas rows a body lying on the floor fills, its painting starts at
+	# DOOR_LIP_FOOT_COLUMN, which DOOR_FOOT_X places in the room.
+	var lip_image: Image = JunctionRoom.DOOR_LIP_PROP.get_image()
+	if lip_image.is_compressed():
+		lip_image.decompress()
+	var lying_rows: int = ceili((MainScript.COLLAPSE_FRAME.y - MainScript.COLLAPSE_TOPS[-1]) * MainScript.COLLAPSE_SCALE / JunctionRoom.DOOR_SCALE)
+	var foot_column: int = int(JunctionRoom.DOOR_REGION.end.x)
+	for y: int in range(int(JunctionRoom.DOOR_REGION.end.y) - lying_rows, int(JunctionRoom.DOOR_REGION.end.y)):
+		for x: int in range(int(JunctionRoom.DOOR_REGION.position.x), foot_column):
+			if lip_image.get_pixel(x, y).a > 0.5:
+				foot_column = x
+				break
+	_expect(foot_column == int(JunctionRoom.DOOR_LIP_FOOT_COLUMN), "over the bottom %d rows the front lip's painting starts at column %d, as JunctionRoom says (%.0f)" % [lying_rows, foot_column, JunctionRoom.DOOR_LIP_FOOT_COLUMN])
 	var row: bool = true
 	for label: Label in room.station_labels:
 		row = row and is_equal_approx(label.position.y, JunctionRoom.LABEL_Y) and label.get_theme_font_size(&"font_size") == JunctionRoom.LABEL_FONT_SIZE
@@ -769,6 +823,56 @@ func _labels_clear(room: JunctionRoom) -> bool:
 				push_error("station plates overlap: %s and %s" % [rects[i], rects[j]])
 				return false
 	return true
+
+
+## The engineer at [param x], facing the door, is knocked down by its blast (the real blast path, without
+## the fuse): they slump forward towards it, and the lying body (the collapse's last frame, its painted
+## columns from COLLAPSE_SPANS and rows from COLLAPSE_TOPS down to the floor) ends LANE_FALL_CLEAR
+## short of the front lip's foot, with no pixel the lip paints inside it. Then autosave A comes back.
+func _check_blast_facing_door(game: Node2D, room: JunctionRoom, human: M0Actor, x: float, label: String) -> void:
+	human.position.x = x
+	human.velocity = Vector2.ZERO
+	human.body_sprite.flip_h = false
+	await physics_frame
+	game.call("_door_blast")
+	if not _require(game.get("fail_active") and room.door_blown, "facing the door %s, the blast knocks the engineer down" % label):
+		return
+	var sprite: Sprite2D = human.body_sprite
+	var last_x: float = MainScript.COLLAPSE_FRAME.x * (MainScript.COLLAPSE_SPANS.size() - 1)
+	_expect(await _wait_until(func() -> bool: return sprite.texture == MainScript.COLLAPSE_SHEET and is_equal_approx(sprite.region_rect.position.x, last_x), 90) and not sprite.flip_h, "facing the door %s, they slump forward towards it and lie down" % label)
+	# Two drawn frames, so the lip's fade has had its _process too.
+	await process_frame
+	await process_frame
+	var drawn: Rect2 = sprite.get_global_transform() * sprite.get_rect()
+	var boots: float = sprite.global_position.x - (MainScript.COLLAPSE_FRAME.x * 0.5 - MainScript.COLLAPSE_PIVOT_X) * MainScript.COLLAPSE_SCALE
+	var span: Vector2 = MainScript.collapse_span(MainScript.COLLAPSE_SPANS.size() - 1, 1.0, boots)
+	var top: float = drawn.end.y - (MainScript.COLLAPSE_FRAME.y - MainScript.COLLAPSE_TOPS[-1]) * MainScript.COLLAPSE_SCALE
+	var body: Rect2 = Rect2(span.x, top, span.y - span.x, drawn.end.y - top)
+	var foot_x: float = room.global_position.x + JunctionRoom.DOOR_FOOT_X
+	var hidden: int = _lip_pixels_in(room.door_lip, body)
+	_expect(span.y <= foot_x - MainScript.LANE_FALL_CLEAR + 0.01 and hidden == 0, "facing the door %s, the whole lying body is clear of the front lip (head at %.1f, the lip's foot at %.1f, %d px under the lip)" % [label, span.y, foot_x, hidden])
+	_expect(await _wait_until(func() -> bool: return not game.get("fail_active"), 240), "the knockdown facing the door %s hands back" % label)
+	_expect(await _wait_until(func() -> bool: return not room.door_shape.disabled and room.door_art.visible and not room.door_blown, 5), "the door stands sealed again after that restore")
+
+
+## How many whole world pixels of [param area] [param lip] paints (alpha over a half) where it is drawn.
+func _lip_pixels_in(lip: Sprite2D, area: Rect2) -> int:
+	var image: Image = lip.texture.get_image()
+	if image.is_compressed():
+		image.decompress()
+	var local_rect: Rect2 = lip.get_rect()
+	var inverse: Transform2D = lip.get_global_transform().affine_inverse()
+	var count: int = 0
+	for wy: int in range(floori(area.position.y), ceili(area.end.y)):
+		for wx: int in range(floori(area.position.x), ceili(area.end.x)):
+			var local: Vector2 = inverse * Vector2(wx + 0.5, wy + 0.5)
+			if not local_rect.has_point(local):
+				continue
+			var tx: int = floori(lip.region_rect.position.x + (local.x - local_rect.position.x) / local_rect.size.x * lip.region_rect.size.x)
+			var ty: int = floori(lip.region_rect.position.y + (local.y - local_rect.position.y) / local_rect.size.y * lip.region_rect.size.y)
+			if image.get_pixel(clampi(tx, 0, image.get_width() - 1), clampi(ty, 0, image.get_height() - 1)).a > 0.5:
+				count += 1
+	return count
 
 
 ## The near pipe column fades back while it covers an actor at either end of the room, and comes back

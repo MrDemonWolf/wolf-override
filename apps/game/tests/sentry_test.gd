@@ -17,9 +17,33 @@ const TANK_LEAP_LANDING: float = 20.0
 
 var failures: int = 0
 var _wolf_pixel_cache: Dictionary = {}
+## The lane watch (_watch_lane): frames looked at in the junction, and what read false on them.
+var lane_frames: int = 0
+var lane_beam_frames: int = 0
+## Frames on which the sentry's body or beam crossed the exit bolt's panel (drawn behind it).
+var lane_panel_frames: int = 0
+var lane_faults: Array[String] = []
+## Emits once a frame after the game's _process (DrawnFrames), so what it shows is what is drawn.
+var drawn_frames: DrawnFrames = null
+
+
+## Processes after every other node (the game included), so whatever listens to [signal drawn] sees
+## each frame as it is drawn. (process_frame comes before the frame's _process, and headless frames
+## outnumber physics steps, so it would see a physics step's move before the game answers it.)
+class DrawnFrames extends Node:
+	signal drawn
+
+	func _init() -> void:
+		process_priority = 1000
+
+	func _process(_delta: float) -> void:
+		drawn.emit()
 
 
 func _initialize() -> void:
+	# One physics step per frame at most: on a busy machine the run slows down instead of taking several
+	# steps between two of Main's frames, so what the checks see does not depend on the machine's load.
+	Engine.max_physics_steps_per_frame = 1
 	call_deferred("_run")
 
 
@@ -55,7 +79,8 @@ func _check_brain() -> void:
 	_expect(is_equal_approx(brain.x, 700.0) and brain.facing < 0.0, "patrol runs left from the far end at 140 px/s")
 	brain.tick(1.0, 100.0, false, -1.0)
 	_expect(is_equal_approx(brain.x, SentryBrain.PATROL_MIN_X * 2.0 - 560.0) and brain.facing > 0.0, "it bounces off its near end and comes back")
-	_expect(is_equal_approx(SentryBrain.PATROL_MIN_X - SentryBrain.HALF_WIDTH, SentryBrain.COVER_MAX_X + M0State.HUMAN_HALF_WIDTH), "the patrol turns where its front edge meets an engineer at the alcove's right end")
+	_expect(is_equal_approx(SentryBrain.PATROL_MIN_X - SentryBrain.DRAWN_HALF_WIDTH, SentryBrain.COVER_MAX_X + M0Actor.HUMAN_REACH), "the patrol turns where its drawn front meets an engineer drawn at the alcove's right end")
+	_expect(SentryBrain.DRAWN_HALF_WIDTH >= Sentry.drawn_half_width() and SentryBrain.DRAWN_HALF_WIDTH - Sentry.drawn_half_width() < 1.0, "the rule's drawn half width is the painted machine's, rounded up (%.2f)" % Sentry.drawn_half_width())
 	_expect(SentryBrain.PATROL_MIN_X < DropArm.MARK_X and SentryBrain.PATROL_MAX_X > DropArm.MARK_X + DropArm.HIT_REACH, "the patrol crosses the mark and leaves the hit window at its far end on every pass")
 	var sliced: SentryBrain = _patrolling_at(SentryBrain.PATROL_MAX_X, -1.0)
 	var whole: SentryBrain = _patrolling_at(SentryBrain.PATROL_MAX_X, -1.0)
@@ -289,15 +314,22 @@ func _check_lock_on() -> void:
 	_expect(locking.state == &"lock" and locking.x == seen_x and not locking.touches(600.0), "through the beat it stands still and is not contact")
 	locking.tick(0.01, 600.0, true, -1.0)
 	_expect(locking.state == &"chase" and locking.x == seen_x, "at the end of the beat the chase starts from where it stood")
-	var sliced: SentryBrain = _patrolling_at(700.0, -1.0)
-	var whole: SentryBrain = _patrolling_at(700.0, -1.0)
-	sliced.tick(0.001, 600.0, true, -1.0)
-	whole.tick(0.001, 600.0, true, -1.0)
+	# From the far end, so the chase after the beat has room before it reaches the engineer.
+	var sliced: SentryBrain = _patrolling_at(SentryBrain.PATROL_MAX_X, -1.0)
+	var whole: SentryBrain = _patrolling_at(SentryBrain.PATROL_MAX_X, -1.0)
+	sliced.tick(0.001, 680.0, true, -1.0)
+	whole.tick(0.001, 680.0, true, -1.0)
+	var far_seen_x: float = whole.x
 	for _frame: int in 48:
-		sliced.tick(1.0 / 60.0, 600.0, true, -1.0)
-	whole.tick(0.8, 600.0, true, -1.0)
+		sliced.tick(1.0 / 60.0, 680.0, true, -1.0)
+	whole.tick(0.8, 680.0, true, -1.0)
 	_expect(sliced.state == &"chase" and whole.state == &"chase" and absf(sliced.x - whole.x) < 0.01, "sliced and whole deltas leave the beat and chase alike (%.2f vs %.2f)" % [sliced.x, whole.x])
-	_expect(is_equal_approx(seen_x - whole.x, SentryBrain.CHASE_SPEED * (0.8 - SentryBrain.LOCK_SECONDS)), "0.8 s after seeing the engineer it has chased only for the time after the beat")
+	_expect(is_equal_approx(far_seen_x - whole.x, SentryBrain.CHASE_SPEED * (0.8 - SentryBrain.LOCK_SECONDS)), "0.8 s after seeing the engineer it has chased only for the time after the beat")
+	# P0-16: it runs at the engineer and stops where the drawn bodies touch, never into them.
+	whole.tick(2.0, 680.0, true, -1.0)
+	_expect(is_equal_approx(whole.x, 680.0 + SentryBrain.CONTACT_RANGE) and whole.touches(680.0) and whole.facing < 0.0, "the chase stops at contact range, facing the engineer (%.1f)" % whole.x)
+	whole.tick(0.1, 680.0 + SentryBrain.CONTACT_RANGE - 3.0, true, -1.0)
+	_expect(is_equal_approx(whole.x, 680.0 + SentryBrain.CONTACT_RANGE) and whole.facing < 0.0, "an engineer who steps closer is not backed away from")
 	var behind: SentryBrain = _patrolling_at(700.0, -1.0)
 	behind.tick(0.001, 720.0, true, -1.0)
 	behind.tick(0.1, 720.0, true, -1.0)
@@ -415,6 +447,11 @@ func _check_scene() -> void:
 	_expect(room.sentry.collision_layer == 0 and room.sentry.collision_mask == 0, "the sentry body never pushes or blocks the actors")
 	game.call("_new_game")
 	game.call("_finish_intro")
+	# P0-16: every frame of the routes below is checked as drawn (_watch_lane).
+	var watch: Callable = _watch_lane.bind(game)
+	drawn_frames = DrawnFrames.new()
+	root.add_child(drawn_frames)
+	drawn_frames.drawn.connect(watch)
 	# Route 1: the relay risk was disclosed, so WOLF chooses to draw the sentry onto the mark.
 	var b_dict: Dictionary = await _start_at_b(game, State.DISCLOSE)
 	_expect(brain.state == &"patrol" and brain.x > SentryBrain.PATROL_MAX_X - 60.0 and brain.facing < 0.0 and arm.state == &"hung" and room.tank.position.y == JunctionRoom.TANK_REST_Y and not room.mark_lit(), "autosave B: the sentry patrols from the far end under a hung tank, outside the brackets")
@@ -710,6 +747,11 @@ func _check_scene() -> void:
 	await _check_engineer_alone(game, path)
 	await _check_cloud(game, path)
 	await _check_chased_cards(game, path)
+	await _check_walk_into(game)
+	drawn_frames.drawn.disconnect(watch)
+	drawn_frames.queue_free()
+	print("Lane watch: %d junction frames, %d with a beam, %d with the sentry behind the bolt panel" % [lane_frames, lane_beam_frames, lane_panel_frames])
+	_expect(lane_frames > 3000 and lane_beam_frames > 500 and lane_panel_frames > 100 and lane_faults.is_empty(), "on all %d junction frames of these routes (%d with a beam, %d with the sentry behind the bolt panel), the sentry never overlaps the standing or lying engineer, its beam never runs past the bolt panel or the tank, neither is drawn over the bolt panel or its feed, and the bolt feed never crosses the tank (%d faults: %s)" % [lane_frames, lane_beam_frames, lane_panel_frames, lane_faults.size(), ", ".join(lane_faults.slice(0, 6))])
 	# A crafted v4 save with the sentry down but the door still sealed is rejected.
 	var crafted: Dictionary = b_dict.duplicate(true)
 	crafted["positions"]["human"] = [120.0, 410.0]
@@ -752,6 +794,7 @@ func _check_engineer_alone(game: Node2D, path: String) -> void:
 	# Step into its path: it sees, chases and runs the engineer down.
 	_expect(await _wait_until(func() -> bool: return brain.facing < 0.0 and brain.x <= 780.0 and brain.x >= 720.0, 300), "the sentry comes back down the lane")
 	human.position.x = 640.0
+	human.body_sprite.flip_h = false
 	_expect(await _wait_until(func() -> bool: return brain.state == &"lock", 5), "it sees the engineer and locks on")
 	var locked_x: float = brain.x
 	_expect(_sounding(game, &"klaxon") and room.sentry.visual.eye == Sentry.SentryVisual.EYE_LOCKED, "locking on turns its eye red with a short alarm")
@@ -762,14 +805,13 @@ func _check_engineer_alone(game: Node2D, path: String) -> void:
 	_expect(await _wait_until(func() -> bool: return game.get("fail_active"), 90), "sentry contact in the lane is a knockdown")
 	_expect(str(game.get("status_line")).begins_with(JunctionRoom.SENTRY_REASON % (game.get("state") as M0State).human_name().get_slice(" ", 0)) and str(game.get("status_line")).begins_with("The sentry saw Rowan out in the open.\nStay close to the TANK RELEASE."), "the status line names the sentry and the engineer, says they were caught out in the open, and points at the TANK RELEASE")
 	_expect(SentryBrain.is_exposed(human.position.x) and human.position.x > SentryBrain.COVER_MAX_X, "and the engineer was indeed caught past the right post (x %.0f)" % human.position.x)
-	# Round 3c item 3: the body lies where the card says they were caught: past the right post, fallen
-	# away from the alcove, clear of the TANK RELEASE and of the sentry, which rolls back off them.
-	for _frame: int in 20:
-		await physics_frame
-	var body_rect: Rect2 = _drawn_rect(human.body_sprite)
+	# Round 3c item 3: the body lies where the card says they were caught: past the right post (facing
+	# away from the alcove they slump forward, the way they faced), clear of the TANK RELEASE and of the
+	# sentry, which rolls back off them.
+	_expect(await _expect_lying(game, 1.0, "out in the lane"), "caught out in the lane facing right, the engineer slumps forward to the right, away from the alcove, onto the floor without turning round")
+	var body_rect: Rect2 = _painted_body(human.body_sprite)
 	var sentry_rect: Rect2 = _drawn_rect(room.sentry.visual.body)
 	var release_right: float = JunctionRoom.ARM_X + JunctionRoom.ARM_PANEL_HALF_WIDTH
-	_expect(game.get("fail_active") and is_equal_approx(human.body_sprite.rotation_degrees, MainScript.FALL_DEGREES), "caught out in the lane, the engineer falls to the right, away from the alcove (tilt %.1f)" % human.body_sprite.rotation_degrees)
 	_expect(body_rect.position.x >= SentryBrain.COVER_MAX_X + 3.0 and body_rect.position.x >= release_right + 3.0, "the body lies past the alcove's right post, clear of the TANK RELEASE (body %.1f..%.1f, post %.0f, release ends %.1f)" % [body_rect.position.x, body_rect.end.x, SentryBrain.COVER_MAX_X, release_right])
 	_expect(room.sentry.position.x > human.position.x and sentry_rect.position.x - body_rect.end.x >= 3.0, "the sentry rolls back off the body and stands clear of it (gap %.1f px)" % (sentry_rect.position.x - body_rect.end.x))
 	_expect(await _wait_until(func() -> bool: return not game.get("fail_active"), 240), "the knockdown hands back")
@@ -902,8 +944,18 @@ func _check_cloud(game: Node2D, path: String) -> void:
 	for _frame: int in 30:
 		await physics_frame
 	_expect(absf(human.position.x - stopped_x) < 0.5 and not DropArm.in_cloud(human.position.x) and not game.get("fail_active"), "the sidestep out of a machine never walks the engineer into the coolant cloud (x %.1f)" % human.position.x)
-	human.position.x = DropArm.MARK_X
-	_expect(await _wait_until(func() -> bool: return game.get("fail_active"), 30), "walking into the coolant cloud is a knockdown")
+	# Walking in from the alcove side, facing the tank: they slump forward, the way they faced, and stagger
+	# back from the tank as they go, so the lying body ends clear of it.
+	human.position.x = DropArm.MARK_X - DropArm.CLOUD_HALF_WIDTH - M0State.HUMAN_HALF_WIDTH - 6.0
+	human.body_sprite.flip_h = false
+	Input.action_press(&"move_right")
+	var walked_in: bool = await _wait_until(func() -> bool: return game.get("fail_active"), 60)
+	Input.action_release(&"move_right")
+	_expect(walked_in, "walking into the coolant cloud is a knockdown")
+	_expect(await _expect_lying(game, 1.0, "in the coolant cloud"), "caught by the cloud facing the tank, the engineer slumps forward towards it onto the floor")
+	var tank_left: float = room.global_position.x + room.tank.position.x - JunctionRoom.TANK_SIZE.x * 0.5
+	var lying_rect: Rect2 = _painted_body(human.body_sprite)
+	_expect(tank_left - lying_rect.end.x >= 3.0, "and the lying body ends clear of the tank on the floor (body ends %.1f, tank starts %.1f)" % [lying_rect.end.x, tank_left])
 	_expect(str(game.get("status_line")).begins_with("The coolant cloud caught %s. Let it clear before crossing the mark." % (game.get("state") as M0State).human_name().get_slice(" ", 0)), "the status line names the cloud and the engineer")
 	_expect(await _wait_until(func() -> bool: return not game.get("fail_active"), 240), "the cloud knockdown hands back")
 	_expect((game.get("state") as M0State).to_dict() == b_dict and not arm.cloud_active() and not room.cloud_hazard.armed and brain.state == &"patrol", "it restores autosave B with the cloud gone")
@@ -928,12 +980,14 @@ func _check_chased_cards(game: Node2D, path: String) -> void:
 	# A miss with the sentry at the far end, and the engineer stays at the release.
 	game.set("lane_choice", "alone")
 	human.position.x = JunctionRoom.ARM_X
+	# Facing the sentry as it comes: they slump forward towards it, and it rolls back off them.
+	human.body_sprite.flip_h = false
 	_expect(brain.state == &"patrol" and brain.x >= 830.0 and arm.drop(), "the drop goes with the sentry at the far end")
 	_expect(await _wait_until(func() -> bool: return arm.state == &"rewinding", 60) and brain.turned_by_miss, "the miss turns the sentry on the release")
 	_expect(await _wait_until(func() -> bool: return game.get("fail_active"), 120), "a chase after a miss runs down an engineer who stays at the release")
 	var status: String = str(game.get("status_line"))
 	_expect(not SentryBrain.is_exposed(human.position.x) and status.begins_with(chased) and not status.contains("alcove's posts") and not status.contains("in its lane"), "caught between the posts after a miss, the card points only at the rubble (%s)" % status)
-	await _expect_shove_fall(game, "after a miss")
+	await _expect_shove_fall(game, "after a miss", false)
 	_expect(await _wait_until(func() -> bool: return not game.get("fail_active"), 240), "the knockdown after a miss hands back")
 	_expect((game.get("state") as M0State).to_dict() == b_dict and not brain.turned_by_miss, "it restores autosave B with the sentry patrolling again")
 	# Seen out in the lane, then caught after ducking into the alcove: the alcove advice would be wrong.
@@ -942,11 +996,113 @@ func _check_chased_cards(game: Node2D, path: String) -> void:
 	human.position.x = 640.0
 	_expect(await _wait_until(func() -> bool: return brain.state == &"lock", 5) and not brain.turned_by_miss, "it sees the engineer in the lane")
 	human.position.x = JunctionRoom.ARM_X
+	# Facing away from it: they slump forward, away from it.
+	human.body_sprite.flip_h = true
 	_expect(await _wait_until(func() -> bool: return game.get("fail_active"), 120), "the chase reaches the engineer in the alcove")
 	status = str(game.get("status_line"))
 	_expect(not SentryBrain.is_exposed(human.position.x) and status.begins_with(chased) and not status.contains("alcove's posts"), "caught inside the alcove, the card points only at the rubble (%s)" % status)
-	await _expect_shove_fall(game, "inside the alcove")
+	await _expect_shove_fall(game, "inside the alcove", true)
 	_expect(await _wait_until(func() -> bool: return not game.get("fail_active"), 240), "that knockdown hands back too")
+	# Out in the lane facing back towards the alcove: they slump forward where they stand, towards it,
+	# never turned round or dragged back against the fall.
+	game.set("lane_choice", "alone")
+	_expect(await _wait_until(func() -> bool: return brain.facing < 0.0 and brain.x <= 780.0 and brain.x >= 720.0, 300), "the sentry comes back down the lane again")
+	human.position.x = 640.0
+	human.body_sprite.flip_h = true
+	_expect(await _wait_until(func() -> bool: return brain.state == &"lock", 5) and not brain.turned_by_miss, "it sees the engineer in the lane, facing the alcove")
+	_expect(await _wait_until(func() -> bool: return game.get("fail_active"), 120), "the chase runs them down in the lane")
+	_expect(str(game.get("status_line")).begins_with(JunctionRoom.SENTRY_REASON % (game.get("state") as M0State).human_name().get_slice(" ", 0)), "the card is the one for being seen out in the lane")
+	var stood_x: float = human.position.x
+	await _expect_shove_fall(game, "in the lane facing the alcove", true)
+	_expect(is_equal_approx(float(game.get("collapse_to_x")), stood_x), "facing the alcove, the boots stay where they stood (x %.1f, lying at %.1f)" % [stood_x, float(game.get("collapse_to_x"))])
+	_expect(await _wait_until(func() -> bool: return not game.get("fail_active"), 240), "the knockdown in the lane hands back")
+	# With Reduced Motion the collapse cuts straight to lying, so the sentry is put clear of the body on
+	# that same frame instead of rolling back over the next ones: after a miss, caught at the release
+	# facing away from it (the lying body reaches back towards it).
+	# It starts afresh at autosave B, as the first miss above does, so the drop goes from the same spot.
+	await _start_at_b(game, State.PRESS)
+	var impact: Impact = game.get("impact") as Impact
+	impact.reduce_motion = true
+	game.set("lane_choice", "alone")
+	human.position.x = JunctionRoom.ARM_X
+	human.body_sprite.flip_h = true
+	_expect(brain.state == &"patrol" and brain.x >= 830.0 and arm.drop(), "with Reduced Motion on, the drop goes with the sentry at the far end (sentry %s at %.1f)" % [brain.state, brain.x])
+	_expect(await _wait_until(func() -> bool: return arm.state == &"rewinding", 60) and brain.turned_by_miss, "with Reduced Motion on, the miss turns the sentry on the release (arm %s, sentry %s at %.1f)" % [arm.state, brain.state, brain.x])
+	# The first drawn frame of the knockdown (it starts in Main's frame, so it is checked on drawn frames).
+	# The wait is counted in physics steps, game time, since a fast machine draws many frames a step.
+	var until: int = Engine.get_physics_frames() + 240
+	while not game.get("fail_active") and Engine.get_physics_frames() < until:
+		await drawn_frames.drawn
+	_expect(game.get("fail_active"), "with Reduced Motion on, the chase after the miss reaches the engineer at the release (arm %s, sentry %s at %.1f, turned %s, engineer at %.1f)" % [arm.state, brain.state, brain.x, brain.turned_by_miss, human.position.x])
+	var room: JunctionRoom = game.get("junction_room") as JunctionRoom
+	var lying_rect: Rect2 = _painted_body(human.body_sprite)
+	var machine_rect: Rect2 = _drawn_rect(room.sentry.visual.body)
+	var first_gap: float = machine_rect.position.x - lying_rect.end.x
+	_expect(human.body_sprite.region_rect.position.x == MainScript.COLLAPSE_FRAME.x * (MainScript.COLLAPSE_SPANS.size() - 1) and first_gap >= 3.0, "with Reduced Motion, on the first frame they lie down the sentry already stands clear of them (gap %.1f px)" % first_gap)
+	impact.reduce_motion = false
+	_expect(await _wait_until(func() -> bool: return not game.get("fail_active"), 240), "the Reduced Motion knockdown hands back")
+
+
+## The sentry is solid: an engineer who walks into it stops where the drawn bodies touch
+## (SentryBrain.CONTACT_RANGE), into the back of a patrolling sentry and into the front of one locking
+## on, and the chase that follows knocks them down at that range. Checked on every frame as drawn
+## (DrawnFrames).
+func _check_walk_into(game: Node2D) -> void:
+	var human: M0Actor = game.get_node("Human") as M0Actor
+	var brain: SentryBrain = game.get("sentry_brain") as SentryBrain
+	await _start_at_b(game, State.PRESS)
+	game.set("lane_choice", "alone")
+	# Its back: patrolling up the lane, away from the engineer, who walks faster than it.
+	_expect(await _wait_until(func() -> bool: return brain.state == &"patrol" and brain.facing > 0.0 and brain.x >= 690.0 and brain.x <= 720.0, 600), "the sentry patrols up the lane, its back to the alcove")
+	human.position.x = brain.x - SentryBrain.CONTACT_RANGE - 12.0
+	human.body_sprite.flip_h = false
+	# It rolls on after the engineer is held at contact each frame, so on a drawn frame they trail it by its
+	# own step that frame: "touching" is the gap less that step.
+	var closest: Vector2 = await _closest_walking_in(game, &"move_right", 40, &"patrol")
+	_expect(closest.x >= SentryBrain.CONTACT_RANGE - 0.01 and closest.y <= SentryBrain.CONTACT_RANGE + 1.0, "walking into its back, the engineer stops where the bodies touch, never inside it (closest %.2f px, %.2f less its step, contact %.1f)" % [closest.x, closest.y, SentryBrain.CONTACT_RANGE])
+	game.call("_load_game")
+	game.set("lane_choice", "alone")
+	# Its front: seen out in the lane, the engineer walks on into it through the lock-on beat. It is met
+	# on its first stretch down from the far end, right of the hung tank, so the bodies touch, and the
+	# engineer goes down, clear of the tank whatever the frame timing (the lane watch counts a collapse
+	# frame that reaches into the tank's base).
+	_expect(await _wait_until(func() -> bool: return brain.state == &"patrol" and brain.facing < 0.0 and brain.x <= 800.0 and brain.x >= 790.0, 600), "the sentry comes back down the lane")
+	human.position.x = brain.x - 90.0
+	human.body_sprite.flip_h = false
+	_expect(await _wait_until(func() -> bool: return brain.state == &"lock", 5), "it sees the engineer in the lane and locks on")
+	closest = await _closest_walking_in(game, &"move_right", int(SentryBrain.LOCK_SECONDS * 60.0) + 30, &"lock")
+	_expect(closest.x >= SentryBrain.CONTACT_RANGE - 0.01 and closest.x <= SentryBrain.CONTACT_RANGE + 1.0, "walking into its front while it locks on, the engineer stops where the bodies touch (closest %.2f px)" % closest.x)
+	_expect(await _wait_until(func() -> bool: return game.get("fail_active"), 120), "the chase that follows runs them down")
+	_expect(absf(human.position.x - brain.x) >= SentryBrain.CONTACT_RANGE - 0.01, "it knocks them down at contact range (%.1f px)" % absf(human.position.x - brain.x))
+	var room: JunctionRoom = game.get("junction_room") as JunctionRoom
+	var tank_right: float = room.global_position.x + DropArm.MARK_X + JunctionRoom.TANK_SIZE.x * 0.5
+	var first_pose: Vector2 = MainScript.collapse_span(0, float(game.get("collapse_fall")), float(game.get("collapse_from_x")))
+	_expect(float(game.get("collapse_fall")) > 0.0 and first_pose.x > tank_right + 4.0, "met right of the hung tank, they go down clear of it from the first frame (body from x %.1f, tank to %.1f)" % [first_pose.x, tank_right])
+	_expect(await _wait_until(func() -> bool: return not game.get("fail_active"), 240), "that knockdown hands back")
+
+
+## Holds [param action] for [param frames] physics steps, or until the sentry leaves [param while_state]
+## or a knockdown starts, and returns the closest the engineer came to it on any drawn frame of that
+## time while it was solid (the frame it left that state included), and the closest less how far it
+## moved on that frame (the engineer is held at contact before it moves).
+func _closest_walking_in(game: Node2D, action: StringName, frames: int, while_state: StringName) -> Vector2:
+	var human: M0Actor = game.get_node("Human") as M0Actor
+	var brain: SentryBrain = game.get("sentry_brain") as SentryBrain
+	var closest: Vector2 = Vector2(INF, INF)
+	var until: int = Engine.get_physics_frames() + frames
+	var last_x: float = brain.x
+	Input.action_press(action)
+	while Engine.get_physics_frames() < until:
+		await drawn_frames.drawn
+		if brain.is_solid() and not game.get("fail_active"):
+			var gap: float = absf(human.position.x - brain.x)
+			closest = Vector2(minf(closest.x, gap), minf(closest.y, gap - absf(brain.x - last_x)))
+		last_x = brain.x
+		if game.get("fail_active") or brain.state != while_state:
+			break
+	Input.action_release(action)
+	print("Walking into the sentry (%s): closest %.2f px (%.2f less its step), contact %.1f, then %s" % [while_state, closest.x, closest.y, SentryBrain.CONTACT_RANGE, brain.state])
+	return closest
 
 
 ## Round 3c item 2: with the tank down on the sentry and WOLF at the rubble, he holds there until the
@@ -1095,19 +1251,146 @@ func _sprite_pixels(sprite: Sprite2D, grow: float) -> Dictionary:
 	return pixels
 
 
-## Round 3c item 3: a chase card's knockdown (after a miss, or caught inside the alcove) keeps the shove
-## it always had: the engineer falls away from the way they face, and the sentry stays where it caught
-## them.
-func _expect_shove_fall(game: Node2D, label: String) -> void:
+## Round 3c item 3 and P0-3: a chase's knockdown: the sentry stops where the bodies touch, the engineer
+## slumps forward the way they faced ([param facing_left]) onto the floor without turning round, and it
+## stands clear of the lying body, whichever side of it they fell.
+func _expect_shove_fall(game: Node2D, label: String, facing_left: bool) -> void:
 	var human: M0Actor = game.get_node("Human") as M0Actor
 	var room: JunctionRoom = game.get("junction_room") as JunctionRoom
 	var brain: SentryBrain = game.get("sentry_brain") as SentryBrain
-	var facing: float = -1.0 if human.body_sprite.flip_h else 1.0
-	for _frame: int in 20:
-		await physics_frame
-	var rest: Vector2 = Vector2(0.0, -5.0)
-	_expect(game.get("fail_active") and is_equal_approx(human.body_sprite.rotation_degrees, -MainScript.FALL_DEGREES * facing) and human.body_sprite.position.is_equal_approx(rest + Vector2(-MainScript.FALL_SHIFT.x * facing, MainScript.FALL_SHIFT.y)), "caught %s, the engineer still falls away from the way they face (tilt %.1f)" % [label, human.body_sprite.rotation_degrees])
-	_expect(is_equal_approx(room.sentry.target_x, brain.x) and room.sentry.max_speed == SentryBrain.CHASE_SPEED, "caught %s, the sentry stays where it caught them" % label)
+	_expect(absf(human.position.x - brain.x) >= SentryBrain.CONTACT_RANGE - 0.01, "caught %s, it knocks the engineer down at contact range, not inside them (%.1f px)" % [label, absf(human.position.x - brain.x)])
+	_expect(await _expect_lying(game, -1.0 if facing_left else 1.0, label), "caught %s, the engineer slumps forward the way they faced onto the floor, without turning round" % label)
+	var body_rect: Rect2 = _painted_body(human.body_sprite)
+	var sentry_rect: Rect2 = _drawn_rect(room.sentry.visual.body)
+	var gap: float = sentry_rect.position.x - body_rect.end.x if room.sentry.position.x > human.position.x else body_rect.position.x - sentry_rect.end.x
+	_expect(gap >= 3.0, "caught %s, the sentry stands clear of the lying body (gap %.1f px)" % [label, gap])
+
+
+## P0-3: the knocked-down engineer lies on the floor line: the collapse's last frame, never tilted, the
+## soles on y 440 (the region's bottom row is the soles' row, so nothing is drawn below it), falling
+## [param fall] (1 right, -1 left), and the shadow under the whole body.
+func _expect_lying(game: Node2D, fall: float, label: String) -> bool:
+	var human: M0Actor = game.get_node("Human") as M0Actor
+	var sprite: Sprite2D = human.body_sprite
+	var last_x: float = MainScript.COLLAPSE_FRAME.x * (MainScript.COLLAPSE_SPANS.size() - 1)
+	var down: bool = await _wait_until(func() -> bool: return sprite.texture == MainScript.COLLAPSE_SHEET and is_equal_approx(sprite.region_rect.position.x, last_x), 90)
+	var rect: Rect2 = _drawn_rect(sprite)
+	var reflection: FloorReflection = game.get("human_reflection") as FloorReflection
+	var span: Vector2 = reflection.shadow_span + Vector2.ONE * human.position.x
+	var ok: bool = down and game.get("fail_active") and is_zero_approx(sprite.rotation_degrees) and absf(rect.end.y - JunctionRoom.FLOOR_Y) < 0.01 and sprite.flip_h == (fall < 0.0)
+	ok = ok and span.x <= rect.get_center().x and span.y >= rect.get_center().x and span.y - span.x >= rect.size.x * 0.9 and reflection.shadow.visible
+	if not ok:
+		print("caught %s: not lying on the floor line (down %s, bottom %.2f, tilt %.1f, flip %s, body %.1f..%.1f, shadow %.1f..%.1f)" % [label, down, rect.end.y, sprite.rotation_degrees, sprite.flip_h, rect.position.x, rect.end.x, span.x, span.y])
+	return ok
+
+
+## P0-16 and SPACE-8, on one frame as it was drawn (connected to DrawnFrames, so it sees the frame
+## after the game's _process): in the junction, (1) the live sentry's drawn body and the engineer's (standing
+## at M0Actor.HUMAN_REACH, or lying as painted) do not overlap; (2) a lit beam ends on or before the
+## near face of the exit bolt's panel and of the tank at the beam's height when they stand ahead of its
+## lens, and never further than SIGHT_RANGE; (3) the bolt feed's boxes, conduits and glands do not
+## cross the tank wherever it hangs, falls or lies; (4) where the sentry or its beam passes behind the
+## exit bolt's panel, the panel is drawn over them.
+func _watch_lane(game: Node2D) -> void:
+	var room: JunctionRoom = game.get("junction_room") as JunctionRoom
+	if room == null or not room.is_visible_in_tree() or paused:
+		return
+	lane_frames += 1
+	var human: M0Actor = game.get_node("Human") as M0Actor
+	var sentry: Sentry = room.sentry
+	var origin: float = room.global_position.x
+	var tank_rect: Rect2 = Rect2(room.tank.position - JunctionRoom.TANK_SIZE * 0.5, JunctionRoom.TANK_SIZE)
+	var facing: float = sentry.visual.scale.x
+	if sentry.is_visible_in_tree() and not sentry.visual.wrecked and (game.get("sentry_brain") as SentryBrain).is_solid():
+		var front: float = (Sentry.ACTIVE_TREAD_X - Sentry.ACTIVE_REGION.position.x) * Sentry.ART_SCALE
+		var back: float = (Sentry.ACTIVE_REGION.end.x - Sentry.ACTIVE_TREAD_X) * Sentry.ART_SCALE
+		var sx: float = origin + sentry.position.x
+		var body: Vector2 = Vector2(sx - (back if facing > 0.0 else front), sx + (front if facing > 0.0 else back))
+		var engineer: Vector2 = Vector2(human.global_position.x - M0Actor.HUMAN_REACH, human.global_position.x + M0Actor.HUMAN_REACH)
+		if human.body_sprite.texture == MainScript.COLLAPSE_SHEET:
+			engineer = _painted_collapse(human)
+		var overlap: float = minf(body.y, engineer.y) - maxf(body.x, engineer.x)
+		if overlap > 0.01:
+			lane_faults.append("frame %d: sentry %.1f..%.1f overlaps the engineer %.1f..%.1f (fail %s, target %.1f, speed %.0f, brain %s %.1f f%.0f, human %.1f)" % [lane_frames, body.x, body.y, engineer.x, engineer.y, game.get("fail_active"), sentry.target_x, sentry.max_speed, (game.get("sentry_brain") as SentryBrain).state, (game.get("sentry_brain") as SentryBrain).x, (game.get("sentry_brain") as SentryBrain).facing, human.position.x] + " region %.0f ts %.2f pos %.2f vel %.1f" % [human.body_sprite.region_rect.position.x, Engine.time_scale, sentry.position.x, sentry.velocity.x])
+	if sentry.is_visible_in_tree() and sentry.visual.is_lit() and sentry.visual.reach > Sentry.lens_rect().end.x:
+		lane_beam_frames += 1
+		var lens: float = sentry.position.x + facing * Sentry.lens_rect().end.x
+		var tip: float = sentry.position.x + facing * sentry.visual.reach
+		if absf(tip - sentry.position.x) > SentryBrain.SIGHT_RANGE + 0.01:
+			lane_faults.append("frame %d: beam %.1f px long" % [lane_frames, absf(tip - sentry.position.x)])
+		var solids: Array[Rect2] = [Rect2(SentryBrain.PANEL_FACE_X, Sentry.FLOOR_Y - 60.0, JunctionRoom.BOLT_PANEL_HALF_WIDTH * 2.0, 60.0)]
+		# (A tank whose base is within a hundredth of a pixel of the beam's top edge only grazes it.)
+		if room.tank.visible and tank_rect.end.y > Sentry.beam_top_y() + 0.01:
+			solids.append(tank_rect)
+		for solid: Rect2 in solids:
+			if facing > 0.0 and lens <= solid.position.x and tip > solid.position.x + 0.01:
+				lane_faults.append("frame %d: beam to %.1f runs into the solid at %.1f" % [lane_frames, tip, solid.position.x])
+			elif facing < 0.0 and lens >= solid.end.x and tip < solid.end.x - 0.01:
+				lane_faults.append("frame %d: beam to %.1f runs into the solid ending %.1f (block %s, arm %s %.2f, tank y %.1f, choice %s, fail %s)" % [lane_frames, tip, solid.end.x, sentry.sight_block, (game.get("drop_arm") as DropArm).state, (game.get("drop_arm") as DropArm).drop_amount(), room.tank.position.y, game.get("waiting_for_choice"), game.get("fail_active")])
+	# (4) The exit bolt's panel and its feed stand in front of the lane: wherever the sentry's painted
+	# body or its lit beam crosses the panel's box or a part of the feed, they are drawn again over them
+	# (PanelFront, right after the sentry at its depth), so neither shows over the box or the feed.
+	if sentry.is_visible_in_tree() and not sentry.visual.wrecked:
+		var panel: Rect2 = JunctionRoom.prop_rect(room.bolt_panel_art, JunctionRoom.BOLT_PANEL_REGION)
+		var art_front: float = (Sentry.ACTIVE_TREAD_X - Sentry.ACTIVE_REGION.position.x) * Sentry.ART_SCALE
+		var art_back: float = (Sentry.ACTIVE_REGION.end.x - Sentry.ACTIVE_TREAD_X) * Sentry.ART_SCALE
+		var parts: Dictionary = {"body": Rect2(sentry.position.x - (art_back if facing > 0.0 else art_front), Sentry.FLOOR_Y - Sentry.DRAWN_HEIGHT, art_front + art_back, Sentry.DRAWN_HEIGHT)}
+		var slit: Rect2 = Sentry.lens_rect()
+		if sentry.visual.is_lit() and sentry.visual.reach > slit.end.x:
+			# The cone from the lens towards its tip, as tall where it crosses the panel as it is at the
+			# crossing's far side (half a pixel more for its soft edges).
+			var lens_x: float = sentry.position.x + facing * slit.end.x
+			var tip_x: float = sentry.position.x + facing * sentry.visual.reach
+			var crossing: Vector2 = Vector2(maxf(minf(lens_x, tip_x), panel.position.x), minf(maxf(lens_x, tip_x), panel.end.x))
+			if crossing.y > crossing.x:
+				var ahead: float = maxf(absf(crossing.x - sentry.position.x), absf(crossing.y - sentry.position.x))
+				var half: float = lerpf(slit.size.y * 0.5, Sentry.BEAM_SPREAD, clampf(inverse_lerp(slit.end.x, sentry.visual.reach, ahead), 0.0, 1.0)) + 0.5
+				parts["beam"] = Rect2(crossing.x, Sentry.FLOOR_Y + slit.get_center().y - half, crossing.y - crossing.x, half * 2.0)
+		var front_drawn: bool = room.panel_front.is_visible_in_tree() and room.panel_front.z_index == sentry.z_index and room.panel_front.z_as_relative and room.panel_front.get_index() > sentry.get_index()
+		var behind: bool = false
+		var fronts: Array[Rect2] = [panel]
+		fronts.append_array(room.bolt_feed_parts())
+		for key: String in parts:
+			for front: Rect2 in fronts:
+				var over: Rect2 = (parts[key] as Rect2).intersection(front)
+				if not over.has_area():
+					continue
+				behind = true
+				var covered: float = 0.0
+				for piece: Rect2 in room.panel_front.cover:
+					covered += over.intersection(piece).get_area()
+				if not front_drawn or covered < over.get_area() - 0.01:
+					lane_faults.append("frame %d: the sentry's %s %s is drawn over %s (front drawn %s, %.1f of %.1f px² covered)" % [lane_frames, key, parts[key], "the bolt panel %s" % panel if front == panel else "the bolt feed's %s" % front, front_drawn, covered, over.get_area()])
+		if behind:
+			lane_panel_frames += 1
+	if human.body_sprite.texture == MainScript.COLLAPSE_SHEET and room.tank.visible:
+		var drawn: Rect2 = _drawn_rect(human.body_sprite)
+		var span: Vector2 = _painted_collapse(human)
+		var frame: int = roundi(human.body_sprite.region_rect.position.x / MainScript.COLLAPSE_FRAME.x)
+		var top: float = drawn.end.y - (MainScript.COLLAPSE_FRAME.y - MainScript.COLLAPSE_TOPS[frame]) * MainScript.COLLAPSE_SCALE
+		var lying: Rect2 = Rect2(span.x, top, span.y - span.x, drawn.end.y - top)
+		var tank_world: Rect2 = Rect2(tank_rect.position + room.global_position, tank_rect.size)
+		if lying.grow(-0.01).intersects(tank_world):
+			lane_faults.append("frame %d: the lying engineer %s overlaps the tank %s" % [lane_frames, lying, tank_world])
+	for part: Rect2 in room.bolt_feed_parts():
+		if room.tank.visible and part.intersects(tank_rect):
+			lane_faults.append("frame %d: the bolt feed %s crosses the tank %s" % [lane_frames, part, tank_rect])
+			break
+
+
+## The x span of the engineer's collapse frame as painted (MainScript.COLLAPSE_SPANS), in the world.
+func _painted_collapse(human: M0Actor) -> Vector2:
+	var sprite: Sprite2D = human.body_sprite
+	var frame: int = roundi(sprite.region_rect.position.x / MainScript.COLLAPSE_FRAME.x)
+	var fall: float = -1.0 if sprite.flip_h else 1.0
+	var boots: float = sprite.global_position.x - fall * (MainScript.COLLAPSE_FRAME.x * 0.5 - MainScript.COLLAPSE_PIVOT_X) * MainScript.COLLAPSE_SCALE
+	return MainScript.collapse_span(frame, fall, boots)
+
+
+## The engineer's lying body as painted: the collapse frame's cut is 4 px wider than the painting on
+## each side (MainScript.COLLAPSE_SPANS), about 1 px in the room.
+func _painted_body(sprite: Sprite2D) -> Rect2:
+	return _drawn_rect(sprite).grow_individual(-4.0 * MainScript.COLLAPSE_SCALE, 0.0, -4.0 * MainScript.COLLAPSE_SCALE, 0.0)
 
 
 ## The axis-aligned box [param sprite]'s drawn rectangle covers in the world.

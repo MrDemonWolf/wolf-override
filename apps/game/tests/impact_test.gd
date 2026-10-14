@@ -2,6 +2,7 @@ extends SceneTree
 
 const GAME_SCENE: PackedScene = preload("res://scenes/main.tscn")
 const State = preload("res://scripts/m0_state.gd")
+const MainScript = preload("res://scripts/main.gd")
 
 var failures: int = 0
 
@@ -11,6 +12,7 @@ func _initialize() -> void:
 
 
 func _run() -> void:
+	_check_collapse_sheet()
 	var path: String = "user://impact-test-%s.json" % OS.get_process_id()
 	if FileAccess.file_exists(path):
 		DirAccess.remove_absolute(ProjectSettings.globalize_path(path))
@@ -146,6 +148,9 @@ func _run() -> void:
 	await physics_frame
 	await physics_frame
 	_expect(not game.get("fail_active"), "an unarmed hazard never knocks the engineer down")
+	# Turned round to face the way they came (the second knockdown below walks in facing left).
+	human.body_sprite.flip_h = false
+	var faced_left: bool = human.body_sprite.flip_h
 	hazard.armed = true
 	if not _require(game.get("fail_active"), "arming a hazard the engineer already stands in knocks them down at once"):
 		return
@@ -156,13 +161,32 @@ func _run() -> void:
 		await physics_frame
 	Input.action_release(&"move_left")
 	_expect(absf(human.position.x - 700.0) <= 12.0, "held movement does nothing during the knockdown")
-	_expect(await _wait_until(func() -> bool: return absf(human.body_sprite.rotation_degrees) > 40.0, 30), "the engineer's sprite tilts over")
+	# P0-3: the painted collapse plays, frame by frame, and the body ends up lying on the floor line.
+	# The painted slump is forward, so the body falls the way they faced and never turns round.
+	var seen_frames: Dictionary = {}
+	var turned: Array[bool] = [human.body_sprite.flip_h != faced_left]
+	var lying: bool = await _wait_until(func() -> bool:
+		turned[0] = turned[0] or human.body_sprite.flip_h != faced_left
+		if human.body_sprite.texture == MainScript.COLLAPSE_SHEET:
+			seen_frames[int(human.body_sprite.region_rect.position.x / MainScript.COLLAPSE_FRAME.x)] = true
+		return seen_frames.has(MainScript.COLLAPSE_SPANS.size() - 1), 60)
+	_expect(lying and seen_frames.size() >= 3, "the engineer collapses through the painted frames (%s) and lies down" % str(seen_frames.keys()))
+	_expect(not turned[0] and is_equal_approx(float(game.get("collapse_fall")), -1.0 if faced_left else 1.0), "facing %s, they slump forward that way and never turn round" % ("left" if faced_left else "right"))
+	# The reflection copies its source in _process, which a physics frame does not always include;
+	# process_frame fires before that frame's _process, so the second one follows a full pass.
+	await process_frame
+	await process_frame
+	_check_lying(human, "in the corridor")
 	_expect(await _wait_until(func() -> bool: return not game.get("fail_active"), 240), "the knockdown hands back within a few seconds")
 	state = game.get("state") as M0State
 	_expect(state.to_dict() == saved and FileAccess.get_file_as_bytes(path) == save_bytes, "the knockdown restores the checkpoint exactly and never writes the save")
 	_expect(state.memory.get("choice_id") == State.DISCLOSE and state.route == "cooperate", "the relay memory and route survive the knockdown")
 	_expect(human.controlled and human.position == state.human_position and wolf.position == state.wolf_position, "the engineer stands at the checkpoint with controls back")
-	_expect(human.body_sprite.rotation_degrees == 0.0 and human.body_sprite.position == Vector2(0.0, -5.0), "the sprite is upright again")
+	_expect(human.body_sprite.rotation_degrees == 0.0 and human.body_sprite.position == Vector2(0.0, -5.0) and human.body_sprite.texture != MainScript.COLLAPSE_SHEET and not human.body_sprite.region_enabled and is_equal_approx(human.body_sprite.scale.x, 0.188), "the engineer stands again, as drawn before the knockdown")
+	var reflection: FloorReflection = game.get("human_reflection") as FloorReflection
+	await process_frame
+	await process_frame
+	_expect(reflection.texture == human.body_sprite.texture and reflection.shadow_span == Vector2.ZERO and is_equal_approx(reflection.floor_y, -5.0 + 192.0 * 0.188), "their reflection and shadow are the standing ones again")
 	_expect(str(game.get("status_line")).contains("Wait for the hiss") and str(game.get("status_line")).contains("Back at the last checkpoint."), "the status line keeps the cause and says where play resumed")
 	_expect(await _wait_until(func() -> bool: return Engine.time_scale == 1.0 and camera.offset == Vector2.ZERO and intro_fade.color.a == 0.0, 90), "time scale, camera and fade are all at rest after the restore")
 	# Walking into the armed hazard is the other contact path.
@@ -171,6 +195,11 @@ func _run() -> void:
 	var tripped: bool = await _wait_until(func() -> bool: return game.get("fail_active"), 120)
 	Input.action_release(&"move_left")
 	_expect(tripped, "walking into an armed hazard knocks the engineer down")
+	var walked_turn: Array[bool] = [not human.body_sprite.flip_h]
+	var walked_down: bool = await _wait_until(func() -> bool:
+		walked_turn[0] = walked_turn[0] or not human.body_sprite.flip_h
+		return human.body_sprite.texture == MainScript.COLLAPSE_SHEET and is_equal_approx(human.body_sprite.region_rect.position.x, MainScript.COLLAPSE_FRAME.x * (MainScript.COLLAPSE_SPANS.size() - 1)), 60)
+	_expect(walked_down and not walked_turn[0], "walking left into it, they slump forward to the left without turning round")
 	_expect(await _wait_until(func() -> bool: return not game.get("fail_active"), 240), "the second knockdown restores too")
 	_expect((game.get("state") as M0State).to_dict() == saved, "the second restore is the same checkpoint")
 	hazard.queue_free()
@@ -200,11 +229,13 @@ func _run() -> void:
 	_expect(human.controlled and human.position == state.human_position, "the engineer is back at the beat start")
 	_expect(str(game.get("status_line")).ends_with("Back at the start of this stretch."), "without a checkpoint the restore line does not claim a checkpoint")
 
-	# Reduced Motion knockdown: no tilt, no dip, still a restore.
+	# Reduced Motion knockdown: straight to lying on the floor, no dip, still a restore.
 	impact.reduce_motion = true
 	game.call("_fail_beat", "Test knockdown.")
 	await process_frame
-	_expect(game.get("fail_active") and Engine.time_scale == 1.0 and human.body_sprite.rotation_degrees == 0.0, "Reduced Motion knockdown skips the tilt and the dip")
+	await process_frame
+	_expect(game.get("fail_active") and Engine.time_scale == 1.0 and human.body_sprite.rotation_degrees == 0.0 and is_equal_approx(human.body_sprite.region_rect.position.x, MainScript.COLLAPSE_FRAME.x * (MainScript.COLLAPSE_SPANS.size() - 1)), "Reduced Motion knockdown cuts straight to lying down and skips the dip")
+	_check_lying(human, "with Reduced Motion")
 	_expect(await _wait_until(func() -> bool: return not game.get("fail_active"), 240), "the Reduced Motion knockdown restores")
 	impact.reduce_motion = false
 
@@ -226,6 +257,53 @@ func _run() -> void:
 	if failures == 0:
 		print("Impact checks passed")
 	quit(1 if failures > 0 else 0)
+
+
+## P0-3: the collapse sheet is cut so each frame's soles are on its bottom row (no gap above the floor
+## line and nothing below it), and Main's spans are the painted body's columns from the boots.
+func _check_collapse_sheet() -> void:
+	var image: Image = MainScript.COLLAPSE_SHEET.get_image()
+	if image.is_compressed():
+		image.decompress()
+	var frame_size: Vector2i = Vector2i(MainScript.COLLAPSE_FRAME)
+	_expect(image.get_width() == frame_size.x * MainScript.COLLAPSE_SPANS.size() and image.get_height() == frame_size.y, "the collapse sheet holds %d frames of %s" % [MainScript.COLLAPSE_SPANS.size(), frame_size])
+	for frame: int in MainScript.COLLAPSE_SPANS.size():
+		var bottom_row: int = 0
+		var top_row: int = frame_size.y
+		var left: int = frame_size.x
+		var right: int = -1
+		for y: int in frame_size.y:
+			for x: int in frame_size.x:
+				if image.get_pixel(frame * frame_size.x + x, y).a >= 0.5:
+					bottom_row = maxi(bottom_row, y)
+					top_row = mini(top_row, y)
+					left = mini(left, x)
+					right = maxi(right, x)
+		_expect(bottom_row == frame_size.y - 1, "collapse frame %d stands its soles on its bottom row (%d)" % [frame, bottom_row])
+		_expect(top_row == int(MainScript.COLLAPSE_TOPS[frame]), "collapse frame %d's painted body starts on row %d, as Main says (%.0f)" % [frame, top_row, MainScript.COLLAPSE_TOPS[frame]])
+		var span: Vector2 = MainScript.COLLAPSE_SPANS[frame]
+		_expect(absf(left - MainScript.COLLAPSE_PIVOT_X - span.x) <= 1.0 and absf(right - MainScript.COLLAPSE_PIVOT_X - span.y) <= 1.0, "collapse frame %d's painted body spans %d..%d from the boots, as Main says (%s)" % [frame, left - int(MainScript.COLLAPSE_PIVOT_X), right - int(MainScript.COLLAPSE_PIVOT_X), span])
+
+
+## P0-3: a knocked-down body lies on the floor line (y 440, the bottom of the engineer's body): never
+## tilted, its soles on the line and nothing drawn below it, its reflection the same picture and its
+## shadow under the whole body.
+func _check_lying(human: M0Actor, label: String) -> void:
+	var sprite: Sprite2D = human.body_sprite
+	var rect: Rect2 = sprite.get_global_transform() * sprite.get_rect()
+	var floor_y: float = human.global_position.y + MainScript.HUMAN_FLOOR_Y
+	_expect(is_zero_approx(sprite.rotation_degrees) and absf(rect.end.y - floor_y) < 0.01, "%s the lying body's soles are on the floor line (bottom %.2f, floor %.2f)" % [label, rect.end.y, floor_y])
+	var reflection: FloorReflection = null
+	for sibling: Node in human.get_children():
+		if sibling is FloorReflection:
+			reflection = sibling
+	if reflection == null:
+		_expect(false, "%s the engineer has a floor reflection" % label)
+		return
+	var span: Vector2 = reflection.shadow_span
+	var local: Rect2 = Rect2(rect.position - human.global_position, rect.size)
+	_expect(reflection.texture == sprite.texture and reflection.region_rect == sprite.region_rect and is_equal_approx(reflection.floor_y, MainScript.HUMAN_FLOOR_Y), "%s the reflection mirrors the lying body about the floor line" % label)
+	_expect(span.x <= local.position.x + 2.0 and span.y >= local.end.x - 2.0 and is_equal_approx(reflection.shadow.position.y, MainScript.HUMAN_FLOOR_Y), "%s the shadow lies under the whole body (%.1f..%.1f under %.1f..%.1f)" % [label, span.x, span.y, local.position.x, local.end.x])
 
 
 func _wait_until(condition: Callable, frames: int) -> bool:

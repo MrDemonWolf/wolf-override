@@ -63,6 +63,11 @@ const DOOR_REGION: Rect2 = Rect2(0.0, 36.0, 384.0, 604.0)
 const DOOR_SCALE: float = RoomDepth.BULKHEAD_SCALE
 ## The seam painted down the sealed leaf, in canvas pixels.
 const DOOR_SEAM_X: float = 196.0
+## The front lip widens at its foot: in the canvas rows a body lying on the floor fills, its painting
+## starts at this canvas column, left of the pillar's face. It draws over the actors, so from
+## DOOR_FOOT_X a lying body would be under it (Main._start_collapse ends a slump short of it).
+const DOOR_LIP_FOOT_COLUMN: float = 57.0
+const DOOR_FOOT_X: float = M0State.JUNCTION_DOOR_LEFT_X - (RoomDepth.BULKHEAD_PILLAR_X - DOOR_LIP_FOOT_COLUMN) * DOOR_SCALE
 ## How long the breaking bulkhead shows at the blast before the blown one replaces it.
 const DOOR_BREAK_SECONDS: float = 0.15
 const VENT_REGION: Rect2 = Rect2(8.0, 35.0, 743.0, 183.0)
@@ -199,6 +204,9 @@ const DOOR_HEIGHT: float = 132.0
 ## over them, so they pass through the doorway once it is open.
 const DOOR_Z: int = 0
 const DOOR_LIP_Z: int = 2
+## The vent's steam and its burst draw one step under the props (the grate is a prop), so the grate is
+## drawn over the steam rising out of it.
+const VENT_STEAM_Z: int = -2
 ## How long the grate stays dangerous after the relief vent lets go.
 const HAZARD_SECONDS: float = 0.4
 ## The knockdown cards, in the third person like the narration; each is formatted with the engineer's
@@ -239,10 +247,17 @@ const DOOR_LABEL_SHIFT: float = 7.0
 const ARM_LABEL_SHIFT: float = 20.0
 ## The EXIT plate sits over the bolt panel, left of the hatch it also names.
 const EXIT_LABEL_X: float = 792.0
-## The feed from the TANK RELEASE to the exit bolt panel: a conduit along the wall at this height,
-## behind the props and the actors. Dead while the winch holds the tank; once the tank is down its
-## power runs to the bolt (amber), warming to white through the whine and green once the bolt drops.
+## The feed from the TANK RELEASE to the exit bolt panel runs under the floor and comes up at the
+## bolt panel (_draw_bolt_feed), so nothing runs across the lane where the tank comes down. Its cable
+## box is centred at this height, behind the ends of the panel's painted cables. Dead while the winch
+## holds the tank; once the tank is down its power runs to the bolt (amber), warming to white through
+## the whine and green once the bolt drops.
 const BOLT_FEED_Y: float = 404.0
+## The cable box (behind the three painted cable ends) and the floor gland the conduit comes up from.
+const FEED_BOX: Vector2 = Vector2(8.0, 34.0)
+const FEED_GLAND: Vector2 = Vector2(12.0, 3.0)
+## The box's and gland's painted-steel face, a step lighter than the conduit.
+const FEED_STEEL: Color = Color("#2a3741")
 ## A plate fades out over this many px as it reaches the edge of the view.
 const LABEL_EDGE_FADE: float = 14.0
 const LABEL_PLATE: Color = Color(0.035, 0.06, 0.08, 0.8)
@@ -352,6 +367,8 @@ var bolt_panel_art: Sprite2D
 var entry_hatch_art: Sprite2D
 var hatch_art: Sprite2D
 var recesses: Recesses
+## The exit bolt's panel drawn again over the sentry where it passes behind it.
+var panel_front: PanelFront
 var door_body: StaticBody2D
 var door_shape: CollisionShape2D
 var door_visual: Node2D
@@ -444,6 +461,48 @@ class Recesses:
 
 	func _draw() -> void:
 		room.draw_recesses(self)
+
+
+## The exit bolt's panel stands nearer than the sentry's lane: at the far end of its patrol the machine
+## and its beam pass behind it. Right after the sentry and at its depth, this draws the panel and its
+## light again wherever the sentry's drawing crosses the panel (bolt_panel_cover), with the bolt's feed
+## under the panel's painted cables there too, so none of them is ever drawn under the machine, and
+## draws nothing while the sentry is clear of it. Only those spots are drawn, so the engineer working the
+## bolt and WOLF by the hatch still draw over the panel as before.
+class PanelFront:
+	extends Node2D
+	var room: JunctionRoom
+	## The room rectangles drawn this frame (bolt_panel_cover) and the colours they were drawn with: the
+	## panel's lamp as it shows (bolt_lamp_color) and the feed's core (bolt_feed_color), so a change to
+	## either redraws them.
+	var cover: Array[Rect2] = []
+	var colors: Array[Color] = []
+
+	func _init() -> void:
+		texture_filter = CanvasItem.TEXTURE_FILTER_LINEAR_WITH_MIPMAPS
+		# After Main's frame, which moves the sentry, so the cover is where the sentry is drawn.
+		process_priority = 100
+
+	func _process(_delta: float) -> void:
+		var now: Array[Rect2] = room.bolt_panel_cover()
+		var look: Array[Color] = [room.bolt_lamp_color(), room.bolt_feed_color()]
+		if now != cover or (not now.is_empty() and look != colors):
+			cover = now
+			colors = look
+			queue_redraw()
+
+	func _draw() -> void:
+		if not cover.is_empty():
+			room.draw_panel_front(self, cover, colors[0])
+
+	## What _draw covers: the bounds of [member cover], for the debug tools' render box.
+	func debug_draw_rect() -> Rect2:
+		if cover.is_empty():
+			return Rect2()
+		var bounds: Rect2 = cover[0]
+		for part: Rect2 in cover:
+			bounds = bounds.merge(part)
+		return bounds
 
 
 ## The exit hatch's doorway over its painted leaf: once the hatch starts to open it draws the painted
@@ -658,9 +717,9 @@ func _build_particles() -> void:
 	vent_steam.position = Vector2(VENT_X, FLOOR_Y - 8.0)
 	vent_steam.emission_shape = CPUParticles2D.EMISSION_SHAPE_RECTANGLE
 	vent_steam.emission_rect_extents = Vector2((PressureLine.VENT_GRATE_MAX_X - PressureLine.VENT_GRATE_MIN_X) * 0.5 - 6.0, 2.0)
-	# Behind the actors, like the coolant cloud: the column rises around an engineer on the grate and
-	# never hides them.
-	vent_steam.z_index = 0
+	# Behind the vent's grate (one step under the props) and the actors: the column rises from inside
+	# the grate, which stays drawn over it, so the grate the card names reads through the steam.
+	vent_steam.z_index = VENT_STEAM_Z
 	add_child(vent_steam)
 	vent_puff = FxPresets.dust_burst()
 	vent_puff.name = "VentPuff"
@@ -673,7 +732,8 @@ func _build_particles() -> void:
 	vent_puff.initial_velocity_max = 260.0
 	vent_puff.spread = 30.0
 	vent_puff.amount = 16
-	vent_puff.z_index = 3
+	# Like the column: out of the grate, behind it and the engineer it knocks down.
+	vent_puff.z_index = VENT_STEAM_Z
 	add_child(vent_puff)
 	blast_sparks = FxPresets.sparks(AMBER)
 	blast_sparks.name = "BlastSparks"
@@ -700,6 +760,11 @@ func _build_lane() -> void:
 	sentry.z_index = 1
 	add_child(sentry)
 	floor_reflections.append_array(sentry.floor_reflections)
+	panel_front = PanelFront.new()
+	panel_front.name = "BoltPanelFront"
+	panel_front.room = self
+	panel_front.z_index = sentry.z_index
+	add_child(panel_front)
 	tank = TankSprite.new()
 	tank.name = "Tank"
 	tank.texture = TANK_PROP
@@ -1321,7 +1386,7 @@ func _draw() -> void:
 	_draw_arm_panel_light()
 	_draw_arm()
 	_draw_floor_mark()
-	var bolt_light: Color = _bolt_light_color().lerp(FLICKER_DARK, 1.0 - lamp_level(&"bolt"))
+	var bolt_light: Color = bolt_lamp_color()
 	_draw_hatch_lamp(hatch_art, bolt_light, 1.0)
 	draw_rect(prop_rect(bolt_panel_art, BOLT_PANEL_LIGHT), bolt_light)
 
@@ -1348,30 +1413,149 @@ func draw_recesses(canvas: CanvasItem) -> void:
 	_draw_bolt_feed(canvas)
 
 
-## The conduit from the TANK RELEASE panel's side to the exit bolt panel's (bolt_feed_span), with a
-## clamp box at each end. Its core is lit only while it carries power to the bolt (bolt_feed_color).
+## The feed comes up out of the floor at the exit bolt's panel: a floor gland, a conduit up the wall and
+## a cable box the panel's painted cables plug into. Its core is lit only while it carries power to the
+## bolt (bolt_feed_color). The TANK RELEASE end needs nothing drawn: the release's own painted pipe runs
+## down into its base, and the run between the two is under the floor, clear of the tank and the lane.
+## Drawn on [param canvas] (Recesses) under the props, so the panel's painted cables run into the box
+## in front of it and the flat code-drawn plates show only round the panel's edge.
 func _draw_bolt_feed(canvas: CanvasItem) -> void:
-	var span: Vector2 = bolt_feed_span()
-	canvas.draw_line(Vector2(span.x, BOLT_FEED_Y), Vector2(span.y, BOLT_FEED_Y), Color("#0d1419"), 6.0)
-	canvas.draw_line(Vector2(span.x, BOLT_FEED_Y - 1.5), Vector2(span.y, BOLT_FEED_Y - 1.5), STEEL, 1.0)
-	canvas.draw_line(Vector2(span.x, BOLT_FEED_Y + 0.5), Vector2(span.y, BOLT_FEED_Y + 0.5), bolt_feed_color(), 2.0)
-	for end_x: float in [span.x, span.y]:
-		canvas.draw_rect(Rect2(end_x - 4.0, BOLT_FEED_Y - 6.0, 8.0, 12.0), Color("#1b2630"))
-		canvas.draw_rect(Rect2(end_x - 4.0, BOLT_FEED_Y - 6.0, 8.0, 12.0), STEEL, false, 1.0)
+	for mark: Array in bolt_feed_marks():
+		canvas.draw_rect(mark[0] as Rect2, mark[1] as Color)
 
 
-## Where the feed runs: from just inside the release panel's right edge to just inside the bolt panel's
-## left edge, so each end disappears behind its machine.
-func bolt_feed_span() -> Vector2:
-	var release: Rect2 = Rect2(prop_point(arm_panel_art, ARM_PANEL_REGION.position), ARM_PANEL_REGION.size * ARM_PANEL_SCALE)
-	var bolt: Rect2 = Rect2(prop_point(bolt_panel_art, BOLT_PANEL_REGION.position), BOLT_PANEL_REGION.size * BOLT_PANEL_SCALE)
-	return Vector2(release.end.x - 6.0, bolt.position.x + 6.0)
+## What _draw_bolt_feed fills, in order, as [rect, colour] pairs, so PanelFront can draw any part of it
+## again: the conduit with its sheen and its core, then the cable box and the floor gland, each a steel
+## plate with a one-pixel dark rim and a sheen along its top.
+func bolt_feed_marks() -> Array:
+	var parts: Array[Rect2] = bolt_feed_parts()
+	var box: Rect2 = parts[0]
+	var conduit: Rect2 = parts[1]
+	var gland: Rect2 = parts[2]
+	var marks: Array = [
+		[conduit, CABLE_SHADOW],
+		[Rect2(conduit.position.x + 0.5, conduit.position.y, 1.0, conduit.size.y), CABLE_SHEEN],
+		[Rect2(conduit.get_center().x - 0.5, conduit.position.y, 2.0, conduit.size.y), bolt_feed_color()],
+	]
+	for plate: Rect2 in [box, gland]:
+		marks.append([plate, FEED_STEEL])
+		marks.append([Rect2(plate.position.x, plate.position.y, plate.size.x, 1.0), CABLE_SHADOW])
+		marks.append([Rect2(plate.position.x, plate.end.y - 1.0, plate.size.x, 1.0), CABLE_SHADOW])
+		marks.append([Rect2(plate.position.x, plate.position.y + 1.0, 1.0, plate.size.y - 2.0), CABLE_SHADOW])
+		marks.append([Rect2(plate.end.x - 1.0, plate.position.y + 1.0, 1.0, plate.size.y - 2.0), CABLE_SHADOW])
+		marks.append([Rect2(plate.position.x + 1.0, plate.position.y + 1.0, plate.size.x - 2.0, 1.0), CABLE_SHEEN])
+	return marks
+
+
+## The feed's parts in the room, top to bottom: the cable box over the ends of the bolt panel's left
+## cables, the conduit from it down to the floor, and the floor gland it goes into.
+func bolt_feed_parts() -> Array[Rect2]:
+	var x: float = bolt_feed_x()
+	var box: Rect2 = Rect2(x - FEED_BOX.x * 0.5, BOLT_FEED_Y - FEED_BOX.y * 0.5, FEED_BOX.x, FEED_BOX.y)
+	var gland: Rect2 = Rect2(x - FEED_GLAND.x * 0.5, FLOOR_Y - FEED_GLAND.y, FEED_GLAND.x, FEED_GLAND.y)
+	var conduit: Rect2 = Rect2(x - 2.5, box.end.y, 5.0, gland.position.y - box.end.y)
+	return [box, conduit, gland]
+
+
+## Where the feed comes up: over the bolt panel's left edge, the box taking in the ends of its painted
+## cables.
+func bolt_feed_x() -> float:
+	return prop_point(bolt_panel_art, BOLT_PANEL_REGION.position).x + FEED_BOX.x * 0.5 + 1.0
 
 
 ## The feed's core: dead until the tank is down, then the bolt's own light (amber, warming to white
 ## through the whine, green once it has dropped).
 func bolt_feed_color() -> Color:
-	return DIM if not sentry_down and not junction_cleared else _bolt_light_color()
+	return DIM if not sentry_down and not junction_cleared else bolt_light_color()
+
+
+## Where the sentry's drawing (Sentry.drawn_rects, widened by a pixel for its soft edges) crosses the
+## exit bolt's panel or its feed (bolt_front_rect), as rectangles in this room that do not overlap one
+## another: PanelFront draws them there again over the machine and its beam. Empty while the sentry is
+## hidden or clear of them.
+func bolt_panel_cover() -> Array[Rect2]:
+	var cover: Array[Rect2] = []
+	if sentry == null or not sentry.is_visible_in_tree():
+		return cover
+	var panel: Rect2 = bolt_front_rect()
+	for part: Rect2 in sentry.drawn_rects():
+		var over: Rect2 = part.grow(1.0).intersection(panel)
+		if over.has_area():
+			cover.append(over)
+	return disjoint_rects(cover)
+
+
+## What stands in front of the sentry's lane at the exit bolt: the panel's box and the bolt's feed (whose
+## floor gland reaches a pixel past the panel's left edge).
+func bolt_front_rect() -> Rect2:
+	var front: Rect2 = prop_rect(bolt_panel_art, BOLT_PANEL_REGION)
+	for part: Rect2 in bolt_feed_parts():
+		front = front.merge(part)
+	return front
+
+
+## The panel's image and its light, drawn on [param canvas] (PanelFront) inside [param cover] only, the
+## light in [param light]; under the image, the bolt's feed (bolt_feed_marks), so the cable box and
+## conduit stay in front of the machine with the painted cables over them.
+func draw_panel_front(canvas: CanvasItem, cover: Array[Rect2], light: Color) -> void:
+	var panel: Rect2 = prop_rect(bolt_panel_art, BOLT_PANEL_REGION)
+	var lamp: Rect2 = prop_rect(bolt_panel_art, BOLT_PANEL_LIGHT)
+	var marks: Array = bolt_feed_marks()
+	for front: Rect2 in cover:
+		for mark: Array in marks:
+			var clipped: Rect2 = (mark[0] as Rect2).intersection(front)
+			if clipped.has_area():
+				canvas.draw_rect(clipped, mark[1] as Color)
+		var part: Rect2 = front.intersection(panel)
+		if not part.has_area():
+			continue
+		var source: Rect2 = Rect2(BOLT_PANEL_REGION.position + (part.position - panel.position) / BOLT_PANEL_SCALE, part.size / BOLT_PANEL_SCALE)
+		# Sampled like the whole sprite (no clamp at the cut), so the redrawn strip matches the art under it.
+		canvas.draw_texture_rect_region(BOLT_PANEL_PROP, part, source, Color.WHITE, false, false)
+		var lit: Rect2 = lamp.intersection(part)
+		if lit.has_area():
+			canvas.draw_rect(lit, light)
+
+
+## [param rects] as rectangles covering the same area without overlapping (so a translucent drawing in
+## each is laid down once): cut into vertical strips at every rectangle's left and right edge, with the
+## covered height ranges of each strip merged, and side-by-side strips of the same height joined.
+static func disjoint_rects(rects: Array[Rect2]) -> Array[Rect2]:
+	var out: Array[Rect2] = []
+	if rects.size() <= 1:
+		out.assign(rects)
+		return out
+	var edges: Array[float] = []
+	for rect: Rect2 in rects:
+		edges.append(rect.position.x)
+		edges.append(rect.end.x)
+	edges.sort()
+	for index: int in edges.size() - 1:
+		var from: float = edges[index]
+		var to: float = edges[index + 1]
+		if to - from <= 0.0:
+			continue
+		var spans: Array[Vector2] = []
+		for rect: Rect2 in rects:
+			if rect.position.x <= from and rect.end.x >= to:
+				spans.append(Vector2(rect.position.y, rect.end.y))
+		spans.sort_custom(func(a: Vector2, b: Vector2) -> bool: return a.x < b.x)
+		var merged: Array[Vector2] = []
+		for span: Vector2 in spans:
+			if not merged.is_empty() and span.x <= merged[-1].y:
+				merged[-1].y = maxf(merged[-1].y, span.y)
+			else:
+				merged.append(span)
+		for span: Vector2 in merged:
+			var joined: bool = false
+			for at: int in out.size():
+				if is_equal_approx(out[at].end.x, from) and is_equal_approx(out[at].position.y, span.x) and is_equal_approx(out[at].end.y, span.y):
+					out[at].size.x = to - out[at].position.x
+					joined = true
+					break
+			if not joined:
+				out.append(Rect2(from, span.x, to - from, span.y - span.x))
+	return out
 
 
 ## The alcove's core: exactly SentryBrain's cover span, up to the label row.
@@ -1514,9 +1698,15 @@ func _draw_floor_mark() -> void:
 		draw_line(Vector2(edge, FLOOR_Y - 10.0), Vector2(edge, FLOOR_Y + 10.0), stripe_color, 2.0)
 
 
+## The exit bolt's lamp as drawn on its panel and over the hatch: its light (bolt_light_color),
+## dimmed while a refused press flickers it (lamp_level).
+func bolt_lamp_color() -> Color:
+	return bolt_light_color().lerp(FLICKER_DARK, 1.0 - lamp_level(&"bolt"))
+
+
 ## The exit bolt's light, on its panel and over the hatch: red and dead while the sentry runs the
 ## line, amber once it can take the overload, warming to white through the whine, green once popped.
-func _bolt_light_color() -> Color:
+func bolt_light_color() -> Color:
 	if junction_cleared or bolt_state == &"open":
 		return GREEN
 	if bolt_state == &"charging":

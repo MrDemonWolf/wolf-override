@@ -74,7 +74,46 @@ func _check_beam_rule() -> void:
 	_expect(is_equal_approx(far_end, SentryBrain.PATROL_MAX_X - SentryBrain.SIGHT_RANGE), "from the far end the beam reaches the full 180 px of sight")
 	_expect(_patrolling_at(SentryBrain.PATROL_MAX_X, -1.0).tick(0.0001, far_end, true, -1.0) == &"lock", "an engineer at the beam's tip is seen")
 	_expect(_patrolling_at(SentryBrain.PATROL_MAX_X, -1.0).tick(0.0001, far_end - 2.0, true, -1.0) == &"patrol", "an engineer just past the beam's tip is not")
-	_expect(is_equal_approx(Sentry.beam_tip_x(700.0, 1.0), 880.0), "facing right it reaches 180 px the other way")
+	_expect(is_equal_approx(Sentry.beam_tip_x(560.0, 1.0), 740.0), "facing right it reaches 180 px the other way")
+	# P0-16: solid things stop it. The exit bolt's panel stands in the lane: from left of it, facing it,
+	# the beam ends on its face and nobody behind it is seen; a sentry already in front of it (its lens
+	# past the face) looks on past it.
+	var face: float = JunctionRoom.BOLT_PANEL_X - JunctionRoom.BOLT_PANEL_HALF_WIDTH
+	_expect(is_equal_approx(SentryBrain.PANEL_FACE_X, face) and is_equal_approx(SentryBrain.LENS_AHEAD, Sentry.lens_rect().end.x), "the sight rule's panel face and lens are the drawn ones (%.2f, %.2f)" % [face, Sentry.lens_rect().end.x])
+	_expect(is_equal_approx(Sentry.beam_tip_x(700.0, 1.0), face), "facing the bolt panel from the mark the beam stops on its face")
+	_expect(_patrolling_at(700.0, 1.0).tick(0.0001, face, true, -1.0) == &"lock" and _patrolling_at(700.0, 1.0).tick(0.0001, face + 2.0, true, -1.0) == &"patrol", "it sees up to the panel's face and nobody behind it")
+	_expect(is_equal_approx(Sentry.beam_tip_x(face - SentryBrain.LENS_AHEAD + 1.0, 1.0), minf(M0Actor.MAX_X, face - SentryBrain.LENS_AHEAD + 1.0 + SentryBrain.SIGHT_RANGE)), "a sentry whose lens is past the panel's face looks on past it")
+	# A missed tank on the floor stops it from either side, and hides whoever is behind it.
+	var tank: Vector2 = Vector2(DropArm.MARK_X - JunctionRoom.TANK_SIZE.x * 0.5, DropArm.MARK_X + JunctionRoom.TANK_SIZE.x * 0.5)
+	_expect(is_equal_approx(Sentry.beam_tip_x(800.0, -1.0, false, INF, tank), tank.y) and is_equal_approx(Sentry.beam_tip_x(620.0, 1.0, false, INF, tank), tank.x), "a tank on the floor stops the beam at its near face, from either side")
+	var behind: SentryBrain = _patrolling_at(800.0, -1.0)
+	behind.sight_block = tank
+	_expect(behind.tick(0.0001, tank.x - 5.0, true, -1.0) == &"patrol", "nobody behind a tank on the floor is seen")
+	# Every x it can stand at, both ways, with and without a tank down: the drawn beam ends where the
+	# brain's sight does (within the room and short of the rubble), and never on the far side of a
+	# solid thing ahead of its lens.
+	var rule_ok: bool = true
+	var x_at: float = SentryBrain.CHASE_MIN_X
+	while x_at <= SentryBrain.PATROL_MAX_X:
+		for facing: float in [-1.0, 1.0]:
+			for floor_tank: Vector2 in [Vector2.ZERO, tank]:
+				if floor_tank != Vector2.ZERO and x_at + SentryBrain.HALF_WIDTH > floor_tank.x and x_at - SentryBrain.HALF_WIDTH < floor_tank.y:
+					continue
+				var tip_x: float = Sentry.beam_tip_x(x_at, facing, false, INF, floor_tank)
+				var sight: float = SentryBrain.sight_end_x(x_at, facing, floor_tank)
+				var lens_x: float = x_at + facing * SentryBrain.LENS_AHEAD
+				if facing > 0.0:
+					rule_ok = rule_ok and is_equal_approx(tip_x, maxf(x_at, minf(sight, M0Actor.MAX_X)))
+					if lens_x <= face:
+						rule_ok = rule_ok and tip_x <= face + 0.001
+					if floor_tank != Vector2.ZERO and lens_x <= floor_tank.x:
+						rule_ok = rule_ok and tip_x <= floor_tank.x + 0.001
+				else:
+					rule_ok = rule_ok and is_equal_approx(tip_x, minf(x_at, maxf(sight, SentryBrain.LANE_ENTRY_X)))
+					if floor_tank != Vector2.ZERO and lens_x >= floor_tank.y:
+						rule_ok = rule_ok and tip_x >= floor_tank.y - 0.001
+		x_at += 1.0
+	_expect(rule_ok, "at every x the drawn beam ends where the sentry's sight does and stops at the panel and a tank on the floor")
 	_expect(is_equal_approx(Sentry.beam_tip_x(SentryBrain.PATROL_MIN_X, -1.0), SentryBrain.LANE_ENTRY_X), "the beam stops at the rubble line, where nobody can be seen")
 	_expect(not SentryBrain.is_exposed(SentryBrain.LANE_ENTRY_X) and not SentryBrain.is_exposed(SentryBrain.LANE_ENTRY_X + 1.0) and SentryBrain.is_exposed(SentryBrain.COVER_MAX_X + 1.0), "nobody is seen from the rubble line to the alcove's right end, the edge of what it can see")
 	_expect(is_equal_approx(Sentry.beam_tip_x(SentryBrain.PATROL_MAX_X, 1.0), M0Actor.MAX_X), "facing right from the far end the beam stops where the engineer can stand furthest, inside the room")

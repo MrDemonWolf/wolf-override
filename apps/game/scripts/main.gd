@@ -248,10 +248,27 @@ const HUMAN_SPRITE_REST: Vector2 = Vector2(0.0, -5.0)
 ## is never hidden behind him.
 const ACTOR_Z: int = 2
 const KNOCKDOWN_Z: int = 3
-## A knockdown tips the engineer this far over and lays them this much lower and further along, the way
-## the fall goes.
-const FALL_DEGREES: float = 70.0
-const FALL_SHIFT: Vector2 = Vector2(30.0, 14.0)
+## A knockdown plays the engineer's collapse: the approved death-pose row (2026-10-11, in
+## docs/research-2026-10/sources/walk-final-2026-10-11/death-poses), its five painted frames cut to
+## COLLAPSE_FRAME and laid side by side. In every frame the boots stand on column COLLAPSE_PIVOT_X and
+## the soles on the bottom edge, so the body goes down onto the floor line and lies on it.
+const COLLAPSE_SHEET: Texture2D = preload("res://assets/engineer-collapse-provisional.png")
+const COLLAPSE_FRAME: Vector2 = Vector2(330.0, 248.0)
+const COLLAPSE_PIVOT_X: float = 98.0
+## Each frame's painted body as columns from the boots (frame px, facing right): knees, slumping, on
+## the side. The shadow lies under it and the sentry rolls back clear of it.
+const COLLAPSE_SPANS: Array[Vector2] = [Vector2(-28.0, 67.0), Vector2(-93.0, 96.0), Vector2(-93.0, 164.0), Vector2(-94.0, 209.0), Vector2(-94.0, 228.0)]
+## Each frame's top painted row (frame px): lying on the side, the body is under 19 px tall in the room.
+const COLLAPSE_TOPS: Array[float] = [6.0, 59.0, 110.0, 159.0, 174.0]
+## When each frame starts (s): knees 0-0.18, the slump onto the side 0.18-0.45; the last one holds.
+## Reduced Motion shows the last frame at once.
+const COLLAPSE_TIMES: Array[float] = [0.0, 0.09, 0.18, 0.315, 0.45]
+const COLLAPSE_SECONDS: float = 0.45
+## Drawn as tall as the standing sprite: the row's standing frame is 277 px, the sprite's 70.3 px.
+const COLLAPSE_SCALE: float = 0.254
+## The floor line in the engineer's space (the bottom of their body, y 440 in every room): the collapse's
+## soles sit on it, and its floor reflection mirrors about it.
+const HUMAN_FLOOR_Y: float = 30.0
 ## Run down out in the sentry's lane (SentryBrain.is_exposed, the SENTRY_REASON card), the engineer falls
 ## away from the alcove and lies where they were caught: all of their drawn body this far past the
 ## alcove's right post (and so clear of the TANK RELEASE), and the sentry rolls back off them to stand
@@ -491,6 +508,17 @@ var exit_sparks: CPUParticles2D
 ## True from a knockdown until the last autosave is back; the engineer has no controls meanwhile.
 var fail_active: bool = false
 var fail_tween: Tween
+## The standing engineer's image and scale, put back when they get up, and their floor reflection.
+var human_texture: Texture2D
+var human_sprite_scale: Vector2 = Vector2.ONE
+var human_reflection: FloorReflection
+## The collapse in progress: the way the body falls (1 right, -1 left), where the boots go from and to
+## (world x), and the way the engineer faced before it, given back when they get up.
+var collapse_fall: float = 1.0
+var collapse_from_x: float = 0.0
+var collapse_to_x: float = 0.0
+var collapse_flip: bool = false
+var collapsed: bool = false
 ## The state at the start of the current beat, for a knockdown before any checkpoint exists.
 var beat_snapshot: Dictionary = {}
 var hold_use: HoldUse = HoldUse.new()
@@ -657,8 +685,11 @@ func _ready() -> void:
 	_setup_particles()
 	# The door end's light and contact shadows are painted into its plates: its stations and seal
 	# cast no runtime floor reflection.
+	human_texture = human.body_sprite.texture
+	human_sprite_scale = human.body_sprite.scale
 	for grounded: Sprite2D in [human.body_sprite, wolf.body_sprite, intro_director, breaker_art]:
 		floor_reflections.append(FloorReflection.attach(grounded))
+	human_reflection = floor_reflections[0]
 	floor_reflections.append_array(records_room.floor_reflections)
 	floor_reflections.append_array(junction_room.floor_reflections)
 	# Each room's near edge pieces fade back while they cover the engineer or WOLF.
@@ -2885,6 +2916,11 @@ func _tick_lane(delta: float) -> void:
 				_tank_rehung()
 		# A missed tank on the floor, or on its way up, stands in the sentry's lane: it stops at its edge.
 		sentry_brain.obstacle = DropArm.footprint() if drop_arm.blocks_lane() else Vector2.ZERO
+		# The tank also hides what is behind it while it stands at the scanner's height: on the floor,
+		# or low in its fall or lift (its base under the beam's top), across its drawn width.
+		var tank_base: float = lerpf(JunctionRoom.TANK_REST_Y, JunctionRoom.landed_tank_y(false), drop_arm.drop_amount()) + JunctionRoom.TANK_SIZE.y * 0.5
+		var tank_half: float = JunctionRoom.TANK_SIZE.x * 0.5
+		sentry_brain.sight_block = Vector2(DropArm.MARK_X - tank_half, DropArm.MARK_X + tank_half) if tank_base > Sentry.beam_top_y() else Vector2.ZERO
 		# WOLF draws it only once his front is over the rubble line; it then parks BAIT_OFFSET short of
 		# his spot by the hatch, on the mark.
 		var bait_x: float = _wolf_drawing_x()
@@ -2896,6 +2932,8 @@ func _tick_lane(delta: float) -> void:
 		var wolf_beyond: bool = wolf_near_x > sentry_brain.x + SentryBrain.HALF_WIDTH and wolf_near_x > SentryBrain.LANE_ENTRY_X
 		sentry_brain.far_x = wolf_near_x - SentryBrain.HALF_WIDTH - WOLF_SENTRY_GAP if wolf_beyond else SentryBrain.PATROL_MAX_X
 		junction_room.sentry.beam_stop_x = wolf_near_x if wolf_beyond else INF
+		_keep_off_sentry()
+		x = human.position.x
 		var before: StringName = sentry_brain.state
 		sentry_brain.tick(delta, x, SentryBrain.is_exposed(x), bait_x)
 		if sentry_brain.state != before:
@@ -2928,7 +2966,7 @@ func _tick_lane(delta: float) -> void:
 		if not _hold_for_lane_question():
 			_ask_lane()
 	elif sentry_brain.touches(human.position.x):
-		_fail_beat(_sentry_reason(), _seen_in_lane())
+		_fail_beat(_sentry_reason(), true)
 
 
 ## WOLF bounds over the live sentry when his way along the lane crosses it (to his spot by the hatch),
@@ -3249,14 +3287,16 @@ func _blast_feedback() -> void:
 	impact.rumble(0.7, 1.0, 0.3)
 
 
-## One path for every knockdown: a readable reaction (hit-stop, red wash, the engineer tilts and
-## slides with a thud and rumble), controls off briefly, a short fade, then the current beat's
+## One path for every knockdown: a readable reaction (hit-stop, red wash, the engineer collapses onto
+## the floor with a thud and rumble), controls off briefly, a short fade, then the current beat's
 ## autosave comes back through _load_game/_sync_scene. Memory and Records flags are never touched.
-## With Reduced Motion the tilt, hit-stop and shake are skipped; the thud, wash and fade remain.
-## [param in_lane]: the sentry ran the engineer down out in its lane (_lane_fall).
-func _fail_beat(reason: String, in_lane: bool = false) -> void:
+## With Reduced Motion the collapse cuts straight to lying on the floor and the hit-stop and shake are
+## skipped; the thud, wash and fade remain. [param by_sentry]: the sentry ran the engineer down
+## (_start_collapse).
+func _fail_beat(reason: String, by_sentry: bool = false) -> void:
 	if fail_active or title_open or intro_active or chapter_close_active or end_card_active or _debug_spares_knockdown():
 		return
+	var in_lane: bool = by_sentry and _seen_in_lane()
 	fail_active = true
 	_drop_box_queue()
 	for action: StringName in GAMEPLAY_ACTIONS:
@@ -3278,19 +3318,13 @@ func _fail_beat(reason: String, in_lane: bool = false) -> void:
 	_cancel_door_recoil()
 	_cancel_fail_tween()
 	fail_tween = create_tween()
+	_start_collapse(by_sentry, in_lane)
 	var reaction_seconds: float = 0.0
 	if impact.motion_allowed():
-		# Fall away from the facing direction so the hit reads as a shove, not a stumble forward; out in
-		# the sentry's lane, away from the alcove instead (_lane_fall).
-		var facing: float = -1.0 if human.body_sprite.flip_h else 1.0
-		var tilt: float = -FALL_DEGREES * facing
-		var shift: Vector2 = Vector2(-FALL_SHIFT.x * facing, FALL_SHIFT.y)
-		if in_lane:
-			shift = _lane_fall()
-			tilt = FALL_DEGREES
-		reaction_seconds = 0.22
-		fail_tween.tween_property(human.body_sprite, "rotation_degrees", tilt, reaction_seconds).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
-		fail_tween.parallel().tween_property(human.body_sprite, "position", HUMAN_SPRITE_REST + shift, reaction_seconds).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
+		reaction_seconds = COLLAPSE_SECONDS
+		fail_tween.tween_method(_show_collapse, 0.0, COLLAPSE_SECONDS, COLLAPSE_SECONDS)
+	else:
+		_show_collapse(COLLAPSE_SECONDS)
 	fail_tween.tween_interval(FAIL_CONTROLS_OFF_SECONDS - reaction_seconds)
 	fail_tween.tween_property(intro_fade, "color:a", 1.0, FAIL_FADE_SECONDS)
 	fail_tween.tween_callback(_restore_beat.bind(reason))
@@ -3299,23 +3333,116 @@ func _fail_beat(reason: String, in_lane: bool = false) -> void:
 	_refresh_ui()
 
 
-## Caught out in the sentry's lane, the engineer falls to the right, away from the alcove, and lies where
-## they were caught: at least FALL_SHIFT along, and further if that would leave any of their drawn body
-## within LANE_FALL_CLEAR of the alcove's right post. The sentry rolls back off them (Sentry.recoil_to)
-## so its drawn body stands LANE_FALL_CLEAR clear of theirs. Returns the body's shift from rest.
-func _lane_fall() -> Vector2:
-	var half: Vector2 = human.body_sprite.get_rect().size * human.body_sprite.scale * 0.5
-	var angle: float = deg_to_rad(FALL_DEGREES)
-	# How far the lying body reaches either side of its centre.
-	var reach: float = half.y * sin(angle) + half.x * cos(angle)
-	var centre_x: float = maxf(human.position.x + FALL_SHIFT.x, SentryBrain.COVER_MAX_X + LANE_FALL_CLEAR + reach)
+## Which way and where the engineer goes down. The painted collapse is a slump forward, so the body
+## falls the way the engineer faced, with the boots where they stood; the sprite never turns round at
+## the hit. Run down by the sentry, they go down at the distance the bodies touched (_keep_off_sentry).
+## Caught out in its lane ([param in_lane]) facing right, away from the alcove, the boots move on along
+## the fall as far as it takes to leave all of the lying body LANE_FALL_CLEAR past the alcove's right
+## post (so the card's advice never reads as failing); facing back towards the alcove they slump
+## forward where they stand, never dragged back against the fall. Whatever knocked them down, a live
+## sentry in the junction rolls back off them (Sentry.recoil_to; with Reduced Motion it is put there at
+## once) as far as it takes for its drawn body to stand LANE_FALL_CLEAR clear of theirs, and a body
+## that would lie into a missed tank on the floor or under the foot of the bulkhead's front lip ends
+## short of it.
+func _start_collapse(by_sentry: bool, in_lane: bool) -> void:
+	collapse_flip = human.body_sprite.flip_h
+	collapse_fall = -1.0 if collapse_flip else 1.0
+	if by_sentry:
+		_keep_off_sentry()
+	collapse_from_x = human.position.x
+	collapse_to_x = human.position.x
+	if in_lane and collapse_fall > 0.0:
+		collapse_to_x = maxf(human.position.x, SentryBrain.COVER_MAX_X + LANE_FALL_CLEAR - COLLAPSE_SPANS[-1].x * COLLAPSE_SCALE)
+	collapsed = true
+	if state.chapter_id != "junction":
+		return
+	# A missed tank low on the mark (its base below the top of the lying body; it only rises from there)
+	# is solid too: a slump that would reach it ends LANE_FALL_CLEAR short of its drawn sides, the boots
+	# staggering back from it as the knees go (this wins over the lane's post, as the gap between the
+	# two is shorter than the lying body).
+	var tank_base: float = lerpf(JunctionRoom.TANK_REST_Y, JunctionRoom.landed_tank_y(false), drop_arm.drop_amount()) + JunctionRoom.TANK_SIZE.y * 0.5
+	if tank_base > JunctionRoom.FLOOR_Y - (COLLAPSE_FRAME.y - COLLAPSE_TOPS[-1]) * COLLAPSE_SCALE:
+		var tank_from: float = DropArm.MARK_X - JunctionRoom.TANK_SIZE.x * 0.5 - LANE_FALL_CLEAR
+		var tank_to: float = DropArm.MARK_X + JunctionRoom.TANK_SIZE.x * 0.5 + LANE_FALL_CLEAR
+		var lying: Vector2 = collapse_span(COLLAPSE_SPANS.size() - 1, collapse_fall, collapse_to_x)
+		if lying.y > tank_from and lying.x < tank_to:
+			collapse_to_x += tank_from - lying.y if human.position.x < DropArm.MARK_X else tank_to - lying.x
+	# The bulkhead's front lip draws over the actors: facing it from its left (cranking the valve when
+	# the door blows, say), a slump that would reach under the lip's foot ends LANE_FALL_CLEAR short of
+	# it, the boots thrown back from the door as the knees go, so no part of the lying body is hidden.
+	if collapse_fall > 0.0 and human.position.x < M0State.JUNCTION_DOOR_LEFT_X:
+		var door_lying: Vector2 = collapse_span(COLLAPSE_SPANS.size() - 1, collapse_fall, collapse_to_x)
+		collapse_to_x -= maxf(0.0, door_lying.y - (JunctionRoom.DOOR_FOOT_X - LANE_FALL_CLEAR))
+	if not sentry_brain.is_solid():
+		return
+	var body: Vector2 = collapse_span(COLLAPSE_SPANS.size() - 1, collapse_fall, collapse_to_x)
 	var sentry: Sentry = junction_room.sentry
 	var sentry_reach: float = Sentry.drawn_half_width()
+	# With Reduced Motion the body is shown lying at once (_fail_beat), so the machine is put clear of
+	# it on that same frame instead of rolling back over the next ones.
+	var at_once: bool = not impact.motion_allowed()
 	if sentry.position.x >= human.position.x:
-		sentry.recoil_to(maxf(sentry.position.x, centre_x + reach + LANE_FALL_CLEAR + sentry_reach))
+		sentry.recoil_to(maxf(sentry.position.x, body.y + LANE_FALL_CLEAR + sentry_reach), at_once)
 	else:
-		sentry.recoil_to(minf(sentry.position.x, centre_x - reach - LANE_FALL_CLEAR - sentry_reach))
-	return Vector2(centre_x - human.position.x, FALL_SHIFT.y)
+		sentry.recoil_to(minf(sentry.position.x, body.x - LANE_FALL_CLEAR - sentry_reach), at_once)
+
+
+## The sentry is a solid machine: an engineer who walks into it stops where the drawn bodies touch
+## (SentryBrain.CONTACT_RANGE), so the two never overlap, whether it is patrolling, locking on or
+## holding on WOLF; a chase that reaches them there is a knockdown, which lands at that distance too
+## (their last step may have taken them closer; it is checked once a frame).
+func _keep_off_sentry() -> void:
+	if not sentry_brain.is_solid():
+		return
+	var gap: float = human.position.x - sentry_brain.x
+	if absf(gap) < SentryBrain.CONTACT_RANGE and gap != 0.0:
+		human.position.x = sentry_brain.x + signf(gap) * SentryBrain.CONTACT_RANGE
+		human.velocity.x = 0.0
+
+
+## Frame [param t] seconds into the collapse: the painted frame for that moment, the boots eased from
+## where they stood to where they lie, the soles on the floor line, and the shadow under the body.
+func _show_collapse(t: float) -> void:
+	var frame: int = 0
+	for index: int in COLLAPSE_TIMES.size():
+		if t >= COLLAPSE_TIMES[index] - 0.0001:
+			frame = index
+	var boots: float = lerpf(collapse_from_x, collapse_to_x, ease(clampf(t / COLLAPSE_SECONDS, 0.0, 1.0), 0.4)) - human.position.x
+	var sprite: Sprite2D = human.body_sprite
+	sprite.texture = COLLAPSE_SHEET
+	sprite.region_enabled = true
+	sprite.region_rect = Rect2(frame * COLLAPSE_FRAME.x, 0.0, COLLAPSE_FRAME.x, COLLAPSE_FRAME.y)
+	sprite.scale = Vector2.ONE * COLLAPSE_SCALE
+	sprite.rotation_degrees = 0.0
+	sprite.flip_h = collapse_fall < 0.0
+	sprite.position = Vector2(boots + collapse_fall * (COLLAPSE_FRAME.x * 0.5 - COLLAPSE_PIVOT_X) * COLLAPSE_SCALE, HUMAN_FLOOR_Y - COLLAPSE_FRAME.y * 0.5 * COLLAPSE_SCALE)
+	var span: Vector2 = collapse_span(frame, collapse_fall, boots)
+	human_reflection.floor_y = HUMAN_FLOOR_Y
+	human_reflection.shadow_span = span
+
+
+## The x span (from, to) of the painted body in collapse frame [param frame], falling [param fall]
+## (1 right, -1 left) with the boots at [param boots_x].
+static func collapse_span(frame: int, fall: float, boots_x: float) -> Vector2:
+	var columns: Vector2 = COLLAPSE_SPANS[frame] * COLLAPSE_SCALE
+	return Vector2(boots_x + minf(columns.x * fall, columns.y * fall), boots_x + maxf(columns.x * fall, columns.y * fall))
+
+
+## The engineer back on their feet: the standing image at rest, facing the way they faced before the
+## collapse, their reflection and shadow as they stand.
+func _stand_up() -> void:
+	var sprite: Sprite2D = human.body_sprite
+	sprite.texture = human_texture
+	sprite.region_enabled = false
+	sprite.scale = human_sprite_scale
+	sprite.position = HUMAN_SPRITE_REST
+	sprite.rotation_degrees = 0.0
+	if collapsed:
+		sprite.flip_h = collapse_flip
+	collapsed = false
+	if human_reflection != null:
+		human_reflection.floor_y = HUMAN_SPRITE_REST.y + human_texture.get_height() * 0.5 * human_sprite_scale.y
+		human_reflection.shadow_span = Vector2.ZERO
 
 
 func _restore_beat(reason: String) -> void:
@@ -3374,8 +3501,7 @@ func _cancel_fail() -> void:
 	_cancel_fail_tween()
 	_cancel_door_recoil()
 	fail_active = false
-	human.body_sprite.rotation_degrees = 0.0
-	human.body_sprite.position = HUMAN_SPRITE_REST
+	_stand_up()
 	human.z_index = ACTOR_Z
 
 
@@ -3436,8 +3562,7 @@ func _sync_scene() -> void:
 	wolf.body_sprite.offset = Vector2.ZERO
 	wolf.body_sprite.scale = wolf_sprite_scale
 	wolf.speed_scale = 1.0
-	human.body_sprite.position = HUMAN_SPRITE_REST
-	human.body_sprite.rotation_degrees = 0.0
+	_stand_up()
 	human.z_index = ACTOR_Z
 	relay_spark.hide()
 	impact.reset()
@@ -4201,7 +4326,6 @@ func debug_place(human_x: float, wolf_x: float) -> void:
 ## cloud, or sentry (worded by how it caught them).
 func debug_knock_down(kind: StringName) -> void:
 	var reason: String = _sentry_reason()
-	var in_lane: bool = kind == &"sentry" and _seen_in_lane()
 	match kind:
 		&"vent":
 			reason = JunctionRoom.VENT_REASON % _first_name()
@@ -4209,7 +4333,7 @@ func debug_knock_down(kind: StringName) -> void:
 			reason = JunctionRoom.BLAST_REASON % _first_name()
 		&"cloud":
 			reason = JunctionRoom.CLOUD_REASON % _first_name()
-	_fail_beat(reason, in_lane)
+	_fail_beat(reason, kind == &"sentry")
 
 
 ## The valve's last turn has landed (the fuse is lit), as the crank lands it.
