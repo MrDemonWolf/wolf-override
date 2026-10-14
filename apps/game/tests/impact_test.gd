@@ -172,7 +172,9 @@ func _run() -> void:
 		return seen_frames.has(MainScript.COLLAPSE_SPANS.size() - 1), 60)
 	_expect(lying and seen_frames.size() >= 3, "the engineer collapses through the painted frames (%s) and lies down" % str(seen_frames.keys()))
 	_expect(not turned[0] and is_equal_approx(float(game.get("collapse_fall")), -1.0 if faced_left else 1.0), "facing %s, they slump forward that way and never turn round" % ("left" if faced_left else "right"))
-	# The reflection copies its source in _process, which a physics frame does not always include.
+	# The reflection copies its source in _process, which a physics frame does not always include;
+	# process_frame fires before that frame's _process, so the second one follows a full pass.
+	await process_frame
 	await process_frame
 	_check_lying(human, "in the corridor")
 	_expect(await _wait_until(func() -> bool: return not game.get("fail_active"), 240), "the knockdown hands back within a few seconds")
@@ -182,6 +184,7 @@ func _run() -> void:
 	_expect(human.controlled and human.position == state.human_position and wolf.position == state.wolf_position, "the engineer stands at the checkpoint with controls back")
 	_expect(human.body_sprite.rotation_degrees == 0.0 and human.body_sprite.position == Vector2(0.0, -5.0) and human.body_sprite.texture != MainScript.COLLAPSE_SHEET and not human.body_sprite.region_enabled and is_equal_approx(human.body_sprite.scale.x, 0.188), "the engineer stands again, as drawn before the knockdown")
 	var reflection: FloorReflection = game.get("human_reflection") as FloorReflection
+	await process_frame
 	await process_frame
 	_expect(reflection.texture == human.body_sprite.texture and reflection.shadow_span == Vector2.ZERO and is_equal_approx(reflection.floor_y, -5.0 + 192.0 * 0.188), "their reflection and shadow are the standing ones again")
 	_expect(str(game.get("status_line")).contains("Wait for the hiss") and str(game.get("status_line")).contains("Back at the last checkpoint."), "the status line keeps the cause and says where play resumed")

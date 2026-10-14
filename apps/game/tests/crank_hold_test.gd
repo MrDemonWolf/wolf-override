@@ -146,7 +146,7 @@ func _check_bypass_toggle() -> void:
 	var seconds: float = (Engine.get_physics_frames() - started_at) / 60.0
 	_expect(opened and state.route == "fallback" and int(game.get("bypass_ticks")) == BypassHandle.TICKS_NEEDED, "with TOGGLE HOLDS on a single press completes the crank (from %d notches, %.2f s)" % [before, seconds])
 	# The latch is let go in Main._process, which a physics frame does not always include on a busy
-	# machine; wait for drawn frames.
+	# machine; process_frame fires before that frame's _process, so the second one follows a full pass.
 	await process_frame
 	await process_frame
 	_expect(not game.get("crank_latched") and not hold.holding, "and the toggle lets go once the crank is done")
