@@ -3340,9 +3340,10 @@ func _fail_beat(reason: String, by_sentry: bool = false) -> void:
 ## the fall as far as it takes to leave all of the lying body LANE_FALL_CLEAR past the alcove's right
 ## post (so the card's advice never reads as failing); facing back towards the alcove they slump
 ## forward where they stand, never dragged back against the fall. Whatever knocked them down, a live
-## sentry in the junction rolls back off them (Sentry.recoil_to) as far as it takes for its drawn body
-## to stand LANE_FALL_CLEAR clear of theirs, and a body that would lie into a missed tank on the floor
-## or under the foot of the bulkhead's front lip ends short of it.
+## sentry in the junction rolls back off them (Sentry.recoil_to; with Reduced Motion it is put there at
+## once) as far as it takes for its drawn body to stand LANE_FALL_CLEAR clear of theirs, and a body
+## that would lie into a missed tank on the floor or under the foot of the bulkhead's front lip ends
+## short of it.
 func _start_collapse(by_sentry: bool, in_lane: bool) -> void:
 	collapse_flip = human.body_sprite.flip_h
 	collapse_fall = -1.0 if collapse_flip else 1.0
@@ -3377,10 +3378,13 @@ func _start_collapse(by_sentry: bool, in_lane: bool) -> void:
 	var body: Vector2 = collapse_span(COLLAPSE_SPANS.size() - 1, collapse_fall, collapse_to_x)
 	var sentry: Sentry = junction_room.sentry
 	var sentry_reach: float = Sentry.drawn_half_width()
+	# With Reduced Motion the body is shown lying at once (_fail_beat), so the machine is put clear of
+	# it on that same frame instead of rolling back over the next ones.
+	var at_once: bool = not impact.motion_allowed()
 	if sentry.position.x >= human.position.x:
-		sentry.recoil_to(maxf(sentry.position.x, body.y + LANE_FALL_CLEAR + sentry_reach))
+		sentry.recoil_to(maxf(sentry.position.x, body.y + LANE_FALL_CLEAR + sentry_reach), at_once)
 	else:
-		sentry.recoil_to(minf(sentry.position.x, body.x - LANE_FALL_CLEAR - sentry_reach))
+		sentry.recoil_to(minf(sentry.position.x, body.x - LANE_FALL_CLEAR - sentry_reach), at_once)
 
 
 ## The sentry is a solid machine: an engineer who walks into it stops where the drawn bodies touch

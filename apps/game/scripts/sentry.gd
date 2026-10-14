@@ -416,10 +416,16 @@ func _sync_reach() -> void:
 
 
 ## With the engineer knocked down near it, it rolls back to [param x], still facing them, so it
-## stands clear of the lying body (Main._start_collapse); the next restore places it afresh.
-func recoil_to(x: float) -> void:
+## stands clear of the lying body (Main._start_collapse), or is put there [param at_once] when the body
+## lies down at once; the next restore places it afresh.
+func recoil_to(x: float, at_once: bool = false) -> void:
 	target_x = x
 	max_speed = RECOIL_SPEED
+	if at_once:
+		# The body lies down at once (Reduced Motion), so the machine is put there on the same frame.
+		position.x = x
+		velocity = Vector2.ZERO
+		_sync_reach()
 
 
 ## What the machine draws, as boxes in its parent's space: its painted body (or wreck) and, from

@@ -1013,6 +1013,31 @@ func _check_chased_cards(game: Node2D, path: String) -> void:
 	await _expect_shove_fall(game, "in the lane facing the alcove", true)
 	_expect(is_equal_approx(float(game.get("collapse_to_x")), stood_x), "facing the alcove, the boots stay where they stood (x %.1f, lying at %.1f)" % [stood_x, float(game.get("collapse_to_x"))])
 	_expect(await _wait_until(func() -> bool: return not game.get("fail_active"), 240), "the knockdown in the lane hands back")
+	# With Reduced Motion the collapse cuts straight to lying, so the sentry is put clear of the body on
+	# that same frame instead of rolling back over the next ones: after a miss, caught at the release
+	# facing away from it (the lying body reaches back towards it).
+	# It starts afresh at autosave B, as the first miss above does, so the drop goes from the same spot.
+	await _start_at_b(game, State.PRESS)
+	var impact: Impact = game.get("impact") as Impact
+	impact.reduce_motion = true
+	game.set("lane_choice", "alone")
+	human.position.x = JunctionRoom.ARM_X
+	human.body_sprite.flip_h = true
+	_expect(brain.state == &"patrol" and brain.x >= 830.0 and arm.drop(), "with Reduced Motion on, the drop goes with the sentry at the far end (sentry %s at %.1f)" % [brain.state, brain.x])
+	_expect(await _wait_until(func() -> bool: return arm.state == &"rewinding", 60) and brain.turned_by_miss, "with Reduced Motion on, the miss turns the sentry on the release (arm %s, sentry %s at %.1f)" % [arm.state, brain.state, brain.x])
+	# The first drawn frame of the knockdown (it starts in Main's frame, so it is checked on drawn frames).
+	# The wait is counted in physics steps, game time, since a fast machine draws many frames a step.
+	var until: int = Engine.get_physics_frames() + 240
+	while not game.get("fail_active") and Engine.get_physics_frames() < until:
+		await drawn_frames.drawn
+	_expect(game.get("fail_active"), "with Reduced Motion on, the chase after the miss reaches the engineer at the release (arm %s, sentry %s at %.1f, turned %s, engineer at %.1f)" % [arm.state, brain.state, brain.x, brain.turned_by_miss, human.position.x])
+	var room: JunctionRoom = game.get("junction_room") as JunctionRoom
+	var lying_rect: Rect2 = _painted_body(human.body_sprite)
+	var machine_rect: Rect2 = _drawn_rect(room.sentry.visual.body)
+	var first_gap: float = machine_rect.position.x - lying_rect.end.x
+	_expect(human.body_sprite.region_rect.position.x == MainScript.COLLAPSE_FRAME.x * (MainScript.COLLAPSE_SPANS.size() - 1) and first_gap >= 3.0, "with Reduced Motion, on the first frame they lie down the sentry already stands clear of them (gap %.1f px)" % first_gap)
+	impact.reduce_motion = false
+	_expect(await _wait_until(func() -> bool: return not game.get("fail_active"), 240), "the Reduced Motion knockdown hands back")
 
 
 ## The sentry is solid: an engineer who walks into it stops where the drawn bodies touch
