@@ -266,8 +266,12 @@ func _check_first_control() -> void:
 	_expect(story.text == first_box, "a box stays up for its reading time")
 	await _play(0.2, "trust line")
 	_expect(story.text != first_box and speaker.text.is_empty(), "then the next box takes its place (%s)" % story.text.c_escape())
+	var narration_width: float = bar.size.x
+	_expect(absf(story.position.x - Main.DIALOGUE_PADDING.x) <= 0.5 and absf(narration_width - (Main.DIALOGUE_PADDING.x * 2.0 + story.size.x)) <= 0.5, "a narration box is only as wide as its words' column, with no empty name column (%s)" % bar.size)
 	await _play(14.0, "opening lines")
 	_expect(speaker.text in ["WOLF", (game.call("_first_name") as String).to_upper()] or game.status_line == Main.STAKES_LINE, "WOLF and the engineer each get their own boxes")
+	if not speaker.text.is_empty():
+		_expect(bar.size.x > narration_width, "a speaker's box adds the name column (%s vs %s)" % [bar.size.x, narration_width])
 
 
 ## The stakes and the relay question at the breaker; a box per speaker as WOLF answers.
@@ -287,6 +291,9 @@ func _check_corridor() -> void:
 	await _play(0.2, "walking on")
 	Input.action_release(&"move_right")
 	_expect(not bar.visible, "a read line clears once the engineer moves on")
+	var hint_panel: Control = game.get_node("CanvasLayer/ContextHint") as Control
+	var hint_rect: Rect2 = hint_panel.get_global_rect()
+	_expect(hint_panel.visible and absf(hint_rect.end.y - Main.DIALOGUE_BOTTOM) <= 0.5, "with no box up the hint bar takes the box's place at the bottom (%s)" % hint_rect)
 	game.call("_interact")
 	await _play(0.1, "said again")
 	_expect(bar.visible or game.status_line.is_empty(), "the next line shows again")

@@ -4216,8 +4216,8 @@ func _story_wrap_width(column: float) -> float:
 
 
 ## Lays out the HUD's text for the current text size, input and box: the dialogue box (its name
-## column beside the words while both fit the canvas, above them when they do not), the hint bar above
-## it, the top card, the tutorial prompt under the card and the answer buttons.
+## column beside the words while both fit the canvas, above them when they do not; narration without
+## one), the hint bar above it (or in its place while no box is up), the top card, the tutorial prompt under the card and the answer buttons.
 func _layout_hud() -> void:
 	var touch_layout: bool = touch_enabled and not controller_active
 	_set_font_size(story, TextSize.px(DIALOGUE_FONT_SIZE))
@@ -4230,7 +4230,8 @@ func _layout_hud() -> void:
 	var names: float = _speaker_column_width()
 	var room: float = 960.0 - HUD_SIDE_MARGIN * 2.0
 	var stacked: bool = DIALOGUE_PADDING.x * 2.0 + names + SPEAKER_GAP + column > room
-	var bar_width: float = DIALOGUE_PADDING.x * 2.0 + column + (0.0 if stacked else names + SPEAKER_GAP)
+	# Narration has no name column, so its box is only as wide as the words' column.
+	var bar_width: float = DIALOGUE_PADDING.x * 2.0 + column + (names + SPEAKER_GAP if speaker.visible and not stacked else 0.0)
 	_set_rect(story, Vector2(story.position.x, DIALOGUE_PADDING.y), Vector2(_story_wrap_width(column), story.size.y))
 	var line_height: float = story.get_line_height()
 	var text_height: float = line_height * maxi(story.get_line_count(), DialogueBoxes.MAX_ROWS)
@@ -4251,7 +4252,9 @@ func _layout_hud() -> void:
 	_set_rect(context_hint_text, Vector2(13.0, 3.0), Vector2(hint_width - 23.0, context_hint_text.size.y))
 	var hint_height: float = maxf(35.0, context_hint_text.get_line_height() * context_hint_text.get_line_count() + 8.0)
 	var hint_x: float = 960.0 - 32.0 - hint_width if cinematic else (TOUCH_HINT_SPAN.x if touch_layout else roundf((960.0 - hint_width) * 0.5))
-	var hint_y: float = 94.0 if cinematic else DIALOGUE_BOTTOM - bar_height - HINT_GAP - hint_height
+	# With no box up the hint takes the box's place at the bottom instead of floating over the floor.
+	var hint_bottom: float = DIALOGUE_BOTTOM - bar_height - HINT_GAP if bottom_bar.visible else DIALOGUE_BOTTOM
+	var hint_y: float = 94.0 if cinematic else hint_bottom - hint_height
 	_set_rect(context_hint, Vector2(hint_x, hint_y), Vector2(hint_width, hint_height))
 	_set_rect(context_hint_text, Vector2(13.0, 3.0), Vector2(hint_width - 23.0, hint_height - 6.0))
 	_set_rect(context_hint.get_node("Accent") as Control, Vector2(1.0, 1.0), Vector2(3.0, hint_height - 2.0))
