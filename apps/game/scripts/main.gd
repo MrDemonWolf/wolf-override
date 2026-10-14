@@ -3140,6 +3140,7 @@ func _flash_relay_spark(from_wolf: bool) -> void:
 
 func _sync_records_room(animate_exit: bool = false) -> void:
 	records_room.visible = state.chapter_id == "records"
+	records_room.set_active(records_room.visible)
 	var in_corridor: bool = state.chapter_id == "lockdown"
 	breaker_status_light.visible = in_corridor
 	relay_status_light.visible = in_corridor
