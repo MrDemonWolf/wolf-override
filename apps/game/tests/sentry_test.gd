@@ -764,12 +764,10 @@ func _check_engineer_alone(game: Node2D, path: String) -> void:
 	_expect(SentryBrain.is_exposed(human.position.x) and human.position.x > SentryBrain.COVER_MAX_X, "and the engineer was indeed caught past the right post (x %.0f)" % human.position.x)
 	# Round 3c item 3: the body lies where the card says they were caught: past the right post, fallen
 	# away from the alcove, clear of the TANK RELEASE and of the sentry, which rolls back off them.
-	for _frame: int in 20:
-		await physics_frame
-	var body_rect: Rect2 = _drawn_rect(human.body_sprite)
+	_expect(await _expect_lying(game, 1.0, "out in the lane"), "caught out in the lane, the engineer falls to the right, away from the alcove, onto the floor")
+	var body_rect: Rect2 = _painted_body(human.body_sprite)
 	var sentry_rect: Rect2 = _drawn_rect(room.sentry.visual.body)
 	var release_right: float = JunctionRoom.ARM_X + JunctionRoom.ARM_PANEL_HALF_WIDTH
-	_expect(game.get("fail_active") and is_equal_approx(human.body_sprite.rotation_degrees, MainScript.FALL_DEGREES), "caught out in the lane, the engineer falls to the right, away from the alcove (tilt %.1f)" % human.body_sprite.rotation_degrees)
 	_expect(body_rect.position.x >= SentryBrain.COVER_MAX_X + 3.0 and body_rect.position.x >= release_right + 3.0, "the body lies past the alcove's right post, clear of the TANK RELEASE (body %.1f..%.1f, post %.0f, release ends %.1f)" % [body_rect.position.x, body_rect.end.x, SentryBrain.COVER_MAX_X, release_right])
 	_expect(room.sentry.position.x > human.position.x and sentry_rect.position.x - body_rect.end.x >= 3.0, "the sentry rolls back off the body and stands clear of it (gap %.1f px)" % (sentry_rect.position.x - body_rect.end.x))
 	_expect(await _wait_until(func() -> bool: return not game.get("fail_active"), 240), "the knockdown hands back")
@@ -1095,19 +1093,43 @@ func _sprite_pixels(sprite: Sprite2D, grow: float) -> Dictionary:
 	return pixels
 
 
-## Round 3c item 3: a chase card's knockdown (after a miss, or caught inside the alcove) keeps the shove
-## it always had: the engineer falls away from the way they face, and the sentry stays where it caught
-## them.
+## Round 3c item 3 and P0-3: a chase card's knockdown (after a miss, or caught inside the alcove): the
+## sentry stops where the bodies touch, the engineer falls away from it onto the floor, and it stands
+## clear of the lying body.
 func _expect_shove_fall(game: Node2D, label: String) -> void:
 	var human: M0Actor = game.get_node("Human") as M0Actor
 	var room: JunctionRoom = game.get("junction_room") as JunctionRoom
 	var brain: SentryBrain = game.get("sentry_brain") as SentryBrain
-	var facing: float = -1.0 if human.body_sprite.flip_h else 1.0
-	for _frame: int in 20:
-		await physics_frame
-	var rest: Vector2 = Vector2(0.0, -5.0)
-	_expect(game.get("fail_active") and is_equal_approx(human.body_sprite.rotation_degrees, -MainScript.FALL_DEGREES * facing) and human.body_sprite.position.is_equal_approx(rest + Vector2(-MainScript.FALL_SHIFT.x * facing, MainScript.FALL_SHIFT.y)), "caught %s, the engineer still falls away from the way they face (tilt %.1f)" % [label, human.body_sprite.rotation_degrees])
-	_expect(is_equal_approx(room.sentry.target_x, brain.x) and room.sentry.max_speed == SentryBrain.CHASE_SPEED, "caught %s, the sentry stays where it caught them" % label)
+	var away: float = signf(human.position.x - brain.x)
+	_expect(await _expect_lying(game, away, label), "caught %s, the engineer falls away from the sentry onto the floor" % label)
+	var body_rect: Rect2 = _painted_body(human.body_sprite)
+	var sentry_rect: Rect2 = _drawn_rect(room.sentry.visual.body)
+	var gap: float = sentry_rect.position.x - body_rect.end.x if room.sentry.position.x > human.position.x else body_rect.position.x - sentry_rect.end.x
+	_expect(gap >= 3.0, "caught %s, the sentry stands clear of the lying body (gap %.1f px)" % [label, gap])
+
+
+## P0-3: the knocked-down engineer lies on the floor line: the collapse's last frame, never tilted, the
+## soles on y 440 (the region's bottom row is the soles' row, so nothing is drawn below it), falling
+## [param fall] (1 right, -1 left), and the shadow under the whole body.
+func _expect_lying(game: Node2D, fall: float, label: String) -> bool:
+	var human: M0Actor = game.get_node("Human") as M0Actor
+	var sprite: Sprite2D = human.body_sprite
+	var last_x: float = MainScript.COLLAPSE_FRAME.x * (MainScript.COLLAPSE_SPANS.size() - 1)
+	var down: bool = await _wait_until(func() -> bool: return sprite.texture == MainScript.COLLAPSE_SHEET and is_equal_approx(sprite.region_rect.position.x, last_x), 90)
+	var rect: Rect2 = _drawn_rect(sprite)
+	var reflection: FloorReflection = game.get("human_reflection") as FloorReflection
+	var span: Vector2 = reflection.shadow_span + Vector2.ONE * human.position.x
+	var ok: bool = down and game.get("fail_active") and is_zero_approx(sprite.rotation_degrees) and absf(rect.end.y - JunctionRoom.FLOOR_Y) < 0.01 and sprite.flip_h == (fall < 0.0)
+	ok = ok and span.x <= rect.get_center().x and span.y >= rect.get_center().x and span.y - span.x >= rect.size.x * 0.9 and reflection.shadow.visible
+	if not ok:
+		print("caught %s: not lying on the floor line (down %s, bottom %.2f, tilt %.1f, flip %s, body %.1f..%.1f, shadow %.1f..%.1f)" % [label, down, rect.end.y, sprite.rotation_degrees, sprite.flip_h, rect.position.x, rect.end.x, span.x, span.y])
+	return ok
+
+
+## The engineer's lying body as painted: the collapse frame's cut is 4 px wider than the painting on
+## each side (MainScript.COLLAPSE_SPANS), about 1 px in the room.
+func _painted_body(sprite: Sprite2D) -> Rect2:
+	return _drawn_rect(sprite).grow_individual(-4.0 * MainScript.COLLAPSE_SCALE, 0.0, -4.0 * MainScript.COLLAPSE_SCALE, 0.0)
 
 
 ## The axis-aligned box [param sprite]'s drawn rectangle covers in the world.

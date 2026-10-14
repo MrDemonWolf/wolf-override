@@ -54,6 +54,16 @@
       "implementation_status": "Full-size 1024x1536 master, kept for future re-derivation and art edits. Not imported or exported by Godot: apps/game/art-source/.gdignore hides the folder from the project. The game uses the derived 256x384 copy in entry rowan-side-right-provisional."
     },
     {
+      "asset_id": "engineer-collapse-provisional",
+      "path": "apps/game/assets/engineer-collapse-provisional.png",
+      "source_or_tool": "Cut with Pillow 12.3 (Python), 2026-10-13, from the approved engineer collapse row docs/research-2026-10/sources/walk-final-2026-10-11/death-poses/eng-collapse-sheet.png (SHA-256 068df65bfbfca4e3...), whose frames were painted with the Codex built-in image_gen tool (edit mode over pose guides) on 2026-10-11; Codex session ids, raw SHA-256 sums and the prompts sent are in that folder's provenance.txt and jobs/ files",
+      "source_reference": "Death poses for the death screen, approved by Nathanial Henniges on 2026-10-11 (death screen look A; walk and death frames in sources/walk-final-2026-10-11/, independent art review rounds 1 and 2 in its REVIEW.md); references were the October 8 sprites, the Look 2 character sheets and the approved walk frames",
+      "terms_reference": "https://openai.com/policies/terms-of-use/",
+      "rights_review_status": "Provisional AI-assisted character animation, human reviewed. Character appearance and final commercial asset-rights review remain open; not covered by the code/docs GPL license.",
+      "modifications": "The five 576x320 frames of the approved collapse row (knees, slump, lying on the side) cut to columns 190..519 and rows 64..311 of each cell and laid side by side in one 1650x248 RGBA sheet (330x248 per frame), so each frame's boots stand on column 98 and its soles on the bottom row. The crop drops only the anti-aliased fringe below the soles (rows 312..314, 111 partly transparent pixels) and empty canvas; no other pixel edits. Saved as an optimised PNG (SHA-256 f24cbe4f15855f8b...). The Godot import generates mipmaps, like the standing sprite.",
+      "implementation_status": "Since 2026-10-13 a knockdown plays these frames (90, 90, 135 and 135 ms, then the last one holds; Reduced Motion shows the last one at once) at 0.254 scale, as tall as the standing engineer, with the soles on the floor line, replacing the standing sprite tilted 70 degrees. Checked by headless tests and rendered stills only; not seen in motion by hand. The standing, walking and death-screen use of the walk-final rows is still to come."
+    },
+    {
       "asset_id": "director-side-left-provisional",
       "path": "apps/game/assets/director-side-left-provisional.png",
       "source_or_tool": "Derived from the full-size master apps/game/art-source/characters/director-side-left-provisional.png (entry director-side-left-provisional-master; original source and tools recorded there) with Pillow 12.3 (Python), 2026-10-10",
