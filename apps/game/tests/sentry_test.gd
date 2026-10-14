@@ -41,6 +41,9 @@ class DrawnFrames extends Node:
 
 
 func _initialize() -> void:
+	# One physics step per frame at most: on a busy machine the run slows down instead of taking several
+	# steps between two of Main's frames, so what the checks see does not depend on the machine's load.
+	Engine.max_physics_steps_per_frame = 1
 	call_deferred("_run")
 
 
@@ -1053,39 +1056,52 @@ func _check_walk_into(game: Node2D) -> void:
 	_expect(await _wait_until(func() -> bool: return brain.state == &"patrol" and brain.facing > 0.0 and brain.x >= 690.0 and brain.x <= 720.0, 600), "the sentry patrols up the lane, its back to the alcove")
 	human.position.x = brain.x - SentryBrain.CONTACT_RANGE - 12.0
 	human.body_sprite.flip_h = false
-	var closest: float = await _closest_walking_in(game, &"move_right", 40, &"patrol")
-	_expect(closest >= SentryBrain.CONTACT_RANGE - 0.01 and closest <= SentryBrain.CONTACT_RANGE + 1.0, "walking into its back, the engineer stops where the bodies touch, never inside it (closest %.2f px, contact %.1f)" % [closest, SentryBrain.CONTACT_RANGE])
+	# It rolls on after the engineer is held at contact each frame, so on a drawn frame they trail it by its
+	# own step that frame: "touching" is the gap less that step.
+	var closest: Vector2 = await _closest_walking_in(game, &"move_right", 40, &"patrol")
+	_expect(closest.x >= SentryBrain.CONTACT_RANGE - 0.01 and closest.y <= SentryBrain.CONTACT_RANGE + 1.0, "walking into its back, the engineer stops where the bodies touch, never inside it (closest %.2f px, %.2f less its step, contact %.1f)" % [closest.x, closest.y, SentryBrain.CONTACT_RANGE])
 	game.call("_load_game")
 	game.set("lane_choice", "alone")
-	# Its front: seen out in the lane, the engineer walks on into it through the lock-on beat.
-	_expect(await _wait_until(func() -> bool: return brain.state == &"patrol" and brain.facing < 0.0 and brain.x <= 780.0 and brain.x >= 720.0, 600), "the sentry comes back down the lane")
-	human.position.x = maxf(640.0, brain.x - 90.0)
+	# Its front: seen out in the lane, the engineer walks on into it through the lock-on beat. It is met
+	# on its first stretch down from the far end, right of the hung tank, so the bodies touch, and the
+	# engineer goes down, clear of the tank whatever the frame timing (the lane watch counts a collapse
+	# frame that reaches into the tank's base).
+	_expect(await _wait_until(func() -> bool: return brain.state == &"patrol" and brain.facing < 0.0 and brain.x <= 800.0 and brain.x >= 790.0, 600), "the sentry comes back down the lane")
+	human.position.x = brain.x - 90.0
 	human.body_sprite.flip_h = false
 	_expect(await _wait_until(func() -> bool: return brain.state == &"lock", 5), "it sees the engineer in the lane and locks on")
 	closest = await _closest_walking_in(game, &"move_right", int(SentryBrain.LOCK_SECONDS * 60.0) + 30, &"lock")
-	_expect(closest >= SentryBrain.CONTACT_RANGE - 0.01 and closest <= SentryBrain.CONTACT_RANGE + 1.0, "walking into its front while it locks on, the engineer stops where the bodies touch (closest %.2f px)" % closest)
+	_expect(closest.x >= SentryBrain.CONTACT_RANGE - 0.01 and closest.x <= SentryBrain.CONTACT_RANGE + 1.0, "walking into its front while it locks on, the engineer stops where the bodies touch (closest %.2f px)" % closest.x)
 	_expect(await _wait_until(func() -> bool: return game.get("fail_active"), 120), "the chase that follows runs them down")
 	_expect(absf(human.position.x - brain.x) >= SentryBrain.CONTACT_RANGE - 0.01, "it knocks them down at contact range (%.1f px)" % absf(human.position.x - brain.x))
+	var room: JunctionRoom = game.get("junction_room") as JunctionRoom
+	var tank_right: float = room.global_position.x + DropArm.MARK_X + JunctionRoom.TANK_SIZE.x * 0.5
+	var first_pose: Vector2 = MainScript.collapse_span(0, float(game.get("collapse_fall")), float(game.get("collapse_from_x")))
+	_expect(float(game.get("collapse_fall")) > 0.0 and first_pose.x > tank_right + 4.0, "met right of the hung tank, they go down clear of it from the first frame (body from x %.1f, tank to %.1f)" % [first_pose.x, tank_right])
 	_expect(await _wait_until(func() -> bool: return not game.get("fail_active"), 240), "that knockdown hands back")
 
 
 ## Holds [param action] for [param frames] physics steps, or until the sentry leaves [param while_state]
 ## or a knockdown starts, and returns the closest the engineer came to it on any drawn frame of that
-## time while it was solid (the frame it left that state included).
-func _closest_walking_in(game: Node2D, action: StringName, frames: int, while_state: StringName) -> float:
+## time while it was solid (the frame it left that state included), and the closest less how far it
+## moved on that frame (the engineer is held at contact before it moves).
+func _closest_walking_in(game: Node2D, action: StringName, frames: int, while_state: StringName) -> Vector2:
 	var human: M0Actor = game.get_node("Human") as M0Actor
 	var brain: SentryBrain = game.get("sentry_brain") as SentryBrain
-	var closest: float = INF
+	var closest: Vector2 = Vector2(INF, INF)
 	var until: int = Engine.get_physics_frames() + frames
+	var last_x: float = brain.x
 	Input.action_press(action)
 	while Engine.get_physics_frames() < until:
 		await drawn_frames.drawn
 		if brain.is_solid() and not game.get("fail_active"):
-			closest = minf(closest, absf(human.position.x - brain.x))
+			var gap: float = absf(human.position.x - brain.x)
+			closest = Vector2(minf(closest.x, gap), minf(closest.y, gap - absf(brain.x - last_x)))
+		last_x = brain.x
 		if game.get("fail_active") or brain.state != while_state:
 			break
 	Input.action_release(action)
-	print("Walking into the sentry (%s): closest %.2f px, contact %.1f, then %s" % [while_state, closest, SentryBrain.CONTACT_RANGE, brain.state])
+	print("Walking into the sentry (%s): closest %.2f px (%.2f less its step), contact %.1f, then %s" % [while_state, closest.x, closest.y, SentryBrain.CONTACT_RANGE, brain.state])
 	return closest
 
 
