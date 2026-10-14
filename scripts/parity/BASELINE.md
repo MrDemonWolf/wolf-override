@@ -253,6 +253,24 @@ was rebased again onto `cec75f6` and proven a third time. **Later steps compare 
   the S01 branch (`parity/s01c/perf-after/`) in one session on a busy machine (load about 18);
   table in `parity/s01c/perf-table.md`.
 
+## Baseline for S02 (e241508)
+
+S02 starts on `e241508` (S01 merged). Its `apps/game` is byte-identical to `fbe83c1`'s, the S01
+commit that `parity/after-s01c/` was captured from (same driver, `capture.gd` `c1746c4c`), so
+`parity/after-s01c/` is the stills baseline for S02; it is itself identical to
+`parity/baseline-cec75f6/` in all 36 runs. The UI dump (`parity/s02/ui-base-e241508.txt`, 364
+lines) and the perf "before" (`parity/s02/perf-before/`, five runs) were taken from a `git archive`
+of `e241508`.
+
+- **Stills.** The S02 branch, captured from a snapshot of its `apps/game` into
+  `parity/after-s02/` (4 render lanes, no failed or retried run), compares
+  `ALL IDENTICAL: 36 run folders, 1908 stills compared` against `parity/after-s01c/` and against
+  `parity/baseline-cec75f6/`, with every text and audio log and frame count the same. That covers
+  R4's 32 consecutive fuse frames and 30 consecutive tank-drop frames (critique C1).
+- **UI dump.** The branch's dump diffs empty against `e241508`'s.
+- **Perf.** Five runs of each side, interleaved in one session after the captures (load 6-12);
+  table in `parity/s02/perf-table.md`.
+
 ## S00a: maps refreshed on 9c7371d
 
 Figures from `python3 -I scripts/parity/surface.py` at `9c7371d` (the critique's maps were taken at
