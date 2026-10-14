@@ -50,19 +50,31 @@ func _run() -> void:
 
 # --- WOLF-1 ---------------------------------------------------------------------------------------
 
-## Every line the game gives WOLF ("WOLF: ..." in any string in the game's scripts) is read for words
-## that would hurry the engineer.
+## Every line the game gives WOLF is read for words that would hurry the engineer: in any string in
+## the game's scripts, the row from "WOLF: " on and each row after it in the same box, up to the next
+## speaker ("%s: ", "NAME: ") or the first choice row ("1  ...").
 func _check_no_urgency() -> void:
 	var lines: Array[String] = []
+	var literal: RegEx = RegEx.create_from_string("\"((?:[^\"\\\\]|\\\\.)*)\"")
+	var next_speaker: RegEx = RegEx.create_from_string("^(%s|[A-Z][A-Za-z]+): |^[0-9]  ")
 	for file: String in _scripts("res://scripts"):
 		var source: String = FileAccess.get_file_as_string(file)
-		var literal: RegEx = RegEx.create_from_string("\"((?:[^\"\\\\]|\\\\.)*)\"")
 		for found: RegExMatch in literal.search_all(source):
+			var wolf_speaking: bool = false
 			for row: String in found.get_string(1).c_unescape().split("\n"):
 				var at: int = row.find("WOLF: ")
 				if at >= 0:
+					wolf_speaking = true
 					lines.append(row.substr(at))
+				elif next_speaker.search(row) != null:
+					wolf_speaking = false
+				elif wolf_speaking and not row.strip_edges().is_empty():
+					lines.append(row)
 	_expect(lines.size() >= 20, "the scan finds WOLF's lines (%d)" % lines.size())
+	for row: String in ["It crosses the mark on every pass.", "Take the purge queue. I'll inspect the mirror.", "I chose the relay. We made it."]:
+		_expect(lines.has(row), "the scan reads the second row of WOLF's two-row boxes (\"%s\")" % row)
+	for row: String in ["%s: Then we get through maintenance before the original logs disappear.", "1  USE WOLF'S READOUT     2  USE MANUAL PORT"]:
+		_expect(not lines.has(row), "and stops at the next speaker or the choices (\"%s\")" % row)
 	for line: String in lines:
 		for word: String in URGENCY:
 			_expect(not line.to_lower().contains(word), "WOLF never hurries the engineer: \"%s\" says \"%s\"" % [line, word])
