@@ -359,6 +359,25 @@ func _check_refusals() -> void:
 	game.set("status_line", "")
 	await _refused("row 2, USE at the sealed door", &"door", "Sealed shut. Something hums behind it.\nThe valve beside it charges it.", &"clank")
 	Input.action_release(&"move_right")
+	# Let go at the door: the settle slides the engineer off the valve's body to its side, and USE there
+	# is still the door's after 30 and 90 frames; once they move, the valve answers again.
+	for wait: int in [30, 90]:
+		await _place(380.0, false)
+		Input.action_press(&"move_right")
+		_expect(await _wait_until(func() -> bool: return human.position.x + M0State.HUMAN_HALF_WIDTH >= M0State.JUNCTION_DOOR_LEFT_X - 1.0, 120), "the engineer walks up against the sealed door again")
+		Input.action_release(&"move_right")
+		_expect(await _wait_until(func() -> bool: return not room.flickering(&"door"), 60), "the bump's flicker is over")
+		for _frame: int in wait:
+			await physics_frame
+		_expect(human.position.x < JunctionRoom.VALVE_X, "let go at the door, the engineer settles off the valve's body (x %.1f)" % human.position.x)
+		await _refused("row 2, USE %d frames after letting go at the sealed door" % wait, &"door", "Sealed shut. Something hums behind it.\nThe valve beside it charges it.", &"clank")
+	Input.action_press(&"move_left")
+	for _frame: int in 4:
+		await physics_frame
+	Input.action_release(&"move_left")
+	for _frame: int in 30:
+		await physics_frame
+	await _refused("row 1 after a step back from the door", &"valve", "The valve is dead. Arm the breaker first.", &"clank")
 	# Rows 4 and 4b: the used valve and breaker once the door is down; row 7: the exit before the sentry.
 	await _start_at(false)
 	await _place(valve_x, false)

@@ -448,6 +448,9 @@ var wolf_look_remaining: float = 0.0
 ## has said why yet (only the first bump does).
 var door_bump_latched: bool = false
 var door_bump_said: bool = false
+## Whether the engineer last came to rest from the sealed door's face: the settle slides them off the
+## valve's body to its side, and USE there is still the door's until they move (_door_use).
+var door_faced: bool = false
 var box_blink_tween: Tween
 var door_recoil_tween: Tween
 ## The junction's purge sentry and the arm over its lane; transient, reset by every scene sync.
@@ -1921,6 +1924,7 @@ func _load_game() -> void:
 		wolf_look_x = -1.0
 		wolf_look_remaining = 0.0
 		door_bump_said = false
+		door_faced = false
 		if state.junction_cleared:
 			status_line = JUNCTION_CLEARED_LINE
 		elif state.sentry_down:
@@ -1955,7 +1959,7 @@ func _interact() -> void:
 		_interact_records(x)
 		return
 	if state.chapter_id == "junction":
-		if _at_door_face(x):
+		if _door_use(x):
 			# The sealed door answers for itself ahead of the valve's reach (P0-15).
 			_refuse(REFUSE_DOOR, &"door")
 			return
@@ -2495,6 +2499,7 @@ func _enter_junction() -> void:
 	ladder_seconds = 0.0
 	ladder_step = 0
 	door_bump_said = false
+	door_faced = false
 	_update_controls()
 	status_line = JUNCTION_ENTRY_LINE % state.human_name().get_slice(" ", 0).to_upper()
 	junction_entry_hold = box_seconds(status_line)
@@ -2558,6 +2563,27 @@ func _at_door_face(x: float) -> bool:
 		return false
 	var gap: float = M0State.JUNCTION_DOOR_LEFT_X - (x + M0State.HUMAN_HALF_WIDTH)
 	return gap >= -DOOR_BUMP_SLOP and gap < absf(x - JunctionRoom.VALVE_X)
+
+
+## True when a USE in the junction is the sealed door's: at its face (_at_door_face), or come to rest
+## from there with no move since. Stopped at the face, the engineer stands over the valve's body, so the
+## settle slides them back to the valve's side (_update_settle); still facing the door, USE there stays
+## the door's until any move input. Elsewhere the door_faced mark is dropped.
+func _door_use(x: float) -> bool:
+	if _at_door_face(x):
+		return true
+	if not door_faced or state.door_blown or human.body_sprite.flip_h or not (pressure_line.state in [&"idle", &"tripped"]):
+		return false
+	return x >= VALVE_CRANK_X - 1.0 and x + M0State.HUMAN_HALF_WIDTH < M0State.JUNCTION_DOOR_LEFT_X
+
+
+## Keeps door_faced: set while the engineer is at the sealed door's face, dropped by any move input,
+## facing away or losing control (a scripted step, a choice, a knockdown).
+func _track_door_face() -> void:
+	if _at_door_face(human.position.x):
+		door_faced = true
+	elif not human.controlled or human.body_sprite.flip_h or Input.get_axis(&"move_left", &"move_right") != 0.0:
+		door_faced = false
 
 
 ## A refused press at [param station] (breaker, valve, door, release or bolt): the station's lamp
@@ -2813,6 +2839,7 @@ func _tick_junction(delta: float) -> void:
 			_wolf_reads_seam()
 	_tick_ladder(delta)
 	_check_door_bump()
+	_track_door_face()
 	if wolf.autonomous_target_x == JunctionRoom.WOLF_BAIT_X and absf(wolf.position.x - JunctionRoom.WOLF_BAIT_X) <= 2.0:
 		# At the far end of the lane he faces back down it: at the sentry he draws, then at the engineer.
 		wolf.body_sprite.flip_h = true
@@ -4163,6 +4190,7 @@ func debug_station_side_x(station: Vector4, x: float) -> float:
 ## The engineer at [param human_x] and WOLF at [param wolf_x], standing still, the controls updated.
 func debug_place(human_x: float, wolf_x: float) -> void:
 	human.position.x = human_x
+	door_faced = false
 	wolf.position.x = wolf_x
 	human.velocity = Vector2.ZERO
 	wolf.velocity = Vector2.ZERO
