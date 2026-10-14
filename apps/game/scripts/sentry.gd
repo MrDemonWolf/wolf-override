@@ -151,9 +151,10 @@ class SentryVisual:
 	func is_lit() -> bool:
 		return not wrecked and eye != EYE_OFF
 
-	## What _draw covers, in this node's space: the lens and the beam out to [member reach] at its
-	## widest, or nothing while it is unlit. The debug tools' render box uses it in an exported build,
-	## where the renderer cannot report what was drawn.
+	## What _draw covers, in this node's space: the lamp, the lens and the beam out to where it is
+	## drawn (to [member reach], or only to the alcove's near side when its sight ends inside the
+	## alcove's [member gap]), at its widest; just the lamp while it is unlit. The debug tools' render
+	## box uses it in an exported build, where the renderer cannot report what was drawn.
 	func debug_draw_rect() -> Rect2:
 		if wrecked:
 			return Rect2()
@@ -164,8 +165,11 @@ class SentryVisual:
 		if reach <= Sentry.lens_rect().end.x:
 			return lens
 		var slit: Rect2 = Sentry.lens_rect()
-		var half: float = maxf(_beam_section(reach, slit).x, slit.size.y * 0.5)
-		return lens.merge(Rect2(slit.end.x, slit.get_center().y - half, reach - slit.end.x, half * 2.0))
+		var end: float = reach
+		if gap.y > gap.x and gap.x < reach and gap.y > slit.end.x and reach <= gap.y:
+			end = clampf(gap.x, slit.end.x, reach)
+		var half: float = maxf(_beam_section(end, slit).x, slit.size.y * 0.5)
+		return lens.merge(Rect2(slit.end.x, slit.get_center().y - half, end - slit.end.x, half * 2.0))
 
 	## Powers the machine down or up; [param animate] brightens it over WAKE_SECONDS as it wakes.
 	func set_dormant(value: bool, animate: bool) -> void:
@@ -411,8 +415,8 @@ func _sync_reach() -> void:
 		visual.gap = Vector2.ZERO
 
 
-## Having run the engineer down out in its lane it rolls back to [param x], facing them still, so it
-## stands clear of the body (Main._lane_fall); the next restore places it afresh.
+## With the engineer knocked down near it, it rolls back to [param x], still facing them, so it
+## stands clear of the lying body (Main._start_collapse); the next restore places it afresh.
 func recoil_to(x: float) -> void:
 	target_x = x
 	max_speed = RECOIL_SPEED

@@ -932,6 +932,21 @@ func _check_custom_draw_boxes() -> void:
 	_expect(drawn.has_area() and not beam.is_empty() and beam.get("custom_draw") == true and beam.get("bounds") == "renderer" and _same_rect(beam["screen_rect"], visual.get_global_transform_with_canvas() * drawn), "the sentry's beam has a render box from what it drew (%s)" % [beam.get("screen_rect")])
 	var declared: Rect2 = visual.call("debug_draw_rect")
 	_expect(declared.grow(2.0).encloses(drawn) and drawn.grow(2.0).encloses(declared), "the beam's declared box matches what it drew (%s vs %s)" % [declared, drawn])
+	# Its sight ending inside the alcove, the beam is drawn only to the alcove's near side; so is its box.
+	# (The game and the sentry are held still so nothing redraws the beam from the brain meanwhile.)
+	for holder: Node in [game, room.sentry]:
+		holder.set_physics_process(false)
+		holder.set_process(false)
+	visual.set("gap", Vector2(150.0, 230.0))
+	visual.set("reach", 180.0)
+	visual.queue_redraw()
+	await _settle(2)
+	var cut: Rect2 = RenderingServer.debug_canvas_item_get_rect(visual.get_canvas_item())
+	var cut_declared: Rect2 = visual.call("debug_draw_rect")
+	_expect(cut.end.x < 160.0 and cut_declared.grow(2.0).encloses(cut) and cut.grow(2.0).encloses(cut_declared), "with its sight ending inside the alcove, the beam's declared box still matches what it drew (%s vs %s)" % [cut_declared, cut])
+	for holder: Node in [game, room.sentry]:
+		holder.set_physics_process(true)
+		holder.set_process(true)
 	var boxed: Dictionary = {}
 	for box: Dictionary in geometry["render_boxes"]:
 		boxed[str(box["path"])] = true
