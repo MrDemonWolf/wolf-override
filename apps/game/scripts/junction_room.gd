@@ -63,6 +63,11 @@ const DOOR_REGION: Rect2 = Rect2(0.0, 36.0, 384.0, 604.0)
 const DOOR_SCALE: float = RoomDepth.BULKHEAD_SCALE
 ## The seam painted down the sealed leaf, in canvas pixels.
 const DOOR_SEAM_X: float = 196.0
+## The front lip widens at its foot: in the canvas rows a body lying on the floor fills, its painting
+## starts at this canvas column, left of the pillar's face. It draws over the actors, so from
+## DOOR_FOOT_X a lying body would be under it (Main._start_collapse ends a slump short of it).
+const DOOR_LIP_FOOT_COLUMN: float = 57.0
+const DOOR_FOOT_X: float = M0State.JUNCTION_DOOR_LEFT_X - (RoomDepth.BULKHEAD_PILLAR_X - DOOR_LIP_FOOT_COLUMN) * DOOR_SCALE
 ## How long the breaking bulkhead shows at the blast before the blown one replaces it.
 const DOOR_BREAK_SECONDS: float = 0.15
 const VENT_REGION: Rect2 = Rect2(8.0, 35.0, 743.0, 183.0)

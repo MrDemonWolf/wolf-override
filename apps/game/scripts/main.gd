@@ -3342,7 +3342,7 @@ func _fail_beat(reason: String, by_sentry: bool = false) -> void:
 ## forward where they stand, never dragged back against the fall. Whatever knocked them down, a live
 ## sentry in the junction rolls back off them (Sentry.recoil_to) as far as it takes for its drawn body
 ## to stand LANE_FALL_CLEAR clear of theirs, and a body that would lie into a missed tank on the floor
-## ends short of it.
+## or under the foot of the bulkhead's front lip ends short of it.
 func _start_collapse(by_sentry: bool, in_lane: bool) -> void:
 	collapse_flip = human.body_sprite.flip_h
 	collapse_fall = -1.0 if collapse_flip else 1.0
@@ -3366,6 +3366,12 @@ func _start_collapse(by_sentry: bool, in_lane: bool) -> void:
 		var lying: Vector2 = collapse_span(COLLAPSE_SPANS.size() - 1, collapse_fall, collapse_to_x)
 		if lying.y > tank_from and lying.x < tank_to:
 			collapse_to_x += tank_from - lying.y if human.position.x < DropArm.MARK_X else tank_to - lying.x
+	# The bulkhead's front lip draws over the actors: facing it from its left (cranking the valve when
+	# the door blows, say), a slump that would reach under the lip's foot ends LANE_FALL_CLEAR short of
+	# it, the boots thrown back from the door as the knees go, so no part of the lying body is hidden.
+	if collapse_fall > 0.0 and human.position.x < M0State.JUNCTION_DOOR_LEFT_X:
+		var door_lying: Vector2 = collapse_span(COLLAPSE_SPANS.size() - 1, collapse_fall, collapse_to_x)
+		collapse_to_x -= maxf(0.0, door_lying.y - (JunctionRoom.DOOR_FOOT_X - LANE_FALL_CLEAR))
 	if not sentry_brain.is_solid():
 		return
 	var body: Vector2 = collapse_span(COLLAPSE_SPANS.size() - 1, collapse_fall, collapse_to_x)
