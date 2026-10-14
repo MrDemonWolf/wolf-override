@@ -128,14 +128,15 @@ static func _words(text: String, tags: Array[String]) -> PackedStringArray:
 	return plain.split(" ", false)
 
 
-## Every String line constant in Main and JunctionRoom's knockdown cards, and every string literal
-## main.gd says through status_line, with "%s" as the engineer's name ({NAME} where it is a tag) and
+## Every line constant in Main (the trust line's boxes, the refusals and the opening exchange too) and
+## JunctionRoom's knockdown cards, and every string literal main.gd says through status_line, _tell,
+## _say or _say_next, with "%s" as the engineer's name ({NAME} where it is a tag) and
 ## "%d" as a number. WOLF's remembered line at the safe point is filled in with each of its three.
 func _corpus() -> Array[String]:
 	var out: Array[String] = []
 	var constants: Dictionary = (load(MAIN_SCRIPT) as Script).get_script_constant_map()
 	for name: String in constants:
-		if name.ends_with("_LINE") or name.ends_with("_LINES") or name.ends_with("_QUESTION") or name.ends_with("_WARNING"):
+		if name.ends_with("_LINE") or name.ends_with("_LINES") or name.ends_with("_QUESTION") or name.ends_with("_WARNING") or name.contains("_LINE_") or name.begins_with("REFUSE_") or name == "OPENING_EXCHANGE":
 			var value: Variant = constants[name]
 			if value is String:
 				out.append(_fill(value))
@@ -155,9 +156,13 @@ func _corpus() -> Array[String]:
 				if found.get_string(1).contains(" "):
 					remembered.append(found.get_string(1).c_unescape())
 	for line: String in source.split("\n"):
-		if not line.contains("status_line = "):
+		var said_at: int = -1
+		for call: String in ["status_line = ", "_tell(", "_say_next(", "_say(["]:
+			if line.contains(call):
+				said_at = line.find(call)
+		if said_at < 0:
 			continue
-		for found: RegExMatch in literal.search_all(line.substr(line.find("status_line = "))):
+		for found: RegExMatch in literal.search_all(line.substr(said_at)):
 			var text: String = found.get_string(1).c_unescape()
 			if not text.contains(" "):
 				continue
