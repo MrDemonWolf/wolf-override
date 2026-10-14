@@ -14,9 +14,12 @@ const HUMAN_HALF_WIDTH: float = 14.0
 const WOLF_HALF_WIDTH: float = 31.0
 ## The Service Junction's sealed door face; until the door is blown nobody can stand past it.
 const JUNCTION_DOOR_LEFT_X: float = 452.0
+## The engineer's two answers at the relay. A save keeps the words its player saw (memory
+## "selected_text"), so a save made before option 2 was reworded on 2026-10-13 ("Go now. We can talk
+## after.") still quotes those words in WOLF's callback.
 const CHOICE_TEXT = {
 	"disclose_risk": "The relay may vent coolant. Your call.",
-	"press_without_warning": "Go now. We can talk after.",
+	"press_without_warning": "Skip the risk talk. Go now.",
 }
 ## The saved ways the junction's sentry can have come down (lane_recap), empty before it falls:
 ## WOLF drew it, he refused, the engineer timed it with WOLF at the rubble, or he broke off by the

@@ -837,9 +837,19 @@
    {
     "id": "DEATH_CARD_SENTRY",
     "where": "Death card, cause line, after the sentry catches the engineer during a chase. SENTRY_REASON stays the non-chase knockdown line (sentry_brain.touches fires on any contact, main.gd:1497).",
-    "text": "The sentry caught %s in the lane. It did not slow.",
-    "alternative": "The sentry caught %s short of the rubble.",
-    "note": "'Caught' instead of 'ran down' so the card and the knockdown line (SENTRY_REASON 'ran you down') are not the same words for two outcomes. The alternative points at the fix (the rubble) without stating it. No contact or injury described."
+    "text": "The sentry caught %s short of the rubble.",
+    "alternative": null,
+    "note": "'Caught' instead of 'ran down' so the card and the knockdown line (SENTRY_REASON 'ran you down') are not the same words for two outcomes. The alternative points at the fix (the rubble) without stating it. No contact or injury described. 2026-10-13 (Q16): the approved alternative is the final text, since the rubble is drawn and the lane is not. With the longest preset name it needs a row break: 'The sentry caught Morgan / short of the rubble.' Not built yet (the P0 batch builds the death card).",
+    "history": [
+     {
+      "text": "The sentry caught %s in the lane. It did not slow.",
+      "alternative": "The sentry caught %s short of the rubble."
+     }
+    ],
+    "approved": {
+     "date": "2026-10-13",
+     "source": "docs/decisions.md, Play decisions (October 13, 2026), Q16; confirmed in docs/research-2026-10/how-it-should-play/drafts-2026-10-13.md, item 3 (S5)"
+    }
    },
    {
     "id": "DEATH_CARD_COOLANT",
@@ -1076,15 +1086,26 @@
     "id": "WOLF_RESPAWN_PRESS_2",
     "where": "WOLF's line after the second retry of a session, PRESS. From the third death on, WOLF_RESPAWN_LOOK is used instead.",
     "text": "WOLF: Again. I'm still where I was.",
-    "alternative": "WOLF: Again. We can talk after.",
-    "note": "Same shape as the DISCLOSE tier so the contrast is the stance. The alternative hands the engineer's own press line back, cold but not blocking; 'I won't go first' was dropped because it ties his refusal to the death."
+    "alternative": null,
+    "note": "Same shape as the DISCLOSE tier so the contrast is the stance. The alternative hands the engineer's own press line back, cold but not blocking; 'I won't go first' was dropped because it ties his refusal to the death. 2026-10-13 (Q14): the relay's option 2 now reads 'Skip the risk talk. Go now.', so the alternative that echoed the old words ('We can talk after.') is dropped; the primary stands. Not built yet.",
+    "history": [
+     {
+      "text": "WOLF: Again. I'm still where I was.",
+      "alternative": "WOLF: Again. We can talk after."
+     }
+    ],
+    "approved": {
+     "date": "2026-10-13",
+     "source": "docs/research-2026-10/how-it-should-play/drafts-2026-10-13.md, item 1 (Q14)"
+    }
    },
    {
     "id": "WOLF_RESPAWN_LOOK",
     "where": "Narrator text from the third retry of a session onward, under both relay memories.",
     "text": "WOLF looks over once, and says nothing.",
     "alternative": "WOLF looks over once, then back to the lane.",
-    "note": "One gesture for both stances with no line to wear out. The primary is neutral enough for a pre-lane retry; the alternative only fits once the lane is live."
+    "note": "One gesture for both stances with no line to wear out. The primary is neutral enough for a pre-lane retry; the alternative only fits once the lane is live.",
+    "open_2026_10_13": "P0-7 (approved 2026-10-13) drops 'lane' from shown lines; this line still says it. Not built yet: reword it for Nathanial's approval when the death-text set is built (for example 'eyes on the sentry')."
    },
    {
     "id": "WOLF_STATION_CORRIDOR_DISCLOSE",
@@ -1119,7 +1140,8 @@
     "where": "WOLF's station moment at the junction door lamp (about x 496) on a completed hold, DISCLOSE. Condition on not wolf_baiting and not state.sentry_down; after the sentry is down drop the lane clause ('WOLF settles close under the lamp.').",
     "text": "WOLF settles under the lamp, eyes on the lane.",
     "alternative": "WOLF: I'll stay in the light with you.",
-    "note": "Close and watchful in the room's most physical register. The alternative is the warmest line in the set and belongs only here, after the blast, where it is earned."
+    "note": "Close and watchful in the room's most physical register. The alternative is the warmest line in the set and belongs only here, after the blast, where it is earned.",
+    "open_2026_10_13": "P0-7 (approved 2026-10-13) drops 'lane' from shown lines; this line still says it. Not built yet: reword it for Nathanial's approval when the death-text set is built (for example 'eyes on the sentry')."
    },
    {
     "id": "WOLF_STATION_JUNCTION_PRESS",

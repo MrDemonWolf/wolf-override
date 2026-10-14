@@ -248,7 +248,8 @@ func _check_scene() -> void:
 	# Round 3 item 3: there is no floor at the sealed door (the valve stands in front of it), so the line
 	# says what the picture shows: WOLF at the valve, reading its LINE gauge.
 	var entry_line: String = str(game.get("status_line"))
-	_expect(entry_line.begins_with("WOLF runs ahead to the valve and reads its LINE gauge.\n") and not entry_line.contains("behind the sealed door") and entry_line.contains(": The breaker by the entrance feeds that line."), "the entry line says WOLF reads the valve's LINE gauge, not the door")
+	# Q6 (approved 2026-10-13): the engineer says only the goal; WOLF's run is shown, not narrated.
+	_expect(entry_line == "%s: That door is our way through." % state.human_name().get_slice(" ", 0).to_upper() and not entry_line.contains("runs ahead") and not entry_line.contains("Overload it"), "the entry line is the engineer's goal only, with no narration of WOLF's run and no chain")
 	_expect(absf(JunctionRoom.WOLF_SEAM_X + M0Actor.WOLF_REACH - (JunctionRoom.VALVE_X - JunctionRoom.VALVE_HALF_WIDTH)) <= 4.0, "his reading spot puts his snout at the valve's edge, under its LINE gauge")
 	_expect(await _wait_until(func() -> bool: return absf(wolf.position.x - JunctionRoom.WOLF_SEAM_X) <= 4.0, 120), "WOLF reaches the valve")
 	for _frame: int in 20:
@@ -275,8 +276,16 @@ func _check_scene() -> void:
 	Input.action_release(&"move_right")
 	_expect(human.position.x < 460.0, "the sealed door blocks the way right")
 	_expect(str(game.call("_context_hint")).contains("valve is dead"), "the valve points back at the breaker before the line is armed")
+	# P0-15: pressed up against the sealed door, USE is the door's, ahead of the valve's reach.
+	Input.action_press(&"move_right")
+	await physics_frame
 	await _tap(&"interact")
-	_expect(line.state == &"idle" and str(game.get("status_line")).contains("Arm the overload breaker"), "USE at a dead valve explains the breaker")
+	Input.action_release(&"move_right")
+	_expect(line.state == &"idle" and str(game.get("status_line")) == "Sealed shut. Something hums behind it.\nThe valve beside it charges it.", "USE against the sealed door gets the door's own answer")
+	var valve_station: Vector4 = (game.get_script().get_script_constant_map()["JUNCTION_STATIONS"] as Array)[1]
+	game.call("debug_place", JunctionRoom.VALVE_X + valve_station.w * float(game.call("_station_offset", valve_station)), wolf.position.x)
+	await _tap(&"interact")
+	_expect(line.state == &"idle" and str(game.get("status_line")) == "The valve is dead. Arm the breaker first.", "USE at a dead valve explains the breaker")
 	var dial: Vector2 = JunctionRoom.prop_point(room.valve_art, JunctionRoom.VALVE_DIAL_CENTRE)
 	var caption: Rect2 = room.line_caption.get_rect()
 	_expect(room.line_caption.text == "LINE" and caption.end.x < dial.x and caption.position.y < dial.y and caption.end.y > dial.y, "the valve's dial carries a LINE caption just left of it")
@@ -368,13 +377,14 @@ func _check_scene() -> void:
 	_expect(fuse_ticks[0] == PressureLine.FUSE_TICKS, "the fuse's ticks are heard, %d of %d" % [fuse_ticks[0], PressureLine.FUSE_TICKS])
 	_expect(_player_for(game, &"hiss_mid") == null and _player_for(game, &"hum") == null, "the line's hiss and pump stop when the door goes")
 	_expect(room.door_breaking_art.visible and not room.door_art.visible and not room.door_blown_art.visible, "at the blast the bulkhead shows breaking first")
-	_expect(game.call("_objective") == "CHECK THE LANE" and room.door_label.text == "DOOR DOWN" and room.blast_sparks.emitting, "the blast is a real state change with sparks, and the card names the lane before anyone mentions the tank")
-	_expect(room.breaker_label.text == "BREAKER SPENT" and room.valve_label.text == "VALVE SPENT", "the blast spends the breaker and the valve")
+	_expect(game.call("_objective") == "GO THROUGH THE DOOR" and room.door_label.text == "DOOR DOWN" and room.blast_sparks.emitting, "the blast is a real state change with sparks, and the card says to go through the door before anyone mentions the tank")
+	_expect(room.breaker_label.text == "BREAKER USED" and room.valve_label.text == "VALVE USED", "the blast uses up the breaker and the valve, in plain words")
 	var knocked: bool = false
 	for _frame: int in 30:
 		await physics_frame
 		knocked = knocked or game.get("fail_active")
-	_expect(not knocked and human.controlled and str(game.get("status_line")) == "The door goes. WOLF heads for the rubble to wait for %s's call. In the lane beyond, something whirs awake." % state.human_name().get_slice(" ", 0), "clear of the zone the blast is not a knockdown, even at its edge, and the line says WOLF is heading for the rubble to wait for the engineer's call")
+	_expect(not knocked and human.controlled and str(game.get("status_line")) == "The door goes. WOLF heads for the rubble\nto wait for %s's call." % state.human_name().get_slice(" ", 0), "clear of the zone the blast is not a knockdown, even at its edge, and the line says WOLF is heading for the rubble to wait for the engineer's call")
+	_expect(game.get("box_queue") == ["Past the doorway, something whirs awake."], "the sentry waking past the doorway is the next box")
 	_expect(await _wait_until(func() -> bool: return room.door_blown_art.visible and not room.door_breaking_art.visible, 30), "then it stands blown open on the passage beyond")
 	_expect(await _wait_until(func() -> bool: return not room.sentry.visual.dormant and room.sentry.visual.is_lit() and room.sentry.visual.body.modulate == Color.WHITE, 90), "the blast wakes the sentry: it powers up and its eye lights")
 	_expect(_labels_clear(room), "after the blast the station plates still sit apart in their row")
@@ -392,22 +402,22 @@ func _check_scene() -> void:
 	# A blast with the engineer already past the fuse needs no second save; Continue restores B.
 	game.call("_load_game")
 	state = game.get("state") as M0State
-	_expect(state.door_blown and room.visible and room.door_shape.disabled and not room.door_art.visible and room.door_blown_art.visible and str(game.get("status_line")).contains("door is down"), "Continue restores the blown door and says so")
-	_expect(room.breaker_label.text == "BREAKER SPENT" and room.valve_label.text == "VALVE SPENT", "Continue shows the same spent breaker and valve as the blast did")
+	_expect(state.door_blown and room.visible and room.door_shape.disabled and not room.door_art.visible and room.door_blown_art.visible and str(game.get("status_line")) == "Service junction restored. The door is\ndown. The sentry patrols past the rubble.", "Continue restores the blown door and says so")
+	_expect(room.breaker_label.text == "BREAKER USED" and room.valve_label.text == "VALVE USED", "Continue shows the same used breaker and valve as the blast did")
 	# The spent line stays spent after Continue: the breaker will not arm, the valve takes no turns
 	# and a stray blast call does nothing.
 	var b_bytes: PackedByteArray = FileAccess.get_file_as_bytes(path)
 	_expect(line.state == &"blown", "Continue from autosave B leaves the line spent, not idle")
 	_expect(await _walk_to(human, JunctionRoom.BREAKER_X), "the engineer walks back to the spent breaker")
 	await _tap(&"interact")
-	_expect(line.state == &"blown" and str(game.get("status_line")).contains("breaker is spent") and not room.vent_steam.emitting, "USE at the spent breaker after Continue arms nothing")
+	_expect(line.state == &"blown" and str(game.get("status_line")) == "No charge left. The door is down." and not room.vent_steam.emitting, "USE at the spent breaker after Continue arms nothing")
 	for _frame: int in 30:
 		await physics_frame
 	_expect(line.state == &"blown" and line.gauge == 0.0 and not game.get("fail_active"), "no gauge builds and no vent trips after the door is down")
 	_expect(await _walk_to(human, JunctionRoom.VALVE_X), "the engineer walks to the spent valve")
 	_expect(game.call("_hold_station") == &"" and not str(game.call("_context_hint")).contains("valve is dead"), "the spent valve offers no crank and never reads as dead")
 	await _tap(&"interact")
-	_expect(str(game.get("status_line")).contains("valve is spent") and line.turns == 0, "USE at the spent valve says so and takes no turns")
+	_expect(str(game.get("status_line")) == "No charge left. The door is down." and line.turns == 0, "USE at the spent valve says so and takes no turns")
 	game.call("_door_blast")
 	_expect(not game.get("fail_active") and FileAccess.get_file_as_bytes(path) == b_bytes and Engine.time_scale == 1.0, "a blast with the door already down is no knockdown, no save and no hit-stop")
 	# A failed autosave never costs more than the current beat: with an older autosave A on disk and

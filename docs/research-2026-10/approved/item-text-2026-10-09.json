@@ -1138,5 +1138,10 @@
    "The draft 'why' rationales in the scratchpad JSON paraphrase private planning. Keep them out of commits, PR text and the public docs.",
    "WOLF notice lines are all 40 characters or fewer, examine text is all 140 characters or fewer, and there are no square brackets (RichTextLabel-safe). All spelling is US; the engineer is never gendered."
   ]
+ },
+ "notes_2026_10_13": {
+  "source": "docs/research-2026-10/how-it-should-play/drafts-2026-10-13.md (items 1 and 3), approved by Nathanial 2026-10-13",
+  "relay_choice": "The relay's option 2 now reads 'Skip the risk talk. Go now.' (option 1 unchanged). The brief above quotes the old words ('Go now. We can talk after.'); WOLF's 'press' reactions keep their stance. A save made before the change keeps the old words.",
+  "junction_words": "Shown lines no longer say alcove, posts, lane, brackets or floor mark; they name the TANK RELEASE, the sentry's sights, the mark, the rubble and the door. Plate state words are plain: BREAKER USED, VALVE USED, RELEASE USED, EXIT LOCKED, EXIT READY (ARM PANEL is TANK RELEASE). The brief's vocabulary list above predates this; LOG_LANE's wording ('lane panel', 'SENTRY / LANE PATROL') is not built and is to be decided against these words when it is."
  }
 }
