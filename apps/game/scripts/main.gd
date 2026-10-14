@@ -297,7 +297,7 @@ const LADDER_CHAIN_LINE: String = "%s: Overload it, crank the valve,\nand the do
 ## station's lamp flickers twice (JunctionRoom.flicker), a short dull clunk plays (the clank, pitched
 ## down) and the line shows in the box; pressing again re-shows it and the box blinks once.
 const REFUSE_VALVE_DEAD: String = "The valve is dead. Arm the breaker first."
-const REFUSE_VALVE_TRIPPED: String = "The vent let go and the breaker tripped. Reset it by the entrance."
+const REFUSE_VALVE_TRIPPED: String = "The vent let go and the breaker tripped.\nReset it by the entrance."
 const REFUSE_DOOR: String = "Sealed shut. Something hums behind it.\nThe valve beside it charges it."
 const REFUSE_BREAKER_LIVE: String = "Already live. Crank the valve by the door."
 const REFUSE_FUSE_LIT: String = "Fuse lit. Get clear of the door."

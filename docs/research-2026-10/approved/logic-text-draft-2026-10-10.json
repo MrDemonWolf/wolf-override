@@ -810,10 +810,21 @@
       "trigger": "USE at the valve after a trip.",
       "speaker": "NARRATION",
       "current": "The vent let go and the breaker tripped. Reset it on the left.",
-      "proposed": "The vent let go and the breaker tripped. Reset it by the entrance.",
+      "proposed": "The vent let go and the breaker tripped.\nReset it by the entrance.",
       "alternatives": [],
-      "notes": "Fit: 1 of 3 rows, untagged box (855 px text width, Roboto 17 px). 2026-10-13 (item 5, P0-15): kept as it is; now shown with the refusal feedback (lamp flicker, clunk, re-show with a blink).",
-      "status": "approved by Nathanial 2026-10-11 (as drafted)"
+      "notes": "Fit: 1 of 3 rows, untagged box (855 px text width, Roboto 17 px). 2026-10-13 (item 5, P0-15): kept as it is; now shown with the refusal feedback (lamp flicker, clunk, re-show with a blink). Same words, reflowed to two rows (40 and 25 characters) so the row stays within the 42-character line rule; the item 5 table lists row 1b as 'Keep (2 rows)'.",
+      "status": "approved by Nathanial 2026-10-13 (item 5 (P0-15), row 1b, kept; through clickable choices after reading the drafts)",
+      "history": [
+        {
+          "proposed": "The vent let go and the breaker tripped. Reset it by the entrance.",
+          "alternatives": [],
+          "status": "approved by Nathanial 2026-10-11 (as drafted)"
+        }
+      ],
+      "approved": {
+        "date": "2026-10-13",
+        "source": "docs/research-2026-10/how-it-should-play/drafts-2026-10-13.md, item 5 (P0-15), row 1b"
+      }
     },
     {
       "id": "JUNCTION_BREAKER_LEFT_3",
@@ -1953,9 +1964,9 @@
       "trigger": "Each invalid press in the Service Junction (item 5 table, rows 1-7).",
       "speaker": "NARRATION",
       "current": null,
-      "proposed": "Row 1 valve before the breaker: The valve is dead. Arm the breaker first.\nRow 1b valve after a trip: The vent let go and the breaker tripped. Reset it by the entrance. (kept)\nRow 2 sealed door (USE, and the first bump): Sealed shut. Something hums behind it. / The valve beside it charges it.\nRow 3 breaker while the line builds: Already live. Crank the valve by the door.\nRow 3b breaker or valve while the fuse burns: Fuse lit. Get clear of the door. (kept)\nRow 4 used valve: No charge left. The door is down.\nRow 4b used breaker: No charge left. The door is down.\nRow 5 DROP too early: Wait. WOLF hasn't got it on the mark yet. (kept)\nRow 5b DROP while the tank winches up: Not yet. The tank is still going back up.\nRow 6 used release: The tank is down on the sentry. / The exit bolt is by the hatch. (kept, two rows)\nRow 7 exit before the sentry is down: Locked out until the sentry is down.\nRow 7b exit before the door is down (hand-made saves only): Bolted. The sealed door comes first.",
+      "proposed": "Row 1 valve before the breaker: The valve is dead. Arm the breaker first.\nRow 1b valve after a trip: The vent let go and the breaker tripped. / Reset it by the entrance. (kept, two rows)\nRow 2 sealed door (USE, and the first bump): Sealed shut. Something hums behind it. / The valve beside it charges it.\nRow 3 breaker while the line builds: Already live. Crank the valve by the door.\nRow 3b breaker or valve while the fuse burns: Fuse lit. Get clear of the door. (kept)\nRow 4 used valve: No charge left. The door is down.\nRow 4b used breaker: No charge left. The door is down.\nRow 5 DROP too early: Wait. WOLF hasn't got it on the mark yet. (kept)\nRow 5b DROP while the tank winches up: Not yet. The tank is still going back up.\nRow 6 used release: The tank is down on the sentry. / The exit bolt is by the hatch. (kept, two rows)\nRow 7 exit before the sentry is down: Locked out until the sentry is down.\nRow 7b exit before the door is down (hand-made saves only): Bolted. The sealed door comes first.",
       "alternatives": [],
-      "notes": "Feedback on every row: on the press frame the station's lamp flickers twice, a short dull clunk plays, the line shows as the status line in the dialogue box, and a repeated press re-shows it with one blink of the box. Walking into the sealed door: a thud, a stop and a lamp flicker, with the row 2 line on the first bump only. Rows 2, 3, 4, 4b, 5b, 7 and 7b are new wording; 1 shortens an approved line.",
+      "notes": "Feedback on every row: on the press frame the station's lamp flickers twice, a short dull clunk plays, the line shows as the status line in the dialogue box, and a repeated press re-shows it with one blink of the box. Walking into the sealed door: a thud, a stop and a lamp flicker, with the row 2 line on the first bump only. Rows 2, 3, 4, 4b, 5b, 7 and 7b are new wording; 1 shortens an approved line; 1b keeps its words on two rows.",
       "status": "approved by Nathanial 2026-10-13 (item 5 (P0-15), rows 1-7; through clickable choices after reading the drafts)",
       "approved": {
         "date": "2026-10-13",
