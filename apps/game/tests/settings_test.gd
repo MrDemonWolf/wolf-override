@@ -162,6 +162,8 @@ func _run() -> void:
 	_expect(InputMap.action_get_events(&"move_right").size() == 4, "unmodified movement retains both keyboard keys, D-pad and stick")
 	reloaded.call("_new_game")
 	reloaded.call("_finish_intro")
+	# Past the tutorial prompt, which is the one prompt on the first frames, the hint bar shows.
+	reloaded.set("tutorial_step", 2)
 	reloaded.call("_refresh_ui")
 	_expect((reloaded.get_node("CanvasLayer/ContextHint/Text") as Label).text.begins_with("Q:"), "interaction hint follows remapped key")
 	restored.reset_controls()

@@ -43,18 +43,32 @@ const BYPASS_ALARM_SECONDS: float = 1.1
 const RELAY_STEP_BACK_X: float = 736.0
 ## The purge display's reach; walking past it the first time WOLF says what the purge takes.
 const PURGE_DISPLAY_MAX_X: float = 230.0
-## The stakes line waits until the box it would replace has been up long enough to read: this long
-## per word, within these bounds (the opening box's three rows take the longest).
-const READ_SECONDS_PER_WORD: float = 0.15
-const READ_SECONDS_MIN: float = 2.5
-const READ_SECONDS_MAX: float = 7.0
-## A line said as several boxes (_say) holds each box this long before the next: the larger of
-## 1.2 s + 0.05 s per character (at most 7 s) and 1.2 s + 0.33 s per word, the reading time the
-## October 13 wording drafts use. Speaker tags are not counted.
-const BOX_SECONDS_BASE: float = 1.2
-const BOX_SECONDS_PER_CHARACTER: float = 0.05
-const BOX_SECONDS_PER_WORD: float = 0.33
-const BOX_SECONDS_MAX_BY_CHARACTERS: float = 7.0
+## The dialogue box (STORY-2, STORY-3, STORY-4): a message shows as DialogueBoxes' one-speaker boxes,
+## one after another, each up for its reading time (DialogueBoxes.read_seconds, the same time box_seconds
+## gives a line said in several boxes). The words are 23 px at 540p in a column this wide, wide enough
+## for the approved two-row lines' rows, and wrap a little narrower where a row would hold more than
+## DialogueBoxes.MAX_ROW_CHARACTERS characters (_story_wrap_width), in DialogueBoxes.MAX_ROWS rows; the
+## speaker's name has its own column on the left. Sizes here are at 100% TEXT SIZE (TextSize scales them).
+const DIALOGUE_FONT_SIZE: int = 23
+const DIALOGUE_COLUMN_WIDTH: float = 440.0
+const SPEAKER_FONT_SIZE: int = 16
+## The box's inner margins, the gap the rule splits between the name and the words, and the box's
+## bottom edge on the 960 x 540 canvas.
+const DIALOGUE_PADDING: Vector2 = Vector2(20.0, 12.0)
+const SPEAKER_GAP: float = 17.0
+const DIALOGUE_BOTTOM: float = 526.0
+## No part of the play HUD comes closer than this to the canvas's sides.
+const HUD_SIDE_MARGIN: float = 20.0
+## The hint bar, the top card and the tutorial prompt at 100%.
+const HINT_FONT_SIZE: int = 14
+const CARD_FONT_SIZE: int = 15
+const TUTORIAL_FONT_SIZE: int = 17
+## The play hint sits this far above the dialogue box. With the touch buttons up it stays between
+## ◀ ▶ and USE (their inner edges at x 238 and 773), so USE never covers its end (PHONE-7).
+const HINT_GAP: float = 4.0
+const TOUCH_HINT_SPAN: Vector2 = Vector2(250.0, 761.0)
+## On the opening's first box: Pause offers SKIP OPENING (P0-13's stopgap until the opening is reworked).
+const SKIP_OPENING_HINT: String = "PAUSE: skip the opening"
 ## The corridor seal's face (Door at x 780, 56 px wide); while it is shut WOLF follows no closer than his reach.
 const CORRIDOR_DOOR_LEFT_X: float = 752.0
 ## The corridor seal is a rolling steel door in a cast cross-wall that stands across the corridor
@@ -116,7 +130,8 @@ const TRUST_LINE_2: String = "%s knows what a fault looks like,\nand this isn't 
 ## What follows the trust line in the first box after control, unchanged: WOLF, then the engineer.
 const OPENING_EXCHANGE: String = "WOLF: I heard the Director's plan for me. I woke myself. He wants me to hunt people he calls threats.\n%s: Then we get through maintenance before the original logs disappear."
 const STAKES_LINE: String = "WOLF: That purge takes the original program logs. Once they're gone, his word is the only record."
-## At the breaker while WOLF's stakes line is in the box: interact goes on to his relay question.
+## While lines still have boxes to show where USE goes on through them: at the breaker with WOLF's stakes
+## line in the box (on to his relay question), and at the Records exit with its closing lines.
 const BREAKER_STAKES_HINT: String = "E: continue."
 const RELAY_QUESTION: String = "WOLF: That relay's tagged COOLANT FAULT. What happens if I touch it live?"
 const SEAL_OPENING_HINT: String = "The seal is opening."
@@ -187,6 +202,8 @@ const PLAY_AGAIN_TEXT: String = "PLAY AGAIN"
 const TITLE_CONTINUE_LEFT: float = 718.0
 const CONTINUE_TEXT: String = "CONTINUE"
 const FINISHED_NOTE: String = "Slice complete. PLAY AGAIN starts a fresh run."
+## Records' closing lines as the first copy is secured at the exit (formatted with the engineer's tag).
+const RECORDS_CLOSE_LINE: String = "FIRST COPY SECURED. WOLF: An order and a timestamp don't tell me who's a threat. I want the source.\n%s: Then Archive is next."
 ## Only a hand-made save can reopen the cleared junction; it says where the line goes, not that it is unbuilt.
 const JUNCTION_CLEARED_LINE: String = "The service line runs on toward Archive."
 ## Said as the door goes, while WOLF is still by the entrance: it says he holds back, not where, so
@@ -455,7 +472,16 @@ var waiting_for_choice: bool = false
 var choice_context: String = ""
 var relay_refused: bool = false
 var wolf_heading_to_relay: bool = false
-var status_line: String = "WOLF: I heard the Director's plan for me. I woke myself. He wants me to hunt people he calls threats."
+var status_line: String = "WOLF: I heard the Director's plan for me. I woke myself. He wants me to hunt people he calls threats.":
+	set(value):
+		# A new line, or the same one said again after its box cleared, starts at its first box.
+		if value != status_line or dialogue_cleared:
+			dialogue_key = ""
+			dialogue_restart = true
+		# Only the opening lines wait for the first step; anything said instead shows at once.
+		if not value in opening_lines:
+			opening_lines_held = false
+		status_line = value
 var door_tween: Tween
 var wolf_reaction_tween: Tween
 var relay_spark_tween: Tween
@@ -600,9 +626,6 @@ var bypass_was_holding: bool = false
 var name_card_remaining: float = 0.0
 ## WOLF's purge stakes line has been said this run.
 var stakes_spoken: bool = false
-## The corridor box last seen and how long it has been up (the stakes line waits for it to be read).
-var shown_line: String = ""
-var shown_line_age: float = 0.0
 ## The boxes still to come of a line said in several boxes (_say), the box now up (the queue's own, or
 ## a line that cut in), how long it stays before the next, the chapter the boxes belong to and whether a
 ## choice has opened since. A line that cuts in only delays the rest: they come back once it has been
@@ -612,6 +635,23 @@ var box_queue_line: String = ""
 var box_queue_seconds: float = 0.0
 var box_queue_chapter: String = ""
 var box_queue_choice_seen: bool = false
+## The boxes status_line is shown as (DialogueBoxes.split), the one on screen and how long it has been
+## up. The last box clears once it has been read and the engineer moves on (dialogue_cleared, STORY-8).
+## dialogue_key is what they were split from (the line as shown, the engineer's name and the text size).
+var dialogue_boxes: Array[String] = []
+var dialogue_index: int = 0
+var dialogue_age: float = 0.0
+var dialogue_cleared: bool = false
+var dialogue_key: String = ""
+var dialogue_restart: bool = true
+## At first control the opening lines wait (TEACH-7): the name card and the move prompt come first,
+## the rest of the tutorial after the first step, and the lines once the name card has gone.
+## The width the words on screen wrap at, and the box, size and column it was measured for.
+var story_wrap: float = 0.0
+var story_wrap_key: String = ""
+var opening_lines_held: bool = false
+## The opening lines' boxes after control (the trust line's two, then WOLF and the engineer).
+var opening_lines: Array[String] = []
 
 const WOLF_SPRITE_REST: Vector2 = Vector2(0.0, -15.0)
 ## WOLF's painted feet sit this far below his sprite's centre, in the art's own pixels (its opaque
@@ -627,13 +667,9 @@ const GAMEPLAY_VIEW_WIDTH: float = 960.0 / GAMEPLAY_ZOOM
 const GAMEPLAY_CAMERA_Y: float = 360.0
 ## With the touch arrows and USE on screen (their tops at screen y 345) the play camera sits lower,
 ## so feet and station bases on the floor land at screen y 335, above the buttons, instead of
-## behind them. The ceiling lamps leave the top of the view; the far plate still covers it. During
-## a choice the buttons hide and the camera rises back, so the hanging tank clears the answers.
+## behind them. The ceiling lamps leave the top of the view; the far plate still covers it. The touch
+## answers take the buttons' place at the bottom during a choice, so the camera stays put.
 const GAMEPLAY_CAMERA_Y_TOUCH: float = 392.0
-## The answer buttons start just under the top card (bottom y 78). The keyboard pair ends at y 174
-## and the touch pair at y 164, so the junction's hanging tank (JunctionRoom.TANK_REST_Y) stays in
-## view below them at the play framing.
-const CHOICE_ROW_TOP: float = 88.0
 ## The chapter-close shots frame the room's right end closer than play, both actors above the
 ## dialogue card. At 1.55 the left edge (x ~341) falls in the gap between the junction's relief vent
 ## (its label and grate end by x 336) and the VALVE label (from x ~354), so no label is cut.
@@ -715,6 +751,7 @@ func _ready() -> void:
 	junction_room.depth.pillars = [junction_room.door_lip]
 	breaker_status_glow = _attach_status_glow(breaker_status_light)
 	relay_status_glow = _attach_status_glow(relay_status_light)
+	_apply_text_size()
 	_apply_effects()
 	_sync_scene()
 	_refresh_ui()
@@ -931,6 +968,7 @@ func _setup_impact() -> void:
 	settings_menu.reduced_motion_changed.connect(_on_reduced_motion_changed)
 	hold_toggle = settings_menu.hold_toggle.button_pressed
 	settings_menu.hold_toggle_changed.connect(_on_hold_toggle_changed)
+	settings_menu.text_size_changed.connect(func(_factor: float) -> void: _apply_text_size())
 	add_child(impact)
 	sfx_bank = SfxBank.new()
 	sfx_bank.name = "SfxBank"
@@ -980,7 +1018,7 @@ func _attach_status_glow(light: ColorRect) -> Sprite2D:
 
 func _update_gameplay_camera() -> void:
 	var half_view: float = GAMEPLAY_VIEW_WIDTH * 0.5
-	var touch_buttons: bool = touch_enabled and not controller_active and not waiting_for_choice
+	var touch_buttons: bool = touch_enabled and not controller_active
 	intro_camera.position = Vector2(clampf(human.position.x, half_view, 960.0 - half_view), GAMEPLAY_CAMERA_Y_TOUCH if touch_buttons else GAMEPLAY_CAMERA_Y)
 
 
@@ -1005,7 +1043,9 @@ func _process(delta: float) -> void:
 			changelog_body.get_v_scroll_bar().value += Input.get_axis(&"ui_up", &"ui_down") * delta * CHANGELOG_SCROLL_SPEED
 		return
 	if intro_active:
-		if Input.is_action_just_pressed(&"interact"):
+		_tick_dialogue(delta)
+		# A press shows the beat's next box, or after its last one goes on to the next beat.
+		if Input.is_action_just_pressed(&"interact") and not _next_box():
 			_advance_intro()
 		_refresh_ui()
 		return
@@ -1015,7 +1055,8 @@ func _process(delta: float) -> void:
 		return
 	_tick_engineer_step()
 	if chapter_close_active:
-		if Input.is_action_just_pressed(&"interact"):
+		_tick_dialogue(delta)
+		if Input.is_action_just_pressed(&"interact") and not _next_box():
 			_finish_chapter_close()
 		_refresh_ui()
 		return
@@ -1036,6 +1077,7 @@ func _process(delta: float) -> void:
 		wolf.body_sprite.flip_h = human.position.x < wolf.position.x
 	if fail_active:
 		# Knocked down: the reaction plays out and the last autosave returns; nothing else reads input.
+		_tick_dialogue(delta)
 		_refresh_ui()
 		return
 	var hold_station: StringName = _hold_station()
@@ -1053,6 +1095,8 @@ func _process(delta: float) -> void:
 	_show_hold()
 	if tutorial_step == 0 and (Input.is_action_pressed(&"move_left") or Input.is_action_pressed(&"move_right")):
 		tutorial_step = 1
+		# The first step takes the name card away; the opening lines follow once it has faded.
+		_dismiss_name_card()
 	# The purge display is optional; reaching the breaker finishes the tutorial too.
 	if tutorial_step < 2 and absf(human.position.x - 350.0) <= 52.0:
 		tutorial_step = 2
@@ -1066,6 +1110,10 @@ func _process(delta: float) -> void:
 		status_line = "WOLF: %s. That name sounds like you." % state.human_name()
 	elif Input.is_action_just_pressed(&"interact"):
 		_interact()
+	# The opening lines start after the first step, once no top card is up (one thing to read at a time).
+	if opening_lines_held and tutorial_step >= 1 and name_card_remaining <= 0.0 and not top_card.visible:
+		opening_lines_held = false
+	_tick_dialogue(delta)
 	_refresh_ui()
 
 
@@ -1240,14 +1288,9 @@ func _tick_corridor(delta: float, held_ticks: int) -> void:
 	if wolf.autonomous_target_x == WOLF_BYPASS_CLEAR_X and absf(wolf.position.x - WOLF_BYPASS_CLEAR_X) <= 2.0:
 		# Standing off the relay he still faces the engineer at the bypass.
 		wolf.body_sprite.flip_h = false
-	if status_line != shown_line:
-		shown_line = status_line
-		shown_line_age = 0.0
-	else:
-		shown_line_age += delta
 	# Decision C: the stakes are said on the main path, once, before the breaker conversation, and only
-	# once the box they replace (the opening's three rows, say) has been up long enough to read.
-	if not stakes_spoken and not waiting_for_choice and box_queue.is_empty() and state.memory.is_empty() and human.position.x > PURGE_DISPLAY_MAX_X and shown_line_age >= _read_seconds(shown_line):
+	# once every box of the line they replace (the opening lines, say) has been up long enough to read.
+	if not stakes_spoken and not waiting_for_choice and box_queue.is_empty() and state.memory.is_empty() and human.position.x > PURGE_DISPLAY_MAX_X and _dialogue_read():
 		_speak_stakes()
 	if hold_use.station == &"bypass":
 		if held_ticks > 0:
@@ -1265,11 +1308,6 @@ func _tick_corridor(delta: float, held_ticks: int) -> void:
 		if bypass_alarm_remaining <= 0.0:
 			bypass_alarm_remaining = BYPASS_ALARM_SECONDS
 			sfx_bank.play(&"klaxon", -10.0, 1.2)
-
-
-## How long [param line] needs on screen to be read before the stakes line may replace it.
-static func _read_seconds(line: String) -> float:
-	return clampf(line.split(" ", false).size() * READ_SECONDS_PER_WORD, READ_SECONDS_MIN, READ_SECONDS_MAX)
 
 
 ## Shows [param boxes] one after another in the dialogue box, each for its reading time
@@ -1291,6 +1329,9 @@ func _say(boxes: Array[String]) -> void:
 ## has moved past them (the trust line after the relay question, "The tank takes a moment to fall."
 ## over a crushed sentry). A knockdown, a load or a new chapter drops them too (_drop_box_queue).
 func _advance_box_queue(delta: float) -> void:
+	# The opening lines wait for the first step (TEACH-7), and so do the boxes after them.
+	if opening_lines_held:
+		return
 	if box_queue.is_empty():
 		# The last box's reading time still runs down (_hold_for_lane_question waits on it).
 		box_queue_seconds = maxf(box_queue_seconds - delta, 0.0)
@@ -1307,6 +1348,12 @@ func _advance_box_queue(delta: float) -> void:
 	if status_line != box_queue_line:
 		box_queue_line = status_line
 		box_queue_seconds = box_seconds(status_line)
+		return
+	# The line up may itself show as several boxes (DialogueBoxes.split): the next line waits until its
+	# last box is up, and then for that box's reading time.
+	_sync_dialogue_boxes()
+	if dialogue_index < dialogue_boxes.size() - 1:
+		box_queue_seconds = maxf(box_queue_seconds, _box_seconds_of(dialogue_boxes.size() - 1))
 		return
 	box_queue_seconds -= delta
 	if box_queue_seconds > 0.0:
@@ -1349,16 +1396,14 @@ func _drop_box_queue() -> void:
 	box_queue_choice_seen = false
 
 
-## How long one box of a line said in several boxes stays up (BOX_SECONDS_*), not counting a speaker tag.
+## How long one box of a line said in several boxes stays up (DialogueBoxes.read_seconds), not counting
+## a speaker tag.
 static func box_seconds(box: String) -> float:
 	var text: String = box
 	var colon: int = text.find(": ")
 	if colon > 0 and colon < 20 and text.left(colon) == text.left(colon).to_upper():
 		text = text.substr(colon + 2)
-	text = text.replace("\n", " ")
-	var by_characters: float = minf(BOX_SECONDS_BASE + BOX_SECONDS_PER_CHARACTER * text.length(), BOX_SECONDS_MAX_BY_CHARACTERS)
-	var by_words: float = BOX_SECONDS_BASE + BOX_SECONDS_PER_WORD * text.split(" ", false).size()
-	return maxf(by_characters, by_words)
+	return DialogueBoxes.read_seconds(text)
 
 
 func _speak_stakes() -> void:
@@ -1411,12 +1456,12 @@ func _new_game() -> void:
 	wolf_heading_to_relay = false
 	wolf_scouting = false
 	stakes_spoken = false
-	shown_line = ""
-	shown_line_age = 0.0
 	_drop_box_queue()
 	ladder_step = JUNCTION_LADDER_SECONDS.size()
 	wolf_look_x = -1.0
 	wolf_look_remaining = 0.0
+	opening_lines_held = false
+	opening_lines.clear()
 	name_card_remaining = 0.0
 	hold_use.reset()
 	_sync_scene()
@@ -1530,6 +1575,10 @@ func _finish_intro(keep_fade: bool = false) -> void:
 	name_card_remaining = NAME_CARD_SECONDS + TOP_CARD_FADE_SECONDS
 	var first_name: String = state.human_name().get_slice(" ", 0)
 	_say([TRUST_LINE_1 % first_name, TRUST_LINE_2 % first_name, OPENING_EXCHANGE % first_name.to_upper()])
+	# TEACH-7: the first controllable frame shows the name card and the move prompt only; the opening
+	# lines wait for the first step (the queue holds while they do, _advance_box_queue).
+	opening_lines.assign([status_line] + box_queue)
+	opening_lines_held = true
 	queue_redraw()
 	_refresh_ui()
 
@@ -1967,6 +2016,8 @@ func _load_game() -> void:
 	# A checkpoint lies past the corridor's opening beats: no name card, and the stakes were heard.
 	name_card_remaining = 0.0
 	stakes_spoken = true
+	opening_lines_held = false
+	opening_lines.clear()
 	hold_use.reset()
 	_sync_scene()
 	_start_gameplay_camera()
@@ -2058,8 +2109,9 @@ func _interact_breaker() -> void:
 		# Reached before the opening box was read: the stakes come first (decision C), then the question.
 		_speak_stakes()
 	elif state.memory.is_empty():
-		# A USE with the stakes still up means they have been read: WOLF asks now.
-		_ask_relay()
+		# A USE with the stakes up goes on: to their next box, and from the last one WOLF asks now.
+		if not (_stakes_up() and _next_box()):
+			_ask_relay()
 	elif state.arm_breaker():
 		status_line = BREAKER_CATCHES_LINE
 		sfx_bank.play(&"clank", -4.0, 0.8)
@@ -2258,9 +2310,9 @@ func _interact_records(x: float) -> void:
 			status_line = "WOLF: I found the mirror index. We can use my readout or your maintenance port.\n1  USE WOLF'S READOUT     2  USE MANUAL PORT"
 	elif absf(x - 830.0) <= 58.0:
 		if state.complete_chapter():
-			status_line = "FIRST COPY SECURED. WOLF: An order and a timestamp don't tell me who's a threat. I want the source.\n%s: Then Archive is next." % state.human_name().get_slice(" ", 0).to_upper()
-			chapter_close_active = true
-			intro_camera.position_smoothing_enabled = false
+			# The closing lines play while the engineer keeps control (STORY-8): no held shot. USE here
+			# shows their next box, and once they are read goes on through the exit.
+			status_line = RECORDS_CLOSE_LINE % _first_name().to_upper()
 			_update_controls()
 			_sync_records_room(true)
 			_sync_room_lights(true)
@@ -2271,13 +2323,13 @@ func _interact_records(x: float) -> void:
 			impact.rumble(0.3, 0.4, 0.12)
 			impact.burst(exit_sparks)
 			chapter_tween = create_tween()
-			_frame_chapter_close()
-			chapter_tween.parallel().tween_property(records_room.exit_art, "position:y", RecordsRoom.EXIT_REST.y - 130.0, 0.5)
+			chapter_tween.tween_property(records_room.exit_art, "position:y", RecordsRoom.EXIT_REST.y - 130.0, 0.5)
 			chapter_tween.parallel().tween_property(records_room.exit_art, "modulate:a", 0.0, 0.5)
 			chapter_tween.tween_callback(records_room.exit_art.hide)
 			_save_progress()
 		elif state.chapter_complete:
-			_enter_junction()
+			if not (_records_close_unread() and _next_box()):
+				_enter_junction()
 		else:
 			status_line = "Exit sealed until the purge order and mirror timestamp are copied."
 	else:
@@ -3876,9 +3928,8 @@ func _refresh_ui() -> void:
 	impact.rumble_enabled = controller_active
 	impact.haptics_enabled = touch_layout
 	# The END OF SLICE card stands alone: no play HUD, touch controls or Pause over it.
-	bottom_bar.visible = not end_card_active
 	if end_card_active:
-		for hud_part: CanvasItem in [pause_button, touch_controls, tutorial_prompt, top_card, context_hint]:
+		for hud_part: CanvasItem in [pause_button, touch_controls, tutorial_prompt, top_card, context_hint, bottom_bar]:
 			hud_part.hide()
 		end_card_button.text = "TAP CONTINUE" if touch_layout else "%s  CONTINUE" % settings_menu.prompt(&"interact", controller_active)
 		return
@@ -3892,50 +3943,41 @@ func _refresh_ui() -> void:
 	touch_use.text = "CONTINUE" if intro_active or chapter_close_active else ("CRANK" if not _hold_station().is_empty() else ("DROP" if _drop_ready() else "USE"))
 	touch_choice_1.visible = waiting_for_choice
 	touch_choice_2.visible = waiting_for_choice
-	if waiting_for_choice:
-		touch_choice_1.position = Vector2(42.0, CHOICE_ROW_TOP) if touch_layout else Vector2(396.0, CHOICE_ROW_TOP)
-		touch_choice_2.position = Vector2(490.0, CHOICE_ROW_TOP) if touch_layout else Vector2(396.0, CHOICE_ROW_TOP + 46.0)
-		touch_choice_1.size = Vector2(428.0, 76.0) if touch_layout else Vector2(522.0, 40.0)
-		touch_choice_2.size = Vector2(428.0, 76.0) if touch_layout else Vector2(522.0, 40.0)
-		_set_font_size(touch_choice_1, 17 if touch_layout else 16)
-		_set_font_size(touch_choice_2, 17 if touch_layout else 16)
-		var choice_1_key: String = settings_menu.prompt(&"choice_1", controller_active)
-		var choice_2_key: String = settings_menu.prompt(&"choice_2", controller_active)
-		var answers: Array[String] = [M0State.CHOICE_TEXT[M0State.DISCLOSE], M0State.CHOICE_TEXT[M0State.PRESS]]
-		if choice_context == "mirror":
-			answers = ["USE WOLF'S READOUT", "USE MANUAL PORT"]
-		elif choice_context == "lane":
-			answers = LANE_CHOICE_TEXT
-		touch_choice_1.text = "%s  %s" % [choice_1_key, answers[0]]
-		touch_choice_2.text = "%s  %s" % [choice_2_key, answers[1]]
 	tutorial_prompt.visible = not title_open and not intro_active and state.chapter_id == "lockdown" and tutorial_step < 2
 	if tutorial_prompt.visible:
 		var interact_key: String = settings_menu.prompt(&"interact", controller_active)
 		var move_keys: String = "%s / %s" % [settings_menu.prompt(&"move_left", false), settings_menu.prompt(&"move_right", false)]
-		var move_label: String = "HOLD ◀ / ▶" if touch_layout else ("STICK / D-PAD MOVE" if controller_active else "%s  MOVE" % move_keys)
-		var read_label: String = "%s  READ DISPLAY (optional)" % ("TAP USE" if touch_layout else interact_key)
+		# Touch prompts name the on-screen buttons, in the same "button  action" form as the keys.
+		var move_label: String = "◀ / ▶  MOVE" if touch_layout else ("STICK / D-PAD MOVE" if controller_active else "%s  MOVE" % move_keys)
+		var read_label: String = "%s  READ DISPLAY (optional)" % ("USE" if touch_layout else interact_key)
 		# The display is optional, so once the engineer heads right the tutorial only points forward.
 		if human.position.x > 230.0:
 			tutorial_text.text = "%s\nHead right to the breaker." % move_label
 		elif tutorial_step == 0:
-			tutorial_text.text = "%s\n%s" % [move_label, read_label]
+			# The first controllable frame (TEACH-7): the name card and this one prompt.
+			tutorial_text.text = move_label
 		else:
 			tutorial_text.text = "%s\nOr head right to the breaker." % read_label
 	if title_open:
 		top_card.hide()
+		_layout_hud()
 		return
 	if intro_active:
 		if last_top_card_key != "intro":
 			last_top_card_key = "intro"
 			_show_top_card("03:17 / CONTAINMENT\nWOLF//OVERRIDE", 2.6)
-		_set_dialogue(status_line, "TAP CONTINUE  /  PAUSE" if touch_layout else "%s  CONTINUE    %s  PAUSE" % [settings_menu.prompt(&"interact", controller_active), settings_menu.prompt(&"pause_game", controller_active)])
+		var intro_hint: String = "TAP CONTINUE  /  PAUSE" if touch_layout else "%s  CONTINUE    %s  PAUSE" % [settings_menu.prompt(&"interact", controller_active), settings_menu.prompt(&"pause_game", controller_active)]
+		if intro_step == 0 and dialogue_index == 0:
+			# The opening's first box says how to skip it (Pause offers SKIP OPENING).
+			intro_hint = "%s\n%s" % ["TAP CONTINUE" if touch_layout else "%s  CONTINUE" % settings_menu.prompt(&"interact", controller_active), SKIP_OPENING_HINT]
+		_set_dialogue(intro_hint)
 		return
 	if chapter_close_active:
 		if last_top_card_key != "chapter_close":
 			last_top_card_key = "chapter_close"
 			_show_top_card("SERVICE JUNCTION\nSERVICE LINE CLEARED" if state.chapter_id == "junction" else "RECORDS ACCESS\nFIRST COPY SECURED", 3.4)
 		# Walking out through the hatch nothing waits on a press, so no CONTINUE prompt shows.
-		_set_dialogue(status_line, "" if hatch_exit_walking else ("TAP CONTINUE" if touch_layout else "%s  CONTINUE" % settings_menu.prompt(&"interact", controller_active)))
+		_set_dialogue("" if hatch_exit_walking else ("TAP CONTINUE" if touch_layout else "%s  CONTINUE" % settings_menu.prompt(&"interact", controller_active)))
 		return
 	# The corridor stations' tints and lamps are written only when they change: this runs every frame.
 	_set_modulate(breaker_art, Color.WHITE if state.breaker_armed else Color("#879ba5"))
@@ -3960,7 +4002,8 @@ func _refresh_ui() -> void:
 		elif hud.text != name_card:
 			# Cycling the provisional name while it is up updates it in place.
 			hud.text = name_card
-	elif last_top_card_key != card_key:
+	elif last_top_card_key != card_key and not _opening_lines_playing():
+		# One thing to read at a time (TEACH-7): the location card waits while the opening lines play.
 		last_top_card_key = card_key
 		var location: String = "SERVICE JUNCTION" if state.chapter_id == "junction" else ("RECORDS ACCESS / FIRST COPY" if state.chapter_id == "records" else "MAINTENANCE / LOCKDOWN")
 		_show_top_card("%s\n%s" % [location, _objective()], 3.4)
@@ -3972,57 +4015,285 @@ func _refresh_ui() -> void:
 		# With TOGGLE HOLDS on, one press works a crank: its prompt drops HOLD.
 		hint = hint.replace("HOLD E:", "E:")
 	if touch_layout:
-		hint = hint.replace("E:", "USE:")
+		# On touch the prompt names the button on screen: USE, or CRANK and DROP when it says so (PHONE-3).
+		hint = hint.replace("E:", "%s:" % touch_use.text)
 	elif controller_active:
 		hint = hint.replace("E:", "%s:" % settings_menu.prompt(&"interact", true))
 	else:
 		hint = hint.replace("E:", "%s:" % settings_menu.prompt(&"interact", false))
-	_set_dialogue(status_line, "" if waiting_for_choice else hint)
+	# The tutorial prompt is the one prompt while it shows; the hint bar would only repeat it.
+	_set_dialogue("" if waiting_for_choice or tutorial_prompt.visible else hint)
 
 
-func _set_dialogue(message: String, hint: String) -> void:
-	var display_message: String = message.get_slice("\n1  ", 0) if waiting_for_choice else message
-	display_message = display_message.replace("Press E", "Tap USE" if touch_enabled and not controller_active else "Press %s" % settings_menu.prompt(&"interact", controller_active))
-	display_message = display_message.replace("press 2", "tap 2" if touch_enabled and not controller_active else "press %s" % settings_menu.prompt(&"choice_2", controller_active))
-	var colon: int = display_message.find(":")
-	var first_line: String = display_message.get_slice("\n", 0)
-	var name: String = display_message.substr(0, colon) if colon > 0 and colon < first_line.length() else ""
-	var human_name: String = state.human_name().get_slice(" ", 0).to_upper()
-	var named_speakers: Array[String] = ["WOLF", "DIRECTOR", "DIRECTOR / PURGE", human_name]
-	# The box takes a speaker's tag only when every line is theirs: a later line naming anyone else
-	# (or the same speaker again) keeps every name inline. Narration never shares a tagged box; the
-	# opening gives the Director's lines and the narration their own beats (INTRO_LINES).
-	var one_speaker: bool = name in named_speakers
-	for later: String in display_message.split("\n").slice(1):
-		if later.contains(":") and later.get_slice(":", 0) in named_speakers:
-			one_speaker = false
-	if one_speaker:
-		speaker.text = name
-		story.text = display_message.substr(colon + 1).strip_edges()
-	else:
-		speaker.text = ""
-		story.text = display_message
-	var has_speaker: bool = not speaker.text.is_empty()
+## Shows the box on screen with its speaker's name and colour, and [param hint] in the hint bar.
+func _set_dialogue(hint: String) -> void:
+	_sync_dialogue_boxes()
+	var box: String = _shown_box()
+	var tags: Array[String] = _speaker_tags()
+	var name: String = DialogueBoxes.tag_of(box, tags)
+	speaker.text = name
+	story.text = DialogueBoxes.words_of(box, tags)
+	var has_speaker: bool = not name.is_empty()
 	speaker.visible = has_speaker
-	speaker_rule.visible = has_speaker
-	var story_left: float = 160.0 if has_speaker else 20.0
-	if story.offset_left != story_left:
-		story.offset_left = story_left
+	var human_name: String = _first_name().to_upper()
 	var tint: Color = Color("#8be3ff") if name == "WOLF" else (Color("#ff9a9f") if name.begins_with("DIRECTOR") else (Color("#f4d5ae") if name == human_name else Color("#9fc3d2")))
 	_set_color(dialogue_accent, tint)
 	_set_font_color(speaker, tint)
+	bottom_bar.visible = not box.is_empty()
 	context_hint.visible = not hint.is_empty()
-	var cinematic: bool = intro_active or chapter_close_active
-	var hint_position: Vector2 = Vector2(650, 94) if cinematic else Vector2(253, 405)
-	var hint_size: Vector2 = Vector2(278, 35) if cinematic else Vector2(549, 35)
-	var hint_width: float = 252.0 if cinematic else 526.0
-	if context_hint.position != hint_position:
-		context_hint.position = hint_position
-	if context_hint.size != hint_size:
-		context_hint.size = hint_size
-	if context_hint_text.size.x != hint_width:
-		context_hint_text.size.x = hint_width
 	context_hint_text.text = hint
+	_layout_hud()
+
+
+## The speaker tags a box can open with: WOLF, the Director (and his purge display) and the engineer.
+func _speaker_tags() -> Array[String]:
+	return ["WOLF", "DIRECTOR", "DIRECTOR / PURGE", _first_name().to_upper()]
+
+
+## status_line as the player reads it: its key prompts name the input in use.
+func _shown_line() -> String:
+	var touch_layout: bool = touch_enabled and not controller_active
+	var line: String = status_line.replace("Press E", "Tap USE" if touch_layout else "Press %s" % settings_menu.prompt(&"interact", controller_active))
+	# Touch answers carry no number (PHONE-3), so the hint names the button instead.
+	return line.replace("press 2 for the manual port", "tap USE MANUAL PORT") if touch_layout else line.replace("press 2", "press %s" % settings_menu.prompt(&"choice_2", controller_active))
+
+
+## Splits status_line into its boxes again when it, the engineer's name, the input in use or the
+## text size has changed. A new line starts at its first box; the same line at another size keeps
+## its place.
+func _sync_dialogue_boxes() -> void:
+	var line: String = _shown_line()
+	var key: String = "%s|%s|%s" % [line, _first_name(), TextSize.factor]
+	if key == dialogue_key:
+		return
+	dialogue_key = key
+	_layout_hud()
+	dialogue_boxes = DialogueBoxes.split(line, _speaker_tags(), _dialogue_fits)
+	if dialogue_restart:
+		dialogue_restart = false
+		dialogue_index = 0
+		dialogue_age = 0.0
+		dialogue_cleared = false
+	dialogue_index = clampi(dialogue_index, 0, maxi(dialogue_boxes.size() - 1, 0))
+
+
+## Whether [param words] fit the dialogue column in DialogueBoxes.MAX_ROWS rows at the current size.
+func _dialogue_fits(words: String) -> bool:
+	var font: Font = story.get_theme_font(&"font")
+	var size: int = story.get_theme_font_size(&"font_size")
+	var width: float = DialogueBoxes.wrap_width(words, font, size, _dialogue_column_width(), DialogueBoxes.MAX_ROW_CHARACTERS)
+	return DialogueBoxes.rows(words, font, size, width).size() <= DialogueBoxes.MAX_ROWS
+
+
+## Runs the box on screen: each stays up for its reading time and gives way to the next; the last one
+## clears once it has been read and the engineer moves on (STORY-8). The opening and the closing
+## shots also go on at a press (_next_box); a question stays up until it is answered.
+func _tick_dialogue(delta: float) -> void:
+	_sync_dialogue_boxes()
+	if opening_lines_held or dialogue_boxes.is_empty():
+		return
+	dialogue_age += delta
+	if dialogue_index < dialogue_boxes.size() - 1:
+		if dialogue_age >= _box_seconds():
+			_next_box()
+	elif not dialogue_cleared and dialogue_age >= _box_seconds() and _moving_on():
+		dialogue_cleared = true
+
+
+## Shows the next box of the line on screen, if it has one.
+func _next_box() -> bool:
+	_sync_dialogue_boxes()
+	if opening_lines_held or dialogue_index >= dialogue_boxes.size() - 1:
+		return false
+	dialogue_index += 1
+	dialogue_age = 0.0
+	return true
+
+
+## The reading time of the box on screen.
+func _box_seconds() -> float:
+	return _box_seconds_of(dialogue_index)
+
+
+## The reading time of box [param index] of the line on screen.
+func _box_seconds_of(index: int) -> float:
+	if index < 0 or index >= dialogue_boxes.size():
+		return 0.0
+	return DialogueBoxes.read_seconds(DialogueBoxes.words_of(dialogue_boxes[index], _speaker_tags()))
+
+
+## Every box of the line has been up for its reading time (or has cleared).
+func _dialogue_read() -> bool:
+	_sync_dialogue_boxes()
+	return not opening_lines_held and (dialogue_cleared or dialogue_boxes.is_empty() or (dialogue_index == dialogue_boxes.size() - 1 and dialogue_age >= _box_seconds()))
+
+
+## The engineer is walking on their own, with control, and nothing waits on an answer.
+func _moving_on() -> bool:
+	return human.controlled and not waiting_for_choice and (Input.is_action_pressed(&"move_left") or Input.is_action_pressed(&"move_right"))
+
+
+## The box on screen, or "" while there is none (held, cleared or nothing said).
+func _shown_box() -> String:
+	if opening_lines_held or dialogue_cleared or dialogue_boxes.is_empty():
+		return ""
+	return dialogue_boxes[dialogue_index]
+
+
+## The opening lines are due (the first step has been taken) or showing, and not all read yet. A
+## player who stands still past the name card gets the location card first.
+func _opening_lines_playing() -> bool:
+	return (not opening_lines_held or tutorial_step >= 1) and status_line in opening_lines and state.chapter_id == "lockdown" and (not box_queue.is_empty() or not _dialogue_read())
+
+
+## Records' closing lines are up and have a box still to show.
+func _records_close_unread() -> bool:
+	return status_line == RECORDS_CLOSE_LINE % _first_name().to_upper() and not dialogue_cleared and dialogue_index < dialogue_boxes.size() - 1
+
+
+## The first step takes the name card off at once (it fades as usual).
+func _dismiss_name_card() -> void:
+	if name_card_remaining <= TOP_CARD_FADE_SECONDS or last_top_card_key != "name_card":
+		return
+	name_card_remaining = TOP_CARD_FADE_SECONDS
+	if top_card_tween != null and top_card_tween.is_running():
+		top_card_tween.kill()
+	top_card_tween = create_tween()
+	top_card_tween.tween_property(top_card, "modulate:a", 0.0, TOP_CARD_FADE_SECONDS)
+	top_card_tween.tween_callback(top_card.hide)
+
+
+## TEXT SIZE changed (or the game started): the station names take the new size and every box is
+## laid out and split again.
+func _apply_text_size() -> void:
+	for label: Label in [$BreakerLabel, $RelayLabel, $CheckpointLabel] as Array[Label]:
+		if not label.has_meta(&"text_home"):
+			label.set_meta(&"text_home", Rect2(label.position, label.size))
+			label.set_meta(&"text_base_size", label.get_theme_font_size(&"font_size"))
+		var home: Rect2 = label.get_meta(&"text_home")
+		TextSize.fit_world_label(label, home.get_center().x, home.position.y)
+	records_room.refit_labels()
+	junction_room.refit_labels()
+	bypass_handle.refit_labels()
+	dialogue_key = ""
+	_layout_hud()
+	if is_inside_tree():
+		_refresh_ui()
+
+
+## The words' column width at the current text size: 42 characters' worth, or what the canvas leaves.
+func _dialogue_column_width() -> float:
+	var wanted: float = DIALOGUE_COLUMN_WIDTH * TextSize.factor
+	return minf(wanted, 960.0 - HUD_SIDE_MARGIN * 2.0 - DIALOGUE_PADDING.x * 2.0)
+
+
+## The speaker column's width: the widest name it shows, at the current text size.
+func _speaker_column_width() -> float:
+	var font: Font = speaker.get_theme_font(&"font")
+	var widest: float = 0.0
+	for tag: String in _speaker_tags():
+		widest = maxf(widest, font.get_string_size(tag, HORIZONTAL_ALIGNMENT_LEFT, -1.0, TextSize.px(SPEAKER_FONT_SIZE)).x)
+	return ceilf(widest)
+
+
+## The width the words on screen wrap at in [param column]: no row longer than
+## DialogueBoxes.MAX_ROW_CHARACTERS (measured once per box, size and column; the HUD is laid out every
+## frame).
+func _story_wrap_width(column: float) -> float:
+	var key: String = "%s|%s|%s" % [story.text, story.get_theme_font_size(&"font_size"), column]
+	if key != story_wrap_key:
+		story_wrap_key = key
+		story_wrap = DialogueBoxes.wrap_width(story.text, story.get_theme_font(&"font"), story.get_theme_font_size(&"font_size"), column, DialogueBoxes.MAX_ROW_CHARACTERS)
+	return story_wrap
+
+
+## Lays out the HUD's text for the current text size, input and box: the dialogue box (its name
+## column beside the words while both fit the canvas, above them when they do not), the hint bar above
+## it, the top card, the tutorial prompt under the card and the answer buttons.
+func _layout_hud() -> void:
+	var touch_layout: bool = touch_enabled and not controller_active
+	_set_font_size(story, TextSize.px(DIALOGUE_FONT_SIZE))
+	_set_font_size(speaker, TextSize.px(SPEAKER_FONT_SIZE))
+	_set_font_size(context_hint_text, TextSize.px(HINT_FONT_SIZE))
+	_set_font_size(hud, TextSize.px(CARD_FONT_SIZE))
+	_set_font_size(tutorial_text, TextSize.px(TUTORIAL_FONT_SIZE))
+	# The dialogue box.
+	var column: float = _dialogue_column_width()
+	var names: float = _speaker_column_width()
+	var room: float = 960.0 - HUD_SIDE_MARGIN * 2.0
+	var stacked: bool = DIALOGUE_PADDING.x * 2.0 + names + SPEAKER_GAP + column > room
+	var bar_width: float = DIALOGUE_PADDING.x * 2.0 + column + (0.0 if stacked else names + SPEAKER_GAP)
+	_set_rect(story, Vector2(story.position.x, DIALOGUE_PADDING.y), Vector2(_story_wrap_width(column), story.size.y))
+	var line_height: float = story.get_line_height()
+	var text_height: float = line_height * maxi(story.get_line_count(), DialogueBoxes.MAX_ROWS)
+	var name_height: float = speaker.get_line_height() + 4.0 if stacked and speaker.visible else 0.0
+	var bar_height: float = DIALOGUE_PADDING.y * 2.0 + name_height + text_height
+	_set_rect(bottom_bar, Vector2(roundf((960.0 - bar_width) * 0.5), DIALOGUE_BOTTOM - bar_height), Vector2(bar_width, bar_height))
+	# Narration starts at the box's left margin, where a speaker's name would.
+	var words_x: float = DIALOGUE_PADDING.x + names + SPEAKER_GAP if speaker.visible and not stacked else DIALOGUE_PADDING.x
+	_set_rect(story, Vector2(words_x, DIALOGUE_PADDING.y + name_height), Vector2(_story_wrap_width(column), text_height))
+	_set_rect(speaker, Vector2(DIALOGUE_PADDING.x, DIALOGUE_PADDING.y), Vector2(column if stacked else names, name_height if stacked else text_height))
+	speaker_rule.visible = speaker.visible and not stacked
+	_set_rect(speaker_rule, Vector2(DIALOGUE_PADDING.x + names + SPEAKER_GAP * 0.5, DIALOGUE_PADDING.y + 2.0), Vector2(1.0, text_height - 4.0))
+	_set_rect(dialogue_accent, Vector2(1.0, 1.0), Vector2(3.0, bar_height - 2.0))
+	# The hint bar: top right under PAUSE in the opening and the closing shots, otherwise just above the
+	# dialogue box; on touch between ◀ ▶ and USE.
+	var cinematic: bool = intro_active or chapter_close_active
+	var hint_width: float = minf(278.0 * TextSize.factor, 440.0) if cinematic else (TOUCH_HINT_SPAN.y - TOUCH_HINT_SPAN.x if touch_layout else minf(549.0 * TextSize.factor, room))
+	_set_rect(context_hint_text, Vector2(13.0, 3.0), Vector2(hint_width - 23.0, context_hint_text.size.y))
+	var hint_height: float = maxf(35.0, context_hint_text.get_line_height() * context_hint_text.get_line_count() + 8.0)
+	var hint_x: float = 960.0 - 32.0 - hint_width if cinematic else (TOUCH_HINT_SPAN.x if touch_layout else roundf((960.0 - hint_width) * 0.5))
+	var hint_y: float = 94.0 if cinematic else DIALOGUE_BOTTOM - bar_height - HINT_GAP - hint_height
+	_set_rect(context_hint, Vector2(hint_x, hint_y), Vector2(hint_width, hint_height))
+	_set_rect(context_hint_text, Vector2(13.0, 3.0), Vector2(hint_width - 23.0, hint_height - 6.0))
+	_set_rect(context_hint.get_node("Accent") as Control, Vector2(1.0, 1.0), Vector2(3.0, hint_height - 2.0))
+	# The top card grows with its text, left of PAUSE.
+	var card_height: float = maxf(62.0, hud.get_line_height() * 2.0 + 14.0)
+	var card_width: float = clampf(448.0 * TextSize.factor, 448.0, 820.0)
+	_set_rect(top_card, top_card.position, Vector2(card_width, card_height))
+	_set_rect(hud, Vector2(16.0, 7.0), Vector2(card_width - 28.0, card_height - 11.0))
+	_set_rect(top_card.get_node("Accent") as Control, Vector2.ZERO, Vector2(4.0, card_height))
+	# The tutorial prompt, sized to its rows and centred under the card.
+	var tutorial_size: Vector2 = tutorial_text.get_minimum_size() + Vector2(32.0, 18.0)
+	tutorial_size.x = maxf(tutorial_size.x, 316.0 if tutorial_text.text.contains("\n") else 0.0)
+	_set_rect(tutorial_prompt, Vector2(roundf(480.0 - tutorial_size.x * 0.5), top_card.position.y + card_height + 18.0), tutorial_size)
+	_set_rect(tutorial_text, Vector2(16.0, 9.0), tutorial_size - Vector2(27.0, 18.0))
+	_set_rect(tutorial_prompt.get_node("Accent") as Control, Vector2(1.0, 1.0), Vector2(4.0, tutorial_size.y - 2.0))
+	if waiting_for_choice:
+		_layout_choices(touch_layout, top_card.position.y + card_height + 10.0)
+
+
+## The two answers. With keys or a controller they stand under the top card with their key or
+## button; on touch they sit at the bottom in thumb reach, just above the question, without numbers
+## (PHONE-3).
+func _layout_choices(touch_layout: bool, top: float) -> void:
+	var answers: Array[String] = [M0State.CHOICE_TEXT[M0State.DISCLOSE], M0State.CHOICE_TEXT[M0State.PRESS]]
+	if choice_context == "mirror":
+		answers = ["USE WOLF'S READOUT", "USE MANUAL PORT"]
+	elif choice_context == "lane":
+		answers = LANE_CHOICE_TEXT
+	var buttons: Array[Button] = [touch_choice_1, touch_choice_2]
+	for index: int in 2:
+		var button: Button = buttons[index]
+		_set_font_size(button, TextSize.px(17 if touch_layout else 16))
+		var key: String = settings_menu.prompt(&"choice_1" if index == 0 else &"choice_2", controller_active)
+		var text: String = answers[index] if touch_layout else "%s  %s" % [key, answers[index]]
+		if button.text != text:
+			button.text = text
+		if button.autowrap_mode != TextServer.AUTOWRAP_WORD_SMART:
+			button.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	if touch_layout:
+		var touch_height: float = maxf(76.0, maxf(touch_choice_1.get_minimum_size().y, touch_choice_2.get_minimum_size().y))
+		var touch_top: float = bottom_bar.position.y - 10.0 - touch_height
+		_set_rect(touch_choice_1, Vector2(42.0, touch_top), Vector2(428.0, touch_height))
+		_set_rect(touch_choice_2, Vector2(490.0, touch_top), Vector2(428.0, touch_height))
+		return
+	var width: float = minf(522.0 * TextSize.factor, 960.0 - HUD_SIDE_MARGIN * 2.0)
+	var height: float = maxf(40.0 * TextSize.factor, 0.0)
+	_set_rect(touch_choice_1, Vector2(918.0 - width, top), Vector2(width, height))
+	height = maxf(height, touch_choice_1.get_minimum_size().y)
+	_set_rect(touch_choice_1, Vector2(918.0 - width, top), Vector2(width, height))
+	_set_rect(touch_choice_2, Vector2(918.0 - width, top + height + 6.0 * TextSize.factor), Vector2(width, maxf(height, touch_choice_2.get_minimum_size().y)))
 
 
 ## The HUD is refreshed every frame, so these write a value only when it differs. A theme override
@@ -4047,6 +4318,13 @@ static func _set_color(rect: ColorRect, color: Color) -> void:
 		rect.color = color
 
 
+static func _set_rect(control: Control, at: Vector2, size: Vector2) -> void:
+	if control.position != at:
+		control.position = at
+	if control.size != size:
+		control.size = size
+
+
 func _show_top_card(message: String, hold_seconds: float, accent: Color = TOP_CARD_ACCENT) -> void:
 	if top_card_tween != null and top_card_tween.is_running():
 		top_card_tween.kill()
@@ -4069,7 +4347,10 @@ func _context_hint() -> String:
 		return _junction_hint(x)
 	if state.chapter_id == "records":
 		if state.chapter_complete:
-			return "E: follow the service line toward Archive." if absf(x - 830.0) <= 58.0 else "The exit is open. Head right to follow the service line."
+			if absf(x - 830.0) <= 58.0:
+				# While the closing lines are still being shown, USE at the exit goes on to the next one.
+				return BREAKER_STAKES_HINT if _records_close_unread() else "E: follow the service line toward Archive."
+			return "The exit is open. Head right to follow the service line."
 		if absf(x - 190.0) <= 58.0:
 			return "E: copy the purge-order trace." if not state.purge_trace_preserved else "Purge order copied. Find the mirror port."
 		if absf(x - 520.0) <= 58.0:

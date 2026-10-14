@@ -6,15 +6,16 @@ extends RefCounted
 ## breaks only where the speaker changes, at its own line breaks and between sentences (inside a
 ## sentence only at a semicolon or comma, and only when the sentence alone is too long).
 
-## Reading time per box: a base plus this long per word, within these bounds (BBC subtitles allow
-## about 0.33 s a word; STORY-2's box limits are 1.2-1.5 s and 7 s).
+## Reading time per box (STORY-2): the larger of a base plus this long per character (at most
+## READ_SECONDS_MAX_BY_CHARACTERS) and the base plus this long per word, the reading time the
+## October 13 wording drafts use (BBC subtitles allow about 0.33 s a word). Speaker tags are not counted.
+const READ_SECONDS_BASE: float = 1.2
+const READ_SECONDS_PER_CHARACTER: float = 0.05
 const READ_SECONDS_PER_WORD: float = 0.33
-const READ_SECONDS_BASE: float = 1.0
-const READ_SECONDS_MIN: float = 1.5
-const READ_SECONDS_MAX: float = 7.0
+const READ_SECONDS_MAX_BY_CHARACTERS: float = 7.0
 ## A box holds at most this many rows of the dialogue column (subtitle practice: two lines).
 const MAX_ROWS: int = 2
-## The column is narrowed so a row holds at most this many characters at 100% text size.
+## A row holds at most this many characters (wrap_width narrows the wrap where a row would hold more).
 const MAX_ROW_CHARACTERS: int = 42
 ## A box of this many words or more is split at its sentence breaks even when it would fit.
 const LONG_LINE_WORDS: int = 20
@@ -67,7 +68,9 @@ static func word_count(text: String) -> int:
 
 ## How long [param words] needs on screen to be read.
 static func read_seconds(words: String) -> float:
-	return clampf(READ_SECONDS_BASE + word_count(words) * READ_SECONDS_PER_WORD, READ_SECONDS_MIN, READ_SECONDS_MAX)
+	var text: String = words.replace("\n", " ")
+	var by_characters: float = minf(READ_SECONDS_BASE + READ_SECONDS_PER_CHARACTER * text.length(), READ_SECONDS_MAX_BY_CHARACTERS)
+	return maxf(by_characters, READ_SECONDS_BASE + READ_SECONDS_PER_WORD * word_count(text))
 
 
 ## The rows [param text] wraps to in a column [param width] px wide, as a Label with smart word wrap
@@ -89,6 +92,26 @@ static func row_texts(text: String, font: Font, font_size: int, width: float) ->
 	for row: Vector2i in rows(text, font, font_size, width):
 		texts.append(text.substr(row.x, row.y - row.x).strip_edges())
 	return texts
+
+
+## The width [param text] wraps at in a column [param width] px wide so that no row holds more than
+## [param max_characters] characters: the column itself, or a little narrower where a row of narrow
+## letters would run longer. The words stay as written; only where the rows break moves.
+static func wrap_width(text: String, font: Font, font_size: int, width: float, max_characters: int) -> float:
+	var at: float = width
+	for attempt: int in 8:
+		var narrower: float = at
+		for row: String in row_texts(text, font, font_size, at):
+			if row.length() <= max_characters:
+				continue
+			# The row's longest start of whole words within the limit.
+			var space: int = row.left(max_characters + 1).rfind(" ")
+			var keep: String = row.left(space) if space > 0 else row.left(max_characters)
+			narrower = minf(narrower, ceilf(font.get_string_size(keep, HORIZONTAL_ALIGNMENT_LEFT, -1.0, font_size).x) + 1.0)
+		if narrower >= at:
+			return at
+		at = narrower
+	return at
 
 
 ## Splits [param line] where a sentence ends and the next one starts with a speaker's tag

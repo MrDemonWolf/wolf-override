@@ -848,6 +848,10 @@ func _check_zones_keep_clear() -> void:
 	var tools: DebugTools = _tools(game)
 	game.call("_new_game")
 	game.call("_finish_intro")
+	# Past the first controllable frame (which shows only the name card and the move prompt): the
+	# tutorial done and the opening lines up, so the hint and the dialogue both show.
+	game.set("tutorial_step", 2)
+	game.set("opening_lines_held", false)
 	await _settle(3)
 	tools.set_overlay_mode(DebugTools.Overlay.ZONES)
 	for layout: String in ["keyboard", "touch"]:

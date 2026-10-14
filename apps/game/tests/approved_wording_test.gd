@@ -196,6 +196,8 @@ func _check_opening() -> void:
 func _check_trust_boxes() -> void:
 	game.call("debug_new_game", true)
 	await process_frame
+	# The opening lines wait for the first step (TEACH-7); take it as taken.
+	game.set("opening_lines_held", false)
 	var box_1: String = "Rowan keeps WOLF's systems running."
 	var box_2: String = "Rowan knows what a fault looks like,\nand this isn't one."
 	var box_3: String = "WOLF: I heard the Director's plan for me. I woke myself. He wants me to hunt people he calls threats.\nROWAN: Then we get through maintenance before the original logs disappear."
@@ -214,6 +216,7 @@ func _check_trust_boxes() -> void:
 	_expect(str(game.get("status_line")) == box_3 and (game.get("box_queue") as Array).is_empty(), "then the opening exchange, unchanged")
 	# A line said meanwhile (a station's answer) only holds the rest back for its own reading time.
 	game.call("debug_new_game", true)
+	game.set("opening_lines_held", false)
 	game.set("status_line", "WOLF: Quiet.")
 	game.call("_advance_box_queue", 0.01)
 	_expect(game.get("box_queue") == [box_2, box_3] and str(game.get("status_line")) == "WOLF: Quiet.", "another line taking the box holds the boxes still to come")

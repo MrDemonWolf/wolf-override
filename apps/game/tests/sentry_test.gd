@@ -462,14 +462,18 @@ func _check_scene() -> void:
 	_expect(game.get("choice_context") == "lane" and human.position.x < SentryBrain.LANE_ENTRY_X and not human.controlled, "the question comes up before the engineer is in the lane")
 	_expect(touch_choice_1.visible and touch_choice_1.text.contains("Draw it under the tank"), "the answers are on screen")
 	_expect(game.call("_objective") == "DROP THE TANK", "once WOLF has asked about the tank the card names it")
-	# The tank WOLF is asking about hangs in view below the answers in both layouts at the play framing.
+	# The tank WOLF is asking about hangs in view clear of the answers at the play framing: below the
+	# keyboard answers under the top card, and above the touch answers at the bottom (PHONE-3).
 	var touch_choice_2: Button = game.get_node("CanvasLayer/TouchControls/Choice2") as Button
 	var tank_top_screen: float = (room.tank.position.y - JunctionRoom.TANK_SIZE.y * 0.5 - camera.position.y) * camera.zoom.y + 270.0
-	for touch_layout: bool in [false, true]:
-		game.set("touch_enabled", touch_layout)
-		game.call("_refresh_ui")
-		var answers_bottom: float = maxf(touch_choice_1.get_global_rect().end.y, touch_choice_2.get_global_rect().end.y)
-		_expect(is_equal_approx(camera.zoom.y, 1.35) and tank_top_screen >= answers_bottom + 8.0, "the hanging tank sits below the %s answers (tank top %.0f, answers end %.0f)" % ["touch" if touch_layout else "keyboard", tank_top_screen, answers_bottom])
+	game.call("_refresh_ui")
+	var answers_bottom: float = maxf(touch_choice_1.get_global_rect().end.y, touch_choice_2.get_global_rect().end.y)
+	_expect(is_equal_approx(camera.zoom.y, 1.35) and tank_top_screen >= answers_bottom + 8.0, "the hanging tank sits below the keyboard answers (tank top %.0f, answers end %.0f)" % [tank_top_screen, answers_bottom])
+	game.set("touch_enabled", true)
+	game.call("_refresh_ui")
+	var tank_bottom_touch: float = (room.tank.position.y + JunctionRoom.TANK_SIZE.y * 0.5 - Main.GAMEPLAY_CAMERA_Y_TOUCH) * camera.zoom.y + 270.0
+	var answers_top: float = minf(touch_choice_1.get_global_rect().position.y, touch_choice_2.get_global_rect().position.y)
+	_expect(answers_top >= tank_bottom_touch + 8.0, "the hanging tank sits above the touch answers at the bottom (tank bottom %.0f, answers start %.0f)" % [tank_bottom_touch, answers_top])
 	game.set("touch_enabled", false)
 	game.call("_refresh_ui")
 	_expect(JunctionRoom.TANK_REST_Y + JunctionRoom.TANK_SIZE.y * 0.5 <= Sentry.FLOOR_Y - Sentry.DRAWN_HEIGHT - 8.0, "the hung tank clears the patrolling sentry's mast")
@@ -606,7 +610,12 @@ func _check_scene() -> void:
 	_expect(paused, "pause works during the closing beat")
 	(game.get_node("CanvasLayer/PauseOverlay") as PauseOverlay).resume_requested.emit()
 	var hatch_start_x: float = human.position.x
-	await _tap(&"interact")
+	# Continue goes through the closing lines' boxes first (one speaker each), then starts the walk.
+	_expect((game.get_node("CanvasLayer/BottomBar/Story") as Label).text == "SERVICE LINE CLEARED.", "the closing lines start with their own first box")
+	for _press: int in 3:
+		await _tap(&"interact")
+		if game.get("hatch_exit_walking"):
+			break
 	# The two leave through the open hatch before the card, one at a time: WOLF steps into it and fades
 	# out first, then the engineer walks in and fades (round 3b: never drawn over each other there).
 	_expect(game.get("hatch_exit_walking") and not game.get("end_card_active") and not human.controlled, "Continue on the closing beat walks them out through the hatch first")
