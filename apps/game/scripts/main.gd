@@ -95,7 +95,7 @@ const CORRIDOR_SEAL_FOOT_Y: float = 311.25 + 581.0 * 0.25
 ## door concept; the lines that call it "the red seal" point at it.
 const CORRIDOR_SEAL_LAMP: Vector2 = Vector2(807.908, 344.759)
 const SEAL_LAMP_SHUT: Color = Color(0.9, 0.2, 0.17)
-const SEAL_LAMP_MOVING: Color = Color("#f3ae4b")
+const SEAL_LAMP_MOVING: Color = Palette.AMBER
 const SEAL_LAMP_OPEN: Color = Color("#7dffa8")
 ## The seal's rolling curtain winds up into its hood over this long, uncovering the open doorway.
 ## WOLF holds the contact and the doorway stays shut until it lands.
@@ -105,6 +105,10 @@ const NAME_CARD_SECONDS: float = 2.6
 const TOP_CARD_FADE_SECONDS: float = 0.45
 const TOP_CARD_ACCENT: Color = Color(0.22, 0.78, 0.92, 1)
 const ENGINEER_TINT: Color = Color("#f4d5ae")
+## WOLF lit up as he wakes in the opening.
+const WOLF_AWAKE_TINT: Color = Color("#9deeff")
+## A corridor station drawn while the breaker is off.
+const UNPOWERED_TINT: Color = Color("#879ba5")
 const DISPLAY_FONT: FontVariation = preload("res://assets/fonts/Montserrat-Bold.tres")
 const END_CARD_ACCENT: Color = Color("#73DDF5")
 const END_CARD_FADE_SECONDS: float = 0.3
@@ -963,7 +967,7 @@ func _setup_particles() -> void:
 	for particles: CPUParticles2D in [relay_sparks, door_dust, gate_dust]:
 		particles.z_index = 3
 		add_child(particles)
-	exit_sparks = FxPresets.sparks(Color("#c1f4d8"))
+	exit_sparks = FxPresets.sparks(Palette.EXIT_GREEN)
 	exit_sparks.position = Vector2(830.0, 330.0)
 	exit_sparks.z_index = 3
 	records_room.add_child(exit_sparks)
@@ -1463,10 +1467,10 @@ func _advance_intro() -> void:
 		2:
 			# WOLF wakes himself.
 			intro_tween = create_tween()
-			intro_tween.tween_property(wolf.body_sprite, "modulate", Color("#9deeff"), 0.45)
+			intro_tween.tween_property(wolf.body_sprite, "modulate", WOLF_AWAKE_TINT, 0.45)
 			intro_tween.parallel().tween_property(intro_camera, "zoom", Vector2(1.95, 1.95), 0.45)
 		3:
-			wolf.body_sprite.modulate = Color("#9deeff")
+			wolf.body_sprite.modulate = WOLF_AWAKE_TINT
 			intro_camera.zoom = Vector2(1.95, 1.95)
 			_shutter_boom()
 			intro_tween = create_tween()
@@ -3673,7 +3677,7 @@ func _flash_relay_spark(from_wolf: bool) -> void:
 			hub + Vector2(9.0, -20.0), hub + Vector2(16.0, -10.0),
 		])
 		relay_sparks.position = hub + Vector2(4.0, -14.0)
-	relay_spark.default_color = Color("#8be3ff") if from_wolf else Color("#f3ae4b")
+	relay_spark.default_color = Palette.CYAN if from_wolf else Palette.AMBER
 	relay_spark.modulate.a = 1.0
 	relay_spark.show()
 	relay_spark_tween = create_tween()
@@ -3938,10 +3942,10 @@ func _refresh_ui() -> void:
 		_set_dialogue(status_line, "" if hatch_exit_walking else ("TAP CONTINUE" if touch_layout else "%s  CONTINUE" % settings_menu.prompt(&"interact", controller_active)))
 		return
 	# The corridor stations' tints and lamps are written only when they change: this runs every frame.
-	_set_modulate(breaker_art, Color.WHITE if state.breaker_armed else Color("#879ba5"))
-	_set_color(breaker_status_light, Color("#8be3ff") if state.breaker_armed else Color("#d48954"))
-	_set_modulate(relay_art, Color.WHITE if state.breaker_armed else Color("#879ba5"))
-	_set_color(relay_status_light, Color("#a4f0c4") if state.door_open else (Color("#f3ae4b") if state.breaker_armed and _relay_refused() else (Color("#8be3ff") if state.breaker_armed else Color("#536e7c"))))
+	_set_modulate(breaker_art, Color.WHITE if state.breaker_armed else UNPOWERED_TINT)
+	_set_color(breaker_status_light, Palette.CYAN if state.breaker_armed else Palette.BREAKER_IDLE)
+	_set_modulate(relay_art, Color.WHITE if state.breaker_armed else UNPOWERED_TINT)
+	_set_color(relay_status_light, Palette.GREEN if state.door_open else (Palette.AMBER if state.breaker_armed and _relay_refused() else (Palette.CYAN if state.breaker_armed else Color("#536e7c"))))
 	var bypass_live: bool = state.breaker_armed and not state.door_open
 	if bypass_handle.live != bypass_live:
 		bypass_handle.live = bypass_live
@@ -4008,7 +4012,7 @@ func _set_dialogue(message: String, hint: String) -> void:
 	var story_left: float = 160.0 if has_speaker else 20.0
 	if story.offset_left != story_left:
 		story.offset_left = story_left
-	var tint: Color = Color("#8be3ff") if name == "WOLF" else (Color("#ff9a9f") if name.begins_with("DIRECTOR") else (Color("#f4d5ae") if name == human_name else Color("#9fc3d2")))
+	var tint: Color = Palette.CYAN if name == "WOLF" else (Color("#ff9a9f") if name.begins_with("DIRECTOR") else (ENGINEER_TINT if name == human_name else Color("#9fc3d2")))
 	_set_color(dialogue_accent, tint)
 	_set_font_color(speaker, tint)
 	context_hint.visible = not hint.is_empty()

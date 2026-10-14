@@ -58,6 +58,8 @@ const BLINK_UP_SECONDS: float = 0.17
 ## Reduced Motion: one shallow, slower dip and no double blink.
 const GENTLE_DOWN_SECONDS: float = 0.18
 const GENTLE_UP_SECONDS: float = 0.35
+## A lockdown beacon's lens and glow (rooms may set their own warning_color).
+const WARNING_RED: Color = Color("#ff4a46")
 const BEACON_ALPHA: float = 0.4
 ## One beacon pulse dims and recovers over twice this.
 const BEACON_PULSE_SECONDS: float = 1.3
@@ -108,7 +110,7 @@ const PILLAR_FADE_ALPHA: float = 0.5
 @export var shaft_lamps: PackedInt32Array = PackedInt32Array()
 ## Lockdown beacons as fractions of the far plate: a small drawn lamp housing with a pulsing glow.
 @export var warning_lamps: PackedVector2Array = PackedVector2Array()
-@export var warning_color: Color = Color("#ff4a46")
+@export var warning_color: Color = WARNING_RED
 ## Ambient dust drifting in the room. Off where the room's light is painted into its plates and
 ## nothing in the air needs to move (the corridor since the door end was rebuilt).
 @export var ambient_dust: bool = true
@@ -166,15 +168,15 @@ var _rng: RandomNumberGenerator = RandomNumberGenerator.new()
 ## A lockdown beacon: a dark housing on a short bracket with a red lens.
 class Beacon:
 	extends Node2D
-	var lens: Color = Color("#ff4a46"):
+	var lens: Color = WARNING_RED:
 		set(value):
 			lens = value
 			queue_redraw()
 
 	func _draw() -> void:
-		draw_line(Vector2(0.0, -9.0), Vector2(0.0, -4.0), Color("#1b2630"), 2.0)
+		draw_line(Vector2(0.0, -9.0), Vector2(0.0, -4.0), Palette.STEEL_DARK, 2.0)
 		draw_rect(Rect2(-7.0, -4.0, 14.0, 9.0), Color("#141c24"))
-		draw_rect(Rect2(-7.0, -4.0, 14.0, 9.0), Color("#3e4f5a"), false, 1.0)
+		draw_rect(Rect2(-7.0, -4.0, 14.0, 9.0), Palette.DIM, false, 1.0)
 		draw_rect(Rect2(-5.0, -2.0, 10.0, 5.0), lens)
 
 

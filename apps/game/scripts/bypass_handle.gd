@@ -35,8 +35,8 @@ const READOUT_HEIGHT: float = 12.0
 const CELL_SIZE: Vector2 = Vector2(5.0, 6.0)
 const CELL_GAP: float = 1.5
 const LAMP_OFF: Color = Color("#24333c")
-const AMBER: Color = Color("#f3ae4b")
-const GREEN: Color = Color("#a4f0c4")
+## A crank light still to come once the bypass is live.
+const LAMP_WAITING: Color = Color("#4d6370")
 const LABEL_TEXT: Color = Color(0.69, 0.82, 0.87, 1)
 const FAULT_TEXT: Color = Color("#ffb36b")
 const FAULT_EDGE: Color = Color(0.78, 0.33, 0.2, 0.8)
@@ -117,7 +117,7 @@ func _init() -> void:
 	wheel.scale = Vector2.ONE * WHEEL_SCALE
 	wheel.position = WHEEL_OFFSET
 	add_child(wheel)
-	bypass_label = _plate("BypassLabel", "MANUAL BYPASS", LABEL_TEXT, Color(0.29, 0.4, 0.45, 0.55), LABEL_WIDTH, READOUT_HEIGHT)
+	bypass_label = _plate("BypassLabel", "MANUAL BYPASS", LABEL_TEXT, Palette.PLATE_EDGE, LABEL_WIDTH, READOUT_HEIGHT)
 	readout = Node2D.new()
 	readout.name = "CrankReadout"
 	readout.draw.connect(_draw_readout)
@@ -185,7 +185,7 @@ func _process(delta: float) -> void:
 ## and [param foot] leaves that much room under the text.
 func _plate(node_name: String, caption: String, text_color: Color, edge: Color, wrap_width: float = 0.0, foot: float = 0.0) -> Label:
 	var plate: StyleBoxFlat = StyleBoxFlat.new()
-	plate.bg_color = JunctionRoom.LABEL_PLATE
+	plate.bg_color = Palette.PLATE_BG
 	plate.border_color = edge
 	plate.set_border_width_all(1)
 	plate.set_corner_radius_all(2)
@@ -247,14 +247,14 @@ func _draw_readout() -> void:
 	var leader_top: float = bypass_label.size.y
 	var leader_bottom: float = LEADER_END_Y - bypass_label.position.y
 	if leader_bottom > leader_top:
-		readout.draw_rect(Rect2(leader_x - LEADER_WIDTH * 0.5, leader_top, LEADER_WIDTH, leader_bottom - leader_top), Color(0.29, 0.4, 0.45, 0.55))
+		readout.draw_rect(Rect2(leader_x - LEADER_WIDTH * 0.5, leader_top, LEADER_WIDTH, leader_bottom - leader_top), Palette.PLATE_EDGE)
 	var row: float = CELL_SIZE.x * TICKS_NEEDED + CELL_GAP * (TICKS_NEEDED - 1)
 	var first: Vector2 = Vector2((bypass_label.size.x - row) * 0.5, bypass_label.size.y - READOUT_HEIGHT * 0.5 - CELL_SIZE.y * 0.5 - 1.0)
 	for index: int in TICKS_NEEDED:
 		var cell: Color = LAMP_OFF
 		if live or done:
-			cell = GREEN if done else (AMBER if index < ticks else Color("#4d6370"))
+			cell = Palette.GREEN if done else (Palette.AMBER if index < ticks else LAMP_WAITING)
 			if not done and index == ticks and hold_fraction > 0.0:
 				# The notch being cranked warms toward amber as the hold adds up.
-				cell = Color("#4d6370").lerp(AMBER, 0.35 + 0.5 * hold_fraction)
+				cell = LAMP_WAITING.lerp(Palette.AMBER, 0.35 + 0.5 * hold_fraction)
 		readout.draw_rect(Rect2(first + Vector2((CELL_SIZE.x + CELL_GAP) * index, 0.0), CELL_SIZE), cell)

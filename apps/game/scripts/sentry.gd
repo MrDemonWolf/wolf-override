@@ -95,7 +95,7 @@ var _down_tween: Tween
 class SentryVisual:
 	extends Node2D
 	const EYE_OFF: Color = Color("#2b1d1d")
-	const EYE_PATROL: Color = Color("#f3ae4b")
+	const EYE_PATROL: Color = Palette.AMBER
 	const EYE_LOCKED: Color = Color("#ff4a3d")
 
 	var eye: Color = EYE_OFF:

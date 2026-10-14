@@ -4,13 +4,11 @@ extends RefCounted
 ## Compatibility): a spark shower, a dust burst and a steam column. Bursts are one-shot and fire
 ## through Impact.burst(); steam toggles emitting with the state that drives it.
 
-const SPARK_CYAN: Color = Color("#8be3ff")
-const SPARK_AMBER: Color = Color("#f3ae4b")
 const DUST: Color = Color("#c9b9a0")
 const STEAM: Color = Color("#bfe8ff")
 
 
-static func sparks(color: Color = SPARK_CYAN) -> CPUParticles2D:
+static func sparks(color: Color = Palette.CYAN) -> CPUParticles2D:
 	var particles: CPUParticles2D = _one_shot("Sparks", 24, 0.45)
 	particles.direction = Vector2(0.0, -1.0)
 	particles.spread = 70.0

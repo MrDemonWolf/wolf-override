@@ -223,10 +223,6 @@ const BLAST_REASON: String = "The door went with %s in front of it. When the fus
 const SENTRY_REASON: String = "The sentry saw %s out in the open.\nStay close to the TANK RELEASE."
 const SENTRY_CHASED_REASON: String = "The sentry ran %s down. Once its\neyes go red, only the rubble is safe."
 const CLOUD_REASON: String = "The coolant cloud caught %s. Let it clear before crossing the mark."
-const AMBER: Color = Color("#f3ae4b")
-const GREEN: Color = Color("#a4f0c4")
-const DIM: Color = Color("#3e4f5a")
-const STEEL: Color = Color("#4a6572")
 const COOLANT: Color = Color("#7fe8ff")
 const SEAM_RED: Color = Color("#ff6a55")
 ## The tank's cable, in the tones of the cable painted on the arm's winch drum.
@@ -262,8 +258,6 @@ const FEED_GLAND: Vector2 = Vector2(12.0, 3.0)
 const FEED_STEEL: Color = Color("#2a3741")
 ## A plate fades out over this many px as it reaches the edge of the view.
 const LABEL_EDGE_FADE: float = 14.0
-const LABEL_PLATE: Color = Color(0.035, 0.06, 0.08, 0.8)
-const LABEL_PLATE_EDGE: Color = Color(0.29, 0.4, 0.45, 0.55)
 const VENT_LABEL: String = "RELIEF VENT"
 ## The glow over the vent grate, warming with the gauge, flashing red through its hard warning and red
 ## once it has tripped.
@@ -541,7 +535,7 @@ class HatchDoorway:
 		if open <= 0.0:
 			return
 		draw_texture_rect_region(JunctionRoom.HATCH_PASSAGE_PROP, Rect2(Vector2.ZERO, size), JunctionRoom.HATCH_PASSAGE, JunctionRoom.HATCH_PASSAGE_TINT)
-		draw_texture_rect(light, Rect2(size.x * 0.05, size.y * 0.1, size.x * 0.9, size.y * 0.7), false, Color(JunctionRoom.GREEN, 0.12 * open))
+		draw_texture_rect(light, Rect2(size.x * 0.05, size.y * 0.1, size.x * 0.9, size.y * 0.7), false, Color(Palette.GREEN, 0.12 * open))
 
 
 func _ready() -> void:
@@ -600,14 +594,14 @@ func _ready() -> void:
 	wheel_material.set_shader_parameter("radius", VALVE_WHEEL_RADIUS / VALVE_PROP.get_size().x)
 	valve_wheel.material = wheel_material
 	add_child(valve_wheel)
-	breaker_glow = RoomDepth.make_glow(AMBER, Vector2(64.0, 30.0), 0.5)
+	breaker_glow = RoomDepth.make_glow(Palette.AMBER, Vector2(64.0, 30.0), 0.5)
 	breaker_glow.name = "BreakerGlow"
 	breaker_glow.position = BREAKER_LIGHT.get_center()
 	# Station lights, glows, plates and captions sit at this node's own depth (z 1), under the actors
 	# (Main.ACTOR_Z): someone standing at a machine is always drawn in front of all of it.
 	breaker_glow.z_index = 0
 	add_child(breaker_glow)
-	vent_glow = RoomDepth.make_glow(AMBER, VENT_GLOW_SIZE, 0.0)
+	vent_glow = RoomDepth.make_glow(Palette.AMBER, VENT_GLOW_SIZE, 0.0)
 	vent_glow.name = "VentGlow"
 	vent_glow.position = Vector2(VENT_X, FLOOR_Y - 6.0)
 	vent_glow.z_index = 0
@@ -619,30 +613,30 @@ func _ready() -> void:
 	vent_hazard = Hazard.make("VentHazard", Rect2(PressureLine.VENT_GRATE_MIN_X, 380.0, PressureLine.VENT_GRATE_MAX_X - PressureLine.VENT_GRATE_MIN_X, 60.0), VENT_REASON)
 	add_child(vent_hazard)
 	label_plate = StyleBoxFlat.new()
-	label_plate.bg_color = LABEL_PLATE
-	label_plate.border_color = LABEL_PLATE_EDGE
+	label_plate.bg_color = Palette.PLATE_BG
+	label_plate.border_color = Palette.PLATE_EDGE
 	label_plate.set_border_width_all(1)
 	label_plate.set_corner_radius_all(2)
 	label_plate.content_margin_left = 5.0
 	label_plate.content_margin_right = 5.0
 	label_plate.content_margin_top = 0.0
 	label_plate.content_margin_bottom = 0.0
-	breaker_label = _add_station_label("OVERLOAD BREAKER", BREAKER_X - BREAKER_LABEL_SHIFT, Color("#b0d1de"))
+	breaker_label = _add_station_label("OVERLOAD BREAKER", BREAKER_X - BREAKER_LABEL_SHIFT, Palette.LABEL_TEXT)
 	# In the row above the grate, where nobody standing on the floor covers it.
-	vent_label = _add_station_label(VENT_LABEL, VENT_X - VENT_LABEL_SHIFT, Color("#8fa6b2"))
+	vent_label = _add_station_label(VENT_LABEL, VENT_X - VENT_LABEL_SHIFT, Palette.LABEL_MUTED)
 	# A little left of the wheel so its longest text ends before the bulkhead.
-	valve_label = _add_station_label("VALVE", VALVE_X - VALVE_LABEL_SHIFT, Color("#b0d1de"))
+	valve_label = _add_station_label("VALVE", VALVE_X - VALVE_LABEL_SHIFT, Palette.LABEL_TEXT)
 	# A placard across the bulkhead's face, over its front pillar.
-	door_label = _add_station_label("SEALED DOOR", door_visual.position.x + DOOR_LABEL_SHIFT, Color("#ffc7c7"))
+	door_label = _add_station_label("SEALED DOOR", door_visual.position.x + DOOR_LABEL_SHIFT, Palette.LABEL_ALERT)
 	door_label.z_index = DOOR_LIP_Z + 1
-	arm_label = _add_station_label("TANK RELEASE", ARM_X + ARM_LABEL_SHIFT, Color("#b0d1de"))
+	arm_label = _add_station_label("TANK RELEASE", ARM_X + ARM_LABEL_SHIFT, Palette.LABEL_TEXT)
 	# Over the landed tank, shown only once it lies on the sentry.
-	tank_label = _add_station_label("TANK DOWN", DropArm.MARK_X, Color("#8fa6b2"))
+	tank_label = _add_station_label("TANK DOWN", DropArm.MARK_X, Palette.LABEL_MUTED)
 	line_caption = Label.new()
 	line_caption.name = "LineCaption"
 	line_caption.text = LINE_CAPTION
 	line_caption.add_theme_font_size_override("font_size", LINE_CAPTION_FONT_SIZE)
-	line_caption.add_theme_color_override("font_color", Color("#b0d1de"))
+	line_caption.add_theme_color_override("font_color", Palette.LABEL_TEXT)
 	line_caption.add_theme_stylebox_override("normal", label_plate)
 	line_caption.z_index = 0
 	add_child(line_caption)
@@ -651,7 +645,7 @@ func _ready() -> void:
 	var dial: Vector2 = prop_point(valve_art, VALVE_DIAL_CENTRE)
 	line_caption.position = Vector2(dial.x - VALVE_DIAL_RADIUS * VALVE_SCALE - 2.0 - line_caption.size.x, dial.y - line_caption.size.y * 0.5)
 	# Over the bolt panel, beside the hatch, so both read as one exit.
-	hatch_label = _add_station_label("EXIT LOCKED", EXIT_LABEL_X, Color("#8fa6b2"))
+	hatch_label = _add_station_label("EXIT LOCKED", EXIT_LABEL_X, Palette.LABEL_MUTED)
 	_build_lane()
 	refresh_state()
 
@@ -705,7 +699,7 @@ func _build_door() -> void:
 	door_lip.z_index = DOOR_LIP_Z
 	door_visual.add_child(door_lip)
 	var leaf_height: float = DOOR_REGION.size.y * DOOR_SCALE * 0.8
-	seam_glow = RoomDepth.make_glow(AMBER, Vector2(40.0, leaf_height), 0.0)
+	seam_glow = RoomDepth.make_glow(Palette.AMBER, Vector2(40.0, leaf_height), 0.0)
 	seam_glow.name = "SeamGlow"
 	seam_glow.position = Vector2(door_visual.position.x + (DOOR_SEAM_X - DOOR_REGION.get_center().x) * DOOR_SCALE, FLOOR_Y - DOOR_REGION.size.y * DOOR_SCALE * 0.5)
 	# On the sealed leaf, under the actors and the front pillar.
@@ -737,7 +731,7 @@ func _build_particles() -> void:
 	# Like the column: out of the grate, behind it and the engineer it knocks down.
 	vent_puff.z_index = VENT_STEAM_Z
 	add_child(vent_puff)
-	blast_sparks = FxPresets.sparks(AMBER)
+	blast_sparks = FxPresets.sparks(Palette.AMBER)
 	blast_sparks.name = "BlastSparks"
 	blast_sparks.position = Vector2(DOOR_X, FLOOR_Y - DOOR_HEIGHT * 0.5)
 	blast_sparks.amount = 36
@@ -815,14 +809,14 @@ func _build_lane() -> void:
 	coolant_burst.amount = 22
 	coolant_burst.z_index = 3
 	add_child(coolant_burst)
-	hit_sparks = FxPresets.sparks(FxPresets.SPARK_CYAN)
+	hit_sparks = FxPresets.sparks(Palette.CYAN)
 	hit_sparks.name = "HitSparks"
 	hit_sparks.position = Vector2(DropArm.MARK_X, FLOOR_Y - 30.0)
 	hit_sparks.amount = 36
 	hit_sparks.spread = 100.0
 	hit_sparks.z_index = 3
 	add_child(hit_sparks)
-	bolt_sparks = FxPresets.sparks(Color("#c1f4d8"))
+	bolt_sparks = FxPresets.sparks(Palette.EXIT_GREEN)
 	bolt_sparks.name = "BoltSparks"
 	bolt_sparks.position = prop_rect(bolt_panel_art, BOLT_PANEL_LIGHT).get_center()
 	bolt_sparks.amount = 30
@@ -935,7 +929,7 @@ func _sync_flicker() -> void:
 	if flicker_station == &"door" and not door_blown and not (line_state in [&"charged", &"fuse"]):
 		if _seam_tween != null and _seam_tween.is_valid():
 			_seam_tween.kill()
-		seam_glow.modulate = Color(AMBER, SEAM_FLICKER_ALPHA * lamp_level(&"door"))
+		seam_glow.modulate = Color(Palette.AMBER, SEAM_FLICKER_ALPHA * lamp_level(&"door"))
 	_sync_breaker_glow()
 	queue_redraw()
 
@@ -1009,7 +1003,7 @@ func sync_line(line: PressureLine) -> void:
 	vent_steam.scale_amount_max = lerpf(6.0, 16.0, clampf(steam, 0.0, 1.0))
 	vent_steam.modulate.a = lerpf(0.45, 1.0, clampf(steam, 0.0, 1.0))
 	if building:
-		seam_glow.modulate = Color(AMBER, 0.25 + 0.5 * gauge)
+		seam_glow.modulate = Color(Palette.AMBER, 0.25 + 0.5 * gauge)
 	_sync_vent_glow()
 	_check_redraw()
 
@@ -1038,11 +1032,11 @@ func _sync_vent_glow() -> void:
 				var flash: float = 1.0 if reduce_motion else 0.5 + 0.5 * cos(gauge * PressureLine.BUILD_SECONDS * VENT_FLASH_HZ * TAU)
 				vent_glow.modulate = Color(SEAM_RED, lerpf(0.35, 0.95, flash))
 			else:
-				vent_glow.modulate = Color(AMBER.lerp(SEAM_RED, gauge * gauge), 0.12 + 0.55 * gauge)
+				vent_glow.modulate = Color(Palette.AMBER.lerp(SEAM_RED, gauge * gauge), 0.12 + 0.55 * gauge)
 		&"tripped":
 			vent_glow.modulate = Color(SEAM_RED, 0.35)
 		_:
-			vent_glow.modulate = Color(AMBER, 0.0)
+			vent_glow.modulate = Color(Palette.AMBER, 0.0)
 
 
 ## Copies the arm in: the tank's height, the cloud and its hurtbox follow DropArm's state.
@@ -1207,36 +1201,36 @@ func refresh_state() -> void:
 		# The blast used the line up: the same labels whether it just went or a save brought it back. State
 		# words on the plates are plain (USED, LOCKED, READY; P0-7, approved 2026-10-13).
 		breaker_label.text = "BREAKER USED"
-		breaker_label.add_theme_color_override("font_color", Color("#8fa6b2"))
+		breaker_label.add_theme_color_override("font_color", Palette.LABEL_MUTED)
 		valve_label.text = "VALVE USED"
-		valve_label.add_theme_color_override("font_color", Color("#8fa6b2"))
+		valve_label.add_theme_color_override("font_color", Palette.LABEL_MUTED)
 	else:
 		var armed: bool = line_state != &"idle" and line_state != &"tripped"
 		breaker_label.text = "BREAKER TRIPPED" if line_state == &"tripped" else ("BREAKER LIVE" if armed else "OVERLOAD BREAKER")
-		breaker_label.add_theme_color_override("font_color", SEAM_RED if line_state == &"tripped" else (Color("#8be3ff") if armed else Color("#b0d1de")))
+		breaker_label.add_theme_color_override("font_color", SEAM_RED if line_state == &"tripped" else (Palette.CYAN if armed else Palette.LABEL_TEXT))
 		valve_label.text = "FUSE LIT" if line_state in [&"charged", &"fuse", &"blown"] else ("VALVE  %d / %d" % [turns, PressureLine.TURNS_NEEDED] if armed else "VALVE")
-		valve_label.add_theme_color_override("font_color", GREEN if turns >= PressureLine.TURNS_NEEDED else Color("#b0d1de"))
+		valve_label.add_theme_color_override("font_color", Palette.GREEN if turns >= PressureLine.TURNS_NEEDED else Palette.LABEL_TEXT)
 	_sync_breaker_glow()
 	door_label.text = "DOOR DOWN" if door_blown else "SEALED DOOR"
-	door_label.add_theme_color_override("font_color", GREEN if door_blown else Color("#ffc7c7"))
+	door_label.add_theme_color_override("font_color", Palette.GREEN if door_blown else Palette.LABEL_ALERT)
 	# A missed tank lying on the floor is not being winched yet: the plate says so only once the winch
 	# takes it (it stays amber, busy, meanwhile).
 	arm_label.text = "RELEASE USED" if sentry_down else ("WINCHING UP" if arm_state == &"rewinding" and not tank_on_floor else "TANK RELEASE")
 	tank_label.visible = sentry_down
-	arm_label.add_theme_color_override("font_color", Color("#8fa6b2") if sentry_down else (AMBER if arm_state == &"rewinding" else Color("#b0d1de")))
+	arm_label.add_theme_color_override("font_color", Palette.LABEL_MUTED if sentry_down else (Palette.AMBER if arm_state == &"rewinding" else Palette.LABEL_TEXT))
 	if junction_cleared or (bolt_state == &"open" and hatch_open >= 1.0):
 		hatch_label.text = "EXIT OPEN"
-		hatch_label.add_theme_color_override("font_color", GREEN)
+		hatch_label.add_theme_color_override("font_color", Palette.GREEN)
 	elif bolt_state == &"open":
 		# The bolt has dropped but the hatch is still sliding: it says open only once it is.
 		hatch_label.text = "EXIT OPENING"
-		hatch_label.add_theme_color_override("font_color", AMBER)
+		hatch_label.add_theme_color_override("font_color", Palette.AMBER)
 	elif sentry_down:
 		hatch_label.text = "EXIT READY"
-		hatch_label.add_theme_color_override("font_color", AMBER)
+		hatch_label.add_theme_color_override("font_color", Palette.AMBER)
 	else:
 		hatch_label.text = "EXIT LOCKED"
-		hatch_label.add_theme_color_override("font_color", Color("#8fa6b2"))
+		hatch_label.add_theme_color_override("font_color", Palette.LABEL_MUTED)
 	for label: Label in station_labels:
 		_fit_label(label)
 	_sync_seam()
@@ -1265,11 +1259,11 @@ func _sync_seam() -> void:
 			_seam_tween.tween_property(seam_glow, "modulate", Color(SEAM_RED, 0.5), 0.08)
 			_seam_tween.tween_property(seam_glow, "modulate", Color(Color.WHITE, 0.9), 0.08)
 		&"building":
-			seam_glow.modulate = Color(AMBER, 0.25 + 0.5 * gauge)
+			seam_glow.modulate = Color(Palette.AMBER, 0.25 + 0.5 * gauge)
 		&"blown":
 			seam_glow.visible = false
 		_:
-			seam_glow.modulate = Color(AMBER, 0.2)
+			seam_glow.modulate = Color(Palette.AMBER, 0.2)
 
 
 ## The vent letting go: a steam burst and a short armed window over the grate.
@@ -1378,12 +1372,12 @@ func _draw() -> void:
 	_drawn_inputs = draw_inputs()
 	# The plates are the Depth child's layers and the machines are sprites; this draws what they
 	# cannot show.
-	_draw_hatch_lamp(entry_hatch_art, GREEN, 1.0)
+	_draw_hatch_lamp(entry_hatch_art, Palette.GREEN, 1.0)
 	_draw_gauge()
 	_draw_breaker_light()
 	_draw_blast_zone()
 	if door_blown:
-		draw_line(Vector2(RUBBLE_X - 6.0, 439.0), Vector2(RUBBLE_X + 6.0, 439.0), AMBER, 3.0)
+		draw_line(Vector2(RUBBLE_X - 6.0, 439.0), Vector2(RUBBLE_X + 6.0, 439.0), Palette.AMBER, 3.0)
 	_draw_alcove_floor()
 	_draw_arm_panel_light()
 	_draw_arm()
@@ -1468,7 +1462,7 @@ func bolt_feed_x() -> float:
 ## The feed's core: dead until the tank is down, then the bolt's own light (amber, warming to white
 ## through the whine, green once it has dropped).
 func bolt_feed_color() -> Color:
-	return DIM if not sentry_down and not junction_cleared else bolt_light_color()
+	return Palette.DIM if not sentry_down and not junction_cleared else bolt_light_color()
 
 
 ## Where the sentry's drawing (Sentry.drawn_rects, widened by a pixel for its soft edges) crosses the
@@ -1631,20 +1625,20 @@ func _draw_breaker_light() -> void:
 
 func _breaker_light_color() -> Color:
 	if door_blown:
-		return DIM
+		return Palette.DIM
 	match line_state:
 		&"tripped":
 			return SEAM_RED
 		&"idle":
-			return Color("#d48954")
+			return Palette.BREAKER_IDLE
 		_:
-			return Color("#8be3ff")
+			return Palette.CYAN
 
 
 ## The ARM PANEL's light: green while the tank hangs ready, amber while the arm is busy, dark once
 ## the sentry is down.
 func _draw_arm_panel_light() -> void:
-	var light: Color = DIM if sentry_down else (GREEN if arm_state == &"hung" else AMBER)
+	var light: Color = Palette.DIM if sentry_down else (Palette.GREEN if arm_state == &"hung" else Palette.AMBER)
 	draw_rect(prop_rect(arm_panel_art, ARM_PANEL_LIGHT), light.lerp(FLICKER_DARK, 1.0 - lamp_level(&"release")))
 
 
@@ -1655,8 +1649,8 @@ func _draw_arm_panel_light() -> void:
 func _draw_arm() -> void:
 	var plate_top: float = arm_art.position.y - ARM_REGION.size.y * TANK_ART_SCALE * 0.5 + 2.0
 	for rod_x: float in [DropArm.MARK_X - 26.0, DropArm.MARK_X + 34.0]:
-		draw_line(Vector2(rod_x, GANTRY_Y), Vector2(rod_x, plate_top), Color("#1b2630"), 5.0)
-		draw_line(Vector2(rod_x - 1.5, GANTRY_Y), Vector2(rod_x - 1.5, plate_top), STEEL, 1.0)
+		draw_line(Vector2(rod_x, GANTRY_Y), Vector2(rod_x, plate_top), Palette.STEEL_DARK, 5.0)
+		draw_line(Vector2(rod_x - 1.5, GANTRY_Y), Vector2(rod_x - 1.5, plate_top), Palette.STEEL, 1.0)
 	if tank_drop <= 0.0 or arm_state != &"rewinding" or tank_on_floor:
 		return
 	var cable_top: Vector2 = Vector2(DropArm.MARK_X, TANK_REST_Y - TANK_SIZE.y * 0.5)
@@ -1680,7 +1674,7 @@ func _draw_floor_mark() -> void:
 	var left: float = DropArm.MARK_X - DropArm.HIT_RANGE
 	var width: float = DropArm.HIT_RANGE * 2.0
 	var lit: bool = mark_lit()
-	var stripe_color: Color = MARK_LIT if lit else AMBER
+	var stripe_color: Color = MARK_LIT if lit else Palette.AMBER
 	# The stripes run along the floor line and down onto the walkway in front of it, so a machine
 	# standing on the mark covers only their top and the brackets still read below its treads.
 	if lit:
@@ -1710,9 +1704,9 @@ func bolt_lamp_color() -> Color:
 ## line, amber once it can take the overload, warming to white through the whine, green once popped.
 func bolt_light_color() -> Color:
 	if junction_cleared or bolt_state == &"open":
-		return GREEN
+		return Palette.GREEN
 	if bolt_state == &"charging":
-		return AMBER.lerp(Color.WHITE, bolt_charge)
+		return Palette.AMBER.lerp(Color.WHITE, bolt_charge)
 	if sentry_down:
-		return AMBER
+		return Palette.AMBER
 	return SEAM_RED
