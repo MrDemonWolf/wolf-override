@@ -422,6 +422,21 @@ func recoil_to(x: float) -> void:
 	max_speed = RECOIL_SPEED
 
 
+## What the machine draws, as boxes in its parent's space: its painted body (or wreck) and, from
+## SentryVisual.debug_draw_rect, the lamp and, while lit, the lens and the beam, plus the lens glow
+## while it shows (JunctionRoom.bolt_panel_cover draws the panel over these).
+func drawn_rects() -> Array[Rect2]:
+	var to_parent: Transform2D = transform * visual.transform
+	var art: Sprite2D = visual.wreck if visual.wrecked else visual.body
+	var rects: Array[Rect2] = [to_parent * art.transform * art.get_rect()]
+	var marks: Rect2 = visual.debug_draw_rect()
+	if marks.has_area():
+		rects.append(to_parent * marks)
+	if visual.lens_glow.visible:
+		rects.append(to_parent * visual.lens_glow.transform * visual.lens_glow.get_rect())
+	return rects
+
+
 ## How far its drawn active body reaches from its origin on its longer side, in px.
 static func drawn_half_width() -> float:
 	return maxf(ACTIVE_TREAD_X - ACTIVE_REGION.position.x, ACTIVE_REGION.end.x - ACTIVE_TREAD_X) * ART_SCALE

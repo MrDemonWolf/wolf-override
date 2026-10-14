@@ -575,8 +575,8 @@ func _check_redraws() -> void:
 		bolt[1] = (frame + 1) / 40.0
 		sync.call()
 		await process_frame
-	# The feed is drawn with the room; the recesses hold only the alcove's shadow, which never changes.
-	_expect(_new_every_frame(room_draws, 30) and feed_draws.is_empty(), "while the bolt charges every frame redraws its lights and its feed, and never the recesses (%d, %d draws)" % [room_draws.size(), feed_draws.size()])
+	# The feed is drawn with the recesses, under the props, so the bolt panel's cables run in front of it.
+	_expect(_new_every_frame(room_draws, 30) and _new_every_frame(feed_draws, 30), "while the bolt charges every frame redraws its lights and its feed (%d, %d draws)" % [room_draws.size(), feed_draws.size()])
 	room_draws.clear()
 	feed_draws.clear()
 	for _frame: int in 10:

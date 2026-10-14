@@ -20,6 +20,8 @@ var _wolf_pixel_cache: Dictionary = {}
 ## The lane watch (_watch_lane): frames looked at in the junction, and what read false on them.
 var lane_frames: int = 0
 var lane_beam_frames: int = 0
+## Frames on which the sentry's body or beam crossed the exit bolt's panel (drawn behind it).
+var lane_panel_frames: int = 0
 var lane_faults: Array[String] = []
 ## Emits once a frame after the game's _process (DrawnFrames), so what it shows is what is drawn.
 var drawn_frames: DrawnFrames = null
@@ -745,8 +747,8 @@ func _check_scene() -> void:
 	await _check_walk_into(game)
 	drawn_frames.drawn.disconnect(watch)
 	drawn_frames.queue_free()
-	print("Lane watch: %d junction frames, %d with a beam" % [lane_frames, lane_beam_frames])
-	_expect(lane_frames > 3000 and lane_beam_frames > 500 and lane_faults.is_empty(), "on all %d junction frames of these routes (%d with a beam), the sentry never overlaps the standing or lying engineer, its beam never runs past the bolt panel or the tank, and the bolt feed never crosses the tank (%d faults: %s)" % [lane_frames, lane_beam_frames, lane_faults.size(), ", ".join(lane_faults.slice(0, 6))])
+	print("Lane watch: %d junction frames, %d with a beam, %d with the sentry behind the bolt panel" % [lane_frames, lane_beam_frames, lane_panel_frames])
+	_expect(lane_frames > 3000 and lane_beam_frames > 500 and lane_panel_frames > 100 and lane_faults.is_empty(), "on all %d junction frames of these routes (%d with a beam, %d with the sentry behind the bolt panel), the sentry never overlaps the standing or lying engineer, its beam never runs past the bolt panel or the tank, neither is drawn over the bolt panel, and the bolt feed never crosses the tank (%d faults: %s)" % [lane_frames, lane_beam_frames, lane_panel_frames, lane_faults.size(), ", ".join(lane_faults.slice(0, 6))])
 	# A crafted v4 save with the sentry down but the door still sealed is rejected.
 	var crafted: Dictionary = b_dict.duplicate(true)
 	crafted["positions"]["human"] = [120.0, 410.0]
@@ -1246,7 +1248,8 @@ func _expect_lying(game: Node2D, fall: float, label: String) -> bool:
 ## at M0Actor.HUMAN_REACH, or lying as painted) do not overlap; (2) a lit beam ends on or before the
 ## near face of the exit bolt's panel and of the tank at the beam's height when they stand ahead of its
 ## lens, and never further than SIGHT_RANGE; (3) the bolt feed's boxes, conduits and glands do not
-## cross the tank wherever it hangs, falls or lies.
+## cross the tank wherever it hangs, falls or lies; (4) where the sentry or its beam passes behind the
+## exit bolt's panel, the panel is drawn over them.
 func _watch_lane(game: Node2D) -> void:
 	var room: JunctionRoom = game.get("junction_room") as JunctionRoom
 	if room == null or not room.is_visible_in_tree() or paused:
@@ -1283,6 +1286,39 @@ func _watch_lane(game: Node2D) -> void:
 				lane_faults.append("frame %d: beam to %.1f runs into the solid at %.1f" % [lane_frames, tip, solid.position.x])
 			elif facing < 0.0 and lens >= solid.end.x and tip < solid.end.x - 0.01:
 				lane_faults.append("frame %d: beam to %.1f runs into the solid ending %.1f (block %s, arm %s %.2f, tank y %.1f, choice %s, fail %s)" % [lane_frames, tip, solid.end.x, sentry.sight_block, (game.get("drop_arm") as DropArm).state, (game.get("drop_arm") as DropArm).drop_amount(), room.tank.position.y, game.get("waiting_for_choice"), game.get("fail_active")])
+	# (4) The exit bolt's panel stands in front of the lane: wherever the sentry's painted body or its lit
+	# beam crosses the panel's box, the panel is drawn again over them (PanelFront, right after the
+	# sentry at its depth), so neither shows over the box.
+	if sentry.is_visible_in_tree() and not sentry.visual.wrecked:
+		var panel: Rect2 = JunctionRoom.prop_rect(room.bolt_panel_art, JunctionRoom.BOLT_PANEL_REGION)
+		var art_front: float = (Sentry.ACTIVE_TREAD_X - Sentry.ACTIVE_REGION.position.x) * Sentry.ART_SCALE
+		var art_back: float = (Sentry.ACTIVE_REGION.end.x - Sentry.ACTIVE_TREAD_X) * Sentry.ART_SCALE
+		var parts: Dictionary = {"body": Rect2(sentry.position.x - (art_back if facing > 0.0 else art_front), Sentry.FLOOR_Y - Sentry.DRAWN_HEIGHT, art_front + art_back, Sentry.DRAWN_HEIGHT)}
+		var slit: Rect2 = Sentry.lens_rect()
+		if sentry.visual.is_lit() and sentry.visual.reach > slit.end.x:
+			# The cone from the lens towards its tip, as tall where it crosses the panel as it is at the
+			# crossing's far side (half a pixel more for its soft edges).
+			var lens_x: float = sentry.position.x + facing * slit.end.x
+			var tip_x: float = sentry.position.x + facing * sentry.visual.reach
+			var crossing: Vector2 = Vector2(maxf(minf(lens_x, tip_x), panel.position.x), minf(maxf(lens_x, tip_x), panel.end.x))
+			if crossing.y > crossing.x:
+				var ahead: float = maxf(absf(crossing.x - sentry.position.x), absf(crossing.y - sentry.position.x))
+				var half: float = lerpf(slit.size.y * 0.5, Sentry.BEAM_SPREAD, clampf(inverse_lerp(slit.end.x, sentry.visual.reach, ahead), 0.0, 1.0)) + 0.5
+				parts["beam"] = Rect2(crossing.x, Sentry.FLOOR_Y + slit.get_center().y - half, crossing.y - crossing.x, half * 2.0)
+		var front_drawn: bool = room.panel_front.is_visible_in_tree() and room.panel_front.z_index == sentry.z_index and room.panel_front.z_as_relative and room.panel_front.get_index() > sentry.get_index()
+		var behind: bool = false
+		for key: String in parts:
+			var over: Rect2 = (parts[key] as Rect2).intersection(panel)
+			if not over.has_area():
+				continue
+			behind = true
+			var covered: float = 0.0
+			for piece: Rect2 in room.panel_front.cover:
+				covered += over.intersection(piece).get_area()
+			if not front_drawn or covered < over.get_area() - 0.01:
+				lane_faults.append("frame %d: the sentry's %s %s is drawn over the bolt panel %s (front drawn %s, %.1f of %.1f px² covered)" % [lane_frames, key, parts[key], panel, front_drawn, covered, over.get_area()])
+		if behind:
+			lane_panel_frames += 1
 	if human.body_sprite.texture == MainScript.COLLAPSE_SHEET and room.tank.visible:
 		var drawn: Rect2 = _drawn_rect(human.body_sprite)
 		var span: Vector2 = _painted_collapse(human)

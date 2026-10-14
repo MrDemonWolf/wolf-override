@@ -249,11 +249,11 @@ const ARM_LABEL_SHIFT: float = 20.0
 const EXIT_LABEL_X: float = 792.0
 ## The feed from the TANK RELEASE to the exit bolt panel runs under the floor and comes up at the
 ## bolt panel (_draw_bolt_feed), so nothing runs across the lane where the tank comes down. Its cable
-## box is centred at this height, over the ends of the panel's painted cables. Dead while the winch
+## box is centred at this height, behind the ends of the panel's painted cables. Dead while the winch
 ## holds the tank; once the tank is down its power runs to the bolt (amber), warming to white through
 ## the whine and green once the bolt drops.
 const BOLT_FEED_Y: float = 404.0
-## The cable box (covering the three painted cable ends) and the floor gland the conduit comes up from.
+## The cable box (behind the three painted cable ends) and the floor gland the conduit comes up from.
 const FEED_BOX: Vector2 = Vector2(8.0, 34.0)
 const FEED_GLAND: Vector2 = Vector2(12.0, 3.0)
 ## The box's and gland's painted-steel face, a step lighter than the conduit.
@@ -367,6 +367,8 @@ var bolt_panel_art: Sprite2D
 var entry_hatch_art: Sprite2D
 var hatch_art: Sprite2D
 var recesses: Recesses
+## The exit bolt's panel drawn again over the sentry where it passes behind it.
+var panel_front: PanelFront
 var door_body: StaticBody2D
 var door_shape: CollisionShape2D
 var door_visual: Node2D
@@ -451,14 +453,52 @@ class TankSprite:
 		add_child(dent)
 
 
-## What sits behind the stations: the shadow of the TANK RELEASE alcove, drawn under the props (the
-## room's own drawing sits over them).
+## What sits behind the stations: the shadow of the TANK RELEASE alcove and the release's feed to the
+## exit bolt, drawn under the props (the room's own drawing sits over them).
 class Recesses:
 	extends Node2D
 	var room: JunctionRoom
 
 	func _draw() -> void:
 		room.draw_recesses(self)
+
+
+## The exit bolt's panel stands nearer than the sentry's lane: at the far end of its patrol the machine
+## and its beam pass behind it. Right after the sentry and at its depth, this draws the panel and its
+## light again wherever the sentry's drawing crosses the panel (bolt_panel_cover), so neither is ever
+## drawn over the box, and draws nothing while the sentry is clear of it. Only those spots are drawn,
+## so the engineer working the bolt and WOLF by the hatch still draw over the panel as before.
+class PanelFront:
+	extends Node2D
+	var room: JunctionRoom
+	## The room rectangles drawn this frame (bolt_panel_cover) and the light colour they were drawn with.
+	var cover: Array[Rect2] = []
+	var light: Color = Color.TRANSPARENT
+
+	func _init() -> void:
+		texture_filter = CanvasItem.TEXTURE_FILTER_LINEAR_WITH_MIPMAPS
+		# After Main's frame, which moves the sentry, so the cover is where the sentry is drawn.
+		process_priority = 100
+
+	func _process(_delta: float) -> void:
+		var now: Array[Rect2] = room.bolt_panel_cover()
+		var color: Color = room.bolt_light_color()
+		if now != cover or (not now.is_empty() and color != light):
+			cover = now
+			light = color
+			queue_redraw()
+
+	func _draw() -> void:
+		room.draw_panel_front(self, cover, light)
+
+	## What _draw covers: the bounds of [member cover], for the debug tools' render box.
+	func debug_draw_rect() -> Rect2:
+		if cover.is_empty():
+			return Rect2()
+		var bounds: Rect2 = cover[0]
+		for part: Rect2 in cover:
+			bounds = bounds.merge(part)
+		return bounds
 
 
 ## The exit hatch's doorway over its painted leaf: once the hatch starts to open it draws the painted
@@ -716,6 +756,11 @@ func _build_lane() -> void:
 	sentry.z_index = 1
 	add_child(sentry)
 	floor_reflections.append_array(sentry.floor_reflections)
+	panel_front = PanelFront.new()
+	panel_front.name = "BoltPanelFront"
+	panel_front.room = self
+	panel_front.z_index = sentry.z_index
+	add_child(panel_front)
 	tank = TankSprite.new()
 	tank.name = "Tank"
 	tank.texture = TANK_PROP
@@ -1021,7 +1066,7 @@ func sync_bolt(state: StringName, charge: float) -> void:
 	bolt_charge = charge
 	if changed:
 		refresh_state()
-	# The bolt's lights and its feed (drawn with the room) warm with the charge.
+	# The bolt's lights and its feed (Recesses) warm with the charge.
 	_check_redraw()
 
 
@@ -1048,10 +1093,9 @@ func draw_inputs() -> Array:
 	return [line_state, gauge, display_gauge, gauge_tripped, fuse_remaining, reduce_motion, door_blown, sentry_down, junction_cleared, arm_state, tank_drop, tank_on_floor, tank.position.y, arm_art.position.y, bolt_state, bolt_charge, breaker_pulse_level(), lamp_level(&"breaker"), lamp_level(&"valve"), lamp_level(&"release"), lamp_level(&"bolt"), mark_lit()]
 
 
-## Every value draw_recesses reads that can change after the room is built: none, as it draws only
-## the alcove's shadow (the bolt's feed is drawn with the room, from draw_inputs).
+## Every value draw_recesses reads that can change after the room is built.
 func recesses_inputs() -> Array:
-	return []
+	return [sentry_down, junction_cleared, bolt_state, bolt_charge]
 
 
 ## How high WOLF's drawn body is lifted with his centre at [param wolf_x] and the live sentry's at
@@ -1192,6 +1236,7 @@ func refresh_state() -> void:
 	_sync_seam()
 	_sync_vent_glow()
 	queue_redraw()
+	recesses.queue_redraw()
 
 
 ## True once the door is down, whether it just went or a save brought it back.
@@ -1337,10 +1382,9 @@ func _draw() -> void:
 	_draw_arm_panel_light()
 	_draw_arm()
 	_draw_floor_mark()
-	var bolt_light: Color = _bolt_light_color().lerp(FLICKER_DARK, 1.0 - lamp_level(&"bolt"))
+	var bolt_light: Color = bolt_light_color().lerp(FLICKER_DARK, 1.0 - lamp_level(&"bolt"))
 	_draw_hatch_lamp(hatch_art, bolt_light, 1.0)
 	draw_rect(prop_rect(bolt_panel_art, BOLT_PANEL_LIGHT), bolt_light)
-	_draw_bolt_feed()
 
 
 ## The alcove's floor: a tint over exactly the cover span, on the floor line and the walkway in front
@@ -1362,25 +1406,27 @@ func draw_recesses(canvas: CanvasItem) -> void:
 	_recesses_drawn_inputs = recesses_inputs()
 	var alcove: Rect2 = alcove_rect()
 	canvas.draw_texture_rect(alcove_shadow, alcove.grow_individual(14.0, 10.0, 14.0, 8.0), false, Color(0.0, 0.02, 0.04, 0.85))
+	_draw_bolt_feed(canvas)
 
 
 ## The feed comes up out of the floor at the exit bolt's panel: a floor gland, a conduit up the wall and
 ## a cable box the panel's painted cables plug into. Its core is lit only while it carries power to the
 ## bolt (bolt_feed_color). The TANK RELEASE end needs nothing drawn: the release's own painted pipe runs
 ## down into its base, and the run between the two is under the floor, clear of the tank and the lane.
-## Drawn over the props (so the cables end in the box) and under the actors.
-func _draw_bolt_feed() -> void:
+## Drawn on [param canvas] (Recesses) under the props, so the panel's painted cables run into the box
+## in front of it and the flat code-drawn plates show only round the panel's edge.
+func _draw_bolt_feed(canvas: CanvasItem) -> void:
 	var parts: Array[Rect2] = bolt_feed_parts()
 	var box: Rect2 = parts[0]
 	var conduit: Rect2 = parts[1]
 	var gland: Rect2 = parts[2]
-	draw_rect(conduit, CABLE_SHADOW)
-	draw_line(Vector2(conduit.position.x + 1.0, conduit.position.y), Vector2(conduit.position.x + 1.0, conduit.end.y), CABLE_SHEEN, 1.0)
-	draw_line(Vector2(conduit.get_center().x + 0.5, conduit.position.y), Vector2(conduit.get_center().x + 0.5, conduit.end.y), bolt_feed_color(), 2.0)
+	canvas.draw_rect(conduit, CABLE_SHADOW)
+	canvas.draw_line(Vector2(conduit.position.x + 1.0, conduit.position.y), Vector2(conduit.position.x + 1.0, conduit.end.y), CABLE_SHEEN, 1.0)
+	canvas.draw_line(Vector2(conduit.get_center().x + 0.5, conduit.position.y), Vector2(conduit.get_center().x + 0.5, conduit.end.y), bolt_feed_color(), 2.0)
 	for plate: Rect2 in [box, gland]:
-		draw_rect(plate, FEED_STEEL)
-		draw_rect(plate, CABLE_SHADOW, false, 1.0)
-		draw_line(plate.position + Vector2(1.0, 1.0), Vector2(plate.end.x - 1.0, plate.position.y + 1.0), CABLE_SHEEN, 1.0)
+		canvas.draw_rect(plate, FEED_STEEL)
+		canvas.draw_rect(plate, CABLE_SHADOW, false, 1.0)
+		canvas.draw_line(plate.position + Vector2(1.0, 1.0), Vector2(plate.end.x - 1.0, plate.position.y + 1.0), CABLE_SHEEN, 1.0)
 
 
 ## The feed's parts in the room, top to bottom: the cable box over the ends of the bolt panel's left
@@ -1402,7 +1448,77 @@ func bolt_feed_x() -> float:
 ## The feed's core: dead until the tank is down, then the bolt's own light (amber, warming to white
 ## through the whine, green once it has dropped).
 func bolt_feed_color() -> Color:
-	return DIM if not sentry_down and not junction_cleared else _bolt_light_color()
+	return DIM if not sentry_down and not junction_cleared else bolt_light_color()
+
+
+## Where the sentry's drawing (Sentry.drawn_rects, widened by a pixel for its soft edges) crosses the
+## exit bolt's panel, as rectangles in this room that do not overlap one another: PanelFront draws the
+## panel there again over the machine and its beam. Empty while the sentry is hidden or clear of it.
+func bolt_panel_cover() -> Array[Rect2]:
+	var cover: Array[Rect2] = []
+	if sentry == null or not sentry.is_visible_in_tree():
+		return cover
+	var panel: Rect2 = prop_rect(bolt_panel_art, BOLT_PANEL_REGION)
+	for part: Rect2 in sentry.drawn_rects():
+		var over: Rect2 = part.grow(1.0).intersection(panel)
+		if over.has_area():
+			cover.append(over)
+	return disjoint_rects(cover)
+
+
+## The panel's image and its light, drawn on [param canvas] (PanelFront) inside [param cover] only, the
+## light in [param light].
+func draw_panel_front(canvas: CanvasItem, cover: Array[Rect2], light: Color) -> void:
+	var panel: Rect2 = prop_rect(bolt_panel_art, BOLT_PANEL_REGION)
+	var lamp: Rect2 = prop_rect(bolt_panel_art, BOLT_PANEL_LIGHT)
+	for part: Rect2 in cover:
+		var source: Rect2 = Rect2(BOLT_PANEL_REGION.position + (part.position - panel.position) / BOLT_PANEL_SCALE, part.size / BOLT_PANEL_SCALE)
+		# Sampled like the whole sprite (no clamp at the cut), so the redrawn strip matches the art under it.
+		canvas.draw_texture_rect_region(BOLT_PANEL_PROP, part, source, Color.WHITE, false, false)
+		var lit: Rect2 = lamp.intersection(part)
+		if lit.has_area():
+			canvas.draw_rect(lit, light)
+
+
+## [param rects] as rectangles covering the same area without overlapping (so a translucent drawing in
+## each is laid down once): cut into vertical strips at every rectangle's left and right edge, with the
+## covered height ranges of each strip merged, and side-by-side strips of the same height joined.
+static func disjoint_rects(rects: Array[Rect2]) -> Array[Rect2]:
+	var out: Array[Rect2] = []
+	if rects.size() <= 1:
+		out.assign(rects)
+		return out
+	var edges: Array[float] = []
+	for rect: Rect2 in rects:
+		edges.append(rect.position.x)
+		edges.append(rect.end.x)
+	edges.sort()
+	for index: int in edges.size() - 1:
+		var from: float = edges[index]
+		var to: float = edges[index + 1]
+		if to - from <= 0.0:
+			continue
+		var spans: Array[Vector2] = []
+		for rect: Rect2 in rects:
+			if rect.position.x <= from and rect.end.x >= to:
+				spans.append(Vector2(rect.position.y, rect.end.y))
+		spans.sort_custom(func(a: Vector2, b: Vector2) -> bool: return a.x < b.x)
+		var merged: Array[Vector2] = []
+		for span: Vector2 in spans:
+			if not merged.is_empty() and span.x <= merged[-1].y:
+				merged[-1].y = maxf(merged[-1].y, span.y)
+			else:
+				merged.append(span)
+		for span: Vector2 in merged:
+			var joined: bool = false
+			for at: int in out.size():
+				if is_equal_approx(out[at].end.x, from) and is_equal_approx(out[at].position.y, span.x) and is_equal_approx(out[at].end.y, span.y):
+					out[at].size.x = to - out[at].position.x
+					joined = true
+					break
+			if not joined:
+				out.append(Rect2(from, span.x, to - from, span.y - span.x))
+	return out
 
 
 ## The alcove's core: exactly SentryBrain's cover span, up to the label row.
@@ -1547,7 +1663,7 @@ func _draw_floor_mark() -> void:
 
 ## The exit bolt's light, on its panel and over the hatch: red and dead while the sentry runs the
 ## line, amber once it can take the overload, warming to white through the whine, green once popped.
-func _bolt_light_color() -> Color:
+func bolt_light_color() -> Color:
 	if junction_cleared or bolt_state == &"open":
 		return GREEN
 	if bolt_state == &"charging":
