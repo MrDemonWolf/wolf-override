@@ -1179,7 +1179,8 @@ func _watch_lane(game: Node2D) -> void:
 		if absf(tip - sentry.position.x) > SentryBrain.SIGHT_RANGE + 0.01:
 			lane_faults.append("frame %d: beam %.1f px long" % [lane_frames, absf(tip - sentry.position.x)])
 		var solids: Array[Rect2] = [Rect2(SentryBrain.PANEL_FACE_X, Sentry.FLOOR_Y - 60.0, JunctionRoom.BOLT_PANEL_HALF_WIDTH * 2.0, 60.0)]
-		if room.tank.visible and tank_rect.end.y > Sentry.beam_top_y():
+		# (A tank whose base is within a hundredth of a pixel of the beam's top edge only grazes it.)
+		if room.tank.visible and tank_rect.end.y > Sentry.beam_top_y() + 0.01:
 			solids.append(tank_rect)
 		for solid: Rect2 in solids:
 			if facing > 0.0 and lens <= solid.position.x and tip > solid.position.x + 0.01:
