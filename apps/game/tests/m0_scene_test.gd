@@ -122,6 +122,13 @@ func _run() -> void:
 	state.cycle_name()
 	game.call("_refresh_ui")
 	_expect(speaker.text.is_empty() and story.text == "Rowan keeps WOLF's systems running.", "the first box after control says why the engineer trusts WOLF, in its own untagged box")
+	# The opening exchange is the trust line's third box. Watch every frame from here to the stakes:
+	# reading the display either cuts in before it (it follows once the display's text is read) or
+	# replaces it after it has had its turn, depending on how long the player takes to press.
+	var exchange_shown: Array[bool] = [false]
+	var watch_exchange: Callable = func() -> void:
+		exchange_shown[0] = exchange_shown[0] or str(game.get("status_line")).begins_with("WOLF: I heard the Director's plan for me.")
+	process_frame.connect(watch_exchange)
 	await create_timer(3.3).timeout
 	game.call("_refresh_ui")
 	_expect(top_card.visible and hud.text.contains("CHECK THE BREAKER") and card_accent.color == Color(0.22, 0.78, 0.92, 1), "the objective card follows the name card")
@@ -151,13 +158,13 @@ func _run() -> void:
 		return
 	_expect(human.position.x > start_x and wolf.position.x > 225.0 and wolf.position.x < human.position.x, "WOLF follows the engineer autonomously")
 	_expect(str(game.get("status_line")).contains("Original program logs marked for deletion"), "walking straight on past the display leaves its text up to be read")
-	# The display cut into the opening's boxes; the exchange still to come follows once the display's
+	# If the display cut into the opening's boxes, the exchange still to come follows once the display's
 	# text has been read, and the stakes wait for it to be read in turn.
-	var exchange_shown: Array[bool] = [false]
 	_expect(await _wait_until(func() -> bool:
-		exchange_shown[0] = exchange_shown[0] or str(game.get("status_line")).begins_with("WOLF: I heard the Director's plan for me.")
+		watch_exchange.call()
 		return str(game.get("status_line")) == "WOLF: That purge takes the original program logs. Once they're gone, his word is the only record.", 1500), "once the display's text has been up long enough to read, WOLF says what the purge takes")
-	_expect(exchange_shown[0], "the opening exchange the display cut into still shows before the stakes")
+	process_frame.disconnect(watch_exchange)
+	_expect(exchange_shown[0], "the opening exchange shows before the stakes, whether or not the display cut into the opening's boxes")
 	if not _require(await _walk_to(human, 450.0), "engineer can move beyond the breaker"):
 		return
 	if not _require(await _walk_to(human, 350.0), "engineer can backtrack to the breaker"):
