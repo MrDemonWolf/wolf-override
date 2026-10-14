@@ -104,6 +104,8 @@ var readout: Node2D
 var _wheel_tween: Tween
 var _fault_tween: Tween
 var _pulse: float = 0.0
+## The relay's centre the COOLANT FAULT tag is centred on (place).
+var _relay_x: float = 0.0
 
 
 func _init() -> void:
@@ -141,7 +143,11 @@ func _init() -> void:
 ## [param relay_x].
 func place(wheel_centre: Vector2, relay_x: float) -> void:
 	position = wheel_centre
-	bypass_label.position = Vector2(-bypass_label.size.x * 0.5 + LABEL_SHIFT_X, LABEL_TOP)
+	_relay_x = relay_x
+	# A larger TEXT SIZE grows the plate upward, so its foot stays over the wheel.
+	var font: Font = bypass_label.get_theme_font(&"font")
+	var grown: float = (font.get_height(TextSize.px(LABEL_FONT_SIZE)) - font.get_height(LABEL_FONT_SIZE)) * bypass_label.get_line_count()
+	bypass_label.position = Vector2(-bypass_label.size.x * 0.5 + LABEL_SHIFT_X, LABEL_TOP - grown)
 	readout.queue_redraw()
 	fault_tag.position = Vector2(relay_x - wheel_centre.x - fault_tag.size.x * 0.5, FAULT_TAG_TOP - wheel_centre.y)
 
@@ -196,16 +202,29 @@ func _plate(node_name: String, caption: String, text_color: Color, edge: Color, 
 	label.name = node_name
 	label.text = caption
 	label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	label.add_theme_font_size_override("font_size", LABEL_FONT_SIZE)
+	TextSize.size_label(label, LABEL_FONT_SIZE)
 	label.add_theme_color_override("font_color", text_color)
 	label.add_theme_stylebox_override("normal", plate)
 	label.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	if wrap_width > 0.0:
 		label.autowrap_mode = TextServer.AUTOWRAP_WORD
-		label.custom_minimum_size.x = wrap_width
+		label.custom_minimum_size.x = wrap_width * TextSize.factor
+		label.set_meta(&"wrap_width", wrap_width)
 	add_child(label)
 	label.size = label.get_combined_minimum_size()
 	return label
+
+
+## TEXT SIZE changed: both plates take the new size (the MANUAL BYPASS plate keeps its two rows) and
+## are placed again.
+func refit_labels() -> void:
+	for label: Label in [bypass_label, fault_tag]:
+		TextSize.size_label(label, LABEL_FONT_SIZE)
+		if label.has_meta(&"wrap_width"):
+			label.custom_minimum_size.x = float(label.get_meta(&"wrap_width")) * TextSize.factor
+		label.size = Vector2.ZERO
+		label.size = label.get_combined_minimum_size()
+	place(position, _relay_x)
 
 
 ## The hold under way: from its press frame the wheel turns part of the way to its next notch, by

@@ -88,7 +88,7 @@ func _add_station_label(caption: String, center_x: float, tint: Color, label_y: 
 	var label: Label = Label.new()
 	label.text = caption
 	label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	label.add_theme_font_size_override("font_size", 13)
+	TextSize.size_label(label, 13)
 	label.add_theme_color_override("font_color", tint)
 	label.set_meta(&"center", Vector2(center_x, label_y))
 	add_child(label)
@@ -97,12 +97,16 @@ func _add_station_label(caption: String, center_x: float, tint: Color, label_y: 
 	return label
 
 
-## Shrinks [param label] to its text and centres it on its station again.
+## Shrinks [param label] to its text and centres it on its station again (TEXT SIZE grows it upward).
 func _fit_label(label: Label) -> void:
 	var center: Vector2 = label.get_meta(&"center")
-	label.size = Vector2.ZERO
-	label.size = label.get_combined_minimum_size()
-	label.position = Vector2(center.x - label.size.x * 0.5, center.y)
+	TextSize.fit_world_label(label, center.x, center.y)
+
+
+## TEXT SIZE changed: every name takes the new size.
+func refit_labels() -> void:
+	for label: Label in station_labels:
+		_fit_label(label)
 
 
 ## A name the edge of the view would cut fades out instead (JunctionRoom.fade_at_view_edge).

@@ -18,12 +18,15 @@ const DEFAULT_WINDOW_SIZE: int = 1
 signal reduced_motion_changed(enabled: bool)
 ## TOGGLE HOLDS changed: with it on, one press of interact works a crank until a second press.
 signal hold_toggle_changed(enabled: bool)
+## TEXT SIZE changed (TextSize.factor already holds the new factor); Main lays the HUD out again.
+signal text_size_changed(factor: float)
 
 var settings_path: String
 var tabs: TabBar
 var vsync: CheckButton
 var antialiasing: OptionButton
 var reduced_motion: CheckButton
+var text_size: OptionButton
 var volumes: Dictionary = {}
 var binding_buttons: Dictionary = {}
 var defaults: Dictionary = {}
@@ -50,6 +53,8 @@ func configure(path: String) -> void:
 	vsync.set_pressed_no_signal(boolean(config, "video", "vsync", true))
 	antialiasing.select(clampi(int(number(config, "video", "msaa_2d", 0)), 0, 3))
 	reduced_motion.set_pressed_no_signal(boolean(config, "video", "reduced_motion", false))
+	TextSize.factor = TextSize.nearest_step(number(config, "video", "text_size", 1.0))
+	text_size.select(TextSize.STEPS.find(TextSize.factor))
 	_apply_graphics()
 	for bus: String in BUSES:
 		if AudioServer.get_bus_index(bus) < 0:
@@ -218,9 +223,22 @@ func _build_menu() -> void:
 	reduced_motion.size = Vector2(272, 40)
 	display.add_child(reduced_motion)
 	reduced_motion.toggled.connect(func(value: bool) -> void: reduced_motion_changed.emit(value); _save_extra())
+	# TEXT SIZE scales the play HUD's words and the station names, 100% to 200% (TextSize).
+	var text_size_label: Label = _label("TEXT SIZE", 16)
+	text_size_label.position = Vector2(410, 198)
+	text_size_label.size = Vector2(100, 40)
+	display.add_child(text_size_label)
+	text_size = OptionButton.new()
+	text_size.position = Vector2(520, 196)
+	text_size.size = Vector2(160, 40)
+	text_size.tooltip_text = "Scales the dialogue, hints, cards and station names."
+	for step: float in TextSize.STEPS:
+		text_size.add_item("%d%%" % roundi(step * 100.0))
+	display.add_child(text_size)
+	text_size.item_selected.connect(func(index: int) -> void: TextSize.factor = TextSize.STEPS[index]; text_size_changed.emit(TextSize.factor); _save_extra())
 	var gpu: Label = _label("GPU: %s\nRenderer: Compatibility" % RenderingServer.get_video_adapter_name(), 14)
 	gpu.position = Vector2(8, 194)
-	gpu.size = Vector2(680, 44)
+	gpu.size = Vector2(390, 44)
 	gpu.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	display.add_child(gpu)
 	var audio: VBoxContainer = _page_box()
@@ -561,6 +579,7 @@ func _save_extra() -> bool:
 	config.set_value("video", "vsync", vsync.button_pressed)
 	config.set_value("video", "msaa_2d", antialiasing.selected)
 	config.set_value("video", "reduced_motion", reduced_motion.button_pressed)
+	config.set_value("video", "text_size", TextSize.factor)
 	for bus: String in BUSES:
 		config.set_value("audio", bus, (volumes[bus] as HSlider).value)
 	config.set_value("controls", "deadzone", deadzone.value)
