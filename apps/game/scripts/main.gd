@@ -4066,7 +4066,7 @@ func _shown_line() -> String:
 ## its place.
 func _sync_dialogue_boxes() -> void:
 	var line: String = _shown_line()
-	var key: String = "%s|%s|%s" % [line, _first_name(), TextSize.factor]
+	var key: String = "%s|%s|%s" % [line, _first_name(), _dialogue_column_width()]
 	if key == dialogue_key:
 		return
 	dialogue_key = key
@@ -4189,7 +4189,14 @@ func _apply_text_size() -> void:
 ## The words' column width at the current text size: 42 characters' worth, or what the canvas leaves.
 func _dialogue_column_width() -> float:
 	var wanted: float = DIALOGUE_COLUMN_WIDTH * TextSize.factor
-	return minf(wanted, 960.0 - HUD_SIDE_MARGIN * 2.0 - DIALOGUE_PADDING.x * 2.0)
+	var room: float = TOUCH_HINT_SPAN.y - TOUCH_HINT_SPAN.x if _box_between_touch_buttons() else 960.0 - HUD_SIDE_MARGIN * 2.0
+	return minf(wanted, room - DIALOGUE_PADDING.x * 2.0)
+
+
+## Above 100% a box under the touch buttons would rise into ◀ ▶ and USE (their bottoms at y 435), so
+## while they show it stands between them instead, in the hint bar's span (PHONE-7).
+func _box_between_touch_buttons() -> bool:
+	return touch_enabled and not controller_active and touch_use.visible and TextSize.factor > 1.0
 
 
 ## The speaker column's width: the widest name it shows, at the current text size (measured once per
@@ -4230,7 +4237,9 @@ func _layout_hud() -> void:
 	# The dialogue box.
 	var column: float = _dialogue_column_width()
 	var names: float = _speaker_column_width()
-	var room: float = 960.0 - HUD_SIDE_MARGIN * 2.0
+	var between: bool = _box_between_touch_buttons()
+	var room: float = TOUCH_HINT_SPAN.y - TOUCH_HINT_SPAN.x if between else 960.0 - HUD_SIDE_MARGIN * 2.0
+	var centre_x: float = (TOUCH_HINT_SPAN.x + TOUCH_HINT_SPAN.y) * 0.5 if between else 480.0
 	var stacked: bool = DIALOGUE_PADDING.x * 2.0 + names + SPEAKER_GAP + column > room
 	# Narration has no name column, so its box is only as wide as the words' column.
 	var bar_width: float = DIALOGUE_PADDING.x * 2.0 + column + (names + SPEAKER_GAP if speaker.visible and not stacked else 0.0)
@@ -4239,7 +4248,7 @@ func _layout_hud() -> void:
 	var text_height: float = line_height * maxi(story.get_line_count(), DialogueBoxes.MAX_ROWS)
 	var name_height: float = speaker.get_line_height() + 4.0 if stacked and speaker.visible else 0.0
 	var bar_height: float = DIALOGUE_PADDING.y * 2.0 + name_height + text_height
-	_set_rect(bottom_bar, Vector2(roundf((960.0 - bar_width) * 0.5), DIALOGUE_BOTTOM - bar_height), Vector2(bar_width, bar_height))
+	_set_rect(bottom_bar, Vector2(roundf(centre_x - bar_width * 0.5), DIALOGUE_BOTTOM - bar_height), Vector2(bar_width, bar_height))
 	# Narration starts at the box's left margin, where a speaker's name would.
 	var words_x: float = DIALOGUE_PADDING.x + names + SPEAKER_GAP if speaker.visible and not stacked else DIALOGUE_PADDING.x
 	_set_rect(story, Vector2(words_x, DIALOGUE_PADDING.y + name_height), Vector2(_story_wrap_width(column), text_height))
@@ -4250,7 +4259,7 @@ func _layout_hud() -> void:
 	# The hint bar: top right under PAUSE in the opening and the closing shots, otherwise just above the
 	# dialogue box; on touch between ◀ ▶ and USE.
 	var cinematic: bool = intro_active or chapter_close_active
-	var hint_width: float = minf(278.0 * TextSize.factor, 440.0) if cinematic else (TOUCH_HINT_SPAN.y - TOUCH_HINT_SPAN.x if touch_layout else minf(549.0 * TextSize.factor, room))
+	var hint_width: float = minf(278.0 * TextSize.factor, 440.0) if cinematic else (TOUCH_HINT_SPAN.y - TOUCH_HINT_SPAN.x if touch_layout else minf(549.0 * TextSize.factor, 960.0 - HUD_SIDE_MARGIN * 2.0))
 	_set_rect(context_hint_text, Vector2(13.0, 3.0), Vector2(hint_width - 23.0, context_hint_text.size.y))
 	var hint_height: float = maxf(35.0, context_hint_text.get_line_height() * context_hint_text.get_line_count() + 8.0)
 	var hint_x: float = 960.0 - 32.0 - hint_width if cinematic else (TOUCH_HINT_SPAN.x if touch_layout else roundf((960.0 - hint_width) * 0.5))

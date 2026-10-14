@@ -26,9 +26,10 @@ static func nearest_step(value: float) -> float:
 
 
 ## Station names over the machines grow with the text size up to this factor; above it they keep
-## this size, since at 200% neighbouring names would run into each other in the rooms' rows of
-## machines (TextSize.WORLD_ROW_GROWTH breaks them onto rows first).
-const WORLD_MAX_FACTOR: float = 1.75
+## this size: larger, neighbouring names would run into each other in the rooms' rows of machines
+## (WORLD_ROW_GROWTH breaks them onto rows first), and on touch, where the play camera sits lower, the
+## corridor's stacked COOLANT RELAY name and COOLANT FAULT tag would reach PAUSE.
+const WORLD_MAX_FACTOR: float = 1.5
 
 
 ## The factor station names in the rooms take at the current text size.

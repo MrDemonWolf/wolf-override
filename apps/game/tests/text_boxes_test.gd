@@ -398,7 +398,7 @@ func _check_text_size(path: String) -> void:
 	settings.text_size.item_selected.emit(4)
 	_expect(is_equal_approx(TextSize.factor, 2.0) and GameSettings.load_config(path).get_value("video", "text_size", 0.0) == 2.0, "choosing 200% applies and saves it")
 	_expect(story.get_theme_font_size(&"font_size") == 46 and (game.get_node("CanvasLayer/ContextHint/Text") as Label).get_theme_font_size(&"font_size") == 28 and game.hud.get_theme_font_size(&"font_size") == 30 and (game.get_node("CanvasLayer/TutorialPrompt/Text") as Label).get_theme_font_size(&"font_size") == 34, "dialogue, hint, card and tutorial double")
-	_expect(breaker_label.get_theme_font_size(&"font_size") == roundi(13 * TextSize.WORLD_MAX_FACTOR) and absf(breaker_label.position.y + breaker_label.size.y - base_label_bottom) <= 2.0, "station names grow to 175%% at 200%% and grow upward from where they stood (%d px)" % breaker_label.get_theme_font_size(&"font_size"))
+	_expect(breaker_label.get_theme_font_size(&"font_size") == roundi(13 * TextSize.WORLD_MAX_FACTOR) and absf(breaker_label.position.y + breaker_label.size.y - base_label_bottom) <= 2.0, "station names grow to their cap (TextSize.WORLD_MAX_FACTOR) at 200%% and grow upward from where they stood (%d px)" % breaker_label.get_theme_font_size(&"font_size"))
 	var junction_label: Label = game.junction_room.station_labels[0]
 	_expect(junction_label.get_theme_font_size(&"font_size") == roundi(JunctionRoom.LABEL_FONT_SIZE * TextSize.WORLD_MAX_FACTOR) and game.records_room.station_labels[0].get_theme_font_size(&"font_size") == roundi(13 * TextSize.WORLD_MAX_FACTOR) and game.bypass_handle.fault_tag.get_theme_font_size(&"font_size") == roundi(BypassHandle.LABEL_FONT_SIZE * TextSize.WORLD_MAX_FACTOR), "the junction's, Records' and the bypass's plates grow too")
 	# Boxes at 200% stay on the canvas, one speaker each; their rows are counted.
@@ -472,6 +472,7 @@ func _check_station_names() -> void:
 					_expect(label.modulate.a > 0.99, "%d%%: %s is not faded at the corridor's start (alpha %.2f)" % [percent, label.text, label.modulate.a])
 				var relay_name: Rect2 = (game.get_node("RelayLabel") as Label).get_global_rect()
 				_expect(relay_name.end.y <= game.bypass_handle.fault_tag.get_global_rect().position.y + 0.5, "%d%%: COOLANT RELAY stands above its COOLANT FAULT tag" % percent)
+		await _check_touch_layout(percent)
 		# The valve's plate changes its words as it is worked ("VALVE  0 / 3" keeps a double space):
 		# each stands on the same line and clears the LINE caption by the dial.
 		game.debug_tools.actions.jump(&"junction_a")
@@ -486,6 +487,31 @@ func _check_station_names() -> void:
 			var plate: Rect2 = Rect2(room.valve_label.position, room.valve_label.size)
 			_expect(absf(plate.end.y - plate_bottom) <= 1.5, "%d%%: the %s plate stands on its line (bottom %.1f, expected %.1f)" % [percent, text.c_escape(), plate.end.y, plate_bottom])
 			_expect(not plate.intersects(Rect2(room.line_caption.position, room.line_caption.size)), "%d%%: the %s plate clears the LINE caption" % [percent, text.c_escape()])
+
+
+## On touch at [param percent]: a box, with a name or without, stays clear of ◀ ▶ and USE, and the
+## corridor's names and the COOLANT FAULT tag stay clear of PAUSE.
+func _check_touch_layout(percent: int) -> void:
+	game.debug_tools.actions.jump(&"corridor_start")
+	game.touch_enabled = true
+	game.controller_active = false
+	for line: String in [Main.STAKES_LINE, Main.JUNCTION_CLEARED_LINE]:
+		game.status_line = line
+		await process_frame
+		await process_frame
+		var box: Rect2 = bar.get_global_rect()
+		_expect(bar.visible, "%d%%, touch: the box shows (%s)" % [percent, line])
+		for button: Control in [game.touch_left, game.touch_right, game.touch_use]:
+			_expect(not box.intersects(button.get_global_rect()), "%d%%, touch: the box stays clear of %s (%s vs %s)" % [percent, (button as Button).text, box, button.get_global_rect()])
+		var hint_panel: Control = game.get_node("CanvasLayer/ContextHint") as Control
+		if hint_panel.visible:
+			_expect(not hint_panel.get_global_rect().intersects(box), "%d%%, touch: the hint bar stays clear of the box" % percent)
+	var pause: Rect2 = game.pause_button.get_global_rect()
+	for label: Label in [game.get_node("RelayLabel"), game.bypass_handle.fault_tag] as Array[Label]:
+		var on_screen: Rect2 = label.get_global_transform_with_canvas() * Rect2(Vector2.ZERO, label.size)
+		_expect(not on_screen.intersects(pause), "%d%%, touch: %s stays clear of PAUSE (%s vs %s)" % [percent, label.text, on_screen, pause])
+	game.touch_enabled = false
+	await process_frame
 
 
 func _expect(condition: bool, label: String) -> void:
