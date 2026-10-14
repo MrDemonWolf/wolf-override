@@ -4169,15 +4169,17 @@ func _dismiss_name_card() -> void:
 ## TEXT SIZE changed (or the game started): the station names take the new size and every box is
 ## laid out and split again.
 func _apply_text_size() -> void:
+	bypass_handle.refit_labels()
 	for label: Label in [$BreakerLabel, $RelayLabel, $CheckpointLabel] as Array[Label]:
 		if not label.has_meta(&"text_home"):
 			label.set_meta(&"text_home", Rect2(label.position, label.size))
 			label.set_meta(&"text_base_size", label.get_theme_font_size(&"font_size"))
 		var home: Rect2 = label.get_meta(&"text_home")
-		TextSize.fit_world_label(label, home.get_center().x, home.position.y)
+		# The relay's name stands over its COOLANT FAULT tag, so it rises as far as the tag grows.
+		var lift: float = bypass_handle.fault_tag_growth() if label == $RelayLabel else 0.0
+		TextSize.fit_world_label(label, home.get_center().x, home.position.y - lift)
 	records_room.refit_labels()
 	junction_room.refit_labels()
-	bypass_handle.refit_labels()
 	dialogue_key = ""
 	_layout_hud()
 	if is_inside_tree():

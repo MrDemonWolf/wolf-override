@@ -47,8 +47,15 @@ func _run() -> void:
 	await _check_touch()
 	await _check_text_size(path)
 	print("text boxes: %d boxes measured on screen; the longest box takes %d rows at 200%%" % [shown_checked, rows_at_200])
+	# The rooms' jumps leave clips playing. Stop every player and let the mixer release their playback
+	# before the game is freed, then give it frames and time before quitting (as chapter_scene_test does).
+	for player: Node in game.find_children("*", "AudioStreamPlayer", true, false) + game.find_children("*", "AudioStreamPlayer2D", true, false):
+		player.call("stop")
+	await create_timer(0.1).timeout
 	game.queue_free()
-	await process_frame
+	for frame: int in 10:
+		await process_frame
+	await create_timer(0.3).timeout
 	for file: String in [path, "%s-save.json" % path]:
 		if FileAccess.file_exists(file):
 			DirAccess.remove_absolute(ProjectSettings.globalize_path(file))
@@ -391,9 +398,9 @@ func _check_text_size(path: String) -> void:
 	settings.text_size.item_selected.emit(4)
 	_expect(is_equal_approx(TextSize.factor, 2.0) and GameSettings.load_config(path).get_value("video", "text_size", 0.0) == 2.0, "choosing 200% applies and saves it")
 	_expect(story.get_theme_font_size(&"font_size") == 46 and (game.get_node("CanvasLayer/ContextHint/Text") as Label).get_theme_font_size(&"font_size") == 28 and game.hud.get_theme_font_size(&"font_size") == 30 and (game.get_node("CanvasLayer/TutorialPrompt/Text") as Label).get_theme_font_size(&"font_size") == 34, "dialogue, hint, card and tutorial double")
-	_expect(breaker_label.get_theme_font_size(&"font_size") == 26 and absf(breaker_label.position.y + breaker_label.size.y - base_label_bottom) <= 2.0, "station names double and grow upward from where they stood")
+	_expect(breaker_label.get_theme_font_size(&"font_size") == roundi(13 * TextSize.WORLD_MAX_FACTOR) and absf(breaker_label.position.y + breaker_label.size.y - base_label_bottom) <= 2.0, "station names grow to 175%% at 200%% and grow upward from where they stood (%d px)" % breaker_label.get_theme_font_size(&"font_size"))
 	var junction_label: Label = game.junction_room.station_labels[0]
-	_expect(junction_label.get_theme_font_size(&"font_size") == JunctionRoom.LABEL_FONT_SIZE * 2 and game.records_room.station_labels[0].get_theme_font_size(&"font_size") == 26 and game.bypass_handle.fault_tag.get_theme_font_size(&"font_size") == BypassHandle.LABEL_FONT_SIZE * 2, "the junction's, Records' and the bypass's plates double too")
+	_expect(junction_label.get_theme_font_size(&"font_size") == roundi(JunctionRoom.LABEL_FONT_SIZE * TextSize.WORLD_MAX_FACTOR) and game.records_room.station_labels[0].get_theme_font_size(&"font_size") == roundi(13 * TextSize.WORLD_MAX_FACTOR) and game.bypass_handle.fault_tag.get_theme_font_size(&"font_size") == roundi(BypassHandle.LABEL_FONT_SIZE * TextSize.WORLD_MAX_FACTOR), "the junction's, Records' and the bypass's plates grow too")
 	# Boxes at 200% stay on the canvas, one speaker each; their rows are counted.
 	game.debug_new_game(true)
 	await process_frame
@@ -422,10 +429,49 @@ func _check_text_size(path: String) -> void:
 	_expect(is_equal_approx(TextSize.factor, 2.0) and again.settings_menu.text_size.selected == 4, "a new session opens at the saved 200%")
 	again.queue_free()
 	await process_frame
+	await _check_station_names()
 	settings.text_size.select(0)
 	settings.text_size.item_selected.emit(0)
 	_expect(is_equal_approx(TextSize.factor, 1.0) and story.get_theme_font_size(&"font_size") == 23 and breaker_label.get_theme_font_size(&"font_size") == 13, "back at 100% everything returns to its size")
 	_expect(is_equal_approx(TextSize.nearest_step(1.3), 1.25) and is_equal_approx(TextSize.nearest_step(9.0), 2.0) and is_equal_approx(TextSize.nearest_step(-1.0), 1.0), "a hand-edited size snaps to the nearest step")
+
+
+## At every text size the station names in each room, in each state, stay apart: a name breaks
+## between its words above 100% (TextSize.WORLD_ROW_GROWTH) instead of running into its neighbours,
+## stands where it stood at 100% (its bottom edge), and the corridor's are not faded out at the start.
+func _check_station_names() -> void:
+	var settings: GameSettings = game.settings_menu
+	var bottoms: Dictionary = {}
+	for index: int in TextSize.STEPS.size():
+		settings.text_size.select(index)
+		settings.text_size.item_selected.emit(index)
+		var percent: int = roundi(TextSize.STEPS[index] * 100.0)
+		for jump: StringName in [&"corridor_start", &"records_mirror", &"junction_a", &"lane", &"tank_down"]:
+			game.debug_tools.actions.jump(jump)
+			for frame: int in 3:
+				await process_frame
+			var labels: Array[Label] = []
+			var candidates: Array = [game.get_node("BreakerLabel"), game.get_node("RelayLabel"), game.get_node("CheckpointLabel"), game.bypass_handle.fault_tag]
+			candidates.append_array(game.records_room.station_labels)
+			candidates.append_array(game.junction_room.station_labels)
+			for label: Label in candidates:
+				if label.is_visible_in_tree() and not label.text.is_empty():
+					labels.append(label)
+			for a: int in labels.size():
+				var rect: Rect2 = labels[a].get_global_rect()
+				var key: String = "%s|%s|%s" % [jump, labels[a].get_path(), labels[a].text]
+				if index == 0:
+					bottoms[key] = rect.end.y
+				elif bottoms.has(key) and labels[a] != game.get_node("RelayLabel"):
+					_expect(absf(rect.end.y - float(bottoms[key])) <= 1.5, "%d%%, %s: %s keeps its bottom edge where it was at 100%% (%.1f vs %.1f)" % [percent, jump, labels[a].text, rect.end.y, bottoms[key]])
+				for b: int in range(a + 1, labels.size()):
+					var other: Rect2 = labels[b].get_global_rect()
+					_expect(not rect.grow(-0.5).intersects(other.grow(-0.5)), "%d%%, %s: %s and %s do not overlap (%s, %s)" % [percent, jump, labels[a].text, labels[b].text, rect, other])
+			if jump == &"corridor_start":
+				for label: Label in [game.get_node("BreakerLabel"), game.get_node("RelayLabel"), game.bypass_handle.fault_tag] as Array[Label]:
+					_expect(label.modulate.a > 0.99, "%d%%: %s is not faded at the corridor's start (alpha %.2f)" % [percent, label.text, label.modulate.a])
+				var relay_name: Rect2 = (game.get_node("RelayLabel") as Label).get_global_rect()
+				_expect(relay_name.end.y <= game.bypass_handle.fault_tag.get_global_rect().position.y + 0.5, "%d%%: COOLANT RELAY stands above its COOLANT FAULT tag" % percent)
 
 
 func _expect(condition: bool, label: String) -> void:

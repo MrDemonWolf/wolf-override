@@ -146,10 +146,16 @@ func place(wheel_centre: Vector2, relay_x: float) -> void:
 	_relay_x = relay_x
 	# A larger TEXT SIZE grows the plate upward, so its foot stays over the wheel.
 	var font: Font = bypass_label.get_theme_font(&"font")
-	var grown: float = (font.get_height(TextSize.px(LABEL_FONT_SIZE)) - font.get_height(LABEL_FONT_SIZE)) * bypass_label.get_line_count()
+	var grown: float = (font.get_height(TextSize.world_px(LABEL_FONT_SIZE)) - font.get_height(LABEL_FONT_SIZE)) * bypass_label.get_line_count()
 	bypass_label.position = Vector2(-bypass_label.size.x * 0.5 + LABEL_SHIFT_X, LABEL_TOP - grown)
 	readout.queue_redraw()
-	fault_tag.position = Vector2(relay_x - wheel_centre.x - fault_tag.size.x * 0.5, FAULT_TAG_TOP - wheel_centre.y)
+	# The tag grows upward too, over the relay's name, which main lifts by as much (fault_tag_growth).
+	fault_tag.position = Vector2(relay_x - wheel_centre.x - fault_tag.size.x * 0.5, FAULT_TAG_TOP - wheel_centre.y - fault_tag_growth())
+
+
+## How much taller the COOLANT FAULT tag stands than at 100% (it breaks onto two rows when larger).
+func fault_tag_growth() -> float:
+	return TextSize.world_growth(fault_tag, LABEL_FONT_SIZE)
 
 
 ## Shows the COOLANT FAULT tag while the relay is still faulted and takes it away once
@@ -208,22 +214,21 @@ func _plate(node_name: String, caption: String, text_color: Color, edge: Color, 
 	label.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	if wrap_width > 0.0:
 		label.autowrap_mode = TextServer.AUTOWRAP_WORD
-		label.custom_minimum_size.x = wrap_width * TextSize.factor
+		label.custom_minimum_size.x = wrap_width * TextSize.world_factor()
 		label.set_meta(&"wrap_width", wrap_width)
 	add_child(label)
 	label.size = label.get_combined_minimum_size()
 	return label
 
 
-## TEXT SIZE changed: both plates take the new size (the MANUAL BYPASS plate keeps its two rows) and
-## are placed again.
+## TEXT SIZE changed: both plates take the new size (the MANUAL BYPASS plate keeps its two rows; the
+## COOLANT FAULT tag breaks onto two above 100%, TextSize.wrap_world_label) and are placed again.
 func refit_labels() -> void:
-	for label: Label in [bypass_label, fault_tag]:
-		TextSize.size_label(label, LABEL_FONT_SIZE)
-		if label.has_meta(&"wrap_width"):
-			label.custom_minimum_size.x = float(label.get_meta(&"wrap_width")) * TextSize.factor
-		label.size = Vector2.ZERO
-		label.size = label.get_combined_minimum_size()
+	TextSize.size_label(bypass_label, LABEL_FONT_SIZE)
+	bypass_label.custom_minimum_size.x = float(bypass_label.get_meta(&"wrap_width")) * TextSize.world_factor()
+	bypass_label.size = Vector2.ZERO
+	bypass_label.size = bypass_label.get_combined_minimum_size()
+	TextSize.wrap_world_label(fault_tag, LABEL_FONT_SIZE)
 	place(position, _relay_x)
 
 
