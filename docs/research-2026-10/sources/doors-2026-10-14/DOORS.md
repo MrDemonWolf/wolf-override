@@ -597,7 +597,7 @@ Every leaf moves physically and never fades or hides; `door_route_test` checks t
 2. **Records** `records/out/records-doors.patch`: two hunks in `main.gd` were rejected because main moved on (PR #63 sound work) and the hatch patch had changed the same lines. I merged them by hand:
    - `records_room.close_entry_behind()` after `enter_records()`, below main's new safe-point chirp;
    - the `records_exit_walking` branch of `_wolf_target_x()`, after the hatch's `end_card_active` branch.
-3. **Junction** `junction/tools/patch_game.py`: I ran a copy (`shots/integration-tools/patch_game.py`, `patch_extra.py`) with three fixes:
+3. **Junction** `junction/tools/patch_game.py` (at dee9996): I ran a copy (`shots/integration-tools/patch_game.py`, `patch_extra.py`; filed as `integration/patch_game.py` at dee9996 and `integration/patch_extra.py` at dee9996) with three fixes:
    - The header-comment replacement now matches the hatch's rewording.
    - The `_build_door` replacement stops at the hatch's `## The exit door's pieces` instead of `_build_particles`. Without this it deleted the hatch's `_build_exit()` and `exit_leaf_anchor()`.
    - The hatch's uses of the old `DOOR_LIP_Z` are renamed to the junction's `DOOR_FRONT_Z` (both z 2), in `junction_room.gd` and `room_depth_test.gd`. I also dropped one identity replacement that no longer matched.

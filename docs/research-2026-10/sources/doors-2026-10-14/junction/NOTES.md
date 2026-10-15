@@ -118,7 +118,7 @@ the blown opening into the lane.
 | Each piece alone, for review | `layers/final/{wall,leaf,leafbreak,hole,damage,cracks,alcove,column,stub,lying,lens}.png` |
 | Cleaned layers before packing | `layers/sealed/`, `layers/blown/` (with `cleanup-report.json`) |
 | Construction design: flat renders, one mask per part, spec | `design/design-*.png`, `design/masks/`, `design/spec.json` |
-| Tools | `tools/jmodel.py` (camera, model, light), `jdesign.py` (every part, with dims and job), `codex_inputs.py`, `cleanup.py`, `install.py`, `preview.py`, `imgkit.py` (filed once, as `../../corridor-door-end-2026-10-12/tools/layers/imgkit.py`: the same file; put it beside the tools to re-run them), `patch_game.py` + `patch_extra.py` (integration), `run_checks.sh`. Filed in `junction/tools/`, which now holds fix round 3's versions (`../README.md`, "Tool map"); round 1's are `junction/tools/jmodel.py` at dee9996, `junction/tools/jdesign.py` at dee9996, `junction/tools/codex_inputs.py` at dee9996, `junction/tools/cleanup.py` at dee9996 and `junction/tools/install.py` at dee9996. The suite runner is `junction/tools/run_checks.sh` at dee9996 (the doors' one suite runner is now `../tools/suite.sh`). |
+| Tools | `tools/jmodel.py` (camera, model, light), `jdesign.py` (every part, with dims and job), `codex_inputs.py`, `cleanup.py`, `install.py`, `preview.py`, `imgkit.py` (filed once, as `../../corridor-door-end-2026-10-12/tools/layers/imgkit.py`: the same file; put it beside the tools to re-run them), `patch_game.py` + `patch_extra.py` (integration), `run_checks.sh`. Filed in `junction/tools/`, which now holds fix round 3's versions (`../README.md`, "Tool map"); round 1's are `junction/tools/jmodel.py` at dee9996, `junction/tools/jdesign.py` at dee9996, `junction/tools/codex_inputs.py` at dee9996, `junction/tools/cleanup.py` at dee9996 and `junction/tools/install.py` at dee9996. The suite runner is `junction/tools/run_checks.sh` at dee9996 (the doors' one suite runner is now `../tools/suite.sh`). The integration scripts are `junction/tools/patch_game.py` at dee9996 and `junction/tools/patch_extra.py` at dee9996 (as adjusted and run at integration: `integration/patch_game.py` at dee9996 and `integration/patch_extra.py` at dee9996); they carried the game code they inserted, which is in `apps/game` and the branch history. |
 | Integrated slice: main + this door | `game-slice/` |
 | Diff of the slice against main | `review/integration.diff` |
 | Render driver | `driver/junction_door_capture.gd` |
@@ -134,7 +134,7 @@ the blown opening into the lane.
 ## How to integrate
 
 Rebuild the slice from a fresh export with
-`python tools/patch_game.py <apps/game copy>`. Every replacement must match exactly once. The
+`python tools/patch_game.py <apps/game copy>` (`junction/tools/patch_game.py` at dee9996). Every replacement must match exactly once. The
 patch does the following.
 
 - **Assets in and out**
