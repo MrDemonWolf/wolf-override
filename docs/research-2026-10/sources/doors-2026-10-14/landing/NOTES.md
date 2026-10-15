@@ -23,7 +23,7 @@ The package was round 4 of `doors-r1` (`fix-r4/`), built on main 0c5d1ae. Its di
 - **Decision (c), the coolant pipe:** `tools/exit_fixes.py` draws two 0.2 m pipes on a strap clamp along the passage's back wall seen through the open exit, at about 1.0-1.4 m, shaded as cylinders lit by the passage's fitting, in the wall's tint, with the grain of the room's own painted pipes. Deterministic image work; no Codex session.
 - **DOOR DOWN ghost (inherited):** once the junction is cleared, a station plate caught in the edge fade is hidden instead of hanging half faded through the walk-out; `sentry_test` checks it.
 - **Mint line through the tank (inherited):** gone on main since PR #68 moved the bolt feed off the wall; nothing to do.
-- **Beam band over the alcove (inherited):** see the PR's open issues and the stills.
+- **Beam band over the alcove (inherited):** gone on main since PR #68: facing back over the TANK RELEASE the beam now stops at the alcove's right edge, and at the far end of its patrol it starts from behind the bolt panel (stills p01 and p02 from `driver2/panel_capture.gd`, and the phone j03-j04 frames).
 
 ## Wording
 
@@ -32,8 +32,25 @@ See `../../../../decisions.md` ("Doors landed") and `../../../approved/`: every 
 ## Evidence
 
 - Suites: every `apps/game/tests/*_test.gd`, run by `bun run game:check` (twice) on the final branch.
-- Stills: `render.sh` with `driver/doors_capture.gd`, before (an untouched `git archive` of `origin/main`) and after (this branch), at 1280x720 (with the budget) and 2400x1080 with the touch layout (`--touch=1`), runs `land-doors-{before,after}-{desk,phone}`.
-- Budget: `perf.py` compares the drivers' per-state draw calls, objects, visible additive items and texture memory (the PR body has the table).
+- Stills: `render.sh` with `driver/doors_capture.gd`, before (an untouched `git archive` of `origin/main`) and after (this branch), at 1280x720 (with the budget) and 2400x1080 with the touch layout (`--touch=1`), runs `land-doors-{before,after}-{desk,phone}`; the sentry at the far end of its patrol and its beam facing back over the alcove come from `driver2/panel_capture.gd` (p01, p02).
+- Budget: `perf.py` compares the drivers' per-state draw calls, objects, visible additive items and texture memory (p50 and max over 60 frames, 1280x720, software GL):
+
+| State | Draw calls p50 (max), main -> doors | Objects p50 | Additive items (room) | Texture MB |
+|---|---|---|---|---|
+| r01-arrival | 49 (53) -> 49 (53) | 209 -> 209 | 9 (9) -> 9 (9) | 75.20 -> 77.08 |
+| r03-arrival-closed | 49 (49) -> 49 (49) | 209 -> 209 | 9 (9) -> 9 (9) | 75.20 -> 77.08 |
+| r04-copy-point | 47 (47) -> 45 (45) | 146 -> 158 | 9 (9) -> 9 (9) | 75.20 -> 77.08 |
+| r07-exit-open | 47 (47) -> 45 (45) | 211 -> 208 | 9 (9) -> 9 (9) | 75.20 -> 77.08 |
+| r11-entry-shut | 92 (92) -> 82 (82) | 269 -> 244 | 10 (10) -> 9 (9) | 75.45 -> 77.33 |
+| j01-sealed | 90 (90) -> 80 (80) | 297 -> 272 | 10 (10) -> 9 (9) | 75.45 -> 77.33 |
+| j04-blown | 97 (101) -> 85 (90) | 696 -> 655 | 10 (10) -> 9 (9) | 75.45 -> 77.33 |
+| j06-lane-sentry | 104 (105) -> 94 (95) | 355 -> 344 | 10 (10) -> 9 (9) | 75.45 -> 77.33 |
+| j08-exit-bolt | 94 (94) -> 79 (79) | 287 -> 263 | 9 (9) -> 8 (8) | 75.45 -> 77.33 |
+| j11-hatch-open | 99 (99) -> 79 (79) | 270 -> 248 | 9 (9) -> 8 (8) | 80.13 -> 77.33 |
+
+  Draw calls and additive items are equal or lower in every state; texture memory is +1.88 MB (the package measured the same), and lower in j11, where main still loaded the old hatch passage.
+- Against the package frames Nathanial approved (`compare.py`, share of pixels more than 8/255 apart on the frames without UI): median 2.2 % over 65 shared states (main's newer text and UI). The larger ones are explained: j03 (about 40 %) is the blast's camera shake at a different moment and the thrown leaf now posed where review r5 said it should be (S1); j05 (59 %) is WOLF holding back by the valve (PR #69) and a camera a few px further; j10 (22 %) catches the sliding door at a slightly different moment.
+- Both phone runs requested 2400x1080 with the touch layout; the container saved them at 1920x1080, as the package's phone runs did. The package's phone frames had no touch layout, so the phone frames differ from them mostly by the touch framing (the camera sits lower) and the touch buttons; they were compared with main's phone frames instead.
 
 ## Not done
 

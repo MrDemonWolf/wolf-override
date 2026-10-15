@@ -97,6 +97,7 @@ for job in sorted(os.listdir(os.path.join(src, "codex"))):
 # The landing (this work).
 tree("tools", "landing/tools", base=land)
 tree("driver", "landing/driver", base=land)
-for f in ("render.sh", "suite.sh", "sheet.py", "file_records.py", "perf.py"):
+tree("driver2", "landing/driver2", base=land)
+for f in ("render.sh", "suite.sh", "sheet.py", "file_records.py", "perf.py", "compare.py"):
     put(f, os.path.join("landing", f), base=land)
 print("filed into", dest)
