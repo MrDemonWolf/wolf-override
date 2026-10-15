@@ -236,7 +236,7 @@ def added_lines(repo, base, ref):
                        'with its history, for example a checkout with fetch-depth 0)') from None
     diff = git(repo, '-c', 'core.quotePath=false', 'diff', '--no-color', '--no-ext-diff',
                '--find-renames', '--unified=0', '--src-prefix=a/', '--dst-prefix=b/',
-               merge_base, ref, '--').decode('utf-8', 'replace')
+               merge_base, ref, '--', *(f'*{ext}' for ext in CODE_EXTS)).decode('utf-8', 'replace')
     added = collections.defaultdict(set)
     path = None
     for line in diff.splitlines():
