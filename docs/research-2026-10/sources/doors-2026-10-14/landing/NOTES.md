@@ -43,6 +43,12 @@ A fresh-clone verification of the branch (render.sh, the touch layout) found the
 - Asset register: the EXIT BOLT panel entry described the old spot (x 806, cables into the hatch frame); it now gives x 796 left of the sliding exit door, worked from about x 747, its riser to a floor flange in the exit atlas's back layer, and the lamp and feed redrawn over the sentry (BoltPanelFront).
 - Not changed: the solid near column that hides an engineer stopped in the blown doorway stays an open call for Nathanial.
 
+## Fixes after the third verification (October 15, 2026)
+
+- Filed fix round 1's own entry door and exit door tools, which the register cites and which differ from the later rounds' copies: `fix-r1/jentry/tools/` (jemodel, jedesign, jeinputs, jeclean, jeinstall) and `fix-r1/hatch/tools/` (geom, design, leaf, noleaf, compose, imgkit, cleanup, hinstall, install, manifest, run_codex.sh), through `file_records.py`, with scratch paths shortened as before.
+- Asset register: the junction far plate, the entry atlas, the mid plate and the exit atlas now cite those tools by their full filed path (the mid plate's `jemid.py` at `fix-r2/jentry/jemid.py`, where it is filed), the blast door atlas's `grade.py` at `fix-r1/tools/grade.py`, the entry atlas's `rgrade.py` at `fix-r1/tools/rgrade.py` and one `grade2.py` at `fix-r2/tools/grade2.py`, each with the full `docs/research-2026-10/sources/doors-2026-10-14/` prefix. No path in the register starts at a round folder or a scratch folder any more; every full tool path in it resolves, and bare script names are left only after their round's own filed folder.
+- Code comments: `junction_door_layout.gd` names the filed `junction/tools/install.py` and `records_room.gd` the filed `fix-r4/tools/`, not the scratch folders. Comments only; nothing drawn or run changes.
+
 ## Wording
 
 See `../../../../decisions.md` ("Doors landed") and `../../../approved/`: every line about the junction exit says "door"; the tank's hit is two one-speaker boxes; the Records container hint names the container.
