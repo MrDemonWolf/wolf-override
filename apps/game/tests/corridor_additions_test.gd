@@ -1,10 +1,10 @@
-extends SceneTree
+extends "res://tests/support/game_suite.gd"
 ## The corridor's round-7 additions, checked without playing: the caged beacons hang where main's
 ## drawn beacons were, and the inner blast leaf seals the whole opening when shut and is wholly in its
 ## wall pocket, behind the walk line, once open. (The leaf moving with the roller and the crank pose's
-## hand on the wheel are checked in play by m0_scene_test.)
+## hand on the wheel are checked in play by m0_scene_test.) Spawn, teardown and failure reporting come
+## from the shared suite kit (tests/support/game_suite.gd).
 
-const GAME_SCENE: PackedScene = preload("res://scenes/main.tscn")
 ## Main's (76d3a50) corridor beacon anchors, read headless from main: CorridorDepth/Backdrop/Beacon0
 ## and Beacon1 (and their WarningGlow sprites) at load.
 const MAIN_BEACONS: PackedVector2Array = [Vector2(327.36, 224.3), Vector2(632.64, 224.3)]
@@ -14,11 +14,9 @@ const MAIN_HOUSING: Rect2 = Rect2(-7.0, -4.0, 14.0, 9.0)
 ## the near jamb (behind the column) and the far jamb (the pocket's mouth).
 const JAMB_NEAR_A: float = -2.09069
 const LEAF_LENGTH_M: float = 3.95
-## The walk line (where the actors' feet are) crosses the wall face at a = 0, at world y 440.
+## The walk line (where the actors' feet are) crosses the wall face at a = 0, at world y
+## RoomDepth.FLOOR_Y.
 const WALK_A: float = 0.0
-const FLOOR_Y: float = 440.0
-
-var failures: int = 0
 
 
 func _initialize() -> void:
@@ -26,25 +24,14 @@ func _initialize() -> void:
 
 
 func _run() -> void:
-	var path: String = "user://corridor-additions-test-%s.json" % OS.get_process_id()
-	var game: Node2D = GAME_SCENE.instantiate() as Node2D
-	game.set("save_path", path)
-	game.set("settings_path", "%s-settings.cfg" % path)
-	root.add_child(game)
-	await process_frame
+	check_name = "Corridor additions"
+	var game: Node2D = await start_game("corridor-additions-test")
+	# start_game waits one process frame; this suite always checked after two, so it still does.
 	await process_frame
 	_check_beacons(game)
 	_check_blast_leaf(game)
-	(game.get("sfx_bank") as SfxBank).stop_all()
-	await create_timer(0.1).timeout
-	game.queue_free()
-	await create_timer(0.1).timeout
-	for p: String in [path, "%s-settings.cfg" % path]:
-		if FileAccess.file_exists(p):
-			DirAccess.remove_absolute(ProjectSettings.globalize_path(p))
-	if failures == 0:
-		print("Corridor additions test passed")
-	quit(1 if failures > 0 else 0)
+	await end_game(game)
+	finish("Corridor additions test passed")
 
 
 func _check_beacons(game: Node2D) -> void:
@@ -98,16 +85,14 @@ func _check_blast_leaf(game: Node2D) -> void:
 	for a: float in [open_lead, open_lead + LEAF_LENGTH_M * 0.5, open_lead + LEAF_LENGTH_M]:
 		for t: float in [BlastLeaf.T_LF, BlastLeaf.T_LB]:
 			deepest_foot_y = maxf(deepest_foot_y, BlastLeaf.project(a, 0.0, t).y)
-	_expect(deepest_foot_y < FLOOR_Y - 8.0, "open, the inner leaf's footprint is wholly behind the walk line (lowest foot at world y %.1f, the walk line at %.0f)" % [deepest_foot_y, FLOOR_Y])
+	_expect(deepest_foot_y < RoomDepth.FLOOR_Y - 8.0, "open, the inner leaf's footprint is wholly behind the walk line (lowest foot at world y %.1f, the walk line at %.0f)" % [deepest_foot_y, RoomDepth.FLOOR_Y])
 	# Round 8: it reads heavier than the roller: a 0.30-0.45 m leading edge, and a feathered contact
 	# shadow on the threshold, in the wall's thickness (in front of the leaf's foot, behind the face),
 	# from a solid black patch of the same atlas (so it still batches).
 	_expect(BlastLeaf.T_LB - BlastLeaf.T_LF >= 0.30 and BlastLeaf.T_LB - BlastLeaf.T_LF <= 0.45 and BlastLeaf.T_LB < 0.66, "the inner leaf's leading edge is %.2f m thick, inside the 0.66 m wall" % (BlastLeaf.T_LB - BlastLeaf.T_LF))
 	var shadow_t: float = BlastLeaf.T_LF - BlastLeaf.SHADOW_DEPTH_M
 	_expect(shadow_t > 0.0 and BlastLeaf.SHADOW_ALPHA > 0.0 and BlastLeaf.SHADOW_ALPHA < 1.0, "the leaf's contact shadow lies on the threshold inside the wall (t %.2f..%.2f m), feathered from alpha %.2f to 0" % [shadow_t, BlastLeaf.T_LF, BlastLeaf.SHADOW_ALPHA])
-	var atlas_img: Image = leaf.texture.get_image()
-	if atlas_img.is_compressed():
-		atlas_img.decompress()
+	var atlas_img: Image = texture_image(leaf.texture)
 	var black: bool = true
 	for y: int in range(int(BlastLeaf.SHADOW_REGION.position.y), int(BlastLeaf.SHADOW_REGION.end.y)):
 		for x: int in range(int(BlastLeaf.SHADOW_REGION.position.x), int(BlastLeaf.SHADOW_REGION.end.x)):
@@ -115,10 +100,3 @@ func _check_blast_leaf(game: Node2D) -> void:
 			if c.a < 0.99 or maxf(c.r, maxf(c.g, c.b)) > 0.01:
 				black = false
 	_expect(black, "the contact shadow's atlas patch is solid black")
-
-
-func _expect(condition: bool, label: String) -> bool:
-	if not condition:
-		failures += 1
-		push_error("Corridor additions check failed: " + label)
-	return condition

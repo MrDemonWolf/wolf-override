@@ -17,6 +17,7 @@ extends SceneTree
 ## Touching (at most TOUCH px of shared painted pixels) is not an overlap.
 
 const GAME_SCENE: PackedScene = preload("res://scenes/main.tscn")
+const Suite = preload("res://tests/support/game_suite.gd")
 const WOLF_ART: String = "res://assets/wolf-side-right-provisional.png"
 const TOUCH: float = 0.5
 ## The corridor's door-end pieces measured in depth, not along x, while WOLF stands in the open
@@ -354,7 +355,7 @@ func _check_doorway(game: Main, label: String, wolf_span: Vector2) -> void:
 	for node_name: String in DRAWN_OVER_ACTORS:
 		var piece: Sprite2D = game.get_node(node_name) as Sprite2D
 		_require(piece != null, "the door end draws %s" % node_name)
-		_expect(_absolute_z(piece) > _absolute_z(wolf_sprite), "%s draws over the actors" % node_name)
+		_expect(Suite.drawn_z(piece) > Suite.drawn_z(wolf_sprite), "%s draws over the actors" % node_name)
 		if piece.is_visible_in_tree():
 			covers.append(piece)
 	var hidden: Dictionary = _covered_pixels(wolf_sprite, covers)
@@ -367,11 +368,11 @@ func _check_doorway(game: Main, label: String, wolf_span: Vector2) -> void:
 	var parked_foot: Vector2 = BlastLeaf.project(BlastLeaf.lead_at(1.0), 0.0, BlastLeaf.T_LF)
 	_expect(not leaf.visible and BlastLeaf.lead_at(leaf.open if leaf.open > 0.0 else 1.0) >= BlastLeaf.A_MOUTH - 0.0001 and parked_foot.y < BlastLeaf.FLOOR_Y - 2.0, "%s: the inner leaf is parked in its pocket, its foot behind the walk line (y %.1f), clear of WOLF" % [label, parked_foot.y])
 	for back: Sprite2D in [game.get("seal_wall") as Sprite2D, game.get_node("Door/CorridorSealFrame") as Sprite2D]:
-		_expect(_absolute_z(back) < _absolute_z(wolf_sprite), "%s draws behind the actors" % back.name)
+		_expect(Suite.drawn_z(back) < Suite.drawn_z(wolf_sprite), "%s draws behind the actors" % back.name)
 	var frame_rows: Vector2 = _painted_rows(game.get_node("Door/CorridorSealFrame") as Sprite2D)
 	_expect(frame_rows.y < BlastLeaf.FLOOR_Y - 8.0, "%s: the seal frame (far guide, hood, operator) ends above the walk line (lowest row %.1f), behind WOLF" % [label, frame_rows.y])
 	var hub: Vector2 = game.bypass_handle.global_position + BypassHandle.WHEEL_OFFSET
-	_expect(hub.y + BypassHandle.COLLAR_RADIUS < BlastLeaf.FLOOR_Y - 20.0 and _absolute_z(game.bypass_handle) < _absolute_z(wolf_sprite), "%s: the MANUAL BYPASS is mounted on the back wall above the floor (its collar's foot at y %.1f), drawn behind WOLF, who stands in front of it" % [label, hub.y + BypassHandle.COLLAR_RADIUS])
+	_expect(hub.y + BypassHandle.COLLAR_RADIUS < BlastLeaf.FLOOR_Y - 20.0 and Suite.drawn_z(game.bypass_handle) < Suite.drawn_z(wolf_sprite), "%s: the MANUAL BYPASS is mounted on the back wall above the floor (its collar's foot at y %.1f), drawn behind WOLF, who stands in front of it" % [label, hub.y + BypassHandle.COLLAR_RADIUS])
 	var camera: Camera2D = game.get_viewport().get_camera_2d()
 	var view: Rect2 = Rect2(camera.get_screen_center_position() - game.get_viewport_rect().size * 0.5 / camera.zoom, game.get_viewport_rect().size / camera.zoom)
 	_expect(wolf_span.x >= view.position.x and wolf_span.y <= view.end.x, "%s: WOLF (%.1f..%.1f) is inside the camera's view (%.1f..%.1f)" % [label, wolf_span.x, wolf_span.y, view.position.x, view.end.x])
@@ -424,26 +425,11 @@ func _opaque_at(sprite: Sprite2D, image: Image, local: Vector2, size: Vector2) -
 	return image.get_pixelv(at).a > 0.5
 
 
-## The z index [param item] is drawn at, its relative indices added up its parents.
-func _absolute_z(item: CanvasItem) -> int:
-	var z: int = 0
-	var node: Node = item
-	while node is CanvasItem:
-		z += (node as CanvasItem).z_index
-		if not (node as CanvasItem).z_as_relative:
-			break
-		node = node.get_parent()
-	return z
-
-
 ## [param sprite]'s texture as an uncompressed image, read once per texture.
 func _image_of(sprite: Sprite2D) -> Image:
 	var key: String = "image %s" % sprite.texture.resource_path
 	if not painted.has(key):
-		var image: Image = sprite.texture.get_image()
-		if image.is_compressed():
-			image.decompress()
-		painted[key] = image
+		painted[key] = Suite.texture_image(sprite.texture)
 	return painted[key]
 
 
@@ -527,9 +513,7 @@ func _painted_columns(sprite: Sprite2D) -> Vector2:
 	var key: String = "%s %s" % [sprite.texture.resource_path, region]
 	if painted.has(key):
 		return painted[key]
-	var image: Image = sprite.texture.get_image()
-	if image.is_compressed():
-		image.decompress()
+	var image: Image = _image_of(sprite)
 	var first: int = region.end.x
 	var last: int = region.position.x - 1
 	for x: int in range(region.position.x, region.end.x):
