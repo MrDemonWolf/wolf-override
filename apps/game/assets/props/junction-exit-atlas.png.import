@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://2cwvdnhfyyt"
-path="res://.godot/imported/junction-hatch.png-659108574108426e98477b1a0f58908d.ctex"
+uid="uid://bn8skxybt8i17"
+path="res://.godot/imported/junction-exit-atlas.png-cdfd66b60d2cb05d6b613c9f2770142a.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/props/junction-hatch.png"
-dest_files=["res://.godot/imported/junction-hatch.png-659108574108426e98477b1a0f58908d.ctex"]
+source_file="res://assets/props/junction-exit-atlas.png"
+dest_files=["res://.godot/imported/junction-exit-atlas.png-cdfd66b60d2cb05d6b613c9f2770142a.ctex"]
 
 [params]
 

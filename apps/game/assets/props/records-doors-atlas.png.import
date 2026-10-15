@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://vp7s1eo2c8h2"
-path="res://.godot/imported/junction-bulkhead-front-lip.png-f42929a2989ac3f64ced10efca04a571.ctex"
+uid="uid://j25vyqap3hub"
+path="res://.godot/imported/records-doors-atlas.png-d242d33ed8450b08057dc67afbea50a5.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/props/junction-bulkhead-front-lip.png"
-dest_files=["res://.godot/imported/junction-bulkhead-front-lip.png-f42929a2989ac3f64ced10efca04a571.ctex"]
+source_file="res://assets/props/records-doors-atlas.png"
+dest_files=["res://.godot/imported/records-doors-atlas.png-d242d33ed8450b08057dc67afbea50a5.ctex"]
 
 [params]
 

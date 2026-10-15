@@ -155,6 +155,8 @@ func _run() -> void:
 	game.call("_sync_scene")
 	await physics_frame
 	await _tap(&"interact")
+	# USE at the open exit walks the engineer out through the doorway first; the junction follows.
+	await _wait_until(func() -> bool: return state.chapter_id == "junction", 180)
 	if not _require(state.chapter_id == "junction" and game.get("wolf_scouting"), "the Records exit enters the junction with WOLF scouting"):
 		return
 	_expect_clear(human, wolf, "junction entry")
@@ -259,15 +261,15 @@ func _check_label_edges(game: Node2D, human: M0Actor, labels: Array[Label], room
 
 
 ## The machines' lights, glows, plates and captions all draw under the two actors, so someone standing
-## at a machine is in front of everything on it. (The door's placard rides over the bulkhead's front
-## pillar, above head height.)
+## at a machine is in front of everything on it. (The door's placard hangs over the blast door's near
+## column, above head height; the door's status lamp is on that column, in front of the actors.)
 func _check_draw_order(game: Node2D, human: M0Actor, wolf: M0Actor) -> void:
 	var actor_z: int = _effective_z(human)
 	_expect(actor_z == _effective_z(wolf), "both actors draw at one depth")
 	var room: JunctionRoom = game.get("junction_room") as JunctionRoom
 	var records: RecordsRoom = game.get("records_room") as RecordsRoom
 	var bypass: BypassHandle = game.get("bypass_handle") as BypassHandle
-	var parts: Array[CanvasItem] = [game.get_node("BreakerStatusLight"), game.get_node("RelayStatusLight"), game.get("breaker_status_glow"), game.get("relay_status_glow"), game.get_node("BreakerArt"), game.get_node("RelayArt"), game.get_node("CheckpointArt"), game.get_node("BreakerLabel"), game.get_node("RelayLabel"), game.get_node("CheckpointLabel"), bypass, bypass.bypass_label, bypass.fault_tag, records.purge_glow, records.mirror_glow, room.breaker_glow, room.vent_glow, room.seam_glow, room.line_caption, room.breaker_art, room.valve_art, room.arm_panel_art, room.bolt_panel_art]
+	var parts: Array[CanvasItem] = [game.get_node("BreakerStatusLight"), game.get_node("RelayStatusLight"), game.get("breaker_status_glow"), game.get("relay_status_glow"), game.get_node("BreakerArt"), game.get_node("RelayArt"), game.get_node("CheckpointArt"), game.get_node("BreakerLabel"), game.get_node("RelayLabel"), game.get_node("CheckpointLabel"), bypass, bypass.bypass_label, bypass.fault_tag, records.purge_glow, records.mirror_glow, room.breaker_glow, room.vent_glow, room.line_caption, room.breaker_art, room.valve_art, room.arm_panel_art, room.bolt_panel_art]
 	for label: Label in records.station_labels:
 		parts.append(label)
 	for label: Label in room.station_labels:

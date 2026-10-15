@@ -68,11 +68,16 @@ func _run() -> void:
 		_fail("engineer can walk on from the mirror port")
 		return
 	_expect(str(game.call("_context_hint")) == "Mirror copied. Head for the exit.", "walking on after both copies the hint names only the exit, never a finished station (%s)" % game.call("_context_hint"))
+	var records: RecordsRoom = game.get("records_room") as RecordsRoom
+	await _walk_to(human, 905.0)
+	_expect(human.position.x <= RecordsRoom.EXIT_DOOR_X - State.HUMAN_HALF_WIDTH + 1.0 and is_equal_approx(records.exit_leaf.open, 0.0), "the shut exit stops the engineer at its leaf before the first copy is secured (x %.1f)" % human.position.x)
 	if not await _walk_to(human, 830.0):
 		_fail("engineer can reach the records exit")
 		return
 	await _tap(&"interact")
 	_expect(state.chapter_complete and game.call("_objective") == "FIRST COPY SECURED", "first chapter resolves after two traces")
+	_expect(records.exit_leaf.open < 0.25 and records.exit_lamp_color() == RecordsRoom.LAMP_MOVING, "securing the copy starts the exit's leaf swinging on its hinges, its status lamp amber")
+	_expect(await _wait_until(func() -> bool: return absf(human.position.x - (RecordsRoom.CONTAINER_X + 21.0)) <= 0.5 and human.body_sprite.flip_h, 60), "the engineer secures the copy at the security container's lock, facing it (x %.1f)" % human.position.x)
 	_expect(str(game.get("status_line")).contains("An order and a timestamp don't tell me who's a threat"), "WOLF names what was copied when he questions the Director's target labels")
 	_expect(game.get("chapter_close_active") and not human.controlled, "first copy opens a player-paced closing beat")
 	_expect((game.get_node("CanvasLayer/PauseButton") as Button).visible, "closing beat keeps the pause button available")
@@ -85,6 +90,7 @@ func _run() -> void:
 	(game.get_node("CanvasLayer/PauseOverlay") as PauseOverlay).resume_requested.emit()
 	_expect(not paused and game.get("chapter_close_active") and not human.controlled, "resume preserves the closing beat until Continue")
 	await create_timer(0.6).timeout
+	_expect(records.exit_leaf.open > 0.0 and records.exit_leaf.open < 1.0 and records.exit_leaf.visible, "the exit's leaf is part way round its swing, never faded or hidden")
 	_expect(closing_camera.zoom.x >= 1.35, "the closing shot never zooms out past the play view")
 	var close_half: Vector2 = Vector2(960.0, 540.0) * 0.5 / closing_camera.zoom
 	var dialogue_top: float = (game.get_node("CanvasLayer/BottomBar") as Panel).position.y

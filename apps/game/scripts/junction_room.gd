@@ -1,17 +1,17 @@
 extends Node2D
 class_name JunctionRoom
 ## Blowback: the Service Junction, the third 960 px room after the Records exit, built from its own
-## layered set (RoomDepth) and painted station props, with the corridor's breaker and a pressure
-## bulkhead for its door. What the art cannot show is drawn over it here from the state the parent
-## mirrors in (PressureLine, DropArm, SentryBrain): the LINE gauge's needle, the vent and seam glows,
-## the hazard stripes over the door's blast zone while the fuse burns, the panel and hatch lights, the
-## alcove's shadow and floor, the passage behind the exit hatch, the floor brackets (lit while the
-## sentry's body is inside them) with the tank's shadow, the rubble line and the winch cable. Station
+## layered set (RoomDepth) and painted station props, with the corridor's breaker and a blast door
+## in a cross-wall across the walkway (JunctionDoorLayout). What the art cannot show is drawn over it
+## here from the state the parent mirrors in (PressureLine, DropArm, SentryBrain): the LINE gauge's
+## needle, the vent glow and the door's status lamp, the hazard stripes over the door's blast zone
+## while the fuse burns, the panel and entry hatch lights, the floor brackets (lit while the sentry's
+## body is inside them) with the tank's shadow and the winch cable. Station
 ## names sit on small plates in one row of clear wall (the vent's on the floor by its grate), and a
 ## plate cut by the edge of the view fades out rather than show part of its name. What pulses follows
 ## the mirrored state (the fuse, the gauge), not a timer of its own.
 
-## The exit hatch has finished sliding open after the bolt arcs (bolt_arc).
+## The exit door has finished sliding open into its pocket after the bolt arcs (bolt_arc).
 signal hatch_opened
 
 const JUNCTION_FAR: Texture2D = preload("res://assets/rooms/junction-far.png")
@@ -19,24 +19,84 @@ const JUNCTION_MID: Texture2D = preload("res://assets/rooms/junction-mid.png")
 const JUNCTION_NEAR: Texture2D = preload("res://assets/rooms/junction-near.png")
 const BREAKER_PROP: Texture2D = preload("res://assets/props/corridor-breaker.png")
 const VALVE_PROP: Texture2D = preload("res://assets/props/junction-valve.png")
-## The pressure bulkhead (design A): sealed, breaking for a moment at the blast, then blown open on
-## the passage beyond, with its front pillar drawn again over the actors.
-const DOOR_SEALED_PROP: Texture2D = preload("res://assets/props/junction-bulkhead-sealed.png")
-const DOOR_BREAKING_PROP: Texture2D = preload("res://assets/props/junction-bulkhead-breaking.png")
-const DOOR_BLOWN_PROP: Texture2D = preload("res://assets/props/junction-bulkhead-blown.png")
-const DOOR_LIP_PROP: Texture2D = preload("res://assets/props/junction-bulkhead-front-lip.png")
+## The blast door: a hinged steel leaf (2.3 x 2.6 m, 0.30 m) in a 0.40 m cast-concrete cross-wall that
+## stands ACROSS the walkway, its face turned 17 degrees to the camera like the corridor's door end.
+## Every piece is one region of one lossless atlas (JunctionDoorLayout, generated from the design's
+## placement.json). Under the actors: the empty doorway (blown), the shut or breaking leaf, the wall
+## with the doorway at alpha 0, the blast damage, the TANK RELEASE bay. Over them: the near column
+## with the status lamp, the wall's stub across the deck and, once blown, the leaf lying in the lane.
 const VENT_PROP: Texture2D = preload("res://assets/props/junction-relief-vent.png")
 const ARM_PROP: Texture2D = preload("res://assets/props/junction-tank-arm.png")
 ## The tank cut out of the tank-arm image (rows 361..743), so it can fall away from the arm.
 const TANK_PROP: Texture2D = preload("res://assets/props/junction-tank.png")
 const ARM_PANEL_PROP: Texture2D = preload("res://assets/props/junction-arm-panel.png")
 const BOLT_PANEL_PROP: Texture2D = preload("res://assets/props/junction-bolt-panel.png")
-const HATCH_PROP: Texture2D = preload("res://assets/props/junction-hatch.png")
-## The open exit hatch shows a painted service passage: this cut of the open corridor bulkhead's
-## doorway (its floor, wall lamps and the light far down the line), drawn a little darker.
-const HATCH_PASSAGE_PROP: Texture2D = preload("res://assets/props/corridor-bulkhead-open.png")
-const HATCH_PASSAGE: Rect2 = Rect2(172.0, 300.0, 110.0, 253.0)
-const HATCH_PASSAGE_TINT: Color = Color(0.78, 0.84, 0.86)
+## The entry (review r1, M5; design: docs/research-2026-10/sources/junction-entry-door-2026-10-13/): the
+## engineer comes in from the service line passage the Records exit opens on, through a 3'0" x 7'0"
+## hollow-metal steel door in a 300 mm cast cross-wall closing the room's left end, turned 17 degrees
+## across the walkway like every door end of the base, in this room's camera (vanishing point (511,
+## 162)). Its leaf swings into the junction on its hinges at the far jamb (SwingLeaf), its closer
+## bringing it shut behind the arriving pair; the passage is painted behind the doorway into the far
+## plate. Wall, leaf, near column, stub and the lamp's glass are one AtlasMesh (one draw call) drawn
+## right after the mid plate: nobody passes behind the column (the leaf stops them at ENTRY_DOOR_X).
+const ENTRY_ATLAS: Texture2D = preload("res://assets/props/junction-entry-atlas.png")
+## The entry leaf's fill (fix round 4, review r4 M1; see RecordsRoom.EXIT_LEAF_FILL).
+const ENTRY_LEAF_FILL: float = 0.0880
+const ENTRY_WALL_REGION: Rect2 = Rect2(92.0, 2.0, 280.0, 607.0)
+const ENTRY_WALL_AT: Vector2 = Vector2(7.0, 140.0)
+const ENTRY_FRONT_REGION: Rect2 = Rect2(2.0, 2.0, 88.0, 634.0)
+const ENTRY_FRONT_AT: Vector2 = Vector2(-2.0, 140.0)
+const ENTRY_LEAF_ROOM_REGION: Rect2 = Rect2(374.0, 2.0, 73.0, 171.0)
+const ENTRY_LEAF_OUT_REGION: Rect2 = Rect2(449.0, 2.0, 73.0, 171.0)
+const ENTRY_LEAF_EDGE_REGION: Rect2 = Rect2(524.0, 2.0, 5.0, 171.0)
+const ENTRY_LENS_REGION: Rect2 = Rect2(531.0, 2.0, 16.0, 20.0)
+## One painted-steel pixel of the leaf's edge (low on it, under the lock front): the closer arm's colour.
+const ENTRY_ARM_REGION: Rect2 = Rect2(526.0, 150.0, 1.0, 1.0)
+## Where the shut leaf's junction face crosses the walk line: the door's collision face. Left of WOLF's
+## tail at his spot by the entrance (WOLF_CLEAR_X - M0Actor.WOLF_REACH, x 33).
+const ENTRY_DOOR_X: float = 30.0
+const ENTRY_LAMP: Vector2 = Vector2(6.8, 345.2)
+const ENTRY_HINGE: Vector3 = Vector3(0.89597, 0.0, 0.43639)
+const ENTRY_AXIS_U: Vector3 = Vector3(0.292372, 0.0, 0.956305)
+const ENTRY_AXIS_N: Vector3 = Vector3(-0.956305, 0.0, 0.292372)
+## The lights the leaf sees, as they light the wall round it (jedesign.py), in the leaf's own exposure
+## (fix round 4, review r4 M1; see RecordsRoom.EXIT_LEAF_LIGHTS): the door light, the room's left ceiling
+## lamp, the wet deck's bounce (fill), the threshold and passage deck through the doorway and the cross-wall's
+## lit face beyond the hinge jamb.
+const ENTRY_LEAF_LIGHTS: Array = [
+	[Vector3(0.8456, 2.8000, -0.0292), Vector3(1.7065, 1.8847, 1.9843), 1.40, 2.0, 0.00],  # the door light over the head (the design's: reach 1.4 m, down 2.0; true Lambert)
+	[Vector3(1.9461, 5.2370, 4.2000), Vector3(0.6570, 0.9537, 1.0597), 3.40, 1.5, 0.06],  # the room's ceiling lamp
+	[Vector3(2.7500, 0.1000, -3.0000), Vector3(0.0550, 0.0750, 0.0850), 4.00, 0.0, 0.06, true],  # the broad floor bounce (fill)
+	[Vector3(0.4755, 0.0300, 0.0871), Vector3(0.3002, 0.3316, 0.3491), 0.90, 0.0, 0.05],  # the lit threshold and passage deck seen through the doorway
+	[Vector3(1.0467, 1.4000, 0.8609), Vector3(0.3697, 0.4083, 0.4299), 1.00, 0.0, 0.05],  # the cross-wall's own lit face beyond the hinge jamb
+]
+## Its closer brings it shut behind them a moment after they come in, 90 to 10 degrees in 3 s or
+## longer (ANSI/BHMA A156.19), as the Records entry's does; amber while it moves, red once it latches.
+const ENTRY_CLOSE_DELAY: float = 0.35
+const ENTRY_CLOSE_SECONDS: float = 3.4
+const ENTRY_LAMP_SHUT: Color = Color(0.9, 0.2, 0.17)
+const ENTRY_LAMP_MOVING: Color = Color("#f3ae4b")
+## The exit: a power-operated sliding steel door in a cast-concrete cross-wall at the room's right end,
+## turned 17 degrees across the walk line like the corridor's door end (its approach face crosses the
+## walk line at EXIT_DOOR_X). Its leaf runs in the wall's middle on bottom rollers and slides back into
+## a pocket in the far jamb; the service passage beyond is painted behind the doorway. One lossless
+## atlas (docs: junction-exit-door-2026-10-13), drawn at EXIT_ATLAS_SCALE (2 source px per world px):
+## - beyond: the passage, the far reveal's rear half and the pocket (under the leaf);
+## - leaf: the sliding leaf, moved by exit_leaf_anchor();
+## - back: the cross-wall behind the walk line (its face back to the room's back wall, the far jamb and
+##   its steel-lined reveal with the pocket mouth, the steel threshold, the status lamp's box and guard
+##   and its conduit) and the bolt panel's riser down to its floor flange, drawn under the props;
+## - lens: the status lamp's globe, lit live in the exit bolt's colour;
+## - front: the cross-wall in front of the walk line (the near jamb, the wall beyond it, the lintel with
+##   the exit bolt's housing, its conduit and the wall pack over the door), drawn over the actors, so
+##   anyone walking through passes behind the near jamb;
+## - deck: the junction's own deck and fascia past x 960 (a translated cut of the mid plate, not its
+##   mirrored bleed), over the actors' floor reflections, since nothing behind the wall reflects in the
+##   floor in front of it;
+## - front also carries the wall's column (its 0.66 m end toward the camera, steel arris angles) and its
+##   0.15 m stub across the deck (review r1, S4), as the corridor's and the blast door's do.
+const EXIT_ATLAS: Texture2D = preload("res://assets/props/junction-exit-atlas.png")
+const EXIT_ATLAS_SCALE: float = 0.5
 ## The source row where the mid plate's walkway meets the back wall; it is drawn at the floor (y 440).
 const WALKWAY_Y: float = 776.0
 ## The far plate sits this much lower than the mid plate, as in the corridor, so it still covers
@@ -56,20 +116,31 @@ const VALVE_WHEEL_CENTRE: Vector2 = Vector2(255.0, 272.0)
 const VALVE_WHEEL_RADIUS: float = 92.0
 const VALVE_DIAL_CENTRE: Vector2 = Vector2(255.0, 64.0)
 const VALVE_DIAL_RADIUS: float = 37.0
-## Every door image (and the front lip) shares one registered canvas whose bottom row is the floor,
-## so all of them use this cut: 181 px tall at RoomDepth.BULKHEAD_SCALE, with the front pillar's
-## outer edge on the door body's face (M0State.JUNCTION_DOOR_LEFT_X).
-const DOOR_REGION: Rect2 = Rect2(0.0, 36.0, 384.0, 604.0)
-const DOOR_SCALE: float = RoomDepth.BULKHEAD_SCALE
-## The seam painted down the sealed leaf, in canvas pixels.
-const DOOR_SEAM_X: float = 196.0
-## The front lip widens at its foot: in the canvas rows a body lying on the floor fills, its painting
-## starts at this canvas column, left of the pillar's face. It draws over the actors, so from
-## DOOR_FOOT_X a lying body would be under it (Main._start_collapse ends a slump short of it).
-const DOOR_LIP_FOOT_COLUMN: float = 57.0
-const DOOR_FOOT_X: float = M0State.JUNCTION_DOOR_LEFT_X - (RoomDepth.BULKHEAD_PILLAR_X - DOOR_LIP_FOOT_COLUMN) * DOOR_SCALE
-## How long the breaking bulkhead shows at the blast before the blown one replaces it.
+## The blast door's near column (JunctionDoorLayout COLUMN, COLBLOWN once blown) draws over the actors
+## (DOOR_FRONT_Z) in every door state. In the rows a body lying on the floor fills (Main.COLLAPSE_TOPS),
+## its painting starts at source column DOOR_COLUMN_FOOT of either cut and ends at the cut's right
+## edge, so it covers DOOR_FOOT_X..DOOR_FOOT_RIGHT_X of the room there (junction_test measures both
+## cuts). The stub's painting starts below the floor line, so it never covers a lying body. A slump
+## that would reach under the column ends short of it on either side (Main._start_collapse).
+const DOOR_COLUMN_FOOT: float = 0.0
+const DOOR_FOOT_X: float = JunctionDoorLayout.COLUMN_AT.x + DOOR_COLUMN_FOOT * JunctionDoorLayout.COLUMN_SCALE
+const DOOR_FOOT_RIGHT_X: float = JunctionDoorLayout.COLUMN_AT.x + JunctionDoorLayout.COLUMN_REGION.size.x * JunctionDoorLayout.COLUMN_SCALE
+## How long the breaking leaf shows at the blast before the blown doorway replaces it.
 const DOOR_BREAK_SECONDS: float = 0.15
+## Fix round 4 (review r4 C2, human r4): the leaf is thrown, not swapped. After DOOR_BREAK_SECONDS the torn
+## leaf leaves its doorway into the lane, tipping over as it flies (SDI 133 / ASTM F2927 Category IV: the
+## door separates from its frame and becomes flying debris), and lands where it then lies, raising dust off
+## the wet deck. World px: its centre from the doorway to the lying leaf's body (JunctionDoorLayout's
+## breaking-leaf and lying-leaf pieces), how high it rises on the way, how far it turns (nearly flat) and how
+## much nearer the camera it lands (the lying leaf is drawn in front of the walk line, at 1.25x the size).
+const DOOR_FLIGHT_SECONDS: float = 0.24
+const DOOR_FLIGHT_FROM: Vector2 = Vector2(479.3, 389.7)
+const DOOR_FLIGHT_TO: Vector2 = Vector2(641.0, 462.5)
+const DOOR_FLIGHT_RISE: float = 18.0
+const DOOR_FLIGHT_TURN: float = 1.5
+const DOOR_FLIGHT_GROW: float = 1.22
+## The share of the flight after which the leaf is clear of the near column and draws in front of it.
+const DOOR_FLIGHT_CLEAR: float = 0.3
 const VENT_REGION: Rect2 = Rect2(8.0, 35.0, 743.0, 183.0)
 const ARM_REGION: Rect2 = Rect2(88.0, 9.0, 388.0, 352.0)
 ## Where the tank was cut out of the tank-arm image.
@@ -81,17 +152,62 @@ const ARM_PANEL_LIGHT: Rect2 = Rect2(206.0, 88.0, 92.0, 20.0)
 const BOLT_PANEL_REGION: Rect2 = Rect2(0.0, 68.0, 512.0, 393.0)
 const BOLT_PANEL_SCALE: float = 0.15
 const BOLT_PANEL_LIGHT: Rect2 = Rect2(222.0, 118.0, 70.0, 20.0)
-const HATCH_REGION: Rect2 = Rect2(54.0, 34.0, 403.0, 700.0)
-## 144 px tall, the size of the hatch it replaced.
-const HATCH_SCALE: float = 0.206
-const HATCH_LAMP: Rect2 = Rect2(206.0, 68.0, 92.0, 24.0)
-## The exit hatch's leaf (its inner door, in source pixels): it slides up into the frame as the hatch
-## opens, over the dark passage behind it, while the frame and its lamp stay.
-const HATCH_LEAF: Rect2 = Rect2(150.0, 142.0, 216.0, 498.0)
+## The exit atlas's pieces: (atlas region, world top-left). placement.json in the design record.
+const EXIT_BEYOND: Rect2 = Rect2(228.0, 0.0, 198.0, 616.0)
+const EXIT_BEYOND_AT: Vector2 = Vector2(933.0, 140.0)
+const EXIT_BACK: Rect2 = Rect2(428.0, 0.0, 286.0, 607.0)
+const EXIT_BACK_AT: Vector2 = Vector2(829.5, 140.0)
+const EXIT_FRONT: Rect2 = Rect2(0.0, 0.0, 226.0, 644.0)
+const EXIT_FRONT_AT: Vector2 = Vector2(919.0, 140.0)
+const EXIT_LENS: Rect2 = Rect2(992.0, 0.0, 14.0, 11.0)
+const EXIT_LENS_AT: Vector2 = Vector2(909.5, 323.0)
+const EXIT_LEAF: Rect2 = Rect2(870.0, 0.0, 120.0, 236.0)
+## The leaf image's leading-edge bottom corner, in its own (atlas-region) pixels: the point
+## exit_leaf_anchor() places.
+const EXIT_LEAF_ANCHOR: Vector2 = Vector2(106.27, 229.9)
+## The cross-wall and its door, in metres (the design's geometry, tools/geom.py): the approach face
+## crosses the walk line at EXIT_DOOR_X; s runs along the wall toward the room's back, n through it
+## toward the passage. The camera is the junction's own (review r1, C1: vanishing point (511, 162), as
+## the blast door's, measured from the deck seams; the walk line 38 m from the eye, 40 px per metre).
+const EXIT_DOOR_X: float = 962.0
+const EXIT_VPX: float = 511.0
+const EXIT_HORIZON: float = 162.0
+const EXIT_WALL_ANGLE: float = 17.0
+const EXIT_LEAF_N: float = 0.27
+const EXIT_LEAD_SHUT_S: float = -0.5
+const EXIT_LEAD_OPEN_S: float = 1.62
+## Where the near jamb's edge stands on screen (s -0.4 on the approach face): anyone whose drawn body is
+## all right of it has gone through, behind the wall.
+const EXIT_NEAR_JAMB_X: float = 971.3
+## The junction's own deck and fascia carried on past x 960 to the view's edge (review r1, M4): the mid
+## plate translated 2.0 m along the room in its camera (seams to its vanishing point), not its mirrored
+## bleed; drawn over the floor reflections of anyone who has gone through, behind the wall's stub.
+const EXIT_DECK: Rect2 = Rect2(716.0, 0.0, 152.0, 288.0)
+const EXIT_DECK_AT: Vector2 = Vector2(956.0, 440.0)
+## The junction's camera may show this far right (Main), so the near jamb, the wall's column and the
+## passage beyond frame the doorway (the exit's pieces and its deck cover the view to here), and the
+## actors may walk on through it this far: on down the passage, out of view behind the wall, far enough
+## that WOLF's body and the engineer's never share the same floor.
+const EXIT_VIEW_RIGHT: float = 1030.0
+const EXIT_WALK_MAX_X: float = 1100.0
+## WOLF in the open doorway, looking back at the engineer: his head, shoulders and forelegs in view on
+## the threshold, his hindquarters already past the near jamb and hidden by it. Fix round 2 (review r2,
+## human pass): at x 985 his rear stood out past the near column (x 971.5..1000 at his height) in the
+## stub's cutaway, against the passage, so the jamb cut him in half; here his tail tip (x 934 + 64 with
+## the art mirrored) stays behind the column's edge at x 1000.
+const WOLF_DOORWAY_X: float = 934.0
+## The engineer is at the exit from here (USE leaves through it), and walks no further while WOLF
+## stands in the doorway (his tail at WOLF_DOORWAY_X - M0Actor.WOLF_REACH).
+## (fix round 2: 846, was 870, so the engineer can stand behind WOLF in his new spot, their back clear
+## of the bolt panel's edge but for STATION_OVERLAP)
+const HATCH_REACH_MIN_X: float = 846.0
+const HATCH_REACH_MAX_X: float = WOLF_DOORWAY_X - M0Actor.WOLF_REACH - M0Actor.HUMAN_REACH
+## Walking out, each is gone once their whole drawn body is past the near jamb.
+const WOLF_GONE_X: float = EXIT_NEAR_JAMB_X + M0Actor.WOLF_REACH + 3.0
+const HUMAN_GONE_X: float = EXIT_NEAR_JAMB_X + M0Actor.HUMAN_REACH + 3.0
 ## The breaker's status light rides on the amber bar painted at the top of its cabinet.
 const BREAKER_LIGHT: Rect2 = Rect2(BREAKER_X - 11.0, 358.0, 18.0, 5.0)
 ## Station centres, left to right.
-const ENTRY_X: float = 80.0
 const BREAKER_X: float = 200.0
 const VENT_X: float = 300.0
 const VALVE_X: float = 420.0
@@ -107,14 +223,16 @@ const BOLT_PANEL_HALF_WIDTH: float = BOLT_PANEL_REGION.size.x * BOLT_PANEL_SCALE
 ## inside its left post, so the engineer works it from beside it, inside the cover (Main's
 ## JUNCTION_STATIONS).
 const ARM_X: float = SentryBrain.COVER_MIN_X + ARM_PANEL_HALF_WIDTH + 2.0
-## The exit bolt's panel stands on the floor left of the hatch, its right cables running into the
-## hatch frame. The engineer works it from its left, facing it (BOLT_X), clear of the downed sentry;
-## its USE reaches from BOLT_REACH_MIN_X rightward, the hatch included.
-const BOLT_PANEL_X: float = 806.0
+## The exit bolt's panel stands on the floor left of the exit door, the riser on its right running down
+## into a floor flange (drawn in the exit's back layer). The engineer works it from its left, facing it
+## (BOLT_X), clear of the downed sentry; its USE reaches from BOLT_REACH_MIN_X rightward, and once the
+## door is open the way out answers from HATCH_REACH_MIN_X.
+## (fix round 2: 796, was 806: 10 px further from the door, so the engineer has room at the open door
+## behind WOLF in the doorway; its riser moves with it, in the exit's back layer)
+const BOLT_PANEL_X: float = 796.0
 ## (6 px: the engineer's front hand over the panel's edge, Main.STATION_OVERLAP.)
 const BOLT_X: float = BOLT_PANEL_X - BOLT_PANEL_HALF_WIDTH - M0Actor.HUMAN_REACH + 6.0
 const BOLT_REACH_MIN_X: float = BOLT_X - 16.0
-const HATCH_X: float = 880.0
 const FLOOR_Y: float = 440.0
 ## Where WOLF stands to read the line on entry: on the valve's left, facing it, his snout at the
 ## valve's edge below its LINE gauge, so he never stands inside the machine. There is no floor at the
@@ -124,9 +242,17 @@ const FLOOR_Y: float = 440.0
 const WOLF_SEAM_X: float = VALVE_X - VALVE_HALF_WIDTH - M0Actor.WOLF_REACH - 2.0
 ## Where WOLF holds back from the rubble line while the engineer deals with the lane (or after he breaks
 ## off drawing the sentry): the nearest clear floor to it, his reading spot by the valve. Between the
-## valve and the rubble line the valve, the blown bulkhead's frame and the engineer at CHOICE_X leave
+## valve and the rubble line the valve, the blown door's near column and the engineer at CHOICE_X leave
 ## no floor as long as he is, so any nearer spot would stand him inside them.
 const WOLF_RUBBLE_X: float = WOLF_SEAM_X
+## Doors fix round 2 (review r2, human pass: "WOLF stands inside the valve"): wherever his body would
+## pass over the valve after the blast (walking by it on the way down the lane or back), he steps out
+## onto the deck in front of it, about 1.3 m nearer the camera: his drawn body this much lower on the screen (the deck
+## in this camera falls 9.3 px per metre toward the camera at the walk line), so his feet stand clearly
+## in front of the valve's base and he draws over it.
+const WOLF_STEP_FORWARD: float = 12.0
+const WOLF_STEP_FULL: float = 40.0
+const WOLF_STEP_RAMP: float = 60.0
 ## Where WOLF stands when he chooses to draw the sentry: at the far end of its lane, in front of the
 ## exit hatch (a doorway in the back wall, not a machine), facing back down the lane, his painted snout
 ## (M0Actor.WOLF_SNOUT) just clear of the bolt panel's right edge and his painted tail
@@ -197,15 +323,22 @@ const TANK_SIZE: Vector2 = TANK_REGION.size * TANK_ART_SCALE
 const SHADOW_Y: float = FLOOR_Y + 1.0
 ## The arm's ceiling plate hangs on two rods from the mid plate's overhead gantry (its underside).
 const GANTRY_Y: float = 120.0
-## The hatch slides open this long after the bolt arcs.
+## The exit door slides open this long after the bolt arcs.
 const HATCH_OPEN_SECONDS: float = 0.5
 ## The sealed door body is this wide; its left face is M0State.JUNCTION_DOOR_LEFT_X.
 const DOOR_WIDTH: float = 56.0
 const DOOR_HEIGHT: float = 132.0
-## The bulkhead draws one step under the actors (this node sits at z 1), its front pillar one step
-## over them, so they pass through the doorway once it is open.
-const DOOR_Z: int = 0
-const DOOR_LIP_Z: int = 2
+## The door's pieces under the actors draw at DOOR_Z (over the mid plate, under the props), the
+## release bay one step above them (over the bolt feed in Recesses); the column, stub and lying leaf
+## at DOOR_FRONT_Z, over the actors (this node sits at z 1), so they pass through the doorway behind
+## the near column.
+const DOOR_Z: int = -3
+const BAY_Z: int = -2
+const DOOR_FRONT_Z: int = 2
+## The status lamp on the column: red shut, amber while the line builds, flashing red and white
+## through the fuse (steady red with Reduced Motion), dark once the door is down.
+const LAMP_SHUT: Color = Color(0.9, 0.2, 0.17)
+const LAMP_DEAD: Color = Color(0.16, 0.17, 0.18)
 ## The vent's steam and its burst draw one step under the props (the grate is a prop), so the grate is
 ## drawn over the steam rising out of it.
 const VENT_STEAM_Z: int = -2
@@ -237,15 +370,15 @@ const CABLE_SHEEN: Color = Color(0.55, 0.64, 0.7, 0.55)
 ## and the machines' tops, and their text size.
 const LABEL_Y: float = 320.0
 const LABEL_FONT_SIZE: int = 12
-## The VALVE plate sits this far left of the wheel so its longest text ends well before the bulkhead.
+## The VALVE plate sits this far left of the wheel so its longest text ends well before the door.
 const VALVE_LABEL_SHIFT: float = 28.0
 ## The breaker's plate sits this far left of the breaker, and the RELIEF VENT plate this far left of
 ## the grate's centre, so the vent's name fits between the longest breaker and valve texts.
 const BREAKER_LABEL_SHIFT: float = 12.0
 const VENT_LABEL_SHIFT: float = 3.0
-## The door's placard sits across the bulkhead's leaf, this far right of its centre, over its pillar.
-const DOOR_LABEL_SHIFT: float = 7.0
-## The TANK RELEASE plate sits right of the panel, clear of the bulkhead's frame and the door's placard.
+## The door's placard is centred over the doorway's head.
+const DOOR_LABEL_X: float = 479.0
+## The TANK RELEASE plate sits right of the panel, clear of the door's column and its placard.
 const ARM_LABEL_SHIFT: float = 20.0
 ## The EXIT plate sits over the bolt panel, left of the hatch it also names.
 const EXIT_LABEL_X: float = 792.0
@@ -282,13 +415,10 @@ const LINE_CAPTION_FONT_SIZE: int = 8
 const BLAST_STRIPE_HZ: float = 1.0 / PressureLine.FUSE_TICK_SECONDS
 ## The floor brackets glow this colour while the sentry's body is inside them.
 const MARK_LIT: Color = Color("#ffe9a8")
-## The alcove's floor is tinted over exactly the span that hides the engineer, down onto the walkway
-## like the floor mark's stripes, and a post stands at each end of it, so where cover stops (the
-## right post) shows beside an engineer at the TANK RELEASE.
-const ALCOVE_FLOOR: Color = Color(0.25, 0.62, 0.72, 0.3)
-const ALCOVE_EDGE: Color = Color(0.5, 0.86, 0.94, 0.85)
+## The alcove is painted: a recessed bay whose two steel posts stand on SentryBrain.COVER_MIN_X and
+## COVER_MAX_X, so where cover stops (the right post) shows beside an engineer at the TANK RELEASE.
 ## A refused press (Main._refuse) or a bump into the sealed door: the station's lamp goes dark for
-## FLICKER_STEP_SECONDS and comes back, twice for a press and once for a bump. The door's seam lamp is
+## FLICKER_STEP_SECONDS and comes back, twice for a press and once for a bump. The door's status lamp is
 ## barely lit at rest, so its flicker lights it up between the dark steps. With Reduced Motion the lamp
 ## goes dark once and comes back, with no repeat.
 const FLICKER_STEP_SECONDS: float = 0.07
@@ -350,12 +480,12 @@ var hatch_open: float = 0.0:
 	set(value):
 		hatch_open = value
 		_sync_hatch()
-## Reduced Motion: the charged seam holds a steady glow instead of strobing.
+## Reduced Motion: the charged door lamp holds steady instead of flashing.
 var reduce_motion: bool = false:
 	set(value):
 		reduce_motion = value
 		if is_node_ready():
-			_sync_seam()
+			_sync_lamp()
 
 var depth: RoomDepth
 var breaker_art: Sprite2D
@@ -366,26 +496,52 @@ var arm_art: Sprite2D
 var arm_rest_y: float = 0.0
 var arm_panel_art: Sprite2D
 var bolt_panel_art: Sprite2D
-var entry_hatch_art: Sprite2D
-var hatch_art: Sprite2D
+## The entry door (see ENTRY_ATLAS): its swinging leaf, the mesh that draws it all, its lamp's glass
+## quad, its collision body and the closer's tween.
+var entry_leaf: SwingLeaf
+var entry_mesh: AtlasMesh
+var entry_lamp_quad: int = -1
+var entry_door_shape: CollisionShape2D
+var entry_tween: Tween
+## The exit door's pieces (see EXIT_ATLAS).
+var exit_beyond: Sprite2D
+var exit_leaf: Sprite2D
+var exit_back: Sprite2D
+var exit_lens: Sprite2D
+var exit_deck: Sprite2D
+var exit_front: Sprite2D
 var recesses: Recesses
 ## The exit bolt's panel drawn again over the sentry where it passes behind it.
 var panel_front: PanelFront
 var door_body: StaticBody2D
 var door_shape: CollisionShape2D
-var door_visual: Node2D
-## The sealed door; at the blast the breaking one shows for DOOR_BREAK_SECONDS, then the blown one.
-var door_art: Sprite2D
-var door_breaking_art: Sprite2D
-var door_blown_art: Sprite2D
-## The bulkhead's front pillar, drawn over the actors.
-var door_lip: Sprite2D
+## The door's pieces (JunctionDoorLayout): the shut leaf; at the blast the breaking leaf and cracks
+## show for DOOR_BREAK_SECONDS, then the empty doorway, the damage and the leaf lying in the lane.
+var door_hole: Sprite2D
+var door_leaf: Sprite2D
+var door_leaf_breaking: Sprite2D
+var door_wall: Sprite2D
+var door_cracks: Sprite2D
+var door_damage: Sprite2D
+var release_bay: Sprite2D
+var door_column: Sprite2D
+var door_stub: Sprite2D
+var door_leaf_down: Sprite2D
+## The status lamp's glass and its small glow, tinted live.
+var door_lamp: Sprite2D
+var door_lamp_glow: Sprite2D
 ## True from the blast until the breaking frame gives way to the blown one.
 var door_breaking: bool = false
+## True while the torn leaf is in the air (DOOR_FLIGHT_SECONDS), and how far along its flight it is (0..1).
+var door_flying: bool = false
+var door_flight: float = 0.0
+## The dust the leaf raises where it lands.
+var landing_dust: CPUParticles2D
 var valve_wheel: Sprite2D
 var vent_steam: CPUParticles2D
 var vent_puff: CPUParticles2D
 var blast_sparks: CPUParticles2D
+var blast_debris: CPUParticles2D
 var blast_dust: CPUParticles2D
 var vent_hazard: Hazard
 var cloud_hazard: Hazard
@@ -402,9 +558,7 @@ var tank_label: Label
 var line_caption: Label
 var hatch_label: Label
 var breaker_glow: Sprite2D
-var seam_glow: Sprite2D
 var vent_glow: Sprite2D
-var hatch_doorway: HatchDoorway
 var breaker_label: Label
 var valve_label: Label
 var door_label: Label
@@ -412,8 +566,6 @@ var door_label: Label
 var vent_label: Label
 var station_labels: Array[Label] = []
 var label_plate: StyleBoxFlat
-## The alcove's soft shadow, made once and kept so the drawing that uses it always has it.
-var alcove_shadow: GradientTexture2D = soft_texture(GradientTexture2D.FILL_SQUARE)
 var floor_reflections: Array[FloorReflection] = []
 ## What this node's _draw and Recesses last drew from (draw_inputs, recesses_inputs), so the
 ## per-frame syncs redraw them only when something they draw has changed.
@@ -429,7 +581,7 @@ var flicker_times: int = 0
 var breaker_pulse_remaining: float = 0.0
 var breaker_pulse_elapsed: float = 0.0
 var _valve_tween: Tween
-var _seam_tween: Tween
+var _lamp_tween: Tween
 var _door_tween: Tween
 var _hazard_tween: Tween
 var _hatch_tween: Tween
@@ -455,8 +607,8 @@ class TankSprite:
 		add_child(dent)
 
 
-## What sits behind the stations: the shadow of the TANK RELEASE alcove and the release's feed to the
-## exit bolt, drawn under the props (the room's own drawing sits over them).
+## What sits behind the stations: the release's feed to the exit bolt, drawn under the props (the
+## room's own drawing sits over them).
 class Recesses:
 	extends Node2D
 	var room: JunctionRoom
@@ -507,43 +659,6 @@ class PanelFront:
 		return bounds
 
 
-## The exit hatch's doorway over its painted leaf: once the hatch starts to open it draws the painted
-## passage beyond (HATCH_PASSAGE), with a faint green work light, and the leaf (cut from the same art
-## as the hatch) slides up inside it into the frame's header, clipped to the doorway. Shut, it draws
-## nothing, so the hatch art shows as painted.
-class HatchDoorway:
-	extends Node2D
-	var size: Vector2
-	var open: float = 0.0:
-		set(value):
-			open = value
-			leaf.position.y = size.y * 0.5 - open * size.y
-			queue_redraw()
-	var leaf: Sprite2D
-	var light: GradientTexture2D
-
-	func _init(texture: Texture2D, region: Rect2, leaf_scale: float) -> void:
-		size = region.size * leaf_scale
-		clip_children = CanvasItem.CLIP_CHILDREN_AND_DRAW
-		texture_filter = CanvasItem.TEXTURE_FILTER_LINEAR_WITH_MIPMAPS
-		leaf = Sprite2D.new()
-		leaf.name = "Leaf"
-		leaf.texture = texture
-		leaf.texture_filter = CanvasItem.TEXTURE_FILTER_LINEAR_WITH_MIPMAPS
-		leaf.region_enabled = true
-		leaf.region_rect = region
-		leaf.scale = Vector2.ONE * leaf_scale
-		leaf.position = Vector2(size.x * 0.5, size.y * 0.5)
-		add_child(leaf)
-		light = JunctionRoom.soft_texture(GradientTexture2D.FILL_RADIAL)
-
-	func _draw() -> void:
-		if open <= 0.0:
-			return
-		draw_texture_rect_region(JunctionRoom.HATCH_PASSAGE_PROP, Rect2(Vector2.ZERO, size), JunctionRoom.HATCH_PASSAGE, JunctionRoom.HATCH_PASSAGE_TINT)
-		draw_texture_rect(light, Rect2(size.x * 0.05, size.y * 0.1, size.x * 0.9, size.y * 0.7), false, Color(JunctionRoom.GREEN, 0.12 * open))
-
-
 func _ready() -> void:
 	depth = RoomDepth.new()
 	depth.name = "Depth"
@@ -557,31 +672,31 @@ func _ready() -> void:
 	depth.base_color = Color("#0a0e18")
 	depth.lamps = lamps
 	depth.shaft_lamps = PackedInt32Array([0, 2])
+	# The middle ceiling lamp is behind the blast door's cross-wall now: its glow is hidden.
+	depth.painted_lamps = PackedInt32Array([1])
 	depth.warning_lamps = warning_lamps
+	# The room's ends are the entry's and the exit's cross-walls now, not mirrored pipe columns.
+	depth.near_left_edge = false
+	depth.near_right_edge = false
 	add_child(depth)
 	recesses = Recesses.new()
 	recesses.name = "Recesses"
 	recesses.room = self
 	recesses.z_index = -2
 	add_child(recesses)
+	_build_bay()
 	breaker_art = RoomDepth.make_prop("BreakerArt", BREAKER_PROP, BREAKER_REGION, BREAKER_SCALE, BREAKER_X)
 	vent_art = RoomDepth.make_prop("VentArt", VENT_PROP, VENT_REGION, vent_scale(), (PressureLine.VENT_GRATE_MIN_X + PressureLine.VENT_GRATE_MAX_X) * 0.5)
 	valve_art = RoomDepth.make_prop("ValveArt", VALVE_PROP, VALVE_REGION, VALVE_SCALE, VALVE_X)
 	arm_panel_art = RoomDepth.make_prop("ArmPanelArt", ARM_PANEL_PROP, ARM_PANEL_REGION, ARM_PANEL_SCALE, ARM_X)
 	bolt_panel_art = RoomDepth.make_prop("BoltPanelArt", BOLT_PANEL_PROP, BOLT_PANEL_REGION, BOLT_PANEL_SCALE, BOLT_PANEL_X)
-	entry_hatch_art = RoomDepth.make_prop("EntryHatchArt", HATCH_PROP, HATCH_REGION, HATCH_SCALE, ENTRY_X)
-	hatch_art = RoomDepth.make_prop("HatchArt", HATCH_PROP, HATCH_REGION, HATCH_SCALE, HATCH_X)
-	for prop: Sprite2D in [breaker_art, vent_art, valve_art, arm_panel_art, bolt_panel_art, entry_hatch_art, hatch_art]:
+	_build_entry()
+	_build_exit()
+	for prop: Sprite2D in [breaker_art, vent_art, valve_art, arm_panel_art, bolt_panel_art]:
 		# One step under this node's own drawing, so the lights and readouts drawn in _draw() sit on the art.
 		prop.z_index = -1
 		add_child(prop)
 		floor_reflections.append(FloorReflection.attach(prop))
-	# The exit hatch's leaf and the passage behind it, over the hatch art.
-	hatch_doorway = HatchDoorway.new(HATCH_PROP, HATCH_LEAF, HATCH_SCALE)
-	hatch_doorway.name = "HatchDoorway"
-	hatch_doorway.position = prop_point(hatch_art, HATCH_LEAF.position)
-	hatch_doorway.z_index = -1
-	add_child(hatch_doorway)
 	# Only the wheel turns: a disc cut from the same image, over the painted wheel.
 	valve_wheel = Sprite2D.new()
 	valve_wheel.name = "ValveWheel"
@@ -630,11 +745,11 @@ func _ready() -> void:
 	breaker_label = _add_station_label("OVERLOAD BREAKER", BREAKER_X - BREAKER_LABEL_SHIFT, Color("#b0d1de"))
 	# In the row above the grate, where nobody standing on the floor covers it.
 	vent_label = _add_station_label(VENT_LABEL, VENT_X - VENT_LABEL_SHIFT, Color("#8fa6b2"))
-	# A little left of the wheel so its longest text ends before the bulkhead.
+	# A little left of the wheel so its longest text ends before the door.
 	valve_label = _add_station_label("VALVE", VALVE_X - VALVE_LABEL_SHIFT, Color("#b0d1de"))
-	# A placard across the bulkhead's face, over its front pillar.
-	door_label = _add_station_label("SEALED DOOR", door_visual.position.x + DOOR_LABEL_SHIFT, Color("#ffc7c7"))
-	door_label.z_index = DOOR_LIP_Z + 1
+	# A placard over the doorway's head, hung in front of the near column (above head height).
+	door_label = _add_station_label("SEALED DOOR", DOOR_LABEL_X, Color("#ffc7c7"))
+	door_label.z_index = DOOR_FRONT_Z + 1
 	arm_label = _add_station_label("TANK RELEASE", ARM_X + ARM_LABEL_SHIFT, Color("#b0d1de"))
 	# Over the landed tank, shown only once it lies on the sentry.
 	tank_label = _add_station_label("TANK DOWN", DropArm.MARK_X, Color("#8fa6b2"))
@@ -650,7 +765,7 @@ func _ready() -> void:
 	# Just left of the dial, level with it.
 	var dial: Vector2 = prop_point(valve_art, VALVE_DIAL_CENTRE)
 	line_caption.position = Vector2(dial.x - VALVE_DIAL_RADIUS * VALVE_SCALE - 2.0 - line_caption.size.x, dial.y - line_caption.size.y * 0.5)
-	# Over the bolt panel, beside the hatch, so both read as one exit.
+	# Over the bolt panel, beside the exit door, so both read as one exit.
 	hatch_label = _add_station_label("EXIT LOCKED", EXIT_LABEL_X, Color("#8fa6b2"))
 	_build_lane()
 	refresh_state()
@@ -672,9 +787,9 @@ static func prop_rect(prop: Sprite2D, source: Rect2) -> Rect2:
 	return Rect2(prop_point(prop, source.position), source.size * prop.scale)
 
 
-## The door: the sealed bulkhead over a 56x132 body on the floor layer, its front pillar on the
-## body's face; at the blast it breaks and then stands blown open on the passage beyond. The visual is
-## pivoted at the floor so the blast can jolt it; the front lip rides with it, drawn over the actors.
+## The door: a 56x132 body on the floor layer whose face stops the engineer just short of the shut
+## leaf, and the blast door's pieces from JunctionDoorLayout; at the blast the leaf breaks, then the
+## doorway stands empty on the lane and the leaf lies thrown beyond it.
 func _build_door() -> void:
 	door_body = StaticBody2D.new()
 	door_body.name = "Door"
@@ -689,28 +804,145 @@ func _build_door() -> void:
 	door_shape.disabled = true
 	door_body.add_child(door_shape)
 	add_child(door_body)
-	door_visual = Node2D.new()
-	door_visual.name = "DoorVisual"
-	door_visual.position = Vector2(RoomDepth.bulkhead_center_x(DOOR_REGION, M0State.JUNCTION_DOOR_LEFT_X), FLOOR_Y)
-	door_visual.z_index = DOOR_Z
-	add_child(door_visual)
-	door_art = RoomDepth.make_prop("DoorArt", DOOR_SEALED_PROP, DOOR_REGION, DOOR_SCALE, 0.0, 0.0)
-	door_breaking_art = RoomDepth.make_prop("DoorBreakingArt", DOOR_BREAKING_PROP, DOOR_REGION, DOOR_SCALE, 0.0, 0.0)
-	door_blown_art = RoomDepth.make_prop("DoorBlownArt", DOOR_BLOWN_PROP, DOOR_REGION, DOOR_SCALE, 0.0, 0.0)
-	for art: Sprite2D in [door_art, door_breaking_art, door_blown_art]:
-		art.visible = art == door_art
-		door_visual.add_child(art)
-		floor_reflections.append(FloorReflection.attach(art))
-	door_lip = RoomDepth.make_prop("DoorLip", DOOR_LIP_PROP, DOOR_REGION, DOOR_SCALE, 0.0, 0.0)
-	door_lip.z_index = DOOR_LIP_Z
-	door_visual.add_child(door_lip)
-	var leaf_height: float = DOOR_REGION.size.y * DOOR_SCALE * 0.8
-	seam_glow = RoomDepth.make_glow(AMBER, Vector2(40.0, leaf_height), 0.0)
-	seam_glow.name = "SeamGlow"
-	seam_glow.position = Vector2(door_visual.position.x + (DOOR_SEAM_X - DOOR_REGION.get_center().x) * DOOR_SCALE, FLOOR_Y - DOOR_REGION.size.y * DOOR_SCALE * 0.5)
-	# On the sealed leaf, under the actors and the front pillar.
-	seam_glow.z_index = DOOR_Z
-	add_child(seam_glow)
+	door_hole = _door_piece("DoorHole", JunctionDoorLayout.HOLE_REGION, JunctionDoorLayout.HOLE_AT, JunctionDoorLayout.HOLE_SCALE, DOOR_Z)
+	door_leaf = _door_piece("DoorLeaf", JunctionDoorLayout.LEAF_REGION, JunctionDoorLayout.LEAF_AT, JunctionDoorLayout.LEAF_SCALE, DOOR_Z)
+	door_leaf_breaking = _door_piece("DoorLeafBreaking", JunctionDoorLayout.LEAFBREAK_REGION, JunctionDoorLayout.LEAFBREAK_AT, JunctionDoorLayout.LEAFBREAK_SCALE, DOOR_Z)
+	door_wall = _door_piece("DoorWall", JunctionDoorLayout.WALL_REGION, JunctionDoorLayout.WALL_AT, JunctionDoorLayout.WALL_SCALE, DOOR_Z)
+	door_cracks = _door_piece("DoorCracks", JunctionDoorLayout.CRACKS_REGION, JunctionDoorLayout.CRACKS_AT, JunctionDoorLayout.CRACKS_SCALE, DOOR_Z)
+	door_damage = _door_piece("DoorDamage", JunctionDoorLayout.DAMAGE_REGION, JunctionDoorLayout.DAMAGE_AT, JunctionDoorLayout.DAMAGE_SCALE, DOOR_Z)
+	# The lamp's glass draws under the column, so the column's guard bars lie over it.
+	door_lamp = _door_piece("DoorLampLens", JunctionDoorLayout.LENS_REGION, JunctionDoorLayout.LENS_AT, JunctionDoorLayout.LENS_SCALE, DOOR_FRONT_Z)
+	door_column = _door_piece("DoorColumn", JunctionDoorLayout.COLUMN_REGION, JunctionDoorLayout.COLUMN_AT, JunctionDoorLayout.COLUMN_SCALE, DOOR_FRONT_Z)
+	door_stub = _door_piece("DoorStub", JunctionDoorLayout.STUB_REGION, JunctionDoorLayout.STUB_AT, JunctionDoorLayout.STUB_SCALE, DOOR_FRONT_Z)
+	door_leaf_down = _door_piece("DoorLeafDown", JunctionDoorLayout.LYING_REGION, JunctionDoorLayout.LYING_AT, JunctionDoorLayout.LYING_SCALE, DOOR_FRONT_Z)
+	door_lamp_glow = RoomDepth.make_glow(LAMP_SHUT, Vector2(16.0, 16.0), 0.45)
+	door_lamp_glow.name = "DoorLampGlow"
+	door_lamp_glow.position = JunctionDoorLayout.LAMP_CENTRE
+	door_lamp_glow.z_index = DOOR_FRONT_Z
+	add_child(door_lamp_glow)
+	_show_door()
+
+
+## One piece of the blast door, cut from JunctionDoorLayout's atlas and placed by its world top-left.
+func _door_piece(piece_name: String, region: Rect2, top_left: Vector2, piece_scale: float, z: int) -> Sprite2D:
+	var sprite: Sprite2D = Sprite2D.new()
+	sprite.name = piece_name
+	sprite.texture = JunctionDoorLayout.ATLAS
+	sprite.texture_filter = CanvasItem.TEXTURE_FILTER_LINEAR_WITH_MIPMAPS
+	sprite.region_enabled = true
+	sprite.region_rect = region
+	sprite.centered = false
+	sprite.scale = Vector2.ONE * piece_scale
+	sprite.position = top_left
+	sprite.z_index = z
+	add_child(sprite)
+	return sprite
+
+
+## The entry door's pieces in one AtlasMesh right after the mid plate (under the props and the actors):
+## the wall with its doorway transparent (the passage in the far plate shows through), the leaf on its
+## hinges with the closer's arm, the lamp's glass, then the near column and stub over them.
+func _build_entry() -> void:
+	entry_leaf = SwingLeaf.new(ENTRY_ATLAS, ENTRY_LEAF_ROOM_REGION, ENTRY_LEAF_OUT_REGION, ENTRY_LEAF_EDGE_REGION, ENTRY_HINGE, ENTRY_AXIS_U, ENTRY_AXIS_N, ENTRY_LEAF_LIGHTS)
+	entry_leaf.fill = ENTRY_LEAF_FILL
+	entry_leaf.name = "EntryLeaf"
+	entry_leaf.vpx = EXIT_VPX
+	entry_leaf.horizon = EXIT_HORIZON
+	entry_leaf.arm_region = ENTRY_ARM_REGION
+	add_child(entry_leaf)
+	entry_mesh = AtlasMesh.new(ENTRY_ATLAS)
+	entry_mesh.name = "EntryDoor"
+	entry_mesh.z_as_relative = false
+	entry_mesh.z_index = RoomDepth.Z_MID
+	entry_mesh.add_quad(ENTRY_WALL_REGION, ENTRY_WALL_AT, 0.5)
+	entry_mesh.add_leaf(entry_leaf)
+	entry_lamp_quad = entry_mesh.add_quad(ENTRY_LENS_REGION, ENTRY_LAMP - ENTRY_LENS_REGION.size * 0.25 * 0.5, 0.25, ENTRY_LAMP_SHUT)
+	entry_mesh.add_quad(ENTRY_FRONT_REGION, ENTRY_FRONT_AT, 0.5)
+	depth.add_child(entry_mesh)
+	# The shut leaf stops whoever walks into it: 16 px deep from its junction face, as tall as a door.
+	var body: StaticBody2D = StaticBody2D.new()
+	body.name = "EntryDoorBody"
+	body.collision_layer = 2
+	body.collision_mask = 0
+	body.position = Vector2(ENTRY_DOOR_X - 8.0, FLOOR_Y - 66.0)
+	entry_door_shape = CollisionShape2D.new()
+	var box: RectangleShape2D = RectangleShape2D.new()
+	box.size = Vector2(16.0, 132.0)
+	entry_door_shape.shape = box
+	entry_door_shape.disabled = true
+	body.add_child(entry_door_shape)
+	add_child(body)
+
+
+## The entry's status lamp: amber while its closer brings the leaf shut, red once it latches.
+func set_entry_lamp(color: Color) -> void:
+	entry_mesh.set_color(entry_lamp_quad, color)
+
+
+func entry_lamp_color() -> Color:
+	return entry_mesh.get_color(entry_lamp_quad)
+
+
+## Coming in from the service line passage: the entry stands open behind the engineer and its closer
+## brings it shut (as the Records entry's does).
+func close_entry_behind() -> void:
+	if entry_tween != null and entry_tween.is_running():
+		entry_tween.kill()
+	entry_leaf.open = 1.0
+	set_entry_lamp(ENTRY_LAMP_MOVING)
+	entry_tween = create_tween()
+	entry_tween.tween_interval(ENTRY_CLOSE_DELAY)
+	entry_tween.tween_property(entry_leaf, "open", 0.0, ENTRY_CLOSE_SECONDS).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
+	entry_tween.tween_callback(func() -> void: set_entry_lamp(ENTRY_LAMP_SHUT))
+
+
+## The release bay draws after Recesses (so its right post lies over the bolt feed); it is made once
+## Recesses exists.
+func _build_bay() -> void:
+	release_bay = _door_piece("ReleaseBay", JunctionDoorLayout.ALCOVE_REGION, JunctionDoorLayout.ALCOVE_AT, JunctionDoorLayout.ALCOVE_SCALE, BAY_Z)
+
+
+## The exit door's pieces, in drawing order. The passage, the leaf, the wall behind the walk line and
+## the lamp's lens go in before the props, one step under this node's drawing like them (the leaf is
+## always behind the walk line where it shows); the deck and the wall in front of the walk line go over
+## the actors with the blast door's column (DOOR_FRONT_Z). Its lens and leaf follow the bolt.
+func _build_exit() -> void:
+	exit_beyond = _exit_piece("ExitBeyond", EXIT_BEYOND, EXIT_BEYOND_AT, -1)
+	exit_leaf = _exit_piece("ExitLeaf", EXIT_LEAF, Vector2.ZERO, -1)
+	exit_leaf.offset = -EXIT_LEAF_ANCHOR
+	exit_back = _exit_piece("ExitBack", EXIT_BACK, EXIT_BACK_AT, -1)
+	exit_lens = _exit_piece("ExitLens", EXIT_LENS, EXIT_LENS_AT, -1)
+	exit_deck = _exit_piece("ExitDeck", EXIT_DECK, EXIT_DECK_AT, DOOR_FRONT_Z)
+	exit_front = _exit_piece("ExitFront", EXIT_FRONT, EXIT_FRONT_AT, DOOR_FRONT_Z)
+	_sync_hatch()
+
+
+func _exit_piece(piece_name: String, region: Rect2, at: Vector2, z: int) -> Sprite2D:
+	var piece: Sprite2D = Sprite2D.new()
+	piece.name = piece_name
+	piece.texture = EXIT_ATLAS
+	piece.texture_filter = CanvasItem.TEXTURE_FILTER_LINEAR_WITH_MIPMAPS
+	piece.centered = false
+	piece.region_enabled = true
+	piece.region_rect = region
+	piece.scale = Vector2.ONE * EXIT_ATLAS_SCALE
+	piece.position = at
+	piece.z_index = z
+	add_child(piece)
+	return piece
+
+
+## Where the leaf's leading-edge bottom corner stands with the door [param open] (0 shut, 1 open), and
+## the leaf's scale there (x, y: the point; z: the scale against the shut leaf's). The leaf slides along
+## the wall, back into the pocket, so it moves left and away from the camera (smaller).
+static func exit_leaf_anchor(open: float) -> Vector3:
+	var a: float = deg_to_rad(EXIT_WALL_ANGLE)
+	var s: float = lerpf(EXIT_LEAD_SHUT_S, EXIT_LEAD_OPEN_S, clampf(open, 0.0, 1.0))
+	var x_m: float = EXIT_DOOR_X / 40.0 - s * sin(a) + EXIT_LEAF_N * cos(a)
+	var z_m: float = s * cos(a) + EXIT_LEAF_N * sin(a)
+	var k: float = 38.0 / (38.0 + z_m)
+	var z_shut: float = EXIT_LEAD_SHUT_S * cos(a) + EXIT_LEAF_N * sin(a)
+	return Vector3(EXIT_VPX + (40.0 * x_m - EXIT_VPX) * k, EXIT_HORIZON + (FLOOR_Y - EXIT_HORIZON) * k, k * (38.0 + z_shut) / 38.0)
 
 
 func _build_particles() -> void:
@@ -737,21 +969,50 @@ func _build_particles() -> void:
 	# Like the column: out of the grate, behind it and the engineer it knocks down.
 	vent_puff.z_index = VENT_STEAM_Z
 	add_child(vent_puff)
-	blast_sparks = FxPresets.sparks(AMBER)
+	# Steel tearing at the latch jamb, where the bolts shear: a few short, hard white-hot streaks thrown
+	# into the lane, falling (FxPresets.streaks), not soft discs.
+	blast_sparks = FxPresets.streaks(14)
 	blast_sparks.name = "BlastSparks"
-	blast_sparks.position = Vector2(DOOR_X, FLOOR_Y - DOOR_HEIGHT * 0.5)
-	blast_sparks.amount = 36
-	blast_sparks.spread = 110.0
+	blast_sparks.position = Vector2(JunctionDoorLayout.FAR_JAMB_FOOT.x + 2.0, FLOOR_Y - 52.0)
+	blast_sparks.emission_shape = CPUParticles2D.EMISSION_SHAPE_RECTANGLE
+	blast_sparks.emission_rect_extents = Vector2(2.0, 46.0)
+	blast_sparks.direction = Vector2(1.0, -0.25)
+	blast_sparks.spread = 40.0
 	blast_sparks.z_index = 3
 	add_child(blast_sparks)
-	blast_dust = FxPresets.dust_burst()
+	# Concrete spalled off round the frame: hard chips thrown through the doorway into the lane, tumbling
+	# and falling to the deck (FxPresets.chips).
+	blast_debris = FxPresets.chips(Color(0.42, 0.43, 0.45), 20)
+	blast_debris.name = "BlastDebris"
+	blast_debris.position = Vector2(DOOR_X, FLOOR_Y - 60.0)
+	blast_debris.emission_shape = CPUParticles2D.EMISSION_SHAPE_RECTANGLE
+	blast_debris.emission_rect_extents = Vector2(8.0, 55.0)
+	blast_debris.z_index = 3
+	add_child(blast_debris)
+	# The blast's dust driven through the doorway into the lane: a fast grey jet out of the opening that
+	# slows and spreads (FxPresets.dust_jet), not a flat sheet on the deck.
+	blast_dust = FxPresets.dust_jet(Color(0.56, 0.58, 0.6, 0.42), 26)
 	blast_dust.name = "BlastDust"
-	blast_dust.position = Vector2(DOOR_X + 20.0, FLOOR_Y - 4.0)
+	blast_dust.position = Vector2(DOOR_X - 2.0, FLOOR_Y - 46.0)
 	blast_dust.emission_shape = CPUParticles2D.EMISSION_SHAPE_RECTANGLE
-	blast_dust.emission_rect_extents = Vector2(70.0, 3.0)
-	blast_dust.amount = 30
+	blast_dust.emission_rect_extents = Vector2(6.0, 42.0)
 	blast_dust.z_index = 3
 	add_child(blast_dust)
+	# Fix round 4 (review r4 C2): the dust the thrown leaf raises off the wet deck where it lands, low and
+	# spreading along it, in front of the lying leaf.
+	landing_dust = FxPresets.dust_jet(Color(0.5, 0.53, 0.56, 0.38), 18)
+	landing_dust.name = "LandingDust"
+	landing_dust.position = DOOR_FLIGHT_TO + Vector2(0.0, 20.0)
+	landing_dust.emission_shape = CPUParticles2D.EMISSION_SHAPE_RECTANGLE
+	landing_dust.emission_rect_extents = Vector2(66.0, 4.0)
+	landing_dust.direction = Vector2(0.0, -1.0)
+	landing_dust.spread = 75.0
+	landing_dust.initial_velocity_min = 50.0
+	landing_dust.initial_velocity_max = 130.0
+	landing_dust.damping_min = 120.0
+	landing_dust.damping_max = 180.0
+	landing_dust.z_index = DOOR_FRONT_Z + 1
+	add_child(landing_dust)
 
 
 ## The sentry, the tank over the mark and the lane's hazards and bursts. The sentry is added before
@@ -822,16 +1083,17 @@ func _build_lane() -> void:
 	hit_sparks.spread = 100.0
 	hit_sparks.z_index = 3
 	add_child(hit_sparks)
-	bolt_sparks = FxPresets.sparks(Color("#c1f4d8"))
+	# The bolt's short in the panel: hot streaks spat out of the panel's face, falling (FxPresets.streaks).
+	bolt_sparks = FxPresets.streaks(22)
 	bolt_sparks.name = "BoltSparks"
 	bolt_sparks.position = prop_rect(bolt_panel_art, BOLT_PANEL_LIGHT).get_center()
-	bolt_sparks.amount = 30
+	bolt_sparks.spread = 75.0
 	bolt_sparks.z_index = 3
 	add_child(bolt_sparks)
 
 
 ## A station name on its plate, centred on [param center_x] in the label row. It draws over the
-## bulkhead and under the actors.
+## door's cross-wall and under the actors.
 func _add_station_label(caption: String, center_x: float, tint: Color) -> Label:
 	var label: Label = Label.new()
 	label.text = caption
@@ -870,7 +1132,7 @@ func flicker(station: StringName, times: int) -> void:
 	flicker_elapsed = 0.0
 	flicker_times = times
 	if was_door and station != &"door":
-		_sync_seam()
+		_sync_lamp()
 	_sync_flicker()
 
 
@@ -922,20 +1184,23 @@ func _advance_flicker(delta: float) -> void:
 		flicker_times = 0
 		flicker_station = &""
 		if station == &"door":
-			_sync_seam()
+			_sync_lamp()
 		_sync_breaker_glow()
+		_sync_exit_lamp()
 		queue_redraw()
 		return
 	_sync_flicker()
 
 
-## Shows the flicker's current step: the drawn lamps follow lamp_level when they draw; the glows and
-## the door's seam lamp are nodes, set here.
+## Shows the flicker's current step: the drawn lamps follow lamp_level when they draw; the glows, the
+## door's status lamp and the exit door's lens are nodes, set here.
 func _sync_flicker() -> void:
 	if flicker_station == &"door" and not door_blown and not (line_state in [&"charged", &"fuse"]):
-		if _seam_tween != null and _seam_tween.is_valid():
-			_seam_tween.kill()
-		seam_glow.modulate = Color(AMBER, SEAM_FLICKER_ALPHA * lamp_level(&"door"))
+		if _lamp_tween != null and _lamp_tween.is_valid():
+			_lamp_tween.kill()
+		var lit: float = lamp_level(&"door")
+		_set_lamp(AMBER if lit > 0.0 else LAMP_DEAD, SEAM_FLICKER_ALPHA * lit)
+	_sync_exit_lamp()
 	_sync_breaker_glow()
 	queue_redraw()
 
@@ -971,13 +1236,14 @@ static func edge_alpha(rect: Rect2, view: Rect2) -> float:
 func set_active(active: bool) -> void:
 	FloorReflection.set_all_active(floor_reflections, active)
 	door_shape.set_deferred("disabled", not active or door_blown)
+	entry_door_shape.set_deferred("disabled", not active)
 	vent_hazard.armed = false
 	vent_hazard.set_deferred("monitoring", active)
 	cloud_hazard.armed = false
 	cloud_hazard.set_deferred("monitoring", active)
 
 
-## Copies the live pressure line in; the gauge needle, steam, seam and labels all follow it.
+## Copies the live pressure line in; the gauge needle, steam, door lamp and labels all follow it.
 func sync_line(line: PressureLine) -> void:
 	var previous_turns: int = turns
 	var previous_state: StringName = line_state
@@ -1008,8 +1274,6 @@ func sync_line(line: PressureLine) -> void:
 	vent_steam.initial_velocity_max = lerpf(60.0, 220.0, clampf(steam, 0.0, 1.0))
 	vent_steam.scale_amount_max = lerpf(6.0, 16.0, clampf(steam, 0.0, 1.0))
 	vent_steam.modulate.a = lerpf(0.45, 1.0, clampf(steam, 0.0, 1.0))
-	if building:
-		seam_glow.modulate = Color(AMBER, 0.25 + 0.5 * gauge)
 	_sync_vent_glow()
 	_check_redraw()
 
@@ -1072,7 +1336,9 @@ func sync_bolt(state: StringName, charge: float) -> void:
 	bolt_charge = charge
 	if changed:
 		refresh_state()
-	# The bolt's lights and its feed (Recesses) warm with the charge.
+	# The exit's status lamp follows the bolt (amber while it charges); the bolt's lights and its feed
+	# (Recesses) warm with the charge.
+	_sync_exit_lamp()
 	_check_redraw()
 
 
@@ -1119,6 +1385,13 @@ static func wolf_tank_leap_height(wolf_x: float) -> float:
 	return TANK_LEAP_HEIGHT * maxf(1.0 - along * along, 0.0)
 
 
+## How far forward of the walk line WOLF stands (0..1, a fraction of WOLF_STEP_FORWARD) with his centre at
+## [param wolf_x]: all the way while his body would overlap the valve's middle, easing back over
+## WOLF_STEP_RAMP to nothing, so he walks round the front of the valve.
+static func wolf_valve_step(wolf_x: float) -> float:
+	return 1.0 - smoothstep(WOLF_STEP_FULL, WOLF_STEP_FULL + WOLF_STEP_RAMP, absf(wolf_x - VALVE_X))
+
+
 ## How far WOLF ducks (px off the top of his drawn body, feet on the floor) with his centre at
 ## [param wolf_x], facing [param facing] (+1 right), under the hung tank: DUCK_DEPTH while his head is
 ## under its base, easing to nothing DUCK_RAMP further out.
@@ -1161,8 +1434,8 @@ func tank_miss() -> void:
 	tank.dented = true
 
 
-## The bolt lets go and the hatch slides open (the parent fires the panel's sparks); hatch_opened
-## follows once it is open.
+## The bolt lets go and the exit door slides open into its pocket (the parent fires the panel's sparks);
+## hatch_opened follows once it is open.
 func bolt_arc() -> void:
 	if _hatch_tween != null and _hatch_tween.is_valid():
 		_hatch_tween.kill()
@@ -1201,7 +1474,7 @@ func _turn_wheel(to_turns: int) -> void:
 	_valve_tween.tween_property(valve_wheel, "rotation_degrees", target, 0.18).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
 
 
-## Labels, glows and the seam follow the line's phase; the parent calls this after state changes.
+## Labels, glows and the door lamp follow the line's phase; the parent calls this after state changes.
 func refresh_state() -> void:
 	if is_spent():
 		# The blast used the line up: the same labels whether it just went or a save brought it back. State
@@ -1239,10 +1512,18 @@ func refresh_state() -> void:
 		hatch_label.add_theme_color_override("font_color", Color("#8fa6b2"))
 	for label: Label in station_labels:
 		_fit_label(label)
-	_sync_seam()
+	_sync_lamp()
 	_sync_vent_glow()
+	_sync_exit_lamp()
 	queue_redraw()
 	recesses.queue_redraw()
+
+
+## The exit door's status lamp (its live lens) shows the bolt's colour: red shut, amber charging,
+## warming through the whine, green open; it goes dark in a refusal's flicker at the bolt panel.
+func _sync_exit_lamp() -> void:
+	if exit_lens != null:
+		exit_lens.modulate = bolt_lamp_color()
 
 
 ## True once the door is down, whether it just went or a save brought it back.
@@ -1250,26 +1531,35 @@ func is_spent() -> bool:
 	return door_blown
 
 
-func _sync_seam() -> void:
-	if _seam_tween != null and _seam_tween.is_valid():
-		_seam_tween.kill()
-	_seam_tween = null
-	seam_glow.visible = not door_blown
+## The door's status lamp follows the line: red shut, amber while it builds, flashing red and white
+## through the fuse (steady red with Reduced Motion), dark once the door is down.
+func _sync_lamp() -> void:
+	if _lamp_tween != null and _lamp_tween.is_valid():
+		_lamp_tween.kill()
+	_lamp_tween = null
+	if door_blown or line_state == &"blown":
+		_set_lamp(LAMP_DEAD, 0.0)
+		return
 	match line_state:
 		&"charged", &"fuse":
-			# The seam strobes white only once the third turn is real; Reduced Motion holds it steady.
-			seam_glow.modulate = Color(Color.WHITE, 0.9)
+			_set_lamp(SEAM_RED, 0.6)
 			if reduce_motion:
 				return
-			_seam_tween = create_tween().set_loops()
-			_seam_tween.tween_property(seam_glow, "modulate", Color(SEAM_RED, 0.5), 0.08)
-			_seam_tween.tween_property(seam_glow, "modulate", Color(Color.WHITE, 0.9), 0.08)
+			_lamp_tween = create_tween().set_loops()
+			_lamp_tween.tween_callback(_set_lamp.bind(Color.WHITE, 0.7))
+			_lamp_tween.tween_interval(0.12)
+			_lamp_tween.tween_callback(_set_lamp.bind(SEAM_RED, 0.6))
+			_lamp_tween.tween_interval(0.12)
 		&"building":
-			seam_glow.modulate = Color(AMBER, 0.25 + 0.5 * gauge)
-		&"blown":
-			seam_glow.visible = false
+			_set_lamp(AMBER, 0.5)
 		_:
-			seam_glow.modulate = Color(AMBER, 0.2)
+			_set_lamp(LAMP_SHUT, 0.45)
+
+
+func _set_lamp(color: Color, glow: float) -> void:
+	door_lamp.modulate = color
+	door_lamp_glow.modulate = Color(color, glow)
+	door_lamp_glow.visible = glow > 0.0
 
 
 ## The vent letting go: a steam burst and a short armed window over the grate.
@@ -1279,44 +1569,82 @@ func vent_blows() -> void:
 	_arm_hazard(vent_hazard)
 
 
-## The door going: the bulkhead breaks under the blast flash and gives way to the blown frame on the
-## passage beyond, which jolts and settles; sparks and dust fly, and the blast zone is dangerous for a
-## moment.
+## The door going: the leaf breaks under the blast flash, then the doorway stands empty and the leaf
+## lies thrown in the lane; sparks, concrete fragments and dust fly, and the blast zone is dangerous
+## for a moment.
 func door_blast() -> void:
 	door_blown = true
 	door_breaking = true
 	vent_hazard.armed = false
 	door_shape.set_deferred("disabled", true)
 	blast_sparks.restart()
+	blast_debris.restart()
 	blast_dust.restart()
 	if _door_tween != null and _door_tween.is_valid():
 		_door_tween.kill()
 	_show_door()
-	door_visual.scale = Vector2(1.04, 0.94)
 	_door_tween = create_tween()
 	_door_tween.tween_interval(DOOR_BREAK_SECONDS)
 	_door_tween.tween_callback(func() -> void:
 		door_breaking = false
+		door_flying = true
 		_show_door())
-	_door_tween.tween_property(door_visual, "scale", Vector2.ONE, 0.3).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
+	_door_tween.tween_method(_set_door_flight, 0.0, 1.0, DOOR_FLIGHT_SECONDS)
+	_door_tween.tween_callback(func() -> void:
+		door_flying = false
+		_show_door()
+		landing_dust.restart())
 	refresh_state()
 
 
-## The sealed bulkhead until the blast, breaking for a moment, then blown open. All of it draws behind
-## the actors (Main.ACTOR_Z) and its front pillar over them, so WOLF holding back by the valve and
-## anyone walking through stay in view in front of it.
+## The shut leaf until the blast; the breaking leaf and its cracks for a moment; then the empty doorway and
+## the damage with the torn leaf in the air, and then lying in the lane. The wall, the bay, the column and the
+## stub always show.
 func _show_door() -> void:
-	door_art.visible = not door_blown
-	door_breaking_art.visible = door_blown and door_breaking
-	door_blown_art.visible = door_blown and not door_breaking
+	var gone: bool = door_blown and not door_breaking
+	door_leaf.visible = not door_blown
+	door_leaf_breaking.visible = door_blown and (door_breaking or door_flying)
+	door_cracks.visible = door_blown and door_breaking
+	door_hole.visible = gone
+	door_damage.visible = gone
+	door_leaf_down.visible = gone and not door_flying
+	if not door_flying:
+		_set_door_flight(0.0)
+	# Fix round 2 (N4): once the leaf has gone, the near column shows what it tore off the hinge jamb (the
+	# hinges' frame leaves and sheared pins, the spalled corner and its bars, the arris angle torn loose):
+	# the same sprite, another region of the atlas (no new draw call).
+	door_column.region_rect = JunctionDoorLayout.COLBLOWN_REGION if door_blown else JunctionDoorLayout.COLUMN_REGION
+	door_column.position = JunctionDoorLayout.COLBLOWN_AT if door_blown else JunctionDoorLayout.COLUMN_AT
 
 
-## The exit hatch's leaf slides up into its frame as it opens, over the passage behind it.
-func _sync_hatch() -> void:
-	if hatch_doorway == null:
+## The torn leaf [param t] (0..1) along its flight from the doorway to where it lies: carried on by the blast
+## and slowed by the air along the lane, up a little and down under gravity, tipping over toward flat and
+## growing as it comes nearer the camera; at 0 it stands in its doorway piece's place again.
+func _set_door_flight(t: float) -> void:
+	door_flight = t
+	var leaf: Sprite2D = door_leaf_breaking
+	if t <= 0.0:
+		leaf.centered = false
+		leaf.position = JunctionDoorLayout.LEAFBREAK_AT
+		leaf.rotation = 0.0
+		leaf.scale = Vector2.ONE * JunctionDoorLayout.LEAFBREAK_SCALE
+		leaf.z_index = DOOR_Z
 		return
-	hatch_doorway.open = hatch_open
-	queue_redraw()
+	leaf.centered = true
+	var along: float = 1.0 - (1.0 - t) * (1.0 - t)
+	leaf.position = Vector2(lerpf(DOOR_FLIGHT_FROM.x, DOOR_FLIGHT_TO.x, along), lerpf(DOOR_FLIGHT_FROM.y, DOOR_FLIGHT_TO.y, t * t) - DOOR_FLIGHT_RISE * 4.0 * t * (1.0 - t))
+	leaf.rotation = DOOR_FLIGHT_TURN * pow(t, 1.2)
+	leaf.scale = Vector2.ONE * JunctionDoorLayout.LEAFBREAK_SCALE * lerpf(1.0, DOOR_FLIGHT_GROW, t)
+	leaf.z_index = DOOR_FRONT_Z + 1 if t >= DOOR_FLIGHT_CLEAR else DOOR_Z
+
+
+## The exit door's leaf slides back along the wall into its pocket as it opens, over the passage behind.
+func _sync_hatch() -> void:
+	if exit_leaf == null:
+		return
+	var anchor: Vector3 = exit_leaf_anchor(hatch_open)
+	exit_leaf.position = Vector2(anchor.x, anchor.y)
+	exit_leaf.scale = Vector2.ONE * EXIT_ATLAS_SCALE * anchor.z
 
 
 func _arm_hazard(hazard: Hazard) -> void:
@@ -1330,12 +1658,16 @@ func _arm_hazard(hazard: Hazard) -> void:
 
 ## Back to the state the save describes: no burst, no fuse, the wheel at rest and the door as saved.
 func reset_transient() -> void:
-	for tween: Tween in [_valve_tween, _seam_tween, _door_tween, _hazard_tween, _hatch_tween, _arm_tween]:
+	for tween: Tween in [_valve_tween, _lamp_tween, _door_tween, _hazard_tween, _hatch_tween, _arm_tween, entry_tween]:
 		if tween != null and tween.is_valid():
 			tween.kill()
+	entry_tween = null
+	# The entry stands shut behind them, as a restored save finds it.
+	entry_leaf.open = 0.0
+	set_entry_lamp(ENTRY_LAMP_SHUT)
 	_arm_tween = null
 	_valve_tween = null
-	_seam_tween = null
+	_lamp_tween = null
 	_door_tween = null
 	_hazard_tween = null
 	_hatch_tween = null
@@ -1344,11 +1676,12 @@ func reset_transient() -> void:
 	breaker_pulse_remaining = 0.0
 	vent_hazard.armed = false
 	cloud_hazard.armed = false
-	for burst: CPUParticles2D in [vent_steam, vent_puff, blast_sparks, blast_dust, coolant_cloud, coolant_burst, hit_sparks, bolt_sparks]:
+	for burst: CPUParticles2D in [vent_steam, vent_puff, blast_sparks, blast_debris, blast_dust, landing_dust, coolant_cloud, coolant_burst, hit_sparks, bolt_sparks]:
 		burst.emitting = false
 	# The tank hangs again (or lies on the downed sentry), undented; the hatch is as the save left it.
 	tank.dented = false
 	door_breaking = false
+	door_flying = false
 	arm_state = &"landed" if sentry_down else &"hung"
 	tank_drop = 1.0 if sentry_down else 0.0
 	tank_on_floor = false
@@ -1365,7 +1698,6 @@ func reset_transient() -> void:
 	hatch_open = 1.0 if junction_cleared else 0.0
 	# A blown door left the wheel at its third quarter; a restored save shows it the same way.
 	valve_wheel.rotation_degrees = 90.0 * PressureLine.TURNS_NEEDED if door_blown else 0.0
-	door_visual.scale = Vector2.ONE
 	_show_door()
 	door_shape.set_deferred("disabled", not visible or door_blown)
 	line_state = &"idle"
@@ -1378,40 +1710,19 @@ func _draw() -> void:
 	_drawn_inputs = draw_inputs()
 	# The plates are the Depth child's layers and the machines are sprites; this draws what they
 	# cannot show.
-	_draw_hatch_lamp(entry_hatch_art, GREEN, 1.0)
 	_draw_gauge()
 	_draw_breaker_light()
 	_draw_blast_zone()
-	if door_blown:
-		draw_line(Vector2(RUBBLE_X - 6.0, 439.0), Vector2(RUBBLE_X + 6.0, 439.0), AMBER, 3.0)
-	_draw_alcove_floor()
 	_draw_arm_panel_light()
 	_draw_arm()
 	_draw_floor_mark()
-	var bolt_light: Color = bolt_lamp_color()
-	_draw_hatch_lamp(hatch_art, bolt_light, 1.0)
-	draw_rect(prop_rect(bolt_panel_art, BOLT_PANEL_LIGHT), bolt_light)
+	draw_rect(prop_rect(bolt_panel_art, BOLT_PANEL_LIGHT), bolt_lamp_color())
 
 
-## The alcove's floor: a tint over exactly the cover span, on the floor line and the walkway in front
-## of it, and an upright post at each end (the right one is where the sentry can see the engineer
-## again).
-func _draw_alcove_floor() -> void:
-	var left: float = SentryBrain.COVER_MIN_X
-	var right: float = SentryBrain.COVER_MAX_X
-	draw_rect(Rect2(left, FLOOR_Y - 3.0, right - left, 13.0), ALCOVE_FLOOR)
-	for edge: float in [left, right]:
-		draw_line(Vector2(edge, FLOOR_Y - 10.0), Vector2(edge, FLOOR_Y + 10.0), ALCOVE_EDGE, 2.0)
-
-
-## The shadow of the alcove behind the TANK RELEASE, drawn on [param canvas] (Recesses, under the
-## props): a soft-edged dark recess in the wall, deepest in the middle, with no outline, so it reads
-## as part of the painted wall. Its core is exactly SentryBrain's cover span, the x range where an
-## engineer is out of the sentry's sight, and the floor under it is tinted over the same span.
+## What Recesses draws under the props: the release's feed to the exit bolt (the bay itself is painted,
+## ReleaseBay, drawn over it, so the feed leaves the bay behind its right post).
 func draw_recesses(canvas: CanvasItem) -> void:
 	_recesses_drawn_inputs = recesses_inputs()
-	var alcove: Rect2 = alcove_rect()
-	canvas.draw_texture_rect(alcove_shadow, alcove.grow_individual(14.0, 10.0, 14.0, 8.0), false, Color(0.0, 0.02, 0.04, 0.85))
 	_draw_bolt_feed(canvas)
 
 
@@ -1584,11 +1895,6 @@ static func soft_texture(fill: GradientTexture2D.Fill) -> GradientTexture2D:
 
 ## A hatch's lamp, painted on the bar over its door, lit in [param color]; it rides and fades with
 ## the hatch as it lifts.
-func _draw_hatch_lamp(hatch: Sprite2D, color: Color, alpha: float) -> void:
-	if alpha > 0.0:
-		draw_rect(prop_rect(hatch, HATCH_LAMP), Color(color, alpha))
-
-
 ## The needle over the valve's painted gauge is the LINE gauge (left at empty, right at the vent's
 ## peak): red through the hard warning, and pinned red at the top for a while after the vent lets go
 ## (display_gauge). The VALVE plate counts the real turns.
@@ -1700,14 +2006,14 @@ func _draw_floor_mark() -> void:
 		draw_line(Vector2(edge, FLOOR_Y - 10.0), Vector2(edge, FLOOR_Y + 10.0), stripe_color, 2.0)
 
 
-## The exit bolt's lamp as drawn on its panel and over the hatch: its light (bolt_light_color),
-## dimmed while a refused press flickers it (lamp_level).
+## The exit bolt's lamp as drawn on its panel and on the exit door's status lamp: its light
+## (bolt_light_color), dimmed while a refused press flickers it (lamp_level).
 func bolt_lamp_color() -> Color:
 	return bolt_light_color().lerp(FLICKER_DARK, 1.0 - lamp_level(&"bolt"))
 
 
-## The exit bolt's light, on its panel and over the hatch: red and dead while the sentry runs the
-## line, amber once it can take the overload, warming to white through the whine, green once popped.
+## The exit bolt's light, on its panel and on the exit door's status lamp: red and dead while the
+## sentry runs the line, amber once it can take the overload, warming to white through the whine, green once popped.
 func bolt_light_color() -> Color:
 	if junction_cleared or bolt_state == &"open":
 		return GREEN

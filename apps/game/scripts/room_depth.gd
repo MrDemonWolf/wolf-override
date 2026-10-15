@@ -69,16 +69,6 @@ const SETTLE_SECONDS: float = 1.2
 ## A near edge piece fades to this opacity while it covers an actor, at NEAR_FADE_SPEED per second.
 const NEAR_FADE_ALPHA: float = 0.35
 const NEAR_FADE_SPEED: float = 4.0
-## The pressure bulkheads (design A) shared by the corridor seal and the junction door: their import
-## copies share one canvas per door whose bottom row is the floor, drawn at this scale, and the front
-## pillar's outer edge sits this many canvas pixels in from the left, its column BULKHEAD_PILLAR_WIDTH
-## canvas pixels wide at body height.
-const BULKHEAD_SCALE: float = 0.3
-const BULKHEAD_PILLAR_X: float = 83.0
-const BULKHEAD_PILLAR_WIDTH: float = 76.0
-## A bulkhead's front pillar (see [member pillars]) fades to this opacity while it covers an actor,
-## keeping more of the doorway than a near edge piece does.
-const PILLAR_FADE_ALPHA: float = 0.5
 
 ## The far plate: back wall, painted lamps and wet floor (opaque).
 @export var painting: Texture2D
@@ -122,6 +112,9 @@ const PILLAR_FADE_ALPHA: float = 0.5
 ## Whether the near strip is mirrored on the room's right edge too. The corridor's right edge now
 ## opens into the machinery room past the seal, so its mirrored pipe column is not drawn there.
 @export var near_right_edge: bool = true
+## Whether the near strip is drawn on the room's left edge. Records closes both its ends with door
+## walls of its own, so neither pipe column is drawn there.
+@export var near_left_edge: bool = true
 ## Lamps (by index into [member lamps]) whose light is painted into the plate: their glow and shaft
 ## stay hidden. They keep their place in the flicker sequence, so the other lamps flicker as before.
 @export var painted_lamps: PackedInt32Array = PackedInt32Array()
@@ -138,9 +131,6 @@ var reduce_motion: bool = false
 var lockdown_cleared: bool = false
 ## Sprites (the actors' bodies) the near edge pieces fade back from while they cover them.
 var occluders: Array[Sprite2D] = []
-## Bulkhead front lips (made with [method make_bulkhead]'s cut) drawn over the actors in this room;
-## each fades back to PILLAR_FADE_ALPHA while its pillar covers one of the [member occluders].
-var pillars: Array[Sprite2D] = []
 
 var backdrop_layer: Parallax2D
 var backdrop: Sprite2D
@@ -189,11 +179,6 @@ func _ready() -> void:
 func _process(delta: float) -> void:
 	if not is_visible_in_tree():
 		return
-	# The pillars fade whether or not the depth pass is on: they draw over the actors either way.
-	for pillar: Sprite2D in pillars:
-		if is_instance_valid(pillar):
-			var pillar_target: float = PILLAR_FADE_ALPHA if pillar_covers(pillar) else 1.0
-			pillar.modulate.a = move_toward(pillar.modulate.a, pillar_target, NEAR_FADE_SPEED * delta)
 	if near_layer == null or not near_layer.visible:
 		return
 	for edge_name: String in ["LeftEdge", "RightEdge"]:
@@ -214,21 +199,6 @@ func near_covers(edge: Sprite2D) -> bool:
 		if is_instance_valid(sprite) and sprite.is_visible_in_tree():
 			var body: Rect2 = sprite.get_global_transform_with_canvas() * sprite.get_rect()
 			if body.position.x < screen.end.x and body.end.x > screen.position.x:
-				return true
-	return false
-
-
-## True when [param pillar]'s front pillar column (BULKHEAD_PILLAR_X, BULKHEAD_PILLAR_WIDTH wide, floor
-## to header) overlaps any visible occluder's body on screen.
-func pillar_covers(pillar: Sprite2D) -> bool:
-	if not pillar.is_visible_in_tree():
-		return false
-	var cut: Rect2 = pillar.get_rect()
-	var local: Rect2 = Rect2(cut.position.x + BULKHEAD_PILLAR_X - pillar.region_rect.position.x, cut.position.y, BULKHEAD_PILLAR_WIDTH, cut.size.y)
-	var screen: Rect2 = pillar.get_global_transform_with_canvas() * local
-	for sprite: Sprite2D in occluders:
-		if is_instance_valid(sprite) and sprite.is_visible_in_tree():
-			if screen.intersects(sprite.get_global_transform_with_canvas() * sprite.get_rect()):
 				return true
 	return false
 
@@ -312,7 +282,8 @@ func rebuild() -> void:
 	near_layer = _add_parallax("Near", NEAR_SCROLL, Z_NEAR)
 	if near_painting != null:
 		var strip: Rect2 = Rect2(0.0, 0.0, minf(near_strip_width, near_painting.get_width()), near_painting.get_height())
-		near_layer.add_child(_plate("LeftEdge", near_painting, strip))
+		if near_left_edge:
+			near_layer.add_child(_plate("LeftEdge", near_painting, strip))
 		if near_right_edge:
 			near_layer.add_child(_plate("RightEdge", near_painting, strip, true))
 	near_dust = _make_dust("NearDust", NEAR_DUST_COUNT, 0.35, 0.65, Z_NEAR)
@@ -580,17 +551,6 @@ static func make_prop(prop_name: String, texture: Texture2D, region: Rect2, prop
 	sprite.scale = Vector2.ONE * prop_scale
 	sprite.position = Vector2(center_x, base_y - region.size.y * prop_scale * 0.5)
 	return sprite
-
-
-## A bulkhead image (BULKHEAD_SCALE, its canvas bottom on the floor) placed so its front pillar's
-## outer edge is at [param face_x], the face of the door's collision body.
-static func make_bulkhead(prop_name: String, texture: Texture2D, region: Rect2, face_x: float) -> Sprite2D:
-	return make_prop(prop_name, texture, region, BULKHEAD_SCALE, bulkhead_center_x(region, face_x))
-
-
-## The centre x of a bulkhead drawn from [param region] with its front pillar's edge at [param face_x].
-static func bulkhead_center_x(region: Rect2, face_x: float) -> float:
-	return face_x + (region.get_center().x - BULKHEAD_PILLAR_X) * BULKHEAD_SCALE
 
 
 ## An additive radial glow; also used by rooms for their station status lights.

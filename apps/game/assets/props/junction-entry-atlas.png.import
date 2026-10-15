@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://mhyt2uw8nb6"
-path="res://.godot/imported/junction-bulkhead-breaking.png-6eba61c513f7bdf46fd17c85c0ec6533.ctex"
+uid="uid://coply0kb7snhu"
+path="res://.godot/imported/junction-entry-atlas.png-e3dcf395e0a1c1366fdf99eaa050aed9.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/props/junction-bulkhead-breaking.png"
-dest_files=["res://.godot/imported/junction-bulkhead-breaking.png-6eba61c513f7bdf46fd17c85c0ec6533.ctex"]
+source_file="res://assets/props/junction-entry-atlas.png"
+dest_files=["res://.godot/imported/junction-entry-atlas.png-e3dcf395e0a1c1366fdf99eaa050aed9.ctex"]
 
 [params]
 

@@ -23,6 +23,13 @@ var settle_x: float = -1.0
 ## The room's machines as x spans (from, to); a follower rests clear of them when clear floor is at
 ## most AVOID_DETOUR further back from the engineer (main sets them per room).
 var avoid_spans: Array[Vector2] = []
+## The furthest right this body may stand: MAX_X, except where Main lets it on through an open doorway at
+## the room's edge (the junction's exit, JunctionRoom.EXIT_WALK_MAX_X).
+var max_x: float = MAX_X
+## The furthest right the player can walk this body (a controlled one): it stops there, but a body
+## already past it is never moved back (Main holds the engineer short of WOLF standing in the junction's
+## open exit). MAX_X when nothing holds it.
+var walk_max_x: float = MAX_X
 ## Scales the speed of a body walking on its own or following (main speeds WOLF up for the moment he
 ## bounds over the junction's sentry, JunctionRoom.wolf_leap_height, and while he dashes past the
 ## engineer waiting for him at the rubble line).
@@ -75,6 +82,8 @@ func _physics_process(delta: float) -> void:
 	if controlled:
 		var axis: float = Input.get_axis(&"move_left", &"move_right")
 		velocity.x = axis * WALK_SPEED
+		if velocity.x > 0.0:
+			velocity.x = minf(velocity.x, maxf(walk_max_x - position.x, 0.0) / delta)
 		if axis == 0.0 and settle_x >= 0.0:
 			velocity.x = clampf(_approach(settle_x, delta), -SETTLE_SPEED, SETTLE_SPEED)
 			settling = true
@@ -107,7 +116,7 @@ func _physics_process(delta: float) -> void:
 	else:
 		velocity.y += GRAVITY * delta
 	move_and_slide()
-	position.x = clampf(position.x, MIN_X, MAX_X)
+	position.x = clampf(position.x, MIN_X, max_x)
 	_tint_pass(delta)
 
 

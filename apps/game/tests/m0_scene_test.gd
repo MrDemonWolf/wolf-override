@@ -254,7 +254,7 @@ func _run() -> void:
 	# The corridor's near column is solid (it never fades and nothing is drawn over it), and slim:
 	# its art ends left of where the engineer can use the safe point.
 	var column: Sprite2D = game.get("door_lip") as Sprite2D
-	_expect(not (game.get("corridor_depth") as RoomDepth).pillars.has(column) and column.modulate.a == 1.0, "the corridor's near column stays opaque")
+	_expect(column.modulate.a == 1.0, "the corridor's near column stays opaque")
 	# Its art has no see-through gap: on every row over the guide's height above its foot (where the
 	# chamfer meets the stub and its contact shadow), from its first fully
 	# opaque pixel to its last, every pixel is fully opaque, but for the live lamp's glass.
