@@ -192,6 +192,11 @@ const EXIT_DECK_BLEED: float = 40.0
 ## mid plate's right bleed does: a camera shake (Impact.MAX_SHAKE_PX, the bolt's arc at 0.8 trauma) at
 ## the view's right end (EXIT_VIEW_RIGHT) would otherwise show the far plate there.
 const EXIT_EDGE_BLEED: float = 12.0
+## Each bleed mirrors its piece's rows or columns from this many atlas px short of the piece's edge, and
+## overlaps the piece by half as many world px: the edge texel blends with the transparent atlas gap
+## beside it under linear filtering, so a seam on the edge itself would let a faint line of the far
+## plate through.
+const EXIT_SEAM_TRIM: float = 2.0
 ## The junction's camera may show this far right (Main), so the near jamb, the wall's column and the
 ## passage beyond frame the doorway (the exit's pieces and its deck cover the view to here), and the
 ## actors may walk on through it this far: on down the passage, out of view behind the wall, far enough
@@ -924,7 +929,7 @@ func _build_exit() -> void:
 	exit_lens = _exit_piece("ExitLens", EXIT_LENS, EXIT_LENS_AT, -1)
 	exit_deck = _exit_piece("ExitDeck", EXIT_DECK, EXIT_DECK_AT, DOOR_FRONT_Z)
 	var bleed_rows: float = EXIT_DECK_BLEED / EXIT_ATLAS_SCALE
-	exit_deck_bleed = _exit_piece("ExitDeckBleed", Rect2(EXIT_DECK.position.x, EXIT_DECK.end.y - bleed_rows, EXIT_DECK.size.x, bleed_rows), EXIT_DECK_AT + Vector2(0.0, EXIT_DECK.size.y * EXIT_ATLAS_SCALE), DOOR_FRONT_Z)
+	exit_deck_bleed = _exit_piece("ExitDeckBleed", Rect2(EXIT_DECK.position.x, EXIT_DECK.end.y - EXIT_SEAM_TRIM - bleed_rows, EXIT_DECK.size.x, bleed_rows), EXIT_DECK_AT + Vector2(0.0, (EXIT_DECK.size.y - EXIT_SEAM_TRIM) * EXIT_ATLAS_SCALE), DOOR_FRONT_Z)
 	exit_deck_bleed.flip_v = true
 	_exit_edge_bleed(exit_deck)
 	_exit_edge_bleed(exit_deck_bleed).flip_v = true
@@ -932,11 +937,12 @@ func _build_exit() -> void:
 	_sync_hatch()
 
 
-## [param piece]'s last EXIT_EDGE_BLEED world px, mirrored on to the right of it at its depth.
+## [param piece]'s last EXIT_EDGE_BLEED world px (short of its edge texels), mirrored on to the right of
+## it at its depth, overlapping its edge.
 func _exit_edge_bleed(piece: Sprite2D) -> Sprite2D:
 	var columns: float = EXIT_EDGE_BLEED / EXIT_ATLAS_SCALE
 	var region: Rect2 = piece.region_rect
-	var strip: Sprite2D = _exit_piece(piece.name + "EdgeBleed", Rect2(region.end.x - columns, region.position.y, columns, region.size.y), piece.position + Vector2(region.size.x * EXIT_ATLAS_SCALE, 0.0), piece.z_index)
+	var strip: Sprite2D = _exit_piece(piece.name + "EdgeBleed", Rect2(region.end.x - EXIT_SEAM_TRIM - columns, region.position.y, columns, region.size.y), piece.position + Vector2((region.size.x - EXIT_SEAM_TRIM) * EXIT_ATLAS_SCALE, 0.0), piece.z_index)
 	strip.flip_h = true
 	return strip
 

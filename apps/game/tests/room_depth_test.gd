@@ -264,7 +264,7 @@ func _check_exit_view_edge(junction: JunctionRoom, camera: Camera2D, half_play: 
 		var strip: Sprite2D = junction.get_node(strip_name) as Sprite2D
 		_expect(strip.flip_h and strip.texture == JunctionRoom.EXIT_ATLAS, "the exit's %s mirrors its piece's last columns" % strip_name)
 		cover.append(_global_rect(strip))
-	_expect(junction.exit_deck_bleed.flip_v and is_equal_approx(_global_rect(junction.exit_deck_bleed).position.y, _global_rect(junction.exit_deck).end.y), "the exit deck's bleed mirrors its bottom rows on from the deck's end")
+	_expect(junction.exit_deck_bleed.flip_v and absf(_global_rect(junction.exit_deck).end.y - _global_rect(junction.exit_deck_bleed).position.y - JunctionRoom.EXIT_SEAM_TRIM * JunctionRoom.EXIT_ATLAS_SCALE) < 0.01, "the exit deck's bleed mirrors its bottom rows on from the deck's end, overlapping its edge row")
 	camera.zoom = Vector2.ONE * 1.35
 	for camera_y: float in [360.0, touch_y]:
 		for shake: float in [-SHAKE, SHAKE]:
