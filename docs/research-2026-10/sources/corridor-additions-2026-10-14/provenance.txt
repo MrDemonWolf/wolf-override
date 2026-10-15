@@ -118,7 +118,7 @@ paint-cut9b    01a13619-28b8-7c02-91b4-d474e3924572    cut9b-painted.png ec14d41
 Both outputs (1254x1254) are byte-identical (cmp) to their originals in ~/.codex/generated_images
 (01a135c0-8eeb-.../exec-73ad7c74-6f7f-4101-861d-dd3976abf45f.png, 01a13619-28b8-.../exec-f90c5973-14d7-40de-8cf4-a6384e3aa395.png)
 and carry their caBX (C2PA) chunks (21,881 and 23,654 bytes).
-No new session for the far plate (deterministic relighting, add7/fix2/far/tools/far9.py) or the beacons
+No new session for the far plate (deterministic relighting, add7/fix2/far/tools/far9.py; fix2/far/tools/far9.py at ada83fa) or the beacons
 (round 7's paint re-used; only the computed light changed, add7/fix2/beacons/tools/cleanup.py).
 Text: no new text.
 

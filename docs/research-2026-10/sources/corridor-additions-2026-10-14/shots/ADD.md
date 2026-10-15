@@ -208,7 +208,7 @@ This round follows Nathanial's two decisions of 2026-10-14 ("Show it as a clean 
 
 ### Real r3 MUST 1: the dark rectangle round the shortened luminaire
 
-- **Cause:** round 9's `far9.py` kept the far plate's old light over a rectangle round the fitting (SOURCE_BOX).
+- **Cause:** round 9's `far9.py` (`fix2/far/tools/far9.py` at ada83fa) kept the far plate's old light over a rectangle round the fitting (SOURCE_BOX).
 - **The fix:** `fix3/far/tools/far10.py`, deterministic relighting from round 8's plate, with no new paint.
   - The old values are kept only on the fitting's own pixels: body, diffuser, rods and canopies, from round 8's design spec.
   - That mask is feathered over about 2.5 plate px.
@@ -407,7 +407,7 @@ Nothing under `game-slice`, `game-main`, `shots/`, `design/`, `layers/`, `codex/
   - **In game:** the zone's column profile, rows 630-700 at x 1140-1240, now reads max/median 1.25 with no peak (round 8: 1.80, peak at x 1181).
 
 **Real MUST 2: the luminaire's wall pool and floor streak now sit under the fitting.**
-- **Method:** deterministic relighting of the far plate in linear light, with no new paint (`fix2/far/tools/far9.py`).
+- **Method:** deterministic relighting of the far plate in linear light, with no new paint (`fix2/far/tools/far9.py` at ada83fa).
   - **The wall pool:** a fitted smooth gain, G = 1 + A(y)·gaussian(x), multiplied by G(x + d)/G(x). The same concrete carries the light at its new place, and the fitting's own pixels keep ratio 1.
   - **The floor reflection:** treated as an additive cool-white reflection. Its luma excess is taken out where it was and added back 44 plate px to the left, so its patchy pattern moves with it.
 - **In game,** with the review's own measure (`luminaire-check.json`; s1 and s5 at 720p, fitting centre x 687):

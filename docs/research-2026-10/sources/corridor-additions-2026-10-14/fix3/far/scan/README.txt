@@ -1,4 +1,5 @@
-Round 10 pool-centring scan (not installed). far10.py run with WALL_EXTRA 9.0 (installed), 4.5, 2.0, 0.0, -3.0
+Round 10 pool-centring scan (not installed). fix3/far/tools/far10.py run unchanged (layer-10a/ is the installed
+run's report; the as-run copy filed beside it was byte for byte far10.py and is at ada83fa) with WALL_EXTRA 9.0 (installed), 4.5, 2.0, 0.0, -3.0
 and measured with a plate proxy of the real review's screen measure (plate scaled 0.9, rows 62-100 at 720p,
 7 px smoothing): peak / centroid (screen x; fitting centre 687.5)
   9.0: 682 / 686.2 (proxy matches the render.sh capture's 682 / 684.9-685.0)

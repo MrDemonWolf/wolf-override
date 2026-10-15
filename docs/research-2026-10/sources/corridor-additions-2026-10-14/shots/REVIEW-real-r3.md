@@ -24,7 +24,7 @@ There are also three should-fix items: the new wall section hides 60% of the eng
 **What I see.** In every door-end state, and in o7 and o8 of the opening, there is a darker rectangle round the shortened 0.6 m fitting. It covers the fitting, its two rods and the wall between and above them, down to the diffuser. Its left and right edges are straight and vertical (`crops/mine/MUST1-luminaire-unrelit-box-s5-4x.png`: round 8 | round 9 | round 9 with contrast x2.5, cyan = the rectangle; `crops/mine/lum-box-r8-r9-s5-3x.png`; `crops/mine/phone-lum-box-r8-r9-s5-2x.png`; `crops/mine/o8-lum-r8r2-r9-3x.png`).
 - At 1x on the laptop frame it is faint. At 3x, and in phone shape at 2x, it is plain. In o8 it sits right beside PAUSE, where the eye goes.
 
-**Where it comes from.** `fix2/far/tools/far9.py` holds `SOURCE_BOX = (1209, 186, 1265, 229)` (plate px) at a gain ratio of 1, so that the fitting itself is not relit. But that box is a rectangle, not the fitting's own pixels. So the wall inside it kept its round-8 values, while the wall all round it was relit: brighter to the left, where the pool moved to, and darker to the right, where it came from.
+**Where it comes from.** `fix2/far/tools/far9.py` (at ada83fa; round 10's `fix3/far/tools/far10.py` replaced it) holds `SOURCE_BOX = (1209, 186, 1265, 229)` (plate px) at a gain ratio of 1, so that the fitting itself is not relit. But that box is a rectangle, not the fitting's own pixels. So the wall inside it kept its round-8 values, while the wall all round it was relit: brighter to the left, where the pool moved to, and darker to the right, where it came from.
 
 **Measured** (my 720p s5 capture against round 8's, `raw8/add/A-720`):
 - The pixels left unchanged form a rectangle at screen x 662-712, y 25-57. Everything round it changed.
@@ -38,7 +38,7 @@ There are also three should-fix items: the new wall section hides 60% of the eng
 - It is new this round. Rounds 6 and 8 do not have it.
 
 **Fix** (deterministic, no new paint):
-- In `far9.py`, keep ratio 1 only on the fitting's own mask (body, diffuser, end caps, rods, canopies, from `fix1/luminaire/tools/design.py`), not on its bounding box.
+- In `far9.py` (`fix2/far/tools/far9.py` at ada83fa), keep ratio 1 only on the fitting's own mask (body, diffuser, end caps, rods, canopies, from `fix1/luminaire/tools/design.py`), not on its bounding box.
 - Feather that mask's edge over 2-3 plate px.
 - Fade the pool's gain smoothly upward above the diffuser's level (about plate y 229), the same inside and outside the old box. The wall above the fitting then dims evenly, with no frame round the source.
 
