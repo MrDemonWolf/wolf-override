@@ -1107,7 +1107,8 @@
     "name": "SENTRY PATROL LOG",
     "examine": "SENTRY / LANE PATROL\nMODE: LOCKDOWN. AUTHORITY: DIRECTOR.\nSTAND-DOWN CODE: NO RECORD.\nSTATUS: DOWN.",
     "wolf_notice_disclosed": "WOLF: Nobody could have called it off.",
-    "wolf_reaction_pressed": "WOLF looks toward the hatch and says nothing.",
+    "wolf_reaction_pressed": "WOLF looks toward the door and says nothing.",
+    "wolf_reaction_pressed_history": [{"text": "WOLF looks toward the hatch and says nothing.", "status": "approved 2026-10-09; reworded 2026-10-14 (\"Say door\": the junction exit is drawn as a sliding door; no other word changed)"}],
     "alternative_name": "SENTRY FAULT LOG",
     "alternative_examine": "SENTRY / FAULT\nSERVO WEAR: HIGH. SERVICE DUE.\nSERVICE DEFERRED: LOCKDOWN.\nSTATUS: DOWN / IMPACT."
    },

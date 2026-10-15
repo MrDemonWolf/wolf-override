@@ -1,5 +1,5 @@
 {
-  "status": "approved by Nathanial 2026-10-11 (all 123 lines, including the 9 added in round 2 and the 6 added in round 3); 2026-10-13: 24 lines reworded or split and 4 added through the October 13 wording drafts (items 1, 3, 4, 5, 6, 7), and 7 more given notes or superseded markers only; each reworded or split line keeps its earlier text in 'history'; 2026-10-14: 2 lines reworded and 2 added (the lines that put WOLF 'at the rubble', Draft A in the WOLF-space drafts), with their earlier text in 'history'",
+  "status": "approved by Nathanial 2026-10-11 (all 123 lines, including the 9 added in round 2 and the 6 added in round 3); 2026-10-13: 24 lines reworded or split and 4 added through the October 13 wording drafts (items 1, 3, 4, 5, 6, 7), and 7 more given notes or superseded markers only; each reworded or split line keeps its earlier text in 'history'; 2026-10-14: 2 lines reworded and 2 added (the lines that put WOLF 'at the rubble', Draft A in the WOLF-space drafts), with their earlier text in 'history'; 2026-10-14 (\"Say door\" and the container hint): 3 lines reworded and 9 added (the junction exit's lines say 'door', the tank's hit is two boxes, the Records exit hint names the container), with their earlier text in 'history'",
   "date": "2026-10-10",
   "source": "Logic audit of 2026-10-10 (327 real-game screenshots, 24 problems) and Nathanial's decisions A-D. Every string here is a proposal; nothing ships until Nathanial approves it.",
   "placeholders": {
@@ -1330,10 +1330,21 @@
       "trigger": "When the hatch art has actually opened.",
       "speaker": "NARRATION",
       "current": null,
-      "proposed": "The bolt arcs and drops. The hatch slides open.",
+      "proposed": "The bolt arcs and drops.\nThe door slides open.",
       "alternatives": [],
-      "notes": "Replaces BOLT_ARC's text at the moment the hatch is visibly open, so the line never shows over a closed hatch. Fit: 1 of 3 rows, untagged box (855 px text width, Roboto 17 px).",
-      "status": "approved by Nathanial 2026-10-11 (as drafted)"
+      "notes": "Replaces BOLT_ARC's text at the moment the hatch is visibly open, so the line never shows over a closed hatch. Fit: 1 of 3 rows, untagged box (855 px text width, Roboto 17 px). 2026-10-14: 'hatch' became 'door' (the exit is drawn as a sliding door) and the line is set on two rows of at most 42 characters (24 and 22).",
+      "status": "approved by Nathanial 2026-10-14 (\"Say door\": the junction's exit is drawn as a sliding door, so 'hatch' becomes 'door'; no other word changes)",
+      "history": [
+        {
+          "proposed": "The bolt arcs and drops. The hatch slides open.",
+          "alternatives": [],
+          "status": "approved by Nathanial 2026-10-11 (as drafted)"
+        }
+      ],
+      "approved": {
+        "date": "2026-10-14",
+        "source": "docs/decisions.md, \"Doors landed (October 14, 2026)\", decision (a) (\"Say door\")"
+      }
     },
     {
       "id": "JUNCTION_CLEARED_DEAD_END",
@@ -1742,12 +1753,29 @@
       "trigger": "The tank lands with the sentry inside the brackets but more than 8 px off the mark (the wreck shows to one side under the tank).",
       "speaker": "NARRATION",
       "current": "The tank comes down square and crushes the sentry flat. Its eyes go dark.\nWOLF: It's down. The bolt by the hatch is next.",
-      "proposed": "The tank catches the sentry off centre and pins it to the floor. Its eyes go dark.\nWOLF: It's down. The bolt by the hatch is next.",
+      "proposed": "The tank catches the sentry off centre and\npins it to the floor. Its eyes go dark.\n\nWOLF: It's down. The bolt by the door is next.",
       "alternatives": [
-        "The tank lands on the sentry's edge and pins it to the floor. Its eyes go dark.\nWOLF: It's down. The bolt by the hatch is next."
+        "The tank lands on the sentry's edge and pins it to the floor. Its eyes go dark.\nWOLF: It's down. The bolt by the door is next."
       ],
-      "notes": "Round 2 item 5: the 'square' line now plays only for a hit within 8 px of the mark; WOLF's row is unchanged. Fit: 2 of 3 rows, untagged box (855 px text width, Roboto 17 px); alt 1: 2 of 3 rows, untagged box (855 px text width, Roboto 17 px).",
-      "status": "approved by Nathanial 2026-10-11 (round 2, as drafted)"
+      "notes": "Round 2 item 5: the 'square' line now plays only for a hit within 8 px of the mark; WOLF's row is unchanged. Fit: 2 of 3 rows, untagged box (855 px text width, Roboto 17 px); alt 1: 2 of 3 rows, untagged box (855 px text width, Roboto 17 px). 2026-10-14: 'hatch' became 'door'; to keep one speaker a box and 2 rows of at most 42 characters, the narration (42 and 39 characters) and WOLF's row (40 after the tag) are now two boxes in order (main.gd TANK_HIT_OFF_CENTRE_LINE, then TANK_HIT_WOLF_LINE). No other word changed.",
+      "status": "approved by Nathanial 2026-10-14 (\"Say door\": the junction's exit is drawn as a sliding door, so 'hatch' becomes 'door'; no other word changes)",
+      "history": [
+        {
+          "proposed": "The tank catches the sentry off centre and pins it to the floor. Its eyes go dark.\nWOLF: It's down. The bolt by the hatch is next.",
+          "alternatives": [
+            "The tank lands on the sentry's edge and pins it to the floor. Its eyes go dark.\nWOLF: It's down. The bolt by the hatch is next."
+          ],
+          "status": "approved by Nathanial 2026-10-11 (round 2, as drafted)"
+        }
+      ],
+      "boxes": [
+        "The tank catches the sentry off centre and\npins it to the floor. Its eyes go dark.",
+        "WOLF: It's down. The bolt by the door is next."
+      ],
+      "approved": {
+        "date": "2026-10-14",
+        "source": "docs/decisions.md, \"Doors landed (October 14, 2026)\", decision (a) (\"Say door\")"
+      }
     },
     {
       "id": "RUBBLE_LINE_R2",
@@ -1978,13 +2006,231 @@
       "trigger": "Each invalid press in the Service Junction (item 5 table, rows 1-7).",
       "speaker": "NARRATION",
       "current": null,
-      "proposed": "Row 1 valve before the breaker: The valve is dead. Arm the breaker first.\nRow 1b valve after a trip: The vent let go and the breaker tripped. / Reset it by the entrance. (kept, two rows)\nRow 2 sealed door (USE, and the first bump): Sealed shut. Something hums behind it. / The valve beside it charges it.\nRow 3 breaker while the line builds: Already live. Crank the valve by the door.\nRow 3b breaker or valve while the fuse burns: Fuse lit. Get clear of the door. (kept)\nRow 4 used valve: No charge left. The door is down.\nRow 4b used breaker: No charge left. The door is down.\nRow 5 DROP too early: Wait. WOLF hasn't got it on the mark yet. (kept)\nRow 5b DROP while the tank winches up: Not yet. The tank is still going back up.\nRow 6 used release: The tank is down on the sentry. / The exit bolt is by the hatch. (kept, two rows)\nRow 7 exit before the sentry is down: Locked out until the sentry is down.\nRow 7b exit before the door is down (hand-made saves only): Bolted. The sealed door comes first.",
+      "proposed": "Row 1 valve before the breaker: The valve is dead. Arm the breaker first.\nRow 1b valve after a trip: The vent let go and the breaker tripped. / Reset it by the entrance. (kept, two rows)\nRow 2 sealed door (USE, and the first bump): Sealed shut. Something hums behind it. / The valve beside it charges it.\nRow 3 breaker while the line builds: Already live. Crank the valve by the door.\nRow 3b breaker or valve while the fuse burns: Fuse lit. Get clear of the door. (kept)\nRow 4 used valve: No charge left. The door is down.\nRow 4b used breaker: No charge left. The door is down.\nRow 5 DROP too early: Wait. WOLF hasn't got it on the mark yet. (kept)\nRow 5b DROP while the tank winches up: Not yet. The tank is still going back up.\nRow 6 used release: The tank is down on the sentry. / The exit bolt is by the door. (kept, two rows)\nRow 7 exit before the sentry is down: Locked out until the sentry is down.\nRow 7b exit before the door is down (hand-made saves only): Bolted. The sealed door comes first.",
       "alternatives": [],
-      "notes": "Feedback on every row: on the press frame the station's lamp flickers twice, a short dull clunk plays, the line shows as the status line in the dialogue box, and a repeated press re-shows it with one blink of the box. Walking into the sealed door: a thud, a stop and a lamp flicker, with the row 2 line on the first bump only. Rows 2, 3, 4, 4b, 5b, 7 and 7b are new wording; 1 shortens an approved line; 1b keeps its words on two rows.",
-      "status": "approved by Nathanial 2026-10-13 (item 5 (P0-15), rows 1-7; through clickable choices after reading the drafts)",
+      "notes": "Feedback on every row: on the press frame the station's lamp flickers twice, a short dull clunk plays, the line shows as the status line in the dialogue box, and a repeated press re-shows it with one blink of the box. Walking into the sealed door: a thud, a stop and a lamp flicker, with the row 2 line on the first bump only. Rows 2, 3, 4, 4b, 5b, 7 and 7b are new wording; 1 shortens an approved line; 1b keeps its words on two rows. 2026-10-14: row 6 says 'by the door' (Say door).",
+      "status": "approved by Nathanial 2026-10-14 (\"Say door\": the junction's exit is drawn as a sliding door, so 'hatch' becomes 'door'; no other word changes); rows 1-7 otherwise as approved 2026-10-13",
       "approved": {
-        "date": "2026-10-13",
-        "source": "docs/research-2026-10/how-it-should-play/drafts-2026-10-13.md, item 5 (P0-15), rows 1-7"
+        "date": "2026-10-14",
+        "source": "docs/decisions.md, \"Doors landed (October 14, 2026)\", decision (a) (\"Say door\"); rows 1-7 from docs/research-2026-10/how-it-should-play/drafts-2026-10-13.md, item 5 (P0-15)"
+      },
+      "history": [
+        {
+          "proposed": "Row 1 valve before the breaker: The valve is dead. Arm the breaker first.\nRow 1b valve after a trip: The vent let go and the breaker tripped. / Reset it by the entrance. (kept, two rows)\nRow 2 sealed door (USE, and the first bump): Sealed shut. Something hums behind it. / The valve beside it charges it.\nRow 3 breaker while the line builds: Already live. Crank the valve by the door.\nRow 3b breaker or valve while the fuse burns: Fuse lit. Get clear of the door. (kept)\nRow 4 used valve: No charge left. The door is down.\nRow 4b used breaker: No charge left. The door is down.\nRow 5 DROP too early: Wait. WOLF hasn't got it on the mark yet. (kept)\nRow 5b DROP while the tank winches up: Not yet. The tank is still going back up.\nRow 6 used release: The tank is down on the sentry. / The exit bolt is by the hatch. (kept, two rows)\nRow 7 exit before the sentry is down: Locked out until the sentry is down.\nRow 7b exit before the door is down (hand-made saves only): Bolted. The sealed door comes first.",
+          "alternatives": [],
+          "status": "approved by Nathanial 2026-10-13 (item 5 (P0-15), rows 1-7; through clickable choices after reading the drafts)"
+        }
+      ]
+    },
+    {
+      "id": "TANK_HIT_SQUARE",
+      "problem": "Say door",
+      "where": "apps/game/scripts/main.gd _tank_hit (TANK_HIT_LINE, then TANK_HIT_WOLF_LINE)",
+      "trigger": "The tank lands with the sentry within 8 px of the mark.",
+      "speaker": "NARRATION",
+      "current": "The tank comes down square and crushes the sentry flat. Its eyes go dark.\nWOLF: It's down. The bolt by the hatch is next.",
+      "proposed": "The tank comes down square and crushes\nthe sentry flat. Its eyes go dark.\n\nWOLF: It's down. The bolt by the door is next.",
+      "alternatives": [],
+      "notes": "The square hit's line (TANK_HIT_OFF_CENTRE's 'current'). 'hatch' became 'door'; the narration (38 and 33 characters) and WOLF's row (40 after the tag) are two boxes in order, one speaker a box. No other word changed.",
+      "status": "approved by Nathanial 2026-10-14 (\"Say door\": the junction's exit is drawn as a sliding door, so 'hatch' becomes 'door'; no other word changes)",
+      "history": [
+        {
+          "proposed": "The tank comes down square and crushes the sentry flat. Its eyes go dark.\nWOLF: It's down. The bolt by the hatch is next.",
+          "alternatives": [],
+          "status": "the game's text before 2026-10-14 (not drafted in this file)"
+        }
+      ],
+      "approved": {
+        "date": "2026-10-14",
+        "source": "docs/decisions.md, \"Doors landed (October 14, 2026)\", decision (a) (\"Say door\")"
+      },
+      "boxes": [
+        "The tank comes down square and crushes\nthe sentry flat. Its eyes go dark.",
+        "WOLF: It's down. The bolt by the door is next."
+      ]
+    },
+    {
+      "id": "EXIT_OPENING_HINT",
+      "problem": "Say door",
+      "where": "apps/game/scripts/main.gd HATCH_OPENING_HINT (_lane_hint)",
+      "trigger": "The bolt has dropped and the exit door is still sliding open.",
+      "speaker": "HINT",
+      "current": "The hatch is opening.",
+      "proposed": "The door is opening.",
+      "alternatives": [],
+      "notes": "Hint bar, one row.",
+      "status": "approved by Nathanial 2026-10-14 (\"Say door\": the junction's exit is drawn as a sliding door, so 'hatch' becomes 'door'; no other word changes)",
+      "history": [
+        {
+          "proposed": "The hatch is opening.",
+          "alternatives": [],
+          "status": "the game's text before 2026-10-14 (not drafted in this file)"
+        }
+      ],
+      "approved": {
+        "date": "2026-10-14",
+        "source": "docs/decisions.md, \"Doors landed (October 14, 2026)\", decision (a) (\"Say door\")"
+      }
+    },
+    {
+      "id": "EXIT_OPEN_HINT",
+      "problem": "Say door",
+      "where": "apps/game/scripts/main.gd _lane_hint",
+      "trigger": "The bolt has dropped and the exit door is open; the engineer is not yet at the door itself.",
+      "speaker": "HINT",
+      "current": "The hatch is open. Leave through it.",
+      "proposed": "The door is open. Leave through it.",
+      "alternatives": [],
+      "notes": "Hint bar, one row.",
+      "status": "approved by Nathanial 2026-10-14 (\"Say door\": the junction's exit is drawn as a sliding door, so 'hatch' becomes 'door'; no other word changes)",
+      "history": [
+        {
+          "proposed": "The hatch is open. Leave through it.",
+          "alternatives": [],
+          "status": "the game's text before 2026-10-14 (not drafted in this file)"
+        }
+      ],
+      "approved": {
+        "date": "2026-10-14",
+        "source": "docs/decisions.md, \"Doors landed (October 14, 2026)\", decision (a) (\"Say door\")"
+      }
+    },
+    {
+      "id": "EXIT_LEAVE_HINT",
+      "problem": "Say door",
+      "where": "apps/game/scripts/main.gd _lane_hint",
+      "trigger": "At the open exit door (from JunctionRoom.HATCH_REACH_MIN_X), where USE leaves.",
+      "speaker": "HINT",
+      "current": "E: leave through the hatch.",
+      "proposed": "E: leave through the door.",
+      "alternatives": [],
+      "notes": "Hint bar, one row; 'E' is the shown key or Tap USE.",
+      "status": "approved by Nathanial 2026-10-14 (\"Say door\": the junction's exit is drawn as a sliding door, so 'hatch' becomes 'door'; no other word changes)",
+      "history": [
+        {
+          "proposed": "E: leave through the hatch.",
+          "alternatives": [],
+          "status": "the game's text before 2026-10-14 (not drafted in this file)"
+        }
+      ],
+      "approved": {
+        "date": "2026-10-14",
+        "source": "docs/decisions.md, \"Doors landed (October 14, 2026)\", decision (a) (\"Say door\")"
+      }
+    },
+    {
+      "id": "EXIT_CLEARED_HINT",
+      "problem": "Say door",
+      "where": "apps/game/scripts/main.gd _lane_hint (junction_cleared)",
+      "trigger": "A cleared junction (the line JUNCTION_CLEARED_DEAD_END's notes named).",
+      "speaker": "HINT",
+      "current": "The hatch is open.",
+      "proposed": "The door is open.",
+      "alternatives": [],
+      "notes": "Hint bar, one row.",
+      "status": "approved by Nathanial 2026-10-14 (\"Say door\": the junction's exit is drawn as a sliding door, so 'hatch' becomes 'door'; no other word changes)",
+      "history": [
+        {
+          "proposed": "The hatch is open.",
+          "alternatives": [],
+          "status": "the game's text before 2026-10-14 (not drafted in this file)"
+        }
+      ],
+      "approved": {
+        "date": "2026-10-14",
+        "source": "docs/decisions.md, \"Doors landed (October 14, 2026)\", decision (a) (\"Say door\")"
+      }
+    },
+    {
+      "id": "BOLT_HINT_SENTRY_DOWN",
+      "problem": "Say door",
+      "where": "apps/game/scripts/main.gd _lane_hint",
+      "trigger": "The sentry is down and the engineer is away from the exit bolt.",
+      "speaker": "HINT",
+      "current": "The sentry is down. Pop the exit bolt by the hatch.",
+      "proposed": "The sentry is down. Pop the exit bolt by the door.",
+      "alternatives": [],
+      "notes": "Hint bar, one row.",
+      "status": "approved by Nathanial 2026-10-14 (\"Say door\": the junction's exit is drawn as a sliding door, so 'hatch' becomes 'door'; no other word changes)",
+      "history": [
+        {
+          "proposed": "The sentry is down. Pop the exit bolt by the hatch.",
+          "alternatives": [],
+          "status": "the game's text before 2026-10-14 (not drafted in this file)"
+        }
+      ],
+      "approved": {
+        "date": "2026-10-14",
+        "source": "docs/decisions.md, \"Doors landed (October 14, 2026)\", decision (a) (\"Say door\")"
+      }
+    },
+    {
+      "id": "RESTORE_C_LINE",
+      "problem": "Say door",
+      "where": "apps/game/scripts/main.gd _sync_scene restore line (sentry down)",
+      "trigger": "Continue from autosave C.",
+      "speaker": "NARRATION",
+      "current": "Service junction restored. The sentry is down; pop the exit bolt by the hatch.",
+      "proposed": "Service junction restored. The sentry\nis down; pop the exit bolt by the door.",
+      "alternatives": [],
+      "notes": "'hatch' became 'door'; set on two rows of at most 42 characters (37 and 39).",
+      "status": "approved by Nathanial 2026-10-14 (\"Say door\": the junction's exit is drawn as a sliding door, so 'hatch' becomes 'door'; no other word changes)",
+      "history": [
+        {
+          "proposed": "Service junction restored. The sentry is down; pop the exit bolt by the hatch.",
+          "alternatives": [],
+          "status": "the game's text before 2026-10-14 (not drafted in this file)"
+        }
+      ],
+      "approved": {
+        "date": "2026-10-14",
+        "source": "docs/decisions.md, \"Doors landed (October 14, 2026)\", decision (a) (\"Say door\")"
+      }
+    },
+    {
+      "id": "NO_STATION_BOLT_LINE",
+      "problem": "Say door",
+      "where": "apps/game/scripts/main.gd _interact_junction (sentry down, no station in reach)",
+      "trigger": "USE away from every station once the sentry is down.",
+      "speaker": "NARRATION",
+      "current": "No station in reach. The exit bolt is by the hatch.",
+      "proposed": "No station in reach. The exit bolt is\nby the door.",
+      "alternatives": [],
+      "notes": "'hatch' became 'door'; set on two rows like the TANK RELEASE line beside it (37 and 12 characters).",
+      "status": "approved by Nathanial 2026-10-14 (\"Say door\": the junction's exit is drawn as a sliding door, so 'hatch' becomes 'door'; no other word changes)",
+      "history": [
+        {
+          "proposed": "No station in reach. The exit bolt is by the hatch.",
+          "alternatives": [],
+          "status": "the game's text before 2026-10-14 (not drafted in this file)"
+        }
+      ],
+      "approved": {
+        "date": "2026-10-14",
+        "source": "docs/decisions.md, \"Doors landed (October 14, 2026)\", decision (a) (\"Say door\")"
+      }
+    },
+    {
+      "id": "RECORDS_SECURE_HINT",
+      "problem": "Say door",
+      "where": "apps/game/scripts/main.gd _context_hint (Records, both traces copied, at the security container and the exit)",
+      "trigger": "At the Records exit with both traces copied, standing at the security container where the first copy is secured.",
+      "speaker": "HINT",
+      "current": "E: secure the first copy.",
+      "proposed": "E: secure the first copy in the container.",
+      "alternatives": [],
+      "notes": "The hint names the drawn security container beside the exit (Nathanial's decision (b) of 2026-10-14). Hint bar, one row of 42 characters.",
+      "status": "approved by Nathanial 2026-10-14 (decision (b): a hint naming the drawn container)",
+      "history": [
+        {
+          "proposed": "E: secure the first copy.",
+          "alternatives": [],
+          "status": "the game's text before 2026-10-14 (not drafted in this file)"
+        }
+      ],
+      "approved": {
+        "date": "2026-10-14",
+        "source": "docs/decisions.md, \"Doors landed (October 14, 2026)\", decision (b)"
       }
     },
     {
