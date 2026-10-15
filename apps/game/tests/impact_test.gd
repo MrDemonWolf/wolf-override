@@ -313,8 +313,6 @@ func _wait_until(condition: Callable, frames: int) -> bool:
 			return true
 	return false
 
-## RETRY on the knockdown card (Q17): waits until the card takes it (Main.RETRY_READY_SECONDS after the
-## hit), presses interact once, and waits until the room has faded back in with the controls back.
 
 ## Q17 (Cold Still timing, October 14, 2026), the same on the first knockdown and every repeat: the card
 ## takes RETRY at 0.9 s and not before, holds until it is pressed, and a press at once has control back
@@ -369,6 +367,8 @@ func _check_retry_timing(game: Node, context: String) -> void:
 	_expect(is_equal_approx(MainScript.RETRY_READY_SECONDS + MainScript.RETRY_FADE_OUT_SECONDS + MainScript.RETRY_FADE_IN_SECONDS, 1.5), "%s: 0.9 s + 0.25 s fade out + 0.35 s fade in = 1.5 s" % context)
 
 
+## RETRY on the knockdown card (Q17): waits until the card takes it (Main.RETRY_READY_SECONDS after the
+## hit), presses interact once, and waits until the room has faded back in with the controls back.
 func _retry(game: Node, frames: int) -> bool:
 	if not await _wait_until(func() -> bool: return bool(game.call("_retry_ready")), frames):
 		return false
