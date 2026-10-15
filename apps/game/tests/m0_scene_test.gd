@@ -4,6 +4,18 @@ const GAME_SCENE: PackedScene = preload("res://scenes/main.tscn")
 const State = preload("res://scripts/m0_state.gd")
 
 var failures: int = 0
+## The MANUAL BYPASS wheel's rim (tube centre line) in its atlas region, measured from the art's
+## alpha and luma profile: 37.5 atlas px, so 9.375 world px at BypassHandle.WHEEL_SCALE.
+const WHEEL_RIM_ATLAS_RADIUS: float = 37.5
+## The crank pose's grips (clock degrees, clockwise from 12): frame A holds the rim at 8 o'clock
+## (the far glove) and 10 o'clock (the near glove); frame B has turned both an eighth of a turn with
+## the wheel, to about half past 9 and half past 11.
+const CRANK_GRIP_CLOCK: PackedFloat32Array = [240.0, 285.0]
+const CRANK_NEAR_GRIP_CLOCK: PackedFloat32Array = [300.0, 345.0]
+## The crank art's glove: dark, neutral, opaque pixels within this many atlas px of the grip.
+const CRANK_GLOVE_SEARCH: int = 16
+## The crank frames' atlas, read once.
+var crank_image: Image
 
 
 func _initialize() -> void:
@@ -244,11 +256,27 @@ func _run() -> void:
 	var seal_leaf: SealLeaf = game.get("seal_leaf") as SealLeaf
 	await create_timer(0.45).timeout
 	_expect(seal_leaf.visible and seal_leaf.open > 0.05 and seal_leaf.open < 0.95 and not door_shape.disabled and wolf.autonomous_target_x == Main.RELAY_CONTACT_X and absf(wolf.position.x - Main.RELAY_CONTACT_X) <= 4.0, "half way the seal's leaf is rising into the header, the doorway is still shut and WOLF still holds the contact")
-	if not _require(await _wait_until(func() -> bool: return not game.get("seal_opening"), 90), "the seal finishes opening"):
+	# The inner blast leaf behind the roller moves on the seal's one open value (no timing of its
+	# own), and the doorway stays shut while any of the leaf is still in the opening.
+	var blast_leaf: BlastLeaf = game.get("blast_leaf") as BlastLeaf
+	_expect(blast_leaf.visible and is_equal_approx(blast_leaf.open, seal_leaf.open), "half way the inner blast leaf shows behind the roller, on the roller's own open value")
+	var leaf_track: Dictionary = {"in_step": true, "blocked": true, "frames": 0}
+	var landed: bool = await _wait_until(func() -> bool:
+		if game.get("seal_opening"):
+			leaf_track["frames"] = int(leaf_track["frames"]) + 1
+			if not is_equal_approx(blast_leaf.open, seal_leaf.open):
+				leaf_track["in_step"] = false
+			if BlastLeaf.lead_at(blast_leaf.open) < BlastLeaf.A_MOUTH - 0.0001 and door_shape.disabled:
+				leaf_track["blocked"] = false
+		return not game.get("seal_opening"), 90)
+	if not _require(landed, "the seal finishes opening"):
 		return
+	print("blast leaf: %d sliding frames sampled, in step %s, doorway blocked while in the opening %s" % [int(leaf_track["frames"]), leaf_track["in_step"], leaf_track["blocked"]])
+	_expect(bool(leaf_track["in_step"]) and bool(leaf_track["blocked"]) and int(leaf_track["frames"]) > 0, "while the seal opens the inner leaf keeps the roller's open value and the doorway stays shut until the leaf is in its pocket (%d frames)" % int(leaf_track["frames"]))
 	await physics_frame
 	var door_visual: ColorRect = game.get_node("Door/Visual") as ColorRect
 	_expect(not door_visual.visible and not seal_leaf.visible and door_shape.disabled, "door retracts after cooperation and the doorway opens once it lands")
+	_expect(not blast_leaf.visible and is_equal_approx(blast_leaf.open, 1.0) and BlastLeaf.lead_at(blast_leaf.open) >= BlastLeaf.A_MOUTH - 0.0001, "once open the inner leaf is home in its wall pocket, out of the walk path (the wall art shows its parked edge)")
 	_expect(str(game.call("_context_hint")).contains("Move to the safe point") and wolf.follow_target == human, "once the seal has landed the hint says it is open and WOLF lets go of the contact")
 	_expect((game.get("door_open_art") as Sprite2D).visible and (game.get("door_lip") as Sprite2D).visible and (game.get("door_lip") as Sprite2D).z_index > human.z_index, "the bulkhead stands open behind the engineer, its front pillar drawn over him")
 	# The corridor's near column is solid (it never fades and nothing is drawn over it), and slim:
@@ -318,6 +346,29 @@ func _run() -> void:
 		return
 	_expect(game.call("_objective") == "SAFE POINT REACHED", "checkpoint closes the first scene")
 	_expect(str(game.get("status_line")).contains(State.CHOICE_TEXT[State.DISCLOSE]), "cooperative checkpoint displays the selected choice")
+	# While the safe point's lines are up WOLF comes to the open doorway (Nathanial's decision of
+	# 2026-10-14) and stands there facing the engineer, both wholly in view: his head in the opening,
+	# his drawn body clear of every floor machine (the relay, the breaker, the safe point's station),
+	# of the doorway's near column (drawn in front of the actors) and of the engineer, inside the
+	# camera's view. The only span he stands in front of is the MANUAL BYPASS, whose gearbox is bolted
+	# to the back wall behind the walkway.
+	var doorway_x: float = float((game.get_script() as Script).get_script_constant_map()["WOLF_DOORWAY_X"])
+	_expect(await _wait_until(func() -> bool: return absf(wolf.position.x - doorway_x) <= 2.0, 240), "at the safe point WOLF walks up to the open doorway (x %.0f)" % wolf.position.x)
+	var wolf_left: float = wolf.position.x - M0Actor.WOLF_REACH + M0Actor.AVOID_TOLERANCE
+	var wolf_right: float = wolf.position.x + M0Actor.WOLF_REACH - M0Actor.AVOID_TOLERANCE
+	var wolf_clear: bool = true
+	var bypass_x: float = (main_constants_safe(game)["BYPASS_WHEEL"] as Vector2).x
+	for span: Vector2 in game.call("_machine_spans") as Array:
+		if absf((span.x + span.y) * 0.5 - bypass_x) < 0.5:
+			continue
+		if wolf_right > span.x and wolf_left < span.y:
+			wolf_clear = false
+	_expect(wolf.position.x + M0Actor.WOLF_REACH >= float(main_constants_safe(game)["CORRIDOR_DOOR_LEFT_X"]) and wolf.position.x - M0Actor.WOLF_REACH + M0Actor.AVOID_TOLERANCE >= BypassHandle.RELIEF_OUTLET.x, "in the doorway WOLF's head is past the curtain's line, in the opening, and his tail is clear of the relay's relief tailpipe (x %.1f)" % wolf.position.x)
+	var column_left: float = column.get_global_transform().origin.x
+	var safe_cam: Camera2D = game.get_node("IntroCamera") as Camera2D
+	var safe_half_view: float = 480.0 / safe_cam.zoom.x
+	var safe_view_x: float = safe_cam.get_screen_center_position().x
+	_expect(wolf_clear and wolf.position.x + M0Actor.WOLF_REACH < column_left and absf(human.position.x - wolf.position.x) >= M0Actor.CLEAR_GAP and wolf.position.x - M0Actor.WOLF_REACH >= safe_view_x - safe_half_view and human.position.x + M0Actor.HUMAN_REACH <= safe_view_x + safe_half_view and not wolf.body_sprite.flip_h, "at the safe point WOLF and the engineer are both wholly in view: WOLF at %.0f clear of the machines, the near column (from %.1f) and the engineer at %.0f" % [wolf.position.x, column_left, human.position.x])
 	var saved: Dictionary = state.to_dict()
 	game.call("_new_game")
 	await _tap(&"pause_game")
@@ -403,8 +454,16 @@ func _run() -> void:
 	_expect(wolf.autonomous_target_x == wolf_clear_x, "after his refusal WOLF stands off the live relay while the engineer works the bypass")
 	var crank_start: int = Time.get_ticks_msec()
 	Input.action_press(&"interact")
-	var halfway: bool = await _wait_until(func() -> bool: return int(game.get("bypass_ticks")) >= 4, 150)
+	# Every frame of the crank: the engineer shows the crank pose, and its glove is on the wheel's rim.
+	var grip: Dictionary = {"frames": [0, 0], "usual": 0, "lead_in": 0, "worst_rim": 0.0, "worst_grip": 0.0, "found": true}
+	var halfway: bool = await _wait_until(func() -> bool:
+		_sample_crank_grip(game, human, bypass_handle, grip)
+		return int(game.get("bypass_ticks")) >= 4, 150)
 	Input.action_release(&"interact")
+	var grip_frames: Array = grip["frames"] as Array
+	print("crank grip: A %d, B %d, usual %d frames (lead-in %d); worst %.2f world px off the rim line, %.2f from the grip point" % [int(grip_frames[0]), int(grip_frames[1]), int(grip["usual"]), int(grip["lead_in"]), float(grip["worst_rim"]), float(grip["worst_grip"])])
+	_expect(int(grip_frames[0]) > 0 and int(grip_frames[1]) > 0 and int(grip["usual"]) == 0 and int(grip["lead_in"]) <= 6, "cranking shows the crank pose: A (grip) and B (push) frames, %d and %d, no usual-sprite frame once it starts (%d) and at most 6 physics frames of lead-in (%d)" % [int(grip_frames[0]), int(grip_frames[1]), int(grip["usual"]), int(grip["lead_in"])])
+	_expect(bool(grip["found"]) and float(grip["worst_rim"]) <= 1.5 and float(grip["worst_grip"]) <= 2.5, "in every crank frame both gloves are on the wheel's rim (worst %.2f world px off the rim line, %.2f from the grip point)" % [float(grip["worst_rim"]), float(grip["worst_grip"])])
 	_expect(halfway and str(game.get("status_line")) == "Halfway. The hiss gets louder; the alarm keeps wailing." and bypass_handle.ticks == int(game.get("bypass_ticks")), "half way through the crank the hiss gets louder and the handle shows the count")
 	_expect(absf(wolf.position.x - wolf_clear_x) <= 3.0 and wolf.position.x + M0Actor.WOLF_REACH < float(main_constants["RELAY_X"]) - 20.0 and not wolf.body_sprite.flip_h, "WOLF is off the relay's housing, facing the engineer at the bypass")
 	# Wait for the game's own frame to see the release. process_frame fires before nodes process, and a
@@ -569,6 +628,62 @@ func _widest_line(label: Label) -> float:
 	return widest
 
 
+## One frame of the crank: which pose shows, and where the crank art's glove is against the wheel's
+## rim. The glove is the centroid of the frame's dark, neutral, opaque pixels near its grip point,
+## taken back to the world through the sprite's own transform.
+func _sample_crank_grip(game: Node2D, human: M0Actor, handle: BypassHandle, grip: Dictionary) -> void:
+	var frame: int = int(game.get("crank_frame"))
+	if frame < 0:
+		# Samples run on physics frames and the pose changes in _process: under load a few physics
+		# steps can run between the press and its first _process, so the usual sprite before the first
+		# crank frame is input latency (counted as lead-in, bounded), not a pop while cranking.
+		if int((grip["frames"] as Array)[0]) + int((grip["frames"] as Array)[1]) == 0:
+			grip["lead_in"] = int(grip["lead_in"]) + 1
+		else:
+			grip["usual"] = int(grip["usual"]) + 1
+		return
+	(grip["frames"] as Array)[frame] = int((grip["frames"] as Array)[frame]) + 1
+	var sprite: Sprite2D = human.body_sprite
+	if crank_image == null:
+		crank_image = sprite.texture.get_image()
+		if crank_image.is_compressed():
+			crank_image.decompress()
+	for clocks: PackedFloat32Array in [CRANK_GRIP_CLOCK, CRANK_NEAR_GRIP_CLOCK]:
+		_sample_glove(sprite, handle, clocks[frame], grip)
+
+
+## One glove against its rim point: the centroid of the crank art's dark, neutral, opaque pixels near
+## the grip point, taken back to the world through the sprite's own transform.
+func _sample_glove(sprite: Sprite2D, handle: BypassHandle, clock_deg: float, grip: Dictionary) -> void:
+	var hub: Vector2 = handle.global_position + BypassHandle.WHEEL_OFFSET
+	var rim: float = WHEEL_RIM_ATLAS_RADIUS * BypassHandle.WHEEL_SCALE
+	var clock: float = deg_to_rad(clock_deg)
+	var target: Vector2 = hub + rim * Vector2(sin(clock), -cos(clock))
+	var to_world: Transform2D = sprite.get_global_transform()
+	var region: Rect2 = sprite.region_rect
+	var origin: Vector2 = region.position + region.size * 0.5 + sprite.offset * -1.0
+	var centre: Vector2 = to_world.affine_inverse() * target + origin
+	var total: Vector2 = Vector2.ZERO
+	var count: int = 0
+	for y: int in range(int(centre.y) - CRANK_GLOVE_SEARCH, int(centre.y) + CRANK_GLOVE_SEARCH + 1):
+		for x: int in range(int(centre.x) - CRANK_GLOVE_SEARCH, int(centre.x) + CRANK_GLOVE_SEARCH + 1):
+			if x < region.position.x or y < region.position.y or x >= region.end.x or y >= region.end.y:
+				continue
+			if Vector2(x, y).distance_to(centre) > CRANK_GLOVE_SEARCH:
+				continue
+			var c: Color = crank_image.get_pixel(x, y)
+			var high: float = maxf(c.r, maxf(c.g, c.b))
+			if c.a >= 0.98 and high < 110.0 / 255.0 and high - minf(c.r, minf(c.g, c.b)) < 30.0 / 255.0:
+				total += Vector2(x, y)
+				count += 1
+	if count < 10:
+		grip["found"] = false
+		return
+	var glove: Vector2 = to_world * (total / count + Vector2(0.5, 0.5) - origin)
+	grip["worst_rim"] = maxf(float(grip["worst_rim"]), absf(glove.distance_to(hub) - rim))
+	grip["worst_grip"] = maxf(float(grip["worst_grip"]), glove.distance_to(target))
+
+
 func _wait_until(condition: Callable, frames: int) -> bool:
 	for _frame in range(frames):
 		await physics_frame
@@ -601,3 +716,8 @@ func _require(condition: bool, label: String) -> bool:
 	if not condition:
 		quit(1)
 	return condition
+
+
+## Main's script constants (for checks that run where no local copy of them is kept).
+func main_constants_safe(game: Node2D) -> Dictionary:
+	return (game.get_script() as Script).get_script_constant_map()

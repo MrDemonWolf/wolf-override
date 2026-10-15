@@ -35,6 +35,18 @@ const BYPASS_CRANK_X: float = BYPASS_WHEEL.x - 26.0
 ## x 388) even as he pulls back refusing (_react_as_wolf), and his snout stops well short of the relay,
 ## so taking the contact is a step he is seen to make.
 const WOLF_BYPASS_CLEAR_X: float = 462.0
+## Nathanial's decision of 2026-10-14 ("WOLF comes to the doorway"): once the seal is open and the
+## engineer has gone through it to the safe point, WOLF walks up and stands in the open doorway,
+## facing them, while "We made it." is said. His head and forelegs are in the opening, past where the
+## curtain crosses the walk line; his snout (M0Actor.WOLF_SNOUT) stops short of the near column (drawn
+## over the actors from x 785) and his tail (M0Actor.WOLF_TAIL) clear of the relay's housing (to
+## 648.1) and its relief tailpipe, with a clear gap to the engineer. The MANUAL BYPASS gearbox is
+## bolted to the back wall behind the walkway, so he stands in front of it. wolf_space_test measures
+## the spot against the door end as drawn.
+const WOLF_DOORWAY_X: float = 716.0
+## WOLF holds the doorway while the engineer is at least a clear gap (M0Actor.CLEAR_GAP) right of it,
+## so their two bodies never overlap; nearer, he follows no further than the relay's left side again.
+const WOLF_DOORWAY_HOLD_X: float = WOLF_DOORWAY_X + M0Actor.CLEAR_GAP
 ## Held-USE ticks the bypass takes (BypassHandle.TICK_SECONDS each, 2 s in all).
 const BYPASS_TICKS: int = BypassHandle.TICKS_NEEDED
 ## While the bypass vents coolant its alarm sounds this often.
@@ -1291,6 +1303,9 @@ func _tick_corridor(delta: float, held_ticks: int) -> void:
 		_update_controls()
 	if wolf.autonomous_target_x == WOLF_BYPASS_CLEAR_X and absf(wolf.position.x - WOLF_BYPASS_CLEAR_X) <= 2.0:
 		# Standing off the relay he still faces the engineer at the bypass.
+		wolf.body_sprite.flip_h = false
+	elif wolf.autonomous_target_x == WOLF_DOORWAY_X and absf(wolf.position.x - WOLF_DOORWAY_X) <= 2.0:
+		# In the doorway he faces the engineer at the safe point.
 		wolf.body_sprite.flip_h = false
 	if status_line != shown_line:
 		shown_line = status_line
@@ -3841,6 +3856,8 @@ func _wolf_target_x() -> float:
 		return WOLF_HATCH_EXIT_X
 	if wolf_heading_to_relay or wolf_holding_relay:
 		return RELAY_CONTACT_X
+	if _wolf_comes_to_doorway():
+		return WOLF_DOORWAY_X
 	if _wolf_off_relay():
 		return WOLF_BYPASS_CLEAR_X
 	match state.chapter_id:
@@ -3891,6 +3908,12 @@ func _wolf_rubble_x() -> float:
 	if wolf.autonomous_target_x == JunctionRoom.WOLF_RUBBLE_X:
 		return JunctionRoom.WOLF_CLEAR_X if gap < M0Actor.CLEAR_GAP - WOLF_RUBBLE_HYSTERESIS else JunctionRoom.WOLF_RUBBLE_X
 	return JunctionRoom.WOLF_CLEAR_X if gap < M0Actor.CLEAR_GAP + WOLF_RUBBLE_HYSTERESIS else JunctionRoom.WOLF_RUBBLE_X
+
+
+## The seal is open and the engineer has gone through it to the safe point: WOLF comes to the open
+## doorway and stands there, facing them (WOLF_DOORWAY_X).
+func _wolf_comes_to_doorway() -> bool:
+	return state.chapter_id == "lockdown" and state.door_open and not seal_opening and human.position.x >= WOLF_DOORWAY_HOLD_X
 
 
 ## WOLF keeps off the live relay, back towards the breaker: once he has refused it, or while the

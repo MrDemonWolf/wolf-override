@@ -19,6 +19,13 @@ extends SceneTree
 const GAME_SCENE: PackedScene = preload("res://scenes/main.tscn")
 const WOLF_ART: String = "res://assets/wolf-side-right-provisional.png"
 const TOUCH: float = 0.5
+## The corridor's door-end pieces measured in depth, not along x, while WOLF stands in the open
+## doorway (_check_doorway): the frame (far guide, hood, operator) and the wall-mounted MANUAL BYPASS
+## stand behind the walk line.
+const DOORWAY_BY_DEPTH: Array[String] = ["the seal frame", "the MANUAL BYPASS"]
+## The door-end pieces drawn over the actors (always opaque): standing in the doorway, none of them
+## may hide any of WOLF.
+const DRAWN_OVER_ACTORS: Array[String] = ["CorridorDoorFront", "CorridorSealStub", "CorridorSealCamera", "SealLamp"]
 ## Frames WOLF is given to reach a spot and stop (his longest walk, the length of a room, takes ~260).
 const SETTLE_FRAMES: int = 600
 
@@ -124,7 +131,10 @@ func _corridor(game: Main, actions: DebugActions, relay: StringName) -> void:
 
 ## After the seal lands: WOLF lets go of his spot and follows, but no further than the relay's left
 ## side, so he never stands in the MANUAL BYPASS or the seal's frame, while the engineer waits by the
-## seal, walks to the safe point and saves there. At rest he faces the engineer.
+## seal. Once they have gone through to the safe point he comes to the open doorway and stands there,
+## facing them, while they save (Nathanial's decision of 2026-10-14, "WOLF comes to the doorway"); the
+## spot is measured against the door end as drawn (_check_doorway). Should they step back into the
+## doorway, he leaves it to them.
 func _safe_point(game: Main, relay: StringName) -> void:
 	var facing: bool = game.wolf.body_sprite.flip_h
 	_require(await _wait_until(func() -> bool: return not game.seal_opening, 240), "%s: the seal finishes opening" % relay)
@@ -141,18 +151,21 @@ func _safe_point(game: Main, relay: StringName) -> void:
 	await _check_rest(game, "%s: corridor, the seal open and the engineer by it (WOLF %s)" % [relay, game.debug_wolf_why()], false)
 	_require(await _walk_to(game.human, 830.0), "%s: the engineer walks to the safe point" % relay)
 	await _settle(game)
-	_expect(game.wolf.follow_target == game.human and absf(game.wolf.position.x - Main.WOLF_FOLLOW_OPEN_MAX_X) <= 2.5, "%s: WOLF waits on the relay's left while the engineer is at the safe point (x %.1f)" % [relay, game.wolf.position.x])
-	_expect(not game.wolf.body_sprite.flip_h, "%s: waiting there he faces the engineer" % relay)
-	await _check_rest(game, "%s: corridor, the engineer at the safe point" % relay, false)
+	_expect(game.wolf.autonomous_target_x == Main.WOLF_DOORWAY_X and absf(game.wolf.position.x - Main.WOLF_DOORWAY_X) <= 2.5, "%s: WOLF comes to the open doorway while the engineer is at the safe point (x %.1f)" % [relay, game.wolf.position.x])
+	_expect(not game.wolf.body_sprite.flip_h and game.human.position.x > game.wolf.position.x, "%s: in the doorway he faces the engineer" % relay)
+	await _check_rest(game, "%s: corridor, WOLF in the doorway with the engineer at the safe point" % relay, true, true)
 	await _tap(&"interact")
 	_require(game.state.checkpoint_reached and game.state.chapter_id == "lockdown", "%s: the safe point saves" % relay)
 	await _tap_frames(&"move_left", 4)
-	# He takes the engineer's other side only after the turn has held for TURN_SETTLE_SECONDS; check
-	# once it has, so the facing rule is tested against the side he would now choose.
-	_expect(await _wait_until(func() -> bool: return game.wolf.follow_side > 0, 60), "%s: once the engineer's turn holds, WOLF's follow side is their right (side %d)" % [relay, game.wolf.follow_side])
+	await _frames(int(M0Actor.TURN_SETTLE_SECONDS * 60.0) + 10)
 	await _settle(game)
-	_expect(absf(game.wolf.position.x - Main.WOLF_FOLLOW_OPEN_MAX_X) <= 2.5 and not game.wolf.body_sprite.flip_h, "%s: the engineer turning round at the safe point leaves WOLF where he is, facing them (x %.1f)" % [relay, game.wolf.position.x])
-	await _check_rest(game, "%s: corridor, saved at the safe point" % relay, false)
+	_expect(absf(game.wolf.position.x - Main.WOLF_DOORWAY_X) <= 2.5 and not game.wolf.body_sprite.flip_h, "%s: the engineer turning round at the safe point leaves WOLF in the doorway, facing them (x %.1f)" % [relay, game.wolf.position.x])
+	await _check_rest(game, "%s: corridor, saved, WOLF in the doorway" % relay, true, true)
+	# Back into the doorway, the engineer would stand where he does: he gives it up and follows again.
+	_require(await _walk_to(game.human, Main.WOLF_DOORWAY_HOLD_X - 30.0), "%s: the engineer steps back into the doorway" % relay)
+	await _settle(game)
+	_expect(game.wolf.autonomous_target_x != Main.WOLF_DOORWAY_X and game.wolf.position.x <= Main.WOLF_FOLLOW_OPEN_MAX_X + 2.5, "%s: with the engineer back in the doorway WOLF leaves it to them and waits on the relay's left (x %.1f)" % [relay, game.wolf.position.x])
+	await _check_rest(game, "%s: corridor, the engineer back in the doorway" % relay, false)
 
 
 ## Records on one mirror answer: WOLF at the mirror port on entry, there while the engineer chooses,
@@ -295,16 +308,151 @@ func _break_off(game: Main, actions: DebugActions) -> void:
 
 ## WOLF at rest: his painted body against every station, door frame and the engineer. With
 ## [param own_spot] he must be on one of his authored spots, not following.
-func _check_rest(game: Main, label: String, own_spot: bool = true) -> void:
+## In the corridor's open doorway ([param doorway]) the door end's pieces are measured in depth
+## instead of along x (_check_doorway): he stands in front of the far jamb, the inner leaf's parked
+## edge and the wall-mounted MANUAL BYPASS, which are all behind the walk line.
+func _check_rest(game: Main, label: String, own_spot: bool = true, doorway: bool = false) -> void:
 	await physics_frame
 	checked.append(label)
 	if own_spot:
 		_expect(game.wolf.autonomous_target_x >= 0.0, "%s: WOLF is on a spot of his own (%s)" % [label, game.debug_wolf_why()])
 	var wolf_span: Vector2 = _painted_span(game.wolf.body_sprite)
+	if doorway:
+		_check_doorway(game, label, wolf_span)
 	for item: Array in _obstacles(game):
+		if doorway and item[0] in DOORWAY_BY_DEPTH:
+			continue
 		var span: Vector2 = item[1]
 		var overlap: float = minf(wolf_span.y, span.y) - maxf(wolf_span.x, span.x)
 		_expect(overlap <= TOUCH, "%s: WOLF (x %.1f, painted %.1f..%.1f) stands clear of %s (%.1f..%.1f), overlap %.1f px" % [label, game.wolf.position.x, wolf_span.x, wolf_span.y, item[0], span.x, span.y, overlap])
+
+
+## WOLF in the corridor's open doorway, measured against the door end as drawn (Nathanial's decision
+## of 2026-10-14): his head is in the opening, past where the shut curtain crosses the walk line; no
+## piece drawn over the actors (the near column with its jamb plate, the cut section, the camera, the
+## status lamp) hides any of his painted pixels, so he is wholly in view; the walk line crosses the
+## cross-wall inside its opening, between the near jamb's receiver and the inner leaf's pocket, and
+## the inner leaf is parked in its pocket behind the walk line, so he stands between the jambs and in
+## front of the parked leaf, not in either; the frame, the far column's jamb plate (painted into the
+## wall piece) and the MANUAL BYPASS on the back wall are drawn behind him and stand behind the walk
+## line or above the floor; and he is inside the camera's view.
+func _check_doorway(game: Main, label: String, wolf_span: Vector2) -> void:
+	var wolf_sprite: Sprite2D = game.wolf.body_sprite
+	_expect(wolf_span.y > Main.CORRIDOR_DOOR_LEFT_X, "%s: WOLF's head is in the opening (snout at %.1f, past the curtain's walk-line crossing at %.1f)" % [label, wolf_span.y, Main.CORRIDOR_DOOR_LEFT_X])
+	var covers: Array[Sprite2D] = []
+	for node_name: String in DRAWN_OVER_ACTORS:
+		var piece: Sprite2D = game.get_node(node_name) as Sprite2D
+		_require(piece != null, "the door end draws %s" % node_name)
+		_expect(_absolute_z(piece) > _absolute_z(wolf_sprite), "%s draws over the actors" % node_name)
+		if piece.is_visible_in_tree():
+			covers.append(piece)
+	var hidden: Dictionary = _covered_pixels(wolf_sprite, covers)
+	var total_hidden: int = 0
+	for count: int in hidden.values():
+		total_hidden += count
+	_expect(total_hidden == 0, "%s: no piece drawn over the actors hides WOLF in the doorway (hidden samples by piece: %s)" % [label, hidden])
+	_expect(BlastLeaf.A_LEAD_SHUT < 0.0 and BlastLeaf.A_MOUTH > 0.0, "the walk line crosses the cross-wall inside its opening (a = 0 between the near jamb's receiver at %.2f m and the pocket's mouth at %.2f m)" % [BlastLeaf.A_LEAD_SHUT, BlastLeaf.A_MOUTH])
+	var leaf: BlastLeaf = game.get("blast_leaf") as BlastLeaf
+	var parked_foot: Vector2 = BlastLeaf.project(BlastLeaf.lead_at(1.0), 0.0, BlastLeaf.T_LF)
+	_expect(not leaf.visible and BlastLeaf.lead_at(leaf.open if leaf.open > 0.0 else 1.0) >= BlastLeaf.A_MOUTH - 0.0001 and parked_foot.y < BlastLeaf.FLOOR_Y - 2.0, "%s: the inner leaf is parked in its pocket, its foot behind the walk line (y %.1f), clear of WOLF" % [label, parked_foot.y])
+	for back: Sprite2D in [game.get("seal_wall") as Sprite2D, game.get_node("Door/CorridorSealFrame") as Sprite2D]:
+		_expect(_absolute_z(back) < _absolute_z(wolf_sprite), "%s draws behind the actors" % back.name)
+	var frame_rows: Vector2 = _painted_rows(game.get_node("Door/CorridorSealFrame") as Sprite2D)
+	_expect(frame_rows.y < BlastLeaf.FLOOR_Y - 8.0, "%s: the seal frame (far guide, hood, operator) ends above the walk line (lowest row %.1f), behind WOLF" % [label, frame_rows.y])
+	var hub: Vector2 = game.bypass_handle.global_position + BypassHandle.WHEEL_OFFSET
+	_expect(hub.y + BypassHandle.COLLAR_RADIUS < BlastLeaf.FLOOR_Y - 20.0 and _absolute_z(game.bypass_handle) < _absolute_z(wolf_sprite), "%s: the MANUAL BYPASS is mounted on the back wall above the floor (its collar's foot at y %.1f), drawn behind WOLF, who stands in front of it" % [label, hub.y + BypassHandle.COLLAR_RADIUS])
+	var camera: Camera2D = game.get_viewport().get_camera_2d()
+	var view: Rect2 = Rect2(camera.get_screen_center_position() - game.get_viewport_rect().size * 0.5 / camera.zoom, game.get_viewport_rect().size / camera.zoom)
+	_expect(wolf_span.x >= view.position.x and wolf_span.y <= view.end.x, "%s: WOLF (%.1f..%.1f) is inside the camera's view (%.1f..%.1f)" % [label, wolf_span.x, wolf_span.y, view.position.x, view.end.x])
+	print("%s: WOLF at %.1f, painted %.1f..%.1f, %d px hidden; the inner leaf's parked foot at y %.1f; the frame's lowest row %.1f" % [label, game.wolf.position.x, wolf_span.x, wolf_span.y, total_hidden, parked_foot.y, frame_rows.y])
+
+
+## How many of [param sprite]'s painted pixels (sampled every half world px) each of [param covers]
+## hides, by node name: covered where the cover's own pixel there is more than half opaque.
+func _covered_pixels(sprite: Sprite2D, covers: Array[Sprite2D]) -> Dictionary:
+	var counts: Dictionary = {}
+	var image: Image = _image_of(sprite)
+	var size: Vector2 = sprite.region_rect.size if sprite.region_enabled else sprite.texture.get_size()
+	var to_local: Transform2D = sprite.get_global_transform().affine_inverse()
+	var corners: PackedVector2Array = []
+	for corner: Vector2 in [Vector2.ZERO, Vector2(size.x, 0.0), Vector2(0.0, size.y), size]:
+		var local: Vector2 = corner - (size * 0.5 if sprite.centered else Vector2.ZERO) + sprite.offset
+		corners.append(sprite.get_global_transform() * local)
+	var top_left: Vector2 = corners[0]
+	var bottom_right: Vector2 = corners[0]
+	for corner: Vector2 in corners:
+		top_left = top_left.min(corner)
+		bottom_right = bottom_right.max(corner)
+	for cover: Sprite2D in covers:
+		counts[String(cover.name)] = 0
+	var y: float = floorf(top_left.y)
+	while y <= bottom_right.y:
+		var x: float = floorf(top_left.x)
+		while x <= bottom_right.x:
+			var world: Vector2 = Vector2(x, y)
+			if _opaque_at(sprite, image, to_local * world, size):
+				for cover: Sprite2D in covers:
+					if _opaque_at(cover, _image_of(cover), cover.get_global_transform().affine_inverse() * world, cover.region_rect.size if cover.region_enabled else cover.texture.get_size()):
+						counts[String(cover.name)] = int(counts[String(cover.name)]) + 1
+			x += 0.5
+		y += 0.5
+	return counts
+
+
+## Whether [param sprite]'s pixel at [param local] (its own space) is more than half opaque.
+func _opaque_at(sprite: Sprite2D, image: Image, local: Vector2, size: Vector2) -> bool:
+	var texel: Vector2 = local - sprite.offset + (size * 0.5 if sprite.centered else Vector2.ZERO)
+	if texel.x < 0.0 or texel.y < 0.0 or texel.x >= size.x or texel.y >= size.y:
+		return false
+	if sprite.flip_h:
+		texel.x = size.x - texel.x
+	if sprite.flip_v:
+		texel.y = size.y - texel.y
+	var origin: Vector2 = sprite.region_rect.position if sprite.region_enabled else Vector2.ZERO
+	var at: Vector2i = Vector2i((origin + texel).floor()).clamp(Vector2i(origin), Vector2i(origin + size) - Vector2i.ONE)
+	return image.get_pixelv(at).a > 0.5
+
+
+## The z index [param item] is drawn at, its relative indices added up its parents.
+func _absolute_z(item: CanvasItem) -> int:
+	var z: int = 0
+	var node: Node = item
+	while node is CanvasItem:
+		z += (node as CanvasItem).z_index
+		if not (node as CanvasItem).z_as_relative:
+			break
+		node = node.get_parent()
+	return z
+
+
+## [param sprite]'s texture as an uncompressed image, read once per texture.
+func _image_of(sprite: Sprite2D) -> Image:
+	var key: String = "image %s" % sprite.texture.resource_path
+	if not painted.has(key):
+		var image: Image = sprite.texture.get_image()
+		if image.is_compressed():
+			image.decompress()
+		painted[key] = image
+	return painted[key]
+
+
+## [param sprite]'s painted rows (first, last + 1) in world y.
+func _painted_rows(sprite: Sprite2D) -> Vector2:
+	var image: Image = _image_of(sprite)
+	var region: Rect2i = Rect2i(sprite.region_rect) if sprite.region_enabled else Rect2i(Vector2i.ZERO, Vector2i(sprite.texture.get_size()))
+	var first: int = region.end.y
+	var last: int = region.position.y - 1
+	for y: int in range(region.position.y, region.end.y):
+		for x: int in range(region.position.x, region.end.x):
+			if image.get_pixel(x, y).a > 0.5:
+				first = mini(first, y)
+				last = maxi(last, y)
+				break
+	var size: Vector2 = Vector2(region.size)
+	var origin: float = sprite.offset.y - (size.y * 0.5 if sprite.centered else 0.0)
+	var a: float = (sprite.global_transform * Vector2(0.0, origin + first - region.position.y)).y
+	var b: float = (sprite.global_transform * Vector2(0.0, origin + last + 1 - region.position.y)).y
+	return Vector2(minf(a, b), maxf(a, b))
 
 
 ## Everything WOLF must not stand in at rest in the current room, by name and painted span.
