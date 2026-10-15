@@ -79,6 +79,9 @@ tree("fix-r3/jentry/design", "junction-entry/design", {".json"})
 for n in (1, 2, 3, 4):
     tree(f"shots/fix-r{n}-tools", f"fix-r{n}")
     put(f"fix-r{n}/doors-section.md", f"fix-r{n}/doors-section.md")
+# Fix round 1 re-built the entry door and the exit door with their own tools (cited by the register).
+tree("fix-r1/jentry/tools", "fix-r1/jentry/tools")
+tree("fix-r1/hatch/tools", "fix-r1/hatch/tools")
 tree("fix-r3/tools", "fix-r3/tools")
 tree("fix-r4/tools", "fix-r4/tools")
 tree("shots/integration-tools", "integration")

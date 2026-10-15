@@ -31,7 +31,7 @@ The method is the corridor door end's (`../corridor-door-end-2026-10-12/`, and `
 - `reviews/`: the realism reviews (`REVIEW-real-r1..r5.md`) and first-time-player reviews (`REVIEW-human-r1..r5.md`), and the package's own budget numbers (`perf-package.json`).
 - `provenance.txt`: every Codex session (job, session id, inputs, outputs with SHA-256, C2PA presence, use), with scratch paths shortened to `doors-r1/...` and the home folder to `~`.
 - `records/`, `junction/`, `junction-exit/`: each track's notes, design specs, placement and tools as built in round 1 (later rounds' changed tools are in `fix-r1/` to `fix-r4/`); `junction-entry/`: the entry door's notes from fix rounds 1-3 (it was first built in fix round 1) and its tools and design as of fix round 3.
-- `fix-r1/` to `fix-r4/`: each fix round's tools and capture driver; `integration/`: the packaging tools.
+- `fix-r1/` to `fix-r4/`: each fix round's tools and capture driver (fix round 1's entry door and exit door tools in `fix-r1/jentry/tools/` and `fix-r1/hatch/tools/`); `integration/`: the packaging tools.
 - `codex/`: prompts and notes for every job, and the raw outputs of fix round 2's jobs.
 - `landing/`: the landing's tools (`exit_fixes.py`, `leaf_wear.py`, `speckle.py`), its capture driver and the scripts used to run checks, render, compare budgets and file this folder.
 
