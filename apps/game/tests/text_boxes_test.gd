@@ -44,6 +44,7 @@ func _run() -> void:
 	await _check_corridor()
 	await _check_records_exit()
 	await _check_junction()
+	await _check_story_kept()
 	await _check_touch()
 	await _check_text_size(path)
 	print("text boxes: %d boxes measured on screen; the longest box takes %d rows at 200%%" % [shown_checked, rows_at_200])
@@ -277,17 +278,25 @@ func _check_first_control() -> void:
 	await _play(0.1, "first step")
 	Input.action_release(&"move_right")
 	_expect(tutorial_text.text.contains("READ DISPLAY (optional)") and not bar.visible, "the first step brings the rest of the tutorial, not the lines yet")
-	# The name card fades (a tween, in real time) while its last moments run out.
-	await create_timer(Main.TOP_CARD_FADE_SECONDS + 0.1).timeout
+	# The name card fades (a tween, in real time) while its last moments run out. Waited out by its
+	# state, not a fixed time, so a loaded machine cannot leave it still fading at the check.
 	await _play(Main.TOP_CARD_FADE_SECONDS, "after the first step")
+	var fade_started: int = Time.get_ticks_msec()
+	while game.top_card.visible and Time.get_ticks_msec() - fade_started < 10000:
+		await process_frame
+	await _play(0.1, "after the name card")
 	_expect(not game.top_card.visible and bar.visible and story.text.begins_with("%s keeps WOLF's systems running." % game.call("_first_name")), "once the name card has gone the lines start, one box at a time (%s)" % story.text.c_escape())
 	_expect(not hint_panel.visible, "the hint bar stays off while the tutorial prompt is the prompt")
+	# Only the test's own steps move the game's clock here, so a slow frame between them on a loaded
+	# machine cannot run the box out early.
+	game.set_process(false)
 	var first_box_seconds: float = DialogueBoxes.read_seconds(story.text) - game.dialogue_age
 	var first_box: String = story.text
 	await _play(first_box_seconds - 0.1, "trust line")
 	_expect(story.text == first_box, "a box stays up for its reading time")
 	await _play(0.2, "trust line")
 	_expect(story.text != first_box and speaker.text.is_empty(), "then the next box takes its place (%s)" % story.text.c_escape())
+	game.set_process(true)
 	var narration_width: float = bar.size.x
 	_expect(absf(story.position.x - Main.DIALOGUE_PADDING.x) <= 0.5 and absf(narration_width - (Main.DIALOGUE_PADDING.x * 2.0 + story.size.x)) <= 0.5, "a narration box is only as wide as its words' column, with no empty name column (%s)" % bar.size)
 	await _play(14.0, "opening lines")
@@ -363,6 +372,66 @@ func _check_junction() -> void:
 		await _play(6.0, "knockdown card %s" % kind)
 
 
+## A station's answer cutting into a story line said through the queue never drops it: Records'
+## closing lines (the engineer keeps control while they play) come back after the route hint at the
+## box they were on, and USE at the exit brings them back first; WOLF's stakes line comes back after
+## the purge display.
+func _check_story_kept() -> void:
+	var acts: DebugActions = game.debug_tools.actions
+	acts.set_relay(&"disclose_wolf")
+	acts.set_mirror(&"wolf")
+	acts.jump(&"records_mirror")
+	await process_frame
+	var close: String = Main.RECORDS_CLOSE_LINE % (game.call("_first_name") as String).to_upper()
+	var exit_side: float = game.debug_station_side_x(Main.RECORDS_STATIONS[2], 829.0)
+	game.debug_place(exit_side, exit_side - M0Actor.FOLLOW_GAP)
+	game.call("_interact")
+	await _play(2.6, "records close kept")
+	_expect(game.status_line == close and speaker.text == "WOLF", "WOLF's box of the closing lines is up (%s)" % story.text.c_escape())
+	# Just outside the exit's reach (772 to 888) USE answers with the route hint.
+	game.debug_place(740.0, 740.0 - M0Actor.FOLLOW_GAP)
+	game.call("_interact")
+	await process_frame
+	_expect(game.status_line == game.call("_records_route_hint") and game.box_queue == [close], "the route hint cuts in and the closing lines wait behind it (%s, %s)" % [game.status_line.c_escape(), str(game.box_queue).c_escape()])
+	await _play(Main.box_seconds(game.status_line) + 0.2, "records close kept")
+	_expect(game.status_line == close and speaker.text == "WOLF", "the closing lines come back at WOLF's box, not their first (%s)" % story.text.c_escape())
+	# Cut in again, then USE at the exit: the lines come back first, and the engineer's box follows.
+	game.call("_interact")
+	game.debug_place(exit_side, exit_side - M0Actor.FOLLOW_GAP)
+	game.call("_refresh_ui")
+	var hint: Label = game.get_node("CanvasLayer/ContextHint/Text") as Label
+	_expect(hint.text.ends_with("continue."), "with the closing lines held back, USE at the exit offers to continue (%s)" % hint.text)
+	game.call("_interact")
+	await process_frame
+	_expect(game.state.chapter_id == "records" and game.status_line == close and speaker.text == "WOLF", "USE at the exit brings the held-back lines back rather than leaving (%s)" % story.text.c_escape())
+	game.call("_interact")
+	await process_frame
+	_expect(game.state.chapter_id == "records" and speaker.text == (game.call("_first_name") as String).to_upper() and story.text.ends_with("Then Archive is next."), "the engineer's closing box follows (%s)" % story.text.c_escape())
+	# WOLF's stakes line, read over at the purge display.
+	game.debug_new_game(true)
+	await process_frame
+	game.set("opening_lines_held", false)
+	game.call("_drop_box_queue")
+	game.debug_place(200.0, 120.0)
+	game.call("_speak_stakes")
+	await _play(0.5, "stakes kept")
+	game.call("_interact")
+	await process_frame
+	_expect(str(game.status_line).begins_with("DIRECTOR / PURGE") and game.box_queue == [Main.STAKES_LINE], "the purge display cuts in and WOLF's stakes line waits behind it")
+	# The display's text shows as two boxes; the stakes follow once both have been up their time.
+	var display_seconds: float = 0.0
+	for box: String in game.dialogue_boxes:
+		display_seconds += DialogueBoxes.read_seconds(DialogueBoxes.words_of(box, game.call("_speaker_tags")))
+	await _play(display_seconds + 0.2, "stakes kept")
+	_expect(game.status_line == Main.STAKES_LINE, "the stakes line comes back after the display's text (%.1f s)" % display_seconds)
+	# Held back again, USE at the breaker brings it back before WOLF asks about the relay.
+	game.call("_interact")
+	game.debug_place(350.0, 270.0)
+	game.call("_interact")
+	await process_frame
+	_expect(game.status_line == Main.STAKES_LINE and not game.waiting_for_choice, "USE at the breaker brings the held-back stakes line back before the relay question")
+
+
 ## P0-10: on touch the answers sit at the bottom without numbers, the hint names the button on screen
 ## and stays clear of USE.
 func _check_touch() -> void:
@@ -435,6 +504,29 @@ func _check_text_size(path: String) -> void:
 		_expect(rect.position.x >= 0.0 and rect.end.x <= 960.0 and rect.position.y >= 0.0 and rect.end.y <= 540.0, "%s stays on the canvas at 200%% (%s)" % [path_name, rect])
 	var card: Rect2 = game.top_card.get_global_rect()
 	_expect(not card.intersects((game.get_node("CanvasLayer/PauseButton") as Control).get_global_rect()), "the top card stays clear of PAUSE at 200%")
+	# The answers keep the HUD's side margin (keys, under the top card), and on touch the top card
+	# stays clear of the DEBUG button where it shows, its words still fitting.
+	game.debug_tools.actions.set_relay(&"disclose_wolf")
+	game.debug_tools.actions.jump(&"relay_question")
+	await process_frame
+	game.call("_refresh_ui")
+	for button_path: String in ["CanvasLayer/TouchControls/Choice1", "CanvasLayer/TouchControls/Choice2"]:
+		var answer: Rect2 = (game.get_node(button_path) as Control).get_global_rect()
+		_expect(answer.position.x >= Main.HUD_SIDE_MARGIN - 0.5 and answer.end.x <= 960.0 - Main.HUD_SIDE_MARGIN + 0.5, "at 200%% the answer keeps the side margin (%s)" % answer)
+	game.call("_answer_choice", 1)
+	game.touch_enabled = true
+	game.controller_active = false
+	game.debug_tools.call("_refresh_view")
+	game.call("_refresh_ui")
+	await process_frame
+	var debug_button: Control = game.debug_tools.debug_button
+	if debug_button.visible:
+		_expect(not game.top_card.get_global_rect().intersects(debug_button.get_global_rect()), "at 200%% on touch the top card stays clear of DEBUG (%s vs %s)" % [game.top_card.get_global_rect(), debug_button.get_global_rect()])
+		_expect(game.hud.get_line_count() * game.hud.get_line_height() <= game.hud.size.y + 1.0, "the narrower top card still fits its words (%d rows)" % game.hud.get_line_count())
+	else:
+		print("text boxes: the DEBUG button is not shown in this build; its check is skipped")
+	game.touch_enabled = false
+	game.debug_tools.call("_refresh_view")
 	# A fresh game reads the saved size back; a broken value falls back to the nearest step.
 	var again: Main = GAME_SCENE.instantiate() as Main
 	again.settings_path = path
@@ -453,10 +545,12 @@ func _check_text_size(path: String) -> void:
 
 ## At every text size the station names in each room, in each state, stay apart: a name breaks
 ## between its words above 100% (TextSize.WORLD_ROW_GROWTH) instead of running into its neighbours,
-## stands where it stood at 100% (its bottom edge), and the corridor's are not faded out at the start.
+## stands where it stood at 100% (its bottom edge), and the corridor's are not faded out at the start
+## (the MANUAL BYPASS plate, a little faded there at 100%, no more than at 100%).
 func _check_station_names() -> void:
 	var settings: GameSettings = game.settings_menu
 	var bottoms: Dictionary = {}
+	var bypass_alpha_at_100: float = 1.0
 	for index: int in TextSize.STEPS.size():
 		settings.text_size.select(index)
 		settings.text_size.item_selected.emit(index)
@@ -485,6 +579,12 @@ func _check_station_names() -> void:
 			if jump == &"corridor_start":
 				for label: Label in [game.get_node("BreakerLabel"), game.get_node("RelayLabel"), game.bypass_handle.fault_tag] as Array[Label]:
 					_expect(label.modulate.a > 0.99, "%d%%: %s is not faded at the corridor's start (alpha %.2f)" % [percent, label.text, label.modulate.a])
+				# The MANUAL BYPASS plate (the engineer-only fallback) sits near the view's edge at the start,
+				# a little faded at 100%; a larger size grows it away from that edge, so it fades no more.
+				var bypass_alpha: float = game.bypass_handle.bypass_label.modulate.a
+				if index == 0:
+					bypass_alpha_at_100 = bypass_alpha
+				_expect(bypass_alpha >= bypass_alpha_at_100 - 0.01 and bypass_alpha > 0.5, "%d%%: MANUAL BYPASS fades no more than at 100%% at the corridor's start (alpha %.2f, %.2f at 100%%)" % [percent, bypass_alpha, bypass_alpha_at_100])
 				var relay_name: Rect2 = (game.get_node("RelayLabel") as Label).get_global_rect()
 				_expect(relay_name.end.y <= game.bypass_handle.fault_tag.get_global_rect().position.y + 0.5, "%d%%: COOLANT RELAY stands above its COOLANT FAULT tag" % percent)
 		await _check_touch_layout(percent)

@@ -59,6 +59,8 @@ const SPEAKER_GAP: float = 17.0
 const DIALOGUE_BOTTOM: float = 526.0
 ## No part of the play HUD comes closer than this to the canvas's sides.
 const HUD_SIDE_MARGIN: float = 20.0
+## The gap the top card keeps from the touch DEBUG button beside it.
+const HUD_CARD_GAP: float = 8.0
 ## The hint bar, the top card and the tutorial prompt at 100%.
 const HINT_FONT_SIZE: int = 14
 const CARD_FONT_SIZE: int = 15
@@ -653,6 +655,10 @@ var box_queue_choice_seen: bool = false
 ## The box the queue itself put up (_say, _next_box_now), not a line that cut in: an aside that takes the
 ## box before it has been read puts it back at the front of the queue (_aside).
 var box_queue_shown: String = ""
+## A line put back by an aside part way through its boxes (_aside), and the box it comes back at, so
+## the boxes already read are not shown again.
+var box_resume_line: String = ""
+var box_resume_index: int = 0
 ## The boxes status_line is shown as (DialogueBoxes.split), the one on screen and how long it has been
 ## up. The last box clears once it has been read and the engineer moves on (dialogue_cleared, STORY-8).
 ## dialogue_key is what they were split from (the line as shown, the engineer's name and the text size).
@@ -1376,10 +1382,10 @@ func _advance_box_queue(delta: float) -> void:
 		box_queue_seconds = box_seconds(status_line)
 		return
 	# The line up may itself show as several boxes (DialogueBoxes.split): the next line waits until its
-	# last box is up, and then for that box's reading time.
+	# last box is up, and then for that box's reading time (not the whole line's again).
 	_sync_dialogue_boxes()
 	if dialogue_index < dialogue_boxes.size() - 1:
-		box_queue_seconds = maxf(box_queue_seconds, _box_seconds_of(dialogue_boxes.size() - 1))
+		box_queue_seconds = _box_seconds_of(dialogue_boxes.size() - 1)
 		return
 	box_queue_seconds -= delta
 	if box_queue_seconds > 0.0:
@@ -1395,12 +1401,15 @@ func _tell(line: String) -> void:
 	status_line = line
 
 
-## Puts an aside in the box (a station's answer, such as the purge display, or a refusal). A box of a
-## line said in several boxes that is up and not yet read comes back after it, ahead of the boxes still
-## to come, so reading a station never drops a story box (the opening exchange, say).
+## Puts an aside in the box (a station's answer, such as the purge display, or a refusal). A story box
+## the queue put up (_say, _next_box_now: the opening lines, the stakes, Records' closing lines) that is
+## not yet read comes back after it, ahead of the boxes still to come and at the box it was on, so
+## reading a station never drops a story box.
 func _aside(line: String) -> void:
 	if not box_queue_shown.is_empty() and status_line == box_queue_shown and status_line != line and not _dialogue_read():
 		box_queue.push_front(status_line)
+		box_resume_line = status_line
+		box_resume_index = dialogue_index
 		box_queue_chapter = state.chapter_id
 		box_queue_choice_seen = false
 	box_queue_shown = ""
@@ -1430,6 +1439,7 @@ func _next_box_now() -> void:
 ## Forgets the boxes still to come of a line said in several boxes.
 func _drop_box_queue() -> void:
 	box_queue.clear()
+	box_resume_line = ""
 	box_queue_line = ""
 	box_queue_shown = ""
 	box_queue_seconds = 0.0
@@ -1446,14 +1456,27 @@ static func box_seconds(box: String) -> float:
 	return DialogueBoxes.read_seconds(text)
 
 
+## WOLF's stakes line. It cuts in ahead of any boxes still to come (the opening's), which follow it, and
+## like a box the queue put up an aside (the purge display) never drops it.
 func _speak_stakes() -> void:
 	stakes_spoken = true
 	status_line = STAKES_LINE
+	box_queue_shown = STAKES_LINE
 
 
 ## WOLF's stakes line is in the box and the relay question has not been asked yet.
 func _stakes_up() -> bool:
 	return status_line == STAKES_LINE and state.memory.is_empty() and not waiting_for_choice
+
+
+## WOLF's stakes line waits behind an aside that cut into it (_aside), so USE brings it back first.
+func _stakes_queued() -> bool:
+	return _queued_next(STAKES_LINE) and state.memory.is_empty() and not waiting_for_choice
+
+
+## [param line] is the next box the queue will show.
+func _queued_next(line: String) -> bool:
+	return not box_queue.is_empty() and box_queue[0] == line
 
 
 ## True within reach of the corridor's breaker.
@@ -2150,7 +2173,9 @@ func _interact_breaker() -> void:
 		_speak_stakes()
 	elif state.memory.is_empty():
 		# A USE with the stakes up goes on: to their next box, and from the last one WOLF asks now.
-		if not (_stakes_up() and _next_box()):
+		if _stakes_queued():
+			_next_box_now()
+		elif not (_stakes_up() and _next_box()):
 			_ask_relay()
 	elif state.arm_breaker():
 		status_line = BREAKER_CATCHES_LINE
@@ -2161,7 +2186,7 @@ func _interact_breaker() -> void:
 		_mark_beat()
 		queue_redraw()
 	else:
-		status_line = "Power is already on. The relay is farther down the hall."
+		_aside("Power is already on. The relay is farther down the hall.")
 
 
 func _choose(choice_id: String) -> void:
@@ -2187,7 +2212,7 @@ func _interact_relay() -> void:
 	if human.position.x < RELAY_SIDE_X - 4.0:
 		_step_engineer(RELAY_SIDE_X, RELAY_X)
 	if not state.breaker_armed:
-		status_line = "The relay is dark. Arm the breaker first."
+		_aside("The relay is dark. Arm the breaker first.")
 		return
 	if state.door_open:
 		status_line = "The seal is open. The safe point is just beyond it."
@@ -2231,7 +2256,7 @@ func _interact_bypass() -> void:
 	if state.door_open:
 		status_line = "The seal is open. The safe point is just beyond it."
 	elif not state.breaker_armed:
-		status_line = "The bypass handle won't move. The breaker has to be on first."
+		_aside("The bypass handle won't move. The breaker has to be on first.")
 	else:
 		# The engineer steps to the crank spot beside the wheel and faces it; a held USE turns it once there.
 		_step_engineer(BYPASS_CRANK_X, BYPASS_WHEEL.x)
@@ -2295,7 +2320,7 @@ func _finish_bypass() -> void:
 
 func _interact_checkpoint() -> void:
 	if not state.door_open:
-		status_line = "The safe point is past the sealed door."
+		_aside("The safe point is past the sealed door.")
 		return
 	if state.checkpoint_reached:
 		if state.enter_records():
@@ -2332,16 +2357,16 @@ func _interact_records(x: float) -> void:
 	if absf(x - 190.0) <= 58.0:
 		if state.preserve_purge_trace():
 			sfx_bank.play(&"chirp", -8.0)
-			status_line = "The Director's purge order has a time and target ID. %s keeps a local copy; the original logs are still missing." % state.human_name().get_slice(" ", 0)
+			_aside("The Director's purge order has a time and target ID. %s keeps a local copy; the original logs are still missing." % state.human_name().get_slice(" ", 0))
 		else:
-			status_line = "The purge-order trace is already copied. The mirror port may confirm when the source existed."
+			_aside("The purge-order trace is already copied. The mirror port may confirm when the source existed.")
 		_sync_records_room()
 		_save_progress()
 	elif absf(x - 520.0) <= 58.0:
 		if not state.purge_trace_preserved:
-			status_line = "The mirror index has no context yet. Copy the purge-order trace first."
+			_aside("The mirror index has no context yet. Copy the purge-order trace first.")
 		elif state.mirror_trace_preserved:
-			status_line = "The mirror timestamp is already preserved. The exit is to the right."
+			_aside("The mirror timestamp is already preserved. The exit is to the right.")
 			_save_progress()
 		else:
 			waiting_for_choice = true
@@ -2351,8 +2376,9 @@ func _interact_records(x: float) -> void:
 	elif absf(x - 830.0) <= 58.0:
 		if state.complete_chapter():
 			# The closing lines play while the engineer keeps control (STORY-8): no held shot. USE here
-			# shows their next box, and once they are read goes on through the exit.
-			status_line = RECORDS_CLOSE_LINE % _first_name().to_upper()
+			# shows their next box, and once they are read goes on through the exit. Said through the queue,
+			# so a station's answer or the route hint cutting in never drops them (_aside).
+			_say([RECORDS_CLOSE_LINE % _first_name().to_upper()])
 			_update_controls()
 			_sync_records_room(true)
 			_sync_room_lights(true)
@@ -2368,12 +2394,15 @@ func _interact_records(x: float) -> void:
 			chapter_tween.tween_callback(records_room.exit_art.hide)
 			_save_progress()
 		elif state.chapter_complete:
-			if not (_records_close_unread() and _next_box()):
+			if not _records_close_unread():
 				_enter_junction()
+			elif not _next_box():
+				# Put back behind an aside: they come back first.
+				_next_box_now()
 		else:
-			status_line = "Exit sealed until the purge order and mirror timestamp are copied."
+			_aside("Exit sealed until the purge order and mirror timestamp are copied.")
 	else:
-		status_line = _records_route_hint()
+		_aside(_records_route_hint())
 
 
 ## Between Records stations: the stations still to do, in order, so a finished one is never named
@@ -4144,6 +4173,10 @@ func _sync_dialogue_boxes() -> void:
 		dialogue_index = 0
 		dialogue_age = 0.0
 		dialogue_cleared = false
+		# A story line an aside cut into comes back at the box it was on (_aside).
+		if status_line == box_resume_line:
+			dialogue_index = box_resume_index
+			box_resume_line = ""
 	dialogue_index = clampi(dialogue_index, 0, maxi(dialogue_boxes.size() - 1, 0))
 
 
@@ -4216,9 +4249,13 @@ func _opening_lines_playing() -> bool:
 	return (not opening_lines_held or tutorial_step >= 1) and status_line in opening_lines and state.chapter_id == "lockdown" and (not box_queue.is_empty() or not _dialogue_read())
 
 
-## Records' closing lines are up and have a box still to show.
+## Records' closing lines are up and have a box still to show, or wait behind an aside that cut into
+## them (_aside).
 func _records_close_unread() -> bool:
-	return status_line == RECORDS_CLOSE_LINE % _first_name().to_upper() and not dialogue_cleared and dialogue_index < dialogue_boxes.size() - 1
+	var close: String = RECORDS_CLOSE_LINE % _first_name().to_upper()
+	if _queued_next(close):
+		return true
+	return status_line == close and not dialogue_cleared and dialogue_index < dialogue_boxes.size() - 1
 
 
 ## The first step takes the name card off at once (it fades as usual).
@@ -4336,9 +4373,13 @@ func _layout_hud() -> void:
 	_set_rect(context_hint, Vector2(hint_x, hint_y), Vector2(hint_width, hint_height))
 	_set_rect(context_hint_text, Vector2(13.0, 3.0), Vector2(hint_width - 23.0, hint_height - 6.0))
 	_set_rect(context_hint.get_node("Accent") as Control, Vector2(1.0, 1.0), Vector2(3.0, hint_height - 2.0))
-	# The top card grows with its text, left of PAUSE.
-	var card_height: float = maxf(62.0, hud.get_line_height() * 2.0 + 14.0)
+	# The top card grows with its text, left of PAUSE (and of the touch DEBUG button where it shows),
+	# and takes a third row if its words need one there.
 	var card_width: float = clampf(448.0 * TextSize.factor, 448.0, 820.0)
+	if debug_tools != null and debug_tools.debug_button != null and debug_tools.debug_button.visible:
+		card_width = minf(card_width, debug_tools.debug_button.position.x - HUD_CARD_GAP - top_card.position.x)
+	_set_rect(hud, Vector2(16.0, 7.0), Vector2(card_width - 28.0, hud.size.y))
+	var card_height: float = maxf(62.0, hud.get_line_height() * maxi(2, hud.get_line_count()) + 14.0)
 	_set_rect(top_card, top_card.position, Vector2(card_width, card_height))
 	_set_rect(hud, Vector2(16.0, 7.0), Vector2(card_width - 28.0, card_height - 11.0))
 	_set_rect(top_card.get_node("Accent") as Control, Vector2.ZERO, Vector2(4.0, card_height))
@@ -4377,7 +4418,8 @@ func _layout_choices(touch_layout: bool, top: float) -> void:
 		_set_rect(touch_choice_1, Vector2(42.0, touch_top), Vector2(428.0, touch_height))
 		_set_rect(touch_choice_2, Vector2(490.0, touch_top), Vector2(428.0, touch_height))
 		return
-	var width: float = minf(522.0 * TextSize.factor, 960.0 - HUD_SIDE_MARGIN * 2.0)
+	# Right-aligned at x 918, so the widest still leaves the side margin on the left.
+	var width: float = minf(522.0 * TextSize.factor, 918.0 - HUD_SIDE_MARGIN)
 	var height: float = maxf(40.0 * TextSize.factor, 0.0)
 	_set_rect(touch_choice_1, Vector2(918.0 - width, top), Vector2(width, height))
 	height = maxf(height, touch_choice_1.get_minimum_size().y)
@@ -4471,7 +4513,7 @@ func _context_hint() -> String:
 	if _at_breaker(x):
 		if state.breaker_armed:
 			return "The breaker is live. Go to the MANUAL BYPASS by the relay." if _relay_refused() else "The breaker is live. Go to the coolant relay."
-		if _stakes_up():
+		if _stakes_up() or _stakes_queued():
 			# The relay prompt never shares the screen with WOLF's stakes line: the next USE goes on from
 			# it, and then he asks about the relay.
 			return BREAKER_STAKES_HINT

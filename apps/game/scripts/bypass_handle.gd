@@ -144,10 +144,14 @@ func _init() -> void:
 func place(wheel_centre: Vector2, relay_x: float) -> void:
 	position = wheel_centre
 	_relay_x = relay_x
-	# A larger TEXT SIZE grows the plate upward, so its foot stays over the wheel.
+	# A larger TEXT SIZE grows the plate upward, so its foot stays over the wheel, and to the left, so
+	# its right edge stays where it stood at 100% (at the corridor's start that edge is near the view's,
+	# where plates fade out: JunctionRoom.fade_at_view_edge).
 	var font: Font = bypass_label.get_theme_font(&"font")
 	var grown: float = (font.get_height(TextSize.world_px(LABEL_FONT_SIZE)) - font.get_height(LABEL_FONT_SIZE)) * bypass_label.get_line_count()
-	bypass_label.position = Vector2(-bypass_label.size.x * 0.5 + LABEL_SHIFT_X, LABEL_TOP - grown)
+	var widened: float = float(bypass_label.get_meta(&"wrap_width")) * (TextSize.world_factor() - 1.0)
+	var right: float = (bypass_label.size.x - widened) * 0.5 + LABEL_SHIFT_X
+	bypass_label.position = Vector2(right - bypass_label.size.x, LABEL_TOP - grown)
 	readout.queue_redraw()
 	# The tag grows upward too, over the relay's name, which main lifts by as much (fault_tag_growth).
 	fault_tag.position = Vector2(relay_x - wheel_centre.x - fault_tag.size.x * 0.5, FAULT_TAG_TOP - wheel_centre.y - fault_tag_growth())
