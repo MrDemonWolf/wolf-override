@@ -56,7 +56,7 @@ beacon_offsets = PackedVector2Array(-10.72, -108.6, -3.72, 4.4, -4.72, 4.4, -36.
 Order per lamp: fixture, globe, guard, light; offsets are far-plate px from the lamp's anchor. `layers/placement.json`
 has every rect in atlas, plate and world coordinates. `warning_lamps` and `warning_color` stay as they are.
 If the door job changes the far plate around (654, 183-326) or (1255-1286, 266-326) plate px, rerun
-`tools/design.py` + `tools/cleanup.py` against the new plate (b1 hangs from the plate's painted back box).
+round 9's `fix2/beacons/tools/design.py` + `fix2/beacons/tools/cleanup.py` against the new plate (this round's `beacons/tools/design.py` and `beacons/tools/cleanup.py` are at ada83fa) (b1 hangs from the plate's painted back box).
 
 ## Checks run (private copy test-game = game-slice + this change)
 - Headless: import twice, 13/13 test suites pass (`logs/test-game/`).

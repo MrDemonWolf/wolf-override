@@ -21,7 +21,8 @@ session id | job | output (sha256) | used?
     1024x1024; the cleanup resizes a working copy to 1024 (registration checked: best gradient match at 0,0 / 0,-1 px).
   - Codex's own notes with the exact image-tool prompt: add7/beacons/codex/paint-beacons/out/notes.txt.
   - archived 2026-10-12 (`codex archive`): 0 live in ~/.codex/sessions, 1 in ~/.codex/archived_sessions.
-Derived (deterministic, no metadata transplanted): add7/beacons/tools/cleanup.py -> add7/beacons/layers/ (b0/b1 fixture,
+Derived (deterministic, no metadata transplanted): add7/beacons/tools/cleanup.py (beacons/tools/cleanup.py at ada83fa;
+  round 9's fix2/beacons/tools/cleanup.py made the installed atlas) -> add7/beacons/layers/ (b0/b1 fixture,
   globe, guard, light PNGs, corridor-beacons.png atlas, placement.json, report.json, previews).
   Conduit, straps, fitting, nipple: Python, from the far plate's existing painted conduit profile and strap steel (no image tool).
   Wall contact shadows and the red light/spill: Python, computed from the construction geometry (no image tool).
