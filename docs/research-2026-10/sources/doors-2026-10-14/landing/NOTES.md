@@ -36,6 +36,13 @@ A fresh-clone verification of the branch (render.sh, the touch layout) found the
 - **Register:** `junction-hatch.png` and `corridor-bulkhead-open.png` were deleted on 2026-10-14 by this branch (not 2026-10-13); two plate entries had a missing full stop.
 - **Left for Nathanial (design call):** an engineer who stops in the blown doorway at about x 490-505 is almost hidden by the blast door's solid near column (x 487-510), as round 4 drew it; main faded the old bulkhead's pillar in front of a character instead.
 
+## Fixes after the second verification (October 15, 2026)
+
+- Changelog: the four entries moved from main's October 14 section to a new October 15 section (the earliest merge day, since three other branches land first); the in-game changelog is regenerated and the drift check is green.
+- Asset register: the junction exit atlas, the Records doors atlas and the Records far plate cited tool scripts under `junction-exit-door-2026-10-13/` and `records-doors-2026-10-13/`, folders that were never filed; they now point at `doors-2026-10-14/junction-exit/tools/` and `doors-2026-10-14/records/tools/`, where the scripts are. A script check of every `docs/` and `apps/` path in the register finds no other missing path from this branch (the one left, `apps/docs/public/fonts`, is main's). The two code comments that named those folders now name the filed ones.
+- Asset register: the EXIT BOLT panel entry described the old spot (x 806, cables into the hatch frame); it now gives x 796 left of the sliding exit door, worked from about x 747, its riser to a floor flange in the exit atlas's back layer, and the lamp and feed redrawn over the sentry (BoltPanelFront).
+- Not changed: the solid near column that hides an engineer stopped in the blown doorway stays an open call for Nathanial.
+
 ## Wording
 
 See `../../../../decisions.md` ("Doors landed") and `../../../approved/`: every line about the junction exit says "door"; the tank's hit is two one-speaker boxes; the Records container hint names the container.
