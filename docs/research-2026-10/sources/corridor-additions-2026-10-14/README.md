@@ -69,11 +69,35 @@ The landing started no Codex session. The image tool painted no lettering that i
 
 - `shots/`: `ADD.md` (every round's report, newest on top), the ten reviews (`REVIEW-real-r1..r5.md`, `REVIEW-human-r1..r5.md`), the code diffs (`add-code.diff` round 6 to 11, `fix1..4-code.diff`), and round 11's measurements (`perf-table.md`, `perf.json`, `measure11.json`, `pulse.json`, `luminaire-check.json`, `opening-diff.json`, `state-diff-*.json`). The raw captures, pairs, crops and sheet they name stayed in scratch (large render captures are not kept in the repository).
 - `door/`, `beacons/`, `plume/`, `crank/`: round 7's four tracks: notes (`NOTES.md`, `beacons/research/SOURCES.md`, `door/research/`), design scripts, specs and masks, Codex jobs, cleanup and install tools.
-- `integrate/`: round 7's integration tools, patches and capture driver.
-- `fix1/` to `fix4/`: rounds 8 to 11 (tools, designs and masks per part, Codex jobs, the capture and measuring tools).
+- `integrate/`: round 7's `manifest.before.json` (the asset register before the integration). Its tools, patches and capture driver were later copies of files kept elsewhere and are at ada83fa (see "One current copy of each tool" below).
+- `fix1/` to `fix4/`: rounds 8 to 11 (designs and masks per part, Codex jobs, and the tools that made each round's art). The capture and measuring tools are filed once: round 11's `fix4/tools/` and `fix4/driver-pulse/`, and round 9's `fix2/tools/` crop, side and preview helpers. Earlier rounds' copies are at ada83fa.
 - `codex/`: round 7's crank prompts and session ids.
 - `provenance.txt`: every Codex session and output, and what each installed file was made from.
 - `landing/`: the landing's tools (head-plate repaint and checks, the all-routes capture driver, render and dry-run scripts, the comparison and performance tools), small check crops and `LANDING.md`.
+
+### One current copy of each tool
+
+On 2026-10-15 these records were deduplicated under the "Don't duplicate code" rule in the repository's `AGENTS.md`: each round had filed a copy of the previous round's tools, and some files were filed more than once. One current copy of each tool stays, the one that made the filed evidence; the others were removed and stay in the history at ada83fa, the last commit that has them (`git show ada83fa:docs/research-2026-10/sources/corridor-additions-2026-10-14/<path>`). Kept tools and notes still name the removed copies by their as-run paths (`add7/<path>`); the last column maps those. `landing/tools/records-list.sh` lists the filing as it was before this dedupe.
+
+| Removed (at ada83fa) | Kept copy | As-run name |
+|---|---|---|
+| `door/integration/blast_leaf.gd`, `door/integration/gdcheck/` | none in the records: it landed, revised, as `apps/game/scripts/blast_leaf.gd` | `add7/door/integration/` |
+| `integrate/driver/realslice_capture.gd`, `plume/driver/realslice_capture.gd`, `fix1/driver/realslice_capture.gd`, `fix2/driver/realslice_capture.gd` | `landing/driver/realslice_capture.gd` (round 8's driver plus the landing's routes; it made the landing stills) | `add7/integrate/driver`, `add7/plume/driver`, `add7/fix1/driver` (round 8's; the default driver of `fix4/tools/render_run.sh`), `add7/fix2/driver` |
+| `fix3/driver-pulse/pulse_capture.gd` | `fix4/driver-pulse/pulse_capture.gd` (made `shots/pulse.json`) | `add7/fix3/driver-pulse` |
+| `integrate/tools/state_diff7.py`, `opening_diff7.py`, `perf_table7.py`, `package7.py`; `fix1/tools/state_diff8.py`, `opening_diff8.py`, `perf_table8.py`, `package8.py`; `fix2/tools/state_diff9.py`, `opening_diff9.py`, `perf_table9.py`, `package9.py`; `fix3/tools/state_diff10.py`, `opening_diff10.py`, `perf_table10.py`, `package10.py` | `fix4/tools/state_diff11.py`, `opening_diff11.py`, `perf_table11.py`, `package11.py` | `add7/<round>/tools/` |
+| `fix2/tools/luminaire_check9.py`, `measure9.py`; `fix3/tools/luminaire_check10.py`, `measure10.py`, `pulse10.py`, `run_package10.sh` | `fix4/tools/luminaire_check11.py`, `measure11.py`, `pulse11.py`, `run_package11.sh` | `add7/fix2/tools/`, `add7/fix3/tools/` |
+| `render_run.sh`, `capture_all.sh`, `headless_perf.sh` and `tests.sh` in `integrate/tools/`, `fix1/tools/`, `fix2/tools/` and `fix3/tools/` | the same four in `fix4/tools/` | `add7/<round>/tools/` |
+| `fix1/tools/crop.py`, `fix1/tools/side.py` | `fix2/tools/crop.py`, `fix2/tools/side.py` (byte for byte) | `add7/fix1/tools/` |
+| `door/tools/install7.py`, `fix1/door/tools/install8.py`, `fix2/door/tools/install9.py` | `fix3/door/tools/install10.py` | `add7/door/tools/`, `add7/fix1/door/tools/`, `add7/fix2/door/tools/` |
+| `fix2/door/tools/cleanup9.py` | `fix3/door/tools/cleanup10.py` (round 10's flat section replaced round 9's painted cut; `fix2/door/tools/cut9.py` stays, since `fix3/door/tools/cleanup10.py` and `cut10.py` import it) | `add7/fix2/door/tools/cleanup9.py` |
+| `fix1/door/tools/hood_blank.py`, `fix4/door/tools/hood_blank.py` | `door/tools/hood_blank.py` (one blob; copy it beside `fix1/door/tools/codex_inputs8.py` or `fix4/door/tools/codex_inputs11.py` to re-run them) | `add7/fix1/door/tools/`, `add7/fix4/door/tools/` |
+| `fix2/far/tools/far9.py`, `fix3/far/scan/layer-10a/far10-as-run.py` | `fix3/far/tools/far10.py` (the as-run copy was the same blob) | `add7/fix2/far/tools/far9.py` |
+| `beacons/tools/design.py`, `beacons/tools/cleanup.py`, `fix1/beacons/tools/design.py`, `fix1/beacons/tools/cleanup.py` | `fix2/beacons/tools/design.py`, `fix2/beacons/tools/cleanup.py` (round 9's; they made the installed `corridor-beacons.png`) | `add7/beacons/tools/`, `add7/fix1/beacons/tools/` |
+| `fix1/codex/run_job.sh`, `fix2/codex/run_job.sh`, `door/codex/run_job7.sh`, `beacons/tools/run_codex.sh`, `plume/tools/run_codex.sh` | `fix4/codex/run_job.sh` | the same paths under `add7/` |
+| `integrate/patches/beacons.diff`, `integrate/patches/crank.diff` | `beacons/beacons-code.diff`, `crank/deliver/crank-code.diff` (the same diffs with other path headers) | `add7/integrate/patches/` |
+| `plume/patch/plume-code.patch` | `plume/patch/plume.patch` (holds every hunk of it, plus the PNG hunk) | `add7/plume/patch/` |
+
+Different tools that share helper code (the capture drivers, the cleanup and portal generations, the Codex input builders) stay as filed. Moving their helpers into one module would change tools that made filed evidence, so it waits until each can be re-run and shown to give identical outputs.
 
 Paths inside the notes and tools are the session's own: `add7/` is this folder, `real-slice/` and `scratchpad/` were the session's scratch folders (with `game-add/`, the round-11 game copy, and `game-slice/`, round 6), and `~/` is the developer's home. Running a tool again means pointing those paths at working copies; the build used Python 3.14 with NumPy 2.5, SciPy and Pillow 12.3, and Godot 4.7.2.
 
