@@ -49,6 +49,8 @@ const LABEL_FONT_SIZE: int = 13
 const LABEL_WIDTH: float = 64.0
 const LABEL_TOP: float = -136.0
 const LABEL_SHIFT_X: float = -32.5
+## Above 100%, the least gap between the MANUAL BYPASS plate and the COOLANT FAULT tag to its left.
+const LABEL_GAP: float = 6.0
 ## A leader from the plate's bottom edge straight down to the top of the wheel's backplate, at the
 ## hub's x, so the plate and its crank lights read as the wheel's (relative to the gameplay point).
 const LEADER_X: float = -6.0
@@ -144,17 +146,19 @@ func _init() -> void:
 func place(wheel_centre: Vector2, relay_x: float) -> void:
 	position = wheel_centre
 	_relay_x = relay_x
-	# A larger TEXT SIZE grows the plate upward, so its foot stays over the wheel, and to the left, so
-	# its right edge stays where it stood at 100% (at the corridor's start that edge is near the view's,
-	# where plates fade out: JunctionRoom.fade_at_view_edge).
-	var font: Font = bypass_label.get_theme_font(&"font")
-	var grown: float = (font.get_height(TextSize.world_px(LABEL_FONT_SIZE)) - font.get_height(LABEL_FONT_SIZE)) * bypass_label.get_line_count()
-	var widened: float = float(bypass_label.get_meta(&"wrap_width")) * (TextSize.world_factor() - 1.0)
-	var right: float = (bypass_label.size.x - widened) * 0.5 + LABEL_SHIFT_X
-	bypass_label.position = Vector2(right - bypass_label.size.x, LABEL_TOP - grown)
-	readout.queue_redraw()
 	# The tag grows upward too, over the relay's name, which main lifts by as much (fault_tag_growth).
 	fault_tag.position = Vector2(relay_x - wheel_centre.x - fault_tag.size.x * 0.5, FAULT_TAG_TOP - wheel_centre.y - fault_tag_growth())
+	# A larger TEXT SIZE grows the plate upward, so its foot stays over the wheel, and to the right of
+	# where it stood at 100%, clear of the COOLANT FAULT tag (the wider of the relay's two names), so
+	# the relay's names and this plate never run into each other.
+	var font: Font = bypass_label.get_theme_font(&"font")
+	var grown: float = (font.get_height(TextSize.world_px(LABEL_FONT_SIZE)) - font.get_height(LABEL_FONT_SIZE)) * bypass_label.get_line_count()
+	var left: float = -bypass_label.size.x * 0.5 + LABEL_SHIFT_X
+	if TextSize.world_factor() > 1.0:
+		var at_100: float = bypass_label.size.x - float(bypass_label.get_meta(&"wrap_width")) * (TextSize.world_factor() - 1.0)
+		left = maxf(-at_100 * 0.5 + LABEL_SHIFT_X, fault_tag.position.x + fault_tag.size.x + LABEL_GAP)
+	bypass_label.position = Vector2(left, LABEL_TOP - grown)
+	readout.queue_redraw()
 
 
 ## How much taller the COOLANT FAULT tag stands than at 100% (it breaks onto two rows when larger).

@@ -546,11 +546,10 @@ func _check_text_size(path: String) -> void:
 ## At every text size the station names in each room, in each state, stay apart: a name breaks
 ## between its words above 100% (TextSize.WORLD_ROW_GROWTH) instead of running into its neighbours,
 ## stands where it stood at 100% (its bottom edge), and the corridor's are not faded out at the start
-## (the MANUAL BYPASS plate, a little faded there at 100%, no more than at 100%).
+## (the MANUAL BYPASS plate, at the view's edge there, once the engineer walks towards it).
 func _check_station_names() -> void:
 	var settings: GameSettings = game.settings_menu
 	var bottoms: Dictionary = {}
-	var bypass_alpha_at_100: float = 1.0
 	for index: int in TextSize.STEPS.size():
 		settings.text_size.select(index)
 		settings.text_size.item_selected.emit(index)
@@ -560,7 +559,7 @@ func _check_station_names() -> void:
 			for frame: int in 3:
 				await process_frame
 			var labels: Array[Label] = []
-			var candidates: Array = [game.get_node("BreakerLabel"), game.get_node("RelayLabel"), game.get_node("CheckpointLabel"), game.bypass_handle.fault_tag]
+			var candidates: Array = [game.get_node("BreakerLabel"), game.get_node("RelayLabel"), game.get_node("CheckpointLabel"), game.bypass_handle.fault_tag, game.bypass_handle.bypass_label]
 			candidates.append_array(game.records_room.station_labels)
 			candidates.append_array(game.junction_room.station_labels)
 			for label: Label in candidates:
@@ -579,12 +578,16 @@ func _check_station_names() -> void:
 			if jump == &"corridor_start":
 				for label: Label in [game.get_node("BreakerLabel"), game.get_node("RelayLabel"), game.bypass_handle.fault_tag] as Array[Label]:
 					_expect(label.modulate.a > 0.99, "%d%%: %s is not faded at the corridor's start (alpha %.2f)" % [percent, label.text, label.modulate.a])
-				# The MANUAL BYPASS plate (the engineer-only fallback) sits near the view's edge at the start,
-				# a little faded at 100%; a larger size grows it away from that edge, so it fades no more.
-				var bypass_alpha: float = game.bypass_handle.bypass_label.modulate.a
+				# The MANUAL BYPASS plate (the engineer-only fallback) stands at the view's right edge at the
+				# start: a little faded at 100%, faded out at larger sizes (it grows to the right, clear of the
+				# relay's names). Standing beside the relay, where WOLF points to the bypass when he refuses,
+				# the engineer sees it in full.
 				if index == 0:
-					bypass_alpha_at_100 = bypass_alpha
-				_expect(bypass_alpha >= bypass_alpha_at_100 - 0.01 and bypass_alpha > 0.5, "%d%%: MANUAL BYPASS fades no more than at 100%% at the corridor's start (alpha %.2f, %.2f at 100%%)" % [percent, bypass_alpha, bypass_alpha_at_100])
+					_expect(game.bypass_handle.bypass_label.modulate.a > 0.5, "100%%: MANUAL BYPASS shows at the corridor's start (alpha %.2f)" % game.bypass_handle.bypass_label.modulate.a)
+				game.debug_place(Main.RELAY_SIDE_X, Main.RELAY_SIDE_X - 120.0)
+				for frame: int in 90:
+					await process_frame
+				_expect(game.bypass_handle.bypass_label.modulate.a > 0.99, "%d%%: MANUAL BYPASS shows in full with the engineer beside the relay (alpha %.2f)" % [percent, game.bypass_handle.bypass_label.modulate.a])
 				var relay_name: Rect2 = (game.get_node("RelayLabel") as Label).get_global_rect()
 				_expect(relay_name.end.y <= game.bypass_handle.fault_tag.get_global_rect().position.y + 0.5, "%d%%: COOLANT RELAY stands above its COOLANT FAULT tag" % percent)
 		await _check_touch_layout(percent)
