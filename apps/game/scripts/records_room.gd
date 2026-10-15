@@ -95,7 +95,7 @@ const MIRROR_LIGHT: Rect2 = Rect2(511.0, 348.0, 20.0, 4.0)
 ## the leaf sees the lit surfaces round it: the threshold and passage deck through the doorway (they light
 ## the open leaf's outside face and the reveal, never the room face) and the cross-wall's lit face beyond the
 ## hinge jamb (the room face turns toward it as the leaf opens, so the leaf never goes black mid-swing).
-## Gains fitted with doors-r1/fix-r4/tools/{leafsim,lp3,l1,refine,dipfix}.py and closed on render.sh frames
+## Gains fitted with docs/research-2026-10/sources/doors-2026-10-14/fix-r4/tools/{leafsim,lp3,l1,refine,dipfix}.py and closed on render.sh frames
 ## (swingcheck.py): open, the leaf by the hinge at 0.7-0.9x the reveal in each row band; shut, below its
 ## wall; through the swing, never far below shut and well above half the wall.
 const EXIT_LEAF_LIGHTS: Array = [
