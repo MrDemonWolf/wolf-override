@@ -117,7 +117,7 @@ class Canvas:
 
 
 # The design canvas: everything this piece draws, at 4 px per world px.
-CV = Canvas(400.0, 136.0, 664.0, 504.0, 4.0)
+CV = Canvas(400.0, 136.0, 704.0, 584.0, 4.0)  # fix round 1: down to y 584 for the stub's cut through the deck fascia
 SS = 4
 
 

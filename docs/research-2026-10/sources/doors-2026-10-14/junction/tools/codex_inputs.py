@@ -22,7 +22,7 @@ sys.path.insert(0, os.path.dirname(__file__))
 import jmodel as M  # noqa: E402
 import preview as P  # noqa: E402
 
-TX0, TY0, TX1, TY1 = 400.0, 122.0, 664.0, 518.0
+TX0, TY0, TX1, TY1 = 396.0, 122.0, 704.0, 584.0  # fix round 1: taller, for the cut through the deck fascia
 TW, TH = 1024, 1536
 S = P.S  # 4 px per world px in the room composite
 
@@ -33,7 +33,7 @@ def to_target(img4: Image.Image) -> Image.Image:
 
 # Soft designed gradients (soot, dust) are not painted by the image tool: the cleanup composites
 # them from the design. They are left out of the paint maps.
-SOFT_PARTS = {"damage": ["soot"], "lying": ["dust_film"]}
+SOFT_PARTS = {"damage": ["soot"], "lying": ["dust_film"], "frontblown": ["col_soot"], "hole": ["lane_shade"]}  # fix round 2
 
 
 def layer_alpha_world(path: str) -> Image.Image:
@@ -59,7 +59,7 @@ def layer_alpha_world(path: str) -> Image.Image:
 def build(job: str) -> None:
     D = os.path.join(M.WORK, "design")
     F = os.path.join(M.WORK, "layers", "sealed")
-    out = os.path.join(M.WORK, "..", "codex", f"junction-paint-{job}", "refs")
+    out = os.path.join(M.WORK, "..", "codex", os.environ.get("JOB_NAME", f"junction-paint-{job}"), "refs")
     os.makedirs(out, exist_ok=True)
     img = P.room()
     white = Image.new("L", img.size, 0)
@@ -104,6 +104,9 @@ def build(job: str) -> None:
         white = Image.fromarray(w)
         put(os.path.join(F, "front.png"), paint=False)
         unpaint(os.path.join(F, "front.png"))
+        # fix round 2 (N4): the near column as the blast left it (torn hinges, spalled corner, bars, the
+        # arris angle torn loose, soot) is painted here; the stub stays the sealed set's
+        put(os.path.join(D, "design-frontblown.png"))
         put(os.path.join(D, "design-lying.png"))
         names = [("1-edit-target-junction-door-blown.png", img), ("2-areas-to-paint-blown.png", white)]
         # the breaking frame: the shut set with the breaking leaf and the cracks

@@ -22,8 +22,8 @@ from PIL import Image
 sys.path.insert(0, os.path.dirname(__file__))
 import jmodel as M  # noqa: E402
 
-L = os.path.join(M.WORK, "layers")
-OUT = os.path.join(L, "final")
+L = os.path.join(M.WORK, "layers", "graded")  # fix round 1: the graded layers (jgrade.py)
+OUT = os.path.join(M.WORK, "layers", "final")
 DM = os.path.join(M.WORK, "design", "masks")
 
 # piece: (source layer, set, ppw, part filter (None = whole layer), node, states, z relative to JunctionRoom, job)
@@ -37,6 +37,8 @@ PIECES = [
     ("damage", "damage", "blown", 2, None, "DoorDamage", ["blown"], -3, "spall, exposed rebar, peeled latch flange, sagging head, soot"),
     ("alcove", "alcove", "sealed", 2, None, "ReleaseBay", ["sealed", "breaking", "blown"], -2, "the TANK RELEASE bay: recess, header, two posts on base plates, its fitting"),
     ("column", "front", "sealed", 2, "column", "DoorColumn", ["sealed", "breaking", "blown"], 2, "the near column over the actors: frame flange, armoured end, status lamp socket, junction box, conduit"),
+    # fix round 2 (N4): the near column as the blast left it; the same DoorColumn sprite shows this region once blown
+    ("colblown", "frontblown", "blown", 2, "colblown", "DoorColumn", ["blown"], 2, "the near column after the blast: torn hinges and sheared pins, the spalled hinge-jamb corner with its bars, the arris angle torn loose, soot"),
     ("stub", "front", "sealed", 2, "stub", "DoorStub", ["sealed", "breaking", "blown"], 2, "the wall's 0.15 m stub across the deck, over the actors"),
     ("lying", "lying", "blown", 2, None, "DoorLeafDown", ["blown"], 2, "the thrown leaf lying on the lane deck, the front rubble and the dust film (over the actors)"),
 ]
@@ -88,7 +90,8 @@ def lens_texture():
 # the approved corridor wall (sRGB ~ (40, 51, 57) against (24, 30, 34)), a flat pale slab against the
 # dark room. Above the door light nothing lights them but the room's far lamps, so their value falls
 # off with height: x1.0 up to the door light's bracket (world y 345), easing to x0.6 above y 250.
-FALLOFF_PIECES = ("wall", "column")
+# fix round 1: the room-relative grade (jgrade.py, ../../tools/grade.py) replaces this fall-off.
+FALLOFF_PIECES = ()
 FALLOFF_TOP_Y, FALLOFF_BOTTOM_Y, FALLOFF_MIN = 250.0, 345.0, 0.6
 
 
@@ -104,6 +107,7 @@ def main():
     spec = json.load(open(os.path.join(M.WORK, "design", "spec.json")))
     pieces = []
     col_sel = part_union("front", COLUMN_PARTS) > 0.002
+    colb_sel = part_union("frontblown", COLUMN_PARTS) > 0.002
     for (pname, layer, sset, ppw, filt, node, states, z, job) in PIECES:
         im = load(layer, sset)
         if filt == "stub":
@@ -112,6 +116,18 @@ def main():
         elif filt == "column":
             im = im.copy()
             im[..., 3] *= col_sel
+        elif filt == "colblown":
+            im = im.copy()
+            # fix round 2: the parts the blast leaves alone (the status lamp and its guard, the junction box,
+            # the conduit feed, the riser) are the sealed column's own pixels, so one fitting never turns
+            # into another between the two states; only the col_* parts (torn hinges, spall, bars, the
+            # arris angle, soot) come from the blown painting
+            keep_sealed = part_union("front", ("lamp_", "jb_", "light_feed_end", "riser"))
+            if keep_sealed is not None:
+                sealed = load("front", "sealed")
+                ks = (keep_sealed > 0.002)[..., None]
+                im = np.where(ks, sealed, im)
+            im[..., 3] *= colb_sel
         im = im.copy()
         if pname in FALLOFF_PIECES:
             im[..., :3] *= upper_falloff(im.shape[0])[:, None, None]
@@ -130,21 +146,24 @@ def main():
     pieces.append({"piece": "lens", "node": "DoorLampLens", "states": ["sealed", "breaking", "blown"], "z": 2, "scale": 0.25,
                    "job": "the status lamp's glass, tinted live: red shut, amber while the line builds, flashing through the fuse, dark once blown",
                    "world_top_left": [gx - lens.shape[1] / 8.0, gy - lens.shape[0] / 8.0], "world_size": [lens.shape[1] / 4.0, lens.shape[0] / 4.0], "img": lens})
-    # shelf packing, tallest first, 1024 wide, 2 px padding
+    # fix round 3: skyline (bottom-left) packing, tallest first, 1024 wide, 2 px padding: each piece goes
+    # where its top is lowest, so short pieces fill the space under shorter neighbours on a shelf (the
+    # wider thrown leaf, review r3 S3, then fits without growing the atlas)
     W, PAD = 1024, 2
     order = sorted(range(len(pieces)), key=lambda i: -pieces[i]["img"].shape[0])
-    x = y = shelf = PAD
-    shelf_h = 0
+    sky = np.full(W, PAD)
     for i in order:
         h, w = pieces[i]["img"].shape[:2]
-        if x + w + PAD > W:
-            y += shelf_h + PAD
-            x, shelf_h = PAD, 0
+        best = None
+        for x in range(PAD, W - w - PAD + 1, 2):
+            y = int(sky[x - PAD:x + w + PAD].max()) if x >= PAD else int(sky[:x + w + PAD].max())
+            if best is None or y < best[1] or (y == best[1] and x < best[0]):
+                best = (x, y)
+        x, y = best
         pieces[i]["region"] = [x, y, w, h]
-        x += w + PAD
-        shelf_h = max(shelf_h, h)
-    H = y + shelf_h + PAD
-    Hp = next(v for v in (256, 512, 768, 1024, 1536, 2048) if v >= H)
+        sky[x:x + w] = y + h + PAD
+    H = int(sky.max())
+    Hp = -(-H // 4) * 4  # fix round 1: the used height (multiple of 4), not the next power-of-two step
     atlas = np.zeros((Hp, W, 4))
     for p in pieces:
         x, y, w, h = p["region"]
@@ -156,7 +175,7 @@ def main():
     place = {"atlas": "res://assets/props/junction-door-atlas.png", "atlas_size": [W, Hp],
              "import": "lossless (compress/mode=0), mipmaps on, filter linear with mipmaps: as corridor-seal-atlas.png",
              "parent": "JunctionRoom (z 1); z below is relative to it (props are -1, actors 2 absolute = 1 relative)",
-             "draw_order": [p["node"] for p in pieces if p["piece"] != "lens"][:7] + ["(Recesses, then ReleaseBay)", "(props, room drawing, actors)", "DoorLampLens", "DoorColumn", "DoorStub", "DoorLeafDown"],
+             "draw_order": [p["node"] for p in pieces if p["piece"] not in ("lens", "colblown")][:7] + ["(Recesses, then ReleaseBay)", "(props, room drawing, actors)", "DoorLampLens", "DoorColumn", "DoorStub", "DoorLeafDown"],
              "pieces": [{k: (v if k != "img" else None) for k, v in p.items() if k != "img"} for p in pieces],
              "lamp_glass_centre": spec["lamp_glass_centre"], "camera": spec["camera"], "model": spec["model"], "screen": spec["screen"]}
     for p in place["pieces"]:

@@ -24,20 +24,23 @@ from scipy import ndimage
 sys.path.insert(0, os.path.dirname(__file__))
 import imgkit as K  # noqa: E402
 import jmodel as M  # noqa: E402
-from codex_inputs import TH, TW, TX0, TY0  # noqa: E402
+from codex_inputs import TH, TW, TX0, TX1, TY0  # noqa: E402
 
-TS = TW / (664.0 - 400.0)  # target px per world px (3.8788)
+TS = TW / (TX1 - TX0)  # target px per world px
 CODEX = os.path.join(M.WORK, "..", "codex")
 DESIGN = os.path.join(M.WORK, "design")
 
 # Faces that must stay calm (large plain surfaces) and how much fine texture they keep.
-CALM = {"face_far_column": (5.0, 0.55), "face_upper": (5.0, 0.55), "col_end": (3.0, 0.6), "col_face_strip": (3.0, 0.6),
-        "stub_face": (3.0, 0.6), "stub_top": (3.0, 0.6), "bay_back": (5.0, 0.5), "leaf_face": (4.0, 0.55),
-        "reveal_far": (3.0, 0.6), "leaf_up_face": (4.0, 0.6), "threshold_full": (2.0, 0.7)}
+# fix round 1 (M1, the human review): the concrete keeps most of the paint's grain and grime now (the
+# designed wear is in its values already), so it is as worked a surface as the room's painted walls;
+# only the leaf faces stay calm, as plate steel is.
+CALM = {"face_far_column": (5.0, 0.9), "face_upper": (5.0, 0.9), "col_end": (3.0, 0.9), "col_face_strip": (3.0, 0.9),
+        "stub_face": (3.0, 0.9), "stub_top": (3.0, 0.9), "bay_back": (5.0, 0.85), "leaf_face": (4.0, 0.7),
+        "reveal_far": (3.0, 0.85), "leaf_up_face": (4.0, 0.75), "threshold_full": (2.0, 0.8), "stub_cut": (3.0, 0.9)}
 # Parts painted only by the design (light sources): kept as drawn.
 KEEP_DESIGN = {"light_lens", "bay_light_lens"}
 # Soft designed films composited over the paint from the design (never painted by the image tool).
-SOFT = {"soot", "dust_film"}
+SOFT = {"soot", "dust_film", "col_soot", "lane_shade"}  # fix round 2: + the column soot, the lane shade
 
 
 def load_design(layer):
@@ -172,17 +175,18 @@ def main():
     cast = room_cast()
     hidden = props_alpha()
     if job == "sealed":
-        reg, info = registered("junction-paint-sealed", "junction-door-shut-painted.png", "1-edit-target-junction-door-shut.png")
+        reg, info = registered(os.environ.get("SEALED_JOB", "r2-junction-sealed"), os.environ.get("SEALED_OUT", "r2-junction-sealed-painted.png"), "1-edit-target-junction-door-shut.png")
         report["registration"]["sealed"] = info
         canvas = sample_painted(reg)
         jobs = [("wall", canvas), ("leaf", canvas), ("front", canvas), ("alcove", canvas)]
     else:
-        reg, info = registered("junction-paint-blown", "junction-door-blown-painted.png", "1-edit-target-junction-door-blown.png")
+        bj = os.environ.get("BLOWN_JOB", "r2-junction-blown")  # fix round 2
+        reg, info = registered(bj, f"{bj}-painted.png".replace("blown-painted", "blown-painted"), "1-edit-target-junction-door-blown.png")
         report["registration"]["blown"] = info
-        reg2, info2 = registered("junction-paint-blown", "junction-door-breaking-painted.png", "3-edit-target-junction-door-breaking.png")
+        reg2, info2 = registered(bj, bj.replace("blown", "breaking") + "-painted.png", "3-edit-target-junction-door-breaking.png")
         report["registration"]["breaking"] = info2
         c1, c2 = sample_painted(reg), sample_painted(reg2)
-        jobs = [("hole", c1), ("damage", c1), ("lying", c1), ("leafbreak", c2), ("cracks", c2)]
+        jobs = [("hole", c1), ("damage", c1), ("lying", c1), ("frontblown", c1), ("leafbreak", c2), ("cracks", c2)]  # fix round 2: + the blown column
     for layer, canvas in jobs:
         rgb, a = clean_layer(layer, canvas, report["value_gain"], cast, hidden if layer in ("wall", "alcove", "hole", "damage", "leaf", "leafbreak", "cracks") else None)
         K.save_rgba(rgb, a, os.path.join(out, f"{layer}.png"))
