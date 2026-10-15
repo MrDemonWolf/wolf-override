@@ -635,6 +635,9 @@ var box_queue_line: String = ""
 var box_queue_seconds: float = 0.0
 var box_queue_chapter: String = ""
 var box_queue_choice_seen: bool = false
+## The box the queue itself put up (_say, _next_box_now), not a line that cut in: an aside that takes the
+## box before it has been read puts it back at the front of the queue (_aside).
+var box_queue_shown: String = ""
 ## The boxes status_line is shown as (DialogueBoxes.split), the one on screen and how long it has been
 ## up. The last box clears once it has been read and the engineer moves on (dialogue_cleared, STORY-8).
 ## dialogue_key is what they were split from (the line as shown, the engineer's name and the text size).
@@ -1319,6 +1322,7 @@ func _say(boxes: Array[String]) -> void:
 	status_line = boxes[0]
 	box_queue = boxes.slice(1)
 	box_queue_line = status_line
+	box_queue_shown = status_line
 	box_queue_seconds = box_seconds(status_line)
 	box_queue_chapter = state.chapter_id
 	box_queue_choice_seen = false
@@ -1372,6 +1376,18 @@ func _tell(line: String) -> void:
 	status_line = line
 
 
+## Puts an aside in the box (a station's answer, such as the purge display, or a refusal). A box of a
+## line said in several boxes that is up and not yet read comes back after it, ahead of the boxes still
+## to come, so reading a station never drops a story box (the opening exchange, say).
+func _aside(line: String) -> void:
+	if not box_queue_shown.is_empty() and status_line == box_queue_shown and status_line != line and not _dialogue_read():
+		box_queue.push_front(status_line)
+		box_queue_chapter = state.chapter_id
+		box_queue_choice_seen = false
+	box_queue_shown = ""
+	status_line = line
+
+
 ## Says [param line] in its own box after the boxes still to come of an earlier line, or now if there
 ## are none.
 func _say_next(line: String) -> void:
@@ -1388,6 +1404,7 @@ func _next_box_now() -> void:
 		return
 	status_line = box_queue.pop_front()
 	box_queue_line = status_line
+	box_queue_shown = status_line
 	box_queue_seconds = box_seconds(status_line)
 
 
@@ -1395,6 +1412,7 @@ func _next_box_now() -> void:
 func _drop_box_queue() -> void:
 	box_queue.clear()
 	box_queue_line = ""
+	box_queue_shown = ""
 	box_queue_seconds = 0.0
 	box_queue_choice_seen = false
 
@@ -2076,7 +2094,7 @@ func _interact() -> void:
 		return
 	_step_beside_station(x)
 	if x <= PURGE_DISPLAY_MAX_X:
-		status_line = "DIRECTOR / PURGE: Original program logs marked for deletion.\nWOLF: They want the source record gone. We need to preserve it."
+		_aside("DIRECTOR / PURGE: Original program logs marked for deletion.\nWOLF: They want the source record gone. We need to preserve it.")
 	elif _at_bypass(x):
 		_interact_bypass()
 	elif _at_breaker(x):
@@ -2086,7 +2104,7 @@ func _interact() -> void:
 	elif absf(x - 876.0) <= 52.0:
 		_interact_checkpoint()
 	else:
-		status_line = "No station in reach. Follow the labeled breaker, relay, bypass or safe point."
+		_aside("No station in reach. Follow the labeled breaker, relay, bypass or safe point.")
 
 
 ## True within reach of the MANUAL BYPASS (x 670 to 730), just past the relay's, so the two never
@@ -2703,7 +2721,7 @@ func _refuse(line: String, station: StringName) -> void:
 	junction_room.flicker(station, 2)
 	if status_line == line:
 		_blink_box()
-	status_line = line
+	_aside(line)
 
 
 ## The dialogue box dips and comes back once, so a line shown again reads as a new answer.

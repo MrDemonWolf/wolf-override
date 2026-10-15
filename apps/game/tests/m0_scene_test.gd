@@ -127,9 +127,8 @@ func _run() -> void:
 	game.call("_refresh_ui")
 	_expect(str(game.get("status_line")) == "Rowan keeps WOLF's systems running.", "the first line after control says why the engineer trusts WOLF")
 	_expect(not (game.get_node("CanvasLayer/BottomBar") as Control).visible and not context_hint.visible, "on the first controllable frames the lines and the hint wait: the name card and the move prompt come first (TEACH-7)")
-	# The opening exchange is the trust line's third box. Watch every frame from here to the stakes:
-	# reading the display either cuts in before it (it follows once the display's text is read) or
-	# replaces it after it has had its turn, depending on how long the player takes to press.
+	# The opening exchange is the trust line's third box. Watch every frame from here to the stakes: it
+	# shows again after the display's text, whichever box was up when the display was read.
 	var exchange_shown: Array[bool] = [false]
 	var watch_exchange: Callable = func() -> void:
 		exchange_shown[0] = exchange_shown[0] or str(game.get("status_line")).begins_with("WOLF: I heard the Director's plan for me.")
@@ -154,8 +153,23 @@ func _run() -> void:
 	_expect(tutorial_text.text.begins_with("USE  READ DISPLAY (optional)") and _widest_line(tutorial_text) <= tutorial_text.size.x, "the touch tutorial names the USE button and fits inside the tutorial box")
 	game.set("touch_enabled", false)
 	game.call("_refresh_ui")
-	await process_frame
-	await _tap(&"interact")
+	# Reading the display never drops a story box, whenever the player presses (the opening's boxes here).
+	# The calls below run without a frame between them, so the box up when the display is read is fixed.
+	# The first step started the opening lines: the trust line's first box is up, unread. Reading the
+	# display now cuts in ahead of them, and every one of them follows it.
+	var opening_boxes: Array[String] = [Main.TRUST_LINE_1 % "Rowan", Main.TRUST_LINE_2 % "Rowan", Main.OPENING_EXCHANGE % "ROWAN"]
+	_expect(str(game.get("status_line")) == opening_boxes[0] and game.get("box_queue") == opening_boxes.slice(1), "the first step starts the opening lines at the trust line's first box")
+	game.call("_interact")
+	_expect(str(game.get("status_line")).begins_with("DIRECTOR / PURGE: Original program logs marked for deletion") and game.get("box_queue") == opening_boxes, "reading the display ahead of the opening lines holds them all back behind it, the box it cut into first")
+	# Brought on to the opening exchange, its box is up and unread: reading the display again puts it
+	# back at the front of the queue instead of replacing it for good (the old flaky case on CI).
+	for box: int in 3:
+		game.call("_next_box_now")
+	_expect(str(game.get("status_line")) == opening_boxes[2] and (game.get("box_queue") as Array).is_empty(), "the opening exchange is the box up")
+	game.call("_interact")
+	_expect(str(game.get("status_line")).contains("Original program logs marked for deletion") and game.get("box_queue") == [opening_boxes[2]], "reading the display over the unread opening exchange brings the exchange back after it")
+	exchange_shown[0] = false
+	game.call("_refresh_ui")
 	_expect(str(game.get("status_line")).contains("Original program logs marked for deletion"), "purge display establishes evidence stakes without inventory")
 	_expect(not tutorial_prompt.visible, "reading the display clears the opening tutorial")
 	var start_x: float = human.position.x
@@ -163,14 +177,13 @@ func _run() -> void:
 		return
 	_expect(human.position.x > start_x and wolf.position.x > 225.0 and wolf.position.x < human.position.x, "WOLF follows the engineer autonomously")
 	_expect(str(game.get("status_line")).contains("Original program logs marked for deletion"), "walking straight on past the display leaves its text up to be read")
-	# If the display cut into the opening's boxes, the exchange still to come follows once the display's
-	# text has been read, and the stakes wait for it to be read in turn. Each line shows box by box, each
-	# box up its reading time, so this can take about 25 s of standing still.
+	# The exchange follows once the display's text has been read, and the stakes wait for it to be read
+	# in turn. Each line shows box by box, each box up its reading time: about 15 s of standing still.
 	_expect(await _wait_until(func() -> bool:
 		watch_exchange.call()
 		return str(game.get("status_line")) == "WOLF: That purge takes the original program logs. Once they're gone, his word is the only record.", 2400), "once the display's text has been up long enough to read, WOLF says what the purge takes")
 	process_frame.disconnect(watch_exchange)
-	_expect(exchange_shown[0], "the opening exchange shows before the stakes, whether or not the display cut into the opening's boxes")
+	_expect(exchange_shown[0], "the opening exchange shows again after the display's text and before the stakes")
 	if not _require(await _walk_to(human, 450.0), "engineer can move beyond the breaker"):
 		return
 	if not _require(await _walk_to(human, 350.0), "engineer can backtrack to the breaker"):

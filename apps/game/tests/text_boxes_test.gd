@@ -140,7 +140,7 @@ static func _words(text: String, tags: Array[String]) -> PackedStringArray:
 
 ## Every line constant in Main (the trust line's boxes, the refusals and the opening exchange too) and
 ## JunctionRoom's knockdown cards, and every string literal main.gd says through status_line, _tell,
-## _say or _say_next, with "%s" as the engineer's name ({NAME} where it is a tag) and
+## _say, _say_next or _aside, with "%s" as the engineer's name ({NAME} where it is a tag) and
 ## "%d" as a number. WOLF's remembered line at the safe point is filled in with each of its three.
 func _corpus() -> Array[String]:
 	var out: Array[String] = []
@@ -167,7 +167,7 @@ func _corpus() -> Array[String]:
 					remembered.append(found.get_string(1).c_unescape())
 	for line: String in source.split("\n"):
 		var said_at: int = -1
-		for call: String in ["status_line = ", "_tell(", "_say_next(", "_say(["]:
+		for call: String in ["status_line = ", "_tell(", "_say_next(", "_say([", "_aside("]:
 			if line.contains(call):
 				said_at = line.find(call)
 		if said_at < 0:
