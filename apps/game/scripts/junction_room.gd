@@ -184,6 +184,14 @@ const EXIT_NEAR_JAMB_X: float = 971.3
 ## bleed; drawn over the floor reflections of anyone who has gone through, behind the wall's stub.
 const EXIT_DECK: Rect2 = Rect2(716.0, 0.0, 152.0, 288.0)
 const EXIT_DECK_AT: Vector2 = Vector2(956.0, 440.0)
+## The deck's bottom rows mirrored on down past its end (y 584), as the room's mid plate's bottom bleed
+## does: the touch framing (Main.GAMEPLAY_CAMERA_Y_TOUCH) shows down to y ~592, and a camera shake
+## 10 px more, so at the junction's right end the view would otherwise show the far plate there.
+const EXIT_DECK_BLEED: float = 40.0
+## The passage's and the deck's right-hand columns mirrored on past their end (x 1032), as the room's
+## mid plate's right bleed does: a camera shake (Impact.MAX_SHAKE_PX, the bolt's arc at 0.8 trauma) at
+## the view's right end (EXIT_VIEW_RIGHT) would otherwise show the far plate there.
+const EXIT_EDGE_BLEED: float = 12.0
 ## The junction's camera may show this far right (Main), so the near jamb, the wall's column and the
 ## passage beyond frame the doorway (the exit's pieces and its deck cover the view to here), and the
 ## actors may walk on through it this far: on down the passage, out of view behind the wall, far enough
@@ -509,6 +517,7 @@ var exit_leaf: Sprite2D
 var exit_back: Sprite2D
 var exit_lens: Sprite2D
 var exit_deck: Sprite2D
+var exit_deck_bleed: Sprite2D
 var exit_front: Sprite2D
 var recesses: Recesses
 ## The exit bolt's panel drawn again over the sentry where it passes behind it.
@@ -908,13 +917,28 @@ func _build_bay() -> void:
 ## the actors with the blast door's column (DOOR_FRONT_Z). Its lens and leaf follow the bolt.
 func _build_exit() -> void:
 	exit_beyond = _exit_piece("ExitBeyond", EXIT_BEYOND, EXIT_BEYOND_AT, -1)
+	_exit_edge_bleed(exit_beyond)
 	exit_leaf = _exit_piece("ExitLeaf", EXIT_LEAF, Vector2.ZERO, -1)
 	exit_leaf.offset = -EXIT_LEAF_ANCHOR
 	exit_back = _exit_piece("ExitBack", EXIT_BACK, EXIT_BACK_AT, -1)
 	exit_lens = _exit_piece("ExitLens", EXIT_LENS, EXIT_LENS_AT, -1)
 	exit_deck = _exit_piece("ExitDeck", EXIT_DECK, EXIT_DECK_AT, DOOR_FRONT_Z)
+	var bleed_rows: float = EXIT_DECK_BLEED / EXIT_ATLAS_SCALE
+	exit_deck_bleed = _exit_piece("ExitDeckBleed", Rect2(EXIT_DECK.position.x, EXIT_DECK.end.y - bleed_rows, EXIT_DECK.size.x, bleed_rows), EXIT_DECK_AT + Vector2(0.0, EXIT_DECK.size.y * EXIT_ATLAS_SCALE), DOOR_FRONT_Z)
+	exit_deck_bleed.flip_v = true
+	_exit_edge_bleed(exit_deck)
+	_exit_edge_bleed(exit_deck_bleed).flip_v = true
 	exit_front = _exit_piece("ExitFront", EXIT_FRONT, EXIT_FRONT_AT, DOOR_FRONT_Z)
 	_sync_hatch()
+
+
+## [param piece]'s last EXIT_EDGE_BLEED world px, mirrored on to the right of it at its depth.
+func _exit_edge_bleed(piece: Sprite2D) -> Sprite2D:
+	var columns: float = EXIT_EDGE_BLEED / EXIT_ATLAS_SCALE
+	var region: Rect2 = piece.region_rect
+	var strip: Sprite2D = _exit_piece(piece.name + "EdgeBleed", Rect2(region.end.x - columns, region.position.y, columns, region.size.y), piece.position + Vector2(region.size.x * EXIT_ATLAS_SCALE, 0.0), piece.z_index)
+	strip.flip_h = true
+	return strip
 
 
 func _exit_piece(piece_name: String, region: Rect2, at: Vector2, z: int) -> Sprite2D:

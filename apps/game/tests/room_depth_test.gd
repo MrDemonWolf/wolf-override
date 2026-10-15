@@ -53,6 +53,7 @@ func _run() -> void:
 			for room_name: String in rooms:
 				_check_coverage("%s, %s, shake %d" % [room_name, framing[0], int(shake)], rooms[room_name], view)
 	camera.offset = Vector2.ZERO
+	await _check_exit_view_edge(junction, camera, half_play, touch_y)
 	# Every station stands on the floor, as tall as the art it replaced.
 	var floor_props: Dictionary = {
 		"breaker": game.get_node("BreakerArt"),
@@ -247,6 +248,46 @@ func _expect(condition: bool, label: String) -> void:
 	if not condition:
 		failures += 1
 		push_error("Room depth check failed: " + label)
+
+
+## The junction's play view runs on past the room's end to JunctionRoom.EXIT_VIEW_RIGHT. Past the mid
+## plate's right bleed only the exit's own pieces stand between the camera and the far plate, so at the
+## right end (keyboard and touch framing, shaken both ways) they cover that strip down to the view's
+## bottom: the deck's bleed carries it below the deck's end, which the touch framing shows, and the
+## mirrored edge strips carry the passage and the deck past their end, which a shake shows.
+func _check_exit_view_edge(junction: JunctionRoom, camera: Camera2D, half_play: float, touch_y: float) -> void:
+	var mid_span: Rect2 = _global_rect(junction.depth.mid_layer.get_node("RightBleed") as Sprite2D)
+	var cover: Array[Rect2] = []
+	for piece: Sprite2D in [junction.exit_beyond, junction.exit_front, junction.exit_deck, junction.exit_deck_bleed]:
+		cover.append(_global_rect(piece))
+	for strip_name: String in ["ExitBeyondEdgeBleed", "ExitDeckEdgeBleed", "ExitDeckBleedEdgeBleed"]:
+		var strip: Sprite2D = junction.get_node(strip_name) as Sprite2D
+		_expect(strip.flip_h and strip.texture == JunctionRoom.EXIT_ATLAS, "the exit's %s mirrors its piece's last columns" % strip_name)
+		cover.append(_global_rect(strip))
+	_expect(junction.exit_deck_bleed.flip_v and is_equal_approx(_global_rect(junction.exit_deck_bleed).position.y, _global_rect(junction.exit_deck).end.y), "the exit deck's bleed mirrors its bottom rows on from the deck's end")
+	camera.zoom = Vector2.ONE * 1.35
+	for camera_y: float in [360.0, touch_y]:
+		for shake: float in [-SHAKE, SHAKE]:
+			camera.position = Vector2(JunctionRoom.EXIT_VIEW_RIGHT - half_play, camera_y)
+			camera.offset = Vector2(shake, absf(shake))
+			await process_frame
+			await process_frame
+			var half: Vector2 = Vector2(960.0, 540.0) * 0.5 / camera.zoom
+			var view: Rect2 = Rect2(camera.get_screen_center_position() - half, half * 2.0)
+			var gaps: int = 0
+			var first_gap: Vector2 = Vector2.ZERO
+			var x: float = mid_span.end.x
+			while x <= view.end.x:
+				var y: float = view.position.y
+				while y <= view.end.y:
+					if not cover.any(func(rect: Rect2) -> bool: return rect.has_point(Vector2(x, y))):
+						if gaps == 0:
+							first_gap = Vector2(x, y)
+						gaps += 1
+					y += 2.0
+				x += 2.0
+			_expect(gaps == 0, "junction, %s play right end, shake %d: the exit's pieces cover the view past the mid plate (first gap at %s)" % ["touch" if camera_y == touch_y else "keyboard", int(shake), first_gap])
+	camera.offset = Vector2.ZERO
 
 
 ## The junction's exit door: its pieces come from one atlas and draw in depth order (the passage, the
