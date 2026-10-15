@@ -4,7 +4,7 @@ Scratch only, 2026-10-12. No Git repository, worktree or game copy was touched. 
 
 **How this was checked:**
 - Python previews composed the way the game layers the pieces (`tools/compose7.py`).
-- One headless Godot parse and maths check of the proposed `BlastLeaf` script, in a throwaway project (`integration/gdcheck/`).
+- One headless Godot parse and maths check of the proposed `BlastLeaf` script, in a throwaway project (`door/integration/gdcheck/` at ada83fa; removed from the records, since its `blast_leaf.gd` was the proposal below).
 - **Not done:** no render.sh capture and no in-game capture (the art is not in any game copy yet), nothing played, no phone. So this note makes **no in-game or feel claims**.
 
 ## What a player sees (think as a human)
@@ -96,7 +96,7 @@ The tool returned 1254 px. Alignment was measured as a pure scale 1254/1024 at o
   - `placement.json` (regions, world positions, owning nodes, the leaf's motion and maths);
   - `atlas-regions.json`;
   - far and mid plates, unchanged.
-- **Integration:** `integration/blast_leaf.gd` (the proposed `BlastLeaf` node) and `integration/main.gd.snippet`.
+- **Integration:** `door/integration/blast_leaf.gd` at ada83fa (landed, revised, as apps/game/scripts/blast_leaf.gd) (the proposed `BlastLeaf` node) and `integration/main.gd.snippet`.
 - **Previews:** `tools/compose7.py`, `tools/leafmesh.py` (the Python reference of the mesh), `work/`.
 - **Research:** `research/ufgs-08-39-54.pdf` and `.txt`. Round 6's references were copied to `ref-round6/`.
 
@@ -106,7 +106,7 @@ The tool returned 1254 px. Alignment was measured as a pure scale 1254/1024 at o
    - Every existing region and `*_AT` constant is **identical** to round 6's (checked).
    - Only two existing pieces change pixels: `CorridorSealWall` (25,729 px: frame, sign, pocket edge, seals, rail) and `CorridorDoorFront` (262 px: near head plate, bolt, strap).
    - New regions: `leaf_front` at (449, 705, 158, 256) and `leaf_edge` at (613, 705, 19, 256), with a 2 px extruded gutter.
-2. **Code.** Add `integration/blast_leaf.gd` as `scripts/blast_leaf.gd`, then apply `integration/main.gd.snippet`:
+2. **Code.** Add `door/integration/blast_leaf.gd` at ada83fa as `scripts/blast_leaf.gd` (it landed, revised, as apps/game/scripts/blast_leaf.gd), then apply `integration/main.gd.snippet`:
    - `BlastLeaf` is a door-body child drawn just before `SealLeaf`, with the same atlas, so it batches.
    - It is visible only while the seal slides.
    - The existing tween drives both leaves through `_set_seal_open`, with the same 1.0 s, quad in-out easing.
