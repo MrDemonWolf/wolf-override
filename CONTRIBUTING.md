@@ -47,6 +47,16 @@ affected route in a normal game window and say in the pull request what
 you played and what remains unplayed. Do not describe a game-feel change
 as validated until the route has been played.
 
+Don't copy code. `bun run check:copies` (Python 3, standard library only)
+looks for runs of six or more matching lines, ignoring comments, blank
+lines and spacing, that your branch adds or touches since it left
+`origin/main`; every pull request runs it as part of the `godot` check.
+When it fails, it names both places: move that code into one shared file
+that both use and delete the copy. If two places truly must stay
+separate, list the pair with a reason in `.copies-allow` and say why in
+the pull request. `python3 scripts/check-copies.py --report` lists the
+older copies already on `main`.
+
 The [setup](https://wolfoverride.mrdemonwolf.dev/docs/development/setup/)
 and
 [testing](https://wolfoverride.mrdemonwolf.dev/docs/development/testing/)
