@@ -1174,10 +1174,16 @@ func _tick_records_walk_out(delta: float) -> void:
 		return
 	records_exit_wait += delta
 	if wolf.position.x >= RECORDS_WOLF_OUT_X - 4.0 or records_exit_wait >= RECORDS_WAIT_SECONDS:
-		records_exit_walking = false
-		records_exit_engineer_out = false
-		records_exit_wait = 0.0
+		_reset_records_walk_out()
 		_enter_junction()
+
+
+## Ends (or clears) the walk out of Records: nobody is walking out, nobody is through, nothing waited.
+## Used when WOLF has followed them through, and when the title or a new scene drops the walk.
+func _reset_records_walk_out() -> void:
+	records_exit_walking = false
+	records_exit_engineer_out = false
+	records_exit_wait = 0.0
 
 
 ## Sends the engineer to [param spot_x] on their own, turning on arrival to face [param face_x].
@@ -1824,9 +1830,7 @@ func _return_to_title() -> void:
 	chapter_close_active = false
 	hatch_exit_walking = false
 	hatch_exit_engineer_walking = false
-	records_exit_walking = false
-	records_exit_engineer_out = false
-	records_exit_wait = 0.0
+	_reset_records_walk_out()
 	_hide_end_card()
 	checkpoint_toast_remaining = 0.0
 	waiting_for_choice = false
@@ -3714,9 +3718,7 @@ func _sync_scene() -> void:
 	# Walked out through the hatch, the actors faded; any new scene shows them again.
 	hatch_exit_walking = false
 	hatch_exit_engineer_walking = false
-	records_exit_walking = false
-	records_exit_engineer_out = false
-	records_exit_wait = 0.0
+	_reset_records_walk_out()
 	human.modulate.a = 1.0
 	wolf.modulate.a = 1.0
 	# The corridor's relay staging and bypass crank belong to the moment, not the save, and so does
