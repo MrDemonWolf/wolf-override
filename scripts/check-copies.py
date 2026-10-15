@@ -7,18 +7,23 @@ This check enforces it. It reads the tracked code files of a git ref straight
 from git objects, so it can check any branch without a checkout.
 
 A copy is a run of at least --min-lines consecutive normalised lines that
-appears in two files, or twice in one file. Normalising drops trailing
-comments and every space outside string quotes (so `a=b` matches `a = b`),
-and skips blank lines, comment-only lines and trivial lines (a lone bracket,
-pass, else:, fi, done, docstring quotes, imports and the like), so comments,
-blank lines, indentation and spacing do not hide a copy. It compares text,
+appears in two files, or twice in one file. Normalising drops comments
+(whole-line, trailing and /* */ ones) and every space outside string quotes
+(so `a=b` matches `a = b`), and skips blank lines and trivial lines (a lone
+bracket, pass, else:, fi, done, docstring quotes, imports and the like), so
+comments, blank lines, indentation and spacing do not hide a copy. It compares text,
 not meaning: a copy with renamed variables still passes, so reviewers read
 for those.
 
+With --base, a copy fails when the branch adds one of its lines, or when the
+branch adds, changes or deletes a code line inside one place of a copy that
+was already at the merge base and six or more lines there still match a copy:
+editing one copy of an old block makes the two drift apart.
+
 Usage (from the repository root):
     python3 scripts/check-copies.py                      # every copy in HEAD; exit 1 if any
-    python3 scripts/check-copies.py --base origin/main   # only copies that touch lines added
-                                                         # since the merge base; exit 1 if any
+    python3 scripts/check-copies.py --base origin/main   # only copies the branch adds or
+                                                         # edits since the merge base; exit 1 if any
     python3 scripts/check-copies.py --report             # whole-repository summary; exit 0
     python3 scripts/check-copies.py --ref BRANCH --base main
     python3 scripts/check-copies.py --self-test
@@ -50,11 +55,15 @@ CODE_EXTS = ('.gd', '.gdshader', '.ts', '.tsx', '.js', '.mjs', '.css', '.py', '.
 ALLOW_FILE = '.copies-allow'
 ADVICE = 'move it into one shared file that both use, and delete the copy'
 
-# Comment syntax per file type: line-comment marker, and whether /* */ blocks apply.
-HASH = ('#', False)  # GDScript, Python, shell
-SLASH = ('//', True)  # GDShader, TypeScript, JavaScript
-CSS = (None, True)
-SYNTAX = {'.gd': HASH, '.py': HASH, '.sh': HASH, '.gdshader': SLASH, '.ts': SLASH,
+# Comment syntax per file type: line-comment marker, whether /* */ blocks apply,
+# whether "#" needs a space before it (shell, where $# and ${#x} are not comments;
+# in GDScript and Python any "#" outside a string starts a comment), and whether
+# triple-quoted strings run across lines.
+HASH = ('#', False, False, True)  # GDScript, Python
+SHELL = ('#', False, True, False)
+SLASH = ('//', True, False, False)  # GDShader, TypeScript, JavaScript
+CSS = (None, True, False, False)
+SYNTAX = {'.gd': HASH, '.py': HASH, '.sh': SHELL, '.gdshader': SLASH, '.ts': SLASH,
           '.tsx': SLASH, '.js': SLASH, '.mjs': SLASH, '.css': CSS}
 
 # Lines that carry no logic of their own: closing brackets, bare keywords, docstring
@@ -66,6 +75,7 @@ TRIVIAL = re.compile(
 SPACES = re.compile(r'\s+')
 QUOTES = re.compile('["\'`]')
 HASH_COMMENT = re.compile(r'(?:^|(?<=[ \t]))#')
+TRIPLE_QUOTES = ('"""', "'''")
 
 
 def git(repo, *args, data=None):
@@ -79,68 +89,87 @@ class GitError(Exception):
     pass
 
 
-def split_code(line, marker):
-    """Return the line without its trailing comment, and that code with every
-    space outside string quotes removed (the text copies are matched on)."""
-    if not QUOTES.search(line):  # fast path: nothing quoted on this line
-        if marker == '#':
+def split_code(line, syntax, open_at_start=None):
+    """Return the line's code without comments, that code with every space outside
+    string quotes removed (the text copies are matched on), and what is still open
+    at the end of the line: '/*' for a block comment, a triple quote for a string,
+    or None."""
+    marker, blocks, spaced, triple = syntax
+    if open_at_start is None and not QUOTES.search(line) and not (blocks and '/*' in line):
+        # Fast path: no quotes and no block comment on this line.
+        if marker == '#' and spaced:
             found = HASH_COMMENT.search(line)
             end = found.start() if found else len(line)
         else:
             end = line.find(marker) if marker else -1
             end = len(line) if end < 0 else end
-        return line[:end], SPACES.sub('', line[:end])
-    quote = None
-    kept = []
+        return line[:end], SPACES.sub('', line[:end]), None
+    in_block = open_at_start == '/*'
+    quote = None if in_block else open_at_start
+    code = []
+    key = []
     i = 0
     n = len(line)
     while i < n:
+        if in_block:
+            end = line.find('*/', i)
+            if end < 0:
+                break
+            in_block = False
+            code.append(' ')
+            i = end + 2
+            continue
         ch = line[i]
         if quote:
             if ch == '\\':
-                kept.append(line[i:i + 2])
+                code.append(line[i:i + 2])
+                key.append(line[i:i + 2])
                 i += 2
                 continue
-            if ch == quote:
+            if line.startswith(quote, i):
+                code.append(quote)
+                key.append(quote)
+                i += len(quote)
                 quote = None
-            kept.append(ch)
+                continue
+            code.append(ch)
+            key.append(ch)
         elif ch in '"\'`':
-            quote = ch
-            kept.append(ch)
-        elif marker and line.startswith(marker, i) and (marker != '#' or i == 0 or line[i - 1] in ' \t'):
-            return line[:i], ''.join(kept)
-        elif not ch.isspace():
-            kept.append(ch)
+            quote = line[i:i + 3] if triple and line.startswith(ch * 3, i) else ch
+            code.append(quote)
+            key.append(quote)
+            i += len(quote)
+            continue
+        elif blocks and line.startswith('/*', i):
+            in_block = True
+            i += 2
+            continue
+        elif marker and line.startswith(marker, i) and (not spaced or i == 0 or line[i - 1] in ' \t'):
+            break
+        else:
+            code.append(ch)
+            if not ch.isspace():
+                key.append(ch)
         i += 1
-    return line, ''.join(kept)
+    still_open = '/*' if in_block else quote if quote and len(quote) == 3 else None
+    return ''.join(code), ''.join(key), still_open
 
 
 def normalise(text, ext):
     """Return [(line number, matched text, readable text)] for the lines that count."""
-    marker, blocks = SYNTAX.get(ext, HASH)
+    syntax = SYNTAX.get(ext, HASH)
     out = []
-    in_block = False
+    still_open = None
     for number, raw in enumerate(text.splitlines(), 1):
-        line = raw.strip()
-        if blocks:
-            if in_block:
-                end = line.find('*/')
-                if end < 0:
-                    continue
-                in_block = False
-                line = line[end + 2:].strip()
-            if line.startswith('/*'):
-                end = line.find('*/', 2)
-                if end < 0:
-                    in_block = True
-                    continue
-                line = line[end + 2:].strip()
-        line, key = split_code(line, marker)
-        line = line.strip()
-        if not line or (marker and line.startswith(marker)):
-            continue
-        line = SPACES.sub(' ', line)
-        if TRIVIAL.match(line):
+        line, key, open_after = split_code(raw.strip(), syntax, still_open)
+        if still_open in TRIPLE_QUOTES or open_after in TRIPLE_QUOTES:
+            # Part of a multi-line string, which often holds code from another file
+            # (a patch script quoting GDScript): read the line on its own, with "#"
+            # a comment only after a space, so that code still matches where it came from.
+            line, key, _ = split_code(raw.strip(), SHELL)
+        still_open = open_after
+        line = SPACES.sub(' ', line).strip()
+        if not line or TRIVIAL.match(line) or TRIVIAL.match(key):  # key: `{/* note */}` is `{}`
             continue
         out.append((number, key, line))
     return out
@@ -245,8 +274,38 @@ def find_copies(norm, k, rules):
     return groups
 
 
-def added_lines(repo, base, ref):
-    """Map path -> set of line numbers in ref added since merge-base(base, ref)."""
+def diff_path(text, prefix):
+    """Return the path from a '--- a/x' or '+++ b/x' line's text, or None for /dev/null.
+
+    git ends the path with a tab when it holds a space, and C-quotes it when it holds
+    a quote, a backslash or a control character."""
+    text = text.rstrip('\t')
+    if text == '/dev/null':
+        return None
+    if len(text) >= 2 and text[0] == '"' and text[-1] == '"':
+        raw = text[1:-1].encode('utf-8')
+        out = bytearray()
+        i = 0
+        escapes = {ord('a'): 7, ord('b'): 8, ord('t'): 9, ord('n'): 10, ord('v'): 11,
+                   ord('f'): 12, ord('r'): 13, ord('"'): 34, ord('\\'): 92}
+        while i < len(raw):
+            if raw[i] == 92 and i + 1 < len(raw):
+                if raw[i + 1:i + 4].isdigit():
+                    out.append(int(raw[i + 1:i + 4], 8))
+                    i += 4
+                    continue
+                out.append(escapes.get(raw[i + 1], raw[i + 1]))
+                i += 2
+                continue
+            out.append(raw[i])
+            i += 1
+        text = out.decode('utf-8', 'replace')
+    return text[len(prefix):] if text.startswith(prefix) else text
+
+
+def diff_hunks(repo, base, ref):
+    """Return the merge base and, per changed code file, (old path, new path, hunks),
+    each hunk (old start, old count, new start, new count) of a zero-context diff."""
     try:
         merge_base = git(repo, 'merge-base', base, ref).decode().strip()
     except GitError as error:
@@ -255,18 +314,98 @@ def added_lines(repo, base, ref):
     diff = git(repo, '-c', 'core.quotePath=false', 'diff', '--no-color', '--no-ext-diff',
                '--find-renames', '--unified=0', '--src-prefix=a/', '--dst-prefix=b/',
                merge_base, ref, '--', *(f'*{ext}' for ext in CODE_EXTS)).decode('utf-8', 'replace')
-    added = collections.defaultdict(set)
-    path = None
+    changes = []
+    old_path = None
+    pending = 0  # content lines of the current hunk still to skip
     for line in diff.splitlines():
-        if line.startswith('+++ '):
-            target = line[4:]
-            path = None if target == '/dev/null' else target[2:] if target.startswith('b/') else target
-        elif line.startswith('@@') and path:
-            match = re.match(r'@@ -\S+ \+(\d+)(?:,(\d+))? @@', line)
+        if pending:
+            if not line.startswith('\\'):  # "\ No newline at end of file"
+                pending -= 1
+            continue
+        if line.startswith('--- '):
+            old_path = diff_path(line[4:], 'a/')
+        elif line.startswith('+++ '):
+            changes.append((old_path, diff_path(line[4:], 'b/'), []))
+        elif line.startswith('@@') and changes:
+            match = re.match(r'@@ -(\d+)(?:,(\d+))? \+(\d+)(?:,(\d+))? @@', line)
             if match:
-                start, count = int(match.group(1)), int(match.group(2) or 1)
-                added[path].update(range(start, start + count))
-    return merge_base, added
+                hunk = tuple(int(g) if g is not None else 1 for g in match.groups())
+                changes[-1][2].append(hunk)
+                pending = hunk[1] + hunk[3]
+    return merge_base, changes
+
+
+def map_span(hunks, first, last):
+    """Map old lines first..last through the hunks; return the new (first, last)."""
+    start = end = None
+    shift_start = shift_end = 0
+    for old, old_count, _new, new_count in hunks:
+        change = new_count - old_count
+        if old_count == 0:  # lines inserted after old line `old`
+            if old < first:
+                shift_start += change
+            if old < last:
+                shift_end += change
+            continue
+        old_last = old + old_count - 1
+        if start is None:
+            if old_last < first:
+                shift_start += change
+            elif old <= first:
+                start = old + shift_start
+        if end is None:
+            if old_last <= last:
+                shift_end += change
+            elif old <= last:
+                end = old + shift_end + new_count - 1
+    return (first + shift_start if start is None else start,
+            last + shift_end if end is None else end)
+
+
+def touched_old_copies(repo, merge_base, changes, norm, groups, k, rules):
+    """Return the copies in ref that overlap a copy at the merge base which the diff
+    edits inside (a code line added, changed or deleted between its first and last
+    line): editing one copy of an old block, and leaving six or more lines of it
+    matching, is drift between the copies."""
+    edited = [(old, new, hunks) for old, new, hunks in changes if old and new and hunks]
+    if not edited:
+        return {}
+    base_norm = {p: normalise(t, os.path.splitext(p)[1])
+                 for p, t in read_files(repo, merge_base).items()}
+    spans = collections.defaultdict(set)
+    for places in find_copies(base_norm, k, rules).values():
+        for path, first, last in places:
+            spans[path].add((base_norm[path][first][0], base_norm[path][last][0]))
+    by_path = collections.defaultdict(list)
+    for text, places in groups.items():
+        for path, first, last in places:
+            by_path[path].append((norm[path][first][0], norm[path][last][0], text))
+    found = {}
+    for old, new, hunks in edited:
+        if old not in spans or new not in by_path:
+            continue
+        base_code = {number for number, _, _ in base_norm[old]}
+        ref_code = {number for number, _, _ in norm[new]}
+        for first, last in spans[old]:
+            inside = False
+            for start, count, new_start, new_count in hunks:
+                if count:
+                    removed = range(max(start, first), min(start + count - 1, last) + 1)
+                    lands = len(removed) > 0
+                else:
+                    removed = ()
+                    lands = first <= start < last
+                if lands and (any(n in base_code for n in removed) or
+                              any(n in ref_code for n in range(new_start, new_start + new_count))):
+                    inside = True
+                    break
+            if not inside:
+                continue
+            new_first, new_last = map_span(hunks, first, last)
+            for copy_first, copy_last, text in by_path[new]:
+                if copy_first <= new_last and new_first <= copy_last:
+                    found[text] = groups[text]
+    return found
 
 
 def area(path):
@@ -292,7 +431,8 @@ def run(args):
     repo = args.repo
     files = read_files(repo, args.ref)
     norm = {p: normalise(t, os.path.splitext(p)[1]) for p, t in files.items()}
-    groups = find_copies(norm, args.min_lines, read_allow(repo, args.ref))
+    rules = read_allow(repo, args.ref)
+    groups = find_copies(norm, args.min_lines, rules)
 
     if args.report:
         copied = collections.defaultdict(set)
@@ -332,8 +472,12 @@ def run(args):
 
     merge_base = None
     if args.base:
-        merge_base, added = added_lines(repo, args.base, args.ref)
-        fresh = {}
+        merge_base, changes = diff_hunks(repo, args.base, args.ref)
+        added = collections.defaultdict(set)
+        for _, path, hunks in changes:
+            for _, _, start, count in hunks:
+                added[path].update(range(start, start + count))
+        fresh = touched_old_copies(repo, merge_base, changes, norm, groups, args.min_lines, rules)
         for text, places in groups.items():
             touched = any(norm[p][i][0] in added.get(p, ())
                           for p, first, last in places for i in range(first, last + 1))
@@ -393,9 +537,17 @@ def self_test():
         block = [f'var total_{i} = speed * {i} + offset' for i in range(8)]
         body = '\n'.join(f'\t{line}' for line in block)
         unique = '\n'.join(f'\tvar other_{i} = {i * 7} - drift' for i in range(8))
+        # An old 12-line copy pair, for edits made to one copy only.
+        long = [f'\tvar step_{i}: float = lerp(start_{i}, goal, weight * {i}.5)' for i in range(12)]
+
+        def long_file(lines):
+            return 'extends Node\n\nfunc run(goal, weight):\n' + '\n'.join(lines) + '\n'
+
         sh('init', '-q', '-b', 'main')
         commit('main', {
             'game/a.gd': f'extends Node\n\nfunc a():\n{body}\n',
+            'game/long_a.gd': long_file(long),
+            'game/long_b.gd': long_file(long),
             'game/old_one.py': 'def f():\n' + '\n'.join(f'    x{i} = y{i} + {i}' for i in range(7)) + '\n',
             'game/old_two.py': 'def g():\n' + '\n'.join(f'    x{i} = y{i} + {i}' for i in range(7)) + '\n',
         })
@@ -424,6 +576,30 @@ def self_test():
         commit('old-copy-edit', {'game/old_one.py': 'def f():\n' + grown,
                                  'game/old_two.py': 'def g():\n' + grown})
         commit('old-copy-untouched', {'game/elsewhere.py': 'print("unrelated")\n'})
+        added = '\tvar gain: float = 1.0'
+        commit('one-copy-near-start', {'game/long_a.gd': long_file(long[:2] + [added] + long[2:])})
+        commit('one-copy-middle', {'game/long_a.gd': long_file(long[:6] + [added] + long[6:])})
+        commit('one-copy-changed', {'game/long_a.gd': long_file(
+            long[:2] + ['\tvar step_2: float = 0.0'] + long[3:])})
+        commit('one-copy-deleted-line', {'game/long_a.gd': long_file(long[:6] + long[7:])})
+        commit('one-copy-comment', {'game/long_a.gd': long_file(
+            long[:6] + ['\t# why this step matters'] + long[6:])})
+        commit('one-copy-mostly-shared', {'game/long_a.gd': long_file(
+            ['\tshared_steps(goal, weight)'] + long[7:])})
+        commit('one-copy-removed', {'game/long_a.gd': long_file(['\tshared_steps(goal, weight)'])})
+        commit('ts-trailing-block', {'site/two.ts': '\n'.join(f'{line} /* why */' for line in js) + '\n'})
+        commit('ts-open-block', {'site/two.ts': '\n'.join(
+            js[:3] + [js[3] + ' /* the next lines', '   are a long comment */'] + js[4:]) + '\n'})
+        commit('hash-no-space', {'game/h.gd': 'extends Node\n\nfunc h():\n' + '\n'.join(
+            f'{line}#note' for line in body.split('\n')) + '\n'})
+        commit('shell-hash', {
+            'tools/one.sh': '\n'.join(f'count_{i}=${{#items_{i}}}' for i in range(7)) + '\n',
+            'tools/two.sh': '\n'.join(f'count_{i}=${{#names_{i}}}' for i in range(7)) + '\n'})
+        commit('triple-string', {
+            'tools/one.py': 'TABLE = """\n' + '\n'.join(f'colour_{i}=#{i}{i}{i}aaa' for i in range(7)) + '\n"""\n',
+            'tools/two.py': 'TABLE = """\n' + '\n'.join(f'colour_{i}=#{i}{i}{i}bbb' for i in range(7)) + '\n"""\n'})
+        commit('space-path', {'game/with space.gd': f'extends Node\n\nfunc s():\n{body}\n'})
+        commit('quoted-path', {'game/say "hi".gd': f'extends Node\n\nfunc q():\n{body}\n'})
         commit('allowed', {'game/b.gd': f'extends Node\n\nfunc b():\n{body}\n',
                            '.copies-allow': 'game/a.gd game/b.gd  fixture pair for the self-test\n'})
         commit('short', {'game/d.gd': 'extends Node\n\nfunc d():\n' + '\n'.join(
@@ -441,6 +617,29 @@ def self_test():
         check('a copy inside one file is caught', 1, '--ref', 'same-file', '--base', 'main')
         check('a new line inside an old copy is caught', 1, '--ref', 'old-copy-edit', '--base', 'main')
         check('an old copy left alone passes', 0, '--ref', 'old-copy-untouched', '--base', 'main')
+        check('a new line near the start of one old copy is caught', 1,
+              '--ref', 'one-copy-near-start', '--base', 'main')
+        check('a new line in the middle of one old copy is caught', 1,
+              '--ref', 'one-copy-middle', '--base', 'main')
+        check('a changed line in one old copy is caught', 1, '--ref', 'one-copy-changed', '--base', 'main')
+        check('a deleted line in one old copy is caught', 1,
+              '--ref', 'one-copy-deleted-line', '--base', 'main')
+        check('a comment added inside one old copy passes', 0,
+              '--ref', 'one-copy-comment', '--base', 'main')
+        check('one old copy cut below six matching lines passes', 0,
+              '--ref', 'one-copy-mostly-shared', '--base', 'main')
+        check('one old copy removed passes', 0, '--ref', 'one-copy-removed', '--base', 'main')
+        check('trailing /* */ comments do not hide a copy', 1,
+              '--ref', 'ts-trailing-block', '--base', 'main')
+        check('a /* comment opened after code does not hide a copy', 1,
+              '--ref', 'ts-open-block', '--base', 'main')
+        check('a # comment with no space before it does not hide a copy', 1,
+              '--ref', 'hash-no-space', '--base', 'main')
+        check('${#x} in shell is code, not a comment', 0, '--ref', 'shell-hash', '--base', 'main')
+        check('a # inside a multi-line string is not a comment', 0,
+              '--ref', 'triple-string', '--base', 'main')
+        check('a copy in a path with a space is caught', 1, '--ref', 'space-path', '--base', 'main')
+        check('a copy in a path git quotes is caught', 1, '--ref', 'quoted-path', '--base', 'main')
         check('an allowed pair passes', 0, '--ref', 'allowed', '--base', 'main')
         check('five matching lines are not a copy', 0, '--ref', 'short', '--base', 'main')
         check('without --base the old copy fails', 1, '--ref', 'main')
@@ -452,8 +651,8 @@ def self_test():
 def main(argv=None):
     parser = argparse.ArgumentParser(description=__doc__.split('\n\n')[0])
     parser.add_argument('--ref', default='HEAD', help='git ref to scan (default HEAD)')
-    parser.add_argument('--base', help='only fail on copies that touch lines added since '
-                                       'git merge-base BASE REF')
+    parser.add_argument('--base', help='only fail on copies that the branch adds or edits '
+                                       'since git merge-base BASE REF')
     parser.add_argument('--report', action='store_true',
                         help='print every copy grouped by area and file, and exit 0')
     parser.add_argument('--min-lines', type=int, default=6, help='shortest copy (default 6)')
