@@ -13,6 +13,10 @@ const MAX_SETTINGS_BYTES: int = 65536
 ## not drawn at the smallest size. Mobile windows are OS-managed and ignore both.
 const WINDOW_SIZES: Array[Vector2i] = [Vector2i(960, 540), Vector2i(1280, 720), Vector2i(1920, 1080)]
 const DEFAULT_WINDOW_SIZE: int = 1
+## The Display tab's note (Q10, October 14, 2026): the window-size sentence shows only on phones and
+## tablets, where the OS sizes the window; the V-sync sentence applies everywhere.
+const MOBILE_WINDOW_NOTE: String = "Window size is OS-managed on mobile."
+const VSYNC_NOTE: String = "V-sync may limit the FPS cap."
 
 ## Reduced Motion changed; Main hands it to the impact kit (no shake or hit-stop, shorter flashes).
 signal reduced_motion_changed(enabled: bool)
@@ -37,6 +41,8 @@ var capture_action: StringName = &""
 var capture_kind: String = ""
 var display_nodes: Array[CanvasItem] = []
 var pages: Array[Control] = []
+## A phone or tablet build (iOS or Android): the window is the OS's, and the Display note says so.
+var mobile: bool = OS.has_feature("ios") or OS.has_feature("android")
 ## prompt() labels by action, for keys and for a controller; the HUD asks for them every frame, so
 ## they are worked out once and forgotten whenever this menu changes a binding.
 var _key_prompts: Dictionary = {}
@@ -236,11 +242,6 @@ func _build_menu() -> void:
 		text_size.add_item("%d%%" % roundi(step * 100.0))
 	display.add_child(text_size)
 	text_size.item_selected.connect(func(index: int) -> void: TextSize.factor = TextSize.STEPS[index]; text_size_changed.emit(TextSize.factor); _save_extra())
-	var gpu: Label = _label("GPU: %s\nRenderer: Compatibility" % RenderingServer.get_video_adapter_name(), 14)
-	gpu.position = Vector2(8, 194)
-	gpu.size = Vector2(390, 44)
-	gpu.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	display.add_child(gpu)
 	var audio: VBoxContainer = _page_box()
 	pages.append(audio)
 	for bus: String in BUSES:
@@ -382,7 +383,12 @@ func select_tab(index: int) -> void:
 		pages[page_index].visible = page_index == index
 	for node: CanvasItem in display_nodes:
 		node.visible = index == 0
-	note.text = ["Window size is OS-managed on mobile. V-sync may limit the FPS cap.", "Volume changes apply immediately. Effects carries every sound effect; there is no music or voice yet.", "Select a binding, then press a key, controller button or move a stick."][index]
+	note.text = [display_note(), "Volume changes apply immediately. Effects carries every sound effect; there is no music or voice yet.", "Select a binding, then press a key, controller button or move a stick."][index]
+
+
+## The Display tab's note: the window-size sentence only where the OS manages the window (Q10).
+func display_note() -> String:
+	return "%s %s" % [MOBILE_WINDOW_NOTE, VSYNC_NOTE] if mobile else VSYNC_NOTE
 
 
 func _apply_graphics() -> void:
