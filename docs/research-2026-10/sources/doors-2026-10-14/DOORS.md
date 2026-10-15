@@ -1,3 +1,11 @@
+# Landing on main (October 14-15, 2026)
+
+Round 4, approved, was ported onto main and landed from branch `codex/doors`. The record continues in `landing/NOTES.md`:
+- the port onto main c5d1d84 (PR #69) with a three-way merge, and the semantic merges with PRs #68 and #69;
+- the review r5 fixes: the capture driver (S1), the exit wall pack's shadow (S2), C1-C3 and the coolant pipe;
+- three verification rounds and what each fixed;
+- the shared code of October 15: one copy of each tool in these records (`README.md`, "Tool map") and the game's door code on shared pieces.
+
 # Doors fix round 4 (doors-r1/fix-r4): the review r4 fixes
 
 Scratch only. The Git repository was not touched.
@@ -43,7 +51,7 @@ Everything below this section describes round 3 and earlier. Where they disagree
 
 | Item | Fix | Measured |
 |---|---|---|
-| **should-fix: the blast leaf seemed to teleport** | **The leaf is thrown, not swapped.** After the 0.15 s break, the torn leaf flies **0.24 s** (`DOOR_FLIGHT_SECONDS`) from the doorway to where it lies:<br>- it is carried along the lane and slowed, rising 18 px and falling;<br>- it tips toward flat (1.5 rad) and grows 1.22x as it comes nearer the camera;<br>- it draws in front of the near column once 30 % along;<br>- it lands in a low dust burst off the wet deck (`landing_dust`).<br>This follows SDI 133 / ASTM F2927 Category IV: the leaf separates from its frame and becomes debris.<br>**New check:** `door_route_test` requires the leaf to be seen in the air past the near jamb with the lying leaf hidden, and drawn whole in every frame. | `j03-flight-20 / 45 / 70 / 90` and `j03-landed` (`flight-sequence.png`). The driver poses the flight with time frozen, because software frames are slow; that pose is a driver-only debug path.<br>**Needs one hands-on check** to see whether it now reads as thrown in motion. |
+| **should-fix: the blast leaf seemed to teleport** | **The leaf is thrown, not swapped.** After the 0.15 s break, the torn leaf flies **0.24 s** (`DOOR_FLIGHT_SECONDS`) from the doorway to where it lies:<br>- it is carried along the lane and slowed, rising 18 px and falling;<br>- it tips toward flat (1.5 rad) and grows 1.22x as it comes nearer the camera;<br>- it draws in front of the near column once 30 % along;<br>- it lands in a low dust burst off the wet deck (`landing_dust`).<br>This follows SDI 133 / ASTM F2927 Category IV: the leaf separates from its frame and becomes debris.<br>**New check:** `door_route_test` requires the leaf to be seen in the air past the near jamb with the lying leaf hidden, and drawn whole in every frame. | Round 4's `j03-flight-20 / 45 / 70 / 90` and `j03-landed`, from its driver (`fix-r4/driver/doors_capture.gd` at dee9996); their sheet (`flight-sequence.png`) was scratch only and is not filed. The landing's driver (`tools/driver/doors_capture.gd`) poses t 0.1, 0.2, 0.3, 0.45, 0.7 and 0.9 and takes `j03-blast-frame` with the leaf in its doorway (`landing/NOTES.md`). The driver poses the flight with time frozen, because software frames are slow; that pose is a driver-only debug path.<br>**Needs one hands-on check** to see whether it now reads as thrown in motion. |
 | **should-fix: text** ("secure the first copy", "hatch") | **Drafts only**, below. | — |
 | **fine / small:** the floor beyond the Records exit column is a plain grey plane | **Not done.** Listed here. | — |
 
