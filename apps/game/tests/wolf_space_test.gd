@@ -366,13 +366,13 @@ func _check_doorway(game: Main, label: String, wolf_span: Vector2) -> void:
 	_expect(BlastLeaf.A_LEAD_SHUT < 0.0 and BlastLeaf.A_MOUTH > 0.0, "the walk line crosses the cross-wall inside its opening (a = 0 between the near jamb's receiver at %.2f m and the pocket's mouth at %.2f m)" % [BlastLeaf.A_LEAD_SHUT, BlastLeaf.A_MOUTH])
 	var leaf: BlastLeaf = game.get("blast_leaf") as BlastLeaf
 	var parked_foot: Vector2 = BlastLeaf.project(BlastLeaf.lead_at(1.0), 0.0, BlastLeaf.T_LF)
-	_expect(not leaf.visible and BlastLeaf.lead_at(leaf.open if leaf.open > 0.0 else 1.0) >= BlastLeaf.A_MOUTH - 0.0001 and parked_foot.y < BlastLeaf.FLOOR_Y - 2.0, "%s: the inner leaf is parked in its pocket, its foot behind the walk line (y %.1f), clear of WOLF" % [label, parked_foot.y])
+	_expect(not leaf.visible and BlastLeaf.lead_at(leaf.open if leaf.open > 0.0 else 1.0) >= BlastLeaf.A_MOUTH - 0.0001 and parked_foot.y < RoomDepth.FLOOR_Y - 2.0, "%s: the inner leaf is parked in its pocket, its foot behind the walk line (y %.1f), clear of WOLF" % [label, parked_foot.y])
 	for back: Sprite2D in [game.get("seal_wall") as Sprite2D, game.get_node("Door/CorridorSealFrame") as Sprite2D]:
 		_expect(Suite.drawn_z(back) < Suite.drawn_z(wolf_sprite), "%s draws behind the actors" % back.name)
 	var frame_rows: Vector2 = _painted_rows(game.get_node("Door/CorridorSealFrame") as Sprite2D)
-	_expect(frame_rows.y < BlastLeaf.FLOOR_Y - 8.0, "%s: the seal frame (far guide, hood, operator) ends above the walk line (lowest row %.1f), behind WOLF" % [label, frame_rows.y])
+	_expect(frame_rows.y < RoomDepth.FLOOR_Y - 8.0, "%s: the seal frame (far guide, hood, operator) ends above the walk line (lowest row %.1f), behind WOLF" % [label, frame_rows.y])
 	var hub: Vector2 = game.bypass_handle.global_position + BypassHandle.WHEEL_OFFSET
-	_expect(hub.y + BypassHandle.COLLAR_RADIUS < BlastLeaf.FLOOR_Y - 20.0 and Suite.drawn_z(game.bypass_handle) < Suite.drawn_z(wolf_sprite), "%s: the MANUAL BYPASS is mounted on the back wall above the floor (its collar's foot at y %.1f), drawn behind WOLF, who stands in front of it" % [label, hub.y + BypassHandle.COLLAR_RADIUS])
+	_expect(hub.y + BypassHandle.COLLAR_RADIUS < RoomDepth.FLOOR_Y - 20.0 and Suite.drawn_z(game.bypass_handle) < Suite.drawn_z(wolf_sprite), "%s: the MANUAL BYPASS is mounted on the back wall above the floor (its collar's foot at y %.1f), drawn behind WOLF, who stands in front of it" % [label, hub.y + BypassHandle.COLLAR_RADIUS])
 	var camera: Camera2D = game.get_viewport().get_camera_2d()
 	var view: Rect2 = Rect2(camera.get_screen_center_position() - game.get_viewport_rect().size * 0.5 / camera.zoom, game.get_viewport_rect().size / camera.zoom)
 	_expect(wolf_span.x >= view.position.x and wolf_span.y <= view.end.x, "%s: WOLF (%.1f..%.1f) is inside the camera's view (%.1f..%.1f)" % [label, wolf_span.x, wolf_span.y, view.position.x, view.end.x])

@@ -8,16 +8,10 @@ extends Node2D
 ## It is drawn as a mesh in its own planes: the front face (t = T_LF, from the leading edge to the
 ## pocket's mouth), the leading edge (a = a_lead, t from T_LF to T_LB), and a feathered contact
 ## shadow on the threshold in front of its foot (a black atlas patch, vertex alpha), all projected
-## with the design's camera. The light belongs to the place, not to the moving leaf: each front-face
-## vertex is shaded from LIGHT at its fixed spot. Driven only by the seal's existing open value: it
-## starts to slide once the roller is 40 % up.
+## with the door end's design camera (DoorCamera). The light belongs to the place, not to the moving
+## leaf: each front-face vertex is shaded from LIGHT at its fixed spot. Driven only by the seal's
+## existing open value: it starts to slide once the roller is 40 % up.
 
-## Camera of the door end (design/tools/common.py): vanishing point, floor, walkway depth, scale.
-const VPX: float = 483.9
-const HORIZON: float = 158.5
-const FLOOR_Y: float = 440.0
-const D0: float = 38.0
-const PX_PER_M: float = 40.0
 ## The cross-wall's frame: origin (metres) where its face meets the walk line (world 752, 440), U
 ## along the face toward the corridor's back wall, N into the wall.
 const ORIGIN_X_M: float = 18.8
@@ -64,12 +58,12 @@ func _init(atlas: Texture2D) -> void:
 	texture_filter = CanvasItem.TEXTURE_FILTER_LINEAR_WITH_MIPMAPS
 
 
-## World (clamp-world) position of the point a metres along the wall, h up, t into it.
+## World (clamp-world) position of the point a metres along the wall, h up, t into it: the wall
+## frame's point in room metres (x along the room, depth behind the walk line), through DoorCamera.
 static func project(a: float, h: float, t: float) -> Vector2:
 	var x_m: float = ORIGIN_X_M + a * U.x + t * N.x
 	var depth: float = a * U.y + t * N.y
-	var s: float = D0 / (D0 + depth)
-	return Vector2(VPX + (x_m * PX_PER_M - VPX) * s, HORIZON + (FLOOR_Y - HORIZON) * s - h * PX_PER_M * s)
+	return DoorCamera.project(x_m, h, depth)
 
 
 static func lead_at(open_value: float) -> float:
