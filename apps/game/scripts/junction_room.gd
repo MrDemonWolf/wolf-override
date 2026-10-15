@@ -839,15 +839,7 @@ func _build_door() -> void:
 
 ## One piece of the blast door, cut from JunctionDoorLayout's atlas and placed by its world top-left.
 func _door_piece(piece_name: String, region: Rect2, top_left: Vector2, piece_scale: float, z: int) -> Sprite2D:
-	var sprite: Sprite2D = Sprite2D.new()
-	sprite.name = piece_name
-	sprite.texture = JunctionDoorLayout.ATLAS
-	sprite.texture_filter = CanvasItem.TEXTURE_FILTER_LINEAR_WITH_MIPMAPS
-	sprite.region_enabled = true
-	sprite.region_rect = region
-	sprite.centered = false
-	sprite.scale = Vector2.ONE * piece_scale
-	sprite.position = top_left
+	var sprite: Sprite2D = RoomDepth.cut(JunctionDoorLayout.ATLAS, region, piece_scale, piece_name, top_left)
 	sprite.z_index = z
 	add_child(sprite)
 	return sprite
@@ -947,16 +939,10 @@ func _exit_edge_bleed(piece: Sprite2D) -> Sprite2D:
 	return strip
 
 
+## One piece of the exit door, cut from EXIT_ATLAS at EXIT_ATLAS_SCALE and placed by its world top-left
+## [param at], drawn at [param z]; added now, so the build order sets the drawing order.
 func _exit_piece(piece_name: String, region: Rect2, at: Vector2, z: int) -> Sprite2D:
-	var piece: Sprite2D = Sprite2D.new()
-	piece.name = piece_name
-	piece.texture = EXIT_ATLAS
-	piece.texture_filter = CanvasItem.TEXTURE_FILTER_LINEAR_WITH_MIPMAPS
-	piece.centered = false
-	piece.region_enabled = true
-	piece.region_rect = region
-	piece.scale = Vector2.ONE * EXIT_ATLAS_SCALE
-	piece.position = at
+	var piece: Sprite2D = RoomDepth.cut(EXIT_ATLAS, region, EXIT_ATLAS_SCALE, piece_name, at)
 	piece.z_index = z
 	add_child(piece)
 	return piece

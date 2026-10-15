@@ -538,17 +538,34 @@ func _make_shaft(additive: CanvasItemMaterial) -> Sprite2D:
 	return shaft
 
 
-## A station prop cut to [param region] of its own image (its painted outline, so the floor
-## reflection mirrors from its real base), [param prop_scale]d, centred on [param center_x] with its
-## base on [param base_y].
-static func make_prop(prop_name: String, texture: Texture2D, region: Rect2, prop_scale: float, center_x: float, base_y: float = FLOOR_Y) -> Sprite2D:
+## A sprite showing [param region] of [param texture] (an atlas or a prop's own image), drawn at
+## [param piece_scale] (world px per source px) with its top-left corner at [param top_left] in its
+## parent's space, filtered with mipmaps like every painted plate. It is named [param piece_name] unless
+## that is empty, and is not added to any parent: node order is draw order, so the caller adds it where
+## it belongs. The one builder for an atlas cut: make_prop, the blast door's and the exit door's pieces
+## (JunctionRoom._door_piece, _exit_piece) and the corridor seal's sprites (Main._seal_sprite) use it, so
+## each must keep wanting exactly these settings; a caller that needs more (centred, z, flips) sets it
+## on the result.
+static func cut(texture: Texture2D, region: Rect2, piece_scale: float, piece_name: String = "", top_left: Vector2 = Vector2.ZERO) -> Sprite2D:
 	var sprite: Sprite2D = Sprite2D.new()
-	sprite.name = prop_name
+	if not piece_name.is_empty():
+		sprite.name = piece_name
 	sprite.texture = texture
 	sprite.texture_filter = CanvasItem.TEXTURE_FILTER_LINEAR_WITH_MIPMAPS
 	sprite.region_enabled = true
 	sprite.region_rect = region
-	sprite.scale = Vector2.ONE * prop_scale
+	sprite.centered = false
+	sprite.scale = Vector2.ONE * piece_scale
+	sprite.position = top_left
+	return sprite
+
+
+## A station prop cut to [param region] of its own image (its painted outline, so the floor
+## reflection mirrors from its real base), [param prop_scale]d, centred on [param center_x] with its
+## base on [param base_y].
+static func make_prop(prop_name: String, texture: Texture2D, region: Rect2, prop_scale: float, center_x: float, base_y: float = FLOOR_Y) -> Sprite2D:
+	var sprite: Sprite2D = cut(texture, region, prop_scale, prop_name)
+	sprite.centered = true
 	sprite.position = Vector2(center_x, base_y - region.size.y * prop_scale * 0.5)
 	return sprite
 

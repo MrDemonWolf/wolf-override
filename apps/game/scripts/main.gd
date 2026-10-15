@@ -896,17 +896,10 @@ func _setup_corridor_door() -> void:
 		add_child(art)
 
 
+## One piece of the corridor seal, cut from CORRIDOR_SEAL_ATLAS and placed by its world top-left; the
+## caller adds it where it draws.
 func _seal_sprite(node_name: String, region: Rect2, top_left: Vector2, scale_factor: float = CORRIDOR_SEAL_SCALE) -> Sprite2D:
-	var sprite: Sprite2D = Sprite2D.new()
-	sprite.name = node_name
-	sprite.texture = CORRIDOR_SEAL_ATLAS
-	sprite.texture_filter = CanvasItem.TEXTURE_FILTER_LINEAR_WITH_MIPMAPS
-	sprite.region_enabled = true
-	sprite.region_rect = region
-	sprite.centered = false
-	sprite.scale = Vector2.ONE * scale_factor
-	sprite.position = top_left
-	return sprite
+	return RoomDepth.cut(CORRIDOR_SEAL_ATLAS, region, scale_factor, node_name, top_left)
 
 
 ## The MANUAL BYPASS on the relay's right, with the relay's COOLANT FAULT tag (a touch left of the
