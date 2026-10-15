@@ -351,30 +351,47 @@ func _beacons_pulse(depth: RoomDepth) -> bool:
 func _check_corridor_flash(game: Node2D, corridor: RoomDepth, records: RoomDepth) -> void:
 	_expect(corridor.beacon_flash and corridor.beacon_lens_trough >= 0.5 and not records.beacon_flash and is_zero_approx(records.beacon_lens_trough), "only the corridor's caged lamps flash with their lenses (Records and the junction keep the drawn beacons' breathe)")
 	var glow: Sprite2D = corridor.lamp_glows.filter(func(node: Sprite2D) -> bool: return node.name == "WarningGlow0")[0]
+	# Time the flash on the beacon's own tween clock, not the wall clock: on a busy machine a stalled
+	# frame moves the wall-clock time of a sample but not the tween's, which is what sets the light.
+	var beacon_tweens: Array = corridor.get("_beacon_tweens") as Array
+	var flash: Tween = beacon_tweens[0] as Tween if not beacon_tweens.is_empty() else null
+	_expect(flash != null and flash.is_valid(), "the corridor's first beacon has its flash tween running")
+	if flash == null or not flash.is_valid():
+		return
 	var alphas: Array[float] = []
 	var reds: Array[float] = []
 	var times: Array[float] = []
+	var clock_start: float = flash.get_total_elapsed_time()
 	var start: int = Time.get_ticks_usec()
-	while Time.get_ticks_usec() - start < 2400000:
+	# About five flashes of the tween's clock (wall-clock cap so a stopped tween cannot hang the run).
+	while flash.is_valid() and flash.get_total_elapsed_time() - clock_start < 3.6 and Time.get_ticks_usec() - start < 15000000:
 		await process_frame
-		times.append(float(Time.get_ticks_usec() - start) / 1000000.0)
+		if not flash.is_valid():
+			break
+		times.append(flash.get_total_elapsed_time() - clock_start)
 		alphas.append(glow.modulate.a)
 		reds.append(_lens(corridor).r)
 	var r: float = _pearson(alphas, reds)
 	var red_low: float = reds.min()
 	var red_high: float = reds.max()
 	_expect(r >= 0.9 and red_low <= 0.5 * red_high, "the corridor lamp's lens moves with its light (r %.3f) and its red falls to %.2f of its top" % [r, red_low / maxf(red_high, 0.001)])
-	# Flashes: rises through the middle of the light's swing.
+	# Flashes: rises through the middle of the light's swing, each placed between its two samples on the
+	# tween clock; the rate comes from the median gap, so one skipped rise cannot halve it.
 	var mid: float = (alphas.min() + alphas.max()) * 0.5
 	var rises: Array[float] = []
 	for i: int in range(1, alphas.size()):
 		if alphas[i - 1] < mid and alphas[i] >= mid:
-			rises.append(times[i])
+			var t: float = (mid - alphas[i - 1]) / maxf(alphas[i] - alphas[i - 1], 0.000001)
+			rises.append(lerpf(times[i - 1], times[i], t))
+	var gaps: Array[float] = []
+	for i: int in range(1, rises.size()):
+		gaps.append(rises[i] - rises[i - 1])
+	gaps.sort()
 	var per_minute: float = 0.0
-	if rises.size() >= 2:
-		per_minute = 60.0 * float(rises.size() - 1) / (rises[rises.size() - 1] - rises[0])
-	_expect(per_minute >= 80.0 and per_minute <= 96.0, "the corridor's beacons flash like a real rotating beacon, about 88 a minute (%.0f), under 3 a second" % per_minute)
-	print("corridor beacon flash: lens-light r %.3f, lens red %.2f to %.2f (%.2f), %.1f flashes a minute over %d samples" % [r, red_low, red_high, red_low / maxf(red_high, 0.001), per_minute, alphas.size()])
+	if gaps.size() >= 3:
+		per_minute = 60.0 / maxf(gaps[int(gaps.size() / 2.0)], 0.000001)
+	_expect(gaps.size() >= 3 and per_minute >= 80.0 and per_minute <= 96.0, "the corridor's beacons flash like a real rotating beacon, about 88 a minute (%.1f from %d gaps), under 3 a second" % [per_minute, gaps.size()])
+	print("corridor beacon flash: lens-light r %.3f, lens red %.2f to %.2f (%.2f), %.1f flashes a minute (tween clock, gaps %s) over %d samples" % [r, red_low, red_high, red_low / maxf(red_high, 0.001), per_minute, str(gaps), alphas.size()])
 	var records_lens: Color = _lens(records)
 	_expect(records_lens.is_equal_approx(records.warning_color), "Records' drawn beacons keep a steady lens")
 	# Reduced Motion: lit and steady at once.

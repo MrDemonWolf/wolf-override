@@ -455,14 +455,15 @@ func _run() -> void:
 	var crank_start: int = Time.get_ticks_msec()
 	Input.action_press(&"interact")
 	# Every frame of the crank: the engineer shows the crank pose, and its glove is on the wheel's rim.
-	var grip: Dictionary = {"frames": [0, 0], "usual": 0, "lead_in": 0, "worst_rim": 0.0, "worst_grip": 0.0, "found": true}
+	var grip: Dictionary = {"frames": [0, 0], "usual": 0, "lead_in": 0, "lead_in_drawn": {}, "worst_rim": 0.0, "worst_grip": 0.0, "found": true}
 	var halfway: bool = await _wait_until(func() -> bool:
 		_sample_crank_grip(game, human, bypass_handle, grip)
 		return int(game.get("bypass_ticks")) >= 4, 150)
 	Input.action_release(&"interact")
 	var grip_frames: Array = grip["frames"] as Array
-	print("crank grip: A %d, B %d, usual %d frames (lead-in %d); worst %.2f world px off the rim line, %.2f from the grip point" % [int(grip_frames[0]), int(grip_frames[1]), int(grip["usual"]), int(grip["lead_in"]), float(grip["worst_rim"]), float(grip["worst_grip"])])
-	_expect(int(grip_frames[0]) > 0 and int(grip_frames[1]) > 0 and int(grip["usual"]) == 0 and int(grip["lead_in"]) <= 6, "cranking shows the crank pose: A (grip) and B (push) frames, %d and %d, no usual-sprite frame once it starts (%d) and at most 6 physics frames of lead-in (%d)" % [int(grip_frames[0]), int(grip_frames[1]), int(grip["usual"]), int(grip["lead_in"])])
+	var lead_in_drawn: int = (grip["lead_in_drawn"] as Dictionary).size()
+	print("crank grip: A %d, B %d, usual %d frames (lead-in %d physics, %d drawn); worst %.2f world px off the rim line, %.2f from the grip point" % [int(grip_frames[0]), int(grip_frames[1]), int(grip["usual"]), int(grip["lead_in"]), lead_in_drawn, float(grip["worst_rim"]), float(grip["worst_grip"])])
+	_expect(int(grip_frames[0]) > 0 and int(grip_frames[1]) > 0 and int(grip["usual"]) == 0 and lead_in_drawn <= 2, "cranking shows the crank pose: A (grip) and B (push) frames, %d and %d, no usual-sprite frame once it starts (%d) and at most 2 drawn frames of lead-in (%d; %d physics)" % [int(grip_frames[0]), int(grip_frames[1]), int(grip["usual"]), lead_in_drawn, int(grip["lead_in"])])
 	_expect(bool(grip["found"]) and float(grip["worst_rim"]) <= 1.5 and float(grip["worst_grip"]) <= 2.5, "in every crank frame both gloves are on the wheel's rim (worst %.2f world px off the rim line, %.2f from the grip point)" % [float(grip["worst_rim"]), float(grip["worst_grip"])])
 	_expect(halfway and str(game.get("status_line")) == "Halfway. The hiss gets louder; the alarm keeps wailing." and bypass_handle.ticks == int(game.get("bypass_ticks")), "half way through the crank the hiss gets louder and the handle shows the count")
 	_expect(absf(wolf.position.x - wolf_clear_x) <= 3.0 and wolf.position.x + M0Actor.WOLF_REACH < float(main_constants["RELAY_X"]) - 20.0 and not wolf.body_sprite.flip_h, "WOLF is off the relay's housing, facing the engineer at the bypass")
@@ -639,6 +640,9 @@ func _sample_crank_grip(game: Node2D, human: M0Actor, handle: BypassHandle, grip
 		# crank frame is input latency (counted as lead-in, bounded), not a pop while cranking.
 		if int((grip["frames"] as Array)[0]) + int((grip["frames"] as Array)[1]) == 0:
 			grip["lead_in"] = int(grip["lead_in"]) + 1
+			# A stalled frame can run several physics steps before one drawn frame, so the bound is on
+			# drawn (process) frames, which is what a player would see.
+			(grip["lead_in_drawn"] as Dictionary)[Engine.get_process_frames()] = true
 		else:
 			grip["usual"] = int(grip["usual"]) + 1
 		return
