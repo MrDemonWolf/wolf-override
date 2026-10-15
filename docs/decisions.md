@@ -70,3 +70,10 @@ Nathanial's choices of 2026-10-14, made through clickable choices after reading 
 - **WOLF comes to the doorway at the corridor's safe point (decided, not built yet):** when WOLF says "We made it." he walks up and stands in the open doorway near the engineer, fully visible, clear of the door frame, the machines and the engineer, and facing them. No line changes; this also settles "Open. I'm with you." Until it is built he waits on the relay's left there, which is a stopgap, not the design.
 - **The safe-point room's camera-side wall is a clean architectural cutaway (decided, not built yet),** as in This War of Mine and Fallout Shelter.
 - Both safe-point decisions are built by the corridor door-end additions job, with a redrawn door end, through its own pull request.
+
+## Decisions of October 14, 2026
+Nathanial's answers of 2026-10-14 to four open play questions (docs/research-2026-10/how-it-should-play/NEEDS.md Q3, Q10 and Q17; drafts-2026-10-13.md Q-G).
+- **Q3 "Not in this slice":** no verb for asking WOLF for a hint in this slice. Revisit only if playtesters stall at one spot.
+- **Q10 "Trim it":** Settings keeps the heading THE DEN / LOCAL CONFIGURATION, loses the GPU / Renderer line, and shows the note "Window size is OS-managed on mobile." only on phones and tablets; the rest of that note ("V-sync may limit the FPS cap.") stays where it applies.
+- **Q17 "Cold Still timing":** after a knockdown, RETRY works at 0.9 s and control is back at about 1.5 s, every time (the first knockdown and every repeat; the draft note's "2.4 s first death, 0.8 s repeat" is dropped). The card holds until RETRY. Cold Still's look (the freeze, drain and card layout) is still to build.
+- **Q-G "The coolant pipe":** "SERVICE LINE CLEARED ... The line runs on toward Archive." keeps its words, because the line is the coolant pipe; the doors job draws the pipe running on through the exit.
