@@ -53,10 +53,10 @@ looks for runs of six or more matching lines, ignoring comments, blank
 lines, indentation and spaces (except inside quoted strings), that your
 branch adds or touches since it left `origin/main`, including an edit
 inside one copy of an older block that leaves six or more lines still
-matching; every pull request runs it as part of the `godot` check. It compares text, not meaning, so a
-copy with renamed variables passes it: a pass is not proof that there are
-no copies, and reviewers still read for them.
-When it fails, it names both places: move that code into one shared file
+matching; every pull request runs it as part of the `godot` check. It
+compares text, not meaning, so a copy with renamed variables passes it: a
+pass is not proof that there are no copies, and reviewers still read for
+them. When it fails, it names both places: move that code into one shared file
 that both use and delete the copy. If two places truly must stay
 separate, list the pair with a reason in `.copies-allow` and say why in
 the pull request. `python3 scripts/check-copies.py --report` lists the
