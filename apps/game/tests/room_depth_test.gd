@@ -169,20 +169,8 @@ func _check_characters(game: Node2D) -> void:
 ## security container stands on the floor behind the walk line, and every leaf is somewhere on its
 ## hinges in every state (nothing fades or hides).
 func _check_records_doors(records: RecordsRoom) -> void:
-	for pair: Array in [[records.exit_leaf, RecordsRoom.EXIT_DOOR_X, "exit"], [records.entry_leaf, RecordsRoom.ENTRY_DOOR_X, "entry"]]:
-		var leaf: SwingLeaf = pair[0]
-		var face_x: float = pair[1]
-		var shut_foot_hinge: Vector2 = SwingLeaf.project(leaf.hinge)
-		var shut_foot_free: Vector2 = SwingLeaf.project(leaf.hinge + leaf.leaf_dir(0.0) * SwingLeaf.LEAF_W)
-		var crossing_x: float = shut_foot_hinge.x + (shut_foot_free.x - shut_foot_hinge.x) * (440.0 - shut_foot_hinge.y) / (shut_foot_free.y - shut_foot_hinge.y)
-		_expect(absf(crossing_x - face_x) < 1.0, "the %s's shut leaf meets the walk line at its collision face (x %.1f)" % [pair[2], crossing_x])
-		var open_free: Vector3 = leaf.hinge + leaf.leaf_dir(PI * 0.5) * SwingLeaf.LEAF_W
-		_expect(open_free.z > 0.1 and leaf.hinge.z > 0.1, "the open %s leaf stands behind the walk line, out of the walkway" % pair[2])
-		for opening: float in [0.0, 0.5, 1.0]:
-			leaf.open = opening
-			_expect(leaf.visible and leaf.modulate.a == 1.0, "the %s leaf is drawn whole at %.0f %% open" % [pair[2], opening * 100.0])
-		leaf.open = 0.0
-		_check_leaf_light(leaf, "Records " + str(pair[2]))
+	_check_swing_leaf(records.exit_leaf, RecordsRoom.EXIT_DOOR_X, "exit", "Records exit")
+	_check_swing_leaf(records.entry_leaf, RecordsRoom.ENTRY_DOOR_X, "entry", "Records entry")
 	var box: Rect2 = records.container_rect()
 	_expect(box.position.x >= RecordsRoom.CONTAINER_SPAN.x - 2.0 and box.position.x <= RecordsRoom.CONTAINER_SPAN.x and box.end.y >= 440.0 and box.end.y <= 446.0, "the security container stands on the floor where the stations expect it (%s)" % box)
 	_expect(SwingLeaf.project(records.exit_leaf.hinge + records.exit_leaf.leaf_dir(PI * 0.5) * SwingLeaf.LEAF_W).x > RecordsRoom.CONTAINER_SPAN.y + 20.0, "the open exit leaf stops clear of the container and of the engineer working it")
@@ -192,20 +180,30 @@ func _check_records_doors(records: RecordsRoom) -> void:
 ## collision face in the junction's own camera, the open leaf stands behind the walk line, the leaf is
 ## drawn whole at every swing, the camera-facing hatch is gone and no near pipe column hides the wall.
 func _check_junction_entry(junction: JunctionRoom) -> void:
-	var leaf: SwingLeaf = junction.entry_leaf
-	var a: Vector2 = SwingLeaf.project(leaf.hinge, leaf.vpx, leaf.horizon)
-	var b: Vector2 = SwingLeaf.project(leaf.hinge + leaf.leaf_dir(0.0) * SwingLeaf.LEAF_W, leaf.vpx, leaf.horizon)
-	var crossing_x: float = a.x + (b.x - a.x) * (440.0 - a.y) / (b.y - a.y)
-	_expect(absf(crossing_x - JunctionRoom.ENTRY_DOOR_X) < 1.0, "the junction entry's shut leaf meets the walk line at its collision face (x %.1f)" % crossing_x)
-	var open_free: Vector3 = leaf.hinge + leaf.leaf_dir(PI * 0.5) * SwingLeaf.LEAF_W
-	_expect(open_free.z > 0.1 and leaf.hinge.z > 0.1, "the open junction entry leaf stands behind the walk line, out of the walkway")
-	for opening: float in [0.0, 0.5, 1.0]:
-		leaf.open = opening
-		_expect(leaf.visible and leaf.modulate.a == 1.0, "the junction entry leaf is drawn whole at %.0f %% open" % (opening * 100.0))
-	leaf.open = 0.0
-	_check_leaf_light(leaf, "junction entry")
+	_check_swing_leaf(junction.entry_leaf, JunctionRoom.ENTRY_DOOR_X, "junction entry", "junction entry")
 	_expect(JunctionRoom.WOLF_CLEAR_X - M0Actor.WOLF_REACH > JunctionRoom.ENTRY_DOOR_X, "WOLF waiting by the entrance stands clear of the shut entry")
 	_expect(junction.get("entry_hatch_art") == null and not junction.depth.near_left_edge, "the camera-facing hatch is gone and no pipe column stands in front of the entry")
+
+
+## One swing leaf (the Records exit and entry, the junction entry): in its own room's camera (its
+## [member SwingLeaf.vpx] and [member SwingLeaf.horizon], which for the Records leaves are
+## DoorCamera's defaults), the shut leaf's room face meets the walk line (y 440) within 1 px of
+## [param face_x], its collision face; the open leaf stands behind the walk line; it is drawn whole
+## shut, half open and open; and its light holds through the swing. [param label] names it in the
+## messages ("exit" reads "the exit's shut leaf ..."), [param light_label] in _check_leaf_light's. It
+## leaves the leaf shut.
+func _check_swing_leaf(leaf: SwingLeaf, face_x: float, label: String, light_label: String) -> void:
+	var shut_foot_hinge: Vector2 = SwingLeaf.project(leaf.hinge, leaf.vpx, leaf.horizon)
+	var shut_foot_free: Vector2 = SwingLeaf.project(leaf.hinge + leaf.leaf_dir(0.0) * SwingLeaf.LEAF_W, leaf.vpx, leaf.horizon)
+	var crossing_x: float = shut_foot_hinge.x + (shut_foot_free.x - shut_foot_hinge.x) * (440.0 - shut_foot_hinge.y) / (shut_foot_free.y - shut_foot_hinge.y)
+	_expect(absf(crossing_x - face_x) < 1.0, "the %s's shut leaf meets the walk line at its collision face (x %.1f)" % [label, crossing_x])
+	var open_free: Vector3 = leaf.hinge + leaf.leaf_dir(PI * 0.5) * SwingLeaf.LEAF_W
+	_expect(open_free.z > 0.1 and leaf.hinge.z > 0.1, "the open %s leaf stands behind the walk line, out of the walkway" % label)
+	for opening: float in [0.0, 0.5, 1.0]:
+		leaf.open = opening
+		_expect(leaf.visible and leaf.modulate.a == 1.0, "the %s leaf is drawn whole at %.0f %% open" % [label, opening * 100.0])
+	leaf.open = 0.0
+	_check_leaf_light(leaf, light_label)
 
 
 ## Fix round 4 (review r4, M1): the leaf draws the face its room's pinhole camera sees (the room face up to
