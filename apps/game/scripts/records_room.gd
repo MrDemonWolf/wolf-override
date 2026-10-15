@@ -6,7 +6,7 @@ const RECORDS_MID: Texture2D = preload("res://assets/rooms/records-mid.png")
 const RECORDS_NEAR: Texture2D = preload("res://assets/rooms/records-near.png")
 const PURGE_QUEUE: Texture2D = preload("res://assets/props/records-purge-queue.png")
 const MIRROR_PORT: Texture2D = preload("res://assets/props/records-mirror-port.png")
-## The Records doors (design: docs/research-2026-10/sources/records-doors-2026-10-13/). Each end of the
+## The Records doors (design: docs/research-2026-10/sources/doors-2026-10-14/records/). Each end of the
 ## room is a 300 mm cast cross-wall turned 17 degrees across the walkway, like the corridor's, with a
 ## 3'0" x 7'0" steel secure-area door in it: the entry on the left (the way in from the corridor
 ## side, its outside face with the combination lock) and the exit on the right (out to the service

@@ -80,7 +80,7 @@ const ENTRY_LAMP_MOVING: Color = Color("#f3ae4b")
 ## turned 17 degrees across the walk line like the corridor's door end (its approach face crosses the
 ## walk line at EXIT_DOOR_X). Its leaf runs in the wall's middle on bottom rollers and slides back into
 ## a pocket in the far jamb; the service passage beyond is painted behind the doorway. One lossless
-## atlas (docs: junction-exit-door-2026-10-13), drawn at EXIT_ATLAS_SCALE (2 source px per world px):
+## atlas (docs: doors-2026-10-14/junction-exit), drawn at EXIT_ATLAS_SCALE (2 source px per world px):
 ## - beyond: the passage, the far reveal's rear half and the pocket (under the leaf);
 ## - leaf: the sliding leaf, moved by exit_leaf_anchor();
 ## - back: the cross-wall behind the walk line (its face back to the room's back wall, the far jamb and
