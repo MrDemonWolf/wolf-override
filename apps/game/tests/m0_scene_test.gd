@@ -579,19 +579,19 @@ func _tap(action: StringName) -> void:
 	Input.action_release(action)
 
 
+func _action_event(action: StringName, pressed: bool) -> InputEventAction:
+	var event: InputEventAction = InputEventAction.new()
+	event.action = action
+	event.pressed = pressed
+	return event
+
+
 ## Presses interact until the opening reaches beat [param step] (each press shows one box).
 func _tap_to_step(step: int) -> void:
 	for _press: int in 6:
 		if int(game_ref.get("intro_step")) >= step:
 			return
 		await _tap(&"interact")
-
-
-func _action_event(action: StringName, pressed: bool) -> InputEventAction:
-	var event: InputEventAction = InputEventAction.new()
-	event.action = action
-	event.pressed = pressed
-	return event
 
 
 func _widest_line(label: Label) -> float:
