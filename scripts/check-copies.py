@@ -7,11 +7,13 @@ This check enforces it. It reads the tracked code files of a git ref straight
 from git objects, so it can check any branch without a checkout.
 
 A copy is a run of at least --min-lines consecutive normalised lines that
-appears in two files, or twice in one file. Normalising trims each line,
-collapses runs of spaces, drops trailing comments, and skips blank lines,
-comment-only lines and trivial lines (a lone bracket, pass, else:, fi, done,
-docstring quotes, imports and the like), so comments, blank lines and
-re-indenting do not hide a copy.
+appears in two files, or twice in one file. Normalising drops trailing
+comments and every space outside string quotes (so `a=b` matches `a = b`),
+and skips blank lines, comment-only lines and trivial lines (a lone bracket,
+pass, else:, fi, done, docstring quotes, imports and the like), so comments,
+blank lines, indentation and spacing do not hide a copy. It compares text,
+not meaning: a copy with renamed variables still passes, so reviewers read
+for those.
 
 Usage (from the repository root):
     python3 scripts/check-copies.py                      # every copy in HEAD; exit 1 if any
@@ -62,6 +64,8 @@ TRIVIAL = re.compile(
     r'|pass|else:?|\} ?else ?\{|elif|try:|finally:|except:|return;?|break;?|continue;?'
     r'|end|fi|done|esac|then|do|default:)$')
 SPACES = re.compile(r'\s+')
+QUOTES = re.compile('["\'`]')
+HASH_COMMENT = re.compile(r'(?:^|(?<=[ \t]))#')
 
 
 def git(repo, *args, data=None):
@@ -75,31 +79,44 @@ class GitError(Exception):
     pass
 
 
-def strip_trailing_comment(line, marker):
-    """Cut a trailing line comment that sits outside string quotes."""
-    if not marker or marker not in line:
-        return line
+def split_code(line, marker):
+    """Return the line without its trailing comment, and that code with every
+    space outside string quotes removed (the text copies are matched on)."""
+    if not QUOTES.search(line):  # fast path: nothing quoted on this line
+        if marker == '#':
+            found = HASH_COMMENT.search(line)
+            end = found.start() if found else len(line)
+        else:
+            end = line.find(marker) if marker else -1
+            end = len(line) if end < 0 else end
+        return line[:end], SPACES.sub('', line[:end])
     quote = None
+    kept = []
     i = 0
     n = len(line)
     while i < n:
         ch = line[i]
         if quote:
             if ch == '\\':
+                kept.append(line[i:i + 2])
                 i += 2
                 continue
             if ch == quote:
                 quote = None
+            kept.append(ch)
         elif ch in '"\'`':
             quote = ch
-        elif line.startswith(marker, i) and (marker != '#' or i == 0 or line[i - 1] in ' \t'):
-            return line[:i]
+            kept.append(ch)
+        elif marker and line.startswith(marker, i) and (marker != '#' or i == 0 or line[i - 1] in ' \t'):
+            return line[:i], ''.join(kept)
+        elif not ch.isspace():
+            kept.append(ch)
         i += 1
-    return line
+    return line, ''.join(kept)
 
 
 def normalise(text, ext):
-    """Return [(line number, normalised text)] for the lines that count."""
+    """Return [(line number, matched text, readable text)] for the lines that count."""
     marker, blocks = SYNTAX.get(ext, HASH)
     out = []
     in_block = False
@@ -118,13 +135,14 @@ def normalise(text, ext):
                     in_block = True
                     continue
                 line = line[end + 2:].strip()
-        line = strip_trailing_comment(line, marker).strip()
+        line, key = split_code(line, marker)
+        line = line.strip()
         if not line or (marker and line.startswith(marker)):
             continue
         line = SPACES.sub(' ', line)
         if TRIVIAL.match(line):
             continue
-        out.append((number, line))
+        out.append((number, key, line))
     return out
 
 
@@ -187,7 +205,7 @@ def find_copies(norm, k, rules):
     """
     windows = collections.defaultdict(list)
     for path, lines in norm.items():
-        texts = [t for _, t in lines]
+        texts = [key for _, key, _ in lines]
         for j in range(len(texts) - k + 1):
             windows[tuple(texts[j:j + k])].append((path, j))
     diagonals = collections.defaultdict(list)
@@ -210,7 +228,7 @@ def find_copies(norm, k, rules):
         if allowed(rules, pa, pb):
             continue
         starts.sort()
-        lines_a = [t for _, t in norm[pa]]
+        lines_a = [key for _, key, _ in norm[pa]]
         run_start = prev = starts[0]
         for s in starts[1:] + [None]:
             if s is not None and s == prev + 1:
@@ -265,7 +283,8 @@ def describe(norm, text, places):
     for path, first, last in sorted(places):
         lines = norm[path]
         spots.append(f'{path}:{lines[first][0]}-{lines[last][0]}')
-    return f"{' ↔ '.join(spots)}\n    {len(text)} lines, starting: {text[0][:100]}"
+    path, first, _ = min(places)
+    return f"{' ↔ '.join(spots)}\n    {len(text)} lines, starting: {norm[path][first][2][:100]}"
 
 
 def run(args):
@@ -385,6 +404,14 @@ def self_test():
         disguised = '\n'.join(f'  {line.replace(" = ", "   =   ")}  # note {i}\n\n\t# a comment\n'
                               for i, line in enumerate(block))
         commit('disguised', {'game/c.gd': f'extends Node\n\nfunc c():\n{disguised}\n'})
+        squeezed = '\n'.join(f'\t{line.replace(" ", "")}' for line in block)
+        commit('squeezed', {'game/e.gd': f'extends Node\n\nfunc e():\n{squeezed}\n'})
+        said = [f'\tsay("part {i} of {i + 1}", {i})' for i in range(7)]
+        commit('said', {'game/f.gd': 'extends Node\n\nfunc f():\n' + '\n'.join(said) + '\n'})
+        sh('checkout', '-q', 'main')
+        sh('merge', '-q', '--ff-only', 'said')
+        commit('respelled', {'game/g.gd': 'extends Node\n\nfunc g():\n' + '\n'.join(
+            line.replace('part ', 'part') for line in said) + '\n'})
         js = [f'const part{i} = scale("#{i}{i}{i}", {i}) + base;' for i in range(7)]
         commit('js-base', {'site/one.mjs': '\n'.join(js) + '\n'})
         sh('checkout', '-q', 'main')
@@ -406,6 +433,9 @@ def self_test():
         check('planted copy is caught', 1, '--ref', 'planted', '--base', 'main')
         check('comments, blank lines and spacing do not hide a copy', 1,
               '--ref', 'disguised', '--base', 'main')
+        check('spaces removed inside lines (a=b) do not hide a copy', 1,
+              '--ref', 'squeezed', '--base', 'main')
+        check('spaces inside quoted strings still count', 0, '--ref', 'respelled', '--base', 'main')
         check('// and /* */ comments do not hide a copy in TypeScript', 1,
               '--ref', 'js-copy', '--base', 'main')
         check('a copy inside one file is caught', 1, '--ref', 'same-file', '--base', 'main')
