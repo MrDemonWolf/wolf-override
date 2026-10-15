@@ -35,8 +35,8 @@ const READOUT_HEIGHT: float = 12.0
 const CELL_SIZE: Vector2 = Vector2(5.0, 6.0)
 const CELL_GAP: float = 1.5
 const LAMP_OFF: Color = Color("#24333c")
-const AMBER: Color = Color("#f3ae4b")
-const GREEN: Color = Color("#a4f0c4")
+## A crank light still to come once the bypass is live.
+const LAMP_WAITING: Color = Color("#4d6370")
 const LABEL_TEXT: Color = Color(0.69, 0.82, 0.87, 1)
 const FAULT_TEXT: Color = Color("#ffb36b")
 const FAULT_EDGE: Color = Color(0.78, 0.33, 0.2, 0.8)
@@ -117,15 +117,13 @@ func _init() -> void:
 	wheel.scale = Vector2.ONE * WHEEL_SCALE
 	wheel.position = WHEEL_OFFSET
 	add_child(wheel)
-	bypass_label = _plate("BypassLabel", "MANUAL BYPASS", LABEL_TEXT, Color(0.29, 0.4, 0.45, 0.55), LABEL_WIDTH, READOUT_HEIGHT)
+	bypass_label = _plate("BypassLabel", "MANUAL BYPASS", LABEL_TEXT, Palette.PLATE_EDGE, LABEL_WIDTH, READOUT_HEIGHT)
 	readout = Node2D.new()
 	readout.name = "CrankReadout"
 	readout.draw.connect(_draw_readout)
 	bypass_label.add_child(readout)
 	fault_tag = _plate("CoolantFaultTag", "COOLANT FAULT", FAULT_TEXT, FAULT_EDGE)
 	coolant_hiss = FxPresets.steam()
-	coolant_hiss.name = "CoolantHiss"
-	coolant_hiss.position = HISS_OFFSET
 	coolant_hiss.amount = 24
 	coolant_hiss.lifetime = 0.75
 	coolant_hiss.direction = Vector2(0.6, -1.0)
@@ -134,7 +132,7 @@ func _init() -> void:
 	coolant_hiss.initial_velocity_max = 45.0
 	coolant_hiss.scale_amount_min = 4.0
 	coolant_hiss.scale_amount_max = 7.0
-	add_child(coolant_hiss)
+	FxPresets.place(coolant_hiss, self, "CoolantHiss", HISS_OFFSET)
 
 
 ## Places the handle with its wheel at [param wheel_centre] and the COOLANT FAULT tag centred on
@@ -154,8 +152,7 @@ func clear_fault(cleared: bool, animate: bool) -> void:
 	if cleared == fault_cleared:
 		return
 	fault_cleared = cleared
-	if _fault_tween != null and _fault_tween.is_valid():
-		_fault_tween.kill()
+	Tweens.kill(_fault_tween)
 	if not cleared:
 		fault_tag.self_modulate.a = 1.0
 		fault_tag.show()
@@ -185,7 +182,7 @@ func _process(delta: float) -> void:
 ## and [param foot] leaves that much room under the text.
 func _plate(node_name: String, caption: String, text_color: Color, edge: Color, wrap_width: float = 0.0, foot: float = 0.0) -> Label:
 	var plate: StyleBoxFlat = StyleBoxFlat.new()
-	plate.bg_color = JunctionRoom.LABEL_PLATE
+	plate.bg_color = Palette.PLATE_BG
 	plate.border_color = edge
 	plate.set_border_width_all(1)
 	plate.set_corner_radius_all(2)
@@ -217,8 +214,7 @@ func show_hold(fraction: float) -> void:
 	var released: bool = fraction <= 0.0
 	hold_fraction = maxf(fraction, 0.0)
 	readout.queue_redraw()
-	if _wheel_tween != null and _wheel_tween.is_valid():
-		_wheel_tween.kill()
+	Tweens.kill(_wheel_tween)
 	var target: float = TICK_DEGREES * (ticks + hold_fraction)
 	if released and is_inside_tree():
 		_wheel_tween = create_tween()
@@ -228,8 +224,7 @@ func show_hold(fraction: float) -> void:
 
 
 func _turn_wheel() -> void:
-	if _wheel_tween != null and _wheel_tween.is_valid():
-		_wheel_tween.kill()
+	Tweens.kill(_wheel_tween)
 	# Mid-hold the notch just reached is where the wheel is; show_hold adds the next part turn.
 	var target: float = TICK_DEGREES * ticks
 	if ticks == 0 or hold_fraction > 0.0 or not is_inside_tree():
@@ -247,14 +242,14 @@ func _draw_readout() -> void:
 	var leader_top: float = bypass_label.size.y
 	var leader_bottom: float = LEADER_END_Y - bypass_label.position.y
 	if leader_bottom > leader_top:
-		readout.draw_rect(Rect2(leader_x - LEADER_WIDTH * 0.5, leader_top, LEADER_WIDTH, leader_bottom - leader_top), Color(0.29, 0.4, 0.45, 0.55))
+		readout.draw_rect(Rect2(leader_x - LEADER_WIDTH * 0.5, leader_top, LEADER_WIDTH, leader_bottom - leader_top), Palette.PLATE_EDGE)
 	var row: float = CELL_SIZE.x * TICKS_NEEDED + CELL_GAP * (TICKS_NEEDED - 1)
 	var first: Vector2 = Vector2((bypass_label.size.x - row) * 0.5, bypass_label.size.y - READOUT_HEIGHT * 0.5 - CELL_SIZE.y * 0.5 - 1.0)
 	for index: int in TICKS_NEEDED:
 		var cell: Color = LAMP_OFF
 		if live or done:
-			cell = GREEN if done else (AMBER if index < ticks else Color("#4d6370"))
+			cell = Palette.GREEN if done else (Palette.AMBER if index < ticks else LAMP_WAITING)
 			if not done and index == ticks and hold_fraction > 0.0:
 				# The notch being cranked warms toward amber as the hold adds up.
-				cell = Color("#4d6370").lerp(AMBER, 0.35 + 0.5 * hold_fraction)
+				cell = LAMP_WAITING.lerp(Palette.AMBER, 0.35 + 0.5 * hold_fraction)
 		readout.draw_rect(Rect2(first + Vector2((CELL_SIZE.x + CELL_GAP) * index, 0.0), CELL_SIZE), cell)

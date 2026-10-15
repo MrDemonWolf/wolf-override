@@ -809,7 +809,9 @@ func _walk_to(target_x: float, must_arrive: bool = true) -> bool:
 		if (target_x - human.position.x) * dir <= 3.0:
 			reached = true
 			break
-		if not human.controlled and not game.get("engineer_waits_for_wolf"):
+		# The engineer holds still while WOLF catches up, and at the rubble line while the box before the
+		# lane question is up (lane_question_held); the key stays down through both.
+		if not human.controlled and not game.get("engineer_waits_for_wolf") and not game.get("lane_question_held"):
 			break
 	Input.action_release(action)
 	await _raw(1)

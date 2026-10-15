@@ -150,8 +150,7 @@ func flash(white_seconds: float, red_seconds: float) -> void:
 
 
 func _end_flash() -> void:
-	if _flash_tween != null and _flash_tween.is_valid():
-		_flash_tween.kill()
+	Tweens.kill(_flash_tween)
 	_flash_tween = null
 	if not _flash_active:
 		return
