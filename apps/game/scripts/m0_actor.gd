@@ -6,7 +6,9 @@ extends CharacterBody2D
 
 var controlled: bool = false
 var follow_target: Node2D
-var autonomous_target_x: float = -1.0
+var autonomous_target_x: float = NO_TARGET
+## GREY BOX (L1): the left clamp is per room now; the lockdown room reaches into the dock room (-730).
+var min_x: float = MIN_X
 ## Where a follower may stand; main pulls follow_max_x back from a sealed door so WOLF never noses into it.
 var follow_min_x: float = MIN_X
 var follow_max_x: float = MAX_X
@@ -60,6 +62,9 @@ const AVOID_DETOUR: float = 100.0
 ## WOLF_REACH is rounded up past his painted nose and tail tip, so this much of it may touch a machine.
 const AVOID_TOLERANCE: float = 4.0
 const MIN_X: float = 40.0
+## GREY BOX (L1): "no target". In L1 real targets can be negative world x, so the old ">= 0" test
+## for "has a target" no longer works; -1.0 stays the sentinel and is compared exactly.
+const NO_TARGET: float = -1.0
 const MAX_X: float = 920.0
 ## While walking past the engineer WOLF draws behind him (main orders him first) and dims a little,
 ## so the pass reads as behind rather than through.
@@ -78,7 +83,7 @@ func _physics_process(delta: float) -> void:
 		if axis == 0.0 and settle_x >= 0.0:
 			velocity.x = clampf(_approach(settle_x, delta), -SETTLE_SPEED, SETTLE_SPEED)
 			settling = true
-	elif autonomous_target_x >= 0.0:
+	elif autonomous_target_x != NO_TARGET:
 		velocity.x = _approach(autonomous_target_x, delta)
 		# Once he has walked off on his own, he picks his side afresh from the engineer's facing.
 		follow_side = 0
@@ -107,7 +112,7 @@ func _physics_process(delta: float) -> void:
 	else:
 		velocity.y += GRAVITY * delta
 	move_and_slide()
-	position.x = clampf(position.x, MIN_X, MAX_X)
+	position.x = clampf(position.x, min_x, MAX_X)
 	_tint_pass(delta)
 
 

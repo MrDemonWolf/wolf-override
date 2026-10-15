@@ -395,4 +395,4 @@ static func _valid_position(value: Variant, floor_height: float) -> bool:
 	for component in value:
 		if typeof(component) != TYPE_INT and typeof(component) != TYPE_FLOAT:
 			return false
-	return float(value[0]) >= 40.0 and float(value[0]) <= 920.0 and float(value[1]) >= 0.0 and float(value[1]) <= floor_height
+	return float(value[0]) >= -606.0 and float(value[0]) <= 920.0 and float(value[1]) >= 0.0 and float(value[1]) <= floor_height

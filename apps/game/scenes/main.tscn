@@ -24,7 +24,7 @@
 [ext_resource type="Shader" path="res://assets/shaders/sharp_sprite.gdshader" id="22_sharp"]
 
 [sub_resource type="RectangleShape2D" id="FloorShape"]
-size = Vector2(960, 60)
+size = Vector2(1740, 60)
 
 [sub_resource type="RectangleShape2D" id="DoorShape"]
 size = Vector2(56, 132)
@@ -66,7 +66,7 @@ painted_lamps = PackedInt32Array(2)
 position = Vector2(480, 270)
 
 [node name="Floor" type="StaticBody2D" parent="."]
-position = Vector2(480, 470)
+position = Vector2(90, 470)
 collision_layer = 2
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Floor"]
@@ -386,7 +386,7 @@ vertical_alignment = 1
 
 [node name="TutorialPrompt" type="Panel" parent="CanvasLayer"]
 visible = false
-offset_left = 322.0
+offset_left = 352.0
 offset_top = 96.0
 offset_right = 638.0
 offset_bottom = 162.0

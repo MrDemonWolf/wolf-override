@@ -33,7 +33,8 @@ func _run() -> void:
 	_check_reaches(human, wolf)
 	_expect(wolf.get_index() < human.get_index() and wolf.z_index == human.z_index and wolf.keep_clear_of == human, "the engineer draws in front of WOLF at the same depth")
 
-	# The opening: the engineer is hidden, so WOLF walking out past his spot never dims.
+	# The opening: WOLF walking out never dims. (P0-13, decided 2026-10-13: the engineer now arrives in the
+	# doorway in box 2 and watches from there, so they are no longer hidden.)
 	game.call("_new_game")
 	var intro_dimmed: bool = false
 	var intro_walked: bool = false
@@ -43,7 +44,15 @@ func _run() -> void:
 			await physics_frame
 			intro_walked = intro_walked or absf(wolf.velocity.x) > 1.0
 			intro_dimmed = intro_dimmed or wolf.passing() or wolf.body_sprite.self_modulate.v < 0.99
-	_expect(intro_walked and not human.is_visible_in_tree() and not intro_dimmed, "in the opening WOLF walks out undimmed past the hidden engineer")
+	# (P0-13 round 4: a press never snaps the break-out to its end, so WOLF steps out once it has played,
+	# about 6 s after these quick presses; watch until he has walked.)
+	for _frame: int in 600:
+		if intro_walked:
+			break
+		await physics_frame
+		intro_walked = intro_walked or absf(wolf.velocity.x) > 1.0
+		intro_dimmed = intro_dimmed or wolf.passing() or wolf.body_sprite.self_modulate.v < 0.99
+	_expect(intro_walked and not intro_dimmed, "in the opening WOLF walks out undimmed")
 
 	# The corridor: the opening hands over with WOLF a follow gap behind, clear of the engineer.
 	game.call("_finish_intro")
@@ -123,12 +132,15 @@ func _run() -> void:
 		_expect(wolf.position.x + M0Actor.WOLF_REACH - M0Actor.AVOID_TOLERANCE <= span.x + 2.5 or wolf.position.x - M0Actor.WOLF_REACH + M0Actor.AVOID_TOLERANCE >= span.y - 2.5 or absf(rest_x - human.position.x - M0Actor.FOLLOW_GAP) < 0.5, "resting there WOLF stands clear of the machine at %.0f..%.0f" % [span.x, span.y])
 	_expect(await _wait_until(func() -> bool: return wolf.body_sprite.self_modulate.is_equal_approx(Color.WHITE), 120), "WOLF's dim clears once he is past")
 
-	# At the left wall there is no room behind a right-facing engineer, so WOLF stays in front.
-	_expect(await _walk_to(human, 48.0), "the engineer walks to the corridor's left wall")
+	# At the left wall there is no room behind a right-facing engineer, so WOLF stays in front. (P0-13,
+	# layout L1, decided 2026-10-14: the corridor's left end is the doorway into the dock room now, so the
+	# nearest left wall is the dock room's end wall.)
+	_expect(await _walk_to(human, -598.0), "the engineer walks to the dock room's end wall")
 	await _tap_frames(&"move_right", 3)
 	await _settle()
 	_expect(M0Actor.facing_of(human) == 1 and wolf.follow_side == 1, "at the wall WOLF keeps to the open side")
-	_expect_clear(human, wolf, "corridor at the left wall")
+	_expect_clear(human, wolf, "dock room at its end wall")
+	_expect(await _walk_to(human, 48.0), "the engineer walks back into the corridor")
 
 	# Against the shut seal there is no room ahead of a left-facing engineer, so WOLF stays behind.
 	await _tap_frames(&"move_right", 300)

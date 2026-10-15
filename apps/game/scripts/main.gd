@@ -145,14 +145,104 @@ const RESTORE_FROM_DISK_LINE: String = "Back at the last checkpoint."
 const RESTORE_BEAT_LINE: String = "Back at the start of this stretch."
 ## The opening's beats, one speaker (or the narration) per box, so narration never sits under a name tag.
 const INTRO_LINES: Array[String] = [
-	"DIRECTOR: I decide who counts as a threat. WOLF handles the rest.",
-	"The Director thinks WOLF is still in standby.",
+	"DIRECTOR: I decide who counts as a threat.\nWOLF handles the rest.",
+	"The Director thinks WOLF is\nstill in standby.",
 	"Nobody gives an activation command.\nWOLF wakes himself.",
 	"The latch breaks from the inside.\nWOLF steps out under his own power.",
-	"DIRECTOR: You were in standby.\nWOLF: I heard you. I won't do it.",
-	"DIRECTOR: Lock down maintenance. WOLF does not leave this site.",
-	"WOLF turns from the Director and heads for maintenance.",
+	"DIRECTOR: You were in standby.",
+	"WOLF: I heard you. I won't do it.",
+	"DIRECTOR: Lock down maintenance.\nWOLF does not leave this site.",
+	"WOLF turns from the Director\nand heads for maintenance.",
 ]
+## GREY BOX (P0-13, layout L1; opening-design/DESIGN.md sections 1.1 and 2). The dock room sits at
+## negative x left of the corridor, joined by a cross-wall doorway; the corridor keeps every coordinate.
+const L1_BAY_O: float = -512.0
+## Round 2: the room ends at its left end wall's cut (GreyboxBay.END_CUT, x -644..-626); the engineer's
+## body (17 px reach) stops clear of it, WOLF's (67 px) further in.
+const L1_ROOM_MIN_X: float = -606.0
+const L1_WOLF_MIN_X: float = -556.0
+const L1_ROOM_RIGHT: float = 8.0
+const L1_CORRIDOR_MIN_VIEW_X: float = -40.0
+## Walk-back camera (round 2): main's corridor framing from the engineer at x 160 rightwards; walking left
+## the camera eases continuously to the whole-room view (centre -318: view x -673.6..37.6 at zoom 1.35),
+## reached with the engineer at -250, just right of the bay. No clamp switch, so no whip-pan at the doorway.
+const L1_WALKBACK_FROM_X: float = 160.0
+const L1_WALKBACK_TO_X: float = -250.0
+const L1_ROOM_VIEW_CENTRE: float = -318.0
+const L1_OPENING_CAMERA: Vector2 = Vector2(-195.0, 344.5)
+const L1_OPENING_ZOOM: float = 1.6
+const L1_WOLF_DOCKED_X: float = -397.0
+## Round 2 (review M2): his nose at the latch post (-317.4), his tail at -432.7, right of the open stack
+## (-435): from here he steps out toward the camera clear of the stacked leaves.
+const L1_WOLF_LATCH_X: float = -376.5
+const L1_WOLF_EXIT_X: float = -327.0
+## Round 3 (review-human-2 should-fix 9): WOLF comes on to the opening's edge (nose at -81), 0.6 m from
+## the engineer, instead of stopping 1.1 m short.
+const L1_WOLF_DOORWAY_X: float = -140.0
+const L1_DIRECTOR_X: float = -257.0
+const L1_DIRECTOR_BACK_X: float = -235.0
+const L1_DIRECTOR_Y: float = 410.0
+## Round 3 (review-real-2 S3, review-human-2 must-fix 1): at the tear the Director steps back and a
+## little toward the camera (0.05 m), and in box 8 WOLF takes a lane 0.1 m further back as he passes
+## him: his feet 5.5 px above the Director's, both with contact shadows, so "behind" reads as depth.
+const L1_DIRECTOR_DOWNSTAGE: float = 2.0
+## Round 4 (review-human-3 must-fix 1, review-real-3 S4; Nathanial 2026-10-14, decision 4, "the Director
+## steps back first"): as box 8 starts the Director steps back, right and up the floor to the back wall
+## (his feet 1.3 px off it), eyes on WOLF; only then does WOLF walk, in his lane nearer the camera, drawn
+## over the Director as he passes in front of him, so he never walks into him and leaves him behind.
+const L1_DIRECTOR_LAST: Vector2 = Vector2(-222.0, 406.5)
+const L1_DIRECTOR_STEP_S: float = 0.5
+const L1_WOLF_WAIT_S: float = 0.35
+## While WOLF passes in front of the Director his lane is this much further toward the camera.
+const L1_WOLF_LANE: float = 2.0
+## Round 4 (review-real-3 S4): WOLF steps down 12 px out of the bay (round 3: 8), so his lane is 0.1 m
+## further from the bay's face and his tail clears the hanging lock.
+const L1_WOLF_STEP_DOWN: float = 12.0
+## Paint fix 2 (review-real-2 S7): his forepaw passes the sill's foot (the floor line, y 440) this far into the
+## step-down; he is drawn in front of the bay's face only from then on, so the sill hides his paws until they
+## have stepped down past it.
+const L1_WOLF_PAW_CLEAR: float = 3.5
+## Round 4 (review-real-3 M2, S3): the Director's exit, a door in the back wall about 1 m left of his last
+## mark (GreyboxBay.EXIT_LEAF). Under the fade he walks to its badge reader, badges, pushes the leaf open,
+## goes through, and its closer pulls it shut.
+const L1_EXIT_READER_X: float = -232.0
+const L1_EXIT_THROUGH_X: float = -262.0
+const L1_EXIT_BADGE_S: float = 0.3
+const L1_EXIT_OPEN_S: float = 0.45
+const L1_EXIT_CLOSE_S: float = 1.2
+## Where each actor's feet are below their origin (measured on the round-2 stills): the Director's
+## soles, WOLF's paws once he has stepped down, the engineer's soles.
+const L1_DIRECTOR_FEET: float = 34.8
+const L1_WOLF_FEET: float = 22.3
+const L1_ENGINEER_FEET: float = 31.0
+## The Director stands nearer the camera than WOLF's lane out of the bay: WOLF passes behind him.
+const L1_DIRECTOR_Z: int = 6
+## Box 8 (round 4): once he has stepped back to the wall WOLF passes in front of him (WOLF is z 5).
+const L1_DIRECTOR_YIELD_Z: int = 4
+const L1_ENGINEER_ENTER_X: float = 125.0
+const L1_ENGINEER_WATCH_X: float = -34.0
+## Box 8 (round 3, review-human-2 should-fix 9): once WOLF is close, the engineer takes a half step
+## toward him, still in the opening and facing him (they meet; the round-2 step back read as backing
+## away).
+const L1_ENGINEER_MEET_X: float = -44.0
+## Box 3 (round 3, review-human-2 should-fix 3): the caption first, then the wake.
+const L1_WAKE_DELAY: float = 0.8
+const L1_WAKE_SECONDS: float = 0.8
+## Calm walking speeds (review S6): 1.4 m/s, under Spot's 1.6 m/s maximum.
+const L1_ENGINEER_SPEED: float = 56.0
+const L1_WOLF_SPEED: float = 56.0
+## Box 4 (Q-F): the caption first, then WOLF's move to the latch edge (the connector parts as he moves),
+## the tear, his planted sweep of the leading stile, and the leaves' coast.
+const L1_LATCH_DELAY: float = 0.8
+const L1_LATCH_SECONDS: float = 0.3
+## The sweep (round 3, review-real-2 S8): WOLF's head and shoulder take the leading stile 42 px,
+## accelerating it over 0.3 s to 85 px/s and holding it there; at 37 px its lug catches the next leaf
+## (a clunk; he pushes through it). Released, the two leaves coast with uniform deceleration; at 74 px
+## the lead catches the last leaf, an inelastic catch that drops the speed to 2/3 (a second clunk); the
+## three roll on to the stop. The speed is continuous everywhere but at that catch.
+const L1_SWEEP_PX: float = 42.0
+const L1_SWEEP_ACCEL_S: float = 0.3
+const L1_LEAF_V0: float = 85.0
 ## Leaving the cleared junction, WOLF goes first: his spot (JunctionRoom.WOLF_DOWN_X) already stands
 ## him in the open hatch's doorway (centred on JunctionRoom.HATCH_X), so he fades out there, without a
 ## step that would put his snout over the bolt box; only then does the engineer walk into the doorway
@@ -444,6 +534,22 @@ var title_focus_return: Control = null
 var intro_active: bool = false
 var intro_step: int = 0
 var intro_tween: Tween
+## GREY BOX (L1): the dock room, the doorway, and the engineer's rim from the doorway's fitting.
+var greybox: GreyboxBay
+var intro_flinch_tween: Tween
+## Box 8: the engineer has taken their half step toward WOLF.
+var engineer_made_way: bool = false
+## Round 4: the opening's beats in order (a press never snaps one to its end), the one playing, box 8's
+## walk under way, and the Director's exit after the last press.
+var intro_beat_queue: Array[Callable] = []
+var intro_beat_tween: Tween
+var wolf_box8_walking: bool = false
+var intro_exit_tween: Tween
+## Round 4 (decision 11): the corridor fitting's lit edge on the engineer and on WOLF.
+var human_lit_edge: Sprite2D
+var wolf_lit_edge: Sprite2D
+## Box 4: seconds since the tear at the leaves' last update (for the catch clunks).
+var leaf_clock: float = -1.0
 var menu_tween: Tween
 var backdrop_tween: Tween
 var top_card_tween: Tween
@@ -698,6 +804,13 @@ func _ready() -> void:
 	_setup_bypass()
 	_setup_corridor_labels()
 	_setup_particles()
+	greybox = GreyboxBay.new()
+	greybox.name = "GreyboxBay"
+	add_child(greybox)
+	greybox.corridor_depth = $CorridorDepth
+	human_lit_edge = GreyboxBay.make_lit_edge(human.body_sprite)
+	wolf_lit_edge = GreyboxBay.make_lit_edge(wolf.body_sprite)
+	greybox.set_empty_quiet()
 	# The door end's light and contact shadows are painted into its plates: its stations and seal
 	# cast no runtime floor reflection.
 	human_texture = human.body_sprite.texture
@@ -956,10 +1069,26 @@ func _setup_particles() -> void:
 	door_dust.position = Vector2(780.0, 436.0)
 	door_dust.emission_shape = CPUParticles2D.EMISSION_SHAPE_RECTANGLE
 	door_dust.emission_rect_extents = Vector2(30.0, 3.0)
-	gate_dust = FxPresets.dust_burst()
-	gate_dust.position = Vector2(115.0, 438.0)
-	gate_dust.emission_shape = CPUParticles2D.EMISSION_SHAPE_RECTANGLE
-	gate_dust.emission_rect_extents = Vector2(70.0, 3.0)
+	# Paint fix 2 (review-real-2 S6, review-tells-2 M2): shearing the lock's plate bolts throws a few chips of
+	# paint, not a puff of glowing sparks. Five hard flakes (no texture: 0.5-0.7 px squares, no glow) flung up
+	# and back at about 1 m/s, falling under gravity, gone within half a second. The boom, the lock's drop and
+	# the beacon carry the beat.
+	gate_dust = CPUParticles2D.new()
+	gate_dust.name = "LockChips"
+	gate_dust.emitting = false
+	gate_dust.one_shot = true
+	gate_dust.explosiveness = 1.0
+	gate_dust.amount = 5
+	gate_dust.lifetime = 0.45
+	gate_dust.position = Vector2(L1_BAY_O + 199.0, 399.0)
+	gate_dust.direction = Vector2(-0.45, -1.0)
+	gate_dust.spread = 35.0
+	gate_dust.initial_velocity_min = 25.0
+	gate_dust.initial_velocity_max = 55.0
+	gate_dust.gravity = Vector2(0.0, 392.0)
+	gate_dust.scale_amount_min = 0.5
+	gate_dust.scale_amount_max = 0.7
+	gate_dust.color = Color("#2b2f31")
 	for particles: CPUParticles2D in [relay_sparks, door_dust, gate_dust]:
 		particles.z_index = 3
 		add_child(particles)
@@ -981,7 +1110,19 @@ func _attach_status_glow(light: ColorRect) -> Sprite2D:
 func _update_gameplay_camera() -> void:
 	var half_view: float = GAMEPLAY_VIEW_WIDTH * 0.5
 	var touch_buttons: bool = touch_enabled and not controller_active and not waiting_for_choice
-	intro_camera.position = Vector2(clampf(human.position.x, half_view, 960.0 - half_view), GAMEPLAY_CAMERA_Y_TOUCH if touch_buttons else GAMEPLAY_CAMERA_Y)
+	var low: float = half_view
+	var high: float = 960.0 - half_view
+	if state.chapter_id == "lockdown":
+		# GREY BOX (L1): the doorway shows at the corridor's left edge; past it the dock room holds.
+		low = L1_CORRIDOR_MIN_VIEW_X + half_view
+		var hx: float = human.position.x
+		if hx < L1_WALKBACK_FROM_X:
+			# GREY BOX round 2: one continuous mapping from the engineer's x to the camera's, from main's
+			# first-control framing to the whole dock room.
+			var u: float = clampf((hx - L1_WALKBACK_TO_X) / (L1_WALKBACK_FROM_X - L1_WALKBACK_TO_X), 0.0, 1.0)
+			intro_camera.position = Vector2(lerpf(L1_ROOM_VIEW_CENTRE, low, u), GAMEPLAY_CAMERA_Y_TOUCH if touch_buttons else GAMEPLAY_CAMERA_Y)
+			return
+	intro_camera.position = Vector2(clampf(human.position.x, low, high), GAMEPLAY_CAMERA_Y_TOUCH if touch_buttons else GAMEPLAY_CAMERA_Y)
 
 
 func _start_gameplay_camera() -> void:
@@ -997,6 +1138,7 @@ func _process(delta: float) -> void:
 	# only while they show something.
 	intro_alarm.visible = intro_alarm.color.a > 0.0
 	intro_fade.visible = intro_fade.color.a > 0.0
+	_tick_greybox()
 	if title_open:
 		if credits_screen.visible and not credits_paused:
 			credits_body.get_v_scroll_bar().value += delta * 18.0
@@ -1421,25 +1563,43 @@ func _new_game() -> void:
 	hold_use.reset()
 	_sync_scene()
 	human.hide()
-	intro_director.position = Vector2(255.0, 410.0)
+	human.position.x = L1_ENGINEER_ENTER_X
+	human.body_sprite.flip_h = true
+	engineer_made_way = false
+	leaf_clock = -1.0
+	wolf_box8_walking = false
+	intro_beat_queue.clear()
+	if intro_beat_tween != null and intro_beat_tween.is_running():
+		intro_beat_tween.kill()
+	intro_beat_tween = null
+	_end_director_exit()
+	intro_director.flip_h = false
+	intro_director.position = Vector2(L1_DIRECTOR_X, L1_DIRECTOR_Y)
+	intro_director.z_index = L1_DIRECTOR_Z
 	intro_director.show()
+	human.body_sprite.rotation_degrees = 0.0
+	wolf.body_sprite.rotation_degrees = 0.0
 	purge_terminal_art.hide()
 	$BreakerLabel.hide()
 	$RelayLabel.hide()
 	$CheckpointLabel.hide()
 	for station: CanvasItem in [breaker_art, relay_art, checkpoint_art, breaker_status_light, relay_status_light, door_visual, door_open_art, door_lip, seal_camera, seal_stub, seal_frame, seal_lamp, seal_lamp_glow, bypass_handle]:
 		station.hide()
-	wolf.position = Vector2(115.0, 423.0)
+	wolf.position = Vector2(L1_WOLF_DOCKED_X, 423.0)
 	wolf.z_index = ACTOR_Z
 	wolf.body_sprite.position = WOLF_SPRITE_REST
 	wolf.body_sprite.modulate = Color("#365263")
-	intro_gate.position = Vector2(115.0, 365.0)
-	intro_gate.set("opening", 0.0)
-	$IntroCage.show()
-	intro_gate.show()
-	intro_camera.position = Vector2(267.0, 355.0)
+	wolf.body_sprite.flip_h = false
+	wolf.autonomous_target_x = M0Actor.NO_TARGET
+	wolf.follow_target = null
+	human.autonomous_target_x = M0Actor.NO_TARGET
+	# GREY BOX (L1): design C's dock replaces the cage; the camera holds one framing (zoom 1.6).
+	intro_gate.hide()
+	$IntroCage.hide()
+	greybox.set_standby()
+	intro_camera.position = L1_OPENING_CAMERA
 	intro_camera.position_smoothing_enabled = false
-	intro_camera.zoom = Vector2(1.8, 1.8)
+	intro_camera.zoom = Vector2.ONE * L1_OPENING_ZOOM
 	intro_alarm.color.a = 0.0
 	intro_fade.color.a = 1.0
 	intro_tween = create_tween()
@@ -1450,52 +1610,334 @@ func _new_game() -> void:
 
 
 ## One opening beat per press: INTRO_LINES[intro_step] is on screen; after the last, the fade into play.
+## Round 4 (review-human-3 should-fix 1): a press never snaps a beat's action to its end. The caption
+## moves on at once, and the action already playing keeps playing; the next box's action starts when it
+## has finished (_queue_beat), so a fast reader sees the same break-out, only with the captions ahead.
 func _advance_intro() -> void:
 	if intro_step >= INTRO_LINES.size():
 		return
 	if intro_tween != null and intro_tween.is_running():
+		# Only the opening's fade-in is on intro_tween while the boxes run; the beats have their own.
 		intro_tween.kill()
 	intro_fade.color.a = 0.0
 	intro_step += 1
 	if intro_step < INTRO_LINES.size():
 		status_line = INTRO_LINES[intro_step]
 	match intro_step:
+		1:
+			_queue_beat(_beat_engineer_arrives)
 		2:
-			# WOLF wakes himself.
-			intro_tween = create_tween()
-			intro_tween.tween_property(wolf.body_sprite, "modulate", Color("#9deeff"), 0.45)
-			intro_tween.parallel().tween_property(intro_camera, "zoom", Vector2(1.95, 1.95), 0.45)
+			_queue_beat(_beat_wake)
 		3:
-			wolf.body_sprite.modulate = Color("#9deeff")
-			intro_camera.zoom = Vector2(1.95, 1.95)
-			_shutter_boom()
-			intro_tween = create_tween()
-			# The gate folds aside and stays drawn, open, against the cage post.
-			intro_tween.tween_property(intro_gate, "opening", 1.0, 0.65).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
-			intro_tween.parallel().tween_property(intro_alarm, "color:a", 0.13, 0.18)
-			intro_tween.tween_callback(func() -> void: wolf.z_index = 5)
-			intro_tween.tween_property(wolf.body_sprite, "position:y", WOLF_SPRITE_REST.y + 8.0, 0.28)
-			intro_tween.tween_callback(func() -> void: wolf.autonomous_target_x = 185.0)
-		4:
-			intro_gate.set("opening", 1.0)
-			wolf.z_index = 5
-			wolf.body_sprite.position.y = WOLF_SPRITE_REST.y + 8.0
-			wolf.autonomous_target_x = 185.0
-			intro_tween = create_tween()
-			intro_tween.tween_property(intro_director, "position:x", 310.0, 0.65).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
-			intro_tween.parallel().tween_property(intro_camera, "position:x", 300.0, 0.65)
-			intro_tween.parallel().tween_property(intro_alarm, "color:a", 0.05, 0.65)
-		5:
-			intro_director.position.x = 310.0
+			_queue_beat(_beat_break_out)
 		6:
-			# The narration says it as he does it: he turns from the Director and walks off.
-			intro_director.position.x = 310.0
-			wolf.autonomous_target_x = 110.0
+			# Box 7: the lockdown order, heard (the klaxon) and seen (round 4, decision 7: the corridor's
+			# lockdown beacon switches on, where the doorway's view reaches it). Said now, so not queued.
+			sfx_bank.play(&"klaxon", -10.0)
+			greybox.set_lockdown(true)
 		7:
+			_queue_beat(_beat_wolf_leaves)
+		8:
 			intro_tween = create_tween()
 			intro_tween.tween_property(intro_fade, "color:a", 1.0, 0.3)
 			intro_tween.tween_callback(_finish_intro.bind(true))
 			intro_tween.tween_property(intro_fade, "color:a", 0.0, 0.35)
+			# Round 4 (review-real-3 M2): the Director leaves by his door under the fade, as a person can.
+			_start_director_exit()
+
+
+## Runs [param beat] now, or once the beat already playing has finished. A beat returns the tween that
+## plays it (or null when it is instant).
+func _queue_beat(beat: Callable) -> void:
+	intro_beat_queue.append(beat)
+	if intro_beat_tween == null or not intro_beat_tween.is_running():
+		_next_beat()
+
+
+func _next_beat() -> void:
+	while not intro_beat_queue.is_empty():
+		var beat: Callable = intro_beat_queue.pop_front()
+		var tween: Variant = beat.call()
+		if tween is Tween and (tween as Tween).is_running():
+			intro_beat_tween = tween as Tween
+			intro_beat_tween.finished.connect(_next_beat, CONNECT_ONE_SHOT)
+			return
+	intro_beat_tween = null
+
+
+## Box 2: the engineer walks in from the corridor and stops in the doorway (Q-A).
+func _beat_engineer_arrives() -> Tween:
+	var tween: Tween = create_tween()
+	tween.tween_interval(0.3)
+	tween.tween_callback(_engineer_walks_in)
+	return tween
+
+
+## Box 3 (round 3): the caption first; then WOLF wakes himself and the dock lamp eases amber to blue.
+func _beat_wake() -> Tween:
+	var tween: Tween = create_tween()
+	tween.tween_interval(L1_WAKE_DELAY)
+	tween.tween_callback(func() -> void: sfx_bank.play(&"servo", -14.0))
+	tween.tween_property(wolf.body_sprite, "modulate", Color.WHITE, L1_WAKE_SECONDS)
+	tween.parallel().tween_method(greybox.set_wake, 0.0, 1.0, L1_WAKE_SECONDS)
+	return tween
+
+
+## Box 4 (Q-F, round 3): the caption first; then WOLF eases to the latch edge (the connector parts on his
+## first frame of movement), the lock tears off, he sweeps the leading stile with his head and shoulder
+## without moving his feet, the leaves coast to the stop, he steps down toward the camera and walks out.
+func _beat_break_out() -> Tween:
+	var tween: Tween = create_tween()
+	tween.tween_interval(L1_LATCH_DELAY)
+	tween.tween_callback(greybox.release_connector)
+	tween.tween_property(wolf, "position:x", L1_WOLF_LATCH_X, L1_LATCH_SECONDS).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
+	tween.tween_callback(_lock_tears)
+	tween.tween_method(_leaves_at, 0.0, _leaf_seconds(), _leaf_seconds())
+	tween.tween_callback(func() -> void: sfx_bank.play(&"clank", -8.0))
+	# The step-down (0.28 s, linear); the z swap lands as his forepaw passes the sill's foot.
+	var paw_s: float = 0.28 * L1_WOLF_PAW_CLEAR / L1_WOLF_STEP_DOWN
+	tween.tween_property(wolf.body_sprite, "position:y", WOLF_SPRITE_REST.y + L1_WOLF_PAW_CLEAR, paw_s)
+	tween.tween_callback(func() -> void: wolf.z_index = 5)
+	tween.tween_property(wolf.body_sprite, "position:y", WOLF_SPRITE_REST.y + L1_WOLF_STEP_DOWN, 0.28 - paw_s)
+	tween.tween_callback(_wolf_walks_out)
+	return tween
+
+
+## Box 8 (round 4, decision 4): the Director steps back first, right and up the floor to the back wall,
+## eyes on WOLF; then WOLF walks to the doorway in his lane nearer the camera, passing in front of him
+## (drawn over him, _tick_greybox), and stops facing the engineer.
+func _beat_wolf_leaves() -> Tween:
+	var tween: Tween = create_tween()
+	tween.tween_callback(func() -> void: intro_director.z_index = L1_DIRECTOR_YIELD_Z)
+	tween.tween_property(intro_director, "position", L1_DIRECTOR_LAST, L1_DIRECTOR_STEP_S).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
+	tween.parallel().tween_callback(_wolf_walks_to.bind(L1_WOLF_DOORWAY_X)).set_delay(L1_WOLF_WAIT_S)
+	tween.parallel().tween_callback(func() -> void: wolf_box8_walking = true).set_delay(L1_WOLF_WAIT_S)
+	return tween
+
+
+## Round 4 (review-real-3 M2, S3): the Director's exit, from the box-8 press on. Under the fade he walks
+## the metre to the badge reader beside his door, badges (the reader's LED goes green), pushes the leaf
+## open and goes through into the passage; the closer pulls the leaf shut behind him. A player who walks
+## straight back finds him gone and, at most, the leaf closing.
+func _start_director_exit() -> void:
+	if intro_exit_tween != null and intro_exit_tween.is_running():
+		intro_exit_tween.kill()
+	intro_beat_queue.clear()
+	if intro_beat_tween != null and intro_beat_tween.is_running():
+		intro_beat_tween.kill()
+	intro_beat_tween = null
+	intro_director.flip_h = false
+	intro_director.modulate = Color.WHITE
+	# A brisk 1.6 m/s: he is leaving to see his order done.
+	var speed: float = 64.0
+	var from: Vector2 = intro_director.position
+	var at_reader: Vector2 = Vector2(L1_EXIT_READER_X, L1_DIRECTOR_LAST.y)
+	var through: Vector2 = Vector2(L1_EXIT_THROUGH_X, L1_DIRECTOR_LAST.y - 1.5)
+	intro_exit_tween = create_tween()
+	intro_exit_tween.tween_property(intro_director, "position", at_reader, maxf(from.distance_to(at_reader) / speed, 0.05))
+	intro_exit_tween.tween_method(func(v: float) -> void: greybox.set_exit(0.0, v), 0.0, 1.0, 0.12)
+	intro_exit_tween.tween_interval(L1_EXIT_BADGE_S - 0.12)
+	intro_exit_tween.tween_method(func(v: float) -> void: greybox.set_exit(v, 1.0), 0.0, 1.0, L1_EXIT_OPEN_S).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
+	var walk_s: float = at_reader.distance_to(through) / speed
+	intro_exit_tween.tween_property(intro_director, "position", through, walk_s)
+	# Into the dark passage: he darkens and is gone over the last part of the step.
+	intro_exit_tween.parallel().tween_property(intro_director, "modulate", Color(0.2, 0.2, 0.2, 0.0), walk_s * 0.6).set_delay(walk_s * 0.4)
+	intro_exit_tween.tween_callback(func() -> void:
+		intro_director.hide()
+		intro_director.modulate = Color.WHITE
+		intro_director.z_index = ACTOR_Z)
+	intro_exit_tween.tween_method(func(v: float) -> void: greybox.set_exit(v, clampf(v * 2.0 - 1.0, 0.0, 1.0)), 1.0, 0.0, L1_EXIT_CLOSE_S).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
+	intro_exit_tween.tween_callback(func() -> void: sfx_bank.play(&"clank", -22.0, 1.2))
+
+
+## Ends the Director's exit at once (a skip, a load, a new game): he is gone and his door is shut.
+func _end_director_exit() -> void:
+	if intro_exit_tween != null and intro_exit_tween.is_running():
+		intro_exit_tween.kill()
+	intro_exit_tween = null
+	intro_director.hide()
+	intro_director.modulate = Color.WHITE
+	intro_director.z_index = ACTOR_Z
+	intro_director.position.y = L1_DIRECTOR_Y
+	greybox.set_exit(0.0, 0.0)
+
+
+func _engineer_walks_in() -> void:
+	human.show()
+	human.speed_scale = L1_ENGINEER_SPEED / M0Actor.FOLLOW_SPEED
+	human.autonomous_target_x = L1_ENGINEER_WATCH_X
+
+
+func _wolf_walks_to(x: float) -> void:
+	wolf.speed_scale = L1_WOLF_SPEED / M0Actor.FOLLOW_SPEED
+	wolf.autonomous_target_x = x
+
+
+func _wolf_walks_out() -> void:
+	_wolf_walks_to(L1_WOLF_EXIT_X)
+
+
+## The sweep plus the coast, in seconds.
+func _leaf_seconds() -> float:
+	var plan: Dictionary = leaf_plan()
+	return float(plan["sweep_s"]) + float(plan["coast_b_s"]) + float(plan["coast_c_s"])
+
+
+func _sweep_seconds() -> float:
+	return float(leaf_plan()["sweep_s"])
+
+
+## Round 3 (review-real-2 S8): the leaves' motion. The sweep (WOLF pushing) holds 85 px/s through the
+## first catch; released at L1_SWEEP_PX with two leaves moving, they decelerate at a (rolling friction,
+## the same for any number of leaves); at the second catch the speed drops to 2/3 (2 leaves' momentum
+## shared by 3); the three stop at the open stop. a is chosen so they stop exactly there.
+static func leaf_plan() -> Dictionary:
+	var total: float = GreyboxBay.LEAD_CLOSED - GreyboxBay.LEAD_OPEN
+	var catch_2: float = GreyboxBay.LEAD_CLOSED - GreyboxBay.PICKUP_1
+	var lb: float = catch_2 - L1_SWEEP_PX
+	var lc: float = total - catch_2
+	# v0^2 = 2 a lb + (3/2)^2 * 2 a lc
+	var a: float = L1_LEAF_V0 * L1_LEAF_V0 / (2.0 * lb + 4.5 * lc)
+	var v_b_end: float = sqrt(4.5 * a * lc)
+	var v_c0: float = v_b_end * 2.0 / 3.0
+	return {
+		"sweep_s": L1_SWEEP_ACCEL_S + (L1_SWEEP_PX - 0.5 * L1_LEAF_V0 * L1_SWEEP_ACCEL_S) / L1_LEAF_V0,
+		"a": a, "coast_b_s": (L1_LEAF_V0 - v_b_end) / a, "coast_c_s": v_c0 / a,
+		"catch_1_px": GreyboxBay.LEAD_CLOSED - GreyboxBay.PICKUP_2, "catch_2_px": catch_2,
+		"v_b_end": v_b_end, "v_c0": v_c0, "total": total,
+	}
+
+
+## How far the leading leaf has travelled [param t] seconds after the tear (see leaf_plan).
+static func leaf_travel(t: float) -> float:
+	var plan: Dictionary = leaf_plan()
+	var accel: float = L1_LEAF_V0 / L1_SWEEP_ACCEL_S
+	var sweep_s: float = plan["sweep_s"]
+	var a: float = plan["a"]
+	var tb: float = plan["coast_b_s"]
+	if t <= L1_SWEEP_ACCEL_S:
+		return 0.5 * accel * t * t
+	if t <= sweep_s:
+		return 0.5 * L1_LEAF_V0 * L1_SWEEP_ACCEL_S + L1_LEAF_V0 * (t - L1_SWEEP_ACCEL_S)
+	var c: float = t - sweep_s
+	if c <= tb:
+		return L1_SWEEP_PX + L1_LEAF_V0 * c - 0.5 * a * c * c
+	var c2: float = minf(c - tb, float(plan["coast_c_s"]))
+	return float(plan["catch_2_px"]) + float(plan["v_c0"]) * c2 - 0.5 * a * c2 * c2
+
+
+## The time after the tear when the leading leaf has travelled [param px] (for the catch clunks).
+static func leaf_time_at(px: float) -> float:
+	var lo: float = 0.0
+	var hi: float = 5.0
+	for i: int in 40:
+		var mid: float = (lo + hi) * 0.5
+		if leaf_travel(mid) < px:
+			lo = mid
+		else:
+			hi = mid
+	return hi
+
+
+## Box 4's leaves at [param t] s after the tear; during the sweep WOLF leans his head and shoulder into
+## the stile (a placeholder for the head-turn sweep pose: 2 px into it, nose 2 degrees down), feet planted.
+func _leaves_at(t: float) -> void:
+	greybox.set_lead_x(GreyboxBay.LEAD_CLOSED - leaf_travel(t))
+	# The two catches: a quiet clunk as each intermediate leaf is picked up.
+	var plan: Dictionary = leaf_plan()
+	for px: float in [float(plan["catch_1_px"]), float(plan["catch_2_px"])]:
+		var at: float = leaf_time_at(px)
+		if leaf_clock < at and t >= at:
+			sfx_bank.play(&"clank", -16.0, 0.85)
+	leaf_clock = t
+	var sweep: float = _sweep_seconds()
+	var lean: float = clampf(t / 0.15, 0.0, 1.0) if t < sweep else clampf(1.0 - (t - sweep) / 0.3, 0.0, 1.0)
+	wolf.body_sprite.position.x = WOLF_SPRITE_REST.x - 2.0 * lean
+	wolf.body_sprite.rotation_degrees = 2.0 * lean
+
+
+## The hook bolt pries the guard lock off its mount: boom, flash, sparks, the red "door forced" lamp;
+## the Director steps back and holds (he never turns, Q-B); the engineer flinches.
+func _lock_tears() -> void:
+	_shutter_boom()
+	# Round 3 (review-real-2 M1, S1): no full-screen wash; the beacon's light stays in the dock room. The
+	# lock's indicator goes dark with its cable (the beacon is the one red).
+	greybox.tear_lock()
+	greybox.set_beacon(true)
+	var step_back: Tween = create_tween()
+	step_back.tween_property(intro_director, "position", Vector2(L1_DIRECTOR_BACK_X, L1_DIRECTOR_Y + L1_DIRECTOR_DOWNSTAGE), 0.65).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
+	# GREY BOX flinch (no frame drawn yet): the body leans 5 degrees back from the flash and shifts 3 px
+	# away (the feet stay put), held 0.3 s, then 0.25 s back to the watching pose.
+	if intro_flinch_tween != null and intro_flinch_tween.is_running():
+		intro_flinch_tween.kill()
+	intro_flinch_tween = create_tween()
+	intro_flinch_tween.tween_property(human.body_sprite, "position", HUMAN_SPRITE_REST + Vector2(3.0, 0.5), 0.06)
+	intro_flinch_tween.parallel().tween_property(human.body_sprite, "rotation_degrees", 5.0, 0.06)
+	intro_flinch_tween.tween_interval(0.3)
+	intro_flinch_tween.tween_property(human.body_sprite, "position", HUMAN_SPRITE_REST, 0.25)
+	intro_flinch_tween.parallel().tween_property(human.body_sprite, "rotation_degrees", 0.0, 0.25)
+
+
+## Every frame: the per-room left clamp, the room shown only in the lockdown chapter, the opening's
+## marks landed exactly, and box 8's half step.
+func _tick_greybox() -> void:
+	var lockdown: bool = state.chapter_id == "lockdown" and not title_open
+	greybox.visible = lockdown or intro_active
+	greybox.reduce_motion = impact.reduce_motion
+	human.min_x = L1_ROOM_MIN_X if (lockdown or intro_active) else M0Actor.MIN_X
+	wolf.min_x = L1_WOLF_MIN_X if (lockdown or intro_active) else M0Actor.MIN_X
+	# The corridor's near-edge pipe strip stood where the cross-wall's cut end now stands.
+	var near: Node = $CorridorDepth.get("near_layer")
+	if near != null:
+		var strip: CanvasItem = near.get_node_or_null("LeftEdge") as CanvasItem
+		if strip != null and strip.visible:
+			strip.visible = false
+	if greybox.visible:
+		greybox.set_shadows(_dock_floor_shadows())
+		# Paint fix 1: docked WOLF shades the stand under him until he steps down out of the bay.
+		greybox.set_occupant(intro_active and wolf.visible and wolf.z_index < 5, wolf.position.x)
+	# Round 4 (decision 11): the corridor fitting's lit edge on the engineer and on WOLF, by distance from
+	# the fitting, and none where the cross-wall stands between them and it.
+	var edges_on: bool = greybox.visible and not title_open
+	greybox.update_lit_edge(human_lit_edge, human.body_sprite, human.position + Vector2(0.0, -30.0), human.visible and edges_on)
+	greybox.update_lit_edge(wolf_lit_edge, wolf.body_sprite, wolf.position + Vector2(0.0, -12.0), wolf.visible and edges_on, 18.0)
+	if not intro_active:
+		# After the order the corridor stays locked down; its beacon settles with main's once it is cleared.
+		greybox.set_lockdown(true, state.checkpoint_reached)
+		return
+	# The walk stops inside a 2 px band; in the opening each actor lands on their mark.
+	for actor: M0Actor in [human, wolf]:
+		var target: float = actor.autonomous_target_x
+		if target != M0Actor.NO_TARGET and absf(actor.position.x - target) <= 2.0 and absf(actor.velocity.x) < 1.0:
+			actor.position.x = target
+			actor.autonomous_target_x = M0Actor.NO_TARGET
+	if wolf_box8_walking:
+		# Round 4: WOLF's lane in front of the Director (who has stepped back to the wall), 2 px nearer the
+		# camera, eased in over his first 21 px and out over his last 15 before the doorway mark.
+		var x: float = wolf.position.x
+		var lane: float = smoothstep(L1_WOLF_EXIT_X, L1_WOLF_EXIT_X + 21.0, x) * (1.0 - smoothstep(-160.0, -145.0, x))
+		wolf.body_sprite.position.y = WOLF_SPRITE_REST.y + L1_WOLF_STEP_DOWN + L1_WOLF_LANE * lane
+		if not engineer_made_way and absf(x - L1_WOLF_DOORWAY_X) <= 30.0:
+			engineer_made_way = true
+			var step_in: Tween = create_tween()
+			step_in.tween_property(human, "position:x", L1_ENGINEER_MEET_X, 0.45).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
+
+
+## Contact shadows for the actors standing on the dock room's floor (left of the cross-wall's cut):
+## Vector3(x, feet y, half width). WOLF casts none while he stands on the stand inside the bay.
+func _dock_floor_shadows() -> Array[Vector3]:
+	var casters: Array[Vector3] = []
+	var left_of_cut: float = GreyboxBay.NEAR_COLUMN.x
+	if human.visible and human.position.x < left_of_cut:
+		casters.append(Vector3(human.position.x, human.position.y + human.body_sprite.position.y - HUMAN_SPRITE_REST.y + L1_ENGINEER_FEET, 10.0))
+	var docked: bool = intro_active and wolf.z_index < 5
+	if wolf.visible and not docked and wolf.position.x < left_of_cut:
+		# L1_WOLF_FEET was measured with his sprite stepped down 8 px; his feet move with the sprite.
+		var wolf_feet: float = wolf.position.y + wolf.body_sprite.position.y - (WOLF_SPRITE_REST.y + 8.0) + L1_WOLF_FEET
+		casters.append(Vector3(wolf.position.x + 2.0, wolf_feet, 40.0))
+	if intro_director.visible:
+		casters.append(Vector3(intro_director.position.x, intro_director.position.y + L1_DIRECTOR_FEET, 11.0))
+	return casters
 
 
 func _finish_intro(keep_fade: bool = false) -> void:
@@ -1508,7 +1950,27 @@ func _finish_intro(keep_fade: bool = false) -> void:
 	intro_alarm.color.a = 0.0
 	intro_gate.hide()
 	$IntroCage.hide()
-	intro_director.hide()
+	# Round 4: the beats stop; after the last press the Director is on his way out through his door
+	# (_start_director_exit), otherwise (a skip) he is simply gone and the door is shut.
+	intro_beat_queue.clear()
+	if intro_beat_tween != null and intro_beat_tween.is_running():
+		intro_beat_tween.kill()
+	intro_beat_tween = null
+	wolf_box8_walking = false
+	if not (keep_fade and intro_exit_tween != null and intro_exit_tween.is_running()):
+		_end_director_exit()
+	if intro_flinch_tween != null and intro_flinch_tween.is_running():
+		intro_flinch_tween.kill()
+	human.body_sprite.rotation_degrees = 0.0
+	wolf.body_sprite.rotation_degrees = 0.0
+	human.autonomous_target_x = M0Actor.NO_TARGET
+	human.body_sprite.position = HUMAN_SPRITE_REST
+	human.speed_scale = 1.0
+	wolf.speed_scale = 1.0
+	human.position = state.human_position
+	human.body_sprite.flip_h = false
+	wolf.body_sprite.flip_h = false
+	greybox.set_empty_quiet()
 	human.show()
 	purge_terminal_art.show()
 	$BreakerLabel.show()
@@ -1517,6 +1979,8 @@ func _finish_intro(keep_fade: bool = false) -> void:
 	for station: CanvasItem in [breaker_art, relay_art, checkpoint_art, breaker_status_light, relay_status_light, door_visual, bypass_handle]:
 		station.show()
 	_start_gameplay_camera()
+	# Review (human) should-fix 4: the camera is on the corridor framing before the fade-in starts.
+	intro_camera.force_update_scroll()
 	wolf.body_sprite.modulate = Color.WHITE
 	wolf.body_sprite.position = WOLF_SPRITE_REST
 	wolf.z_index = ACTOR_Z
@@ -1947,6 +2411,12 @@ func _load_game() -> void:
 	intro_alarm.color.a = 0.0
 	human.show()
 	$IntroCage.hide()
+	greybox.set_empty_quiet()
+	_end_director_exit()
+	intro_beat_queue.clear()
+	if intro_beat_tween != null and intro_beat_tween.is_running():
+		intro_beat_tween.kill()
+	intro_beat_tween = null
 	wolf.z_index = ACTOR_Z
 	wolf.body_sprite.position = WOLF_SPRITE_REST
 	purge_terminal_art.show()
@@ -2021,7 +2491,7 @@ func _interact() -> void:
 		_interact_junction(x)
 		return
 	_step_beside_station(x)
-	if x <= PURGE_DISPLAY_MAX_X:
+	if x > L1_ROOM_RIGHT and x <= PURGE_DISPLAY_MAX_X:
 		status_line = "DIRECTOR / PURGE: Original program logs marked for deletion.\nWOLF: They want the source record gone. We need to preserve it."
 	elif _at_bypass(x):
 		_interact_bypass()
@@ -3585,6 +4055,7 @@ func _sync_scene() -> void:
 	wolf.body_sprite.offset = Vector2.ZERO
 	wolf.body_sprite.scale = wolf_sprite_scale
 	wolf.speed_scale = 1.0
+	human.speed_scale = 1.0
 	_stand_up()
 	human.z_index = ACTOR_Z
 	relay_spark.hide()
@@ -3757,6 +4228,7 @@ func _update_controls() -> void:
 	wolf.autonomous_target_x = _wolf_target_x()
 	wolf.follow_target = human if human.controlled and wolf.autonomous_target_x < 0.0 else null
 	wolf.follow_max_x = _wolf_follow_max_x()
+	wolf.follow_min_x = L1_WOLF_MIN_X if state.chapter_id == "lockdown" else M0Actor.MIN_X
 	wolf.avoid_spans = _machine_spans()
 	human.queue_redraw()
 	wolf.queue_redraw()
@@ -3889,6 +4361,15 @@ func _refresh_ui() -> void:
 	touch_left.visible = touch_layout and touch_move
 	touch_right.visible = touch_layout and touch_move
 	touch_use.visible = touch_layout and not waiting_for_choice and not hatch_exit_walking
+	# GREY BOX stand-in (DESIGN 1.3; the text/UI job's to agree): during the opening the touch CONTINUE
+	# sits in the dialogue panel's right end, so it never covers the doorway or the engineer.
+	var use_rect: Rect2 = Rect2(782.0, 452.0, 136.0, 66.0) if intro_active and touch_layout else Rect2(773.0, 345.0, 155.0, 90.0)
+	if touch_use.position != use_rect.position or touch_use.size != use_rect.size:
+		touch_use.position = use_rect.position
+		touch_use.size = use_rect.size
+	var story_right: float = 764.0 if intro_active and touch_layout else 875.0
+	if story.offset_right != story_right:
+		story.offset_right = story_right
 	touch_use.text = "CONTINUE" if intro_active or chapter_close_active else ("CRANK" if not _hold_station().is_empty() else ("DROP" if _drop_ready() else "USE"))
 	touch_choice_1.visible = waiting_for_choice
 	touch_choice_2.visible = waiting_for_choice
@@ -3915,7 +4396,8 @@ func _refresh_ui() -> void:
 		var move_label: String = "HOLD ◀ / ▶" if touch_layout else ("STICK / D-PAD MOVE" if controller_active else "%s  MOVE" % move_keys)
 		var read_label: String = "%s  READ DISPLAY (optional)" % ("TAP USE" if touch_layout else interact_key)
 		# The display is optional, so once the engineer heads right the tutorial only points forward.
-		if human.position.x > 230.0:
+		# GREY BOX (L1): in the dock room the prompt points back to the breaker.
+		if human.position.x > 230.0 or human.position.x < L1_ROOM_RIGHT:
 			tutorial_text.text = "%s\nHead right to the breaker." % move_label
 		elif tutorial_step == 0:
 			tutorial_text.text = "%s\n%s" % [move_label, read_label]
@@ -3928,7 +4410,9 @@ func _refresh_ui() -> void:
 		if last_top_card_key != "intro":
 			last_top_card_key = "intro"
 			_show_top_card("03:17 / CONTAINMENT\nWOLF//OVERRIDE", 2.6)
-		_set_dialogue(status_line, "TAP CONTINUE  /  PAUSE" if touch_layout else "%s  CONTINUE    %s  PAUSE" % [settings_menu.prompt(&"interact", controller_active), settings_menu.prompt(&"pause_game", controller_active)])
+		# GREY BOX stand-in (round 3, review-human-2 should-fix 8; the text/UI job's to agree): on touch the
+		# CONTINUE button sits in the dialogue panel and PAUSE has its own button, so no pill repeats them.
+		_set_dialogue(status_line, "" if touch_layout else "%s  CONTINUE    %s  PAUSE" % [settings_menu.prompt(&"interact", controller_active), settings_menu.prompt(&"pause_game", controller_active)])
 		return
 	if chapter_close_active:
 		if last_top_card_key != "chapter_close":
@@ -3950,6 +4434,13 @@ func _refresh_ui() -> void:
 	_set_modulate(breaker_status_glow, Color(breaker_status_light.color, 0.75 if state.breaker_armed else 0.45))
 	_set_modulate(relay_status_glow, Color(relay_status_light.color, 0.75 if state.breaker_armed else 0.3))
 	_set_modulate(checkpoint_art, Color("#d5ffe3") if state.checkpoint_reached else Color.WHITE)
+	# GREY BOX stand-in (round 3, review-human-2 should-fix 6; P0-8 and the text job's to agree): until the
+	# breaker is armed the relay's name and its COOLANT FAULT tag are dimmed, so the one goal leads.
+	var relay_alpha: float = 1.0 if state.breaker_armed or state.chapter_id != "lockdown" else 0.45
+	if $RelayLabel.self_modulate.a != relay_alpha:
+		$RelayLabel.self_modulate.a = relay_alpha
+	if not bypass_handle.fault_cleared and bypass_handle.fault_tag.self_modulate.a != relay_alpha:
+		bypass_handle.fault_tag.self_modulate.a = relay_alpha
 	var card_key: String = "%s:%s" % [state.chapter_id, _objective()]
 	if name_card_remaining > 0.0 and state.chapter_id == "lockdown":
 		# The name card comes first; the location card follows once it has faded or been skipped.
@@ -3960,7 +4451,9 @@ func _refresh_ui() -> void:
 		elif hud.text != name_card:
 			# Cycling the provisional name while it is up updates it in place.
 			hud.text = name_card
-	elif last_top_card_key != card_key:
+	elif last_top_card_key != card_key and not (state.chapter_id == "lockdown" and human.position.x < L1_ROOM_RIGHT):
+		# GREY BOX (round 3, review-human-2 should-fix 7): the corridor's card waits until the engineer is in
+		# the corridor; walking straight back into the dock room shows none.
 		last_top_card_key = card_key
 		var location: String = "SERVICE JUNCTION" if state.chapter_id == "junction" else ("RECORDS ACCESS / FIRST COPY" if state.chapter_id == "records" else "MAINTENANCE / LOCKDOWN")
 		_show_top_card("%s\n%s" % [location, _objective()], 3.4)
@@ -4080,15 +4573,18 @@ func _context_hint() -> String:
 			return "E: secure the first copy." if state.mirror_trace_preserved else "Preserve both traces before leaving."
 		return _records_route_hint()
 	if state.checkpoint_reached:
-		return "E: enter records access. The Director's purge is still running." if absf(x - 876.0) <= 52.0 else ("E: read the Director's purge display." if x <= 230.0 else "Return to the safe point to enter records access.")
+		return "E: enter records access. The Director's purge is still running." if absf(x - 876.0) <= 52.0 else ("E: read the Director's purge display." if x > L1_ROOM_RIGHT and x <= 230.0 else "Return to the safe point to enter records access.")
 	if state.door_open:
 		if seal_opening:
 			return SEAL_OPENING_HINT
 		if absf(x - 876.0) <= 52.0:
 			return "E: save at the safe point."
 		return "The seal is open. Move to the safe point."
-	if x <= PURGE_DISPLAY_MAX_X:
+	if x > L1_ROOM_RIGHT and x <= PURGE_DISPLAY_MAX_X:
 		return "E: read the Director's purge display."
+	if x <= L1_ROOM_RIGHT and tutorial_step < 2:
+		# GREY BOX: in the dock room the tutorial prompt already points back to the breaker.
+		return ""
 	if wolf_heading_to_relay:
 		return "WOLF is moving to the contact."
 	if _at_bypass(x):

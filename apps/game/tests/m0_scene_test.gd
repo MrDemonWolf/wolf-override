@@ -77,33 +77,42 @@ func _run() -> void:
 	var intro_director: Sprite2D = game.get_node("IntroDirector") as Sprite2D
 	var intro_fade: ColorRect = game.get_node("CanvasLayer/IntroFade") as ColorRect
 	var purge_terminal_art: Sprite2D = game.get_node("PurgeTerminalArt") as Sprite2D
-	_expect(game.get("intro_active") and intro_gate.visible and intro_director.visible and not human.visible and not purge_terminal_art.visible and not human.controlled, "opening shows only WOLF and Director, without the later terminal or engineer")
+	# P0-13 (decided 2026-10-13/14): layout L1, design C's standby dock in place of the cage and gate, eight
+	# boxes (option A splits the refusal off; main's words with its row breaks), the engineer arriving in
+	# the doorway in box 2, the Director stepping back before WOLF walks and leaving by his own door.
+	var bay: Node2D = game.get("greybox") as Node2D
+	_expect(game.get("intro_active") and not intro_gate.visible and intro_director.visible and not human.visible and not purge_terminal_art.visible and not human.controlled, "opening shows only WOLF in his dock and the Director, without the later terminal or engineer")
 	_expect(top_card.visible and hud.text.contains("CONTAINMENT"), "opening starts with a location slate")
 	await create_timer(3.2).timeout
 	game.call("_refresh_ui")
 	_expect(not top_card.visible, "opening slate fades away and does not reappear each frame")
+	_expect(bay.visible and not bool(bay.get("lock_torn")) and is_equal_approx(float(bay.get("lead_x")), GreyboxBay.LEAD_CLOSED), "WOLF's dock stands shut and locked in the opening")
 	# Audit 12: the Director's lines carry his tag; the narration has its own untagged boxes.
-	_expect(speaker.visible and speaker.text == "DIRECTOR" and story.text == "I decide who counts as a threat. WOLF handles the rest.", "the Director's first line sits alone under his tag")
+	_expect(speaker.visible and speaker.text == "DIRECTOR" and story.text == "I decide who counts as a threat.\nWOLF handles the rest.", "the Director's first line sits alone under his tag")
 	await _tap(&"interact")
-	_expect(game.get("intro_step") == 1 and not speaker.visible and story.text == "The Director thinks WOLF is still in standby.", "the narration after it gets its own untagged box, naming the Director")
+	_expect(game.get("intro_step") == 1 and not speaker.visible and story.text == "The Director thinks WOLF is\nstill in standby.", "the narration after it gets its own untagged box, naming the Director")
+	_expect(await _wait_until(func() -> bool: return human.visible and absf(human.position.x - Main.L1_ENGINEER_WATCH_X) < 0.5, 300) and human.body_sprite.flip_h and not human.controlled, "the engineer walks in and stops in the doorway, watching, not yet in control")
 	await _tap(&"interact")
 	_expect(game.get("intro_step") == 2 and str(game.get("status_line")) == "Nobody gives an activation command.\nWOLF wakes himself." and not speaker.visible, "WOLF wakes himself and opens containment, with no line about a blue light the picture does not show")
 	await _tap(&"interact")
 	_expect(game.get("intro_step") == 3 and str(game.get("status_line")) == "The latch breaks from the inside.\nWOLF steps out under his own power.", "WOLF opens containment from inside; the gate's slide and the Director are shown, not narrated")
-	await create_timer(1.2).timeout
-	_expect(intro_gate.visible and is_equal_approx(float(intro_gate.get("opening")), 1.0), "the opened gate stays drawn, folded aside, instead of vanishing")
+	_expect(await _wait_until(func() -> bool: return bool(bay.get("lock_torn")) and is_equal_approx(float(bay.get("lead_x")), GreyboxBay.LEAD_OPEN), 600), "the opened dock stays drawn, its leaves stacked at the open stop and its lock hanging, instead of vanishing")
 	await _tap(&"interact")
-	_expect(game.get("intro_step") == 4 and str(game.get("status_line")).contains("I won't do it") and not speaker.visible and story.text.begins_with("DIRECTOR: ") and story.text.contains("\nWOLF: "), "WOLF refuses the Director before the engineer arrives, both names inline")
-	_expect(intro_gate.visible and is_equal_approx(float(intro_gate.get("opening")), 1.0), "the gate is still standing open in the next beat")
+	_expect(game.get("intro_step") == 4 and speaker.text == "DIRECTOR" and story.text == "You were in standby.", "the Director's challenge has its own box under his tag")
 	await _tap(&"interact")
-	_expect(game.get("intro_step") == 5 and speaker.text == "DIRECTOR" and story.text == "Lock down maintenance. WOLF does not leave this site.", "Director orders lockdown under his own tag")
+	_expect(game.get("intro_step") == 5 and speaker.text == "WOLF" and story.text == "I heard you. I won't do it.", "WOLF refuses the Director under his own tag, before the engineer is part of it")
+	_expect(is_equal_approx(float(bay.get("lead_x")), GreyboxBay.LEAD_OPEN), "the dock is still standing open in the next beat")
 	await _tap(&"interact")
-	_expect(game.get("intro_step") == 6 and not speaker.visible and story.text == "WOLF turns from the Director and heads for maintenance." and wolf.autonomous_target_x == 110.0, "the narration says WOLF turns from the Director and heads for maintenance as he walks off")
+	_expect(game.get("intro_step") == 6 and speaker.text == "DIRECTOR" and story.text == "Lock down maintenance.\nWOLF does not leave this site.", "Director orders lockdown under his own tag")
+	await _tap(&"interact")
+	_expect(game.get("intro_step") == 7 and not speaker.visible and story.text == "WOLF turns from the Director\nand heads for maintenance.", "the narration says WOLF turns from the Director and heads for maintenance")
+	_expect(await _wait_until(func() -> bool: return wolf.autonomous_target_x == Main.L1_WOLF_DOORWAY_X and intro_director.position.is_equal_approx(Main.L1_DIRECTOR_LAST), 180), "the Director steps back to the wall; WOLF walks off toward maintenance")
 	# Round 3c: the opening is main's (76d3a50): nothing is added on the wall behind WOLF's cage.
 	_expect(game.get_node_or_null("OpeningHatch") == null and game.get("opening_hatch") == null, "nothing new stands behind the cage in the opening")
 	await _tap(&"interact")
 	await create_timer(0.8).timeout
-	_expect(not game.get("intro_active") and not intro_gate.visible and not intro_director.visible and human.visible and purge_terminal_art.visible and human.controlled and intro_fade.color.a < 0.01, "opening fades into engineer control and gameplay stations")
+	var view_left: float = (game.get_node("IntroCamera") as Camera2D).get_screen_center_position().x - 960.0 / (game.get_node("IntroCamera") as Camera2D).zoom.x * 0.5
+	_expect(not game.get("intro_active") and not intro_gate.visible and (not intro_director.visible or intro_director.position.x < view_left) and human.visible and purge_terminal_art.visible and human.controlled and intro_fade.color.a < 0.01, "opening fades into engineer control and gameplay stations, the Director out of view on his way out")
 	var gameplay_camera: Camera2D = game.get_node("IntroCamera") as Camera2D
 	_expect(gameplay_camera.zoom.x > 1.0 and gameplay_camera.position_smoothing_enabled, "play view is closer and follows the engineer after the opening")
 	var state: M0State = game.get("state") as M0State
