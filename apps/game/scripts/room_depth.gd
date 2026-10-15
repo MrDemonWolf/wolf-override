@@ -3,8 +3,8 @@ extends Node2D
 ## A room built from three painted plates that share one 16:9 frame, plus the light every room
 ## shares, all with built-in nodes:
 ## - far: the back wall and floor, a Parallax2D that lags the camera, with additive glows and
-##   drifting light shafts over its painted lamps, procedurally drawn lockdown beacons, wall haze
-##   and dust;
+##   drifting light shafts over its painted lamps, lockdown beacons (painted fixtures from
+##   [member beacon_atlas], or a small drawn housing where a room has none), wall haze and dust;
 ## - mid: the play plane, drawn 1:1 with the room so its painted walkway is the floor (y 440) the
 ##   actors and stations stand on;
 ## - near: the plate's edge pieces only (a left strip and the same strip mirrored on the right),
@@ -64,6 +64,14 @@ const BEACON_PULSE_SECONDS: float = 1.3
 ## A cleared room's beacons hold this steady, dim glow, their lenses darkened by SETTLED_LENS_DARKEN.
 const SETTLED_BEACON_ALPHA: float = 0.1
 const SETTLED_LENS_DARKEN: float = 0.6
+## A rotating warning beacon seen from one place ([member beacon_flash]): the beam sweeps past in
+## BEACON_FLASH_RISE_SECONDS, then the globe falls back to its dim glow over BEACON_FLASH_FALL_SECONDS
+## while the reflector turns away: one flash every 0.68 s, 88 a minute, like a real 80-90 fpm red
+## rotating beacon and well under three flashes a second. The second beacon runs
+## BEACON_FLASH_PHASE_SECONDS behind the first, as two beacons on one circuit drift apart.
+const BEACON_FLASH_RISE_SECONDS: float = 0.17
+const BEACON_FLASH_FALL_SECONDS: float = 0.51
+const BEACON_FLASH_PHASE_SECONDS: float = 0.29
 ## How long the beacons take to settle when the route is cleared in play.
 const SETTLE_SECONDS: float = 1.2
 ## A near edge piece fades to this opacity while it covers an actor, at NEAR_FADE_SPEED per second.
@@ -79,6 +87,8 @@ const BULKHEAD_PILLAR_WIDTH: float = 76.0
 ## A bulkhead's front pillar (see [member pillars]) fades to this opacity while it covers an actor,
 ## keeping more of the doorway than a near edge piece does.
 const PILLAR_FADE_ALPHA: float = 0.5
+## Regions per painted beacon in [member beacon_regions]: fixture, globe, guard, light.
+const BEACON_ART_PARTS: int = 4
 
 ## The far plate: back wall, painted lamps and wet floor (opaque).
 @export var painting: Texture2D
@@ -106,9 +116,31 @@ const PILLAR_FADE_ALPHA: float = 0.5
 @export var lamp_color: Color = Color("#9fe4ff")
 ## Lamps (by index into [member lamps]) that also cast a drifting light shaft.
 @export var shaft_lamps: PackedInt32Array = PackedInt32Array()
-## Lockdown beacons as fractions of the far plate: a small drawn lamp housing with a pulsing glow.
+## Lockdown beacons as fractions of the far plate: a lamp with a pulsing glow.
 @export var warning_lamps: PackedVector2Array = PackedVector2Array()
 @export var warning_color: Color = Color("#ff4a46")
+## Painted beacons (the corridor's caged wall lamps): one small atlas holding, per beacon,
+## BEACON_ART_PARTS regions in [member beacon_regions] (atlas px), each drawn at its offset in
+## [member beacon_offsets] from the beacon's anchor (far-plate px, so the art lands on the plate's own
+## pixel grid): the fixture with its conduit and wall shadow, the globe (greyscale glass tinted by
+## the live lens colour), the guard in front of the globe, and the lamp's light (additive, pulsed and
+## settled exactly like the drawn beacons' glow). Without an atlas the room draws the small housing.
+@export var beacon_atlas: Texture2D
+@export var beacon_regions: Array[Rect2] = []
+@export var beacon_offsets: PackedVector2Array = PackedVector2Array()
+## The beacons' light at the top of each pulse, and how far it falls between pulses (a fraction of
+## the top). The drawn housings keep BEACON_ALPHA and the shallow 0.55 dip; the corridor's caged lamps
+## are real alarm lamps going off, so they swing from nearly dark to a brighter top (round 10, human
+## review r3: at 1x the shallow pulse read as warning lights, not an alarm).
+@export var beacon_peak_alpha: float = BEACON_ALPHA
+@export var beacon_trough: float = 0.55
+## How far each beacon's lens (its lit globe) darkens at the bottom of a pulse, moving with its light
+## so the lamp itself dims and brightens with the light it casts (0 keeps a steady lens: the drawn
+## housings). The corridor's caged lamps darken to 0.6, the unlit red of a jelly-jar globe.
+@export var beacon_lens_trough: float = 0.0
+## The rhythm of a real rotating warning beacon (see BEACON_FLASH_RISE_SECONDS) instead of the slow
+## 2.6 s breathe. Reduced Motion holds these beacons lit and steady.
+@export var beacon_flash: bool = false
 ## Ambient dust drifting in the room. Off where the room's light is painted into its plates and
 ## nothing in the air needs to move (the corridor since the door end was rebuilt).
 @export var ambient_dust: bool = true
@@ -132,8 +164,15 @@ var effects_enabled: bool = true:
 		if is_node_ready():
 			_apply()
 ## Reduced Motion: the lamps flicker with one shallow, slower dip and never double blink. Read at
-## each flicker, so a change applies from the next one.
-var reduce_motion: bool = false
+## each flicker, so a change applies from the next one. Flashing beacons ([member beacon_flash]) stop
+## at once and hold their lit, steady state.
+var reduce_motion: bool = false:
+	set(value):
+		if value == reduce_motion:
+			return
+		reduce_motion = value
+		if beacon_flash and is_node_ready() and _motion_running:
+			_settle_beacons(false)
 ## True once Main says the room's route is cleared; see [method set_lockdown_cleared].
 var lockdown_cleared: bool = false
 ## Sprites (the actors' bodies) the near edge pieces fade back from while they cover them.
@@ -163,15 +202,26 @@ var _motion_running: bool = false
 var _rng: RandomNumberGenerator = RandomNumberGenerator.new()
 
 
-## A lockdown beacon: a dark housing on a short bracket with a red lens.
+## A lockdown beacon: a dark housing on a short bracket with a red lens, or, with [member art], the
+## painted fixture, its globe tinted by [member lens] and the guard over it (one texture, so both
+## beacons batch).
 class Beacon:
 	extends Node2D
 	var lens: Color = Color("#ff4a46"):
 		set(value):
 			lens = value
 			queue_redraw()
+	var art: Texture2D
+	## Destination rect (relative to the anchor, world px) and atlas region, for the fixture, the
+	## globe and the guard in turn.
+	var parts: Array[Rect2] = []
 
 	func _draw() -> void:
+		if art != null:
+			draw_texture_rect_region(art, parts[0], parts[1])
+			draw_texture_rect_region(art, parts[2], parts[3], lens)
+			draw_texture_rect_region(art, parts[4], parts[5])
+			return
 		draw_line(Vector2(0.0, -9.0), Vector2(0.0, -4.0), Color("#1b2630"), 2.0)
 		draw_rect(Rect2(-7.0, -4.0, 14.0, 9.0), Color("#141c24"))
 		draw_rect(Rect2(-7.0, -4.0, 14.0, 9.0), Color("#3e4f5a"), false, 1.0)
@@ -277,14 +327,34 @@ func rebuild() -> void:
 			backdrop_layer.add_child(shaft)
 			lamp_glows.append(shaft)
 			_shafts.append(shaft)
+	var painted_beacons: bool = beacon_atlas != null and beacon_regions.size() >= warning_lamps.size() * BEACON_ART_PARTS
 	for index: int in warning_lamps.size():
 		var beacon: Beacon = Beacon.new()
 		beacon.name = "Beacon%d" % index
 		beacon.lens = warning_color
 		beacon.z_index = 1
+		var glow: Sprite2D
+		if painted_beacons:
+			var first: int = index * BEACON_ART_PARTS
+			var plate_scale: float = _plate_scale()
+			beacon.art = beacon_atlas
+			for part: int in 3:
+				var region: Rect2 = beacon_regions[first + part]
+				beacon.parts.append(Rect2(beacon_offsets[first + part] * plate_scale, region.size * plate_scale))
+				beacon.parts.append(region)
+			glow = Sprite2D.new()
+			glow.texture = beacon_atlas
+			glow.centered = false
+			glow.region_enabled = true
+			glow.region_rect = beacon_regions[first + 3]
+			glow.offset = beacon_offsets[first + 3]
+			glow.scale = Vector2.ONE * plate_scale
+			glow.modulate = Color(warning_color, beacon_peak_alpha)
+			glow.material = additive
+		else:
+			glow = make_glow(warning_color, Vector2(90.0, 90.0), beacon_peak_alpha, additive)
 		backdrop_layer.add_child(beacon)
 		beacons.append(beacon)
-		var glow: Sprite2D = make_glow(warning_color, Vector2(90.0, 90.0), BEACON_ALPHA, additive)
 		glow.name = "WarningGlow%d" % index
 		glow.z_index = 2
 		backdrop_layer.add_child(glow)
@@ -465,7 +535,7 @@ func _settle_beacons(animate: bool) -> void:
 			tween.kill()
 	_beacon_tweens.clear()
 	var lens: Color = warning_color.darkened(SETTLED_LENS_DARKEN) if lockdown_cleared else warning_color
-	var alpha: float = SETTLED_BEACON_ALPHA if lockdown_cleared else BEACON_ALPHA
+	var alpha: float = SETTLED_BEACON_ALPHA if lockdown_cleared else beacon_peak_alpha
 	if animate and lockdown_cleared and _motion_running:
 		var settle: Tween = create_tween().set_parallel(true)
 		_beacon_tweens.append(settle)
@@ -473,11 +543,12 @@ func _settle_beacons(animate: bool) -> void:
 			settle.tween_property(beacons[index], "lens", lens, SETTLE_SECONDS)
 			settle.tween_property(_warning_glows[index], "modulate:a", alpha, SETTLE_SECONDS).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
 		return
+	var steady: bool = beacon_flash and reduce_motion
 	for index: int in beacons.size():
 		(beacons[index] as Beacon).lens = lens
 		_warning_glows[index].modulate.a = alpha
-		if not lockdown_cleared and _motion_running:
-			_pulse(_warning_glows[index], 0.5 * index)
+		if not lockdown_cleared and _motion_running and not steady:
+			_pulse(index, (BEACON_FLASH_PHASE_SECONDS if beacon_flash else 0.5) * index)
 
 
 func _draw() -> void:
@@ -639,12 +710,32 @@ func _flicker(glow: Sprite2D) -> void:
 	tween.tween_callback(_flicker.bind(glow))
 
 
-func _pulse(glow: Sprite2D, phase: float) -> void:
+## Pulses beacon [param index] from its peak: its light (the glow's alpha) and, with
+## [member beacon_lens_trough], its lens fall and rise together in one sequence, so the lamp and the
+## light it casts never disagree.
+func _pulse(index: int, phase: float) -> void:
+	var glow: Sprite2D = _warning_glows[index]
+	var beacon: Beacon = beacons[index] as Beacon
+	var low_alpha: float = beacon_peak_alpha * beacon_trough
+	var low_lens: Color = warning_color.darkened(beacon_lens_trough)
 	var tween: Tween = create_tween().set_loops()
 	_beacon_tweens.append(tween)
-	tween.tween_interval(phase)
-	tween.tween_property(glow, "modulate:a", BEACON_ALPHA * 0.55, BEACON_PULSE_SECONDS).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
-	tween.tween_property(glow, "modulate:a", BEACON_ALPHA, BEACON_PULSE_SECONDS).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
+	if not beacon_flash:
+		tween.tween_interval(phase)
+	var fall: float = BEACON_FLASH_FALL_SECONDS if beacon_flash else BEACON_PULSE_SECONDS
+	var rise: float = BEACON_FLASH_RISE_SECONDS if beacon_flash else BEACON_PULSE_SECONDS
+	var fall_trans: Tween.TransitionType = Tween.TRANS_EXPO if beacon_flash else Tween.TRANS_SINE
+	var fall_ease: Tween.EaseType = Tween.EASE_OUT if beacon_flash else Tween.EASE_IN_OUT
+	var rise_ease: Tween.EaseType = Tween.EASE_IN if beacon_flash else Tween.EASE_IN_OUT
+	tween.tween_property(glow, "modulate:a", low_alpha, fall).set_trans(fall_trans).set_ease(fall_ease)
+	if beacon_lens_trough > 0.0:
+		tween.parallel().tween_property(beacon, "lens", low_lens, fall).set_trans(fall_trans).set_ease(fall_ease)
+	tween.tween_property(glow, "modulate:a", beacon_peak_alpha, rise).set_trans(Tween.TRANS_SINE).set_ease(rise_ease)
+	if beacon_lens_trough > 0.0:
+		tween.parallel().tween_property(beacon, "lens", warning_color, rise).set_trans(Tween.TRANS_SINE).set_ease(rise_ease)
+	if beacon_flash and phase > 0.0:
+		# Start part way through the cycle (an interval inside the loop would repeat every cycle).
+		tween.custom_step(phase)
 
 
 func _drift(shaft: Sprite2D, phase: float) -> void:

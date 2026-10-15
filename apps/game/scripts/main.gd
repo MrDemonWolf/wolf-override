@@ -64,8 +64,10 @@ const CORRIDOR_DOOR_LEFT_X: float = 752.0
 ## seal frame (far guide, hood, operator) draws over the curtain. The wall round it: CorridorSealWall
 ## is the cross-wall behind the walk line with the doorway transparent (so the machinery room in the
 ## far plate shows through it), drawn with the mid plate under everything else; the near column (its
-## guide, frame, end face, lamp socket and push buttons), the camera on its arm and the wall's 0.15 m
-## stub running along its own line to the camera draw over the actors, always opaque, and the column
+## guide, frame, end face, lamp socket and push buttons), the camera on its arm and the wall itself,
+## carried along its own line to the camera as a section cut at 0.36 m (so the plant room is closed on
+## the camera side and the door is the only way in; drawn as a clean cutaway, one dark section poche,
+## Nathanial's decision of 2026-10-14), draw over the actors, always opaque, and the column
 ## is slim enough that nobody stopping at the safe point stands behind it. The curtain crosses the
 ## walk line at the collision face (x 752, y 440). Every piece is a region of one lossless atlas (one
 ## texture, so they batch); the wall, column, camera and stub are 2 px per world px, the rest 4 px;
@@ -77,7 +79,7 @@ const CORRIDOR_SEAL_FRAME_REGION: Rect2 = Rect2(2.0, 2.0, 387.0, 564.0)
 const CORRIDOR_SEAL_WALL_REGION: Rect2 = Rect2(672.0, 2.0, 267.0, 613.0)
 const CORRIDOR_SEAL_COLUMN_REGION: Rect2 = Rect2(941.0, 2.0, 74.0, 606.0)
 const CORRIDOR_SEAL_CAMERA_REGION: Rect2 = Rect2(858.0, 619.0, 49.0, 18.0)
-const CORRIDOR_SEAL_STUB_REGION: Rect2 = Rect2(2.0, 619.0, 443.0, 187.0)
+const CORRIDOR_SEAL_STUB_REGION: Rect2 = Rect2(2.0, 619.0, 443.0, 195.0)
 const CORRIDOR_SEAL_LENS_REGION: Rect2 = Rect2(822.0, 619.0, 32.0, 40.0)
 const CORRIDOR_SEAL_CURTAIN_AT: Vector2 = Vector2(721.75, 311.25)
 const CORRIDOR_SEAL_OPEN_AT: Vector2 = Vector2(722.25, 311.5)
@@ -85,7 +87,7 @@ const CORRIDOR_SEAL_FRAME_AT: Vector2 = Vector2(700.5, 289.5)
 const CORRIDOR_SEAL_WALL_AT: Vector2 = Vector2(684.0, 150.0)
 const CORRIDOR_SEAL_COLUMN_AT: Vector2 = Vector2(785.0, 150.0)
 const CORRIDOR_SEAL_CAMERA_AT: Vector2 = Vector2(762.5, 267.5)
-const CORRIDOR_SEAL_STUB_AT: Vector2 = Vector2(762.5, 448.5)
+const CORRIDOR_SEAL_STUB_AT: Vector2 = Vector2(762.5, 440.0)
 const CORRIDOR_SEAL_SCALE: float = 0.25
 const CORRIDOR_SEAL_FRONT_SCALE: float = 0.5
 ## Where the shut curtain's art ends at the bottom (its near-jamb corner, in front of the walk line).
@@ -259,6 +261,19 @@ const GAMEPLAY_ACTIONS: Array[StringName] = [&"move_left", &"move_right", &"inte
 const FAIL_CONTROLS_OFF_SECONDS: float = 0.7
 const FAIL_FADE_SECONDS: float = 0.4
 const HUMAN_SPRITE_REST: Vector2 = Vector2(0.0, -5.0)
+## The engineer's crank pose at the MANUAL BYPASS: two frames cut from the engineer's own sprite
+## (the same drawing, scale and light; the legs are its pixels exactly), leaning into the wheel with
+## both gloves on its rim. A (the regrip) holds it at 8 and 10 o'clock; B (the push) has turned both
+## grips an eighth of a turn with the wheel, to half past 9 and half past 11. One atlas, two 205x380
+## regions trimmed from 384x384 cells whose centre is the usual sprite's centre, drawn at the usual
+## sprite's scale, so the boots stand exactly where they always do.
+const CRANK_ART: Texture2D = preload("res://assets/characters/eng-crank-atlas.png")
+const CRANK_REGION_SIZE: Vector2 = Vector2(205.0, 380.0)
+const CRANK_SCALE: float = 0.188
+const CRANK_SPRITE_POS: Vector2 = Vector2(2.35, -4.812)
+## B (the push) shows this long after each crank tick, at most half a tick (_bypass_cranked); A (the
+## regrip) the rest of the tick. Both follow the ticks, so any hold length works, TOGGLE HOLDS too.
+const CRANK_PUSH_SECONDS: float = 0.2
 ## Both actors draw at this depth; a knocked-down engineer draws one step above WOLF so the fall
 ## is never hidden behind him.
 const ACTOR_Z: int = 2
@@ -568,6 +583,9 @@ var seal_lamp: Sprite2D
 var seal_lamp_glow: Sprite2D
 ## The seal's rolling curtain winding up into its hood while the seal opens.
 var seal_leaf: SealLeaf
+## The inner blast leaf behind the roller, sliding back into its wall pocket while the seal opens
+## (the parked leaf's edge is painted into the wall piece, so this draws only while it moves).
+var blast_leaf: BlastLeaf
 ## True from the moment the seal starts to open until its curtain is up in the hood.
 var seal_opening: bool = false
 ## WOLF stays on the live contact, by his own choice, until the seal has landed.
@@ -593,6 +611,10 @@ var corridor_label_fader: EdgeFader
 ## The corridor's MANUAL BYPASS beside the relay, its crank count and whether it is venting coolant.
 var bypass_handle: BypassHandle
 var bypass_ticks: int = 0
+## The crank frame shown (0 = A, 1 = B), or -1 while the engineer shows their usual sprite.
+var crank_frame: int = -1
+## Seconds left of the B (push) frame after the last crank tick.
+var crank_push_left: float = 0.0
 var bypass_venting: bool = false
 var bypass_alarm_remaining: float = 0.0
 var bypass_was_holding: bool = false
@@ -828,6 +850,7 @@ func _setup_corridor_door() -> void:
 	corridor_depth.add_child(seal_wall)
 	door_open_art = _seal_sprite("CorridorDoorOpen", CORRIDOR_SEAL_OPEN_REGION, CORRIDOR_SEAL_OPEN_AT)
 	seal_leaf = SealLeaf.new(CORRIDOR_SEAL_ATLAS, CORRIDOR_SEAL_CURTAIN_REGION, CORRIDOR_SEAL_CURTAIN_AT, CORRIDOR_SEAL_SCALE)
+	blast_leaf = BlastLeaf.new(CORRIDOR_SEAL_ATLAS)
 	seal_frame = _seal_sprite("CorridorSealFrame", CORRIDOR_SEAL_FRAME_REGION, CORRIDOR_SEAL_FRAME_AT)
 	door_lip = _seal_sprite("CorridorDoorFront", CORRIDOR_SEAL_COLUMN_REGION, CORRIDOR_SEAL_COLUMN_AT, CORRIDOR_SEAL_FRONT_SCALE)
 	door_lip.z_index = KNOCKDOWN_Z
@@ -841,11 +864,11 @@ func _setup_corridor_door() -> void:
 	seal_lamp_glow.name = "SealLampGlow"
 	seal_lamp_glow.position = CORRIDOR_SEAL_LAMP
 	seal_lamp_glow.z_index = KNOCKDOWN_Z
-	# The tucked bar, the rising curtain and the frame draw right after the shut curtain (the door
-	# body's children, in that order), so the atlas pieces batch into one draw call; their positions
-	# stay world positions.
+	# The tucked bar, the inner blast leaf, the rising curtain and the frame draw right after the shut
+	# curtain (the door body's children, in that order), so the atlas pieces batch into one draw call;
+	# their positions stay world positions.
 	var door_body: Node2D = door_visual.get_parent() as Node2D
-	for art: Node2D in [door_open_art, seal_leaf, seal_frame]:
+	for art: Node2D in [door_open_art, blast_leaf, seal_leaf, seal_frame]:
 		art.visible = false
 		art.position -= door_body.global_position
 		door_body.add_child(art)
@@ -1040,6 +1063,7 @@ func _process(delta: float) -> void:
 		return
 	var hold_station: StringName = _hold_station()
 	var held_ticks: int = hold_use.advance(delta, _crank_held(hold_station), hold_station, _hold_tick_seconds(hold_station))
+	_update_crank_pose(delta)
 	if hold_use.started:
 		_hold_started()
 	_update_settle()
@@ -1107,6 +1131,34 @@ func _show_hold() -> void:
 func _on_hold_toggle_changed(on: bool) -> void:
 	hold_toggle = on
 	crank_latched = false
+
+
+## The crank pose while USE is held at the MANUAL BYPASS with the engineer on the crank spot: B for
+## CRANK_PUSH_SECONDS after each tick, A the rest of the hold; otherwise the engineer's usual sprite.
+## The floor reflection mirrors whichever art the sprite shows (FloorReflection._mirror).
+func _update_crank_pose(delta: float) -> void:
+	crank_push_left = maxf(crank_push_left - delta, 0.0)
+	var frame: int = -1
+	if state.chapter_id == "lockdown" and not state.door_open and hold_use.holding and hold_use.station == &"bypass" \
+			and engineer_step_x < 0.0 and absf(human.position.x - BYPASS_CRANK_X) <= 1.0:
+		frame = 1 if crank_push_left > 0.0 else 0
+	if frame == crank_frame or human_texture == null:
+		return
+	crank_frame = frame
+	var sprite: Sprite2D = human.body_sprite
+	if frame < 0:
+		sprite.texture = human_texture
+		sprite.region_enabled = false
+		sprite.scale = human_sprite_scale
+		sprite.position = HUMAN_SPRITE_REST
+	else:
+		sprite.texture = CRANK_ART
+		sprite.region_enabled = true
+		sprite.region_rect = Rect2(Vector2(CRANK_REGION_SIZE.x * frame, 0.0), CRANK_REGION_SIZE)
+		sprite.scale = Vector2.ONE * CRANK_SCALE
+		sprite.position = CRANK_SPRITE_POS
+		# The wheel is on the engineer's right.
+		sprite.flip_h = false
 
 
 ## The engineer's authored step (back from the relay, to a crank spot, or beside a station they used):
@@ -2176,6 +2228,8 @@ func _bypass_cranked() -> void:
 		return
 	bypass_ticks = mini(hold_use.ticks, BYPASS_TICKS)
 	bypass_handle.ticks = bypass_ticks
+	# Half a tick at most, so the regrip still shows if the hold gets shorter.
+	crank_push_left = minf(CRANK_PUSH_SECONDS, BypassHandle.TICK_SECONDS * 0.5)
 	sfx_bank.play(&"clank", -7.0, 1.5)
 	impact.rumble(0.12, 0.0, 0.05)
 	if not bypass_venting:
@@ -3568,6 +3622,10 @@ func _sync_scene() -> void:
 	bypass_handle.ticks = 0
 	bypass_handle.done = state.route == "fallback"
 	bypass_handle.clear_fault(state.door_open, false)
+	# The crank pose belongs to the moment too: back to the usual sprite before it is placed below.
+	crank_push_left = 0.0
+	crank_frame = 0
+	_update_crank_pose(0.0)
 	# The lane's choices and WOLF's part in it belong to the attempt, not the save.
 	lane_choice = ""
 	wolf_baiting = false
@@ -3730,12 +3788,21 @@ func _sync_door(animate: bool = false) -> void:
 	seal_lamp_glow.visible = in_corridor and state.door_open
 	seal_leaf.open = 0.0
 	seal_leaf.visible = sliding
+	blast_leaf.open = 0.0
+	blast_leaf.visible = sliding
 	if sliding:
 		door_tween = create_tween()
-		door_tween.tween_property(seal_leaf, "open", 1.0, CORRIDOR_DOOR_OPEN_SECONDS).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN_OUT)
+		door_tween.tween_method(_set_seal_open, 0.0, 1.0, CORRIDOR_DOOR_OPEN_SECONDS).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN_OUT)
 		door_tween.tween_callback(seal_leaf.hide)
+		door_tween.tween_callback(blast_leaf.hide)
 		door_tween.tween_callback(_set_seal_lamp.bind(SEAL_LAMP_OPEN))
 		door_tween.tween_callback(_door_lands)
+
+
+## The seal's one open value drives the roller curtain and the inner blast leaf behind it.
+func _set_seal_open(value: float) -> void:
+	seal_leaf.open = value
+	blast_leaf.open = value
 
 
 ## The seal's status lamp: red while shut, amber while the curtain moves, green open; only the lens
