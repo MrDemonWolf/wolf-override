@@ -51,6 +51,28 @@ The third landing verification found three minor wording defects; none changes t
 - **The crank frames' credit:** the Credits page said the frames were cut by script "with only the joints repaired by the image tool". Codex's paint is used in the repair zones (the arms, where the arms left the body, and the hip seam; `../fix1/crank/tools/cleanup.py`). New: "cut from their own sprite by a script; the image tool repainted the arms and the seams where they meet the body, and the legs are the sprite's own pixels." The register's `eng-crank-atlas` entry now names the repair zones the same way.
 - **The corridor backdrop's register entry:** `corridor-far` still said the corridor has "two procedurally drawn lockdown beacons". It now says they were drawn until 2026-10-14 and are since the painted `corridor-beacons` atlas (RoomDepth `beacon_atlas`), while Records Access and the Service Junction keep their drawn beacons.
 
+## Shared code (2026-10-15)
+
+On 2026-10-15 Nathanial asked that the project avoid duplication and use shared code (the "Don't duplicate code" rule in `AGENTS.md`). This branch was cleaned of its copies before merging. Nothing the player sees, hears or reads changed, apart from two minor documentation fixes from the landing verification (below).
+
+**Shared pieces.** Three new files, one commit each. Each applies unchanged to main 204ca49, and `codex/doors` and `codex/p0-text` use the same commits:
+- **db6751a, `apps/game/tests/support/game_suite.gd`:** one kit for the headless suites (`_expect`, `finish`, game spawn and teardown, frame-counted waits and holds, file removal, a node's drawn z, a texture's decompressed image). `follow_spacing_test`'s `_effective_z` moved into it as `drawn_z`.
+- **f3bed4c, `scripts/world/door_camera.gd` (`DoorCamera`):** the door ends' design camera (vanishing point, horizon, D0, 40 px per metre), written once for the blast leaf and the doors branch's swing leaves.
+- **e13d7c6, `scripts/fx/tri_mesh.gd` (`TriMesh`):** one builder for atlas triangle meshes, used by `SealLeaf` (converted in the same commit) and `BlastLeaf`.
+
+**This branch onto them.** 6a2d482 moves `corridor_additions_test` and `wolf_space_test` onto the kit (`wolf_space_test`'s copy of `_effective_z` is gone). 8298cf9 and 52a323a project and build `BlastLeaf` through `DoorCamera` and `TriMesh`, deleting its own camera constants and index loops. c1bd0ff gives `Main` one place that puts the engineer's body sprite on the standing image or on a sheet frame (`_show_human_standing`, `_show_human_frame`), used by the crank pose, the collapse and the stand-up. 513b73d makes `wolf_space_test`'s painted-column and painted-row scans one function.
+
+**The records.** Each fix round had filed a copy of the previous round's tools, and some files were filed two or three times. One current copy of each stays, the one that made the filed evidence; 69 files were removed and stay in the history at ada83fa. `../README.md` ("One current copy of each tool") maps every removed path to its kept copy. The asset register's entries for `corridor-seal-atlas`, `corridor-far` and `corridor-beacons` now name the kept tools; `corridor-beacons` had cited round 7's scripts, but round 9's made the installed file. No asset changed.
+
+**Two documentation fixes from the landing verification:** the doc comment on `Main._wolf_follow_max_x` now says WOLF comes to the doorway once the engineer is at the safe point (86dcaa5, comment only), and the research indexes list these records (ea5437f).
+
+**How identity was proven** (headless logic and rendered stills; nothing played by hand):
+- Headless dumps, byte-identical between 4e661e6 (the branch before this work) and the new code: `BlastLeaf.project` at 810 points, the `SealLeaf` and `BlastLeaf` triangle arrays at 21 openings each, and the engineer's body sprite (texture, region, scale, position, rotation, flip) after the crank frames, every collapse frame both ways and the stand-up.
+- The changed suites (`corridor_additions`, `wolf_space`, `follow_spacing`, `m0_scene`, `crank_hold`, `impact`, `sentry`) pass alone on both trees and print the same lines, except frame counts that vary from run to run on either tree. A `wolf_space_test` negative (WOLF's doorway spot moved to x 740 in a scratch copy) fails with the same messages and hidden counts on both trees.
+- Rendered stills (`tools/render/render.sh`, the same driver bytes on both trees, 1280x720 and 2400x1080 with the touch layout): the seal opening, both crank frames and the other door-end states are pixel-identical to 4e661e6, except the ceiling lamps' run-to-run flicker at the top left of the screen.
+- No string in the game's scripts or scenes changed; the suites' failure messages stay word for word.
+- The copy check (`check-copies` against main 204ca49) went from 143 copied blocks to 29, all in research tools that share helpers but made different filed evidence (the capture drivers, the cleanup and portal generations); merging those needs each tool re-run, so it is left for a later job.
+
 ## Evidence
 
 - **Headless logic:** `bun run game:check` twice on the final game (import twice, 21 suites, 4 at a time, on a machine at a load average of about 28). First run: 20 of 21; `studio_logo_test` failed (a texture error at close and its "closing fade is quick" timing). Second run: 21 of 21. Run alone, `studio_logo_test` passed 3 of 3 on the branch and 3 of 3 on main; run six at a time it failed its fade timing on both (6 of 6 on the branch, 4 of 6 on main), so its timing is load-sensitive on main too. The texture error was not seen again in those 12 runs; it is listed as open.
