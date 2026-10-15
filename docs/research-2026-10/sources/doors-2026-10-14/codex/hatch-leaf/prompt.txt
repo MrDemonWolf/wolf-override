@@ -1,0 +1,18 @@
+HARD RULES FOR THIS SESSION (read first):
+- Use ONLY your BUILT-IN image generation tool, in EDIT mode, with the attached images. Do not call any image API, CLI, script, Python, ImageMagick or any other generator or editor. Do not draw anything with code.
+- Save every generated image by copying the tool's original output file byte-for-byte (cp) into ./out/ with the exact file name given below. KEEP ALL METADATA, including the C2PA content credentials (caBX chunk). Never strip, clean, re-encode, resize, crop, convert, optimise or otherwise modify the files, and never remove or edit metadata.
+- When done, write ./out/notes.txt: for each output file, its name, the absolute path of the original generated file you copied, its sha256 (shasum -a 256), its pixel size, and the exact prompt text you gave the image tool. Then stop.
+- Add NO text, letters, numbers, logos, labels, signs, UI, watermarks, guide lines or borders anywhere. (Signs are typeset later by a script.)
+- THIS IS A PAINT-OVER OF A CONSTRUCTION DRAWING. Every silhouette, edge, line and joint is measured and stays exactly where it is, at the same size; the canvas size and framing stay identical. You may ONLY add realistic surface material and the light that is already designed. You must NOT add, remove, move, resize, reshape, rotate or invent any part.
+- LOOK: grounded realism for a near-future hardened military installation run by automated systems: cast concrete and painted steel plate, matte, built and lit like a real underground defence facility photographed once. Wear only where use and water would put it. Calm, quiet large surfaces. NO grunge speckle, NO drip streaks, NO rust spots, NO rivets or bolts that are not in the drawing, NO greebles, NO glowing seams, NO sci-fi panels, NO rim light on edges, NO haze or light shafts, NO lettering.
+- Values: keep the drawing's value plan exactly (which areas are dark, mid and light, and how the light falls off). Do not brighten or darken whole areas; do not add light where the drawing is dark.
+
+JOB hatch-leaf: ONE image. Attached (also in ./refs/):
+  refs/1-edit-target-leaf.png = THE EDIT TARGET (1024x1024): a construction render of ONE sliding steel door leaf, alone on #FF00FF, seen at a steep angle from a high side camera (its face foreshortened into a parallelogram). Flat-shaded; light and values are already designed.
+  refs/2-areas-to-paint-leaf.png = a black and white map: WHITE marks the leaf, to paint; BLACK (the #FF00FF key) must stay unchanged.
+
+The part: a heavy SLIDING BLAST/WATERTIGHT DOOR LEAF of welded steel plate, painted matte gunship grey (#5B5E6A). Its face is a plain steel skin with a narrow flat perimeter band and two horizontal weld seams across it (keep every drawn line exactly where it is). On its right is its narrow LEADING EDGE, painted with diagonal yellow and black caught-between stripes and a black rubber seal down its middle (keep the stripes exactly). A thin top edge is visible along the top.
+Light: the top of the face is in the shadow of the door head (dark), the lower face catches soft light from a wall pack above the doorway (as drawn). Wear only where use puts it: the paint rubbed thin along the bottom edge (kick height) and on the leading edge's stripes at hand height (about 40 percent of the way up the leaf). No dents, no rust, no rivets, no text.
+
+Output -> ./out/hatch-leaf-painted.png (same framing, 1024x1024).
+Paint ONLY the WHITE areas; everything under BLACK stays exactly as it is. Every shape, edge, line and position stays exactly as drawn. No text, no numbers, no new parts.

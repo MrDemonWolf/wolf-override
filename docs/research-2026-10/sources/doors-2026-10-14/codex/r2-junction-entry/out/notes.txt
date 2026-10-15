@@ -1,0 +1,27 @@
+r2-junction-entry-painted.png
+Original generated file: ~/.codex/generated_images/01a13646-c4af-7ab3-a67d-4164a78298ea/exec-d4a988e6-5592-43d2-a71c-67a033e1dffe.png
+SHA256: 3a3da6482714a1ed189ac55c67c882adfe8347c62bc5205662ec53fc1ef6fe42
+Pixel size: 1024x1536
+Exact prompt:
+EDIT MODE. Input 1 is edit target A; input 2 is its paint map, WHITE editable and BLACK absolutely unchanged. Output exactly 1024x1536, identical framing. This is a material-only paint-over of measured construction geometry. Preserve every silhouette, edge, line, joint, position and size exactly. Do not invent, move or reshape anything. Paint only white-map areas; preserve all already painted right machinery, pipes, tank, gauge, wheel, yellow-black rail and wet deck pixel-exactly.
+Match the grounded gritty realism and detail of the finished room: near-future hardened automated military underground installation, matte aged concrete and painted steel photographed once. Preserve original dark/mid/light value plan and existing light falloff; no illumination in dark areas.
+Cross-wall: cool grey board-formed reinforced concrete, mottling, small blowholes, faint plywood form-panel joints and small round grouted tie holes in regular grid ONLY exactly where drawn. One drawn thin horizontal pour joint, darker seepage immediately under it; irregular damp band at foot, boot scuffs beside doorway. No other drips or streaks.
+Paint the drawn slim vapour-tight LED above doorway, conduit, junction box, switch on header; keep its downward light pool exactly drawn. Two pipes at upper right run left into concrete: large main and thin upper line, dark wet painted steel matching the continuing right pipes, same wear/highlights. Their drawn upright elliptical escutcheons matte steel with grime rings.
+Doorway remains OPEN with NO door leaf: matte gunship-grey steel frame/header, three existing right-jamb hinge knuckles, existing closer-arm shoe, threshold worn bright centrally. Through opening paint existing passage concrete, two pipes, cable ladder and dry floor under its existing fitting.
+Narrow near column: grimy concrete cut end, existing thin steel corner angles, latch jamb hand-polished at hand height, existing wire-guard lamp socket whose round glass remains BLACK, strapped conduit and damp foot. Calm concrete without even speckle.
+Bottom-left curb: concrete stub, dull steel top edge angle, damp deck junction.
+Far-left passage: used dusty stained concrete back wall, two painted steel pipes, cable ladder and strut brackets exactly drawn, dry concrete floor. Existing 1.2m vapour-tight wall batten with two clips, grey plastic end caps and conduit entering end cap, soft diffuser and original light pool.
+NO text, letters, numbers, logos, signs, labels, UI, watermarks, guide lines or borders. NO even noise/speckle, rust spots, added rivets/bolts, greebles, glowing seams, sci-fi panels, rim light, haze or shafts. Surface detail must be as worked and dirty as finished room, not cleaner or rendered. Preserve all metadata including C2PA content credentials; never strip them.
+
+r2-junction-entry-leaf-painted.png
+Original generated file: ~/.codex/generated_images/01a13646-c4af-7ab3-a67d-4164a78298ea/exec-8696c1ad-2094-4b45-b60b-8d3f561f22d7.png
+SHA256: 408e62ccadb6e7a87a50df254cbd0cf85214ca5d56283fef81ea48da6607339f
+Pixel size: 1254x1254
+Exact prompt:
+EDIT MODE. First input is target B, second its paint map: WHITE paint only, BLACK preserve pixel-exactly, third input is style reference A only. Output exactly 1024x1024 and identical framing to B. Preserve plain grey ground exactly. Material-only paint-over of measured construction drawing: two door faces and narrow edge stay precisely in their original rectangular silhouettes, positions, sizes, joints and hardware placement. No perspective, rotation, resizing or new parts.
+Paint as real used gunship-grey matte painted steel matching the grounded gritty realism of the underground automated military plant room in reference A, not clean rendered panels. Preserve B's value plan. Left face junction side: subtle pressed-steel skin waviness, fine orange-peel paint, greasy hand marks and grime around existing lever/rose and thumbturn near right edge, small edge/bottom-corner chips to grey primer, scuffed lower third. Existing upper-left surface door closer body dark grey cast aluminium with small round pinion cap, exact drawn dimensions.
+Middle face passage side: same worn painted steel, existing scratched dented steel bottom kick plate with black boot scuffs, existing black rubber bottom seal, existing lever/rose and small key cylinder, grime around lever. Narrow right strip is latch edge, existing steel lock front and paint worn off edge corners.
+Only surface and material changes within white shapes. Every silhouette, edge, line and joint remains exactly as drawn. No text, letters, numbers, logos, labels, signs, UI, watermarks, guide lines or borders. No added hardware, rivets, bolts, panels, greebles, rust spots, even speckle/noise, glowing seams, rim light, haze or shafts. Wear only at real use points. Preserve all metadata including C2PA content credentials; never strip them.
+
+Verification: Original files copied with cp, without alteration. The image tool returned the leaf at 1254x1254 despite the requested 1024x1024. It was preserved without resizing as instructed. Pixel-exact preservation of black-map areas has not been verified.
+
