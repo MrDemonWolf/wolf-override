@@ -587,6 +587,10 @@ def self_test():
         commit('one-copy-mostly-shared', {'game/long_a.gd': long_file(
             ['\tshared_steps(goal, weight)'] + long[7:])})
         commit('one-copy-removed', {'game/long_a.gd': long_file(['\tshared_steps(goal, weight)'])})
+        # The old copy runs from `extends Node` to its last step, so the edges are the
+        # file's first line and the line after the last step.
+        commit('one-copy-edges', {'game/long_a.gd': 'class_name LongA\n' + long_file(
+            long + ['\tvar after: float = 1.0'])})
         commit('ts-trailing-block', {'site/two.ts': '\n'.join(f'{line} /* why */' for line in js) + '\n'})
         commit('ts-open-block', {'site/two.ts': '\n'.join(
             js[:3] + [js[3] + ' /* the next lines', '   are a long comment */'] + js[4:]) + '\n'})
@@ -629,6 +633,8 @@ def self_test():
         check('one old copy cut below six matching lines passes', 0,
               '--ref', 'one-copy-mostly-shared', '--base', 'main')
         check('one old copy removed passes', 0, '--ref', 'one-copy-removed', '--base', 'main')
+        check('lines added just above and below one old copy pass', 0,
+              '--ref', 'one-copy-edges', '--base', 'main')
         check('trailing /* */ comments do not hide a copy', 1,
               '--ref', 'ts-trailing-block', '--base', 'main')
         check('a /* comment opened after code does not hide a copy', 1,
