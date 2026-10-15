@@ -1,0 +1,49 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+press: corridor, WOLF in the doorway with the engineer at the safe point: WOLF at 715.0, painted 659.0..774.1, 0 px hidden; the inner leaf's parked foot at y 429.7; the frame's lowest row 430.2
+press: corridor, saved, WOLF in the doorway: WOLF at 715.0, painted 659.0..774.1, 0 px hidden; the inner leaf's parked foot at y 429.7; the frame's lowest row 430.2
+disclose_wolf: corridor, WOLF in the doorway with the engineer at the safe point: WOLF at 716.0, painted 660.0..775.1, 0 px hidden; the inner leaf's parked foot at y 429.7; the frame's lowest row 430.2
+disclose_wolf: corridor, saved, WOLF in the doorway: WOLF at 716.0, painted 660.0..775.1, 0 px hidden; the inner leaf's parked foot at y 429.7; the frame's lowest row 430.2
+disclose_bypass: corridor, WOLF in the doorway with the engineer at the safe point: WOLF at 715.2, painted 659.3..774.3, 0 px hidden; the inner leaf's parked foot at y 429.7; the frame's lowest row 430.2
+disclose_bypass: corridor, saved, WOLF in the doorway: WOLF at 715.2, painted 659.3..774.3, 0 px hidden; the inner leaf's parked foot at y 429.7; the frame's lowest row 430.2
+WOLF space checks passed at 40 rest points:
+  press: corridor, engineer at the relay (WOLF refuse: off the relay he refused)
+  press: corridor, WOLF off the relay as the bypass locks over
+  press: corridor, the seal open and the engineer by it (WOLF follow)
+  press: corridor, WOLF in the doorway with the engineer at the safe point
+  press: corridor, saved, WOLF in the doorway
+  press: corridor, the engineer back in the doorway
+  disclose_wolf: corridor, engineer at the relay (WOLF hold: back from the relay)
+  disclose_wolf: corridor, WOLF on the relay contact as the seal opens
+  disclose_wolf: corridor, the seal open and the engineer by it (WOLF follow)
+  disclose_wolf: corridor, WOLF in the doorway with the engineer at the safe point
+  disclose_wolf: corridor, saved, WOLF in the doorway
+  disclose_wolf: corridor, the engineer back in the doorway
+  disclose_bypass: corridor, engineer at the relay (WOLF hold: back from the relay)
+  disclose_bypass: corridor, WOLF off the relay as the bypass locks over
+  disclose_bypass: corridor, the seal open and the engineer by it (WOLF follow)
+  disclose_bypass: corridor, WOLF in the doorway with the engineer at the safe point
+  disclose_bypass: corridor, saved, WOLF in the doorway
+  disclose_bypass: corridor, the engineer back in the doorway
+  wolf: Records, WOLF at the mirror port on entry
+  wolf: Records, both at the mirror port for the choice
+  wolf: Records, after the mirror copy (WOLF follow)
+  manual: Records, WOLF at the mirror port on entry
+  manual: Records, both at the mirror port for the choice
+  manual: Records, after the mirror copy (WOLF follow)
+  junction, WOLF reading the LINE gauge on entry
+  junction, WOLF clear of the vent while the line builds
+  junction, WOLF clear of the blast while the fuse burns
+  junction, after the blast, the engineer still just past the valve
+  junction, WOLF waiting for the engineer's call after the blast
+  wolf: lane, WOLF drawing the sentry from the far end (engineer at the rubble)
+  wolf: lane, WOLF holding the sentry on the mark (engineer at the TANK RELEASE)
+  wolf: tank down, WOLF by the hatch
+  wolf: tank down, WOLF by the hatch with the engineer at the bolt
+  alone: lane, WOLF holding back while the engineer takes the lane
+  alone: tank down, WOLF by the hatch
+  alone: tank down, WOLF by the hatch with the engineer at the bolt
+  refused: lane, WOLF holding back while the engineer takes the lane
+  refused: tank down, WOLF by the hatch
+  refused: tank down, WOLF by the hatch with the engineer at the bolt
+  wolf: lane, WOLF holding back by the valve after breaking off

@@ -1,0 +1,92 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+ERROR: WOLF space check failed: press: corridor, WOLF in the doorway with the engineer at the safe point: no piece drawn over the actors hides WOLF in the doorway (hidden samples by piece: { "CorridorDoorFront": 536, "CorridorSealStub": 0, "CorridorSealCamera": 0, "SealLamp": 0 })
+   at: push_error (core/variant/variant_utility.cpp:1023)
+   GDScript backtrace (most recent call first):
+       [0] _expect (res://tests/wolf_space_test.gd:611)
+       [1] _check_doorway (res://tests/wolf_space_test.gd:353)
+       [2] _check_rest (res://tests/wolf_space_test.gd:321)
+press: corridor, WOLF in the doorway with the engineer at the safe point: WOLF at 740.0, painted 684.0..799.1, 536 px hidden; the inner leaf's parked foot at y 429.7; the frame's lowest row 430.2
+ERROR: WOLF space check failed: press: corridor, WOLF in the doorway with the engineer at the safe point: WOLF (x 740.0, painted 684.0..799.1) stands clear of the seal's near column (785.0..822.0), overlap 14.1 px
+   at: push_error (core/variant/variant_utility.cpp:1023)
+   GDScript backtrace (most recent call first):
+       [0] _expect (res://tests/wolf_space_test.gd:611)
+       [1] _check_rest (res://tests/wolf_space_test.gd:327)
+ERROR: WOLF space check failed: press: the engineer turning round at the safe point leaves WOLF in the doorway, facing them (x 498.9)
+   at: push_error (core/variant/variant_utility.cpp:1023)
+   GDScript backtrace (most recent call first):
+       [0] _expect (res://tests/wolf_space_test.gd:611)
+       [1] _safe_point (res://tests/wolf_space_test.gd:162)
+       [2] _settle (res://tests/wolf_space_test.gd:547)
+ERROR: WOLF space check failed: press: corridor, saved, WOLF in the doorway: WOLF is on a spot of his own (follow)
+   at: push_error (core/variant/variant_utility.cpp:1023)
+   GDScript backtrace (most recent call first):
+       [0] _expect (res://tests/wolf_space_test.gd:611)
+       [1] _check_rest (res://tests/wolf_space_test.gd:318)
+ERROR: WOLF space check failed: press: corridor, saved, WOLF in the doorway: WOLF's head is in the opening (snout at 558.0, past the curtain's walk-line crossing at 752.0)
+   at: push_error (core/variant/variant_utility.cpp:1023)
+   GDScript backtrace (most recent call first):
+       [0] _expect (res://tests/wolf_space_test.gd:611)
+       [1] _check_doorway (res://tests/wolf_space_test.gd:341)
+       [2] _check_rest (res://tests/wolf_space_test.gd:321)
+press: corridor, saved, WOLF in the doorway: WOLF at 498.9, painted 442.9..558.0, 0 px hidden; the inner leaf's parked foot at y 429.7; the frame's lowest row 430.2
+ERROR: WOLF space check failed: disclose_wolf: corridor, WOLF in the doorway with the engineer at the safe point: no piece drawn over the actors hides WOLF in the doorway (hidden samples by piece: { "CorridorDoorFront": 412, "CorridorSealStub": 0, "CorridorSealCamera": 0, "SealLamp": 0 })
+   at: push_error (core/variant/variant_utility.cpp:1023)
+   GDScript backtrace (most recent call first):
+       [0] _expect (res://tests/wolf_space_test.gd:611)
+       [1] _check_doorway (res://tests/wolf_space_test.gd:353)
+       [2] _check_rest (res://tests/wolf_space_test.gd:321)
+disclose_wolf: corridor, WOLF in the doorway with the engineer at the safe point: WOLF at 738.2, painted 682.2..797.3, 412 px hidden; the inner leaf's parked foot at y 429.7; the frame's lowest row 430.2
+ERROR: WOLF space check failed: disclose_wolf: corridor, WOLF in the doorway with the engineer at the safe point: WOLF (x 738.2, painted 682.2..797.3) stands clear of the seal's near column (785.0..822.0), overlap 12.3 px
+   at: push_error (core/variant/variant_utility.cpp:1023)
+   GDScript backtrace (most recent call first):
+       [0] _expect (res://tests/wolf_space_test.gd:611)
+       [1] _check_rest (res://tests/wolf_space_test.gd:327)
+ERROR: WOLF space check failed: disclose_wolf: the engineer turning round at the safe point leaves WOLF in the doorway, facing them (x 499.8)
+   at: push_error (core/variant/variant_utility.cpp:1023)
+   GDScript backtrace (most recent call first):
+       [0] _expect (res://tests/wolf_space_test.gd:611)
+       [1] _safe_point (res://tests/wolf_space_test.gd:162)
+       [2] _settle (res://tests/wolf_space_test.gd:547)
+ERROR: WOLF space check failed: disclose_wolf: corridor, saved, WOLF in the doorway: WOLF is on a spot of his own (follow)
+   at: push_error (core/variant/variant_utility.cpp:1023)
+   GDScript backtrace (most recent call first):
+       [0] _expect (res://tests/wolf_space_test.gd:611)
+       [1] _check_rest (res://tests/wolf_space_test.gd:318)
+ERROR: WOLF space check failed: disclose_wolf: corridor, saved, WOLF in the doorway: WOLF's head is in the opening (snout at 558.9, past the curtain's walk-line crossing at 752.0)
+   at: push_error (core/variant/variant_utility.cpp:1023)
+   GDScript backtrace (most recent call first):
+       [0] _expect (res://tests/wolf_space_test.gd:611)
+       [1] _check_doorway (res://tests/wolf_space_test.gd:341)
+       [2] _check_rest (res://tests/wolf_space_test.gd:321)
+disclose_wolf: corridor, saved, WOLF in the doorway: WOLF at 499.8, painted 443.8..558.9, 0 px hidden; the inner leaf's parked foot at y 429.7; the frame's lowest row 430.2
+ERROR: WOLF space check failed: disclose_bypass: corridor, WOLF in the doorway with the engineer at the safe point: no piece drawn over the actors hides WOLF in the doorway (hidden samples by piece: { "CorridorDoorFront": 536, "CorridorSealStub": 0, "CorridorSealCamera": 0, "SealLamp": 0 })
+   at: push_error (core/variant/variant_utility.cpp:1023)
+   GDScript backtrace (most recent call first):
+       [0] _expect (res://tests/wolf_space_test.gd:611)
+       [1] _check_doorway (res://tests/wolf_space_test.gd:353)
+       [2] _check_rest (res://tests/wolf_space_test.gd:321)
+disclose_bypass: corridor, WOLF in the doorway with the engineer at the safe point: WOLF at 740.0, painted 684.0..799.1, 536 px hidden; the inner leaf's parked foot at y 429.7; the frame's lowest row 430.2
+ERROR: WOLF space check failed: disclose_bypass: corridor, WOLF in the doorway with the engineer at the safe point: WOLF (x 740.0, painted 684.0..799.1) stands clear of the seal's near column (785.0..822.0), overlap 14.1 px
+   at: push_error (core/variant/variant_utility.cpp:1023)
+   GDScript backtrace (most recent call first):
+       [0] _expect (res://tests/wolf_space_test.gd:611)
+       [1] _check_rest (res://tests/wolf_space_test.gd:327)
+ERROR: WOLF space check failed: disclose_bypass: the engineer turning round at the safe point leaves WOLF in the doorway, facing them (x 498.9)
+   at: push_error (core/variant/variant_utility.cpp:1023)
+   GDScript backtrace (most recent call first):
+       [0] _expect (res://tests/wolf_space_test.gd:611)
+       [1] _safe_point (res://tests/wolf_space_test.gd:162)
+       [2] _settle (res://tests/wolf_space_test.gd:547)
+ERROR: WOLF space check failed: disclose_bypass: corridor, saved, WOLF in the doorway: WOLF is on a spot of his own (follow)
+   at: push_error (core/variant/variant_utility.cpp:1023)
+   GDScript backtrace (most recent call first):
+       [0] _expect (res://tests/wolf_space_test.gd:611)
+       [1] _check_rest (res://tests/wolf_space_test.gd:318)
+ERROR: WOLF space check failed: disclose_bypass: corridor, saved, WOLF in the doorway: WOLF's head is in the opening (snout at 558.0, past the curtain's walk-line crossing at 752.0)
+   at: push_error (core/variant/variant_utility.cpp:1023)
+   GDScript backtrace (most recent call first):
+       [0] _expect (res://tests/wolf_space_test.gd:611)
+       [1] _check_doorway (res://tests/wolf_space_test.gd:341)
+       [2] _check_rest (res://tests/wolf_space_test.gd:321)
+disclose_bypass: corridor, saved, WOLF in the doorway: WOLF at 498.9, painted 442.9..558.0, 0 px hidden; the inner leaf's parked foot at y 429.7; the frame's lowest row 430.2

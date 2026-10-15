@@ -183,7 +183,8 @@ No Codex session was started. No image tool was used.
       eng-crank-atlas.png      356064e459cc4242b77f3c3c142fa2f8ef6784fb5d60c604ec068229d3bcf4a6
   * The filed edit-target scripts (door/tools/codex_inputs7.py, fix1/door/tools/codex_inputs8.py,
     fix4/door/tools/codex_inputs11.py) now blank the hood's typeset lettering (hood_blank.py); the targets
-    the sessions used are kept unchanged in codex/<job>/refs/.
+    the sessions used are kept unchanged in <track>/codex/<job>/refs/ (door/codex/paint-door7/refs/,
+    fix1/codex/paint-door8/refs/, fix4/codex/paint-jamb11/refs/).
   * Filed here with their C2PA chunk (caBX) checked present and SHA-256 equal to the records above: the
     used outputs of paint-beacons, paint-relief, paint-door7, paint-door8, paint-crank8, paint-relay8,
     paint-lum8 and paint-jamb11. The unused outputs (crank-1a..2c, crank8-try1, cut9, cut9b, jamb11's first
