@@ -22,7 +22,7 @@ const BLAST_FACE_X: float = M0State.JUNCTION_DOOR_LEFT_X
 ## The exit's leaf runs in the wall's middle (its room face EXIT_LEAF_N in from the approach face), so
 ## the shut leaf meets the walk line that far behind the approach face's crossing at EXIT_DOOR_X; the
 ## reveal in front of it is open floor.
-var exit_leaf_x: float = JunctionRoom.EXIT_DOOR_X + 40.0 * JunctionRoom.EXIT_LEAF_N / cos(deg_to_rad(JunctionRoom.EXIT_WALL_ANGLE))
+var exit_leaf_x: float = JunctionRoom.EXIT_DOOR_X + DoorCamera.PX_PER_M * JunctionRoom.EXIT_LEAF_N / cos(deg_to_rad(JunctionRoom.EXIT_WALL_ANGLE))
 ## The blast door's doorway on the deck, far jamb foot to the near column's far side.
 const BLAST_SPAN: Vector2 = Vector2(JunctionDoorLayout.FAR_JAMB_FOOT.x, JunctionDoorLayout.COLUMN_AT.x + JunctionDoorLayout.COLUMN_REGION.size.x * JunctionDoorLayout.COLUMN_SCALE)
 ## The exit door's doorway on the walk line: its far jamb (junction-exit-door NOTES, "Opening") to

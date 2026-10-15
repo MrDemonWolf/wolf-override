@@ -44,8 +44,9 @@ func quad_rect(index: int) -> Rect2:
 	return Rect2(piece[1], (piece[0] as Rect2).size * float(piece[2]))
 
 
+## Every piece in order into one TriMesh, drawn in one call (nothing is drawn while there is none).
 func _draw() -> void:
-	var mesh: Array = [PackedVector2Array(), PackedVector2Array(), PackedColorArray(), PackedInt32Array()]
+	var mesh: TriMesh = TriMesh.new()
 	var size: Vector2 = texture.get_size()
 	for piece: Variant in _pieces:
 		if piece is SwingLeaf:
@@ -55,19 +56,8 @@ func _draw() -> void:
 		var top_left: Vector2 = piece[1]
 		var extent: Vector2 = region.size * float(piece[2])
 		var color: Color = piece[3]
-		var points: PackedVector2Array = mesh[0]
-		var uvs: PackedVector2Array = mesh[1]
-		var colors: PackedColorArray = mesh[2]
-		var indices: PackedInt32Array = mesh[3]
-		var first: int = points.size()
+		var first: int = mesh.vertex_count()
 		for corner: Vector2 in [Vector2(0.0, 0.0), Vector2(1.0, 0.0), Vector2(1.0, 1.0), Vector2(0.0, 1.0)]:
-			points.append(top_left + extent * corner)
-			uvs.append((region.position + region.size * corner) / size)
-			colors.append(color)
-		indices.append_array([first, first + 1, first + 2, first, first + 2, first + 3])
-		mesh[0] = points
-		mesh[1] = uvs
-		mesh[2] = colors
-		mesh[3] = indices
-	if not (mesh[3] as PackedInt32Array).is_empty():
-		RenderingServer.canvas_item_add_triangle_array(get_canvas_item(), mesh[3], mesh[0], mesh[2], mesh[1], PackedInt32Array(), PackedFloat32Array(), texture.get_rid())
+			mesh.add_vertex(top_left + extent * corner, (region.position + region.size * corner) / size, color)
+		mesh.add_quad(first)
+	mesh.draw(get_canvas_item(), texture)

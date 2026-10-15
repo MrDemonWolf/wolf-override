@@ -964,15 +964,17 @@ func _exit_piece(piece_name: String, region: Rect2, at: Vector2, z: int) -> Spri
 
 ## Where the leaf's leading-edge bottom corner stands with the door [param open] (0 shut, 1 open), and
 ## the leaf's scale there (x, y: the point; z: the scale against the shut leaf's). The leaf slides along
-## the wall, back into the pocket, so it moves left and away from the camera (smaller).
+## the wall, back into the pocket, so it moves left and away from the camera (smaller). The point is
+## DoorCamera's projection with the junction's vanishing point; x_m and z_m stay 64-bit floats up to it,
+## so the anchor is bit for bit the one the retyped formula gave before DoorCamera existed.
 static func exit_leaf_anchor(open: float) -> Vector3:
 	var a: float = deg_to_rad(EXIT_WALL_ANGLE)
 	var s: float = lerpf(EXIT_LEAD_SHUT_S, EXIT_LEAD_OPEN_S, clampf(open, 0.0, 1.0))
-	var x_m: float = EXIT_DOOR_X / 40.0 - s * sin(a) + EXIT_LEAF_N * cos(a)
+	var x_m: float = EXIT_DOOR_X / DoorCamera.PX_PER_M - s * sin(a) + EXIT_LEAF_N * cos(a)
 	var z_m: float = s * cos(a) + EXIT_LEAF_N * sin(a)
-	var k: float = 38.0 / (38.0 + z_m)
 	var z_shut: float = EXIT_LEAD_SHUT_S * cos(a) + EXIT_LEAF_N * sin(a)
-	return Vector3(EXIT_VPX + (40.0 * x_m - EXIT_VPX) * k, EXIT_HORIZON + (FLOOR_Y - EXIT_HORIZON) * k, k * (38.0 + z_shut) / 38.0)
+	var p: Vector2 = DoorCamera.project(x_m, 0.0, z_m, EXIT_VPX, EXIT_HORIZON)
+	return Vector3(p.x, p.y, DoorCamera.depth_scale(z_m) * (DoorCamera.D0 + z_shut) / DoorCamera.D0)
 
 
 func _build_particles() -> void:

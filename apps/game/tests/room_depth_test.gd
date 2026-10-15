@@ -193,8 +193,8 @@ func _check_records_doors(records: RecordsRoom) -> void:
 ## drawn whole at every swing, the camera-facing hatch is gone and no near pipe column hides the wall.
 func _check_junction_entry(junction: JunctionRoom) -> void:
 	var leaf: SwingLeaf = junction.entry_leaf
-	var a: Vector2 = SwingLeaf.project_in(leaf.hinge, leaf.vpx, leaf.horizon)
-	var b: Vector2 = SwingLeaf.project_in(leaf.hinge + leaf.leaf_dir(0.0) * SwingLeaf.LEAF_W, leaf.vpx, leaf.horizon)
+	var a: Vector2 = SwingLeaf.project(leaf.hinge, leaf.vpx, leaf.horizon)
+	var b: Vector2 = SwingLeaf.project(leaf.hinge + leaf.leaf_dir(0.0) * SwingLeaf.LEAF_W, leaf.vpx, leaf.horizon)
 	var crossing_x: float = a.x + (b.x - a.x) * (440.0 - a.y) / (b.y - a.y)
 	_expect(absf(crossing_x - JunctionRoom.ENTRY_DOOR_X) < 1.0, "the junction entry's shut leaf meets the walk line at its collision face (x %.1f)" % crossing_x)
 	var open_free: Vector3 = leaf.hinge + leaf.leaf_dir(PI * 0.5) * SwingLeaf.LEAF_W

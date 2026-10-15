@@ -10,14 +10,9 @@ extends Node2D
 ## Nothing here fades: the leaf is always somewhere on its hinges. A leaf can be drawn by an AtlasMesh
 ## on the same atlas ([member host]), so a room's door pieces cost one draw call between them.
 
-## The game camera (corridor door end, common.py): world px of a point x metres along the room, h
-## metres up, d metres behind the walkway. A room with its own measured vanishing point (the Service
-## Junction's, (511, 162)) sets [member vpx] and [member horizon].
-const VPX: float = 483.9
-const HORIZON: float = 158.5
-const FLOOR_Y: float = 440.0
-const D0: float = 38.0
-const PX_PER_M: float = 40.0
+## The leaf is placed with the door ends' design camera, DoorCamera (x metres along the room, h metres
+## up, d metres behind the walkway); a room with its own measured vanishing point (the Service
+## Junction's, (511, 162)) sets [member vpx] and [member horizon]. The leaf's size in metres:
 const LEAF_W: float = 0.914
 const LEAF_H: float = 2.134
 const LEAF_T: float = 0.044
@@ -73,9 +68,9 @@ var exposure: float = 1.0
 var fill: float = -1.0
 ## The AtlasMesh whose draw call draws this leaf (it then draws nothing itself), or null.
 var host: CanvasItem = null
-## This room's camera (see VPX).
-var vpx: float = VPX
-var horizon: float = HORIZON
+## This room's vanishing point in world px (DoorCamera.project's vp_x, vp_y).
+var vpx: float = DoorCamera.VPX
+var horizon: float = DoorCamera.HORIZON
 ## A small solid region of the atlas (painted steel) the closer's arm is drawn with; empty: no arm.
 var arm_region: Rect2 = Rect2()
 
@@ -93,17 +88,17 @@ func _init(atlas: Texture2D, room: Rect2, outside: Rect2, edge: Rect2, hinge_foo
 	texture_filter = CanvasItem.TEXTURE_FILTER_LINEAR_WITH_MIPMAPS
 
 
-static func project(p: Vector3) -> Vector2:
-	return project_in(p, VPX, HORIZON)
+## World px of the point [param p] (metres: x along the room, y up, z behind the walk line) seen from
+## the vanishing point ([param vp_x], [param vp_y]): DoorCamera.project for the leaf's Vector3 points,
+## whose components are already 32-bit, so passing them on changes no vertex. The room tests call it
+## with a leaf's own [member vpx] and [member horizon].
+static func project(p: Vector3, vp_x: float = DoorCamera.VPX, vp_y: float = DoorCamera.HORIZON) -> Vector2:
+	return DoorCamera.project(p.x, p.y, p.z, vp_x, vp_y)
 
 
-static func project_in(p: Vector3, vp_x: float, vp_y: float) -> Vector2:
-	var s: float = D0 / (D0 + p.z)
-	return Vector2(vp_x + (p.x * PX_PER_M - vp_x) * s, vp_y + (FLOOR_Y - vp_y) * s - p.y * PX_PER_M * s)
-
-
+## [param p] on screen in this leaf's room ([member vpx], [member horizon]).
 func _project(p: Vector3) -> Vector2:
-	return project_in(p, vpx, horizon)
+	return project(p, vpx, horizon)
 
 
 ## The closer arm's three joints (pinion on the leaf, elbow, shoe on the head) at the current swing.
@@ -174,18 +169,20 @@ static func _srgb(c: float) -> float:
 	return c * 12.92 if c <= 0.0031308 else 1.055 * pow(c, 1.0 / 2.4) - 0.055
 
 
+## Draws the leaf on its own unless an AtlasMesh [member host] draws it in its own call.
 func _draw() -> void:
 	if host != null:
 		return
-	var mesh: Array = [PackedVector2Array(), PackedVector2Array(), PackedColorArray(), PackedInt32Array()]
+	var mesh: TriMesh = TriMesh.new()
 	append_mesh(mesh)
-	RenderingServer.canvas_item_add_triangle_array(get_canvas_item(), mesh[3], mesh[0], mesh[2], mesh[1], PackedInt32Array(), PackedFloat32Array(), texture.get_rid())
+	mesh.draw(get_canvas_item(), texture)
 
 
-## The room's pinhole camera (project_in): x = vpx / PX_PER_M, d = -D0. Its height does not matter to
-## which face it sees, since the leaf turns about a vertical axis.
+## The room's pinhole camera (DoorCamera, with this leaf's vanishing point): x = vpx / PX_PER_M,
+## d = -D0. Its height does not matter to which face it sees, since the leaf turns about a vertical
+## axis.
 func camera() -> Vector3:
-	return Vector3(vpx / PX_PER_M, 0.0, -D0)
+	return Vector3(vpx / DoorCamera.PX_PER_M, 0.0, -DoorCamera.D0)
 
 
 ## True while the camera sees the room face at swing [param theta], else the outside face. Fix round 4
@@ -197,9 +194,10 @@ func room_face_shows(theta: float) -> bool:
 	return room_normal(theta).dot(centre - camera()) < 0.0
 
 
-## Adds this leaf, at its current swing, to [param mesh] ([points, uvs, colours, indices]): the face
-## the camera sees, and the latch edge.
-func append_mesh(mesh: Array) -> void:
+## Adds this leaf, at its current swing, to [param mesh] (in the order the leaf draws: the face the
+## camera sees, the latch edge, then the closer arm's two links). AtlasMesh calls it to draw a hosted
+## leaf in its own draw call; nothing is added while the leaf is hidden.
+func append_mesh(mesh: TriMesh) -> void:
 	if not visible:
 		return
 	var theta: float = angle()
@@ -224,49 +222,25 @@ func append_mesh(mesh: Array) -> void:
 
 
 ## One link of the closer's arm: a thin bar between two joints, ARM_WIDTH wide on screen.
-func _append_link(mesh: Array, from: Vector3, to: Vector3, color: Color) -> void:
+func _append_link(mesh: TriMesh, from: Vector3, to: Vector3, color: Color) -> void:
 	var size: Vector2 = texture.get_size()
 	var a: Vector2 = _project(from)
 	var b: Vector2 = _project(to)
-	var across: Vector2 = (b - a).orthogonal().normalized() * (ARM_WIDTH * PX_PER_M * 0.5)
-	var points: PackedVector2Array = mesh[0]
-	var uvs: PackedVector2Array = mesh[1]
-	var colors: PackedColorArray = mesh[2]
-	var indices: PackedInt32Array = mesh[3]
-	var first: int = points.size()
+	var across: Vector2 = (b - a).orthogonal().normalized() * (ARM_WIDTH * DoorCamera.PX_PER_M * 0.5)
+	var first: int = mesh.vertex_count()
 	var uv: Vector2 = arm_region.get_center() / size
 	for p: Vector2 in [a + across, b + across, b - across, a - across]:
-		points.append(p)
-		uvs.append(uv)
-		colors.append(color)
-	indices.append_array([first, first + 1, first + 2, first, first + 2, first + 3])
-	mesh[0] = points
-	mesh[1] = uvs
-	mesh[2] = colors
-	mesh[3] = indices
+		mesh.add_vertex(p, uv, color)
+	mesh.add_quad(first)
 
 
 ## One face as a two-column mesh: [param base] is its bottom corner on the hinge side (or the inner
 ## side, for the edge), [param across] runs to its other side, rows go up the leaf.
-func _append_quad(mesh: Array, base: Vector3, across: Vector3, region: Rect2, nrm: Vector3) -> void:
+func _append_quad(mesh: TriMesh, base: Vector3, across: Vector3, region: Rect2, nrm: Vector3) -> void:
 	var size: Vector2 = texture.get_size()
-	var points: PackedVector2Array = mesh[0]
-	var uvs: PackedVector2Array = mesh[1]
-	var colors: PackedColorArray = mesh[2]
-	var indices: PackedInt32Array = mesh[3]
-	var first: int = points.size()
+	var first: int = mesh.vertex_count()
 	for column: int in 2:
 		for row: float in ROWS:
 			var p: Vector3 = base + across * float(column) + Vector3(0.0, LEAF_BOTTOM + row * LEAF_H, 0.0)
-			points.append(_project(p))
-			uvs.append((region.position + Vector2(float(column) * region.size.x, (1.0 - row) * region.size.y)) / size)
-			colors.append(shade(p, nrm))
-	var rows: int = ROWS.size()
-	for r: int in rows - 1:
-		var a: int = first + r
-		var b: int = first + rows + r
-		indices.append_array([a, b, a + 1, a + 1, b, b + 1])
-	mesh[0] = points
-	mesh[1] = uvs
-	mesh[2] = colors
-	mesh[3] = indices
+			mesh.add_vertex(_project(p), (region.position + Vector2(float(column) * region.size.x, (1.0 - row) * region.size.y)) / size, shade(p, nrm))
+	mesh.add_grid(first, 2, ROWS.size())
