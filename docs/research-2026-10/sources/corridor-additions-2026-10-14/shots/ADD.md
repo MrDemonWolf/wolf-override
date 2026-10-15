@@ -8,7 +8,7 @@ This round fixes the one must-fix of the real review r4, the should-fix that bot
 
 **How this was checked:**
 - **Headless logic:** 14 of 14 suites pass after two imports, run after the last change to any game file (`logs11/tests-add/`). `room_lights_test` now checks the corridor's flash too. `m0_scene_test` passed 6 more times, 3 at a time (`logs11/m0-repeat/`): usual 0 frames, lead-in 0, worst grip 0.80 world px, blast leaf 31-33 frames in step.
-- **Rendered stills:** all made with `tools/render/render.sh` and round 8's driver (`add7/fix1/driver`), unchanged. That covers routes O, A and B at 1280x720 and in phone shape, O at 1600x900, a second O run and the perf runs (`raw11/add`). There is also a new, finer beacon strip (route P, driver `fix4/driver-pulse`): 60 frames 2 game frames apart (1/30 s, 2.0 s), for round 10 (`raw11/r10/P-720`, from `fix4/work/r10-game`) and round 11 (`raw11/add/P-720`). No window opened on the Mac.
+- **Rendered stills:** all made with `tools/render/render.sh` and round 8's driver (`add7/fix1/driver`, filed as `fix1/driver/realslice_capture.gd` at ada83fa), unchanged. That covers routes O, A and B at 1280x720 and in phone shape, O at 1600x900, a second O run and the perf runs (`raw11/add`). There is also a new, finer beacon strip (route P, driver `fix4/driver-pulse`): 60 frames 2 game frames apart (1/30 s, 2.0 s), for round 10 (`raw11/r10/P-720`, from `fix4/work/r10-game`) and round 11 (`raw11/add/P-720`). No window opened on the Mac.
   - Every capture (05:01-05:38) was made after the last change to the game copy's art, scene or scripts (05:00). The later edits are two tests and the asset register's wording, which change nothing the game draws; the tests were re-run after them.
 - **Not done:** nothing was played by hand, so there are **no feel claims**. The flash rhythm is measured, not judged in motion. No phone, device or export test. No review has run on round 11, and Nathanial has not seen it.
 
@@ -147,7 +147,7 @@ This round follows Nathanial's two decisions of 2026-10-14 ("Show it as a clean 
 
 **How this was checked:**
 - **Headless logic:** 14 of 14 suites pass after two imports, re-run at the end after the last file changed (`logs10/tests-add/`). `m0_scene_test` also passed 12 more times, run in parallel (`logs10/m0-repeat/`), with 0 usual-sprite frames each time once the crank started, and 0-2 frames of lead-in. The worst crank grip is still 0.80 world px.
-- **Rendered stills:** all were made with `tools/render/render.sh`, with round 8's driver (`add7/fix1/driver`), unchanged. That covers routes O, A and B at 1280x720 and in phone shape, O at 1600x900, a second O run, and the perf runs (`raw10/add`). There is also a new 16-frame beacon pulse strip (route P, driver `fix3/driver-pulse`), made for main, round 9 and round 10 (`raw10/{main,r9,add}/P-720`). No window opened on the Mac.
+- **Rendered stills:** all were made with `tools/render/render.sh`, with round 8's driver (`add7/fix1/driver`, filed as `fix1/driver/realslice_capture.gd` at ada83fa), unchanged. That covers routes O, A and B at 1280x720 and in phone shape, O at 1600x900, a second O run, and the perf runs (`raw10/add`). There is also a new 16-frame beacon pulse strip (route P, driver `fix3/driver-pulse/pulse_capture.gd` at ada83fa; round 11's `fix4/driver-pulse/` is the same driver with a finer route P), made for main, round 9 and round 10 (`raw10/{main,r9,add}/P-720`). No window opened on the Mac.
   - Every capture (00:48-02:24) was made after the last change to the game copy's art, scenes or scripts (00:36). The one later edit is a note in the asset register about the beacon pulse. It changes nothing the game draws, and the tests were re-run after it.
 - **Not done:** nothing was played by hand, so there are **no feel claims**, and the beacon pulse is judged from a 16-frame strip, not in motion. No phone, device or export test was run. No review has run on round 10, and Nathanial has not seen it.
 
@@ -353,7 +353,7 @@ Nothing under `game-slice`, `game-main`, `shots/`, `design/`, `layers/`, `codex/
 **How this was checked:**
 - **Headless logic:** 14 of 14 suites pass after two imports (`logs9/tests-add/`). `m0_scene_test` passed 3 more times, with no errors or leaks, and the worst crank grip was 0.80 world px in every run (`logs9/m0-repeat/`).
 - **Rendered stills:** all were made with `tools/render/render.sh`, and no window opened on the Mac.
-  - Round 9 was captured with round 8's driver (`add7/fix1/driver`), unchanged: routes O, A and B at 1280x720 and in phone shape, O at 1600x900, a second O run, and the perf runs (`raw9/add`).
+  - Round 9 was captured with round 8's driver (`add7/fix1/driver`, filed as `fix1/driver/realslice_capture.gd` at ada83fa), unchanged: routes O, A and B at 1280x720 and in phone shape, O at 1600x900, a second O run, and the perf runs (`raw9/add`).
   - Main, round 6 and round 8 are compared from round 8's render.sh captures with the same driver (`raw8/`). Main and round 6 did not change.
 - **Not done:** nothing was played by hand, so there are **no feel claims**. No phone, device or export test was run. No review pass has run on round 9, and Nathanial has not seen it.
 
@@ -542,7 +542,7 @@ Scratch only, 2026-10-13. No Git repository or worktree was edited. The fixes ar
 
 **How this was checked:**
 - **Headless logic:** 14 of 14 suites pass after two imports (`logs8/tests-add/`). `m0_scene_test` was also run five more times on the final copy (`logs8/m0-repeat/`).
-- **Rendered stills:** all made with `tools/render/render.sh`, and no window opened on the Mac. Main, round 6 and round 8 were all re-captured this round with one driver (`add7/fix1/driver`): routes O, A and B at 1280x720 and in phone shape, plus O at 1600x900, plus perf runs. Round 7 is compared from its own render.sh captures (`raw7/add`).
+- **Rendered stills:** all made with `tools/render/render.sh`, and no window opened on the Mac. Main, round 6 and round 8 were all re-captured this round with one driver (`add7/fix1/driver`, filed as `fix1/driver/realslice_capture.gd` at ada83fa): routes O, A and B at 1280x720 and in phone shape, plus O at 1600x900, plus perf runs. Round 7 is compared from its own render.sh captures (`raw7/add`).
 - **Not done:** nothing was played by hand, so there are **no feel claims**. No phone, device or export test was run. No review pass has run on round 8, and Nathanial has not seen it.
 
 ## What to open
@@ -735,7 +735,7 @@ Phone shape shows the same regions. The only exception is s2's roller foot, a 21
   - `luminaire/`: `design.py`, `cleanup.py`, `design/`, `layer/`.
   - `codex/`: five job folders with prompt, refs, out (C2PA kept), `run.log` and `session.txt`; `run_job.sh`; `archive.log`.
   - `tools/`: capture, tests, headless perf, `opening_diff8`, `state_diff8`, `perf_table8`, `package8`, `crop`, `side`.
-  - `driver/`.
+  - `driver/` (`fix1/driver/realslice_capture.gd` at ada83fa; round 9's identical copy `fix2/driver/realslice_capture.gd` is at ada83fa too).
   - `work/`, including `r7-installed/` with round 7's replaced files.
 - **Outputs `add7/shots/`:**
   - New and regenerated: `ADD.md` (this section), `sheet.png`, `pairs/`, `crops/`, `opening-diff/` and `opening-diff.json`, `state-diff-*.json`, `perf.json`, `perf-table.md`, `add-code.diff`, `fix1-code.diff`.
@@ -932,7 +932,7 @@ The installed art is byte-identical to each track's delivered file: atlas 9b1719
 - **Integration tools `add7/integrate/`:**
   - `tools/tests.sh`, `render_run.sh`, `capture_all.sh` and `headless_perf.sh` (adapted copies of `fix6/tools`);
   - `tools/opening_diff7.py`, `state_diff7.py`, `perf_table7.py` and `package7.py`;
-  - `driver/realslice_capture.gd`, a copy of `fix3/driver` that adds s4b and the crank strip;
+  - `driver/realslice_capture.gd` (`integrate/driver/realslice_capture.gd` at ada83fa), a copy of `fix3/driver` that adds s4b and the crank strip;
   - `patches/` (the beacon and crank diffs with relative paths);
   - `probe/` (the main beacon probe, and private main and round-6 copies for headless timing);
   - `negtest/` (the negative crank checks);

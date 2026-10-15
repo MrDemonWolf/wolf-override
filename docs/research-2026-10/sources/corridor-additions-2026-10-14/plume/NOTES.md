@@ -151,7 +151,7 @@ only the coolant relay entry. Then import twice headless.
 - **Headless** (game-plume, own HOME, after two imports): all 13 suites pass (logs/*_test.log). These are chapter
   scene, follow spacing, hold use, impact, junction, m0 scene, m0 state, room depth, room lights, sentry, settings,
   sfx bank and UI controls.
-- **render.sh** (`--name add7-plume`, round 6's driver and arguments, tools/capture.sh): shots/B-720, shots/B-phone
+- **render.sh** (`--name add7-plume`, round 6's driver and arguments, tools/capture.sh; the driver copy was filed as `plume/driver/realslice_capture.gd` at ada83fa): shots/B-720, shots/B-phone
   (s3), shots/B-720-perf and shots/A-720-perf (s1, s2, s4-s7).
   - Every perf number equals round 6: s1 54 draw calls, s3 63, additive items 7, texture 73.87 MB, video 80.24 MB,
     full-screen translucent layers 2.
