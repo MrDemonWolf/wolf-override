@@ -154,7 +154,7 @@ static func _break_after(text: String, marks: String, skip_quotes: bool) -> Arra
 ## The boxes one speaker's [param words] need: whole when they fit and are short, otherwise their
 ## lines and sentences grouped greedily, in order, into boxes that fit.
 static func _fit(words: String, fits: Callable) -> Array[String]:
-	if word_count(words) < LONG_LINE_WORDS and fits.call(words):
+	if _fits_box(words, fits):
 		return [words]
 	# Each unit carries the separator that joined it to the one before ("\n" between written lines).
 	var units: Array[String] = []
@@ -171,7 +171,7 @@ static func _fit(words: String, fits: Callable) -> Array[String]:
 	var current: String = units[0]
 	for index: int in range(1, units.size()):
 		var joined: String = current + joins[index] + units[index]
-		if word_count(joined) < LONG_LINE_WORDS and fits.call(joined):
+		if _fits_box(joined, fits):
 			current = joined
 		else:
 			boxes.append(current)
@@ -182,19 +182,26 @@ static func _fit(words: String, fits: Callable) -> Array[String]:
 
 ## A sentence that does not fit on its own, broken after its semicolons, or failing that its commas.
 static func _clauses(sentence: String, fits: Callable) -> Array[String]:
-	if word_count(sentence) < LONG_LINE_WORDS and fits.call(sentence):
+	if _fits_box(sentence, fits):
 		return [sentence]
 	for marks: String in [";", ","]:
 		var parts: Array[String] = _break_after(sentence, marks, true)
 		if parts.size() > 1:
 			var grouped: Array[String] = []
 			for part: String in parts:
-				if not grouped.is_empty() and fits.call(grouped.back() + " " + part) and word_count(grouped.back() + " " + part) < LONG_LINE_WORDS:
+				if not grouped.is_empty() and _fits_box(grouped.back() + " " + part, fits):
 					grouped[grouped.size() - 1] += " " + part
 				else:
 					grouped.append(part)
 			return grouped
 	return [sentence]
+
+
+## Whether [param text] can be one box: fewer than LONG_LINE_WORDS words and [param fits] (the
+## caller's row rule, a pure test of the words at the current text size) holds for it. Both tests are
+## pure, so the order they run in does not matter. Used by _fit and _clauses.
+static func _fits_box(text: String, fits: Callable) -> bool:
+	return word_count(text) < LONG_LINE_WORDS and fits.call(text)
 
 
 static func _longest_first(speakers: Array[String]) -> Array[String]:

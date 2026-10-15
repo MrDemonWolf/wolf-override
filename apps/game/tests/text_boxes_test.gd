@@ -394,7 +394,7 @@ func _check_junction() -> void:
 ## the purge display.
 func _check_story_kept() -> void:
 	await _to_records_mirror()
-	var close: String = Main.RECORDS_CLOSE_LINE % (game.call("_first_name") as String).to_upper()
+	var close: String = game._records_close_line()
 	_place_at_records_exit()
 	game.call("_interact")
 	await _play(2.6, "records close kept")
@@ -567,7 +567,7 @@ func _check_station_names() -> void:
 			for frame: int in 3:
 				await process_frame
 			var labels: Array[Label] = []
-			var candidates: Array = [game.get_node("BreakerLabel"), game.get_node("RelayLabel"), game.get_node("CheckpointLabel"), game.bypass_handle.fault_tag, game.bypass_handle.bypass_label]
+			var candidates: Array = game._corridor_station_labels()
 			candidates.append_array(game.records_room.station_labels)
 			candidates.append_array(game.junction_room.station_labels)
 			for label: Label in candidates:
@@ -679,7 +679,7 @@ func _check_prompt_clear(fresh: Main, touch: bool, box_up: bool, context: String
 	var prompt: Rect2 = fresh.tutorial_prompt.get_global_rect()
 	# A long frame under load can carry the engineer past the display, where the prompt only points on.
 	_expect(fresh.tutorial_text.text.contains("right to the breaker.") and prompt.position.y >= 0.0 and prompt.end.y <= Main.DIALOGUE_BOTTOM and prompt.position.x >= 0.0 and prompt.end.x <= 960.0, "%s: after the first step the tutorial prompt shows on the canvas (%s)" % [context, prompt])
-	for label: Label in [fresh.get_node("BreakerLabel"), fresh.get_node("RelayLabel"), fresh.get_node("CheckpointLabel"), fresh.bypass_handle.fault_tag, fresh.bypass_handle.bypass_label] as Array[Label]:
+	for label: Label in fresh._corridor_station_labels():
 		if label.is_visible_in_tree() and label.modulate.a > 0.05:
 			var name_rect: Rect2 = label.get_global_transform_with_canvas() * Rect2(Vector2.ZERO, label.size)
 			_expect(not prompt.intersects(name_rect), "%s: the tutorial prompt leaves %s readable (%s vs %s)" % [context, label.text.replace("\n", " "), prompt, name_rect])

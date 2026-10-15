@@ -1274,6 +1274,13 @@ func _first_name() -> String:
 	return state.human_name().get_slice(" ", 0)
 
 
+## Records' closing lines (RECORDS_CLOSE_LINE) with the engineer's first name as their speaker tag.
+## One place builds it, so the line said at the exit, the check for its unread boxes and
+## text_boxes_test all compare the same text.
+func _records_close_line() -> String:
+	return RECORDS_CLOSE_LINE % _first_name().to_upper()
+
+
 ## A restored engineer never stands inside a station's machine: a save or snapshot taken over its
 ## drawn body (by an earlier build, or a USE whose step out had not finished) places them at its side,
 ## facing it, still within reach.
@@ -2361,7 +2368,7 @@ func _interact_records(x: float) -> void:
 	if absf(x - 190.0) <= 58.0:
 		if state.preserve_purge_trace():
 			sfx_bank.play(&"chirp", -8.0)
-			_aside("The Director's purge order has a time and target ID. %s keeps a local copy; the original logs are still missing." % state.human_name().get_slice(" ", 0))
+			_aside("The Director's purge order has a time and target ID. %s keeps a local copy; the original logs are still missing." % _first_name())
 		else:
 			_aside("The purge-order trace is already copied. The mirror port may confirm when the source existed.")
 		_sync_records_room()
@@ -2382,7 +2389,7 @@ func _interact_records(x: float) -> void:
 			# The closing lines play while the engineer keeps control (STORY-8): no held shot. USE here
 			# shows their next box, and once they are read goes on through the exit. Said through the queue,
 			# so a station's answer or the route hint cutting in never drops them (_aside).
-			_say([RECORDS_CLOSE_LINE % _first_name().to_upper()])
+			_say([_records_close_line()])
 			_update_controls()
 			_sync_records_room(true)
 			_sync_room_lights(true)
@@ -4247,7 +4254,7 @@ func _opening_lines_playing() -> bool:
 ## Records' closing lines are up and have a box still to show, or wait behind an aside that cut into
 ## them (_aside).
 func _records_close_unread() -> bool:
-	var close: String = RECORDS_CLOSE_LINE % _first_name().to_upper()
+	var close: String = _records_close_line()
 	if _queued_next(close):
 		return true
 	return status_line == close and not dialogue_cleared and dialogue_index < dialogue_boxes.size() - 1
@@ -4434,11 +4441,19 @@ func _tutorial_prompt_place(rect: Rect2, touch_layout: bool) -> Vector2:
 	return rect.position
 
 
+## The corridor's station names, in the order the checks name them: the breaker, the relay and the
+## safe point's labels, then the bypass handle's COOLANT FAULT tag and MANUAL BYPASS plate. Needs the
+## bypass handle (built in _ready). Used by _covers_station_name (where the tutorial prompt may go) and
+## by text_boxes_test, so the game and its test agree on which names the prompt must leave readable.
+func _corridor_station_labels() -> Array[Label]:
+	return [$BreakerLabel, $RelayLabel, $CheckpointLabel, bypass_handle.fault_tag, bypass_handle.bypass_label] as Array[Label]
+
+
 ## Whether [param rect] (on the HUD canvas) covers a corridor station name that shows.
 func _covers_station_name(rect: Rect2) -> bool:
 	if bypass_handle == null:
 		return false
-	for label: Label in [$BreakerLabel, $RelayLabel, $CheckpointLabel, bypass_handle.fault_tag, bypass_handle.bypass_label] as Array[Label]:
+	for label: Label in _corridor_station_labels():
 		if label.is_visible_in_tree() and label.modulate.a > 0.05 and rect.intersects(label.get_global_transform_with_canvas() * Rect2(Vector2.ZERO, label.size)):
 			return true
 	return false
