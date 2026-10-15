@@ -91,7 +91,7 @@ The tool returned 1254 px. Alignment was measured as a pure scale 1254/1024 at o
 - **Layers** (`tools/cleanup7.py`, in `layers/`):
   - `portal-wall.png`, `portal-front.png`, `leaf-front.png`, `leaf-edge.png`, `report7.json`;
   - copies of round 6's unchanged curtain, open bar, frame, wheel, lens, far and mid plates.
-- **Game-ready** (`tools/install7.py`, in `game/`; nothing copied into any game):
+- **Game-ready** (`tools/install7.py`, `door/tools/install7.py` at ada83fa; round 10's `fix3/door/tools/install10.py` is the current packer; in `game/`; nothing copied into any game):
   - `corridor-seal-atlas.png` (1024x1024, as round 6);
   - `placement.json` (regions, world positions, owning nodes, the leaf's motion and maths);
   - `atlas-regions.json`;

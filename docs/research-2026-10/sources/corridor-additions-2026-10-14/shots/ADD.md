@@ -398,7 +398,7 @@ Nothing under `game-slice`, `game-main`, `shots/`, `design/`, `layers/`, `codex/
   - Shapes: `fix2/door/tools/cut9.py`.
   - Edit target and map: `codex_inputs9.py`.
   - Paint: one Codex edit-mode session, `paint-cut9b`, used only as clamped luma detail inside the masks.
-  - Cleanup and pack: `cleanup9.py` and `install9.py`. Every value is the design light times one constant per part.
+  - Cleanup and pack: `cleanup9.py` and `install9.py` (`fix2/door/tools/` at ada83fa; round 10's `fix3/door/tools/cleanup10.py` and `install10.py` replaced them). Every value is the design light times one constant per part.
   - Only the atlas's stub region changes (now `Rect2(2, 619, 443, 202)` at world (762.5, 440.0)), plus the column region's lower rows. Every other region and position is round 8's.
   - The superseded 0.42 m try (`paint-cut9`) is kept and recorded.
 - **The streak in the same frames:** the corridor-floor streak at x 1185 reflected a lamp behind that wall, and it was taken out of the far plate.
@@ -527,7 +527,7 @@ The new section replaces the old stub inside the same atlas region, the far plat
   - `assets/props/corridor-seal-atlas.png`, `assets/rooms/corridor-far.png`, `assets/props/corridor-beacons.png`.
   - `assets/manifest.json`: round-9 notes on corridor-seal-atlas, corridor-far and corridor-beacons, and the 256x156 correction.
 - **Work `add7/fix2/`:**
-  - `door/`: `tools/cut9.py`, `codex_inputs9.py`, `cleanup9.py`, `install9.py`; `design/`, `layers/` (`portal-front.png`, `report9.json`), `game/` (atlas, regions); `work-042/` (the superseded 0.42 m design).
+  - `door/`: `tools/cut9.py`, `codex_inputs9.py`, `cleanup9.py`, `install9.py` (the last two `fix2/door/tools/` at ada83fa); `design/`, `layers/` (`portal-front.png`, `report9.json`), `game/` (atlas, regions); `work-042/` (the superseded 0.42 m design).
   - `far/`: `tools/far9.py`; `layer/` (plate, `report.json`, before/after crops).
   - `beacons/`: a copy of round 8's tools and design, with the R9 light, and `layers/`.
   - `codex/`: `paint-cut9b` (used), `paint-cut9` (0.42 m try, not used) and `empty-run-r9` (a wrong-path empty run, no image), each with prompt, refs, out (C2PA kept), `run.log` and `session.txt`; `run_job.sh`; `archive.log`.
@@ -728,7 +728,7 @@ Phone shape shows the same regions. The only exception is s2's roller foot, a 21
   - Tests: `m0_scene_test.gd` (both gloves, race wait, WOLF safe-point check), `corridor_additions_test.gd` (leaf thickness, shadow).
   - Assets: `corridor-seal-atlas.png`, `corridor-beacons.png`, `eng-crank-atlas.png`, `corridor-coolant-relay.png`, `rooms/corridor-far.png`, and `manifest.json`. The register now holds a `corridor-seal-atlas` entry (from main's, with the scratch additions) and updated entries for the far plate, relay, beacons and crank atlas.
 - **Work `add7/fix1/`:**
-  - `door/`: `portal8.py`, `base8.py`, `codex_inputs8.py`, `cleanup8.py`, `install8.py`, `design/`, `layers/`, `game/`.
+  - `door/`: `portal8.py`, `base8.py`, `codex_inputs8.py`, `cleanup8.py`, `install8.py` (`fix1/door/tools/install8.py` at ada83fa), `design/`, `layers/`, `game/`.
   - `crank/`: `rig.py`, `codex_inputs.py`, `cleanup.py`, `pack.py`, `rig/`, `frames/`, `deliver/`.
   - `beacons/`: copied design and cleanup with the R8 changes, plus `layers/`.
   - `plume/`: `design8.py`, `codex_inputs8.py`, `cleanup8.py`, `design/`, `layer/`.

@@ -57,7 +57,7 @@ session id | job | output (sha256) | used?
   - archived 2026-10-12 (`codex archive`): 0 live in ~/.codex/sessions, 1 in ~/.codex/archived_sessions (add7/door/codex/archive.log).
 Derived (deterministic, no metadata transplanted): add7/door/tools/cleanup7.py -> add7/door/layers/ (portal-wall.png, portal-front.png,
   leaf-front.png, leaf-edge.png, report7.json; copies of round 6's unchanged frame, curtain, open bar, lens, wheel, far and mid plates);
-  add7/door/tools/install7.py -> add7/door/game/ (corridor-seal-atlas.png, atlas-regions.json; far and mid plates unchanged).
+  add7/door/tools/install7.py (door/tools/install7.py at ada83fa) -> add7/door/game/ (corridor-seal-atlas.png, atlas-regions.json; far and mid plates unchanged).
 Deterministic, no image tool: every shape and mask (tools/portal7.py), the RESTRICTED AREA stencil (typeset in the game's bundled Roboto,
   SIL OFL 1.1, bridges cut by script), all bolts, plate joints, wiper seals, the second saddle strap (painted with round 6's strap
   steel, itself from paint-portal2 01a12e59-e7ba-7073-8a77-796f536bcc43), every value and all light (round 6's painted light per place).
@@ -114,7 +114,7 @@ the prompts told Codex to keep all metadata including C2PA and never strip it. A
 job            session id                              output (sha256)                                                                  used for
 empty-run-r9   01a135c0-104f-7811-824a-7e690e3e25d3    none                                                                             NOT USED: started by a wrong job path with an empty prompt; produced no image; archived
 paint-cut9     01a135c0-8eeb-7d02-a132-b3368f2c5a5a    cut9-painted.png  f764301cff45b6bcc667b262c4cc56be91fa71e927c30967c1403400c3488b8b   NOT USED in the end: the 0.42 m try (its render.sh capture showed the section's far arris taking the rear heel's last 1-2 screen px at the safe point); refs rebuilt from add7/fix2/door/work-042/design
-paint-cut9b    01a13619-28b8-7c02-91b4-d474e3924572    cut9b-painted.png ec14d41ee36e1098c722a7010a8ae7f3709206575ff5053f59edde830905cd69   the 0.36 m cut concrete section (face, damp foot, ties, joints, top, edge angles): clamped luma high-pass detail inside the masks only (add7/fix2/door/tools/cleanup9.py)
+paint-cut9b    01a13619-28b8-7c02-91b4-d474e3924572    cut9b-painted.png ec14d41ee36e1098c722a7010a8ae7f3709206575ff5053f59edde830905cd69   the 0.36 m cut concrete section (face, damp foot, ties, joints, top, edge angles): clamped luma high-pass detail inside the masks only (add7/fix2/door/tools/cleanup9.py; fix2/door/tools/cleanup9.py at ada83fa)
 Both outputs (1254x1254) are byte-identical (cmp) to their originals in ~/.codex/generated_images
 (01a135c0-8eeb-.../exec-73ad7c74-6f7f-4101-861d-dd3976abf45f.png, 01a13619-28b8-.../exec-f90c5973-14d7-40de-8cf4-a6384e3aa395.png)
 and carry their caBX (C2PA) chunks (21,881 and 23,654 bytes).
