@@ -1,0 +1,35 @@
+{
+ "liner": {
+  "plate_px": 54453,
+  "bolt_px": 728,
+  "highlight_px": 112
+ },
+ "leaf_edge_parked": {
+  "px": 23956,
+  "receiver_px": 1303
+ },
+ "lamp": {
+  "lamp_px_equal_round6": true,
+  "new_part_px_within_2_world_px_of_lamp": 0
+ },
+ "wall_changed_outside_new_masks_px": 0,
+ "layer_luma": {
+  "liner_head_mean": 51.6,
+  "liner_jamb_mean": 42.9,
+  "concrete_near_head_mean": 35.3
+ },
+ "leaf-front": {
+  "size": [
+   632,
+   512
+  ],
+  "mean_luma": 38.6
+ },
+ "leaf-edge": {
+  "size": [
+   58,
+   512
+  ],
+  "mean_luma": 28.2
+ }
+}

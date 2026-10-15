@@ -1,0 +1,29 @@
+{
+ "parts": {
+  "poche": {
+   "px_cvd": 84269,
+   "srgb": [
+    15,
+    17,
+    20
+   ],
+   "mean_luma_layer": 16.79
+  }
+ },
+ "junction_notch_px_closed": 5,
+ "changed_px": 141190,
+ "changed_bbox_cvd": [
+  360,
+  1160,
+  1231,
+  1567
+ ],
+ "changed_bbox_world": [
+  766.0,
+  440.0,
+  984.0,
+  542.0
+ ],
+ "old_shadow_px_replaced": 825267,
+ "codex": null
+}

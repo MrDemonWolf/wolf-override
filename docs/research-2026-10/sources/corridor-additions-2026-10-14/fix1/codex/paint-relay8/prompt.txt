@@ -1,0 +1,19 @@
+HARD RULES FOR THIS SESSION (read first):
+- Use ONLY your BUILT-IN image generation tool, in EDIT mode, with the attached images. Do not call any image API, CLI, script, Python, ImageMagick or any other generator or editor. Do not draw anything with code.
+- Save every generated image by copying the tool's original output file byte-for-byte (cp) into ./out/ with the exact file name given below. KEEP ALL METADATA, including the C2PA content credentials (caBX chunk). Never strip, clean, re-encode, resize, crop, convert, optimise or otherwise modify the files, and never remove or edit metadata.
+- When done, write ./out/notes.txt: for each output file, its name, the absolute path of the original generated file you copied, its sha256 (shasum -a 256), its pixel size, and the exact prompt text you gave the image tool. Then stop.
+- Add NO text, letters, numbers, logos, labels, symbols, UI, watermarks or borders anywhere.
+- THIS IS A PAINT-OVER OF A CONSTRUCTION DRAWING. Every silhouette, edge and part is measured and stays exactly where it is, at the same size; the canvas size and framing stay identical. You may ONLY add realistic surface material and light. You must NOT add, remove, move, resize or reshape any part.
+- LOOK: grounded realism, a real industrial coolant fitting in a hardened underground military facility, matte painted and galvanised steel, lit softly from above and the left like the rest of the machine. NO glow, NO steam, NO water spray, NO drips drawn, NO rust spots, NO grunge speckle, NO greebles.
+
+JOB paint-relay8: ONE image. Attached (also in ./refs/):
+  refs/1-edit-target-relay.png = THE EDIT TARGET (1024x1024): the right side of an industrial coolant relay machine on a flat dark field. It is ALREADY PAINTED, apart from a few new parts drawn FLAT.
+  refs/2-areas-to-paint.png = black and white map of the same frame: WHITE marks the only areas to paint. Everything under BLACK must come out unchanged.
+
+The parts to paint (all under WHITE):
+  1. The long thin vertical pipe on the far right: a 40 mm galvanised steel discharge pipe carried down from the small relief valve's tailpipe at the top to an open end near the floor. Round, matte, a soft highlight down its lit side, darker on its shadow side, slightly dustier toward the bottom. Its short wider ring near the top is a pipe UNION (two hex shoulders, steel). Its very bottom end is an open cut pipe end (dark bore).
+  2. The two small bands round that pipe with short horizontal bars back to the large coolant pipe: steel PIPE CLAMPS with support brackets, each bracket bolted (one small bolt head each), matte steel, a little darker than the pipe.
+  3. The flat dark oval on the floor at the bottom right: a DAMP PATCH on the concrete floor where the pipe has dripped before: slightly darker wet concrete, a faint cool sheen along its upper edge, soft edges. Not a puddle, no reflections of objects, no drops drawn.
+
+Output -> ./out/relay8-painted.png  (1024x1024, the same framing).
+Paint ONLY the WHITE areas; everything under BLACK stays exactly as it is. No text, no new parts.

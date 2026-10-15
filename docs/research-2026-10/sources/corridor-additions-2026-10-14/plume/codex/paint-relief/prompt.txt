@@ -1,0 +1,22 @@
+HARD RULES FOR THIS SESSION (read first):
+- Use ONLY your BUILT-IN image generation tool, in EDIT mode, with the attached images. Do not call any image API, CLI, script, Python, ImageMagick or any other generator or editor. Do not draw anything with code.
+- Save every generated image by copying the tool's original output file byte-for-byte (cp) into ./out/ with the exact file name given below. KEEP ALL METADATA, including the C2PA content credentials (caBX chunk). Never strip, clean, re-encode, resize, crop, convert, optimise or otherwise modify the files, and never remove or edit metadata.
+- When done, write ./out/notes.txt: for each output file, its name, the absolute path of the original generated file you copied, its sha256 (shasum -a 256), its pixel size, and the exact prompt text you gave the image tool. Then stop.
+- Add NO text, letters, numbers, logos, labels, signs, UI, watermarks, guide lines or borders anywhere.
+- THIS IS A PAINT-OVER OF A CONSTRUCTION DRAWING. Every silhouette, edge, line and joint is measured and stays exactly where it is, at the same size; the canvas size and framing stay identical. You may ONLY add realistic surface material and light. You must NOT add, remove, move, resize, reshape, rotate or invent any part.
+- LOOK: grounded realism, a real industrial fitting in a near-future hardened military installation, built and lit like a real one photographed once. Matte. Wear only where hands and water would put it. NO grunge speckle, NO rust spots, NO drips, NO bolts or details that are not in the drawing, NO greebles, NO glow, NO steam or vapour, NO lettering.
+- Values: keep the drawing's value plan (which areas are dark, mid and light). Do not brighten or darken whole parts.
+
+JOB paint-relief: ONE image. Attached (also in ./refs/):
+  refs/1-edit-target-relief-valve.png = THE EDIT TARGET (1024x1024). On the left is the side of a painted steel coolant cabinet and the big steel pipe loop on its side; they are ALREADY PAINTED and must stay exactly as they are. Standing on top of the pipe's upper bend is a small SAFETY RELIEF VALVE drawn as FLAT construction shapes; paint only it.
+  refs/2-areas-to-paint.png = a black and white map of the same frame: WHITE marks the flat parts to paint. Everything under BLACK must come out unchanged (same pixels, same values, same colours).
+
+The flat parts to paint (all under WHITE), bottom to top, then the outlet pipe:
+  1. A short steel weld boss (a socket-weld fitting) welded to the crown of the big pipe, with a thin fillet weld bead where it meets the pipe. Same dark blue-grey painted steel as the big pipe.
+  2. A steel hex inlet nut: three flat faces seen, the left face in shade, the middle face mid, the right face catching the light. Crisp machined edges.
+  3. The valve: a cast bronze body with a short side outlet boss to the right (and a steel hex fitting on the outlet), a slightly tapered bronze spring bonnet above it, a small bronze cap on top, and a thin steel test lever pivoting at the cap and reaching to the left with a small round knob at its end. Dull, slightly oxidised cast bronze: brown-olive, matte, with a faint metallic sheen where the overhead light falls on its upper right; a fine cast surface. Not shiny gold, not orange.
+  4. The discharge tailpipe: a thin dark blue-grey painted steel pipe running right from the valve outlet, with a plain union coupling part way along, then a smooth 90-degree bend turning straight DOWN, ending in a short open cut end (the dark bottom edge). Painted like the big pipe: soft top highlight, darker underside, a faint cool edge where the light rakes it.
+  Light: from the corridor ceiling lamps above and slightly to the right, the same light as on the big pipe (soft highlight on top faces, falling darker below). Keep the thin dark outline around the parts, like the cabinet's line work.
+
+Output -> ./out/relief-valve-painted.png  (1024x1024, the same framing).
+Paint ONLY the WHITE areas; everything under BLACK stays exactly as it is. Every shape, edge, line and position stays exactly as drawn. No text, no numbers, no new parts, no steam.

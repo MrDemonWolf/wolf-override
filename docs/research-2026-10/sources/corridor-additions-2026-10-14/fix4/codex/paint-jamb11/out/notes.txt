@@ -1,0 +1,10 @@
+Output file: jamb11-painted.png
+Original generated file copied byte-for-byte: ~/.codex/generated_images/01a139d9-1863-7681-8bc9-ab42ca7191c0/exec-cfaf71db-0fb9-4e5e-bca3-e059c6d77d00.png
+SHA-256: b3b66a50a3ce0173153715695428f3e31fa24b37afe69161ff8da79865ee016e
+Pixel size: 1254x1254 (the image tool returned this size despite the explicit 1024x1024 request)
+Exact prompt:
+EDIT the attached images. Use the first attached image as the exact base and the second as the mask. Return exactly one PNG at precisely 1024x1024 pixels, keeping its canvas and framing identical to the source. Paint only the WHITE mask pixels and leave every BLACK mask pixel visually unchanged. This is a strict construction drawing paint-over: preserve every silhouette, edge, line, joint, bolt and position exactly as drawn; add only realistic surface material on the two existing door-frame jamb plates.
+
+LEFT white jamb: dark gunship grey matching the existing head plate, smooth matte rolled steel, very slight paint unevenness, restrained lighter wear only on its arrises and around existing bolt washers, faint low cart scuffs. RIGHT white jamb: dull grey bare hot-dip galvanised steel, faint subtle old spangle, slightly darker/duller waist-height contact, a little darker grime at the foot. Preserve both plates' two thin dark horizontal joints and all existing square washers and hex heads exactly in place and size. Add no bolts.
+
+Grounded realistic near-future hardened military installation, calm quiet matte surfaces. Keep source values exactly, do not brighten or darken areas. No grunge speckle, drip streaks, rust spots, extra rivets or bolts, greebles, glowing seams, sci-fi panels, rim light, haze. Add absolutely no text, letters, numbers, logos, labels, symbols, writing, UI, watermarks, guide lines or borders. All content outside the two white-mask plates must remain visually identical to the base.

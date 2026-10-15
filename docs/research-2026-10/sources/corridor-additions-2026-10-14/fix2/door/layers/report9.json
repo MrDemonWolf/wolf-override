@@ -1,0 +1,135 @@
+{
+ "parts": {
+  "cut_face": {
+   "target_luma": 27.5,
+   "k": 0.7711,
+   "mean_luma": 27.5,
+   "detail": {
+    "sigma_px": 5.0,
+    "clamp": [
+     0.86,
+     1.14
+    ]
+   }
+  },
+  "cut_face_damp": {
+   "target_luma": 22.5,
+   "k": 0.7424,
+   "mean_luma": 22.5,
+   "detail": {
+    "sigma_px": 4.0,
+    "clamp": [
+     0.88,
+     1.12
+    ]
+   }
+  },
+  "cut_ties": {
+   "target_luma": 21.0,
+   "k": 0.6471,
+   "mean_luma": 21.02,
+   "detail": null
+  },
+  "cut_joint_face0": {
+   "target_luma": 15.0,
+   "k": 0.5874,
+   "mean_luma": 15.57,
+   "detail": null
+  },
+  "cut_joint_top0": {
+   "target_luma": 18.0,
+   "k": 0.5394,
+   "mean_luma": 17.8,
+   "detail": null
+  },
+  "cut_joint_face1": {
+   "target_luma": 15.0,
+   "k": 0.9006,
+   "mean_luma": 15.14,
+   "detail": null
+  },
+  "cut_joint_top1": {
+   "target_luma": 18.0,
+   "k": 0.7304,
+   "mean_luma": 17.74,
+   "detail": null
+  },
+  "cut_top": {
+   "target_luma": 35.0,
+   "k": 1.324,
+   "mean_luma": 34.99,
+   "detail": {
+    "sigma_px": 5.0,
+    "clamp": [
+     0.88,
+     1.12
+    ]
+   }
+  },
+  "cut_angle_top": {
+   "target_luma": 47.0,
+   "k": 1.0802,
+   "mean_luma": 47.0,
+   "detail": {
+    "sigma_px": 2.0,
+    "clamp": [
+     0.82,
+     1.22
+    ]
+   }
+  },
+  "cut_angle_face": {
+   "target_luma": 41.0,
+   "k": 0.928,
+   "mean_luma": 41.0,
+   "detail": {
+    "sigma_px": 2.0,
+    "clamp": [
+     0.84,
+     1.18
+    ]
+   }
+  },
+  "cut_angle_far": {
+   "target_luma": 44.0,
+   "k": 0.9363,
+   "mean_luma": 44.0,
+   "detail": {
+    "sigma_px": 2.0,
+    "clamp": [
+     0.84,
+     1.18
+    ]
+   }
+  },
+  "cut_anchors": {
+   "target_luma": 12.0,
+   "k": 0.537,
+   "mean_luma": 12.02,
+   "detail": null
+  }
+ },
+ "junction_notch_px_closed": 5,
+ "changed_px": 141239,
+ "changed_bbox_cvd": [
+  360,
+  1160,
+  1231,
+  1567
+ ],
+ "changed_bbox_world": [
+  766.0,
+  440.0,
+  984.0,
+  542.0
+ ],
+ "old_shadow_px_replaced": 825267,
+ "codex": {
+  "file": "codex/paint-cut9b/out/cut9b-painted.png",
+  "used_as": "luma high-pass detail per part, clamped",
+  "shift": [
+   0,
+   0
+  ]
+ }
+}

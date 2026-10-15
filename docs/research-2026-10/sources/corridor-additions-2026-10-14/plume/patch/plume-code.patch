@@ -1,0 +1,161 @@
+diff --git a/apps/game/scripts/bypass_handle.gd b/apps/game/scripts/bypass_handle.gd
+index 268c3d4..6ac1ddc 100644
+--- a/apps/game/scripts/bypass_handle.gd
++++ b/apps/game/scripts/bypass_handle.gd
+@@ -7,8 +7,9 @@ extends Node2D
+ ## can turn. Its hub sits WHEEL_OFFSET from the gameplay point (Main's BYPASS_WHEEL), under the hand
+ ## of the engineer's crank pose. A row of crank lights along the bottom of its name plate, above the
+ ## head of the engineer cranking it and clear of WOLF beside them, counts the held-USE ticks. It also carries the relay's
+-## COOLANT FAULT tag and the coolant that hisses from the housing while the bypass is cranked. A plate
+-## the edge of the view cuts fades out, as in the junction. Main owns the rules; this only shows them.
++## COOLANT FAULT tag and the coolant that jets from the relay's relief valve while the bypass is
++## cranked. A plate the edge of the view cuts fades out, as in the junction. Main owns the rules;
++## this only shows them.
+ 
+ ## Crank lights in the readout, one per held-USE tick.
+ const TICKS_NEEDED: int = 8
+@@ -48,8 +49,10 @@ const LEADER_END_Y: float = -14.0
+ const LEADER_WIDTH: float = 1.0
+ ## The COOLANT FAULT tag sits under the COOLANT RELAY name, centred on the relay.
+ const FAULT_TAG_TOP: float = 331.0
+-## Where the coolant leaks from the relay's housing, from the wheel's centre.
+-const HISS_OFFSET: Vector2 = Vector2(-56.0, 1.0)
++## The open end of the relief valve's tailpipe, painted on the relay art (art px (352, 92) at its
++## 0.25 scale): the valve stands on the crown of the relay's side pipe and its tailpipe turns down,
++## beside the pipe and away from the engineer at the wheel. The coolant jets from here, downward.
++const RELIEF_OUTLET: Vector2 = Vector2(649.625, 361.0)
+ ## The fault tag pulses with the alarm while the bypass vents.
+ const PULSE_SECONDS: float = 1.1
+ 
+@@ -71,7 +74,8 @@ var done: bool = false:
+ 	set(value):
+ 		done = value
+ 		readout.queue_redraw()
+-## Coolant hissing from the housing while the bypass is cranked; the fault tag pulses with the alarm.
++## Coolant jetting from the relief valve while the bypass is cranked; the fault tag pulses with the
++## alarm.
+ var venting: bool = false:
+ 	set(value):
+ 		venting = value
+@@ -106,24 +110,16 @@ func _init() -> void:
+ 	readout.draw.connect(_draw_readout)
+ 	bypass_label.add_child(readout)
+ 	fault_tag = _plate("CoolantFaultTag", "COOLANT FAULT", FAULT_TEXT, FAULT_EDGE)
+-	coolant_hiss = FxPresets.steam()
++	coolant_hiss = FxPresets.relief_jet()
+ 	coolant_hiss.name = "CoolantHiss"
+-	coolant_hiss.position = HISS_OFFSET
+-	coolant_hiss.amount = 24
+-	coolant_hiss.lifetime = 0.75
+-	coolant_hiss.direction = Vector2(0.6, -1.0)
+-	coolant_hiss.spread = 25.0
+-	coolant_hiss.initial_velocity_min = 25.0
+-	coolant_hiss.initial_velocity_max = 45.0
+-	coolant_hiss.scale_amount_min = 4.0
+-	coolant_hiss.scale_amount_max = 7.0
+ 	add_child(coolant_hiss)
+ 
+ 
+ ## Places the handle with its wheel at [param wheel_centre] and the COOLANT FAULT tag centred on
+-## [param relay_x].
++## [param relay_x]; the coolant jet sits on the relief valve's outlet.
+ func place(wheel_centre: Vector2, relay_x: float) -> void:
+ 	position = wheel_centre
++	coolant_hiss.position = RELIEF_OUTLET - wheel_centre
+ 	bypass_label.position = Vector2(-bypass_label.size.x * 0.5 + LABEL_SHIFT_X, LABEL_TOP)
+ 	readout.queue_redraw()
+ 	fault_tag.position = Vector2(relay_x - wheel_centre.x - fault_tag.size.x * 0.5, FAULT_TAG_TOP - wheel_centre.y)
+diff --git a/apps/game/scripts/fx_presets.gd b/apps/game/scripts/fx_presets.gd
+index 6123a60..0b3da36 100644
+--- a/apps/game/scripts/fx_presets.gd
++++ b/apps/game/scripts/fx_presets.gd
+@@ -1,8 +1,9 @@
+ class_name FxPresets
+ extends RefCounted
+-## Three reusable CPUParticles2D configurations (they run on every renderer, including GL
+-## Compatibility): a spark shower, a dust burst and a steam column. Bursts are one-shot and fire
+-## through Impact.burst(); steam toggles emitting with the state that drives it.
++## Four reusable CPUParticles2D configurations (they run on every renderer, including GL
++## Compatibility): a spark shower, a dust burst, a steam column and a relief-valve jet. Bursts are
++## one-shot and fire through Impact.burst(); steam and the jet toggle emitting with the state that
++## drives them.
+ 
+ const SPARK_CYAN: Color = Color("#8be3ff")
+ const SPARK_AMBER: Color = Color("#f3ae4b")
+@@ -66,6 +67,41 @@ static func steam() -> CPUParticles2D:
+ 	return particles
+ 
+ 
++## Continuous: the narrow jet from a pressure-relief valve's open tailpipe, pointing straight down.
++## A real relief discharge leaves the pipe as a thin jet that widens at about 12 degrees, slows as
++## it mixes with the air and is gone within a short distance; so this is a few soft streaks,
++## stretched along their travel (align Y), that start pipe-narrow, flare to about 11 px, and fade
++## out within about 20 px, at low alpha in normal blending (no glow). The caller sets emitting.
++static func relief_jet() -> CPUParticles2D:
++	var particles: CPUParticles2D = CPUParticles2D.new()
++	particles.name = "ReliefJet"
++	particles.emitting = false
++	particles.amount = 16
++	particles.lifetime = 0.36
++	particles.direction = Vector2(0.0, 1.0)
++	particles.spread = 5.0
++	particles.initial_velocity_min = 62.0
++	particles.initial_velocity_max = 72.0
++	particles.damping_min = 55.0
++	particles.damping_max = 70.0
++	particles.gravity = Vector2(0.0, -10.0)
++	particles.particle_flag_align_y = true
++	particles.scale_amount_min = 0.98
++	particles.scale_amount_max = 1.15
++	var flare: Curve = Curve.new()
++	flare.add_point(Vector2(0.0, 0.174))
++	flare.add_point(Vector2(0.3, 0.478))
++	flare.add_point(Vector2(1.0, 1.0))
++	particles.scale_amount_curve = flare
++	particles.color = Color(0.84, 0.9, 0.93, 0.18)
++	var fade: Gradient = Gradient.new()
++	fade.offsets = PackedFloat32Array([0.0, 0.12, 0.45, 1.0])
++	fade.colors = PackedColorArray([Color(1.0, 1.0, 1.0, 0.8), Color.WHITE, Color(1.0, 1.0, 1.0, 0.45), Color(1.0, 1.0, 1.0, 0.0)])
++	particles.color_ramp = fade
++	particles.texture = _streak_texture(10, 16)
++	return particles
++
++
+ static func _one_shot(particles_name: String, amount: int, lifetime: float) -> CPUParticles2D:
+ 	var particles: CPUParticles2D = CPUParticles2D.new()
+ 	particles.name = particles_name
+@@ -96,3 +132,19 @@ static func _dot_texture(size: int) -> GradientTexture2D:
+ 	texture.fill_from = Vector2(0.5, 0.5)
+ 	texture.fill_to = Vector2(0.5, 0.0)
+ 	return texture
++
++
++## A soft ellipse [param width] by [param height] (the radial fill runs in UV space), for streaks
++## stretched along their travel.
++static func _streak_texture(width: int, height: int) -> GradientTexture2D:
++	var gradient: Gradient = Gradient.new()
++	gradient.offsets = PackedFloat32Array([0.0, 0.45, 1.0])
++	gradient.colors = PackedColorArray([Color.WHITE, Color(1.0, 1.0, 1.0, 0.4), Color(1.0, 1.0, 1.0, 0.0)])
++	var texture: GradientTexture2D = GradientTexture2D.new()
++	texture.gradient = gradient
++	texture.width = width
++	texture.height = height
++	texture.fill = GradientTexture2D.FILL_RADIAL
++	texture.fill_from = Vector2(0.5, 0.5)
++	texture.fill_to = Vector2(0.5, 0.0)
++	return texture
+diff --git a/apps/game/assets/manifest.json b/apps/game/assets/manifest.json
+index 1c7da4d..a0d86b5 100644
+--- a/apps/game/assets/manifest.json
++++ b/apps/game/assets/manifest.json
+@@ -276,8 +276,8 @@
+       "source_reference": "Reference: maintenance-props-provisional.png, the earlier ChatGPT Create prop sheet (WOLF//OVERRIDE [Game] project, https://chatgpt.com/g/g-p-6ab60b48c7608191987f04a81b04b5e2-wolf-override-game/c/6abb82fd-5d14-83e9-9332-a78148b708b2), registered here until it was retired on 2026-10-09; generation prompts retained in ignored art notes",
+       "terms_reference": "https://openai.com/policies/terms-of-use/",
+       "rights_review_status": "Provisional AI-generated gameplay prop, human reviewed and approved for integration. Final commercial asset-rights review remains open; not covered by the code/docs GPL license. Approved for integration by Nathanial Henniges on 2026-10-08 from a review sheet.",
+-      "modifications": "Original 512x512 RGBA prop, copied unchanged. The game shows the region inside its painted outline (so its floor reflection and contact shadow start at its real base) with mipmaps and linear-with-mipmaps filtering.",
+-      "implementation_status": "In use since 2026-10-09 as the corridor COOLANT RELAY at x 605, 0.221x (89 px tall, as before); the status light is drawn on its painted cyan bar, with its station label, state tint or glow and floor reflection unchanged."
++      "modifications": "Original 512x512 RGBA prop, copied unchanged. The game shows the region inside its painted outline (so its floor reflection and contact shadow start at its real base) with mipmaps and linear-with-mipmaps filtering. 2026-10-12: a spring-loaded safety relief valve with a short open tailpipe turned down was added on the crown of the side pipe's upper elbow (relay art px 291-356 x 52-94, 938 px; every other pixel unchanged): laid out as exact shapes by script, painted inside those shapes with the Codex built-in image_gen tool in edit mode (session 01a1335a-f620-7b42-ae60-ce8dce78c082; the original output with its C2PA manifest is kept in the art notes), then resampled, clipped to the shapes and merged by script (SHA-256 fb192cc2334aaf70...).",
++      "implementation_status": "In use since 2026-10-09 as the corridor COOLANT RELAY at x 605, 0.221x (89 px tall, as before); the status light is drawn on its painted cyan bar, with its station label, state tint or glow and floor reflection unchanged. Since 2026-10-12 the coolant jets from its relief valve's tailpipe (BypassHandle.RELIEF_OUTLET) while the bypass is cranked."
+     },
+     {
+       "asset_id": "corridor-bulkhead-sealed",

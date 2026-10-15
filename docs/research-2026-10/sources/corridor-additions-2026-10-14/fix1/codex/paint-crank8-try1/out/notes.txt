@@ -1,0 +1,14 @@
+Output file: crank8-painted.png
+Original generated file: ~/.codex/generated_images/01a134bc-6a3b-74d0-9dc7-49fd2b789c28/exec-a115d0f3-baea-4937-b9ea-cfdb97041c77.png
+SHA256: 310fa5da6bd3dd247d306c87bfcd9d23692f4b1ea4ee8f44602b8d108b5a3d2d
+Pixel size: 1254x1254
+Copy verification: cmp passed; original bytes and all metadata preserved.
+Limitation: tool returned 1254x1254 despite the requested 1024x1024. No resizing or other modification performed. Protected-pixel equality was not verified.
+Exact prompt text:
+Edit Image 1 only. Produce ONE 1024x1024 image with exactly the same framing, two poses, character sizes and locations. Image 2 is a strict repaint map: WHITE permits repair; BLACK protects every underlying pixel in Image 1. Image 3 is only the original character's drawing-style and anatomy reference; do not substitute its standing pose.
+
+Repair the cut-and-rotate seams within the WHITE regions so both poses read as single clean drawings of this exact young engineer. Match the original line weight, pixel-art-like painted rendering, red padded jacket with quilted folds and pocket flap, black gloves and cuffs, colours and values, and thin cool-blue edge light on the left edges. Connect shoulder, sleeve, elbow, cuff, wrist and glove naturally, keeping arm length and thickness like Image 3. Sleeve folds must follow each bend. The near arm crosses in front of the jacket; the far upper arm is mostly hidden behind the torso. Repair the jacket side/back and trousers where the old hanging arms were removed: no holes, fragments, duplicate hands or extra fingers. Smooth the leaned torso-to-legs waist join so belt, jacket hem and trousers connect.
+
+Keep both gloves exactly at their current rim-guide positions and make them CLOSED around the thin cyan rim line, fingers visibly wrapped over it. Left pose A regrip: slight lean; far lower glove at about 8 o'clock, near glove at about 10 o'clock. Right pose B push: slightly greater lean; far lower glove at about 9:30, near arm extended with glove at about 11:30. Preserve the cyan circles exactly as existing guides; do not draw a wheel, spokes, hub or any other object.
+
+Everything under BLACK in Image 2 must remain exactly unchanged: head, face, hair, front of jacket, legs, boots, magenta background and cyan circles. Do not move, redraw, restyle or relight these protected areas. Keep silhouettes tight and flat #FF00FF magenta right up to their edges, no background shadow, glow or halo. Add no text, letters, numbers, logos, labels, symbols, UI, watermarks or borders. Preserve all output metadata including C2PA content credentials; never strip metadata.

@@ -1,0 +1,23 @@
+HARD RULES FOR THIS SESSION (read first):
+- Use ONLY your BUILT-IN image generation tool, in EDIT mode, with the attached images. Do not call any image API, CLI, script, Python, ImageMagick or any other generator or editor. Do not draw anything with code.
+- Save every generated image by copying the tool's original output file byte-for-byte (cp) into ./out/ with the exact file name given below. KEEP ALL METADATA, including the C2PA content credentials (caBX chunk). Never strip, clean, re-encode, resize, crop, convert, optimise or otherwise modify the files, and never remove or edit metadata.
+- When done, write ./out/notes.txt: for each output file, its name, the absolute path of the original generated file you copied, its sha256 (shasum -a 256), its pixel size, and the exact prompt text you gave the image tool. Then stop.
+- Add NO text, letters, numbers, logos, labels, signs, UI, watermarks, guide lines or borders anywhere.
+- THIS IS A PAINT-OVER OF A CONSTRUCTION DRAWING. Every silhouette, edge, line and joint is measured and stays exactly where it is, at the same size; the canvas size and framing stay identical. You may ONLY add realistic surface material and the light that is already designed. You must NOT add, remove, move, resize, reshape, rotate or invent any part.
+- LOOK: grounded realism for a near-future hardened military installation run by automated systems: cast metal and painted steel, matte, built and lit like real hardware in an underground defence facility photographed once. Wear only where use and weather would put it. NO grunge speckle, NO drip streaks, NO rust spots, NO rivets, bolts or screws that are not in the drawing, NO greebles, NO glowing seams, NO sci-fi parts, NO rim light on edges, NO lens flare, NO haze, NO light rays.
+- Values: keep the drawing's value plan (which areas are dark, mid and light). The left panel is a dark, dimly lit wall; keep that fixture dark and quiet. The right panel sits right under a ceiling light; its top faces catch that cool light.
+
+JOB paint-beacons: ONE image. Attached (also in ./refs/):
+  refs/1-edit-target-beacons.png = THE EDIT TARGET (1024x1024): two close-up panels of the same kind of wall-mounted industrial warning lamp, each on its own concrete wall in a dim underground corridor, drawn as flat construction shapes at 16x magnification. Both are a real product type: a hazardous-location LED luminaire with a red glass globe and a cast guard, hung on a cast aluminium wall bracket (like an explosion-proof "jelly jar" fixture).
+  refs/2-areas-to-paint.png = a black and white map of the same 1024x1024 frame: WHITE marks the fixture parts to paint. Everything under BLACK (the walls, the thin pipe above the left lamp, the grey border) may stay as it is; it will be discarded.
+
+Paint each fixture, part by part, exactly inside its drawn shape:
+  1. Top: the cast wall bracket plate (the rounded rectangle) with two round anchor bolt heads near its top corners and a short threaded conduit hub on its top edge. Cast aluminium painted dark gunship grey (#5B5E6A in good light; here much darker), matte, slightly rough cast surface, crisp edges, a faint chipped edge on the top corners only.
+  2. The rounded boss below the bolts: the front end of the bracket arm, same cast grey, its top edge catching light.
+  3. The flared housing with three horizontal grooves: a finned cast-aluminium LED driver housing, same grey paint, the grooves are real cooling fins (dark gaps between fins), the top chamfer catching light from above.
+  4. The narrow band under the housing: a threaded steel guard collar, darker, slightly oily.
+  5. The red shape: a thick red heat- and impact-resistant GLASS globe, lit steadily from inside by an LED module (keep the bright core where it is drawn, falling to deep red at the edges). Real moulded glass: a faint vertical prism ribbing inside, a soft reflection of the cool ceiling light on its upper shoulder, no emoji-like gloss, no outer glow beyond the shape.
+  6. The dark bars, the horizontal ring and the small foot under the globe: a cast steel wire guard (bars, mid ring, foot ring with a drain boss), dark grey paint, matte, each bar round in section with a thin highlight on top, the sides of the bars facing the globe tinted faintly red by its light.
+
+Output -> ./out/beacons-painted.png  (1024x1024, the same framing).
+Paint ONLY the WHITE areas; every shape, edge, line and position stays exactly as drawn. No text, no numbers, no new parts, no glow outside the globe.

@@ -1,0 +1,101 @@
+{
+ "raw": "raw/crank-1a.png",
+ "raw_size": [
+  1536,
+  1024
+ ],
+ "guide_scale_ratio": [
+  1.0,
+  1.0
+ ],
+ "matte": {
+  "key": [
+   252.0,
+   3.0,
+   251.0
+  ],
+  "bg_noise_p99": 10.95,
+  "bg_threshold": 18.0,
+  "matte": "magenta-signature alpha + interior colour extension (2 px)"
+ },
+ "anchor": {
+  "scale": 1.0,
+  "iou": 0.9911,
+  "t": [
+   0.0,
+   0.0
+  ],
+  "vs_idle_mean_abs_rgb": 6.4,
+  "vs_idle_alpha_iou": 0.9895
+ },
+ "final_px_per_raw_px": 0.34483,
+ "frames": {
+  "anchor": {
+   "baseline_snap_px": 0.0,
+   "boot_lock_dx": 0.0,
+   "boot_ncc": null,
+   "lowest_row": 311,
+   "bbox": [
+    104,
+    36,
+    176,
+    311
+   ],
+   "edge_clip": {
+    "left": 0,
+    "right": 0,
+    "top": 0
+   }
+  },
+  "crank-a": {
+   "baseline_snap_px": 0.0,
+   "boot_lock_dx": -0.25,
+   "boot_ncc": 0.9992709755897522,
+   "lowest_row": 311,
+   "bbox": [
+    104,
+    39,
+    187,
+    311
+   ],
+   "edge_clip": {
+    "left": 0,
+    "right": 0,
+    "top": 0
+   }
+  },
+  "crank-b": {
+   "baseline_snap_px": 0.0,
+   "boot_lock_dx": 0.0,
+   "boot_ncc": 0.9983990788459778,
+   "lowest_row": 311,
+   "bbox": [
+    104,
+    37,
+    184,
+    311
+   ],
+   "edge_clip": {
+    "left": 0,
+    "right": 0,
+    "top": 0
+   }
+  }
+ },
+ "legs_fit": {
+  "crank-a": {
+   "iou": 0.9717,
+   "t": [
+    -1.0,
+    0.0
+   ]
+  },
+  "crank-b": {
+   "iou": 0.9736,
+   "t": [
+    0.0,
+    -1.0
+   ]
+  }
+ }
+}

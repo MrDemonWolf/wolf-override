@@ -1,0 +1,16 @@
+Output file: lum8-painted.png
+Original generated file: ~/.codex/generated_images/01a134c9-e14e-7482-aad9-3642fae31b50/exec-2553cd17-af68-425f-bb3f-8777716856c6.png
+SHA256: ab294c9f5baaab2fa4c588a3af537606ffcdb5d253c0f9b0685d2157f2ba1d93
+Pixel size: 1254x1254
+Copy verification: cmp passed; original bytes and all metadata retained.
+Limitation: Tool returned 1254x1254 despite the requested 1024x1024. No resizing or other modification was performed. Exact preservation of black-mask pixels was not verified.
+
+Exact prompt:
+EDIT MODE — precise construction-drawing paint-over. Produce ONE 1024x1024 image.
+Input image 1 is THE EDIT TARGET. Input image 2 is an edit permission map of the same frame, NOT an image to render: WHITE permits paint; BLACK must remain exactly unchanged from image 1, pixel for pixel. Preserve the original canvas, framing, dark grey top and bottom areas, black ceiling cable tray, concrete wall and all protected parts. Do not render the mask.
+Every existing silhouette and part is measured: keep each exactly at its original position, size and shape. ONLY add realistic surface material and light within permitted WHITE areas.
+Paint the existing short horizontal fitting in the middle as a real 0.6 m vapour-tight LED luminaire: light grey polycarbonate body, darker end caps, two small clips represented only within the existing fitting silhouette; opal milky diffuser along its underside, softly illuminated internally, brightest in its middle, even and milky rather than a hard white line. The lower body edge picks up a little diffuser light; its top remains in shadow.
+Paint the existing two thin vertical suspension rods above the fitting as dim matte steel, each ending at its top in a small round ceiling canopy plate fixed under the tray, preserving the exact existing dimensions and silhouette.
+All other WHITE areas to the left and right of the fitting and the two thin vertical strips must become plain concrete wall seamlessly continuing the surrounding wall, matching its texture, tone and existing soft light falling from the fitting. Draw no objects in these wall areas.
+Grounded realism: a real light fitting under the ceiling of an underground military corridor, photographed once. Preserve the original image's softness and lighting. No glow halo, lens flare, light rays, haze, grunge speckle or greebles. Add no parts. Do not add, remove, move, resize or reshape any part. No text, letters, numbers, logos, labels, symbols, UI, watermarks or borders. Keep all output metadata including C2PA content credentials intact.
+
