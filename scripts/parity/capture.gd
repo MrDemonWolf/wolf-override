@@ -481,6 +481,9 @@ func _route_4() -> void:
 	_press("CanvasLayer/PauseOverlay/Panel/PauseMenu/ResumeButton")
 	await _raw(20)
 	await _shot("vent-knockdown-card")
+	# RETRY on the knockdown card (Q17), once it takes it.
+	await _wait_until(func() -> bool: return bool(game.call("_retry_ready")), 300)
+	await _tap(&"interact")
 	await _wait_until(func() -> bool: return not game.get("fail_active"), 300)
 	await _raw(40)
 	await _shot("vent-restored")
@@ -563,6 +566,9 @@ func _route_4() -> void:
 		_fail("the sentry never knocked the engineer down")
 	await _raw(20)
 	await _shot("sentry-knockdown")
+	# RETRY on the knockdown card (Q17), once it takes it.
+	await _wait_until(func() -> bool: return bool(game.call("_retry_ready")), 300)
+	await _tap(&"interact")
 	await _wait_until(func() -> bool: return not game.get("fail_active"), 300)
 	await _raw(40)
 	await _shot("sentry-restored")

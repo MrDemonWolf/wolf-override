@@ -177,7 +177,7 @@ func _run() -> void:
 	await process_frame
 	await process_frame
 	_check_lying(human, "in the corridor")
-	_expect(await _wait_until(func() -> bool: return not game.get("fail_active"), 240), "the knockdown hands back within a few seconds")
+	await _check_retry_timing(game, "the first knockdown")
 	state = game.get("state") as M0State
 	_expect(state.to_dict() == saved and FileAccess.get_file_as_bytes(path) == save_bytes, "the knockdown restores the checkpoint exactly and never writes the save")
 	_expect(state.memory.get("choice_id") == State.DISCLOSE and state.route == "cooperate", "the relay memory and route survive the knockdown")
@@ -200,7 +200,7 @@ func _run() -> void:
 		walked_turn[0] = walked_turn[0] or not human.body_sprite.flip_h
 		return human.body_sprite.texture == MainScript.COLLAPSE_SHEET and is_equal_approx(human.body_sprite.region_rect.position.x, MainScript.COLLAPSE_FRAME.x * (MainScript.COLLAPSE_SPANS.size() - 1)), 60)
 	_expect(walked_down and not walked_turn[0], "walking left into it, they slump forward to the left without turning round")
-	_expect(await _wait_until(func() -> bool: return not game.get("fail_active"), 240), "the second knockdown restores too")
+	await _check_retry_timing(game, "a repeat knockdown")
 	_expect((game.get("state") as M0State).to_dict() == saved, "the second restore is the same checkpoint")
 	hazard.queue_free()
 
@@ -223,7 +223,7 @@ func _run() -> void:
 	var pre_save: Dictionary = (game.get("beat_snapshot") as Dictionary).duplicate(true)
 	_expect(await _walk_to(human, 450.0), "the engineer moves on before any save exists")
 	game.call("_fail_beat", "Test knockdown.")
-	_expect(await _wait_until(func() -> bool: return not game.get("fail_active"), 240), "a knockdown before the first checkpoint still hands back")
+	_expect(await _retry(game, 240), "a knockdown before the first checkpoint still hands back")
 	state = game.get("state") as M0State
 	_expect(state.to_dict() == pre_save and state.memory.get("choice_id") == State.PRESS and not state.checkpoint_reached and state.chapter_id == "lockdown", "without a checkpoint the beat snapshot restores the choice, not an older save")
 	_expect(human.controlled and human.position == state.human_position, "the engineer is back at the beat start")
@@ -236,7 +236,7 @@ func _run() -> void:
 	await process_frame
 	_expect(game.get("fail_active") and Engine.time_scale == 1.0 and human.body_sprite.rotation_degrees == 0.0 and is_equal_approx(human.body_sprite.region_rect.position.x, MainScript.COLLAPSE_FRAME.x * (MainScript.COLLAPSE_SPANS.size() - 1)), "Reduced Motion knockdown cuts straight to lying down and skips the dip")
 	_check_lying(human, "with Reduced Motion")
-	_expect(await _wait_until(func() -> bool: return not game.get("fail_active"), 240), "the Reduced Motion knockdown restores")
+	_expect(await _retry(game, 240), "the Reduced Motion knockdown restores")
 	impact.reduce_motion = false
 
 	# Intro and chapter close never knock down; the kit's intro boom still settles.
@@ -312,6 +312,71 @@ func _wait_until(condition: Callable, frames: int) -> bool:
 		if condition.call():
 			return true
 	return false
+
+## RETRY on the knockdown card (Q17): waits until the card takes it (Main.RETRY_READY_SECONDS after the
+## hit), presses interact once, and waits until the room has faded back in with the controls back.
+
+## Q17 (Cold Still timing, October 14, 2026), the same on the first knockdown and every repeat: the card
+## takes RETRY at 0.9 s and not before, holds until it is pressed, and a press at once has control back
+## at about 1.5 s. Time is the game's own (the frames' deltas, as the knockdown and its tweens count it),
+## and each moment is checked to the frame it falls in, so a slow machine does not change the result.
+func _check_retry_timing(game: Node, context: String) -> void:
+	var hint: Label = game.get_node("CanvasLayer/ContextHint/Text") as Label
+	var age: float = float(game.get("fail_age"))
+	var before: float = age
+	var early_press: bool = false
+	var ready_matches: bool = true
+	while not bool(game.call("_retry_ready")) and age < 3.0:
+		await process_frame
+		before = age
+		age = float(game.get("fail_age"))
+		ready_matches = ready_matches and bool(game.call("_retry_ready")) == (age >= 0.9)
+		if not early_press and age >= 0.5 and age < 0.8:
+			# A press before 0.9 s does nothing, and no prompt asks for one.
+			early_press = true
+			Input.action_press(&"interact")
+			await process_frame
+			Input.action_release(&"interact")
+			before = age
+			age = float(game.get("fail_age"))
+			_expect(bool(game.get("fail_active")) and not bool(game.get("retrying")) and not hint.text.contains("RETRY"), "%s: a press at %.2f s does nothing and no RETRY shows yet" % [context, age])
+	_expect(early_press and ready_matches and bool(game.call("_retry_ready")) and age >= 0.9 and before < 0.9, "%s: the card takes RETRY from the frame that reaches 0.9 s (%.3f s, the frame before at %.3f s)" % [context, age, before])
+	await process_frame
+	_expect(hint.text == "E  RETRY" and (game.get_node("CanvasLayer/ContextHint") as Control).visible, "%s: the hint reads E  RETRY once it does (%s)" % [context, hint.text.c_escape()])
+	# Left alone, the card holds: it never moves on by itself.
+	while float(game.get("fail_age")) < 2.5:
+		await process_frame
+	_expect(bool(game.get("fail_active")) and not bool(game.get("retrying")) and hint.text == "E  RETRY", "%s: the card holds until RETRY (still up %.1f s after the hit)" % [context, float(game.get("fail_age"))])
+	# On touch the hint reads TAP RETRY, USE reads RETRY, and the arrows are gone while the card is up.
+	game.set("touch_enabled", true)
+	game.call("_refresh_ui")
+	var use: Button = game.get_node("CanvasLayer/TouchControls/Use") as Button
+	_expect(hint.text == "TAP RETRY" and use.visible and use.text == "RETRY" and not (game.get_node("CanvasLayer/TouchControls/Left") as Control).visible and not (game.get_node("CanvasLayer/TouchControls/Right") as Control).visible, "%s: on touch the hint reads TAP RETRY on the RETRY button, with no arrows (%s, %s)" % [context, hint.text, use.text])
+	game.set("touch_enabled", false)
+	game.call("_refresh_ui")
+	# RETRY: the fade out, the restore and the fade in take 0.6 s, so a press at 0.9 s has control at 1.5 s.
+	Input.action_press(&"interact")
+	await process_frame
+	Input.action_release(&"interact")
+	var after_press: float = 0.0
+	var longest_frame: float = 0.0
+	var human: M0Actor = game.get_node("Human") as M0Actor
+	while not human.controlled and after_press < 3.0:
+		await process_frame
+		after_press += game.get_process_delta_time()
+		longest_frame = maxf(longest_frame, game.get_process_delta_time())
+	_expect(human.controlled and not bool(game.get("fail_active")) and absf(after_press - 0.6) <= longest_frame * 2.0 + 0.02, "%s: control comes back 0.6 s after RETRY, so about 1.5 s after the hit for a press at 0.9 s (%.3f s after the press)" % [context, after_press])
+	_expect(is_equal_approx(MainScript.RETRY_READY_SECONDS + MainScript.RETRY_FADE_OUT_SECONDS + MainScript.RETRY_FADE_IN_SECONDS, 1.5), "%s: 0.9 s + 0.25 s fade out + 0.35 s fade in = 1.5 s" % context)
+
+
+func _retry(game: Node, frames: int) -> bool:
+	if not await _wait_until(func() -> bool: return bool(game.call("_retry_ready")), frames):
+		return false
+	await process_frame
+	Input.action_press(&"interact")
+	await process_frame
+	Input.action_release(&"interact")
+	return await _wait_until(func() -> bool: return not bool(game.get("fail_active")) and not bool(game.get("retry_fading_in")), frames)
 
 
 func _walk_to(actor: M0Actor, target_x: float) -> bool:

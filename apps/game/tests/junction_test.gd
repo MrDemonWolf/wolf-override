@@ -347,7 +347,7 @@ func _check_scene() -> void:
 	_expect(room.door_blown and (room.door_breaking_art.visible or room.door_blown_art.visible) and not room.door_art.visible and room.blast_sparks.emitting, "the knockdown shows the door blowing, so the cause is on screen")
 	_expect(not state.door_blown and FileAccess.get_file_as_bytes(path) == a_bytes, "a knockdown blast saves nothing and never really blows the door")
 	_expect(str(game.get("status_line")).begins_with("The door went with %s in front of it." % state.human_name().get_slice(" ", 0)), "the status line names the blast as the cause")
-	_expect(await _wait_until(func() -> bool: return not game.get("fail_active"), 240), "the knockdown hands back")
+	_expect(await _retry(game, 240), "the knockdown hands back")
 	state = game.get("state") as M0State
 	_expect(state.to_dict() == autosave_a.to_dict() and human.position == state.human_position and human.controlled, "the engineer is back at autosave A with controls")
 	_expect(line.state == &"idle" and room.turns == 0 and not room.vent_hazard.armed, "the restore resets the line, the wheel and the vent")
@@ -439,7 +439,7 @@ func _check_scene() -> void:
 	game.set("save_path", path)
 	_expect(game.get("save_pending") and str(game.get("save_error")).begins_with("Save failed"), "a failed autosave is flagged and shown")
 	game.call("_fail_beat", "Test knockdown.")
-	_expect(await _wait_until(func() -> bool: return not game.get("fail_active"), 240), "the knockdown after a failed save hands back")
+	_expect(await _retry(game, 240), "the knockdown after a failed save hands back")
 	state = game.get("state") as M0State
 	_expect(state.door_blown and str(game.get("status_line")).ends_with("Back at the start of this stretch."), "the knockdown restores the unwritten beat, not the older autosave on disk")
 	await _tap(&"interact")
@@ -450,7 +450,7 @@ func _check_scene() -> void:
 	disk.store_string("not a save")
 	disk.close()
 	game.call("_fail_beat", "Test knockdown.")
-	_expect(await _wait_until(func() -> bool: return not game.get("fail_active"), 240), "the knockdown with an unreadable save hands back")
+	_expect(await _retry(game, 240), "the knockdown with an unreadable save hands back")
 	state = game.get("state") as M0State
 	_expect(state.chapter_id == "junction" and state.door_blown, "with the save unreadable the knockdown keeps the current beat")
 	game.call("_save_progress")
@@ -680,7 +680,7 @@ func _check_vent_edges(game: Node2D, human: M0Actor, wolf: M0Actor, room: Juncti
 	await create_timer(JunctionRoom.HAZARD_SECONDS + 0.2).timeout
 	_expect(game.get("fail_active") and room.display_gauge == 1.0, "and holds there through the knockdown")
 	_expect(human.z_index > wolf.z_index and room.vent_puff.color.a <= 0.35, "the knocked-down engineer draws above WOLF and the steam burst is translucent")
-	_expect(await _wait_until(func() -> bool: return not game.get("fail_active"), 240), "the vent knockdown hands back")
+	_expect(await _retry(game, 240), "the vent knockdown hands back")
 	_expect(FileAccess.get_file_as_bytes(game.get("save_path")) == a_bytes and human.position == Vector2(120.0, 410.0) and human.z_index == wolf.z_index, "the vent knockdown restores autosave A and the usual draw order")
 	_expect(str(game.get("status_line")).ends_with("Back at the last checkpoint."), "the restore line names the checkpoint it came from")
 	_expect(room.display_gauge == 0.0 and not room.gauge_tripped, "the restore puts the needle back at empty")
@@ -747,6 +747,17 @@ func _wait_until(condition: Callable, frames: int) -> bool:
 		if condition.call():
 			return true
 	return false
+
+## RETRY on the knockdown card (Q17): waits until the card takes it (Main.RETRY_READY_SECONDS after the
+## hit), presses interact once, and waits until the room has faded back in with the controls back.
+func _retry(game: Node, frames: int) -> bool:
+	if not await _wait_until(func() -> bool: return bool(game.call("_retry_ready")), frames):
+		return false
+	await process_frame
+	Input.action_press(&"interact")
+	await process_frame
+	Input.action_release(&"interact")
+	return await _wait_until(func() -> bool: return not bool(game.get("fail_active")) and not bool(game.get("retry_fading_in")), frames)
 
 
 func _walk_to(actor: M0Actor, target_x: float) -> bool:
@@ -853,7 +864,7 @@ func _check_blast_facing_door(game: Node2D, room: JunctionRoom, human: M0Actor, 
 	var foot_x: float = room.global_position.x + JunctionRoom.DOOR_FOOT_X
 	var hidden: int = _lip_pixels_in(room.door_lip, body)
 	_expect(span.y <= foot_x - MainScript.LANE_FALL_CLEAR + 0.01 and hidden == 0, "facing the door %s, the whole lying body is clear of the front lip (head at %.1f, the lip's foot at %.1f, %d px under the lip)" % [label, span.y, foot_x, hidden])
-	_expect(await _wait_until(func() -> bool: return not game.get("fail_active"), 240), "the knockdown facing the door %s hands back" % label)
+	_expect(await _retry(game, 240), "the knockdown facing the door %s hands back" % label)
 	_expect(await _wait_until(func() -> bool: return not room.door_shape.disabled and room.door_art.visible and not room.door_blown, 5), "the door stands sealed again after that restore")
 
 

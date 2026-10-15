@@ -272,9 +272,18 @@ const WOLF_RUBBLE_HYSTERESIS: float = 24.0
 const MENU_NAVIGATION_ACTIONS: Array[StringName] = [&"ui_accept", &"ui_up", &"ui_down", &"ui_left", &"ui_right", &"ui_focus_next", &"ui_focus_prev"]
 ## Every gameplay action; pause and a knockdown release them all so nothing stays held.
 const GAMEPLAY_ACTIONS: Array[StringName] = [&"move_left", &"move_right", &"interact", &"choice_1", &"choice_2"]
-## A knockdown keeps the controls off this long before the fade to the last autosave.
-const FAIL_CONTROLS_OFF_SECONDS: float = 0.7
-const FAIL_FADE_SECONDS: float = 0.4
+## A knockdown's timing (Cold Still, decided October 11 and confirmed as Q17 on October 14, 2026): its
+## card takes RETRY from this long after the hit, the same for the first knockdown and every repeat,
+## and holds until then, never moving on by itself. RETRY fades to black, the last autosave comes back,
+## the room fades in, and control returns once it has: about 1.5 s after the hit for a press at once.
+const RETRY_READY_SECONDS: float = 0.9
+const RETRY_FADE_OUT_SECONDS: float = 0.25
+const RETRY_FADE_IN_SECONDS: float = 0.35
+## The knockdown card's prompt in the hint bar (the approved death-text set, final entries 3 to 5): the
+## interact key or button, or TAP RETRY on touch, where the USE button reads RETRY.
+const RETRY_PROMPT: String = "%s  RETRY"
+const RETRY_TOUCH_PROMPT: String = "TAP RETRY"
+const RETRY_BUTTON_TEXT: String = "RETRY"
 const HUMAN_SPRITE_REST: Vector2 = Vector2(0.0, -5.0)
 ## Both actors draw at this depth; a knocked-down engineer draws one step above WOLF so the fall
 ## is never hidden behind him.
@@ -549,6 +558,12 @@ var exit_sparks: CPUParticles2D
 ## True from a knockdown until the last autosave is back; the engineer has no controls meanwhile.
 var fail_active: bool = false
 var fail_tween: Tween
+## Seconds since the knockdown's hit, its card (the cause), and whether RETRY has been pressed.
+var fail_age: float = 0.0
+var fail_reason: String = ""
+var retrying: bool = false
+## After RETRY the room fades back in with the controls still off (RETRY_FADE_IN_SECONDS).
+var retry_fading_in: bool = false
 ## The standing engineer's image and scale, put back when they get up, and their floor reflection.
 var human_texture: Texture2D
 var human_sprite_scale: Vector2 = Vector2.ONE
@@ -1082,7 +1097,11 @@ func _process(delta: float) -> void:
 		# sentry, even after breaking off, when he walked back in facing the entrance.
 		wolf.body_sprite.flip_h = human.position.x < wolf.position.x
 	if fail_active:
-		# Knocked down: the reaction plays out and the last autosave returns; nothing else reads input.
+		# Knocked down: the card holds until RETRY, which it takes from RETRY_READY_SECONDS after the hit
+		# (only a fresh press counts: the knockdown released every held action); nothing else reads input.
+		fail_age += delta
+		if _retry_ready() and Input.is_action_just_pressed(&"interact"):
+			_retry()
 		_tick_dialogue(delta)
 		_refresh_ui()
 		return
@@ -3413,18 +3432,16 @@ func _fail_beat(reason: String, by_sentry: bool = false) -> void:
 	human.z_index = KNOCKDOWN_Z
 	_cancel_door_recoil()
 	_cancel_fail_tween()
-	fail_tween = create_tween()
 	_start_collapse(by_sentry, in_lane)
-	var reaction_seconds: float = 0.0
 	if impact.motion_allowed():
-		reaction_seconds = COLLAPSE_SECONDS
+		fail_tween = create_tween()
 		fail_tween.tween_method(_show_collapse, 0.0, COLLAPSE_SECONDS, COLLAPSE_SECONDS)
 	else:
 		_show_collapse(COLLAPSE_SECONDS)
-	fail_tween.tween_interval(FAIL_CONTROLS_OFF_SECONDS - reaction_seconds)
-	fail_tween.tween_property(intro_fade, "color:a", 1.0, FAIL_FADE_SECONDS)
-	fail_tween.tween_callback(_restore_beat.bind(reason))
-	fail_tween.tween_property(intro_fade, "color:a", 0.0, 0.35)
+	# The card holds until RETRY (_retry), from RETRY_READY_SECONDS.
+	fail_age = 0.0
+	fail_reason = reason
+	retrying = false
 	status_line = reason
 	_refresh_ui()
 
@@ -3541,8 +3558,35 @@ func _stand_up() -> void:
 		human_reflection.shadow_span = Vector2.ZERO
 
 
+## The knockdown card takes RETRY: RETRY_READY_SECONDS after the hit, every time (Q17).
+func _retry_ready() -> bool:
+	return fail_active and not retrying and fail_age >= RETRY_READY_SECONDS
+
+
+## RETRY on the knockdown card: a fade to black, the last autosave back, a fade in, then control.
+func _retry() -> void:
+	retrying = true
+	if collapsed:
+		_show_collapse(COLLAPSE_SECONDS)
+	_cancel_fail_tween()
+	fail_tween = create_tween()
+	fail_tween.tween_property(intro_fade, "color:a", 1.0, RETRY_FADE_OUT_SECONDS)
+	fail_tween.tween_callback(_restore_beat.bind(fail_reason))
+	fail_tween.tween_property(intro_fade, "color:a", 0.0, RETRY_FADE_IN_SECONDS)
+	fail_tween.tween_callback(_end_retry_fade)
+
+
+## The room has faded back in after RETRY: the engineer has their controls again.
+func _end_retry_fade() -> void:
+	retry_fading_in = false
+	_update_controls()
+
+
 func _restore_beat(reason: String) -> void:
 	fail_active = false
+	retrying = false
+	# The controls stay off while the room fades back in (_end_retry_fade).
+	retry_fading_in = true
 	var restored: bool = false
 	var from_disk: bool = false
 	# A failed autosave leaves an older file on disk; the snapshot is the beat that failed to write.
@@ -3597,6 +3641,8 @@ func _cancel_fail() -> void:
 	_cancel_fail_tween()
 	_cancel_door_recoil()
 	fail_active = false
+	retrying = false
+	retry_fading_in = false
 	_stand_up()
 	human.z_index = ACTOR_Z
 
@@ -3819,7 +3865,7 @@ func _set_seal_lamp(color: Color) -> void:
 
 
 func _update_controls() -> void:
-	human.controlled = not title_open and not intro_active and not chapter_close_active and not end_card_active and not waiting_for_choice and not fail_active and engineer_step_x < 0.0 and not engineer_waits_for_wolf and not lane_question_held
+	human.controlled = not title_open and not intro_active and not chapter_close_active and not end_card_active and not waiting_for_choice and not fail_active and not retry_fading_in and engineer_step_x < 0.0 and not engineer_waits_for_wolf and not lane_question_held
 	# Stepping back from the relay, the engineer walks on their own for a moment; leaving the junction
 	# they wait for WOLF to go through the hatch first.
 	if hatch_exit_walking:
@@ -3957,14 +4003,14 @@ func _refresh_ui() -> void:
 	pause_button.visible = not title_open and not pause_overlay.visible
 	pause_button.text = "PAUSE"
 	touch_controls.visible = (touch_layout or waiting_for_choice) and not title_open and not pause_overlay.visible
-	var touch_move: bool = not intro_active and not chapter_close_active and not waiting_for_choice
+	var touch_move: bool = not intro_active and not chapter_close_active and not waiting_for_choice and not fail_active
 	touch_left.visible = touch_layout and touch_move
 	touch_right.visible = touch_layout and touch_move
 	touch_use.visible = touch_layout and not waiting_for_choice and not hatch_exit_walking
-	touch_use.text = "CONTINUE" if intro_active or chapter_close_active else ("CRANK" if not _hold_station().is_empty() else ("DROP" if _drop_ready() else "USE"))
+	touch_use.text = RETRY_BUTTON_TEXT if fail_active else ("CONTINUE" if intro_active or chapter_close_active else ("CRANK" if not _hold_station().is_empty() else ("DROP" if _drop_ready() else "USE")))
 	touch_choice_1.visible = waiting_for_choice
 	touch_choice_2.visible = waiting_for_choice
-	tutorial_prompt.visible = not title_open and not intro_active and state.chapter_id == "lockdown" and tutorial_step < 2
+	tutorial_prompt.visible = not title_open and not intro_active and not fail_active and state.chapter_id == "lockdown" and tutorial_step < 2
 	if tutorial_prompt.visible:
 		var interact_key: String = settings_menu.prompt(&"interact", controller_active)
 		var move_keys: String = "%s / %s" % [settings_menu.prompt(&"move_left", false), settings_menu.prompt(&"move_right", false)]
@@ -4042,6 +4088,9 @@ func _refresh_ui() -> void:
 		hint = hint.replace("E:", "%s:" % settings_menu.prompt(&"interact", true))
 	else:
 		hint = hint.replace("E:", "%s:" % settings_menu.prompt(&"interact", false))
+	if _retry_ready():
+		# The knockdown card's one prompt once it takes RETRY (Q17); before that only a save error shows.
+		hint = RETRY_TOUCH_PROMPT if touch_layout else RETRY_PROMPT % settings_menu.prompt(&"interact", controller_active)
 	# The tutorial prompt is the one prompt while it shows; the hint bar would only repeat it.
 	_set_dialogue("" if waiting_for_choice or tutorial_prompt.visible else hint)
 
