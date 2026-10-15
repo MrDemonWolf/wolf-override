@@ -933,7 +933,7 @@ The installed art is byte-identical to each track's delivered file: atlas 9b1719
   - `tools/tests.sh`, `render_run.sh`, `capture_all.sh` and `headless_perf.sh` (adapted copies of `fix6/tools`; `integrate/tools/` at ada83fa);
   - `tools/opening_diff7.py`, `state_diff7.py`, `perf_table7.py` and `package7.py` (`integrate/tools/` at ada83fa; round 11's `fix4/tools/` holds the current copies);
   - `driver/realslice_capture.gd` (`integrate/driver/realslice_capture.gd` at ada83fa), a copy of `fix3/driver` that adds s4b and the crank strip;
-  - `patches/` (the beacon and crank diffs with relative paths);
+  - `patches/` (the beacon and crank diffs with relative paths; `integrate/patches/` at ada83fa: they equal `beacons/beacons-code.diff` and `crank/deliver/crank-code.diff` except for their path headers);
   - `probe/` (the main beacon probe, and private main and round-6 copies for headless timing);
   - `negtest/` (the negative crank checks);
   - `work/`, `manifest.before.json` and the battery logs.

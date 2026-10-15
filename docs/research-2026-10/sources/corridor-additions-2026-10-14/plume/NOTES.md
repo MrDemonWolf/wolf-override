@@ -121,7 +121,7 @@ Measured in the render.sh capture (mock/stats-720.json and stats-phone.json agre
   - corridor-coolant-relay.png: a literal binary hunk, preimage blob 38bfcf9
   - bypass_handle.gd
   - fx_presets.gd
-- `patch/plume-code.patch`: the same, without the PNG hunk.
+- `patch/plume-code.patch` (`plume/patch/plume-code.patch` at ada83fa): the same, without the PNG hunk; every hunk of it is also in `plume.patch`.
 
 Changes:
 - **fx_presets.gd**:
@@ -141,7 +141,7 @@ Changes:
 To integrate, from the root of game-slice, or of main after round 6 lands:
 `git apply --check <plume>/patch/plume.patch && git apply <plume>/patch/plume.patch`.
 I checked it here against a copy of game-slice: it applies cleanly and reproduces game-plume's four files byte for
-byte. If the binary hunk refuses because the relay PNG's base changed, apply `plume-code.patch` and copy
+byte. If the binary hunk refuses because the relay PNG's base changed, apply `plume-code.patch` (`plume/patch/plume-code.patch` at ada83fa) and copy
 `layer/corridor-coolant-relay.png` over `assets/props/corridor-coolant-relay.png`. If the relay art itself changed,
 re-run tools/cleanup.py on the new base instead, since it merges only inside the masks. The manifest hunk touches
 only the coolant relay entry. Then import twice headless.
