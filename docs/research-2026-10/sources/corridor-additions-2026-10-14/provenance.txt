@@ -182,7 +182,9 @@ No Codex session was started. No image tool was used.
       corridor-far.png         5d74d1d727d7f48ad6706bde572c0dc389fac59997e7be606230848059704ce3
       eng-crank-atlas.png      356064e459cc4242b77f3c3c142fa2f8ef6784fb5d60c604ec068229d3bcf4a6
   * The filed edit-target scripts (door/tools/codex_inputs7.py, fix1/door/tools/codex_inputs8.py,
-    fix4/door/tools/codex_inputs11.py) now blank the hood's typeset lettering (hood_blank.py); the targets
+    fix4/door/tools/codex_inputs11.py) now blank the hood's typeset lettering (hood_blank.py, filed once in
+    door/tools/; a re-run of codex_inputs8.py or codex_inputs11.py needs it copied beside them, as it was
+    filed there too: fix1/door/tools/hood_blank.py and fix4/door/tools/hood_blank.py at ada83fa); the targets
     the sessions used are kept unchanged in <track>/codex/<job>/refs/ (door/codex/paint-door7/refs/,
     fix1/codex/paint-door8/refs/, fix4/codex/paint-jamb11/refs/).
   * Filed here with their C2PA chunk (caBX) checked present and SHA-256 equal to the records above: the
