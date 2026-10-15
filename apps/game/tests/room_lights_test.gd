@@ -187,15 +187,12 @@ func _check_scene() -> void:
 	game.call("_return_to_title")
 	game.call("_new_game")
 	game.call("_finish_intro")
+	# The corridor's lens dims with each flash and is at full red only for an instant, so read it as the
+	# new game sets the beacons back, before the flash has run a frame (a busy machine can skip that
+	# instant later), then check the flash is running.
+	var restart_lens: Color = _lens(corridor)
 	var new_game_pulsing: bool = await _beacons_pulse(corridor)
-	# The corridor's lens now dims with each flash, so look for it back at full red over a cycle.
-	var top_red: float = 0.0
-	var watch_start: int = Time.get_ticks_usec()
-	while Time.get_ticks_usec() - watch_start < 900000:
-		await process_frame
-		top_red = maxf(top_red, _lens(corridor).r)
-	var full_red: bool = top_red >= corridor.warning_color.r - 0.02
-	_expect(not corridor.lockdown_cleared and full_red and new_game_pulsing, "a new game brings the corridor's pulse back (cleared %s, lens red up to %.2f, pulsing %s)" % [corridor.lockdown_cleared, top_red, new_game_pulsing])
+	_expect(not corridor.lockdown_cleared and restart_lens.is_equal_approx(corridor.warning_color) and new_game_pulsing, "a new game brings the corridor's pulse back (cleared %s, lens %s, pulsing %s)" % [corridor.lockdown_cleared, restart_lens, new_game_pulsing])
 	game.call("_return_to_title")
 	game.call("_load_game")
 	var continued_pulsing: bool = await _beacons_pulse(corridor)
