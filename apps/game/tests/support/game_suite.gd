@@ -173,7 +173,7 @@ static func texture_image(texture: Texture2D) -> Image:
 ## [param game] is the running game; [param max_frames] bounds each of the two waits, in physics
 ## frames. Returns false when the card never takes RETRY or the room never comes back in time.
 ## The press is held for exactly one process frame, the way a tap reaches the game. Users: the suites
-## that knock the engineer down (approved_wording, impact, junction, sentry).
+## that knock the engineer down (approved_wording, debug_tools, impact, junction, sentry).
 static func retry(game: Node, max_frames: int) -> bool:
 	if not await wait_until(func() -> bool: return bool(game.call("_retry_ready")), max_frames):
 		return false

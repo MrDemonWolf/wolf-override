@@ -1,6 +1,7 @@
 extends SceneTree
 
 const GAME_SCENE: PackedScene = preload("res://scenes/main.tscn")
+const Suite = preload("res://tests/support/game_suite.gd")
 
 var failures: int = 0
 var base: String = ""
@@ -1684,13 +1685,9 @@ func _check_forcing() -> void:
 		note = actions.force_knockdown(kind)
 		_expect(game.get("fail_active") and str(game.get("status_line")) == expected and note == "Forced the %s knockdown." % kind, "forcing the %s knockdown plays it with its own card, even while invincible" % kind)
 		_expect(actions.force_knockdown(kind).contains("already"), "a second force waits for the first")
-	# RETRY on the knockdown card (Q17), once it takes it.
-	await create_timer(float(game.get_script().get_script_constant_map()["RETRY_READY_SECONDS"]) + 0.1).timeout
-	await process_frame
-	Input.action_press(&"interact")
-	await process_frame
-	Input.action_release(&"interact")
-	await create_timer(float(game.get_script().get_script_constant_map()["RETRY_FADE_OUT_SECONDS"]) + float(game.get_script().get_script_constant_map()["RETRY_FADE_IN_SECONDS"]) + 0.3).timeout
+	# RETRY on the knockdown card (Q17), pressed the way every suite presses it; the check below says
+	# whether the room came back.
+	await Suite.retry(game, 240)
 	_expect(not game.get("fail_active") and str(game.get("status_line")).contains(str(game.get_script().get_script_constant_map()["RESTORE_FROM_DISK_LINE"])) and (game.get("state") as M0State).chapter_id == "junction" and not (game.get("state") as M0State).door_blown, "the forced knockdown brings back the beat's checkpoint (junction save A)")
 	actions.set_invincible(false)
 	# The door fuse, the engineer clear of the blast.
