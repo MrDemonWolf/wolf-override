@@ -307,14 +307,6 @@ func _check_lying(human: M0Actor, label: String) -> void:
 	_expect(span.x <= local.position.x + 2.0 and span.y >= local.end.x - 2.0 and is_equal_approx(reflection.shadow.position.y, MainScript.HUMAN_FLOOR_Y), "%s the shadow lies under the whole body (%.1f..%.1f under %.1f..%.1f)" % [label, span.x, span.y, local.position.x, local.end.x])
 
 
-func _wait_until(condition: Callable, frames: int) -> bool:
-	for _frame: int in range(frames):
-		await physics_frame
-		if condition.call():
-			return true
-	return false
-
-
 ## Q17 (Cold Still timing, October 14, 2026), the same on the first knockdown and every repeat: the card
 ## takes RETRY at 0.9 s and not before, holds until it is pressed, and a press at once has control back
 ## at about 1.5 s. Time is the game's own (the frames' deltas, as the knockdown and its tweens count it),
@@ -371,6 +363,14 @@ func _check_retry_timing(game: Node, context: String) -> void:
 		await process_frame
 	_expect(human.controlled and not bool(game.get("fail_active")) and after_press >= 0.6 - 0.001 and after_press - 0.6 <= longest_frame + 0.001, "%s: control comes back 0.6 s after RETRY, so about 1.5 s after the hit for a press at 0.9 s (%.3f s after the press, frames up to %.3f s)" % [context, after_press, longest_frame])
 	_expect(is_equal_approx(MainScript.RETRY_READY_SECONDS + MainScript.RETRY_FADE_OUT_SECONDS + MainScript.RETRY_FADE_IN_SECONDS, 1.5), "%s: 0.9 s + 0.25 s fade out + 0.35 s fade in = 1.5 s" % context)
+
+
+func _wait_until(condition: Callable, frames: int) -> bool:
+	for _frame: int in range(frames):
+		await physics_frame
+		if condition.call():
+			return true
+	return false
 
 
 func _walk_to(actor: M0Actor, target_x: float) -> bool:
