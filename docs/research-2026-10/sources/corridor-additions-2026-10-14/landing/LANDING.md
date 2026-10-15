@@ -1,6 +1,25 @@
-# Landing the corridor additions on main (2026-10-14)
+# Landing the corridor additions on main (2026-10-14, fixed 2026-10-15)
 
 Branch `codex/corridor-additions` from origin/main c5d1d84. What was ported and why is in `../README.md` ("The landing"). This file says how it was checked. Nothing was played by hand, so it makes no claim about how the door end, the flash, the crank or WOLF's walk feel.
+
+## Player-facing text
+
+- **In-game, new (no old text):** the sign `RESTRICTED AREA` above the door. It is typeset by script in the game's bundled Roboto (`../integrate/tools/package7.py`, carried through `../fix*/tools/package*.py`), not painted by the image tool. `SECTOR 4B` and `DOOR 4B-07` were already on main (round 6) and are unchanged.
+- **In-game, unchanged:** no story, WOLF or narration line was added, removed or reworded ("We made it." and "Open. I'm with you." are untouched).
+- **Website and in-game changelog:** a new section "October 15, 2026" with the door-end entry and its Website entry (moved there from October 14 on 2026-10-15, as the merge cannot happen before then). In the October 14 WOLF entry, old: "Once the corridor's door is open he follows you no further than the relay's left side and waits there, facing you, while you go on to the safe point, instead of standing over the MANUAL BYPASS and in the doorway; this is a stopgap until the corridor's door end is redrawn with room for him." New: "Once the corridor's door is open he follows you no further than the relay's left side while you walk through, instead of standing over the MANUAL BYPASS and in the doorway; at the safe point itself he now comes to the open doorway (see the door end entry above)." The corridor walkthrough, Settings, Credits and Testing pages change as listed in `../README.md`.
+
+## Deviations from the must-fix checks, to be accepted
+
+- **High-pass detail in the review's box** (atlas x 728-840, y 296-338) was asked to be 3 or less. Over the whole box it is 5.51 after the repaint (5.82 before; the landing verifier's sigma-2 measure: round 6 2.76, round 11 5.03, landing 4.85), because the box holds the head plate's designed joints, the parked inner leaf's stripes and the doorway's alpha edge, none of which were in round 6. Over the repainted plate paint it falls from 2.62 to 1.45 (round 6: 1.42; the verifier: 2.73 to 1.55), and the 5x stretched and high-pass crops show no letter shapes (`atlasfix/`).
+- **Byte identity with round 11** was asked for every corridor state and opening frame at 1280x720. 19 of 29 frames are byte-identical; the other 10 differ only in the ceiling lamps' run-to-run flicker at the top of the screen, with 0 door-end pixels changed. The verifier also showed the door end cannot change: all 1,633 changed atlas pixels sit under hood pixels that are fully opaque (minimum alpha 255) within 2 world px all round, and the hood is drawn whenever the corridor is.
+
+## Fixes after the landing verification (2026-10-15)
+
+- **Changelog date:** the door-end entry and its Website entry now sit under October 15, 2026; the in-game changelog was regenerated (`scripts/export_changelog.py`) and the drift check is green.
+- **WOLF walking to and fro by the doorway:** the verifier saw him set off for the doorway with the engineer at x 806 and walk back when they stepped to 794, each time about 200 px. He now sets off only once the engineer is at the safe point's near edge (x 824, `WOLF_DOORWAY_HOLD_X` 800 plus `WOLF_DOORWAY_HYSTERESIS` 24) and, once set off, keeps the doorway until they are back within a clear gap of him (x 800), so the bodies still never overlap. `wolf_space_test` gained two edge cases on all three relay answers: walking to and fro between x 788 and 812 from the relay's left, and between 812 and 840 from the doorway, with 0 changes of mind allowed. With the hysteresis set to 0 the first case fails on every route (5 changes of mind each).
+- **`room_lights_test` under load:** the "a new game brings the corridor's pulse back" check had to catch the lens at the brief top of a flash inside 0.9 s of wall-clock time and failed once at a load average of about 127. It now reads the lens as the new game sets the beacons back, before the flash has run a frame, then checks the flash runs.
+- **Repaint pixel count:** the README, provenance and the asset register said 1,702 px; the repaint changed 1,633 px (repaint mask 1,793 px), as `atlasfix/report12.json` and the verifier's diff of the round 11 atlas against the landing atlas both give.
+- **decisions.md:** the stopgap sentence in the now-built decision is in the past tense.
 
 ## Evidence
 

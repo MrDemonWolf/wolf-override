@@ -174,7 +174,7 @@ Round 10's installed game copy (scripts, scene, tests, assets; no .godot) is kep
 No Codex session was started. No image tool was used.
   * corridor-seal-atlas.png: round 11's atlas (sha256 a46626df12321ed2...) with the head plate's flat paint
     repainted by Python behind the hood, where the image tool had left a faint copy of DOOR 4B-07
-    (review r5, should-fix 1): landing/atlasfix/repaint_head12.py (masks.py), 1,702 px, alpha unchanged;
+    (review r5, should-fix 1): landing/atlasfix/repaint_head12.py (masks.py), 1,633 px changed (mask 1,793 px), alpha unchanged;
     installed sha256 066e39918a6fb7af69a4580c0b30838a27478f59e3f8045c5914b4e802c0f33d.
   * Every other installed file is round 11's, byte for byte (sha256):
       corridor-beacons.png     5e055b4e416ec0eb2b17c77053de44723dc4aa8b79c1959d35dc73e7274b7977
