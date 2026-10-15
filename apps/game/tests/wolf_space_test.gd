@@ -8,12 +8,14 @@ extends SceneTree
 ## What is measured is what the player sees: each body's painted pixels (more than half opaque) along
 ## the floor, from the live sprites, so a moved prop or a new image is measured as drawn.
 ## - Stations: every room's machines (the corridor's purge display, breaker, coolant relay, MANUAL
-##   BYPASS and safe point; Records' purge queue, mirror port and exit; the junction's breaker, valve,
+##   BYPASS and safe point; Records' purge queue, mirror port and security container; the junction's breaker, valve,
 ##   TANK RELEASE and exit bolt panel, and the tank once it is down), plus the sentry, live or crushed.
 ## - Door frames: the doors the walk line passes through, the corridor's seal portal (frame and near
-##   column) and the junction's bulkhead (sealed, breaking or blown, and its front pillar).
-## - Not counted: the junction's entry and exit hatches, doorways in the back wall that the actors stand
-##   in front of, and the relief vent, a grate in the floor. The walk-out through the exit hatch is P0-5's.
+##   column), Records' entry and exit and the junction's entry and exit while they are shut (from the
+##   leaf's face on the walk line to the near column), and the junction's blast door (its shut or
+##   breaking leaf and its near column) and the leaf it throws, lying in the lane.
+## - Not counted: the relief vent, a grate in the floor. Standing in an open doorway behind its near
+##   jamb and the walk-outs through the exits are door_route_test's.
 ## Touching (at most TOUCH px of shared painted pixels) is not an overlap.
 
 const GAME_SCENE: PackedScene = preload("res://scenes/main.tscn")
@@ -190,7 +192,8 @@ func _junction_entry(game: Main, actions: DebugActions) -> void:
 	await _frames(5)
 	game.human.position.x = 830.0
 	await _tap(&"interact")
-	_require(game.state.chapter_id == "junction" and game.wolf_scouting, "USE at the secured exit enters the junction with WOLF heading for the valve")
+	# USE at the open exit walks them out through it; the junction begins once WOLF is through too.
+	_require(await _wait_until(func() -> bool: return game.state.chapter_id == "junction", 400) and game.wolf_scouting, "USE at the secured exit walks them out into the junction with WOLF heading for the valve")
 	_require(await _wait_until(func() -> bool: return absf(game.wolf.position.x - JunctionRoom.WOLF_SEAM_X) <= 2.0, 240), "WOLF reaches the valve")
 	await _frames(10)
 	await _check_rest(game, "junction, WOLF reading the LINE gauge on entry")
@@ -324,16 +327,27 @@ func _obstacles(game: Main) -> Array[Array]:
 			found.append(["the MANUAL BYPASS", Vector2(Main.BYPASS_WHEEL.x - BypassHandle.COLLAR_RADIUS, Main.BYPASS_WHEEL.x + BypassHandle.COLLAR_RADIUS)])
 		"records":
 			var records: RecordsRoom = game.records_room
-			sprites = {"the purge queue": records.get_node("PurgeArt"), "the mirror port": records.get_node("MirrorArt"), "the Records exit": records.get_node("ExitArt")}
+			sprites = {"the purge queue": records.get_node("PurgeArt"), "the mirror port": records.get_node("MirrorArt")}
+			# The container and the doors are regions of one atlas mesh: their spans on the walk line.
+			found.append(["the security container", RecordsRoom.CONTAINER_SPAN])
+			found.append(["the shut Records entry", Vector2(RecordsRoom.ENTRY_COLUMN_AT.x, RecordsRoom.ENTRY_DOOR_X)])
+			if not game.state.chapter_complete:
+				found.append(["the shut Records exit", Vector2(RecordsRoom.EXIT_DOOR_X, RecordsRoom.EXIT_COLUMN_AT.x + RecordsRoom.EXIT_COLUMN_REGION.size.x * RecordsRoom.DOORS_SCALE)])
 		"junction":
 			var room: JunctionRoom = game.junction_room
 			sprites = {
 				"the junction breaker": room.get_node("BreakerArt"), "the valve": room.get_node("ValveArt"),
 				"the TANK RELEASE": room.get_node("ArmPanelArt"), "the exit bolt panel": room.get_node("BoltPanelArt"),
 				"the sentry": room.get_node("Sentry/Visual/Body"), "the crushed sentry": room.get_node("Sentry/Visual/Wreck"),
-				"the sealed bulkhead": room.get_node("DoorVisual/DoorArt"), "the breaking bulkhead": room.get_node("DoorVisual/DoorBreakingArt"),
-				"the blown bulkhead": room.get_node("DoorVisual/DoorBlownArt"), "the bulkhead's front pillar": room.get_node("DoorVisual/DoorLip"),
+				"the blast door's shut leaf": room.door_leaf, "the blast door's breaking leaf": room.door_leaf_breaking,
+				"the blast door's near column": room.door_column, "the thrown leaf lying in the lane": room.door_leaf_down,
 			}
+			# The entry stands shut behind them, and the exit until it has slid open: from the leaf's face
+			# on the walk line to the near jamb.
+			found.append(["the shut junction entry", Vector2(JunctionRoom.ENTRY_FRONT_AT.x, JunctionRoom.ENTRY_DOOR_X)])
+			if room.hatch_open <= 0.0:
+				var exit_leaf_x: float = JunctionRoom.EXIT_DOOR_X + 40.0 * JunctionRoom.EXIT_LEAF_N / cos(deg_to_rad(JunctionRoom.EXIT_WALL_ANGLE))
+				found.append(["the shut junction exit", Vector2(exit_leaf_x, maxf(exit_leaf_x, JunctionRoom.EXIT_NEAR_JAMB_X))])
 			# The tank stands on the floor only once it is down; hanging, he runs under it.
 			if game.state.sentry_down:
 				sprites["the landed tank"] = room.get_node("Tank")
