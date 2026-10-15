@@ -68,6 +68,8 @@ const TUTORIAL_FONT_SIZE: int = 17
 ## The play hint sits this far above the dialogue box. With the touch buttons up it stays between
 ## ◀ ▶ and USE (their inner edges at x 238 and 773), so USE never covers its end (PHONE-7).
 const HINT_GAP: float = 4.0
+## The most of its own area the tutorial prompt may lay over the corridor's machines in the top card's place.
+const TUTORIAL_ART_OVERLAP: float = 0.1
 const TOUCH_HINT_SPAN: Vector2 = Vector2(250.0, 761.0)
 ## On the opening's first box: Pause offers SKIP OPENING (P0-13's stopgap until the opening is reworked).
 const SKIP_OPENING_HINT: String = "PAUSE: skip the opening"
@@ -479,6 +481,8 @@ var last_top_card_key: String = ""
 var chapter_close_active: bool = false
 var chapter_tween: Tween
 var tutorial_step: int = 2
+## Where the tutorial prompt stands: under_card, card_place, bottom or waiting (hidden behind a box; see _tutorial_prompt_place).
+var tutorial_prompt_slot: StringName = &"under_card"
 var waiting_for_choice: bool = false
 var choice_context: String = ""
 var relay_refused: bool = false
@@ -4321,7 +4325,7 @@ func _story_wrap_width(column: float) -> float:
 
 ## Lays out the HUD's text for the current text size, input and box: the dialogue box (its name
 ## column beside the words while both fit the canvas, above them when they do not; narration without
-## one), the hint bar above it (or in its place while no box is up), the top card, the tutorial prompt under the card and the answer buttons.
+## one), the hint bar above it (or in its place while no box is up), the top card, the tutorial prompt under the card (or off a station, see _tutorial_prompt_place) and the answer buttons.
 func _layout_hud() -> void:
 	var touch_layout: bool = touch_enabled and not controller_active
 	_set_font_size(story, TextSize.px(DIALOGUE_FONT_SIZE))
@@ -4351,19 +4355,6 @@ func _layout_hud() -> void:
 	speaker_rule.visible = speaker.visible and not stacked
 	_set_rect(speaker_rule, Vector2(DIALOGUE_PADDING.x + names + SPEAKER_GAP * 0.5, DIALOGUE_PADDING.y + 2.0), Vector2(1.0, text_height - 4.0))
 	_set_rect(dialogue_accent, Vector2(1.0, 1.0), Vector2(3.0, bar_height - 2.0))
-	# The hint bar: top right under PAUSE in the opening and the closing shots, otherwise just above the
-	# dialogue box; on touch between ◀ ▶ and USE.
-	var cinematic: bool = intro_active or chapter_close_active
-	var hint_width: float = minf(278.0 * TextSize.factor, 440.0) if cinematic else (TOUCH_HINT_SPAN.y - TOUCH_HINT_SPAN.x if touch_layout else minf(549.0 * TextSize.factor, 960.0 - HUD_SIDE_MARGIN * 2.0))
-	_set_rect(context_hint_text, Vector2(13.0, 3.0), Vector2(hint_width - 23.0, context_hint_text.size.y))
-	var hint_height: float = maxf(35.0, context_hint_text.get_line_height() * context_hint_text.get_line_count() + 8.0)
-	var hint_x: float = 960.0 - 32.0 - hint_width if cinematic else (TOUCH_HINT_SPAN.x if touch_layout else roundf((960.0 - hint_width) * 0.5))
-	# With no box up the hint takes the box's place at the bottom instead of floating over the floor.
-	var hint_bottom: float = DIALOGUE_BOTTOM - bar_height - HINT_GAP if bottom_bar.visible else DIALOGUE_BOTTOM
-	var hint_y: float = 94.0 if cinematic else hint_bottom - hint_height
-	_set_rect(context_hint, Vector2(hint_x, hint_y), Vector2(hint_width, hint_height))
-	_set_rect(context_hint_text, Vector2(13.0, 3.0), Vector2(hint_width - 23.0, hint_height - 6.0))
-	_set_rect(context_hint.get_node("Accent") as Control, Vector2(1.0, 1.0), Vector2(3.0, hint_height - 2.0))
 	# The top card grows with its text, left of PAUSE (and of the touch DEBUG button where it shows),
 	# and takes a third row if its words need one there.
 	var card_width: float = clampf(448.0 * TextSize.factor, 448.0, 820.0)
@@ -4374,14 +4365,93 @@ func _layout_hud() -> void:
 	_set_rect(top_card, top_card.position, Vector2(card_width, card_height))
 	_set_rect(hud, Vector2(16.0, 7.0), Vector2(card_width - 28.0, card_height - 11.0))
 	_set_rect(top_card.get_node("Accent") as Control, Vector2.ZERO, Vector2(4.0, card_height))
+	# The hint bar: top right under PAUSE (and under the top card where that reaches across) in the
+	# opening and the closing shots, otherwise just above the dialogue box; on touch between ◀ ▶ and USE.
+	var cinematic: bool = intro_active or chapter_close_active
+	var hint_width: float = minf(278.0 * TextSize.factor, 440.0) if cinematic else (TOUCH_HINT_SPAN.y - TOUCH_HINT_SPAN.x if touch_layout else minf(549.0 * TextSize.factor, 960.0 - HUD_SIDE_MARGIN * 2.0))
+	_set_rect(context_hint_text, Vector2(13.0, 3.0), Vector2(hint_width - 23.0, context_hint_text.size.y))
+	var hint_height: float = maxf(35.0, context_hint_text.get_line_height() * context_hint_text.get_line_count() + 8.0)
+	var hint_x: float = 960.0 - 32.0 - hint_width if cinematic else (TOUCH_HINT_SPAN.x if touch_layout else roundf((960.0 - hint_width) * 0.5))
+	# With no box up the hint takes the box's place at the bottom instead of floating over the floor.
+	var hint_bottom: float = DIALOGUE_BOTTOM - bar_height - HINT_GAP if bottom_bar.visible else DIALOGUE_BOTTOM
+	var hint_y: float = maxf(94.0, top_card.position.y + card_height + HUD_CARD_GAP) if cinematic else hint_bottom - hint_height
+	_set_rect(context_hint, Vector2(hint_x, hint_y), Vector2(hint_width, hint_height))
+	_set_rect(context_hint_text, Vector2(13.0, 3.0), Vector2(hint_width - 23.0, hint_height - 6.0))
+	_set_rect(context_hint.get_node("Accent") as Control, Vector2(1.0, 1.0), Vector2(3.0, hint_height - 2.0))
 	# The tutorial prompt, sized to its rows and centred under the card.
 	var tutorial_size: Vector2 = tutorial_text.get_minimum_size() + Vector2(32.0, 18.0)
 	tutorial_size.x = maxf(tutorial_size.x, 316.0 if tutorial_text.text.contains("\n") else 0.0)
-	_set_rect(tutorial_prompt, Vector2(roundf(480.0 - tutorial_size.x * 0.5), top_card.position.y + card_height + 18.0), tutorial_size)
+	var tutorial_rect: Rect2 = Rect2(Vector2(roundf(480.0 - tutorial_size.x * 0.5), top_card.position.y + card_height + 18.0), tutorial_size)
+	tutorial_prompt_slot = &"under_card"
+	if tutorial_prompt.visible and (_covers_station_name(tutorial_rect) or _station_art_overlap(tutorial_rect) > 0.0):
+		tutorial_rect.position = _tutorial_prompt_place(tutorial_rect, touch_layout)
+		if tutorial_prompt_slot == &"card_place" and top_card.visible:
+			# It takes the place of a card that is already leaving: the card goes at once instead of
+			# fading out under it.
+			top_card.hide()
+	_set_rect(tutorial_prompt, tutorial_rect.position, tutorial_size)
 	_set_rect(tutorial_text, Vector2(16.0, 9.0), tutorial_size - Vector2(27.0, 18.0))
 	_set_rect(tutorial_prompt.get_node("Accent") as Control, Vector2(1.0, 1.0), Vector2(4.0, tutorial_size.y - 2.0))
 	if waiting_for_choice:
 		_layout_choices(touch_layout, top_card.position.y + card_height + 10.0)
+
+
+## Where the tutorial prompt goes when, under the top card, it would cover a station (the breaker's
+## name it points to, at large text sizes). Once the card is fading or gone it takes the card's
+## place: as near the middle as it can stand between PAUSE (and DEBUG) and the margin, clear of every
+## station name and over at most TUTORIAL_ART_OVERLAP of its own area of the machines, the least it
+## can. Failing that it goes to the bottom while no box is up; with a box up it waits, hidden, until
+## the box has gone (one thing to read at a time, as the opening lines wait for the name card), and
+## the hint bar stays empty meanwhile. Sets tutorial_prompt_slot and returns the prompt's position.
+func _tutorial_prompt_place(rect: Rect2, touch_layout: bool) -> Vector2:
+	# The name card starts fading on the first step's frame, before its tween has moved.
+	var card_leaving: bool = last_top_card_key == "name_card" and tutorial_step >= 1
+	if not top_card.visible or top_card.modulate.a < 0.999 or card_leaving:
+		var top_right: float = pause_button.position.x
+		if debug_tools != null and debug_tools.debug_button != null and debug_tools.debug_button.visible:
+			top_right = minf(top_right, debug_tools.debug_button.position.x)
+		var best: Vector2 = Vector2(-1.0, top_card.position.y)
+		var best_overlap: float = rect.get_area() * TUTORIAL_ART_OVERLAP
+		var x: float = HUD_SIDE_MARGIN
+		while x + rect.size.x <= top_right - HUD_CARD_GAP:
+			var place: Rect2 = Rect2(Vector2(x, top_card.position.y), rect.size)
+			if not _covers_station_name(place):
+				var overlap: float = _station_art_overlap(place)
+				var nearer: bool = best.x < 0.0 or absf(x + rect.size.x * 0.5 - 480.0) < absf(best.x + rect.size.x * 0.5 - 480.0)
+				if overlap < best_overlap or (overlap == best_overlap and nearer):
+					best = place.position
+					best_overlap = overlap
+			x += 4.0
+		if best.x >= 0.0:
+			tutorial_prompt_slot = &"card_place"
+			return best
+	if not bottom_bar.visible:
+		var centre: float = (TOUCH_HINT_SPAN.x + TOUCH_HINT_SPAN.y) * 0.5 if touch_layout and rect.size.x <= TOUCH_HINT_SPAN.y - TOUCH_HINT_SPAN.x else 480.0
+		tutorial_prompt_slot = &"bottom"
+		return Vector2(roundf(centre - rect.size.x * 0.5), DIALOGUE_BOTTOM - rect.size.y)
+	tutorial_prompt_slot = &"waiting"
+	tutorial_prompt.hide()
+	return rect.position
+
+
+## Whether [param rect] (on the HUD canvas) covers a corridor station name that shows.
+func _covers_station_name(rect: Rect2) -> bool:
+	if bypass_handle == null:
+		return false
+	for label: Label in [$BreakerLabel, $RelayLabel, $CheckpointLabel, bypass_handle.fault_tag, bypass_handle.bypass_label] as Array[Label]:
+		if label.is_visible_in_tree() and label.modulate.a > 0.05 and rect.intersects(label.get_global_transform_with_canvas() * Rect2(Vector2.ZERO, label.size)):
+			return true
+	return false
+
+
+## How much of [param rect] (on the HUD canvas) lies over the corridor's machines: the purge display,
+## the breaker and the relay.
+func _station_art_overlap(rect: Rect2) -> float:
+	var area: float = 0.0
+	for art: Sprite2D in [purge_terminal_art, breaker_art, relay_art] as Array[Sprite2D]:
+		if art.is_visible_in_tree():
+			area += rect.intersection(art.get_global_transform_with_canvas() * art.get_rect()).get_area()
+	return area
 
 
 ## The two answers. With keys or a controller they stand under the top card with their key or

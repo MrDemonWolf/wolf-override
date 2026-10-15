@@ -5,7 +5,7 @@ extends SceneTree
 ## 100% text size, under 20 words, read at 0.33 s a word or slower, and without a word changed. Then
 ## the boxes the game shows on the way through the opening, the corridor, Records Access and the
 ## Service Junction are measured on screen, and the first controllable frame, the Records exit, the
-## touch layout and the TEXT SIZE setting are checked.
+## touch layout, the TEXT SIZE setting and the prompts at every size are checked.
 
 const GAME_SCENE: PackedScene = preload("res://scenes/main.tscn")
 const MAIN_SCRIPT: String = "res://scripts/main.gd"
@@ -537,6 +537,7 @@ func _check_text_size(path: String) -> void:
 	again.queue_free()
 	await process_frame
 	await _check_station_names()
+	await _check_prompts_clear(path)
 	settings.text_size.select(0)
 	settings.text_size.item_selected.emit(0)
 	_expect(is_equal_approx(TextSize.factor, 1.0) and story.get_theme_font_size(&"font_size") == 23 and breaker_label.get_theme_font_size(&"font_size") == 13, "back at 100% everything returns to its size")
@@ -584,8 +585,12 @@ func _check_station_names() -> void:
 				# the engineer sees it in full.
 				if index == 0:
 					_expect(game.bypass_handle.bypass_label.modulate.a > 0.5, "100%%: MANUAL BYPASS shows at the corridor's start (alpha %.2f)" % game.bypass_handle.bypass_label.modulate.a)
+				# The camera eases after the engineer in time, not frames: once it has its new target it is
+				# snapped there, so the check does not depend on how fast the frames run.
 				game.debug_place(Main.RELAY_SIDE_X, Main.RELAY_SIDE_X - 120.0)
-				for frame: int in 90:
+				await process_frame
+				game.intro_camera.reset_smoothing()
+				for frame: int in 3:
 					await process_frame
 				_expect(game.bypass_handle.bypass_label.modulate.a > 0.99, "%d%%: MANUAL BYPASS shows in full with the engineer beside the relay (alpha %.2f)" % [percent, game.bypass_handle.bypass_label.modulate.a])
 				var relay_name: Rect2 = (game.get_node("RelayLabel") as Label).get_global_rect()
@@ -605,6 +610,92 @@ func _check_station_names() -> void:
 			var plate: Rect2 = Rect2(room.valve_label.position, room.valve_label.size)
 			_expect(absf(plate.end.y - plate_bottom) <= 1.5, "%d%%: the %s plate stands on its line (bottom %.1f, expected %.1f)" % [percent, text.c_escape(), plate.end.y, plate_bottom])
 			_expect(not plate.intersects(Rect2(room.line_caption.position, room.line_caption.size)), "%d%%: the %s plate clears the LINE caption" % [percent, text.c_escape()])
+
+
+## At every text size, keys and touch, in a fresh game: the opening's hint bar stands below the top
+## card, not on it, and after the first step the tutorial prompt (moved off the station names where
+## it would cover the breaker's, see Main._tutorial_prompt_place) is checked on the step's own frame,
+## before any box, and again once the opening lines' first box is up, so a slow machine cannot change
+## what is checked.
+func _check_prompts_clear(path: String) -> void:
+	for touch: bool in [false, true]:
+		for index: int in TextSize.STEPS.size():
+			var fresh: Main = GAME_SCENE.instantiate() as Main
+			fresh.settings_path = "%s-prompts.cfg" % path
+			fresh.save_path = "%s-prompts.json" % path
+			fresh.auto_pause_on_focus_loss = false
+			root.add_child(fresh)
+			await process_frame
+			fresh.touch_enabled = touch
+			fresh.settings_menu.text_size.select(index)
+			fresh.settings_menu.text_size.item_selected.emit(index)
+			var context: String = "%d%%, %s" % [roundi(TextSize.STEPS[index] * 100.0), "touch" if touch else "keys"]
+			fresh.new_game_button.pressed.emit()
+			for frame: int in 40:
+				await process_frame
+			var hint_panel: Control = fresh.get_node("CanvasLayer/ContextHint") as Control
+			_expect(fresh.intro_active and fresh.top_card.visible and hint_panel.visible and not hint_panel.get_global_rect().intersects(fresh.top_card.get_global_rect()), "%s: the opening's hint bar stands below the top card (%s vs %s)" % [context, hint_panel.get_global_rect(), fresh.top_card.get_global_rect()])
+			fresh.debug_new_game(true)
+			fresh.touch_enabled = touch
+			for frame: int in 5:
+				await process_frame
+			# The frame of the first step: the name card starts its fade, so no box is up yet.
+			Input.action_press(&"move_right")
+			await process_frame
+			_expect(not fresh.bottom_bar.visible, "%s: no box is up on the frame of the first step" % context)
+			_check_prompt_clear(fresh, touch, false, context)
+			for frame: int in 5:
+				await process_frame
+			Input.action_release(&"move_right")
+			for frame: int in 600:
+				if fresh.bottom_bar.visible:
+					break
+				await process_frame
+			_check_prompt_clear(fresh, touch, true, context)
+			_expect(fresh.bottom_bar.visible, "%s: the opening lines' first box comes up while the tutorial prompt shows" % context)
+			for player: Node in fresh.find_children("*", "AudioStreamPlayer", true, false) + fresh.find_children("*", "AudioStreamPlayer2D", true, false):
+				player.call("stop")
+			fresh.queue_free()
+			await process_frame
+	for file: String in ["%s-prompts.cfg" % path, "%s-prompts.json" % path]:
+		if FileAccess.file_exists(file):
+			DirAccess.remove_absolute(ProjectSettings.globalize_path(file))
+
+
+## The tutorial prompt in [param fresh] after the first step, with or without a box up ([param box_up]):
+## on the canvas, over no station name, neither actor, the box, a top card that shows (one leaving
+## goes at once when the prompt takes its place), PAUSE, DEBUG or the touch buttons, and
+## over at most Main.TUTORIAL_ART_OVERLAP of its area of the machines. Where it waits hidden behind a
+## box, the hint bar is empty too.
+func _check_prompt_clear(fresh: Main, touch: bool, box_up: bool, context: String) -> void:
+	context += ", box up" if box_up else ", no box yet"
+	if not fresh.tutorial_prompt.visible:
+		_expect(box_up and fresh.tutorial_prompt_slot == &"waiting" and not (fresh.get_node("CanvasLayer/ContextHint") as Control).visible, "%s: the tutorial prompt is hidden only while it waits behind a box, with the hint bar empty (%s)" % [context, fresh.tutorial_prompt_slot])
+		return
+	var prompt: Rect2 = fresh.tutorial_prompt.get_global_rect()
+	# A long frame under load can carry the engineer past the display, where the prompt only points on.
+	_expect(fresh.tutorial_text.text.contains("right to the breaker.") and prompt.position.y >= 0.0 and prompt.end.y <= Main.DIALOGUE_BOTTOM and prompt.position.x >= 0.0 and prompt.end.x <= 960.0, "%s: after the first step the tutorial prompt shows on the canvas (%s)" % [context, prompt])
+	for label: Label in [fresh.get_node("BreakerLabel"), fresh.get_node("RelayLabel"), fresh.get_node("CheckpointLabel"), fresh.bypass_handle.fault_tag, fresh.bypass_handle.bypass_label] as Array[Label]:
+		if label.is_visible_in_tree() and label.modulate.a > 0.05:
+			var name_rect: Rect2 = label.get_global_transform_with_canvas() * Rect2(Vector2.ZERO, label.size)
+			_expect(not prompt.intersects(name_rect), "%s: the tutorial prompt leaves %s readable (%s vs %s)" % [context, label.text.replace("\n", " "), prompt, name_rect])
+	for sprite: Sprite2D in [fresh.human.body_sprite, fresh.wolf.body_sprite] as Array[Sprite2D]:
+		_expect(not prompt.intersects(sprite.get_global_transform_with_canvas() * sprite.get_rect()), "%s: the tutorial prompt leaves %s uncovered" % [context, sprite.get_parent().name])
+	var art_overlap: float = 0.0
+	for sprite: Sprite2D in [fresh.breaker_art, fresh.purge_terminal_art, fresh.relay_art] as Array[Sprite2D]:
+		art_overlap += prompt.intersection(sprite.get_global_transform_with_canvas() * sprite.get_rect()).get_area()
+	_expect(art_overlap <= prompt.get_area() * Main.TUTORIAL_ART_OVERLAP, "%s: the tutorial prompt lies over at most a tenth of its area of the machines (%.0f of %.0f)" % [context, art_overlap, prompt.get_area()])
+	var others: Array[Control] = [fresh.pause_button]
+	if fresh.top_card.visible:
+		others.append(fresh.top_card)
+	if box_up:
+		others.append(fresh.bottom_bar)
+	if fresh.debug_tools.debug_button.visible:
+		others.append(fresh.debug_tools.debug_button)
+	if touch:
+		others.append_array([fresh.touch_left, fresh.touch_right, fresh.touch_use])
+	for other: Control in others:
+		_expect(not prompt.intersects(other.get_global_rect()), "%s: the tutorial prompt stays clear of %s (%s vs %s)" % [context, other.name, prompt, other.get_global_rect()])
 
 
 ## On touch at [param percent]: a box, with a name or without, stays clear of ◀ ▶ and USE, and the
