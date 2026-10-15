@@ -2415,24 +2415,16 @@ func _records_route_hint() -> String:
 	return "Follow the station lights: purge queue, mirror port, then exit."
 
 
+## CONTINUE on the junction's closing shot, the only one (Records keeps control while its closing
+## lines run): out through the hatch, the END OF SLICE card, then the title (decision D).
 func _finish_chapter_close() -> void:
 	if hatch_exit_walking:
 		# Already on their way out; the card follows on its own.
 		return
 	if chapter_tween != null and chapter_tween.is_running():
 		chapter_tween.kill()
-	# CONTINUE on a closing shot sounds the same in both rooms, whether it hands control back (Records)
-	# or starts the walk out through the hatch (the junction).
 	sfx_bank.play(&"chirp", -10.0, 0.75)
-	if state.chapter_id == "junction" and state.junction_cleared:
-		# The end of the built route: out through the hatch, the END OF SLICE card, then the title
-		# (decision D).
-		_walk_out_through_hatch()
-		return
-	chapter_close_active = false
-	_start_gameplay_camera()
-	_sync_records_room()
-	_update_controls()
+	_walk_out_through_hatch()
 
 
 ## The two leave through the open hatch, WOLF first: he fades out in the doorway while the engineer
@@ -2975,7 +2967,6 @@ func _leave_junction() -> void:
 	_update_controls()
 	_tell("SERVICE LINE CLEARED. WOLF: It's quiet now. The line runs on toward Archive.\n%s: Then that's where we go." % state.human_name().get_slice(" ", 0).to_upper())
 	chapter_tween = create_tween()
-	# The same frame the Records close uses.
 	_frame_chapter_close()
 
 
@@ -4071,7 +4062,7 @@ func _refresh_ui() -> void:
 	if chapter_close_active:
 		if last_top_card_key != "chapter_close":
 			last_top_card_key = "chapter_close"
-			_show_top_card("SERVICE JUNCTION\nSERVICE LINE CLEARED" if state.chapter_id == "junction" else "RECORDS ACCESS\nFIRST COPY SECURED", 3.4)
+			_show_top_card("SERVICE JUNCTION\nSERVICE LINE CLEARED", 3.4)
 		# Walking out through the hatch nothing waits on a press, so no CONTINUE prompt shows.
 		_set_dialogue("" if hatch_exit_walking else ("TAP CONTINUE" if touch_layout else "%s  CONTINUE" % settings_menu.prompt(&"interact", controller_active)))
 		return
