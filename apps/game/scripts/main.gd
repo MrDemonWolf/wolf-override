@@ -3972,8 +3972,9 @@ func _machine_spans() -> Array[Vector2]:
 ## The furthest right WOLF follows to: short of a shut door by his drawn reach, so he never noses
 ## into it and the engineer always has room in front of it. Once the corridor's seal is open, the
 ## floor past the relay (the MANUAL BYPASS, the seal's frame and the safe point) has no gap as long
-## as he is, so he follows no further than the relay's left side (WOLF_FOLLOW_OPEN_MAX_X) and waits
-## there while the engineer goes on to the safe point. His authored spots ignore this.
+## as he is, so he follows no further than the relay's left side (WOLF_FOLLOW_OPEN_MAX_X) while the
+## engineer walks through. Once the engineer is at the safe point, WOLF comes to the open doorway
+## instead (_wolf_comes_to_doorway, WOLF_DOORWAY_X). His authored spots ignore this limit.
 func _wolf_follow_max_x() -> float:
 	if state.chapter_id == "lockdown":
 		return WOLF_FOLLOW_OPEN_MAX_X if state.door_open else CORRIDOR_DOOR_LEFT_X - M0Actor.WOLF_REACH
