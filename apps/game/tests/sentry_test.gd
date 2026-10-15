@@ -631,6 +631,14 @@ func _check_scene() -> void:
 	_expect(game.get("hatch_exit_walking") and not game.get("end_card_active") and not human.controlled, "Continue on the closing beat walks them out through the hatch first")
 	# Nothing waits on a press during the walk, so no CONTINUE prompt shows, in any layout.
 	_expect(not (game.get_node("CanvasLayer/ContextHint") as Control).visible, "walking out through the hatch shows no CONTINUE prompt")
+	# The closing shot's camera stands still: a station plate is either whole or hidden, never left
+	# half faded at the view's edge for the whole walk-out (review r5, DOOR DOWN on a phone).
+	await process_frame
+	var half_faded: Array[String] = []
+	for label: Label in room.station_labels:
+		if label.modulate.a > 0.0 and label.modulate.a < 1.0:
+			half_faded.append(label.text)
+	_expect(half_faded.is_empty(), "during the walk-out no station plate hangs half faded at the view's edge (%s)" % ", ".join(half_faded))
 	game.set("touch_enabled", true)
 	game.call("_refresh_ui")
 	_expect(not touch_use.visible and not (game.get_node("CanvasLayer/ContextHint") as Control).visible, "nor does the touch CONTINUE button show during the walk")

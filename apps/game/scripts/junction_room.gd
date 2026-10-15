@@ -1117,10 +1117,17 @@ func _fit_label(label: Label) -> void:
 
 
 ## A plate the edge of the view cuts would show part of a name: it fades out as it reaches the edge.
+## Once the junction is cleared the closing shot's camera stands still, so a plate caught in that fade
+## would hang there half see-through for the whole walk-out (review r5: DOOR DOWN at the left edge on
+## a phone); it is hidden instead.
 func _process(delta: float) -> void:
 	if not visible:
 		return
 	fade_at_view_edge(station_labels, get_viewport())
+	if junction_cleared:
+		for label: Label in station_labels:
+			if label.modulate.a < 1.0:
+				label.modulate.a = 0.0
 	_advance_flicker(delta)
 
 

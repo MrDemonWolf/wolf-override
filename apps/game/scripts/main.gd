@@ -2985,6 +2985,8 @@ func _hatch_opened() -> void:
 func _leave_junction() -> void:
 	if not state.clear_junction():
 		return
+	# The room knows it is cleared from now (its plates settle for the closing shot), as a restore shows it.
+	junction_room.junction_cleared = true
 	# Autosave D: the service line is clear.
 	_save_progress()
 	# The room's lights switch over with a contactor's clunk, as at the safe point.
