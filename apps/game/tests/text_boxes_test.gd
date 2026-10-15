@@ -1,17 +1,16 @@
-extends SceneTree
+extends "res://tests/support/game_suite.gd"
 ## Text you can read (P0-8, P0-9, P0-10, P0-13; STORY-2, STORY-3, STORY-4, STORY-8, STORY-10,
 ## TEACH-7, PHONE-3, PHONE-7). Every line constant and every dialogue literal in main.gd, as each
 ## engineer name, splits into boxes with one speaker, at most two rows of at most 42 characters at
 ## 100% text size, under 20 words, read at 0.33 s a word or slower, and without a word changed. Then
 ## the boxes the game shows on the way through the opening, the corridor, Records Access and the
 ## Service Junction are measured on screen, and the first controllable frame, the Records exit, the
-## touch layout, the TEXT SIZE setting and the prompts at every size are checked.
+## touch layout, the TEXT SIZE setting and the prompts at every size are checked. Spawn, teardown and
+## failure reporting come from the shared suite kit (tests/support/game_suite.gd).
 
-const GAME_SCENE: PackedScene = preload("res://scenes/main.tscn")
 const MAIN_SCRIPT: String = "res://scripts/main.gd"
 const NAMES: Array[String] = ["Rowan", "Alex", "Morgan"]
 
-var failures: int = 0
 var game: Main
 var story: Label
 var speaker: Label
@@ -25,15 +24,14 @@ func _initialize() -> void:
 	call_deferred("_run")
 
 
+## One game through every check, then the kit's teardown (no sound, node or file left behind) and
+## exit status. Its settings file, [code]path[/code], is the one _check_text_size saves to and reads
+## back in a second game.
 func _run() -> void:
+	check_name = "Text boxes"
 	var path: String = "user://text-boxes-test-%s.cfg" % OS.get_process_id()
-	game = GAME_SCENE.instantiate() as Main
-	game.settings_path = path
-	game.save_path = "%s-save.json" % path
-	game.auto_pause_on_focus_loss = false
-	root.add_child(game)
-	await process_frame
-	story = game.get_node("CanvasLayer/BottomBar/Story") as Label
+	game = await spawn_game("%s-save.json" % path, path, _keep_running) as Main
+	story =game.get_node("CanvasLayer/BottomBar/Story") as Label
 	speaker = game.get_node("CanvasLayer/BottomBar/Speaker") as Label
 	bar = game.get_node("CanvasLayer/BottomBar") as Control
 	_check_reading_rule()
@@ -48,19 +46,16 @@ func _run() -> void:
 	await _check_touch()
 	await _check_text_size(path)
 	print("text boxes: %d boxes measured on screen; the longest box takes %d rows at 200%%" % [shown_checked, rows_at_200])
-	# The rooms' jumps leave clips playing. Stop every player and let the mixer release their playback
-	# before the game is freed, then give it frames and time before quitting (as chapter_scene_test does).
-	for player: Node in game.find_children("*", "AudioStreamPlayer", true, false) + game.find_children("*", "AudioStreamPlayer2D", true, false):
-		player.call("stop")
-	await create_timer(0.1).timeout
-	game.queue_free()
-	for frame: int in 10:
-		await process_frame
-	await create_timer(0.3).timeout
-	for file: String in [path, "%s-save.json" % path]:
-		if FileAccess.file_exists(file):
-			DirAccess.remove_absolute(ProjectSettings.globalize_path(file))
-	quit(1 if failures > 0 else 0)
+	# The rooms' jumps leave clips playing; end_game stops them before freeing the game and removes
+	# its save and settings files.
+	await end_game(game)
+	finish("")
+
+
+## Passed to spawn_game for the games this suite drives itself: they keep running when the window
+## has no focus (a headless run never has it), instead of pausing.
+static func _keep_running(spawned: Node) -> void:
+	spawned.set("auto_pause_on_focus_loss", false)
 
 
 ## STORY-2: 1.2 s plus 0.33 s a word, or plus 0.05 s a character (at most 7 s), whichever is longer.
@@ -118,17 +113,29 @@ func _check_corpus() -> void:
 func _check_box(box: String, tags: Array[String], font: Font, size: int, width: float, source: String) -> void:
 	var words: String = DialogueBoxes.words_of(box, tags)
 	var rows: Array[String] = DialogueBoxes.row_texts(words, font, size, DialogueBoxes.wrap_width(words, font, size, width, DialogueBoxes.MAX_ROW_CHARACTERS))
-	var longest: int = 0
-	for row: String in rows:
-		longest = maxi(longest, row.length())
-	var inline: bool = false
-	for tag: String in tags:
-		if words.contains(tag + ": "):
-			inline = true
-	_expect(not inline, "one speaker per box: %s" % box.c_escape())
+	var longest: int = _longest_row(rows)
+	_expect(not _names_inline(words, tags), "one speaker per box: %s" % box.c_escape())
 	_expect(rows.size() <= DialogueBoxes.MAX_ROWS and longest <= DialogueBoxes.MAX_ROW_CHARACTERS, "a box takes at most 2 rows of at most 42 characters (%d rows, %d characters): %s (from %s)" % [rows.size(), longest, box.c_escape(), source.c_escape()])
 	_expect(DialogueBoxes.word_count(words) < DialogueBoxes.LONG_LINE_WORDS, "a box holds fewer than 20 words: %s" % box.c_escape())
 	_expect(DialogueBoxes.read_seconds(words) >= DialogueBoxes.word_count(words) * 0.33, "a box is up 0.33 s a word or longer: %s" % box.c_escape())
+
+
+## The length in characters of the longest of [param rows] (0 for none). Used by _check_box and
+## _measure_shown against DialogueBoxes.MAX_ROW_CHARACTERS.
+static func _longest_row(rows: Array[String]) -> int:
+	var longest: int = 0
+	for row: String in rows:
+		longest = maxi(longest, row.length())
+	return longest
+
+
+## Whether [param text] names a speaker inside it ("TAG: " for any of [param tags]), which would put
+## two speakers in one box. Used by _check_box and _measure_shown.
+static func _names_inline(text: String, tags: Array[String]) -> bool:
+	for tag: String in tags:
+		if text.contains(tag + ": "):
+			return true
+	return false
 
 
 ## The words of [param text] with the speaker tags taken out, in order.
@@ -205,14 +212,9 @@ func _measure_shown(context: String) -> void:
 	var font: Font = story.get_theme_font(&"font")
 	var size: int = story.get_theme_font_size(&"font_size")
 	var rows: Array[String] = DialogueBoxes.row_texts(story.text, font, size, story.size.x)
-	var longest: int = 0
-	for row: String in rows:
-		longest = maxi(longest, row.length())
+	var longest: int = _longest_row(rows)
 	var tags: Array[String] = game.call("_speaker_tags")
-	var inline: bool = false
-	for tag: String in tags:
-		if story.text.contains(tag + ": "):
-			inline = true
+	var inline: bool = _names_inline(story.text, tags)
 	_expect(story.get_line_count() == rows.size(), "the shown box wraps as measured (%s)" % context)
 	if is_equal_approx(TextSize.factor, 1.0):
 		_expect(rows.size() <= 2 and longest <= 42, "%s: the shown box takes %d rows, the longest %d characters: %s" % [context, rows.size(), longest, story.text.c_escape()])
@@ -246,6 +248,8 @@ func _check_opening() -> void:
 	while game.intro_active and game.intro_step < Main.INTRO_LINES.size() and pressed < 40:
 		var step: int = game.intro_step
 		var index: int = game.dialogue_index
+		# Pressed inline, press first: the suites' _tap helpers wait a frame before pressing, and that
+		# leading frame would let the box read here change before the press lands.
 		Input.action_press(&"interact")
 		await process_frame
 		Input.action_release(&"interact")
@@ -333,13 +337,8 @@ func _check_corridor() -> void:
 ## Records' exit: securing the first copy keeps control; its closing lines run while the engineer
 ## walks, USE there goes through them, and they clear once read and walked away from.
 func _check_records_exit() -> void:
-	var acts: DebugActions = game.debug_tools.actions
-	acts.set_relay(&"disclose_wolf")
-	acts.set_mirror(&"wolf")
-	acts.jump(&"records_mirror")
-	await process_frame
-	var exit_side: float = game.debug_station_side_x(Main.RECORDS_STATIONS[2], 829.0)
-	game.debug_place(exit_side, exit_side - M0Actor.FOLLOW_GAP)
+	await _to_records_mirror()
+	_place_at_records_exit()
 	game.call("_interact")
 	await _play(0.6, "records exit")
 	_expect(not game.chapter_close_active and game.human.controlled, "securing the first copy holds no closing shot: the engineer keeps control")
@@ -355,10 +354,27 @@ func _check_records_exit() -> void:
 	await _play(seconds + 0.1, "records exit, walking")
 	Input.action_release(&"move_left")
 	_expect(not bar.visible, "walking on after the last box has been read clears it (no hold at the exit)")
-	game.debug_place(exit_side, exit_side - M0Actor.FOLLOW_GAP)
+	_place_at_records_exit()
 	game.call("_interact")
 	await process_frame
 	_expect(game.state.chapter_id == "junction", "with the lines read, USE at the exit goes on to the junction")
+
+
+## Records Access with the purge trace and the mirror done (WOLF's relay disclosure, WOLF's readout),
+## one process frame after the debug jump, so only the exit is left.
+func _to_records_mirror() -> void:
+	var acts: DebugActions = game.debug_tools.actions
+	acts.set_relay(&"disclose_wolf")
+	acts.set_mirror(&"wolf")
+	acts.jump(&"records_mirror")
+	await process_frame
+
+
+## The engineer at Records' exit station (Main.RECORDS_STATIONS[2]), on the side they walk up to it
+## from, with WOLF the follow gap behind; standing still, controls updated (Main.debug_place).
+func _place_at_records_exit() -> void:
+	var exit_side: float = game.debug_station_side_x(Main.RECORDS_STATIONS[2], 829.0)
+	game.debug_place(exit_side, exit_side - M0Actor.FOLLOW_GAP)
 
 
 ## The junction's entry lines and the knockdown cards split into boxes as they show.
@@ -377,14 +393,9 @@ func _check_junction() -> void:
 ## box they were on, and USE at the exit brings them back first; WOLF's stakes line comes back after
 ## the purge display.
 func _check_story_kept() -> void:
-	var acts: DebugActions = game.debug_tools.actions
-	acts.set_relay(&"disclose_wolf")
-	acts.set_mirror(&"wolf")
-	acts.jump(&"records_mirror")
-	await process_frame
+	await _to_records_mirror()
 	var close: String = Main.RECORDS_CLOSE_LINE % (game.call("_first_name") as String).to_upper()
-	var exit_side: float = game.debug_station_side_x(Main.RECORDS_STATIONS[2], 829.0)
-	game.debug_place(exit_side, exit_side - M0Actor.FOLLOW_GAP)
+	_place_at_records_exit()
 	game.call("_interact")
 	await _play(2.6, "records close kept")
 	_expect(game.status_line == close and speaker.text == "WOLF", "WOLF's box of the closing lines is up (%s)" % story.text.c_escape())
@@ -397,7 +408,7 @@ func _check_story_kept() -> void:
 	_expect(game.status_line == close and speaker.text == "WOLF", "the closing lines come back at WOLF's box, not their first (%s)" % story.text.c_escape())
 	# Cut in again, then USE at the exit: the lines come back first, and the engineer's box follows.
 	game.call("_interact")
-	game.debug_place(exit_side, exit_side - M0Actor.FOLLOW_GAP)
+	_place_at_records_exit()
 	game.call("_refresh_ui")
 	var hint: Label = game.get_node("CanvasLayer/ContextHint/Text") as Label
 	_expect(hint.text.ends_with("continue."), "with the closing lines held back, USE at the exit offers to continue (%s)" % hint.text)
@@ -494,8 +505,7 @@ func _check_text_size(path: String) -> void:
 	await _play(20.0, "200% opening lines")
 	game.debug_tools.actions.jump(&"records_mirror")
 	await process_frame
-	var exit_side: float = game.debug_station_side_x(Main.RECORDS_STATIONS[2], 829.0)
-	game.debug_place(exit_side, exit_side - M0Actor.FOLLOW_GAP)
+	_place_at_records_exit()
 	game.call("_interact")
 	await _play(12.0, "200% records exit")
 	_expect(rows_at_200 >= 1 and rows_at_200 <= 3, "at 200%% a box takes at most 3 rows (%d)" % rows_at_200)
@@ -528,11 +538,8 @@ func _check_text_size(path: String) -> void:
 	game.touch_enabled = false
 	game.debug_tools.call("_refresh_view")
 	# A fresh game reads the saved size back; a broken value falls back to the nearest step.
-	var again: Main = GAME_SCENE.instantiate() as Main
-	again.settings_path = path
-	again.save_path = "%s-again.json" % path
-	root.add_child(again)
-	await process_frame
+	# Not end_game for this one: it would remove the settings file the first game still saves to.
+	var again: Main = await spawn_game("%s-again.json" % path, path) as Main
 	_expect(is_equal_approx(TextSize.factor, 2.0) and again.settings_menu.text_size.selected == 4, "a new session opens at the saved 200%")
 	again.queue_free()
 	await process_frame
@@ -620,12 +627,7 @@ func _check_station_names() -> void:
 func _check_prompts_clear(path: String) -> void:
 	for touch: bool in [false, true]:
 		for index: int in TextSize.STEPS.size():
-			var fresh: Main = GAME_SCENE.instantiate() as Main
-			fresh.settings_path = "%s-prompts.cfg" % path
-			fresh.save_path = "%s-prompts.json" % path
-			fresh.auto_pause_on_focus_loss = false
-			root.add_child(fresh)
-			await process_frame
+			var fresh: Main = await spawn_game("%s-prompts.json" % path, "%s-prompts.cfg" % path, _keep_running) as Main
 			fresh.touch_enabled = touch
 			fresh.settings_menu.text_size.select(index)
 			fresh.settings_menu.text_size.item_selected.emit(index)
@@ -653,13 +655,13 @@ func _check_prompts_clear(path: String) -> void:
 				await process_frame
 			_check_prompt_clear(fresh, touch, true, context)
 			_expect(fresh.bottom_bar.visible, "%s: the opening lines' first box comes up while the tutorial prompt shows" % context)
-			for player: Node in fresh.find_children("*", "AudioStreamPlayer", true, false) + fresh.find_children("*", "AudioStreamPlayer2D", true, false):
-				player.call("stop")
+			# A quick free, not end_game: its settle time on each of the 10 games adds up, and the files
+			# are shared by every fresh game here, so they are removed once after the loop.
+			stop_audio(fresh)
 			fresh.queue_free()
 			await process_frame
 	for file: String in ["%s-prompts.cfg" % path, "%s-prompts.json" % path]:
-		if FileAccess.file_exists(file):
-			DirAccess.remove_absolute(ProjectSettings.globalize_path(file))
+		remove_file(file)
 
 
 ## The tutorial prompt in [param fresh] after the first step, with or without a box up ([param box_up]):
@@ -681,6 +683,8 @@ func _check_prompt_clear(fresh: Main, touch: bool, box_up: bool, context: String
 			_expect(not prompt.intersects(name_rect), "%s: the tutorial prompt leaves %s readable (%s vs %s)" % [context, label.text.replace("\n", " "), prompt, name_rect])
 	for sprite: Sprite2D in [fresh.human.body_sprite, fresh.wolf.body_sprite] as Array[Sprite2D]:
 		_expect(not prompt.intersects(sprite.get_global_transform_with_canvas() * sprite.get_rect()), "%s: the tutorial prompt leaves %s uncovered" % [context, sprite.get_parent().name])
+	# Summed here from the sprites, not through Main._station_art_overlap: the test's own measure is
+	# the independent check of the game's placement rule.
 	var art_overlap: float = 0.0
 	for sprite: Sprite2D in [fresh.breaker_art, fresh.purge_terminal_art, fresh.relay_art] as Array[Sprite2D]:
 		art_overlap += prompt.intersection(sprite.get_global_transform_with_canvas() * sprite.get_rect()).get_area()
@@ -722,8 +726,3 @@ func _check_touch_layout(percent: int) -> void:
 	game.touch_enabled = false
 	await process_frame
 
-
-func _expect(condition: bool, label: String) -> void:
-	if not condition:
-		failures += 1
-		push_error("Text boxes check failed: " + label)
