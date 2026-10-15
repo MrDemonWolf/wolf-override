@@ -462,7 +462,7 @@ Nothing under `game-slice`, `game-main`, `shots/`, `design/`, `layers/`, `codex/
 
 ## Measured
 
-**Rule 5** (`opening-diff.json`, `opening-diff/`; `fix2/tools/opening_diff9.py`). o0-o8 against main, three older main runs, round 6, round 7 and round 8:
+**Rule 5** (`opening-diff.json`, `opening-diff/`; `fix2/tools/opening_diff9.py` at ada83fa). o0-o8 against main, three older main runs, round 6, round 7 and round 8:
 - Left of world x 540 and outside the two beacon zones: **0 px** against rounds 6, 7 and 8, and only main's dust against main (0 non-dust blobs).
 - The beacon zones differ from round 8 by 2,700-10,700 px (the stronger light).
 - o4-o6 right of x 540: 0 px.
@@ -531,7 +531,7 @@ The new section replaces the old stub inside the same atlas region, the far plat
   - `far/`: `tools/far9.py`; `layer/` (plate, `report.json`, before/after crops).
   - `beacons/`: a copy of round 8's tools and design, with the R9 light, and `layers/`.
   - `codex/`: `paint-cut9b` (used), `paint-cut9` (0.42 m try, not used) and `empty-run-r9` (a wrong-path empty run, no image), each with prompt, refs, out (C2PA kept), `run.log` and `session.txt`; `run_job.sh`; `archive.log`.
-  - `tools/`: `tests.sh`, `render_run.sh`, `capture_all.sh`, `headless_perf.sh`, `opening_diff9.py`, `state_diff9.py`, `perf_table9.py`, `package9.py`, `luminaire_check9.py`, `measure9.py`, `preview.py`, `crop.py`, `side.py`.
+  - `tools/`: `tests.sh`, `render_run.sh`, `capture_all.sh`, `headless_perf.sh`, `opening_diff9.py`, `state_diff9.py`, `perf_table9.py`, `package9.py`, `luminaire_check9.py`, `measure9.py` (all `fix2/tools/` at ada83fa; round 11's `fix4/tools/` holds the current copies), `preview.py`, `crop.py`, `side.py` (still filed in `fix2/tools/`).
   - `work/`: `r8-game/` (round 8's installed copy), previews.
 
 ---
@@ -669,7 +669,7 @@ Scratch only, 2026-10-13. No Git repository or worktree was edited. The fixes ar
 
 ## Measured
 
-**Rule 5** (`opening-diff.json`, `opening-diff/`; `fix1/tools/opening_diff8.py`):
+**Rule 5** (`opening-diff.json`, `opening-diff/`; `fix1/tools/opening_diff8.py` at ada83fa):
 - o0-o8 against this round's main, three older main runs, round 6 and round 7: left of world x 540 and outside the two beacon zones, **0 px against round 6 and round 7**, and against main only main's dust (0 non-dust blobs).
 - Each beacon zone contains main's red lens.
 - o4-o6 right of x 540: 0 px.
@@ -734,7 +734,7 @@ Phone shape shows the same regions. The only exception is s2's roller foot, a 21
   - `plume/`: `design8.py`, `codex_inputs8.py`, `cleanup8.py`, `design/`, `layer/`.
   - `luminaire/`: `design.py`, `cleanup.py`, `design/`, `layer/`.
   - `codex/`: five job folders with prompt, refs, out (C2PA kept), `run.log` and `session.txt`; `run_job.sh`; `archive.log`.
-  - `tools/`: capture, tests, headless perf, `opening_diff8`, `state_diff8`, `perf_table8`, `package8`, `crop`, `side`.
+  - `tools/`: capture, tests, headless perf, `opening_diff8`, `state_diff8`, `perf_table8`, `package8`, `crop`, `side` (all `fix1/tools/` at ada83fa; round 11's `fix4/tools/` holds the current copies, and round 9's `fix2/tools/crop.py` and `side.py` are byte for byte round 8's).
   - `driver/` (`fix1/driver/realslice_capture.gd` at ada83fa; round 9's identical copy `fix2/driver/realslice_capture.gd` is at ada83fa too).
   - `work/`, including `r7-installed/` with round 7's replaced files.
 - **Outputs `add7/shots/`:**
@@ -805,7 +805,7 @@ Scratch only, 2026-10-13. No Git repository or worktree was edited. The addition
 
 Phone shape shows the same regions.
 
-### Rule 5: the opening (`opening-diff.json`, `tools: integrate/tools/opening_diff7.py`)
+### Rule 5: the opening (`opening-diff.json`, `tools: integrate/tools/opening_diff7.py` at ada83fa)
 
 **Method.** The additions' `raw7/add/O-720` is compared with three references:
 - each of main's three render.sh runs (`shots/raw5/main/O-720`, `-repeat`, `-r3`);
@@ -930,8 +930,8 @@ The installed art is byte-identical to each track's delivered file: atlas 9b1719
   - changed: `scripts/main.gd`, `room_depth.gd`, `bypass_handle.gd`, `fx_presets.gd`, `floor_reflection.gd`, `scenes/main.tscn`, `assets/manifest.json`, `assets/props/corridor-seal-atlas.png`, `corridor-coolant-relay.png` and `tests/m0_scene_test.gd`;
   - new: `scripts/blast_leaf.gd`, `assets/props/corridor-beacons.png(.import)`, `assets/characters/eng-crank-atlas.png(.import)` and `tests/corridor_additions_test.gd`.
 - **Integration tools `add7/integrate/`:**
-  - `tools/tests.sh`, `render_run.sh`, `capture_all.sh` and `headless_perf.sh` (adapted copies of `fix6/tools`);
-  - `tools/opening_diff7.py`, `state_diff7.py`, `perf_table7.py` and `package7.py`;
+  - `tools/tests.sh`, `render_run.sh`, `capture_all.sh` and `headless_perf.sh` (adapted copies of `fix6/tools`; `integrate/tools/` at ada83fa);
+  - `tools/opening_diff7.py`, `state_diff7.py`, `perf_table7.py` and `package7.py` (`integrate/tools/` at ada83fa; round 11's `fix4/tools/` holds the current copies);
   - `driver/realslice_capture.gd` (`integrate/driver/realslice_capture.gd` at ada83fa), a copy of `fix3/driver` that adds s4b and the crank strip;
   - `patches/` (the beacon and crank diffs with relative paths);
   - `probe/` (the main beacon probe, and private main and round-6 copies for headless timing);
