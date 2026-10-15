@@ -87,7 +87,7 @@ The tool returned 1254 px. Alignment was measured as a pure scale 1254/1024 at o
 - **Design:**
   - `tools/portal7.py`: parts, masks and spec. `tools/stack.py` imports round 6's stack read-only.
   - `design/`: `spec.json`, `masks/`, `design-add-*.png`, leaf albedo elevations, `flat7/` (the flat design layer set).
-- **Paint:** `codex/paint-door7/` (prompt, refs, `panels.json`, `out/door7-painted.png` with its C2PA, `notes.txt`, `run.log`, `session.txt`), `codex/run_job7.sh`, `codex/archive.log`. The edit target is built by `tools/codex_inputs7.py`.
+- **Paint:** `codex/paint-door7/` (prompt, refs, `panels.json`, `out/door7-painted.png` with its C2PA, `notes.txt`, `run.log`, `session.txt`), `codex/run_job7.sh` (`door/codex/run_job7.sh` at ada83fa; round 11's `fix4/codex/run_job.sh` is the kept runner), `codex/archive.log`. The edit target is built by `tools/codex_inputs7.py`.
 - **Layers** (`tools/cleanup7.py`, in `layers/`):
   - `portal-wall.png`, `portal-front.png`, `leaf-front.png`, `leaf-edge.png`, `report7.json`;
   - copies of round 6's unchanged curtain, open bar, frame, wheel, lens, far and mid plates.

@@ -530,7 +530,7 @@ The new section replaces the old stub inside the same atlas region, the far plat
   - `door/`: `tools/cut9.py`, `codex_inputs9.py`, `cleanup9.py`, `install9.py` (the last two `fix2/door/tools/` at ada83fa); `design/`, `layers/` (`portal-front.png`, `report9.json`), `game/` (atlas, regions); `work-042/` (the superseded 0.42 m design).
   - `far/`: `tools/far9.py`; `layer/` (plate, `report.json`, before/after crops).
   - `beacons/`: a copy of round 8's tools and design, with the R9 light, and `layers/` (`fix2/beacons/tools/`, the kept copy; round 8's `fix1/beacons/tools/design.py` and `cleanup.py` are at ada83fa).
-  - `codex/`: `paint-cut9b` (used), `paint-cut9` (0.42 m try, not used) and `empty-run-r9` (a wrong-path empty run, no image), each with prompt, refs, out (C2PA kept), `run.log` and `session.txt`; `run_job.sh`; `archive.log`.
+  - `codex/`: `paint-cut9b` (used), `paint-cut9` (0.42 m try, not used) and `empty-run-r9` (a wrong-path empty run, no image), each with prompt, refs, out (C2PA kept), `run.log` and `session.txt`; `run_job.sh` (`fix2/codex/run_job.sh` at ada83fa; round 11's `fix4/codex/run_job.sh` differs only in its comment line); `archive.log`.
   - `tools/`: `tests.sh`, `render_run.sh`, `capture_all.sh`, `headless_perf.sh`, `opening_diff9.py`, `state_diff9.py`, `perf_table9.py`, `package9.py`, `luminaire_check9.py`, `measure9.py` (all `fix2/tools/` at ada83fa; round 11's `fix4/tools/` holds the current copies), `preview.py`, `crop.py`, `side.py` (still filed in `fix2/tools/`).
   - `work/`: `r8-game/` (round 8's installed copy), previews.
 
@@ -733,7 +733,7 @@ Phone shape shows the same regions. The only exception is s2's roller foot, a 21
   - `beacons/`: copied design and cleanup with the R8 changes (`fix1/beacons/tools/design.py` and `fix1/beacons/tools/cleanup.py` at ada83fa), plus `layers/`.
   - `plume/`: `design8.py`, `codex_inputs8.py`, `cleanup8.py`, `design/`, `layer/`.
   - `luminaire/`: `design.py`, `cleanup.py`, `design/`, `layer/`.
-  - `codex/`: five job folders with prompt, refs, out (C2PA kept), `run.log` and `session.txt`; `run_job.sh`; `archive.log`.
+  - `codex/`: five job folders with prompt, refs, out (C2PA kept), `run.log` and `session.txt`; `run_job.sh` (`fix1/codex/run_job.sh` at ada83fa; round 11's `fix4/codex/run_job.sh` differs only in its comment line); `archive.log`.
   - `tools/`: capture, tests, headless perf, `opening_diff8`, `state_diff8`, `perf_table8`, `package8`, `crop`, `side` (all `fix1/tools/` at ada83fa; round 11's `fix4/tools/` holds the current copies, and round 9's `fix2/tools/crop.py` and `side.py` are byte for byte round 8's).
   - `driver/` (`fix1/driver/realslice_capture.gd` at ada83fa; round 9's identical copy `fix2/driver/realslice_capture.gd` is at ada83fa too).
   - `work/`, including `r7-installed/` with round 7's replaced files.
