@@ -23,6 +23,8 @@ func _initialize() -> void:
 	call_deferred("_run")
 
 
+## One game from the title screen: the beacon and blast-leaf checks, then the kit's teardown (no
+## sound, node or file left behind) and exit status.
 func _run() -> void:
 	check_name = "Corridor additions"
 	var game: Node2D = await start_game("corridor-additions-test")
