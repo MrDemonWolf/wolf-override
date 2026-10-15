@@ -25,6 +25,16 @@ The package was round 4 of `doors-r1` (`fix-r4/`), built on main 0c5d1ae. Its di
 - **Mint line through the tank (inherited):** gone on main since PR #68 moved the bolt feed off the wall; nothing to do.
 - **Beam band over the alcove (inherited):** gone on main since PR #68: facing back over the TANK RELEASE the beam now stops at the alcove's right edge, and at the far end of its patrol it starts from behind the bolt panel (stills p01 and p02 from `driver2/panel_capture.gd`, and the phone j03-j04 frames).
 
+## Fixes after the landing's verification
+
+A fresh-clone verification of the branch (render.sh, the touch layout) found these; all fixed on the branch:
+
+- **Grey corner at the junction's right end, touch layout (major):** the junction's play view runs on to `JunctionRoom.EXIT_VIEW_RIGHT` (x 1030), past the mid plate's right bleed (x 976), where only the exit's own pieces cover the far plate. The exit deck ends at y 584, and the touch framing (`Main.GAMEPLAY_CAMERA_Y_TOUCH` 392 at zoom 1.35) shows down to about y 592, so a flat grey block (the far plate) showed in the bottom right of every frame near the right end (j08-j12). The deck's bottom rows are now mirrored on down past its end (`ExitDeckBleed`, 40 world px), as the room's mid plate's bottom bleed does. The same check found that a camera shake there (the bolt's arc at 0.8 trauma shakes up to 6.4 px; `Impact.MAX_SHAKE_PX` is 10) would show the far plate past the passage's and deck's right end (x 1032) in either framing, so their last 12 world px are mirrored on past it too (`ExitBeyondEdgeBleed`, `ExitDeckEdgeBleed`, `ExitDeckBleedEdgeBleed`). `room_depth_test` now samples the view right of the mid plate at the junction's right end (keyboard and touch framing, shaken both ways) and requires every point inside an exit piece; with the deck bleed cut to 2 px it fails at (976, 586).
+- **Site wording:** the Status page's "Leaving through the hatch" and "the exit hatch" now say door; the Testing page no longer lists the removed hatch doorway among the render boxes, and its knockdown check names the blast door's near column and stub (with the new knockdown just past the doorway) instead of the old bulkhead's pillar.
+- **Changelog:** the phone stills are 1920x1080 (the container's size for a 2400x1080 request), not 2400x1080.
+- **Register:** `junction-hatch.png` and `corridor-bulkhead-open.png` were deleted on 2026-10-14 by this branch (not 2026-10-13); two plate entries had a missing full stop.
+- **Left for Nathanial (design call):** an engineer who stops in the blown doorway at about x 490-505 is almost hidden by the blast door's solid near column (x 487-510), as round 4 drew it; main faded the old bulkhead's pillar in front of a character instead.
+
 ## Wording
 
 See `../../../../decisions.md` ("Doors landed") and `../../../approved/`: every line about the junction exit says "door"; the tank's hit is two one-speaker boxes; the Records container hint names the container.
