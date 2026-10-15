@@ -49,6 +49,31 @@ A fresh-clone verification of the branch (render.sh, the touch layout) found the
 - Asset register: the junction far plate, the entry atlas, the mid plate and the exit atlas now cite those tools by their full filed path (the mid plate's `jemid.py` as `fix-r2/jentry/jemid.py` at dee9996, where it was filed), the blast door atlas's `grade.py` as `fix-r1/tools/grade.py` at dee9996, the entry atlas's `rgrade.py` as `fix-r1/tools/rgrade.py` at dee9996 and one `grade2.py` as `fix-r2/tools/grade2.py` at dee9996 (on October 15 these became the kept `tools/` copies or the same cites; see "Shared code"), each with the full `docs/research-2026-10/sources/doors-2026-10-14/` prefix. No path in the register starts at a round folder or a scratch folder any more; every full tool path in it resolves, and bare script names are left only after their round's own filed folder.
 - Code comments: `junction_door_layout.gd` names the filed `junction/tools/install.py` and `records_room.gd` the filed `fix-r4/tools/`, not the scratch folders. Comments only; nothing drawn or run changes.
 
+## Shared code (October 15, 2026)
+
+Nathanial, October 15: "WE need to avoid duplication and use shared code at all cost" (AGENTS.md, "Don't duplicate code", PR #72). The branch's copies were taken out without changing what the game does, draws or says.
+
+**Shared pieces.** Made once on `codex/corridor-additions` and cherry-picked here, so every branch has the same file:
+- `apps/game/tests/support/game_suite.gd`, the headless suites' kit (corridor db6751a, here cc74660); `follow_spacing_test`'s z walk moved into it as `drawn_z`;
+- `apps/game/scripts/world/door_camera.gd`, DoorCamera, the door ends' design camera (f3bed4c, here ff2718f);
+- `apps/game/scripts/fx/tri_mesh.gd`, TriMesh, one builder for the leaves' atlas meshes, with main's SealLeaf on it (e13d7c6, here d4b9a2d).
+
+**Game code.**
+- `SwingLeaf` and `AtlasMesh` build their meshes with TriMesh (`atlas_mesh.gd` had copied six lines of `swing_leaf.gd`) and project with DoorCamera; `JunctionRoom.exit_leaf_anchor` uses DoorCamera instead of retyping its formula.
+- `RoomDepth.cut`: one atlas-region sprite builder for the blast door's pieces, the exit door's, the corridor seal's (`Main._seal_sprite`) and `make_prop`.
+- `RoomDepth.door_body` and `SwingLeaf.make_body`: one door collision body for both Records doors, the junction entry and the blast door.
+- `SwingLeaf.close_behind`: the entry closer and its timing, written once for both entries.
+- `Main._reset_records_walk_out`: one reset instead of three.
+- Proof: a headless dump of every swing leaf and atlas mesh at open 0 to 1, `exit_leaf_anchor` at t 0 to 1, every Sprite2D under Main and every collision body in each `DebugActions.build_state` state is byte for byte the same as bc1b51e's. render.sh stills, the same driver on both trees at `--fixed-fps 60`: Records r01-r11 with the swing and leaf-hidden frames, junction j01-j15 and the knockdowns (166 stills each at 1280x720 and in the touch layout), and the corridor door end from `scripts/parity/capture.gd` (51 each): all 434 pairs AE 0, with the run logs, text and audio logs identical.
+
+**Tests.** `door_route_test` runs on the kit and on game time: its waits are bounded by physics frames, the blast is watched at time scale 0.1 until the leaf lies in the lane, and its walks hold for game-time frames (it had failed five checks on a loaded machine; doors verify-4). It seeds Records with `DebugActions.build_state(&"records_entry")`, whose saved state equals the old seed's. `room_depth_test` checks the three swing leaves with one helper. Every message reads as before.
+
+**These records.** One current copy of each tool (`../README.md`, "Tool map"): 381 tracked files became 237. 130 copies were deleted, 25 tools moved into a track's `tools/` or the new top-level `tools/`, and 14 track tools were replaced in place by their current version; every earlier version that differs is cited as `<path> at dee9996` (or at 7d55687 for fix round 1's entry and exit door tools), in the notes, DOORS.md and the asset register alike. `imgkit.py` is cited from `../../corridor-door-end-2026-10-12/tools/layers/` (the same file). The patch scripts and `junction_room.gd.tmpl` are deleted and cited, since they carried the game code they inserted. The fix rounds' `doors-section.md` copies of DOORS.md and the entry door's three round notes are gone; `junction-entry/NOTES.md` holds the entry door's notes.
+
+**Copies left.** The copy check (`check-copies.py`, which the copies-check job adds to `scripts/`) against main 204ca49: 300 copied blocks new on the branch before, 36 after. All 36 lie between different as-run research tools (rmodel and jemodel, the grade tools, hinstall and install, lp, lp2 and lp3, and others), each cited for its own round, or between this folder's capture drivers and main's drivers and tests (`_initialize`, `_tap`, `_raw`). Sharing their helpers needs a re-run with byte-identical outputs, so they are left for a main-wide job.
+
+**Waiting for the rebase onto `codex/lighter-1`:** `fx_presets`' streak and chip textures through FxKit, the lamp colours into Palette, the tweens' restart through Tweens, and one FLOOR_Y.
+
 ## Wording
 
 See `../../../../decisions.md` ("Doors landed") and `../../../approved/`: every line about the junction exit says "door"; the tank's hit is two one-speaker boxes; the Records container hint names the container.
