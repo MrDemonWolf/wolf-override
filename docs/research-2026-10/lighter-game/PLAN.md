@@ -364,7 +364,7 @@ The approved concepts are `doors-shutter-approved/` (four 1671x941 concept scene
 - **Tests**: `junction_test` 613 and 635 (stand-in texture); `room_depth_test` 124-131.
 - **Not imported**: the HQ identity-reference side poses and `death-poses/` (for the later death system; the WOLF death-pose colour must be regraded first).
 
-**S22 swap-shutters** (VISUAL: approved shutter doors replace the bulkheads in the corridor and the junction)
+**S22 swap-shutters** (VISUAL: approved shutter doors replace the bulkheads in the corridor and the junction). **Done:** the corridor's door end landed on 2026-10-12 and the junction's blast door on 2026-10-14 (`../sources/doors-2026-10-14/`); every file listed below is deleted, `scripts/prepare_bulkheads.py` included.
 
 - **Add** the 3.1 corridor and junction layers.
 - **Delete** these 7 files with their imports and manifest entries:
@@ -378,7 +378,7 @@ The approved concepts are `doors-shutter-approved/` (four 1671x941 concept scene
 - **Blocker**: `corridor-bulkhead-open` also feeds the junction exit-hatch passage (`junction_room.gd` 37-39 and 392). Either S23 lands first, or the hatch passage temporarily points at the new corridor `passage` layer. Name that as a VISUAL change inside the hatch.
 - **Tests**: `room_depth_test` 76-77; `junction_test` 563-565; `m0_scene_test` 222-237, through the `seal_leaf` shim.
 
-**S23 swap-hatches** (VISUAL: new junction entry and exit hatch and Records exit)
+**S23 swap-hatches** (VISUAL: new junction entry and exit hatch and Records exit). **Done 2026-10-14:** real doors replaced them (swing doors at the Records entry and exit and the junction entry, a sliding door at the junction exit); both hatch images and their constants are gone.
 
 - **Delete** `props/junction-hatch.png` and `props/records-exit-hatch.png` with their imports and 2 manifest entries.
 - **Delete** the constants `HATCH_REGION`, `HATCH_SCALE`, `HATCH_LAMP`, `HATCH_LEAF`, `HATCH_PASSAGE*`, plus Records `EXIT_*` and `_draw_exit`.

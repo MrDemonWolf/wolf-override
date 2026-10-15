@@ -116,7 +116,7 @@ Each split below is one PR with one parity run:
 
    The plan lists it as "kept unchanged". After S21 and S22, the title shows the old characters and the old door look.
    **Amend:** add S24a, "title key art": a decision for Nathanial (re-paint from the new sprites and doors, or keep it with a stated reason). If replaced, the 4 published copies are regenerated as well.
-2. **Hatches.** Both hatches (`junction-hatch`, `records-exit-hatch`) and the r3 opening-hatch art depend on hatch art that **no approved set contains**. The approved shutter concepts are also 4 concept scenes, not layers. The plan has a "Draw first" table but no step, owner or review gate.
+2. **Hatches.** (Resolved 2026-10-14: real doors replaced both hatches; `../sources/doors-2026-10-14/`.) Both hatches (`junction-hatch`, `records-exit-hatch`) and the r3 opening-hatch art depend on hatch art that **no approved set contains**. The approved shutter concepts are also 4 concept scenes, not layers. The plan has a "Draw first" table but no step, owner or review gate.
    **Amend:** add art steps:
    - A1: corridor and junction shutter layers from `doors-shutter-approved/`.
    - A2: hatch family (junction entry and exit, opening hatch, Records exit).
