@@ -25,7 +25,7 @@ X0, Y0 = d.X0, d.Y0
 MAG = (255, 0, 255)
 
 # the panel: BOLT_PANEL_X 806, region (0, 68, 512, 393), scale 0.15, base on the floor
-PANEL_X, PANEL_SCALE, PANEL_REGION = 806.0, 0.15, (0, 68, 512, 461)
+PANEL_X, PANEL_SCALE, PANEL_REGION = 796.0, 0.15, (0, 68, 512, 461)
 RISER_X = PANEL_X + (512 - 256) * PANEL_SCALE          # 844.4: the riser's centre is the image edge
 RISER_R = 3.1                                          # world px (0.155 m)
 RISER_TOP = 440.0 - (461 - 131) * PANEL_SCALE          # its cap (390.5)

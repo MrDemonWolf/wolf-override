@@ -60,10 +60,10 @@ Light: two visible sources are ray-cast: the junction's right ceiling fitting, w
 
 Method (the corridor's):
 
-1. Measured parts and camera in Python: `tools/geom.py`, `design.py`, `leaf.py` and `noleaf.py`. There is one mask per part (`design/v6/masks/`) and `design/v6/spec.json`.
-2. `compose.py` builds the edit targets.
+1. Measured parts and camera in Python: `tools/geom.py`, `design.py`, `leaf.py` and `noleaf.py` (round 1's `junction-exit/tools/geom.py` at dee9996 and `junction-exit/tools/design.py` at dee9996; `tools/` now holds fix round 3's, see the Files list). There is one mask per part (`design/v6/masks/`) and `design/v6/spec.json`.
+2. `compose.py` builds the edit targets (round 1's: `junction-exit/tools/compose.py` at dee9996).
 3. Codex's built-in image tool in edit mode painted material and light only. There were two jobs, `hatch-wall` and `hatch-leaf`; their outputs are kept byte for byte with C2PA (caBX). See `../provenance.txt` and `../codex/hatch-*/`. Both sessions are archived.
-4. `tools/cleanup.py` registers each paint to its target. Wall edge NCC is 0.85, with 99.7 % of strong design edges recalled. It then re-imposes every design mask, removes the key's magenta feather, calms the concrete as one surface, clamps each part's value to the design (within 10 to 15 %), grades and tints the result, and adds the floor wedge.
+4. `tools/cleanup.py` (round 1's: `junction-exit/tools/cleanup.py` at dee9996) registers each paint to its target. Wall edge NCC is 0.85, with 99.7 % of strong design edges recalled. It then re-imposes every design mask, removes the key's magenta feather, calms the concrete as one surface, clamps each part's value to the design (within 10 to 15 %), grades and tints the result, and adds the floor wedge.
 5. `tools/install.py` packs one lossless atlas and writes `placement.json`. `tools/manifest.py` writes the manifest.
 
 ## The ending as specified and built
@@ -89,7 +89,7 @@ Rendered stills of all of this are in `review/` and `captures/b4/`. Before frame
 - `placement.json`: the atlas's regions, each piece's world top-left and the leaf's anchor.
 - `layers/`: `beyond`, `back`, `lens`, `front` and `leaf` PNGs at 2 px per world px, `junction-exit-atlas.png` (sha256 07e4d56b...), `cleanup.json` (registration and fidelity numbers), and the review composites.
 - `design/v6/`: the construction. It holds `spec.json`, the masks, the per-state renders and the Codex targets in `compose/`.
-- `tools/`: `geom.py`, `design.py`, `leaf.py`, `noleaf.py`, `compose.py`, `imgkit.py`, `cleanup.py`, `install.py`, `manifest.py`, `run_codex.sh`.
+- `tools/`: `geom.py`, `design.py`, `leaf.py`, `noleaf.py`, `compose.py`, `imgkit.py`, `cleanup.py`, `install.py`, `manifest.py`, `run_codex.sh`. Filed in `junction-exit/tools/`, which now holds fix round 3's versions (`../README.md`, "Tool map"; `hinstall.py` from fix round 1 on); round 1's `geom.py`, `design.py`, `compose.py` and `cleanup.py` are `junction-exit/tools/geom.py` at dee9996, `junction-exit/tools/design.py` at dee9996, `junction-exit/tools/compose.py` at dee9996 and `junction-exit/tools/cleanup.py` at dee9996; `leaf.py`, `noleaf.py`, `install.py` and `manifest.py` are unchanged since.
 - `templates/junction_room.gd.tmpl`: the script with placement placeholders that `install.py` fills.
 - `driver/hatch_capture.gd`: the render.sh capture driver.
 - `captures/` (b1..b4, main-perf, b2-perf) and `review/1..5-*.png`: the before/after and sequence sheets.

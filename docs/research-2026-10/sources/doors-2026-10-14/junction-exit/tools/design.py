@@ -17,17 +17,19 @@ sys.path.insert(0, __file__.rsplit("/", 1)[0])
 import geom as g  # noqa: E402
 
 PPW = 4.0                    # design px per world px
-X0, X1 = 838.0, 1032.0       # world rect of the wall pieces
-Y0, Y1 = 140.0, 470.0
+X0, X1 = 826.0, 1032.0       # world rect of the wall pieces (fix round 2: from 826, so the bolt panel's riser at x 834 is in it)
+Y0, Y1 = 140.0, 584.0        # fix round 1: down through the deck's fascia (the stub's cut)
 AMBIENT = np.array([0.068, 0.076, 0.090])
 I1 = np.array([1.00, 1.02, 1.06]) * 30.0      # the junction's cold LED fitting
-I2 = np.array([1.00, 1.03, 1.08]) * 1.3       # the passage bulkhead fitting
-I3 = np.array([1.00, 1.02, 1.05]) * 1.6       # the wall pack over the door (downward lobe)
+I2 = np.array([1.00, 1.03, 1.08]) * 2.6       # the passage bulkhead fitting (fix round 2: the passage reads as a lit space)
+I3 = np.array([1.00, 1.02, 1.05]) * 2.4       # the wall pack over the door (forward-down lobe; fix round 2: it is lit, S7)
 TARGET_WALL_SRGB = 50.0
 # The fittings are area lights (a 1.2 m LED batten; a 0.5 m wall pack): sampled along their length so
 # shadows from small fixtures go soft with distance, as they do.
-L1_SAMPLES = [np.array([dx, 0.0, dz]) for dx in (-0.6, -0.3, 0.0, 0.3, 0.6) for dz in (-0.15, 0.15)]
-L3_SAMPLES = [g.U * ds for ds in (-0.2, -0.07, 0.07, 0.2)]                         # median of the lit concrete faces (the room's wall values)
+# fix round 1 (S3): sampled densely enough that a small box's shadow is the soft smudge a 1.2 m batten
+# gives, not five stacked hard copies of a point light's wedge.
+L1_SAMPLES = [np.array([dx, 0.0, dz]) for dx in np.linspace(-0.6, 0.6, 13) for dz in (-0.15, 0.0, 0.15)]
+L3_SAMPLES = [g.U * ds + g.V * dn for ds in np.linspace(-0.22, 0.22, 9) for dn in (-0.06, 0.06)]                         # median of the lit concrete faces (the room's wall values)
 EXPOSURE = 1.0
 
 
@@ -66,11 +68,53 @@ def cast(parts, X, Y):
     return idx, best, pos, uv
 
 
+def _noise3(P, scale, seed):
+    rng = np.random.default_rng(seed)
+    out = np.zeros(len(P))
+    for k in range(6):
+        f = rng.uniform(0.6, 1.6, 3) / scale
+        ph = rng.uniform(0, 2 * np.pi, 3)
+        out += np.sin(P[:, 0] * f[0] * 2 * np.pi + ph[0]) * np.sin(P[:, 1] * f[1] * 2 * np.pi + ph[1]) * np.cos(P[:, 2] * f[2] * 2 * np.pi + ph[2]) / (k + 1)
+    return out / 1.5
+
+
+def concrete_wear(P):
+    """Designed wear on the cast concrete (fix round 1, M1): board-form mottle (+-6 %), a damp band at
+    the foot where the deck's water wicks up (irregular top, 0.12-0.24 m), and seepage just under the
+    3.6 m pour joint (a cold joint leaks). Nothing else: no random drips."""
+    h = P[:, 1]
+    f = 1.0 + 0.06 * _noise3(P, np.array([1.2, 0.9, 1.2]), 51)
+    top = 0.18 + 0.06 * _noise3(P * np.array([1, 0, 1]), np.array([0.5, 1.0, 0.5]), 52)
+    f *= 1.0 - 0.36 * np.clip(1.0 - h / top, 0, 1) ** 0.7 * (h > -0.05)
+    f *= 1.0 - 0.12 * np.exp(-(((h - (g.POUR_JOINT_H - 0.08)) / 0.08) ** 2))
+    return f
+
+
+def cast_marks(P, seed=5):
+    """Fix round 2: form-panel joints (1.2 x 2.4 m plywood) and grouted 25 mm tie-cone holes 0.6 m on
+    centre (ACI 347), on the cross-wall's approach face, from its (s, h)."""
+    s_al = ((P - g.C) * g.U).sum(-1)
+    h = P[:, 1]
+    v = np.ones(len(P))
+    da, dh = np.mod(s_al, 1.2), np.mod(h, 2.4)
+    joint = (np.minimum(da, 1.2 - da) < 0.005) | (np.minimum(dh, 2.4 - dh) < 0.005)
+    fin = ((da > 0.005) & (da < 0.016)) | ((dh > 0.005) & (dh < 0.016))
+    v = np.where(joint, 0.86, np.where(fin, 1.04, v))
+    ta, th = np.mod(s_al - 0.3, 0.6), np.mod(h - 0.3, 0.6)
+    r = np.sqrt(np.minimum(ta, 0.6 - ta) ** 2 + np.minimum(th, 0.6 - th) ** 2)
+    cell = (np.floor((s_al - 0.3) / 0.6 + 0.5) * 131 + np.floor((h - 0.3) / 0.6 + 0.5) * 17 + seed) % 7
+    core = np.where(cell < 2, 0.80, 0.58)
+    return np.where(r < 0.0125, v * core, np.where(r < 0.024, v * 1.07, v))
+
+
 def detail(pt, P, uv):
     """Albedo multiplier for designed detail: pour joint, leaf seams and frame band, edge stripes."""
     m = np.ones(len(P))
     nm = pt.name
+    if nm in ("back_face", "lintel_face", "front_face", "below_sill", "col_end", "stub_face", "stub_top", "stub_cut"):
+        m = m * concrete_wear(P)
     if nm in ("back_face", "lintel_face", "front_face"):
+        m = m * cast_marks(P)
         m[np.abs(P[:, 1] - g.POUR_JOINT_H) < 0.012] = 0.55
     if nm == "sill":
         # the leaf's bottom track: a slot in the threshold plate under the leaf (uv: s along a, n along b)
@@ -118,7 +162,11 @@ def shade(parts, idx, pos, uv=None):
                 l = d / np.sqrt(dist2)[:, None]
                 lam = np.clip((n * l).sum(-1), 0, 1)
                 if lobe:
-                    lam = lam * np.clip(l[:, 1], 0, 1) ** 1.5
+                    # forward-throw (fix round 2): the light leaves the front glass down and out toward
+                    # the approach (-V); the wall right under it gets the spill, the leaf, threshold and
+                    # deck in front get the beam; nothing goes up
+                    fwd = (l * g.V[None, :]).sum(-1)
+                    lam = lam * np.clip(l[:, 1], 0, 1) ** 0.8 * (0.35 + 0.65 * np.clip(fwd, 0, 1))
                 vis = ~g.occluded(P + n * 0.004, L, occ, skip=pt.name)
                 acc += lam * vis / (dist2 + soft)
             col += I[None, :] * (acc / len(samples))[:, None]
