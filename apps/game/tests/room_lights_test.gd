@@ -377,7 +377,9 @@ func _check_corridor_flash(game: Node2D, corridor: RoomDepth, records: RoomDepth
 	var red_high: float = reds.max()
 	_expect(r >= 0.9 and red_low <= 0.5 * red_high, "the corridor lamp's lens moves with its light (r %.3f) and its red falls to %.2f of its top" % [r, red_low / maxf(red_high, 0.001)])
 	# Flashes: rises through the middle of the light's swing, each placed between its two samples on the
-	# tween clock; the rate comes from the median gap, so one skipped rise cannot halve it.
+	# tween clock. A stall can skip a rise (a gap of two flashes) or blur one (a gap a little off), so the
+	# rate is the whole span over the flashes in it, each gap counted as a whole number of flashes of the
+	# typical gap (the median of the gaps under 1.5 times the shortest).
 	var mid: float = (alphas.min() + alphas.max()) * 0.5
 	var rises: Array[float] = []
 	for i: int in range(1, alphas.size()):
@@ -387,11 +389,17 @@ func _check_corridor_flash(game: Node2D, corridor: RoomDepth, records: RoomDepth
 	var gaps: Array[float] = []
 	for i: int in range(1, rises.size()):
 		gaps.append(rises[i] - rises[i - 1])
-	gaps.sort()
 	var per_minute: float = 0.0
+	var flashes: int = 0
 	if gaps.size() >= 4:
-		per_minute = 60.0 / maxf(gaps[int(gaps.size() / 2.0)], 0.000001)
-	_expect(gaps.size() >= 4 and per_minute >= 80.0 and per_minute <= 96.0, "the corridor's beacons flash like a real rotating beacon, about 88 a minute (%.1f from %d gaps), under 3 a second" % [per_minute, gaps.size()])
+		var sorted_gaps: Array[float] = gaps.duplicate()
+		sorted_gaps.sort()
+		var single: Array[float] = sorted_gaps.filter(func(gap: float) -> bool: return gap < 1.5 * sorted_gaps[0])
+		var typical: float = maxf(single[int(single.size() / 2.0)], 0.000001)
+		for gap: float in gaps:
+			flashes += maxi(1, roundi(gap / typical))
+		per_minute = 60.0 * float(flashes) / maxf(rises[rises.size() - 1] - rises[0], 0.000001)
+	_expect(gaps.size() >= 4 and per_minute >= 80.0 and per_minute <= 96.0, "the corridor's beacons flash like a real rotating beacon, about 88 a minute (%.1f, %d flashes over %d gaps), under 3 a second" % [per_minute, flashes, gaps.size()])
 	print("corridor beacon flash: lens-light r %.3f, lens red %.2f to %.2f (%.2f), %.1f flashes a minute (tween clock, gaps %s) over %d samples" % [r, red_low, red_high, red_low / maxf(red_high, 0.001), per_minute, str(gaps), alphas.size()])
 	var records_lens: Color = _lens(records)
 	_expect(records_lens.is_equal_approx(records.warning_color), "Records' drawn beacons keep a steady lens")
