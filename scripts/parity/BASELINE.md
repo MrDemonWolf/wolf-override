@@ -271,6 +271,70 @@ of `e241508`.
 - **Perf.** Five runs of each side, interleaved in one session after the captures (load 6-12);
   table in `parity/s02/perf-table.md`.
 
+## Baseline for S03 (c5d1d84)
+
+S03 was first proven on `8cb4301` (S02 merged). Before it shipped, `origin/main` gained PR #67
+(approved wording: `junction_room.gd`, `main.gd`, new UI text and narration), PR #68 (the knockdown
+body, a true sentry beam, the bolt feed drawn in front of the sentry) and PR #69 (WOLF out of the
+machines: `m0_actor.gd` facing and edging, Main's rest spots), all of which change pixels, text and
+sound calls. So S03 (S03a palette, S03b fx-kit, S03c tweens) was rebased onto `c5d1d84`, the
+Palette and Tweens conversion redone for the code those PRs added (the conflicting bolt feed and
+vent steam blocks; the new colours that only one script uses, such as `FLICKER_DARK`, `FEED_STEEL`
+and the valve face, stay in that script), and every baseline re-taken from a `git archive` of
+`c5d1d84`'s `apps/game`.
+
+**Driver change.** Since #67 the engineer stops at the rubble line while the box before the lane
+question is up (`Main.lane_question_held`), so R4's walk to the lane question ended short ("walk to
+600 stopped at 527.2") and the rest of R4 failed on every commit. `_walk_to` now keeps the key down
+through that hold, as it already did while the engineer waits for WOLF. The driver is now
+`capture.gd` SHA-1 `1a312f17` (`parity_sfx_bank.gd` `57cc689b` unchanged), and every
+capture below, before and after, was taken with it. Older folders taken with `c1746c4c` are not
+comparable with these and were deleted.
+
+- **Stills.** `parity/s03c5/cap-base/` (`c5d1d84`) and `parity/s03c5/cap-head/` (the S03 branch's
+  last commit): all 36 runs each, 1,908 stills, four render lanes (one run lost to a half-imported
+  render cache under other agents' render jobs was re-taken on a fresh cache; no failed run is in the
+  compared folders). `compare.py` reports `ALL IDENTICAL: 36 run folders, 1908 stills compared`,
+  with every text and audio log and frame count the same. Frame counts on `c5d1d84`: R1 1,480; R2
+  3,011; R3 1,605; R4 2,635 (`kb-fx`), 2,629 (`kb-calm`), 2,633 (`touch-fx`). Texture memory per
+  still fell from 80.1 to 77.4 MB on average (the shared gradients) and draw calls by 1.0% over all
+  stills (the shared additive material batches); both are information, not the gate.
+- **Each split (critique D).** S03a and S03b were each captured on their own at 1280x720 (all four
+  routes in all three variants, 12 runs each) into `parity/s03c5/cap-a/` and `parity/s03c5/cap-b/`:
+  against `cap-base/`'s 1280x720 runs, `compare.py --subset` reports `ALL IDENTICAL: 12 run
+  folders, 636 stills compared` for each, with every text and audio log and frame count the same.
+  S03a leaves texture memory and draw calls exactly as they were; S03b brings the whole fall (76.7
+  to 74.0 MB per still on average, 48,697 to 48,202 draw calls over the 636 stills), and S03c
+  changes neither. Headless, every split's UI dump and a node-tree dump of seven states (every node's
+  class, visibility, colours, z, material and blend, texture with its gradient, and particle
+  settings; 3,886 lines) are identical to `c5d1d84`'s, every route's text and audio logs from a
+  headless run of the driver match, and the import and every suite pass on each split
+  (`studio_logo_test` once logged a dummy-renderer texture error on S03a, which does not touch the
+  logo screen, and passed three re-runs).
+- **UI dump.** `parity/s03c5/ui-base-c5d1d84.txt`, 364 lines over 13 states; the branch's dump and
+  each split's diff empty against it.
+- **game:check.** On the branch's `apps/game`, with HOME isolated, all 21 suites passed (169 s, no
+  leak) at load about 30. A second run at load 111 failed `crank_hold_test`, `debug_tools_test` and
+  `impact_test` on timing; run alone, `impact_test` and `crank_hold_test` pass three times out of
+  three on both `c5d1d84` and the branch, and `debug_tools_test` fails the same timing checks
+  (a drawn frame within 10 frames; the note clear of the actors after a jump) on `c5d1d84` as on
+  the branch at that load (`parity/s03c5/rerun-suites.txt`, `rerun-debug-tools.txt`).
+- **Perf.** Five runs of each side, interleaved in one session (`parity/s03c5/perf-before/` and
+  `perf-after/`; table in `parity/s03c5/perf-table.md`) on a shared machine at load about 30 with
+  other agents' render jobs running. The first frame after the scene enters the tree fell from 12.4
+  to 3.5 ms, objects at the end from 3,491 to 3,277 and static memory from 135.0 to 132.5 MB, with
+  556 nodes on both sides; frame and `_process` times moved in both directions within the noise of
+  that load. A second session ran at load about 250 and was discarded. The perf table's scene load
+  read +5.8% (median of five), so load time was measured again on its own in fresh headless
+  processes, before and after alternating (`parity/s03c5/loadtime-b1.txt`, `loadtime-b2.txt`,
+  `loadcpu-1.txt`, `load3.txt` with a before-against-before control arm, and `loadsplit.txt`), at
+  load 15-67. Wall time is too noisy there to read (the control arm's medians moved 4.5%), but the
+  process's CPU time is steadier: after against before, the median of paired ratios is +2.3% and
+  +2.8% (the control arm -0.3%), and the fastest and 10th-percentile runs +2.2% and +2.5%. The
+  three new scripts take 3.2 ms to load on their own. So S03 adds about 2-3% (some 17-20 ms of CPU
+  on this machine) to a fresh process that loads the scene, inside the critique's 5% budget; it is
+  not proven smaller than that on this machine.
+
 ## S00a: maps refreshed on 9c7371d
 
 Figures from `python3 -I scripts/parity/surface.py` at `9c7371d` (the critique's maps were taken at
