@@ -25,6 +25,13 @@ jobs:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
+          # Full history, so the copy check can find the pull request's merge base.
+          fetch-depth: 0
+      - name: Check for copied code
+        if: github.event_name == 'pull_request'
+        env:
+          BASE_REF: ${{ github.base_ref }}
+        run: python3 scripts/check-copies.py --base "origin/$BASE_REF"
       - name: Get pinned Godot 4.7.2
         run: |
           curl --fail --location --retry 3 \

@@ -7,6 +7,7 @@
     "apps/*"
   ],
   "scripts": {
+    "check:copies": "python3 scripts/check-copies.py --base origin/main",
     "docs:dev": "bun run --filter docs dev",
     "docs:check": "bun run --filter docs types:check",
     "docs:build": "bun run --filter docs build && scripts/check-docs-export.sh",
