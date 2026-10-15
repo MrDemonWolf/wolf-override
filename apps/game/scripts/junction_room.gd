@@ -805,19 +805,9 @@ static func prop_rect(prop: Sprite2D, source: Rect2) -> Rect2:
 ## leaf, and the blast door's pieces from JunctionDoorLayout; at the blast the leaf breaks, then the
 ## doorway stands empty on the lane and the leaf lies thrown beyond it.
 func _build_door() -> void:
-	door_body = StaticBody2D.new()
-	door_body.name = "Door"
-	door_body.position = Vector2(DOOR_X, FLOOR_Y - DOOR_HEIGHT * 0.5)
-	door_body.collision_layer = 2
-	door_body.collision_mask = 0
-	door_shape = CollisionShape2D.new()
-	var box: RectangleShape2D = RectangleShape2D.new()
-	box.size = Vector2(DOOR_WIDTH, DOOR_HEIGHT)
-	door_shape.shape = box
 	# Off until the junction is the room in play (see set_active).
-	door_shape.disabled = true
-	door_body.add_child(door_shape)
-	add_child(door_body)
+	door_shape = RoomDepth.door_body(self, "Door", Vector2(DOOR_X, FLOOR_Y - DOOR_HEIGHT * 0.5), Vector2(DOOR_WIDTH, DOOR_HEIGHT))
+	door_body = door_shape.get_parent() as StaticBody2D
 	door_hole = _door_piece("DoorHole", JunctionDoorLayout.HOLE_REGION, JunctionDoorLayout.HOLE_AT, JunctionDoorLayout.HOLE_SCALE, DOOR_Z)
 	door_leaf = _door_piece("DoorLeaf", JunctionDoorLayout.LEAF_REGION, JunctionDoorLayout.LEAF_AT, JunctionDoorLayout.LEAF_SCALE, DOOR_Z)
 	door_leaf_breaking = _door_piece("DoorLeafBreaking", JunctionDoorLayout.LEAFBREAK_REGION, JunctionDoorLayout.LEAFBREAK_AT, JunctionDoorLayout.LEAFBREAK_SCALE, DOOR_Z)
@@ -866,18 +856,7 @@ func _build_entry() -> void:
 	entry_mesh.add_quad(ENTRY_FRONT_REGION, ENTRY_FRONT_AT, 0.5)
 	depth.add_child(entry_mesh)
 	# The shut leaf stops whoever walks into it: 16 px deep from its junction face, as tall as a door.
-	var body: StaticBody2D = StaticBody2D.new()
-	body.name = "EntryDoorBody"
-	body.collision_layer = 2
-	body.collision_mask = 0
-	body.position = Vector2(ENTRY_DOOR_X - 8.0, FLOOR_Y - 66.0)
-	entry_door_shape = CollisionShape2D.new()
-	var box: RectangleShape2D = RectangleShape2D.new()
-	box.size = Vector2(16.0, 132.0)
-	entry_door_shape.shape = box
-	entry_door_shape.disabled = true
-	body.add_child(entry_door_shape)
-	add_child(body)
+	entry_door_shape = SwingLeaf.make_body(self, "EntryDoorBody", ENTRY_DOOR_X, -1.0)
 
 
 ## The entry's status lamp: amber while its closer brings the leaf shut, red once it latches.

@@ -208,8 +208,9 @@ func _ready() -> void:
 	front_mesh.add_quad(EXIT_COLUMN_REGION, EXIT_COLUMN_AT, DOORS_SCALE)
 	front_mesh.add_quad(EXIT_STUB_REGION, EXIT_STUB_AT, DOORS_SCALE)
 	add_child(front_mesh)
-	exit_door_shape = _door_body("ExitDoor", EXIT_DOOR_X, 1.0)
-	entry_door_shape = _door_body("EntryDoor", ENTRY_DOOR_X, -1.0)
+	# Each shut leaf stops whoever walks into it at its room face; refresh_state() enables the bodies.
+	exit_door_shape = SwingLeaf.make_body(self, "ExitDoor", EXIT_DOOR_X, 1.0)
+	entry_door_shape = SwingLeaf.make_body(self, "EntryDoor", ENTRY_DOOR_X, -1.0)
 	purge_glow = _add_glow("PurgeGlow", PURGE_LIGHT.get_center())
 	mirror_glow = _add_glow("MirrorGlow", MIRROR_LIGHT.get_center())
 	purge_label = _add_station_label("PURGE QUEUE", 190.0, Color("#ffc7c7"))
@@ -241,24 +242,6 @@ func entry_lamp_color() -> Color:
 ## Where the security container's art is drawn (world).
 func container_rect() -> Rect2:
 	return plate_mesh.quad_rect(container_quad)
-
-
-## A shut leaf's body: 16 px deep from its room face at [param face_x], on the side [param side] (1
-## right, -1 left), as tall as the corridor seal's. Main enables it through refresh_state().
-func _door_body(body_name: String, face_x: float, side: float) -> CollisionShape2D:
-	var body: StaticBody2D = StaticBody2D.new()
-	body.name = body_name
-	body.collision_layer = 2
-	body.collision_mask = 0
-	body.position = Vector2(face_x + side * 8.0, RoomDepth.FLOOR_Y - 66.0)
-	var shape: CollisionShape2D = CollisionShape2D.new()
-	var box: RectangleShape2D = RectangleShape2D.new()
-	box.size = Vector2(16.0, 132.0)
-	shape.shape = box
-	shape.disabled = true
-	body.add_child(shape)
-	add_child(body)
-	return shape
 
 
 ## An additive glow over a drawn machine light; refresh_state() tints it with the light's colour. It

@@ -560,6 +560,29 @@ static func cut(texture: Texture2D, region: Rect2, piece_scale: float, piece_nam
 	return sprite
 
 
+## A door's collision: a StaticBody2D named [param body_name] at [param center] (world px, in
+## [param parent]'s space) on the doors' layer 2, colliding with nothing itself, holding a
+## CollisionShape2D with a [param size] (px) RectangleShape2D. The body is added to [param parent]
+## now (its place among the parent's children is kept, so callers call it where the body belongs) and
+## the shape starts disabled: the room turns it on while it is the room in play (refresh_state,
+## set_active). Returns the shape. Users: the blast door (JunctionRoom._build_door) and the swing doors
+## through SwingLeaf.make_body (the Records entry and exit, the junction entry).
+static func door_body(parent: Node, body_name: String, center: Vector2, size: Vector2) -> CollisionShape2D:
+	var body: StaticBody2D = StaticBody2D.new()
+	body.name = body_name
+	body.collision_layer = 2
+	body.collision_mask = 0
+	body.position = center
+	var shape: CollisionShape2D = CollisionShape2D.new()
+	var box: RectangleShape2D = RectangleShape2D.new()
+	box.size = size
+	shape.shape = box
+	shape.disabled = true
+	body.add_child(shape)
+	parent.add_child(body)
+	return shape
+
+
 ## A station prop cut to [param region] of its own image (its painted outline, so the floor
 ## reflection mirrors from its real base), [param prop_scale]d, centred on [param center_x] with its
 ## base on [param base_y].

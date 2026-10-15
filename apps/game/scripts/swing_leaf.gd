@@ -30,6 +30,9 @@ const ARM_SHOE_OFF: float = 0.035
 const ARM_MAIN: float = 0.26
 const ARM_FORE: float = 0.30
 const ARM_WIDTH: float = 0.028
+## A shut swing leaf's collision box (px): 16 deep from its room face, as tall as the corridor seal's
+## (132), so it stops whoever walks into it at the face.
+const BODY_SIZE: Vector2 = Vector2(16.0, 132.0)
 ## Rows of the mesh (fractions of the leaf height), so the door light's fall-off down the leaf is smooth.
 const ROWS: PackedFloat32Array = [0.0, 0.2, 0.45, 0.7, 0.88, 1.0]
 const AMBIENT: Vector3 = Vector3(0.020, 0.032, 0.042)
@@ -86,6 +89,13 @@ func _init(atlas: Texture2D, room: Rect2, outside: Rect2, edge: Rect2, hinge_foo
 	axis_n = n
 	lights = lamps
 	texture_filter = CanvasItem.TEXTURE_FILTER_LINEAR_WITH_MIPMAPS
+
+
+## A shut swing leaf's body in [param parent] (RoomDepth.door_body): BODY_SIZE, its face on the walk
+## line at world x [param face_x], reaching into the doorway on the side [param side] (1 right, -1
+## left), standing on the floor. Disabled until the room enables it; returns the shape.
+static func make_body(parent: Node, body_name: String, face_x: float, side: float) -> CollisionShape2D:
+	return RoomDepth.door_body(parent, body_name, Vector2(face_x + side * BODY_SIZE.x * 0.5, RoomDepth.FLOOR_Y - BODY_SIZE.y * 0.5), BODY_SIZE)
 
 
 ## World px of the point [param p] (metres: x along the room, y up, z behind the walk line) seen from
