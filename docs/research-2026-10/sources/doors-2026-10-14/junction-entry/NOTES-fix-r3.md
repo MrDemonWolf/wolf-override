@@ -40,15 +40,15 @@ same kind of door end as every other door of the base, in the junction's own cam
   the walkway, its approach face crossing the walk line at x 30, with a 3'0" x 7'0" hollow-metal steel door
   on three 4-1/2 in hinges at the far jamb (SDI 129) and a surface closer on its junction side; the near
   column with a guarded status lamp; a 0.15 m stub. The design reuses `records/tools/rdesign.py`'s parts
-  (`tools/jedesign.py`), with its own pour joint (3.3 m), no pipe plates, its own lamps (the door light, the
+  (`tools/jedesign.py`; this round's: `fix-r1/jentry/tools/jedesign.py` at 7d55687), with its own pour joint (3.3 m), no pipe plates, its own lamps (the door light, the
   junction's left ceiling lamp, the passage fitting) and its own passage behind (concrete, the service
   line's two pipes and cable ladder running on toward Records, one fitting).
 - **Why x 30.** WOLF's authored spot by the entrance (WOLF_CLEAR_X 100) puts his tail at x 33: the shut
   leaf's junction face at x 30 and the near column (x 4.5..15 at 1 m) stay left of him. The engineer's
   collision face is the leaf (x 30), so they stop at x 44; WOLF follows no further left than x 97.
 - **Paint and clean-up.** Session fix-junction-entry (two images: the door end, the leaf's faces), the
-  records cleanup's method (`tools/jeclean.py`: design colour and light times the paint's detail), graded
-  by `../tools/rgrade.py`, packed by `tools/jeinstall.py`: `junction-entry-atlas.png` (549 x 638), the
+  records cleanup's method (`tools/jeclean.py`, this round's `fix-r1/jentry/tools/jeclean.py` at 7d55687: design colour and light times the paint's detail), graded
+  by `../tools/rgrade.py`, packed by `tools/jeinstall.py` (this round's: `fix-r1/jentry/tools/jeinstall.py` at 7d55687): `junction-entry-atlas.png` (549 x 638), the
   passage painted into `junction-far.png` at the left clamp's parallax, `junction-mid.png` cleared left of
   the column and the stub (the cutaway).
 - **In the game** (`junction_room.gd` ENTRY_*): one AtlasMesh after the mid plate (wall, leaf with the
