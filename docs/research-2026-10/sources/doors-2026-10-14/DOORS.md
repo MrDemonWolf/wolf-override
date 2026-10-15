@@ -82,7 +82,7 @@ Everything below this section describes round 3 and earlier. Where they disagree
 - **`fix-r4/rebuild.sh`** reproduces the one changed asset. A re-run left the game copy byte-identical.
 - **Capture driver:** it now reads optional flags through `_flag()`, so it runs on main, which has no flight. Main's run notes "flight not caught", as expected.
 - **Register:** `manifest.json`, see S3.
-- **Track notes:** `records/`, `junction/`, `hatch/NOTES.md` and `fix-r3/jentry/NOTES.md` have round-4 sections.
+- **Track notes:** `records/`, `junction/`, `junction-exit/` and `junction-entry/NOTES.md` have round-4 sections.
 - **Tools** are in `fix-r4-tools/`: the tools, driver, rebuild, render and suite scripts, gains and constants.
 
 ## Drafts for Nathanial (not shipped)
@@ -195,7 +195,7 @@ The "leaf / wall ≤ 1" rule from review r2 (N3) still holds for the **shut** le
 - **No Codex session this round.** Every change is design-driven and deterministic (NumPy, SciPy, Pillow) on round 2's cleaned paint, or drawn from the model.
 - **`tools/rebuild.sh`** (filed as `fix-r3/rebuild.sh` at dee9996) reproduces every asset. A full re-run changes only the file it should (byte-identical elsewhere).
 - **The asset register** (`manifest.json`) has round-3 notes on the seven changed assets: records-doors-atlas, records-far, junction-door-atlas, junction-entry-atlas, junction-exit-atlas, junction-mid and junction-far, each with size and SHA-256 (`manifest_r3.py`).
-- **Track notes:** `records/`, `junction/` and `hatch/NOTES.md` and `fix-r3/jentry/NOTES.md` have round-3 sections.
+- **Track notes:** `records/`, `junction/`, `junction-exit/` and `junction-entry/NOTES.md` have round-3 sections.
 - **Tools** are in `fix-r3/` (scratch name `fix-r3-tools/`); those later rounds kept using are in `tools/` (`README.md`, "Tool map").
 
 ## Drafts for Nathanial (not shipped)
@@ -336,8 +336,8 @@ The raw texture ratio against the back walls stays under 0.5 at most ends, becau
 - **The asset register** (`manifest.json`) records round 2 for the seven changed assets (sessions, method, size, SHA-256).
 - **Corrected notes:**
   - `records/NOTES.md` now names the ghost door, and the pipe-less plates' streaks;
-  - `fix-r1/jentry/NOTES.md` and `fix-r2/jentry/NOTES.md` correct the "junction-mid cleared" claim and the passage claim;
-  - `junction/NOTES.md` and `hatch/NOTES.md` have round-2 sections on top.
+  - `junction-entry/NOTES.md` (its round 2 section) corrects the "junction-mid cleared" claim and the passage claim;
+  - `junction/NOTES.md` and `junction-exit/NOTES.md` have round-2 sections on top.
 
 ## Drafts for Nathanial (not shipped)
 
