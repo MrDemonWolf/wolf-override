@@ -170,6 +170,7 @@ func _check_scene() -> void:
 	_check_running(depths, "corridor", "in the corridor")
 	var corridor_pulsing: bool = await _beacons_pulse(corridor)
 	_expect(not corridor.lockdown_cleared and corridor_pulsing, "the corridor's lockdown beacons pulse before the safe point")
+	await _check_corridor_flash(game, corridor, records)
 	# Open the seal by the bypass and reach the safe point: the corridor is cleared.
 	var state: M0State = game.get("state") as M0State
 	state.record_choice(State.PRESS)
@@ -187,7 +188,14 @@ func _check_scene() -> void:
 	game.call("_new_game")
 	game.call("_finish_intro")
 	var new_game_pulsing: bool = await _beacons_pulse(corridor)
-	_expect(not corridor.lockdown_cleared and _lens(corridor).is_equal_approx(corridor.warning_color) and new_game_pulsing, "a new game brings the corridor's pulse back")
+	# The corridor's lens now dims with each flash, so look for it back at full red over a cycle.
+	var top_red: float = 0.0
+	var watch_start: int = Time.get_ticks_usec()
+	while Time.get_ticks_usec() - watch_start < 900000:
+		await process_frame
+		top_red = maxf(top_red, _lens(corridor).r)
+	var full_red: bool = top_red >= corridor.warning_color.r - 0.02
+	_expect(not corridor.lockdown_cleared and full_red and new_game_pulsing, "a new game brings the corridor's pulse back (cleared %s, lens red up to %.2f, pulsing %s)" % [corridor.lockdown_cleared, top_red, new_game_pulsing])
 	game.call("_return_to_title")
 	game.call("_load_game")
 	var continued_pulsing: bool = await _beacons_pulse(corridor)
@@ -326,10 +334,82 @@ func _check_running(depths: Dictionary, current: String, label: String) -> void:
 
 ## True when a beacon glow's brightness changes over most of a second.
 func _beacons_pulse(depth: RoomDepth) -> bool:
+	# Sampled through 0.7 s rather than at its two ends, which a 0.68 s flash cycle (the corridor's)
+	# could land on at the same phase.
 	var glow: Sprite2D = depth.lamp_glows.filter(func(node: Sprite2D) -> bool: return node.name == "WarningGlow0")[0]
-	var before: float = glow.modulate.a
-	await create_timer(0.7).timeout
-	return absf(glow.modulate.a - before) > 0.02
+	var low: float = glow.modulate.a
+	var high: float = low
+	for _sample: int in 7:
+		await create_timer(0.1).timeout
+		low = minf(low, glow.modulate.a)
+		high = maxf(high, glow.modulate.a)
+	return high - low > 0.02
+
+
+## The corridor's caged lamps flash like a real rotating red beacon (round 11, realism review r4):
+## each lamp's lens dims and brightens with the light it casts (in phase, its red at the bottom no
+## more than half its red at the top), about 80-96 flashes a minute and never 3 a second, while
+## Records' drawn beacons keep their steady lens and slow breathe; Reduced Motion holds the corridor's
+## lamps lit and steady at once, and turning it off brings the flash back.
+func _check_corridor_flash(game: Node2D, corridor: RoomDepth, records: RoomDepth) -> void:
+	_expect(corridor.beacon_flash and corridor.beacon_lens_trough >= 0.5 and not records.beacon_flash and is_zero_approx(records.beacon_lens_trough), "only the corridor's caged lamps flash with their lenses (Records and the junction keep the drawn beacons' breathe)")
+	var glow: Sprite2D = corridor.lamp_glows.filter(func(node: Sprite2D) -> bool: return node.name == "WarningGlow0")[0]
+	var alphas: Array[float] = []
+	var reds: Array[float] = []
+	var times: Array[float] = []
+	var start: int = Time.get_ticks_usec()
+	while Time.get_ticks_usec() - start < 2400000:
+		await process_frame
+		times.append(float(Time.get_ticks_usec() - start) / 1000000.0)
+		alphas.append(glow.modulate.a)
+		reds.append(_lens(corridor).r)
+	var r: float = _pearson(alphas, reds)
+	var red_low: float = reds.min()
+	var red_high: float = reds.max()
+	_expect(r >= 0.9 and red_low <= 0.5 * red_high, "the corridor lamp's lens moves with its light (r %.3f) and its red falls to %.2f of its top" % [r, red_low / maxf(red_high, 0.001)])
+	# Flashes: rises through the middle of the light's swing.
+	var mid: float = (alphas.min() + alphas.max()) * 0.5
+	var rises: Array[float] = []
+	for i: int in range(1, alphas.size()):
+		if alphas[i - 1] < mid and alphas[i] >= mid:
+			rises.append(times[i])
+	var per_minute: float = 0.0
+	if rises.size() >= 2:
+		per_minute = 60.0 * float(rises.size() - 1) / (rises[rises.size() - 1] - rises[0])
+	_expect(per_minute >= 80.0 and per_minute <= 96.0, "the corridor's beacons flash like a real rotating beacon, about 88 a minute (%.0f), under 3 a second" % per_minute)
+	print("corridor beacon flash: lens-light r %.3f, lens red %.2f to %.2f (%.2f), %.1f flashes a minute over %d samples" % [r, red_low, red_high, red_low / maxf(red_high, 0.001), per_minute, alphas.size()])
+	var records_lens: Color = _lens(records)
+	_expect(records_lens.is_equal_approx(records.warning_color), "Records' drawn beacons keep a steady lens")
+	# Reduced Motion: lit and steady at once.
+	game.call("_on_reduced_motion_changed", true)
+	await process_frame
+	var steady: bool = true
+	for _sample: int in 8:
+		await create_timer(0.1).timeout
+		steady = steady and is_equal_approx(glow.modulate.a, corridor.beacon_peak_alpha) and _lens(corridor).is_equal_approx(corridor.warning_color)
+	_expect(steady, "with Reduced Motion the corridor's beacons hold lit and steady (light %.2f, lens %s)" % [glow.modulate.a, _lens(corridor)])
+	game.call("_on_reduced_motion_changed", false)
+	var back: bool = await _beacons_pulse(corridor)
+	_expect(back, "turning Reduced Motion off brings the corridor's flash back")
+
+
+func _pearson(xs: Array[float], ys: Array[float]) -> float:
+	var n: float = float(xs.size())
+	var mx: float = 0.0
+	var my: float = 0.0
+	for i: int in xs.size():
+		mx += xs[i]
+		my += ys[i]
+	mx /= n
+	my /= n
+	var sxy: float = 0.0
+	var sxx: float = 0.0
+	var syy: float = 0.0
+	for i: int in xs.size():
+		sxy += (xs[i] - mx) * (ys[i] - my)
+		sxx += (xs[i] - mx) * (xs[i] - mx)
+		syy += (ys[i] - my) * (ys[i] - my)
+	return sxy / maxf(sqrt(sxx * syy), 0.000001)
 
 
 ## True when every beacon holds the settled glow with a darkened lens.
