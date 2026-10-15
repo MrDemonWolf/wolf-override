@@ -35,6 +35,7 @@ opening a pull request:
 
 ```bash
 bun run game:check   # changelog export check, Godot import, headless suites
+bun run check:copies # no new copied code since origin/main
 bun run docs:check   # MDX and Next types, then TypeScript
 bun run docs:test    # docs unit tests
 bun run docs:build   # static export plus the export checks
@@ -49,8 +50,11 @@ as validated until the route has been played.
 
 Don't copy code. `bun run check:copies` (Python 3, standard library only)
 looks for runs of six or more matching lines, ignoring comments, blank
-lines and spacing, that your branch adds or touches since it left
-`origin/main`; every pull request runs it as part of the `godot` check.
+lines, indentation and spaces (except inside quoted strings), that your
+branch adds or touches since it left `origin/main`; every pull request
+runs it as part of the `godot` check. It compares text, not meaning, so a
+copy with renamed variables passes it: a pass is not proof that there are
+no copies, and reviewers still read for them.
 When it fails, it names both places: move that code into one shared file
 that both use and delete the copy. If two places truly must stay
 separate, list the pair with a reason in `.copies-allow` and say why in
