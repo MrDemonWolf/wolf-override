@@ -649,9 +649,11 @@ func _check_prompts_clear(path: String) -> void:
 			for frame: int in 5:
 				await process_frame
 			Input.action_release(&"move_right")
-			for frame: int in 600:
-				if fresh.bottom_bar.visible:
-					break
+			# The first box waits for the name card's fade (Main.TOP_CARD_FADE_SECONDS, counted in each
+			# frame's real delta), so the wait is bounded by real time, not a frame count: headless frames
+			# on an idle machine can run 600 of them in under that fade.
+			var waited_from: int = Time.get_ticks_msec()
+			while not fresh.bottom_bar.visible and Time.get_ticks_msec() - waited_from < 10000:
 				await process_frame
 			_check_prompt_clear(fresh, touch, true, context)
 			_expect(fresh.bottom_bar.visible, "%s: the opening lines' first box comes up while the tutorial prompt shows" % context)
