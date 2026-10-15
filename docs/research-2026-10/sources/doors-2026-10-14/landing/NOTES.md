@@ -15,7 +15,7 @@ The package was round 4 of `doors-r1` (`fix-r4/`), built on main 0c5d1ae. Its di
 
 ## Fixes made while landing
 
-- **Review r5 S1 (capture driver):** one frame's wait after time freezes, so the flight tween's pending step lands before the pose; the thrown leaf is posed at t 0.1, 0.2, 0.3, 0.45, 0.7 and 0.9 (`driver/doors_capture.gd`). The frames now read in order: behind the near column, clear of it, in front of the column and the release, tipping, low and nearly flat.
+- **Review r5 S1 (capture driver):** one frame's wait after time freezes, so the flight tween's pending step lands before the pose; the thrown leaf is posed at t 0.1, 0.2, 0.3, 0.45, 0.7 and 0.9 (`landing/driver/doors_capture.gd` at dee9996, now `../tools/driver/doors_capture.gd`). The frames now read in order: behind the near column, clear of it, in front of the column and the release, tipping, low and nearly flat.
 - **Review r5 S2 (exit wall pack shadow):** `tools/exit_fixes.py` refills the hard diagonal band with the face's own concrete (same row, 14 px along) at 0.9x the lit concrete beside it, its edge softening with distance from the fitting, with a short contact shadow under the housing. Band mean luminance 33.7 -> 40.4 against 44.0 for the lit concrete beside it.
 - **C1:** the warm streaks in the exit's floor wedge and carried-on deck take the wall pack's cool white at 0.85x their luminance (4,942 atlas px).
 - **C2:** `tools/leaf_wear.py` rebuilds the three push-face kick plates as brushed stainless (mottle standard deviation 38-59 -> 10-13) and fades the evenly scattered scuff dashes outside the wear zones (by the lever, low on the leaf), keeping them there in uneven clusters.
@@ -56,7 +56,7 @@ See `../../../../decisions.md` ("Doors landed") and `../../../approved/`: every 
 ## Evidence
 
 - Suites: every `apps/game/tests/*_test.gd`, run by `bun run game:check` (twice) on the final branch.
-- Stills: `render.sh` with `driver/doors_capture.gd`, before (an untouched `git archive` of `origin/main`) and after (this branch), at 1280x720 (with the budget) and 2400x1080 with the touch layout (`--touch=1`), runs `land-doors-{before,after}-{desk,phone}`; the sentry at the far end of its patrol and its beam facing back over the alcove come from `driver2/panel_capture.gd` (p01, p02).
+- Stills: `render.sh` (now `../tools/render.sh`) with `landing/driver/doors_capture.gd` at dee9996, before (an untouched `git archive` of `origin/main`) and after (this branch), at 1280x720 (with the budget) and 2400x1080 with the touch layout (`--touch=1`), runs `land-doors-{before,after}-{desk,phone}`; the sentry at the far end of its patrol and its beam facing back over the alcove come from `driver2/panel_capture.gd` (p01, p02).
 - Budget: `perf.py` compares the drivers' per-state draw calls, objects, visible additive items and texture memory (p50 and max over 60 frames, 1280x720, software GL):
 
 | State | Draw calls p50 (max), main -> doors | Objects p50 | Additive items (room) | Texture MB |
