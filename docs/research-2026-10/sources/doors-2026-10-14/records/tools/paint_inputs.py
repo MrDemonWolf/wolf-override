@@ -28,7 +28,7 @@ PPW = 4.0
 
 def door_target(side):
     piece = "exit" if side > 0 else "entry"
-    job = f"records-{piece}" + os.environ.get("JOB_SUFFIX", "")
+    job = f"r2-records-{piece}"
     door = M.DoorEnd(side, RD.XC if side > 0 else RD.XE)
     X0 = 757.0 if side > 0 else -53.0
     Y0 = 140.0
@@ -66,11 +66,9 @@ def door_target(side):
         img.alpha_composite(cont, co)
         m = np.asarray(Image.open(os.path.join(M.DESIGN, "container", "masks", "container--ALPHA.png")), dtype=np.float64) / 255.0
         area[co[1]:co[1] + m.shape[0], co[0]:co[0] + m.shape[1]] = np.maximum(area[co[1]:co[1] + m.shape[0], co[0]:co[0] + m.shape[1]], m)
-    # the shut leaf (its room face), warped into place
-    before = np.asarray(img).copy()
-    C.place_leaf(img, X0, Y0, door, 0.0, os.path.join(M.DESIGN, "leaf"), "out-exit")
-    after = np.asarray(img)
-    area = np.maximum(area, (np.abs(after.astype(int) - before.astype(int)).sum(-1) > 0).astype(float))
+    # fix round 2 (N1): painted OPEN with no leaf: the doorway shows the passage (or vestibule) behind it,
+    # painted as itself; the leaf's faces are painted flat on the parts sheet. (Round 1 painted the shut
+    # leaf here and the cleanup then built the space behind the doorway from it: a ghost door.)
     paste("design-front.png", "front--ALPHA.png")
     out = os.path.join(CODEX, job)
     os.makedirs(os.path.join(out, "refs"), exist_ok=True)
@@ -84,7 +82,7 @@ def door_target(side):
 
 
 def parts_target():
-    job = "records-parts" + os.environ.get("JOB_SUFFIX", "")
+    job = "r2-records-parts"
     out = os.path.join(CODEX, job)
     os.makedirs(os.path.join(out, "refs"), exist_ok=True)
     os.makedirs(os.path.join(out, "out"), exist_ok=True)

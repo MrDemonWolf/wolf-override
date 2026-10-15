@@ -185,7 +185,8 @@ def write_json(path, data):
 
 
 class Part:
-    def __init__(self, layer, name, polys, albedo, plane=None, dims="", job="", texture=None, emit=None, clip=None, lamps=None, clipfn=None):
+    def __init__(self, layer, name, polys, albedo, plane=None, dims="", job="", texture=None, emit=None, clip=None, lamps=None, clipfn=None, mod=None):
+        self.mod = mod  # fix round 1: albedo multiplier from the plane's (la, lb), as jmodel's (designed wear)
         self.layer, self.name, self.polys, self.albedo, self.plane = layer, name, polys, np.asarray(albedo, float), plane
         self.dims, self.job, self.texture, self.emit, self.clip, self.lamps = dims, job, texture, emit, clip, lamps
         self.clipfn = clipfn  # per-pixel 0..1 from the part's 3D points (e.g. only what lies beyond a wall)
@@ -208,6 +209,9 @@ def render(parts, canvas, lamps):
             col = p.albedo * shade(Pp, pl.n, p.lamps if p.lamps is not None else lamps)
             if p.texture == "seam":  # a recessed joint: darker
                 col = col * 0.55
+            if p.mod is not None:
+                fm = p.mod(Pp, la, lb)
+                col = col * (fm[..., None] if isinstance(fm, np.ndarray) else fm)
         lay = out.setdefault(p.layer, {"lin": np.zeros((H, W, 3)), "a": np.zeros((H, W)), "masks": {}})
         lay["lin"] = lay["lin"] * (1 - m[..., None]) + col * m[..., None]
         lay["a"] = m + lay["a"] * (1 - m)

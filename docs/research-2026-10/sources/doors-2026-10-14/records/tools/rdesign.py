@@ -57,13 +57,93 @@ def lamps_for(side):
         f_door = Lamp("entry door light: vapour-tight LED 0.6 m on the cross-wall face over the door", door.pt(0.0, 2.80, -0.10), (0.86, 0.95, 1.0), 0.95, 1.4, 2.0)
         f_room = Lamp("Records ceiling lamp 0 (far plate, painted)", M.from_screen(178.6, 211.0, 4.3), (0.72, 0.93, 1.0), 0.9, 3.2, 1.5)
         f_pass = Lamp("vestibule light: vapour-tight LED on the vestibule back wall", M.from_screen(18.0, 300.0, PASSAGE_D - 0.12), (0.80, 0.92, 1.0), 0.55, 1.4, 1.5)
-    bounce = Lamp("floor bounce (wet floor in front, a fill)", np.array([door.O[0] - door.side * 2.0, 0.1, -3.0]), (0.55, 0.75, 0.85), 0.10, 4.0)
+    # fix round 2 (N3): the wet floor in front of the door end is lit by the room's lamps and throws that
+    # light back up onto every face that looks at it (the open leaf, the container's front, the column's
+    # end): a broad, low fill from the floor itself, the visible source those faces see
+    bounce = Lamp("floor bounce (the lit wet floor in front, a broad fill)", np.array([door.O[0] - door.side * 2.0, 0.1, -3.0]), (0.55, 0.75, 0.85), BOUNCE_I, 5.0)
     return door, [f_door, f_room, f_pass, bounce], f_door, f_pass
+
+
+def _noise2(a, h, sa, sh, seed):
+    rng = np.random.default_rng(seed)
+    out = np.zeros_like(a)
+    for k in range(6):
+        fa, fh = rng.uniform(0.6, 1.6) / sa, rng.uniform(0.6, 1.6) / sh
+        ph = rng.uniform(0, 2 * math.pi, 2)
+        out += np.sin(a * fa * 2 * math.pi + ph[0]) * np.sin(h * fh * 2 * math.pi + ph[1]) / (k + 1)
+    return out / 1.5
+
+
+# fix round 1 (S6): the two end walls were cast in different lifts and fitted differently, so they are
+# not one layout mirrored: the exit's pour joint is at 3.6 m, the entry's at 4.2 m.
+POUR_H = {1: 3.60, -1: 4.20}
+# the room's two pipe runs on its back wall (measured on the far plate: h 1.27 and 4.13 m at the back
+# wall) pass through each cross-wall at its back corner, each through a welded penetration plate
+PIPE_RUNS = ()  # fix round 2 (S2): the room's pipe runs end behind the mid plate's pillar at the back corner;
+# the two blank penetration plates (and the leach streaks under them) had no visible pipe, so they are gone
+BOUNCE_I = 0.30  # fix round 2: the floor fill (was 0.10)
+# fix round 2 (human: "smooth empty slab"): the cast face carries the marks of how it was cast. Plywood
+# form panels 1.2 x 2.4 m leave faint joint lines; she-bolt form ties 0.6 m on centre leave 25 mm cone
+# holes, grouted flush (ACI 347; a grouted cone reads as a small darker disc with a lighter rim).
+TIE_PITCH = 0.60
+TIE_R = 0.0125
+PANEL_W, PANEL_H = 1.20, 2.40
+
+
+def wall_wear(side, d):
+    """Designed wear on the cast face (fix round 1, M1): board-form mottle, a damp band at the foot,
+    seepage under the pour joint, leach streaks only under the two pipe penetrations at the back corner,
+    and a scuffed kick zone either side of the doorway at boot height. Albedo multiplier on (a, h)."""
+    pj = POUR_H[side]
+    seed = 61 if side > 0 else 71
+
+    def f(P_, la, lb):
+        a, h = la, lb
+        v = 1.0 + 0.07 * _noise2(a, h, 1.3, 0.9, seed) + 0.025 * np.sign(np.sin(h / 0.15 * math.pi)) * (0.5 + 0.5 * _noise2(a, h, 3.0, 2.0, seed + 1))
+        top = 0.15 + 0.08 * (0.5 + 0.5 * _noise2(a, h * 0 + 1, 0.45, 1.0, seed + 2))
+        v = v * (1.0 - 0.36 * np.clip(1.0 - h / top, 0, 1) ** 0.7)
+        v = v * (1.0 - 0.12 * np.exp(-(((h - (pj - 0.07)) / 0.07) ** 2)) * (0.6 + 0.4 * _noise2(a, h, 0.7, 1.0, seed + 3)))
+        for (hp, r) in PIPE_RUNS:
+            ac = d.A_BACK - 0.45
+            across = np.abs(a - ac) / 0.5
+            streak = np.clip(1.0 - across, 0, 1) * (0.55 + 0.45 * np.sin(a * 37.0 + hp) ** 2)
+            v = v * (1.0 - 0.22 * streak * np.clip(1.0 - (hp - r - h) / 2.2, 0, 1) * (h < hp - r))
+        kick = np.exp(-((h - 0.18) / 0.16) ** 2) * np.exp(-((np.abs(a) - 0.62) / 0.25) ** 2)
+        v = v * (1.0 - 0.10 * kick)
+        v = v * cast_marks(a, h, seed)
+        return v
+    return f
+
+
+def cast_marks(a, h, seed, a0=0.0):
+    """Fix round 2: what the formwork leaves on a cast face (albedo multiplier): form-panel joints every
+    1.2 m along and 2.4 m up (a 10 mm line a little darker, its fin a little lighter beside it) and the
+    grouted tie-cone holes 0.6 m on centre, 0.3 m in from the panel edges."""
+    rng = np.random.default_rng(seed + 7)
+    v = np.ones_like(a)
+    da = np.mod(a - a0, PANEL_W)
+    dh = np.mod(h, PANEL_H)
+    jv = (np.minimum(da, PANEL_W - da) < 0.005)
+    jh = (np.minimum(dh, PANEL_H - dh) < 0.005)
+    fin = ((da > 0.005) & (da < 0.016)) | ((dh > 0.005) & (dh < 0.016))
+    v = np.where(jv | jh, 0.86, np.where(fin, 1.04, v))
+    ta = np.mod(a - a0 - 0.3, TIE_PITCH)
+    th = np.mod(h - 0.3, TIE_PITCH)
+    ra = np.minimum(ta, TIE_PITCH - ta)
+    rh = np.minimum(th, TIE_PITCH - th)
+    r = np.sqrt(ra ** 2 + rh ** 2)
+    # a few cones were patched with a lighter grout than others (seeded per wall)
+    cell = (np.floor((a - a0 - 0.3) / TIE_PITCH + 0.5) * 131 + np.floor((h - 0.3) / TIE_PITCH + 0.5) * 17 + seed) % 7
+    core = np.where(cell < 2, 0.80, 0.58)
+    v = np.where(r < TIE_R, v * core, np.where(r < TIE_R * 1.9, v * 1.07, v))
+    return v
 
 
 def wall_parts(door: DoorEnd, lamps):
     d = door
     P = []
+    wear = wall_wear(d.side, d)
+    pj = POUR_H[d.side]
     fp = d.face_plane(0.0)
     FF, T = d.FRAME_FACE, d.T_WALL
     head_top = d.H_OPEN + d.HEADER_H
@@ -74,11 +154,15 @@ def wall_parts(door: DoorEnd, lamps):
     P.append(Part("wall", "threshold", [d.quad_top(d.A_N, d.A_F, -0.04, T + 0.04, 0.006)], (0.30, 0.305, 0.32), d.top_plane(0.006),
                   "steel threshold 0.38 m x 0.92 m", "metal threshold; the door bottom seal lands on it (acoustic, ICD 705 ch. 9)"))
     P.append(Part("wall", "face_back", [d.quad_face(d.A_F + FF, d.A_BACK, 0.0, d.H_TOP)], M.CONCRETE, fp,
-                  "cast reinforced-concrete cross-wall, 300 mm, from the hinge jamb to the room's back wall", "closes the Records room's end"))
+                  "cast reinforced-concrete cross-wall, 300 mm, from the hinge jamb to the room's back wall", "closes the Records room's end", mod=wear))
     P.append(Part("wall", "face_head", [d.quad_face(d.A_N - FF, d.A_F + FF, head_top, d.H_TOP)], M.CONCRETE, fp,
-                  "the wall over the door", "carries the door light and the switch box"))
-    P.append(Part("wall", "pour_joint", [d.quad_face(d.A_N - FF, d.A_BACK, 3.60 - 0.012, 3.60 + 0.012)], M.CONCRETE_DK, fp,
-                  "pour line between concrete lifts at 3.6 m", "construction joint", texture="seam"))
+                  "the wall over the door", "carries the door light and the switch box", mod=wear))
+    P.append(Part("wall", "pour_joint", [d.quad_face(d.A_N - FF, d.A_BACK, pj - 0.012, pj + 0.012)], M.CONCRETE_DK, fp,
+                  f"pour line between concrete lifts at {pj} m", "construction joint", texture="seam"))
+    for i, (hp, r) in enumerate(PIPE_RUNS):
+        ac = d.A_BACK - 0.45
+        P.append(Part("wall", f"pipe_plate{i}", [d.quad_face(ac - r - 0.15, min(ac + r + 0.15, d.A_BACK - 0.05), hp - r - 0.15, hp + r + 0.15, -0.006)], M.STEEL, d.face_plane(-0.006),
+                      "6 mm welded penetration plate, 150 mm past the pipe", "where the room's pipe run passes through the cross-wall (it carries on behind the wall)"))
     P.append(Part("wall", "back_corner", [d.quad_face(d.A_BACK - 0.05, d.A_BACK, 0.0, d.H_TOP, -0.002)], M.CONCRETE_DK, d.face_plane(-0.002),
                   "internal corner with the room's back wall", "where the cross-wall meets the back wall"))
     P.append(Part("wall", "frame_far_jamb", [d.quad_face(d.A_F, d.A_F + FF, 0.0, d.H_OPEN, -0.012)], M.GUNSHIP, d.face_plane(-0.012),
@@ -92,7 +176,7 @@ def wall_parts(door: DoorEnd, lamps):
         c1 = d.pt(d.A_F, h1, -0.012)
         x0, y0 = M.scr(c0)
         x1, y1 = M.scr(c1)
-        r = 0.009 * M.PX_PER_M
+        r = 0.026 * M.PX_PER_M  # fix round 1 (S5): the knuckle's 26 mm barrel, about 2 world px across so it reads
         P.append(Part("wall", f"hinge{i}", [[(x0 - r, y0), (x0 + r, y0), (x1 + r, y1), (x1 - r, y1)]], M.STEEL, Plane(c0, door.U, EY, -door.N),
                       "4-1/2 in heavy-weight hinge knuckle (SDI 129-24 location)", "carries the leaf; on the room side (in-swing), pins inside the secure area (ICD 705 3E.5)"))
     # door light, switch box and conduit on the face over the door
@@ -101,49 +185,87 @@ def wall_parts(door: DoorEnd, lamps):
                   "vapour-tight LED fitting 0.6 m", "lights the door, its threshold and the floor in front"))
     P.append(Part("wall", "light_diffuser", [d.quad_face(-0.28, 0.28, 2.745, 2.765, -0.11)], M.FITTING_LENS, d.face_plane(-0.11),
                   "opal diffuser (unlit paint; its light is in the surfaces)", "the fitting's lens", texture=None))
-    jb_a0, jb_a1 = d.A_N + 0.05, d.A_N + 0.22
+    # the junction box sits on the latch side over the exit, on the hinge side over the entry (S6)
+    jb_a0, jb_a1 = (d.A_N + 0.05, d.A_N + 0.22) if d.side > 0 else (d.A_F - 0.22, d.A_F - 0.05)
     P.append(Part("wall", "jb_box", [d.quad_face(jb_a0, jb_a1, 2.98, 3.16, -0.10)], M.GUNSHIP, d.face_plane(-0.10),
                   "junction box 170 x 180 mm, tamper switch inside", "terminates the light, switch and operator feeds"))
     P.append(Part("wall", "hss", [d.quad_face(d.A_N + 0.06, d.A_N + 0.22, head_top, head_top + 0.03, -0.035)], M.HOUSING, d.face_plane(-0.035),
                   "high security switch 160 x 30 mm on the header, latch side", "alarms before the door opens 1-3/4 in (ICD 705 TS 7: HSS)"))
     P.append(Part("wall", "hss_flex", [d.quad_face(d.A_N + 0.135, d.A_N + 0.150, head_top + 0.03, 2.98, -0.04)], M.DARK, d.face_plane(-0.04),
                   "armoured flex 12 mm", "switch to box"))
-    P.append(Part("wall", "light_feed", [d.quad_face(jb_a1, -0.28, 3.035, 3.055, -0.05), d.quad_face(-0.30, -0.28, 2.84, 3.055, -0.05)], M.STEEL, d.face_plane(-0.05),
+    feed = [d.quad_face(jb_a1, -0.28, 3.035, 3.055, -0.05), d.quad_face(-0.30, -0.28, 2.84, 3.055, -0.05)] if d.side > 0 else [d.quad_face(0.28, jb_a0, 3.035, 3.055, -0.05), d.quad_face(0.28, 0.30, 2.84, 3.055, -0.05)]
+    P.append(Part("wall", "light_feed", feed, M.STEEL, d.face_plane(-0.05),
                   "20 mm rigid conduit", "box to the light"))
     P.append(Part("wall", "conduit_up", [d.quad_face(jb_a0 + 0.075, jb_a0 + 0.095, 3.16, d.H_TOP, -0.04)], M.STEEL, d.face_plane(-0.04),
                   "20 mm rigid conduit to the ceiling tray", "the feed from the facility's power and alarm panels"))
     P.append(Part("wall", "conduit_strap", [d.quad_face(jb_a0 + 0.06, jb_a0 + 0.11, 3.80, 3.84, -0.05)], M.DARK, d.face_plane(-0.05),
                   "one-hole strap within 0.9 m of the box", "holds the conduit"))
-    # a fixed dome camera high on the face, watching the room (the facility is machine-run)
-    cam_a, cam_h = 1.70, 4.10
-    P.append(Part("wall", "cam_plate", [d.quad_face(cam_a - 0.08, cam_a + 0.08, cam_h + 0.02, cam_h + 0.20, -0.01)], M.HOUSING, d.face_plane(-0.01),
-                  "wall plate 160 x 180 mm, two anchors", "fixes the camera arm"))
-    P.append(Part("wall", "cam_arm", [d.poly([d.pt(cam_a - 0.02, cam_h + 0.13, -0.01), d.pt(cam_a - 0.02, cam_h + 0.13, -0.24), d.pt(cam_a + 0.02, cam_h + 0.09, -0.24), d.pt(cam_a + 0.02, cam_h + 0.09, -0.01)])], M.HOUSING, d.face_plane(-0.12),
-                  "tubular arm 0.24 m", "holds the dome off the wall"))
-    ccx, ccy = d.s(cam_a, cam_h + 0.03, -0.26)
-    P.append(Part("wall", "cam_housing", [("ellipse", ccx, ccy - 0.6, 3.4, 1.6)], M.GUNSHIP, M.front_plane(d.pt(cam_a, 0, -0.26)[2]),
-                  "vandal-resistant dome housing 170 mm", "watches the room; static art, no glow"))
-    P.append(Part("wall", "cam_dome", [("ellipse", ccx, ccy + 0.9, 2.6, 1.6)], M.DARK, M.front_plane(d.pt(cam_a, 0, -0.26)[2]),
-                  "smoked dome", "the lens cover"))
-    P.append(Part("wall", "cam_conduit", [d.quad_face(cam_a - 0.010, cam_a + 0.010, cam_h + 0.20, d.H_TOP, -0.03)], M.STEEL, d.face_plane(-0.03),
-                  "20 mm conduit to the ceiling tray", "the camera's feed"))
+    if d.side > 0:
+        # a fixed dome camera high on the face, watching the room (the facility is machine-run)
+        cam_a, cam_h = 1.70, 4.10
+        P.append(Part("wall", "cam_plate", [d.quad_face(cam_a - 0.08, cam_a + 0.08, cam_h + 0.02, cam_h + 0.20, -0.01)], M.HOUSING, d.face_plane(-0.01),
+                      "wall plate 160 x 180 mm, two anchors", "fixes the camera arm"))
+        P.append(Part("wall", "cam_arm", [d.poly([d.pt(cam_a - 0.02, cam_h + 0.13, -0.01), d.pt(cam_a - 0.02, cam_h + 0.13, -0.24), d.pt(cam_a + 0.02, cam_h + 0.09, -0.24), d.pt(cam_a + 0.02, cam_h + 0.09, -0.01)])], M.HOUSING, d.face_plane(-0.12),
+                      "tubular arm 0.24 m", "holds the dome off the wall"))
+        ccx, ccy = d.s(cam_a, cam_h + 0.03, -0.26)
+        P.append(Part("wall", "cam_housing", [("ellipse", ccx, ccy - 0.6, 3.4, 1.6)], M.GUNSHIP, M.front_plane(d.pt(cam_a, 0, -0.26)[2]),
+                      "vandal-resistant dome housing 170 mm", "watches the room; static art, no glow"))
+        P.append(Part("wall", "cam_dome", [("ellipse", ccx, ccy + 0.9, 2.6, 1.6)], M.DARK, M.front_plane(d.pt(cam_a, 0, -0.26)[2]),
+                      "smoked dome", "the lens cover"))
+        P.append(Part("wall", "cam_conduit", [d.quad_face(cam_a - 0.010, cam_a + 0.010, cam_h + 0.20, d.H_TOP, -0.03)], M.STEEL, d.face_plane(-0.03),
+                      "20 mm conduit to the ceiling tray", "the camera's feed"))
+    # the closer's arm shoe on the frame head's room face, near the hinge (the arm itself is drawn live
+    # by the game, linking it to the closer body on the leaf: SwingLeaf)
+    P.append(Part("wall", "closer_shoe", [d.quad_face(d.A_F - 0.49, d.A_F - 0.41, d.H_OPEN + 0.01, d.H_OPEN + 0.06, -0.02)], M.HOUSING, d.face_plane(-0.02),
+                  "closer arm shoe 80 x 50 mm on the head", "anchors the closer's arm (ICD 705 TS 3E: automatic non-hold closer inside)"))
+    if d.side > 0:
+        # (human review) the EXIT caption hangs on a real sign: an internally lit exit sign housing
+        # projecting square from the wall over the door at 3.9 m (perpendicular to the wall, so it
+        # faces down the room), on a bracket, fed by conduit from above. Its face is blank: the
+        # legend is the game's own typeset caption.
+        sw, sh_, sd = 0.95, 0.42, 0.09
+        base = d.pt(0.0, 3.90, -0.02)
+        def S3(w, h, t):  # w along -N (out of the wall into the room), h up, t along U (its depth)
+            return base - d.N * w + EY * h + d.U * t
+        P.append(Part("wall", "sign_bracket", [d.poly([S3(0.0, sh_ / 2 + 0.02, -0.03), S3(0.10, sh_ / 2 + 0.02, -0.03), S3(0.10, sh_ / 2 + 0.06, -0.03), S3(0.0, sh_ / 2 + 0.06, -0.03)])], M.HOUSING,
+                      Plane(base, -d.N, EY, -d.U), "steel bracket from the wall plate", "holds the sign off the wall"))
+        P.append(Part("wall", "sign_wallplate", [d.quad_face(-0.08, 0.08, 3.90 - sh_ / 2 - 0.04, 3.90 + sh_ / 2 + 0.10, -0.01)], M.HOUSING, d.face_plane(-0.01),
+                      "wall plate 160 x 560 mm, four anchors", "fixes the sign to the wall"))
+        P.append(Part("wall", "sign_housing", [d.poly([S3(0.06, -sh_ / 2, -sd / 2), S3(sw, -sh_ / 2, -sd / 2), S3(sw, sh_ / 2, -sd / 2), S3(0.06, sh_ / 2, -sd / 2)])], M.HOUSING,
+                      Plane(base, -d.N, EY, -d.U), "exit sign housing 0.9 x 0.42 x 0.09 m, steel", "the exit sign (its legend is typeset by the game)"))
+        P.append(Part("wall", "sign_face", [d.poly([S3(0.10, -sh_ / 2 + 0.04, -sd / 2 - 0.002), S3(sw - 0.04, -sh_ / 2 + 0.04, -sd / 2 - 0.002), S3(sw - 0.04, sh_ / 2 - 0.04, -sd / 2 - 0.002), S3(0.10, sh_ / 2 - 0.04, -sd / 2 - 0.002)])], (0.025, 0.04, 0.035),
+                      Plane(base, -d.N, EY, -d.U), "dark sign face (blank; lit legend typeset by the game)", "where EXIT reads"))
+        P.append(Part("wall", "sign_conduit", [d.quad_face(-0.01, 0.01, 3.90 + sh_ / 2 + 0.10, d.H_TOP, -0.03)], M.STEEL, d.face_plane(-0.03),
+                      "20 mm conduit to the ceiling tray", "feeds the sign"))
     # the floor stop where the open leaf's latch edge rests (90 degrees)
     tip = door.hinge + door.leaf_dir(math.pi / 2) * (door.LEAF_W - 0.06) + door.N * 0.03
     tx, ty = M.scr(tip)
-    P.append(Part("wall", "floor_stop", [("ellipse", tx, ty - 0.5, 1.0, 0.7)], M.STEEL, d.top_plane(0.03),
-                  "dome floor stop 35 mm, anchored", "holds the leaf open at 90 degrees"))
+    P.append(Part("wall", "floor_stop", [("ellipse", tx, ty - 1.0, 1.7, 1.3)], M.STEEL, d.top_plane(0.05),
+                  "floor stop 85 mm dia x 60 mm, rubber bumper, anchored", "the open leaf rests against it at 90 degrees"))
     return P
+
+
+def front_wear(seed):
+    """The near column's and the stub's concrete: the same mottle and the damp band at the foot."""
+    def f(P_, la, lb):
+        v = 1.0 + 0.07 * _noise2(la * 3.0, lb, 1.3, 0.9, seed)
+        v = v * (1.0 - 0.36 * np.clip(1.0 - lb / 0.18, 0, 1) ** 0.7)
+        # fix round 2: the panel joints carry on round the column (no tie holes in a 0.16 m strip)
+        dh = np.mod(lb, PANEL_H)
+        return v * np.where(np.minimum(dh, PANEL_H - dh) < 0.005, 0.86, 1.0)
+    return f
 
 
 def front_parts(door: DoorEnd, x_limit):
     d = door
     P = []
+    fw = front_wear(81 if d.side > 0 else 91)
     FF, T = d.FRAME_FACE, d.T_WALL
     A_E = d.A_END
     P.append(Part("front", "col_face", [d.quad_face(A_E, d.A_N - FF, 0.0, d.H_TOP)], M.CONCRETE, d.face_plane(0.0),
-                  "the wall's end beside the near jamb: 0.16 m of approach face", "carries the latch-side frame"))
+                  "the wall's end beside the near jamb: 0.16 m of approach face", "carries the latch-side frame", mod=fw))
     P.append(Part("front", "col_end", [d.quad_side(A_E, 0.0, T, 0.0, d.H_TOP)], M.CONCRETE, d.side_plane(A_E),
-                  "end face toward the camera, the wall's 300 mm", "the wall's end (cutaway); carries the status lamp"))
+                  "end face toward the camera, the wall's 300 mm", "the wall's end (cutaway); carries the status lamp", mod=fw))
     P.append(Part("front", "arris_l", [d.quad_side(A_E - 0.004, 0.0, 0.05, 0.0, d.H_TOP)], M.STEEL, d.side_plane(A_E - 0.004),
                   "50 mm steel arris angle", "armours the room-side corner"))
     P.append(Part("front", "arris_r", [d.quad_side(A_E - 0.004, T - 0.05, T, 0.0, d.H_TOP)], M.STEEL, d.side_plane(A_E - 0.004),
@@ -151,7 +273,8 @@ def front_parts(door: DoorEnd, x_limit):
     P.append(Part("front", "arris_face", [d.quad_face(A_E, A_E + 0.05, 0.0, d.H_TOP, -0.004)], M.STEEL, d.face_plane(-0.004),
                   "arris angle, face leg", "armours the corner"))
     P.append(Part("front", "frame_near_jamb", [d.quad_face(d.A_N - FF, d.A_N, 0.0, d.H_OPEN + d.HEADER_H, -0.012)], M.GUNSHIP, d.face_plane(-0.012),
-                  "hollow-metal frame, 2 in face, latch jamb", "carries the strike and the electrified bolt"))
+                  "hollow-metal frame, 2 in face, latch jamb", "carries the strike and the electrified bolt",
+                  mod=lambda P_, la, lb: 1.0 + 0.45 * np.exp(-((lb - 1.05) / 0.16) ** 2)))
     tl = T / 2
     lamp_a = A_E - 0.10
     P.append(Part("front", "lamp_base", [d.quad_side(lamp_a, tl - 0.08, tl + 0.08, d.LAMP_H - 0.16, d.LAMP_H - 0.10)], M.HOUSING, d.side_plane(lamp_a),
@@ -169,10 +292,10 @@ def front_parts(door: DoorEnd, x_limit):
     a_far = d.stub_far_a(x_limit)
     STUB = d.STUB_H
     P.append(Part("front", "stub_face", [d.quad_face(a_far, A_E, 0.0, STUB)], M.CONCRETE, d.face_plane(0.0),
-                  "the cross-wall's 0.15 m stub, room-side face", "the wall's line carried to the camera (cutaway), a curb between the room and the passage"))
+                  "the cross-wall's 0.15 m stub, room-side face", "the wall's line carried to the camera (cutaway), a curb between the room and the passage", mod=fw))
     P.append(Part("front", "stub_top", [d.quad_top(a_far, A_E, 0.0, T, STUB)], M.CONCRETE, d.top_plane(STUB),
                   "stub top, the wall's 300 mm", "the cut section, seen from above"))
-    P.append(Part("front", "stub_angle_top", [d.quad_top(a_far, A_E, 0.0, 0.05, STUB + 0.003)], M.STEEL_WORN, d.top_plane(STUB + 0.003),
+    P.append(Part("front", "stub_angle_top", [d.quad_top(a_far, A_E, 0.0, 0.05, STUB + 0.003)], M.STEEL, d.top_plane(STUB + 0.003),
                   "50 mm steel edge angle, top leg", "armours the curb's room edge (carts)"))
     P.append(Part("front", "stub_angle_face", [d.quad_face(a_far, A_E, STUB - 0.05, STUB, -0.004)], M.STEEL, d.face_plane(-0.004),
                   "50 mm steel edge angle, face leg", "armours the curb's room edge"))
@@ -262,17 +385,37 @@ def beyond_parts(door: DoorEnd, lamps):
                               "pipe clamp", "holds the pipe on the strut"))
     # the passage light on its back wall, fed from above
     lx, ly = (936.0, 300.0) if s > 0 else (18.0, 300.0)
-    lw = 0.60 * M.PX_PER_M * M.depth_scale(Dp - 0.12) / 2
-    P.append(Part("beyond", "light_body", [[(lx - lw, ly - 1.6), (lx + lw, ly - 1.6), (lx + lw, ly + 1.2), (lx - lw, ly + 1.2)]], M.HOUSING, M.front_plane(Dp - 0.12),
-                  "vapour-tight LED fitting 0.6 m", "lights the passage" if s > 0 else "lights the vestibule"))
-    P.append(Part("beyond", "light_diffuser", [[(lx - lw + 0.6, ly + 1.2), (lx + lw - 0.6, ly + 1.2), (lx + lw - 0.6, ly + 2.0), (lx - lw + 0.6, ly + 2.0)]], (1, 1, 1), None,
-                  "opal diffuser, lit", "the fitting's lens", emit=(0.80, 0.90, 0.96)))
+    P += passage_fitting(lx, ly, Dp, "lights the passage" if s > 0 else "lights the vestibule")
+    lw = 1.20 * M.PX_PER_M * M.depth_scale(Dp - 0.12) / 2
     cx = lx + (lw - 1.5) * (1 if s > 0 else -1)
-    P.append(Part("beyond", "light_conduit", [[(cx - 0.4, 100.0), (cx + 0.4, 100.0), (cx + 0.4, ly - 1.6), (cx - 0.4, ly - 1.6)]], M.STEEL, M.front_plane(Dp - 0.04),
+    # the conduit drops into the batten's end cap (its gland), not into mid-air
+    P.append(Part("beyond", "light_conduit", [[(cx - 0.4, 100.0), (cx + 0.4, 100.0), (cx + 0.4, ly - 0.10 * M.PX_PER_M * M.depth_scale(Dp - 0.12) + 0.4), (cx - 0.4, ly - 0.10 * M.PX_PER_M * M.depth_scale(Dp - 0.12) + 0.4)]], M.STEEL, M.front_plane(Dp - 0.04),
                   "20 mm conduit", "feeds the fitting from the ceiling"))
     for p in P:
         if p.emit is None:
             p.clipfn = beyond_wall
+    return P
+
+
+def passage_fitting(lx, ly, Dp, job):
+    """Fix round 2 (human: "a stray white dash with no fitting"): a 1.2 m vapour-tight LED batten as it is
+    made: a grey polycarbonate body 0.10 m deep on two stainless clips on the wall, its opal diffuser along
+    the underside, end caps; the diffuser is the brightest thing in the passage but is a lit lens, not a
+    white bar: its body and clips read round it, and its light pools on the wall (the design's lamp)."""
+    s_ = M.depth_scale(Dp - 0.12)
+    lw = 1.20 * M.PX_PER_M * s_ / 2
+    bh = 0.10 * M.PX_PER_M * s_
+    P = []
+    P.append(Part("beyond", "light_body", [[(lx - lw, ly - bh), (lx + lw, ly - bh), (lx + lw, ly + 0.6), (lx - lw, ly + 0.6)]], (0.22, 0.23, 0.25), M.front_plane(Dp - 0.12),
+                  "vapour-tight LED batten 1.2 m, grey polycarbonate body", job))
+    for k, cx in enumerate((lx - lw * 0.62, lx + lw * 0.62)):
+        P.append(Part("beyond", f"light_clip{k}", [[(cx - 0.5, ly - bh - 0.9), (cx + 0.5, ly - bh - 0.9), (cx + 0.5, ly - bh + 0.4), (cx - 0.5, ly - bh + 0.4)]], M.STEEL, M.front_plane(Dp - 0.06),
+                      "stainless fixing clip", "holds the batten off the wall"))
+    for k, cx in enumerate((lx - lw, lx + lw)):
+        P.append(Part("beyond", f"light_cap{k}", [[(cx - 0.7, ly - bh - 0.2), (cx + 0.7, ly - bh - 0.2), (cx + 0.7, ly + 1.0), (cx - 0.7, ly + 1.0)]], M.HOUSING, M.front_plane(Dp - 0.13),
+                      "end cap with its gland", "seals the batten"))
+    P.append(Part("beyond", "light_diffuser", [[(lx - lw + 0.9, ly + 0.6), (lx + lw - 0.9, ly + 0.6), (lx + lw - 0.9, ly + 1.4), (lx - lw + 0.9, ly + 1.4)]], (1, 1, 1), None,
+                  "opal diffuser, lit", "the fitting's lens", emit=(0.42, 0.48, 0.52)))
     return P
 
 
@@ -358,23 +501,27 @@ def leaf_faces():
     common_parts = [("leaf", R(0, LW, 0, DoorEnd.LEAF_H), M.GUNSHIP, "1-3/4 in steel leaf, 18 ga faces (ICD 705 3E.11)", "the door")]
     room = common_parts + [
         ("rose", E(LW - backset, lever_v, 0.034, 0.034), M.STEEL, "lever rose 68 mm", "lever trim, free egress from the room"),
-        ("lever", R(LW - backset - 0.130, LW - backset, lever_v - 0.010, lever_v + 0.010), M.STEEL_WORN, "lever 130 mm, returned toward the hinge", "opens the latch from inside"),
+        ("lever", R(LW - backset - 0.130, LW - backset, lever_v - 0.011, lever_v + 0.011), M.STEEL_WORN, "lever 130 mm, returned toward the hinge", "opens the latch from inside"),
         ("thumbturn_rose", E(LW - backset, lever_v + 0.105, 0.026, 0.026), M.STEEL, "deadbolt thumbturn rose", "FF-L-2890 deadbolt, thrown from inside"),
         ("thumbturn", R(LW - backset - 0.006, LW - backset + 0.006, lever_v + 0.085, lever_v + 0.125), M.STEEL_WORN, "thumbturn", "throws the deadbolt"),
         ("hand_wear", E(LW - backset - 0.05, lever_v, 0.11, 0.09), M.GUNSHIP, "worn paint round the lever (no geometry)", "where hands push the leaf"),
+        # fix round 1 (S5): the surface closer on the room face's top rail by the hinge (ICD/ICS 705:
+        # an automatic, non-hold closer inside); its arm runs to the shoe on the head (drawn live)
+        ("closer_body", R(0.05, 0.36, DoorEnd.LEAF_H - 0.125, DoorEnd.LEAF_H - 0.060), M.HOUSING, "surface door closer 310 x 65 mm, regular arm, room side", "shuts the door behind whoever goes through; non-hold"),
+        ("closer_pinion", E(0.10, DoorEnd.LEAF_H - 0.092, 0.018, 0.018), M.STEEL, "closer pinion cap", "the arm's pivot"),
     ]
     out_exit = common_parts + [
         ("kick", R(0.04, LW - 0.04, 0.0, 0.254), M.STEEL, "10 in steel kick plate", "the push side (outside) takes the carts and boots"),
         ("seal", R(0.0, LW, 0.0, 0.018), M.RUBBER, "automatic door bottom", "drops onto the threshold when shut (acoustic seal)"),
         ("rose", E(LW - backset, lever_v, 0.034, 0.034), M.STEEL, "lever rose 68 mm with a key cylinder", "outside lever trim (access-controlled, ICD 705 3E.1b)"),
         ("cylinder", E(LW - backset, lever_v, 0.012, 0.012), M.DARK, "key cylinder face", "access control override"),
-        ("lever", R(LW - backset - 0.130, LW - backset, lever_v - 0.010, lever_v + 0.010), M.STEEL_WORN, "lever 130 mm", "opens the latch when the reader releases it"),
+        ("lever", R(LW - backset - 0.130, LW - backset, lever_v - 0.011, lever_v + 0.011), M.STEEL_WORN, "lever 130 mm", "opens the latch when the reader releases it"),
     ]
     out_entry = common_parts + [
         ("kick", R(0.04, LW - 0.04, 0.0, 0.254), M.STEEL, "10 in steel kick plate", "the push side (outside)"),
         ("seal", R(0.0, LW, 0.0, 0.018), M.RUBBER, "automatic door bottom", "acoustic seal"),
         ("rose", E(LW - backset, lever_v, 0.034, 0.034), M.STEEL, "lever rose 68 mm", "outside lever trim"),
-        ("lever", R(LW - backset - 0.130, LW - backset, lever_v - 0.010, lever_v + 0.010), M.STEEL_WORN, "lever 130 mm", "opens the latch"),
+        ("lever", R(LW - backset - 0.130, LW - backset, lever_v - 0.011, lever_v + 0.011), M.STEEL_WORN, "lever 130 mm", "opens the latch"),
         ("lock_housing", R(LW - backset - 0.050, LW - backset + 0.050, 1.360, 1.520), M.HOUSING, "combination lock housing 100 x 160 mm", "the primary entrance's FF-L-2740 lock (ICD 705 3E.1a)"),
         ("lock_dial_ring", E(LW - backset, 1.415, 0.040, 0.040), M.STEEL, "spin-dial ring", "FF-L-2740 combination dial"),
         ("lock_dial", E(LW - backset, 1.415, 0.031, 0.031), M.DARK, "spin dial (no graduations painted: too small to read)", "sets the combination"),
@@ -463,10 +610,18 @@ def container():
     top_h0 = base_h + 3 * dh + 0.006
     lh = top_h0 + dh - 0.075 - 0.14
     lc = M.scr(P3(cx + 0.15, lh, d0 - 0.03))
-    parts.append(Part("container", "lock_ring", [("ellipse", lc[0], lc[1], 0.043 * M.PX_PER_M, 0.043 * M.PX_PER_M)], M.STEEL, M.front_plane(d0 - 0.03),
-                      "FF-L-2740 spin-dial ring", "the single lock that controls all four drawers"))
-    parts.append(Part("container", "lock_dial", [("ellipse", lc[0], lc[1], 0.033 * M.PX_PER_M, 0.033 * M.PX_PER_M)], M.DARK, M.front_plane(d0 - 0.035),
-                      "spin dial (graduations too small to read: none painted)", "sets the combination"))
+    # fix round 1 (S8): the FF-L-2740 lock as it is fitted: a 130 x 100 mm lock housing on the top drawer
+    # face with a 120 mm spin-dial ring and dial (graduations too small to read: none painted)
+    lb0 = M.scr(P3(cx + 0.15 - 0.065, lh - 0.05, d0 - 0.025))
+    lb1 = M.scr(P3(cx + 0.15 + 0.065, lh + 0.05, d0 - 0.025))
+    parts.append(Part("container", "lock_housing", [[(lb0[0], lb0[1]), (lb1[0], lb0[1]), (lb1[0], lb1[1]), (lb0[0], lb1[1])]], M.HOUSING, M.front_plane(d0 - 0.025),
+                      "lock housing 130 x 100 mm", "the single FF-L-2740 lock that controls all four drawers"))
+    parts.append(Part("container", "lock_ring", [("ellipse", lc[0], lc[1], 0.06 * M.PX_PER_M, 0.06 * M.PX_PER_M)], M.STEEL, M.front_plane(d0 - 0.03),
+                      "spin-dial ring 120 mm", "the dial's bezel"))
+    parts.append(Part("container", "lock_dial", [("ellipse", lc[0], lc[1], 0.044 * M.PX_PER_M, 0.044 * M.PX_PER_M)], M.DARK, M.front_plane(d0 - 0.035),
+                      "spin dial 88 mm (graduations too small to read: none painted)", "sets the combination"))
+    parts.append(Part("container", "lock_dial_index", [[(lc[0] - 0.15, lc[1] - 0.044 * M.PX_PER_M - 0.4), (lc[0] + 0.15, lc[1] - 0.044 * M.PX_PER_M - 0.4), (lc[0] + 0.15, lc[1] - 0.044 * M.PX_PER_M + 0.4), (lc[0] - 0.15, lc[1] - 0.044 * M.PX_PER_M + 0.4)]], M.STEEL_WORN, M.front_plane(d0 - 0.036),
+                      "index mark", "where the combination is read"))
     lamps_c = [l for l in lamps]
     lay = M.render(parts, cv, lamps_c)["container"]
     # floor contact shadow from the footprint (darkest at the contact line), on the walkway floor

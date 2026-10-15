@@ -28,7 +28,7 @@ import rdesign as RD  # noqa: E402
 
 TRACK = M.TRACK
 GAME = os.path.join(TRACK, "..", "main-records", "apps", "game")
-LAYERS = os.path.join(TRACK, "layers")
+LAYERS = os.path.join(TRACK, "layers", "graded")  # fix round 1: the graded layers (../../tools/rgrade.py)
 OUT = os.path.join(TRACK, "out")
 PAD = 2
 
