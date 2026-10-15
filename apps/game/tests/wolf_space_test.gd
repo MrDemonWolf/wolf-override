@@ -32,7 +32,9 @@ const SETTLE_FRAMES: int = 600
 
 var failures: int = 0
 var checked: Array[String] = []
-## Painted columns (first, last + 1) of each texture region, by texture path and region.
+## Read-once art for the painted-extent scans: each texture's uncompressed image ("image <path>",
+## _image_of) and each region's painted extent along x or y ("<path> <region> <axis>", _painted_extent).
+## The routes ask for the same sprites at every rest point, so each is scanned once per run.
 var painted: Dictionary = {}
 
 
@@ -433,22 +435,14 @@ func _image_of(sprite: Sprite2D) -> Image:
 	return painted[key]
 
 
-## [param sprite]'s painted rows (first, last + 1) in world y.
+## [param sprite]'s painted rows (first, last + 1) in world y. Unlike _painted_span it has no flip
+## handling: none of the sprites it measures (the seal frame) is drawn with flip_v.
 func _painted_rows(sprite: Sprite2D) -> Vector2:
-	var image: Image = _image_of(sprite)
-	var region: Rect2i = Rect2i(sprite.region_rect) if sprite.region_enabled else Rect2i(Vector2i.ZERO, Vector2i(sprite.texture.get_size()))
-	var first: int = region.end.y
-	var last: int = region.position.y - 1
-	for y: int in range(region.position.y, region.end.y):
-		for x: int in range(region.position.x, region.end.x):
-			if image.get_pixel(x, y).a > 0.5:
-				first = mini(first, y)
-				last = maxi(last, y)
-				break
-	var size: Vector2 = Vector2(region.size)
+	var rows: Vector2 = _painted_extent(sprite, Vector2.AXIS_Y)
+	var size: Vector2 = Vector2(_art_region(sprite).size)
 	var origin: float = sprite.offset.y - (size.y * 0.5 if sprite.centered else 0.0)
-	var a: float = (sprite.global_transform * Vector2(0.0, origin + first - region.position.y)).y
-	var b: float = (sprite.global_transform * Vector2(0.0, origin + last + 1 - region.position.y)).y
+	var a: float = (sprite.global_transform * Vector2(0.0, origin + rows.x)).y
+	var b: float = (sprite.global_transform * Vector2(0.0, origin + rows.y)).y
 	return Vector2(minf(a, b), maxf(a, b))
 
 
@@ -507,24 +501,40 @@ func _painted_span(sprite: Sprite2D) -> Vector2:
 	return Vector2(minf(a, b), maxf(a, b))
 
 
-## The first painted column and one past the last of [param sprite]'s texture (or region).
+## The first painted column and one past the last of [param sprite]'s texture (or region), in art px
+## from the region's left edge.
 func _painted_columns(sprite: Sprite2D) -> Vector2:
-	var region: Rect2i = Rect2i(sprite.region_rect) if sprite.region_enabled else Rect2i(Vector2i.ZERO, Vector2i(sprite.texture.get_size()))
-	var key: String = "%s %s" % [sprite.texture.resource_path, region]
+	return _painted_extent(sprite, Vector2.AXIS_X)
+
+
+## The art [param sprite] draws, in texel px: its region when it has one, else the whole texture.
+func _art_region(sprite: Sprite2D) -> Rect2i:
+	return Rect2i(sprite.region_rect) if sprite.region_enabled else Rect2i(Vector2i.ZERO, Vector2i(sprite.texture.get_size()))
+
+
+## The first painted line and one past the last of [param sprite]'s art along [param axis]
+## (Vector2.AXIS_X: columns, Vector2.AXIS_Y: rows), in art px from the region's corner. A line counts
+## as painted when any pixel on it is more than half opaque; a sprite with none returns
+## (size, 0). The one scan behind _painted_columns and _painted_rows, cached in painted[].
+func _painted_extent(sprite: Sprite2D, axis: int) -> Vector2:
+	var region: Rect2i = _art_region(sprite)
+	var key: String = "%s %s %d" % [sprite.texture.resource_path, region, axis]
 	if painted.has(key):
 		return painted[key]
 	var image: Image = _image_of(sprite)
-	var first: int = region.end.x
-	var last: int = region.position.x - 1
-	for x: int in range(region.position.x, region.end.x):
-		for y: int in range(region.position.y, region.end.y):
-			if image.get_pixel(x, y).a > 0.5:
-				first = mini(first, x)
-				last = maxi(last, x)
+	var across: int = 1 - axis
+	var first: int = region.end[axis]
+	var last: int = region.position[axis] - 1
+	for line: int in range(region.position[axis], region.end[axis]):
+		for along: int in range(region.position[across], region.end[across]):
+			var texel: Vector2i = Vector2i(line, along) if axis == Vector2.AXIS_X else Vector2i(along, line)
+			if image.get_pixelv(texel).a > 0.5:
+				first = mini(first, line)
+				last = maxi(last, line)
 				break
-	var columns: Vector2 = Vector2(first - region.position.x, last + 1 - region.position.x)
-	painted[key] = columns
-	return columns
+	var extent: Vector2 = Vector2(first - region.position[axis], last + 1 - region.position[axis])
+	painted[key] = extent
+	return extent
 
 
 # --- Helpers --------------------------------------------------------------------------------------
