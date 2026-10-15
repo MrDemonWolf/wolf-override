@@ -71,7 +71,8 @@ On 2026-10-15 Nathanial asked that the project avoid duplication and use shared 
 - The changed suites (`corridor_additions`, `wolf_space`, `follow_spacing`, `m0_scene`, `crank_hold`, `impact`, `sentry`) pass alone on both trees and print the same lines, except frame counts that vary from run to run on either tree. A `wolf_space_test` negative (WOLF's doorway spot moved to x 740 in a scratch copy) fails with the same messages and hidden counts on both trees.
 - Rendered stills (`tools/render/render.sh`, the same driver bytes on both trees, 1280x720 and 2400x1080 with the touch layout): the seal opening, both crank frames and the other door-end states are pixel-identical to 4e661e6, except the ceiling lamps' run-to-run flicker at the top left of the screen.
 - No string in the game's scripts or scenes changed; the suites' failure messages stay word for word.
-- The copy check (`check-copies` against main 204ca49) went from 143 copied blocks to 29, all in research tools that share helpers but made different filed evidence (the capture drivers, the cleanup and portal generations); merging those needs each tool re-run, so it is left for a later job.
+- `bun run game:check` on the final code: 21 of 21 suites pass, with no leak at exit and no file changed by the import.
+- The copy check (`check-copies` against main 204ca49) went from 143 copied blocks to 29. 28 are in research tools that share helpers but made different filed evidence (the capture drivers, the cleanup and portal generations); merging those needs each tool re-run, so they are left for a later job. The last one is older than this branch: `wolf_space_test` and `companion_rules_test` have carried the same `_tap` helper since before it, and the check counts it because this branch edits that file's copied helper block elsewhere. It belongs in the suite kit, which needs all three branches to take the change, so it is listed below.
 
 ## Evidence
 
@@ -119,4 +120,5 @@ On 2026-10-15 Nathanial asked that the project avoid duplication and use shared 
 - Overdraw and texture memory over the lighter-game targets (above).
 - The review box's whole-box high-pass figure stays at 5.5 because it holds designed joints, the leaf's stripes and the doorway's edge; the lettering itself is gone (`../README.md`).
 - `studio_logo_test`'s engine error in the threaded load (seen in one of six full runs on the branch on 2026-10-15 and in the first landing's runs, always under heavy load, never in a suite run alone, and not in the two full runs on main), and one leak at exit in `ui_controls_test` under load.
+- Copied code left for a later, main-wide job: `wolf_space_test`'s and `companion_rules_test`'s shared `_tap` (and the rest of their old copied helper block) belong in the suite kit; the capture drivers here, `scripts/parity/` and older records share helpers that need a re-run to merge.
 - Nothing played by hand; no phone, device or export test.
