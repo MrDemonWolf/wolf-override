@@ -54,7 +54,7 @@ changed); this section corrects the claims below that the round-1 art did not sh
 - **Cut section (S9):** the stub's end is the wall's cut, carried down the deck's fascia to y 580 with steel
   trim angles; the stub end plate is gone.
 - **Values (M1):** wear designed into the concrete (`concrete_wear`); the paint keeps 90 % of its grain;
-  `jgrade.py` (with `fix-r1/tools/grade.py`) sets the concrete row by row at 0.70x the junction's back wall,
+  `jgrade.py` (with `../tools/grade.py`) sets the concrete row by row at 0.70x the junction's back wall,
   keeps the light pools and lifts the paint's own fine grain; the bay at 0.75x. The round-1 upper-wall
   fall-off in `install.py` is replaced by it. The atlas is packed to its used height (1024 x 888).
 - **Effects (S7):** the blast's sparks are hard streaks, its debris hard tumbling chips, its dust a jet

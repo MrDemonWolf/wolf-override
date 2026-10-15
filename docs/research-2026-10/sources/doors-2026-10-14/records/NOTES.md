@@ -46,7 +46,7 @@ claims below: in round 1 the hinge knuckles were 0.7 px wide and no closer was d
 - **Values and look (M1, the human pass):** designed wear (`wall_wear`: mottle, damp band, seepage under the
   pour joint, leach streaks under the two new pipe penetration plates, a kick zone either side of the door),
   re-painted to the room's grit (sessions records-exit-fix, records-entry-fix), the paint's detail kept to
-  +-60 % (log), graded by `fix-r1/tools/rgrade.py` to 0.70x the Records back wall at the same height.
+  +-60 % (log), graded by `../tools/rgrade.py` to 0.70x the Records back wall at the same height.
 - **Two walls, two layouts (S6):** the exit's pour joint at 3.6 m, the entry's at 4.2 m; the camera only on
   the exit; the junction box on the latch side over the exit, the hinge side over the entry.
 - **Closer and hinges (S5):** a 310 x 65 mm surface closer on the leaf's room face by the hinge
