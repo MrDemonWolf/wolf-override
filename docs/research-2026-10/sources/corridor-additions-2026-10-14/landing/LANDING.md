@@ -21,6 +21,13 @@ Branch `codex/corridor-additions` from origin/main c5d1d84. What was ported and 
 - **Repaint pixel count:** the README, provenance and the asset register said 1,702 px; the repaint changed 1,633 px (repaint mask 1,793 px), as `atlasfix/report12.json` and the verifier's diff of the round 11 atlas against the landing atlas both give.
 - **decisions.md:** the stopgap sentence in the now-built decision is in the past tense.
 
+Evidence for the fixes (2026-10-15; nothing played by hand):
+
+- **Headless, alone:** `wolf_space_test` passes at 43 rest points (40 before, plus the edging cases); `room_lights_test` passes. Mutation: `WOLF_DOORWAY_HYSTERESIS` set to 0 fails `wolf_space_test` on all three relay answers.
+- **`bun run game:check`:** 21 of 21 at a load average of about 12. Further runs were made on a machine shared with other jobs at a load average of 19 to 165, five on the branch and four on an untouched copy of c5d1d84 (two run side by side with branch runs), and each failed some timing-bound suites on both alike: `studio_logo_test` (its "closing fade is quick" timing), `crank_hold_test` (the valve's press-frame click), `debug_tools_test` (capture wait and note placement), `approved_wording_test` (reading-time margins), and on main also `junction_test` and `sfx_bank_test`. `studio_logo_test` run alone 8 times on each, 8 at once: the fade timing failed 7 of 8 on both. One branch run also showed an engine error during the logo's threaded load (`Initializing already initialized RID`, then `Parameter "t" is null` in the dummy texture storage) and once `ui_controls_test` leaked 2 objects at exit; neither came back in the other runs, and neither was seen in the main runs. They stay open below.
+- **Docs:** `docs:check`, `docs:test` and `docs:build` pass; the changelog drift check is green.
+- **Stills:** `land-corridor-fix-desk` (render.sh, 1280x720, routes A and B): every shot's state (positions, facing, door, leaf, crank frame) matches the earlier `-after-desk` run exactly, WOLF at 716.0 facing the engineer at s7. The pixels differ only in the ceiling lamps' flicker (screen y 0-63), the left beacon's flash phase and their reflections on the floor (screen y 512-575), as that run also played the opening first; nothing differs near WOLF or the engineer.
+
 ## Evidence
 
 - **Headless logic:** `bun run game:check` twice on the final game (import twice, 21 suites, 4 at a time, on a machine at a load average of about 28). First run: 20 of 21; `studio_logo_test` failed (a texture error at close and its "closing fade is quick" timing). Second run: 21 of 21. Run alone, `studio_logo_test` passed 3 of 3 on the branch and 3 of 3 on main; run six at a time it failed its fade timing on both (6 of 6 on the branch, 4 of 6 on main), so its timing is load-sensitive on main too. The texture error was not seen again in those 12 runs; it is listed as open.
@@ -66,5 +73,5 @@ Branch `codex/corridor-additions` from origin/main c5d1d84. What was ported and 
 - Inherited and unchanged: WOLF's surge cloud at the relay (s2); the floating station name plates; the narration's "The red seal opens"; the shutter's slats against the sloping hood; the roller's striped bottom bar under the hood's end when open; three yellows open and three reds shut; the Records and junction beacons still drawn in code; the inner leaf's bogie box reading like a vent box; the thin conduit behind the band's corner; the `RESTRICTED AREA` plate's open choices; the crank pose to be cut again from the approved walk frames.
 - Overdraw and texture memory over the lighter-game targets (above).
 - The review box's whole-box high-pass figure stays at 5.5 because it holds designed joints, the leaf's stripes and the doorway's edge; the lettering itself is gone (`../README.md`).
-- `studio_logo_test`'s texture error at close, seen once under load.
+- `studio_logo_test`'s engine error in the threaded load (seen three times in about nine full runs on the branch under heavy load, never alone and not in the two full runs on main), and one leak at exit in `ui_controls_test` under load.
 - Nothing played by hand; no phone, device or export test.
