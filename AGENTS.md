@@ -12,4 +12,6 @@ Don't duplicate code. Before you write a script, scene, shader, test helper, sty
 
 Commit in small steps and push your branch to GitHub as you go, so no work exists only on one machine. Land finished work through a pull request; never push to main. Never add Co-Authored-By or other AI attribution lines to commits.
 
+Give code good developer comments. Every script, class and non-obvious function gets a doc comment (`##` in GDScript) saying what it is for and its contract: inputs, outputs, units (world px, metres, seconds) and side effects. Constants say where their numbers come from, and comments explain why something is done, or why a simpler way doesn't work, rather than repeating the line. Update or delete a comment when its code changes; reviews check comments with the code.
+
 Never search the whole disk or home folder (`find /`, `find ~`, `mdfind` or Spotlight) or open Finder windows to look for files or skills: on Nathanial's Mac that pops up access prompts while he works. Load a skill through your tool's skill loader or from the folder its listing gives, and look for files only inside this repository and your job's own folders.
