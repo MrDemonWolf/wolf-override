@@ -353,17 +353,21 @@ func _check_retry_timing(game: Node, context: String) -> void:
 	game.set("touch_enabled", false)
 	game.call("_refresh_ui")
 	# RETRY: the fade out, the restore and the fade in take 0.6 s, so a press at 0.9 s has control at 1.5 s.
+	# Counted in the game's own frames: the press is read in this frame, whose fade takes its first step
+	# at the frame's end, and each frame's delta (known as it starts) is added before it runs, so a long
+	# frame anywhere (a loaded machine) is counted where the fade counts it.
+	var after_press: float = game.get_process_delta_time()
+	var longest_frame: float = after_press
 	Input.action_press(&"interact")
 	await process_frame
 	Input.action_release(&"interact")
-	var after_press: float = 0.0
-	var longest_frame: float = 0.0
 	var human: M0Actor = game.get_node("Human") as M0Actor
 	while not human.controlled and after_press < 3.0:
+		var step: float = game.get_process_delta_time()
+		after_press += step
+		longest_frame = maxf(longest_frame, step)
 		await process_frame
-		after_press += game.get_process_delta_time()
-		longest_frame = maxf(longest_frame, game.get_process_delta_time())
-	_expect(human.controlled and not bool(game.get("fail_active")) and absf(after_press - 0.6) <= longest_frame * 2.0 + 0.02, "%s: control comes back 0.6 s after RETRY, so about 1.5 s after the hit for a press at 0.9 s (%.3f s after the press)" % [context, after_press])
+	_expect(human.controlled and not bool(game.get("fail_active")) and after_press >= 0.6 - 0.001 and after_press - 0.6 <= longest_frame + 0.001, "%s: control comes back 0.6 s after RETRY, so about 1.5 s after the hit for a press at 0.9 s (%.3f s after the press, frames up to %.3f s)" % [context, after_press, longest_frame])
 	_expect(is_equal_approx(MainScript.RETRY_READY_SECONDS + MainScript.RETRY_FADE_OUT_SECONDS + MainScript.RETRY_FADE_IN_SECONDS, 1.5), "%s: 0.9 s + 0.25 s fade out + 0.35 s fade in = 1.5 s" % context)
 
 
