@@ -19,8 +19,8 @@ The method is the corridor door end's (`../corridor-door-end-2026-10-12/`, and `
 
 1. **Design first.** Python draws every part as an exact shape from measured real hardware, in each room's own camera (`records/tools/rdesign.py`, `junction/tools/jdesign.py`, `junction-exit/tools/design.py` and `geom.py`, `junction-entry/tools/jedesign.py`), with the specs in each `design/` folder. No image tool touches this step, and no part carries lettering.
 2. **Paint.** Codex's built-in image generation tool, in edit mode, painted material and light only onto the construction renders, one Codex session per job (`codex/<job>/prompt.txt`, Codex's own notes in `codex/<job>/out/notes.txt`). The raw outputs behind the shipped atlases (fix round 2's, `codex/r2-*/out/`) are kept byte for byte with their C2PA content credentials; earlier rounds' outputs were superseded and are listed with their SHA-256 in `provenance.txt`. Every session is archived; none called an image API.
-3. **Cleanup and install.** Deterministic Python (NumPy, SciPy, Pillow) registers each paint to its design, keeps paint only inside the design's masks, re-imposes exact alpha and values, grades to the room and packs the atlases (`*/tools/cleanup*.py`, `install*.py`, `placement.json`).
-4. **Fix rounds 1-4** (`fix-r1/` to `fix-r4/`, each with its own tools and its section of `DOORS.md`): changes asked for by each review round. Rounds 3 and 4 ran no Codex session.
+3. **Cleanup and install.** Deterministic Python (NumPy, SciPy, Pillow) registers each paint to its design, keeps paint only inside the design's masks, re-imposes exact alpha and values, grades to the room and packs the atlases (`*/tools/cleanup.py`, `*/tools/*install.py`, `placement.json`).
+4. **Fix rounds 1-4** (each with its section of `DOORS.md`): changes asked for by each review round. Rounds 3 and 4 ran no Codex session. Each track's tools as they stand now, after the rounds that changed them, are in its own `tools/` folder; the tools several rounds used are in `tools/`; `fix-r1/` to `fix-r4/` keep what only that round used.
 5. **Review.** After each round two independent reviewers looked at every rendered frame: one for realism against the hardware and the AI-tell checklist, one as a first-time player (`reviews/`).
 6. **Approval.** Nathanial approved round 4 on 2026-10-14 from its frames ("Land them"), with the decisions recorded in `../../../decisions.md` ("Doors landed").
 7. **Landing** (`landing/`): the package was ported onto main with a three-way merge and the review r5 fixes. See `landing/NOTES.md`.
@@ -30,10 +30,91 @@ The method is the corridor door end's (`../corridor-door-end-2026-10-12/`, and `
 - `DOORS.md`: the running record of every round, newest on top.
 - `reviews/`: the realism reviews (`REVIEW-real-r1..r5.md`) and first-time-player reviews (`REVIEW-human-r1..r5.md`), and the package's own budget numbers (`perf-package.json`).
 - `provenance.txt`: every Codex session (job, session id, inputs, outputs with SHA-256, C2PA presence, use), with scratch paths shortened to `doors-r1/...` and the home folder to `~`.
-- `records/`, `junction/`, `junction-exit/`: each track's notes, design specs, placement and tools as built in round 1 (later rounds' changed tools are in `fix-r1/` to `fix-r4/`); `junction-entry/`: the entry door's notes from fix rounds 1-3 (it was first built in fix round 1) and its tools and design as of fix round 3.
-- `fix-r1/` to `fix-r4/`: each fix round's tools and capture driver (fix round 1's entry door and exit door tools in `fix-r1/jentry/tools/` and `fix-r1/hatch/tools/`); `integration/`: the packaging tools.
+- `records/`, `junction/`, `junction-exit/`, `junction-entry/`: each track's notes (`NOTES.md`), design specs and placement as built in round 1 (the entry door's from fix round 1, when it was first built), and in `tools/` the track's tools in their current version: the one that made the shipped atlas. Earlier versions that differ are cited by commit in the tool map below.
+- `tools/`: one copy of each tool more than one round used: the grading, measuring, ghost-check and packaging tools, `rebuild.sh`, and the render wrapper (`render.sh`), suite runner (`suite.sh`), Codex job runner (`run_codex.sh`) and capture driver (`driver/doors_capture.gd`, in its own folder because `render.sh --driver` copies the whole folder into the game).
+- `fix-r1/` to `fix-r4/`: the tools, data and notes only that round used (for example `fix-r3/tools/leafwear.py`, `fix-r4/tools/steamlap.py` and round 4's `rebuild.sh`).
 - `codex/`: prompts and notes for every job, and the raw outputs of fix round 2's jobs.
-- `landing/`: the landing's tools (`exit_fixes.py`, `leaf_wear.py`, `speckle.py`), its capture driver and the scripts used to run checks, render, compare budgets and file this folder.
+- `landing/`: the landing's tools (`landing/tools/exit_fixes.py`, `leaf_wear.py`, `speckle.py`), the panel capture driver (`landing/driver2/`) and the scripts used to compare budgets, make sheets and file this folder (`file_records.py`, which filed the layout before the consolidation below).
+
+## Tool map (October 15, 2026)
+
+Until October 15 each fix round filed its own copy of every tool it ran, so most tools were here two to four times, mostly byte for byte. AGENTS.md's "Don't duplicate code" rule keeps one current copy of each; `landing/NOTES.md` ("Shared code") has the counts. Every earlier version that differs is cited as `<path> at <commit>`: read it with `git show <commit>:docs/research-2026-10/sources/doors-2026-10-14/<path>`. dee9996 is the commit that filed these records and 7d55687 the one that filed fix round 1's entry and exit door tools; both are in the branch history.
+
+| Kept | Blob | Same-bytes copies removed | Earlier versions, cited |
+|---|---|---|---|
+| `records/tools/cleanup.py` | 00e71c7a | 1 | `records/tools/cleanup.py` at dee9996 |
+| `records/tools/compose.py` | 858ffad9 | 2 | - |
+| `records/tools/install.py` | 75a80f3b | 1 | `records/tools/install.py` at dee9996 |
+| `records/tools/paint_inputs.py` | b67e17cc | 1 | `records/tools/paint_inputs.py` at dee9996 |
+| `records/tools/preview_clean.py` | acdaf573 | 2 | - |
+| `records/tools/rbbox.py` | 2cd72e83 | 1 | - |
+| `records/tools/rdesign.py` | f666afc7 | 1 | `records/tools/rdesign.py` at dee9996 |
+| `records/tools/rmodel.py` | 350d3b96 | 1 | `records/tools/rmodel.py` at dee9996 |
+| `records/tools/rules.txt` | 4aabb2a7 | 1 | - |
+| `junction/tools/bbox.py` | 3120e610 | 1 | - |
+| `junction/tools/cleanup.py` | e0997672 | 1 | `junction/tools/cleanup.py` at dee9996 |
+| `junction/tools/codex_inputs.py` | 5304f598 | 1 | `junction/tools/codex_inputs.py` at dee9996 |
+| `junction/tools/install.py` | 06867f40 | 0 | `junction/tools/install.py` at dee9996; `fix-r2/junction/install.py` at dee9996 |
+| `junction/tools/jdesign.py` | ab05ac2c | 1 | `junction/tools/jdesign.py` at dee9996 |
+| `junction/tools/jgrade.py` | 2ecb41d4 | 1 | - |
+| `junction/tools/jgrade2.py` | 35d0ff42 | 0 | `fix-r2/junction/jgrade2.py` at dee9996 |
+| `junction/tools/jmodel.py` | a40018f1 | 1 | `junction/tools/jmodel.py` at dee9996 |
+| `junction/tools/preview.py` | e8a45d90 | 2 | - |
+| `junction/tools/lying3.py` | ab1d9c79 | 0 | - |
+| none: it carried game code, which is in `apps/game` and the history |  | 0 | `integration/patch_game.py` at dee9996; `junction/tools/patch_game.py` at dee9996; `fix-r2/junction/patch_game.py` at dee9996; `fix-r3/junction/tools/patch_game.py` at dee9996 |
+| none: it carried game code, which is in `apps/game` and the history |  | 0 | `integration/patch_extra.py` at dee9996; `junction/tools/patch_extra.py` at dee9996; `fix-r2/junction/patch_extra.py` at dee9996; `fix-r3/junction/tools/patch_extra.py` at dee9996 |
+| none: it carried game code, which is in `apps/game` and the history |  | 2 | `records/tools/patch_main.py` at dee9996 (the same file as `fix-r2/records/patch_main.py` at dee9996 and `fix-r3/records/tools/patch_main.py` at dee9996) |
+| none: it carried game code, which is in `apps/game` and the history |  | 0 | `junction-exit/templates/junction_room.gd.tmpl` at dee9996 |
+| `../corridor-door-end-2026-10-12/tools/layers/imgkit.py` (main's copy) | 94a33458 | 7 | - |
+| `junction-exit/tools/cleanup.py` | a8df00fe | 0 | `junction-exit/tools/cleanup.py` at dee9996; `fix-r1/hatch/tools/cleanup.py` at 7d55687; `fix-r2/hatch/cleanup.py` at dee9996 |
+| `junction-exit/tools/compose.py` | 3b8f56fb | 1 | `junction-exit/tools/compose.py` at dee9996; `fix-r1/hatch/tools/compose.py` at 7d55687 |
+| `junction-exit/tools/design.py` | df2f0bf0 | 1 | `junction-exit/tools/design.py` at dee9996; `fix-r1/hatch/tools/design.py` at 7d55687 |
+| `junction-exit/tools/geom.py` | fb0b639e | 1 | `junction-exit/tools/geom.py` at dee9996; `fix-r1/hatch/tools/geom.py` at 7d55687 |
+| `junction-exit/tools/hinstall.py` | bf7fd006 | 1 | `fix-r1/hatch/tools/hinstall.py` at 7d55687 |
+| `junction-exit/tools/install.py` | be78771c | 3 | - |
+| `junction-exit/tools/leaf.py` | c3067d59 | 3 | - |
+| `junction-exit/tools/manifest.py` | 7ce34281 | 3 | - |
+| `junction-exit/tools/noleaf.py` | f5cd073b | 3 | - |
+| `junction-entry/tools/jeclean.py` | 20bce038 | 2 | `fix-r1/jentry/tools/jeclean.py` at 7d55687 |
+| `junction-entry/tools/jedesign.py` | a58d27e3 | 2 | `fix-r1/jentry/tools/jedesign.py` at 7d55687 |
+| `junction-entry/tools/jeinputs.py` | 595e8eaf | 2 | `fix-r1/jentry/tools/jeinputs.py` at 7d55687 |
+| `junction-entry/tools/jeinstall.py` | 797c8d42 | 1 | `fix-r1/jentry/tools/jeinstall.py` at 7d55687; `fix-r2/jentry/jeinstall.py` at dee9996 |
+| `junction-entry/tools/jemid.py` | 2b97ae95 | 1 | `fix-r2/jentry/jemid.py` at dee9996 |
+| `junction-entry/tools/jemodel.py` | 03640720 | 3 | - |
+| `tools/grade.py` | 2d3aa3d9 | 2 | - |
+| `tools/grade2.py` | e52eef95 | 1 | - |
+| `tools/rgrade.py` | e6234551 | 2 | - |
+| `tools/rgrade2.py` | 769d7adf | 0 | `fix-r2/tools/rgrade2.py` at dee9996 |
+| `tools/feedback.py` | bc66b406 | 1 | - |
+| `tools/ghostcheck.py` | fe28dc22 | 1 | - |
+| `tools/manifest_r2.py` | 820d0630 | 1 | - |
+| `tools/measure3.py` | 6334c17a | 1 | - |
+| `tools/measure4.py` | c0b59a8b | 1 | - |
+| `tools/measure_r2.py` | fade0d9d | 2 | - |
+| `tools/package.py` | d1663468 | 0 | `integration/package.py` at dee9996; `fix-r1/tools/package.py` at dee9996; `fix-r2/tools/package.py` at dee9996; `fix-r3/tools/package.py` at dee9996 |
+| `tools/perftable.py` | 58cc1b51 | 0 | `fix-r3/tools/perftable.py` at dee9996 |
+| `tools/sentry-load.sh` | 493354f5 | 0 | `fix-r3/tools/sentry-load.sh` at dee9996 |
+| `tools/render.sh` | 40a683c5 | 0 | `fix-r1/render.sh` at dee9996; `fix-r2/render.sh` at dee9996; `fix-r3/render.sh` at dee9996; `fix-r4/render.sh` at dee9996 |
+| `tools/suite.sh` | c944c442 | 0 | `records/tools/run_suites.sh` at dee9996; `junction/tools/run_checks.sh` at dee9996; `fix-r1/run-suites.sh` at dee9996; `fix-r2/run-suites.sh` at dee9996; `fix-r3/records/tools/run_suites.sh` at dee9996; `fix-r3/junction/tools/run_checks.sh` at dee9996; `fix-r3/run-suites.sh` at dee9996; `fix-r4/run-suites.sh` at dee9996 |
+| `tools/run_codex.sh` | 8643f8fe | 2 | `records/tools/run_job.sh` at dee9996; `junction-exit/tools/run_codex.sh` at dee9996; `fix-r1/hatch/tools/run_codex.sh` at 7d55687; `fix-r3/hatch/tools/run_codex.sh` at dee9996; `fix-r3/records/tools/run_job.sh` at dee9996 |
+| `tools/rebuild.sh` | aca17d4e | 0 | `fix-r2/rebuild.sh` at dee9996 |
+| `tools/driver/doors_capture.gd` | 8f7c9ec6 | 0 | `landing/driver/doors_capture.gd` at dee9996 (the landing's stills; before the October 15 blast-frame fix); `integration/doors_capture.gd` at dee9996; `fix-r1/driver/doors_capture.gd` at dee9996; `fix-r2/driver/doors_capture.gd` at dee9996; `fix-r3/driver/doors_capture.gd` at dee9996; `fix-r4/driver/doors_capture.gd` at dee9996 |
+| `DOORS.md` |  | 4 | the fix rounds' `fix-r1/doors-section.md` at dee9996 to `fix-r4/doors-section.md` at dee9996 were copies of its sections (every line is in it) |
+| `junction-entry/NOTES.md` |  | 3 | was `junction-entry/NOTES-fix-r3.md` at dee9996; `junction-entry/NOTES-fix-r1.md` at dee9996, `junction-entry/NOTES-fix-r2.md` at dee9996 and `fix-r3/jentry/NOTES.md` at dee9996 were wholly contained in it |
+
+The tools import their siblings by name (`sys.path`), and some read their round's scratch layout (`doors-r1/...`), so a re-run needs them put back in that layout, with `imgkit.py` from `../corridor-door-end-2026-10-12/tools/layers/` beside them. The patch scripts and the junction_room template are not kept: they carried the game code they inserted, which is in `apps/game`.
+
+## Scratch names
+
+The notes, `provenance.txt` and the reviews were written in the scratch run and keep its names; paths that start with `doors-r1/` name the scratch run and are left as written. A tool path in `provenance.txt` or a review names the tool as it was in that session's round (for example round 1's sessions cite `records/tools/rdesign.py`, which is `records/tools/rdesign.py` at dee9996 here); the tool map gives every earlier version:
+
+| Scratch name | Filed as |
+|---|---|
+| `hatch/` | `junction-exit/` |
+| `jentry/` (in `fix-r1/` to `fix-r3/`) | `junction-entry/` |
+| `shots/integration-tools/` | `integration/` at dee9996 (removed on October 15; each of its files is cited in the tool map) |
+| `shots/fix-rN-tools/`, `fix-rN-tools/` | `fix-rN/` |
+| `driver/` in a round | `tools/driver/` (one driver; each round's own at dee9996) |
 
 Left out: the rendered captures, review crops and evidence sheets (large, and reproducible with the drivers), the `.npy` design caches, the scratch game copies, and the local copies of the standards and papers below (cited by link instead).
 

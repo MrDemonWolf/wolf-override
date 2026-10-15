@@ -94,7 +94,7 @@ The doors and the container are drawn in **two draw calls** in total. Both are `
 - everything behind the walk line, drawn right after the mid plate;
 - the exit's near column and stub, drawn over the actors.
 
-The lamp glass quads take their live tint as vertex colours. The design, masks, specs and every measured dimension are in `records/design/` and `records/tools/rdesign.py` / `rmodel.py`, as in the corridor door end's method.
+The lamp glass quads take their live tint as vertex colours. The design, masks, specs and every measured dimension are in `records/design/` and `records/tools/rdesign.py` / `rmodel.py` (as built here, round 1's: `records/tools/rdesign.py` at dee9996 and `records/tools/rmodel.py` at dee9996), as in the corridor door end's method.
 
 Removed from the room:
 - the hatch prop with its reflection and shadow;

@@ -365,7 +365,7 @@ New this round:
 - Outside apps/game:
   - delete repo-root `scripts/prepare_bulkheads.py`;
   - update the lighter-game docs;
-  - file the design records under `docs/research-2026-10/sources/`: the four tracks, `fix-r1/jentry` and the fix-r2 tools.
+  - file the design records under `docs/research-2026-10/sources/`: the four tracks, `doors-r1/fix-r1/jentry` and the fix-r2 tools.
 
 ---
 
@@ -558,7 +558,7 @@ The first figure in each pair is the upper rows, the second the mid rows.
 5. **Texture ratio.** It is 0.12-0.45 on the darkest walls. The grain is the paint's own, lifted; no noise was added.
 6. **Thrown leaf.** Its left end is painted as torn edge channel showing the concrete fill.
 7. **Image size.** Codex returned three outputs at 1254 x 1254 for 1024 targets. Each was mapped by ratio, as in round 1.
-8. **Repo-root files.** `scripts/prepare_bulkheads.py` and the lighter-game docs still list deleted files. Filing the design records under `docs/research-2026-10/sources/` is still to do, now including `junction-entry-door-2026-10-13/` from `fix-r1/jentry/`.
+8. **Repo-root files.** `scripts/prepare_bulkheads.py` and the lighter-game docs still list deleted files. Filing the design records under `docs/research-2026-10/sources/` is still to do, now including `junction-entry-door-2026-10-13/` from `doors-r1/fix-r1/jentry/`.
 9. **Not done:** the changelog export check, exports and device tests.
 
 ## Provenance
@@ -605,7 +605,7 @@ Every leaf moves physically and never fades or hides; `door_route_test` checks t
 2. **Records** `records/out/records-doors.patch`: two hunks in `main.gd` were rejected because main moved on (PR #63 sound work) and the hatch patch had changed the same lines. I merged them by hand:
    - `records_room.close_entry_behind()` after `enter_records()`, below main's new safe-point chirp;
    - the `records_exit_walking` branch of `_wolf_target_x()`, after the hatch's `end_card_active` branch.
-3. **Junction** `junction/tools/patch_game.py` (at dee9996): I ran a copy (`shots/integration-tools/patch_game.py`, `patch_extra.py`; filed as `integration/patch_game.py` at dee9996 and `integration/patch_extra.py` at dee9996) with three fixes:
+3. **Junction** `junction/tools/patch_game.py` at dee9996: I ran a copy (`shots/integration-tools/patch_game.py`, `patch_extra.py`; filed as `integration/patch_game.py` at dee9996 and `integration/patch_extra.py` at dee9996) with three fixes:
    - The header-comment replacement now matches the hatch's rewording.
    - The `_build_door` replacement stops at the hatch's `## The exit door's pieces` instead of `_build_particles`. Without this it deleted the hatch's `_build_exit()` and `exit_leaf_anchor()`.
    - The hatch's uses of the old `DOOR_LIP_Z` are renamed to the junction's `DOOR_FRONT_Z` (both z 2), in `junction_room.gd` and `room_depth_test.gd`. I also dropped one identity replacement that no longer matched.

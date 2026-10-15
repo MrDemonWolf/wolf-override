@@ -1,4 +1,9 @@
-"""Copy the doors' design records from the scratch folder into the repository (no captures, no caches,
+"""Filed this folder's layout on October 14-15, 2026, before the October 15 consolidation (one copy of each
+tool; see ../README.md, "Tool map"): the put() mapping below is evidence of what was filed where, and is
+not rewritten. Several of the paths it writes (the fix rounds' copies, integration/, fix-r*/doors-section.md,
+junction-entry/NOTES-fix-r*.md) no longer exist; the tool map cites each by commit.
+
+Copy the doors' design records from the scratch folder into the repository (no captures, no caches,
 no copies of copyrighted standards), rewriting scratch and home paths to relative ones.
 usage: file_records.py SCRATCH_DOORS_R1 LAND_DOORS DEST
 """
