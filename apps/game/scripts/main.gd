@@ -47,6 +47,10 @@ const WOLF_DOORWAY_X: float = 716.0
 ## WOLF holds the doorway while the engineer is at least a clear gap (M0Actor.CLEAR_GAP) right of it,
 ## so their two bodies never overlap; nearer, he follows no further than the relay's left side again.
 const WOLF_DOORWAY_HOLD_X: float = WOLF_DOORWAY_X + M0Actor.CLEAR_GAP
+## From the relay's left he sets off for the doorway only once the engineer is this much further on,
+## at the safe point's near edge (x 824, where USE reaches it), so an engineer edging about just past
+## the hold line never sends him walking to and fro (_wolf_comes_to_doorway).
+const WOLF_DOORWAY_HYSTERESIS: float = 24.0
 ## Held-USE ticks the bypass takes (BypassHandle.TICK_SECONDS each, 2 s in all).
 const BYPASS_TICKS: int = BypassHandle.TICKS_NEEDED
 ## While the bypass vents coolant its alarm sounds this often.
@@ -3911,9 +3915,14 @@ func _wolf_rubble_x() -> float:
 
 
 ## The seal is open and the engineer has gone through it to the safe point: WOLF comes to the open
-## doorway and stands there, facing them (WOLF_DOORWAY_X).
+## doorway and stands there, facing them (WOLF_DOORWAY_X). He sets off only once they are at the safe
+## point (WOLF_DOORWAY_HYSTERESIS past the hold line), and once he has set off he keeps to the doorway
+## until they come back within a clear gap of it (WOLF_DOORWAY_HOLD_X).
 func _wolf_comes_to_doorway() -> bool:
-	return state.chapter_id == "lockdown" and state.door_open and not seal_opening and human.position.x >= WOLF_DOORWAY_HOLD_X
+	if state.chapter_id != "lockdown" or not state.door_open or seal_opening:
+		return false
+	var hold_x: float = WOLF_DOORWAY_HOLD_X if wolf.autonomous_target_x == WOLF_DOORWAY_X else WOLF_DOORWAY_HOLD_X + WOLF_DOORWAY_HYSTERESIS
+	return human.position.x >= hold_x
 
 
 ## WOLF keeps off the live relay, back towards the breaker: once he has refused it, or while the

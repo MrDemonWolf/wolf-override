@@ -166,6 +166,17 @@ func _safe_point(game: Main, relay: StringName) -> void:
 	await _settle(game)
 	_expect(game.wolf.autonomous_target_x != Main.WOLF_DOORWAY_X and game.wolf.position.x <= Main.WOLF_FOLLOW_OPEN_MAX_X + 2.5, "%s: with the engineer back in the doorway WOLF leaves it to them and waits on the relay's left (x %.1f)" % [relay, game.wolf.position.x])
 	await _check_rest(game, "%s: corridor, the engineer back in the doorway" % relay, false)
+	# Edging about just past the hold line never sends him to and fro: from the relay's left he sets off
+	# only once the engineer is at the safe point, and from the doorway he leaves it only once they are
+	# back within a clear gap of him.
+	var changes: int = await _edge_between(game, Main.WOLF_DOORWAY_HOLD_X - 12.0, Main.WOLF_DOORWAY_HOLD_X + 12.0)
+	_expect(changes == 0 and game.wolf.position.x <= Main.WOLF_FOLLOW_OPEN_MAX_X + 2.5, "%s: edging about just past the doorway leaves WOLF waiting on the relay's left (%d changes of mind, x %.1f)" % [relay, changes, game.wolf.position.x])
+	_require(await _walk_to(game.human, 830.0), "%s: the engineer goes back to the safe point" % relay)
+	await _settle(game)
+	_expect(game.wolf.autonomous_target_x == Main.WOLF_DOORWAY_X and absf(game.wolf.position.x - Main.WOLF_DOORWAY_X) <= 2.5, "%s: back at the safe point, WOLF comes to the doorway again (x %.1f)" % [relay, game.wolf.position.x])
+	changes = await _edge_between(game, Main.WOLF_DOORWAY_HOLD_X + 12.0, 840.0)
+	_expect(changes == 0 and absf(game.wolf.position.x - Main.WOLF_DOORWAY_X) <= 2.5, "%s: edging about short of the safe point leaves WOLF in the doorway (%d changes of mind, x %.1f)" % [relay, changes, game.wolf.position.x])
+	await _check_rest(game, "%s: corridor, the engineer edging about by the safe point, WOLF in the doorway" % relay, true, true)
 
 
 ## Records on one mirror answer: WOLF at the mirror port on entry, there while the engineer chooses,
@@ -546,6 +557,23 @@ func _settle(game: Main) -> void:
 		if still >= 12:
 			return
 	_expect(false, "WOLF stops within %d frames (x %.1f, heading for %.1f)" % [SETTLE_FRAMES, game.wolf.position.x, game.debug_wolf_target()])
+
+
+## Walks the engineer from [param a] to [param b] and back three times, and returns how often WOLF
+## changed his mind about where to go on his own on the way.
+func _edge_between(game: Main, a: float, b: float) -> int:
+	var changes: Array[int] = [0]
+	var last: Array[float] = [game.wolf.autonomous_target_x]
+	var watch: Callable = func() -> void:
+		if game.wolf.autonomous_target_x != last[0]:
+			changes[0] += 1
+			last[0] = game.wolf.autonomous_target_x
+	physics_frame.connect(watch)
+	for _pass: int in 3:
+		_require(await _walk_to(game.human, a), "the engineer edges to x %.0f" % a)
+		_require(await _walk_to(game.human, b), "the engineer edges to x %.0f" % b)
+	physics_frame.disconnect(watch)
+	return changes[0]
 
 
 ## Holds [param action] down for [param count] frames.
