@@ -1,4 +1,11 @@
 extends SceneTree
+## Doors verify-4 (2026-10-15, human review r5 S1): j03-blast-frame is the blast's first frame, the breaking
+## leaf and its cracks in the doorway. The driver runs the fuse at full speed to its last 0.1 s, slows to
+## 0.05 for the blast, and freezes time the frame door_blown flips (then lets the step already taken land),
+## so the shot can no longer catch the fuse still lit (fixed-fps runs) or the leaf already in the air
+## (slow real-time runs); if the break had ended, the leaf is posed at the flight's t 0 in its doorway.
+## The j03 set then reads in story order by name: blast-frame, flight-10..90, landed. Its _run.json note
+## says which ("blast frame: breaking=..., door_flight=...").
 ## Landing the doors (land-doors, 2026-10-14): review r5's driver, with S1's fix (one frame's wait after
 ## time freezes, so the flight tween's last step lands before the pose), the thrown leaf posed at t 0.1,
 ## 0.2, 0.3, 0.45, 0.7 and 0.9, a knockdown at the valve facing the blast door (sealed, then as it
@@ -185,11 +192,7 @@ func _junction_route() -> void:
 			break
 	await _raw(3)
 	await _shot("j02-fuse", "junction", false)
-	for _i: int in 400:
-		await process_frame
-		if _flag(junction, "door_blown"):
-			break
-	await _shot("j03-blast-frame", "junction", false)
+	await _blast_frame(line)
 	# The thrown leaf in the air (fix round 4): software frames here are slow, so once the flight starts time is
 	# frozen and the flight is posed at four points (the room's own _set_door_flight, a debug pose in this driver
 	# only), then it runs on and lands.
@@ -489,6 +492,34 @@ func _walk_to(target_x: float) -> bool:
 	if not reached:
 		notes.append("walk to %.0f stopped at %.0f" % [target_x, human.position.x])
 	return reached
+
+
+## j03-blast-frame: the blast's first frame. The fuse runs at full speed until 0.1 s of it is left (a fuse
+## at 0.05 takes 3000 frames at --fixed-fps 60), then at 0.05 until door_blown flips; time freezes there
+## and one frame passes, so the step that frame already took lands before the shot. The leaf is then still
+## breaking in its doorway (the break lasts JunctionRoom.DOOR_BREAK_SECONDS, 0.15 s, which no single slow
+## frame at 0.05 crosses); if it is already flying it is posed at t 0, the doorway end of its flight.
+## Leaves time at 0.05 for the flight frames that follow.
+func _blast_frame(line: Object) -> void:
+	Engine.time_scale = 1.0
+	for _i: int in 4000:
+		if _flag(junction, "door_blown") or float(line.get("fuse_remaining")) <= 0.1:
+			break
+		await process_frame
+	Engine.time_scale = 0.05
+	for _i: int in 4000:
+		if _flag(junction, "door_blown"):
+			break
+		await process_frame
+	Engine.time_scale = 0.0
+	await _raw(1)
+	var breaking: bool = _flag(junction, "door_breaking")
+	if not breaking and _flag(junction, "door_flying"):
+		junction.call("_set_door_flight", 0.0)
+		await _raw(2)
+	notes.append("blast frame: blown=%s, breaking=%s, flying=%s, door_flight=%.3f" % [_flag(junction, "door_blown"), breaking, _flag(junction, "door_flying"), float(junction.get("door_flight"))])
+	await _shot("j03-blast-frame", "junction", false)
+	Engine.time_scale = 0.05
 
 
 func _raw(frames: int) -> void:
