@@ -207,7 +207,7 @@ func _run() -> void:
 	_expect(game.get("status_line") == "WOLF: Copied." and hint_text.text == "Save failed. Use a station to try again.", "save failure shows in the system hint, not in WOLF's line")
 	human.position.x = 830.0
 	game.call("_refresh_ui")
-	_expect(hint_text.text.ends_with("secure the first copy."), "moving to another station brings back its interaction hint after a save failure")
+	_expect(hint_text.text.ends_with("secure the first copy in the container."), "moving to another station brings back its interaction hint after a save failure")
 	human.position.x = 190.0
 	game.call("_save_progress")
 	game.set("save_path", path)

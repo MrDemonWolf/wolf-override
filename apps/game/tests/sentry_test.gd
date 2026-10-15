@@ -563,7 +563,8 @@ func _check_scene() -> void:
 	await _tap(&"interact")
 	_expect(arm.state == &"falling", "USE at the panel lets the tank go")
 	_expect(await _wait_until(func() -> bool: return (game.get("state") as M0State).sentry_down, 60), "the tank lands on the parked sentry")
-	_expect(str(game.get("status_line")).begins_with("The tank comes down square and crushes the sentry flat.") and absf(brain.x - DropArm.MARK_X) <= 8.0, "a hit on the mark is told as square")
+	_expect(str(game.get("status_line")) == "The tank comes down square and crushes\nthe sentry flat. Its eyes go dark." and absf(brain.x - DropArm.MARK_X) <= 8.0, "a hit on the mark is told as square, the narration in its own box")
+	_expect(game.get("box_queue") == ["WOLF: It's down. The bolt by the door is next."], "then WOLF's own box says the bolt by the door is next")
 	_expect(brain.state == &"down" and room.sentry_down and room.coolant_burst.emitting and room.hit_sparks.emitting, "the hit is a real state change with coolant and sparks")
 	_expect(room.arm_label.text == "RELEASE USED" and room.tank_label.visible and room.tank_label.text == "TANK DOWN" and absf(room.tank_label.position.x + room.tank_label.size.x * 0.5 - DropArm.MARK_X) < 0.5, "the release reads spent and TANK DOWN sits over the tank")
 	await physics_frame
@@ -574,7 +575,7 @@ func _check_scene() -> void:
 	_expect(autosave_c != null and autosave_c.lane_recap == "wolf", "autosave C keeps how the sentry came down for the END OF SLICE recap")
 	_expect(await _wait_until(func() -> bool: return Engine.time_scale == 1.0 and camera.offset == Vector2.ZERO, 90), "time scale and camera settle after BOOM 2")
 	game.call("_load_game")
-	_expect(brain.state == &"down" and brain.x == DropArm.MARK_X and arm.state == &"landed" and room.sentry.visual.wrecked and room.tank.position.y > JunctionRoom.TANK_REST_Y and str(game.get("status_line")).contains("sentry is down"), "Continue from autosave C shows the sentry down under the tank")
+	_expect(brain.state == &"down" and brain.x == DropArm.MARK_X and arm.state == &"landed" and room.sentry.visual.wrecked and room.tank.position.y > JunctionRoom.TANK_REST_Y and str(game.get("status_line")) == "Service junction restored. The sentry\nis down; pop the exit bolt by the door.", "Continue from autosave C shows the sentry down under the tank")
 	_check_crushed(room, brain, "Continue from autosave C")
 	_expect(await _wait_until(func() -> bool: return absf(wolf.position.x - JunctionRoom.WOLF_DOWN_X) <= 2.0, 240) and wolf.body_sprite.flip_h, "after Continue from autosave C WOLF waits by the hatch, facing back at the engineer")
 	_expect(await _walk_to(human, JunctionRoom.BOLT_X), "the engineer reaches the exit bolt")
@@ -589,12 +590,12 @@ func _check_scene() -> void:
 	_expect(await _wait_until(func() -> bool: return game.get("bolt_state") == &"open", 60), "the bolt arcs after the whine")
 	_expect(room.bolt_sparks.emitting and (game.get("impact") as Impact).trauma > 0.0, "the arc throws sparks and shakes the view")
 	_expect(room.hatch_open < 1.0 and str(game.get("status_line")) == "The bolt arcs and drops.", "while the hatch is still opening the line says only that the bolt dropped")
-	_expect(room.hatch_label.text == "EXIT OPENING" and str(game.call("_context_hint")) == "The hatch is opening.", "while the hatch slides its plate and hint say it is opening, not open")
+	_expect(room.hatch_label.text == "EXIT OPENING" and str(game.call("_context_hint")) == "The door is opening.", "while the hatch slides its plate and hint say it is opening, not open")
 	await _tap(&"interact")
 	_expect(not game.get("chapter_close_active") and not (game.get("state") as M0State).junction_cleared, "USE at a hatch still sliding does not leave through it")
 	_expect(await _wait_until(func() -> bool: return room.hatch_open >= 1.0 and Engine.time_scale == 1.0, 60), "the hatch slides open")
-	_expect(await _wait_until(func() -> bool: return str(game.get("status_line")) == "The bolt arcs and drops. The hatch slides open.", 6), "the line says the hatch slid open once it has")
-	_expect(room.hatch_label.text == "EXIT OPEN" and str(game.call("_context_hint")) == "The hatch is open. Leave through it.", "once the hatch is open its plate reads EXIT OPEN and, at the bolt panel, the hint points to the open door")
+	_expect(await _wait_until(func() -> bool: return str(game.get("status_line")) == "The bolt arcs and drops.\nThe door slides open.", 6), "the line says the hatch slid open once it has")
+	_expect(room.hatch_label.text == "EXIT OPEN" and str(game.call("_context_hint")) == "The door is open. Leave through it.", "once the hatch is open its plate reads EXIT OPEN and, at the bolt panel, the hint points to the open door")
 	# WOLF steps into the open doorway and waits there, looking back at the engineer.
 	_expect(await _wait_until(func() -> bool: return absf(wolf.position.x - JunctionRoom.WOLF_DOORWAY_X) <= 2.0, 120), "WOLF steps into the open doorway (x %.0f)" % wolf.position.x)
 	# Main sets his facing in its per-frame update, and under load physics can step more than once before
@@ -612,7 +613,7 @@ func _check_scene() -> void:
 	await physics_frame
 	_expect(human.position.x >= JunctionRoom.HATCH_REACH_MIN_X and human.position.x <= JunctionRoom.HATCH_REACH_MAX_X + 1.0, "walking on, the engineer reaches the door and stops behind WOLF (x %.0f)" % human.position.x)
 	_expect(wolf.position.x - M0Actor.WOLF_REACH >= human.position.x + M0Actor.HUMAN_REACH - 1.0, "at the door the engineer and WOLF are not drawn over each other")
-	_expect(str(game.call("_context_hint")) == "E: leave through the hatch.", "at the door the hint offers the way out")
+	_expect(str(game.call("_context_hint")) == "E: leave through the door.", "at the door the hint offers the way out")
 	await _tap(&"interact")
 	var state: M0State = game.get("state") as M0State
 	_expect(state.junction_cleared and game.get("chapter_close_active") and not human.controlled and (game.get_node("CanvasLayer/TopBar/HUD") as Label).text.contains("SERVICE LINE CLEARED"), "USE at the open hatch clears the junction into a closing beat")
@@ -704,7 +705,7 @@ func _check_scene() -> void:
 	await physics_frame
 	human.position.x = JunctionRoom.BOLT_X
 	await _tap(&"interact")
-	_expect(str(game.get("status_line")) == "The service line runs on toward Archive." and str(game.call("_context_hint")) == "The hatch is open.", "the open hatch has no developer note in the dialogue or the hint")
+	_expect(str(game.get("status_line")) == "The service line runs on toward Archive." and str(game.call("_context_hint")) == "The door is open.", "the open hatch has no developer note in the dialogue or the hint")
 	# The card answers the interact key, its own button and Back too.
 	for way: String in ["interact", "button", "back"]:
 		game.set("chapter_close_active", true)
@@ -996,7 +997,7 @@ func _check_cloud(game: Node2D, path: String) -> void:
 	game.set("lane_choice", "alone")
 	arm.drop()
 	_expect(await _wait_until(func() -> bool: return (game.get("state") as M0State).sentry_down, 60) and absf(brain.x - DropArm.MARK_X) > 8.0, "a drop on a sentry near the bracket's edge still hits")
-	_expect(str(game.get("status_line")).begins_with("The tank catches the sentry off centre and pins it to the floor.") and str(game.get("status_line")).ends_with("WOLF: It's down. The bolt by the hatch is next."), "an off-centre hit is told as off centre, not square")
+	_expect(str(game.get("status_line")) == "The tank catches the sentry off centre and\npins it to the floor. Its eyes go dark." and game.get("box_queue") == ["WOLF: It's down. The bolt by the door is next."], "an off-centre hit is told as off centre, not square, then WOLF's own box")
 
 
 ## The sentry card follows the cause. Seen and caught out in the lane, it points at the alcove or

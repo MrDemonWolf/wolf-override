@@ -129,9 +129,11 @@ const BYPASS_OFFER_HINT: String = "HOLD E: crank it yourself, or let WOLF take t
 ## Part-cranked on the honest route: the turns so far, and that WOLF can still take the relay instead.
 const BYPASS_HOLD_OFFER_HINT: String = "HOLD E: crank on, %d of %d, or let WOLF take the relay."
 const BOLT_ARC_LINE: String = "The bolt arcs and drops."
-const HATCH_OPENED_LINE: String = "The bolt arcs and drops. The hatch slides open."
-## The hint while the hatch is still sliding, like the corridor's SEAL_OPENING_HINT.
-const HATCH_OPENING_HINT: String = "The hatch is opening."
+## The junction's exit is drawn as a sliding door, so its lines say "door" (Nathanial, 2026-10-14,
+## "Say door"; code names keep "hatch").
+const HATCH_OPENED_LINE: String = "The bolt arcs and drops.\nThe door slides open."
+## The hint while the exit door is still sliding, like the corridor's SEAL_OPENING_HINT.
+const HATCH_OPENING_HINT: String = "The door is opening."
 const SAVE_FAILED_HINT: String = "Save failed. Use a station to try again."
 const NO_CHECKPOINT_NOTE: String = "No checkpoint yet. Saving starts at the first SAFE POINT."
 const UNREADABLE_CHECKPOINT_NOTE: String = "Saved checkpoint could not be read."
@@ -219,9 +221,11 @@ const BAIT_NO_LINE: String = "WOLF: At the relay you'd have sent me in blind. I 
 ## "I'll hold back." is Draft A, approved 2026-10-14: he waits by the valve, short of the rubble).
 const ALONE_LINES: Array[String] = ["WOLF: I'll hold back.\nIt crosses the mark on every pass.", "WOLF: The tank takes a moment to fall."]
 ## A hit on the mark, and one that catches the sentry more than OFF_CENTRE_HIT off it (the tank lands on
-## the mark and pins the machine where it stands, so the wreck shows to one side under it).
-const TANK_HIT_LINE: String = "The tank comes down square and crushes the sentry flat. Its eyes go dark.\nWOLF: It's down. The bolt by the hatch is next."
-const TANK_HIT_OFF_CENTRE_LINE: String = "The tank catches the sentry off centre and pins it to the floor. Its eyes go dark.\nWOLF: It's down. The bolt by the hatch is next."
+## the mark and pins the machine where it stands, so the wreck shows to one side under it). Either is
+## the narration's box, then WOLF's own (TANK_HIT_WOLF_LINE): one speaker a box.
+const TANK_HIT_LINE: String = "The tank comes down square and crushes\nthe sentry flat. Its eyes go dark."
+const TANK_HIT_OFF_CENTRE_LINE: String = "The tank catches the sentry off centre and\npins it to the floor. Its eyes go dark."
+const TANK_HIT_WOLF_LINE: String = "WOLF: It's down. The bolt by the door is next."
 const OFF_CENTRE_HIT: float = 8.0
 const POP_BOLT_LINE: String = "With the tank down, the winch's power reroutes to the exit bolt. The panel whines."
 const BOLT_CHARGING_LINE: String = "The bolt is taking the charge."
@@ -358,7 +362,7 @@ const REFUSE_BREAKER_LIVE: String = "Already live. Crank the valve by the door."
 const REFUSE_FUSE_LIT: String = "Fuse lit. Get clear of the door."
 const REFUSE_SPENT: String = "No charge left. The door is down."
 const REFUSE_REWINDING: String = "Not yet. The tank is still going back up."
-const REFUSE_RELEASE_SPENT: String = "The tank is down on the sentry.\nThe exit bolt is by the hatch."
+const REFUSE_RELEASE_SPENT: String = "The tank is down on the sentry.\nThe exit bolt is by the door."
 const REFUSE_EXIT_SENTRY: String = "Locked out until the sentry is down."
 ## Only a hand-made save can press the exit before the door is down: the sealed door blocks the way.
 const REFUSE_EXIT_DOOR: String = "Bolted. The sealed door comes first."
@@ -2046,7 +2050,7 @@ func _load_game() -> void:
 		if state.junction_cleared:
 			status_line = JUNCTION_CLEARED_LINE
 		elif state.sentry_down:
-			status_line = "Service junction restored. The sentry is down; pop the exit bolt by the hatch."
+			status_line = "Service junction restored. The sentry\nis down; pop the exit bolt by the door."
 		elif state.door_blown:
 			status_line = "Service junction restored. The door is\ndown. The sentry patrols past the rubble."
 		else:
@@ -2725,7 +2729,7 @@ func _interact_junction(x: float) -> void:
 	elif x >= JunctionRoom.BOLT_REACH_MIN_X:
 		_use_exit(x)
 	elif state.sentry_down:
-		status_line = "No station in reach. The exit bolt is by the hatch."
+		status_line = "No station in reach. The exit bolt is\nby the door."
 	elif state.door_blown:
 		status_line = "No station in reach. The TANK RELEASE\nis past the rubble."
 	else:
@@ -3313,7 +3317,8 @@ func _tank_hit() -> void:
 	impact.burst(junction_room.hit_sparks)
 	_fade_servo()
 	_update_controls()
-	_tell(TANK_HIT_OFF_CENTRE_LINE if absf(at_x - DropArm.MARK_X) > OFF_CENTRE_HIT else TANK_HIT_LINE)
+	_drop_box_queue()
+	_say([TANK_HIT_OFF_CENTRE_LINE if absf(at_x - DropArm.MARK_X) > OFF_CENTRE_HIT else TANK_HIT_LINE, TANK_HIT_WOLF_LINE])
 	# Autosave C: the sentry is down.
 	_save_progress()
 
@@ -4290,7 +4295,8 @@ func _context_hint() -> String:
 				return "Mirror copied. Head for the exit."
 			return "E: examine the mirror port." if state.purge_trace_preserved else "Copy the purge order first."
 		if _at_records_exit(x):
-			return "E: secure the first copy." if state.mirror_trace_preserved else "Preserve both traces before leaving."
+			# At the container the hint names it (Nathanial, 2026-10-14): the copy goes into the drawn container.
+			return "E: secure the first copy in the container." if state.mirror_trace_preserved else "Preserve both traces before leaving."
 		return _records_route_hint()
 	if state.checkpoint_reached:
 		return "E: enter records access. The Director's purge is still running." if absf(x - 876.0) <= 52.0 else ("E: read the Director's purge display." if x <= 230.0 else "Return to the safe point to enter records access.")
@@ -4382,7 +4388,7 @@ func _drop_ready() -> bool:
 
 func _lane_hint(x: float) -> String:
 	if state.junction_cleared:
-		return "The hatch is open."
+		return "The door is open."
 	if state.sentry_down:
 		if x >= JunctionRoom.BOLT_REACH_MIN_X:
 			match bolt_state:
@@ -4393,10 +4399,10 @@ func _lane_hint(x: float) -> String:
 			if _hatch_sliding():
 				return HATCH_OPENING_HINT
 			# The way out is offered at the door itself, not from the bolt panel.
-			return "E: leave through the hatch." if x >= JunctionRoom.HATCH_REACH_MIN_X else "The hatch is open. Leave through it."
+			return "E: leave through the door." if x >= JunctionRoom.HATCH_REACH_MIN_X else "The door is open. Leave through it."
 		if _hatch_sliding():
 			return HATCH_OPENING_HINT
-		return "The hatch is open. Leave through it." if bolt_state == &"open" else "The sentry is down. Pop the exit bolt by the hatch."
+		return "The door is open. Leave through it." if bolt_state == &"open" else "The sentry is down. Pop the exit bolt by the door."
 	if drop_arm.cloud_active() and DropArm.in_cloud(x):
 		return "Coolant cloud. Get out of it."
 	if _sentry_hunting() and x > SentryBrain.LANE_ENTRY_X:
@@ -4728,7 +4734,7 @@ func debug_wolf_why() -> String:
 	if not wolf.visible or title_open:
 		return "—"
 	if hatch_exit_walking:
-		return "leaving through the hatch"
+		return "leaving through the exit door"
 	if wolf_holding_relay:
 		return "hold: on the relay contact"
 	if wolf_heading_to_relay:

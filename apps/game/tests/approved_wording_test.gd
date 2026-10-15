@@ -5,7 +5,8 @@ extends SceneTree
 ## two boxes in order, the junction's goal-only entry and its hint ladder (timers and order), every
 ## refused press in the junction answered with a sound, a lamp flicker and a line within 6 frames (and
 ## again, with a blink of the box, when pressed again), the sealed door's own USE answer and its bump,
-## and none of the cut lines left anywhere in the game's scripts or on screen.
+## and none of the cut lines left anywhere in the game's scripts or on screen. Since 2026-10-14 ("Say
+## door") the junction's exit, drawn as a sliding door, is a door in every line about it.
 
 const GAME_SCENE: PackedScene = preload("res://scenes/main.tscn")
 const MainScript = preload("res://scripts/main.gd")
@@ -42,6 +43,10 @@ const CUT_LINES: Array[String] = [
 	"heads for the rubble",
 	"hold at the rubble",
 	"held at the rubble",
+	# Replaced on 2026-10-14 ("Say door"): the junction's exit is drawn as a sliding door.
+	"the hatch",
+	"The hatch",
+	"hatches",
 ]
 
 var failures: int = 0
@@ -136,6 +141,8 @@ func _check_constants() -> void:
 	_expect(c["ALONE_LINES"] == ["WOLF: I'll hold back.\nIt crosses the mark on every pass.", "WOLF: The tank takes a moment to fall."], "item 3 S13 with Draft A (2026-10-14): WOLF's two boxes when the engineer times it alone")
 	_expect(c["BROKE_OFF_RUBBLE_LINE"] == "WOLF: I'm out. I'll hold back." and c["BROKE_OFF_HATCH_LINE"] == "WOLF: I'm out.", "Draft A (2026-10-14): WOLF breaking off short of the sentry holds back; past it he is only out")
 	_expect(c["RECAP_LANE_ALONE"] == "SENTRY  WOLF held back while {name} timed the drop.", "Draft A (2026-10-14): the end card's row when the engineer timed it alone")
+	_expect(c["HATCH_OPENED_LINE"] == "The bolt arcs and drops.\nThe door slides open." and c["HATCH_OPENING_HINT"] == "The door is opening.", "Say door (2026-10-14): the exit door slides open")
+	_expect(c["TANK_HIT_LINE"] == "The tank comes down square and crushes\nthe sentry flat. Its eyes go dark." and c["TANK_HIT_OFF_CENTRE_LINE"] == "The tank catches the sentry off centre and\npins it to the floor. Its eyes go dark." and c["TANK_HIT_WOLF_LINE"] == "WOLF: It's down. The bolt by the door is next.", "Say door (2026-10-14): the tank's hit, then WOLF's own box naming the bolt by the door")
 	_expect(c["SENTRY_LOCK_LINE"] == "The sentry stops and its eyes snap red.\nIt has %s; get back over the rubble." and c["SENTRY_LOST_LINE"] == "The sentry loses %s behind the rubble\nand rolls back to its patrol.", "item 3 S7 and S8: the same words on two rows")
 	_expect(JunctionRoom.SENTRY_REASON == "The sentry saw %s out in the open.\nStay close to the TANK RELEASE." and JunctionRoom.SENTRY_CHASED_REASON == "The sentry ran %s down. Once its\neyes go red, only the rubble is safe.", "item 3 S3 and S4: the sentry's knockdown cards")
 	for key: String in ["RECAP_LANE_WOLF", "RECAP_LANE_REFUSED", "RECAP_LANE_ALONE", "RECAP_LANE_BROKE_OFF", "RECAP_LANE_UNKNOWN"]:
@@ -149,7 +156,7 @@ func _check_constants() -> void:
 		"REFUSE_SPENT": "No charge left. The door is down.",
 		"DROP_WAIT_LINE": "Wait. WOLF hasn't got it on the mark yet.",
 		"REFUSE_REWINDING": "Not yet. The tank is still going back up.",
-		"REFUSE_RELEASE_SPENT": "The tank is down on the sentry.\nThe exit bolt is by the hatch.",
+		"REFUSE_RELEASE_SPENT": "The tank is down on the sentry.\nThe exit bolt is by the door.",
 		"REFUSE_EXIT_SENTRY": "Locked out until the sentry is down.",
 		"REFUSE_EXIT_DOOR": "Bolted. The sealed door comes first.",
 	}
@@ -157,7 +164,7 @@ func _check_constants() -> void:
 		_expect(c[key] == refusals[key], "item 5: %s reads as approved" % key)
 	# Line rules: at most 42 characters a row (with the longest preset name) and 2 rows a box.
 	var boxes: Array[String] = []
-	for key: String in ["TRUST_LINE_1", "TRUST_LINE_2", "RUBBLE_LINE", "RUBBLE_WAKE_LINE", "BROKE_OFF_RUBBLE_LINE", "TANK_MISS_LINE", "TANK_MISS_TURN_LINE", "SENTRY_LOCK_LINE", "SENTRY_LOST_LINE", "LADDER_BREAKER_LINE", "LADDER_CHAIN_LINE", "JUNCTION_ENTRY_LINE"]:
+	for key: String in ["TRUST_LINE_1", "TRUST_LINE_2", "RUBBLE_LINE", "RUBBLE_WAKE_LINE", "BROKE_OFF_RUBBLE_LINE", "TANK_MISS_LINE", "TANK_MISS_TURN_LINE", "SENTRY_LOCK_LINE", "SENTRY_LOST_LINE", "LADDER_BREAKER_LINE", "LADDER_CHAIN_LINE", "JUNCTION_ENTRY_LINE", "HATCH_OPENED_LINE", "TANK_HIT_LINE", "TANK_HIT_OFF_CENTRE_LINE", "TANK_HIT_WOLF_LINE"]:
 		boxes.append(str(c[key]))
 	boxes.append_array(c["ALONE_LINES"] as Array)
 	boxes.append_array(refusals.values())
@@ -165,6 +172,8 @@ func _check_constants() -> void:
 	boxes.append_array([(c["INTRO_LINES"] as Array)[2], (c["INTRO_LINES"] as Array)[3], c["BREAKER_CATCHES_LINE"]])
 	# S11 and S16 are said where they happen; _check_after_blast checks them on screen word for word.
 	boxes.append_array(["No station in reach. The TANK RELEASE\nis past the rubble.", "Service junction restored. The door is\ndown. The sentry patrols past the rubble."])
+	# Say door (2026-10-14): the lines said where they happen.
+	boxes.append_array(["No station in reach. The exit bolt is\nby the door.", "Service junction restored. The sentry\nis down; pop the exit bolt by the door."])
 	for box: String in boxes:
 		var shown: String = box.replace("%s", "MORGAN" if box.begins_with("%s:") else "Morgan")
 		if shown.begins_with("MORGAN: ") or shown.begins_with("WOLF: "):
@@ -416,7 +425,7 @@ func _check_refusals() -> void:
 	# Row 6: the release once the sentry is down.
 	await _start_at(true)
 	await _place(release_x, false)
-	await _refused("row 6, the used release", &"release", "The tank is down on the sentry.\nThe exit bolt is by the hatch.", &"clank")
+	await _refused("row 6, the used release", &"release", "The tank is down on the sentry.\nThe exit bolt is by the door.", &"clank")
 	(tools.get("actions") as Object).set("sentry_frozen", false)
 	(tools.get("actions") as Object).set("invincible", false)
 
@@ -557,8 +566,10 @@ func _check_story_moves_on() -> void:
 	(game.get("sentry_brain") as SentryBrain).x = DropArm.MARK_X
 	game.call("_tank_hit")
 	var hit: String = str(game.get("status_line"))
+	_expect(hit == c["TANK_HIT_LINE"] and game.get("box_queue") == [c["TANK_HIT_WOLF_LINE"]], "a hit within WOLF's first box drops it: the tank's box, then WOLF's own")
 	game.call("_advance_box_queue", 30.0)
-	_expect(hit.contains("It's down.") and str(game.get("status_line")) == hit and (game.get("box_queue") as Array).is_empty(), "a hit within WOLF's first box stays up; \"%s\" never comes back over the crushed sentry" % str(alone[1]))
+	game.call("_advance_box_queue", 30.0)
+	_expect(str(game.get("status_line")) == c["TANK_HIT_WOLF_LINE"] and (game.get("box_queue") as Array).is_empty(), "WOLF's box after the hit stays up; \"%s\" never comes back over the crushed sentry" % str(alone[1]))
 	_expect(await _wait_until(func() -> bool: return Engine.time_scale == 1.0, 90), "time scale settles after the hit")
 
 
