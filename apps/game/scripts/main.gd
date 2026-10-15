@@ -1161,20 +1161,11 @@ func _update_crank_pose(delta: float) -> void:
 	if frame == crank_frame or human_texture == null:
 		return
 	crank_frame = frame
-	var sprite: Sprite2D = human.body_sprite
 	if frame < 0:
-		sprite.texture = human_texture
-		sprite.region_enabled = false
-		sprite.scale = human_sprite_scale
-		sprite.position = HUMAN_SPRITE_REST
+		_show_human_standing()
 	else:
-		sprite.texture = CRANK_ART
-		sprite.region_enabled = true
-		sprite.region_rect = Rect2(Vector2(CRANK_REGION_SIZE.x * frame, 0.0), CRANK_REGION_SIZE)
-		sprite.scale = Vector2.ONE * CRANK_SCALE
-		sprite.position = CRANK_SPRITE_POS
-		# The wheel is on the engineer's right.
-		sprite.flip_h = false
+		# The wheel is on the engineer's right, so the crank frames never flip.
+		_show_human_frame(CRANK_ART, Rect2(Vector2(CRANK_REGION_SIZE.x * frame, 0.0), CRANK_REGION_SIZE), CRANK_SCALE, CRANK_SPRITE_POS, false)
 
 
 ## The engineer's authored step (back from the relay, to a crank spot, or beside a station they used):
@@ -3504,14 +3495,10 @@ func _show_collapse(t: float) -> void:
 		if t >= COLLAPSE_TIMES[index] - 0.0001:
 			frame = index
 	var boots: float = lerpf(collapse_from_x, collapse_to_x, ease(clampf(t / COLLAPSE_SECONDS, 0.0, 1.0), 0.4)) - human.position.x
-	var sprite: Sprite2D = human.body_sprite
-	sprite.texture = COLLAPSE_SHEET
-	sprite.region_enabled = true
-	sprite.region_rect = Rect2(frame * COLLAPSE_FRAME.x, 0.0, COLLAPSE_FRAME.x, COLLAPSE_FRAME.y)
-	sprite.scale = Vector2.ONE * COLLAPSE_SCALE
-	sprite.rotation_degrees = 0.0
-	sprite.flip_h = collapse_fall < 0.0
-	sprite.position = Vector2(boots + collapse_fall * (COLLAPSE_FRAME.x * 0.5 - COLLAPSE_PIVOT_X) * COLLAPSE_SCALE, HUMAN_FLOOR_Y - COLLAPSE_FRAME.y * 0.5 * COLLAPSE_SCALE)
+	_show_human_frame(COLLAPSE_SHEET, Rect2(frame * COLLAPSE_FRAME.x, 0.0, COLLAPSE_FRAME.x, COLLAPSE_FRAME.y), COLLAPSE_SCALE,
+			Vector2(boots + collapse_fall * (COLLAPSE_FRAME.x * 0.5 - COLLAPSE_PIVOT_X) * COLLAPSE_SCALE, HUMAN_FLOOR_Y - COLLAPSE_FRAME.y * 0.5 * COLLAPSE_SCALE),
+			collapse_fall < 0.0)
+	human.body_sprite.rotation_degrees = 0.0
 	var span: Vector2 = collapse_span(frame, collapse_fall, boots)
 	human_reflection.floor_y = HUMAN_FLOOR_Y
 	human_reflection.shadow_span = span
@@ -3524,14 +3511,39 @@ static func collapse_span(frame: int, fall: float, boots_x: float) -> Vector2:
 	return Vector2(boots_x + minf(columns.x * fall, columns.y * fall), boots_x + maxf(columns.x * fall, columns.y * fall))
 
 
-## The engineer back on their feet: the standing image at rest, facing the way they faced before the
-## collapse, their reflection and shadow as they stand.
-func _stand_up() -> void:
+## The engineer's body sprite back on the standing image (human_texture, the whole texture) at its
+## rest scale and offset. The one place that undoes a sheet frame (_show_human_frame), so the crank
+## and the stand-up after a collapse restore the same four properties. Leaves rotation and flip_h to
+## the caller: the crank keeps the facing it had, and _stand_up restores the facing from before the
+## collapse.
+func _show_human_standing() -> void:
 	var sprite: Sprite2D = human.body_sprite
 	sprite.texture = human_texture
 	sprite.region_enabled = false
 	sprite.scale = human_sprite_scale
 	sprite.position = HUMAN_SPRITE_REST
+
+
+## The engineer's body sprite on one frame of a painted sheet: [param sheet] cut to [param region]
+## (art px), drawn at [param frame_scale] (world px per art px) at position [param at] (world px,
+## relative to the engineer's origin), mirrored when [param flip]. Used by the crank frames
+## (CRANK_ART) and the collapse (COLLAPSE_SHEET); _show_human_standing undoes it. Leaves rotation to
+## the caller.
+func _show_human_frame(sheet: Texture2D, region: Rect2, frame_scale: float, at: Vector2, flip: bool) -> void:
+	var sprite: Sprite2D = human.body_sprite
+	sprite.texture = sheet
+	sprite.region_enabled = true
+	sprite.region_rect = region
+	sprite.scale = Vector2.ONE * frame_scale
+	sprite.position = at
+	sprite.flip_h = flip
+
+
+## The engineer back on their feet: the standing image at rest, facing the way they faced before the
+## collapse, their reflection and shadow as they stand.
+func _stand_up() -> void:
+	_show_human_standing()
+	var sprite: Sprite2D = human.body_sprite
 	sprite.rotation_degrees = 0.0
 	if collapsed:
 		sprite.flip_h = collapse_flip
