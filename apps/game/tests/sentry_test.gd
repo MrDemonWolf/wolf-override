@@ -7,6 +7,7 @@ extends SceneTree
 const GAME_SCENE: PackedScene = preload("res://scenes/main.tscn")
 const State = preload("res://scripts/m0_state.gd")
 const MainScript = preload("res://scripts/main.gd")
+const Suite = preload("res://tests/support/game_suite.gd")
 ## How far WOLF's painted body stays from the hung tank's on his way down the lane, in px.
 const TANK_CLEARANCE: float = 3.0
 ## The bound over the crushed tank (_check_tank_leap_shape): its steepest rise or fall in px up per px
@@ -823,7 +824,7 @@ func _check_engineer_alone(game: Node2D, path: String) -> void:
 	var release_right: float = JunctionRoom.ARM_X + JunctionRoom.ARM_PANEL_HALF_WIDTH
 	_expect(body_rect.position.x >= SentryBrain.COVER_MAX_X + 3.0 and body_rect.position.x >= release_right + 3.0, "the body lies past the alcove's right post, clear of the TANK RELEASE (body %.1f..%.1f, post %.0f, release ends %.1f)" % [body_rect.position.x, body_rect.end.x, SentryBrain.COVER_MAX_X, release_right])
 	_expect(room.sentry.position.x > human.position.x and sentry_rect.position.x - body_rect.end.x >= 3.0, "the sentry rolls back off the body and stands clear of it (gap %.1f px)" % (sentry_rect.position.x - body_rect.end.x))
-	_expect(await _retry(game, 240), "the knockdown hands back")
+	_expect(await Suite.retry(game, 240), "the knockdown hands back")
 	var state: M0State = game.get("state") as M0State
 	_expect(FileAccess.get_file_as_bytes(path) == b_bytes and state.to_dict() == b_dict and state.memory.get("choice_id") == State.PRESS, "it restores autosave B with the relay memory intact and saves nothing")
 	_expect(brain.state == &"patrol" and brain.x > SentryBrain.PATROL_MAX_X - 60.0 and arm.state == &"hung" and game.get("lane_choice") == "" and human.controlled, "the restore puts the sentry back at the far end under a hung tank")
@@ -966,7 +967,7 @@ func _check_cloud(game: Node2D, path: String) -> void:
 	var lying_rect: Rect2 = _painted_body(human.body_sprite)
 	_expect(tank_left - lying_rect.end.x >= 3.0, "and the lying body ends clear of the tank on the floor (body ends %.1f, tank starts %.1f)" % [lying_rect.end.x, tank_left])
 	_expect(str(game.get("status_line")).begins_with("The coolant cloud caught %s. Let it clear before crossing the mark." % (game.get("state") as M0State).human_name().get_slice(" ", 0)), "the status line names the cloud and the engineer")
-	_expect(await _retry(game, 240), "the cloud knockdown hands back")
+	_expect(await Suite.retry(game, 240), "the cloud knockdown hands back")
 	_expect((game.get("state") as M0State).to_dict() == b_dict and not arm.cloud_active() and not room.cloud_hazard.armed and brain.state == &"patrol", "it restores autosave B with the cloud gone")
 	# A hit well off the mark is told as one: the tank catches the sentry off centre, not square.
 	brain.state = &"dormant"
@@ -997,7 +998,7 @@ func _check_chased_cards(game: Node2D, path: String) -> void:
 	var status: String = str(game.get("status_line"))
 	_expect(not SentryBrain.is_exposed(human.position.x) and status.begins_with(chased) and not status.contains("alcove's posts") and not status.contains("in its lane"), "caught between the posts after a miss, the card points only at the rubble (%s)" % status)
 	await _expect_shove_fall(game, "after a miss", false)
-	_expect(await _retry(game, 240), "the knockdown after a miss hands back")
+	_expect(await Suite.retry(game, 240), "the knockdown after a miss hands back")
 	_expect((game.get("state") as M0State).to_dict() == b_dict and not brain.turned_by_miss, "it restores autosave B with the sentry patrolling again")
 	# Seen out in the lane, then caught after ducking into the alcove: the alcove advice would be wrong.
 	game.set("lane_choice", "alone")
@@ -1011,7 +1012,7 @@ func _check_chased_cards(game: Node2D, path: String) -> void:
 	status = str(game.get("status_line"))
 	_expect(not SentryBrain.is_exposed(human.position.x) and status.begins_with(chased) and not status.contains("alcove's posts"), "caught inside the alcove, the card points only at the rubble (%s)" % status)
 	await _expect_shove_fall(game, "inside the alcove", true)
-	_expect(await _retry(game, 240), "that knockdown hands back too")
+	_expect(await Suite.retry(game, 240), "that knockdown hands back too")
 	# Out in the lane facing back towards the alcove: they slump forward where they stand, towards it,
 	# never turned round or dragged back against the fall.
 	game.set("lane_choice", "alone")
@@ -1024,7 +1025,7 @@ func _check_chased_cards(game: Node2D, path: String) -> void:
 	var stood_x: float = human.position.x
 	await _expect_shove_fall(game, "in the lane facing the alcove", true)
 	_expect(is_equal_approx(float(game.get("collapse_to_x")), stood_x), "facing the alcove, the boots stay where they stood (x %.1f, lying at %.1f)" % [stood_x, float(game.get("collapse_to_x"))])
-	_expect(await _retry(game, 240), "the knockdown in the lane hands back")
+	_expect(await Suite.retry(game, 240), "the knockdown in the lane hands back")
 	# With Reduced Motion the collapse cuts straight to lying, so the sentry is put clear of the body on
 	# that same frame instead of rolling back over the next ones: after a miss, caught at the release
 	# facing away from it (the lying body reaches back towards it).
@@ -1049,7 +1050,7 @@ func _check_chased_cards(game: Node2D, path: String) -> void:
 	var first_gap: float = machine_rect.position.x - lying_rect.end.x
 	_expect(human.body_sprite.region_rect.position.x == MainScript.COLLAPSE_FRAME.x * (MainScript.COLLAPSE_SPANS.size() - 1) and first_gap >= 3.0, "with Reduced Motion, on the first frame they lie down the sentry already stands clear of them (gap %.1f px)" % first_gap)
 	impact.reduce_motion = false
-	_expect(await _retry(game, 240), "the Reduced Motion knockdown hands back")
+	_expect(await Suite.retry(game, 240), "the Reduced Motion knockdown hands back")
 
 
 ## The sentry is solid: an engineer who walks into it stops where the drawn bodies touch
@@ -1087,7 +1088,7 @@ func _check_walk_into(game: Node2D) -> void:
 	var tank_right: float = room.global_position.x + DropArm.MARK_X + JunctionRoom.TANK_SIZE.x * 0.5
 	var first_pose: Vector2 = MainScript.collapse_span(0, float(game.get("collapse_fall")), float(game.get("collapse_from_x")))
 	_expect(float(game.get("collapse_fall")) > 0.0 and first_pose.x > tank_right + 4.0, "met right of the hung tank, they go down clear of it from the first frame (body from x %.1f, tank to %.1f)" % [first_pose.x, tank_right])
-	_expect(await _retry(game, 240), "that knockdown hands back")
+	_expect(await Suite.retry(game, 240), "that knockdown hands back")
 
 
 ## Holds [param action] for [param frames] physics steps, or until the sentry leaves [param while_state]
@@ -1734,17 +1735,6 @@ func _wait_until(condition: Callable, frames: int) -> bool:
 		if condition.call():
 			return true
 	return false
-
-## RETRY on the knockdown card (Q17): waits until the card takes it (Main.RETRY_READY_SECONDS after the
-## hit), presses interact once, and waits until the room has faded back in with the controls back.
-func _retry(game: Node, frames: int) -> bool:
-	if not await _wait_until(func() -> bool: return bool(game.call("_retry_ready")), frames):
-		return false
-	await process_frame
-	Input.action_press(&"interact")
-	await process_frame
-	Input.action_release(&"interact")
-	return await _wait_until(func() -> bool: return not bool(game.get("fail_active")) and not bool(game.get("retry_fading_in")), frames)
 
 
 func _walk_to(actor: M0Actor, target_x: float) -> bool:

@@ -3,6 +3,7 @@ extends SceneTree
 const GAME_SCENE: PackedScene = preload("res://scenes/main.tscn")
 const State = preload("res://scripts/m0_state.gd")
 const MainScript = preload("res://scripts/main.gd")
+const Suite = preload("res://tests/support/game_suite.gd")
 
 var failures: int = 0
 
@@ -223,7 +224,7 @@ func _run() -> void:
 	var pre_save: Dictionary = (game.get("beat_snapshot") as Dictionary).duplicate(true)
 	_expect(await _walk_to(human, 450.0), "the engineer moves on before any save exists")
 	game.call("_fail_beat", "Test knockdown.")
-	_expect(await _retry(game, 240), "a knockdown before the first checkpoint still hands back")
+	_expect(await Suite.retry(game, 240), "a knockdown before the first checkpoint still hands back")
 	state = game.get("state") as M0State
 	_expect(state.to_dict() == pre_save and state.memory.get("choice_id") == State.PRESS and not state.checkpoint_reached and state.chapter_id == "lockdown", "without a checkpoint the beat snapshot restores the choice, not an older save")
 	_expect(human.controlled and human.position == state.human_position, "the engineer is back at the beat start")
@@ -236,7 +237,7 @@ func _run() -> void:
 	await process_frame
 	_expect(game.get("fail_active") and Engine.time_scale == 1.0 and human.body_sprite.rotation_degrees == 0.0 and is_equal_approx(human.body_sprite.region_rect.position.x, MainScript.COLLAPSE_FRAME.x * (MainScript.COLLAPSE_SPANS.size() - 1)), "Reduced Motion knockdown cuts straight to lying down and skips the dip")
 	_check_lying(human, "with Reduced Motion")
-	_expect(await _retry(game, 240), "the Reduced Motion knockdown restores")
+	_expect(await Suite.retry(game, 240), "the Reduced Motion knockdown restores")
 	impact.reduce_motion = false
 
 	# Intro and chapter close never knock down; the kit's intro boom still settles.
@@ -319,6 +320,7 @@ func _wait_until(condition: Callable, frames: int) -> bool:
 ## at about 1.5 s. Time is the game's own (the frames' deltas, as the knockdown and its tweens count it),
 ## and each moment is checked to the frame it falls in, so a slow machine does not change the result.
 func _check_retry_timing(game: Node, context: String) -> void:
+	# Its two presses stay inline, not Suite.retry: each is frame-exact and counts the press frame itself.
 	var hint: Label = game.get_node("CanvasLayer/ContextHint/Text") as Label
 	var age: float = float(game.get("fail_age"))
 	var before: float = age
@@ -369,18 +371,6 @@ func _check_retry_timing(game: Node, context: String) -> void:
 		await process_frame
 	_expect(human.controlled and not bool(game.get("fail_active")) and after_press >= 0.6 - 0.001 and after_press - 0.6 <= longest_frame + 0.001, "%s: control comes back 0.6 s after RETRY, so about 1.5 s after the hit for a press at 0.9 s (%.3f s after the press, frames up to %.3f s)" % [context, after_press, longest_frame])
 	_expect(is_equal_approx(MainScript.RETRY_READY_SECONDS + MainScript.RETRY_FADE_OUT_SECONDS + MainScript.RETRY_FADE_IN_SECONDS, 1.5), "%s: 0.9 s + 0.25 s fade out + 0.35 s fade in = 1.5 s" % context)
-
-
-## RETRY on the knockdown card (Q17): waits until the card takes it (Main.RETRY_READY_SECONDS after the
-## hit), presses interact once, and waits until the room has faded back in with the controls back.
-func _retry(game: Node, frames: int) -> bool:
-	if not await _wait_until(func() -> bool: return bool(game.call("_retry_ready")), frames):
-		return false
-	await process_frame
-	Input.action_press(&"interact")
-	await process_frame
-	Input.action_release(&"interact")
-	return await _wait_until(func() -> bool: return not bool(game.get("fail_active")) and not bool(game.get("retry_fading_in")), frames)
 
 
 func _walk_to(actor: M0Actor, target_x: float) -> bool:

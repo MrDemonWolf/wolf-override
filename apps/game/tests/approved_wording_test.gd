@@ -10,6 +10,7 @@ extends SceneTree
 const GAME_SCENE: PackedScene = preload("res://scenes/main.tscn")
 const MainScript = preload("res://scripts/main.gd")
 const State = preload("res://scripts/m0_state.gd")
+const Suite = preload("res://tests/support/game_suite.gd")
 ## A press must be heard, seen on its station's lamp and answered in the box within this many frames.
 const ANSWER_FRAMES: int = 6
 ## Lines cut on 2026-10-13 (P0-19 / Q5: N1, N4, N5, N14 and the two clauses; Q6's chain on entry).
@@ -492,7 +493,7 @@ func _check_knockdown_boxes() -> void:
 	var reason: String = JunctionRoom.SENTRY_REASON % "Rowan"
 	game.call("_fail_beat", reason, true)
 	_expect(bool(game.get("fail_active")), "the sentry knockdown starts")
-	_expect(await _retry(game, 300), "the knockdown restores the checkpoint")
+	_expect(await Suite.retry(game, 300), "the knockdown restores the checkpoint")
 	var c: Dictionary = (MainScript as GDScript).get_script_constant_map()
 	var queue: Array = game.get("box_queue")
 	_expect(str(game.get("status_line")) == reason and queue.size() == 1 and (queue[0] == c["RESTORE_FROM_DISK_LINE"] or queue[0] == c["RESTORE_BEAT_LINE"]), "after restore the two-row card keeps its box and the restore line comes next (box \"%s\", then %s)" % [str(game.get("status_line")).c_escape(), str(queue)])
@@ -612,7 +613,7 @@ func _check_miss_boxes() -> void:
 			"stay":
 				_expect(ended and seen[0] == miss and turn_at == 1, "staying at the release: the miss, then the order to get back over the rubble before the sentry reaches them (seen %s)" % str(seen).c_escape())
 				_expect(turn_ms[0] >= 0 and turn_ms[0] <= int((SentryBrain.LOCK_SECONDS + 0.3) * 1000.0), "the order comes as the sentry swings, after its %.1f s lock-on beat (%d ms)" % [SentryBrain.LOCK_SECONDS, turn_ms[0]])
-				_expect(await _retry(game, 300), "the knockdown restores")
+				_expect(await Suite.retry(game, 300), "the knockdown restores")
 			"back at once":
 				_expect(ended and seen[0] == miss and turn_at < 0 and seen.has(lost), "back over the rubble before it swings: no stale order, then the sentry giving up (seen %s)" % str(seen).c_escape())
 			_:
@@ -729,17 +730,6 @@ func _wait_until(condition: Callable, frames: int) -> bool:
 		if condition.call():
 			return true
 	return false
-
-## RETRY on the knockdown card (Q17): waits until the card takes it (Main.RETRY_READY_SECONDS after the
-## hit), presses interact once, and waits until the room has faded back in with the controls back.
-func _retry(game: Node, frames: int) -> bool:
-	if not await _wait_until(func() -> bool: return bool(game.call("_retry_ready")), frames):
-		return false
-	await process_frame
-	Input.action_press(&"interact")
-	await process_frame
-	Input.action_release(&"interact")
-	return await _wait_until(func() -> bool: return not bool(game.get("fail_active")) and not bool(game.get("retry_fading_in")), frames)
 
 
 func _remove(file: String) -> void:

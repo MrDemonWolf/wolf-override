@@ -166,3 +166,19 @@ static func texture_image(texture: Texture2D) -> Image:
 	if image.is_compressed():
 		image.decompress()
 	return image
+
+
+## RETRY on the knockdown card (Q17): waits until the card takes it (Main.RETRY_READY_SECONDS after the
+## hit), presses interact once, and waits until the room has faded back in with the controls back.
+## [param game] is the running game; [param max_frames] bounds each of the two waits, in physics
+## frames. Returns false when the card never takes RETRY or the room never comes back in time.
+## The press is held for exactly one process frame, the way a tap reaches the game. Users: the suites
+## that knock the engineer down (approved_wording, impact, junction, sentry).
+static func retry(game: Node, max_frames: int) -> bool:
+	if not await wait_until(func() -> bool: return bool(game.call("_retry_ready")), max_frames):
+		return false
+	await tree().process_frame
+	Input.action_press(&"interact")
+	await tree().process_frame
+	Input.action_release(&"interact")
+	return await wait_until(func() -> bool: return not bool(game.get("fail_active")) and not bool(game.get("retry_fading_in")), max_frames)
