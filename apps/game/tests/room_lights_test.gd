@@ -363,8 +363,9 @@ func _check_corridor_flash(game: Node2D, corridor: RoomDepth, records: RoomDepth
 	var times: Array[float] = []
 	var clock_start: float = flash.get_total_elapsed_time()
 	var start: int = Time.get_ticks_usec()
-	# About five flashes of the tween's clock (wall-clock cap so a stopped tween cannot hang the run).
-	while flash.is_valid() and flash.get_total_elapsed_time() - clock_start < 3.6 and Time.get_ticks_usec() - start < 15000000:
+	# About nine flashes of the tween's clock, so a stall that skips a rise or two still leaves most gaps
+	# whole (wall-clock cap so a stopped tween cannot hang the run).
+	while flash.is_valid() and flash.get_total_elapsed_time() - clock_start < 6.2 and Time.get_ticks_usec() - start < 15000000:
 		await process_frame
 		if not flash.is_valid():
 			break
@@ -388,9 +389,9 @@ func _check_corridor_flash(game: Node2D, corridor: RoomDepth, records: RoomDepth
 		gaps.append(rises[i] - rises[i - 1])
 	gaps.sort()
 	var per_minute: float = 0.0
-	if gaps.size() >= 3:
+	if gaps.size() >= 4:
 		per_minute = 60.0 / maxf(gaps[int(gaps.size() / 2.0)], 0.000001)
-	_expect(gaps.size() >= 3 and per_minute >= 80.0 and per_minute <= 96.0, "the corridor's beacons flash like a real rotating beacon, about 88 a minute (%.1f from %d gaps), under 3 a second" % [per_minute, gaps.size()])
+	_expect(gaps.size() >= 4 and per_minute >= 80.0 and per_minute <= 96.0, "the corridor's beacons flash like a real rotating beacon, about 88 a minute (%.1f from %d gaps), under 3 a second" % [per_minute, gaps.size()])
 	print("corridor beacon flash: lens-light r %.3f, lens red %.2f to %.2f (%.2f), %.1f flashes a minute (tween clock, gaps %s) over %d samples" % [r, red_low, red_high, red_low / maxf(red_high, 0.001), per_minute, str(gaps), alphas.size()])
 	var records_lens: Color = _lens(records)
 	_expect(records_lens.is_equal_approx(records.warning_color), "Records' drawn beacons keep a steady lens")
