@@ -99,13 +99,12 @@ static func edge_light(lead: float) -> float:
 	return 0.35 + 0.65 * sqrt(clampf((lead - (A_LEAD_SHUT + 0.1)) / 1.2, 0.0, 1.0))
 
 
+## One TriMesh, one draw call: the front face, then the leading edge, then the contact shadow (the
+## order the triangles were always drawn in, so later ones cover earlier ones as before).
 func _draw() -> void:
 	var lead: float = lead_at(open)
 	var size: Vector2 = texture.get_size()
-	var points: PackedVector2Array = PackedVector2Array()
-	var uvs: PackedVector2Array = PackedVector2Array()
-	var colors: PackedColorArray = PackedColorArray()
-	var indices: PackedInt32Array = PackedInt32Array()
+	var mesh: TriMesh = TriMesh.new()
 	# front face: columns from the leading edge back to the pocket's mouth
 	var cols: PackedFloat32Array = PackedFloat32Array([lead])
 	for i: int in range(A_COLS.size() - 1, -1, -1):
@@ -115,36 +114,24 @@ func _draw() -> void:
 	if cols.size() >= 2:
 		for a: float in cols:
 			for h: float in H_ROWS:
-				points.append(project(a, h, T_LF))
 				var texel: Vector2 = FRONT_REGION.position + Vector2((a - lead) * U_TEXELS_PER_M, (LEAF_TOP_M - h) * H_TEXELS_PER_M)
-				uvs.append(texel / size)
 				var g: float = light_at(a, h)
-				colors.append(Color(g, g, g, 1.0))
-		for c: int in cols.size() - 1:
-			for r: int in rows - 1:
-				var i0: int = c * rows + r
-				var i1: int = (c + 1) * rows + r
-				indices.append_array([i0, i1, i0 + 1, i0 + 1, i1, i1 + 1])
-	# leading edge
-	var base: int = points.size()
+				mesh.add_vertex(project(a, h, T_LF), texel / size, Color(g, g, g, 1.0))
+		mesh.add_grid(0, cols.size(), rows)
+	# leading edge: two columns (its front and back corner lines), each with every row
+	var base: int = mesh.vertex_count()
 	var ge: float = edge_light(lead)
 	for t: float in [T_LF, T_LB]:
 		for h: float in H_ROWS:
-			points.append(project(lead, h, t))
 			var texel: Vector2 = EDGE_REGION.position + Vector2((t - T_LF) * H_TEXELS_PER_M, (LEAF_TOP_M - h) * H_TEXELS_PER_M)
-			uvs.append(texel / size)
-			colors.append(Color(ge, ge, ge, 1.0))
-	for r: int in rows - 1:
-		var j0: int = base + r
-		var j1: int = base + rows + r
-		indices.append_array([j0, j1, j0 + 1, j0 + 1, j1, j1 + 1])
+			mesh.add_vertex(project(lead, h, t), texel / size, Color(ge, ge, ge, 1.0))
+	mesh.add_grid(base, 2, rows)
 	# contact shadow on the threshold, in front of the foot: dark at the foot, clear at its far edge
-	var sbase: int = points.size()
+	# (a 2 x 2 grid: at the leading edge and at the mouth, each at the foot and SHADOW_DEPTH_M out)
+	var sbase: int = mesh.vertex_count()
 	var suv: Vector2 = (SHADOW_REGION.position + SHADOW_REGION.size * 0.5) / size
 	for a: float in [lead, A_MOUTH]:
 		for k: int in 2:
-			points.append(project(a, 0.0, T_LF - SHADOW_DEPTH_M * k))
-			uvs.append(suv)
-			colors.append(Color(1.0, 1.0, 1.0, SHADOW_ALPHA * (1 - k)))
-	indices.append_array([sbase, sbase + 2, sbase + 1, sbase + 1, sbase + 2, sbase + 3])
-	RenderingServer.canvas_item_add_triangle_array(get_canvas_item(), indices, points, colors, uvs, PackedInt32Array(), PackedFloat32Array(), texture.get_rid())
+			mesh.add_vertex(project(a, 0.0, T_LF - SHADOW_DEPTH_M * k), suv, Color(1.0, 1.0, 1.0, SHADOW_ALPHA * (1 - k)))
+	mesh.add_grid(sbase, 2, 2)
+	mesh.draw(get_canvas_item(), texture)
