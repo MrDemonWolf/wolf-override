@@ -30,6 +30,11 @@ const ARM_SHOE_OFF: float = 0.035
 const ARM_MAIN: float = 0.26
 const ARM_FORE: float = 0.30
 const ARM_WIDTH: float = 0.028
+## The entry closer's timing (close_behind): the leaf rests open this long (seconds) as they come in,
+## then the closer brings it from 90 degrees to shut in CLOSE_SECONDS, eased. ANSI/BHMA A156.19 asks a
+## closer 3 s or longer from 90 to 10 degrees. The Records entry and the junction entry share it.
+const CLOSE_DELAY: float = 0.35
+const CLOSE_SECONDS: float = 3.4
 ## A shut swing leaf's collision box (px): 16 deep from its room face, as tall as the corridor seal's
 ## (132), so it stops whoever walks into it at the face.
 const BODY_SIZE: Vector2 = Vector2(16.0, 132.0)
@@ -96,6 +101,23 @@ func _init(atlas: Texture2D, room: Rect2, outside: Rect2, edge: Rect2, hinge_foo
 ## left), standing on the floor. Disabled until the room enables it; returns the shape.
 static func make_body(parent: Node, body_name: String, face_x: float, side: float) -> CollisionShape2D:
 	return RoomDepth.door_body(parent, body_name, Vector2(face_x + side * BODY_SIZE.x * 0.5, RoomDepth.FLOOR_Y - BODY_SIZE.y * 0.5), BODY_SIZE)
+
+
+## Shuts the leaf behind someone who just came through: it stands fully open (open = 1) now, rests
+## CLOSE_DELAY, swings shut over CLOSE_SECONDS (sine, in and out), then calls [param shut] (the room
+## turns its status lamp red there; it sets the moving colour itself before calling this). The tween
+## belongs to [param room], so it pauses and frees with the room; [param running], the
+## room's previous closer tween, is killed first so two closers never fight. Returns the new tween for
+## the room to keep (its entry_tween, which the tests and Main read).
+func close_behind(room: Node, running: Tween, shut: Callable) -> Tween:
+	if running != null and running.is_running():
+		running.kill()
+	open = 1.0
+	var tween: Tween = room.create_tween()
+	tween.tween_interval(CLOSE_DELAY)
+	tween.tween_property(self, "open", 0.0, CLOSE_SECONDS).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
+	tween.tween_callback(shut)
+	return tween
 
 
 ## World px of the point [param p] (metres: x along the room, y up, z behind the walk line) seen from

@@ -70,10 +70,8 @@ const CONTAINER_X: float = 797.0
 const CONTAINER_SPAN: Vector2 = Vector2(776.0, 807.0)
 ## A low-energy operator swings the exit's leaf open: ANSI/BHMA A156.19 asks 3 s or longer to
 ## backcheck or 80 degrees, so 90 degrees takes this long. The entry's closer brings its leaf shut
-## behind the engineer a moment after they come in, 90 to 10 degrees in 3 s or longer (the same).
+## behind the engineer a moment after they come in (SwingLeaf.close_behind's timing).
 const EXIT_SWING_SECONDS: float = 3.5
-const ENTRY_CLOSE_DELAY: float = 0.35
-const ENTRY_CLOSE_SECONDS: float = 3.4
 const LAMP_SHUT: Color = Color(0.9, 0.2, 0.17)
 const LAMP_MOVING: Color = Color("#f3ae4b")
 const LAMP_OPEN: Color = Color("#7dffa8")
@@ -333,21 +331,16 @@ func open_exit(animate: bool) -> void:
 	exit_tween.tween_callback(func() -> void: set_exit_lamp(LAMP_OPEN))
 
 
-## Entering from the corridor side: the entry stands open behind the engineer and its closer brings
-## it shut, amber while it moves, red once it latches.
+## True while the exit's operator is swinging its leaf open.
 func exit_swinging() -> bool:
 	return exit_tween != null and exit_tween.is_running()
 
 
+## Entering from the corridor side: the entry stands open behind the engineer and its closer brings
+## it shut, amber while it moves, red once it latches.
 func close_entry_behind() -> void:
-	if entry_tween != null and entry_tween.is_running():
-		entry_tween.kill()
-	entry_leaf.open = 1.0
 	set_entry_lamp(LAMP_MOVING)
-	entry_tween = create_tween()
-	entry_tween.tween_interval(ENTRY_CLOSE_DELAY)
-	entry_tween.tween_property(entry_leaf, "open", 0.0, ENTRY_CLOSE_SECONDS).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
-	entry_tween.tween_callback(func() -> void: set_entry_lamp(LAMP_SHUT))
+	entry_tween = entry_leaf.close_behind(self, entry_tween, func() -> void: set_entry_lamp(LAMP_SHUT))
 
 
 func _draw() -> void:

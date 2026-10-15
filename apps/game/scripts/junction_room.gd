@@ -70,10 +70,8 @@ const ENTRY_LEAF_LIGHTS: Array = [
 	[Vector3(0.4755, 0.0300, 0.0871), Vector3(0.3002, 0.3316, 0.3491), 0.90, 0.0, 0.05],  # the lit threshold and passage deck seen through the doorway
 	[Vector3(1.0467, 1.4000, 0.8609), Vector3(0.3697, 0.4083, 0.4299), 1.00, 0.0, 0.05],  # the cross-wall's own lit face beyond the hinge jamb
 ]
-## Its closer brings it shut behind them a moment after they come in, 90 to 10 degrees in 3 s or
-## longer (ANSI/BHMA A156.19), as the Records entry's does; amber while it moves, red once it latches.
-const ENTRY_CLOSE_DELAY: float = 0.35
-const ENTRY_CLOSE_SECONDS: float = 3.4
+## Its closer brings it shut behind them a moment after they come in, as the Records entry's does
+## (SwingLeaf.close_behind); its lamp is amber while it moves, red once it latches.
 const ENTRY_LAMP_SHUT: Color = Color(0.9, 0.2, 0.17)
 const ENTRY_LAMP_MOVING: Color = Color("#f3ae4b")
 ## The exit: a power-operated sliding steel door in a cast-concrete cross-wall at the room's right end,
@@ -871,14 +869,8 @@ func entry_lamp_color() -> Color:
 ## Coming in from the service line passage: the entry stands open behind the engineer and its closer
 ## brings it shut (as the Records entry's does).
 func close_entry_behind() -> void:
-	if entry_tween != null and entry_tween.is_running():
-		entry_tween.kill()
-	entry_leaf.open = 1.0
 	set_entry_lamp(ENTRY_LAMP_MOVING)
-	entry_tween = create_tween()
-	entry_tween.tween_interval(ENTRY_CLOSE_DELAY)
-	entry_tween.tween_property(entry_leaf, "open", 0.0, ENTRY_CLOSE_SECONDS).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
-	entry_tween.tween_callback(func() -> void: set_entry_lamp(ENTRY_LAMP_SHUT))
+	entry_tween = entry_leaf.close_behind(self, entry_tween, func() -> void: set_entry_lamp(ENTRY_LAMP_SHUT))
 
 
 ## The release bay draws after Recesses (so its right post lies over the bolt feed); it is made once
