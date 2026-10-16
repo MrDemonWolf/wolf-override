@@ -533,7 +533,12 @@ func _route_4() -> void:
 	await _tap(&"interact")
 	await _raw(100)
 	await _shot("closing-beat")
-	await _tap(&"interact")
+	# CONTINUE goes through the closing lines' boxes first (one speaker each, P0-9), then starts the
+	# walk out; 3 presses cover the 3 boxes, and the END OF SLICE wait below fails the run otherwise.
+	for _press: int in 3:
+		await _tap(&"interact")
+		if game.get("hatch_exit_walking"):
+			break
 	await _burst("walk-out", 8, 8)
 	if not await _wait_until(func() -> bool: return bool(game.get("end_card_active")), 300):
 		_fail("the END OF SLICE card never showed")
