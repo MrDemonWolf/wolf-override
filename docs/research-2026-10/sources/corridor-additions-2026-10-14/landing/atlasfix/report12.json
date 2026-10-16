@@ -1,8 +1,0 @@
-{
- "changed_px": 1633,
- "grain_std_rel": 0.0153,
- "smooth_sigma_px": 8.0,
- "repaint_mask_px": 1793,
- "plate_px_in_box": 3224,
- "plate_px_in_box_not_under_opaque_hood": 1431
-}

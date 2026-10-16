@@ -1,6 +1,6 @@
 # Parity harness and baseline (S00 and S00a of the lighter-game plan)
 
-The gate for every behaviour-identical step of `docs/research-2026-10/lighter-game/PLAN.md`, with
+The gate for every behaviour-identical step of [`docs/research-2026-10/lighter-game/PLAN.md`](https://github.com/MrDemonWolf/wolf-override/blob/1cf8d73c4703f8d8dfb693c41fc57c62c43118e3/docs/research-2026-10/lighter-game/PLAN.md), with
 the corrections in `CRITIQUE.md` applied. It lives outside `res://`, so nothing here ships, and no
 Godot window opens on the developer's machine: rendered captures run through
 `tools/render/render.sh` (Godot 4.7.2 in a container with a virtual screen and software OpenGL),

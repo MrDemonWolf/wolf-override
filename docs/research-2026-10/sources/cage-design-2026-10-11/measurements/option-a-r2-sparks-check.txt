@@ -1,2 +1,0 @@
-final [('beat3-f002.p', 0, None), ('beat3-f003.p', 18, 213.9), ('beat3-f004.p', 99, 218.0), ('beat3-f005.p', 54, 220.3), ('beat3-f006.p', 12, 213.7), ('beat3-f008.p', 59, 215.8), ('beat3-f012.p', 32, 219.7), ('beat3-f020.p', 0, None), ('beat3-f030.p', 0, None)]
-r2 [('beat3-f002.p', 0, None), ('beat3-f003.p', 0, None), ('beat3-f004.p', 0, None), ('beat3-f005.p', 0, None), ('beat3-f006.p', 0, None), ('beat3-f008.p', 0, None), ('beat3-f012.p', 0, None), ('beat3-f020.p', 0, None), ('beat3-f030.p', 0, None)]

@@ -1,5 +1,5 @@
 extends SceneTree
-## The wording Nathanial approved on 2026-10-13 (docs/research-2026-10/how-it-should-play/
+## The wording Nathanial approved on 2026-10-13 (1cf8d73:docs/research-2026-10/how-it-should-play/
 ## drafts-2026-10-13.md, items 1 and 3-7), with the four lines where WOLF holds back that he chose on
 ## 2026-10-14 (drafts-wolf-space-2026-10-14.md, Draft A), as the game shows it: every changed line, the trust line as
 ## two boxes in order, the junction's goal-only entry and its hint ladder (timers and order), every

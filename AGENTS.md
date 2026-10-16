@@ -2,7 +2,7 @@
 
 Read [AGENT.md](AGENT.md) before game, site or README work. It is the shared, public guide for playable quality, credits, asset provenance and honest test claims.
 
-Read `PRIVATE_AGENTS.md`, `PROJECT_CONTEXT.md` and `docs/next-session.md` before story or gameplay changes; design notes and research live under `docs/`. They hold provisional story and design decisions and are tracked in this repository by Nathanial's decision (October 11, 2026), so they are public. Keep spoiler-heavy material out of the website, in-game text and build output. The latest explicit user decision wins.
+Read `PRIVATE_AGENTS.md`, `PROJECT_CONTEXT.md` and `docs/next-session.md` before story or gameplay changes. Since October 16, 2026, design notes, research write-ups, reviews and plans live in Notion ("Notes & Research" under the Game Hub), which is their source of truth; [docs/NOTES.md](docs/NOTES.md) indexes them, and the repository keeps rules and records: these agent files, `docs/decisions.md`, `docs/next-session.md`, the asset register, credits and legal. Write new notes to Notion through Codex, not into the repository; earlier notes stay in git history. The tracked files hold provisional story and design decisions and are public by Nathanial's decision (October 11, 2026). Keep spoiler-heavy material out of the website, in-game text and build output. The latest explicit user decision wins.
 
 Inspect Git status and task-relevant source before editing. Work in small, playable steps using the pinned Godot project at `apps/game`; keep the public site at `apps/docs`. WOLF is an independent companion, the engineer is the sole playable character, and essential progress needs an engineer-only fallback. Keep the original game and story credit with Nathanial Henniges.
 

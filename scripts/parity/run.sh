@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Parity and performance runs for the behaviour-identical refactor steps of the lighter-game plan
-# (docs/research-2026-10/lighter-game/PLAN.md). Nothing here ships and no window opens on this
+# (1cf8d73:docs/research-2026-10/lighter-game/PLAN.md). Nothing here ships and no window opens on this
 # machine: rendered captures run through tools/render/render.sh (Godot in a container with a virtual
 # screen), and the UI dump and the performance probe run with godot --headless on a scratch copy.
 #
