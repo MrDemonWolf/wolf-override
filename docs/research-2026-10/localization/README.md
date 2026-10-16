@@ -144,7 +144,7 @@ stayed calm:
 | `01a14409-6eb1-7db2-8ef1-f6f3714d953b` | prototype | 2 shortened buttons |
 | `01a14426-2248-7773-8edf-2c4cb6fa3ef8` | design | 34 Russian back-translations |
 | `01a146cf-4beb-7f42-8d61-726071ffb149` | fix-2 | 136 back-translations with roles and `engineer_gendered` |
-| (filled in at filing) | fix-3 | filed this write-up to Notion |
+| `01a146f9-dd51-7852-91e8-c39c689da9a4` | fix-3 | filed this write-up to Notion: [Localization](https://app.notion.com/p/3fbd61481c7b81cbbcd5cf9cc9ea0c48) under "Notes & Research", with child pages Languages, Decisions, Plan, Pipeline and Design (file links are permalinks at 6c6e9e4) |
 
 No paid service, API key or new account was used.
 
