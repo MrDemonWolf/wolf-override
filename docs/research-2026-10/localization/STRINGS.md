@@ -41,11 +41,11 @@ from `main` at 1cf8d73.
 
 ## How much
 
-| | Strings | Unique | Words |
+| | Strings | Unique strings | Words (all occurrences) |
 |---|---|---|---|
 | Shown to players, everything | 650 | 613 | 16,362 |
 | The in-game changelog alone | 213 | 213 | 13,502 (83% of all words) |
-| **Everything except the changelog** | **437** | **400** | **2,763** |
+| **Everything except the changelog** | **437** | **400** | **2,860** (2,763 counting each unique string once) |
 | Debug tools (out of scope, listed only) | 328 | | about 980 |
 | On hidden labels | 2 | | |
 

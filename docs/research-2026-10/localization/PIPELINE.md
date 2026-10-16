@@ -26,8 +26,8 @@ The recommendation reads "on the device" as **on our machine, at build time**:
 4. **Quality.** Apple's framework failed in the trial (next table).
 5. **Layout.** Boxes are split at 440 px and 42 characters, and runtime text could not be checked for
    overflow ahead of time.
-6. **Disclosure.** Valve's January 2026 rules treat text generated during play as a separate AI
-   disclosure category that also needs guardrails (VGC, January 17, 2026).
+6. **Disclosure.** Valve's January 2026 rules treat content generated live during play as its own AI
+   disclosure category, apart from content made during development (VGC, January 17, 2026).
 
 ## What the trial and the prototype measured
 
@@ -79,8 +79,10 @@ msgid has a named placeholder or a plural form yet, which is why those two gates
 cases.
 
 **chrF on its own is not a gate.**
-- Apple's back-translation of its own output scored the highest mean chrF (59.5), although Apple's
-  translations were the worst. A round trip through the same engine confirms itself.
+- Among the lines Apple back-translated, Apple's own output scored the highest mean chrF (59.55 over its 36 lines, against
+  51.2-51.8 for the other translators' lines it back-translated), although Apple's translations were the
+  worst. A round trip through the same engine confirms itself. (Across all pairings, Claude's lines
+  back-translated by Codex and Codex's by Claude score higher still, 62.39 and 62.75; means recomputed from `pipeline/out/scores.json`.)
 - Correct short labels score low: TANK RELEASE against "TANK DROP" is 19.6.
 - So chrF only flags a line for a person. The real drift check is the back-translator's list of
   meaning differences.
@@ -331,8 +333,8 @@ cross-checked with Codex (OpenAI); reviewed by <names>", or "not yet reviewed".
 | Run | Codex session | Input tokens | Output tokens |
 |---|---|---|---|
 | Pipeline trial: 36 translations and 36 back-translations | `01a143d1-a4b4-7a23-be45-2e550a2fc217` | 35,443 (13,184 cached) | 2,479 |
-| Prototype: 102 back-translations | `01a143f0-8b81-7703-972f-13e21953fd61` | 37,015 | 3,007 |
-| Prototype: 2 shortened buttons | `01a14409-6eb1-7db2-8ef1-f6f3714d953b` | | |
+| Prototype: 102 back-translations | `01a143f0-8b81-7703-972f-13e21953fd61` | 37,015 (13,184 cached) | 3,007 |
+| Prototype: 2 shortened buttons | `01a14409-6eb1-7db2-8ef1-f6f3714d953b` | 33,912 (13,184 cached) | 55 |
 | Design step: 34 Russian back-translations | `01a14426-2248-7773-8edf-2c4cb6fa3ef8` | 33,534 (13,056 cached) | 1,346 |
 
 Every session is archived. No API key was set and no paid service was used. The Claude translations

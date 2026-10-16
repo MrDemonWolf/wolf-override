@@ -169,7 +169,8 @@ any CJK language, so the real choice is between fixed subsets (no re-subsetting 
 changes) and per-game subsets (about 4 MB smaller, a new subset with every English change). The
 default stays fixed subsets; Nathanial may prefer the smaller download.
 
-**Settled: the subsets keep the Noto names.** The only Reserved Font Name is "Source": Google Fonts'
+**Settled: the subsets keep the Noto names.** The font licence (the OFL) lets a font's authors reserve
+names that a changed copy may not use. The only reserved name here is "Source": Google Fonts'
 licence files for Noto Sans JP, SC, TC and KR all read "Copyright 2014-2021 Adobe
 (http://www.adobe.com/), with Reserved Font Name 'Source'" (fetched October 16, 2026), and the font's
 own name table records no reserved name (measured). Each bundled licence file starts with that

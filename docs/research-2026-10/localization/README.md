@@ -56,7 +56,7 @@ build starts only after he answers [DECISIONS.md](DECISIONS.md).
 | [DECISIONS.md](DECISIONS.md) | The 11 questions only Nathanial can answer, each with a recommended default |
 | [DESIGN.md](DESIGN.md) | The Godot architecture: one locale module, one catalog per language, one extractor, one test suite; the Settings option; fonts; dialogue boxes and TEXT SIZE; the lighter-game plan's text steps; the tests that assert English; exports |
 | [PIPELINE.md](PIPELINE.md) | How translations are made, checked, reviewed, labelled and updated; the style rules for the they/them engineer, WOLF and inserted names |
-| [STRINGS.md](STRINGS.md) | What there is to translate (650 shown strings, 16,362 words; 2,763 without the changelog), with [strings-inventory.json](strings-inventory.json) beside it |
+| [STRINGS.md](STRINGS.md) | What there is to translate (650 shown strings, 16,362 words; 2,860 without the changelog), with [strings-inventory.json](strings-inventory.json) beside it |
 | [PLAN.md](PLAN.md) | The build as small PRs in order, each with its gates and an effort estimate (about 27.5 agent days, 29.5 if L7 also builds the lighter plan's S05 and S08); what can start before `codex/opening-dock` merges |
 | [prototype/README.md](prototype/README.md) | The prototype: what it proves, the measured overflows, the nine key stills and how to reproduce it |
 
@@ -95,6 +95,10 @@ Six steps ran on October 15 and 16, 2026, as one Claude Code workflow for Nathan
    and a study of ConPaws' localization.
 5. **prototype:** the design built in a scratch copy, in es, de and ja.
 6. **design:** these documents; Russian added to the prototype; the records filed here.
+7. **fix** (after three reviews): the Steam table recomputed over all 14 survey months; the gender,
+   named-placeholder and plural gates built and proved with planted errors; the overflow gate, the
+   lighter-game steps and the opening-dock line breaks planned; the Noto naming question settled; the
+   test claims corrected; and the reader's summaries added.
 
 **Heavy runs** (Godot imports, full test runs and renders) took one shared slot, so Nathanial's Mac
 stayed calm:
@@ -163,3 +167,13 @@ Each item was deleted by its literal path:
 
 The research steps' own scratch folders (`<scratch>/i18n/{research-markets,godot,strings,pipeline,proto}`)
 were left for the workflow's own clean-up. Everything cited from them is filed here.
+
+## Deleted by the fix step
+
+The machine restart had already emptied `<scratch>`. The fix step re-cloned this branch to
+`<scratch>/i18n/repo`, worked in `<scratch>/i18n/fix-1`, ran no Godot import, render or full check
+(so it took no heavy slot), started no Codex session, and deleted by literal path:
+- `<scratch>/i18n/fix-1`: the Steam and Wayback pages, a scratch copy of `main` with the prototype
+  patch applied (no `.godot` import), the planted-error PO copies, a fontTools venv and the gate
+  outputs before they were copied here;
+- `<scratch>/i18n/repo`: the clone, after the last push.
