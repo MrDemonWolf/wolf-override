@@ -1,0 +1,73 @@
+{
+ "_about": "The one per-language table the i18n tools read (i18n_tool.py; the build's I18n module reads the same file once PR L1 moves it to apps/game/i18n/languages.json and adds the picker names, font chain, reading speed and review state, PLAN.md). Nothing else lists these facts. 'languages' is keyed by Godot locale code: 'glossary' is the language's key in pipeline/glossary.json and the style packet; 'script' picks the script guard; 'family' is the base language, and every file of a family with two or more files must be complete (Godot looks a message up in every loaded file of the same language, so a gap in zh_Hant shows zh_Hans text: DESIGN.md, 'A missing line falls back to its sibling file'); 'plural_forms' is the gettext header rule (CLDR, the same as Godot's core/string/locales.h); 'gender' names a row of 'gender_rules'; 'name_case' turns on the check that no case ending is glued to the name slot (Slavic languages decline names). A gender rule holds these case-insensitive regular expressions: 'forms' matches one word that shows a person's grammatical gender (past tense, agreeing adjective or participle, job noun), 'you' a second-person pronoun, 'first_person' a first-person subject pronoun (a clause with one is about the speaker, WOLF), 'first_forms' (optional) one word that is first person by its ending alone (Polish -łem/-łam: WOLF's own verbs, skipped unless the engineer speaks), 'pronouns' a gendered third-person pronoun (searched in running text, so CJK rules need no spaces). 'extends' copies every field the row does not set from another row. Patterns are heuristics: a flag costs a look, a miss is caught by native review (PIPELINE.md, 'The engineer is never gendered').",
+ "languages": {
+  "en": {"source": true, "glossary": "en", "script": "latin", "family": "en", "plural_forms": "nplurals=2; plural=(n != 1);"},
+  "es": {"glossary": "es-419", "script": "latin", "family": "es", "plural_forms": "nplurals=2; plural=(n != 1);", "gender": "spanish"},
+  "es_ES": {"glossary": "es-ES", "script": "latin", "family": "es", "plural_forms": "nplurals=2; plural=(n != 1);", "gender": "spanish"},
+  "pt_BR": {"glossary": "pt-BR", "script": "latin", "family": "pt", "plural_forms": "nplurals=2; plural=(n > 1);", "gender": "portuguese"},
+  "fr": {"glossary": "fr", "script": "latin", "family": "fr", "plural_forms": "nplurals=2; plural=(n > 1);", "gender": "french"},
+  "de": {"glossary": "de", "script": "latin", "family": "de", "plural_forms": "nplurals=2; plural=(n != 1);", "gender": "german"},
+  "it": {"glossary": "it", "script": "latin", "family": "it", "plural_forms": "nplurals=2; plural=(n != 1);", "gender": "italian"},
+  "pl": {"glossary": "pl", "script": "latin", "family": "pl", "plural_forms": "nplurals=3; plural=(n==1 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);", "gender": "polish", "name_case": true},
+  "ru": {"glossary": "ru", "script": "cyrillic", "family": "ru", "plural_forms": "nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);", "gender": "russian", "name_case": true},
+  "uk": {"glossary": "uk", "script": "cyrillic", "family": "uk", "plural_forms": "nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);", "gender": "ukrainian", "name_case": true},
+  "ja": {"glossary": "ja", "script": "cjk", "family": "ja", "plural_forms": "nplurals=1; plural=0;", "gender": "japanese"},
+  "ko": {"glossary": "ko", "script": "cjk", "family": "ko", "plural_forms": "nplurals=1; plural=0;", "gender": "korean"},
+  "zh_Hans": {"glossary": "zh-Hans", "script": "cjk", "family": "zh", "plural_forms": "nplurals=1; plural=0;", "gender": "chinese"},
+  "zh_Hant": {"glossary": "zh-Hant", "script": "cjk", "family": "zh", "plural_forms": "nplurals=1; plural=0;", "gender": "chinese"}
+ },
+ "gender_rules": {
+  "russian": {
+   "forms": "^(?:[а-яёіїєґ'ʼ]+(?:л|ла|лся|лась)|сам[аи]?|одна|один|готова?|должна|должен|рада?|жива?|цела?|ранена?|прав[аы]?)$",
+   "you": "\\b(?:ты|тебя|тебе|тобой|тобою)\\b",
+   "first_person": "\\bя\\b",
+   "pronouns": "\\b(?:он|она|его|её|ее|ему|ей|ним|ней|нём|нем|него|неё|нее|нему|нею)\\b"
+  },
+  "ukrainian": {
+   "extends": "russian",
+   "you": "\\b(?:ти|тебе|тобі|тобою)\\b",
+   "first_person": "\\bя\\b",
+   "pronouns": "\\b(?:він|вона|його|її|йому|їй|ним|нею|нього|неї)\\b"
+  },
+  "polish": {
+   "forms": "^(?:\\w+(?:ł|ła|łem|łam|łeś|łaś|łby|łaby|łbyś|łabyś)|sam[a]?|gotowa|gotów|jedna|jeden)$",
+   "you": "\\b(?:ty|ciebie|cię|tobie|ci|tobą)\\b",
+   "first_person": "\\bja\\b",
+   "first_forms": "^\\w+(?:łem|łam|łbym|łabym)$",
+   "pronouns": "\\b(?:on|ona|jego|jej|go|ją|mu|niej|nim|niego|nią|niemu)\\b"
+  },
+  "spanish": {
+   "forms": "^(?!(?:cada|nada|vida|salida|partida|entrada|llegada)$)(?:\\w+(?:ad|id)[oa]s?|sol[oa]s?|list[oa]s?|segur[oa]s?|ingenier[oa]s?)$",
+   "you": "\\b(?:tú|te|ti|contigo|usted)\\b",
+   "first_person": "\\byo\\b",
+   "pronouns": "\\b(?:él|ella)\\b"
+  },
+  "portuguese": {
+   "forms": "^(?:\\w+(?:ad|id)[oa]s?|sozinh[oa]s?|pront[oa]s?|engenheir[oa]s?)$",
+   "you": "\\b(?:você|tu|te|ti|contigo)\\b",
+   "first_person": "\\beu\\b",
+   "pronouns": "\\b(?:ele|ela|dele|dela)\\b"
+  },
+  "french": {
+   "forms": "^(?:\\w+ée?s?|seule?s?|prête?s?|ingénieure?s?)$",
+   "you": "\\b(?:tu|te|toi|vous)\\b|\\bt'",
+   "first_person": "\\bje\\b|\\bj'",
+   "pronouns": "\\b(?:il|elle)\\b"
+  },
+  "italian": {
+   "forms": "^(?:\\w+(?:at|it|ut)[oa]|sol[oa]|pront[oa]|ingegner[ea])$",
+   "you": "\\b(?:tu|te|ti)\\b",
+   "first_person": "\\bio\\b",
+   "pronouns": "\\b(?:lui|lei)\\b"
+  },
+  "german": {
+   "forms": "^(?:ingenieur(?:in|innen)?|techniker(?:in|innen)?|mechaniker(?:in|innen)?)$",
+   "you": "\\b(?:du|dich|dir)\\b",
+   "first_person": "\\bich\\b",
+   "pronouns": "\\b(?:er|sie|ihn|ihm)\\b"
+  },
+  "japanese": {"pronouns": "彼女|彼(?!ら)"},
+  "korean": {"pronouns": "그녀|(?:^|\\s)그(?:는|가|의|를|에게)(?=\\s|$)"},
+  "chinese": {"pronouns": "她|他(?!们|們)"}
+ }
+}

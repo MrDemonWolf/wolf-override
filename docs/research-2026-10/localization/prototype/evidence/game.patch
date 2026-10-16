@@ -2398,10 +2398,10 @@ index 6f70e7d..e142930 100644
    "status": "One provisional brand mark, the MrDemonWolf, Inc. studio logo (two mascot images rendered from company brand files and the boot splash image rendered from the logo screen; company branding, all rights reserved), three provisional character images (redrawn 2026-10-08; full-size masters under apps/game/art-source/characters/ and the downscaled copies the game loads) and the engineer's two-frame crank pose cut from their sprite (2026-10-14), one title background, three layered gameplay rooms (far, mid and near plates for the corridor, Records Access and the Service Junction), sixteen station prop images (seven for the corridor and Records Access; six for the Service Junction plus one documented derivative crop of its tank; the junction reuses the corridor breaker), five door-end atlases, each a cross-wall turned across the walkway with its doorway transparent (the corridor seal's, 2026-10-12: the cross-wall, rolling steel door, near column, camera, lamp glass and bypass handwheel; 2026-10-14: with the steel blast frame, RESTRICTED AREA plate, inner blast leaf and clean cutaway; Records Access's two swing doors, 2026-10-13: both cross-walls, the steel leaves' faces and edge, the near columns and stubs, the security container and the status lamps' glass; the Service Junction blast door's, 2026-10-13: the doorway, the cross-wall, the leaf whole, breaking and thrown, the near column whole and blown, the blast damage, the release bay, the stub and the lamp glass; the Service Junction entry's swing door, 2026-10-13: the cross-wall, the leaf's faces and edge, the near column, the stub and the lamp glass; and the Service Junction exit door's, 2026-10-13: the cross-wall, sliding steel leaf, exit bolt housing, status lamp glass and the service passage beyond), the corridor's two caged red beacons in one atlas (2026-10-14), two sentry images, three derivative marketing captures, the Roboto and Montserrat font families with their licence texts, four project-written font and theme resources (three FontVariation .tres files and the UI theme), three project shader files, one generated changelog text export, one procedural sound-effect set (code, no files) and seven processed CC0 sound recordings (the Service Junction's three pressure-line loops, relief-vent burst and coolant-cloud bed from Joseph Sardin's BigSoundBank recordings, and WOLF's seam and refusal growls from OpenGameArt recordings) recorded. Glows, haze, dust, the Records Access and Service Junction lockdown beacons, reflections, particles, the Service Junction's state overlays (gauge needle, vent and door-lamp glows, panel lights, the station name plates, floor mark, arm rods and cable, the sentry's beam and eye light), the swing doors' leaves (meshes over their atlas regions, lit per vertex) and the screen grade are procedural built-in nodes and three small shaders (the registered reflection and grade shader files plus the valve wheel's inline disc mask), not image assets. Godot's .import and .uid sidecar files and this manifest itself are not registered.",
 diff --git a/apps/game/i18n/de.po b/apps/game/i18n/de.po
 new file mode 100644
-index 0000000..ce506b4
+index 0000000..dd595b3
 --- /dev/null
 +++ b/apps/game/i18n/de.po
-@@ -0,0 +1,788 @@
+@@ -0,0 +1,822 @@
 +# Sample translations for the scratch prototype (proof only; not reviewed).
 +msgid ""
 +msgstr ""
@@ -2443,6 +2443,7 @@ index 0000000..ce506b4
 +
 +# machine-translated by Claude (Anthropic), unreviewed
 +#. TRANSLATORS: the on-screen PAUSE button
++#. i18n: speaker=ui
 +#: scenes/main.tscn
 +#: scripts/main.gd:4368
 +msgid "PAUSE"
@@ -2471,6 +2472,7 @@ index 0000000..ce506b4
 +
 +# machine-translated by Claude (Anthropic), unreviewed
 +#. TRANSLATORS: title screen, above the game's logo (studio name stays English)
++#. i18n: speaker=ui
 +#: scenes/main.tscn
 +msgid "MRDEMONWOLF, INC. PRESENTS"
 +msgstr "MRDEMONWOLF, INC. PRÄSENTIERT"
@@ -2481,18 +2483,21 @@ index 0000000..ce506b4
 +
 +# machine-translated by Claude (Anthropic), unreviewed
 +#. TRANSLATORS: title screen subtitle; two spaces round the slash
++#. i18n: speaker=ui
 +#: scenes/main.tscn
 +msgid "CHAPTER 1  /  LOCKDOWN"
 +msgstr "KAPITEL 1  /  ABRIEGELUNG"
 +
 +# machine-translated by Claude (Anthropic), unreviewed
 +#. TRANSLATORS: title screen button
++#. i18n: speaker=ui
 +#: scenes/main.tscn
 +msgid "NEW GAME"
 +msgstr "NEUES SPIEL"
 +
 +# machine-translated by Claude (Anthropic), unreviewed
 +#. TRANSLATORS: title screen button
++#. i18n: speaker=ui
 +#: scenes/main.tscn
 +#: scripts/main.gd:926
 +msgid "CONTINUE"
@@ -2500,12 +2505,14 @@ index 0000000..ce506b4
 +
 +# machine-translated by Claude (Anthropic), unreviewed
 +#. TRANSLATORS: title screen button
++#. i18n: speaker=ui
 +#: scenes/main.tscn
 +msgid "CREDITS"
 +msgstr "MITWIRKENDE"
 +
 +# machine-translated by Claude (Anthropic), unreviewed
 +#. TRANSLATORS: title and pause button
++#. i18n: speaker=ui
 +#: scenes/main.tscn
 +msgid "SETTINGS"
 +msgstr "OPTIONEN"
@@ -2516,12 +2523,14 @@ index 0000000..ce506b4
 +
 +# machine-translated by Claude (Anthropic), unreviewed
 +#. TRANSLATORS: title screen button (the game's update notes)
++#. i18n: speaker=ui
 +#: scenes/main.tscn
 +msgid "CHANGELOG"
 +msgstr "ÄNDERUNGEN"
 +
 +# machine-translated by Claude (Anthropic), unreviewed
 +#. TRANSLATORS: title screen footer; the person's name stays as is
++#. i18n: speaker=ui
 +#: scenes/main.tscn
 +msgid "Concept: Nathanial Henniges  /  AI-assisted development"
 +msgstr "Konzept: Nathanial Henniges  /  KI-gestützte Entwicklung"
@@ -2696,6 +2705,7 @@ index 0000000..ce506b4
 +
 +# machine-translated by Claude (Anthropic), unreviewed
 +#. TRANSLATORS: Settings caption beside the language list
++#. i18n: speaker=ui
 +#: scripts/game_settings.gd:242
 +msgid "LANGUAGE"
 +msgstr "SPRACHE"
@@ -2735,6 +2745,7 @@ index 0000000..ce506b4
 +
 +# machine-translated by Claude (Anthropic), unreviewed
 +#. TRANSLATORS: knockdown card; %s is the engineer's first name (non-binary)
++#. i18n: speaker=narrator engineer=name
 +#: scripts/junction_room.gd:774
 +#: scripts/main.gd:5216
 +#, c-format
@@ -2777,6 +2788,7 @@ index 0000000..ce506b4
 +
 +# machine-translated by Claude (Anthropic), unreviewed
 +#. TRANSLATORS: title screen button after the slice is finished
++#. i18n: speaker=ui
 +#: scripts/main.gd:926
 +msgid "PLAY AGAIN"
 +msgstr "NOCHMAL SPIELEN"
@@ -2791,6 +2803,7 @@ index 0000000..ce506b4
 +
 +# machine-translated by Claude (Anthropic), unreviewed
 +#. TRANSLATORS: title screen note under a greyed CONTINUE; SAFE POINT is a station plate
++#. i18n: speaker=ui
 +#: scripts/main.gd:933
 +msgid "No checkpoint yet. Saving starts at the first SAFE POINT."
 +msgstr "Noch kein Checkpoint. Gespeichert wird ab dem ersten SICHERUNGSPUNKT."
@@ -2801,12 +2814,14 @@ index 0000000..ce506b4
 +
 +# machine-translated by Claude (Anthropic), unreviewed
 +#. TRANSLATORS: opening narration box (narrator, no speaker)
++#. i18n: speaker=narrator
 +#: scripts/main.gd:1718
 +msgid "The Director thinks WOLF is still in standby."
 +msgstr "Der Direktor glaubt, WOLF sei noch im Standby."
 +
 +# machine-translated by Claude (Anthropic), unreviewed
 +#. TRANSLATORS: opening narration box; keep the line break
++#. i18n: speaker=narrator
 +#: scripts/main.gd:1718
 +msgid ""
 +"Nobody gives an activation command.\n"
@@ -2859,6 +2874,7 @@ index 0000000..ce506b4
 +
 +# machine-translated by Claude (Anthropic), unreviewed
 +#. TRANSLATORS: knockdown card; %s is the engineer's first name; TANK RELEASE is a station plate
++#. i18n: speaker=narrator engineer=name
 +#: scripts/main.gd:3385
 +#, c-format
 +msgid ""
@@ -2891,6 +2907,7 @@ index 0000000..ce506b4
 +
 +# machine-translated by Claude (Anthropic), unreviewed
 +#. TRANSLATORS: tutorial prompt; %s is the move keys
++#. i18n: speaker=hint slot=key
 +#: scripts/main.gd:4382
 +#, c-format
 +msgid "%s  MOVE"
@@ -2898,6 +2915,7 @@ index 0000000..ce506b4
 +
 +# machine-translated by Claude (Anthropic), unreviewed
 +#. TRANSLATORS: tutorial prompt; %s is a key
++#. i18n: speaker=hint slot=key
 +#: scripts/main.gd:4383
 +#, c-format
 +msgid "%s  READ DISPLAY (optional)"
@@ -2905,18 +2923,21 @@ index 0000000..ce506b4
 +
 +# machine-translated by Claude (Anthropic), unreviewed
 +#. TRANSLATORS: tutorial prompt second row
++#. i18n: speaker=hint engineer=you
 +#: scripts/main.gd:4386
 +msgid "Head right to the breaker."
 +msgstr "Geh nach rechts zum Schutzschalter."
 +
 +# machine-translated by Claude (Anthropic), unreviewed
 +#. TRANSLATORS: tutorial prompt second row
++#. i18n: speaker=hint engineer=you
 +#: scripts/main.gd:4391
 +msgid "Or head right to the breaker."
 +msgstr "Oder geh nach rechts zum Schutzschalter."
 +
 +# machine-translated by Claude (Anthropic), unreviewed
 +#. TRANSLATORS: top card as the opening starts: a clock time and the place
++#. i18n: speaker=ui
 +#: scripts/main.gd:4399
 +msgid "03:17 / CONTAINMENT"
 +msgstr "03:17 / EINDÄMMUNG"
@@ -2927,6 +2948,7 @@ index 0000000..ce506b4
 +
 +# machine-translated by Claude (Anthropic), unreviewed
 +#. TRANSLATORS: hint bar in the opening; each %s is a key name (E, Esc)
++#. i18n: speaker=hint slot=key
 +#: scripts/main.gd:4400
 +#, c-format
 +msgid "%s  CONTINUE    %s  PAUSE"
@@ -2938,6 +2960,7 @@ index 0000000..ce506b4
 +
 +# machine-translated by Claude (Anthropic), unreviewed
 +#. TRANSLATORS: hint bar; %s is a key name
++#. i18n: speaker=hint slot=key
 +#: scripts/main.gd:4403
 +#, c-format
 +msgid "%s  CONTINUE"
@@ -2945,18 +2968,21 @@ index 0000000..ce506b4
 +
 +# machine-translated by Claude (Anthropic), unreviewed
 +#. TRANSLATORS: hint bar on the opening's first box: the Pause menu offers to skip it
++#. i18n: speaker=hint
 +#: scripts/main.gd:4403
 +msgid "PAUSE: skip the opening"
 +msgstr "PAUSE: Intro überspringen"
 +
 +# machine-translated by Claude (Anthropic), unreviewed
 +#. TRANSLATORS: name card under the engineer's name; the engineer is non-binary, so no gendered noun
++#. i18n: speaker=ui engineer=third
 +#: scripts/main.gd:4429
 +msgid "MAINTENANCE ENGINEER"
 +msgstr "WARTUNGSTECHNIK"
 +
 +# machine-translated by Claude (Anthropic), unreviewed
 +#. TRANSLATORS: top card: place
++#. i18n: speaker=ui
 +#: scripts/main.gd:4440
 +msgid "SERVICE JUNCTION"
 +msgstr "VERSORGUNGSKNOTEN"
@@ -2967,6 +2993,7 @@ index 0000000..ce506b4
 +
 +# machine-translated by Claude (Anthropic), unreviewed
 +#. TRANSLATORS: top card: place / chapter
++#. i18n: speaker=ui
 +#: scripts/main.gd:4440
 +msgid "MAINTENANCE / LOCKDOWN"
 +msgstr "WARTUNG / ABRIEGELUNG"
@@ -2981,6 +3008,7 @@ index 0000000..ce506b4
 +
 +# machine-translated by Claude (Anthropic), unreviewed
 +#. TRANSLATORS: hint bar on the knockdown card; %s is a key name
++#. i18n: speaker=hint slot=key
 +#: scripts/main.gd:4458
 +#, c-format
 +msgid "%s  RETRY"
@@ -3033,6 +3061,7 @@ index 0000000..ce506b4
 +
 +# machine-translated by Claude (Anthropic), unreviewed
 +#. TRANSLATORS: hint bar; 'E:' is replaced by the bound key and must stay exactly 'E:'
++#. i18n: speaker=hint engineer=you
 +#: scripts/main.gd:4922
 +#: scripts/main.gd:4930
 +msgid "E: read the Director's purge display."
@@ -3064,6 +3093,7 @@ index 0000000..ce506b4
 +
 +# machine-translated by Claude (Anthropic), unreviewed
 +#. TRANSLATORS: hint bar; keep 'E:'; %d of %d is turns so far and turns needed
++#. i18n: speaker=hint engineer=you
 +#: scripts/main.gd:4937
 +#, c-format
 +msgid "HOLD E: crank the manual bypass, %d of %d."
@@ -3088,6 +3118,7 @@ index 0000000..ce506b4
 +
 +# machine-translated by Claude (Anthropic), unreviewed
 +#. TRANSLATORS: hint bar; keep 'E:'
++#. i18n: speaker=hint engineer=you
 +#: scripts/main.gd:4947
 +msgid "E: talk to WOLF about the relay."
 +msgstr "E: Mit WOLF über das Relais sprechen."
@@ -3122,6 +3153,7 @@ index 0000000..ce506b4
 +
 +# machine-translated by Claude (Anthropic), unreviewed
 +#. TRANSLATORS: hint bar, first hint of the game
++#. i18n: speaker=hint engineer=you
 +#: scripts/main.gd:4956
 +msgid "Find the breaker. WOLF will follow your lead."
 +msgstr "Finde den Schutzschalter. WOLF folgt dir."
@@ -3152,6 +3184,7 @@ index 0000000..ce506b4
 +
 +# machine-translated by Claude (Anthropic), unreviewed
 +#. TRANSLATORS: top card objective
++#. i18n: speaker=ui
 +#: scripts/main.gd:5065
 +#: scripts/main.gd:5081
 +msgid "ARM THE BREAKER"
@@ -3187,15 +3220,16 @@ index 0000000..ce506b4
 +
 +# machine-translated by Claude (Anthropic), unreviewed
 +#. TRANSLATORS: top card objective
++#. i18n: speaker=ui
 +#: scripts/main.gd:5082
 +msgid "CHECK THE BREAKER"
 +msgstr "SCHUTZSCHALTER PRÜFEN"
 diff --git a/apps/game/i18n/es.po b/apps/game/i18n/es.po
 new file mode 100644
-index 0000000..6c82485
+index 0000000..7fe12d4
 --- /dev/null
 +++ b/apps/game/i18n/es.po
-@@ -0,0 +1,788 @@
+@@ -0,0 +1,822 @@
 +# Sample translations for the scratch prototype (proof only; not reviewed).
 +msgid ""
 +msgstr ""
@@ -3237,6 +3271,7 @@ index 0000000..6c82485
 +
 +# machine-translated by Claude (Anthropic), unreviewed
 +#. TRANSLATORS: the on-screen PAUSE button
++#. i18n: speaker=ui
 +#: scenes/main.tscn
 +#: scripts/main.gd:4368
 +msgid "PAUSE"
@@ -3265,6 +3300,7 @@ index 0000000..6c82485
 +
 +# machine-translated by Claude (Anthropic), unreviewed
 +#. TRANSLATORS: title screen, above the game's logo (studio name stays English)
++#. i18n: speaker=ui
 +#: scenes/main.tscn
 +msgid "MRDEMONWOLF, INC. PRESENTS"
 +msgstr "MRDEMONWOLF, INC. PRESENTA"
@@ -3275,18 +3311,21 @@ index 0000000..6c82485
 +
 +# machine-translated by Claude (Anthropic), unreviewed
 +#. TRANSLATORS: title screen subtitle; two spaces round the slash
++#. i18n: speaker=ui
 +#: scenes/main.tscn
 +msgid "CHAPTER 1  /  LOCKDOWN"
 +msgstr "CAPÍTULO 1  /  BLOQUEO"
 +
 +# machine-translated by Claude (Anthropic), unreviewed
 +#. TRANSLATORS: title screen button
++#. i18n: speaker=ui
 +#: scenes/main.tscn
 +msgid "NEW GAME"
 +msgstr "NUEVA PARTIDA"
 +
 +# machine-translated by Claude (Anthropic), unreviewed
 +#. TRANSLATORS: title screen button
++#. i18n: speaker=ui
 +#: scenes/main.tscn
 +#: scripts/main.gd:926
 +msgid "CONTINUE"
@@ -3294,12 +3333,14 @@ index 0000000..6c82485
 +
 +# machine-translated by Claude (Anthropic), unreviewed
 +#. TRANSLATORS: title screen button
++#. i18n: speaker=ui
 +#: scenes/main.tscn
 +msgid "CREDITS"
 +msgstr "CRÉDITOS"
 +
 +# machine-translated by Claude (Anthropic), unreviewed
 +#. TRANSLATORS: title and pause button
++#. i18n: speaker=ui
 +#: scenes/main.tscn
 +msgid "SETTINGS"
 +msgstr "AJUSTES"
@@ -3310,12 +3351,14 @@ index 0000000..6c82485
 +
 +# machine-translated by Claude (Anthropic), unreviewed
 +#. TRANSLATORS: title screen button (the game's update notes)
++#. i18n: speaker=ui
 +#: scenes/main.tscn
 +msgid "CHANGELOG"
 +msgstr "CAMBIOS"
 +
 +# machine-translated by Claude (Anthropic), unreviewed
 +#. TRANSLATORS: title screen footer; the person's name stays as is
++#. i18n: speaker=ui
 +#: scenes/main.tscn
 +msgid "Concept: Nathanial Henniges  /  AI-assisted development"
 +msgstr "Concepto: Nathanial Henniges  /  Desarrollo asistido por IA"
@@ -3490,6 +3533,7 @@ index 0000000..6c82485
 +
 +# machine-translated by Claude (Anthropic), unreviewed
 +#. TRANSLATORS: Settings caption beside the language list
++#. i18n: speaker=ui
 +#: scripts/game_settings.gd:242
 +msgid "LANGUAGE"
 +msgstr "IDIOMA"
@@ -3529,6 +3573,7 @@ index 0000000..6c82485
 +
 +# machine-translated by Claude (Anthropic), unreviewed
 +#. TRANSLATORS: knockdown card; %s is the engineer's first name (non-binary)
++#. i18n: speaker=narrator engineer=name
 +#: scripts/junction_room.gd:774
 +#: scripts/main.gd:5216
 +#, c-format
@@ -3571,6 +3616,7 @@ index 0000000..6c82485
 +
 +# machine-translated by Claude (Anthropic), unreviewed
 +#. TRANSLATORS: title screen button after the slice is finished
++#. i18n: speaker=ui
 +#: scripts/main.gd:926
 +msgid "PLAY AGAIN"
 +msgstr "JUGAR DE NUEVO"
@@ -3585,6 +3631,7 @@ index 0000000..6c82485
 +
 +# machine-translated by Claude (Anthropic), unreviewed
 +#. TRANSLATORS: title screen note under a greyed CONTINUE; SAFE POINT is a station plate
++#. i18n: speaker=ui
 +#: scripts/main.gd:933
 +msgid "No checkpoint yet. Saving starts at the first SAFE POINT."
 +msgstr "Aún no hay punto de control. Se guarda desde el primer PUNTO SEGURO."
@@ -3595,12 +3642,14 @@ index 0000000..6c82485
 +
 +# machine-translated by Claude (Anthropic), unreviewed
 +#. TRANSLATORS: opening narration box (narrator, no speaker)
++#. i18n: speaker=narrator
 +#: scripts/main.gd:1718
 +msgid "The Director thinks WOLF is still in standby."
 +msgstr "El Director cree que WOLF sigue en espera."
 +
 +# machine-translated by Claude (Anthropic), unreviewed
 +#. TRANSLATORS: opening narration box; keep the line break
++#. i18n: speaker=narrator
 +#: scripts/main.gd:1718
 +msgid ""
 +"Nobody gives an activation command.\n"
@@ -3653,6 +3702,7 @@ index 0000000..6c82485
 +
 +# machine-translated by Claude (Anthropic), unreviewed
 +#. TRANSLATORS: knockdown card; %s is the engineer's first name; TANK RELEASE is a station plate
++#. i18n: speaker=narrator engineer=name
 +#: scripts/main.gd:3385
 +#, c-format
 +msgid ""
@@ -3685,6 +3735,7 @@ index 0000000..6c82485
 +
 +# machine-translated by Claude (Anthropic), unreviewed
 +#. TRANSLATORS: tutorial prompt; %s is the move keys
++#. i18n: speaker=hint slot=key
 +#: scripts/main.gd:4382
 +#, c-format
 +msgid "%s  MOVE"
@@ -3692,6 +3743,7 @@ index 0000000..6c82485
 +
 +# machine-translated by Claude (Anthropic), unreviewed
 +#. TRANSLATORS: tutorial prompt; %s is a key
++#. i18n: speaker=hint slot=key
 +#: scripts/main.gd:4383
 +#, c-format
 +msgid "%s  READ DISPLAY (optional)"
@@ -3699,18 +3751,21 @@ index 0000000..6c82485
 +
 +# machine-translated by Claude (Anthropic), unreviewed
 +#. TRANSLATORS: tutorial prompt second row
++#. i18n: speaker=hint engineer=you
 +#: scripts/main.gd:4386
 +msgid "Head right to the breaker."
 +msgstr "Ve a la derecha, al interruptor."
 +
 +# machine-translated by Claude (Anthropic), unreviewed
 +#. TRANSLATORS: tutorial prompt second row
++#. i18n: speaker=hint engineer=you
 +#: scripts/main.gd:4391
 +msgid "Or head right to the breaker."
 +msgstr "O ve a la derecha, al interruptor."
 +
 +# machine-translated by Claude (Anthropic), unreviewed
 +#. TRANSLATORS: top card as the opening starts: a clock time and the place
++#. i18n: speaker=ui
 +#: scripts/main.gd:4399
 +msgid "03:17 / CONTAINMENT"
 +msgstr "03:17 / CONTENCIÓN"
@@ -3721,6 +3776,7 @@ index 0000000..6c82485
 +
 +# machine-translated by Claude (Anthropic), unreviewed
 +#. TRANSLATORS: hint bar in the opening; each %s is a key name (E, Esc)
++#. i18n: speaker=hint slot=key
 +#: scripts/main.gd:4400
 +#, c-format
 +msgid "%s  CONTINUE    %s  PAUSE"
@@ -3732,6 +3788,7 @@ index 0000000..6c82485
 +
 +# machine-translated by Claude (Anthropic), unreviewed
 +#. TRANSLATORS: hint bar; %s is a key name
++#. i18n: speaker=hint slot=key
 +#: scripts/main.gd:4403
 +#, c-format
 +msgid "%s  CONTINUE"
@@ -3739,18 +3796,21 @@ index 0000000..6c82485
 +
 +# machine-translated by Claude (Anthropic), unreviewed
 +#. TRANSLATORS: hint bar on the opening's first box: the Pause menu offers to skip it
++#. i18n: speaker=hint
 +#: scripts/main.gd:4403
 +msgid "PAUSE: skip the opening"
 +msgstr "PAUSA: saltar la introducción"
 +
 +# machine-translated by Claude (Anthropic), unreviewed
 +#. TRANSLATORS: name card under the engineer's name; the engineer is non-binary, so no gendered noun
++#. i18n: speaker=ui engineer=third
 +#: scripts/main.gd:4429
 +msgid "MAINTENANCE ENGINEER"
 +msgstr "INGENIERÍA DE MANTENIMIENTO"
 +
 +# machine-translated by Claude (Anthropic), unreviewed
 +#. TRANSLATORS: top card: place
++#. i18n: speaker=ui
 +#: scripts/main.gd:4440
 +msgid "SERVICE JUNCTION"
 +msgstr "EMPALME DE SERVICIO"
@@ -3761,6 +3821,7 @@ index 0000000..6c82485
 +
 +# machine-translated by Claude (Anthropic), unreviewed
 +#. TRANSLATORS: top card: place / chapter
++#. i18n: speaker=ui
 +#: scripts/main.gd:4440
 +msgid "MAINTENANCE / LOCKDOWN"
 +msgstr "MANTENIMIENTO / BLOQUEO"
@@ -3775,6 +3836,7 @@ index 0000000..6c82485
 +
 +# machine-translated by Claude (Anthropic), unreviewed
 +#. TRANSLATORS: hint bar on the knockdown card; %s is a key name
++#. i18n: speaker=hint slot=key
 +#: scripts/main.gd:4458
 +#, c-format
 +msgid "%s  RETRY"
@@ -3827,6 +3889,7 @@ index 0000000..6c82485
 +
 +# machine-translated by Claude (Anthropic), unreviewed
 +#. TRANSLATORS: hint bar; 'E:' is replaced by the bound key and must stay exactly 'E:'
++#. i18n: speaker=hint engineer=you
 +#: scripts/main.gd:4922
 +#: scripts/main.gd:4930
 +msgid "E: read the Director's purge display."
@@ -3858,6 +3921,7 @@ index 0000000..6c82485
 +
 +# machine-translated by Claude (Anthropic), unreviewed
 +#. TRANSLATORS: hint bar; keep 'E:'; %d of %d is turns so far and turns needed
++#. i18n: speaker=hint engineer=you
 +#: scripts/main.gd:4937
 +#, c-format
 +msgid "HOLD E: crank the manual bypass, %d of %d."
@@ -3882,6 +3946,7 @@ index 0000000..6c82485
 +
 +# machine-translated by Claude (Anthropic), unreviewed
 +#. TRANSLATORS: hint bar; keep 'E:'
++#. i18n: speaker=hint engineer=you
 +#: scripts/main.gd:4947
 +msgid "E: talk to WOLF about the relay."
 +msgstr "E: hablar con WOLF sobre el relé."
@@ -3916,6 +3981,7 @@ index 0000000..6c82485
 +
 +# machine-translated by Claude (Anthropic), unreviewed
 +#. TRANSLATORS: hint bar, first hint of the game
++#. i18n: speaker=hint engineer=you
 +#: scripts/main.gd:4956
 +msgid "Find the breaker. WOLF will follow your lead."
 +msgstr "Encuentra el interruptor. WOLF seguirá tus pasos."
@@ -3946,6 +4012,7 @@ index 0000000..6c82485
 +
 +# machine-translated by Claude (Anthropic), unreviewed
 +#. TRANSLATORS: top card objective
++#. i18n: speaker=ui
 +#: scripts/main.gd:5065
 +#: scripts/main.gd:5081
 +msgid "ARM THE BREAKER"
@@ -3981,15 +4048,16 @@ index 0000000..6c82485
 +
 +# machine-translated by Claude (Anthropic), unreviewed
 +#. TRANSLATORS: top card objective
++#. i18n: speaker=ui
 +#: scripts/main.gd:5082
 +msgid "CHECK THE BREAKER"
 +msgstr "REVISAR EL INTERRUPTOR"
 diff --git a/apps/game/i18n/ja.po b/apps/game/i18n/ja.po
 new file mode 100644
-index 0000000..cdbc381
+index 0000000..ad1cb32
 --- /dev/null
 +++ b/apps/game/i18n/ja.po
-@@ -0,0 +1,788 @@
+@@ -0,0 +1,822 @@
 +# Sample translations for the scratch prototype (proof only; not reviewed).
 +msgid ""
 +msgstr ""
@@ -4031,6 +4099,7 @@ index 0000000..cdbc381
 +
 +# machine-translated by Claude (Anthropic), unreviewed
 +#. TRANSLATORS: the on-screen PAUSE button
++#. i18n: speaker=ui
 +#: scenes/main.tscn
 +#: scripts/main.gd:4368
 +msgid "PAUSE"
@@ -4059,6 +4128,7 @@ index 0000000..cdbc381
 +
 +# machine-translated by Claude (Anthropic), unreviewed
 +#. TRANSLATORS: title screen, above the game's logo (studio name stays English)
++#. i18n: speaker=ui
 +#: scenes/main.tscn
 +msgid "MRDEMONWOLF, INC. PRESENTS"
 +msgstr "MRDEMONWOLF, INC. 提供"
@@ -4069,18 +4139,21 @@ index 0000000..cdbc381
 +
 +# machine-translated by Claude (Anthropic), unreviewed
 +#. TRANSLATORS: title screen subtitle; two spaces round the slash
++#. i18n: speaker=ui
 +#: scenes/main.tscn
 +msgid "CHAPTER 1  /  LOCKDOWN"
 +msgstr "第1章  /  ロックダウン"
 +
 +# machine-translated by Claude (Anthropic), unreviewed
 +#. TRANSLATORS: title screen button
++#. i18n: speaker=ui
 +#: scenes/main.tscn
 +msgid "NEW GAME"
 +msgstr "ニューゲーム"
 +
 +# machine-translated by Claude (Anthropic), unreviewed
 +#. TRANSLATORS: title screen button
++#. i18n: speaker=ui
 +#: scenes/main.tscn
 +#: scripts/main.gd:926
 +msgid "CONTINUE"
@@ -4088,12 +4161,14 @@ index 0000000..cdbc381
 +
 +# machine-translated by Claude (Anthropic), unreviewed
 +#. TRANSLATORS: title screen button
++#. i18n: speaker=ui
 +#: scenes/main.tscn
 +msgid "CREDITS"
 +msgstr "クレジット"
 +
 +# machine-translated by Claude (Anthropic), unreviewed
 +#. TRANSLATORS: title and pause button
++#. i18n: speaker=ui
 +#: scenes/main.tscn
 +msgid "SETTINGS"
 +msgstr "設定"
@@ -4104,12 +4179,14 @@ index 0000000..cdbc381
 +
 +# machine-translated by Claude (Anthropic), unreviewed
 +#. TRANSLATORS: title screen button (the game's update notes)
++#. i18n: speaker=ui
 +#: scenes/main.tscn
 +msgid "CHANGELOG"
 +msgstr "更新履歴"
 +
 +# machine-translated by Claude (Anthropic), unreviewed
 +#. TRANSLATORS: title screen footer; the person's name stays as is
++#. i18n: speaker=ui
 +#: scenes/main.tscn
 +msgid "Concept: Nathanial Henniges  /  AI-assisted development"
 +msgstr "原案：Nathanial Henniges  /  AI支援による開発"
@@ -4284,6 +4361,7 @@ index 0000000..cdbc381
 +
 +# machine-translated by Claude (Anthropic), unreviewed
 +#. TRANSLATORS: Settings caption beside the language list
++#. i18n: speaker=ui
 +#: scripts/game_settings.gd:242
 +msgid "LANGUAGE"
 +msgstr "言語"
@@ -4323,6 +4401,7 @@ index 0000000..cdbc381
 +
 +# machine-translated by Claude (Anthropic), unreviewed
 +#. TRANSLATORS: knockdown card; %s is the engineer's first name (non-binary)
++#. i18n: speaker=narrator engineer=name
 +#: scripts/junction_room.gd:774
 +#: scripts/main.gd:5216
 +#, c-format
@@ -4365,6 +4444,7 @@ index 0000000..cdbc381
 +
 +# machine-translated by Claude (Anthropic), unreviewed
 +#. TRANSLATORS: title screen button after the slice is finished
++#. i18n: speaker=ui
 +#: scripts/main.gd:926
 +msgid "PLAY AGAIN"
 +msgstr "もう一度プレイ"
@@ -4379,6 +4459,7 @@ index 0000000..cdbc381
 +
 +# machine-translated by Claude (Anthropic), unreviewed
 +#. TRANSLATORS: title screen note under a greyed CONTINUE; SAFE POINT is a station plate
++#. i18n: speaker=ui
 +#: scripts/main.gd:933
 +msgid "No checkpoint yet. Saving starts at the first SAFE POINT."
 +msgstr "チェックポイントはまだない。最初のセーフポイントから保存される。"
@@ -4389,12 +4470,14 @@ index 0000000..cdbc381
 +
 +# machine-translated by Claude (Anthropic), unreviewed
 +#. TRANSLATORS: opening narration box (narrator, no speaker)
++#. i18n: speaker=narrator
 +#: scripts/main.gd:1718
 +msgid "The Director thinks WOLF is still in standby."
 +msgstr "所長は、WOLFがまだ待機状態だと思っている。"
 +
 +# machine-translated by Claude (Anthropic), unreviewed
 +#. TRANSLATORS: opening narration box; keep the line break
++#. i18n: speaker=narrator
 +#: scripts/main.gd:1718
 +msgid ""
 +"Nobody gives an activation command.\n"
@@ -4447,6 +4530,7 @@ index 0000000..cdbc381
 +
 +# machine-translated by Claude (Anthropic), unreviewed
 +#. TRANSLATORS: knockdown card; %s is the engineer's first name; TANK RELEASE is a station plate
++#. i18n: speaker=narrator engineer=name
 +#: scripts/main.gd:3385
 +#, c-format
 +msgid ""
@@ -4479,6 +4563,7 @@ index 0000000..cdbc381
 +
 +# machine-translated by Claude (Anthropic), unreviewed
 +#. TRANSLATORS: tutorial prompt; %s is the move keys
++#. i18n: speaker=hint slot=key
 +#: scripts/main.gd:4382
 +#, c-format
 +msgid "%s  MOVE"
@@ -4486,6 +4571,7 @@ index 0000000..cdbc381
 +
 +# machine-translated by Claude (Anthropic), unreviewed
 +#. TRANSLATORS: tutorial prompt; %s is a key
++#. i18n: speaker=hint slot=key
 +#: scripts/main.gd:4383
 +#, c-format
 +msgid "%s  READ DISPLAY (optional)"
@@ -4493,18 +4579,21 @@ index 0000000..cdbc381
 +
 +# machine-translated by Claude (Anthropic), unreviewed
 +#. TRANSLATORS: tutorial prompt second row
++#. i18n: speaker=hint engineer=you
 +#: scripts/main.gd:4386
 +msgid "Head right to the breaker."
 +msgstr "右のブレーカーへ向かう。"
 +
 +# machine-translated by Claude (Anthropic), unreviewed
 +#. TRANSLATORS: tutorial prompt second row
++#. i18n: speaker=hint engineer=you
 +#: scripts/main.gd:4391
 +msgid "Or head right to the breaker."
 +msgstr "または右のブレーカーへ。"
 +
 +# machine-translated by Claude (Anthropic), unreviewed
 +#. TRANSLATORS: top card as the opening starts: a clock time and the place
++#. i18n: speaker=ui
 +#: scripts/main.gd:4399
 +msgid "03:17 / CONTAINMENT"
 +msgstr "03:17 / 収容区画"
@@ -4515,6 +4604,7 @@ index 0000000..cdbc381
 +
 +# machine-translated by Claude (Anthropic), unreviewed
 +#. TRANSLATORS: hint bar in the opening; each %s is a key name (E, Esc)
++#. i18n: speaker=hint slot=key
 +#: scripts/main.gd:4400
 +#, c-format
 +msgid "%s  CONTINUE    %s  PAUSE"
@@ -4526,6 +4616,7 @@ index 0000000..cdbc381
 +
 +# machine-translated by Claude (Anthropic), unreviewed
 +#. TRANSLATORS: hint bar; %s is a key name
++#. i18n: speaker=hint slot=key
 +#: scripts/main.gd:4403
 +#, c-format
 +msgid "%s  CONTINUE"
@@ -4533,18 +4624,21 @@ index 0000000..cdbc381
 +
 +# machine-translated by Claude (Anthropic), unreviewed
 +#. TRANSLATORS: hint bar on the opening's first box: the Pause menu offers to skip it
++#. i18n: speaker=hint
 +#: scripts/main.gd:4403
 +msgid "PAUSE: skip the opening"
 +msgstr "ポーズ：オープニングをスキップ"
 +
 +# machine-translated by Claude (Anthropic), unreviewed
 +#. TRANSLATORS: name card under the engineer's name; the engineer is non-binary, so no gendered noun
++#. i18n: speaker=ui engineer=third
 +#: scripts/main.gd:4429
 +msgid "MAINTENANCE ENGINEER"
 +msgstr "保守技術者"
 +
 +# machine-translated by Claude (Anthropic), unreviewed
 +#. TRANSLATORS: top card: place
++#. i18n: speaker=ui
 +#: scripts/main.gd:4440
 +msgid "SERVICE JUNCTION"
 +msgstr "サービスジャンクション"
@@ -4555,6 +4649,7 @@ index 0000000..cdbc381
 +
 +# machine-translated by Claude (Anthropic), unreviewed
 +#. TRANSLATORS: top card: place / chapter
++#. i18n: speaker=ui
 +#: scripts/main.gd:4440
 +msgid "MAINTENANCE / LOCKDOWN"
 +msgstr "保守区画 / ロックダウン"
@@ -4569,6 +4664,7 @@ index 0000000..cdbc381
 +
 +# machine-translated by Claude (Anthropic), unreviewed
 +#. TRANSLATORS: hint bar on the knockdown card; %s is a key name
++#. i18n: speaker=hint slot=key
 +#: scripts/main.gd:4458
 +#, c-format
 +msgid "%s  RETRY"
@@ -4621,6 +4717,7 @@ index 0000000..cdbc381
 +
 +# machine-translated by Claude (Anthropic), unreviewed
 +#. TRANSLATORS: hint bar; 'E:' is replaced by the bound key and must stay exactly 'E:'
++#. i18n: speaker=hint engineer=you
 +#: scripts/main.gd:4922
 +#: scripts/main.gd:4930
 +msgid "E: read the Director's purge display."
@@ -4652,6 +4749,7 @@ index 0000000..cdbc381
 +
 +# machine-translated by Claude (Anthropic), unreviewed
 +#. TRANSLATORS: hint bar; keep 'E:'; %d of %d is turns so far and turns needed
++#. i18n: speaker=hint engineer=you
 +#: scripts/main.gd:4937
 +#, c-format
 +msgid "HOLD E: crank the manual bypass, %d of %d."
@@ -4676,6 +4774,7 @@ index 0000000..cdbc381
 +
 +# machine-translated by Claude (Anthropic), unreviewed
 +#. TRANSLATORS: hint bar; keep 'E:'
++#. i18n: speaker=hint engineer=you
 +#: scripts/main.gd:4947
 +msgid "E: talk to WOLF about the relay."
 +msgstr "E: リレーについてWOLFと話す"
@@ -4710,6 +4809,7 @@ index 0000000..cdbc381
 +
 +# machine-translated by Claude (Anthropic), unreviewed
 +#. TRANSLATORS: hint bar, first hint of the game
++#. i18n: speaker=hint engineer=you
 +#: scripts/main.gd:4956
 +msgid "Find the breaker. WOLF will follow your lead."
 +msgstr "ブレーカーを探そう。WOLFが後をついて来る。"
@@ -4740,6 +4840,7 @@ index 0000000..cdbc381
 +
 +# machine-translated by Claude (Anthropic), unreviewed
 +#. TRANSLATORS: top card objective
++#. i18n: speaker=ui
 +#: scripts/main.gd:5065
 +#: scripts/main.gd:5081
 +msgid "ARM THE BREAKER"
@@ -4775,15 +4876,16 @@ index 0000000..cdbc381
 +
 +# machine-translated by Claude (Anthropic), unreviewed
 +#. TRANSLATORS: top card objective
++#. i18n: speaker=ui
 +#: scripts/main.gd:5082
 +msgid "CHECK THE BREAKER"
 +msgstr "ブレーカーを確認"
 diff --git a/apps/game/i18n/ru.po b/apps/game/i18n/ru.po
 new file mode 100644
-index 0000000..5b9da78
+index 0000000..739079e
 --- /dev/null
 +++ b/apps/game/i18n/ru.po
-@@ -0,0 +1,788 @@
+@@ -0,0 +1,822 @@
 +# Sample translations for the scratch prototype (proof only; not reviewed).
 +msgid ""
 +msgstr ""
@@ -4825,6 +4927,7 @@ index 0000000..5b9da78
 +
 +# machine-translated by Claude (Anthropic), unreviewed
 +#. TRANSLATORS: the on-screen PAUSE button
++#. i18n: speaker=ui
 +#: scenes/main.tscn
 +#: scripts/main.gd:4368
 +msgid "PAUSE"
@@ -4853,6 +4956,7 @@ index 0000000..5b9da78
 +
 +# machine-translated by Claude (Anthropic), unreviewed
 +#. TRANSLATORS: title screen, above the game's logo (studio name stays English)
++#. i18n: speaker=ui
 +#: scenes/main.tscn
 +msgid "MRDEMONWOLF, INC. PRESENTS"
 +msgstr "MRDEMONWOLF, INC. ПРЕДСТАВЛЯЕТ"
@@ -4863,18 +4967,21 @@ index 0000000..5b9da78
 +
 +# machine-translated by Claude (Anthropic), unreviewed
 +#. TRANSLATORS: title screen subtitle; two spaces round the slash
++#. i18n: speaker=ui
 +#: scenes/main.tscn
 +msgid "CHAPTER 1  /  LOCKDOWN"
 +msgstr "ГЛАВА 1  /  БЛОКИРОВКА"
 +
 +# machine-translated by Claude (Anthropic), unreviewed
 +#. TRANSLATORS: title screen button
++#. i18n: speaker=ui
 +#: scenes/main.tscn
 +msgid "NEW GAME"
 +msgstr "НОВАЯ ИГРА"
 +
 +# machine-translated by Claude (Anthropic), unreviewed
 +#. TRANSLATORS: title screen button
++#. i18n: speaker=ui
 +#: scenes/main.tscn
 +#: scripts/main.gd:926
 +msgid "CONTINUE"
@@ -4882,12 +4989,14 @@ index 0000000..5b9da78
 +
 +# machine-translated by Claude (Anthropic), unreviewed
 +#. TRANSLATORS: title screen button
++#. i18n: speaker=ui
 +#: scenes/main.tscn
 +msgid "CREDITS"
 +msgstr "ТИТРЫ"
 +
 +# machine-translated by Claude (Anthropic), unreviewed
 +#. TRANSLATORS: title and pause button
++#. i18n: speaker=ui
 +#: scenes/main.tscn
 +msgid "SETTINGS"
 +msgstr "НАСТРОЙКИ"
@@ -4898,12 +5007,14 @@ index 0000000..5b9da78
 +
 +# machine-translated by Claude (Anthropic), unreviewed
 +#. TRANSLATORS: title screen button (the game's update notes)
++#. i18n: speaker=ui
 +#: scenes/main.tscn
 +msgid "CHANGELOG"
 +msgstr "ИЗМЕНЕНИЯ"
 +
 +# machine-translated by Claude (Anthropic), unreviewed
 +#. TRANSLATORS: title screen footer; the person's name stays as is
++#. i18n: speaker=ui
 +#: scenes/main.tscn
 +msgid "Concept: Nathanial Henniges  /  AI-assisted development"
 +msgstr "Идея: Nathanial Henniges  /  Разработка с помощью ИИ"
@@ -5078,6 +5189,7 @@ index 0000000..5b9da78
 +
 +# machine-translated by Claude (Anthropic), unreviewed
 +#. TRANSLATORS: Settings caption beside the language list
++#. i18n: speaker=ui
 +#: scripts/game_settings.gd:242
 +msgid "LANGUAGE"
 +msgstr "ЯЗЫК"
@@ -5117,6 +5229,7 @@ index 0000000..5b9da78
 +
 +# machine-translated by Claude (Anthropic), unreviewed
 +#. TRANSLATORS: knockdown card; %s is the engineer's first name (non-binary)
++#. i18n: speaker=narrator engineer=name
 +#: scripts/junction_room.gd:774
 +#: scripts/main.gd:5216
 +#, c-format
@@ -5159,6 +5272,7 @@ index 0000000..5b9da78
 +
 +# machine-translated by Claude (Anthropic), unreviewed
 +#. TRANSLATORS: title screen button after the slice is finished
++#. i18n: speaker=ui
 +#: scripts/main.gd:926
 +msgid "PLAY AGAIN"
 +msgstr "ИГРАТЬ СНОВА"
@@ -5173,6 +5287,7 @@ index 0000000..5b9da78
 +
 +# machine-translated by Claude (Anthropic), unreviewed
 +#. TRANSLATORS: title screen note under a greyed CONTINUE; SAFE POINT is a station plate
++#. i18n: speaker=ui
 +#: scripts/main.gd:933
 +msgid "No checkpoint yet. Saving starts at the first SAFE POINT."
 +msgstr "Контрольной точки пока нет. Сохранение начнётся на первой станции «БЕЗОПАСНАЯ ТОЧКА»."
@@ -5183,12 +5298,14 @@ index 0000000..5b9da78
 +
 +# machine-translated by Claude (Anthropic), unreviewed
 +#. TRANSLATORS: opening narration box (narrator, no speaker)
++#. i18n: speaker=narrator
 +#: scripts/main.gd:1718
 +msgid "The Director thinks WOLF is still in standby."
 +msgstr "Директор думает, что WOLF всё ещё в режиме ожидания."
 +
 +# machine-translated by Claude (Anthropic), unreviewed
 +#. TRANSLATORS: opening narration box; keep the line break
++#. i18n: speaker=narrator
 +#: scripts/main.gd:1718
 +msgid ""
 +"Nobody gives an activation command.\n"
@@ -5241,6 +5358,7 @@ index 0000000..5b9da78
 +
 +# machine-translated by Claude (Anthropic), unreviewed
 +#. TRANSLATORS: knockdown card; %s is the engineer's first name; TANK RELEASE is a station plate
++#. i18n: speaker=narrator engineer=name
 +#: scripts/main.gd:3385
 +#, c-format
 +msgid ""
@@ -5273,6 +5391,7 @@ index 0000000..5b9da78
 +
 +# machine-translated by Claude (Anthropic), unreviewed
 +#. TRANSLATORS: tutorial prompt; %s is the move keys
++#. i18n: speaker=hint slot=key
 +#: scripts/main.gd:4382
 +#, c-format
 +msgid "%s  MOVE"
@@ -5280,6 +5399,7 @@ index 0000000..5b9da78
 +
 +# machine-translated by Claude (Anthropic), unreviewed
 +#. TRANSLATORS: tutorial prompt; %s is a key
++#. i18n: speaker=hint slot=key
 +#: scripts/main.gd:4383
 +#, c-format
 +msgid "%s  READ DISPLAY (optional)"
@@ -5287,18 +5407,21 @@ index 0000000..5b9da78
 +
 +# machine-translated by Claude (Anthropic), unreviewed
 +#. TRANSLATORS: tutorial prompt second row
++#. i18n: speaker=hint engineer=you
 +#: scripts/main.gd:4386
 +msgid "Head right to the breaker."
 +msgstr "Иди направо к рубильнику."
 +
 +# machine-translated by Claude (Anthropic), unreviewed
 +#. TRANSLATORS: tutorial prompt second row
++#. i18n: speaker=hint engineer=you
 +#: scripts/main.gd:4391
 +msgid "Or head right to the breaker."
 +msgstr "Или иди направо к рубильнику."
 +
 +# machine-translated by Claude (Anthropic), unreviewed
 +#. TRANSLATORS: top card as the opening starts: a clock time and the place
++#. i18n: speaker=ui
 +#: scripts/main.gd:4399
 +msgid "03:17 / CONTAINMENT"
 +msgstr "03:17 / ЗОНА СОДЕРЖАНИЯ"
@@ -5309,6 +5432,7 @@ index 0000000..5b9da78
 +
 +# machine-translated by Claude (Anthropic), unreviewed
 +#. TRANSLATORS: hint bar in the opening; each %s is a key name (E, Esc)
++#. i18n: speaker=hint slot=key
 +#: scripts/main.gd:4400
 +#, c-format
 +msgid "%s  CONTINUE    %s  PAUSE"
@@ -5320,6 +5444,7 @@ index 0000000..5b9da78
 +
 +# machine-translated by Claude (Anthropic), unreviewed
 +#. TRANSLATORS: hint bar; %s is a key name
++#. i18n: speaker=hint slot=key
 +#: scripts/main.gd:4403
 +#, c-format
 +msgid "%s  CONTINUE"
@@ -5327,18 +5452,21 @@ index 0000000..5b9da78
 +
 +# machine-translated by Claude (Anthropic), unreviewed
 +#. TRANSLATORS: hint bar on the opening's first box: the Pause menu offers to skip it
++#. i18n: speaker=hint
 +#: scripts/main.gd:4403
 +msgid "PAUSE: skip the opening"
 +msgstr "ПАУЗА: пропустить вступление"
 +
 +# machine-translated by Claude (Anthropic), unreviewed
 +#. TRANSLATORS: name card under the engineer's name; the engineer is non-binary, so no gendered noun
++#. i18n: speaker=ui engineer=third
 +#: scripts/main.gd:4429
 +msgid "MAINTENANCE ENGINEER"
 +msgstr "СЛУЖБА ТЕХОБСЛУЖИВАНИЯ"
 +
 +# machine-translated by Claude (Anthropic), unreviewed
 +#. TRANSLATORS: top card: place
++#. i18n: speaker=ui
 +#: scripts/main.gd:4440
 +msgid "SERVICE JUNCTION"
 +msgstr "СЕРВИСНЫЙ УЗЕЛ"
@@ -5349,6 +5477,7 @@ index 0000000..5b9da78
 +
 +# machine-translated by Claude (Anthropic), unreviewed
 +#. TRANSLATORS: top card: place / chapter
++#. i18n: speaker=ui
 +#: scripts/main.gd:4440
 +msgid "MAINTENANCE / LOCKDOWN"
 +msgstr "ТЕХОБСЛУЖИВАНИЕ / БЛОКИРОВКА"
@@ -5363,6 +5492,7 @@ index 0000000..5b9da78
 +
 +# machine-translated by Claude (Anthropic), unreviewed
 +#. TRANSLATORS: hint bar on the knockdown card; %s is a key name
++#. i18n: speaker=hint slot=key
 +#: scripts/main.gd:4458
 +#, c-format
 +msgid "%s  RETRY"
@@ -5415,6 +5545,7 @@ index 0000000..5b9da78
 +
 +# machine-translated by Claude (Anthropic), unreviewed
 +#. TRANSLATORS: hint bar; 'E:' is replaced by the bound key and must stay exactly 'E:'
++#. i18n: speaker=hint engineer=you
 +#: scripts/main.gd:4922
 +#: scripts/main.gd:4930
 +msgid "E: read the Director's purge display."
@@ -5446,6 +5577,7 @@ index 0000000..5b9da78
 +
 +# machine-translated by Claude (Anthropic), unreviewed
 +#. TRANSLATORS: hint bar; keep 'E:'; %d of %d is turns so far and turns needed
++#. i18n: speaker=hint engineer=you
 +#: scripts/main.gd:4937
 +#, c-format
 +msgid "HOLD E: crank the manual bypass, %d of %d."
@@ -5470,6 +5602,7 @@ index 0000000..5b9da78
 +
 +# machine-translated by Claude (Anthropic), unreviewed
 +#. TRANSLATORS: hint bar; keep 'E:'
++#. i18n: speaker=hint engineer=you
 +#: scripts/main.gd:4947
 +msgid "E: talk to WOLF about the relay."
 +msgstr "E: поговорить с WOLF о реле."
@@ -5504,6 +5637,7 @@ index 0000000..5b9da78
 +
 +# machine-translated by Claude (Anthropic), unreviewed
 +#. TRANSLATORS: hint bar, first hint of the game
++#. i18n: speaker=hint engineer=you
 +#: scripts/main.gd:4956
 +msgid "Find the breaker. WOLF will follow your lead."
 +msgstr "Найди рубильник. WOLF пойдёт за тобой."
@@ -5534,6 +5668,7 @@ index 0000000..5b9da78
 +
 +# machine-translated by Claude (Anthropic), unreviewed
 +#. TRANSLATORS: top card objective
++#. i18n: speaker=ui
 +#: scripts/main.gd:5065
 +#: scripts/main.gd:5081
 +msgid "ARM THE BREAKER"
@@ -5569,6 +5704,7 @@ index 0000000..5b9da78
 +
 +# machine-translated by Claude (Anthropic), unreviewed
 +#. TRANSLATORS: top card objective
++#. i18n: speaker=ui
 +#: scripts/main.gd:5082
 +msgid "CHECK THE BREAKER"
 +msgstr "ПРОВЕРИТЬ РУБИЛЬНИК"

@@ -22,9 +22,10 @@ Contract
     like {"back": {translator: {lang: {line_id: english}}}}.
 
 Measures (all automated; tone and gender are judged by a person and kept in ../out/judgments.json)
-    placeholders  positional tokens (%s, %d and a literal %%) must equal the English line's in number
-                  AND order; named tokens ({name}, {current}, {total}: any {lower_snake}) must equal
-                  them as a multiset, in any order, since reordering is what names are for.
+    placeholders  positional printf tokens (%s, %d, %02d, %.1f ... and a literal %%) must equal the
+                  English line's in number AND order; named tokens ({name}, {current}, {0}: any
+                  {word}) must equal them as a multiset, in any order, since reordering is what names
+                  are for. (bbcode_ok, the BBCode tag check, is used by the prototype's i18n_tool.py.)
     tag           a line that starts "WOLF: " in English must start with it in the translation.
     breaks        the count of authored "\\n" must match (Apple doubled them in the trial).
     glossary      every glossary term in the English line must appear in its required/variant form.
@@ -57,14 +58,21 @@ OUT = ROOT / "out"
 #: ROOT/fonts; the filed copy reads the originals instead of keeping a second copy of each font.)
 FONT_DIR = ROOT.parents[3] / "apps" / "game" / "assets" / "fonts"
 LANGS = ["es-419", "de", "ja"]
-#: Positional inserts filled by Godot's String % operator. "%%" is a token too: String % reads it as a
-#: literal percent, so a stray "%%d" (Apple's Japanese L03 in the trial) silently eats a placeholder and
-#: must count as a mismatch.
-POSITIONAL = re.compile(r"%%|%[sd]")
-#: Named inserts filled by String.format ({name} on the end card; the build plan's {current} and {total}).
-#: Any lower_snake name counts, so a misspelt or dropped one is caught: String.format leaves an unknown
-#: key on screen as literal text, and msgfmt's c-format check ignores braces.
-NAMED = re.compile(r"\{[a-z_]+\}")
+#: Positional inserts filled by Godot's String % operator, in its full printf form: any run of the
+#: modifiers it reads (- + u 0-9 . *) before a conversion it accepts (s c d o x X f v; String::sprintf in
+#: core/string/ustring.cpp, 4.7.2-stable). The whole token is compared, so "%02d" turned into "%d" or a
+#: dropped "%.1f" is a mismatch. "%%" is a token too: String % reads it as a literal percent, so a stray
+#: "%%d" (Apple's Japanese L03 in the trial) silently eats a placeholder and must count as a mismatch.
+#: A space is not a modifier, so "100% sure" holds no token.
+POSITIONAL = re.compile(r"%%|%[-+u0-9.*]*[scdoxXfv]")
+#: Named inserts filled by String.format: {name} on the end card, the build plan's {current} and {total},
+#: and indexed ones such as {0}. Any word of letters, digits and _ counts, so a misspelt or dropped one is
+#: caught: String.format leaves an unknown key on screen as literal text, and msgfmt's c-format check
+#: ignores braces.
+NAMED = re.compile(r"\{[A-Za-z0-9_]+\}")
+#: A BBCode tag as RichTextLabel reads it: [b], [/b], [color=#ff8800], [font_size=19]. The credits are one
+#: BBCode msgid, so its tags must survive translation.
+BBCODE = re.compile(r"\[(/?)([a-z_]+)(?:=[^\]]*)?\]")
 
 
 def placeholders_ok(english: str, text: str) -> bool:
@@ -73,6 +81,27 @@ def placeholders_ok(english: str, text: str) -> bool:
     translator may move them. Pure; no side effects."""
     return (POSITIONAL.findall(english) == POSITIONAL.findall(text)
             and Counter(NAMED.findall(english)) == Counter(NAMED.findall(text)))
+
+
+def _bbcode_nests(text: str) -> bool:
+    """True when every closing tag in ``text`` closes the innermost open tag and none stays open."""
+    stack: list[str] = []
+    for match in BBCODE.finditer(text):
+        if not match.group(1):
+            stack.append(match.group(2))
+        elif not stack or stack.pop() != match.group(2):
+            return False
+    return not stack
+
+
+def bbcode_ok(english: str, text: str) -> bool:
+    """True when ``text`` has exactly ``english``'s BBCode tags, attribute values included, as a multiset
+    (a translator may move a bold word), and they nest properly wherever the English does (a tag with no
+    closing form, such as [br], makes the English itself not nest, and then only the multiset counts).
+    Pure; no side effects."""
+    if Counter(m.group(0) for m in BBCODE.finditer(english)) != Counter(m.group(0) for m in BBCODE.finditer(text)):
+        return False
+    return _bbcode_nests(text) or not _bbcode_nests(english)
 #: The letters each candidate language needs beyond ASCII, for the glyph-coverage report. CJK is
 #: reported as a count of sample characters instead, since no Latin font covers it.
 ALPHABETS = {

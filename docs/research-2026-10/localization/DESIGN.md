@@ -44,20 +44,25 @@ where it is drawn.
 
 All locale code lives here once. The prototype's version is in `prototype/evidence/game.patch`.
 
-**The language table, `LANGUAGES`.** One list holds every per-language fact, and everything else reads
-it:
+**The language table, `LANGUAGES`.** One file, `apps/game/i18n/languages.json`, holds every per-language
+fact. `I18n` reads it into `LANGUAGES` once at start, and the Python tool reads the same file, so the
+game and the gates never keep two lists (the prototype's tool already reads its own
+`prototype/tools/languages.json`, which PR L1 grows into this file). It holds:
 - the Godot code and the picker name (in its own language);
 - the font fallback (none, JP, SC, TC or KR);
 - the reading speed in characters per second;
 - the row character limit;
-- the plural form count;
-- the review state (machine-translated or reviewed).
+- the plural rule;
+- the review state (machine-translated or reviewed);
+- for the gates: the glossary key, the script, the family (for the sibling-file gate), the gender rule
+  and the name-case flag.
 
 ConPaws' history is why there is one list. Its language list drifted three times between the picker,
 `CFBundleLocalizations`, the Swift widget tables and the Intl data imports. It now keeps one list plus
 parity tests (`apps/native/src/lib/supported-locales.ts`). Here a test checks that
 `project.godot`'s `internationalization/locale/translations`, the `.po` files on disk, the picker and
-the export presets all match the table.
+the export presets all match the table, and `i18n_tool.py check` stops on a PO file whose language the
+table lacks.
 
 **The resolver, `resolve()`.** It turns a locale into an offered language with an explicit table, as
 ConPaws' `resolveDeviceLocale` does:

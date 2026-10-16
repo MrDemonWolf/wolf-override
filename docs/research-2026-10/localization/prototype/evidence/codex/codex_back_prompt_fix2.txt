@@ -1,0 +1,820 @@
+You are checking game UI and dialogue translations by back-translating them. Translate each text below into plain, literal English, keeping placeholders (%s, %d), the token 'E:' and line breaks (\n) exactly as they appear. Do not guess what the original English was; translate only what is written. Context: a 2D sci-fi game; WOLF is a robot wolf (he), the Director a human (he), the sentry a machine; the player character is a non-binary engineer (they/them). Each item says who speaks ('speaker': WOLF, narrator, hint for the hint bar that addresses the player, ui) and how the engineer appears in it ('engineer'). After each back-translation add 'notes' listing anything ambiguous, unidiomatic or gendered in the source text (empty string if none), and 'engineer_gendered': true only if the text shows the grammatical gender of the engineer: when the engineer is addressed, by a verb, adjective or participle agreeing with 'you'; when named or referred to, by a past-tense ending, an agreeing adjective or participle, a gendered job noun or a gendered pronoun (he/she, 彼/彼女, 他/她, 그/그녀); false otherwise, including when only WOLF, the Director or the sentry is gendered. Answer with JSON only: {"back": {"<id>": {"english": "...", "notes": "...", "engineer_gendered": false}}}. Do not run any commands or read any files.
+
+{
+ "de-6951795429": {
+  "language": "de",
+  "speaker": "ui",
+  "engineer": "not in this text",
+  "text": "PAUSE"
+ },
+ "de-65596e37c4": {
+  "language": "de",
+  "speaker": "ui",
+  "engineer": "not in this text",
+  "text": "MRDEMONWOLF, INC. PRÄSENTIERT"
+ },
+ "de-78d3ae705e": {
+  "language": "de",
+  "speaker": "ui",
+  "engineer": "not in this text",
+  "text": "KAPITEL 1  /  ABRIEGELUNG"
+ },
+ "de-f2edc4bde5": {
+  "language": "de",
+  "speaker": "ui",
+  "engineer": "not in this text",
+  "text": "NEUES SPIEL"
+ },
+ "de-da57109028": {
+  "language": "de",
+  "speaker": "ui",
+  "engineer": "not in this text",
+  "text": "FORTSETZEN"
+ },
+ "de-d6eec45feb": {
+  "language": "de",
+  "speaker": "ui",
+  "engineer": "not in this text",
+  "text": "MITWIRKENDE"
+ },
+ "de-3ebe9afe4e": {
+  "language": "de",
+  "speaker": "ui",
+  "engineer": "not in this text",
+  "text": "OPTIONEN"
+ },
+ "de-47aeb44f53": {
+  "language": "de",
+  "speaker": "ui",
+  "engineer": "not in this text",
+  "text": "ÄNDERUNGEN"
+ },
+ "de-18af70093a": {
+  "language": "de",
+  "speaker": "ui",
+  "engineer": "not in this text",
+  "text": "Konzept: Nathanial Henniges  /  KI-gestützte Entwicklung"
+ },
+ "de-6e0e3df910": {
+  "language": "de",
+  "speaker": "ui",
+  "engineer": "not in this text",
+  "text": "SPRACHE"
+ },
+ "de-94b450d90d": {
+  "language": "de",
+  "speaker": "narrator",
+  "engineer": "named (their first name fills %s or {name})",
+  "text": "Das Überdruckventil hat unter %s ausgeblasen. Steht die Anzeige am Anschlag, runter vom Gitter."
+ },
+ "de-43c23c91e7": {
+  "language": "de",
+  "speaker": "ui",
+  "engineer": "not in this text",
+  "text": "NOCHMAL SPIELEN"
+ },
+ "de-0ca0b6634c": {
+  "language": "de",
+  "speaker": "ui",
+  "engineer": "not in this text",
+  "text": "Noch kein Checkpoint. Gespeichert wird ab dem ersten SICHERUNGSPUNKT."
+ },
+ "de-52cd049646": {
+  "language": "de",
+  "speaker": "narrator",
+  "engineer": "not in this text",
+  "text": "Der Direktor glaubt, WOLF sei noch im Standby."
+ },
+ "de-8807ee1649": {
+  "language": "de",
+  "speaker": "narrator",
+  "engineer": "not in this text",
+  "text": "Niemand gibt einen Aktivierungsbefehl.\nWOLF weckt sich selbst."
+ },
+ "de-7f8978c405": {
+  "language": "de",
+  "speaker": "narrator",
+  "engineer": "named (their first name fills %s or {name})",
+  "text": "Der Wächter hat %s im Freien gesehen.\nBleib nah am TANKAUSLÖSER."
+ },
+ "de-2841b94a99": {
+  "language": "de",
+  "speaker": "hint",
+  "engineer": "%s is a key name",
+  "text": "%s  BEWEGEN"
+ },
+ "de-3d8b77cfbd": {
+  "language": "de",
+  "speaker": "hint",
+  "engineer": "%s is a key name",
+  "text": "%s  ANZEIGE LESEN (optional)"
+ },
+ "de-7ad341dfa9": {
+  "language": "de",
+  "speaker": "hint",
+  "engineer": "addressed as 'you'",
+  "text": "Geh nach rechts zum Schutzschalter."
+ },
+ "de-f2a4b7717d": {
+  "language": "de",
+  "speaker": "hint",
+  "engineer": "addressed as 'you'",
+  "text": "Oder geh nach rechts zum Schutzschalter."
+ },
+ "de-4fac2e5774": {
+  "language": "de",
+  "speaker": "ui",
+  "engineer": "not in this text",
+  "text": "03:17 / EINDÄMMUNG"
+ },
+ "de-d121814de8": {
+  "language": "de",
+  "speaker": "hint",
+  "engineer": "%s is a key name",
+  "text": "%s  WEITER    %s  PAUSE"
+ },
+ "de-cd406a7125": {
+  "language": "de",
+  "speaker": "hint",
+  "engineer": "%s is a key name",
+  "text": "%s  WEITER"
+ },
+ "de-dc1b53d6dd": {
+  "language": "de",
+  "speaker": "hint",
+  "engineer": "not in this text",
+  "text": "PAUSE: Intro überspringen"
+ },
+ "de-61241ea8fd": {
+  "language": "de",
+  "speaker": "ui",
+  "engineer": "referred to without their name",
+  "text": "WARTUNGSTECHNIK"
+ },
+ "de-184448071c": {
+  "language": "de",
+  "speaker": "ui",
+  "engineer": "not in this text",
+  "text": "VERSORGUNGSKNOTEN"
+ },
+ "de-182037756f": {
+  "language": "de",
+  "speaker": "ui",
+  "engineer": "not in this text",
+  "text": "WARTUNG / ABRIEGELUNG"
+ },
+ "de-fbfe739735": {
+  "language": "de",
+  "speaker": "hint",
+  "engineer": "%s is a key name",
+  "text": "%s  WIEDERHOLEN"
+ },
+ "de-1816337735": {
+  "language": "de",
+  "speaker": "hint",
+  "engineer": "addressed as 'you'",
+  "text": "E: Säuberungsanzeige des Direktors lesen."
+ },
+ "de-8bf12a7e34": {
+  "language": "de",
+  "speaker": "hint",
+  "engineer": "addressed as 'you'",
+  "text": "HALTEN E: manuellen Bypass kurbeln, %d von %d."
+ },
+ "de-73f6716ea5": {
+  "language": "de",
+  "speaker": "hint",
+  "engineer": "addressed as 'you'",
+  "text": "E: Mit WOLF über das Relais sprechen."
+ },
+ "de-ac6f6b38eb": {
+  "language": "de",
+  "speaker": "hint",
+  "engineer": "addressed as 'you'",
+  "text": "Finde den Schutzschalter. WOLF folgt dir."
+ },
+ "de-7fe92521a4": {
+  "language": "de",
+  "speaker": "ui",
+  "engineer": "not in this text",
+  "text": "SCHUTZSCHALTER EINSCHALTEN"
+ },
+ "de-d42d96c34c": {
+  "language": "de",
+  "speaker": "ui",
+  "engineer": "not in this text",
+  "text": "SCHUTZSCHALTER PRÜFEN"
+ },
+ "es-6951795429": {
+  "language": "es-419",
+  "speaker": "ui",
+  "engineer": "not in this text",
+  "text": "PAUSA"
+ },
+ "es-65596e37c4": {
+  "language": "es-419",
+  "speaker": "ui",
+  "engineer": "not in this text",
+  "text": "MRDEMONWOLF, INC. PRESENTA"
+ },
+ "es-78d3ae705e": {
+  "language": "es-419",
+  "speaker": "ui",
+  "engineer": "not in this text",
+  "text": "CAPÍTULO 1  /  BLOQUEO"
+ },
+ "es-f2edc4bde5": {
+  "language": "es-419",
+  "speaker": "ui",
+  "engineer": "not in this text",
+  "text": "NUEVA PARTIDA"
+ },
+ "es-da57109028": {
+  "language": "es-419",
+  "speaker": "ui",
+  "engineer": "not in this text",
+  "text": "CONTINUAR"
+ },
+ "es-d6eec45feb": {
+  "language": "es-419",
+  "speaker": "ui",
+  "engineer": "not in this text",
+  "text": "CRÉDITOS"
+ },
+ "es-3ebe9afe4e": {
+  "language": "es-419",
+  "speaker": "ui",
+  "engineer": "not in this text",
+  "text": "AJUSTES"
+ },
+ "es-47aeb44f53": {
+  "language": "es-419",
+  "speaker": "ui",
+  "engineer": "not in this text",
+  "text": "CAMBIOS"
+ },
+ "es-18af70093a": {
+  "language": "es-419",
+  "speaker": "ui",
+  "engineer": "not in this text",
+  "text": "Concepto: Nathanial Henniges  /  Desarrollo asistido por IA"
+ },
+ "es-6e0e3df910": {
+  "language": "es-419",
+  "speaker": "ui",
+  "engineer": "not in this text",
+  "text": "IDIOMA"
+ },
+ "es-94b450d90d": {
+  "language": "es-419",
+  "speaker": "narrator",
+  "engineer": "named (their first name fills %s or {name})",
+  "text": "La válvula de alivio estalló bajo %s. Cuando el manómetro llegue al máximo, no pises la rejilla."
+ },
+ "es-43c23c91e7": {
+  "language": "es-419",
+  "speaker": "ui",
+  "engineer": "not in this text",
+  "text": "JUGAR DE NUEVO"
+ },
+ "es-0ca0b6634c": {
+  "language": "es-419",
+  "speaker": "ui",
+  "engineer": "not in this text",
+  "text": "Aún no hay punto de control. Se guarda desde el primer PUNTO SEGURO."
+ },
+ "es-52cd049646": {
+  "language": "es-419",
+  "speaker": "narrator",
+  "engineer": "not in this text",
+  "text": "El Director cree que WOLF sigue en espera."
+ },
+ "es-8807ee1649": {
+  "language": "es-419",
+  "speaker": "narrator",
+  "engineer": "not in this text",
+  "text": "Nadie da una orden de activación.\nWOLF se despierta solo."
+ },
+ "es-7f8978c405": {
+  "language": "es-419",
+  "speaker": "narrator",
+  "engineer": "named (their first name fills %s or {name})",
+  "text": "El centinela vio a %s al descubierto.\nQuédate cerca de SOLTAR TANQUE."
+ },
+ "es-2841b94a99": {
+  "language": "es-419",
+  "speaker": "hint",
+  "engineer": "%s is a key name",
+  "text": "%s  MOVERSE"
+ },
+ "es-3d8b77cfbd": {
+  "language": "es-419",
+  "speaker": "hint",
+  "engineer": "%s is a key name",
+  "text": "%s  LEER PANTALLA (opcional)"
+ },
+ "es-7ad341dfa9": {
+  "language": "es-419",
+  "speaker": "hint",
+  "engineer": "addressed as 'you'",
+  "text": "Ve a la derecha, al interruptor."
+ },
+ "es-f2a4b7717d": {
+  "language": "es-419",
+  "speaker": "hint",
+  "engineer": "addressed as 'you'",
+  "text": "O ve a la derecha, al interruptor."
+ },
+ "es-4fac2e5774": {
+  "language": "es-419",
+  "speaker": "ui",
+  "engineer": "not in this text",
+  "text": "03:17 / CONTENCIÓN"
+ },
+ "es-d121814de8": {
+  "language": "es-419",
+  "speaker": "hint",
+  "engineer": "%s is a key name",
+  "text": "%s  CONTINUAR    %s  PAUSA"
+ },
+ "es-cd406a7125": {
+  "language": "es-419",
+  "speaker": "hint",
+  "engineer": "%s is a key name",
+  "text": "%s  CONTINUAR"
+ },
+ "es-dc1b53d6dd": {
+  "language": "es-419",
+  "speaker": "hint",
+  "engineer": "not in this text",
+  "text": "PAUSA: saltar la introducción"
+ },
+ "es-61241ea8fd": {
+  "language": "es-419",
+  "speaker": "ui",
+  "engineer": "referred to without their name",
+  "text": "INGENIERÍA DE MANTENIMIENTO"
+ },
+ "es-184448071c": {
+  "language": "es-419",
+  "speaker": "ui",
+  "engineer": "not in this text",
+  "text": "EMPALME DE SERVICIO"
+ },
+ "es-182037756f": {
+  "language": "es-419",
+  "speaker": "ui",
+  "engineer": "not in this text",
+  "text": "MANTENIMIENTO / BLOQUEO"
+ },
+ "es-fbfe739735": {
+  "language": "es-419",
+  "speaker": "hint",
+  "engineer": "%s is a key name",
+  "text": "%s  REINTENTAR"
+ },
+ "es-1816337735": {
+  "language": "es-419",
+  "speaker": "hint",
+  "engineer": "addressed as 'you'",
+  "text": "E: leer la pantalla de purga del Director."
+ },
+ "es-8bf12a7e34": {
+  "language": "es-419",
+  "speaker": "hint",
+  "engineer": "addressed as 'you'",
+  "text": "MANTÉN E: girar el bypass manual, %d de %d."
+ },
+ "es-73f6716ea5": {
+  "language": "es-419",
+  "speaker": "hint",
+  "engineer": "addressed as 'you'",
+  "text": "E: hablar con WOLF sobre el relé."
+ },
+ "es-ac6f6b38eb": {
+  "language": "es-419",
+  "speaker": "hint",
+  "engineer": "addressed as 'you'",
+  "text": "Encuentra el interruptor. WOLF seguirá tus pasos."
+ },
+ "es-7fe92521a4": {
+  "language": "es-419",
+  "speaker": "ui",
+  "engineer": "not in this text",
+  "text": "ACTIVAR EL INTERRUPTOR"
+ },
+ "es-d42d96c34c": {
+  "language": "es-419",
+  "speaker": "ui",
+  "engineer": "not in this text",
+  "text": "REVISAR EL INTERRUPTOR"
+ },
+ "ja-6951795429": {
+  "language": "ja",
+  "speaker": "ui",
+  "engineer": "not in this text",
+  "text": "ポーズ"
+ },
+ "ja-65596e37c4": {
+  "language": "ja",
+  "speaker": "ui",
+  "engineer": "not in this text",
+  "text": "MRDEMONWOLF, INC. 提供"
+ },
+ "ja-78d3ae705e": {
+  "language": "ja",
+  "speaker": "ui",
+  "engineer": "not in this text",
+  "text": "第1章  /  ロックダウン"
+ },
+ "ja-f2edc4bde5": {
+  "language": "ja",
+  "speaker": "ui",
+  "engineer": "not in this text",
+  "text": "ニューゲーム"
+ },
+ "ja-da57109028": {
+  "language": "ja",
+  "speaker": "ui",
+  "engineer": "not in this text",
+  "text": "コンティニュー"
+ },
+ "ja-d6eec45feb": {
+  "language": "ja",
+  "speaker": "ui",
+  "engineer": "not in this text",
+  "text": "クレジット"
+ },
+ "ja-3ebe9afe4e": {
+  "language": "ja",
+  "speaker": "ui",
+  "engineer": "not in this text",
+  "text": "設定"
+ },
+ "ja-47aeb44f53": {
+  "language": "ja",
+  "speaker": "ui",
+  "engineer": "not in this text",
+  "text": "更新履歴"
+ },
+ "ja-18af70093a": {
+  "language": "ja",
+  "speaker": "ui",
+  "engineer": "not in this text",
+  "text": "原案：Nathanial Henniges  /  AI支援による開発"
+ },
+ "ja-6e0e3df910": {
+  "language": "ja",
+  "speaker": "ui",
+  "engineer": "not in this text",
+  "text": "言語"
+ },
+ "ja-94b450d90d": {
+  "language": "ja",
+  "speaker": "narrator",
+  "engineer": "named (their first name fills %s or {name})",
+  "text": "%sの足元でリリーフベントが噴き出した。ゲージが振り切れたら、格子から離れること。"
+ },
+ "ja-43c23c91e7": {
+  "language": "ja",
+  "speaker": "ui",
+  "engineer": "not in this text",
+  "text": "もう一度プレイ"
+ },
+ "ja-0ca0b6634c": {
+  "language": "ja",
+  "speaker": "ui",
+  "engineer": "not in this text",
+  "text": "チェックポイントはまだない。最初のセーフポイントから保存される。"
+ },
+ "ja-52cd049646": {
+  "language": "ja",
+  "speaker": "narrator",
+  "engineer": "not in this text",
+  "text": "所長は、WOLFがまだ待機状態だと思っている。"
+ },
+ "ja-8807ee1649": {
+  "language": "ja",
+  "speaker": "narrator",
+  "engineer": "not in this text",
+  "text": "誰も起動命令を出していない。\nWOLFは自ら目を覚ます。"
+ },
+ "ja-7f8978c405": {
+  "language": "ja",
+  "speaker": "narrator",
+  "engineer": "named (their first name fills %s or {name})",
+  "text": "セントリーが開けた場所にいる%sを見つけた。\nタンク投下の近くにいること。"
+ },
+ "ja-2841b94a99": {
+  "language": "ja",
+  "speaker": "hint",
+  "engineer": "%s is a key name",
+  "text": "%s  移動"
+ },
+ "ja-3d8b77cfbd": {
+  "language": "ja",
+  "speaker": "hint",
+  "engineer": "%s is a key name",
+  "text": "%s  表示を読む（任意）"
+ },
+ "ja-7ad341dfa9": {
+  "language": "ja",
+  "speaker": "hint",
+  "engineer": "addressed as 'you'",
+  "text": "右のブレーカーへ向かう。"
+ },
+ "ja-f2a4b7717d": {
+  "language": "ja",
+  "speaker": "hint",
+  "engineer": "addressed as 'you'",
+  "text": "または右のブレーカーへ。"
+ },
+ "ja-4fac2e5774": {
+  "language": "ja",
+  "speaker": "ui",
+  "engineer": "not in this text",
+  "text": "03:17 / 収容区画"
+ },
+ "ja-d121814de8": {
+  "language": "ja",
+  "speaker": "hint",
+  "engineer": "%s is a key name",
+  "text": "%s  続ける    %s  ポーズ"
+ },
+ "ja-cd406a7125": {
+  "language": "ja",
+  "speaker": "hint",
+  "engineer": "%s is a key name",
+  "text": "%s  続ける"
+ },
+ "ja-dc1b53d6dd": {
+  "language": "ja",
+  "speaker": "hint",
+  "engineer": "not in this text",
+  "text": "ポーズ：オープニングをスキップ"
+ },
+ "ja-61241ea8fd": {
+  "language": "ja",
+  "speaker": "ui",
+  "engineer": "referred to without their name",
+  "text": "保守技術者"
+ },
+ "ja-184448071c": {
+  "language": "ja",
+  "speaker": "ui",
+  "engineer": "not in this text",
+  "text": "サービスジャンクション"
+ },
+ "ja-182037756f": {
+  "language": "ja",
+  "speaker": "ui",
+  "engineer": "not in this text",
+  "text": "保守区画 / ロックダウン"
+ },
+ "ja-fbfe739735": {
+  "language": "ja",
+  "speaker": "hint",
+  "engineer": "%s is a key name",
+  "text": "%s  リトライ"
+ },
+ "ja-1816337735": {
+  "language": "ja",
+  "speaker": "hint",
+  "engineer": "addressed as 'you'",
+  "text": "E: 所長のパージ表示を読む"
+ },
+ "ja-8bf12a7e34": {
+  "language": "ja",
+  "speaker": "hint",
+  "engineer": "addressed as 'you'",
+  "text": "長押し E: 手動バイパスを回す（%d / %d）"
+ },
+ "ja-73f6716ea5": {
+  "language": "ja",
+  "speaker": "hint",
+  "engineer": "addressed as 'you'",
+  "text": "E: リレーについてWOLFと話す"
+ },
+ "ja-ac6f6b38eb": {
+  "language": "ja",
+  "speaker": "hint",
+  "engineer": "addressed as 'you'",
+  "text": "ブレーカーを探そう。WOLFが後をついて来る。"
+ },
+ "ja-7fe92521a4": {
+  "language": "ja",
+  "speaker": "ui",
+  "engineer": "not in this text",
+  "text": "ブレーカーを入れる"
+ },
+ "ja-d42d96c34c": {
+  "language": "ja",
+  "speaker": "ui",
+  "engineer": "not in this text",
+  "text": "ブレーカーを確認"
+ },
+ "ru-6951795429": {
+  "language": "ru",
+  "speaker": "ui",
+  "engineer": "not in this text",
+  "text": "ПАУЗА"
+ },
+ "ru-65596e37c4": {
+  "language": "ru",
+  "speaker": "ui",
+  "engineer": "not in this text",
+  "text": "MRDEMONWOLF, INC. ПРЕДСТАВЛЯЕТ"
+ },
+ "ru-78d3ae705e": {
+  "language": "ru",
+  "speaker": "ui",
+  "engineer": "not in this text",
+  "text": "ГЛАВА 1  /  БЛОКИРОВКА"
+ },
+ "ru-f2edc4bde5": {
+  "language": "ru",
+  "speaker": "ui",
+  "engineer": "not in this text",
+  "text": "НОВАЯ ИГРА"
+ },
+ "ru-da57109028": {
+  "language": "ru",
+  "speaker": "ui",
+  "engineer": "not in this text",
+  "text": "ПРОДОЛЖИТЬ"
+ },
+ "ru-d6eec45feb": {
+  "language": "ru",
+  "speaker": "ui",
+  "engineer": "not in this text",
+  "text": "ТИТРЫ"
+ },
+ "ru-3ebe9afe4e": {
+  "language": "ru",
+  "speaker": "ui",
+  "engineer": "not in this text",
+  "text": "НАСТРОЙКИ"
+ },
+ "ru-47aeb44f53": {
+  "language": "ru",
+  "speaker": "ui",
+  "engineer": "not in this text",
+  "text": "ИЗМЕНЕНИЯ"
+ },
+ "ru-18af70093a": {
+  "language": "ru",
+  "speaker": "ui",
+  "engineer": "not in this text",
+  "text": "Идея: Nathanial Henniges  /  Разработка с помощью ИИ"
+ },
+ "ru-6e0e3df910": {
+  "language": "ru",
+  "speaker": "ui",
+  "engineer": "not in this text",
+  "text": "ЯЗЫК"
+ },
+ "ru-94b450d90d": {
+  "language": "ru",
+  "speaker": "narrator",
+  "engineer": "named (their first name fills %s or {name})",
+  "text": "Сорвало предохранительный клапан, а %s — прямо на решётке. Когда стрелка манометра на пределе, не стой на решётке."
+ },
+ "ru-43c23c91e7": {
+  "language": "ru",
+  "speaker": "ui",
+  "engineer": "not in this text",
+  "text": "ИГРАТЬ СНОВА"
+ },
+ "ru-0ca0b6634c": {
+  "language": "ru",
+  "speaker": "ui",
+  "engineer": "not in this text",
+  "text": "Контрольной точки пока нет. Сохранение начнётся на первой станции «БЕЗОПАСНАЯ ТОЧКА»."
+ },
+ "ru-52cd049646": {
+  "language": "ru",
+  "speaker": "narrator",
+  "engineer": "not in this text",
+  "text": "Директор думает, что WOLF всё ещё в режиме ожидания."
+ },
+ "ru-8807ee1649": {
+  "language": "ru",
+  "speaker": "narrator",
+  "engineer": "not in this text",
+  "text": "Никто не отдаёт команду на активацию.\nWOLF просыпается сам."
+ },
+ "ru-7f8978c405": {
+  "language": "ru",
+  "speaker": "narrator",
+  "engineer": "named (their first name fills %s or {name})",
+  "text": "Страж заметил: %s на открытом месте.\nДержись ближе к пульту «СБРОС БАКА»."
+ },
+ "ru-2841b94a99": {
+  "language": "ru",
+  "speaker": "hint",
+  "engineer": "%s is a key name",
+  "text": "%s  ДВИЖЕНИЕ"
+ },
+ "ru-3d8b77cfbd": {
+  "language": "ru",
+  "speaker": "hint",
+  "engineer": "%s is a key name",
+  "text": "%s  ПРОЧИТАТЬ ЭКРАН (по желанию)"
+ },
+ "ru-7ad341dfa9": {
+  "language": "ru",
+  "speaker": "hint",
+  "engineer": "addressed as 'you'",
+  "text": "Иди направо к рубильнику."
+ },
+ "ru-f2a4b7717d": {
+  "language": "ru",
+  "speaker": "hint",
+  "engineer": "addressed as 'you'",
+  "text": "Или иди направо к рубильнику."
+ },
+ "ru-4fac2e5774": {
+  "language": "ru",
+  "speaker": "ui",
+  "engineer": "not in this text",
+  "text": "03:17 / ЗОНА СОДЕРЖАНИЯ"
+ },
+ "ru-d121814de8": {
+  "language": "ru",
+  "speaker": "hint",
+  "engineer": "%s is a key name",
+  "text": "%s  ДАЛЕЕ    %s  ПАУЗА"
+ },
+ "ru-cd406a7125": {
+  "language": "ru",
+  "speaker": "hint",
+  "engineer": "%s is a key name",
+  "text": "%s  ДАЛЕЕ"
+ },
+ "ru-dc1b53d6dd": {
+  "language": "ru",
+  "speaker": "hint",
+  "engineer": "not in this text",
+  "text": "ПАУЗА: пропустить вступление"
+ },
+ "ru-61241ea8fd": {
+  "language": "ru",
+  "speaker": "ui",
+  "engineer": "referred to without their name",
+  "text": "СЛУЖБА ТЕХОБСЛУЖИВАНИЯ"
+ },
+ "ru-184448071c": {
+  "language": "ru",
+  "speaker": "ui",
+  "engineer": "not in this text",
+  "text": "СЕРВИСНЫЙ УЗЕЛ"
+ },
+ "ru-182037756f": {
+  "language": "ru",
+  "speaker": "ui",
+  "engineer": "not in this text",
+  "text": "ТЕХОБСЛУЖИВАНИЕ / БЛОКИРОВКА"
+ },
+ "ru-fbfe739735": {
+  "language": "ru",
+  "speaker": "hint",
+  "engineer": "%s is a key name",
+  "text": "%s  ПОВТОРИТЬ"
+ },
+ "ru-1816337735": {
+  "language": "ru",
+  "speaker": "hint",
+  "engineer": "addressed as 'you'",
+  "text": "E: прочитать экран зачистки Директора."
+ },
+ "ru-8bf12a7e34": {
+  "language": "ru",
+  "speaker": "hint",
+  "engineer": "addressed as 'you'",
+  "text": "ДЕРЖАТЬ E: крутить ручной байпас, %d из %d."
+ },
+ "ru-73f6716ea5": {
+  "language": "ru",
+  "speaker": "hint",
+  "engineer": "addressed as 'you'",
+  "text": "E: поговорить с WOLF о реле."
+ },
+ "ru-ac6f6b38eb": {
+  "language": "ru",
+  "speaker": "hint",
+  "engineer": "addressed as 'you'",
+  "text": "Найди рубильник. WOLF пойдёт за тобой."
+ },
+ "ru-7fe92521a4": {
+  "language": "ru",
+  "speaker": "ui",
+  "engineer": "not in this text",
+  "text": "ВКЛЮЧИТЬ РУБИЛЬНИК"
+ },
+ "ru-d42d96c34c": {
+  "language": "ru",
+  "speaker": "ui",
+  "engineer": "not in this text",
+  "text": "ПРОВЕРИТЬ РУБИЛЬНИК"
+ }
+}

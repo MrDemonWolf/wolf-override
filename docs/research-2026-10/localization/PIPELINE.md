@@ -59,24 +59,42 @@ Two more options were ruled out on paper:
 |---|---|---|---|---|
 | Translated by | Claude | Claude | Claude | Claude (design step) |
 | `msgfmt --check-format --check-header` | rc 0 | rc 0 | rc 0 | rc 0 |
-| Gate failures (placeholders, tag, breaks, key token, script, glossary; re-run by the fix step with the gender and plural gates) | 0 | 0 | 0 | 0 |
-| Drift flags (chrF under 35 on lines over 4 words) | 2 ("interruptor" reads as "switch") | 0 | 0 | 0 |
-| Mean chrF of Codex's back-translation against the English | 77.1 | 70.5 | 77.4 | 64.0 |
+| Gate failures (every gate below, re-run by the fix-2 step) | 0 | 0 | 0 | 0 |
+| Back-translation's `engineer_gendered` (fix-2 run) | false on 34 | false on 34 | false on 34 | false on 34 |
+| Drift flags (chrF under 35 on lines over 4 words; fix-2 run) | 2 ("interruptor" reads as "switch") | 0 | 1 | 1 |
+| Mean chrF of Codex's back-translation against the English (fix-2 run) | 77.4 | 71.3 | 78.3 | 62.4 |
+
+The fix-2 step ran the back-translation again (Codex session `01a146cf-4beb-7f42-8d61-726071ffb149`,
+`prototype/evidence/codex/codex_back_prompt_fix2.txt`), because the earlier answers had no
+`engineer_gendered` field and were keyed by list position. The earlier runs gave mean chrF 77.1, 70.5,
+77.4 and 64.0 and only the 2 es drift flags (this file at commit 9a59e0e). The new ja and ru flags are
+literal round trips of correct lines ("WOLF wakes up on his own"; "the safety valve was blown off"):
+chrF moves by a few points from one back-translation to the next, which is why it only flags.
 
 **The checks catch what they should.** Broken copies were run as negative controls:
 
 | Copy | Breaks put in | Caught |
 |---|---|---|
-| `es` | `%s` dropped; `%s` changed to `%d`; `E:` removed | all 3 (msgfmt 2, the token check 1) |
-| `ru` (design step) | a Cyrillic `Е:` for the Latin key token; a Latin `A` inside `ПАУЗА`; a dropped `%d` | all 3 (the token check, the script guard and msgfmt) |
+| `es` | `%s` dropped; `%s` changed to `%d`; `E:` removed | all 3 (msgfmt 2, the placeholder check 2, the token check 1) |
+| `ru` (design step) | a Cyrillic `Е:` for the Latin key token; a Latin `A` inside `ПАУЗА`; a dropped `%d` | all 3 (the token check, the script guard, msgfmt and the placeholder check) |
 | `ru` and `es` (fix step) | the engineer gendered: ru "%s стояла на решётке" (feminine past tense), es "%s estaba sola" (agreeing adjective); and a back-translation that answers `engineer_gendered: true` | all 3 (the gender gate 2, the back-translation's field 1) |
-| `i18n_tool.py selftest` (fix step) | 18 fixed cases: a misspelt and a dropped `{total}`, reordered positional inserts, gendered ru, pl, es and fr lines, a ru plural with a missing form or a dropped `%d`, and the clean lines each gate must pass | 18 of 18 as expected |
+| `ru`, `de`, `ja` and a planted `es_ES` (fix-2 step) | ru "Ты нашла рубильник" on a hint that addresses the engineer (no name slot); ru "заметил %sа" (a case ending glued to the name); de "%s ... gesehen.\nSie soll ..." and ja "彼女は..." (a gendered pronoun after the name); an `es_ES` copy of `es` with NEW GAME left empty and CONTINUE fuzzy | all 6: the gender gate caught the three gendered lines, the name-case gate the glued ending (the gender gate also flags that line, through the sentry's verb beside the name), and the sibling gate both es_ES lines |
+| `i18n_tool.py selftest` | 54 fixed cases: printf and named placeholders (`%02d`, `%.1f`, `{0}`, a misspelt `{total}`); BBCode tags dropped, recoloured or crossed; 27 gender lines in ru, pl, es, fr, de, ja and zh, the reviewers' 7 planted lines of October 16 among them (WOLF's "you" in the past tense, the vocative, pronouns, the German job noun); the name-case ending; a ru plural with a missing form or a dropped `%d`; 5 sibling-file cases; and the clean lines each gate must pass | 54 of 54 as expected |
 
-The reports are `prototype/evidence/po_check_negative_control*.json` and
-`prototype/evidence/gate_selftest.json`. With the fix step's gates added, the prototype's real 136 lines
-still pass with 0 failures and the same 2 es drift flags (`prototype/evidence/po_check.json`). No prototype
-msgid has a named placeholder or a plural form yet, which is why those two gates are proved on fixed
-cases.
+The reports are `prototype/evidence/po_check_negative_control*.json` (all four re-run by the fix-2 step
+with its tool) and `prototype/evidence/gate_selftest.json`. Every report with a planted error makes
+`check` exit 1. The prototype's real 136 lines pass every gate with 0 failures, and `check` exits 0
+(`prototype/evidence/po_check.json`).
+
+**What each gate has been proved on, honestly:**
+- **On real lines:** placeholders, tag, breaks, key token, script, glossary, msgfmt, and the gender
+  checks as far as the 34 msgids reach. Those hold 2 lines that name the engineer (the two knockdown
+  cards), 6 hints that address them and the name card. The gender checks flagged none of them, and
+  Codex answered `engineer_gendered: false` on all 136 rows, a real run, not a planted one.
+- **Only on planted cases:** named and printf-width placeholders, BBCode, plural forms, the name-case
+  gate and the sibling gate, because no prototype msgid has a named insert, a tag, a plural or a sibling
+  file. 24 of the game's 26 gender-risk lines are not among the 34 msgids, so the gender checks have not
+  met them in a real translation yet; L11 (pl and ru) is where they do.
 
 **chrF on its own is not a gate.**
 - Among the lines Apple back-translated, Apple's own output scored the highest mean chrF (59.55 over its 36 lines, against
@@ -102,19 +120,29 @@ cases.
 4. **Back-translate independently.** Codex, through the ChatGPT subscription and in a read-only
    sandbox, back-translates every line:
    - It is **not shown the English**.
+   - Each text comes with who speaks and how the engineer appears in it (named, addressed as "you",
+     referred to, or absent), from the line's `#. i18n:` marks, but never with its English.
    - It notes anything ambiguous, unidiomatic or gendered (`i18n_tool.py backprompt`), and answers a
      structured `engineer_gendered` true or false for each line. The free-text notes alone are too
      noisy to gate on: they say "masculine" for WOLF, the Director or the sentry on almost every ru, es
      and de row.
+   - Answers are filed by language and a hash of the line's context and English (`entry_key`), not by
+     position, so a `msgmerge` between the back-translation and the check never moves an answer onto
+     another line.
    - The model that translated a line never back-translates it.
    - Each Codex session is archived when done.
-5. **Run the gates.** `i18n_tool.py check` writes one JSON report. Every gate must pass:
+5. **Run the gates.** `i18n_tool.py check` writes one JSON report and exits 1 if any language fails (a
+   failed line, a non-zero msgfmt or a sibling gap), so the CI job that runs it fails too. Every gate must
+   pass:
    - `msgfmt --check-format --check-header`. The tool adds `#, c-format` itself, since Godot's
      generator writes no format flag.
-   - **Placeholders:** the same `%s` and `%d` in the same order, and the same named placeholders
-     (`{name}`, `{current}`, `{total}`: any `{lower_snake}`) in any order. A stray `%%` counts as a
-     mismatch. A misspelt named placeholder matters: `String.format` leaves an unknown key on screen as
-     literal text, and msgfmt ignores braces.
+   - **Placeholders:** the same printf inserts in the same order, compared whole (`%s`, `%d`, `%02d`,
+     `%.1f`: every form Godot's `String::sprintf` reads, `core/string/ustring.cpp`), and the same named
+     placeholders (`{name}`, `{current}`, `{0}`) in any order. A stray `%%` counts as a mismatch. A
+     misspelt named placeholder matters: `String.format` leaves an unknown key on screen as literal text,
+     and msgfmt ignores braces.
+   - **BBCode tags:** the same tags with the same values (`[b]`, `[color=#ff8800]`), properly nested. The
+     credits are one BBCode msgid, so this gate must pass before D4 translates them.
    - **Speaker tag**, until speaker and words are stored apart.
    - **Line breaks.** A msgid marked `#. i18n: keep-breaks` (the name card, a choice list) keeps the
      English count. Every other `\n` is layout sized for English, so a translation may drop it and let
@@ -123,14 +151,32 @@ cases.
    - **Script guard**, ported once from ConPaws' locales-script test: no Cyrillic in a Latin-script
      or CJK text, and no Latin letters in a Cyrillic text outside the glossary's keep words.
    - **Glossary:** each term's required form, with stems for Slavic languages.
-   - **The engineer's gender.** A word-ending check per language family: a gendered form (ru and uk
-     past tense in -л/-ла, pl -ł/-ła, es and pt participles in -ado/-ada, fr -é/-ée, plus "alone",
-     "ready" and the job noun) in the same clause as the name and within 3 words of it fails the line.
-     So does a back-translation that answers `engineer_gendered: true`. It is a heuristic: a flag is
-     cleared by rewording or by a reviewer's `# gender-ok: <name> <date>` comment, and native review of
-     the 26 gender-risk lines stays the real check (below).
+   - **The engineer's gender.** Each line says how the engineer appears in it, with a `#. i18n:` mark
+     written in the source (`engineer=name`, `you`, `third` or `self`; `slot=key` or `slot=choice` when
+     a `%s` is not the name). Per language, `prototype/tools/languages.json` holds the gendered word
+     forms (ru and uk past tense in -л/-ла, pl -ł/-ła, es and pt -ado/-ada, fr -é/-ée, "alone",
+     "ready", job nouns), the second- and first-person pronouns and the gendered third-person pronouns.
+     A line fails when:
+     - a gendered form sits within 3 words of the name, in the same clause;
+     - a clause holds "you" (ты, ty, tú) and a gendered form ("%s, ты была права");
+     - on a line that addresses or describes the engineer, a clause without "I" holds a gendered form
+       ("Ты нашла другой путь" fails, WOLF's own "Я отказался" passes; Polish -łem/-łam endings are
+       WOLF's and pass);
+     - a gendered pronoun (он/она, er/sie, 彼女, 她) sits in the name's sentence or the next one;
+     - the back-translation answers `engineer_gendered: true`.
+
+     With every gender-risk line marked (PR L7c), the checks reach all 26. A line with no mark is checked
+     only next to its name slot, which leaves out the 6 with no slot. It is a heuristic: it flags some
+     correct lines (a noun that ends like a verb, a pronoun that means WOLF), and it misses a gendered
+     form its lists lack. A flag is cleared by rewording or by a reviewer's `# gender-ok: <name> <date>`
+     comment, and native review of the 26 gender-risk lines stays the real check (below).
+   - **Name case** (pl, ru, uk): no letter glued to the name slot ("заметил %sа"), since the name stays
+     in the nominative.
    - **Plural forms:** one `msgstr[n]` per form of the header's rule, none empty, each with the
      English inserts. Every form is checked, not only `msgstr[0]`.
+   - **Sibling files complete:** where a language has two files (es and es_ES, zh_Hans and zh_Hant),
+     a line one of them translates must be translated, not fuzzy, in the other. Godot would otherwise
+     show the sibling's text (DESIGN.md, "A missing line falls back to its sibling file").
    - **Drift flag:** chrF under 35 on lines over 4 words sends the line to a person.
 
    An earlier draft also listed a "consistency" gate (the same msgid always gets the same
@@ -138,7 +184,9 @@ cases.
    and `msgctxt`, so there is nothing to check. Consistency across lines is the glossary gate's job.
 6. **Check the layout.** `tests/i18n_test.gd` runs headless:
    - every character drawable by the bundled font chain;
-   - no overflow on the title, menus, HUD and plates;
+   - no overflow on the title, menus, Settings rows, HUD, plates, the end card (its recap rows are the
+     longest translated UI text), the choice rows and the credits' RichTextLabel, with the build's
+     overflow check (DESIGN.md);
    - every dialogue box fits its rows at every TEXT SIZE step.
 
    Then `i18n_capture.gd` renders stills per language in the container (`tools/render/render.sh`), for

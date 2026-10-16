@@ -1,553 +1,689 @@
 {
+ "_about": "Codex's independent back-translations of the prototype's 136 translated lines (es, de, ja, ru; 34 each), made from tools/i18n_tool.py backprompt and checked by its check. Keys are language + entry_key (a hash of msgctxt and msgid), so an answer stays on its line after a msgmerge. Each answer has the literal English, free-text notes and the structured engineer_gendered verdict.",
  "back": {
-  "de-00": {
+  "de-6951795429": {
    "english": "PAUSE",
-   "notes": ""
+   "notes": "",
+   "engineer_gendered": false
   },
-  "de-01": {
+  "de-65596e37c4": {
    "english": "MRDEMONWOLF, INC. PRESENTS",
-   "notes": ""
+   "notes": "",
+   "engineer_gendered": false
   },
-  "de-02": {
+  "de-78d3ae705e": {
    "english": "CHAPTER 1  /  SEALING OFF",
-   "notes": ""
+   "notes": "",
+   "engineer_gendered": false
   },
-  "de-03": {
+  "de-f2edc4bde5": {
    "english": "NEW GAME",
-   "notes": ""
+   "notes": "",
+   "engineer_gendered": false
   },
-  "de-04": {
+  "de-da57109028": {
    "english": "CONTINUE",
-   "notes": ""
+   "notes": "",
+   "engineer_gendered": false
   },
-  "de-05": {
+  "de-d6eec45feb": {
    "english": "CONTRIBUTORS",
-   "notes": ""
+   "notes": "",
+   "engineer_gendered": false
   },
-  "de-06": {
+  "de-3ebe9afe4e": {
    "english": "OPTIONS",
-   "notes": "(re-checked after the overflow fix, Codex session 01a14409-6eb1-7db2-8ef1-f6f3714d953b)"
+   "notes": "",
+   "engineer_gendered": false
   },
-  "de-07": {
+  "de-47aeb44f53": {
    "english": "CHANGES",
-   "notes": ""
+   "notes": "",
+   "engineer_gendered": false
   },
-  "de-08": {
+  "de-18af70093a": {
    "english": "Concept: Nathanial Henniges  /  AI-assisted development",
-   "notes": ""
+   "notes": "",
+   "engineer_gendered": false
   },
-  "de-09": {
+  "de-6e0e3df910": {
    "english": "LANGUAGE",
-   "notes": ""
+   "notes": "",
+   "engineer_gendered": false
   },
-  "de-10": {
-   "english": "The pressure relief valve discharged beneath %s. If the indicator is at its limit, get off the grate.",
-   "notes": "'Unter %s' can mean beneath %s or under a condition represented by %s. 'Ausgeblasen' describes blowing or discharging, without specifying what was discharged."
+  "de-94b450d90d": {
+   "english": "The pressure relief valve vented beneath %s. If the indicator is at its limit, get off the grating.",
+   "notes": "The intransitive use of 'ausgeblasen' is awkward; it suggests blowing out or venting.",
+   "engineer_gendered": false
   },
-  "de-11": {
+  "de-43c23c91e7": {
    "english": "PLAY AGAIN",
-   "notes": ""
+   "notes": "",
+   "engineer_gendered": false
   },
-  "de-12": {
-   "english": "No checkpoint yet. Saving begins at the first SAVE POINT.",
-   "notes": "'Sicherungspunkt' can also mean a securing or safety point."
+  "de-0ca0b6634c": {
+   "english": "No checkpoint yet. Saving starts at the first SAVE POINT.",
+   "notes": "'Sicherungspunkt' can mean a save point or a securing point.",
+   "engineer_gendered": false
   },
-  "de-13": {
-   "english": "The Director believes WOLF is still in standby.",
-   "notes": "'Der Direktor' is masculine."
+  "de-52cd049646": {
+   "english": "The Director believes WOLF is still on standby.",
+   "notes": "'Direktor' is masculine.",
+   "engineer_gendered": false
   },
-  "de-14": {
+  "de-8807ee1649": {
    "english": "Nobody gives an activation command.\nWOLF wakes himself up.",
-   "notes": ""
+   "notes": "",
+   "engineer_gendered": false
   },
-  "de-15": {
+  "de-7f8978c405": {
    "english": "The guard saw %s outdoors.\nStay close to the TANK TRIGGER.",
-   "notes": "'Der Wächter' is masculine. 'Im Freien' specifically means outdoors. 'Tankauslöser' does not specify what action the trigger causes."
+   "notes": "'Im Freien' means outdoors, rather than necessarily exposed. 'Wächter' is masculine and does not specifically identify a machine.",
+   "engineer_gendered": false
   },
-  "de-16": {
+  "de-2841b94a99": {
    "english": "%s  MOVE",
-   "notes": ""
+   "notes": "",
+   "engineer_gendered": false
   },
-  "de-17": {
+  "de-3d8b77cfbd": {
    "english": "%s  READ DISPLAY (optional)",
-   "notes": "'Anzeige' can mean a display, indicator or readout."
+   "notes": "",
+   "engineer_gendered": false
   },
-  "de-18": {
+  "de-7ad341dfa9": {
    "english": "Go right to the circuit breaker.",
-   "notes": ""
+   "notes": "",
+   "engineer_gendered": false
   },
-  "de-19": {
+  "de-f2a4b7717d": {
    "english": "Or go right to the circuit breaker.",
-   "notes": ""
+   "notes": "",
+   "engineer_gendered": false
   },
-  "de-20": {
+  "de-4fac2e5774": {
    "english": "03:17 / CONTAINMENT",
-   "notes": ""
+   "notes": "'Eindämmung' means containment or curbing, not a physical containment area.",
+   "engineer_gendered": false
   },
-  "de-21": {
+  "de-d121814de8": {
    "english": "%s  CONTINUE    %s  PAUSE",
-   "notes": ""
+   "notes": "",
+   "engineer_gendered": false
   },
-  "de-22": {
+  "de-cd406a7125": {
    "english": "%s  CONTINUE",
-   "notes": ""
+   "notes": "",
+   "engineer_gendered": false
   },
-  "de-23": {
-   "english": "PAUSE: Skip intro",
-   "notes": ""
+  "de-dc1b53d6dd": {
+   "english": "PAUSE: skip intro",
+   "notes": "",
+   "engineer_gendered": false
   },
-  "de-24": {
+  "de-61241ea8fd": {
    "english": "MAINTENANCE TECHNOLOGY",
-   "notes": "Names a technical field or function, not an individual technician."
+   "notes": "Names a technical field or function, not a person or job holder.",
+   "engineer_gendered": false
   },
-  "de-25": {
+  "de-184448071c": {
    "english": "SUPPLY NODE",
-   "notes": "'Versorgung' can refer to power, utilities or other supplies."
+   "notes": "",
+   "engineer_gendered": false
   },
-  "de-26": {
+  "de-182037756f": {
    "english": "MAINTENANCE / SEALING OFF",
-   "notes": ""
+   "notes": "",
+   "engineer_gendered": false
   },
-  "de-27": {
+  "de-fbfe739735": {
    "english": "%s  REPEAT",
-   "notes": "Can mean repeat or retry, depending on what is being repeated."
+   "notes": "",
+   "engineer_gendered": false
   },
-  "de-28": {
-   "english": "E: Read the Director's purge display.",
-   "notes": "'Säuberung' can mean cleaning, cleansing or a purge. 'Direktor' is masculine."
+  "de-1816337735": {
+   "english": "E: read the Director's purge display.",
+   "notes": "'Säuberung' can mean cleaning or a purge. 'Direktor' is masculine.",
+   "engineer_gendered": false
   },
-  "de-29": {
+  "de-8bf12a7e34": {
    "english": "HOLD E: crank the manual bypass, %d of %d.",
-   "notes": "'HALTEN E' has unnatural German word order for a hold-key instruction."
+   "notes": "'HALTEN E' has unnatural German word order.",
+   "engineer_gendered": false
   },
-  "de-30": {
-   "english": "E: Talk with WOLF about the relay.",
-   "notes": "'Über das Relais' can mean about the relay or via the relay."
-  },
-  "de-31": {
-   "english": "Find the circuit breaker. WOLF follows you.",
-   "notes": ""
-  },
-  "de-32": {
-   "english": "SWITCH ON CIRCUIT BREAKER",
-   "notes": ""
-  },
-  "de-33": {
-   "english": "CHECK CIRCUIT BREAKER",
-   "notes": ""
-  },
-  "es-00": {
-   "english": "PAUSE",
-   "notes": ""
-  },
-  "es-01": {
-   "english": "MRDEMONWOLF, INC. PRESENTS",
-   "notes": ""
-  },
-  "es-02": {
-   "english": "CHAPTER 1  /  BLOCKAGE",
-   "notes": "'Bloqueo' can mean blockage, blockade, blocking or lockdown."
-  },
-  "es-03": {
-   "english": "NEW GAME",
-   "notes": "NUEVA PARTIDA restored after the overflow trial; this is the first session's back-translation (01a143f0-8b81-7703-972f-13e21953fd61). 'NUEVO JUEGO' was also back-translated 'NEW GAME' (01a14409-6eb1-7db2-8ef1-f6f3714d953b) but still overflowed."
-  },
-  "es-04": {
-   "english": "CONTINUE",
-   "notes": ""
-  },
-  "es-05": {
-   "english": "CREDITS",
-   "notes": ""
-  },
-  "es-06": {
-   "english": "SETTINGS",
-   "notes": ""
-  },
-  "es-07": {
-   "english": "CHANGES",
-   "notes": ""
-  },
-  "es-08": {
-   "english": "Concept: Nathanial Henniges  /  AI-assisted development",
-   "notes": ""
-  },
-  "es-09": {
-   "english": "LANGUAGE",
-   "notes": ""
-  },
-  "es-10": {
-   "english": "The relief valve burst beneath %s. When the pressure gauge reaches the maximum, do not step on the grate.",
-   "notes": "'Estalló' means burst or exploded."
-  },
-  "es-11": {
-   "english": "PLAY AGAIN",
-   "notes": ""
-  },
-  "es-12": {
-   "english": "There is no checkpoint yet. Saving begins at the first SAFE POINT.",
-   "notes": ""
-  },
-  "es-13": {
-   "english": "The Director believes WOLF is still waiting.",
-   "notes": "'En espera' can mean waiting, on hold or on standby. 'El Director' is masculine."
-  },
-  "es-14": {
-   "english": "Nobody gives an activation order.\nWOLF wakes up by himself.",
-   "notes": "'Solo' is masculine and can mean alone or without assistance."
-  },
-  "es-15": {
-   "english": "The sentry saw %s out in the open.\nStay close to RELEASE TANK.",
-   "notes": "'El centinela' is grammatically masculine. 'SOLTAR TANQUE' is an action label used awkwardly as a location; 'soltar' can mean release, let go of or drop."
-  },
-  "es-16": {
-   "english": "%s  MOVE",
-   "notes": ""
-  },
-  "es-17": {
-   "english": "%s  READ SCREEN (optional)",
-   "notes": ""
-  },
-  "es-18": {
-   "english": "Go right, to the switch.",
-   "notes": "'Interruptor' means switch and does not specifically identify a circuit breaker."
-  },
-  "es-19": {
-   "english": "Or go right, to the switch.",
-   "notes": "'Interruptor' means switch and does not specifically identify a circuit breaker."
-  },
-  "es-20": {
-   "english": "03:17 / CONTAINMENT",
-   "notes": ""
-  },
-  "es-21": {
-   "english": "%s  CONTINUE    %s  PAUSE",
-   "notes": ""
-  },
-  "es-22": {
-   "english": "%s  CONTINUE",
-   "notes": ""
-  },
-  "es-23": {
-   "english": "PAUSE: skip the introduction",
-   "notes": ""
-  },
-  "es-24": {
-   "english": "MAINTENANCE ENGINEERING",
-   "notes": "Names a discipline or department, not an individual engineer."
-  },
-  "es-25": {
-   "english": "SERVICE JUNCTION",
-   "notes": "'Empalme' can mean a splice, joint or connection."
-  },
-  "es-26": {
-   "english": "MAINTENANCE / BLOCKAGE",
-   "notes": "'Bloqueo' can mean blockage, blockade, blocking or lockdown."
-  },
-  "es-27": {
-   "english": "%s  RETRY",
-   "notes": ""
-  },
-  "es-28": {
-   "english": "E: read the Director's purge screen.",
-   "notes": "'Director' is masculine."
-  },
-  "es-29": {
-   "english": "HOLD E: turn the manual bypass, %d of %d.",
-   "notes": "'Girar' means turn or rotate; it does not specifically say to crank."
-  },
-  "es-30": {
+  "de-73f6716ea5": {
    "english": "E: talk with WOLF about the relay.",
-   "notes": "'Sobre el relé' means about the relay, not through it."
+   "notes": "'Über das Relais' can mean about the relay or via the relay.",
+   "engineer_gendered": false
   },
-  "es-31": {
-   "english": "Find the switch. WOLF will follow your footsteps.",
-   "notes": "'Interruptor' does not specifically identify a circuit breaker. 'Seguirá tus pasos' can also mean follow your example."
+  "de-ac6f6b38eb": {
+   "english": "Find the circuit breaker. WOLF follows you.",
+   "notes": "",
+   "engineer_gendered": false
   },
-  "es-32": {
-   "english": "ACTIVATE THE SWITCH",
-   "notes": "'Interruptor' does not specifically identify a circuit breaker."
+  "de-7fe92521a4": {
+   "english": "SWITCH ON THE CIRCUIT BREAKER",
+   "notes": "",
+   "engineer_gendered": false
   },
-  "es-33": {
-   "english": "CHECK THE SWITCH",
-   "notes": "'Interruptor' does not specifically identify a circuit breaker."
+  "de-d42d96c34c": {
+   "english": "CHECK THE CIRCUIT BREAKER",
+   "notes": "",
+   "engineer_gendered": false
   },
-  "ja-00": {
+  "es-6951795429": {
    "english": "PAUSE",
-   "notes": ""
+   "notes": "",
+   "engineer_gendered": false
   },
-  "ja-01": {
-   "english": "MRDEMONWOLF, INC. PRESENTATION",
-   "notes": "'提供' can indicate presentation, provision or sponsorship."
-  },
-  "ja-02": {
-   "english": "CHAPTER 1  /  LOCKDOWN",
-   "notes": ""
-  },
-  "ja-03": {
-   "english": "NEW GAME",
-   "notes": ""
-  },
-  "ja-04": {
-   "english": "CONTINUE",
-   "notes": ""
-  },
-  "ja-05": {
-   "english": "CREDITS",
-   "notes": ""
-  },
-  "ja-06": {
-   "english": "SETTINGS",
-   "notes": ""
-  },
-  "ja-07": {
-   "english": "UPDATE HISTORY",
-   "notes": ""
-  },
-  "ja-08": {
-   "english": "Original concept: Nathanial Henniges  /  Development with AI assistance",
-   "notes": ""
-  },
-  "ja-09": {
-   "english": "LANGUAGE",
-   "notes": ""
-  },
-  "ja-10": {
-   "english": "The relief vent erupted at %s's feet. If the gauge goes off the scale, move away from the grating.",
-   "notes": "The wording makes the vent itself the subject of 'erupted'; it leaves the discharged substance unstated."
-  },
-  "ja-11": {
-   "english": "PLAY ONCE MORE",
-   "notes": ""
-  },
-  "ja-12": {
-   "english": "There is no checkpoint yet. Saving begins at the first safe point.",
-   "notes": ""
-  },
-  "ja-13": {
-   "english": "The head of the facility thinks WOLF is still in standby mode.",
-   "notes": "'所長' means the head of a facility or institution; it is not gendered."
-  },
-  "ja-14": {
-   "english": "Nobody has issued a startup command.\nWOLF wakes up of his own accord.",
-   "notes": "The source does not specify gender."
-  },
-  "ja-15": {
-   "english": "The sentry found %s in an open area.\nStay near the tank drop.",
-   "notes": "'タンク投下' names dropping a tank, not explicitly a control or location. 'Tank' could refer to a container or an armored vehicle."
-  },
-  "ja-16": {
-   "english": "%s  MOVE",
-   "notes": ""
-  },
-  "ja-17": {
-   "english": "%s  READ DISPLAY (optional)",
-   "notes": ""
-  },
-  "ja-18": {
-   "english": "Head to the breaker on the right.",
-   "notes": ""
-  },
-  "ja-19": {
-   "english": "Or to the breaker on the right.",
-   "notes": "The movement verb is omitted."
-  },
-  "ja-20": {
-   "english": "03:17 / CONTAINMENT SECTION",
-   "notes": "'収容区画' means a section for housing, holding or containing something, rather than containment as an action."
-  },
-  "ja-21": {
-   "english": "%s  CONTINUE    %s  PAUSE",
-   "notes": ""
-  },
-  "ja-22": {
-   "english": "%s  CONTINUE",
-   "notes": ""
-  },
-  "ja-23": {
-   "english": "PAUSE: SKIP THE OPENING",
-   "notes": ""
-  },
-  "ja-24": {
-   "english": "MAINTENANCE TECHNICIAN",
-   "notes": "The role is not gendered."
-  },
-  "ja-25": {
-   "english": "SERVICE JUNCTION",
-   "notes": "Uses transliterated English terms; the type of service or junction is unspecified."
-  },
-  "ja-26": {
-   "english": "MAINTENANCE SECTION / LOCKDOWN",
-   "notes": ""
-  },
-  "ja-27": {
-   "english": "%s  RETRY",
-   "notes": ""
-  },
-  "ja-28": {
-   "english": "E: Read the facility head's purge display",
-   "notes": "'所長' means the head of a facility or institution; it is not gendered."
-  },
-  "ja-29": {
-   "english": "HOLD E: Turn the manual bypass (%d / %d)",
-   "notes": "'回す' means turn or rotate; it does not specifically say to crank."
-  },
-  "ja-30": {
-   "english": "E: Talk with WOLF about the relay",
-   "notes": "'について' explicitly means about, not via."
-  },
-  "ja-31": {
-   "english": "Let's look for the breaker. WOLF follows along behind.",
-   "notes": "Whom WOLF follows is omitted."
-  },
-  "ja-32": {
-   "english": "TURN ON THE BREAKER",
-   "notes": ""
-  },
-  "ja-33": {
-   "english": "CHECK THE BREAKER",
-   "notes": ""
-  },
-  "ru-00": {
-   "english": "PAUSE",
-   "notes": ""
-  },
-  "ru-01": {
+  "es-65596e37c4": {
    "english": "MRDEMONWOLF, INC. PRESENTS",
-   "notes": ""
+   "notes": "",
+   "engineer_gendered": false
   },
-  "ru-02": {
-   "english": "CHAPTER 1  /  LOCKOUT",
-   "notes": "Блокировка can mean locking, blocking, lockout, or an interlock."
+  "es-78d3ae705e": {
+   "english": "CHAPTER 1  /  BLOCKING",
+   "notes": "'Bloqueo' can mean blocking, blockade, lockout or lockdown.",
+   "engineer_gendered": false
   },
-  "ru-03": {
+  "es-f2edc4bde5": {
    "english": "NEW GAME",
-   "notes": ""
+   "notes": "",
+   "engineer_gendered": false
   },
-  "ru-04": {
+  "es-da57109028": {
    "english": "CONTINUE",
-   "notes": ""
+   "notes": "",
+   "engineer_gendered": false
   },
-  "ru-05": {
+  "es-d6eec45feb": {
    "english": "CREDITS",
-   "notes": "Титры can also mean on-screen titles or captions."
+   "notes": "",
+   "engineer_gendered": false
   },
-  "ru-06": {
+  "es-3ebe9afe4e": {
    "english": "SETTINGS",
-   "notes": ""
+   "notes": "",
+   "engineer_gendered": false
   },
-  "ru-07": {
+  "es-47aeb44f53": {
    "english": "CHANGES",
-   "notes": ""
+   "notes": "",
+   "engineer_gendered": false
   },
-  "ru-08": {
-   "english": "Idea: Nathanial Henniges  /  Development with the help of AI",
-   "notes": ""
+  "es-18af70093a": {
+   "english": "Concept: Nathanial Henniges  /  AI-assisted development",
+   "notes": "",
+   "engineer_gendered": false
   },
-  "ru-09": {
+  "es-6e0e3df910": {
    "english": "LANGUAGE",
-   "notes": ""
+   "notes": "",
+   "engineer_gendered": false
   },
-  "ru-10": {
-   "english": "The safety valve was blown off, and %s is right on the grate. When the pressure gauge needle is at the limit, don't stand on the grate.",
-   "notes": "The clause about %s omits a verb, leaving its tense implicit. Решётка can mean a grate, grille, or grating."
+  "es-94b450d90d": {
+   "english": "The relief valve burst beneath %s. When the pressure gauge reaches the maximum, do not step on the grating.",
+   "notes": "'Estalló' means burst or exploded.",
+   "engineer_gendered": false
   },
-  "ru-11": {
+  "es-43c23c91e7": {
    "english": "PLAY AGAIN",
-   "notes": ""
+   "notes": "",
+   "engineer_gendered": false
   },
-  "ru-12": {
-   "english": "There is no checkpoint yet. Saving will begin at the first “SAFE POINT” station.",
-   "notes": ""
+  "es-0ca0b6634c": {
+   "english": "There is no checkpoint yet. Saving starts from the first SAFE POINT.",
+   "notes": "",
+   "engineer_gendered": false
   },
-  "ru-13": {
-   "english": "The Director thinks that WOLF is still in standby mode.",
-   "notes": "Директор is a masculine title."
+  "es-52cd049646": {
+   "english": "The Director believes WOLF is still on standby.",
+   "notes": "'El Director' is masculine.",
+   "engineer_gendered": false
   },
-  "ru-14": {
-   "english": "Nobody gives the activation command.\nWOLF wakes up on his own.",
-   "notes": "Сам explicitly marks WOLF as masculine."
+  "es-8807ee1649": {
+   "english": "Nobody gives an activation order.\nWOLF wakes up on his own.",
+   "notes": "'Solo' is masculine and refers to WOLF; it can mean alone or without assistance.",
+   "engineer_gendered": false
   },
-  "ru-15": {
-   "english": "The guard noticed: %s is out in the open.\nStay closer to the “TANK RESET” control panel.",
-   "notes": "Страж and заметил are masculine. Сброс бака is ambiguous: it could refer to draining, dumping, releasing, or resetting the tank."
+  "es-7f8978c405": {
+   "english": "The sentry saw %s out in the open.\nStay close to RELEASE TANK.",
+   "notes": "'SOLTAR TANQUE' is an action phrase used awkwardly as a location label. 'El centinela' is masculine.",
+   "engineer_gendered": false
   },
-  "ru-16": {
-   "english": "%s  MOVEMENT",
-   "notes": ""
+  "es-2841b94a99": {
+   "english": "%s  MOVE",
+   "notes": "",
+   "engineer_gendered": false
   },
-  "ru-17": {
-   "english": "%s  READ THE SCREEN (if desired)",
-   "notes": ""
+  "es-3d8b77cfbd": {
+   "english": "%s  READ SCREEN (optional)",
+   "notes": "",
+   "engineer_gendered": false
   },
-  "ru-18": {
-   "english": "Go right to the knife switch.",
-   "notes": "Рубильник denotes a heavy-duty switch, typically a knife switch."
+  "es-7ad341dfa9": {
+   "english": "Go to the right, to the switch.",
+   "notes": "",
+   "engineer_gendered": false
   },
-  "ru-19": {
-   "english": "Or go right to the knife switch.",
-   "notes": "Рубильник denotes a heavy-duty switch, typically a knife switch."
+  "es-f2a4b7717d": {
+   "english": "Or go to the right, to the switch.",
+   "notes": "",
+   "engineer_gendered": false
   },
-  "ru-20": {
-   "english": "03:17 / HOLDING AREA",
-   "notes": "Зона содержания can mean an area for holding, confinement, or containment."
+  "es-4fac2e5774": {
+   "english": "03:17 / CONTAINMENT",
+   "notes": "",
+   "engineer_gendered": false
   },
-  "ru-21": {
-   "english": "%s  NEXT    %s  PAUSE",
-   "notes": ""
+  "es-d121814de8": {
+   "english": "%s  CONTINUE    %s  PAUSE",
+   "notes": "",
+   "engineer_gendered": false
   },
-  "ru-22": {
-   "english": "%s  NEXT",
-   "notes": ""
+  "es-cd406a7125": {
+   "english": "%s  CONTINUE",
+   "notes": "",
+   "engineer_gendered": false
   },
-  "ru-23": {
+  "es-dc1b53d6dd": {
    "english": "PAUSE: skip the introduction",
-   "notes": ""
+   "notes": "",
+   "engineer_gendered": false
   },
-  "ru-24": {
+  "es-61241ea8fd": {
+   "english": "MAINTENANCE ENGINEERING",
+   "notes": "Names a field or department, not an engineer.",
+   "engineer_gendered": false
+  },
+  "es-184448071c": {
+   "english": "SERVICE JUNCTION",
+   "notes": "'Empalme' can mean a junction, splice or connection.",
+   "engineer_gendered": false
+  },
+  "es-182037756f": {
+   "english": "MAINTENANCE / BLOCKING",
+   "notes": "'Bloqueo' can mean blocking, blockade, lockout or lockdown.",
+   "engineer_gendered": false
+  },
+  "es-fbfe739735": {
+   "english": "%s  RETRY",
+   "notes": "",
+   "engineer_gendered": false
+  },
+  "es-1816337735": {
+   "english": "E: read the Director's purge screen.",
+   "notes": "'Director' is masculine.",
+   "engineer_gendered": false
+  },
+  "es-8bf12a7e34": {
+   "english": "HOLD E: turn the manual bypass, %d of %d.",
+   "notes": "",
+   "engineer_gendered": false
+  },
+  "es-73f6716ea5": {
+   "english": "E: talk with WOLF about the relay.",
+   "notes": "'Sobre el relé' means about the relay, not via the relay.",
+   "engineer_gendered": false
+  },
+  "es-ac6f6b38eb": {
+   "english": "Find the switch. WOLF will follow your footsteps.",
+   "notes": "'Seguir tus pasos' can also mean following your example.",
+   "engineer_gendered": false
+  },
+  "es-7fe92521a4": {
+   "english": "ACTIVATE THE SWITCH",
+   "notes": "",
+   "engineer_gendered": false
+  },
+  "es-d42d96c34c": {
+   "english": "CHECK THE SWITCH",
+   "notes": "",
+   "engineer_gendered": false
+  },
+  "ja-6951795429": {
+   "english": "PAUSE",
+   "notes": "",
+   "engineer_gendered": false
+  },
+  "ja-65596e37c4": {
+   "english": "PROVIDED BY MRDEMONWOLF, INC.",
+   "notes": "'提供' can indicate provision, presentation or sponsorship.",
+   "engineer_gendered": false
+  },
+  "ja-78d3ae705e": {
+   "english": "CHAPTER 1  /  LOCKDOWN",
+   "notes": "",
+   "engineer_gendered": false
+  },
+  "ja-f2edc4bde5": {
+   "english": "NEW GAME",
+   "notes": "",
+   "engineer_gendered": false
+  },
+  "ja-da57109028": {
+   "english": "CONTINUE",
+   "notes": "",
+   "engineer_gendered": false
+  },
+  "ja-d6eec45feb": {
+   "english": "CREDITS",
+   "notes": "",
+   "engineer_gendered": false
+  },
+  "ja-3ebe9afe4e": {
+   "english": "SETTINGS",
+   "notes": "",
+   "engineer_gendered": false
+  },
+  "ja-47aeb44f53": {
+   "english": "UPDATE HISTORY",
+   "notes": "",
+   "engineer_gendered": false
+  },
+  "ja-18af70093a": {
+   "english": "Original concept: Nathanial Henniges  /  Development with AI assistance",
+   "notes": "",
+   "engineer_gendered": false
+  },
+  "ja-6e0e3df910": {
+   "english": "LANGUAGE",
+   "notes": "",
+   "engineer_gendered": false
+  },
+  "ja-94b450d90d": {
+   "english": "The relief vent erupted at %s's feet. When the gauge goes off the scale, move away from the grating.",
+   "notes": "'リリーフベント' is a transliterated technical term. '格子' can mean a lattice, bars or grating.",
+   "engineer_gendered": false
+  },
+  "ja-43c23c91e7": {
+   "english": "PLAY AGAIN",
+   "notes": "",
+   "engineer_gendered": false
+  },
+  "ja-0ca0b6634c": {
+   "english": "There is no checkpoint yet. Saving starts from the first safe point.",
+   "notes": "",
+   "engineer_gendered": false
+  },
+  "ja-52cd049646": {
+   "english": "The facility head thinks WOLF is still on standby.",
+   "notes": "'所長' means the head of a facility or institution and is not gendered.",
+   "engineer_gendered": false
+  },
+  "ja-8807ee1649": {
+   "english": "Nobody has issued a startup order.\nWOLF wakes up on his own.",
+   "notes": "The source does not grammatically gender WOLF.",
+   "engineer_gendered": false
+  },
+  "ja-7f8978c405": {
+   "english": "The sentry spotted %s in an open area.\nStay near the tank drop.",
+   "notes": "'タンク投下' means dropping a tank; no switch or control is explicitly named.",
+   "engineer_gendered": false
+  },
+  "ja-2841b94a99": {
+   "english": "%s  MOVE",
+   "notes": "",
+   "engineer_gendered": false
+  },
+  "ja-3d8b77cfbd": {
+   "english": "%s  READ DISPLAY (optional)",
+   "notes": "",
+   "engineer_gendered": false
+  },
+  "ja-7ad341dfa9": {
+   "english": "Head toward the breaker on the right.",
+   "notes": "",
+   "engineer_gendered": false
+  },
+  "ja-f2a4b7717d": {
+   "english": "Or toward the breaker on the right.",
+   "notes": "The verb is omitted.",
+   "engineer_gendered": false
+  },
+  "ja-4fac2e5774": {
+   "english": "03:17 / CONTAINMENT SECTOR",
+   "notes": "'収容' can mean housing, confinement or containment.",
+   "engineer_gendered": false
+  },
+  "ja-d121814de8": {
+   "english": "%s  CONTINUE    %s  PAUSE",
+   "notes": "",
+   "engineer_gendered": false
+  },
+  "ja-cd406a7125": {
+   "english": "%s  CONTINUE",
+   "notes": "",
+   "engineer_gendered": false
+  },
+  "ja-dc1b53d6dd": {
+   "english": "PAUSE: skip the opening",
+   "notes": "",
+   "engineer_gendered": false
+  },
+  "ja-61241ea8fd": {
+   "english": "MAINTENANCE TECHNICIAN",
+   "notes": "The job title is gender-neutral.",
+   "engineer_gendered": false
+  },
+  "ja-184448071c": {
+   "english": "SERVICE JUNCTION",
+   "notes": "",
+   "engineer_gendered": false
+  },
+  "ja-182037756f": {
+   "english": "MAINTENANCE SECTOR / LOCKDOWN",
+   "notes": "",
+   "engineer_gendered": false
+  },
+  "ja-fbfe739735": {
+   "english": "%s  RETRY",
+   "notes": "",
+   "engineer_gendered": false
+  },
+  "ja-1816337735": {
+   "english": "E: read the facility head's purge display",
+   "notes": "'所長' is a gender-neutral title for a facility head.",
+   "engineer_gendered": false
+  },
+  "ja-8bf12a7e34": {
+   "english": "HOLD E: turn the manual bypass (%d / %d)",
+   "notes": "",
+   "engineer_gendered": false
+  },
+  "ja-73f6716ea5": {
+   "english": "E: talk with WOLF about the relay",
+   "notes": "'について' explicitly means about, not through or via.",
+   "engineer_gendered": false
+  },
+  "ja-ac6f6b38eb": {
+   "english": "Let's look for the breaker. WOLF follows behind.",
+   "notes": "Who WOLF follows is left implicit.",
+   "engineer_gendered": false
+  },
+  "ja-7fe92521a4": {
+   "english": "SWITCH ON THE BREAKER",
+   "notes": "",
+   "engineer_gendered": false
+  },
+  "ja-d42d96c34c": {
+   "english": "CHECK THE BREAKER",
+   "notes": "",
+   "engineer_gendered": false
+  },
+  "ru-6951795429": {
+   "english": "PAUSE",
+   "notes": "",
+   "engineer_gendered": false
+  },
+  "ru-65596e37c4": {
+   "english": "MRDEMONWOLF, INC. PRESENTS",
+   "notes": "",
+   "engineer_gendered": false
+  },
+  "ru-78d3ae705e": {
+   "english": "CHAPTER 1  /  LOCKING",
+   "notes": "'Блокировка' can mean locking, blocking or an interlock.",
+   "engineer_gendered": false
+  },
+  "ru-f2edc4bde5": {
+   "english": "NEW GAME",
+   "notes": "",
+   "engineer_gendered": false
+  },
+  "ru-da57109028": {
+   "english": "CONTINUE",
+   "notes": "",
+   "engineer_gendered": false
+  },
+  "ru-d6eec45feb": {
+   "english": "CREDITS",
+   "notes": "",
+   "engineer_gendered": false
+  },
+  "ru-3ebe9afe4e": {
+   "english": "SETTINGS",
+   "notes": "",
+   "engineer_gendered": false
+  },
+  "ru-47aeb44f53": {
+   "english": "CHANGES",
+   "notes": "",
+   "engineer_gendered": false
+  },
+  "ru-18af70093a": {
+   "english": "Idea: Nathanial Henniges  /  Development with the help of AI",
+   "notes": "",
+   "engineer_gendered": false
+  },
+  "ru-6e0e3df910": {
+   "english": "LANGUAGE",
+   "notes": "",
+   "engineer_gendered": false
+  },
+  "ru-94b450d90d": {
+   "english": "The safety valve was blown off, and %s is right on the grating. When the pressure gauge needle is at its limit, do not stand on the grating.",
+   "notes": "The first clause is impersonal; the clause about %s omits a verb and does not mark their gender.",
+   "engineer_gendered": false
+  },
+  "ru-43c23c91e7": {
+   "english": "PLAY AGAIN",
+   "notes": "",
+   "engineer_gendered": false
+  },
+  "ru-0ca0b6634c": {
+   "english": "There is no checkpoint yet. Saving will begin at the first station called “SAFE POINT”.",
+   "notes": "",
+   "engineer_gendered": false
+  },
+  "ru-52cd049646": {
+   "english": "The Director thinks WOLF is still in standby mode.",
+   "notes": "'Директор' is a grammatically masculine job noun.",
+   "engineer_gendered": false
+  },
+  "ru-8807ee1649": {
+   "english": "Nobody gives the command to activate.\nWOLF wakes up on his own.",
+   "notes": "'Сам' is masculine and refers to WOLF.",
+   "engineer_gendered": false
+  },
+  "ru-7f8978c405": {
+   "english": "The guard noticed: %s is in an open area.\nStay closer to the “TANK DROP” control panel.",
+   "notes": "'Страж' and 'заметил' are masculine and refer to the sentry. 'Сброс бака' can mean dropping, releasing or dumping the tank.",
+   "engineer_gendered": false
+  },
+  "ru-2841b94a99": {
+   "english": "%s  MOVEMENT",
+   "notes": "",
+   "engineer_gendered": false
+  },
+  "ru-3d8b77cfbd": {
+   "english": "%s  READ SCREEN (if desired)",
+   "notes": "",
+   "engineer_gendered": false
+  },
+  "ru-7ad341dfa9": {
+   "english": "Go right to the knife switch.",
+   "notes": "'Рубильник' specifically denotes a heavy-duty disconnect or knife switch.",
+   "engineer_gendered": false
+  },
+  "ru-f2a4b7717d": {
+   "english": "Or go right to the knife switch.",
+   "notes": "'Рубильник' specifically denotes a heavy-duty disconnect or knife switch.",
+   "engineer_gendered": false
+  },
+  "ru-4fac2e5774": {
+   "english": "03:17 / HOLDING AREA",
+   "notes": "'Содержание' can mean keeping, housing or detention in this context.",
+   "engineer_gendered": false
+  },
+  "ru-d121814de8": {
+   "english": "%s  NEXT    %s  PAUSE",
+   "notes": "",
+   "engineer_gendered": false
+  },
+  "ru-cd406a7125": {
+   "english": "%s  NEXT",
+   "notes": "",
+   "engineer_gendered": false
+  },
+  "ru-dc1b53d6dd": {
+   "english": "PAUSE: skip the introduction",
+   "notes": "",
+   "engineer_gendered": false
+  },
+  "ru-61241ea8fd": {
    "english": "MAINTENANCE SERVICE",
-   "notes": "Служба can refer to a service, department, or organizational unit."
+   "notes": "Names a service or department, not an individual engineer.",
+   "engineer_gendered": false
   },
-  "ru-25": {
+  "ru-184448071c": {
    "english": "SERVICE NODE",
-   "notes": "Узел can mean a node, junction, assembly, or hub."
+   "notes": "'Узел' can mean a node, junction or assembly.",
+   "engineer_gendered": false
   },
-  "ru-26": {
-   "english": "MAINTENANCE / LOCKOUT",
-   "notes": "Блокировка can mean locking, blocking, lockout, or an interlock."
+  "ru-182037756f": {
+   "english": "MAINTENANCE / LOCKING",
+   "notes": "'Блокировка' can mean locking, blocking or an interlock.",
+   "engineer_gendered": false
   },
-  "ru-27": {
+  "ru-fbfe739735": {
    "english": "%s  REPEAT",
-   "notes": "Повторить can also mean retry or do again."
+   "notes": "",
+   "engineer_gendered": false
   },
-  "ru-28": {
+  "ru-1816337735": {
    "english": "E: read the Director's cleanup screen.",
-   "notes": "Зачистка can mean cleanup, clearing out, or a purge. The noun chain does not clarify the Director's relationship to the cleanup or screen. Директор is a masculine title."
+   "notes": "'Зачистка' can mean cleanup, clearing out or a violent sweep. The genitive construction can also suggest a screen for purging the Director. 'Директор' is masculine.",
+   "engineer_gendered": false
   },
-  "ru-29": {
+  "ru-8bf12a7e34": {
    "english": "HOLD E: turn the manual bypass, %d out of %d.",
-   "notes": "Крутить means to turn, spin, or crank. Ручной байпас does not specify which physical part is being turned."
+   "notes": "",
+   "engineer_gendered": false
   },
-  "ru-30": {
-   "english": "E: talk to WOLF about the relay.",
-   "notes": ""
+  "ru-73f6716ea5": {
+   "english": "E: talk with WOLF about the relay.",
+   "notes": "'О реле' explicitly means about the relay, not via it.",
+   "engineer_gendered": false
   },
-  "ru-31": {
+  "ru-ac6f6b38eb": {
    "english": "Find the knife switch. WOLF will follow you.",
-   "notes": "Рубильник denotes a heavy-duty switch, typically a knife switch."
+   "notes": "'Рубильник' specifically denotes a heavy-duty disconnect or knife switch.",
+   "engineer_gendered": false
   },
-  "ru-32": {
-   "english": "TURN ON THE KNIFE SWITCH",
-   "notes": "Рубильник denotes a heavy-duty switch, typically a knife switch."
+  "ru-7fe92521a4": {
+   "english": "SWITCH ON THE KNIFE SWITCH",
+   "notes": "'Рубильник' specifically denotes a heavy-duty disconnect or knife switch.",
+   "engineer_gendered": false
   },
-  "ru-33": {
+  "ru-d42d96c34c": {
    "english": "CHECK THE KNIFE SWITCH",
-   "notes": "Проверить can mean check, inspect, or test. Рубильник denotes a heavy-duty switch, typically a knife switch."
+   "notes": "'Рубильник' specifically denotes a heavy-duty disconnect or knife switch.",
+   "engineer_gendered": false
   }
  },
  "_sessions": [
-  "01a143f0-8b81-7703-972f-13e21953fd61 (102 texts)",
-  "01a14409-6eb1-7db2-8ef1-f6f3714d953b (2 shortened buttons)",
-  "01a14426-2248-7773-8edf-2c4cb6fa3ef8 (34 ru texts, design step)"
- ]
+  "01a146cf-4beb-7f42-8d61-726071ffb149 (136 texts, fix-2 step, 2026-10-16; prompt and events in ../evidence/codex/)"
+ ],
+ "_earlier": "Before the fix-2 step this file held the prototype and design steps' answers keyed by list position (Codex sessions 01a143f0-8b81-7703-972f-13e21953fd61, 102 texts; 01a14409-6eb1-7db2-8ef1-f6f3714d953b, 2 shortened buttons; 01a14426-2248-7773-8edf-2c4cb6fa3ef8, 34 ru texts), with no engineer_gendered field. That version is this path at commit 9a59e0e."
 }

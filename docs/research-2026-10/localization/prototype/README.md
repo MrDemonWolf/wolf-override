@@ -30,10 +30,10 @@ and Polish work the same way as es and de.
 | Settings has a LANGUAGE row. The game starts in the OS language and falls back to English | `tests/i18n_test.gd` (resolver and picker checks) |
 | The PO files load at runtime with no import step | the same suite |
 | Text is translated where it is drawn, and redraws when the language changes: the title, a narration box, the name card, the location card, a hint, a knockdown card with the engineer's name, and the RETRY prompt | the same suite, in es, de, ja and ru |
-| Every translation passes the pipeline's gates, and broken copies fail them | `evidence/po_check.json`; `evidence/po_check_negative_control.json` (es); `evidence/po_check_negative_control_ru.json` (ru); `evidence/po_check_negative_control_gender.json` (ru and es, the engineer gendered); `evidence/gate_selftest.json` (named placeholders, gender, plural forms) |
+| Every translation passes the pipeline's gates, and broken copies fail them | `evidence/po_check.json`; `evidence/po_check_negative_control.json` (es); `evidence/po_check_negative_control_ru.json` (ru); `evidence/po_check_negative_control_gender.json` (ru and es, the engineer gendered); `evidence/po_check_negative_control_fix2.json` ("you" lines, pronouns, the name case and a sibling `es_ES` file); `evidence/gate_selftest.json` (54 planted cases) |
 | A subset Noto Sans JP fallback draws all the Japanese | the glyph checks; 0 tofu in the render audits |
 | Russian needs no fallback font: Roboto and Montserrat draw every Cyrillic character, and the line height stays 21 px at 17 px | the suite's "Russian chains no fallback" checks |
-| The Russian knockdown card keeps the name in the nominative and shows no gender | the suite; the back-translation notes in `translations/codex_back.json` |
+| The Russian knockdown card keeps the name in the nominative and shows no gender | the suite; the gender and name-case gates and Codex's `engineer_gendered: false` in `evidence/po_check.json` |
 | Godot's pseudolocalization reaches the whole game | the suite; the pseudo stills |
 | The game's other 24 suites still pass | `evidence/logs/check-game-results.txt` (prototype step: 25 of 25); `evidence/logs/check-game-results-ru.txt` (design step: 24 of 24 with Russian; see "Headless checks") |
 
@@ -77,6 +77,13 @@ Details and reasons are in DESIGN.md. In short:
 | Gate failures | 0 of 102 | 0 of 34 |
 | Drift flags | 2, both es ("interruptor" reads as "switch") | 0 |
 | Mean chrF | es 77.1, de 70.5, ja 77.4 | 64.0 |
+
+**Re-run by the fix-2 step** with its gates and a new back-translation of all 136 lines (Codex session
+`01a146cf-4beb-7f42-8d61-726071ffb149`, which also answers `engineer_gendered` and knows who speaks and
+how the engineer appears in each line): 0 gate failures in any language; `engineer_gendered` false on
+all 136; drift flags es 2 (the same two), ja 1 and ru 1, both literal round trips of correct lines; mean
+chrF es 77.4, de 71.3, ja 78.3, ru 62.4. That run's answers replaced the earlier ones in
+`translations/codex_back.json`.
 
 **Fixed after the overflow gate:** de SETTINGS changed from EINSTELLUNGEN to OPTIONEN. Codex session
 `01a14409-6eb1-7db2-8ef1-f6f3714d953b` back-translated the new word.
@@ -231,27 +238,33 @@ this record.
   - edits to `main.gd`, `game_settings.gd`, `junction_room.gd`, `dialogue_boxes.gd` and
     `project.godot`.
 - **`evidence/messages.pot`:** the generated POT.
-- **`evidence/po_check*.json`:** the gate reports, and the three negative controls. `po_check.json` was
-  re-run by the fix step with the gender, plural and line-break gates added: the same 0 failures and 2 es
-  drift flags as the as-run report.
-- **`evidence/gate_selftest.json`:** `i18n_tool.py selftest`, the fixed planted cases for the gates no
-  prototype msgid exercises yet.
+- **`evidence/po_check*.json`:** the gate report and the four negative controls, all re-run by the fix-2
+  step with its tool (PIPELINE.md lists each planted error). The earlier versions are these paths at
+  commit 9a59e0e.
+- **`evidence/gate_selftest.json`:** `i18n_tool.py selftest`, 54 fixed planted cases, mostly for the gates
+  no prototype msgid exercises yet.
 - **`evidence/hardcoded.json`:** the shown strings still missing from the POT, by file and line.
 - **`evidence/codex/`:** the Codex prompts and their JSON event streams (the prototype step's two, the
-  design step's `*_ru.*`).
+  design step's `*_ru.*`, the fix-2 step's `*_fix2.*`).
 - **`evidence/logs/`:** the POT run, the suite logs and results, and the four render logs that made the
   filed stills.
   - They are filed as `.txt`, because the repository ignores `*.log` under `docs/`. The research-godot
     step's measurement logs in `../godot/evidence/` are `.txt` for the same reason.
   - The scratch paths are shortened to `<scratch>`.
-- **`translations/claude.json`:** the sample translations, with a context note per line and the
-  revision notes.
-- **`translations/codex_back.json`:** the back-translations, with their session ids.
+- **`translations/claude.json`:** the sample translations, with a context note and the `#. i18n:` marks
+  per line, and the revision notes.
+- **`translations/codex_back.json`:** the fix-2 step's 136 back-translations, keyed by language and
+  `entry_key`, with the session id. The earlier position-keyed answers are this path at commit 9a59e0e.
 - **`tools/i18n_tool.py`:**
   - Its subcommands are `potfiles`, `subset`, `fill`, `backprompt`, `check`, `selftest` and `hardcoded`.
   - The fix step added the engineer-gender gate (with the back-translation's `engineer_gendered` field),
     the plural-form gate over every `msgstr[n]`, the `keep-breaks` line-break rule, named placeholders
     (in `trial.py`) and `selftest`. The as-run version is at commit 65a6db7.
+  - The fix-2 step moved every per-language fact into `tools/languages.json`, the one table the tool
+    reads; made the gender gate read each line's `#. i18n:` marks ("you" lines, pronouns, the vocative);
+    added the name-case, BBCode and sibling-file gates and printf-width placeholders (in `trial.py`);
+    keyed the back-translations by message; made `potfiles` walk every folder; and made `check` exit 1
+    on any failure. The version before it is at commit 9a59e0e.
   - It imports `../pipeline/tools/trial.py` for the pipeline step's measures; nothing is copied.
   - The design step added the Russian plural rule, plural-form counts from it, and the script guard
     ported from ConPaws.
@@ -267,7 +280,7 @@ this record.
 ```sh
 bash tools/heavy.sh bash tools/extract_pot.sh ROOT evidence/messages.pot LOGS
 python3 -I -B tools/i18n_tool.py fill evidence/messages.pot translations/claude.json ROOT/apps/game/i18n
-python3 -I -B tools/i18n_tool.py backprompt PODIR PROMPT   # then: codex exec --sandbox read-only - < PROMPT
+python3 -I -B tools/i18n_tool.py backprompt PODIR PROMPT   # then: codex exec --sandbox read-only --skip-git-repo-check --json - < PROMPT
 python3 -I -B tools/i18n_tool.py check evidence/messages.pot ROOT/apps/game/i18n translations/codex_back.json OUT.json
 python3 -I -B tools/i18n_tool.py selftest OUT.json
 python3 -I -B tools/i18n_tool.py hardcoded evidence/messages.pot ../strings-inventory.json OUT.json
@@ -296,6 +309,7 @@ python3 -I -B tools/i18n_tool.py hardcoded evidence/messages.pot ../strings-inve
 - `01a143f0-8b81-7703-972f-13e21953fd61`
 - `01a14409-6eb1-7db2-8ef1-f6f3714d953b`
 - `01a14426-2248-7773-8edf-2c4cb6fa3ef8`
+- `01a146cf-4beb-7f42-8d61-726071ffb149` (fix-2 step)
 
 **Sources:**
 - Godot 4.7.2-stable source, as cited in DESIGN.md.

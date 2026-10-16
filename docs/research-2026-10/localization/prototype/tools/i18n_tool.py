@@ -5,54 +5,67 @@ Purpose
     Every step of the prototype that is not a Godot run lives here once, as a subcommand:
 
     potfiles GAME             prints project.godot's translations_pot_files line for GAME (apps/game):
-                              every scene and script the player can meet (tests, tools and the debug
-                              tools are left out; the debug strings are out of scope per the strings step).
+                              every .tscn and .gd at any depth except POT_SKIP (the tests, the debug
+                              tools, add-ons and the import cache), so a new subfolder is never missed.
     subset SRC OUT TRANS      writes OUT, a subset of the OpenType font SRC (Noto Sans JP) holding
                               printable ASCII, kana, CJK punctuation, full-width forms, "日本語" (the
                               language list's own name) and every character of TRANS's "ja" texts;
                               prints its size next to SRC's and a JIS X 0208 level-1 subset's (measure).
     fill POT TRANS OUTDIR     writes OUTDIR/<lang>.po for every language in TRANS from the POT: each
-                              message keeps the POT's comments and gets TRANS's context as a "#." note
-                              and its translation, stamped "# machine-translated by Claude, unreviewed".
-    backprompt PODIR OUT      writes the Codex back-translation prompt: the translated texts only, by id,
-                              with no English, so the back-translation is independent. Each answer carries
-                              a structured "engineer_gendered" true/false next to its free-text notes.
+                              message keeps the POT's comments and gets TRANS's context as a "#." note,
+                              its marks as "#. i18n: ..." (MARKS) and its translation, stamped
+                              "# machine-translated by Claude, unreviewed".
+    backprompt PODIR OUT      writes the Codex back-translation prompt: the translated texts only, keyed
+                              by language and entry_key, with no English, so the back-translation is
+                              independent. Each text says who speaks and how the engineer appears; each
+                              answer carries a structured "engineer_gendered" next to its free-text notes.
     check POT PODIR BACK OUT  every automated gate on the PO files, as JSON at OUT: msgfmt --check-format,
-                              the research-pipeline step's per-line measures (placeholders, positional and
-                              named; speaker tag; glossary; ../../pipeline/tools/trial.py, imported, not
-                              copied), line breaks (BREAKS_KEEP), the "E:" key token the hint bar replaces,
-                              the script guard (SCRIPT_GUARD), the engineer-gender gate (GENDER_GATES and
-                              the back-translation's engineer_gendered), the plural forms of every
-                              msgstr[n], and chrF of Codex's back-translation (BACK, JSON) against the
-                              English. Exits 0 even when lines fail; the report says which.
-    selftest OUT              runs the gates above that need no PO file on fixed planted cases (SELFTEST)
+                              the research-pipeline step's per-line measures (printf and named
+                              placeholders, BBCode tags, speaker tag, glossary; ../../pipeline/tools/
+                              trial.py, imported, not copied), line breaks (BREAKS_KEEP), the "E:" key
+                              token the hint bar replaces, the script guard (SCRIPT_GUARD), the engineer-
+                              gender gate (gendered_words, and the back-translation's engineer_gendered),
+                              the Slavic name-case gate (NAME_CASE), the plural forms of every msgstr[n],
+                              the sibling-file completeness gate (family_gaps), and chrF of Codex's
+                              back-translation (BACK, JSON) against the English. Exits 1 when any language
+                              fails (a failed line, a non-zero msgfmt or a sibling gap), so CI can gate on it.
+    selftest OUT              runs the gates above on fixed planted cases (SELFTEST, FAMILY_SELFTEST)
                               and writes the result as JSON at OUT; exits 1 if a planted error passes or
                               a clean line fails. The negative control for gates no prototype msgid
-                              exercises yet (named placeholders, plural forms).
+                              exercises yet (named and printf placeholders, BBCode, plural forms, the
+                              "you", pronoun and name-case checks, sibling files).
     hardcoded POT INVENTORY OUT
                               player-facing strings of the strings step's inventory (in scope and shown)
                               whose text is no msgid of POT, by file, as JSON at OUT.
 
 Contract
-    python3 -I tools/i18n_tool.py <subcommand> ...   (stdlib only; `subset` needs hb-subset, `check`
-    needs msgfmt, both from Homebrew). Paths are arguments; nothing outside them is written.
-    TRANS is translations/claude.json: {"context": {msgid: note}, "translations": {lang: {msgid: text}}}.
+    python3 -I -B tools/i18n_tool.py <subcommand> ...   (stdlib only; `subset` needs hb-subset, `check`
+    needs msgfmt, both from Homebrew). Paths are arguments; nothing outside them is written. Every
+    per-language fact comes from languages.json beside this file (LANGUAGES); a PO whose language is not
+    in it stops `check`.
+    TRANS is translations/claude.json: {"context": {msgid: note}, "marks": {msgid: "engineer=... slot=...
+    speaker=..."}, "translations": {lang: {msgid: text}}}.
 
 Gotchas
     - The PO parser here reads what Godot's generator and this tool write (msgctxt, msgid, msgid_plural,
       msgstr, msgstr[n], comments, continued strings); it is not a general gettext parser.
-    - Godot reads "Language:" from the PO header and drops an empty "Plural-Forms:" with an error
-      (core/string/plural_rules.cpp), so the header always carries the language's real rule.
-    - "es" is Latin-American Spanish: Godot reduces es-419 to "es" (see I18n.LANGUAGES), but the glossary
-      and style packet name it es-419, so the checker maps it back.
-    - The gender gate is a word-ending heuristic, not a parser: it can flag a correct line (a noun that
-      ends like a past-tense verb) and miss a gendered form it has no pattern for. A flag is resolved by
-      rewording or by a reviewer's "# gender-ok: <name> <date>" comment on the entry; native review of
-      the gender-risk lines (PIPELINE.md) stays the real check.
+    - Godot reads "Language:" from the PO header. A file that has a msgid_plural entry but a missing or
+      invalid "Plural-Forms:" header, or a plural entry with the wrong number of msgstr[n], is rejected
+      whole (core/io/translation_loader_po.cpp, ERR_FAIL), so the header always carries the language's
+      real rule and the plural gate counts the forms.
+    - "es" is Latin-American Spanish: Godot reduces es-419 to "es", but the glossary and style packet name
+      it es-419; languages.json's "glossary" field maps it back.
+    - The gender gate is a heuristic, not a parser: it can flag a correct line (a noun that ends like a
+      past-tense verb, a pronoun that means WOLF) and miss a gendered form it has no pattern for. It reads
+      the engineer's role on each line from its marks, so a gender-risk line with no mark is checked only
+      next to its name slot. A flag is resolved by rewording or by a reviewer's "# gender-ok: <name>
+      <date>" comment on the entry; native review of the gender-risk lines (PIPELINE.md) stays the real
+      check.
     - Run with python3 -I -B so nothing is written next to the tools (no __pycache__ in the docs tree).
 """
 from __future__ import annotations
 
+import hashlib
 import json
 import re
 import subprocess
@@ -64,16 +77,14 @@ PIPELINE_TOOLS = HERE.parent.parent / "pipeline" / "tools"
 sys.path.insert(0, str(PIPELINE_TOOLS))
 import trial  # noqa: E402  (the research-pipeline step's measures: chrf, check_line, placeholders_ok)
 
-#: gettext Plural-Forms per language (CLDR; the same rules Godot's core/string/locales.h holds). Russian
-#: has three forms (1, 21 / 2-4, 22-24 / 0, 5-20, 11-14), which the design step added with ru.
-PLURALS = {"es": "nplurals=2; plural=(n != 1);", "de": "nplurals=2; plural=(n != 1);", "ja": "nplurals=1; plural=0;",
-           "ru": "nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);"}
-#: The style packet's and glossary's names for the PO languages.
-GLOSSARY_LANG = {"es": "es-419", "de": "de", "ja": "ja", "ru": "ru"}
-#: Languages written in Cyrillic; every other language here is written in Latin letters or in Japanese.
-CYRILLIC_LANGS = {"ru"}
+#: The one per-language table (languages.json beside this file): glossary key, script, family, plural rule,
+#: gender rule and the name-case flag for every language the tools know. Read once here; PR L1 moves the
+#: file into the game so I18n reads it too (PLAN.md), and nothing keeps a second list.
+LANGUAGES_FILE = HERE / "languages.json"
+_TABLE = json.loads(LANGUAGES_FILE.read_text(encoding="utf-8"))
+LANGUAGES: dict[str, dict] = _TABLE["languages"]
 #: The script guard, ported once from ConPaws' locales-script test (written there after a Russian word
-#: slipped into its pt-BR file): a Latin-script or Japanese text holds no Cyrillic letter, and a Cyrillic
+#: slipped into its pt-BR file): a Latin-script or CJK text holds no Cyrillic letter, and a Cyrillic
 #: text holds no Latin letter outside the glossary's "keep" words (WOLF, the "E:" key token, the studio
 #: and person names, placeholders), which stay as written in every language. It catches look-alike swaps
 #: both ways; a Cyrillic "Е:" for the key token passes it (no Latin letter is left) but fails key_token_ok,
@@ -95,38 +106,53 @@ KEY_TOKEN = re.compile(r"(?<![^\W\d_])E:")
 #: DialogueBoxes break rows for its own language; it may not add breaks (Apple's doubling in the trial).
 BREAKS_KEEP = "i18n: keep-breaks"
 #: Where the engineer's first name goes in a msgid: the positional %s of the knockdown cards and
-#: narration, or {name} on the end card. A %s that holds a key name is checked too; past-tense or
-#: agreeing forms next to a key name are rare, and a flag there costs a look, not a miss.
+#: narration, or {name} on the end card.
 NAME_SLOT = re.compile(r"%s|\{name\}")
+#: The per-line marks a msgid carries as an extracted comment, "#. i18n: <word> <key=value> ...": the
+#: build writes them in the source as "# TRANSLATORS: i18n: ..." (Godot's generator turns that into a
+#: "#." note), the prototype's `fill` from TRANS's "marks". Keys read here:
+#:   engineer=name,you,third,self  how the engineer appears: named by the slot, addressed as "you",
+#:                            referred to without the slot ("the engineer", "they", the name card), or
+#:                            speaking (the six lines tagged with the engineer's upper-case name);
+#:   slot=key|choice          what a %s holds when it is not the name (a key name, a quoted choice);
+#:   speaker=WOLF|narrator|hint|ui   who says the line (given to the back-translator).
+#: With no engineer= mark, a msgid with a NAME_SLOT counts as engineer=name unless slot= says otherwise
+#: (the safe default: more lines checked). Every inventory gender-risk line gets a mark in PR L7c.
+MARKS = re.compile(r"i18n:\s*(.*)")
 #: Clause boundaries: a gendered form only counts in the same clause as the name ("Страж заметил: %s"
 #: is the sentry's verb, cut off by the colon).
 CLAUSE_SPLIT = re.compile(r"[,:;.!?\u2014\u2013()\n«»„“”「」]")
+#: Sentence boundaries for the pronoun check, in Latin, Cyrillic and CJK punctuation.
+SENTENCE_SPLIT = re.compile(r"[.!?\n。！？]")
 #: How many words on each side of the name are read: subject and verb, or name and adjective, sit
 #: within three words in every sample line; a wider window mostly adds other people's verbs.
 GENDER_WINDOW = 3
-#: Word forms that show the grammatical gender of the person they describe, per language family. The
-#: engineer is they/them (docs/decisions.md S1-03), so any of these beside the name fails the line.
-#: Slavic: past-tense -л/-ла (ru, uk) and -ł/-ła (pl) plus the common short forms; Romance: participles
-#: and adjectives that agree (-ado/-ada, -é/-ée) plus "alone", "ready" and the job noun. Languages not
-#: listed (de, ja, ko, zh) have no gendered form in this position (PIPELINE.md, "The engineer is never
-#: gendered"); add a row with each new language that has one.
-#: Russian and Ukrainian share one pattern (the same past-tense endings); both Spanish files share one.
-#: The Spanish one skips everyday nouns that end like a participle (cada, nada, vida, salida, partida,
-#: entrada, llegada), so an exit or a new game beside the name does not raise a flag.
-_SLAVIC_CYRILLIC = re.compile(r"^(?:[а-яёіїєґ'ʼ]+(?:л|ла|лся|лась)|сам[аи]?|одна|один|готова?|должна|должен|рада?|жива?|цела?|ранена?)$")
-_SPANISH = re.compile(r"^(?!(?:cada|nada|vida|salida|partida|entrada|llegada)$)(?:\w+(?:ad|id)[oa]s?|sol[oa]s?|list[oa]s?|segur[oa]s?|ingenier[oa]s?)$")
-GENDER_GATES = {
-    "ru": _SLAVIC_CYRILLIC,
-    "uk": _SLAVIC_CYRILLIC,
-    "pl": re.compile(r"^(?:\w+(?:ł|ła|łem|łam|łeś|łaś)|sam[a]?|gotowa|gotów|jedna|jeden)$"),
-    "es": _SPANISH,
-    "es_ES": _SPANISH,
-    "pt_BR": re.compile(r"^(?:\w+(?:ad|id)[oa]s?|sozinh[oa]s?|pront[oa]s?|engenheir[oa]s?)$"),
-    "fr": re.compile(r"^(?:\w+ée?s?|seule?s?|prête?s?|ingénieure?s?)$"),
-    "it": re.compile(r"^(?:\w+(?:at|it|ut)[oa]|sol[oa]|pront[oa]|ingegner[ea])$"),
-}
-#: Skipped by `potfiles`: tests and the debug tools (out of scope), and anything outside scenes/scripts.
-POT_SKIP = ("scripts/debug/",)
+#: A letter glued to the name slot ("заметил %sа"): a case ending, which Slavic languages add to names
+#: and which depends on the name's gender. Checked for languages whose row sets name_case.
+NAME_CASE = re.compile(r"(?:%s|\{name\})[^\W\d_]")
+#: Skipped by `potfiles`, the only exclusions: the tests and the debug tools (out of scope per the strings
+#: step), the editor add-ons and Godot's import cache. Every other .tscn and .gd under the game is listed.
+POT_SKIP = ("tests/", "scripts/debug/", "addons/", ".godot/")
+
+
+def gender_rule(lang: str) -> dict[str, re.Pattern]:
+    """The compiled gender rule of ``lang`` (LANGUAGES[lang]["gender"] in languages.json, with any
+    "extends" row filled in), as {"forms", "you", "first_person", "pronouns"} -> pattern, missing keys left
+    out. Empty for a language with no rule. Pure; patterns are case-insensitive."""
+    name = LANGUAGES.get(lang, {}).get("gender")
+    fields: dict[str, str] = {}
+    while name:
+        row = _TABLE["gender_rules"][name]
+        for key, value in row.items():
+            fields.setdefault(key, value)
+        name = row.get("extends")
+    fields.pop("extends", None)
+    return {key: re.compile(value, re.IGNORECASE) for key, value in fields.items()}
+
+
+def plural_count(lang: str) -> int:
+    """nplurals of ``lang``'s Plural-Forms rule in languages.json."""
+    return nplurals(LANGUAGES[lang]["plural_forms"])
 
 
 # ------------------------------------------------------------------------------------------- PO files
@@ -195,11 +221,49 @@ def messages(path: Path) -> dict[str, dict]:
     return {e["msgid"]: e for e in read_po(path) if e["msgid"]}
 
 
+def entry_key(entry: dict) -> str:
+    """A stable id for a message: the first 10 hex digits of SHA-1 over msgctxt + EOT + msgid (gettext's
+    own context separator). The back-translations are filed by it, so adding, removing or reordering PO
+    entries (msgmerge after an English change) never attaches an answer to the wrong line."""
+    raw = (entry.get("msgctxt", "") + "\x04" + entry["msgid"]).encode("utf-8")
+    return hashlib.sha1(raw).hexdigest()[:10]
+
+
+def is_fuzzy(entry: dict) -> bool:
+    """True when the entry has gettext's fuzzy flag, which Godot's PO loader skips (the line then falls
+    to another file of the same language, or to English: DESIGN.md)."""
+    return any(c.startswith("#,") and "fuzzy" in c for c in entry["comments"])
+
+
+def marks(entry: dict) -> dict[str, str]:
+    """The entry's "#. i18n: ..." marks (MARKS) as {key: value}; a bare word such as keep-breaks maps to
+    "". Read from extracted comments only ("#." lines), where the generator and `fill` put them."""
+    found: dict[str, str] = {}
+    for comment in entry["comments"]:
+        match = MARKS.search(comment) if comment.startswith("#.") else None
+        for word in (match.group(1).split() if match else []):
+            key, _, value = word.partition("=")
+            found[key] = value
+    return found
+
+
+def engineer_roles(entry: dict) -> set[str]:
+    """How the engineer appears in the entry's msgid: a subset of {"name", "you", "third", "self"} from its
+    engineer= mark, or {"name"} when it has a NAME_SLOT and no mark says the slot holds something else."""
+    found = marks(entry)
+    if "engineer" in found:
+        return {role for role in found["engineer"].split(",") if role}
+    has_slot = NAME_SLOT.search(entry["msgid"]) and found.get("slot") not in ("key", "choice")
+    return {"name"} if has_slot else set()
+
+
 # ---------------------------------------------------------------------------------------- subcommands
 
 def potfiles(game: Path) -> None:
-    """Prints the translations_pot_files setting for every player-facing scene and script of ``game``."""
-    files = sorted(p.relative_to(game).as_posix() for p in list(game.glob("scenes/*.tscn")) + list(game.glob("scripts/**/*.gd")))
+    """Prints the translations_pot_files setting for ``game`` (apps/game): every .tscn and .gd under it,
+    at any depth, except POT_SKIP. Walking the whole tree is what makes the CI equality check meaningful:
+    a scene in a new subfolder (the lighter plan's scenes/ui/) is listed without anyone adding it."""
+    files = sorted(p.relative_to(game).as_posix() for p in list(game.rglob("*.tscn")) + list(game.rglob("*.gd")))
     kept = [f"res://{f}" for f in files if not f.startswith(POT_SKIP)]
     print("locale/translations_pot_files=PackedStringArray(" + ", ".join(json.dumps(f) for f in kept) + ")")
 
@@ -236,7 +300,10 @@ def _hb_subset(src: Path, out: Path, codepoints: set[int]) -> None:
 
 
 def fill(pot: Path, trans: Path, outdir: Path) -> None:
-    """Writes one PO per language from the POT and the translations file."""
+    """Writes one PO per language from the POT and the translations file. Each entry gets TRANS's context
+    as a "#. TRANSLATORS:" note and its marks (TRANS "marks", by msgid) as "#. i18n: ..." (MARKS), the
+    header gets the language's Plural-Forms from languages.json, and a msgid with a printf insert gets
+    "#, c-format" so msgfmt --check-format compares the inserts."""
     data = json.loads(trans.read_text(encoding="utf-8"))
     entries = read_po(pot)
     outdir.mkdir(parents=True, exist_ok=True)
@@ -250,17 +317,20 @@ def fill(pot: Path, trans: Path, outdir: Path) -> None:
                 header = ("Project-Id-Version: WOLF//OVERRIDE i18n prototype\\n", "PO-Revision-Date: 2026-10-16 00:00+0000\\n",
                           "Last-Translator: Claude (Anthropic), machine translation, unreviewed\\n", "Language-Team: none\\n", "MIME-Version: 1.0\\n",
                           "Content-Type: text/plain; charset=UTF-8\\n", "Content-Transfer-Encoding: 8bit\\n",
-                          f"Language: {lang}\\n", f"Plural-Forms: {PLURALS[lang]}\\n")
+                          f"Language: {lang}\\n", f"Plural-Forms: {LANGUAGES[lang]['plural_forms']}\\n")
                 out.append("# Sample translations for the scratch prototype (proof only; not reviewed).\n"
                            'msgid ""\nmsgstr ""\n' + "\n".join(f'"{h}"' for h in header))
                 continue
-            # A plural entry gets one msgstr per plural form of the language (its PLURALS nplurals).
-            forms = int(PLURALS[lang].split(";")[0].split("=")[1]) if "msgid_plural" in entry else 1
+            # A plural entry gets one msgstr per plural form of the language.
+            forms = plural_count(lang) if "msgid_plural" in entry else 1
             done = dict(entry, comments=list(entry["comments"]), msgstr=[""] * forms)
-            if re.search(r"%[sd]", entry["msgid"]) and not any(c.startswith("#,") for c in done["comments"]):
+            if any(token != "%%" for token in trial.POSITIONAL.findall(entry["msgid"])) and not any(c.startswith("#,") for c in done["comments"]):
                 # Godot's generator writes no format flag; with it msgfmt --check-format compares the
-                # translation's %s/%d with the msgid's (the pipeline step's msgfmt gate).
+                # translation's printf inserts with the msgid's (the pipeline step's msgfmt gate).
                 done["comments"].append("#, c-format")
+            mark = data.get("marks", {}).get(entry["msgid"])
+            if mark:
+                done["comments"].insert(0, f"#. i18n: {mark}")
             note = data["context"].get(entry["msgid"])
             if note:
                 done["comments"].insert(0, f"#. TRANSLATORS: {note}")
@@ -272,56 +342,132 @@ def fill(pot: Path, trans: Path, outdir: Path) -> None:
         print(f"{lang}.po: {len(texts)} of {len(entries) - 1} messages translated")
 
 
+#: How the back-translation prompt names each engineer role (engineer_roles) for one text.
+ROLE_WORDS = {"name": "named (their first name fills %s or {name})", "you": "addressed as 'you'",
+              "third": "referred to without their name", "self": "speaking (first person)"}
+
+
 def backprompt(podir: Path, out: Path) -> None:
-    """The Codex prompt: back-translate every translated message, given without its English."""
+    """The Codex prompt: back-translate every translated, non-fuzzy message, given without its English.
+    Each text carries its id (language + entry_key, so answers survive a msgmerge), who speaks and how the
+    engineer appears (from its marks), which the engineer_gendered answer needs for "you" lines and lines
+    with no name slot. Plural entries send msgstr[0] only; the plural gate checks the other forms."""
     items = {}
     for po in sorted(podir.glob("*.po")):
         lang = po.stem
-        for index, entry in enumerate(e for e in read_po(po) if e["msgid"] and e["msgstr"] and e["msgstr"][0]):
-            items[f"{lang}-{index:02d}"] = {"language": GLOSSARY_LANG[lang], "text": entry["msgstr"][0]}
+        for entry in (e for e in read_po(po) if e["msgid"] and e["msgstr"] and e["msgstr"][0] and not is_fuzzy(e)):
+            found, roles = marks(entry), engineer_roles(entry)
+            slot = {"key": "%s is a key name", "choice": "%s is an answer the engineer chose, quoted"}.get(found.get("slot", ""), "")
+            items[f"{lang}-{entry_key(entry)}"] = {
+                "language": LANGUAGES[lang]["glossary"], "speaker": found.get("speaker", "unknown"),
+                "engineer": "; ".join([ROLE_WORDS[r] for r in sorted(roles)] + ([slot] if slot else [])) or "not in this text",
+                "text": entry["msgstr"][0]}
     out.write_text(
         "You are checking game UI and dialogue translations by back-translating them. Translate each text below "
         "into plain, literal English, keeping placeholders (%s, %d), the token 'E:' and line breaks (\\n) exactly "
         "as they appear. Do not guess what the original English was; translate only what is written. Context: a "
-        "2D sci-fi game; WOLF is a robot wolf (he), the Director a human (he), the player character is a "
-        "non-binary engineer whose first name fills %s. After each back-translation add 'notes' listing anything "
-        "ambiguous, unidiomatic or gendered in the source text (empty string if none), and 'engineer_gendered': "
-        "true only if the text shows the grammatical gender of the engineer (the person whose name fills %s), "
-        "for example by a past-tense verb ending, an agreeing adjective or participle, or a gendered job noun; "
-        "false otherwise, including when only WOLF, the Director or the sentry is gendered. Answer with JSON "
-        'only: {"back": {"<id>": {"english": "...", "notes": "...", "engineer_gendered": false}}}. Do not run '
-        "any commands or read any files.\n\n"
+        "2D sci-fi game; WOLF is a robot wolf (he), the Director a human (he), the sentry a machine; the player "
+        "character is a non-binary engineer (they/them). Each item says who speaks ('speaker': WOLF, narrator, "
+        "hint for the hint bar that addresses the player, ui) and how the engineer appears in it ('engineer'). "
+        "After each back-translation add 'notes' listing anything ambiguous, unidiomatic or gendered in the "
+        "source text (empty string if none), and 'engineer_gendered': true only if the text shows the "
+        "grammatical gender of the engineer: when the engineer is addressed, by a verb, adjective or participle "
+        "agreeing with 'you'; when named or referred to, by a past-tense ending, an agreeing adjective or "
+        "participle, a gendered job noun or a gendered pronoun (he/she, 彼/彼女, 他/她, 그/그녀); false "
+        "otherwise, including when only WOLF, the Director or the sentry is gendered. Answer with JSON only: "
+        '{"back": {"<id>": {"english": "...", "notes": "...", "engineer_gendered": false}}}. Do not run any '
+        "commands or read any files.\n\n"
         + json.dumps(items, ensure_ascii=False, indent=1) + "\n", encoding="utf-8")
     print(f"{len(items)} texts in {out}")
 
 
 def script_ok(text: str, lang: str, keep: list[str]) -> bool:
     """The script guard (SCRIPT_GUARD) for one translation ``text`` in ``lang``."""
-    if lang not in CYRILLIC_LANGS:
+    if LANGUAGES[lang]["script"] != "cyrillic":
         return not SCRIPT_GUARD["cyrillic"].search(text)
     for word in sorted(keep, key=len, reverse=True):
         text = text.replace(word, "")
     return not SCRIPT_GUARD["latin"].search(text)
 
 
-def gendered_words(text: str, lang: str) -> list[str]:
-    """The words of ``text`` that show the engineer's gender in ``lang``: forms matching
-    GENDER_GATES[lang] within GENDER_WINDOW words of a NAME_SLOT, in the same clause (CLAUSE_SPLIT).
-    Empty for a language with no gate row. Pure; no side effects."""
-    gate = GENDER_GATES.get(lang)
-    hits: list[str] = []
-    if not gate:
-        return hits
+def gendered_words(text: str, lang: str, roles: set[str]) -> list[str]:
+    """The words of ``text`` that show the engineer's gender in ``lang``, for a line where the engineer
+    appears as ``roles`` (engineer_roles). Four checks, from gender_rule(lang):
+      1. name: a "forms" word within GENDER_WINDOW words of a NAME_SLOT, in the same clause (CLAUSE_SPLIT);
+      2. clause: every "forms" word in a clause that holds a second-person pronoun ("you"; this catches
+         the vocative "%s, ты была права"), and, when the engineer is addressed or referred to without
+         the name (roles "you" or "third"), in every clause with no first-person subject pronoun, so
+         WOLF's own "Я отказался" stays clear while "Ты нашла" is flagged. Words that are first person
+         by their ending ("first_forms", Polish "Odmówiłem") are WOLF's and skipped;
+      3. self: when the engineer speaks ("self"), every "forms" and "first_forms" word;
+      4. pronoun: a gendered third-person pronoun ("pronouns") anywhere for "third", or in the sentence
+         holding the name and the one after it for "name" ("%s ist ... Sie wartet", "彼女は%sだ").
+    Empty for a line with no roles or a language with no rule. Each word once, in order. Pure.
+    A heuristic: a pronoun that means WOLF or the sentry next to the name is flagged too (a look, cleared
+    by a "# gender-ok:" stamp), and a gendered word it has no pattern for is missed (native review)."""
+    rule = gender_rule(lang)
+    if not rule or not roles:
+        return []
+    forms, first_forms, hits = rule.get("forms"), rule.get("first_forms"), []
+
+    def flag(words: list[str], own_too: bool = False) -> None:
+        for word in words:
+            bare = word.strip("\"'…-").lower()
+            if first_forms and first_forms.match(bare):
+                if own_too:
+                    hits.append(bare)
+            elif forms and forms.match(bare):
+                hits.append(bare)
+
     for clause in CLAUSE_SPLIT.split(text):
         words = clause.split()
-        for index, word in enumerate(words):
-            if not NAME_SLOT.search(word):
-                continue
-            for near in words[max(0, index - GENDER_WINDOW):index] + words[index + 1:index + 1 + GENDER_WINDOW]:
-                bare = near.strip("\"'…-").lower()
-                if gate.match(bare):
-                    hits.append(bare)
-    return hits
+        if "name" in roles:
+            for index, word in enumerate(words):
+                if NAME_SLOT.search(word):
+                    flag(words[max(0, index - GENDER_WINDOW):index] + words[index + 1:index + 1 + GENDER_WINDOW])
+        addressed = "you" in rule and rule["you"].search(clause)
+        about = bool(roles & {"you", "third"}) and not ("first_person" in rule and rule["first_person"].search(clause))
+        if "self" in roles:
+            flag(words, own_too=True)
+        elif addressed or about:
+            flag(words)
+    if "pronouns" in rule and roles & {"name", "third"}:
+        # Empty pieces (". \n" ends one sentence twice) are dropped, so "the next sentence" is a real one.
+        sentences = [piece for piece in SENTENCE_SPLIT.split(text) if piece.strip()]
+        for index, sentence in enumerate(sentences):
+            if "third" in roles or NAME_SLOT.search(sentence) or (index and NAME_SLOT.search(sentences[index - 1])):
+                hits += [match.group(0).strip().lower() for match in rule["pronouns"].finditer(sentence)]
+    return list(dict.fromkeys(hits))
+
+
+def name_case_ok(text: str, lang: str, roles: set[str]) -> bool:
+    """False when ``lang`` declines names (languages.json name_case) and a letter is glued to the name
+    slot in ``text`` (NAME_CASE), the case ending PIPELINE.md's nominative-only rule forbids."""
+    return not (LANGUAGES[lang].get("name_case") and "name" in roles and NAME_CASE.search(text))
+
+
+def family_gaps(po_entries: dict[str, list[dict]]) -> dict[str, list[str]]:
+    """For every language whose family (languages.json) has two or more PO files here: the msgids that a
+    sibling file translates but this one leaves untranslated, fuzzy or with an empty plural form. Godot
+    looks each message up in every loaded file of the language (core/string/translation_domain.cpp,
+    get_message_from_translations, 4.7.2), so such a gap shows the sibling's text (Simplified characters
+    in a Traditional line, Latin-American Spanish in Spain's file), not English. A line no file of the
+    family translates falls to English and is no gap; languages with no sibling are left out. Pure."""
+    def done(entries: list[dict]) -> set[tuple[str, str]]:
+        return {(e.get("msgctxt", ""), e["msgid"]) for e in entries if e["msgid"] and e["msgstr"] and all(e["msgstr"]) and not is_fuzzy(e)}
+
+    families: dict[str, list[str]] = {}
+    for lang in po_entries:
+        families.setdefault(LANGUAGES[lang]["family"], []).append(lang)
+    gaps: dict[str, list[str]] = {}
+    for langs in families.values():
+        if len(langs) < 2:
+            continue
+        translated = {lang: done(po_entries[lang]) for lang in langs}
+        for lang in langs:
+            elsewhere = set().union(*(translated[other] for other in langs if other != lang))
+            gaps[lang] = sorted(msgid for _, msgid in elsewhere - translated[lang])
+    return gaps
 
 
 def nplurals(header: str) -> int:
@@ -333,7 +479,9 @@ def nplurals(header: str) -> int:
 def plural_problems(entry: dict, forms: int) -> list[str]:
     """What is wrong with a plural entry's msgstr[n] for a language with ``forms`` plural forms: the
     wrong number of forms, an empty form, or a form whose inserts differ from its English (form 0 against
-    msgid, the others against msgid_plural; trial.placeholders_ok). Empty for a non-plural entry."""
+    msgid, the others against msgid_plural; trial.placeholders_ok). Empty for a non-plural entry. A wrong
+    count matters beyond the line: Godot's PO loader rejects the whole file for it, as it does for a
+    msgid_plural under a missing or invalid Plural-Forms header (core/io/translation_loader_po.cpp)."""
     if "msgid_plural" not in entry:
         return []
     problems = [] if len(entry["msgstr"]) == forms else [f"{len(entry['msgstr'])} forms, the header says {forms}"]
@@ -346,95 +494,168 @@ def plural_problems(entry: dict, forms: int) -> list[str]:
     return problems
 
 
+#: The per-line gates that must all hold for a line to pass (each a boolean measure in the report).
+LINE_GATES = ("placeholders_ok", "tag_ok", "breaks_ok", "key_token_ok", "script_ok", "bbcode_ok", "gender_ok", "name_case_ok")
+
+
 def check(pot: Path, podir: Path, back: Path, out: Path) -> None:
-    """Runs every automated gate on the PO files and writes the report."""
+    """Runs every automated gate on the PO files, writes the report to ``out`` and exits 1 when any
+    language fails: a failed line, a non-zero msgfmt, or a gap in a language with a sibling file
+    (family_gaps). A PO whose language is not in languages.json stops the run."""
     glossary = trial.load("glossary.json")
     fonts = trial.Fonts()
     backs = json.loads(back.read_text(encoding="utf-8"))["back"] if back.exists() else {}
+    po_entries = {po.stem: read_po(po) for po in sorted(podir.glob("*.po"))}
+    unknown = sorted(set(po_entries) - set(LANGUAGES))
+    if unknown:
+        sys.exit(f"PO files for languages missing from {LANGUAGES_FILE.name}: {unknown}")
+    gaps = family_gaps(po_entries)
     report: dict = {"pot_messages": len(messages(pot)), "languages": {}}
-    for po in sorted(podir.glob("*.po")):
-        lang = po.stem
-        fmt = subprocess.run(["msgfmt", "--check-format", "--check-header", "-o", "/dev/null", "--statistics", str(po)],
+    for lang, entries in po_entries.items():
+        fmt = subprocess.run(["msgfmt", "--check-format", "--check-header", "-o", "/dev/null", "--statistics", str(podir / f"{lang}.po")],
                              capture_output=True, text=True)
         rows = []
-        entries = read_po(po)
         header = next((e["msgstr"][0] for e in entries if not e["msgid"] and e["msgstr"]), "")
-        translated = [e for e in entries if e["msgid"] and e["msgstr"] and e["msgstr"][0]]
-        for index, entry in enumerate(translated):
+        translated = [e for e in entries if e["msgid"] and e["msgstr"] and e["msgstr"][0] and not is_fuzzy(e)]
+        for entry in translated:
             english, text = entry["msgid"], entry["msgstr"][0]
-            measures = trial.check_line({"text": english, "surface": "dialogue"}, text, GLOSSARY_LANG[lang], glossary, fonts)
+            roles = engineer_roles(entry)
+            measures = trial.check_line({"text": english, "surface": "dialogue"}, text, LANGUAGES[lang]["glossary"], glossary, fonts)
             measures.pop("missing_glyphs", None)  # the game's own glyph test (i18n_test.gd) checks the real font chain
             measures.pop("width_ratio_est", None)
             keep_breaks = any(BREAKS_KEEP in c for c in entry["comments"])
             measures["breaks_ok"] = (text.count("\n") == english.count("\n")) if keep_breaks else text.count("\n") <= english.count("\n")
             measures["key_token_ok"] = len(KEY_TOKEN.findall(english)) == len(KEY_TOKEN.findall(text))
             measures["script_ok"] = script_ok(text, lang, glossary["keep"])
+            measures["bbcode_ok"] = trial.bbcode_ok(english, text)
             gender_stamped = any(c.startswith("# gender-ok:") for c in entry["comments"])
-            measures["gender_words"] = gendered_words(text, lang)
+            measures["engineer_roles"] = sorted(roles)
+            measures["gender_words"] = gendered_words(text, lang, roles)
             measures["gender_ok"] = gender_stamped or not measures["gender_words"]
+            measures["name_case_ok"] = name_case_ok(text, lang, roles)
             measures["plural_problems"] = plural_problems(entry, nplurals(header))
-            item = backs.get(f"{lang}-{index:02d}")
+            measures["back_key"] = f"{lang}-{entry_key(entry)}"
+            item = backs.get(measures["back_key"])
             measures["back_engineer_gendered"] = item.get("engineer_gendered") if item else None
             if item:
                 measures["back"] = item["english"]
                 measures["back_notes"] = item.get("notes", "")
                 measures["chrf"] = trial.chrf(item["english"], english)
                 measures["drift_flag"] = measures["chrf"] < 35 and len(english.split()) > 4
-            # A back-translation filed before the engineer_gendered field existed reads None: no verdict,
-            # so only an explicit true fails the line.
+            # A missing answer or one filed before the engineer_gendered field existed reads None: no
+            # verdict, so only an explicit true fails the line (back_missing counts the lines with none).
             back_gender_ok = gender_stamped or measures["back_engineer_gendered"] is not True
-            measures["ok"] = (all(measures[k] for k in ("placeholders_ok", "tag_ok", "breaks_ok", "key_token_ok", "script_ok", "gender_ok"))
-                              and back_gender_ok and not measures["glossary_missing"] and not measures["plural_problems"])
+            measures["ok"] = (all(measures[k] for k in LINE_GATES) and back_gender_ok
+                              and not measures["glossary_missing"] and not measures["plural_problems"])
             rows.append({"msgid": english, "msgstr": text, **measures})
+        failed = [r["msgid"] for r in rows if not r["ok"]]
         report["languages"][lang] = {
+            "ok": fmt.returncode == 0 and not failed and not gaps.get(lang),
             "msgfmt_rc": fmt.returncode, "msgfmt": (fmt.stdout + fmt.stderr).strip(),
-            "translated": len(translated), "failed": [r["msgid"] for r in rows if not r["ok"]],
+            "translated": len(translated), "fuzzy": [e["msgid"] for e in entries if e["msgid"] and is_fuzzy(e)],
+            "family_gaps": gaps.get(lang), "failed": failed,
+            "back_missing": sum(1 for r in rows if "back" not in r),
             "drift_flags": [r["msgid"] for r in rows if r.get("drift_flag")], "rows": rows,
         }
     out.write_text(json.dumps(report, ensure_ascii=False, indent=1) + "\n", encoding="utf-8")
     for lang, data in report["languages"].items():
+        gap = "" if data["family_gaps"] is None else f", {len(data['family_gaps'])} sibling gaps"
         print(f"{lang}: msgfmt rc {data['msgfmt_rc']} ({data['msgfmt']}); {data['translated']} checked, "
-              f"{len(data['failed'])} failed, {len(data['drift_flags'])} drift flags")
+              f"{len(data['failed'])} failed, {len(data['drift_flags'])} drift flags, "
+              f"{data['back_missing']} without a back-translation{gap}")
+    if not all(data["ok"] for data in report["languages"].values()):
+        sys.exit(1)
 
 
-#: The planted cases `selftest` runs: (gate, language, English, translation, should it pass). Each gate
-#: gets clean lines that must pass (two are the prototype's real Russian knockdown lines, which put
-#: another subject's verb or an impersonal verb near the name) and planted errors that must fail.
+#: The planted cases `selftest` runs: (gate, language, English, translation, should it pass, engineer
+#: mark). Each gate gets clean lines that must pass (some are the prototype's real Russian knockdown
+#: lines, which put another subject's verb or an impersonal verb near the name) and planted errors that
+#: must fail; the reviewers' planted gender lines of October 16 are among them. An empty mark means the
+#: default (engineer=name when the line has a slot).
 SELFTEST = [
-    ("placeholders", "ru", "{current} of {total} turns.", "{current} из {total} оборотов.", True),
-    ("placeholders", "ja", "{current} of {total} turns.", "{total}回中{current}回。", True),
-    ("placeholders", "ru", "{current} of {total} turns.", "{current} из {totl} оборотов.", False),
-    ("placeholders", "ru", "{current} of {total} turns.", "{current} оборотов.", False),
-    ("placeholders", "de", "HOLD %s: crank, %d of %d.", "%d von %d: HALTEN %s.", False),
-    ("gender", "ru", "", "Сорвало предохранительный клапан, а %s — прямо на решётке.", True),
-    ("gender", "ru", "", "Страж заметил: %s на открытом месте.", True),
-    ("gender", "ru", "", "%s стояла на решётке, и клапан сорвало.", False),
-    ("gender", "ru", "", "%s был прямо на решётке.", False),
-    ("gender", "pl", "", "%s stoi na kratce.", True),
-    ("gender", "pl", "", "%s stała na kratce.", False),
-    ("gender", "es", "", "La válvula de alivio cedió y %s quedó sobre la rejilla.", True),
-    ("gender", "es", "", "%s estaba sola sobre la rejilla.", False),
-    ("gender", "fr", "", "%s est restée seule sur la grille.", False),
-    ("gender", "de", "", "%s stand allein auf dem Gitter.", True),
-    ("plural", "ru", "The valve gives. %d of %d turns.", ["Клапан поддаётся. %d из %d оборота.", "Клапан поддаётся. %d из %d оборотов.", "Клапан поддаётся. %d из %d оборотов."], True),
-    ("plural", "ru", "The valve gives. %d of %d turns.", ["Клапан поддаётся. %d из %d оборота.", "Клапан поддаётся. %d из %d оборотов."], False),
-    ("plural", "ru", "The valve gives. %d of %d turns.", ["Клапан поддаётся. %d из %d оборота.", "Клапан поддаётся. %d оборотов.", "Клапан поддаётся. %d из %d оборотов."], False),
+    ("placeholders", "ru", "{current} of {total} turns.", "{current} из {total} оборотов.", True, ""),
+    ("placeholders", "ja", "{current} of {total} turns.", "{total}回中{current}回。", True, ""),
+    ("placeholders", "ru", "{current} of {total} turns.", "{current} из {totl} оборотов.", False, ""),
+    ("placeholders", "ru", "{current} of {total} turns.", "{current} оборотов.", False, ""),
+    ("placeholders", "de", "HOLD %s: crank, %d of %d.", "%d von %d: HALTEN %s.", False, ""),
+    ("placeholders", "de", "%02d:%02d left", "noch %02d", False, ""),
+    ("placeholders", "de", "%.1f s", "s", False, ""),
+    ("placeholders", "ru", "{0} of {1}", "{1}", False, ""),
+    ("placeholders", "ru", "{0} of {1}", "{0} из {1}", True, ""),
+    ("placeholders", "fr", "%d%% done", "%d %% fait", True, ""),
+    ("bbcode", "de", "[b]%s[/b] waits.", "[b]%s wartet.", False, ""),
+    ("bbcode", "de", "[center][b]CREDITS[/b][/center]", "[center][b]MITWIRKENDE[/b][/center]", True, ""),
+    ("bbcode", "de", "[color=#ff8800]WOLF[/color]", "[color=#00ff00]WOLF[/color]", False, ""),
+    ("bbcode", "de", "[b]A[/b] [i]B[/i]", "[i]B[/i] [b]A[/b]", True, ""),
+    ("bbcode", "de", "[b][i]A[/i][/b]", "[b][i]A[/b][/i]", False, ""),
+    ("gender", "ru", "", "Сорвало предохранительный клапан, а %s — прямо на решётке.", True, ""),
+    ("gender", "ru", "", "Страж заметил: %s на открытом месте.", True, ""),
+    ("gender", "ru", "", "%s стояла на решётке, и клапан сорвало.", False, ""),
+    ("gender", "ru", "", "%s был прямо на решётке.", False, ""),
+    ("gender", "ru", "", "%s, ты была права.", False, ""),
+    ("gender", "ru", "", "WOLF: Ты сказала мне правду у реле.", False, "you"),
+    ("gender", "ru", "", "WOLF: Ты сказала «%s»\nЯ отказался. Ты нашла другой путь.", False, "you"),
+    ("gender", "ru", "", "WOLF: Я отказался. Спасибо за правду.", True, "you"),
+    ("gender", "ru", "", "Страж увидел её на открытом месте.", False, "third"),
+    ("gender", "pl", "", "%s stoi na kratce.", True, ""),
+    ("gender", "pl", "", "%s stała na kratce.", False, ""),
+    ("gender", "pl", "", "WOLF: Powiedziałaś mi prawdę.", False, "you"),
+    ("gender", "pl", "", "WOLF: Dziękuję za prawdę. Biorę przekaźnik.", True, "you"),
+    ("gender", "pl", "", "WOLF: Odmówiłem. Znalazłaś inną drogę.", False, "you"),
+    ("gender", "pl", "", "WOLF: Odmówiłem. Dziękuję.", True, "you"),
+    ("gender", "pl", "", "Odmówiłam.", False, "self"),
+    ("gender", "es", "", "La válvula de alivio cedió y %s quedó sobre la rejilla.", True, ""),
+    ("gender", "es", "", "%s estaba sola sobre la rejilla.", False, ""),
+    ("gender", "es", "", "WOLF: Estabas sola en la rejilla.", False, "you"),
+    ("gender", "fr", "", "%s est restée seule sur la grille.", False, ""),
+    ("gender", "de", "", "%s stand allein auf dem Gitter.", True, ""),
+    ("gender", "de", "", "%s ist die Ingenieurin. Sie wartet.", False, ""),
+    ("gender", "de", "", "Der Wächter hat %s gesehen.\nSie soll am Tank bleiben.", False, ""),
+    ("gender", "ja", "", "%sは格子の上にいる。", True, ""),
+    ("gender", "ja", "", "彼女は%sだ。", False, ""),
+    ("gender", "zh_Hans", "", "%s站在格栅上。", True, ""),
+    ("gender", "zh_Hans", "", "她是%s。", False, ""),
+    ("name_case", "ru", "", "Страж заметил %sа на открытом месте.", False, ""),
+    ("name_case", "ru", "", "Страж заметил: %s на открытом месте.", True, ""),
+    ("name_case", "pl", "", "Strażnik zobaczył %sa.", False, ""),
+    ("name_case", "ja", "", "%sは無事だ。", True, ""),
+    ("plural", "ru", "The valve gives. %d of %d turns.", ["Клапан поддаётся. %d из %d оборота.", "Клапан поддаётся. %d из %d оборотов.", "Клапан поддаётся. %d из %d оборотов."], True, ""),
+    ("plural", "ru", "The valve gives. %d of %d turns.", ["Клапан поддаётся. %d из %d оборота.", "Клапан поддаётся. %d из %d оборотов."], False, ""),
+    ("plural", "ru", "The valve gives. %d of %d turns.", ["Клапан поддаётся. %d из %d оборота.", "Клапан поддаётся. %d оборотов.", "Клапан поддаётся. %d из %d оборотов."], False, ""),
+]
+#: Planted sibling-file cases for family_gaps: (what, {lang: {msgid: (msgstr, fuzzy)}}, languages that
+#: must report a gap).
+FAMILY_SELFTEST = [
+    ("es and es_ES both translate A and B", {"es": {"A": ("a", False), "B": ("b", False)}, "es_ES": {"A": ("a", False), "B": ("b", False)}}, []),
+    ("es_ES misses B, so B would show the es text", {"es": {"A": ("a", False), "B": ("b", False)}, "es_ES": {"A": ("a", False)}}, ["es_ES"]),
+    ("zh_Hant has B fuzzy, so B would show Simplified", {"zh_Hans": {"A": ("a", False), "B": ("b", False)}, "zh_Hant": {"A": ("a", False), "B": ("b", True)}}, ["zh_Hant"]),
+    ("es and es_ES both miss B: English shows, no gap", {"es": {"A": ("a", False)}, "es_ES": {"A": ("a", False)}}, []),
+    ("es alone misses B: English shows, no gap", {"es": {"A": ("a", False)}}, []),
 ]
 
 
 def selftest(out: Path) -> None:
-    """Runs SELFTEST through the gates, writes each case's result to ``out`` and exits 1 on a mismatch."""
+    """Runs SELFTEST and FAMILY_SELFTEST through the gates, writes each case's result to ``out`` and exits
+    1 on a mismatch. Touches nothing else."""
     results = []
-    for gate, lang, english, text, expected in SELFTEST:
+    for gate, lang, english, text, expected, mark in SELFTEST:
         if gate == "placeholders":
             passed = trial.placeholders_ok(english, text)
-        elif gate == "gender":
-            passed = not gendered_words(text, lang)
+        elif gate == "bbcode":
+            passed = trial.bbcode_ok(english, text)
+        elif gate in ("gender", "name_case"):
+            roles = engineer_roles({"msgid": text, "comments": [f"#. i18n: engineer={mark}"] if mark else []})
+            passed = (not gendered_words(text, lang, roles)) if gate == "gender" else name_case_ok(text, lang, roles)
         else:
-            forms = nplurals(PLURALS[lang])
-            passed = not plural_problems({"msgid": english, "msgid_plural": english, "msgstr": text}, forms)
-        results.append({"gate": gate, "language": lang, "english": english, "translation": text,
+            passed = not plural_problems({"msgid": english, "msgid_plural": english, "msgstr": text}, plural_count(lang))
+        results.append({"gate": gate, "language": lang, "english": english, "translation": text, "engineer": mark,
                         "expected_pass": expected, "passed": passed, "as_expected": passed == expected})
+    for what, files, expected_gaps in FAMILY_SELFTEST:
+        po = {lang: [{"msgid": msgid, "comments": ["#, fuzzy"] if fuzzy else [], "msgstr": [text]} for msgid, (text, fuzzy) in texts.items()]
+              for lang, texts in files.items()}
+        flagged = sorted(lang for lang, gap in family_gaps(po).items() if gap)
+        results.append({"gate": "family", "case": what, "expected_gaps": expected_gaps, "gaps": flagged,
+                        "as_expected": flagged == sorted(expected_gaps)})
     wrong = [r for r in results if not r["as_expected"]]
     out.write_text(json.dumps({"cases": len(results), "as_expected": len(results) - len(wrong), "results": results},
                               ensure_ascii=False, indent=1) + "\n", encoding="utf-8")

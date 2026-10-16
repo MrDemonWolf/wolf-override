@@ -1,12 +1,13 @@
 {
- "cases": 18,
- "as_expected": 18,
+ "cases": 54,
+ "as_expected": 54,
  "results": [
   {
    "gate": "placeholders",
    "language": "ru",
    "english": "{current} of {total} turns.",
    "translation": "{current} из {total} оборотов.",
+   "engineer": "",
    "expected_pass": true,
    "passed": true,
    "as_expected": true
@@ -16,6 +17,7 @@
    "language": "ja",
    "english": "{current} of {total} turns.",
    "translation": "{total}回中{current}回。",
+   "engineer": "",
    "expected_pass": true,
    "passed": true,
    "as_expected": true
@@ -25,6 +27,7 @@
    "language": "ru",
    "english": "{current} of {total} turns.",
    "translation": "{current} из {totl} оборотов.",
+   "engineer": "",
    "expected_pass": false,
    "passed": false,
    "as_expected": true
@@ -34,6 +37,7 @@
    "language": "ru",
    "english": "{current} of {total} turns.",
    "translation": "{current} оборотов.",
+   "engineer": "",
    "expected_pass": false,
    "passed": false,
    "as_expected": true
@@ -43,6 +47,107 @@
    "language": "de",
    "english": "HOLD %s: crank, %d of %d.",
    "translation": "%d von %d: HALTEN %s.",
+   "engineer": "",
+   "expected_pass": false,
+   "passed": false,
+   "as_expected": true
+  },
+  {
+   "gate": "placeholders",
+   "language": "de",
+   "english": "%02d:%02d left",
+   "translation": "noch %02d",
+   "engineer": "",
+   "expected_pass": false,
+   "passed": false,
+   "as_expected": true
+  },
+  {
+   "gate": "placeholders",
+   "language": "de",
+   "english": "%.1f s",
+   "translation": "s",
+   "engineer": "",
+   "expected_pass": false,
+   "passed": false,
+   "as_expected": true
+  },
+  {
+   "gate": "placeholders",
+   "language": "ru",
+   "english": "{0} of {1}",
+   "translation": "{1}",
+   "engineer": "",
+   "expected_pass": false,
+   "passed": false,
+   "as_expected": true
+  },
+  {
+   "gate": "placeholders",
+   "language": "ru",
+   "english": "{0} of {1}",
+   "translation": "{0} из {1}",
+   "engineer": "",
+   "expected_pass": true,
+   "passed": true,
+   "as_expected": true
+  },
+  {
+   "gate": "placeholders",
+   "language": "fr",
+   "english": "%d%% done",
+   "translation": "%d %% fait",
+   "engineer": "",
+   "expected_pass": true,
+   "passed": true,
+   "as_expected": true
+  },
+  {
+   "gate": "bbcode",
+   "language": "de",
+   "english": "[b]%s[/b] waits.",
+   "translation": "[b]%s wartet.",
+   "engineer": "",
+   "expected_pass": false,
+   "passed": false,
+   "as_expected": true
+  },
+  {
+   "gate": "bbcode",
+   "language": "de",
+   "english": "[center][b]CREDITS[/b][/center]",
+   "translation": "[center][b]MITWIRKENDE[/b][/center]",
+   "engineer": "",
+   "expected_pass": true,
+   "passed": true,
+   "as_expected": true
+  },
+  {
+   "gate": "bbcode",
+   "language": "de",
+   "english": "[color=#ff8800]WOLF[/color]",
+   "translation": "[color=#00ff00]WOLF[/color]",
+   "engineer": "",
+   "expected_pass": false,
+   "passed": false,
+   "as_expected": true
+  },
+  {
+   "gate": "bbcode",
+   "language": "de",
+   "english": "[b]A[/b] [i]B[/i]",
+   "translation": "[i]B[/i] [b]A[/b]",
+   "engineer": "",
+   "expected_pass": true,
+   "passed": true,
+   "as_expected": true
+  },
+  {
+   "gate": "bbcode",
+   "language": "de",
+   "english": "[b][i]A[/i][/b]",
+   "translation": "[b][i]A[/b][/i]",
+   "engineer": "",
    "expected_pass": false,
    "passed": false,
    "as_expected": true
@@ -52,6 +157,7 @@
    "language": "ru",
    "english": "",
    "translation": "Сорвало предохранительный клапан, а %s — прямо на решётке.",
+   "engineer": "",
    "expected_pass": true,
    "passed": true,
    "as_expected": true
@@ -61,6 +167,7 @@
    "language": "ru",
    "english": "",
    "translation": "Страж заметил: %s на открытом месте.",
+   "engineer": "",
    "expected_pass": true,
    "passed": true,
    "as_expected": true
@@ -70,6 +177,7 @@
    "language": "ru",
    "english": "",
    "translation": "%s стояла на решётке, и клапан сорвало.",
+   "engineer": "",
    "expected_pass": false,
    "passed": false,
    "as_expected": true
@@ -79,6 +187,57 @@
    "language": "ru",
    "english": "",
    "translation": "%s был прямо на решётке.",
+   "engineer": "",
+   "expected_pass": false,
+   "passed": false,
+   "as_expected": true
+  },
+  {
+   "gate": "gender",
+   "language": "ru",
+   "english": "",
+   "translation": "%s, ты была права.",
+   "engineer": "",
+   "expected_pass": false,
+   "passed": false,
+   "as_expected": true
+  },
+  {
+   "gate": "gender",
+   "language": "ru",
+   "english": "",
+   "translation": "WOLF: Ты сказала мне правду у реле.",
+   "engineer": "you",
+   "expected_pass": false,
+   "passed": false,
+   "as_expected": true
+  },
+  {
+   "gate": "gender",
+   "language": "ru",
+   "english": "",
+   "translation": "WOLF: Ты сказала «%s»\nЯ отказался. Ты нашла другой путь.",
+   "engineer": "you",
+   "expected_pass": false,
+   "passed": false,
+   "as_expected": true
+  },
+  {
+   "gate": "gender",
+   "language": "ru",
+   "english": "",
+   "translation": "WOLF: Я отказался. Спасибо за правду.",
+   "engineer": "you",
+   "expected_pass": true,
+   "passed": true,
+   "as_expected": true
+  },
+  {
+   "gate": "gender",
+   "language": "ru",
+   "english": "",
+   "translation": "Страж увидел её на открытом месте.",
+   "engineer": "third",
    "expected_pass": false,
    "passed": false,
    "as_expected": true
@@ -88,6 +247,7 @@
    "language": "pl",
    "english": "",
    "translation": "%s stoi na kratce.",
+   "engineer": "",
    "expected_pass": true,
    "passed": true,
    "as_expected": true
@@ -97,6 +257,57 @@
    "language": "pl",
    "english": "",
    "translation": "%s stała na kratce.",
+   "engineer": "",
+   "expected_pass": false,
+   "passed": false,
+   "as_expected": true
+  },
+  {
+   "gate": "gender",
+   "language": "pl",
+   "english": "",
+   "translation": "WOLF: Powiedziałaś mi prawdę.",
+   "engineer": "you",
+   "expected_pass": false,
+   "passed": false,
+   "as_expected": true
+  },
+  {
+   "gate": "gender",
+   "language": "pl",
+   "english": "",
+   "translation": "WOLF: Dziękuję za prawdę. Biorę przekaźnik.",
+   "engineer": "you",
+   "expected_pass": true,
+   "passed": true,
+   "as_expected": true
+  },
+  {
+   "gate": "gender",
+   "language": "pl",
+   "english": "",
+   "translation": "WOLF: Odmówiłem. Znalazłaś inną drogę.",
+   "engineer": "you",
+   "expected_pass": false,
+   "passed": false,
+   "as_expected": true
+  },
+  {
+   "gate": "gender",
+   "language": "pl",
+   "english": "",
+   "translation": "WOLF: Odmówiłem. Dziękuję.",
+   "engineer": "you",
+   "expected_pass": true,
+   "passed": true,
+   "as_expected": true
+  },
+  {
+   "gate": "gender",
+   "language": "pl",
+   "english": "",
+   "translation": "Odmówiłam.",
+   "engineer": "self",
    "expected_pass": false,
    "passed": false,
    "as_expected": true
@@ -106,6 +317,7 @@
    "language": "es",
    "english": "",
    "translation": "La válvula de alivio cedió y %s quedó sobre la rejilla.",
+   "engineer": "",
    "expected_pass": true,
    "passed": true,
    "as_expected": true
@@ -115,6 +327,17 @@
    "language": "es",
    "english": "",
    "translation": "%s estaba sola sobre la rejilla.",
+   "engineer": "",
+   "expected_pass": false,
+   "passed": false,
+   "as_expected": true
+  },
+  {
+   "gate": "gender",
+   "language": "es",
+   "english": "",
+   "translation": "WOLF: Estabas sola en la rejilla.",
+   "engineer": "you",
    "expected_pass": false,
    "passed": false,
    "as_expected": true
@@ -124,6 +347,7 @@
    "language": "fr",
    "english": "",
    "translation": "%s est restée seule sur la grille.",
+   "engineer": "",
    "expected_pass": false,
    "passed": false,
    "as_expected": true
@@ -133,6 +357,107 @@
    "language": "de",
    "english": "",
    "translation": "%s stand allein auf dem Gitter.",
+   "engineer": "",
+   "expected_pass": true,
+   "passed": true,
+   "as_expected": true
+  },
+  {
+   "gate": "gender",
+   "language": "de",
+   "english": "",
+   "translation": "%s ist die Ingenieurin. Sie wartet.",
+   "engineer": "",
+   "expected_pass": false,
+   "passed": false,
+   "as_expected": true
+  },
+  {
+   "gate": "gender",
+   "language": "de",
+   "english": "",
+   "translation": "Der Wächter hat %s gesehen.\nSie soll am Tank bleiben.",
+   "engineer": "",
+   "expected_pass": false,
+   "passed": false,
+   "as_expected": true
+  },
+  {
+   "gate": "gender",
+   "language": "ja",
+   "english": "",
+   "translation": "%sは格子の上にいる。",
+   "engineer": "",
+   "expected_pass": true,
+   "passed": true,
+   "as_expected": true
+  },
+  {
+   "gate": "gender",
+   "language": "ja",
+   "english": "",
+   "translation": "彼女は%sだ。",
+   "engineer": "",
+   "expected_pass": false,
+   "passed": false,
+   "as_expected": true
+  },
+  {
+   "gate": "gender",
+   "language": "zh_Hans",
+   "english": "",
+   "translation": "%s站在格栅上。",
+   "engineer": "",
+   "expected_pass": true,
+   "passed": true,
+   "as_expected": true
+  },
+  {
+   "gate": "gender",
+   "language": "zh_Hans",
+   "english": "",
+   "translation": "她是%s。",
+   "engineer": "",
+   "expected_pass": false,
+   "passed": false,
+   "as_expected": true
+  },
+  {
+   "gate": "name_case",
+   "language": "ru",
+   "english": "",
+   "translation": "Страж заметил %sа на открытом месте.",
+   "engineer": "",
+   "expected_pass": false,
+   "passed": false,
+   "as_expected": true
+  },
+  {
+   "gate": "name_case",
+   "language": "ru",
+   "english": "",
+   "translation": "Страж заметил: %s на открытом месте.",
+   "engineer": "",
+   "expected_pass": true,
+   "passed": true,
+   "as_expected": true
+  },
+  {
+   "gate": "name_case",
+   "language": "pl",
+   "english": "",
+   "translation": "Strażnik zobaczył %sa.",
+   "engineer": "",
+   "expected_pass": false,
+   "passed": false,
+   "as_expected": true
+  },
+  {
+   "gate": "name_case",
+   "language": "ja",
+   "english": "",
+   "translation": "%sは無事だ。",
+   "engineer": "",
    "expected_pass": true,
    "passed": true,
    "as_expected": true
@@ -146,6 +471,7 @@
     "Клапан поддаётся. %d из %d оборотов.",
     "Клапан поддаётся. %d из %d оборотов."
    ],
+   "engineer": "",
    "expected_pass": true,
    "passed": true,
    "as_expected": true
@@ -158,6 +484,7 @@
     "Клапан поддаётся. %d из %d оборота.",
     "Клапан поддаётся. %d из %d оборотов."
    ],
+   "engineer": "",
    "expected_pass": false,
    "passed": false,
    "as_expected": true
@@ -171,8 +498,52 @@
     "Клапан поддаётся. %d оборотов.",
     "Клапан поддаётся. %d из %d оборотов."
    ],
+   "engineer": "",
    "expected_pass": false,
    "passed": false,
+   "as_expected": true
+  },
+  {
+   "gate": "family",
+   "case": "es and es_ES both translate A and B",
+   "expected_gaps": [],
+   "gaps": [],
+   "as_expected": true
+  },
+  {
+   "gate": "family",
+   "case": "es_ES misses B, so B would show the es text",
+   "expected_gaps": [
+    "es_ES"
+   ],
+   "gaps": [
+    "es_ES"
+   ],
+   "as_expected": true
+  },
+  {
+   "gate": "family",
+   "case": "zh_Hant has B fuzzy, so B would show Simplified",
+   "expected_gaps": [
+    "zh_Hant"
+   ],
+   "gaps": [
+    "zh_Hant"
+   ],
+   "as_expected": true
+  },
+  {
+   "gate": "family",
+   "case": "es and es_ES both miss B: English shows, no gap",
+   "expected_gaps": [],
+   "gaps": [],
+   "as_expected": true
+  },
+  {
+   "gate": "family",
+   "case": "es alone misses B: English shows, no gap",
+   "expected_gaps": [],
+   "gaps": [],
    "as_expected": true
   }
  ]
