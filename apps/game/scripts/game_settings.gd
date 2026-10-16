@@ -212,15 +212,7 @@ func _build_menu() -> void:
 	display.add_child(vsync)
 	vsync.disabled = DisplayServer.get_name() == "headless"
 	vsync.toggled.connect(func(_value: bool) -> void: _apply_graphics(); _save_extra())
-	var aa_label: Label = _label("EDGE SMOOTHING", 16)
-	aa_label.position = Vector2(410, 77)
-	display.add_child(aa_label)
-	antialiasing = OptionButton.new()
-	antialiasing.position = Vector2(410, 111)
-	antialiasing.size = Vector2(270, 42)
-	for caption: String in ["OFF", "2× MSAA", "4× MSAA", "8× MSAA"]:
-		antialiasing.add_item(caption)
-	display.add_child(antialiasing)
+	antialiasing = _option_row(display, "EDGE SMOOTHING", Rect2(410, 77, 0, 0), Rect2(410, 111, 270, 42), ["OFF", "2× MSAA", "4× MSAA", "8× MSAA"])
 	antialiasing.item_selected.connect(func(_index: int) -> void: _apply_graphics(); _save_extra())
 	reduced_motion = CheckButton.new()
 	reduced_motion.text = "REDUCED MOTION"
@@ -230,17 +222,11 @@ func _build_menu() -> void:
 	display.add_child(reduced_motion)
 	reduced_motion.toggled.connect(func(value: bool) -> void: reduced_motion_changed.emit(value); _save_extra())
 	# TEXT SIZE scales the play HUD's words and the station names, 100% to 200% (TextSize).
-	var text_size_label: Label = _label("TEXT SIZE", 16)
-	text_size_label.position = Vector2(410, 198)
-	text_size_label.size = Vector2(100, 40)
-	display.add_child(text_size_label)
-	text_size = OptionButton.new()
-	text_size.position = Vector2(520, 196)
-	text_size.size = Vector2(160, 40)
-	text_size.tooltip_text = "Scales the dialogue, hints, cards and station names."
+	var size_captions: Array[String] = []
 	for step: float in TextSize.STEPS:
-		text_size.add_item("%d%%" % roundi(step * 100.0))
-	display.add_child(text_size)
+		size_captions.append("%d%%" % roundi(step * 100.0))
+	text_size = _option_row(display, "TEXT SIZE", Rect2(410, 198, 100, 40), Rect2(520, 196, 160, 40), size_captions)
+	text_size.tooltip_text = "Scales the dialogue, hints, cards and station names."
 	text_size.item_selected.connect(func(index: int) -> void: TextSize.factor = TextSize.STEPS[index]; text_size_changed.emit(TextSize.factor); _save_extra())
 	var audio: VBoxContainer = _page_box()
 	pages.append(audio)
@@ -323,6 +309,26 @@ func _label(caption: String, font_size: int) -> Label:
 	label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 	label.add_theme_font_size_override("font_size", font_size)
 	return label
+
+
+## A captioned drop-down on [param page]: a 16 px label reading [param caption] at
+## [param label_rect]'s position (and at its size, unless that is zero, when the label keeps its own),
+## then an OptionButton at [param option_rect] (page px) holding [param items] in order, label first in
+## the tree. Returns the OptionButton; the caller connects it and sets anything else. The DISPLAY
+## page's EDGE SMOOTHING and TEXT SIZE rows are made with it.
+func _option_row(page: Control, caption: String, label_rect: Rect2, option_rect: Rect2, items: Array[String]) -> OptionButton:
+	var label: Label = _label(caption, 16)
+	label.position = label_rect.position
+	if label_rect.size != Vector2.ZERO:
+		label.size = label_rect.size
+	page.add_child(label)
+	var option: OptionButton = OptionButton.new()
+	option.position = option_rect.position
+	option.size = option_rect.size
+	for item: String in items:
+		option.add_item(item)
+	page.add_child(option)
+	return option
 
 
 func _slider_row(parent: Node, caption: String, minimum: float, maximum: float, step: float) -> HSlider:
