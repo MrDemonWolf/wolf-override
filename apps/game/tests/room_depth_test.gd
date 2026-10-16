@@ -38,18 +38,13 @@ func _run() -> void:
 		["touch play, right end", Vector2(960.0 - half_play, touch_y), 1.35, SHAKE],
 		["opening", Vector2(267.0, 355.0), 1.8, 0.0],
 		["opening, pan", Vector2(300.0, 355.0), 1.95, 0.0],
-		["chapter close", Vector2(960.0 - 480.0 / 1.55, 352.0), 1.55, 0.0],
+		["close-up, right end", Vector2(960.0 - 480.0 / 1.55, 352.0), 1.55, 0.0],
 	]
 	camera.position_smoothing_enabled = false
 	for framing: Array in framings:
 		camera.zoom = Vector2.ONE * float(framing[2])
 		for shake: float in ([-framing[3], framing[3]] if framing[3] > 0.0 else [0.0]):
-			camera.position = framing[1]
-			camera.offset = Vector2(shake, absf(shake))
-			await process_frame
-			await process_frame
-			var half: Vector2 = Vector2(960.0, 540.0) * 0.5 / camera.zoom
-			var view: Rect2 = Rect2(camera.get_screen_center_position() - half, half * 2.0)
+			var view: Rect2 = await _view_at(camera, framing[1], shake)
 			for room_name: String in rooms:
 				_check_coverage("%s, %s, shake %d" % [room_name, framing[0], int(shake)], rooms[room_name], view)
 	camera.offset = Vector2.ZERO
@@ -259,6 +254,18 @@ func _expect(condition: bool, label: String) -> void:
 		push_error("Room depth check failed: " + label)
 
 
+## The world rect [param camera] shows at its current zoom, placed at [param at] with the shake
+## offset [param shake] (world px: right by shake and down by |shake|), once two process frames have
+## drawn it there (the camera takes its new position on the next frame).
+func _view_at(camera: Camera2D, at: Vector2, shake: float) -> Rect2:
+	camera.position = at
+	camera.offset = Vector2(shake, absf(shake))
+	await process_frame
+	await process_frame
+	var half: Vector2 = Vector2(960.0, 540.0) * 0.5 / camera.zoom
+	return Rect2(camera.get_screen_center_position() - half, half * 2.0)
+
+
 ## The junction's play view runs on past the room's end to JunctionRoom.EXIT_VIEW_RIGHT. Past the mid
 ## plate's right bleed only the exit's own pieces stand between the camera and the far plate, so at the
 ## right end (keyboard and touch framing, shaken both ways) they cover that strip down to the view's
@@ -277,12 +284,7 @@ func _check_exit_view_edge(junction: JunctionRoom, camera: Camera2D, half_play: 
 	camera.zoom = Vector2.ONE * 1.35
 	for camera_y: float in [360.0, touch_y]:
 		for shake: float in [-SHAKE, SHAKE]:
-			camera.position = Vector2(JunctionRoom.EXIT_VIEW_RIGHT - half_play, camera_y)
-			camera.offset = Vector2(shake, absf(shake))
-			await process_frame
-			await process_frame
-			var half: Vector2 = Vector2(960.0, 540.0) * 0.5 / camera.zoom
-			var view: Rect2 = Rect2(camera.get_screen_center_position() - half, half * 2.0)
+			var view: Rect2 = await _view_at(camera, Vector2(JunctionRoom.EXIT_VIEW_RIGHT - half_play, camera_y), shake)
 			var gaps: int = 0
 			var first_gap: Vector2 = Vector2.ZERO
 			var x: float = mid_span.end.x
