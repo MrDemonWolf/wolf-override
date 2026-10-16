@@ -47,6 +47,7 @@ func _run() -> void:
 	await process_frame
 	_expect((game.get_node("IntroCamera") as Camera2D).offset == Vector2.ZERO and Engine.time_scale == 1.0, "with Reduced Motion on, a boom leaves the camera still and skips hit-stop")
 	_expect(paused and menu.is_visible_in_tree() and game.get("title_open"), "settings open before starting a game")
+	_check_display_page(menu)
 	var navigation_actions: Array[StringName] = [&"ui_left", &"ui_right", &"ui_up", &"ui_down"]
 	var navigation_buttons: Array[JoyButton] = [JOY_BUTTON_DPAD_LEFT, JOY_BUTTON_DPAD_RIGHT, JOY_BUTTON_DPAD_UP, JOY_BUTTON_DPAD_DOWN]
 	for index: int in navigation_actions.size():
@@ -162,6 +163,8 @@ func _run() -> void:
 	_expect(InputMap.action_get_events(&"move_right").size() == 4, "unmodified movement retains both keyboard keys, D-pad and stick")
 	reloaded.call("_new_game")
 	reloaded.call("_finish_intro")
+	# Past the tutorial prompt, which is the one prompt on the first frames, the hint bar shows.
+	reloaded.set("tutorial_step", 2)
 	reloaded.call("_refresh_ui")
 	_expect((reloaded.get_node("CanvasLayer/ContextHint/Text") as Label).text.begins_with("Q:"), "interaction hint follows remapped key")
 	restored.reset_controls()
@@ -220,6 +223,34 @@ func _check_hostile_settings() -> void:
 			Engine.remove_meta("wolf_settings_poc")
 	for file: String in [path, script_path, save_path]:
 		DirAccess.remove_absolute(ProjectSettings.globalize_path(file))
+
+
+## Q10 (October 14, 2026): the Display tab, where TEXT SIZE is, keeps its THE DEN / LOCAL CONFIGURATION
+## heading, shows no GPU or renderer line, and says the window size is OS-managed only on phones and
+## tablets; the V-sync sentence shows everywhere.
+func _check_display_page(menu: GameSettings) -> void:
+	menu.select_tab(0)
+	var texts: Array[String] = []
+	for label: Node in menu.find_children("*", "Label", true, false):
+		if (label as Label).is_visible_in_tree():
+			texts.append((label as Label).text)
+	_expect("THE DEN  /  LOCAL CONFIGURATION" in texts and menu.text_size.is_visible_in_tree(), "the Display tab keeps the THE DEN / LOCAL CONFIGURATION heading, beside TEXT SIZE")
+	var adapter: String = RenderingServer.get_video_adapter_name()
+	var developer_lines: Array[String] = []
+	for text: String in texts:
+		if text.contains("GPU") or text.contains("Renderer") or (not adapter.is_empty() and text.contains(adapter)):
+			developer_lines.append(text)
+	_expect(developer_lines.is_empty(), "the Display tab shows no GPU or renderer line (%s)" % [developer_lines])
+	var was_mobile: bool = menu.mobile
+	_expect(not was_mobile, "a desktop run is not a phone or tablet")
+	_expect(menu.note.text == "V-sync may limit the FPS cap.", "on desktop the Display note leaves out the mobile window size (%s)" % menu.note.text)
+	menu.mobile = true
+	menu.select_tab(0)
+	_expect(menu.note.text == "Window size is OS-managed on mobile. V-sync may limit the FPS cap.", "on phones and tablets the Display note says the OS manages the window size (%s)" % menu.note.text)
+	menu.select_tab(1)
+	_expect(not menu.note.text.contains("OS-managed"), "the other tabs keep their own notes")
+	menu.mobile = was_mobile
+	menu.select_tab(0)
 
 
 func _write_text(path: String, text: String) -> void:

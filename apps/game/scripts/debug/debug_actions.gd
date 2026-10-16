@@ -177,12 +177,14 @@ func jump(id: StringName) -> String:
 		&"relay_question":
 			game.debug_new_game(true)
 			# Beside the breaker, as play arrives there; its interact gives WOLF's purge stakes, the next
-			# one his question about the relay.
+			# ones go on through their boxes to his question about the relay.
 			var breaker: Vector4 = Main.CORRIDOR_STATIONS[0]
 			var spot: float = game.debug_station_side_x(breaker, breaker.x - 1.0)
 			game.debug_place(spot, spot - M0Actor.FOLLOW_GAP)
-			game.debug_interact()
-			game.debug_interact()
+			for _press: int in 4:
+				if game.waiting_for_choice:
+					break
+				game.debug_interact()
 		_:
 			if not build_state(id).save_to_disk(game.save_path):
 				return "The checkpoint for %s could not be written." % JUMP_NAMES[id]

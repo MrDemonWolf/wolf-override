@@ -13,17 +13,24 @@ const MAX_SETTINGS_BYTES: int = 65536
 ## not drawn at the smallest size. Mobile windows are OS-managed and ignore both.
 const WINDOW_SIZES: Array[Vector2i] = [Vector2i(960, 540), Vector2i(1280, 720), Vector2i(1920, 1080)]
 const DEFAULT_WINDOW_SIZE: int = 1
+## The Display tab's note (Q10, October 14, 2026): the window-size sentence shows only on phones and
+## tablets, where the OS sizes the window; the V-sync sentence applies everywhere.
+const MOBILE_WINDOW_NOTE: String = "Window size is OS-managed on mobile."
+const VSYNC_NOTE: String = "V-sync may limit the FPS cap."
 
 ## Reduced Motion changed; Main hands it to the impact kit (no shake or hit-stop, shorter flashes).
 signal reduced_motion_changed(enabled: bool)
 ## TOGGLE HOLDS changed: with it on, one press of interact works a crank until a second press.
 signal hold_toggle_changed(enabled: bool)
+## TEXT SIZE changed (TextSize.factor already holds the new factor); Main lays the HUD out again.
+signal text_size_changed(factor: float)
 
 var settings_path: String
 var tabs: TabBar
 var vsync: CheckButton
 var antialiasing: OptionButton
 var reduced_motion: CheckButton
+var text_size: OptionButton
 var volumes: Dictionary = {}
 var binding_buttons: Dictionary = {}
 var defaults: Dictionary = {}
@@ -34,6 +41,8 @@ var capture_action: StringName = &""
 var capture_kind: String = ""
 var display_nodes: Array[CanvasItem] = []
 var pages: Array[Control] = []
+## A phone or tablet build (iOS or Android): the window is the OS's, and the Display note says so.
+var mobile: bool = OS.has_feature("ios") or OS.has_feature("android")
 ## prompt() labels by action, for keys and for a controller; the HUD asks for them every frame, so
 ## they are worked out once and forgotten whenever this menu changes a binding.
 var _key_prompts: Dictionary = {}
@@ -50,6 +59,8 @@ func configure(path: String) -> void:
 	vsync.set_pressed_no_signal(boolean(config, "video", "vsync", true))
 	antialiasing.select(clampi(int(number(config, "video", "msaa_2d", 0)), 0, 3))
 	reduced_motion.set_pressed_no_signal(boolean(config, "video", "reduced_motion", false))
+	TextSize.factor = TextSize.nearest_step(number(config, "video", "text_size", 1.0))
+	text_size.select(TextSize.STEPS.find(TextSize.factor))
 	_apply_graphics()
 	for bus: String in BUSES:
 		if AudioServer.get_bus_index(bus) < 0:
@@ -201,15 +212,7 @@ func _build_menu() -> void:
 	display.add_child(vsync)
 	vsync.disabled = DisplayServer.get_name() == "headless"
 	vsync.toggled.connect(func(_value: bool) -> void: _apply_graphics(); _save_extra())
-	var aa_label: Label = _label("EDGE SMOOTHING", 16)
-	aa_label.position = Vector2(410, 77)
-	display.add_child(aa_label)
-	antialiasing = OptionButton.new()
-	antialiasing.position = Vector2(410, 111)
-	antialiasing.size = Vector2(270, 42)
-	for caption: String in ["OFF", "2× MSAA", "4× MSAA", "8× MSAA"]:
-		antialiasing.add_item(caption)
-	display.add_child(antialiasing)
+	antialiasing = _option_row(display, "EDGE SMOOTHING", Rect2(410, 77, 0, 0), Rect2(410, 111, 270, 42), ["OFF", "2× MSAA", "4× MSAA", "8× MSAA"])
 	antialiasing.item_selected.connect(func(_index: int) -> void: _apply_graphics(); _save_extra())
 	reduced_motion = CheckButton.new()
 	reduced_motion.text = "REDUCED MOTION"
@@ -218,11 +221,13 @@ func _build_menu() -> void:
 	reduced_motion.size = Vector2(272, 40)
 	display.add_child(reduced_motion)
 	reduced_motion.toggled.connect(func(value: bool) -> void: reduced_motion_changed.emit(value); _save_extra())
-	var gpu: Label = _label("GPU: %s\nRenderer: Compatibility" % RenderingServer.get_video_adapter_name(), 14)
-	gpu.position = Vector2(8, 194)
-	gpu.size = Vector2(680, 44)
-	gpu.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	display.add_child(gpu)
+	# TEXT SIZE scales the play HUD's words and the station names, 100% to 200% (TextSize).
+	var size_captions: Array[String] = []
+	for step: float in TextSize.STEPS:
+		size_captions.append("%d%%" % roundi(step * 100.0))
+	text_size = _option_row(display, "TEXT SIZE", Rect2(410, 198, 100, 40), Rect2(520, 196, 160, 40), size_captions)
+	text_size.tooltip_text = "Scales the dialogue, hints, cards and station names."
+	text_size.item_selected.connect(func(index: int) -> void: TextSize.factor = TextSize.STEPS[index]; text_size_changed.emit(TextSize.factor); _save_extra())
 	var audio: VBoxContainer = _page_box()
 	pages.append(audio)
 	for bus: String in BUSES:
@@ -306,6 +311,26 @@ func _label(caption: String, font_size: int) -> Label:
 	return label
 
 
+## A captioned drop-down on [param page]: a 16 px label reading [param caption] at
+## [param label_rect]'s position (and at its size, unless that is zero, when the label keeps its own),
+## then an OptionButton at [param option_rect] (page px) holding [param items] in order, label first in
+## the tree. Returns the OptionButton; the caller connects it and sets anything else. The DISPLAY
+## page's EDGE SMOOTHING and TEXT SIZE rows are made with it.
+func _option_row(page: Control, caption: String, label_rect: Rect2, option_rect: Rect2, items: Array[String]) -> OptionButton:
+	var label: Label = _label(caption, 16)
+	label.position = label_rect.position
+	if label_rect.size != Vector2.ZERO:
+		label.size = label_rect.size
+	page.add_child(label)
+	var option: OptionButton = OptionButton.new()
+	option.position = option_rect.position
+	option.size = option_rect.size
+	for item: String in items:
+		option.add_item(item)
+	page.add_child(option)
+	return option
+
+
 func _slider_row(parent: Node, caption: String, minimum: float, maximum: float, step: float) -> HSlider:
 	var row: HBoxContainer = HBoxContainer.new()
 	row.custom_minimum_size.y = 48
@@ -364,7 +389,12 @@ func select_tab(index: int) -> void:
 		pages[page_index].visible = page_index == index
 	for node: CanvasItem in display_nodes:
 		node.visible = index == 0
-	note.text = ["Window size is OS-managed on mobile. V-sync may limit the FPS cap.", "Volume changes apply immediately. Effects carries every sound effect; there is no music or voice yet.", "Select a binding, then press a key, controller button or move a stick."][index]
+	note.text = [display_note(), "Volume changes apply immediately. Effects carries every sound effect; there is no music or voice yet.", "Select a binding, then press a key, controller button or move a stick."][index]
+
+
+## The Display tab's note: the window-size sentence only where the OS manages the window (Q10).
+func display_note() -> String:
+	return "%s %s" % [MOBILE_WINDOW_NOTE, VSYNC_NOTE] if mobile else VSYNC_NOTE
 
 
 func _apply_graphics() -> void:
@@ -561,6 +591,7 @@ func _save_extra() -> bool:
 	config.set_value("video", "vsync", vsync.button_pressed)
 	config.set_value("video", "msaa_2d", antialiasing.selected)
 	config.set_value("video", "reduced_motion", reduced_motion.button_pressed)
+	config.set_value("video", "text_size", TextSize.factor)
 	for bus: String in BUSES:
 		config.set_value("audio", bus, (volumes[bus] as HSlider).value)
 	config.set_value("controls", "deadzone", deadzone.value)
