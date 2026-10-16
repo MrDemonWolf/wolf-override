@@ -101,7 +101,7 @@ build starts only after he answers [DECISIONS.md](DECISIONS.md).
 
 ## How it was made
 
-Six steps ran on October 15 and 16, 2026, as one Claude Code workflow for Nathanial:
+These steps ran on October 15 and 16, 2026, as one Claude Code workflow for Nathanial:
 1. **research-markets:** the language list from Steam, mobile, speaker and English-proficiency data.
 2. **research-godot:** Godot 4.7.2's localization features, read in the 4.7.2-stable source and the
    4.7 docs and measured headless.
@@ -114,6 +114,11 @@ Six steps ran on October 15 and 16, 2026, as one Claude Code workflow for Nathan
    named-placeholder and plural gates built and proved with planted errors; the overflow gate, the
    lighter-game steps and the opening-dock line breaks planned; the Noto naming question settled; the
    test claims corrected; and the reader's summaries added.
+8. **fix-2** (after a second round of three reviews): the sibling-file fallback measured and designed
+   out (one catalog registered, plus a gate); one per-language table for the tools; the gender gate
+   rebuilt on per-line marks ("you" lines, the vocative, pronouns) and measured on a real Codex run; the
+   name-case, BBCode, printf and sibling gates; `check` failing CI; the proofreading priced; the stills
+   captioned; and the smaller facts corrected.
 
 **Heavy runs** (Godot imports, full test runs and renders) took one shared slot, so Nathanial's Mac
 stayed calm:
@@ -194,4 +199,19 @@ The machine restart had already emptied `<scratch>`. The fix step re-cloned this
 - `<scratch>/i18n/fix-1`: the Steam and Wayback pages, a scratch copy of `main` with the prototype
   patch applied (no `.godot` import), the planted-error PO copies, a fontTools venv and the gate
   outputs before they were copied here;
+- `<scratch>/i18n/repo`: the clone, after the last push.
+
+## Deleted by the fix-2 step
+
+The fix-2 step re-cloned this branch to `<scratch>/i18n/repo` and worked in `<scratch>/i18n/fix-2`. It
+took the heavy slot once, for one headless run of the research probe (`godot/probe/probe_runtime.gd`,
+a tiny project, no game import), and freed it after. It ran no render and no full check, opened no
+window, and started one Codex session (`01a146cf-4beb-7f42-8d61-726071ffb149`, archived). The prototype
+patch's PO files changed by `#. i18n:` comment lines only, which Godot's loader skips, so the game
+suites were not run again; the patch still applies to 1cf8d73 (`git apply --check`). Deleted by literal
+path:
+- `<scratch>/i18n/fix-2`: the scratch copies of `main` with and without the patch (no `.godot`
+  import), the probe copy and its isolated HOME with Godot's import of the probe, the planted-error PO
+  copies and their script, the Codex working folder, the fetched pages (Quebec, ProZ, AUSIT) and the
+  Godot source files read for the citations;
 - `<scratch>/i18n/repo`: the clone, after the last push.
