@@ -49,10 +49,21 @@ Contract
 Gotchas
     - The PO parser here reads what Godot's generator and this tool write (msgctxt, msgid, msgid_plural,
       msgstr, msgstr[n], comments, continued strings); it is not a general gettext parser.
-    - Godot reads "Language:" from the PO header. A file that has a msgid_plural entry but a missing or
-      invalid "Plural-Forms:" header, or a plural entry with the wrong number of msgstr[n], is rejected
-      whole (core/io/translation_loader_po.cpp, ERR_FAIL), so the header always carries the language's
-      real rule and the plural gate counts the forms.
+    - Godot reads "Language:" from the PO header (4.7.2-stable core/io/translation_loader_po.cpp). It
+      rejects the whole file when the header entry is missing ("No config found"), when a msgid_plural
+      entry comes and the header has no "Plural-Forms:" line at all, or when a plural entry has another
+      number of msgstr[n] than the rule's nplurals. A Plural-Forms line whose value does not parse is NOT
+      rejected: PluralRules::parse fails and Translation falls back to the rule of its locale at parse
+      time, still the default "en" (n != 1, 2 forms), because "Language:" is applied after the parse. So
+      a 1-form (ja, ko, zh) or 3-form (ru, pl) file is then rejected by the msgstr[n] count, but a 2-form
+      file (es, de, fr, pt_BR) loads silently with the English rule, which is wrong for fr and pt_BR at
+      n = 0. `check` therefore compares the header's rule with languages.json word for word
+      (plural_header_ok) rather than trusting the header's nplurals; msgfmt --check-header catches a
+      rule that does not parse.
+    - Godot skips the next message after ANY comment line that contains "fuzzy" (`l.contains("fuzzy")`,
+      the same loader), not only a "#, fuzzy" flag, so a translator note or mark with the word in it
+      silently drops a translated line. is_fuzzy mirrors the loader, `check` fails a language with such a
+      note (fuzzy_notes) and `fill` refuses to write one.
     - "es" is Latin-American Spanish: Godot reduces es-419 to "es", but the glossary and style packet name
       it es-419; languages.json's "glossary" field maps it back.
     - The gender gate is a heuristic, not a parser: it can flag a correct line (a noun that ends like a
@@ -122,6 +133,14 @@ MARKS = re.compile(r"i18n:\s*(.*)")
 #: Clause boundaries: a gendered form only counts in the same clause as the name ("Страж заметил: %s"
 #: is the sentry's verb, cut off by the colon).
 CLAUSE_SPLIT = re.compile(r"[,:;.!?\u2014\u2013()\n«»„“”「」]")
+#: Phrase boundaries for the apposition check: CLAUSE_SPLIT without the comma and the dashes, which in
+#: "%s, усталая, идёт" or "%s — раненая" set off a word that still describes the name. Only the words
+#: after the name are read this way; before it a comma usually ends another subject's clause.
+APPOSITION_SPLIT = re.compile(r"[:;.!?()\n«»„“”「」]")
+#: The comma and dashes an apposition is set off with, turned into spaces before the words are counted.
+APPOSITION_MARKS = re.compile(r"[,\u2014\u2013]")
+#: Punctuation stripped from each word's ends before it is matched (Spanish ¡ ¿, quotes, ellipsis).
+WORD_STRIP = "\"'…-¡¿"
 #: Sentence boundaries for the pronoun check, in Latin, Cyrillic and CJK punctuation.
 SENTENCE_SPLIT = re.compile(r"[.!?\n。！？]")
 #: How many words on each side of the name are read: subject and verb, or name and adjective, sit
@@ -137,8 +156,8 @@ POT_SKIP = ("tests/", "scripts/debug/", "addons/", ".godot/")
 
 def gender_rule(lang: str) -> dict[str, re.Pattern]:
     """The compiled gender rule of ``lang`` (LANGUAGES[lang]["gender"] in languages.json, with any
-    "extends" row filled in), as {"forms", "you", "first_person", "pronouns"} -> pattern, missing keys left
-    out. Empty for a language with no rule. Pure; patterns are case-insensitive."""
+    "extends" row filled in), as {"forms", "near_forms", "you", "first_person", "first_forms", "pronouns",
+    "person_words"} -> pattern, missing keys left out. Empty for a language with no rule. Pure; patterns are case-insensitive."""
     name = LANGUAGES.get(lang, {}).get("gender")
     fields: dict[str, str] = {}
     while name:
@@ -230,21 +249,48 @@ def entry_key(entry: dict) -> str:
 
 
 def is_fuzzy(entry: dict) -> bool:
-    """True when the entry has gettext's fuzzy flag, which Godot's PO loader skips (the line then falls
-    to another file of the same language, or to English: DESIGN.md)."""
-    return any(c.startswith("#,") and "fuzzy" in c for c in entry["comments"])
+    """True when Godot's PO loader skips the entry: any of its comment lines contains "fuzzy" (case-
+    sensitive, as the loader's String.contains), the gettext "#, fuzzy" flag or any other comment (see
+    Gotchas). The line then falls to another file of the same language, or to English: DESIGN.md."""
+    return any("fuzzy" in c for c in entry["comments"])
 
 
-def marks(entry: dict) -> dict[str, str]:
-    """The entry's "#. i18n: ..." marks (MARKS) as {key: value}; a bare word such as keep-breaks maps to
-    "". Read from extracted comments only ("#." lines), where the generator and `fill` put them."""
-    found: dict[str, str] = {}
+def fuzzy_notes(entry: dict) -> list[str]:
+    """The entry's comment lines that contain "fuzzy" but are not a "#," flag line: a translator note or
+    mark that makes Godot skip a line nobody marked fuzzy (Gotchas). Empty when there is none."""
+    return [c for c in entry["comments"] if "fuzzy" in c and not c.startswith("#,")]
+
+
+def _mark_values(entry: dict) -> dict[str, list[str]]:
+    """Every value each "#. i18n:" mark key has on the entry, in comment order. One msgid used at two
+    call sites gets one "#." note from each site (Godot's generator keeps both, the first as
+    "#. TRANSLATORS: i18n: ...", the second as "#. i18n: ..."), so a key can appear twice."""
+    found: dict[str, list[str]] = {}
     for comment in entry["comments"]:
         match = MARKS.search(comment) if comment.startswith("#.") else None
         for word in (match.group(1).split() if match else []):
             key, _, value = word.partition("=")
-            found[key] = value
+            found.setdefault(key, []).append(value)
     return found
+
+
+def marks(entry: dict) -> dict[str, str]:
+    """The entry's "#. i18n: ..." marks (MARKS) as {key: value}; a bare word such as keep-breaks maps to
+    "". Read from extracted comments only ("#." lines), where the generator and `fill` put them. When a
+    key has two different values the last wins here, and mark_conflicts reports it so `check` fails."""
+    return {key: values[-1] for key, values in _mark_values(entry).items()}
+
+
+#: The mark keys whose value changes what the gender gate and the back-translation are told; two call
+#: sites of one msgid that disagree on one of them make `check` fail (mark_conflicts).
+CONFLICT_KEYS = ("engineer", "slot", "speaker")
+
+
+def mark_conflicts(entry: dict) -> list[str]:
+    """The CONFLICT_KEYS that carry two different values on the entry (one msgid marked engineer=name at
+    one call site and slot=key or engineer=you at another), sorted. Empty when the marks agree. Pure."""
+    values = _mark_values(entry)
+    return sorted(key for key in CONFLICT_KEYS if len(set(values.get(key, []))) > 1)
 
 
 def engineer_roles(entry: dict) -> set[str]:
@@ -329,9 +375,12 @@ def fill(pot: Path, trans: Path, outdir: Path) -> None:
                 # translation's printf inserts with the msgid's (the pipeline step's msgfmt gate).
                 done["comments"].append("#, c-format")
             mark = data.get("marks", {}).get(entry["msgid"])
+            note = data["context"].get(entry["msgid"])
+            if "fuzzy" in f"{mark} {note}":
+                # Godot would skip the line for the word alone (Gotchas), so it never reaches a PO.
+                sys.exit(f"the note or mark for {entry['msgid']!r} contains 'fuzzy'; reword it")
             if mark:
                 done["comments"].insert(0, f"#. i18n: {mark}")
-            note = data["context"].get(entry["msgid"])
             if note:
                 done["comments"].insert(0, f"#. TRANSLATORS: {note}")
             if entry["msgid"] in texts:
@@ -392,31 +441,40 @@ def script_ok(text: str, lang: str, keep: list[str]) -> bool:
 
 def gendered_words(text: str, lang: str, roles: set[str]) -> list[str]:
     """The words of ``text`` that show the engineer's gender in ``lang``, for a line where the engineer
-    appears as ``roles`` (engineer_roles). Four checks, from gender_rule(lang):
-      1. name: a "forms" word within GENDER_WINDOW words of a NAME_SLOT, in the same clause (CLAUSE_SPLIT);
-      2. clause: every "forms" word in a clause that holds a second-person pronoun ("you"; this catches
+    appears as ``roles`` (engineer_roles). Six checks, from gender_rule(lang):
+      1. name: a "forms" or "near_forms" word within GENDER_WINDOW words before a NAME_SLOT in its clause
+         (CLAUSE_SPLIT), or after it across a comma or dash (APPOSITION_SPLIT: "%s, усталая,",
+         "%s — раненая", "%s, la nueva técnica");
+      2. you: a "near_forms" word within GENDER_WINDOW words of a second-person pronoun ("Tu es assise",
+         "Ты усталая");
+      3. clause: every "forms" word in a clause that holds a second-person pronoun ("you"; this catches
          the vocative "%s, ты была права"), and, when the engineer is addressed or referred to without
          the name (roles "you" or "third"), in every clause with no first-person subject pronoun, so
          WOLF's own "Я отказался" stays clear while "Ты нашла" is flagged. Words that are first person
          by their ending ("first_forms", Polish "Odmówiłem") are WOLF's and skipped;
-      3. self: when the engineer speaks ("self"), every "forms" and "first_forms" word;
-      4. pronoun: a gendered third-person pronoun ("pronouns") anywhere for "third", or in the sentence
-         holding the name and the one after it for "name" ("%s ist ... Sie wartet", "彼女は%sだ").
+      4. self: when the engineer speaks ("self"), every "forms" and "first_forms" word;
+      5. pronoun: a gendered third-person pronoun ("pronouns") anywhere for "third", or in the sentence
+         holding the name and the one after it for "name" ("%s ist ... Sie wartet", "彼女は%sだ");
+      6. person word: a gendered noun or honorific for a person ("person_words": 女の子, 小姐, 언니)
+         anywhere in a line where the engineer appears at all.
     Empty for a line with no roles or a language with no rule. Each word once, in order. Pure.
     A heuristic: a pronoun that means WOLF or the sentry next to the name is flagged too (a look, cleared
-    by a "# gender-ok:" stamp), and a gendered word it has no pattern for is missed (native review)."""
+    by a "# gender-ok:" stamp), and a gendered word it has no pattern for is missed (native review;
+    PIPELINE.md lists the form classes it does not cover)."""
     rule = gender_rule(lang)
     if not rule or not roles:
         return []
-    forms, first_forms, hits = rule.get("forms"), rule.get("first_forms"), []
+    forms, near_forms, first_forms, hits = rule.get("forms"), rule.get("near_forms"), rule.get("first_forms"), []
 
-    def flag(words: list[str], own_too: bool = False) -> None:
+    def flag(words: list[str], own_too: bool = False, near: bool = False) -> None:
+        """Adds each of ``words`` that is a gendered form: "forms" always, "near_forms" when ``near``
+        (the word sits next to the name or a "you"), first-person forms only when ``own_too``."""
         for word in words:
-            bare = word.strip("\"'…-").lower()
+            bare = word.strip(WORD_STRIP).lower()
             if first_forms and first_forms.match(bare):
                 if own_too:
                     hits.append(bare)
-            elif forms and forms.match(bare):
+            elif (forms and forms.match(bare)) or (near and near_forms and near_forms.match(bare)):
                 hits.append(bare)
 
     for clause in CLAUSE_SPLIT.split(text):
@@ -424,19 +482,31 @@ def gendered_words(text: str, lang: str, roles: set[str]) -> list[str]:
         if "name" in roles:
             for index, word in enumerate(words):
                 if NAME_SLOT.search(word):
-                    flag(words[max(0, index - GENDER_WINDOW):index] + words[index + 1:index + 1 + GENDER_WINDOW])
+                    flag(words[max(0, index - GENDER_WINDOW):index], near=True)
+        if "you" in rule:
+            for index, word in enumerate(words):
+                if rule["you"].search(word.strip(WORD_STRIP).lower()):
+                    flag(words[max(0, index - GENDER_WINDOW):index] + words[index + 1:index + 1 + GENDER_WINDOW], near=True)
         addressed = "you" in rule and rule["you"].search(clause)
         about = bool(roles & {"you", "third"}) and not ("first_person" in rule and rule["first_person"].search(clause))
         if "self" in roles:
             flag(words, own_too=True)
         elif addressed or about:
             flag(words)
+    if "name" in roles:
+        for phrase in APPOSITION_SPLIT.split(text):
+            words = APPOSITION_MARKS.sub(" ", phrase).split()
+            for index, word in enumerate(words):
+                if NAME_SLOT.search(word):
+                    flag(words[index + 1:index + 1 + GENDER_WINDOW], near=True)
     if "pronouns" in rule and roles & {"name", "third"}:
         # Empty pieces (". \n" ends one sentence twice) are dropped, so "the next sentence" is a real one.
         sentences = [piece for piece in SENTENCE_SPLIT.split(text) if piece.strip()]
         for index, sentence in enumerate(sentences):
             if "third" in roles or NAME_SLOT.search(sentence) or (index and NAME_SLOT.search(sentences[index - 1])):
                 hits += [match.group(0).strip().lower() for match in rule["pronouns"].finditer(sentence)]
+    if "person_words" in rule:
+        hits += [match.group(0).lower() for match in rule["person_words"].finditer(text)]
     return list(dict.fromkeys(hits))
 
 
@@ -470,6 +540,20 @@ def family_gaps(po_entries: dict[str, list[dict]]) -> dict[str, list[str]]:
     return gaps
 
 
+def header_plural_rule(header: str) -> str | None:
+    """The value of a PO header's "Plural-Forms:" line with its whitespace collapsed, or None when the
+    header has no such line."""
+    match = re.search(r"^Plural-Forms:(.*)$", header, re.MULTILINE)
+    return " ".join(match.group(1).split()) if match else None
+
+
+def plural_header_ok(header: str, lang: str) -> bool:
+    """True when the PO header's Plural-Forms value is ``lang``'s rule in languages.json, word for word
+    (whitespace aside). Not "it parses": Godot loads a 2-form file whose rule does not parse with the
+    English rule and no error (Gotchas), so only an exact match proves the shipped rule."""
+    return header_plural_rule(header) == " ".join(LANGUAGES[lang]["plural_forms"].split())
+
+
 def nplurals(header: str) -> int:
     """The nplurals of a PO header's Plural-Forms line (1 when the header has none)."""
     match = re.search(r"nplurals\s*=\s*(\d+)", header)
@@ -481,7 +565,8 @@ def plural_problems(entry: dict, forms: int) -> list[str]:
     wrong number of forms, an empty form, or a form whose inserts differ from its English (form 0 against
     msgid, the others against msgid_plural; trial.placeholders_ok). Empty for a non-plural entry. A wrong
     count matters beyond the line: Godot's PO loader rejects the whole file for it, as it does for a
-    msgid_plural under a missing or invalid Plural-Forms header (core/io/translation_loader_po.cpp)."""
+    msgid_plural under a header with no Plural-Forms line (core/io/translation_loader_po.cpp; an
+    unparsable rule is plural_header_ok's job, see Gotchas)."""
     if "msgid_plural" not in entry:
         return []
     problems = [] if len(entry["msgstr"]) == forms else [f"{len(entry['msgstr'])} forms, the header says {forms}"]
@@ -500,8 +585,10 @@ LINE_GATES = ("placeholders_ok", "tag_ok", "breaks_ok", "key_token_ok", "script_
 
 def check(pot: Path, podir: Path, back: Path, out: Path) -> None:
     """Runs every automated gate on the PO files, writes the report to ``out`` and exits 1 when any
-    language fails: a failed line, a non-zero msgfmt, or a gap in a language with a sibling file
-    (family_gaps). A PO whose language is not in languages.json stops the run."""
+    language fails: a failed line, a non-zero msgfmt, a gap in a language with a sibling file
+    (family_gaps), a header Plural-Forms rule other than languages.json's (plural_header_ok), a comment
+    that would make Godot skip a line (fuzzy_notes), or a msgid whose call sites disagree on a mark
+    (mark_conflicts, in the POT or the PO). A PO whose language is not in languages.json stops the run."""
     glossary = trial.load("glossary.json")
     fonts = trial.Fonts()
     backs = json.loads(back.read_text(encoding="utf-8"))["back"] if back.exists() else {}
@@ -510,7 +597,8 @@ def check(pot: Path, podir: Path, back: Path, out: Path) -> None:
     if unknown:
         sys.exit(f"PO files for languages missing from {LANGUAGES_FILE.name}: {unknown}")
     gaps = family_gaps(po_entries)
-    report: dict = {"pot_messages": len(messages(pot)), "languages": {}}
+    pot_conflicts = {msgid: mark_conflicts(entry) for msgid, entry in messages(pot).items() if mark_conflicts(entry)}
+    report: dict = {"pot_messages": len(messages(pot)), "pot_mark_conflicts": pot_conflicts, "languages": {}}
     for lang, entries in po_entries.items():
         fmt = subprocess.run(["msgfmt", "--check-format", "--check-header", "-o", "/dev/null", "--statistics", str(podir / f"{lang}.po")],
                              capture_output=True, text=True)
@@ -533,7 +621,7 @@ def check(pot: Path, podir: Path, back: Path, out: Path) -> None:
             measures["gender_words"] = gendered_words(text, lang, roles)
             measures["gender_ok"] = gender_stamped or not measures["gender_words"]
             measures["name_case_ok"] = name_case_ok(text, lang, roles)
-            measures["plural_problems"] = plural_problems(entry, nplurals(header))
+            measures["plural_problems"] = plural_problems(entry, plural_count(lang))
             measures["back_key"] = f"{lang}-{entry_key(entry)}"
             item = backs.get(measures["back_key"])
             measures["back_engineer_gendered"] = item.get("engineer_gendered") if item else None
@@ -549,9 +637,14 @@ def check(pot: Path, podir: Path, back: Path, out: Path) -> None:
                               and not measures["glossary_missing"] and not measures["plural_problems"])
             rows.append({"msgid": english, "msgstr": text, **measures})
         failed = [r["msgid"] for r in rows if not r["ok"]]
+        notes = [e["msgid"] for e in entries if e["msgid"] and fuzzy_notes(e)]
+        conflicts = {e["msgid"]: mark_conflicts(e) for e in entries if e["msgid"] and mark_conflicts(e)}
+        header_ok = plural_header_ok(header, lang)
         report["languages"][lang] = {
-            "ok": fmt.returncode == 0 and not failed and not gaps.get(lang),
+            "ok": (fmt.returncode == 0 and not failed and not gaps.get(lang) and header_ok and not notes
+                   and not conflicts and not pot_conflicts),
             "msgfmt_rc": fmt.returncode, "msgfmt": (fmt.stdout + fmt.stderr).strip(),
+            "plural_header_ok": header_ok, "fuzzy_notes": notes, "mark_conflicts": conflicts,
             "translated": len(translated), "fuzzy": [e["msgid"] for e in entries if e["msgid"] and is_fuzzy(e)],
             "family_gaps": gaps.get(lang), "failed": failed,
             "back_missing": sum(1 for r in rows if "back" not in r),
@@ -568,7 +661,8 @@ def check(pot: Path, podir: Path, back: Path, out: Path) -> None:
 
 
 #: The planted cases `selftest` runs: (gate, language, English, translation, should it pass, engineer
-#: mark). Each gate gets clean lines that must pass (some are the prototype's real Russian knockdown
+#: mark). For "plural_header" the translation slot holds a PO header, for "fuzzy_note" and "marks" an
+#: entry's comment lines. Each gate gets clean lines that must pass (some are the prototype's real Russian knockdown
 #: lines, which put another subject's verb or an impersonal verb near the name) and planted errors that
 #: must fail; the reviewers' planted gender lines of October 16 are among them. An empty mark means the
 #: default (engineer=name when the line has a slot).
@@ -615,6 +709,59 @@ SELFTEST = [
     ("gender", "ja", "", "彼女は%sだ。", False, ""),
     ("gender", "zh_Hans", "", "%s站在格栅上。", True, ""),
     ("gender", "zh_Hans", "", "她是%s。", False, ""),
+    # The review-feasibility-3 planted lines (October 16): the commonest feminine and masculine forms
+    # per language. Each must fail; the clean lines after each language must still pass.
+    ("gender", "fr", "", "%s est sortie.", False, ""),
+    ("gender", "fr", "", "%s est partie.", False, ""),
+    ("gender", "fr", "", "%s est morte.", False, ""),
+    ("gender", "fr", "", "%s est mort.", False, ""),
+    ("gender", "fr", "", "%s est heureuse.", False, ""),
+    ("gender", "fr", "", "%s est heureux.", False, ""),
+    ("gender", "fr", "", "WOLF : Tu es assise.", False, "you"),
+    ("gender", "fr", "", "WOLF : Tu es assis.", False, "you"),
+    ("gender", "fr", "", "%s, la technicienne, ouvre la vanne.", False, ""),
+    ("gender", "fr", "", "%s ouvre la porte de la sortie.", True, ""),
+    ("gender", "fr", "", "WOLF : Tu vois la porte ? Va vers la batterie.", True, "you"),
+    ("gender", "es", "", "%s está muerta.", False, ""),
+    ("gender", "es", "", "%s está muerto.", False, ""),
+    ("gender", "es", "", "%s está despierta.", False, ""),
+    ("gender", "es", "", "%s, la nueva técnica, revisa el panel.", False, ""),
+    ("gender", "es", "", "%s, el nuevo técnico, revisa el panel.", False, ""),
+    ("gender", "es", "", "WOLF: ¿Estás cansada?", False, "you"),
+    ("gender", "es", "", "%s abre la puerta de salida.", True, ""),
+    ("gender", "pt_BR", "", "%s está morta.", False, ""),
+    ("gender", "pt_BR", "", "%s está morto.", False, ""),
+    ("gender", "pt_BR", "", "WOLF: Você está certa.", False, "you"),
+    ("gender", "pt_BR", "", "%s abre a porta da escada.", True, ""),
+    ("gender", "pl", "", "%s jest zmęczona.", False, ""),
+    ("gender", "pl", "", "%s jest zmęczony.", False, ""),
+    ("gender", "pl", "", "%s jest ranna.", False, ""),
+    ("gender", "pl", "", "WOLF: Jesteś zmęczona.", False, "you"),
+    ("gender", "pl", "", "WOLF: Jesteś pewny?", False, "you"),
+    ("gender", "pl", "", "%s stoi przy ścianie, strona druga.", True, ""),
+    ("gender", "ru", "", "%s, усталая, идёт к реле.", False, ""),
+    ("gender", "ru", "", "%s, усталый, идёт к реле.", False, ""),
+    ("gender", "ru", "", "%s — раненая.", False, ""),
+    ("gender", "ru", "", "Инженерка %s у реле.", False, ""),
+    ("gender", "ru", "", "Техничка %s у реле.", False, ""),
+    ("gender", "ru", "", "%s уверена.", False, ""),
+    ("gender", "ru", "", "WOLF: Ты усталая.", False, "you"),
+    ("gender", "ru", "", "%s — у стены, а дверь закрыта.", True, ""),
+    ("gender", "ru", "", "WOLF: Иди к большой двери. Найди рубильник.", True, "you"),
+    ("gender", "de", "", "%s ist Wartungstechnikerin.", False, ""),
+    ("gender", "de", "", "%s ist Wartungsingenieur.", False, ""),
+    ("gender", "de", "", "WARTUNGSINGENIEURIN", False, "third"),
+    ("gender", "de", "", "%s öffnet die Tür. Die Wartungstechnik wartet.", True, ""),
+    ("gender", "it", "", "%s è stanca.", False, ""),
+    ("gender", "it", "", "%s è stanco.", False, ""),
+    ("gender", "it", "", "%s apre la porta.", True, ""),
+    ("gender", "ja", "", "%sさんは女の子だ。", False, ""),
+    ("gender", "ja", "", "%sくん、格子から離れて。", False, ""),
+    ("gender", "ja", "", "%sさんは格子の上にいる。ちゃんと見て。", True, ""),
+    ("gender", "zh_Hans", "", "%s小姐在格栅上。", False, ""),
+    ("gender", "zh_Hans", "", "%s在格栅上。", True, ""),
+    ("gender", "ko", "", "%s 씨는 여자다.", False, ""),
+    ("gender", "ko", "", "%s 씨는 격자 위에 있다.", True, ""),
     ("name_case", "ru", "", "Страж заметил %sа на открытом месте.", False, ""),
     ("name_case", "ru", "", "Страж заметил: %s на открытом месте.", True, ""),
     ("name_case", "pl", "", "Strażnik zobaczył %sa.", False, ""),
@@ -622,6 +769,19 @@ SELFTEST = [
     ("plural", "ru", "The valve gives. %d of %d turns.", ["Клапан поддаётся. %d из %d оборота.", "Клапан поддаётся. %d из %d оборотов.", "Клапан поддаётся. %d из %d оборотов."], True, ""),
     ("plural", "ru", "The valve gives. %d of %d turns.", ["Клапан поддаётся. %d из %d оборота.", "Клапан поддаётся. %d из %d оборотов."], False, ""),
     ("plural", "ru", "The valve gives. %d of %d turns.", ["Клапан поддаётся. %d из %d оборота.", "Клапан поддаётся. %d оборотов.", "Клапан поддаётся. %d из %d оборотов."], False, ""),
+    # Header rules: Godot loads fr with an unparsable rule silently as English (Gotchas).
+    ("plural_header", "fr", "", "Language: fr\nPlural-Forms: nplurals=2; plural=(n > 1);\n", True, ""),
+    ("plural_header", "fr", "", "Language: fr\nPlural-Forms: nplurals=2; plural=(n != 1);\n", False, ""),
+    ("plural_header", "fr", "", "Language: fr\nPlural-Forms: nplurals=2; plural=n >> 1\n", False, ""),
+    ("plural_header", "ru", "", "Language: ru\n", False, ""),
+    # Comment lines: any "fuzzy" outside a "#," flag line makes Godot skip the line (fuzzy_notes).
+    ("fuzzy_note", "de", "", ["#. TRANSLATORS: the gauge reading is fuzzy on purpose"], False, ""),
+    ("fuzzy_note", "de", "", ["#, c-format", "#. TRANSLATORS: the gauge reading is vague on purpose"], True, ""),
+    # Two call sites of one msgid (mark_conflicts).
+    ("marks", "de", "", ["#. TRANSLATORS: i18n: engineer=name", "#. i18n: engineer=name"], True, ""),
+    ("marks", "de", "", ["#. TRANSLATORS: i18n: engineer=name", "#. i18n: slot=key"], True, ""),
+    ("marks", "de", "", ["#. TRANSLATORS: i18n: engineer=name", "#. i18n: engineer=you"], False, ""),
+    ("marks", "de", "", ["#. TRANSLATORS: i18n: slot=choice", "#. i18n: slot=key"], False, ""),
 ]
 #: Planted sibling-file cases for family_gaps: (what, {lang: {msgid: (msgstr, fuzzy)}}, languages that
 #: must report a gap).
@@ -646,6 +806,12 @@ def selftest(out: Path) -> None:
         elif gate in ("gender", "name_case"):
             roles = engineer_roles({"msgid": text, "comments": [f"#. i18n: engineer={mark}"] if mark else []})
             passed = (not gendered_words(text, lang, roles)) if gate == "gender" else name_case_ok(text, lang, roles)
+        elif gate == "plural_header":
+            passed = plural_header_ok(text, lang)
+        elif gate == "fuzzy_note":
+            passed = not fuzzy_notes({"comments": text})
+        elif gate == "marks":
+            passed = not mark_conflicts({"comments": text})
         else:
             passed = not plural_problems({"msgid": english, "msgid_plural": english, "msgstr": text}, plural_count(lang))
         results.append({"gate": gate, "language": lang, "english": english, "translation": text, "engineer": mark,

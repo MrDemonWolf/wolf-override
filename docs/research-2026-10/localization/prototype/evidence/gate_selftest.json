@@ -1,6 +1,6 @@
 {
- "cases": 54,
- "as_expected": 54,
+ "cases": 115,
+ "as_expected": 115,
  "results": [
   {
    "gate": "placeholders",
@@ -423,6 +423,516 @@
    "as_expected": true
   },
   {
+   "gate": "gender",
+   "language": "fr",
+   "english": "",
+   "translation": "%s est sortie.",
+   "engineer": "",
+   "expected_pass": false,
+   "passed": false,
+   "as_expected": true
+  },
+  {
+   "gate": "gender",
+   "language": "fr",
+   "english": "",
+   "translation": "%s est partie.",
+   "engineer": "",
+   "expected_pass": false,
+   "passed": false,
+   "as_expected": true
+  },
+  {
+   "gate": "gender",
+   "language": "fr",
+   "english": "",
+   "translation": "%s est morte.",
+   "engineer": "",
+   "expected_pass": false,
+   "passed": false,
+   "as_expected": true
+  },
+  {
+   "gate": "gender",
+   "language": "fr",
+   "english": "",
+   "translation": "%s est mort.",
+   "engineer": "",
+   "expected_pass": false,
+   "passed": false,
+   "as_expected": true
+  },
+  {
+   "gate": "gender",
+   "language": "fr",
+   "english": "",
+   "translation": "%s est heureuse.",
+   "engineer": "",
+   "expected_pass": false,
+   "passed": false,
+   "as_expected": true
+  },
+  {
+   "gate": "gender",
+   "language": "fr",
+   "english": "",
+   "translation": "%s est heureux.",
+   "engineer": "",
+   "expected_pass": false,
+   "passed": false,
+   "as_expected": true
+  },
+  {
+   "gate": "gender",
+   "language": "fr",
+   "english": "",
+   "translation": "WOLF : Tu es assise.",
+   "engineer": "you",
+   "expected_pass": false,
+   "passed": false,
+   "as_expected": true
+  },
+  {
+   "gate": "gender",
+   "language": "fr",
+   "english": "",
+   "translation": "WOLF : Tu es assis.",
+   "engineer": "you",
+   "expected_pass": false,
+   "passed": false,
+   "as_expected": true
+  },
+  {
+   "gate": "gender",
+   "language": "fr",
+   "english": "",
+   "translation": "%s, la technicienne, ouvre la vanne.",
+   "engineer": "",
+   "expected_pass": false,
+   "passed": false,
+   "as_expected": true
+  },
+  {
+   "gate": "gender",
+   "language": "fr",
+   "english": "",
+   "translation": "%s ouvre la porte de la sortie.",
+   "engineer": "",
+   "expected_pass": true,
+   "passed": true,
+   "as_expected": true
+  },
+  {
+   "gate": "gender",
+   "language": "fr",
+   "english": "",
+   "translation": "WOLF : Tu vois la porte ? Va vers la batterie.",
+   "engineer": "you",
+   "expected_pass": true,
+   "passed": true,
+   "as_expected": true
+  },
+  {
+   "gate": "gender",
+   "language": "es",
+   "english": "",
+   "translation": "%s está muerta.",
+   "engineer": "",
+   "expected_pass": false,
+   "passed": false,
+   "as_expected": true
+  },
+  {
+   "gate": "gender",
+   "language": "es",
+   "english": "",
+   "translation": "%s está muerto.",
+   "engineer": "",
+   "expected_pass": false,
+   "passed": false,
+   "as_expected": true
+  },
+  {
+   "gate": "gender",
+   "language": "es",
+   "english": "",
+   "translation": "%s está despierta.",
+   "engineer": "",
+   "expected_pass": false,
+   "passed": false,
+   "as_expected": true
+  },
+  {
+   "gate": "gender",
+   "language": "es",
+   "english": "",
+   "translation": "%s, la nueva técnica, revisa el panel.",
+   "engineer": "",
+   "expected_pass": false,
+   "passed": false,
+   "as_expected": true
+  },
+  {
+   "gate": "gender",
+   "language": "es",
+   "english": "",
+   "translation": "%s, el nuevo técnico, revisa el panel.",
+   "engineer": "",
+   "expected_pass": false,
+   "passed": false,
+   "as_expected": true
+  },
+  {
+   "gate": "gender",
+   "language": "es",
+   "english": "",
+   "translation": "WOLF: ¿Estás cansada?",
+   "engineer": "you",
+   "expected_pass": false,
+   "passed": false,
+   "as_expected": true
+  },
+  {
+   "gate": "gender",
+   "language": "es",
+   "english": "",
+   "translation": "%s abre la puerta de salida.",
+   "engineer": "",
+   "expected_pass": true,
+   "passed": true,
+   "as_expected": true
+  },
+  {
+   "gate": "gender",
+   "language": "pt_BR",
+   "english": "",
+   "translation": "%s está morta.",
+   "engineer": "",
+   "expected_pass": false,
+   "passed": false,
+   "as_expected": true
+  },
+  {
+   "gate": "gender",
+   "language": "pt_BR",
+   "english": "",
+   "translation": "%s está morto.",
+   "engineer": "",
+   "expected_pass": false,
+   "passed": false,
+   "as_expected": true
+  },
+  {
+   "gate": "gender",
+   "language": "pt_BR",
+   "english": "",
+   "translation": "WOLF: Você está certa.",
+   "engineer": "you",
+   "expected_pass": false,
+   "passed": false,
+   "as_expected": true
+  },
+  {
+   "gate": "gender",
+   "language": "pt_BR",
+   "english": "",
+   "translation": "%s abre a porta da escada.",
+   "engineer": "",
+   "expected_pass": true,
+   "passed": true,
+   "as_expected": true
+  },
+  {
+   "gate": "gender",
+   "language": "pl",
+   "english": "",
+   "translation": "%s jest zmęczona.",
+   "engineer": "",
+   "expected_pass": false,
+   "passed": false,
+   "as_expected": true
+  },
+  {
+   "gate": "gender",
+   "language": "pl",
+   "english": "",
+   "translation": "%s jest zmęczony.",
+   "engineer": "",
+   "expected_pass": false,
+   "passed": false,
+   "as_expected": true
+  },
+  {
+   "gate": "gender",
+   "language": "pl",
+   "english": "",
+   "translation": "%s jest ranna.",
+   "engineer": "",
+   "expected_pass": false,
+   "passed": false,
+   "as_expected": true
+  },
+  {
+   "gate": "gender",
+   "language": "pl",
+   "english": "",
+   "translation": "WOLF: Jesteś zmęczona.",
+   "engineer": "you",
+   "expected_pass": false,
+   "passed": false,
+   "as_expected": true
+  },
+  {
+   "gate": "gender",
+   "language": "pl",
+   "english": "",
+   "translation": "WOLF: Jesteś pewny?",
+   "engineer": "you",
+   "expected_pass": false,
+   "passed": false,
+   "as_expected": true
+  },
+  {
+   "gate": "gender",
+   "language": "pl",
+   "english": "",
+   "translation": "%s stoi przy ścianie, strona druga.",
+   "engineer": "",
+   "expected_pass": true,
+   "passed": true,
+   "as_expected": true
+  },
+  {
+   "gate": "gender",
+   "language": "ru",
+   "english": "",
+   "translation": "%s, усталая, идёт к реле.",
+   "engineer": "",
+   "expected_pass": false,
+   "passed": false,
+   "as_expected": true
+  },
+  {
+   "gate": "gender",
+   "language": "ru",
+   "english": "",
+   "translation": "%s, усталый, идёт к реле.",
+   "engineer": "",
+   "expected_pass": false,
+   "passed": false,
+   "as_expected": true
+  },
+  {
+   "gate": "gender",
+   "language": "ru",
+   "english": "",
+   "translation": "%s — раненая.",
+   "engineer": "",
+   "expected_pass": false,
+   "passed": false,
+   "as_expected": true
+  },
+  {
+   "gate": "gender",
+   "language": "ru",
+   "english": "",
+   "translation": "Инженерка %s у реле.",
+   "engineer": "",
+   "expected_pass": false,
+   "passed": false,
+   "as_expected": true
+  },
+  {
+   "gate": "gender",
+   "language": "ru",
+   "english": "",
+   "translation": "Техничка %s у реле.",
+   "engineer": "",
+   "expected_pass": false,
+   "passed": false,
+   "as_expected": true
+  },
+  {
+   "gate": "gender",
+   "language": "ru",
+   "english": "",
+   "translation": "%s уверена.",
+   "engineer": "",
+   "expected_pass": false,
+   "passed": false,
+   "as_expected": true
+  },
+  {
+   "gate": "gender",
+   "language": "ru",
+   "english": "",
+   "translation": "WOLF: Ты усталая.",
+   "engineer": "you",
+   "expected_pass": false,
+   "passed": false,
+   "as_expected": true
+  },
+  {
+   "gate": "gender",
+   "language": "ru",
+   "english": "",
+   "translation": "%s — у стены, а дверь закрыта.",
+   "engineer": "",
+   "expected_pass": true,
+   "passed": true,
+   "as_expected": true
+  },
+  {
+   "gate": "gender",
+   "language": "ru",
+   "english": "",
+   "translation": "WOLF: Иди к большой двери. Найди рубильник.",
+   "engineer": "you",
+   "expected_pass": true,
+   "passed": true,
+   "as_expected": true
+  },
+  {
+   "gate": "gender",
+   "language": "de",
+   "english": "",
+   "translation": "%s ist Wartungstechnikerin.",
+   "engineer": "",
+   "expected_pass": false,
+   "passed": false,
+   "as_expected": true
+  },
+  {
+   "gate": "gender",
+   "language": "de",
+   "english": "",
+   "translation": "%s ist Wartungsingenieur.",
+   "engineer": "",
+   "expected_pass": false,
+   "passed": false,
+   "as_expected": true
+  },
+  {
+   "gate": "gender",
+   "language": "de",
+   "english": "",
+   "translation": "WARTUNGSINGENIEURIN",
+   "engineer": "third",
+   "expected_pass": false,
+   "passed": false,
+   "as_expected": true
+  },
+  {
+   "gate": "gender",
+   "language": "de",
+   "english": "",
+   "translation": "%s öffnet die Tür. Die Wartungstechnik wartet.",
+   "engineer": "",
+   "expected_pass": true,
+   "passed": true,
+   "as_expected": true
+  },
+  {
+   "gate": "gender",
+   "language": "it",
+   "english": "",
+   "translation": "%s è stanca.",
+   "engineer": "",
+   "expected_pass": false,
+   "passed": false,
+   "as_expected": true
+  },
+  {
+   "gate": "gender",
+   "language": "it",
+   "english": "",
+   "translation": "%s è stanco.",
+   "engineer": "",
+   "expected_pass": false,
+   "passed": false,
+   "as_expected": true
+  },
+  {
+   "gate": "gender",
+   "language": "it",
+   "english": "",
+   "translation": "%s apre la porta.",
+   "engineer": "",
+   "expected_pass": true,
+   "passed": true,
+   "as_expected": true
+  },
+  {
+   "gate": "gender",
+   "language": "ja",
+   "english": "",
+   "translation": "%sさんは女の子だ。",
+   "engineer": "",
+   "expected_pass": false,
+   "passed": false,
+   "as_expected": true
+  },
+  {
+   "gate": "gender",
+   "language": "ja",
+   "english": "",
+   "translation": "%sくん、格子から離れて。",
+   "engineer": "",
+   "expected_pass": false,
+   "passed": false,
+   "as_expected": true
+  },
+  {
+   "gate": "gender",
+   "language": "ja",
+   "english": "",
+   "translation": "%sさんは格子の上にいる。ちゃんと見て。",
+   "engineer": "",
+   "expected_pass": true,
+   "passed": true,
+   "as_expected": true
+  },
+  {
+   "gate": "gender",
+   "language": "zh_Hans",
+   "english": "",
+   "translation": "%s小姐在格栅上。",
+   "engineer": "",
+   "expected_pass": false,
+   "passed": false,
+   "as_expected": true
+  },
+  {
+   "gate": "gender",
+   "language": "zh_Hans",
+   "english": "",
+   "translation": "%s在格栅上。",
+   "engineer": "",
+   "expected_pass": true,
+   "passed": true,
+   "as_expected": true
+  },
+  {
+   "gate": "gender",
+   "language": "ko",
+   "english": "",
+   "translation": "%s 씨는 여자다.",
+   "engineer": "",
+   "expected_pass": false,
+   "passed": false,
+   "as_expected": true
+  },
+  {
+   "gate": "gender",
+   "language": "ko",
+   "english": "",
+   "translation": "%s 씨는 격자 위에 있다.",
+   "engineer": "",
+   "expected_pass": true,
+   "passed": true,
+   "as_expected": true
+  },
+  {
    "gate": "name_case",
    "language": "ru",
    "english": "",
@@ -497,6 +1007,123 @@
     "Клапан поддаётся. %d из %d оборота.",
     "Клапан поддаётся. %d оборотов.",
     "Клапан поддаётся. %d из %d оборотов."
+   ],
+   "engineer": "",
+   "expected_pass": false,
+   "passed": false,
+   "as_expected": true
+  },
+  {
+   "gate": "plural_header",
+   "language": "fr",
+   "english": "",
+   "translation": "Language: fr\nPlural-Forms: nplurals=2; plural=(n > 1);\n",
+   "engineer": "",
+   "expected_pass": true,
+   "passed": true,
+   "as_expected": true
+  },
+  {
+   "gate": "plural_header",
+   "language": "fr",
+   "english": "",
+   "translation": "Language: fr\nPlural-Forms: nplurals=2; plural=(n != 1);\n",
+   "engineer": "",
+   "expected_pass": false,
+   "passed": false,
+   "as_expected": true
+  },
+  {
+   "gate": "plural_header",
+   "language": "fr",
+   "english": "",
+   "translation": "Language: fr\nPlural-Forms: nplurals=2; plural=n >> 1\n",
+   "engineer": "",
+   "expected_pass": false,
+   "passed": false,
+   "as_expected": true
+  },
+  {
+   "gate": "plural_header",
+   "language": "ru",
+   "english": "",
+   "translation": "Language: ru\n",
+   "engineer": "",
+   "expected_pass": false,
+   "passed": false,
+   "as_expected": true
+  },
+  {
+   "gate": "fuzzy_note",
+   "language": "de",
+   "english": "",
+   "translation": [
+    "#. TRANSLATORS: the gauge reading is fuzzy on purpose"
+   ],
+   "engineer": "",
+   "expected_pass": false,
+   "passed": false,
+   "as_expected": true
+  },
+  {
+   "gate": "fuzzy_note",
+   "language": "de",
+   "english": "",
+   "translation": [
+    "#, c-format",
+    "#. TRANSLATORS: the gauge reading is vague on purpose"
+   ],
+   "engineer": "",
+   "expected_pass": true,
+   "passed": true,
+   "as_expected": true
+  },
+  {
+   "gate": "marks",
+   "language": "de",
+   "english": "",
+   "translation": [
+    "#. TRANSLATORS: i18n: engineer=name",
+    "#. i18n: engineer=name"
+   ],
+   "engineer": "",
+   "expected_pass": true,
+   "passed": true,
+   "as_expected": true
+  },
+  {
+   "gate": "marks",
+   "language": "de",
+   "english": "",
+   "translation": [
+    "#. TRANSLATORS: i18n: engineer=name",
+    "#. i18n: slot=key"
+   ],
+   "engineer": "",
+   "expected_pass": true,
+   "passed": true,
+   "as_expected": true
+  },
+  {
+   "gate": "marks",
+   "language": "de",
+   "english": "",
+   "translation": [
+    "#. TRANSLATORS: i18n: engineer=name",
+    "#. i18n: engineer=you"
+   ],
+   "engineer": "",
+   "expected_pass": false,
+   "passed": false,
+   "as_expected": true
+  },
+  {
+   "gate": "marks",
+   "language": "de",
+   "english": "",
+   "translation": [
+    "#. TRANSLATORS: i18n: slot=choice",
+    "#. i18n: slot=key"
    ],
    "engineer": "",
    "expected_pass": false,
