@@ -59,18 +59,24 @@ Two more options were ruled out on paper:
 |---|---|---|---|---|
 | Translated by | Claude | Claude | Claude | Claude (design step) |
 | `msgfmt --check-format --check-header` | rc 0 | rc 0 | rc 0 | rc 0 |
-| Gate failures (placeholders, tag, breaks, key token, script, glossary) | 0 | 0 | 0 | 0 |
+| Gate failures (placeholders, tag, breaks, key token, script, glossary; re-run by the fix step with the gender and plural gates) | 0 | 0 | 0 | 0 |
 | Drift flags (chrF under 35 on lines over 4 words) | 2 ("interruptor" reads as "switch") | 0 | 0 | 0 |
 | Mean chrF of Codex's back-translation against the English | 77.1 | 70.5 | 77.4 | 64.0 |
 
-**The checks catch what they should.** Two broken copies were run as negative controls:
+**The checks catch what they should.** Broken copies were run as negative controls:
 
 | Copy | Breaks put in | Caught |
 |---|---|---|
 | `es` | `%s` dropped; `%s` changed to `%d`; `E:` removed | all 3 (msgfmt 2, the token check 1) |
 | `ru` (design step) | a Cyrillic `Е:` for the Latin key token; a Latin `A` inside `ПАУЗА`; a dropped `%d` | all 3 (the token check, the script guard and msgfmt) |
+| `ru` and `es` (fix step) | the engineer gendered: ru "%s стояла на решётке" (feminine past tense), es "%s estaba sola" (agreeing adjective); and a back-translation that answers `engineer_gendered: true` | all 3 (the gender gate 2, the back-translation's field 1) |
+| `i18n_tool.py selftest` (fix step) | 18 fixed cases: a misspelt and a dropped `{total}`, reordered positional inserts, gendered ru, pl, es and fr lines, a ru plural with a missing form or a dropped `%d`, and the clean lines each gate must pass | 18 of 18 as expected |
 
-The reports are `prototype/evidence/po_check_negative_control*.json`.
+The reports are `prototype/evidence/po_check_negative_control*.json` and
+`prototype/evidence/gate_selftest.json`. With the fix step's gates added, the prototype's real 136 lines
+still pass with 0 failures and the same 2 es drift flags (`prototype/evidence/po_check.json`). No prototype
+msgid has a named placeholder or a plural form yet, which is why those two gates are proved on fixed
+cases.
 
 **chrF on its own is not a gate.**
 - Apple's back-translation of its own output scored the highest mean chrF (59.5), although Apple's
@@ -94,23 +100,40 @@ The reports are `prototype/evidence/po_check_negative_control*.json`.
 4. **Back-translate independently.** Codex, through the ChatGPT subscription and in a read-only
    sandbox, back-translates every line:
    - It is **not shown the English**.
-   - It notes anything ambiguous, unidiomatic or gendered (`i18n_tool.py backprompt`).
+   - It notes anything ambiguous, unidiomatic or gendered (`i18n_tool.py backprompt`), and answers a
+     structured `engineer_gendered` true or false for each line. The free-text notes alone are too
+     noisy to gate on: they say "masculine" for WOLF, the Director or the sentry on almost every ru, es
+     and de row.
    - The model that translated a line never back-translates it.
    - Each Codex session is archived when done.
 5. **Run the gates.** `i18n_tool.py check` writes one JSON report. Every gate must pass:
    - `msgfmt --check-format --check-header`. The tool adds `#, c-format` itself, since Godot's
      generator writes no format flag.
-   - **Placeholders:** the same `%s`, `%d` and `{name}` in the same order. A stray `%%` counts as a
-     mismatch.
+   - **Placeholders:** the same `%s` and `%d` in the same order, and the same named placeholders
+     (`{name}`, `{current}`, `{total}`: any `{lower_snake}`) in any order. A stray `%%` counts as a
+     mismatch. A misspelt named placeholder matters: `String.format` leaves an unknown key on screen as
+     literal text, and msgfmt ignores braces.
    - **Speaker tag**, until speaker and words are stored apart.
-   - **`\n` count.**
+   - **Line breaks.** A msgid marked `#. i18n: keep-breaks` (the name card, a choice list) keeps the
+     English count. Every other `\n` is layout sized for English, so a translation may drop it and let
+     `DialogueBoxes` break rows for its language, but may never add one (Apple doubled them in the trial).
    - **The `E:` key token**, until it becomes a placeholder.
    - **Script guard**, ported once from ConPaws' locales-script test: no Cyrillic in a Latin-script
      or CJK text, and no Latin letters in a Cyrillic text outside the glossary's keep words.
    - **Glossary:** each term's required form, with stems for Slavic languages.
-   - **Plural forms:** the header's rule, with one `msgstr[n]` per form.
-   - **Consistency:** the same msgid always gets the same translation unless `msgctxt` differs.
+   - **The engineer's gender.** A word-ending check per language family: a gendered form (ru and uk
+     past tense in -л/-ла, pl -ł/-ła, es and pt participles in -ado/-ada, fr -é/-ée, plus "alone",
+     "ready" and the job noun) in the same clause as the name and within 3 words of it fails the line.
+     So does a back-translation that answers `engineer_gendered: true`. It is a heuristic: a flag is
+     cleared by rewording or by a reviewer's `# gender-ok: <name> <date>` comment, and native review of
+     the 26 gender-risk lines stays the real check (below).
+   - **Plural forms:** one `msgstr[n]` per form of the header's rule, none empty, each with the
+     English inserts. Every form is checked, not only `msgstr[0]`.
    - **Drift flag:** chrF under 35 on lines over 4 words sends the line to a person.
+
+   An earlier draft also listed a "consistency" gate (the same msgid always gets the same
+   translation). Within one PO file that holds by construction, since gettext keeps one entry per msgid
+   and `msgctxt`, so there is nothing to check. Consistency across lines is the glossary gate's job.
 6. **Check the layout.** `tests/i18n_test.gd` runs headless:
    - every character drawable by the bundled font chain;
    - no overflow on the title, menus, HUD and plates;
@@ -193,7 +216,7 @@ Cyrillic "Е" looks the same but is never replaced; the token check catches it (
 
 **Placeholders.** Lines with more than one insert get named placeholders (`{current}`, `{total}`,
 filled with `String.format`), so a translator can reorder them. Positional `%s` cannot be reordered
-(Godot 4.7 "Internationalizing games").
+(Godot 4.7 "Internationalizing games"). The placeholder gate checks named ones as a set, in any order.
 
 **Quotes:**
 

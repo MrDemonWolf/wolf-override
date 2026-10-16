@@ -22,7 +22,9 @@ Contract
     like {"back": {translator: {lang: {line_id: english}}}}.
 
 Measures (all automated; tone and gender are judged by a person and kept in ../out/judgments.json)
-    placeholders  the multiset AND order of %s / %d / {name} tokens must equal the English line's.
+    placeholders  positional tokens (%s, %d and a literal %%) must equal the English line's in number
+                  AND order; named tokens ({name}, {current}, {total}: any {lower_snake}) must equal
+                  them as a multiset, in any order, since reordering is what names are for.
     tag           a line that starts "WOLF: " in English must start with it in the translation.
     breaks        the count of authored "\\n" must match (Apple doubled them in the trial).
     glossary      every glossary term in the English line must appear in its required/variant form.
@@ -55,9 +57,22 @@ OUT = ROOT / "out"
 #: ROOT/fonts; the filed copy reads the originals instead of keeping a second copy of each font.)
 FONT_DIR = ROOT.parents[3] / "apps" / "game" / "assets" / "fonts"
 LANGS = ["es-419", "de", "ja"]
-#: "%%" is a token too: Godot's String % reads it as a literal percent, so a stray "%%d" (Apple's
-#: Japanese L03 in the trial) silently eats a placeholder and must count as a mismatch.
-PLACEHOLDER = re.compile(r"%%|%[sd]|\{name\}")
+#: Positional inserts filled by Godot's String % operator. "%%" is a token too: String % reads it as a
+#: literal percent, so a stray "%%d" (Apple's Japanese L03 in the trial) silently eats a placeholder and
+#: must count as a mismatch.
+POSITIONAL = re.compile(r"%%|%[sd]")
+#: Named inserts filled by String.format ({name} on the end card; the build plan's {current} and {total}).
+#: Any lower_snake name counts, so a misspelt or dropped one is caught: String.format leaves an unknown
+#: key on screen as literal text, and msgfmt's c-format check ignores braces.
+NAMED = re.compile(r"\{[a-z_]+\}")
+
+
+def placeholders_ok(english: str, text: str) -> bool:
+    """True when ``text`` keeps ``english``'s inserts: the positional ones (POSITIONAL) in the same
+    order, since %s and %d are filled left to right, and the named ones (NAMED) as a multiset, since a
+    translator may move them. Pure; no side effects."""
+    return (POSITIONAL.findall(english) == POSITIONAL.findall(text)
+            and Counter(NAMED.findall(english)) == Counter(NAMED.findall(text)))
 #: The letters each candidate language needs beyond ASCII, for the glyph-coverage report. CJK is
 #: reported as a count of sample characters instead, since no Latin font covers it.
 ALPHABETS = {
@@ -162,7 +177,7 @@ def check_line(line: dict, text: str, lang: str, glossary: dict, fonts: Fonts) -
     """Every automated measure for one translation of one line."""
     english = line["text"]
     result: dict = {
-        "placeholders_ok": PLACEHOLDER.findall(english) == PLACEHOLDER.findall(text),
+        "placeholders_ok": placeholders_ok(english, text),
         "wolf_ok": text.count("WOLF") >= english.count("WOLF"),
         "tag_ok": (not english.startswith("WOLF: ")) or text.startswith("WOLF: "),
         "breaks_ok": english.count("\n") == text.count("\n"),

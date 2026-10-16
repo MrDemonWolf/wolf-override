@@ -29,7 +29,7 @@ and Polish work the same way as es and de.
 | Settings has a LANGUAGE row. The game starts in the OS language and falls back to English | `tests/i18n_test.gd` (resolver and picker checks) |
 | The PO files load at runtime with no import step | the same suite |
 | Text is translated where it is drawn, and redraws when the language changes: the title, a narration box, the name card, the location card, a hint, a knockdown card with the engineer's name, and the RETRY prompt | the same suite, in es, de, ja and ru |
-| Every translation passes the pipeline's gates, and broken copies fail them | `evidence/po_check.json`; `evidence/po_check_negative_control.json` (es); `evidence/po_check_negative_control_ru.json` (ru) |
+| Every translation passes the pipeline's gates, and broken copies fail them | `evidence/po_check.json`; `evidence/po_check_negative_control.json` (es); `evidence/po_check_negative_control_ru.json` (ru); `evidence/po_check_negative_control_gender.json` (ru and es, the engineer gendered); `evidence/gate_selftest.json` (named placeholders, gender, plural forms) |
 | A subset Noto Sans JP fallback draws all the Japanese | the glyph checks; 0 tofu in the render audits |
 | Russian needs no fallback font: Roboto and Montserrat draw every Cyrillic character, and the line height stays 21 px at 17 px | the suite's "Russian chains no fallback" checks |
 | The Russian knockdown card keeps the name in the nominative and shows no gender | the suite; the back-translation notes in `translations/codex_back.json` |
@@ -224,7 +224,11 @@ this record.
   - edits to `main.gd`, `game_settings.gd`, `junction_room.gd`, `dialogue_boxes.gd` and
     `project.godot`.
 - **`evidence/messages.pot`:** the generated POT.
-- **`evidence/po_check*.json`:** the gate reports, and the two negative controls.
+- **`evidence/po_check*.json`:** the gate reports, and the three negative controls. `po_check.json` was
+  re-run by the fix step with the gender, plural and line-break gates added: the same 0 failures and 2 es
+  drift flags as the as-run report.
+- **`evidence/gate_selftest.json`:** `i18n_tool.py selftest`, the fixed planted cases for the gates no
+  prototype msgid exercises yet.
 - **`evidence/hardcoded.json`:** the shown strings still missing from the POT, by file and line.
 - **`evidence/codex/`:** the Codex prompts and their JSON event streams (the prototype step's two, the
   design step's `*_ru.*`).
@@ -237,7 +241,10 @@ this record.
   revision notes.
 - **`translations/codex_back.json`:** the back-translations, with their session ids.
 - **`tools/i18n_tool.py`:**
-  - Its subcommands are `potfiles`, `subset`, `fill`, `backprompt`, `check` and `hardcoded`.
+  - Its subcommands are `potfiles`, `subset`, `fill`, `backprompt`, `check`, `selftest` and `hardcoded`.
+  - The fix step added the engineer-gender gate (with the back-translation's `engineer_gendered` field),
+    the plural-form gate over every `msgstr[n]`, the `keep-breaks` line-break rule, named placeholders
+    (in `trial.py`) and `selftest`. The as-run version is at commit 65a6db7.
   - It imports `../pipeline/tools/trial.py` for the pipeline step's measures; nothing is copied.
   - The design step added the Russian plural rule, plural-form counts from it, and the script guard
     ported from ConPaws.
@@ -252,10 +259,11 @@ this record.
 
 ```sh
 bash tools/heavy.sh bash tools/extract_pot.sh ROOT evidence/messages.pot LOGS
-python3 -I tools/i18n_tool.py fill evidence/messages.pot translations/claude.json ROOT/apps/game/i18n
-python3 -I tools/i18n_tool.py backprompt PODIR PROMPT   # then: codex exec --sandbox read-only - < PROMPT
-python3 -I tools/i18n_tool.py check evidence/messages.pot ROOT/apps/game/i18n translations/codex_back.json OUT.json
-python3 -I tools/i18n_tool.py hardcoded evidence/messages.pot ../strings-inventory.json OUT.json
+python3 -I -B tools/i18n_tool.py fill evidence/messages.pot translations/claude.json ROOT/apps/game/i18n
+python3 -I -B tools/i18n_tool.py backprompt PODIR PROMPT   # then: codex exec --sandbox read-only - < PROMPT
+python3 -I -B tools/i18n_tool.py check evidence/messages.pot ROOT/apps/game/i18n translations/codex_back.json OUT.json
+python3 -I -B tools/i18n_tool.py selftest OUT.json
+python3 -I -B tools/i18n_tool.py hardcoded evidence/messages.pot ../strings-inventory.json OUT.json
 (cd ROOT && bash scripts/check-game.sh --suite i18n_test LOGS WORK)
 (cd ROOT && bash DOCS/prototype/tools/heavy.sh bash tools/render/render.sh --screen 1280x720 --name i18n-NAME \
   --driver DOCS/prototype/capture apps/game OUT -- --fixed-fps 60 \

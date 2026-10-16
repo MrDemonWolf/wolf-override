@@ -1,0 +1,179 @@
+{
+ "cases": 18,
+ "as_expected": 18,
+ "results": [
+  {
+   "gate": "placeholders",
+   "language": "ru",
+   "english": "{current} of {total} turns.",
+   "translation": "{current} из {total} оборотов.",
+   "expected_pass": true,
+   "passed": true,
+   "as_expected": true
+  },
+  {
+   "gate": "placeholders",
+   "language": "ja",
+   "english": "{current} of {total} turns.",
+   "translation": "{total}回中{current}回。",
+   "expected_pass": true,
+   "passed": true,
+   "as_expected": true
+  },
+  {
+   "gate": "placeholders",
+   "language": "ru",
+   "english": "{current} of {total} turns.",
+   "translation": "{current} из {totl} оборотов.",
+   "expected_pass": false,
+   "passed": false,
+   "as_expected": true
+  },
+  {
+   "gate": "placeholders",
+   "language": "ru",
+   "english": "{current} of {total} turns.",
+   "translation": "{current} оборотов.",
+   "expected_pass": false,
+   "passed": false,
+   "as_expected": true
+  },
+  {
+   "gate": "placeholders",
+   "language": "de",
+   "english": "HOLD %s: crank, %d of %d.",
+   "translation": "%d von %d: HALTEN %s.",
+   "expected_pass": false,
+   "passed": false,
+   "as_expected": true
+  },
+  {
+   "gate": "gender",
+   "language": "ru",
+   "english": "",
+   "translation": "Сорвало предохранительный клапан, а %s — прямо на решётке.",
+   "expected_pass": true,
+   "passed": true,
+   "as_expected": true
+  },
+  {
+   "gate": "gender",
+   "language": "ru",
+   "english": "",
+   "translation": "Страж заметил: %s на открытом месте.",
+   "expected_pass": true,
+   "passed": true,
+   "as_expected": true
+  },
+  {
+   "gate": "gender",
+   "language": "ru",
+   "english": "",
+   "translation": "%s стояла на решётке, и клапан сорвало.",
+   "expected_pass": false,
+   "passed": false,
+   "as_expected": true
+  },
+  {
+   "gate": "gender",
+   "language": "ru",
+   "english": "",
+   "translation": "%s был прямо на решётке.",
+   "expected_pass": false,
+   "passed": false,
+   "as_expected": true
+  },
+  {
+   "gate": "gender",
+   "language": "pl",
+   "english": "",
+   "translation": "%s stoi na kratce.",
+   "expected_pass": true,
+   "passed": true,
+   "as_expected": true
+  },
+  {
+   "gate": "gender",
+   "language": "pl",
+   "english": "",
+   "translation": "%s stała na kratce.",
+   "expected_pass": false,
+   "passed": false,
+   "as_expected": true
+  },
+  {
+   "gate": "gender",
+   "language": "es",
+   "english": "",
+   "translation": "La válvula de alivio cedió y %s quedó sobre la rejilla.",
+   "expected_pass": true,
+   "passed": true,
+   "as_expected": true
+  },
+  {
+   "gate": "gender",
+   "language": "es",
+   "english": "",
+   "translation": "%s estaba sola sobre la rejilla.",
+   "expected_pass": false,
+   "passed": false,
+   "as_expected": true
+  },
+  {
+   "gate": "gender",
+   "language": "fr",
+   "english": "",
+   "translation": "%s est restée seule sur la grille.",
+   "expected_pass": false,
+   "passed": false,
+   "as_expected": true
+  },
+  {
+   "gate": "gender",
+   "language": "de",
+   "english": "",
+   "translation": "%s stand allein auf dem Gitter.",
+   "expected_pass": true,
+   "passed": true,
+   "as_expected": true
+  },
+  {
+   "gate": "plural",
+   "language": "ru",
+   "english": "The valve gives. %d of %d turns.",
+   "translation": [
+    "Клапан поддаётся. %d из %d оборота.",
+    "Клапан поддаётся. %d из %d оборотов.",
+    "Клапан поддаётся. %d из %d оборотов."
+   ],
+   "expected_pass": true,
+   "passed": true,
+   "as_expected": true
+  },
+  {
+   "gate": "plural",
+   "language": "ru",
+   "english": "The valve gives. %d of %d turns.",
+   "translation": [
+    "Клапан поддаётся. %d из %d оборота.",
+    "Клапан поддаётся. %d из %d оборотов."
+   ],
+   "expected_pass": false,
+   "passed": false,
+   "as_expected": true
+  },
+  {
+   "gate": "plural",
+   "language": "ru",
+   "english": "The valve gives. %d of %d turns.",
+   "translation": [
+    "Клапан поддаётся. %d из %d оборота.",
+    "Клапан поддаётся. %d оборотов.",
+    "Клапан поддаётся. %d из %d оборотов."
+   ],
+   "expected_pass": false,
+   "passed": false,
+   "as_expected": true
+  }
+ ]
+}

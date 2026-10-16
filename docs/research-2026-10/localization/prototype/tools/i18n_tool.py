@@ -15,13 +15,20 @@ Purpose
                               message keeps the POT's comments and gets TRANS's context as a "#." note
                               and its translation, stamped "# machine-translated by Claude, unreviewed".
     backprompt PODIR OUT      writes the Codex back-translation prompt: the translated texts only, by id,
-                              with no English, so the back-translation is independent.
+                              with no English, so the back-translation is independent. Each answer carries
+                              a structured "engineer_gendered" true/false next to its free-text notes.
     check POT PODIR BACK OUT  every automated gate on the PO files, as JSON at OUT: msgfmt --check-format,
-                              the research-pipeline step's per-line measures (placeholders, speaker tag,
-                              line breaks, glossary; ../../pipeline/tools/trial.py, imported, not copied),
-                              the "E:" key token the hint bar replaces, the script guard (no letters of
-                              another script; see SCRIPT_GUARD), and chrF of Codex's back-translation
-                              (BACK, JSON) against the English.
+                              the research-pipeline step's per-line measures (placeholders, positional and
+                              named; speaker tag; glossary; ../../pipeline/tools/trial.py, imported, not
+                              copied), line breaks (BREAKS_KEEP), the "E:" key token the hint bar replaces,
+                              the script guard (SCRIPT_GUARD), the engineer-gender gate (GENDER_GATES and
+                              the back-translation's engineer_gendered), the plural forms of every
+                              msgstr[n], and chrF of Codex's back-translation (BACK, JSON) against the
+                              English. Exits 0 even when lines fail; the report says which.
+    selftest OUT              runs the gates above that need no PO file on fixed planted cases (SELFTEST)
+                              and writes the result as JSON at OUT; exits 1 if a planted error passes or
+                              a clean line fails. The negative control for gates no prototype msgid
+                              exercises yet (named placeholders, plural forms).
     hardcoded POT INVENTORY OUT
                               player-facing strings of the strings step's inventory (in scope and shown)
                               whose text is no msgid of POT, by file, as JSON at OUT.
@@ -38,6 +45,11 @@ Gotchas
       (core/string/plural_rules.cpp), so the header always carries the language's real rule.
     - "es" is Latin-American Spanish: Godot reduces es-419 to "es" (see I18n.LANGUAGES), but the glossary
       and style packet name it es-419, so the checker maps it back.
+    - The gender gate is a word-ending heuristic, not a parser: it can flag a correct line (a noun that
+      ends like a past-tense verb) and miss a gendered form it has no pattern for. A flag is resolved by
+      rewording or by a reviewer's "# gender-ok: <name> <date>" comment on the entry; native review of
+      the gender-risk lines (PIPELINE.md) stays the real check.
+    - Run with python3 -I -B so nothing is written next to the tools (no __pycache__ in the docs tree).
 """
 from __future__ import annotations
 
@@ -50,7 +62,7 @@ from pathlib import Path
 HERE = Path(__file__).resolve().parent
 PIPELINE_TOOLS = HERE.parent.parent / "pipeline" / "tools"
 sys.path.insert(0, str(PIPELINE_TOOLS))
-import trial  # noqa: E402  (the research-pipeline step's measures: chrf, check_line, PLACEHOLDER)
+import trial  # noqa: E402  (the research-pipeline step's measures: chrf, check_line, placeholders_ok)
 
 #: gettext Plural-Forms per language (CLDR; the same rules Godot's core/string/locales.h holds). Russian
 #: has three forms (1, 21 / 2-4, 22-24 / 0, 5-20, 11-14), which the design step added with ru.
@@ -74,8 +86,45 @@ JA_BASE_RANGES = [(0x20, 0x7E), (0x3000, 0x303F), (0x3040, 0x309F), (0x30A0, 0x3
 JA_ALWAYS = "日本語"
 #: The hint bar replaces "E:" with the bound key (main.gd _refresh_ui), so it must survive. Counted only
 #: where no letter comes before it: "PAUSE:" ends in "E:" too (the game's own replace is a plain
-#: substring replace and would hit it; see PROTOTYPE.md).
+#: substring replace and would hit it; see ../README.md, "Code changes outside I18n").
 KEY_TOKEN = re.compile(r"(?<![^\W\d_])E:")
+#: The comment that marks a msgid whose authored line breaks carry meaning (the name card's
+#: "%s\nMAINTENANCE ENGINEER", a choice list), written by the build as "#. i18n: keep-breaks". Only those
+#: msgids must keep the English break count. Every other "\n" is layout sized for English (the
+#: codex/opening-dock branch adds such breaks mid-sentence), so a translation may drop it and let
+#: DialogueBoxes break rows for its own language; it may not add breaks (Apple's doubling in the trial).
+BREAKS_KEEP = "i18n: keep-breaks"
+#: Where the engineer's first name goes in a msgid: the positional %s of the knockdown cards and
+#: narration, or {name} on the end card. A %s that holds a key name is checked too; past-tense or
+#: agreeing forms next to a key name are rare, and a flag there costs a look, not a miss.
+NAME_SLOT = re.compile(r"%s|\{name\}")
+#: Clause boundaries: a gendered form only counts in the same clause as the name ("Страж заметил: %s"
+#: is the sentry's verb, cut off by the colon).
+CLAUSE_SPLIT = re.compile(r"[,:;.!?\u2014\u2013()\n«»„“”「」]")
+#: How many words on each side of the name are read: subject and verb, or name and adjective, sit
+#: within three words in every sample line; a wider window mostly adds other people's verbs.
+GENDER_WINDOW = 3
+#: Word forms that show the grammatical gender of the person they describe, per language family. The
+#: engineer is they/them (docs/decisions.md S1-03), so any of these beside the name fails the line.
+#: Slavic: past-tense -л/-ла (ru, uk) and -ł/-ła (pl) plus the common short forms; Romance: participles
+#: and adjectives that agree (-ado/-ada, -é/-ée) plus "alone", "ready" and the job noun. Languages not
+#: listed (de, ja, ko, zh) have no gendered form in this position (PIPELINE.md, "The engineer is never
+#: gendered"); add a row with each new language that has one.
+#: Russian and Ukrainian share one pattern (the same past-tense endings); both Spanish files share one.
+#: The Spanish one skips everyday nouns that end like a participle (cada, nada, vida, salida, partida,
+#: entrada, llegada), so an exit or a new game beside the name does not raise a flag.
+_SLAVIC_CYRILLIC = re.compile(r"^(?:[а-яёіїєґ'ʼ]+(?:л|ла|лся|лась)|сам[аи]?|одна|один|готова?|должна|должен|рада?|жива?|цела?|ранена?)$")
+_SPANISH = re.compile(r"^(?!(?:cada|nada|vida|salida|partida|entrada|llegada)$)(?:\w+(?:ad|id)[oa]s?|sol[oa]s?|list[oa]s?|segur[oa]s?|ingenier[oa]s?)$")
+GENDER_GATES = {
+    "ru": _SLAVIC_CYRILLIC,
+    "uk": _SLAVIC_CYRILLIC,
+    "pl": re.compile(r"^(?:\w+(?:ł|ła|łem|łam|łeś|łaś)|sam[a]?|gotowa|gotów|jedna|jeden)$"),
+    "es": _SPANISH,
+    "es_ES": _SPANISH,
+    "pt_BR": re.compile(r"^(?:\w+(?:ad|id)[oa]s?|sozinh[oa]s?|pront[oa]s?|engenheir[oa]s?)$"),
+    "fr": re.compile(r"^(?:\w+ée?s?|seule?s?|prête?s?|ingénieure?s?)$"),
+    "it": re.compile(r"^(?:\w+(?:at|it|ut)[oa]|sol[oa]|pront[oa]|ingegner[ea])$"),
+}
 #: Skipped by `potfiles`: tests and the debug tools (out of scope), and anything outside scenes/scripts.
 POT_SKIP = ("scripts/debug/",)
 
@@ -236,8 +285,12 @@ def backprompt(podir: Path, out: Path) -> None:
         "as they appear. Do not guess what the original English was; translate only what is written. Context: a "
         "2D sci-fi game; WOLF is a robot wolf (he), the Director a human (he), the player character is a "
         "non-binary engineer whose first name fills %s. After each back-translation add 'notes' listing anything "
-        "ambiguous, unidiomatic or gendered in the source text (empty string if none). Answer with JSON only: "
-        '{"back": {"<id>": {"english": "...", "notes": "..."}}}. Do not run any commands or read any files.\n\n'
+        "ambiguous, unidiomatic or gendered in the source text (empty string if none), and 'engineer_gendered': "
+        "true only if the text shows the grammatical gender of the engineer (the person whose name fills %s), "
+        "for example by a past-tense verb ending, an agreeing adjective or participle, or a gendered job noun; "
+        "false otherwise, including when only WOLF, the Director or the sentry is gendered. Answer with JSON "
+        'only: {"back": {"<id>": {"english": "...", "notes": "...", "engineer_gendered": false}}}. Do not run '
+        "any commands or read any files.\n\n"
         + json.dumps(items, ensure_ascii=False, indent=1) + "\n", encoding="utf-8")
     print(f"{len(items)} texts in {out}")
 
@@ -251,6 +304,48 @@ def script_ok(text: str, lang: str, keep: list[str]) -> bool:
     return not SCRIPT_GUARD["latin"].search(text)
 
 
+def gendered_words(text: str, lang: str) -> list[str]:
+    """The words of ``text`` that show the engineer's gender in ``lang``: forms matching
+    GENDER_GATES[lang] within GENDER_WINDOW words of a NAME_SLOT, in the same clause (CLAUSE_SPLIT).
+    Empty for a language with no gate row. Pure; no side effects."""
+    gate = GENDER_GATES.get(lang)
+    hits: list[str] = []
+    if not gate:
+        return hits
+    for clause in CLAUSE_SPLIT.split(text):
+        words = clause.split()
+        for index, word in enumerate(words):
+            if not NAME_SLOT.search(word):
+                continue
+            for near in words[max(0, index - GENDER_WINDOW):index] + words[index + 1:index + 1 + GENDER_WINDOW]:
+                bare = near.strip("\"'…-").lower()
+                if gate.match(bare):
+                    hits.append(bare)
+    return hits
+
+
+def nplurals(header: str) -> int:
+    """The nplurals of a PO header's Plural-Forms line (1 when the header has none)."""
+    match = re.search(r"nplurals\s*=\s*(\d+)", header)
+    return int(match.group(1)) if match else 1
+
+
+def plural_problems(entry: dict, forms: int) -> list[str]:
+    """What is wrong with a plural entry's msgstr[n] for a language with ``forms`` plural forms: the
+    wrong number of forms, an empty form, or a form whose inserts differ from its English (form 0 against
+    msgid, the others against msgid_plural; trial.placeholders_ok). Empty for a non-plural entry."""
+    if "msgid_plural" not in entry:
+        return []
+    problems = [] if len(entry["msgstr"]) == forms else [f"{len(entry['msgstr'])} forms, the header says {forms}"]
+    for index, text in enumerate(entry["msgstr"]):
+        english = entry["msgid"] if index == 0 else entry["msgid_plural"]
+        if not text:
+            problems.append(f"msgstr[{index}] is empty")
+        elif not trial.placeholders_ok(english, text):
+            problems.append(f"msgstr[{index}] inserts differ from the English")
+    return problems
+
+
 def check(pot: Path, podir: Path, back: Path, out: Path) -> None:
     """Runs every automated gate on the PO files and writes the report."""
     glossary = trial.load("glossary.json")
@@ -262,21 +357,34 @@ def check(pot: Path, podir: Path, back: Path, out: Path) -> None:
         fmt = subprocess.run(["msgfmt", "--check-format", "--check-header", "-o", "/dev/null", "--statistics", str(po)],
                              capture_output=True, text=True)
         rows = []
-        translated = [e for e in read_po(po) if e["msgid"] and e["msgstr"] and e["msgstr"][0]]
+        entries = read_po(po)
+        header = next((e["msgstr"][0] for e in entries if not e["msgid"] and e["msgstr"]), "")
+        translated = [e for e in entries if e["msgid"] and e["msgstr"] and e["msgstr"][0]]
         for index, entry in enumerate(translated):
             english, text = entry["msgid"], entry["msgstr"][0]
             measures = trial.check_line({"text": english, "surface": "dialogue"}, text, GLOSSARY_LANG[lang], glossary, fonts)
             measures.pop("missing_glyphs", None)  # the game's own glyph test (i18n_test.gd) checks the real font chain
             measures.pop("width_ratio_est", None)
+            keep_breaks = any(BREAKS_KEEP in c for c in entry["comments"])
+            measures["breaks_ok"] = (text.count("\n") == english.count("\n")) if keep_breaks else text.count("\n") <= english.count("\n")
             measures["key_token_ok"] = len(KEY_TOKEN.findall(english)) == len(KEY_TOKEN.findall(text))
             measures["script_ok"] = script_ok(text, lang, glossary["keep"])
+            gender_stamped = any(c.startswith("# gender-ok:") for c in entry["comments"])
+            measures["gender_words"] = gendered_words(text, lang)
+            measures["gender_ok"] = gender_stamped or not measures["gender_words"]
+            measures["plural_problems"] = plural_problems(entry, nplurals(header))
             item = backs.get(f"{lang}-{index:02d}")
+            measures["back_engineer_gendered"] = item.get("engineer_gendered") if item else None
             if item:
                 measures["back"] = item["english"]
                 measures["back_notes"] = item.get("notes", "")
                 measures["chrf"] = trial.chrf(item["english"], english)
                 measures["drift_flag"] = measures["chrf"] < 35 and len(english.split()) > 4
-            measures["ok"] = all(measures[k] for k in ("placeholders_ok", "tag_ok", "breaks_ok", "key_token_ok", "script_ok")) and not measures["glossary_missing"]
+            # A back-translation filed before the engineer_gendered field existed reads None: no verdict,
+            # so only an explicit true fails the line.
+            back_gender_ok = gender_stamped or measures["back_engineer_gendered"] is not True
+            measures["ok"] = (all(measures[k] for k in ("placeholders_ok", "tag_ok", "breaks_ok", "key_token_ok", "script_ok", "gender_ok"))
+                              and back_gender_ok and not measures["glossary_missing"] and not measures["plural_problems"])
             rows.append({"msgid": english, "msgstr": text, **measures})
         report["languages"][lang] = {
             "msgfmt_rc": fmt.returncode, "msgfmt": (fmt.stdout + fmt.stderr).strip(),
@@ -287,6 +395,52 @@ def check(pot: Path, podir: Path, back: Path, out: Path) -> None:
     for lang, data in report["languages"].items():
         print(f"{lang}: msgfmt rc {data['msgfmt_rc']} ({data['msgfmt']}); {data['translated']} checked, "
               f"{len(data['failed'])} failed, {len(data['drift_flags'])} drift flags")
+
+
+#: The planted cases `selftest` runs: (gate, language, English, translation, should it pass). Each gate
+#: gets clean lines that must pass (two are the prototype's real Russian knockdown lines, which put
+#: another subject's verb or an impersonal verb near the name) and planted errors that must fail.
+SELFTEST = [
+    ("placeholders", "ru", "{current} of {total} turns.", "{current} из {total} оборотов.", True),
+    ("placeholders", "ja", "{current} of {total} turns.", "{total}回中{current}回。", True),
+    ("placeholders", "ru", "{current} of {total} turns.", "{current} из {totl} оборотов.", False),
+    ("placeholders", "ru", "{current} of {total} turns.", "{current} оборотов.", False),
+    ("placeholders", "de", "HOLD %s: crank, %d of %d.", "%d von %d: HALTEN %s.", False),
+    ("gender", "ru", "", "Сорвало предохранительный клапан, а %s — прямо на решётке.", True),
+    ("gender", "ru", "", "Страж заметил: %s на открытом месте.", True),
+    ("gender", "ru", "", "%s стояла на решётке, и клапан сорвало.", False),
+    ("gender", "ru", "", "%s был прямо на решётке.", False),
+    ("gender", "pl", "", "%s stoi na kratce.", True),
+    ("gender", "pl", "", "%s stała na kratce.", False),
+    ("gender", "es", "", "La válvula de alivio cedió y %s quedó sobre la rejilla.", True),
+    ("gender", "es", "", "%s estaba sola sobre la rejilla.", False),
+    ("gender", "fr", "", "%s est restée seule sur la grille.", False),
+    ("gender", "de", "", "%s stand allein auf dem Gitter.", True),
+    ("plural", "ru", "The valve gives. %d of %d turns.", ["Клапан поддаётся. %d из %d оборота.", "Клапан поддаётся. %d из %d оборотов.", "Клапан поддаётся. %d из %d оборотов."], True),
+    ("plural", "ru", "The valve gives. %d of %d turns.", ["Клапан поддаётся. %d из %d оборота.", "Клапан поддаётся. %d из %d оборотов."], False),
+    ("plural", "ru", "The valve gives. %d of %d turns.", ["Клапан поддаётся. %d из %d оборота.", "Клапан поддаётся. %d оборотов.", "Клапан поддаётся. %d из %d оборотов."], False),
+]
+
+
+def selftest(out: Path) -> None:
+    """Runs SELFTEST through the gates, writes each case's result to ``out`` and exits 1 on a mismatch."""
+    results = []
+    for gate, lang, english, text, expected in SELFTEST:
+        if gate == "placeholders":
+            passed = trial.placeholders_ok(english, text)
+        elif gate == "gender":
+            passed = not gendered_words(text, lang)
+        else:
+            forms = nplurals(PLURALS[lang])
+            passed = not plural_problems({"msgid": english, "msgid_plural": english, "msgstr": text}, forms)
+        results.append({"gate": gate, "language": lang, "english": english, "translation": text,
+                        "expected_pass": expected, "passed": passed, "as_expected": passed == expected})
+    wrong = [r for r in results if not r["as_expected"]]
+    out.write_text(json.dumps({"cases": len(results), "as_expected": len(results) - len(wrong), "results": results},
+                              ensure_ascii=False, indent=1) + "\n", encoding="utf-8")
+    print(f"selftest: {len(results) - len(wrong)} of {len(results)} cases as expected")
+    if wrong:
+        sys.exit(1)
 
 
 def hardcoded(pot: Path, inventory: Path, out: Path) -> None:
@@ -315,7 +469,7 @@ def hardcoded(pot: Path, inventory: Path, out: Path) -> None:
 
 if __name__ == "__main__":
     commands = {"potfiles": (potfiles, 1), "subset": (subset, 3), "fill": (fill, 3), "backprompt": (backprompt, 2),
-                "check": (check, 4), "hardcoded": (hardcoded, 3)}
+                "check": (check, 4), "selftest": (selftest, 1), "hardcoded": (hardcoded, 3)}
     if len(sys.argv) < 2 or sys.argv[1] not in commands or len(sys.argv) - 2 != commands[sys.argv[1]][1]:
         sys.exit(__doc__)
     commands[sys.argv[1]][0](*(Path(a) for a in sys.argv[2:]))
