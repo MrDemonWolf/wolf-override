@@ -77,7 +77,7 @@ func _run() -> void:
 func _check_reach_constants(game: Main) -> void:
 	var wolf: M0Actor = game.wolf
 	_expect(wolf.body_sprite.texture.resource_path == WOLF_ART, "WOLF is drawn from the art the reach constants were measured on")
-	var columns: Vector2 = _painted_columns(wolf.body_sprite)
+	var columns: Vector2 = _painted_extent(wolf.body_sprite, Vector2.AXIS_X)
 	var half: float = wolf.body_sprite.texture.get_width() * 0.5
 	var scale: float = wolf.body_sprite.scale.x
 	var tail: float = (half - columns.x) * scale
@@ -330,7 +330,7 @@ func _check_rest(game: Main, label: String, own_spot: bool = true, doorway: bool
 	checked.append(label)
 	if own_spot:
 		_expect(game.wolf.autonomous_target_x >= 0.0, "%s: WOLF is on a spot of his own (%s)" % [label, game.debug_wolf_why()])
-	var wolf_span: Vector2 = _painted_span(game.wolf.body_sprite)
+	var wolf_span: Vector2 = _painted_world(game.wolf.body_sprite, Vector2.AXIS_X)
 	if doorway:
 		_check_doorway(game, label, wolf_span)
 	for item: Array in _obstacles(game):
@@ -371,7 +371,7 @@ func _check_doorway(game: Main, label: String, wolf_span: Vector2) -> void:
 	_expect(not leaf.visible and BlastLeaf.lead_at(leaf.open if leaf.open > 0.0 else 1.0) >= BlastLeaf.A_MOUTH - 0.0001 and parked_foot.y < RoomDepth.FLOOR_Y - 2.0, "%s: the inner leaf is parked in its pocket, its foot behind the walk line (y %.1f), clear of WOLF" % [label, parked_foot.y])
 	for back: Sprite2D in [game.get("seal_wall") as Sprite2D, game.get_node("Door/CorridorSealFrame") as Sprite2D]:
 		_expect(Suite.drawn_z(back) < Suite.drawn_z(wolf_sprite), "%s draws behind the actors" % back.name)
-	var frame_rows: Vector2 = _painted_rows(game.get_node("Door/CorridorSealFrame") as Sprite2D)
+	var frame_rows: Vector2 = _painted_world(game.get_node("Door/CorridorSealFrame") as Sprite2D, Vector2.AXIS_Y)
 	_expect(frame_rows.y < RoomDepth.FLOOR_Y - 8.0, "%s: the seal frame (far guide, hood, operator) ends above the walk line (lowest row %.1f), behind WOLF" % [label, frame_rows.y])
 	var hub: Vector2 = game.bypass_handle.global_position + BypassHandle.WHEEL_OFFSET
 	_expect(hub.y + BypassHandle.COLLAR_RADIUS < RoomDepth.FLOOR_Y - 20.0 and Suite.drawn_z(game.bypass_handle) < Suite.drawn_z(wolf_sprite), "%s: the MANUAL BYPASS is mounted on the back wall above the floor (its collar's foot at y %.1f), drawn behind WOLF, who stands in front of it" % [label, hub.y + BypassHandle.COLLAR_RADIUS])
@@ -386,7 +386,8 @@ func _check_doorway(game: Main, label: String, wolf_span: Vector2) -> void:
 func _covered_pixels(sprite: Sprite2D, covers: Array[Sprite2D]) -> Dictionary:
 	var counts: Dictionary = {}
 	var image: Image = _image_of(sprite)
-	var size: Vector2 = sprite.region_rect.size if sprite.region_enabled else sprite.texture.get_size()
+	var art: Rect2 = _art_rect(sprite)
+	var size: Vector2 = art.size
 	var to_local: Transform2D = sprite.get_global_transform().affine_inverse()
 	var corners: PackedVector2Array = []
 	for corner: Vector2 in [Vector2.ZERO, Vector2(size.x, 0.0), Vector2(0.0, size.y), size]:
@@ -404,9 +405,9 @@ func _covered_pixels(sprite: Sprite2D, covers: Array[Sprite2D]) -> Dictionary:
 		var x: float = floorf(top_left.x)
 		while x <= bottom_right.x:
 			var world: Vector2 = Vector2(x, y)
-			if _opaque_at(sprite, image, to_local * world, size):
+			if _opaque_at(sprite, image, to_local * world, art):
 				for cover: Sprite2D in covers:
-					if _opaque_at(cover, _image_of(cover), cover.get_global_transform().affine_inverse() * world, cover.region_rect.size if cover.region_enabled else cover.texture.get_size()):
+					if _opaque_at(cover, _image_of(cover), cover.get_global_transform().affine_inverse() * world, _art_rect(cover)):
 						counts[String(cover.name)] = int(counts[String(cover.name)]) + 1
 			x += 0.5
 		y += 0.5
@@ -414,7 +415,10 @@ func _covered_pixels(sprite: Sprite2D, covers: Array[Sprite2D]) -> Dictionary:
 
 
 ## Whether [param sprite]'s pixel at [param local] (its own space) is more than half opaque.
-func _opaque_at(sprite: Sprite2D, image: Image, local: Vector2, size: Vector2) -> bool:
+## [param image] is its texture's image (_image_of) and [param art] its _art_rect, both passed in
+## because the callers already hold them for every sample of the same sprite.
+func _opaque_at(sprite: Sprite2D, image: Image, local: Vector2, art: Rect2) -> bool:
+	var size: Vector2 = art.size
 	var texel: Vector2 = local - sprite.offset + (size * 0.5 if sprite.centered else Vector2.ZERO)
 	if texel.x < 0.0 or texel.y < 0.0 or texel.x >= size.x or texel.y >= size.y:
 		return false
@@ -422,7 +426,7 @@ func _opaque_at(sprite: Sprite2D, image: Image, local: Vector2, size: Vector2) -
 		texel.x = size.x - texel.x
 	if sprite.flip_v:
 		texel.y = size.y - texel.y
-	var origin: Vector2 = sprite.region_rect.position if sprite.region_enabled else Vector2.ZERO
+	var origin: Vector2 = art.position
 	var at: Vector2i = Vector2i((origin + texel).floor()).clamp(Vector2i(origin), Vector2i(origin + size) - Vector2i.ONE)
 	return image.get_pixelv(at).a > 0.5
 
@@ -435,22 +439,11 @@ func _image_of(sprite: Sprite2D) -> Image:
 	return painted[key]
 
 
-## [param sprite]'s painted rows (first, last + 1) in world y. Unlike _painted_span it has no flip
-## handling: none of the sprites it measures (the seal frame) is drawn with flip_v.
-func _painted_rows(sprite: Sprite2D) -> Vector2:
-	var rows: Vector2 = _painted_extent(sprite, Vector2.AXIS_Y)
-	var size: Vector2 = Vector2(_art_region(sprite).size)
-	var origin: float = sprite.offset.y - (size.y * 0.5 if sprite.centered else 0.0)
-	var a: float = (sprite.global_transform * Vector2(0.0, origin + rows.x)).y
-	var b: float = (sprite.global_transform * Vector2(0.0, origin + rows.y)).y
-	return Vector2(minf(a, b), maxf(a, b))
-
-
 ## Everything WOLF must not stand in at rest in the current room, by name and painted span.
 func _obstacles(game: Main) -> Array[Array]:
 	var found: Array[Array] = []
 	if game.human.is_visible_in_tree():
-		found.append(["the engineer", _painted_span(game.human.body_sprite)])
+		found.append(["the engineer", _painted_world(game.human.body_sprite, Vector2.AXIS_X)])
 	var sprites: Dictionary = {}
 	match game.state.chapter_id:
 		"lockdown":
@@ -480,44 +473,50 @@ func _obstacles(game: Main) -> Array[Array]:
 		var sprite: Sprite2D = sprites[name] as Sprite2D
 		_require(sprite != null, "the room draws %s" % name)
 		if sprite.is_visible_in_tree() and sprite.modulate.a * sprite.self_modulate.a > 0.05:
-			found.append([name, _painted_span(sprite)])
+			found.append([name, _painted_world(sprite, Vector2.AXIS_X)])
 	return found
 
 
-## [param sprite]'s painted pixels (more than half opaque) along x, in world space.
-func _painted_span(sprite: Sprite2D) -> Vector2:
-	var columns: Vector2 = _painted_columns(sprite)
-	var size: Vector2 = sprite.region_rect.size if sprite.region_enabled else sprite.texture.get_size()
-	var origin: float = sprite.offset.x - (size.x * 0.5 if sprite.centered else 0.0)
-	var from: float = origin + columns.x
-	var to: float = origin + columns.y
-	if sprite.flip_h:
-		var mirror: float = 2.0 * (origin + size.x * 0.5)
+## [param sprite]'s painted lines along [param axis] (Vector2.AXIS_X: columns, Vector2.AXIS_Y: rows)
+## in world px on that axis: (first, one past the last), low to high. A flipped sprite (flip_h for x,
+## flip_v for y) draws its art mirrored about the middle of its rect, so the art-px span is mirrored
+## the same way first. Only the span's two ends on [param axis] go through the global transform, with
+## the other coordinate 0, which is exact for the unrotated sprites this suite measures at rest (a
+## rotation would tilt the span, and is not accounted for).
+func _painted_world(sprite: Sprite2D, axis: int) -> Vector2:
+	var lines: Vector2 = _painted_extent(sprite, axis)
+	var size: float = _art_rect(sprite).size[axis]
+	var origin: float = sprite.offset[axis] - (size * 0.5 if sprite.centered else 0.0)
+	var from: float = origin + lines.x
+	var to: float = origin + lines.y
+	var flipped: bool = sprite.flip_h if axis == Vector2.AXIS_X else sprite.flip_v
+	if flipped:
+		var mirror: float = 2.0 * (origin + size * 0.5)
 		var flipped_from: float = mirror - to
 		to = mirror - from
 		from = flipped_from
-	var a: float = (sprite.global_transform * Vector2(from, 0.0)).x
-	var b: float = (sprite.global_transform * Vector2(to, 0.0)).x
+	var a_local: Vector2 = Vector2.ZERO
+	var b_local: Vector2 = Vector2.ZERO
+	a_local[axis] = from
+	b_local[axis] = to
+	var a: float = (sprite.global_transform * a_local)[axis]
+	var b: float = (sprite.global_transform * b_local)[axis]
 	return Vector2(minf(a, b), maxf(a, b))
 
 
-## The first painted column and one past the last of [param sprite]'s texture (or region), in art px
-## from the region's left edge.
-func _painted_columns(sprite: Sprite2D) -> Vector2:
-	return _painted_extent(sprite, Vector2.AXIS_X)
-
-
-## The art [param sprite] draws, in texel px: its region when it has one, else the whole texture.
-func _art_region(sprite: Sprite2D) -> Rect2i:
-	return Rect2i(sprite.region_rect) if sprite.region_enabled else Rect2i(Vector2i.ZERO, Vector2i(sprite.texture.get_size()))
+## The art [param sprite] draws, in texel px of its texture: its region when it has one, else the
+## whole texture. The one place the suite reads that choice (sampling, the extent scan, world spans).
+func _art_rect(sprite: Sprite2D) -> Rect2:
+	return sprite.region_rect if sprite.region_enabled else Rect2(Vector2.ZERO, sprite.texture.get_size())
 
 
 ## The first painted line and one past the last of [param sprite]'s art along [param axis]
 ## (Vector2.AXIS_X: columns, Vector2.AXIS_Y: rows), in art px from the region's corner. A line counts
 ## as painted when any pixel on it is more than half opaque; a sprite with none returns
-## (size, 0). The one scan behind _painted_columns and _painted_rows, cached in painted[].
+## (size, 0). The one scan behind _painted_world and the reach check, cached in painted[]; the art
+## rect is truncated to whole texels (Rect2i), as the image is indexed by texel.
 func _painted_extent(sprite: Sprite2D, axis: int) -> Vector2:
-	var region: Rect2i = _art_region(sprite)
+	var region: Rect2i = Rect2i(_art_rect(sprite))
 	var key: String = "%s %s %d" % [sprite.texture.resource_path, region, axis]
 	if painted.has(key):
 		return painted[key]
