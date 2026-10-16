@@ -40,67 +40,69 @@ The method is the corridor door end's (`../corridor-door-end-2026-10-12/`, and `
 
 Until October 15 each fix round filed its own copy of every tool it ran, so most tools were here two to four times, mostly byte for byte. AGENTS.md's "Don't duplicate code" rule keeps one current copy of each; `landing/NOTES.md` ("Shared code") has the counts. Every earlier version that differs is cited as `<path> at <commit>`: read it with `git show <commit>:docs/research-2026-10/sources/doors-2026-10-14/<path>`. dee9996 is the commit that filed these records and 7d55687 the one that filed fix round 1's entry and exit door tools; both are in the branch history.
 
-| Kept | Blob | Same-bytes copies removed | Earlier versions, cited |
-|---|---|---|---|
-| `records/tools/cleanup.py` | 00e71c7a | 1 | `records/tools/cleanup.py` at dee9996 |
-| `records/tools/compose.py` | 858ffad9 | 2 | - |
-| `records/tools/install.py` | 75a80f3b | 1 | `records/tools/install.py` at dee9996 |
-| `records/tools/paint_inputs.py` | b67e17cc | 1 | `records/tools/paint_inputs.py` at dee9996 |
-| `records/tools/preview_clean.py` | acdaf573 | 2 | - |
-| `records/tools/rbbox.py` | 2cd72e83 | 1 | - |
-| `records/tools/rdesign.py` | f666afc7 | 1 | `records/tools/rdesign.py` at dee9996 |
-| `records/tools/rmodel.py` | 350d3b96 | 1 | `records/tools/rmodel.py` at dee9996 |
-| `records/tools/rules.txt` | 4aabb2a7 | 1 | - |
-| `junction/tools/bbox.py` | 3120e610 | 1 | - |
-| `junction/tools/cleanup.py` | e0997672 | 1 | `junction/tools/cleanup.py` at dee9996 |
-| `junction/tools/codex_inputs.py` | 5304f598 | 1 | `junction/tools/codex_inputs.py` at dee9996 |
-| `junction/tools/install.py` | 06867f40 | 0 | `junction/tools/install.py` at dee9996; `fix-r2/junction/install.py` at dee9996 |
-| `junction/tools/jdesign.py` | ab05ac2c | 1 | `junction/tools/jdesign.py` at dee9996 |
-| `junction/tools/jgrade.py` | 2ecb41d4 | 1 | - |
-| `junction/tools/jgrade2.py` | 35d0ff42 | 0 | `fix-r2/junction/jgrade2.py` at dee9996 |
-| `junction/tools/jmodel.py` | a40018f1 | 1 | `junction/tools/jmodel.py` at dee9996 |
-| `junction/tools/preview.py` | e8a45d90 | 2 | - |
-| `junction/tools/lying3.py` | ab1d9c79 | 0 | - |
-| none: it carried game code, which is in `apps/game` and the history |  | 0 | `integration/patch_game.py` at dee9996; `junction/tools/patch_game.py` at dee9996; `fix-r2/junction/patch_game.py` at dee9996; `fix-r3/junction/tools/patch_game.py` at dee9996 |
-| none: it carried game code, which is in `apps/game` and the history |  | 0 | `integration/patch_extra.py` at dee9996; `junction/tools/patch_extra.py` at dee9996; `fix-r2/junction/patch_extra.py` at dee9996; `fix-r3/junction/tools/patch_extra.py` at dee9996 |
-| none: it carried game code, which is in `apps/game` and the history |  | 2 | `records/tools/patch_main.py` at dee9996 (the same file as `fix-r2/records/patch_main.py` at dee9996 and `fix-r3/records/tools/patch_main.py` at dee9996) |
-| none: it carried game code, which is in `apps/game` and the history |  | 0 | `junction-exit/templates/junction_room.gd.tmpl` at dee9996 |
-| `../corridor-door-end-2026-10-12/tools/layers/imgkit.py` (main's copy) | 94a33458 | 7 | - |
-| `junction-exit/tools/cleanup.py` | a8df00fe | 0 | `junction-exit/tools/cleanup.py` at dee9996; `fix-r1/hatch/tools/cleanup.py` at 7d55687; `fix-r2/hatch/cleanup.py` at dee9996 |
-| `junction-exit/tools/compose.py` | 3b8f56fb | 1 | `junction-exit/tools/compose.py` at dee9996; `fix-r1/hatch/tools/compose.py` at 7d55687 |
-| `junction-exit/tools/design.py` | df2f0bf0 | 1 | `junction-exit/tools/design.py` at dee9996; `fix-r1/hatch/tools/design.py` at 7d55687 |
-| `junction-exit/tools/geom.py` | fb0b639e | 1 | `junction-exit/tools/geom.py` at dee9996; `fix-r1/hatch/tools/geom.py` at 7d55687 |
-| `junction-exit/tools/hinstall.py` | bf7fd006 | 1 | `fix-r1/hatch/tools/hinstall.py` at 7d55687 |
-| `junction-exit/tools/install.py` | be78771c | 3 | - |
-| `junction-exit/tools/leaf.py` | c3067d59 | 3 | - |
-| `junction-exit/tools/manifest.py` | 7ce34281 | 3 | - |
-| `junction-exit/tools/noleaf.py` | f5cd073b | 3 | - |
-| `junction-entry/tools/jeclean.py` | 20bce038 | 2 | `fix-r1/jentry/tools/jeclean.py` at 7d55687 |
-| `junction-entry/tools/jedesign.py` | a58d27e3 | 2 | `fix-r1/jentry/tools/jedesign.py` at 7d55687 |
-| `junction-entry/tools/jeinputs.py` | 595e8eaf | 2 | `fix-r1/jentry/tools/jeinputs.py` at 7d55687 |
-| `junction-entry/tools/jeinstall.py` | 797c8d42 | 1 | `fix-r1/jentry/tools/jeinstall.py` at 7d55687; `fix-r2/jentry/jeinstall.py` at dee9996 |
-| `junction-entry/tools/jemid.py` | 2b97ae95 | 1 | `fix-r2/jentry/jemid.py` at dee9996 |
-| `junction-entry/tools/jemodel.py` | 03640720 | 3 | - |
-| `tools/grade.py` | 2d3aa3d9 | 2 | - |
-| `tools/grade2.py` | e52eef95 | 1 | - |
-| `tools/rgrade.py` | e6234551 | 2 | - |
-| `tools/rgrade2.py` | 769d7adf | 0 | `fix-r2/tools/rgrade2.py` at dee9996 |
-| `tools/feedback.py` | bc66b406 | 1 | - |
-| `tools/ghostcheck.py` | fe28dc22 | 1 | - |
-| `tools/manifest_r2.py` | 820d0630 | 1 | - |
-| `tools/measure3.py` | 6334c17a | 1 | - |
-| `tools/measure4.py` | c0b59a8b | 1 | - |
-| `tools/measure_r2.py` | fade0d9d | 2 | - |
-| `tools/package.py` | d1663468 | 0 | `integration/package.py` at dee9996; `fix-r1/tools/package.py` at dee9996; `fix-r2/tools/package.py` at dee9996; `fix-r3/tools/package.py` at dee9996 |
-| `tools/perftable.py` | 58cc1b51 | 0 | `fix-r3/tools/perftable.py` at dee9996 |
-| `tools/sentry-load.sh` | 493354f5 | 0 | `fix-r3/tools/sentry-load.sh` at dee9996 |
-| `tools/render.sh` | 40a683c5 | 0 | `fix-r1/render.sh` at dee9996; `fix-r2/render.sh` at dee9996; `fix-r3/render.sh` at dee9996; `fix-r4/render.sh` at dee9996 |
-| `tools/suite.sh` | c944c442 | 0 | `records/tools/run_suites.sh` at dee9996; `junction/tools/run_checks.sh` at dee9996; `fix-r1/run-suites.sh` at dee9996; `fix-r2/run-suites.sh` at dee9996; `fix-r3/records/tools/run_suites.sh` at dee9996; `fix-r3/junction/tools/run_checks.sh` at dee9996; `fix-r3/run-suites.sh` at dee9996; `fix-r4/run-suites.sh` at dee9996 |
-| `tools/run_codex.sh` | 8643f8fe | 2 | `records/tools/run_job.sh` at dee9996; `junction-exit/tools/run_codex.sh` at dee9996; `fix-r1/hatch/tools/run_codex.sh` at 7d55687; `fix-r3/hatch/tools/run_codex.sh` at dee9996; `fix-r3/records/tools/run_job.sh` at dee9996 |
-| `tools/rebuild.sh` | aca17d4e | 0 | `fix-r2/rebuild.sh` at dee9996 |
-| `tools/driver/doors_capture.gd` | 8f7c9ec6 | 0 | `landing/driver/doors_capture.gd` at dee9996 (the landing's stills; before the October 15 blast-frame fix); `integration/doors_capture.gd` at dee9996; `fix-r1/driver/doors_capture.gd` at dee9996; `fix-r2/driver/doors_capture.gd` at dee9996; `fix-r3/driver/doors_capture.gd` at dee9996; `fix-r4/driver/doors_capture.gd` at dee9996 |
-| `DOORS.md` |  | 4 | the fix rounds' `fix-r1/doors-section.md` at dee9996 to `fix-r4/doors-section.md` at dee9996 were copies of its sections (every line is in it) |
-| `junction-entry/NOTES.md` |  | 3 | was `junction-entry/NOTES-fix-r3.md` at dee9996; `junction-entry/NOTES-fix-r1.md` at dee9996, `junction-entry/NOTES-fix-r2.md` at dee9996 and `fix-r3/jentry/NOTES.md` at dee9996 were wholly contained in it |
+"At bc1b51e" says where each kept file's bytes were just before the consolidation (bc1b51e, the doors branch head before October 15, is in the history too): moved here with `git mv`, already here, or copied over this path's earlier version from a fix round's copy, and which same-bytes copies were removed. A filed script that calls a tool by its round path names the file this column gives: for example `fix-r4/rebuild.sh` runs `$R3/rebuild.sh`, that is `fix-r3/rebuild.sh`, now `tools/rebuild.sh`.
+
+| Kept | Blob | Same-bytes copies removed | At bc1b51e | Earlier versions, cited |
+|---|---|---|---|---|
+| `records/tools/cleanup.py` | 00e71c7a | 1 | copied over this path's earlier version from `fix-r3/records/tools/cleanup.py` (removed); same bytes removed: `fix-r2/records/cleanup.py` | `records/tools/cleanup.py` at dee9996 |
+| `records/tools/compose.py` | 858ffad9 | 2 | here; same bytes removed: `fix-r2/records/compose.py`, `fix-r3/records/tools/compose.py` | - |
+| `records/tools/install.py` | 75a80f3b | 1 | copied over this path's earlier version from `fix-r3/records/tools/install.py` (removed); same bytes removed: `fix-r2/records/install.py` | `records/tools/install.py` at dee9996 |
+| `records/tools/paint_inputs.py` | b67e17cc | 1 | copied over this path's earlier version from `fix-r3/records/tools/paint_inputs.py` (removed); same bytes removed: `fix-r2/records/paint_inputs.py` | `records/tools/paint_inputs.py` at dee9996 |
+| `records/tools/preview_clean.py` | acdaf573 | 2 | here; same bytes removed: `fix-r2/records/preview_clean.py`, `fix-r3/records/tools/preview_clean.py` | - |
+| `records/tools/rbbox.py` | 2cd72e83 | 1 | moved here from `fix-r2/records/rbbox.py`; same bytes removed: `fix-r3/records/tools/rbbox.py` | - |
+| `records/tools/rdesign.py` | f666afc7 | 1 | copied over this path's earlier version from `fix-r3/records/tools/rdesign.py` (removed); same bytes removed: `fix-r2/records/rdesign.py` | `records/tools/rdesign.py` at dee9996 |
+| `records/tools/rmodel.py` | 350d3b96 | 1 | copied over this path's earlier version from `fix-r3/records/tools/rmodel.py` (removed); same bytes removed: `fix-r2/records/rmodel.py` | `records/tools/rmodel.py` at dee9996 |
+| `records/tools/rules.txt` | 4aabb2a7 | 1 | here; same bytes removed: `fix-r3/records/tools/rules.txt` | - |
+| `junction/tools/bbox.py` | 3120e610 | 1 | moved here from `fix-r2/junction/bbox.py`; same bytes removed: `fix-r3/junction/tools/bbox.py` | - |
+| `junction/tools/cleanup.py` | e0997672 | 1 | copied over this path's earlier version from `fix-r3/junction/tools/cleanup.py` (removed); same bytes removed: `fix-r2/junction/cleanup.py` | `junction/tools/cleanup.py` at dee9996 |
+| `junction/tools/codex_inputs.py` | 5304f598 | 1 | copied over this path's earlier version from `fix-r3/junction/tools/codex_inputs.py` (removed); same bytes removed: `fix-r2/junction/codex_inputs.py` | `junction/tools/codex_inputs.py` at dee9996 |
+| `junction/tools/install.py` | 06867f40 | 0 | copied over this path's earlier version from `fix-r3/junction/tools/install.py` (removed) | `junction/tools/install.py` at dee9996; `fix-r2/junction/install.py` at dee9996 |
+| `junction/tools/jdesign.py` | ab05ac2c | 1 | copied over this path's earlier version from `fix-r3/junction/tools/jdesign.py` (removed); same bytes removed: `fix-r2/junction/jdesign.py` | `junction/tools/jdesign.py` at dee9996 |
+| `junction/tools/jgrade.py` | 2ecb41d4 | 1 | moved here from `fix-r2/junction/jgrade.py`; same bytes removed: `fix-r3/junction/tools/jgrade.py` | - |
+| `junction/tools/jgrade2.py` | 35d0ff42 | 0 | moved here from `fix-r3/junction/tools/jgrade2.py` | `fix-r2/junction/jgrade2.py` at dee9996 |
+| `junction/tools/jmodel.py` | a40018f1 | 1 | copied over this path's earlier version from `fix-r3/junction/tools/jmodel.py` (removed); same bytes removed: `fix-r2/junction/jmodel.py` | `junction/tools/jmodel.py` at dee9996 |
+| `junction/tools/preview.py` | e8a45d90 | 2 | here; same bytes removed: `fix-r2/junction/preview.py`, `fix-r3/junction/tools/preview.py` | - |
+| `junction/tools/lying3.py` | ab1d9c79 | 0 | moved here from `fix-r3/junction/tools/lying3.py` | - |
+| none: it carried game code, which is in `apps/game` and the history |  | 0 | - | `integration/patch_game.py` at dee9996; `junction/tools/patch_game.py` at dee9996; `fix-r2/junction/patch_game.py` at dee9996; `fix-r3/junction/tools/patch_game.py` at dee9996 |
+| none: it carried game code, which is in `apps/game` and the history |  | 0 | - | `integration/patch_extra.py` at dee9996; `junction/tools/patch_extra.py` at dee9996; `fix-r2/junction/patch_extra.py` at dee9996; `fix-r3/junction/tools/patch_extra.py` at dee9996 |
+| none: it carried game code, which is in `apps/game` and the history |  | 2 | - | `records/tools/patch_main.py` at dee9996 (the same file as `fix-r2/records/patch_main.py` at dee9996 and `fix-r3/records/tools/patch_main.py` at dee9996) |
+| none: it carried game code, which is in `apps/game` and the history |  | 0 | - | `junction-exit/templates/junction_room.gd.tmpl` at dee9996 |
+| `../corridor-door-end-2026-10-12/tools/layers/imgkit.py` (main's copy) | 94a33458 | 7 | removed: `fix-r1/hatch/tools/imgkit.py`, `fix-r2/hatch/imgkit.py`, `fix-r2/junction/imgkit.py`, `fix-r3/hatch/tools/imgkit.py`, `fix-r3/junction/tools/imgkit.py`, `junction-exit/tools/imgkit.py`, `junction/tools/imgkit.py` | - |
+| `junction-exit/tools/cleanup.py` | a8df00fe | 0 | copied over this path's earlier version from `fix-r3/hatch/tools/cleanup.py` (removed) | `junction-exit/tools/cleanup.py` at dee9996; `fix-r1/hatch/tools/cleanup.py` at 7d55687; `fix-r2/hatch/cleanup.py` at dee9996 |
+| `junction-exit/tools/compose.py` | 3b8f56fb | 1 | copied over this path's earlier version from `fix-r3/hatch/tools/compose.py` (removed); same bytes removed: `fix-r2/hatch/compose.py` | `junction-exit/tools/compose.py` at dee9996; `fix-r1/hatch/tools/compose.py` at 7d55687 |
+| `junction-exit/tools/design.py` | df2f0bf0 | 1 | copied over this path's earlier version from `fix-r3/hatch/tools/design.py` (removed); same bytes removed: `fix-r2/hatch/design.py` | `junction-exit/tools/design.py` at dee9996; `fix-r1/hatch/tools/design.py` at 7d55687 |
+| `junction-exit/tools/geom.py` | fb0b639e | 1 | copied over this path's earlier version from `fix-r3/hatch/tools/geom.py` (removed); same bytes removed: `fix-r2/hatch/geom.py` | `junction-exit/tools/geom.py` at dee9996; `fix-r1/hatch/tools/geom.py` at 7d55687 |
+| `junction-exit/tools/hinstall.py` | bf7fd006 | 1 | moved here from `fix-r2/hatch/hinstall.py`; same bytes removed: `fix-r3/hatch/tools/hinstall.py` | `fix-r1/hatch/tools/hinstall.py` at 7d55687 |
+| `junction-exit/tools/install.py` | be78771c | 3 | here; same bytes removed: `fix-r1/hatch/tools/install.py`, `fix-r2/hatch/install.py`, `fix-r3/hatch/tools/install.py` | - |
+| `junction-exit/tools/leaf.py` | c3067d59 | 3 | here; same bytes removed: `fix-r1/hatch/tools/leaf.py`, `fix-r2/hatch/leaf.py`, `fix-r3/hatch/tools/leaf.py` | - |
+| `junction-exit/tools/manifest.py` | 7ce34281 | 3 | here; same bytes removed: `fix-r1/hatch/tools/manifest.py`, `fix-r2/hatch/manifest.py`, `fix-r3/hatch/tools/manifest.py` | - |
+| `junction-exit/tools/noleaf.py` | f5cd073b | 3 | here; same bytes removed: `fix-r1/hatch/tools/noleaf.py`, `fix-r2/hatch/noleaf.py`, `fix-r3/hatch/tools/noleaf.py` | - |
+| `junction-entry/tools/jeclean.py` | 20bce038 | 2 | here; same bytes removed: `fix-r2/jentry/jeclean.py`, `fix-r3/jentry/tools/jeclean.py` | `fix-r1/jentry/tools/jeclean.py` at 7d55687 |
+| `junction-entry/tools/jedesign.py` | a58d27e3 | 2 | here; same bytes removed: `fix-r2/jentry/jedesign.py`, `fix-r3/jentry/tools/jedesign.py` | `fix-r1/jentry/tools/jedesign.py` at 7d55687 |
+| `junction-entry/tools/jeinputs.py` | 595e8eaf | 2 | here; same bytes removed: `fix-r2/jentry/jeinputs.py`, `fix-r3/jentry/tools/jeinputs.py` | `fix-r1/jentry/tools/jeinputs.py` at 7d55687 |
+| `junction-entry/tools/jeinstall.py` | 797c8d42 | 1 | here; same bytes removed: `fix-r3/jentry/tools/jeinstall.py` | `fix-r1/jentry/tools/jeinstall.py` at 7d55687; `fix-r2/jentry/jeinstall.py` at dee9996 |
+| `junction-entry/tools/jemid.py` | 2b97ae95 | 1 | here; same bytes removed: `fix-r3/jentry/tools/jemid.py` | `fix-r2/jentry/jemid.py` at dee9996 |
+| `junction-entry/tools/jemodel.py` | 03640720 | 3 | here; same bytes removed: `fix-r1/jentry/tools/jemodel.py`, `fix-r2/jentry/jemodel.py`, `fix-r3/jentry/tools/jemodel.py` | - |
+| `tools/grade.py` | 2d3aa3d9 | 2 | moved here from `fix-r1/tools/grade.py`; same bytes removed: `fix-r2/tools/grade.py`, `fix-r3/tools/grade.py` | - |
+| `tools/grade2.py` | e52eef95 | 1 | moved here from `fix-r2/tools/grade2.py`; same bytes removed: `fix-r3/tools/grade2.py` | - |
+| `tools/rgrade.py` | e6234551 | 2 | moved here from `fix-r1/tools/rgrade.py`; same bytes removed: `fix-r2/tools/rgrade.py`, `fix-r3/tools/rgrade.py` | - |
+| `tools/rgrade2.py` | 769d7adf | 0 | moved here from `fix-r3/tools/rgrade2.py` | `fix-r2/tools/rgrade2.py` at dee9996 |
+| `tools/feedback.py` | bc66b406 | 1 | moved here from `fix-r2/tools/feedback.py`; same bytes removed: `fix-r3/tools/feedback.py` | - |
+| `tools/ghostcheck.py` | fe28dc22 | 1 | moved here from `fix-r2/tools/ghostcheck.py`; same bytes removed: `fix-r3/tools/ghostcheck.py` | - |
+| `tools/manifest_r2.py` | 820d0630 | 1 | moved here from `fix-r2/tools/manifest_r2.py`; same bytes removed: `fix-r3/tools/manifest_r2.py` | - |
+| `tools/measure3.py` | 6334c17a | 1 | moved here from `fix-r2/tools/measure3.py`; same bytes removed: `fix-r3/tools/measure3.py` | - |
+| `tools/measure4.py` | c0b59a8b | 1 | moved here from `fix-r2/tools/measure4.py`; same bytes removed: `fix-r3/tools/measure4.py` | - |
+| `tools/measure_r2.py` | fade0d9d | 2 | moved here from `fix-r1/tools/measure_r2.py`; same bytes removed: `fix-r2/tools/measure_r2.py`, `fix-r3/tools/measure_r2.py` | - |
+| `tools/package.py` | d1663468 | 0 | moved here from `fix-r4/tools/package.py` | `integration/package.py` at dee9996; `fix-r1/tools/package.py` at dee9996; `fix-r2/tools/package.py` at dee9996; `fix-r3/tools/package.py` at dee9996 |
+| `tools/perftable.py` | 58cc1b51 | 0 | moved here from `fix-r4/tools/perftable.py` | `fix-r3/tools/perftable.py` at dee9996 |
+| `tools/sentry-load.sh` | 493354f5 | 0 | moved here from `fix-r4/tools/sentry-load.sh` | `fix-r3/tools/sentry-load.sh` at dee9996 |
+| `tools/render.sh` | 40a683c5 | 0 | moved here from `landing/render.sh` | `fix-r1/render.sh` at dee9996; `fix-r2/render.sh` at dee9996; `fix-r3/render.sh` at dee9996; `fix-r4/render.sh` at dee9996 |
+| `tools/suite.sh` | c944c442 | 0 | moved here from `landing/suite.sh` | `records/tools/run_suites.sh` at dee9996; `junction/tools/run_checks.sh` at dee9996; `fix-r1/run-suites.sh` at dee9996; `fix-r2/run-suites.sh` at dee9996; `fix-r3/records/tools/run_suites.sh` at dee9996; `fix-r3/junction/tools/run_checks.sh` at dee9996; `fix-r3/run-suites.sh` at dee9996; `fix-r4/run-suites.sh` at dee9996 |
+| `tools/run_codex.sh` | 8643f8fe | 2 | moved here from `fix-r1/run_codex.sh`; same bytes removed: `fix-r2/run_codex.sh`, `fix-r3/run_codex.sh` | `records/tools/run_job.sh` at dee9996; `junction-exit/tools/run_codex.sh` at dee9996; `fix-r1/hatch/tools/run_codex.sh` at 7d55687; `fix-r3/hatch/tools/run_codex.sh` at dee9996; `fix-r3/records/tools/run_job.sh` at dee9996 |
+| `tools/rebuild.sh` | aca17d4e | 0 | moved here from `fix-r3/rebuild.sh` | `fix-r2/rebuild.sh` at dee9996 |
+| `tools/driver/doors_capture.gd` | 8f7c9ec6 | 0 | moved here from `landing/driver/doors_capture.gd`, then given the blast-frame fix | `landing/driver/doors_capture.gd` at dee9996 (the landing's stills; before the October 15 blast-frame fix); `integration/doors_capture.gd` at dee9996; `fix-r1/driver/doors_capture.gd` at dee9996; `fix-r2/driver/doors_capture.gd` at dee9996; `fix-r3/driver/doors_capture.gd` at dee9996; `fix-r4/driver/doors_capture.gd` at dee9996 |
+| `DOORS.md` |  | 4 | here | the fix rounds' `fix-r1/doors-section.md` at dee9996 to `fix-r4/doors-section.md` at dee9996 were copies of its sections (every line is in it) |
+| `junction-entry/NOTES.md` |  | 3 | moved here from `junction-entry/NOTES-fix-r3.md`, then updated | was `junction-entry/NOTES-fix-r3.md` at dee9996; `junction-entry/NOTES-fix-r1.md` at dee9996, `junction-entry/NOTES-fix-r2.md` at dee9996 and `fix-r3/jentry/NOTES.md` at dee9996 were wholly contained in it |
 
 The tools import their siblings by name (`sys.path`), and some read their round's scratch layout (`doors-r1/...`), so a re-run needs them put back in that layout, with `imgkit.py` from `../corridor-door-end-2026-10-12/tools/layers/` beside them. The patch scripts and the junction_room template are not kept: they carried the game code they inserted, which is in `apps/game`.
 
