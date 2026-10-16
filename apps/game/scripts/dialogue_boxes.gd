@@ -62,6 +62,9 @@ static func words_of(box: String, speakers: Array[String]) -> String:
 	return box if tag.is_empty() else box.substr(tag.length() + 1).strip_edges()
 
 
+## The words in [param text]: runs of characters between spaces, a line break counting as a space.
+## The box limit (LONG_LINE_WORDS, through _fits_box), read_seconds and text_boxes_test all count
+## with it, so they agree on what a word is.
 static func word_count(text: String) -> int:
 	return text.replace("\n", " ").split(" ", false).size()
 
@@ -204,6 +207,9 @@ static func _fits_box(text: String, fits: Callable) -> bool:
 	return word_count(text) < LONG_LINE_WORDS and fits.call(text)
 
 
+## A copy of [param speakers], longest tag first ([param speakers] itself is left as it is). tag_of
+## and split try tags in this order, so where one tag could also match the start of a longer one's
+## box the longer tag wins. text_boxes_test walks the tags in the same order.
 static func _longest_first(speakers: Array[String]) -> Array[String]:
 	var sorted: Array[String] = speakers.duplicate()
 	sorted.sort_custom(func(a: String, b: String) -> bool: return a.length() > b.length())

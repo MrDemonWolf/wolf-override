@@ -8,6 +8,9 @@ extends RefCounted
 ## The sizes Settings offers, as factors.
 const STEPS: Array[float] = [1.0, 1.25, 1.5, 1.75, 2.0]
 
+## The current factor: one of STEPS (1.0 is 100%). GameSettings sets it when the settings load and
+## when TEXT SIZE changes, then emits text_size_changed so Main lays the HUD out again; px,
+## world_factor and every caller read it live, so nothing keeps a stale copy.
 static var factor: float = 1.0
 
 

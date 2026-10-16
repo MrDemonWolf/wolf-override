@@ -70,7 +70,14 @@ const TUTORIAL_FONT_SIZE: int = 17
 const HINT_GAP: float = 4.0
 ## The most of its own area the tutorial prompt may lay over the corridor's machines in the top card's place.
 const TUTORIAL_ART_OVERLAP: float = 0.1
+## The x span (canvas px, left and right edge) the hint bar fills on touch: 12 px in from the inner
+## edges of ◀ ▶ and USE (offset_right 238 and offset_left 773 under TouchControls in main.tscn).
+## Above 100% the dialogue box stands in it too (_box_between_touch_buttons), and a tutorial prompt
+## that drops to the bottom on touch centres on it. Move the buttons and this moves with them.
 const TOUCH_HINT_SPAN: Vector2 = Vector2(250.0, 761.0)
+## TOUCH_HINT_SPAN's width (511 px) and middle (x 505.5), worked out once for every user above.
+const TOUCH_HINT_WIDTH: float = TOUCH_HINT_SPAN.y - TOUCH_HINT_SPAN.x
+const TOUCH_HINT_CENTRE_X: float = (TOUCH_HINT_SPAN.x + TOUCH_HINT_SPAN.y) * 0.5
 ## On the opening's first box: Pause offers SKIP OPENING (P0-13's stopgap until the opening is reworked).
 const SKIP_OPENING_HINT: String = "PAUSE: skip the opening"
 ## The corridor seal's face (Door at x 780, 56 px wide); while it is shut WOLF follows no closer than his reach.
@@ -679,11 +686,12 @@ var dialogue_age: float = 0.0
 var dialogue_cleared: bool = false
 var dialogue_key: String = ""
 var dialogue_restart: bool = true
-## At first control the opening lines wait (TEACH-7): the name card and the move prompt come first,
-## the rest of the tutorial after the first step, and the lines once the name card has gone.
-## The width the words on screen wrap at, and the box, size and column it was measured for.
+## The width the words on screen wrap at (canvas px), and the box, size and column it was measured
+## for (_story_wrap_width measures again only when that key changes).
 var story_wrap: float = 0.0
 var story_wrap_key: String = ""
+## At first control the opening lines wait (TEACH-7): the name card and the move prompt come first,
+## the rest of the tutorial after the first step, and the lines once the name card has gone.
 var opening_lines_held: bool = false
 ## The opening lines' boxes after control (the trust line's two, then WOLF and the engineer).
 var opening_lines: Array[String] = []
@@ -4275,8 +4283,14 @@ func _apply_text_size() -> void:
 ## The words' column width at the current text size: 42 characters' worth, or what the canvas leaves.
 func _dialogue_column_width() -> float:
 	var wanted: float = DIALOGUE_COLUMN_WIDTH * TextSize.factor
-	var room: float = TOUCH_HINT_SPAN.y - TOUCH_HINT_SPAN.x if _box_between_touch_buttons() else 960.0 - HUD_SIDE_MARGIN * 2.0
-	return minf(wanted, room - DIALOGUE_PADDING.x * 2.0)
+	return minf(wanted, _dialogue_room(_box_between_touch_buttons()) - DIALOGUE_PADDING.x * 2.0)
+
+
+## The width (canvas px) the dialogue box may take, padding included: the touch hint span while it
+## stands between the touch buttons ([param between], from _box_between_touch_buttons), otherwise the
+## canvas less HUD_SIDE_MARGIN each side. The column width and the box layout both read it.
+func _dialogue_room(between: bool) -> float:
+	return TOUCH_HINT_WIDTH if between else 960.0 - HUD_SIDE_MARGIN * 2.0
 
 
 ## Above 100% a box under the touch buttons would rise into ◀ ▶ and USE (their bottoms at y 435), so
@@ -4324,8 +4338,8 @@ func _layout_hud() -> void:
 	var column: float = _dialogue_column_width()
 	var names: float = _speaker_column_width()
 	var between: bool = _box_between_touch_buttons()
-	var room: float = TOUCH_HINT_SPAN.y - TOUCH_HINT_SPAN.x if between else 960.0 - HUD_SIDE_MARGIN * 2.0
-	var centre_x: float = (TOUCH_HINT_SPAN.x + TOUCH_HINT_SPAN.y) * 0.5 if between else 480.0
+	var room: float = _dialogue_room(between)
+	var centre_x: float = TOUCH_HINT_CENTRE_X if between else 480.0
 	var stacked: bool = DIALOGUE_PADDING.x * 2.0 + names + SPEAKER_GAP + column > room
 	# Narration has no name column, so its box is only as wide as the words' column.
 	var bar_width: float = DIALOGUE_PADDING.x * 2.0 + column + (names + SPEAKER_GAP if speaker.visible and not stacked else 0.0)
@@ -4345,7 +4359,7 @@ func _layout_hud() -> void:
 	# The top card grows with its text, left of PAUSE (and of the touch DEBUG button where it shows),
 	# and takes a third row if its words need one there.
 	var card_width: float = clampf(448.0 * TextSize.factor, 448.0, 820.0)
-	if debug_tools != null and debug_tools.debug_button != null and debug_tools.debug_button.visible:
+	if _debug_button_shown():
 		card_width = minf(card_width, debug_tools.debug_button.position.x - HUD_CARD_GAP - top_card.position.x)
 	_set_rect(hud, Vector2(16.0, 7.0), Vector2(card_width - 28.0, hud.size.y))
 	var card_height: float = maxf(62.0, hud.get_line_height() * maxi(2, hud.get_line_count()) + 14.0)
@@ -4355,7 +4369,7 @@ func _layout_hud() -> void:
 	# The hint bar: top right under PAUSE (and under the top card where that reaches across) in the
 	# opening and the closing shots, otherwise just above the dialogue box; on touch between ◀ ▶ and USE.
 	var cinematic: bool = intro_active or chapter_close_active
-	var hint_width: float = minf(278.0 * TextSize.factor, 440.0) if cinematic else (TOUCH_HINT_SPAN.y - TOUCH_HINT_SPAN.x if touch_layout else minf(549.0 * TextSize.factor, 960.0 - HUD_SIDE_MARGIN * 2.0))
+	var hint_width: float = minf(278.0 * TextSize.factor, 440.0) if cinematic else (TOUCH_HINT_WIDTH if touch_layout else minf(549.0 * TextSize.factor, 960.0 - HUD_SIDE_MARGIN * 2.0))
 	_set_rect(context_hint_text, Vector2(13.0, 3.0), Vector2(hint_width - 23.0, context_hint_text.size.y))
 	var hint_height: float = maxf(35.0, context_hint_text.get_line_height() * context_hint_text.get_line_count() + 8.0)
 	var hint_x: float = 960.0 - 32.0 - hint_width if cinematic else (TOUCH_HINT_SPAN.x if touch_layout else roundf((960.0 - hint_width) * 0.5))
@@ -4383,6 +4397,13 @@ func _layout_hud() -> void:
 		_layout_choices(touch_layout, top_card.position.y + card_height + 10.0)
 
 
+## True while the DEBUG button shows at the top right (DebugTools shows it only when the debug tools
+## are available, on the touch layout, with no menu or card up), so the top card and a tutorial
+## prompt in the card's place stop short of it. False before DebugTools exists.
+func _debug_button_shown() -> bool:
+	return debug_tools != null and debug_tools.debug_button != null and debug_tools.debug_button.visible
+
+
 ## Where the tutorial prompt goes when, under the top card, it would cover a station (the breaker's
 ## name it points to, at large text sizes). Once the card is fading or gone it takes the card's
 ## place: as near the middle as it can stand between PAUSE (and DEBUG) and the margin, clear of every
@@ -4395,7 +4416,7 @@ func _tutorial_prompt_place(rect: Rect2, touch_layout: bool) -> Vector2:
 	var card_leaving: bool = last_top_card_key == "name_card" and tutorial_step >= 1
 	if not top_card.visible or top_card.modulate.a < 0.999 or card_leaving:
 		var top_right: float = pause_button.position.x
-		if debug_tools != null and debug_tools.debug_button != null and debug_tools.debug_button.visible:
+		if _debug_button_shown():
 			top_right = minf(top_right, debug_tools.debug_button.position.x)
 		var best: Vector2 = Vector2(-1.0, top_card.position.y)
 		var best_overlap: float = rect.get_area() * TUTORIAL_ART_OVERLAP
@@ -4413,7 +4434,7 @@ func _tutorial_prompt_place(rect: Rect2, touch_layout: bool) -> Vector2:
 			tutorial_prompt_slot = &"card_place"
 			return best
 	if not bottom_bar.visible:
-		var centre: float = (TOUCH_HINT_SPAN.x + TOUCH_HINT_SPAN.y) * 0.5 if touch_layout and rect.size.x <= TOUCH_HINT_SPAN.y - TOUCH_HINT_SPAN.x else 480.0
+		var centre: float = TOUCH_HINT_CENTRE_X if touch_layout and rect.size.x <= TOUCH_HINT_WIDTH else 480.0
 		tutorial_prompt_slot = &"bottom"
 		return Vector2(roundf(centre - rect.size.x * 0.5), DIALOGUE_BOTTOM - rect.size.y)
 	tutorial_prompt_slot = &"waiting"
@@ -4505,6 +4526,8 @@ static func _set_color(rect: ColorRect, color: Color) -> void:
 		rect.color = color
 
 
+## Moves [param control] to [param at] and sizes it to [param size] (canvas px), each only when it
+## differs, like the setters above: a needless write would queue a layout pass every frame.
 static func _set_rect(control: Control, at: Vector2, size: Vector2) -> void:
 	if control.position != at:
 		control.position = at
