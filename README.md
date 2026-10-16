@@ -170,13 +170,16 @@ The root `package.json` defines these commands:
   fonts).
 - `bun run docs:check-export` - Re-run that export check on the last
   build.
+- `bun run check:copies` - Fail on code copied (six or more matching
+  lines) since the branch left `origin/main`.
 
 ### Code Quality
 
 The game uses typed GDScript, the built-in InputMap and stable event IDs
 that do not depend on editable display names. CI runs a checksum-pinned
-Godot 4.7.2 import plus the headless suites on every pull request, and
-the docs type check, tests and Pages build before deployment. Headless
+Godot 4.7.2 import plus the headless suites on every pull request, after
+a check that the branch adds no copied code, and the docs type check,
+tests and Pages build before deployment. Headless
 checks cover both door routes, both mirror routes, the Service Junction
 stages and knockdowns, settings validation and Continue; they do not
 establish how a route feels. The Service Junction, the closer camera, the
