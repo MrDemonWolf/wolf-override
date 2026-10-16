@@ -139,10 +139,8 @@ static func make_body(parent: Node, body_name: String, face_x: float, side: floa
 ## leaves a closing leaf alone while it runs; JunctionRoom.reset_transient kills it), and so does
 ## door_route_test, which waits on it. Main does not read it.
 func close_behind(room: Node, running: Tween, shut: Callable) -> Tween:
-	if running != null and running.is_running():
-		running.kill()
+	var tween: Tween = Tweens.restart(room, running)
 	open = 1.0
-	var tween: Tween = room.create_tween()
 	tween.tween_interval(CLOSE_DELAY)
 	tween.tween_property(self, "open", 0.0, CLOSE_SECONDS).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
 	tween.tween_callback(shut)
