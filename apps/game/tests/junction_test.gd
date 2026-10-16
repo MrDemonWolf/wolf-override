@@ -3,6 +3,8 @@ extends SceneTree
 const GAME_SCENE: PackedScene = preload("res://scenes/main.tscn")
 const State = preload("res://scripts/m0_state.gd")
 const MainScript = preload("res://scripts/main.gd")
+## The shared suite kit, for its static helpers (texture_image); this suite still runs on its own loop.
+const Suite = preload("res://tests/support/game_suite.gd")
 ## Frames to wait for the fuse to run out, with a margin.
 const FUSE_FRAMES: int = int(PressureLine.FUSE_SECONDS * 60.0) + 60
 
@@ -825,9 +827,7 @@ func _check_presentation(room: JunctionRoom, human: M0Actor, wolf: M0Actor) -> v
 	# or blown (COLBLOWN), spans DOOR_FOOT_X..DOOR_FOOT_RIGHT_X of the room, which Main._start_collapse
 	# keeps a lying body clear of; the stub's painting starts below the floor line, under no lying body.
 	var lying_top: float = JunctionRoom.FLOOR_Y - (MainScript.COLLAPSE_FRAME.y - MainScript.COLLAPSE_TOPS[-1]) * MainScript.COLLAPSE_SCALE
-	var atlas_image: Image = JunctionDoorLayout.ATLAS.get_image()
-	if atlas_image.is_compressed():
-		atlas_image.decompress()
+	var atlas_image: Image = Suite.texture_image(JunctionDoorLayout.ATLAS)
 	var sealed_foot: Vector2 = _painted_x_in_rows(atlas_image, JunctionDoorLayout.COLUMN_REGION, JunctionDoorLayout.COLUMN_AT, JunctionDoorLayout.COLUMN_SCALE, lying_top, JunctionRoom.FLOOR_Y)
 	var blown_foot: Vector2 = _painted_x_in_rows(atlas_image, JunctionDoorLayout.COLBLOWN_REGION, JunctionDoorLayout.COLBLOWN_AT, JunctionDoorLayout.COLBLOWN_SCALE, lying_top, JunctionRoom.FLOOR_Y)
 	var stub_foot: Vector2 = _painted_x_in_rows(atlas_image, JunctionDoorLayout.STUB_REGION, JunctionDoorLayout.STUB_AT, JunctionDoorLayout.STUB_SCALE, lying_top, JunctionRoom.FLOOR_Y)
@@ -942,9 +942,7 @@ func _lying_body(human: M0Actor, fall: float, label: String) -> Rect2:
 func _front_pixels_in(piece: Sprite2D, area: Rect2) -> int:
 	if not piece.is_visible_in_tree():
 		return 0
-	var image: Image = piece.texture.get_image()
-	if image.is_compressed():
-		image.decompress()
+	var image: Image = Suite.texture_image(piece.texture)
 	var local_rect: Rect2 = piece.get_rect()
 	var inverse: Transform2D = piece.get_global_transform().affine_inverse()
 	var count: int = 0
