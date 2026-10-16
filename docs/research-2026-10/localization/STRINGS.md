@@ -53,7 +53,7 @@ from `main` at 1cf8d73.
 Without the changelog, the words split roughly as:
 - story text, about 1,460 words: opening, dialogue, narration, refusals, knockdown cards, end card,
   choices and restore lines;
-- hints, objectives, tutorial and top cards, about 640;
+- hints, objectives, tutorial and top cards, about 660;
 - the credits, one BBCode block of 214;
 - menus, settings, input names and station labels, the rest.
 

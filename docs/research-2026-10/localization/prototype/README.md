@@ -30,7 +30,8 @@ and Polish work the same way as es and de.
 | Settings has a LANGUAGE row. The game starts in the OS language and falls back to English | `tests/i18n_test.gd` (resolver and picker checks) |
 | The PO files load at runtime with no import step | the same suite |
 | Text is translated where it is drawn, and redraws when the language changes: the title, a narration box, the name card, the location card, a hint, a knockdown card with the engineer's name, and the RETRY prompt | the same suite, in es, de, ja and ru |
-| Every translation passes the pipeline's gates, and broken copies fail them | `evidence/po_check.json`; `evidence/po_check_negative_control.json` (es); `evidence/po_check_negative_control_ru.json` (ru); `evidence/po_check_negative_control_gender.json` (ru and es, the engineer gendered); `evidence/po_check_negative_control_fix2.json` ("you" lines, pronouns, the name case and a sibling `es_ES` file); `evidence/gate_selftest.json` (54 planted cases) |
+| Every translation passes the pipeline's gates, and broken copies fail them | `evidence/po_check.json`; `evidence/po_check_negative_control.json` (es); `evidence/po_check_negative_control_ru.json` (ru); `evidence/po_check_negative_control_gender.json` (ru and es, the engineer gendered); `evidence/po_check_negative_control_fix2.json` ("you" lines, pronouns, the name case and a sibling `es_ES` file); `evidence/gate_selftest.json` (115 planted cases) |
+| A translated template whose inserts differ from the English shows the English line instead of a script error (fix-3 step) | `tests/i18n_test.gd`, `_check_format_guard`; `evidence/logs/i18n_test-fix3.txt` |
 | A subset Noto Sans JP fallback draws all the Japanese | the glyph checks; 0 tofu in the render audits |
 | Russian needs no fallback font: Roboto and Montserrat draw every Cyrillic character, and the line height stays 21 px at 17 px | the suite's "Russian chains no fallback" checks |
 | The Russian knockdown card keeps the name in the nominative and shows no gender | the suite; the gender and name-case gates and Codex's `engineer_gendered: false` in `evidence/po_check.json` |
@@ -241,8 +242,11 @@ this record.
 - **`evidence/po_check*.json`:** the gate report and the four negative controls, all re-run by the fix-2
   step with its tool (PIPELINE.md lists each planted error). The earlier versions are these paths at
   commit 9a59e0e.
-- **`evidence/gate_selftest.json`:** `i18n_tool.py selftest`, 54 fixed planted cases, mostly for the gates
-  no prototype msgid exercises yet.
+- **`evidence/gate_selftest.json`:** `i18n_tool.py selftest`, 115 fixed planted cases, mostly for the
+  gates no prototype msgid exercises yet (the fix-3 step's run; the 54-case version is this path at
+  commit 894763c).
+- **`evidence/logs/i18n_test-fix3.txt`:** the fix-3 step's headless run of `i18n_test` with the
+  insert guard (122 checks; the two warnings are the guard's planted case).
 - **`evidence/hardcoded.json`:** the shown strings still missing from the POT, by file and line.
 - **`evidence/codex/`:** the Codex prompts and their JSON event streams (the prototype step's two, the
   design step's `*_ru.*`, the fix-2 step's `*_fix2.*`).
@@ -265,6 +269,11 @@ this record.
     added the name-case, BBCode and sibling-file gates and printf-width placeholders (in `trial.py`);
     keyed the back-translations by message; made `potfiles` walk every folder; and made `check` exit 1
     on any failure. The version before it is at commit 9a59e0e.
+  - The fix-3 step widened the gender rules (participles, agreeing adjectives, job nouns, appositions
+    after the name, "near forms" next to the name or a "you", CJK person words), and made `check` fail
+    on a header plural rule other than `languages.json`'s, on a comment with "fuzzy" outside the flag
+    (Godot skips the line), and on call sites that disagree on a mark. The version before it is at
+    commit 894763c.
   - It imports `../pipeline/tools/trial.py` for the pipeline step's measures; nothing is copied.
   - The design step added the Russian plural rule, plural-form counts from it, and the script guard
     ported from ConPaws.

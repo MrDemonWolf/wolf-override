@@ -81,7 +81,7 @@ chrF moves by a few points from one back-translation to the next, which is why i
 | `ru` (design step) | a Cyrillic `Е:` for the Latin key token; a Latin `A` inside `ПАУЗА`; a dropped `%d` | all 3 (the token check, the script guard, msgfmt and the placeholder check) |
 | `ru` and `es` (fix step) | the engineer gendered: ru "%s стояла на решётке" (feminine past tense), es "%s estaba sola" (agreeing adjective); and a back-translation that answers `engineer_gendered: true` | all 3 (the gender gate 2, the back-translation's field 1) |
 | `ru`, `de`, `ja` and a planted `es_ES` (fix-2 step) | ru "Ты нашла рубильник" on a hint that addresses the engineer (no name slot); ru "заметил %sа" (a case ending glued to the name); de "%s ... gesehen.\nSie soll ..." and ja "彼女は..." (a gendered pronoun after the name); an `es_ES` copy of `es` with NEW GAME left empty and CONTINUE fuzzy | all 6: the gender gate caught the three gendered lines, the name-case gate the glued ending (the gender gate also flags that line, through the sentry's verb beside the name), and the sibling gate both es_ES lines |
-| `i18n_tool.py selftest` | 54 fixed cases: printf and named placeholders (`%02d`, `%.1f`, `{0}`, a misspelt `{total}`); BBCode tags dropped, recoloured or crossed; 27 gender lines in ru, pl, es, fr, de, ja and zh, the reviewers' 7 planted lines of October 16 among them (WOLF's "you" in the past tense, the vocative, pronouns, the German job noun); the name-case ending; a ru plural with a missing form or a dropped `%d`; 5 sibling-file cases; and the clean lines each gate must pass | 54 of 54 as expected |
+| `i18n_tool.py selftest` | 115 fixed cases: printf and named placeholders (`%02d`, `%.1f`, `{0}`, a misspelt `{total}`); BBCode tags dropped, recoloured or crossed; 79 gender lines in ru, pl, es, pt_BR, fr, de, it, ja, ko and zh, among them the reviewers' 7 planted lines of the second review and the third review's commonest feminine and masculine forms (fr sortie, partie, morte, heureuse, assise; es muerta, despierta, "la nueva técnica"; pt morta; pl zmęczona, ranna; ru appositions "%s, усталая," and "%s — раненая", Инженерка, Техничка; de Wartungstechnikerin, Wartungsingenieur; it stanca; ja 女の子, くん; zh 小姐; ko 여자), each language with clean lines beside them; the name-case ending; a ru plural with a missing form or a dropped `%d`; 4 header rules; 2 comment lines with "fuzzy"; 4 pairs of marks; 5 sibling-file cases | 115 of 115 as expected |
 
 The reports are `prototype/evidence/po_check_negative_control*.json` (all four re-run by the fix-2 step
 with its tool) and `prototype/evidence/gate_selftest.json`. Every report with a planted error makes
@@ -155,11 +155,26 @@ with its tool) and `prototype/evidence/gate_selftest.json`. Every report with a 
    - **Glossary:** each term's required form, with stems for Slavic languages.
    - **The engineer's gender.** Each line says how the engineer appears in it, with a `#. i18n:` mark
      written in the source (`engineer=name`, `you`, `third` or `self`; `slot=key` or `slot=choice` when
-     a `%s` is not the name). Per language, `prototype/tools/languages.json` holds the gendered word
-     forms (ru and uk past tense in -л/-ла, pl -ł/-ła, es and pt -ado/-ada, fr -é/-ée, "alone",
-     "ready", job nouns), the second- and first-person pronouns and the gendered third-person pronouns.
-     A line fails when:
-     - a gendered form sits within 3 words of the name, in the same clause;
+     a `%s` is not the name). Per language, `prototype/tools/languages.json` holds, in both genders:
+     - **forms**, read across a clause: ru and uk past tense in -л/-ла, short adjectives and participles
+       (-ена, -ыта, -ята, уверена, ранена); pl past tense in -ł/-ła and participles in -ona/-ony,
+       -ęta, -yta, -ita, -wana (zmęczona, ranna); es and pt -ado/-ada, -ido/-ida, -erto/-erta (muerta,
+       despierta), morta, nueva, cansada; it -ato/-ata, -ito, -uto, -oso/-osa, stanca; fr -é/-ée; the
+       words for "alone", "ready", "sure", "alive"; and the job nouns (Инженерка, Техничка,
+       Wartungstechnikerin and any German -erin, técnica, technicienne);
+     - **near forms**, read only next to the name or a "you": Russian full adjectives (-ая, -ый,
+       усталая, раненая) and French participles and adjectives (sortie, partie, morte, assise,
+       heureuse, heureux);
+     - **person words** for Japanese, Korean and Chinese, read anywhere on the line: 女の子, 少年, くん,
+       ちゃん, 小姐, 女士, 先生, 언니, 여자;
+     - the second- and first-person pronouns and the gendered third-person pronouns.
+
+     Common nouns that end like a gendered form are listed as exceptions (puerta, стена, strona, porte,
+     batterie). A line fails when:
+     - a gendered form sits within 3 words before the name in the same clause, or within 3 words after
+       it across a comma or dash (the apposition "%s, усталая," or "%s — раненая");
+     - a near form sits within 3 words of a "you" ("Tu es assise", "Ты усталая");
+     - a person word appears anywhere on a line where the engineer appears;
      - a clause holds "you" (ты, ty, tú) and a gendered form ("%s, ты была права");
      - on a line that addresses or describes the engineer, a clause without "I" holds a gendered form
        ("Ты нашла другой путь" fails, WOLF's own "Я отказался" passes; Polish -łem/-łam endings are
@@ -167,15 +182,43 @@ with its tool) and `prototype/evidence/gate_selftest.json`. Every report with a 
      - a gendered pronoun (он/она, er/sie, 彼女, 她) sits in the name's sentence or the next one;
      - the back-translation answers `engineer_gendered: true`.
 
-     With every gender-risk line marked (PR L7c), the checks reach all 26. A line with no mark is checked
-     only next to its name slot, which leaves out the 6 with no slot. It is a heuristic: it flags some
-     correct lines (a noun that ends like a verb, a pronoun that means WOLF), and it misses a gendered
-     form its lists lack. A flag is cleared by rewording or by a reviewer's `# gender-ok: <name> <date>`
-     comment, and native review of the 26 gender-risk lines stays the real check (below).
+     With every gender-risk line marked (PR L7c), the checks reach all 26 lines. That is line coverage,
+     not form coverage. A line with no mark is checked only next to its name slot, which leaves out the
+     6 with no slot. `selftest` plants the commonest feminine and masculine forms in fr, es, pt_BR, pl,
+     ru, de, it, ja, ko and zh (the review's 22 missed lines among them) with clean lines beside them,
+     and all pass as expected; the prototype's real 136 lines still pass. It is a heuristic: it flags
+     some correct lines (a noun that ends like a participle, a pronoun that means WOLF), and a flag is
+     cleared by rewording or by a reviewer's `# gender-ok: <name> <date>` comment.
+
+     **What the gate does not cover, so native reviewers check these first:**
+     - agreeing adjectives outside the lists (es "rápida", pl adjectives in -a/-y other than the
+       participle endings, pt and it adjectives in -o/-a beyond the listed ones);
+     - a gendered word more than 3 words from the name or a "you", or before the name across a comma;
+       a Russian full adjective or a French -ie/-ise/-euse word in a clause about the engineer that has
+       neither the name nor "you" (read only next to them, because these endings also describe things);
+     - compound tenses and moods: Polish "będziesz zmęczona" is caught by the participle, but Polish
+       and Russian conditional and future forms built on other words are not listed;
+     - French masculine participles beyond the listed ones (sorti, parti, venu, perdu, mort, assis, any
+       -é), and idioms excluded on purpose (es "al descubierto");
+     - German nominalised adjectives with an article ("die Neue", "der Verletzte") and the ambiguity of
+       "Sie" (she, they or formal you);
+     - Ukrainian, which inherits the Russian lists although its adjective endings differ (Tier 1);
+     - CJK gender carried by speech style rather than words: the engineer's own first person (僕,
+       あたし), sentence-final particles (わ), Korean kinship and speech-level choices beyond the list,
+       and gendered characters chosen for the stored names;
+     - anything on a line with no `engineer=` mark and no name slot.
+     Native review of the 26 gender-risk lines stays the real check (below).
    - **Name case** (pl, ru, uk): no letter glued to the name slot ("заметил %sа"), since the name stays
      in the nominative.
-   - **Plural forms:** one `msgstr[n]` per form of the header's rule, none empty, each with the
+   - **Plural forms:** the header's `Plural-Forms` rule must equal the language's rule in
+     `languages.json` word for word (Godot silently uses the English rule for a 2-form file whose rule
+     does not parse: DESIGN.md); then one `msgstr[n]` per form of that rule, none empty, each with the
      English inserts. Every form is checked, not only `msgstr[0]`.
+   - **No stray "fuzzy":** Godot skips a line after any comment that contains the word, so a
+     translator note or mark with it fails the language (`fuzzy_notes`).
+   - **Marks agree:** one msgid used at two call sites gets two `#.` notes; if they disagree on
+     `engineer=`, `slot=` or `speaker=`, the line fails (`mark_conflicts`), rather than the later one
+     silently winning.
    - **Sibling files complete:** where a language has two files (es and es_ES, zh_Hans and zh_Hant),
      a line one of them translates must be translated, not fuzzy, in the other. Godot would otherwise
      show the sibling's text (DESIGN.md, "A missing line falls back to its sibling file").
