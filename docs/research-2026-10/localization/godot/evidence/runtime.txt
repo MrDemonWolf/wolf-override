@@ -68,9 +68,9 @@ RESULT tr(HELLO) at fr_FR (server locale fr_FR) = HELLO
 ERROR: Invalid plural rules format. Missing equal sign for `nplurals`.
    at: parse (core/string/plural_rules.cpp:142)
    GDScript backtrace (most recent call first):
-       [0] _po (res://probe_runtime.gd:37)
-       [1] _po_features (res://probe_runtime.gd:71)
-       [2] _initialize (res://probe_runtime.gd:24)
+       [0] _po (res://probe_runtime.gd:39)
+       [1] _po_features (res://probe_runtime.gd:73)
+       [2] _initialize (res://probe_runtime.gd:25)
 RESULT es ctx verb = Abrir
 RESULT es ctx adjective = Abierto
 RESULT es no ctx (falls to msgid) = Open
@@ -92,6 +92,15 @@ RESULT built-in plural rule ja = nplurals=1; plural=0;
 RESULT built-in plural rule pt_BR = nplurals=2; plural=(n > 1);
 RESULT pl PO without Plural-Forms locale = pl
 RESULT missing locale de -> fallback en, untranslated = HELLO
+RESULT sibling: tr(HELLO) at zh_Hant, zh_Hans and zh_Hant loaded = 你好 (zh_Hant)
+RESULT sibling: tr(ONLY IN HANS) at zh_Hant, zh_Hans and zh_Hant loaded = 只在简体 (zh_Hans)
+RESULT sibling: tr(FUZZY IN HANT) at zh_Hant, zh_Hans and zh_Hant loaded = 简体 (zh_Hans)
+RESULT sibling: tr(EMPTY IN HANT) at zh_Hant, zh_Hans and zh_Hant loaded = 简体 (zh_Hans)
+RESULT sibling: tr(ONLY IN ES) at es_MX, es and es_MX loaded = Solo en es (es)
+RESULT sibling: tr(HELLO) at zh_Hant, only zh_Hant loaded = 你好 (zh_Hant)
+RESULT sibling: tr(ONLY IN HANS) at zh_Hant, only zh_Hant loaded = ONLY IN HANS
+RESULT sibling: tr(FUZZY IN HANT) at zh_Hant, only zh_Hant loaded = FUZZY IN HANT
+RESULT sibling: tr(EMPTY IN HANT) at zh_Hant, only zh_Hant loaded = EMPTY IN HANT
 RESULT percent after tr = Hola Rowan
 RESULT format after tr = Rowan mantiene a WOLF en marcha.
 RESULT tr after percent (key no longer matches) = Hello Rowan

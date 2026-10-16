@@ -188,10 +188,24 @@ row goes is decision D10.
 
 ## How the OS language picks a file (measured in Godot 4.7.2)
 
-Godot scores each loaded translation against the OS locale (`compare_locales`: 10 for an exact match,
-5 for the same language, plus or minus 1 for each matching or differing script or country). On a tie,
-the translation added last wins. Measured with `markets/tools/locale_probe.gd` and
-`godot/probe/probe_runtime.gd`:
+Godot scores each loaded translation against the current locale (`compare_locales`: 10 for an exact
+match, 5 for the same language, plus or minus 1 for each script, country or variant that both name and
+that matches or differs; `core/string/translation_server.cpp`). It does this **for each line, not once
+per file**: it walks every file that scores above 0, skips a file that lacks the line, has it fuzzy or
+has it empty, keeps the best score (on a tie, the file added last), and stops at an exact match
+(`get_message_from_translations`, `core/string/translation_domain.cpp`, 4.7.2-stable). Only when no
+file of the language has the line does it try the fallback locale, then the English msgid.
+
+So with both Chinese files loaded, a line missing from `zh_Hant` shows the `zh_Hans` text (score 3),
+and with `es` and `es_ES` loaded, a line missing from one shows the other's. Measured with
+`godot/probe/probe_runtime.gd` (`godot/evidence/runtime.txt`, "sibling"): at zh_Hant, a line only
+`zh_Hans` had, one fuzzy in `zh_Hant` and one empty in `zh_Hant` all came out Simplified; with `zh_Hans`
+removed, all three came out English. The game therefore keeps only the chosen language's file
+registered, and a gate requires the files of a pair to translate the same lines (DESIGN.md, "A missing
+line falls back to its sibling file").
+
+Which file the OS locale picks, measured with `markets/tools/locale_probe.gd` and
+`godot/probe/probe_runtime.gd` (every file loaded, as in the research probes):
 
 | OS locale | Plays in | Why |
 |---|---|---|

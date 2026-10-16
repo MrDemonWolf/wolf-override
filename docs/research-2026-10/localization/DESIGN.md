@@ -73,13 +73,15 @@ ConPaws' `resolveDeviceLocale` does:
 - `uk` goes to `en`, never `ru`.
 
 Only then does it fall back to Godot's own `compare_locales`. On a tie Godot picks the translation added
-last, so a tie must never decide (LANGUAGES.md, "How the OS language picks a file").
+last, so a tie must never decide (LANGUAGES.md, "How the OS language picks a file"). The resolver's
+answer is final: `apply()` registers only that language's file (below), so Godot never mixes in another.
 
 **Choosing and keeping the language:**
 - `saved()` uses the language saved in `settings.cfg`, `[general] language`.
 - With none saved, it uses the locale Godot started in. That is `OS.get_locale()`, unless `--language`
   or `internationalization/locale/test` overrides it (`core/string/translation_server.cpp`, `setup`).
-- `apply()` sets the fallback font for the language, then calls `TranslationServer.set_locale()`.
+- `apply()` sets the fallback font for the language, keeps only that language's catalog registered
+  (below), then calls `TranslationServer.set_locale()`.
 
 **Redrawing on a change.** `set_locale` sends `NOTIFICATION_TRANSLATION_CHANGED` to every node
 (`scene/main/scene_tree.cpp`).
@@ -137,13 +139,20 @@ the PO files: the per-language names (Роуэн, ローワン), the key labels 
   and takes the locale from the `Language:` header.
 - **Exports carry the file raw** (measured: "Storing File: res://i18n_probe/ja.po").
 - **Fuzzy entries are skipped**, so an unreviewed change never ships: the loader drops any entry after
-  a `fuzzy` comment (measured). `#.` notes give translators context.
+  a `fuzzy` comment (measured). With only one catalog registered (below), the player sees the English
+  line instead. `#.` notes give translators context.
 - **Plurals and contexts work:**
   - `msgctxt` "verb" against "adjective" gave Abrir / Abierto.
   - Russian `tr_n` gave 1 клапан, 2 клапана, 5 клапанов, 11 клапанов, 21 клапан, 22 клапана
     (`godot/evidence/runtime.txt`).
-- **An empty `Plural-Forms:` header logs an error** (`core/string/plural_rules.cpp`), so every file
-  carries its language's rule.
+- **A bad plural header loses the whole language.** In a file with any `msgid_plural` entry, a
+  missing or invalid `Plural-Forms:` header makes the loader reject the whole file
+  (`core/io/translation_loader_po.cpp`: "PO file uses 'msgid_plural' but 'Plural-Forms' is invalid or
+  missing in header"), and so does a plural entry whose `msgstr[n]` count differs from `nplurals`. Every
+  line of that language would then show English, or a sibling's text. A file with no plural entries and
+  no header falls back to the rule in `core/string/locales.h` (`core/string/translation.cpp`). So every
+  file carries its language's rule from `languages.json`, and the plural gate counts the forms of every
+  plural entry before a file can ship.
 - **CSV was ruled out.** Godot 4.7's CSV importer has context and plural columns
   (`editor/import/resource_importer_csv_translation.cpp`), but it keeps every language in one sheet.
   It has no fuzzy or review state, needs an editor import and cannot load at runtime.
@@ -154,7 +163,30 @@ keeps only two-letter upper-case regions (`Locale::Locale`), so the Latin-Americ
 
 **Registration.** The files are listed in `project.godot`, `internationalization/locale/translations`,
 which `main/main.cpp` loads once at start-up. The same tool that writes the PO files keeps this line in
-step with `LANGUAGES`.
+step with `LANGUAGES`. The list stays complete, because the exports read it (the macOS `.lproj`
+folders, below).
+
+**A missing line falls back to its sibling file.** Godot looks up each line in every loaded file whose
+locale scores above 0 against the current one, skipping a file that lacks the line, has it fuzzy or has
+it empty, and only then tries the fallback locale and the English msgid
+(`TranslationDomain::get_message_from_translations`, `core/string/translation_domain.cpp`, 4.7.2-stable).
+With `zh_Hans` and `zh_Hant` both loaded, a line `zh_Hant` lacks shows the Simplified text (score 3: same
+language, different script and country); with `es` and `es_ES`, the other Spanish (score 5). The research
+probe measured it: at zh_Hant, a line only `zh_Hans` had, a fuzzy one and an empty one all showed
+Simplified characters; with `zh_Hans` removed, all three showed English (`godot/probe/probe_runtime.gd`,
+`godot/evidence/runtime.txt`, "sibling"). Taiwan and Hong Kong players would see Simplified characters
+mixed into Traditional text. Two answers, both in the build:
+- **One catalog registered at a time.** `I18n.apply()` keeps the catalogs Godot loaded at start-up
+  (`TranslationServer.get_translations()`), removes every one whose locale is not the chosen language and
+  adds that one back if an earlier switch removed it. A gap then shows English, as the README promises.
+  `i18n_test` proves it with a planted gap: a line only `zh_Hans` has must show English at zh_Hant (PR L1).
+- **The sibling gate.** `i18n_tool.py check` fails a language whose sibling file translates a line it
+  lacks or has fuzzy (`family_gaps`; proved by `selftest` and the fix-2 negative control). The pair
+  ships aligned, so the rule above is a safety net, not a visible fallback.
+
+Accepting the sibling fallback instead was considered and rejected: Simplified characters in a
+Traditional game, or vosotros forms in the Latin-American file, read as errors to the players they
+are meant for.
 
 **Outside `res://`.** The template (`messages.pot`), the glossary and the per-language style guides live
 in a repository-root `i18n/` folder. A template inside the project is scanned or imported (a CSV

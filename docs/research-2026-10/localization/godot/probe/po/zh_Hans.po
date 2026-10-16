@@ -6,3 +6,12 @@ msgstr ""
 
 msgid "HELLO"
 msgstr "你好 (zh_Hans)"
+
+msgid "ONLY IN HANS"
+msgstr "只在简体 (zh_Hans)"
+
+msgid "FUZZY IN HANT"
+msgstr "简体 (zh_Hans)"
+
+msgid "EMPTY IN HANT"
+msgstr "简体 (zh_Hans)"

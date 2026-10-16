@@ -29,3 +29,6 @@ msgid "%d valve"
 msgid_plural "%d valves"
 msgstr[0] "%d válvula"
 msgstr[1] "%d válvulas"
+
+msgid "ONLY IN ES"
+msgstr "Solo en es (es)"

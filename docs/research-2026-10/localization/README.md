@@ -40,6 +40,10 @@ build starts only after he answers [DECISIONS.md](DECISIONS.md).
 - **What players see:** the game starts in their computer's or phone's language if it is offered, and
   in English if not. Settings gets a LANGUAGE choice that names each language in itself (Deutsch, 日本語)
   with a "machine translation" tag until native review. Any line not translated yet shows in English.
+  That needs one design rule: Godot fills a missing line from any other file of the same language
+  (measured: a gap in Traditional Chinese showed the Simplified text), so the game keeps only the chosen
+  language's file registered, and a gate fails the build when one Spanish or Chinese file lacks a line the
+  other has (DESIGN.md).
   Stills: [the Spanish title](prototype/stills/1280x720-es-title.png) and
   [a Japanese story box](prototype/stills/1280x720-ja-narration.png).
 - **In Godot:** English stays the internal text and is translated where it is drawn. There is one

@@ -6,3 +6,10 @@ msgstr ""
 
 msgid "HELLO"
 msgstr "你好 (zh_Hant)"
+
+#, fuzzy
+msgid "FUZZY IN HANT"
+msgstr "繁體 (zh_Hant)"
+
+msgid "EMPTY IN HANT"
+msgstr ""

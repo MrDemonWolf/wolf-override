@@ -367,8 +367,12 @@ cross-checked with Codex (OpenAI); reviewed by <names>", or "not yet reviewed".
    - Changed lines turn `#, fuzzy`.
    - The pipeline step rehearsed this on its German file: msgmerge kept 11 translations and flagged
      the edited line fuzzy ("11 translated messages, 1 fuzzy translation").
-3. Godot skips fuzzy entries, so players see the new English for that line until it is translated.
-   No stale translation ships.
+3. Godot skips fuzzy entries, so no stale translation ships. What players see instead depends on the
+   other files: Godot looks each line up in every loaded file of the language, so a fuzzy line in
+   `zh_Hant` would show `zh_Hans`'s text and one in `es_ES` the Latin-American text (measured,
+   `godot/evidence/runtime.txt`). The game registers only the chosen language's file (DESIGN.md), so
+   the player sees the new English, and the sibling gate fails the build until both files of a pair
+   translate the line.
 4. The translator re-translates only fuzzy and new lines, given the old translation and the English
    diff.
 5. The back-translation and all gates run again.

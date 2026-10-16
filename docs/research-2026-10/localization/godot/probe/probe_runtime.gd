@@ -3,7 +3,8 @@ extends SceneTree
 ##
 ## Purpose: measure, headlessly, how TranslationServer names and matches locales, how PO plurals,
 ## contexts and fuzzy entries load, what pseudolocalization does to placeholders and BBCode, which
-## nodes hear NOTIFICATION_TRANSLATION_CHANGED, and what auto_translate_mode does to a Label.
+## nodes hear NOTIFICATION_TRANSLATION_CHANGED, what auto_translate_mode does to a Label, and (fix-2
+## step) which file fills a line that one file of a language lacks.
 ## Contract: run as `godot --headless --path <probe> --script res://probe_runtime.gd` with an
 ## isolated HOME. Prints one "RESULT key = value" line per measurement and quits with 0. It loads
 ## the PO fixtures in res://po/ directly (PO needs no import: core/io/translation_loader_po.cpp).
@@ -22,6 +23,7 @@ func _initialize() -> void:
 	_standardize()
 	_matching()
 	_po_features()
+	_sibling_fallback()
 	_formats()
 	_pseudolocalization()
 	await _notifications_and_auto_translate()
@@ -87,6 +89,30 @@ func _po_features() -> void:
 	_out("pl PO without Plural-Forms locale", pl.locale)
 	TranslationServer.set_locale("de")
 	_out("missing locale de -> fallback en, untranslated", TranslationServer.translate("HELLO"))
+	TranslationServer.clear()
+
+
+## What a player sees for a line one file of a language lacks (added by the fix-2 step, 2026-10-16).
+## Godot looks every message up in each loaded translation whose locale scores above 0 against the
+## current one (core/string/translation_domain.cpp, get_message_from_translations), skipping a file
+## that lacks the message, has it fuzzy (the PO loader drops it) or has it empty; only then does it try
+## the fallback locale and the msgid. So a gap in zh_Hant is filled from zh_Hans, and one in es_MX from
+## es. The second half removes the sibling file, as I18n.apply() would if it kept only the chosen
+## language's catalog registered, and the same gaps then show English.
+func _sibling_fallback() -> void:
+	TranslationServer.clear()
+	var hans: Translation = _po("zh_Hans.po")
+	for translation: Translation in [hans, _po("zh_Hant.po"), _po("es.po"), _po("es_MX.po")]:
+		TranslationServer.add_translation(translation)
+	TranslationServer.set_locale("zh_Hant")
+	for message: String in ["HELLO", "ONLY IN HANS", "FUZZY IN HANT", "EMPTY IN HANT"]:
+		_out("sibling: tr(%s) at zh_Hant, zh_Hans and zh_Hant loaded" % message, TranslationServer.translate(message))
+	TranslationServer.set_locale("es_MX")
+	_out("sibling: tr(ONLY IN ES) at es_MX, es and es_MX loaded", TranslationServer.translate("ONLY IN ES"))
+	TranslationServer.remove_translation(hans)
+	TranslationServer.set_locale("zh_Hant")
+	for message: String in ["HELLO", "ONLY IN HANS", "FUZZY IN HANT", "EMPTY IN HANT"]:
+		_out("sibling: tr(%s) at zh_Hant, only zh_Hant loaded" % message, TranslationServer.translate(message))
 	TranslationServer.clear()
 
 
