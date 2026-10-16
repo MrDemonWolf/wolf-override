@@ -1,0 +1,19 @@
+HARD RULES FOR THIS SESSION (read first):
+- Use ONLY your BUILT-IN image generation tool, in EDIT mode, with the attached images. Do not call any image API, CLI, script, Python, ImageMagick or any other generator or editor. Do not draw anything with code.
+- Save every generated image by copying the tool's original output file byte-for-byte (cp) into ./out/ with the exact file name given below. KEEP ALL METADATA, including the C2PA content credentials (caBX chunk). Never strip, clean, re-encode, resize, crop, convert, optimise or otherwise modify the files, and never remove or edit metadata.
+- When done, write ./out/notes.txt: for each output file, its name, the absolute path of the original generated file you copied, its sha256 (shasum -a 256), its pixel size, and the exact prompt text you gave the image tool. Then stop.
+- Add NO text, letters, numbers, logos, labels, symbols, UI, watermarks or borders anywhere.
+- THIS IS A PAINT-OVER OF A CONSTRUCTION DRAWING. Every silhouette and part is measured and stays exactly where it is, at the same size; the canvas size and framing stay identical. You may ONLY add realistic surface material and light. You must NOT add, remove, move, resize or reshape any part.
+- LOOK: grounded realism, a real light fitting under the ceiling of an underground military corridor, photographed once. NO glow halo, NO lens flare, NO light rays, NO haze, NO grunge speckle, NO greebles.
+
+JOB paint-lum8: ONE image. Attached (also in ./refs/):
+  refs/1-edit-target-luminaire.png = THE EDIT TARGET (1024x1024): a strip of a dark concrete corridor wall just under the ceiling cable tray (the black band at the top), already painted, with a few parts drawn FLAT.
+  refs/2-areas-to-paint.png = black and white map of the same frame: WHITE marks the only areas to paint. Everything under BLACK must come out unchanged.
+
+The parts to paint (all under WHITE):
+  1. The short horizontal fitting in the middle: a real 0.6 m VAPOUR-TIGHT LED LUMINAIRE: a light grey polycarbonate body with darker end caps and two small clips, over an opal (milky) diffuser along its underside that is lit from inside: the diffuser glows softly, brightest in its middle, even and milky (not a hard white line). The body's lower edge picks up a little of the diffuser's light; its top is in shadow.
+  2. The two thin vertical rods above it: steel suspension rods, each ending at the top in a small round ceiling canopy plate fixed under the tray. Matte steel, dim.
+  3. The other WHITE areas (left and right of the fitting, and two thin vertical strips): plain concrete wall, continuing the wall around them exactly (same texture, same tone, same soft light falling from the fitting), so nothing shows there. Do not draw anything in them.
+
+Output -> ./out/lum8-painted.png  (1024x1024, the same framing).
+Paint ONLY the WHITE areas; everything under BLACK stays exactly as it is. No text, no new parts.

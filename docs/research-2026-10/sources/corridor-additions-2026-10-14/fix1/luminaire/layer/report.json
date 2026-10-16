@@ -1,0 +1,18 @@
+{
+ "changed_px": 2802,
+ "changed_bbox_plate": [
+  1213,
+  192,
+  1329,
+  250
+ ],
+ "diffuser_gain": 0.967,
+ "fitting_plate_x": [
+  1213,
+  1261
+ ],
+ "old_bar_plate_x": [
+  1232,
+  1327
+ ]
+}

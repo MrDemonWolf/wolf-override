@@ -1,4 +1,4 @@
-[gd_scene load_steps=28 format=3]
+[gd_scene load_steps=29 format=3]
 
 [ext_resource type="Script" path="res://scripts/main.gd" id="1_main"]
 [ext_resource type="Script" path="res://scripts/m0_actor.gd" id="2_actor"]
@@ -22,6 +22,7 @@
 [ext_resource type="Texture2D" path="res://assets/props/corridor-safe-point.png" id="21_safe_point"]
 [ext_resource type="Shader" path="res://assets/shaders/post_grade.gdshader" id="16_grade"]
 [ext_resource type="Shader" path="res://assets/shaders/sharp_sprite.gdshader" id="22_sharp"]
+[ext_resource type="Texture2D" path="res://assets/props/corridor-beacons.png" id="23_beacons"]
 
 [sub_resource type="RectangleShape2D" id="FloorShape"]
 size = Vector2(960, 60)
@@ -56,6 +57,13 @@ base_color = Color(0.0352941, 0.0823529, 0.2, 1)
 lamps = PackedVector2Array(0.144, 0.188, 0.5, 0.188, 0.854, 0.188)
 shaft_lamps = PackedInt32Array(1, 2)
 warning_lamps = PackedVector2Array(0.341, 0.27, 0.659, 0.27)
+beacon_atlas = ExtResource("23_beacons")
+beacon_regions = Array[Rect2]([Rect2(2, 2, 25, 135), Rect2(2, 141, 11, 12), Rect2(228, 2, 13, 15), Rect2(29, 2, 85, 109), Rect2(203, 2, 23, 46), Rect2(15, 141, 11, 12), Rect2(243, 2, 13, 15), Rect2(116, 2, 85, 109)])
+beacon_offsets = PackedVector2Array(-10.72, -108.6, -3.72, 4.4, -4.72, 4.4, -40.72, -27.6, -10.28, -18.6, -4.28, 4.4, -5.28, 4.4, -41.28, -27.6)
+beacon_peak_alpha = 0.55
+beacon_trough = 0.12
+beacon_lens_trough = 0.6
+beacon_flash = true
 ambient_dust = false
 haze_end = 0.588
 haze_fade = 0.12

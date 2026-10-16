@@ -1,0 +1,7 @@
+{
+ "gain_to_round7_tailpipe": 0.735,
+ "changed_px": 3978,
+ "changed_outside_masks_px": 14,
+ "drop_mean_luma": 80.4,
+ "tailpipe_mean_luma": 80.3
+}

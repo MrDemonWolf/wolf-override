@@ -36,15 +36,19 @@ static func cached_count() -> int:
 
 
 ## A [param size] px square texture of [param colors] at [param offsets], from the centre out to the
-## middle of an edge ([param fill] radial for a disc, square for a soft-edged rectangle).
-static func radial(size: int, offsets: Array[float], colors: Array[Color], fill: GradientTexture2D.Fill = GradientTexture2D.FILL_RADIAL) -> GradientTexture2D:
-	var key: Array = [&"radial", size, offsets, colors, fill]
+## middle of an edge ([param fill] radial for a disc, square for a soft-edged rectangle). A
+## [param height] above 0 makes it [param size] px wide by that many px tall instead: the fill runs in
+## UV space, so that gives a soft ellipse (the relief jet's streak, FxPresets.relief_jet).
+static func radial(size: int, offsets: Array[float], colors: Array[Color], fill: GradientTexture2D.Fill = GradientTexture2D.FILL_RADIAL, height: int = 0) -> GradientTexture2D:
+	# 0 means square; the key holds the resolved height so a square asked for both ways is one texture.
+	var tall: int = height if height > 0 else size
+	var key: Array = [&"radial", size, tall, offsets, colors, fill]
 	var texture: GradientTexture2D = _find(key) as GradientTexture2D
 	if texture == null:
 		texture = GradientTexture2D.new()
 		texture.gradient = _new_ramp(offsets, colors)
 		texture.width = size
-		texture.height = size
+		texture.height = tall
 		texture.fill = fill
 		texture.fill_from = Vector2(0.5, 0.5)
 		texture.fill_to = Vector2(0.5, 0.0)

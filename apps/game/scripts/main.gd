@@ -35,6 +35,22 @@ const BYPASS_CRANK_X: float = BYPASS_WHEEL.x - 26.0
 ## x 388) even as he pulls back refusing (_react_as_wolf), and his snout stops well short of the relay,
 ## so taking the contact is a step he is seen to make.
 const WOLF_BYPASS_CLEAR_X: float = 462.0
+## Nathanial's decision of 2026-10-14 ("WOLF comes to the doorway"): once the seal is open and the
+## engineer has gone through it to the safe point, WOLF walks up and stands in the open doorway,
+## facing them, while "We made it." is said. His head and forelegs are in the opening, past where the
+## curtain crosses the walk line; his snout (M0Actor.WOLF_SNOUT) stops short of the near column (drawn
+## over the actors from x 785) and his tail (M0Actor.WOLF_TAIL) clear of the relay's housing (to
+## 648.1) and its relief tailpipe, with a clear gap to the engineer. The MANUAL BYPASS gearbox is
+## bolted to the back wall behind the walkway, so he stands in front of it. wolf_space_test measures
+## the spot against the door end as drawn.
+const WOLF_DOORWAY_X: float = 716.0
+## WOLF holds the doorway while the engineer is at least a clear gap (M0Actor.CLEAR_GAP) right of it,
+## so their two bodies never overlap; nearer, he follows no further than the relay's left side again.
+const WOLF_DOORWAY_HOLD_X: float = WOLF_DOORWAY_X + M0Actor.CLEAR_GAP
+## From the relay's left he sets off for the doorway only once the engineer is this much further on,
+## at the safe point's near edge (x 824, where USE reaches it), so an engineer edging about just past
+## the hold line never sends him walking to and fro (_wolf_comes_to_doorway).
+const WOLF_DOORWAY_HYSTERESIS: float = 24.0
 ## Held-USE ticks the bypass takes (BypassHandle.TICK_SECONDS each, 2 s in all).
 const BYPASS_TICKS: int = BypassHandle.TICKS_NEEDED
 ## While the bypass vents coolant its alarm sounds this often.
@@ -89,8 +105,10 @@ const CORRIDOR_DOOR_LEFT_X: float = 752.0
 ## seal frame (far guide, hood, operator) draws over the curtain. The wall round it: CorridorSealWall
 ## is the cross-wall behind the walk line with the doorway transparent (so the machinery room in the
 ## far plate shows through it), drawn with the mid plate under everything else; the near column (its
-## guide, frame, end face, lamp socket and push buttons), the camera on its arm and the wall's 0.15 m
-## stub running along its own line to the camera draw over the actors, always opaque, and the column
+## guide, frame, end face, lamp socket and push buttons), the camera on its arm and the wall itself,
+## carried along its own line to the camera as a section cut at 0.36 m (so the plant room is closed on
+## the camera side and the door is the only way in; drawn as a clean cutaway, one dark section poche,
+## Nathanial's decision of 2026-10-14), draw over the actors, always opaque, and the column
 ## is slim enough that nobody stopping at the safe point stands behind it. The curtain crosses the
 ## walk line at the collision face (x 752, y 440). Every piece is a region of one lossless atlas (one
 ## texture, so they batch); the wall, column, camera and stub are 2 px per world px, the rest 4 px;
@@ -102,7 +120,7 @@ const CORRIDOR_SEAL_FRAME_REGION: Rect2 = Rect2(2.0, 2.0, 387.0, 564.0)
 const CORRIDOR_SEAL_WALL_REGION: Rect2 = Rect2(672.0, 2.0, 267.0, 613.0)
 const CORRIDOR_SEAL_COLUMN_REGION: Rect2 = Rect2(941.0, 2.0, 74.0, 606.0)
 const CORRIDOR_SEAL_CAMERA_REGION: Rect2 = Rect2(858.0, 619.0, 49.0, 18.0)
-const CORRIDOR_SEAL_STUB_REGION: Rect2 = Rect2(2.0, 619.0, 443.0, 187.0)
+const CORRIDOR_SEAL_STUB_REGION: Rect2 = Rect2(2.0, 619.0, 443.0, 195.0)
 const CORRIDOR_SEAL_LENS_REGION: Rect2 = Rect2(822.0, 619.0, 32.0, 40.0)
 const CORRIDOR_SEAL_CURTAIN_AT: Vector2 = Vector2(721.75, 311.25)
 const CORRIDOR_SEAL_OPEN_AT: Vector2 = Vector2(722.25, 311.5)
@@ -110,7 +128,7 @@ const CORRIDOR_SEAL_FRAME_AT: Vector2 = Vector2(700.5, 289.5)
 const CORRIDOR_SEAL_WALL_AT: Vector2 = Vector2(684.0, 150.0)
 const CORRIDOR_SEAL_COLUMN_AT: Vector2 = Vector2(785.0, 150.0)
 const CORRIDOR_SEAL_CAMERA_AT: Vector2 = Vector2(762.5, 267.5)
-const CORRIDOR_SEAL_STUB_AT: Vector2 = Vector2(762.5, 448.5)
+const CORRIDOR_SEAL_STUB_AT: Vector2 = Vector2(762.5, 440.0)
 const CORRIDOR_SEAL_SCALE: float = 0.25
 const CORRIDOR_SEAL_FRONT_SCALE: float = 0.5
 ## Where the shut curtain's art ends at the bottom (its near-jamb corner, in front of the walk line).
@@ -300,6 +318,19 @@ const RETRY_PROMPT: String = "%s  RETRY"
 const RETRY_TOUCH_PROMPT: String = "TAP RETRY"
 const RETRY_BUTTON_TEXT: String = "RETRY"
 const HUMAN_SPRITE_REST: Vector2 = Vector2(0.0, -5.0)
+## The engineer's crank pose at the MANUAL BYPASS: two frames cut from the engineer's own sprite
+## (the same drawing, scale and light; the legs are its pixels exactly), leaning into the wheel with
+## both gloves on its rim. A (the regrip) holds it at 8 and 10 o'clock; B (the push) has turned both
+## grips an eighth of a turn with the wheel, to half past 9 and half past 11. One atlas, two 205x380
+## regions trimmed from 384x384 cells whose centre is the usual sprite's centre, drawn at the usual
+## sprite's scale, so the boots stand exactly where they always do.
+const CRANK_ART: Texture2D = preload("res://assets/characters/eng-crank-atlas.png")
+const CRANK_REGION_SIZE: Vector2 = Vector2(205.0, 380.0)
+const CRANK_SCALE: float = 0.188
+const CRANK_SPRITE_POS: Vector2 = Vector2(2.35, -4.812)
+## B (the push) shows this long after each crank tick, at most half a tick (_bypass_cranked); A (the
+## regrip) the rest of the tick. Both follow the ticks, so any hold length works, TOGGLE HOLDS too.
+const CRANK_PUSH_SECONDS: float = 0.2
 ## Both actors draw at this depth; a knocked-down engineer draws one step above WOLF so the fall
 ## is never hidden behind him.
 const ACTOR_Z: int = 2
@@ -629,6 +660,9 @@ var seal_lamp: Sprite2D
 var seal_lamp_glow: Sprite2D
 ## The seal's rolling curtain winding up into its hood while the seal opens.
 var seal_leaf: SealLeaf
+## The inner blast leaf behind the roller, sliding back into its wall pocket while the seal opens
+## (the parked leaf's edge is painted into the wall piece, so this draws only while it moves).
+var blast_leaf: BlastLeaf
 ## True from the moment the seal starts to open until its curtain is up in the hood.
 var seal_opening: bool = false
 ## WOLF stays on the live contact, by his own choice, until the seal has landed.
@@ -654,6 +688,10 @@ var corridor_label_fader: EdgeFader
 ## The corridor's MANUAL BYPASS beside the relay, its crank count and whether it is venting coolant.
 var bypass_handle: BypassHandle
 var bypass_ticks: int = 0
+## The crank frame shown (0 = A, 1 = B), or -1 while the engineer shows their usual sprite.
+var crank_frame: int = -1
+## Seconds left of the B (push) frame after the last crank tick.
+var crank_push_left: float = 0.0
 var bypass_venting: bool = false
 var bypass_alarm_remaining: float = 0.0
 var bypass_was_holding: bool = false
@@ -921,6 +959,7 @@ func _setup_corridor_door() -> void:
 	corridor_depth.add_child(seal_wall)
 	door_open_art = _seal_sprite("CorridorDoorOpen", CORRIDOR_SEAL_OPEN_REGION, CORRIDOR_SEAL_OPEN_AT)
 	seal_leaf = SealLeaf.new(CORRIDOR_SEAL_ATLAS, CORRIDOR_SEAL_CURTAIN_REGION, CORRIDOR_SEAL_CURTAIN_AT, CORRIDOR_SEAL_SCALE)
+	blast_leaf = BlastLeaf.new(CORRIDOR_SEAL_ATLAS)
 	seal_frame = _seal_sprite("CorridorSealFrame", CORRIDOR_SEAL_FRAME_REGION, CORRIDOR_SEAL_FRAME_AT)
 	door_lip = _seal_sprite("CorridorDoorFront", CORRIDOR_SEAL_COLUMN_REGION, CORRIDOR_SEAL_COLUMN_AT, CORRIDOR_SEAL_FRONT_SCALE)
 	door_lip.z_index = KNOCKDOWN_Z
@@ -934,11 +973,11 @@ func _setup_corridor_door() -> void:
 	seal_lamp_glow.name = "SealLampGlow"
 	seal_lamp_glow.position = CORRIDOR_SEAL_LAMP
 	seal_lamp_glow.z_index = KNOCKDOWN_Z
-	# The tucked bar, the rising curtain and the frame draw right after the shut curtain (the door
-	# body's children, in that order), so the atlas pieces batch into one draw call; their positions
-	# stay world positions.
+	# The tucked bar, the inner blast leaf, the rising curtain and the frame draw right after the shut
+	# curtain (the door body's children, in that order), so the atlas pieces batch into one draw call;
+	# their positions stay world positions.
 	var door_body: Node2D = door_visual.get_parent() as Node2D
-	for art: Node2D in [door_open_art, seal_leaf, seal_frame]:
+	for art: Node2D in [door_open_art, blast_leaf, seal_leaf, seal_frame]:
 		art.visible = false
 		art.position -= door_body.global_position
 		door_body.add_child(art)
@@ -1129,6 +1168,7 @@ func _process(delta: float) -> void:
 		return
 	var hold_station: StringName = _hold_station()
 	var held_ticks: int = hold_use.advance(delta, _crank_held(hold_station), hold_station, _hold_tick_seconds(hold_station))
+	_update_crank_pose(delta)
 	if hold_use.started:
 		_hold_started()
 	_update_settle()
@@ -1202,6 +1242,25 @@ func _show_hold() -> void:
 func _on_hold_toggle_changed(on: bool) -> void:
 	hold_toggle = on
 	crank_latched = false
+
+
+## The crank pose while USE is held at the MANUAL BYPASS with the engineer on the crank spot: B for
+## CRANK_PUSH_SECONDS after each tick, A the rest of the hold; otherwise the engineer's usual sprite.
+## The floor reflection mirrors whichever art the sprite shows (FloorReflection._mirror).
+func _update_crank_pose(delta: float) -> void:
+	crank_push_left = maxf(crank_push_left - delta, 0.0)
+	var frame: int = -1
+	if state.chapter_id == "lockdown" and not state.door_open and hold_use.holding and hold_use.station == &"bypass" \
+			and engineer_step_x < 0.0 and absf(human.position.x - BYPASS_CRANK_X) <= 1.0:
+		frame = 1 if crank_push_left > 0.0 else 0
+	if frame == crank_frame or human_texture == null:
+		return
+	crank_frame = frame
+	if frame < 0:
+		_show_human_standing()
+	else:
+		# The wheel is on the engineer's right, so the crank frames never flip.
+		_show_human_frame(CRANK_ART, Rect2(Vector2(CRANK_REGION_SIZE.x * frame, 0.0), CRANK_REGION_SIZE), CRANK_SCALE, CRANK_SPRITE_POS, false)
 
 
 ## The engineer's authored step (back from the relay, to a crank spot, or beside a station they used):
@@ -1341,6 +1400,9 @@ func _tick_corridor(delta: float, held_ticks: int) -> void:
 		_update_controls()
 	if wolf.autonomous_target_x == WOLF_BYPASS_CLEAR_X and absf(wolf.position.x - WOLF_BYPASS_CLEAR_X) <= 2.0:
 		# Standing off the relay he still faces the engineer at the bypass.
+		wolf.body_sprite.flip_h = false
+	elif wolf.autonomous_target_x == WOLF_DOORWAY_X and absf(wolf.position.x - WOLF_DOORWAY_X) <= 2.0:
+		# In the doorway he faces the engineer at the safe point.
 		wolf.body_sprite.flip_h = false
 	# Decision C: the stakes are said on the main path, once, before the breaker conversation, and only
 	# once every box of the line they replace (the opening lines, say) has been up long enough to read.
@@ -2307,6 +2369,8 @@ func _bypass_cranked() -> void:
 		return
 	bypass_ticks = mini(hold_use.ticks, BYPASS_TICKS)
 	bypass_handle.ticks = bypass_ticks
+	# Half a tick at most, so the regrip still shows if the hold gets shorter.
+	crank_push_left = minf(CRANK_PUSH_SECONDS, BypassHandle.TICK_SECONDS * 0.5)
 	sfx_bank.play(&"clank", -7.0, 1.5)
 	impact.rumble(0.12, 0.0, 0.05)
 	if not bypass_venting:
@@ -3550,14 +3614,10 @@ func _show_collapse(t: float) -> void:
 		if t >= COLLAPSE_TIMES[index] - 0.0001:
 			frame = index
 	var boots: float = lerpf(collapse_from_x, collapse_to_x, ease(clampf(t / COLLAPSE_SECONDS, 0.0, 1.0), 0.4)) - human.position.x
-	var sprite: Sprite2D = human.body_sprite
-	sprite.texture = COLLAPSE_SHEET
-	sprite.region_enabled = true
-	sprite.region_rect = Rect2(frame * COLLAPSE_FRAME.x, 0.0, COLLAPSE_FRAME.x, COLLAPSE_FRAME.y)
-	sprite.scale = Vector2.ONE * COLLAPSE_SCALE
-	sprite.rotation_degrees = 0.0
-	sprite.flip_h = collapse_fall < 0.0
-	sprite.position = Vector2(boots + collapse_fall * (COLLAPSE_FRAME.x * 0.5 - COLLAPSE_PIVOT_X) * COLLAPSE_SCALE, HUMAN_FLOOR_Y - COLLAPSE_FRAME.y * 0.5 * COLLAPSE_SCALE)
+	_show_human_frame(COLLAPSE_SHEET, Rect2(frame * COLLAPSE_FRAME.x, 0.0, COLLAPSE_FRAME.x, COLLAPSE_FRAME.y), COLLAPSE_SCALE,
+			Vector2(boots + collapse_fall * (COLLAPSE_FRAME.x * 0.5 - COLLAPSE_PIVOT_X) * COLLAPSE_SCALE, HUMAN_FLOOR_Y - COLLAPSE_FRAME.y * 0.5 * COLLAPSE_SCALE),
+			collapse_fall < 0.0)
+	human.body_sprite.rotation_degrees = 0.0
 	var span: Vector2 = collapse_span(frame, collapse_fall, boots)
 	human_reflection.floor_y = HUMAN_FLOOR_Y
 	human_reflection.shadow_span = span
@@ -3570,14 +3630,39 @@ static func collapse_span(frame: int, fall: float, boots_x: float) -> Vector2:
 	return Vector2(boots_x + minf(columns.x * fall, columns.y * fall), boots_x + maxf(columns.x * fall, columns.y * fall))
 
 
-## The engineer back on their feet: the standing image at rest, facing the way they faced before the
-## collapse, their reflection and shadow as they stand.
-func _stand_up() -> void:
+## The engineer's body sprite back on the standing image (human_texture, the whole texture) at its
+## rest scale and offset. The one place that undoes a sheet frame (_show_human_frame), so the crank
+## and the stand-up after a collapse restore the same four properties. Leaves rotation and flip_h to
+## the caller: the crank keeps the facing it had, and _stand_up restores the facing from before the
+## collapse.
+func _show_human_standing() -> void:
 	var sprite: Sprite2D = human.body_sprite
 	sprite.texture = human_texture
 	sprite.region_enabled = false
 	sprite.scale = human_sprite_scale
 	sprite.position = HUMAN_SPRITE_REST
+
+
+## The engineer's body sprite on one frame of a painted sheet: [param sheet] cut to [param region]
+## (art px), drawn at [param frame_scale] (world px per art px) at position [param at] (world px,
+## relative to the engineer's origin), mirrored when [param flip]. Used by the crank frames
+## (CRANK_ART) and the collapse (COLLAPSE_SHEET); _show_human_standing undoes it. Leaves rotation to
+## the caller.
+func _show_human_frame(sheet: Texture2D, region: Rect2, frame_scale: float, at: Vector2, flip: bool) -> void:
+	var sprite: Sprite2D = human.body_sprite
+	sprite.texture = sheet
+	sprite.region_enabled = true
+	sprite.region_rect = region
+	sprite.scale = Vector2.ONE * frame_scale
+	sprite.position = at
+	sprite.flip_h = flip
+
+
+## The engineer back on their feet: the standing image at rest, facing the way they faced before the
+## collapse, their reflection and shadow as they stand.
+func _stand_up() -> void:
+	_show_human_standing()
+	var sprite: Sprite2D = human.body_sprite
 	sprite.rotation_degrees = 0.0
 	if collapsed:
 		sprite.flip_h = collapse_flip
@@ -3713,6 +3798,10 @@ func _sync_scene() -> void:
 	bypass_handle.ticks = 0
 	bypass_handle.done = state.route == "fallback"
 	bypass_handle.clear_fault(state.door_open, false)
+	# The crank pose belongs to the moment too: back to the usual sprite before it is placed below.
+	crank_push_left = 0.0
+	crank_frame = 0
+	_update_crank_pose(0.0)
 	# The lane's choices and WOLF's part in it belong to the attempt, not the save.
 	lane_choice = ""
 	wolf_baiting = false
@@ -3870,12 +3959,21 @@ func _sync_door(animate: bool = false) -> void:
 	seal_lamp_glow.visible = in_corridor and state.door_open
 	seal_leaf.open = 0.0
 	seal_leaf.visible = sliding
+	blast_leaf.open = 0.0
+	blast_leaf.visible = sliding
 	if sliding:
 		door_tween = create_tween()
-		door_tween.tween_property(seal_leaf, "open", 1.0, CORRIDOR_DOOR_OPEN_SECONDS).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN_OUT)
+		door_tween.tween_method(_set_seal_open, 0.0, 1.0, CORRIDOR_DOOR_OPEN_SECONDS).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN_OUT)
 		door_tween.tween_callback(seal_leaf.hide)
+		door_tween.tween_callback(blast_leaf.hide)
 		door_tween.tween_callback(_set_seal_lamp.bind(SEAL_LAMP_OPEN))
 		door_tween.tween_callback(_door_lands)
+
+
+## The seal's one open value drives the roller curtain and the inner blast leaf behind it.
+func _set_seal_open(value: float) -> void:
+	seal_leaf.open = value
+	blast_leaf.open = value
 
 
 ## The seal's status lamp: red while shut, amber while the curtain moves, green open; only the lens
@@ -3914,6 +4012,8 @@ func _wolf_target_x() -> float:
 		return WOLF_HATCH_EXIT_X
 	if wolf_heading_to_relay or wolf_holding_relay:
 		return RELAY_CONTACT_X
+	if _wolf_comes_to_doorway():
+		return WOLF_DOORWAY_X
 	if _wolf_off_relay():
 		return WOLF_BYPASS_CLEAR_X
 	match state.chapter_id:
@@ -3966,6 +4066,17 @@ func _wolf_rubble_x() -> float:
 	return JunctionRoom.WOLF_CLEAR_X if gap < M0Actor.CLEAR_GAP + WOLF_RUBBLE_HYSTERESIS else JunctionRoom.WOLF_RUBBLE_X
 
 
+## The seal is open and the engineer has gone through it to the safe point: WOLF comes to the open
+## doorway and stands there, facing them (WOLF_DOORWAY_X). He sets off only once they are at the safe
+## point (WOLF_DOORWAY_HYSTERESIS past the hold line), and once he has set off he keeps to the doorway
+## until they come back within a clear gap of it (WOLF_DOORWAY_HOLD_X).
+func _wolf_comes_to_doorway() -> bool:
+	if state.chapter_id != "lockdown" or not state.door_open or seal_opening:
+		return false
+	var hold_x: float = WOLF_DOORWAY_HOLD_X if wolf.autonomous_target_x == WOLF_DOORWAY_X else WOLF_DOORWAY_HOLD_X + WOLF_DOORWAY_HYSTERESIS
+	return human.position.x >= hold_x
+
+
 ## WOLF keeps off the live relay, back towards the breaker: once he has refused it, or while the
 ## engineer works the bypass instead, until the seal they opened has landed. So the bypass route
 ## never shows him on the contact he did not take. On the honest route he also waits there, ready,
@@ -4001,8 +4112,9 @@ func _machine_spans() -> Array[Vector2]:
 ## The furthest right WOLF follows to: short of a shut door by his drawn reach, so he never noses
 ## into it and the engineer always has room in front of it. Once the corridor's seal is open, the
 ## floor past the relay (the MANUAL BYPASS, the seal's frame and the safe point) has no gap as long
-## as he is, so he follows no further than the relay's left side (WOLF_FOLLOW_OPEN_MAX_X) and waits
-## there while the engineer goes on to the safe point. His authored spots ignore this.
+## as he is, so he follows no further than the relay's left side (WOLF_FOLLOW_OPEN_MAX_X) while the
+## engineer walks through. Once the engineer is at the safe point, WOLF comes to the open doorway
+## instead (_wolf_comes_to_doorway, WOLF_DOORWAY_X). His authored spots ignore this limit.
 func _wolf_follow_max_x() -> float:
 	if state.chapter_id == "lockdown":
 		return WOLF_FOLLOW_OPEN_MAX_X if state.door_open else CORRIDOR_DOOR_LEFT_X - M0Actor.WOLF_REACH

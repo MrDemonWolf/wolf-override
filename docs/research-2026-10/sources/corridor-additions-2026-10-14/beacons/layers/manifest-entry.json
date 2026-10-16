@@ -1,0 +1,10 @@
+{
+ "asset_id": "corridor-beacons",
+ "path": "apps/game/assets/props/corridor-beacons.png",
+ "source_or_tool": "Codex built-in image_gen tool in edit mode, 2026-10-12 (session 01a1335e-53be-7ca3-bac0-059cf4b5a18d), painting material only inside a deterministic construction drawing of two wall-mounted caged red warning lamps",
+ "source_reference": "Shapes and proportions from the Eaton Crouse-Hinds EV LED hazardous-location luminaire (red glass globe, guard, wall bracket, 3/4 in hub); the original 1254x1254 output keeps its C2PA manifest and is kept outside the repo with its prompt",
+ "terms_reference": "https://openai.com/policies/terms-of-use/",
+ "rights_review_status": "Provisional AI-assisted gameplay prop. Pending Nathanial Henniges' review; final commercial asset-rights review remains open; not covered by the code/docs GPL license.",
+ "modifications": "Deterministic cleanup: Codex's paint is sampled only inside the designed masks and resampled to the far plate's pixel grid; conduit, straps, fittings, wall contact shadows and the red light and wall spill are computed in Python. Packed into one 256x156 RGBA atlas (per lamp: fixture, greyscale globe, guard, additive light), lossless, no mipmaps.",
+ "implementation_status": "Replaces the corridor's two code-drawn lockdown beacon housings and their 90x90 radial glows (RoomDepth warning_lamps 0.341,0.27 and 0.659,0.27 of the far plate)."
+}

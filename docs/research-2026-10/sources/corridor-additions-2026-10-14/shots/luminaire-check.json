@@ -1,0 +1,239 @@
+{
+ "round9": {
+  "s1-door-end-rest": {
+   "diffuser_x": [
+    668,
+    706
+   ],
+   "fitting_centre": 687.0,
+   "pool_centroid": 685.0,
+   "pool_peak": 682,
+   "floor_streak_peak": 686,
+   "pool_peak_off": -5.0,
+   "pool_centroid_off": -2.0,
+   "floor_peak_off": -1.0,
+   "box_edge_profile_x655_668": [
+    22.9,
+    23.2,
+    23.7,
+    23.5,
+    23.8,
+    23.9,
+    21.8,
+    18.0,
+    18.0,
+    18.1,
+    18.1,
+    19.1,
+    19.0,
+    20.3
+   ],
+   "box_edge_max_step": 3.84,
+   "conduit_sides_x707_711_vs_716_720": [
+    28.0,
+    24.2
+   ],
+   "conduit_sides_diff": 3.76,
+   "pass": false,
+   "stray_zone_s_max_over_median": 1.246
+  },
+  "s5-door-open": {
+   "diffuser_x": [
+    668,
+    706
+   ],
+   "fitting_centre": 687.0,
+   "pool_centroid": 684.9,
+   "pool_peak": 682,
+   "floor_streak_peak": 686,
+   "pool_peak_off": -5.0,
+   "pool_centroid_off": -2.1,
+   "floor_peak_off": -1.0,
+   "box_edge_profile_x655_668": [
+    22.9,
+    23.2,
+    23.7,
+    23.7,
+    23.8,
+    23.9,
+    21.3,
+    18.0,
+    18.0,
+    18.1,
+    18.1,
+    19.2,
+    19.2,
+    20.4
+   ],
+   "box_edge_max_step": 3.34,
+   "conduit_sides_x707_711_vs_716_720": [
+    28.0,
+    24.3
+   ],
+   "conduit_sides_diff": 3.72,
+   "pass": false,
+   "stray_zone_s_max_over_median": 1.246
+  },
+  "s7-safe-point": {
+   "stray_zone_s_max_over_median": 1.246
+  }
+ },
+ "round10": {
+  "s1-door-end-rest": {
+   "diffuser_x": [
+    668,
+    706
+   ],
+   "fitting_centre": 687.0,
+   "pool_centroid": 685.0,
+   "pool_peak": 682,
+   "floor_streak_peak": 686,
+   "pool_peak_off": -5.0,
+   "pool_centroid_off": -2.0,
+   "floor_peak_off": -1.0,
+   "box_edge_profile_x655_668": [
+    20.4,
+    20.6,
+    21.1,
+    20.7,
+    21.0,
+    21.2,
+    21.2,
+    21.7,
+    21.7,
+    21.7,
+    21.2,
+    21.7,
+    21.2,
+    21.8
+   ],
+   "box_edge_max_step": 0.62,
+   "conduit_sides_x707_711_vs_716_720": [
+    27.3,
+    26.3
+   ],
+   "conduit_sides_diff": 1.01,
+   "pass": true,
+   "stray_zone_s_max_over_median": 1.246
+  },
+  "s5-door-open": {
+   "diffuser_x": [
+    668,
+    706
+   ],
+   "fitting_centre": 687.0,
+   "pool_centroid": 684.9,
+   "pool_peak": 682,
+   "floor_streak_peak": 686,
+   "pool_peak_off": -5.0,
+   "pool_centroid_off": -2.1,
+   "floor_peak_off": -1.0,
+   "box_edge_profile_x655_668": [
+    20.4,
+    20.6,
+    21.1,
+    21.0,
+    21.0,
+    21.2,
+    21.2,
+    21.7,
+    21.7,
+    21.7,
+    21.1,
+    21.8,
+    21.2,
+    21.8
+   ],
+   "box_edge_max_step": 0.71,
+   "conduit_sides_x707_711_vs_716_720": [
+    27.3,
+    26.4
+   ],
+   "conduit_sides_diff": 0.88,
+   "pass": true,
+   "stray_zone_s_max_over_median": 1.245
+  },
+  "s7-safe-point": {
+   "stray_zone_s_max_over_median": 1.245
+  }
+ },
+ "round11": {
+  "s1-door-end-rest": {
+   "diffuser_x": [
+    668,
+    706
+   ],
+   "fitting_centre": 687.0,
+   "pool_centroid": 684.9,
+   "pool_peak": 682,
+   "floor_streak_peak": 686,
+   "pool_peak_off": -5.0,
+   "pool_centroid_off": -2.1,
+   "floor_peak_off": -1.0,
+   "box_edge_profile_x655_668": [
+    20.4,
+    20.6,
+    21.1,
+    20.7,
+    21.0,
+    21.2,
+    21.2,
+    21.7,
+    21.7,
+    21.7,
+    21.2,
+    21.7,
+    21.2,
+    21.8
+   ],
+   "box_edge_max_step": 0.62,
+   "conduit_sides_x707_711_vs_716_720": [
+    27.3,
+    26.3
+   ],
+   "conduit_sides_diff": 1.01,
+   "pass": true,
+   "stray_zone_s_max_over_median": 1.246
+  },
+  "s5-door-open": {
+   "diffuser_x": [
+    668,
+    706
+   ],
+   "fitting_centre": 687.0,
+   "pool_centroid": 684.9,
+   "pool_peak": 682,
+   "floor_streak_peak": 686,
+   "pool_peak_off": -5.0,
+   "pool_centroid_off": -2.1,
+   "floor_peak_off": -1.0,
+   "box_edge_profile_x655_668": [
+    20.4,
+    20.6,
+    21.1,
+    21.0,
+    21.0,
+    21.2,
+    21.2,
+    21.7,
+    21.7,
+    21.7,
+    21.1,
+    21.8,
+    21.2,
+    21.8
+   ],
+   "box_edge_max_step": 0.71,
+   "conduit_sides_x707_711_vs_716_720": [
+    27.3,
+    26.4
+   ],
+   "conduit_sides_diff": 0.88,
+   "pass": true,
+   "stray_zone_s_max_over_median": 1.245
+  },
+  "s7-safe-point": {
+   "stray_zone_s_max_over_median": 1.245
+  }
+ }
+}

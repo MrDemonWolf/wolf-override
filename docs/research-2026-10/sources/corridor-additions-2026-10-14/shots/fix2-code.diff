@@ -1,0 +1,99 @@
+diff -ruN -x *.uid -x .godot -x *.png -x *.import -x art-source round8/assets/manifest.json round9/assets/manifest.json
+--- round8/assets/manifest.json	2026-10-13 05:42:45
++++ round9/assets/manifest.json	2026-10-13 11:32:00
+@@ -166,7 +166,7 @@
+       "source_reference": "Reference: maintenance-corridor-background-provisional.png, the earlier single corridor painting (ChatGPT Create in the WOLF//OVERRIDE [Game] project, https://chatgpt.com/g/g-p-6ab60b48c7608191987f04a81b04b5e2-wolf-override-game/c/6abb82fd-5d14-83e9-9332-a78148b708b2), registered here until it was retired on 2026-10-09; generation prompts retained in ignored art notes",
+       "terms_reference": "https://openai.com/policies/terms-of-use/",
+       "rights_review_status": "Provisional AI-generated environment art, human reviewed and approved for integration. Final commercial asset-rights review remains open; not covered by the code/docs GPL license. Approved for integration by Nathanial Henniges on 2026-10-08 from a review sheet.",
+-      "modifications": "Original 1920x1080 RGB far plate (back wall, three ceiling lamps, wet floor), copied unchanged. First trialled 2026-10-08 as assets/trial/corridor-far-trial.png (same bytes). add7 fix round 1 (2026-10-13; scratch copy, not on main): the chain-hung luminaire near the door end (plate x 1230-1329, y 192-250) became a 0.6 m vapour-tight LED fitting (grey body, end caps, opal diffuser, two suspension rods with ceiling canopies) at plate x 1213-1261, so at 1280x720 it ends clear of the PAUSE button; the old 1.2 m bar's ends and its hangers were taken back to the wall by a deterministic inpaint. Shapes by Python (add7/fix1/luminaire/tools/design.py), painted with Codex's built-in image_gen in edit mode (session 01a134c9-e14e-7482-aad9-3642fae31b50), values pinned by cleanup.py; 2,802 plate px changed, all inside that box.",
++      "modifications": "Original 1920x1080 RGB far plate (back wall, three ceiling lamps, wet floor), copied unchanged. First trialled 2026-10-08 as assets/trial/corridor-far-trial.png (same bytes). add7 fix round 1 (2026-10-13; scratch copy, not on main): the chain-hung luminaire near the door end (plate x 1230-1329, y 192-250) became a 0.6 m vapour-tight LED fitting (grey body, end caps, opal diffuser, two suspension rods with ceiling canopies) at plate x 1213-1261, so at 1280x720 it ends clear of the PAUSE button; the old 1.2 m bar's ends and its hangers were taken back to the wall by a deterministic inpaint. Shapes by Python (add7/fix1/luminaire/tools/design.py), painted with Codex's built-in image_gen in edit mode (session 01a134c9-e14e-7482-aad9-3642fae31b50), values pinned by cleanup.py; 2,802 plate px changed, all inside that box. add7 fix round 2 (2026-10-13; scratch copy, not on main): the luminaire's painted wall pool and its wet-floor reflection streak moved under the shortened fitting (they had stayed under the old 1.2 m bar, about 0.55 m to its right), and the floor streak in front of the safe point's wall (a reflection of a lamp behind that wall) taken out. Deterministic relighting in linear light, no new paint (add7/fix2/far/tools/far9.py): the pool is moved by a fitted smooth gain ratio, the streak as an additive cool-white reflection shifted 44 px, the stray streak (plate x ~1786) inpainted (low frequency interpolated across, the floor's own texture kept); the door light's own reflection under the door is kept.",
+       "implementation_status": "In use since 2026-10-09, imported VRAM-compressed. Drawn by RoomDepth as the corridor backdrop: a Parallax2D at 0.9x camera speed, 960 px wide, sitting 27 px lower than the mid plate so its painted ceiling lamps stay in the play view, with additive glows and light shafts on its lamps, two procedurally drawn lockdown beacons, haze and dust. From 2026-10-09 it also stood in, tinted, for the Service Junction until that room's own set was integrated the same day."
+     },
+     {
+@@ -731,7 +731,7 @@
+       "source_reference": "Shapes and proportions from the Eaton Crouse-Hinds EV LED hazardous-location luminaire (red glass globe, guard, wall bracket, 3/4 in hub); the original 1254x1254 output keeps its C2PA manifest and is kept outside the repo with its prompt",
+       "terms_reference": "https://openai.com/policies/terms-of-use/",
+       "rights_review_status": "Provisional AI-assisted gameplay prop. Pending Nathanial Henniges' review; final commercial asset-rights review remains open; not covered by the code/docs GPL license.",
+-      "modifications": "Deterministic cleanup: Codex's paint is sampled only inside the designed masks and resampled to the far plate's pixel grid; conduit, straps, fittings, wall contact shadows and the red light and wall spill are computed in Python. Packed into one 256x156 RGBA atlas (per lamp: fixture, greyscale globe, guard, additive light), lossless, no mipmaps. add7 fix round 1 (2026-10-13; scratch copy, not on main): the red pool is stronger and reaches the pipes below (spill 1.0, a broader d/r^2 skirt, faded to nothing at the light box's edges), the glass bloom 0.45, the left lamp's feed held by three wider one-hole straps with lit tops and a hairline wall shadow; the globes keep their real 0.14 m size. Same Codex paint (no new session); atlas now 256x160 (add7/fix1/beacons/tools).",
++      "modifications": "Deterministic cleanup: Codex's paint is sampled only inside the designed masks and resampled to the far plate's pixel grid; conduit, straps, fittings, wall contact shadows and the red light and wall spill are computed in Python. Packed into one 256x156 RGBA atlas (per lamp: fixture, greyscale globe, guard, additive light), lossless, no mipmaps. add7 fix round 1 (2026-10-13; scratch copy, not on main): the red pool is stronger and reaches the pipes below (spill 1.0, a broader d/r^2 skirt, faded to nothing at the light box's edges), the glass bloom 0.45, the left lamp's feed held by three wider one-hole straps with lit tops and a hairline wall shadow; the globes keep their real 0.14 m size. Same Codex paint (no new session); atlas now 256x160 (add7/fix1/beacons/tools). add7 fix round 2 (2026-10-13; scratch copy, not on main): the light is stronger so the alarm reads at 1x (red wall pool x2.0, glass bloom 0.70 over 3.0 px); fixture, globe and guard pixels unchanged, the globes keep their real size; light regions now 85x109 (add7/fix2/beacons/tools/cleanup.py). Correction: the atlas has been 256x156 since round 7 (round 8's note said 256x160).",
+       "implementation_status": "Replaces the corridor's two code-drawn lockdown beacon housings and their 90x90 radial glows (RoomDepth warning_lamps 0.341,0.27 and 0.659,0.27 of the far plate)."
+     },
+     {
+@@ -751,7 +751,7 @@
+       "source_reference": "Design, review and paint records in docs/research-2026-10/sources/corridor-door-end-2026-10-12/ (README.md, DESIGN.md, spec.json, SLICE.md, review/REVIEW-round1..6.md and every tool); Codex sessions (ids, outputs, SHA-256 and what each was used for) in docs/research-2026-10/sources/corridor-door-end-2026-10-12/provenance.txt; the raw Codex outputs are kept byte for byte, with their C2PA content credentials (caBX chunk), in docs/research-2026-10/sources/corridor-door-end-2026-10-12/codex/<job>/out/. Composition from the approved shutter concept in docs/research-2026-10/sources/doors-shutter-approved/; rules from docs/research-2026-10/art-direction/REAL-LOOK.md.",
+       "terms_reference": "https://openai.com/policies/terms-of-use/",
+       "rights_review_status": "Provisional AI-assisted gameplay prop: deterministic construction drawings painted with an AI image tool, then cleaned up deterministically; human reviewed and approved for integration. Final commercial asset-rights review remains open; not covered by the code/docs GPL license. Approved for integration by Nathanial Henniges on 2026-10-12 from rendered before/after frames of the corridor's door end, after six independent review rounds.",
+-      "modifications": "One lossless 1024x1024 RGBA atlas (SHA-256 f8bb4bb74174ac0c...) holding every piece of the corridor's door end: the concrete cross-wall behind the walk line with its doorway transparent and the wall-mounted MANUAL BYPASS backplate, worm gearbox and chain guard on it (2 source px per world px); the shut rolling-steel curtain, its bottom bar tucked under the hood, and the frame (far guide, hood, operator) at 4 px; the near column (guide, channel frame, end face, steel-faced chamfer, guarded status lamp socket, push buttons and the lamp's conduit into the camera's wall plate), the camera on its arm and the wall's 0.15 m stub, at 2 px; the lamp's glass and the bypass handwheel at 4 px. Paint is kept only inside each part's designed mask; the design's exact alpha is re-imposed, values are held to the design's light plan, large faces are calmed and given luminance-only grain, and later fix rounds move existing paint onto corrected shapes (no new image-tool output after paint-v3). Reproducible with install6.py from the session's layers (not kept in the repository; rebuildable with the tools in docs/research-2026-10/sources/corridor-door-end-2026-10-12/tools/); checked byte for byte on 2026-10-12. Scratch additions (round 7, 2026-10-12, and add7 fix round 1 (2026-10-13; scratch copy, not on main)): a steel blast-frame liner round the head and far jamb (40 mm plates, lit arrises, joints, dark anchor heads; kept clear of the door light), the RESTRICTED AREA plate (typeset in Roboto, never painted by the image tool), the inner blast leaf's parked 0.36 m leading edge with its wiper seals and locking-bolt receivers, the floor rail, a second conduit strap, and three new regions: the leaf's front face (158x256), its leading edge (29x256) and an 8x8 black patch for its feathered contact shadow. Shapes by Python (add7/door/tools/portal7.py; add7/fix1/door/tools/portal8.py), painted with Codex's built-in image_gen in edit mode (sessions 01a13367-ff5e-7032-9f9a-2a89354a3561 and 01a134ac-cb13-7733-b679-7230257e0555), cleaned up deterministically (cleanup7.py, cleanup8.py, install8.py). Every existing region and world position is unchanged.",
++      "modifications": "One lossless 1024x1024 RGBA atlas (SHA-256 f8bb4bb74174ac0c...) holding every piece of the corridor's door end: the concrete cross-wall behind the walk line with its doorway transparent and the wall-mounted MANUAL BYPASS backplate, worm gearbox and chain guard on it (2 source px per world px); the shut rolling-steel curtain, its bottom bar tucked under the hood, and the frame (far guide, hood, operator) at 4 px; the near column (guide, channel frame, end face, steel-faced chamfer, guarded status lamp socket, push buttons and the lamp's conduit into the camera's wall plate), the camera on its arm and the wall's 0.15 m stub, at 2 px; the lamp's glass and the bypass handwheel at 4 px. Paint is kept only inside each part's designed mask; the design's exact alpha is re-imposed, values are held to the design's light plan, large faces are calmed and given luminance-only grain, and later fix rounds move existing paint onto corrected shapes (no new image-tool output after paint-v3). Reproducible with install6.py from the session's layers (not kept in the repository; rebuildable with the tools in docs/research-2026-10/sources/corridor-door-end-2026-10-12/tools/); checked byte for byte on 2026-10-12. Scratch additions (round 7, 2026-10-12, and add7 fix round 1 (2026-10-13; scratch copy, not on main)): a steel blast-frame liner round the head and far jamb (40 mm plates, lit arrises, joints, dark anchor heads; kept clear of the door light), the RESTRICTED AREA plate (typeset in Roboto, never painted by the image tool), the inner blast leaf's parked 0.36 m leading edge with its wiper seals and locking-bolt receivers, the floor rail, a second conduit strap, and three new regions: the leaf's front face (158x256), its leading edge (29x256) and an 8x8 black patch for its feathered contact shadow. Shapes by Python (add7/door/tools/portal7.py; add7/fix1/door/tools/portal8.py), painted with Codex's built-in image_gen in edit mode (sessions 01a13367-ff5e-7032-9f9a-2a89354a3561 and 01a134ac-cb13-7733-b679-7230257e0555), cleaned up deterministically (cleanup7.py, cleanup8.py, install8.py). Every existing region and world position is unchanged. add7 fix round 2 (2026-10-13; scratch copy, not on main): the cross-wall is carried to the camera along its own line as a section cut at 0.36 m (the old 0.15 m curb, now a low cast-concrete wall: corridor face with a damp foot, plugged form-tie holes, two control joints, its 0.66 m top, galvanised edge angles on both arrises with anchor heads, and a footprint contact shadow on the corridor floor), so the plant room is closed on the camera side and DOOR 4B-07 is the only way in; 0.36 m leaves the engineer's boots whole at the safe point (a first try at 0.42 m clipped the rear heel). Shapes by Python (add7/fix2/door/tools/cut9.py), painted with Codex's built-in image_gen in edit mode (session 01a13619-28b8-7c02-91b4-d474e3924572; used only as clamped luma detail inside the masks), cleaned up and packed deterministically (cleanup9.py, install9.py). Only the stub region (now 443x202 at world 762.5, 440.0) and the column region's lower rows change; every other region and world position is unchanged.",
+       "implementation_status": "In use since 2026-10-12 as the corridor seal (main.gd CORRIDOR_SEAL_* regions and world positions; main.tscn DoorArt shows the curtain): the cross-wall draws right after the mid plate; the curtain, the rising curtain (SealLeaf) and the frame batch with the door body; the near column, camera and stub draw over the actors and stay opaque; the lamp's glass is tinted live (red shut, amber moving, green open) and the handwheel turns in BypassHandle. Imported lossless with mipmaps, drawn with linear-with-mipmaps filtering. It replaces corridor-bulkhead-sealed.png and corridor-bulkhead-front-lip.png (deleted 2026-10-12, with their art-source originals; all in the Git history). The inner blast leaf (BlastLeaf) draws from the new regions while the seal opens."
+     }
+   ],
+diff -ruN -x *.uid -x .godot -x *.png -x *.import -x art-source round8/scenes/main.tscn round9/scenes/main.tscn
+--- round8/scenes/main.tscn	2026-10-13 05:10:53
++++ round9/scenes/main.tscn	2026-10-13 10:03:47
+@@ -58,8 +58,8 @@
+ shaft_lamps = PackedInt32Array(1, 2)
+ warning_lamps = PackedVector2Array(0.341, 0.27, 0.659, 0.27)
+ beacon_atlas = ExtResource("23_beacons")
+-beacon_regions = Array[Rect2]([Rect2(2, 2, 25, 135), Rect2(2, 141, 11, 12), Rect2(224, 2, 13, 15), Rect2(29, 2, 83, 107), Rect2(199, 2, 23, 46), Rect2(15, 141, 11, 12), Rect2(239, 2, 13, 15), Rect2(114, 2, 83, 107)])
+-beacon_offsets = PackedVector2Array(-10.72, -108.6, -3.72, 4.4, -4.72, 4.4, -39.72, -26.6, -10.28, -18.6, -4.28, 4.4, -5.28, 4.4, -40.28, -26.6)
++beacon_regions = Array[Rect2]([Rect2(2, 2, 25, 135), Rect2(2, 141, 11, 12), Rect2(228, 2, 13, 15), Rect2(29, 2, 85, 109), Rect2(203, 2, 23, 46), Rect2(15, 141, 11, 12), Rect2(243, 2, 13, 15), Rect2(116, 2, 85, 109)])
++beacon_offsets = PackedVector2Array(-10.72, -108.6, -3.72, 4.4, -4.72, 4.4, -40.72, -27.6, -10.28, -18.6, -4.28, 4.4, -5.28, 4.4, -41.28, -27.6)
+ ambient_dust = false
+ haze_end = 0.588
+ haze_fade = 0.12
+diff -ruN -x *.uid -x .godot -x *.png -x *.import -x art-source round8/scripts/fx_presets.gd round9/scripts/fx_presets.gd
+--- round8/scripts/fx_presets.gd	2026-10-13 05:19:35
++++ round9/scripts/fx_presets.gd	2026-10-13 10:03:57
+@@ -71,7 +71,8 @@
+ ## floor, pointing straight down. Hot coolant that relieves to air flashes, so it shows right at the
+ ## mouth: a short, dense, slightly fanned spray of soft streaks (align Y) that starts pipe-narrow,
+ ## widens as it falls and spreads where it meets the floor about 18 px below, and is gone there; low
+-## alpha in normal blending (no glow). The caller sets emitting.
++## alpha in normal blending (no glow; 0.2 since round 9, so it stays faint, as brief (g) asks). The
++## caller sets emitting.
+ static func relief_jet() -> CPUParticles2D:
+ 	var particles: CPUParticles2D = CPUParticles2D.new()
+ 	particles.name = "ReliefJet"
+@@ -93,7 +94,7 @@
+ 	flare.add_point(Vector2(0.55, 0.6))
+ 	flare.add_point(Vector2(1.0, 1.0))
+ 	particles.scale_amount_curve = flare
+-	particles.color = Color(0.86, 0.92, 0.95, 0.3)
++	particles.color = Color(0.86, 0.92, 0.95, 0.2)
+ 	var fade: Gradient = Gradient.new()
+ 	fade.offsets = PackedFloat32Array([0.0, 0.1, 0.7, 1.0])
+ 	fade.colors = PackedColorArray([Color(1.0, 1.0, 1.0, 0.85), Color.WHITE, Color(1.0, 1.0, 1.0, 0.55), Color(1.0, 1.0, 1.0, 0.0)])
+diff -ruN -x *.uid -x .godot -x *.png -x *.import -x art-source round8/scripts/main.gd round9/scripts/main.gd
+--- round8/scripts/main.gd	2026-10-13 05:26:36
++++ round9/scripts/main.gd	2026-10-13 11:32:00
+@@ -50,8 +50,9 @@
+ ## seal frame (far guide, hood, operator) draws over the curtain. The wall round it: CorridorSealWall
+ ## is the cross-wall behind the walk line with the doorway transparent (so the machinery room in the
+ ## far plate shows through it), drawn with the mid plate under everything else; the near column (its
+-## guide, frame, end face, lamp socket and push buttons), the camera on its arm and the wall's 0.15 m
+-## stub running along its own line to the camera draw over the actors, always opaque, and the column
++## guide, frame, end face, lamp socket and push buttons), the camera on its arm and the wall itself,
++## carried along its own line to the camera as a section cut at 0.36 m (so the plant room is closed on
++## the camera side and the door is the only way in), draw over the actors, always opaque, and the column
+ ## is slim enough that nobody stopping at the safe point stands behind it. The curtain crosses the
+ ## walk line at the collision face (x 752, y 440). Every piece is a region of one lossless atlas (one
+ ## texture, so they batch); the wall, column, camera and stub are 2 px per world px, the rest 4 px;
+@@ -63,7 +64,7 @@
+ const CORRIDOR_SEAL_WALL_REGION: Rect2 = Rect2(672.0, 2.0, 267.0, 613.0)
+ const CORRIDOR_SEAL_COLUMN_REGION: Rect2 = Rect2(941.0, 2.0, 74.0, 606.0)
+ const CORRIDOR_SEAL_CAMERA_REGION: Rect2 = Rect2(858.0, 619.0, 49.0, 18.0)
+-const CORRIDOR_SEAL_STUB_REGION: Rect2 = Rect2(2.0, 619.0, 443.0, 187.0)
++const CORRIDOR_SEAL_STUB_REGION: Rect2 = Rect2(2.0, 619.0, 443.0, 202.0)
+ const CORRIDOR_SEAL_LENS_REGION: Rect2 = Rect2(822.0, 619.0, 32.0, 40.0)
+ const CORRIDOR_SEAL_CURTAIN_AT: Vector2 = Vector2(721.75, 311.25)
+ const CORRIDOR_SEAL_OPEN_AT: Vector2 = Vector2(722.25, 311.5)
+@@ -71,7 +72,7 @@
+ const CORRIDOR_SEAL_WALL_AT: Vector2 = Vector2(684.0, 150.0)
+ const CORRIDOR_SEAL_COLUMN_AT: Vector2 = Vector2(785.0, 150.0)
+ const CORRIDOR_SEAL_CAMERA_AT: Vector2 = Vector2(762.5, 267.5)
+-const CORRIDOR_SEAL_STUB_AT: Vector2 = Vector2(762.5, 448.5)
++const CORRIDOR_SEAL_STUB_AT: Vector2 = Vector2(762.5, 440.0)
+ const CORRIDOR_SEAL_SCALE: float = 0.25
+ const CORRIDOR_SEAL_FRONT_SCALE: float = 0.5
+ ## Where the shut curtain's art ends at the bottom (its near-jamb corner, in front of the walk line).

@@ -1,0 +1,15 @@
+File: relay8-painted.png
+Original generated file: ~/.codex/generated_images/01a134c3-505a-7132-88f6-8ea5867103a0/exec-5577c394-1981-497a-a83a-eac3592ab448.png
+SHA256: 181ab3bb60c91e8f5fbc6aed2e11c6e59391b71a67af275937aef25cf53d771d
+Pixel size: 1254x1254
+Copy verification: cmp passed; original bytes and all metadata preserved.
+Limitation: tool returned 1254x1254 despite the requested 1024x1024. No resizing or re-encoding performed. Exact unchanged pixels under BLACK not verified.
+
+Exact prompt:
+Use case: precise-object-edit. EDIT the first attached image only. Image 1 is the 1024x1024 edit target; Image 2 is a same-frame black/white permission map, NOT an image to render. WHITE marks the only pixels allowed to paint. Every pixel under BLACK must remain exactly unchanged. Output ONE 1024x1024 image with identical canvas, framing and geometry.
+This is a paint-over of a measured construction drawing. All silhouettes, edges and parts stay exactly where they are and at the same size. ONLY add realistic surface material and light within WHITE.
+Paint the existing thin vertical pipe on the far right as a 40 mm round matte galvanised steel discharge pipe from the existing relief-valve tailpipe down to its existing open end near the floor. Soft highlight on upper-left lit side, darker shadow side, slightly dustier toward bottom without speckling. Existing short wider top ring is a steel pipe union with two hex shoulders; preserve its exact outline. Existing bottom end is an open cut pipe end with a dark bore.
+Paint the two existing small bands and short horizontal bars connecting back to the large coolant pipe as matte steel pipe clamps and support brackets slightly darker than the pipe, one small bolt head per bracket, confined to existing bracket shapes.
+Paint the existing flat dark oval at bottom right as a damp patch in concrete: slightly darker wet concrete, faint cool sheen along upper edge, soft edges. Not a puddle; no object reflections or drawn drops.
+Grounded realism matching this already-painted industrial coolant relay in a hardened underground military facility, matte painted and galvanised steel, softly lit from above and left like the existing machine. Keep the entire existing machine, cyan ring, background and all unmasked pixels exactly unchanged. Do not add/remove/move/resize/reshape any part. No new glow, steam, spray, drips, rust spots, grunge speckle or greebles. Add NO text, letters, numbers, logos, labels, symbols, UI, watermarks or borders anywhere. Preserve all metadata including C2PA content credentials; never strip them.
+

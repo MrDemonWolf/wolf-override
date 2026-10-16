@@ -1,9 +1,10 @@
 class_name FxPresets
 extends RefCounted
-## Three reusable CPUParticles2D configurations (they run on every renderer, including GL
-## Compatibility): a spark shower, a dust burst and a steam column. Bursts are one-shot and fire
-## through Impact.burst(); steam toggles emitting with the state that drives it. Their dot textures and
-## fade ramp are FxKit's shared ones; place() parks a configured one in its room.
+## Four reusable CPUParticles2D configurations (they run on every renderer, including GL
+## Compatibility): a spark shower, a dust burst, a steam column and a relief-valve jet. Bursts are
+## one-shot and fire through Impact.burst(); steam and the jet toggle emitting with the state that
+## drives them. Their textures and ramps are FxKit's shared ones; place() parks a configured one in its
+## room.
 
 const DUST: Color = Color("#c9b9a0")
 const STEAM: Color = Color("#bfe8ff")
@@ -62,6 +63,40 @@ static func steam() -> CPUParticles2D:
 	particles.color = Color(STEAM, 0.35)
 	particles.color_ramp = _fade_ramp()
 	particles.texture = _dot_texture(16)
+	return particles
+
+
+## Continuous: the coolant spray from a pressure-relief discharge pipe's open end, 0.44 m above the
+## floor, pointing straight down. Hot coolant that relieves to air flashes, so it shows right at the
+## mouth: a short, dense, slightly fanned spray of soft streaks (align Y) that starts pipe-narrow,
+## widens as it falls and spreads where it meets the floor about 18 px below, and is gone there; low
+## alpha in normal blending (no glow; 0.2 since round 9, so it stays faint, as brief (g) asks). The
+## caller sets emitting. Its ramp and streak texture are FxKit's, shared, so nothing writes to them.
+static func relief_jet() -> CPUParticles2D:
+	var particles: CPUParticles2D = CPUParticles2D.new()
+	particles.name = "ReliefJet"
+	particles.emitting = false
+	particles.amount = 22
+	particles.lifetime = 0.22
+	particles.direction = Vector2(0.0, 1.0)
+	particles.spread = 9.0
+	particles.initial_velocity_min = 70.0
+	particles.initial_velocity_max = 84.0
+	particles.damping_min = 35.0
+	particles.damping_max = 50.0
+	particles.gravity = Vector2(0.0, 120.0)
+	particles.particle_flag_align_y = true
+	particles.scale_amount_min = 1.0
+	particles.scale_amount_max = 1.2
+	var flare: Curve = Curve.new()
+	flare.add_point(Vector2(0.0, 0.22))
+	flare.add_point(Vector2(0.55, 0.6))
+	flare.add_point(Vector2(1.0, 1.0))
+	particles.scale_amount_curve = flare
+	particles.color = Color(0.86, 0.92, 0.95, 0.2)
+	particles.color_ramp = FxKit.ramp([0.0, 0.1, 0.7, 1.0], [Color(1.0, 1.0, 1.0, 0.85), Color.WHITE, Color(1.0, 1.0, 1.0, 0.55), Color(1.0, 1.0, 1.0, 0.0)])
+	# A soft 12x16 ellipse (the radial fill runs in UV space), a streak stretched along its travel.
+	particles.texture = FxKit.radial(12, [0.0, 0.45, 1.0], [Color.WHITE, Color(1.0, 1.0, 1.0, 0.4), Color(1.0, 1.0, 1.0, 0.0)], GradientTexture2D.FILL_RADIAL, 16)
 	return particles
 
 

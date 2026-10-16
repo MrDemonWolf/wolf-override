@@ -1,0 +1,14 @@
+Output file: cut9-painted.png
+SHA256: f764301cff45b6bcc667b262c4cc56be91fa71e927c30967c1403400c3488b8b
+Original generated file: ~/.codex/generated_images/01a135c0-8eeb-7d02-a132-b3368f2c5a5a/exec-73ad7c74-6f7f-4101-861d-dd3976abf45f.png
+Pixel size: 1254x1254 (tool output; preserved without resizing)
+Exact prompt:
+Edit Image 1 only. Image 1 is the 1024x1024 construction drawing paint-over target. Image 2 is a registered black-and-white paint mask of the exact same frame: WHITE is the only permitted painting area; BLACK must remain exactly unchanged. Output ONE image at 1024x1024, with identical canvas and framing. Do not output the mask.
+
+Paint only the existing low concrete cross-wall running diagonally from the foot of the left pier to the right edge. Preserve every measured silhouette, edge, line, joint, dot, bolt, position and size exactly. This is surface material painting only, not redesign. Leave the flat dark grey outer field, wet corridor floor, door and pier, plant room dry floor, machine and plinth exactly as in Image 1. Preserve the drawing's existing dark/mid/light value plan; do not brighten or darken whole areas.
+
+The long tall corridor-facing face is cool mid-dark grey matte cast-in-place, form-finished concrete: subtle faint horizontal formwork board lines, a few tiny air holes, and restrained slight tonal variation. Its bottom strip where it meets the wet floor is damp darker concrete fading gently upward from capillary moisture, without drips. Preserve the existing small row of plugged form-tie holes as small slightly darker grout plugs, at their exact positions. Preserve the two thin vertical formed control joints exactly.
+The narrower diagonal top band is trowelled concrete, slightly lighter and smoother than the face, mildly scuffed, maintaining its exact geometry and existing value.
+The existing thin light lines along both long edges of the top and along the top of the face are dull grey galvanised steel edge angles with subtly worn brighter rubbing edges. Preserve every existing dark anchor bolt head on the face's top strip exactly; add none.
+
+Grounded photographic realism for a quiet near-future hardened automated underground military defence facility. Calm large matte surfaces, concrete and galvanised steel. Match the existing light, sharpness, perspective and surroundings. Wear only where use and water would cause it. No grunge speckle, drip streaks, rust spots, extra bolts or rivets, greebles, glowing seams, sci-fi panels, rim light or haze. No text, letters, numbers, logos, labels, symbols, writing, UI, watermarks, guide lines or borders anywhere. Do not add, remove, move, resize, reshape, rotate or invent any part. Everything under BLACK in Image 2 must remain unchanged. Preserve all image metadata and C2PA content credentials; do not strip metadata.

@@ -7,9 +7,9 @@ extends Node2D
 ## can turn. Its hub sits WHEEL_OFFSET from the gameplay point (Main's BYPASS_WHEEL), under the hand
 ## of the engineer's crank pose. A row of crank lights along the bottom of its name plate, above the
 ## head of the engineer cranking it and clear of WOLF beside them, counts the held-USE ticks. It also carries the relay's
-## COOLANT FAULT tag, until WOLF takes the surge or the bypass locks over, and the coolant that hisses
-## from the housing while the bypass is cranked. A plate
-## the edge of the view cuts fades out, as in the junction. Main owns the rules; this only shows them.
+## COOLANT FAULT tag, until WOLF takes the surge or the bypass locks over, and the coolant that jets
+## from the relay's relief valve while the bypass is cranked. A plate the edge of the view cuts fades
+## out, as in the junction. Main owns the rules; this only shows them.
 
 ## Crank lights in the readout, one per held-USE tick.
 const TICKS_NEEDED: int = 8
@@ -58,8 +58,11 @@ const LEADER_END_Y: float = -14.0
 const LEADER_WIDTH: float = 1.0
 ## The COOLANT FAULT tag sits under the COOLANT RELAY name, centred on the relay.
 const FAULT_TAG_TOP: float = 331.0
-## Where the coolant leaks from the relay's housing, from the wheel's centre.
-const HISS_OFFSET: Vector2 = Vector2(-56.0, 1.0)
+## The open end of the relief valve's discharge pipe, painted on the relay art (art px (352.5, 337)
+## at its 0.25 scale): the valve stands on the crown of the relay's side pipe, and its tailpipe is
+## carried down the relay's side in two clamps to a safe point 0.44 m above the floor, away from the
+## engineer's hands and face at the wheel. The coolant sprays from here, down onto the floor.
+const RELIEF_OUTLET: Vector2 = Vector2(649.75, 422.25)
 ## The fault tag pulses with the alarm while the bypass vents.
 const PULSE_SECONDS: float = 1.1
 ## How long the COOLANT FAULT tag takes to fade once the relay is dealt with.
@@ -83,7 +86,8 @@ var done: bool = false:
 	set(value):
 		done = value
 		readout.queue_redraw()
-## Coolant hissing from the housing while the bypass is cranked; the fault tag pulses with the alarm.
+## Coolant jetting from the relief valve while the bypass is cranked; the fault tag pulses with the
+## alarm.
 var venting: bool = false:
 	set(value):
 		venting = value
@@ -127,22 +131,16 @@ func _init() -> void:
 	readout.draw.connect(_draw_readout)
 	bypass_label.add_child(readout)
 	fault_tag = _plate("CoolantFaultTag", "COOLANT FAULT", FAULT_TEXT, FAULT_EDGE)
-	coolant_hiss = FxPresets.steam()
-	coolant_hiss.amount = 24
-	coolant_hiss.lifetime = 0.75
-	coolant_hiss.direction = Vector2(0.6, -1.0)
-	coolant_hiss.spread = 25.0
-	coolant_hiss.initial_velocity_min = 25.0
-	coolant_hiss.initial_velocity_max = 45.0
-	coolant_hiss.scale_amount_min = 4.0
-	coolant_hiss.scale_amount_max = 7.0
-	FxPresets.place(coolant_hiss, self, "CoolantHiss", HISS_OFFSET)
+	coolant_hiss = FxPresets.relief_jet()
+	# place() moves it onto the relief valve's outlet once the wheel's centre is known.
+	FxPresets.place(coolant_hiss, self, "CoolantHiss", Vector2.ZERO)
 
 
 ## Places the handle with its wheel at [param wheel_centre] and the COOLANT FAULT tag centred on
-## [param relay_x].
+## [param relay_x]; the coolant jet sits on the relief valve's outlet.
 func place(wheel_centre: Vector2, relay_x: float) -> void:
 	position = wheel_centre
+	coolant_hiss.position = RELIEF_OUTLET - wheel_centre
 	_relay_x = relay_x
 	# The tag grows upward too, over the relay's name, which main lifts by as much (fault_tag_growth).
 	fault_tag.position = Vector2(relay_x - wheel_centre.x - fault_tag.size.x * 0.5, FAULT_TAG_TOP - wheel_centre.y - fault_tag_growth())

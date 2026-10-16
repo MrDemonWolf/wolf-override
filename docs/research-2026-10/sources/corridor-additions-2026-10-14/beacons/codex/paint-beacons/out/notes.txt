@@ -1,0 +1,38 @@
+Output file: beacons-painted.png
+Original generated file: ~/.codex/generated_images/01a1335e-53be-7ca3-bac0-059cf4b5a18d/exec-23ac6a3d-4891-4fd5-b4ae-20482ff74d93.png
+SHA256 (shasum -a 256): 06c89478d1b3c428cc51119b42215e0a7ff853fac02c37c5e262138128161b27
+Pixel size: 1254 x 1254
+Tool: built-in image_gen, edit mode, with both attached reference images
+Copy verification: cp used; cmp returned exit code 0; original and copied file SHA256 hashes match. All original file bytes and metadata are preserved.
+
+Limitation: The built-in tool returned 1254 x 1254 despite the exact 1024 x 1024 prompt. The requested pixel size is unmet. No resizing, cropping, re-encoding, metadata editing, or other post-processing was performed. Exact pixel-for-pixel geometry and mask adherence were not independently verified.
+
+Exact prompt text:
+Use case: sketch-to-render. EDIT the first attached image; produce exactly ONE 1024x1024 PNG with the identical canvas, framing, composition, and geometry.
+
+INPUT ROLES:
+Image 1, refs/1-edit-target-beacons.png, is the EDIT TARGET, a measured construction drawing of two wall-mounted industrial warning lamps at 16x magnification.
+Image 2, refs/2-areas-to-paint.png, is ONLY a paint-region map of that exact frame: WHITE indicates the fixture surfaces you may paint. BLACK is protected. Do not render the black-and-white map as artwork.
+
+THIS IS A STRICT SURFACE PAINT-OVER. Every silhouette, edge, line, joint, bolt, bar, groove, and part must stay exactly where drawn, at exactly its existing size and shape. Do not add, remove, move, resize, reshape, rotate, reinterpret, or invent any part. Keep the same straight-on view. Paint strictly inside the WHITE areas of Image 2. Keep everything under BLACK unchanged, including the walls, the thin pipe above the left lamp, and the existing grey frame and divider. Any existing conduit-hub portion outside the white mask must remain unchanged. Preserve the existing borders; add no new borders or guide lines. No geometry redesign, no perspective change.
+
+LOOK:
+Grounded photographic realism for a near-future hardened military installation run by automated systems: matte cast metal, painted steel, and thick moulded red glass, built and lit like real hardware in an underground defence facility photographed once. The fixture is a hazardous-location LED luminaire, an explosion-proof jelly-jar product with a red glass globe, cast guard, and cast aluminium wall bracket. Add realistic material response within the existing shapes, without altering the drawing.
+
+VALUE AND LIGHT PLAN:
+Preserve which areas are dark, mid, and light in Image 1. The left panel is a dark, dimly lit wall: keep its fixture dark and quiet, with restrained surface detail and very subdued highlights. The right panel sits directly beneath an existing cool ceiling light: its upward-facing surfaces catch that light while recesses stay dark. Do not brighten both fixtures equally. The internal red light is steady; preserve the drawn bright core's exact position and its falloff to deep red at the globe's edges. No light outside the glass globe.
+
+PAINT EACH EXISTING PART:
+1. The rounded rectangular wall-bracket plate, its two existing round anchor bolt heads near the upper corners, and the existing short conduit hub wherever inside the white region: dark gunship-grey painted cast aluminium, nominal #5B5E6A in good light but much darker here, matte with subtle rough cast texture, crisp unchanged edges, faint chipped paint on the top corners only. Do not add bolt slots, screws, rivets, or hardware.
+2. The existing rounded boss beneath the bolts is the front end of the bracket arm: the same cast grey, its existing top edge catching a restrained overhead highlight.
+3. The existing flared housing with exactly three horizontal grooves is a finned cast-aluminium LED driver housing: the same grey paint, the grooves remain precisely the existing dark gaps between cooling fins, with the existing top chamfer catching overhead light. No extra fins or grooves.
+4. The existing narrow band immediately beneath the housing is a threaded steel guard collar: darker, subtly oily, with the existing silhouette unchanged. Do not invent visible parts or enlarge the band.
+5. The existing red shape is a thick red heat- and impact-resistant GLASS globe, steadily illuminated from an internal LED module. Preserve the drawn central bright red core and deep red edge values. Add faint vertical prism ribbing INSIDE the glass, subtle thickness and transmission, and a soft reflection of the cool ceiling light on the upper shoulder, particularly on the right fixture. No exaggerated or emoji-like gloss, no white-hot core, no outer glow, and no bloom beyond the drawn glass shape.
+6. The existing dark vertical guard bars, horizontal middle ring, curved lower guard, small foot ring, and drain boss are matte dark-grey painted cast steel. Keep exactly the existing number, width, curvature, location, connections, and occlusions of the bars and rings. Suggest round cross-sections by surface shading only, with a thin subdued top-facing highlight and a faint red tint on the faces turned toward the globe. Keep the left guard substantially darker than the right.
+
+ABSOLUTE EXCLUSIONS:
+No text, letters, numbers, logos, labels, signs, UI, watermarks, new borders, or guide lines anywhere. No grunge speckle, drip streaks, rust spots, added rivets, bolts, screws, greebles, glowing seams, sci-fi parts, bright edge rim light, lens flare, haze, light rays, or added external red glow. Wear only where actual use would cause it, limited to the faint top-corner chips requested. No new detail that changes an edge or part. No scene redesign.
+
+OUTPUT:
+One opaque 1024x1024 PNG paint-over of Image 1, same framing. Only WHITE-map fixture surfaces are painted. Retain all original tool-generated metadata and C2PA content credentials, including the caBX chunk; do not strip, clean, resize, crop, convert, re-encode, optimise, or otherwise alter the generated file.
+

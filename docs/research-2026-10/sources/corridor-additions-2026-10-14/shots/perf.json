@@ -1,0 +1,2936 @@
+{
+ "main": {
+  "s1-door-end-rest": {
+   "additive_items_on_screen": 8,
+   "door_open_after": false,
+   "draw_calls_max": 72,
+   "draw_calls_p50": 72,
+   "frame_ms_mean": 261.520293333333,
+   "frame_ms_p50": 254.331,
+   "frame_ms_p99": 464.99,
+   "frames": 300,
+   "fullscreen_canvaslayer_list": [
+    "/root/Main/PostProcess/Grade",
+    "/root/Main/CanvasLayer/IntroAlarm",
+    "/root/Main/CanvasLayer/IntroFade"
+   ],
+   "fullscreen_canvaslayer_quads": 3,
+   "fullscreen_list": [
+    "/root/Main/CorridorDepth/Backdrop/Haze 0.75",
+    "/root/Main/CorridorDepth/MidPlate/Painting 1.00"
+   ],
+   "fullscreen_translucent_layers": 2,
+   "nodes": 437.0,
+   "objects": 233.0,
+   "overdraw_estimate": 3.60399762989562,
+   "particles_emitting": 2,
+   "primitives": 2604.0,
+   "render_cpu_ms_p50": 1.27499997615814,
+   "slug": "s1-door-end-rest",
+   "texture_mem_mb": 71.9692945480347,
+   "translucent_items_on_screen": 29,
+   "video_mem_mb": 78.347861289978
+  },
+  "s2-relay-wolf": {
+   "additive_items_on_screen": 8,
+   "door_open_after": true,
+   "draw_calls_max": 77,
+   "draw_calls_p50": 77,
+   "frame_ms_mean": 267.16913,
+   "frame_ms_p50": 260.971,
+   "frame_ms_p99": 523.884,
+   "frames": 300,
+   "fullscreen_canvaslayer_list": [
+    "/root/Main/PostProcess/Grade",
+    "/root/Main/CanvasLayer/IntroAlarm",
+    "/root/Main/CanvasLayer/IntroFade"
+   ],
+   "fullscreen_canvaslayer_quads": 3,
+   "fullscreen_list": [
+    "/root/Main/CorridorDepth/Backdrop/Haze 0.75",
+    "/root/Main/CorridorDepth/MidPlate/Painting 1.00"
+   ],
+   "fullscreen_translucent_layers": 2,
+   "nodes": 437.0,
+   "objects": 210.0,
+   "overdraw_estimate": 3.58802121574496,
+   "particles_emitting": 2,
+   "primitives": 2559.0,
+   "render_cpu_ms_p50": 110.365997314453,
+   "slug": "s2-relay-wolf",
+   "texture_mem_mb": 76.6555738449097,
+   "translucent_items_on_screen": 30,
+   "video_mem_mb": 83.0343999862671
+  },
+  "s4-door-opening": {
+   "additive_items_on_screen": 8,
+   "door_open_after": true,
+   "draw_calls_max": 73,
+   "draw_calls_p50": 73,
+   "frame_ms_mean": 241.989086666667,
+   "frame_ms_p50": 232.241,
+   "frame_ms_p99": 522.632,
+   "frames": 300,
+   "fullscreen_canvaslayer_list": [
+    "/root/Main/PostProcess/Grade",
+    "/root/Main/CanvasLayer/IntroAlarm",
+    "/root/Main/CanvasLayer/IntroFade"
+   ],
+   "fullscreen_canvaslayer_quads": 3,
+   "fullscreen_list": [
+    "/root/Main/CorridorDepth/Backdrop/Haze 0.75",
+    "/root/Main/CorridorDepth/MidPlate/Painting 1.00"
+   ],
+   "fullscreen_translucent_layers": 2,
+   "nodes": 437.0,
+   "objects": 210.0,
+   "overdraw_estimate": 3.61213895632897,
+   "particles_emitting": 2,
+   "primitives": 2559.0,
+   "render_cpu_ms_p50": 101.31600189209,
+   "slug": "s4-door-opening",
+   "texture_mem_mb": 76.6555738449097,
+   "translucent_items_on_screen": 30,
+   "video_mem_mb": 83.0343999862671
+  },
+  "s4b-leaf-moving": {
+   "additive_items_on_screen": 8,
+   "door_open_after": true,
+   "draw_calls_max": 73,
+   "draw_calls_p50": 73,
+   "frame_ms_mean": 165.954766666667,
+   "frame_ms_p50": 162.952,
+   "frame_ms_p99": 224.797,
+   "frames": 300,
+   "fullscreen_canvaslayer_list": [
+    "/root/Main/PostProcess/Grade",
+    "/root/Main/CanvasLayer/IntroAlarm",
+    "/root/Main/CanvasLayer/IntroFade"
+   ],
+   "fullscreen_canvaslayer_quads": 3,
+   "fullscreen_list": [
+    "/root/Main/CorridorDepth/Backdrop/Haze 0.75",
+    "/root/Main/CorridorDepth/MidPlate/Painting 1.00"
+   ],
+   "fullscreen_translucent_layers": 2,
+   "nodes": 437.0,
+   "objects": 210.0,
+   "overdraw_estimate": 3.58328958205235,
+   "particles_emitting": 2,
+   "primitives": 2559.0,
+   "render_cpu_ms_p50": 71.4120025634766,
+   "slug": "s4b-leaf-moving",
+   "texture_mem_mb": 76.6555738449097,
+   "translucent_items_on_screen": 30,
+   "video_mem_mb": 83.0343999862671
+  },
+  "s5-door-open": {
+   "additive_items_on_screen": 8,
+   "door_open_after": true,
+   "draw_calls_max": 71,
+   "draw_calls_p50": 71,
+   "frame_ms_mean": 163.37394,
+   "frame_ms_p50": 157.213,
+   "frame_ms_p99": 342.981,
+   "frames": 300,
+   "fullscreen_canvaslayer_list": [
+    "/root/Main/PostProcess/Grade",
+    "/root/Main/CanvasLayer/IntroAlarm",
+    "/root/Main/CanvasLayer/IntroFade"
+   ],
+   "fullscreen_canvaslayer_quads": 3,
+   "fullscreen_list": [
+    "/root/Main/CorridorDepth/Backdrop/Haze 0.75",
+    "/root/Main/CorridorDepth/MidPlate/Painting 1.00"
+   ],
+   "fullscreen_translucent_layers": 2,
+   "nodes": 437.0,
+   "objects": 224.0,
+   "overdraw_estimate": 3.60319367491169,
+   "particles_emitting": 2,
+   "primitives": 2586.0,
+   "render_cpu_ms_p50": 2.2260000705719,
+   "slug": "s5-door-open",
+   "texture_mem_mb": 76.6555738449097,
+   "translucent_items_on_screen": 29,
+   "video_mem_mb": 83.0343999862671
+  },
+  "s6-walk-through": {
+   "additive_items_on_screen": 8,
+   "door_open_after": true,
+   "draw_calls_max": 71,
+   "draw_calls_p50": 71,
+   "frame_ms_mean": 174.677773333333,
+   "frame_ms_p50": 169.968,
+   "frame_ms_p99": 306.168,
+   "frames": 300,
+   "fullscreen_canvaslayer_list": [
+    "/root/Main/PostProcess/Grade",
+    "/root/Main/CanvasLayer/IntroAlarm",
+    "/root/Main/CanvasLayer/IntroFade"
+   ],
+   "fullscreen_canvaslayer_quads": 3,
+   "fullscreen_list": [
+    "/root/Main/CorridorDepth/Backdrop/Haze 0.75",
+    "/root/Main/CorridorDepth/MidPlate/Painting 1.00"
+   ],
+   "fullscreen_translucent_layers": 2,
+   "nodes": 437.0,
+   "objects": 224.0,
+   "overdraw_estimate": 3.56066982646047,
+   "particles_emitting": 2,
+   "primitives": 2586.0,
+   "render_cpu_ms_p50": 1.47399997711182,
+   "slug": "s6-walk-through",
+   "texture_mem_mb": 76.6555738449097,
+   "translucent_items_on_screen": 29,
+   "video_mem_mb": 83.0343999862671
+  },
+  "s7-safe-point": {
+   "additive_items_on_screen": 8,
+   "door_open_after": true,
+   "draw_calls_max": 75,
+   "draw_calls_p50": 71,
+   "frame_ms_mean": 194.321226666667,
+   "frame_ms_p50": 190.375,
+   "frame_ms_p99": 372.306,
+   "frames": 300,
+   "fullscreen_canvaslayer_list": [
+    "/root/Main/PostProcess/Grade",
+    "/root/Main/CanvasLayer/IntroAlarm",
+    "/root/Main/CanvasLayer/IntroFade"
+   ],
+   "fullscreen_canvaslayer_quads": 3,
+   "fullscreen_list": [
+    "/root/Main/CorridorDepth/Backdrop/Haze 0.75",
+    "/root/Main/CorridorDepth/MidPlate/Painting 1.00"
+   ],
+   "fullscreen_translucent_layers": 2,
+   "nodes": 437.0,
+   "objects": 275.0,
+   "overdraw_estimate": 3.55484697671584,
+   "particles_emitting": 2,
+   "primitives": 2688.0,
+   "render_cpu_ms_p50": 2.52300000190735,
+   "slug": "s7-safe-point",
+   "texture_mem_mb": 76.6555738449097,
+   "translucent_items_on_screen": 26,
+   "video_mem_mb": 83.0343999862671
+  },
+  "s3-bypass-crank": {
+   "additive_items_on_screen": 9,
+   "door_open_after": false,
+   "draw_calls_max": 73,
+   "draw_calls_p50": 73,
+   "frame_ms_mean": 160.224786666667,
+   "frame_ms_p50": 155.898,
+   "frame_ms_p99": 240.25,
+   "frames": 300,
+   "fullscreen_canvaslayer_list": [
+    "/root/Main/PostProcess/Grade",
+    "/root/Main/CanvasLayer/IntroAlarm",
+    "/root/Main/CanvasLayer/IntroFade"
+   ],
+   "fullscreen_canvaslayer_quads": 3,
+   "fullscreen_list": [
+    "/root/Main/CorridorDepth/Backdrop/Haze 0.75",
+    "/root/Main/CorridorDepth/MidPlate/Painting 1.00"
+   ],
+   "fullscreen_translucent_layers": 2,
+   "nodes": 437.0,
+   "objects": 217.0,
+   "overdraw_estimate": 3.59663922969206,
+   "particles_emitting": 3,
+   "primitives": 2618.0,
+   "render_cpu_ms_p50": 2.6340000629425,
+   "slug": "s3-bypass-crank",
+   "texture_mem_mb": 71.9692945480347,
+   "translucent_items_on_screen": 30,
+   "video_mem_mb": 78.347861289978
+  }
+ },
+ "round6": {
+  "s1-door-end-rest": {
+   "additive_items_on_screen": 7,
+   "door_open_after": false,
+   "draw_calls_max": 54,
+   "draw_calls_p50": 54,
+   "frame_ms_mean": 235.72126,
+   "frame_ms_p50": 233.845,
+   "frame_ms_p99": 424.931,
+   "frames": 300,
+   "fullscreen_canvaslayer_list": [
+    "/root/Main/PostProcess/Grade"
+   ],
+   "fullscreen_canvaslayer_quads": 1,
+   "fullscreen_list": [
+    "/root/Main/CorridorDepth/Backdrop/Haze 0.62",
+    "/root/Main/CorridorDepth/MidPlate/Painting 1.00"
+   ],
+   "fullscreen_translucent_layers": 2,
+   "nodes": 433.0,
+   "objects": 215.0,
+   "overdraw_estimate": 3.53708060370551,
+   "particles_emitting": 0,
+   "primitives": 2354.0,
+   "render_cpu_ms_p50": 1.28999996185303,
+   "slug": "s1-door-end-rest",
+   "texture_mem_mb": 73.8675870895386,
+   "translucent_items_on_screen": 26,
+   "video_mem_mb": 80.2430868148804
+  },
+  "s2-relay-wolf": {
+   "additive_items_on_screen": 7,
+   "door_open_after": true,
+   "draw_calls_max": 60,
+   "draw_calls_p50": 60,
+   "frame_ms_mean": 228.841986666667,
+   "frame_ms_p50": 221.16,
+   "frame_ms_p99": 454.313,
+   "frames": 300,
+   "fullscreen_canvaslayer_list": [
+    "/root/Main/PostProcess/Grade"
+   ],
+   "fullscreen_canvaslayer_quads": 1,
+   "fullscreen_list": [
+    "/root/Main/CorridorDepth/Backdrop/Haze 0.62",
+    "/root/Main/CorridorDepth/MidPlate/Painting 1.00"
+   ],
+   "fullscreen_translucent_layers": 2,
+   "nodes": 433.0,
+   "objects": 192.0,
+   "overdraw_estimate": 3.46554054589919,
+   "particles_emitting": 0,
+   "primitives": 2450.0,
+   "render_cpu_ms_p50": 1.25399994850159,
+   "slug": "s2-relay-wolf",
+   "texture_mem_mb": 73.8675870895386,
+   "translucent_items_on_screen": 26,
+   "video_mem_mb": 80.2476682662964
+  },
+  "s4-door-opening": {
+   "additive_items_on_screen": 7,
+   "door_open_after": true,
+   "draw_calls_max": 56,
+   "draw_calls_p50": 56,
+   "frame_ms_mean": 216.977153333333,
+   "frame_ms_p50": 210.89,
+   "frame_ms_p99": 456.553,
+   "frames": 300,
+   "fullscreen_canvaslayer_list": [
+    "/root/Main/PostProcess/Grade"
+   ],
+   "fullscreen_canvaslayer_quads": 1,
+   "fullscreen_list": [
+    "/root/Main/CorridorDepth/Backdrop/Haze 0.62",
+    "/root/Main/CorridorDepth/MidPlate/Painting 1.00"
+   ],
+   "fullscreen_translucent_layers": 2,
+   "nodes": 433.0,
+   "objects": 192.0,
+   "overdraw_estimate": 3.4896582864832,
+   "particles_emitting": 0,
+   "primitives": 2370.0,
+   "render_cpu_ms_p50": 1.06599998474121,
+   "slug": "s4-door-opening",
+   "texture_mem_mb": 73.8675870895386,
+   "translucent_items_on_screen": 26,
+   "video_mem_mb": 80.245379447937
+  },
+  "s4b-leaf-moving": {
+   "additive_items_on_screen": 7,
+   "door_open_after": true,
+   "draw_calls_max": 56,
+   "draw_calls_p50": 56,
+   "frame_ms_mean": 190.971473333333,
+   "frame_ms_p50": 186.042,
+   "frame_ms_p99": 364.599,
+   "frames": 300,
+   "fullscreen_canvaslayer_list": [
+    "/root/Main/PostProcess/Grade"
+   ],
+   "fullscreen_canvaslayer_quads": 1,
+   "fullscreen_list": [
+    "/root/Main/CorridorDepth/Backdrop/Haze 0.62",
+    "/root/Main/CorridorDepth/MidPlate/Painting 1.00"
+   ],
+   "fullscreen_translucent_layers": 2,
+   "nodes": 433.0,
+   "objects": 192.0,
+   "overdraw_estimate": 3.46080891220658,
+   "particles_emitting": 0,
+   "primitives": 2338.0,
+   "render_cpu_ms_p50": 0.925000011920929,
+   "slug": "s4b-leaf-moving",
+   "texture_mem_mb": 73.8675870895386,
+   "translucent_items_on_screen": 26,
+   "video_mem_mb": 80.2444639205933
+  },
+  "s5-door-open": {
+   "additive_items_on_screen": 7,
+   "door_open_after": true,
+   "draw_calls_max": 54,
+   "draw_calls_p50": 54,
+   "frame_ms_mean": 192.70407,
+   "frame_ms_p50": 186.059,
+   "frame_ms_p99": 376.825,
+   "frames": 300,
+   "fullscreen_canvaslayer_list": [
+    "/root/Main/PostProcess/Grade"
+   ],
+   "fullscreen_canvaslayer_quads": 1,
+   "fullscreen_list": [
+    "/root/Main/CorridorDepth/Backdrop/Haze 0.62",
+    "/root/Main/CorridorDepth/MidPlate/Painting 1.00"
+   ],
+   "fullscreen_translucent_layers": 2,
+   "nodes": 433.0,
+   "objects": 207.0,
+   "overdraw_estimate": 3.48906349040844,
+   "particles_emitting": 0,
+   "primitives": 2338.0,
+   "render_cpu_ms_p50": 0.935000002384186,
+   "slug": "s5-door-open",
+   "texture_mem_mb": 73.8675870895386,
+   "translucent_items_on_screen": 26,
+   "video_mem_mb": 80.2432737350464
+  },
+  "s6-walk-through": {
+   "additive_items_on_screen": 7,
+   "door_open_after": true,
+   "draw_calls_max": 54,
+   "draw_calls_p50": 54,
+   "frame_ms_mean": 193.718983333333,
+   "frame_ms_p50": 187.846,
+   "frame_ms_p99": 412.689,
+   "frames": 300,
+   "fullscreen_canvaslayer_list": [
+    "/root/Main/PostProcess/Grade"
+   ],
+   "fullscreen_canvaslayer_quads": 1,
+   "fullscreen_list": [
+    "/root/Main/CorridorDepth/Backdrop/Haze 0.62",
+    "/root/Main/CorridorDepth/MidPlate/Painting 1.00"
+   ],
+   "fullscreen_translucent_layers": 2,
+   "nodes": 433.0,
+   "objects": 207.0,
+   "overdraw_estimate": 3.44653964195722,
+   "particles_emitting": 0,
+   "primitives": 2338.0,
+   "render_cpu_ms_p50": 1.05499994754791,
+   "slug": "s6-walk-through",
+   "texture_mem_mb": 73.8675870895386,
+   "translucent_items_on_screen": 26,
+   "video_mem_mb": 80.2432737350464
+  },
+  "s7-safe-point": {
+   "additive_items_on_screen": 7,
+   "door_open_after": true,
+   "draw_calls_max": 58,
+   "draw_calls_p50": 54,
+   "frame_ms_mean": 201.597596666667,
+   "frame_ms_p50": 191.114,
+   "frame_ms_p99": 485.812,
+   "frames": 300,
+   "fullscreen_canvaslayer_list": [
+    "/root/Main/PostProcess/Grade"
+   ],
+   "fullscreen_canvaslayer_quads": 1,
+   "fullscreen_list": [
+    "/root/Main/CorridorDepth/Backdrop/Haze 0.62",
+    "/root/Main/CorridorDepth/MidPlate/Painting 1.00"
+   ],
+   "fullscreen_translucent_layers": 2,
+   "nodes": 433.0,
+   "objects": 258.0,
+   "overdraw_estimate": 3.44071679221259,
+   "particles_emitting": 0,
+   "primitives": 2440.0,
+   "render_cpu_ms_p50": 1.00800001621246,
+   "slug": "s7-safe-point",
+   "texture_mem_mb": 73.8675870895386,
+   "translucent_items_on_screen": 23,
+   "video_mem_mb": 80.2432737350464
+  },
+  "s3-bypass-crank": {
+   "additive_items_on_screen": 7,
+   "door_open_after": false,
+   "draw_calls_max": 55,
+   "draw_calls_p50": 55,
+   "frame_ms_mean": 208.226943333333,
+   "frame_ms_p50": 200.979,
+   "frame_ms_p99": 454.637,
+   "frames": 300,
+   "fullscreen_canvaslayer_list": [
+    "/root/Main/PostProcess/Grade"
+   ],
+   "fullscreen_canvaslayer_quads": 1,
+   "fullscreen_list": [
+    "/root/Main/CorridorDepth/Backdrop/Haze 0.62",
+    "/root/Main/CorridorDepth/MidPlate/Painting 1.00"
+   ],
+   "fullscreen_translucent_layers": 2,
+   "nodes": 433.0,
+   "objects": 199.0,
+   "overdraw_estimate": 3.52645162864968,
+   "particles_emitting": 1,
+   "primitives": 2368.0,
+   "render_cpu_ms_p50": 0.90200001001358,
+   "slug": "s3-bypass-crank",
+   "texture_mem_mb": 73.8675870895386,
+   "translucent_items_on_screen": 26,
+   "video_mem_mb": 80.2430868148804
+  }
+ },
+ "round7": {
+  "s1-door-end-rest": {
+   "additive_items_on_screen": 7,
+   "draw_calls_max": 47,
+   "draw_calls_p50": 47,
+   "frame_ms_mean": 145.497813333333,
+   "frame_ms_p50": 143.402,
+   "frame_ms_p99": 194.745,
+   "frames": 300,
+   "fullscreen_canvaslayer_list": [
+    "/root/Main/PostProcess/Grade"
+   ],
+   "fullscreen_canvaslayer_quads": 1,
+   "fullscreen_list": [
+    "/root/Main/CorridorDepth/Backdrop/Haze 0.62",
+    "/root/Main/CorridorDepth/MidPlate/Painting 1.00"
+   ],
+   "fullscreen_translucent_layers": 2,
+   "nodes": 434.0,
+   "objects": 211.0,
+   "overdraw_estimate": 3.45868997927065,
+   "particles_emitting": 0,
+   "primitives": 2338.0,
+   "render_cpu_ms_p50": 0.906000018119812,
+   "slug": "s1-door-end-rest",
+   "texture_mem_mb": 74.3794813156128,
+   "translucent_items_on_screen": 26,
+   "video_mem_mb": 80.7541570663452
+  },
+  "s2-relay-wolf": {
+   "additive_items_on_screen": 7,
+   "draw_calls_max": 54,
+   "draw_calls_p50": 54,
+   "frame_ms_mean": 140.28315,
+   "frame_ms_p50": 142.418,
+   "frame_ms_p99": 208.006,
+   "frames": 300,
+   "fullscreen_canvaslayer_list": [
+    "/root/Main/PostProcess/Grade"
+   ],
+   "fullscreen_canvaslayer_quads": 1,
+   "fullscreen_list": [
+    "/root/Main/CorridorDepth/Backdrop/Haze 0.62",
+    "/root/Main/CorridorDepth/MidPlate/Painting 1.00"
+   ],
+   "fullscreen_translucent_layers": 2,
+   "nodes": 434.0,
+   "objects": 189.0,
+   "overdraw_estimate": 3.38714992146433,
+   "particles_emitting": 0,
+   "primitives": 2578.0,
+   "render_cpu_ms_p50": 1.04999995231628,
+   "slug": "s2-relay-wolf",
+   "texture_mem_mb": 74.3794813156128,
+   "translucent_items_on_screen": 26,
+   "video_mem_mb": 80.7634077072144
+  },
+  "s4-door-opening": {
+   "additive_items_on_screen": 7,
+   "draw_calls_max": 50,
+   "draw_calls_p50": 50,
+   "frame_ms_mean": 107.579966666667,
+   "frame_ms_p50": 101.706,
+   "frame_ms_p99": 180.93,
+   "frames": 300,
+   "fullscreen_canvaslayer_list": [
+    "/root/Main/PostProcess/Grade"
+   ],
+   "fullscreen_canvaslayer_quads": 1,
+   "fullscreen_list": [
+    "/root/Main/CorridorDepth/Backdrop/Haze 0.62",
+    "/root/Main/CorridorDepth/MidPlate/Painting 1.00"
+   ],
+   "fullscreen_translucent_layers": 2,
+   "nodes": 434.0,
+   "objects": 189.0,
+   "overdraw_estimate": 3.41126766204834,
+   "particles_emitting": 0,
+   "primitives": 2466.0,
+   "render_cpu_ms_p50": 1.35099995136261,
+   "slug": "s4-door-opening",
+   "texture_mem_mb": 74.3794813156128,
+   "translucent_items_on_screen": 26,
+   "video_mem_mb": 80.7602033615112
+  },
+  "s4b-leaf-moving": {
+   "additive_items_on_screen": 7,
+   "draw_calls_max": 50,
+   "draw_calls_p50": 50,
+   "frame_ms_mean": 125.970686666667,
+   "frame_ms_p50": 122.585,
+   "frame_ms_p99": 240.772,
+   "frames": 300,
+   "fullscreen_canvaslayer_list": [
+    "/root/Main/PostProcess/Grade"
+   ],
+   "fullscreen_canvaslayer_quads": 1,
+   "fullscreen_list": [
+    "/root/Main/CorridorDepth/Backdrop/Haze 0.62",
+    "/root/Main/CorridorDepth/MidPlate/Painting 1.00"
+   ],
+   "fullscreen_translucent_layers": 2,
+   "nodes": 434.0,
+   "objects": 189.0,
+   "overdraw_estimate": 3.38241828777172,
+   "particles_emitting": 0,
+   "primitives": 2386.0,
+   "render_cpu_ms_p50": 1.192999958992,
+   "slug": "s4b-leaf-moving",
+   "texture_mem_mb": 74.3794813156128,
+   "translucent_items_on_screen": 26,
+   "video_mem_mb": 80.7579145431519
+  },
+  "s5-door-open": {
+   "additive_items_on_screen": 7,
+   "draw_calls_max": 47,
+   "draw_calls_p50": 47,
+   "frame_ms_mean": 119.200076666667,
+   "frame_ms_p50": 117.326,
+   "frame_ms_p99": 169.824,
+   "frames": 300,
+   "fullscreen_canvaslayer_list": [
+    "/root/Main/PostProcess/Grade"
+   ],
+   "fullscreen_canvaslayer_quads": 1,
+   "fullscreen_list": [
+    "/root/Main/CorridorDepth/Backdrop/Haze 0.62",
+    "/root/Main/CorridorDepth/MidPlate/Painting 1.00"
+   ],
+   "fullscreen_translucent_layers": 2,
+   "nodes": 434.0,
+   "objects": 203.0,
+   "overdraw_estimate": 3.41067286597358,
+   "particles_emitting": 0,
+   "primitives": 2322.0,
+   "render_cpu_ms_p50": 0.939000010490417,
+   "slug": "s5-door-open",
+   "texture_mem_mb": 74.3794813156128,
+   "translucent_items_on_screen": 26,
+   "video_mem_mb": 80.7543439865112
+  },
+  "s6-walk-through": {
+   "additive_items_on_screen": 7,
+   "draw_calls_max": 47,
+   "draw_calls_p50": 47,
+   "frame_ms_mean": 117.90489,
+   "frame_ms_p50": 117.018,
+   "frame_ms_p99": 166.344,
+   "frames": 300,
+   "fullscreen_canvaslayer_list": [
+    "/root/Main/PostProcess/Grade"
+   ],
+   "fullscreen_canvaslayer_quads": 1,
+   "fullscreen_list": [
+    "/root/Main/CorridorDepth/Backdrop/Haze 0.62",
+    "/root/Main/CorridorDepth/MidPlate/Painting 1.00"
+   ],
+   "fullscreen_translucent_layers": 2,
+   "nodes": 434.0,
+   "objects": 203.0,
+   "overdraw_estimate": 3.36814901752236,
+   "particles_emitting": 0,
+   "primitives": 2322.0,
+   "render_cpu_ms_p50": 1.05299997329712,
+   "slug": "s6-walk-through",
+   "texture_mem_mb": 74.3794813156128,
+   "translucent_items_on_screen": 26,
+   "video_mem_mb": 80.7543439865112
+  },
+  "s7-safe-point": {
+   "additive_items_on_screen": 7,
+   "draw_calls_max": 50,
+   "draw_calls_p50": 46,
+   "frame_ms_mean": 122.084696666667,
+   "frame_ms_p50": 118.756,
+   "frame_ms_p99": 213.95,
+   "frames": 300,
+   "fullscreen_canvaslayer_list": [
+    "/root/Main/PostProcess/Grade"
+   ],
+   "fullscreen_canvaslayer_quads": 1,
+   "fullscreen_list": [
+    "/root/Main/CorridorDepth/Backdrop/Haze 0.62",
+    "/root/Main/CorridorDepth/MidPlate/Painting 1.00"
+   ],
+   "fullscreen_translucent_layers": 2,
+   "nodes": 434.0,
+   "objects": 254.0,
+   "overdraw_estimate": 3.36232616777773,
+   "particles_emitting": 0,
+   "primitives": 2424.0,
+   "render_cpu_ms_p50": 1.33800005912781,
+   "slug": "s7-safe-point",
+   "texture_mem_mb": 74.3794813156128,
+   "translucent_items_on_screen": 23,
+   "video_mem_mb": 80.7543439865112
+  },
+  "s3-bypass-crank": {
+   "additive_items_on_screen": 7,
+   "draw_calls_max": 57,
+   "draw_calls_p50": 51,
+   "frame_ms_mean": 134.887633333333,
+   "frame_ms_p50": 126.852,
+   "frame_ms_p99": 300.461,
+   "frames": 300,
+   "fullscreen_canvaslayer_list": [
+    "/root/Main/PostProcess/Grade"
+   ],
+   "fullscreen_canvaslayer_quads": 1,
+   "fullscreen_list": [
+    "/root/Main/CorridorDepth/Backdrop/Haze 0.62",
+    "/root/Main/CorridorDepth/MidPlate/Painting 1.00"
+   ],
+   "fullscreen_translucent_layers": 2,
+   "nodes": 434.0,
+   "objects": 222.0,
+   "overdraw_estimate": 3.39782282558488,
+   "particles_emitting": 0,
+   "primitives": 2360.0,
+   "render_cpu_ms_p50": 1.93400001525879,
+   "slug": "s3-bypass-crank",
+   "texture_mem_mb": 74.3794813156128,
+   "translucent_items_on_screen": 26,
+   "video_mem_mb": 80.7543249130249
+  }
+ },
+ "round8": {
+  "s1-door-end-rest": {
+   "additive_items_on_screen": 7,
+   "door_open_after": false,
+   "draw_calls_max": 47,
+   "draw_calls_p50": 47,
+   "frame_ms_mean": 219.72613,
+   "frame_ms_p50": 212.103,
+   "frame_ms_p99": 466.142,
+   "frames": 300,
+   "fullscreen_canvaslayer_list": [
+    "/root/Main/PostProcess/Grade"
+   ],
+   "fullscreen_canvaslayer_quads": 1,
+   "fullscreen_list": [
+    "/root/Main/CorridorDepth/Backdrop/Haze 0.62",
+    "/root/Main/CorridorDepth/MidPlate/Painting 1.00"
+   ],
+   "fullscreen_translucent_layers": 2,
+   "nodes": 434.0,
+   "objects": 211.0,
+   "overdraw_estimate": 3.46358373100375,
+   "particles_emitting": 0,
+   "primitives": 2338.0,
+   "render_cpu_ms_p50": 0.917999982833862,
+   "slug": "s1-door-end-rest",
+   "texture_mem_mb": 74.6954374313354,
+   "translucent_items_on_screen": 26,
+   "video_mem_mb": 81.070387840271
+  },
+  "s2-relay-wolf": {
+   "additive_items_on_screen": 7,
+   "door_open_after": true,
+   "draw_calls_max": 54,
+   "draw_calls_p50": 54,
+   "frame_ms_mean": 220.53154,
+   "frame_ms_p50": 215.971,
+   "frame_ms_p99": 453.221,
+   "frames": 300,
+   "fullscreen_canvaslayer_list": [
+    "/root/Main/PostProcess/Grade"
+   ],
+   "fullscreen_canvaslayer_quads": 1,
+   "fullscreen_list": [
+    "/root/Main/CorridorDepth/Backdrop/Haze 0.62",
+    "/root/Main/CorridorDepth/MidPlate/Painting 1.00"
+   ],
+   "fullscreen_translucent_layers": 2,
+   "nodes": 434.0,
+   "objects": 189.0,
+   "overdraw_estimate": 3.39204367319743,
+   "particles_emitting": 0,
+   "primitives": 2580.0,
+   "render_cpu_ms_p50": 1.09399998188019,
+   "slug": "s2-relay-wolf",
+   "texture_mem_mb": 74.6954374313354,
+   "translucent_items_on_screen": 26,
+   "video_mem_mb": 81.0797834396362
+  },
+  "s4-door-opening": {
+   "additive_items_on_screen": 7,
+   "door_open_after": true,
+   "draw_calls_max": 50,
+   "draw_calls_p50": 50,
+   "frame_ms_mean": 196.64509,
+   "frame_ms_p50": 188.517,
+   "frame_ms_p99": 413.089,
+   "frames": 300,
+   "fullscreen_canvaslayer_list": [
+    "/root/Main/PostProcess/Grade"
+   ],
+   "fullscreen_canvaslayer_quads": 1,
+   "fullscreen_list": [
+    "/root/Main/CorridorDepth/Backdrop/Haze 0.62",
+    "/root/Main/CorridorDepth/MidPlate/Painting 1.00"
+   ],
+   "fullscreen_translucent_layers": 2,
+   "nodes": 434.0,
+   "objects": 189.0,
+   "overdraw_estimate": 3.41616141378144,
+   "particles_emitting": 0,
+   "primitives": 2468.0,
+   "render_cpu_ms_p50": 0.90200001001358,
+   "slug": "s4-door-opening",
+   "texture_mem_mb": 74.6954374313354,
+   "translucent_items_on_screen": 26,
+   "video_mem_mb": 81.0765790939331
+  },
+  "s4b-leaf-moving": {
+   "additive_items_on_screen": 7,
+   "door_open_after": true,
+   "draw_calls_max": 50,
+   "draw_calls_p50": 50,
+   "frame_ms_mean": 193.8599,
+   "frame_ms_p50": 187.129,
+   "frame_ms_p99": 394.265,
+   "frames": 300,
+   "fullscreen_canvaslayer_list": [
+    "/root/Main/PostProcess/Grade"
+   ],
+   "fullscreen_canvaslayer_quads": 1,
+   "fullscreen_list": [
+    "/root/Main/CorridorDepth/Backdrop/Haze 0.62",
+    "/root/Main/CorridorDepth/MidPlate/Painting 1.00"
+   ],
+   "fullscreen_translucent_layers": 2,
+   "nodes": 434.0,
+   "objects": 189.0,
+   "overdraw_estimate": 3.38731203950482,
+   "particles_emitting": 0,
+   "primitives": 2388.0,
+   "render_cpu_ms_p50": 0.90200001001358,
+   "slug": "s4b-leaf-moving",
+   "texture_mem_mb": 74.6954374313354,
+   "translucent_items_on_screen": 26,
+   "video_mem_mb": 81.0742902755737
+  },
+  "s5-door-open": {
+   "additive_items_on_screen": 7,
+   "door_open_after": true,
+   "draw_calls_max": 47,
+   "draw_calls_p50": 47,
+   "frame_ms_mean": 194.817823333333,
+   "frame_ms_p50": 187.981,
+   "frame_ms_p99": 370.403,
+   "frames": 300,
+   "fullscreen_canvaslayer_list": [
+    "/root/Main/PostProcess/Grade"
+   ],
+   "fullscreen_canvaslayer_quads": 1,
+   "fullscreen_list": [
+    "/root/Main/CorridorDepth/Backdrop/Haze 0.62",
+    "/root/Main/CorridorDepth/MidPlate/Painting 1.00"
+   ],
+   "fullscreen_translucent_layers": 2,
+   "nodes": 434.0,
+   "objects": 203.0,
+   "overdraw_estimate": 3.41556661770668,
+   "particles_emitting": 0,
+   "primitives": 2322.0,
+   "render_cpu_ms_p50": 0.954999983310699,
+   "slug": "s5-door-open",
+   "texture_mem_mb": 74.6954374313354,
+   "translucent_items_on_screen": 26,
+   "video_mem_mb": 81.070574760437
+  },
+  "s6-walk-through": {
+   "additive_items_on_screen": 7,
+   "door_open_after": true,
+   "draw_calls_max": 47,
+   "draw_calls_p50": 47,
+   "frame_ms_mean": 195.37222,
+   "frame_ms_p50": 184.122,
+   "frame_ms_p99": 449.942,
+   "frames": 300,
+   "fullscreen_canvaslayer_list": [
+    "/root/Main/PostProcess/Grade"
+   ],
+   "fullscreen_canvaslayer_quads": 1,
+   "fullscreen_list": [
+    "/root/Main/CorridorDepth/Backdrop/Haze 0.62",
+    "/root/Main/CorridorDepth/MidPlate/Painting 1.00"
+   ],
+   "fullscreen_translucent_layers": 2,
+   "nodes": 434.0,
+   "objects": 203.0,
+   "overdraw_estimate": 3.37304276925546,
+   "particles_emitting": 0,
+   "primitives": 2322.0,
+   "render_cpu_ms_p50": 0.856000006198883,
+   "slug": "s6-walk-through",
+   "texture_mem_mb": 74.6954374313354,
+   "translucent_items_on_screen": 26,
+   "video_mem_mb": 81.070574760437
+  },
+  "s7-safe-point": {
+   "additive_items_on_screen": 7,
+   "door_open_after": true,
+   "draw_calls_max": 50,
+   "draw_calls_p50": 46,
+   "frame_ms_mean": 194.899246666666,
+   "frame_ms_p50": 189.815,
+   "frame_ms_p99": 390.2,
+   "frames": 300,
+   "fullscreen_canvaslayer_list": [
+    "/root/Main/PostProcess/Grade"
+   ],
+   "fullscreen_canvaslayer_quads": 1,
+   "fullscreen_list": [
+    "/root/Main/CorridorDepth/Backdrop/Haze 0.62",
+    "/root/Main/CorridorDepth/MidPlate/Painting 1.00"
+   ],
+   "fullscreen_translucent_layers": 2,
+   "nodes": 434.0,
+   "objects": 254.0,
+   "overdraw_estimate": 3.38573056468257,
+   "particles_emitting": 0,
+   "primitives": 2424.0,
+   "render_cpu_ms_p50": 0.930999994277954,
+   "slug": "s7-safe-point",
+   "texture_mem_mb": 74.6954374313354,
+   "translucent_items_on_screen": 23,
+   "video_mem_mb": 81.070574760437
+  },
+  "s3-bypass-crank": {
+   "additive_items_on_screen": 7,
+   "door_open_after": false,
+   "draw_calls_max": 48,
+   "draw_calls_p50": 48,
+   "frame_ms_mean": 170.435356666667,
+   "frame_ms_p50": 167.636,
+   "frame_ms_p99": 250.828,
+   "frames": 300,
+   "fullscreen_canvaslayer_list": [
+    "/root/Main/PostProcess/Grade"
+   ],
+   "fullscreen_canvaslayer_quads": 1,
+   "fullscreen_list": [
+    "/root/Main/CorridorDepth/Backdrop/Haze 0.62",
+    "/root/Main/CorridorDepth/MidPlate/Painting 1.00"
+   ],
+   "fullscreen_translucent_layers": 2,
+   "nodes": 434.0,
+   "objects": 195.0,
+   "overdraw_estimate": 3.44728980429378,
+   "particles_emitting": 1,
+   "primitives": 2348.0,
+   "render_cpu_ms_p50": 1.28799998760223,
+   "slug": "s3-bypass-crank",
+   "texture_mem_mb": 74.6954374313354,
+   "translucent_items_on_screen": 26,
+   "video_mem_mb": 81.070387840271
+  }
+ },
+ "round9": {
+  "s1-door-end-rest": {
+   "additive_items_on_screen": 7,
+   "door_open_after": false,
+   "draw_calls_max": 47,
+   "draw_calls_p50": 47,
+   "frame_ms_mean": 118.896103333333,
+   "frame_ms_p50": 119.137,
+   "frame_ms_p99": 150.002,
+   "frames": 300,
+   "fullscreen_canvaslayer_list": [
+    "/root/Main/PostProcess/Grade"
+   ],
+   "fullscreen_canvaslayer_quads": 1,
+   "fullscreen_list": [
+    "/root/Main/CorridorDepth/Backdrop/Haze 0.62",
+    "/root/Main/CorridorDepth/MidPlate/Painting 1.00"
+   ],
+   "fullscreen_translucent_layers": 2,
+   "nodes": 434.0,
+   "objects": 211.0,
+   "overdraw_estimate": 3.46583145118054,
+   "particles_emitting": 0,
+   "primitives": 2338.0,
+   "render_cpu_ms_p50": 1.10099995136261,
+   "slug": "s1-door-end-rest",
+   "texture_mem_mb": 74.6954374313354,
+   "translucent_items_on_screen": 26,
+   "video_mem_mb": 81.070387840271
+  },
+  "s2-relay-wolf": {
+   "additive_items_on_screen": 7,
+   "door_open_after": true,
+   "draw_calls_max": 54,
+   "draw_calls_p50": 54,
+   "frame_ms_mean": 138.933286666667,
+   "frame_ms_p50": 129.126,
+   "frame_ms_p99": 300.709,
+   "frames": 300,
+   "fullscreen_canvaslayer_list": [
+    "/root/Main/PostProcess/Grade"
+   ],
+   "fullscreen_canvaslayer_quads": 1,
+   "fullscreen_list": [
+    "/root/Main/CorridorDepth/Backdrop/Haze 0.62",
+    "/root/Main/CorridorDepth/MidPlate/Painting 1.00"
+   ],
+   "fullscreen_translucent_layers": 2,
+   "nodes": 434.0,
+   "objects": 189.0,
+   "overdraw_estimate": 3.39429139337422,
+   "particles_emitting": 0,
+   "primitives": 2580.0,
+   "render_cpu_ms_p50": 1.77799999713898,
+   "slug": "s2-relay-wolf",
+   "texture_mem_mb": 74.6954374313354,
+   "translucent_items_on_screen": 26,
+   "video_mem_mb": 81.0797834396362
+  },
+  "s4-door-opening": {
+   "additive_items_on_screen": 7,
+   "door_open_after": true,
+   "draw_calls_max": 50,
+   "draw_calls_p50": 50,
+   "frame_ms_mean": 146.7458,
+   "frame_ms_p50": 146.845,
+   "frame_ms_p99": 226.801,
+   "frames": 300,
+   "fullscreen_canvaslayer_list": [
+    "/root/Main/PostProcess/Grade"
+   ],
+   "fullscreen_canvaslayer_quads": 1,
+   "fullscreen_list": [
+    "/root/Main/CorridorDepth/Backdrop/Haze 0.62",
+    "/root/Main/CorridorDepth/MidPlate/Painting 1.00"
+   ],
+   "fullscreen_translucent_layers": 2,
+   "nodes": 434.0,
+   "objects": 189.0,
+   "overdraw_estimate": 3.41840913395823,
+   "particles_emitting": 0,
+   "primitives": 2468.0,
+   "render_cpu_ms_p50": 1.03100001811981,
+   "slug": "s4-door-opening",
+   "texture_mem_mb": 74.6954374313354,
+   "translucent_items_on_screen": 26,
+   "video_mem_mb": 81.0765790939331
+  },
+  "s4b-leaf-moving": {
+   "additive_items_on_screen": 7,
+   "door_open_after": true,
+   "draw_calls_max": 50,
+   "draw_calls_p50": 50,
+   "frame_ms_mean": 149.735436666667,
+   "frame_ms_p50": 146.621,
+   "frame_ms_p99": 229.144,
+   "frames": 300,
+   "fullscreen_canvaslayer_list": [
+    "/root/Main/PostProcess/Grade"
+   ],
+   "fullscreen_canvaslayer_quads": 1,
+   "fullscreen_list": [
+    "/root/Main/CorridorDepth/Backdrop/Haze 0.62",
+    "/root/Main/CorridorDepth/MidPlate/Painting 1.00"
+   ],
+   "fullscreen_translucent_layers": 2,
+   "nodes": 434.0,
+   "objects": 189.0,
+   "overdraw_estimate": 3.38955975968161,
+   "particles_emitting": 0,
+   "primitives": 2388.0,
+   "render_cpu_ms_p50": 0.949999988079071,
+   "slug": "s4b-leaf-moving",
+   "texture_mem_mb": 74.6954374313354,
+   "translucent_items_on_screen": 26,
+   "video_mem_mb": 81.0742902755737
+  },
+  "s5-door-open": {
+   "additive_items_on_screen": 7,
+   "door_open_after": true,
+   "draw_calls_max": 47,
+   "draw_calls_p50": 47,
+   "frame_ms_mean": 149.807786666667,
+   "frame_ms_p50": 142.415,
+   "frame_ms_p99": 315.046,
+   "frames": 300,
+   "fullscreen_canvaslayer_list": [
+    "/root/Main/PostProcess/Grade"
+   ],
+   "fullscreen_canvaslayer_quads": 1,
+   "fullscreen_list": [
+    "/root/Main/CorridorDepth/Backdrop/Haze 0.62",
+    "/root/Main/CorridorDepth/MidPlate/Painting 1.00"
+   ],
+   "fullscreen_translucent_layers": 2,
+   "nodes": 434.0,
+   "objects": 203.0,
+   "overdraw_estimate": 3.41781433788347,
+   "particles_emitting": 0,
+   "primitives": 2322.0,
+   "render_cpu_ms_p50": 0.901000022888184,
+   "slug": "s5-door-open",
+   "texture_mem_mb": 74.6954374313354,
+   "translucent_items_on_screen": 26,
+   "video_mem_mb": 81.070574760437
+  },
+  "s6-walk-through": {
+   "additive_items_on_screen": 7,
+   "door_open_after": true,
+   "draw_calls_max": 47,
+   "draw_calls_p50": 47,
+   "frame_ms_mean": 153.270013333333,
+   "frame_ms_p50": 144.968,
+   "frame_ms_p99": 348.062,
+   "frames": 300,
+   "fullscreen_canvaslayer_list": [
+    "/root/Main/PostProcess/Grade"
+   ],
+   "fullscreen_canvaslayer_quads": 1,
+   "fullscreen_list": [
+    "/root/Main/CorridorDepth/Backdrop/Haze 0.62",
+    "/root/Main/CorridorDepth/MidPlate/Painting 1.00"
+   ],
+   "fullscreen_translucent_layers": 2,
+   "nodes": 434.0,
+   "objects": 203.0,
+   "overdraw_estimate": 3.37529048943225,
+   "particles_emitting": 0,
+   "primitives": 2322.0,
+   "render_cpu_ms_p50": 0.990000009536743,
+   "slug": "s6-walk-through",
+   "texture_mem_mb": 74.6954374313354,
+   "translucent_items_on_screen": 26,
+   "video_mem_mb": 81.070574760437
+  },
+  "s7-safe-point": {
+   "additive_items_on_screen": 7,
+   "door_open_after": true,
+   "draw_calls_max": 50,
+   "draw_calls_p50": 46,
+   "frame_ms_mean": 166.554236666667,
+   "frame_ms_p50": 153.36,
+   "frame_ms_p99": 548.613,
+   "frames": 300,
+   "fullscreen_canvaslayer_list": [
+    "/root/Main/PostProcess/Grade"
+   ],
+   "fullscreen_canvaslayer_quads": 1,
+   "fullscreen_list": [
+    "/root/Main/CorridorDepth/Backdrop/Haze 0.62",
+    "/root/Main/CorridorDepth/MidPlate/Painting 1.00"
+   ],
+   "fullscreen_translucent_layers": 2,
+   "nodes": 434.0,
+   "objects": 254.0,
+   "overdraw_estimate": 3.38797828485936,
+   "particles_emitting": 0,
+   "primitives": 2424.0,
+   "render_cpu_ms_p50": 1.78199994564056,
+   "slug": "s7-safe-point",
+   "texture_mem_mb": 74.6954374313354,
+   "translucent_items_on_screen": 23,
+   "video_mem_mb": 81.070574760437
+  },
+  "s3-bypass-crank": {
+   "additive_items_on_screen": 7,
+   "door_open_after": false,
+   "draw_calls_max": 48,
+   "draw_calls_p50": 48,
+   "frame_ms_mean": 151.475866666667,
+   "frame_ms_p50": 141.43,
+   "frame_ms_p99": 294.436,
+   "frames": 300,
+   "fullscreen_canvaslayer_list": [
+    "/root/Main/PostProcess/Grade"
+   ],
+   "fullscreen_canvaslayer_quads": 1,
+   "fullscreen_list": [
+    "/root/Main/CorridorDepth/Backdrop/Haze 0.62",
+    "/root/Main/CorridorDepth/MidPlate/Painting 1.00"
+   ],
+   "fullscreen_translucent_layers": 2,
+   "nodes": 434.0,
+   "objects": 195.0,
+   "overdraw_estimate": 3.44953752447058,
+   "particles_emitting": 1,
+   "primitives": 2348.0,
+   "render_cpu_ms_p50": 2.12199997901917,
+   "slug": "s3-bypass-crank",
+   "texture_mem_mb": 74.6954374313354,
+   "translucent_items_on_screen": 26,
+   "video_mem_mb": 81.070387840271
+  }
+ },
+ "round10": {
+  "s1-door-end-rest": {
+   "additive_items_on_screen": 7,
+   "door_open_after": false,
+   "draw_calls_max": 47,
+   "draw_calls_p50": 47,
+   "frame_ms_mean": 281.914433333333,
+   "frame_ms_p50": 270.617,
+   "frame_ms_p99": 561.087,
+   "frames": 300,
+   "fullscreen_canvaslayer_list": [
+    "/root/Main/PostProcess/Grade"
+   ],
+   "fullscreen_canvaslayer_quads": 1,
+   "fullscreen_list": [
+    "/root/Main/CorridorDepth/Backdrop/Haze 0.62",
+    "/root/Main/CorridorDepth/MidPlate/Painting 1.00"
+   ],
+   "fullscreen_translucent_layers": 2,
+   "nodes": 436.0,
+   "objects": 211.0,
+   "overdraw_estimate": 3.46583145118054,
+   "particles_emitting": 0,
+   "primitives": 2338.0,
+   "render_cpu_ms_p50": 2.98300004005432,
+   "slug": "s1-door-end-rest",
+   "texture_mem_mb": 74.6954374313354,
+   "translucent_items_on_screen": 26,
+   "video_mem_mb": 81.070387840271
+  },
+  "s2-relay-wolf": {
+   "additive_items_on_screen": 7,
+   "door_open_after": true,
+   "draw_calls_max": 54,
+   "draw_calls_p50": 54,
+   "frame_ms_mean": 260.570093333333,
+   "frame_ms_p50": 256.97,
+   "frame_ms_p99": 346.789,
+   "frames": 300,
+   "fullscreen_canvaslayer_list": [
+    "/root/Main/PostProcess/Grade"
+   ],
+   "fullscreen_canvaslayer_quads": 1,
+   "fullscreen_list": [
+    "/root/Main/CorridorDepth/Backdrop/Haze 0.62",
+    "/root/Main/CorridorDepth/MidPlate/Painting 1.00"
+   ],
+   "fullscreen_translucent_layers": 2,
+   "nodes": 436.0,
+   "objects": 189.0,
+   "overdraw_estimate": 3.39429139337422,
+   "particles_emitting": 0,
+   "primitives": 2580.0,
+   "render_cpu_ms_p50": 1.4210000038147,
+   "slug": "s2-relay-wolf",
+   "texture_mem_mb": 74.6954374313354,
+   "translucent_items_on_screen": 26,
+   "video_mem_mb": 81.0797834396362
+  },
+  "s4-door-opening": {
+   "additive_items_on_screen": 7,
+   "door_open_after": true,
+   "draw_calls_max": 50,
+   "draw_calls_p50": 50,
+   "frame_ms_mean": 307.19244,
+   "frame_ms_p50": 265.005,
+   "frame_ms_p99": 785.417,
+   "frames": 300,
+   "fullscreen_canvaslayer_list": [
+    "/root/Main/PostProcess/Grade"
+   ],
+   "fullscreen_canvaslayer_quads": 1,
+   "fullscreen_list": [
+    "/root/Main/CorridorDepth/Backdrop/Haze 0.62",
+    "/root/Main/CorridorDepth/MidPlate/Painting 1.00"
+   ],
+   "fullscreen_translucent_layers": 2,
+   "nodes": 436.0,
+   "objects": 189.0,
+   "overdraw_estimate": 3.41840913395823,
+   "particles_emitting": 0,
+   "primitives": 2468.0,
+   "render_cpu_ms_p50": 3.87100005149841,
+   "slug": "s4-door-opening",
+   "texture_mem_mb": 74.6954374313354,
+   "translucent_items_on_screen": 26,
+   "video_mem_mb": 81.0765790939331
+  },
+  "s4b-leaf-moving": {
+   "additive_items_on_screen": 7,
+   "door_open_after": true,
+   "draw_calls_max": 50,
+   "draw_calls_p50": 50,
+   "frame_ms_mean": 259.61482,
+   "frame_ms_p50": 235.914,
+   "frame_ms_p99": 638.81,
+   "frames": 300,
+   "fullscreen_canvaslayer_list": [
+    "/root/Main/PostProcess/Grade"
+   ],
+   "fullscreen_canvaslayer_quads": 1,
+   "fullscreen_list": [
+    "/root/Main/CorridorDepth/Backdrop/Haze 0.62",
+    "/root/Main/CorridorDepth/MidPlate/Painting 1.00"
+   ],
+   "fullscreen_translucent_layers": 2,
+   "nodes": 436.0,
+   "objects": 189.0,
+   "overdraw_estimate": 3.38955975968161,
+   "particles_emitting": 0,
+   "primitives": 2388.0,
+   "render_cpu_ms_p50": 5.67999982833862,
+   "slug": "s4b-leaf-moving",
+   "texture_mem_mb": 74.6954374313354,
+   "translucent_items_on_screen": 26,
+   "video_mem_mb": 81.0742902755737
+  },
+  "s5-door-open": {
+   "additive_items_on_screen": 7,
+   "door_open_after": true,
+   "draw_calls_max": 47,
+   "draw_calls_p50": 47,
+   "frame_ms_mean": 356.130493333333,
+   "frame_ms_p50": 284.103,
+   "frame_ms_p99": 1711.943,
+   "frames": 300,
+   "fullscreen_canvaslayer_list": [
+    "/root/Main/PostProcess/Grade"
+   ],
+   "fullscreen_canvaslayer_quads": 1,
+   "fullscreen_list": [
+    "/root/Main/CorridorDepth/Backdrop/Haze 0.62",
+    "/root/Main/CorridorDepth/MidPlate/Painting 1.00"
+   ],
+   "fullscreen_translucent_layers": 2,
+   "nodes": 436.0,
+   "objects": 203.0,
+   "overdraw_estimate": 3.41781433788347,
+   "particles_emitting": 0,
+   "primitives": 2322.0,
+   "render_cpu_ms_p50": 16.8579998016357,
+   "slug": "s5-door-open",
+   "texture_mem_mb": 74.6954374313354,
+   "translucent_items_on_screen": 26,
+   "video_mem_mb": 81.070574760437
+  },
+  "s6-walk-through": {
+   "additive_items_on_screen": 7,
+   "door_open_after": true,
+   "draw_calls_max": 47,
+   "draw_calls_p50": 47,
+   "frame_ms_mean": 350.184036666667,
+   "frame_ms_p50": 283.589,
+   "frame_ms_p99": 1217.492,
+   "frames": 300,
+   "fullscreen_canvaslayer_list": [
+    "/root/Main/PostProcess/Grade"
+   ],
+   "fullscreen_canvaslayer_quads": 1,
+   "fullscreen_list": [
+    "/root/Main/CorridorDepth/Backdrop/Haze 0.62",
+    "/root/Main/CorridorDepth/MidPlate/Painting 1.00"
+   ],
+   "fullscreen_translucent_layers": 2,
+   "nodes": 436.0,
+   "objects": 203.0,
+   "overdraw_estimate": 3.37529048943225,
+   "particles_emitting": 0,
+   "primitives": 2322.0,
+   "render_cpu_ms_p50": 20.2299995422363,
+   "slug": "s6-walk-through",
+   "texture_mem_mb": 74.6954374313354,
+   "translucent_items_on_screen": 26,
+   "video_mem_mb": 81.070574760437
+  },
+  "s7-safe-point": {
+   "additive_items_on_screen": 7,
+   "door_open_after": true,
+   "draw_calls_max": 50,
+   "draw_calls_p50": 46,
+   "frame_ms_mean": 309.08537,
+   "frame_ms_p50": 290.516,
+   "frame_ms_p99": 827.162,
+   "frames": 300,
+   "fullscreen_canvaslayer_list": [
+    "/root/Main/PostProcess/Grade"
+   ],
+   "fullscreen_canvaslayer_quads": 1,
+   "fullscreen_list": [
+    "/root/Main/CorridorDepth/Backdrop/Haze 0.62",
+    "/root/Main/CorridorDepth/MidPlate/Painting 1.00"
+   ],
+   "fullscreen_translucent_layers": 2,
+   "nodes": 436.0,
+   "objects": 254.0,
+   "overdraw_estimate": 3.38602433852208,
+   "particles_emitting": 0,
+   "primitives": 2424.0,
+   "render_cpu_ms_p50": 14.4020004272461,
+   "slug": "s7-safe-point",
+   "texture_mem_mb": 74.6954374313354,
+   "translucent_items_on_screen": 23,
+   "video_mem_mb": 81.070574760437
+  },
+  "s3-bypass-crank": {
+   "additive_items_on_screen": 7,
+   "door_open_after": false,
+   "draw_calls_max": 48,
+   "draw_calls_p50": 48,
+   "frame_ms_mean": 332.212886666667,
+   "frame_ms_p50": 296.648,
+   "frame_ms_p99": 766.469,
+   "frames": 300,
+   "fullscreen_canvaslayer_list": [
+    "/root/Main/PostProcess/Grade"
+   ],
+   "fullscreen_canvaslayer_quads": 1,
+   "fullscreen_list": [
+    "/root/Main/CorridorDepth/Backdrop/Haze 0.62",
+    "/root/Main/CorridorDepth/MidPlate/Painting 1.00"
+   ],
+   "fullscreen_translucent_layers": 2,
+   "nodes": 436.0,
+   "objects": 195.0,
+   "overdraw_estimate": 3.44953752447058,
+   "particles_emitting": 1,
+   "primitives": 2348.0,
+   "render_cpu_ms_p50": 8.97799968719482,
+   "slug": "s3-bypass-crank",
+   "texture_mem_mb": 74.6954374313354,
+   "translucent_items_on_screen": 26,
+   "video_mem_mb": 81.070387840271
+  }
+ },
+ "round11": {
+  "s1-door-end-rest": {
+   "additive_items_on_screen": 7,
+   "door_open_after": false,
+   "draw_calls_max": 47,
+   "draw_calls_p50": 47,
+   "frame_ms_mean": 27.7298,
+   "frame_ms_p50": 26.287,
+   "frame_ms_p99": 92.118,
+   "frames": 300,
+   "fullscreen_canvaslayer_list": [
+    "/root/Main/PostProcess/Grade"
+   ],
+   "fullscreen_canvaslayer_quads": 1,
+   "fullscreen_list": [
+    "/root/Main/CorridorDepth/Backdrop/Haze 0.62",
+    "/root/Main/CorridorDepth/MidPlate/Painting 1.00"
+   ],
+   "fullscreen_translucent_layers": 2,
+   "nodes": 436.0,
+   "objects": 211.0,
+   "overdraw_estimate": 3.46583145118054,
+   "particles_emitting": 0,
+   "primitives": 2338.0,
+   "render_cpu_ms_p50": 0.873000025749207,
+   "slug": "s1-door-end-rest",
+   "texture_mem_mb": 74.6954374313354,
+   "translucent_items_on_screen": 26,
+   "video_mem_mb": 81.070387840271
+  },
+  "s2-relay-wolf": {
+   "additive_items_on_screen": 7,
+   "door_open_after": true,
+   "draw_calls_max": 54,
+   "draw_calls_p50": 54,
+   "frame_ms_mean": 77.7262666666667,
+   "frame_ms_p50": 53.51,
+   "frame_ms_p99": 221.496,
+   "frames": 300,
+   "fullscreen_canvaslayer_list": [
+    "/root/Main/PostProcess/Grade"
+   ],
+   "fullscreen_canvaslayer_quads": 1,
+   "fullscreen_list": [
+    "/root/Main/CorridorDepth/Backdrop/Haze 0.62",
+    "/root/Main/CorridorDepth/MidPlate/Painting 1.00"
+   ],
+   "fullscreen_translucent_layers": 2,
+   "nodes": 436.0,
+   "objects": 189.0,
+   "overdraw_estimate": 3.39429139337422,
+   "particles_emitting": 0,
+   "primitives": 2580.0,
+   "render_cpu_ms_p50": 1.59599995613098,
+   "slug": "s2-relay-wolf",
+   "texture_mem_mb": 74.6954374313354,
+   "translucent_items_on_screen": 26,
+   "video_mem_mb": 81.0797834396362
+  },
+  "s4-door-opening": {
+   "additive_items_on_screen": 7,
+   "door_open_after": true,
+   "draw_calls_max": 50,
+   "draw_calls_p50": 50,
+   "frame_ms_mean": 158.415566666667,
+   "frame_ms_p50": 153.245,
+   "frame_ms_p99": 275.912,
+   "frames": 300,
+   "fullscreen_canvaslayer_list": [
+    "/root/Main/PostProcess/Grade"
+   ],
+   "fullscreen_canvaslayer_quads": 1,
+   "fullscreen_list": [
+    "/root/Main/CorridorDepth/Backdrop/Haze 0.62",
+    "/root/Main/CorridorDepth/MidPlate/Painting 1.00"
+   ],
+   "fullscreen_translucent_layers": 2,
+   "nodes": 436.0,
+   "objects": 189.0,
+   "overdraw_estimate": 3.41840913395823,
+   "particles_emitting": 0,
+   "primitives": 2468.0,
+   "render_cpu_ms_p50": 2.38499999046326,
+   "slug": "s4-door-opening",
+   "texture_mem_mb": 74.6954374313354,
+   "translucent_items_on_screen": 26,
+   "video_mem_mb": 81.0765790939331
+  },
+  "s4b-leaf-moving": {
+   "additive_items_on_screen": 7,
+   "door_open_after": true,
+   "draw_calls_max": 50,
+   "draw_calls_p50": 50,
+   "frame_ms_mean": 245.042883333333,
+   "frame_ms_p50": 240.434,
+   "frame_ms_p99": 500.132,
+   "frames": 300,
+   "fullscreen_canvaslayer_list": [
+    "/root/Main/PostProcess/Grade"
+   ],
+   "fullscreen_canvaslayer_quads": 1,
+   "fullscreen_list": [
+    "/root/Main/CorridorDepth/Backdrop/Haze 0.62",
+    "/root/Main/CorridorDepth/MidPlate/Painting 1.00"
+   ],
+   "fullscreen_translucent_layers": 2,
+   "nodes": 436.0,
+   "objects": 189.0,
+   "overdraw_estimate": 3.38955975968161,
+   "particles_emitting": 0,
+   "primitives": 2388.0,
+   "render_cpu_ms_p50": 2.17000007629395,
+   "slug": "s4b-leaf-moving",
+   "texture_mem_mb": 74.6954374313354,
+   "translucent_items_on_screen": 26,
+   "video_mem_mb": 81.0742902755737
+  },
+  "s5-door-open": {
+   "additive_items_on_screen": 7,
+   "door_open_after": true,
+   "draw_calls_max": 47,
+   "draw_calls_p50": 47,
+   "frame_ms_mean": 266.922866666667,
+   "frame_ms_p50": 257.602,
+   "frame_ms_p99": 403.893,
+   "frames": 300,
+   "fullscreen_canvaslayer_list": [
+    "/root/Main/PostProcess/Grade"
+   ],
+   "fullscreen_canvaslayer_quads": 1,
+   "fullscreen_list": [
+    "/root/Main/CorridorDepth/Backdrop/Haze 0.62",
+    "/root/Main/CorridorDepth/MidPlate/Painting 1.00"
+   ],
+   "fullscreen_translucent_layers": 2,
+   "nodes": 436.0,
+   "objects": 203.0,
+   "overdraw_estimate": 3.41781433788347,
+   "particles_emitting": 0,
+   "primitives": 2322.0,
+   "render_cpu_ms_p50": 1.84500002861023,
+   "slug": "s5-door-open",
+   "texture_mem_mb": 74.6954374313354,
+   "translucent_items_on_screen": 26,
+   "video_mem_mb": 81.070574760437
+  },
+  "s6-walk-through": {
+   "additive_items_on_screen": 7,
+   "door_open_after": true,
+   "draw_calls_max": 47,
+   "draw_calls_p50": 47,
+   "frame_ms_mean": 275.54279,
+   "frame_ms_p50": 262.306,
+   "frame_ms_p99": 522.482,
+   "frames": 300,
+   "fullscreen_canvaslayer_list": [
+    "/root/Main/PostProcess/Grade"
+   ],
+   "fullscreen_canvaslayer_quads": 1,
+   "fullscreen_list": [
+    "/root/Main/CorridorDepth/Backdrop/Haze 0.62",
+    "/root/Main/CorridorDepth/MidPlate/Painting 1.00"
+   ],
+   "fullscreen_translucent_layers": 2,
+   "nodes": 436.0,
+   "objects": 203.0,
+   "overdraw_estimate": 3.37529048943225,
+   "particles_emitting": 0,
+   "primitives": 2322.0,
+   "render_cpu_ms_p50": 2.23399996757507,
+   "slug": "s6-walk-through",
+   "texture_mem_mb": 74.6954374313354,
+   "translucent_items_on_screen": 26,
+   "video_mem_mb": 81.070574760437
+  },
+  "s7-safe-point": {
+   "additive_items_on_screen": 7,
+   "door_open_after": true,
+   "draw_calls_max": 50,
+   "draw_calls_p50": 46,
+   "frame_ms_mean": 258.76886,
+   "frame_ms_p50": 252.301,
+   "frame_ms_p99": 381.46,
+   "frames": 300,
+   "fullscreen_canvaslayer_list": [
+    "/root/Main/PostProcess/Grade"
+   ],
+   "fullscreen_canvaslayer_quads": 1,
+   "fullscreen_list": [
+    "/root/Main/CorridorDepth/Backdrop/Haze 0.62",
+    "/root/Main/CorridorDepth/MidPlate/Painting 1.00"
+   ],
+   "fullscreen_translucent_layers": 2,
+   "nodes": 436.0,
+   "objects": 254.0,
+   "overdraw_estimate": 3.38602433852208,
+   "particles_emitting": 0,
+   "primitives": 2424.0,
+   "render_cpu_ms_p50": 1.99699997901917,
+   "slug": "s7-safe-point",
+   "texture_mem_mb": 74.6954374313354,
+   "translucent_items_on_screen": 23,
+   "video_mem_mb": 81.070574760437
+  },
+  "s3-bypass-crank": {
+   "additive_items_on_screen": 7,
+   "door_open_after": false,
+   "draw_calls_max": 48,
+   "draw_calls_p50": 48,
+   "frame_ms_mean": 305.811043333333,
+   "frame_ms_p50": 293.513,
+   "frame_ms_p99": 547.022,
+   "frames": 300,
+   "fullscreen_canvaslayer_list": [
+    "/root/Main/PostProcess/Grade"
+   ],
+   "fullscreen_canvaslayer_quads": 1,
+   "fullscreen_list": [
+    "/root/Main/CorridorDepth/Backdrop/Haze 0.62",
+    "/root/Main/CorridorDepth/MidPlate/Painting 1.00"
+   ],
+   "fullscreen_translucent_layers": 2,
+   "nodes": 436.0,
+   "objects": 195.0,
+   "overdraw_estimate": 3.44953752447058,
+   "particles_emitting": 1,
+   "primitives": 2348.0,
+   "render_cpu_ms_p50": 5.85200023651123,
+   "slug": "s3-bypass-crank",
+   "texture_mem_mb": 74.6954374313354,
+   "translucent_items_on_screen": 26,
+   "video_mem_mb": 81.070387840271
+  }
+ },
+ "headless": {
+  "main": {
+   "s1-door-end-rest": {
+    "additive_items_on_screen": 8,
+    "draw_calls_max": 0,
+    "draw_calls_p50": 0,
+    "frame_ms_mean": 0.23553,
+    "frame_ms_p50": 0.226,
+    "frame_ms_p99": 0.428,
+    "frames": 300,
+    "fullscreen_canvaslayer_list": [
+     "/root/Main/PostProcess/Grade",
+     "/root/Main/CanvasLayer/IntroAlarm",
+     "/root/Main/CanvasLayer/IntroFade"
+    ],
+    "fullscreen_canvaslayer_quads": 3,
+    "fullscreen_list": [
+     "/root/Main/CorridorDepth/Backdrop/Haze 0.75",
+     "/root/Main/CorridorDepth/MidPlate/Painting 1.00"
+    ],
+    "fullscreen_translucent_layers": 2,
+    "nodes": 437.0,
+    "objects": 0.0,
+    "overdraw_estimate": 3.60396690886698,
+    "particles_emitting": 2,
+    "primitives": 0.0,
+    "process_ms_p50": 1.711,
+    "process_ms_p99": 1.711,
+    "render_cpu_ms_p50": 0.0,
+    "slug": "s1-door-end-rest",
+    "texture_mem_mb": 0.0,
+    "translucent_items_on_screen": 29,
+    "video_mem_mb": 0.0
+   },
+   "s2-relay-wolf": {
+    "additive_items_on_screen": 8,
+    "draw_calls_max": 0,
+    "draw_calls_p50": 0,
+    "frame_ms_mean": 0.21473,
+    "frame_ms_p50": 0.211,
+    "frame_ms_p99": 0.346,
+    "frames": 300,
+    "fullscreen_canvaslayer_list": [
+     "/root/Main/PostProcess/Grade",
+     "/root/Main/CanvasLayer/IntroAlarm",
+     "/root/Main/CanvasLayer/IntroFade"
+    ],
+    "fullscreen_canvaslayer_quads": 3,
+    "fullscreen_list": [
+     "/root/Main/CorridorDepth/Backdrop/Haze 0.75",
+     "/root/Main/CorridorDepth/MidPlate/Painting 1.00"
+    ],
+    "fullscreen_translucent_layers": 2,
+    "nodes": 437.0,
+    "objects": 0.0,
+    "overdraw_estimate": 3.58805923838674,
+    "particles_emitting": 2,
+    "primitives": 0.0,
+    "process_ms_p50": 1.711,
+    "process_ms_p99": 1.711,
+    "render_cpu_ms_p50": 0.0,
+    "slug": "s2-relay-wolf",
+    "texture_mem_mb": 0.0,
+    "translucent_items_on_screen": 30,
+    "video_mem_mb": 0.0
+   },
+   "s4-door-opening": {
+    "additive_items_on_screen": 8,
+    "draw_calls_max": 0,
+    "draw_calls_p50": 0,
+    "frame_ms_mean": 0.222026666666667,
+    "frame_ms_p50": 0.216,
+    "frame_ms_p99": 0.333,
+    "frames": 300,
+    "fullscreen_canvaslayer_list": [
+     "/root/Main/PostProcess/Grade",
+     "/root/Main/CanvasLayer/IntroAlarm",
+     "/root/Main/CanvasLayer/IntroFade"
+    ],
+    "fullscreen_canvaslayer_quads": 3,
+    "fullscreen_list": [
+     "/root/Main/CorridorDepth/Backdrop/Haze 0.75",
+     "/root/Main/CorridorDepth/MidPlate/Painting 1.00"
+    ],
+    "fullscreen_translucent_layers": 2,
+    "nodes": 437.0,
+    "objects": 0.0,
+    "overdraw_estimate": 3.61209835664726,
+    "particles_emitting": 2,
+    "primitives": 0.0,
+    "process_ms_p50": 1.711,
+    "process_ms_p99": 1.711,
+    "render_cpu_ms_p50": 0.0,
+    "slug": "s4-door-opening",
+    "texture_mem_mb": 0.0,
+    "translucent_items_on_screen": 30,
+    "video_mem_mb": 0.0
+   },
+   "s5-door-open": {
+    "additive_items_on_screen": 8,
+    "draw_calls_max": 0,
+    "draw_calls_p50": 0,
+    "frame_ms_mean": 0.211343333333333,
+    "frame_ms_p50": 0.198,
+    "frame_ms_p99": 0.373,
+    "frames": 300,
+    "fullscreen_canvaslayer_list": [
+     "/root/Main/PostProcess/Grade",
+     "/root/Main/CanvasLayer/IntroAlarm",
+     "/root/Main/CanvasLayer/IntroFade"
+    ],
+    "fullscreen_canvaslayer_quads": 3,
+    "fullscreen_list": [
+     "/root/Main/CorridorDepth/Backdrop/Haze 0.75",
+     "/root/Main/CorridorDepth/MidPlate/Painting 1.00"
+    ],
+    "fullscreen_translucent_layers": 2,
+    "nodes": 437.0,
+    "objects": 0.0,
+    "overdraw_estimate": 3.57925609353148,
+    "particles_emitting": 2,
+    "primitives": 0.0,
+    "process_ms_p50": 1.711,
+    "process_ms_p99": 1.711,
+    "render_cpu_ms_p50": 0.0,
+    "slug": "s5-door-open",
+    "texture_mem_mb": 0.0,
+    "translucent_items_on_screen": 29,
+    "video_mem_mb": 0.0
+   },
+   "s6-walk-through": {
+    "additive_items_on_screen": 8,
+    "draw_calls_max": 0,
+    "draw_calls_p50": 0,
+    "frame_ms_mean": 0.242033333333334,
+    "frame_ms_p50": 0.237,
+    "frame_ms_p99": 0.418,
+    "frames": 300,
+    "fullscreen_canvaslayer_list": [
+     "/root/Main/PostProcess/Grade",
+     "/root/Main/CanvasLayer/IntroAlarm",
+     "/root/Main/CanvasLayer/IntroFade"
+    ],
+    "fullscreen_canvaslayer_quads": 3,
+    "fullscreen_list": [
+     "/root/Main/CorridorDepth/Backdrop/Haze 0.75",
+     "/root/Main/CorridorDepth/MidPlate/Painting 1.00"
+    ],
+    "fullscreen_translucent_layers": 2,
+    "nodes": 437.0,
+    "objects": 0.0,
+    "overdraw_estimate": 3.58997931539277,
+    "particles_emitting": 2,
+    "primitives": 0.0,
+    "process_ms_p50": 1.711,
+    "process_ms_p99": 1.711,
+    "render_cpu_ms_p50": 0.0,
+    "slug": "s6-walk-through",
+    "texture_mem_mb": 0.0,
+    "translucent_items_on_screen": 29,
+    "video_mem_mb": 0.0
+   },
+   "s7-safe-point": {
+    "additive_items_on_screen": 8,
+    "draw_calls_max": 0,
+    "draw_calls_p50": 0,
+    "frame_ms_mean": 0.233226666666667,
+    "frame_ms_p50": 0.228,
+    "frame_ms_p99": 0.401,
+    "frames": 300,
+    "fullscreen_canvaslayer_list": [
+     "/root/Main/PostProcess/Grade",
+     "/root/Main/CanvasLayer/IntroAlarm",
+     "/root/Main/CanvasLayer/IntroFade"
+    ],
+    "fullscreen_canvaslayer_quads": 3,
+    "fullscreen_list": [
+     "/root/Main/CorridorDepth/Backdrop/Haze 0.75",
+     "/root/Main/CorridorDepth/MidPlate/Painting 1.00"
+    ],
+    "fullscreen_translucent_layers": 2,
+    "nodes": 437.0,
+    "objects": 0.0,
+    "overdraw_estimate": 3.52970049987605,
+    "particles_emitting": 2,
+    "primitives": 0.0,
+    "process_ms_p50": 1.711,
+    "process_ms_p99": 1.711,
+    "render_cpu_ms_p50": 0.0,
+    "slug": "s7-safe-point",
+    "texture_mem_mb": 0.0,
+    "translucent_items_on_screen": 26,
+    "video_mem_mb": 0.0
+   },
+   "s3-bypass-crank": {
+    "additive_items_on_screen": 9,
+    "draw_calls_max": 0,
+    "draw_calls_p50": 0,
+    "frame_ms_mean": 1.39711,
+    "frame_ms_p50": 0.211,
+    "frame_ms_p99": 0.433,
+    "frames": 300,
+    "fullscreen_canvaslayer_list": [
+     "/root/Main/PostProcess/Grade",
+     "/root/Main/CanvasLayer/IntroAlarm",
+     "/root/Main/CanvasLayer/IntroFade"
+    ],
+    "fullscreen_canvaslayer_quads": 3,
+    "fullscreen_list": [
+     "/root/Main/CorridorDepth/Backdrop/Haze 0.75",
+     "/root/Main/CorridorDepth/MidPlate/Painting 1.00"
+    ],
+    "fullscreen_translucent_layers": 2,
+    "nodes": 437.0,
+    "objects": 0.0,
+    "overdraw_estimate": 3.59216931343079,
+    "particles_emitting": 2,
+    "primitives": 0.0,
+    "process_ms_p50": 352.216,
+    "process_ms_p99": 352.216,
+    "render_cpu_ms_p50": 0.0,
+    "slug": "s3-bypass-crank",
+    "texture_mem_mb": 0.0,
+    "translucent_items_on_screen": 30,
+    "video_mem_mb": 0.0
+   }
+  },
+  "r6": {
+   "s1-door-end-rest": {
+    "additive_items_on_screen": 7,
+    "draw_calls_max": 0,
+    "draw_calls_p50": 0,
+    "frame_ms_mean": 0.286873333333333,
+    "frame_ms_p50": 0.268,
+    "frame_ms_p99": 0.692,
+    "frames": 300,
+    "fullscreen_canvaslayer_list": [
+     "/root/Main/PostProcess/Grade"
+    ],
+    "fullscreen_canvaslayer_quads": 1,
+    "fullscreen_list": [
+     "/root/Main/CorridorDepth/Backdrop/Haze 0.62",
+     "/root/Main/CorridorDepth/MidPlate/Painting 1.00"
+    ],
+    "fullscreen_translucent_layers": 2,
+    "nodes": 433.0,
+    "objects": 0.0,
+    "overdraw_estimate": 3.53704988267687,
+    "particles_emitting": 0,
+    "primitives": 0.0,
+    "process_ms_p50": 2.533,
+    "process_ms_p99": 2.533,
+    "render_cpu_ms_p50": 0.0,
+    "slug": "s1-door-end-rest",
+    "texture_mem_mb": 0.0,
+    "translucent_items_on_screen": 26,
+    "video_mem_mb": 0.0
+   },
+   "s2-relay-wolf": {
+    "additive_items_on_screen": 7,
+    "draw_calls_max": 0,
+    "draw_calls_p50": 0,
+    "frame_ms_mean": 0.617223333333333,
+    "frame_ms_p50": 0.364,
+    "frame_ms_p99": 5.663,
+    "frames": 300,
+    "fullscreen_canvaslayer_list": [
+     "/root/Main/PostProcess/Grade"
+    ],
+    "fullscreen_canvaslayer_quads": 1,
+    "fullscreen_list": [
+     "/root/Main/CorridorDepth/Backdrop/Haze 0.62",
+     "/root/Main/CorridorDepth/MidPlate/Painting 1.00"
+    ],
+    "fullscreen_translucent_layers": 2,
+    "nodes": 433.0,
+    "objects": 0.0,
+    "overdraw_estimate": 3.46557856854097,
+    "particles_emitting": 0,
+    "primitives": 0.0,
+    "process_ms_p50": 2.533,
+    "process_ms_p99": 2.533,
+    "render_cpu_ms_p50": 0.0,
+    "slug": "s2-relay-wolf",
+    "texture_mem_mb": 0.0,
+    "translucent_items_on_screen": 26,
+    "video_mem_mb": 0.0
+   },
+   "s4-door-opening": {
+    "additive_items_on_screen": 7,
+    "draw_calls_max": 0,
+    "draw_calls_p50": 0,
+    "frame_ms_mean": 0.399206666666667,
+    "frame_ms_p50": 0.317,
+    "frame_ms_p99": 2.641,
+    "frames": 300,
+    "fullscreen_canvaslayer_list": [
+     "/root/Main/PostProcess/Grade"
+    ],
+    "fullscreen_canvaslayer_quads": 1,
+    "fullscreen_list": [
+     "/root/Main/CorridorDepth/Backdrop/Haze 0.62",
+     "/root/Main/CorridorDepth/MidPlate/Painting 1.00"
+    ],
+    "fullscreen_translucent_layers": 2,
+    "nodes": 433.0,
+    "objects": 0.0,
+    "overdraw_estimate": 3.48961768680149,
+    "particles_emitting": 0,
+    "primitives": 0.0,
+    "process_ms_p50": 2.533,
+    "process_ms_p99": 2.533,
+    "render_cpu_ms_p50": 0.0,
+    "slug": "s4-door-opening",
+    "texture_mem_mb": 0.0,
+    "translucent_items_on_screen": 26,
+    "video_mem_mb": 0.0
+   },
+   "s5-door-open": {
+    "additive_items_on_screen": 7,
+    "draw_calls_max": 0,
+    "draw_calls_p50": 0,
+    "frame_ms_mean": 0.303506666666667,
+    "frame_ms_p50": 0.298,
+    "frame_ms_p99": 0.516,
+    "frames": 300,
+    "fullscreen_canvaslayer_list": [
+     "/root/Main/PostProcess/Grade"
+    ],
+    "fullscreen_canvaslayer_quads": 1,
+    "fullscreen_list": [
+     "/root/Main/CorridorDepth/Backdrop/Haze 0.62",
+     "/root/Main/CorridorDepth/MidPlate/Painting 1.00"
+    ],
+    "fullscreen_translucent_layers": 2,
+    "nodes": 433.0,
+    "objects": 0.0,
+    "overdraw_estimate": 3.46512590902823,
+    "particles_emitting": 0,
+    "primitives": 0.0,
+    "process_ms_p50": 2.533,
+    "process_ms_p99": 2.533,
+    "render_cpu_ms_p50": 0.0,
+    "slug": "s5-door-open",
+    "texture_mem_mb": 0.0,
+    "translucent_items_on_screen": 26,
+    "video_mem_mb": 0.0
+   },
+   "s6-walk-through": {
+    "additive_items_on_screen": 7,
+    "draw_calls_max": 0,
+    "draw_calls_p50": 0,
+    "frame_ms_mean": 0.280703333333333,
+    "frame_ms_p50": 0.281,
+    "frame_ms_p99": 0.476,
+    "frames": 300,
+    "fullscreen_canvaslayer_list": [
+     "/root/Main/PostProcess/Grade"
+    ],
+    "fullscreen_canvaslayer_quads": 1,
+    "fullscreen_list": [
+     "/root/Main/CorridorDepth/Backdrop/Haze 0.62",
+     "/root/Main/CorridorDepth/MidPlate/Painting 1.00"
+    ],
+    "fullscreen_translucent_layers": 2,
+    "nodes": 433.0,
+    "objects": 0.0,
+    "overdraw_estimate": 3.47584913088952,
+    "particles_emitting": 0,
+    "primitives": 0.0,
+    "process_ms_p50": 329.401,
+    "process_ms_p99": 329.401,
+    "render_cpu_ms_p50": 0.0,
+    "slug": "s6-walk-through",
+    "texture_mem_mb": 0.0,
+    "translucent_items_on_screen": 26,
+    "video_mem_mb": 0.0
+   },
+   "s7-safe-point": {
+    "additive_items_on_screen": 7,
+    "draw_calls_max": 0,
+    "draw_calls_p50": 0,
+    "frame_ms_mean": 0.72562,
+    "frame_ms_p50": 0.412,
+    "frame_ms_p99": 12.89,
+    "frames": 300,
+    "fullscreen_canvaslayer_list": [
+     "/root/Main/PostProcess/Grade"
+    ],
+    "fullscreen_canvaslayer_quads": 1,
+    "fullscreen_list": [
+     "/root/Main/CorridorDepth/Backdrop/Haze 0.62",
+     "/root/Main/CorridorDepth/MidPlate/Painting 1.00"
+    ],
+    "fullscreen_translucent_layers": 2,
+    "nodes": 433.0,
+    "objects": 0.0,
+    "overdraw_estimate": 3.4155703153728,
+    "particles_emitting": 0,
+    "primitives": 0.0,
+    "process_ms_p50": 329.401,
+    "process_ms_p99": 329.401,
+    "render_cpu_ms_p50": 0.0,
+    "slug": "s7-safe-point",
+    "texture_mem_mb": 0.0,
+    "translucent_items_on_screen": 23,
+    "video_mem_mb": 0.0
+   },
+   "s3-bypass-crank": {
+    "additive_items_on_screen": 7,
+    "draw_calls_max": 0,
+    "draw_calls_p50": 0,
+    "frame_ms_mean": 0.961809999999999,
+    "frame_ms_p50": 0.236,
+    "frame_ms_p99": 0.427,
+    "frames": 300,
+    "fullscreen_canvaslayer_list": [
+     "/root/Main/PostProcess/Grade"
+    ],
+    "fullscreen_canvaslayer_quads": 1,
+    "fullscreen_list": [
+     "/root/Main/CorridorDepth/Backdrop/Haze 0.62",
+     "/root/Main/CorridorDepth/MidPlate/Painting 1.00"
+    ],
+    "fullscreen_translucent_layers": 2,
+    "nodes": 433.0,
+    "objects": 0.0,
+    "overdraw_estimate": 3.47640071492136,
+    "particles_emitting": 0,
+    "primitives": 0.0,
+    "process_ms_p50": 26.236,
+    "process_ms_p99": 26.236,
+    "render_cpu_ms_p50": 0.0,
+    "slug": "s3-bypass-crank",
+    "texture_mem_mb": 0.0,
+    "translucent_items_on_screen": 26,
+    "video_mem_mb": 0.0
+   }
+  },
+  "add": {
+   "s1-door-end-rest": {
+    "additive_items_on_screen": 7,
+    "draw_calls_max": 0,
+    "draw_calls_p50": 0,
+    "frame_ms_mean": 0.222203333333333,
+    "frame_ms_p50": 0.219,
+    "frame_ms_p99": 0.462,
+    "frames": 300,
+    "fullscreen_canvaslayer_list": [
+     "/root/Main/PostProcess/Grade"
+    ],
+    "fullscreen_canvaslayer_quads": 1,
+    "fullscreen_list": [
+     "/root/Main/CorridorDepth/Backdrop/Haze 0.62",
+     "/root/Main/CorridorDepth/MidPlate/Painting 1.00"
+    ],
+    "fullscreen_translucent_layers": 2,
+    "nodes": 434.0,
+    "objects": 0.0,
+    "overdraw_estimate": 3.4635530099751,
+    "particles_emitting": 0,
+    "primitives": 0.0,
+    "process_ms_p50": 0.0,
+    "process_ms_p99": 1.424,
+    "render_cpu_ms_p50": 0.0,
+    "slug": "s1-door-end-rest",
+    "texture_mem_mb": 0.0,
+    "translucent_items_on_screen": 26,
+    "video_mem_mb": 0.0
+   },
+   "s2-relay-wolf": {
+    "additive_items_on_screen": 7,
+    "draw_calls_max": 0,
+    "draw_calls_p50": 0,
+    "frame_ms_mean": 0.226706666666667,
+    "frame_ms_p50": 0.222,
+    "frame_ms_p99": 0.357,
+    "frames": 300,
+    "fullscreen_canvaslayer_list": [
+     "/root/Main/PostProcess/Grade"
+    ],
+    "fullscreen_canvaslayer_quads": 1,
+    "fullscreen_list": [
+     "/root/Main/CorridorDepth/Backdrop/Haze 0.62",
+     "/root/Main/CorridorDepth/MidPlate/Painting 1.00"
+    ],
+    "fullscreen_translucent_layers": 2,
+    "nodes": 434.0,
+    "objects": 0.0,
+    "overdraw_estimate": 3.39208169583921,
+    "particles_emitting": 0,
+    "primitives": 0.0,
+    "process_ms_p50": 1.424,
+    "process_ms_p99": 1.424,
+    "render_cpu_ms_p50": 0.0,
+    "slug": "s2-relay-wolf",
+    "texture_mem_mb": 0.0,
+    "translucent_items_on_screen": 26,
+    "video_mem_mb": 0.0
+   },
+   "s4-door-opening": {
+    "additive_items_on_screen": 7,
+    "draw_calls_max": 0,
+    "draw_calls_p50": 0,
+    "frame_ms_mean": 0.20963,
+    "frame_ms_p50": 0.208,
+    "frame_ms_p99": 0.339,
+    "frames": 300,
+    "fullscreen_canvaslayer_list": [
+     "/root/Main/PostProcess/Grade"
+    ],
+    "fullscreen_canvaslayer_quads": 1,
+    "fullscreen_list": [
+     "/root/Main/CorridorDepth/Backdrop/Haze 0.62",
+     "/root/Main/CorridorDepth/MidPlate/Painting 1.00"
+    ],
+    "fullscreen_translucent_layers": 2,
+    "nodes": 434.0,
+    "objects": 0.0,
+    "overdraw_estimate": 3.41612081409972,
+    "particles_emitting": 0,
+    "primitives": 0.0,
+    "process_ms_p50": 1.424,
+    "process_ms_p99": 1.424,
+    "render_cpu_ms_p50": 0.0,
+    "slug": "s4-door-opening",
+    "texture_mem_mb": 0.0,
+    "translucent_items_on_screen": 26,
+    "video_mem_mb": 0.0
+   },
+   "s5-door-open": {
+    "additive_items_on_screen": 7,
+    "draw_calls_max": 0,
+    "draw_calls_p50": 0,
+    "frame_ms_mean": 0.20006,
+    "frame_ms_p50": 0.193,
+    "frame_ms_p99": 0.387,
+    "frames": 300,
+    "fullscreen_canvaslayer_list": [
+     "/root/Main/PostProcess/Grade"
+    ],
+    "fullscreen_canvaslayer_quads": 1,
+    "fullscreen_list": [
+     "/root/Main/CorridorDepth/Backdrop/Haze 0.62",
+     "/root/Main/CorridorDepth/MidPlate/Painting 1.00"
+    ],
+    "fullscreen_translucent_layers": 2,
+    "nodes": 434.0,
+    "objects": 0.0,
+    "overdraw_estimate": 3.39162903632647,
+    "particles_emitting": 0,
+    "primitives": 0.0,
+    "process_ms_p50": 1.424,
+    "process_ms_p99": 1.424,
+    "render_cpu_ms_p50": 0.0,
+    "slug": "s5-door-open",
+    "texture_mem_mb": 0.0,
+    "translucent_items_on_screen": 26,
+    "video_mem_mb": 0.0
+   },
+   "s6-walk-through": {
+    "additive_items_on_screen": 7,
+    "draw_calls_max": 0,
+    "draw_calls_p50": 0,
+    "frame_ms_mean": 0.211246666666667,
+    "frame_ms_p50": 0.209,
+    "frame_ms_p99": 0.308,
+    "frames": 300,
+    "fullscreen_canvaslayer_list": [
+     "/root/Main/PostProcess/Grade"
+    ],
+    "fullscreen_canvaslayer_quads": 1,
+    "fullscreen_list": [
+     "/root/Main/CorridorDepth/Backdrop/Haze 0.62",
+     "/root/Main/CorridorDepth/MidPlate/Painting 1.00"
+    ],
+    "fullscreen_translucent_layers": 2,
+    "nodes": 434.0,
+    "objects": 0.0,
+    "overdraw_estimate": 3.40235225818775,
+    "particles_emitting": 0,
+    "primitives": 0.0,
+    "process_ms_p50": 1.424,
+    "process_ms_p99": 1.424,
+    "render_cpu_ms_p50": 0.0,
+    "slug": "s6-walk-through",
+    "texture_mem_mb": 0.0,
+    "translucent_items_on_screen": 26,
+    "video_mem_mb": 0.0
+   },
+   "s7-safe-point": {
+    "additive_items_on_screen": 7,
+    "draw_calls_max": 0,
+    "draw_calls_p50": 0,
+    "frame_ms_mean": 0.21788,
+    "frame_ms_p50": 0.218,
+    "frame_ms_p99": 0.315,
+    "frames": 300,
+    "fullscreen_canvaslayer_list": [
+     "/root/Main/PostProcess/Grade"
+    ],
+    "fullscreen_canvaslayer_quads": 1,
+    "fullscreen_list": [
+     "/root/Main/CorridorDepth/Backdrop/Haze 0.62",
+     "/root/Main/CorridorDepth/MidPlate/Painting 1.00"
+    ],
+    "fullscreen_translucent_layers": 2,
+    "nodes": 434.0,
+    "objects": 0.0,
+    "overdraw_estimate": 3.36058408784278,
+    "particles_emitting": 0,
+    "primitives": 0.0,
+    "process_ms_p50": 1.424,
+    "process_ms_p99": 1.424,
+    "render_cpu_ms_p50": 0.0,
+    "slug": "s7-safe-point",
+    "texture_mem_mb": 0.0,
+    "translucent_items_on_screen": 23,
+    "video_mem_mb": 0.0
+   },
+   "s3-bypass-crank": {
+    "additive_items_on_screen": 7,
+    "draw_calls_max": 0,
+    "draw_calls_p50": 0,
+    "frame_ms_mean": 1.50574,
+    "frame_ms_p50": 0.23,
+    "frame_ms_p99": 0.813,
+    "frames": 300,
+    "fullscreen_canvaslayer_list": [
+     "/root/Main/PostProcess/Grade"
+    ],
+    "fullscreen_canvaslayer_quads": 1,
+    "fullscreen_list": [
+     "/root/Main/CorridorDepth/Backdrop/Haze 0.62",
+     "/root/Main/CorridorDepth/MidPlate/Painting 1.00"
+    ],
+    "fullscreen_translucent_layers": 2,
+    "nodes": 434.0,
+    "objects": 0.0,
+    "overdraw_estimate": 3.4029038422196,
+    "particles_emitting": 0,
+    "primitives": 0.0,
+    "process_ms_p50": 372.908,
+    "process_ms_p99": 372.908,
+    "render_cpu_ms_p50": 0.0,
+    "slug": "s3-bypass-crank",
+    "texture_mem_mb": 0.0,
+    "translucent_items_on_screen": 26,
+    "video_mem_mb": 0.0
+   }
+  },
+  "r9": {
+   "s1-door-end-rest": {
+    "additive_items_on_screen": 7,
+    "draw_calls_max": 0,
+    "draw_calls_p50": 0,
+    "frame_ms_mean": 0.24471,
+    "frame_ms_p50": 0.214,
+    "frame_ms_p99": 0.705,
+    "frames": 300,
+    "fullscreen_canvaslayer_list": [
+     "/root/Main/PostProcess/Grade"
+    ],
+    "fullscreen_canvaslayer_quads": 1,
+    "fullscreen_list": [
+     "/root/Main/CorridorDepth/Backdrop/Haze 0.62",
+     "/root/Main/CorridorDepth/MidPlate/Painting 1.00"
+    ],
+    "fullscreen_translucent_layers": 2,
+    "nodes": 434.0,
+    "objects": 0.0,
+    "overdraw_estimate": 3.46580073015189,
+    "particles_emitting": 0,
+    "primitives": 0.0,
+    "process_ms_p50": 1.672,
+    "process_ms_p99": 1.672,
+    "render_cpu_ms_p50": 0.0,
+    "slug": "s1-door-end-rest",
+    "texture_mem_mb": 0.0,
+    "translucent_items_on_screen": 26,
+    "video_mem_mb": 0.0
+   },
+   "s2-relay-wolf": {
+    "additive_items_on_screen": 7,
+    "draw_calls_max": 0,
+    "draw_calls_p50": 0,
+    "frame_ms_mean": 0.277863333333333,
+    "frame_ms_p50": 0.232,
+    "frame_ms_p99": 0.961,
+    "frames": 300,
+    "fullscreen_canvaslayer_list": [
+     "/root/Main/PostProcess/Grade"
+    ],
+    "fullscreen_canvaslayer_quads": 1,
+    "fullscreen_list": [
+     "/root/Main/CorridorDepth/Backdrop/Haze 0.62",
+     "/root/Main/CorridorDepth/MidPlate/Painting 1.00"
+    ],
+    "fullscreen_translucent_layers": 2,
+    "nodes": 434.0,
+    "objects": 0.0,
+    "overdraw_estimate": 3.394329416016,
+    "particles_emitting": 0,
+    "primitives": 0.0,
+    "process_ms_p50": 1.672,
+    "process_ms_p99": 1.672,
+    "render_cpu_ms_p50": 0.0,
+    "slug": "s2-relay-wolf",
+    "texture_mem_mb": 0.0,
+    "translucent_items_on_screen": 26,
+    "video_mem_mb": 0.0
+   },
+   "s4-door-opening": {
+    "additive_items_on_screen": 7,
+    "draw_calls_max": 0,
+    "draw_calls_p50": 0,
+    "frame_ms_mean": 0.39098,
+    "frame_ms_p50": 0.268,
+    "frame_ms_p99": 1.966,
+    "frames": 300,
+    "fullscreen_canvaslayer_list": [
+     "/root/Main/PostProcess/Grade"
+    ],
+    "fullscreen_canvaslayer_quads": 1,
+    "fullscreen_list": [
+     "/root/Main/CorridorDepth/Backdrop/Haze 0.62",
+     "/root/Main/CorridorDepth/MidPlate/Painting 1.00"
+    ],
+    "fullscreen_translucent_layers": 2,
+    "nodes": 434.0,
+    "objects": 0.0,
+    "overdraw_estimate": 3.41836853427651,
+    "particles_emitting": 0,
+    "primitives": 0.0,
+    "process_ms_p50": 1.672,
+    "process_ms_p99": 1.672,
+    "render_cpu_ms_p50": 0.0,
+    "slug": "s4-door-opening",
+    "texture_mem_mb": 0.0,
+    "translucent_items_on_screen": 26,
+    "video_mem_mb": 0.0
+   },
+   "s5-door-open": {
+    "additive_items_on_screen": 7,
+    "draw_calls_max": 0,
+    "draw_calls_p50": 0,
+    "frame_ms_mean": 0.673006666666666,
+    "frame_ms_p50": 0.457,
+    "frame_ms_p99": 2.69,
+    "frames": 300,
+    "fullscreen_canvaslayer_list": [
+     "/root/Main/PostProcess/Grade"
+    ],
+    "fullscreen_canvaslayer_quads": 1,
+    "fullscreen_list": [
+     "/root/Main/CorridorDepth/Backdrop/Haze 0.62",
+     "/root/Main/CorridorDepth/MidPlate/Painting 1.00"
+    ],
+    "fullscreen_translucent_layers": 2,
+    "nodes": 434.0,
+    "objects": 0.0,
+    "overdraw_estimate": 3.39387675650326,
+    "particles_emitting": 0,
+    "primitives": 0.0,
+    "process_ms_p50": 299.228,
+    "process_ms_p99": 299.228,
+    "render_cpu_ms_p50": 0.0,
+    "slug": "s5-door-open",
+    "texture_mem_mb": 0.0,
+    "translucent_items_on_screen": 26,
+    "video_mem_mb": 0.0
+   },
+   "s6-walk-through": {
+    "additive_items_on_screen": 7,
+    "draw_calls_max": 0,
+    "draw_calls_p50": 0,
+    "frame_ms_mean": 0.349886666666667,
+    "frame_ms_p50": 0.305,
+    "frame_ms_p99": 0.935,
+    "frames": 300,
+    "fullscreen_canvaslayer_list": [
+     "/root/Main/PostProcess/Grade"
+    ],
+    "fullscreen_canvaslayer_quads": 1,
+    "fullscreen_list": [
+     "/root/Main/CorridorDepth/Backdrop/Haze 0.62",
+     "/root/Main/CorridorDepth/MidPlate/Painting 1.00"
+    ],
+    "fullscreen_translucent_layers": 2,
+    "nodes": 434.0,
+    "objects": 0.0,
+    "overdraw_estimate": 3.40459997836454,
+    "particles_emitting": 0,
+    "primitives": 0.0,
+    "process_ms_p50": 299.228,
+    "process_ms_p99": 299.228,
+    "render_cpu_ms_p50": 0.0,
+    "slug": "s6-walk-through",
+    "texture_mem_mb": 0.0,
+    "translucent_items_on_screen": 26,
+    "video_mem_mb": 0.0
+   },
+   "s7-safe-point": {
+    "additive_items_on_screen": 7,
+    "draw_calls_max": 0,
+    "draw_calls_p50": 0,
+    "frame_ms_mean": 0.273133333333333,
+    "frame_ms_p50": 0.215,
+    "frame_ms_p99": 1.071,
+    "frames": 300,
+    "fullscreen_canvaslayer_list": [
+     "/root/Main/PostProcess/Grade"
+    ],
+    "fullscreen_canvaslayer_quads": 1,
+    "fullscreen_list": [
+     "/root/Main/CorridorDepth/Backdrop/Haze 0.62",
+     "/root/Main/CorridorDepth/MidPlate/Painting 1.00"
+    ],
+    "fullscreen_translucent_layers": 2,
+    "nodes": 434.0,
+    "objects": 0.0,
+    "overdraw_estimate": 3.36283180801957,
+    "particles_emitting": 0,
+    "primitives": 0.0,
+    "process_ms_p50": 299.228,
+    "process_ms_p99": 299.228,
+    "render_cpu_ms_p50": 0.0,
+    "slug": "s7-safe-point",
+    "texture_mem_mb": 0.0,
+    "translucent_items_on_screen": 23,
+    "video_mem_mb": 0.0
+   },
+   "s3-bypass-crank": {
+    "additive_items_on_screen": 7,
+    "draw_calls_max": 0,
+    "draw_calls_p50": 0,
+    "frame_ms_mean": 1.41995,
+    "frame_ms_p50": 0.25,
+    "frame_ms_p99": 0.887,
+    "frames": 300,
+    "fullscreen_canvaslayer_list": [
+     "/root/Main/PostProcess/Grade"
+    ],
+    "fullscreen_canvaslayer_quads": 1,
+    "fullscreen_list": [
+     "/root/Main/CorridorDepth/Backdrop/Haze 0.62",
+     "/root/Main/CorridorDepth/MidPlate/Painting 1.00"
+    ],
+    "fullscreen_translucent_layers": 2,
+    "nodes": 434.0,
+    "objects": 0.0,
+    "overdraw_estimate": 3.40515156239639,
+    "particles_emitting": 0,
+    "primitives": 0.0,
+    "process_ms_p50": 2.099,
+    "process_ms_p99": 2.099,
+    "render_cpu_ms_p50": 0.0,
+    "slug": "s3-bypass-crank",
+    "texture_mem_mb": 0.0,
+    "translucent_items_on_screen": 26,
+    "video_mem_mb": 0.0
+   }
+  },
+  "r10": {
+   "s1-door-end-rest": {
+    "additive_items_on_screen": 7,
+    "draw_calls_max": 0,
+    "draw_calls_p50": 0,
+    "frame_ms_mean": 1.50542,
+    "frame_ms_p50": 0.227,
+    "frame_ms_p99": 15.433,
+    "frames": 300,
+    "fullscreen_canvaslayer_list": [
+     "/root/Main/PostProcess/Grade"
+    ],
+    "fullscreen_canvaslayer_quads": 1,
+    "fullscreen_list": [
+     "/root/Main/CorridorDepth/Backdrop/Haze 0.62",
+     "/root/Main/CorridorDepth/MidPlate/Painting 1.00"
+    ],
+    "fullscreen_translucent_layers": 2,
+    "nodes": 436.0,
+    "objects": 0.0,
+    "overdraw_estimate": 3.46580073015189,
+    "particles_emitting": 0,
+    "primitives": 0.0,
+    "process_ms_p50": 38.347,
+    "process_ms_p99": 38.347,
+    "render_cpu_ms_p50": 0.0,
+    "slug": "s1-door-end-rest",
+    "texture_mem_mb": 0.0,
+    "translucent_items_on_screen": 26,
+    "video_mem_mb": 0.0
+   },
+   "s2-relay-wolf": {
+    "additive_items_on_screen": 7,
+    "draw_calls_max": 0,
+    "draw_calls_p50": 0,
+    "frame_ms_mean": 0.703473333333333,
+    "frame_ms_p50": 0.288,
+    "frame_ms_p99": 9.255,
+    "frames": 300,
+    "fullscreen_canvaslayer_list": [
+     "/root/Main/PostProcess/Grade"
+    ],
+    "fullscreen_canvaslayer_quads": 1,
+    "fullscreen_list": [
+     "/root/Main/CorridorDepth/Backdrop/Haze 0.62",
+     "/root/Main/CorridorDepth/MidPlate/Painting 1.00"
+    ],
+    "fullscreen_translucent_layers": 2,
+    "nodes": 436.0,
+    "objects": 0.0,
+    "overdraw_estimate": 3.394329416016,
+    "particles_emitting": 0,
+    "primitives": 0.0,
+    "process_ms_p50": 393.929,
+    "process_ms_p99": 393.929,
+    "render_cpu_ms_p50": 0.0,
+    "slug": "s2-relay-wolf",
+    "texture_mem_mb": 0.0,
+    "translucent_items_on_screen": 26,
+    "video_mem_mb": 0.0
+   },
+   "s4-door-opening": {
+    "additive_items_on_screen": 7,
+    "draw_calls_max": 0,
+    "draw_calls_p50": 0,
+    "frame_ms_mean": 2.08950333333333,
+    "frame_ms_p50": 0.472,
+    "frame_ms_p99": 25.363,
+    "frames": 300,
+    "fullscreen_canvaslayer_list": [
+     "/root/Main/PostProcess/Grade"
+    ],
+    "fullscreen_canvaslayer_quads": 1,
+    "fullscreen_list": [
+     "/root/Main/CorridorDepth/Backdrop/Haze 0.62",
+     "/root/Main/CorridorDepth/MidPlate/Painting 1.00"
+    ],
+    "fullscreen_translucent_layers": 2,
+    "nodes": 436.0,
+    "objects": 0.0,
+    "overdraw_estimate": 3.41836853427651,
+    "particles_emitting": 0,
+    "primitives": 0.0,
+    "process_ms_p50": 393.929,
+    "process_ms_p99": 393.929,
+    "render_cpu_ms_p50": 0.0,
+    "slug": "s4-door-opening",
+    "texture_mem_mb": 0.0,
+    "translucent_items_on_screen": 26,
+    "video_mem_mb": 0.0
+   },
+   "s5-door-open": {
+    "additive_items_on_screen": 7,
+    "draw_calls_max": 0,
+    "draw_calls_p50": 0,
+    "frame_ms_mean": 1.08309666666667,
+    "frame_ms_p50": 0.398,
+    "frame_ms_p99": 15.044,
+    "frames": 300,
+    "fullscreen_canvaslayer_list": [
+     "/root/Main/PostProcess/Grade"
+    ],
+    "fullscreen_canvaslayer_quads": 1,
+    "fullscreen_list": [
+     "/root/Main/CorridorDepth/Backdrop/Haze 0.62",
+     "/root/Main/CorridorDepth/MidPlate/Painting 1.00"
+    ],
+    "fullscreen_translucent_layers": 2,
+    "nodes": 436.0,
+    "objects": 0.0,
+    "overdraw_estimate": 3.39387675650326,
+    "particles_emitting": 0,
+    "primitives": 0.0,
+    "process_ms_p50": 26.092,
+    "process_ms_p99": 26.092,
+    "render_cpu_ms_p50": 0.0,
+    "slug": "s5-door-open",
+    "texture_mem_mb": 0.0,
+    "translucent_items_on_screen": 26,
+    "video_mem_mb": 0.0
+   },
+   "s6-walk-through": {
+    "additive_items_on_screen": 7,
+    "draw_calls_max": 0,
+    "draw_calls_p50": 0,
+    "frame_ms_mean": 0.683923333333334,
+    "frame_ms_p50": 0.232,
+    "frame_ms_p99": 7.463,
+    "frames": 300,
+    "fullscreen_canvaslayer_list": [
+     "/root/Main/PostProcess/Grade"
+    ],
+    "fullscreen_canvaslayer_quads": 1,
+    "fullscreen_list": [
+     "/root/Main/CorridorDepth/Backdrop/Haze 0.62",
+     "/root/Main/CorridorDepth/MidPlate/Painting 1.00"
+    ],
+    "fullscreen_translucent_layers": 2,
+    "nodes": 436.0,
+    "objects": 0.0,
+    "overdraw_estimate": 3.40459997836454,
+    "particles_emitting": 0,
+    "primitives": 0.0,
+    "process_ms_p50": 26.092,
+    "process_ms_p99": 26.092,
+    "render_cpu_ms_p50": 0.0,
+    "slug": "s6-walk-through",
+    "texture_mem_mb": 0.0,
+    "translucent_items_on_screen": 26,
+    "video_mem_mb": 0.0
+   },
+   "s7-safe-point": {
+    "additive_items_on_screen": 7,
+    "draw_calls_max": 0,
+    "draw_calls_p50": 0,
+    "frame_ms_mean": 0.804276666666667,
+    "frame_ms_p50": 0.351,
+    "frame_ms_p99": 15.04,
+    "frames": 300,
+    "fullscreen_canvaslayer_list": [
+     "/root/Main/PostProcess/Grade"
+    ],
+    "fullscreen_canvaslayer_quads": 1,
+    "fullscreen_list": [
+     "/root/Main/CorridorDepth/Backdrop/Haze 0.62",
+     "/root/Main/CorridorDepth/MidPlate/Painting 1.00"
+    ],
+    "fullscreen_translucent_layers": 2,
+    "nodes": 436.0,
+    "objects": 0.0,
+    "overdraw_estimate": 3.36087786168228,
+    "particles_emitting": 0,
+    "primitives": 0.0,
+    "process_ms_p50": 26.092,
+    "process_ms_p99": 26.092,
+    "render_cpu_ms_p50": 0.0,
+    "slug": "s7-safe-point",
+    "texture_mem_mb": 0.0,
+    "translucent_items_on_screen": 23,
+    "video_mem_mb": 0.0
+   },
+   "s3-bypass-crank": {
+    "additive_items_on_screen": 7,
+    "draw_calls_max": 0,
+    "draw_calls_p50": 0,
+    "frame_ms_mean": 2.14309666666667,
+    "frame_ms_p50": 0.243,
+    "frame_ms_p99": 7.927,
+    "frames": 300,
+    "fullscreen_canvaslayer_list": [
+     "/root/Main/PostProcess/Grade"
+    ],
+    "fullscreen_canvaslayer_quads": 1,
+    "fullscreen_list": [
+     "/root/Main/CorridorDepth/Backdrop/Haze 0.62",
+     "/root/Main/CorridorDepth/MidPlate/Painting 1.00"
+    ],
+    "fullscreen_translucent_layers": 2,
+    "nodes": 436.0,
+    "objects": 0.0,
+    "overdraw_estimate": 3.40515156239639,
+    "particles_emitting": 0,
+    "primitives": 0.0,
+    "process_ms_p50": 397.209,
+    "process_ms_p99": 397.209,
+    "render_cpu_ms_p50": 0.0,
+    "slug": "s3-bypass-crank",
+    "texture_mem_mb": 0.0,
+    "translucent_items_on_screen": 26,
+    "video_mem_mb": 0.0
+   }
+  },
+  "r11": {
+   "s1-door-end-rest": {
+    "additive_items_on_screen": 7,
+    "draw_calls_max": 0,
+    "draw_calls_p50": 0,
+    "frame_ms_mean": 0.276773333333333,
+    "frame_ms_p50": 0.214,
+    "frame_ms_p99": 1.159,
+    "frames": 300,
+    "fullscreen_canvaslayer_list": [
+     "/root/Main/PostProcess/Grade"
+    ],
+    "fullscreen_canvaslayer_quads": 1,
+    "fullscreen_list": [
+     "/root/Main/CorridorDepth/Backdrop/Haze 0.62",
+     "/root/Main/CorridorDepth/MidPlate/Painting 1.00"
+    ],
+    "fullscreen_translucent_layers": 2,
+    "nodes": 436.0,
+    "objects": 0.0,
+    "overdraw_estimate": 3.46580073015189,
+    "particles_emitting": 0,
+    "primitives": 0.0,
+    "process_ms_p50": 2.083,
+    "process_ms_p99": 2.083,
+    "render_cpu_ms_p50": 0.0,
+    "slug": "s1-door-end-rest",
+    "texture_mem_mb": 0.0,
+    "translucent_items_on_screen": 26,
+    "video_mem_mb": 0.0
+   },
+   "s2-relay-wolf": {
+    "additive_items_on_screen": 7,
+    "draw_calls_max": 0,
+    "draw_calls_p50": 0,
+    "frame_ms_mean": 0.32029,
+    "frame_ms_p50": 0.214,
+    "frame_ms_p99": 1.726,
+    "frames": 300,
+    "fullscreen_canvaslayer_list": [
+     "/root/Main/PostProcess/Grade"
+    ],
+    "fullscreen_canvaslayer_quads": 1,
+    "fullscreen_list": [
+     "/root/Main/CorridorDepth/Backdrop/Haze 0.62",
+     "/root/Main/CorridorDepth/MidPlate/Painting 1.00"
+    ],
+    "fullscreen_translucent_layers": 2,
+    "nodes": 436.0,
+    "objects": 0.0,
+    "overdraw_estimate": 3.394329416016,
+    "particles_emitting": 0,
+    "primitives": 0.0,
+    "process_ms_p50": 2.083,
+    "process_ms_p99": 2.083,
+    "render_cpu_ms_p50": 0.0,
+    "slug": "s2-relay-wolf",
+    "texture_mem_mb": 0.0,
+    "translucent_items_on_screen": 26,
+    "video_mem_mb": 0.0
+   },
+   "s4-door-opening": {
+    "additive_items_on_screen": 7,
+    "draw_calls_max": 0,
+    "draw_calls_p50": 0,
+    "frame_ms_mean": 0.316833333333333,
+    "frame_ms_p50": 0.23,
+    "frame_ms_p99": 1.43,
+    "frames": 300,
+    "fullscreen_canvaslayer_list": [
+     "/root/Main/PostProcess/Grade"
+    ],
+    "fullscreen_canvaslayer_quads": 1,
+    "fullscreen_list": [
+     "/root/Main/CorridorDepth/Backdrop/Haze 0.62",
+     "/root/Main/CorridorDepth/MidPlate/Painting 1.00"
+    ],
+    "fullscreen_translucent_layers": 2,
+    "nodes": 436.0,
+    "objects": 0.0,
+    "overdraw_estimate": 3.41836853427651,
+    "particles_emitting": 0,
+    "primitives": 0.0,
+    "process_ms_p50": 2.083,
+    "process_ms_p99": 2.083,
+    "render_cpu_ms_p50": 0.0,
+    "slug": "s4-door-opening",
+    "texture_mem_mb": 0.0,
+    "translucent_items_on_screen": 26,
+    "video_mem_mb": 0.0
+   },
+   "s5-door-open": {
+    "additive_items_on_screen": 7,
+    "draw_calls_max": 0,
+    "draw_calls_p50": 0,
+    "frame_ms_mean": 0.261463333333333,
+    "frame_ms_p50": 0.211,
+    "frame_ms_p99": 0.952,
+    "frames": 300,
+    "fullscreen_canvaslayer_list": [
+     "/root/Main/PostProcess/Grade"
+    ],
+    "fullscreen_canvaslayer_quads": 1,
+    "fullscreen_list": [
+     "/root/Main/CorridorDepth/Backdrop/Haze 0.62",
+     "/root/Main/CorridorDepth/MidPlate/Painting 1.00"
+    ],
+    "fullscreen_translucent_layers": 2,
+    "nodes": 436.0,
+    "objects": 0.0,
+    "overdraw_estimate": 3.39387675650326,
+    "particles_emitting": 0,
+    "primitives": 0.0,
+    "process_ms_p50": 2.083,
+    "process_ms_p99": 2.083,
+    "render_cpu_ms_p50": 0.0,
+    "slug": "s5-door-open",
+    "texture_mem_mb": 0.0,
+    "translucent_items_on_screen": 26,
+    "video_mem_mb": 0.0
+   },
+   "s6-walk-through": {
+    "additive_items_on_screen": 7,
+    "draw_calls_max": 0,
+    "draw_calls_p50": 0,
+    "frame_ms_mean": 0.249976666666667,
+    "frame_ms_p50": 0.212,
+    "frame_ms_p99": 0.717,
+    "frames": 300,
+    "fullscreen_canvaslayer_list": [
+     "/root/Main/PostProcess/Grade"
+    ],
+    "fullscreen_canvaslayer_quads": 1,
+    "fullscreen_list": [
+     "/root/Main/CorridorDepth/Backdrop/Haze 0.62",
+     "/root/Main/CorridorDepth/MidPlate/Painting 1.00"
+    ],
+    "fullscreen_translucent_layers": 2,
+    "nodes": 436.0,
+    "objects": 0.0,
+    "overdraw_estimate": 3.40459997836454,
+    "particles_emitting": 0,
+    "primitives": 0.0,
+    "process_ms_p50": 2.083,
+    "process_ms_p99": 2.083,
+    "render_cpu_ms_p50": 0.0,
+    "slug": "s6-walk-through",
+    "texture_mem_mb": 0.0,
+    "translucent_items_on_screen": 26,
+    "video_mem_mb": 0.0
+   },
+   "s7-safe-point": {
+    "additive_items_on_screen": 7,
+    "draw_calls_max": 0,
+    "draw_calls_p50": 0,
+    "frame_ms_mean": 0.24323,
+    "frame_ms_p50": 0.214,
+    "frame_ms_p99": 0.718,
+    "frames": 300,
+    "fullscreen_canvaslayer_list": [
+     "/root/Main/PostProcess/Grade"
+    ],
+    "fullscreen_canvaslayer_quads": 1,
+    "fullscreen_list": [
+     "/root/Main/CorridorDepth/Backdrop/Haze 0.62",
+     "/root/Main/CorridorDepth/MidPlate/Painting 1.00"
+    ],
+    "fullscreen_translucent_layers": 2,
+    "nodes": 436.0,
+    "objects": 0.0,
+    "overdraw_estimate": 3.36087786168228,
+    "particles_emitting": 0,
+    "primitives": 0.0,
+    "process_ms_p50": 327.14,
+    "process_ms_p99": 327.14,
+    "render_cpu_ms_p50": 0.0,
+    "slug": "s7-safe-point",
+    "texture_mem_mb": 0.0,
+    "translucent_items_on_screen": 23,
+    "video_mem_mb": 0.0
+   },
+   "s3-bypass-crank": {
+    "additive_items_on_screen": 7,
+    "draw_calls_max": 0,
+    "draw_calls_p50": 0,
+    "frame_ms_mean": 1.49995,
+    "frame_ms_p50": 0.218,
+    "frame_ms_p99": 0.649,
+    "frames": 300,
+    "fullscreen_canvaslayer_list": [
+     "/root/Main/PostProcess/Grade"
+    ],
+    "fullscreen_canvaslayer_quads": 1,
+    "fullscreen_list": [
+     "/root/Main/CorridorDepth/Backdrop/Haze 0.62",
+     "/root/Main/CorridorDepth/MidPlate/Painting 1.00"
+    ],
+    "fullscreen_translucent_layers": 2,
+    "nodes": 436.0,
+    "objects": 0.0,
+    "overdraw_estimate": 3.40515156239639,
+    "particles_emitting": 0,
+    "primitives": 0.0,
+    "process_ms_p50": 373.467,
+    "process_ms_p99": 373.467,
+    "render_cpu_ms_p50": 0.0,
+    "slug": "s3-bypass-crank",
+    "texture_mem_mb": 0.0,
+    "translucent_items_on_screen": 26,
+    "video_mem_mb": 0.0
+   }
+  }
+ }
+}

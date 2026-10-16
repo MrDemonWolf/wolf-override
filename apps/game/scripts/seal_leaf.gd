@@ -68,21 +68,12 @@ func _draw() -> void:
 	if heights.size() < 2:
 		return
 	var size: Vector2 = texture.get_size()
-	var points: PackedVector2Array = PackedVector2Array()
-	var uvs: PackedVector2Array = PackedVector2Array()
-	var colors: PackedColorArray = PackedColorArray()
+	# One vertex per column and height, column by column, then the grid's cells between them.
+	var mesh: TriMesh = TriMesh.new()
 	for column: Vector3 in COLUMNS:
 		for h: float in heights:
-			points.append(Vector2(column.x, column.y - h * column.z))
 			var art: Vector2 = Vector2(column.x, column.y - (h - lift) * column.z)
-			uvs.append((region.position + (art - art_origin) / art_scale) / size)
 			var shade: float = shadow_at(h) / shadow_at(h - lift)
-			colors.append(Color(shade, shade, shade, 1.0))
-	var rows: int = heights.size()
-	var indices: PackedInt32Array = PackedInt32Array()
-	for c: int in COLUMNS.size() - 1:
-		for r: int in rows - 1:
-			var a: int = c * rows + r
-			var b: int = (c + 1) * rows + r
-			indices.append_array([a, b, a + 1, a + 1, b, b + 1])
-	RenderingServer.canvas_item_add_triangle_array(get_canvas_item(), indices, points, colors, uvs, PackedInt32Array(), PackedFloat32Array(), texture.get_rid())
+			mesh.add_vertex(Vector2(column.x, column.y - h * column.z), (region.position + (art - art_origin) / art_scale) / size, Color(shade, shade, shade, 1.0))
+	mesh.add_grid(0, COLUMNS.size(), heights.size())
+	mesh.draw(get_canvas_item(), texture)
