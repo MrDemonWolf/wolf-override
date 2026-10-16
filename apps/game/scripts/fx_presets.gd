@@ -95,11 +95,9 @@ static func relief_jet() -> CPUParticles2D:
 	flare.add_point(Vector2(1.0, 1.0))
 	particles.scale_amount_curve = flare
 	particles.color = Color(0.86, 0.92, 0.95, 0.2)
-	var fade: Gradient = Gradient.new()
-	fade.offsets = PackedFloat32Array([0.0, 0.1, 0.7, 1.0])
-	fade.colors = PackedColorArray([Color(1.0, 1.0, 1.0, 0.85), Color.WHITE, Color(1.0, 1.0, 1.0, 0.55), Color(1.0, 1.0, 1.0, 0.0)])
-	particles.color_ramp = fade
-	particles.texture = _streak_texture(12, 16)
+	particles.color_ramp = _ramp([0.0, 0.1, 0.7, 1.0], [Color(1.0, 1.0, 1.0, 0.85), Color.WHITE, Color(1.0, 1.0, 1.0, 0.55), Color(1.0, 1.0, 1.0, 0.0)])
+	# A soft 12x16 ellipse (the radial fill runs in UV space), a streak stretched along its travel.
+	particles.texture = _radial(12, 16, [0.0, 0.45, 1.0], [Color.WHITE, Color(1.0, 1.0, 1.0, 0.4), Color(1.0, 1.0, 1.0, 0.0)])
 	return particles
 
 
@@ -114,38 +112,38 @@ static func _one_shot(particles_name: String, amount: int, lifetime: float) -> C
 	return particles
 
 
+## Every particle's colour over its life except the relief jet's: full until 60 % of it, then fading out.
 static func _fade_ramp() -> Gradient:
-	var ramp: Gradient = Gradient.new()
-	ramp.offsets = PackedFloat32Array([0.0, 0.6, 1.0])
-	ramp.colors = PackedColorArray([Color.WHITE, Color.WHITE, Color(1.0, 1.0, 1.0, 0.0)])
-	return ramp
+	return _ramp([0.0, 0.6, 1.0], [Color.WHITE, Color.WHITE, Color(1.0, 1.0, 1.0, 0.0)])
 
 
+## A round soft dot [param size] px across: white at the centre, half alpha halfway out, clear at the
+## edge. The sparks, dust and steam share it.
 static func _dot_texture(size: int) -> GradientTexture2D:
-	var gradient: Gradient = Gradient.new()
-	gradient.offsets = PackedFloat32Array([0.0, 0.5, 1.0])
-	gradient.colors = PackedColorArray([Color.WHITE, Color(1.0, 1.0, 1.0, 0.5), Color(1.0, 1.0, 1.0, 0.0)])
-	var texture: GradientTexture2D = GradientTexture2D.new()
-	texture.gradient = gradient
-	texture.width = size
-	texture.height = size
-	texture.fill = GradientTexture2D.FILL_RADIAL
-	texture.fill_from = Vector2(0.5, 0.5)
-	texture.fill_to = Vector2(0.5, 0.0)
-	return texture
+	return _radial(size, size, [0.0, 0.5, 1.0], [Color.WHITE, Color(1.0, 1.0, 1.0, 0.5), Color(1.0, 1.0, 1.0, 0.0)])
 
 
-## A soft ellipse [param width] by [param height] (the radial fill runs in UV space), for streaks
-## stretched along their travel.
-static func _streak_texture(width: int, height: int) -> GradientTexture2D:
-	var gradient: Gradient = Gradient.new()
-	gradient.offsets = PackedFloat32Array([0.0, 0.45, 1.0])
-	gradient.colors = PackedColorArray([Color.WHITE, Color(1.0, 1.0, 1.0, 0.4), Color(1.0, 1.0, 1.0, 0.0)])
+## A [param width] by [param height] px texture of [param colors] at [param offsets], radial from the
+## centre out to the middle of the top edge. The fill runs in UV space, so a width other than the
+## height gives a soft ellipse. Every call makes a new texture; nothing here caches.
+## Merge note: main (since the lighter-game work, ba82b4f) has this as FxKit.radial, square only. At the
+## merge this function and _ramp go, and their callers use FxKit.radial (given an optional height)
+## and FxKit.ramp, so the presets keep one gradient builder with the rooms.
+static func _radial(width: int, height: int, offsets: Array[float], colors: Array[Color]) -> GradientTexture2D:
 	var texture: GradientTexture2D = GradientTexture2D.new()
-	texture.gradient = gradient
+	texture.gradient = _ramp(offsets, colors)
 	texture.width = width
 	texture.height = height
 	texture.fill = GradientTexture2D.FILL_RADIAL
 	texture.fill_from = Vector2(0.5, 0.5)
 	texture.fill_to = Vector2(0.5, 0.0)
 	return texture
+
+
+## A new Gradient of [param colors] at [param offsets] (0..1, ascending, one per colour): a particle's
+## colour over its life, or a texture's stops.
+static func _ramp(offsets: Array[float], colors: Array[Color]) -> Gradient:
+	var gradient: Gradient = Gradient.new()
+	gradient.offsets = PackedFloat32Array(offsets)
+	gradient.colors = PackedColorArray(colors)
+	return gradient
