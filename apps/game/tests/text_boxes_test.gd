@@ -31,7 +31,7 @@ func _run() -> void:
 	check_name = "Text boxes"
 	var path: String = "user://text-boxes-test-%s.cfg" % OS.get_process_id()
 	game = await spawn_game("%s-save.json" % path, path, _keep_running) as Main
-	story =game.get_node("CanvasLayer/BottomBar/Story") as Label
+	story = game.get_node("CanvasLayer/BottomBar/Story") as Label
 	speaker = game.get_node("CanvasLayer/BottomBar/Speaker") as Label
 	bar = game.get_node("CanvasLayer/BottomBar") as Control
 	_check_reading_rule()
@@ -285,9 +285,7 @@ func _check_first_control() -> void:
 	# The name card fades (a tween, in real time) while its last moments run out. Waited out by its
 	# state, not a fixed time, so a loaded machine cannot leave it still fading at the check.
 	await _play(Main.TOP_CARD_FADE_SECONDS, "after the first step")
-	var fade_started: int = Time.get_ticks_msec()
-	while game.top_card.visible and Time.get_ticks_msec() - fade_started < 10000:
-		await process_frame
+	await _wait_real(func() -> bool: return not game.top_card.visible, 10000)
 	await _play(0.1, "after the name card")
 	_expect(not game.top_card.visible and bar.visible and story.text.begins_with("%s keeps WOLF's systems running." % game.call("_first_name")), "once the name card has gone the lines start, one box at a time (%s)" % story.text.c_escape())
 	_expect(not hint_panel.visible, "the hint bar stays off while the tutorial prompt is the prompt")
@@ -358,6 +356,26 @@ func _check_records_exit() -> void:
 	game.call("_interact")
 	await process_frame
 	_expect(game.state.chapter_id == "junction", "with the lines read, USE at the exit goes on to the junction")
+
+
+## The relay question with WOLF disclosed (DebugActions), on screen: one frame for the jump to land,
+## then the HUD refreshed, so the answer buttons are laid out for the current device and text size.
+func _to_relay_question() -> void:
+	game.debug_tools.actions.set_relay(&"disclose_wolf")
+	game.debug_tools.actions.jump(&"relay_question")
+	await process_frame
+	game.call("_refresh_ui")
+
+
+## Waits process frames until [param condition] holds or [param limit_ms] of wall-clock time have
+## passed (it returns either way; the caller checks). For the game's real-time steps, such as the
+## name card's fade, which runs on each frame's real delta: headless frames on an idle machine run
+## far faster than 1/60 s, so no frame count bounds them. The kit's waits count physics frames on
+## purpose (game_suite.gd's header), so this wall-clock wait stays in this suite.
+func _wait_real(condition: Callable, limit_ms: int) -> void:
+	var waited_from: int = Time.get_ticks_msec()
+	while not condition.call() and Time.get_ticks_msec() - waited_from < limit_ms:
+		await process_frame
 
 
 ## Records Access with the purge trace and the mirror done (WOLF's relay disclosure, WOLF's readout),
@@ -448,10 +466,7 @@ func _check_story_kept() -> void:
 func _check_touch() -> void:
 	game.touch_enabled = true
 	game.controller_active = false
-	game.debug_tools.actions.set_relay(&"disclose_wolf")
-	game.debug_tools.actions.jump(&"relay_question")
-	await process_frame
-	game.call("_refresh_ui")
+	await _to_relay_question()
 	var choice_1: Button = game.get_node("CanvasLayer/TouchControls/Choice1") as Button
 	var choice_2: Button = game.get_node("CanvasLayer/TouchControls/Choice2") as Button
 	_expect(choice_1.visible and not choice_1.text.begins_with("1") and not choice_2.text.begins_with("2") and choice_1.text == M0State.CHOICE_TEXT[M0State.DISCLOSE], "touch answers carry no number (%s / %s)" % [choice_1.text, choice_2.text])
@@ -516,10 +531,7 @@ func _check_text_size(path: String) -> void:
 	_expect(not card.intersects((game.get_node("CanvasLayer/PauseButton") as Control).get_global_rect()), "the top card stays clear of PAUSE at 200%")
 	# The answers keep the HUD's side margin (keys, under the top card), and on touch the top card
 	# stays clear of the DEBUG button where it shows, its words still fitting.
-	game.debug_tools.actions.set_relay(&"disclose_wolf")
-	game.debug_tools.actions.jump(&"relay_question")
-	await process_frame
-	game.call("_refresh_ui")
+	await _to_relay_question()
 	for button_path: String in ["CanvasLayer/TouchControls/Choice1", "CanvasLayer/TouchControls/Choice2"]:
 		var answer: Rect2 = (game.get_node(button_path) as Control).get_global_rect()
 		_expect(answer.position.x >= Main.HUD_SIDE_MARGIN - 0.5 and answer.end.x <= 960.0 - Main.HUD_SIDE_MARGIN + 0.5, "at 200%% the answer keeps the side margin (%s)" % answer)
@@ -652,9 +664,7 @@ func _check_prompts_clear(path: String) -> void:
 			# The first box waits for the name card's fade (Main.TOP_CARD_FADE_SECONDS, counted in each
 			# frame's real delta), so the wait is bounded by real time, not a frame count: headless frames
 			# on an idle machine can run 600 of them in under that fade.
-			var waited_from: int = Time.get_ticks_msec()
-			while not fresh.bottom_bar.visible and Time.get_ticks_msec() - waited_from < 10000:
-				await process_frame
+			await _wait_real(func() -> bool: return fresh.bottom_bar.visible, 10000)
 			_check_prompt_clear(fresh, touch, true, context)
 			_expect(fresh.bottom_bar.visible, "%s: the opening lines' first box comes up while the tutorial prompt shows" % context)
 			# A quick free, not end_game: its settle time on each of the 10 games adds up, and the files
