@@ -29,11 +29,14 @@ func add_leaf(leaf: SwingLeaf) -> void:
 	queue_redraw()
 
 
+## Tints the flat piece [param index] (an index add_quad returned) with [param color],
+## the vertex colour multiplied over its art, and redraws. The rooms' status lamps set their glass with it.
 func set_color(index: int, color: Color) -> void:
 	(_pieces[index] as Array)[3] = color
 	queue_redraw()
 
 
+## The vertex colour the flat piece [param index] is drawn with now: add_quad's, or the last set_color's.
 func get_color(index: int) -> Color:
 	return (_pieces[index] as Array)[3]
 

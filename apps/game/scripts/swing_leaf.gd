@@ -40,6 +40,11 @@ const CLOSE_SECONDS: float = 3.4
 const BODY_SIZE: Vector2 = Vector2(16.0, 132.0)
 ## Rows of the mesh (fractions of the leaf height), so the door light's fall-off down the leaf is smooth.
 const ROWS: PackedFloat32Array = [0.0, 0.2, 0.45, 0.7, 0.88, 1.0]
+## The design model's own shading constants (AMBIENT and WRAP in rmodel.py, under
+## docs/research-2026-10/sources/doors-2026-10-14/records/tools; rdesign.py lit the painted walls and
+## reveals with them), so a leaf lit here matches the art round it. AMBIENT is the linear-light fill every face gets (scaled by the fill exposure);
+## WRAP lifts a lamp's n.l so a face turned slightly away still takes a little of it (a light entry's
+## fifth value overrides it, as the door lights' 0 does).
 const AMBIENT: Vector3 = Vector3(0.020, 0.032, 0.042)
 const WRAP: float = 0.06
 ## The paint the face art was made at (GUNSHIP albedo at reference exposure 1): a vertex's colour is
@@ -83,6 +88,11 @@ var horizon: float = DoorCamera.HORIZON
 var arm_region: Rect2 = Rect2()
 
 
+## A leaf cut from [param atlas]: [param room], [param outside] and [param edge] are the atlas regions
+## of its room face, outside face and latch edge (each painted flat, u across, v up); [param hinge_foot]
+## is the hinge axis's foot and [param u], [param n] the wall's plan axes (see [member hinge]); [param
+## lamps] its lights (see [member lights]). It starts shut, named "SwingLeaf", in DoorCamera's default
+## vanishing point, with no closer arm: the room sets name, fill, vpx, horizon and arm_region as it needs.
 func _init(atlas: Texture2D, room: Rect2, outside: Rect2, edge: Rect2, hinge_foot: Vector3, u: Vector3, n: Vector3, lamps: Array) -> void:
 	name = "SwingLeaf"
 	texture = atlas
@@ -164,10 +174,18 @@ func angle() -> float:
 	return open * PI * 0.5
 
 
+## The unit plan vector from the hinge edge to the latch edge at swing [param theta] (radians, 0 shut):
+## shut it runs along the face away from the back wall (-axis_u); at 90 degrees it stands straight out
+## of the wall into the room (-axis_n). The leaf turns about the vertical hinge axis, so y is always 0.
+## The arm, the faces and the room tests (room_depth_test) all place the leaf with it.
 func leaf_dir(theta: float) -> Vector3:
 	return -axis_u * cos(theta) - axis_n * sin(theta)
 
 
+## The room face's outward unit normal at swing [param theta]: shut it faces out of the wall into the
+## room (-axis_n); at 90 degrees it faces along the wall toward the back (+axis_u). It stays leaf_dir
+## turned a quarter turn, so the outside face's normal is its negative and the faces sit LEAF_T apart
+## along it.
 func room_normal(theta: float) -> Vector3:
 	return -axis_n * cos(theta) + axis_u * sin(theta)
 
@@ -196,6 +214,9 @@ func shade(p: Vector3, nrm: Vector3) -> Color:
 	return Color(_srgb(lit.x) / _srgb(PAINT.x), _srgb(lit.y) / _srgb(PAINT.y), _srgb(lit.z) / _srgb(PAINT.z), 1.0)
 
 
+## The sRGB transfer function (IEC 61966-2-1) of the linear value [param c], clamped to 0..1 first. shade()
+## takes the lit paint's ratio to the bare paint in sRGB, because the vertex colour multiplies the face
+## art's stored sRGB values.
 static func _srgb(c: float) -> float:
 	c = clampf(c, 0.0, 1.0)
 	return c * 12.92 if c <= 0.0031308 else 1.055 * pow(c, 1.0 / 2.4) - 0.055
