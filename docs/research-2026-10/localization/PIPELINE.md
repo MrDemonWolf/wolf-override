@@ -50,8 +50,10 @@ Two more options were ruled out on paper:
 - **Local open models.** NLLB-200 is CC-BY-NC 4.0, so it cannot be used for a game that may be sold.
   MADLAD-400 3B is Apache 2.0 but takes no glossary or context. Gemma- and Qwen-class models would load
   Nathanial's Mac and still need a quality trial.
-- **Crowdin's free open-source plan.** It requires "no commercial products related to the project",
-  and a paid Steam release would break that.
+- **Crowdin's free open-source plan.** Its conditions are an OSI-approved licence, being the project
+  lead, at least three months of work on the project, and "You do not have any commercial products
+  related to the open-source project you are requesting a license for" (crowdin.com/product/for-open-source,
+  read October 16, 2026). A paid Steam release would break the last one.
 
 **The prototype** ran the pipeline on the 34 msgids its stills show (`prototype/evidence/po_check.json`).
 
@@ -231,7 +233,7 @@ pl on, with masculine past tense.
 **WOLF's voice:** calm, direct, terse and dry, a peer and never a servant; no exclamation marks and no
 slang.
 - He uses informal address (tú, du, tu, ты, ty).
-- In Japanese he speaks in plain form, without keigo. His first-person pronoun (俺, 私 or 僕) and how
+- In Japanese he speaks in plain form, without keigo (Japanese polite speech). His first-person pronoun (俺, 私 or 僕) and how
   he refers to the Director are Nathanial's call (D11).
 - His Korean speech level is also Nathanial's call (D11).
 
@@ -308,14 +310,27 @@ filled with `String.format`), so a translator can reorder them. Positional `%s` 
 
 ## Human review
 
-- **Where.** Weblate's free Libre plan is for public projects (weblate.org/en/hosting, read October
-  16, 2026). The repository is public under GPL-3.0. Weblate reads and writes PO files in Git and
+- **Where.** Weblate's free Libre plan is for libre (open-source) projects and "only for public
+  projects" (weblate.org/en/hosting, read October 16, 2026). The repository is public under GPL-3.0, so
+  it qualifies. Weblate reads and writes PO files in Git and
   shows each line's context, notes and fuzzy state.
 - **Who.**
   - Community native speakers first, in the order of the list (es, de and ja were the pipeline
     trial's first three).
-  - Before any paid release, one paid native proofreader per language reads the story lines. Rates
-    were not researched: a gap.
+  - Before any paid release, one paid native proofreader per language reads the story lines.
+  - **What that costs (an estimate, not a quote).** One UK agency's published list price for
+    proofreading is £40 per 1,000 words for most European languages and £45 for Mandarin, Korean and
+    into Japanese, plus VAT, with a £25 minimum per language (Absolute Translations, https://www.absolutetranslations.com/proofreading-prices (dated July 6, 2026, read October 16, 2026)). At those prices:
+
+    | Scope | Per European file | Per CJK file | All 11 non-English files (7 at £40, 4 at £45) |
+    |---|---|---|---|
+    | Story lines, about 1,460 words | about £58 | about £66 | about £670 plus VAT |
+    | Everything but the changelog, 2,860 words | about £114 | about £129 | about £1,320 plus VAT |
+
+    The page does not name Russian or Polish, and reviewing a machine translation of a game against
+    its style rules may be priced above plain proofreading, so a real quote can be higher. It is one
+    agency's list, not a market survey; the freelance rate surveys we tried (ProZ, Upwork) were not
+    readable without an account or a browser check. Who recruits the reviewers is still not planned.
 - **What is checked first:**
   - the engineer's gender in Russian and Polish;
   - WOLF's voice;
@@ -388,15 +403,31 @@ cross-checked with Codex (OpenAI); reviewed by <names>", or "not yet reviewed".
 | Prototype: 102 back-translations | `01a143f0-8b81-7703-972f-13e21953fd61` | 37,015 (13,184 cached) | 3,007 |
 | Prototype: 2 shortened buttons | `01a14409-6eb1-7db2-8ef1-f6f3714d953b` | 33,912 (13,184 cached) | 55 |
 | Design step: 34 Russian back-translations | `01a14426-2248-7773-8edf-2c4cb6fa3ef8` | 33,534 (13,056 cached) | 1,346 |
+| Fix-2 step: 136 back-translations with roles and `engineer_gendered` | `01a146cf-4beb-7f42-8d61-726071ffb149` | 41,314 (13,312 cached) | 5,510 |
 
 Every session is archived. No API key was set and no paid service was used. The Claude translations
 were made in the steps' own Claude Code sessions.
+
+**Projected for the full translation (an estimate).** The fix-2 run back-translated 136 texts, 612
+English words' worth across four languages, for 5,510 output tokens. Its input was 41,314 tokens, of
+which about 33,900 is the fixed prompt every session carries (the 2-button session above used 33,912 for
+almost no text), so the text itself took about 7,400. The game outside the changelog is 2,860 words, and
+11 files make 31,460 words, about 51 times that run:
+- back-translation output: about 280,000 tokens;
+- back-translation input: about 380,000 tokens of text, plus about 34,000 fixed per session; at one
+  session per scene batch per language (about 6 batches × 11 files = 66 sessions), about 2.6 million in
+  all, most of it the cached fixed prompt;
+- Claude's translation: the same order of text in and out, in Claude Code sessions (not measured).
+
+OpenAI and Anthropic do not publish their subscription limits as token counts, so whether this fits
+one usage window is unknown. The plan already spreads it out: one language PR at a time (L9 to L12), a
+batch per scene.
 
 ## Credits and sources
 
 **Tools:**
 - Claude (Claude Code, Anthropic) translated, wrote the tools and wrote these notes.
-- Codex (codex-cli 0.162.1, OpenAI, ChatGPT subscription) back-translated.
+- Codex (codex-cli 0.162.1, and 0.163.0 for the fix-2 run; OpenAI, ChatGPT subscription) back-translated.
 - Apple's Translation framework (macOS 27.0.1) was probed query-only, with no prompt and no download
   (`pipeline/probe/apple_translate_probe.swift`).
 - GNU gettext 1.0 (`msgfmt`, `msgmerge`) and fontTools 4.60.1.
@@ -411,6 +442,10 @@ were made in the steps' own Claude Code sessions.
   - https://docs.godotengine.org/en/4.7/tutorials/i18n/pseudolocalization.html
 - Weblate hosting: https://weblate.org/en/hosting/
 - Crowdin for open source: https://crowdin.com/product/for-open-source
+- Proofreading list prices, Absolute Translations (dated July 6, 2026):
+  https://www.absolutetranslations.com/proofreading-prices
+- Godot 4.7.2-stable source (ed1daf0bf): `core/string/translation_domain.cpp`,
+  `core/io/translation_loader_po.cpp`, `core/string/ustring.cpp` (`String::sprintf`)
 - ML Kit translation: https://developers.google.com/ml-kit/language/translation
 - MADLAD-400: https://huggingface.co/google/madlad400-3b-mt
 - Valve's AI disclosure rules, VGC, January 17, 2026:

@@ -11,8 +11,8 @@ doors (PRs #75, #76, #78 and #79). **One branch is in flight:** `codex/opening-d
 `main` it changes `main.gd` (549 lines added, 53 removed), `main.tscn`, `m0_state.gd` and `m0_actor.gd`;
 adds `greybox_bay.gd` (931 lines), `dock_paint_data.gd` and `dock_shapes_data.gd`; and edits or adds
 tests (`git diff --stat origin/main...origin/codex/opening-dock`, 68 files).
-- It also puts English line breaks in the middle of three `INTRO_LINES` sentences and splits one box
-  into two. The line-break gate treats such breaks as layout (DESIGN.md, "Layout breaks never bind a
+- It also adds a line break to four `INTRO_LINES` (two in the middle of a sentence, two between
+  sentences) and splits one box into two. The line-break gate treats such breaks as layout (DESIGN.md, "Layout breaks never bind a
   translation"), and the first PR after the merge moves the prototype's opening check to the new
   msgids.
 
@@ -27,15 +27,18 @@ tests (`git diff --stat origin/main...origin/codex/opening-dock`, 68 files).
 
 | Lighter step | Touches | Order with this plan |
 |---|---|---|
+| S01 hud-dirty (on-change HUD writes, the `settings_menu.prompt()` cache) | the key names and prompts L7a and L7b translate | Before L7a; L7a adds the cache clear on `NOTIFICATION_TRANSLATION_CHANGED` and a test that switches language and reads a prompt. If S01 comes later, it carries that clear. |
 | S05 helpers (text tables, Hud `key()` and `localise()`, Choice record) | the lines L7b and L7c mark | Default: S05 lands first as its own lighter PR. Otherwise L7b and L7c build those parts and carry its parity gate and effort (below). |
 | S08 hud (the Hud view model) | the HUD text L7b marks | The same as S05. |
 | S09 title-pause-settings | the title buttons and Settings rows | Before L6, L7a and L8. If it has not started when L6 is due, L6 and L7a go first (no English pixel changes) and S09 carries the LANGUAGE row and auto-translate modes over. |
 | S10 endcard-theme | the end card, `settings_menu.tscn`, `settings_theme.tres` | The same as S09; before L7c's end-card text where it can. |
+| S11 intro-beatsaver (IntroSequence, BeatSaver) | `INTRO_LINES` and the opening boxes L7c marks | After `codex/opening-dock` merges and before L7c's opening lines; otherwise S11 moves the marks with the lines and carries the opening check in `i18n_test`. |
 | S12 room-base (NamePlate) | the station plates | Before L8's plate work (D3). |
 | S13-S15 room beats | where hints and objectives live | Either order: beats return English msgids, marked at their tables. |
 
-  **L8 retakes the R1 baseline.** L8 is a visible change to the title, so it lands after S09 and S10,
-  and its approved stills become the lighter plan's new title-and-menus baseline.
+  **L8 retakes the R1 baseline** (the lighter plan's reference screenshots of route R1, the title and
+  menus). L8 is a visible change to the title, so it lands after S09 and S10, and its approved stills
+  become the lighter plan's new title-and-menus baseline.
 
 ## Gates every PR passes
 
@@ -53,6 +56,9 @@ These are on top of the gates each PR names below:
 - **After each milestone,** update Notion and the Codex board through Codex (the process rule).
 
 The **effort** column is an estimate in agent working days, including the gates. It is not measured.
+An agent day is about one working day of one Claude Code session doing the PR and its checks. It is not
+calendar time: the calendar also waits on Nathanial's answers, reviews, the shared heavy-run slot and
+other jobs, so no calendar range is given.
 
 ## Phase 0: foundation (can start now)
 
@@ -68,12 +74,12 @@ The **effort** column is an estimate in agent working days, including the gates.
 
 | PR | What changes | Its gates | Effort |
 |---|---|---|---|
-| **L6 `settings-language`** | The LANGUAGE row in a GENERAL tab (D10), with the list's own font chain, saved as `[general] language`. With one language it stays hidden. | `ui_controls_test` and `settings_test`; the picker checks in `i18n_test`; a Settings still in en and pseudo; `controls/settings.mdx`; a changelog line once it is visible. | 1 |
+| **L6 `settings-language`** | The LANGUAGE row in a GENERAL tab (D10), with the list's own font chain, saved as `[general] language`; the "machine translation" tag on a second row of the open list and as a note under the row (DESIGN.md, "Settings"). With one language it stays hidden. | `ui_controls_test` and `settings_test`; the picker checks in `i18n_test`, including every tag drawable by the list's font chain; a Settings still in en and pseudo; `controls/settings.mdx`; a changelog line once it is visible. | 1 |
 | **L7a `mark-menus`** | Title, pause, Settings captions and tooltips, input names and the rebind prompt: auto-translate for scene text, `KEY.tr` for code captions. The volume and rebind rows show display names, not bus or device ids. Key names use `DisplayServer.keyboard_get_label_from_physical`. | The pseudo audit finds 0 untranslated text on the title, pause and Settings stills; the `hardcoded` count for `game_settings.gd` and the menus reaches 0; the key-name change gets a still on an AZERTY layout. | 1.5 |
 | **L7b `mark-hud`** (after S05 and S08, or with their Hud parts) | Hints, objectives, top cards and the tutorial. The key tokens `E:`, `HOLD E:`, `Press E` and `press 2` become placeholders filled after `tr()`. "CONTINUE" gets a `msgctxt` (a context tag, so one English word can have two translations) for the touch button. | The pseudo audit on the corridor, Records and junction hint stills; the prompt checks in `m0_scene_test` stay green; the touch layout stills. If it builds S05's or S08's parts: the lighter plan's four-route screenshot parity in English and an empty UI-dump diff. | 1.5 (2.5 with S05 and S08's Hud parts) |
-| **L7c `mark-story`** (after S05, or with its text tables and Choice record) | Narration, dialogue, refusals, knockdown cards, restore lines, choices and the end card. Speaker and words are stored apart and the colour goes by speaker id. Lines with inserts use `I18n.format` and named placeholders. Lines whose breaks carry meaning get `#. i18n: keep-breaks`. The save keeps English (DESIGN.md). | `approved_wording_test` unchanged; the `hardcoded` count in code reaches 0; the pseudo audit on every story still; an old save loads and WOLF quotes its choice in pseudo. If it builds S05's parts: the four-route screenshot parity in English. | 3 (4 with S05's tables and Choice record) |
+| **L7c `mark-story`** (after S05, or with its text tables and Choice record) | Narration, dialogue, refusals, knockdown cards, restore lines, choices and the end card. Speaker and words are stored apart and the colour goes by speaker id. Lines with inserts use `I18n.format` and named placeholders. Lines whose breaks carry meaning get `#. i18n: keep-breaks`. Every one of the inventory's 26 gender-risk lines gets its `# TRANSLATORS: i18n: engineer=...` mark (and `slot=choice` on the three checkpoint callbacks), which the gender gate and the back-translation read. The save keeps English (DESIGN.md). | `approved_wording_test` unchanged; the `hardcoded` count in code reaches 0; the pseudo audit on every story still; an old save loads and WOLF quotes its choice in pseudo. If it builds S05's parts: the four-route screenshot parity in English. | 3 (4 with S05's tables and Choice record) |
 | **L7d `boxes-per-language`** | `DialogueBoxes`: one shared `fits()` (the two copies go); `…` and the «» „“ 「」 quote pairs; per-language characters a second and cap; per-script row rule with a balanced two-row split; `LONG_LINE_WORDS` gets a character equivalent; the station-name wrap uses `TextParagraph`. The rules come from `LANGUAGES`. | `text_boxes_test` loops every language × every `TextSize` step; stills of a Japanese box with no lone short last row. | 2 (the parts in `dialogue_boxes.gd` can start now) |
-| **L8 `layout-for-languages`** (after S09, S10 and S12) | D10's title layout: wider buttons (the longest measured is 213 px for es NEW GAME), a CONTINUE note that wraps to two rows, room for the Brand line, PAUSE and the touch USE button. The station plates' fit and their neighbours, if D3 translates them. | `KNOWN_OVERFLOWS` empty with L1's overflow check (trimmed text and height count); 0 overflows under pseudo +30% on every still; `text_boxes_test`'s existing overlap checks (station names, touch, top card, prompts) run in every language and pass, with no new overlap check written; a played route on desktop and touch for the layout; the title-and-menus parity baseline retaken after Nathanial approves; a changelog line. | 2 |
+| **L8 `layout-for-languages`** (after S09, S10 and S12) | D10's title layout: wider buttons (the longest measured is 213 px for es NEW GAME), a CONTINUE note that wraps to two rows, room for the Brand line, PAUSE and the touch USE button. The station plates' fit and their neighbours, if D3 translates them. | `KNOWN_OVERFLOWS` empty with L1's overflow check (trimmed text and height count) on the title, menus, Settings rows, HUD, plates, the end card, the choice rows and the credits, each in a state that shows it; 0 overflows under pseudo +30% on every still; `text_boxes_test`'s existing overlap checks (station names, touch, top card, prompts) run in every language and pass, with no new overlap check written; a played route on desktop and touch for the layout; the title-and-menus parity baseline retaken after Nathanial approves; a changelog line. | 2 |
 
 ## Phase 2: the languages
 
@@ -99,11 +105,11 @@ The gates every language PR names:
 
 | PR | Languages | Extra gates | Effort |
 |---|---|---|---|
-| **L9** | es (Latin America) and the es_ES adaptation pass | the resolver sends es_MX, es_AR and es_US to `es` and es_ES to `es_ES`; Spain's text differs only where the adaptation rules say; the sibling gate: `es` and `es_ES` translate the same lines, none fuzzy | 1.5 |
+| **L9** | es (Latin America) and the es_ES adaptation pass, plus the Spanish part of L13 (Steam's language table rows and the AI disclosure, D2), so Spanish can reach players with the first release after L9 rather than waiting for L13 | the resolver sends es_MX, es_AR and es_US to `es` and es_ES to `es_ES`; Spain's text differs only where the adaptation rules say; the sibling gate: `es` and `es_ES` translate the same lines, none fuzzy | 1.5 |
 | **L10** | pt_BR, fr, de | fr uses U+00A0 before `; : ! ?`; de and fr long-word layout stills | 2.5 |
-| **L11** | pl and ru | the Slavic rules: no past tense about the engineer; the name only in the nominative; no one-letter word at a row's end (a new `i18n_tool.py` gate); a native reviewer reads the gendered lines first | 2 |
+| **L11** | pl and ru | the Slavic rules: no past tense about the engineer (the gender gate, with every gender-risk line marked in L7c); the name only in the nominative (the name-case gate, already in the tool); no one-letter word at a row's end (a new `i18n_tool.py` gate); a native reviewer reads the gendered lines first | 2 |
 | **L12** | ja, ko, zh_Hans and the zh_Hant conversion and review | the sibling gate for `zh_Hans` and `zh_Hant`; each turns on its own Noto fallback and only that one (the line-height check per language); reading speed and row rules; `icudt_godot.dat` in the export (L3); ko particles after names | 3 |
-| **L13 `exports-and-stores`** | all | macOS export: the `.lproj` folders and the App Store's language list, checked on TestFlight. Windows export. Steam's language table lists only the shipped languages, with the AI disclosure (D2). Phone presets come later: Android `locales_config`, `values-pt-rBR`. | 1.5 |
+| **L13 `exports-and-stores`** | all | macOS export: the `.lproj` folders and the App Store's language list, checked on TestFlight. Windows export. Steam's language table lists only the shipped languages (Spanish's rows already went in with L9), with the AI disclosure (D2). Phone presets come later: Android `locales_config`, `values-pt-rBR`. | 1.5 |
 
 **The changelog and the credits** follow D4. By default the credits screen translates its role text but
 no names, and the in-game changelog stays English under a translated heading with a link. Translating

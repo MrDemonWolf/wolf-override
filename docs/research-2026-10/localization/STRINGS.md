@@ -4,11 +4,12 @@ An inventory of every string a player can read in WOLF//OVERRIDE at `main` 1cf8d
 2026). Every branch merged before it was taken (lighter-1, p0-text, corridor-additions and doors, PRs
 #75, #76, #78 and #79). The in-flight `codex/opening-dock` branch (9b6a2e3) is not in it. What that
 branch does to the text:
-- It puts English line breaks in the middle of three `INTRO_LINES` sentences ("The Director thinks
-  WOLF is\nstill in standby.", "...a threat.\nWOLF handles the rest.", "WOLF turns from the
-  Director\nand heads for maintenance."). Those breaks are placed for English width and sit inside the
-  msgids, so they are a new case for the line-break gate (DESIGN.md, "Layout breaks never bind a
-  translation").
+- It adds a `\n` to four `INTRO_LINES` (`git diff 1cf8d73...9b6a2e3 -- apps/game/scripts/main.gd`):
+  two in the middle of a sentence ("The Director thinks WOLF is\nstill in standby.", "WOLF turns from
+  the Director\nand heads for maintenance.") and two between sentences ("DIRECTOR: I decide who counts
+  as a threat.\nWOLF handles the rest.", "DIRECTOR: Lock down maintenance.\nWOLF does not leave this
+  site."). Those breaks are placed for English width and sit inside the msgids, so they are a new case
+  for the line-break gate (DESIGN.md, "Layout breaks never bind a translation").
 - It splits one box into two lines ("DIRECTOR: You were in standby." and "WOLF: I heard you. I won't do
   it."), which are new msgids.
 - It changes one hint condition. Its new room script, `greybox_bay.gd`, draws the room and shows no
@@ -86,7 +87,7 @@ here (decision D6).
 | The engineer's first name (`{name}` on the end card; `%s` on knockdown cards and in narration) | 20 |
 | The upper-case first name as a speaker tag (`'%s: That door is our way through.'`) | 6 |
 | The full name in upper case (the name card, `'%s\nMAINTENANCE ENGINEER'`) | 1 |
-| Numbers | 16 |
+| Numbers (16 `%d` inserts in all) | 10 |
 | Joined with `+` (`WOLF_DOOR_WARNING`, `checkpoint_callback()`) | 2 |
 
 Choice texts are also put inside ASCII quotes (`'%s\n1  "%s"\n2  "%s"'`).
@@ -188,7 +189,7 @@ are among the 261 still to be marked.
 
 **British spellings in player text:**
 - In the game: "off centre" (`TANK_HIT_OFF_CENTRE_LINE`, approved wording) and "Rebind cancelled."
-- In the changelog: centre, centred, neighbouring, colour, grey and licence.
+- In the changelog: centre, centred, neighbouring, colour, grey, licence and signalled.
 
 Everything else is US spelling. Decision D5.
 

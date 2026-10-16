@@ -1,7 +1,9 @@
 # Decisions for Nathanial
 
 These are the questions only Nathanial can answer. Each has a recommended default, so the build can
-start the day he agrees. If he answers only "go with the defaults", every one below is taken as written.
+start the day he agrees. If he answers only "go with the defaults", every one below is taken as written, except one: D5's
+"off centre" is approved wording, so changing it needs his own explicit yes, and without it the line
+stays as it is while the rest of D5 goes ahead.
 Nothing in the game or its English changes until he answers.
 
 ## On one screen
@@ -15,7 +17,7 @@ before the work that can start now.
 | D2 | How do we say the translations are by AI? | A tag in the picker, the credits and the store page until native review | L9, the first language |
 | D3 | Translate words painted in the art, and the station name plates? | Painted words stay English; plates are translated | L8 |
 | D4 | Translate the credits and the in-game changelog? | Credits' role text yes; changelog stays English | L7c |
-| D5 | US or British spelling in the English? | US ("off center", "canceled") | L7a |
+| D5 | US or British spelling in the English? | US ("off center", "canceled"); "off centre" changes only with his own yes | L7a |
 | D6 | Translate the website? | Later, after the first reviewed languages | can wait |
 | **D7, first** | How much font for Chinese, Japanese and Korean? | Fixed common-character sets, about 9-10 MB with line-breaking data | L4 |
 | D8 | Who reviews the translations? | Volunteers on Weblate, a paid proofreader before a paid release | L9 |
@@ -61,8 +63,9 @@ German, Japanese, French, Korean and Polish?
 **Question.** How openly are the AI translations labelled?
 
 **Default: everywhere, until a native speaker has reviewed the language.**
-- **In the picker:** a short tag in the language itself, such as "Deutsch — maschinelle Übersetzung".
-  The ten tags are in PIPELINE.md.
+- **In the picker:** a short tag in the language itself, such as "maschinelle Übersetzung" under
+  "Deutsch", on a second row of the open list and as a note under the LANGUAGE row (DESIGN.md,
+  "Settings"). The ten tags are in PIPELINE.md.
 - **In the credits:** "machine translation by Claude (Anthropic), cross-checked with Codex (OpenAI)",
   followed by "reviewed by <names>" or "not yet reviewed".
 - **In the language files themselves** (their headers and line comments).
@@ -82,7 +85,8 @@ RESTRICTED AREA.
 **Default: leave them in English** as in-world signage on the base:
 - two of them are identifiers;
 - the third is a standard sign;
-- re-typesetting the atlas per language would add 10 art variants.
+- re-typesetting them would need a copy of the door's texture sheet (`corridor-seal-atlas.png`, the
+  atlas) for every language whose words differ: up to 11, one per non-English language file.
 
 The door tools typeset all three in Roboto, so they can be redone later if he wants.
 
@@ -115,12 +119,12 @@ new translation pass.
 
 The player text is mostly US spelling. The exceptions:
 - in the game: "off centre" (`TANK_HIT_OFF_CENTRE_LINE`, approved wording) and "Rebind cancelled.";
-- in the changelog: centre, centred, neighbouring, colour, grey and licence.
+- in the changelog: centre, centred, neighbouring, colour, grey, licence and signalled.
 
 **Default: normalise player-facing text to US spelling** in the first wiring PR:
 - "off center";
 - "Rebind canceled.";
-- the six changelog words.
+- the seven changelog words.
 
 There is no separate en-GB file. Steam has one English, and Godot maps `en_GB` to `en`. "Off centre"
 is approved wording, so it changes only with his explicit yes. This research changed no English line.
@@ -179,18 +183,22 @@ copyright line, which the OFL asks to travel with every copy.
 ## D8. Native-speaker review
 
 **Default:**
-- **Community review first,** on Weblate's free Libre plan for public projects. It reads and writes the
+- **Community review first,** on Weblate's free Libre plan for libre (open-source) public projects. It reads and writes the
   PO files in Git.
 - **One paid native proofreader per language** reads the story lines (about 1,460 English words, plus
-  the knockdown and end cards) before any paid release. Rates were not researched.
+  the knockdown and end cards) before any paid release. At one UK agency's published proofreading list
+  price (£40 or £45 per 1,000 words plus VAT), that is about £670 plus VAT for the 11 non-English files,
+  or about £1,320 for everything but the changelog: an estimate, not a quote (PIPELINE.md, "Human
+  review").
 - **Every language ships labelled** (D2) until its story lines are stamped.
 - **Review order:**
   - Russian and Polish first for the gender rules;
   - then es, de and ja, which the pipeline trial covered;
   - then the rest.
 
-**Note:** Crowdin's free plan excludes projects with commercial products, so a paid Steam release
-would rule it out.
+**Note:** Crowdin's free open-source licence requires that "You do not have any commercial products
+related to the open-source project you are requesting a license for" (crowdin.com/product/for-open-source,
+read October 16, 2026), so a paid Steam release would rule it out.
 
 ## D9. Pronouns, gender and names where a language can't stay neutral
 
@@ -246,7 +254,7 @@ These are visible layout changes to the title, so they get stills and a played c
 
 | Choice | Default |
 |---|---|
-| WOLF's Japanese first person | 俺, used sparingly, in plain form with no keigo (the style packet) |
+| WOLF's Japanese first person | 俺, used sparingly, in plain form with no keigo (Japanese polite speech; the style packet) |
 | How WOLF refers to the Director in Japanese | 所長 for now; Codex read it as "head of the facility". Is "Director" a title or a name? |
 | WOLF's Korean speech level | plain informal speech (반말), matching his Japanese plain form. No source was checked for peers. |
 | breaker | not "interruptor" (es) or "автомат" (ru, which also means an assault rifle). Native reviewers pick from "disyuntor" or "breaker" (es) and "рубильник" (ru, the sample). |

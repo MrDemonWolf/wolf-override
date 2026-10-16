@@ -245,7 +245,12 @@ template is imported as an empty translation, measured), and a `.json` inside it
   - The list follows changes made anywhere, through `NOTIFICATION_TRANSLATION_CHANGED` (the prototype
     fixed a bug here).
   - There is no "follow the system" entry. The first run follows the OS, and a pick is kept.
-- **Unreviewed languages** carry a short tag in their own language (PIPELINE.md).
+- **Unreviewed languages** carry a short tag in their own language (PIPELINE.md). The tag goes on a
+  second, smaller row under the name in the open list, so the name row keeps its width ("Español
+  (Latinoamérica)" already fills it), and the closed button shows the name only, with the tag as a note
+  under the LANGUAGE row while the chosen language is unreviewed. The picker's small CJK subsets hold
+  the tags' characters too (機械翻訳, 기계 번역, 机器翻译, 機器翻譯), and PR L6's glyph check covers
+  every tag with the list's own font chain.
 
 ## Fonts
 
@@ -314,9 +319,11 @@ The S25b PR takes its ranges from the `LANGUAGES` table instead of a fixed Latin
 
 **Layout breaks never bind a translation.**
 - Many English lines carry a `\n` placed for English width: 45 on `main` (STRINGS.md), and
-  `codex/opening-dock` adds more in the middle of sentences ("The Director thinks WOLF is\nstill in
-  standby.", "WOLF turns from the Director\nand heads for maintenance."). The English stays
-  byte-identical, so the msgid keeps the break: Godot's generator extracts the literal.
+  `codex/opening-dock` adds one to four `INTRO_LINES`, two in the middle of a sentence ("The Director
+  thinks WOLF is\nstill in standby.", "WOLF turns from the Director\nand heads for maintenance.") and
+  two between sentences ("...a threat.\nWOLF handles the rest.", "DIRECTOR: Lock down
+  maintenance.\nWOLF does not leave this site."). The English stays byte-identical, so the msgid keeps
+  the break: Godot's generator extracts the literal.
 - So the line-break gate treats a `\n` as layout unless the msgid is marked `#. i18n: keep-breaks` (the
   name card, a choice list). A translation may drop layout breaks and let `DialogueBoxes` break rows for
   its own language and width; it may not add breaks (`i18n_tool.py check`, `BREAKS_KEEP`).
@@ -379,18 +386,20 @@ after play.
 
 ## How the lighter-game plan's text steps fit
 
-The lighter-game plan (`../lighter-game/PLAN.md`) is the ordered refactor of `main.gd`. Its steps S05,
-S08, S09, S10, S12 and S13-S15 touch the same text or the same screens. Every one of them is an
+The lighter-game plan (`../lighter-game/PLAN.md`) is the ordered refactor of `main.gd`. Its steps S01,
+S05, S08, S09, S10, S11, S12 and S13-S15 touch the same text or the same screens. Every one of them is an
 IDENTICAL step: all suites green, an empty UI-dump diff and the screenshot parity of its section 5.2
 (routes R1 title and menus to R4 junction, AE = 0 on the HUD and menus). Only S03 has landed on `main`.
 
 | Lighter step | What it does to text | How languages ride on it |
 |---|---|---|
+| **S01 hud-dirty** | Writes HUD values only on change, and caches `settings_menu.prompt()` per device or binding | The prompt cache must also be cleared on `NOTIFICATION_TRANSLATION_CHANGED`, or a language change keeps showing the old language's key names and prompts. Its "only on change" guards must treat a language change as a change. |
 | **S05 helpers** | Per-room text tables (byte-identical); a Choice record; the Hud's `key()` and `localise()` | The text tables are where the `I18n.KEY.tr` marks go, once per table entry. A Choice keeps answer ids, not words. `localise()` *is* the key-token fill: build it once, as placeholders filled after `tr()`. Don't build a substring replace and then a placeholder fill. |
 | **S08 hud** | A Hud script with a view model (status, hint, objective, card key), applied only on change; a prompt cache cleared on rebind or device change | The view model holds English keys and their inserts, and the Hud translates when it applies them. That is the display boundary. The prompt cache is also cleared on `NOTIFICATION_TRANSLATION_CHANGED`. |
 | **S09 title-pause-settings** | A TitleScreen script; the video settings move into GameSettings | The title buttons (L7a's auto-translate, L8's widths) and the Settings rows (L6's GENERAL tab) live here. |
 | **S10 endcard-theme** | EndCard and EndCardRow scenes, CardPanel, `settings_menu.tscn` and `settings_theme.tres` | The end card's topic and text rows (L7c) and the Settings scene (L6) move into these files. The theme is where a per-language font chain would be set. |
 | **S12 room-base** | Room base, NamePlate, PlateFader; "plates keep 12/13/8 px fonts and their rows at y 320/309/313" | If D3 translates the plates, NamePlate is where the plate's msgid and its fit live, and L8's plate work is done there. The lighter plan's October 11 amendment also replaces the always-on plates with contextual item labels as a named visual step, so L8 fits whatever the plates have become by then. |
+| **S11 intro-beatsaver** | IntroSequence and BeatSaver take the opening, including `INTRO_LINES` | The prototype's intro marks (`I18n.KEY.tr` on `INTRO_LINES`, `I18n.shown()` where the box is drawn) move with the lines into IntroSequence, and the opening check in `i18n_test` follows them. `codex/opening-dock` changes the same lines, so S11 and L7c go after it merges. |
 | **S13-S15 corridor, Records and junction beats** | Hints and objectives move into each room's beats | Each beat returns English msgids, marked at its table. Nothing in the beats calls `tr()`. |
 
 **Order (the default; PLAN.md gives it per PR):**
@@ -401,9 +410,14 @@ IDENTICAL step: all suites green, an empty UI-dump diff and the screenshot parit
 - **S09 and S10 land before L6, L7a and L8**, so their parity baseline is taken in English before any
   language exists. If they have not started when L6 is due, L6 and L7a go first (in English they change
   no pixel), and S09 and S10 carry the LANGUAGE row and the auto-translate modes over unchanged.
+- **S01 lands before L7a and L7b** (its prompt cache then gets the language-change clear as part of
+  L7a), or, if it comes later, S01 carries that clear itself.
+- **S11 lands before L7c's opening lines**, after `codex/opening-dock` merges; if L7c comes first, S11
+  moves the marks with the lines.
 - **S12 lands before L8's plate work**, and after the contextual-label step if that comes first.
 - **L8 is a visible change** (D10's title layout). It lands after S09 and S10 and retakes the R1 baseline
-  once Nathanial approves its stills, as the lighter plan does for its own visual steps.
+  (the lighter plan's reference screenshots of route R1, the title and menus) once Nathanial approves its
+  stills, as the lighter plan does for its own visual steps.
 - If S08 lands after the language wiring, the prototype's `I18n.shown()` and `I18n.lines()` calls
   move from `main._refresh_ui` into the Hud with it.
 
@@ -425,14 +439,20 @@ The lighter plan's rule "strings stay byte-identical" stays true, because Englis
   - redraw on a change;
   - the fallback font on only for its language;
   - every character of every translation drawable by the bundled chain with OS fallback off;
-  - no overflow on the title, menus, HUD and station plates in every language, with known overflows
-    pinned by name, using the build's overflow check above (containers, trimmed text, both axes);
+  - no overflow on the title, menus, Settings rows, HUD, station plates, the end card (its recap and
+    topic rows, the longest translated UI text, inside containers), the choice rows and the credits'
+    RichTextLabel (measured with its content height against its rect) in every language, with known
+    overflows pinned by name, using the build's overflow check above (containers, trimmed text, both
+    axes). Each of these surfaces is captured in a state that shows it (the end card after a finished
+    run, a choice up, the credits open), since the CONTINUE note showed that an unseen state is an
+    unchecked one;
   - every character of every language drawable by that language's own font chain, and the inserted
     names, key labels and touch prompts too;
   - pseudolocalization reaching composed text.
 - **The box fit and the overlap checks run per language.** `text_boxes_test` loops its corpus, its
   station-name, touch, top-card and prompt checks over every language and `TextSize` step.
-- **The Python gates** (`i18n_tool.py check`) run in CI without Godot.
+- **The Python gates** (`i18n_tool.py check`) run in CI without Godot, and fail the job: `check` exits 1
+  on any failed gate.
 - **Stills per language,** from `prototype/capture/i18n_capture.gd` moved to `scripts/i18n/`, are
   review evidence, not a test. A still proves neither game feel nor readability in play (AGENT.md).
   When it moves, the driver reads `I18n.LANGUAGES` plus "pseudo" instead of its own `LANGUAGES` list,

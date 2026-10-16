@@ -27,13 +27,20 @@ build starts only after he answers [DECISIONS.md](DECISIONS.md).
   that output could not be tested or checked for fit before players see it, and it needs language
   downloads and prompts ([PIPELINE.md](PIPELINE.md)).
 - **What it costs:** no new money now. The AI work runs on the Claude and ChatGPT subscriptions he
-  already has (token use in PIPELINE.md), Weblate's review site is free for public projects, and the
-  Noto fonts are free. Before a paid release: one paid native proofreader per language for the story
-  lines (about 1,460 English words each), at a price not yet researched.
-- **When players get it:** the first language is Spanish (PR L9 in [PLAN.md](PLAN.md)). That comes after
-  about 17 to 19 agent days of groundwork and wiring, plus 1.5 days for Spanish itself. The groundwork
-  (6 days) can start now; the wiring waits for `codex/opening-dock` to merge. No calendar date is set:
-  it depends on that merge and on his answers in [DECISIONS.md](DECISIONS.md).
+  already has (measured token use and a projection for the full run in PIPELINE.md; neither company
+  publishes its limits as tokens, so the plan spreads the work over one language PR at a time).
+  Weblate's review site is free for libre (open-source) public projects, which this GPL-3.0 repository
+  is, and the Noto fonts are free. Before a paid release: one paid native proofreader per language for
+  the story lines (about 1,460 English words each). At one UK agency's published list price that is
+  about £670 plus VAT for all 11 files, or about £1,320 for every word outside the changelog: an
+  estimate, not a quote (PIPELINE.md, "Human review").
+- **When players get it:** the first language is Spanish (PR L9 in [PLAN.md](PLAN.md)), which also
+  carries Spanish's store steps, so it can ship with the first release after L9 instead of waiting for
+  the other languages. That comes after about 17 to 19 agent days of groundwork and wiring, plus 1.5
+  days for Spanish itself. An agent day is about one working day of one Claude Code session on a PR and
+  its checks; it is not a calendar day. The groundwork (6 days) can start now; the wiring waits for
+  `codex/opening-dock` to merge. No calendar date is set: it depends on that merge, on reviews, on the
+  shared heavy-run slot and on his answers in [DECISIONS.md](DECISIONS.md).
 - **Who checks it:** the automated checks and an independent AI back-translation on every line; then
   native-speaker volunteers on Weblate, and one paid proofreader per language before a paid release.
   Who recruits and runs the reviewers is not planned yet. Every final word is his.
@@ -44,8 +51,12 @@ build starts only after he answers [DECISIONS.md](DECISIONS.md).
   (measured: a gap in Traditional Chinese showed the Simplified text), so the game keeps only the chosen
   language's file registered, and a gate fails the build when one Spanish or Chinese file lacks a line the
   other has (DESIGN.md).
-  Stills: [the Spanish title](prototype/stills/1280x720-es-title.png) and
-  [a Japanese story box](prototype/stills/1280x720-ja-narration.png).
+  Prototype stills, which show what is still to fix, not the shipping look:
+  - [the Spanish title](prototype/stills/1280x720-es-title.png): before the title layout fix (PR L8)
+    and the glossary review. NUEVA PARTIDA runs past its button into CONTINUAR (213 px in a 186 px
+    button), and the subtitle's BLOQUEO is the word D11 rejects; both are known and planned.
+  - [a Japanese story box](prototype/stills/1280x720-ja-narration.png): before the per-language box
+    rules (PR L7d). Its last row, いる。, sits alone, which L7d's balanced two-row split fixes.
 - **In Godot:** English stays the internal text and is translated where it is drawn. There is one
   shared language module, one PO catalog (language file) per language, Godot's own extraction tool, and
   bundled fonts for Chinese, Japanese and Korean that go on only for their language.
@@ -75,7 +86,7 @@ build starts only after he answers [DECISIONS.md](DECISIONS.md).
 | `godot/evidence/` | the same | The probes' measured output, `game.pot` from `main`, and `measurements.txt` |
 | `strings/tools/` | research-strings step | `extract_literals.py`, `candidates.py`, `classify.py` and `test_asserts.py`; their outputs `summary.json` and `test_asserts.json`; the inventory is `../strings-inventory.json` |
 | `pipeline/` | research-pipeline step | `tools/trial.py` (the trial's prompt, measures and scores); `probe/apple_translate_probe.swift` (query-only); the 12 trial lines; the style packet and glossary (the design step added Russian); `out/` with every translator's output, the scores, the judgments and the gettext rehearsal |
-| `prototype/` | prototype step; design step for Russian | `tools/i18n_tool.py` (imports `../pipeline/tools/trial.py`), `extract_pot.sh` with `pot_addon/`, `heavy.sh`; `capture/i18n_capture.gd`; the translations; `evidence/` (the game patch, POT, gate reports, Codex records, run outputs); `stills/` |
+| `prototype/` | prototype step; design step for Russian; fix steps for the gates | `tools/i18n_tool.py` (imports `../pipeline/tools/trial.py`) and `tools/languages.json`, the one per-language table it reads; `extract_pot.sh` with `pot_addon/`, `heavy.sh`; `capture/i18n_capture.gd`; the translations; `evidence/` (the game patch, POT, gate reports, Codex records, run outputs); `stills/` |
 
 **Filing rules applied:**
 - Scratch paths are shortened to `<scratch>`.
@@ -118,6 +129,7 @@ stayed calm:
 | `01a143f0-8b81-7703-972f-13e21953fd61` | prototype | 102 back-translations |
 | `01a14409-6eb1-7db2-8ef1-f6f3714d953b` | prototype | 2 shortened buttons |
 | `01a14426-2248-7773-8edf-2c4cb6fa3ef8` | design | 34 Russian back-translations |
+| `01a146cf-4beb-7f42-8d61-726071ffb149` | fix-2 | 136 back-translations with roles and `engineer_gendered` |
 
 No paid service, API key or new account was used.
 
@@ -129,7 +141,7 @@ No paid service, API key or new account was used.
 - **Research, measurements, tools, sample translations and these notes:** Claude (Claude Code,
   Anthropic), working for Nathanial.
 - **Independent back-translations and the trial's second translations:** Codex (OpenAI, codex-cli
-  0.162.1).
+  0.162.1; 0.163.0 for the fix-2 run).
 - **Tools:**
   - Godot 4.7.2 (godotengine.org);
   - GNU gettext 1.0 (`msgfmt`, `msgmerge`);
@@ -153,7 +165,9 @@ No paid service, API key or new account was used.
   - Netflix's Timed Text Style Guides;
   - W3C;
   - Weblate and Crowdin;
-  - legal and market reporting on Quebec, China and Russia.
+  - Absolute Translations' published proofreading prices;
+  - Quebec's Charter of the French language (legisquebec), and legal and market reporting on Quebec,
+    China and Russia.
 
   Each is cited with its URL and date where it is used, mostly in LANGUAGES.md and PIPELINE.md.
   They informed the recommendations. None of them is a contributor to or endorser of the game.

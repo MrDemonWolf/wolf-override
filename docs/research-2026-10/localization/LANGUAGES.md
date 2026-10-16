@@ -42,8 +42,8 @@ are in "Codes and numbers, for the build" below.
 | Region | Inside the 10 | Notes |
 |---|---|---|
 | **USA** | English, US spelling | The source text is mostly US spelling with a few British forms (STRINGS.md). Normalising it is decision D5. Steam has one "English"; Godot maps `en_GB` to `en` (measured), so no separate British file. |
-| **EU** | German, French, Spanish (Spain), Polish | Italian is first in Tier 1. Dutch and the Nordic languages wait in Tier 3: their players have the EU's strongest English (EF 603-624). |
-| **Mexico** | Spanish (Latin America), shown as "Español (Latinoamérica)" | Tagged `es-419` (the code for Latin-American Spanish) on Steam and Google Play. Apple has no `es-419`, so the App Store's es-MX listing reuses the Latin-American text. Godot reduces `es_419` to `es`, so the game file is `es` (measured, `godot/evidence/locale.txt`). English skill (EF EPI) in Mexico is 440, very low: Mexico is one of the markets that needs the translation most. |
+| **EU** | German, French, Spanish (Spain), Polish | Italian is first in Tier 1. Dutch and the Nordic languages wait in Tier 3: their players have the EU's strongest English (English-skill scores, EF EPI 2025, of 603-624; explained under "Why swap at all?"). |
+| **Mexico** | Spanish (Latin America), shown as "Español (Latinoamérica)" | Tagged `es-419` (the code for Latin-American Spanish) on Steam and Google Play. Apple has no `es-419`, so the App Store's Spanish (Mexico) listing reuses the Latin-American text. Godot reduces `es_419` to `es`, so the game file is `es` (measured, `godot/evidence/locale.txt`). English skill (EF EPI) in Mexico is 440, very low: Mexico is one of the markets that needs the translation most. |
 
 ## Ten slots, twelve files, and the coverage
 
@@ -75,18 +75,23 @@ but it changes no rank.
 
 ### Codes and numbers, for the build
 
-| # | Language | Godot file(s) | Store codes | Steam share, mean [September 2026] | Speakers (world rank) |
-|---|---|---|---|---|---|
-| 1 | English (US) | `en` | en, en-US | 36.5% [34.2] | 1,493M (#1) |
-| 2 | Chinese, Simplified and Traditional | `zh_Hans`, `zh_Hant` | zh-Hans / zh-CN, zh-Hant / zh-TW | 26.7% + 1.3% [31.4 + 1.3] | 1,183M Mandarin (#2) |
-| 3 | Russian | `ru` | ru | 9.3% [9.05] | 210M (#11) |
-| 4 | Spanish, Latin America and Spain | `es` (Latin America), `es_ES` | es-419 (Apple: es-MX), es-ES | 0.7% + 4.3% [0.75 + 4.08] | 561M (#4) |
-| 5 | Portuguese (Brazil) | `pt_BR` | pt-BR | 3.9% [3.70] | 269M (#8) |
-| 6 | German | `de` | de, de-DE | 2.8% [2.48] | 133M (#12) |
-| 7 | Japanese | `ja` | ja | 2.5% [2.41] | 126M (#13) |
-| 8 | French | `fr` | fr, fr-FR (reused for fr-CA listings) | 2.3% [2.08] | 334M (#6) |
-| 9 | Korean | `ko` | ko | 1.8% [1.37] | 82M (#28) |
-| 10 | Polish | `pl` | pl | 1.6% [1.49] | about 40M (estimate; not in the table) |
+| # | Language | Godot file(s) | Steam (Web API code) | Google Play (listing code) | App Store (listing language) | Steam share, mean [September 2026] | Speakers (world rank) |
+|---|---|---|---|---|---|---|---|
+| 1 | English (US) | `en` | en | en-US | English (U.S.) | 36.5% [34.2] | 1,493M (#1) |
+| 2 | Chinese, Simplified and Traditional | `zh_Hans`, `zh_Hant` | zh-CN, zh-TW | zh-CN, zh-TW | Chinese (Simplified), Chinese (Traditional) | 26.7% + 1.3% [31.4 + 1.3] | 1,183M Mandarin (#2) |
+| 3 | Russian | `ru` | ru | ru-RU | Russian | 9.3% [9.05] | 210M (#11) |
+| 4 | Spanish, Latin America and Spain | `es` (Latin America), `es_ES` | es-419, es | es-419, es-ES | Spanish (Mexico), Spanish (Spain) | 0.7% + 4.3% [0.75 + 4.08] | 561M (#4) |
+| 5 | Portuguese (Brazil) | `pt_BR` | pt-BR | pt-BR | Portuguese (Brazil) | 3.9% [3.70] | 269M (#8) |
+| 6 | German | `de` | de | de-DE | German | 2.8% [2.48] | 133M (#12) |
+| 7 | Japanese | `ja` | ja | ja-JP | Japanese | 2.5% [2.41] | 126M (#13) |
+| 8 | French | `fr` | fr | fr-FR (fr-CA reuses its text) | French (French (Canada) reuses its text) | 2.3% [2.08] | 334M (#6) |
+| 9 | Korean | `ko` | ko | ko-KR | Korean | 1.8% [1.37] | 82M (#28) |
+| 10 | Polish | `pl` | pl | pl-PL | Polish | 1.6% [1.49] | about 40M (estimate; not in the table) |
+
+Store codes, each read on October 16, 2026: Steam's "Web API language code" column (its other column,
+the API code, reads `schinese`, `latam`, `koreana` and so on; partner.steamgames.com); Google Play's
+listing codes (support.google.com, answer 9844778); Apple lists listing languages by name only, with no
+`es-419` (developer.apple.com, App Store localizations). Steam's Spain row is plain `es`, not `es-ES`.
 
 ## Side by side with the world's top 10
 
@@ -235,7 +240,7 @@ Each tier is its own later build. Every language in it goes through the same pip
 
 | Language | Picker name | Code | Steam share | Why | Risk | Cost |
 |---|---|---|---|---|---|---|
-| Italian | Italiano | `it` | 0.61% [0.56] | Main EU language; 66M speakers; EF 513, the lowest of the big EU markets; 14 of 16 peers | Gender agreement for the engineer; about 3 times the English length on short labels | One translation; fonts fine |
+| Italian | Italiano | `it` | 0.61% [0.56] | Main EU language; 66M speakers; EF 513, the lowest of the big EU markets; 14 of 16 peers | Gender agreement for the engineer; short labels of up to 10 characters can run 2-3 times the English length in European languages (W3C citing IBM; W3C's one Italian sample, "visualizzazioni", is 3.0 times) | One translation; fonts fine |
 | Turkish | Türkçe | `tr` | 1.22% [1.09] | 94M speakers; EF 488 (low); 7 of 16 peers | Dotted and dotless i break `to_upper()` (the game upper-cases the name and the speaker tag in code); suffixes attach to names | One translation; fonts cover ş, ğ, ı (measured) |
 | Ukrainian | Українська | `uk` | 0.69% [0.66] | Steam share above Italian's; players in Ukraine should not have to fall back to Russian | Same Slavic gender, case and plural issues as Russian. The translator must be a native Ukrainian speaker, not someone converting from Russian | One translation; reuses the Slavic style rules; fonts cover і, ї, є, ґ (measured) |
 
@@ -243,7 +248,7 @@ Each tier is its own later build. Every language in it goes through the same pip
 
 | Language | Picker name | Code | Steam share | Why | Risk | Cost |
 |---|---|---|---|---|---|---|
-| Thai | ไทย | `th` | 0.85% [0.82] | Above Ukrainian on Steam; EF 402 (very low) | No Thai glyphs in our fonts (measured); no spaces between words, so line breaking needs ICU's dictionary data | New font, line-break checks, one translation |
+| Thai | ไทย | `th` | 0.85% [0.82] | Above Ukrainian on Steam; EF 402 (very low) | No Thai glyphs in our fonts (measured); no spaces between words, so line breaking needs the dictionary data of ICU, the Unicode text library Godot uses | New font, line-break checks, one translation |
 | Indonesian | Bahasa Indonesia | `id` | 0.14% | World #9 by speakers; 6.4% of mobile game downloads (Sensor Tower, June 2025) | Low spending per player | The cheapest language there is: Latin script, one plural form, no gender |
 | Portuguese (Portugal) | Português (Portugal) | `pt_PT` | 0.35% | EU variant; 5 of 16 peers | Players understand the Brazilian file | Adaptation pass of `pt_BR` |
 | Vietnamese | Tiếng Việt | `vi` | 0.21% [0.25], growing (0.20% in August 2025, 0.29% in August 2026) | 97M speakers | Stacked diacritics need line-height checks | Fonts cover it (measured); one translation |
@@ -264,7 +269,7 @@ Greek, Roboto has it, measured).
 | Hindi | No Steam client language; new font and shaping; low spending per player. |
 | Bengali | No Steam client language; new font and shaping. |
 | Urdu | No Steam client language; right-to-left Nastaliq; the most expensive language of all. |
-| Separate French (Canada) | Quebec's Charter of the French language, s.52.1, asks for game software to be available in French when a French version exists. Shipping `fr` meets it (Osler's guide; the official legisquebec text returned HTTP 403, so this needs a check against it). Reuse `fr` for the fr-CA store listings. |
+| Separate French (Canada) | Quebec's Charter of the French language, s.52.1: "All computer software, including game software and operating systems, whether installed or uninstalled, must be available in French unless no French version exists" (legisquebec.gouv.qc.ca, CQLR c C-11, read October 16, 2026; Osler's guide agrees). Shipping `fr` meets it. Reuse `fr` for the fr-CA store listings. |
 | Separate English (UK) | Steam has one English; Godot maps `en_GB` to `en` (measured). |
 | Malay | 0.00% of Steam (it first appears in the survey in June 2026). ConPaws ships it; the game does not need it yet. |
 
@@ -340,7 +345,8 @@ Greek, Roboto has it, measured).
   https://support.google.com/googleplay/android-developer/answer/9844778
 
 **Law and distribution:**
-- Quebec: Osler, "French language rules",
+- Quebec: Charter of the French language, CQLR c C-11, s.52.1 (official text, read October 16, 2026):
+  https://www.legisquebec.gouv.qc.ca/en/document/cs/C-11 ; Osler, "French language rules",
   https://www.osler.com/osler/media/Osler/downloads/doing-business-in-canada/Osler-DBIC-French-language-rules.pdf ;
   DLA Piper on Bill 96, https://www.dlapiper.com/insights/publications/2022/05/quebec-passes-amended-bill-96
 - China:
@@ -358,7 +364,7 @@ Greek, Roboto has it, measured).
 - `core/string/locales.h` (scripts and plural rules)
 - `scene/gui/control.h` (`LAYOUT_DIRECTION_RTL`)
 
-**ConPaws** (read only, the commit at HEAD on October 16, 2026):
+**ConPaws** (read only, at commit 7799239 of October 10, 2026, its HEAD on October 16):
 - `apps/native/src/lib/supported-locales.ts`: its 23 locales
 - `apps/native/src/lib/i18n.ts`: the native names
 - `apps/native/app/(tabs)/settings/language.tsx`: its flags
