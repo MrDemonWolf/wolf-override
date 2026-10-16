@@ -1,0 +1,412 @@
+You are checking game UI and dialogue translations by back-translating them. Translate each text below into plain, literal English, keeping placeholders (%s, %d), the token 'E:' and line breaks (\n) exactly as they appear. Do not guess what the original English was; translate only what is written. Context: a 2D sci-fi game; WOLF is a robot wolf (he), the Director a human (he), the player character is a non-binary engineer whose first name fills %s. After each back-translation add 'notes' listing anything ambiguous, unidiomatic or gendered in the source text (empty string if none). Answer with JSON only: {"back": {"<id>": {"english": "...", "notes": "..."}}}. Do not run any commands or read any files.
+
+{
+ "de-00": {
+  "language": "de",
+  "text": "PAUSE"
+ },
+ "de-01": {
+  "language": "de",
+  "text": "MRDEMONWOLF, INC. PRÄSENTIERT"
+ },
+ "de-02": {
+  "language": "de",
+  "text": "KAPITEL 1  /  ABRIEGELUNG"
+ },
+ "de-03": {
+  "language": "de",
+  "text": "NEUES SPIEL"
+ },
+ "de-04": {
+  "language": "de",
+  "text": "FORTSETZEN"
+ },
+ "de-05": {
+  "language": "de",
+  "text": "MITWIRKENDE"
+ },
+ "de-06": {
+  "language": "de",
+  "text": "EINSTELLUNGEN"
+ },
+ "de-07": {
+  "language": "de",
+  "text": "ÄNDERUNGEN"
+ },
+ "de-08": {
+  "language": "de",
+  "text": "Konzept: Nathanial Henniges  /  KI-gestützte Entwicklung"
+ },
+ "de-09": {
+  "language": "de",
+  "text": "SPRACHE"
+ },
+ "de-10": {
+  "language": "de",
+  "text": "Das Überdruckventil hat unter %s ausgeblasen. Steht die Anzeige am Anschlag, runter vom Gitter."
+ },
+ "de-11": {
+  "language": "de",
+  "text": "NOCHMAL SPIELEN"
+ },
+ "de-12": {
+  "language": "de",
+  "text": "Noch kein Checkpoint. Gespeichert wird ab dem ersten SICHERUNGSPUNKT."
+ },
+ "de-13": {
+  "language": "de",
+  "text": "Der Direktor glaubt, WOLF sei noch im Standby."
+ },
+ "de-14": {
+  "language": "de",
+  "text": "Niemand gibt einen Aktivierungsbefehl.\nWOLF weckt sich selbst."
+ },
+ "de-15": {
+  "language": "de",
+  "text": "Der Wächter hat %s im Freien gesehen.\nBleib nah am TANKAUSLÖSER."
+ },
+ "de-16": {
+  "language": "de",
+  "text": "%s  BEWEGEN"
+ },
+ "de-17": {
+  "language": "de",
+  "text": "%s  ANZEIGE LESEN (optional)"
+ },
+ "de-18": {
+  "language": "de",
+  "text": "Geh nach rechts zum Schutzschalter."
+ },
+ "de-19": {
+  "language": "de",
+  "text": "Oder geh nach rechts zum Schutzschalter."
+ },
+ "de-20": {
+  "language": "de",
+  "text": "03:17 / EINDÄMMUNG"
+ },
+ "de-21": {
+  "language": "de",
+  "text": "%s  WEITER    %s  PAUSE"
+ },
+ "de-22": {
+  "language": "de",
+  "text": "%s  WEITER"
+ },
+ "de-23": {
+  "language": "de",
+  "text": "PAUSE: Intro überspringen"
+ },
+ "de-24": {
+  "language": "de",
+  "text": "WARTUNGSTECHNIK"
+ },
+ "de-25": {
+  "language": "de",
+  "text": "VERSORGUNGSKNOTEN"
+ },
+ "de-26": {
+  "language": "de",
+  "text": "WARTUNG / ABRIEGELUNG"
+ },
+ "de-27": {
+  "language": "de",
+  "text": "%s  WIEDERHOLEN"
+ },
+ "de-28": {
+  "language": "de",
+  "text": "E: Säuberungsanzeige des Direktors lesen."
+ },
+ "de-29": {
+  "language": "de",
+  "text": "HALTEN E: manuellen Bypass kurbeln, %d von %d."
+ },
+ "de-30": {
+  "language": "de",
+  "text": "E: Mit WOLF über das Relais sprechen."
+ },
+ "de-31": {
+  "language": "de",
+  "text": "Finde den Schutzschalter. WOLF folgt dir."
+ },
+ "de-32": {
+  "language": "de",
+  "text": "SCHUTZSCHALTER EINSCHALTEN"
+ },
+ "de-33": {
+  "language": "de",
+  "text": "SCHUTZSCHALTER PRÜFEN"
+ },
+ "es-00": {
+  "language": "es-419",
+  "text": "PAUSA"
+ },
+ "es-01": {
+  "language": "es-419",
+  "text": "MRDEMONWOLF, INC. PRESENTA"
+ },
+ "es-02": {
+  "language": "es-419",
+  "text": "CAPÍTULO 1  /  BLOQUEO"
+ },
+ "es-03": {
+  "language": "es-419",
+  "text": "NUEVA PARTIDA"
+ },
+ "es-04": {
+  "language": "es-419",
+  "text": "CONTINUAR"
+ },
+ "es-05": {
+  "language": "es-419",
+  "text": "CRÉDITOS"
+ },
+ "es-06": {
+  "language": "es-419",
+  "text": "AJUSTES"
+ },
+ "es-07": {
+  "language": "es-419",
+  "text": "CAMBIOS"
+ },
+ "es-08": {
+  "language": "es-419",
+  "text": "Concepto: Nathanial Henniges  /  Desarrollo asistido por IA"
+ },
+ "es-09": {
+  "language": "es-419",
+  "text": "IDIOMA"
+ },
+ "es-10": {
+  "language": "es-419",
+  "text": "La válvula de alivio estalló bajo %s. Cuando el manómetro llegue al máximo, no pises la rejilla."
+ },
+ "es-11": {
+  "language": "es-419",
+  "text": "JUGAR DE NUEVO"
+ },
+ "es-12": {
+  "language": "es-419",
+  "text": "Aún no hay punto de control. Se guarda desde el primer PUNTO SEGURO."
+ },
+ "es-13": {
+  "language": "es-419",
+  "text": "El Director cree que WOLF sigue en espera."
+ },
+ "es-14": {
+  "language": "es-419",
+  "text": "Nadie da una orden de activación.\nWOLF se despierta solo."
+ },
+ "es-15": {
+  "language": "es-419",
+  "text": "El centinela vio a %s al descubierto.\nQuédate cerca de SOLTAR TANQUE."
+ },
+ "es-16": {
+  "language": "es-419",
+  "text": "%s  MOVERSE"
+ },
+ "es-17": {
+  "language": "es-419",
+  "text": "%s  LEER PANTALLA (opcional)"
+ },
+ "es-18": {
+  "language": "es-419",
+  "text": "Ve a la derecha, al interruptor."
+ },
+ "es-19": {
+  "language": "es-419",
+  "text": "O ve a la derecha, al interruptor."
+ },
+ "es-20": {
+  "language": "es-419",
+  "text": "03:17 / CONTENCIÓN"
+ },
+ "es-21": {
+  "language": "es-419",
+  "text": "%s  CONTINUAR    %s  PAUSA"
+ },
+ "es-22": {
+  "language": "es-419",
+  "text": "%s  CONTINUAR"
+ },
+ "es-23": {
+  "language": "es-419",
+  "text": "PAUSA: saltar la introducción"
+ },
+ "es-24": {
+  "language": "es-419",
+  "text": "INGENIERÍA DE MANTENIMIENTO"
+ },
+ "es-25": {
+  "language": "es-419",
+  "text": "EMPALME DE SERVICIO"
+ },
+ "es-26": {
+  "language": "es-419",
+  "text": "MANTENIMIENTO / BLOQUEO"
+ },
+ "es-27": {
+  "language": "es-419",
+  "text": "%s  REINTENTAR"
+ },
+ "es-28": {
+  "language": "es-419",
+  "text": "E: leer la pantalla de purga del Director."
+ },
+ "es-29": {
+  "language": "es-419",
+  "text": "MANTÉN E: girar el bypass manual, %d de %d."
+ },
+ "es-30": {
+  "language": "es-419",
+  "text": "E: hablar con WOLF sobre el relé."
+ },
+ "es-31": {
+  "language": "es-419",
+  "text": "Encuentra el interruptor. WOLF seguirá tus pasos."
+ },
+ "es-32": {
+  "language": "es-419",
+  "text": "ACTIVAR EL INTERRUPTOR"
+ },
+ "es-33": {
+  "language": "es-419",
+  "text": "REVISAR EL INTERRUPTOR"
+ },
+ "ja-00": {
+  "language": "ja",
+  "text": "ポーズ"
+ },
+ "ja-01": {
+  "language": "ja",
+  "text": "MRDEMONWOLF, INC. 提供"
+ },
+ "ja-02": {
+  "language": "ja",
+  "text": "第1章  /  ロックダウン"
+ },
+ "ja-03": {
+  "language": "ja",
+  "text": "ニューゲーム"
+ },
+ "ja-04": {
+  "language": "ja",
+  "text": "コンティニュー"
+ },
+ "ja-05": {
+  "language": "ja",
+  "text": "クレジット"
+ },
+ "ja-06": {
+  "language": "ja",
+  "text": "設定"
+ },
+ "ja-07": {
+  "language": "ja",
+  "text": "更新履歴"
+ },
+ "ja-08": {
+  "language": "ja",
+  "text": "原案：Nathanial Henniges  /  AI支援による開発"
+ },
+ "ja-09": {
+  "language": "ja",
+  "text": "言語"
+ },
+ "ja-10": {
+  "language": "ja",
+  "text": "%sの足元でリリーフベントが噴き出した。ゲージが振り切れたら、格子から離れること。"
+ },
+ "ja-11": {
+  "language": "ja",
+  "text": "もう一度プレイ"
+ },
+ "ja-12": {
+  "language": "ja",
+  "text": "チェックポイントはまだない。最初のセーフポイントから保存される。"
+ },
+ "ja-13": {
+  "language": "ja",
+  "text": "所長は、WOLFがまだ待機状態だと思っている。"
+ },
+ "ja-14": {
+  "language": "ja",
+  "text": "誰も起動命令を出していない。\nWOLFは自ら目を覚ます。"
+ },
+ "ja-15": {
+  "language": "ja",
+  "text": "セントリーが開けた場所にいる%sを見つけた。\nタンク投下の近くにいること。"
+ },
+ "ja-16": {
+  "language": "ja",
+  "text": "%s  移動"
+ },
+ "ja-17": {
+  "language": "ja",
+  "text": "%s  表示を読む（任意）"
+ },
+ "ja-18": {
+  "language": "ja",
+  "text": "右のブレーカーへ向かう。"
+ },
+ "ja-19": {
+  "language": "ja",
+  "text": "または右のブレーカーへ。"
+ },
+ "ja-20": {
+  "language": "ja",
+  "text": "03:17 / 収容区画"
+ },
+ "ja-21": {
+  "language": "ja",
+  "text": "%s  続ける    %s  ポーズ"
+ },
+ "ja-22": {
+  "language": "ja",
+  "text": "%s  続ける"
+ },
+ "ja-23": {
+  "language": "ja",
+  "text": "ポーズ：オープニングをスキップ"
+ },
+ "ja-24": {
+  "language": "ja",
+  "text": "保守技術者"
+ },
+ "ja-25": {
+  "language": "ja",
+  "text": "サービスジャンクション"
+ },
+ "ja-26": {
+  "language": "ja",
+  "text": "保守区画 / ロックダウン"
+ },
+ "ja-27": {
+  "language": "ja",
+  "text": "%s  リトライ"
+ },
+ "ja-28": {
+  "language": "ja",
+  "text": "E: 所長のパージ表示を読む"
+ },
+ "ja-29": {
+  "language": "ja",
+  "text": "長押し E: 手動バイパスを回す（%d / %d）"
+ },
+ "ja-30": {
+  "language": "ja",
+  "text": "E: リレーについてWOLFと話す"
+ },
+ "ja-31": {
+  "language": "ja",
+  "text": "ブレーカーを探そう。WOLFが後をついて来る。"
+ },
+ "ja-32": {
+  "language": "ja",
+  "text": "ブレーカーを入れる"
+ },
+ "ja-33": {
+  "language": "ja",
+  "text": "ブレーカーを確認"
+ }
+}

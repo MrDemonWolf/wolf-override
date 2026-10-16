@@ -1,0 +1,416 @@
+{
+ "back": {
+  "de-00": {
+   "english": "PAUSE",
+   "notes": ""
+  },
+  "de-01": {
+   "english": "MRDEMONWOLF, INC. PRESENTS",
+   "notes": ""
+  },
+  "de-02": {
+   "english": "CHAPTER 1  /  SEALING OFF",
+   "notes": ""
+  },
+  "de-03": {
+   "english": "NEW GAME",
+   "notes": ""
+  },
+  "de-04": {
+   "english": "CONTINUE",
+   "notes": ""
+  },
+  "de-05": {
+   "english": "CONTRIBUTORS",
+   "notes": ""
+  },
+  "de-06": {
+   "english": "OPTIONS",
+   "notes": "(re-checked after the overflow fix, Codex session 01a14409-6eb1-7db2-8ef1-f6f3714d953b)"
+  },
+  "de-07": {
+   "english": "CHANGES",
+   "notes": ""
+  },
+  "de-08": {
+   "english": "Concept: Nathanial Henniges  /  AI-assisted development",
+   "notes": ""
+  },
+  "de-09": {
+   "english": "LANGUAGE",
+   "notes": ""
+  },
+  "de-10": {
+   "english": "The pressure relief valve discharged beneath %s. If the indicator is at its limit, get off the grate.",
+   "notes": "'Unter %s' can mean beneath %s or under a condition represented by %s. 'Ausgeblasen' describes blowing or discharging, without specifying what was discharged."
+  },
+  "de-11": {
+   "english": "PLAY AGAIN",
+   "notes": ""
+  },
+  "de-12": {
+   "english": "No checkpoint yet. Saving begins at the first SAVE POINT.",
+   "notes": "'Sicherungspunkt' can also mean a securing or safety point."
+  },
+  "de-13": {
+   "english": "The Director believes WOLF is still in standby.",
+   "notes": "'Der Direktor' is masculine."
+  },
+  "de-14": {
+   "english": "Nobody gives an activation command.\nWOLF wakes himself up.",
+   "notes": ""
+  },
+  "de-15": {
+   "english": "The guard saw %s outdoors.\nStay close to the TANK TRIGGER.",
+   "notes": "'Der Wächter' is masculine. 'Im Freien' specifically means outdoors. 'Tankauslöser' does not specify what action the trigger causes."
+  },
+  "de-16": {
+   "english": "%s  MOVE",
+   "notes": ""
+  },
+  "de-17": {
+   "english": "%s  READ DISPLAY (optional)",
+   "notes": "'Anzeige' can mean a display, indicator or readout."
+  },
+  "de-18": {
+   "english": "Go right to the circuit breaker.",
+   "notes": ""
+  },
+  "de-19": {
+   "english": "Or go right to the circuit breaker.",
+   "notes": ""
+  },
+  "de-20": {
+   "english": "03:17 / CONTAINMENT",
+   "notes": ""
+  },
+  "de-21": {
+   "english": "%s  CONTINUE    %s  PAUSE",
+   "notes": ""
+  },
+  "de-22": {
+   "english": "%s  CONTINUE",
+   "notes": ""
+  },
+  "de-23": {
+   "english": "PAUSE: Skip intro",
+   "notes": ""
+  },
+  "de-24": {
+   "english": "MAINTENANCE TECHNOLOGY",
+   "notes": "Names a technical field or function, not an individual technician."
+  },
+  "de-25": {
+   "english": "SUPPLY NODE",
+   "notes": "'Versorgung' can refer to power, utilities or other supplies."
+  },
+  "de-26": {
+   "english": "MAINTENANCE / SEALING OFF",
+   "notes": ""
+  },
+  "de-27": {
+   "english": "%s  REPEAT",
+   "notes": "Can mean repeat or retry, depending on what is being repeated."
+  },
+  "de-28": {
+   "english": "E: Read the Director's purge display.",
+   "notes": "'Säuberung' can mean cleaning, cleansing or a purge. 'Direktor' is masculine."
+  },
+  "de-29": {
+   "english": "HOLD E: crank the manual bypass, %d of %d.",
+   "notes": "'HALTEN E' has unnatural German word order for a hold-key instruction."
+  },
+  "de-30": {
+   "english": "E: Talk with WOLF about the relay.",
+   "notes": "'Über das Relais' can mean about the relay or via the relay."
+  },
+  "de-31": {
+   "english": "Find the circuit breaker. WOLF follows you.",
+   "notes": ""
+  },
+  "de-32": {
+   "english": "SWITCH ON CIRCUIT BREAKER",
+   "notes": ""
+  },
+  "de-33": {
+   "english": "CHECK CIRCUIT BREAKER",
+   "notes": ""
+  },
+  "es-00": {
+   "english": "PAUSE",
+   "notes": ""
+  },
+  "es-01": {
+   "english": "MRDEMONWOLF, INC. PRESENTS",
+   "notes": ""
+  },
+  "es-02": {
+   "english": "CHAPTER 1  /  BLOCKAGE",
+   "notes": "'Bloqueo' can mean blockage, blockade, blocking or lockdown."
+  },
+  "es-03": {
+   "english": "NEW GAME",
+   "notes": "NUEVA PARTIDA restored after the overflow trial; this is the first session's back-translation (01a143f0-8b81-7703-972f-13e21953fd61). 'NUEVO JUEGO' was also back-translated 'NEW GAME' (01a14409-6eb1-7db2-8ef1-f6f3714d953b) but still overflowed."
+  },
+  "es-04": {
+   "english": "CONTINUE",
+   "notes": ""
+  },
+  "es-05": {
+   "english": "CREDITS",
+   "notes": ""
+  },
+  "es-06": {
+   "english": "SETTINGS",
+   "notes": ""
+  },
+  "es-07": {
+   "english": "CHANGES",
+   "notes": ""
+  },
+  "es-08": {
+   "english": "Concept: Nathanial Henniges  /  AI-assisted development",
+   "notes": ""
+  },
+  "es-09": {
+   "english": "LANGUAGE",
+   "notes": ""
+  },
+  "es-10": {
+   "english": "The relief valve burst beneath %s. When the pressure gauge reaches the maximum, do not step on the grate.",
+   "notes": "'Estalló' means burst or exploded."
+  },
+  "es-11": {
+   "english": "PLAY AGAIN",
+   "notes": ""
+  },
+  "es-12": {
+   "english": "There is no checkpoint yet. Saving begins at the first SAFE POINT.",
+   "notes": ""
+  },
+  "es-13": {
+   "english": "The Director believes WOLF is still waiting.",
+   "notes": "'En espera' can mean waiting, on hold or on standby. 'El Director' is masculine."
+  },
+  "es-14": {
+   "english": "Nobody gives an activation order.\nWOLF wakes up by himself.",
+   "notes": "'Solo' is masculine and can mean alone or without assistance."
+  },
+  "es-15": {
+   "english": "The sentry saw %s out in the open.\nStay close to RELEASE TANK.",
+   "notes": "'El centinela' is grammatically masculine. 'SOLTAR TANQUE' is an action label used awkwardly as a location; 'soltar' can mean release, let go of or drop."
+  },
+  "es-16": {
+   "english": "%s  MOVE",
+   "notes": ""
+  },
+  "es-17": {
+   "english": "%s  READ SCREEN (optional)",
+   "notes": ""
+  },
+  "es-18": {
+   "english": "Go right, to the switch.",
+   "notes": "'Interruptor' means switch and does not specifically identify a circuit breaker."
+  },
+  "es-19": {
+   "english": "Or go right, to the switch.",
+   "notes": "'Interruptor' means switch and does not specifically identify a circuit breaker."
+  },
+  "es-20": {
+   "english": "03:17 / CONTAINMENT",
+   "notes": ""
+  },
+  "es-21": {
+   "english": "%s  CONTINUE    %s  PAUSE",
+   "notes": ""
+  },
+  "es-22": {
+   "english": "%s  CONTINUE",
+   "notes": ""
+  },
+  "es-23": {
+   "english": "PAUSE: skip the introduction",
+   "notes": ""
+  },
+  "es-24": {
+   "english": "MAINTENANCE ENGINEERING",
+   "notes": "Names a discipline or department, not an individual engineer."
+  },
+  "es-25": {
+   "english": "SERVICE JUNCTION",
+   "notes": "'Empalme' can mean a splice, joint or connection."
+  },
+  "es-26": {
+   "english": "MAINTENANCE / BLOCKAGE",
+   "notes": "'Bloqueo' can mean blockage, blockade, blocking or lockdown."
+  },
+  "es-27": {
+   "english": "%s  RETRY",
+   "notes": ""
+  },
+  "es-28": {
+   "english": "E: read the Director's purge screen.",
+   "notes": "'Director' is masculine."
+  },
+  "es-29": {
+   "english": "HOLD E: turn the manual bypass, %d of %d.",
+   "notes": "'Girar' means turn or rotate; it does not specifically say to crank."
+  },
+  "es-30": {
+   "english": "E: talk with WOLF about the relay.",
+   "notes": "'Sobre el relé' means about the relay, not through it."
+  },
+  "es-31": {
+   "english": "Find the switch. WOLF will follow your footsteps.",
+   "notes": "'Interruptor' does not specifically identify a circuit breaker. 'Seguirá tus pasos' can also mean follow your example."
+  },
+  "es-32": {
+   "english": "ACTIVATE THE SWITCH",
+   "notes": "'Interruptor' does not specifically identify a circuit breaker."
+  },
+  "es-33": {
+   "english": "CHECK THE SWITCH",
+   "notes": "'Interruptor' does not specifically identify a circuit breaker."
+  },
+  "ja-00": {
+   "english": "PAUSE",
+   "notes": ""
+  },
+  "ja-01": {
+   "english": "MRDEMONWOLF, INC. PRESENTATION",
+   "notes": "'提供' can indicate presentation, provision or sponsorship."
+  },
+  "ja-02": {
+   "english": "CHAPTER 1  /  LOCKDOWN",
+   "notes": ""
+  },
+  "ja-03": {
+   "english": "NEW GAME",
+   "notes": ""
+  },
+  "ja-04": {
+   "english": "CONTINUE",
+   "notes": ""
+  },
+  "ja-05": {
+   "english": "CREDITS",
+   "notes": ""
+  },
+  "ja-06": {
+   "english": "SETTINGS",
+   "notes": ""
+  },
+  "ja-07": {
+   "english": "UPDATE HISTORY",
+   "notes": ""
+  },
+  "ja-08": {
+   "english": "Original concept: Nathanial Henniges  /  Development with AI assistance",
+   "notes": ""
+  },
+  "ja-09": {
+   "english": "LANGUAGE",
+   "notes": ""
+  },
+  "ja-10": {
+   "english": "The relief vent erupted at %s's feet. If the gauge goes off the scale, move away from the grating.",
+   "notes": "The wording makes the vent itself the subject of 'erupted'; it leaves the discharged substance unstated."
+  },
+  "ja-11": {
+   "english": "PLAY ONCE MORE",
+   "notes": ""
+  },
+  "ja-12": {
+   "english": "There is no checkpoint yet. Saving begins at the first safe point.",
+   "notes": ""
+  },
+  "ja-13": {
+   "english": "The head of the facility thinks WOLF is still in standby mode.",
+   "notes": "'所長' means the head of a facility or institution; it is not gendered."
+  },
+  "ja-14": {
+   "english": "Nobody has issued a startup command.\nWOLF wakes up of his own accord.",
+   "notes": "The source does not specify gender."
+  },
+  "ja-15": {
+   "english": "The sentry found %s in an open area.\nStay near the tank drop.",
+   "notes": "'タンク投下' names dropping a tank, not explicitly a control or location. 'Tank' could refer to a container or an armored vehicle."
+  },
+  "ja-16": {
+   "english": "%s  MOVE",
+   "notes": ""
+  },
+  "ja-17": {
+   "english": "%s  READ DISPLAY (optional)",
+   "notes": ""
+  },
+  "ja-18": {
+   "english": "Head to the breaker on the right.",
+   "notes": ""
+  },
+  "ja-19": {
+   "english": "Or to the breaker on the right.",
+   "notes": "The movement verb is omitted."
+  },
+  "ja-20": {
+   "english": "03:17 / CONTAINMENT SECTION",
+   "notes": "'収容区画' means a section for housing, holding or containing something, rather than containment as an action."
+  },
+  "ja-21": {
+   "english": "%s  CONTINUE    %s  PAUSE",
+   "notes": ""
+  },
+  "ja-22": {
+   "english": "%s  CONTINUE",
+   "notes": ""
+  },
+  "ja-23": {
+   "english": "PAUSE: SKIP THE OPENING",
+   "notes": ""
+  },
+  "ja-24": {
+   "english": "MAINTENANCE TECHNICIAN",
+   "notes": "The role is not gendered."
+  },
+  "ja-25": {
+   "english": "SERVICE JUNCTION",
+   "notes": "Uses transliterated English terms; the type of service or junction is unspecified."
+  },
+  "ja-26": {
+   "english": "MAINTENANCE SECTION / LOCKDOWN",
+   "notes": ""
+  },
+  "ja-27": {
+   "english": "%s  RETRY",
+   "notes": ""
+  },
+  "ja-28": {
+   "english": "E: Read the facility head's purge display",
+   "notes": "'所長' means the head of a facility or institution; it is not gendered."
+  },
+  "ja-29": {
+   "english": "HOLD E: Turn the manual bypass (%d / %d)",
+   "notes": "'回す' means turn or rotate; it does not specifically say to crank."
+  },
+  "ja-30": {
+   "english": "E: Talk with WOLF about the relay",
+   "notes": "'について' explicitly means about, not via."
+  },
+  "ja-31": {
+   "english": "Let's look for the breaker. WOLF follows along behind.",
+   "notes": "Whom WOLF follows is omitted."
+  },
+  "ja-32": {
+   "english": "TURN ON THE BREAKER",
+   "notes": ""
+  },
+  "ja-33": {
+   "english": "CHECK THE BREAKER",
+   "notes": ""
+  }
+ },
+ "_sessions": [
+  "01a143f0-8b81-7703-972f-13e21953fd61 (102 texts)",
+  "01a14409-6eb1-7db2-8ef1-f6f3714d953b (2 shortened buttons)"
+ ]
+}

@@ -1,0 +1,203 @@
+{
+ "1280x720/en-title": {
+  "texts": 10,
+  "overflow": [],
+  "tofu": [],
+  "untranslated_in_pseudo": [],
+  "image": "1280x720"
+ },
+ "1280x720/en-settings": {
+  "texts": 27,
+  "overflow": [],
+  "tofu": [],
+  "untranslated_in_pseudo": [],
+  "image": "1280x720"
+ },
+ "1280x720/en-narration": {
+  "texts": 4,
+  "overflow": [],
+  "tofu": [],
+  "untranslated_in_pseudo": [],
+  "image": "1280x720"
+ },
+ "1280x720/en-hint": {
+  "texts": 8,
+  "overflow": [],
+  "tofu": [],
+  "untranslated_in_pseudo": [],
+  "image": "1280x720"
+ },
+ "1280x720/en-knockdown": {
+  "texts": 11,
+  "overflow": [],
+  "tofu": [],
+  "untranslated_in_pseudo": [],
+  "image": "1280x720"
+ },
+ "1280x720/es-title": {
+  "texts": 9,
+  "overflow": [
+   "CanvasLayer/TitleScreen/NewGameButton \"NUEVA PARTIDA\" needs 213 px, has 213"
+  ],
+  "tofu": [],
+  "untranslated_in_pseudo": [],
+  "image": "1280x720"
+ },
+ "1280x720/es-settings": {
+  "texts": 26,
+  "overflow": [
+   "CanvasLayer/TitleScreen/NewGameButton \"NUEVA PARTIDA\" needs 213 px, has 213"
+  ],
+  "tofu": [],
+  "untranslated_in_pseudo": [],
+  "image": "1280x720"
+ },
+ "1280x720/es-narration": {
+  "texts": 4,
+  "overflow": [],
+  "tofu": [],
+  "untranslated_in_pseudo": [],
+  "image": "1280x720"
+ },
+ "1280x720/es-hint": {
+  "texts": 8,
+  "overflow": [],
+  "tofu": [],
+  "untranslated_in_pseudo": [],
+  "image": "1280x720"
+ },
+ "1280x720/es-knockdown": {
+  "texts": 11,
+  "overflow": [],
+  "tofu": [],
+  "untranslated_in_pseudo": [],
+  "image": "1280x720"
+ },
+ "1280x720/de-title": {
+  "texts": 9,
+  "overflow": [
+   "CanvasLayer/TitleScreen/Brand \"MRDEMONWOLF, INC. PRÄSENTIERT\" needs 298 px, has 298"
+  ],
+  "tofu": [],
+  "untranslated_in_pseudo": [],
+  "image": "1280x720"
+ },
+ "1280x720/de-settings": {
+  "texts": 26,
+  "overflow": [
+   "CanvasLayer/TitleScreen/Brand \"MRDEMONWOLF, INC. PRÄSENTIERT\" needs 298 px, has 298"
+  ],
+  "tofu": [],
+  "untranslated_in_pseudo": [],
+  "image": "1280x720"
+ },
+ "1280x720/de-narration": {
+  "texts": 4,
+  "overflow": [],
+  "tofu": [],
+  "untranslated_in_pseudo": [],
+  "image": "1280x720"
+ },
+ "1280x720/de-hint": {
+  "texts": 8,
+  "overflow": [],
+  "tofu": [],
+  "untranslated_in_pseudo": [],
+  "image": "1280x720"
+ },
+ "1280x720/de-knockdown": {
+  "texts": 11,
+  "overflow": [],
+  "tofu": [],
+  "untranslated_in_pseudo": [],
+  "image": "1280x720"
+ },
+ "1280x720/ja-title": {
+  "texts": 9,
+  "overflow": [],
+  "tofu": [],
+  "untranslated_in_pseudo": [],
+  "image": "1280x720"
+ },
+ "1280x720/ja-settings": {
+  "texts": 26,
+  "overflow": [],
+  "tofu": [],
+  "untranslated_in_pseudo": [],
+  "image": "1280x720"
+ },
+ "1280x720/ja-narration": {
+  "texts": 4,
+  "overflow": [],
+  "tofu": [],
+  "untranslated_in_pseudo": [],
+  "image": "1280x720"
+ },
+ "1280x720/ja-hint": {
+  "texts": 8,
+  "overflow": [],
+  "tofu": [],
+  "untranslated_in_pseudo": [],
+  "image": "1280x720"
+ },
+ "1280x720/ja-knockdown": {
+  "texts": 11,
+  "overflow": [],
+  "tofu": [],
+  "untranslated_in_pseudo": [],
+  "image": "1280x720"
+ },
+ "1280x720/pseudo-title": {
+  "texts": 9,
+  "overflow": [
+   "CanvasLayer/TitleScreen/Brand \"[___MRDEMONWOLF, INC. PRESENTS___]\" needs 329 px, has 329",
+   "CanvasLayer/TitleScreen/GameTitle \"[__WOLF//OVERRIDE__]\" needs 512 px, has 512",
+   "CanvasLayer/TitleScreen/NewGameButton \"[_NEW GAME_]\" needs 197 px, has 197",
+   "CanvasLayer/TitleScreen/Credit \"[________Concept: Nathanial Henniges  /  AI-assisted development________]\" needs 529 px, has 529"
+  ],
+  "tofu": [],
+  "untranslated_in_pseudo": [],
+  "image": "1280x720"
+ },
+ "1280x720/pseudo-settings": {
+  "texts": 26,
+  "overflow": [
+   "CanvasLayer/TitleScreen/Brand \"[___MRDEMONWOLF, INC. PRESENTS___]\" needs 329 px, has 329",
+   "CanvasLayer/TitleScreen/GameTitle \"[__WOLF//OVERRIDE__]\" needs 512 px, has 512",
+   "CanvasLayer/TitleScreen/NewGameButton \"[_NEW GAME_]\" needs 197 px, has 197",
+   "CanvasLayer/TitleScreen/Credit \"[________Concept: Nathanial Henniges  /  AI-assisted development________]\" needs 529 px, has 529"
+  ],
+  "tofu": [],
+  "untranslated_in_pseudo": [
+   "CanvasLayer/PauseOverlay/Panel/SettingsMenu/@Control@30/@OptionButton@68 \"English\""
+  ],
+  "image": "1280x720"
+ },
+ "1280x720/pseudo-narration": {
+  "texts": 4,
+  "overflow": [
+   "CanvasLayer/PauseButton \"[PAUSE]\" needs 100 px, has 100"
+  ],
+  "tofu": [],
+  "untranslated_in_pseudo": [],
+  "image": "1280x720"
+ },
+ "1280x720/pseudo-hint": {
+  "texts": 8,
+  "overflow": [
+   "CanvasLayer/PauseButton \"[PAUSE]\" needs 100 px, has 100"
+  ],
+  "tofu": [],
+  "untranslated_in_pseudo": [],
+  "image": "1280x720"
+ },
+ "1280x720/pseudo-knockdown": {
+  "texts": 11,
+  "overflow": [
+   "CanvasLayer/PauseButton \"[PAUSE]\" needs 100 px, has 100"
+  ],
+  "tofu": [],
+  "untranslated_in_pseudo": [],
+  "image": "1280x720"
+ }
+}

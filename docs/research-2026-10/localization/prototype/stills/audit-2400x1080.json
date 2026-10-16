@@ -1,0 +1,167 @@
+{
+ "2400x1080/en-title": {
+  "texts": 10,
+  "overflow": [],
+  "tofu": [],
+  "untranslated_in_pseudo": [],
+  "image": "1920x1080"
+ },
+ "2400x1080/en-narration": {
+  "texts": 5,
+  "overflow": [],
+  "tofu": [],
+  "untranslated_in_pseudo": [],
+  "image": "1920x1080"
+ },
+ "2400x1080/en-hint": {
+  "texts": 12,
+  "overflow": [],
+  "tofu": [],
+  "untranslated_in_pseudo": [],
+  "image": "1920x1080"
+ },
+ "2400x1080/en-knockdown": {
+  "texts": 13,
+  "overflow": [],
+  "tofu": [],
+  "untranslated_in_pseudo": [],
+  "image": "1920x1080"
+ },
+ "2400x1080/es-title": {
+  "texts": 9,
+  "overflow": [
+   "CanvasLayer/TitleScreen/NewGameButton \"NUEVA PARTIDA\" needs 213 px, has 213"
+  ],
+  "tofu": [],
+  "untranslated_in_pseudo": [],
+  "image": "1920x1080"
+ },
+ "2400x1080/es-narration": {
+  "texts": 6,
+  "overflow": [
+   "CanvasLayer/TouchControls/Use \"CONTINUAR\" needs 173 px, has 173"
+  ],
+  "tofu": [],
+  "untranslated_in_pseudo": [],
+  "image": "1920x1080"
+ },
+ "2400x1080/es-hint": {
+  "texts": 12,
+  "overflow": [],
+  "tofu": [],
+  "untranslated_in_pseudo": [],
+  "image": "1920x1080"
+ },
+ "2400x1080/es-knockdown": {
+  "texts": 13,
+  "overflow": [],
+  "tofu": [],
+  "untranslated_in_pseudo": [],
+  "image": "1920x1080"
+ },
+ "2400x1080/de-title": {
+  "texts": 9,
+  "overflow": [
+   "CanvasLayer/TitleScreen/Brand \"MRDEMONWOLF, INC. PRÄSENTIERT\" needs 298 px, has 298"
+  ],
+  "tofu": [],
+  "untranslated_in_pseudo": [],
+  "image": "1920x1080"
+ },
+ "2400x1080/de-narration": {
+  "texts": 6,
+  "overflow": [
+   "CanvasLayer/TouchControls/Use \"FORTSETZEN\" needs 185 px, has 185"
+  ],
+  "tofu": [],
+  "untranslated_in_pseudo": [],
+  "image": "1920x1080"
+ },
+ "2400x1080/de-hint": {
+  "texts": 12,
+  "overflow": [],
+  "tofu": [],
+  "untranslated_in_pseudo": [],
+  "image": "1920x1080"
+ },
+ "2400x1080/de-knockdown": {
+  "texts": 13,
+  "overflow": [],
+  "tofu": [],
+  "untranslated_in_pseudo": [],
+  "image": "1920x1080"
+ },
+ "2400x1080/ja-title": {
+  "texts": 9,
+  "overflow": [],
+  "tofu": [],
+  "untranslated_in_pseudo": [],
+  "image": "1920x1080"
+ },
+ "2400x1080/ja-narration": {
+  "texts": 6,
+  "overflow": [
+   "CanvasLayer/TouchControls/Use \"コンティニュー\" needs 188 px, has 188"
+  ],
+  "tofu": [],
+  "untranslated_in_pseudo": [],
+  "image": "1920x1080"
+ },
+ "2400x1080/ja-hint": {
+  "texts": 12,
+  "overflow": [],
+  "tofu": [],
+  "untranslated_in_pseudo": [],
+  "image": "1920x1080"
+ },
+ "2400x1080/ja-knockdown": {
+  "texts": 13,
+  "overflow": [],
+  "tofu": [],
+  "untranslated_in_pseudo": [],
+  "image": "1920x1080"
+ },
+ "2400x1080/pseudo-title": {
+  "texts": 9,
+  "overflow": [
+   "CanvasLayer/TitleScreen/Brand \"[___MRDEMONWOLF, INC. PRESENTS___]\" needs 329 px, has 329",
+   "CanvasLayer/TitleScreen/GameTitle \"[__WOLF//OVERRIDE__]\" needs 512 px, has 512",
+   "CanvasLayer/TitleScreen/NewGameButton \"[_NEW GAME_]\" needs 197 px, has 197",
+   "CanvasLayer/TitleScreen/Credit \"[________Concept: Nathanial Henniges  /  AI-assisted development________]\" needs 529 px, has 529"
+  ],
+  "tofu": [],
+  "untranslated_in_pseudo": [],
+  "image": "1920x1080"
+ },
+ "2400x1080/pseudo-narration": {
+  "texts": 6,
+  "overflow": [
+   "CanvasLayer/PauseButton \"[PAUSE]\" needs 100 px, has 100",
+   "CanvasLayer/TouchControls/Use \"[_CONTINUE_]\" needs 195 px, has 195",
+   "DebugTools/DebugLayer/DebugButton \"[DEBUG]\" needs 87 px, has 87"
+  ],
+  "tofu": [],
+  "untranslated_in_pseudo": [],
+  "image": "1920x1080"
+ },
+ "2400x1080/pseudo-hint": {
+  "texts": 12,
+  "overflow": [
+   "CanvasLayer/PauseButton \"[PAUSE]\" needs 100 px, has 100",
+   "DebugTools/DebugLayer/DebugButton \"[DEBUG]\" needs 87 px, has 87"
+  ],
+  "tofu": [],
+  "untranslated_in_pseudo": [],
+  "image": "1920x1080"
+ },
+ "2400x1080/pseudo-knockdown": {
+  "texts": 13,
+  "overflow": [
+   "CanvasLayer/PauseButton \"[PAUSE]\" needs 100 px, has 100",
+   "DebugTools/DebugLayer/DebugButton \"[DEBUG]\" needs 87 px, has 87"
+  ],
+  "tofu": [],
+  "untranslated_in_pseudo": [],
+  "image": "1920x1080"
+ }
+}
