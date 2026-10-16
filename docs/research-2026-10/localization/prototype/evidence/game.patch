@@ -5874,10 +5874,10 @@ index cda3344..d853b22 100644
  	config.set_value("controls", "deadzone", deadzone.value)
 diff --git a/apps/game/scripts/i18n.gd b/apps/game/scripts/i18n.gd
 new file mode 100644
-index 0000000..ff1ce30
+index 0000000..c044627
 --- /dev/null
 +++ b/apps/game/scripts/i18n.gd
-@@ -0,0 +1,197 @@
+@@ -0,0 +1,220 @@
 +class_name I18n
 +extends RefCounted
 +## The game's languages (scratch prototype of the i18n job, 2026-10-16; not on any branch).
@@ -5931,6 +5931,9 @@ index 0000000..ff1ce30
 +static var KEY: Object = _make_key()
 +## Template and inserts of every line built with [method format], by the finished English line.
 +static var _formats: Dictionary = {}
++## One printf conversion as String % reads it (core/string/ustring.cpp sprintf, 4.7.2): flags, a width
++## or *, a precision or .*, then the type letter; "%%" is matched too so it can be skipped as a literal.
++static var _conversion: RegEx = RegEx.create_from_string("%%|%[-+ 0#]*(\\*|\\d+)?(\\.(\\*|\\d+))?[scdoxXfv]")
 +
 +
 +static func _make_key() -> Object:
@@ -6017,7 +6020,14 @@ index 0000000..ff1ce30
 +static func shown(line: String, speakers: Array[String]) -> String:
 +	if _formats.has(line):
 +		var entry: Array = _formats[line]
-+		return String(TranslationServer.translate(entry[0])) % entry[1]
++		var template: String = String(TranslationServer.translate(entry[0]))
++		if _inserts(template) != _inserts(entry[0]):
++			# A shipped translation whose inserts differ would make % raise a script error and the box
++			# would not draw. The PO gates (msgfmt --check-format, i18n_tool.py check) stop that before a
++			# build; this keeps a gap in them to one English line instead of a broken box.
++			push_warning("I18n: the %s translation of %s has other inserts; showing English" % [TranslationServer.get_locale(), entry[0].c_escape()])
++			template = entry[0]
++		return template % entry[1]
 +	var out: PackedStringArray = []
 +	for row: String in line.split("\n"):
 +		var tag: String = DialogueBoxes.tag_of(row, speakers)
@@ -6032,6 +6042,19 @@ index 0000000..ff1ce30
 +		var translated: String = String(TranslationServer.translate(words))
 +		out[index] = translated if tag.is_empty() else "%s: %s" % [tag, translated]
 +	return "\n".join(out)
++
++
++## The printf conversions of [param template] in order, each reduced to what % takes from the
++## inserts: one "*" per star width or precision, then the type letter ("%02d" and "%d" are both "d").
++## A literal "%%" takes nothing and is left out. Used by [method shown] to compare a translation with its
++## English template.
++static func _inserts(template: String) -> PackedStringArray:
++	var found: PackedStringArray = []
++	for match: RegExMatch in _conversion.search_all(template):
++		var token: String = match.get_string()
++		if token != "%%":
++			found.append("*".repeat(token.count("*")) + token.right(1))
++	return found
 +
 +
 +## [param text] with each of its lines translated on its own (the top card's location and objective).
@@ -6446,10 +6469,10 @@ index 6751e01..33413df 100644
  
 diff --git a/apps/game/tests/i18n_test.gd b/apps/game/tests/i18n_test.gd
 new file mode 100644
-index 0000000..52c4955
+index 0000000..fd43e19
 --- /dev/null
 +++ b/apps/game/tests/i18n_test.gd
-@@ -0,0 +1,280 @@
+@@ -0,0 +1,301 @@
 +extends "res://tests/support/game_suite.gd"
 +## Languages (i18n prototype, scratch only, 2026-10-16). One game through: the OS-locale resolver and
 +## its fallback; the PO translations Godot loaded from project.godot; switching the language while
@@ -6502,6 +6525,7 @@ index 0000000..52c4955
 +	_check_resolver()
 +	_check_catalogs()
 +	_check_glyphs()
++	_check_format_guard()
 +	game = await start_game("i18n-test") as Main
 +	game.auto_pause_on_focus_loss = false
 +	await _check_title()
@@ -6532,6 +6556,26 @@ index 0000000..52c4955
 +	_check(I18n.saved(empty) == I18n.resolve(TranslationServer.get_locale()), "with nothing saved the start-up locale (%s) decides" % TranslationServer.get_locale())
 +	empty.set_value(I18n.CONFIG_SECTION, I18n.CONFIG_KEY, "ja")
 +	_check(I18n.saved(empty) == "ja", "a saved language wins over the OS locale")
++
++
++## A formatted line whose translation has other inserts than its English shows the English line rather
++## than raising a script error (I18n.shown), and a matching translation is still used. The two msgids
++## are made up for this check and live only in a Translation added here and removed again, so no
++## catalog is touched; "de" is the locale because its PO is loaded and has neither msgid.
++func _check_format_guard() -> void:
++	var broken: String = "I18N GUARD CHECK %s of %d"
++	var fine: String = "I18N GUARD FINE %s"
++	var extra: Translation = Translation.new()
++	extra.locale = "de"
++	extra.add_message(broken, "I18N GUARD PRÜFUNG %d")
++	extra.add_message(fine, "I18N GUARD GUT %s")
++	TranslationServer.add_translation(extra)
++	I18n.apply("de")
++	var english: String = I18n.format(broken, ["A", 3])
++	_check(I18n.shown(english, []) == "I18N GUARD CHECK A of 3", "a translation with other inserts shows the English line (got %s)" % I18n.shown(english, []))
++	_check(I18n.shown(I18n.format(fine, ["A"]), []) == "I18N GUARD GUT A", "a translation with the same inserts is used (got %s)" % I18n.shown(I18n.format(fine, ["A"]), []))
++	TranslationServer.remove_translation(extra)
++	I18n.apply("en")
 +
 +
 +## Godot loaded each PO from project.godot. (Placeholders, line breaks and the "E:" token of every
