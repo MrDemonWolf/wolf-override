@@ -208,7 +208,6 @@ func _check_scene() -> void:
 	(game.get_node("Human") as M0Actor).position = Vector2(830.0, 410.0)
 	game.call("_interact")
 	_expect(records_state.chapter_complete and records.lockdown_cleared, "securing the first copy clears Records")
-	game.call("_finish_chapter_close")
 	# Into the junction: Records stops, the junction starts.
 	game.call("_enter_junction")
 	_check_running(depths, "junction", "in the Service Junction")

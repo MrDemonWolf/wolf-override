@@ -58,6 +58,8 @@ const BLINK_UP_SECONDS: float = 0.17
 ## Reduced Motion: one shallow, slower dip and no double blink.
 const GENTLE_DOWN_SECONDS: float = 0.18
 const GENTLE_UP_SECONDS: float = 0.35
+## A lockdown beacon's lens and glow (rooms may set their own warning_color).
+const WARNING_RED: Color = Color("#ff4a46")
 const BEACON_ALPHA: float = 0.4
 ## One beacon pulse dims and recovers over twice this.
 const BEACON_PULSE_SECONDS: float = 1.3
@@ -118,7 +120,7 @@ const BEACON_ART_PARTS: int = 4
 @export var shaft_lamps: PackedInt32Array = PackedInt32Array()
 ## Lockdown beacons as fractions of the far plate: a lamp with a pulsing glow.
 @export var warning_lamps: PackedVector2Array = PackedVector2Array()
-@export var warning_color: Color = Color("#ff4a46")
+@export var warning_color: Color = WARNING_RED
 ## Painted beacons (the corridor's caged wall lamps): one small atlas holding, per beacon,
 ## BEACON_ART_PARTS regions in [member beacon_regions] (atlas px), each drawn at its offset in
 ## [member beacon_offsets] from the beacon's anchor (far-plate px, so the art lands on the plate's own
@@ -207,7 +209,7 @@ var _rng: RandomNumberGenerator = RandomNumberGenerator.new()
 ## beacons batch).
 class Beacon:
 	extends Node2D
-	var lens: Color = Color("#ff4a46"):
+	var lens: Color = WARNING_RED:
 		set(value):
 			lens = value
 			queue_redraw()
@@ -222,9 +224,9 @@ class Beacon:
 			draw_texture_rect_region(art, parts[2], parts[3], lens)
 			draw_texture_rect_region(art, parts[4], parts[5])
 			return
-		draw_line(Vector2(0.0, -9.0), Vector2(0.0, -4.0), Color("#1b2630"), 2.0)
+		draw_line(Vector2(0.0, -9.0), Vector2(0.0, -4.0), Palette.STEEL_DARK, 2.0)
 		draw_rect(Rect2(-7.0, -4.0, 14.0, 9.0), Color("#141c24"))
-		draw_rect(Rect2(-7.0, -4.0, 14.0, 9.0), Color("#3e4f5a"), false, 1.0)
+		draw_rect(Rect2(-7.0, -4.0, 14.0, 9.0), Palette.DIM, false, 1.0)
 		draw_rect(Rect2(-5.0, -2.0, 10.0, 5.0), lens)
 
 
@@ -308,21 +310,19 @@ func rebuild() -> void:
 	haze.name = "Haze"
 	haze.centered = false
 	haze.z_index = 1
-	haze.texture = _linear_texture([0.0, 0.62, 1.0], [Color(0.37, 0.54, 0.65, 0.0), Color(0.37, 0.54, 0.65, 0.14), Color(0.37, 0.54, 0.65, 0.0)])
+	haze.texture = FxKit.linear([0.0, 0.62, 1.0], [Color(0.37, 0.54, 0.65, 0.0), Color(0.37, 0.54, 0.65, 0.14), Color(0.37, 0.54, 0.65, 0.0)])
 	if haze_fade > 0.0:
 		haze.texture = _faded_haze(haze.texture as GradientTexture2D, haze_end, haze_fade)
 	backdrop_layer.add_child(haze)
-	var additive: CanvasItemMaterial = CanvasItemMaterial.new()
-	additive.blend_mode = CanvasItemMaterial.BLEND_MODE_ADD
 	for index: int in lamps.size():
-		var glow: Sprite2D = make_glow(lamp_color, GLOW_SIZE, LAMP_ALPHA, additive)
+		var glow: Sprite2D = make_glow(lamp_color, GLOW_SIZE, LAMP_ALPHA)
 		glow.name = "LampGlow%d" % index
 		glow.z_index = 1
 		backdrop_layer.add_child(glow)
 		lamp_glows.append(glow)
 		_lamp_lights.append(glow)
 		if index in shaft_lamps:
-			var shaft: Sprite2D = _make_shaft(additive)
+			var shaft: Sprite2D = _make_shaft()
 			shaft.name = "LightShaft%d" % index
 			backdrop_layer.add_child(shaft)
 			lamp_glows.append(shaft)
@@ -350,9 +350,9 @@ func rebuild() -> void:
 			glow.offset = beacon_offsets[first + 3]
 			glow.scale = Vector2.ONE * plate_scale
 			glow.modulate = Color(warning_color, beacon_peak_alpha)
-			glow.material = additive
+			glow.material = FxKit.additive()
 		else:
-			glow = make_glow(warning_color, Vector2(90.0, 90.0), beacon_peak_alpha, additive)
+			glow = make_glow(warning_color, Vector2(90.0, 90.0), beacon_peak_alpha)
 		backdrop_layer.add_child(beacon)
 		beacons.append(beacon)
 		glow.name = "WarningGlow%d" % index
@@ -501,11 +501,9 @@ func _sync_motion() -> void:
 func _stop_motion() -> void:
 	_motion_running = false
 	for tween: Tween in _tweens:
-		if tween.is_valid():
-			tween.kill()
+		Tweens.kill(tween)
 	for tween: Tween in _beacon_tweens:
-		if tween.is_valid():
-			tween.kill()
+		Tweens.kill(tween)
 	_tweens.clear()
 	_beacon_tweens.clear()
 	for glow: Sprite2D in _lamp_lights:
@@ -531,8 +529,7 @@ func set_lockdown_cleared(cleared: bool, animate: bool = false) -> void:
 ## animating) or settled.
 func _settle_beacons(animate: bool) -> void:
 	for tween: Tween in _beacon_tweens:
-		if tween.is_valid():
-			tween.kill()
+		Tweens.kill(tween)
 	_beacon_tweens.clear()
 	var lens: Color = warning_color.darkened(SETTLED_LENS_DARKEN) if lockdown_cleared else warning_color
 	var alpha: float = SETTLED_BEACON_ALPHA if lockdown_cleared else beacon_peak_alpha
@@ -613,26 +610,23 @@ func _make_dust(dust_name: String, count: int, scale_min: float, scale_max: floa
 	dust.scale_amount_min = scale_min
 	dust.scale_amount_max = scale_max
 	dust.color = Color(0.8, 0.93, 1.0, 0.55)
-	var ramp: Gradient = Gradient.new()
-	ramp.offsets = PackedFloat32Array([0.0, 0.3, 0.7, 1.0])
-	ramp.colors = PackedColorArray([Color(1, 1, 1, 0), Color.WHITE, Color.WHITE, Color(1, 1, 1, 0)])
-	dust.color_ramp = ramp
-	dust.texture = _radial_texture(16, [0.0, 0.5, 1.0], [Color.WHITE, Color(1, 1, 1, 0.4), Color(1, 1, 1, 0)])
+	dust.color_ramp = FxKit.ramp([0.0, 0.3, 0.7, 1.0], [Color(1, 1, 1, 0), Color.WHITE, Color.WHITE, Color(1, 1, 1, 0)])
+	dust.texture = FxKit.radial(16, [0.0, 0.5, 1.0], [Color.WHITE, Color(1, 1, 1, 0.4), Color(1, 1, 1, 0)])
 	add_child(dust)
 	_built.append(dust)
 	return dust
 
 
 ## The lower half of a squashed radial gradient: a soft cone hanging from the lamp.
-func _make_shaft(additive: CanvasItemMaterial) -> Sprite2D:
+func _make_shaft() -> Sprite2D:
 	var shaft: Sprite2D = Sprite2D.new()
 	shaft.centered = false
-	shaft.texture = _radial_texture(128, [0.0, 0.35, 1.0], [Color(lamp_color, 0.3), Color(lamp_color, 0.14), Color(lamp_color, 0.0)])
+	shaft.texture = FxKit.radial(128, [0.0, 0.35, 1.0], [Color(lamp_color, 0.3), Color(lamp_color, 0.14), Color(lamp_color, 0.0)])
 	shaft.region_enabled = true
 	shaft.region_rect = Rect2(0.0, 64.0, 128.0, 64.0)
 	shaft.offset = Vector2(-64.0, 0.0)
 	shaft.scale = SHAFT_SIZE / shaft.region_rect.size
-	shaft.material = additive
+	shaft.material = FxKit.additive()
 	shaft.z_index = 1
 	shaft.skew = 0.04
 	return shaft
@@ -664,16 +658,14 @@ static func bulkhead_center_x(region: Rect2, face_x: float) -> float:
 	return face_x + (region.get_center().x - BULKHEAD_PILLAR_X) * BULKHEAD_SCALE
 
 
-## An additive radial glow; also used by rooms for their station status lights.
-static func make_glow(color: Color, size: Vector2, alpha: float, material: CanvasItemMaterial = null) -> Sprite2D:
+## An additive radial glow (the shared FxKit texture and blend); also used by rooms for their station
+## status lights.
+static func make_glow(color: Color, size: Vector2, alpha: float) -> Sprite2D:
 	var glow: Sprite2D = Sprite2D.new()
-	glow.texture = _radial_texture(128, [0.0, 0.4, 1.0], [Color.WHITE, Color(1, 1, 1, 0.3), Color(1, 1, 1, 0)])
+	glow.texture = FxKit.radial(128, [0.0, 0.4, 1.0], [Color.WHITE, Color(1, 1, 1, 0.3), Color(1, 1, 1, 0)])
 	glow.scale = size / glow.texture.get_size()
 	glow.modulate = Color(color, alpha)
-	if material == null:
-		material = CanvasItemMaterial.new()
-		material.blend_mode = CanvasItemMaterial.BLEND_MODE_ADD
-	glow.material = material
+	glow.material = FxKit.additive()
 	return glow
 
 
@@ -751,31 +743,3 @@ func _loop() -> Tween:
 	var tween: Tween = create_tween().set_loops()
 	_tweens.append(tween)
 	return tween
-
-
-static func _gradient(offsets: Array[float], colors: Array[Color]) -> Gradient:
-	var gradient: Gradient = Gradient.new()
-	gradient.offsets = PackedFloat32Array(offsets)
-	gradient.colors = PackedColorArray(colors)
-	return gradient
-
-
-static func _radial_texture(size: int, offsets: Array[float], colors: Array[Color]) -> GradientTexture2D:
-	var texture: GradientTexture2D = GradientTexture2D.new()
-	texture.gradient = _gradient(offsets, colors)
-	texture.width = size
-	texture.height = size
-	texture.fill = GradientTexture2D.FILL_RADIAL
-	texture.fill_from = Vector2(0.5, 0.5)
-	texture.fill_to = Vector2(0.5, 0.0)
-	return texture
-
-
-static func _linear_texture(offsets: Array[float], colors: Array[Color], horizontal: bool = false) -> GradientTexture2D:
-	var texture: GradientTexture2D = GradientTexture2D.new()
-	texture.gradient = _gradient(offsets, colors)
-	texture.width = 64 if horizontal else 4
-	texture.height = 4 if horizontal else 64
-	texture.fill_from = Vector2(0.0, 0.0)
-	texture.fill_to = Vector2(1.0, 0.0) if horizontal else Vector2(0.0, 1.0)
-	return texture

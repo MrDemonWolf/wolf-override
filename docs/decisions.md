@@ -71,6 +71,13 @@ Nathanial's choices of 2026-10-14, made through clickable choices after reading 
 - **The safe-point room's camera-side wall is a clean architectural cutaway (decided; built on 2026-10-14, see below),** as in This War of Mine and Fallout Shelter.
 - Both safe-point decisions are built by the corridor door-end additions job, with a redrawn door end, through its own pull request.
 
+## Decisions of October 14, 2026
+Nathanial's answers of 2026-10-14 to four open play questions (docs/research-2026-10/how-it-should-play/NEEDS.md Q3, Q10 and Q17; drafts-2026-10-13.md Q-G).
+- **Q3 "Not in this slice":** no verb for asking WOLF for a hint in this slice. Revisit only if playtesters stall at one spot.
+- **Q10 "Trim it":** Settings keeps the heading THE DEN / LOCAL CONFIGURATION, loses the GPU / Renderer line, and shows the note "Window size is OS-managed on mobile." only on phones and tablets; the rest of that note ("V-sync may limit the FPS cap.") stays where it applies.
+- **Q17 "Cold Still timing":** after a knockdown, RETRY works at 0.9 s and control is back at about 1.5 s, every time (the first knockdown and every repeat; the draft note's "2.4 s first death, 0.8 s repeat" is dropped). The card holds until RETRY. Cold Still's look (the freeze, drain and card layout) is still to build.
+- **Q-G "The coolant pipe":** "SERVICE LINE CLEARED ... The line runs on toward Archive." keeps its words, because the line is the coolant pipe; the doors job draws the pipe running on through the exit.
+
 ## Corridor door end landed (October 14, 2026)
 Nathanial saw the corridor door-end additions' rendered frames (round 11) on 2026-10-14 and said "Land it". They land through their own pull request (branch `codex/corridor-additions`), with the two safe-point decisions of the same day built in; records in docs/research-2026-10/sources/corridor-additions-2026-10-14/.
 - **Clean cutaway (built):** the safe-point room's camera-side wall is a clean architectural section, as in This War of Mine and Fallout Shelter: one solid dark section fill with a clean top, no steel angles or anchors, and the controlled character's floor marker drawn above it. The door stays the only way in.

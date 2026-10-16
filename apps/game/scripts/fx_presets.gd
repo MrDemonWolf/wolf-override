@@ -3,15 +3,14 @@ extends RefCounted
 ## Four reusable CPUParticles2D configurations (they run on every renderer, including GL
 ## Compatibility): a spark shower, a dust burst, a steam column and a relief-valve jet. Bursts are
 ## one-shot and fire through Impact.burst(); steam and the jet toggle emitting with the state that
-## drives them.
+## drives them. Their textures and ramps are FxKit's shared ones; place() parks a configured one in its
+## room.
 
-const SPARK_CYAN: Color = Color("#8be3ff")
-const SPARK_AMBER: Color = Color("#f3ae4b")
 const DUST: Color = Color("#c9b9a0")
 const STEAM: Color = Color("#bfe8ff")
 
 
-static func sparks(color: Color = SPARK_CYAN) -> CPUParticles2D:
+static func sparks(color: Color = Palette.CYAN) -> CPUParticles2D:
 	var particles: CPUParticles2D = _one_shot("Sparks", 24, 0.45)
 	particles.direction = Vector2(0.0, -1.0)
 	particles.spread = 70.0
@@ -72,7 +71,7 @@ static func steam() -> CPUParticles2D:
 ## mouth: a short, dense, slightly fanned spray of soft streaks (align Y) that starts pipe-narrow,
 ## widens as it falls and spreads where it meets the floor about 18 px below, and is gone there; low
 ## alpha in normal blending (no glow; 0.2 since round 9, so it stays faint, as brief (g) asks). The
-## caller sets emitting.
+## caller sets emitting. Its ramp and streak texture are FxKit's, shared, so nothing writes to them.
 static func relief_jet() -> CPUParticles2D:
 	var particles: CPUParticles2D = CPUParticles2D.new()
 	particles.name = "ReliefJet"
@@ -95,9 +94,24 @@ static func relief_jet() -> CPUParticles2D:
 	flare.add_point(Vector2(1.0, 1.0))
 	particles.scale_amount_curve = flare
 	particles.color = Color(0.86, 0.92, 0.95, 0.2)
-	particles.color_ramp = _ramp([0.0, 0.1, 0.7, 1.0], [Color(1.0, 1.0, 1.0, 0.85), Color.WHITE, Color(1.0, 1.0, 1.0, 0.55), Color(1.0, 1.0, 1.0, 0.0)])
+	particles.color_ramp = FxKit.ramp([0.0, 0.1, 0.7, 1.0], [Color(1.0, 1.0, 1.0, 0.85), Color.WHITE, Color(1.0, 1.0, 1.0, 0.55), Color(1.0, 1.0, 1.0, 0.0)])
 	# A soft 12x16 ellipse (the radial fill runs in UV space), a streak stretched along its travel.
-	particles.texture = _radial(12, 16, [0.0, 0.45, 1.0], [Color.WHITE, Color(1.0, 1.0, 1.0, 0.4), Color(1.0, 1.0, 1.0, 0.0)])
+	particles.texture = FxKit.radial(12, [0.0, 0.45, 1.0], [Color.WHITE, Color(1.0, 1.0, 1.0, 0.4), Color(1.0, 1.0, 1.0, 0.0)], GradientTexture2D.FILL_RADIAL, 16)
+	return particles
+
+
+## Names [param particles] (an empty [param particles_name] keeps the preset's), parks it at [param at] on
+## [param z] and adds it to [param parent]; a non-zero [param extents] spreads its emission over a
+## rectangle that size. The caller sets anything else on it first. Returns [param particles].
+static func place(particles: CPUParticles2D, parent: Node, particles_name: String, at: Vector2, z: int = 0, extents: Vector2 = Vector2.ZERO) -> CPUParticles2D:
+	if not particles_name.is_empty():
+		particles.name = particles_name
+	particles.position = at
+	if extents != Vector2.ZERO:
+		particles.emission_shape = CPUParticles2D.EMISSION_SHAPE_RECTANGLE
+		particles.emission_rect_extents = extents
+	particles.z_index = z
+	parent.add_child(particles)
 	return particles
 
 
@@ -112,38 +126,9 @@ static func _one_shot(particles_name: String, amount: int, lifetime: float) -> C
 	return particles
 
 
-## Every particle's colour over its life except the relief jet's: full until 60 % of it, then fading out.
 static func _fade_ramp() -> Gradient:
-	return _ramp([0.0, 0.6, 1.0], [Color.WHITE, Color.WHITE, Color(1.0, 1.0, 1.0, 0.0)])
+	return FxKit.ramp([0.0, 0.6, 1.0], [Color.WHITE, Color.WHITE, Color(1.0, 1.0, 1.0, 0.0)])
 
 
-## A round soft dot [param size] px across: white at the centre, half alpha halfway out, clear at the
-## edge. The sparks, dust and steam share it.
 static func _dot_texture(size: int) -> GradientTexture2D:
-	return _radial(size, size, [0.0, 0.5, 1.0], [Color.WHITE, Color(1.0, 1.0, 1.0, 0.5), Color(1.0, 1.0, 1.0, 0.0)])
-
-
-## A [param width] by [param height] px texture of [param colors] at [param offsets], radial from the
-## centre out to the middle of the top edge. The fill runs in UV space, so a width other than the
-## height gives a soft ellipse. Every call makes a new texture; nothing here caches.
-## Merge note: main (since the lighter-game work, ba82b4f) has this as FxKit.radial, square only. At the
-## merge this function and _ramp go, and their callers use FxKit.radial (given an optional height)
-## and FxKit.ramp, so the presets keep one gradient builder with the rooms.
-static func _radial(width: int, height: int, offsets: Array[float], colors: Array[Color]) -> GradientTexture2D:
-	var texture: GradientTexture2D = GradientTexture2D.new()
-	texture.gradient = _ramp(offsets, colors)
-	texture.width = width
-	texture.height = height
-	texture.fill = GradientTexture2D.FILL_RADIAL
-	texture.fill_from = Vector2(0.5, 0.5)
-	texture.fill_to = Vector2(0.5, 0.0)
-	return texture
-
-
-## A new Gradient of [param colors] at [param offsets] (0..1, ascending, one per colour): a particle's
-## colour over its life, or a texture's stops.
-static func _ramp(offsets: Array[float], colors: Array[Color]) -> Gradient:
-	var gradient: Gradient = Gradient.new()
-	gradient.offsets = PackedFloat32Array(offsets)
-	gradient.colors = PackedColorArray(colors)
-	return gradient
+	return FxKit.radial(size, [0.0, 0.5, 1.0], [Color.WHITE, Color(1.0, 1.0, 1.0, 0.5), Color(1.0, 1.0, 1.0, 0.0)])

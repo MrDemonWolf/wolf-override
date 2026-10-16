@@ -20,16 +20,17 @@ extends SceneTree
 ## Users (2026-10-15): follow_spacing_test (drawn_z); on the corridor, doors and text branches their
 ## suites as each branch's dedupe lists them. What must stay true for every user:
 ## - What the statics touch besides their arguments: the running SceneTree (tree()); the global
-##   Input actions (hold presses its action and releases it before it returns); user:// files
-##   (remove_file deletes one, start_game deletes stale save and settings files before the game
-##   starts, end_game deletes the game's own after it is freed); and the process id (start_game puts
-##   it in the file names, so suites run side by side do not share files). Nothing else is kept
-##   between calls: the kit has no static state.
-## - frames, wait_until and hold count physics frames (1/60 s of game time each at the project's
-##   physics rate, not the wall clock), so a busy machine slows those waits down but does not change
-##   what they see. spawn_game waits one process frame. end_game waits process frames and SceneTree
-##   timers in seconds, which do follow real time: the audio mixer and the loader threads it waits
-##   for run on the wall clock, not on game frames.
+##   Input actions (hold presses its action and retry presses interact, each releasing it before it
+##   returns); user:// files (remove_file deletes one, start_game deletes stale save and settings
+##   files before the game starts, end_game deletes the game's own after it is freed); and the
+##   process id (start_game puts it in the file names, so suites run side by side do not share
+##   files). Nothing else is kept between calls: the kit has no static state.
+## - frames, wait_until, hold and retry count physics frames (1/60 s of game time each at the
+##   project's physics rate, not the wall clock), so a busy machine slows those waits down but does
+##   not change what they see; retry holds its one press for a process frame. spawn_game waits one
+##   process frame. end_game waits process frames and SceneTree timers in seconds, which do follow
+##   real time: the audio mixer and the loader threads it waits for run on the wall clock, not on
+##   game frames.
 ## - end_game leaves no game, sound or file behind, because check-game fails a suite that leaks
 ##   objects at exit.
 
@@ -175,3 +176,19 @@ static func texture_image(texture: Texture2D) -> Image:
 	if image.is_compressed():
 		image.decompress()
 	return image
+
+
+## RETRY on the knockdown card (Q17): waits until the card takes it (Main.RETRY_READY_SECONDS after the
+## hit), presses interact once, and waits until the room has faded back in with the controls back.
+## [param game] is the running game; [param max_frames] bounds each of the two waits, in physics
+## frames. Returns false when the card never takes RETRY or the room never comes back in time.
+## The press is held for exactly one process frame, the way a tap reaches the game. Users: the suites
+## that knock the engineer down (approved_wording, debug_tools, impact, junction, sentry).
+static func retry(game: Node, max_frames: int) -> bool:
+	if not await wait_until(func() -> bool: return bool(game.call("_retry_ready")), max_frames):
+		return false
+	await tree().process_frame
+	Input.action_press(&"interact")
+	await tree().process_frame
+	Input.action_release(&"interact")
+	return await wait_until(func() -> bool: return not bool(game.get("fail_active")) and not bool(game.get("retry_fading_in")), max_frames)
