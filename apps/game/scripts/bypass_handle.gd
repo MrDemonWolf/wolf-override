@@ -49,6 +49,8 @@ const LABEL_FONT_SIZE: int = 13
 const LABEL_WIDTH: float = 64.0
 const LABEL_TOP: float = -136.0
 const LABEL_SHIFT_X: float = -32.5
+## Above 100%, the least gap between the MANUAL BYPASS plate and the COOLANT FAULT tag to its left.
+const LABEL_GAP: float = 6.0
 ## A leader from the plate's bottom edge straight down to the top of the wheel's backplate, at the
 ## hub's x, so the plate and its crank lights read as the wheel's (relative to the gameplay point).
 const LEADER_X: float = -6.0
@@ -104,6 +106,8 @@ var readout: Node2D
 var _wheel_tween: Tween
 var _fault_tween: Tween
 var _pulse: float = 0.0
+## The relay's centre the COOLANT FAULT tag is centred on (place).
+var _relay_x: float = 0.0
 
 
 func _init() -> void:
@@ -139,9 +143,25 @@ func _init() -> void:
 ## [param relay_x].
 func place(wheel_centre: Vector2, relay_x: float) -> void:
 	position = wheel_centre
-	bypass_label.position = Vector2(-bypass_label.size.x * 0.5 + LABEL_SHIFT_X, LABEL_TOP)
+	_relay_x = relay_x
+	# The tag grows upward too, over the relay's name, which main lifts by as much (fault_tag_growth).
+	fault_tag.position = Vector2(relay_x - wheel_centre.x - fault_tag.size.x * 0.5, FAULT_TAG_TOP - wheel_centre.y - fault_tag_growth())
+	# A larger TEXT SIZE grows the plate upward, so its foot stays over the wheel, and to the right of
+	# where it stood at 100%, clear of the COOLANT FAULT tag (the wider of the relay's two names), so
+	# the relay's names and this plate never run into each other.
+	var font: Font = bypass_label.get_theme_font(&"font")
+	var grown: float = (font.get_height(TextSize.world_px(LABEL_FONT_SIZE)) - font.get_height(LABEL_FONT_SIZE)) * bypass_label.get_line_count()
+	var left: float = -bypass_label.size.x * 0.5 + LABEL_SHIFT_X
+	if TextSize.world_factor() > 1.0:
+		var at_100: float = bypass_label.size.x - float(bypass_label.get_meta(&"wrap_width")) * (TextSize.world_factor() - 1.0)
+		left = maxf(-at_100 * 0.5 + LABEL_SHIFT_X, fault_tag.position.x + fault_tag.size.x + LABEL_GAP)
+	bypass_label.position = Vector2(left, LABEL_TOP - grown)
 	readout.queue_redraw()
-	fault_tag.position = Vector2(relay_x - wheel_centre.x - fault_tag.size.x * 0.5, FAULT_TAG_TOP - wheel_centre.y)
+
+
+## How much taller the COOLANT FAULT tag stands than at 100% (it breaks onto two rows when larger).
+func fault_tag_growth() -> float:
+	return TextSize.world_growth(fault_tag, LABEL_FONT_SIZE)
 
 
 ## Shows the COOLANT FAULT tag while the relay is still faulted and takes it away once
@@ -193,16 +213,28 @@ func _plate(node_name: String, caption: String, text_color: Color, edge: Color, 
 	label.name = node_name
 	label.text = caption
 	label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	label.add_theme_font_size_override("font_size", LABEL_FONT_SIZE)
+	TextSize.size_label(label, LABEL_FONT_SIZE)
 	label.add_theme_color_override("font_color", text_color)
 	label.add_theme_stylebox_override("normal", plate)
 	label.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	if wrap_width > 0.0:
 		label.autowrap_mode = TextServer.AUTOWRAP_WORD
-		label.custom_minimum_size.x = wrap_width
+		label.custom_minimum_size.x = wrap_width * TextSize.world_factor()
+		label.set_meta(&"wrap_width", wrap_width)
 	add_child(label)
 	label.size = label.get_combined_minimum_size()
 	return label
+
+
+## TEXT SIZE changed: both plates take the new size (the MANUAL BYPASS plate keeps its two rows; the
+## COOLANT FAULT tag breaks onto two above 100%, TextSize.wrap_world_label) and are placed again.
+func refit_labels() -> void:
+	TextSize.size_label(bypass_label, LABEL_FONT_SIZE)
+	bypass_label.custom_minimum_size.x = float(bypass_label.get_meta(&"wrap_width")) * TextSize.world_factor()
+	bypass_label.size = Vector2.ZERO
+	bypass_label.size = bypass_label.get_combined_minimum_size()
+	TextSize.wrap_world_label(fault_tag, LABEL_FONT_SIZE)
+	place(position, _relay_x)
 
 
 ## The hold under way: from its press frame the wheel turns part of the way to its next notch, by

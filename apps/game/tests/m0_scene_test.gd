@@ -4,6 +4,9 @@ const GAME_SCENE: PackedScene = preload("res://scenes/main.tscn")
 const State = preload("res://scripts/m0_state.gd")
 
 var failures: int = 0
+## The running game, for helpers such as _tap_to_step: _run holds it in a local, which other
+## functions cannot see.
+var game_ref: Node2D
 
 
 func _initialize() -> void:
@@ -18,6 +21,7 @@ func _run() -> void:
 	game.set("save_path", path)
 	game.set("settings_path", "%s-settings.cfg" % path)
 	root.add_child(game)
+	game_ref = game
 	var title_screen: Control = game.get_node("CanvasLayer/TitleScreen") as Control
 	var title_art: TextureRect = game.get_node("CanvasLayer/TitleScreen/CorridorArt") as TextureRect
 	var title_mark: TextureRect = game.get_node("CanvasLayer/TitleScreen/LogoMark") as TextureRect
@@ -92,10 +96,12 @@ func _run() -> void:
 	_expect(game.get("intro_step") == 3 and str(game.get("status_line")) == "The latch breaks from the inside.\nWOLF steps out under his own power.", "WOLF opens containment from inside; the gate's slide and the Director are shown, not narrated")
 	await create_timer(1.2).timeout
 	_expect(intro_gate.visible and is_equal_approx(float(intro_gate.get("opening")), 1.0), "the opened gate stays drawn, folded aside, instead of vanishing")
+	await _tap_to_step(4)
+	_expect(game.get("intro_step") == 4 and str(game.get("status_line")).contains("I won't do it") and speaker.text == "DIRECTOR" and story.text == "You were in standby.", "the Director speaks first in his own box")
 	await _tap(&"interact")
-	_expect(game.get("intro_step") == 4 and str(game.get("status_line")).contains("I won't do it") and not speaker.visible and story.text.begins_with("DIRECTOR: ") and story.text.contains("\nWOLF: "), "WOLF refuses the Director before the engineer arrives, both names inline")
+	_expect(game.get("intro_step") == 4 and speaker.text == "WOLF" and story.text == "I heard you. I won't do it.", "WOLF refuses the Director in his own box, before the engineer arrives (STORY-4)")
 	_expect(intro_gate.visible and is_equal_approx(float(intro_gate.get("opening")), 1.0), "the gate is still standing open in the next beat")
-	await _tap(&"interact")
+	await _tap_to_step(5)
 	_expect(game.get("intro_step") == 5 and speaker.text == "DIRECTOR" and story.text == "Lock down maintenance. WOLF does not leave this site.", "Director orders lockdown under his own tag")
 	await _tap(&"interact")
 	_expect(game.get("intro_step") == 6 and not speaker.visible and story.text == "WOLF turns from the Director and heads for maintenance." and wolf.autonomous_target_x == 110.0, "the narration says WOLF turns from the Director and heads for maintenance as he walks off")
@@ -121,10 +127,10 @@ func _run() -> void:
 	state.cycle_name()
 	state.cycle_name()
 	game.call("_refresh_ui")
-	_expect(speaker.text.is_empty() and story.text == "Rowan keeps WOLF's systems running.", "the first box after control says why the engineer trusts WOLF, in its own untagged box")
-	# The opening exchange is the trust line's third box. Watch every frame from here to the stakes:
-	# reading the display either cuts in before it (it follows once the display's text is read) or
-	# replaces it after it has had its turn, depending on how long the player takes to press.
+	_expect(str(game.get("status_line")) == "Rowan keeps WOLF's systems running.", "the first line after control says why the engineer trusts WOLF")
+	_expect(not (game.get_node("CanvasLayer/BottomBar") as Control).visible and not context_hint.visible, "on the first controllable frames the lines and the hint wait: the name card and the move prompt come first (TEACH-7)")
+	# The opening exchange is the trust line's third box. Watch every frame from here to the stakes: it
+	# shows again after the display's text, whichever box was up when the display was read.
 	var exchange_shown: Array[bool] = [false]
 	var watch_exchange: Callable = func() -> void:
 		exchange_shown[0] = exchange_shown[0] or str(game.get("status_line")).begins_with("WOLF: I heard the Director's plan for me.")
@@ -135,7 +141,7 @@ func _run() -> void:
 	await create_timer(3.9).timeout
 	game.call("_refresh_ui")
 	_expect(not top_card.visible, "gameplay objective card fades without returning each frame")
-	_expect(tutorial_prompt.visible and tutorial_text.text == "A / D  MOVE\nE  READ DISPLAY (optional)", "New Game teaches movement and offers the nearby display as optional")
+	_expect(tutorial_prompt.visible and tutorial_text.text == "A / D  MOVE", "New Game teaches movement first, one prompt alone")
 	var breaker_art: Sprite2D = game.get_node("BreakerArt") as Sprite2D
 	var tutorial_rect: Rect2 = tutorial_prompt.get_global_rect()
 	_expect(not tutorial_rect.intersects(purge_terminal_art.get_global_transform_with_canvas() * purge_terminal_art.get_rect()) and not tutorial_rect.intersects(breaker_art.get_global_transform_with_canvas() * breaker_art.get_rect()) and not tutorial_rect.intersects(top_card.get_global_rect()), "tutorial box leaves the purge display, breaker and objective card uncovered")
@@ -146,11 +152,26 @@ func _run() -> void:
 	_expect(tutorial_prompt.visible and tutorial_text.text == "E  READ DISPLAY (optional)\nOr head right to the breaker.", "movement leaves the display optional and points on to the breaker")
 	game.set("touch_enabled", true)
 	game.call("_refresh_ui")
-	_expect(tutorial_text.text.begins_with("TAP USE  READ DISPLAY (optional)") and _widest_line(tutorial_text) <= tutorial_text.size.x, "touch tutorial line fits inside the tutorial box")
+	_expect(tutorial_text.text.begins_with("USE  READ DISPLAY (optional)") and _widest_line(tutorial_text) <= tutorial_text.size.x, "the touch tutorial names the USE button and fits inside the tutorial box")
 	game.set("touch_enabled", false)
 	game.call("_refresh_ui")
-	await process_frame
-	await _tap(&"interact")
+	# Reading the display never drops a story box, whenever the player presses (the opening's boxes here).
+	# The calls below run without a frame between them, so the box up when the display is read is fixed.
+	# The first step started the opening lines: the trust line's first box is up, unread. Reading the
+	# display now cuts in ahead of them, and every one of them follows it.
+	var opening_boxes: Array[String] = [Main.TRUST_LINE_1 % "Rowan", Main.TRUST_LINE_2 % "Rowan", Main.OPENING_EXCHANGE % "ROWAN"]
+	_expect(str(game.get("status_line")) == opening_boxes[0] and game.get("box_queue") == opening_boxes.slice(1), "the first step starts the opening lines at the trust line's first box")
+	game.call("_interact")
+	_expect(str(game.get("status_line")).begins_with("DIRECTOR / PURGE: Original program logs marked for deletion") and game.get("box_queue") == opening_boxes, "reading the display ahead of the opening lines holds them all back behind it, the box it cut into first")
+	# Brought on to the opening exchange, its box is up and unread: reading the display again puts it
+	# back at the front of the queue instead of replacing it for good (the old flaky case on CI).
+	for box: int in 3:
+		game.call("_next_box_now")
+	_expect(str(game.get("status_line")) == opening_boxes[2] and (game.get("box_queue") as Array).is_empty(), "the opening exchange is the box up")
+	game.call("_interact")
+	_expect(str(game.get("status_line")).contains("Original program logs marked for deletion") and game.get("box_queue") == [opening_boxes[2]], "reading the display over the unread opening exchange brings the exchange back after it")
+	exchange_shown[0] = false
+	game.call("_refresh_ui")
 	_expect(str(game.get("status_line")).contains("Original program logs marked for deletion"), "purge display establishes evidence stakes without inventory")
 	_expect(not tutorial_prompt.visible, "reading the display clears the opening tutorial")
 	var start_x: float = human.position.x
@@ -158,13 +179,13 @@ func _run() -> void:
 		return
 	_expect(human.position.x > start_x and wolf.position.x > 225.0 and wolf.position.x < human.position.x, "WOLF follows the engineer autonomously")
 	_expect(str(game.get("status_line")).contains("Original program logs marked for deletion"), "walking straight on past the display leaves its text up to be read")
-	# If the display cut into the opening's boxes, the exchange still to come follows once the display's
-	# text has been read, and the stakes wait for it to be read in turn.
+	# The exchange follows once the display's text has been read, and the stakes wait for it to be read
+	# in turn. Each line shows box by box, each box up its reading time: about 15 s of standing still.
 	_expect(await _wait_until(func() -> bool:
 		watch_exchange.call()
-		return str(game.get("status_line")) == "WOLF: That purge takes the original program logs. Once they're gone, his word is the only record.", 1500), "once the display's text has been up long enough to read, WOLF says what the purge takes")
+		return str(game.get("status_line")) == "WOLF: That purge takes the original program logs. Once they're gone, his word is the only record.", 2400), "once the display's text has been up long enough to read, WOLF says what the purge takes")
 	process_frame.disconnect(watch_exchange)
-	_expect(exchange_shown[0], "the opening exchange shows before the stakes, whether or not the display cut into the opening's boxes")
+	_expect(exchange_shown[0], "the opening exchange shows again after the display's text and before the stakes")
 	if not _require(await _walk_to(human, 450.0), "engineer can move beyond the breaker"):
 		return
 	if not _require(await _walk_to(human, 350.0), "engineer can backtrack to the breaker"):
@@ -177,7 +198,11 @@ func _run() -> void:
 	# or a little further back where that gap would stand him over the breaker.
 	_expect(await _wait_until(func() -> bool: return wolf.position.x > human.position.x and absf(wolf.velocity.x) < 1.0 and wolf.position.x - human.position.x >= M0Actor.FOLLOW_GAP - 5.0 and wolf.position.x - human.position.x <= M0Actor.FOLLOW_GAP + M0Actor.AVOID_DETOUR, 150), "WOLF settles behind the engineer after backtracking")
 	_expect(wolf.position.x - M0Actor.WOLF_REACH + M0Actor.AVOID_TOLERANCE >= 350.0 + 38.0 - 3.0, "resting behind the engineer at the breaker, WOLF stands clear of its cabinet (x %.0f)" % wolf.position.x)
-	await _tap(&"interact")
+	# USE goes on through the stakes' boxes; from the last one WOLF asks.
+	for _press: int in 3:
+		await _tap(&"interact")
+		if game.get("waiting_for_choice"):
+			break
 	if not _require(game.get("waiting_for_choice"), "breaker opens authored disagreement"):
 		return
 	_expect(speaker.text == "WOLF" and story.text.contains("COOLANT FAULT") and not story.text.contains("\n1  "), "dialogue identifies WOLF, points at the relay's fault tag and keeps response text out of the question")
@@ -488,8 +513,9 @@ func _run() -> void:
 		return
 	await _tap(&"interact")
 	_expect(str(game.get("status_line")).begins_with("WOLF: That purge takes") and not game.get("waiting_for_choice"), "the stakes line comes before the breaker question on every new run")
-	# The relay prompt never shares the screen with the stakes: the hint only offers to go on.
-	for _frame in range(200):
+	# The relay prompt never shares the screen with the stakes: the hint only offers to go on. The stakes
+	# show as two boxes; by 400 frames the second is up, so the next USE goes on to the question.
+	for _frame in range(400):
 		await physics_frame
 	_expect(str(game.call("_context_hint")) == "E: continue." and not game.get("waiting_for_choice") and str(game.get("status_line")).begins_with("WOLF: That purge takes"), "with WOLF's stakes up at the breaker the hint offers only to go on, never the relay prompt, and nothing opens the question on a timer")
 	await _tap(&"interact")
@@ -560,6 +586,16 @@ func _action_event(action: StringName, pressed: bool) -> InputEventAction:
 	event.action = action
 	event.pressed = pressed
 	return event
+
+
+## Presses interact until the opening reaches beat [param step] (each press shows one box), at most
+## 6 times: more than any step this suite asks for needs, so the cap only keeps a stuck opening from
+## hanging the suite, and the caller's next check then fails.
+func _tap_to_step(step: int) -> void:
+	for _press: int in 6:
+		if int(game_ref.get("intro_step")) >= step:
+			return
+		await _tap(&"interact")
 
 
 func _widest_line(label: Label) -> float:

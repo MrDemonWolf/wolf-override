@@ -635,15 +635,11 @@ func _ready() -> void:
 	line_caption = Label.new()
 	line_caption.name = "LineCaption"
 	line_caption.text = LINE_CAPTION
-	line_caption.add_theme_font_size_override("font_size", LINE_CAPTION_FONT_SIZE)
 	line_caption.add_theme_color_override("font_color", Palette.LABEL_TEXT)
 	line_caption.add_theme_stylebox_override("normal", label_plate)
 	line_caption.z_index = 0
 	add_child(line_caption)
-	line_caption.size = line_caption.get_combined_minimum_size()
-	# Just left of the dial, level with it.
-	var dial: Vector2 = prop_point(valve_art, VALVE_DIAL_CENTRE)
-	line_caption.position = Vector2(dial.x - VALVE_DIAL_RADIUS * VALVE_SCALE - 2.0 - line_caption.size.x, dial.y - line_caption.size.y * 0.5)
+	_place_line_caption()
 	# Over the bolt panel, beside the hatch, so both read as one exit.
 	hatch_label = _add_station_label("EXIT LOCKED", EXIT_LABEL_X, Palette.LABEL_MUTED)
 	_build_lane()
@@ -797,7 +793,7 @@ func _add_station_label(caption: String, center_x: float, tint: Color) -> Label:
 	var label: Label = Label.new()
 	label.text = caption
 	label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	label.add_theme_font_size_override("font_size", LABEL_FONT_SIZE)
+	TextSize.size_label(label, LABEL_FONT_SIZE)
 	label.add_theme_color_override("font_color", tint)
 	label.add_theme_stylebox_override("normal", label_plate)
 	label.z_index = 0
@@ -810,9 +806,23 @@ func _add_station_label(caption: String, center_x: float, tint: Color) -> Label:
 
 ## Shrinks [param label]'s plate to its text and centres it on its station again.
 func _fit_label(label: Label) -> void:
-	label.size = Vector2.ZERO
-	label.size = label.get_combined_minimum_size()
-	label.position = Vector2(float(label.get_meta(&"center_x")) - label.size.x * 0.5, LABEL_Y)
+	TextSize.fit_world_label(label, float(label.get_meta(&"center_x")), LABEL_Y)
+
+
+## TEXT SIZE changed: every plate, and the LINE caption by the valve's dial, takes the new size.
+func refit_labels() -> void:
+	for label: Label in station_labels:
+		_fit_label(label)
+	_place_line_caption()
+
+
+## The LINE caption just left of the valve's dial, level with it.
+func _place_line_caption() -> void:
+	TextSize.size_label(line_caption, LINE_CAPTION_FONT_SIZE)
+	line_caption.size = Vector2.ZERO
+	line_caption.size = line_caption.get_combined_minimum_size()
+	var dial: Vector2 = prop_point(valve_art, VALVE_DIAL_CENTRE)
+	line_caption.position = Vector2(dial.x - VALVE_DIAL_RADIUS * VALVE_SCALE - 2.0 - line_caption.size.x, dial.y - line_caption.size.y * 0.5)
 
 
 ## A plate the edge of the view cuts would show part of a name: it fades out as it reaches the edge.
