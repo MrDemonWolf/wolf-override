@@ -844,17 +844,12 @@ func _door_piece(piece_name: String, region: Rect2, top_left: Vector2, piece_sca
 ## the wall with its doorway transparent (the passage in the far plate shows through), the leaf on its
 ## hinges with the closer's arm, the lamp's glass, then the near column and stub over them.
 func _build_entry() -> void:
-	entry_leaf = SwingLeaf.new(ENTRY_ATLAS, ENTRY_LEAF_ROOM_REGION, ENTRY_LEAF_OUT_REGION, ENTRY_LEAF_EDGE_REGION, ENTRY_HINGE, ENTRY_AXIS_U, ENTRY_AXIS_N, ENTRY_LEAF_LIGHTS)
-	entry_leaf.fill = ENTRY_LEAF_FILL
-	entry_leaf.name = "EntryLeaf"
+	entry_leaf = SwingLeaf.make("EntryLeaf", ENTRY_ATLAS, ENTRY_LEAF_ROOM_REGION, ENTRY_LEAF_OUT_REGION, ENTRY_LEAF_EDGE_REGION, ENTRY_HINGE, ENTRY_AXIS_U, ENTRY_AXIS_N, ENTRY_LEAF_LIGHTS, ENTRY_LEAF_FILL, ENTRY_ARM_REGION)
+	# The junction's own camera (its measured vanishing point), as the exit's.
 	entry_leaf.vpx = EXIT_VPX
 	entry_leaf.horizon = EXIT_HORIZON
-	entry_leaf.arm_region = ENTRY_ARM_REGION
 	add_child(entry_leaf)
-	entry_mesh = AtlasMesh.new(ENTRY_ATLAS)
-	entry_mesh.name = "EntryDoor"
-	entry_mesh.z_as_relative = false
-	entry_mesh.z_index = RoomDepth.Z_MID
+	entry_mesh = AtlasMesh.make(ENTRY_ATLAS, "EntryDoor", RoomDepth.Z_MID)
 	entry_mesh.add_quad(ENTRY_WALL_REGION, ENTRY_WALL_AT, 0.5)
 	entry_mesh.add_leaf(entry_leaf)
 	entry_lamp_quad = entry_mesh.add_quad(ENTRY_LENS_REGION, ENTRY_LAMP - ENTRY_LENS_REGION.size * 0.25 * 0.5, 0.25, ENTRY_LAMP_SHUT)

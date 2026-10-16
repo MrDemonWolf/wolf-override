@@ -174,24 +174,15 @@ func _ready() -> void:
 		add_child(prop)
 		floor_reflections.append(FloorReflection.attach(prop))
 	# The leaves swing on their hinges (SwingLeaf, lit per vertex); the room's door meshes draw them.
-	exit_leaf = SwingLeaf.new(DOORS_ATLAS, LEAF_ROOM_REGION, LEAF_OUT_EXIT_REGION, LEAF_EDGE_REGION, EXIT_HINGE, EXIT_AXIS_U, EXIT_AXIS_N, EXIT_LEAF_LIGHTS)
-	exit_leaf.name = "ExitLeaf"
-	exit_leaf.fill = EXIT_LEAF_FILL
-	entry_leaf = SwingLeaf.new(DOORS_ATLAS, LEAF_ROOM_REGION, LEAF_OUT_ENTRY_REGION, LEAF_EDGE_REGION, ENTRY_HINGE, ENTRY_AXIS_U, ENTRY_AXIS_N, ENTRY_LEAF_LIGHTS)
-	entry_leaf.name = "EntryLeaf"
-	entry_leaf.fill = ENTRY_LEAF_FILL
 	# Each leaf's surface closer works a regular arm to a shoe on its head, on the room side.
-	exit_leaf.arm_region = LEAF_ARM_REGION
-	entry_leaf.arm_region = LEAF_ARM_REGION
+	exit_leaf = SwingLeaf.make("ExitLeaf", DOORS_ATLAS, LEAF_ROOM_REGION, LEAF_OUT_EXIT_REGION, LEAF_EDGE_REGION, EXIT_HINGE, EXIT_AXIS_U, EXIT_AXIS_N, EXIT_LEAF_LIGHTS, EXIT_LEAF_FILL, LEAF_ARM_REGION)
+	entry_leaf = SwingLeaf.make("EntryLeaf", DOORS_ATLAS, LEAF_ROOM_REGION, LEAF_OUT_ENTRY_REGION, LEAF_EDGE_REGION, ENTRY_HINGE, ENTRY_AXIS_U, ENTRY_AXIS_N, ENTRY_LEAF_LIGHTS, ENTRY_LEAF_FILL, LEAF_ARM_REGION)
 	# Everything behind the walk line, in one draw call right after the mid plate: the two cross-walls
 	# (their doorways transparent, so the passage and the vestibule in the far plate show through), the
 	# security container in front of the exit's wall, both leaves, and the entry's near column, lamp
 	# and stub, which nobody ever passes behind (the entry stops the engineer and WOLF short of them).
 	# Contact shadows and light are painted: nothing here casts a runtime reflection.
-	plate_mesh = AtlasMesh.new(DOORS_ATLAS)
-	plate_mesh.name = "DoorPlates"
-	plate_mesh.z_as_relative = false
-	plate_mesh.z_index = RoomDepth.Z_MID
+	plate_mesh = AtlasMesh.make(DOORS_ATLAS, "DoorPlates", RoomDepth.Z_MID)
 	plate_mesh.add_quad(EXIT_WALL_REGION, EXIT_WALL_AT, DOORS_SCALE)
 	plate_mesh.add_quad(ENTRY_WALL_REGION, ENTRY_WALL_AT, DOORS_SCALE)
 	container_quad = plate_mesh.add_quad(CONTAINER_REGION, CONTAINER_AT, DOORS_SCALE)
@@ -205,10 +196,7 @@ func _ready() -> void:
 	depth.add_child(plate_mesh)
 	# The exit's near column, lamp and stub draw over the actors (they walk out behind them), always
 	# opaque, in one draw call.
-	front_mesh = AtlasMesh.new(DOORS_ATLAS)
-	front_mesh.name = "DoorFronts"
-	front_mesh.z_as_relative = false
-	front_mesh.z_index = RoomDepth.Z_NEAR
+	front_mesh = AtlasMesh.make(DOORS_ATLAS, "DoorFronts", RoomDepth.Z_NEAR)
 	exit_lamp_quad = front_mesh.add_quad(LENS_REGION, EXIT_LAMP - LENS_REGION.size * LENS_SCALE * 0.5, LENS_SCALE, LAMP_SHUT)
 	front_mesh.add_quad(EXIT_COLUMN_REGION, EXIT_COLUMN_AT, DOORS_SCALE)
 	front_mesh.add_quad(EXIT_STUB_REGION, EXIT_STUB_AT, DOORS_SCALE)

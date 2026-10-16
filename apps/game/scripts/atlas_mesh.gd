@@ -15,6 +15,18 @@ func _init(atlas: Texture2D) -> void:
 	texture_filter = CanvasItem.TEXTURE_FILTER_LINEAR_WITH_MIPMAPS
 
 
+## A new, empty mesh on [param atlas], named [param mesh_name], drawn at the absolute z [param z] (a
+## RoomDepth layer such as Z_MID or Z_NEAR): z_as_relative is off, so it sorts against the actors by
+## that layer whether the room adds it to itself or to its RoomDepth. The Records doors' plate and
+## front meshes and the junction entry's mesh are made here; the caller adds pieces and the node.
+static func make(atlas: Texture2D, mesh_name: String, z: int) -> AtlasMesh:
+	var mesh: AtlasMesh = AtlasMesh.new(atlas)
+	mesh.name = mesh_name
+	mesh.z_as_relative = false
+	mesh.z_index = z
+	return mesh
+
+
 ## Adds a flat piece; returns its index for [method set_color].
 func add_quad(region: Rect2, top_left: Vector2, scale_factor: float, color: Color = Color.WHITE) -> int:
 	_pieces.append([region, top_left, scale_factor, color])

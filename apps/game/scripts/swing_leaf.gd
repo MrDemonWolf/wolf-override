@@ -106,6 +106,19 @@ func _init(atlas: Texture2D, room: Rect2, outside: Rect2, edge: Rect2, hinge_foo
 	texture_filter = CanvasItem.TEXTURE_FILTER_LINEAR_WITH_MIPMAPS
 
 
+## A leaf as a room's door uses it: [method _init]'s leaf (atlas, faces, hinge, axes, lights) named
+## [param leaf_name], with [param fill_exposure] as its [member fill] and its closer's arm drawn with
+## [param arm] (an empty Rect2: no arm). The Records exit and entry and the junction entry are made
+## here; a room with its own vanishing point then sets [member vpx] and [member horizon], and the room
+## adds the leaf as a child and to the AtlasMesh that draws it.
+static func make(leaf_name: String, atlas: Texture2D, room: Rect2, outside: Rect2, edge: Rect2, hinge_foot: Vector3, u: Vector3, n: Vector3, lamps: Array, fill_exposure: float, arm: Rect2) -> SwingLeaf:
+	var leaf: SwingLeaf = SwingLeaf.new(atlas, room, outside, edge, hinge_foot, u, n, lamps)
+	leaf.name = leaf_name
+	leaf.fill = fill_exposure
+	leaf.arm_region = arm
+	return leaf
+
+
 ## A shut swing leaf's body in [param parent] (RoomDepth.door_body): BODY_SIZE, its face on the walk
 ## line at world x [param face_x], reaching into the doorway on the side [param side] (1 right, -1
 ## left), standing on the floor. Disabled until the room enables it; returns the shape.
