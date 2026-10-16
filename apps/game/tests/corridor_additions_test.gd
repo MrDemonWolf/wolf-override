@@ -36,6 +36,10 @@ func _run() -> void:
 	finish("Corridor additions test passed")
 
 
+## The corridor's two caged beacons (RoomDepth's painted beacon atlas): each stands on main's old
+## anchor (MAIN_BEACONS), its lens is red, its globe hangs where main's drawn housing was, and its light
+## is an additive region of the same atlas. Records Access and the Service Junction keep their drawn
+## beacons (no atlas). Reads the live [param game] once, right after it loads; reports through _expect.
 func _check_beacons(game: Node2D) -> void:
 	var depth: RoomDepth = game.get_node("CorridorDepth") as RoomDepth
 	_expect(depth.beacon_atlas != null and depth.beacon_regions.size() == MAIN_BEACONS.size() * RoomDepth.BEACON_ART_PARTS, "the corridor's beacons use the painted caged-lamp atlas")
@@ -62,6 +66,12 @@ func _check_beacons(game: Node2D) -> void:
 			_expect((room as RoomDepth).beacon_atlas == null, "%s keeps its drawn beacons" % room.get_path())
 
 
+## The inner blast leaf behind the roller, from BlastLeaf's own geometry (lead_at, project, in metres
+## on the wall face and world px) and the live [param game]'s leaf: hidden at rest and drawn right
+## before the roller from the same atlas (so they batch); shut, it spans the opening from the near
+## jamb; it waits for the roller to be 40 % up and only moves toward its pocket; open, it is wholly in
+## the pocket with its foot behind the walk line; its edge thickness and contact shadow fit inside the
+## 0.66 m wall, and the shadow's atlas patch is solid black. Reports through _expect.
 func _check_blast_leaf(game: Node2D) -> void:
 	var leaf: BlastLeaf = game.get("blast_leaf") as BlastLeaf
 	var seal_leaf: SealLeaf = game.get("seal_leaf") as SealLeaf

@@ -416,6 +416,11 @@ func _check_corridor_flash(game: Node2D, corridor: RoomDepth, records: RoomDepth
 	_expect(back, "turning Reduced Motion off brings the corridor's flash back")
 
 
+## The Pearson correlation of [param xs] with [param ys] (paired samples, the same length, at least
+## two): +1 when they rise and fall together in step, 0 for no linear relation, -1 for opposite. The
+## beacon check uses it on the glow's alpha and the lens's red, sampled on the same frames. A series
+## with no spread at all would divide by zero, so the denominator is floored at 1e-6; such a series
+## gives exactly 0 (sxy is 0 too), which fails the 0.9 bar, as a lens that never changes should.
 func _pearson(xs: Array[float], ys: Array[float]) -> float:
 	var n: float = float(xs.size())
 	var mx: float = 0.0
