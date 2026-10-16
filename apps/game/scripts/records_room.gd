@@ -6,7 +6,7 @@ const RECORDS_MID: Texture2D = preload("res://assets/rooms/records-mid.png")
 const RECORDS_NEAR: Texture2D = preload("res://assets/rooms/records-near.png")
 const PURGE_QUEUE: Texture2D = preload("res://assets/props/records-purge-queue.png")
 const MIRROR_PORT: Texture2D = preload("res://assets/props/records-mirror-port.png")
-## The Records doors (design: docs/research-2026-10/sources/doors-2026-10-14/records/). Each end of the
+## The Records doors (design: 1cf8d73:docs/research-2026-10/sources/doors-2026-10-14/records/). Each end of the
 ## room is a 300 mm cast cross-wall turned 17 degrees across the walkway, like the corridor's, with a
 ## 3'0" x 7'0" steel secure-area door in it: the entry on the left (the way in from the corridor
 ## side, its outside face with the combination lock) and the exit on the right (out to the service
@@ -24,7 +24,7 @@ const DOORS_ATLAS: Texture2D = preload("res://assets/props/records-doors-atlas.p
 const EXIT_LEAF_FILL: float = 0.0370
 const ENTRY_LEAF_FILL: float = 0.0509
 ## World px per atlas px of the doors' pieces: the atlas is painted at 2 px per world px (install.py's
-## to_2ppw and its placement's "scale": 0.5, under docs/research-2026-10/sources/doors-2026-10-14/records/tools).
+## to_2ppw and its placement's "scale": 0.5, under 1cf8d73:docs/research-2026-10/sources/doors-2026-10-14/records/tools).
 const DOORS_SCALE: float = 0.5
 ## World px per atlas px of the status lamps' glass, painted at 4 px per world px (install.py's lens()
 ## and its placement's "scale": 0.25).
@@ -101,7 +101,7 @@ const MIRROR_LIGHT: Rect2 = Rect2(511.0, 348.0, 20.0, 4.0)
 ## the leaf sees the lit surfaces round it: the threshold and passage deck through the doorway (they light
 ## the open leaf's outside face and the reveal, never the room face) and the cross-wall's lit face beyond the
 ## hinge jamb (the room face turns toward it as the leaf opens, so the leaf never goes black mid-swing).
-## Gains fitted with docs/research-2026-10/sources/doors-2026-10-14/fix-r4/tools/{leafsim,lp3,l1,refine,dipfix}.py and closed on render.sh frames
+## Gains fitted with 1cf8d73:docs/research-2026-10/sources/doors-2026-10-14/fix-r4/tools/{leafsim,lp3,l1,refine,dipfix}.py and closed on render.sh frames
 ## (swingcheck.py): open, the leaf by the hinge at 0.7-0.9x the reveal in each row band; shut, below its
 ## wall; through the swing, never far below shut and well above half the wall.
 const EXIT_LEAF_LIGHTS: Array = [

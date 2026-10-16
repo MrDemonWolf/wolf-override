@@ -363,7 +363,7 @@ const CRANK_PUSH_SECONDS: float = 0.2
 const ACTOR_Z: int = 2
 const KNOCKDOWN_Z: int = 3
 ## A knockdown plays the engineer's collapse: the approved death-pose row (2026-10-11, in
-## docs/research-2026-10/sources/walk-final-2026-10-11/death-poses), its five painted frames cut to
+## 1cf8d73:docs/research-2026-10/sources/walk-final-2026-10-11/death-poses), its five painted frames cut to
 ## COLLAPSE_FRAME and laid side by side. In every frame the boots stand on column COLLAPSE_PIVOT_X and
 ## the soles on the bottom edge, so the body goes down onto the floor line and lies on it.
 const COLLAPSE_SHEET: Texture2D = preload("res://assets/engineer-collapse-provisional.png")

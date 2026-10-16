@@ -43,7 +43,7 @@ const BODY_SIZE: Vector2 = Vector2(16.0, 132.0)
 ## Rows of the mesh (fractions of the leaf height), so the door light's fall-off down the leaf is smooth.
 const ROWS: PackedFloat32Array = [0.0, 0.2, 0.45, 0.7, 0.88, 1.0]
 ## The design model's own shading constants (AMBIENT and WRAP in rmodel.py, under
-## docs/research-2026-10/sources/doors-2026-10-14/records/tools; rdesign.py lit the painted walls and
+## 1cf8d73:docs/research-2026-10/sources/doors-2026-10-14/records/tools; rdesign.py lit the painted walls and
 ## reveals with them), so a leaf lit here matches the art round it. AMBIENT is the linear-light fill every face gets (scaled by the fill exposure);
 ## WRAP lifts a lamp's n.l so a face turned slightly away still takes a little of it (a light entry's
 ## fifth value overrides it, as the door lights' 0 does).

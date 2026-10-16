@@ -33,7 +33,7 @@ const ARM_PROP: Texture2D = preload("res://assets/props/junction-tank-arm.png")
 const TANK_PROP: Texture2D = preload("res://assets/props/junction-tank.png")
 const ARM_PANEL_PROP: Texture2D = preload("res://assets/props/junction-arm-panel.png")
 const BOLT_PANEL_PROP: Texture2D = preload("res://assets/props/junction-bolt-panel.png")
-## The entry (review r1, M5; design: docs/research-2026-10/sources/doors-2026-10-14/junction-entry/): the
+## The entry (review r1, M5; design: 1cf8d73:docs/research-2026-10/sources/doors-2026-10-14/junction-entry/): the
 ## engineer comes in from the service line passage the Records exit opens on, through a 3'0" x 7'0"
 ## hollow-metal steel door in a 300 mm cast cross-wall closing the room's left end, turned 17 degrees
 ## across the walkway like every door end of the base, in this room's camera (vanishing point (511,
@@ -44,7 +44,7 @@ const BOLT_PANEL_PROP: Texture2D = preload("res://assets/props/junction-bolt-pan
 const ENTRY_ATLAS: Texture2D = preload("res://assets/props/junction-entry-atlas.png")
 ## World px per atlas px of the entry's wall and near column, painted at 2 px per world px, and of its
 ## lamp's glass, painted at 4 (jeinstall.py's placement, "scale": 0.5 and the lens's 0.25, under
-## docs/research-2026-10/sources/doors-2026-10-14/junction-entry/tools; the Records doors' DOORS_SCALE
+## 1cf8d73:docs/research-2026-10/sources/doors-2026-10-14/junction-entry/tools; the Records doors' DOORS_SCALE
 ## and LENS_SCALE are the same).
 const ENTRY_ATLAS_SCALE: float = 0.5
 const ENTRY_LENS_SCALE: float = 0.25
@@ -198,7 +198,7 @@ const EXIT_NEAR_JAMB_X: float = 971.3
 const EXIT_LEAF_SHUT_X: float = EXIT_DOOR_X + DoorCamera.PX_PER_M * EXIT_LEAF_N / cos(deg_to_rad(EXIT_WALL_ANGLE))
 ## The exit doorway's far jamb on the walk line (world px): junction-exit/NOTES.md, "Opening" (far jamb
 ## x 925.5, near jamb x 971.6 at the floor), in the doors records
-## (docs/research-2026-10/sources/doors-2026-10-14/). The near side is the game's own EXIT_NEAR_JAMB_X.
+## (1cf8d73:docs/research-2026-10/sources/doors-2026-10-14/). The near side is the game's own EXIT_NEAR_JAMB_X.
 const EXIT_FAR_JAMB_X: float = 925.5
 ## The open exit's doorway on the walk line (world px, x from..to): far jamb to near jamb. No game code
 ## reads it; door_route_test measures resting spots and the walk-out against it, like RecordsRoom's

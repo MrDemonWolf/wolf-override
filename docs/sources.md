@@ -10,7 +10,7 @@ Nathanial Henniges originated the game and core story. The current conversation 
 - [Bouquet et al. on nonplayer character companion design](https://www.medien.ifi.lmu.de/pubdb/publications/pub/bouquet2018mindtrek/bouquet2018mindtrek.pdf): companion individuality, autonomy and personal goals support giving WOLF a credible decision of his own. The specific Fracture incident remains ours to write.
 - [A Fold Apart developer account](https://blog.playstation.com/2020/05/18/a-fold-apart-explores-the-emotions-of-a-long-distance-relationship-in-a-folding-paper-world-out-tomorrow-on-ps4/): separation can be felt in interaction and both perspectives can matter. Apply that craft principle without copying its romantic plot or folding mechanic.
 
-The temporary departure/reunion in [story-map.md](story-map.md) is a **proposal** for a later chapter. Exact crisis, tasks, duration, dialogue, route rules and the shutdown cause remain open; M0 does not include it.
+The temporary departure/reunion in [story-map.md](https://github.com/MrDemonWolf/wolf-override/blob/1cf8d73c4703f8d8dfb693c41fc57c62c43118e3/docs/story-map.md) is a **proposal** for a later chapter. Exact crisis, tasks, duration, dialogue, route rules and the shutdown cause remain open; M0 does not include it.
 
 ## Cover-up research, not fictional fact or new canon
 - [DOJ case involving an assault followed by false reports that the victim attacked first](https://www.justice.gov/archives/opa/pr/former-federal-prison-lieutenant-sentenced-using-excessive-force-and-obstructing): supports the plausibility of a sanitized threat narrative. The game incident is fictional and still undecided.

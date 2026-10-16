@@ -112,8 +112,9 @@ invent credits for people, music or tools that were not involved.
 ## Private story material
 
 Detailed story drafts, future plot decisions and planning notes live in
-`PRIVATE_AGENTS.md`, `PROJECT_CONTEXT.md` and under `docs/`. They are
-tracked in this repository, so they contain spoilers. Keep that material
+`PRIVATE_AGENTS.md`, `PROJECT_CONTEXT.md`, the records under `docs/` and
+the project's private Notion notes (indexed in `docs/NOTES.md`). The
+repository files are public and contain spoilers. Keep that material
 out of the website, in-game text and build output; public copy describes
 what is playable today.
 

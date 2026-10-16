@@ -226,9 +226,9 @@ The provisional logo, sprites, title art, layered room plates and station
 props are separate assets with AI-assisted provenance recorded in
 [the asset register](apps/game/assets/manifest.json); they are not
 covered by the code/docs GPL and their final rights review is open. The
-concept art, mock-ups and game captures in the design notes under `docs/`
-have the same status. The processed sound recordings are CC0, credited on
-the credits page. The MrDemonWolf, Inc. logo and mascot are the company's
+concept art, mock-ups and game captures in the design notes (now in git
+history; see `docs/NOTES.md`) have the same status. The processed sound
+recordings are CC0, credited on the credits page. The MrDemonWolf, Inc. logo and mascot are the company's
 branding, all rights reserved, and are not covered by the GPL.
 
 The game stores only its checkpoint, settings and Godot's own log and

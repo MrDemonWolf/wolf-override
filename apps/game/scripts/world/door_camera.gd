@@ -6,7 +6,7 @@ extends RefCounted
 ## around it.
 ##
 ## The camera was measured from the corridor far plate's floor joints (the corridor door-end
-## design, docs/research-2026-10/sources/corridor-door-end-2026-10-12/tools/design/common.py, whose
+## design, 1cf8d73:docs/research-2026-10/sources/corridor-door-end-2026-10-12/tools/design/common.py, whose
 ## project() and depth_scale() this matches): the walk line is at depth D0 metres from the eye, and a
 ## point d metres behind it is scaled by D0 / (D0 + d) about the vanishing point. A room with its own
 ## measured vanishing point passes it as (vp_x, vp_y); the Service Junction's is (511, 162).

@@ -848,7 +848,7 @@
     ],
     "approved": {
      "date": "2026-10-13",
-     "source": "docs/decisions.md, Play decisions (October 13, 2026), Q16; confirmed in docs/research-2026-10/how-it-should-play/drafts-2026-10-13.md, item 3 (S5)"
+     "source": "docs/decisions.md, Play decisions (October 13, 2026), Q16; confirmed in https://github.com/MrDemonWolf/wolf-override/blob/1cf8d73c4703f8d8dfb693c41fc57c62c43118e3/docs/research-2026-10/how-it-should-play/drafts-2026-10-13.md, item 3 (S5)"
     }
    },
    {
@@ -1096,7 +1096,7 @@
     ],
     "approved": {
      "date": "2026-10-13",
-     "source": "docs/research-2026-10/how-it-should-play/drafts-2026-10-13.md, item 1 (Q14)"
+     "source": "https://github.com/MrDemonWolf/wolf-override/blob/1cf8d73c4703f8d8dfb693c41fc57c62c43118e3/docs/research-2026-10/how-it-should-play/drafts-2026-10-13.md, item 1 (Q14)"
     }
    },
    {
