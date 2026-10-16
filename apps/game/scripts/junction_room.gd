@@ -5,8 +5,10 @@ class_name JunctionRoom
 ## in a cross-wall across the walkway (JunctionDoorLayout). What the art cannot show is drawn over it
 ## here from the state the parent mirrors in (PressureLine, DropArm, SentryBrain): the LINE gauge's
 ## needle, the vent glow and the door's status lamp, the hazard stripes over the door's blast zone
-## while the fuse burns, the panel and entry hatch lights, the floor brackets (lit while the sentry's
-## body is inside them) with the tank's shadow and the winch cable. Station
+## while the fuse burns, the breaker's light and the TANK RELEASE and exit bolt panels' lights, the
+## floor brackets (lit while the sentry's body is inside them) with the tank's shadow and the winch
+## cable. The entry is a swing door (SwingLeaf) whose status lamp's glass is a tinted quad of its
+## AtlasMesh (set_entry_lamp), so _draw draws nothing of it. Station
 ## names sit on small plates in one row of clear wall (the vent's on the floor by its grate), and a
 ## plate cut by the edge of the view fades out rather than show part of its name. What pulses follows
 ## the mirrored state (the fuse, the gauge), not a timer of its own.
@@ -31,7 +33,7 @@ const ARM_PROP: Texture2D = preload("res://assets/props/junction-tank-arm.png")
 const TANK_PROP: Texture2D = preload("res://assets/props/junction-tank.png")
 const ARM_PANEL_PROP: Texture2D = preload("res://assets/props/junction-arm-panel.png")
 const BOLT_PANEL_PROP: Texture2D = preload("res://assets/props/junction-bolt-panel.png")
-## The entry (review r1, M5; design: docs/research-2026-10/sources/junction-entry-door-2026-10-13/): the
+## The entry (review r1, M5; design: docs/research-2026-10/sources/doors-2026-10-14/junction-entry/): the
 ## engineer comes in from the service line passage the Records exit opens on, through a 3'0" x 7'0"
 ## hollow-metal steel door in a 300 mm cast cross-wall closing the room's left end, turned 17 degrees
 ## across the walkway like every door end of the base, in this room's camera (vanishing point (511,

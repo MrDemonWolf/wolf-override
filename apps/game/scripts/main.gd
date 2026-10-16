@@ -165,7 +165,9 @@ const HATCH_EXIT_X: float = JunctionRoom.HUMAN_GONE_X
 ## WOLF walks on down the passage past the point where the jamb hides him (JunctionRoom.WOLF_GONE_X,
 ## which the engineer waits for), so the engineer coming through behind him never stands in him.
 const WOLF_HATCH_EXIT_X: float = JunctionRoom.EXIT_WALK_MAX_X
-const HATCH_EXIT_FADE_DELAY: float = 0.3
+## How long (seconds) the walk-out waits, with the exit door standing open, before WOLF sets off
+## through it, so the open doorway is seen before anyone moves.
+const HATCH_EXIT_START_DELAY: float = 0.3
 const HATCH_EXIT_EMPTY_SECONDS: float = 0.4
 ## The most either walk is waited for (both take well under a second at HATCH_EXIT_SPEED_SCALE).
 const HATCH_EXIT_MAX_SECONDS: float = 3.0
@@ -2424,7 +2426,7 @@ func _walk_out_through_hatch() -> void:
 	junction_room.hatch_open = 1.0
 	_update_controls()
 	chapter_tween = create_tween()
-	chapter_tween.tween_interval(HATCH_EXIT_FADE_DELAY)
+	chapter_tween.tween_interval(HATCH_EXIT_START_DELAY)
 	chapter_tween.tween_callback(_wait_until_through.bind(wolf, JunctionRoom.WOLF_GONE_X, _engineer_follows_out))
 
 

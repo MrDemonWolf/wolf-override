@@ -5,8 +5,10 @@ extends Node2D
 ## against nothing but its floor stop. Its faces are flat art in the leaf's own plane (u from the
 ## hinge edge to the latch edge, v up), regions of the room's door atlas; the face the camera sees
 ## is drawn (the room face while it shows, else the outside face), plus the latch edge. The light is
-## the design's own (records_room door light and the room's ceiling lamp, as rdesign.py lights the
-## wall round it), applied per vertex, so the leaf never carries light that belongs to the place.
+## the design's own: each room passes the lamps its own design lit the wall round the door with
+## ([member lights]; RecordsRoom's EXIT_LEAF_LIGHTS and ENTRY_LEAF_LIGHTS from rdesign.py, the junction
+## entry's ENTRY_LEAF_LIGHTS from jedesign.py), applied per vertex, so the leaf never carries light that
+## belongs to the place. Users: the Records exit and entry and the junction entry.
 ## Nothing here fades: the leaf is always somewhere on its hinges. A leaf can be drawn by an AtlasMesh
 ## on the same atlas ([member host]), so a room's door pieces cost one draw call between them.
 
@@ -58,6 +60,8 @@ var open: float = 0.0:
 		queue_redraw()
 		if host != null:
 			host.queue_redraw()
+## The room's door atlas, and the regions of it painted flat for the room face, the outside face and
+## the latch edge (atlas px; u across from the hinge, v up).
 var texture: Texture2D
 var room_region: Rect2
 var out_region: Rect2

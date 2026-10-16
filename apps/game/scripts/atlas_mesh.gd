@@ -5,11 +5,16 @@ extends Node2D
 ## the game can tint, like a status lamp's glass) and swinging leaves (SwingLeaf, which then draw
 ## nothing themselves). Pieces draw in the order they were added, later over earlier.
 
+## The atlas every piece is cut from (each quad's region and each hosted leaf's regions are in its
+## pixels); the one texture the single draw call binds. Set once by _init.
 var texture: Texture2D
 ## Each quad: [region (Rect2), world top-left (Vector2), scale (float), colour (Color)], or a leaf.
 var _pieces: Array = []
 
 
+## A mesh on [param atlas] with nothing in it yet, sampled with mipmaps like the rooms' other door art.
+## Rooms call [method make], which also names it and sets its z layer; _init alone leaves the node's
+## name, z_index and z_as_relative at Godot's defaults.
 func _init(atlas: Texture2D) -> void:
 	texture = atlas
 	texture_filter = CanvasItem.TEXTURE_FILTER_LINEAR_WITH_MIPMAPS
