@@ -193,9 +193,11 @@ Everything else is US spelling. Decision D5.
 `m0_scene_test` (62), `sentry_test` (50), `junction_test` (38), `chapter_scene_test` (22) and
 `text_boxes_test` (20).
 
-The prototype keeps English as the internal text, so all of these keep passing unchanged. Its 25
-suites passed, and passed again after Russian was added. What they need is the language pinned to
-English (DESIGN.md, "Tests").
+The prototype keeps English as the internal text, so all of these keep passing unchanged. The full run
+with es, de and ja passed all 25 suites. The full run with Russian added passed the 24 existing suites;
+the new `i18n_test` failed on the Russian CONTINUE overflow, and passed when run alone after that
+overflow was pinned (prototype/README.md, "Headless checks"). What the existing suites need is the
+language pinned to English (DESIGN.md, "Tests").
 
 ## How much the prototype already reaches
 

@@ -17,8 +17,10 @@ where it is drawn.
   source would break all of them at once.
 - The save stores the choice the player saw as English (`selected_text`). With English internal, an
   old save quotes the right line in any language, and no save version changes.
-- About 270 test checks assert English. All 25 suites passed with no test edits in the prototype, once
-  with es, de and ja and again with Russian added.
+- About 270 test checks assert English. With es, de and ja, all 25 suites passed with no edits to the
+  game's existing tests. With Russian added, the other 24 passed unchanged; `i18n_test` failed on the
+  Russian CONTINUE overflow until that was pinned, and then passed when run alone. The full run was not
+  repeated (prototype/README.md, "Headless checks").
 - Nathanial's approved wording stays byte-identical, as the lighter-game plan already requires.
 
 **Text reaches the screen in one of three ways** (documented once, in the `I18n` class):
@@ -312,7 +314,8 @@ The lighter plan's rule "strings stay byte-identical" stays true, because Englis
 ## Tests that assert English
 
 - **Nothing to rewrite.** English is the internal text, so `approved_wording_test`, `m0_scene_test`
-  and the others keep asserting English and keep passing (measured: 25 of 25 suites in the prototype).
+  and the others keep asserting English and keep passing (measured: the 24 existing suites passed in
+  both full runs; the new `i18n_test` passed in the first and failed in the Russian one, as above).
 - **Pin the language.** `I18n.saved()` follows the start-up locale, so on a Mac set to Spanish, German
   or Japanese the English suites would draw that language. `scripts/check-game.sh` passes
   `--language en` to each suite, and the CI workflow does the same. The CI runner's locale is
