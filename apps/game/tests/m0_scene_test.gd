@@ -352,18 +352,18 @@ func _run() -> void:
 	# of the doorway's near column (drawn in front of the actors) and of the engineer, inside the
 	# camera's view. The only span he stands in front of is the MANUAL BYPASS, whose gearbox is bolted
 	# to the back wall behind the walkway.
-	var doorway_x: float = float((game.get_script() as Script).get_script_constant_map()["WOLF_DOORWAY_X"])
+	var doorway_x: float = Main.WOLF_DOORWAY_X
 	_expect(await _wait_until(func() -> bool: return absf(wolf.position.x - doorway_x) <= 2.0, 240), "at the safe point WOLF walks up to the open doorway (x %.0f)" % wolf.position.x)
 	var wolf_left: float = wolf.position.x - M0Actor.WOLF_REACH + M0Actor.AVOID_TOLERANCE
 	var wolf_right: float = wolf.position.x + M0Actor.WOLF_REACH - M0Actor.AVOID_TOLERANCE
 	var wolf_clear: bool = true
-	var bypass_x: float = (main_constants_safe(game)["BYPASS_WHEEL"] as Vector2).x
+	var bypass_x: float = Main.BYPASS_WHEEL.x
 	for span: Vector2 in game.call("_machine_spans") as Array:
 		if absf((span.x + span.y) * 0.5 - bypass_x) < 0.5:
 			continue
 		if wolf_right > span.x and wolf_left < span.y:
 			wolf_clear = false
-	_expect(wolf.position.x + M0Actor.WOLF_REACH >= float(main_constants_safe(game)["CORRIDOR_DOOR_LEFT_X"]) and wolf.position.x - M0Actor.WOLF_REACH + M0Actor.AVOID_TOLERANCE >= BypassHandle.RELIEF_OUTLET.x, "in the doorway WOLF's head is past the curtain's line, in the opening, and his tail is clear of the relay's relief tailpipe (x %.1f)" % wolf.position.x)
+	_expect(wolf.position.x + M0Actor.WOLF_REACH >= Main.CORRIDOR_DOOR_LEFT_X and wolf.position.x - M0Actor.WOLF_REACH + M0Actor.AVOID_TOLERANCE >= BypassHandle.RELIEF_OUTLET.x, "in the doorway WOLF's head is past the curtain's line, in the opening, and his tail is clear of the relay's relief tailpipe (x %.1f)" % wolf.position.x)
 	var column_left: float = column.get_global_transform().origin.x
 	var safe_cam: Camera2D = game.get_node("IntroCamera") as Camera2D
 	var safe_half_view: float = 480.0 / safe_cam.zoom.x
@@ -721,7 +721,3 @@ func _require(condition: bool, label: String) -> bool:
 		quit(1)
 	return condition
 
-
-## Main's script constants (for checks that run where no local copy of them is kept).
-func main_constants_safe(game: Node2D) -> Dictionary:
-	return (game.get_script() as Script).get_script_constant_map()
