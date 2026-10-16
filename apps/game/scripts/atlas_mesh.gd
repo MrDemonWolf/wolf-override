@@ -34,6 +34,15 @@ func add_quad(region: Rect2, top_left: Vector2, scale_factor: float, color: Colo
 	return _pieces.size() - 1
 
 
+## Adds a flat piece centred on the world point [param centre] instead of placed by its top-left: a
+## status lamp's glass, which the design places by the lamp's centre (the placement's "centre" or the
+## room's *_LAMP point). The top-left is centre - region.size * scale_factor * 0.5, the expression the
+## rooms used inline, in the same order, so the quad lands on the same 32-bit vertices. Returns its
+## index for [method set_color]. Used by the Records doors' two lamps and the junction entry's.
+func add_centred_quad(region: Rect2, centre: Vector2, scale_factor: float, color: Color = Color.WHITE) -> int:
+	return add_quad(region, centre - region.size * scale_factor * 0.5, scale_factor, color)
+
+
 ## Draws [param leaf] here, at its place in the order, from now on.
 func add_leaf(leaf: SwingLeaf) -> void:
 	leaf.host = self

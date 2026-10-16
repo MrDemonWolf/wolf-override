@@ -40,6 +40,12 @@ const BOLT_PANEL_PROP: Texture2D = preload("res://assets/props/junction-bolt-pan
 ## plate. Wall, leaf, near column, stub and the lamp's glass are one AtlasMesh (one draw call) drawn
 ## right after the mid plate: nobody passes behind the column (the leaf stops them at ENTRY_DOOR_X).
 const ENTRY_ATLAS: Texture2D = preload("res://assets/props/junction-entry-atlas.png")
+## World px per atlas px of the entry's wall and near column, painted at 2 px per world px, and of its
+## lamp's glass, painted at 4 (jeinstall.py's placement, "scale": 0.5 and the lens's 0.25, under
+## docs/research-2026-10/sources/doors-2026-10-14/junction-entry/tools; the Records doors' DOORS_SCALE
+## and LENS_SCALE are the same).
+const ENTRY_ATLAS_SCALE: float = 0.5
+const ENTRY_LENS_SCALE: float = 0.25
 ## The entry leaf's fill (fix round 4, review r4 M1; see RecordsRoom.EXIT_LEAF_FILL).
 const ENTRY_LEAF_FILL: float = 0.0880
 const ENTRY_WALL_REGION: Rect2 = Rect2(92.0, 2.0, 280.0, 607.0)
@@ -864,10 +870,10 @@ func _build_entry() -> void:
 	entry_leaf.horizon = EXIT_HORIZON
 	add_child(entry_leaf)
 	entry_mesh = AtlasMesh.make(ENTRY_ATLAS, "EntryDoor", RoomDepth.Z_MID)
-	entry_mesh.add_quad(ENTRY_WALL_REGION, ENTRY_WALL_AT, 0.5)
+	entry_mesh.add_quad(ENTRY_WALL_REGION, ENTRY_WALL_AT, ENTRY_ATLAS_SCALE)
 	entry_mesh.add_leaf(entry_leaf)
-	entry_lamp_quad = entry_mesh.add_quad(ENTRY_LENS_REGION, ENTRY_LAMP - ENTRY_LENS_REGION.size * 0.25 * 0.5, 0.25, ENTRY_LAMP_SHUT)
-	entry_mesh.add_quad(ENTRY_FRONT_REGION, ENTRY_FRONT_AT, 0.5)
+	entry_lamp_quad = entry_mesh.add_centred_quad(ENTRY_LENS_REGION, ENTRY_LAMP, ENTRY_LENS_SCALE, ENTRY_LAMP_SHUT)
+	entry_mesh.add_quad(ENTRY_FRONT_REGION, ENTRY_FRONT_AT, ENTRY_ATLAS_SCALE)
 	depth.add_child(entry_mesh)
 	# The shut leaf stops whoever walks into it: 16 px deep from its junction face, as tall as a door.
 	entry_door_shape = SwingLeaf.make_body(self, "EntryDoorBody", ENTRY_DOOR_X, -1.0)

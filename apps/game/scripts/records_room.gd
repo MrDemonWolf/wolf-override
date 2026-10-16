@@ -23,7 +23,11 @@ const DOORS_ATLAS: Texture2D = preload("res://assets/props/records-doors-atlas.p
 ## door light misses (fix round 4, review r4 M1; see EXIT_LEAF_LIGHTS).
 const EXIT_LEAF_FILL: float = 0.0370
 const ENTRY_LEAF_FILL: float = 0.0509
+## World px per atlas px of the doors' pieces: the atlas is painted at 2 px per world px (install.py's
+## to_2ppw and its placement's "scale": 0.5, under docs/research-2026-10/sources/doors-2026-10-14/records/tools).
 const DOORS_SCALE: float = 0.5
+## World px per atlas px of the status lamps' glass, painted at 4 px per world px (install.py's lens()
+## and its placement's "scale": 0.25).
 const LENS_SCALE: float = 0.25
 const EXIT_WALL_REGION: Rect2 = Rect2(328.0, 2.0, 222.0, 560.0)
 const EXIT_WALL_AT: Vector2 = Vector2(791.5, 163.5)
@@ -190,14 +194,14 @@ func _ready() -> void:
 		add_child(leaf)
 		plate_mesh.add_leaf(leaf)
 	# Each lamp's glass before its column, so the painted guard bars draw over it.
-	entry_lamp_quad = plate_mesh.add_quad(LENS_REGION, ENTRY_LAMP - LENS_REGION.size * LENS_SCALE * 0.5, LENS_SCALE, LAMP_SHUT)
+	entry_lamp_quad = plate_mesh.add_centred_quad(LENS_REGION, ENTRY_LAMP, LENS_SCALE, LAMP_SHUT)
 	plate_mesh.add_quad(ENTRY_COLUMN_REGION, ENTRY_COLUMN_AT, DOORS_SCALE)
 	plate_mesh.add_quad(ENTRY_STUB_REGION, ENTRY_STUB_AT, DOORS_SCALE)
 	depth.add_child(plate_mesh)
 	# The exit's near column, lamp and stub draw over the actors (they walk out behind them), always
 	# opaque, in one draw call.
 	front_mesh = AtlasMesh.make(DOORS_ATLAS, "DoorFronts", RoomDepth.Z_NEAR)
-	exit_lamp_quad = front_mesh.add_quad(LENS_REGION, EXIT_LAMP - LENS_REGION.size * LENS_SCALE * 0.5, LENS_SCALE, LAMP_SHUT)
+	exit_lamp_quad = front_mesh.add_centred_quad(LENS_REGION, EXIT_LAMP, LENS_SCALE, LAMP_SHUT)
 	front_mesh.add_quad(EXIT_COLUMN_REGION, EXIT_COLUMN_AT, DOORS_SCALE)
 	front_mesh.add_quad(EXIT_STUB_REGION, EXIT_STUB_AT, DOORS_SCALE)
 	add_child(front_mesh)
