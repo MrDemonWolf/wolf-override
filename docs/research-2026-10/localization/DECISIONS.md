@@ -125,9 +125,28 @@ and 4-5 MB for all four. That figure is an estimate built from these numbers:
 - **Either way,** each font goes on only while its language is on. Chained always, it grows every
   Latin line by about 19% (measured).
 
-**Also to settle:** may a subset keep the name "Noto Sans JP"? The OFL's Reserved Font Name clause
-decides it. The font's licence file does not say, so the font's own name table needs checking. If a
-name is reserved, the subsets get new names.
+**What the whole download grows by.** The fonts are not the only cost. As soon as any Chinese,
+Japanese or Korean file is registered, the export also adds Godot's line-breaking data,
+`icudt_godot.dat`, 4,797,472 B (measured, DESIGN.md "Line breaking"). So:
+
+| | Size |
+|---|---|
+| Today's exported `.pck` | 24.96 MB (lighter-game plan, section 4) |
+| The lighter-game plan's goal before its new character sheets | about 22-23 MB (its estimate) |
+| Four fixed CJK subsets | about 4-5 MB (estimate) |
+| Line-breaking data | 4.8 MB (measured) |
+| **The 10 languages add** | **about 9-10 MB (estimate)**, or about 5-6 MB with per-game subsets instead of fixed ones |
+
+That undoes the lighter plan's size work about three times over. The line-breaking data is needed for
+any CJK language, so the real choice is between fixed subsets (no re-subsetting when the English
+changes) and per-game subsets (about 4 MB smaller, a new subset with every English change). The
+default stays fixed subsets; Nathanial may prefer the smaller download.
+
+**Settled: the subsets keep the Noto names.** The only Reserved Font Name is "Source": Google Fonts'
+licence files for Noto Sans JP, SC, TC and KR all read "Copyright 2014-2021 Adobe
+(http://www.adobe.com/), with Reserved Font Name 'Source'" (fetched October 16, 2026), and the font's
+own name table records no reserved name (measured). Each bundled licence file starts with that
+copyright line, which the OFL asks to travel with every copy.
 
 ## D8. Native-speaker review
 

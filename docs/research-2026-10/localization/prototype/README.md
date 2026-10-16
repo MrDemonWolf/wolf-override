@@ -8,7 +8,8 @@ built it on October 16, 2026:
 Both steps worked on a scratch export of `main` at 1cf8d73 with Godot 4.7.2.stable.official.ed1daf0bf.
 Nothing went onto a game branch and no English line changed. The whole change is one patch,
 [`evidence/game.patch`](evidence/game.patch), font included. It applies cleanly to a fresh
-`git archive` of `main` at 1cf8d73 (checked with `git apply --check` after the Russian change).
+`git archive` of `main` at 1cf8d73 (checked with `git apply --check` after the Russian change, and again after the fix step added Adobe's
+copyright line to the font's licence text).
 
 The translations are proof samples only. No native speaker has reviewed them, and the story and WOLF
 wording stay Nathanial's.
@@ -115,8 +116,8 @@ Details and reasons are in DESIGN.md. In short:
 | Prototype subset | 139,224 B, 673 code points: ASCII, CJK punctuation, kana, full-width forms, "日本語" and every character of the ja texts. Made with hb-subset 14.6.0 (`tools/i18n_tool.py subset`). |
 | Full-game size estimate | 878,736 B for kana plus all 2,965 JIS level-1 kanji (measured) |
 | The trap | `Font.get_height()` takes the tallest font in the chain. With Noto behind Roboto, Roboto's line height grew from 15 to 18 px at 12 px, from 21 to 25 at 17 and from 28 to 34 at 23. That broke 2 suites, so the fallback goes on only in Japanese. |
-| Glyph check | 296 distinct characters across the four languages, against Roboto-Regular, Montserrat-Semibold and Montserrat-Bold: 0 missing. Russian was also checked with no fallback at all: 0 missing. |
-| Open question | The `Sans/LICENSE` file has no copyright or Reserved Font Name line, so whether a subset may keep the name "Noto Sans JP" needs a check of the font's own name table (decision D7). |
+| Glyph check | 296 distinct characters across the four languages, against Roboto-Regular, Montserrat-Semibold and Montserrat-Bold with the Japanese fallback on: 0 missing. Russian was also checked with no fallback at all: 0 missing. Because the fallback was on for every language, a CJK character in a Latin file would have passed; the build checks each language with its own chain (DESIGN.md). |
+| Naming | The subset may keep the name "Noto Sans JP". The only Reserved Font Name is "Source": Google Fonts' `ofl/notosansjp/OFL.txt` reads "Copyright 2014-2021 Adobe (http://www.adobe.com/), with Reserved Font Name 'Source'", and the font's name table records no reserved name (ID 0: "© 2014-2021 Adobe", read with fontTools 4.60.1 by the fix step). The upstream `Sans/LICENSE` lacks that copyright line, which OFL condition 2 asks for with every copy, so the fix step added it to the top of the patch's `NotoSansJP-OFL.txt` and updated the manifest entry. That changed two text files only, so no test was re-run. |
 
 ## Overflows: the gate and the stills
 
@@ -142,6 +143,11 @@ pins every known overflow by name in `KNOWN_OVERFLOWS`, so any new overflow fail
   and the game title logo 430 → 512. The logo should not be translated at all.
 - **Neighbours are not compared.** Under pseudo, the junction's OVERLOAD BREAKER and RELIEF VENT plates
   touch. The audit does not compare neighbours.
+- **What this check cannot see.** `I18n.overflows()` skips Controls inside Containers (all of Settings,
+  the end card), counts trimmed or clipped text as fitting (Settings trims with "…"), checks width only,
+  and compares no neighbours. So "fits" in the table above means "fits by this check". The build's
+  version and the reuse of `text_boxes_test`'s overlap checks are in [../DESIGN.md](../DESIGN.md)
+  ("The prototype's overflow check has four blind spots").
 
 These wait for Nathanial's layout decision ([../DECISIONS.md](../DECISIONS.md), D10).
 
@@ -155,7 +161,8 @@ The stills come from `tools/render/render.sh`, in the container only, under the 
   new `--languages=ru`.
 - **What was filed:** the 54 frames stayed in the session scratch. The nine below were filed at 960 px
   wide (256 colours). At 2400x1080 the saved image is 1920x1080 (measured); the likely reason, the
-  game's default 16:9 stretch, is inferred.
+  game's default 16:9 stretch, is inferred. So the "touch layout" stills show the touch controls at
+  16:9, not at a 20:9 phone's shape. The measured pixel widths still hold under the canvas stretch.
 - **The audits:** `stills/audit-1280x720.json` and `stills/audit-2400x1080.json` list every frame's
   visible-text count, overflow, tofu and untranslated text, for all 54 frames.
 

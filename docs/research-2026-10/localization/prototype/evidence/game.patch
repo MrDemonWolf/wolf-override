@@ -1,9 +1,11 @@
 diff --git a/apps/game/assets/fonts/NotoSansJP-OFL.txt b/apps/game/assets/fonts/NotoSansJP-OFL.txt
 new file mode 100644
-index 0000000..d952d62
+index 0000000..bb90eea
 --- /dev/null
 +++ b/apps/game/assets/fonts/NotoSansJP-OFL.txt
-@@ -0,0 +1,92 @@
+@@ -0,0 +1,94 @@
++Copyright 2014-2021 Adobe (http://www.adobe.com/), with Reserved Font Name 'Source'
++
 +This Font Software is licensed under the SIL Open Font License,
 +Version 1.1.
 +
@@ -2374,7 +2376,7 @@ index 0000000..766e79e
 +script_support={}
 +opentype_features={}
 diff --git a/apps/game/assets/manifest.json b/apps/game/assets/manifest.json
-index 6f70e7d..7d34830 100644
+index 6f70e7d..e142930 100644
 --- a/apps/game/assets/manifest.json
 +++ b/apps/game/assets/manifest.json
 @@ -673,6 +673,16 @@
@@ -2387,8 +2389,8 @@ index 6f70e7d..7d34830 100644
 +      "path": "apps/game/assets/fonts/NotoSansJP-Subset.otf",
 +      "source_or_tool": "Subset of Noto Sans JP Regular (notofonts/noto-cjk, Sans 2.004, Sans/SubsetOTF/JP/NotoSansJP-Regular.otf, last changed in commit 165c01b46ea5 on 2021-04-30; file SHA-256 dff723ba59d57d136764a04b9b2d03205544f7cd785a711442d6d2d085ac5073), made with hb-subset 14.6.0 by the i18n prototype's tools/i18n_tool.py subset (scratch, 2026-10-16).",
 +      "source_reference": "https://github.com/notofonts/noto-cjk/blob/main/Sans/SubsetOTF/JP/NotoSansJP-Regular.otf",
-+      "terms_reference": "SIL Open Font License 1.1; bundled licence text in apps/game/assets/fonts/NotoSansJP-OFL.txt (Sans/LICENSE of notofonts/noto-cjk)",
-+      "rights_review_status": "Scratch prototype only. A subset is a Modified Version under OFL 1.1; the Reserved Font Name question is open (see PROTOTYPE.md).",
++      "terms_reference": "SIL Open Font License 1.1; bundled licence text in apps/game/assets/fonts/NotoSansJP-OFL.txt (Sans/LICENSE of notofonts/noto-cjk, headed by the copyright line of Google Fonts' ofl/notosansjp/OFL.txt, which OFL condition 2 requires with every copy)",
++      "rights_review_status": "Scratch prototype only. A subset is a Modified Version under OFL 1.1. The only Reserved Font Name is 'Source' (Google Fonts ofl/notosansjp/OFL.txt) and the font's name table records none (ID 0: © 2014-2021 Adobe), so the subset may keep the name Noto Sans JP.",
 +      "modifications": "Glyph subset only (ASCII, CJK punctuation, kana, full-width forms and the prototype's Japanese sample text); no outlines changed.",
 +      "implementation_status": "Fallback behind Roboto and Montserrat (I18n.use_japanese_fallback, Japanese only; the language list has its own chain, I18n.language_list_font), prototype only."
      }
