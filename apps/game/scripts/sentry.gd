@@ -13,8 +13,8 @@ extends CharacterBody2D
 ## points the way it looks. Dormant behind the sealed door it stands powered down: dark eye and lamp,
 ## no beam, the machine dimmed.
 
-## Origin is the middle of its treads on the floor.
-const FLOOR_Y: float = 440.0
+## Origin is the middle of its treads on the floor: the walk line's floor, RoomDepth's one definition.
+const FLOOR_Y: float = RoomDepth.FLOOR_Y
 const ACTIVE_ART: Texture2D = preload("res://assets/props/junction-sentry-side-left.png")
 const WRECK_ART: Texture2D = preload("res://assets/props/junction-sentry-down.png")
 ## Each image is cut to its painted outline; both face left and share one scale, chosen so the
