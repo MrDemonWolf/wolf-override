@@ -481,12 +481,7 @@ func _route_4() -> void:
 	_press("CanvasLayer/PauseOverlay/Panel/PauseMenu/ResumeButton")
 	await _raw(20)
 	await _shot("vent-knockdown-card")
-	# RETRY on the knockdown card (Q17), once it takes it.
-	await _wait_until(func() -> bool: return bool(game.call("_retry_ready")), 300)
-	await _tap(&"interact")
-	await _wait_until(func() -> bool: return not game.get("fail_active"), 300)
-	await _raw(40)
-	await _shot("vent-restored")
+	await _retry_and_shoot("vent-restored")
 	await _walk_to(JunctionRoom.BREAKER_X)
 	await _tap(&"interact")
 	await _raw(10)
@@ -566,15 +561,23 @@ func _route_4() -> void:
 		_fail("the sentry never knocked the engineer down")
 	await _raw(20)
 	await _shot("sentry-knockdown")
-	# RETRY on the knockdown card (Q17), once it takes it.
+	await _retry_and_shoot("sentry-restored")
+
+
+# ---------------------------------------------------------------- route pieces
+
+## RETRY on the knockdown card that is up (Q17): waits until the card takes RETRY
+## (Main._retry_ready), presses interact, waits for the fade back to end the knockdown, lets 40
+## frames settle and takes the still [param slug]. Both knockdowns in R4 (vent and sentry) restore
+## through this; each wait gives up after 300 frames (5 s at --fixed-fps 60) and the still is taken
+## anyway, so a stuck card shows in the still rather than hanging the run.
+func _retry_and_shoot(slug: String) -> void:
 	await _wait_until(func() -> bool: return bool(game.call("_retry_ready")), 300)
 	await _tap(&"interact")
 	await _wait_until(func() -> bool: return not game.get("fail_active"), 300)
 	await _raw(40)
-	await _shot("sentry-restored")
+	await _shot(slug)
 
-
-# ---------------------------------------------------------------- route pieces
 
 func _sentry_walking_back() -> bool:
 	var b: SentryBrain = game.get("sentry_brain") as SentryBrain
