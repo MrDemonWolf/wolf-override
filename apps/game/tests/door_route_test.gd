@@ -7,15 +7,22 @@ extends "res://tests/support/game_suite.gd"
 ## the engineer are through the exit; and no authored resting spot leaves an actor's drawn body across
 ## a door frame, other than standing in an open doorway behind its near jamb.
 ##
-## It runs on the shared suite kit (tests/support/game_suite.gd) and waits on game time, never the
-## wall clock: every wait is bounded by physics frames (1/60 s of game time each), and the blast is
-## watched in slow motion until its tween has ended, so a busy machine slows the suite down but does
-## not change what it sees.
+## It runs on the shared suite kit (tests/support/game_suite.gd) and counts frames, never the wall
+## clock, so a busy machine slows the suite down but does not change what it sees:
+## - each beat is bounded by BEAT_FRAMES physics frames (at normal speed, 1/60 s of game time each);
+## - the loops that watch a beat sample every drawn frame (process_frame) inside that bound;
+## - the blast is watched in slow motion (BLAST_TIME_SCALE) until the leaf lies in the lane;
+## - the closing beat at the exit is sampled on a fixed count of drawn frames (see _check_exit_door).
 
-## How many physics frames a beat may take before the test gives up on it (15 s of game time).
+## How many physics frames a beat may take before the test gives up on it: 15 s of game time at normal
+## speed. In the blast's slow motion each physics frame is 1/600 s, so there the same cap is 1.5 s of
+## game time, still about four times the break and the flight (DOOR_BREAK_SECONDS +
+## DOOR_FLIGHT_SECONDS, 0.39 s).
 const BEAT_FRAMES: int = 900
 ## How slow the game runs while the test watches the blast (Engine.time_scale), so that even a long
-## frame on a busy machine samples the 0.24 s flight several times (the capture driver uses 0.05).
+## frame on a busy machine samples the 0.24 s flight several times (the capture driver uses 0.05). The
+## blast's own hit-stop (Impact.hit_stop, 70 ms of real time) would put time_scale back to 1.0 a moment
+## later, so the test ends it first (Impact.end_hit_stop) and the slow motion then holds to the landing.
 const BLAST_TIME_SCALE: float = 0.1
 ## Where each shut door's face crosses the walk line: a resting body must stay short of it. The
 ## doorways' spans themselves are the rooms' own (RecordsRoom.EXIT_SPAN and ENTRY_SPAN,
@@ -132,7 +139,9 @@ func _check_blast_door() -> void:
 	var leaf_shown: bool = true
 	var flew: bool = false
 	# Watch every drawn frame of the break and the flight in slow motion, until the leaf lies in the
-	# lane (the blast tween has ended), however long the frames take; then normal speed again.
+	# lane (the blast tween has ended), however long the frames take; then normal speed again. The
+	# blast's hit-stop is ended first, or its real-time timer would reset time_scale to 1.0 mid-break.
+	(game as Main).impact.end_hit_stop()
 	Engine.time_scale = BLAST_TIME_SCALE
 	var started: int = Engine.get_physics_frames()
 	while Engine.get_physics_frames() - started < BEAT_FRAMES:
@@ -181,8 +190,10 @@ func _check_exit_door() -> void:
 	game.call("debug_place", leave_x, wolf.position.x)
 	game.call("debug_interact")
 	_expect(state.junction_cleared and bool(game.get("chapter_close_active")), "USE at the open doorway leaves the junction")
+	# The engineer's lowest x over the next 60 drawn frames (process frames, not physics frames: how
+	# much game time they cover depends on the frame rate, at most 8 physics steps each).
 	var closing_min_x: float = human.position.x
-	for i in 60:
+	for _frame: int in 60:
 		await process_frame
 		closing_min_x = minf(closing_min_x, human.position.x)
 	_expect(float(game.get("engineer_step_x")) < 0.0 and closing_min_x >= leave_x - 1.0 and state.human_position.x >= leave_x - 1.0, "leaving, the engineer stays at the open door through the closing beat (lowest x %.1f, saved x %.1f, left from %.1f; the bolt panel's side is %.1f)" % [closing_min_x, state.human_position.x, leave_x, JunctionRoom.BOLT_X])
