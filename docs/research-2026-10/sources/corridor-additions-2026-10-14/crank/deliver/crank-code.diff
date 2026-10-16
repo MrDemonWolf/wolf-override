@@ -1,0 +1,138 @@
+diff --color -ru scratchpad/real-slice/game-slice/apps/game/scripts/floor_reflection.gd scratchpad/real-slice/add7/crank/game-crank/apps/game/scripts/floor_reflection.gd
+--- scratchpad/real-slice/game-slice/apps/game/scripts/floor_reflection.gd	2026-10-11 16:08:13
++++ scratchpad/real-slice/add7/crank/game-crank/apps/game/scripts/floor_reflection.gd	2026-10-12 22:58:23
+@@ -74,6 +74,23 @@
+ 	shadow.modulate.a = source.modulate.a
+ 
+ 
++## Re-reads the source's art after a pose swap changed its texture or region (the engineer's crank
++## pose); position, scale and flip follow the source every frame anyway.
++func sync_art() -> void:
++	if source == null:
++		return
++	texture = source.texture
++	region_enabled = source.region_enabled
++	region_rect = source.region_rect
++	var shader_material: ShaderMaterial = material as ShaderMaterial
++	if shader_material != null:
++		var span: Vector2 = Vector2(0.0, 1.0)
++		if region_enabled and texture != null:
++			span = Vector2(region_rect.position.y, region_rect.end.y) / float(texture.get_height())
++		shader_material.set_shader_parameter("uv_span", span)
++	_mirror()
++
++
+ ## The mipmap LOD bias a sprite samples with: its sharp_sprite material's lod_bias, or 0.0.
+ static func lod_bias_of(sprite: Sprite2D) -> float:
+ 	var shader_material: ShaderMaterial = sprite.material as ShaderMaterial
+diff --color -ru scratchpad/real-slice/game-slice/apps/game/scripts/main.gd scratchpad/real-slice/add7/crank/game-crank/apps/game/scripts/main.gd
+--- scratchpad/real-slice/game-slice/apps/game/scripts/main.gd	2026-10-12 19:01:56
++++ scratchpad/real-slice/add7/crank/game-crank/apps/game/scripts/main.gd	2026-10-12 22:59:00
+@@ -206,6 +206,18 @@
+ const FAIL_CONTROLS_OFF_SECONDS: float = 0.7
+ const FAIL_FADE_SECONDS: float = 0.4
+ const HUMAN_SPRITE_REST: Vector2 = Vector2(0.0, -5.0)
++## The engineer's crank pose at the MANUAL BYPASS (Look 2, two frames): A grips the wheel's rim at
++## 8 o'clock, B has pushed it up an eighth of a turn with the wheel (the same rim point, now at half
++## past 9); the far hand is braced flat on the wall plate in both. One atlas, two 152x308 regions, each
++## centred on its 256x320 cell's centre (cell pivot x 128, feet on row 311), drawn at the approved
++## frame-by-frame rows' scale (70 world px tall) so the boots stand on the floor at y 440.
++const CRANK_ART: Texture2D = preload("res://assets/characters/eng-crank-atlas.png")
++const CRANK_REGION_SIZE: Vector2 = Vector2(152.0, 308.0)
++const CRANK_SCALE: float = 0.254
++const CRANK_SPRITE_POS: Vector2 = Vector2(0.0, -8.61)
++## B (the push) shows this long after each crank tick, while the wheel turns its eighth (0.18 s);
++## A (the regrip) the rest of the tick's 0.4 s.
++const CRANK_PUSH_SECONDS: float = 0.2
+ ## Both actors draw at this depth; a knocked-down engineer draws one step above WOLF so the fall
+ ## is never hidden behind him.
+ const ACTOR_Z: int = 2
+@@ -413,6 +425,14 @@
+ ## The corridor's MANUAL BYPASS beside the relay, its crank count and whether it is venting coolant.
+ var bypass_handle: BypassHandle
+ var bypass_ticks: int = 0
++## The crank frame shown (0 = A, 1 = B), or -1 while the engineer shows their usual sprite.
++var crank_frame: int = -1
++## Seconds left of the B (push) frame after the last crank tick.
++var crank_push_left: float = 0.0
++## The engineer's usual sprite art, restored when the crank pose ends.
++var human_art: Texture2D
++var human_art_scale: Vector2
++var human_reflection: FloorReflection
+ var bypass_venting: bool = false
+ var bypass_alarm_remaining: float = 0.0
+ var bypass_was_holding: bool = false
+@@ -511,6 +531,9 @@
+ 	# cast no runtime floor reflection.
+ 	for grounded: Sprite2D in [human.body_sprite, wolf.body_sprite, intro_director, breaker_art]:
+ 		floor_reflections.append(FloorReflection.attach(grounded))
++	human_reflection = floor_reflections[0]
++	human_art = human.body_sprite.texture
++	human_art_scale = human.body_sprite.scale
+ 	floor_reflections.append_array(records_room.floor_reflections)
+ 	floor_reflections.append_array(junction_room.floor_reflections)
+ 	# Each room's near edge pieces fade back while they cover the engineer or WOLF.
+@@ -833,6 +856,7 @@
+ 		_refresh_ui()
+ 		return
+ 	var held_ticks: int = hold_use.advance(delta, human.controlled and Input.is_action_pressed(&"interact"), _hold_station())
++	_update_crank_pose(delta)
+ 	_update_settle()
+ 	if state.chapter_id == "junction":
+ 		_tick_junction(delta)
+@@ -859,6 +883,36 @@
+ 	_refresh_ui()
+ 
+ 
++## The crank pose while USE is held at the MANUAL BYPASS with the engineer on the crank spot: B for
++## CRANK_PUSH_SECONDS after each tick, A the rest of the hold; otherwise the engineer's usual sprite.
++## The floor reflection re-reads the art whenever it changes.
++func _update_crank_pose(delta: float) -> void:
++	crank_push_left = maxf(crank_push_left - delta, 0.0)
++	var frame: int = -1
++	if state.chapter_id == "lockdown" and not state.door_open and hold_use.holding and hold_use.station == &"bypass" \
++			and engineer_step_x < 0.0 and absf(human.position.x - BYPASS_CRANK_X) <= 1.0:
++		frame = 1 if crank_push_left > 0.0 else 0
++	if frame == crank_frame or human_art == null:
++		return
++	crank_frame = frame
++	var sprite: Sprite2D = human.body_sprite
++	if frame < 0:
++		sprite.texture = human_art
++		sprite.region_enabled = false
++		sprite.scale = human_art_scale
++		sprite.position = HUMAN_SPRITE_REST
++	else:
++		sprite.texture = CRANK_ART
++		sprite.region_enabled = true
++		sprite.region_rect = Rect2(Vector2(CRANK_REGION_SIZE.x * frame, 0.0), CRANK_REGION_SIZE)
++		sprite.scale = Vector2.ONE * CRANK_SCALE
++		sprite.position = CRANK_SPRITE_POS
++		# The wheel is on the engineer's right.
++		sprite.flip_h = false
++	if human_reflection != null:
++		human_reflection.sync_art()
++
++
+ ## The engineer's authored step (back from the relay, to a crank spot, or beside a station they used):
+ ## on arrival they settle on the spot, face what they came to use, and get their controls back.
+ func _tick_engineer_step() -> void:
+@@ -1818,6 +1872,7 @@
+ 		return
+ 	bypass_ticks = mini(hold_use.ticks, BYPASS_TICKS)
+ 	bypass_handle.ticks = bypass_ticks
++	crank_push_left = CRANK_PUSH_SECONDS
+ 	sfx_bank.play(&"clank", -7.0, 1.5)
+ 	impact.rumble(0.12, 0.0, 0.05)
+ 	if not bypass_venting:
+@@ -2786,6 +2841,10 @@
+ 	bypass_was_holding = false
+ 	bypass_handle.ticks = 0
+ 	bypass_handle.done = state.route == "fallback"
++	# The crank pose belongs to the moment too: back to the usual sprite before it is placed below.
++	crank_push_left = 0.0
++	crank_frame = 0
++	_update_crank_pose(0.0)
+ 	# The lane's choices and WOLF's part in it belong to the attempt, not the save.
+ 	lane_choice = ""
+ 	wolf_baiting = false

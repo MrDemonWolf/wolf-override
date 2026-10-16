@@ -1,0 +1,41 @@
+{
+ "codex": {
+  "native_size": [
+   1254,
+   1254
+  ],
+  "mean_abs_diff_outside_paint_map_srgb": 3.56
+ },
+ "far_bolts": {
+  "washer_px": 557,
+  "head_px": 168,
+  "cast_shadow_px": 183
+ },
+ "far_plate": {
+  "px": 7425,
+  "codex_visible_px": 3862,
+  "detail_range": [
+   0.88,
+   1.12
+  ],
+  "mean_luma": 39.4
+ },
+ "near_bolts": {
+  "washer_px": 441,
+  "head_px": 114,
+  "cast_shadow_px": 126
+ },
+ "near_plate": {
+  "px": 4103,
+  "codex_visible_px": 4096,
+  "detail_range": [
+   0.88,
+   1.12
+  ],
+  "mean_luma": 32.7,
+  "end_face_concrete_luma_beside": 25.0
+ },
+ "changed_px": 12206,
+ "changed_outside_new_masks_px": 0,
+ "alpha_changed_px": 0
+}

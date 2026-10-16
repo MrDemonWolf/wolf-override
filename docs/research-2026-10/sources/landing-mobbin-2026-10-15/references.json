@@ -1,0 +1,226 @@
+[
+  {
+    "product": "HBO Max",
+    "screen": "Black Adam cinematic hero",
+    "mobbin_url": "https://mobbin.com/sites/sections/f291567d-0f1c-4c71-a3cb-b298fc0f694e",
+    "pattern": "Key-art hero",
+    "borrow": "Keep the title, premise, and one primary action inside the quiet side of the artwork, with a strong dark gradient for readable copy."
+  },
+  {
+    "product": "HBO Max",
+    "screen": "Ready for your next favorite split hero",
+    "mobbin_url": "https://mobbin.com/sites/sections/305702e6-1b67-4c2d-8e14-83373e5ecb32",
+    "pattern": "Editorial hero composition",
+    "borrow": "Use a controlled copy panel next to cinematic imagery instead of placing text across visually busy subjects."
+  },
+  {
+    "product": "Apple",
+    "screen": "Shrinking Apple TV+ carousel hero",
+    "mobbin_url": "https://mobbin.com/sites/sections/046ff1f9-3dc0-4c80-878c-d403495996c7",
+    "pattern": "Title-led entertainment hero",
+    "borrow": "Pair a very short action label and compact genre hook with dominant key art; keep secondary content visibly below the fold."
+  },
+  {
+    "product": "Epidemic Sound",
+    "screen": "Royalty-free cinematic feature",
+    "mobbin_url": "https://mobbin.com/sites/sections/c8176f29-44c2-4bba-b068-81660d5f7c06",
+    "pattern": "Dark feature panel",
+    "borrow": "Use one cinematic still, one blunt benefit statement, and one accent link with generous negative space."
+  },
+  {
+    "product": "A24",
+    "screen": "A24 app launch hero",
+    "mobbin_url": "https://mobbin.com/sites/sections/c5dcdb53-983a-46ea-8d01-142a6100474b",
+    "pattern": "Editorial product launch",
+    "borrow": "Let the title and artwork carry the identity while platform information stays compact and factual."
+  },
+  {
+    "product": "TIDAL",
+    "screen": "Originals on all devices",
+    "mobbin_url": "https://mobbin.com/sites/sections/8a841b2a-2d99-4cbf-ac25-5eafec2c113c",
+    "pattern": "Device availability CTA",
+    "borrow": "Combine one availability statement, one device image, and one follow-up link rather than a large grid of equal-weight controls."
+  },
+  {
+    "product": "HBO Max",
+    "screen": "Biggest Movies poster mosaic",
+    "mobbin_url": "https://mobbin.com/sites/sections/1dd57555-4739-467b-81de-793f12919025",
+    "pattern": "Media proof strip",
+    "borrow": "Put concise explanatory copy beside a tightly cropped set of visual proof rather than adding another text-only section."
+  },
+  {
+    "product": "Siena Film Foundation",
+    "screen": "Film gallery grid",
+    "mobbin_url": "https://mobbin.com/sites/sections/1115875b-e6af-4b8f-b002-d5aa10ec282e",
+    "pattern": "Cinematic gallery",
+    "borrow": "Use a restrained multi-frame gallery with consistent crops and minimal chrome so the imagery reads as a sequence."
+  },
+  {
+    "product": "Rivian",
+    "screen": "Vehicle gallery carousel",
+    "mobbin_url": "https://mobbin.com/sites/sections/ceb97802-b7e4-4c5c-814c-220c0aea8def",
+    "pattern": "Large image gallery",
+    "borrow": "Lead with a large frame, expose the current position, and provide simple previous/next controls plus a full-screen path."
+  },
+  {
+    "product": "Base",
+    "screen": "Asset collection grid",
+    "mobbin_url": "https://mobbin.com/sites/sections/d4f3d376-5f46-430f-b7f6-0b3d82a90917",
+    "pattern": "Media contact sheet",
+    "borrow": "Label each visual with useful metadata; avoid decorative thumbnails that do not tell the visitor what they are seeing."
+  },
+  {
+    "product": "PayPal",
+    "screen": "Featured and additional stories",
+    "mobbin_url": "https://mobbin.com/sites/sections/bfbfa657-cdbd-4f08-8b96-424931e1c7b9",
+    "pattern": "Primary story plus teasers",
+    "borrow": "Feature one current development update prominently and show two smaller follow-ups rather than presenting every update equally."
+  },
+  {
+    "product": "Grail",
+    "screen": "About Journey editorial timeline",
+    "mobbin_url": "https://mobbin.com/sites/sections/17a1fab5-defb-422a-ab75-d4e8adc00025",
+    "pattern": "Narrative progression",
+    "borrow": "Use numbered story beats, very short copy, and small cinematic frames to create rhythm without exposing plot details."
+  },
+  {
+    "product": "VanMoof",
+    "screen": "Live for the movement story panel",
+    "mobbin_url": "https://mobbin.com/sites/sections/797e281b-ffe2-4d8e-adce-5e5515e54b1b",
+    "pattern": "Image-led premise",
+    "borrow": "Place a short premise and a single story link directly on a legible area of a wide image."
+  },
+  {
+    "product": "Discord",
+    "screen": "Platform download cards",
+    "mobbin_url": "https://mobbin.com/sites/sections/2809158e-5935-4deb-9d2d-43c1fac39424",
+    "pattern": "Platform downloads",
+    "borrow": "Give each platform a clearly labeled status/action and use platform-specific imagery only when it helps recognition."
+  },
+  {
+    "product": "Craft",
+    "screen": "Desktop and mobile download matrix",
+    "mobbin_url": "https://mobbin.com/sites/sections/a0b7540c-22d4-479f-830b-eede4bd022b2",
+    "pattern": "Compact availability matrix",
+    "borrow": "Group platforms by desktop/mobile and make the recommended option obvious without hiding alternatives."
+  },
+  {
+    "product": "Clay",
+    "screen": "Dark multi-platform download page",
+    "mobbin_url": "https://mobbin.com/sites/sections/4bc512f1-126c-4b38-88b4-ce21b294ce4e",
+    "pattern": "Dark download storytelling",
+    "borrow": "Use platform rows with recognizable labels and short supporting copy while preserving a cinematic dark palette."
+  },
+  {
+    "product": "Deezer",
+    "screen": "Mobile platform availability section",
+    "mobbin_url": "https://mobbin.com/sites/sections/7943de20-3afd-4d54-9f0d-e580747a9c84",
+    "pattern": "Alternating device rows",
+    "borrow": "Keep device support scannable with one platform heading, one sentence, one badge/status, and one image per row."
+  },
+  {
+    "product": "Linear",
+    "screen": "Changelog card row",
+    "mobbin_url": "https://mobbin.com/sites/sections/44c38fe6-0c18-4730-a93d-0baf7dbd4f50",
+    "pattern": "Development updates teaser",
+    "borrow": "Show three dated updates with real thumbnails and a clear all-updates link; dates make project activity credible."
+  },
+  {
+    "product": "Cursor",
+    "screen": "Compact changelog strip",
+    "mobbin_url": "https://mobbin.com/sites/sections/56c0a44a-16ef-4f35-ae19-dd3f87be370e",
+    "pattern": "Low-maintenance changelog",
+    "borrow": "Use a compact text-first update strip when there are no strong images, keeping version/date/title visible."
+  },
+  {
+    "product": "SpaceXAI",
+    "screen": "Join the conversation links",
+    "mobbin_url": "https://mobbin.com/sites/sections/ca39b43a-51d6-41de-9917-afce3db849d9",
+    "pattern": "Community link panel",
+    "borrow": "State why someone should join, then offer a short list of explicit destinations instead of unlabeled social icons."
+  },
+  {
+    "product": "Framer",
+    "screen": "Join our Discord community card",
+    "mobbin_url": "https://mobbin.com/sites/sections/ace1b79b-7e61-4193-9486-669f8031143a",
+    "pattern": "Single community CTA",
+    "borrow": "Give Discord one focused card with a sentence about what happens there and one verb-led button."
+  },
+  {
+    "product": "The Leap",
+    "screen": "Newsletter and footer block",
+    "mobbin_url": "https://mobbin.com/sites/sections/5a5e734d-0b06-4545-8131-5e421c4560be",
+    "pattern": "Newsletter close",
+    "borrow": "Place the newsletter action beside the final footer navigation so following development feels like the next logical step."
+  },
+  {
+    "product": "Locomotive",
+    "screen": "Dark FAQ accordion",
+    "mobbin_url": "https://mobbin.com/sites/sections/056c0156-ba82-4238-8b86-5e7049a20103",
+    "pattern": "Minimal FAQ",
+    "borrow": "Use short questions, one open answer, strong dividers, and large row targets; keep the list intentionally small."
+  },
+  {
+    "product": "Dovetail",
+    "screen": "Questions and answers split layout",
+    "mobbin_url": "https://mobbin.com/sites/sections/305c3f1c-1497-4d04-9803-7b977805d603",
+    "pattern": "FAQ with fixed heading",
+    "borrow": "Use a stable section heading beside a narrow accordion so questions remain easy to scan on wide screens."
+  },
+  {
+    "product": "Current",
+    "screen": "Dark grouped footer with CTA",
+    "mobbin_url": "https://mobbin.com/sites/sections/33353d30-cc34-4205-949a-a72e0cde3d6d",
+    "pattern": "Footer conversion and legal",
+    "borrow": "Close with one large action, then separate product, legal, and social groups with clear labels."
+  },
+  {
+    "product": "Resend",
+    "screen": "Dark multi-column footer",
+    "mobbin_url": "https://mobbin.com/sites/sections/9301c687-40d0-4d8d-bbb8-b1325bac2679",
+    "pattern": "Dense footer hierarchy",
+    "borrow": "Use quiet headings, generous column spacing, and a small status or trust item without letting footer links dominate the page."
+  },
+  {
+    "product": "Square",
+    "screen": "Make your next move image CTA",
+    "mobbin_url": "https://mobbin.com/sites/sections/f3b33314-0ee1-476c-b4b8-f1e5d5d0f2a0",
+    "pattern": "Single-image dark CTA",
+    "borrow": "Center one compact visual and limit the action area to a primary and secondary choice."
+  },
+  {
+    "product": "Google TV",
+    "screen": "Hijack title detail",
+    "mobbin_url": "https://mobbin.com/screens/a1f44c0d-58fe-456e-a388-cd11b244a7b5",
+    "pattern": "Phone title hierarchy",
+    "borrow": "On phone, crop art to the top, then order title, compact metadata, two-line synopsis, full-width primary action, and secondary actions."
+  },
+  {
+    "product": "Netflix",
+    "screen": "Wonder title detail",
+    "mobbin_url": "https://mobbin.com/screens/f7087383-70ec-4e3a-85c7-a4e5428cdc25",
+    "pattern": "Phone media detail",
+    "borrow": "Keep the principal action full width and immediately below metadata; make supporting actions visually quieter."
+  },
+  {
+    "product": "HBO Max",
+    "screen": "Game of Thrones title detail",
+    "mobbin_url": "https://mobbin.com/screens/af95ae3e-1f3b-484b-acd0-7d67bf6a560f",
+    "pattern": "Poster-to-content transition",
+    "borrow": "Use a deliberate fade from tall artwork into controls so text never competes with the focal image."
+  },
+  {
+    "product": "Paramount+",
+    "screen": "Tracker title detail",
+    "mobbin_url": "https://mobbin.com/screens/775152ea-3d99-4195-9057-c013f8c019cb",
+    "pattern": "Compact mobile metadata",
+    "borrow": "Put genre, status, rating, and concise synopsis into a tight block below one dominant action."
+  },
+  {
+    "product": "Apple TV",
+    "screen": "Argylle title detail",
+    "mobbin_url": "https://mobbin.com/screens/4def31fa-a9a3-47e9-96e1-bbd7da3a57c3",
+    "pattern": "Layered mobile media detail",
+    "borrow": "Use progressive disclosure: hero, action, short premise, metadata, then trailers, rather than presenting all content at once."
+  }
+]

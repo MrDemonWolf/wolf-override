@@ -1,0 +1,417 @@
+--- round7/scripts/main.gd
++++ round8/scripts/main.gd
+@@ -23,7 +23,10 @@
+ const BYPASS_CRANK_X: float = BYPASS_WHEEL.x - 26.0
+ ## While the engineer is at the relay or works the bypass, WOLF stands off the relay (refused, not
+ ## asked yet, or not asked at all), back towards the breaker, clear of both machines, until the seal
+-## has opened or he is signalled to take it (_wolf_off_relay).
++## has opened or he is signalled to take it (_wolf_off_relay). Once the seal is open he also waits
++## here, facing the engineer, while they are beyond it: at 130 px long he has no clear floor nearer
++## the door end (between the relay, the bypass, the doorway's near column and the safe point's
++## station), so he rests here rather than over a machine or half behind the column (_wolf_target_x).
+ const WOLF_BYPASS_CLEAR_X: float = 490.0
+ ## Held-USE ticks the bypass takes (HoldUse.TICK_SECONDS each, about three seconds in all).
+ const BYPASS_TICKS: int = BypassHandle.TICKS_NEEDED
+@@ -206,17 +209,18 @@
+ const FAIL_CONTROLS_OFF_SECONDS: float = 0.7
+ const FAIL_FADE_SECONDS: float = 0.4
+ const HUMAN_SPRITE_REST: Vector2 = Vector2(0.0, -5.0)
+-## The engineer's crank pose at the MANUAL BYPASS (Look 2, two frames): A grips the wheel's rim at
+-## 8 o'clock, B has pushed it up an eighth of a turn with the wheel (the same rim point, now at half
+-## past 9); the far hand is braced flat on the wall plate in both. One atlas, two 152x308 regions, each
+-## centred on its 256x320 cell's centre (cell pivot x 128, feet on row 311), drawn at the approved
+-## frame-by-frame rows' scale (70 world px tall) so the boots stand on the floor at y 440.
+-const CRANK_ART: Texture2D = preload("res://assets/characters/eng-crank-atlas.png")
+-const CRANK_REGION_SIZE: Vector2 = Vector2(152.0, 308.0)
+-const CRANK_SCALE: float = 0.254
+-const CRANK_SPRITE_POS: Vector2 = Vector2(0.0, -8.61)
++## The engineer's crank pose at the MANUAL BYPASS: two frames cut from the engineer's own sprite
++## (the same drawing, scale and light; the legs are its pixels exactly), leaning into the wheel with
++## both gloves on its rim. A (the regrip) holds it at 8 and 10 o'clock; B (the push) has turned both
++## grips an eighth of a turn with the wheel, to half past 9 and half past 11. One atlas, two 205x380
++## regions trimmed from 384x384 cells whose centre is the usual sprite's centre, drawn at the usual
++## sprite's scale, so the boots stand exactly where they always do.
++const CRANK_ART: Texture2D = preload("res://assets/characters/eng-crank-atlas.png")
++const CRANK_REGION_SIZE: Vector2 = Vector2(205.0, 380.0)
++const CRANK_SCALE: float = 0.188
++const CRANK_SPRITE_POS: Vector2 = Vector2(2.35, -4.812)
+ ## B (the push) shows this long after each crank tick, while the wheel turns its eighth (0.18 s);
+-## A (the regrip) the rest of the tick's 0.4 s.
++## A (the regrip) the rest of the tick. Both follow the ticks, so any hold length works.
+ const CRANK_PUSH_SECONDS: float = 0.2
+ ## Both actors draw at this depth; a knocked-down engineer draws one step above WOLF so the fall
+ ## is never hidden behind him.
+@@ -1876,7 +1880,8 @@
+ 		return
+ 	bypass_ticks = mini(hold_use.ticks, BYPASS_TICKS)
+ 	bypass_handle.ticks = bypass_ticks
+-	crank_push_left = CRANK_PUSH_SECONDS
++	# Half a tick at most, so the regrip still shows if the hold gets shorter.
++	crank_push_left = minf(CRANK_PUSH_SECONDS, HoldUse.TICK_SECONDS * 0.5)
+ 	sfx_bank.play(&"clank", -7.0, 1.5)
+ 	impact.rumble(0.12, 0.0, 0.05)
+ 	if not bypass_venting:
+@@ -3044,7 +3049,7 @@
+ 		return WOLF_HATCH_EXIT_X
+ 	if wolf_heading_to_relay or wolf_holding_relay:
+ 		return RELAY_CONTACT_X
+-	if _wolf_off_relay():
++	if _wolf_off_relay() or _wolf_waits_for_safe_point():
+ 		return WOLF_BYPASS_CLEAR_X
+ 	match state.chapter_id:
+ 		"records":
+@@ -3063,6 +3068,13 @@
+ 	return -1.0
+ 
+ 
++## The seal is open and the engineer has gone on past where WOLF could follow without standing over
++## the relay or the bypass, in the doorway behind its near column, or over the safe point's station:
++## he waits at his clear spot in the corridor, in view, and follows again once they come back.
++func _wolf_waits_for_safe_point() -> bool:
++	return state.chapter_id == "lockdown" and state.door_open and not seal_opening and human.position.x >= WOLF_BYPASS_CLEAR_X + M0Actor.FOLLOW_GAP
++
++
+ ## WOLF keeps off the live relay, back towards the breaker: once he has refused it, or while the
+ ## engineer works the bypass instead, until the seal they opened has landed. So the bypass route
+ ## never shows him on the contact he did not take. On the honest route he also waits there, ready,
+--- round7/scripts/bypass_handle.gd
++++ round8/scripts/bypass_handle.gd
+@@ -49,10 +49,11 @@
+ const LEADER_WIDTH: float = 1.0
+ ## The COOLANT FAULT tag sits under the COOLANT RELAY name, centred on the relay.
+ const FAULT_TAG_TOP: float = 331.0
+-## The open end of the relief valve's tailpipe, painted on the relay art (art px (352, 92) at its
+-## 0.25 scale): the valve stands on the crown of the relay's side pipe and its tailpipe turns down,
+-## beside the pipe and away from the engineer at the wheel. The coolant jets from here, downward.
+-const RELIEF_OUTLET: Vector2 = Vector2(649.625, 361.0)
++## The open end of the relief valve's discharge pipe, painted on the relay art (art px (352.5, 337)
++## at its 0.25 scale): the valve stands on the crown of the relay's side pipe, and its tailpipe is
++## carried down the relay's side in two clamps to a safe point 0.44 m above the floor, away from the
++## engineer's hands and face at the wheel. The coolant sprays from here, down onto the floor.
++const RELIEF_OUTLET: Vector2 = Vector2(649.75, 422.25)
+ ## The fault tag pulses with the alarm while the bypass vents.
+ const PULSE_SECONDS: float = 1.1
+ 
+--- round7/scripts/fx_presets.gd
++++ round8/scripts/fx_presets.gd
+@@ -67,38 +67,38 @@
+ 	return particles
+ 
+ 
+-## Continuous: the narrow jet from a pressure-relief valve's open tailpipe, pointing straight down.
+-## A real relief discharge leaves the pipe as a thin jet that widens at about 12 degrees, slows as
+-## it mixes with the air and is gone within a short distance; so this is a few soft streaks,
+-## stretched along their travel (align Y), that start pipe-narrow, flare to about 11 px, and fade
+-## out within about 20 px, at low alpha in normal blending (no glow). The caller sets emitting.
++## Continuous: the coolant spray from a pressure-relief discharge pipe's open end, 0.44 m above the
++## floor, pointing straight down. Hot coolant that relieves to air flashes, so it shows right at the
++## mouth: a short, dense, slightly fanned spray of soft streaks (align Y) that starts pipe-narrow,
++## widens as it falls and spreads where it meets the floor about 18 px below, and is gone there; low
++## alpha in normal blending (no glow). The caller sets emitting.
+ static func relief_jet() -> CPUParticles2D:
+ 	var particles: CPUParticles2D = CPUParticles2D.new()
+ 	particles.name = "ReliefJet"
+ 	particles.emitting = false
+-	particles.amount = 16
+-	particles.lifetime = 0.36
++	particles.amount = 22
++	particles.lifetime = 0.22
+ 	particles.direction = Vector2(0.0, 1.0)
+-	particles.spread = 5.0
+-	particles.initial_velocity_min = 62.0
+-	particles.initial_velocity_max = 72.0
+-	particles.damping_min = 55.0
+-	particles.damping_max = 70.0
+-	particles.gravity = Vector2(0.0, -10.0)
++	particles.spread = 9.0
++	particles.initial_velocity_min = 70.0
++	particles.initial_velocity_max = 84.0
++	particles.damping_min = 35.0
++	particles.damping_max = 50.0
++	particles.gravity = Vector2(0.0, 120.0)
+ 	particles.particle_flag_align_y = true
+-	particles.scale_amount_min = 0.98
+-	particles.scale_amount_max = 1.15
++	particles.scale_amount_min = 1.0
++	particles.scale_amount_max = 1.2
+ 	var flare: Curve = Curve.new()
+-	flare.add_point(Vector2(0.0, 0.174))
+-	flare.add_point(Vector2(0.3, 0.478))
++	flare.add_point(Vector2(0.0, 0.22))
++	flare.add_point(Vector2(0.55, 0.6))
+ 	flare.add_point(Vector2(1.0, 1.0))
+ 	particles.scale_amount_curve = flare
+-	particles.color = Color(0.84, 0.9, 0.93, 0.18)
++	particles.color = Color(0.86, 0.92, 0.95, 0.3)
+ 	var fade: Gradient = Gradient.new()
+-	fade.offsets = PackedFloat32Array([0.0, 0.12, 0.45, 1.0])
+-	fade.colors = PackedColorArray([Color(1.0, 1.0, 1.0, 0.8), Color.WHITE, Color(1.0, 1.0, 1.0, 0.45), Color(1.0, 1.0, 1.0, 0.0)])
++	fade.offsets = PackedFloat32Array([0.0, 0.1, 0.7, 1.0])
++	fade.colors = PackedColorArray([Color(1.0, 1.0, 1.0, 0.85), Color.WHITE, Color(1.0, 1.0, 1.0, 0.55), Color(1.0, 1.0, 1.0, 0.0)])
+ 	particles.color_ramp = fade
+-	particles.texture = _streak_texture(10, 16)
++	particles.texture = _streak_texture(12, 16)
+ 	return particles
+ 
+ 
+--- round7/scripts/blast_leaf.gd
++++ round8/scripts/blast_leaf.gd
+@@ -1,15 +1,16 @@
+ class_name BlastLeaf
+ extends Node2D
+-## The corridor seal's inner blast leaf while the seal opens (round 7, add7 track DOOR; proposed, not
+-## yet in any game copy). A 0.24 m steel-faced concrete leaf runs in a slot 0.22..0.46 m behind the
+-## cross-wall's face on flanged wheels in a floor rail: shut, its leading edge sits in a receiver in
+-## the near jamb (behind the column); it slides back along the wall into a pocket in the far side,
+-## and open its leading edge stands flush in the pocket's mouth (that parked edge is painted into the
+-## wall piece, so this node only draws while the seal moves). It is drawn as a mesh in its own planes:
+-## the front face (t = T_LF, from the leading edge to the pocket's mouth) and the leading edge
+-## (a = a_lead, t from T_LF to T_LB), projected with the design's camera. The light belongs to the
+-## place, not to the moving leaf: each front-face vertex is shaded from LIGHT at its fixed spot.
+-## Driven only by the seal's existing open value: it starts to slide once the roller is 40 % up.
++## The corridor seal's inner blast leaf while the seal opens. A 0.36 m steel-faced concrete leaf runs
++## in a slot 0.14..0.54 m behind the cross-wall's face on two bogies in a floor rail: shut, its
++## leading edge sits in a receiver in the near jamb (behind the column); it slides back along the
++## wall into a pocket in the far side, and open its leading edge stands flush in the pocket's mouth
++## (that parked edge is painted into the wall piece, so this node only draws while the seal moves).
++## It is drawn as a mesh in its own planes: the front face (t = T_LF, from the leading edge to the
++## pocket's mouth), the leading edge (a = a_lead, t from T_LF to T_LB), and a feathered contact
++## shadow on the threshold in front of its foot (a black atlas patch, vertex alpha), all projected
++## with the design's camera. The light belongs to the place, not to the moving leaf: each front-face
++## vertex is shaded from LIGHT at its fixed spot. Driven only by the seal's existing open value: it
++## starts to slide once the roller is 40 % up.
+ 
+ ## Camera of the door end (design/tools/common.py): vanishing point, floor, walkway depth, scale.
+ const VPX: float = 483.9
+@@ -23,8 +24,8 @@
+ const U: Vector2 = Vector2(-0.2913294, 0.9566228)  # (x, depth) components
+ const N: Vector2 = Vector2(0.9566228, 0.2913294)
+ ## Leaf geometry (metres).
+-const T_LF: float = 0.22
+-const T_LB: float = 0.46
++const T_LF: float = 0.16
++const T_LB: float = 0.52
+ const A_MOUTH: float = 1.46348
+ const A_LEAD_SHUT: float = -2.19069
+ const TRAVEL_M: float = 3.65417
+@@ -33,7 +34,12 @@
+ const START: float = 0.4
+ ## Atlas regions (corridor-seal-atlas.png, round 7) and their texel densities.
+ const FRONT_REGION: Rect2 = Rect2(449.0, 705.0, 158.0, 256.0)
+-const EDGE_REGION: Rect2 = Rect2(613.0, 705.0, 19.0, 256.0)
++const EDGE_REGION: Rect2 = Rect2(613.0, 705.0, 29.0, 256.0)
++## A solid black patch: the contact shadow takes its colour from it and its feather from vertex alpha.
++const SHADOW_REGION: Rect2 = Rect2(648.0, 705.0, 8.0, 8.0)
++## The contact shadow reaches this far in front of the foot (m) and is this dark at the foot.
++const SHADOW_DEPTH_M: float = 0.14
++const SHADOW_ALPHA: float = 0.62
+ const U_TEXELS_PER_M: float = 40.0
+ const H_TEXELS_PER_M: float = 80.0
+ ## Light on the front plane: columns at fixed a (mouth first), rows at fixed h; grey vertex colour.
+@@ -41,7 +47,7 @@
+ const H_ROWS: PackedFloat32Array = [0.0, 0.4, 0.8, 1.2, 1.6, 2.0, 2.4, 2.75, 3.05]
+ ## (row-major: index = column * H_ROWS.size() + row)
+ const LIGHT: PackedFloat32Array = [
+-	0.612, 0.612, 0.612, 0.612, 0.642, 0.642, 0.642, 0.552, 0.552, 0.761, 0.791, 0.821, 0.821, 0.851, 0.881, 0.94, 0.582, 0.552, 0.791, 0.821, 0.821, 0.851, 0.881, 0.91, 0.97, 0.612, 0.582, 0.821, 0.851, 0.851, 0.881, 0.91, 0.94, 0.97, 0.642, 0.612, 0.881, 0.881, 0.881, 0.91, 0.91, 0.94, 0.97, 0.672, 0.642, 0.91, 0.91, 0.94, 0.94, 0.94, 0.94, 0.94, 0.701, 0.672, 0.97, 0.97, 0.97, 0.94, 0.94, 0.94, 0.91, 0.731, 0.701, 1.0, 1.0, 1.0, 0.97, 0.94, 0.94, 0.91, 0.731, 0.701, 0.463, 0.463, 0.463, 0.493, 0.493, 0.493, 0.493, 0.343, 0.343,
++	0.612, 0.612, 0.612, 0.612, 0.612, 0.612, 0.612, 0.552, 0.552, 0.761, 0.791, 0.791, 0.821, 0.851, 0.881, 0.91, 0.582, 0.552, 0.791, 0.821, 0.821, 0.851, 0.881, 0.91, 0.94, 0.612, 0.582, 0.821, 0.851, 0.851, 0.881, 0.881, 0.91, 0.97, 0.642, 0.612, 0.881, 0.881, 0.881, 0.91, 0.91, 0.94, 0.97, 0.672, 0.642, 0.91, 0.91, 0.91, 0.91, 0.91, 0.94, 0.94, 0.701, 0.672, 0.97, 0.97, 0.97, 0.94, 0.94, 0.91, 0.91, 0.731, 0.701, 1.0, 1.0, 1.0, 0.97, 0.94, 0.91, 0.881, 0.731, 0.701, 0.463, 0.463, 0.463, 0.463, 0.493, 0.493, 0.493, 0.343, 0.343,
+ ]
+ 
+ ## The seal's open value (0 shut, 1 open), the same value SealLeaf.open takes.
+@@ -138,4 +144,13 @@
+ 		var j0: int = base + r
+ 		var j1: int = base + rows + r
+ 		indices.append_array([j0, j1, j0 + 1, j0 + 1, j1, j1 + 1])
++	# contact shadow on the threshold, in front of the foot: dark at the foot, clear at its far edge
++	var sbase: int = points.size()
++	var suv: Vector2 = (SHADOW_REGION.position + SHADOW_REGION.size * 0.5) / size
++	for a: float in [lead, A_MOUTH]:
++		for k: int in 2:
++			points.append(project(a, 0.0, T_LF - SHADOW_DEPTH_M * k))
++			uvs.append(suv)
++			colors.append(Color(1.0, 1.0, 1.0, SHADOW_ALPHA * (1 - k)))
++	indices.append_array([sbase, sbase + 2, sbase + 1, sbase + 1, sbase + 2, sbase + 3])
+ 	RenderingServer.canvas_item_add_triangle_array(get_canvas_item(), indices, points, colors, uvs, PackedInt32Array(), PackedFloat32Array(), texture.get_rid())
+--- round7/tests/m0_scene_test.gd
++++ round8/tests/m0_scene_test.gd
+@@ -7,9 +7,11 @@
+ ## The MANUAL BYPASS wheel's rim (tube centre line) in its atlas region, measured from the art's
+ ## alpha and luma profile: 37.5 atlas px, so 9.375 world px at BypassHandle.WHEEL_SCALE.
+ const WHEEL_RIM_ATLAS_RADIUS: float = 37.5
+-## The crank pose's grip: frame A holds the rim at 8 o'clock; frame B has turned that rim point an
+-## eighth of a turn with the wheel, to about half past 9 (clock degrees, clockwise from 12).
++## The crank pose's grips (clock degrees, clockwise from 12): frame A holds the rim at 8 o'clock
++## (the far glove) and 10 o'clock (the near glove); frame B has turned both an eighth of a turn with
++## the wheel, to about half past 9 and half past 11.
+ const CRANK_GRIP_CLOCK: PackedFloat32Array = [240.0, 285.0]
++const CRANK_NEAR_GRIP_CLOCK: PackedFloat32Array = [300.0, 345.0]
+ ## The crank art's glove: dark, neutral, opaque pixels within this many atlas px of the grip.
+ const CRANK_GLOVE_SEARCH: int = 16
+ ## The crank frames' atlas, read once.
+@@ -260,7 +262,7 @@
+ 	var door_visual: ColorRect = game.get_node("Door/Visual") as ColorRect
+ 	_expect(not door_visual.visible and not seal_leaf.visible and door_shape.disabled, "door retracts after cooperation and the doorway opens once it lands")
+ 	_expect(not blast_leaf.visible and is_equal_approx(blast_leaf.open, 1.0) and BlastLeaf.lead_at(blast_leaf.open) >= BlastLeaf.A_MOUTH - 0.0001, "once open the inner leaf is home in its wall pocket, out of the walk path (the wall art shows its parked edge)")
+-	_expect(str(game.call("_context_hint")).contains("Move to the safe point") and wolf.follow_target == human, "once the seal has landed the hint says it is open and WOLF lets go of the contact")
++	_expect(str(game.call("_context_hint")).contains("Move to the safe point") and not game.get("wolf_holding_relay") and (wolf.follow_target == human or bool(game.call("_wolf_waits_for_safe_point"))), "once the seal has landed the hint says it is open and WOLF lets go of the contact (he follows, or waits clear while the engineer is past the relay)")
+ 	_expect((game.get("door_open_art") as Sprite2D).visible and (game.get("door_lip") as Sprite2D).visible and (game.get("door_lip") as Sprite2D).z_index > human.z_index, "the bulkhead stands open behind the engineer, its front pillar drawn over him")
+ 	# The corridor's near column is solid (it never fades and nothing is drawn over it), and slim:
+ 	# its art ends left of where the engineer can use the safe point.
+@@ -329,6 +331,21 @@
+ 		return
+ 	_expect(game.call("_objective") == "SAFE POINT REACHED", "checkpoint closes the first scene")
+ 	_expect(str(game.get("status_line")).contains(State.CHOICE_TEXT[State.DISCLOSE]), "cooperative checkpoint displays the selected choice")
++	# While the safe point's lines are up, WOLF stands where both of them are wholly in view: his drawn
++	# body clear of every machine, of the doorway's near column (drawn in front of the actors) and of
++	# the engineer, and inside the camera's view, facing the engineer.
++	await _wait_until(func() -> bool: return absf(wolf.position.x - float((game.get_script() as Script).get_script_constant_map()["WOLF_BYPASS_CLEAR_X"])) <= 2.0, 240)
++	var wolf_left: float = wolf.position.x - M0Actor.WOLF_REACH + M0Actor.AVOID_TOLERANCE
++	var wolf_right: float = wolf.position.x + M0Actor.WOLF_REACH - M0Actor.AVOID_TOLERANCE
++	var wolf_clear: bool = true
++	for span: Vector2 in game.call("_machine_spans") as Array:
++		if wolf_right > span.x and wolf_left < span.y:
++			wolf_clear = false
++	var column_left: float = column.get_global_transform().origin.x
++	var safe_cam: Camera2D = game.get_node("IntroCamera") as Camera2D
++	var safe_half_view: float = 480.0 / safe_cam.zoom.x
++	var safe_view_x: float = safe_cam.get_screen_center_position().x
++	_expect(wolf_clear and wolf.position.x + M0Actor.WOLF_REACH < column_left and absf(human.position.x - wolf.position.x) >= M0Actor.CLEAR_GAP and wolf.position.x - M0Actor.WOLF_REACH >= safe_view_x - safe_half_view and human.position.x + M0Actor.HUMAN_REACH <= safe_view_x + safe_half_view and not wolf.body_sprite.flip_h, "at the safe point WOLF and the engineer are both wholly in view: WOLF at %.0f clear of the machines, the near column (from %.1f) and the engineer at %.0f" % [wolf.position.x, column_left, human.position.x])
+ 	var saved: Dictionary = state.to_dict()
+ 	game.call("_new_game")
+ 	await _tap(&"pause_game")
+@@ -423,11 +440,14 @@
+ 	var grip_frames: Array = grip["frames"] as Array
+ 	print("crank grip: A %d, B %d, usual %d frames; worst %.2f world px off the rim line, %.2f from the grip point" % [int(grip_frames[0]), int(grip_frames[1]), int(grip["usual"]), float(grip["worst_rim"]), float(grip["worst_grip"])])
+ 	_expect(int(grip_frames[0]) > 0 and int(grip_frames[1]) > 0 and int(grip["usual"]) <= 1, "cranking shows the crank pose: A (grip) and B (push) frames, %d and %d, and %d usual-sprite frames" % [int(grip_frames[0]), int(grip_frames[1]), int(grip["usual"])])
+-	_expect(bool(grip["found"]) and float(grip["worst_rim"]) <= 1.5 and float(grip["worst_grip"]) <= 2.5, "in every crank frame the glove is on the wheel's rim (worst %.2f world px off the rim line, %.2f from the grip point)" % [float(grip["worst_rim"]), float(grip["worst_grip"])])
++	_expect(bool(grip["found"]) and float(grip["worst_rim"]) <= 1.5 and float(grip["worst_grip"]) <= 2.5, "in every crank frame both gloves are on the wheel's rim (worst %.2f world px off the rim line, %.2f from the grip point)" % [float(grip["worst_rim"]), float(grip["worst_grip"])])
+ 	_expect(halfway and str(game.get("status_line")) == "Halfway. The hiss gets louder; the alarm keeps wailing." and bypass_handle.ticks == int(game.get("bypass_ticks")), "half way through the crank the hiss gets louder and the handle shows the count")
+ 	_expect(absf(wolf.position.x - wolf_clear_x) <= 3.0 and wolf.position.x + M0Actor.WOLF_REACH < float(main_constants["RELAY_X"]) - 20.0 and not wolf.body_sprite.flip_h, "WOLF is off the relay's housing, facing the engineer at the bypass")
++	# The game reads USE in _process. Two physics steps can run in one frame, and process_frame is
++	# emitted before _process, so wait for a whole frame after the release before reading the line.
+ 	await physics_frame
+ 	await process_frame
++	await process_frame
+ 	var kept: int = int(game.get("bypass_ticks"))
+ 	_expect(not state.door_open and kept >= 4 and str(game.get("status_line")) == "The handle holds where Rowan left it. The alarm keeps going." and str(game.call("_context_hint")) == "HOLD E: crank the manual bypass, %d of 8." % kept, "letting go keeps the turns made; the alarm keeps going")
+ 	Input.action_press(&"interact")
+@@ -544,7 +564,7 @@
+ 	Input.action_release(&"interact")
+ 	_expect(cranked and state.route == "fallback" and not game.get("wolf_heading_to_relay") and str(game.get("status_line")).begins_with("The bypass locks over"), "the engineer can crank the bypass even after WOLF offered")
+ 	_expect(wolf.autonomous_target_x == float((game.get_script() as Script).get_script_constant_map()["WOLF_BYPASS_CLEAR_X"]) and game.get("seal_opening"), "WOLF stays off the relay he was not asked to take while the seal the engineer opened slides up")
+-	_expect(await _wait_until(func() -> bool: return not game.get("seal_opening") and wolf.follow_target == human, 120), "once the seal has landed WOLF follows the engineer again")
++	_expect(await _wait_until(func() -> bool: return not game.get("seal_opening") and (wolf.follow_target == human or bool(game.call("_wolf_waits_for_safe_point"))), 120), "once the seal has landed WOLF follows the engineer again, or waits clear of the door end while they are past the relay")
+ 	state.reach_checkpoint()
+ 	_expect(state.checkpoint_callback().ends_with("I made my call. You cranked the bypass anyway. I stayed."), "the safe point remembers that WOLF offered and the engineer cranked the bypass anyway")
+ 	DirAccess.remove_absolute(ProjectSettings.globalize_path(path))
+@@ -600,9 +620,16 @@
+ 		crank_image = sprite.texture.get_image()
+ 		if crank_image.is_compressed():
+ 			crank_image.decompress()
++	for clocks: PackedFloat32Array in [CRANK_GRIP_CLOCK, CRANK_NEAR_GRIP_CLOCK]:
++		_sample_glove(sprite, handle, clocks[frame], grip)
++
++
++## One glove against its rim point: the centroid of the crank art's dark, neutral, opaque pixels near
++## the grip point, taken back to the world through the sprite's own transform.
++func _sample_glove(sprite: Sprite2D, handle: BypassHandle, clock_deg: float, grip: Dictionary) -> void:
+ 	var hub: Vector2 = handle.global_position + BypassHandle.WHEEL_OFFSET
+ 	var rim: float = WHEEL_RIM_ATLAS_RADIUS * BypassHandle.WHEEL_SCALE
+-	var clock: float = deg_to_rad(CRANK_GRIP_CLOCK[frame])
++	var clock: float = deg_to_rad(clock_deg)
+ 	var target: Vector2 = hub + rim * Vector2(sin(clock), -cos(clock))
+ 	var to_world: Transform2D = sprite.get_global_transform()
+ 	var region: Rect2 = sprite.region_rect
+--- round7/tests/corridor_additions_test.gd
++++ round8/tests/corridor_additions_test.gd
+@@ -96,6 +96,22 @@
+ 		for t: float in [BlastLeaf.T_LF, BlastLeaf.T_LB]:
+ 			deepest_foot_y = maxf(deepest_foot_y, BlastLeaf.project(a, 0.0, t).y)
+ 	_expect(deepest_foot_y < FLOOR_Y - 8.0, "open, the inner leaf's footprint is wholly behind the walk line (lowest foot at world y %.1f, the walk line at %.0f)" % [deepest_foot_y, FLOOR_Y])
++	# Round 8: it reads heavier than the roller: a 0.30-0.45 m leading edge, and a feathered contact
++	# shadow on the threshold, in the wall's thickness (in front of the leaf's foot, behind the face),
++	# from a solid black patch of the same atlas (so it still batches).
++	_expect(BlastLeaf.T_LB - BlastLeaf.T_LF >= 0.30 and BlastLeaf.T_LB - BlastLeaf.T_LF <= 0.45 and BlastLeaf.T_LB < 0.66, "the inner leaf's leading edge is %.2f m thick, inside the 0.66 m wall" % (BlastLeaf.T_LB - BlastLeaf.T_LF))
++	var shadow_t: float = BlastLeaf.T_LF - BlastLeaf.SHADOW_DEPTH_M
++	_expect(shadow_t > 0.0 and BlastLeaf.SHADOW_ALPHA > 0.0 and BlastLeaf.SHADOW_ALPHA < 1.0, "the leaf's contact shadow lies on the threshold inside the wall (t %.2f..%.2f m), feathered from alpha %.2f to 0" % [shadow_t, BlastLeaf.T_LF, BlastLeaf.SHADOW_ALPHA])
++	var atlas_img: Image = leaf.texture.get_image()
++	if atlas_img.is_compressed():
++		atlas_img.decompress()
++	var black: bool = true
++	for y: int in range(int(BlastLeaf.SHADOW_REGION.position.y), int(BlastLeaf.SHADOW_REGION.end.y)):
++		for x: int in range(int(BlastLeaf.SHADOW_REGION.position.x), int(BlastLeaf.SHADOW_REGION.end.x)):
++			var c: Color = atlas_img.get_pixel(x, y)
++			if c.a < 0.99 or maxf(c.r, maxf(c.g, c.b)) > 0.01:
++				black = false
++	_expect(black, "the contact shadow's atlas patch is solid black")
+ 
+ 
+ func _expect(condition: bool, label: String) -> bool:
+--- round7/scenes/main.tscn
++++ round8/scenes/main.tscn
+@@ -58,8 +58,8 @@
+ shaft_lamps = PackedInt32Array(1, 2)
+ warning_lamps = PackedVector2Array(0.341, 0.27, 0.659, 0.27)
+ beacon_atlas = ExtResource("23_beacons")
+-beacon_regions = Array[Rect2]([Rect2(2, 2, 25, 135), Rect2(242, 2, 11, 12), Rect2(212, 2, 13, 15), Rect2(29, 2, 77, 95), Rect2(187, 2, 23, 46), Rect2(2, 141, 11, 12), Rect2(227, 2, 13, 15), Rect2(108, 2, 77, 95)])
+-beacon_offsets = PackedVector2Array(-10.72, -108.6, -3.72, 4.4, -4.72, 4.4, -36.72, -30.6, -10.28, -18.6, -4.28, 4.4, -5.28, 4.4, -37.28, -30.6)
++beacon_regions = Array[Rect2]([Rect2(2, 2, 25, 135), Rect2(2, 141, 11, 12), Rect2(224, 2, 13, 15), Rect2(29, 2, 83, 107), Rect2(199, 2, 23, 46), Rect2(15, 141, 11, 12), Rect2(239, 2, 13, 15), Rect2(114, 2, 83, 107)])
++beacon_offsets = PackedVector2Array(-10.72, -108.6, -3.72, 4.4, -4.72, 4.4, -39.72, -26.6, -10.28, -18.6, -4.28, 4.4, -5.28, 4.4, -40.28, -26.6)
+ ambient_dust = false
+ haze_end = 0.588
+ haze_fade = 0.12
+--- round7/assets/manifest.json
++++ round8/assets/manifest.json
+@@ -166,7 +166,7 @@
+       "source_reference": "Reference: maintenance-corridor-background-provisional.png, the earlier single corridor painting (ChatGPT Create in the WOLF//OVERRIDE [Game] project, https://chatgpt.com/g/g-p-6ab60b48c7608191987f04a81b04b5e2-wolf-override-game/c/6abb82fd-5d14-83e9-9332-a78148b708b2), registered here until it was retired on 2026-10-09; generation prompts retained in ignored art notes",
+       "terms_reference": "https://openai.com/policies/terms-of-use/",
+       "rights_review_status": "Provisional AI-generated environment art, human reviewed and approved for integration. Final commercial asset-rights review remains open; not covered by the code/docs GPL license. Approved for integration by Nathanial Henniges on 2026-10-08 from a review sheet.",
+-      "modifications": "Original 1920x1080 RGB far plate (back wall, three ceiling lamps, wet floor), copied unchanged. First trialled 2026-10-08 as assets/trial/corridor-far-trial.png (same bytes).",
++      "modifications": "Original 1920x1080 RGB far plate (back wall, three ceiling lamps, wet floor), copied unchanged. First trialled 2026-10-08 as assets/trial/corridor-far-trial.png (same bytes). add7 fix round 1 (2026-10-13; scratch copy, not on main): the chain-hung luminaire near the door end (plate x 1230-1329, y 192-250) became a 0.6 m vapour-tight LED fitting (grey body, end caps, opal diffuser, two suspension rods with ceiling canopies) at plate x 1213-1261, so at 1280x720 it ends clear of the PAUSE button; the old 1.2 m bar's ends and its hangers were taken back to the wall by a deterministic inpaint. Shapes by Python (add7/fix1/luminaire/tools/design.py), painted with Codex's built-in image_gen in edit mode (session 01a134c9-e14e-7482-aad9-3642fae31b50), values pinned by cleanup.py; 2,802 plate px changed, all inside that box.",
+       "implementation_status": "In use since 2026-10-09, imported VRAM-compressed. Drawn by RoomDepth as the corridor backdrop: a Parallax2D at 0.9x camera speed, 960 px wide, sitting 27 px lower than the mid plate so its painted ceiling lamps stay in the play view, with additive glows and light shafts on its lamps, two procedurally drawn lockdown beacons, haze and dust. From 2026-10-09 it also stood in, tinted, for the Service Junction until that room's own set was integrated the same day."
+     },
+     {
+@@ -276,8 +276,8 @@
+       "source_reference": "Reference: maintenance-props-provisional.png, the earlier ChatGPT Create prop sheet (WOLF//OVERRIDE [Game] project, https://chatgpt.com/g/g-p-6ab60b48c7608191987f04a81b04b5e2-wolf-override-game/c/6abb82fd-5d14-83e9-9332-a78148b708b2), registered here until it was retired on 2026-10-09; generation prompts retained in ignored art notes",
+       "terms_reference": "https://openai.com/policies/terms-of-use/",
+       "rights_review_status": "Provisional AI-generated gameplay prop, human reviewed and approved for integration. Final commercial asset-rights review remains open; not covered by the code/docs GPL license. Approved for integration by Nathanial Henniges on 2026-10-08 from a review sheet.",
+-      "modifications": "Original 512x512 RGBA prop, copied unchanged. The game shows the region inside its painted outline (so its floor reflection and contact shadow start at its real base) with mipmaps and linear-with-mipmaps filtering. 2026-10-12: a spring-loaded safety relief valve with a short open tailpipe turned down was added on the crown of the side pipe's upper elbow (relay art px 291-356 x 52-94, 938 px; every other pixel unchanged): laid out as exact shapes by script, painted inside those shapes with the Codex built-in image_gen tool in edit mode (session 01a1335a-f620-7b42-ae60-ce8dce78c082; the original output with its C2PA manifest is kept in the art notes), then resampled, clipped to the shapes and merged by script (SHA-256 fb192cc2334aaf70...).",
+-      "implementation_status": "In use since 2026-10-09 as the corridor COOLANT RELAY at x 605, 0.221x (89 px tall, as before); the status light is drawn on its painted cyan bar, with its station label, state tint or glow and floor reflection unchanged. Since 2026-10-12 the coolant jets from its relief valve's tailpipe (BypassHandle.RELIEF_OUTLET) while the bypass is cranked."
++      "modifications": "Original 512x512 RGBA prop, copied unchanged. The game shows the region inside its painted outline (so its floor reflection and contact shadow start at its real base) with mipmaps and linear-with-mipmaps filtering. 2026-10-12: a spring-loaded safety relief valve with a short open tailpipe turned down was added on the crown of the side pipe's upper elbow (relay art px 291-356 x 52-94, 938 px; every other pixel unchanged): laid out as exact shapes by script, painted inside those shapes with the Codex built-in image_gen tool in edit mode (session 01a1335a-f620-7b42-ae60-ce8dce78c082; the original output with its C2PA manifest is kept in the art notes), then resampled, clipped to the shapes and merged by script (SHA-256 fb192cc2334aaf70...). add7 fix round 1 (2026-10-13; scratch copy, not on main): the relief valve's discharge is carried down the relay's side to an open end 0.44 m above the floor (union, 40 mm galvanised drop, two pipe clamps with brackets to the coolant pipe, art x 331-358, y 92-337) and a damp patch on the floor under it (art (352, 404)); shapes by Python (add7/fix1/plume/tools/design8.py), painted with Codex's built-in image_gen in edit mode (session 01a134c3-505a-7132-88f6-8ea5867103a0), value pinned to round 7's own tailpipe (cleanup8.py).",
++      "implementation_status": "In use since 2026-10-09 as the corridor COOLANT RELAY at x 605, 0.221x (89 px tall, as before); the status light is drawn on its painted cyan bar, with its station label, state tint or glow and floor reflection unchanged. Since 2026-10-12 the coolant jets from its relief valve's tailpipe (BypassHandle.RELIEF_OUTLET) while the bypass is cranked. add7 fix round 1 (2026-10-13; scratch copy, not on main): the coolant spray (FxPresets.relief_jet) leaves the drop's open end at world (649.75, 422.25) and falls to the floor."
+     },
+     {
+       "asset_id": "corridor-bulkhead-sealed",
+@@ -731,18 +731,28 @@
+       "source_reference": "Shapes and proportions from the Eaton Crouse-Hinds EV LED hazardous-location luminaire (red glass globe, guard, wall bracket, 3/4 in hub); the original 1254x1254 output keeps its C2PA manifest and is kept outside the repo with its prompt",
+       "terms_reference": "https://openai.com/policies/terms-of-use/",
+       "rights_review_status": "Provisional AI-assisted gameplay prop. Pending Nathanial Henniges' review; final commercial asset-rights review remains open; not covered by the code/docs GPL license.",
+-      "modifications": "Deterministic cleanup: Codex's paint is sampled only inside the designed masks and resampled to the far plate's pixel grid; conduit, straps, fittings, wall contact shadows and the red light and wall spill are computed in Python. Packed into one 256x156 RGBA atlas (per lamp: fixture, greyscale globe, guard, additive light), lossless, no mipmaps.",
++      "modifications": "Deterministic cleanup: Codex's paint is sampled only inside the designed masks and resampled to the far plate's pixel grid; conduit, straps, fittings, wall contact shadows and the red light and wall spill are computed in Python. Packed into one 256x156 RGBA atlas (per lamp: fixture, greyscale globe, guard, additive light), lossless, no mipmaps. add7 fix round 1 (2026-10-13; scratch copy, not on main): the red pool is stronger and reaches the pipes below (spill 1.0, a broader d/r^2 skirt, faded to nothing at the light box's edges), the glass bloom 0.45, the left lamp's feed held by three wider one-hole straps with lit tops and a hairline wall shadow; the globes keep their real 0.14 m size. Same Codex paint (no new session); atlas now 256x160 (add7/fix1/beacons/tools).",
+       "implementation_status": "Replaces the corridor's two code-drawn lockdown beacon housings and their 90x90 radial glows (RoomDepth warning_lamps 0.341,0.27 and 0.659,0.27 of the far plate)."
+     },
+     {
+       "asset_id": "eng-crank-atlas",
+       "path": "apps/game/assets/characters/eng-crank-atlas.png",
+-      "source_or_tool": "Codex built-in image_gen, edit mode (session 01a13361-7b84-7151-8d8e-76e9a12b9f12, 2026-10-12), on a pose guide built from the approved walk-final engineer idle frame_00; cleaned up with Python (Pillow, numpy, scipy)",
+-      "source_reference": "docs/research-2026-10/sources/walk-final-2026-10-11/engineer/eng-idle/frame_00.png (approved 2026-10-11)",
++      "source_or_tool": "Cut from the engineer's own in-game sprite (assets/rowan-side-right-provisional.png) by a deterministic Python rig (add7/fix1/crank/tools/rig.py: legs kept, torso leaned 6 and 9 degrees, each arm two-bone IK onto the handwheel's rim), the joints repaired with Codex's built-in image_gen in edit mode (session 01a134c1-4d7e-72a1-8170-134476ae8325, 2026-10-13; an earlier try, 01a134bc-6a3b-74d0-9dc7-49fd2b789c28, not used), cleaned up with Python (cleanup.py, pack.py: NumPy, SciPy, Pillow)",
++      "source_reference": "apps/game/assets/rowan-side-right-provisional.png (the engineer as the game draws them); the raw Codex outputs keep their C2PA manifest outside the repo with their prompts",
+       "terms_reference": "https://openai.com/policies/terms-of-use/",
+       "rights_review_status": "Provisional AI-assisted character art, human review pending. Final commercial asset-rights review open; not covered by the code/docs GPL license.",
+-      "modifications": "Two-frame crank pose. Colour mapped back onto the idle's palette; legs (rows 218-319) are the idle's own pixels; far glove registered between frames; magenta despill; exact alpha. Packed as a 304x308 two-region atlas. Derived crop, so it carries no C2PA; the original (with C2PA) is kept in the art-source record.",
+-      "implementation_status": "Shown only while USE is held at the MANUAL BYPASS. Not yet seen in motion by hand."
++      "modifications": "Two-frame crank pose, both gloves on the rim: A (8 and 10 o'clock), B (half past 9 and half past 11). Codex's pixels are used only in the repair zones (arms, where the arms were, the hip seam), colour-matched to the sprite and despilled; the legs below the hip seam are the sprite's own pixels exactly; one cut sliver removed. Packed as a 410x380 atlas of two 205x380 regions trimmed from 384x384 cells centred on the sprite's centre, drawn at the sprite's 0.188 scale. Derived image, so it carries no C2PA.",
++      "implementation_status": "Shown only while USE is held at the MANUAL BYPASS on the crank spot; replaces round 7's walk-final-style crank frames, which were a different drawing from the in-game sprite. Not yet seen in motion by hand."
++    },
++    {
++      "asset_id": "corridor-seal-atlas",
++      "path": "apps/game/assets/props/corridor-seal-atlas.png",
++      "source_or_tool": "Design-first build, 2026-10-11 to 2026-10-12: construction drawings, masks and specs drawn by Python from measured real hardware (docs/research-2026-10/sources/corridor-door-end-2026-10-12/tools/design/portal2.py to portal6.py, NumPy and Pillow; the SECTOR 4B and DOOR 4B-07 stencils typeset in the game's own Roboto, OFL, never drawn by the image tool), painted inside those shapes with Codex's built-in image_gen tool in edit mode (sessions paint-portal2, 01a12e59-e7ba-7073-8a77-796f536bcc43, 2026-10-11, and paint-v3, 01a1318b-1601-76e2-8de2-0c19430d2c42, 2026-10-12), then cleaned up and packed deterministically by Python (docs/research-2026-10/sources/corridor-door-end-2026-10-12/tools/layers/cleanup2.py to cleanup6.py, install4.py and install6.py, NumPy, SciPy and Pillow)",
++      "source_reference": "Design, review and paint records in docs/research-2026-10/sources/corridor-door-end-2026-10-12/ (README.md, DESIGN.md, spec.json, SLICE.md, review/REVIEW-round1..6.md and every tool); Codex sessions (ids, outputs, SHA-256 and what each was used for) in docs/research-2026-10/sources/corridor-door-end-2026-10-12/provenance.txt; the raw Codex outputs are kept byte for byte, with their C2PA content credentials (caBX chunk), in docs/research-2026-10/sources/corridor-door-end-2026-10-12/codex/<job>/out/. Composition from the approved shutter concept in docs/research-2026-10/sources/doors-shutter-approved/; rules from docs/research-2026-10/art-direction/REAL-LOOK.md.",
++      "terms_reference": "https://openai.com/policies/terms-of-use/",
++      "rights_review_status": "Provisional AI-assisted gameplay prop: deterministic construction drawings painted with an AI image tool, then cleaned up deterministically; human reviewed and approved for integration. Final commercial asset-rights review remains open; not covered by the code/docs GPL license. Approved for integration by Nathanial Henniges on 2026-10-12 from rendered before/after frames of the corridor's door end, after six independent review rounds.",
++      "modifications": "One lossless 1024x1024 RGBA atlas (SHA-256 f8bb4bb74174ac0c...) holding every piece of the corridor's door end: the concrete cross-wall behind the walk line with its doorway transparent and the wall-mounted MANUAL BYPASS backplate, worm gearbox and chain guard on it (2 source px per world px); the shut rolling-steel curtain, its bottom bar tucked under the hood, and the frame (far guide, hood, operator) at 4 px; the near column (guide, channel frame, end face, steel-faced chamfer, guarded status lamp socket, push buttons and the lamp's conduit into the camera's wall plate), the camera on its arm and the wall's 0.15 m stub, at 2 px; the lamp's glass and the bypass handwheel at 4 px. Paint is kept only inside each part's designed mask; the design's exact alpha is re-imposed, values are held to the design's light plan, large faces are calmed and given luminance-only grain, and later fix rounds move existing paint onto corrected shapes (no new image-tool output after paint-v3). Reproducible with install6.py from the session's layers (not kept in the repository; rebuildable with the tools in docs/research-2026-10/sources/corridor-door-end-2026-10-12/tools/); checked byte for byte on 2026-10-12. Scratch additions (round 7, 2026-10-12, and add7 fix round 1 (2026-10-13; scratch copy, not on main)): a steel blast-frame liner round the head and far jamb (40 mm plates, lit arrises, joints, dark anchor heads; kept clear of the door light), the RESTRICTED AREA plate (typeset in Roboto, never painted by the image tool), the inner blast leaf's parked 0.36 m leading edge with its wiper seals and locking-bolt receivers, the floor rail, a second conduit strap, and three new regions: the leaf's front face (158x256), its leading edge (29x256) and an 8x8 black patch for its feathered contact shadow. Shapes by Python (add7/door/tools/portal7.py; add7/fix1/door/tools/portal8.py), painted with Codex's built-in image_gen in edit mode (sessions 01a13367-ff5e-7032-9f9a-2a89354a3561 and 01a134ac-cb13-7733-b679-7230257e0555), cleaned up deterministically (cleanup7.py, cleanup8.py, install8.py). Every existing region and world position is unchanged.",
++      "implementation_status": "In use since 2026-10-12 as the corridor seal (main.gd CORRIDOR_SEAL_* regions and world positions; main.tscn DoorArt shows the curtain): the cross-wall draws right after the mid plate; the curtain, the rising curtain (SealLeaf) and the frame batch with the door body; the near column, camera and stub draw over the actors and stay opaque; the lamp's glass is tinted live (red shut, amber moving, green open) and the handwheel turns in BypassHandle. Imported lossless with mipmaps, drawn with linear-with-mipmaps filtering. It replaces corridor-bulkhead-sealed.png and corridor-bulkhead-front-lip.png (deleted 2026-10-12, with their art-source originals; all in the Git history). The inner blast leaf (BlastLeaf) draws from the new regions while the seal opens."
+     }
+   ],
+   "status": "One provisional brand mark, three provisional character images (redrawn 2026-10-08; full-size masters under apps/game/art-source/characters/ and the downscaled copies the game loads), one title background, three layered gameplay rooms (far, mid and near plates for the corridor, Records Access and the Service Junction), sixteen station prop images (seven for the corridor and Records Access; six for the Service Junction plus one documented derivative crop of its tank; the junction reuses the corridor breaker), two pressure bulkheads in door design A (the corridor's sealed, open and front-lip images and the junction's sealed, breaking, blown and front-lip images, with their full-size approved originals under apps/game/art-source/doors/), two sentry images, three derivative marketing captures, the Roboto and Montserrat font families with their licence texts, four project-written font and theme resources (three FontVariation .tres files and the UI theme), three project shader files, one generated changelog text export, one procedural sound-effect set (code, no files) and seven processed CC0 sound recordings (the Service Junction's three pressure-line loops, relief-vent burst and coolant-cloud bed from Joseph Sardin's BigSoundBank recordings, and WOLF's seam and refusal growls from OpenGameArt recordings) recorded. Glows, haze, dust, lockdown beacons, reflections, particles, the Service Junction's state overlays (gauge needle, vent and seam glows, panel and hatch lights, the alcove's soft shadow, the station name plates, floor mark, arm rods and cable, the sentry's beam and eye light) and the screen grade are procedural built-in nodes and three small shaders (the registered reflection and grade shader files plus the valve wheel's inline disc mask), not image assets. Godot's .import and .uid sidecar files and this manifest itself are not registered.",

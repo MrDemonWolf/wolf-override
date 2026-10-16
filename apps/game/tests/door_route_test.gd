@@ -83,12 +83,19 @@ func _check_records() -> void:
 	game.call("debug_place", 830.0, 700.0)
 	game.call("debug_interact")
 	_expect(state.chapter_complete and records.exit_swinging(), "securing the first copy starts the exit's swing")
-	game.call("_finish_chapter_close")
 	var exit_whole: bool = await _leaf_whole_while(records.exit_leaf, func() -> bool: return records.exit_swinging())
 	_expect(exit_whole and is_equal_approx(records.exit_leaf.open, 1.0), "the exit swings fully open, drawn whole every frame")
 	# USE at the open exit: the engineer walks out through the doorway before the junction starts.
 	await wait_until(func() -> bool: return float(game.get("engineer_step_x")) < 0.0 and human.controlled, BEAT_FRAMES)
 	game.call("debug_place", 830.0, 740.0)
+	# STORY-8: the closing lines run while the engineer keeps control, and USE at the exit shows their
+	# next box until they are read; only the press after that walks out. Bounded by the boxes there are.
+	for _box: int in 8:
+		if not bool(game.call("_records_close_unread")):
+			break
+		game.call("debug_interact")
+		await frames(1)
+	_expect(not bool(game.call("_records_close_unread")) and state.chapter_id == "records" and not bool(game.get("records_exit_walking")), "USE at the exit shows the closing lines' boxes before it walks out")
 	game.call("debug_interact")
 	var furthest: float = human.position.x
 	var wolf_furthest: float = wolf.position.x

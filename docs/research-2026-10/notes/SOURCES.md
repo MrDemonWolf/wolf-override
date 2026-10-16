@@ -16,6 +16,7 @@ Most of the research cites its sources next to the claims they back. Start there
 | [`art-audit/README.md`](art-audit/README.md) | Godot and Android texture docs, rendering talks and papers (23 sources) |
 | [`../sources/sound-picks/README.md`](../sources/sound-picks/README.md) and [`../sources/sound-picks/LICENCES.md`](../sources/sound-picks/LICENCES.md) | The CC0 recordings used in the game, their authors and licences, and the papers the sound code follows |
 | [`../sources/corridor-door-end-2026-10-12/README.md`](../sources/corridor-door-end-2026-10-12/README.md), section "Credits: outside sources" | The corridor's door end: real rolling-door, enclosure, cable-tray, lighting, drain and signage hardware and standards; what makes an image read as AI-made; how shipped games look real; rendering on phones and in Godot (about 90 sources, summary-only pages marked) |
+| [`../sources/corridor-additions-2026-10-14/README.md`](../sources/corridor-additions-2026-10-14/README.md), section "Sources" | The corridor door end's additions: blast-door, sign, beacon, relief-valve and lighting standards and hardware (UFGS, UFC, NPS, OSHA, MIL-STD, FED-STD), product data, and the cut-away conventions of shipped games, as cited in its reviews [S1]-[S22] |
 
 ## Pages downloaded during the sessions
 

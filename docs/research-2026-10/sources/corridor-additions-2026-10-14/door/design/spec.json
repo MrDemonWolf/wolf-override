@@ -1,0 +1,425 @@
+{
+ "units": "metres; a along the cross-wall's face from O = world (752, 440) toward the corridor's back wall, t into the wall (beyond side), h up. Screen: common.project / portal2.scr (clamp-world px).",
+ "camera": {
+  "VPX": 483.9,
+  "HORIZON": 158.5,
+  "FLOOR_Y": 440.0,
+  "D0": 38.0,
+  "PX_PER_M": 40.0,
+  "O_m": [
+   18.8,
+   0.0,
+   0.0
+  ],
+  "U": [
+   -0.2913294,
+   0.0,
+   0.9566228
+  ],
+  "N": [
+   0.9566228,
+   0.0,
+   0.2913294
+  ]
+ },
+ "jambs_a": {
+  "A_F": 1.46348,
+  "A_N": -2.09069,
+  "A_END4": -2.25069,
+  "A_BACK": 2.50883
+ },
+ "blast_frame": {
+  "face_t": -0.025,
+  "top_h": 3.92,
+  "jamb_plate_a": [
+   1.4635,
+   2.0135
+  ],
+  "head_plate_a": [
+   -2.2507,
+   2.0135
+  ],
+  "head_plate_h": [
+   3.05,
+   3.92
+  ],
+  "jamb_seams_h": [
+   1.3,
+   2.6
+  ],
+  "head_seams_a": [
+   -0.85,
+   0.35
+  ],
+  "bolt": "M24, 44 mm head, 300 mm pitch",
+  "screen": {
+   "jamb_outer_edge_at_1m": [
+    715.87,
+    388.39
+   ],
+   "head_top_near": [
+    794.95,
+    290.72
+   ],
+   "head_top_far": [
+    715.87,
+    277.21
+   ]
+  }
+ },
+ "sign": {
+  "text": "RESTRICTED AREA",
+  "plate_a": [
+   -1.9,
+   1.1
+  ],
+  "plate_h": [
+   4.8,
+   5.34
+  ],
+  "cap_m": 0.24,
+  "text_info": {
+   "text": "RESTRICTED AREA",
+   "cap_world_px": 9.6,
+   "plane_length_m": 2.737
+  },
+  "font": "Roboto (game's bundled Roboto-Variable.ttf, SIL OFL 1.1, Roboto-OFL.txt), wght 700, wdth 75, stencil bridges cut by script (design/tools/text_layer.py bridges())",
+  "colours": "plate lusterless white 37875 (weathered), letters black 37038",
+  "screen": {
+   "plate_corners": [
+    [
+     788.27,
+     229.82
+    ],
+    [
+     731.88,
+     224.58
+    ],
+    [
+     731.88,
+     245.6
+    ],
+    [
+     788.27,
+     252.51
+    ]
+   ],
+   "cap_world_px": 9.6,
+   "cap_px_1280x720": 17.3
+  }
+ },
+ "leaf": {
+  "thickness_m": 0.24,
+  "front_t": 0.22,
+  "back_t": 0.46,
+  "slot_t": [
+   0.2,
+   0.48
+  ],
+  "length_m": 3.95,
+  "height_m": 3.2,
+  "a_lead_shut": -2.19069,
+  "a_lead_open": 1.46348,
+  "travel_m": 3.6542,
+  "pocket": "a from 1.463 to 5.463 m along the wall (into the mass behind the corridor's back wall)",
+  "rail_recess_t": [
+   0.3,
+   0.38
+  ],
+  "rail_head_t": [
+   0.325,
+   0.355
+  ],
+  "start_open_value": 0.4,
+  "screen": {
+   "mouth_foot": [
+    733.74,
+    429.56
+   ],
+   "mouth_head": [
+    733.74,
+    312.08
+   ],
+   "receiver_foot": [
+    803.01,
+    455.9
+   ],
+   "edge_parked_foot": [
+    [
+     733.74,
+     429.56
+    ],
+    [
+     742.12,
+     429.08
+    ]
+   ]
+  },
+  "light_table": {
+   "a_cols": [
+    1.4635,
+    1.0067,
+    0.5499,
+    0.0932,
+    -0.3636,
+    -0.8204,
+    -1.2771,
+    -1.7339,
+    -2.1907
+   ],
+   "h_rows": [
+    0.0,
+    0.4,
+    0.8,
+    1.2,
+    1.6,
+    2.0,
+    2.4,
+    2.75,
+    3.05
+   ],
+   "vertex_colour": [
+    [
+     0.612,
+     0.612,
+     0.612,
+     0.612,
+     0.642,
+     0.642,
+     0.642,
+     0.552,
+     0.552
+    ],
+    [
+     0.761,
+     0.791,
+     0.821,
+     0.821,
+     0.851,
+     0.881,
+     0.94,
+     0.582,
+     0.552
+    ],
+    [
+     0.791,
+     0.821,
+     0.821,
+     0.851,
+     0.881,
+     0.91,
+     0.97,
+     0.612,
+     0.582
+    ],
+    [
+     0.821,
+     0.851,
+     0.851,
+     0.881,
+     0.91,
+     0.94,
+     0.97,
+     0.642,
+     0.612
+    ],
+    [
+     0.881,
+     0.881,
+     0.881,
+     0.91,
+     0.91,
+     0.94,
+     0.97,
+     0.672,
+     0.642
+    ],
+    [
+     0.91,
+     0.91,
+     0.94,
+     0.94,
+     0.94,
+     0.94,
+     0.94,
+     0.701,
+     0.672
+    ],
+    [
+     0.97,
+     0.97,
+     0.97,
+     0.94,
+     0.94,
+     0.94,
+     0.91,
+     0.731,
+     0.701
+    ],
+    [
+     1.0,
+     1.0,
+     1.0,
+     0.97,
+     0.94,
+     0.94,
+     0.91,
+     0.731,
+     0.701
+    ],
+    [
+     0.463,
+     0.463,
+     0.463,
+     0.493,
+     0.493,
+     0.493,
+     0.493,
+     0.343,
+     0.343
+    ]
+   ],
+   "note": "vertex colour (grey) per (a column, h row) on the leaf's front plane: the place's light (corridor luminaire, door light, floor bounce, each seen only through the doorway) over the brightest place, in sRGB as Godot modulates"
+  }
+ },
+ "strap": {
+  "h": 3.45,
+  "screen": [
+   806.02,
+   310.43
+  ]
+ },
+ "parts": {
+  "wall": [
+   {
+    "name": "bf_jamb_plate",
+    "dims": "blast frame jamb plates: 25 mm steel, 0.55 m wide, 0 to 3.92 m, three plates",
+    "job": "armour round the opening's far jamb; part of the embedded steel subframe that carries the blast load into the wall"
+   },
+   {
+    "name": "bf_head_plate",
+    "dims": "blast frame head plates: 25 mm steel, 0.87 m tall (3.05 to 3.92 m), three plates",
+    "job": "armour over the opening (shows above the hood from 3.5 m)"
+   },
+   {
+    "name": "bf_jamb_seam0",
+    "dims": "plate joint",
+    "job": "joint between two armour plates"
+   },
+   {
+    "name": "bf_jamb_seam1",
+    "dims": "plate joint",
+    "job": "joint between two armour plates"
+   },
+   {
+    "name": "bf_head_seam0",
+    "dims": "plate joint",
+    "job": "joint between two armour plates"
+   },
+   {
+    "name": "bf_head_seam1",
+    "dims": "plate joint",
+    "job": "joint between two armour plates"
+   },
+   {
+    "name": "bf_bolts",
+    "dims": "M24 anchor bolts at 300 mm pitch",
+    "job": "hold the armour plates to the embedded subframe"
+   },
+   {
+    "name": "sign_plate",
+    "dims": "steel sign plate 3.0 x 0.54 m, 3 mm, lusterless white (37875, weathered)",
+    "job": "carries the RESTRICTED AREA stencil at the security boundary"
+   },
+   {
+    "name": "sign_bolts",
+    "dims": "six M10 anchors",
+    "job": "hold the sign plate to the concrete"
+   },
+   {
+    "name": "slot_seal_front",
+    "dims": "rubber wiper seal 20 mm",
+    "job": "seals the leaf's front face at the pocket's mouth"
+   },
+   {
+    "name": "slot_seal_back",
+    "dims": "rubber wiper seal 20 mm",
+    "job": "seals the leaf's back face at the pocket's mouth"
+   },
+   {
+    "name": "leaf_edge_parked",
+    "dims": "the blast leaf's leading edge, 0.24 m, parked flush in the pocket's mouth",
+    "job": "the inner blast door, slid open into the wall"
+   },
+   {
+    "name": "rail_recess",
+    "dims": "rail recess 80 mm in the steel threshold",
+    "job": "the floor rail's channel"
+   },
+   {
+    "name": "rail_head",
+    "dims": "crane-rail head 30 mm, flush, polished by the wheels",
+    "job": "the blast leaf's wheels run on it"
+   }
+  ],
+  "front": [
+   {
+    "name": "bf_near_head",
+    "dims": "blast frame head plate over the near jamb, 0.16 m",
+    "job": "the head plate carried over the column's approach face"
+   },
+   {
+    "name": "bf_near_bolts",
+    "dims": "M24 anchor bolt",
+    "job": "holds the head plate"
+   },
+   {
+    "name": "lamp_conduit_strap2",
+    "dims": "one-hole saddle strap 24 mm at 3.45 m, anchored to the concrete",
+    "job": "holds the 1.54 m vertical lamp conduit (within 0.9 m of the elbow and of the lamp box's strap point)"
+   }
+  ],
+  "leaf": [
+   {
+    "name": "leaf_face",
+    "dims": "10 mm steel faceplate (36081) over a concrete core, 3.95 x 3.2 m",
+    "job": "the blast leaf's face"
+   },
+   {
+    "name": "leaf_nose",
+    "dims": "100 mm steel channel",
+    "job": "stiffens the leading edge that seats in the receiver"
+   },
+   {
+    "name": "leaf_seam0..1",
+    "dims": "faceplate weld seams at 1.3 and 2.6 m",
+    "job": "faceplates are 1.3 m sheets"
+   },
+   {
+    "name": "leaf_bottom_rail",
+    "dims": "160 mm bottom rail",
+    "job": "carries the leaf's weight onto the wheel trucks"
+   },
+   {
+    "name": "leaf_truck0..1",
+    "dims": "bolted cover plates 0.5 m",
+    "job": "cover the two flanged-wheel trucks on the floor rail"
+   },
+   {
+    "name": "leaf_sweep",
+    "dims": "20 mm rubber sweep",
+    "job": "seals the leaf's foot to the threshold"
+   },
+   {
+    "name": "edge_stripes",
+    "dims": "0.14 m yellow/black 45 degree bands, 0.10 m",
+    "job": "caught-between marking on the leading edge (OSHA yellow)"
+   },
+   {
+    "name": "edge_angles",
+    "dims": "two 50 mm steel angles",
+    "job": "armour the leading edge's corners"
+   }
+  ]
+ }
+}

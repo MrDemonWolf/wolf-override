@@ -1,0 +1,156 @@
+{
+ "reference": "hazardous-location LED luminaire, red heat- and impact-resistant glass globe, cast guard, wall bracket (Eaton Crouse-Hinds EV LED EVLEDBX2C201R: 7.25 in W x 16.81 in H x 12.56 in D, 3/4 in conduit entry)",
+ "scale": "80 far-plate px per metre (far plate drawn at 0.5, so 40 world px per metre)",
+ "parts": {
+  "bracket_plate": [
+   "11 x 14 px",
+   "0.14 x 0.175 m",
+   "cast wall bracket plate, flush on the wall, carries the arm"
+  ],
+  "anchor_bolts": [
+   "2 x 1.7 px",
+   "M10 anchors",
+   "fix the bracket to the concrete (lower pair hidden by the housing)"
+  ],
+  "arm_hub": [
+   "5.2 x 6 px",
+   "0.065 x 0.075 m",
+   "front end of the bracket arm (0.32 m out from the wall) where the luminaire hangs"
+  ],
+  "housing": [
+   "12-15 x 9 px",
+   "0.15-0.19 x 0.11 m",
+   "finned cast driver housing (LED driver, heat sink)"
+  ],
+  "housing_fins": [
+   "3 grooves",
+   "",
+   "cooling fins"
+  ],
+  "collar": [
+   "13.2 x 2 px",
+   "0.165 x 0.025 m",
+   "threaded guard collar that holds globe and guard"
+  ],
+  "globe": [
+   "10.6 x 11.2 px",
+   "0.13 x 0.14 m",
+   "red heat- and impact-resistant glass globe; the lamp"
+  ],
+  "guard_bars": [
+   "8 bars, 4 in front",
+   "6 mm cast bars",
+   "guard against knocks"
+  ],
+  "guard_ring": [
+   "12.5 px",
+   "",
+   "mid ring of the guard"
+  ],
+  "guard_cap": [
+   "4.8 x 2.8 px",
+   "0.06 m",
+   "guard foot ring and drain boss"
+  ],
+  "conduit_nipple": [
+   "3 x 2 px",
+   "3/4 in rigid conduit",
+   "b1: from the existing back box into the bracket's top hub"
+  ],
+  "conduit": [
+   "3 px wide",
+   "3/4 in rigid conduit (OD 26.7 mm, drawn at the corridor's 25 mm conduit width)",
+   "b0: feed from the ceiling cable tray"
+  ],
+  "conduit_fitting": [
+   "5 x 3 px",
+   "",
+   "b0: connector into the tray"
+  ],
+  "conduit_straps": [
+   "5.2 x 2 px",
+   "",
+   "b0: one-hole straps at 0.29 m and 0.89 m above the bracket (within 0.9 m of a box)"
+  ],
+  "conduit_hub": [
+   "4.2 x 2 px",
+   "",
+   "b0: threaded hub on the bracket top"
+  ]
+ },
+ "height_total_px": 35.2,
+ "height_total_m": 0.44,
+ "light": "b1: pendant fitting directly above (plate y 225): top faces lit, short shadow straight down the wall. b0: no fitting near it; dim ambient from both bay lamps, soft shadow straight down.",
+ "beacons": [
+  {
+   "name": "b0",
+   "anchor": [
+    654.72,
+    291.6
+   ],
+   "c": 656,
+   "T": 275,
+   "canvas": [
+    636,
+    176,
+    676,
+    326
+   ],
+   "conduit_top": 183,
+   "straps": [
+    204,
+    252
+   ]
+  },
+  {
+   "name": "b1",
+   "anchor": [
+    1265.28,
+    291.6
+   ],
+   "c": 1266,
+   "T": 275,
+   "canvas": [
+    1246,
+    266,
+    1286,
+    326
+   ],
+   "nipple": [
+    273,
+    275
+   ]
+  }
+ ],
+ "order": [
+  "conduit",
+  "conduit_fitting",
+  "conduit_straps",
+  "conduit_hub",
+  "conduit_nipple",
+  "bracket_plate",
+  "anchor_bolts",
+  "arm_hub",
+  "housing",
+  "housing_fins",
+  "collar",
+  "globe",
+  "guard_ring",
+  "guard_bars",
+  "guard_cap"
+ ],
+ "cage": [
+  "guard_ring",
+  "guard_bars",
+  "guard_cap"
+ ],
+ "shadow_casters": [
+  "arm_hub",
+  "housing",
+  "collar",
+  "globe",
+  "guard_ring",
+  "guard_bars",
+  "guard_cap"
+ ]
+}

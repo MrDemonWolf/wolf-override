@@ -35,6 +35,7 @@ opening a pull request:
 
 ```bash
 bun run game:check   # changelog export check, Godot import, headless suites
+bun run check:copies # no new copied code since origin/main
 bun run docs:check   # MDX and Next types, then TypeScript
 bun run docs:test    # docs unit tests
 bun run docs:build   # static export plus the export checks
@@ -46,6 +47,20 @@ affects movement, pacing, readability or WOLF's behaviour, also play the
 affected route in a normal game window and say in the pull request what
 you played and what remains unplayed. Do not describe a game-feel change
 as validated until the route has been played.
+
+Don't copy code. `bun run check:copies` (Python 3, standard library only)
+looks for runs of six or more matching lines, ignoring comments, blank
+lines, indentation and spaces (except inside quoted strings), that your
+branch adds or touches since it left `origin/main`, including an edit
+inside one copy of an older block that leaves six or more lines still
+matching; every pull request runs it as part of the `godot` check. It
+compares text, not meaning, so a copy with renamed variables passes it: a
+pass is not proof that there are no copies, and reviewers still read for
+them. When it fails, it names both places: move that code into one shared file
+that both use and delete the copy. If two places truly must stay
+separate, list the pair with a reason in `.copies-allow` and say why in
+the pull request. `python3 scripts/check-copies.py --report` lists the
+older copies already on `main`.
 
 The [setup](https://wolfoverride.mrdemonwolf.dev/docs/development/setup/)
 and

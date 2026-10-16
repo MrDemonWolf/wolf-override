@@ -76,32 +76,27 @@ func _run() -> void:
 		return
 	await _tap(&"interact")
 	_expect(state.chapter_complete and game.call("_objective") == "FIRST COPY SECURED", "first chapter resolves after two traces")
-	_expect(records.exit_leaf.open < 0.25 and records.exit_lamp_color() == RecordsRoom.LAMP_MOVING, "securing the copy starts the exit's leaf swinging on its hinges, its status lamp amber")
-	_expect(await _wait_until(func() -> bool: return absf(human.position.x - (RecordsRoom.CONTAINER_X + 21.0)) <= 0.5 and human.body_sprite.flip_h, 60), "the engineer secures the copy at the security container's lock, facing it (x %.1f)" % human.position.x)
+	_expect(records.exit_leaf.open < 0.25 and records.exit_lamp_color() == Palette.AMBER, "securing the copy starts the exit's leaf swinging on its hinges, its status lamp amber")
+	_expect(await _wait_until(func() -> bool: return absf(human.position.x - float(main_constants["RECORDS_CONTAINER_SIDE_X"])) <= 0.5 and human.body_sprite.flip_h, 60), "the engineer secures the copy at the security container's lock, facing it (x %.1f)" % human.position.x)
 	_expect(str(game.get("status_line")).contains("An order and a timestamp don't tell me who's a threat"), "WOLF names what was copied when he questions the Director's target labels")
-	_expect(game.get("chapter_close_active") and not human.controlled, "first copy opens a player-paced closing beat")
-	_expect((game.get_node("CanvasLayer/PauseButton") as Button).visible, "closing beat keeps the pause button available")
+	# STORY-8: securing the first copy holds no closing shot; its lines run, one box at a time, while the
+	# engineer keeps control, and USE at the exit goes through them before it leaves.
+	_expect(not game.get("chapter_close_active") and await _wait_until(func() -> bool: return human.controlled, 60), "securing the first copy keeps control while its closing lines run")
+	var closing_story: Label = game.get_node("CanvasLayer/BottomBar/Story") as Label
+	var closing_speaker: Label = game.get_node("CanvasLayer/BottomBar/Speaker") as Label
+	_expect(closing_story.text == "FIRST COPY SECURED." and closing_speaker.text.is_empty(), "the closing lines start with their own first box (%s)" % closing_story.text)
+	_expect((game.get_node("CanvasLayer/PauseButton") as Button).visible, "the closing lines keep the pause button available")
 	await _tap(&"pause_game")
-	_expect(paused and game.get("chapter_close_active") and (game.get_node("CanvasLayer/PauseOverlay") as Control).visible, "pause key opens the menu without dismissing the closing beat")
-	var closing_camera: Camera2D = game.get_node("IntroCamera") as Camera2D
-	var paused_camera_position: Vector2 = closing_camera.position
-	await create_timer(0.1, true).timeout
-	_expect(closing_camera.position == paused_camera_position, "pause freezes the closing camera transition")
+	_expect(paused and (game.get_node("CanvasLayer/PauseOverlay") as Control).visible, "pause opens over the closing lines")
+	var paused_age: float = float(game.get("dialogue_age"))
+	await create_timer(0.2, true).timeout
+	_expect(is_equal_approx(float(game.get("dialogue_age")), paused_age), "pause holds the box on screen")
 	(game.get_node("CanvasLayer/PauseOverlay") as PauseOverlay).resume_requested.emit()
-	_expect(not paused and game.get("chapter_close_active") and not human.controlled, "resume preserves the closing beat until Continue")
-	await create_timer(0.6).timeout
-	_expect(records.exit_leaf.open > 0.0 and records.exit_leaf.open < 1.0 and records.exit_leaf.visible, "the exit's leaf is part way round its swing, never faded or hidden")
-	_expect(closing_camera.zoom.x >= 1.35, "the closing shot never zooms out past the play view")
-	var close_half: Vector2 = Vector2(960.0, 540.0) * 0.5 / closing_camera.zoom
-	var dialogue_top: float = (game.get_node("CanvasLayer/BottomBar") as Panel).position.y
-	var framed: bool = closing_camera.position.x + close_half.x <= 960.0
-	for actor: M0Actor in [human, wolf]:
-		var screen_x: float = (actor.position.x - closing_camera.position.x) * closing_camera.zoom.x + 480.0
-		framed = framed and screen_x > 40.0 and screen_x < 920.0
-	framed = framed and (440.0 - closing_camera.position.y) * closing_camera.zoom.y + 270.0 <= dialogue_top - 24.0
-	_expect(framed, "the closing shot keeps both actors in view with their feet clear above the dialogue")
+	_expect(records.exit_leaf.open > 0.0 and records.exit_leaf.open < 1.0 and records.exit_leaf.visible, "the exit's leaf is part way round its swing while the closing lines run, never faded or hidden")
 	await _tap(&"interact")
-	_expect(not game.get("chapter_close_active") and human.controlled, "closing beat returns control to the engineer")
+	_expect(state.chapter_id == "records" and closing_speaker.text == "WOLF" and closing_story.text.contains("I want the source."), "USE at the exit shows WOLF's box rather than leaving")
+	await _tap(&"interact")
+	_expect(state.chapter_id == "records" and closing_speaker.text == state.human_name().get_slice(" ", 0).to_upper(), "and then the engineer's, in their own box")
 	var saved: Dictionary = state.to_dict()
 	game.call("_new_game")
 	for _step in range((main_constants["INTRO_LINES"] as Array).size()):

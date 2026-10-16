@@ -83,9 +83,6 @@ const CONTAINER_SPAN: Vector2 = Vector2(776.0, 807.0)
 ## backcheck or 80 degrees, so 90 degrees takes this long. The entry's closer brings its leaf shut
 ## behind the engineer a moment after they come in (SwingLeaf.close_behind's timing).
 const EXIT_SWING_SECONDS: float = 3.5
-const LAMP_SHUT: Color = Color(0.9, 0.2, 0.17)
-const LAMP_MOVING: Color = Color("#f3ae4b")
-const LAMP_OPEN: Color = Color("#7dffa8")
 ## The source row where the mid plate's walkway (its pillar and machine bases) meets the floor.
 const WALKWAY_Y: float = 742.0
 ## Each prop is cut to its painted outline and scaled to the height of the art it replaced
@@ -121,6 +118,8 @@ const ENTRY_LEAF_LIGHTS: Array = [
 	[Vector3(1.4754, 0.0300, 0.0868), Vector3(0.6889, 0.7610, 0.8008), 0.90, 0.0, 0.05],  # the lit threshold and passage deck seen through the doorway
 	[Vector3(2.0457, 1.4000, 0.8612), Vector3(0.2724, 0.3010, 0.3167), 1.00, 0.0, 0.05],  # the cross-wall's own lit face beyond the hinge jamb
 ]
+## The MIRROR PORT name until its trace is preserved.
+const MIRROR_TEXT: Color = Color("#b6edff")
 ## Ceiling lamps and lockdown beacons as fractions of the far plate, measured from the plate.
 var lamps: PackedVector2Array = PackedVector2Array([Vector2(0.199, 0.263), Vector2(0.6, 0.263), Vector2(0.869, 0.263)])
 var warning_lamps: PackedVector2Array = PackedVector2Array([Vector2(0.304, 0.31), Vector2(0.698, 0.31)])
@@ -194,14 +193,14 @@ func _ready() -> void:
 		add_child(leaf)
 		plate_mesh.add_leaf(leaf)
 	# Each lamp's glass before its column, so the painted guard bars draw over it.
-	entry_lamp_quad = plate_mesh.add_centred_quad(LENS_REGION, ENTRY_LAMP, LENS_SCALE, LAMP_SHUT)
+	entry_lamp_quad = plate_mesh.add_centred_quad(LENS_REGION, ENTRY_LAMP, LENS_SCALE, Palette.LAMP_SHUT)
 	plate_mesh.add_quad(ENTRY_COLUMN_REGION, ENTRY_COLUMN_AT, DOORS_SCALE)
 	plate_mesh.add_quad(ENTRY_STUB_REGION, ENTRY_STUB_AT, DOORS_SCALE)
 	depth.add_child(plate_mesh)
 	# The exit's near column, lamp and stub draw over the actors (they walk out behind them), always
 	# opaque, in one draw call.
 	front_mesh = AtlasMesh.make(DOORS_ATLAS, "DoorFronts", RoomDepth.Z_NEAR)
-	exit_lamp_quad = front_mesh.add_centred_quad(LENS_REGION, EXIT_LAMP, LENS_SCALE, LAMP_SHUT)
+	exit_lamp_quad = front_mesh.add_centred_quad(LENS_REGION, EXIT_LAMP, LENS_SCALE, Palette.LAMP_SHUT)
 	front_mesh.add_quad(EXIT_COLUMN_REGION, EXIT_COLUMN_AT, DOORS_SCALE)
 	front_mesh.add_quad(EXIT_STUB_REGION, EXIT_STUB_AT, DOORS_SCALE)
 	add_child(front_mesh)
@@ -210,11 +209,11 @@ func _ready() -> void:
 	entry_door_shape = SwingLeaf.make_body(self, "EntryDoor", ENTRY_DOOR_X, -1.0)
 	purge_glow = _add_glow("PurgeGlow", PURGE_LIGHT.get_center())
 	mirror_glow = _add_glow("MirrorGlow", MIRROR_LIGHT.get_center())
-	purge_label = _add_station_label("PURGE QUEUE", 190.0, Color("#ffc7c7"))
-	mirror_label = _add_station_label("MIRROR PORT", 520.0, Color("#b6edff"))
+	purge_label = _add_station_label("PURGE QUEUE", 190.0, Palette.LABEL_ALERT)
+	mirror_label = _add_station_label("MIRROR PORT", 520.0, MIRROR_TEXT)
 	# The exit's name sits on the cross-wall over its door, left of the near column (which draws over
 	# the actors and would cut it; captions stay under the actors).
-	_add_station_label("EXIT", EXIT_LABEL_X, Color("#c1f4d8"), 276.0)
+	_add_station_label("EXIT", EXIT_LABEL_X, Palette.EXIT_GREEN, 276.0)
 	refresh_state()
 
 
@@ -223,6 +222,8 @@ func set_exit_lamp(color: Color) -> void:
 	front_mesh.set_color(exit_lamp_quad, color)
 
 
+## The exit lamp's current colour (the glass quad's tint): what set_exit_lamp last set
+## (chapter_scene_test reads it).
 func exit_lamp_color() -> Color:
 	return front_mesh.get_color(exit_lamp_quad)
 
@@ -232,6 +233,7 @@ func set_entry_lamp(color: Color) -> void:
 	plate_mesh.set_color(entry_lamp_quad, color)
 
 
+## The entry lamp's current colour (the glass quad's tint): what set_entry_lamp last set.
 func entry_lamp_color() -> Color:
 	return plate_mesh.get_color(entry_lamp_quad)
 
@@ -257,7 +259,7 @@ func _add_station_label(caption: String, center_x: float, tint: Color, label_y: 
 	var label: Label = Label.new()
 	label.text = caption
 	label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	label.add_theme_font_size_override("font_size", 13)
+	TextSize.size_label(label, 13)
 	label.add_theme_color_override("font_color", tint)
 	label.set_meta(&"center", Vector2(center_x, label_y))
 	add_child(label)
@@ -266,12 +268,16 @@ func _add_station_label(caption: String, center_x: float, tint: Color, label_y: 
 	return label
 
 
-## Shrinks [param label] to its text and centres it on its station again.
+## Shrinks [param label] to its text and centres it on its station again (TEXT SIZE grows it upward).
 func _fit_label(label: Label) -> void:
 	var center: Vector2 = label.get_meta(&"center")
-	label.size = Vector2.ZERO
-	label.size = label.get_combined_minimum_size()
-	label.position = Vector2(center.x - label.size.x * 0.5, center.y)
+	TextSize.fit_world_label(label, center.x, center.y)
+
+
+## TEXT SIZE changed: every name takes the new size.
+func refit_labels() -> void:
+	for label: Label in station_labels:
+		_fit_label(label)
 
 
 ## A name the edge of the view would cut fades out instead (JunctionRoom.fade_at_view_edge).
@@ -295,19 +301,19 @@ func set_active(active: bool) -> void:
 ## finishes its swing.
 func refresh_state() -> void:
 	purge_label.text = "PURGE COPIED" if purge_trace_preserved else "PURGE QUEUE"
-	purge_label.add_theme_color_override("font_color", Color("#a4f0c4") if purge_trace_preserved else Color("#ffc7c7"))
+	purge_label.add_theme_color_override("font_color", Palette.GREEN if purge_trace_preserved else Palette.LABEL_ALERT)
 	mirror_label.text = "MIRROR COPIED" if mirror_trace_preserved else "MIRROR PORT"
-	mirror_label.add_theme_color_override("font_color", Color("#a4f0c4") if mirror_trace_preserved else Color("#b6edff"))
+	mirror_label.add_theme_color_override("font_color", Palette.GREEN if mirror_trace_preserved else MIRROR_TEXT)
 	purge_glow.modulate = Color(_purge_light_color(), 0.6)
 	mirror_glow.modulate = Color(_mirror_light_color(), 0.6)
 	for label: Label in station_labels:
 		_fit_label(label)
 	if exit_tween == null or not exit_tween.is_running():
 		exit_leaf.open = 1.0 if chapter_complete else 0.0
-		set_exit_lamp(LAMP_OPEN if chapter_complete else LAMP_SHUT)
+		set_exit_lamp(Palette.LAMP_OPEN if chapter_complete else Palette.LAMP_SHUT)
 	if entry_tween == null or not entry_tween.is_running():
 		entry_leaf.open = 0.0
-		set_entry_lamp(LAMP_SHUT)
+		set_entry_lamp(Palette.LAMP_SHUT)
 	# The exit stops the actors only while it is shut, and only while Records is the room in play.
 	exit_door_shape.set_deferred("disabled", not visible or chapter_complete)
 	entry_door_shape.set_deferred("disabled", not visible)
@@ -317,17 +323,16 @@ func refresh_state() -> void:
 ## The secured copy releases the exit: the lamp turns amber, the operator swings the leaf into the room
 ## onto its floor stop, and the lamp turns green. Without [param animate] it is simply open.
 func open_exit(animate: bool) -> void:
-	if exit_tween != null and exit_tween.is_running():
-		exit_tween.kill()
+	Tweens.kill(exit_tween)
 	exit_door_shape.set_deferred("disabled", true)
 	if not animate:
 		exit_leaf.open = 1.0
-		set_exit_lamp(LAMP_OPEN)
+		set_exit_lamp(Palette.LAMP_OPEN)
 		return
-	set_exit_lamp(LAMP_MOVING)
+	set_exit_lamp(Palette.AMBER)
 	exit_tween = create_tween()
 	exit_tween.tween_property(exit_leaf, "open", 1.0, EXIT_SWING_SECONDS).from(0.0).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
-	exit_tween.tween_callback(func() -> void: set_exit_lamp(LAMP_OPEN))
+	exit_tween.tween_callback(func() -> void: set_exit_lamp(Palette.LAMP_OPEN))
 
 
 ## True while the exit's operator is swinging its leaf open.
@@ -338,8 +343,8 @@ func exit_swinging() -> bool:
 ## Entering from the corridor side: the entry stands open behind the engineer and its closer brings
 ## it shut, amber while it moves, red once it latches.
 func close_entry_behind() -> void:
-	set_entry_lamp(LAMP_MOVING)
-	entry_tween = entry_leaf.close_behind(self, entry_tween, func() -> void: set_entry_lamp(LAMP_SHUT))
+	set_entry_lamp(Palette.AMBER)
+	entry_tween = entry_leaf.close_behind(self, entry_tween, func() -> void: set_entry_lamp(Palette.LAMP_SHUT))
 
 
 func _draw() -> void:
@@ -353,8 +358,8 @@ func _draw_machine_lights() -> void:
 
 
 func _purge_light_color() -> Color:
-	return Color("#a4f0c4") if purge_trace_preserved else Color("#d86b70")
+	return Palette.GREEN if purge_trace_preserved else Color("#d86b70")
 
 
 func _mirror_light_color() -> Color:
-	return Color("#a4f0c4") if mirror_trace_preserved else Color("#73b9d2")
+	return Palette.GREEN if mirror_trace_preserved else Color("#73b9d2")

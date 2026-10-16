@@ -4,7 +4,11 @@ extends CharacterBody2D
 @export var actor_id: StringName = &"human"
 @onready var body_sprite: Sprite2D = get_node_or_null("BodySprite") as Sprite2D
 
-var controlled: bool = false
+var controlled: bool = false:
+	set(value):
+		controlled = value
+		if _marker != null:
+			_marker.queue_redraw()
 var follow_target: Node2D
 var autonomous_target_x: float = -1.0
 ## Where a follower may stand; main pulls follow_max_x back from a sealed door so WOLF never noses into it.
@@ -34,6 +38,12 @@ var walk_max_x: float = MAX_X
 ## bounds over the junction's sentry, JunctionRoom.wolf_leap_height, and while he dashes past the
 ## engineer waiting for him at the rubble line).
 var speed_scale: float = 1.0
+
+## The control marker is UI ("this is who you control"), so it draws on its own canvas item above
+## the art drawn over the actors (the corridor door's near column and its cut section, z 3): no wall
+## ever cuts it.
+const MARKER_Z: int = 4
+var _marker: Node2D
 
 const WALK_SPEED: float = 190.0
 const FOLLOW_SPEED: float = 220.0
@@ -197,7 +207,17 @@ func _tint_pass(delta: float) -> void:
 	body_sprite.self_modulate = body_sprite.self_modulate.lerp(tint, minf(PASS_TINT_RATE * delta, 1.0))
 
 
-func _draw() -> void:
+func _ready() -> void:
+	_marker = Node2D.new()
+	_marker.name = "ControlMarker"
+	_marker.z_as_relative = false
+	_marker.z_index = MARKER_Z
+	_marker.draw.connect(_draw_marker)
+	add_child(_marker)
+
+
+## The control marker: the line at the feet of whoever the player controls.
+func _draw_marker() -> void:
 	if controlled:
 		var ground_y: float = 22.0 if actor_id == &"wolf" else 34.0
-		draw_line(Vector2(-20, ground_y), Vector2(20, ground_y), Color("#8be3ff80"), 2.0)
+		_marker.draw_line(Vector2(-20, ground_y), Vector2(20, ground_y), Color("#8be3ff80"), 2.0)

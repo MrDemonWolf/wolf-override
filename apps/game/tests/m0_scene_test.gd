@@ -4,6 +4,21 @@ const GAME_SCENE: PackedScene = preload("res://scenes/main.tscn")
 const State = preload("res://scripts/m0_state.gd")
 
 var failures: int = 0
+## The MANUAL BYPASS wheel's rim (tube centre line) in its atlas region, measured from the art's
+## alpha and luma profile: 37.5 atlas px, so 9.375 world px at BypassHandle.WHEEL_SCALE.
+const WHEEL_RIM_ATLAS_RADIUS: float = 37.5
+## The crank pose's grips (clock degrees, clockwise from 12): frame A holds the rim at 8 o'clock
+## (the far glove) and 10 o'clock (the near glove); frame B has turned both an eighth of a turn with
+## the wheel, to about half past 9 and half past 11.
+const CRANK_GRIP_CLOCK: PackedFloat32Array = [240.0, 285.0]
+const CRANK_NEAR_GRIP_CLOCK: PackedFloat32Array = [300.0, 345.0]
+## The crank art's glove: dark, neutral, opaque pixels within this many atlas px of the grip.
+const CRANK_GLOVE_SEARCH: int = 16
+## The crank frames' atlas, read once.
+var crank_image: Image
+## The running game, for helpers such as _tap_to_step: _run holds it in a local, which other
+## functions cannot see.
+var game_ref: Node2D
 
 
 func _initialize() -> void:
@@ -18,6 +33,7 @@ func _run() -> void:
 	game.set("save_path", path)
 	game.set("settings_path", "%s-settings.cfg" % path)
 	root.add_child(game)
+	game_ref = game
 	var title_screen: Control = game.get_node("CanvasLayer/TitleScreen") as Control
 	var title_art: TextureRect = game.get_node("CanvasLayer/TitleScreen/CorridorArt") as TextureRect
 	var title_mark: TextureRect = game.get_node("CanvasLayer/TitleScreen/LogoMark") as TextureRect
@@ -92,10 +108,12 @@ func _run() -> void:
 	_expect(game.get("intro_step") == 3 and str(game.get("status_line")) == "The latch breaks from the inside.\nWOLF steps out under his own power.", "WOLF opens containment from inside; the gate's slide and the Director are shown, not narrated")
 	await create_timer(1.2).timeout
 	_expect(intro_gate.visible and is_equal_approx(float(intro_gate.get("opening")), 1.0), "the opened gate stays drawn, folded aside, instead of vanishing")
+	await _tap_to_step(4)
+	_expect(game.get("intro_step") == 4 and str(game.get("status_line")).contains("I won't do it") and speaker.text == "DIRECTOR" and story.text == "You were in standby.", "the Director speaks first in his own box")
 	await _tap(&"interact")
-	_expect(game.get("intro_step") == 4 and str(game.get("status_line")).contains("I won't do it") and not speaker.visible and story.text.begins_with("DIRECTOR: ") and story.text.contains("\nWOLF: "), "WOLF refuses the Director before the engineer arrives, both names inline")
+	_expect(game.get("intro_step") == 4 and speaker.text == "WOLF" and story.text == "I heard you. I won't do it.", "WOLF refuses the Director in his own box, before the engineer arrives (STORY-4)")
 	_expect(intro_gate.visible and is_equal_approx(float(intro_gate.get("opening")), 1.0), "the gate is still standing open in the next beat")
-	await _tap(&"interact")
+	await _tap_to_step(5)
 	_expect(game.get("intro_step") == 5 and speaker.text == "DIRECTOR" and story.text == "Lock down maintenance. WOLF does not leave this site.", "Director orders lockdown under his own tag")
 	await _tap(&"interact")
 	_expect(game.get("intro_step") == 6 and not speaker.visible and story.text == "WOLF turns from the Director and heads for maintenance." and wolf.autonomous_target_x == 110.0, "the narration says WOLF turns from the Director and heads for maintenance as he walks off")
@@ -121,10 +139,10 @@ func _run() -> void:
 	state.cycle_name()
 	state.cycle_name()
 	game.call("_refresh_ui")
-	_expect(speaker.text.is_empty() and story.text == "Rowan keeps WOLF's systems running.", "the first box after control says why the engineer trusts WOLF, in its own untagged box")
-	# The opening exchange is the trust line's third box. Watch every frame from here to the stakes:
-	# reading the display either cuts in before it (it follows once the display's text is read) or
-	# replaces it after it has had its turn, depending on how long the player takes to press.
+	_expect(str(game.get("status_line")) == "Rowan keeps WOLF's systems running.", "the first line after control says why the engineer trusts WOLF")
+	_expect(not (game.get_node("CanvasLayer/BottomBar") as Control).visible and not context_hint.visible, "on the first controllable frames the lines and the hint wait: the name card and the move prompt come first (TEACH-7)")
+	# The opening exchange is the trust line's third box. Watch every frame from here to the stakes: it
+	# shows again after the display's text, whichever box was up when the display was read.
 	var exchange_shown: Array[bool] = [false]
 	var watch_exchange: Callable = func() -> void:
 		exchange_shown[0] = exchange_shown[0] or str(game.get("status_line")).begins_with("WOLF: I heard the Director's plan for me.")
@@ -135,7 +153,7 @@ func _run() -> void:
 	await create_timer(3.9).timeout
 	game.call("_refresh_ui")
 	_expect(not top_card.visible, "gameplay objective card fades without returning each frame")
-	_expect(tutorial_prompt.visible and tutorial_text.text == "A / D  MOVE\nE  READ DISPLAY (optional)", "New Game teaches movement and offers the nearby display as optional")
+	_expect(tutorial_prompt.visible and tutorial_text.text == "A / D  MOVE", "New Game teaches movement first, one prompt alone")
 	var breaker_art: Sprite2D = game.get_node("BreakerArt") as Sprite2D
 	var tutorial_rect: Rect2 = tutorial_prompt.get_global_rect()
 	_expect(not tutorial_rect.intersects(purge_terminal_art.get_global_transform_with_canvas() * purge_terminal_art.get_rect()) and not tutorial_rect.intersects(breaker_art.get_global_transform_with_canvas() * breaker_art.get_rect()) and not tutorial_rect.intersects(top_card.get_global_rect()), "tutorial box leaves the purge display, breaker and objective card uncovered")
@@ -146,11 +164,26 @@ func _run() -> void:
 	_expect(tutorial_prompt.visible and tutorial_text.text == "E  READ DISPLAY (optional)\nOr head right to the breaker.", "movement leaves the display optional and points on to the breaker")
 	game.set("touch_enabled", true)
 	game.call("_refresh_ui")
-	_expect(tutorial_text.text.begins_with("TAP USE  READ DISPLAY (optional)") and _widest_line(tutorial_text) <= tutorial_text.size.x, "touch tutorial line fits inside the tutorial box")
+	_expect(tutorial_text.text.begins_with("USE  READ DISPLAY (optional)") and _widest_line(tutorial_text) <= tutorial_text.size.x, "the touch tutorial names the USE button and fits inside the tutorial box")
 	game.set("touch_enabled", false)
 	game.call("_refresh_ui")
-	await process_frame
-	await _tap(&"interact")
+	# Reading the display never drops a story box, whenever the player presses (the opening's boxes here).
+	# The calls below run without a frame between them, so the box up when the display is read is fixed.
+	# The first step started the opening lines: the trust line's first box is up, unread. Reading the
+	# display now cuts in ahead of them, and every one of them follows it.
+	var opening_boxes: Array[String] = [Main.TRUST_LINE_1 % "Rowan", Main.TRUST_LINE_2 % "Rowan", Main.OPENING_EXCHANGE % "ROWAN"]
+	_expect(str(game.get("status_line")) == opening_boxes[0] and game.get("box_queue") == opening_boxes.slice(1), "the first step starts the opening lines at the trust line's first box")
+	game.call("_interact")
+	_expect(str(game.get("status_line")).begins_with("DIRECTOR / PURGE: Original program logs marked for deletion") and game.get("box_queue") == opening_boxes, "reading the display ahead of the opening lines holds them all back behind it, the box it cut into first")
+	# Brought on to the opening exchange, its box is up and unread: reading the display again puts it
+	# back at the front of the queue instead of replacing it for good (the old flaky case on CI).
+	for box: int in 3:
+		game.call("_next_box_now")
+	_expect(str(game.get("status_line")) == opening_boxes[2] and (game.get("box_queue") as Array).is_empty(), "the opening exchange is the box up")
+	game.call("_interact")
+	_expect(str(game.get("status_line")).contains("Original program logs marked for deletion") and game.get("box_queue") == [opening_boxes[2]], "reading the display over the unread opening exchange brings the exchange back after it")
+	exchange_shown[0] = false
+	game.call("_refresh_ui")
 	_expect(str(game.get("status_line")).contains("Original program logs marked for deletion"), "purge display establishes evidence stakes without inventory")
 	_expect(not tutorial_prompt.visible, "reading the display clears the opening tutorial")
 	var start_x: float = human.position.x
@@ -158,13 +191,13 @@ func _run() -> void:
 		return
 	_expect(human.position.x > start_x and wolf.position.x > 225.0 and wolf.position.x < human.position.x, "WOLF follows the engineer autonomously")
 	_expect(str(game.get("status_line")).contains("Original program logs marked for deletion"), "walking straight on past the display leaves its text up to be read")
-	# If the display cut into the opening's boxes, the exchange still to come follows once the display's
-	# text has been read, and the stakes wait for it to be read in turn.
+	# The exchange follows once the display's text has been read, and the stakes wait for it to be read
+	# in turn. Each line shows box by box, each box up its reading time: about 15 s of standing still.
 	_expect(await _wait_until(func() -> bool:
 		watch_exchange.call()
-		return str(game.get("status_line")) == "WOLF: That purge takes the original program logs. Once they're gone, his word is the only record.", 1500), "once the display's text has been up long enough to read, WOLF says what the purge takes")
+		return str(game.get("status_line")) == "WOLF: That purge takes the original program logs. Once they're gone, his word is the only record.", 2400), "once the display's text has been up long enough to read, WOLF says what the purge takes")
 	process_frame.disconnect(watch_exchange)
-	_expect(exchange_shown[0], "the opening exchange shows before the stakes, whether or not the display cut into the opening's boxes")
+	_expect(exchange_shown[0], "the opening exchange shows again after the display's text and before the stakes")
 	if not _require(await _walk_to(human, 450.0), "engineer can move beyond the breaker"):
 		return
 	if not _require(await _walk_to(human, 350.0), "engineer can backtrack to the breaker"):
@@ -177,7 +210,11 @@ func _run() -> void:
 	# or a little further back where that gap would stand him over the breaker.
 	_expect(await _wait_until(func() -> bool: return wolf.position.x > human.position.x and absf(wolf.velocity.x) < 1.0 and wolf.position.x - human.position.x >= M0Actor.FOLLOW_GAP - 5.0 and wolf.position.x - human.position.x <= M0Actor.FOLLOW_GAP + M0Actor.AVOID_DETOUR, 150), "WOLF settles behind the engineer after backtracking")
 	_expect(wolf.position.x - M0Actor.WOLF_REACH + M0Actor.AVOID_TOLERANCE >= 350.0 + 38.0 - 3.0, "resting behind the engineer at the breaker, WOLF stands clear of its cabinet (x %.0f)" % wolf.position.x)
-	await _tap(&"interact")
+	# USE goes on through the stakes' boxes; from the last one WOLF asks.
+	for _press: int in 3:
+		await _tap(&"interact")
+		if game.get("waiting_for_choice"):
+			break
 	if not _require(game.get("waiting_for_choice"), "breaker opens authored disagreement"):
 		return
 	_expect(speaker.text == "WOLF" and story.text.contains("COOLANT FAULT") and not story.text.contains("\n1  "), "dialogue identifies WOLF, points at the relay's fault tag and keeps response text out of the question")
@@ -244,11 +281,27 @@ func _run() -> void:
 	var seal_leaf: SealLeaf = game.get("seal_leaf") as SealLeaf
 	await create_timer(0.45).timeout
 	_expect(seal_leaf.visible and seal_leaf.open > 0.05 and seal_leaf.open < 0.95 and not door_shape.disabled and wolf.autonomous_target_x == Main.RELAY_CONTACT_X and absf(wolf.position.x - Main.RELAY_CONTACT_X) <= 4.0, "half way the seal's leaf is rising into the header, the doorway is still shut and WOLF still holds the contact")
-	if not _require(await _wait_until(func() -> bool: return not game.get("seal_opening"), 90), "the seal finishes opening"):
+	# The inner blast leaf behind the roller moves on the seal's one open value (no timing of its
+	# own), and the doorway stays shut while any of the leaf is still in the opening.
+	var blast_leaf: BlastLeaf = game.get("blast_leaf") as BlastLeaf
+	_expect(blast_leaf.visible and is_equal_approx(blast_leaf.open, seal_leaf.open), "half way the inner blast leaf shows behind the roller, on the roller's own open value")
+	var leaf_track: Dictionary = {"in_step": true, "blocked": true, "frames": 0}
+	var landed: bool = await _wait_until(func() -> bool:
+		if game.get("seal_opening"):
+			leaf_track["frames"] = int(leaf_track["frames"]) + 1
+			if not is_equal_approx(blast_leaf.open, seal_leaf.open):
+				leaf_track["in_step"] = false
+			if BlastLeaf.lead_at(blast_leaf.open) < BlastLeaf.A_MOUTH - 0.0001 and door_shape.disabled:
+				leaf_track["blocked"] = false
+		return not game.get("seal_opening"), 90)
+	if not _require(landed, "the seal finishes opening"):
 		return
+	print("blast leaf: %d sliding frames sampled, in step %s, doorway blocked while in the opening %s" % [int(leaf_track["frames"]), leaf_track["in_step"], leaf_track["blocked"]])
+	_expect(bool(leaf_track["in_step"]) and bool(leaf_track["blocked"]) and int(leaf_track["frames"]) > 0, "while the seal opens the inner leaf keeps the roller's open value and the doorway stays shut until the leaf is in its pocket (%d frames)" % int(leaf_track["frames"]))
 	await physics_frame
 	var door_visual: ColorRect = game.get_node("Door/Visual") as ColorRect
 	_expect(not door_visual.visible and not seal_leaf.visible and door_shape.disabled, "door retracts after cooperation and the doorway opens once it lands")
+	_expect(not blast_leaf.visible and is_equal_approx(blast_leaf.open, 1.0) and BlastLeaf.lead_at(blast_leaf.open) >= BlastLeaf.A_MOUTH - 0.0001, "once open the inner leaf is home in its wall pocket, out of the walk path (the wall art shows its parked edge)")
 	_expect(str(game.call("_context_hint")).contains("Move to the safe point") and wolf.follow_target == human, "once the seal has landed the hint says it is open and WOLF lets go of the contact")
 	_expect((game.get("door_open_art") as Sprite2D).visible and (game.get("door_lip") as Sprite2D).visible and (game.get("door_lip") as Sprite2D).z_index > human.z_index, "the bulkhead stands open behind the engineer, its front pillar drawn over him")
 	# The corridor's near column is solid (it never fades and nothing is drawn over it), and slim:
@@ -318,6 +371,29 @@ func _run() -> void:
 		return
 	_expect(game.call("_objective") == "SAFE POINT REACHED", "checkpoint closes the first scene")
 	_expect(str(game.get("status_line")).contains(State.CHOICE_TEXT[State.DISCLOSE]), "cooperative checkpoint displays the selected choice")
+	# While the safe point's lines are up WOLF comes to the open doorway (Nathanial's decision of
+	# 2026-10-14) and stands there facing the engineer, both wholly in view: his head in the opening,
+	# his drawn body clear of every floor machine (the relay, the breaker, the safe point's station),
+	# of the doorway's near column (drawn in front of the actors) and of the engineer, inside the
+	# camera's view. The only span he stands in front of is the MANUAL BYPASS, whose gearbox is bolted
+	# to the back wall behind the walkway.
+	var doorway_x: float = Main.WOLF_DOORWAY_X
+	_expect(await _wait_until(func() -> bool: return absf(wolf.position.x - doorway_x) <= 2.0, 240), "at the safe point WOLF walks up to the open doorway (x %.0f)" % wolf.position.x)
+	var wolf_left: float = wolf.position.x - M0Actor.WOLF_REACH + M0Actor.AVOID_TOLERANCE
+	var wolf_right: float = wolf.position.x + M0Actor.WOLF_REACH - M0Actor.AVOID_TOLERANCE
+	var wolf_clear: bool = true
+	var bypass_x: float = Main.BYPASS_WHEEL.x
+	for span: Vector2 in game.call("_machine_spans") as Array:
+		if absf((span.x + span.y) * 0.5 - bypass_x) < 0.5:
+			continue
+		if wolf_right > span.x and wolf_left < span.y:
+			wolf_clear = false
+	_expect(wolf.position.x + M0Actor.WOLF_REACH >= Main.CORRIDOR_DOOR_LEFT_X and wolf.position.x - M0Actor.WOLF_REACH + M0Actor.AVOID_TOLERANCE >= BypassHandle.RELIEF_OUTLET.x, "in the doorway WOLF's head is past the curtain's line, in the opening, and his tail is clear of the relay's relief tailpipe (x %.1f)" % wolf.position.x)
+	var column_left: float = column.get_global_transform().origin.x
+	var safe_cam: Camera2D = game.get_node("IntroCamera") as Camera2D
+	var safe_half_view: float = 480.0 / safe_cam.zoom.x
+	var safe_view_x: float = safe_cam.get_screen_center_position().x
+	_expect(wolf_clear and wolf.position.x + M0Actor.WOLF_REACH < column_left and absf(human.position.x - wolf.position.x) >= M0Actor.CLEAR_GAP and wolf.position.x - M0Actor.WOLF_REACH >= safe_view_x - safe_half_view and human.position.x + M0Actor.HUMAN_REACH <= safe_view_x + safe_half_view and not wolf.body_sprite.flip_h, "at the safe point WOLF and the engineer are both wholly in view: WOLF at %.0f clear of the machines, the near column (from %.1f) and the engineer at %.0f" % [wolf.position.x, column_left, human.position.x])
 	var saved: Dictionary = state.to_dict()
 	game.call("_new_game")
 	await _tap(&"pause_game")
@@ -403,8 +479,17 @@ func _run() -> void:
 	_expect(wolf.autonomous_target_x == wolf_clear_x, "after his refusal WOLF stands off the live relay while the engineer works the bypass")
 	var crank_start: int = Time.get_ticks_msec()
 	Input.action_press(&"interact")
-	var halfway: bool = await _wait_until(func() -> bool: return int(game.get("bypass_ticks")) >= 4, 150)
+	# Every frame of the crank: the engineer shows the crank pose, and its glove is on the wheel's rim.
+	var grip: Dictionary = {"frames": [0, 0], "usual": 0, "lead_in": 0, "lead_in_drawn": {}, "worst_rim": 0.0, "worst_grip": 0.0, "found": true}
+	var halfway: bool = await _wait_until(func() -> bool:
+		_sample_crank_grip(game, human, bypass_handle, grip)
+		return int(game.get("bypass_ticks")) >= 4, 150)
 	Input.action_release(&"interact")
+	var grip_frames: Array = grip["frames"] as Array
+	var lead_in_drawn: int = (grip["lead_in_drawn"] as Dictionary).size()
+	print("crank grip: A %d, B %d, usual %d frames (lead-in %d physics, %d drawn); worst %.2f world px off the rim line, %.2f from the grip point" % [int(grip_frames[0]), int(grip_frames[1]), int(grip["usual"]), int(grip["lead_in"]), lead_in_drawn, float(grip["worst_rim"]), float(grip["worst_grip"])])
+	_expect(int(grip_frames[0]) > 0 and int(grip_frames[1]) > 0 and int(grip["usual"]) == 0 and lead_in_drawn <= 2, "cranking shows the crank pose: A (grip) and B (push) frames, %d and %d, no usual-sprite frame once it starts (%d) and at most 2 drawn frames of lead-in (%d; %d physics)" % [int(grip_frames[0]), int(grip_frames[1]), int(grip["usual"]), lead_in_drawn, int(grip["lead_in"])])
+	_expect(bool(grip["found"]) and float(grip["worst_rim"]) <= 1.5 and float(grip["worst_grip"]) <= 2.5, "in every crank frame both gloves are on the wheel's rim (worst %.2f world px off the rim line, %.2f from the grip point)" % [float(grip["worst_rim"]), float(grip["worst_grip"])])
 	_expect(halfway and str(game.get("status_line")) == "Halfway. The hiss gets louder; the alarm keeps wailing." and bypass_handle.ticks == int(game.get("bypass_ticks")), "half way through the crank the hiss gets louder and the handle shows the count")
 	_expect(absf(wolf.position.x - wolf_clear_x) <= 3.0 and wolf.position.x + M0Actor.WOLF_REACH < float(main_constants["RELAY_X"]) - 20.0 and not wolf.body_sprite.flip_h, "WOLF is off the relay's housing, facing the engineer at the bypass")
 	# Wait for the game's own frame to see the release. process_frame fires before nodes process, and a
@@ -488,8 +573,9 @@ func _run() -> void:
 		return
 	await _tap(&"interact")
 	_expect(str(game.get("status_line")).begins_with("WOLF: That purge takes") and not game.get("waiting_for_choice"), "the stakes line comes before the breaker question on every new run")
-	# The relay prompt never shares the screen with the stakes: the hint only offers to go on.
-	for _frame in range(200):
+	# The relay prompt never shares the screen with the stakes: the hint only offers to go on. The stakes
+	# show as two boxes; by 400 frames the second is up, so the next USE goes on to the question.
+	for _frame in range(400):
 		await physics_frame
 	_expect(str(game.call("_context_hint")) == "E: continue." and not game.get("waiting_for_choice") and str(game.get("status_line")).begins_with("WOLF: That purge takes"), "with WOLF's stakes up at the breaker the hint offers only to go on, never the relay prompt, and nothing opens the question on a timer")
 	await _tap(&"interact")
@@ -562,11 +648,80 @@ func _action_event(action: StringName, pressed: bool) -> InputEventAction:
 	return event
 
 
+## Presses interact until the opening reaches beat [param step] (each press shows one box), at most
+## 6 times: more than any step this suite asks for needs, so the cap only keeps a stuck opening from
+## hanging the suite, and the caller's next check then fails.
+func _tap_to_step(step: int) -> void:
+	for _press: int in 6:
+		if int(game_ref.get("intro_step")) >= step:
+			return
+		await _tap(&"interact")
+
+
 func _widest_line(label: Label) -> float:
 	var widest: float = 0.0
 	for line: String in label.text.split("\n"):
 		widest = maxf(widest, label.get_theme_font("font").get_string_size(line, HORIZONTAL_ALIGNMENT_LEFT, -1, label.get_theme_font_size("font_size")).x)
 	return widest
+
+
+## One frame of the crank: which pose shows, and where the crank art's glove is against the wheel's
+## rim. The glove is the centroid of the frame's dark, neutral, opaque pixels near its grip point,
+## taken back to the world through the sprite's own transform.
+func _sample_crank_grip(game: Node2D, human: M0Actor, handle: BypassHandle, grip: Dictionary) -> void:
+	var frame: int = int(game.get("crank_frame"))
+	if frame < 0:
+		# Samples run on physics frames and the pose changes in _process: under load a few physics
+		# steps can run between the press and its first _process, so the usual sprite before the first
+		# crank frame is input latency (counted as lead-in, bounded), not a pop while cranking.
+		if int((grip["frames"] as Array)[0]) + int((grip["frames"] as Array)[1]) == 0:
+			grip["lead_in"] = int(grip["lead_in"]) + 1
+			# A stalled frame can run several physics steps before one drawn frame, so the bound is on
+			# drawn (process) frames, which is what a player would see.
+			(grip["lead_in_drawn"] as Dictionary)[Engine.get_process_frames()] = true
+		else:
+			grip["usual"] = int(grip["usual"]) + 1
+		return
+	(grip["frames"] as Array)[frame] = int((grip["frames"] as Array)[frame]) + 1
+	var sprite: Sprite2D = human.body_sprite
+	if crank_image == null:
+		crank_image = sprite.texture.get_image()
+		if crank_image.is_compressed():
+			crank_image.decompress()
+	for clocks: PackedFloat32Array in [CRANK_GRIP_CLOCK, CRANK_NEAR_GRIP_CLOCK]:
+		_sample_glove(sprite, handle, clocks[frame], grip)
+
+
+## One glove against its rim point: the centroid of the crank art's dark, neutral, opaque pixels near
+## the grip point, taken back to the world through the sprite's own transform.
+func _sample_glove(sprite: Sprite2D, handle: BypassHandle, clock_deg: float, grip: Dictionary) -> void:
+	var hub: Vector2 = handle.global_position + BypassHandle.WHEEL_OFFSET
+	var rim: float = WHEEL_RIM_ATLAS_RADIUS * BypassHandle.WHEEL_SCALE
+	var clock: float = deg_to_rad(clock_deg)
+	var target: Vector2 = hub + rim * Vector2(sin(clock), -cos(clock))
+	var to_world: Transform2D = sprite.get_global_transform()
+	var region: Rect2 = sprite.region_rect
+	var origin: Vector2 = region.position + region.size * 0.5 + sprite.offset * -1.0
+	var centre: Vector2 = to_world.affine_inverse() * target + origin
+	var total: Vector2 = Vector2.ZERO
+	var count: int = 0
+	for y: int in range(int(centre.y) - CRANK_GLOVE_SEARCH, int(centre.y) + CRANK_GLOVE_SEARCH + 1):
+		for x: int in range(int(centre.x) - CRANK_GLOVE_SEARCH, int(centre.x) + CRANK_GLOVE_SEARCH + 1):
+			if x < region.position.x or y < region.position.y or x >= region.end.x or y >= region.end.y:
+				continue
+			if Vector2(x, y).distance_to(centre) > CRANK_GLOVE_SEARCH:
+				continue
+			var c: Color = crank_image.get_pixel(x, y)
+			var high: float = maxf(c.r, maxf(c.g, c.b))
+			if c.a >= 0.98 and high < 110.0 / 255.0 and high - minf(c.r, minf(c.g, c.b)) < 30.0 / 255.0:
+				total += Vector2(x, y)
+				count += 1
+	if count < 10:
+		grip["found"] = false
+		return
+	var glove: Vector2 = to_world * (total / count + Vector2(0.5, 0.5) - origin)
+	grip["worst_rim"] = maxf(float(grip["worst_rim"]), absf(glove.distance_to(hub) - rim))
+	grip["worst_grip"] = maxf(float(grip["worst_grip"]), glove.distance_to(target))
 
 
 func _wait_until(condition: Callable, frames: int) -> bool:
@@ -601,3 +756,4 @@ func _require(condition: bool, label: String) -> bool:
 	if not condition:
 		quit(1)
 	return condition
+

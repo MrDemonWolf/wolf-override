@@ -1,0 +1,198 @@
+crank/crank-1a <- session 01a1335b-97d0-7c73-8e3f-7a231ef3a513 | sha256 2fc146b2808527deaa8c036e3116912329e1c3a8cb26639177f1cb73f405832d | src ~/.codex/generated_images/01a1335b-97d0-7c73-8e3f-7a231ef3a513/exec-45896e12-d95e-4bdd-b8db-bf1d87e4de1f.png | out scratchpad/real-slice/add7/crank/raw/crank-1a.png | cwd scratchpad/real-slice/add7/codex/crank-crank-1a | 2026-10-13T03:45:04Z
+crank/crank-1b <- session 01a1335b-97d0-7110-b5b2-48ccab499e15 | sha256 7c25119e6cd22aa86ebac77a7a1c8fee6a879676c921004aa7d75f49b288e0b0 | src ~/.codex/generated_images/01a1335b-97d0-7110-b5b2-48ccab499e15/exec-c9c20633-1d63-485c-ad0d-625dd4caf6f0.png | out scratchpad/real-slice/add7/crank/raw/crank-1b.png | cwd scratchpad/real-slice/add7/codex/crank-crank-1b | 2026-10-13T03:45:04Z
+crank/crank-1a archived 01a1335b-97d0-7c73-8e3f-7a231ef3a513
+crank/crank-1b archived 01a1335b-97d0-7110-b5b2-48ccab499e15
+crank/crank-2b <- session 01a13361-7b7d-7231-a8b6-cc69df739ac8 | sha256 e9479de6c27abcbefc05918d65724226ff079f056e92eb3bede0e4b9da5bafa8 | src ~/.codex/generated_images/01a13361-7b7d-7231-a8b6-cc69df739ac8/exec-82dfccca-4c2a-4139-a45e-b28ab133c313.png | out scratchpad/real-slice/add7/crank/raw/crank-2b.png | cwd scratchpad/real-slice/add7/codex/crank-crank-2b | 2026-10-13T03:51:14Z
+crank/crank-2b archived 01a13361-7b7d-7231-a8b6-cc69df739ac8
+crank/crank-2a <- session 01a13361-7b82-74c1-8b25-7a40ce10662c | sha256 e8d88740ab8fb8d9b0c311532b2448962f3e8b610ce117e67faad2db9c552a3a | src ~/.codex/generated_images/01a13361-7b82-74c1-8b25-7a40ce10662c/exec-0ca666b5-dcf6-4229-b185-a82a8388c0f1.png | out scratchpad/real-slice/add7/crank/raw/crank-2a.png | cwd scratchpad/real-slice/add7/codex/crank-crank-2a | 2026-10-13T03:51:18Z
+crank/crank-2a archived 01a13361-7b82-74c1-8b25-7a40ce10662c
+crank/crank-2c <- session 01a13361-7b84-7151-8d8e-76e9a12b9f12 | sha256 7db031ece6546924d401871c912a1e1e79fe05865925fef136e494e5e6b0008e | src ~/.codex/generated_images/01a13361-7b84-7151-8d8e-76e9a12b9f12/exec-72e26957-70c1-4ed2-8961-3071e7ff9a2a.png | out scratchpad/real-slice/add7/crank/raw/crank-2c.png | cwd scratchpad/real-slice/add7/codex/crank-crank-2c | 2026-10-13T03:51:20Z
+crank/crank-2c archived 01a13361-7b84-7151-8d8e-76e9a12b9f12
+
+== add7 / beacons (item d: caged red lockdown beacons on wall brackets), 2026-10-12 ==
+Tool: Codex built-in image generation, edit mode, one session, run from add7/beacons/codex/paint-beacons/ with
+  codex exec --skip-git-repo-check -s workspace-write --add-dir <job dir> --add-dir ~/.codex/generated_images --image=refs/* "<prompt.txt>" < /dev/null
+(add7/beacons/tools/run_codex.sh; beacons/tools/run_codex.sh at ada83fa). The prompt told Codex to KEEP all metadata including C2PA and never strip it.
+Edit target and paint map: add7/beacons/design/codex-target.png, codex-areas.png (deterministic, tools/design.py: beacons/tools/design.py
+  at ada83fa; the kept fix2/beacons/tools/design.py, round 9's, makes the same codex-target.png, blob 1a952e28).
+
+session id | job | output (sha256) | used?
+01a1335e-53be-7ca3-bac0-059cf4b5a18d | paint-beacons | beacons-painted.png (06c89478d1b3c428cc51119b42215e0a7ff853fac02c37c5e262138128161b27) <- ~/.codex/generated_images/01a1335e-53be-7ca3-bac0-059cf4b5a18d/exec-23ac6a3d-4891-4fd5-b4ae-20482ff74d93.png | used (fixture, globe and guard colour, sampled inside the construction masks)
+  - cp copy, byte-identical (sha256 checked); carries its caBX (C2PA) chunk (23,654 bytes). The tool returned 1254x1254, not
+    1024x1024; the cleanup resizes a working copy to 1024 (registration checked: best gradient match at 0,0 / 0,-1 px).
+  - Codex's own notes with the exact image-tool prompt: add7/beacons/codex/paint-beacons/out/notes.txt.
+  - archived 2026-10-12 (`codex archive`): 0 live in ~/.codex/sessions, 1 in ~/.codex/archived_sessions.
+Derived (deterministic, no metadata transplanted): add7/beacons/tools/cleanup.py (beacons/tools/cleanup.py at ada83fa;
+  round 9's fix2/beacons/tools/cleanup.py made the installed atlas) -> add7/beacons/layers/ (b0/b1 fixture,
+  globe, guard, light PNGs, corridor-beacons.png atlas, placement.json, report.json, previews).
+  Conduit, straps, fitting, nipple: Python, from the far plate's existing painted conduit profile and strap steel (no image tool).
+  Wall contact shadows and the red light/spill: Python, computed from the construction geometry (no image tool).
+
+## add7 / plume (item g: the coolant relief jet) - 2026-10-12
+Tool: Codex built-in image generation, EDIT mode, one session, run from add7/plume/codex/paint-relief/
+  via add7/plume/tools/run_codex.sh (plume/tools/run_codex.sh at ada83fa): codex exec --skip-git-repo-check -s workspace-write --add-dir <job> --add-dir ~/.codex/generated_images
+  --image=refs/1-edit-target-relief-valve.png --image=refs/2-areas-to-paint.png "<prompt.txt>" < /dev/null
+The prompt told Codex to KEEP all metadata, C2PA included, and never strip it. Edit target and area map were built
+deterministically by add7/plume/tools/codex_inputs.py from add7/plume/design (tools/design.py).
+
+session id | job | output (sha256) | used?
+01a1335a-f620-7b42-ae60-ce8dce78c082 | paint-relief | add7/plume/codex/paint-relief/out/relief-valve-painted.png (23626327c8ae74d83601753da790f6d31c0539103219c38a9641289c31b8bb21) <- ~/.codex/generated_images/01a1335a-f620-7b42-ae60-ce8dce78c082/exec-ecf630c4-7a80-4244-8d41-f0c96c64f337.png | used, only inside the designed masks (add7/plume/layer/relief-valve-layer.png, add7/plume/layer/corridor-coolant-relay.png)
+  The tool returned 1254x1254 (asked 1024); the original is kept unchanged (cmp byte-identical to the generated_images file; caBX chunk present, 21881 bytes) and cleanup resamples a copy.
+Derived (no metadata transplanted): add7/plume/tools/cleanup.py -> layer/relief-valve-layer.png, layer/corridor-coolant-relay.png (SHA-256 fb192cc2334aaf7089a562b1220ce25f8ae891940c60c39a28f22323902ab87a), layer/cleanup-report.json
+Deterministic (no image tool): design/* (masks, construction), mock/* (jet simulation), the jet itself (runtime CPUParticles2D).
+archived 2026-10-12: codex archive 01a1335a-f620-7b42-ae60-ce8dce78c082 -> "Archived session ..." (add7/plume/codex/archive.log)
+
+== add7 / door (items a steel blast frame, b RESTRICTED AREA sign, c inner blast door, h conduit strap), 2026-10-12 ==
+Tool: Codex built-in image generation, EDIT mode, one session, run from add7/door/codex/paint-door7/ via
+  add7/door/codex/run_job7.sh (door/codex/run_job7.sh at ada83fa): codex exec --skip-git-repo-check -s workspace-write --add-dir <job dir> --add-dir ~/.codex/generated_images
+  --image=refs/1-edit-target-door-end.png --image=refs/2-areas-to-paint.png "<prompt.txt>" < /dev/null
+The prompt (add7/door/codex/paint-door7/prompt.txt) told Codex to KEEP all metadata, C2PA included, never strip it, to add no
+letters (the sign plate stays blank) and to add, move or invent no part. Edit target and paint map were built deterministically
+by add7/door/tools/codex_inputs7.py from add7/door/design (tools/portal7.py) over round 6's painted layers (layers/v6).
+
+session id | job | output (sha256) | used?
+01a13367-ff5e-7032-9f9a-2a89354a3561 | paint-door7 | add7/door/codex/paint-door7/out/door7-painted.png (1b798261cc418e4c81581766488a4feea6fd413e260fb3fa8783d72891604a4e) <- ~/.codex/generated_images/01a13367-ff5e-7032-9f9a-2a89354a3561/exec-8b20e853-0460-4f8d-9130-a57a23f7fca0.png | used as material detail only, inside the design masks (blast frame plates, sign plate, parked leaf edge, rail, leaf front and edge elevations)
+  - cp copy, byte-identical (sha256 of copy and original match); carries its caBX (C2PA) chunk (21,881 bytes). The tool returned
+    1254x1254 (asked 1024) and repainted protected areas; cleanup uses only its relative high-pass detail inside the white areas,
+    on a resampled copy (registration measured: pure scale 1254/1024, offset 0,0). Its values are never used.
+  - Codex's own notes with the exact image-tool prompt: add7/door/codex/paint-door7/out/notes.txt.
+  - archived 2026-10-12 (`codex archive`): 0 live in ~/.codex/sessions, 1 in ~/.codex/archived_sessions (add7/door/codex/archive.log).
+Derived (deterministic, no metadata transplanted): add7/door/tools/cleanup7.py -> add7/door/layers/ (portal-wall.png, portal-front.png,
+  leaf-front.png, leaf-edge.png, report7.json; copies of round 6's unchanged frame, curtain, open bar, lens, wheel, far and mid plates);
+  add7/door/tools/install7.py (door/tools/install7.py at ada83fa) -> add7/door/game/ (corridor-seal-atlas.png, atlas-regions.json; far and mid plates unchanged).
+Deterministic, no image tool: every shape and mask (tools/portal7.py), the RESTRICTED AREA stencil (typeset in the game's bundled Roboto,
+  SIL OFL 1.1, bridges cut by script), all bolts, plate joints, wiper seals, the second saddle strap (painted with round 6's strap
+  steel, itself from paint-portal2 01a12e59-e7ba-7073-8a77-796f536bcc43), every value and all light (round 6's painted light per place).
+  2026-10-13 (beacons, continued): no new Codex session. cleanup.py (beacons/tools/cleanup.py at ada83fa; round 9's
+  fix2/beacons/tools/cleanup.py is the kept copy) light box enlarged 6 px upward and the wall spill raised
+  from 0.5 to 0.8 (Python only) so the red pool reads at the pulse peak; layers/ and the atlas rebuilt from the same Codex
+  output (sha256 06c89478... unchanged, caBX 23,654 bytes present, session still archived: 0 live, 1 archived).
+  Atlas layers/corridor-beacons.png md5 afd3bb20b214043a081864320e552b05.
+
+## add7 / integration (all four tracks in real-slice/game-add) - 2026-10-13
+No new Codex session and no new image-tool output. Every installed file is a byte copy of a track's delivered file (md5):
+  assets/props/corridor-seal-atlas.png 9b1719def95eaa2dd7c031bcc745f1f5 = add7/door/game/corridor-seal-atlas.png
+  assets/props/corridor-beacons.png    afd3bb20b214043a081864320e552b05 = add7/beacons/layers/corridor-beacons.png
+  assets/characters/eng-crank-atlas.png 8ca192310218e17a66ebf054e31730ca = add7/crank/deliver/sprites/eng-crank-atlas.png
+  assets/props/corridor-coolant-relay.png 9fbcf045bf5f25965c616841cf9f9e5a = add7/plume/layer/corridor-coolant-relay.png (via plume.patch)
+Re-checked 2026-10-13: all eight add7 Codex originals carry their caBX (C2PA) chunk (crank-1a/2a/2c, relief-valve, door7: 21,881 bytes;
+crank-1b/2b, beacons: 23,654 bytes); all eight sessions are archived (0 live in ~/.codex/sessions, 1 each in ~/.codex/archived_sessions):
+01a1335b-97d0-7c73-8e3f-7a231ef3a513, 01a1335b-97d0-7110-b5b2-48ccab499e15, 01a13361-7b82-74c1-8b25-7a40ce10662c,
+01a13361-7b7d-7231-a8b6-cc69df739ac8, 01a13361-7b84-7151-8d8e-76e9a12b9f12, 01a1335e-53be-7ca3-bac0-059cf4b5a18d,
+01a1335a-f620-7b42-ae60-ce8dce78c082, 01a13367-ff5e-7032-9f9a-2a89354a3561.
+
+==== add7 FIX ROUND 1 (round 8), 2026-10-13 ====
+All five sessions: Codex built-in image_gen tool, EDIT mode only, run from their own folders under
+add7/fix1/codex/<job>/ by add7/fix1/codex/run_job.sh (fix1/codex/run_job.sh at ada83fa; it differs from the kept
+fix4/codex/run_job.sh only in its comment line); every prompt told Codex to keep all metadata
+including C2PA and never strip it. Each output in out/ is byte-identical to its original in
+~/.codex/generated_images (checked with cmp) and carries its caBX (C2PA) chunk (23,654 bytes each).
+All five sessions archived (codex archive; ~/.codex/archived_sessions/rollout-2026-10-13T*-<id>.jsonl;
+add7/fix1/codex/archive.log). Codex pixels are used only as material inside designed masks (see each
+cleanup tool); no lettering was painted by the tool.
+
+job                session id                              output (sha256)                                                       used for
+paint-door8        01a134ac-cb13-7733-b679-7230257e0555    door8-painted.png  e9a239f597b32fa4e5da0ecb169af989b9671695c3cc65e94d9740c0d77a6229   blast-frame liner, wider parked leaf edge with receivers, leaf front and edge elevations (high-pass detail only; add7/fix1/door/tools/cleanup8.py)
+paint-crank8-try1  01a134bc-6a3b-74d0-9dc7-49fd2b789c28    crank8-painted.png 310fa5da6bd3dd247d306c87bfcd9d23692f4b1ea4ee8f44602b8d108b5a3d2d   NOT USED (a cut sliver of the trouser outline survived as a rod by the far glove; rig polygon tightened and re-run)
+paint-crank8       01a134c1-4d7e-72a1-8170-134476ae8325    crank8-painted.png 5c613d4f7656cf393c19c911abd0188e2c5d61889e2f34dd30c3149078469146   crank frames A and B: repair zones only (arms, where the arms were, hip seam); add7/fix1/crank/tools/cleanup.py
+paint-relay8       01a134c3-505a-7132-88f6-8ea5867103a0    relay8-painted.png 181ab3bb60c91e8f5fbc6aed2e11c6e59391b71a67af275937aef25cf53d771d   relief discharge drop, union, clamps, brackets, damp patch on the relay art; add7/fix1/plume/tools/cleanup8.py
+paint-lum8         01a134c9-e14e-7482-aad9-3642fae31b50    lum8-painted.png   ab294c9f5baaab2fa4c588a3af537606ffcdb5d253c0f9b0685d2157f2ba1d93   corridor luminaire near the door end (far plate); add7/fix1/luminaire/tools/cleanup.py (paint sampled 28 px right of the fitting's final place)
+
+No new session for the beacons: round 7's paint (add7/beacons/codex/paint-beacons, session in the beacons
+section above) is re-used; only the deterministic light, straps and wall hairline changed.
+Text: no new text. RESTRICTED AREA, SECTOR 4B and DOOR 4B-07 are round 7's / round 6's typeset pixels.
+
+Installed in real-slice/game-add (md5, identical to the delivered file):
+  assets/props/corridor-seal-atlas.png     ca1cfdf1758c8c0c755816995898f4b4  (add7/fix1/door/game/)
+  assets/props/corridor-beacons.png        5974e95567c26760dba112ade5fdf0a8  (add7/fix1/beacons/layers/)
+  assets/characters/eng-crank-atlas.png    5a263880dad1cd0edad9f6c9848c528f  (add7/fix1/crank/deliver/)
+  assets/props/corridor-coolant-relay.png  87d7edb67881c089e71473cfb3335615  (add7/fix1/plume/layer/)
+  assets/rooms/corridor-far.png            7bd28feb678518b5802393c3ec431006  (add7/fix1/luminaire/layer/)
+Round 7's installed copies are kept in add7/fix1/work/r7-installed/.
+
+==== add7 FIX ROUND 2 (round 9), 2026-10-13 ====
+Codex built-in image_gen tool, EDIT mode only, run from add7/fix2/codex/<job>/ by add7/fix2/codex/run_job.sh
+(fix2/codex/run_job.sh at ada83fa; it differs from the kept fix4/codex/run_job.sh only in its comment line);
+the prompts told Codex to keep all metadata including C2PA and never strip it. All three sessions archived
+(codex archive; add7/fix2/codex/archive.log; 0 live in ~/.codex/sessions).
+
+job            session id                              output (sha256)                                                                  used for
+empty-run-r9   01a135c0-104f-7811-824a-7e690e3e25d3    none                                                                             NOT USED: started by a wrong job path with an empty prompt; produced no image; archived
+paint-cut9     01a135c0-8eeb-7d02-a132-b3368f2c5a5a    cut9-painted.png  f764301cff45b6bcc667b262c4cc56be91fa71e927c30967c1403400c3488b8b   NOT USED in the end: the 0.42 m try (its render.sh capture showed the section's far arris taking the rear heel's last 1-2 screen px at the safe point); refs rebuilt from add7/fix2/door/work-042/design
+paint-cut9b    01a13619-28b8-7c02-91b4-d474e3924572    cut9b-painted.png ec14d41ee36e1098c722a7010a8ae7f3709206575ff5053f59edde830905cd69   the 0.36 m cut concrete section (face, damp foot, ties, joints, top, edge angles): clamped luma high-pass detail inside the masks only (add7/fix2/door/tools/cleanup9.py; fix2/door/tools/cleanup9.py at ada83fa)
+Both outputs (1254x1254) are byte-identical (cmp) to their originals in ~/.codex/generated_images
+(01a135c0-8eeb-.../exec-73ad7c74-6f7f-4101-861d-dd3976abf45f.png, 01a13619-28b8-.../exec-f90c5973-14d7-40de-8cf4-a6384e3aa395.png)
+and carry their caBX (C2PA) chunks (21,881 and 23,654 bytes).
+No new session for the far plate (deterministic relighting, add7/fix2/far/tools/far9.py; fix2/far/tools/far9.py at ada83fa) or the beacons
+(round 7's paint re-used; only the computed light changed, add7/fix2/beacons/tools/cleanup.py).
+Text: no new text.
+
+Installed in real-slice/game-add (md5, identical to the delivered file):
+  assets/props/corridor-seal-atlas.png     271c2da3d6c3bc5add6511d0747f0e7a  (add7/fix2/door/game/)
+  assets/rooms/corridor-far.png            c334eb642b52d68625d24eeaa813baca  (add7/fix2/far/layer/)
+  assets/props/corridor-beacons.png        72efa04f54b780b044b12c0bbb0fd3ce  (add7/fix2/beacons/layers/)
+Round 8's installed game copy (scripts, scene, tests, assets; no .godot) is kept in add7/fix2/work/r8-game/.
+
+==== add7 FIX ROUND 3 (round 10), 2026-10-14 ====
+No Codex session was started by this round.
+  * The cut wall (Nathanial's decision "Show it as a clean cutaway"): a flat section poche, deterministic
+    (add7/fix3/door/tools/cut10.py, cleanup10.py, install10.py). paint-cut9b's detail is no longer used
+    anywhere in the installed atlas; its session and file stay recorded above.
+  * The far plate (real review r3 MUST 1): deterministic relighting from round 8's plate
+    (add7/fix3/far/tools/far10.py), no new paint.
+  * The beacons: art unchanged (round 9's corridor-beacons.png, md5 72efa04f54b780b044b12c0bbb0fd3ce);
+    only the pulse's strength in code/scene changed.
+Text: no new text.
+
+Installed in real-slice/game-add (md5, identical to the delivered file):
+  assets/props/corridor-seal-atlas.png     16e54f8a589f206463acd8003682916b  (add7/fix3/door/game/)
+  assets/rooms/corridor-far.png            a2db51a0cd09aa97c6f7a09b014cc98d  (add7/fix3/far/layer/)
+Round 9's installed game copy (scripts, scene, tests, assets; no .godot) is kept in add7/fix3/work/r9-game/.
+  * Round 10 finish (03:30-04:00): a pool-centring scan of far10.py (WALL_EXTRA 9.0/4.5/2.0/0.0/-3.0,
+    add7/fix3/far/scan/README.txt) found no better setting; the installed far plate is unchanged
+    (md5 a2db51a0cd09aa97c6f7a09b014cc98d). Asset register: a round-10 note on corridor-beacons (art
+    unchanged, md5 72efa04f54b780b044b12c0bbb0fd3ce; pulse in code only). Still no Codex session.
+
+==== add7 FIX ROUND 4 (round 11), 2026-10-14 ====
+Codex built-in image_gen tool, EDIT mode only, run from add7/fix4/codex/paint-jamb11/ by add7/fix4/codex/run_job.sh;
+the prompt told Codex to keep all metadata including C2PA and never strip it. Session archived
+(codex archive; add7/fix4/codex/archive.log; 0 live in ~/.codex/sessions).
+
+job            session id                              output (sha256)                                                                  used for
+paint-jamb11   01a139d9-1863-7681-8bc9-ab42ca7191c0    jamb11-painted.png  b3b66a50a3ce0173153715695428f3e31fa24b37afe69161ff8da79865ee016e   the blast frame's two jamb plates (far: 36118 paint; near: galvanised): clamped luma high-pass detail (+-12 %) inside their masks only (add7/fix4/door/tools/cleanup11.py)
+The session's tool made two images: exec-3d13c24a-b29c-4656-adff-541bc3849bdf.png (sha256 6b707cb92d886cd8b6c42aaeea9d306a2524cd49cc31e45cfd0a2f50be552bb7,
+1254x1254, caBX present) was NOT USED (Codex generated again and copied only the second); the used output is byte-identical (sha256)
+to ~/.codex/generated_images/01a139d9-1863-7681-8bc9-ab42ca7191c0/exec-cfaf71db-0fb9-4e5e-bca3-e059c6d77d00.png (1254x1254) and carries its caBX (C2PA) chunk.
+Shapes: add7/fix4/door/tools/jamb11.py (design, masks, spec.json), codex_inputs11.py (edit target and paint map), cleanup11.py
+(values from the light the round-10 art carries, bolts, joints and edge shadows by script). Outside the two plates' masks 0 atlas px
+changed; alpha 0 px changed (add7/fix4/door/layers/report11.json).
+The beacons: art unchanged (corridor-beacons.png, md5 72efa04f54b780b044b12c0bbb0fd3ce); only the lens tint and the pulse's
+rhythm changed in code (RoomDepth beacon_lens_trough, beacon_flash) and the scene.
+Text: no new text.
+
+Installed in real-slice/game-add (md5, identical to the delivered file):
+  assets/props/corridor-seal-atlas.png     14fd7bed565083256e544687865dd4c4  (add7/fix4/door/game/; sha256 a46626df12321ed267055efeba54fc9d95ac796d4c447eef2d47f0a0859ee5d2)
+  assets/rooms/corridor-far.png            a2db51a0cd09aa97c6f7a09b014cc98d  (unchanged since round 10)
+Round 10's installed game copy (scripts, scene, tests, assets; no .godot) is kept in add7/fix4/work/r10-game/.
+
+==== LANDING on main (branch codex/corridor-additions), 2026-10-14 ====
+No Codex session was started. No image tool was used.
+  * corridor-seal-atlas.png: round 11's atlas (sha256 a46626df12321ed2...) with the head plate's flat paint
+    repainted by Python behind the hood, where the image tool had left a faint copy of DOOR 4B-07
+    (review r5, should-fix 1): landing/atlasfix/repaint_head12.py (masks.py), 1,633 px changed (mask 1,793 px), alpha unchanged;
+    installed sha256 066e39918a6fb7af69a4580c0b30838a27478f59e3f8045c5914b4e802c0f33d.
+  * Every other installed file is round 11's, byte for byte (sha256):
+      corridor-beacons.png     5e055b4e416ec0eb2b17c77053de44723dc4aa8b79c1959d35dc73e7274b7977
+      corridor-coolant-relay   b2eee7303a08fd4b051243c5112f7d4615db4405027a6c89f6dd75fa2b982585
+      corridor-far.png         5d74d1d727d7f48ad6706bde572c0dc389fac59997e7be606230848059704ce3
+      eng-crank-atlas.png      356064e459cc4242b77f3c3c142fa2f8ef6784fb5d60c604ec068229d3bcf4a6
+  * The filed edit-target scripts (door/tools/codex_inputs7.py, fix1/door/tools/codex_inputs8.py,
+    fix4/door/tools/codex_inputs11.py) now blank the hood's typeset lettering (hood_blank.py, filed once in
+    door/tools/; a re-run of codex_inputs8.py or codex_inputs11.py needs it copied beside them, as it was
+    filed there too: fix1/door/tools/hood_blank.py and fix4/door/tools/hood_blank.py at ada83fa); the targets
+    the sessions used are kept unchanged in <track>/codex/<job>/refs/ (door/codex/paint-door7/refs/,
+    fix1/codex/paint-door8/refs/, fix4/codex/paint-jamb11/refs/).
+  * Filed here with their C2PA chunk (caBX) checked present and SHA-256 equal to the records above: the
+    used outputs of paint-beacons, paint-relief, paint-door7, paint-door8, paint-crank8, paint-relay8,
+    paint-lum8 and paint-jamb11. The unused outputs (crank-1a..2c, crank8-try1, cut9, cut9b, jamb11's first
+    image) are recorded above by SHA-256 and were not filed.

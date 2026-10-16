@@ -1,0 +1,132 @@
+--- base-game/apps/game/scripts/room_depth.gd	2026-10-12 22:46:32
++++ test-game/apps/game/scripts/room_depth.gd	2026-10-12 22:47:13
+@@ -3,8 +3,8 @@
+ ## A room built from three painted plates that share one 16:9 frame, plus the light every room
+ ## shares, all with built-in nodes:
+ ## - far: the back wall and floor, a Parallax2D that lags the camera, with additive glows and
+-##   drifting light shafts over its painted lamps, procedurally drawn lockdown beacons, wall haze
+-##   and dust;
++##   drifting light shafts over its painted lamps, lockdown beacons (painted fixtures from
++##   [member beacon_atlas], or a small drawn housing where a room has none), wall haze and dust;
+ ## - mid: the play plane, drawn 1:1 with the room so its painted walkway is the floor (y 440) the
+ ##   actors and stations stand on;
+ ## - near: the plate's edge pieces only (a left strip and the same strip mirrored on the right),
+@@ -79,6 +79,8 @@
+ ## A bulkhead's front pillar (see [member pillars]) fades to this opacity while it covers an actor,
+ ## keeping more of the doorway than a near edge piece does.
+ const PILLAR_FADE_ALPHA: float = 0.5
++## Regions per painted beacon in [member beacon_regions]: fixture, globe, guard, light.
++const BEACON_ART_PARTS: int = 4
+ 
+ ## The far plate: back wall, painted lamps and wet floor (opaque).
+ @export var painting: Texture2D
+@@ -106,9 +108,18 @@
+ @export var lamp_color: Color = Color("#9fe4ff")
+ ## Lamps (by index into [member lamps]) that also cast a drifting light shaft.
+ @export var shaft_lamps: PackedInt32Array = PackedInt32Array()
+-## Lockdown beacons as fractions of the far plate: a small drawn lamp housing with a pulsing glow.
++## Lockdown beacons as fractions of the far plate: a lamp with a pulsing glow.
+ @export var warning_lamps: PackedVector2Array = PackedVector2Array()
+ @export var warning_color: Color = Color("#ff4a46")
++## Painted beacons (the corridor's caged wall lamps): one small atlas holding, per beacon,
++## BEACON_ART_PARTS regions in [member beacon_regions] (atlas px), each drawn at its offset in
++## [member beacon_offsets] from the beacon's anchor (far-plate px, so the art lands on the plate's own
++## pixel grid): the fixture with its conduit and wall shadow, the globe (greyscale glass tinted by
++## the live lens colour), the guard in front of the globe, and the lamp's light (additive, pulsed and
++## settled exactly like the drawn beacons' glow). Without an atlas the room draws the small housing.
++@export var beacon_atlas: Texture2D
++@export var beacon_regions: Array[Rect2] = []
++@export var beacon_offsets: PackedVector2Array = PackedVector2Array()
+ ## Ambient dust drifting in the room. Off where the room's light is painted into its plates and
+ ## nothing in the air needs to move (the corridor since the door end was rebuilt).
+ @export var ambient_dust: bool = true
+@@ -163,15 +174,26 @@
+ var _rng: RandomNumberGenerator = RandomNumberGenerator.new()
+ 
+ 
+-## A lockdown beacon: a dark housing on a short bracket with a red lens.
++## A lockdown beacon: a dark housing on a short bracket with a red lens, or, with [member art], the
++## painted fixture, its globe tinted by [member lens] and the guard over it (one texture, so both
++## beacons batch).
+ class Beacon:
+ 	extends Node2D
+ 	var lens: Color = Color("#ff4a46"):
+ 		set(value):
+ 			lens = value
+ 			queue_redraw()
++	var art: Texture2D
++	## Destination rect (relative to the anchor, world px) and atlas region, for the fixture, the
++	## globe and the guard in turn.
++	var parts: Array[Rect2] = []
+ 
+ 	func _draw() -> void:
++		if art != null:
++			draw_texture_rect_region(art, parts[0], parts[1])
++			draw_texture_rect_region(art, parts[2], parts[3], lens)
++			draw_texture_rect_region(art, parts[4], parts[5])
++			return
+ 		draw_line(Vector2(0.0, -9.0), Vector2(0.0, -4.0), Color("#1b2630"), 2.0)
+ 		draw_rect(Rect2(-7.0, -4.0, 14.0, 9.0), Color("#141c24"))
+ 		draw_rect(Rect2(-7.0, -4.0, 14.0, 9.0), Color("#3e4f5a"), false, 1.0)
+@@ -277,14 +299,34 @@
+ 			backdrop_layer.add_child(shaft)
+ 			lamp_glows.append(shaft)
+ 			_shafts.append(shaft)
++	var painted_beacons: bool = beacon_atlas != null and beacon_regions.size() >= warning_lamps.size() * BEACON_ART_PARTS
+ 	for index: int in warning_lamps.size():
+ 		var beacon: Beacon = Beacon.new()
+ 		beacon.name = "Beacon%d" % index
+ 		beacon.lens = warning_color
+ 		beacon.z_index = 1
++		var glow: Sprite2D
++		if painted_beacons:
++			var first: int = index * BEACON_ART_PARTS
++			var plate_scale: float = _plate_scale()
++			beacon.art = beacon_atlas
++			for part: int in 3:
++				var region: Rect2 = beacon_regions[first + part]
++				beacon.parts.append(Rect2(beacon_offsets[first + part] * plate_scale, region.size * plate_scale))
++				beacon.parts.append(region)
++			glow = Sprite2D.new()
++			glow.texture = beacon_atlas
++			glow.centered = false
++			glow.region_enabled = true
++			glow.region_rect = beacon_regions[first + 3]
++			glow.offset = beacon_offsets[first + 3]
++			glow.scale = Vector2.ONE * plate_scale
++			glow.modulate = Color(warning_color, BEACON_ALPHA)
++			glow.material = additive
++		else:
++			glow = make_glow(warning_color, Vector2(90.0, 90.0), BEACON_ALPHA, additive)
+ 		backdrop_layer.add_child(beacon)
+ 		beacons.append(beacon)
+-		var glow: Sprite2D = make_glow(warning_color, Vector2(90.0, 90.0), BEACON_ALPHA, additive)
+ 		glow.name = "WarningGlow%d" % index
+ 		glow.z_index = 2
+ 		backdrop_layer.add_child(glow)
+--- base-game/apps/game/scenes/main.tscn	2026-10-12 22:46:31
++++ test-game/apps/game/scenes/main.tscn	2026-10-13 00:24:48
+@@ -1,4 +1,4 @@
+-[gd_scene load_steps=28 format=3]
++[gd_scene load_steps=29 format=3]
+ 
+ [ext_resource type="Script" path="res://scripts/main.gd" id="1_main"]
+ [ext_resource type="Script" path="res://scripts/m0_actor.gd" id="2_actor"]
+@@ -22,6 +22,7 @@
+ [ext_resource type="Texture2D" path="res://assets/props/corridor-safe-point.png" id="21_safe_point"]
+ [ext_resource type="Shader" path="res://assets/shaders/post_grade.gdshader" id="16_grade"]
+ [ext_resource type="Shader" path="res://assets/shaders/sharp_sprite.gdshader" id="22_sharp"]
++[ext_resource type="Texture2D" path="res://assets/props/corridor-beacons.png" id="23_beacons"]
+ 
+ [sub_resource type="RectangleShape2D" id="FloorShape"]
+ size = Vector2(960, 60)
+@@ -56,6 +57,9 @@
+ lamps = PackedVector2Array(0.144, 0.188, 0.5, 0.188, 0.854, 0.188)
+ shaft_lamps = PackedInt32Array(1, 2)
+ warning_lamps = PackedVector2Array(0.341, 0.27, 0.659, 0.27)
++beacon_atlas = ExtResource("23_beacons")
++beacon_regions = Array[Rect2]([Rect2(2, 2, 25, 135), Rect2(242, 2, 11, 12), Rect2(212, 2, 13, 15), Rect2(29, 2, 77, 95), Rect2(187, 2, 23, 46), Rect2(2, 141, 11, 12), Rect2(227, 2, 13, 15), Rect2(108, 2, 77, 95)])
++beacon_offsets = PackedVector2Array(-10.72, -108.6, -3.72, 4.4, -4.72, 4.4, -36.72, -30.6, -10.28, -18.6, -4.28, 4.4, -5.28, 4.4, -37.28, -30.6)
+ ambient_dust = false
+ haze_end = 0.588
+ haze_fade = 0.12

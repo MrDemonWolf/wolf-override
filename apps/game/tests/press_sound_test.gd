@@ -137,6 +137,7 @@ func _junction_exit() -> void:
 	_expect(not state.junction_cleared, "the bolt panel does not take the engineer out through the door")
 	await _press(&"interact", "leaving through the open exit door", (JunctionRoom.HATCH_REACH_MIN_X + JunctionRoom.HATCH_REACH_MAX_X) * 0.5)
 	_expect(state.junction_cleared and bool(game.get("chapter_close_active")), "the hatch clears the service line and starts the closing shot")
+	await _read_on()
 	await _press(&"interact", "continuing from the junction's closing shot")
 	_expect(bool(game.get("hatch_exit_walking")), "continue starts the walk out through the hatch")
 
@@ -184,8 +185,20 @@ func _records(mirror_route: String) -> void:
 	_expect((game.get("state") as M0State).mirror_route == mirror_route, "the mirror is copied by the chosen route")
 	await _press(&"interact", "securing the first copy at the Records exit", 830.0)
 	_expect(started.has(&"records_arc"), "the first copy lets the exit go with its arc (heard %s)" % [started])
-	await _press(&"interact", "continuing from the Records closing shot")
-	_expect(not bool(game.get("chapter_close_active")) and await _until(func() -> bool: return human.controlled), "continue hands control back after the first copy")
+	# No closing shot holds the engineer (STORY-8): control stays while the closing lines run, and USE at
+	# the exit goes on through their boxes before it leaves.
+	_expect(not bool(game.get("chapter_close_active")) and await _until(func() -> bool: return human.controlled), "the engineer keeps control after the first copy")
+	await _read_on(830.0)
+
+
+## Presses USE through the boxes of the line on screen (no state changes) up to its last one, with the
+## engineer first placed at [param at_x] when it is 0 or more (see _press). At most 6 presses: more
+## than any line here has boxes, so the cap only keeps a stuck line from hanging the suite.
+func _read_on(at_x: float = -1.0) -> void:
+	for _box: int in 6:
+		if int(game.get("dialogue_index")) >= (game.get("dialogue_boxes") as Array).size() - 1:
+			return
+		await _press(&"interact", "reading on", at_x, false)
 
 
 ## WOLF asks at the rubble line how to bring the sentry down, and [param response] answers.

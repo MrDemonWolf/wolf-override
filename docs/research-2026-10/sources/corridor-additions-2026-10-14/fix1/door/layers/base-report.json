@@ -1,0 +1,12 @@
+{
+ "wall": {
+  "reverted_px": 78367,
+  "round7_px_kept": 22469,
+  "round7_px_total": 100836
+ },
+ "front": {
+  "reverted_px": 2074,
+  "round7_px_kept": 35,
+  "round7_px_total": 2109
+ }
+}

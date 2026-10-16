@@ -1,0 +1,25 @@
+{
+ "registration_shift_px_1024": [
+  -0.5,
+  0.0
+ ],
+ "registration_rmse": 2.3327505464688496,
+ "bronze": {
+  "paint_mean_luma": 83.86738595655487,
+  "construction_mean_luma": 67.12682520325204,
+  "gain": 0.92
+ },
+ "steel": {
+  "paint_mean_luma": 73.58591422650285,
+  "construction_mean_luma": 54.57399045801527,
+  "gain": 1.0
+ },
+ "relay_px_changed": 938,
+ "relay_px_changed_outside_mask": 0,
+ "changed_bbox_art": [
+  291,
+  52,
+  356,
+  94
+ ]
+}

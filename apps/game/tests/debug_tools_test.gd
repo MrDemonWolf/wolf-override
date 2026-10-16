@@ -1,6 +1,7 @@
 extends SceneTree
 
 const GAME_SCENE: PackedScene = preload("res://scenes/main.tscn")
+const Suite = preload("res://tests/support/game_suite.gd")
 
 var failures: int = 0
 var base: String = ""
@@ -848,6 +849,10 @@ func _check_zones_keep_clear() -> void:
 	var tools: DebugTools = _tools(game)
 	game.call("_new_game")
 	game.call("_finish_intro")
+	# Past the first controllable frame (which shows only the name card and the move prompt): the
+	# tutorial done and the opening lines up, so the hint and the dialogue both show.
+	game.set("tutorial_step", 2)
+	game.set("opening_lines_held", false)
 	await _settle(3)
 	tools.set_overlay_mode(DebugTools.Overlay.ZONES)
 	for layout: String in ["keyboard", "touch"]:
@@ -1680,7 +1685,9 @@ func _check_forcing() -> void:
 		note = actions.force_knockdown(kind)
 		_expect(game.get("fail_active") and str(game.get("status_line")) == expected and note == "Forced the %s knockdown." % kind, "forcing the %s knockdown plays it with its own card, even while invincible" % kind)
 		_expect(actions.force_knockdown(kind).contains("already"), "a second force waits for the first")
-	await create_timer(float(game.get_script().get_script_constant_map()["FAIL_CONTROLS_OFF_SECONDS"]) + float(game.get_script().get_script_constant_map()["FAIL_FADE_SECONDS"]) + 0.3).timeout
+	# RETRY on the knockdown card (Q17), pressed the way every suite presses it; the check below says
+	# whether the room came back.
+	await Suite.retry(game, 240)
 	_expect(not game.get("fail_active") and str(game.get("status_line")).contains(str(game.get_script().get_script_constant_map()["RESTORE_FROM_DISK_LINE"])) and (game.get("state") as M0State).chapter_id == "junction" and not (game.get("state") as M0State).door_blown, "the forced knockdown brings back the beat's checkpoint (junction save A)")
 	actions.set_invincible(false)
 	# The door fuse, the engineer clear of the blast.

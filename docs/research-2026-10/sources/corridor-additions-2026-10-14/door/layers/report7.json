@@ -1,0 +1,37 @@
+{
+ "blast_frame": {
+  "plate_px": 60305,
+  "bolt_px": 639
+ },
+ "sign": {
+  "plate_mean_luma": 48.6,
+  "letter_mean_luma": 11.0
+ },
+ "leaf_edge_parked": {
+  "px": 15972,
+  "yellow_mean_luma": 38.6
+ },
+ "wall_outside_new_masks_changed_px": 0,
+ "strap2": {
+  "px": 28,
+  "colour_from_round6_strap_srgb": [
+   31,
+   39,
+   45
+  ]
+ },
+ "leaf-front": {
+  "size": [
+   632,
+   512
+  ],
+  "mean_luma": 29.8
+ },
+ "leaf-edge": {
+  "size": [
+   38,
+   512
+  ],
+  "mean_luma": 32.4
+ }
+}
