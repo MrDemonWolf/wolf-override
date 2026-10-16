@@ -81,7 +81,11 @@ These are on top of the gates each PR names below:
 The **effort** column is an estimate in agent working days, including the gates. It is not measured.
 An agent day is about one working day of one Claude Code session doing the PR and its checks. It is not
 calendar time: the calendar also waits on Nathanial's answers, reviews, the shared heavy-run slot and
-other jobs, so no calendar range is given.
+other jobs. **A rough guide, as an estimate only:** Spanish (L9) needs about 20 agent days of PRs, so
+about 4 working weeks after his answers if one PR runs at a time and nothing waits, and later if the
+opening-dock work, reviews or the heavy slot hold it up. The event to watch for: Spanish can be in the
+first release about 13 to 15 PR days after the opening-dock work lands, if Phase 0 is done by then
+(Phase 1's 11 to 13 days plus L9's 1.5).
 
 ## Phase 0: foundation (can start now)
 

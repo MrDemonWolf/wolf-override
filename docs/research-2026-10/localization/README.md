@@ -41,7 +41,7 @@ build starts only after he answers [DECISIONS.md](DECISIONS.md).
   the opening-dock work to land. **Roughly when, as an estimate:** about 4 working weeks of agent PRs
   after his answers if one PR runs at a time and nothing waits; later if the dock work, reviews or the
   shared heavy-run slot hold it up. The event to watch for: Spanish can be in the first release about
-  20 PR days after the opening-dock work lands.
+  13 to 15 PR days after the opening-dock work lands, if the groundwork is done by then.
 - **Who checks it:** the automated checks and an independent AI back-translation on every line; then
   native-speaker volunteers on Weblate, and one paid proofreader per language before a paid release.
   By default (D8) Claude sets up the Weblate project in the implementation step, Nathanial posts one
@@ -122,6 +122,12 @@ in that session, not in this repository.
    rebuilt on per-line marks ("you" lines, the vocative, pronouns) and measured on a real Codex run; the
    name-case, BBCode, printf and sibling gates; `check` failing CI; the proofreading priced; the stills
    captioned; and the smaller facts corrected.
+9. **fix-3** (after a third round of three reviews): the gender gate widened to the commonest
+   feminine and masculine forms in each language (115 planted selftest cases) with its blind spots
+   listed; checks for the header's plural rule, a stray "fuzzy" comment and disagreeing marks; a
+   runtime guard so a translation with other inserts shows English; the plan rebased on the notes move
+   to Notion, the dock redo and the landed lighter steps; L2 extending the parity capture driver; a
+   default for who runs review; the Godot plural and fuzzy facts corrected; the reader's order fixes.
 
 **Heavy runs** (Godot imports, full test runs and renders) took one shared slot, so Nathanial's Mac
 stayed calm:
@@ -138,6 +144,7 @@ stayed calm:
 | `01a14409-6eb1-7db2-8ef1-f6f3714d953b` | prototype | 2 shortened buttons |
 | `01a14426-2248-7773-8edf-2c4cb6fa3ef8` | design | 34 Russian back-translations |
 | `01a146cf-4beb-7f42-8d61-726071ffb149` | fix-2 | 136 back-translations with roles and `engineer_gendered` |
+| (filled in at filing) | fix-3 | filed this write-up to Notion |
 
 No paid service, API key or new account was used.
 
@@ -218,3 +225,14 @@ path:
   copies and their script, the Codex working folder, the fetched pages (Quebec, ProZ, AUSIT) and the
   Godot source files read for the citations;
 - `<scratch>/i18n/repo`: the clone, after the last push.
+
+## Deleted by the fix-3 step
+
+The fix-3 step cloned this branch to `<work>/i18n/repo` (`<work>` is the
+`wolf-override-work` folder beside the repository), added a git worktree of `main` at 1cf8d73 with the
+prototype patch applied (`<work>/i18n/game`), and kept the Godot sources and outputs it read in
+`<work>/i18n/dl` and `<work>/i18n/scratch`. It took the heavy slot once, for a headless import of that
+worktree and one `check-game.sh --suite i18n_test` run with an isolated HOME (`<work>/i18n/home`), and
+freed it after. It ran no render and opened no window. Deleted by literal path after the last push:
+`<work>/i18n/game` (with its `.godot` import), `<work>/i18n/dl`, `<work>/i18n/scratch`,
+`<work>/i18n/home`, `<work>/i18n/repo` and the round-3 review file `<work>/i18n-review3.json`.
