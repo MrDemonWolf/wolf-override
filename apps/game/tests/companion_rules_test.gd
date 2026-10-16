@@ -270,11 +270,13 @@ func _check_engineer_only_route(game: Main, actions: DebugActions) -> void:
 	_require(await _walk_to(game.human, 830.0), "the engineer walks to the Records exit")
 	await _tap(&"interact")
 	_require(game.state.chapter_complete, "the first copy is secured")
+	# USE goes on from the closing shot, then walks them out through the open exit door; the junction
+	# begins once WOLF is through behind the engineer.
 	for _step: int in 4:
 		if game.state.chapter_id == "junction":
 			break
 		await _tap(&"interact")
-		await _frames(30)
+		await _wait_until(func() -> bool: return game.state.chapter_id == "junction", 120)
 	_require(game.state.chapter_id == "junction", "the Records exit leads into the junction")
 	_check_no_meter(game, "junction")
 	_require(await _wait_until(func() -> bool: return not game.wolf_scouting, 300), "WOLF reads the gauge")
@@ -305,12 +307,14 @@ func _check_engineer_only_route(game: Main, actions: DebugActions) -> void:
 	await _tap(&"interact")
 	_require(game.bolt_state == &"charging", "the engineer pops the bolt")
 	_require(await _wait_until(func() -> bool: return game.bolt_state == &"open" and game.junction_room.hatch_open >= 1.0, 240), "the bolt drops and the hatch opens")
+	# The way out is offered at the open door itself, behind WOLF waiting in its doorway.
+	_require(await _walk_to(game.human, JunctionRoom.HATCH_REACH_MAX_X + 4.0), "the engineer walks up to the open exit door")
 	for _step: int in 8:
 		if game.end_card_active:
 			break
 		await _tap(&"interact")
-		await _frames(90)
-	_require(game.state.junction_cleared and game.end_card_active, "the engineer leaves through the hatch to the END OF SLICE card")
+		await _wait_until(func() -> bool: return game.end_card_active, 240)
+	_require(game.state.junction_cleared and game.end_card_active, "the engineer leaves through the exit door to the END OF SLICE card")
 	_check_no_meter(game, "END OF SLICE card")
 
 

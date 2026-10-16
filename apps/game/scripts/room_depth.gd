@@ -79,16 +79,6 @@ const SETTLE_SECONDS: float = 1.2
 ## A near edge piece fades to this opacity while it covers an actor, at NEAR_FADE_SPEED per second.
 const NEAR_FADE_ALPHA: float = 0.35
 const NEAR_FADE_SPEED: float = 4.0
-## The pressure bulkheads (design A) shared by the corridor seal and the junction door: their import
-## copies share one canvas per door whose bottom row is the floor, drawn at this scale, and the front
-## pillar's outer edge sits this many canvas pixels in from the left, its column BULKHEAD_PILLAR_WIDTH
-## canvas pixels wide at body height.
-const BULKHEAD_SCALE: float = 0.3
-const BULKHEAD_PILLAR_X: float = 83.0
-const BULKHEAD_PILLAR_WIDTH: float = 76.0
-## A bulkhead's front pillar (see [member pillars]) fades to this opacity while it covers an actor,
-## keeping more of the doorway than a near edge piece does.
-const PILLAR_FADE_ALPHA: float = 0.5
 ## Regions per painted beacon in [member beacon_regions]: fixture, globe, guard, light.
 const BEACON_ART_PARTS: int = 4
 
@@ -156,6 +146,9 @@ const BEACON_ART_PARTS: int = 4
 ## Whether the near strip is mirrored on the room's right edge too. The corridor's right edge now
 ## opens into the machinery room past the seal, so its mirrored pipe column is not drawn there.
 @export var near_right_edge: bool = true
+## Whether the near strip is drawn on the room's left edge. Records closes both its ends with door
+## walls of its own, so neither pipe column is drawn there.
+@export var near_left_edge: bool = true
 ## Lamps (by index into [member lamps]) whose light is painted into the plate: their glow and shaft
 ## stay hidden. They keep their place in the flicker sequence, so the other lamps flicker as before.
 @export var painted_lamps: PackedInt32Array = PackedInt32Array()
@@ -179,9 +172,6 @@ var reduce_motion: bool = false:
 var lockdown_cleared: bool = false
 ## Sprites (the actors' bodies) the near edge pieces fade back from while they cover them.
 var occluders: Array[Sprite2D] = []
-## Bulkhead front lips (made with [method make_bulkhead]'s cut) drawn over the actors in this room;
-## each fades back to PILLAR_FADE_ALPHA while its pillar covers one of the [member occluders].
-var pillars: Array[Sprite2D] = []
 
 var backdrop_layer: Parallax2D
 var backdrop: Sprite2D
@@ -241,11 +231,6 @@ func _ready() -> void:
 func _process(delta: float) -> void:
 	if not is_visible_in_tree():
 		return
-	# The pillars fade whether or not the depth pass is on: they draw over the actors either way.
-	for pillar: Sprite2D in pillars:
-		if is_instance_valid(pillar):
-			var pillar_target: float = PILLAR_FADE_ALPHA if pillar_covers(pillar) else 1.0
-			pillar.modulate.a = move_toward(pillar.modulate.a, pillar_target, NEAR_FADE_SPEED * delta)
 	if near_layer == null or not near_layer.visible:
 		return
 	for edge_name: String in ["LeftEdge", "RightEdge"]:
@@ -266,21 +251,6 @@ func near_covers(edge: Sprite2D) -> bool:
 		if is_instance_valid(sprite) and sprite.is_visible_in_tree():
 			var body: Rect2 = sprite.get_global_transform_with_canvas() * sprite.get_rect()
 			if body.position.x < screen.end.x and body.end.x > screen.position.x:
-				return true
-	return false
-
-
-## True when [param pillar]'s front pillar column (BULKHEAD_PILLAR_X, BULKHEAD_PILLAR_WIDTH wide, floor
-## to header) overlaps any visible occluder's body on screen.
-func pillar_covers(pillar: Sprite2D) -> bool:
-	if not pillar.is_visible_in_tree():
-		return false
-	var cut: Rect2 = pillar.get_rect()
-	var local: Rect2 = Rect2(cut.position.x + BULKHEAD_PILLAR_X - pillar.region_rect.position.x, cut.position.y, BULKHEAD_PILLAR_WIDTH, cut.size.y)
-	var screen: Rect2 = pillar.get_global_transform_with_canvas() * local
-	for sprite: Sprite2D in occluders:
-		if is_instance_valid(sprite) and sprite.is_visible_in_tree():
-			if screen.intersects(sprite.get_global_transform_with_canvas() * sprite.get_rect()):
 				return true
 	return false
 
@@ -382,7 +352,8 @@ func rebuild() -> void:
 	near_layer = _add_parallax("Near", NEAR_SCROLL, Z_NEAR)
 	if near_painting != null:
 		var strip: Rect2 = Rect2(0.0, 0.0, minf(near_strip_width, near_painting.get_width()), near_painting.get_height())
-		near_layer.add_child(_plate("LeftEdge", near_painting, strip))
+		if near_left_edge:
+			near_layer.add_child(_plate("LeftEdge", near_painting, strip))
 		if near_right_edge:
 			near_layer.add_child(_plate("RightEdge", near_painting, strip, true))
 	near_dust = _make_dust("NearDust", NEAR_DUST_COUNT, 0.35, 0.65, Z_NEAR)
@@ -632,30 +603,59 @@ func _make_shaft() -> Sprite2D:
 	return shaft
 
 
-## A station prop cut to [param region] of its own image (its painted outline, so the floor
-## reflection mirrors from its real base), [param prop_scale]d, centred on [param center_x] with its
-## base on [param base_y].
-static func make_prop(prop_name: String, texture: Texture2D, region: Rect2, prop_scale: float, center_x: float, base_y: float = FLOOR_Y) -> Sprite2D:
+## A sprite showing [param region] of [param texture] (an atlas or a prop's own image), drawn at
+## [param piece_scale] (world px per source px) with its top-left corner at [param top_left] in its
+## parent's space, filtered with mipmaps like every painted plate. It is named [param piece_name] unless
+## that is empty, and is not added to any parent: node order is draw order, so the caller adds it where
+## it belongs. The one builder for an atlas cut: make_prop, the blast door's and the exit door's pieces
+## (JunctionRoom._door_piece, _exit_piece) and the corridor seal's sprites (Main._seal_sprite) use it, so
+## each must keep wanting exactly these settings; a caller that needs more (centred, z, flips) sets it
+## on the result.
+static func cut(texture: Texture2D, region: Rect2, piece_scale: float, piece_name: String = "", top_left: Vector2 = Vector2.ZERO) -> Sprite2D:
 	var sprite: Sprite2D = Sprite2D.new()
-	sprite.name = prop_name
+	if not piece_name.is_empty():
+		sprite.name = piece_name
 	sprite.texture = texture
 	sprite.texture_filter = CanvasItem.TEXTURE_FILTER_LINEAR_WITH_MIPMAPS
 	sprite.region_enabled = true
 	sprite.region_rect = region
-	sprite.scale = Vector2.ONE * prop_scale
-	sprite.position = Vector2(center_x, base_y - region.size.y * prop_scale * 0.5)
+	sprite.centered = false
+	sprite.scale = Vector2.ONE * piece_scale
+	sprite.position = top_left
 	return sprite
 
 
-## A bulkhead image (BULKHEAD_SCALE, its canvas bottom on the floor) placed so its front pillar's
-## outer edge is at [param face_x], the face of the door's collision body.
-static func make_bulkhead(prop_name: String, texture: Texture2D, region: Rect2, face_x: float) -> Sprite2D:
-	return make_prop(prop_name, texture, region, BULKHEAD_SCALE, bulkhead_center_x(region, face_x))
+## A door's collision: a StaticBody2D named [param body_name] at [param center] (world px, in
+## [param parent]'s space) on the doors' layer 2, colliding with nothing itself, holding a
+## CollisionShape2D with a [param size] (px) RectangleShape2D. The body is added to [param parent]
+## now (its place among the parent's children is kept, so callers call it where the body belongs) and
+## the shape starts disabled: the room turns it on while it is the room in play (refresh_state,
+## set_active). Returns the shape. Users: the blast door (JunctionRoom._build_door) and the swing doors
+## through SwingLeaf.make_body (the Records entry and exit, the junction entry).
+static func door_body(parent: Node, body_name: String, center: Vector2, size: Vector2) -> CollisionShape2D:
+	var body: StaticBody2D = StaticBody2D.new()
+	body.name = body_name
+	body.collision_layer = 2
+	body.collision_mask = 0
+	body.position = center
+	var shape: CollisionShape2D = CollisionShape2D.new()
+	var box: RectangleShape2D = RectangleShape2D.new()
+	box.size = size
+	shape.shape = box
+	shape.disabled = true
+	body.add_child(shape)
+	parent.add_child(body)
+	return shape
 
 
-## The centre x of a bulkhead drawn from [param region] with its front pillar's edge at [param face_x].
-static func bulkhead_center_x(region: Rect2, face_x: float) -> float:
-	return face_x + (region.get_center().x - BULKHEAD_PILLAR_X) * BULKHEAD_SCALE
+## A station prop cut to [param region] of its own image (its painted outline, so the floor
+## reflection mirrors from its real base), [param prop_scale]d, centred on [param center_x] with its
+## base on [param base_y].
+static func make_prop(prop_name: String, texture: Texture2D, region: Rect2, prop_scale: float, center_x: float, base_y: float = FLOOR_Y) -> Sprite2D:
+	var sprite: Sprite2D = cut(texture, region, prop_scale, prop_name)
+	sprite.centered = true
+	sprite.position = Vector2(center_x, base_y - region.size.y * prop_scale * 0.5)
+	return sprite
 
 
 ## An additive radial glow (the shared FxKit texture and blend); also used by rooms for their station

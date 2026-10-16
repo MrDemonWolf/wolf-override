@@ -21,6 +21,10 @@ const PLATE_BG: Color = Color(0.035, 0.06, 0.08, 0.8)
 const PLATE_EDGE: Color = Color(0.29, 0.4, 0.45, 0.55)
 ## Unpowered: a dark machine's status light.
 const BREAKER_IDLE: Color = Color("#d48954")
+## A door's status lamp: red while it is shut, green once it stands open, AMBER while it moves (the
+## corridor seal, both Records Access doors and the Service Junction's entry).
+const LAMP_SHUT: Color = Color(0.9, 0.2, 0.17)
+const LAMP_OPEN: Color = Color("#7dffa8")
 ## Drawn metal: frames and rails, the darker brackets, rods and housings, and their dim edges.
 const STEEL: Color = Color("#4a6572")
 const STEEL_DARK: Color = Color("#1b2630")

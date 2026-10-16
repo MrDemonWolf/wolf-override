@@ -68,11 +68,16 @@ func _run() -> void:
 		_fail("engineer can walk on from the mirror port")
 		return
 	_expect(str(game.call("_context_hint")) == "Mirror copied. Head for the exit.", "walking on after both copies the hint names only the exit, never a finished station (%s)" % game.call("_context_hint"))
+	var records: RecordsRoom = game.get("records_room") as RecordsRoom
+	await _walk_to(human, 905.0)
+	_expect(human.position.x <= RecordsRoom.EXIT_DOOR_X - State.HUMAN_HALF_WIDTH + 1.0 and is_equal_approx(records.exit_leaf.open, 0.0), "the shut exit stops the engineer at its leaf before the first copy is secured (x %.1f)" % human.position.x)
 	if not await _walk_to(human, 830.0):
 		_fail("engineer can reach the records exit")
 		return
 	await _tap(&"interact")
 	_expect(state.chapter_complete and game.call("_objective") == "FIRST COPY SECURED", "first chapter resolves after two traces")
+	_expect(records.exit_leaf.open < 0.25 and records.exit_lamp_color() == Palette.AMBER, "securing the copy starts the exit's leaf swinging on its hinges, its status lamp amber")
+	_expect(await _wait_until(func() -> bool: return absf(human.position.x - float(main_constants["RECORDS_CONTAINER_SIDE_X"])) <= 0.5 and human.body_sprite.flip_h, 60), "the engineer secures the copy at the security container's lock, facing it (x %.1f)" % human.position.x)
 	_expect(str(game.get("status_line")).contains("An order and a timestamp don't tell me who's a threat"), "WOLF names what was copied when he questions the Director's target labels")
 	# STORY-8: securing the first copy holds no closing shot; its lines run, one box at a time, while the
 	# engineer keeps control, and USE at the exit goes through them before it leaves.
@@ -87,6 +92,7 @@ func _run() -> void:
 	await create_timer(0.2, true).timeout
 	_expect(is_equal_approx(float(game.get("dialogue_age")), paused_age), "pause holds the box on screen")
 	(game.get_node("CanvasLayer/PauseOverlay") as PauseOverlay).resume_requested.emit()
+	_expect(records.exit_leaf.open > 0.0 and records.exit_leaf.open < 1.0 and records.exit_leaf.visible, "the exit's leaf is part way round its swing while the closing lines run, never faded or hidden")
 	await _tap(&"interact")
 	_expect(state.chapter_id == "records" and closing_speaker.text == "WOLF" and closing_story.text.contains("I want the source."), "USE at the exit shows WOLF's box rather than leaving")
 	await _tap(&"interact")
@@ -196,7 +202,7 @@ func _run() -> void:
 	_expect(game.get("status_line") == "WOLF: Copied." and hint_text.text == "Save failed. Use a station to try again.", "save failure shows in the system hint, not in WOLF's line")
 	human.position.x = 830.0
 	game.call("_refresh_ui")
-	_expect(hint_text.text.ends_with("secure the first copy."), "moving to another station brings back its interaction hint after a save failure")
+	_expect(hint_text.text.ends_with("secure the first copy in the container."), "moving to another station brings back its interaction hint after a save failure")
 	human.position.x = 190.0
 	game.call("_save_progress")
 	game.set("save_path", path)

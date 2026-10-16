@@ -1,0 +1,20 @@
+File: records-exit-fix-painted.png
+Original generated file: ~/.codex/generated_images/01a135b6-a273-7943-93da-90aeadbe758e/exec-af513d97-96be-45fa-8cce-b5fe23163e55.png
+SHA256: eef275558d7a8e78edf011704210171c622893aa0ad2eb1cb114944a5888afab
+Pixel size: 1024x1536
+Exact prompt:
+EDIT Image 1 only. Image 2 is a strict paint mask: WHITE may be painted, BLACK must remain pixel-for-pixel unchanged. Produce ONE 1024x1536 PNG, identical framing. This is a paint-over of a measured construction drawing, not a redesign. Every silhouette, edge, line, joint, object, perspective and position must remain exactly as drawn. Add ONLY realistic surface material and the already designed light. Preserve all output metadata and C2PA content credentials.
+
+Match exactly the gritty painted realism of Image 1's already finished left steel lattice column and wet floor, which must remain unchanged. Near-future hardened underground military records room, cool blue-grey, cast concrete and matte painted steel, used for years. Match the existing value plan and light falloff; dark areas remain dark. No new light.
+
+Paint these existing flat objects, without changing their geometry:
+1 Cross-wall (155,0)-(581,1284): dark cool structural grey reinforced board-formed concrete, mottled material, small blowholes, faint form-board lines, horizontal pour joint exactly as drawn. Existing darker damp band at foot with irregular top edge, darker seepage just below joint, leach streaks ONLY below two existing square penetration plates at far left (157,457)-(225,1068), scuffed boot-height band either side of door. No other drips or stains. Plates are matte 6 mm welded steel with edge weld bead.
+2 Existing wall equipment: fixed dome camera on short arm and vertical conduit (327,0)-(385,574); junction box, high-security switch on door header, slim vapour-tight LED over door and conduit (490,758)-(565,916), with only the existing downward door/floor light pool. Existing exit-sign assembly (388,0)-(539,668): wall plate, bracket, square projecting steel box housing, BLANK matte dark face, ceiling conduit. NO text.
+3 Existing almost edge-on secure door (484,899)-(626,1314): matte gunship grey #5B5E6A steel in its frame/header, three existing hinge knuckles left edge, existing closer-arm shoe near hinges, slight bottom paint wear. Existing threshold worn bright in middle, existing round floor stop.
+4 Near column (576,0)-(638,1320): cut wall end, dark grimy concrete, existing thin steel corner angles both edges, latch jamb left edge polished by hands only at hand height. Existing wire-guarded socket glass stays black hole; existing conduit and two straps; damp foot.
+5 Existing diagonal low concrete curb (592,1291)-(966,1442), dull steel top angle, damp floor meeting.
+6 Existing right service passage (640,0)-(966,1405): gritty concrete back wall, two existing painted steel pipes and cable tray on existing strut brackets, existing vapour-tight LED and its designed pool brightest near fixture then falling off. Dry dusty used concrete floor.
+7 Existing grey steel security container left of door: four drawers, existing top drawer round spin-dial lock housing, pulls and blank label holders, grey enamel slightly worn at pulls, soft existing contact shadow.
+
+Absolute prohibitions: no text, letters, numbers, logos, labels, signs with lettering, UI, watermarks, guides, borders. No added, removed, moved, resized, reshaped, rotated or invented parts. No even speckle/noise layer, rust spots, new rivets/bolts, greebles, glowing seams, sci-fi panels, edge rim lighting, haze or shafts. New surfaces must be as detailed, grimy and matte as the already painted room, never cleaner or smoother or CGI-rendered. Paint ONLY white mask regions and preserve ALL black mask pixels exactly.
+

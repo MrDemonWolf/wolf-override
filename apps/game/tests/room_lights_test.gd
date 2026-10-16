@@ -232,7 +232,8 @@ func _check_scene() -> void:
 	_expect(_beacons_settled(junction) and not settled_junction_pulsing, "the junction's beacons settle once the line is cleared")
 	game.call("_finish_chapter_close")
 	var card_up: bool = false
-	for _frame: int in 120:
+	# They walk out through the exit door first (WOLF from wherever he stands, then the engineer).
+	for _frame: int in 420:
 		await physics_frame
 		if game.get("end_card_active"):
 			card_up = true

@@ -37,7 +37,7 @@ const LENS_AHEAD: float = 10.22
 ## in the lane, as tall as the scanner: a sentry whose lens is left of this face sees no further right
 ## than it, and its beam stops there. Further right, at the far end of its patrol, the machine and its
 ## beam pass behind the box, which is drawn over them (JunctionRoom.PanelFront).
-const PANEL_FACE_X: float = 767.6
+const PANEL_FACE_X: float = 757.6
 ## The patrol turns where its front edge meets an engineer standing at the alcove's right end, so a
 ## patrolling sentry never runs into someone hiding there (675; the patrol still crosses the mark).
 const PATROL_MIN_X: float = COVER_MAX_X + CONTACT_RANGE

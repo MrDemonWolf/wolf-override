@@ -56,16 +56,18 @@ static func radial(size: int, offsets: Array[float], colors: Array[Color], fill:
 	return texture
 
 
-## A thin band of [param colors] at [param offsets], top to bottom (64x4 left to right when
-## [param horizontal]); it is stretched to size where it is drawn.
-static func linear(offsets: Array[float], colors: Array[Color], horizontal: bool = false) -> GradientTexture2D:
-	var key: Array = [&"linear", offsets, colors, horizontal]
+## A thin band of [param colors] at [param offsets], top to bottom (left to right when
+## [param horizontal]): [param length] px along the gradient by [param thickness] px across, 64x4 by
+## default, which is stretched to size where it is drawn. A particle draws its texture at its own size,
+## so the particle presets ask for the exact small sizes they need (FxPresets' 2x8 streak, 3x3 chip).
+static func linear(offsets: Array[float], colors: Array[Color], horizontal: bool = false, length: int = 64, thickness: int = 4) -> GradientTexture2D:
+	var key: Array = [&"linear", offsets, colors, horizontal, length, thickness]
 	var texture: GradientTexture2D = _find(key) as GradientTexture2D
 	if texture == null:
 		texture = GradientTexture2D.new()
 		texture.gradient = _new_ramp(offsets, colors)
-		texture.width = 64 if horizontal else 4
-		texture.height = 4 if horizontal else 64
+		texture.width = length if horizontal else thickness
+		texture.height = thickness if horizontal else length
 		texture.fill_from = Vector2(0.0, 0.0)
 		texture.fill_to = Vector2(1.0, 0.0) if horizontal else Vector2(0.0, 1.0)
 		_keep(key, texture)

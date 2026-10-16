@@ -1,0 +1,501 @@
+{
+ "canvas": {
+  "x0": 770.0,
+  "y0": 140.0,
+  "ppw": 4.0,
+  "w": 840,
+  "h": 1420
+ },
+ "door": {
+  "side": 1,
+  "x_cross": 880.0,
+  "turn_deg": 16.938,
+  "wall_m": 0.3,
+  "leaf_m": [
+   0.914,
+   2.134,
+   0.044
+  ],
+  "opening_m": [
+   0.92,
+   2.14
+  ],
+  "hinge_axis_screen_bottom_top": [
+   [
+    869.75,
+    436.41
+   ],
+   [
+    869.75,
+    352.02
+   ]
+  ],
+  "near_jamb_foot": [
+   890.06,
+   443.3
+  ],
+  "far_jamb_foot": [
+   870.17,
+   436.78
+  ],
+  "far_reveal_back_foot": [
+   880.61,
+   436.15
+  ],
+  "column_end_face_at_1m": [
+   893.62,
+   904.3
+  ],
+  "back_end_foot": [
+   792.68,
+   411.38
+  ],
+  "stub_far_a": -4.52,
+  "status_lamp_screen": [
+   901.665,
+   345.264
+  ]
+ },
+ "lamps": [
+  {
+   "name": "exit door light: vapour-tight LED 0.6 m on the cross-wall face over the door",
+   "pos_m": [
+    21.904,
+    2.8,
+    -0.029
+   ],
+   "screen": [
+    876.47,
+    328.13
+   ]
+  },
+  {
+   "name": "Records ceiling lamp 1 (far plate, painted)",
+   "pos_m": [
+    15.006,
+    5.576,
+    4.3
+   ],
+   "screen": [
+    588.4,
+    211.0
+   ]
+  },
+  {
+   "name": "service line passage light: vapour-tight LED on the passage back wall",
+   "pos_m": [
+    23.84,
+    3.362,
+    1.48
+   ],
+   "screen": [
+    936.0,
+    300.0
+   ]
+  },
+  {
+   "name": "floor bounce (wet floor in front, a fill)",
+   "pos_m": [
+    20.0,
+    0.1,
+    -3.0
+   ],
+   "screen": [
+    827.09,
+    459.79
+   ]
+  }
+ ],
+ "parts": [
+  {
+   "layer": "wall",
+   "name": "reveal_far",
+   "dims": "far (hinge) jamb reveal: the frame's steel throat lining the 300 mm wall",
+   "job": "the wall's thickness, steel-lined at the opening"
+  },
+  {
+   "layer": "wall",
+   "name": "stop_far",
+   "dims": "frame stop 16 mm (5/8 in)",
+   "job": "the leaf closes against it; carries the acoustic seal"
+  },
+  {
+   "layer": "wall",
+   "name": "threshold",
+   "dims": "steel threshold 0.38 m x 0.92 m",
+   "job": "metal threshold; the door bottom seal lands on it (acoustic, ICD 705 ch. 9)"
+  },
+  {
+   "layer": "wall",
+   "name": "face_back",
+   "dims": "cast reinforced-concrete cross-wall, 300 mm, from the hinge jamb to the room's back wall",
+   "job": "closes the Records room's end"
+  },
+  {
+   "layer": "wall",
+   "name": "face_head",
+   "dims": "the wall over the door",
+   "job": "carries the door light and the switch box"
+  },
+  {
+   "layer": "wall",
+   "name": "pour_joint",
+   "dims": "pour line between concrete lifts at 3.6 m",
+   "job": "construction joint"
+  },
+  {
+   "layer": "wall",
+   "name": "back_corner",
+   "dims": "internal corner with the room's back wall",
+   "job": "where the cross-wall meets the back wall"
+  },
+  {
+   "layer": "wall",
+   "name": "frame_far_jamb",
+   "dims": "hollow-metal frame, 2 in face",
+   "job": "hinge jamb; three anchors per jamb grout it into the wall"
+  },
+  {
+   "layer": "wall",
+   "name": "frame_head",
+   "dims": "header 120 mm with the concealed low-energy operator and closer",
+   "job": "opens the door on release (ANSI/BHMA A156.19) and closes it (non-hold closer inside, ICD 705 3E.3)"
+  },
+  {
+   "layer": "wall",
+   "name": "frame_head_seam",
+   "dims": "header access-panel joint",
+   "job": "the operator's removable cover"
+  },
+  {
+   "layer": "wall",
+   "name": "hinge0",
+   "dims": "4-1/2 in heavy-weight hinge knuckle (SDI 129-24 location)",
+   "job": "carries the leaf; on the room side (in-swing), pins inside the secure area (ICD 705 3E.5)"
+  },
+  {
+   "layer": "wall",
+   "name": "hinge1",
+   "dims": "4-1/2 in heavy-weight hinge knuckle (SDI 129-24 location)",
+   "job": "carries the leaf; on the room side (in-swing), pins inside the secure area (ICD 705 3E.5)"
+  },
+  {
+   "layer": "wall",
+   "name": "hinge2",
+   "dims": "4-1/2 in heavy-weight hinge knuckle (SDI 129-24 location)",
+   "job": "carries the leaf; on the room side (in-swing), pins inside the secure area (ICD 705 3E.5)"
+  },
+  {
+   "layer": "wall",
+   "name": "light_bracket",
+   "dims": "fixing bracket",
+   "job": "holds the fitting off the wall"
+  },
+  {
+   "layer": "wall",
+   "name": "light_body",
+   "dims": "vapour-tight LED fitting 0.6 m",
+   "job": "lights the door, its threshold and the floor in front"
+  },
+  {
+   "layer": "wall",
+   "name": "light_diffuser",
+   "dims": "opal diffuser (unlit paint; its light is in the surfaces)",
+   "job": "the fitting's lens"
+  },
+  {
+   "layer": "wall",
+   "name": "jb_box",
+   "dims": "junction box 170 x 180 mm, tamper switch inside",
+   "job": "terminates the light, switch and operator feeds"
+  },
+  {
+   "layer": "wall",
+   "name": "hss",
+   "dims": "high security switch 160 x 30 mm on the header, latch side",
+   "job": "alarms before the door opens 1-3/4 in (ICD 705 TS 7: HSS)"
+  },
+  {
+   "layer": "wall",
+   "name": "hss_flex",
+   "dims": "armoured flex 12 mm",
+   "job": "switch to box"
+  },
+  {
+   "layer": "wall",
+   "name": "light_feed",
+   "dims": "20 mm rigid conduit",
+   "job": "box to the light"
+  },
+  {
+   "layer": "wall",
+   "name": "conduit_up",
+   "dims": "20 mm rigid conduit to the ceiling tray",
+   "job": "the feed from the facility's power and alarm panels"
+  },
+  {
+   "layer": "wall",
+   "name": "conduit_strap",
+   "dims": "one-hole strap within 0.9 m of the box",
+   "job": "holds the conduit"
+  },
+  {
+   "layer": "wall",
+   "name": "cam_plate",
+   "dims": "wall plate 160 x 180 mm, two anchors",
+   "job": "fixes the camera arm"
+  },
+  {
+   "layer": "wall",
+   "name": "cam_arm",
+   "dims": "tubular arm 0.24 m",
+   "job": "holds the dome off the wall"
+  },
+  {
+   "layer": "wall",
+   "name": "cam_housing",
+   "dims": "vandal-resistant dome housing 170 mm",
+   "job": "watches the room; static art, no glow"
+  },
+  {
+   "layer": "wall",
+   "name": "cam_dome",
+   "dims": "smoked dome",
+   "job": "the lens cover"
+  },
+  {
+   "layer": "wall",
+   "name": "cam_conduit",
+   "dims": "20 mm conduit to the ceiling tray",
+   "job": "the camera's feed"
+  },
+  {
+   "layer": "wall",
+   "name": "floor_stop",
+   "dims": "dome floor stop 35 mm, anchored",
+   "job": "holds the leaf open at 90 degrees"
+  },
+  {
+   "layer": "front",
+   "name": "col_face",
+   "dims": "the wall's end beside the near jamb: 0.16 m of approach face",
+   "job": "carries the latch-side frame"
+  },
+  {
+   "layer": "front",
+   "name": "col_end",
+   "dims": "end face toward the camera, the wall's 300 mm",
+   "job": "the wall's end (cutaway); carries the status lamp"
+  },
+  {
+   "layer": "front",
+   "name": "arris_l",
+   "dims": "50 mm steel arris angle",
+   "job": "armours the room-side corner"
+  },
+  {
+   "layer": "front",
+   "name": "arris_r",
+   "dims": "50 mm steel arris angle",
+   "job": "armours the far corner"
+  },
+  {
+   "layer": "front",
+   "name": "arris_face",
+   "dims": "arris angle, face leg",
+   "job": "armours the corner"
+  },
+  {
+   "layer": "front",
+   "name": "frame_near_jamb",
+   "dims": "hollow-metal frame, 2 in face, latch jamb",
+   "job": "carries the strike and the electrified bolt"
+  },
+  {
+   "layer": "front",
+   "name": "lamp_base",
+   "dims": "cast lamp body on a conduit box",
+   "job": "carries the globe"
+  },
+  {
+   "layer": "front",
+   "name": "lamp_cap",
+   "dims": "guard cap",
+   "job": "tops the wire guard"
+  },
+  {
+   "layer": "front",
+   "name": "lamp_guard0",
+   "dims": "wire guard bar",
+   "job": "protects the globe"
+  },
+  {
+   "layer": "front",
+   "name": "lamp_guard1",
+   "dims": "wire guard bar",
+   "job": "protects the globe"
+  },
+  {
+   "layer": "front",
+   "name": "lamp_guard2",
+   "dims": "wire guard bar",
+   "job": "protects the globe"
+  },
+  {
+   "layer": "front",
+   "name": "lamp_conduit",
+   "dims": "20 mm conduit up the end face",
+   "job": "feeds the status lamp from the ceiling tray"
+  },
+  {
+   "layer": "front",
+   "name": "lamp_strap0",
+   "dims": "one-hole strap",
+   "job": "holds the conduit"
+  },
+  {
+   "layer": "front",
+   "name": "lamp_strap1",
+   "dims": "one-hole strap",
+   "job": "holds the conduit"
+  },
+  {
+   "layer": "front",
+   "name": "stub_face",
+   "dims": "the cross-wall's 0.15 m stub, room-side face",
+   "job": "the wall's line carried to the camera (cutaway), a curb between the room and the passage"
+  },
+  {
+   "layer": "front",
+   "name": "stub_top",
+   "dims": "stub top, the wall's 300 mm",
+   "job": "the cut section, seen from above"
+  },
+  {
+   "layer": "front",
+   "name": "stub_angle_top",
+   "dims": "50 mm steel edge angle, top leg",
+   "job": "armours the curb's room edge (carts)"
+  },
+  {
+   "layer": "front",
+   "name": "stub_angle_face",
+   "dims": "50 mm steel edge angle, face leg",
+   "job": "armours the curb's room edge"
+  },
+  {
+   "layer": "beyond",
+   "name": "back_wall",
+   "dims": "the passage's back wall, cast concrete",
+   "job": "the far side of the service line passage"
+  },
+  {
+   "layer": "beyond",
+   "name": "floor",
+   "dims": "the same slab, dry under the passage light",
+   "job": "the passage floor"
+  },
+  {
+   "layer": "beyond",
+   "name": "wall_base",
+   "dims": "damp line at the wall's foot",
+   "job": "water from mopping and condensation sits here"
+  },
+  {
+   "layer": "beyond",
+   "name": "pour_joint",
+   "dims": "pour line at 3.6 m (the same lifts as the cross-wall)",
+   "job": "construction joint"
+  },
+  {
+   "layer": "beyond",
+   "name": "pipe0",
+   "dims": "150 mm steel pipe, painted",
+   "job": "the service line toward Archive (chilled water supply and return)"
+  },
+  {
+   "layer": "beyond",
+   "name": "pipe1",
+   "dims": "100 mm steel pipe, painted",
+   "job": "the service line toward Archive (chilled water supply and return)"
+  },
+  {
+   "layer": "beyond",
+   "name": "tray_rail",
+   "dims": "cable ladder side rail 100 mm, 400 mm wide tray",
+   "job": "carries the data and power cables along the passage"
+  },
+  {
+   "layer": "beyond",
+   "name": "strut0",
+   "dims": "41 mm strut channel bracket, anchored",
+   "job": "holds the pipes and the tray off the wall"
+  },
+  {
+   "layer": "beyond",
+   "name": "clamp0_220",
+   "dims": "pipe clamp",
+   "job": "holds the pipe on the strut"
+  },
+  {
+   "layer": "beyond",
+   "name": "clamp0_248",
+   "dims": "pipe clamp",
+   "job": "holds the pipe on the strut"
+  },
+  {
+   "layer": "beyond",
+   "name": "strut1",
+   "dims": "41 mm strut channel bracket, anchored",
+   "job": "holds the pipes and the tray off the wall"
+  },
+  {
+   "layer": "beyond",
+   "name": "clamp1_220",
+   "dims": "pipe clamp",
+   "job": "holds the pipe on the strut"
+  },
+  {
+   "layer": "beyond",
+   "name": "clamp1_248",
+   "dims": "pipe clamp",
+   "job": "holds the pipe on the strut"
+  },
+  {
+   "layer": "beyond",
+   "name": "strut2",
+   "dims": "41 mm strut channel bracket, anchored",
+   "job": "holds the pipes and the tray off the wall"
+  },
+  {
+   "layer": "beyond",
+   "name": "clamp2_220",
+   "dims": "pipe clamp",
+   "job": "holds the pipe on the strut"
+  },
+  {
+   "layer": "beyond",
+   "name": "clamp2_248",
+   "dims": "pipe clamp",
+   "job": "holds the pipe on the strut"
+  },
+  {
+   "layer": "beyond",
+   "name": "light_body",
+   "dims": "vapour-tight LED fitting 0.6 m",
+   "job": "lights the passage"
+  },
+  {
+   "layer": "beyond",
+   "name": "light_diffuser",
+   "dims": "opal diffuser, lit",
+   "job": "the fitting's lens"
+  },
+  {
+   "layer": "beyond",
+   "name": "light_conduit",
+   "dims": "20 mm conduit",
+   "job": "feeds the fitting from the ceiling"
+  }
+ ]
+}

@@ -1,0 +1,374 @@
+{
+ "atlas": "res://assets/props/junction-door-atlas.png",
+ "atlas_size": [
+  1024,
+  768
+ ],
+ "import": "lossless (compress/mode=0), mipmaps on, filter linear with mipmaps: as corridor-seal-atlas.png",
+ "parent": "JunctionRoom (z 1); z below is relative to it (props are -1, actors 2 absolute = 1 relative)",
+ "draw_order": [
+  "DoorHole",
+  "DoorLeaf",
+  "DoorLeafBreaking",
+  "DoorWall",
+  "DoorCracks",
+  "DoorDamage",
+  "ReleaseBay",
+  "(Recesses, then ReleaseBay)",
+  "(props, room drawing, actors)",
+  "DoorLampLens",
+  "DoorColumn",
+  "DoorStub",
+  "DoorLeafDown"
+ ],
+ "pieces": [
+  {
+   "piece": "hole",
+   "node": "DoorHole",
+   "states": [
+    "blown"
+   ],
+   "z": -3,
+   "job": "the empty doorway: far jamb liner with torn bolt keepers, buckled threshold, back rubble (under the actors)",
+   "scale": 0.5,
+   "world_top_left": [
+    460.0,
+    332.0
+   ],
+   "world_size": [
+    81.0,
+    122.0
+   ],
+   "region": [
+    700,
+    2,
+    162,
+    244
+   ]
+  },
+  {
+   "piece": "leaf",
+   "node": "DoorLeaf",
+   "states": [
+    "sealed"
+   ],
+   "z": -3,
+   "job": "the shut leaf in the opening (under the wall, so the frame laps it)",
+   "scale": 0.25,
+   "world_top_left": [
+    467.0,
+    333.0
+   ],
+   "world_size": [
+    26.0,
+    119.0
+   ],
+   "region": [
+    196,
+    2,
+    104,
+    476
+   ]
+  },
+  {
+   "piece": "leafbreak",
+   "node": "DoorLeafBreaking",
+   "states": [
+    "breaking"
+   ],
+   "z": -3,
+   "job": "the leaf at the instant of failure, 0.15 s",
+   "scale": 0.25,
+   "world_top_left": [
+    465.0,
+    333.0
+   ],
+   "world_size": [
+    28.0,
+    119.0
+   ],
+   "region": [
+    302,
+    2,
+    112,
+    476
+   ]
+  },
+  {
+   "piece": "wall",
+   "node": "DoorWall",
+   "states": [
+    "sealed",
+    "breaking",
+    "blown"
+   ],
+   "z": -3,
+   "job": "the cross-wall behind the walk line, doorway at alpha 0",
+   "scale": 0.5,
+   "world_top_left": [
+    419.0,
+    136.0
+   ],
+   "world_size": [
+    75.0,
+    318.0
+   ],
+   "region": [
+    44,
+    2,
+    150,
+    636
+   ]
+  },
+  {
+   "piece": "cracks",
+   "node": "DoorCracks",
+   "states": [
+    "breaking"
+   ],
+   "z": -3,
+   "job": "cracks running from the frame, 0.15 s",
+   "scale": 0.5,
+   "world_top_left": [
+    457.0,
+    317.0
+   ],
+   "world_size": [
+    41.0,
+    105.0
+   ],
+   "region": [
+    864,
+    2,
+    82,
+    210
+   ]
+  },
+  {
+   "piece": "damage",
+   "node": "DoorDamage",
+   "states": [
+    "blown"
+   ],
+   "z": -3,
+   "job": "spall, exposed rebar, peeled latch flange, sagging head, soot",
+   "scale": 0.5,
+   "world_top_left": [
+    451.0,
+    272.0
+   ],
+   "world_size": [
+    43.0,
+    167.0
+   ],
+   "region": [
+    416,
+    2,
+    86,
+    334
+   ]
+  },
+  {
+   "piece": "alcove",
+   "node": "ReleaseBay",
+   "states": [
+    "sealed",
+    "breaking",
+    "blown"
+   ],
+   "z": -2,
+   "job": "the TANK RELEASE bay: recess, header, two posts on base plates, its fitting",
+   "scale": 0.5,
+   "world_top_left": [
+    537.0,
+    319.0
+   ],
+   "world_size": [
+    97.0,
+    129.0
+   ],
+   "region": [
+    504,
+    2,
+    194,
+    258
+   ]
+  },
+  {
+   "piece": "column",
+   "node": "DoorColumn",
+   "states": [
+    "sealed",
+    "breaking",
+    "blown"
+   ],
+   "z": 2,
+   "job": "the near column over the actors: frame flange, armoured end, status lamp socket, junction box, conduit",
+   "scale": 0.5,
+   "world_top_left": [
+    490.0,
+    136.0
+   ],
+   "world_size": [
+    20.0,
+    319.0
+   ],
+   "region": [
+    2,
+    2,
+    40,
+    638
+   ]
+  },
+  {
+   "piece": "stub",
+   "node": "DoorStub",
+   "states": [
+    "sealed",
+    "breaking",
+    "blown"
+   ],
+   "z": 2,
+   "job": "the wall's 0.15 m stub across the deck, over the actors",
+   "scale": 0.5,
+   "world_top_left": [
+    468.0,
+    446.0
+   ],
+   "world_size": [
+    127.0,
+    50.0
+   ],
+   "region": [
+    2,
+    642,
+    254,
+    100
+   ]
+  },
+  {
+   "piece": "lying",
+   "node": "DoorLeafDown",
+   "states": [
+    "blown"
+   ],
+   "z": 2,
+   "job": "the thrown leaf lying on the lane deck, the front rubble and the dust film (over the actors)",
+   "scale": 0.5,
+   "world_top_left": [
+    426.0,
+    439.0
+   ],
+   "world_size": [
+    233.0,
+    41.0
+   ],
+   "region": [
+    258,
+    642,
+    466,
+    82
+   ]
+  },
+  {
+   "piece": "lens",
+   "node": "DoorLampLens",
+   "states": [
+    "sealed",
+    "breaking",
+    "blown"
+   ],
+   "z": 2,
+   "scale": 0.25,
+   "job": "the status lamp's glass, tinted live: red shut, amber while the line builds, flashing through the fuse, dark once blown",
+   "world_top_left": [
+    500.924,
+    355.023
+   ],
+   "world_size": [
+    4.5,
+    5.5
+   ],
+   "region": [
+    726,
+    642,
+    18,
+    22
+   ]
+  }
+ ],
+ "lamp_glass_centre": [
+  503.174,
+  357.773
+ ],
+ "camera": {
+  "vp": [
+   511.0,
+   162.0
+  ],
+  "d0_m": 38.0,
+  "px_per_m": 40.0,
+  "floor_y": 440.0,
+  "vp2": [
+   46.29,
+   162.0
+  ],
+  "turn_deg": 17.0
+ },
+ "model": {
+  "origin_walkline": [
+   472.0,
+   440.0
+  ],
+  "a_far_jamb": 0.5751304660679315,
+  "a_near_jamb": -1.7248695339320683,
+  "a_wall_end": -1.9248695339320683,
+  "a_back": 5.5421663093818845,
+  "wall_t_m": 0.4,
+  "opening_m": [
+   2.3,
+   2.6
+  ],
+  "leaf_t_m": [
+   0.03,
+   0.33
+  ],
+  "frame_flange_m": 0.18
+ },
+ "screen": {
+  "far_jamb_foot": [
+   465.93,
+   436.03
+  ],
+  "near_jamb_foot": [
+   491.32,
+   452.61
+  ],
+  "opening_top": [
+   [
+    465.93,
+    333.52
+   ],
+   [
+    491.32,
+    343.9
+   ]
+  ],
+  "column_at_1m": [
+   493.11,
+   509.76
+  ],
+  "back_corner_x": 419.89,
+  "stub_line": [
+   [
+    493.67,
+    454.15
+   ],
+   [
+    555.0,
+    494.2
+   ]
+  ],
+  "charge_line_x": 453.51
+ }
+}

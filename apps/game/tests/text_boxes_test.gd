@@ -355,7 +355,11 @@ func _check_records_exit() -> void:
 	_place_at_records_exit()
 	game.call("_interact")
 	await process_frame
-	_expect(game.state.chapter_id == "junction", "with the lines read, USE at the exit goes on to the junction")
+	# The press walks them out through the open door (Main._leave_records); the junction starts once
+	# they are through, on the game's own frames, so this waits on the wall clock with a bound.
+	_expect(game.records_exit_walking, "with the lines read, USE at the exit walks out through the door")
+	await _wait_real(func() -> bool: return game.state.chapter_id == "junction", 15000)
+	_expect(game.state.chapter_id == "junction", "and the walk out goes on to the junction")
 
 
 ## The relay question with WOLF disclosed (DebugActions), on screen: one frame for the jump to land,

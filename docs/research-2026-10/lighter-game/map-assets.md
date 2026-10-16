@@ -12,6 +12,7 @@ Read-only analysis. Nothing under the repo or the wt-r3 worktree was touched. Me
 - **Blocked.**
   - The 7 door images (corridor and junction bulkheads) wait on the **game-ready shutter layers, which do not exist yet**.
   - The 2 hatch images (junction hatch, Records exit hatch) wait on **hatch art, which the HQ batch does not include**.
+  - **Update 2026-10-14:** both are done. The corridor's door end (2026-10-12) and the doors of Records Access and the Service Junction (2026-10-14, `../sources/doors-2026-10-14/`) replaced all 7 bulkhead images, their 7 masters, both hatch images and `scripts/prepare_bulkheads.py`, each deleted with its import and manifest entry.
 - **Memory, estimated.**
   - **Stations:** 15.4 MiB down to 8.6 MiB.
   - **Sentry:** 8.0 MiB down to 0.86 MiB. The old sentry is 1024x768 drawn at 0.07, which is 14 source px per world px, 3.5x over the bible.
@@ -48,14 +49,14 @@ Drawn world size = region × scale. Density = source px per world px (1/scale).
 | `props/junction-sentry-side-left.png` | 882,897 | 1024x768 (854x625) | c0 mip | 60x44 (0.07, **D 14.3**) | `sentry.gd:15,111` | `junction-sentry-side-left` | DELETE → `sentry-active` |
 | `props/junction-sentry-down.png` | 817,912 | 1024x768 (842x622) | c0 mip | 59x44 (0.07) | `sentry.gd:16,112` | `junction-sentry-down` | DELETE → `sentry-wreck` |
 | `props/corridor-bulkhead-sealed.png` | 333,471 | 384x648 (308x602) | c0 mip | 115x182 canvas (0.3, D 3.3) | `main.tscn:9` (Door/Visual/DoorArt L89); `main.gd:45,584`; `seal_leaf.gd` LEAF/DOORWAY rects | `corridor-bulkhead-sealed` | **DELETED 2026-10-12** with its import, manifest entry and master (the corridor door end, `../sources/corridor-door-end-2026-10-12/`) |
-| `props/corridor-bulkhead-open.png` | 347,459 | 384x648 (312x602) | c0 mip | same | `main.gd:46,580`; **also** `junction_room.gd:37,392` (the junction exit hatch's passage is a cut of this image) | `corridor-bulkhead-open` | DELETE after the shutter **and** the hatch passage land (2026-10-12: the corridor no longer uses it; kept for the junction hatch passage only) |
+| `props/corridor-bulkhead-open.png` | 347,459 | 384x648 (312x602) | c0 mip | same | `main.gd:46,580`; **also** `junction_room.gd:37,392` (the junction exit hatch's passage is a cut of this image) | `corridor-bulkhead-open` | **DELETED 2026-10-14** with its import and manifest entry (the doors landed: `../sources/doors-2026-10-14/`); the junction exit's passage is now its own piece of the exit door's atlas |
 | `props/corridor-bulkhead-front-lip.png` | 119,225 | 384x648 (115x601) | c0 mip | same | `main.gd:47,581` | `corridor-bulkhead-front-lip` | **DELETED 2026-10-12** with its import, manifest entry and master (the corridor door end) |
-| `props/junction-bulkhead-sealed.png` | 335,605 | 384x640 (307x599) | c0 mip | 115x181 (0.3) | `junction_room.gd:24,546` | `junction-bulkhead-sealed` | DELETE after the shutter lands |
-| `props/junction-bulkhead-breaking.png` | 354,752 | 384x640 | c0 mip | same | `junction_room.gd:25,547` | `junction-bulkhead-breaking` | DELETE after the shutter lands |
-| `props/junction-bulkhead-blown.png` | 362,949 | 384x640 | c0 mip | same | `junction_room.gd:26,548` | `junction-bulkhead-blown` | DELETE after the shutter lands |
-| `props/junction-bulkhead-front-lip.png` | 134,506 | 384x640 (126x593) | c0 mip | same | `junction_room.gd:27,553` | `junction-bulkhead-front-lip` | DELETE after the shutter lands |
-| `props/junction-hatch.png` | 595,185 | 512x768 (401x698) | c0 mip | 83x144 (0.206) | `junction_room.gd:34,421,422,429` (entry hatch, exit hatch, HatchDoorway leaf) | `junction-hatch` | DELETE after new hatch art exists (**round 3 is editing this hatch now**) |
-| `props/records-exit-hatch.png` | 253,361 | 512² (254x479) | c0 mip | 76x140 (0.291, D 3.4) | `records_room.gd:9,58` | `records-exit-hatch` | DELETE after new hatch art exists |
+| `props/junction-bulkhead-sealed.png` | 335,605 | 384x640 (307x599) | c0 mip | 115x181 (0.3) | `junction_room.gd:24,546` | `junction-bulkhead-sealed` | **DELETED 2026-10-14** with its import and manifest entry (the doors landed: `../sources/doors-2026-10-14/`) |
+| `props/junction-bulkhead-breaking.png` | 354,752 | 384x640 | c0 mip | same | `junction_room.gd:25,547` | `junction-bulkhead-breaking` | **DELETED 2026-10-14** with its import and manifest entry (the doors landed: `../sources/doors-2026-10-14/`) |
+| `props/junction-bulkhead-blown.png` | 362,949 | 384x640 | c0 mip | same | `junction_room.gd:26,548` | `junction-bulkhead-blown` | **DELETED 2026-10-14** with its import and manifest entry (the doors landed: `../sources/doors-2026-10-14/`) |
+| `props/junction-bulkhead-front-lip.png` | 134,506 | 384x640 (126x593) | c0 mip | same | `junction_room.gd:27,553` | `junction-bulkhead-front-lip` | **DELETED 2026-10-14** with its import and manifest entry (the doors landed: `../sources/doors-2026-10-14/`) |
+| `props/junction-hatch.png` | 595,185 | 512x768 (401x698) | c0 mip | 83x144 (0.206) | `junction_room.gd:34,421,422,429` (entry hatch, exit hatch, HatchDoorway leaf) | `junction-hatch` | **DELETED 2026-10-14** with its import and manifest entry (the doors landed: `../sources/doors-2026-10-14/`); the junction's entry and exit are now swing and sliding doors |
+| `props/records-exit-hatch.png` | 253,361 | 512² (254x479) | c0 mip | 76x140 (0.291, D 3.4) | `records_room.gd:9,58` | `records-exit-hatch` | **DELETED 2026-10-14** with its import and manifest entry (the doors landed: `../sources/doors-2026-10-14/`); the Records exit is now a swing door |
 
 ### 1b. Files to keep
 
@@ -93,7 +94,7 @@ None of these has a clear new replacement in the approved set.
 |---|---|---|---|
 | `apps/game/art-source/characters/{rowan-side-right,wolf-side-right,director-side-left}-provisional.png` | part of 11 MB | full-size masters of the 3 provisional sprites; `.gdignore` | `*-provisional-master` (3) |
 | `apps/game/art-source/doors/{corridor-sealed,corridor-open,corridor-front-lip,junction-sealed,junction-breaking,junction-blown,junction-front-lip}.png` | | door A masters | `door-a-*-master` (7) |
-| `scripts/prepare_bulkheads.py` (repo root) | | only builds bulkheads from `art-source/doors`; it goes away with them | — |
+| `scripts/prepare_bulkheads.py` (repo root) | | only built bulkheads from `art-source/doors`; **deleted 2026-10-14** with the last of them | — |
 | `apps/docs/app/images/{corridor-start,service-junction-entry,title-screen}-capture.png` | | marketing captures of the old art; re-render after the swap (bible: site captures), do not delete | `*-capture-*` (3) |
 | local `.godot/imported/` (8.6 MB, not committed) | | stale entries such as `maintenance-props-provisional`; a clean reimport clears them | — |
 
@@ -183,7 +184,7 @@ Then run `scripts/check-game.sh`, which reimports and fails on stray errors.
 | `art-source/characters/*.png` (3) | — | `*-provisional-master` (3) | comment at `room_depth_test.gd:124` |
 | overwritten in place (old pixels gone): `props/corridor-breaker`, `corridor-coolant-relay`, `corridor-purge-display`, `corridor-safe-point`, `records-purge-queue`, `records-mirror-port`, `junction-valve`, `junction-tank`, `junction-tank-arm`, `junction-arm-panel`, `junction-bolt-panel`, `junction-relief-vent` | reimported | rewrite all 12 entries (new source, SHA, modifications) | `main.tscn` region_rect and scale on PurgeTerminalArt (L169), BreakerArt (L178), RelayArt (L187) and CheckpointArt (L196); `junction_room.gd:47-85` (all `*_REGION`, `*_SCALE`, `*_LIGHT`, `VALVE_WHEEL_*`, `VALVE_DIAL_*`, `TANK_REGION`, `ARM_REGION`, `HATCH_*` stays), `:224-230` `WHEEL_MASK`, `:434-451` wheel cut, `:510-511` `vent_scale`, `:628` arm hang; `bypass_handle.gd:79-94`; `records_room.gd:12-24`; `main.gd:692` status glow; tests `junction_test.gd:445`, `follow_spacing_test.gd:211-212,270` |
 
-### Phase B: only after the game-ready shutter layers exist
+### Phase B: only after the game-ready shutter layers exist (done: corridor 2026-10-12, junction 2026-10-14)
 
 | delete | + .import | manifest | code / test references |
 |---|---|---|---|
@@ -194,7 +195,7 @@ Then run `scripts/check-game.sh`, which reimports and fails on stray errors.
 | `art-source/doors/*.png` (7) | — | `door-a-*-master` (7) | `scripts/prepare_bulkheads.py` (delete it) |
 | — | | | `room_depth.gd:74` `BULKHEAD_SCALE` 0.3, `make_bulkhead` / `bulkhead_center_x` (the registered-canvas assumption); tests `room_depth_test.gd:76-77`, `junction_test.gd:563-565`, `m0_scene_test.gd:222-237` (SealLeaf behaviour: keep it, re-pointed at the shutter leaf) |
 
-### Phase C: only after new hatch art exists
+### Phase C: only after new hatch art exists (done 2026-10-14: the doors replaced the hatches)
 
 | delete | + .import | manifest | code |
 |---|---|---|---|

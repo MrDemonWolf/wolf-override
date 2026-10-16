@@ -1,0 +1,20 @@
+Output file: records-exit-v2-painted.png
+Original generated file: ~/.codex/generated_images/01a13486-5993-7e52-b4dd-194f15b12d86/exec-88f57813-1985-43ee-96c4-bd95085c807d.png
+SHA256: 233d8a68f568a885cfda73951598f21caccda92db6ee4e33cef578c8ae1a540a
+Pixel size: 1024x1536
+Copy verification: cmp passed; byte-for-byte unchanged including all original metadata.
+Exact prompt:
+EDIT the first attached image only. Image 1 is the exact construction drawing/edit target. Image 2 is a same-frame paint permission map, NOT an image to reproduce: paint ONLY where it is WHITE; all pixels beneath BLACK must remain exactly unchanged. Produce ONE 1024x1536 PNG with identical canvas and framing. Retain all metadata including C2PA content credentials; do not strip credentials.
+
+This is a precise surface-material paint-over, not a redesign. Every silhouette, edge, line, joint, object, proportion and position is measured and must stay exactly where drawn at the same size. Do not add, remove, move, resize, reshape, rotate or invent any part. Preserve the already painted dark steel lattice column on the far left and wet concrete floor absolutely unchanged. Preserve the drawing's exact value plan and designed light pools and falloff; no overall brightening or darkening, no new light in dark areas.
+
+Paint the flat WHITE areas into grounded photographic realism: a quiet near-future hardened underground military records facility run by automated systems, matte cast concrete and painted steel, cool blue-grey illumination. Calm large surfaces, faint material variation only.
+1. Big middle cross-wall at a slight angle: matte board-formed reinforced concrete, neutral structural grey #7E7E87 family held dark in existing shadow, faint form-panel variation, preserve thin horizontal pour joint. Slight damp darkening only at its foot. Preserve and materialize exactly the small fixed dome camera on its short arm and upward conduit, junction box, conduit up and short run to the slim vapour-tight LED over the door. Keep the existing downward light pool exactly.
+2. Lower-centre nearly edge-on secure steel door: matte gunship grey #5B5E6A, exact steel frame/header, lever handle and three dark left-edge hinge knuckles. Slight use wear at lever and bottom edge. Exact steel floor threshold worn bright at centre.
+3. Narrow foreground vertical concrete cut-end to the right of door: matte concrete with the exact thin steel corner angles at both edges, existing wire-guarded lamp socket with round glass remaining a BLACK hole, conduit and two straps.
+4. Bottom-right diagonal low concrete curb with its exact steel angle on top.
+5. Far-right narrow service passage: concrete back wall, exactly existing two painted steel pipes and cable tray on strut brackets running right; existing vapour-tight LED with unchanged brightest area near fitting and unchanged falloff; dry concrete floor.
+6. Left of door, existing standing four-drawer security filing cabinet: matte grey steel powder coat, round spin-dial lock on top drawer, exact drawer pulls and blank label holders; slight wear at pulls and soft contact shadow.
+
+NO text, letters, numbers, logos, labels, signs, UI, watermarks, guide lines or borders. Blank label holders must stay blank. NO grunge speckle, drip streaks, rust spots, added rivets or bolts, greebles, glowing seams, sci-fi panels, rim light, haze or light shafts. Wear only where actual use and water would put it. Maintain the exact drawing, only add restrained realistic surfaces within WHITE.
+

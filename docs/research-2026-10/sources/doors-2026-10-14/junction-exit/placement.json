@@ -1,0 +1,72 @@
+{
+ "atlas": "assets/props/junction-exit-atlas.png",
+ "atlas_size": [
+  719,
+  643
+ ],
+ "source_px_per_world_px": 2,
+ "pieces": {
+  "front": {
+   "region": [
+    0,
+    0,
+    230,
+    643
+   ],
+   "world_top_left": [
+    917.0,
+    140.0
+   ]
+  },
+  "back": {
+   "region": [
+    232,
+    0,
+    268,
+    607
+   ],
+   "world_top_left": [
+    839.5,
+    140.0
+   ]
+  },
+  "leaf": {
+   "region": [
+    502,
+    0,
+    120,
+    236
+   ],
+   "world_top_left": null,
+   "anchor": [
+    106.85,
+    229.98
+   ],
+   "note": "placed each frame by JunctionRoom.exit_leaf_anchor(open): anchor = leading edge's bottom corner"
+  },
+  "beyond": {
+   "region": [
+    624,
+    0,
+    82,
+    208
+   ],
+   "world_top_left": [
+    932.5,
+    336.5
+   ]
+  },
+  "lens": {
+   "region": [
+    708,
+    0,
+    11,
+    13
+   ],
+   "world_top_left": [
+    909.0,
+    322.0
+   ]
+  }
+ }
+}

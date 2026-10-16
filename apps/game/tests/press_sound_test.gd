@@ -8,8 +8,9 @@ extends SceneTree
 
 const GAME_SCENE: PackedScene = preload("res://scenes/main.tscn")
 ## Game variables that are part of a press's outcome beyond the save: the closing shots, the walk out,
-## the lane answer, WOLF heading for the relay or refusing it, the bypass venting and the exit bolt.
-const STATE_VARS: Array[String] = ["chapter_close_active", "hatch_exit_walking", "lane_choice", "wolf_heading_to_relay", "relay_refused", "bypass_venting", "bolt_state"]
+## the lane answer, WOLF heading for the relay or refusing it, the bypass venting, the exit bolt and the
+## walk out through the Records exit door.
+const STATE_VARS: Array[String] = ["chapter_close_active", "hatch_exit_walking", "lane_choice", "wolf_heading_to_relay", "relay_refused", "bypass_venting", "bolt_state", "records_exit_walking"]
 ## How long, in seconds of real time, a scripted beat (WOLF walking to the relay, the crank, the
 ## seal) may take before the test gives up on it.
 const BEAT_SECONDS: float = 15.0
@@ -80,7 +81,7 @@ func _route_wolf_takes_relay() -> void:
 	_expect(await _until(func() -> bool: return human.controlled and not bool(game.get("seal_opening"))), "the seal opens and the engineer has control again")
 	await _safe_point()
 	await _records("wolf")
-	await _press(&"interact", "taking the Records exit into the junction", 830.0)
+	await _leave_records()
 	_expect((game.get("state") as M0State).chapter_id == "junction", "the Records exit leads into the Service Junction")
 	await _press(&"interact", "arming the junction's overload breaker", JunctionRoom.BREAKER_X)
 	await _lane_answer(1, "asking WOLF to draw the sentry")
@@ -114,7 +115,7 @@ func _route_bypass() -> void:
 	_expect(await _until(func() -> bool: return human.controlled and not bool(game.get("seal_opening"))), "the seal opens on the engineer's own work")
 	await _safe_point()
 	await _records("manual")
-	await _press(&"interact", "taking the Records exit into the junction", 830.0)
+	await _leave_records()
 	await _press(&"interact", "arming the junction's overload breaker", JunctionRoom.BREAKER_X)
 	await _lane_answer(1, "asking WOLF to draw the sentry after the relay")
 	_expect(started.has(&"growl_refusal"), "WOLF refusing to draw the sentry growls (heard %s)" % [started])
@@ -131,11 +132,21 @@ func _junction_exit() -> void:
 	await _frames(2)
 	await _press(&"interact", "popping the exit bolt", JunctionRoom.BOLT_X)
 	_expect(await _until(func() -> bool: return float((game.get("junction_room") as JunctionRoom).hatch_open) >= 1.0), "the bolt arcs and the hatch slides open")
-	await _press(&"interact", "leaving through the open hatch", JunctionRoom.BOLT_X)
+	# USE at the bolt panel does nothing once the door is open: the engineer walks up to the doorway.
+	await _press(&"interact", "using the bolt panel once the door is open", JunctionRoom.BOLT_X, false)
+	_expect(not state.junction_cleared, "the bolt panel does not take the engineer out through the door")
+	await _press(&"interact", "leaving through the open exit door", (JunctionRoom.HATCH_REACH_MIN_X + JunctionRoom.HATCH_REACH_MAX_X) * 0.5)
 	_expect(state.junction_cleared and bool(game.get("chapter_close_active")), "the hatch clears the service line and starts the closing shot")
 	await _read_on()
 	await _press(&"interact", "continuing from the junction's closing shot")
 	_expect(bool(game.get("hatch_exit_walking")), "continue starts the walk out through the hatch")
+
+
+## USE at the open Records exit: the engineer walks out through the doorway (the press is heard on its
+## frame) and the Service Junction begins once they are through.
+func _leave_records() -> void:
+	await _press(&"interact", "walking out through the Records exit", 830.0)
+	_expect(await _until(func() -> bool: return (game.get("state") as M0State).chapter_id == "junction" and human.controlled), "the walk through the Records exit ends in the Service Junction")
 
 
 ## At the breaker: USE until WOLF asks about the relay (the stakes line may come first).

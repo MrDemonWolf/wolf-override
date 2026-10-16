@@ -1,0 +1,21 @@
+File: records-parts-v2-painted.png
+Original generated file: ~/.codex/generated_images/01a13486-59a0-7ad2-8fd3-7c50df48e12b/exec-b52c90a0-68cc-4780-b166-4d396e564883.png
+SHA256: 86e90b34078e4309b2c8a7e628a159346bf778a12af0600e8ad0bb82b0086d67
+Pixel size: 1254x1254
+Copy verification: cmp passed; original bytes and all metadata preserved.
+Limitation: Tool returned 1254x1254 despite requested 1024x1024. No resizing or other modification performed. Exact mask/background/geometry preservation has not been verified.
+
+Exact prompt:
+EDIT the first attached image, using the second attached image ONLY as the exact paint-area map. Produce ONE 1024x1024 image with identical framing. This is a precise construction-drawing paint-over for a game parts sheet, not a redesign. WHITE on image 2 permits material paint; BLACK forbids changes: preserve the plain grey ground of image 1 exactly. Preserve every silhouette, edge, line, joint, position, size, handle shape and perspective exactly. Do not add, remove, move, resize, reshape or rotate any part.
+
+Apply grounded realistic matte painted-steel surfaces for a near-future hardened automated military underground facility. Keep the source value plan and light falloff exactly. All three door faces and the thin edge strip are perfectly flat, straight-on, evenly neutrally lit and shadowless: no directional light, gradient or vignette. The cabinet alone retains precisely its existing drawn shading and soft floor shadow.
+
+Left to right:
+1. Plain steel door inner face, matte gunship-grey paint (#5B5E6A), existing steel lever and small deadbolt thumbturn above near right edge. Very slight polished hand wear around lever and faint bottom-edge scuffs, otherwise calm even paint.
+2. Same painted outer door face, existing steel lever and key cylinder in rose; existing bottom kick plate becomes brushed steel with restrained boot/cart scuffs; existing very-bottom strip becomes black rubber door-bottom seal.
+3. Same as 2, retaining existing dark steel combination-lock housing above lever, round plain spin dial with NO numbers or marks, and small blank dark display window above it.
+4. Existing thin vertical door edge strip, painted steel and existing brushed steel lock face plate at handle height.
+5. Existing four-drawer security filing cabinet at right, exact front/left-side/top perspective and recessed base. Grey steel with matte light-grey powder-coat material while preserving the source's dark/mid/light value relationships and overall brightness exactly; existing recessed pulls, blank label holders, round spin-dial lock on top drawer. Slight use wear at pulls and base. Preserve the exact source lighting and shadow.
+
+Large surfaces remain quiet and smooth. Wear only where hands, boots and carts touch. NO grunge speckle, drip streaks, rust spots, invented rivets/bolts, greebles, glowing seams, sci-fi panels, edge rim lights, haze or light shafts. Add NO text, letters, numbers, logos, labels, signs, UI, watermarks, guide lines or borders. Do not brighten or darken whole regions or add lighting in dark areas. Output must retain C2PA content credentials and all original generated metadata.
+

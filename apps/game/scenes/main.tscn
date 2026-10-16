@@ -25,7 +25,7 @@
 [ext_resource type="Texture2D" path="res://assets/props/corridor-beacons.png" id="23_beacons"]
 
 [sub_resource type="RectangleShape2D" id="FloorShape"]
-size = Vector2(960, 60)
+size = Vector2(1200, 60)
 
 [sub_resource type="RectangleShape2D" id="DoorShape"]
 size = Vector2(56, 132)
@@ -74,7 +74,7 @@ painted_lamps = PackedInt32Array(2)
 position = Vector2(480, 270)
 
 [node name="Floor" type="StaticBody2D" parent="."]
-position = Vector2(480, 470)
+position = Vector2(600, 470)
 collision_layer = 2
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Floor"]

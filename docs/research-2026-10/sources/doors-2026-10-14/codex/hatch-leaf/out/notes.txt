@@ -1,0 +1,14 @@
+File: hatch-leaf-painted.png
+Original generated file: ~/.codex/generated_images/01a13425-e4a3-7aa0-ae2f-c035b413d7c7/exec-cc452682-0117-4042-b9c2-d3382d60d88e.png
+SHA256: a62ceb5e024476873ac2ef7cf3fc842ced90ba201e0aa5569afee17ca5e2e8c4
+Pixel size: 1254x1254
+Copy verification: cmp passed; original bytes and all metadata preserved.
+Limitation: Built-in editor returned 1254x1254 despite the requested 1024x1024. Output was not resized or otherwise modified. Exact pixel geometry and protected-background fidelity have not been verified.
+Exact prompt:
+Use case: sketch-to-render, precise paint-over EDIT.
+Image 1 is the EDIT TARGET: one sliding steel door leaf on solid #FF00FF. Image 2 is ONLY the paint-area map: WHITE is editable, BLACK is protected. Return ONE 1024x1024 image, identical framing.
+Paint realistic surface material ONLY onto the white-map leaf pixels of Image 1. Preserve the #FF00FF background exactly. This is a measured construction drawing: every silhouette, edge, line, joint, perspective, position and dimension must remain exactly as drawn. Do not add, remove, move, resize, reshape or rotate anything.
+The leaf is heavy welded steel plate painted matte gunship grey (#5B5E6A), appearing under the existing dark lighting. Plain calm steel skin, narrow flat perimeter band, exactly the two drawn horizontal weld seams. Keep all drawn lines exactly. Preserve the thin visible top edge. Preserve the narrow right leading edge's existing diagonal yellow/black caught-between stripes exactly, with the black rubber seal down its middle.
+Keep the existing value plan and illumination exactly: upper face dark in door-head shadow; lower face softly lit by the existing wall pack above the doorway, with exactly the drawn falloff. Do not brighten or darken whole areas or add illumination to dark areas. Add restrained realistic matte painted-steel surface response without noisy texture. Grounded near-future hardened automated underground military facility, photographed once.
+Wear is minimal and localized: paint rubbed thin along bottom edge at kick height and on leading-edge stripes at hand height, about 40 percent up from bottom. No dents, rust, grunge speckle, drip streaks, rivets, bolts, greebles, new panels, glowing seams, rim lights, haze, light shafts, text, letters, numbers, logos, labels, signs, UI, watermarks, guide lines or borders. Do not render the mask. Preserve all output metadata including C2PA content credentials; do not strip metadata.
+

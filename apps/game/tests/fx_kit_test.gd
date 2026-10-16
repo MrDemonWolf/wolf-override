@@ -1,6 +1,7 @@
 extends SceneTree
-## FxKit: the rooms' glows, shafts, haze, shadows, recess and hatch light and particle textures share
-## one resource per distinct gradient, ramp and blend while Main is up; nothing writes to a shared
+## FxKit: the rooms' glows, shafts, haze, shadows and particle textures and ramps (the blast door's
+## streaks, chips and dust jets among them) share one resource per distinct gradient, ramp and blend
+## while Main is up; nothing writes to a shared
 ## resource after it is made (the game plays through effects and motion switches, bursts, the blast
 ## and a scene sync, and every one still matches what it was made as); and the kit lets go of all of
 ## it when Main leaves. Without a kit every call makes a fresh resource, as before.
@@ -46,12 +47,17 @@ func _check_scene() -> void:
 	var junction: JunctionRoom = game.get("junction_room") as JunctionRoom
 	var corridor: RoomDepth = game.get_node("CorridorDepth") as RoomDepth
 	# Every glow in the game draws the one glow texture with the one additive blend.
-	var glows: Array[Sprite2D] = [corridor.lamp_glows[0], records.purge_glow, records.mirror_glow, junction.breaker_glow, junction.vent_glow, junction.seam_glow, junction.sentry.visual.lens_glow, game.get("seal_lamp_glow") as Sprite2D, game.get("breaker_status_glow") as Sprite2D]
+	var glows: Array[Sprite2D] = [corridor.lamp_glows[0], records.purge_glow, records.mirror_glow, junction.breaker_glow, junction.vent_glow, junction.door_lamp_glow, junction.sentry.visual.lens_glow, game.get("seal_lamp_glow") as Sprite2D, game.get("breaker_status_glow") as Sprite2D]
 	var glow_texture: GradientTexture2D = _glow_texture()
 	for glow: Sprite2D in glows:
 		_expect(glow.texture == glow_texture and glow.material == FxKit.additive(), "%s shares the kit's glow texture and additive blend" % glow.name)
 	_expect(junction.vent_steam.texture == junction.coolant_cloud.texture and junction.vent_steam.color_ramp == (game.get("relay_sparks") as CPUParticles2D).color_ramp, "particles of one preset share their dot texture, and every preset its fade ramp")
-	_expect(junction.alcove_shadow == JunctionRoom.soft_texture(GradientTexture2D.FILL_SQUARE) and junction.hatch_doorway.light == JunctionRoom.soft_texture(GradientTexture2D.FILL_RADIAL), "the junction's recess shadow and hatch light come from the kit")
+	# The doors' particles: both streak showers (the blast's and the bolt's) share one streak texture and
+	# ramp, the blast's dust jet and the landing's share the presets' dot texture, and the thrown chips'
+	# texture and ramp are the kit's too.
+	_expect(junction.blast_sparks.texture == junction.bolt_sparks.texture and junction.blast_sparks.color_ramp == junction.bolt_sparks.color_ramp, "the blast's and the bolt's streaks share one texture and ramp")
+	_expect(junction.landing_dust.texture == junction.vent_steam.texture and junction.landing_dust.color_ramp == junction.vent_steam.color_ramp, "the dust jets share the presets' dot texture and fade ramp")
+	_expect(kit._cache.values().has(junction.blast_debris.texture) and kit._cache.values().has(junction.blast_debris.color_ramp), "the thrown chips' texture and ramp come from the kit")
 	# Everything generated on screen is one of the kit's: count the distinct ones.
 	var shared: Array[Resource] = []
 	var stray: Array[String] = []

@@ -134,12 +134,10 @@ const CORRIDOR_SEAL_FRONT_SCALE: float = 0.5
 ## Where the shut curtain's art ends at the bottom (its near-jamb corner, in front of the walk line).
 const CORRIDOR_SEAL_FOOT_Y: float = 311.25 + 581.0 * 0.25
 ## The guarded status lamp on the near column's end: its socket and guard are painted, its glass is
-## this live lens (red while shut, amber while the curtain moves, green open), as on the approved
+## this live lens (red while shut, amber while the curtain moves, green open: Palette.LAMP_SHUT,
+## Palette.AMBER and Palette.LAMP_OPEN, as every door's status lamp), as on the approved
 ## door concept; the lines that call it "the red seal" point at it.
 const CORRIDOR_SEAL_LAMP: Vector2 = Vector2(807.908, 344.759)
-const SEAL_LAMP_SHUT: Color = Color(0.9, 0.2, 0.17)
-const SEAL_LAMP_MOVING: Color = Palette.AMBER
-const SEAL_LAMP_OPEN: Color = Color("#7dffa8")
 ## The seal's rolling curtain winds up into its hood over this long, uncovering the open doorway.
 ## WOLF holds the contact and the doorway stays shut until it lands.
 const CORRIDOR_DOOR_OPEN_SECONDS: float = 1.0
@@ -177,9 +175,11 @@ const BYPASS_OFFER_HINT: String = "HOLD E: crank it yourself, or let WOLF take t
 ## Part-cranked on the honest route: the turns so far, and that WOLF can still take the relay instead.
 const BYPASS_HOLD_OFFER_HINT: String = "HOLD E: crank on, %d of %d, or let WOLF take the relay."
 const BOLT_ARC_LINE: String = "The bolt arcs and drops."
-const HATCH_OPENED_LINE: String = "The bolt arcs and drops. The hatch slides open."
-## The hint while the hatch is still sliding, like the corridor's SEAL_OPENING_HINT.
-const HATCH_OPENING_HINT: String = "The hatch is opening."
+## The junction's exit is drawn as a sliding door, so its lines say "door" (Nathanial, 2026-10-14,
+## "Say door"; code names keep "hatch").
+const HATCH_OPENED_LINE: String = "The bolt arcs and drops.\nThe door slides open."
+## The hint while the exit door is still sliding, like the corridor's SEAL_OPENING_HINT.
+const HATCH_OPENING_HINT: String = "The door is opening."
 const SAVE_FAILED_HINT: String = "Save failed. Use a station to try again."
 const NO_CHECKPOINT_NOTE: String = "No checkpoint yet. Saving starts at the first SAFE POINT."
 const UNREADABLE_CHECKPOINT_NOTE: String = "Saved checkpoint could not be read."
@@ -201,14 +201,24 @@ const INTRO_LINES: Array[String] = [
 	"DIRECTOR: Lock down maintenance. WOLF does not leave this site.",
 	"WOLF turns from the Director and heads for maintenance.",
 ]
-## Leaving the cleared junction, WOLF goes first: his spot (JunctionRoom.WOLF_DOWN_X) already stands
-## him in the open hatch's doorway (centred on JunctionRoom.HATCH_X), so he fades out there, without a
-## step that would put his snout over the bolt box; only then does the engineer walk into the doorway
-## and fade, so the two are never drawn over each other there. Then the END OF SLICE card.
-const HATCH_EXIT_X: float = JunctionRoom.HATCH_X + 6.0
-const WOLF_HATCH_EXIT_X: float = JunctionRoom.WOLF_DOWN_X
-const HATCH_EXIT_FADE_DELAY: float = 0.3
-const HATCH_EXIT_FADE_SECONDS: float = 0.5
+## Leaving the cleared junction, WOLF goes first: once the exit door is open he waits in its doorway
+## (JunctionRoom.WOLF_DOORWAY_X), facing on down the passage, and walks on through it until his whole
+## drawn body is behind the near jamb (JunctionRoom.WOLF_GONE_X); only then does the engineer walk
+## through after him until they are behind it too (JunctionRoom.HUMAN_GONE_X), so the two are never
+## drawn over each other in the doorway. Nobody fades: the wall in front of the walk line hides them.
+## The END OF SLICE card comes up once the doorway has stood empty for HATCH_EXIT_EMPTY_SECONDS.
+const HATCH_EXIT_X: float = JunctionRoom.HUMAN_GONE_X
+## WOLF walks on down the passage past the point where the jamb hides him (JunctionRoom.WOLF_GONE_X,
+## which the engineer waits for), so the engineer coming through behind him never stands in him.
+const WOLF_HATCH_EXIT_X: float = JunctionRoom.EXIT_WALK_MAX_X
+## How long (seconds) the walk-out waits, with the exit door standing open, before WOLF sets off
+## through it, so the open doorway is seen before anyone moves.
+const HATCH_EXIT_START_DELAY: float = 0.3
+const HATCH_EXIT_EMPTY_SECONDS: float = 0.4
+## The most either walk is waited for (both take well under a second at HATCH_EXIT_SPEED_SCALE).
+const HATCH_EXIT_MAX_SECONDS: float = 3.0
+## Walking out they go at a walk, not the follow run, so the leaving is seen.
+const HATCH_EXIT_SPEED_SCALE: float = 0.55
 ## With WOLF holding the far end of the junction's lane, the sentry's body turns this far short of his
 ## drawn body (SentryBrain.far_x).
 const WOLF_SENTRY_GAP: float = 4.0
@@ -261,9 +271,11 @@ const BAIT_NO_LINE: String = "WOLF: At the relay you'd have sent me in blind. I 
 ## "I'll hold back." is Draft A, approved 2026-10-14: he waits by the valve, short of the rubble).
 const ALONE_LINES: Array[String] = ["WOLF: I'll hold back.\nIt crosses the mark on every pass.", "WOLF: The tank takes a moment to fall."]
 ## A hit on the mark, and one that catches the sentry more than OFF_CENTRE_HIT off it (the tank lands on
-## the mark and pins the machine where it stands, so the wreck shows to one side under it).
-const TANK_HIT_LINE: String = "The tank comes down square and crushes the sentry flat. Its eyes go dark.\nWOLF: It's down. The bolt by the hatch is next."
-const TANK_HIT_OFF_CENTRE_LINE: String = "The tank catches the sentry off centre and pins it to the floor. Its eyes go dark.\nWOLF: It's down. The bolt by the hatch is next."
+## the mark and pins the machine where it stands, so the wreck shows to one side under it). Either is
+## the narration's box, then WOLF's own (TANK_HIT_WOLF_LINE): one speaker a box.
+const TANK_HIT_LINE: String = "The tank comes down square and crushes\nthe sentry flat. Its eyes go dark."
+const TANK_HIT_OFF_CENTRE_LINE: String = "The tank catches the sentry off centre and\npins it to the floor. Its eyes go dark."
+const TANK_HIT_WOLF_LINE: String = "WOLF: It's down. The bolt by the door is next."
 const OFF_CENTRE_HIT: float = 8.0
 const POP_BOLT_LINE: String = "With the tank down, the winch's power reroutes to the exit bolt. The panel whines."
 const BOLT_CHARGING_LINE: String = "The bolt is taking the charge."
@@ -273,9 +285,24 @@ const BOLT_CHARGING_LINE: String = "The bolt is taking the charge."
 ## the engineer out to its side, facing it, still within reach, and so does stopping there
 ## (_update_settle). The mirror port's right is WOLF's (WOLF_MIRROR_X). The coolant relay is worked
 ## from its right, towards the MANUAL BYPASS, clear of where WOLF stands off it (WOLF_BYPASS_CLEAR_X)
-## and of his contact (RELAY_SIDE_X).
+## and of his contact (RELAY_SIDE_X). The Records security container, where the first copy is
+## secured, is worked from its right, where its lock is, towards the exit (RECORDS_CONTAINER_SIDE_X).
 const CORRIDOR_STATIONS: Array[Vector4] = [Vector4(350.0, 38.0, 52.0, 0.0), Vector4(RELAY_X, 43.0, RELAY_REACH, 1.0), Vector4(876.0, 35.0, 52.0, 0.0)]
-const RECORDS_STATIONS: Array[Vector4] = [Vector4(190.0, 56.0, 58.0, 0.0), Vector4(520.0, 45.0, 58.0, -1.0), Vector4(830.0, 38.0, 58.0, 0.0)]
+const RECORDS_STATIONS: Array[Vector4] = [Vector4(190.0, 56.0, 58.0, 0.0), Vector4(520.0, 45.0, 58.0, -1.0), Vector4(RecordsRoom.CONTAINER_X, 10.0, 58.0, 1.0)]
+## The Records exit's USE reaches this far either side of x 830 (the security container and the exit
+## door both stand inside it; once the exit is open it also reaches on through the doorway).
+const RECORDS_EXIT_X: float = 830.0
+const RECORDS_EXIT_REACH: float = 58.0
+## Securing the first copy, the engineer stands at the container's right, their front hand on its lock.
+const RECORDS_CONTAINER_SIDE_X: float = RecordsRoom.CONTAINER_X + 21.0
+## Leaving Records, the engineer walks through the open exit and on down the service line passage out
+## of view, and WOLF follows them through it (review r1: nobody is left behind by the cabinet); the
+## junction begins once his whole drawn body is past the doorway's near column (RecordsRoom's exit
+## column, its right edge at x 908.5), or after RECORDS_WAIT_SECONDS at most.
+const RECORDS_WALK_OUT_X: float = 1000.0
+const RECORDS_WOLF_OUT_X: float = 980.0
+const RECORDS_WALK_MAX_X: float = 1040.0
+const RECORDS_WAIT_SECONDS: float = 3.0
 ## The junction's machines. The overload breaker is worked from its right, towards the valve: its left
 ## is where WOLF waits while the line builds (JunctionRoom.WOLF_CLEAR_X), and the spot stays just off
 ## the relief vent (PressureLine.VENT_MIN_X). The valve's body here is its wheel, which the engineer
@@ -407,7 +434,7 @@ const REFUSE_BREAKER_LIVE: String = "Already live. Crank the valve by the door."
 const REFUSE_FUSE_LIT: String = "Fuse lit. Get clear of the door."
 const REFUSE_SPENT: String = "No charge left. The door is down."
 const REFUSE_REWINDING: String = "Not yet. The tank is still going back up."
-const REFUSE_RELEASE_SPENT: String = "The tank is down on the sentry.\nThe exit bolt is by the hatch."
+const REFUSE_RELEASE_SPENT: String = "The tank is down on the sentry.\nThe exit bolt is by the door."
 const REFUSE_EXIT_SENTRY: String = "Locked out until the sentry is down."
 ## Only a hand-made save can press the exit before the door is down: the sealed door blocks the way.
 const REFUSE_EXIT_DOOR: String = "Bolted. The sealed door comes first."
@@ -600,12 +627,15 @@ var servo_tween: Tween
 ## WOLF's body sprite at rest, as the scene sets it; ducking under the junction's hung tank squashes it
 ## for a moment (_sync_wolf_leap).
 var wolf_sprite_scale: Vector2 = Vector2.ONE
+## WOLF's floor reflection and its contact line at rest (fix round 2: his step forward of the valve moves
+## both with his feet, JunctionRoom.wolf_valve_step).
+var wolf_reflection: FloorReflection
+var wolf_reflection_floor_y: float = 0.0
 var impact: Impact
 var sfx_bank: SfxBank
 var relay_sparks: CPUParticles2D
 var door_dust: CPUParticles2D
 var gate_dust: CPUParticles2D
-var exit_sparks: CPUParticles2D
 ## True from a knockdown until the last autosave is back; the engineer has no controls meanwhile.
 var fail_active: bool = false
 var fail_tween: Tween
@@ -678,6 +708,11 @@ var checkpoint_toast_remaining: float = 0.0
 ## END OF SLICE card; the engineer starts walking (hatch_exit_engineer_walking) once WOLF has gone in.
 var hatch_exit_walking: bool = false
 var hatch_exit_engineer_walking: bool = false
+## True while the engineer walks out through the Records exit, from the USE until they are through.
+var records_exit_walking: bool = false
+## Leaving Records: the engineer is through and out of view; the junction waits for WOLF (seconds waited).
+var records_exit_engineer_out: bool = false
+var records_exit_wait: float = 0.0
 ## True while the END OF SLICE card is up; any confirm, Back or Pause goes on to the title.
 var end_card_active: bool = false
 var end_card: ColorRect
@@ -754,11 +789,15 @@ const GAMEPLAY_CAMERA_Y: float = 360.0
 ## behind them. The ceiling lamps leave the top of the view; the far plate still covers it. The touch
 ## answers take the buttons' place at the bottom during a choice, so the camera stays put.
 const GAMEPLAY_CAMERA_Y_TOUCH: float = 392.0
-## The chapter-close shots frame the room's right end closer than play, both actors above the
-## dialogue card. At 1.55 the left edge (x ~341) falls in the gap between the junction's relief vent
-## (its label and grate end by x 336) and the VALVE label (from x ~354), so no label is cut.
-const CHAPTER_CLOSE_ZOOM: float = 1.55
-const CHAPTER_CLOSE_CAMERA: Vector2 = Vector2(960.0 - 480.0 / CHAPTER_CLOSE_ZOOM, 352.0)
+## The junction's close (the only chapter-close shot: Records keeps control while its closing lines
+## run) frames its exit door whole and off the edge of the view (review r1): its right
+## edge runs on to JUNCTION_CLOSE_RIGHT, past the near jamb (JunctionRoom.EXIT_NEAR_JAMB_X) and the
+## wall's column into the passage beyond, so the doorway they walk out through sits inside the frame,
+## and the view is closer than play (zoom 1.62), its left edge (x ~438) just left of the DOOR DOWN
+## placard, with the floor about 70 % down the view, above the dialogue card.
+const JUNCTION_CLOSE_RIGHT: float = JunctionRoom.EXIT_VIEW_RIGHT
+const JUNCTION_CLOSE_ZOOM: float = 1.62
+const JUNCTION_CLOSE_CAMERA: Vector2 = Vector2(JUNCTION_CLOSE_RIGHT - 480.0 / JUNCTION_CLOSE_ZOOM, 373.0)
 ## Menu cards fade and slide in over this long; short enough never to hold up input or players who want little motion.
 const MENU_REVEAL_SECONDS: float = 0.12
 const MENU_REVEAL_OFFSET: Vector2 = Vector2(0.0, 10.0)
@@ -835,14 +874,13 @@ func _ready() -> void:
 	for grounded: Sprite2D in [human.body_sprite, wolf.body_sprite, intro_director, breaker_art]:
 		floor_reflections.append(FloorReflection.attach(grounded))
 	human_reflection = floor_reflections[0]
+	wolf_reflection = floor_reflections[1]
+	wolf_reflection_floor_y = wolf_reflection.floor_y
 	floor_reflections.append_array(records_room.floor_reflections)
 	floor_reflections.append_array(junction_room.floor_reflections)
 	# Each room's near edge pieces fade back while they cover the engineer or WOLF.
 	for depth: RoomDepth in _room_depths():
 		depth.occluders = [human.body_sprite, wolf.body_sprite]
-	# So does the junction bulkhead's front pillar, which otherwise hides whoever stands in its doorway.
-	# The corridor's near column stays solid: it is slim, and nobody stops behind it.
-	junction_room.depth.pillars = [junction_room.door_lip]
 	breaker_status_glow = _attach_status_glow(breaker_status_light)
 	relay_status_glow = _attach_status_glow(relay_status_light)
 	_apply_text_size()
@@ -969,7 +1007,7 @@ func _setup_corridor_door() -> void:
 	seal_stub.z_index = KNOCKDOWN_Z
 	seal_lamp = _seal_sprite("SealLamp", CORRIDOR_SEAL_LENS_REGION, CORRIDOR_SEAL_LAMP - CORRIDOR_SEAL_LENS_REGION.size * CORRIDOR_SEAL_SCALE * 0.5)
 	seal_lamp.z_index = KNOCKDOWN_Z
-	seal_lamp_glow = RoomDepth.make_glow(SEAL_LAMP_OPEN, Vector2(22.0, 22.0), 0.45)
+	seal_lamp_glow = RoomDepth.make_glow(Palette.LAMP_OPEN, Vector2(22.0, 22.0), 0.45)
 	seal_lamp_glow.name = "SealLampGlow"
 	seal_lamp_glow.position = CORRIDOR_SEAL_LAMP
 	seal_lamp_glow.z_index = KNOCKDOWN_Z
@@ -986,17 +1024,10 @@ func _setup_corridor_door() -> void:
 		add_child(art)
 
 
+## One piece of the corridor seal, cut from CORRIDOR_SEAL_ATLAS and placed by its world top-left; the
+## caller adds it where it draws.
 func _seal_sprite(node_name: String, region: Rect2, top_left: Vector2, scale_factor: float = CORRIDOR_SEAL_SCALE) -> Sprite2D:
-	var sprite: Sprite2D = Sprite2D.new()
-	sprite.name = node_name
-	sprite.texture = CORRIDOR_SEAL_ATLAS
-	sprite.texture_filter = CanvasItem.TEXTURE_FILTER_LINEAR_WITH_MIPMAPS
-	sprite.region_enabled = true
-	sprite.region_rect = region
-	sprite.centered = false
-	sprite.scale = Vector2.ONE * scale_factor
-	sprite.position = top_left
-	return sprite
+	return RoomDepth.cut(CORRIDOR_SEAL_ATLAS, region, scale_factor, node_name, top_left)
 
 
 ## The MANUAL BYPASS on the relay's right, with the relay's COOLANT FAULT tag (a touch left of the
@@ -1081,12 +1112,11 @@ func _on_reduced_motion_changed(on: bool) -> void:
 
 
 ## One-shot particle presets parked at the places that already answer the player: the relay
-## contact, the seal's landing, the containment gate and the Records exit arc.
+## contact, the seal's landing and the containment gate.
 func _setup_particles() -> void:
 	relay_sparks = FxPresets.place(FxPresets.sparks(), self, "", Vector2(601.0, 390.0), 3)
 	door_dust = FxPresets.place(FxPresets.dust_burst(), self, "", Vector2(780.0, 436.0), 3, Vector2(30.0, 3.0))
 	gate_dust = FxPresets.place(FxPresets.dust_burst(), self, "", Vector2(115.0, 438.0), 3, Vector2(70.0, 3.0))
-	exit_sparks = FxPresets.place(FxPresets.sparks(Palette.EXIT_GREEN), records_room, "", Vector2(830.0, 330.0), 3)
 
 
 ## A small additive glow riding on a station status light; it takes the light's colour each refresh.
@@ -1101,7 +1131,16 @@ func _attach_status_glow(light: ColorRect) -> Sprite2D:
 func _update_gameplay_camera() -> void:
 	var half_view: float = GAMEPLAY_VIEW_WIDTH * 0.5
 	var touch_buttons: bool = touch_enabled and not controller_active
-	intro_camera.position = Vector2(clampf(human.position.x, half_view, 960.0 - half_view), GAMEPLAY_CAMERA_Y_TOUCH if touch_buttons else GAMEPLAY_CAMERA_Y)
+	intro_camera.position = Vector2(clampf(human.position.x, half_view, _view_right() - half_view), GAMEPLAY_CAMERA_Y_TOUCH if touch_buttons else GAMEPLAY_CAMERA_Y)
+
+
+## The play view's right edge: the room's, except in the junction, where it runs on to show the exit
+## door whole (its near jamb past x 960, the wall's column and the passage beyond), so the door the lines
+## name is on screen before the bolt is popped as well as after (review r1).
+func _view_right() -> float:
+	if state.chapter_id == "junction":
+		return JunctionRoom.EXIT_VIEW_RIGHT
+	return 960.0
 
 
 func _start_gameplay_camera() -> void:
@@ -1136,6 +1175,7 @@ func _process(delta: float) -> void:
 			_close_end_card()
 		return
 	_tick_engineer_step()
+	_tick_records_walk_out(delta)
 	if chapter_close_active:
 		_tick_dialogue(delta)
 		if Input.is_action_just_pressed(&"interact") and not _next_box():
@@ -1274,6 +1314,29 @@ func _tick_engineer_step() -> void:
 	engineer_step_x = -1.0
 	engineer_face_x = -1.0
 	_update_controls()
+	if records_exit_walking:
+		# Out through the Records exit: once WOLF is through behind them, the service line to Archive
+		# begins (_tick_records_walk_out).
+		records_exit_engineer_out = true
+
+
+## Leaving Records: the engineer is out of view down the passage; the junction begins once WOLF has
+## followed them through the doorway, past the near column, or after RECORDS_WAIT_SECONDS at most.
+func _tick_records_walk_out(delta: float) -> void:
+	if not records_exit_walking or not records_exit_engineer_out:
+		return
+	records_exit_wait += delta
+	if wolf.position.x >= RECORDS_WOLF_OUT_X - 4.0 or records_exit_wait >= RECORDS_WAIT_SECONDS:
+		_reset_records_walk_out()
+		_enter_junction()
+
+
+## Ends (or clears) the walk out of Records: nobody is walking out, nobody is through, nothing waited.
+## Used when WOLF has followed them through, and when the title or a new scene drops the walk.
+func _reset_records_walk_out() -> void:
+	records_exit_walking = false
+	records_exit_engineer_out = false
+	records_exit_wait = 0.0
 
 
 ## Sends the engineer to [param spot_x] on their own, turning on arrival to face [param face_x].
@@ -1956,6 +2019,7 @@ func _return_to_title() -> void:
 	chapter_close_active = false
 	hatch_exit_walking = false
 	hatch_exit_engineer_walking = false
+	_reset_records_walk_out()
 	_hide_end_card()
 	checkpoint_toast_remaining = 0.0
 	waiting_for_choice = false
@@ -2172,7 +2236,7 @@ func _load_game() -> void:
 		if state.junction_cleared:
 			status_line = JUNCTION_CLEARED_LINE
 		elif state.sentry_down:
-			status_line = "Service junction restored. The sentry is down; pop the exit bolt by the hatch."
+			status_line = "Service junction restored. The sentry\nis down; pop the exit bolt by the door."
 		elif state.door_blown:
 			status_line = "Service junction restored. The door is\ndown. The sentry patrols past the rubble."
 		else:
@@ -2207,7 +2271,11 @@ func _interact() -> void:
 			# The sealed door answers for itself ahead of the valve's reach (P0-15).
 			_refuse(REFUSE_DOOR, &"door")
 			return
-		_step_beside_station(x)
+		# Fix round 3 (review r3, human pass): at the open exit the USE leaves through it. The bolt panel's
+		# reach (_station_offset + 4 either side of BOLT_PANEL_X) runs out to x 849, past HATCH_REACH_MIN_X,
+		# so the sidestep sent the engineer back to the panel's working side (BOLT_X) as they left.
+		if not _at_open_exit(x):
+			_step_beside_station(x)
 		_interact_junction(x)
 		return
 	_step_beside_station(x)
@@ -2405,6 +2473,8 @@ func _interact_checkpoint() -> void:
 			# The safe point accepts: the same chirp as a save, a little lower.
 			sfx_bank.play(&"chirp", -9.0, 0.9)
 			_sync_scene()
+			# They came in through the entry: it stands open behind them and its closer brings it shut.
+			records_room.close_entry_behind()
 			# A new room: cut the camera to the engineer instead of panning across from the safe point.
 			_start_gameplay_camera()
 			var remembered_line: String = "I refused the live relay; I'm still here." if state.memory.get("choice_id") == M0State.PRESS else ("I took the relay because you told me the truth." if state.route == "cooperate" else "I offered the relay; you cranked the bypass. Still with you.")
@@ -2451,29 +2521,29 @@ func _interact_records(x: float) -> void:
 			choice_context = "mirror"
 			_update_controls()
 			status_line = "WOLF: I found the mirror index. We can use my readout or your maintenance port.\n1  USE WOLF'S READOUT     2  USE MANUAL PORT"
-	elif absf(x - 830.0) <= 58.0:
+	elif _at_records_exit(x):
 		if state.complete_chapter():
+			# The copy goes into the security container, at its lock; the exit's bolt lets go and the door
+			# swings open (RecordsRoom.open_exit).
+			_step_engineer(RECORDS_CONTAINER_SIDE_X, RecordsRoom.CONTAINER_X)
 			# The closing lines play while the engineer keeps control (STORY-8): no held shot. USE here
-			# shows their next box, and once they are read goes on through the exit. Said through the queue,
-			# so a station's answer or the route hint cutting in never drops them (_aside).
+			# shows their next box, and once they are read walks out through the door (_leave_records).
+			# Said through the queue, so a station's answer or the route hint cutting in never drops them
+			# (_aside).
 			_say([_records_close_line()])
 			_update_controls()
 			_sync_records_room(true)
 			_sync_room_lights(true)
-			# The exit arc: the bolt lets go with a crackle, a small kick and a spark shower.
+			# The exit's bolt lets go with a crackle and a small kick; what shows is the door itself: its
+			# lamp turns amber and the leaf swings open (no particle puff stands in for the bolt).
 			sfx_bank.play(&"records_arc", -3.0)
 			impact.add_trauma(0.3)
 			impact.flash(0.06, 0.0)
 			impact.rumble(0.3, 0.4, 0.12)
-			impact.burst(exit_sparks)
-			chapter_tween = create_tween()
-			chapter_tween.tween_property(records_room.exit_art, "position:y", RecordsRoom.EXIT_REST.y - 130.0, 0.5)
-			chapter_tween.parallel().tween_property(records_room.exit_art, "modulate:a", 0.0, 0.5)
-			chapter_tween.tween_callback(records_room.exit_art.hide)
 			_save_progress()
 		elif state.chapter_complete:
 			if not _records_close_unread():
-				_enter_junction()
+				_leave_records()
 			elif not _next_box():
 				# Put back behind an aside: they come back first.
 				_next_box_now()
@@ -2481,6 +2551,34 @@ func _interact_records(x: float) -> void:
 			_aside("Exit sealed until the purge order and mirror timestamp are copied.")
 	else:
 		_aside(_records_route_hint())
+
+
+## The Records exit's USE: the security container and the shut exit within RECORDS_EXIT_REACH of x
+## 830, and, once the exit is open, the doorway and the passage past it too.
+func _at_records_exit(x: float) -> bool:
+	return absf(x - RECORDS_EXIT_X) <= RECORDS_EXIT_REACH or (state.chapter_complete and x >= RECORDS_EXIT_X)
+
+
+## USE at the open exit once the first copy is secured: the engineer walks out through the doorway
+## into the service line passage, WOLF following one gap behind, and the junction begins once they are
+## through (_tick_engineer_step).
+func _leave_records() -> void:
+	if records_exit_walking:
+		return
+	records_exit_walking = true
+	# The press is heard on its frame, as CONTINUE on a closing shot is, and the hint bar (the USE prompt
+	# or the save toast from securing the copy) clears as they set off.
+	sfx_bank.play(&"chirp", -10.0, 0.75)
+	checkpoint_toast_remaining = 0.0
+	_update_controls()
+	if records_room.exit_swinging():
+		# Mid-swing the leaf crosses the walkway: they go once it is on its floor stop.
+		await records_room.exit_tween.finished
+		if not records_exit_walking or state.chapter_id != "records":
+			return
+	engineer_step_x = RECORDS_WALK_OUT_X
+	engineer_face_x = -1.0
+	_update_controls()
 
 
 ## Between Records stations: the stations still to do, in order, so a finished one is never named
@@ -2504,31 +2602,49 @@ func _finish_chapter_close() -> void:
 	_walk_out_through_hatch()
 
 
-## The two leave through the open hatch, WOLF first: he fades out in the doorway while the engineer
-## waits where they are; then the engineer walks into it and fades, and the END OF SLICE
-## card comes up. One at a time, they are never drawn over each other in the doorway.
+## The two leave through the open exit door, WOLF first: he walks on from the doorway through the
+## wall until the near jamb hides all of him, while the engineer waits where they are; then the
+## engineer walks through after him until it hides them too, the doorway stands empty for a moment,
+## and the END OF SLICE card comes up. One at a time, they are never drawn over each other in it.
 func _walk_out_through_hatch() -> void:
 	hatch_exit_walking = true
 	hatch_exit_engineer_walking = false
+	# A cleared junction's door stands open (as a restore shows it), whatever brought the close on.
+	junction_room.hatch_open = 1.0
 	_update_controls()
-	var wolf_seconds: float = absf(WOLF_HATCH_EXIT_X - wolf.position.x) / M0Actor.FOLLOW_SPEED
 	chapter_tween = create_tween()
-	chapter_tween.tween_interval(maxf(HATCH_EXIT_FADE_DELAY, wolf_seconds))
-	chapter_tween.tween_property(wolf, "modulate:a", 0.0, HATCH_EXIT_FADE_SECONDS)
-	chapter_tween.tween_callback(_engineer_follows_out)
+	chapter_tween.tween_interval(HATCH_EXIT_START_DELAY)
+	chapter_tween.tween_callback(_wait_until_through.bind(wolf, JunctionRoom.WOLF_GONE_X, _engineer_follows_out))
 
 
-## WOLF is through: the engineer walks into the doorway and fades once they are half a fade from it,
-## so they are seen to reach it, then the END OF SLICE card.
+## Calls [param then] once [param body] has reached [param x] (it walks there on its own), or after
+## HATCH_EXIT_MAX_SECONDS whatever happens, so nothing can hold the card up for good.
+func _wait_until_through(body: M0Actor, x: float, then: Callable, waited: float = 0.0) -> void:
+	if not hatch_exit_walking:
+		return
+	if body.position.x >= x - 2.5 or waited >= HATCH_EXIT_MAX_SECONDS:
+		then.call()
+		return
+	chapter_tween = create_tween()
+	chapter_tween.tween_interval(0.05)
+	chapter_tween.tween_callback(_wait_until_through.bind(body, x, then, waited + 0.05))
+
+
+## WOLF is through: the engineer walks through after him, then the END OF SLICE card.
 func _engineer_follows_out() -> void:
 	if not hatch_exit_walking:
 		return
 	hatch_exit_engineer_walking = true
 	_update_controls()
-	var walk_seconds: float = absf(HATCH_EXIT_X - human.position.x) / M0Actor.FOLLOW_SPEED
+	_wait_until_through(human, HATCH_EXIT_X, _doorway_empty)
+
+
+## Both are through and out of sight: the empty doorway holds for a moment, then the card.
+func _doorway_empty() -> void:
+	if not hatch_exit_walking:
+		return
 	chapter_tween = create_tween()
-	chapter_tween.tween_interval(maxf(HATCH_EXIT_FADE_DELAY, walk_seconds - HATCH_EXIT_FADE_SECONDS * 0.5))
-	chapter_tween.tween_property(human, "modulate:a", 0.0, HATCH_EXIT_FADE_SECONDS)
+	chapter_tween.tween_interval(HATCH_EXIT_EMPTY_SECONDS)
 	chapter_tween.tween_callback(_show_end_card)
 
 
@@ -2711,6 +2827,10 @@ func _capture_positions() -> void:
 	# keeps the spot they are stepping to, so Continue never puts them back over the machine.
 	state.human_position = human.position if engineer_step_x < 0.0 else Vector2(engineer_step_x, human.position.y)
 	state.wolf_position = wolf.position
+	# Through the junction's open exit door they may stand past the room's edge (WOLF waits in its
+	# doorway); a save keeps them inside the room's floor, and Continue walks WOLF back to the doorway.
+	state.human_position.x = minf(state.human_position.x, M0Actor.MAX_X)
+	state.wolf_position.x = minf(state.wolf_position.x, M0Actor.MAX_X)
 
 
 ## Remembers the state at the start of a beat. Before the first checkpoint there is no autosave,
@@ -2735,6 +2855,9 @@ func _enter_junction() -> void:
 	if not state.enter_junction():
 		return
 	_sync_scene()
+	# They came in through the entry from the service line passage: it stands open behind them and its
+	# closer brings it shut (review r1, M5).
+	junction_room.close_entry_behind()
 	# A new room: cut the camera to the engineer instead of panning across from the Records exit.
 	_start_gameplay_camera()
 	wolf_scouting = true
@@ -2789,9 +2912,9 @@ func _interact_junction(x: float) -> void:
 	elif state.door_blown and _at_arm_panel(x):
 		_use_arm_panel()
 	elif x >= JunctionRoom.BOLT_REACH_MIN_X:
-		_use_exit()
+		_use_exit(x)
 	elif state.sentry_down:
-		status_line = "No station in reach. The exit bolt is by the hatch."
+		status_line = "No station in reach. The exit bolt is\nby the door."
 	elif state.door_blown:
 		status_line = "No station in reach. The TANK RELEASE\nis past the rubble."
 	else:
@@ -2969,9 +3092,10 @@ func _drop_tank() -> void:
 	_tell("The clamp lets go.")
 
 
-## The exit bolt panel and the hatch beside it share one reach: the first USE pops the bolt once the
-## sentry is down, the next leaves through the open hatch.
-func _use_exit() -> void:
+## The exit bolt panel and the exit door beside it: USE at the panel pops the bolt once the sentry is
+## down; once the door is open, USE at the door itself (from JunctionRoom.HATCH_REACH_MIN_X, behind
+## WOLF waiting in its doorway) leaves through it. At the panel the hint points to the open door.
+func _use_exit(x: float) -> void:
 	if not state.door_blown:
 		_refuse(REFUSE_EXIT_DOOR, &"bolt")
 	elif not state.sentry_down:
@@ -2985,8 +3109,9 @@ func _use_exit() -> void:
 			&"charging":
 				_tell(BOLT_CHARGING_LINE)
 			_:
-				# Not through a hatch that is still sliding; its hint already says so.
-				if not _hatch_sliding():
+				# Not through a hatch that is still sliding, nor from the bolt panel: the engineer walks up to
+				# the doorway first (the hint says the hatch is open).
+				if not _hatch_sliding() and x >= JunctionRoom.HATCH_REACH_MIN_X:
 					_leave_junction()
 
 
@@ -3015,15 +3140,27 @@ func _bolt_arc() -> void:
 		_tell(BOLT_ARC_LINE)
 
 
+## The engineer stands at the junction's exit, where USE leaves through it, not at the bolt panel: the
+## bolt has dropped and they are at or past JunctionRoom.HATCH_REACH_MIN_X.
+func _at_open_exit(x: float) -> bool:
+	return bolt_state == &"open" and x >= JunctionRoom.HATCH_REACH_MIN_X
+
+
+## The junction's exit door stands open (sliding open finished, or a cleared junction restored).
+func _exit_door_open() -> bool:
+	return state.chapter_id == "junction" and state.sentry_down and junction_room != null and junction_room.hatch_open >= 1.0
+
+
 ## The bolt has dropped and the hatch is still sliding open; it is not a way out until it has.
 func _hatch_sliding() -> bool:
 	return bolt_state == &"open" and not state.junction_cleared and junction_room.hatch_open < 1.0
 
 
-## The hatch art has finished opening.
+## The exit door has finished opening: WOLF steps into its doorway (_wolf_target_x).
 func _hatch_opened() -> void:
 	if not fail_active and status_line == BOLT_ARC_LINE:
 		_tell(HATCH_OPENED_LINE)
+	_update_controls()
 
 
 ## USE at the open hatch: the junction is cleared, autosave D is written, and a short closing beat
@@ -3031,6 +3168,8 @@ func _hatch_opened() -> void:
 func _leave_junction() -> void:
 	if not state.clear_junction():
 		return
+	# The room knows it is cleared from now (its plates settle for the closing shot), as a restore shows it.
+	junction_room.junction_cleared = true
 	# Autosave D: the service line is clear.
 	_save_progress()
 	# The room's lights switch over with a contactor's clunk, as at the safe point.
@@ -3044,11 +3183,11 @@ func _leave_junction() -> void:
 	_frame_chapter_close()
 
 
-## Starts the chapter-close camera move on chapter_tween: as far right as the room allows at the
-## closing zoom, so the exit and both actors share the shot.
+## Starts the junction's chapter-close camera move on chapter_tween (JUNCTION_CLOSE_CAMERA at
+## JUNCTION_CLOSE_ZOOM, over 0.5 s), so the exit door and both actors share the shot.
 func _frame_chapter_close() -> void:
-	chapter_tween.tween_property(intro_camera, "position", CHAPTER_CLOSE_CAMERA, 0.5).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
-	chapter_tween.parallel().tween_property(intro_camera, "zoom", Vector2.ONE * CHAPTER_CLOSE_ZOOM, 0.5)
+	chapter_tween.tween_property(intro_camera, "position", JUNCTION_CLOSE_CAMERA, 0.5).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
+	chapter_tween.parallel().tween_property(intro_camera, "zoom", Vector2.ONE * JUNCTION_CLOSE_ZOOM, 0.5)
 
 
 ## Runs the pressure line every frame in the junction: held USE at the valve cranks it, the line
@@ -3082,6 +3221,10 @@ func _tick_junction(delta: float) -> void:
 	_track_door_face()
 	if wolf.autonomous_target_x == JunctionRoom.WOLF_BAIT_X and absf(wolf.position.x - JunctionRoom.WOLF_BAIT_X) <= 2.0:
 		# At the far end of the lane he faces back down it: at the sentry he draws, then at the engineer.
+		wolf.body_sprite.flip_h = true
+	if wolf.autonomous_target_x == JunctionRoom.WOLF_DOORWAY_X and absf(wolf.position.x - JunctionRoom.WOLF_DOORWAY_X) <= 2.0:
+		# In the open doorway he waits looking back at the engineer, his head and shoulders in view
+		# and the rest of him already past the near jamb; he turns to go once they leave.
 		wolf.body_sprite.flip_h = true
 	# The line's phase moves WOLF (clear of the vent and the blast while it is live).
 	if not fail_active and wolf.autonomous_target_x != _wolf_target_x():
@@ -3193,12 +3336,24 @@ func _sync_wolf_leap() -> void:
 			if drop_arm.state == &"hung":
 				# Under the hung tank he ducks (JunctionRoom.wolf_duck_depth).
 				duck = JunctionRoom.wolf_duck_depth(wolf.position.x, -1.0 if wolf.body_sprite.flip_h else 1.0)
-	wolf.speed_scale = JunctionRoom.LEAP_SPEED_SCALE if lift > 0.0 or engineer_waits_for_wolf else 1.0
+	wolf.speed_scale = JunctionRoom.LEAP_SPEED_SCALE if lift > 0.0 or engineer_waits_for_wolf else (HATCH_EXIT_SPEED_SCALE if hatch_exit_walking else 1.0)
 	# The duck squashes his drawn body from the feet up: the sprite is shorter and shifted down by what
 	# the squash takes off below its centre, so his feet stay on the floor.
 	var squash: float = (WOLF_DRAWN_HEIGHT - duck) / WOLF_DRAWN_HEIGHT
+	# Past the blast he never stands inside the valve: over it, he walks on the deck a pace in front of it
+	# (JunctionRoom.wolf_valve_step), his feet and his reflection lower, and he draws over the engineer
+	# there, as anything nearer the camera does. (The actors are drawn at one scale wherever they stand.)
+	var step: float = JunctionRoom.wolf_valve_step(wolf.position.x) if state.chapter_id == "junction" and state.door_blown else 0.0
 	wolf.body_sprite.scale = Vector2(wolf_sprite_scale.x, wolf_sprite_scale.y * squash)
 	wolf.body_sprite.offset.y = -lift / wolf.body_sprite.scale.y + WOLF_FEET_BELOW_CENTRE * (1.0 - squash) / squash
+	if state.chapter_id == "junction":
+		var down: float = JunctionRoom.WOLF_STEP_FORWARD * step
+		wolf.body_sprite.position.y = WOLF_SPRITE_REST.y + down
+		if wolf_reflection != null:
+			wolf_reflection.floor_y = wolf_reflection_floor_y + down
+	var in_front: bool = step > 0.5
+	if in_front != (wolf.get_index() > human.get_index()):
+		move_child(wolf, human.get_index() + (1 if in_front else 0) - (1 if wolf.get_index() < human.get_index() else 0))
 
 
 ## The sentry's knockdown card. The alcove advice is only for an engineer it saw out in the lane and
@@ -3344,7 +3499,8 @@ func _tank_hit() -> void:
 	impact.burst(junction_room.hit_sparks)
 	_fade_servo()
 	_update_controls()
-	_tell(TANK_HIT_OFF_CENTRE_LINE if absf(at_x - DropArm.MARK_X) > OFF_CENTRE_HIT else TANK_HIT_LINE)
+	_drop_box_queue()
+	_say([TANK_HIT_OFF_CENTRE_LINE if absf(at_x - DropArm.MARK_X) > OFF_CENTRE_HIT else TANK_HIT_LINE, TANK_HIT_WOLF_LINE])
 	# Autosave C: the sentry is down.
 	_save_progress()
 
@@ -3548,8 +3704,8 @@ func _fail_beat(reason: String, by_sentry: bool = false) -> void:
 ## forward where they stand, never dragged back against the fall. Whatever knocked them down, a live
 ## sentry in the junction rolls back off them (Sentry.recoil_to; with Reduced Motion it is put there at
 ## once) as far as it takes for its drawn body to stand LANE_FALL_CLEAR clear of theirs, and a body
-## that would lie into a missed tank on the floor or under the foot of the bulkhead's front lip ends
-## short of it.
+## that would lie into a missed tank on the floor or under the foot of the blast door's near column
+## ends short of it.
 func _start_collapse(by_sentry: bool, in_lane: bool) -> void:
 	collapse_flip = human.body_sprite.flip_h
 	collapse_fall = -1.0 if collapse_flip else 1.0
@@ -3573,12 +3729,17 @@ func _start_collapse(by_sentry: bool, in_lane: bool) -> void:
 		var lying: Vector2 = collapse_span(COLLAPSE_SPANS.size() - 1, collapse_fall, collapse_to_x)
 		if lying.y > tank_from and lying.x < tank_to:
 			collapse_to_x += tank_from - lying.y if human.position.x < DropArm.MARK_X else tank_to - lying.x
-	# The bulkhead's front lip draws over the actors: facing it from its left (cranking the valve when
-	# the door blows, say), a slump that would reach under the lip's foot ends LANE_FALL_CLEAR short of
-	# it, the boots thrown back from the door as the knees go, so no part of the lying body is hidden.
-	if collapse_fall > 0.0 and human.position.x < M0State.JUNCTION_DOOR_LEFT_X:
-		var door_lying: Vector2 = collapse_span(COLLAPSE_SPANS.size() - 1, collapse_fall, collapse_to_x)
-		collapse_to_x -= maxf(0.0, door_lying.y - (JunctionRoom.DOOR_FOOT_X - LANE_FALL_CLEAR))
+	# The blast door's near column draws over the actors, sealed or blown: a slump that would reach under
+	# its foot (JunctionRoom.DOOR_FOOT_X..DOOR_FOOT_RIGHT_X) ends LANE_FALL_CLEAR short of it on the side
+	# the engineer stood (facing it from the valve when the door blows, or from the lane running back for
+	# the rubble), the boots thrown back from the door as the knees go, so no part of the lying body is
+	# hidden.
+	var door_lying: Vector2 = collapse_span(COLLAPSE_SPANS.size() - 1, collapse_fall, collapse_to_x)
+	if door_lying.y > JunctionRoom.DOOR_FOOT_X - LANE_FALL_CLEAR and door_lying.x < JunctionRoom.DOOR_FOOT_RIGHT_X + LANE_FALL_CLEAR:
+		if human.position.x < (JunctionRoom.DOOR_FOOT_X + JunctionRoom.DOOR_FOOT_RIGHT_X) * 0.5:
+			collapse_to_x -= door_lying.y - (JunctionRoom.DOOR_FOOT_X - LANE_FALL_CLEAR)
+		else:
+			collapse_to_x += JunctionRoom.DOOR_FOOT_RIGHT_X + LANE_FALL_CLEAR - door_lying.x
 	if not sentry_brain.is_solid():
 		return
 	var body: Vector2 = collapse_span(COLLAPSE_SPANS.size() - 1, collapse_fall, collapse_to_x)
@@ -3784,6 +3945,7 @@ func _sync_scene() -> void:
 	# Walked out through the hatch, the actors faded; any new scene shows them again.
 	hatch_exit_walking = false
 	hatch_exit_engineer_walking = false
+	_reset_records_walk_out()
 	human.modulate.a = 1.0
 	wolf.modulate.a = 1.0
 	# The corridor's relay staging and bypass crank belong to the moment, not the save, and so does
@@ -3826,6 +3988,16 @@ func _sync_scene() -> void:
 	human.settle_x = -1.0
 	_clear_station_body()
 	wolf.position = state.wolf_position
+	if state.chapter_id == "records":
+		# Records' doors stand across the walkway: a save from before they did (when the room's ends
+		# were open floor) never places anyone inside the shut entry or past the exit before it opens.
+		var exit_open: bool = state.chapter_complete
+		human.position.x = clampf(human.position.x, RecordsRoom.ENTRY_DOOR_X + M0State.HUMAN_HALF_WIDTH, M0Actor.MAX_X if exit_open else RecordsRoom.EXIT_DOOR_X - M0State.HUMAN_HALF_WIDTH)
+		wolf.position.x = clampf(wolf.position.x, RecordsRoom.ENTRY_DOOR_X + M0State.WOLF_HALF_WIDTH, M0Actor.MAX_X if exit_open else RecordsRoom.EXIT_DOOR_X - M0State.WOLF_HALF_WIDTH)
+	if state.chapter_id == "junction":
+		# The junction's entry stands across the walkway at its left end: nobody is restored inside it.
+		human.position.x = maxf(human.position.x, JunctionRoom.ENTRY_DOOR_X + M0State.HUMAN_HALF_WIDTH)
+		wolf.position.x = maxf(wolf.position.x, JunctionRoom.ENTRY_DOOR_X + M0State.WOLF_HALF_WIDTH)
 	if state.chapter_id == "junction" and state.sentry_down:
 		# With the sentry down he waits at his spot by the hatch, facing back down the lane; a save taken
 		# as the tank landed (autosave C) has him wherever he was then, and he never walks back across
@@ -3930,9 +4102,9 @@ func _sync_records_room(animate_exit: bool = false) -> void:
 	records_room.purge_trace_preserved = state.purge_trace_preserved
 	records_room.mirror_trace_preserved = state.mirror_trace_preserved
 	records_room.chapter_complete = state.chapter_complete
-	records_room.exit_art.position = RecordsRoom.EXIT_REST
-	records_room.exit_art.modulate = Color.WHITE
-	records_room.exit_art.visible = not state.chapter_complete or animate_exit
+	if animate_exit and state.chapter_complete:
+		# The secured copy releases the exit: its leaf swings open on its hinges, never vanishing.
+		records_room.open_exit(true)
 	records_room.refresh_state()
 
 
@@ -3955,7 +4127,7 @@ func _sync_door(animate: bool = false) -> void:
 	seal_stub.visible = in_corridor
 	seal_frame.visible = in_corridor
 	seal_lamp.visible = in_corridor
-	_set_seal_lamp(SEAL_LAMP_MOVING if sliding else (SEAL_LAMP_OPEN if state.door_open else SEAL_LAMP_SHUT))
+	_set_seal_lamp(Palette.AMBER if sliding else (Palette.LAMP_OPEN if state.door_open else Palette.LAMP_SHUT))
 	seal_lamp_glow.visible = in_corridor and state.door_open
 	seal_leaf.open = 0.0
 	seal_leaf.visible = sliding
@@ -3966,7 +4138,7 @@ func _sync_door(animate: bool = false) -> void:
 		door_tween.tween_method(_set_seal_open, 0.0, 1.0, CORRIDOR_DOOR_OPEN_SECONDS).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN_OUT)
 		door_tween.tween_callback(seal_leaf.hide)
 		door_tween.tween_callback(blast_leaf.hide)
-		door_tween.tween_callback(_set_seal_lamp.bind(SEAL_LAMP_OPEN))
+		door_tween.tween_callback(_set_seal_lamp.bind(Palette.LAMP_OPEN))
 		door_tween.tween_callback(_door_lands)
 
 
@@ -3984,17 +4156,31 @@ func _set_seal_lamp(color: Color) -> void:
 
 
 func _update_controls() -> void:
-	human.controlled = not title_open and not intro_active and not chapter_close_active and not end_card_active and not waiting_for_choice and not fail_active and not retry_fading_in and engineer_step_x < 0.0 and not engineer_waits_for_wolf and not lane_question_held
+	human.controlled = not title_open and not intro_active and not chapter_close_active and not end_card_active and not waiting_for_choice and not fail_active and not retry_fading_in and engineer_step_x < 0.0 and not engineer_waits_for_wolf and not lane_question_held and not records_exit_walking
 	# Stepping back from the relay, the engineer walks on their own for a moment; leaving the junction
 	# they wait for WOLF to go through the hatch first.
 	if hatch_exit_walking:
 		human.autonomous_target_x = HATCH_EXIT_X if hatch_exit_engineer_walking else -1.0
 	else:
 		human.autonomous_target_x = engineer_step_x
+	# Through the junction's open exit door both may walk on past the room's edge; the player walks
+	# the engineer no further than WOLF waiting in its doorway allows.
+	var exit_open: bool = _exit_door_open()
+	human.max_x = JunctionRoom.EXIT_WALK_MAX_X if exit_open else (RECORDS_WALK_MAX_X if records_exit_walking else M0Actor.MAX_X)
+	wolf.max_x = human.max_x
+	human.walk_max_x = JunctionRoom.HATCH_REACH_MAX_X if exit_open and not hatch_exit_walking else M0Actor.MAX_X
+	human.speed_scale = HATCH_EXIT_SPEED_SCALE if hatch_exit_walking else 1.0
+	if hatch_exit_walking:
+		# Fix round 2 (review r2, the human pass: "I never see WOLF take a step through"): WOLF walks out at
+		# the same walk as the engineer. The junction's tick, which sets his speed otherwise
+		# (_sync_wolf_leap), does not run during the chapter close, so he kept his full follow speed and
+		# was through the doorway in about 0.15 s.
+		wolf.speed_scale = HATCH_EXIT_SPEED_SCALE
 	wolf.controlled = false
 	wolf.autonomous_target_x = _wolf_target_x()
 	wolf.follow_target = human if human.controlled and wolf.autonomous_target_x < 0.0 else null
 	wolf.follow_max_x = _wolf_follow_max_x()
+	wolf.follow_min_x = _wolf_follow_min_x()
 	wolf.avoid_spans = _machine_spans()
 	human.queue_redraw()
 	wolf.queue_redraw()
@@ -4008,8 +4194,14 @@ func _update_controls() -> void:
 ## through the hatch at the end.
 func _wolf_target_x() -> float:
 	if hatch_exit_walking:
-		# He goes through the hatch first, from his spot in its doorway.
+		# He goes through the exit door first, on from his spot in its doorway.
 		return WOLF_HATCH_EXIT_X
+	if end_card_active:
+		# Gone through the exit door: he stays where he is, out of sight, under the card.
+		return -1.0
+	if records_exit_walking:
+		# Leaving Records he follows the engineer out through the exit, past its near column.
+		return RECORDS_WOLF_OUT_X
 	if wolf_heading_to_relay or wolf_holding_relay:
 		return RELAY_CONTACT_X
 	if _wolf_comes_to_doorway():
@@ -4035,6 +4227,9 @@ func _wolf_target_x() -> float:
 				# winched up out of his way; until then he holds where he is.
 				if wolf.position.x < DropArm.MARK_X and junction_room.arm_parked < 1.0:
 					return wolf.position.x
+				# Once the exit door is open he steps into its doorway and waits there for the engineer.
+				if _exit_door_open():
+					return JunctionRoom.WOLF_DOORWAY_X
 				return JunctionRoom.WOLF_DOWN_X
 			if state.door_blown:
 				# He draws the sentry only by his own choice, from the far end of its lane; otherwise he will
@@ -4098,7 +4293,7 @@ func _machine_spans() -> Array[Vector2]:
 		"lockdown":
 			halves = [Vector2(350.0, 38.5), Vector2(RELAY_X, RELAY_HALF_WIDTH), Vector2(BYPASS_WHEEL.x, BypassHandle.COLLAR_RADIUS), Vector2(876.0, 35.0)]
 		"records":
-			halves = [Vector2(190.0, 57.1), Vector2(520.0, 44.6), Vector2(RecordsRoom.EXIT_REST.x, 37.8)]
+			halves = [Vector2(190.0, 57.1), Vector2(520.0, 44.6), Vector2((RecordsRoom.CONTAINER_SPAN.x + RecordsRoom.CONTAINER_SPAN.y) * 0.5, (RecordsRoom.CONTAINER_SPAN.y - RecordsRoom.CONTAINER_SPAN.x) * 0.5)]
 		"junction":
 			halves = [Vector2(JunctionRoom.BREAKER_X, JunctionRoom.BREAKER_HALF_WIDTH), Vector2(JunctionRoom.VALVE_X, JunctionRoom.VALVE_HALF_WIDTH), Vector2(JunctionRoom.ARM_X, JunctionRoom.ARM_PANEL_HALF_WIDTH), Vector2(JunctionRoom.BOLT_PANEL_X, JunctionRoom.BOLT_PANEL_HALF_WIDTH)]
 			if state.sentry_down:
@@ -4120,7 +4315,21 @@ func _wolf_follow_max_x() -> float:
 		return WOLF_FOLLOW_OPEN_MAX_X if state.door_open else CORRIDOR_DOOR_LEFT_X - M0Actor.WOLF_REACH
 	if state.chapter_id == "junction" and not state.door_blown:
 		return M0State.JUNCTION_DOOR_LEFT_X - M0Actor.WOLF_REACH
+	if state.chapter_id == "records":
+		# Shut, the exit stops him; open, he still waits in the room for the engineer to go first
+		# rather than standing in its doorway (RECORDS_WOLF_OUT_X when they leave).
+		return RecordsRoom.EXIT_DOOR_X - M0Actor.WOLF_REACH
 	return M0Actor.MAX_X
+
+
+## The furthest left WOLF follows to: in Records and the junction, clear of the shut entry by his drawn
+## reach.
+func _wolf_follow_min_x() -> float:
+	if state.chapter_id == "records":
+		return RecordsRoom.ENTRY_DOOR_X + M0Actor.WOLF_REACH
+	if state.chapter_id == "junction":
+		return JunctionRoom.ENTRY_DOOR_X + M0Actor.WOLF_REACH
+	return M0Actor.MIN_X
 
 
 func _refresh_ui() -> void:
@@ -4664,11 +4873,14 @@ func _context_hint() -> String:
 	if fail_active:
 		# The status line names the cause and the fix; no station hint competes with it.
 		return ""
+	if records_exit_walking:
+		# On their way out through the Records exit, controls off: the USE prompt has been answered.
+		return ""
 	if state.chapter_id == "junction":
 		return _junction_hint(x)
 	if state.chapter_id == "records":
 		if state.chapter_complete:
-			if absf(x - 830.0) <= 58.0:
+			if _at_records_exit(x):
 				# While the closing lines are still being shown, USE at the exit goes on to the next one.
 				return BREAKER_STAKES_HINT if _records_close_unread() else "E: follow the service line toward Archive."
 			return "The exit is open. Head right to follow the service line."
@@ -4678,8 +4890,9 @@ func _context_hint() -> String:
 			if state.mirror_trace_preserved:
 				return "Mirror copied. Head for the exit."
 			return "E: examine the mirror port." if state.purge_trace_preserved else "Copy the purge order first."
-		if absf(x - 830.0) <= 58.0:
-			return "E: secure the first copy." if state.mirror_trace_preserved else "Preserve both traces before leaving."
+		if _at_records_exit(x):
+			# At the container the hint names it (Nathanial, 2026-10-14): the copy goes into the drawn container.
+			return "E: secure the first copy in the container." if state.mirror_trace_preserved else "Preserve both traces before leaving."
 		return _records_route_hint()
 	if state.checkpoint_reached:
 		return "E: enter records access. The Director's purge is still running." if absf(x - 876.0) <= 52.0 else ("E: read the Director's purge display." if x <= 230.0 else "Return to the safe point to enter records access.")
@@ -4771,7 +4984,7 @@ func _drop_ready() -> bool:
 
 func _lane_hint(x: float) -> String:
 	if state.junction_cleared:
-		return "The hatch is open."
+		return "The door is open."
 	if state.sentry_down:
 		if x >= JunctionRoom.BOLT_REACH_MIN_X:
 			match bolt_state:
@@ -4779,10 +4992,13 @@ func _lane_hint(x: float) -> String:
 					return "E: pop the exit bolt."
 				&"charging":
 					return BOLT_CHARGING_LINE
-			return HATCH_OPENING_HINT if _hatch_sliding() else "E: leave through the hatch."
+			if _hatch_sliding():
+				return HATCH_OPENING_HINT
+			# The way out is offered at the door itself, not from the bolt panel.
+			return "E: leave through the door." if x >= JunctionRoom.HATCH_REACH_MIN_X else "The door is open. Leave through it."
 		if _hatch_sliding():
 			return HATCH_OPENING_HINT
-		return "The hatch is open. Leave through it." if bolt_state == &"open" else "The sentry is down. Pop the exit bolt by the hatch."
+		return "The door is open. Leave through it." if bolt_state == &"open" else "The sentry is down. Pop the exit bolt by the door."
 	if drop_arm.cloud_active() and DropArm.in_cloud(x):
 		return "Coolant cloud. Get out of it."
 	if _sentry_hunting() and x > SentryBrain.LANE_ENTRY_X:
@@ -5072,7 +5288,7 @@ func debug_beat() -> String:
 		return "opening %d/%d" % [intro_step + 1, INTRO_LINES.size()]
 	if end_card_active:
 		return "END OF SLICE card"
-	if hatch_exit_walking:
+	if hatch_exit_walking or records_exit_walking:
 		return "walking out"
 	if chapter_close_active:
 		return "chapter close"
@@ -5114,7 +5330,7 @@ func debug_wolf_why() -> String:
 	if not wolf.visible or title_open:
 		return "—"
 	if hatch_exit_walking:
-		return "leaving through the hatch"
+		return "leaving through the exit door"
 	if wolf_holding_relay:
 		return "hold: on the relay contact"
 	if wolf_heading_to_relay:

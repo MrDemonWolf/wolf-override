@@ -1,0 +1,760 @@
+{
+ "camera": {
+  "vp": [
+   511.0,
+   162.0
+  ],
+  "d0_m": 38.0,
+  "px_per_m": 40.0,
+  "floor_y": 440.0,
+  "vp2": [
+   46.29,
+   162.0
+  ],
+  "turn_deg": 17.0
+ },
+ "model": {
+  "origin_walkline": [
+   472.0,
+   440.0
+  ],
+  "a_far_jamb": 0.5751304660679315,
+  "a_near_jamb": -1.7248695339320683,
+  "a_wall_end": -1.9248695339320683,
+  "a_back": 5.5421663093818845,
+  "wall_t_m": 0.4,
+  "opening_m": [
+   2.3,
+   2.6
+  ],
+  "leaf_t_m": [
+   0.03,
+   0.33
+  ],
+  "frame_flange_m": 0.18
+ },
+ "canvas": {
+  "world_box": [
+   400.0,
+   136.0,
+   664.0,
+   504.0
+  ],
+  "px_per_world": 4.0
+ },
+ "lamps": [
+  {
+   "name": "door light: vapour-tight LED 1.2 m on a bracket over the door head",
+   "pos_m": [
+    11.643,
+    3.22,
+    -0.649
+   ],
+   "screen": [
+    464.9,
+    313.8
+   ],
+   "note": "lights the leaf, the frame, the threshold and the valve's top; falls off down the leaf"
+  },
+  {
+   "name": "far-plate lamp 0 (approach side)",
+   "pos_m": [
+    2.02,
+    5.192,
+    5.3
+   ],
+   "screen": [
+    133.4,
+    223.7
+   ],
+   "note": ""
+  },
+  {
+   "name": "far-plate lamp 1 (lane side, behind the cross-wall)",
+   "pos_m": [
+    11.7,
+    5.192,
+    5.3
+   ],
+   "screen": [
+    473.3,
+    223.7
+   ],
+   "note": ""
+  },
+  {
+   "name": "far-plate lamp 2 (lane, far end)",
+   "pos_m": [
+    21.655,
+    5.192,
+    5.3
+   ],
+   "screen": [
+    822.7,
+    223.7
+   ],
+   "note": ""
+  },
+  {
+   "name": "alcove fitting: vapour-tight LED 0.6 m under the bay's header",
+   "pos_m": [
+    14.731,
+    2.855,
+    1.9
+   ],
+   "screen": [
+    585.5,
+    318.0
+   ],
+   "note": ""
+  },
+  {
+   "name": "wet deck bounce (fill)",
+   "pos_m": [
+    12.5,
+    0.1,
+    -3.0
+   ],
+   "screen": [
+    499.1,
+    459.5
+   ],
+   "note": ""
+  }
+ ],
+ "parts": {
+  "wall": [
+   {
+    "name": "face_far_column",
+    "dims": "cast reinforced concrete, 0.40 m thick; 4.7 m of face from the far jamb's frame back to the room's back wall",
+    "job": "the cross-wall the door is set in; carries the charge line"
+   },
+   {
+    "name": "face_upper",
+    "dims": "the same wall over the door head, up to the slab",
+    "job": "closes the junction off from the lane"
+   },
+   {
+    "name": "pour_joint0",
+    "dims": "pour line between concrete lifts",
+    "job": "construction joint"
+   },
+   {
+    "name": "pour_joint1",
+    "dims": "pour line between concrete lifts",
+    "job": "construction joint"
+   },
+   {
+    "name": "back_corner",
+    "dims": "internal corner with the room's back wall",
+    "job": "where the cross-wall meets the back wall"
+   },
+   {
+    "name": "frame_far",
+    "dims": "steel channel frame, 120 mm approach flange, anchored into the concrete",
+    "job": "lines the latch jamb; carries the bolt keepers"
+   },
+   {
+    "name": "frame_head",
+    "dims": "steel channel head, 120 mm flange",
+    "job": "lines the head"
+   },
+   {
+    "name": "threshold",
+    "dims": "steel threshold plate 2.4 x 0.6 m (front strip; the rest is under the leaf)",
+    "job": "metal threshold of the opening; the leaf's drop seal lands on it"
+   },
+   {
+    "name": "light_bracket0",
+    "dims": "flat bracket 0.3 m",
+    "job": "holds the fitting off the wall"
+   },
+   {
+    "name": "light_bracket1",
+    "dims": "flat bracket 0.3 m",
+    "job": "holds the fitting off the wall"
+   },
+   {
+    "name": "light_body",
+    "dims": "vapour-tight LED fitting 1.2 x 0.12 m",
+    "job": "lights the door, the threshold and the approach"
+   },
+   {
+    "name": "light_lens",
+    "dims": "diffuser",
+    "job": "the light source (painted lit, static)"
+   },
+   {
+    "name": "light_feed",
+    "dims": "20 mm rigid conduit",
+    "job": "feeds the door light from the junction box on the column's end"
+   },
+   {
+    "name": "light_feed_strap",
+    "dims": "one-hole strap",
+    "job": "holds the conduit within 0.9 m of the fitting"
+   },
+   {
+    "name": "charge_line",
+    "dims": "100 mm steel pipe, the valve's outlet",
+    "job": "carries the overloaded line from the valve through the wall to the door's frame on the lane side"
+   },
+   {
+    "name": "charge_plate",
+    "dims": "6 mm welded penetration plate 0.48 x 0.46 m, 150 mm past the pipe",
+    "job": "where the line passes the wall"
+   },
+   {
+    "name": "charge_collar",
+    "dims": "welded sleeve collar",
+    "job": "seals the pipe to the plate"
+   },
+   {
+    "name": "charge_clamp0",
+    "dims": "U-bolt pipe clamp on a stand-off bracket",
+    "job": "holds the riser to the wall"
+   },
+   {
+    "name": "pipe_sleeve_plate",
+    "dims": "6 mm welded penetration plate round the 1.3 m main",
+    "job": "where the junction's main passes into the lane"
+   }
+  ],
+  "leaf": [
+   {
+    "name": "leaf_face",
+    "dims": "steel leaf 2.3 x 2.6 m, 0.30 m thick, 10 mm skins over a concrete fill (about 4.5 t)",
+    "job": "the door; hung and locked from the lane side"
+   },
+   {
+    "name": "leaf_seam0",
+    "dims": "skin-to-edge-channel weld seam, 60 mm in",
+    "job": "the skin's welded edge"
+   },
+   {
+    "name": "leaf_seam1",
+    "dims": "skin-to-edge-channel weld seam, 60 mm in",
+    "job": "the skin's welded edge"
+   },
+   {
+    "name": "leaf_seam2",
+    "dims": "skin-to-edge-channel weld seam, 60 mm in",
+    "job": "the skin's welded edge"
+   },
+   {
+    "name": "leaf_seam3",
+    "dims": "skin-to-edge-channel weld seam, 60 mm in",
+    "job": "the skin's welded edge"
+   },
+   {
+    "name": "leaf_drop_seal",
+    "dims": "rubber drop seal",
+    "job": "seals to the threshold"
+   },
+   {
+    "name": "leaf_spindle_cap0",
+    "dims": "capped square lever spindle, 120 mm boss",
+    "job": "the locking lever on this side is removed: the door is worked only from the lane side"
+   },
+   {
+    "name": "leaf_spindle_cap1",
+    "dims": "capped square lever spindle, 120 mm boss",
+    "job": "the locking lever on this side is removed: the door is worked only from the lane side"
+   }
+  ],
+  "leafbreak": [
+   {
+    "name": "gap_reveal",
+    "dims": "the far reveal's steel liner, seen in the opening gap",
+    "job": "the frame the leaf is tearing out of"
+   },
+   {
+    "name": "leaf_face",
+    "dims": "steel leaf 2.3 x 2.6 m, 0.30 m thick, 10 mm skins over a concrete fill (about 4.5 t)",
+    "job": "the door; hung and locked from the lane side"
+   },
+   {
+    "name": "leaf_seam0",
+    "dims": "skin-to-edge-channel weld seam, 60 mm in",
+    "job": "the skin's welded edge"
+   },
+   {
+    "name": "leaf_seam1",
+    "dims": "skin-to-edge-channel weld seam, 60 mm in",
+    "job": "the skin's welded edge"
+   },
+   {
+    "name": "leaf_seam2",
+    "dims": "skin-to-edge-channel weld seam, 60 mm in",
+    "job": "the skin's welded edge"
+   },
+   {
+    "name": "leaf_seam3",
+    "dims": "skin-to-edge-channel weld seam, 60 mm in",
+    "job": "the skin's welded edge"
+   },
+   {
+    "name": "leaf_drop_seal",
+    "dims": "rubber drop seal",
+    "job": "seals to the threshold"
+   },
+   {
+    "name": "leaf_spindle_cap0",
+    "dims": "capped square lever spindle, 120 mm boss",
+    "job": "the locking lever on this side is removed: the door is worked only from the lane side"
+   },
+   {
+    "name": "leaf_spindle_cap1",
+    "dims": "capped square lever spindle, 120 mm boss",
+    "job": "the locking lever on this side is removed: the door is worked only from the lane side"
+   },
+   {
+    "name": "bent_bolt0",
+    "dims": "50 mm locking bolt, bent",
+    "job": "the bolts are shearing at the latch jamb"
+   },
+   {
+    "name": "bent_bolt1",
+    "dims": "50 mm locking bolt, bent",
+    "job": "the bolts are shearing at the latch jamb"
+   },
+   {
+    "name": "bent_bolt2",
+    "dims": "50 mm locking bolt, bent",
+    "job": "the bolts are shearing at the latch jamb"
+   }
+  ],
+  "cracks": [
+   {
+    "name": "cracks",
+    "dims": "hairline-to-3 mm cracks",
+    "job": "the frame's anchors pulling out of the concrete"
+   }
+  ],
+  "hole": [
+   {
+    "name": "reveal_far",
+    "dims": "the latch jamb's frame web: 6 mm steel liner over the 0.40 m wall",
+    "job": "the jamb the bolts sheared out of; seen through the empty opening"
+   },
+   {
+    "name": "keeper0",
+    "dims": "torn bolt keeper pocket 160 x 160 mm",
+    "job": "where a locking bolt was"
+   },
+   {
+    "name": "keeper_tab0",
+    "dims": "keeper lip bent out",
+    "job": "torn steel at the pocket"
+   },
+   {
+    "name": "keeper1",
+    "dims": "torn bolt keeper pocket 160 x 160 mm",
+    "job": "where a locking bolt was"
+   },
+   {
+    "name": "keeper_tab1",
+    "dims": "keeper lip bent out",
+    "job": "torn steel at the pocket"
+   },
+   {
+    "name": "keeper2",
+    "dims": "torn bolt keeper pocket 160 x 160 mm",
+    "job": "where a locking bolt was"
+   },
+   {
+    "name": "keeper_tab2",
+    "dims": "keeper lip bent out",
+    "job": "torn steel at the pocket"
+   },
+   {
+    "name": "threshold_full",
+    "dims": "steel threshold plate 2.4 x 0.6 m, bowed up 40 mm where the leaf tore out",
+    "job": "metal threshold of the opening"
+   },
+   {
+    "name": "rubble_heap",
+    "dims": "a heap of spalled concrete and fines 0.34 m high, 1.8 m long",
+    "job": "what the blast tore out of the jambs; the rubble line (x 540) is its end"
+   },
+   {
+    "name": "rubble_back",
+    "dims": "spalled concrete 0.21 m",
+    "job": "rubble from the blast"
+   },
+   {
+    "name": "frame_piece",
+    "dims": "1.0 m of the frame's 120 mm channel, torn off",
+    "job": "frame fragment"
+   },
+   {
+    "name": "frame_piece_top",
+    "dims": "its torn top edge",
+    "job": "frame fragment"
+   }
+  ],
+  "damage": [
+   {
+    "name": "spall",
+    "dims": "concrete spalled off the face round the frame's anchors, 30-60 mm deep",
+    "job": "the back-blast tore the frame's approach flange loose"
+   },
+   {
+    "name": "rebar",
+    "dims": "16 mm reinforcing bars exposed in the spall",
+    "job": "the wall's reinforcement"
+   },
+   {
+    "name": "flange_peeled",
+    "dims": "the latch flange, torn off its anchors above 1.1 m and bent 0.3 m out",
+    "job": "frame damage"
+   },
+   {
+    "name": "flange_far_low",
+    "dims": "latch flange, still anchored",
+    "job": "frame"
+   },
+   {
+    "name": "head_sag",
+    "dims": "head flange bowed 80 mm",
+    "job": "frame damage"
+   },
+   {
+    "name": "soot",
+    "dims": "soot from the vented gas",
+    "job": "where the blast left the frame"
+   }
+  ],
+  "lying": [
+   {
+    "name": "dust_film",
+    "dims": "a film of concrete dust",
+    "job": "settled after the blast"
+   },
+   {
+    "name": "prop_chunk",
+    "dims": "spalled concrete 0.26 m",
+    "job": "rubble from the blast"
+   },
+   {
+    "name": "leaf_shadow",
+    "dims": "contact shadow",
+    "job": "the leaf lies on the deck"
+   },
+   {
+    "name": "leaf_left_edge",
+    "dims": "the leaf's hinge edge, 0.30 m",
+    "job": "torn hinge side"
+   },
+   {
+    "name": "leaf_top_edge",
+    "dims": "the leaf's top edge, 0.30 m: 10 mm skins and the edge channel over the concrete fill",
+    "job": "the door's edge, toward the camera"
+   },
+   {
+    "name": "leaf_up_face",
+    "dims": "the leaf's approach face, up: bowed 40 mm",
+    "job": "the door, thrown 2-3 m into the lane"
+   },
+   {
+    "name": "leaf_spindle_cap0",
+    "dims": "capped lever spindle",
+    "job": "the same caps as on the shut door"
+   },
+   {
+    "name": "leaf_spindle_cap1",
+    "dims": "capped lever spindle",
+    "job": "the same caps as on the shut door"
+   },
+   {
+    "name": "hinge_knuckle0",
+    "dims": "torn hinge knuckle 180 mm, its pin sheared",
+    "job": "the leaf hung on three of these on the lane side"
+   },
+   {
+    "name": "hinge_knuckle1",
+    "dims": "torn hinge knuckle 180 mm, its pin sheared",
+    "job": "the leaf hung on three of these on the lane side"
+   },
+   {
+    "name": "hinge_knuckle2",
+    "dims": "torn hinge knuckle 180 mm, its pin sheared",
+    "job": "the leaf hung on three of these on the lane side"
+   },
+   {
+    "name": "rubble_front",
+    "dims": "spalled concrete 0.07 m",
+    "job": "rubble from the blast"
+   }
+  ],
+  "front": [
+   {
+    "name": "col_flange_near",
+    "dims": "steel channel frame, 120 mm approach flange",
+    "job": "lines the hinge jamb"
+   },
+   {
+    "name": "col_face_strip",
+    "dims": "20 mm of face",
+    "job": "the wall's end"
+   },
+   {
+    "name": "col_end",
+    "dims": "the cross-wall's end face toward the camera, 0.40 m",
+    "job": "the wall's end; carries the status lamp and the junction box"
+   },
+   {
+    "name": "col_arris_face",
+    "dims": "50 mm steel arris angle, face leg",
+    "job": "armours the corner"
+   },
+   {
+    "name": "col_arris_end_l",
+    "dims": "50 mm steel arris angle",
+    "job": "armours the corner"
+   },
+   {
+    "name": "col_arris_end_r",
+    "dims": "50 mm steel arris angle",
+    "job": "armours the lane-side corner"
+   },
+   {
+    "name": "lamp_base",
+    "dims": "cast lamp body on a conduit box",
+    "job": "carries the globe"
+   },
+   {
+    "name": "lamp_cap",
+    "dims": "guard cap",
+    "job": "tops the wire guard"
+   },
+   {
+    "name": "lamp_guard0",
+    "dims": "wire guard bar",
+    "job": "protects the globe"
+   },
+   {
+    "name": "lamp_guard1",
+    "dims": "wire guard bar",
+    "job": "protects the globe"
+   },
+   {
+    "name": "lamp_guard2",
+    "dims": "wire guard bar",
+    "job": "protects the globe"
+   },
+   {
+    "name": "lamp_conduit",
+    "dims": "20 mm rigid conduit",
+    "job": "feeds the lamp from the junction box"
+   },
+   {
+    "name": "jb_backplate",
+    "dims": "backplate",
+    "job": "carries the box"
+   },
+   {
+    "name": "jb_box",
+    "dims": "lockable junction box 0.24 x 0.40 x 0.12 m",
+    "job": "terminates the lamp's and the door light's feeds"
+   },
+   {
+    "name": "jb_hinge",
+    "dims": "cover hinge",
+    "job": "hinged cover"
+   },
+   {
+    "name": "jb_lock",
+    "dims": "padlock hasp",
+    "job": "lockable"
+   },
+   {
+    "name": "light_feed_end",
+    "dims": "20 mm conduit round the arris",
+    "job": "the door light's feed into the box"
+   },
+   {
+    "name": "riser",
+    "dims": "20 mm conduit up to the slab tray",
+    "job": "feeds the box from above"
+   },
+   {
+    "name": "riser_strap0",
+    "dims": "one-hole strap",
+    "job": "holds the riser every 0.9 m"
+   },
+   {
+    "name": "riser_strap1",
+    "dims": "one-hole strap",
+    "job": "holds the riser every 0.9 m"
+   },
+   {
+    "name": "riser_strap2",
+    "dims": "one-hole strap",
+    "job": "holds the riser every 0.9 m"
+   },
+   {
+    "name": "riser_strap3",
+    "dims": "one-hole strap",
+    "job": "holds the riser every 0.9 m"
+   },
+   {
+    "name": "stub_face",
+    "dims": "the wall's 0.15 m stub, approach-side face",
+    "job": "the wall's line carried across the deck to the camera (cutaway)"
+   },
+   {
+    "name": "stub_top",
+    "dims": "stub top, the wall's 0.40 m thickness",
+    "job": "the cut section, seen from above"
+   },
+   {
+    "name": "stub_angle_top",
+    "dims": "50 mm steel edge angle",
+    "job": "armours the approach-side edge"
+   },
+   {
+    "name": "stub_angle_face",
+    "dims": "50 mm steel edge angle",
+    "job": "armours the approach-side edge"
+   },
+   {
+    "name": "stub_angle_far",
+    "dims": "50 mm steel edge angle",
+    "job": "armours the lane-side edge"
+   },
+   {
+    "name": "stub_end",
+    "dims": "10 mm steel end plate",
+    "job": "closes the stub at the deck's front edge"
+   }
+  ],
+  "alcove": [
+   {
+    "name": "bay_back",
+    "dims": "the bay's back wall, cast concrete, 1.15 m behind the posts",
+    "job": "the recess the TANK RELEASE stands in"
+   },
+   {
+    "name": "bay_side",
+    "dims": "the bay's right reveal",
+    "job": "the recess's side"
+   },
+   {
+    "name": "bay_floor",
+    "dims": "the bay's floor",
+    "job": "concrete floor of the recess"
+   },
+   {
+    "name": "header",
+    "dims": "W310 steel header beam 2.3 m",
+    "job": "spans the bay; the wall above sits on it"
+   },
+   {
+    "name": "header_flange",
+    "dims": "its bottom flange edge",
+    "job": "beam flange"
+   },
+   {
+    "name": "post0",
+    "dims": "W150 steel post, 150 mm flange, 2.7 m",
+    "job": "carries the header; marks where the bay's cover ends"
+   },
+   {
+    "name": "post_web0",
+    "dims": "flange edge shadow line",
+    "job": "the section's front flange edges"
+   },
+   {
+    "name": "post_base0",
+    "dims": "base plate 300 x 300 x 30 mm",
+    "job": "bolts the post to the floor"
+   },
+   {
+    "name": "post_anchor00",
+    "dims": "M20 anchor nut",
+    "job": "holds the base plate down"
+   },
+   {
+    "name": "post_anchor01",
+    "dims": "M20 anchor nut",
+    "job": "holds the base plate down"
+   },
+   {
+    "name": "post1",
+    "dims": "W150 steel post, 150 mm flange, 2.7 m",
+    "job": "carries the header; marks where the bay's cover ends"
+   },
+   {
+    "name": "post_web1",
+    "dims": "flange edge shadow line",
+    "job": "the section's front flange edges"
+   },
+   {
+    "name": "post_base1",
+    "dims": "base plate 300 x 300 x 30 mm",
+    "job": "bolts the post to the floor"
+   },
+   {
+    "name": "post_anchor10",
+    "dims": "M20 anchor nut",
+    "job": "holds the base plate down"
+   },
+   {
+    "name": "post_anchor11",
+    "dims": "M20 anchor nut",
+    "job": "holds the base plate down"
+   },
+   {
+    "name": "bay_light_body",
+    "dims": "vapour-tight LED 0.6 m under the header",
+    "job": "lights the bay and the TANK RELEASE"
+   },
+   {
+    "name": "bay_light_lens",
+    "dims": "diffuser",
+    "job": "light source"
+   }
+  ]
+ },
+ "lamp_glass_centre": [
+  503.174,
+  357.773
+ ],
+ "screen": {
+  "far_jamb_foot": [
+   465.93,
+   436.03
+  ],
+  "near_jamb_foot": [
+   491.32,
+   452.61
+  ],
+  "opening_top": [
+   [
+    465.93,
+    333.52
+   ],
+   [
+    491.32,
+    343.9
+   ]
+  ],
+  "column_at_1m": [
+   493.11,
+   509.76
+  ],
+  "back_corner_x": 419.89,
+  "stub_line": [
+   [
+    493.67,
+    454.15
+   ],
+   [
+    555.0,
+    494.2
+   ]
+  ],
+  "charge_line_x": 453.51
+ }
+}
