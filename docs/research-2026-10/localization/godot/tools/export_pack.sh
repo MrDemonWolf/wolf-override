@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Imports a scratch copy of the game and exports a .pck of its macOS preset, to see which translation
 # files and which ICU line-breaking data an export carries (research-godot step, 2026-10-16; evidence:
-# ../evidence/pck-translation-files.log and measurements.txt).
+# ../evidence/pck-translation-files.txt and measurements.txt).
 #   export_pack.sh ROOT LOG_DIR
 # ROOT is a scratch export of the repository (it holds apps/game and scripts/godot-helpers.sh, whose
 # isolate_godot_home, bounded and import_game this reuses); never the real checkout. Godot's user data
@@ -14,7 +14,7 @@
 # run only in ../../prototype/tools/extract_pot.sh, so each of those is written once.
 # Gotcha: a first import under an isolated HOME and a /private/tmp project path logged
 # "Could not create ObjectDB Snapshots directory", which godot-helpers.sh's import_game counts as a
-# failure although the import finished (../evidence/pot.log); the run goes on and says so.
+# failure although the import finished (../evidence/pot.txt); the run goes on and says so.
 set -euo pipefail
 root="$(cd "$1" && pwd)" logs="$2"
 mkdir -p "$logs"

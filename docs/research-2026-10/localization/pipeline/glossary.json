@@ -1,14 +1,14 @@
 {
-  "_about": "Trial glossary for es-419, de and ja (proof only; Nathanial owns final wording). 'required' is the exact form a translation must contain whenever the English line contains the term; 'variants' lists inflected forms the checker also accepts. 'keep' terms are copied through untranslated. The checker (tools/trial.py, and the prototype's tools/i18n_tool.py through it) reads this file; nothing else lists the terms.",
-  "keep": ["WOLF", "%s", "%d", "{name}"],
+  "_about": "Trial glossary for es-419, de and ja, with ru added by the design step (proof only; Nathanial owns final wording). 'required' is the exact form a translation must contain whenever the English line contains the term; 'variants' lists inflected forms the checker also accepts. 'keep' terms are copied through untranslated. The checker (tools/trial.py, and the prototype's tools/i18n_tool.py through it) reads this file; nothing else lists the terms. For ru the 'required' form is a stem that every case form of the noun contains (Russian nouns change their ending by case: страж, стража, стражу), plus the capitalised variants; a station plate is quoted in «» in its own nominative form, so its plate words never change. 'keep' also lists the Latin-letter words that stay as written in every script: the 'E:' key token, the studio name and the person's name (the prototype's script guard skips them).",
+  "keep": ["WOLF", "%s", "%d", "{name}", "E:", "MRDEMONWOLF, INC.", "Nathanial Henniges"],
   "terms": {
-    "SAFE POINT": {"es-419": {"required": "PUNTO SEGURO"}, "de": {"required": "SICHERUNGSPUNKT"}, "ja": {"required": "セーフポイント"}},
-    "TANK RELEASE": {"es-419": {"required": "SOLTAR TANQUE"}, "de": {"required": "TANKAUSLÖSER", "variants": ["TANKAUSLÖSERS"]}, "ja": {"required": "タンク投下"}},
-    "relay": {"es-419": {"required": "relé"}, "de": {"required": "Relais"}, "ja": {"required": "リレー"}},
-    "bypass": {"es-419": {"required": "bypass"}, "de": {"required": "Bypass"}, "ja": {"required": "バイパス"}},
-    "sentry": {"es-419": {"required": "centinela", "variants": ["CENTINELA"]}, "de": {"required": "Wächter", "variants": ["WÄCHTER"]}, "ja": {"required": "セントリー"}},
-    "SENTRY": {"es-419": {"required": "CENTINELA"}, "de": {"required": "WÄCHTER"}, "ja": {"required": "セントリー"}},
-    "coolant": {"es-419": {"required": "refrigerante"}, "de": {"required": "Kühlmittel"}, "ja": {"required": "冷却材"}},
-    "the mark": {"es-419": {"required": "marca"}, "de": {"required": "Markierung"}, "ja": {"required": "マーク"}}
+    "SAFE POINT": {"es-419": {"required": "PUNTO SEGURO"}, "de": {"required": "SICHERUNGSPUNKT"}, "ja": {"required": "セーフポイント"}, "ru": {"required": "БЕЗОПАСНАЯ ТОЧКА"}},
+    "TANK RELEASE": {"es-419": {"required": "SOLTAR TANQUE"}, "de": {"required": "TANKAUSLÖSER", "variants": ["TANKAUSLÖSERS"]}, "ja": {"required": "タンク投下"}, "ru": {"required": "СБРОС БАКА"}},
+    "relay": {"es-419": {"required": "relé"}, "de": {"required": "Relais"}, "ja": {"required": "リレー"}, "ru": {"required": "реле"}},
+    "bypass": {"es-419": {"required": "bypass"}, "de": {"required": "Bypass"}, "ja": {"required": "バイパス"}, "ru": {"required": "байпас"}},
+    "sentry": {"es-419": {"required": "centinela", "variants": ["CENTINELA"]}, "de": {"required": "Wächter", "variants": ["WÄCHTER"]}, "ja": {"required": "セントリー"}, "ru": {"required": "страж", "variants": ["Страж", "СТРАЖ"]}},
+    "SENTRY": {"es-419": {"required": "CENTINELA"}, "de": {"required": "WÄCHTER"}, "ja": {"required": "セントリー"}, "ru": {"required": "СТРАЖ"}},
+    "coolant": {"es-419": {"required": "refrigerante"}, "de": {"required": "Kühlmittel"}, "ja": {"required": "冷却材"}, "ru": {"required": "хладагент"}},
+    "the mark": {"es-419": {"required": "marca"}, "de": {"required": "Markierung"}, "ja": {"required": "マーク"}, "ru": {"required": "отметк"}}
   }
 }

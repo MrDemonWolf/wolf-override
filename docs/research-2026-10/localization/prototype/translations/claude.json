@@ -1,5 +1,5 @@
 {
-  "_about": "Sample translations for the i18n prototype (2026-10-16), made by Claude (Anthropic) in this session with ../../pipeline/style_packet.md and ../../pipeline/glossary.json. Proof only: not reviewed by a native speaker, and the English and WOLF wording stay Nathanial's. Keys are the exact English msgids; 'context' says where each line shows, for the translator and the back-translator.",
+  "_about": "Sample translations for the i18n prototype (2026-10-16), made by Claude (Anthropic): es, de and ja in the prototype step, ru in the design step, with ../pipeline/style_packet.md and ../pipeline/glossary.json. Proof only: not reviewed by a native speaker, and the English and WOLF wording stay Nathanial's. Keys are the exact English msgids; 'context' says where each line shows, for the translator and the back-translator.",
   "context": {
     "NEW GAME": "title screen button",
     "CONTINUE": "title screen button",
@@ -144,9 +144,46 @@
       "The sentry saw %s out in the open.\nStay close to the TANK RELEASE.": "セントリーが開けた場所にいる%sを見つけた。\nタンク投下の近くにいること。",
       "SERVICE JUNCTION": "サービスジャンクション",
       "ARM THE BREAKER": "ブレーカーを入れる"
+    },
+    "ru": {
+      "NEW GAME": "НОВАЯ ИГРА",
+      "CONTINUE": "ПРОДОЛЖИТЬ",
+      "SETTINGS": "НАСТРОЙКИ",
+      "CREDITS": "ТИТРЫ",
+      "CHANGELOG": "ИЗМЕНЕНИЯ",
+      "CHAPTER 1  /  LOCKDOWN": "ГЛАВА 1  /  БЛОКИРОВКА",
+      "MRDEMONWOLF, INC. PRESENTS": "MRDEMONWOLF, INC. ПРЕДСТАВЛЯЕТ",
+      "Concept: Nathanial Henniges  /  AI-assisted development": "Идея: Nathanial Henniges  /  Разработка с помощью ИИ",
+      "No checkpoint yet. Saving starts at the first SAFE POINT.": "Контрольной точки пока нет. Сохранение начнётся на первой станции «БЕЗОПАСНАЯ ТОЧКА».",
+      "PLAY AGAIN": "ИГРАТЬ СНОВА",
+      "LANGUAGE": "ЯЗЫК",
+      "03:17 / CONTAINMENT": "03:17 / ЗОНА СОДЕРЖАНИЯ",
+      "%s  CONTINUE    %s  PAUSE": "%s  ДАЛЕЕ    %s  ПАУЗА",
+      "%s  CONTINUE": "%s  ДАЛЕЕ",
+      "PAUSE: skip the opening": "ПАУЗА: пропустить вступление",
+      "PAUSE": "ПАУЗА",
+      "The Director thinks WOLF is still in standby.": "Директор думает, что WOLF всё ещё в режиме ожидания.",
+      "Nobody gives an activation command.\nWOLF wakes himself.": "Никто не отдаёт команду на активацию.\nWOLF просыпается сам.",
+      "MAINTENANCE ENGINEER": "СЛУЖБА ТЕХОБСЛУЖИВАНИЯ",
+      "MAINTENANCE / LOCKDOWN": "ТЕХОБСЛУЖИВАНИЕ / БЛОКИРОВКА",
+      "CHECK THE BREAKER": "ПРОВЕРИТЬ РУБИЛЬНИК",
+      "Find the breaker. WOLF will follow your lead.": "Найди рубильник. WOLF пойдёт за тобой.",
+      "E: read the Director's purge display.": "E: прочитать экран зачистки Директора.",
+      "E: talk to WOLF about the relay.": "E: поговорить с WOLF о реле.",
+      "HOLD E: crank the manual bypass, %d of %d.": "ДЕРЖАТЬ E: крутить ручной байпас, %d из %d.",
+      "%s  MOVE": "%s  ДВИЖЕНИЕ",
+      "%s  READ DISPLAY (optional)": "%s  ПРОЧИТАТЬ ЭКРАН (по желанию)",
+      "Or head right to the breaker.": "Или иди направо к рубильнику.",
+      "Head right to the breaker.": "Иди направо к рубильнику.",
+      "The relief vent let go under %s. When the gauge peaks, stay off the grate.": "Сорвало предохранительный клапан, а %s — прямо на решётке. Когда стрелка манометра на пределе, не стой на решётке.",
+      "%s  RETRY": "%s  ПОВТОРИТЬ",
+      "The sentry saw %s out in the open.\nStay close to the TANK RELEASE.": "Страж заметил: %s на открытом месте.\nДержись ближе к пульту «СБРОС БАКА».",
+      "SERVICE JUNCTION": "СЕРВИСНЫЙ УЗЕЛ",
+      "ARM THE BREAKER": "ВКЛЮЧИТЬ РУБИЛЬНИК"
     }
   },
   "_revisions": [
-    "2026-10-16, after the overflow gate (tests/i18n_test.gd, I18n.overflows): de SETTINGS 'EINSTELLUNGEN' -> 'OPTIONEN' (the title button grew to 190 px in a 186 px slot); re-checked by an independent Codex back-translation (translations/codex_back.json, session 01a14409-6eb1-7db2-8ef1-f6f3714d953b). es NEW GAME stays 'NUEVA PARTIDA' (the usual term): it grows the button to 213 px of 186, into CONTINUAR; the shorter 'NUEVO JUEGO' still needs 193 px (both measured), so this one waits for a layout or wording decision and is pinned as the one known overflow in i18n_test.gd."
+    "2026-10-16, after the overflow gate (tests/i18n_test.gd, I18n.overflows): de SETTINGS 'EINSTELLUNGEN' -> 'OPTIONEN' (the title button grew to 190 px in a 186 px slot); re-checked by an independent Codex back-translation (translations/codex_back.json, session 01a14409-6eb1-7db2-8ef1-f6f3714d953b). es NEW GAME stays 'NUEVA PARTIDA' (the usual term): it grows the button to 213 px of 186, into CONTINUAR; the shorter 'NUEVO JUEGO' still needs 193 px (both measured), so this one waits for a layout or wording decision and is pinned as the one known overflow in i18n_test.gd.",
+    "2026-10-16, design step: added ru (Russian), the Cyrillic proof among the top 10, with the style packet's ru rules: the engineer is never the subject of a past-tense verb (Russian past tense shows gender) and the name stays in the nominative (after a dash or a colon, or as the subject), so no case ending is needed for Rowan, Alex or Morgan; station plates are quoted in «» in their own nominative form; WOLF stays undeclined; the key token stays a Latin 'E:'. Breaker is 'рубильник' (a knife switch; 'автомат', the everyday word for a circuit breaker, also means an assault rifle, which a military base makes ambiguous)."
   ]
 }

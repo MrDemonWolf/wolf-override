@@ -2331,6 +2331,48 @@ jFRdjfY{|!!<c*%+dmR_aFwg(h>lo!o=R}!X3>or2#@U?@
 literal 0
 HcmV?d00001
 
+diff --git a/apps/game/assets/fonts/NotoSansJP-Subset.otf.import b/apps/game/assets/fonts/NotoSansJP-Subset.otf.import
+new file mode 100644
+index 0000000..766e79e
+--- /dev/null
++++ b/apps/game/assets/fonts/NotoSansJP-Subset.otf.import
+@@ -0,0 +1,36 @@
++[remap]
++
++importer="font_data_dynamic"
++type="FontFile"
++uid="uid://dxkpo77iapfui"
++path="res://.godot/imported/NotoSansJP-Subset.otf-250fb4ab852196143e2e57f47bfe79f3.fontdata"
++
++[deps]
++
++source_file="res://assets/fonts/NotoSansJP-Subset.otf"
++dest_files=["res://.godot/imported/NotoSansJP-Subset.otf-250fb4ab852196143e2e57f47bfe79f3.fontdata"]
++
++[params]
++
++Rendering=null
++antialiasing=1
++generate_mipmaps=false
++disable_embedded_bitmaps=true
++multichannel_signed_distance_field=false
++msdf_pixel_range=8
++msdf_size=48
++allow_system_fallback=true
++force_autohinter=false
++modulate_color_glyphs=false
++hinting=3
++subpixel_positioning=4
++keep_rounding_remainders=true
++oversampling=0.0
++Fallbacks=null
++fallbacks=[]
++Compress=null
++compress=true
++preload=[]
++language_support={}
++script_support={}
++opentype_features={}
 diff --git a/apps/game/assets/manifest.json b/apps/game/assets/manifest.json
 index 6f70e7d..7d34830 100644
 --- a/apps/game/assets/manifest.json
@@ -4734,8 +4776,802 @@ index 0000000..cdbc381
 +#: scripts/main.gd:5082
 +msgid "CHECK THE BREAKER"
 +msgstr "ブレーカーを確認"
+diff --git a/apps/game/i18n/ru.po b/apps/game/i18n/ru.po
+new file mode 100644
+index 0000000..5b9da78
+--- /dev/null
++++ b/apps/game/i18n/ru.po
+@@ -0,0 +1,788 @@
++# Sample translations for the scratch prototype (proof only; not reviewed).
++msgid ""
++msgstr ""
++"Project-Id-Version: WOLF//OVERRIDE i18n prototype\n"
++"PO-Revision-Date: 2026-10-16 00:00+0000\n"
++"Last-Translator: Claude (Anthropic), machine translation, unreviewed\n"
++"Language-Team: none\n"
++"MIME-Version: 1.0\n"
++"Content-Type: text/plain; charset=UTF-8\n"
++"Content-Transfer-Encoding: 8bit\n"
++"Language: ru\n"
++"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
++
++#: scenes/main.tscn
++msgid "ROWAN"
++msgstr ""
++
++#: scenes/main.tscn
++msgid "WOLF"
++msgstr ""
++
++#: scenes/main.tscn
++msgid "BREAKER"
++msgstr ""
++
++#: scenes/main.tscn
++msgid "COOLANT RELAY"
++msgstr ""
++
++#: scenes/main.tscn
++msgid "SAFE POINT"
++msgstr ""
++
++#: scenes/main.tscn
++msgid ""
++"A / D  MOVE\n"
++"E  READ DISPLAY (optional)"
++msgstr ""
++
++# machine-translated by Claude (Anthropic), unreviewed
++#. TRANSLATORS: the on-screen PAUSE button
++#: scenes/main.tscn
++#: scripts/main.gd:4368
++msgid "PAUSE"
++msgstr "ПАУЗА"
++
++#: scenes/main.tscn
++msgid "◀"
++msgstr ""
++
++#: scenes/main.tscn
++msgid "▶"
++msgstr ""
++
++#: scenes/main.tscn
++#: scripts/main.gd:4383
++msgid "USE"
++msgstr ""
++
++#: scenes/main.tscn
++msgid "1  WOLF"
++msgstr ""
++
++#: scenes/main.tscn
++msgid "2  MANUAL"
++msgstr ""
++
++# machine-translated by Claude (Anthropic), unreviewed
++#. TRANSLATORS: title screen, above the game's logo (studio name stays English)
++#: scenes/main.tscn
++msgid "MRDEMONWOLF, INC. PRESENTS"
++msgstr "MRDEMONWOLF, INC. ПРЕДСТАВЛЯЕТ"
++
++#: scenes/main.tscn
++msgid "WOLF//OVERRIDE"
++msgstr ""
++
++# machine-translated by Claude (Anthropic), unreviewed
++#. TRANSLATORS: title screen subtitle; two spaces round the slash
++#: scenes/main.tscn
++msgid "CHAPTER 1  /  LOCKDOWN"
++msgstr "ГЛАВА 1  /  БЛОКИРОВКА"
++
++# machine-translated by Claude (Anthropic), unreviewed
++#. TRANSLATORS: title screen button
++#: scenes/main.tscn
++msgid "NEW GAME"
++msgstr "НОВАЯ ИГРА"
++
++# machine-translated by Claude (Anthropic), unreviewed
++#. TRANSLATORS: title screen button
++#: scenes/main.tscn
++#: scripts/main.gd:926
++msgid "CONTINUE"
++msgstr "ПРОДОЛЖИТЬ"
++
++# machine-translated by Claude (Anthropic), unreviewed
++#. TRANSLATORS: title screen button
++#: scenes/main.tscn
++msgid "CREDITS"
++msgstr "ТИТРЫ"
++
++# machine-translated by Claude (Anthropic), unreviewed
++#. TRANSLATORS: title and pause button
++#: scenes/main.tscn
++msgid "SETTINGS"
++msgstr "НАСТРОЙКИ"
++
++#: scenes/main.tscn
++msgid "Development updates, in the game and online"
++msgstr ""
++
++# machine-translated by Claude (Anthropic), unreviewed
++#. TRANSLATORS: title screen button (the game's update notes)
++#: scenes/main.tscn
++msgid "CHANGELOG"
++msgstr "ИЗМЕНЕНИЯ"
++
++# machine-translated by Claude (Anthropic), unreviewed
++#. TRANSLATORS: title screen footer; the person's name stays as is
++#: scenes/main.tscn
++msgid "Concept: Nathanial Henniges  /  AI-assisted development"
++msgstr "Идея: Nathanial Henniges  /  Разработка с помощью ИИ"
++
++#: scenes/main.tscn
++msgid ""
++"[center][color=#73DDF5]ORIGINAL CONCEPT, CORE STORY & CREATIVE VISION[/color]\n"
++"[font_size=30][b]Nathanial Henniges[/b][/font_size]\n"
++"\n"
++"\n"
++"[color=#73DDF5]DEVELOPMENT[/color]\n"
++"[font_size=26][b]MrDemonWolf, Inc.[/b][/font_size]\n"
++"\n"
++"\n"
++"[color=#73DDF5]AI-ASSISTED PRODUCTION[/color]\n"
++"ChatGPT and Codex (OpenAI) and Claude Code by Anthropic\n"
++"assisted with research, writing and code.\n"
++"Nathanial directed and reviewed the work.\n"
++"\n"
++"\n"
++"[color=#73DDF5]PROVISIONAL ART[/color]\n"
++"Created with ChatGPT Create and the Codex image generation tool.\n"
++"Nathanial reviewed and approved each set.\n"
++"The WOLF//OVERRIDE mark was redrawn from a generated concept.\n"
++"\n"
++"\n"
++"[color=#73DDF5]SOUND EFFECTS[/color]\n"
++"Most are generated by the game's own code.\n"
++"\n"
++"Recorded steam (CC0)\n"
++"Joseph Sardin - BigSoundBank.com / LaSonotheque.org\n"
++"\n"
++"Recorded growls (CC0, OpenGameArt.org)\n"
++"pauliuw, bonebrah and AntumDeluge\n"
++"(bear growl from the U.S. Fish & Wildlife Service)\n"
++"\n"
++"No music or voice yet.\n"
++"\n"
++"\n"
++"[color=#73DDF5]TYPEFACES[/color]\n"
++"Roboto and Montserrat\n"
++"SIL Open Font License 1.1\n"
++"\n"
++"\n"
++"[color=#73DDF5]BUILT WITH[/color]\n"
++"Godot 4.7.2  /  GDScript\n"
++"Next.js  /  Fumadocs  /  Tailwind CSS  /  Bun\n"
++"Pillow  /  NumPy  /  ImageMagick  /  cwebp\n"
++"\n"
++"\n"
++"[color=#73DDF5]RESEARCH & CRAFT REFERENCES[/color]\n"
++"Fumito Ueda / The Last Guardian\n"
++"Companion behavior and visual storytelling\n"
++"\n"
++"Naughty Dog / The Last of Us Part II\n"
++"Reviewed controls and readable presentation\n"
++"\n"
++"Game Accessibility Guidelines\n"
++"Player-paced text and recognizable interactions\n"
++"\n"
++"Godot 4.7 Camera2D reference\n"
++"Camera follow and smoothing\n"
++"\n"
++"Nielsen Norman Group\n"
++"Mobile screenshot readability\n"
++"\n"
++"NIST AI Risk Management Framework\n"
++"National Archives records guidance\n"
++"\n"
++"References inform craft, not the origin of this game.\n"
++"Original concept, core story and creative vision:\n"
++"Nathanial Henniges.\n"
++"Referenced creators are not project contributors.\n"
++"\n"
++"Full sources, tools and asset credits:\n"
++"wolfoverride.mrdemonwolf.dev/docs/credits/\n"
++"\n"
++"\n"
++"[font_size=24][b]THANK YOU FOR PLAYING[/b][/font_size][/center]"
++msgstr ""
++
++#: scenes/main.tscn
++msgid "BACK TO TITLE"
++msgstr ""
++
++#: scenes/main.tscn
++#: scripts/main.gd:1810
++msgid "PAUSE SCROLL"
++msgstr ""
++
++#: scenes/main.tscn
++msgid "DEVELOPMENT UPDATES"
++msgstr ""
++
++#: scenes/main.tscn
++msgid "Source-build changes by date, not releases. Scroll with the wheel, drag the text or use up/down."
++msgstr ""
++
++#: scenes/main.tscn
++msgid "Opens wolfoverride.mrdemonwolf.dev/docs/changelog/ in your browser"
++msgstr ""
++
++#: scenes/main.tscn
++msgid "OPEN FULL CHANGELOG ONLINE"
++msgstr ""
++
++#: scenes/main.tscn
++msgid "SESSION PAUSED"
++msgstr ""
++
++#: scenes/main.tscn
++msgid "RESUME"
++msgstr ""
++
++#: scenes/main.tscn
++msgid "ESC / START TO RESUME"
++msgstr ""
++
++#: scenes/main.tscn
++msgid "RETURN TO TITLE"
++msgstr ""
++
++#: scenes/main.tscn
++msgid ""
++"Returning keeps your last checkpoint.\n"
++"Unsaved progress will be lost."
++msgstr ""
++
++#: scenes/main.tscn
++msgid "SYSTEM SETTINGS"
++msgstr ""
++
++#: scenes/main.tscn
++msgid "FPS LIMIT"
++msgstr ""
++
++#: scenes/main.tscn
++msgid "WINDOW SIZE"
++msgstr ""
++
++#: scenes/main.tscn
++msgid "FULLSCREEN"
++msgstr ""
++
++#: scenes/main.tscn
++msgid "Window size applies on desktop."
++msgstr ""
++
++#: scenes/main.tscn
++msgid "BACK"
++msgstr ""
++
++#: scenes/studio_logo.tscn
++msgid "MrDemonWolf, Inc."
++msgstr ""
++
++#: scripts/game_settings.gd:215
++msgid "V-SYNC"
++msgstr ""
++
++#: scripts/game_settings.gd:224
++msgid "REDUCED MOTION"
++msgstr ""
++
++#: scripts/game_settings.gd:225
++msgid "No camera shake or hit-stop; screen flashes are shorter."
++msgstr ""
++
++#: scripts/game_settings.gd:235
++msgid "Scales the dialogue, hints, cards and station names."
++msgstr ""
++
++# machine-translated by Claude (Anthropic), unreviewed
++#. TRANSLATORS: Settings caption beside the language list
++#: scripts/game_settings.gd:242
++msgid "LANGUAGE"
++msgstr "ЯЗЫК"
++
++#: scripts/game_settings.gd:286
++msgid "TOGGLE HOLDS"
++msgstr ""
++
++#: scripts/game_settings.gd:287
++msgid "Press interact once to start a crank and again to stop it, instead of holding it down. Keyboard, controller and touch."
++msgstr ""
++
++#: scripts/game_settings.gd:292
++msgid "RESTORE DEFAULT CONTROLS"
++msgstr ""
++
++#: scripts/game_settings.gd:305
++msgid "CANCEL REBIND"
++msgstr ""
++
++#: scripts/game_settings.gd:450
++msgid "Rebind cancelled."
++msgstr ""
++
++#: scripts/game_settings.gd:470
++msgid "Binding saved."
++msgstr ""
++
++#: scripts/game_settings.gd:600
++msgid "Default controls restored."
++msgstr ""
++
++#: scripts/game_settings.gd:624
++#: scripts/main.gd:1938
++msgid "Settings could not be saved."
++msgstr ""
++
++# machine-translated by Claude (Anthropic), unreviewed
++#. TRANSLATORS: knockdown card; %s is the engineer's first name (non-binary)
++#: scripts/junction_room.gd:774
++#: scripts/main.gd:5216
++#, c-format
++msgid "The relief vent let go under %s. When the gauge peaks, stay off the grate."
++msgstr "Сорвало предохранительный клапан, а %s — прямо на решётке. Когда стрелка манометра на пределе, не стой на решётке."
++
++#: scripts/junction_room.gd:798
++msgid "LINE"
++msgstr ""
++
++#: scripts/junction_room.gd:1029
++#: scripts/main.gd:5220
++#, c-format
++msgid "The coolant cloud caught %s. Let it clear before crossing the mark."
++msgstr ""
++
++#: scripts/junction_room.gd:1458
++msgid "BREAKER USED"
++msgstr ""
++
++#: scripts/junction_room.gd:1460
++msgid "VALVE USED"
++msgstr ""
++
++#: scripts/junction_room.gd:1477
++msgid "EXIT OPEN"
++msgstr ""
++
++#: scripts/junction_room.gd:1481
++msgid "EXIT OPENING"
++msgstr ""
++
++#: scripts/junction_room.gd:1484
++msgid "EXIT READY"
++msgstr ""
++
++#: scripts/junction_room.gd:1487
++msgid "EXIT LOCKED"
++msgstr ""
++
++# machine-translated by Claude (Anthropic), unreviewed
++#. TRANSLATORS: title screen button after the slice is finished
++#: scripts/main.gd:926
++msgid "PLAY AGAIN"
++msgstr "ИГРАТЬ СНОВА"
++
++#: scripts/main.gd:931
++msgid "Slice complete. PLAY AGAIN starts a fresh run."
++msgstr ""
++
++#: scripts/main.gd:933
++msgid "Saved checkpoint could not be read."
++msgstr ""
++
++# machine-translated by Claude (Anthropic), unreviewed
++#. TRANSLATORS: title screen note under a greyed CONTINUE; SAFE POINT is a station plate
++#: scripts/main.gd:933
++msgid "No checkpoint yet. Saving starts at the first SAFE POINT."
++msgstr "Контрольной точки пока нет. Сохранение начнётся на первой станции «БЕЗОПАСНАЯ ТОЧКА»."
++
++#: scripts/main.gd:956
++msgid "LINK UNAVAILABLE"
++msgstr ""
++
++# machine-translated by Claude (Anthropic), unreviewed
++#. TRANSLATORS: opening narration box (narrator, no speaker)
++#: scripts/main.gd:1718
++msgid "The Director thinks WOLF is still in standby."
++msgstr "Директор думает, что WOLF всё ещё в режиме ожидания."
++
++# machine-translated by Claude (Anthropic), unreviewed
++#. TRANSLATORS: opening narration box; keep the line break
++#: scripts/main.gd:1718
++msgid ""
++"Nobody gives an activation command.\n"
++"WOLF wakes himself."
++msgstr ""
++"Никто не отдаёт команду на активацию.\n"
++"WOLF просыпается сам."
++
++#: scripts/main.gd:1718
++msgid ""
++"The latch breaks from the inside.\n"
++"WOLF steps out under his own power."
++msgstr ""
++
++#: scripts/main.gd:1718
++msgid "WOLF turns from the Director and heads for maintenance."
++msgstr ""
++
++#: scripts/main.gd:1845
++msgid "RESUME SCROLL"
++msgstr ""
++
++#: scripts/main.gd:1878
++msgid "30 FPS"
++msgstr ""
++
++#: scripts/main.gd:1879
++msgid "60 FPS"
++msgstr ""
++
++#: scripts/main.gd:1880
++msgid "UNCAPPED"
++msgstr ""
++
++#: scripts/main.gd:1881
++msgid "90 FPS"
++msgstr ""
++
++#: scripts/main.gd:1882
++msgid "120 FPS"
++msgstr ""
++
++#: scripts/main.gd:1883
++msgid "144 FPS"
++msgstr ""
++
++#: scripts/main.gd:1900
++msgid "TAP RESUME TO RETURN"
++msgstr ""
++
++# machine-translated by Claude (Anthropic), unreviewed
++#. TRANSLATORS: knockdown card; %s is the engineer's first name; TANK RELEASE is a station plate
++#: scripts/main.gd:3385
++#, c-format
++msgid ""
++"The sentry saw %s out in the open.\n"
++"Stay close to the TANK RELEASE."
++msgstr ""
++"Страж заметил: %s на открытом месте.\n"
++"Держись ближе к пульту «СБРОС БАКА»."
++
++#: scripts/main.gd:3385
++#, c-format
++msgid ""
++"The sentry ran %s down. Once its\n"
++"eyes go red, only the rubble is safe."
++msgstr ""
++
++#: scripts/main.gd:3655
++#: scripts/main.gd:5218
++#, c-format
++msgid "The door went with %s in front of it. When the fuse lights, back away past the valve."
++msgstr ""
++
++#: scripts/main.gd:4382
++msgid "◀ / ▶  MOVE"
++msgstr ""
++
++#: scripts/main.gd:4382
++msgid "STICK / D-PAD MOVE"
++msgstr ""
++
++# machine-translated by Claude (Anthropic), unreviewed
++#. TRANSLATORS: tutorial prompt; %s is the move keys
++#: scripts/main.gd:4382
++#, c-format
++msgid "%s  MOVE"
++msgstr "%s  ДВИЖЕНИЕ"
++
++# machine-translated by Claude (Anthropic), unreviewed
++#. TRANSLATORS: tutorial prompt; %s is a key
++#: scripts/main.gd:4383
++#, c-format
++msgid "%s  READ DISPLAY (optional)"
++msgstr "%s  ПРОЧИТАТЬ ЭКРАН (по желанию)"
++
++# machine-translated by Claude (Anthropic), unreviewed
++#. TRANSLATORS: tutorial prompt second row
++#: scripts/main.gd:4386
++msgid "Head right to the breaker."
++msgstr "Иди направо к рубильнику."
++
++# machine-translated by Claude (Anthropic), unreviewed
++#. TRANSLATORS: tutorial prompt second row
++#: scripts/main.gd:4391
++msgid "Or head right to the breaker."
++msgstr "Или иди направо к рубильнику."
++
++# machine-translated by Claude (Anthropic), unreviewed
++#. TRANSLATORS: top card as the opening starts: a clock time and the place
++#: scripts/main.gd:4399
++msgid "03:17 / CONTAINMENT"
++msgstr "03:17 / ЗОНА СОДЕРЖАНИЯ"
++
++#: scripts/main.gd:4400
++msgid "TAP CONTINUE  /  PAUSE"
++msgstr ""
++
++# machine-translated by Claude (Anthropic), unreviewed
++#. TRANSLATORS: hint bar in the opening; each %s is a key name (E, Esc)
++#: scripts/main.gd:4400
++#, c-format
++msgid "%s  CONTINUE    %s  PAUSE"
++msgstr "%s  ДАЛЕЕ    %s  ПАУЗА"
++
++#: scripts/main.gd:4403
++msgid "TAP CONTINUE"
++msgstr ""
++
++# machine-translated by Claude (Anthropic), unreviewed
++#. TRANSLATORS: hint bar; %s is a key name
++#: scripts/main.gd:4403
++#, c-format
++msgid "%s  CONTINUE"
++msgstr "%s  ДАЛЕЕ"
++
++# machine-translated by Claude (Anthropic), unreviewed
++#. TRANSLATORS: hint bar on the opening's first box: the Pause menu offers to skip it
++#: scripts/main.gd:4403
++msgid "PAUSE: skip the opening"
++msgstr "ПАУЗА: пропустить вступление"
++
++# machine-translated by Claude (Anthropic), unreviewed
++#. TRANSLATORS: name card under the engineer's name; the engineer is non-binary, so no gendered noun
++#: scripts/main.gd:4429
++msgid "MAINTENANCE ENGINEER"
++msgstr "СЛУЖБА ТЕХОБСЛУЖИВАНИЯ"
++
++# machine-translated by Claude (Anthropic), unreviewed
++#. TRANSLATORS: top card: place
++#: scripts/main.gd:4440
++msgid "SERVICE JUNCTION"
++msgstr "СЕРВИСНЫЙ УЗЕЛ"
++
++#: scripts/main.gd:4440
++msgid "RECORDS ACCESS / FIRST COPY"
++msgstr ""
++
++# machine-translated by Claude (Anthropic), unreviewed
++#. TRANSLATORS: top card: place / chapter
++#: scripts/main.gd:4440
++msgid "MAINTENANCE / LOCKDOWN"
++msgstr "ТЕХОБСЛУЖИВАНИЕ / БЛОКИРОВКА"
++
++#: scripts/main.gd:4445
++msgid "Checkpoint saved."
++msgstr ""
++
++#: scripts/main.gd:4458
++msgid "TAP RETRY"
++msgstr ""
++
++# machine-translated by Claude (Anthropic), unreviewed
++#. TRANSLATORS: hint bar on the knockdown card; %s is a key name
++#: scripts/main.gd:4458
++#, c-format
++msgid "%s  RETRY"
++msgstr "%s  ПОВТОРИТЬ"
++
++#: scripts/main.gd:4909
++#: scripts/main.gd:4946
++msgid "E: continue."
++msgstr ""
++
++#: scripts/main.gd:4909
++msgid "E: follow the service line toward Archive."
++msgstr ""
++
++#: scripts/main.gd:4910
++msgid "The exit is open. Head right to follow the service line."
++msgstr ""
++
++#: scripts/main.gd:4912
++msgid "E: copy the purge-order trace."
++msgstr ""
++
++#: scripts/main.gd:4912
++msgid "Purge order copied. Find the mirror port."
++msgstr ""
++
++#: scripts/main.gd:4915
++msgid "Mirror copied. Head for the exit."
++msgstr ""
++
++#: scripts/main.gd:4916
++msgid "E: examine the mirror port."
++msgstr ""
++
++#: scripts/main.gd:4916
++msgid "Copy the purge order first."
++msgstr ""
++
++#: scripts/main.gd:4919
++msgid "E: secure the first copy in the container."
++msgstr ""
++
++#: scripts/main.gd:4919
++msgid "Preserve both traces before leaving."
++msgstr ""
++
++#: scripts/main.gd:4922
++msgid "E: enter records access. The Director's purge is still running."
++msgstr ""
++
++# machine-translated by Claude (Anthropic), unreviewed
++#. TRANSLATORS: hint bar; 'E:' is replaced by the bound key and must stay exactly 'E:'
++#: scripts/main.gd:4922
++#: scripts/main.gd:4930
++msgid "E: read the Director's purge display."
++msgstr "E: прочитать экран зачистки Директора."
++
++#: scripts/main.gd:4922
++msgid "Return to the safe point to enter records access."
++msgstr ""
++
++#: scripts/main.gd:4925
++msgid "The seal is opening."
++msgstr ""
++
++#: scripts/main.gd:4927
++msgid "E: save at the safe point."
++msgstr ""
++
++#: scripts/main.gd:4928
++msgid "The seal is open. Move to the safe point."
++msgstr ""
++
++#: scripts/main.gd:4932
++msgid "WOLF is moving to the contact."
++msgstr ""
++
++#: scripts/main.gd:4935
++msgid "The bypass is dead. Arm the breaker first."
++msgstr ""
++
++# machine-translated by Claude (Anthropic), unreviewed
++#. TRANSLATORS: hint bar; keep 'E:'; %d of %d is turns so far and turns needed
++#: scripts/main.gd:4937
++#, c-format
++msgid "HOLD E: crank the manual bypass, %d of %d."
++msgstr "ДЕРЖАТЬ E: крутить ручной байпас, %d из %d."
++
++#: scripts/main.gd:4939
++msgid "HOLD E: crank it yourself, or let WOLF take the relay."
++msgstr ""
++
++#: scripts/main.gd:4939
++#, c-format
++msgid "HOLD E: crank on, %d of %d, or let WOLF take the relay."
++msgstr ""
++
++#: scripts/main.gd:4942
++msgid "The breaker is live. Go to the MANUAL BYPASS by the relay."
++msgstr ""
++
++#: scripts/main.gd:4942
++msgid "The breaker is live. Go to the coolant relay."
++msgstr ""
++
++# machine-translated by Claude (Anthropic), unreviewed
++#. TRANSLATORS: hint bar; keep 'E:'
++#: scripts/main.gd:4947
++msgid "E: talk to WOLF about the relay."
++msgstr "E: поговорить с WOLF о реле."
++
++#: scripts/main.gd:4947
++msgid "E: arm the breaker."
++msgstr ""
++
++#: scripts/main.gd:4950
++msgid "The relay is dark. Return to the breaker first."
++msgstr ""
++
++#: scripts/main.gd:4951
++msgid "WOLF refused the live contact. Use the MANUAL BYPASS beside it."
++msgstr ""
++
++#: scripts/main.gd:4951
++msgid "E: signal WOLF to take the contact."
++msgstr ""
++
++#: scripts/main.gd:4953
++msgid "Go to the MANUAL BYPASS beside the relay."
++msgstr ""
++
++#: scripts/main.gd:4953
++msgid "Go to the coolant relay. WOLF is ready for the contact."
++msgstr ""
++
++#: scripts/main.gd:4955
++msgid "Return to the breaker and arm power."
++msgstr ""
++
++# machine-translated by Claude (Anthropic), unreviewed
++#. TRANSLATORS: hint bar, first hint of the game
++#: scripts/main.gd:4956
++msgid "Find the breaker. WOLF will follow your lead."
++msgstr "Найди рубильник. WOLF пойдёт за тобой."
++
++#: scripts/main.gd:5054
++msgid "SERVICE LINE CLEARED"
++msgstr ""
++
++#: scripts/main.gd:5056
++msgid "POP THE EXIT BOLT"
++msgstr ""
++
++#: scripts/main.gd:5059
++msgid "DROP THE TANK"
++msgstr ""
++
++#: scripts/main.gd:5059
++msgid "GO THROUGH THE DOOR"
++msgstr ""
++
++#: scripts/main.gd:5062
++msgid "CRANK THE VALVE"
++msgstr ""
++
++#: scripts/main.gd:5064
++msgid "GET CLEAR OF THE DOOR"
++msgstr ""
++
++# machine-translated by Claude (Anthropic), unreviewed
++#. TRANSLATORS: top card objective
++#: scripts/main.gd:5065
++#: scripts/main.gd:5081
++msgid "ARM THE BREAKER"
++msgstr "ВКЛЮЧИТЬ РУБИЛЬНИК"
++
++#: scripts/main.gd:5068
++msgid "FIRST COPY SECURED"
++msgstr ""
++
++#: scripts/main.gd:5070
++msgid "COPY PURGE ORDER"
++msgstr ""
++
++#: scripts/main.gd:5072
++msgid "COPY MIRROR INDEX"
++msgstr ""
++
++#: scripts/main.gd:5073
++msgid "REACH EXIT"
++msgstr ""
++
++#: scripts/main.gd:5075
++msgid "SAFE POINT REACHED"
++msgstr ""
++
++#: scripts/main.gd:5077
++msgid "REACH SAFE POINT"
++msgstr ""
++
++#: scripts/main.gd:5079
++msgid "OPEN THE SEAL"
++msgstr ""
++
++# machine-translated by Claude (Anthropic), unreviewed
++#. TRANSLATORS: top card objective
++#: scripts/main.gd:5082
++msgid "CHECK THE BREAKER"
++msgstr "ПРОВЕРИТЬ РУБИЛЬНИК"
 diff --git a/apps/game/project.godot b/apps/game/project.godot
-index 7a0f155..c240272 100644
+index 7a0f155..e824f87 100644
 --- a/apps/game/project.godot
 +++ b/apps/game/project.godot
 @@ -35,3 +35,8 @@ theme/custom="res://assets/fonts/game_theme.tres"
@@ -4746,7 +5582,7 @@ index 7a0f155..c240272 100644
 +[internationalization]
 +
 +locale/translations_pot_files=PackedStringArray("res://scenes/main.tscn", "res://scenes/studio_logo.tscn", "res://scripts/atlas_mesh.gd", "res://scripts/blast_leaf.gd", "res://scripts/bypass_handle.gd", "res://scripts/containment_cage.gd", "res://scripts/dialogue_boxes.gd", "res://scripts/drop_arm.gd", "res://scripts/floor_reflection.gd", "res://scripts/fx/fx_kit.gd", "res://scripts/fx/palette.gd", "res://scripts/fx/tri_mesh.gd", "res://scripts/fx/tweens.gd", "res://scripts/fx_presets.gd", "res://scripts/game_settings.gd", "res://scripts/hazard.gd", "res://scripts/hold_use.gd", "res://scripts/i18n.gd", "res://scripts/impact.gd", "res://scripts/junction_door_layout.gd", "res://scripts/junction_room.gd", "res://scripts/m0_actor.gd", "res://scripts/m0_state.gd", "res://scripts/main.gd", "res://scripts/pause_overlay.gd", "res://scripts/pressure_line.gd", "res://scripts/records_room.gd", "res://scripts/room_depth.gd", "res://scripts/seal_leaf.gd", "res://scripts/sentry.gd", "res://scripts/sentry_brain.gd", "res://scripts/sfx_bank.gd", "res://scripts/studio_logo.gd", "res://scripts/swing_leaf.gd", "res://scripts/text_size.gd", "res://scripts/ui_motion.gd", "res://scripts/world/door_camera.gd")
-+locale/translations=PackedStringArray("res://i18n/es.po", "res://i18n/de.po", "res://i18n/ja.po")
++locale/translations=PackedStringArray("res://i18n/es.po", "res://i18n/de.po", "res://i18n/ja.po", "res://i18n/ru.po")
 diff --git a/apps/game/scripts/dialogue_boxes.gd b/apps/game/scripts/dialogue_boxes.gd
 index c8b1e48..297cfb6 100644
 --- a/apps/game/scripts/dialogue_boxes.gd
@@ -4900,10 +5736,10 @@ index cda3344..d853b22 100644
  	config.set_value("controls", "deadzone", deadzone.value)
 diff --git a/apps/game/scripts/i18n.gd b/apps/game/scripts/i18n.gd
 new file mode 100644
-index 0000000..e7cf01c
+index 0000000..ff1ce30
 --- /dev/null
 +++ b/apps/game/scripts/i18n.gd
-@@ -0,0 +1,195 @@
+@@ -0,0 +1,197 @@
 +class_name I18n
 +extends RefCounted
 +## The game's languages (scratch prototype of the i18n job, 2026-10-16; not on any branch).
@@ -4932,8 +5768,10 @@ index 0000000..e7cf01c
 +
 +## The languages offered, in Settings order: Godot locale code, then the name in its own language.
 +## "es" is Latin-American Spanish (es-419): Godot reduces es-419 to "es" (TranslationServer.
-+## standardize_locale keeps only two-letter regions), so a Spain file would be "es_ES".
-+const LANGUAGES: Array[Array] = [["en", "English"], ["es", "Español (Latinoamérica)"], ["de", "Deutsch"], ["ja", "日本語"]]
++## standardize_locale keeps only two-letter regions), so a Spain file would be "es_ES". "ru" (added by
++## the design step, 2026-10-16) is the Cyrillic proof: the game's Roboto and Montserrat already draw it,
++## so it needs no fallback font. A Ukrainian OS (uk_UA) resolves to English, never to Russian.
++const LANGUAGES: Array[Array] = [["en", "English"], ["es", "Español (Latinoamérica)"], ["de", "Deutsch"], ["ja", "日本語"], ["ru", "Русский"]]
 +## The language when the OS asks for one the game does not have.
 +const FALLBACK: String = "en"
 +## The Japanese fallback font: a subset of Noto Sans JP (SIL OFL 1.1, notofonts/noto-cjk Sans 2.004)
@@ -5470,10 +6308,10 @@ index 6751e01..33413df 100644
  
 diff --git a/apps/game/tests/i18n_test.gd b/apps/game/tests/i18n_test.gd
 new file mode 100644
-index 0000000..08de7ac
+index 0000000..52c4955
 --- /dev/null
 +++ b/apps/game/tests/i18n_test.gd
-@@ -0,0 +1,230 @@
+@@ -0,0 +1,280 @@
 +extends "res://tests/support/game_suite.gd"
 +## Languages (i18n prototype, scratch only, 2026-10-16). One game through: the OS-locale resolver and
 +## its fallback; the PO translations Godot loaded from project.godot; switching the language while
@@ -5485,16 +6323,34 @@ index 0000000..08de7ac
 +## not overflowing in any language; and Godot's pseudolocalization reaching the composed text with its
 +## inserts intact. English stays the internal text throughout (I18n class notes), so the game's other
 +## suites keep checking English. Spawn, waits and teardown come from tests/support/game_suite.gd.
++## Russian (added by the design step, 2026-10-16) is the Cyrillic proof among the top 10 languages: it is
++## drawn by the game's own fonts with no fallback (so its lines keep their height), and its knockdown card
++## keeps the name in the nominative, so no case ending is needed for any of the three names.
 +
-+const LOCALES: Array[String] = ["es", "de", "ja"]
++const LOCALES: Array[String] = ["es", "de", "ja", "ru"]
 +const PO_DIR: String = "res://i18n/%s.po"
 +## The theme's fonts: the body (Roboto) and the two Montserrat weights the buttons and headings use.
 +const FONTS: Array[String] = ["res://assets/fonts/Roboto-Regular.tres", "res://assets/fonts/Montserrat-Semibold.tres", "res://assets/fonts/Montserrat-Bold.tres"]
 +
-+## Overflows the gate is known to find, as "locale:text as drawn". The Spanish NEW GAME grows its 186 px
-+## title button to 213 px, into CONTINUAR's; the shorter "NUEVO JUEGO" still needs 193 (measured). It
-+## waits for Nathanial's layout or wording decision (PROTOTYPE.md); any other overflow fails.
-+const KNOWN_OVERFLOWS: Array[String] = ["es:NUEVA PARTIDA"]
++## Overflows the gate is known to find, as "locale:text as drawn"; any other overflow fails. All wait for
++## Nathanial's layout or wording decision (DECISIONS.md D10: wider title buttons, a CONTINUE note that
++## wraps to two rows, a Brand line that may grow). Measured by this suite (design step, 2026-10-16):
++## - NEW GAME, es "NUEVA PARTIDA": 213 px of the 186 px button (the shorter "NUEVO JUEGO" needs 193).
++## - CONTINUE, ru "ПРОДОЛЖИТЬ" (the usual word for continuing a save): 199 px of 186.
++## - The Brand line: de 298 px and ru 321 px of 280.
++## - The CONTINUE note (shown only while there is no save; one row, no wrap): es 485, de 510, ja 480 and
++##   ru 671 px of 388. The prototype's render audit never saw it in es, de or ja, because its English pass
++##   had saved by then.
++const KNOWN_OVERFLOWS: Array[String] = [
++	"es:NUEVA PARTIDA",
++	"ru:ПРОДОЛЖИТЬ",
++	"de:MRDEMONWOLF, INC. PRÄSENTIERT",
++	"ru:MRDEMONWOLF, INC. ПРЕДСТАВЛЯЕТ",
++	"es:Aún no hay punto de control. Se guarda desde el primer PUNTO SEGURO.",
++	"de:Noch kein Checkpoint. Gespeichert wird ab dem ersten SICHERUNGSPUNKT.",
++	"ja:チェックポイントはまだない。最初のセーフポイントから保存される。",
++	"ru:Контрольной точки пока нет. Сохранение начнётся на первой станции «БЕЗОПАСНАЯ ТОЧКА».",
++]
 +
 +var game: Main
 +
@@ -5531,7 +6387,7 @@ index 0000000..08de7ac
 +
 +## The OS locale picks a language the game has, else English.
 +func _check_resolver() -> void:
-+	var cases: Dictionary = {"es_MX": "es", "es_419": "es", "es-419": "es", "es_ES": "es", "de_AT": "de", "de": "de", "ja_JP": "ja", "en_US": "en", "fr_FR": "en", "pt_BR": "en", "": "en"}
++	var cases: Dictionary = {"es_MX": "es", "es_419": "es", "es-419": "es", "es_ES": "es", "de_AT": "de", "de": "de", "ja_JP": "ja", "ru_RU": "ru", "ru_KZ": "ru", "uk_UA": "en", "en_US": "en", "fr_FR": "en", "pt_BR": "en", "": "en"}
 +	for locale: String in cases:
 +		_check(I18n.resolve(locale) == cases[locale], "OS locale %s resolves to %s (got %s)" % [locale, cases[locale], I18n.resolve(locale)])
 +	var empty: ConfigFile = ConfigFile.new()
@@ -5576,6 +6432,16 @@ index 0000000..08de7ac
 +	_check(roboto.get_height(17) > latin_height, "Japanese puts the Noto fallback behind Roboto (line height %.0f -> %.0f px)" % [latin_height, roboto.get_height(17)])
 +	I18n.apply("en")
 +	_check(roboto.get_height(17) == latin_height, "and English takes it off again (line height %.0f px)" % roboto.get_height(17))
++	# Russian is drawn by the game fonts alone: no fallback goes on, so no line grows.
++	var russian: Translation = load(PO_DIR % "ru") as Translation
++	var cyrillic: String = ""
++	for msgid: String in russian.get_message_list():
++		cyrillic += String(russian.get_message(msgid)).replace("\n", "")
++	I18n.apply("ru")
++	_check(roboto.get_height(17) == latin_height, "Russian chains no fallback (line height %.0f px)" % roboto.get_height(17))
++	for path: String in FONTS:
++		var missing_ru: String = I18n.missing_glyphs(cyrillic, load(path) as Font)
++		_check(missing_ru.is_empty(), "%s draws every Russian character without a fallback; missing: %s" % [path.get_file(), missing_ru])
 +	I18n.apply("ja")
 +	var needed: Dictionary = {}
 +	for locale: String in LOCALES:
@@ -5592,24 +6458,27 @@ index 0000000..08de7ac
 +	I18n.apply("en")
 +
 +
-+## The title's buttons translate themselves and still fit; the language row offers every language.
++## The title's buttons translate themselves and still fit, and so do its Brand line and CONTINUE note
++## (added by the design step: its Russian render audit found both too wide, and the prototype's audit
++## had never seen the note in es, de or ja, because it shows only while there is no save); the language
++## row offers every language.
 +func _check_title() -> void:
-+	var buttons: Array[Button] = [game.new_game_button, game.continue_button, game.credits_button, game.changelog_button, game.get_node("CanvasLayer/TitleScreen/SettingsButton") as Button]
-+	var expected: Dictionary = {"es": "NUEVA PARTIDA", "de": "NEUES SPIEL", "ja": "ニューゲーム", "en": "NEW GAME"}
-+	for locale: String in ["es", "de", "ja", "en"]:
++	var buttons: Array[Control] = [game.new_game_button, game.continue_button, game.credits_button, game.changelog_button, game.get_node("CanvasLayer/TitleScreen/SettingsButton") as Button, game.get_node("CanvasLayer/TitleScreen/Brand") as Label, game.continue_note]
++	var expected: Dictionary = {"es": "NUEVA PARTIDA", "de": "NEUES SPIEL", "ja": "ニューゲーム", "ru": "НОВАЯ ИГРА", "en": "NEW GAME"}
++	for locale: String in ["es", "de", "ja", "ru", "en"]:
 +		I18n.apply(locale)
 +		await frames(2)
 +		_check(game.new_game_button.atr(game.new_game_button.text) == expected[locale], "title NEW GAME reads %s in %s (got %s)" % [expected[locale], locale, game.new_game_button.atr(game.new_game_button.text)])
 +		_check(game.new_game_button.text == "NEW GAME", "the button keeps its English text internally in %s" % locale)
-+		for button: Button in buttons:
-+			var shown: String = button.atr(button.text)
++		for button: Control in buttons:
++			var shown: String = button.atr(str(button.get("text")))
 +			var designed: float = button.offset_right - button.offset_left
 +			var known: bool = KNOWN_OVERFLOWS.has("%s:%s" % [locale, shown])
-+			_check(I18n.overflows(button) == known, "%s title button %s %s (needs %.0f px, the layout gives %.0f)" % [locale, shown, "is the known overflow" if known else "fits", button.get_minimum_size().x, designed])
++			_check(I18n.overflows(button) == known, "%s title text %s %s (needs %.0f px, the layout gives %.0f)" % [locale, shown, "is a known overflow" if known else "fits", button.get_minimum_size().x, designed])
 +		var note: Label = game.continue_note
 +		_check(note.atr(note.text) != note.text or locale == "en", "the CONTINUE note is translated in %s" % locale)
 +	var language: OptionButton = game.settings_menu.language
-+	_check(language.item_count == I18n.LANGUAGES.size() and language.get_item_text(3) == "日本語", "Settings offers every language by its own name")
++	_check(language.item_count == I18n.LANGUAGES.size() and language.get_item_text(3) == "日本語" and language.get_item_text(4) == "Русский", "Settings offers every language by its own name")
 +	I18n.apply("de")
 +	await frames(1)
 +	_check(language.selected == 2, "the language list follows a change made elsewhere (selected %d)" % language.selected)
@@ -5640,6 +6509,9 @@ index 0000000..08de7ac
 +	I18n.apply("de")
 +	await frames(3)
 +	_check(game.story.text == "Niemand gibt einen Aktivierungsbefehl.\nWOLF weckt sich selbst.", "and in de (got %s)" % game.story.text.c_escape())
++	I18n.apply("ru")
++	await frames(3)
++	_check(game.story.text == "Никто не отдаёт команду на активацию.\nWOLF просыпается сам.", "and in ru (got %s)" % game.story.text.c_escape())
 +
 +
 +## The first play frames: the name card (top card), then a hint, each redrawn on a language change.
@@ -5652,6 +6524,11 @@ index 0000000..08de7ac
 +	I18n.apply("es")
 +	await frames(1)
 +	_check(game.hud.text == "%s\nINGENIERÍA DE MANTENIMIENTO" % name, "name card redrawn in es without showing again (got %s)" % game.hud.text.c_escape())
++	I18n.apply("ru")
++	await frames(1)
++	_check(game.hud.text == "%s\nСЛУЖБА ТЕХОБСЛУЖИВАНИЯ" % name, "name card in ru names a department, not a gendered noun (got %s)" % game.hud.text.c_escape())
++	I18n.apply("es")
++	await frames(1)
 +	game.tutorial_step = 2
 +	# The location card waits while the opening lines play; with them dropped it comes up at once.
 +	game.opening_lines.clear()
@@ -5665,6 +6542,10 @@ index 0000000..08de7ac
 +	game.name_card_remaining = 0.0
 +	await frames(3)
 +	_check(game.hud.text == "保守区画 / ロックダウン\nブレーカーを確認", "location card in ja (got %s)" % game.hud.text.c_escape())
++	I18n.apply("ru")
++	await frames(2)
++	_check(game.hud.text == "ТЕХОБСЛУЖИВАНИЕ / БЛОКИРОВКА\nПРОВЕРИТЬ РУБИЛЬНИК", "location card in ru (got %s)" % game.hud.text.c_escape())
++	_check(game.context_hint_text.text == "%s: прочитать экран зачистки Директора." % key, "hint in ru with the key named (got %s)" % game.context_hint_text.text.c_escape())
 +
 +
 +## A knockdown card: its template translated, the engineer's name filled in, and the RETRY prompt.
@@ -5688,6 +6569,13 @@ index 0000000..08de7ac
 +	_check(game.context_hint_text.text == "%s  リトライ" % key, "RETRY prompt in ja (got %s)" % game.context_hint_text.text.c_escape())
 +	for box: String in game.dialogue_boxes:
 +		_check(game._dialogue_fits(DialogueBoxes.words_of(box, game._speaker_tags())), "ja knockdown box fits two rows: %s" % box.c_escape())
++	I18n.apply("ru")
++	await frames(2)
++	shown = " ".join(game.dialogue_boxes).replace("\n", " ")
++	_check(shown == "Сорвало предохранительный клапан, а %s — прямо на решётке. Когда стрелка манометра на пределе, не стой на решётке." % first, "knockdown card in ru with the name in the nominative (got %s)" % shown.c_escape())
++	_check(game.context_hint_text.text == "%s  ПОВТОРИТЬ" % key, "RETRY prompt in ru (got %s)" % game.context_hint_text.text.c_escape())
++	for box: String in game.dialogue_boxes:
++		_check(game._dialogue_fits(DialogueBoxes.words_of(box, game._speaker_tags())), "ru knockdown box fits two rows: %s" % box.c_escape())
 +
 +
 +## Godot's pseudolocalization reaches the composed text and keeps the name in it.

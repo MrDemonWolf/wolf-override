@@ -1,0 +1,15 @@
+RESULT support data file = icudt_godot.dat, 4797472 bytes
+RESULT is_locale_using_support_data(en) = false
+RESULT is_locale_using_support_data(es) = false
+RESULT is_locale_using_support_data(pt_BR) = false
+RESULT is_locale_using_support_data(de) = false
+RESULT is_locale_using_support_data(fr) = false
+RESULT is_locale_using_support_data(ru) = false
+RESULT is_locale_using_support_data(ja) = true
+RESULT is_locale_using_support_data(ko) = true
+RESULT is_locale_using_support_data(zh_Hans) = true
+RESULT is_locale_using_support_data(zh_Hant) = true
+RESULT is_locale_using_support_data(th) = true
+RESULT is_locale_using_support_data(vi) = false
+RESULT is_locale_using_support_data(pl) = false
+RESULT is_locale_using_support_data(tr) = false

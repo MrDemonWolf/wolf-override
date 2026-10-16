@@ -1,0 +1,110 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+RESULT OS.get_locale() = en_US
+RESULT OS.get_locale_language() = en
+RESULT TranslationServer.get_locale() at start (no test locale) = en_US
+RESULT standardize(es-419) = es | add_defaults: es
+RESULT standardize(es_419) = es | add_defaults: es
+RESULT standardize(es-MX) = es_MX | add_defaults: es_MX
+RESULT standardize(es_ES) = es_ES | add_defaults: es_ES
+RESULT standardize(es) = es | add_defaults: es
+RESULT standardize(zh-Hans) = zh_Hans | add_defaults: zh_Hans_CN
+RESULT standardize(zh-Hant) = zh_Hant | add_defaults: zh_Hant_TW
+RESULT standardize(zh-Hans-CN) = zh_Hans_CN | add_defaults: zh_Hans_CN
+RESULT standardize(zh_CN) = zh_CN | add_defaults: zh_Hans_CN
+RESULT standardize(zh_TW) = zh_TW | add_defaults: zh_Hant_TW
+RESULT standardize(zh_HK) = zh_HK | add_defaults: zh_Hant_HK
+RESULT standardize(pt-BR) = pt_BR | add_defaults: pt_BR
+RESULT standardize(pt_PT) = pt_PT | add_defaults: pt_PT
+RESULT standardize(pt) = pt | add_defaults: pt
+RESULT standardize(ja_JP) = ja_JP | add_defaults: ja_JP
+RESULT standardize(ko_KR) = ko_KR | add_defaults: ko_KR
+RESULT standardize(de_DE) = de_DE | add_defaults: de_DE
+RESULT standardize(fr_CA) = fr_CA | add_defaults: fr_CA
+RESULT standardize(ru_RU) = ru_RU | add_defaults: ru_RU
+RESULT standardize(en_US) = en_US | add_defaults: en_US
+RESULT standardize(pl_PL) = pl_PL | add_defaults: pl_PL
+RESULT standardize(tr_TR) = tr_TR | add_defaults: tr_TR
+RESULT standardize(it_IT) = it_IT | add_defaults: it_IT
+RESULT standardize(uk_UA) = uk_UA | add_defaults: uk_UA
+RESULT standardize(vi_VN) = vi_VN | add_defaults: vi_VN
+RESULT standardize(id_ID) = id_ID | add_defaults: id_ID
+RESULT standardize(th_TH) = th_TH | add_defaults: th_TH
+RESULT compare_locales(es_419, es) = 10
+RESULT compare_locales(es_419, es_MX) = 5
+RESULT compare_locales(es_MX, es_ES) = 4
+RESULT compare_locales(zh_TW, zh_Hant) = 10
+RESULT compare_locales(zh_HK, zh_Hant) = 5
+RESULT compare_locales(zh_CN, zh_Hant) = 3
+RESULT compare_locales(zh, zh_Hans) = 10
+RESULT compare_locales(pt_BR, pt_PT) = 4
+RESULT compare_locales(pt, pt_BR) = 5
+RESULT po locale(es.po) = es
+RESULT po locale(es_419.po) = es
+RESULT po locale(es_MX.po) = es_MX
+RESULT po locale(pt_BR.po) = pt_BR
+RESULT po locale(pt_PT.po) = pt_PT
+RESULT po locale(zh_Hans.po) = zh_Hans
+RESULT po locale(zh_Hant.po) = zh_Hant
+RESULT loaded_locales = ["es", "es_MX", "pt_BR", "pt_PT", "zh_Hans", "zh_Hant"]
+RESULT tr(HELLO) at es_419 (server locale es) = Hola (es)
+RESULT tr(HELLO) at es-419 (server locale es) = Hola (es)
+RESULT tr(HELLO) at es_AR (server locale es_AR) = Hola (es-419)
+RESULT tr(HELLO) at es_MX (server locale es_MX) = Hola (es_MX)
+RESULT tr(HELLO) at es_ES (server locale es_ES) = Hola (es-419)
+RESULT tr(HELLO) at es_US (server locale es_US) = Hola (es-419)
+RESULT tr(HELLO) at pt_BR (server locale pt_BR) = Olá (pt_BR)
+RESULT tr(HELLO) at pt_PT (server locale pt_PT) = Olá (pt_PT)
+RESULT tr(HELLO) at pt_AO (server locale pt_AO) = Olá (pt_PT)
+RESULT tr(HELLO) at pt (server locale pt) = Olá (pt_PT)
+RESULT tr(HELLO) at zh_CN (server locale zh_CN) = 你好 (zh_Hans)
+RESULT tr(HELLO) at zh_Hans_CN (server locale zh_Hans_CN) = 你好 (zh_Hans)
+RESULT tr(HELLO) at zh_TW (server locale zh_TW) = 你好 (zh_Hant)
+RESULT tr(HELLO) at zh_HK (server locale zh_HK) = 你好 (zh_Hant)
+RESULT tr(HELLO) at zh_Hant_TW (server locale zh_Hant_TW) = 你好 (zh_Hant)
+RESULT tr(HELLO) at zh_SG (server locale zh_SG) = 你好 (zh_Hans)
+RESULT tr(HELLO) at zh (server locale zh) = 你好 (zh_Hans)
+RESULT tr(HELLO) at fr_FR (server locale fr_FR) = HELLO
+ERROR: Invalid plural rules format. Missing equal sign for `nplurals`.
+   at: parse (core/string/plural_rules.cpp:142)
+   GDScript backtrace (most recent call first):
+       [0] _po (res://probe_runtime.gd:37)
+       [1] _po_features (res://probe_runtime.gd:71)
+       [2] _initialize (res://probe_runtime.gd:24)
+RESULT es ctx verb = Abrir
+RESULT es ctx adjective = Abierto
+RESULT es no ctx (falls to msgid) = Open
+RESULT es fuzzy entry = FUZZY ONE
+RESULT es tr_n(0) = 0 válvulas
+RESULT es tr_n(1) = 1 válvula
+RESULT es tr_n(2) = 2 válvulas
+RESULT es tr_n(5) = 5 válvulas
+RESULT ru tr_n(1) = 1 клапан
+RESULT ru tr_n(2) = 2 клапана
+RESULT ru tr_n(5) = 5 клапанов
+RESULT ru tr_n(11) = 11 клапанов
+RESULT ru tr_n(21) = 21 клапан
+RESULT ru tr_n(22) = 22 клапана
+RESULT ru tr_n(25) = 25 клапанов
+RESULT built-in plural rule ru = nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);
+RESULT built-in plural rule pl = nplurals=3; plural=(n==1 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);
+RESULT built-in plural rule ja = nplurals=1; plural=0;
+RESULT built-in plural rule pt_BR = nplurals=2; plural=(n > 1);
+RESULT pl PO without Plural-Forms locale = pl
+RESULT missing locale de -> fallback en, untranslated = HELLO
+RESULT percent after tr = Hola Rowan
+RESULT format after tr = Rowan mantiene a WOLF en marcha.
+RESULT tr after percent (key no longer matches) = Hello Rowan
+RESULT pseudo(HOLD E: crank the manual bypass, %d of %d.) = [______ĤÖÖŁÐ ÉÉ: ćŕááήḱ ŧh̀éé m̀ááήüüááł ḅýṕáášš, %d ôôf́ %d.______]  (length 42 -> 68, x1.62)
+RESULT pseudo({name} keeps WOLF's systems running.) = [_____{ήáám̀éé} ḱééééṕš ŴÖÖŁF́'š šýšŧéém̀š ŕüüήήííήǵ._____]  (length 36 -> 59, x1.64)
+RESULT pseudo([b]RELAY[/b]  {name} told WOLF the risk.) = [______[ḅ]ŘÉÉŁÅÅŸ[/ḅ]  {ήáám̀éé} ŧôôłd́ ŴÖÖŁF́ ŧh̀éé ŕííšḱ.______]  (length 40 -> 66, x1.65)
+RESULT pseudo(Back at the last checkpoint.) = [____ßááćḱ ááŧ ŧh̀éé łáášŧ ćh̀ééćḱṕôôííήŧ.____]  (length 28 -> 47, x1.68)
+RESULT listener notifications on set_locale = 1
+RESULT root auto_translate_mode (0 inherit,1 always,2 disabled) = 1
+RESULT Label inherit shown chars (HELLO=5, 'Hola (es)'=9) = 9
+RESULT Label disabled shown chars = 5
+RESULT Label.text property after locale change = HELLO
+RESULT RichTextLabel .text shown = Hola (es)
+RESULT RichTextLabel append_text shown = HELLO
+RESULT Node.tr in disabled node = Hola (es)
+RESULT Node.atr in disabled node = HELLO

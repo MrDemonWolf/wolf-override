@@ -163,5 +163,44 @@
   "tofu": [],
   "untranslated_in_pseudo": [],
   "image": "1920x1080"
+ },
+ "2400x1080/ru-title": {
+  "texts": 10,
+  "overflow": [
+   "CanvasLayer/TitleScreen/Brand \"MRDEMONWOLF, INC. ПРЕДСТАВЛЯЕТ\" needs 321 px, has 321",
+   "CanvasLayer/TitleScreen/ContinueButton \"ПРОДОЛЖИТЬ\" needs 199 px, has 199",
+   "CanvasLayer/TitleScreen/ContinueNote \"Контрольной точки пока нет. Сохранение начнётся на первой станции «БЕЗОПАСНАЯ ТОЧКА».\" needs 671 px, has 671"
+  ],
+  "tofu": [],
+  "untranslated_in_pseudo": [],
+  "image": "1920x1080"
+ },
+ "2400x1080/ru-narration": {
+  "texts": 5,
+  "overflow": [
+   "CanvasLayer/PauseButton \"ПАУЗА\" needs 91 px, has 91",
+   "CanvasLayer/TouchControls/Use \"ПРОДОЛЖИТЬ\" needs 211 px, has 211"
+  ],
+  "tofu": [],
+  "untranslated_in_pseudo": [],
+  "image": "1920x1080"
+ },
+ "2400x1080/ru-hint": {
+  "texts": 12,
+  "overflow": [
+   "CanvasLayer/PauseButton \"ПАУЗА\" needs 91 px, has 91"
+  ],
+  "tofu": [],
+  "untranslated_in_pseudo": [],
+  "image": "1920x1080"
+ },
+ "2400x1080/ru-knockdown": {
+  "texts": 13,
+  "overflow": [
+   "CanvasLayer/PauseButton \"ПАУЗА\" needs 91 px, has 91"
+  ],
+  "tofu": [],
+  "untranslated_in_pseudo": [],
+  "image": "1920x1080"
  }
 }

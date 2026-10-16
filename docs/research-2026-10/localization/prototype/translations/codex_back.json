@@ -407,10 +407,147 @@
   "ja-33": {
    "english": "CHECK THE BREAKER",
    "notes": ""
+  },
+  "ru-00": {
+   "english": "PAUSE",
+   "notes": ""
+  },
+  "ru-01": {
+   "english": "MRDEMONWOLF, INC. PRESENTS",
+   "notes": ""
+  },
+  "ru-02": {
+   "english": "CHAPTER 1  /  LOCKOUT",
+   "notes": "Блокировка can mean locking, blocking, lockout, or an interlock."
+  },
+  "ru-03": {
+   "english": "NEW GAME",
+   "notes": ""
+  },
+  "ru-04": {
+   "english": "CONTINUE",
+   "notes": ""
+  },
+  "ru-05": {
+   "english": "CREDITS",
+   "notes": "Титры can also mean on-screen titles or captions."
+  },
+  "ru-06": {
+   "english": "SETTINGS",
+   "notes": ""
+  },
+  "ru-07": {
+   "english": "CHANGES",
+   "notes": ""
+  },
+  "ru-08": {
+   "english": "Idea: Nathanial Henniges  /  Development with the help of AI",
+   "notes": ""
+  },
+  "ru-09": {
+   "english": "LANGUAGE",
+   "notes": ""
+  },
+  "ru-10": {
+   "english": "The safety valve was blown off, and %s is right on the grate. When the pressure gauge needle is at the limit, don't stand on the grate.",
+   "notes": "The clause about %s omits a verb, leaving its tense implicit. Решётка can mean a grate, grille, or grating."
+  },
+  "ru-11": {
+   "english": "PLAY AGAIN",
+   "notes": ""
+  },
+  "ru-12": {
+   "english": "There is no checkpoint yet. Saving will begin at the first “SAFE POINT” station.",
+   "notes": ""
+  },
+  "ru-13": {
+   "english": "The Director thinks that WOLF is still in standby mode.",
+   "notes": "Директор is a masculine title."
+  },
+  "ru-14": {
+   "english": "Nobody gives the activation command.\nWOLF wakes up on his own.",
+   "notes": "Сам explicitly marks WOLF as masculine."
+  },
+  "ru-15": {
+   "english": "The guard noticed: %s is out in the open.\nStay closer to the “TANK RESET” control panel.",
+   "notes": "Страж and заметил are masculine. Сброс бака is ambiguous: it could refer to draining, dumping, releasing, or resetting the tank."
+  },
+  "ru-16": {
+   "english": "%s  MOVEMENT",
+   "notes": ""
+  },
+  "ru-17": {
+   "english": "%s  READ THE SCREEN (if desired)",
+   "notes": ""
+  },
+  "ru-18": {
+   "english": "Go right to the knife switch.",
+   "notes": "Рубильник denotes a heavy-duty switch, typically a knife switch."
+  },
+  "ru-19": {
+   "english": "Or go right to the knife switch.",
+   "notes": "Рубильник denotes a heavy-duty switch, typically a knife switch."
+  },
+  "ru-20": {
+   "english": "03:17 / HOLDING AREA",
+   "notes": "Зона содержания can mean an area for holding, confinement, or containment."
+  },
+  "ru-21": {
+   "english": "%s  NEXT    %s  PAUSE",
+   "notes": ""
+  },
+  "ru-22": {
+   "english": "%s  NEXT",
+   "notes": ""
+  },
+  "ru-23": {
+   "english": "PAUSE: skip the introduction",
+   "notes": ""
+  },
+  "ru-24": {
+   "english": "MAINTENANCE SERVICE",
+   "notes": "Служба can refer to a service, department, or organizational unit."
+  },
+  "ru-25": {
+   "english": "SERVICE NODE",
+   "notes": "Узел can mean a node, junction, assembly, or hub."
+  },
+  "ru-26": {
+   "english": "MAINTENANCE / LOCKOUT",
+   "notes": "Блокировка can mean locking, blocking, lockout, or an interlock."
+  },
+  "ru-27": {
+   "english": "%s  REPEAT",
+   "notes": "Повторить can also mean retry or do again."
+  },
+  "ru-28": {
+   "english": "E: read the Director's cleanup screen.",
+   "notes": "Зачистка can mean cleanup, clearing out, or a purge. The noun chain does not clarify the Director's relationship to the cleanup or screen. Директор is a masculine title."
+  },
+  "ru-29": {
+   "english": "HOLD E: turn the manual bypass, %d out of %d.",
+   "notes": "Крутить means to turn, spin, or crank. Ручной байпас does not specify which physical part is being turned."
+  },
+  "ru-30": {
+   "english": "E: talk to WOLF about the relay.",
+   "notes": ""
+  },
+  "ru-31": {
+   "english": "Find the knife switch. WOLF will follow you.",
+   "notes": "Рубильник denotes a heavy-duty switch, typically a knife switch."
+  },
+  "ru-32": {
+   "english": "TURN ON THE KNIFE SWITCH",
+   "notes": "Рубильник denotes a heavy-duty switch, typically a knife switch."
+  },
+  "ru-33": {
+   "english": "CHECK THE KNIFE SWITCH",
+   "notes": "Проверить can mean check, inspect, or test. Рубильник denotes a heavy-duty switch, typically a knife switch."
   }
  },
  "_sessions": [
   "01a143f0-8b81-7703-972f-13e21953fd61 (102 texts)",
-  "01a14409-6eb1-7db2-8ef1-f6f3714d953b (2 shortened buttons)"
+  "01a14409-6eb1-7db2-8ef1-f6f3714d953b (2 shortened buttons)",
+  "01a14426-2248-7773-8edf-2c4cb6fa3ef8 (34 ru texts, design step)"
  ]
 }

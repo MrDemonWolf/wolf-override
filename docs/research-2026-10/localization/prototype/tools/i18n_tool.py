@@ -19,7 +19,8 @@ Purpose
     check POT PODIR BACK OUT  every automated gate on the PO files, as JSON at OUT: msgfmt --check-format,
                               the research-pipeline step's per-line measures (placeholders, speaker tag,
                               line breaks, glossary; ../../pipeline/tools/trial.py, imported, not copied),
-                              the "E:" key token the hint bar replaces, and chrF of Codex's back-translation
+                              the "E:" key token the hint bar replaces, the script guard (no letters of
+                              another script; see SCRIPT_GUARD), and chrF of Codex's back-translation
                               (BACK, JSON) against the English.
     hardcoded POT INVENTORY OUT
                               player-facing strings of the strings step's inventory (in scope and shown)
@@ -51,10 +52,21 @@ PIPELINE_TOOLS = HERE.parent.parent / "pipeline" / "tools"
 sys.path.insert(0, str(PIPELINE_TOOLS))
 import trial  # noqa: E402  (the research-pipeline step's measures: chrf, check_line, PLACEHOLDER)
 
-#: gettext Plural-Forms per language (CLDR; the same rules Godot's core/string/locales.h holds).
-PLURALS = {"es": "nplurals=2; plural=(n != 1);", "de": "nplurals=2; plural=(n != 1);", "ja": "nplurals=1; plural=0;"}
+#: gettext Plural-Forms per language (CLDR; the same rules Godot's core/string/locales.h holds). Russian
+#: has three forms (1, 21 / 2-4, 22-24 / 0, 5-20, 11-14), which the design step added with ru.
+PLURALS = {"es": "nplurals=2; plural=(n != 1);", "de": "nplurals=2; plural=(n != 1);", "ja": "nplurals=1; plural=0;",
+           "ru": "nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);"}
 #: The style packet's and glossary's names for the PO languages.
-GLOSSARY_LANG = {"es": "es-419", "de": "de", "ja": "ja"}
+GLOSSARY_LANG = {"es": "es-419", "de": "de", "ja": "ja", "ru": "ru"}
+#: Languages written in Cyrillic; every other language here is written in Latin letters or in Japanese.
+CYRILLIC_LANGS = {"ru"}
+#: The script guard, ported once from ConPaws' locales-script test (written there after a Russian word
+#: slipped into its pt-BR file): a Latin-script or Japanese text holds no Cyrillic letter, and a Cyrillic
+#: text holds no Latin letter outside the glossary's "keep" words (WOLF, the "E:" key token, the studio
+#: and person names, placeholders), which stay as written in every language. It catches look-alike swaps
+#: both ways; a Cyrillic "Е:" for the key token passes it (no Latin letter is left) but fails key_token_ok,
+#: since the hint bar replaces only the Latin "E:".
+SCRIPT_GUARD = {"cyrillic": re.compile(r"[\u0400-\u04FF]"), "latin": re.compile(r"[A-Za-z]")}
 #: Ranges every Japanese subset keeps whatever the texts use: printable ASCII, CJK symbols and
 #: punctuation, hiragana, katakana, half- and full-width forms (so a later line's kana never tofus).
 JA_BASE_RANGES = [(0x20, 0x7E), (0x3000, 0x303F), (0x3040, 0x309F), (0x30A0, 0x30FF), (0xFF00, 0xFFEF)]
@@ -193,7 +205,9 @@ def fill(pot: Path, trans: Path, outdir: Path) -> None:
                 out.append("# Sample translations for the scratch prototype (proof only; not reviewed).\n"
                            'msgid ""\nmsgstr ""\n' + "\n".join(f'"{h}"' for h in header))
                 continue
-            done = dict(entry, comments=list(entry["comments"]), msgstr=[""] * (2 if lang != "ja" and "msgid_plural" in entry else 1))
+            # A plural entry gets one msgstr per plural form of the language (its PLURALS nplurals).
+            forms = int(PLURALS[lang].split(";")[0].split("=")[1]) if "msgid_plural" in entry else 1
+            done = dict(entry, comments=list(entry["comments"]), msgstr=[""] * forms)
             if re.search(r"%[sd]", entry["msgid"]) and not any(c.startswith("#,") for c in done["comments"]):
                 # Godot's generator writes no format flag; with it msgfmt --check-format compares the
                 # translation's %s/%d with the msgid's (the pipeline step's msgfmt gate).
@@ -228,6 +242,15 @@ def backprompt(podir: Path, out: Path) -> None:
     print(f"{len(items)} texts in {out}")
 
 
+def script_ok(text: str, lang: str, keep: list[str]) -> bool:
+    """The script guard (SCRIPT_GUARD) for one translation ``text`` in ``lang``."""
+    if lang not in CYRILLIC_LANGS:
+        return not SCRIPT_GUARD["cyrillic"].search(text)
+    for word in sorted(keep, key=len, reverse=True):
+        text = text.replace(word, "")
+    return not SCRIPT_GUARD["latin"].search(text)
+
+
 def check(pot: Path, podir: Path, back: Path, out: Path) -> None:
     """Runs every automated gate on the PO files and writes the report."""
     glossary = trial.load("glossary.json")
@@ -246,13 +269,14 @@ def check(pot: Path, podir: Path, back: Path, out: Path) -> None:
             measures.pop("missing_glyphs", None)  # the game's own glyph test (i18n_test.gd) checks the real font chain
             measures.pop("width_ratio_est", None)
             measures["key_token_ok"] = len(KEY_TOKEN.findall(english)) == len(KEY_TOKEN.findall(text))
+            measures["script_ok"] = script_ok(text, lang, glossary["keep"])
             item = backs.get(f"{lang}-{index:02d}")
             if item:
                 measures["back"] = item["english"]
                 measures["back_notes"] = item.get("notes", "")
                 measures["chrf"] = trial.chrf(item["english"], english)
                 measures["drift_flag"] = measures["chrf"] < 35 and len(english.split()) > 4
-            measures["ok"] = all(measures[k] for k in ("placeholders_ok", "tag_ok", "breaks_ok", "key_token_ok")) and not measures["glossary_missing"]
+            measures["ok"] = all(measures[k] for k in ("placeholders_ok", "tag_ok", "breaks_ok", "key_token_ok", "script_ok")) and not measures["glossary_missing"]
             rows.append({"msgid": english, "msgstr": text, **measures})
         report["languages"][lang] = {
             "msgfmt_rc": fmt.returncode, "msgfmt": (fmt.stdout + fmt.stderr).strip(),

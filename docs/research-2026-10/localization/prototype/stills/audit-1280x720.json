@@ -199,5 +199,54 @@
   "tofu": [],
   "untranslated_in_pseudo": [],
   "image": "1280x720"
+ },
+ "1280x720/ru-title": {
+  "texts": 10,
+  "overflow": [
+   "CanvasLayer/TitleScreen/Brand \"MRDEMONWOLF, INC. ПРЕДСТАВЛЯЕТ\" needs 321 px, has 321",
+   "CanvasLayer/TitleScreen/ContinueButton \"ПРОДОЛЖИТЬ\" needs 199 px, has 199",
+   "CanvasLayer/TitleScreen/ContinueNote \"Контрольной точки пока нет. Сохранение начнётся на первой станции «БЕЗОПАСНАЯ ТОЧКА».\" needs 671 px, has 671"
+  ],
+  "tofu": [],
+  "untranslated_in_pseudo": [],
+  "image": "1280x720"
+ },
+ "1280x720/ru-settings": {
+  "texts": 27,
+  "overflow": [
+   "CanvasLayer/TitleScreen/Brand \"MRDEMONWOLF, INC. ПРЕДСТАВЛЯЕТ\" needs 321 px, has 321",
+   "CanvasLayer/TitleScreen/ContinueButton \"ПРОДОЛЖИТЬ\" needs 199 px, has 199",
+   "CanvasLayer/TitleScreen/ContinueNote \"Контрольной точки пока нет. Сохранение начнётся на первой станции «БЕЗОПАСНАЯ ТОЧКА».\" needs 671 px, has 671"
+  ],
+  "tofu": [],
+  "untranslated_in_pseudo": [],
+  "image": "1280x720"
+ },
+ "1280x720/ru-narration": {
+  "texts": 4,
+  "overflow": [
+   "CanvasLayer/PauseButton \"ПАУЗА\" needs 91 px, has 91"
+  ],
+  "tofu": [],
+  "untranslated_in_pseudo": [],
+  "image": "1280x720"
+ },
+ "1280x720/ru-hint": {
+  "texts": 8,
+  "overflow": [
+   "CanvasLayer/PauseButton \"ПАУЗА\" needs 91 px, has 91"
+  ],
+  "tofu": [],
+  "untranslated_in_pseudo": [],
+  "image": "1280x720"
+ },
+ "1280x720/ru-knockdown": {
+  "texts": 11,
+  "overflow": [
+   "CanvasLayer/PauseButton \"ПАУЗА\" needs 91 px, has 91"
+  ],
+  "tofu": [],
+  "untranslated_in_pseudo": [],
+  "image": "1280x720"
  }
 }

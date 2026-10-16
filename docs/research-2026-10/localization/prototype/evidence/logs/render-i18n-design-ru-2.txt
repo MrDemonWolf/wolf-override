@@ -1,0 +1,31 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+WARNING: Could not set V-Sync mode, as changing V-Sync mode is not supported by the graphics driver.
+     at: set_use_vsync (platform/linuxbsd/x11/gl_manager_x11.cpp:372)
+OpenGL API 4.5 (Core Profile) Mesa 22.3.6 - Compatibility - Using Device: Mesa/X.org - llvmpipe (LLVM 15.0.6, 128 bits)
+
+WARNING: Image format ETC2_RGB8 not supported by hardware, converting to RGBA8.
+     at: _get_gl_image_and_format (drivers/gles3/storage/texture_storage.cpp:987)
+WARNING: Image format ETC2_RGBA8 not supported by hardware, converting to RGBA8.
+     at: _get_gl_image_and_format (drivers/gles3/storage/texture_storage.cpp:987)
+WARNING: Image format ETC2_RGBA8 not supported by hardware, converting to RGBA8.
+     at: _get_gl_image_and_format (drivers/gles3/storage/texture_storage.cpp:987)
+WARNING: Image format ETC2_RGB8 not supported by hardware, converting to RGBA8.
+     at: _get_gl_image_and_format (drivers/gles3/storage/texture_storage.cpp:987)
+WARNING: Image format ETC2_RGBA8 not supported by hardware, converting to RGBA8.
+     at: _get_gl_image_and_format (drivers/gles3/storage/texture_storage.cpp:987)
+WARNING: Image format ETC2_RGBA8 not supported by hardware, converting to RGBA8.
+     at: _get_gl_image_and_format (drivers/gles3/storage/texture_storage.cpp:987)
+WARNING: Image format ETC2_RGB8 not supported by hardware, converting to RGBA8.
+     at: _get_gl_image_and_format (drivers/gles3/storage/texture_storage.cpp:987)
+     GDScript backtrace (most recent call first):
+         [0] _run (res://review_capture/i18n_capture.gd:41)
+WARNING: Image format ETC2_RGBA8 not supported by hardware, converting to RGBA8.
+     at: _get_gl_image_and_format (drivers/gles3/storage/texture_storage.cpp:987)
+     GDScript backtrace (most recent call first):
+         [0] _run (res://review_capture/i18n_capture.gd:41)
+WARNING: Image format ETC2_RGBA8 not supported by hardware, converting to RGBA8.
+     at: _get_gl_image_and_format (drivers/gles3/storage/texture_storage.cpp:987)
+     GDScript backtrace (most recent call first):
+         [0] _run (res://review_capture/i18n_capture.gd:41)
+i18n capture: 4 frames
+rc2=0

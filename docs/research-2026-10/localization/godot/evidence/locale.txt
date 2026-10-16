@@ -1,0 +1,4 @@
+es-419: RESULT start locale = es (OS en_US)
+zh-Hant-TW: RESULT start locale = zh_Hant_TW (OS en_US)
+pt-BR: RESULT start locale = pt_BR (OS en_US)
+ja: RESULT start locale = ja (OS en_US)

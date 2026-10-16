@@ -1,0 +1,33 @@
+RESULT OS.has_feature(system_fonts) = true
+RESULT text server = ICU / HarfBuzz / Graphite (Built-in)
+RESULT chain Roboto-Variable.ttf en:  [glyphs drawn by an OS fallback font: 0, unresolved (tofu): 0]
+RESULT chain Roboto-Variable.ttf es:  [glyphs drawn by an OS fallback font: 0, unresolved (tofu): 0]
+RESULT chain Roboto-Variable.ttf pt_BR:  [glyphs drawn by an OS fallback font: 0, unresolved (tofu): 0]
+RESULT chain Roboto-Variable.ttf de:  [glyphs drawn by an OS fallback font: 0, unresolved (tofu): 0]
+RESULT chain Roboto-Variable.ttf fr:  [glyphs drawn by an OS fallback font: 0, unresolved (tofu): 0]
+RESULT chain Roboto-Variable.ttf ru:  [glyphs drawn by an OS fallback font: 0, unresolved (tofu): 0]
+RESULT chain Roboto-Variable.ttf ja:  [glyphs drawn by an OS fallback font: 0, unresolved (tofu): 30]
+RESULT chain Roboto-Variable.ttf zh_Hans:  [glyphs drawn by an OS fallback font: 0, unresolved (tofu): 13]
+RESULT chain Roboto-Variable.ttf ko:  [glyphs drawn by an OS fallback font: 0, unresolved (tofu): 24]
+RESULT OS.has_feature(system_fonts) = true
+RESULT text server = ICU / HarfBuzz / Graphite (Built-in)
+RESULT chain Roboto-Variable.ttf + hiragino-sample.otf en:  [glyphs drawn by an OS fallback font: 0, unresolved (tofu): 0]
+RESULT chain Roboto-Variable.ttf + hiragino-sample.otf es:  [glyphs drawn by an OS fallback font: 0, unresolved (tofu): 0]
+RESULT chain Roboto-Variable.ttf + hiragino-sample.otf pt_BR:  [glyphs drawn by an OS fallback font: 0, unresolved (tofu): 0]
+RESULT chain Roboto-Variable.ttf + hiragino-sample.otf de:  [glyphs drawn by an OS fallback font: 0, unresolved (tofu): 0]
+RESULT chain Roboto-Variable.ttf + hiragino-sample.otf fr:  [glyphs drawn by an OS fallback font: 0, unresolved (tofu): 0]
+RESULT chain Roboto-Variable.ttf + hiragino-sample.otf ru:  [glyphs drawn by an OS fallback font: 0, unresolved (tofu): 0]
+RESULT chain Roboto-Variable.ttf + hiragino-sample.otf ja:  [glyphs drawn by an OS fallback font: 0, unresolved (tofu): 27]
+RESULT chain Roboto-Variable.ttf + hiragino-sample.otf zh_Hans:  [glyphs drawn by an OS fallback font: 0, unresolved (tofu): 0]
+RESULT chain Roboto-Variable.ttf + hiragino-sample.otf ko:  [glyphs drawn by an OS fallback font: 0, unresolved (tofu): 24]
+RESULT OS.has_feature(system_fonts) = true
+RESULT text server = ICU / HarfBuzz / Graphite (Built-in)
+RESULT chain Roboto-Variable.ttf + hiragino-gb2312_l1.otf en:  [glyphs drawn by an OS fallback font: 0, unresolved (tofu): 0]
+RESULT chain Roboto-Variable.ttf + hiragino-gb2312_l1.otf es:  [glyphs drawn by an OS fallback font: 0, unresolved (tofu): 0]
+RESULT chain Roboto-Variable.ttf + hiragino-gb2312_l1.otf pt_BR:  [glyphs drawn by an OS fallback font: 0, unresolved (tofu): 0]
+RESULT chain Roboto-Variable.ttf + hiragino-gb2312_l1.otf de:  [glyphs drawn by an OS fallback font: 0, unresolved (tofu): 0]
+RESULT chain Roboto-Variable.ttf + hiragino-gb2312_l1.otf fr:  [glyphs drawn by an OS fallback font: 0, unresolved (tofu): 0]
+RESULT chain Roboto-Variable.ttf + hiragino-gb2312_l1.otf ru:  [glyphs drawn by an OS fallback font: 0, unresolved (tofu): 0]
+RESULT chain Roboto-Variable.ttf + hiragino-gb2312_l1.otf ja:  [glyphs drawn by an OS fallback font: 0, unresolved (tofu): 25]
+RESULT chain Roboto-Variable.ttf + hiragino-gb2312_l1.otf zh_Hans:  [glyphs drawn by an OS fallback font: 0, unresolved (tofu): 0]
+RESULT chain Roboto-Variable.ttf + hiragino-gb2312_l1.otf ko:  [glyphs drawn by an OS fallback font: 0, unresolved (tofu): 24]

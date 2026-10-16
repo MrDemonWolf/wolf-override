@@ -1,0 +1,17 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+RESULT [en (game, main.gd OPENING_EXCHANGE)] 2 boxes
+RESULT    tag=WOLF words=10 chars=50 rows=2 fits=true read=4.50s (11.1 chars/s) rows=["I heard the Director\'s plan for me. I woke", "myself."]
+RESULT    tag=WOLF words=9 chars=44 rows=2 fits=true read=4.17s (10.6 chars/s) rows=["He wants me to hunt people he calls", "threats."]
+RESULT [es] 2 boxes
+RESULT    tag=WOLF words=10 chars=55 rows=2 fits=true read=4.50s (12.2 chars/s) rows=["Escuché el plan del Director para mí. Me", "desperté solo."]
+RESULT    tag=WOLF words=10 chars=53 rows=2 fits=true read=4.50s (11.8 chars/s) rows=["Quiere que cace a las personas que él", "llama amenazas."]
+RESULT [es (¿? ¡! marks)] 1 boxes
+RESULT    tag=WOLF words=13 chars=72 rows=2 fits=true read=5.49s (13.1 chars/s) rows=["¿Qué pasa si toco el relé con corriente?", "¡Dímelo ya! No quiero adivinar."]
+RESULT [de] 2 boxes
+RESULT    tag=WOLF words=14 chars=78 rows=2 fits=true read=5.82s (13.4 chars/s) rows=["Ich habe den Plan des Direktors für mich", "gehört. Ich habe mich selbst geweckt."]
+RESULT    tag=WOLF words=10 chars=58 rows=2 fits=true read=4.50s (12.9 chars/s) rows=["Er will, dass ich Menschen jage, die er", "Bedrohungen nennt."]
+RESULT [zh_Hans] 1 boxes
+RESULT    tag=WOLF words=1 chars=37 rows=2 fits=true read=3.05s (12.1 chars/s) rows=["我听到了主管对我的计划。我自己醒了过来。他想让我去", "追捕那些他称为威胁的人。"]
+RESULT [zh_Hans (fullwidth colon tag)] 1 boxes
+RESULT    tag= words=1 chars=42 rows=2 fits=true read=3.30s (12.7 chars/s) rows=["WOLF：我听到了主管对我的计划。我自己醒了过来。他想", "让我去追捕那些他称为威胁的人。"]

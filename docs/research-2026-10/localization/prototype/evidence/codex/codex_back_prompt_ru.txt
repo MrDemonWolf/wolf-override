@@ -1,0 +1,140 @@
+You are checking game UI and dialogue translations by back-translating them. Translate each text below into plain, literal English, keeping placeholders (%s, %d), the token 'E:' and line breaks (\n) exactly as they appear. Do not guess what the original English was; translate only what is written. Context: a 2D sci-fi game; WOLF is a robot wolf (he), the Director a human (he), the player character is a non-binary engineer whose first name fills %s. After each back-translation add 'notes' listing anything ambiguous, unidiomatic or gendered in the source text (empty string if none). Answer with JSON only: {"back": {"<id>": {"english": "...", "notes": "..."}}}. Do not run any commands or read any files.
+
+{
+ "ru-00": {
+  "language": "ru",
+  "text": "ПАУЗА"
+ },
+ "ru-01": {
+  "language": "ru",
+  "text": "MRDEMONWOLF, INC. ПРЕДСТАВЛЯЕТ"
+ },
+ "ru-02": {
+  "language": "ru",
+  "text": "ГЛАВА 1  /  БЛОКИРОВКА"
+ },
+ "ru-03": {
+  "language": "ru",
+  "text": "НОВАЯ ИГРА"
+ },
+ "ru-04": {
+  "language": "ru",
+  "text": "ПРОДОЛЖИТЬ"
+ },
+ "ru-05": {
+  "language": "ru",
+  "text": "ТИТРЫ"
+ },
+ "ru-06": {
+  "language": "ru",
+  "text": "НАСТРОЙКИ"
+ },
+ "ru-07": {
+  "language": "ru",
+  "text": "ИЗМЕНЕНИЯ"
+ },
+ "ru-08": {
+  "language": "ru",
+  "text": "Идея: Nathanial Henniges  /  Разработка с помощью ИИ"
+ },
+ "ru-09": {
+  "language": "ru",
+  "text": "ЯЗЫК"
+ },
+ "ru-10": {
+  "language": "ru",
+  "text": "Сорвало предохранительный клапан, а %s — прямо на решётке. Когда стрелка манометра на пределе, не стой на решётке."
+ },
+ "ru-11": {
+  "language": "ru",
+  "text": "ИГРАТЬ СНОВА"
+ },
+ "ru-12": {
+  "language": "ru",
+  "text": "Контрольной точки пока нет. Сохранение начнётся на первой станции «БЕЗОПАСНАЯ ТОЧКА»."
+ },
+ "ru-13": {
+  "language": "ru",
+  "text": "Директор думает, что WOLF всё ещё в режиме ожидания."
+ },
+ "ru-14": {
+  "language": "ru",
+  "text": "Никто не отдаёт команду на активацию.\nWOLF просыпается сам."
+ },
+ "ru-15": {
+  "language": "ru",
+  "text": "Страж заметил: %s на открытом месте.\nДержись ближе к пульту «СБРОС БАКА»."
+ },
+ "ru-16": {
+  "language": "ru",
+  "text": "%s  ДВИЖЕНИЕ"
+ },
+ "ru-17": {
+  "language": "ru",
+  "text": "%s  ПРОЧИТАТЬ ЭКРАН (по желанию)"
+ },
+ "ru-18": {
+  "language": "ru",
+  "text": "Иди направо к рубильнику."
+ },
+ "ru-19": {
+  "language": "ru",
+  "text": "Или иди направо к рубильнику."
+ },
+ "ru-20": {
+  "language": "ru",
+  "text": "03:17 / ЗОНА СОДЕРЖАНИЯ"
+ },
+ "ru-21": {
+  "language": "ru",
+  "text": "%s  ДАЛЕЕ    %s  ПАУЗА"
+ },
+ "ru-22": {
+  "language": "ru",
+  "text": "%s  ДАЛЕЕ"
+ },
+ "ru-23": {
+  "language": "ru",
+  "text": "ПАУЗА: пропустить вступление"
+ },
+ "ru-24": {
+  "language": "ru",
+  "text": "СЛУЖБА ТЕХОБСЛУЖИВАНИЯ"
+ },
+ "ru-25": {
+  "language": "ru",
+  "text": "СЕРВИСНЫЙ УЗЕЛ"
+ },
+ "ru-26": {
+  "language": "ru",
+  "text": "ТЕХОБСЛУЖИВАНИЕ / БЛОКИРОВКА"
+ },
+ "ru-27": {
+  "language": "ru",
+  "text": "%s  ПОВТОРИТЬ"
+ },
+ "ru-28": {
+  "language": "ru",
+  "text": "E: прочитать экран зачистки Директора."
+ },
+ "ru-29": {
+  "language": "ru",
+  "text": "ДЕРЖАТЬ E: крутить ручной байпас, %d из %d."
+ },
+ "ru-30": {
+  "language": "ru",
+  "text": "E: поговорить с WOLF о реле."
+ },
+ "ru-31": {
+  "language": "ru",
+  "text": "Найди рубильник. WOLF пойдёт за тобой."
+ },
+ "ru-32": {
+  "language": "ru",
+  "text": "ВКЛЮЧИТЬ РУБИЛЬНИК"
+ },
+ "ru-33": {
+  "language": "ru",
+  "text": "ПРОВЕРИТЬ РУБИЛЬНИК"
+ }
+}

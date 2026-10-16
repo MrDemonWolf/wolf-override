@@ -11,8 +11,10 @@
 # Nothing else is kept between runs.
 # History: as run on 2026-10-16 the slot script's scratch path was written into this file; the filed
 # copy reads it from HEAVY_SLOTS instead, so no session path is kept in the repository.
+# Gotcha: keep apostrophes out of the ${HEAVY_SLOTS:?...} message below; inside double quotes bash
+# reads one as an opening quote and the whole script fails to parse (the first filed copy did).
 set -uo pipefail
-slots="${HEAVY_SLOTS:?set HEAVY_SLOTS to the session's heavy-run slot script}"
+slots="${HEAVY_SLOTS:?set HEAVY_SLOTS to the heavy-run slot script of the session}"
 slot=""
 for _try in 1 2 3 4 5 6; do
   if slot="$(bash "$slots" take)"; then break; fi

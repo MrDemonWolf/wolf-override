@@ -12,8 +12,10 @@ extends SceneTree
 ## For every saved frame it audits the visible Labels and Buttons (the text as drawn, auto-translate
 ## applied) and writes /work/out/audit.json: text that overflows its control, characters the control's
 ## font chain cannot draw (tofu), and in the pseudo frames, text that did not go through translation.
-## Contract: run as `--script res://review_capture/i18n_capture.gd -- --size=WxH` with render.sh
-## --screen WxH. Quits with 0, or 1 if a step could not be reached.
+## Contract: run as `--script res://review_capture/i18n_capture.gd -- --size=WxH [--languages=a,b]`
+## with render.sh --screen WxH. --languages limits the run to those entries of LANGUAGES (the design
+## step's Russian runs used --languages=ru, so the earlier languages were not rendered again). Quits with
+## 0, or 1 if a step could not be reached or a language is not in LANGUAGES.
 ## A size wider than 2:1 (2400x1080) is a phone: the run turns the game's touch layout on, as the
 ## earlier phone captures did (docs/research-2026-10/how-it-should-play/playthrough/CAPTURE-ROUND1.md).
 ## Gotchas: the game's own launch sizing runs first, so the size is set on the root window after it
@@ -22,7 +24,7 @@ extends SceneTree
 ## sets the same flag), so it is set first. The title fades its logo in over about
 ## a second. Text the title screen covers (the play HUD behind it) is not audited.
 
-const LANGUAGES: Array[String] = ["en", "es", "de", "ja", "pseudo"]
+const LANGUAGES: Array[String] = ["en", "es", "de", "ja", "ru", "pseudo"]
 const WAIT_FRAMES: int = 45
 const OUT: String = "/work/out"
 
@@ -40,17 +42,25 @@ func _run() -> void:
 	game.auto_pause_on_focus_loss = false
 	root.add_child(game)
 	var size: Vector2i = Vector2i(1280, 720)
+	var languages: Array[String] = LANGUAGES.duplicate()
 	for argument: String in OS.get_cmdline_user_args():
 		if argument.begins_with("--size="):
 			var parts: PackedStringArray = argument.trim_prefix("--size=").split("x")
 			size = Vector2i(int(parts[0]), int(parts[1]))
+		elif argument.begins_with("--languages="):
+			languages.assign(argument.trim_prefix("--languages=").split(",", false))
+	for language: String in languages:
+		if not LANGUAGES.has(language):
+			push_error("unknown language %s (LANGUAGES: %s)" % [language, LANGUAGES])
+			quit(1)
+			return
 	DisplayServer.window_set_flag(DisplayServer.WINDOW_FLAG_BORDERLESS, true)
 	game.touch_enabled = size.x > size.y * 2
 	await _wait(60)
 	root.size = size
 	await _wait(30)
 	DirAccess.make_dir_recursive_absolute("%s/%dx%d" % [OUT, size.x, size.y])
-	for language: String in LANGUAGES:
+	for language: String in languages:
 		_set_language(language)
 		await _title(size, language)
 		if size == Vector2i(1280, 720):

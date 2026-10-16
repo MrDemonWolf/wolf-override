@@ -1,0 +1,11 @@
+[  52% ] savepack | Storing File: res://i18n_probe/out/game_template.csv.import
+[  53% ] savepack | Storing File: res://i18n_probe/ja.po
+[  54% ] savepack | Storing File: res://i18n_probe/probe.csv.import
+[  55% ] savepack | Storing File: res://i18n_probe/probe.es.translation
+[  56% ] savepack | Storing File: res://i18n_probe/probe.ja.translation
+[  57% ] savepack | Storing File: res://i18n_probe/probe_ctx.csv.import
+[  58% ] savepack | Storing File: res://i18n_probe/probe_ctx.es.translation
+[  59% ] savepack | Storing File: res://i18n_probe/sample_tr.gdc
+[  98% ] savepack | Storing File: res://i18n_probe/sample_tr.gd.remap
+Export: Using editor embedded text server data, text display in the exported project might be broken if export template was built with different ICU version!
+[  98% ] savepack | Storing File: res://icudt_godot.dat
