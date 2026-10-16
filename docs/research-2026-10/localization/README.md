@@ -10,23 +10,43 @@ build starts only after he answers [DECISIONS.md](DECISIONS.md).
   multi langs on our game. Let's do of course USA and EU and Mexican, maybe a few. Make a list of what
   langs we should support, and we can do the translations on the device using AI, whatever works, and
   use whatever is needed to get this working on Godot."
-- October 16: support the top 10 world languages.
+- October 16: "support the top 10". This job received it from the main Claude Code session, which
+  relayed his message; his exact words are in that session, not in this repository. If he meant the
+  world's 10 most-spoken languages exactly, that is an option in D1.
 
 **The answer in short:**
-- **Ten languages, shipped as 12 locale files:** English (US), Chinese (Simplified and Traditional),
+- **Ten languages, shipped as 12 language files:** English (US), Chinese (Simplified and Traditional),
   Russian, Spanish (Latin America and Spain), Portuguese (Brazil), German, Japanese, French, Korean and
   Polish.
   - They cover about 94% of Steam users and all three of his regions.
   - Five of them are also in the world's top 10 by speakers. The other five swaps are explained with
     numbers.
 - **The translations:** AI translates at build time, a second AI checks each line independently,
-  automated gates and people review the result, and the game ships fixed files. Nothing is translated
-  on the player's device while they play.
+  automated checks and people review the result, and the game ships fixed files. Nothing is translated
+  on the player's device while they play: Godot has no way to call the phone's or the Mac's translator,
+  that output could not be tested or checked for fit before players see it, and it needs language
+  downloads and prompts ([PIPELINE.md](PIPELINE.md)).
+- **What it costs:** no new money now. The AI work runs on the Claude and ChatGPT subscriptions he
+  already has (token use in PIPELINE.md), Weblate's review site is free for public projects, and the
+  Noto fonts are free. Before a paid release: one paid native proofreader per language for the story
+  lines (about 1,460 English words each), at a price not yet researched.
+- **When players get it:** the first language is Spanish (PR L9 in [PLAN.md](PLAN.md)). That comes after
+  about 17 to 19 agent days of groundwork and wiring, plus 1.5 days for Spanish itself. The groundwork
+  (6 days) can start now; the wiring waits for `codex/opening-dock` to merge. No calendar date is set:
+  it depends on that merge and on his answers in [DECISIONS.md](DECISIONS.md).
+- **Who checks it:** the automated checks and an independent AI back-translation on every line; then
+  native-speaker volunteers on Weblate, and one paid proofreader per language before a paid release.
+  Who recruits and runs the reviewers is not planned yet. Every final word is his.
+- **What players see:** the game starts in their computer's or phone's language if it is offered, and
+  in English if not. Settings gets a LANGUAGE choice that names each language in itself (Deutsch, 日本語)
+  with a "machine translation" tag until native review. Any line not translated yet shows in English.
+  Stills: [the Spanish title](prototype/stills/1280x720-es-title.png) and
+  [a Japanese story box](prototype/stills/1280x720-ja-narration.png).
 - **In Godot:** English stays the internal text and is translated where it is drawn. There is one
-  locale module, one PO catalog per language, Godot's own POT generator, and bundled CJK fonts that go
-  on only for their language.
-- **The prototype proves one language from each script family in the 10:** Latin (es, de), CJK (ja)
-  and Cyrillic (ru).
+  shared language module, one PO catalog (language file) per language, Godot's own extraction tool, and
+  bundled fonts for Chinese, Japanese and Korean that go on only for their language.
+- **The prototype proves one language from each script family in the 10:** Latin (es, de), the
+  Chinese-Japanese-Korean family (ja) and Cyrillic (ru).
 
 ## Read in this order
 

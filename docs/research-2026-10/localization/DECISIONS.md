@@ -4,24 +4,51 @@ These are the questions only Nathanial can answer. Each has a recommended defaul
 start the day he agrees. If he answers only "go with the defaults", every one below is taken as written.
 Nothing in the game or its English changes until he answers.
 
+## On one screen
+
+The PRs (L1 to L13) are the build steps in [PLAN.md](PLAN.md). **The three marked first** are needed
+before the work that can start now.
+
+| | Question | Default | Needed before |
+|---|---|---|---|
+| **D1, first** | Which languages? | The 10 in LANGUAGES.md, as 12 files; Polish over Italian | L1, the first PR |
+| D2 | How do we say the translations are by AI? | A tag in the picker, the credits and the store page until native review | L9, the first language |
+| D3 | Translate words painted in the art, and the station name plates? | Painted words stay English; plates are translated | L8 |
+| D4 | Translate the credits and the in-game changelog? | Credits' role text yes; changelog stays English | L7c |
+| D5 | US or British spelling in the English? | US ("off center", "canceled") | L7a |
+| D6 | Translate the website? | Later, after the first reviewed languages | can wait |
+| **D7, first** | How much font for Chinese, Japanese and Korean? | Fixed common-character sets, about 9-10 MB with line-breaking data | L4 |
+| D8 | Who reviews the translations? | Volunteers on Weblate, a paid proofreader before a paid release | L9 |
+| **D9, first** | How do languages with gendered grammar stay neutral about the engineer? | Rephrase, never pick a gender | L5 |
+| D10 | Where does the LANGUAGE setting go, and how does the title make room? | A new GENERAL tab; wider title buttons | L6 and L8 |
+| D11 | WOLF's voice and key terms in other languages | The proposals in D11 below | L5, and they can change later |
+
 ## D1. The language list
 
 **Question.** Ship the 10 in LANGUAGES.md: English (US), Chinese, Russian, Spanish, Portuguese (Brazil),
 German, Japanese, French, Korean and Polish?
 
-**Default: yes, as listed, as 12 locale files.**
+**Default: yes, as listed, as 12 language files.**
 - Spanish is one slot with two files: Latin America (`es`) and Spain (`es_ES`).
 - Chinese is one slot with two files: Simplified (`zh_Hans`) and Traditional (`zh_Hant`).
 - Together they cover 93.8% of Steam users (mean of 14 months; 94.3% in September 2026).
-- The 10 hold his three regions: the US, the EU (de, fr, es-ES, pl) and Mexico (es-419).
+- The 10 hold his three regions: the US, the EU (de, fr, es-ES, pl) and Mexico (es-419, the code for
+  Latin-American Spanish).
 
 **Two sub-questions:**
 - **Polish or Italian for slot 10?**
   - The default is Polish: 1.64% of Steam against 0.61%, 2.5-2.8 times Italian in every month.
-  - The case for Italian: weaker English (EF 513 against 600), and it ships in more peer games (14 of
-    16 against 9).
+  - The case for Italian: weaker English (an English-skill score, EF EPI, of 513 against Poland's 600),
+    and it ships in more of the 16 similar games we looked at (14 against 9).
   - Whichever is not picked leads Tier 1.
 - **Strictly 10 files?** If so, move `zh_Hant` to Tier 1 and keep `es_ES`, because he named the EU.
+- **Or the world's 10 most-spoken languages exactly?** If his "top 10" meant that list, the 10 would
+  be English, Chinese, Hindi, Spanish, Arabic, French, Bengali, Portuguese, Indonesian and Urdu
+  (Ethnologue 2026). That swaps Russian, German, Japanese, Korean and Polish (about 18% of Steam users
+  together) for five languages with about 0.14% of Steam between them. It costs two right-to-left
+  languages (Arabic, Urdu), three new scripts with new fonts (Devanagari, Bengali, Arabic), and three
+  languages Steam's own client does not offer (Hindi, Bengali, Urdu). Costs are in LANGUAGES.md, "What
+  the strict world top 10 would cost instead".
 
 **Also known:**
 - Mainland China needs a licensed publisher for phones.
@@ -38,7 +65,7 @@ German, Japanese, French, Korean and Polish?
   The ten tags are in PIPELINE.md.
 - **In the credits:** "machine translation by Claude (Anthropic), cross-checked with Codex (OpenAI)",
   followed by "reviewed by <names>" or "not yet reviewed".
-- **In the PO headers and line comments.**
+- **In the language files themselves** (their headers and line comments).
 - **On the Steam page:** "machine-translated, community review in progress", and a disclosure in
   Steam's Content Survey.
   - Valve's January 2026 rules ask for disclosure of AI that generates game content. They do not name
@@ -65,8 +92,8 @@ The door tools typeset all three in Roboto, so they can be redone later if he wa
   plate.
 - AGENT.md asks for stations a player can recognise.
 - Russian and Polish quote a plate in its own nominative form (PIPELINE.md).
-- L8 checks that neighbouring plates don't touch. Under pseudo +30% the junction's OVERLOAD BREAKER and
-  RELIEF VENT plates already do.
+- The plate-layout PR (L8) checks that neighbouring plates don't touch. With every text made 30% longer
+  as a test (pseudolocalization), the junction's OVERLOAD BREAKER and RELIEF VENT plates already do.
 
 If he prefers English signage for the plates too, every hint keeps the English plate name in quotes.
 
@@ -109,15 +136,15 @@ The site (`apps/docs`) has 22 pages and about 37,700 words: more than twice the 
   site's static GitHub Pages export is not checked yet.
 - The site stays Tailwind-styled, as now.
 
-## D7. The CJK font budget
+## D7. The font budget for Chinese, Japanese and Korean (CJK)
 
 **Default: fixed common-character subsets** of Noto Sans SC, TC, JP and KR (SIL OFL 1.1), about 1 MB each
 and 4-5 MB for all four. That figure is an estimate built from these numbers:
 
 | Font | Size | Measured or estimate |
 |---|---|---|
-| JP: kana + JIS level 1 | 878,736 B | measured |
-| SC: GB2312 level 1 | about 1.38 MB | measured on an Apple font, so an estimate for Noto |
+| JP: kana + JIS level 1 (Japan's common-kanji set) | 878,736 B | measured |
+| SC: GB2312 level 1 (China's common-character set) | about 1.38 MB | measured on an Apple font, so an estimate for Noto |
 | TC, KR | | not measured |
 
 - **The other choice** is to subset each font to the characters the game uses: 139 KB for the
@@ -137,7 +164,7 @@ Japanese or Korean file is registered, the export also adds Godot's line-breakin
 | Line-breaking data | 4.8 MB (measured) |
 | **The 10 languages add** | **about 9-10 MB (estimate)**, or about 5-6 MB with per-game subsets instead of fixed ones |
 
-That undoes the lighter plan's size work about three times over. The line-breaking data is needed for
+That is three to five times what the lighter plan's size work saves (2-3 MB). The line-breaking data is needed for
 any CJK language, so the real choice is between fixed subsets (no re-subsetting when the English
 changes) and per-game subsets (about 4 MB smaller, a new subset with every English change). The
 default stays fixed subsets; Nathanial may prefer the smaller download.
@@ -170,7 +197,8 @@ The engineer is they/them. English can stay neutral; Russian and Polish past ten
 adjectives and job nouns, cannot (PIPELINE.md). **Default: rephrase, never pick a gender.**
 - **Russian and Polish:**
   - present tense, noun phrases, impersonal forms or the imperative;
-  - the name always in the nominative;
+  - the name always in the nominative, the form a name has as the subject, so it never changes its
+    ending;
   - informal address (ty, ты).
 - **French, Spanish and Portuguese:**
   - adverbial phrases instead of agreeing adjectives;
