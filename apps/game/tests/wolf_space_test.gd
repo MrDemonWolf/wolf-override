@@ -344,10 +344,11 @@ func _obstacles(game: Main) -> Array[Array]:
 			}
 			# The entry stands shut behind them, and the exit until it has slid open: from the leaf's face
 			# on the walk line to the near jamb. The exit leaf's face (JunctionRoom.EXIT_LEAF_SHUT_X) lies a
-			# little right of the near jamb's edge, so the shut exit's span is the line at its face.
+			# little right of the near jamb's edge, so the shut exit's span is the line at its face
+			# (JunctionRoom.EXIT_SHUT_SPAN, which door_route_test reads too).
 			found.append(["the shut junction entry", Vector2(JunctionRoom.ENTRY_FRONT_AT.x, JunctionRoom.ENTRY_DOOR_X)])
 			if room.hatch_open <= 0.0:
-				found.append(["the shut junction exit", Vector2(JunctionRoom.EXIT_LEAF_SHUT_X, maxf(JunctionRoom.EXIT_LEAF_SHUT_X, JunctionRoom.EXIT_NEAR_JAMB_X))])
+				found.append(["the shut junction exit", JunctionRoom.EXIT_SHUT_SPAN])
 			# The tank stands on the floor only once it is down; hanging, he runs under it.
 			if game.state.sentry_down:
 				sprites["the landed tank"] = room.get_node("Tank")

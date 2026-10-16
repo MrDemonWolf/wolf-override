@@ -182,8 +182,22 @@ const EXIT_NEAR_JAMB_X: float = 971.3
 ## approach face, and that face, turned EXIT_WALL_ANGLE off square to the walk line, crosses it
 ## EXIT_LEAF_N / cos(EXIT_WALL_ANGLE) m past EXIT_DOOR_X, at the walk line's DoorCamera.PX_PER_M. The
 ## reveal in front of it is open floor. door_route_test and wolf_space_test both measure the shut exit
-## from here, so a change to the wall's geometry moves both.
+## from here (EXIT_SHUT_SPAN), so a change to the wall's geometry moves both.
 const EXIT_LEAF_SHUT_X: float = EXIT_DOOR_X + DoorCamera.PX_PER_M * EXIT_LEAF_N / cos(deg_to_rad(EXIT_WALL_ANGLE))
+## The exit doorway's far jamb on the walk line (world px): junction-exit/NOTES.md, "Opening" (far jamb
+## x 925.5, near jamb x 971.6 at the floor), in the doors records
+## (docs/research-2026-10/sources/doors-2026-10-14/). The near side is the game's own EXIT_NEAR_JAMB_X.
+const EXIT_FAR_JAMB_X: float = 925.5
+## The open exit's doorway on the walk line (world px, x from..to): far jamb to near jamb. No game code
+## reads it; door_route_test measures resting spots and the walk-out against it, like RecordsRoom's
+## EXIT_SPAN and ENTRY_SPAN.
+const EXIT_SPAN: Vector2 = Vector2(EXIT_FAR_JAMB_X, EXIT_NEAR_JAMB_X)
+## The shut exit on the walk line (world px, x from..to): only the line at the leaf's room face
+## (EXIT_LEAF_SHUT_X). That face lies a little right of the near jamb's edge and the reveal in front of
+## it is open floor, so a body crosses the shut door only where it covers that line; maxf keeps the
+## span from running backwards if the geometry ever puts the face left of the jamb. door_route_test and
+## wolf_space_test both read it, so neither derives its own.
+const EXIT_SHUT_SPAN: Vector2 = Vector2(EXIT_LEAF_SHUT_X, maxf(EXIT_LEAF_SHUT_X, EXIT_NEAR_JAMB_X))
 ## The junction's own deck and fascia carried on past x 960 to the view's edge (review r1, M4): the mid
 ## plate translated 2.0 m along the room in its camera (seams to its vanishing point), not its mirrored
 ## bleed; drawn over the floor reflections of anyone who has gone through, behind the wall's stub.

@@ -26,16 +26,13 @@ const BEAT_FRAMES: int = 900
 const BLAST_TIME_SCALE: float = 0.1
 ## Where each shut door's face crosses the walk line: a resting body must stay short of it. The
 ## doorways' spans themselves are the rooms' own (RecordsRoom.EXIT_SPAN and ENTRY_SPAN,
-## JunctionRoom.EXIT_LEAF_SHUT_X), which wolf_space_test reads too.
+## JunctionRoom.EXIT_SPAN and EXIT_SHUT_SPAN), which wolf_space_test reads too.
 const RECORDS_EXIT_FACE_X: float = RecordsRoom.EXIT_DOOR_X
 const RECORDS_ENTRY_FACE_X: float = RecordsRoom.ENTRY_DOOR_X
 const BLAST_FACE_X: float = M0State.JUNCTION_DOOR_LEFT_X
 ## The blast door's doorway on the deck, far jamb foot to the near column's far side (the column's foot,
 ## JunctionRoom.DOOR_FOOT_RIGHT_X).
 const BLAST_SPAN: Vector2 = Vector2(JunctionDoorLayout.FAR_JAMB_FOOT.x, JunctionRoom.DOOR_FOOT_RIGHT_X)
-## The junction exit's doorway on the walk line: its far jamb (junction-exit-door NOTES, "Opening") to
-## the near jamb.
-const EXIT_SPAN: Vector2 = Vector2(925.5, JunctionRoom.EXIT_NEAR_JAMB_X)
 
 var game: Node2D
 var human: M0Actor
@@ -182,7 +179,7 @@ func _check_exit_door() -> void:
 		await process_frame
 	_expect(room.hatch_open >= 1.0 and leaf_whole and _whole(room.exit_leaf), "the exit leaf slides open into its pocket, drawn whole every frame")
 	var shut_edge: Vector3 = JunctionRoom.exit_leaf_anchor(0.0)
-	_expect(room.exit_leaf.position.x - EXIT_SPAN.x < 0.25 * (EXIT_SPAN.y - EXIT_SPAN.x) and shut_edge.x - room.exit_leaf.position.x > 0.6 * (EXIT_SPAN.y - EXIT_SPAN.x), "the open leaf has slid back to the pocket's mouth by the far jamb (leading edge x %.1f, shut %.1f)" % [room.exit_leaf.position.x, shut_edge.x])
+	_expect(room.exit_leaf.position.x - JunctionRoom.EXIT_SPAN.x < 0.25 * (JunctionRoom.EXIT_SPAN.y - JunctionRoom.EXIT_SPAN.x) and shut_edge.x - room.exit_leaf.position.x > 0.6 * (JunctionRoom.EXIT_SPAN.y - JunctionRoom.EXIT_SPAN.x), "the open leaf has slid back to the pocket's mouth by the far jamb (leading edge x %.1f, shut %.1f)" % [room.exit_leaf.position.x, shut_edge.x])
 	await wait_until(func() -> bool: return human.controlled and absf(wolf.position.x - JunctionRoom.WOLF_DOORWAY_X) < 3.0, BEAT_FRAMES)
 	# Fix round 3 (review r3, human pass): USE from the nearest spot that leaves (HATCH_REACH_MIN_X, still
 	# inside the bolt panel's reach) leaves without stepping the engineer back to the panel's side.
@@ -208,9 +205,9 @@ func _check_exit_door() -> void:
 	started = Engine.get_physics_frames()
 	while not bool(game.get("end_card_active")) and Engine.get_physics_frames() - started < BEAT_FRAMES:
 		exit_off_floor = maxf(exit_off_floor, maxf(absf(human.position.y - exit_floor_y.x), absf(wolf.position.y - exit_floor_y.y)))
-		if wolf_through < 0 and wolf.position.x - M0Actor.WOLF_REACH >= EXIT_SPAN.y:
+		if wolf_through < 0 and wolf.position.x - M0Actor.WOLF_REACH >= JunctionRoom.EXIT_SPAN.y:
 			wolf_through = Engine.get_physics_frames()
-		if human_through < 0 and human.position.x - M0Actor.HUMAN_REACH >= EXIT_SPAN.y:
+		if human_through < 0 and human.position.x - M0Actor.HUMAN_REACH >= JunctionRoom.EXIT_SPAN.y:
 			human_through = Engine.get_physics_frames()
 		nobody_faded = nobody_faded and human.visible and wolf.visible and human.modulate.a == 1.0 and wolf.modulate.a == 1.0 and human.self_modulate.a == 1.0 and wolf.self_modulate.a == 1.0
 		leaf_whole = leaf_whole and _whole(room.exit_leaf)
@@ -247,10 +244,10 @@ func _check_rest_spots() -> void:
 		["Junction: WOLF reading the seam", JunctionRoom.WOLF_SEAM_X, wolf_reach, Vector2(BLAST_FACE_X, BLAST_SPAN.y), false, null],
 		["Junction: WOLF at the rubble", JunctionRoom.WOLF_RUBBLE_X, wolf_reach, BLAST_SPAN, true, room.door_column],
 		["Junction: the lane question", JunctionRoom.CHOICE_X, human_reach, BLAST_SPAN, true, room.door_column],
-		["Junction: WOLF by the exit", JunctionRoom.WOLF_DOWN_X, wolf_reach, Vector2(JunctionRoom.EXIT_LEAF_SHUT_X, EXIT_SPAN.y), false, null],
-		["Junction: engineer at the exit bolt", JunctionRoom.BOLT_X, human_reach, Vector2(JunctionRoom.EXIT_LEAF_SHUT_X, EXIT_SPAN.y), false, null],
-		["Junction: engineer behind WOLF at the open exit", JunctionRoom.HATCH_REACH_MAX_X, human_reach, EXIT_SPAN, true, room.exit_front],
-		["Junction: WOLF waiting in the open exit doorway", JunctionRoom.WOLF_DOORWAY_X, wolf_reach, EXIT_SPAN, true, room.exit_front],
+		["Junction: WOLF by the exit", JunctionRoom.WOLF_DOWN_X, wolf_reach, JunctionRoom.EXIT_SHUT_SPAN, false, null],
+		["Junction: engineer at the exit bolt", JunctionRoom.BOLT_X, human_reach, JunctionRoom.EXIT_SHUT_SPAN, false, null],
+		["Junction: engineer behind WOLF at the open exit", JunctionRoom.HATCH_REACH_MAX_X, human_reach, JunctionRoom.EXIT_SPAN, true, room.exit_front],
+		["Junction: WOLF waiting in the open exit doorway", JunctionRoom.WOLF_DOORWAY_X, wolf_reach, JunctionRoom.EXIT_SPAN, true, room.exit_front],
 	]
 	var in_doorway: Array[String] = []
 	for spot: Array in spots:
