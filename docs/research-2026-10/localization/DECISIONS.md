@@ -12,12 +12,12 @@ German, Japanese, French, Korean and Polish?
 **Default: yes, as listed, as 12 locale files.**
 - Spanish is one slot with two files: Latin America (`es`) and Spain (`es_ES`).
 - Chinese is one slot with two files: Simplified (`zh_Hans`) and Traditional (`zh_Hant`).
-- Together they cover 93.9% of Steam users (mean of 10 months; 94.3% in September 2026).
+- Together they cover 93.8% of Steam users (mean of 14 months; 94.3% in September 2026).
 - The 10 hold his three regions: the US, the EU (de, fr, es-ES, pl) and Mexico (es-419).
 
 **Two sub-questions:**
 - **Polish or Italian for slot 10?**
-  - The default is Polish: 1.60% of Steam against 0.59%, 2.6-2.8 times Italian in every month.
+  - The default is Polish: 1.64% of Steam against 0.61%, 2.5-2.8 times Italian in every month.
   - The case for Italian: weaker English (EF 513 against 600), and it ships in more peer games (14 of
     16 against 9).
   - Whichever is not picked leads Tier 1.

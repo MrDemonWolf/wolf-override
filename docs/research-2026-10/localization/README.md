@@ -45,7 +45,7 @@ build starts only after he answers [DECISIONS.md](DECISIONS.md).
 | Folder | Made by | Holds |
 |---|---|---|
 | `markets/tools/` | research-markets step | `steamlang.py`: parses the Steam survey's language table. `steamapps.py`: peer games' Steam language lists. `locale_probe.gd`: Godot locale codes and font glyph samples. |
-| `markets/data/` | the same | The Steam language table (10 months), the 16 peer games' language lists and counts |
+| `markets/data/` | the same; the 14-month table by the fix step | The Steam language table (14 months) and the page behind each month, the 16 peer games' language lists and counts |
 | `godot/probe/` | research-godot step | The headless probes: runtime, static and const `tr()`, fonts and chains, dialogue boxes, ICU data, start-up locale; their PO fixtures; the POT run's sample script (`pot_probe/i18n_probe/`). The POT plugin itself moved to `prototype/tools/pot_addon/`. |
 | `godot/tools/export_pack.sh` | the same | The import and export-pack run (as-run name `bin/heavy_run.sh`; its slot and POT parts are now `prototype/tools/heavy.sh` and `extract_pot.sh`) |
 | `godot/evidence/` | the same | The probes' measured output, `game.pot` from `main`, and `measurements.txt` |

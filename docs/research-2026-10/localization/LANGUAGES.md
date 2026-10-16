@@ -9,27 +9,28 @@ approves it ([DECISIONS.md](DECISIONS.md), D1).
 - October 16: "support the top 10".
 
 **The answer in one line:** 10 languages, shipped as 12 locale files. Together they cover about
-**94% of Steam users** (the mean of 10 survey months is 93.9%; September 2026 alone is 94.3%). All three
+**94% of Steam users** (the mean of 14 survey months is 93.8%; September 2026 alone is 94.3%). All three
 of his regions are inside the 10.
 
 Every share below comes from our own parse of the Steam Hardware & Software Survey
-(`markets/data/steam-table.txt`, made by `markets/tools/steamlang.py`). It is the mean of 10 survey
-months, August 2025 to September 2026, with the September 2026 value in brackets. Every other number
+(`markets/data/steam-table.txt`, made by `markets/tools/steamlang.py` from the pages listed in
+`markets/data/steam-captures.txt`). It is the mean of all 14 survey months, August 2025 to September
+2026, with the September 2026 value in brackets. Every other number
 names its source in [Sources](#sources). Estimates are marked as estimates.
 
 ## The 10
 
 | # | Language | Name in the picker | Godot file(s) | Store codes | Steam share | Speakers (world rank) |
 |---|---|---|---|---|---|---|
-| 1 | English (US) | English | `en` | en, en-US | 35.7% [34.2] | 1,493M (#1) |
-| 2 | Chinese, Simplified and Traditional | 简体中文 and 繁體中文 | `zh_Hans`, `zh_Hant` | zh-Hans / zh-CN, zh-Hant / zh-TW | 27.9% + 1.3% [31.4 + 1.3] | 1,183M Mandarin (#2) |
+| 1 | English (US) | English | `en` | en, en-US | 36.5% [34.2] | 1,493M (#1) |
+| 2 | Chinese, Simplified and Traditional | 简体中文 and 繁體中文 | `zh_Hans`, `zh_Hant` | zh-Hans / zh-CN, zh-Hant / zh-TW | 26.7% + 1.3% [31.4 + 1.3] | 1,183M Mandarin (#2) |
 | 3 | Russian | Русский | `ru` | ru | 9.3% [9.05] | 210M (#11) |
-| 4 | Spanish, Latin America and Spain | Español (Latinoamérica) and Español (España) | `es` (Latin America), `es_ES` | es-419 (Apple: es-MX), es-ES | 0.7% + 4.2% [0.75 + 4.08] | 561M (#4) |
-| 5 | Portuguese (Brazil) | Português (Brasil) | `pt_BR` | pt-BR | 3.8% [3.70] | 269M (#8) |
-| 6 | German | Deutsch | `de` | de, de-DE | 2.7% [2.48] | 133M (#12) |
+| 4 | Spanish, Latin America and Spain | Español (Latinoamérica) and Español (España) | `es` (Latin America), `es_ES` | es-419 (Apple: es-MX), es-ES | 0.7% + 4.3% [0.75 + 4.08] | 561M (#4) |
+| 5 | Portuguese (Brazil) | Português (Brasil) | `pt_BR` | pt-BR | 3.9% [3.70] | 269M (#8) |
+| 6 | German | Deutsch | `de` | de, de-DE | 2.8% [2.48] | 133M (#12) |
 | 7 | Japanese | 日本語 | `ja` | ja | 2.5% [2.41] | 126M (#13) |
-| 8 | French | Français | `fr` | fr, fr-FR (reused for fr-CA listings) | 2.2% [2.08] | 334M (#6) |
-| 9 | Korean | 한국어 | `ko` | ko | 1.9% [1.37] | 82M (#28) |
+| 8 | French | Français | `fr` | fr, fr-FR (reused for fr-CA listings) | 2.3% [2.08] | 334M (#6) |
+| 9 | Korean | 한국어 | `ko` | ko | 1.8% [1.37] | 82M (#28) |
 | 10 | Polish | Polski | `pl` | pl | 1.6% [1.49] | about 40M (estimate; not in the table) |
 
 **Ten slots, twelve files.** Two slots carry a second file that is an adaptation, not a second
@@ -38,7 +39,7 @@ translation:
   an adaptation pass for Spain (vosotros forms and vocabulary).
   - Both files are needed because Nathanial named both Mexico and the EU.
   - The two variants are mutually intelligible.
-  - Steam's "Spanish - Spain" row (4.2%) is far above "Spanish - Latin America" (0.7%). Steam added
+  - Steam's "Spanish - Spain" row (4.3%) is far above "Spanish - Latin America" (0.7%). Steam added
     Latin-American Spanish only in October 2018 (PCGamesInsider), so many Latin-American players
     probably still run the Spain option. That is our inference, not a measurement.
   - Peers: 15 of 16 ship Spain's Spanish and 6 of 16 ship Latin America's.
@@ -50,13 +51,12 @@ translation:
 If Nathanial wants strictly 10 files, move `zh_Hant` to Tier 1 and keep `es_ES`, because he named
 the EU.
 
-**Coverage, measured.** The 12 Steam language rows these files serve add up to 93.9% (mean) and 94.3%
-(September 2026). Without Traditional Chinese the mean is 92.6%, and without both adaptation files it
-is 91.9%. The markets step's summary rounded this to "about 91%". The recomputed figures above replace
-it.
+**Coverage, measured.** The 12 Steam language rows these files serve add up to 93.8% (mean of 14 months)
+and 94.3% (September 2026). Traditional Chinese adds 1.3 points of that. The second Spanish file changes
+which Spanish Spain's players see, not how many players are covered: without it they still get Spanish.
 
-**One survey month is an outlier.** Simplified Chinese read 54.6% in February 2026, against 22.5-31.4%
-in every other month. The median over the 10 months is 24.1%. That month drags every other row down,
+**One survey month is an outlier.** Simplified Chinese read 54.6% in February 2026, against 21.9-31.4%
+in every other month. The median over the 14 months is 24.0%. That month pulls every other row down,
 but it changes no rank.
 
 ## Side by side with the world's top 10
@@ -90,10 +90,10 @@ counts:
 | Swap | Out (world rank) | In | The numbers |
 |---|---|---|---|
 | 1 | Hindi (#3, 611M) | Russian (#11, 210M) | **Hindi:** Steam offers Hindi only as a game language, so there is no client language and no survey row. Under 0.1% of web content (W3Techs). India leads mobile game *downloads* (15.7-18% in monthly Sensor Tower reports) but is not in AppMagic's top 10 by revenue. EF India 484 (low). **Russian:** 9.3% of Steam (#3); 15 of 16 peers. |
-| 2 | Arabic (#5, 335M) | German (#12, 133M) | **Arabic:** 0.00% of Steam in every month, because Steam's own client is not translated into Arabic. It is right-to-left, has 6 plural forms and gendered verbs, and our fonts lack its glyphs (measured). 2 of 16 peers. **German:** 2.7% of Steam. Germany is the #5 mobile game revenue market (AppMagic 2025), with about EUR 2.7B of mobile game revenue in 2025 (game e.V.). 16 of 16 peers. |
+| 2 | Arabic (#5, 335M) | German (#12, 133M) | **Arabic:** 0.00% of Steam in every month, because Steam's own client is not translated into Arabic. It is right-to-left, has 6 plural forms and gendered verbs, and our fonts lack its glyphs (measured). 2 of 16 peers. **German:** 2.8% of Steam. Germany is the #5 mobile game revenue market (AppMagic 2025), with about EUR 2.7B of mobile game revenue in 2025 (game e.V.). 16 of 16 peers. |
 | 3 | Bengali (#7, 274M) | Japanese (#13, 126M) | **Bengali:** no Steam client language, and not in W3Techs' top 15. **Japanese:** 2.5% of Steam. Japan is the #3 mobile revenue market, with 12.7-13% of world mobile game in-app spending (Sensor Tower, June and December 2025). EF Japan 446 (very low). 15 of 16 peers. |
-| 4 | Indonesian (#9, 255M) | Korean (#28, 82M) | **Indonesian:** 0.14% of Steam. Indonesia is a top-4 mobile *download* market (6.4% in June 2025) with low revenue. **Korean:** 1.9% of Steam. Korea is the #4 mobile revenue market (about $5B, Sensor Tower). 13 of 16 peers. Indonesian leads Tier 2 for the phone release. |
-| 5 | Urdu (#10, 246M) | Polish (about 40M, estimate) | **Urdu:** no Steam client language. It is right-to-left, and its Nastaliq script is hard to render. EF Pakistan 493 (low). **Polish:** 1.6% of Steam, 2.6 to 2.8 times Italian's share in every surveyed month. An EU language; 9 of 16 peers. |
+| 4 | Indonesian (#9, 255M) | Korean (#28, 82M) | **Indonesian:** 0.14% of Steam. Indonesia is a top-4 mobile *download* market (6.4% in June 2025) with low revenue. **Korean:** 1.8% of Steam. Korea is the #4 mobile revenue market (about $5B, Sensor Tower). 13 of 16 peers. Indonesian leads Tier 2 for the phone release. |
+| 5 | Urdu (#10, 246M) | Polish (about 40M, estimate) | **Urdu:** no Steam client language. It is right-to-left, and its Nastaliq script is hard to render. EF Pakistan 493 (low). **Polish:** 1.6% of Steam, 2.5 to 2.8 times Italian's share in every surveyed month. An EU language; 9 of 16 peers. |
 
 **What the strict world top 10 would cost instead.**
 - **Indonesian:** cheap. Latin script, which our fonts already cover; one plural form; no grammatical
@@ -112,11 +112,11 @@ Three of these five (Hindi, Bengali, Urdu) have no Steam client language at all.
 
 | | Polish | Italian |
 |---|---|---|
-| Steam share | 1.60% | 0.59% |
+| Steam share | 1.64% | 0.61% |
 | English proficiency (EF EPI 2025) | 600, very high | 513, moderate |
 | Peer games that ship it | 9 of 16 | 14 of 16 |
 
-Polish players are 2.7 times as many, but they manage better in English. Whichever is not picked leads
+Polish players are 2.7 times as many (14-month means), but they manage better in English. Whichever is not picked leads
 Tier 1.
 
 ## Nathanial's three regions
@@ -200,25 +200,25 @@ Each tier is its own later build. Every language in it goes through the same pip
 
 | Language | Picker name | Code | Steam share | Why | Risk | Cost |
 |---|---|---|---|---|---|---|
-| Italian | Italiano | `it` | 0.59% [0.56] | Main EU language; 66M speakers; EF 513, the lowest of the big EU markets; 14 of 16 peers | Gender agreement for the engineer; about 3 times the English length on short labels | One translation; fonts fine |
-| Turkish | Türkçe | `tr` | 1.21% [1.09] | 94M speakers; EF 488 (low); 7 of 16 peers | Dotted and dotless i break `to_upper()` (the game upper-cases the name and the speaker tag in code); suffixes attach to names | One translation; fonts cover ş, ğ, ı (measured) |
-| Ukrainian | Українська | `uk` | 0.68% [0.66] | Steam share above Italian's; players in Ukraine should not have to fall back to Russian | Same Slavic gender, case and plural issues as Russian. The translator must be a native Ukrainian speaker, not someone converting from Russian | One translation; reuses the Slavic style rules; fonts cover і, ї, є, ґ (measured) |
+| Italian | Italiano | `it` | 0.61% [0.56] | Main EU language; 66M speakers; EF 513, the lowest of the big EU markets; 14 of 16 peers | Gender agreement for the engineer; about 3 times the English length on short labels | One translation; fonts fine |
+| Turkish | Türkçe | `tr` | 1.22% [1.09] | 94M speakers; EF 488 (low); 7 of 16 peers | Dotted and dotless i break `to_upper()` (the game upper-cases the name and the speaker tag in code); suffixes attach to names | One translation; fonts cover ş, ğ, ı (measured) |
+| Ukrainian | Українська | `uk` | 0.69% [0.66] | Steam share above Italian's; players in Ukraine should not have to fall back to Russian | Same Slavic gender, case and plural issues as Russian. The translator must be a native Ukrainian speaker, not someone converting from Russian | One translation; reuses the Slavic style rules; fonts cover і, ї, є, ґ (measured) |
 
 ### Tier 2: mainly for the phone release
 
 | Language | Picker name | Code | Steam share | Why | Risk | Cost |
 |---|---|---|---|---|---|---|
-| Thai | ไทย | `th` | 0.84% [0.82] | Above Ukrainian on Steam; EF 402 (very low) | No Thai glyphs in our fonts (measured); no spaces between words, so line breaking needs ICU's dictionary data | New font, line-break checks, one translation |
+| Thai | ไทย | `th` | 0.85% [0.82] | Above Ukrainian on Steam; EF 402 (very low) | No Thai glyphs in our fonts (measured); no spaces between words, so line breaking needs ICU's dictionary data | New font, line-break checks, one translation |
 | Indonesian | Bahasa Indonesia | `id` | 0.14% | World #9 by speakers; 6.4-7.6% of mobile game downloads | Low spending per player | The cheapest language there is: Latin script, one plural form, no gender |
-| Portuguese (Portugal) | Português (Portugal) | `pt_PT` | 0.34% | EU variant; 5 of 16 peers | Players understand the Brazilian file | Adaptation pass of `pt_BR` |
-| Vietnamese | Tiếng Việt | `vi` | 0.22% [0.25], growing | 97M speakers | Stacked diacritics need line-height checks | Fonts cover it (measured); one translation |
+| Portuguese (Portugal) | Português (Portugal) | `pt_PT` | 0.35% | EU variant; 5 of 16 peers | Players understand the Brazilian file | Adaptation pass of `pt_BR` |
+| Vietnamese | Tiếng Việt | `vi` | 0.21% [0.25], growing (0.20% in August 2025, 0.29% in August 2026) | 97M speakers | Stacked diacritics need line-height checks | Fonts cover it (measured); one translation |
 
 ### Tier 3: optional; strong English, small Steam share
 
-Dutch (Nederlands, `nl`, 0.25%, EF 624), Swedish (Svenska, `sv`, 0.25%, EF 609), Danish (Dansk, `da`,
-0.21%, EF 611), Norwegian Bokmål (Norsk bokmål, `nb`, 0.11%, EF 613; Godot maps `no` to `nb`, measured),
-Finnish (Suomi, `fi`, 0.14%, EF 603), Czech (Čeština, `cs`, 0.53%, EF 582), Hungarian (Magyar, `hu`,
-0.36%, EF 590), Romanian (Română, `ro`, 0.12%) and Greek (Ελληνικά, `el`, 0.06%; Montserrat lacks most
+Dutch (Nederlands, `nl`, 0.25%, EF 624), Swedish (Svenska, `sv`, 0.26%, EF 609), Danish (Dansk, `da`,
+0.22%, EF 611), Norwegian Bokmål (Norsk bokmål, `nb`, 0.12%, EF 613; Godot maps `no` to `nb`, measured),
+Finnish (Suomi, `fi`, 0.15%, EF 603), Czech (Čeština, `cs`, 0.54%, EF 582), Hungarian (Magyar, `hu`,
+0.37%, EF 590), Romanian (Română, `ro`, 0.12%) and Greek (Ελληνικά, `el`, 0.06%; Montserrat lacks most
 Greek, Roboto has it, measured).
 
 ### Not now
@@ -247,8 +247,9 @@ Greek, Roboto has it, measured).
 ## Sources
 
 **Our own measurements:**
-- `markets/tools/steamlang.py` → `markets/data/steam-table.txt`: the Steam language shares, recomputed
-  for the sums above on October 16, 2026.
+- `markets/tools/steamlang.py` → `markets/data/steam-table.txt`: the Steam language shares over 14
+  survey months, its `--table` output filed as is, recomputed for the sums above on October 16, 2026.
+  `markets/data/steam-captures.txt` lists the page behind each month.
 - `markets/tools/steamapps.py` → `markets/data/steam-games.tsv` and `steam-games-count.txt`: the 16 peer
   games' language lists from Steam's public appdetails API, fetched October 16, 2026.
 - `markets/tools/locale_probe.gd` and `godot/probe/`: the locale codes and glyph coverage, Godot
@@ -257,9 +258,11 @@ Greek, Roboto has it, measured).
 **Steam:**
 - Hardware & Software Survey, Language section:
   https://store.steampowered.com/hwsurvey/Steam-Hardware-Software-Survey-Welcome-to-Steam (September
-  2026 live). Earlier months come from Wayback Machine captures of the same URL (10 distinct months,
-  August 2025 to September 2026; September 2025, December 2025, March 2026 and May 2026 were not
-  captured).
+  2026 live, fetched October 16, 2026). Earlier months come from Wayback Machine captures of the same
+  URL: one capture per survey month, all 14 months from August 2025 to September 2026, each listed with
+  its timestamp and URL in `markets/data/steam-captures.txt`. An earlier step's table had only 10 of
+  them; the four it called "not captured" (September 2025, December 2025, March 2026, May 2026) are in
+  the Wayback Machine and parse cleanly.
 - Supported languages and API codes: https://partner.steamgames.com/doc/store/localization/languages
   (read October 16, 2026).
 - Latin-American Spanish added in October 2018:

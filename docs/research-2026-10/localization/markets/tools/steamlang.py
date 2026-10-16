@@ -1,13 +1,18 @@
 """Parse the Language table out of saved Steam Hardware & Software Survey pages.
 
 Purpose: give the i18n market research one repeatable measurement of Steam's
-per-language user share, for the latest month and for a 12-month view built
+per-language user share, for the latest month and for a multi-month view built
 from Wayback Machine snapshots of
 https://store.steampowered.com/hwsurvey/Steam-Hardware-Software-Survey-Welcome-to-Steam
+The filed view (../data/steam-table.txt) covers the 14 survey months August 2025
+to September 2026; ../data/steam-captures.txt lists the page behind each month.
 
 Usage:  python3 -I steamlang.py [--table] FILE...
   FILE   a saved survey page; plain HTML or gzip (Wayback serves gzip bodies).
-  --table  print a language x month table (percent) instead of JSON.
+  --table  print a language x month table (percent) instead of JSON: tab-separated,
+           a "language" header row, one column per survey month in the order the
+           files were given, then the mean of the months that list the language.
+           ../data/steam-table.txt is this output saved as is.
 
 Contract: each page yields {"month": "<Month YYYY>" or None, "langs": {name: pct}}
 where pct is the share of surveyed Steam users (percent, 0-100) whose Steam
@@ -47,8 +52,10 @@ def parse(path):
     s = re.sub(r'<[^>]+>', ' ', s)
     s = html.unescape(re.sub(r'\s+', ' ', s))
     i = s.find(' Language ')
-    # The survey header names its month before the tables; take the first hit
-    # after the page chrome so the language picker text cannot confuse it.
+    # The month is the first "<Month> 20YY" anywhere in the stripped page. On
+    # every capture filed in steam-captures.txt that is the survey header's
+    # month: the store chrome before it names no month. If Valve ever adds a
+    # dated banner above the header, this would need to search after it.
     m = re.search(MONTH_RE, s)
     j = s.find('Free Hard Drive', i) if i >= 0 else -1
     seg = s[i:j] if i >= 0 and j > i else ''

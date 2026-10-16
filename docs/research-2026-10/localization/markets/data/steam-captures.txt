@@ -1,0 +1,19 @@
+# The Steam survey pages behind steam-table.txt, fetched October 16, 2026.
+# One Wayback Machine capture per survey month (the capture nearest the 18th of the month after),
+# plus the live page. Columns: capture, survey month read by steamlang.py, URL.
+# The page bodies are not filed (.gitignore: docs/**/dl/); fetch the id_ URL to get the raw page.
+20250918101213	August 2025	https://web.archive.org/web/20250918101213id_/https://store.steampowered.com/hwsurvey/Steam-Hardware-Software-Survey-Welcome-to-Steam
+20251017112002	September 2025	https://web.archive.org/web/20251017112002id_/https://store.steampowered.com/hwsurvey/Steam-Hardware-Software-Survey-Welcome-to-Steam
+20251117174645	October 2025	https://web.archive.org/web/20251117174645id_/https://store.steampowered.com/hwsurvey/Steam-Hardware-Software-Survey-Welcome-to-Steam
+20251217030141	November 2025	https://web.archive.org/web/20251217030141id_/https://store.steampowered.com/hwsurvey/Steam-Hardware-Software-Survey-Welcome-to-Steam
+20260118041218	December 2025	https://web.archive.org/web/20260118041218id_/https://store.steampowered.com/hwsurvey/Steam-Hardware-Software-Survey-Welcome-to-Steam
+20260218205105	January 2026	https://web.archive.org/web/20260218205105id_/https://store.steampowered.com/hwsurvey/Steam-Hardware-Software-Survey-Welcome-to-Steam
+20260318090626	February 2026	https://web.archive.org/web/20260318090626id_/https://store.steampowered.com/hwsurvey/Steam-Hardware-Software-Survey-Welcome-to-Steam
+20260417064732	March 2026	https://web.archive.org/web/20260417064732id_/https://store.steampowered.com/hwsurvey/Steam-Hardware-Software-Survey-Welcome-to-Steam/
+20260517185636	April 2026	https://web.archive.org/web/20260517185636id_/https://store.steampowered.com/hwsurvey/Steam-Hardware-Software-Survey-Welcome-to-Steam
+20260619175047	May 2026	https://web.archive.org/web/20260619175047id_/https://store.steampowered.com/hwsurvey/Steam-Hardware-Software-Survey-Welcome-to-Steam
+20260716033938	June 2026	https://web.archive.org/web/20260716033938id_/https://store.steampowered.com/hwsurvey/Steam-Hardware-Software-Survey-Welcome-to-Steam
+20260815110247	July 2026	https://web.archive.org/web/20260815110247id_/https://store.steampowered.com/hwsurvey/Steam-Hardware-Software-Survey-Welcome-to-Steam
+20260918184834	August 2026	https://web.archive.org/web/20260918184834id_/https://store.steampowered.com/hwsurvey/Steam-Hardware-Software-Survey-Welcome-to-Steam
+20261016194504	September 2026	https://web.archive.org/web/20261016194504id_/https://store.steampowered.com/hwsurvey/Steam-Hardware-Software-Survey-Welcome-to-Steam
+live-20261016	September 2026	https://store.steampowered.com/hwsurvey/Steam-Hardware-Software-Survey-Welcome-to-Steam
