@@ -9,6 +9,7 @@ Every moved file is still in git history at commit `1cf8d73`: open one with `git
 - [Notes & Research](https://app.notion.com/p/3fbd61481c7b81228069c3438442a480): the index page in Notion
 - [Inbox (temporary notes)](https://app.notion.com/p/3fbd61481c7b81799e00c9bc7b2c61a0): quick notes waiting to be sorted
 - [Migration record (2026-10-16)](https://app.notion.com/p/3fbd61481c7b81569636d2063f0acf00): the migration plan and the map from every moved path to its Notion page
+- [Twitch: category, Drops and integration (2026-10-16)](https://app.notion.com/p/3fbd61481c7b818c9af4dcfb19b031bd): how to get a Twitch category, Twitch Drops and Twitch integration ideas
 
 ## Asset sources
 
