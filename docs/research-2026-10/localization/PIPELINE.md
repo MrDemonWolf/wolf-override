@@ -1,0 +1,351 @@
+# Pipeline: translating, checking, reviewing and updating
+
+How the translations are made, checked, reviewed, labelled and kept up to date. The research-pipeline
+step tried each translator on 12 real game lines (`pipeline/`). The prototype then ran the chosen
+pipeline on 34 msgids in four languages (`prototype/`).
+
+## The decision: AI translates at build time; the game ships fixed files
+
+Nathanial said on October 15: "we can do the translations on the device using AI, whatever works".
+The recommendation reads "on the device" as **on our machine, at build time**:
+1. AI agents translate the catalogs on the developer's Mac.
+2. Every line passes the automated checks.
+3. People review the lines.
+4. The game ships fixed `.po` files.
+
+**Nothing is translated on the player's device while they play.** The pipeline step found six reasons:
+1. **No engine support.** Godot has no OS translation API, so each platform would need its own
+   GDExtension:
+   - Apple's Translation framework;
+   - Android's ML Kit, which downloads language packs and is "intended for casual and simple
+     translations" (developers.google.com/ml-kit/language/translation);
+   - nothing found for Windows apps (Edge's Translator API is web-only).
+2. **Nothing to pin.** The output is not deterministic and changes with OS updates, so no test,
+   still or approved-wording check could pin it.
+3. **Downloads.** Language packs can be missing offline, and downloading one needs a consent prompt.
+4. **Quality.** Apple's framework failed in the trial (next table).
+5. **Layout.** Boxes are split at 440 px and 42 characters, and runtime text could not be checked for
+   overflow ahead of time.
+6. **Disclosure.** Valve's January 2026 rules treat text generated during play as a separate AI
+   disclosure category that also needs guardrails (VGC, January 17, 2026).
+
+## What the trial and the prototype measured
+
+**The trial** (`pipeline/out/side_by_side.md`, `scores.json` and `judgments.json`): 12 real lines from
+`main`, each translated into es-419, de and ja.
+
+| Translator | Hard failures | Glossary misses | Gender failures | Meaning errors | Use it as |
+|---|---|---|---|---|---|
+| Claude agents, with the style packet and glossary | 0 | 0 | 0 | 1-3 minor per language | the translator |
+| Codex (ChatGPT subscription) | 0 | 0 | 0 | 1-3 minor per language | the independent back-translator and critic |
+| Apple Translation, on the device (macOS 27.0.1) | 3-4 per language | 5-7 per language | 1 (es made the engineer masculine) | 3-6 per language | an optional third signal on Macs, never a gate |
+
+Apple's hard failures included:
+- every authored `\n` doubled;
+- Japanese `%%dの%d`, which breaks Godot's `%` format;
+- "draw it" (the lure) read as "draw a picture";
+- Japanese "out in the open" rendered as "naked".
+
+Two more options were ruled out on paper:
+- **Local open models.** NLLB-200 is CC-BY-NC 4.0, so it cannot be used for a game that may be sold.
+  MADLAD-400 3B is Apache 2.0 but takes no glossary or context. Gemma- and Qwen-class models would load
+  Nathanial's Mac and still need a quality trial.
+- **Crowdin's free open-source plan.** It requires "no commercial products related to the project",
+  and a paid Steam release would break that.
+
+**The prototype** ran the pipeline on the 34 msgids its stills show (`prototype/evidence/po_check.json`).
+
+| | es (Latin America) | de | ja | ru |
+|---|---|---|---|---|
+| Translated by | Claude | Claude | Claude | Claude (design step) |
+| `msgfmt --check-format --check-header` | rc 0 | rc 0 | rc 0 | rc 0 |
+| Gate failures (placeholders, tag, breaks, key token, script, glossary) | 0 | 0 | 0 | 0 |
+| Drift flags (chrF under 35 on lines over 4 words) | 2 ("interruptor" reads as "switch") | 0 | 0 | 0 |
+| Mean chrF of Codex's back-translation against the English | 77.1 | 70.5 | 77.4 | 64.0 |
+
+**The checks catch what they should.** Two broken copies were run as negative controls:
+
+| Copy | Breaks put in | Caught |
+|---|---|---|
+| `es` | `%s` dropped; `%s` changed to `%d`; `E:` removed | all 3 (msgfmt 2, the token check 1) |
+| `ru` (design step) | a Cyrillic `Е:` for the Latin key token; a Latin `A` inside `ПАУЗА`; a dropped `%d` | all 3 (the token check, the script guard and msgfmt) |
+
+The reports are `prototype/evidence/po_check_negative_control*.json`.
+
+**chrF on its own is not a gate.**
+- Apple's back-translation of its own output scored the highest mean chrF (59.5), although Apple's
+  translations were the worst. A round trip through the same engine confirms itself.
+- Correct short labels score low: TANK RELEASE against "TANK DROP" is 19.6.
+- So chrF only flags a line for a person. The real drift check is the back-translator's list of
+  meaning differences.
+
+## The steps, for each batch
+
+1. **Extract.** `extract_pot.sh` runs Godot's own generator headless and writes `i18n/messages.pot`
+   (DESIGN.md, "One extraction tool").
+2. **Batch.** Translate one scene or room at a time, in reading order: the opening, the corridor,
+   Records, the Service Junction, menus and settings, and the end card. Each batch carries:
+   - the whole scene's English, with the speaker of each line and what the player sees then;
+   - the surface each line appears on (dialogue box at 440 px and 23 px, plate at 12 px, button) and
+     its length budget;
+   - a `#. TRANSLATORS:` note per line (the prototype's `translations/claude.json` "context");
+   - the glossary and that language's style guide.
+3. **Translate.** A Claude agent translates the batch, through the subscription and never billed API.
+4. **Back-translate independently.** Codex, through the ChatGPT subscription and in a read-only
+   sandbox, back-translates every line:
+   - It is **not shown the English**.
+   - It notes anything ambiguous, unidiomatic or gendered (`i18n_tool.py backprompt`).
+   - The model that translated a line never back-translates it.
+   - Each Codex session is archived when done.
+5. **Run the gates.** `i18n_tool.py check` writes one JSON report. Every gate must pass:
+   - `msgfmt --check-format --check-header`. The tool adds `#, c-format` itself, since Godot's
+     generator writes no format flag.
+   - **Placeholders:** the same `%s`, `%d` and `{name}` in the same order. A stray `%%` counts as a
+     mismatch.
+   - **Speaker tag**, until speaker and words are stored apart.
+   - **`\n` count.**
+   - **The `E:` key token**, until it becomes a placeholder.
+   - **Script guard**, ported once from ConPaws' locales-script test: no Cyrillic in a Latin-script
+     or CJK text, and no Latin letters in a Cyrillic text outside the glossary's keep words.
+   - **Glossary:** each term's required form, with stems for Slavic languages.
+   - **Plural forms:** the header's rule, with one `msgstr[n]` per form.
+   - **Consistency:** the same msgid always gets the same translation unless `msgctxt` differs.
+   - **Drift flag:** chrF under 35 on lines over 4 words sends the line to a person.
+6. **Check the layout.** `tests/i18n_test.gd` runs headless:
+   - every character drawable by the bundled font chain;
+   - no overflow on the title, menus, HUD and plates;
+   - every dialogue box fits its rows at every TEXT SIZE step.
+
+   Then `i18n_capture.gd` renders stills per language in the container (`tools/render/render.sh`), for
+   a person to look at.
+7. **Human review** (below).
+8. **Stamp and ship.** A reviewed line carries `# reviewed-by: <name> <date>`. A language counts as
+   reviewed when every story-critical line has a stamp.
+
+## Style rules
+
+The pipeline step's style packet (`pipeline/style_packet.md`) and glossary (`pipeline/glossary.json`)
+are the starting point. The design step added Russian to both. In the build they become
+`i18n/style/<code>.md` and `i18n/glossary.json`. All wording choices stay Nathanial's (decisions D9 and
+D11).
+
+### The engineer is never gendered
+
+The engineer is non-binary and uses they/them (`docs/decisions.md` S1-03). English can avoid gender;
+most of the 10 cannot. The rule is to rephrase, never to pick a gender:
+
+| Language | Where gender shows | The rule |
+|---|---|---|
+| es, pt_BR, fr (and it) | Adjectives and participles agree (solo/sola, seul/seule, sozinho/sozinha); job nouns (ingeniero/a) | Rephrase with an adverbial phrase ("sin ayuda", "por su cuenta", "sans aide"). Name the department, not the person: the prototype's name card reads INGENIERÍA DE MANTENIMIENTO. French avoids the passé composé with être about the engineer. Neopronouns (French iel, Spanish elle) only if Nathanial chooses them (D9). |
+| de | Nouns and pronouns only; predicative adjectives do not agree | No Ingenieur/Ingenieurin. Name the field: WARTUNGSTECHNIK. Use the name instead of er/sie. |
+| ru, pl (and uk, cs) | **Past-tense verbs** (сделал/сделала, zrobił/zrobiła), short adjectives, participles, and "yourself" (сам/сама) | Present tense, a noun phrase, an impersonal construction ("сорвало клапан") or the imperative, which has no gender. The prototype's Russian knockdown card does this: "Сорвало предохранительный клапан, а %s — прямо на решётке." Polish addresses with ty, never Pan/Pani. This is the hardest rule; native review checks it first. |
+| ja, ko, zh | Little grammatical gender, but gendered pronouns exist | Never 彼/彼女 (ja), 그/그녀 (ko) or 他/她 (zh) for the engineer; use the name or drop the pronoun. |
+| tr (Tier 1) | none | (no rule needed) |
+
+**This affects 26 lines in the game and 44 in the changelog** (STRINGS.md). Seven of the 26 are
+past-tense recap and narration lines about the engineer. If a Russian or Polish rewrite cannot keep
+their meaning, the English would need restructuring, and only Nathanial can change the English (D9).
+
+### WOLF is he
+
+WOLF is masculine in every language: es él, pt ele, fr il, it lui, de er (which fits der Wolf), ru он,
+pl on, with masculine past tense.
+- In Chinese, WOLF is 他 and never 它: he is a person, not an object.
+- In Japanese, never それ or あれ for WOLF.
+- WOLF is never declined in Russian or Polish ("с WOLF", "o WOLF"). The name stays as written in Latin
+  letters in every language.
+
+**WOLF's voice:** calm, direct, terse and dry, a peer and never a servant; no exclamation marks and no
+slang.
+- He uses informal address (tú, du, tu, ты, ty).
+- In Japanese he speaks in plain form, without keigo. His first-person pronoun (俺, 私 or 僕) and how
+  he refers to the Director are Nathanial's call (D11).
+- His Korean speech level is also Nathanial's call (D11).
+
+### Inserting names
+
+The engineer's name comes from a fixed roster of three: Rowan Vale, Alex Bennett and Morgan Reed, all
+provisional (`m0_state.gd`). The rules:
+- **Slavic languages:** the name stays in the nominative. Make it the subject, or put it after a dash
+  or a colon ("Страж заметил: %s на открытом месте"). Never put it where the language needs a case
+  ending ("под %s", "у %s"). The prototype's Russian lines follow this, so no declined forms are
+  needed for any of the three names.
+- **German possessives:** use "von %s", never "%ss". Spanish, French and Portuguese use "de %s".
+- **Korean:** particles change with the name's last sound. 로완 and 모건 end in a consonant (은, 이);
+  알렉스 ends in a vowel (는, 가). Rephrase so no particle follows the name, or store the particle
+  class with each name.
+- **Names in other scripts.** In Russian, Japanese, Korean and Chinese text the Latin "Rowan" stands
+  out. The default is to store each name per language: Роуэн, ローワン, 로완, 罗温 (samples only,
+  D9). The English name stays the internal key.
+- **Upper case in Turkish.** The game upper-cases the name and the tags with `to_upper()`, which
+  ignores the locale. For Turkish, upper-case with the locale's rules (Tier 1).
+
+### Plates, tokens, quotes and punctuation
+
+**Station plates:**
+- They follow the glossary in every line that names them.
+- In Russian and Polish a plate is quoted in «» in its own nominative form ("к пульту «СБРОС БАКА»"),
+  so the plate's words never change case.
+- Whether plates are translated at all is decision D3.
+
+**Key tokens.** Until the hint bar uses placeholders, the Latin "E:" stays exactly as written. A
+Cyrillic "Е" looks the same but is never replaced; the token check catches it (measured).
+
+**Placeholders.** Lines with more than one insert get named placeholders (`{current}`, `{total}`,
+filled with `String.format`), so a translator can reorder them. Positional `%s` cannot be reordered
+(Godot 4.7 "Internationalizing games").
+
+**Quotes:**
+
+| Language | Quotes |
+|---|---|
+| fr | « … », with no-break spaces inside |
+| ru, es | «…» |
+| de | „…“ |
+| pl | „…” |
+| ja, zh_Hant | 「…」 |
+| zh_Hans | “…” |
+
+**Punctuation.**
+- French puts a no-break space (U+00A0) before `; : ! ?`. Our fonts lack the narrow U+202F.
+- Russian and Polish never leave a one-letter word at the end of a row (ru а, в, и, к, о, с, у, я;
+  pl a, i, o, u, w, z). The translation binds it to the next word with a no-break space (U+00A0). The
+  design step's Russian stills left "а" and "в" at row ends. A gate checks this from the build's first
+  Slavic PR (PLAN.md).
+- Japanese and Chinese keep 。 and 、 in the game's boxes. Netflix drops them in subtitles; that is a
+  style choice the guide states once.
+
+**Register and length.**
+- Buttons and objectives use the infinitive.
+- Stay within about 130% of the English length where possible, and as short as possible on plates and
+  buttons.
+- The overflow gate has the last word: it made the prototype's de SETTINGS shorter, OPTIONEN instead
+  of EINSTELLUNGEN.
+
+### Open glossary questions found so far
+
+| Term | What the back-translation showed |
+|---|---|
+| breaker | es "interruptor" reads as "switch" (both es drift flags). The ru sample uses "рубильник", which reads as "knife switch". "Автомат", the everyday Russian word for a circuit breaker, also means an assault rifle, which a military base makes ambiguous. |
+| LOCKDOWN | es BLOQUEO reads as "blockage"; ru БЛОКИРОВКА reads as "lockout". |
+| TANK RELEASE | ru «СБРОС БАКА» reads as "TANK RESET"; сброс means both drop and reset. |
+| the Director | ja 所長 reads as "head of the facility": a title, or a name? |
+| SERVICE JUNCTION | de VERSORGUNGSKNOTEN reads as "supply node"; ru СЕРВИСНЫЙ УЗЕЛ reads as "service node". |
+| HOLD E: | The de word order "HALTEN E:" is forced by the token. Placeholders fix it. |
+
+## Human review
+
+- **Where.** Weblate's free Libre plan is for public projects (weblate.org/en/hosting, read October
+  16, 2026). The repository is public under GPL-3.0. Weblate reads and writes PO files in Git and
+  shows each line's context, notes and fuzzy state.
+- **Who.**
+  - Community native speakers first, in the order of the list (es, de and ja were the pipeline
+    trial's first three).
+  - Before any paid release, one paid native proofreader per language reads the story lines. Rates
+    were not researched: a gap.
+- **What is checked first:**
+  - the engineer's gender in Russian and Polish;
+  - WOLF's voice;
+  - the open glossary terms.
+- **Shown as reviewed** only when every story-critical line carries a reviewer stamp. A changed line
+  loses its stamp.
+
+## Honest labelling
+
+**In the picker.** An unreviewed language carries a short tag in its own language. The default tags
+(decision D2) are standard terms, still to be reviewed:
+
+| Language | Tag |
+|---|---|
+| Deutsch | maschinelle Übersetzung |
+| Español (both) | traducción automática |
+| Français | traduction automatique |
+| Português (Brasil) | tradução automática |
+| Polski | tłumaczenie maszynowe |
+| Русский | машинный перевод |
+| 日本語 | 機械翻訳 |
+| 한국어 | 기계 번역 |
+| 简体中文 | 机器翻译 |
+| 繁體中文 | 機器翻譯 |
+
+**In the credits.** Name the tools and the people, and never invent a translator (AGENT.md; the IGDA
+crediting guidelines). For example: "Translations: machine translation by Claude (Anthropic),
+cross-checked with Codex (OpenAI); reviewed by <names>", or "not yet reviewed".
+
+**In each PO file:**
+- The header names the machine translation (`Last-Translator: Claude (Anthropic), machine translation,
+  unreviewed`).
+- Each machine line carries `# machine-translated by Claude (Anthropic), unreviewed` until a person
+  stamps it.
+
+**On the store pages:**
+- Steam's language table lists only languages that ship.
+- "About This Game" says "machine-translated, community review in progress" until review is done.
+- Valve's January 2026 rules require disclosing AI used "to generate content for the game" (VGC,
+  January 17, 2026). They do not name translation. The conservative default is to disclose it in the
+  Content Survey (D2).
+- No App Store rule was checked: a gap.
+
+## When the English changes
+
+1. Extract the POT again.
+2. Run `msgmerge --update` on every PO file.
+   - Unchanged lines keep their translation.
+   - Changed lines turn `#, fuzzy`.
+   - The pipeline step rehearsed this on its German file: msgmerge kept 11 translations and flagged
+     the edited line fuzzy ("11 translated messages, 1 fuzzy translation").
+3. Godot skips fuzzy entries, so players see the new English for that line until it is translated.
+   No stale translation ships.
+4. The translator re-translates only fuzzy and new lines, given the old translation and the English
+   diff.
+5. The back-translation and all gates run again.
+6. A changed line that was reviewed loses its stamp and goes back to the review queue.
+7. CI fails on any fuzzy entry in a language marked reviewed, and on any untranslated story-critical
+   line.
+
+## What it costs (measured usage; all through subscriptions)
+
+| Run | Codex session | Input tokens | Output tokens |
+|---|---|---|---|
+| Pipeline trial: 36 translations and 36 back-translations | `01a143d1-a4b4-7a23-be45-2e550a2fc217` | 35,443 (13,184 cached) | 2,479 |
+| Prototype: 102 back-translations | `01a143f0-8b81-7703-972f-13e21953fd61` | 37,015 | 3,007 |
+| Prototype: 2 shortened buttons | `01a14409-6eb1-7db2-8ef1-f6f3714d953b` | | |
+| Design step: 34 Russian back-translations | `01a14426-2248-7773-8edf-2c4cb6fa3ef8` | 33,534 (13,056 cached) | 1,346 |
+
+Every session is archived. No API key was set and no paid service was used. The Claude translations
+were made in the steps' own Claude Code sessions.
+
+## Credits and sources
+
+**Tools:**
+- Claude (Claude Code, Anthropic) translated, wrote the tools and wrote these notes.
+- Codex (codex-cli 0.162.1, OpenAI, ChatGPT subscription) back-translated.
+- Apple's Translation framework (macOS 27.0.1) was probed query-only, with no prompt and no download
+  (`pipeline/probe/apple_translate_probe.swift`).
+- GNU gettext 1.0 (`msgfmt`, `msgmerge`) and fontTools 4.60.1.
+- Godot 4.7.2.
+
+**The chrF metric:** M. Popović, "chrF: character n-gram F-score for automatic MT evaluation", WMT 2015.
+
+**Pages fetched on October 16, 2026:**
+- Godot 4.7 docs:
+  - https://docs.godotengine.org/en/4.7/tutorials/i18n/localization_using_gettext.html
+  - https://docs.godotengine.org/en/4.7/tutorials/i18n/internationalizing_games.html
+  - https://docs.godotengine.org/en/4.7/tutorials/i18n/pseudolocalization.html
+- Weblate hosting: https://weblate.org/en/hosting/
+- Crowdin for open source: https://crowdin.com/product/for-open-source
+- ML Kit translation: https://developers.google.com/ml-kit/language/translation
+- MADLAD-400: https://huggingface.co/google/madlad400-3b-mt
+- Valve's AI disclosure rules, VGC, January 17, 2026:
+  https://www.videogameschronicle.com/news/valve-has-significantly-rewritten-steams-rules-for-how-developers-much-disclose-ai-use
+
+**Found through search:**
+- NLLB's licence: https://github.com/facebookresearch/fairseq/blob/nllb/README.md
+- Edge's Translator API: https://blogs.windows.com/msedgedev/2026/06/02/expanding-on-device-ai-in-microsoft-edge-new-models-and-apis-for-the-web/
+
+**Netflix Timed Text Style Guides** (speeds and line lengths), fetched October 16, 2026 by the
+research-godot step: Simplified Chinese, Japanese, Korean, English (USA), and Castilian and
+Latin-American Spanish, at partnerhelp.netflixstudios.com.
+
+**ConPaws** (read only): `apps/native/src/locales/*.test.ts`, `src/lib/i18n.ts`, and commits 3147f3d,
+380d18f and 2f0a152.
