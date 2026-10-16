@@ -73,8 +73,50 @@ ConPaws' `resolveDeviceLocale` does:
 - `uk` goes to `en`, never `ru`.
 
 Only then does it fall back to Godot's own `compare_locales`. On a tie Godot picks the translation added
-last, so a tie must never decide (LANGUAGES.md, "How the OS language picks a file"). The resolver's
-answer is final: `apply()` registers only that language's file (below), so Godot never mixes in another.
+last, so a tie must never decide ("How Godot picks a file for the system language", below). The
+resolver's answer is final: `apply()` registers only that language's file (below), so Godot never mixes
+in another.
+
+### How Godot picks a file for the system language (measured in Godot 4.7.2)
+
+Godot scores each loaded translation against the current locale (`compare_locales`: 10 for an exact
+match, 5 for the same language, plus or minus 1 for each script, country or variant that both name and
+that matches or differs; `core/string/translation_server.cpp`). It does this **for each line, not once
+per file**: it walks every file that scores above 0, skips a file that lacks the line, has it fuzzy or
+has it empty, keeps the best score (on a tie, the file added last), and stops at an exact match
+(`get_message_from_translations`, `core/string/translation_domain.cpp`, 4.7.2-stable). Only when no
+file of the language has the line does it try the fallback locale, then the English msgid.
+
+So with both Chinese files loaded, a line missing from `zh_Hant` shows the `zh_Hans` text (score 3),
+and with `es` and `es_ES` loaded, a line missing from one shows the other's. Measured with
+`godot/probe/probe_runtime.gd` (`godot/evidence/runtime.txt`, "sibling"): at zh_Hant, a line only
+`zh_Hans` had, one fuzzy in `zh_Hant` and one empty in `zh_Hant` all came out Simplified; with `zh_Hans`
+removed, all three came out English. The game therefore keeps only the chosen language's file
+registered, and a gate requires the files of a pair to translate the same lines ("A missing line falls
+back to its sibling file", below).
+
+Which file the OS locale picks, measured with `markets/tools/locale_probe.gd` and
+`godot/probe/probe_runtime.gd` (every file loaded, as in the research probes):
+
+| OS locale | Plays in | Why |
+|---|---|---|
+| es_MX, es_AR, es_US; `es-419` as typed | `es` (Latin America) | `es` scores 5, `es_ES` scores 4; `es_419` standardises to `es` |
+| es_ES | `es_ES` | exact, 10 |
+| pt_PT | `pt_BR` | the only Portuguese file (4) |
+| zh_CN, zh_SG, zh | `zh_Hans` | zh_CN scores 10 against zh_Hans |
+| zh_TW, zh_HK | `zh_Hant` | zh_TW scores 10; zh_HK scores 5 |
+| fr_CA | `fr` | same language, 5 |
+| en_GB | `en` | same language, 5 |
+| uk_UA | `en` | **never Russian** until Ukrainian ships (Tier 1); measured in the prototype's resolver test |
+| anything else | `en` | the fallback, `internationalization/locale/fallback` |
+
+Not measured, but they follow the same rule and go into the resolver's table: zh_MO to `zh_Hant`,
+fr_BE and fr_CH to `fr`, en_AU to `en`. With both Portuguese files loaded, the research-godot step
+measured plain `pt` and pt_AO picking `pt_PT` only by tie order. If `pt_PT` ever ships, the table
+decides those cases on purpose instead.
+
+The resolver (above) writes these mappings out as one explicit table, as ConPaws'
+`resolveDeviceLocale` does, rather than trusting tie order.
 
 **Choosing and keeping the language:**
 - `saved()` uses the language saved in `settings.cfg`, `[general] language`.
@@ -141,17 +183,36 @@ the PO files: the per-language names (Роуэн, ローワン), the key labels 
 - **Fuzzy entries are skipped**, so an unreviewed change never ships: the loader drops any entry after
   a `fuzzy` comment (measured). With only one catalog registered (below), the player sees the English
   line instead. `#.` notes give translators context.
+  - **Any comment counts, not only the flag.** The loader sets its skip for every comment line that
+    contains the text "fuzzy" (`if (l.contains("fuzzy"))`, `core/io/translation_loader_po.cpp`, about
+    line 261, 4.7.2-stable), so a translator note or `#. i18n:` mark with the word in it silently drops a
+    translated line. `i18n_tool.py` mirrors the loader in `is_fuzzy`, `check` fails a language with such
+    a note (`fuzzy_notes`), and `fill` refuses to write one.
 - **Plurals and contexts work:**
   - `msgctxt` "verb" against "adjective" gave Abrir / Abierto.
   - Russian `tr_n` gave 1 клапан, 2 клапана, 5 клапанов, 11 клапанов, 21 клапан, 22 клапана
     (`godot/evidence/runtime.txt`).
-- **A bad plural header loses the whole language.** In a file with any `msgid_plural` entry, a
-  missing or invalid `Plural-Forms:` header makes the loader reject the whole file
-  (`core/io/translation_loader_po.cpp`: "PO file uses 'msgid_plural' but 'Plural-Forms' is invalid or
-  missing in header"), and so does a plural entry whose `msgstr[n]` count differs from `nplurals`. Every
-  line of that language would then show English, or a sibling's text. A file with no plural entries and
-  no header falls back to the rule in `core/string/locales.h` (`core/string/translation.cpp`). So every
-  file carries its language's rule from `languages.json`, and the plural gate counts the forms of every
+- **A bad plural header loses the whole language, or silently uses English plurals.** What the
+  loader does (`core/io/translation_loader_po.cpp`, 4.7.2-stable):
+  - **No header entry at all:** the file is rejected ("No config found", about line 326).
+  - **A header with no `Plural-Forms:` line, and a `msgid_plural` entry:** rejected ("PO file uses
+    'msgid_plural' but 'Plural-Forms' is invalid or missing in header", about line 203, which fires only
+    when the line is absent).
+  - **A plural entry whose `msgstr[n]` count differs from `nplurals`:** rejected.
+  - **A `Plural-Forms:` line whose value does not parse:** NOT rejected. `PluralRules::parse` fails
+    (`core/string/plural_rules.cpp`, about line 142) and `Translation::_get_plural_rules` falls back to
+    the rule of the translation's locale, which during parsing is still the default "en", because the
+    `Language:` header is applied after the parse (`core/string/translation.h`, `translation.cpp`
+    about lines 137-144 and 216-240). A 1-form file (ja, ko, zh) or a 3-form file (ru, pl) is then
+    still rejected by the `msgstr[n]` count; a 2-form file (es, de, fr, pt_BR) loads with no error
+    and uses the English rule `n != 1`, which is wrong for fr and pt_BR at n = 0. The research probe's
+    `godot/probe/po/pl_noheader.po` has an empty `Plural-Forms:` line, which logged "Invalid plural
+    rules format" (`godot/evidence/runtime.txt`).
+
+  A rejected file shows English for every line of the language, or a sibling's text. So every file
+  carries its language's rule from `languages.json`; `check` compares the header's rule with that row
+  word for word (`plural_header_ok`) rather than trusting the header's `nplurals`; `msgfmt
+  --check-header` catches a rule that does not parse; and the plural gate counts the forms of every
   plural entry before a file can ship.
 - **CSV was ruled out.** Godot 4.7's CSV importer has context and plural columns
   (`editor/import/resource_importer_csv_translation.cpp`), but it keeps every language in one sheet.
@@ -319,7 +380,7 @@ The S25b PR takes its ranges from the `LANGUAGES` table instead of a fixed Latin
 
 **Layout breaks never bind a translation.**
 - Many English lines carry a `\n` placed for English width: 45 on `main` (STRINGS.md), and
-  `codex/opening-dock` adds one to four `INTRO_LINES`, two in the middle of a sentence ("The Director
+  the opening-dock backup branch (`codex/opening-dock`) adds one to four `INTRO_LINES`, two in the middle of a sentence ("The Director
   thinks WOLF is\nstill in standby.", "WOLF turns from the Director\nand heads for maintenance.") and
   two between sentences ("...a threat.\nWOLF handles the rest.", "DIRECTOR: Lock down
   maintenance.\nWOLF does not leave this site."). The English stays byte-identical, so the msgid keeps
@@ -327,9 +388,10 @@ The S25b PR takes its ranges from the `LANGUAGES` table instead of a fixed Latin
 - So the line-break gate treats a `\n` as layout unless the msgid is marked `#. i18n: keep-breaks` (the
   name card, a choice list). A translation may drop layout breaks and let `DialogueBoxes` break rows for
   its own language and width; it may not add breaks (`i18n_tool.py check`, `BREAKS_KEEP`).
-- When `codex/opening-dock` merges, those `INTRO_LINES` msgids change, so their translations go fuzzy
-  at `msgmerge`, and the prototype's opening check in `i18n_test` (which expects the old msgid) moves
-  with them in the first PR after the merge. That branch also splits one box into two
+- When the opening-dock work lands (whichever branch carries it; the dock is being redone, PLAN.md),
+  those `INTRO_LINES` msgids change, so their translations go fuzzy at `msgmerge`, and the prototype's
+  opening check in `i18n_test` (which expects the old msgid) moves with them in the first PR after it
+  lands. The backup branch also splits one box into two
   ("DIRECTOR: You were in standby." and "WOLF: I heard you. I won't do it."), which is two new msgids.
 
 **Split after translating.**
@@ -354,8 +416,10 @@ The S25b PR takes its ranges from the `LANGUAGES` table instead of a fixed Latin
 - Still to add: `…`; the quote pairs «…», „…“, „…”, “…”, 「…」 and 『…』 for quote tracking; and `¿ ¡` as openers.
 
 **Per-language reading speed.** `read_seconds` uses 0.05 s a character, which is 20 characters a
-second, Netflix's English adult speed. A Chinese box counts as one word, so the per-word rule never
-applies to it. Netflix's adult speeds by language:
+second, Netflix's English (USA) subtitle speed for adult programmes. A Chinese box counts as one word,
+so the per-word rule never applies to it. Netflix's subtitle speed limits by language (the Japanese
+guide has no adult and children split: 4 cps is its subtitle limit, section I.19, and 7 cps its SDH
+limit; URLs in PIPELINE.md, Sources):
 
 | Language | Netflix speed |
 |---|---|
@@ -386,10 +450,12 @@ after play.
 
 ## How the lighter-game plan's text steps fit
 
-The lighter-game plan (`../lighter-game/PLAN.md`) is the ordered refactor of `main.gd`. Its steps S01,
+The lighter-game plan (`1cf8d73:docs/research-2026-10/lighter-game/PLAN.md`; in Notion as "Lighter
+game" since the notes move) is the ordered refactor of `main.gd`. Its steps S01,
 S05, S08, S09, S10, S11, S12 and S13-S15 touch the same text or the same screens. Every one of them is an
 IDENTICAL step: all suites green, an empty UI-dump diff and the screenshot parity of its section 5.2
-(routes R1 title and menus to R4 junction, AE = 0 on the HUD and menus). Only S03 has landed on `main`.
+(routes R1 title and menus to R4 junction, AE = 0 on the HUD and menus). On `main`, S00 (the
+`scripts/parity` harness and its `BASELINE.md`), S03, S22 and S23 have landed.
 
 | Lighter step | What it does to text | How languages ride on it |
 |---|---|---|
@@ -412,7 +478,7 @@ IDENTICAL step: all suites green, an empty UI-dump diff and the screenshot parit
   no pixel), and S09 and S10 carry the LANGUAGE row and the auto-translate modes over unchanged.
 - **S01 lands before L7a and L7b** (its prompt cache then gets the language-change clear as part of
   L7a), or, if it comes later, S01 carries that clear itself.
-- **S11 lands before L7c's opening lines**, after `codex/opening-dock` merges; if L7c comes first, S11
+- **S11 lands before L7c's opening lines**, after the opening-dock work lands; if L7c comes first, S11
   moves the marks with the lines.
 - **S12 lands before L8's plate work**, and after the contextual-label step if that comes first.
 - **L8 is a visible change** (D10's title layout). It lands after S09 and S10 and retakes the R1 baseline
@@ -453,11 +519,15 @@ The lighter plan's rule "strings stay byte-identical" stays true, because Englis
   station-name, touch, top-card and prompt checks over every language and `TextSize` step.
 - **The Python gates** (`i18n_tool.py check`) run in CI without Godot, and fail the job: `check` exits 1
   on any failed gate.
-- **Stills per language,** from `prototype/capture/i18n_capture.gd` moved to `scripts/i18n/`, are
-  review evidence, not a test. A still proves neither game feel nor readability in play (AGENT.md).
-  When it moves, the driver reads `I18n.LANGUAGES` plus "pseudo" instead of its own `LANGUAGES` list,
-  and takes its spawn and wait from `tests/support/game_suite.gd`, so there is one language list and
-  one spawn helper.
+- **Stills per language** come from the existing parity driver, `scripts/parity/capture.gd`, not a
+  second one. It already drives routes R1-R4 into saved states (`_records_entry_state`,
+  `_junction_entry_state`), shoots stills at fixed moments, sets the size and the touch layout and dumps
+  UI text, and it reaches the Records line and the end card the per-language gate wants. L2 gives it a
+  `--language <code>` option (any code in `I18n.LANGUAGES`, plus "pseudo") and the `I18n.overflows()` /
+  `missing_glyphs()` audit beside its UI dump. The prototype's `prototype/capture/i18n_capture.gd`
+  re-implemented a subset of it (title, narration, hint, knockdown, waits, size, saving) and is not
+  moved: it stays on the research branch as the record of the prototype's stills. The stills are review
+  evidence, not a test. A still proves neither game feel nor readability in play (AGENT.md).
 - **Touch stills at phone shape.** The prototype's 2400x1080 runs saved 1920x1080 frames (16:9), so
   they are not phone-shaped stills. The pixel widths still hold under the canvas stretch, but the
   build's touch stills are checked at 20:9 (the size of the saved image is checked too).
@@ -502,4 +572,5 @@ The lighter plan's rule "strings stay byte-identical" stays true, because Englis
 | `apps/game/assets/fonts/NotoSans{SC,TC,JP,KR}-Subset.otf` and `-OFL.txt` | CJK fallbacks, each with its licence and a manifest entry |
 | `apps/game/tests/i18n_test.gd` | the language suite |
 | `i18n/messages.pot`, `i18n/glossary.json`, `i18n/style/<code>.md` | template, glossary and style guides (repository root, outside `res://`) |
-| `scripts/i18n/i18n_tool.py`, `extract_pot.sh`, `pot_addon/`, `i18n_capture.gd` | the one tool, the extractor and the render driver, moved from `prototype/` |
+| `scripts/i18n/i18n_tool.py`, `extract_pot.sh`, `pot_addon/` | the one tool and the extractor, moved from `prototype/` |
+| `scripts/parity/capture.gd`, `run.sh` | the existing render driver, with `--language` and the language audit added (L2) |

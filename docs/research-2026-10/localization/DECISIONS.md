@@ -1,10 +1,7 @@
 # Decisions for Nathanial
 
 These are the questions only Nathanial can answer. Each has a recommended default, so the build can
-start the day he agrees. If he answers only "go with the defaults", every one below is taken as written, except one: D5's
-"off centre" is approved wording, so changing it needs his own explicit yes, and without it the line
-stays as it is while the rest of D5 goes ahead.
-Nothing in the game or its English changes until he answers.
+start the day he agrees. Nothing in the game or its English changes until he answers.
 
 ## On one screen
 
@@ -17,13 +14,17 @@ before the work that can start now.
 | D2 | How do we say the translations are by AI? | A tag in the picker, the credits and the store page until native review | L9, the first language |
 | D3 | Translate words painted in the art, and the station name plates? | Painted words stay English; plates are translated | L8 |
 | D4 | Translate the credits and the in-game changelog? | Credits' role text yes; changelog stays English | L7c |
-| D5 | US or British spelling in the English? | US ("off center", "canceled"); "off centre" changes only with his own yes | L7a |
+| D5 | US or British spelling in the English? | US ("canceled"; "off center" needs its own yes, below) | L7a |
 | D6 | Translate the website? | Later, after the first reviewed languages | can wait |
 | **D7, first** | How much font for Chinese, Japanese and Korean? | Fixed common-character sets, about 9-10 MB with line-breaking data | L4 |
-| D8 | Who reviews the translations? | Volunteers on Weblate, a paid proofreader before a paid release | L9 |
+| D8 | Who reviews the translations, and who finds them? | Volunteers on Weblate (Claude sets it up, Nathanial posts one call); a paid proofreader per language before a paid release, alone if no volunteer comes | L9 |
 | **D9, first** | How do languages with gendered grammar stay neutral about the engineer? | Rephrase, never pick a gender | L5 |
 | D10 | Where does the LANGUAGE setting go, and how does the title make room? | A new GENERAL tab; wider title buttons | L6 and L8 |
 | D11 | WOLF's voice and key terms in other languages | The proposals in D11 below | L5, and they can change later |
+
+**"Go with the defaults" approves everything here except changing "off centre": that one needs its own
+yes.** It is approved wording (D5); without that yes the line stays as it is and the rest of D5 goes
+ahead.
 
 ## D1. The language list
 
@@ -112,8 +113,8 @@ never names, studio names or titles of works.**
 - one translated line saying it is in English;
 - the link to the online changelog.
 
-Translating it would multiply each language's word count about 6 times, and every update would need a
-new translation pass.
+Translating it would add about 13,500 more words per language, nearly five times the rest of the game,
+and every update would need a new translation pass.
 
 ## D5. US or British English in the source
 
@@ -122,12 +123,12 @@ The player text is mostly US spelling. The exceptions:
 - in the changelog: centre, centred, neighbouring, colour, grey, licence and signalled.
 
 **Default: normalise player-facing text to US spelling** in the first wiring PR:
-- "off center";
 - "Rebind canceled.";
+- "off center", only with his own yes (the line under the table);
 - the seven changelog words.
 
-There is no separate en-GB file. Steam has one English, and Godot maps `en_GB` to `en`. "Off centre"
-is approved wording, so it changes only with his explicit yes. This research changed no English line.
+There is no separate en-GB file. Steam has one English, and Godot maps `en_GB` to `en`. This research
+changed no English line.
 
 ## D6. Localising the website later
 
@@ -185,11 +186,17 @@ copyright line, which the OFL asks to travel with every copy.
 **Default:**
 - **Community review first,** on Weblate's free Libre plan for libre (open-source) public projects. It reads and writes the
   PO files in Git.
-- **One paid native proofreader per language** reads the story lines (about 1,460 English words, plus
-  the knockdown and end cards) before any paid release. At one UK agency's published proofreading list
-  price (£40 or £45 per 1,000 words plus VAT), that is about £670 plus VAT for the 11 non-English files,
-  or about £1,320 for everything but the changelog: an estimate, not a quote (PIPELINE.md, "Human
-  review").
+- **One paid native proofreader per language** reads the story lines (about 1,460 English words,
+  knockdown and end cards included) before any paid release. At one UK agency's published proofreading
+  list price (£40 or £45 per 1,000 words plus VAT), that is about £670 plus VAT for the 11 non-English
+  files, or about £1,320 plus VAT for everything but the changelog: an estimate, not a quote
+  (PIPELINE.md, "Human review").
+- **Who does what (default):**
+  - Claude sets up the Weblate project, with the glossary and style guides, in the implementation step
+    (PR L5, ready for L9);
+  - Nathanial posts one call for volunteers on his channels;
+  - Nathanial commissions and pays the proofreader per language before a paid release;
+  - if no volunteer comes for a language, the paid proofreader alone is its check.
 - **Every language ships labelled** (D2) until its story lines are stamped.
 - **Review order:**
   - Russian and Polish first for the gender rules;

@@ -271,7 +271,10 @@ this record.
 - **`tools/extract_pot.sh` and `tools/pot_addon/`:** the extraction. The research-godot step proved the
   route, and its plugin moved here.
 - **`tools/heavy.sh`:** runs one command under the shared heavy-run slot, read from `HEAVY_SLOTS`.
-- **`capture/i18n_capture.gd`:** the render driver, with `--languages=` added by the design step.
+- **`capture/i18n_capture.gd`:** the render driver, with `--languages=` added by the design step. It
+  re-implements part of `scripts/parity/capture.gd` (on `main`), so the build does not move it: L2 adds
+  `--language` and the language audit to that driver instead (PLAN.md), and this file stays here as the
+  record of how the stills were made.
 - **`stills/`:** the nine stills above and the two audits.
 
 **To reproduce**, start from a scratch export of `main` at 1cf8d73 with the patch applied. ROOT holds

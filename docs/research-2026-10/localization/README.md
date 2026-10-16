@@ -10,9 +10,8 @@ build starts only after he answers [DECISIONS.md](DECISIONS.md).
   multi langs on our game. Let's do of course USA and EU and Mexican, maybe a few. Make a list of what
   langs we should support, and we can do the translations on the device using AI, whatever works, and
   use whatever is needed to get this working on Godot."
-- October 16: "support the top 10". This job received it from the main Claude Code session, which
-  relayed his message; his exact words are in that session, not in this repository. If he meant the
-  world's 10 most-spoken languages exactly, that is an option in D1.
+- October 16: "support the top 10". If he meant the world's 10 most-spoken languages exactly, that is
+  an option in D1.
 
 **The answer in short:**
 - **Ten languages, shipped as 12 language files:** English (US), Chinese (Simplified and Traditional),
@@ -32,25 +31,27 @@ build starts only after he answers [DECISIONS.md](DECISIONS.md).
   Weblate's review site is free for libre (open-source) public projects, which this GPL-3.0 repository
   is, and the Noto fonts are free. Before a paid release: one paid native proofreader per language for
   the story lines (about 1,460 English words each). At one UK agency's published list price that is
-  about £670 plus VAT for all 11 files, or about £1,320 for every word outside the changelog: an
-  estimate, not a quote (PIPELINE.md, "Human review").
+  about £670 plus VAT for all 11 files, or about £1,320 plus VAT for every word outside the changelog:
+  an estimate, not a quote (PIPELINE.md, "Human review").
 - **When players get it:** the first language is Spanish (PR L9 in [PLAN.md](PLAN.md)), which also
   carries Spanish's store steps, so it can ship with the first release after L9 instead of waiting for
   the other languages. That comes after about 17 to 19 agent days of groundwork and wiring, plus 1.5
   days for Spanish itself. An agent day is about one working day of one Claude Code session on a PR and
   its checks; it is not a calendar day. The groundwork (6 days) can start now; the wiring waits for
-  `codex/opening-dock` to merge. No calendar date is set: it depends on that merge, on reviews, on the
-  shared heavy-run slot and on his answers in [DECISIONS.md](DECISIONS.md).
+  the opening-dock work to land. **Roughly when, as an estimate:** about 4 working weeks of agent PRs
+  after his answers if one PR runs at a time and nothing waits; later if the dock work, reviews or the
+  shared heavy-run slot hold it up. The event to watch for: Spanish can be in the first release about
+  20 PR days after the opening-dock work lands.
 - **Who checks it:** the automated checks and an independent AI back-translation on every line; then
   native-speaker volunteers on Weblate, and one paid proofreader per language before a paid release.
-  Who recruits and runs the reviewers is not planned yet. Every final word is his.
+  By default (D8) Claude sets up the Weblate project in the implementation step, Nathanial posts one
+  call for volunteers on his channels, and he commissions the paid proofreader before a paid release;
+  where no volunteer comes, the paid proofreader alone is the check. Every final word is his.
 - **What players see:** the game starts in their computer's or phone's language if it is offered, and
   in English if not. Settings gets a LANGUAGE choice that names each language in itself (Deutsch, 日本語)
-  with a "machine translation" tag until native review. Any line not translated yet shows in English.
-  That needs one design rule: Godot fills a missing line from any other file of the same language
-  (measured: a gap in Traditional Chinese showed the Simplified text), so the game keeps only the chosen
-  language's file registered, and a gate fails the build when one Spanish or Chinese file lacks a line the
-  other has (DESIGN.md).
+  with a "machine translation" tag until native review. Any line not translated yet shows in English,
+  never in the other Spanish or the other Chinese (how: DESIGN.md, "A missing line falls back to its
+  sibling file").
   Prototype stills, which show what is still to fix, not the shipping look:
   - [the Spanish title](prototype/stills/1280x720-es-title.png): before the title layout fix (PR L8)
     and the glossary review. NUEVA PARTIDA runs past its button into CONTINUAR (213 px in a 186 px
@@ -67,12 +68,12 @@ build starts only after he answers [DECISIONS.md](DECISIONS.md).
 
 | File | What it is |
 |---|---|
-| [LANGUAGES.md](LANGUAGES.md) | The recommended list: the 10 beside the world's top 10, every swap with its numbers, Nathanial's three regions, the picker names, the OS-locale mapping, and the tiers after the 10 |
+| [LANGUAGES.md](LANGUAGES.md) | The recommended list: the 10 beside the world's top 10, every swap with its numbers, Nathanial's three regions, the picker names, which language the game starts in, the tiers after the 10, and the codes for the build |
 | [DECISIONS.md](DECISIONS.md) | The 11 questions only Nathanial can answer, each with a recommended default |
 | [DESIGN.md](DESIGN.md) | The Godot architecture: one locale module, one catalog per language, one extractor, one test suite; the Settings option; fonts; dialogue boxes and TEXT SIZE; the lighter-game plan's text steps; the tests that assert English; exports |
 | [PIPELINE.md](PIPELINE.md) | How translations are made, checked, reviewed, labelled and updated; the style rules for the they/them engineer, WOLF and inserted names |
 | [STRINGS.md](STRINGS.md) | What there is to translate (650 shown strings, 16,362 words; 2,860 without the changelog), with [strings-inventory.json](strings-inventory.json) beside it |
-| [PLAN.md](PLAN.md) | The build as small PRs in order, each with its gates and an effort estimate (about 27.5 agent days, 29.5 if L7 also builds the lighter plan's S05 and S08); what can start before `codex/opening-dock` merges |
+| [PLAN.md](PLAN.md) | The build as small PRs in order, each with its gates and an effort estimate (about 27.5 agent days, 29.5 if L7 also builds the lighter plan's S05 and S08); what can start before the opening-dock work lands |
 | [prototype/README.md](prototype/README.md) | The prototype: what it proves, the measured overflows, the nine key stills and how to reproduce it |
 
 ## Tool map: one current copy of each tool
@@ -101,7 +102,9 @@ build starts only after he answers [DECISIONS.md](DECISIONS.md).
 
 ## How it was made
 
-These steps ran on October 15 and 16, 2026, as one Claude Code workflow for Nathanial:
+These steps ran on October 15 and 16, 2026, as one Claude Code workflow for Nathanial. His October 16
+"support the top 10" reached the workflow relayed by the main Claude Code session; his exact words are
+in that session, not in this repository.
 1. **research-markets:** the language list from Steam, mobile, speaker and English-proficiency data.
 2. **research-godot:** Godot 4.7.2's localization features, read in the 4.7.2-stable source and the
    4.7 docs and measured headless.

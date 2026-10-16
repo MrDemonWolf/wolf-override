@@ -6,18 +6,11 @@ approves it ([DECISIONS.md](DECISIONS.md), D1).
 **What he asked:**
 - October 15: "support multi langs on our game. Let's do of course USA and EU and Mexican, maybe a
   few."
-- October 16: "support the top 10" (relayed to this job by the main Claude Code session; his exact words
-  are in that session, not in this repository).
+- October 16: "support the top 10".
 
 **The answer in one line:** 10 languages, shipped as 12 language files. Together they cover about
 **94% of Steam users** (the mean of 14 survey months is 93.8%; September 2026 alone is 94.3%). All three
 of his regions are inside the 10.
-
-Every share below comes from our own parse of the Steam Hardware & Software Survey
-(`markets/data/steam-table.txt`, made by `markets/tools/steamlang.py` from the pages listed in
-`markets/data/steam-captures.txt`). It is the mean of all 14 survey months, August 2025 to September
-2026, with the September 2026 value in brackets. Every other number
-names its source in [Sources](#sources). Estimates are marked as estimates.
 
 ## The 10
 
@@ -35,15 +28,20 @@ names its source in [Sources](#sources). Estimates are marked as estimates.
 | Polish | Polski | The EU; slot 10 against Italian is his call | 1.6% |
 
 Shares are the mean of 14 survey months; the codes, the September 2026 values and the speaker counts
-are in "Codes and numbers, for the build" below.
+are in "Codes and numbers, for the build" at the end.
+
+**Where the numbers come from.** Every Steam share here is our own parse of the Steam Hardware &
+Software Survey, the mean of all 14 survey months from August 2025 to September 2026, with the
+September 2026 value in brackets where given. Every other number names its source in
+[Sources](#sources). Estimates are marked as estimates.
 
 ## Nathanial's three regions
 
 | Region | Inside the 10 | Notes |
 |---|---|---|
 | **USA** | English, US spelling | The source text is mostly US spelling with a few British forms (STRINGS.md). Normalising it is decision D5. Steam has one "English"; Godot maps `en_GB` to `en` (measured), so no separate British file. |
-| **EU** | German, French, Spanish (Spain), Polish | Italian is first in Tier 1. Dutch and the Nordic languages wait in Tier 3: their players have the EU's strongest English (English-skill scores, EF EPI 2025, of 603-624; explained under "Why swap at all?"). |
-| **Mexico** | Spanish (Latin America), shown as "Español (Latinoamérica)" | Tagged `es-419` (the code for Latin-American Spanish) on Steam and Google Play. Apple has no `es-419`, so the App Store's Spanish (Mexico) listing reuses the Latin-American text. Godot reduces `es_419` to `es`, so the game file is `es` (measured, `godot/evidence/locale.txt`). English skill (EF EPI) in Mexico is 440, very low: Mexico is one of the markets that needs the translation most. |
+| **EU** | German, French, Spanish (Spain), Polish | Italian is first in Tier 1 (the next batch after the 10). Dutch and the Nordic languages wait in Tier 3: their players have the EU's strongest English (English-skill scores, EF EPI 2025, of 603-624; explained under "Why swap at all?"). |
+| **Mexico** | Spanish (Latin America), shown as "Español (Latinoamérica)" | The App Store's Spanish (Mexico) listing uses the same text. English skill (EF EPI) in Mexico is 440, very low: Mexico is one of the markets that needs the translation most. The store and file codes are in "Codes and numbers, for the build". |
 
 ## Ten slots, twelve files, and the coverage
 
@@ -56,7 +54,8 @@ translation:
   - Steam's "Spanish - Spain" row (4.3%) is far above "Spanish - Latin America" (0.7%). Steam added
     Latin-American Spanish only in October 2018 (PCGamesInsider), so many Latin-American players
     probably still run the Spain option. That is our inference, not a measurement.
-  - Peers: 15 of 16 ship Spain's Spanish and 6 of 16 ship Latin America's.
+  - Peers (16 similar Steam games we checked; "Why swap at all?" below): 15 of 16 ship Spain's Spanish
+    and 6 of 16 ship Latin America's.
 - **Chinese.** `zh_Hant` is a script conversion of `zh_Hans` plus a Taiwan review.
   - Traditional Chinese alone is 1.3% of Steam, more than Italian.
   - Taiwan is the #6 mobile game revenue market (AppMagic 2025).
@@ -72,26 +71,6 @@ which Spanish Spain's players see, not how many players are covered: without it 
 **One survey month is an outlier.** Simplified Chinese read 54.6% in February 2026, against 21.9-31.4%
 in every other month. The median over the 14 months is 24.0%. That month pulls every other row down,
 but it changes no rank.
-
-### Codes and numbers, for the build
-
-| # | Language | Godot file(s) | Steam (Web API code) | Google Play (listing code) | App Store (listing language) | Steam share, mean [September 2026] | Speakers (world rank) |
-|---|---|---|---|---|---|---|---|
-| 1 | English (US) | `en` | en | en-US | English (U.S.) | 36.5% [34.2] | 1,493M (#1) |
-| 2 | Chinese, Simplified and Traditional | `zh_Hans`, `zh_Hant` | zh-CN, zh-TW | zh-CN, zh-TW | Chinese (Simplified), Chinese (Traditional) | 26.7% + 1.3% [31.4 + 1.3] | 1,183M Mandarin (#2) |
-| 3 | Russian | `ru` | ru | ru-RU | Russian | 9.3% [9.05] | 210M (#11) |
-| 4 | Spanish, Latin America and Spain | `es` (Latin America), `es_ES` | es-419, es | es-419, es-ES | Spanish (Mexico), Spanish (Spain) | 0.7% + 4.3% [0.75 + 4.08] | 561M (#4) |
-| 5 | Portuguese (Brazil) | `pt_BR` | pt-BR | pt-BR | Portuguese (Brazil) | 3.9% [3.70] | 269M (#8) |
-| 6 | German | `de` | de | de-DE | German | 2.8% [2.48] | 133M (#12) |
-| 7 | Japanese | `ja` | ja | ja-JP | Japanese | 2.5% [2.41] | 126M (#13) |
-| 8 | French | `fr` | fr | fr-FR (fr-CA reuses its text) | French (French (Canada) reuses its text) | 2.3% [2.08] | 334M (#6) |
-| 9 | Korean | `ko` | ko | ko-KR | Korean | 1.8% [1.37] | 82M (#28) |
-| 10 | Polish | `pl` | pl | pl-PL | Polish | 1.6% [1.49] | about 40M (estimate; not in the table) |
-
-Store codes, each read on October 16, 2026: Steam's "Web API language code" column (its other column,
-the API code, reads `schinese`, `latam`, `koreana` and so on; partner.steamgames.com); Google Play's
-listing codes (support.google.com, answer 9844778); Apple lists listing languages by name only, with no
-`es-419` (developer.apple.com, App Store localizations). Steam's Spain row is plain `es`, not `es-ES`.
 
 ## Side by side with the world's top 10
 
@@ -191,46 +170,12 @@ entry carries a short tag in that same language (PIPELINE.md, "Honest labelling"
 **The picker needs more width.** The DISPLAY tab trims "Español (Latinoamérica)" (prototype). Where the
 row goes is decision D10.
 
-## How the OS language picks a file (measured in Godot 4.7.2)
+## Which language the game starts in
 
-Godot scores each loaded translation against the current locale (`compare_locales`: 10 for an exact
-match, 5 for the same language, plus or minus 1 for each script, country or variant that both name and
-that matches or differs; `core/string/translation_server.cpp`). It does this **for each line, not once
-per file**: it walks every file that scores above 0, skips a file that lacks the line, has it fuzzy or
-has it empty, keeps the best score (on a tie, the file added last), and stops at an exact match
-(`get_message_from_translations`, `core/string/translation_domain.cpp`, 4.7.2-stable). Only when no
-file of the language has the line does it try the fallback locale, then the English msgid.
-
-So with both Chinese files loaded, a line missing from `zh_Hant` shows the `zh_Hans` text (score 3),
-and with `es` and `es_ES` loaded, a line missing from one shows the other's. Measured with
-`godot/probe/probe_runtime.gd` (`godot/evidence/runtime.txt`, "sibling"): at zh_Hant, a line only
-`zh_Hans` had, one fuzzy in `zh_Hant` and one empty in `zh_Hant` all came out Simplified; with `zh_Hans`
-removed, all three came out English. The game therefore keeps only the chosen language's file
-registered, and a gate requires the files of a pair to translate the same lines (DESIGN.md, "A missing
-line falls back to its sibling file").
-
-Which file the OS locale picks, measured with `markets/tools/locale_probe.gd` and
-`godot/probe/probe_runtime.gd` (every file loaded, as in the research probes):
-
-| OS locale | Plays in | Why |
-|---|---|---|
-| es_MX, es_AR, es_US; `es-419` as typed | `es` (Latin America) | `es` scores 5, `es_ES` scores 4; `es_419` standardises to `es` |
-| es_ES | `es_ES` | exact, 10 |
-| pt_PT | `pt_BR` | the only Portuguese file (4) |
-| zh_CN, zh_SG, zh | `zh_Hans` | zh_CN scores 10 against zh_Hans |
-| zh_TW, zh_HK | `zh_Hant` | zh_TW scores 10; zh_HK scores 5 |
-| fr_CA | `fr` | same language, 5 |
-| en_GB | `en` | same language, 5 |
-| uk_UA | `en` | **never Russian** until Ukrainian ships (Tier 1); measured in the prototype's resolver test |
-| anything else | `en` | the fallback, `internationalization/locale/fallback` |
-
-Not measured, but they follow the same rule and go into the resolver's table: zh_MO to `zh_Hant`,
-fr_BE and fr_CH to `fr`, en_AU to `en`. With both Portuguese files loaded, the research-godot step
-measured plain `pt` and pt_AO picking `pt_PT` only by tie order. If `pt_PT` ever ships, the table
-decides those cases on purpose instead.
-
-The game's resolver (DESIGN.md) writes these mappings out as one explicit table, as ConPaws'
-`resolveDeviceLocale` does, rather than trusting tie order.
+The game starts in the player's system language if we ship it, otherwise in English. Mexico and the
+rest of Latin America get Latin-American Spanish, Spain gets Spain's, Portugal gets Brazilian
+Portuguese, Quebec gets French, and Ukraine gets English, never Russian. How Godot matches the system
+language to a file, measured, is in DESIGN.md ("How Godot picks a file for the system language").
 
 ## Tiers after the 10
 
@@ -269,7 +214,7 @@ Greek, Roboto has it, measured).
 | Hindi | No Steam client language; new font and shaping; low spending per player. |
 | Bengali | No Steam client language; new font and shaping. |
 | Urdu | No Steam client language; right-to-left Nastaliq; the most expensive language of all. |
-| Separate French (Canada) | Quebec's Charter of the French language, s.52.1: "All computer software, including game software and operating systems, whether installed or uninstalled, must be available in French unless no French version exists" (legisquebec.gouv.qc.ca, CQLR c C-11, read October 16, 2026; Osler's guide agrees). Shipping `fr` meets it. Reuse `fr` for the fr-CA store listings. |
+| Separate French (Canada) | Quebec's Charter of the French language, s.52.1: "All computer software, including game software and operating systems, whether installed or uninstalled, must be available in French unless no French version exists" (legisquebec.gouv.qc.ca, CQLR c C-11, read October 16, 2026; Osler's guide agrees). It continues: other languages are allowed "provided that the French version can be obtained on terms, except price ..., that are no less favourable and that it has technical characteristics that are at least equivalent". Shipping `fr` meets it only if the French is as complete and works as well as the English: a machine-translated `fr` that shows English for untranslated lines may not, so `fr` ships complete before a Quebec release. Reuse `fr` for the fr-CA store listings. |
 | Separate English (UK) | Steam has one English; Godot maps `en_GB` to `en` (measured). |
 | Malay | 0.00% of Steam (it first appears in the survey in June 2026). ConPaws ships it; the game does not need it yet. |
 
@@ -284,7 +229,35 @@ Greek, Roboto has it, measured).
 | Text length | de, ru, pl, fr | Short labels of up to 10 characters can grow to 2-3 times their English length in European languages (W3C, citing IBM's guidelines), and W3C's German example runs 2.8 times. Measured on one line at 18 px Roboto: es 1.68x, de 1.96x, fr 1.59x, ru 2.06x, pt_BR 1.44x of the English width. |
 | Distribution | zh (mainland), ru | Mainland iOS and Android need a game licence from China's regulator, the NPPA, through a Chinese publisher (6-12 months), and Google Play is absent there. Google Play billing has been paused in Russia since March 2022. Both languages still earn their slot from Steam. |
 
+## Codes and numbers, for the build
+
+| # | Language | Godot file(s) | Steam (Web API code) | Google Play (listing code) | App Store (listing language) | Steam share, mean [September 2026] | Speakers (world rank) |
+|---|---|---|---|---|---|---|---|
+| 1 | English (US) | `en` | en | en-US | English (U.S.) | 36.5% [34.2] | 1,493M (#1) |
+| 2 | Chinese, Simplified and Traditional | `zh_Hans`, `zh_Hant` | zh-CN, zh-TW | zh-CN, zh-TW | Chinese (Simplified), Chinese (Traditional) | 26.7% + 1.3% [31.4 + 1.3] | 1,183M Mandarin (#2) |
+| 3 | Russian | `ru` | ru | ru-RU | Russian | 9.3% [9.05] | 210M (#11) |
+| 4 | Spanish, Latin America and Spain | `es` (Latin America), `es_ES` | es-419, es | es-419, es-ES | Spanish (Mexico), Spanish (Spain) | 0.7% + 4.3% [0.75 + 4.08] | 561M (#4) |
+| 5 | Portuguese (Brazil) | `pt_BR` | pt-BR | pt-BR | Portuguese (Brazil) | 3.9% [3.70] | 269M (#8) |
+| 6 | German | `de` | de | de-DE | German | 2.8% [2.48] | 133M (#12) |
+| 7 | Japanese | `ja` | ja | ja-JP | Japanese | 2.5% [2.41] | 126M (#13) |
+| 8 | French | `fr` | fr | fr-FR (fr-CA reuses its text) | French (French (Canada) reuses its text) | 2.3% [2.08] | 334M (#6) |
+| 9 | Korean | `ko` | ko | ko-KR | Korean | 1.8% [1.37] | 82M (#28) |
+| 10 | Polish | `pl` | pl | pl-PL | Polish | 1.6% [1.49] | about 40M (estimate; not in the table) |
+
+Store codes, each read on October 16, 2026: Steam's "Web API language code" column (its other column,
+the API code, reads `schinese`, `latam`, `koreana` and so on; partner.steamgames.com); Google Play's
+listing codes (support.google.com, answer 9844778); Apple lists listing languages by name only, with no
+`es-419` (developer.apple.com, App Store localizations). Steam's Spain row is plain `es`, not `es-ES`.
+
+**Mexico's codes.** Steam and Google Play tag Latin-American Spanish `es-419`. Apple has no `es-419`,
+so the App Store's Spanish (Mexico) listing reuses the Latin-American text. Godot reduces `es_419` to
+`es`, so the game file is `es` (measured, `godot/evidence/locale.txt`).
+
 ## Sources
+
+**What he asked:** the October 16 "support the top 10" reached this job relayed by the main Claude Code
+session; his exact words are in that session, not in this repository. If he meant the world's 10
+most-spoken languages exactly, that is an option in D1.
 
 **Our own measurements:**
 - `markets/tools/steamlang.py` → `markets/data/steam-table.txt`: the Steam language shares over 14

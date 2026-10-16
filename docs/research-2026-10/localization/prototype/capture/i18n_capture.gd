@@ -1,6 +1,10 @@
 extends SceneTree
 ## Render-container capture driver for the i18n prototype (scratch only, 2026-10-16). Copied into the
 ## project copy as res://review_capture/ by tools/render/render.sh --driver; never part of the game.
+## Not moved into the build: it re-implements part of scripts/parity/capture.gd (routes, waits, size,
+## touch layout, saving), so PR L2 adds --language and this file's audit to that driver instead and this
+## copy stays on the research branch as the record of how the prototype's stills were made (PLAN.md, L2).
+## Its earlier-capture path below is git history: 1cf8d73:docs/research-2026-10/how-it-should-play/...
 ##
 ## One run plays the game once at one window size (user argument --size=WxH, default 1280x720; run
 ## render.sh with the same --screen) and, for each language in LANGUAGES, saves four frames to

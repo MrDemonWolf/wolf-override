@@ -191,7 +191,8 @@ with its tool) and `prototype/evidence/gate_selftest.json`. Every report with a 
      overflow check (DESIGN.md);
    - every dialogue box fits its rows at every TEXT SIZE step.
 
-   Then `i18n_capture.gd` renders stills per language in the container (`tools/render/render.sh`), for
+   Then the parity driver, `scripts/parity/capture.gd` with `--language` (L2), renders stills per
+   language in the container (`tools/render/render.sh`), for
    a person to look at.
 7. **Human review** (below).
 8. **Stamp and ship.** A reviewed line carries `# reviewed-by: <name> <date>`. A language counts as
@@ -330,7 +331,10 @@ filled with `String.format`), so a translator can reorder them. Positional `%s` 
     The page does not name Russian or Polish, and reviewing a machine translation of a game against
     its style rules may be priced above plain proofreading, so a real quote can be higher. It is one
     agency's list, not a market survey; the freelance rate surveys we tried (ProZ, Upwork) were not
-    readable without an account or a browser check. Who recruits the reviewers is still not planned.
+    readable without an account or a browser check.
+  - **Who finds and runs them (default, D8):** Claude sets up the Weblate project in PR L5; Nathanial
+    posts one call for volunteers on his channels; Nathanial commissions and pays the proofreader per
+    language before a paid release; where no volunteer comes, the paid proofreader alone is the check.
 - **What is checked first:**
   - the engineer's gender in Russian and Polish;
   - WOLF's voice;
@@ -392,8 +396,10 @@ cross-checked with Codex (OpenAI); reviewed by <names>", or "not yet reviewed".
    diff.
 5. The back-translation and all gates run again.
 6. A changed line that was reviewed loses its stamp and goes back to the review queue.
-7. CI fails on any fuzzy entry in a language marked reviewed, and on any untranslated story-critical
-   line.
+7. `i18n_tool.py check --release` (PR L2) fails on any fuzzy entry in a language whose `review` state in
+   `languages.json` is `reviewed`, and on any untranslated line marked `#. i18n: story` (the marks go in
+   with L7c). Release CI runs it; the prototype's `check` has no such gate yet, which is right for a
+   prototype whose languages each leave 115 lines untranslated.
 
 ## What it costs (measured usage; all through subscriptions)
 
@@ -456,8 +462,13 @@ batch per scene.
 - Edge's Translator API: https://blogs.windows.com/msedgedev/2026/06/02/expanding-on-device-ai-in-microsoft-edge-new-models-and-apis-for-the-web/
 
 **Netflix Timed Text Style Guides** (speeds and line lengths), fetched October 16, 2026 by the
-research-godot step: Simplified Chinese, Japanese, Korean, English (USA), and Castilian and
-Latin-American Spanish, at partnerhelp.netflixstudios.com.
+research-godot step:
+- Japanese (subtitles 4 cps, 13 characters a line; SDH 7 cps; no adult or children split):
+  https://partnerhelp.netflixstudios.com/hc/en-us/articles/215767517
+- Korean (12 cps, 16 characters): https://partnerhelp.netflixstudios.com/hc/en-us/articles/216001127
+- Simplified Chinese (9 cps, 16 characters): https://partnerhelp.netflixstudios.com/hc/en-us/articles/215986007
+- English (USA) (20 cps for adult programmes): https://partnerhelp.netflixstudios.com/hc/en-us/articles/217350977
+- Castilian and Latin-American Spanish: the guides of the same name at partnerhelp.netflixstudios.com.
 
 **ConPaws** (read only): `apps/native/src/locales/*.test.ts`, `src/lib/i18n.ts`, and commits 3147f3d,
 380d18f and 2f0a152.
