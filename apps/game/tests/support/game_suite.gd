@@ -20,16 +20,17 @@ extends SceneTree
 ## Users (2026-10-15): follow_spacing_test (drawn_z); on the corridor, doors and text branches their
 ## suites as each branch's dedupe lists them. What must stay true for every user:
 ## - What the statics touch besides their arguments: the running SceneTree (tree()); the global
-##   Input actions (hold presses its action and releases it before it returns); user:// files
-##   (remove_file deletes one, start_game deletes stale save and settings files before the game
-##   starts, end_game deletes the game's own after it is freed); and the process id (start_game puts
-##   it in the file names, so suites run side by side do not share files). Nothing else is kept
-##   between calls: the kit has no static state.
-## - frames, wait_until and hold count physics frames (1/60 s of game time each at the project's
-##   physics rate, not the wall clock), so a busy machine slows those waits down but does not change
-##   what they see. spawn_game waits one process frame. end_game waits process frames and SceneTree
-##   timers in seconds, which do follow real time: the audio mixer and the loader threads it waits
-##   for run on the wall clock, not on game frames.
+##   Input actions (hold presses its action and retry presses interact, each releasing it before it
+##   returns); user:// files (remove_file deletes one, start_game deletes stale save and settings
+##   files before the game starts, end_game deletes the game's own after it is freed); and the
+##   process id (start_game puts it in the file names, so suites run side by side do not share
+##   files). Nothing else is kept between calls: the kit has no static state.
+## - frames, wait_until, hold and retry count physics frames (1/60 s of game time each at the
+##   project's physics rate, not the wall clock), so a busy machine slows those waits down but does
+##   not change what they see; retry holds its one press for a process frame. spawn_game waits one
+##   process frame. end_game waits process frames and SceneTree timers in seconds, which do follow
+##   real time: the audio mixer and the loader threads it waits for run on the wall clock, not on
+##   game frames.
 ## - end_game leaves no game, sound or file behind, because check-game fails a suite that leaks
 ##   objects at exit.
 
