@@ -92,8 +92,38 @@ last, so a tie must never decide (LANGUAGES.md, "How the OS language picks a fil
 
 **Checks the tests and the render driver share:**
 - `missing_glyphs(text, font)`: uses `Font.has_char`, which never asks OS fonts.
-- `overflows(control)`: compares a Control against the width its anchors and offsets give it. A
-  Control grows to its minimum size, so comparing it with its own rect never fires.
+- `overflows(control)`: in the prototype, compares a Control against the width its anchors and offsets
+  give it. A Control grows to its minimum size, so comparing it with its own rect never fires.
+
+**The prototype's overflow check has four blind spots,** so it cannot be the build's gate as it is
+(`scripts/i18n.gd` in `prototype/evidence/game.patch`):
+1. **Containers.** It skips the designed-width test for any Control inside a Container. The Settings
+   rows (`game_settings.gd`) and the end card are HBox and VBox containers, so they are never tested.
+2. **Trimmed text counts as fitting.** It returns false for any Label that clips or trims, and for a
+   Button it looks only at `clip_text`. Settings sets `OVERRUN_TRIM_ELLIPSIS`, so a translation cut to
+   "…" passes.
+3. **Width only.** An autowrap Label that grows downward is not flagged unless lines are hidden. D10's
+   default lets the CONTINUE note wrap, and the Japanese fallback makes every line about 19% taller, so
+   height is where the next overflows will be.
+4. **No neighbours.** Two Controls that each fit can still cover each other.
+
+**The build's version (PR L1)** closes them:
+- A Control inside a Container is judged by the outermost Container's designed rect and by the
+  viewport, since the Container grows to hold it.
+- Trimmed or clipped text whose full string is wider than the Control is an overflow, measured with
+  the Control's font (`Font.get_string_size`).
+- Both axes: the designed height and the viewport's bottom edge, for autowrap Labels too.
+- Neighbours are not a new check. `tests/text_boxes_test.gd` already intersects rects: station names
+  against each other at every TEXT SIZE step (`_check_station_names`), the touch answers and the hint
+  bar against the buttons (`_check_touch`), the top card against PAUSE and DEBUG at 200%
+  (`_check_text_size`) and the prompts (`_check_prompts_clear`). PR L8 runs those in every language,
+  as L7d runs the box corpus, instead of writing an overlap check of its own.
+
+**The glyph check runs per language.** The prototype checked every language's characters with the
+Japanese fallback on (`tests/i18n_test.gd`), so a CJK character in a German file would have passed. The
+build checks each language with only its own font chain, and also checks text that does not come from
+the PO files: the per-language names (Роуэн, ローワン), the key labels from
+`DisplayServer.keyboard_get_label_from_physical`, and the touch prompts.
 
 ## One catalog per language
 
@@ -196,11 +226,16 @@ Two exceptions:
 **CJK: one bundled Noto subset per language, chained only while that language is on.**
 - **Why bundle?** The OS fallback is not reliable. On the Mac, 5 of 30 Japanese glyphs and all 13
   Chinese glyphs came out as tofu (measured). There is no OS font fallback on web exports at all, and
-  the 4.7 docs call Android's unreliable. The ship check turns `allow_system_fallback` off.
+  the 4.7 docs call Android's unreliable. PR L4 sets `allow_system_fallback` off on the game's fonts,
+  so a missing glyph shows the same on every device and the glyph test is the whole truth.
 - **Which fonts?** Noto Sans SC, TC, JP and KR, from notofonts/noto-cjk (SIL OFL 1.1; the licence file
   ships next to each font, as the prototype's `NotoSansJP-OFL.txt` does). A subset counts as a
-  Modified Version under the OFL. Whether the subset may keep the Noto name is the open Reserved Font
-  Name question (decision D7).
+  Modified Version under the OFL. **The subsets may keep the Noto names:** the only Reserved Font Name
+  is "Source" (Google Fonts' `ofl/notosansjp/OFL.txt`, and the same line in its SC, TC and KR files:
+  "Copyright 2014-2021 Adobe (http://www.adobe.com/), with Reserved Font Name 'Source'", fetched
+  October 16, 2026), and the font's own name table records no reserved name (ID 0 reads "© 2014-2021
+  Adobe", measured with fontTools). OFL condition 2 asks for the copyright notice with every copy, so
+  each bundled `-OFL.txt` starts with that line (the prototype's now does).
 - **One per language, because of Han unification.** A Simplified Chinese font draws Japanese kanji in
   Chinese shapes, so each language gets its own font.
 - **Only while that language is on, because of a measured trap.** `Font.get_height()` takes the
@@ -239,6 +274,19 @@ The S25b PR takes its ranges from the `LANGUAGES` table instead of a fixed Latin
 ## Dialogue boxes and TextSize (the P0 text work)
 
 `DialogueBoxes` and `TextSize` came in with p0-text (PR #76). They keep working, with these changes:
+
+**Layout breaks never bind a translation.**
+- Many English lines carry a `\n` placed for English width: 45 on `main` (STRINGS.md), and
+  `codex/opening-dock` adds more in the middle of sentences ("The Director thinks WOLF is\nstill in
+  standby.", "WOLF turns from the Director\nand heads for maintenance."). The English stays
+  byte-identical, so the msgid keeps the break: Godot's generator extracts the literal.
+- So the line-break gate treats a `\n` as layout unless the msgid is marked `#. i18n: keep-breaks` (the
+  name card, a choice list). A translation may drop layout breaks and let `DialogueBoxes` break rows for
+  its own language and width; it may not add breaks (`i18n_tool.py check`, `BREAKS_KEEP`).
+- When `codex/opening-dock` merges, those `INTRO_LINES` msgids change, so their translations go fuzzy
+  at `msgmerge`, and the prototype's opening check in `i18n_test` (which expects the old msgid) moves
+  with them in the first PR after the merge. That branch also splits one box into two
+  ("DIRECTOR: You were in standby." and "WOLF: I heard you. I won't do it."), which is two new msgids.
 
 **Split after translating.**
 - `main.gd` translates the whole line, then calls `DialogueBoxes.split`, and the Story label has
@@ -295,17 +343,30 @@ after play.
 ## How the lighter-game plan's text steps fit
 
 The lighter-game plan (`../lighter-game/PLAN.md`) is the ordered refactor of `main.gd`. Its steps S05,
-S08 and S13-S15 touch the same text:
+S08, S09, S10, S12 and S13-S15 touch the same text or the same screens. Every one of them is an
+IDENTICAL step: all suites green, an empty UI-dump diff and the screenshot parity of its section 5.2
+(routes R1 title and menus to R4 junction, AE = 0 on the HUD and menus). Only S03 has landed on `main`.
 
 | Lighter step | What it does to text | How languages ride on it |
 |---|---|---|
 | **S05 helpers** | Per-room text tables (byte-identical); a Choice record; the Hud's `key()` and `localise()` | The text tables are where the `I18n.KEY.tr` marks go, once per table entry. A Choice keeps answer ids, not words. `localise()` *is* the key-token fill: build it once, as placeholders filled after `tr()`. Don't build a substring replace and then a placeholder fill. |
 | **S08 hud** | A Hud script with a view model (status, hint, objective, card key), applied only on change; a prompt cache cleared on rebind or device change | The view model holds English keys and their inserts, and the Hud translates when it applies them. That is the display boundary. The prompt cache is also cleared on `NOTIFICATION_TRANSLATION_CHANGED`. |
+| **S09 title-pause-settings** | A TitleScreen script; the video settings move into GameSettings | The title buttons (L7a's auto-translate, L8's widths) and the Settings rows (L6's GENERAL tab) live here. |
+| **S10 endcard-theme** | EndCard and EndCardRow scenes, CardPanel, `settings_menu.tscn` and `settings_theme.tres` | The end card's topic and text rows (L7c) and the Settings scene (L6) move into these files. The theme is where a per-language font chain would be set. |
+| **S12 room-base** | Room base, NamePlate, PlateFader; "plates keep 12/13/8 px fonts and their rows at y 320/309/313" | If D3 translates the plates, NamePlate is where the plate's msgid and its fit live, and L8's plate work is done there. The lighter plan's October 11 amendment also replaces the always-on plates with contextual item labels as a named visual step, so L8 fits whatever the plates have become by then. |
 | **S13-S15 corridor, Records and junction beats** | Hints and objectives move into each room's beats | Each beat returns English msgids, marked at its table. Nothing in the beats calls `tr()`. |
 
-**Order.** Either order works, but don't mark every line twice:
-- If S05 has not landed when the text-marking PRs start, the marking PR builds S05's per-room text
-  tables at the same time.
+**Order (the default; PLAN.md gives it per PR):**
+- **S05 and S08 land first, as their own lighter PRs** under their IDENTICAL gate, before L7b and L7c.
+  Then L7 only marks text. If they have not started when L7 is due, L7b and L7c build those parts of
+  them and carry the same gate (the four-route screenshot parity in English) and the extra effort.
+  Don't mark every line twice.
+- **S09 and S10 land before L6, L7a and L8**, so their parity baseline is taken in English before any
+  language exists. If they have not started when L6 is due, L6 and L7a go first (in English they change
+  no pixel), and S09 and S10 carry the LANGUAGE row and the auto-translate modes over unchanged.
+- **S12 lands before L8's plate work**, and after the contextual-label step if that comes first.
+- **L8 is a visible change** (D10's title layout). It lands after S09 and S10 and retakes the R1 baseline
+  once Nathanial approves its stills, as the lighter plan does for its own visual steps.
 - If S08 lands after the language wiring, the prototype's `I18n.shown()` and `I18n.lines()` calls
   move from `main._refresh_ui` into the Hud with it.
 
@@ -328,13 +389,21 @@ The lighter plan's rule "strings stay byte-identical" stays true, because Englis
   - the fallback font on only for its language;
   - every character of every translation drawable by the bundled chain with OS fallback off;
   - no overflow on the title, menus, HUD and station plates in every language, with known overflows
-    pinned by name;
+    pinned by name, using the build's overflow check above (containers, trimmed text, both axes);
+  - every character of every language drawable by that language's own font chain, and the inserted
+    names, key labels and touch prompts too;
   - pseudolocalization reaching composed text.
-- **The box fit runs per language.** `text_boxes_test` loops its corpus over every language and
-  `TextSize` step.
+- **The box fit and the overlap checks run per language.** `text_boxes_test` loops its corpus, its
+  station-name, touch, top-card and prompt checks over every language and `TextSize` step.
 - **The Python gates** (`i18n_tool.py check`) run in CI without Godot.
 - **Stills per language,** from `prototype/capture/i18n_capture.gd` moved to `scripts/i18n/`, are
   review evidence, not a test. A still proves neither game feel nor readability in play (AGENT.md).
+  When it moves, the driver reads `I18n.LANGUAGES` plus "pseudo" instead of its own `LANGUAGES` list,
+  and takes its spawn and wait from `tests/support/game_suite.gd`, so there is one language list and
+  one spawn helper.
+- **Touch stills at phone shape.** The prototype's 2400x1080 runs saved 1920x1080 frames (16:9), so
+  they are not phone-shaped stills. The pixel widths still hold under the canvas stretch, but the
+  build's touch stills are checked at 20:9 (the size of the saved image is checked too).
 
 **Pseudolocalization** is Godot's own (`internationalization/pseudolocalization/*`).
 - Turn accents and doubled vowels off. They turned `{name}` into `{ήáám̀éé}` and `[b]` into `[ḅ]`

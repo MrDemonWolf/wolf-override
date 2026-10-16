@@ -37,7 +37,7 @@ build starts only after he answers [DECISIONS.md](DECISIONS.md).
 | [DESIGN.md](DESIGN.md) | The Godot architecture: one locale module, one catalog per language, one extractor, one test suite; the Settings option; fonts; dialogue boxes and TEXT SIZE; the lighter-game plan's text steps; the tests that assert English; exports |
 | [PIPELINE.md](PIPELINE.md) | How translations are made, checked, reviewed, labelled and updated; the style rules for the they/them engineer, WOLF and inserted names |
 | [STRINGS.md](STRINGS.md) | What there is to translate (650 shown strings, 16,362 words; 2,763 without the changelog), with [strings-inventory.json](strings-inventory.json) beside it |
-| [PLAN.md](PLAN.md) | The build as small PRs in order, each with its gates and an effort estimate (about 26.5 agent days); what can start before `codex/opening-dock` merges |
+| [PLAN.md](PLAN.md) | The build as small PRs in order, each with its gates and an effort estimate (about 27.5 agent days, 29.5 if L7 also builds the lighter plan's S05 and S08); what can start before `codex/opening-dock` merges |
 | [prototype/README.md](prototype/README.md) | The prototype: what it proves, the measured overflows, the nine key stills and how to reproduce it |
 
 ## Tool map: one current copy of each tool

@@ -2,9 +2,18 @@
 
 An inventory of every string a player can read in WOLF//OVERRIDE at `main` 1cf8d73 (October 16,
 2026). Every branch merged before it was taken (lighter-1, p0-text, corridor-additions and doors, PRs
-#75, #76, #78 and #79). The in-flight `codex/opening-dock` branch is not in it. That branch reflows
-`INTRO_LINES` and changes one hint condition, so it adds no new kind of text, but every `main.gd` line
-number below will move when it merges.
+#75, #76, #78 and #79). The in-flight `codex/opening-dock` branch (9b6a2e3) is not in it. What that
+branch does to the text:
+- It puts English line breaks in the middle of three `INTRO_LINES` sentences ("The Director thinks
+  WOLF is\nstill in standby.", "...a threat.\nWOLF handles the rest.", "WOLF turns from the
+  Director\nand heads for maintenance."). Those breaks are placed for English width and sit inside the
+  msgids, so they are a new case for the line-break gate (DESIGN.md, "Layout breaks never bind a
+  translation").
+- It splits one box into two lines ("DIRECTOR: You were in standby." and "WOLF: I heard you. I won't do
+  it."), which are new msgids.
+- It changes one hint condition. Its new room script, `greybox_bay.gd`, draws the room and shows no
+  text (searched for text assignments and literals).
+- Every `main.gd` line number below moves when it merges, and the inventory is re-run then (PLAN.md).
 
 **The data:** [`strings-inventory.json`](strings-inventory.json) has 980 entries, one per string
 occurrence. Each entry gives:
