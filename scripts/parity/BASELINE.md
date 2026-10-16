@@ -237,8 +237,8 @@ was rebased again onto `cec75f6` and proven a third time. **Later steps compare 
 `cec75f6` folders.**
 
 - **Stills.** Scratch folder `parity/baseline-cec75f6/`, from a `git archive` of `cec75f6`'s
-  `apps/game`, same driver (`capture.gd` `c1746c4c`, `parity_sfx_bank.gd` `57cc689b`, git blob
-  hashes): all 36 runs, 1,908 stills. Frame counts changed with #65: R1 1,480; R2 3,016; R3 1,498;
+  `apps/game`, same driver (`capture.gd` `c1746c4c`, `parity_sfx_bank.gd` `57cc689b`, SHA-1
+  of each file as `shasum` prints it, not git blob ids): all 36 runs, 1,908 stills. Frame counts changed with #65: R1 1,480; R2 3,016; R3 1,498;
   R4 2,430 (`kb-fx`), 2,424 (`kb-calm`), 2,428 (`touch-fx`). The S01 branch, captured into
   `parity/after-s01c/`, compares `ALL IDENTICAL: 36 run folders, 1908 stills compared`, with every
   text and audio log and frame count the same.
@@ -334,6 +334,28 @@ comparable with these and were deleted.
   three new scripts take 3.2 ms to load on their own. So S03 adds about 2-3% (some 17-20 ms of CPU
   on this machine) to a fresh process that loads the scene, inside the critique's 5% budget; it is
   not proven smaller than that on this machine.
+
+## Driver change for codex/p0-text (Q17 RETRY, one speaker per box)
+
+That branch changes the game at R4's knockdowns and closing beat, and the driver with it:
+
+- **Q17.** The knockdown card no longer restores on its own: it takes RETRY 0.9 s after the hit. R4's
+  vent and sentry knockdowns end through `_retry_and_shoot` (wait for `Main._retry_ready`, press
+  interact, wait for the restore, 40 frames, then the still).
+- **P0-9.** The junction's closing lines are one box per speaker, so at the closing beat CONTINUE is
+  pressed up to 3 times, until the walk out starts.
+
+The driver is now `capture.gd` SHA-1 `d5c7217c` (`shasum`, like every SHA-1 here; `parity_sfx_bank.gd`
+`57cc689b` unchanged). R1 to R3 take the same steps as with `1a312f17`. R4 captures taken with
+`1a312f17`, or on a game without these changes, cannot be compared with R4 captures from this
+driver, so the next behaviour-identical step re-takes R4's baseline after this branch merges.
+
+Checked in the render container at 960x540 `kb-fx`, R4 only, on the branch's game (`3651065`, main
+`ba82b4f` merged): the driver before `_retry_and_shoot` (`21e9104e`) and after it (`8af8d3f8`) gave
+the same 115 stills with 0 changed pixels, the same text and audio logs and the same 4,652 frames.
+Both runs stopped at the closing beat, which the closing-box presses then fixed. With `d5c7217c` R4
+completes with no failure: 115 stills and 2,653 frames, the first 99 stills byte-identical to the
+`8af8d3f8` run.
 
 ## S00a: maps refreshed on 9c7371d
 
