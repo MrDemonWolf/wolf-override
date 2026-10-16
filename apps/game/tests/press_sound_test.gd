@@ -180,7 +180,9 @@ func _records(mirror_route: String) -> void:
 	await _read_on(830.0)
 
 
-## Presses USE through the boxes of the line on screen (no state changes) up to its last one.
+## Presses USE through the boxes of the line on screen (no state changes) up to its last one, with the
+## engineer first placed at [param at_x] when it is 0 or more (see _press). At most 6 presses: more
+## than any line here has boxes, so the cap only keeps a stuck line from hanging the suite.
 func _read_on(at_x: float = -1.0) -> void:
 	for _box: int in 6:
 		if int(game.get("dialogue_index")) >= (game.get("dialogue_boxes") as Array).size() - 1:

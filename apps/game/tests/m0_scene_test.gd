@@ -4,6 +4,8 @@ const GAME_SCENE: PackedScene = preload("res://scenes/main.tscn")
 const State = preload("res://scripts/m0_state.gd")
 
 var failures: int = 0
+## The running game, for helpers such as _tap_to_step: _run holds it in a local, which other
+## functions cannot see.
 var game_ref: Node2D
 
 
@@ -586,7 +588,9 @@ func _action_event(action: StringName, pressed: bool) -> InputEventAction:
 	return event
 
 
-## Presses interact until the opening reaches beat [param step] (each press shows one box).
+## Presses interact until the opening reaches beat [param step] (each press shows one box), at most
+## 6 times: more than any step this suite asks for needs, so the cap only keeps a stuck opening from
+## hanging the suite, and the caller's next check then fails.
 func _tap_to_step(step: int) -> void:
 	for _press: int in 6:
 		if int(game_ref.get("intro_step")) >= step:
