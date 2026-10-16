@@ -3589,8 +3589,7 @@ func _retry() -> void:
 	retrying = true
 	if collapsed:
 		_show_collapse(COLLAPSE_SECONDS)
-	_cancel_fail_tween()
-	fail_tween = create_tween()
+	fail_tween = Tweens.restart(self, fail_tween)
 	fail_tween.tween_property(intro_fade, "color:a", 1.0, RETRY_FADE_OUT_SECONDS)
 	fail_tween.tween_callback(_restore_beat.bind(fail_reason))
 	fail_tween.tween_property(intro_fade, "color:a", 0.0, RETRY_FADE_IN_SECONDS)
@@ -4248,9 +4247,7 @@ func _dismiss_name_card() -> void:
 	if name_card_remaining <= TOP_CARD_FADE_SECONDS or last_top_card_key != "name_card":
 		return
 	name_card_remaining = TOP_CARD_FADE_SECONDS
-	if top_card_tween != null and top_card_tween.is_running():
-		top_card_tween.kill()
-	top_card_tween = create_tween()
+	top_card_tween = Tweens.restart(self, top_card_tween)
 	top_card_tween.tween_property(top_card, "modulate:a", 0.0, TOP_CARD_FADE_SECONDS)
 	top_card_tween.tween_callback(top_card.hide)
 
