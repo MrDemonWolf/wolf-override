@@ -131,7 +131,9 @@ static func make_body(parent: Node, body_name: String, face_x: float, side: floa
 ## turns its status lamp red there; it sets the moving colour itself before calling this). The tween
 ## belongs to [param room], so it pauses and frees with the room; [param running], the
 ## room's previous closer tween, is killed first so two closers never fight. Returns the new tween for
-## the room to keep (its entry_tween, which the tests and Main read).
+## the room to keep as its entry_tween: the room's own refresh or reset reads it (RecordsRoom.refresh_state
+## leaves a closing leaf alone while it runs; JunctionRoom.reset_transient kills it), and so does
+## door_route_test, which waits on it. Main does not read it.
 func close_behind(room: Node, running: Tween, shut: Callable) -> Tween:
 	if running != null and running.is_running():
 		running.kill()
