@@ -13,7 +13,8 @@ crank/crank-2c archived 01a13361-7b84-7151-8d8e-76e9a12b9f12
 Tool: Codex built-in image generation, edit mode, one session, run from add7/beacons/codex/paint-beacons/ with
   codex exec --skip-git-repo-check -s workspace-write --add-dir <job dir> --add-dir ~/.codex/generated_images --image=refs/* "<prompt.txt>" < /dev/null
 (add7/beacons/tools/run_codex.sh; beacons/tools/run_codex.sh at ada83fa). The prompt told Codex to KEEP all metadata including C2PA and never strip it.
-Edit target and paint map: add7/beacons/design/codex-target.png, codex-areas.png (deterministic, tools/design.py).
+Edit target and paint map: add7/beacons/design/codex-target.png, codex-areas.png (deterministic, tools/design.py: beacons/tools/design.py
+  at ada83fa; the kept fix2/beacons/tools/design.py, round 9's, makes the same codex-target.png, blob 1a952e28).
 
 session id | job | output (sha256) | used?
 01a1335e-53be-7ca3-bac0-059cf4b5a18d | paint-beacons | beacons-painted.png (06c89478d1b3c428cc51119b42215e0a7ff853fac02c37c5e262138128161b27) <- ~/.codex/generated_images/01a1335e-53be-7ca3-bac0-059cf4b5a18d/exec-23ac6a3d-4891-4fd5-b4ae-20482ff74d93.png | used (fixture, globe and guard colour, sampled inside the construction masks)
@@ -62,7 +63,8 @@ Derived (deterministic, no metadata transplanted): add7/door/tools/cleanup7.py -
 Deterministic, no image tool: every shape and mask (tools/portal7.py), the RESTRICTED AREA stencil (typeset in the game's bundled Roboto,
   SIL OFL 1.1, bridges cut by script), all bolts, plate joints, wiper seals, the second saddle strap (painted with round 6's strap
   steel, itself from paint-portal2 01a12e59-e7ba-7073-8a77-796f536bcc43), every value and all light (round 6's painted light per place).
-  2026-10-13 (beacons, continued): no new Codex session. cleanup.py light box enlarged 6 px upward and the wall spill raised
+  2026-10-13 (beacons, continued): no new Codex session. cleanup.py (beacons/tools/cleanup.py at ada83fa; round 9's
+  fix2/beacons/tools/cleanup.py is the kept copy) light box enlarged 6 px upward and the wall spill raised
   from 0.5 to 0.8 (Python only) so the red pool reads at the pulse peak; layers/ and the atlas rebuilt from the same Codex
   output (sha256 06c89478... unchanged, caBX 23,654 bytes present, session still archived: 0 live, 1 archived).
   Atlas layers/corridor-beacons.png md5 afd3bb20b214043a081864320e552b05.

@@ -528,7 +528,7 @@ The new section replaces the old stub inside the same atlas region, the far plat
   - `assets/manifest.json`: round-9 notes on corridor-seal-atlas, corridor-far and corridor-beacons, and the 256x156 correction.
 - **Work `add7/fix2/`:**
   - `door/`: `tools/cut9.py`, `codex_inputs9.py`, `cleanup9.py`, `install9.py` (the last two `fix2/door/tools/` at ada83fa); `design/`, `layers/` (`portal-front.png`, `report9.json`), `game/` (atlas, regions); `work-042/` (the superseded 0.42 m design).
-  - `far/`: `tools/far9.py`; `layer/` (plate, `report.json`, before/after crops).
+  - `far/`: `tools/far9.py` (`fix2/far/tools/far9.py` at ada83fa; round 10's `fix3/far/tools/far10.py` is the kept copy); `layer/` (plate, `report.json`, before/after crops).
   - `beacons/`: a copy of round 8's tools and design, with the R9 light, and `layers/` (`fix2/beacons/tools/`, the kept copy; round 8's `fix1/beacons/tools/design.py` and `cleanup.py` are at ada83fa).
   - `codex/`: `paint-cut9b` (used), `paint-cut9` (0.42 m try, not used) and `empty-run-r9` (a wrong-path empty run, no image), each with prompt, refs, out (C2PA kept), `run.log` and `session.txt`; `run_job.sh` (`fix2/codex/run_job.sh` at ada83fa; round 11's `fix4/codex/run_job.sh` differs only in its comment line); `archive.log`.
   - `tools/`: `tests.sh`, `render_run.sh`, `capture_all.sh`, `headless_perf.sh`, `opening_diff9.py`, `state_diff9.py`, `perf_table9.py`, `package9.py`, `luminaire_check9.py`, `measure9.py` (all `fix2/tools/` at ada83fa; round 11's `fix4/tools/` holds the current copies), `preview.py`, `crop.py`, `side.py` (still filed in `fix2/tools/`).
