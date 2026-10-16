@@ -95,7 +95,7 @@ var _down_tween: Tween
 class SentryVisual:
 	extends Node2D
 	const EYE_OFF: Color = Color("#2b1d1d")
-	const EYE_PATROL: Color = Color("#f3ae4b")
+	const EYE_PATROL: Color = Palette.AMBER
 	const EYE_LOCKED: Color = Color("#ff4a3d")
 
 	var eye: Color = EYE_OFF:
@@ -173,8 +173,7 @@ class SentryVisual:
 
 	## Powers the machine down or up; [param animate] brightens it over WAKE_SECONDS as it wakes.
 	func set_dormant(value: bool, animate: bool) -> void:
-		if _wake_tween != null and _wake_tween.is_valid():
-			_wake_tween.kill()
+		Tweens.kill(_wake_tween)
 		_wake_tween = null
 		dormant = value
 		var tint: Color = Sentry.DORMANT_TINT if dormant else Color.WHITE
@@ -463,6 +462,5 @@ func keel_over(at_x: float) -> void:
 
 
 func _kill_tween() -> void:
-	if _down_tween != null and _down_tween.is_valid():
-		_down_tween.kill()
+	Tweens.kill(_down_tween)
 	_down_tween = null

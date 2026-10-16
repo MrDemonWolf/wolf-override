@@ -206,7 +206,7 @@ func _advance() -> void:
 	if design and int(game.get("intro_step")) == 2:
 		# Proposed: the floor dust burst becomes the existing amber spark preset at the lock (one emitter
 		# swapped for another; nothing added).
-		var sparks: CPUParticles2D = FxPresets.sparks(FxPresets.SPARK_AMBER)
+		var sparks: CPUParticles2D = FxPresets.sparks(Palette.AMBER)
 		# Revision 2: a narrow, slow spray from the lock that falls down and back along the post and the
 		# leading leaf, away from the Director (his coat starts at x 245.8).
 		sparks.position = Vector2(199, 399)
