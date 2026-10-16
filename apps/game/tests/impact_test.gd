@@ -182,7 +182,12 @@ func _run() -> void:
 	state = game.get("state") as M0State
 	_expect(state.to_dict() == saved and FileAccess.get_file_as_bytes(path) == save_bytes, "the knockdown restores the checkpoint exactly and never writes the save")
 	_expect(state.memory.get("choice_id") == State.DISCLOSE and state.route == "cooperate", "the relay memory and route survive the knockdown")
-	_expect(human.controlled and human.position == state.human_position and wolf.position == state.wolf_position, "the engineer stands at the checkpoint with controls back")
+	# The checkpoint is the safe point, so WOLF sets off for the doorway (Main.WOLF_DOORWAY_X) as soon as
+	# the room is restored, and walks during RETRY's fade-in (0.35 s) before control comes back. He must
+	# be on his saved floor line, between his saved spot and the doorway, and headed for the doorway.
+	var wolf_saved_x: float = state.wolf_position.x
+	var wolf_on_way: bool = wolf.position.y == state.wolf_position.y and wolf.autonomous_target_x == MainScript.WOLF_DOORWAY_X and wolf.position.x >= minf(wolf_saved_x, MainScript.WOLF_DOORWAY_X) and wolf.position.x <= maxf(wolf_saved_x, MainScript.WOLF_DOORWAY_X)
+	_expect(human.controlled and human.position == state.human_position and wolf_on_way, "the engineer stands at the checkpoint with controls back, and WOLF heads from his saved spot to the doorway (at x %.1f, saved %.1f)" % [wolf.position.x, wolf_saved_x])
 	_expect(human.body_sprite.rotation_degrees == 0.0 and human.body_sprite.position == Vector2(0.0, -5.0) and human.body_sprite.texture != MainScript.COLLAPSE_SHEET and not human.body_sprite.region_enabled and is_equal_approx(human.body_sprite.scale.x, 0.188), "the engineer stands again, as drawn before the knockdown")
 	var reflection: FloorReflection = game.get("human_reflection") as FloorReflection
 	await process_frame
