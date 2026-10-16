@@ -330,9 +330,9 @@ func _obstacles(game: Main) -> Array[Array]:
 			sprites = {"the purge queue": records.get_node("PurgeArt"), "the mirror port": records.get_node("MirrorArt")}
 			# The container and the doors are regions of one atlas mesh: their spans on the walk line.
 			found.append(["the security container", RecordsRoom.CONTAINER_SPAN])
-			found.append(["the shut Records entry", Vector2(RecordsRoom.ENTRY_COLUMN_AT.x, RecordsRoom.ENTRY_DOOR_X)])
+			found.append(["the shut Records entry", RecordsRoom.ENTRY_SPAN])
 			if not game.state.chapter_complete:
-				found.append(["the shut Records exit", Vector2(RecordsRoom.EXIT_DOOR_X, RecordsRoom.EXIT_COLUMN_AT.x + RecordsRoom.EXIT_COLUMN_REGION.size.x * RecordsRoom.DOORS_SCALE)])
+				found.append(["the shut Records exit", RecordsRoom.EXIT_SPAN])
 		"junction":
 			var room: JunctionRoom = game.junction_room
 			sprites = {
@@ -343,11 +343,11 @@ func _obstacles(game: Main) -> Array[Array]:
 				"the blast door's near column": room.door_column, "the thrown leaf lying in the lane": room.door_leaf_down,
 			}
 			# The entry stands shut behind them, and the exit until it has slid open: from the leaf's face
-			# on the walk line to the near jamb.
+			# on the walk line to the near jamb. The exit leaf's face (JunctionRoom.EXIT_LEAF_SHUT_X) lies a
+			# little right of the near jamb's edge, so the shut exit's span is the line at its face.
 			found.append(["the shut junction entry", Vector2(JunctionRoom.ENTRY_FRONT_AT.x, JunctionRoom.ENTRY_DOOR_X)])
 			if room.hatch_open <= 0.0:
-				var exit_leaf_x: float = JunctionRoom.EXIT_DOOR_X + 40.0 * JunctionRoom.EXIT_LEAF_N / cos(deg_to_rad(JunctionRoom.EXIT_WALL_ANGLE))
-				found.append(["the shut junction exit", Vector2(exit_leaf_x, maxf(exit_leaf_x, JunctionRoom.EXIT_NEAR_JAMB_X))])
+				found.append(["the shut junction exit", Vector2(JunctionRoom.EXIT_LEAF_SHUT_X, maxf(JunctionRoom.EXIT_LEAF_SHUT_X, JunctionRoom.EXIT_NEAR_JAMB_X))])
 			# The tank stands on the floor only once it is down; hanging, he runs under it.
 			if game.state.sentry_down:
 				sprites["the landed tank"] = room.get_node("Tank")

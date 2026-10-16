@@ -17,22 +17,16 @@ const BEAT_FRAMES: int = 900
 ## How slow the game runs while the test watches the blast (Engine.time_scale), so that even a long
 ## frame on a busy machine samples the 0.24 s flight several times (the capture driver uses 0.05).
 const BLAST_TIME_SCALE: float = 0.1
-## The Records exit's doorway on the walk line: from its shut leaf's face to the near column's far
-## side, which an engineer walking out has passed once their origin is beyond it.
-const RECORDS_EXIT_SPAN: Vector2 = Vector2(RecordsRoom.EXIT_DOOR_X, RecordsRoom.EXIT_COLUMN_AT.x + RecordsRoom.EXIT_COLUMN_REGION.size.x * RecordsRoom.DOORS_SCALE)
-## The Records entry's doorway: from the near column's room side to the shut leaf's face.
-const RECORDS_ENTRY_SPAN: Vector2 = Vector2(RecordsRoom.ENTRY_COLUMN_AT.x, RecordsRoom.ENTRY_DOOR_X)
-## Where each shut door's face crosses the walk line: a resting body must stay short of it.
+## Where each shut door's face crosses the walk line: a resting body must stay short of it. The
+## doorways' spans themselves are the rooms' own (RecordsRoom.EXIT_SPAN and ENTRY_SPAN,
+## JunctionRoom.EXIT_LEAF_SHUT_X), which wolf_space_test reads too.
 const RECORDS_EXIT_FACE_X: float = RecordsRoom.EXIT_DOOR_X
 const RECORDS_ENTRY_FACE_X: float = RecordsRoom.ENTRY_DOOR_X
 const BLAST_FACE_X: float = M0State.JUNCTION_DOOR_LEFT_X
-## The exit's leaf runs in the wall's middle (its room face EXIT_LEAF_N in from the approach face), so
-## the shut leaf meets the walk line that far behind the approach face's crossing at EXIT_DOOR_X; the
-## reveal in front of it is open floor.
-var exit_leaf_x: float = JunctionRoom.EXIT_DOOR_X + DoorCamera.PX_PER_M * JunctionRoom.EXIT_LEAF_N / cos(deg_to_rad(JunctionRoom.EXIT_WALL_ANGLE))
-## The blast door's doorway on the deck, far jamb foot to the near column's far side.
-const BLAST_SPAN: Vector2 = Vector2(JunctionDoorLayout.FAR_JAMB_FOOT.x, JunctionDoorLayout.COLUMN_AT.x + JunctionDoorLayout.COLUMN_REGION.size.x * JunctionDoorLayout.COLUMN_SCALE)
-## The exit door's doorway on the walk line: its far jamb (junction-exit-door NOTES, "Opening") to
+## The blast door's doorway on the deck, far jamb foot to the near column's far side (the column's foot,
+## JunctionRoom.DOOR_FOOT_RIGHT_X).
+const BLAST_SPAN: Vector2 = Vector2(JunctionDoorLayout.FAR_JAMB_FOOT.x, JunctionRoom.DOOR_FOOT_RIGHT_X)
+## The junction exit's doorway on the walk line: its far jamb (junction-exit-door NOTES, "Opening") to
 ## the near jamb.
 const EXIT_SPAN: Vector2 = Vector2(925.5, JunctionRoom.EXIT_NEAR_JAMB_X)
 
@@ -73,14 +67,14 @@ func _check_records() -> void:
 	game.call("_start_gameplay_camera")
 	await frames(2)
 	var records: RecordsRoom = game.get("records_room") as RecordsRoom
-	_expect(state.human_position.x > RECORDS_ENTRY_SPAN.y and state.wolf_position.x > RECORDS_ENTRY_SPAN.y, "both arrive in Records past the entry's doorway, having come through it")
+	_expect(state.human_position.x > RecordsRoom.ENTRY_SPAN.y and state.wolf_position.x > RecordsRoom.ENTRY_SPAN.y, "both arrive in Records past the entry's doorway, having come through it")
 	records.close_entry_behind()
 	var entry_whole: bool = await _leaf_whole_while(records.entry_leaf, func() -> bool: return records.entry_tween != null and records.entry_tween.is_running())
 	_expect(entry_whole and is_zero_approx(records.entry_leaf.open), "the entry closes behind them on its hinges, drawn whole every frame")
 	# Shut, the exit stops the engineer short of its face.
 	game.call("debug_place", 800.0, 700.0)
 	await hold(&"move_right", 72)  # 1.2 s of game time
-	_expect(human.position.x < RECORDS_EXIT_SPAN.x and records.exit_leaf.visible and is_zero_approx(records.exit_leaf.open), "the shut exit stops the route (engineer at x %.1f)" % human.position.x)
+	_expect(human.position.x < RecordsRoom.EXIT_SPAN.x and records.exit_leaf.visible and is_zero_approx(records.exit_leaf.open), "the shut exit stops the route (engineer at x %.1f)" % human.position.x)
 	# The first copy goes into the container; the exit swings open on its hinges.
 	game.call("debug_place", 830.0, 700.0)
 	game.call("debug_interact")
@@ -106,10 +100,10 @@ func _check_records() -> void:
 		leaf_whole = leaf_whole and _whole(records.exit_leaf)
 		await process_frame
 	_expect(state.chapter_id == "junction", "walking out of Records leads into the Service Junction")
-	_expect(furthest > RECORDS_EXIT_SPAN.y, "the engineer is through the exit's doorway (x %.1f past %.1f) before the junction starts" % [furthest, RECORDS_EXIT_SPAN.y])
+	_expect(furthest > RecordsRoom.EXIT_SPAN.y, "the engineer is through the exit's doorway (x %.1f past %.1f) before the junction starts" % [furthest, RecordsRoom.EXIT_SPAN.y])
 	# Review r1: nobody is left behind by the cabinet; WOLF follows them through, his whole body past the
 	# near column, before the junction starts.
-	_expect(wolf_furthest - M0Actor.WOLF_REACH >= RECORDS_EXIT_SPAN.y - 0.5, "WOLF follows them through the exit's doorway (his tail at x %.1f past %.1f) before the junction starts" % [wolf_furthest - M0Actor.WOLF_REACH, RECORDS_EXIT_SPAN.y])
+	_expect(wolf_furthest - M0Actor.WOLF_REACH >= RecordsRoom.EXIT_SPAN.y - 0.5, "WOLF follows them through the exit's doorway (his tail at x %.1f past %.1f) before the junction starts" % [wolf_furthest - M0Actor.WOLF_REACH, RecordsRoom.EXIT_SPAN.y])
 	_expect(leaf_whole, "the open exit leaf stays drawn whole while they walk through")
 	_expect(off_floor <= 1.0, "both walk out of Records on the floor, never dropping off its end (at most %.1f px off it)" % off_floor)
 	# In the junction they came in through its entry, which stands open behind them and closes on its
@@ -233,17 +227,17 @@ func _check_rest_spots() -> void:
 	# [label, x, reach, door span, door open there, near piece drawn over the actors]; a shut door's span
 	# starts at its face on the walk line (the room side of it is open floor).
 	var spots: Array = [
-		["Records: engineer's leftmost spot (the shut entry)", RecordsRoom.ENTRY_DOOR_X + human_reach, human_reach, Vector2(RECORDS_ENTRY_SPAN.x, RECORDS_ENTRY_FACE_X), false, null],
-		["Records: WOLF's leftmost follow spot", RecordsRoom.ENTRY_DOOR_X + wolf_reach, wolf_reach, Vector2(RECORDS_ENTRY_SPAN.x, RECORDS_ENTRY_FACE_X), false, null],
-		["Records: engineer at the container", main_constants["RECORDS_CONTAINER_SIDE_X"], human_reach, Vector2(RECORDS_EXIT_FACE_X, RECORDS_EXIT_SPAN.y), false, null],
-		["Records: WOLF's rightmost follow spot", RecordsRoom.EXIT_DOOR_X - wolf_reach, wolf_reach, Vector2(RECORDS_EXIT_FACE_X, RECORDS_EXIT_SPAN.y), false, null],
-		["Records: WOLF following the engineer out", main_constants["RECORDS_WOLF_OUT_X"], wolf_reach, RECORDS_EXIT_SPAN, true, records.front_mesh],
+		["Records: engineer's leftmost spot (the shut entry)", RecordsRoom.ENTRY_DOOR_X + human_reach, human_reach, Vector2(RecordsRoom.ENTRY_SPAN.x, RECORDS_ENTRY_FACE_X), false, null],
+		["Records: WOLF's leftmost follow spot", RecordsRoom.ENTRY_DOOR_X + wolf_reach, wolf_reach, Vector2(RecordsRoom.ENTRY_SPAN.x, RECORDS_ENTRY_FACE_X), false, null],
+		["Records: engineer at the container", main_constants["RECORDS_CONTAINER_SIDE_X"], human_reach, Vector2(RECORDS_EXIT_FACE_X, RecordsRoom.EXIT_SPAN.y), false, null],
+		["Records: WOLF's rightmost follow spot", RecordsRoom.EXIT_DOOR_X - wolf_reach, wolf_reach, Vector2(RECORDS_EXIT_FACE_X, RecordsRoom.EXIT_SPAN.y), false, null],
+		["Records: WOLF following the engineer out", main_constants["RECORDS_WOLF_OUT_X"], wolf_reach, RecordsRoom.EXIT_SPAN, true, records.front_mesh],
 		["Junction: WOLF clear of the blast", JunctionRoom.WOLF_CLEAR_X, wolf_reach, Vector2(BLAST_FACE_X, BLAST_SPAN.y), false, null],
 		["Junction: WOLF reading the seam", JunctionRoom.WOLF_SEAM_X, wolf_reach, Vector2(BLAST_FACE_X, BLAST_SPAN.y), false, null],
 		["Junction: WOLF at the rubble", JunctionRoom.WOLF_RUBBLE_X, wolf_reach, BLAST_SPAN, true, room.door_column],
 		["Junction: the lane question", JunctionRoom.CHOICE_X, human_reach, BLAST_SPAN, true, room.door_column],
-		["Junction: WOLF by the exit", JunctionRoom.WOLF_DOWN_X, wolf_reach, Vector2(exit_leaf_x, EXIT_SPAN.y), false, null],
-		["Junction: engineer at the exit bolt", JunctionRoom.BOLT_X, human_reach, Vector2(exit_leaf_x, EXIT_SPAN.y), false, null],
+		["Junction: WOLF by the exit", JunctionRoom.WOLF_DOWN_X, wolf_reach, Vector2(JunctionRoom.EXIT_LEAF_SHUT_X, EXIT_SPAN.y), false, null],
+		["Junction: engineer at the exit bolt", JunctionRoom.BOLT_X, human_reach, Vector2(JunctionRoom.EXIT_LEAF_SHUT_X, EXIT_SPAN.y), false, null],
 		["Junction: engineer behind WOLF at the open exit", JunctionRoom.HATCH_REACH_MAX_X, human_reach, EXIT_SPAN, true, room.exit_front],
 		["Junction: WOLF waiting in the open exit doorway", JunctionRoom.WOLF_DOORWAY_X, wolf_reach, EXIT_SPAN, true, room.exit_front],
 	]

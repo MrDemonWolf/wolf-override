@@ -177,6 +177,13 @@ const EXIT_LEAD_OPEN_S: float = 1.62
 ## Where the near jamb's edge stands on screen (s -0.4 on the approach face): anyone whose drawn body is
 ## all right of it has gone through, behind the wall.
 const EXIT_NEAR_JAMB_X: float = 971.3
+## Where the shut leaf's room face meets the walk line (world px; about 973.3, a little right of
+## EXIT_NEAR_JAMB_X). The leaf runs in the wall's middle, its room face EXIT_LEAF_N m in from the
+## approach face, and that face, turned EXIT_WALL_ANGLE off square to the walk line, crosses it
+## EXIT_LEAF_N / cos(EXIT_WALL_ANGLE) m past EXIT_DOOR_X, at the walk line's DoorCamera.PX_PER_M. The
+## reveal in front of it is open floor. door_route_test and wolf_space_test both measure the shut exit
+## from here, so a change to the wall's geometry moves both.
+const EXIT_LEAF_SHUT_X: float = EXIT_DOOR_X + DoorCamera.PX_PER_M * EXIT_LEAF_N / cos(deg_to_rad(EXIT_WALL_ANGLE))
 ## The junction's own deck and fascia carried on past x 960 to the view's edge (review r1, M4): the mid
 ## plate translated 2.0 m along the room in its camera (seams to its vanishing point), not its mirrored
 ## bleed; drawn over the floor reflections of anyone who has gone through, behind the wall's stub.

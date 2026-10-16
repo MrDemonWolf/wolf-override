@@ -53,6 +53,13 @@ const EXIT_LABEL_X: float = 862.0
 ## Where each shut leaf's room face crosses the walk line (y 440): the doors' collision faces.
 const EXIT_DOOR_X: float = 880.0
 const ENTRY_DOOR_X: float = 70.0
+## Each doorway on the walk line (world px, x from .x to .y), read by door_route_test and
+## wolf_space_test. The exit's runs from its shut leaf's room face to the near column's far side (its
+## painted width at DOORS_SCALE), so an engineer walking out has passed it once their origin is beyond
+## .y; the entry's runs from its near column's room side to its shut leaf's room face. The room side of
+## a shut face is open floor.
+const EXIT_SPAN: Vector2 = Vector2(EXIT_DOOR_X, EXIT_COLUMN_AT.x + EXIT_COLUMN_REGION.size.x * DOORS_SCALE)
+const ENTRY_SPAN: Vector2 = Vector2(ENTRY_COLUMN_AT.x, ENTRY_DOOR_X)
 ## The guarded status lamps on the near columns' end faces (their glass is the live lens).
 const EXIT_LAMP: Vector2 = Vector2(901.665, 345.264)
 const ENTRY_LAMP: Vector2 = Vector2(48.018, 345.264)
