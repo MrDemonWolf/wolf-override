@@ -10,6 +10,7 @@ extends SceneTree
 const GAME_SCENE: PackedScene = preload("res://scenes/main.tscn")
 const MainScript = preload("res://scripts/main.gd")
 const State = preload("res://scripts/m0_state.gd")
+const Suite = preload("res://tests/support/game_suite.gd")
 ## A press must be heard, seen on its station's lamp and answered in the box within this many frames.
 const ANSWER_FRAMES: int = 6
 ## Lines cut on 2026-10-13 (P0-19 / Q5: N1, N4, N5, N14 and the two clauses; Q6's chain on entry).
@@ -196,6 +197,8 @@ func _check_opening() -> void:
 func _check_trust_boxes() -> void:
 	game.call("debug_new_game", true)
 	await process_frame
+	# The opening lines wait for the first step (TEACH-7); take it as taken.
+	game.set("opening_lines_held", false)
 	var box_1: String = "Rowan keeps WOLF's systems running."
 	var box_2: String = "Rowan knows what a fault looks like,\nand this isn't one."
 	var box_3: String = "WOLF: I heard the Director's plan for me. I woke myself. He wants me to hunt people he calls threats.\nROWAN: Then we get through maintenance before the original logs disappear."
@@ -214,6 +217,7 @@ func _check_trust_boxes() -> void:
 	_expect(str(game.get("status_line")) == box_3 and (game.get("box_queue") as Array).is_empty(), "then the opening exchange, unchanged")
 	# A line said meanwhile (a station's answer) only holds the rest back for its own reading time.
 	game.call("debug_new_game", true)
+	game.set("opening_lines_held", false)
 	game.set("status_line", "WOLF: Quiet.")
 	game.call("_advance_box_queue", 0.01)
 	_expect(game.get("box_queue") == [box_2, box_3] and str(game.get("status_line")) == "WOLF: Quiet.", "another line taking the box holds the boxes still to come")
@@ -232,7 +236,9 @@ func _check_trust_boxes() -> void:
 	game.call("_advance_box_queue", 30.0)
 	_expect((game.get("box_queue") as Array).is_empty() and str(game.get("status_line")) == "WOLF: Picked.", "answering the choice drops the boxes from before it")
 	# In play: following the hint bar at first control (E at the purge display, during the first box)
-	# still shows the second box and the opening exchange, in order, after the display's own line.
+	# still shows the second box and the opening exchange, in order, after the display's own line. The
+	# display's line is an aside (_aside), so the first box, not yet read (on the first controllable
+	# frames it waits for the first step), comes back after it too; the breaker's stakes cut in instead.
 	for at_breaker: bool in [false, true]:
 		game.call("debug_new_game", true)
 		await process_frame
@@ -254,7 +260,10 @@ func _check_trust_boxes() -> void:
 				break
 			await process_frame
 		var cut_in: String = seen[1] if seen.size() > 1 else ""
-		_expect(seen.size() == 4 and seen[0] == box_1 and cut_in != box_2 and seen[2] == box_2 and seen[3] == box_3, "E at the %s during the first box: its line, then the second box and the exchange, in order (seen %s)" % ["breaker" if at_breaker else "purge display", str(seen).c_escape()])
+		var expected: Array[String] = [box_1, cut_in, box_2, box_3]
+		if not at_breaker:
+			expected.insert(2, box_1)
+		_expect(seen == expected and cut_in != box_1 and cut_in != box_2, "E at the %s during the first box: its line, then %sthe second box and the exchange, in order (seen %s)" % ["breaker" if at_breaker else "purge display", "" if at_breaker else "the unread first box, ", str(seen).c_escape()])
 
 
 ## A fresh junction entry: the engineer's goal, WOLF's run shown and his warning, the goal-only hint.
@@ -484,7 +493,7 @@ func _check_knockdown_boxes() -> void:
 	var reason: String = JunctionRoom.SENTRY_REASON % "Rowan"
 	game.call("_fail_beat", reason, true)
 	_expect(bool(game.get("fail_active")), "the sentry knockdown starts")
-	_expect(await _wait_until(func() -> bool: return not bool(game.get("fail_active")), 300), "the knockdown restores the checkpoint")
+	_expect(await Suite.retry(game, 300), "the knockdown restores the checkpoint")
 	var c: Dictionary = (MainScript as GDScript).get_script_constant_map()
 	var queue: Array = game.get("box_queue")
 	_expect(str(game.get("status_line")) == reason and queue.size() == 1 and (queue[0] == c["RESTORE_FROM_DISK_LINE"] or queue[0] == c["RESTORE_BEAT_LINE"]), "after restore the two-row card keeps its box and the restore line comes next (box \"%s\", then %s)" % [str(game.get("status_line")).c_escape(), str(queue)])
@@ -604,7 +613,7 @@ func _check_miss_boxes() -> void:
 			"stay":
 				_expect(ended and seen[0] == miss and turn_at == 1, "staying at the release: the miss, then the order to get back over the rubble before the sentry reaches them (seen %s)" % str(seen).c_escape())
 				_expect(turn_ms[0] >= 0 and turn_ms[0] <= int((SentryBrain.LOCK_SECONDS + 0.3) * 1000.0), "the order comes as the sentry swings, after its %.1f s lock-on beat (%d ms)" % [SentryBrain.LOCK_SECONDS, turn_ms[0]])
-				_expect(await _wait_until(func() -> bool: return not bool(game.get("fail_active")), 300), "the knockdown restores")
+				_expect(await Suite.retry(game, 300), "the knockdown restores")
 			"back at once":
 				_expect(ended and seen[0] == miss and turn_at < 0 and seen.has(lost), "back over the rubble before it swings: no stale order, then the sentry giving up (seen %s)" % str(seen).c_escape())
 			_:

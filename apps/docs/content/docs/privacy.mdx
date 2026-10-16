@@ -14,11 +14,11 @@ The game writes two files of its own to Godot's user data folder for the project
 | File | Contents |
 | --- | --- |
 | `m0-save.json` | The checkpoint: the current room, the engineer's and WOLF's positions, puzzle state, which of the three preset engineer names is in use, and the reply WOLF remembers from the corridor choice. There is one checkpoint and each save replaces it; a save is written to `m0-save.json.tmp` first and renamed when complete. |
-| `settings.cfg` | Your settings: FPS limit, window size, fullscreen, V-sync, MSAA, Reduced Motion, the audio slider levels, the controller deadzone and your key bindings. |
+| `settings.cfg` | Your settings: FPS limit, window size, fullscreen, V-sync, MSAA, Reduced Motion, text size, the audio slider levels, the controller deadzone, Toggle Holds and your key bindings. |
 
 The Godot engine also writes to the same folder on desktop. A `logs/` folder holds `godot.log` and up to four older copies, each recording the engine version, the graphics driver and GPU model, and any warnings, such as a settings file that could not be read. A `shader_cache/` folder holds compiled graphics shaders so later starts are faster. Neither leaves your device.
 
-The game has no text entry. The engineer's display name is cycled from a fixed list, so nothing you type is stored. The game does not read your account name, location or clipboard. It reads your GPU model only to show it on the Settings screen and does not save it; the engine's log records the same model.
+The game has no text entry. The engineer's display name is cycled from a fixed list, so nothing you type is stored. The game does not read your account name, location or clipboard. It does not show your GPU model anywhere; only the engine's log records it.
 
 ### Where it lives and how to delete it
 

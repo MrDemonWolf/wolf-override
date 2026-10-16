@@ -132,7 +132,7 @@ func _run() -> void:
 	var touch_event: InputEventScreenTouch = InputEventScreenTouch.new()
 	touch_event.pressed = true
 	game.call("_input", touch_event)
-	_expect(first_choice.size.y == 76.0 and first_choice.text.begins_with("1  "), "touch input restores large choice targets")
+	_expect(first_choice.size.y == 76.0 and first_choice.text == M0State.CHOICE_TEXT[M0State.DISCLOSE], "touch input restores large choice targets, named by their words alone (PHONE-3)")
 	game.set("waiting_for_choice", false)
 	game.call("_refresh_ui")
 	game.call("_pause_game")
@@ -183,9 +183,12 @@ func _run() -> void:
 	await process_frame
 	game.call("_finish_intro")
 	(game.get_node("Human") as M0Actor).position.x = 350.0
-	# The first USE at the breaker says the purge stakes (decision C); the second asks the question.
-	game.call("_interact")
-	game.call("_interact")
+	# The first USE at the breaker says the purge stakes (decision C); the next go on through their
+	# boxes, and from the last one WOLF asks the question.
+	for _press: int in 4:
+		if game.get("waiting_for_choice"):
+			break
+		game.call("_interact")
 	first_choice.grab_focus()
 	await process_frame
 	Input.parse_input_event(_controller_button(JOY_BUTTON_A, true))
@@ -329,8 +332,10 @@ func _check_hud_writes_on_change(game: Node2D) -> void:
 		game.call("_refresh_ui")
 	_expect(notified[0] == 0, "an unchanged HUD refresh in play sets no theme override (%d notifications)" % notified[0])
 	(game.get_node("Human") as M0Actor).position.x = 350.0
-	game.call("_interact")
-	game.call("_interact")
+	for _press: int in 4:
+		if game.get("waiting_for_choice"):
+			break
+		game.call("_interact")
 	game.call("_refresh_ui")
 	notified[0] = 0
 	for _i: int in range(3):

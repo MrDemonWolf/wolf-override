@@ -146,19 +146,9 @@ static func _half_width(sprite: Sprite2D) -> float:
 
 
 static func _make_shadow(owner_name: String, width: float) -> Sprite2D:
-	var gradient: Gradient = Gradient.new()
-	gradient.offsets = PackedFloat32Array([0.0, 0.45, 1.0])
-	gradient.colors = PackedColorArray([Color(0.0, 0.0, 0.0, 0.5), Color(0.0, 0.0, 0.0, 0.22), Color(0.0, 0.0, 0.0, 0.0)])
-	var texture: GradientTexture2D = GradientTexture2D.new()
-	texture.gradient = gradient
-	texture.width = 64
-	texture.height = 64
-	texture.fill = GradientTexture2D.FILL_RADIAL
-	texture.fill_from = Vector2(0.5, 0.5)
-	texture.fill_to = Vector2(0.5, 0.0)
 	var shadow: Sprite2D = Sprite2D.new()
 	shadow.name = owner_name + "Shadow"
-	shadow.texture = texture
+	shadow.texture = FxKit.radial(64, [0.0, 0.45, 1.0], [Color(0.0, 0.0, 0.0, 0.5), Color(0.0, 0.0, 0.0, 0.22), Color(0.0, 0.0, 0.0, 0.0)])
 	shadow.z_as_relative = false
 	shadow.z_index = Z_FLOOR
 	shadow.scale = Vector2(maxf(width, 24.0) / 64.0, 12.0 / 64.0)

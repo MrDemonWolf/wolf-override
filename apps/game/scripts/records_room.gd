@@ -22,6 +22,8 @@ const EXIT_REST: Vector2 = Vector2(830.0, RoomDepth.FLOOR_Y - 481.0 * 0.291 * 0.
 ## The status lights sit on the bar under the purge screen and under the mirror's screen.
 const PURGE_LIGHT: Rect2 = Rect2(163.0, 360.5, 16.0, 4.0)
 const MIRROR_LIGHT: Rect2 = Rect2(511.0, 348.0, 20.0, 4.0)
+## The MIRROR PORT name until its trace is preserved.
+const MIRROR_TEXT: Color = Color("#b6edff")
 ## Ceiling lamps and lockdown beacons as fractions of the far plate, measured from the plate.
 var lamps: PackedVector2Array = PackedVector2Array([Vector2(0.199, 0.263), Vector2(0.6, 0.263), Vector2(0.869, 0.263)])
 var warning_lamps: PackedVector2Array = PackedVector2Array([Vector2(0.304, 0.31), Vector2(0.698, 0.31)])
@@ -66,9 +68,9 @@ func _ready() -> void:
 		floor_reflections.append(FloorReflection.attach(prop))
 	purge_glow = _add_glow("PurgeGlow", PURGE_LIGHT.get_center())
 	mirror_glow = _add_glow("MirrorGlow", MIRROR_LIGHT.get_center())
-	purge_label = _add_station_label("PURGE QUEUE", 190.0, Color("#ffc7c7"))
-	mirror_label = _add_station_label("MIRROR PORT", 520.0, Color("#b6edff"))
-	_add_station_label("EXIT", 830.0, Color("#c1f4d8"), 276.0)
+	purge_label = _add_station_label("PURGE QUEUE", 190.0, Palette.LABEL_ALERT)
+	mirror_label = _add_station_label("MIRROR PORT", 520.0, MIRROR_TEXT)
+	_add_station_label("EXIT", 830.0, Palette.EXIT_GREEN, 276.0)
 	refresh_state()
 
 
@@ -88,7 +90,7 @@ func _add_station_label(caption: String, center_x: float, tint: Color, label_y: 
 	var label: Label = Label.new()
 	label.text = caption
 	label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	label.add_theme_font_size_override("font_size", 13)
+	TextSize.size_label(label, 13)
 	label.add_theme_color_override("font_color", tint)
 	label.set_meta(&"center", Vector2(center_x, label_y))
 	add_child(label)
@@ -97,12 +99,16 @@ func _add_station_label(caption: String, center_x: float, tint: Color, label_y: 
 	return label
 
 
-## Shrinks [param label] to its text and centres it on its station again.
+## Shrinks [param label] to its text and centres it on its station again (TEXT SIZE grows it upward).
 func _fit_label(label: Label) -> void:
 	var center: Vector2 = label.get_meta(&"center")
-	label.size = Vector2.ZERO
-	label.size = label.get_combined_minimum_size()
-	label.position = Vector2(center.x - label.size.x * 0.5, center.y)
+	TextSize.fit_world_label(label, center.x, center.y)
+
+
+## TEXT SIZE changed: every name takes the new size.
+func refit_labels() -> void:
+	for label: Label in station_labels:
+		_fit_label(label)
 
 
 ## A name the edge of the view would cut fades out instead (JunctionRoom.fade_at_view_edge).
@@ -123,9 +129,9 @@ func set_active(active: bool) -> void:
 
 func refresh_state() -> void:
 	purge_label.text = "PURGE COPIED" if purge_trace_preserved else "PURGE QUEUE"
-	purge_label.add_theme_color_override("font_color", Color("#a4f0c4") if purge_trace_preserved else Color("#ffc7c7"))
+	purge_label.add_theme_color_override("font_color", Palette.GREEN if purge_trace_preserved else Palette.LABEL_ALERT)
 	mirror_label.text = "MIRROR COPIED" if mirror_trace_preserved else "MIRROR PORT"
-	mirror_label.add_theme_color_override("font_color", Color("#a4f0c4") if mirror_trace_preserved else Color("#b6edff"))
+	mirror_label.add_theme_color_override("font_color", Palette.GREEN if mirror_trace_preserved else MIRROR_TEXT)
 	purge_glow.modulate = Color(_purge_light_color(), 0.6)
 	mirror_glow.modulate = Color(_mirror_light_color(), 0.6)
 	for label: Label in station_labels:
@@ -142,8 +148,8 @@ func _draw() -> void:
 func _draw_exit() -> void:
 	if chapter_complete:
 		draw_rect(Rect2(798, 300, 64, 138), Color("#081b2b"))
-		draw_rect(Rect2(790, 296, 80, 144), Color("#4a6572"), false, 3.0)
-		draw_line(Vector2(810, 433), Vector2(851, 433), Color("#a4f0c4"), 4.0)
+		draw_rect(Rect2(790, 296, 80, 144), Palette.STEEL, false, 3.0)
+		draw_line(Vector2(810, 433), Vector2(851, 433), Palette.GREEN, 4.0)
 
 
 func _draw_machine_lights() -> void:
@@ -152,8 +158,8 @@ func _draw_machine_lights() -> void:
 
 
 func _purge_light_color() -> Color:
-	return Color("#a4f0c4") if purge_trace_preserved else Color("#d86b70")
+	return Palette.GREEN if purge_trace_preserved else Color("#d86b70")
 
 
 func _mirror_light_color() -> Color:
-	return Color("#a4f0c4") if mirror_trace_preserved else Color("#73b9d2")
+	return Palette.GREEN if mirror_trace_preserved else Color("#73b9d2")

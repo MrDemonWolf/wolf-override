@@ -6,6 +6,7 @@ extends SceneTree
 const GAME_SCENE: PackedScene = preload("res://scenes/main.tscn")
 const State = preload("res://scripts/m0_state.gd")
 const Main = preload("res://scripts/main.gd")
+const Suite = preload("res://tests/support/game_suite.gd")
 ## Physics frames given to WOLF to reach his spot and stop.
 const SETTLE_FRAMES: int = 150
 
@@ -262,8 +263,8 @@ func _check_label_edges(game: Node2D, human: M0Actor, labels: Array[Label], room
 ## at a machine is in front of everything on it. (The door's placard rides over the bulkhead's front
 ## pillar, above head height.)
 func _check_draw_order(game: Node2D, human: M0Actor, wolf: M0Actor) -> void:
-	var actor_z: int = _effective_z(human)
-	_expect(actor_z == _effective_z(wolf), "both actors draw at one depth")
+	var actor_z: int = Suite.drawn_z(human)
+	_expect(actor_z == Suite.drawn_z(wolf), "both actors draw at one depth")
 	var room: JunctionRoom = game.get("junction_room") as JunctionRoom
 	var records: RecordsRoom = game.get("records_room") as RecordsRoom
 	var bypass: BypassHandle = game.get("bypass_handle") as BypassHandle
@@ -275,20 +276,9 @@ func _check_draw_order(game: Node2D, human: M0Actor, wolf: M0Actor) -> void:
 			parts.append(label)
 	var over: Array[String] = []
 	for part: CanvasItem in parts:
-		if _effective_z(part) >= actor_z:
-			over.append("%s (z %d)" % [part.name, _effective_z(part)])
+		if Suite.drawn_z(part) >= actor_z:
+			over.append("%s (z %d)" % [part.name, Suite.drawn_z(part)])
 	_expect(over.is_empty(), "every machine's light, glow and plate draws under the actors (over: %s)" % ", ".join(over))
-
-
-func _effective_z(item: CanvasItem) -> int:
-	var z: int = 0
-	var node: Node = item
-	while node is CanvasItem:
-		z += (node as CanvasItem).z_index
-		if not (node as CanvasItem).z_as_relative:
-			break
-		node = node.get_parent()
-	return z
 
 
 ## WOLF_REACH and HUMAN_REACH must cover the visible art, or FOLLOW_GAP would not keep them apart.
