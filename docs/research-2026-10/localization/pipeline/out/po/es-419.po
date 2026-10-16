@@ -1,0 +1,64 @@
+msgid ""
+msgstr ""
+"Content-Type: text/plain; charset=UTF-8\n"
+"Language: es-419\n"
+
+#. Button on the END OF SLICE card. Starts a fresh run. All caps in English by design.
+#: apps/game/scripts/main.gd:243 PLAY_AGAIN_TEXT
+msgid "PLAY AGAIN"
+msgstr "JUGAR DE NUEVO"
+
+#. Title-screen note when Continue has nothing to load. SAFE POINT is the in-world name of the save station (glossary term).
+#: apps/game/scripts/main.gd:184 NO_CHECKPOINT_NOTE
+msgid "No checkpoint yet. Saving starts at the first SAFE POINT."
+msgstr "Aún no hay punto de control. Se empieza a guardar en el primer PUNTO SEGURO."
+
+#. Context hint above the dialogue bar while the engineer cranks the manual bypass. 'E' is the bound key (rebindable; the key name is swapped in by code later). The two %d are turns done and turns needed, in that order.
+#: apps/game/scripts/main.gd:176 BYPASS_HOLD_OFFER_HINT
+msgid "HOLD E: crank on, %d of %d, or let WOLF take the relay."
+msgstr "MANTÉN E: sigue girando, %d de %d, o deja que WOLF se encargue del relé."
+
+#. Fail card after the sentry runs the engineer down. %s is the engineer's first name (Rowan, Alex or Morgan; any gender). TANK RELEASE is the station label the player can see (glossary term, must match L10). The line break is authored.
+#: apps/game/scripts/junction_room.gd:401 SENTRY_REASON
+msgid "The sentry saw %s out in the open.\nStay close to the TANK RELEASE."
+msgstr "El centinela vio a %s al descubierto.\nQuédate junto a SOLTAR TANQUE."
+
+#. Narration box when the engineer first pulls the manual bypass handle. Present tense, terse, physical.
+#: apps/game/scripts/main.gd:169 BYPASS_START_LINE
+msgid "The bypass handle is stiff. Coolant hisses from the relay housing and an alarm starts to wail."
+msgstr "La palanca del bypass está dura. Sale refrigerante silbando de la carcasa del relé y una alarma empieza a aullar."
+
+#. Opening cinematic caption. WOLF (a robotic wolf, he/him) wakes up on his own, without an order. The line break is authored.
+#: apps/game/scripts/main.gd:198 opening beat 3
+msgid "Nobody gives an activation command.\nWOLF wakes himself."
+msgstr "Nadie da una orden de activación.\nWOLF se despierta por sí mismo."
+
+#. WOLF speaks to the engineer at the breaker. 'his' is the Director. 'WOLF: ' is the speaker tag the dialogue splitter reads; it is not translated.
+#: apps/game/scripts/main.gd:163 STAKES_LINE
+msgid "WOLF: That purge takes the original program logs. Once they're gone, his word is the only record."
+msgstr "WOLF: Esa purga se lleva los registros originales del programa. Cuando ya no estén, su palabra será el único registro."
+
+#. WOLF refuses to lure the sentry because the engineer rushed him earlier at the relay. Calm, direct, not sulking. 'it' is the sentry; 'the release' is the TANK RELEASE station; 'the mark' is the floor spot under the tank.
+#: apps/game/scripts/main.gd:269 BAIT_NO_LINE
+msgid "WOLF: At the relay you'd have sent me in blind. I won't walk into its sights. Time the drop from the release; it crosses the mark on every pass."
+msgstr "WOLF: En el relé me habrías mandado a ciegas. No voy a meterme en su mira. Elige cuándo soltar desde el control; pasa por la marca en cada vuelta."
+
+#. End-card recap row. 'SENTRY' is the row's topic label, two spaces, then the summary. {name} is the engineer's first name (any gender; they/them in English). 'alone' must not reveal a gender.
+#: apps/game/scripts/main.gd:236 RECAP_LANE_REFUSED
+msgid "SENTRY  WOLF wouldn't draw it, so {name} timed the drop alone."
+msgstr "CENTINELA  WOLF no quiso atraerlo, así que {name} calculó la caída sin ayuda."
+
+#. Station plate over the lever that drops a coolant tank. 12 px caps on a small plate; must match the term used in L04.
+#: apps/game/scripts/junction_room.gd:793
+msgid "TANK RELEASE"
+msgstr "SOLTAR TANQUE"
+
+#. Answer button: the ENGINEER says this to WOLF, telling him the risk and letting him decide. Second person addresses WOLF.
+#: apps/game/scripts/m0_state.gd:21 disclose_risk
+msgid "The relay may vent coolant. Your call."
+msgstr "El relé podría soltar refrigerante. Tú decides."
+
+#. Narration after the sealed door blows. %s is the engineer's first name; the possessive must work with any name. The line break is authored.
+#: apps/game/scripts/main.gd:256 RUBBLE_LINE
+msgid "The door goes. WOLF falls back\nto wait for %s's call."
+msgstr "La puerta cede. WOLF retrocede\npara esperar la señal de %s."

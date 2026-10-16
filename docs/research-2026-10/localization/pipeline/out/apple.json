@@ -1,0 +1,766 @@
+{
+  "availability" : [
+    {
+      "reverseStatus" : "installed",
+      "status" : "installed",
+      "statusHighFidelity" : "installed",
+      "target" : "es"
+    },
+    {
+      "reverseStatus" : "installed",
+      "status" : "installed",
+      "statusHighFidelity" : "installed",
+      "target" : "es-419"
+    },
+    {
+      "reverseStatus" : "installed",
+      "status" : "installed",
+      "statusHighFidelity" : "installed",
+      "target" : "es-MX"
+    },
+    {
+      "reverseStatus" : "installed",
+      "status" : "installed",
+      "statusHighFidelity" : "installed",
+      "target" : "fr"
+    },
+    {
+      "reverseStatus" : "installed",
+      "status" : "installed",
+      "statusHighFidelity" : "installed",
+      "target" : "de"
+    },
+    {
+      "reverseStatus" : "installed",
+      "status" : "installed",
+      "statusHighFidelity" : "installed",
+      "target" : "it"
+    },
+    {
+      "reverseStatus" : "installed",
+      "status" : "installed",
+      "statusHighFidelity" : "installed",
+      "target" : "pt"
+    },
+    {
+      "reverseStatus" : "installed",
+      "status" : "installed",
+      "statusHighFidelity" : "installed",
+      "target" : "pt-BR"
+    },
+    {
+      "reverseStatus" : "installed",
+      "status" : "installed",
+      "statusHighFidelity" : "installed",
+      "target" : "pl"
+    },
+    {
+      "reverseStatus" : "installed",
+      "status" : "installed",
+      "statusHighFidelity" : "installed",
+      "target" : "ja"
+    },
+    {
+      "reverseStatus" : "installed",
+      "status" : "installed",
+      "statusHighFidelity" : "installed",
+      "target" : "ko"
+    },
+    {
+      "reverseStatus" : "installed",
+      "status" : "installed",
+      "statusHighFidelity" : "installed",
+      "target" : "zh"
+    },
+    {
+      "reverseStatus" : "installed",
+      "status" : "installed",
+      "statusHighFidelity" : "installed",
+      "target" : "zh-Hans"
+    },
+    {
+      "reverseStatus" : "installed",
+      "status" : "installed",
+      "statusHighFidelity" : "installed",
+      "target" : "zh-Hant"
+    },
+    {
+      "reverseStatus" : "installed",
+      "status" : "installed",
+      "statusHighFidelity" : "installed",
+      "target" : "ru"
+    },
+    {
+      "reverseStatus" : "installed",
+      "status" : "installed",
+      "statusHighFidelity" : "installed",
+      "target" : "uk"
+    },
+    {
+      "reverseStatus" : "installed",
+      "status" : "installed",
+      "statusHighFidelity" : "installed",
+      "target" : "tr"
+    },
+    {
+      "reverseStatus" : "installed",
+      "status" : "installed",
+      "statusHighFidelity" : "installed",
+      "target" : "nl"
+    }
+  ],
+  "backChecks" : [
+    {
+      "backTranslation" : "PLAY AGAIN",
+      "id" : "L01",
+      "target" : "es-419",
+      "translator" : "claude"
+    },
+    {
+      "backTranslation" : "There is no checkpoint yet. It is starting to be stored at the first SAFE POINT.",
+      "id" : "L02",
+      "target" : "es-419",
+      "translator" : "claude"
+    },
+    {
+      "backTranslation" : "KEEP E: keep spinning, %d of %d, or let WOLF take care of the relay.",
+      "id" : "L03",
+      "target" : "es-419",
+      "translator" : "claude"
+    },
+    {
+      "backTranslation" : "The sentinel saw %s exposed.\n\nStay next to RELEASE TANK.",
+      "id" : "L04",
+      "target" : "es-419",
+      "translator" : "claude"
+    },
+    {
+      "backTranslation" : "The bypass lever is hard. Refrigerant whistles out of the relay casing and an alarm starts howling.",
+      "id" : "L05",
+      "target" : "es-419",
+      "translator" : "claude"
+    },
+    {
+      "backTranslation" : "No one gives an activation order.\n\nWOLF wakes up on his own.",
+      "id" : "L06",
+      "target" : "es-419",
+      "translator" : "claude"
+    },
+    {
+      "backTranslation" : "WOLF: That purge takes the original records of the program. When they are no longer there, your word will be the only record.",
+      "id" : "L07",
+      "target" : "es-419",
+      "translator" : "claude"
+    },
+    {
+      "backTranslation" : "WOLF: You would have sent me blindly through the relay. I'm not going to get in his sights. Choose when to release from the control; pass through the mark on each lap.",
+      "id" : "L08",
+      "target" : "es-419",
+      "translator" : "claude"
+    },
+    {
+      "backTranslation" : "SENTINEL WOLF didn't want to attract him, so {name} calculated the fall without help.",
+      "id" : "L09",
+      "target" : "es-419",
+      "translator" : "claude"
+    },
+    {
+      "backTranslation" : "RELEASE TANK",
+      "id" : "L10",
+      "target" : "es-419",
+      "translator" : "claude"
+    },
+    {
+      "backTranslation" : "The relay could leak refrigerant. You decide.",
+      "id" : "L11",
+      "target" : "es-419",
+      "translator" : "claude"
+    },
+    {
+      "backTranslation" : "The door gives way. WOLF retreats\n\nto wait for the %s signal.",
+      "id" : "L12",
+      "target" : "es-419",
+      "translator" : "claude"
+    },
+    {
+      "backTranslation" : "PLAY AGAIN",
+      "id" : "L01",
+      "target" : "de",
+      "translator" : "claude"
+    },
+    {
+      "backTranslation" : "No checkpoint yet. It is saved from the first BACKUP POINT.",
+      "id" : "L02",
+      "target" : "de",
+      "translator" : "claude"
+    },
+    {
+      "backTranslation" : "E HOLD: continue cranking, %d of %d, or WOLF leave the relay.",
+      "id" : "L03",
+      "target" : "de",
+      "translator" : "claude"
+    },
+    {
+      "backTranslation" : "The guard discovered %s outdoors.\n\nStay close to the FUEL RELEASE.",
+      "id" : "L04",
+      "target" : "de",
+      "translator" : "claude"
+    },
+    {
+      "backTranslation" : "The bypass lever is stiff. Coolant squirms out of the relay housing, and an alarm begins to wail.",
+      "id" : "L05",
+      "target" : "de",
+      "translator" : "claude"
+    },
+    {
+      "backTranslation" : "No one gives an activation command.\n\nWOLF wakes himself up.",
+      "id" : "L06",
+      "target" : "de",
+      "translator" : "claude"
+    },
+    {
+      "backTranslation" : "WOLF: This deletion takes the original program protocols with it. If they are gone, his word is the only evidence.",
+      "id" : "L07",
+      "target" : "de",
+      "translator" : "claude"
+    },
+    {
+      "backTranslation" : "WOLF: At the relay you would have sent me in blind. I'm not going to get in his sights. Watch the release from the trigger; it goes over the marking on every lap.",
+      "id" : "L08",
+      "target" : "de",
+      "translator" : "claude"
+    },
+    {
+      "backTranslation" : "GUARD WOLFt want to lure him, so {name} took care of the throw-away alone.",
+      "id" : "L09",
+      "target" : "de",
+      "translator" : "claude"
+    },
+    {
+      "backTranslation" : "TANK TRIGGER",
+      "id" : "L10",
+      "target" : "de",
+      "translator" : "claude"
+    },
+    {
+      "backTranslation" : "The relay could be leaking coolant. Your decision.",
+      "id" : "L11",
+      "target" : "de",
+      "translator" : "claude"
+    },
+    {
+      "backTranslation" : "The door gives way. WOLF retreats.\n\nAnd waits for the sign of %s.",
+      "id" : "L12",
+      "target" : "de",
+      "translator" : "claude"
+    },
+    {
+      "backTranslation" : "Play again",
+      "id" : "L01",
+      "target" : "ja",
+      "translator" : "claude"
+    },
+    {
+      "backTranslation" : "There are no checkpoints yet. It will be saved from the first safe point.",
+      "id" : "L02",
+      "target" : "ja",
+      "translator" : "claude"
+    },
+    {
+      "backTranslation" : "Long press E: Keep turning the crank ( %d%d ) or let the relay be handled by WOLF.",
+      "id" : "L03",
+      "target" : "ja",
+      "translator" : "claude"
+    },
+    {
+      "backTranslation" : "I found %s who is in the place where the sentinel opened.\n\nDo not leave the side of the tank drop.",
+      "id" : "L04",
+      "target" : "ja",
+      "translator" : "claude"
+    },
+    {
+      "backTranslation" : "The bypass handle is stuck. Coolant sprays out of the relay housing with a hissing sound, and the alarm starts to sound.",
+      "id" : "L05",
+      "target" : "ja",
+      "translator" : "claude"
+    },
+    {
+      "backTranslation" : "No one has issued the startup command.\n\nWOLF wakes up himself.",
+      "id" : "L06",
+      "target" : "ja",
+      "translator" : "claude"
+    },
+    {
+      "backTranslation" : "WOLF: The original program log is deleted with that purge. If it's deleted, all that remains as a record is his words.",
+      "id" : "L07",
+      "target" : "ja",
+      "translator" : "claude"
+    },
+    {
+      "backTranslation" : "WOLF: When it was relay, it was a place where they let me go without telling me anything. Don't get caught in that beam. Figure out the timing to drop it from the tank drop. It passes through the mark every time it patrols.",
+      "id" : "L08",
+      "target" : "ja",
+      "translator" : "claude"
+    },
+    {
+      "backTranslation" : "Since Sentinel WOLF refused to guide, {name} calculated the timing of the drop alone.",
+      "id" : "L09",
+      "target" : "ja",
+      "translator" : "claude"
+    },
+    {
+      "backTranslation" : "Tank drop",
+      "id" : "L10",
+      "target" : "ja",
+      "translator" : "claude"
+    },
+    {
+      "backTranslation" : "Coolant may spray out from the relay. Leave the judgment to me.",
+      "id" : "L11",
+      "target" : "ja",
+      "translator" : "claude"
+    },
+    {
+      "backTranslation" : "The door blew away. WOLF went down behind,\n\nWaiting for the signal of %s.",
+      "id" : "L12",
+      "target" : "ja",
+      "translator" : "claude"
+    },
+    {
+      "backTranslation" : "PLAY AGAIN",
+      "id" : "L01",
+      "target" : "es-419",
+      "translator" : "codex"
+    },
+    {
+      "backTranslation" : "There is no checkpoint yet. It is saved from the first SAFE POINT.",
+      "id" : "L02",
+      "target" : "es-419",
+      "translator" : "codex"
+    },
+    {
+      "backTranslation" : "KEEP E: keep spinning, %d of %d, or leave the relay to WOLF.",
+      "id" : "L03",
+      "target" : "es-419",
+      "translator" : "codex"
+    },
+    {
+      "backTranslation" : "The sentinel saw %s exposed.\n\nStay close to RELEASE TANK.",
+      "id" : "L04",
+      "target" : "es-419",
+      "translator" : "codex"
+    },
+    {
+      "backTranslation" : "The bypass lever is hard. The refrigerant whistles when it comes out of the relay casing and an alarm starts howling.",
+      "id" : "L05",
+      "target" : "es-419",
+      "translator" : "codex"
+    },
+    {
+      "backTranslation" : "No one gives an activation order.\n\nWOLF wakes up on his own.",
+      "id" : "L06",
+      "target" : "es-419",
+      "translator" : "codex"
+    },
+    {
+      "backTranslation" : "WOLF: That purge erases the original records of the program. When they disappear, their word will be the only record.",
+      "id" : "L07",
+      "target" : "es-419",
+      "translator" : "codex"
+    },
+    {
+      "backTranslation" : "WOLF: You would have sent me blindly in the relay. I'm not going to get into his sights. Calculate when to release from RELEASE TANK; cross the mark on each pass.",
+      "id" : "L08",
+      "target" : "es-419",
+      "translator" : "codex"
+    },
+    {
+      "backTranslation" : "SENTINEL WOLF refused to attract him, so {name} calculated when to let go without help.",
+      "id" : "L09",
+      "target" : "es-419",
+      "translator" : "codex"
+    },
+    {
+      "backTranslation" : "RELEASE TANK",
+      "id" : "L10",
+      "target" : "es-419",
+      "translator" : "codex"
+    },
+    {
+      "backTranslation" : "The relay could release refrigerant. You decide.",
+      "id" : "L11",
+      "target" : "es-419",
+      "translator" : "codex"
+    },
+    {
+      "backTranslation" : "The door bursts open. WOLF steps back.\n\nto wait for the %s signal.",
+      "id" : "L12",
+      "target" : "es-419",
+      "translator" : "codex"
+    },
+    {
+      "backTranslation" : "PLAY AGAIN",
+      "id" : "L01",
+      "target" : "de",
+      "translator" : "codex"
+    },
+    {
+      "backTranslation" : "No checkpoint yet. It is saved from the first BACKUP POINT.",
+      "id" : "L02",
+      "target" : "de",
+      "translator" : "codex"
+    },
+    {
+      "backTranslation" : "HOLD E: Continue for a while, %d of %d, or hand over the relay to WOLF.",
+      "id" : "L03",
+      "target" : "de",
+      "translator" : "codex"
+    },
+    {
+      "backTranslation" : "The guard saw %s in the open.\n\nStay close to the FUEL RELEASE.",
+      "id" : "L04",
+      "target" : "de",
+      "translator" : "codex"
+    },
+    {
+      "backTranslation" : "The bypass lever jams. Coolant squirms out of the relay housing, and an alarm begins to wail.",
+      "id" : "L05",
+      "target" : "de",
+      "translator" : "codex"
+    },
+    {
+      "backTranslation" : "No one gives an activation command.\n\nWOLF wakes himself up.",
+      "id" : "L06",
+      "target" : "de",
+      "translator" : "codex"
+    },
+    {
+      "backTranslation" : "WOLF: This deletion destroys the original program protocols. Once they are gone, only his word remains as proof.",
+      "id" : "L07",
+      "target" : "de",
+      "translator" : "codex"
+    },
+    {
+      "backTranslation" : "WOLF: At the relay you would have sent me in blind. I'm not going to get in his sights. Watch the drop off at the TANK TRIGGER; it crosses the marking on every round.",
+      "id" : "L08",
+      "target" : "de",
+      "translator" : "codex"
+    },
+    {
+      "backTranslation" : "GUARD WOLFt want to lure him, so {name} caught the throw without help.",
+      "id" : "L09",
+      "target" : "de",
+      "translator" : "codex"
+    },
+    {
+      "backTranslation" : "TANK TRIGGER",
+      "id" : "L10",
+      "target" : "de",
+      "translator" : "codex"
+    },
+    {
+      "backTranslation" : "The relay could be leaking coolant. You decide.",
+      "id" : "L11",
+      "target" : "de",
+      "translator" : "codex"
+    },
+    {
+      "backTranslation" : "The door flies away. WOLF retreats.\n\nAnd is waiting for the signal from %s.",
+      "id" : "L12",
+      "target" : "de",
+      "translator" : "codex"
+    },
+    {
+      "backTranslation" : "Play again",
+      "id" : "L01",
+      "target" : "ja",
+      "translator" : "codex"
+    },
+    {
+      "backTranslation" : "There are no checkpoints yet. Start saving from the first safe point.",
+      "id" : "L02",
+      "target" : "ja",
+      "translator" : "codex"
+    },
+    {
+      "backTranslation" : "E long press: Turn the crank. %d%d. You can leave the relay to WOLF.",
+      "id" : "L03",
+      "target" : "ja",
+      "translator" : "codex"
+    },
+    {
+      "backTranslation" : "%s was found by the Sentinel in a place where he couldn't hide.\n\nLet's be near the tank drop.",
+      "id" : "L04",
+      "target" : "ja",
+      "translator" : "codex"
+    },
+    {
+      "backTranslation" : "The bypass handle is stiff. Coolant starts leaking from the relay housing with a sound, and the alarm begins to sound.",
+      "id" : "L05",
+      "target" : "ja",
+      "translator" : "codex"
+    },
+    {
+      "backTranslation" : "No one gives the startup command.\n\nWOLF wakes up himself.",
+      "id" : "L06",
+      "target" : "ja",
+      "translator" : "codex"
+    },
+    {
+      "backTranslation" : "WOLF: The original program log is deleted with that purge. If it is deleted, the records will only be the words of that man.",
+      "id" : "L07",
+      "target" : "ja",
+      "translator" : "codex"
+    },
+    {
+      "backTranslation" : "WOLF: In the relay, they were going to send me out without knowing the situation. I don't get into Sentinel's aim. Count the aircraft dropped with the tank drop. I pass through the mark every time I patrol.",
+      "id" : "L08",
+      "target" : "ja",
+      "translator" : "codex"
+    },
+    {
+      "backTranslation" : "Rejecting the invitation from Sentinel WOLF, {name} devised a plan to drop it alone.",
+      "id" : "L09",
+      "target" : "ja",
+      "translator" : "codex"
+    },
+    {
+      "backTranslation" : "Tank drop",
+      "id" : "L10",
+      "target" : "ja",
+      "translator" : "codex"
+    },
+    {
+      "backTranslation" : "Coolant may spray out from the relay. Leave the judgment to me.",
+      "id" : "L11",
+      "target" : "ja",
+      "translator" : "codex"
+    },
+    {
+      "backTranslation" : "The door blew away. WOLF stepped back.\n\nWaiting for the signal of %s.",
+      "id" : "L12",
+      "target" : "ja",
+      "translator" : "codex"
+    }
+  ],
+  "osVersion" : "Version 27.0.1 (Build 26A434)",
+  "probedAt" : "2026-10-16T08:30:44Z",
+  "trials" : [
+    {
+      "backTranslation" : "PLAY AGAIN",
+      "id" : "L01",
+      "target" : "es-419 (as es-419)",
+      "translation" : "JUEGA DE NUEVO"
+    },
+    {
+      "backTranslation" : "There is no checkpoint yet. The saved game starts at the first SAFE POINT.",
+      "id" : "L02",
+      "target" : "es-419 (as es-419)",
+      "translation" : "Aún no hay punto de control. La guardado comienza en el primer PUNTO SEGURO."
+    },
+    {
+      "backTranslation" : "KEEP E: give it a push, %d of %d, or let WOLF take over the relay.",
+      "id" : "L03",
+      "target" : "es-419 (as es-419)",
+      "translation" : "MANTENER E: darle marcha, %d de %d, o dejar que WOLF tome el relé."
+    },
+    {
+      "backTranslation" : "The sentinel saw %s exposed.\n\nStay close to the TANQUE LIBERATOR.",
+      "id" : "L04",
+      "target" : "es-419 (as es-419)",
+      "translation" : "El centinela vio %s al descubierto.\n\nMantente cerca del LIBERADOR DE TANQUE."
+    },
+    {
+      "backTranslation" : "The override handle is stiff. The refrigerant hisses from the relay socket and an alarm starts to sound.",
+      "id" : "L05",
+      "target" : "es-419 (as es-419)",
+      "translation" : "La manija de desvío está rígida. El refrigerante sisea desde el enchufe del relé y una alarma comienza a sonar."
+    },
+    {
+      "backTranslation" : "No one gives an activation command.\n\nWOLF wakes up.",
+      "id" : "L06",
+      "target" : "es-419 (as es-419)",
+      "translation" : "Nadie da un comando de activación.\n\nWOLF se despierta."
+    },
+    {
+      "backTranslation" : "WOLF: That purge deletes the original program records. Once they are lost, your word is the only record.",
+      "id" : "L07",
+      "target" : "es-419 (as es-419)",
+      "translation" : "WOLF: Esa purga elimina los registros originales del programa. Una vez que se pierden, su palabra es el único registro."
+    },
+    {
+      "backTranslation" : "WOLF: In the relay you would have sent me blindly. I won't get into his sights. Time for the descent from the launch; cross the line on every pass.",
+      "id" : "L08",
+      "target" : "es-419 (as es-419)",
+      "translation" : "WOLF: En el relevo me habrías enviado a ciegas. No entraré en su mira. Tiempo el descenso desde el lanzamiento; cruza la marca en cada pase."
+    },
+    {
+      "backTranslation" : "SENTRY WOLF wouldn't draw it, so {name} timed the descent alone.",
+      "id" : "L09",
+      "target" : "es-419 (as es-419)",
+      "translation" : "SENTRY WOLF no lo dibujaría, así que {name} cronometró el descenso solo."
+    },
+    {
+      "backTranslation" : "TANK LIBERATION",
+      "id" : "L10",
+      "target" : "es-419 (as es-419)",
+      "translation" : "LIBERACIÓN DEL TANQUE"
+    },
+    {
+      "backTranslation" : "The relay can release refrigerant. You decide.",
+      "id" : "L11",
+      "target" : "es-419 (as es-419)",
+      "translation" : "El relé puede liberar refrigerante. Tú decides."
+    },
+    {
+      "backTranslation" : "The door closes. WOLF stays behind.\n\nWait for the call from %s.",
+      "id" : "L12",
+      "target" : "es-419 (as es-419)",
+      "translation" : "La puerta se cierra. WOLF se queda atrás.\n\nesperar la llamada de %s."
+    },
+    {
+      "backTranslation" : "PLAY AGAIN",
+      "id" : "L01",
+      "target" : "de (as de)",
+      "translation" : "NOCH EINMAL SPIELEN"
+    },
+    {
+      "backTranslation" : "No checkpoint yet. Storage starts at the first SAFE POINT.",
+      "id" : "L02",
+      "target" : "de (as de)",
+      "translation" : "Noch kein Kontrollpunkt. Das Speichern beginnt am ersten SAFE POINT."
+    },
+    {
+      "backTranslation" : "HOLD E: turn on, %d of %d, or let WOLF take over the relay.",
+      "id" : "L03",
+      "target" : "de (as de)",
+      "translation" : "HALTEN SIE E: drehen Sie an, %d von %d, oder lassen Sie WOLF den Relais übernehmen."
+    },
+    {
+      "backTranslation" : "The guard looked %s openly exposed.\n\nStay near the FUEL CUT-OFF.",
+      "id" : "L04",
+      "target" : "de (as de)",
+      "translation" : "Der Wächter sah %s offen ausgesetzt.\n\nBleiben Sie in der Nähe der TANKFREISCHALTUNG."
+    },
+    {
+      "backTranslation" : "The bypass handle is stiff. Coolant is squirting out of the relay housing and an alarm begins to wail.",
+      "id" : "L05",
+      "target" : "de (as de)",
+      "translation" : "Der Umleitungsgriff ist steif. Kühlmittel zischt aus dem Relaisgehäuse und ein Alarm beginnt zu heulen."
+    },
+    {
+      "backTranslation" : "No one gives an activation command.\n\nWOLF wakes up.",
+      "id" : "L06",
+      "target" : "de (as de)",
+      "translation" : "Niemand gibt einen Aktivierungsbefehl.\n\nWOLF weckt sich auf."
+    },
+    {
+      "backTranslation" : "WOLF: This cleanup deletes the original program logs. Once they are gone, his word is the only evidence.",
+      "id" : "L07",
+      "target" : "de (as de)",
+      "translation" : "WOLF: Diese Säuberung löscht die ursprünglichen Programmprotokolle. Sobald sie verschwunden sind, ist sein Wort das einzige Nachweis."
+    },
+    {
+      "backTranslation" : "WOLF: When transferring, you would have sent me blindfolded. I will not run towards his goals. Time to step down from the release; he crosses the mark every time with every pass.",
+      "id" : "L08",
+      "target" : "de (as de)",
+      "translation" : "WOLF: Beim Übertragen hättest du mich blind geschickt. Ich werde nicht in seine Ziele laufen. Zeit den Abstieg von der Freigabe; er kreuzt jedes Mal die Marke bei jedem Pass."
+    },
+    {
+      "backTranslation" : "SENTRY WOLF wouldn't draw it, so {name} has the drop alone in line with current times.",
+      "id" : "L09",
+      "target" : "de (as de)",
+      "translation" : "SENTRY WOLF würde es nicht zeichnen, also hat {name} den Drop allein zeitgemessen."
+    },
+    {
+      "backTranslation" : "TANK DRAIN SWITCH",
+      "id" : "L10",
+      "target" : "de (as de)",
+      "translation" : "TANKFREISCHALTUNG"
+    },
+    {
+      "backTranslation" : "The relay can replace the coolant. Your decision.",
+      "id" : "L11",
+      "target" : "de (as de)",
+      "translation" : "Das Relais kann Kühlmittel austauschen. Ihre Entscheidung."
+    },
+    {
+      "backTranslation" : "The door goes. WOLF falls back\n\nWaiting for the call from %s.",
+      "id" : "L12",
+      "target" : "de (as de)",
+      "translation" : "Die Tür geht. WOLF fällt zurück\n\nAuf den Anruf von %s warten."
+    },
+    {
+      "backTranslation" : "Play again",
+      "id" : "L01",
+      "target" : "ja (as ja)",
+      "translation" : "もう一度プレイする"
+    },
+    {
+      "backTranslation" : "There are no checkpoints yet. Saving will start from the first SAFE POINT.",
+      "id" : "L02",
+      "target" : "ja (as ja)",
+      "translation" : "まだチェックポイントはありません。保存は最初のSAFE POINTから開始されます。"
+    },
+    {
+      "backTranslation" : "Press E: Turn the crank, %%d, or relay to WOLF.",
+      "id" : "L03",
+      "target" : "ja (as ja)",
+      "translation" : "Eを押す：クランクを回す、%%dの%d、またはWOLFにリレーを任せる。"
+    },
+    {
+      "backTranslation" : "The security guard saw %s naked.\n\nI am near Tankurilise.",
+      "id" : "L04",
+      "target" : "ja (as ja)",
+      "translation" : "警備員は%sが露わにいるのを見た。\n\nタンクリリーゼの近くにいます。"
+    },
+    {
+      "backTranslation" : "The bypass handle is hard. Coolant is hissing out of the relay housing, and the alarm starts to sound.",
+      "id" : "L05",
+      "target" : "ja (as ja)",
+      "translation" : "バイパスハンドルが硬いです。リレーハウジングから冷却液がヒスリッとしており、警報音が鳴り始めます。"
+    },
+    {
+      "backTranslation" : "No one is giving me the activation command.\n\nWOLF wakes himself up.",
+      "id" : "L06",
+      "target" : "ja (as ja)",
+      "translation" : "誰もアクティベーションコマンドを渡してくれません。\n\nWOLFは自分自身を起こす。"
+    },
+    {
+      "backTranslation" : "WOLF: That cleansing will delete the original program log. Once they are deleted, his words will be the only record.",
+      "id" : "L07",
+      "target" : "ja (as ja)",
+      "translation" : "WOLF: そのクレンジングは元のプログラムログを削除します。それらが消えると、彼の言葉が唯一の記録となります。"
+    },
+    {
+      "backTranslation" : "WOLF: In the relay, you were sending me blindfolded. I won't miss that target. I should time the fall from the release well. It will surpass the mark on every pass.",
+      "id" : "L08",
+      "target" : "ja (as ja)",
+      "translation" : "WOLF: リレーでは、あなたは私を盲目に送り込んでいたでしょう。私はその狙いを外しません。リリースからの落下をタイミングよく行うべきです。それはすべてのパスでマークを越えます。"
+    },
+    {
+      "backTranslation" : "Since SENTRY WOLF didn't draw it, {name} measured the timing of the drop alone.",
+      "id" : "L09",
+      "target" : "ja (as ja)",
+      "translation" : "SENTRY WOLFはそれを描かなかったので、{name}単独でドロップのタイミングを計った。"
+    },
+    {
+      "backTranslation" : "Tanky Lysine",
+      "id" : "L10",
+      "target" : "ja (as ja)",
+      "translation" : "タンクリリーゼ"
+    },
+    {
+      "backTranslation" : "The relay may be discharging the cooling liquid. Please consult.",
+      "id" : "L11",
+      "target" : "ja (as ja)",
+      "translation" : "リレーが冷却液を排出する可能性があります。ご相談ください。"
+    },
+    {
+      "backTranslation" : "The door closes. WOLF falls behind.\n\nWaiting for %s call.",
+      "id" : "L12",
+      "target" : "ja (as ja)",
+      "translation" : "ドアが閉まる。WOLFは後ろに倒れる。\n\n%sの電話を待つ。"
+    }
+  ]
+}

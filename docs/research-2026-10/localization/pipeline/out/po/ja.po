@@ -1,0 +1,64 @@
+msgid ""
+msgstr ""
+"Content-Type: text/plain; charset=UTF-8\n"
+"Language: ja\n"
+
+#. Button on the END OF SLICE card. Starts a fresh run. All caps in English by design.
+#: apps/game/scripts/main.gd:243 PLAY_AGAIN_TEXT
+msgid "PLAY AGAIN"
+msgstr "もう一度プレイ"
+
+#. Title-screen note when Continue has nothing to load. SAFE POINT is the in-world name of the save station (glossary term).
+#: apps/game/scripts/main.gd:184 NO_CHECKPOINT_NOTE
+msgid "No checkpoint yet. Saving starts at the first SAFE POINT."
+msgstr "チェックポイントはまだありません。最初のセーフポイントからセーブされます。"
+
+#. Context hint above the dialogue bar while the engineer cranks the manual bypass. 'E' is the bound key (rebindable; the key name is swapped in by code later). The two %d are turns done and turns needed, in that order.
+#: apps/game/scripts/main.gd:176 BYPASS_HOLD_OFFER_HINT
+msgid "HOLD E: crank on, %d of %d, or let WOLF take the relay."
+msgstr "Eを長押し：クランクを回し続ける（%d/%d）か、リレーをWOLFに任せる。"
+
+#. Fail card after the sentry runs the engineer down. %s is the engineer's first name (Rowan, Alex or Morgan; any gender). TANK RELEASE is the station label the player can see (glossary term, must match L10). The line break is authored.
+#: apps/game/scripts/junction_room.gd:401 SENTRY_REASON
+msgid "The sentry saw %s out in the open.\nStay close to the TANK RELEASE."
+msgstr "セントリーが開けた場所にいる%sを見つけた。\nタンク投下のそばを離れないこと。"
+
+#. Narration box when the engineer first pulls the manual bypass handle. Present tense, terse, physical.
+#: apps/game/scripts/main.gd:169 BYPASS_START_LINE
+msgid "The bypass handle is stiff. Coolant hisses from the relay housing and an alarm starts to wail."
+msgstr "バイパスハンドルが固い。リレーの筐体から冷却材がシューッと噴き出し、警報が鳴り始める。"
+
+#. Opening cinematic caption. WOLF (a robotic wolf, he/him) wakes up on his own, without an order. The line break is authored.
+#: apps/game/scripts/main.gd:198 opening beat 3
+msgid "Nobody gives an activation command.\nWOLF wakes himself."
+msgstr "起動命令は誰も出していない。\nWOLFは自ら目を覚ます。"
+
+#. WOLF speaks to the engineer at the breaker. 'his' is the Director. 'WOLF: ' is the speaker tag the dialogue splitter reads; it is not translated.
+#: apps/game/scripts/main.gd:163 STAKES_LINE
+msgid "WOLF: That purge takes the original program logs. Once they're gone, his word is the only record."
+msgstr "WOLF: あのパージで元のプログラムログが消える。消えたら、記録として残るのはあいつの言葉だけだ。"
+
+#. WOLF refuses to lure the sentry because the engineer rushed him earlier at the relay. Calm, direct, not sulking. 'it' is the sentry; 'the release' is the TANK RELEASE station; 'the mark' is the floor spot under the tank.
+#: apps/game/scripts/main.gd:269 BAIT_NO_LINE
+msgid "WOLF: At the relay you'd have sent me in blind. I won't walk into its sights. Time the drop from the release; it crosses the mark on every pass."
+msgstr "WOLF: リレーのときは、何も知らせずに俺を行かせるところだった。あれの射線には入らない。タンク投下から落とすタイミングを計れ。あれは巡回のたびにマークを通る。"
+
+#. End-card recap row. 'SENTRY' is the row's topic label, two spaces, then the summary. {name} is the engineer's first name (any gender; they/them in English). 'alone' must not reveal a gender.
+#: apps/game/scripts/main.gd:236 RECAP_LANE_REFUSED
+msgid "SENTRY  WOLF wouldn't draw it, so {name} timed the drop alone."
+msgstr "セントリー  WOLFが誘導を断ったので、{name}がひとりで投下のタイミングを計った。"
+
+#. Station plate over the lever that drops a coolant tank. 12 px caps on a small plate; must match the term used in L04.
+#: apps/game/scripts/junction_room.gd:793
+msgid "TANK RELEASE"
+msgstr "タンク投下"
+
+#. Answer button: the ENGINEER says this to WOLF, telling him the risk and letting him decide. Second person addresses WOLF.
+#: apps/game/scripts/m0_state.gd:21 disclose_risk
+msgid "The relay may vent coolant. Your call."
+msgstr "リレーから冷却材が噴き出すかもしれない。判断は任せる。"
+
+#. Narration after the sealed door blows. %s is the engineer's first name; the possessive must work with any name. The line break is authored.
+#: apps/game/scripts/main.gd:256 RUBBLE_LINE
+msgid "The door goes. WOLF falls back\nto wait for %s's call."
+msgstr "扉が吹き飛ぶ。WOLFは後ろに下がり、\n%sの合図を待つ。"

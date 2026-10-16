@@ -1,0 +1,31 @@
+msgid ""
+msgstr ""
+"Content-Type: text/plain; charset=UTF-8\n"
+"Language: es\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+msgid "HELLO"
+msgstr "Hola (es)"
+
+msgctxt "verb"
+msgid "Open"
+msgstr "Abrir"
+
+msgctxt "adjective"
+msgid "Open"
+msgstr "Abierto"
+
+#, fuzzy
+msgid "FUZZY ONE"
+msgstr "Debe ignorarse"
+
+msgid "Hello %s"
+msgstr "Hola %s"
+
+msgid "{name} keeps WOLF running."
+msgstr "{name} mantiene a WOLF en marcha."
+
+msgid "%d valve"
+msgid_plural "%d valves"
+msgstr[0] "%d válvula"
+msgstr[1] "%d válvulas"

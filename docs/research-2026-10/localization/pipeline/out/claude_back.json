@@ -1,0 +1,49 @@
+{
+  "_about": "Claude's literal back-translation of Codex's translations (each model back-translates the other's work, never its own). Literal on purpose: says what the text says, does not repair it.",
+  "back": {
+    "codex": {
+      "es-419": {
+        "L01": "PLAY AGAIN",
+        "L02": "There is no checkpoint yet. Saving happens from the first SAFE POINT.",
+        "L03": "HOLD E: keep turning, %d of %d, or leave the relay to WOLF.",
+        "L04": "The sentry saw %s out in the open.\nStay near RELEASE TANK.",
+        "L05": "The bypass lever is stiff. The coolant hisses as it comes out of the relay housing and an alarm starts to howl.",
+        "L06": "Nobody gives an activation order.\nWOLF wakes up by himself.",
+        "L07": "WOLF: That purge erases the program's original records. When they disappear, his/her/your word will be the only record.",
+        "L08": "WOLF: At the relay you would have sent me in blind. I'm not going to step into its sights. Work out when to drop from RELEASE TANK; it crosses the mark on every pass.",
+        "L09": "SENTRY  WOLF refused to lure it, so {name} worked out when to drop without help.",
+        "L10": "RELEASE TANK",
+        "L11": "The relay could release coolant. You decide.",
+        "L12": "The door bursts. WOLF backs off\nto wait for %s's signal."
+      },
+      "de": {
+        "L01": "PLAY AGAIN",
+        "L02": "No checkpoint yet. Saving happens from the first SAFEGUARD POINT.",
+        "L03": "HOLD E: Crank on, %d of %d, or leave the relay to WOLF.",
+        "L04": "The guard saw %s in the open.\nStay close to the TANK RELEASE.",
+        "L05": "The bypass lever is jammed. Coolant hisses out of the relay housing, and an alarm starts to howl.",
+        "L06": "Nobody gives an activation command.\nWOLF wakes himself.",
+        "L07": "WOLF: This deletion destroys the original program logs. Once they are gone, only his word is left as evidence.",
+        "L08": "WOLF: At the relay you would have sent me in blind. I won't run into its sights. Time the drop at the TANK RELEASE; it crosses the marking on every round.",
+        "L09": "GUARD  WOLF didn't want to lure it, so {name} timed the drop without help.",
+        "L10": "TANK RELEASE",
+        "L11": "The relay could vent coolant. You decide.",
+        "L12": "The door flies off. WOLF pulls back\nand waits for the signal from %s."
+      },
+      "ja": {
+        "L01": "Play once more",
+        "L02": "No checkpoint yet. Saving starts from the first SAFE POINT.",
+        "L03": "Hold E: turn the crank. %d/%d. You may also leave the relay to WOLF.",
+        "L04": "%s was found by the sentry in a place with no cover.\nLet's stay by the TANK DROP.",
+        "L05": "The bypass handle is stiff. Coolant leaks from the relay housing with a noise, and an alarm starts to ring.",
+        "L06": "Nobody issues an activation order.\nWOLF wakes up by himself.",
+        "L07": "WOLF: That purge makes the original program logs disappear. Once they disappear, the record becomes only that man's words.",
+        "L08": "WOLF: At the relay, you almost sent me in without knowing the situation. I won't enter the sentry's sights. Judge the moment of the drop at TANK DROP. It passes the mark on every patrol.",
+        "L09": "SENTRY  WOLF refused to lure it out, and {name} judged the moment of the drop alone.",
+        "L10": "TANK DROP",
+        "L11": "Coolant might burst out of the relay. I leave the judgment to you.",
+        "L12": "The door blows away. WOLF backs off\nand waits for %s's signal."
+      }
+    }
+  }
+}

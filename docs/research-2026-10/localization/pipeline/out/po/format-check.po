@@ -1,0 +1,12 @@
+msgid ""
+msgstr ""
+"Content-Type: text/plain; charset=UTF-8\n"
+"Language: ja\n"
+
+#, c-format
+msgid "HOLD E: crank on, %d of %d, or let WOLF take the relay."
+msgstr "Eを押す：クランクを回す、%%dの%d、またはWOLFにリレーを任せる。"
+
+#, python-brace-format
+msgid "SENTRY  WOLF wouldn't draw it, so {name} timed the drop alone."
+msgstr "セントリー  WOLFが誘導を断ったので、{nombre}がひとりで投下のタイミングを計った。"

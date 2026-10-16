@@ -1,0 +1,42 @@
+{
+  "_about": "Judged scores for the trial (meaning drift, WOLF's tone, engineer gender neutrality, placeholder/format safety, length). Judged by Claude (claude-opus-5-5), who is also translator (a): that is a conflict of interest, so the Claude column is cross-checked against Codex's independent back-translation and Apple's, and NO score here replaces a native speaker. Automated measures are in scores.json; this file lists only what a reader judged. Scale: issues counted per 12 lines; 'major' = a player would understand something different or the line is broken; 'minor' = right meaning, wrong nuance, register or term consistency.",
+  "summary": {
+    "claude": {
+      "es-419": {"major": 0, "minor": 3, "tone_ok": true, "gender_fail": 0, "format_fail": 0, "length_flags": ["L01 1.52x"]},
+      "de":     {"major": 0, "minor": 1, "tone_ok": true, "gender_fail": 0, "format_fail": 0, "length_flags": ["L01 1.64x", "L11 1.65x"]},
+      "ja":     {"major": 0, "minor": 1, "tone_ok": true, "gender_fail": 0, "format_fail": 0, "length_flags": ["needs a CJK font; width not measurable with game fonts"]}
+    },
+    "codex": {
+      "es-419": {"major": 0, "minor": 1, "tone_ok": true, "gender_fail": 0, "format_fail": 0, "length_flags": ["L01 1.52x"]},
+      "de":     {"major": 0, "minor": 3, "tone_ok": true, "gender_fail": 0, "format_fail": 0, "length_flags": ["L11 1.53x"]},
+      "ja":     {"major": 0, "minor": 1, "tone_ok": true, "gender_fail": 0, "format_fail": 0, "length_flags": ["needs a CJK font"]}
+    },
+    "apple": {
+      "es-419": {"major": 4, "minor": 4, "tone_ok": false, "gender_fail": 1, "format_fail": 4, "length_flags": ["L01 1.51x", "L10 1.69x"]},
+      "de":     {"major": 3, "minor": 5, "tone_ok": false, "gender_fail": 0, "format_fail": 4, "length_flags": ["L01 1.97x", "L03 1.61x", "L11 1.65x", "L10 1.50x"]},
+      "ja":     {"major": 6, "minor": 2, "tone_ok": false, "gender_fail": 0, "format_fail": 5, "length_flags": ["needs a CJK font"]}
+    }
+  },
+  "notes": {
+    "claude": [
+      "es-419 L07 'su palabra' reads as his / your(usted) / their: both back-translators (Codex: 'their word'; Apple: 'your word') caught it. Rule needed: disambiguate a third-person possessive when it is not the addressee.",
+      "es-419 L08 'desde el control' is vague where Codex used the glossary label SOLTAR TANQUE; L09 'la caída' (the fall) for 'the drop' is a slight drift.",
+      "de L08 'vom Auslöser' shortens the station name TANKAUSLÖSER; the glossary check missed it because 'the release' is not a listed term. Glossary must list short references to stations too.",
+      "ja L07 'あいつ' (that guy) for the Director is a register choice for Nathanial, not an error. WOLF's first-person pronoun (俺 vs 私 vs 僕) is likewise his decision.",
+      "es-419 L04 'Quédate junto a SOLTAR TANQUE': a verb-shaped station label makes the death-card sentence awkward. The glossary choice, not the translator, caused it; a noun label may read better."
+    ],
+    "codex": [
+      "es-419 L07 has the same 'su palabra' ambiguity as Claude.",
+      "de L05 'klemmt' (jams) for 'is stiff' changes what the player expects from the handle: caught by Claude's back-translation ('is jammed').",
+      "de L04 'im Offenen' is unidiomatic ('im Freien' / 'ungedeckt'); de L12 'Die Tür fliegt weg' reads slightly comic.",
+      "ja L02 'セーブ開始。' is clipped for a UI note; acceptable but terser than the rest of the UI."
+    ],
+    "apple": [
+      "Format: every authored \\n came back doubled (\\n\\n) in L04, L06, L12; the recap's two-space separator collapsed to one in L09; ja L03 corrupted a placeholder to '%%dの%d', which would throw at runtime when Godot formats it.",
+      "Meaning: 'draw it' (lure) became 'draw a picture' in all three languages (L09: dibujaría / zeichnen / 描かなかった); 'the door goes' became 'the door closes' (es, ja L12) and ja L12 'call' became a phone call (電話); ja L04 'out in the open' became 'naked' (露わ); ja L10 'タンクリリーゼ' is not a word; ja L11 'Your call' became 'please consult us'; de L11 'vent' became 'replace' (austauschen).",
+      "Gender: es-419 L09 '...cronometró el descenso solo' genders the engineer masculine, the exact failure the line was chosen to test.",
+      "Register: de uses formal 'Sie' in hints and the death card (L03, L04) where the style packet asks for 'du'; es L02 'La guardado' and L12 'esperar' are ungrammatical. Apple has no glossary, style or context input at all, which is why its terms drift (TANKFREISCHALTUNG, LIBERACIÓN DEL TANQUE).",
+      "As a back-translator Apple is noisy: 'WOLFt want' (its skip-translation span split a German verb), '判断は任せる' back as 'Leave the judgment to me' (inverted; the Japanese was right), and it adds pronouns Japanese never had ('where he couldn't hide'). Its round-trip of its OWN output scored the highest chrF (59.5 vs 51-52) while being the worst translation: a same-engine round trip confirms itself."
+    ]
+  }
+}

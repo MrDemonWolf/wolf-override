@@ -1,0 +1,6 @@
+; Scratch probe project for the WOLF//OVERRIDE i18n research (step research-godot). Not the game.
+config_version=5
+
+[application]
+
+config/name="i18n probe"

@@ -1,0 +1,371 @@
+{
+ "classes": {
+  "baked_art": {
+   "strings": 3,
+   "words": 6,
+   "unique_words": 6,
+   "dynamic": 0,
+   "gender_risk": 0,
+   "plural": 0,
+   "unique": 3
+  },
+  "changelog": {
+   "strings": 213,
+   "words": 13502,
+   "unique_words": 13502,
+   "dynamic": 0,
+   "gender_risk": 44,
+   "plural": 0,
+   "unique": 213
+  },
+  "changelog_screen": {
+   "strings": 7,
+   "words": 45,
+   "unique_words": 45,
+   "dynamic": 0,
+   "gender_risk": 0,
+   "plural": 0,
+   "unique": 7
+  },
+  "choice": {
+   "strings": 7,
+   "words": 36,
+   "unique_words": 36,
+   "dynamic": 1,
+   "gender_risk": 0,
+   "plural": 0,
+   "unique": 7
+  },
+  "credits": {
+   "strings": 1,
+   "words": 214,
+   "unique_words": 214,
+   "dynamic": 0,
+   "gender_risk": 0,
+   "plural": 0,
+   "unique": 1
+  },
+  "credits_screen": {
+   "strings": 7,
+   "words": 14,
+   "unique_words": 8,
+   "dynamic": 0,
+   "gender_risk": 0,
+   "plural": 0,
+   "unique": 4
+  },
+  "death_card": {
+   "strings": 10,
+   "words": 85,
+   "unique_words": 85,
+   "dynamic": 6,
+   "gender_risk": 5,
+   "plural": 0,
+   "unique": 10
+  },
+  "dialogue": {
+   "strings": 35,
+   "words": 463,
+   "unique_words": 463,
+   "dynamic": 14,
+   "gender_risk": 8,
+   "plural": 0,
+   "unique": 35
+  },
+  "end_card": {
+   "strings": 15,
+   "words": 103,
+   "unique_words": 103,
+   "dynamic": 8,
+   "gender_risk": 7,
+   "plural": 0,
+   "unique": 15
+  },
+  "engineer_name": {
+   "strings": 3,
+   "words": 6,
+   "unique_words": 6,
+   "dynamic": 0,
+   "gender_risk": 0,
+   "plural": 0,
+   "unique": 3
+  },
+  "hint": {
+   "strings": 75,
+   "words": 564,
+   "unique_words": 542,
+   "dynamic": 25,
+   "gender_risk": 1,
+   "plural": 1,
+   "unique": 70
+  },
+  "hud_button": {
+   "strings": 2,
+   "words": 2,
+   "unique_words": 1,
+   "dynamic": 0,
+   "gender_risk": 0,
+   "plural": 0,
+   "unique": 1
+  },
+  "input_action_name": {
+   "strings": 6,
+   "words": 11,
+   "unique_words": 11,
+   "dynamic": 0,
+   "gender_risk": 0,
+   "plural": 0,
+   "unique": 6
+  },
+  "input_name": {
+   "strings": 19,
+   "words": 22,
+   "unique_words": 21,
+   "dynamic": 12,
+   "gender_risk": 0,
+   "plural": 0,
+   "unique": 18
+  },
+  "narration": {
+   "strings": 47,
+   "words": 533,
+   "unique_words": 522,
+   "dynamic": 9,
+   "gender_risk": 4,
+   "plural": 1,
+   "unique": 46
+  },
+  "objective": {
+   "strings": 16,
+   "words": 51,
+   "unique_words": 48,
+   "dynamic": 0,
+   "gender_risk": 0,
+   "plural": 0,
+   "unique": 15
+  },
+  "opening": {
+   "strings": 7,
+   "words": 70,
+   "unique_words": 70,
+   "dynamic": 0,
+   "gender_risk": 0,
+   "plural": 0,
+   "unique": 7
+  },
+  "pause_menu": {
+   "strings": 11,
+   "words": 35,
+   "unique_words": 28,
+   "dynamic": 1,
+   "gender_risk": 0,
+   "plural": 0,
+   "unique": 9
+  },
+  "prompt_token": {
+   "strings": 12,
+   "words": 24,
+   "unique_words": 21,
+   "dynamic": 12,
+   "gender_risk": 0,
+   "plural": 0,
+   "unique": 9
+  },
+  "refusal": {
+   "strings": 10,
+   "words": 91,
+   "unique_words": 91,
+   "dynamic": 0,
+   "gender_risk": 0,
+   "plural": 0,
+   "unique": 10
+  },
+  "restore_line": {
+   "strings": 7,
+   "words": 80,
+   "unique_words": 80,
+   "dynamic": 1,
+   "gender_risk": 0,
+   "plural": 0,
+   "unique": 7
+  },
+  "settings": {
+   "strings": 53,
+   "words": 183,
+   "unique_words": 173,
+   "dynamic": 4,
+   "gender_risk": 0,
+   "plural": 0,
+   "unique": 51
+  },
+  "speaker_tag": {
+   "strings": 3,
+   "words": 4,
+   "unique_words": 4,
+   "dynamic": 0,
+   "gender_risk": 0,
+   "plural": 0,
+   "unique": 3
+  },
+  "station_label": {
+   "strings": 37,
+   "words": 68,
+   "unique_words": 55,
+   "dynamic": 1,
+   "gender_risk": 0,
+   "plural": 0,
+   "unique": 30
+  },
+  "studio_logo": {
+   "strings": 1,
+   "words": 2,
+   "unique_words": 2,
+   "dynamic": 0,
+   "gender_risk": 0,
+   "plural": 0,
+   "unique": 1
+  },
+  "system_message": {
+   "strings": 6,
+   "words": 41,
+   "unique_words": 41,
+   "dynamic": 2,
+   "gender_risk": 0,
+   "plural": 0,
+   "unique": 6
+  },
+  "title_menu": {
+   "strings": 15,
+   "words": 52,
+   "unique_words": 51,
+   "dynamic": 0,
+   "gender_risk": 0,
+   "plural": 0,
+   "unique": 14
+  },
+  "top_card": {
+   "strings": 6,
+   "words": 18,
+   "unique_words": 18,
+   "dynamic": 1,
+   "gender_risk": 1,
+   "plural": 0,
+   "unique": 6
+  },
+  "touch_ui": {
+   "strings": 7,
+   "words": 9,
+   "unique_words": 8,
+   "dynamic": 0,
+   "gender_risk": 0,
+   "plural": 0,
+   "unique": 6
+  },
+  "tutorial": {
+   "strings": 8,
+   "words": 27,
+   "unique_words": 27,
+   "dynamic": 4,
+   "gender_risk": 0,
+   "plural": 0,
+   "unique": 8
+  },
+  "window_title": {
+   "strings": 1,
+   "words": 1,
+   "unique_words": 1,
+   "dynamic": 0,
+   "gender_risk": 0,
+   "plural": 0,
+   "unique": 1
+  }
+ },
+ "in_scope_strings": 650,
+ "in_scope_unique": 613,
+ "in_scope_words": 16362,
+ "in_scope_unique_words": 16265,
+ "without_changelog": {
+  "strings": 437,
+  "unique": 400,
+  "unique_words": 2763
+ },
+ "debug_strings": 328,
+ "hidden_strings": 2,
+ "british_spellings": {
+  "centre": {
+   "count": 2,
+   "where": [
+    "apps/game/scripts/main.gd:277",
+    "apps/game/assets/changelog.txt:67"
+   ]
+  },
+  "licence": {
+   "count": 2,
+   "where": [
+    "apps/game/assets/changelog.txt:50",
+    "apps/game/assets/changelog.txt:171"
+   ]
+  },
+  "centred": {
+   "count": 2,
+   "where": [
+    "apps/game/assets/changelog.txt:101",
+    "apps/game/assets/changelog.txt:126"
+   ]
+  },
+  "cancelled": {
+   "count": 1,
+   "where": [
+    "apps/game/scripts/game_settings.gd:436"
+   ]
+  },
+  "neighbouring": {
+   "count": 1,
+   "where": [
+    "apps/game/assets/changelog.txt:15"
+   ]
+  },
+  "colour": {
+   "count": 1,
+   "where": [
+    "apps/game/assets/changelog.txt:23"
+   ]
+  },
+  "grey": {
+   "count": 1,
+   "where": [
+    "apps/game/assets/changelog.txt:94"
+   ]
+  }
+ },
+ "gender_lines": [
+  "apps/game/scripts/junction_room.gd:394 'The relief vent let go under %s. When the gauge peaks, stay off the grate.' -> pl,ru,uk",
+  "apps/game/scripts/junction_room.gd:395 'The door went with %s in front of it. When the fuse lights, back away past the valve.' -> pl,ru,uk",
+  "apps/game/scripts/junction_room.gd:401 'The sentry saw %s out in the open.\\nStay close to the TANK RELEASE.' -> pl,ru,uk",
+  "apps/game/scripts/junction_room.gd:402 'The sentry ran %s down. Once its\\neyes go red, only the rubble is safe.' -> pl,ru,uk",
+  "apps/game/scripts/junction_room.gd:403 'The coolant cloud caught %s. Let it clear before crossing the mark.' -> pl,ru,uk",
+  "apps/game/scripts/m0_state.gd:186 'WOLF: You said \"%s\"\\nI refused. You found another way. Next time, tell me what it costs.' -> pl,ru,uk",
+  "apps/game/scripts/m0_state.gd:188 'WOLF: You said \"%s\"\\nI chose the relay. We made it.' -> pl,ru,uk",
+  "apps/game/scripts/m0_state.gd:190 'WOLF: You said \"%s\"\\nI made my call. You cranked the bypass anyway. I stayed.' -> pl,ru,uk",
+  "apps/game/scripts/main.gd:171 'The handle holds where %s left it. The alarm keeps going.' -> pl,ru,uk",
+  "apps/game/scripts/main.gd:174 'HOLD E: crank it yourself, or let WOLF take the relay.' -> ru,uk,pl",
+  "apps/game/scripts/main.gd:230 'RELAY  {name} told WOLF the risk. WOLF took the live contact.' -> pl,ru,uk",
+  "apps/game/scripts/main.gd:231 'RELAY  {name} told WOLF the risk, then cranked the bypass anyway.' -> pl,ru,uk",
+  "apps/game/scripts/main.gd:232 'RELAY  {name} rushed WOLF. He refused, so {name} cranked the bypass.' -> pl,ru,uk",
+  "apps/game/scripts/main.gd:234 'MIRROR  {name} copied the timestamp through the maintenance port.' -> pl,ru,uk",
+  "apps/game/scripts/main.gd:236 \"SENTRY  WOLF wouldn't draw it, so {name} timed the drop alone.\" -> es,fr,it,pt,pl,ru,uk",
+  "apps/game/scripts/main.gd:237 'SENTRY  WOLF held back while {name} timed the drop.' -> pl,ru,uk",
+  "apps/game/scripts/main.gd:240 'SENTRY  WOLF broke off while {name} timed the drop.' -> pl,ru,uk",
+  "apps/game/scripts/main.gd:256 \"The door goes. WOLF falls back\\nto wait for %s's call.\" -> pl,ru,uk",
+  "apps/game/scripts/main.gd:258 \"WOLF: You told me the truth at the relay. I'll draw it onto the mark and keep clear of the\" -> pl,ru,uk",
+  "apps/game/scripts/main.gd:269 \"WOLF: At the relay you'd have sent me in blind. I won't walk into its sights. Time the dro\" -> pl,ru,uk",
+  "apps/game/scripts/main.gd:405 'The sentry stops and its eyes snap red.\\nIt has %s; get back over the rubble.' -> pl,ru,uk",
+  "apps/game/scripts/main.gd:406 'The sentry loses %s behind the rubble\\nand rolls back to its patrol.' -> pl,ru,uk",
+  "apps/game/scripts/main.gd:2344 \"WOLF: Thank you for telling me. I'll take the relay. Arm the breaker.\" -> pl,ru,uk",
+  "apps/game/scripts/main.gd:2480 'I took the relay because you told me the truth.' -> pl,ru,uk",
+  "apps/game/scripts/main.gd:2480 'I offered the relay; you cranked the bypass. Still with you.' -> pl,ru,uk",
+  "apps/game/scripts/main.gd:4407 '%s\\nMAINTENANCE ENGINEER' -> es,fr,it,pt,de,pl,ru,uk"
+ ],
+ "gender_changelog_lines": 44,
+ "unclassified": []
+}

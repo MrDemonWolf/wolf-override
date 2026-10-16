@@ -1,0 +1,27 @@
+16 games
+16 English
+16 French
+16 German
+15 Spanish - Spain
+15 Japanese
+15 Russian
+14 Italian
+14 Simplified Chinese
+13 Korean
+13 Portuguese - Brazil
+11 Traditional Chinese
+ 9 Polish
+ 7 Turkish
+ 6 Spanish - Latin America
+ 5 Portuguese - Portugal
+ 5 Dutch
+ 4 Danish
+ 4 Swedish
+ 3 Czech
+ 3 Hungarian
+ 3 Norwegian
+ 2 Arabic
+ 2 Ukrainian
+ 2 Finnish
+ 1 Greek
+ 1 Romanian

@@ -1,0 +1,118 @@
+{
+ "files": {
+  "tests/approved_wording_test.gd": {
+   "english_literals": 89,
+   "english_lines": 69,
+   "constant_refs": 11,
+   "expect_lines": 36
+  },
+  "tests/chapter_scene_test.gd": {
+   "english_literals": 20,
+   "english_lines": 20,
+   "constant_refs": 10,
+   "expect_lines": 22
+  },
+  "tests/companion_rules_test.gd": {
+   "english_literals": 6,
+   "english_lines": 3,
+   "constant_refs": 6,
+   "expect_lines": 0
+  },
+  "tests/crank_hold_test.gd": {
+   "english_literals": 2,
+   "english_lines": 1,
+   "constant_refs": 0,
+   "expect_lines": 1
+  },
+  "tests/debug_tools_test.gd": {
+   "english_literals": 19,
+   "english_lines": 15,
+   "constant_refs": 11,
+   "expect_lines": 16
+  },
+  "tests/follow_spacing_test.gd": {
+   "english_literals": 0,
+   "english_lines": 0,
+   "constant_refs": 2,
+   "expect_lines": 0
+  },
+  "tests/impact_test.gd": {
+   "english_literals": 5,
+   "english_lines": 4,
+   "constant_refs": 4,
+   "expect_lines": 6
+  },
+  "tests/junction_test.gd": {
+   "english_literals": 50,
+   "english_lines": 40,
+   "constant_refs": 6,
+   "expect_lines": 38
+  },
+  "tests/m0_scene_test.gd": {
+   "english_literals": 70,
+   "english_lines": 61,
+   "constant_refs": 20,
+   "expect_lines": 62
+  },
+  "tests/m0_state_test.gd": {
+   "english_literals": 2,
+   "english_lines": 1,
+   "constant_refs": 14,
+   "expect_lines": 6
+  },
+  "tests/room_depth_test.gd": {
+   "english_literals": 3,
+   "english_lines": 3,
+   "constant_refs": 0,
+   "expect_lines": 0
+  },
+  "tests/room_lights_test.gd": {
+   "english_literals": 2,
+   "english_lines": 2,
+   "constant_refs": 6,
+   "expect_lines": 2
+  },
+  "tests/sentry_test.gd": {
+   "english_literals": 67,
+   "english_lines": 48,
+   "constant_refs": 18,
+   "expect_lines": 50
+  },
+  "tests/settings_test.gd": {
+   "english_literals": 2,
+   "english_lines": 2,
+   "constant_refs": 1,
+   "expect_lines": 2
+  },
+  "tests/studio_logo_test.gd": {
+   "english_literals": 1,
+   "english_lines": 1,
+   "constant_refs": 0,
+   "expect_lines": 1
+  },
+  "tests/text_boxes_test.gd": {
+   "english_literals": 23,
+   "english_lines": 19,
+   "constant_refs": 18,
+   "expect_lines": 20
+  },
+  "tests/ui_controls_test.gd": {
+   "english_literals": 5,
+   "english_lines": 5,
+   "constant_refs": 4,
+   "expect_lines": 7
+  },
+  "tests/wolf_space_test.gd": {
+   "english_literals": 10,
+   "english_lines": 8,
+   "constant_refs": 1,
+   "expect_lines": 1
+  }
+ },
+ "totals": {
+  "english_literals": 376,
+  "english_lines": 302,
+  "constant_refs": 132,
+  "expect_lines": 270
+ }
+}

@@ -1,0 +1,92 @@
+{
+  "translations": {
+    "es-419": {
+      "L01": "JUGAR DE NUEVO",
+      "L02": "Aún no hay punto de control. Se guarda desde el primer PUNTO SEGURO.",
+      "L03": "MANTÉN E: sigue girando, %d de %d, o deja el relé a WOLF.",
+      "L04": "El centinela vio a %s al descubierto.\nQuédate cerca de SOLTAR TANQUE.",
+      "L05": "La palanca del bypass está dura. El refrigerante silba al salir de la carcasa del relé y una alarma empieza a aullar.",
+      "L06": "Nadie da una orden de activación.\nWOLF despierta por sí mismo.",
+      "L07": "WOLF: Esa purga borra los registros originales del programa. Cuando desaparezcan, su palabra será el único registro.",
+      "L08": "WOLF: En el relé me habrías enviado a ciegas. No voy a entrar en su mira. Calcula cuándo soltar desde SOLTAR TANQUE; cruza la marca en cada pasada.",
+      "L09": "CENTINELA  WOLF se negó a atraerlo, así que {name} calculó cuándo soltar sin ayuda.",
+      "L10": "SOLTAR TANQUE",
+      "L11": "El relé podría liberar refrigerante. Tú decides.",
+      "L12": "La puerta revienta. WOLF retrocede\npara esperar la señal de %s."
+    },
+    "de": {
+      "L01": "ERNEUT SPIELEN",
+      "L02": "Noch kein Checkpoint. Gespeichert wird ab dem ersten SICHERUNGSPUNKT.",
+      "L03": "HALTE E: Kurble weiter, %d von %d, oder überlass WOLF das Relais.",
+      "L04": "Der Wächter hat %s im Offenen gesehen.\nBleib nah am TANKAUSLÖSER.",
+      "L05": "Der Bypass-Hebel klemmt. Kühlmittel zischt aus dem Relaisgehäuse, und ein Alarm beginnt zu heulen.",
+      "L06": "Niemand gibt einen Aktivierungsbefehl.\nWOLF weckt sich selbst.",
+      "L07": "WOLF: Diese Löschung vernichtet die ursprünglichen Programmprotokolle. Sind sie weg, bleibt nur sein Wort als Beleg.",
+      "L08": "WOLF: Am Relais hättest du mich blind reingeschickt. Ich laufe ihm nicht ins Visier. Pass den Abwurf am TANKAUSLÖSER ab; er überquert die Markierung bei jeder Runde.",
+      "L09": "WÄCHTER  WOLF wollte ihn nicht anlocken, also passte {name} den Abwurf ohne Hilfe ab.",
+      "L10": "TANKAUSLÖSER",
+      "L11": "Das Relais könnte Kühlmittel ablassen. Du entscheidest.",
+      "L12": "Die Tür fliegt weg. WOLF zieht sich zurück\nund wartet auf das Signal von %s."
+    },
+    "ja": {
+      "L01": "もう一度プレイ",
+      "L02": "チェックポイントはまだない。最初のセーフポイントからセーブ開始。",
+      "L03": "E長押し：クランクを回す。%d/%d。リレーをWOLFに任せてもいい。",
+      "L04": "身を隠せない場所で%sがセントリーに見つかった。\nタンク投下のそばにいよう。",
+      "L05": "バイパスのハンドルが固い。リレーの筐体から冷却材が音を立てて漏れ、警報が鳴り始める。",
+      "L06": "誰も起動命令を出さない。\nWOLFは自ら目を覚ます。",
+      "L07": "WOLF: あのパージで元のプログラムログが消える。消えれば、記録はあの男の言葉だけになる。",
+      "L08": "WOLF: リレーでは、状況も知らないまま俺を送り込むところだった。セントリーの照準には入らない。タンク投下で投下の機を計れ。巡回のたびにマークを通る。",
+      "L09": "セントリー  WOLFが誘い出すのを断り、{name}がひとりで投下の機を計った。",
+      "L10": "タンク投下",
+      "L11": "リレーから冷却材が噴き出すかもしれない。判断は任せる。",
+      "L12": "扉が吹き飛ぶ。WOLFは後退し\n%sの合図を待つ。"
+    }
+  },
+  "back": {
+    "claude": {
+      "es-419": {
+        "L01": "PLAY AGAIN",
+        "L02": "There is no checkpoint yet. Saving begins at the first SAFE POINT.",
+        "L03": "HOLD E: keep turning, %d of %d, or let WOLF take care of the relay.",
+        "L04": "The sentry saw %s exposed.\nStay next to RELEASE TANK.",
+        "L05": "The bypass lever is stiff. Coolant comes out hissing from the relay housing and an alarm begins to howl.",
+        "L06": "Nobody gives an activation order.\nWOLF wakes up by himself.",
+        "L07": "WOLF: That purge takes away the original program records. When they are no longer there, their word will be the only record.",
+        "L08": "WOLF: At the relay you would have sent me in blind. I'm not going to get into its sights. Choose when to release from the control; it passes over the mark on every circuit.",
+        "L09": "SENTRY  WOLF did not want to lure it, so {name} calculated the fall without help.",
+        "L10": "RELEASE TANK",
+        "L11": "The relay could release coolant. You decide.",
+        "L12": "The door gives way. WOLF backs away\nto wait for the signal from %s."
+      },
+      "de": {
+        "L01": "PLAY AGAIN",
+        "L02": "No checkpoint yet. Saving takes place from the first SAVE POINT onward.",
+        "L03": "HOLD E: keep cranking, %d of %d, or leave the relay to WOLF.",
+        "L04": "The guard spotted %s outdoors.\nStay close to the TANK RELEASE.",
+        "L05": "The bypass lever is stiff to operate. Coolant hisses out of the relay housing, and an alarm begins to howl.",
+        "L06": "Nobody gives an activation command.\nWOLF wakes himself up.",
+        "L07": "WOLF: This deletion takes the original program logs with it. Once they are gone, his word is the only evidence.",
+        "L08": "WOLF: At the relay you would have sent me in blind. I won't walk into its sights. Time the drop from the release; it drives over the mark on every circuit.",
+        "L09": "GUARD  WOLF did not want to lure it, so {name} timed the drop alone.",
+        "L10": "TANK RELEASE",
+        "L11": "The relay could discharge coolant. Your decision.",
+        "L12": "The door gives way. WOLF withdraws\nand waits for the sign from %s."
+      },
+      "ja": {
+        "L01": "Play again",
+        "L02": "There is no checkpoint yet. Saving takes place from the first safe point onward.",
+        "L03": "Hold E: keep turning the crank (%d/%d), or leave the relay to WOLF.",
+        "L04": "The sentry found %s in an open area.\nDo not leave the vicinity of tank drop.",
+        "L05": "The bypass handle is stiff. Coolant spurts out of the relay housing with a hiss, and an alarm begins to sound.",
+        "L06": "Nobody has issued an activation command.\nWOLF wakes of his own accord.",
+        "L07": "WOLF: That purge will erase the original program logs. Once they disappear, the only thing left as a record will be that guy's words.",
+        "L08": "WOLF: Back at the relay, you were about to make me go without telling me anything. I won't enter that thing's line of fire. Gauge the timing for dropping it from tank drop. That thing passes the mark on every patrol.",
+        "L09": "Sentry  WOLF refused to guide it, so {name} gauged the timing of the drop alone.",
+        "L10": "Tank drop",
+        "L11": "Coolant may spurt out of the relay. I'll leave the judgment to you.",
+        "L12": "The door blows away. WOLF steps back,\nand waits for the signal from %s."
+      }
+    }
+  }
+}

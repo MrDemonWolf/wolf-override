@@ -1,0 +1,9 @@
+CSV import results (scratch export of origin/main 1cf8d73, Godot 4.7.2):
+  probe_ctx.es.translation: Translation, 439 bytes
+  probe.es.translation: OptimizedTranslation, 495 bytes
+  probe.ja.translation: OptimizedTranslation, 515 bytes
+pck size bytes: 29907556
+subset (hb-subset 14.6.0 of /System/Library/Fonts/Hiragino Sans GB.ttc face 0, measurement only, not shippable): sample 13 hanzi+ASCII = 27356 bytes; GB2312 level-1 3755 hanzi+punct+ASCII = 1375388 bytes; source ttc = 23510656 bytes (2 faces)
+extraction counts (game.pot): 75 distinct game msgids with 78 source locations (41 in scenes/main.tscn + studio_logo.tscn, 37 in scripts: literal assignments to .text/.tooltip_text and add_item-style calls); plus 10 entries from i18n_probe/sample_tr.gd
+grep: string literal occurrences in scripts/**/*.gd = 3171, distinct = 1483, distinct prose-like (letter + space) = 569; scene text/title props = 44; tr()/tr_n()/atr() calls in game scripts = 0
+strings-step extract_literals.py (run in place) excluding tests/: 3121 literals (3077 gd, 44 tscn), 1486 distinct; plain String literals 2449, 1391 distinct

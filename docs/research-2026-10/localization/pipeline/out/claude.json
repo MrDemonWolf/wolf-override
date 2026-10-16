@@ -1,0 +1,48 @@
+{
+  "_about": "Option (a): Claude (claude-opus-5-5, this research step's agent) translating with style_packet.md, glossary.json and the per-line context in lines.json. Samples for proof only.",
+  "translator": "claude-opus-5-5",
+  "translations": {
+    "es-419": {
+      "L01": "JUGAR DE NUEVO",
+      "L02": "Aún no hay punto de control. Se empieza a guardar en el primer PUNTO SEGURO.",
+      "L03": "MANTÉN E: sigue girando, %d de %d, o deja que WOLF se encargue del relé.",
+      "L04": "El centinela vio a %s al descubierto.\nQuédate junto a SOLTAR TANQUE.",
+      "L05": "La palanca del bypass está dura. Sale refrigerante silbando de la carcasa del relé y una alarma empieza a aullar.",
+      "L06": "Nadie da una orden de activación.\nWOLF se despierta por sí mismo.",
+      "L07": "WOLF: Esa purga se lleva los registros originales del programa. Cuando ya no estén, su palabra será el único registro.",
+      "L08": "WOLF: En el relé me habrías mandado a ciegas. No voy a meterme en su mira. Elige cuándo soltar desde el control; pasa por la marca en cada vuelta.",
+      "L09": "CENTINELA  WOLF no quiso atraerlo, así que {name} calculó la caída sin ayuda.",
+      "L10": "SOLTAR TANQUE",
+      "L11": "El relé podría soltar refrigerante. Tú decides.",
+      "L12": "La puerta cede. WOLF retrocede\npara esperar la señal de %s."
+    },
+    "de": {
+      "L01": "NOCHMAL SPIELEN",
+      "L02": "Noch kein Checkpoint. Gespeichert wird ab dem ersten SICHERUNGSPUNKT.",
+      "L03": "E HALTEN: weiterkurbeln, %d von %d, oder WOLF das Relais überlassen.",
+      "L04": "Der Wächter hat %s im Freien entdeckt.\nBleib nah am TANKAUSLÖSER.",
+      "L05": "Der Bypass-Hebel ist schwergängig. Aus dem Relaisgehäuse zischt Kühlmittel, und ein Alarm beginnt zu heulen.",
+      "L06": "Niemand gibt einen Aktivierungsbefehl.\nWOLF weckt sich selbst.",
+      "L07": "WOLF: Diese Löschung nimmt die ursprünglichen Programmprotokolle mit. Sind sie weg, ist sein Wort der einzige Beleg.",
+      "L08": "WOLF: Am Relais hättest du mich blind reingeschickt. Ich laufe ihm nicht ins Visier. Pass den Abwurf vom Auslöser aus ab; er fährt bei jeder Runde über die Markierung.",
+      "L09": "WÄCHTER  WOLF wollte ihn nicht locken, also hat {name} den Abwurf allein abgepasst.",
+      "L10": "TANKAUSLÖSER",
+      "L11": "Das Relais könnte Kühlmittel ablassen. Deine Entscheidung.",
+      "L12": "Die Tür gibt nach. WOLF zieht sich zurück\nund wartet auf das Zeichen von %s."
+    },
+    "ja": {
+      "L01": "もう一度プレイ",
+      "L02": "チェックポイントはまだありません。最初のセーフポイントからセーブされます。",
+      "L03": "Eを長押し：クランクを回し続ける（%d/%d）か、リレーをWOLFに任せる。",
+      "L04": "セントリーが開けた場所にいる%sを見つけた。\nタンク投下のそばを離れないこと。",
+      "L05": "バイパスハンドルが固い。リレーの筐体から冷却材がシューッと噴き出し、警報が鳴り始める。",
+      "L06": "起動命令は誰も出していない。\nWOLFは自ら目を覚ます。",
+      "L07": "WOLF: あのパージで元のプログラムログが消える。消えたら、記録として残るのはあいつの言葉だけだ。",
+      "L08": "WOLF: リレーのときは、何も知らせずに俺を行かせるところだった。あれの射線には入らない。タンク投下から落とすタイミングを計れ。あれは巡回のたびにマークを通る。",
+      "L09": "セントリー  WOLFが誘導を断ったので、{name}がひとりで投下のタイミングを計った。",
+      "L10": "タンク投下",
+      "L11": "リレーから冷却材が噴き出すかもしれない。判断は任せる。",
+      "L12": "扉が吹き飛ぶ。WOLFは後ろに下がり、\n%sの合図を待つ。"
+    }
+  }
+}

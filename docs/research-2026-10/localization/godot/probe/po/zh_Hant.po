@@ -1,0 +1,8 @@
+msgid ""
+msgstr ""
+"Content-Type: text/plain; charset=UTF-8\n"
+"Language: zh_Hant\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+
+msgid "HELLO"
+msgstr "你好 (zh_Hant)"

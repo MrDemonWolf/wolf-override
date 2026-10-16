@@ -1,0 +1,1536 @@
+{
+ "es-419": {
+  "claude": {
+   "L01": {
+    "placeholders_ok": true,
+    "wolf_ok": true,
+    "tag_ok": true,
+    "breaks_ok": true,
+    "char_ratio": 1.4,
+    "glossary_missing": [],
+    "missing_glyphs": "",
+    "width_ratio_est": 1.52,
+    "drift_chrf": {
+     "apple": 100.0,
+     "codex": 100.0
+    }
+   },
+   "L02": {
+    "placeholders_ok": true,
+    "wolf_ok": true,
+    "tag_ok": true,
+    "breaks_ok": true,
+    "char_ratio": 1.33,
+    "glossary_missing": [],
+    "missing_glyphs": "",
+    "width_ratio_est": 1.43,
+    "drift_chrf": {
+     "apple": 70.8,
+     "codex": 81.9
+    }
+   },
+   "L03": {
+    "placeholders_ok": true,
+    "wolf_ok": true,
+    "tag_ok": true,
+    "breaks_ok": true,
+    "char_ratio": 1.31,
+    "glossary_missing": [],
+    "missing_glyphs": "",
+    "width_ratio_est": 1.38,
+    "drift_chrf": {
+     "apple": 62.0,
+     "codex": 69.3
+    }
+   },
+   "L04": {
+    "placeholders_ok": true,
+    "wolf_ok": true,
+    "tag_ok": true,
+    "breaks_ok": true,
+    "char_ratio": 1.03,
+    "glossary_missing": [],
+    "missing_glyphs": "",
+    "width_ratio_est": 1.03,
+    "drift_chrf": {
+     "apple": 39.9,
+     "codex": 48.7
+    }
+   },
+   "L05": {
+    "placeholders_ok": true,
+    "wolf_ok": true,
+    "tag_ok": true,
+    "breaks_ok": true,
+    "char_ratio": 1.2,
+    "glossary_missing": [],
+    "missing_glyphs": "",
+    "width_ratio_est": 1.21,
+    "drift_chrf": {
+     "apple": 49.7,
+     "codex": 66.5
+    }
+   },
+   "L06": {
+    "placeholders_ok": true,
+    "wolf_ok": true,
+    "tag_ok": true,
+    "breaks_ok": true,
+    "char_ratio": 1.18,
+    "glossary_missing": [],
+    "missing_glyphs": "",
+    "width_ratio_est": 0.89,
+    "drift_chrf": {
+     "apple": 52.0,
+     "codex": 73.9
+    }
+   },
+   "L07": {
+    "placeholders_ok": true,
+    "wolf_ok": true,
+    "tag_ok": true,
+    "breaks_ok": true,
+    "char_ratio": 1.22,
+    "glossary_missing": [],
+    "missing_glyphs": "",
+    "width_ratio_est": 1.21,
+    "drift_chrf": {
+     "apple": 61.0,
+     "codex": 61.4
+    }
+   },
+   "L08": {
+    "placeholders_ok": true,
+    "wolf_ok": true,
+    "tag_ok": true,
+    "breaks_ok": true,
+    "char_ratio": 1.01,
+    "glossary_missing": [],
+    "missing_glyphs": "",
+    "width_ratio_est": 1.06,
+    "drift_chrf": {
+     "apple": 45.1,
+     "codex": 62.1
+    }
+   },
+   "L09": {
+    "placeholders_ok": true,
+    "wolf_ok": true,
+    "tag_ok": true,
+    "breaks_ok": true,
+    "char_ratio": 1.24,
+    "glossary_missing": [],
+    "missing_glyphs": "",
+    "width_ratio_est": 1.22,
+    "drift_chrf": {
+     "apple": 35.5,
+     "codex": 44.0
+    }
+   },
+   "L10": {
+    "placeholders_ok": true,
+    "wolf_ok": true,
+    "tag_ok": true,
+    "breaks_ok": true,
+    "char_ratio": 1.08,
+    "glossary_missing": [],
+    "missing_glyphs": "",
+    "width_ratio_est": 1.12,
+    "drift_chrf": {
+     "apple": 67.7,
+     "codex": 67.7
+    }
+   },
+   "L11": {
+    "placeholders_ok": true,
+    "wolf_ok": true,
+    "tag_ok": true,
+    "breaks_ok": true,
+    "char_ratio": 1.24,
+    "glossary_missing": [],
+    "missing_glyphs": "",
+    "width_ratio_est": 1.19,
+    "drift_chrf": {
+     "apple": 36.9,
+     "codex": 48.6
+    }
+   },
+   "L12": {
+    "placeholders_ok": true,
+    "wolf_ok": true,
+    "tag_ok": true,
+    "breaks_ok": true,
+    "char_ratio": 1.11,
+    "glossary_missing": [],
+    "missing_glyphs": "",
+    "width_ratio_est": 1.01,
+    "drift_chrf": {
+     "apple": 41.3,
+     "codex": 44.6
+    }
+   }
+  },
+  "codex": {
+   "L01": {
+    "placeholders_ok": true,
+    "wolf_ok": true,
+    "tag_ok": true,
+    "breaks_ok": true,
+    "char_ratio": 1.4,
+    "glossary_missing": [],
+    "missing_glyphs": "",
+    "width_ratio_est": 1.52,
+    "drift_chrf": {
+     "apple": 100.0,
+     "claude": 100.0
+    }
+   },
+   "L02": {
+    "placeholders_ok": true,
+    "wolf_ok": true,
+    "tag_ok": true,
+    "breaks_ok": true,
+    "char_ratio": 1.19,
+    "glossary_missing": [],
+    "missing_glyphs": "",
+    "width_ratio_est": 1.29,
+    "drift_chrf": {
+     "apple": 66.0,
+     "claude": 75.2
+    }
+   },
+   "L03": {
+    "placeholders_ok": true,
+    "wolf_ok": true,
+    "tag_ok": true,
+    "breaks_ok": true,
+    "char_ratio": 1.04,
+    "glossary_missing": [],
+    "missing_glyphs": "",
+    "width_ratio_est": 1.08,
+    "drift_chrf": {
+     "apple": 46.7,
+     "claude": 54.5
+    }
+   },
+   "L04": {
+    "placeholders_ok": true,
+    "wolf_ok": true,
+    "tag_ok": true,
+    "breaks_ok": true,
+    "char_ratio": 1.05,
+    "glossary_missing": [],
+    "missing_glyphs": "",
+    "width_ratio_est": 1.05,
+    "drift_chrf": {
+     "apple": 49.8,
+     "claude": 72.9
+    }
+   },
+   "L05": {
+    "placeholders_ok": true,
+    "wolf_ok": true,
+    "tag_ok": true,
+    "breaks_ok": true,
+    "char_ratio": 1.24,
+    "glossary_missing": [],
+    "missing_glyphs": "",
+    "width_ratio_est": 1.22,
+    "drift_chrf": {
+     "apple": 49.2,
+     "claude": 71.2
+    }
+   },
+   "L06": {
+    "placeholders_ok": true,
+    "wolf_ok": true,
+    "tag_ok": true,
+    "breaks_ok": true,
+    "char_ratio": 1.13,
+    "glossary_missing": [],
+    "missing_glyphs": "",
+    "width_ratio_est": 0.89,
+    "drift_chrf": {
+     "apple": 52.0,
+     "claude": 73.9
+    }
+   },
+   "L07": {
+    "placeholders_ok": true,
+    "wolf_ok": true,
+    "tag_ok": true,
+    "breaks_ok": true,
+    "char_ratio": 1.2,
+    "glossary_missing": [],
+    "missing_glyphs": "",
+    "width_ratio_est": 1.22,
+    "drift_chrf": {
+     "apple": 55.4,
+     "claude": 53.2
+    }
+   },
+   "L08": {
+    "placeholders_ok": true,
+    "wolf_ok": true,
+    "tag_ok": true,
+    "breaks_ok": true,
+    "char_ratio": 1.02,
+    "glossary_missing": [],
+    "missing_glyphs": "",
+    "width_ratio_est": 1.09,
+    "drift_chrf": {
+     "apple": 45.9,
+     "claude": 72.1
+    }
+   },
+   "L09": {
+    "placeholders_ok": true,
+    "wolf_ok": true,
+    "tag_ok": true,
+    "breaks_ok": true,
+    "char_ratio": 1.34,
+    "glossary_missing": [],
+    "missing_glyphs": "",
+    "width_ratio_est": 1.33,
+    "drift_chrf": {
+     "apple": 32.6,
+     "claude": 43.8
+    }
+   },
+   "L10": {
+    "placeholders_ok": true,
+    "wolf_ok": true,
+    "tag_ok": true,
+    "breaks_ok": true,
+    "char_ratio": 1.08,
+    "glossary_missing": [],
+    "missing_glyphs": "",
+    "width_ratio_est": 1.12,
+    "drift_chrf": {
+     "apple": 67.7,
+     "claude": 67.7
+    }
+   },
+   "L11": {
+    "placeholders_ok": true,
+    "wolf_ok": true,
+    "tag_ok": true,
+    "breaks_ok": true,
+    "char_ratio": 1.26,
+    "glossary_missing": [],
+    "missing_glyphs": "",
+    "width_ratio_est": 1.21,
+    "drift_chrf": {
+     "apple": 36.2,
+     "claude": 48.6
+    }
+   },
+   "L12": {
+    "placeholders_ok": true,
+    "wolf_ok": true,
+    "tag_ok": true,
+    "breaks_ok": true,
+    "char_ratio": 1.19,
+    "glossary_missing": [],
+    "missing_glyphs": "",
+    "width_ratio_est": 1.11,
+    "drift_chrf": {
+     "apple": 43.1,
+     "claude": 53.5
+    }
+   }
+  },
+  "apple": {
+   "L01": {
+    "placeholders_ok": true,
+    "wolf_ok": true,
+    "tag_ok": true,
+    "breaks_ok": true,
+    "char_ratio": 1.4,
+    "glossary_missing": [],
+    "missing_glyphs": "",
+    "width_ratio_est": 1.51,
+    "drift_chrf": {
+     "apple": 100.0
+    }
+   },
+   "L02": {
+    "placeholders_ok": true,
+    "wolf_ok": true,
+    "tag_ok": true,
+    "breaks_ok": true,
+    "char_ratio": 1.33,
+    "glossary_missing": [],
+    "missing_glyphs": "",
+    "width_ratio_est": 1.45,
+    "drift_chrf": {
+     "apple": 79.4
+    }
+   },
+   "L03": {
+    "placeholders_ok": true,
+    "wolf_ok": true,
+    "tag_ok": true,
+    "breaks_ok": true,
+    "char_ratio": 1.2,
+    "glossary_missing": [],
+    "missing_glyphs": "",
+    "width_ratio_est": 1.28,
+    "drift_chrf": {
+     "apple": 62.1
+    }
+   },
+   "L04": {
+    "placeholders_ok": true,
+    "wolf_ok": true,
+    "tag_ok": true,
+    "breaks_ok": false,
+    "char_ratio": 1.15,
+    "glossary_missing": [
+     "TANK RELEASE"
+    ],
+    "missing_glyphs": "",
+    "width_ratio_est": 1.29,
+    "drift_chrf": {
+     "apple": 50.8
+    }
+   },
+   "L05": {
+    "placeholders_ok": true,
+    "wolf_ok": true,
+    "tag_ok": true,
+    "breaks_ok": true,
+    "char_ratio": 1.18,
+    "glossary_missing": [
+     "bypass"
+    ],
+    "missing_glyphs": "",
+    "width_ratio_est": 1.19,
+    "drift_chrf": {
+     "apple": 62.9
+    }
+   },
+   "L06": {
+    "placeholders_ok": true,
+    "wolf_ok": true,
+    "tag_ok": true,
+    "breaks_ok": false,
+    "char_ratio": 0.98,
+    "glossary_missing": [],
+    "missing_glyphs": "",
+    "width_ratio_est": 0.95,
+    "drift_chrf": {
+     "apple": 69.7
+    }
+   },
+   "L07": {
+    "placeholders_ok": true,
+    "wolf_ok": true,
+    "tag_ok": true,
+    "breaks_ok": true,
+    "char_ratio": 1.23,
+    "glossary_missing": [],
+    "missing_glyphs": "",
+    "width_ratio_est": 1.22,
+    "drift_chrf": {
+     "apple": 70.2
+    }
+   },
+   "L08": {
+    "placeholders_ok": true,
+    "wolf_ok": true,
+    "tag_ok": true,
+    "breaks_ok": true,
+    "char_ratio": 0.97,
+    "glossary_missing": [
+     "relay"
+    ],
+    "missing_glyphs": "",
+    "width_ratio_est": 1.03,
+    "drift_chrf": {
+     "apple": 53.2
+    }
+   },
+   "L09": {
+    "placeholders_ok": true,
+    "wolf_ok": true,
+    "tag_ok": true,
+    "breaks_ok": true,
+    "char_ratio": 1.16,
+    "glossary_missing": [
+     "SENTRY"
+    ],
+    "missing_glyphs": "",
+    "width_ratio_est": 1.17,
+    "drift_chrf": {
+     "apple": 87.4
+    }
+   },
+   "L10": {
+    "placeholders_ok": true,
+    "wolf_ok": true,
+    "tag_ok": true,
+    "breaks_ok": true,
+    "char_ratio": 1.75,
+    "glossary_missing": [
+     "TANK RELEASE"
+    ],
+    "missing_glyphs": "",
+    "width_ratio_est": 1.69,
+    "drift_chrf": {
+     "apple": 21.6
+    }
+   },
+   "L11": {
+    "placeholders_ok": true,
+    "wolf_ok": true,
+    "tag_ok": true,
+    "breaks_ok": true,
+    "char_ratio": 1.24,
+    "glossary_missing": [],
+    "missing_glyphs": "",
+    "width_ratio_est": 1.22,
+    "drift_chrf": {
+     "apple": 36.6
+    }
+   },
+   "L12": {
+    "placeholders_ok": true,
+    "wolf_ok": true,
+    "tag_ok": true,
+    "breaks_ok": false,
+    "char_ratio": 1.28,
+    "glossary_missing": [],
+    "missing_glyphs": "",
+    "width_ratio_est": 1.31,
+    "drift_chrf": {
+     "apple": 40.3
+    }
+   }
+  }
+ },
+ "de": {
+  "claude": {
+   "L01": {
+    "placeholders_ok": true,
+    "wolf_ok": true,
+    "tag_ok": true,
+    "breaks_ok": true,
+    "char_ratio": 1.5,
+    "glossary_missing": [],
+    "missing_glyphs": "",
+    "width_ratio_est": 1.64,
+    "drift_chrf": {
+     "apple": 100.0,
+     "codex": 100.0
+    }
+   },
+   "L02": {
+    "placeholders_ok": true,
+    "wolf_ok": true,
+    "tag_ok": true,
+    "breaks_ok": true,
+    "char_ratio": 1.21,
+    "glossary_missing": [],
+    "missing_glyphs": "",
+    "width_ratio_est": 1.36,
+    "drift_chrf": {
+     "apple": 53.4,
+     "codex": 66.4
+    }
+   },
+   "L03": {
+    "placeholders_ok": true,
+    "wolf_ok": true,
+    "tag_ok": true,
+    "breaks_ok": true,
+    "char_ratio": 1.24,
+    "glossary_missing": [],
+    "missing_glyphs": "",
+    "width_ratio_est": 1.31,
+    "drift_chrf": {
+     "apple": 53.2,
+     "codex": 59.0
+    }
+   },
+   "L04": {
+    "placeholders_ok": true,
+    "wolf_ok": true,
+    "tag_ok": true,
+    "breaks_ok": true,
+    "char_ratio": 0.98,
+    "glossary_missing": [],
+    "missing_glyphs": "",
+    "width_ratio_est": 1.13,
+    "drift_chrf": {
+     "apple": 44.3,
+     "codex": 59.1
+    }
+   },
+   "L05": {
+    "placeholders_ok": true,
+    "wolf_ok": true,
+    "tag_ok": true,
+    "breaks_ok": true,
+    "char_ratio": 1.15,
+    "glossary_missing": [],
+    "missing_glyphs": "",
+    "width_ratio_est": 1.21,
+    "drift_chrf": {
+     "apple": 62.0,
+     "codex": 59.6
+    }
+   },
+   "L06": {
+    "placeholders_ok": true,
+    "wolf_ok": true,
+    "tag_ok": true,
+    "breaks_ok": true,
+    "char_ratio": 1.13,
+    "glossary_missing": [],
+    "missing_glyphs": "",
+    "width_ratio_est": 1.02,
+    "drift_chrf": {
+     "apple": 82.2,
+     "codex": 97.3
+    }
+   },
+   "L07": {
+    "placeholders_ok": true,
+    "wolf_ok": true,
+    "tag_ok": true,
+    "breaks_ok": true,
+    "char_ratio": 1.2,
+    "glossary_missing": [],
+    "missing_glyphs": "",
+    "width_ratio_est": 1.24,
+    "drift_chrf": {
+     "apple": 62.7,
+     "codex": 71.1
+    }
+   },
+   "L08": {
+    "placeholders_ok": true,
+    "wolf_ok": true,
+    "tag_ok": true,
+    "breaks_ok": true,
+    "char_ratio": 1.16,
+    "glossary_missing": [],
+    "missing_glyphs": "",
+    "width_ratio_est": 1.19,
+    "drift_chrf": {
+     "apple": 57.4,
+     "codex": 83.8
+    }
+   },
+   "L09": {
+    "placeholders_ok": true,
+    "wolf_ok": true,
+    "tag_ok": true,
+    "breaks_ok": true,
+    "char_ratio": 1.34,
+    "glossary_missing": [],
+    "missing_glyphs": "",
+    "width_ratio_est": 1.34,
+    "drift_chrf": {
+     "apple": 34.3,
+     "codex": 62.4
+    }
+   },
+   "L10": {
+    "placeholders_ok": true,
+    "wolf_ok": true,
+    "tag_ok": true,
+    "breaks_ok": true,
+    "char_ratio": 1.0,
+    "glossary_missing": [],
+    "missing_glyphs": "",
+    "width_ratio_est": 1.08,
+    "drift_chrf": {
+     "apple": 19.9,
+     "codex": 100.0
+    }
+   },
+   "L11": {
+    "placeholders_ok": true,
+    "wolf_ok": true,
+    "tag_ok": true,
+    "breaks_ok": true,
+    "char_ratio": 1.53,
+    "glossary_missing": [],
+    "missing_glyphs": "",
+    "width_ratio_est": 1.65,
+    "drift_chrf": {
+     "apple": 50.3,
+     "codex": 49.8
+    }
+   },
+   "L12": {
+    "placeholders_ok": true,
+    "wolf_ok": true,
+    "tag_ok": true,
+    "breaks_ok": true,
+    "char_ratio": 1.43,
+    "glossary_missing": [],
+    "missing_glyphs": "",
+    "width_ratio_est": 1.3,
+    "drift_chrf": {
+     "apple": 30.2,
+     "codex": 30.1
+    }
+   }
+  },
+  "codex": {
+   "L01": {
+    "placeholders_ok": true,
+    "wolf_ok": true,
+    "tag_ok": true,
+    "breaks_ok": true,
+    "char_ratio": 1.4,
+    "glossary_missing": [],
+    "missing_glyphs": "",
+    "width_ratio_est": 1.44,
+    "drift_chrf": {
+     "apple": 100.0,
+     "claude": 100.0
+    }
+   },
+   "L02": {
+    "placeholders_ok": true,
+    "wolf_ok": true,
+    "tag_ok": true,
+    "breaks_ok": true,
+    "char_ratio": 1.21,
+    "glossary_missing": [],
+    "missing_glyphs": "",
+    "width_ratio_est": 1.36,
+    "drift_chrf": {
+     "apple": 53.4,
+     "claude": 70.4
+    }
+   },
+   "L03": {
+    "placeholders_ok": true,
+    "wolf_ok": true,
+    "tag_ok": true,
+    "breaks_ok": true,
+    "char_ratio": 1.18,
+    "glossary_missing": [],
+    "missing_glyphs": "",
+    "width_ratio_est": 1.23,
+    "drift_chrf": {
+     "apple": 49.8,
+     "claude": 76.5
+    }
+   },
+   "L04": {
+    "placeholders_ok": true,
+    "wolf_ok": true,
+    "tag_ok": true,
+    "breaks_ok": true,
+    "char_ratio": 0.98,
+    "glossary_missing": [],
+    "missing_glyphs": "",
+    "width_ratio_est": 1.18,
+    "drift_chrf": {
+     "apple": 59.4,
+     "claude": 75.4
+    }
+   },
+   "L05": {
+    "placeholders_ok": true,
+    "wolf_ok": true,
+    "tag_ok": true,
+    "breaks_ok": true,
+    "char_ratio": 1.04,
+    "glossary_missing": [],
+    "missing_glyphs": "",
+    "width_ratio_est": 1.1,
+    "drift_chrf": {
+     "apple": 53.9,
+     "claude": 64.5
+    }
+   },
+   "L06": {
+    "placeholders_ok": true,
+    "wolf_ok": true,
+    "tag_ok": true,
+    "breaks_ok": true,
+    "char_ratio": 1.13,
+    "glossary_missing": [],
+    "missing_glyphs": "",
+    "width_ratio_est": 1.02,
+    "drift_chrf": {
+     "apple": 82.2,
+     "claude": 100.0
+    }
+   },
+   "L07": {
+    "placeholders_ok": true,
+    "wolf_ok": true,
+    "tag_ok": true,
+    "breaks_ok": true,
+    "char_ratio": 1.2,
+    "glossary_missing": [],
+    "missing_glyphs": "",
+    "width_ratio_est": 1.23,
+    "drift_chrf": {
+     "apple": 53.5,
+     "claude": 61.5
+    }
+   },
+   "L08": {
+    "placeholders_ok": true,
+    "wolf_ok": true,
+    "tag_ok": true,
+    "breaks_ok": true,
+    "char_ratio": 1.15,
+    "glossary_missing": [],
+    "missing_glyphs": "",
+    "width_ratio_est": 1.21,
+    "drift_chrf": {
+     "apple": 59.1,
+     "claude": 77.6
+    }
+   },
+   "L09": {
+    "placeholders_ok": true,
+    "wolf_ok": true,
+    "tag_ok": true,
+    "breaks_ok": true,
+    "char_ratio": 1.37,
+    "glossary_missing": [],
+    "missing_glyphs": "",
+    "width_ratio_est": 1.38,
+    "drift_chrf": {
+     "apple": 28.6,
+     "claude": 53.8
+    }
+   },
+   "L10": {
+    "placeholders_ok": true,
+    "wolf_ok": true,
+    "tag_ok": true,
+    "breaks_ok": true,
+    "char_ratio": 1.0,
+    "glossary_missing": [],
+    "missing_glyphs": "",
+    "width_ratio_est": 1.08,
+    "drift_chrf": {
+     "apple": 19.9,
+     "claude": 100.0
+    }
+   },
+   "L11": {
+    "placeholders_ok": true,
+    "wolf_ok": true,
+    "tag_ok": true,
+    "breaks_ok": true,
+    "char_ratio": 1.45,
+    "glossary_missing": [],
+    "missing_glyphs": "",
+    "width_ratio_est": 1.53,
+    "drift_chrf": {
+     "apple": 48.0,
+     "claude": 60.9
+    }
+   },
+   "L12": {
+    "placeholders_ok": true,
+    "wolf_ok": true,
+    "tag_ok": true,
+    "breaks_ok": true,
+    "char_ratio": 1.43,
+    "glossary_missing": [],
+    "missing_glyphs": "",
+    "width_ratio_est": 1.32,
+    "drift_chrf": {
+     "apple": 28.2,
+     "claude": 41.0
+    }
+   }
+  },
+  "apple": {
+   "L01": {
+    "placeholders_ok": true,
+    "wolf_ok": true,
+    "tag_ok": true,
+    "breaks_ok": true,
+    "char_ratio": 1.9,
+    "glossary_missing": [],
+    "missing_glyphs": "",
+    "width_ratio_est": 1.97,
+    "drift_chrf": {
+     "apple": 100.0
+    }
+   },
+   "L02": {
+    "placeholders_ok": true,
+    "wolf_ok": true,
+    "tag_ok": true,
+    "breaks_ok": true,
+    "char_ratio": 1.19,
+    "glossary_missing": [
+     "SAFE POINT"
+    ],
+    "missing_glyphs": "",
+    "width_ratio_est": 1.27,
+    "drift_chrf": {
+     "apple": 83.7
+    }
+   },
+   "L03": {
+    "placeholders_ok": true,
+    "wolf_ok": true,
+    "tag_ok": true,
+    "breaks_ok": true,
+    "char_ratio": 1.51,
+    "glossary_missing": [],
+    "missing_glyphs": "",
+    "width_ratio_est": 1.61,
+    "drift_chrf": {
+     "apple": 74.6
+    }
+   },
+   "L04": {
+    "placeholders_ok": true,
+    "wolf_ok": true,
+    "tag_ok": true,
+    "breaks_ok": false,
+    "char_ratio": 1.27,
+    "glossary_missing": [
+     "TANK RELEASE"
+    ],
+    "missing_glyphs": "",
+    "width_ratio_est": 1.49,
+    "drift_chrf": {
+     "apple": 22.7
+    }
+   },
+   "L05": {
+    "placeholders_ok": true,
+    "wolf_ok": true,
+    "tag_ok": true,
+    "breaks_ok": true,
+    "char_ratio": 1.1,
+    "glossary_missing": [
+     "bypass"
+    ],
+    "missing_glyphs": "",
+    "width_ratio_est": 1.12,
+    "drift_chrf": {
+     "apple": 75.0
+    }
+   },
+   "L06": {
+    "placeholders_ok": true,
+    "wolf_ok": true,
+    "tag_ok": true,
+    "breaks_ok": false,
+    "char_ratio": 1.09,
+    "glossary_missing": [],
+    "missing_glyphs": "",
+    "width_ratio_est": 1.02,
+    "drift_chrf": {
+     "apple": 69.7
+    }
+   },
+   "L07": {
+    "placeholders_ok": true,
+    "wolf_ok": true,
+    "tag_ok": true,
+    "breaks_ok": true,
+    "char_ratio": 1.37,
+    "glossary_missing": [],
+    "missing_glyphs": "",
+    "width_ratio_est": 1.44,
+    "drift_chrf": {
+     "apple": 71.8
+    }
+   },
+   "L08": {
+    "placeholders_ok": true,
+    "wolf_ok": true,
+    "tag_ok": true,
+    "breaks_ok": true,
+    "char_ratio": 1.21,
+    "glossary_missing": [
+     "relay",
+     "the mark"
+    ],
+    "missing_glyphs": "",
+    "width_ratio_est": 1.24,
+    "drift_chrf": {
+     "apple": 50.5
+    }
+   },
+   "L09": {
+    "placeholders_ok": true,
+    "wolf_ok": true,
+    "tag_ok": true,
+    "breaks_ok": true,
+    "char_ratio": 1.32,
+    "glossary_missing": [
+     "SENTRY"
+    ],
+    "missing_glyphs": "",
+    "width_ratio_est": 1.34,
+    "drift_chrf": {
+     "apple": 79.5
+    }
+   },
+   "L10": {
+    "placeholders_ok": true,
+    "wolf_ok": true,
+    "tag_ok": true,
+    "breaks_ok": true,
+    "char_ratio": 1.42,
+    "glossary_missing": [
+     "TANK RELEASE"
+    ],
+    "missing_glyphs": "",
+    "width_ratio_est": 1.5,
+    "drift_chrf": {
+     "apple": 19.8
+    }
+   },
+   "L11": {
+    "placeholders_ok": true,
+    "wolf_ok": true,
+    "tag_ok": true,
+    "breaks_ok": true,
+    "char_ratio": 1.53,
+    "glossary_missing": [],
+    "missing_glyphs": "",
+    "width_ratio_est": 1.65,
+    "drift_chrf": {
+     "apple": 51.6
+    }
+   },
+   "L12": {
+    "placeholders_ok": true,
+    "wolf_ok": true,
+    "tag_ok": true,
+    "breaks_ok": false,
+    "char_ratio": 1.15,
+    "glossary_missing": [],
+    "missing_glyphs": "",
+    "width_ratio_est": 0.97,
+    "drift_chrf": {
+     "apple": 66.7
+    }
+   }
+  }
+ },
+ "ja": {
+  "claude": {
+   "L01": {
+    "placeholders_ok": true,
+    "wolf_ok": true,
+    "tag_ok": true,
+    "breaks_ok": true,
+    "char_ratio": 0.7,
+    "glossary_missing": [],
+    "missing_glyphs": "うもイプレ一度",
+    "width_ratio_est": 1.15,
+    "drift_chrf": {
+     "apple": 100.0,
+     "codex": 100.0
+    }
+   },
+   "L02": {
+    "placeholders_ok": true,
+    "wolf_ok": true,
+    "tag_ok": true,
+    "breaks_ok": true,
+    "char_ratio": 0.65,
+    "glossary_missing": [],
+    "missing_glyphs": "。あかさすせだのはまらりれんイェクセチットフブポンー初最",
+    "width_ratio_est": 1.47,
+    "drift_chrf": {
+     "apple": 60.0,
+     "codex": 72.0
+    }
+   },
+   "L03": {
+    "placeholders_ok": true,
+    "wolf_ok": true,
+    "tag_ok": true,
+    "breaks_ok": true,
+    "char_ratio": 0.69,
+    "glossary_missing": [],
+    "missing_glyphs": "、。かけしせにるをクラリレンー任回押続長（）：",
+    "width_ratio_est": 1.41,
+    "drift_chrf": {
+     "apple": 34.0,
+     "codex": 43.3
+    }
+   },
+   "L04": {
+    "placeholders_ok": true,
+    "wolf_ok": true,
+    "tag_ok": true,
+    "breaks_ok": true,
+    "char_ratio": 0.59,
+    "glossary_missing": [],
+    "missing_glyphs": "。いがけこそたつとなにのばるれをクセタトリンー下場所投見開離",
+    "width_ratio_est": 1.38,
+    "drift_chrf": {
+     "apple": 34.1,
+     "codex": 30.0
+    }
+   },
+   "L05": {
+    "placeholders_ok": true,
+    "wolf_ok": true,
+    "tag_ok": true,
+    "breaks_ok": true,
+    "char_ratio": 0.46,
+    "glossary_missing": [],
+    "missing_glyphs": "、。いかがきしとのめらりるイシスッドハバパュリルレンー体冷出却噴固報始材筐警鳴",
+    "width_ratio_est": 1.05,
+    "drift_chrf": {
+     "apple": 62.2,
+     "codex": 67.5
+    }
+   },
+   "L06": {
+    "placeholders_ok": true,
+    "wolf_ok": true,
+    "tag_ok": true,
+    "breaks_ok": true,
+    "char_ratio": 0.51,
+    "glossary_missing": [],
+    "missing_glyphs": "。いしすてなはまもらを令出動命目自覚誰起",
+    "width_ratio_est": 0.82,
+    "drift_chrf": {
+     "apple": 45.6,
+     "codex": 66.4
+    }
+   },
+   "L07": {
+    "placeholders_ok": true,
+    "wolf_ok": true,
+    "tag_ok": true,
+    "breaks_ok": true,
+    "char_ratio": 0.52,
+    "glossary_missing": [],
+    "missing_glyphs": "、。あいえがけしただつてでとのはらるグジパプムラロー元残消葉言記録",
+    "width_ratio_est": 1.1,
+    "drift_chrf": {
+     "apple": 52.3,
+     "codex": 64.2
+    }
+   },
+   "L08": {
+    "placeholders_ok": true,
+    "wolf_ok": true,
+    "tag_ok": true,
+    "breaks_ok": true,
+    "char_ratio": 0.56,
+    "glossary_missing": [],
+    "missing_glyphs": "、。あいかきこすずせただっとなにのはびもらるれろをイクグタマミリレンー下何俺入回射巡投知線落行計通",
+    "width_ratio_est": 1.26,
+    "drift_chrf": {
+     "apple": 34.9,
+     "codex": 41.0
+    }
+   },
+   "L09": {
+    "placeholders_ok": true,
+    "wolf_ok": true,
+    "tag_ok": true,
+    "breaks_ok": true,
+    "char_ratio": 0.73,
+    "glossary_missing": [],
+    "missing_glyphs": "、。がたっでとのひりをイグセタトミリンー下導投断計誘",
+    "width_ratio_est": 1.37,
+    "drift_chrf": {
+     "apple": 41.7,
+     "codex": 58.6
+    }
+   },
+   "L10": {
+    "placeholders_ok": true,
+    "wolf_ok": true,
+    "tag_ok": true,
+    "breaks_ok": true,
+    "char_ratio": 0.42,
+    "glossary_missing": [],
+    "missing_glyphs": "クタン下投",
+    "width_ratio_est": 0.72,
+    "drift_chrf": {
+     "apple": 19.6,
+     "codex": 19.6
+    }
+   },
+   "L11": {
+    "placeholders_ok": true,
+    "wolf_ok": true,
+    "tag_ok": true,
+    "breaks_ok": true,
+    "char_ratio": 0.71,
+    "glossary_missing": [],
+    "missing_glyphs": "。いかがきしすせなはもらるれリレー任冷出判却噴断材",
+    "width_ratio_est": 1.52,
+    "drift_chrf": {
+     "apple": 41.2,
+     "codex": 41.8
+    }
+   },
+   "L12": {
+    "placeholders_ok": true,
+    "wolf_ok": true,
+    "tag_ok": true,
+    "breaks_ok": true,
+    "char_ratio": 0.55,
+    "glossary_missing": [],
+    "missing_glyphs": "、。がきつにのはぶりろを下合吹図待後扉飛",
+    "width_ratio_est": 1.25,
+    "drift_chrf": {
+     "apple": 28.8,
+     "codex": 34.2
+    }
+   }
+  },
+  "codex": {
+   "L01": {
+    "placeholders_ok": true,
+    "wolf_ok": true,
+    "tag_ok": true,
+    "breaks_ok": true,
+    "char_ratio": 0.7,
+    "glossary_missing": [],
+    "missing_glyphs": "うもイプレ一度",
+    "width_ratio_est": 1.15,
+    "drift_chrf": {
+     "apple": 100.0,
+     "claude": 21.4
+    }
+   },
+   "L02": {
+    "placeholders_ok": true,
+    "wolf_ok": true,
+    "tag_ok": true,
+    "breaks_ok": true,
+    "char_ratio": 0.56,
+    "glossary_missing": [],
+    "missing_glyphs": "。いかだなのはまらイェクセチットフブポンー初始最開",
+    "width_ratio_est": 1.27,
+    "drift_chrf": {
+     "apple": 73.8,
+     "claude": 89.2
+    }
+   },
+   "L03": {
+    "placeholders_ok": true,
+    "wolf_ok": true,
+    "tag_ok": true,
+    "breaks_ok": true,
+    "char_ratio": 0.64,
+    "glossary_missing": [],
+    "missing_glyphs": "。いしすせてにもをクラリレンー任回押長：",
+    "width_ratio_est": 1.29,
+    "drift_chrf": {
+     "apple": 32.9,
+     "claude": 39.1
+    }
+   },
+   "L04": {
+    "placeholders_ok": true,
+    "wolf_ok": true,
+    "tag_ok": true,
+    "breaks_ok": true,
+    "char_ratio": 0.58,
+    "glossary_missing": [],
+    "missing_glyphs": "。いうかがせそたっつでなにのばよをクセタトリンー下場所投見身隠",
+    "width_ratio_est": 1.52,
+    "drift_chrf": {
+     "apple": 30.6,
+     "claude": 34.6
+    }
+   },
+   "L05": {
+    "placeholders_ok": true,
+    "wolf_ok": true,
+    "tag_ok": true,
+    "breaks_ok": true,
+    "char_ratio": 0.45,
+    "glossary_missing": [],
+    "missing_glyphs": "、。いかがてのめらりるれをイスドハバパリルレンー体冷却固報始材漏立筐警音鳴",
+    "width_ratio_est": 1.03,
+    "drift_chrf": {
+     "apple": 68.1,
+     "claude": 80.5
+    }
+   },
+   "L06": {
+    "placeholders_ok": true,
+    "wolf_ok": true,
+    "tag_ok": true,
+    "breaks_ok": true,
+    "char_ratio": 0.47,
+    "glossary_missing": [],
+    "missing_glyphs": "。いさすなはまもらを令出動命目自覚誰起",
+    "width_ratio_est": 0.71,
+    "drift_chrf": {
+     "apple": 49.6,
+     "claude": 62.1
+    }
+   },
+   "L07": {
+    "placeholders_ok": true,
+    "wolf_ok": true,
+    "tag_ok": true,
+    "breaks_ok": true,
+    "char_ratio": 0.47,
+    "glossary_missing": [],
+    "missing_glyphs": "、。あえがけだでなにのはばるれグジパプムラロー元消男葉言記録",
+    "width_ratio_est": 1.01,
+    "drift_chrf": {
+     "apple": 50.5,
+     "claude": 63.6
+    }
+   },
+   "L08": {
+    "placeholders_ok": true,
+    "wolf_ok": true,
+    "tag_ok": true,
+    "breaks_ok": true,
+    "char_ratio": 0.53,
+    "glossary_missing": [],
+    "missing_glyphs": "、。いこただっでとなにのはびまむもらりるれろをクセタトマリレンー下俺入回巡投機況準照状知計込送通",
+    "width_ratio_est": 1.18,
+    "drift_chrf": {
+     "apple": 33.5,
+     "claude": 52.1
+    }
+   },
+   "L09": {
+    "placeholders_ok": true,
+    "wolf_ok": true,
+    "tag_ok": true,
+    "breaks_ok": true,
+    "char_ratio": 0.66,
+    "glossary_missing": [],
+    "missing_glyphs": "、。いがすたっでとのひりをセトリンー下出投断機計誘",
+    "width_ratio_est": 1.23,
+    "drift_chrf": {
+     "apple": 30.6,
+     "claude": 50.1
+    }
+   },
+   "L10": {
+    "placeholders_ok": true,
+    "wolf_ok": true,
+    "tag_ok": true,
+    "breaks_ok": true,
+    "char_ratio": 0.42,
+    "glossary_missing": [],
+    "missing_glyphs": "クタン下投",
+    "width_ratio_est": 0.72,
+    "drift_chrf": {
+     "apple": 19.6,
+     "claude": 19.6
+    }
+   },
+   "L11": {
+    "placeholders_ok": true,
+    "wolf_ok": true,
+    "tag_ok": true,
+    "breaks_ok": true,
+    "char_ratio": 0.71,
+    "glossary_missing": [],
+    "missing_glyphs": "。いかがきしすせなはもらるれリレー任冷出判却噴断材",
+    "width_ratio_est": 1.52,
+    "drift_chrf": {
+     "apple": 41.2,
+     "claude": 38.8
+    }
+   },
+   "L12": {
+    "placeholders_ok": true,
+    "wolf_ok": true,
+    "tag_ok": true,
+    "breaks_ok": true,
+    "char_ratio": 0.47,
+    "glossary_missing": [],
+    "missing_glyphs": "。がきしつのはぶを合吹図待後扉退飛",
+    "width_ratio_est": 0.97,
+    "drift_chrf": {
+     "apple": 31.8,
+     "claude": 39.6
+    }
+   }
+  },
+  "apple": {
+   "L01": {
+    "placeholders_ok": true,
+    "wolf_ok": true,
+    "tag_ok": true,
+    "breaks_ok": true,
+    "char_ratio": 0.9,
+    "glossary_missing": [],
+    "missing_glyphs": "うすもるイプレ一度",
+    "width_ratio_est": 1.48,
+    "drift_chrf": {
+     "apple": 100.0
+    }
+   },
+   "L02": {
+    "placeholders_ok": true,
+    "wolf_ok": true,
+    "tag_ok": true,
+    "breaks_ok": true,
+    "char_ratio": 0.74,
+    "glossary_missing": [
+     "SAFE POINT"
+    ],
+    "missing_glyphs": "。あかさすせだのはまらりれんイェクチットポン保初始存最開",
+    "width_ratio_est": 1.49,
+    "drift_chrf": {
+     "apple": 73.4
+    }
+   },
+   "L03": {
+    "placeholders_ok": false,
+    "wolf_ok": true,
+    "tag_ok": true,
+    "breaks_ok": true,
+    "char_ratio": 0.65,
+    "glossary_missing": [],
+    "missing_glyphs": "、。すせたにのはまるをクラリレンー任回押：",
+    "width_ratio_est": 1.34,
+    "drift_chrf": {
+     "apple": 29.7
+    }
+   },
+   "L04": {
+    "placeholders_ok": true,
+    "wolf_ok": true,
+    "tag_ok": true,
+    "breaks_ok": false,
+    "char_ratio": 0.52,
+    "glossary_missing": [
+     "TANK RELEASE",
+     "sentry"
+    ],
+    "missing_glyphs": "。いがくすたにのはまるわをクゼタリンー備員見警近露",
+    "width_ratio_est": 1.06,
+    "drift_chrf": {
+     "apple": 20.6
+    }
+   },
+   "L05": {
+    "placeholders_ok": true,
+    "wolf_ok": true,
+    "tag_ok": true,
+    "breaks_ok": true,
+    "char_ratio": 0.52,
+    "glossary_missing": [],
+    "missing_glyphs": "、。いおかがしすてでとまめらりイウグジスッドハバパヒリルレンー冷却報始液硬警音鳴",
+    "width_ratio_est": 1.2,
+    "drift_chrf": {
+     "apple": 62.2
+    }
+   },
+   "L06": {
+    "placeholders_ok": true,
+    "wolf_ok": true,
+    "tag_ok": true,
+    "breaks_ok": false,
+    "char_ratio": 0.75,
+    "glossary_missing": [],
+    "missing_glyphs": "。くこしすせてはまもれをんアィクコシテドベマョンー分渡自誰起身",
+    "width_ratio_est": 1.47,
+    "drift_chrf": {
+     "apple": 68.6
+    }
+   },
+   "L07": {
+    "placeholders_ok": true,
+    "wolf_ok": true,
+    "tag_ok": true,
+    "breaks_ok": true,
+    "char_ratio": 0.58,
+    "glossary_missing": [],
+    "missing_glyphs": "、。えがしすそとなのはまらりるれをクグジプムラレロン一元削唯彼消葉言記録除",
+    "width_ratio_est": 1.24,
+    "drift_chrf": {
+     "apple": 61.9
+    }
+   },
+   "L08": {
+    "placeholders_ok": true,
+    "wolf_ok": true,
+    "tag_ok": true,
+    "breaks_ok": true,
+    "char_ratio": 0.62,
+    "glossary_missing": [],
+    "missing_glyphs": "、。あいうえかきくしすせそたてでなにのはべまょよらりれをんイクグスタパマミリレンー下外狙目盲私落行越込送",
+    "width_ratio_est": 1.39,
+    "drift_chrf": {
+     "apple": 51.5
+    }
+   },
+   "L09": {
+    "placeholders_ok": true,
+    "wolf_ok": true,
+    "tag_ok": true,
+    "breaks_ok": true,
+    "char_ratio": 0.77,
+    "glossary_missing": [
+     "SENTRY"
+    ],
+    "missing_glyphs": "、。かそたっでなのはれをイグタッドプミロン単描独計",
+    "width_ratio_est": 1.42,
+    "drift_chrf": {
+     "apple": 63.9
+    }
+   },
+   "L10": {
+    "placeholders_ok": true,
+    "wolf_ok": true,
+    "tag_ok": true,
+    "breaks_ok": true,
+    "char_ratio": 0.58,
+    "glossary_missing": [
+     "TANK RELEASE"
+    ],
+    "missing_glyphs": "クゼタリンー",
+    "width_ratio_est": 1.01,
+    "drift_chrf": {
+     "apple": 21.4
+    }
+   },
+   "L11": {
+    "placeholders_ok": true,
+    "wolf_ok": true,
+    "tag_ok": true,
+    "breaks_ok": true,
+    "char_ratio": 0.76,
+    "glossary_missing": [
+     "coolant"
+    ],
+    "missing_glyphs": "。あいがくごさすだまりるをリレー冷出却可性排液相能談",
+    "width_ratio_est": 1.63,
+    "drift_chrf": {
+     "apple": 36.7
+    }
+   },
+   "L12": {
+    "placeholders_ok": true,
+    "wolf_ok": true,
+    "tag_ok": true,
+    "breaks_ok": false,
+    "char_ratio": 0.57,
+    "glossary_missing": [],
+    "missing_glyphs": "。がつにのはまるれろをアド倒待後話閉電",
+    "width_ratio_est": 1.25,
+    "drift_chrf": {
+     "apple": 54.1
+    }
+   }
+  }
+ }
+}

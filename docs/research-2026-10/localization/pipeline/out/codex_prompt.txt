@@ -1,0 +1,143 @@
+You are translating sample lines from WOLF//OVERRIDE, a grounded military sci-fi / dark horror 2D game (Godot). This is a PROOF trial: the outputs are samples, not shipped text.
+
+Characters
+- The player is a systems engineer, addressed only by a first name the player picks (Rowan, Alex or Morgan). The engineer is non-binary and uses they/them. NEVER reveal a gender for the engineer: no gendered pronouns, nouns, adjectives or participles that refer to them. Rewrite the sentence instead (use the name, a neutral construction, or an adverbial phrase such as "without help").
+- WOLF is a robotic wolf, an independent companion (he/him). His voice: calm, direct, terse, dry; a peer, never a servant; no exclamation marks; no slang. He can refuse.
+- The Director is the human antagonist (he/him).
+
+Hard rules
+- Keep these exactly, untranslated: WOLF, %s, %d, {name}. Keep every placeholder, in the same count and order.
+- A line that starts with "WOLF: " keeps that tag exactly, untranslated, at the start.
+- Keep each authored line break (\n) in the same place in the sentence flow, exactly once.
+- Keep ALL-CAPS terms in all caps (they are printed station plates and UI).
+- Two spaces after a recap topic label ("SENTRY  ...") stay two spaces.
+- %s is always the engineer's first name. Possessives must work for any name (Alex, Morgan, Rowan).
+
+Register
+- es-419 (Latin American Spanish, neutral, Mexico-friendly): tú between characters and in hints; infinitive for buttons. Personal "a" before the name as object.
+- de (German): du between characters and in hints; infinitive for buttons. Name possessives via "von %s" (never "%ss").
+- ja (Japanese): WOLF uses 俺 sparingly and plain form (だ/る), no keigo; avoid second-person pronouns. UI and hints: short, plain. Narration: plain past/present.
+
+Glossary (use exactly)
+- SAFE POINT: es-419 PUNTO SEGURO / de SICHERUNGSPUNKT / ja セーフポイント
+- TANK RELEASE (station plate over the lever that drops a coolant tank): es-419 SOLTAR TANQUE / de TANKAUSLÖSER / ja タンク投下
+- relay: relé / Relais / リレー
+- bypass: bypass / Bypass / バイパス
+- sentry (a patrolling security robot): centinela / Wächter / セントリー
+- coolant: refrigerante / Kühlmittel / 冷却材
+- the mark (floor spot under the tank): la marca / die Markierung / マーク
+
+Length: stay within about 130% of the English length where you can; station plates and buttons as short as possible.
+
+
+TASK 1. Translate each line below into es-419, de and ja, following the rules above.
+[
+ {
+  "id": "L01",
+  "text": "PLAY AGAIN",
+  "context": "Button on the END OF SLICE card. Starts a fresh run. All caps in English by design."
+ },
+ {
+  "id": "L02",
+  "text": "No checkpoint yet. Saving starts at the first SAFE POINT.",
+  "context": "Title-screen note when Continue has nothing to load. SAFE POINT is the in-world name of the save station (glossary term)."
+ },
+ {
+  "id": "L03",
+  "text": "HOLD E: crank on, %d of %d, or let WOLF take the relay.",
+  "context": "Context hint above the dialogue bar while the engineer cranks the manual bypass. 'E' is the bound key (rebindable; the key name is swapped in by code later). The two %d are turns done and turns needed, in that order."
+ },
+ {
+  "id": "L04",
+  "text": "The sentry saw %s out in the open.\nStay close to the TANK RELEASE.",
+  "context": "Fail card after the sentry runs the engineer down. %s is the engineer's first name (Rowan, Alex or Morgan; any gender). TANK RELEASE is the station label the player can see (glossary term, must match L10). The line break is authored."
+ },
+ {
+  "id": "L05",
+  "text": "The bypass handle is stiff. Coolant hisses from the relay housing and an alarm starts to wail.",
+  "context": "Narration box when the engineer first pulls the manual bypass handle. Present tense, terse, physical."
+ },
+ {
+  "id": "L06",
+  "text": "Nobody gives an activation command.\nWOLF wakes himself.",
+  "context": "Opening cinematic caption. WOLF (a robotic wolf, he/him) wakes up on his own, without an order. The line break is authored."
+ },
+ {
+  "id": "L07",
+  "text": "WOLF: That purge takes the original program logs. Once they're gone, his word is the only record.",
+  "context": "WOLF speaks to the engineer at the breaker. 'his' is the Director. 'WOLF: ' is the speaker tag the dialogue splitter reads; it is not translated."
+ },
+ {
+  "id": "L08",
+  "text": "WOLF: At the relay you'd have sent me in blind. I won't walk into its sights. Time the drop from the release; it crosses the mark on every pass.",
+  "context": "WOLF refuses to lure the sentry because the engineer rushed him earlier at the relay. Calm, direct, not sulking. 'it' is the sentry; 'the release' is the TANK RELEASE station; 'the mark' is the floor spot under the tank."
+ },
+ {
+  "id": "L09",
+  "text": "SENTRY  WOLF wouldn't draw it, so {name} timed the drop alone.",
+  "context": "End-card recap row. 'SENTRY' is the row's topic label, two spaces, then the summary. {name} is the engineer's first name (any gender; they/them in English). 'alone' must not reveal a gender."
+ },
+ {
+  "id": "L10",
+  "text": "TANK RELEASE",
+  "context": "Station plate over the lever that drops a coolant tank. 12 px caps on a small plate; must match the term used in L04."
+ },
+ {
+  "id": "L11",
+  "text": "The relay may vent coolant. Your call.",
+  "context": "Answer button: the ENGINEER says this to WOLF, telling him the risk and letting him decide. Second person addresses WOLF."
+ },
+ {
+  "id": "L12",
+  "text": "The door goes. WOLF falls back\nto wait for %s's call.",
+  "context": "Narration after the sealed door blows. %s is the engineer's first name; the possessive must work with any name. The line break is authored."
+ }
+]
+
+TASK 2. Independently back-translate these existing translations into literal English (say what they actually say, do not repair them). Keep placeholders as they are.
+{
+ "es-419": {
+  "L01": "JUGAR DE NUEVO",
+  "L02": "Aún no hay punto de control. Se empieza a guardar en el primer PUNTO SEGURO.",
+  "L03": "MANTÉN E: sigue girando, %d de %d, o deja que WOLF se encargue del relé.",
+  "L04": "El centinela vio a %s al descubierto.\nQuédate junto a SOLTAR TANQUE.",
+  "L05": "La palanca del bypass está dura. Sale refrigerante silbando de la carcasa del relé y una alarma empieza a aullar.",
+  "L06": "Nadie da una orden de activación.\nWOLF se despierta por sí mismo.",
+  "L07": "WOLF: Esa purga se lleva los registros originales del programa. Cuando ya no estén, su palabra será el único registro.",
+  "L08": "WOLF: En el relé me habrías mandado a ciegas. No voy a meterme en su mira. Elige cuándo soltar desde el control; pasa por la marca en cada vuelta.",
+  "L09": "CENTINELA  WOLF no quiso atraerlo, así que {name} calculó la caída sin ayuda.",
+  "L10": "SOLTAR TANQUE",
+  "L11": "El relé podría soltar refrigerante. Tú decides.",
+  "L12": "La puerta cede. WOLF retrocede\npara esperar la señal de %s."
+ },
+ "de": {
+  "L01": "NOCHMAL SPIELEN",
+  "L02": "Noch kein Checkpoint. Gespeichert wird ab dem ersten SICHERUNGSPUNKT.",
+  "L03": "E HALTEN: weiterkurbeln, %d von %d, oder WOLF das Relais überlassen.",
+  "L04": "Der Wächter hat %s im Freien entdeckt.\nBleib nah am TANKAUSLÖSER.",
+  "L05": "Der Bypass-Hebel ist schwergängig. Aus dem Relaisgehäuse zischt Kühlmittel, und ein Alarm beginnt zu heulen.",
+  "L06": "Niemand gibt einen Aktivierungsbefehl.\nWOLF weckt sich selbst.",
+  "L07": "WOLF: Diese Löschung nimmt die ursprünglichen Programmprotokolle mit. Sind sie weg, ist sein Wort der einzige Beleg.",
+  "L08": "WOLF: Am Relais hättest du mich blind reingeschickt. Ich laufe ihm nicht ins Visier. Pass den Abwurf vom Auslöser aus ab; er fährt bei jeder Runde über die Markierung.",
+  "L09": "WÄCHTER  WOLF wollte ihn nicht locken, also hat {name} den Abwurf allein abgepasst.",
+  "L10": "TANKAUSLÖSER",
+  "L11": "Das Relais könnte Kühlmittel ablassen. Deine Entscheidung.",
+  "L12": "Die Tür gibt nach. WOLF zieht sich zurück\nund wartet auf das Zeichen von %s."
+ },
+ "ja": {
+  "L01": "もう一度プレイ",
+  "L02": "チェックポイントはまだありません。最初のセーフポイントからセーブされます。",
+  "L03": "Eを長押し：クランクを回し続ける（%d/%d）か、リレーをWOLFに任せる。",
+  "L04": "セントリーが開けた場所にいる%sを見つけた。\nタンク投下のそばを離れないこと。",
+  "L05": "バイパスハンドルが固い。リレーの筐体から冷却材がシューッと噴き出し、警報が鳴り始める。",
+  "L06": "起動命令は誰も出していない。\nWOLFは自ら目を覚ます。",
+  "L07": "WOLF: あのパージで元のプログラムログが消える。消えたら、記録として残るのはあいつの言葉だけだ。",
+  "L08": "WOLF: リレーのときは、何も知らせずに俺を行かせるところだった。あれの射線には入らない。タンク投下から落とすタイミングを計れ。あれは巡回のたびにマークを通る。",
+  "L09": "セントリー  WOLFが誘導を断ったので、{name}がひとりで投下のタイミングを計った。",
+  "L10": "タンク投下",
+  "L11": "リレーから冷却材が噴き出すかもしれない。判断は任せる。",
+  "L12": "扉が吹き飛ぶ。WOLFは後ろに下がり、\n%sの合図を待つ。"
+ }
+}
+
+Reply with ONLY one JSON object, no prose, no code fence: {"translations": {"es-419": {"L01": "..."}, "de": {...}, "ja": {...}}, "back": {"claude": {"es-419": {"L01": "..."}, "de": {...}, "ja": {...}}}}. Do not run any commands or read any files.
