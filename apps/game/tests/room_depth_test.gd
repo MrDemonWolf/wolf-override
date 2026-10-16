@@ -209,13 +209,15 @@ func _check_swing_leaf(leaf: SwingLeaf, face_x: float, label: String, light_labe
 ## Fix round 4 (review r4, M1): the leaf draws the face its room's pinhole camera sees (the room face up to
 ## about 30 degrees, where a view straight along +d had switched at 17-18), and through the swing the lit
 ## paint at the middle of that face stays within 5 % of the shut leaf's or above it (no black card mid-swing).
+## Which face the camera sees is checked on screen, not with the leaf's own 3D test: the room face's
+## outline, projected, keeps the winding it has shut exactly while the camera stays on the room side
+## of its plane (a pinhole view mirrors a plane's outline once the eye crosses to its back).
 func _check_leaf_light(leaf: SwingLeaf, label: String) -> void:
-	var cam: Vector3 = leaf.camera()
-	var agrees: bool = true
+	var shut_turn: float = signf(_room_face_turn(leaf, 0.0))
+	var agrees: bool = leaf.room_face_shows(0.0) and shut_turn != 0.0
 	for degrees: int in range(0, 91, 2):
 		var theta: float = deg_to_rad(float(degrees))
-		var centre: Vector3 = leaf.hinge + leaf.leaf_dir(theta) * (SwingLeaf.LEAF_W * 0.5)
-		agrees = agrees and leaf.room_face_shows(theta) == (leaf.room_normal(theta).dot(centre - cam) < 0.0)
+		agrees = agrees and leaf.room_face_shows(theta) == (signf(_room_face_turn(leaf, theta)) == shut_turn)
 	_expect(agrees and leaf.room_face_shows(deg_to_rad(24.0)) and not leaf.room_face_shows(deg_to_rad(60.0)), "the %s leaf draws the face its room's camera sees (the room face still at 24 degrees)" % label)
 	var shut: float = _face_level(leaf, 0.0)
 	var lowest: float = shut
@@ -224,13 +226,22 @@ func _check_leaf_light(leaf: SwingLeaf, label: String) -> void:
 	_expect(lowest >= 0.95 * shut, "the %s leaf's face stays lit through its swing (lowest %.3f against %.3f shut)" % [label, lowest, shut])
 
 
-## The vertex light (luminance of SwingLeaf.shade) at the middle of the face the camera sees.
+## The signed screen area (world px squared) of the room face's hinge-foot, latch-foot, hinge-head
+## corners at swing [param theta], projected in the leaf's own room camera. Its sign is the outline's
+## winding; it flips only when the camera crosses the face's plane.
+func _room_face_turn(leaf: SwingLeaf, theta: float) -> float:
+	var foot: Vector2 = SwingLeaf.project(leaf.hinge, leaf.vpx, leaf.horizon)
+	var latch: Vector2 = SwingLeaf.project(leaf.hinge + leaf.leaf_dir(theta) * SwingLeaf.LEAF_W, leaf.vpx, leaf.horizon)
+	var head: Vector2 = SwingLeaf.project(leaf.hinge + Vector3(0.0, SwingLeaf.LEAF_H, 0.0), leaf.vpx, leaf.horizon)
+	return (latch - foot).cross(head - foot)
+
+
+## The vertex light (luminance of SwingLeaf.shade) at the middle of the face the camera sees (1.07 m
+## up, half the leaf's width from the hinge), on the face SwingLeaf.visible_face says the leaf draws.
 func _face_level(leaf: SwingLeaf, theta: float) -> float:
-	var room: bool = leaf.room_face_shows(theta)
-	var n_room: Vector3 = leaf.room_normal(theta)
-	var base: Vector3 = leaf.hinge if room else leaf.hinge - n_room * SwingLeaf.LEAF_T
-	var p: Vector3 = base + leaf.leaf_dir(theta) * (SwingLeaf.LEAF_W * 0.5) + Vector3(0.0, 1.07, 0.0)
-	var c: Color = leaf.shade(p, n_room if room else -n_room)
+	var face: Array = leaf.visible_face(theta)
+	var p: Vector3 = (face[1] as Vector3) + leaf.leaf_dir(theta) * (SwingLeaf.LEAF_W * 0.5) + Vector3(0.0, 1.07, 0.0)
+	var c: Color = leaf.shade(p, face[2] as Vector3)
 	return c.get_luminance()
 
 

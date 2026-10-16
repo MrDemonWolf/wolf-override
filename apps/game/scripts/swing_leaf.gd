@@ -262,6 +262,20 @@ func room_face_shows(theta: float) -> bool:
 	return room_normal(theta).dot(centre - camera()) < 0.0
 
 
+## The face the camera sees at swing [param theta] (radians, 0 shut), as [room, base, normal]: room is
+## room_face_shows(theta) (true: the room face, false: the outside face); base (metres) is that face's
+## bottom corner on the hinge side, the hinge foot for the room face and LEAF_T behind it, along the
+## room face's normal, for the outside face; normal is that face's outward unit normal. append_mesh
+## draws and lights the face from it and room_depth_test measures the face's light from it, so the
+## two can never pick different faces.
+func visible_face(theta: float) -> Array:
+	var n_room: Vector3 = room_normal(theta)
+	var room_shows: bool = room_face_shows(theta)
+	var base: Vector3 = hinge if room_shows else hinge - n_room * LEAF_T
+	var nrm: Vector3 = n_room if room_shows else -n_room
+	return [room_shows, base, nrm]
+
+
 ## Adds this leaf, at its current swing, to [param mesh] (in the order the leaf draws: the face the
 ## camera sees, the latch edge, then the closer arm's two links). AtlasMesh calls it to draw a hosted
 ## leaf in its own draw call; nothing is added while the leaf is hidden.
@@ -271,11 +285,10 @@ func append_mesh(mesh: TriMesh) -> void:
 	var theta: float = angle()
 	var dir: Vector3 = leaf_dir(theta)
 	var n_room: Vector3 = room_normal(theta)
-	var room_shows: bool = room_face_shows(theta)
-	var base: Vector3 = hinge if room_shows else hinge - n_room * LEAF_T
-	var nrm: Vector3 = n_room if room_shows else -n_room
-	var region: Rect2 = room_region if room_shows else out_region
-	_append_quad(mesh, base, dir * LEAF_W, region, nrm)
+	var face: Array = visible_face(theta)
+	var nrm: Vector3 = face[2]
+	var region: Rect2 = room_region if bool(face[0]) else out_region
+	_append_quad(mesh, face[1] as Vector3, dir * LEAF_W, region, nrm)
 	# The latch edge, a 44 mm strip at the free end, faces the camera through the whole swing.
 	var edge_base: Vector3 = hinge + dir * LEAF_W
 	_append_quad(mesh, edge_base, -n_room * LEAF_T, edge_region, dir)
@@ -283,7 +296,7 @@ func append_mesh(mesh: TriMesh) -> void:
 		var joints: PackedVector3Array = arm_joints()
 		# The arm is dark painted steel on the room side of the head, in the leaf's own light (review r2:
 		# lit as a top face it read as a pale sliver floating over the leaf).
-		var lit: Color = shade(joints[0], n_room if room_shows else -n_room)
+		var lit: Color = shade(joints[0], nrm)
 		var steel: Color = Color(lit.r * 0.85, lit.g * 0.85, lit.b * 0.85, 1.0)
 		for k: int in 2:
 			_append_link(mesh, joints[k], joints[k + 1], steel)
