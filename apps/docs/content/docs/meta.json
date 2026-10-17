@@ -1,4 +1,19 @@
 {
   "title": "Game guide",
-  "pages": ["index", "get-game", "about", "controls", "walkthrough", "development", "changelog", "credits", "legal", "privacy"]
+  "pages": [
+    "index",
+    "---Play---",
+    "...controls",
+    "walkthrough",
+    "---Get the game and support---",
+    "get-game",
+    "changelog",
+    "about",
+    "development/story",
+    "credits",
+    "legal",
+    "privacy",
+    "---Develop---",
+    "...development"
+  ]
 }
