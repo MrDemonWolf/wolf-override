@@ -31,8 +31,9 @@ const DRAWN_HALF_WIDTH: float = 32.0
 ## Contact is the two drawn bodies touching: this machine's drawn half and the engineer's
 ## (M0Actor.HUMAN_REACH). A knockdown lands at this distance, before the drawings overlap.
 const CONTACT_RANGE: float = DRAWN_HALF_WIDTH + M0Actor.HUMAN_REACH
-## How far ahead of its origin the scanner's lens ends (Sentry.lens_rect): where its sight and beam start.
-const LENS_AHEAD: float = 10.22
+## How far ahead of its origin the scanner's lens ends (Sentry.lens_rect().end.x, from the active
+## piece's LENS: 68 piece px at Sentry.ART_SCALE): where its sight and beam start.
+const LENS_AHEAD: float = 10.2748
 ## The exit bolt's panel (JunctionRoom.BOLT_PANEL_X less BOLT_PANEL_HALF_WIDTH) is a solid box standing
 ## in the lane, as tall as the scanner: a sentry whose lens is left of this face sees no further right
 ## than it, and its beam stops there. Further right, at the far end of its patrol, the machine and its

@@ -35,6 +35,7 @@
 # res://scripts/swing_leaf.gd
 # res://scripts/text_size.gd
 # res://scripts/ui_motion.gd
+# res://scripts/wolf_lights.gd
 # res://scripts/world/door_camera.gd
 #
 # FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
@@ -74,7 +75,7 @@ msgid ""
 msgstr ""
 
 #: scenes/main.tscn
-#: scripts/main.gd:4360
+#: scripts/main.gd:4402
 msgid "PAUSE"
 msgstr ""
 
@@ -156,6 +157,8 @@ msgid ""
 "\n"
 "[color=#73DDF5]PROVISIONAL ART[/color]\n"
 "Created with ChatGPT Create and the Codex image generation tool.\n"
+"The characters are whole pieces painted over\n"
+"script-drawn shape guides (October 16, 2026).\n"
 "Nathanial reviewed and approved each set.\n"
 "The WOLF//OVERRIDE mark was redrawn from a generated concept.\n"
 "\n"
@@ -228,7 +231,7 @@ msgid "BACK TO TITLE"
 msgstr ""
 
 #: scenes/main.tscn
-#: scripts/main.gd:1809
+#: scripts/main.gd:1843
 msgid "PAUSE SCROLL"
 msgstr ""
 
@@ -343,7 +346,7 @@ msgid "Default controls restored."
 msgstr ""
 
 #: scripts/game_settings.gd:608
-#: scripts/main.gd:1937
+#: scripts/main.gd:1971
 msgid "Settings could not be saved."
 msgstr ""
 
@@ -375,38 +378,38 @@ msgstr ""
 msgid "EXIT LOCKED"
 msgstr ""
 
-#: scripts/main.gd:964
+#: scripts/main.gd:998
 msgid "LINK UNAVAILABLE"
 msgstr ""
 
-#: scripts/main.gd:1844
+#: scripts/main.gd:1878
 msgid "RESUME SCROLL"
 msgstr ""
 
-#: scripts/main.gd:1877
+#: scripts/main.gd:1911
 msgid "30 FPS"
 msgstr ""
 
-#: scripts/main.gd:1878
+#: scripts/main.gd:1912
 msgid "60 FPS"
 msgstr ""
 
-#: scripts/main.gd:1879
+#: scripts/main.gd:1913
 msgid "UNCAPPED"
 msgstr ""
 
-#: scripts/main.gd:1880
+#: scripts/main.gd:1914
 msgid "90 FPS"
 msgstr ""
 
-#: scripts/main.gd:1881
+#: scripts/main.gd:1915
 msgid "120 FPS"
 msgstr ""
 
-#: scripts/main.gd:1882
+#: scripts/main.gd:1916
 msgid "144 FPS"
 msgstr ""
 
-#: scripts/main.gd:1899
+#: scripts/main.gd:1933
 msgid "TAP RESUME TO RETURN"
 msgstr ""

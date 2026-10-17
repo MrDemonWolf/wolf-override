@@ -349,17 +349,24 @@ const RETRY_FADE_IN_SECONDS: float = 0.35
 const RETRY_PROMPT: String = "%s  RETRY"
 const RETRY_TOUCH_PROMPT: String = "TAP RETRY"
 const RETRY_BUTTON_TEXT: String = "RETRY"
-const HUMAN_SPRITE_REST: Vector2 = Vector2(0.0, -5.0)
-## The engineer's crank pose at the MANUAL BYPASS: two frames cut from the engineer's own sprite
-## (the same drawing, scale and light; the legs are its pixels exactly), leaning into the wheel with
-## both gloves on its rim. A (the regrip) holds it at 8 and 10 o'clock; B (the push) has turned both
-## grips an eighth of a turn with the wheel, to half past 9 and half past 11. One atlas, two 205x380
-## regions trimmed from 384x384 cells whose centre is the usual sprite's centre, drawn at the usual
-## sprite's scale, so the boots stand exactly where they always do.
-const CRANK_ART: Texture2D = preload("res://assets/characters/eng-crank-atlas.png")
-const CRANK_REGION_SIZE: Vector2 = Vector2(205.0, 380.0)
-const CRANK_SCALE: float = 0.188
-const CRANK_SPRITE_POS: Vector2 = Vector2(2.35, -4.812)
+## The engineer's standing piece (characters/eng-stand.png, 217x562, painted at 8 px per world px) is
+## drawn at 1/8 (main.tscn Human/BodySprite scale 0.125), 27.1 x 70.25 world px. Its centre sits this
+## far from the engineer's origin: the soles (the piece's bottom row) land on HUMAN_FLOOR_Y,
+## 30 - 562 / 2 * 0.125. The body stays centred on x 0 so it mirrors in place when the engineer turns.
+const HUMAN_SPRITE_REST: Vector2 = Vector2(0.0, -5.125)
+## The engineer's crank pose at the MANUAL BYPASS: two whole pieces painted over the earlier crank
+## frames, leaning into the wheel with both gloves on its rim, drawn at the standing piece's scale.
+## Index 0 (A, the regrip; characters/eng-crank-push.png, 216x569) holds the rim at 8 and 10 o'clock;
+## index 1 (B, the push; characters/eng-crank-pull.png, 262x568) has turned both grips an eighth of a
+## turn with the wheel, to half past 9 and half past 11. (The piece names are the art set's; the poses
+## are A and B as m0_scene_test reads them.)
+const CRANK_ART: Array[Texture2D] = [preload("res://assets/characters/eng-crank-push.png"), preload("res://assets/characters/eng-crank-pull.png")]
+const CRANK_SCALE: float = 0.125
+## Each crank piece's centre from the engineer's origin (world px): where the earlier frame's painted box
+## stood plus the art set's registration offset (whole-regen manifest offset_world_px), so the gloves
+## land on the rim where they did; y puts the soles (each piece's bottom row) on HUMAN_FLOOR_Y,
+## 30 - height / 2 * CRANK_SCALE.
+const CRANK_SPRITE_POS: Array[Vector2] = [Vector2(2.39, -5.5625), Vector2(4.91, -5.5)]
 ## B (the push) shows this long after each crank tick, at most half a tick (_bypass_cranked); A (the
 ## regrip) the rest of the tick. Both follow the ticks, so any hold length works, TOGGLE HOLDS too.
 const CRANK_PUSH_SECONDS: float = 0.2
@@ -368,23 +375,34 @@ const CRANK_PUSH_SECONDS: float = 0.2
 const ACTOR_Z: int = 2
 const KNOCKDOWN_Z: int = 3
 ## A knockdown plays the engineer's collapse: the approved death-pose row (2026-10-11, in
-## 1cf8d73:docs/research-2026-10/sources/walk-final-2026-10-11/death-poses), its five painted frames cut to
-## COLLAPSE_FRAME and laid side by side. In every frame the boots stand on column COLLAPSE_PIVOT_X and
-## the soles on the bottom edge, so the body goes down onto the floor line and lies on it.
-const COLLAPSE_SHEET: Texture2D = preload("res://assets/engineer-collapse-provisional.png")
-const COLLAPSE_FRAME: Vector2 = Vector2(330.0, 248.0)
-const COLLAPSE_PIVOT_X: float = 98.0
-## Each frame's painted body as columns from the boots (frame px, facing right): knees, slumping, on
-## the side. The shadow lies under it and the sentry rolls back clear of it.
-const COLLAPSE_SPANS: Array[Vector2] = [Vector2(-28.0, 67.0), Vector2(-93.0, 96.0), Vector2(-93.0, 164.0), Vector2(-94.0, 209.0), Vector2(-94.0, 228.0)]
-## Each frame's top painted row (frame px): lying on the side, the body is under 19 px tall in the room.
-const COLLAPSE_TOPS: Array[float] = [6.0, 59.0, 110.0, 159.0, 174.0]
+## 1cf8d73:docs/research-2026-10/sources/walk-final-2026-10-11/death-poses), repainted as five whole
+## pieces (characters/eng-collapse-1..5.png, each cut to its painted outline, facing right). In every
+## piece the soles are on its bottom row, so the body goes down onto the floor line and lies on it.
+const COLLAPSE_ART: Array[Texture2D] = [
+	preload("res://assets/characters/eng-collapse-1.png"),
+	preload("res://assets/characters/eng-collapse-2.png"),
+	preload("res://assets/characters/eng-collapse-3.png"),
+	preload("res://assets/characters/eng-collapse-4.png"),
+	preload("res://assets/characters/eng-collapse-5.png"),
+]
+## The column the boots stand on in each piece (piece px from its left edge, facing right): where the
+## earlier frame's boots column lands in the repainted piece (its painted box plus the art set's
+## registration offset, times the pieces' 6 px per world px).
+const COLLAPSE_PIVOTS: Array[float] = [42.0, 141.0, 140.0, 143.0, 144.0]
+## Each piece's painted body (alpha over half) as columns from the boots (piece px, facing right, first
+## and last column): knees, slumping, on the side. The shadow lies under it and the sentry rolls back
+## clear of it.
+const COLLAPSE_SPANS: Array[Vector2] = [Vector2(-41.0, 104.0), Vector2(-141.0, 149.0), Vector2(-139.0, 251.0), Vector2(-143.0, 319.0), Vector2(-144.0, 349.0)]
+## Each piece's top painted row (piece px; the pieces are cut to their outline, so 0 or 1): lying on the
+## side, the body is under 19 px tall in the room.
+const COLLAPSE_TOPS: Array[float] = [1.0, 0.0, 1.0, 0.0, 0.0]
 ## When each frame starts (s): knees 0-0.18, the slump onto the side 0.18-0.45; the last one holds.
 ## Reduced Motion shows the last frame at once.
 const COLLAPSE_TIMES: Array[float] = [0.0, 0.09, 0.18, 0.315, 0.45]
 const COLLAPSE_SECONDS: float = 0.45
-## Drawn as tall as the standing sprite: the row's standing frame is 277 px, the sprite's 70.3 px.
-const COLLAPSE_SCALE: float = 0.254
+## The pieces' own density: they were painted at 6 px per world px, so the kneeling first frame
+## stands 59.5 world px tall, as the earlier row drew it.
+const COLLAPSE_SCALE: float = 1.0 / 6.0
 ## The floor line in the engineer's space (the bottom of their body, y 440 in every room): the collapse's
 ## soles sit on it, and its floor reflection mirrors about it.
 const HUMAN_FLOOR_Y: float = 30.0
@@ -779,13 +797,27 @@ var opening_lines: Array[String] = []
 var speaker_column: float = 0.0
 var speaker_column_key: String = ""
 
-const WOLF_SPRITE_REST: Vector2 = Vector2(0.0, -15.0)
-## WOLF's painted feet sit this far below his sprite's centre, in the art's own pixels (its opaque
-## rows end at 367 of 406).
-const WOLF_FEET_BELOW_CENTRE: float = 164.0
-## WOLF's drawn height at rest, from the tips of his ears to his feet, in world px (his art's opaque
-## rows at WOLF's rest scale).
-const WOLF_DRAWN_HEIGHT: float = 59.0
+## WOLF's standing piece and the scale it is drawn at (main.tscn Wolf/BodySprite uses both; the
+## WOLF art checks in wolf_space_test and sentry_test read them from here). The piece (1028x549) was
+## painted at 8 px per world px over a guide 12 % larger than the earlier sprite's painted body, so it
+## is not drawn at 1/8: WOLF keeps about the size he was drawn before (the default for the open
+## WOLF-size question, 2026-10-16, until Nathanial picks another). The earlier body ran 56 px behind
+## his origin and 59.1 ahead (115.1 x 61.6 world px); the piece is cut to his outline and centred, so
+## it reaches as far each way, and 0.1089 keeps his tail tip where it was (55.97 px back, inside the
+## Service Junction's right edge at his spot by the exit, WOLF_BAIT_X): 111.9 x 59.8 world px, 3 %
+## smaller than before.
+const WOLF_ART_PATH: String = "res://assets/characters/wolf-stand.png"
+const WOLF_ART_SCALE: float = 0.1089
+## The sprite's centre from WOLF's origin: his feet (the piece's bottom row) stand where the earlier
+## art's did, 15.4 world px below the origin (-14.5 + 549 / 2 * WOLF_ART_SCALE). x stays 0 so he
+## mirrors in place.
+const WOLF_SPRITE_REST: Vector2 = Vector2(0.0, -14.5)
+## WOLF's painted feet sit this far below his sprite's centre, in the art's own pixels (the piece is
+## cut to its outline: half its 549 rows).
+const WOLF_FEET_BELOW_CENTRE: float = 274.5
+## WOLF's drawn height at rest, from the tips of his ears to his feet, in world px (the piece's 549
+## rows at WOLF_ART_SCALE).
+const WOLF_DRAWN_HEIGHT: float = 549.0 * WOLF_ART_SCALE
 const GAMEPLAY_ZOOM: float = 1.35
 const GAMEPLAY_VIEW_WIDTH: float = 960.0 / GAMEPLAY_ZOOM
 ## The play camera's resting height. At 1.35 it puts the floor (y 440) 27 px above the context hint
@@ -877,6 +909,8 @@ func _ready() -> void:
 	move_child(wolf, human.get_index())
 	wolf.keep_clear_of = human
 	wolf_sprite_scale = wolf.body_sprite.scale
+	# His piece is painted with its lights off; the eye and seam lights are drawn over it in code.
+	WolfLights.attach(wolf.body_sprite)
 	_setup_corridor_door()
 	_setup_bypass()
 	_setup_corridor_labels()
@@ -1314,7 +1348,7 @@ func _update_crank_pose(delta: float) -> void:
 		_show_human_standing()
 	else:
 		# The wheel is on the engineer's right, so the crank frames never flip.
-		_show_human_frame(CRANK_ART, Rect2(Vector2(CRANK_REGION_SIZE.x * frame, 0.0), CRANK_REGION_SIZE), CRANK_SCALE, CRANK_SPRITE_POS, false)
+		_show_human_frame(CRANK_ART[frame], CRANK_SCALE, CRANK_SPRITE_POS[frame], false)
 
 
 ## The engineer's authored step (back from the relay, to a crank spot, or beside a station they used):
@@ -3737,7 +3771,7 @@ func _start_collapse(by_sentry: bool, in_lane: bool) -> void:
 	# staggering back from it as the knees go (this wins over the lane's post, as the gap between the
 	# two is shorter than the lying body).
 	var tank_base: float = lerpf(JunctionRoom.TANK_REST_Y, JunctionRoom.landed_tank_y(false), drop_arm.drop_amount()) + JunctionRoom.TANK_SIZE.y * 0.5
-	if tank_base > JunctionRoom.FLOOR_Y - (COLLAPSE_FRAME.y - COLLAPSE_TOPS[-1]) * COLLAPSE_SCALE:
+	if tank_base > JunctionRoom.FLOOR_Y - collapse_height(COLLAPSE_ART.size() - 1):
 		var tank_from: float = DropArm.MARK_X - JunctionRoom.TANK_SIZE.x * 0.5 - LANE_FALL_CLEAR
 		var tank_to: float = DropArm.MARK_X + JunctionRoom.TANK_SIZE.x * 0.5 + LANE_FALL_CLEAR
 		var lying: Vector2 = collapse_span(COLLAPSE_SPANS.size() - 1, collapse_fall, collapse_to_x)
@@ -3789,13 +3823,26 @@ func _show_collapse(t: float) -> void:
 		if t >= COLLAPSE_TIMES[index] - 0.0001:
 			frame = index
 	var boots: float = lerpf(collapse_from_x, collapse_to_x, ease(clampf(t / COLLAPSE_SECONDS, 0.0, 1.0), 0.4)) - human.position.x
-	_show_human_frame(COLLAPSE_SHEET, Rect2(frame * COLLAPSE_FRAME.x, 0.0, COLLAPSE_FRAME.x, COLLAPSE_FRAME.y), COLLAPSE_SCALE,
-			Vector2(boots + collapse_fall * (COLLAPSE_FRAME.x * 0.5 - COLLAPSE_PIVOT_X) * COLLAPSE_SCALE, HUMAN_FLOOR_Y - COLLAPSE_FRAME.y * 0.5 * COLLAPSE_SCALE),
+	var art: Texture2D = COLLAPSE_ART[frame]
+	_show_human_frame(art, COLLAPSE_SCALE,
+			Vector2(boots + collapse_fall * collapse_centre_from_boots(frame), HUMAN_FLOOR_Y - art.get_height() * 0.5 * COLLAPSE_SCALE),
 			collapse_fall < 0.0)
 	human.body_sprite.rotation_degrees = 0.0
 	var span: Vector2 = collapse_span(frame, collapse_fall, boots)
 	human_reflection.floor_y = HUMAN_FLOOR_Y
 	human_reflection.shadow_span = span
+
+
+## How far collapse frame [param frame]'s piece centre stands ahead of the boots along the fall, in
+## world px (facing right; mirrored for a fall to the left).
+static func collapse_centre_from_boots(frame: int) -> float:
+	return (COLLAPSE_ART[frame].get_width() * 0.5 - COLLAPSE_PIVOTS[frame]) * COLLAPSE_SCALE
+
+
+## How high collapse frame [param frame]'s painted body reaches above the floor line, in world px (its
+## piece's rows from COLLAPSE_TOPS down to the soles).
+static func collapse_height(frame: int) -> float:
+	return (COLLAPSE_ART[frame].get_height() - COLLAPSE_TOPS[frame]) * COLLAPSE_SCALE
 
 
 ## The x span (from, to) of the painted body in collapse frame [param frame], falling [param fall]
@@ -3805,29 +3852,24 @@ static func collapse_span(frame: int, fall: float, boots_x: float) -> Vector2:
 	return Vector2(boots_x + minf(columns.x * fall, columns.y * fall), boots_x + maxf(columns.x * fall, columns.y * fall))
 
 
-## The engineer's body sprite back on the standing image (human_texture, the whole texture) at its
-## rest scale and offset. The one place that undoes a sheet frame (_show_human_frame), so the crank
-## and the stand-up after a collapse restore the same four properties. Leaves rotation and flip_h to
-## the caller: the crank keeps the facing it had, and _stand_up restores the facing from before the
-## collapse.
+## The engineer's body sprite back on the standing piece (human_texture) at its rest scale and
+## offset. The one place that undoes a posed piece (_show_human_frame), so the crank and the stand-up
+## after a collapse restore the same three properties. Leaves rotation and flip_h to the caller: the
+## crank keeps the facing it had, and _stand_up restores the facing from before the collapse.
 func _show_human_standing() -> void:
 	var sprite: Sprite2D = human.body_sprite
 	sprite.texture = human_texture
-	sprite.region_enabled = false
 	sprite.scale = human_sprite_scale
 	sprite.position = HUMAN_SPRITE_REST
 
 
-## The engineer's body sprite on one frame of a painted sheet: [param sheet] cut to [param region]
-## (art px), drawn at [param frame_scale] (world px per art px) at position [param at] (world px,
-## relative to the engineer's origin), mirrored when [param flip]. Used by the crank frames
-## (CRANK_ART) and the collapse (COLLAPSE_SHEET); _show_human_standing undoes it. Leaves rotation to
-## the caller.
-func _show_human_frame(sheet: Texture2D, region: Rect2, frame_scale: float, at: Vector2, flip: bool) -> void:
+## The engineer's body sprite on one whole posed piece: [param art] drawn at [param frame_scale]
+## (world px per art px) at position [param at] (world px, relative to the engineer's origin),
+## mirrored when [param flip]. Used by the crank frames (CRANK_ART) and the collapse (COLLAPSE_ART);
+## _show_human_standing undoes it. Leaves rotation to the caller.
+func _show_human_frame(art: Texture2D, frame_scale: float, at: Vector2, flip: bool) -> void:
 	var sprite: Sprite2D = human.body_sprite
-	sprite.texture = sheet
-	sprite.region_enabled = true
-	sprite.region_rect = region
+	sprite.texture = art
 	sprite.scale = Vector2.ONE * frame_scale
 	sprite.position = at
 	sprite.flip_h = flip

@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://b2g3sm4886qx7"
-path="res://.godot/imported/director-side-left-provisional.png-7cc2a96b5dd41e7302cda72388091b1f.ctex"
+uid="uid://c306e5s8d8afv"
+path="res://.godot/imported/wolf-stand.png-f94319cb955459b4b29fd926df9f1411.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/director-side-left-provisional.png"
-dest_files=["res://.godot/imported/director-side-left-provisional.png-7cc2a96b5dd41e7302cda72388091b1f.ctex"]
+source_file="res://assets/characters/wolf-stand.png"
+dest_files=["res://.godot/imported/wolf-stand.png-f94319cb955459b4b29fd926df9f1411.ctex"]
 
 [params]
 

@@ -825,7 +825,7 @@ func _check_presentation(room: JunctionRoom, human: M0Actor, wolf: M0Actor) -> v
 	# The near column's foot: in the rows a body lying on the floor fills, its painting, sealed (COLUMN)
 	# or blown (COLBLOWN), spans DOOR_FOOT_X..DOOR_FOOT_RIGHT_X of the room, which Main._start_collapse
 	# keeps a lying body clear of; the stub's painting starts below the floor line, under no lying body.
-	var lying_top: float = JunctionRoom.FLOOR_Y - (MainScript.COLLAPSE_FRAME.y - MainScript.COLLAPSE_TOPS[-1]) * MainScript.COLLAPSE_SCALE
+	var lying_top: float = JunctionRoom.FLOOR_Y - MainScript.collapse_height(MainScript.COLLAPSE_ART.size() - 1)
 	var atlas_image: Image = Suite.texture_image(JunctionDoorLayout.ATLAS)
 	var sealed_foot: Vector2 = _painted_x_in_rows(atlas_image, JunctionDoorLayout.COLUMN_REGION, JunctionDoorLayout.COLUMN_AT, JunctionDoorLayout.COLUMN_SCALE, lying_top, JunctionRoom.FLOOR_Y)
 	var blown_foot: Vector2 = _painted_x_in_rows(atlas_image, JunctionDoorLayout.COLBLOWN_REGION, JunctionDoorLayout.COLBLOWN_AT, JunctionDoorLayout.COLBLOWN_SCALE, lying_top, JunctionRoom.FLOOR_Y)
@@ -924,15 +924,15 @@ func _check_down_facing_blown_door(game: Node2D, room: JunctionRoom, human: M0Ac
 ## the floor.
 func _lying_body(human: M0Actor, fall: float, label: String) -> Rect2:
 	var sprite: Sprite2D = human.body_sprite
-	var last_x: float = MainScript.COLLAPSE_FRAME.x * (MainScript.COLLAPSE_SPANS.size() - 1)
-	_expect(await _wait_until(func() -> bool: return sprite.texture == MainScript.COLLAPSE_SHEET and is_equal_approx(sprite.region_rect.position.x, last_x), 90) and sprite.flip_h == (fall < 0.0), "%s, they slump forward towards it and lie down" % label)
+	_expect(await _wait_until(func() -> bool: return sprite.texture == MainScript.COLLAPSE_ART[-1], 90) and sprite.flip_h == (fall < 0.0), "%s, they slump forward towards it and lie down" % label)
 	# Two drawn frames, so the slump's last step has been drawn.
 	await process_frame
 	await process_frame
 	var drawn: Rect2 = sprite.get_global_transform() * sprite.get_rect()
-	var boots: float = sprite.global_position.x - fall * (MainScript.COLLAPSE_FRAME.x * 0.5 - MainScript.COLLAPSE_PIVOT_X) * MainScript.COLLAPSE_SCALE
-	var span: Vector2 = MainScript.collapse_span(MainScript.COLLAPSE_SPANS.size() - 1, fall, boots)
-	var top: float = drawn.end.y - (MainScript.COLLAPSE_FRAME.y - MainScript.COLLAPSE_TOPS[-1]) * MainScript.COLLAPSE_SCALE
+	var last: int = MainScript.COLLAPSE_ART.size() - 1
+	var boots: float = sprite.global_position.x - fall * MainScript.collapse_centre_from_boots(last)
+	var span: Vector2 = MainScript.collapse_span(last, fall, boots)
+	var top: float = drawn.end.y - MainScript.collapse_height(last)
 	return Rect2(span.x, top, span.y - span.x, drawn.end.y - top)
 
 

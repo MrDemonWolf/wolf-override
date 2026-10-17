@@ -20,7 +20,6 @@ extends SceneTree
 
 const GAME_SCENE: PackedScene = preload("res://scenes/main.tscn")
 const Suite = preload("res://tests/support/game_suite.gd")
-const WOLF_ART: String = "res://assets/wolf-side-right-provisional.png"
 const TOUCH: float = 0.5
 ## The corridor's door-end pieces measured in depth, not along x, while WOLF stands in the open
 ## doorway (_check_doorway): the frame (far guide, hood, operator) and the wall-mounted MANUAL BYPASS
@@ -78,7 +77,7 @@ func _run() -> void:
 ## M0Actor.WOLF_SNOUT and WOLF_TAIL, which place his spots, are his painted art's reach.
 func _check_reach_constants(game: Main) -> void:
 	var wolf: M0Actor = game.wolf
-	_expect(wolf.body_sprite.texture.resource_path == WOLF_ART, "WOLF is drawn from the art the reach constants were measured on")
+	_expect(wolf.body_sprite.texture.resource_path == Main.WOLF_ART_PATH and wolf.body_sprite.scale == Vector2.ONE * Main.WOLF_ART_SCALE, "WOLF is drawn from the art the reach constants were measured on, at its scale")
 	var columns: Vector2 = _painted_extent(wolf.body_sprite, Vector2.AXIS_X)
 	var half: float = wolf.body_sprite.texture.get_width() * 0.5
 	var scale: float = wolf.body_sprite.scale.x

@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://ccuylhkqnqxn7"
-path="res://.godot/imported/rowan-side-right-provisional.png-75962d0315501878e993bef9684f7853.ctex"
+uid="uid://cekw5x46oqfeb"
+path="res://.godot/imported/eng-stand.png-f7006a75058a75129edea8c8a8b38bdc.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/rowan-side-right-provisional.png"
-dest_files=["res://.godot/imported/rowan-side-right-provisional.png-75962d0315501878e993bef9684f7853.ctex"]
+source_file="res://assets/characters/eng-stand.png"
+dest_files=["res://.godot/imported/eng-stand.png-f7006a75058a75129edea8c8a8b38bdc.ctex"]
 
 [params]
 

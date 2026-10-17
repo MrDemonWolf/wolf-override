@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://b012nu0pwmqpx"
-path="res://.godot/imported/junction-sentry-side-left.png-1cc36e315c23e984c5d80bf7d794136b.ctex"
+uid="uid://4ukoviaurju1"
+path="res://.godot/imported/eng-crank-pull.png-1f73278a5b9e1b41c6256bdbe4591e1a.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/props/junction-sentry-side-left.png"
-dest_files=["res://.godot/imported/junction-sentry-side-left.png-1cc36e315c23e984c5d80bf7d794136b.ctex"]
+source_file="res://assets/characters/eng-crank-pull.png"
+dest_files=["res://.godot/imported/eng-crank-pull.png-1f73278a5b9e1b41c6256bdbe4591e1a.ctex"]
 
 [params]
 

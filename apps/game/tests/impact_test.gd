@@ -13,7 +13,7 @@ func _initialize() -> void:
 
 
 func _run() -> void:
-	_check_collapse_sheet()
+	_check_collapse_pieces()
 	var path: String = "user://impact-test-%s.json" % OS.get_process_id()
 	if FileAccess.file_exists(path):
 		DirAccess.remove_absolute(ProjectSettings.globalize_path(path))
@@ -168,9 +168,9 @@ func _run() -> void:
 	var turned: Array[bool] = [human.body_sprite.flip_h != faced_left]
 	var lying: bool = await _wait_until(func() -> bool:
 		turned[0] = turned[0] or human.body_sprite.flip_h != faced_left
-		if human.body_sprite.texture == MainScript.COLLAPSE_SHEET:
-			seen_frames[int(human.body_sprite.region_rect.position.x / MainScript.COLLAPSE_FRAME.x)] = true
-		return seen_frames.has(MainScript.COLLAPSE_SPANS.size() - 1), 60)
+		if MainScript.COLLAPSE_ART.has(human.body_sprite.texture):
+			seen_frames[MainScript.COLLAPSE_ART.find(human.body_sprite.texture)] = true
+		return seen_frames.has(MainScript.COLLAPSE_ART.size() - 1), 60)
 	_expect(lying and seen_frames.size() >= 3, "the engineer collapses through the painted frames (%s) and lies down" % str(seen_frames.keys()))
 	_expect(not turned[0] and is_equal_approx(float(game.get("collapse_fall")), -1.0 if faced_left else 1.0), "facing %s, they slump forward that way and never turn round" % ("left" if faced_left else "right"))
 	# The reflection copies its source in _process, which a physics frame does not always include;
@@ -188,11 +188,11 @@ func _run() -> void:
 	var wolf_saved_x: float = state.wolf_position.x
 	var wolf_on_way: bool = wolf.position.y == state.wolf_position.y and wolf.autonomous_target_x == MainScript.WOLF_DOORWAY_X and wolf.position.x >= minf(wolf_saved_x, MainScript.WOLF_DOORWAY_X) and wolf.position.x <= maxf(wolf_saved_x, MainScript.WOLF_DOORWAY_X)
 	_expect(human.controlled and human.position == state.human_position and wolf_on_way, "the engineer stands at the checkpoint with controls back, and WOLF heads from his saved spot to the doorway (at x %.1f, saved %.1f)" % [wolf.position.x, wolf_saved_x])
-	_expect(human.body_sprite.rotation_degrees == 0.0 and human.body_sprite.position == Vector2(0.0, -5.0) and human.body_sprite.texture != MainScript.COLLAPSE_SHEET and not human.body_sprite.region_enabled and is_equal_approx(human.body_sprite.scale.x, 0.188), "the engineer stands again, as drawn before the knockdown")
+	_expect(human.body_sprite.rotation_degrees == 0.0 and human.body_sprite.position == MainScript.HUMAN_SPRITE_REST and not MainScript.COLLAPSE_ART.has(human.body_sprite.texture) and not human.body_sprite.region_enabled and is_equal_approx(human.body_sprite.scale.x, 0.125), "the engineer stands again, as drawn before the knockdown")
 	var reflection: FloorReflection = game.get("human_reflection") as FloorReflection
 	await process_frame
 	await process_frame
-	_expect(reflection.texture == human.body_sprite.texture and reflection.shadow_span == Vector2.ZERO and is_equal_approx(reflection.floor_y, -5.0 + 192.0 * 0.188), "their reflection and shadow are the standing ones again")
+	_expect(reflection.texture == human.body_sprite.texture and reflection.shadow_span == Vector2.ZERO and is_equal_approx(reflection.floor_y, MainScript.HUMAN_FLOOR_Y), "their reflection and shadow are the standing ones again")
 	_expect(str(game.get("status_line")).contains("Wait for the hiss") and str(game.get("status_line")).contains("Back at the last checkpoint."), "the status line keeps the cause and says where play resumed")
 	_expect(await _wait_until(func() -> bool: return Engine.time_scale == 1.0 and camera.offset == Vector2.ZERO and intro_fade.color.a == 0.0, 90), "time scale, camera and fade are all at rest after the restore")
 	# Walking into the armed hazard is the other contact path.
@@ -204,7 +204,7 @@ func _run() -> void:
 	var walked_turn: Array[bool] = [not human.body_sprite.flip_h]
 	var walked_down: bool = await _wait_until(func() -> bool:
 		walked_turn[0] = walked_turn[0] or not human.body_sprite.flip_h
-		return human.body_sprite.texture == MainScript.COLLAPSE_SHEET and is_equal_approx(human.body_sprite.region_rect.position.x, MainScript.COLLAPSE_FRAME.x * (MainScript.COLLAPSE_SPANS.size() - 1)), 60)
+		return human.body_sprite.texture == MainScript.COLLAPSE_ART[-1], 60)
 	_expect(walked_down and not walked_turn[0], "walking left into it, they slump forward to the left without turning round")
 	await _check_retry_timing(game, "a repeat knockdown")
 	_expect((game.get("state") as M0State).to_dict() == saved, "the second restore is the same checkpoint")
@@ -240,7 +240,7 @@ func _run() -> void:
 	game.call("_fail_beat", "Test knockdown.")
 	await process_frame
 	await process_frame
-	_expect(game.get("fail_active") and Engine.time_scale == 1.0 and human.body_sprite.rotation_degrees == 0.0 and is_equal_approx(human.body_sprite.region_rect.position.x, MainScript.COLLAPSE_FRAME.x * (MainScript.COLLAPSE_SPANS.size() - 1)), "Reduced Motion knockdown cuts straight to lying down and skips the dip")
+	_expect(game.get("fail_active") and Engine.time_scale == 1.0 and human.body_sprite.rotation_degrees == 0.0 and human.body_sprite.texture == MainScript.COLLAPSE_ART[-1], "Reduced Motion knockdown cuts straight to lying down and skips the dip")
 	_check_lying(human, "with Reduced Motion")
 	_expect(await Suite.retry(game, 240), "the Reduced Motion knockdown restores")
 	impact.reduce_motion = false
@@ -265,22 +265,23 @@ func _run() -> void:
 	quit(1 if failures > 0 else 0)
 
 
-## P0-3: the collapse sheet is cut so each frame's soles are on its bottom row (no gap above the floor
-## line and nothing below it), and Main's spans are the painted body's columns from the boots.
-func _check_collapse_sheet() -> void:
-	var image: Image = MainScript.COLLAPSE_SHEET.get_image()
-	if image.is_compressed():
-		image.decompress()
-	var frame_size: Vector2i = Vector2i(MainScript.COLLAPSE_FRAME)
-	_expect(image.get_width() == frame_size.x * MainScript.COLLAPSE_SPANS.size() and image.get_height() == frame_size.y, "the collapse sheet holds %d frames of %s" % [MainScript.COLLAPSE_SPANS.size(), frame_size])
-	for frame: int in MainScript.COLLAPSE_SPANS.size():
+## P0-3: each collapse piece is cut so its soles are on its bottom row (no gap above the floor line and
+## nothing below it), and Main's spans are the painted body's columns from the boots.
+func _check_collapse_pieces() -> void:
+	var count: int = MainScript.COLLAPSE_ART.size()
+	_expect(MainScript.COLLAPSE_SPANS.size() == count and MainScript.COLLAPSE_PIVOTS.size() == count and MainScript.COLLAPSE_TOPS.size() == count and MainScript.COLLAPSE_TIMES.size() == count, "every collapse piece has its boots column, span, top row and start time")
+	for frame: int in count:
+		var image: Image = MainScript.COLLAPSE_ART[frame].get_image()
+		if image.is_compressed():
+			image.decompress()
+		var frame_size: Vector2i = image.get_size()
 		var bottom_row: int = 0
 		var top_row: int = frame_size.y
 		var left: int = frame_size.x
 		var right: int = -1
 		for y: int in frame_size.y:
 			for x: int in frame_size.x:
-				if image.get_pixel(frame * frame_size.x + x, y).a >= 0.5:
+				if image.get_pixel(x, y).a >= 0.5:
 					bottom_row = maxi(bottom_row, y)
 					top_row = mini(top_row, y)
 					left = mini(left, x)
@@ -288,7 +289,8 @@ func _check_collapse_sheet() -> void:
 		_expect(bottom_row == frame_size.y - 1, "collapse frame %d stands its soles on its bottom row (%d)" % [frame, bottom_row])
 		_expect(top_row == int(MainScript.COLLAPSE_TOPS[frame]), "collapse frame %d's painted body starts on row %d, as Main says (%.0f)" % [frame, top_row, MainScript.COLLAPSE_TOPS[frame]])
 		var span: Vector2 = MainScript.COLLAPSE_SPANS[frame]
-		_expect(absf(left - MainScript.COLLAPSE_PIVOT_X - span.x) <= 1.0 and absf(right - MainScript.COLLAPSE_PIVOT_X - span.y) <= 1.0, "collapse frame %d's painted body spans %d..%d from the boots, as Main says (%s)" % [frame, left - int(MainScript.COLLAPSE_PIVOT_X), right - int(MainScript.COLLAPSE_PIVOT_X), span])
+		var pivot: float = MainScript.COLLAPSE_PIVOTS[frame]
+		_expect(absf(left - pivot - span.x) <= 1.0 and absf(right - pivot - span.y) <= 1.0, "collapse frame %d's painted body spans %d..%d from the boots, as Main says (%s)" % [frame, left - int(pivot), right - int(pivot), span])
 
 
 ## P0-3: a knocked-down body lies on the floor line (y 440, the bottom of the engineer's body): never

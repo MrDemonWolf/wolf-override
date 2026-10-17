@@ -12,10 +12,11 @@ const WHEEL_RIM_ATLAS_RADIUS: float = 37.5
 ## the wheel, to about half past 9 and half past 11.
 const CRANK_GRIP_CLOCK: PackedFloat32Array = [240.0, 285.0]
 const CRANK_NEAR_GRIP_CLOCK: PackedFloat32Array = [300.0, 345.0]
-## The crank art's glove: dark, neutral, opaque pixels within this many atlas px of the grip.
-const CRANK_GLOVE_SEARCH: int = 16
-## The crank frames' atlas, read once.
-var crank_image: Image
+## The crank art's glove: dark, neutral, opaque pixels within this many piece px of the grip (3 world
+## px at Main.CRANK_SCALE, the radius the earlier atlas was searched with).
+const CRANK_GLOVE_SEARCH: int = 24
+## Each crank piece's image by texture, read once.
+var crank_images: Dictionary = {}
 ## The running game, for helpers such as _tap_to_step: _run holds it in a local, which other
 ## functions cannot see.
 var game_ref: Node2D
@@ -234,7 +235,7 @@ func _run() -> void:
 	if not _require(state.memory.get("choice_id") == State.DISCLOSE, "first dialogue key records disclosed risk"):
 		return
 	await create_timer(0.1).timeout
-	_expect(wolf.body_sprite.position.distance_to(Vector2(0.0, -15.0)) > 2.0, "WOLF visibly reacts to the disclosed risk")
+	_expect(wolf.body_sprite.position.distance_to(Main.WOLF_SPRITE_REST) > 2.0, "WOLF visibly reacts to the disclosed risk")
 	_expect(game.call("_objective") == "ARM THE BREAKER", "honest answer advances the objective")
 	await _tap(&"interact")
 	if not _require(state.breaker_armed, "breaker arms after choice"):
@@ -359,7 +360,7 @@ func _run() -> void:
 	var column_right: float = column.get_global_transform().origin.x + column.region_rect.size.x * column.scale.x
 	# The safe point answers from x 824 (its station at 876, reach 52): the column ends before that.
 	_expect(column_right <= 876.0 - 52.0, "the near column ends clear of where the safe point is used (right edge %.1f)" % column_right)
-	_expect(not relay_spark.visible and wolf.body_sprite.position == Vector2(0.0, -15.0), "contact reaction settles after the seal opens")
+	_expect(not relay_spark.visible and wolf.body_sprite.position == Main.WOLF_SPRITE_REST, "contact reaction settles after the seal opens")
 	if not _require(await _walk_to(human, 605.0), "the engineer can walk back to the open relay"):
 		return
 	await _tap(&"interact")
@@ -684,10 +685,11 @@ func _sample_crank_grip(game: Node2D, human: M0Actor, handle: BypassHandle, grip
 		return
 	(grip["frames"] as Array)[frame] = int((grip["frames"] as Array)[frame]) + 1
 	var sprite: Sprite2D = human.body_sprite
-	if crank_image == null:
-		crank_image = sprite.texture.get_image()
-		if crank_image.is_compressed():
-			crank_image.decompress()
+	if not crank_images.has(sprite.texture):
+		var image: Image = sprite.texture.get_image()
+		if image.is_compressed():
+			image.decompress()
+		crank_images[sprite.texture] = image
 	for clocks: PackedFloat32Array in [CRANK_GRIP_CLOCK, CRANK_NEAR_GRIP_CLOCK]:
 		_sample_glove(sprite, handle, clocks[frame], grip)
 
@@ -700,8 +702,9 @@ func _sample_glove(sprite: Sprite2D, handle: BypassHandle, clock_deg: float, gri
 	var clock: float = deg_to_rad(clock_deg)
 	var target: Vector2 = hub + rim * Vector2(sin(clock), -cos(clock))
 	var to_world: Transform2D = sprite.get_global_transform()
-	var region: Rect2 = sprite.region_rect
-	var origin: Vector2 = region.position + region.size * 0.5 + sprite.offset * -1.0
+	var crank_image: Image = crank_images[sprite.texture]
+	var region: Rect2 = Rect2(Vector2.ZERO, crank_image.get_size())
+	var origin: Vector2 = region.size * 0.5 + sprite.offset * -1.0
 	var centre: Vector2 = to_world.affine_inverse() * target + origin
 	var total: Vector2 = Vector2.ZERO
 	var count: int = 0

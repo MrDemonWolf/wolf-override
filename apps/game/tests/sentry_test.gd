@@ -1088,7 +1088,7 @@ func _check_chased_cards(game: Node2D, path: String) -> void:
 	var lying_rect: Rect2 = _painted_body(human.body_sprite)
 	var machine_rect: Rect2 = _drawn_rect(room.sentry.visual.body)
 	var first_gap: float = machine_rect.position.x - lying_rect.end.x
-	_expect(human.body_sprite.region_rect.position.x == MainScript.COLLAPSE_FRAME.x * (MainScript.COLLAPSE_SPANS.size() - 1) and first_gap >= 3.0, "with Reduced Motion, on the first frame they lie down the sentry already stands clear of them (gap %.1f px)" % first_gap)
+	_expect(human.body_sprite.texture == MainScript.COLLAPSE_ART[-1] and first_gap >= 3.0, "with Reduced Motion, on the first frame they lie down the sentry already stands clear of them (gap %.1f px)" % first_gap)
 	impact.reduce_motion = false
 	_expect(await Suite.retry(game, 240), "the Reduced Motion knockdown hands back")
 
@@ -1208,7 +1208,7 @@ func _check_tank_crossing(game: Node2D) -> void:
 		head_y = minf(head_y, pixel.y)
 	_expect(human.position.x >= SentryBrain.COVER_MIN_X and human.position.x <= SentryBrain.COVER_MAX_X and over_engineer[0] > -INF and over_engineer[0] <= head_y - TANK_CLEARANCE, "with the engineer at the release he passes over them on the way up, his feet (y %.0f) clear of their head (y %.0f)" % [over_engineer[0], head_y])
 	# The leap at every x of the crossing, with the wreck pinned anywhere the tank can catch it.
-	var feet_rest: float = 423.0 - 15.0 + MainScript.WOLF_FEET_BELOW_CENTRE * rest_scale.y
+	var feet_rest: float = 423.0 + MainScript.WOLF_SPRITE_REST.y + MainScript.WOLF_FEET_BELOW_CENTRE * rest_scale.y
 	_expect(JunctionRoom.wolf_tank_leap_height(JunctionRoom.WOLF_RUBBLE_X) == 0.0 and JunctionRoom.wolf_tank_leap_height(JunctionRoom.WOLF_DOWN_X) == 0.0, "at his spot by the valve and at his spot by the hatch he is on the floor")
 	_check_tank_leap_shape()
 	for at_x: float in [DropArm.MARK_X - DropArm.HIT_REACH, DropArm.MARK_X, DropArm.MARK_X + DropArm.HIT_REACH]:
@@ -1317,13 +1317,12 @@ func _expect_shove_fall(game: Node2D, label: String, facing_left: bool) -> void:
 
 
 ## P0-3: the knocked-down engineer lies on the floor line: the collapse's last frame, never tilted, the
-## soles on y 440 (the region's bottom row is the soles' row, so nothing is drawn below it), falling
+## soles on y 440 (the piece's bottom row is the soles' row, so nothing is drawn below it), falling
 ## [param fall] (1 right, -1 left), and the shadow under the whole body.
 func _expect_lying(game: Node2D, fall: float, label: String) -> bool:
 	var human: M0Actor = game.get_node("Human") as M0Actor
 	var sprite: Sprite2D = human.body_sprite
-	var last_x: float = MainScript.COLLAPSE_FRAME.x * (MainScript.COLLAPSE_SPANS.size() - 1)
-	var down: bool = await _wait_until(func() -> bool: return sprite.texture == MainScript.COLLAPSE_SHEET and is_equal_approx(sprite.region_rect.position.x, last_x), 90)
+	var down: bool = await _wait_until(func() -> bool: return sprite.texture == MainScript.COLLAPSE_ART[-1], 90)
 	var rect: Rect2 = _drawn_rect(sprite)
 	var reflection: FloorReflection = game.get("human_reflection") as FloorReflection
 	var span: Vector2 = reflection.shadow_span + Vector2.ONE * human.position.x
@@ -1352,16 +1351,16 @@ func _watch_lane(game: Node2D) -> void:
 	var tank_rect: Rect2 = Rect2(room.tank.position - JunctionRoom.TANK_SIZE * 0.5, JunctionRoom.TANK_SIZE)
 	var facing: float = sentry.visual.scale.x
 	if sentry.is_visible_in_tree() and not sentry.visual.wrecked and (game.get("sentry_brain") as SentryBrain).is_solid():
-		var front: float = (Sentry.ACTIVE_TREAD_X - Sentry.ACTIVE_REGION.position.x) * Sentry.ART_SCALE
-		var back: float = (Sentry.ACTIVE_REGION.end.x - Sentry.ACTIVE_TREAD_X) * Sentry.ART_SCALE
+		var front: float = Sentry.ACTIVE_TREAD_X * Sentry.ART_SCALE
+		var back: float = (Sentry.ACTIVE_SIZE.x - Sentry.ACTIVE_TREAD_X) * Sentry.ART_SCALE
 		var sx: float = origin + sentry.position.x
 		var body: Vector2 = Vector2(sx - (back if facing > 0.0 else front), sx + (front if facing > 0.0 else back))
 		var engineer: Vector2 = Vector2(human.global_position.x - M0Actor.HUMAN_REACH, human.global_position.x + M0Actor.HUMAN_REACH)
-		if human.body_sprite.texture == MainScript.COLLAPSE_SHEET:
+		if MainScript.COLLAPSE_ART.has(human.body_sprite.texture):
 			engineer = _painted_collapse(human)
 		var overlap: float = minf(body.y, engineer.y) - maxf(body.x, engineer.x)
 		if overlap > 0.01:
-			lane_faults.append("frame %d: sentry %.1f..%.1f overlaps the engineer %.1f..%.1f (fail %s, target %.1f, speed %.0f, brain %s %.1f f%.0f, human %.1f)" % [lane_frames, body.x, body.y, engineer.x, engineer.y, game.get("fail_active"), sentry.target_x, sentry.max_speed, (game.get("sentry_brain") as SentryBrain).state, (game.get("sentry_brain") as SentryBrain).x, (game.get("sentry_brain") as SentryBrain).facing, human.position.x] + " region %.0f ts %.2f pos %.2f vel %.1f" % [human.body_sprite.region_rect.position.x, Engine.time_scale, sentry.position.x, sentry.velocity.x])
+			lane_faults.append("frame %d: sentry %.1f..%.1f overlaps the engineer %.1f..%.1f (fail %s, target %.1f, speed %.0f, brain %s %.1f f%.0f, human %.1f)" % [lane_frames, body.x, body.y, engineer.x, engineer.y, game.get("fail_active"), sentry.target_x, sentry.max_speed, (game.get("sentry_brain") as SentryBrain).state, (game.get("sentry_brain") as SentryBrain).x, (game.get("sentry_brain") as SentryBrain).facing, human.position.x] + " frame %d ts %.2f pos %.2f vel %.1f" % [MainScript.COLLAPSE_ART.find(human.body_sprite.texture), Engine.time_scale, sentry.position.x, sentry.velocity.x])
 	if sentry.is_visible_in_tree() and sentry.visual.is_lit() and sentry.visual.reach > Sentry.lens_rect().end.x:
 		lane_beam_frames += 1
 		var lens: float = sentry.position.x + facing * Sentry.lens_rect().end.x
@@ -1382,8 +1381,8 @@ func _watch_lane(game: Node2D) -> void:
 	# (PanelFront, right after the sentry at its depth), so neither shows over the box or the feed.
 	if sentry.is_visible_in_tree() and not sentry.visual.wrecked:
 		var panel: Rect2 = JunctionRoom.prop_rect(room.bolt_panel_art, JunctionRoom.BOLT_PANEL_REGION)
-		var art_front: float = (Sentry.ACTIVE_TREAD_X - Sentry.ACTIVE_REGION.position.x) * Sentry.ART_SCALE
-		var art_back: float = (Sentry.ACTIVE_REGION.end.x - Sentry.ACTIVE_TREAD_X) * Sentry.ART_SCALE
+		var art_front: float = Sentry.ACTIVE_TREAD_X * Sentry.ART_SCALE
+		var art_back: float = (Sentry.ACTIVE_SIZE.x - Sentry.ACTIVE_TREAD_X) * Sentry.ART_SCALE
 		var parts: Dictionary = {"body": Rect2(sentry.position.x - (art_back if facing > 0.0 else art_front), Sentry.FLOOR_Y - Sentry.DRAWN_HEIGHT, art_front + art_back, Sentry.DRAWN_HEIGHT)}
 		var slit: Rect2 = Sentry.lens_rect()
 		if sentry.visual.is_lit() and sentry.visual.reach > slit.end.x:
@@ -1413,11 +1412,10 @@ func _watch_lane(game: Node2D) -> void:
 					lane_faults.append("frame %d: the sentry's %s %s is drawn over %s (front drawn %s, %.1f of %.1f px² covered)" % [lane_frames, key, parts[key], "the bolt panel %s" % panel if front == panel else "the bolt feed's %s" % front, front_drawn, covered, over.get_area()])
 		if behind:
 			lane_panel_frames += 1
-	if human.body_sprite.texture == MainScript.COLLAPSE_SHEET and room.tank.visible:
+	if MainScript.COLLAPSE_ART.has(human.body_sprite.texture) and room.tank.visible:
 		var drawn: Rect2 = _drawn_rect(human.body_sprite)
 		var span: Vector2 = _painted_collapse(human)
-		var frame: int = roundi(human.body_sprite.region_rect.position.x / MainScript.COLLAPSE_FRAME.x)
-		var top: float = drawn.end.y - (MainScript.COLLAPSE_FRAME.y - MainScript.COLLAPSE_TOPS[frame]) * MainScript.COLLAPSE_SCALE
+		var top: float = drawn.end.y - MainScript.collapse_height(MainScript.COLLAPSE_ART.find(human.body_sprite.texture))
 		var lying: Rect2 = Rect2(span.x, top, span.y - span.x, drawn.end.y - top)
 		var tank_world: Rect2 = Rect2(tank_rect.position + room.global_position, tank_rect.size)
 		if lying.grow(-0.01).intersects(tank_world):
@@ -1431,16 +1429,16 @@ func _watch_lane(game: Node2D) -> void:
 ## The x span of the engineer's collapse frame as painted (MainScript.COLLAPSE_SPANS), in the world.
 func _painted_collapse(human: M0Actor) -> Vector2:
 	var sprite: Sprite2D = human.body_sprite
-	var frame: int = roundi(sprite.region_rect.position.x / MainScript.COLLAPSE_FRAME.x)
+	var frame: int = MainScript.COLLAPSE_ART.find(sprite.texture)
 	var fall: float = -1.0 if sprite.flip_h else 1.0
-	var boots: float = sprite.global_position.x - fall * (MainScript.COLLAPSE_FRAME.x * 0.5 - MainScript.COLLAPSE_PIVOT_X) * MainScript.COLLAPSE_SCALE
+	var boots: float = sprite.global_position.x - fall * MainScript.collapse_centre_from_boots(frame)
 	return MainScript.collapse_span(frame, fall, boots)
 
 
-## The engineer's lying body as painted: the collapse frame's cut is 4 px wider than the painting on
-## each side (MainScript.COLLAPSE_SPANS), about 1 px in the room.
+## The engineer's lying body as painted: each collapse piece is cut to its painted outline
+## (MainScript.COLLAPSE_SPANS run from its first column to its last), so it is the drawn rect.
 func _painted_body(sprite: Sprite2D) -> Rect2:
-	return _drawn_rect(sprite).grow_individual(-4.0 * MainScript.COLLAPSE_SCALE, 0.0, -4.0 * MainScript.COLLAPSE_SCALE, 0.0)
+	return _drawn_rect(sprite)
 
 
 ## The axis-aligned box [param sprite]'s drawn rectangle covers in the world.
@@ -1614,7 +1612,7 @@ func _action_event(action: StringName, pressed: bool) -> InputEventAction:
 ## on an engineer over the rubble and then patrolling again, stays short of him (SentryBrain.far_x).
 func _check_bait_walk() -> void:
 	var clear: float = SentryBrain.HALF_WIDTH + M0State.WOLF_HALF_WIDTH
-	var feet_y: float = 423.0 + (-15.0) + _wolf_art_feet()
+	var feet_y: float = 423.0 + MainScript.WOLF_SPRITE_REST.y + _wolf_art_feet()
 	_expect(feet_y - JunctionRoom.LEAP_HEIGHT < Sentry.FLOOR_Y - Sentry.DRAWN_HEIGHT, "at the top of his bound WOLF's painted feet (y %.1f) clear the sentry's drawn top (y %.1f)" % [feet_y - JunctionRoom.LEAP_HEIGHT, Sentry.FLOOR_Y - Sentry.DRAWN_HEIGHT])
 	_expect(JunctionRoom.wolf_leap_height(JunctionRoom.WOLF_RUBBLE_X, SentryBrain.CHASE_MIN_X) < 0.5 and JunctionRoom.wolf_leap_height(JunctionRoom.WOLF_BAIT_X, DropArm.MARK_X) == 0.0, "standing at his spot by the valve or by the hatch he is on the floor")
 	_expect(JunctionRoom.wolf_duck_depth(JunctionRoom.WOLF_RUBBLE_X, 1.0) == 0.0 and JunctionRoom.wolf_duck_depth(JunctionRoom.WOLF_BAIT_X, -1.0) == 0.0, "nor does he duck there")
@@ -1714,8 +1712,8 @@ func _tank_pixels(grow: float) -> Dictionary:
 func _wolf_pixels(duck_halves: int) -> Dictionary:
 	if _wolf_pixel_cache.has(duck_halves):
 		return _wolf_pixel_cache[duck_halves]
-	var image: Image = (load("res://assets/wolf-side-right-provisional.png") as Texture2D).get_image()
-	var scale_x: float = 0.18325
+	var image: Image = (load(MainScript.WOLF_ART_PATH) as Texture2D).get_image()
+	var scale_x: float = MainScript.WOLF_ART_SCALE
 	var squash: float = (MainScript.WOLF_DRAWN_HEIGHT - duck_halves * 0.5) / MainScript.WOLF_DRAWN_HEIGHT
 	var scale_y: float = scale_x * squash
 	# The texture's centre sits WOLF_FEET_BELOW_CENTRE texture px above his feet.
@@ -1734,7 +1732,7 @@ func _wolf_pixels(duck_halves: int) -> Dictionary:
 ## WOLF's painted body at rest, from his art: how far it reaches behind his origin (x, his tail) and
 ## ahead of it (y, his snout), in world px.
 func _wolf_art_reach() -> Vector2:
-	var image: Image = (load("res://assets/wolf-side-right-provisional.png") as Texture2D).get_image()
+	var image: Image = (load(MainScript.WOLF_ART_PATH) as Texture2D).get_image()
 	var left: int = image.get_width()
 	var right: int = -1
 	for x: int in image.get_width():
@@ -1743,21 +1741,21 @@ func _wolf_art_reach() -> Vector2:
 				left = mini(left, x)
 				right = maxi(right, x)
 				break
-	var scale: float = 0.18325
+	var scale: float = MainScript.WOLF_ART_SCALE
 	var centre: float = image.get_width() * 0.5
 	return Vector2((centre - left) * scale, (right + 1 - centre) * scale)
 
 
 ## How far below WOLF's sprite centre his painted feet reach, in world px.
 func _wolf_art_feet() -> float:
-	var image: Image = (load("res://assets/wolf-side-right-provisional.png") as Texture2D).get_image()
+	var image: Image = (load(MainScript.WOLF_ART_PATH) as Texture2D).get_image()
 	var bottom: int = 0
 	for y: int in image.get_height():
 		for x: int in image.get_width():
 			if image.get_pixel(x, y).a > 0.5:
 				bottom = y
 				break
-	return (bottom + 1 - image.get_height() * 0.5) * 0.18325
+	return (bottom + 1 - image.get_height() * 0.5) * MainScript.WOLF_ART_SCALE
 
 
 ## True while some player in the sound bank is playing [param clip].

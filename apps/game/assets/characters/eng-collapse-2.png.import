@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://lkqqgndqjvk0"
-path="res://.godot/imported/engineer-collapse-provisional.png-a3fb8fa2f0792d77298648a814058624.ctex"
+uid="uid://dwlrhrtg6u58m"
+path="res://.godot/imported/eng-collapse-2.png-f42d1a14e54a0a703ddf58df0e274b69.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/engineer-collapse-provisional.png"
-dest_files=["res://.godot/imported/engineer-collapse-provisional.png-a3fb8fa2f0792d77298648a814058624.ctex"]
+source_file="res://assets/characters/eng-collapse-2.png"
+dest_files=["res://.godot/imported/eng-collapse-2.png-f42d1a14e54a0a703ddf58df0e274b69.ctex"]
 
 [params]
 

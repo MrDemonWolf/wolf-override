@@ -15,25 +15,30 @@ extends CharacterBody2D
 
 ## Origin is the middle of its treads on the floor: the walk line's floor, RoomDepth's one definition.
 const FLOOR_Y: float = RoomDepth.FLOOR_Y
-const ACTIVE_ART: Texture2D = preload("res://assets/props/junction-sentry-side-left.png")
-const WRECK_ART: Texture2D = preload("res://assets/props/junction-sentry-down.png")
-## Each image is cut to its painted outline; both face left and share one scale, chosen so the
-## treads are a little longer than the brain's body (SentryBrain.HALF_WIDTH).
-const ACTIVE_REGION: Rect2 = Rect2(113.0, 57.0, 855.0, 626.0)
-const WRECK_REGION: Rect2 = Rect2(143.0, 80.0, 844.0, 623.0)
-const ART_SCALE: float = 0.07
-## The source column under the middle of each machine's treads (the node's origin).
-const ACTIVE_TREAD_X: float = 516.0
-const WRECK_TREAD_X: float = 545.0
-## The source row of the crushed hull's top either side of the bent mast on the wreck art. A tank
-## that lands on the sentry rests this high, so the wreck's treads and hull show under it.
-const WRECK_HULL_TOP: float = 340.0
-const WRECK_CRUSH_HEIGHT: float = (WRECK_REGION.end.y - WRECK_HULL_TOP) * ART_SCALE
-## The scanner slit on the active art (source pixels): the beam and eye light are drawn over it.
-const LENS: Rect2 = Rect2(370.0, 166.0, 145.0, 28.0)
+## The two whole pieces (painted at 5.5 px per world px, lights neutralised: the lamp, lens and beam
+## are drawn here in code). Each is cut to its painted outline, so its size is its painted box; both
+## face left.
+const ACTIVE_ART: Texture2D = preload("res://assets/characters/sentry-active.png")
+const WRECK_ART: Texture2D = preload("res://assets/characters/sentry-wreck.png")
+const ACTIVE_SIZE: Vector2 = Vector2(397.0, 290.0)
+const WRECK_SIZE: Vector2 = Vector2(365.0, 269.0)
+## Both share one scale, which keeps the machine as tall as it was drawn before the repaint (the
+## earlier art's 626 painted rows at 0.07, 43.82 world px, over the active piece's 290 rows), so its
+## sight, contact and the leaps over it are unchanged; at the pieces' own 1/5.5 it would stand 20 %
+## taller (1.32 m). The treads stay a little longer than the brain's body (SentryBrain.HALF_WIDTH).
+const ART_SCALE: float = 0.1511
+## The piece column under the middle of each machine's treads (the node's origin), piece px.
+const ACTIVE_TREAD_X: float = 187.0
+const WRECK_TREAD_X: float = 174.0
+## The piece row of the crushed hull's top either side of the bent mast on the wreck. A tank that
+## lands on the sentry rests this high, so the wreck's treads and hull show under it.
+const WRECK_HULL_TOP: float = 112.0
+const WRECK_CRUSH_HEIGHT: float = (WRECK_SIZE.y - WRECK_HULL_TOP) * ART_SCALE
+## The scanner slit's glass on the active piece (piece px): the beam and eye light are drawn over it.
+const LENS: Rect2 = Rect2(119.0, 50.5, 67.0, 13.0)
 const BODY_SIZE: Vector2 = Vector2(SentryBrain.HALF_WIDTH * 2.0, 30.0)
 ## How far the drawing reaches above the floor: the top of the scanner's fin.
-const DRAWN_HEIGHT: float = ACTIVE_REGION.size.y * ART_SCALE
+const DRAWN_HEIGHT: float = ACTIVE_SIZE.y * ART_SCALE
 ## The beam opens to this half-height at its tip and fades from BEAM_ALPHA at the lens to
 ## BEAM_TIP_ALPHA there, where a hard bright edge marks the end of its sight. A pale core runs along
 ## its middle and dashed pale lines along its two edges, so it still reads where its colour does not
@@ -52,10 +57,10 @@ const BEAM_DASH_GAP: float = 3.0
 const BEAM_TIP_WHITE: float = 0.6
 const BEAM_TIP_ALPHA_EDGE: float = 0.95
 const BEAM_TIP_WIDTH: float = 2.0
-## The round lamp painted on the front of the hull (source pixels: its lens's centre and radius): it is
+## The round lamp painted on the front of the hull (piece px: its lens's centre and radius): it is
 ## drawn over in the eye's colour, dark while the machine is powered down.
-const LAMP_CENTRE: Vector2 = Vector2(245.0, 398.0)
-const LAMP_RADIUS: float = 32.0
+const LAMP_CENTRE: Vector2 = Vector2(61.0, 158.0)
+const LAMP_RADIUS: float = 15.0
 ## The lamp's soft halo, this many times its radius, at this opacity.
 const LAMP_HALO: float = 1.9
 const LAMP_HALO_ALPHA: float = 0.3
@@ -138,8 +143,8 @@ class SentryVisual:
 	var _wake_tween: Tween
 
 	func _init() -> void:
-		body = _art("Body", Sentry.ACTIVE_ART, Sentry.ACTIVE_REGION, Sentry.ACTIVE_TREAD_X)
-		wreck = _art("Wreck", Sentry.WRECK_ART, Sentry.WRECK_REGION, Sentry.WRECK_TREAD_X)
+		body = _art("Body", Sentry.ACTIVE_ART, Sentry.ACTIVE_TREAD_X)
+		wreck = _art("Wreck", Sentry.WRECK_ART, Sentry.WRECK_TREAD_X)
 		wreck.visible = false
 		var lens: Rect2 = Sentry.lens_rect()
 		lens_glow = RoomDepth.make_glow(EYE_PATROL, Sentry.LENS_GLOW_SIZE, Sentry.LENS_GLOW_ALPHA)
@@ -189,18 +194,16 @@ class SentryVisual:
 		lens_glow.visible = glow_allowed and is_lit()
 		lens_glow.modulate = Color(eye, Sentry.LENS_GLOW_ALPHA)
 
-	## A mirrored cut of [param texture] with its base on the floor and [param tread_x] at x 0. It
-	## draws behind this node's own lens drawing.
-	func _art(art_name: String, texture: Texture2D, region: Rect2, tread_x: float) -> Sprite2D:
+	## [param texture] (a whole piece) mirrored, with its base on the floor and its column
+	## [param tread_x] (piece px) at x 0. It draws behind this node's own lens drawing.
+	func _art(art_name: String, texture: Texture2D, tread_x: float) -> Sprite2D:
 		var sprite: Sprite2D = Sprite2D.new()
 		sprite.name = art_name
 		sprite.texture = texture
 		sprite.texture_filter = CanvasItem.TEXTURE_FILTER_LINEAR_WITH_MIPMAPS
-		sprite.region_enabled = true
-		sprite.region_rect = region
 		sprite.flip_h = true
 		sprite.scale = Vector2.ONE * Sentry.ART_SCALE
-		sprite.position = Vector2(-(region.get_center().x - tread_x), -region.size.y * 0.5) * Sentry.ART_SCALE
+		sprite.position = Vector2(-(texture.get_width() * 0.5 - tread_x), -texture.get_height() * 0.5) * Sentry.ART_SCALE
 		sprite.show_behind_parent = true
 		add_child(sprite)
 		return sprite
@@ -312,7 +315,7 @@ static func beam_top_y() -> float:
 
 ## The hull's lamp in the visual's space (facing +x), from the active art's LAMP_CENTRE and its halo.
 static func lamp_rect() -> Rect2:
-	var centre: Vector2 = Vector2(ACTIVE_TREAD_X - LAMP_CENTRE.x, -(ACTIVE_REGION.end.y - LAMP_CENTRE.y)) * ART_SCALE
+	var centre: Vector2 = Vector2(ACTIVE_TREAD_X - LAMP_CENTRE.x, -(ACTIVE_SIZE.y - LAMP_CENTRE.y)) * ART_SCALE
 	var radius: float = LAMP_RADIUS * ART_SCALE * LAMP_HALO
 	return Rect2(centre - Vector2.ONE * radius, Vector2.ONE * radius * 2.0)
 
@@ -320,7 +323,7 @@ static func lamp_rect() -> Rect2:
 ## The scanner slit in the visual's space (facing +x), from the active art's LENS.
 static func lens_rect() -> Rect2:
 	var left: float = -(LENS.end.x - ACTIVE_TREAD_X) * ART_SCALE
-	var top: float = -(ACTIVE_REGION.end.y - LENS.position.y) * ART_SCALE
+	var top: float = -(ACTIVE_SIZE.y - LENS.position.y) * ART_SCALE
 	return Rect2(left, top, LENS.size.x * ART_SCALE, LENS.size.y * ART_SCALE)
 
 
@@ -444,7 +447,7 @@ func drawn_rects() -> Array[Rect2]:
 
 ## How far its drawn active body reaches from its origin on its longer side, in px.
 static func drawn_half_width() -> float:
-	return maxf(ACTIVE_TREAD_X - ACTIVE_REGION.position.x, ACTIVE_REGION.end.x - ACTIVE_TREAD_X) * ART_SCALE
+	return maxf(ACTIVE_TREAD_X, ACTIVE_SIZE.x - ACTIVE_TREAD_X) * ART_SCALE
 
 
 ## The tank lands on it at [param at_x]: the machine is pinned there and crushed into its wreck,
