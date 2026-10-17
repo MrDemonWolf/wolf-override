@@ -21,6 +21,11 @@ Changes merged after 0.15.0. They become the next version when it is cut.
 
 - The title screen shows the game's version number under **CHANGELOG**.
 - The in-game credits add SciPy and Playwright to the tools and list the October 2026 door hardware and "how it should play" research.
+- New character art, approved by Nathanial Henniges: WOLF, the engineer, the Director and the sentry are repainted, one whole image per pose.
+- The engineer's crank at the **MANUAL BYPASS** and their fall when knocked down use the new frames too.
+- Everyone stands where they did. The sentry keeps its size; WOLF is 3% smaller, so his tail still fits by the Service Junction's exit.
+- WOLF's cyan eye and body seams are now lit by the game over his new picture.
+- The crushed sentry under the tank is a little smaller (55 by 41 pixels, was 59 by 44), as painted beside the patrolling one.
 
 ### Website
 
@@ -31,6 +36,7 @@ Changes merged after 0.15.0. They become the next version when it is cut.
 - Credits add a fonts table, a studio logo line and one table of research references, linked to the research kept in the repository's history.
 - Credits no longer call adjustable dialogue size a proposal: **TEXT SIZE** exists.
 - Legal lists the CC0 sound recordings and every kind of AI-made art, including the doors, the door end and the engineer's collapse and crank frames.
+- Credits and Legal say how the new whole-piece characters were made.
 
 ### Development
 
@@ -44,6 +50,7 @@ Changes merged after 0.15.0. They become the next version when it is cut.
 ### How it was checked
 
 - **Checked:** headless test suites, the docs checks and build, rendered stills of the title screen, and headless browser screenshots of the credits and legal pages; not played by hand.
+- **New characters checked:** headless test suites and rendered stills (1280x720 and a phone shape) of each pose, before and after; not played by hand, so nothing was judged in motion.
 
 ## 0.15.0 - October 16, 2026
 
@@ -90,6 +97,10 @@ Changes merged after 0.15.0. They become the next version when it is cut.
 <Details>
 <Summary>Full notes for 0.15.0 (October 16, 2026)</Summary>
 
+- New character art, approved by Nathanial Henniges: WOLF, the engineer, the Director and the Service Junction's sentry are repainted, one whole image per pose. The engineer's crank at the **MANUAL BYPASS** and their fall when knocked down use new frames too. Everyone stands where they did. The sentry keeps its size, and WOLF is about the same (3% smaller, so his tail still fits by the Service Junction's exit). Checked by automated tests and still images from scripted play at 1280x720 and a phone shape; not played by hand.
+- WOLF's cyan eye and the glowing seams on his body are now lit by the game over his new picture. Checked by still images only.
+- The crushed sentry under the tank is a little smaller than before (55 by 41 pixels instead of 59 by 44), the size it was painted beside the patrolling one. Checked by automated tests and still images.
+- Website: Credits say how the new character art was made.
 - Records Access and the Service Junction now have real doors, approved by Nathanial Henniges from rendered frames. You come into Records Access through a steel swing door that its closer swings shut behind you, and you leave through another: securing the first copy in the dark security container beside the exit lets the exit's bolt go, its lamp turns amber and the door swings open on its hinges, then the engineer walks out through it with WOLF following. The Service Junction's entry is the same kind of door. Its sealed door is now a steel blast door in a concrete wall across the walkway, with a lamp on the wall's near column (red, amber while the line builds, flashing red and white while the fuse burns, steady red with **REDUCED MOTION**); when it blows it is torn off its hinges and thrown along the floor, where it lands and lies, and you walk through the doorway behind its column. The exit is a sliding steel door in the wall at the room's right end: popping the bolt slides it into its pocket, WOLF steps into the doorway and waits, and you leave from the door itself (from the **EXIT BOLT** box, which now stands a little further from it, the hint only says it is open). On leaving, WOLF walks out through it first and the engineer follows him before the **END OF SLICE** card; nobody fades out. Through the open exit the coolant line runs on along the passage beyond. The doors replace the earlier pressure bulkhead and hatch images; their art was made with AI assistance, painted inside shapes drawn by scripts from real door hardware. Checked by automated tests, a new one among them that walks the route through every door, and by still images from scripted play at 1280x720 and on a 1920x1080 touch layout; not played by hand, so the thrown door and the walk-outs have not been seen in motion.
 - Knocked down by the Service Junction's blast door, facing it from the valve or right against it, or from the floor beyond the open doorway, the engineer now always lies in full view, clear of the door's near column, with **REDUCED MOTION** on or off. Checked by automated tests that measure the lying body against the column's painted foot, and by still images from scripted play.
 - Wording approved by Nathanial Henniges: the Service Junction's exit is drawn as a door, so every line about it now says "door" where it said "hatch" (for example "The exit bolt is by the door." and "E: leave through the door."), with no other word changed; the tank landing on the sentry now shows the narration and WOLF's line as two boxes, one speaker each. In Records Access the hint at the security container now reads "E: secure the first copy in the container." Checked by the automated wording checks.

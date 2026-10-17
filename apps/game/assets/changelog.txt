@@ -4,6 +4,11 @@ Changes merged after 0.15.0. They become the next version when it is cut.
 -- Gameplay --
 - The title screen shows the game's version number under CHANGELOG.
 - The in-game credits add SciPy and Playwright to the tools and list the October 2026 door hardware and "how it should play" research.
+- New character art, approved by Nathanial Henniges: WOLF, the engineer, the Director and the sentry are repainted, one whole image per pose.
+- The engineer's crank at the MANUAL BYPASS and their fall when knocked down use the new frames too.
+- Everyone stands where they did. The sentry keeps its size; WOLF is 3% smaller, so his tail still fits by the Service Junction's exit.
+- WOLF's cyan eye and body seams are now lit by the game over his new picture.
+- The crushed sentry under the tank is a little smaller (55 by 41 pixels, was 59 by 44), as painted beside the patrolling one.
 
 -- Website --
 - The changelog is split into development versions, 0.1.0 (September 26, 2026) to 0.15.0 (October 16, 2026), with short lines by group and the full notes under each version.
@@ -13,6 +18,7 @@ Changes merged after 0.15.0. They become the next version when it is cut.
 - Credits add a fonts table, a studio logo line and one table of research references, linked to the research kept in the repository's history.
 - Credits no longer call adjustable dialogue size a proposal: TEXT SIZE exists.
 - Legal lists the CC0 sound recordings and every kind of AI-made art, including the doors, the door end and the engineer's collapse and crank frames.
+- Credits and Legal say how the new whole-piece characters were made.
 
 -- Development --
 - The game's version lives in one place, apps/game/project.godot; the macOS and Windows test builds now take it from there instead of 0.0.0.
@@ -24,6 +30,7 @@ Changes merged after 0.15.0. They become the next version when it is cut.
 
 -- How it was checked --
 - Checked: headless test suites, the docs checks and build, rendered stills of the title screen, and headless browser screenshots of the credits and legal pages; not played by hand.
+- New characters checked: headless test suites and rendered stills (1280x720 and a phone shape) of each pose, before and after; not played by hand, so nothing was judged in motion.
 
 == 0.15.0 - October 16, 2026 ==
 Summary: real doors in Records Access and the Service Junction, a copied-code check, notes moved to Notion and groundwork for more languages.
