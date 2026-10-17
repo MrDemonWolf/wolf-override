@@ -1,32 +1,91 @@
 ---
 title: Controls
-description: Default keyboard, controller, and touch inputs for the current source build.
+description: Every action on keyboard, controller and touch in the current source build, and how cranks work.
 ---
 
-You control the engineer. WOLF is an independent companion. In-game prompts show the keyboard or controller binding you have set; these are the defaults.
+**What this page is for:** every action on keyboard, controller and touch, in one table.
 
-Every room uses the same small set of inputs: move, interact, the two answers and pause. The corridor's **MANUAL BYPASS** and the Service Junction's valve add no new buttons; each is cranked by **holding** interact, and its prompt says **HOLD** when that applies. The wheel gives a little with a soft click the moment you press; each 0.4 seconds held is one turn of the valve, and each quarter second one of the bypass's eight notches (two seconds in all). Turns already made stay done if you let go or pause. **TOGGLE HOLDS** in [Settings](/docs/controls/settings/#controls) turns every crank into press once to start and press again to stop, on the keyboard, a controller and touch; the prompt then drops **HOLD**.
+- **You control the engineer.** WOLF is an independent companion.
+- **These are the defaults.** In-game prompts always show your current bindings.
+- **Few buttons.** Every room uses the same small set: move, interact, the two answers and pause. There are no other buttons to learn.
+
+## All actions
 
 | Action | Keyboard | Controller | Touch |
 | --- | --- | --- | --- |
-| Move | A / D or ← / → | Left stick or D-pad left / right | Hold ◀ / ▶ |
-| Interact; show the next line in the opening or closing beat | E | A | USE (labelled CONTINUE during the opening and closing beat) |
-| Retry after a knockdown (from about 0.9 seconds after the hit) | E | A | USE (labelled RETRY while the knockdown card is up) |
-| Crank the corridor's manual bypass or the Service Junction valve | Hold E | Hold A | Hold USE (labelled CRANK there) |
-| Answer 1 / Answer 2 | 1 / 2, or click the response | X / Y | Tap the response (at the bottom of the screen) |
-| Pause or resume | Esc | Start | PAUSE button; tap RESUME to continue |
+| Move | A / D or ← / → | Left stick or D-pad | Hold ◀ / ▶ |
+| Interact; next line in the opening or closing scene | E | A | USE (reads CONTINUE in those scenes) |
+| Retry after a knockdown | E | A | USE (reads RETRY) |
+| Crank a wheel ([how](#hold-to-crank)) | Hold E | Hold A | Hold USE (reads CRANK) |
+| Answer 1 / Answer 2 | 1 / 2, or click | X / Y | Tap the answer |
+| Pause or resume | Esc | Start | PAUSE; tap RESUME |
 | Back in menus | Esc | B | Android Back |
 | Cancel a rebind | Esc or CANCEL REBIND | — | Android Back |
-| Cycle the provisional engineer name | I (fixed; not rebindable) | — | — |
+| Cycle the provisional engineer name | I (fixed) | — | — |
 
-Move, Interact, both answers, and Pause can be rebound in [Settings](/docs/controls/settings/). Controller labels are generic; your controller may name the same buttons differently.
+- **Rebind** Move, Interact, both answers and Pause in [Settings](/docs/controls/settings/#controls).
+- **Controller labels are generic.** Your controller may name the same buttons differently.
+- **Retry timing:** see [Knockdowns](/docs/controls/saves/#knockdowns).
 
-## Notes by device
+## Hold to crank
 
-**Keyboard and mouse:** response buttons also appear on screen when a choice is waiting, so you can click them. The title and pause menus take the mouse as well as the keyboard.
+**Crank** means turning a wheel by holding interact. Two wheels need it: the corridor's **MANUAL BYPASS** and the Service Junction's **VALVE**.
 
-**Controller:** the selected menu item shows a cyan outline inside its border. Closing Settings from the title returns the selection to **SETTINGS**.
+1. Walk up to the wheel. The prompt says **HOLD**.
+2. Hold interact (**E**, controller **A**, or **CRANK** on touch).
+3. Keep holding until it is done.
 
-**Touch:** on iOS and Android builds the direction buttons hide during the opening, the closing beat, and while a choice is waiting. **PAUSE** opens Resume, Settings, and Return to Title (Skip Opening during the opening). On Android, the system Back gesture backs out of menus one step at a time and pauses play; it only closes the game from the title screen. Leaving the app during play pauses the game. Menus opened by touch show no selection outline; the first arrow key or controller press selects a menu item without activating it. At the Service Junction's tank release **USE** reads **DROP**, and the hint names the button on screen: **HOLD CRANK** at a crank, **DROP** at the tank release, **USE** elsewhere. The hint line sits between the arrows and **USE**, so neither covers it; with **TEXT SIZE** above 100% the dialogue box moves into that space too, with the hint line just above it. When a question is waiting, its two answers replace the arrows and **USE** at the bottom of the screen, side by side within thumb reach, without the 1 and 2 of the keyboard. The camera sits a little lower on touch, so the characters' feet and the machines' bases stay above the buttons, and stays there while answers are shown.
+- **It starts at once.** The wheel gives a little with a soft click the moment you press.
+- **Turns you made stay done** if you let go, pause or step away.
+- **Can't hold a button?** Turn on **TOGGLE HOLDS** (below).
 
-**Status:** controller hardware and physical touch devices have not been playtested; one iOS simulator launch was checked. There is no public mobile download yet. For checkpoint behaviour, see [Saving](/docs/controls/saves/).
+### TOGGLE HOLDS
+
+- **Where:** [Settings](/docs/controls/settings/#controls), Controls tab. Off by default.
+- **What it does:** one press starts a crank; it keeps turning on its own.
+- **To stop:** press interact again, walk away or pause. It also stops when the crank is done.
+- **Works on** keyboard, controller and touch, because all three press the same interact action.
+- **Prompts change:** they drop the word **HOLD** (for example **E: crank the valve**).
+- **It is saved** with your other preferences. **RESTORE DEFAULT CONTROLS** does not change it.
+
+<Details>
+<Summary>Crank timing</Summary>
+
+- **VALVE:** each 0.4 seconds held is one turn. Three turns charge the door.
+- **MANUAL BYPASS:** each quarter second held is one of eight notches, two seconds in all.
+
+</Details>
+
+## Keyboard and mouse
+
+- **Answers appear as buttons** on screen when a choice is waiting, so you can click them.
+- **Title and pause menus** take the mouse as well as the keyboard.
+
+## Controller
+
+- **The selected menu item** shows a cyan outline inside its border.
+- **Closing Settings** from the title returns the selection to **SETTINGS**.
+
+## Touch (iOS and Android builds)
+
+- **The arrow buttons hide** during the opening, the closing scene and while a question waits.
+- **PAUSE** opens Resume, Settings and Return to Title (Skip Opening during the opening).
+- **Leaving the app** during play pauses the game.
+- **Android Back** steps back one menu, and pauses play. It closes the game only from the title screen.
+- **Touch menus show no outline.** The first arrow key or controller press selects an item without using it.
+- **The USE button changes its name:** **CRANK** at a crank, **DROP** at the tank release, **USE** elsewhere.
+- **Answers** replace the arrows and **USE** at the bottom, side by side, within thumb reach.
+
+<Details>
+<Summary>Where things sit on a touch screen</Summary>
+
+- The hint line sits between the arrows and **USE**, so neither covers it.
+- With **TEXT SIZE** above 100%, the dialogue box moves into that space too, with the hint line just above it.
+- Touch answers show their words only, without the 1 and 2 of the keyboard.
+- The camera sits a little lower on touch, so feet and machine bases stay above the buttons. It stays there while answers show.
+
+</Details>
+
+<Callout title="Not tried on real hardware yet">
+  Controllers and physical touch devices have not been playtested. One iOS simulator launch was checked. There is no public mobile download yet.
+</Callout>
