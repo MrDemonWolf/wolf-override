@@ -307,7 +307,7 @@ func _check_scene() -> void:
 	game.call("debug_place", JunctionRoom.VALVE_X + valve_station.w * float(game.call("_station_offset", valve_station)), wolf.position.x)
 	await _tap(&"interact")
 	_expect(line.state == &"idle" and str(game.get("status_line")) == "The valve is dead. Arm the breaker first.", "USE at a dead valve explains the breaker")
-	var dial: Vector2 = JunctionRoom.prop_point(room.valve_art, JunctionRoom.VALVE_DIAL_CENTRE)
+	var dial: Vector2 = RoomDepth.prop_point(room.valve_art, JunctionRoom.VALVE_DIAL_CENTRE)
 	var caption: Rect2 = room.line_caption.get_rect()
 	_expect(room.line_caption.text == "LINE" and caption.end.x < dial.x and caption.position.y < dial.y and caption.end.y > dial.y, "the valve's dial carries a LINE caption just left of it")
 	_expect(await _walk_to(human, 200.0), "the engineer walks back to the breaker")
@@ -526,7 +526,7 @@ func _check_panel_front() -> void:
 	var spare: JunctionRoom = JunctionRoom.new()
 	root.add_child(spare)
 	await process_frame
-	var panel: Rect2 = JunctionRoom.prop_rect(spare.bolt_panel_art, JunctionRoom.BOLT_PANEL_REGION)
+	var panel: Rect2 = RoomDepth.prop_bounds(spare.bolt_panel_art)
 	var front: Rect2 = spare.bolt_front_rect()
 	var outside: Array[Rect2] = []
 	for mark: Array in spare.bolt_feed_marks():

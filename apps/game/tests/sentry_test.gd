@@ -1367,20 +1367,24 @@ func _watch_lane(game: Node2D) -> void:
 		var tip: float = sentry.position.x + facing * sentry.visual.reach
 		if absf(tip - sentry.position.x) > SentryBrain.SIGHT_RANGE + 0.01:
 			lane_faults.append("frame %d: beam %.1f px long" % [lane_frames, absf(tip - sentry.position.x)])
-		var solids: Array[Rect2] = [Rect2(SentryBrain.PANEL_FACE_X, Sentry.FLOOR_Y - 60.0, JunctionRoom.BOLT_PANEL_HALF_WIDTH * 2.0, 60.0)]
+		# The bolt panel stops the beam only from its lane side (SentryBrain.PANEL_FACE_X, P0-16). At the
+		# patrol's far end the sentry stands beside and behind the real-size box, so facing left its beam
+		# passes behind it, drawn over by PanelFront (checked in (4) below), and goes on its full length.
+		var panel_solid: Rect2 = Rect2(SentryBrain.PANEL_FACE_X, Sentry.FLOOR_Y - 60.0, JunctionRoom.BOLT_PANEL_HALF_WIDTH * 2.0, 60.0)
+		var solids: Array[Rect2] = [panel_solid]
 		# (A tank whose base is within a hundredth of a pixel of the beam's top edge only grazes it.)
 		if room.tank.visible and tank_rect.end.y > Sentry.beam_top_y() + 0.01:
 			solids.append(tank_rect)
 		for solid: Rect2 in solids:
 			if facing > 0.0 and lens <= solid.position.x and tip > solid.position.x + 0.01:
 				lane_faults.append("frame %d: beam to %.1f runs into the solid at %.1f" % [lane_frames, tip, solid.position.x])
-			elif facing < 0.0 and lens >= solid.end.x and tip < solid.end.x - 0.01:
+			elif facing < 0.0 and solid != panel_solid and lens >= solid.end.x and tip < solid.end.x - 0.01:
 				lane_faults.append("frame %d: beam to %.1f runs into the solid ending %.1f (block %s, arm %s %.2f, tank y %.1f, choice %s, fail %s)" % [lane_frames, tip, solid.end.x, sentry.sight_block, (game.get("drop_arm") as DropArm).state, (game.get("drop_arm") as DropArm).drop_amount(), room.tank.position.y, game.get("waiting_for_choice"), game.get("fail_active")])
 	# (4) The exit bolt's panel and its feed stand in front of the lane: wherever the sentry's painted
 	# body or its lit beam crosses the panel's box or a part of the feed, they are drawn again over them
 	# (PanelFront, right after the sentry at its depth), so neither shows over the box or the feed.
 	if sentry.is_visible_in_tree() and not sentry.visual.wrecked:
-		var panel: Rect2 = JunctionRoom.prop_rect(room.bolt_panel_art, JunctionRoom.BOLT_PANEL_REGION)
+		var panel: Rect2 = RoomDepth.prop_bounds(room.bolt_panel_art)
 		var art_front: float = Sentry.ACTIVE_TREAD_X * Sentry.ART_SCALE
 		var art_back: float = (Sentry.ACTIVE_SIZE.x - Sentry.ACTIVE_TREAD_X) * Sentry.ART_SCALE
 		var parts: Dictionary = {"body": Rect2(sentry.position.x - (art_back if facing > 0.0 else art_front), Sentry.FLOOR_Y - Sentry.DRAWN_HEIGHT, art_front + art_back, Sentry.DRAWN_HEIGHT)}
