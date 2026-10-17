@@ -47,14 +47,14 @@ const captures = [
     small: recordsCapture480,
     medium: recordsCapture960,
     large: recordsCapture1600,
-    alt: 'RECORDS_ALT',
+    alt: 'Gameplay frame in Records Access: the engineer stands at the red PURGE QUEUE console beside the shut steel entry door, WOLF waits by the MIRROR PORT, and the objective reads COPY PURGE ORDER.',
   },
   {
     title: 'Service Junction',
     small: junctionCapture480,
     medium: junctionCapture960,
     large: junctionCapture1600,
-    alt: 'JUNCTION_ALT',
+    alt: 'Gameplay frame in the Service Junction: the engineer stands at the yellow valve wheel under a row of station plates (BREAKER LIVE, RELIEF VENT, VALVE 0 / 3, SEALED DOOR, TANK RELEASE), the blast door stands shut behind the SEALED DOOR plate, WOLF walks by the breaker at the left, and the objective reads CRANK THE VALVE.',
   },
 ] as const;
 
@@ -185,9 +185,9 @@ export default function HomePage() {
             </p>
           </div>
           {/* Phones show only the art label, over the bottom of the art; the genre already heads the copy. */}
-          <div className="absolute right-8 bottom-6 left-8 flex justify-between gap-4 phone:top-[17.6rem] phone:right-5 phone:bottom-auto phone:left-5">
+          <div className="absolute right-8 bottom-6 left-8 flex justify-between gap-4 phone:top-[17.9rem] phone:right-5 phone:bottom-auto phone:left-5">
             <span className="hud-label text-muted phone:hidden">Side-view sci-fi horror / Narrative adventure</span>
-            <span className="hud-label text-muted phone:rounded-control phone:bg-ink/80 phone:px-2 phone:py-1">Provisional key art · Not a gameplay capture</span>
+            <span className="hud-label text-muted phone:rounded-control phone:bg-ink/80 phone:px-2 phone:py-1 phone:text-[.68rem] phone:tracking-[.06em]">Provisional key art · Not a gameplay capture</span>
           </div>
         </section>
         <section id="story" className={`${landingWidth} ${twoColumns} ${sectionAnchor}`} aria-labelledby="story-title">
