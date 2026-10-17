@@ -184,7 +184,9 @@ export default function HomePage() {
               <Link className="inline-flex min-h-11 items-center text-accent underline underline-offset-4" href="/docs/changelog/">Version {version}: what changed</Link>
             </p>
           </div>
-          {/* Phones show only the art label, over the bottom of the art; the genre already heads the copy. */}
+          {/* Phones show only the art label, over the bottom of the art; the genre already heads the copy.
+              phone:top-[17.9rem] is tied to the phone art height phone:h-80 (20rem) on the img above: 20rem minus
+              the label's height (about 2.1rem) puts the label on the art's bottom edge. Change both together. */}
           <div className="absolute right-8 bottom-6 left-8 flex justify-between gap-4 phone:top-[17.9rem] phone:right-5 phone:bottom-auto phone:left-5">
             <span className="hud-label text-muted phone:hidden">Side-view sci-fi horror / Narrative adventure</span>
             <span className="hud-label text-muted phone:rounded-control phone:bg-ink/80 phone:px-2 phone:py-1 phone:text-[.68rem] phone:tracking-[.06em]">Provisional key art · Not a gameplay capture</span>
@@ -211,8 +213,9 @@ export default function HomePage() {
             {captures.map((capture) => (
               <figure key={capture.title} className={`${card} min-w-0`}>
                 {/* The link clips the image to the frame's top corners; the figure stays unclipped so the link's focus ring shows. */}
+                {/* Phones crop the 16:9 capture to 4:3 from the left edge: the objective HUD, the engineer, the entry door and WOLF all sit in the left of the frame, so a centred crop cut them off. */}
                 <a className="block overflow-hidden rounded-t-[calc(var(--radius-card)-1px)] hover-always:text-accent" href={capture.large.src} target="_blank" rel="noopener noreferrer">
-                  <img className="w-full phone:aspect-[4/3] phone:object-cover" src={capture.medium.src} srcSet={`${capture.small.src} 480w, ${capture.medium.src} 960w, ${capture.large.src} 1600w`} sizes="(max-width: 700px) calc(100vw - 2rem), min(50vw - 3rem, 600px)" alt={capture.alt} width={capture.medium.width} height={capture.medium.height} loading="lazy" decoding="async" />
+                  <img className="w-full phone:aspect-[4/3] phone:object-cover phone:object-left" src={capture.medium.src} srcSet={`${capture.small.src} 480w, ${capture.medium.src} 960w, ${capture.large.src} 1600w`} sizes="(max-width: 700px) calc(100vw - 2rem), min(50vw - 3rem, 600px)" alt={capture.alt} width={capture.medium.width} height={capture.medium.height} loading="lazy" decoding="async" />
                   <span className="sr-only">(full-size image, opens in a new tab)</span>
                 </a>
                 <figcaption className="flex flex-wrap justify-between gap-x-4 gap-y-1 px-5 py-4 text-caption text-muted">
@@ -234,7 +237,6 @@ export default function HomePage() {
               <ul className="flex list-disc flex-col gap-2 pl-5 leading-[1.6] text-muted marker:text-accent">
                 {comingNext.map((line) => <li key={line}>{line}</li>)}
               </ul>
-              <Link className={inlineLink} href="/docs/changelog/">Version {version}: read the changelog <span aria-hidden="true">→</span></Link>
             </section>
           </div>
           <div className="mt-16 mb-6 grid grid-cols-3 gap-6 phone:mt-12 phone:grid-cols-[1fr] phone:gap-4">
