@@ -366,10 +366,10 @@ const WOLF_HEAD_X: float = 45.0
 ## x, so at his steady LEAP_SPEED_SCALE speed it is a fall under constant gravity, TANK_LEAP_HEIGHT at
 ## its top over TANK_LEAP_PEAK_X and back on the floor TANK_LEAP_HALF_SPAN either side. He is 134 px
 ## long, the tank stands 107 px over the floor about 60 px past the engineer working the release, and
-## the parked arm's claw hangs only some 10 px above the height that clears the tank, so there is no
+## the parked arm's shackle hangs only some 20 px above the height that clears the tank, so there is no
 ## room for a short hop: he takes off a few px before his snout reaches the engineer's back, passes
 ## over them on the way up and lands just short of his spot. His painted feet (y 438) pass over the
-## tank's top (y 331, on the crushed hull) and his back under the claw. The empty arm hangs too low over
+## tank's top (y 331, on the crushed hull) and his back under the shackle. The empty arm hangs too low over
 ## the tank for him to pass under it, so it winches up into its ceiling plate as the tank lands for good
 ## (ARM_PARK_RISE over ARM_PARK_SECONDS), and he waits by the valve until it is up. sentry_test measures
 ## his painted body against the tank's, the wreck's and the arm's images on every frame of the crossing
