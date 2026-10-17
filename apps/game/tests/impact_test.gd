@@ -13,7 +13,7 @@ func _initialize() -> void:
 
 
 func _run() -> void:
-	_check_collapse_sheet()
+	_check_collapse_pieces()
 	var path: String = "user://impact-test-%s.json" % OS.get_process_id()
 	if FileAccess.file_exists(path):
 		DirAccess.remove_absolute(ProjectSettings.globalize_path(path))
@@ -267,7 +267,7 @@ func _run() -> void:
 
 ## P0-3: each collapse piece is cut so its soles are on its bottom row (no gap above the floor line and
 ## nothing below it), and Main's spans are the painted body's columns from the boots.
-func _check_collapse_sheet() -> void:
+func _check_collapse_pieces() -> void:
 	var count: int = MainScript.COLLAPSE_ART.size()
 	_expect(MainScript.COLLAPSE_SPANS.size() == count and MainScript.COLLAPSE_PIVOTS.size() == count and MainScript.COLLAPSE_TOPS.size() == count and MainScript.COLLAPSE_TIMES.size() == count, "every collapse piece has its boots column, span, top row and start time")
 	for frame: int in count:
