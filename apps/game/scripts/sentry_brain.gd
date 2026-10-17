@@ -34,11 +34,13 @@ const CONTACT_RANGE: float = DRAWN_HALF_WIDTH + M0Actor.HUMAN_REACH
 ## How far ahead of its origin the scanner's lens ends (Sentry.lens_rect().end.x, from the active
 ## piece's LENS: 68 piece px at Sentry.ART_SCALE): where its sight and beam start.
 const LENS_AHEAD: float = 10.2748
-## The exit bolt's panel (JunctionRoom.BOLT_PANEL_X less BOLT_PANEL_HALF_WIDTH) is a solid box standing
-## in the lane, as tall as the scanner: a sentry whose lens is left of this face sees no further right
-## than it, and its beam stops there. Further right, at the far end of its patrol, the machine and its
-## beam pass behind the box, which is drawn over them (JunctionRoom.PanelFront).
-const PANEL_FACE_X: float = 757.6
+## The exit bolt's panel (JunctionRoom.BOLT_PANEL_X less BOLT_PANEL_HALF_WIDTH: 796 - 24.76, the
+## real-size junction box, 38 px tall, a little taller than the scanner's lens at 36 px up) is a solid
+## box standing in the lane: a sentry whose lens is left of this face sees no further right than it,
+## and its beam stops there. Further right, at the far end of its patrol, the machine and its beam pass
+## behind the box, which is drawn over them (JunctionRoom.PanelFront). A number here, not the
+## expression, because JunctionRoom's constants read this class's; room_lights_test checks the two agree.
+const PANEL_FACE_X: float = 771.2374
 ## The patrol turns where its front edge meets an engineer standing at the alcove's right end, so a
 ## patrolling sentry never runs into someone hiding there (675; the patrol still crosses the mark).
 const PATROL_MIN_X: float = COVER_MAX_X + CONTACT_RANGE
