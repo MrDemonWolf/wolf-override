@@ -25,7 +25,7 @@ driver at the same version) and record the commit here.
 | File | What it does |
 |---|---|
 | `run.sh` | `capture` (render container), `ui` and `perf` (headless). See its header for arguments and environment. |
-| `capture.gd` | Input-driven capture driver: routes R1-R4, fixed seeds, stills, text and audio logs, controller stills and mid-play device switches. |
+| `capture.gd` | Input-driven capture driver: routes R1-R4, fixed seeds, stills, text and audio logs, controller stills and mid-play device switches. Since localization PR L2 it also takes `--language <code>` (or `pseudo`; `run.sh capture --language <code> ...`) and writes a language audit (overflows, missing glyphs, untranslated text under pseudo) into each still's `shots.json` entry; without `--language` it switches nothing: at 1280x720 kb-fx the 212 English stills of R1-R4 and their text and audio logs were byte-identical to the driver before it (October 16, 2026; R2 and R4 stop early with the same notes on both drivers, a drift of those route scripts from the game on `main` at `daace6a`, not from this change). |
 | `parity_sfx_bank.gd` | SfxBank subclass the driver swaps in to log every `play`, `play_blend`, `stop` and `stop_all` by frame. |
 | `compare.py` | Compares two capture folders still by still with an exact count of changed pixels (any channel, any amount), and their text and audio logs byte for byte. `--self-test` checks the count on known changes. |
 | `ui_dump.gd` | Headless resolved-property dump (rect, alpha, font, size, colour, stylebox, text) of every visible HUD and menu control in 13 states. |
