@@ -8,6 +8,9 @@ const CHANGELOG_URL: String = SITE_URL + "/docs/changelog/"
 ## empty), scripts/export_changelog.py checks the newest changelog heading against it, and the website
 ## reads it at build time (apps/docs/lib/version.ts).
 const VERSION_SETTING: String = "application/config/version"
+## The project setting that holds the game's name ("WOLF OVERRIDE"); the window title reads it, so the
+## name is written once, in project.godot.
+const NAME_SETTING: String = "application/config/name"
 ## Plain-text export of the public changelog (scripts/export_changelog.py); check-game.sh fails when it drifts.
 ## A bare .txt is not a Godot resource: an export preset must list *.txt in its include filter or the
 ## screen falls back to CHANGELOG_UNAVAILABLE.
@@ -870,7 +873,7 @@ static func game_version() -> String:
 
 
 func _ready() -> void:
-	get_window().title = "WOLF//OVERRIDE"
+	get_window().title = str(ProjectSettings.get_setting(NAME_SETTING, ""))
 	title_version.text = game_version()
 	_install_inputs()
 	_setup_settings()
@@ -4430,7 +4433,7 @@ func _refresh_ui() -> void:
 	if intro_active:
 		if last_top_card_key != "intro":
 			last_top_card_key = "intro"
-			_show_top_card("03:17 / CONTAINMENT\nWOLF//OVERRIDE", 2.6)
+			_show_top_card("03:17 / CONTAINMENT\nWOLF OVERRIDE", 2.6)
 		var intro_hint: String = "TAP CONTINUE  /  PAUSE" if touch_layout else "%s  CONTINUE    %s  PAUSE" % [settings_menu.prompt(&"interact", controller_active), settings_menu.prompt(&"pause_game", controller_active)]
 		if intro_step == 0 and dialogue_index == 0:
 			# The opening's first box says how to skip it (Pause offers SKIP OPENING).
