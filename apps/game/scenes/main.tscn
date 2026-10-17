@@ -3,7 +3,7 @@
 [ext_resource type="Script" path="res://scripts/main.gd" id="1_main"]
 [ext_resource type="Script" path="res://scripts/m0_actor.gd" id="2_actor"]
 [ext_resource type="Texture2D" path="res://assets/logo-mark.svg" id="3_logo"]
-[ext_resource type="Texture2D" path="res://assets/wolf-side-right-provisional.png" id="4_wolf"]
+[ext_resource type="Texture2D" path="res://assets/characters/wolf-stand.png" id="4_wolf"]
 [ext_resource type="Texture2D" path="res://assets/rowan-side-right-provisional.png" id="5_rowan"]
 [ext_resource type="Texture2D" path="res://assets/title-corridor-key-art-provisional.png" id="6_title_art"]
 [ext_resource type="Texture2D" path="res://assets/props/corridor-seal-atlas.png" id="7_door"]
@@ -140,8 +140,8 @@ shape = SubResource("WolfShape")
 [node name="BodySprite" type="Sprite2D" parent="Wolf"]
 texture_filter = 4
 material = SubResource("SharpSpriteMaterial")
-position = Vector2(0, -15)
-scale = Vector2(0.18325, 0.18325)
+position = Vector2(0, -15.4)
+scale = Vector2(0.11215, 0.11215)
 texture = ExtResource("4_wolf")
 
 [node name="Tag" type="Label" parent="Wolf"]

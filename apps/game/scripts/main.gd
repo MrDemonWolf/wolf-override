@@ -779,13 +779,24 @@ var opening_lines: Array[String] = []
 var speaker_column: float = 0.0
 var speaker_column_key: String = ""
 
-const WOLF_SPRITE_REST: Vector2 = Vector2(0.0, -15.0)
-## WOLF's painted feet sit this far below his sprite's centre, in the art's own pixels (its opaque
-## rows end at 367 of 406).
-const WOLF_FEET_BELOW_CENTRE: float = 164.0
-## WOLF's drawn height at rest, from the tips of his ears to his feet, in world px (his art's opaque
-## rows at WOLF's rest scale).
-const WOLF_DRAWN_HEIGHT: float = 59.0
+## WOLF's standing piece and the scale it is drawn at (main.tscn Wolf/BodySprite uses both; the
+## WOLF art checks in wolf_space_test and sentry_test read them from here). The piece (1028x549) was
+## painted at 8 px per world px over a guide 12 % larger than the earlier sprite's painted body, so it
+## is drawn at 0.11215, not 1/8: that keeps WOLF the size he is drawn today (115.3 x 61.6 world px,
+## the earlier art's 629 x 336 painted px at 0.18325), the default for the open WOLF-size question
+## (2026-10-16: he keeps his drawn size until Nathanial picks another).
+const WOLF_ART_PATH: String = "res://assets/characters/wolf-stand.png"
+const WOLF_ART_SCALE: float = 0.11215
+## The sprite's centre from WOLF's origin: his feet (the piece's bottom row) stand where the earlier
+## art's did, 15.4 world px below the origin (-15.4 + 549 / 2 * WOLF_ART_SCALE). x stays 0 so he
+## mirrors in place.
+const WOLF_SPRITE_REST: Vector2 = Vector2(0.0, -15.4)
+## WOLF's painted feet sit this far below his sprite's centre, in the art's own pixels (the piece is
+## cut to its outline: half its 549 rows).
+const WOLF_FEET_BELOW_CENTRE: float = 274.5
+## WOLF's drawn height at rest, from the tips of his ears to his feet, in world px (the piece's 549
+## rows at WOLF_ART_SCALE).
+const WOLF_DRAWN_HEIGHT: float = 549.0 * WOLF_ART_SCALE
 const GAMEPLAY_ZOOM: float = 1.35
 const GAMEPLAY_VIEW_WIDTH: float = 960.0 / GAMEPLAY_ZOOM
 ## The play camera's resting height. At 1.35 it puts the floor (y 440) 27 px above the context hint
@@ -877,6 +888,8 @@ func _ready() -> void:
 	move_child(wolf, human.get_index())
 	wolf.keep_clear_of = human
 	wolf_sprite_scale = wolf.body_sprite.scale
+	# His piece is painted with its lights off; the eye and seam lights are drawn over it in code.
+	WolfLights.attach(wolf.body_sprite)
 	_setup_corridor_door()
 	_setup_bypass()
 	_setup_corridor_labels()

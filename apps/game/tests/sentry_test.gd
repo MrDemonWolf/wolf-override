@@ -1208,7 +1208,7 @@ func _check_tank_crossing(game: Node2D) -> void:
 		head_y = minf(head_y, pixel.y)
 	_expect(human.position.x >= SentryBrain.COVER_MIN_X and human.position.x <= SentryBrain.COVER_MAX_X and over_engineer[0] > -INF and over_engineer[0] <= head_y - TANK_CLEARANCE, "with the engineer at the release he passes over them on the way up, his feet (y %.0f) clear of their head (y %.0f)" % [over_engineer[0], head_y])
 	# The leap at every x of the crossing, with the wreck pinned anywhere the tank can catch it.
-	var feet_rest: float = 423.0 - 15.0 + MainScript.WOLF_FEET_BELOW_CENTRE * rest_scale.y
+	var feet_rest: float = 423.0 + MainScript.WOLF_SPRITE_REST.y + MainScript.WOLF_FEET_BELOW_CENTRE * rest_scale.y
 	_expect(JunctionRoom.wolf_tank_leap_height(JunctionRoom.WOLF_RUBBLE_X) == 0.0 and JunctionRoom.wolf_tank_leap_height(JunctionRoom.WOLF_DOWN_X) == 0.0, "at his spot by the valve and at his spot by the hatch he is on the floor")
 	_check_tank_leap_shape()
 	for at_x: float in [DropArm.MARK_X - DropArm.HIT_REACH, DropArm.MARK_X, DropArm.MARK_X + DropArm.HIT_REACH]:
@@ -1614,7 +1614,7 @@ func _action_event(action: StringName, pressed: bool) -> InputEventAction:
 ## on an engineer over the rubble and then patrolling again, stays short of him (SentryBrain.far_x).
 func _check_bait_walk() -> void:
 	var clear: float = SentryBrain.HALF_WIDTH + M0State.WOLF_HALF_WIDTH
-	var feet_y: float = 423.0 + (-15.0) + _wolf_art_feet()
+	var feet_y: float = 423.0 + MainScript.WOLF_SPRITE_REST.y + _wolf_art_feet()
 	_expect(feet_y - JunctionRoom.LEAP_HEIGHT < Sentry.FLOOR_Y - Sentry.DRAWN_HEIGHT, "at the top of his bound WOLF's painted feet (y %.1f) clear the sentry's drawn top (y %.1f)" % [feet_y - JunctionRoom.LEAP_HEIGHT, Sentry.FLOOR_Y - Sentry.DRAWN_HEIGHT])
 	_expect(JunctionRoom.wolf_leap_height(JunctionRoom.WOLF_RUBBLE_X, SentryBrain.CHASE_MIN_X) < 0.5 and JunctionRoom.wolf_leap_height(JunctionRoom.WOLF_BAIT_X, DropArm.MARK_X) == 0.0, "standing at his spot by the valve or by the hatch he is on the floor")
 	_expect(JunctionRoom.wolf_duck_depth(JunctionRoom.WOLF_RUBBLE_X, 1.0) == 0.0 and JunctionRoom.wolf_duck_depth(JunctionRoom.WOLF_BAIT_X, -1.0) == 0.0, "nor does he duck there")
@@ -1714,8 +1714,8 @@ func _tank_pixels(grow: float) -> Dictionary:
 func _wolf_pixels(duck_halves: int) -> Dictionary:
 	if _wolf_pixel_cache.has(duck_halves):
 		return _wolf_pixel_cache[duck_halves]
-	var image: Image = (load("res://assets/wolf-side-right-provisional.png") as Texture2D).get_image()
-	var scale_x: float = 0.18325
+	var image: Image = (load(MainScript.WOLF_ART_PATH) as Texture2D).get_image()
+	var scale_x: float = MainScript.WOLF_ART_SCALE
 	var squash: float = (MainScript.WOLF_DRAWN_HEIGHT - duck_halves * 0.5) / MainScript.WOLF_DRAWN_HEIGHT
 	var scale_y: float = scale_x * squash
 	# The texture's centre sits WOLF_FEET_BELOW_CENTRE texture px above his feet.
@@ -1734,7 +1734,7 @@ func _wolf_pixels(duck_halves: int) -> Dictionary:
 ## WOLF's painted body at rest, from his art: how far it reaches behind his origin (x, his tail) and
 ## ahead of it (y, his snout), in world px.
 func _wolf_art_reach() -> Vector2:
-	var image: Image = (load("res://assets/wolf-side-right-provisional.png") as Texture2D).get_image()
+	var image: Image = (load(MainScript.WOLF_ART_PATH) as Texture2D).get_image()
 	var left: int = image.get_width()
 	var right: int = -1
 	for x: int in image.get_width():
@@ -1743,21 +1743,21 @@ func _wolf_art_reach() -> Vector2:
 				left = mini(left, x)
 				right = maxi(right, x)
 				break
-	var scale: float = 0.18325
+	var scale: float = MainScript.WOLF_ART_SCALE
 	var centre: float = image.get_width() * 0.5
 	return Vector2((centre - left) * scale, (right + 1 - centre) * scale)
 
 
 ## How far below WOLF's sprite centre his painted feet reach, in world px.
 func _wolf_art_feet() -> float:
-	var image: Image = (load("res://assets/wolf-side-right-provisional.png") as Texture2D).get_image()
+	var image: Image = (load(MainScript.WOLF_ART_PATH) as Texture2D).get_image()
 	var bottom: int = 0
 	for y: int in image.get_height():
 		for x: int in image.get_width():
 			if image.get_pixel(x, y).a > 0.5:
 				bottom = y
 				break
-	return (bottom + 1 - image.get_height() * 0.5) * 0.18325
+	return (bottom + 1 - image.get_height() * 0.5) * MainScript.WOLF_ART_SCALE
 
 
 ## True while some player in the sound bank is playing [param clip].

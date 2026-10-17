@@ -234,7 +234,7 @@ func _run() -> void:
 	if not _require(state.memory.get("choice_id") == State.DISCLOSE, "first dialogue key records disclosed risk"):
 		return
 	await create_timer(0.1).timeout
-	_expect(wolf.body_sprite.position.distance_to(Vector2(0.0, -15.0)) > 2.0, "WOLF visibly reacts to the disclosed risk")
+	_expect(wolf.body_sprite.position.distance_to(Main.WOLF_SPRITE_REST) > 2.0, "WOLF visibly reacts to the disclosed risk")
 	_expect(game.call("_objective") == "ARM THE BREAKER", "honest answer advances the objective")
 	await _tap(&"interact")
 	if not _require(state.breaker_armed, "breaker arms after choice"):
@@ -359,7 +359,7 @@ func _run() -> void:
 	var column_right: float = column.get_global_transform().origin.x + column.region_rect.size.x * column.scale.x
 	# The safe point answers from x 824 (its station at 876, reach 52): the column ends before that.
 	_expect(column_right <= 876.0 - 52.0, "the near column ends clear of where the safe point is used (right edge %.1f)" % column_right)
-	_expect(not relay_spark.visible and wolf.body_sprite.position == Vector2(0.0, -15.0), "contact reaction settles after the seal opens")
+	_expect(not relay_spark.visible and wolf.body_sprite.position == Main.WOLF_SPRITE_REST, "contact reaction settles after the seal opens")
 	if not _require(await _walk_to(human, 605.0), "the engineer can walk back to the open relay"):
 		return
 	await _tap(&"interact")

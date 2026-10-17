@@ -50,15 +50,18 @@ const FOLLOW_SPEED: float = 220.0
 ## The unhurried step out from over a machine (settle_x).
 const SETTLE_SPEED: float = 140.0
 ## Horizontal reach of each drawn body from its origin, rounded up from the sprites' visible pixels
-## (WOLF's run about -64..66 px, the engineer's about -16..15; flipping mirrors them).
+## (WOLF's run -57.6..57.6 px, the engineer's -13.6..13.6; flipping mirrors them). Kept at the earlier
+## art's values, which still cover both, so the spacing behaviour is unchanged.
 ## follow_spacing_test measures the art against these.
 const WOLF_REACH: float = 67.0
 const HUMAN_REACH: float = 17.0
 ## How far WOLF's painted body (pixels more than half opaque) reaches ahead of his origin to his snout
 ## and behind it to his tail tip. His authored spots stand him on clear floor by these, and
 ## wolf_space_test measures the art against them.
-const WOLF_SNOUT: float = 59.1
-const WOLF_TAIL: float = 56.0
+## Both are half the standing piece's 1028 columns at Main.WOLF_ART_SCALE: the piece is cut to his
+## outline and drawn centred on his origin.
+const WOLF_SNOUT: float = 57.65
+const WOLF_TAIL: float = 57.65
 ## A follower stands this far from the engineer: both reaches plus a little air.
 const FOLLOW_GAP: float = 88.0
 ## The least spacing at which the two drawn bodies still do not touch. A side with less room than
