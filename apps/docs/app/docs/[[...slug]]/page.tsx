@@ -5,6 +5,7 @@ import { createRelativeLink } from 'fumadocs-ui/mdx';
 import { getMDXComponents } from '@/mdx-components';
 import { source } from '@/lib/source';
 import { pageMetadata } from '@/lib/seo';
+import { breadcrumbStructuredData, JsonLd } from '@/lib/structured-data';
 
 type PageProps = { params: Promise<{ slug?: string[] }> };
 
@@ -16,6 +17,7 @@ export default async function Page({ params }: PageProps) {
 
   return (
     <DocsPage toc={page.data.toc} full={page.data.full}>
+      <JsonLd data={breadcrumbStructuredData(page.url)} />
       <DocsTitle id="main-content" tabIndex={-1}>{page.data.title}</DocsTitle>
       <DocsDescription>{page.data.description}</DocsDescription>
       <DocsBody>

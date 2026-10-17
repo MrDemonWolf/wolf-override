@@ -5,8 +5,9 @@
 # Fails when any exported page references the /_next/image optimiser (absent on
 # GitHub Pages), lacks the #main-content skip-link target, carries more than one
 # robots meta tag (robots and googlebot counted together), or when any page or stylesheet
-# references a .ttf font. Also fails when robots.txt lacks its Sitemap line or sitemap.xml
-# has a guide page without <lastmod>.
+# references a .ttf font. Also fails when robots.txt lacks its Sitemap line, sitemap.xml
+# has a guide page without <lastmod>, the landing page or a guide page lacks its JSON-LD
+# block, or any JSON-LD block is not valid JSON.
 # Usage: scripts/check-docs-export.sh   (DOCS_OUT_DIR overrides the export directory)
 # Fails when apps/docs/out is missing rather than passing silently.
 set -euo pipefail
@@ -75,7 +76,34 @@ else
   fi
 fi
 
+# Structured data (apps/docs/lib/structured-data.tsx): the landing page carries the site graph and
+# every guide page one BreadcrumbList; each block must parse as JSON, or search engines drop it.
+if ! python3 -I - "$out" <<'PY'
+import json, pathlib, re, sys
+out = pathlib.Path(sys.argv[1])
+failed = False
+for page in sorted(out.rglob('*.html')):
+    rel = page.relative_to(out).as_posix()
+    if rel.startswith('_next/'):
+        continue
+    blocks = re.findall(r'<script type="application/ld\+json">(.*?)</script>', page.read_text(), re.S)
+    expected = 1 if rel == 'index.html' or rel.startswith('docs/') else 0
+    if len(blocks) != expected:
+        print(f'FAIL  {rel} has {len(blocks)} JSON-LD blocks (expected {expected})', file=sys.stderr)
+        failed = True
+    for block in blocks:
+        try:
+            json.loads(block)
+        except ValueError as error:
+            print(f'FAIL  {rel} has a JSON-LD block that is not valid JSON: {error}', file=sys.stderr)
+            failed = True
+sys.exit(1 if failed else 0)
+PY
+then
+  status=1
+fi
+
 if [ "$status" -eq 0 ]; then
-  echo "pass  $count exported pages: no /_next/image, one #main-content each, at most one robots meta, no .ttf references; robots.txt names the sitemap; every guide URL in sitemap.xml has <lastmod>"
+  echo "pass  $count exported pages: no /_next/image, one #main-content each, at most one robots meta, no .ttf references; robots.txt names the sitemap; every guide URL in sitemap.xml has <lastmod>; valid JSON-LD on the landing and guide pages"
 fi
 exit "$status"

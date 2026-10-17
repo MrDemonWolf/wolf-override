@@ -7,6 +7,7 @@ import corridorCapture480 from './images/corridor-start-capture-480.webp';
 import corridorCapture960 from './images/corridor-start-capture-960.webp';
 import corridorCapture1600 from './images/corridor-start-capture-1600.webp';
 import { pageMetadata, siteDescription } from '@/lib/seo';
+import { homeStructuredData, JsonLd } from '@/lib/structured-data';
 
 // Static export has no image optimiser, so the hero ships hand-encoded WebP sizes of the key art.
 const keyArtSrcSet = ['640', '1024', '1672'].map((w) => `/title-corridor-key-art-provisional-${w}.webp ${w}w`).join(', ');
@@ -67,6 +68,7 @@ export default function HomePage() {
     // header, main and footer are siblings so assistive tech sees three top-level landmarks (banner, main, contentinfo).
     // data-landing keeps the root dark as well (see the end of global.css).
     <div data-landing="" className="flow-root overflow-clip bg-ink text-text scheme-dark">
+      <JsonLd data={homeStructuredData()} />
       <header className="relative z-30 mx-auto mt-4 -mb-23 flex min-h-19 w-[min(calc(100%-2rem),1232px)] items-center justify-between gap-4 rounded-control border border-accent/24 bg-panel/94 px-[clamp(1rem,2.5vw,1.75rem)] py-[.65rem] shadow-panel phone:mt-2 phone:-mb-30 phone:min-h-0 phone:w-[calc(100%-1rem)] phone:px-3 phone-xs:gap-2 phone-xs:px-2">
         <BrandLockup
           className="phone:min-w-0 phone:gap-[.45rem] phone-xs:gap-[.35rem]"
