@@ -7,6 +7,9 @@ extends "res://tests/support/game_suite.gd"
 ##   Spanish or Japanese still runs the English suites in English;
 ## - the language table (apps/game/i18n/languages.json): D1's twelve files, every field the game reads,
 ##   and nothing offered whose fonts are not in the build;
+## - the shipped catalogs (PR L2): the offered translated languages, the .po files in res://i18n/ and
+##   project.godot's internationalization/locale/translations are the same set of codes, so no language
+##   is offered without its file and no file ships without being offered;
 ## - the OS-locale resolver's explicit table (DESIGN.md, "How Godot picks a file for the system
 ##   language") and the saved setting;
 ## - each language's glyphs checked with only its own font chain, and a CJK character planted in a
@@ -34,6 +37,8 @@ const SIBLING_ONE: String = "I18N TEST LINE ONLY ONE FILE HAS"
 ## sizes and four rows when wrapped at 200 px, so it outgrows every planted box below by far.
 const LONG_TEXT: String = "WWWWWWWWWW WWWWWWWWWW WWWWWWWWWW WWWWWWWWWW"
 const SHORT_TEXT: String = "OK"
+## The folder holding the shipped catalogs, beside languages.json: one <code>.po per offered language.
+const CATALOG_DIR: String = "res://i18n"
 
 var _checks: int = 0
 
@@ -46,6 +51,7 @@ func _run() -> void:
 	check_name = "Languages"
 	_check_pinned()
 	_check_table()
+	_check_catalogs()
 	_check_resolver()
 	_check_saved()
 	_check_glyphs()
@@ -94,6 +100,33 @@ func _check_table() -> void:
 	_check(not offered.is_empty() and offered[0] == "en", "English is offered first (offered: %s)" % [offered])
 	for code: String in offered:
 		_check(I18n.font_chain_complete(code), "%s is offered only once its fallback font is in the build" % code)
+
+
+## Every offered language but the source (English, which has no catalog) has its catalog
+## (CATALOG_DIR/<code>.po), and project.godot registers exactly those catalogs: the three lists hold the
+## same codes. Turning a language on in languages.json without its file, adding a file without turning
+## it on (its text could still reach players through the OS locale, since Godot loads every registered
+## catalog), or forgetting the project.godot entry all fail here. Every .po must also be a language of
+## the table (i18n_tool.py check stops on one that is not).
+func _check_catalogs() -> void:
+	var offered: Array[String] = []
+	for code: String in I18n.offered():
+		if not bool((I18n.LANGUAGES[code] as Dictionary).get("source", false)):
+			offered.append(code)
+	var files: Array[String] = []
+	for file: String in DirAccess.get_files_at(CATALOG_DIR):
+		if file.get_extension() == "po":
+			files.append(file.get_basename())
+	var registered: Array[String] = []
+	for path: String in ProjectSettings.get_setting("internationalization/locale/translations", PackedStringArray()):
+		registered.append(path.get_file().get_basename())
+	offered.sort()
+	files.sort()
+	registered.sort()
+	_check(files == offered, "the .po files in %s are the offered translated languages (files %s, offered %s)" % [CATALOG_DIR, files, offered])
+	_check(registered == offered, "project.godot registers the offered translated languages' catalogs (registered %s, offered %s)" % [registered, offered])
+	for code: String in files:
+		_check(I18n.LANGUAGES.has(code), "the catalog %s.po is a language of the table" % code)
 
 
 ## The OS locale goes through the explicit table to an offered language, else English. Checked twice:
