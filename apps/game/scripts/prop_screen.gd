@@ -9,8 +9,10 @@ extends Node2D
 ## It is a child of the prop's Sprite2D, so it moves, scales and dims (modulate) with the prop and
 ## draws over it. [member glass] is in the piece's own pixels (piece px), as measured on the PNG.
 
-## How strongly the glass glows (alpha of the tint over the dark painted glass).
-const FILL_ALPHA: float = 0.42
+## The glass's glow: the tint darkened this much (so the rows stand out on it) at this alpha over the
+## dark painted glass.
+const FILL_DARKEN: float = 0.35
+const FILL_ALPHA: float = 0.8
 ## The readout's rows: their share of the glass's width, top to bottom. Fixed, so a still is the same
 ## every run; short and long rows read as a log, not as words.
 const ROWS: PackedFloat32Array = [0.72, 0.55, 0.83, 0.4, 0.66, 0.5]
@@ -19,10 +21,11 @@ const ROW_HEIGHT: float = 0.055
 const ROW_STEP: float = 0.12
 ## The rows' inset from the glass's left and top edges, as shares of its width and height.
 const INSET: Vector2 = Vector2(0.08, 0.14)
-## The rows are this much brighter than the fill (alpha).
-const ROW_ALPHA: float = 0.75
+## The rows: the tint lightened this much and nearly opaque, so they read as lit lines on the glow.
+const ROW_LIGHTEN: float = 0.25
+const ROW_ALPHA: float = 0.9
 ## A thin bright line along the glass's top edge, the light catching it (alpha).
-const EDGE_ALPHA: float = 0.5
+const EDGE_ALPHA: float = 0.35
 
 ## The glass, in piece px.
 var glass: Rect2 = Rect2()
@@ -53,10 +56,10 @@ func local_glass() -> Rect2:
 
 func _draw() -> void:
 	var rect: Rect2 = local_glass()
-	draw_rect(rect, Color(tint, FILL_ALPHA))
+	draw_rect(rect, Color(tint.darkened(FILL_DARKEN), FILL_ALPHA))
 	var row_height: float = rect.size.y * ROW_HEIGHT
 	for index: int in ROWS.size():
 		var top: float = rect.position.y + rect.size.y * (INSET.y + ROW_STEP * index)
 		var left: float = rect.position.x + rect.size.x * INSET.x
-		draw_rect(Rect2(left, top, rect.size.x * (1.0 - 2.0 * INSET.x) * ROWS[index], row_height), Color(tint.lightened(0.35), ROW_ALPHA))
+		draw_rect(Rect2(left, top, rect.size.x * (1.0 - 2.0 * INSET.x) * ROWS[index], row_height), Color(tint.lightened(ROW_LIGHTEN), ROW_ALPHA))
 	draw_rect(Rect2(rect.position, Vector2(rect.size.x, maxf(row_height * 0.5, 1.0))), Color(tint.lightened(0.6), EDGE_ALPHA))
