@@ -112,6 +112,6 @@ The game writes `m0-save.json` (the checkpoint) and `settings.cfg` (your setting
   Removing this folder removes the checkpoint and your settings. There is no undo.
 </Callout>
 
-- **The double dash is normal.** Godot replaces the slashes in the project name with dashes.
+- **The double dash is normal.** The folder keeps the game's earlier name, WOLF//OVERRIDE, with its slashes turned into dashes, so older saves still load.
 - **Safe writes:** a save goes to `m0-save.json.tmp` first and is renamed when complete, so a half-written file never replaces a good checkpoint.
 - **Tests don't touch it.** `bun run game:check` uses a temporary folder.
