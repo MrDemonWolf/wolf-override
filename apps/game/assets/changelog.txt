@@ -9,6 +9,14 @@ Changes merged after 0.15.0. They become the next version when it is cut.
 - Everyone stands where they did. The sentry keeps its size; WOLF is 3% smaller, so his tail still fits by the Service Junction's exit.
 - WOLF's cyan eye and body seams are now lit by the game over his new picture.
 - The crushed sentry under the tank is a little smaller (55 by 41 pixels, was 59 by 44), as painted beside the patrolling one.
+- New machine art, approved by Nathanial Henniges: every machine in the corridor, Records Access and the Service Junction is repainted, one whole image each.
+- Five machines are now their real size, so they are smaller: the purge display, the PURGE QUEUE, the MIRROR PORT, the tank arm and the EXIT BOLT panel.
+- WOLF keeps his size for now, so he looks big beside the real-size machines.
+- Screens, lamps and the LINE gauge are lit by the game. The PURGE QUEUE and MIRROR PORT screens turn green once copied.
+- One handwheel turns at both the MANUAL BYPASS and the VALVE.
+- The coolant tank hangs from the arm on a cable.
+- The RELIEF VENT has a relief valve standing on its grate. The danger area is still the grate.
+- Small spot changes: the purge display answers until x 177 (was 230), the engineer stands closer to the PURGE QUEUE, MIRROR PORT and EXIT BOLT, and WOLF reads the MIRROR PORT from x 613 (was 625).
 
 -- Website --
 - The changelog is split into development versions, 0.1.0 (September 26, 2026) to 0.15.0 (October 16, 2026), with short lines by group and the full notes under each version.
@@ -19,6 +27,7 @@ Changes merged after 0.15.0. They become the next version when it is cut.
 - Credits no longer call adjustable dialogue size a proposal: TEXT SIZE exists.
 - Legal lists the CC0 sound recordings and every kind of AI-made art, including the doors, the door end and the engineer's collapse and crank frames.
 - Credits and Legal say how the new whole-piece characters were made.
+- Credits and Legal say how the new whole-piece machines were made.
 
 -- Development --
 - The game's version lives in one place, apps/game/project.godot; the macOS and Windows test builds now take it from there instead of 0.0.0.
@@ -31,6 +40,7 @@ Changes merged after 0.15.0. They become the next version when it is cut.
 -- How it was checked --
 - Checked: headless test suites, the docs checks and build, rendered stills of the title screen, and headless browser screenshots of the credits and legal pages; not played by hand.
 - New characters checked: headless test suites and rendered stills (1280x720 and a phone shape) of each pose, before and after; not played by hand, so nothing was judged in motion.
+- New machines checked: headless test suites and rendered stills (1280x720 and a phone shape) of each room, before and after; not played by hand.
 
 == 0.15.0 - October 16, 2026 ==
 Summary: real doors in Records Access and the Service Junction, a copied-code check, notes moved to Notion and groundwork for more languages.
