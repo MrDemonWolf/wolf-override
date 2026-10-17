@@ -25,6 +25,9 @@
 # (docs/research-2026-10/localization/prototype/tools/extract_pot.sh) in PR L2; it now takes GODOT_BIN,
 # and the heavy-slot wrapper it ran under there stayed on that branch.
 set -euo pipefail
+# OUT's folder is made first: the editor writes only the file, and a missing folder made the generator
+# write "/messages.pot" instead (the cd below failed inside the substitution, which set -e does not stop).
+mkdir -p "$(dirname "$2")"
 root="$(cd "$1" && pwd)" out="$(cd "$(dirname "$2")" && pwd)/$(basename "$2")" logs="$3"
 here="$(cd "$(dirname "$0")" && pwd)"
 godot="${GODOT_BIN:-godot}"
