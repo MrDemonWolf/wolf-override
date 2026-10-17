@@ -1,11 +1,89 @@
 ---
 title: Changelog
-description: Spoiler-free changes to the WOLF//OVERRIDE source game and website.
+description: What changed in each development version of the WOLF//OVERRIDE source game and website, newest first. Spoiler-free.
 ---
 
-These are development updates to the source build, not downloadable releases. There is no public release or automatic updater yet; the automatic test builds are unsigned debug builds for testing, kept for 14 days. Original concept, core story and creative vision: Nathanial Henniges.
+**What this page is for:** what changed in each development version, newest first. Spoiler-free.
 
-## October 16, 2026
+<CurrentVersion />
+
+- **Versions** are numbered `0.MINOR.0`, one per milestone (a day of finished work). They are development versions of the source build, not downloadable releases.
+- **No release yet.** There is no public release or automatic updater. The automatic test builds are unsigned debug builds for testing, kept for 14 days.
+- **Read the short lines.** Each version lists one-line changes by group. Open **Full notes** under a version for every detail.
+- **How it was checked** closes each version. "Not played by hand" means only automated tests and still images saw it.
+- **Credit:** original concept, core story and creative vision: Nathanial Henniges.
+
+## Next version (in development)
+
+Changes merged after 0.15.0. They become the next version when it is cut.
+
+### Gameplay
+
+- The title screen shows the game's version number under **CHANGELOG**.
+
+### Website
+
+- The changelog is split into development versions, 0.1.0 (September 26, 2026) to 0.15.0 (October 16, 2026), with short lines by group and the full notes under each version.
+- The changelog page shows the current version, read from the game's project file when the site is built.
+- What is next is up to date: sound and **TEXT SIZE** already exist.
+
+### Development
+
+- The game's version lives in one place, `apps/game/project.godot`; the macOS and Windows test builds now take it from there instead of 0.0.0.
+- F12 bug captures record the game's version.
+- The in-game changelog shows the short lines only; the full notes stay on the website's changelog.
+- The changelog export fails if the newest version on this page is not the game's version.
+- New rule: every pull request that changes the game, the site or the tools adds its lines under Next version; a version is cut per milestone.
+- Changes that reached the game or site earlier but were missing from this page are now listed under their versions.
+
+### How it was checked
+
+- **Checked:** headless test suites, the docs checks and build, and rendered stills of the title screen; not played by hand.
+
+## 0.15.0 - October 16, 2026
+
+**Summary:** real doors in Records Access and the Service Junction, a copied-code check, notes moved to Notion and groundwork for more languages.
+
+### Gameplay
+
+- Records Access and the Service Junction have real doors, approved by Nathanial Henniges from rendered frames.
+- Records Access: you enter through a steel swing door that shuts behind you; securing the first copy unbolts the exit door and it swings open.
+- Service Junction: the sealed door is a steel blast door with a status lamp; the blast throws it along the floor and you walk through the doorway.
+- Service Junction: the exit is a sliding steel door; WOLF walks out first and the engineer follows before the **END OF SLICE** card.
+- Knocked down by the blast door, the engineer always lies in full view, clear of the door's column.
+- Wording approved by Nathanial Henniges: the junction's exit is called a "door", not a "hatch"; the tank landing shows two boxes, one speaker each; the container hint reads "E: secure the first copy in the container."
+
+### Art
+
+- The door art was made with AI assistance, painted inside shapes drawn by scripts from real door hardware. It replaces the earlier bulkhead and hatch images.
+
+### Accessibility
+
+- With **REDUCED MOTION** on, the blast door's lamp stays steady red instead of flashing.
+
+### Website
+
+- The Records Access and Service Junction walkthroughs describe the new doors, with a new Service Junction screenshot.
+- Saving says exit door, Credits list the door hardware references, and Testing describes the door checks.
+- Search basics: a robots.txt that points at the sitemap, page dates in the sitemap, one robots tag per page, a phone home-screen icon and a dark browser bar colour.
+- The landing page footer's group names are plain labels instead of headings.
+- Structured data for search engines: the landing page describes the site, the game and its publisher; guide pages list their place in the guide. No ratings, prices or release dates are claimed.
+- For AI assistants: an llms.txt index, an llms-full.txt with every guide page as Markdown, and a Markdown copy of each guide page, built from the guide on every build.
+- The Testing page and README list the docs export checks in full.
+
+### Development
+
+- Agent rules: push work to GitHub as you go, and give code good developer comments.
+- A copied-code check (`scripts/check-copies.py`) runs in CI on every pull request.
+- Notes and research moved to Notion; the repository keeps the rules, records and an index in `docs/NOTES.md`.
+- The localization decision is recorded, and language groundwork is in: a language table, a shared I18n module and test suites pinned to English. Only English is offered; nothing on screen changes.
+
+### How it was checked
+
+- **Checked:** automated tests (one walks the route through every door) and still images from scripted play at 1280x720 and on a 1920x1080 touch layout; not played by hand, so the thrown door and the walk-outs have not been seen in motion. The website search basics, structured data (each block confirmed valid) and AI-assistant files were checked by the site's automated build checks.
+
+<Details>
+<Summary>Full notes for 0.15.0 (October 16, 2026)</Summary>
 
 - Records Access and the Service Junction now have real doors, approved by Nathanial Henniges from rendered frames. You come into Records Access through a steel swing door that its closer swings shut behind you, and you leave through another: securing the first copy in the dark security container beside the exit lets the exit's bolt go, its lamp turns amber and the door swings open on its hinges, then the engineer walks out through it with WOLF following. The Service Junction's entry is the same kind of door. Its sealed door is now a steel blast door in a concrete wall across the walkway, with a lamp on the wall's near column (red, amber while the line builds, flashing red and white while the fuse burns, steady red with **REDUCED MOTION**); when it blows it is torn off its hinges and thrown along the floor, where it lands and lies, and you walk through the doorway behind its column. The exit is a sliding steel door in the wall at the room's right end: popping the bolt slides it into its pocket, WOLF steps into the doorway and waits, and you leave from the door itself (from the **EXIT BOLT** box, which now stands a little further from it, the hint only says it is open). On leaving, WOLF walks out through it first and the engineer follows him before the **END OF SLICE** card; nobody fades out. Through the open exit the coolant line runs on along the passage beyond. The doors replace the earlier pressure bulkhead and hatch images; their art was made with AI assistance, painted inside shapes drawn by scripts from real door hardware. Checked by automated tests, a new one among them that walks the route through every door, and by still images from scripted play at 1280x720 and on a 1920x1080 touch layout; not played by hand, so the thrown door and the walk-outs have not been seen in motion.
 - Knocked down by the Service Junction's blast door, facing it from the valve or right against it, or from the floor beyond the open doorway, the engineer now always lies in full view, clear of the door's near column, with **REDUCED MOTION** on or off. Checked by automated tests that measure the lying body against the column's painted foot, and by still images from scripted play.
@@ -15,7 +93,56 @@ These are development updates to the source build, not downloadable releases. Th
 - Website for AI assistants: the site now publishes an llms.txt index of the guide, an llms-full.txt with every guide page as plain Markdown, and a Markdown copy of each guide page that the page links to, all generated from the guide itself on every build, so tools that read the web can answer questions about the game from the real guide. Checked by the site's automated build checks, which the Testing page and README now list in full.
 - Website: the Records Access and Service Junction walkthroughs describe the new doors and the Service Junction walkthrough has a new screenshot, Saving says exit door, Credits list the door hardware references and how the door art was made, and the Testing page describes the new door checks.
 
-## October 15, 2026
+</Details>
+
+## 0.14.0 - October 15, 2026
+
+**Summary:** the corridor's door end gains its approved additions, dialogue shows one speaker at a time, and **TEXT SIZE** and **RETRY** arrive.
+
+### Gameplay
+
+- The corridor's door end gains the additions Nathanial Henniges approved: a blast frame under a **RESTRICTED AREA** sign and a striped inner door that slides open after the roller.
+- The two red wall lamps are caged warning beacons that flash while the corridor is locked down.
+- Cranking the **MANUAL BYPASS** shows the engineer leaning into the wheel with both hands; coolant sprays from a relief pipe.
+- At the safe point WOLF waits in the open doorway, facing you, clear of the machines. No lines changed.
+- Dialogue shows one speaker at a time, in larger text (23 px instead of 17 on the 960x540 canvas), at most two rows per box; not read by a player on a screen yet.
+- Each box stays up for its reading time, then the next follows on its own, so you can keep walking.
+- A station's answer no longer loses the line it cuts into: that line comes back afterwards at the box it was on.
+- You keep control while the Records Access exit's closing lines play.
+- When you first get control, only the name card and the move prompt show; the opening lines start once the card fades.
+- The hint beside the opening's first box says **PAUSE: skip the opening**.
+- After a knockdown the hint offers **RETRY** from 0.9 seconds; pressing it returns you to the room's last automatic save.
+- The **RETRY** timing is the same for every knockdown, as Nathanial Henniges decided.
+- On touch, a question's two answers sit at the bottom within thumb reach and the hint names the on-screen button; not tried on a phone.
+
+### Accessibility
+
+- With **REDUCED MOTION** on, the corridor's beacons stay lit and steady.
+- New setting: **TEXT SIZE** (Settings > Display, 100% to 200%) enlarges the dialogue, hints, cards, prompts, answer buttons and station names; not tried on a device.
+
+### Settings
+
+- Settings > Display no longer shows the graphics card and renderer; its note now fits the device; not tried on a phone.
+
+### Website
+
+- The corridor walkthrough describes the new door end, the crank and where WOLF waits; Settings lists the beacons under **REDUCED MOTION**; Credits describe the additions.
+- First steps has a new section on reading the dialogue.
+- The guide pages describe the new boxes, **TEXT SIZE**, the touch answers, **RETRY** and the trimmed Settings note; Testing describes the new checks.
+- A design brief for the landing page, based on Mobbin research, is recorded.
+
+### Development
+
+- Agent rules: never search the whole disk, and reuse shared code instead of copying it.
+- Colours, generated textures and tween stops are shared through one Palette, FxKit and Tweens.
+- The headless test suites share one kit.
+
+### How it was checked
+
+- **Checked:** automated tests (one covers every line in the game) and still images from scripted play at 1280x720, 960x540 and phone shapes; not played by hand, so the flashing, the crank and WOLF's walk have not been judged in motion.
+
+<Details>
+<Summary>Full notes for 0.14.0 (October 15, 2026)</Summary>
 
 - The door end of the maintenance corridor gains the additions Nathanial Henniges approved. The rolling door now sits in a bolted steel blast frame under a **RESTRICTED AREA** sign, and behind it a heavier striped inner door slides sideways into the wall once the roller is part way up, so the doorway opens in two steps. The two red lamps on the corridor wall are caged warning lamps on wall brackets that flash like rotating beacons while the corridor is locked down, each lamp's red glass dimming and brightening with its light; with **REDUCED MOTION** on they stay lit and steady. Cranking the **MANUAL BYPASS** shows the engineer leaning into the wheel with both hands on its rim, and the coolant sprays down from a relief pipe on the relay instead of a pale cloud. The ceiling light near the door is a shorter fitting that no longer sits under the **PAUSE** button, and the room with the **SAFE POINT** is shown cut open along its near side, so the door is the only way in. When you reach the safe point WOLF now comes up to the open doorway and stands there facing you, in front of the frame's far side and the wall-mounted **MANUAL BYPASS** wheel and clear of the relay, the safe point and you, instead of waiting on the relay's left; edging about just short of the safe point does not send him back and forth. No lines changed. Checked by automated tests (the inner door moving with the roller and out of the way once open, the crank frames with both hands on the wheel, the lamps' flash rate and Reduced Motion, and WOLF's spot measured against the redrawn door end, with the engineer edging about short of the safe point) and by still images from scripted play at 1280×720 and a 2400×1080 phone shape, compared before and after; not played by hand, so the flashing, the crank and WOLF's walk have not been judged in motion.
 - Website: the corridor walkthrough describes the new door end, the crank and where WOLF waits at the safe point, Settings lists the beacons under **REDUCED MOTION**, Credits describe how the additions were made and the real hardware they follow, and the Testing page describes the new checks.
@@ -30,7 +157,51 @@ These are development updates to the source build, not downloadable releases. Th
 - Settings is trimmed: the Display tab keeps its **THE DEN / LOCAL CONFIGURATION** heading but no longer shows the graphics card and renderer, and its note says **Window size is OS-managed on mobile.** only on phones and tablets; elsewhere it reads **V-sync may limit the FPS cap.** Checked by automated tests; not tried on a phone.
 - Website: First steps has a new section on reading the dialogue; First steps, Input, Saving, Settings, Troubleshooting, Privacy, the corridor, Records Access and Service Junction walkthroughs and the Testing page describe the new boxes, **TEXT SIZE**, the touch answers, the Records Access exit, **RETRY**, the trimmed Settings note and the new checks.
 
-## October 14, 2026
+</Details>
+
+## 0.13.0 - October 14, 2026
+
+**Summary:** a real knockdown collapse, a sentry that reads true, and WOLF kept out of machines.
+
+### Gameplay
+
+- A knockdown shows the engineer dropping to their knees and slumping onto their side, lying on the floor.
+- They fall the way they were facing; the sentry rolls back clear, and nobody lies hidden under the junction door's frame.
+- The sentry's front lamp matches its scanner: dark when powered down, amber on patrol, red once it has you.
+- The sentry's beam ends exactly where its sight ends, and stops at the **EXIT BOLT** box and at a tank on the floor.
+- You can no longer walk through the sentry; a chase stops where the two touch.
+- The sentry's patrol turns a few steps earlier and stays over the mark for about 0.9 s, still well over the half-second window.
+- WOLF no longer stops inside a machine or a doorway at the spots he goes to on his own (the junction's hatches are left for later).
+- Choosing **1** at the rubble line keeps the engineer waiting about 0.7 s while WOLF dashes past (was about 0.4 s).
+- Wording approved by Nathanial Henniges: lines that said WOLF waits at the rubble now say he holds back.
+
+### Art
+
+- The collapse uses approved painted frames made with AI assistance.
+- The exit bolt's power conduit comes up out of the floor into a cable box (simple provisional shapes); the vent's grate stays in front of its steam.
+
+### Accessibility
+
+- With **REDUCED MOTION** on, the engineer is shown lying down at once.
+- The sentry's beam has a pale centre line and dashed edges for players who see red poorly; viewed in protanopia and deuteranopia simulations.
+
+### Website
+
+- First steps, Settings and the Service Junction walkthrough describe the collapse, the sentry's lamp and beam, the conduit and the vent grate; Credits note the collapse frames.
+- The walkthroughs say where WOLF stands; Testing describes the new checks.
+
+### Development
+
+- New checks: WOLF's lines never hurry you, the hazards never turn on him unless he draws the sentry, nothing he does completes your steps, there is no trust meter, and the all-refusal route reaches the end card.
+- New checks for knockdowns, for overlaps on every frame of the sentry's routes, and for WOLF's body against every machine.
+- The junction redraws only when what it draws changes.
+
+### How it was checked
+
+- **Checked:** automated tests and still images from scripted play, including all five knockdowns; not played by hand.
+
+<Details>
+<Summary>Full notes for 0.13.0 (October 14, 2026)</Summary>
 
 - A knockdown now looks like one: the engineer drops to their knees and slumps onto their side, lying on the floor with their shadow and reflection under them, instead of the standing figure tipping over and hanging in the air. The collapse uses approved painted frames made with AI assistance; with **REDUCED MOTION** on they are shown lying down at once. They slump forward, the way they were facing, and never turn round as they go down; in the Service Junction the sentry rolls back clear of the body (with **REDUCED MOTION** on it is put clear on the same frame they lie down), someone who goes down beside a tank lying on the floor staggers back from it rather than falling into it, and someone facing the junction door when it blows is thrown back from it, so no part of them lies hidden under its frame. Checked by automated tests and by still images from scripted play at all five knockdowns (relief vent, door blast, the sentry spotting you, the sentry chasing you, the coolant cloud); not played by hand.
 - The Service Junction's sentry reads truer. The round lamp on its front now shows the same colour as its scanner (dark while powered down, amber on patrol, red once it has you), so every light on it points the way it faces. Its beam ends on a bright edge exactly where its sight ends, and a pale line down its middle and dashed edges keep it visible for players who see red poorly. The beam, and what the sentry can see, now stop at the **EXIT BOLT** box and at the tank while it lies on the floor. A chase stops where the two bodies touch and the knockdown lands there, and you can no longer walk through the sentry, so the two are never drawn over each other. At the far end of its patrol the sentry now passes behind the **EXIT BOLT** box, so neither the machine nor its beam is drawn over the box. Its patrol now turns a few steps further from the **TANK RELEASE**, so it never touches someone standing at the right-hand end of the tint beside it; each time it patrols onto the mark it is now over it for a little under a second (about 0.9 s, down from about one second), still well over the half-second window. Checked by automated tests, one of which watches every frame of its scripted routes for overlaps, and by still images from scripted play, with the beam also viewed in protanopia and deuteranopia simulations; not played by hand.
@@ -41,7 +212,57 @@ These are development updates to the source build, not downloadable releases. Th
 - Development: new automated checks that WOLF's lines never hurry you, that the sentry and the hazards never turn on him except when he chooses to draw the sentry, that nothing he does on his own completes one of your steps, that the screen has no trust meter, and that the route where he refuses everything still reaches the **END OF SLICE** card.
 - Website: the corridor, Records Access and Service Junction walkthroughs say where WOLF stands, and the Testing page describes the two new checks, the wording checks' new lines and what the WOLF space check leaves out.
 
-## October 13, 2026
+</Details>
+
+## 0.12.0 - October 13, 2026
+
+**Summary:** approved wording, answers to refused presses, a fairer fuse, tank drop and cranks, and **TOGGLE HOLDS**.
+
+### Gameplay
+
+- Wording approved by Nathanial Henniges: a plainer relay answer, a shorter opening, and Service Junction lines and plates that point at what you can see (**GO THROUGH THE DOOR**; **USED**, **LOCKED**, **READY**).
+- Lines come as boxes of at most two short rows, one after another.
+- In the Service Junction every press that cannot do anything yet answers: a lamp flicker, a dull clunk and a line saying why.
+- Walking into the sealed door gives a thud, a lamp flicker and a small give in the engineer's body.
+- On entering the Service Junction the engineer names only the goal; if the breaker is not armed, hints grow at about 45 seconds, 1.5 minutes and 3 minutes. The timings may be tuned.
+- The door's fuse burns about 2.5 seconds instead of 1, with a rising tick every half second. Whether it is now too easy is open.
+- A dropped tank counts when it catches a quarter of the sentry (was half); the window on the mark is about one second.
+- Cranking the **MANUAL BYPASS** takes about 2 seconds of hold instead of a little over 3; both cranks answer the moment you press.
+- The relay's **COOLANT FAULT** tag fades once the fault is dealt with.
+
+### Audio
+
+- Cranking the **MANUAL BYPASS** now plays the coolant hiss (a misnamed sound meant only the alarm played); not heard in a hands-on session.
+- Saving, copying, answering WOLF and leaving a room make a sound within a frame of the press, with two new generated sounds; not checked by ear.
+
+### Accessibility
+
+- The fuse's hazard stripes pulse twice a second instead of four times; a frame-by-frame check found the flashing under the WCAG general-flash threshold.
+
+### Settings
+
+- New setting: **TOGGLE HOLDS** (Settings > Controls). One press starts a crank and it keeps turning. Off by default; not tried by hand on any device.
+
+### Website
+
+- Settings, Input, First steps and Troubleshooting describe **TOGGLE HOLDS** and the shorter bypass; the walkthroughs give the new timings.
+- The walkthroughs, First steps, Saving and Testing describe the new wording, the answers to refused presses, the door's bump and the junction's hints.
+- The walkthroughs mention the new sounds and the fault tag; Settings, Credits and Troubleshooting list the new sounds.
+
+### Development
+
+- The checks fail on any sound asked for by a name that does not exist; a debug build warns about one.
+- A check requires the sound, the lamp and the line within six frames of every refused press in the junction.
+- Research on how the game should play, the play decisions and the wording drafts are recorded.
+- A parity harness checks that refactors keep the game's behaviour the same.
+- The HUD writes its per-frame values only when they change.
+
+### How it was checked
+
+- **Checked:** automated tests and still images from scripted play; not played by hand. The new sounds have not been checked by ear.
+
+<Details>
+<Summary>Full notes for 0.12.0 (October 13, 2026)</Summary>
 
 - Wording approved by Nathanial Henniges. The second answer at the relay now says plainly that the engineer skips the risk talk; a save made before the change keeps the words its player chose. After the opening, why the engineer trusts WOLF now comes as two short boxes that name the engineer instead of saying "they". Three opening lines and two half-lines that described things the picture does not show are gone. In the Service Junction the lines and plates no longer name an alcove, posts, a lane, brackets or a floor mark; they point at the **TANK RELEASE**, the sentry's sights, the mark, the rubble and the doorway. The card after the blast reads **GO THROUGH THE DOOR**, the plates read **USED**, **LOCKED** and **READY** instead of **SPENT** and **BOLTED**, and most of the changed lines come as boxes of at most two short rows, one after another; a line that cuts in, such as a station's answer, holds the rest back for a moment instead of skipping them, while a line that moves the story on, such as the tank landing, drops the ones it has made out of date. In the Service Junction the engineer stops at the rubble line until the line after the blast has shown its second box, and after a missed drop the order to get back over the rubble comes as the sentry swings, or not at all if the engineer is already back over it. Checked by automated tests and still images from scripted play; not played by hand.
 - In the Service Junction every press that cannot do anything yet now answers: the machine's lamp flickers twice, a short dull clunk plays and a line says why and what to do instead, and pressing again makes the dialogue box blink as the line comes back. The sealed door answers for itself once you walk up to it, even after you let go, until you move again, instead of repeating the valve's line, and walking into it gives a dull thud, a flicker of its seam lamp and a small give in the engineer's body, with the line on the first bump only. An automated test requires the sound, the lamp and the line within six frames of every such press. Checked by automated tests and still images from scripted play; how it feels has not been played by hand.
@@ -58,7 +279,48 @@ These are development updates to the source build, not downloadable releases. Th
 - Saving, copying, answering WOLF and leaving a room now make a sound within a frame of the press. A station that takes a save or a copy answers with a short chirp (the **SAFE POINT**, the purge queue, the mirror port and the closing scenes' continue), WOLF's joints whir whenever he answers with his body, and the lights switching over at the safe point and at the end of the Service Junction clunk. The two new sounds are generated by the game's own code. Checked by an automated test that makes 29 such presses along both routes of the corridor and Records Access and in the Service Junction, and watches which sounds start; not checked by ear, and presses elsewhere (the junction's valve, tank and drop, or a press that only opens a question) were not part of it; how they sound and sit in the mix is unproven until someone plays it.
 - Website: the corridor, Records Access and Service Junction walkthroughs mention the new sounds and the fault tag clearing, Settings, Credits and Troubleshooting list the bypass hiss and the new sounds, and the Testing page describes the two sound checks.
 
-## October 12, 2026
+</Details>
+
+## 0.11.0 - October 12, 2026
+
+**Summary:** the corridor's door end is rebuilt, the game opens on the studio logo, and automatic test builds start.
+
+### Gameplay
+
+- The game opens on the MrDemonWolf, Inc. logo for about two seconds, with no sound; any input skips ahead once the title is ready.
+- For a little over half a second after the logo, presses do not reach the title, so you cannot pick an option by accident.
+- A saved window size or full screen applies from the logo's first moment.
+
+### Art
+
+- The corridor's end is rebuilt: a concrete wall with a numbered rolling steel door and a red, amber and green status lamp. New provisional art made with AI assistance and approved by Nathanial Henniges.
+- The **MANUAL BYPASS** is a handwheel on a gearbox on the wall beside the door; the relay and safe point use newer station art on bolted bases.
+- The corridor no longer has drifting dust, and the near edge of the wall stays solid.
+
+### Accessibility
+
+- **REDUCED MOTION** drops the logo's hop, and the loading bar glows instead of sweeping.
+
+### Website
+
+- The corridor walkthrough describes the rolling door and the wall-mounted bypass, with a fresh screenshot; Credits describe how the door end was made.
+- Testing covers the test builds and the new checks; Get the game points testers to the builds.
+
+### Development
+
+- Automatic test builds for macOS (Apple silicon and Intel) and 64-bit Windows on every change to main and every pull request from this repository.
+- Test builds are unsigned debug builds, kept for 14 days. They are not releases, and nobody has opened one by hand as part of making it.
+- Test builds carry the game's GPL licence beside Godot's and the fonts' notices, link their source, and say the art has separate rights.
+- The game checks run suites at once, stop a suite that hangs, and fail on unexpected errors in the first import.
+- A render container (`tools/render/render.sh`) makes captures off screen, so no Godot window opens on the developer's Mac.
+- Stale September package files are removed, and the site's dependencies are updated, including TypeScript 7.
+
+### How it was checked
+
+- **Checked:** automated tests and still images from scripted play; not played by hand.
+
+<Details>
+<Summary>Full notes for 0.11.0 (October 12, 2026)</Summary>
 
 - The end of the maintenance corridor is rebuilt. A concrete wall now stands across the corridor with a numbered rolling steel door in it, and a dim machinery room shows through the doorway once it opens. A status lamp on the wall's near edge shows red while the door is shut, amber while it rolls up and green once it is open. The **MANUAL BYPASS** is now a handwheel on a gearbox mounted on the wall beside the door, with a chain guard running up to the door's motor, instead of a wheel on a stand in the middle of the floor; its name plate sits above the wheel with a thin line down to it. The **COOLANT RELAY** and the **SAFE POINT** use the newer station art and stand on bolted steel bases, with shadows where they meet the floor. The light at this end of the corridor is painted into the art, the corridor no longer has drifting dust, and the near edge of the wall stays solid instead of turning see-through when someone passes behind it. Where you stand, what you use and how the door opens are unchanged. New provisional art made with AI assistance (the shapes drawn first, then painted) and approved by Nathanial Henniges. Checked by automated tests and still images from scripted play only, not played by hand.
 - Website: the corridor walkthrough describes the rolling door and the wall-mounted **MANUAL BYPASS**, its screenshot is a fresh capture with the new station art, and the credits describe how the door end was made.
@@ -67,7 +329,46 @@ These are development updates to the source build, not downloadable releases. Th
 - Automatic test builds: every change to the main branch, and every pull request from this repository, now builds the game for macOS (one app for Apple silicon and Intel) and 64-bit Windows. They are unsigned debug builds with the debug tools on, kept for 14 days, and anyone signed in to GitHub can download them; macOS and Windows warn the first time one is opened. The Testing page explains where to get them and how to open them. They are not releases, and nobody has opened one by hand as part of making it.
 - Development: the automated game checks now run several test suites at once, stop and report a suite that hangs, and also fail on unexpected errors in the first import. Website: the Testing page covers the test builds and these checks, and Get the game points testers to the builds.
 
-## October 11, 2026
+</Details>
+
+## 0.10.0 - October 11, 2026
+
+**Summary:** WOLF draws the sentry from the far end of its lane, debug tools for testers, and many Service Junction fixes.
+
+### Gameplay
+
+- When WOLF draws the sentry, the engineer waits at the rubble line while he dashes past, bounding over the sentry to the far end of its lane.
+- The sentry stops on the mark facing WOLF, showing only its red eye; the engineer at the release is behind it.
+- Once the sentry is down, WOLF bounds over the crushed tank and waits by the exit hatch in full view.
+- Leaving the junction, WOLF goes through the exit hatch first and the engineer follows.
+- A missed tank drop lies on the mark spraying coolant before the winch hauls it up; the sentry stops at its edge.
+- The engineer no longer stays inside a machine: with no direction held, they sidestep out beside it.
+- Station lights, glows and name plates draw behind the engineer and WOLF.
+- The **TANK RELEASE** alcove is wider, and WOLF waits beside machines instead of inside them.
+- The run back over the rubble after a missed drop is a little longer; how that feels has not been played by hand.
+- Knockdown lines name the engineer and say how they were caught; run down out in the lane, they fall where they were caught.
+- Smaller hint and line fixes in the junction and the corridor, and no **CONTINUE** prompt that did nothing at the hatch.
+- The opening's last line says WOLF heads for maintenance as he walks off.
+- Station names in the corridor and Records Access fade at the edge of the screen.
+
+### Development
+
+- Debug tools: **F3** shows performance numbers and what the game is doing, including collision boxes and zones; **F12** saves a screenshot and a state file for bug reports.
+- The tools are on in debug builds, or unlocked by a code on the title screen in any build.
+- A debug menu for testers: jump to any point, cheats, forced knockdowns, saves and effect switches, with a keyboard, a controller or touch.
+- Design notes and research are tracked in the repository.
+
+### Website
+
+- The Service Junction walkthrough describes WOLF drawing the sentry, the missed tank, the knockdown cards and where WOLF waits.
+- The corridor and Service Junction walkthroughs describe the sidestep, the wider alcove and where the exit bolt is worked from.
+
+### How it was checked
+
+- **Checked:** automated tests and still images from scripted play; not played by hand.
+
+<Details>
+<Summary>Full notes for 0.10.0 (October 11, 2026)</Summary>
 
 - In the Service Junction, when WOLF chooses to draw the sentry, the engineer now waits at the rubble line while he dashes past, instead of WOLF running through them later at the **TANK RELEASE**. The sentry turns to him and backs away down the lane ahead of him rather than rolling under the hanging tank to meet him, so he ducks under the tank and bounds over the sentry at the far end of its patrol, clear of the tank, and it then backs onto the mark facing him. While it holds on him it shows only its red eye, with no beam running across the **EXIT BOLT** box between them. If a missed drop makes him break off once he is past it, he stays by the hatch rather than crossing back under the tank, and says only that he is out. Checked by automated tests and still images from scripted play only, not played by hand.
 - Leaving the Service Junction, WOLF now goes through the exit hatch first and the engineer follows, instead of the two being drawn over each other in the doorway. Checked by automated tests and still images from scripted play only, not played by hand.
@@ -88,7 +389,72 @@ These are development updates to the source build, not downloadable releases. Th
 - A debug menu for testers (backquote, both sticks, or a small **DEBUG** button beside **PAUSE** in touch play): jump straight to any point of the slice with your choice of the earlier decisions, turn on cheats (invincibility, a frozen sentry, instant cranks, slow motion and frame-by-frame stepping), force each knockdown (with the same flash and shake as in play), set off the junction's big moments, save, reload or clear the checkpoint, and switch the visual effects, camera shake and screen flashes off. It works with a keyboard, a controller and touch, and holds the game still while it is open. The Testing page lists every code, key and action. Checked by automated tests and still images only, not played by hand.
 - Website: the corridor and Service Junction walkthroughs describe the sidestep beside machines, WOLF waiting back from the relay, the wider alcove, the release's "stop" line and where the exit bolt is worked from.
 
-## October 10, 2026
+</Details>
+
+## 0.9.0 - October 10, 2026
+
+**Summary:** the **END OF SLICE** card, the **MANUAL BYPASS** handle, recorded sounds, new title art and a Privacy page.
+
+### Gameplay
+
+- The Service Junction ends on an **END OF SLICE** card that recaps three of your choices; the engineer and WOLF walk out through the hatch first.
+- On a finished save the title shows one **PLAY AGAIN** button, which starts a fresh run.
+- Saving uses one word, checkpoint; **Checkpoint saved.** shows for about two seconds after each automatic save.
+- The corridor's manual bypass is its own **MANUAL BYPASS** handle: hold interact about three seconds to crank it. The engineer can always open the seal alone.
+- When WOLF takes the relay, the seal visibly slides up before the doorway opens.
+- A short card names the engineer as control starts, and WOLF sums up the purge as you walk past the display.
+- The engineer no longer stands inside a machine they use, and the checkpoint keeps the spot beside it.
+- The Service Junction's rules match the screen: brackets as wide as the tank, a tinted hiding span, a striped blast zone and a vent that warns first.
+- The **TANK RELEASE** (formerly **ARM PANEL**) waits until WOLF has the sentry on the mark.
+- The sentry stops for about half a second, with a red light and an alarm, before it chases.
+- The sentry's beam reaches as far as it can see (before, about a fifth as long); whether it reads clearly has not been checked by hand.
+- WOLF keeps about a body length away while following and crosses behind you instead of walking through you.
+- Clearer wording and objective cards: **ARM THE BREAKER**, **CRANK THE VALVE**, **CHECK THE LANE**, **SAFE POINT REACHED**.
+- A dialogue box shows a name tag only when every line in it is that speaker's.
+- Smaller hint and line fixes in all three rooms.
+
+### Art
+
+- The corridor seal and the junction door are heavy pressure bulkheads: new provisional art made with AI assistance and approved by Nathanial Henniges.
+- New provisional title art, made with AI assistance and approved by Nathanial Henniges; the title menu moved onto the picture's dark side.
+- The Service Junction looks tidier: one row of name plates, and the exit hatch opens on a painted passage. Readability in play has not been checked by hand.
+- The characters are drawn sharper from high-quality downscaled art, which also uses less graphics memory (not measured on a device).
+- Room lights follow the story: lockdown beacons fade to a steady glow once a room is cleared, and ceiling lamps flicker every 4 to 15 seconds.
+
+### Audio
+
+- Recorded sounds for the steam line, the relief vent, the coolant cloud and WOLF's growls, plus new generated sounds.
+- Nathanial Henniges picked each sound by ear from audition files; none has been heard in the game during hands-on play yet, and levels may change.
+- The recordings are CC0 sounds by Joseph Sardin (BigSoundBank) and by pauliuw, bonebrah and AntumDeluge (OpenGameArt).
+- Sound follows only the **Master** and **Effects** sliders.
+
+### Accessibility
+
+- With **REDUCED MOTION** on, each ceiling-lamp flicker is a single, gentler dip; double blinks stay under three flashes a second.
+
+### Settings
+
+- On desktop the first launch opens a 1280x720 window instead of 960x540; a stored window size is kept.
+
+### Website
+
+- New Privacy page: what the game stores on your device, that it sends nothing, and that this site loads no analytics.
+- The legal page says which art is AI-generated and human-reviewed; the repository gains a security policy and a contributing guide.
+- Credits in the game and on this site name the sound authors, Tailwind CSS and the image tools.
+- The site uses shared Tailwind CSS tokens and one stylesheet for every page.
+- Fresh screenshots of the current build on the landing page, First steps and the walkthroughs.
+- The guide describes the **END OF SLICE** card, **Checkpoint saved.** and **PLAY AGAIN**.
+
+### Development
+
+- The game checks fail when a test leaves objects behind at exit; the asset register covers the shader, font and theme files.
+
+### How it was checked
+
+- **Checked:** automated tests and still images from scripted play; not played by hand.
+
+<Details>
+<Summary>Full notes for 0.9.0 (October 10, 2026)</Summary>
 
 - The end of the Service Junction now shows its exit being used: after the closing scene the engineer and WOLF walk out through the open hatch before the **END OF SLICE** card comes up. The card's line about how the sentry came down is now saved with the checkpoint at the tank's fall, so quitting and pressing Continue after that no longer loses it. On a finished save the title shows a single **PLAY AGAIN** button instead of **NEW GAME** and **PLAY AGAIN** side by side doing the same thing. Checked by automated tests and still images from scripted play only, not played by hand.
 - The **TANK RELEASE** alcove now shows where its cover ends: its floor is tinted more strongly and a short post stands at each end of the safe span. While WOLF draws the sentry onto the mark, its red beam ends short of the alcove instead of running into the engineer at the release, so it no longer looks the same as being spotted. Pressing the release too early keeps its "wait" line up for about a second and a half, so the answer can be read even if the sentry stops a moment later. Arming the overload breaker steps the engineer out beside the cabinet instead of leaving them in front of it. Checked by automated tests and still images from scripted play only, not played by hand.
@@ -127,7 +493,57 @@ These are development updates to the source build, not downloadable releases. Th
 - Development: the game checks now fail when a test leaves objects behind at exit, and the asset register covers the shader, font and theme files kept with the art.
 - Website: a new Privacy page explains what the game stores on your device (the checkpoint and settings files), that the game sends nothing over the network and only opens your browser from the Changelog screen's online button, and that this site stores only your theme choice and loads no analytics or third-party scripts. The legal page now says which art is AI-generated and human-reviewed and which code and docs are AI-assisted, and the repository gains a security policy and a contributing guide.
 
-## October 9, 2026
+</Details>
+
+## 0.8.0 - October 9, 2026
+
+**Summary:** layered painted rooms, and the Service Junction runs past its door to a sentry, a tank and the exit.
+
+### Gameplay
+
+- The Service Junction runs past the blown door: a patrolling sentry guards the lane, and a coolant tank hangs over a floor mark.
+- Drop the tank from the **ARM PANEL**. At the rubble WOLF decides for himself whether to help; you can always time the drop yourself.
+- A missed drop vents a coolant cloud and sends the sentry after you; the tank winches back up for another try.
+- With the sentry down, pop the **EXIT BOLT** and leave through the hatch.
+- Bringing down the sentry and leaving both autosave; being caught is a knockdown back to the last autosave.
+- The blast and the relief vent knock you down only where their warnings say.
+- A door that is already down stays spent after Continue or a knockdown.
+- A failed save sends a knockdown to the start of the current step; your next interact tries the save again.
+- A damaged save that puts someone past the sealed door is rejected.
+- The play camera sits closer and shows the characters higher; entering a room starts the camera on the engineer.
+- On touch the camera sits a little lower, so the buttons do not hide feet or machines.
+- Controller rumble goes to the controller you are using.
+- Smaller sentry, label and layout fixes.
+
+### Art
+
+- New provisional art for the corridor and Records Access, made with AI assistance and approved by Nathanial Henniges: painted far, middle and near layers and redrawn characters.
+- The Service Junction has its own provisional art, made with AI assistance and approved by Nathanial Henniges.
+- Room art loads as compressed textures to use less graphics memory; not measured on a device yet.
+
+### Audio
+
+- New generated sounds for the sentry's motors, the winch, the tank landing and the exit bolt.
+
+### Accessibility
+
+- With **REDUCED MOTION** on, the charged door seam glows steadily instead of strobing.
+
+### Website
+
+- A Service Junction walkthrough, with its solutions marked as spoilers; updated First steps, Input, Saving, status and Credits pages.
+- Credits list Claude Code by Anthropic beside ChatGPT and Codex, the Codex image tool and the generated sounds.
+
+### Development
+
+- Dependency updates, including Next.js 16.3.8 security fixes.
+
+### How it was checked
+
+- **Checked:** none of the new room, camera, art or sound has been played through by hand yet; expect tuning after the first playtest.
+
+<Details>
+<Summary>Full notes for 0.8.0 (October 9, 2026)</Summary>
 
 - New provisional art, made with AI assistance and approved by Nathanial Henniges, for the maintenance corridor and Records Access. Each room is now built from far, middle and near painted layers that move at different speeds as the camera follows you, with pillars and machines along the walkway and pipework framing the screen edges. Each of the eight stations has its own machine in the same place and at the same size, with its labels and status lights as before, and the engineer, WOLF and the Director were redrawn.
 - The **Service Junction** has its own provisional art, made with AI assistance and approved by Nathanial Henniges: far, middle and near painted layers like the other two rooms, and painted machines for the valve, the sealed door, the relief vent, the overhead arm and its coolant tank, the **ARM PANEL**, the exit bolt, both hatches and the sentry, which now carries a scanner head. The door is left a torn frame after the blast, the tank drops away from an arm that stays put and comes to rest on the crushed sentry when it hits, and the gauge needle, turn lights, door seam and panel lights still show what the room is doing over the art.
@@ -153,7 +569,62 @@ These are development updates to the source build, not downloadable releases. Th
 - The room art now loads as compressed textures and the unused part of each foreground layer was trimmed, to use less graphics memory. This has not been measured on a device yet.
 - Website: a Service Junction walkthrough with its solutions marked as spoilers, plus updated first steps (holding interact, knockdowns), input, saving, status and credits pages. None of the new room, camera, art or sound has been played through by hand yet; expect tuning after the first playtest.
 
-## October 8, 2026
+</Details>
+
+## 0.7.0 - October 8, 2026
+
+**Summary:** the Service Junction begins, big moments get impact and sound, **REDUCED MOTION** arrives, and the changelog opens in the game.
+
+### Gameplay
+
+- A third room, the **Service Junction**, begins past the Records exit: arm the breaker, hold interact to crank the valve, and get clear of the door.
+- Knockdowns there return you to the room's last autosave with your choices intact. Saves are now version 4; older checkpoints still load.
+- After you tell WOLF about the relay risk, he walks to the contact himself.
+- The N and L/F9 hotkeys are gone; they threw away unsaved progress without warning.
+- Pause during the opening pauses; **Skip Opening** is in the Pause menu.
+- On Android, Back backs out of menus and pauses play; it closes the game only from the title.
+- Switching away from the game during play pauses it.
+- Damaged settings and save files are read safely, and Continue says why it is unavailable.
+- Continue in Records Access says which copy is next; a failed save there says so in the hint line.
+- Returning to the title no longer leaves an unanswered choice.
+- The opening tutorial matches the objective card and marks the display as optional.
+- In-game changelog and credits links point at wolfoverride.mrdemonwolf.dev.
+
+### Art
+
+- Menus, buttons and cards share a raised look; Settings keeps its squared terminal style.
+- The rooms gained depth: flickering ceiling lamps, light shafts, beacons, haze, dust, reflections, shadows and a vignette.
+
+### Audio
+
+- Big moments get a short sound generated by the game, a camera shake and a spark or dust burst; the sounds follow the Master and Effects sliders.
+- Those moments also rumble a controller or vibrate a phone or tablet.
+
+### Accessibility
+
+- New setting: **REDUCED MOTION** (Settings > Display) turns off camera shake and hit-stop and shortens screen flashes.
+- Title, credits, Pause and Settings share one cyan selection outline; menus opened by touch show none.
+
+### Settings
+
+- The title's **CHANGELOG** button opens these updates in the game, with **OPEN FULL CHANGELOG ONLINE** for the website.
+
+### Website
+
+- Fonts load as small WOFF2 files and images as WebP sized for the screen.
+- One **Get the build** section, with a plain list of planned platforms, each marked "no release date".
+- The landing page is dark only, with Montserrat labels, links of at least 16 px and stronger borders.
+- Better keyboard and screen-reader support: landmarks, one 3 px focus ring and an accessible phone menu.
+- The guide is grouped as **Play and settings**, **Chapter walkthrough** and **Development**, and matches the build.
+- The Credits page is titled **Credits and references**; link previews use a 1200x630 JPEG.
+- The README is rewritten in the house format, without puzzle solutions; it states that complete routes have not been played by hand.
+
+### How it was checked
+
+- **Checked:** no check was recorded for most of these changes. The Records Access page said both mirror routes pass headless checks but the room had not been played by hand.
+
+<Details>
+<Summary>Full notes for 0.7.0 (October 8, 2026)</Summary>
 
 - A third room, the **Service Junction**, begins past the Records exit: after the closing beat, use the open exit again to follow the service line. Arm the **OVERLOAD BREAKER**, then **hold** interact at the **VALVE** (the touch button reads **CRANK**) for three real turns before the relief vent lets go, and get clear of the door before its one-second fuse ends. The gauge, steam, hiss, pump pitch, wheel and lights all follow the real line; WOLF reads the door seam on his own and holds at the rubble afterwards. The room is in progress: what lies past the door is not built yet.
 - Being knocked down in the Service Junction (standing on the vent when it lets go, or in front of the door when it blows) returns you to the room's last autosave with your choices intact; entering the room and blowing the door both autosave. Saves are now version 4; older checkpoints still load.
@@ -192,7 +663,32 @@ These are development updates to the source build, not downloadable releases. Th
 - README rewritten in the house format: shorter, with one keyboard / controller / touch controls table, setup and check commands, licence, credits and contact, and without the puzzle solutions (those stay in the walkthrough). It states that complete routes have not been played by hand.
 - Website and README: the Input table and the README controls table now say that only **Esc**, **CANCEL REBIND** or Android Back cancel a rebind (controller **B** pressed during a controller capture is bound, not treated as cancel), and that touch players resume from Pause by tapping **RESUME** because the on-screen **PAUSE** button is hidden while the menu is open. The README's wolf mark now renders at 160 px instead of the full page width.
 
-## October 7, 2026
+</Details>
+
+## 0.6.0 - October 7, 2026
+
+**Summary:** fixes for backing out of Pause and Settings, and the Roboto and Montserrat typefaces.
+
+### Gameplay
+
+- Esc and controller Start resume from Pause.
+- Esc or controller B in in-game Settings returns to Pause; Esc cancels a key rebind.
+
+### Art
+
+- The game and the site use the Roboto and Montserrat typefaces (SIL Open Font License 1.1).
+- The room backgrounds keep their 16:9 framing, and the Director and WOLF sprites were re-exported.
+
+### Website
+
+- A mobile navigation menu, a restyled landing page, readable hover states and underlined guide links.
+
+### How it was checked
+
+- **Checked:** no check was recorded for these changes; complete routes had still not been played by hand.
+
+<Details>
+<Summary>Full notes for 0.6.0 (October 7, 2026)</Summary>
 
 - Esc and controller Start now resume from Pause; previously they could reopen Pause on the same press.
 - Esc or controller B in in-game Settings returns to the Pause menu instead of resuming; closing Settings from the title returns focus to the title menu.
@@ -201,7 +697,25 @@ These are development updates to the source build, not downloadable releases. Th
 - Corridor and Records Access backgrounds keep their 16:9 framing, and the provisional Director and WOLF sprites were re-exported.
 - Website: a mobile navigation menu that opens over the page, a restyled landing page, readable hover states on the main buttons, and underlined links in the guide again.
 
-## October 3, 2026
+</Details>
+
+## 0.5.0 - October 3, 2026
+
+**Summary:** a first-steps tutorial and easier access to the source build.
+
+### Website
+
+- A spoiler-light first-steps tutorial for movement, interactions, choices and checkpoints.
+- Game availability and source-build steps come first in the guide, with a direct ZIP link that is clearly not an installer.
+- Clearer navigation and footer links, an icon theme control, theme-aware scrollbars and a fixed platform picker contrast.
+- A public development story, and clearer links to the guide, changelog, credits, references, tools and legal notes.
+
+### How it was checked
+
+- **Checked:** no check was recorded for these changes; complete routes had still not been played by hand.
+
+<Details>
+<Summary>Full notes for 0.5.0 (October 3, 2026)</Summary>
 
 - Added a spoiler-light first-steps tutorial for movement, interactions, choices, and checkpoints, linked from the homepage and game guide.
 - Fixed the platform picker menu contrast in dark and light themes.
@@ -209,9 +723,48 @@ These are development updates to the source build, not downloadable releases. Th
 - Put game availability and source-build instructions at the front of the guide, with a direct current-source ZIP link and clear notice that it is not an installer.
 - Added a public development story, clearer links to the full guide, changelog, credits, references, tools, and legal/licensing notes.
 
-## September 30, 2026
+</Details>
 
-### Menus and controls
+## 0.4.0 - September 30, 2026
+
+**Summary:** terminal-style Settings, a closer camera, **Return to Title**, this changelog, a new landing page and search metadata.
+
+### Gameplay
+
+- A closer, smooth camera follows the engineer and keeps the room edges in view.
+- **Return to Title** in Pause, for keyboard, controller and touch; unsaved progress is lost.
+- Fixes for controller confirmation, remapped answers, interrupted loads and Pause during closing dialogue.
+- The containment cage has a gate that slides aside, and WOLF steps forward after it opens.
+- Prompts and answer cards sit clear of the characters; checkpoint prompts match the route you took.
+
+### Settings
+
+- Settings has a terminal theme with clearer labels, spacing and focus indicators; the title keeps its game look.
+- Saved preferences are hardened against invalid values and conflicting bindings.
+
+### Website
+
+- The site moved to wolfoverride.mrdemonwolf.dev.
+- The guide is reorganised into a short start page, controls and settings, and an optional chapter walkthrough.
+- A redesigned landing page with key art, story and gameplay sections; planned download channels are marked unavailable.
+- Search and social-sharing metadata, canonical URLs, author credits and a sitemap.
+- This changelog, with a title-screen link that opens it in your browser.
+- Skip to content moves focus to the page heading.
+- Credits list the consulted design research, separate from project contributors.
+
+### Development
+
+- Manual CI runs, bounded job times and downloadable failure logs.
+- A staged plan for direct macOS distribution (Sparkle) is recorded; it is **not implemented or enabled**.
+
+### How it was checked
+
+- **Checked:** five deterministic Godot checks and the docs build passed, and agents inspected 44 rendered stills. No complete hands-on routes, physical controller, touch device or export checks.
+
+<Details>
+<Summary>Full notes for 0.4.0 (September 30, 2026)</Summary>
+
+**Menus and controls**
 
 - Restyled Settings with a terminal theme, clearer section labels and square-edged controls. The title screen keeps its game presentation.
 - Added a closer, smooth horizontal gameplay camera that follows the engineer while keeping the room edges inside view.
@@ -221,14 +774,14 @@ These are development updates to the source build, not downloadable releases. Th
 - Hardened saved preferences against invalid values and conflicting bindings.
 - Fixed interrupted-load transitions and allowed Pause during closing dialogue.
 
-### Scene presentation
+**Scene presentation**
 
 - Added a framed containment cage, a gate that slides aside, and WOLF stepping forward after it opens.
 - Moved cinematic prompts and response cards clear of characters; adjusted the closing camera to show both actors above dialogue.
 - Corrected nearby checkpoint prompts and callbacks to match the route actually taken.
 - Expanded in-game and website credits with consulted design research, separate from project contributors.
 
-### Website and development
+**Website and development**
 
 - Reorganized the guide into a short start page, controls/settings and optional chapter walkthrough. Updated setup links and save behavior, kept private campaign drafts out, and clarified code versus asset licensing.
 - Fixed Skip to content to move keyboard focus to the page heading, with a visible focus outline.
@@ -242,7 +795,29 @@ These are development updates to the source build, not downloadable releases. Th
 
 Five deterministic Godot checks and the docs build passed during the UI review. Agents inspected 44 rendered stills. This does not replace complete hands-on routes, physical-controller testing, touch-device testing or export checks.
 
-## September 29, 2026
+</Details>
+
+## 0.3.0 - September 29, 2026
+
+**Summary:** the opening scene, objective cards, controller and touch input, and Pause and Settings.
+
+### Gameplay
+
+- A player-paced Director and WOLF opening before you take control of the engineer.
+- Short location and objective cards, a guided movement and interaction tutorial, and clearer station feedback.
+- Better speaker labels, answer cards and a chapter closing beat.
+- Controller and touch input, Pause, and saved Display, Audio and Controls settings.
+
+### Art
+
+- Provisional room and machinery artwork, with its sources in the asset register.
+
+### How it was checked
+
+- **Checked:** headless import, state, scene and input checks passed; a partial window playtest covered corridor movement and WOLF following; complete routes were not played by hand. A local iOS simulator build showed its title screen; no touch, controller or device tests.
+
+<Details>
+<Summary>Full notes for 0.3.0 (September 29, 2026)</Summary>
 
 - Added a player-paced Director/WOLF opening before the engineer enters gameplay.
 - Added short-lived location and objective cards, a guided movement/interaction tutorial, and clearer station feedback.
@@ -250,12 +825,72 @@ Five deterministic Godot checks and the docs build passed during the UI review. 
 - Added controller and touch input, Pause, and saved Display, Audio and Controls settings.
 - Added provisional room and machinery artwork with provenance in the asset register.
 
-## Earlier foundation
+</Details>
+
+## 0.2.0 - September 28, 2026
+
+**Summary:** the engineer becomes the only playable character, the Records chapter begins, and the first art, credits and site themes arrive.
+
+### Gameplay
+
+- The engineer is the only playable character; WOLF is an independent companion.
+- Records Access, the first Records chapter room, follows the corridor.
+
+### Art
+
+- Provisional character and title artwork, made with ChatGPT Create.
+
+### Website
+
+- Credits and source attribution in the game.
+- An easier first-play guide, light and dark site themes, and a developer setup page.
+- The site deploys to GitHub Pages from main.
+
+### Development
+
+- A shared game quality guide for people and agents (`AGENT.md`).
+
+### How it was checked
+
+- **Checked:** headless import, state and scene checks passed, and a partial window playtest covered the corridor; Records Access was seen in three rendered frames but not played by hand. No export or device tests.
+
+## 0.1.0 - September 26, 2026
+
+**Summary:** the first playable corridor: the engineer and WOLF, a door puzzle with two routes, a checkpoint and the public guide.
+
+### Gameplay
+
+- One side-view corridor with the engineer and WOLF; at this point you could also switch to WOLF in one floor zone.
+- WOLF can cooperate or refuse at the relay, and a manual fallback route always opens the door.
+- One remembered choice, a safe point that saves, and Continue on the title screen.
+
+### Website
+
+- The public site starts with a play guide, the premise and the development status.
+
+### Development
+
+- Godot checks run in CI on a pinned Godot 4.7.2.
+
+### How it was checked
+
+- **Checked:** headless checks of both door routes and of saving and loading, and a scripted rendered replay at 960x540; not a full hands-on playthrough.
+
+<Details>
+<Summary>Full notes for 0.1.0 (September 26, 2026)</Summary>
+
+First written as "Earlier foundation", covering September 26 and 28, 2026:
 
 The initial source slice established engineer-only movement, WOLF's independent cooperation/refusal, a manual puzzle fallback, remembered choices, checkpoints and save/load across two rooms. The public site added a play guide, development setup, light/dark themes and credits.
 
+</Details>
+
 ## What is next
 
-Complete hands-on route testing comes first. Directional character animation, sound, adjustable dialogue presentation and release/device validation remain future work. Story drafts stay private; this page records source changes without campaign spoilers.
+- Complete hands-on route testing comes first.
+- Directional character animation, and release and device validation, remain future work.
+- Sound (since 0.7.0) and **TEXT SIZE** (0.14.0) are done.
+- More languages are planned; only English is offered today.
+- Story drafts stay private; this page records source changes without campaign spoilers.
 
 See [Testing and deployment](/docs/development/testing/) for test boundaries and [credits](/docs/credits/) for tools, research and asset provenance.

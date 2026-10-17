@@ -75,11 +75,18 @@ pages describe the commands and their limits in more detail.
   (Deploy Docs workflow) must pass before a change lands.
 - Keep the Godot pin, the stable event IDs, the existing asset sources and
   the engineer-only viewpoint intact.
-- When a change is visible to players, add a bullet to
-  `apps/docs/content/docs/changelog.mdx` under the current date, run
+- When a change touches the game, the site or the tools, add one-line
+  bullets to `apps/docs/content/docs/changelog.mdx` under
+  **Next version (in development)**, in the right group (Gameplay, Art,
+  Audio, Accessibility, Settings, Website, Development), run
   `python3 scripts/export_changelog.py` and commit the regenerated
-  `apps/game/assets/changelog.txt` in the same pull request. Update the
-  affected guide pages (first steps, controls, saving, walkthrough) too.
+  `apps/game/assets/changelog.txt` in the same pull request. Say how it
+  was checked. Update the affected guide pages (first steps, controls,
+  saving, walkthrough) too.
+- Versions are development versions, `0.MINOR.0`, cut once per
+  milestone: Next version becomes `0.N.0 - <date>` and
+  `application/config/version` in `apps/game/project.godot` is set to the
+  same number. The export fails when the two differ.
 - Write plain, spoiler-free commit messages and pull request text. If you
   used an AI coding tool, say so in the pull request; the credits page
   lists the tools used in the build.
