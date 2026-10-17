@@ -1,28 +1,68 @@
 ---
 title: Records Access
-description: Optional help for the purge queue, mirror port, and exit door in the second source room.
+description: Step-by-step help for the purge queue, the mirror port and the exit in the second room. Contains puzzle solutions.
 ---
 
-**Puzzle solutions for the second source room follow.** The [maintenance corridor](/docs/walkthrough/corridor/) comes first.
+<Callout type="warn" title="Spoilers: puzzle solutions for the second room">
+  The [maintenance corridor](/docs/walkthrough/corridor/) comes first.
+</Callout>
 
-You come in through a steel swing door, which its closer swings shut behind you (its lamp turns red). Entering the room saves your progress, and WOLF heads toward the mirror independently while you keep control of the engineer; he stands just right of the mirror port, leaving its left side for you. Each station below saves again when it succeeds; at the purge queue and the mirror port a short chirp tells you it took the copy.
+**What this page is for:** how to get through Records Access, step by step.
+
+**Route:** Purge queue → Mirror port → Exit.
+
+- **Entering the room saves.** Each station saves again when it works.
+- **WOLF heads to the mirror** on his own. You keep control of the engineer.
 
 ## 1. Copy the purge trace
 
-Interact with the **PURGE QUEUE** on the left to copy its trace.
+**Do this:**
+
+1. Go to the **PURGE QUEUE** on the left.
+2. Press interact. A chirp confirms the copy.
 
 ## 2. Preserve a timestamp
 
-Interact with the **MIRROR PORT** in the middle. Choose **1** when WOLF is ready to use his readout, or **2** for the manual maintenance port. If he is still checking the drive, wait for him or use the manual option.
+**Do this:**
+
+1. Go to the **MIRROR PORT** in the middle.
+2. Press interact and choose an answer:
+   - **1:** WOLF uses his own readout, when he is ready.
+   - **2:** you use the manual maintenance port.
+3. A chirp confirms the copy.
+
+- **WOLF still checking the drive?** Wait for him, or choose the manual port.
+- **He stands just right of the port,** leaving its left side for you.
 
 ## 3. Open the exit
 
-The **EXIT** on the right is a steel door in a concrete wall across the walkway, with a dark security container beside it. With both traces copied, the hint by the container reads **E: secure the first copy in the container.** Interact: the engineer puts the copy in the container, the door's bolt lets go, its lamp turns amber and the door swings open on its hinges (its lamp green once it is open), and the closing lines play one box at a time while you keep control. Interact at the exit (the hint says **continue**) to show the next line sooner; if you interact elsewhere while they play, its answer shows first and the closing lines come back after it, where they left off; once the lines are done, interact at the open door again: the engineer walks out through it into the service line and WOLF follows, into the [Service Junction](/docs/walkthrough/service-junction/).
+**Do this:**
 
-The preserved traces are a first lead. A full investigation is still future work. **Continue** restores saved chapter progress and tells you which copy is next or that the exit is open.
+1. Go to the **EXIT** on the right, beside the dark security container.
+2. The hint reads **E: secure the first copy in the container.** Press interact.
+3. The door unlocks and swings open. The closing lines play while you move.
+4. When the lines are done, press interact at the open door to leave.
 
-## After the slice
+- **Want the lines faster?** Press interact at the exit (the hint says **continue**).
+- **Next room:** [Service Junction](/docs/walkthrough/service-junction/).
 
-You can revisit the room, return to the title through Pause, or start another run to try the other response. **New Game** clears the current timeline; it retains the previous checkpoint until the new run saves over it.
+<Details>
+<Summary>What you'll see</Summary>
 
-If you are stuck, [Troubleshooting](/docs/controls/troubleshooting/) has recovery tips. **Status:** both mirror routes pass headless checks, but the room has not been played through by hand; see [Testing and deployment](/docs/development/testing/).
+- You come in through a steel swing door. Its closer swings it shut behind you, and its lamp turns red.
+- The exit is a steel door in a concrete wall across the walkway.
+- When you secure the copy, the bolt lets go, the lamp turns amber and the door swings open on its hinges. Its lamp turns green once it is open.
+- If you interact elsewhere during the closing lines, that answer shows first. The closing lines come back after it, where they left off.
+- The engineer walks out into the service line, and WOLF follows.
+
+</Details>
+
+## After the room
+
+- **The copies are a first lead.** A full investigation is future work.
+- **Continue** tells you which copy is next, or that the exit is open.
+- **Try the other answer:** start a **New Game**. The old checkpoint stays until the new run saves over it.
+
+<Callout title="Not played by hand">
+  Both mirror routes pass automated checks, but the room has not been played through by hand. See [Testing](/docs/development/testing/).
+</Callout>

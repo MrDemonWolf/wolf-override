@@ -1,55 +1,117 @@
 ---
-title: Saving
-description: How the safe point, automatic saves, Continue, New Game, and Pause affect your chapter progress, and where the save file lives.
+title: Saving and retrying
+description: When the game saves, what Continue, New Game and RETRY do, and where the save file lives.
 ---
+
+**What this page is for:** when the game saves, what retry does, and where your files live.
+
+- **One checkpoint file.** There are no save slots. Each save replaces the last one.
+- **Saving starts at the first SAFE POINT.** After that, the game also saves on its own.
+- **A knockdown costs one step at most.** Your choices are kept.
 
 ## When the game saves
 
-- **Safe point.** Use the green **SAFE POINT** beyond the sealed door. This is the first save in a run.
-- **Records Access.** Entering Records Access from the safe point, copying the purge-order trace, preserving the mirror timestamp, and securing the first copy at the exit each save automatically.
-- **Service Junction.** Entering the room, blowing the sealed door, bringing down the sentry, and leaving through the exit door each save automatically (see the table below).
+| Where | What saves |
+| --- | --- |
+| Maintenance corridor | Using the green **SAFE POINT** beyond the sealed door (your first save) |
+| Records Access | Entering from the safe point, copying the purge-order trace, preserving the mirror timestamp, securing the first copy at the exit |
+| Service Junction | Entering the room, blowing the sealed door, bringing down the sentry, leaving through the exit door |
 
-Each automatic save that works shows **Checkpoint saved.** in the hint line for about two seconds (never over a choice); the safe point says it in its own line. A save stores the room, both characters' positions, puzzle state, the engineer's display name, and the remembered choice. There is one checkpoint file, not multiple save slots, and each save replaces it.
+- **You will see Checkpoint saved.** in the hint line for about two seconds (never over a choice). The safe point says it in its own line.
+- **A save stores** the room, both characters' positions, puzzle state, the engineer's display name and the remembered choice.
 
-If an automatic save fails, the hint line shows **Save failed. Use a station to try again.** until you move to another spot or a later save works. Your next interact press, at a station or anywhere else in the room, tries the save again, and progress since the last successful save is stored once a later save works. If the first safe-point save fails, the safe point stays unused so you can use it again.
+### If a save fails
 
-The Service Junction saves automatically four times, and Continue restores each stage:
+1. The hint line shows **Save failed. Use a station to try again.**
+2. Press interact again, at a station or anywhere in the room. That retries the save.
+3. Progress since the last good save is stored once a later save works.
+
+- **The message stays** until you move to another spot or a later save works.
+- **If the first safe-point save fails,** the safe point stays unused, so you can use it again.
+
+### Service Junction: what Continue brings back
 
 | Save | Continue restores |
 | --- | --- |
-| Entering the room | The door still sealed and the breaker ready to arm; the valve's turns start again from zero |
-| Blowing the door | The door down, the breaker and valve used, the sentry patrolling from the far end, past the rubble, and the tank hung over the mark |
-| Bringing down the sentry | The sentry down under the tank and the exit bolt still to pop |
-| Leaving through the exit door | Nothing to continue: the slice is finished, and the title offers **PLAY AGAIN** instead (see below) |
+| Entering the room | Door sealed, breaker ready to arm, valve turns back to zero |
+| Blowing the door | Door down, breaker and valve used, sentry patrolling from the far end, tank hung over the mark |
+| Bringing down the sentry | Sentry down under the tank, exit bolt still to pop |
+| Leaving through the exit door | Nothing to continue: the slice is finished, and the title offers **PLAY AGAIN** |
 
 ## Knockdowns
 
-Being knocked down in the Service Junction (by the relief vent, the door blast, the sentry or the coolant cloud) and pressing **RETRY** returns you to the most recent of its saves, so you lose at most the step you were on. If that save failed to write, or the file cannot be read, the knockdown still returns you to the start of the step you were on, kept in memory, rather than to an older save, and the line after it reads **Back at the start of this stretch.** instead of **Back at the last checkpoint.** The knockdown itself never writes the file, and your earlier choices and Records progress are kept. A blown door stays blown through every reload: the used breaker and valve cannot be used again.
+**Knockdown** means the engineer is knocked to the floor by a hazard. It can happen only in the Service Junction: the relief vent, the door blast, the sentry or the coolant cloud.
+
+1. The screen flashes red and the engineer drops to the floor.
+2. Read the line. It names what hit you and how to avoid it.
+3. From just under a second (0.9 seconds) after the hit, the hint offers **RETRY**.
+4. Press interact (**E**, controller **A**, **TAP RETRY** on touch).
+5. The screen fades to black and back to the room's last automatic save.
+
+- **No rush.** The screen waits for **RETRY** and never moves on by itself. Pause works while the card is up.
+- **Timing:** control returns about half a second after you press, so about 1.5 seconds after the hit if you press at once.
+- **Same every time:** the first knockdown and every repeat use the same timing.
+- **No penalty.** You lose only the step you were on. Earlier choices and Records progress are kept.
+- **Reduced Motion:** the engineer is shown lying on the floor at once, with the thud and a shorter red wash. See [Accessibility](/docs/accessibility/#reduced-motion).
+
+<Details>
+<Summary>What if the save could not be read?</Summary>
+
+- If the last save failed to write, or the file cannot be read, retry still returns you to the start of the step you were on, kept in memory.
+- The line after it then reads **Back at the start of this stretch.** instead of **Back at the last checkpoint.**
+- A knockdown never writes the save file.
+- A blown door stays blown through every reload. The used breaker and valve cannot be used again.
+
+</Details>
 
 ## Continue and New Game
 
-**Continue** on the title screen resumes a valid checkpoint without replaying the opening. In Records Access it tells you which copy is next or that the exit is open. When Continue is unavailable, a note under it says why: **No checkpoint yet. Saving starts at the first SAFE POINT.** means no safe point has been used, and **Saved checkpoint could not be read** means the file is damaged; reaching the safe point in a new run replaces it. If the checkpoint file is missing or damaged but a complete save was still being written when the game closed, Continue uses that copy.
+| Button | What it does |
+| --- | --- |
+| **Continue** | Resumes your checkpoint without replaying the opening |
+| **New Game** | Starts a fresh run with the opening; the old checkpoint stays until the new run saves over it |
+| **PLAY AGAIN** | Shown after you finish the slice, in place of both; works like New Game |
 
-**New Game** begins a fresh run with the opening. The old checkpoint remains until the fresh run saves over it.
+- **In Records Access,** Continue tells you which copy is next or that the exit is open.
+- **After the slice,** the note reads **Slice complete. PLAY AGAIN starts a fresh run.**
+- **A half-written save:** if the checkpoint is missing or damaged but a complete save was still being written when the game closed, Continue uses that copy.
 
-After the end of the slice the title shows one **PLAY AGAIN** button in place of New Game and Continue, with the note **Slice complete. PLAY AGAIN starts a fresh run.** It works like New Game: the opening plays, and the finished save stays until the new run saves over it.
+### Why is Continue greyed out?
+
+Read the note under it:
+
+| Note | Meaning | Fix |
+| --- | --- | --- |
+| **No checkpoint yet. Saving starts at the first SAFE POINT.** | You have not used a safe point | Play to the safe point and use it |
+| **Saved checkpoint could not be read** | The file is damaged | Start a New Game and reach the safe point to replace it |
 
 ## Pause and Return to Title
 
-During gameplay or the player-paced closing beat, **Esc** opens Pause with **Resume**, **Settings**, and **Return to Title**. During the opening, Pause shows **Skip Opening** in place of Return to Title. Switching away from the game during play also opens Pause; it does not save.
+- **Esc** opens Pause during play and the closing scene: **Resume**, **Settings**, **Return to Title**.
+- **During the opening,** Pause shows **Skip Opening** instead of Return to Title.
+- **Switching away** from the game during play opens Pause. It does not save.
+- **Return to Title** warns that unsaved progress is lost. It keeps the last checkpoint.
 
-**Return to Title** warns that unsaved progress is lost and keeps the last checkpoint. To restore that checkpoint during play, choose Return to Title, then **Continue**.
+### Go back to your last checkpoint
+
+1. Open Pause.
+2. Choose **Return to Title**.
+3. Choose **Continue**.
+
+There are no load or restart hotkeys.
 
 ## Where saves live
 
-The game writes `m0-save.json` (the checkpoint) and `settings.cfg` to Godot's user data folder for the project:
+The game writes `m0-save.json` (the checkpoint) and `settings.cfg` (your settings) here:
 
-| Platform | Folder |
-| --- | --- |
-| macOS | `~/Library/Application Support/Godot/app_userdata/WOLF--OVERRIDE/` |
-| Windows | `%APPDATA%\Godot\app_userdata\WOLF--OVERRIDE\` |
-| Linux | `~/.local/share/godot/app_userdata/WOLF--OVERRIDE/` |
+- **macOS:** `~/Library/Application Support/Godot/app_userdata/WOLF--OVERRIDE/`
+- **Windows:** `%APPDATA%\Godot\app_userdata\WOLF--OVERRIDE\`
+- **Linux:** `~/.local/share/godot/app_userdata/WOLF--OVERRIDE/`
 
-Godot replaces the slashes in the project name with dashes. A save is written to `m0-save.json.tmp` first and renamed when complete, so a half-written file never replaces a good checkpoint. Deleting the folder removes the checkpoint and your settings. `bun run game:check` uses a temporary folder and never touches these files.
+<Callout type="warn" title="Deleting the folder deletes your progress">
+  Removing this folder removes the checkpoint and your settings. There is no undo.
+</Callout>
 
-For the path to the safe point, see the optional [corridor walkthrough](/docs/walkthrough/corridor/). For the other keys, see [Controls](/docs/controls/input/).
+- **The double dash is normal.** The folder keeps the game's earlier name, WOLF//OVERRIDE, with its slashes turned into dashes, so older saves still load.
+- **Safe writes:** a save goes to `m0-save.json.tmp` first and is renamed when complete, so a half-written file never replaces a good checkpoint.
+- **Tests don't touch it.** `bun run game:check` uses a temporary folder.
