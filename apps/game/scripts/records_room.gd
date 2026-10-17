@@ -112,6 +112,9 @@ const MIRROR_LIGHT: Rect2 = Rect2(172.0, 183.0, 7.0, 19.0)
 ## is copied, then both go green (the corridor's purge display shows the same order in PURGE_RED).
 const PURGE_RED: Color = Color("#d86b70")
 const MIRROR_CYAN: Color = Color("#73b9d2")
+## The two station names' row (their top edge): just over the taller station, the MIRROR PORT (its top
+## at y 360), so each name reads as its machine's now that both stand at their real size.
+const STATION_LABEL_Y: float = 340.0
 ## The lights each leaf sees, as they light the wall and reveal round it (rdesign.py), in the leaf's own
 ## exposure: [position (m), colour * intensity, reach (m), down exponent, wrap, fill]. Fix round 4 (review r4,
 ## M1): the door light is the design's own again (reach 1.4 m, down 2.0) as a true Lambert source, so the
@@ -239,8 +242,8 @@ func _ready() -> void:
 	entry_door_shape = SwingLeaf.make_body(self, "EntryDoor", ENTRY_DOOR_X, -1.0)
 	purge_glow = _add_glow("PurgeGlow", RoomDepth.prop_rect(purge_art, PURGE_LIGHT).get_center())
 	mirror_glow = _add_glow("MirrorGlow", RoomDepth.prop_rect(mirror_art, MIRROR_LIGHT).get_center())
-	purge_label = _add_station_label("PURGE QUEUE", PURGE_X, Palette.LABEL_ALERT)
-	mirror_label = _add_station_label("MIRROR PORT", MIRROR_X, MIRROR_TEXT)
+	purge_label = _add_station_label("PURGE QUEUE", PURGE_X, Palette.LABEL_ALERT, STATION_LABEL_Y)
+	mirror_label = _add_station_label("MIRROR PORT", MIRROR_X, MIRROR_TEXT, STATION_LABEL_Y)
 	# The exit's name sits on the cross-wall over its door, left of the near column (which draws over
 	# the actors and would cut it; captions stay under the actors).
 	_add_station_label("EXIT", EXIT_LABEL_X, Palette.EXIT_GREEN, 276.0)
