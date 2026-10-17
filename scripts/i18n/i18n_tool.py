@@ -28,8 +28,9 @@ Purpose
                               every automated gate on the PO files in PODIR (apps/game/i18n), as JSON at
                               OUT: msgfmt --check-format, the per-line measures (printf and named
                               placeholders, BBCode tags, speaker tag, glossary's required and avoid forms:
-                              line_measures, folded in from the research pipeline step's trial tool), line breaks (BREAKS_KEEP), the
-                              "E:" key token the hint bar replaces, the script guard (SCRIPT_GUARD), the
+                              line_measures, folded in from the research pipeline step's trial tool), line
+                              breaks (BREAKS_KEEP), the "E:" key token the hint bar replaces, the script
+                              guard (SCRIPT_GUARD), the
                               engineer-gender gate (gendered_words, and the back-translation's
                               engineer_gendered), the Slavic name-case gate (NAME_CASE), the plural forms of
                               every msgstr[n], the sibling-file completeness gate (family_gaps), and chrF of

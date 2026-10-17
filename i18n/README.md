@@ -57,7 +57,7 @@ labels (docs.weblate.org, "Component configuration", read October 17, 2026).
 | Manage strings | Off | The English comes from the game's source. |
 | Translation license | GPL-3.0-or-later | The repository's licence. |
 | Long lines wrapping (file format parameter `po_line_wrap`) | No wrapping | The repository's PO files are not wrapped; wrapping would rewrite every line. |
-| Add-ons | "Update PO files to match POT (msgmerge)" | Keeps the PO files in step with `messages.pot` the way PIPELINE.md describes. |
+| Add-ons | "Update PO files to match POT (msgmerge)" | Keeps the PO files in step with `messages.pot` the way the research pipeline describes (codex/localization-research at 520cad1, `docs/research-2026-10/localization/PIPELINE.md`). |
 
 **Glossary.** Weblate keeps its glossary as a component of its own. `glossary.json` stays the one source:
 `python3 -I -B scripts/i18n/i18n_tool.py weblate-glossary <folder>` writes one TBX file per language,

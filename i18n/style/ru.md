@@ -29,7 +29,7 @@ WOLF is **он**, with masculine past tense in -л. He is never declined: "с WO
 - The name stays in the nominative: make it the subject, or put it after a dash or a colon ("Страж
   заметил: %s на открытом месте"). Never "под %s" or "у %s"; the checker fails a letter glued to the name.
 - Stored per language (D9): Роуэн, Алекс, Морган (samples in `../glossary.json`).
-- A station plate is quoted in «» in its own nominative form: "к пульту «СБРОС…»".
+- A station plate is quoted in «» in its own nominative form: "к пульту «РЕЛЕ…»".
 
 ## Quotes and punctuation
 
