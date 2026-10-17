@@ -56,7 +56,7 @@ export function homeStructuredData(): JsonLdObject {
         '@type': 'VideoGame',
         '@id': ids.game,
         name: 'WOLF OVERRIDE',
-        // Same former name as the WebSite entry, as IGDB also lists it.
+        // The same former name as the WebSite entry above.
         alternateName: ['WOLF//OVERRIDE'],
         description: siteDescription,
         url: `${siteUrl}/`,
