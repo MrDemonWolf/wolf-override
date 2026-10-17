@@ -682,7 +682,8 @@ static func _timestamp() -> String:
 
 ## Everything the overlay shows and a bug capture saves, in one dictionary of plain values: Main's
 ## debug_snapshot() (room, beat, actors, machines, hazards, memory and choices, flags and the full
-## save state) plus performance, the save on disk, the build, the tools' own flags and "geometry"
+## save state) plus performance, the save on disk, the build (the game's version from project.godot,
+## Godot, OS, display and window), the tools' own flags and "geometry"
 ## (DebugZones.geometry: the camera and every zone, hitbox and render box with its node path, world
 ## and screen rects, z-index, canvas layer and visibility). Capture drivers call this to log state
 ## beside each screenshot. The overlay's refresh passes [param full] false: no full save state and no
@@ -695,6 +696,7 @@ func dump(full: bool = true) -> Dictionary:
 	var window: Vector2i = get_window().size
 	data["build"] = {
 		"debug_build": OS.is_debug_build(),
+		"version": Main.game_version(),
 		"godot": str(Engine.get_version_info().get("string", "")),
 		"os": OS.get_name(),
 		"display": DisplayServer.get_name(),

@@ -3,6 +3,11 @@ extends Node2D
 
 const SITE_URL: String = "https://wolfoverride.mrdemonwolf.dev"
 const CHANGELOG_URL: String = SITE_URL + "/docs/changelog/"
+## The project setting that holds the game's development version (0.MINOR.0, one minor version per
+## milestone). project.godot is the single source: the exports read it (their version fields are left
+## empty), scripts/export_changelog.py checks the newest changelog heading against it, and the website
+## reads it at build time (apps/docs/lib/version.ts).
+const VERSION_SETTING: String = "application/config/version"
 ## Plain-text export of the public changelog (scripts/export_changelog.py); check-game.sh fails when it drifts.
 ## A bare .txt is not a Godot resource: an export preset must list *.txt in its include filter or the
 ## screen falls back to CHANGELOG_UNAVAILABLE.
@@ -521,6 +526,8 @@ const JUNCTION_RESTORE_A_LINE: String = "Service junction restored. Arm the brea
 @onready var new_game_button: Button = $CanvasLayer/TitleScreen/NewGameButton
 @onready var continue_button: Button = $CanvasLayer/TitleScreen/ContinueButton
 @onready var continue_note: Label = $CanvasLayer/TitleScreen/ContinueNote
+## The version number under CHANGELOG (the number only, no wording; auto-translate off in the scene).
+@onready var title_version: Label = $CanvasLayer/TitleScreen/VersionLabel
 @onready var credits_button: Button = $CanvasLayer/TitleScreen/CreditsButton
 @onready var credits_screen: ColorRect = $CanvasLayer/TitleScreen/CreditsScreen
 @onready var credits_body: RichTextLabel = $CanvasLayer/TitleScreen/CreditsScreen/CreditsBody
@@ -824,8 +831,15 @@ func _exit_tree() -> void:
 	FxKit.close(fx_kit)
 
 
+## The game's version as project.godot states it (for example "0.15.0"), or "" if the setting is
+## missing. Read at run time so the title, the F12 capture and an exported build agree with no copy.
+static func game_version() -> String:
+	return str(ProjectSettings.get_setting(VERSION_SETTING, ""))
+
+
 func _ready() -> void:
 	get_window().title = "WOLF//OVERRIDE"
+	title_version.text = game_version()
 	_install_inputs()
 	_setup_settings()
 	_setup_impact()

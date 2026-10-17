@@ -595,9 +595,9 @@ text = "SETTINGS"
 
 [node name="ChangelogButton" type="Button" parent="CanvasLayer/TitleScreen"]
 offset_left = 48.0
-offset_top = 459.0
+offset_top = 451.0
 offset_right = 278.0
-offset_bottom = 513.0
+offset_bottom = 505.0
 theme_override_font_sizes/font_size = 18
 text = "CHANGELOG"
 tooltip_text = "Development updates, in the game and online"
@@ -610,6 +610,15 @@ offset_bottom = 514.0
 theme_override_colors/font_color = Color(0.59, 0.70, 0.77, 1)
 theme_override_font_sizes/font_size = 16
 text = "Concept: Nathanial Henniges  /  AI-assisted development"
+
+[node name="VersionLabel" type="Label" parent="CanvasLayer/TitleScreen"]
+auto_translate_mode = 2
+offset_left = 48.0
+offset_top = 507.0
+offset_right = 278.0
+offset_bottom = 528.0
+theme_override_colors/font_color = Color(0.59, 0.70, 0.77, 1)
+theme_override_font_sizes/font_size = 15
 
 [node name="CreditsScreen" type="ColorRect" parent="CanvasLayer/TitleScreen"]
 visible = false
