@@ -800,15 +800,18 @@ var speaker_column_key: String = ""
 ## WOLF's standing piece and the scale it is drawn at (main.tscn Wolf/BodySprite uses both; the
 ## WOLF art checks in wolf_space_test and sentry_test read them from here). The piece (1028x549) was
 ## painted at 8 px per world px over a guide 12 % larger than the earlier sprite's painted body, so it
-## is drawn at 0.11215, not 1/8: that keeps WOLF the size he is drawn today (115.3 x 61.6 world px,
-## the earlier art's 629 x 336 painted px at 0.18325), the default for the open WOLF-size question
-## (2026-10-16: he keeps his drawn size until Nathanial picks another).
+## is not drawn at 1/8: WOLF keeps about the size he was drawn before (the default for the open
+## WOLF-size question, 2026-10-16, until Nathanial picks another). The earlier body ran 56 px behind
+## his origin and 59.1 ahead (115.1 x 61.6 world px); the piece is cut to his outline and centred, so
+## it reaches as far each way, and 0.109 keeps his tail tip where it was (56.03 px back, inside the
+## Service Junction's right edge at his spot by the exit, WOLF_BAIT_X): 112.1 x 59.8 world px, 3 %
+## smaller than before.
 const WOLF_ART_PATH: String = "res://assets/characters/wolf-stand.png"
-const WOLF_ART_SCALE: float = 0.11215
+const WOLF_ART_SCALE: float = 0.109
 ## The sprite's centre from WOLF's origin: his feet (the piece's bottom row) stand where the earlier
-## art's did, 15.4 world px below the origin (-15.4 + 549 / 2 * WOLF_ART_SCALE). x stays 0 so he
+## art's did, 15.4 world px below the origin (-14.5 + 549 / 2 * WOLF_ART_SCALE). x stays 0 so he
 ## mirrors in place.
-const WOLF_SPRITE_REST: Vector2 = Vector2(0.0, -15.4)
+const WOLF_SPRITE_REST: Vector2 = Vector2(0.0, -14.5)
 ## WOLF's painted feet sit this far below his sprite's centre, in the art's own pixels (the piece is
 ## cut to its outline: half its 549 rows).
 const WOLF_FEET_BELOW_CENTRE: float = 274.5

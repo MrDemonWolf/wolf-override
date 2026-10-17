@@ -140,8 +140,8 @@ shape = SubResource("WolfShape")
 [node name="BodySprite" type="Sprite2D" parent="Wolf"]
 texture_filter = 4
 material = SubResource("SharpSpriteMaterial")
-position = Vector2(0, -15.4)
-scale = Vector2(0.11215, 0.11215)
+position = Vector2(0, -14.5)
+scale = Vector2(0.109, 0.109)
 texture = ExtResource("4_wolf")
 
 [node name="Tag" type="Label" parent="Wolf"]
