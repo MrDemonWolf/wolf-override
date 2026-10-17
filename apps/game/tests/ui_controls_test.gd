@@ -26,7 +26,14 @@ func _run() -> void:
 	_expect(changelog.pressed.is_connected(Callable(game, "_show_changelog")) and changelog_online.pressed.is_connected(Callable(game, "_open_changelog")) and str(game.CHANGELOG_URL) == "https://wolfoverride.mrdemonwolf.dev/docs/changelog/" and str(game.SITE_URL).begins_with("https://wolfoverride.mrdemonwolf.dev"), "title changelog opens in the game and the online button points to the public development updates")
 	var changelog_text: String = str(game.get("changelog_text"))
 	var first_heading: String = changelog_text.get_slice("\n", 0)
-	_expect(first_heading.begins_with("== ") and first_heading.ends_with(" ==") and first_heading.contains(", 20") and changelog_text.contains("\n- "), "the exported changelog loads and starts with the newest dated heading")
+	# The newest heading is either the open "Next version (in development)" or a cut version such as
+	# "0.15.0 - October 16, 2026" (scripts/export_changelog.py checks the cut one against project.godot).
+	var version_heading: RegEx = RegEx.create_from_string("^== \\d+\\.\\d+\\.\\d+ - [A-Z][a-z]+ \\d{1,2}, 20\\d\\d ==$")
+	_expect((first_heading == "== Next version (in development) ==" or version_heading.search(first_heading) != null) and changelog_text.contains("\n- "), "the exported changelog loads and starts with Next version or the newest version heading")
+	_expect(changelog_text.contains("== %s - " % Main.game_version()), "the in-game changelog has a heading for the game's current version")
+	# The title shows the version number alone, read from project.godot, so it never needs translating.
+	var version_label: Label = game.get_node("CanvasLayer/TitleScreen/VersionLabel") as Label
+	_expect(version_label.text == Main.game_version() and RegEx.create_from_string("^\\d+\\.\\d+\\.\\d+$").search(version_label.text) != null and version_label.auto_translate_mode == Node.AUTO_TRANSLATE_MODE_DISABLED and version_label.is_visible_in_tree(), "the title shows the game's version number, untranslated")
 	changelog.pressed.emit()
 	_expect(changelog_screen.visible and not title_logo.visible and game.get("title_open") and changelog_back.has_focus(), "CHANGELOG opens the in-game screen over the title without starting a game")
 	_expect(changelog_body.get_parsed_text().begins_with(first_heading.substr(3, first_heading.length() - 6)) and changelog_body.get_v_scroll_bar().value == 0.0, "the changelog screen shows the text from its newest heading")

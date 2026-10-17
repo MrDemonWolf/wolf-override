@@ -103,7 +103,7 @@ func _check_keyboard_code_and_storage() -> void:
 	_expect(tools.note.visible and tools.note_label.text == DebugTools.UNLOCKED_NOTE and tools.layer.visible, "the title shows 'Debug tools unlocked'")
 	_expect(game.get("title_open") and not game.get("intro_active"), "typing the code does not start a game")
 	var note_rect: Rect2 = tools.note.get_global_rect()
-	for path: String in ["Brand", "LogoMark", "TitleLine", "GameTitle", "Subtitle", "NewGameButton", "ContinueButton", "ContinueNote", "CreditsButton", "SettingsButton", "ChangelogButton", "Credit"]:
+	for path: String in ["Brand", "LogoMark", "TitleLine", "GameTitle", "Subtitle", "NewGameButton", "ContinueButton", "ContinueNote", "CreditsButton", "SettingsButton", "ChangelogButton", "Credit", "VersionLabel"]:
 		_expect(not note_rect.intersects((game.get_node("CanvasLayer/TitleScreen/" + path) as Control).get_global_rect()), "the title's note leaves %s clear" % path)
 	var config: ConfigFile = GameSettings.load_config(_settings_path())
 	_expect(GameSettings.boolean(config, DebugTools.SETTINGS_SECTION, DebugTools.SETTINGS_KEY, false), "the unlock is stored in the settings file")
@@ -389,6 +389,9 @@ func _check_snapshot() -> void:
 	_expect(title.get("beat") == "title" and title.get("room") == "lockdown" and (title.get("save") as Dictionary).get("exists") == false and (title.get("save") as Dictionary).get("checkpoint") == "none", "on the title the dump says title and that no save exists")
 	for key: String in ["room", "beat", "objective", "line", "engineer", "wolf", "sentry", "pressure_line", "drop_arm", "bolt", "hazards", "memory", "choices", "flags", "state", "performance", "save", "build", "debug", "time"]:
 		_expect(title.has(key), "the dump has '%s'" % key)
+	# A bug capture names the build's version, read from project.godot like the title's version label.
+	var version: String = str((title.get("build") as Dictionary).get("version"))
+	_expect(version == Main.game_version() and version == str(ProjectSettings.get_setting("application/config/version")) and not version.is_empty(), "the dump's build names the game's version")
 	var state: M0State = _junction_state(false)
 	_expect(state.save_to_disk(str(game.get("save_path"))), "a junction entry save is written")
 	game.call("_load_game")

@@ -1,3 +1,4 @@
+import type { ComponentProps } from 'react';
 import type { StaticImageData } from 'next/image';
 import { asMarkdown } from 'fumadocs-core/server';
 import { siteUrl } from '@/lib/seo';
@@ -91,4 +92,19 @@ export function LinkCards({ label, links, variant = 'cards' }: LinkCardsProps) {
       ))}
     </nav>
   );
+}
+
+/**
+ * A collapsible block for long notes, such as a changelog version's Full notes: the visible text above
+ * it must stand on its own, and the block holds the detail. Pages write `<Details>` and `<Summary>`:
+ * MDX maps only capitalised JSX names to components (a literal `<details>` would skip the styling).
+ * scripts/export_changelog.py leaves everything inside it out of the in-game changelog. Closed by default.
+ */
+export function Details({ className, ...props }: ComponentProps<'details'>) {
+  return <details {...props} className={['mt-4 mb-6 rounded-card border border-fd-border bg-fd-card px-4 py-2', className].filter(Boolean).join(' ')} />;
+}
+
+/** The always-visible line of a {@link Details} block: the click and keyboard target that opens it. */
+export function Summary({ className, ...props }: ComponentProps<'summary'>) {
+  return <summary {...props} className={['cursor-pointer py-1 font-medium text-fd-foreground', className].filter(Boolean).join(' ')} />;
 }

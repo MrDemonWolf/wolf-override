@@ -343,14 +343,14 @@ func _place(control: Control, parent: Node, rect: Rect2) -> void:
 	parent.add_child(control)
 
 
-## The real title in English, judged by the build's check: its buttons, the Brand line and the CONTINUE
-## note (shown only while there is no save, which start_game guarantees) all fit, so the check finds no
-## overflow where the game shows none.
+## The real title in English, judged by the build's check: its buttons, the Brand line, the CONTINUE
+## note (shown only while there is no save, which start_game guarantees) and the version number all
+## fit, so the check finds no overflow where the game shows none.
 func _check_title() -> void:
 	var game: Main = await start_game("i18n-test") as Main
 	game.auto_pause_on_focus_loss = false
 	await frames(3)
-	var controls: Array[Control] = [game.new_game_button, game.continue_button, game.credits_button, game.changelog_button, game.get_node("CanvasLayer/TitleScreen/SettingsButton") as Button, game.get_node("CanvasLayer/TitleScreen/Brand") as Label, game.continue_note]
+	var controls: Array[Control] = [game.new_game_button, game.continue_button, game.credits_button, game.changelog_button, game.get_node("CanvasLayer/TitleScreen/SettingsButton") as Button, game.get_node("CanvasLayer/TitleScreen/Brand") as Label, game.continue_note, game.title_version]
 	_check(game.continue_note.is_visible_in_tree(), "the CONTINUE note is up on a fresh title, so it is judged")
 	for control: Control in controls:
 		_check(not I18n.overflows(control), "the English title's %s fits (size %s)" % [str(control.get("text")).c_escape(), control.size])
