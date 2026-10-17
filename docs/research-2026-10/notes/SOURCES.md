@@ -1,6 +1,6 @@
 # Outside sources (October 2026 research)
 
-The research behind WOLF//OVERRIDE read many outside pages, talks, papers and videos. Copies of those files were never kept in this repository: they belong to their authors and publishers. This file cites them instead, so anyone can find the originals. WOLF//OVERRIDE, its story and its characters are by Nathanial Henniges; the research, notes and reviews in this folder were done by Claude (Claude Code) and Codex agents working for him.
+The research behind WOLF OVERRIDE read many outside pages, talks, papers and videos. Copies of those files were never kept in this repository: they belong to their authors and publishers. This file cites them instead, so anyone can find the originals. WOLF OVERRIDE, its story and its characters are by Nathanial Henniges; the research, notes and reviews in this folder were done by Claude (Claude Code) and Codex agents working for him.
 
 ## Where the sources are cited
 
