@@ -14,6 +14,10 @@ extends "res://tests/support/game_suite.gd"
 ##   language") and the saved setting;
 ## - each language's glyphs checked with only its own font chain, and a CJK character planted in a
 ##   German catalog failing that check (the prototype's check had every fallback on at once);
+## - the bundled fonts (PR L4): no font asks the OS for a missing glyph, each CJK subset draws its whole
+##   fixed character list (decision D7) and nothing outside it, the subsets and the line-breaking data
+##   stay inside D7's size budget, every character the game's English text uses is drawn by every theme
+##   font, and Roboto's symbols fallback leaves its line height alone;
 ## - the sibling case: with made-up zh_Hans and zh_Hant catalogs (and es and es_ES), a line only one file
 ##   of the pair has shows English in the other, and the same lookup with every catalog kept (what an
 ##   apply() that keeps them all would leave) shows the sibling's text, so the check can fail;
@@ -39,6 +43,27 @@ const LONG_TEXT: String = "WWWWWWWWWW WWWWWWWWWW WWWWWWWWWW WWWWWWWWWW"
 const SHORT_TEXT: String = "OK"
 ## The folder holding the shipped catalogs, beside languages.json: one <code>.po per offered language.
 const CATALOG_DIR: String = "res://i18n"
+## The fonts folder: every .ttf and .otf in it is checked to have the OS fallback off.
+const FONT_DIR: String = "res://assets/fonts"
+## Each CJK subset's fixed character list, written with the subsets by `scripts/i18n/i18n_tool.py fonts`.
+const CHARSETS_PATH: String = "res://tests/support/cjk_charsets.json"
+## A character no subset may draw: U+3400, the first of CJK Extension A, which none of the four common
+## sets holds. Its absence shows Font.has_char reads the subset alone and that the list check can fail.
+const OUTSIDE_EVERY_SET: String = "\u3400"
+## Decision D7 (DECISIONS.md, decided October 16, 2026): fixed common-character subsets, "about 4-5 MB"
+## for the four fonts and "about 9-10 MB" once Godot's line-breaking data joins them. The budgets are
+## the top of each range, in bytes (decimal MB, as the plan measures the .pck).
+const CJK_FONT_BUDGET_BYTES: int = 5_000_000
+const CJK_TOTAL_BUDGET_BYTES: int = 10_000_000
+## icudt_godot.dat, the line-breaking data an export adds once any CJK catalog is registered (measured,
+## DESIGN.md "Line breaking"; scripts/get-export-templates.sh unpacks and checks it, PR L3). Not under
+## res://, so the size is recorded here rather than read.
+const ICU_DATA_BYTES: int = 4_797_472
+## Where the game's English text lives: every string literal of these folders' scripts and scenes is
+## scanned for characters the theme fonts must draw (the tests and add-ons are not game text).
+const TEXT_DIRS: Array[String] = ["res://scripts", "res://scenes"]
+## Roboto's own file: the line-height check compares it, with its symbols fallback, to a bare copy.
+const ROBOTO_FILE: String = "res://assets/fonts/Roboto-Variable.ttf"
 
 var _checks: int = 0
 
@@ -55,6 +80,8 @@ func _run() -> void:
 	_check_resolver()
 	_check_saved()
 	_check_glyphs()
+	_check_fonts()
+	_check_english_glyphs()
 	_check_sibling(["zh_Hans", "zh_Hant"], ["两条都有", "兩條都有"], "只有简体")
 	_check_sibling(["es", "es_ES"], ["ambas la tienen", "ambas la tienen (España)"], "solo Latinoamérica")
 	_check_format_guard()
@@ -173,8 +200,8 @@ func _check_saved() -> void:
 
 ## Every language's own text (its picker name, its machine-translation tag and every line of its
 ## registered catalogs) drawn by the theme fonts with only that language's fallback behind them;
-## Font.has_char never asks the OS's fonts. Languages whose fallback font is not in the build yet
-## (the CJK subsets, PR L4) are checked to be unoffered instead. Latin and Cyrillic chain nothing, so
+## Font.has_char never asks the OS's fonts. A language whose fallback font is not in the build is
+## checked to be unoffered instead. Latin and Cyrillic chain nothing, so
 ## their line height stays English's. Then the planted case: a German catalog holding a CJK character
 ## must fail the same check.
 func _check_glyphs() -> void:
@@ -199,6 +226,82 @@ func _check_glyphs() -> void:
 	var missing_planted: String = I18n.missing_glyphs(_language_text("de", [planted]), load(THEME_FONTS[0]) as Font)
 	_check(missing_planted == "日本", "a CJK character in a German catalog fails German's own chain (missing: %s)" % missing_planted)
 	I18n.apply("en")
+
+
+## The bundled fonts (PR L4). Every font file has the OS fallback off (its import's
+## allow_system_fallback), so a missing glyph is tofu on every device alike and these glyph checks are
+## the whole truth. Each CJK subset draws every character of its fixed list (cjk_charsets.json), the list
+## holds the language's picker name and tag, and the subset lacks OUTSIDE_EVERY_SET (the planted miss).
+## The four subsets, alone and with the line-breaking data, stay inside D7's budgets.
+func _check_fonts() -> void:
+	for file: String in DirAccess.get_files_at(FONT_DIR):
+		if file.get_extension() in ["ttf", "otf"]:
+			var font_file: FontFile = load(FONT_DIR.path_join(file)) as FontFile
+			_check(font_file != null and not font_file.allow_system_fallback, "%s never asks the OS for a missing glyph" % file)
+	var charsets: Dictionary = (JSON.parse_string(FileAccess.get_file_as_string(CHARSETS_PATH)) as Dictionary)["charsets"]
+	var font_bytes: int = 0
+	for code: String in I18n.LANGUAGES:
+		var path: Variant = I18n.LANGUAGES[code]["fallback_font"]
+		if path == null:
+			continue
+		var subset: Font = I18n.fallback_font(code)
+		_check(subset != null, "%s's subset %s is in the build" % [code, path])
+		_check(charsets.has(code), "%s has a fixed character list in %s" % [code, CHARSETS_PATH])
+		if subset == null or not charsets.has(code):
+			continue
+		var wanted: String = charsets[code]
+		var missing: String = I18n.missing_glyphs(wanted, subset)
+		_check(missing.is_empty(), "%s's subset draws all %d characters of its list; missing: %s" % [code, wanted.length(), missing])
+		var own: String = str(I18n.LANGUAGES[code]["name"]) + str(I18n.LANGUAGES[code]["machine_tag"])
+		var not_listed: String = ""
+		for character: String in own.replace(" ", "").split("", false):
+			if not wanted.contains(character):
+				not_listed += character
+		_check(not_listed.is_empty(), "%s's list holds its picker name and tag (%s); not listed: %s" % [code, own, not_listed])
+		_check(I18n.missing_glyphs(OUTSIDE_EVERY_SET, subset) == OUTSIDE_EVERY_SET, "%s's subset lacks U+3400, outside every common set (planted miss)" % code)
+		font_bytes += FileAccess.get_file_as_bytes(path as String).size()
+	_check(font_bytes > 0 and font_bytes <= CJK_FONT_BUDGET_BYTES, "the CJK subsets total %d B, within D7's %d B" % [font_bytes, CJK_FONT_BUDGET_BYTES])
+	_check(font_bytes + ICU_DATA_BYTES <= CJK_TOTAL_BUDGET_BYTES, "the CJK subsets and line-breaking data total %d B, within D7's %d B" % [font_bytes + ICU_DATA_BYTES, CJK_TOTAL_BUDGET_BYTES])
+
+
+## Every character of the game's English (each string literal in TEXT_DIRS' .gd and .tscn files, code
+## comments left out) drawn by every theme font in English, where no language fallback is chained. Before
+## PR L4 the OS fallback hid the arrows and the empty square Roboto lacks; now Roboto chains
+## Montserrat-Symbols-Subset.ttf for them, so this fails when new text needs a character no theme font
+## has. That fallback's vertical metrics match Roboto's, so Roboto's line height must equal a bare copy's
+## at a spread of sizes from 12 to 40 px, unlike the 21 to 25 px a CJK fallback causes.
+func _check_english_glyphs() -> void:
+	I18n.apply("en")
+	var literal: RegEx = RegEx.create_from_string("\"((?:[^\"\\\\\n]|\\\\.)*)\"")
+	var characters: String = ""
+	for dir: String in TEXT_DIRS:
+		for path: String in _files_under(dir, ["gd", "tscn"]):
+			for line: String in FileAccess.get_file_as_string(path).split("\n"):
+				var code: String = line.get_slice("#", 0) if path.ends_with(".gd") else line
+				for found: RegExMatch in literal.search_all(code):
+					for character: String in found.get_string(1).split("", false):
+						if character.unicode_at(0) > 0x7E and not characters.contains(character):
+							characters += character
+	_check(characters.contains("\u25b6"), "the scan finds the touch arrow ▶ in the game's text (found %s)" % characters)
+	for path: String in THEME_FONTS:
+		var missing: String = I18n.missing_glyphs(characters, load(path) as Font)
+		_check(missing.is_empty(), "%s draws every character of the game's English (%s); missing: %s" % [path.get_file(), characters, missing])
+	var roboto: Font = load(ROBOTO_FILE) as Font
+	var bare: FontFile = FontFile.new()
+	bare.data = FileAccess.get_file_as_bytes(ROBOTO_FILE)
+	for px: int in [12, 14, 16, 17, 20, 23, 28, 40]:
+		_check(roboto.get_height(px) == bare.get_height(px), "Roboto with its symbols fallback keeps its own line height at %d px (%.0f, bare %.0f)" % [px, roboto.get_height(px), bare.get_height(px)])
+
+
+## Every file under [param dir] (at any depth) whose extension is in [param extensions], as res:// paths.
+func _files_under(dir: String, extensions: Array[String]) -> Array[String]:
+	var found: Array[String] = []
+	for file: String in DirAccess.get_files_at(dir):
+		if file.get_extension() in extensions:
+			found.append(dir.path_join(file))
+	for sub: String in DirAccess.get_directories_at(dir):
+		found.append_array(_files_under(dir.path_join(sub), extensions))
+	return found
 
 
 ## The text [param code] must draw: its picker name, its machine-translation tag, and every message of
