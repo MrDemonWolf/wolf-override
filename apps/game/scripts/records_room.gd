@@ -16,10 +16,10 @@ const CONTAINER: Texture2D = preload("res://assets/props/records-container.png")
 ## line passage toward Archive, painted into the far plate behind its doorway). Each leaf swings into
 ## the room on its hinges at the far jamb (SwingLeaf), opened and closed by a concealed operator in its
 ## header; nothing fades. The first copy is secured in the GSA security container left of the exit,
-## not at the door. Every piece is a region of one lossless atlas, drawn by two AtlasMesh nodes (one
-## draw call each): everything behind the walk line right after the mid plate (both walls with their
-## doorways transparent, the container, both leaves, and the entry's near column, which nobody passes
-## behind), and the exit's near column and stub over the actors. Each column carries a guarded status
+## not at the door (its own whole piece, CONTAINER). Every door piece is a region of one lossless atlas,
+## drawn by two AtlasMesh nodes (one draw call each): everything behind the walk line right after the
+## mid plate (both walls with their doorways transparent, both leaves, and the entry's near column,
+## which nobody passes behind), and the exit's near column and stub over the actors. Each column carries a guarded status
 ## lamp whose glass is a live-tinted quad. Positions are each piece's world top-left (placement.json).
 const DOORS_ATLAS: Texture2D = preload("res://assets/props/records-doors-atlas.png")
 ## Each leaf's fill (SwingLeaf.fill): the ambient and the broad floor bounce, which reach every face the
@@ -165,7 +165,7 @@ var container_art: Sprite2D
 var floor_reflections: Array[FloorReflection] = []
 var exit_leaf: SwingLeaf
 var entry_leaf: SwingLeaf
-## The door pieces behind the walk line (walls, container, leaves, the entry's front) and the exit's
+## The door pieces behind the walk line (walls, leaves, the entry's front) and the exit's
 ## front over the actors, each one draw call; the lamps' glass quads in them take the live tint.
 var plate_mesh: AtlasMesh
 var front_mesh: AtlasMesh
