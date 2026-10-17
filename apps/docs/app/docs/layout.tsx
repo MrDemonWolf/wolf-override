@@ -1,6 +1,7 @@
 import type { ReactNode } from 'react';
 import { DocsLayout } from 'fumadocs-ui/layouts/docs';
 import type { LinkItemType } from 'fumadocs-ui/layouts/shared';
+import { repoUrl } from '@/lib/seo';
 import { source } from '@/lib/source';
 import BrandLink from './brand-link';
 import SidebarDrawerShim from './sidebar-drawer-shim';
@@ -9,7 +10,7 @@ import SidebarDrawerShim from './sidebar-drawer-shim';
 const links: LinkItemType[] = [
   {
     type: 'icon',
-    url: 'https://github.com/MrDemonWolf/wolf-override',
+    url: repoUrl,
     label: 'Source on GitHub',
     text: 'Source on GitHub',
     external: true,

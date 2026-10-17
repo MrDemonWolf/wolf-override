@@ -1,5 +1,5 @@
 import { docsLlms } from '@/lib/source';
-import { siteDescription, siteUrl } from '@/lib/seo';
+import { repoUrl, siteDescription, siteUrl } from '@/lib/seo';
 
 // A static export only prerenders route handlers marked force-static (Next static-exports guide).
 export const dynamic = 'force-static';
@@ -20,6 +20,6 @@ export async function GET() {
     `# WOLF OVERRIDE\n\n> ${siteDescription}\n\n` +
     `Spoiler-light player guide; walkthrough pages label their spoilers. Every page in full, as Markdown: ${siteUrl}/llms-full.txt\n\n` +
     `## Game guide\n${tree}\n\n` +
-    `## Optional\n\n- [Source code](https://github.com/MrDemonWolf/wolf-override): the Godot project and this website (GPL-3.0-or-later code; art and branding have their own terms)\n`;
+    `## Optional\n\n- [Source code](${repoUrl}): the Godot project and this website (GPL-3.0-or-later code; art and branding have their own terms)\n`;
   return new Response(body, { headers: { 'Content-Type': 'text/plain; charset=utf-8' } });
 }
