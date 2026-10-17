@@ -139,7 +139,7 @@ func _initialize() -> void:
 			DirAccess.remove_absolute(ProjectSettings.globalize_path(leftover))
 
 	var malformed_bodies: Dictionary = {
-		"non-JSON": "WOLF//OVERRIDE save",
+		"non-JSON": "WOLF OVERRIDE save",
 		"truncated JSON": JSON.stringify(records.to_dict()).left(40),
 		"empty file": "",
 		"JSON array root": "[1, 2, 3]",

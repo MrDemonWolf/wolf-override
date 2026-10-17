@@ -33,7 +33,7 @@ labels (docs.weblate.org, "Component configuration", read October 17, 2026).
 
 | Setting | Value |
 |---|---|
-| Project name, URL slug | `WOLF//OVERRIDE`, `wolf-override` |
+| Project name, URL slug | `WOLF OVERRIDE`, `wolf-override` |
 | Project website | `https://github.com/MrDemonWolf/wolf-override` |
 | Translation instructions | "Read the shared style guide first, then your language's guide, and use the glossary's words: https://github.com/MrDemonWolf/wolf-override/tree/main/i18n/style. Never give the engineer a gender in any language. Lines are machine-translated until a native speaker reviews them." |
 | Enable reviews | On, so a reviewer approves lines. |
