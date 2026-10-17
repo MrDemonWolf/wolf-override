@@ -2,7 +2,10 @@
 # Install the parts of the Godot 4.7.2 export templates that the macOS and Windows debug presets use
 # into an isolated Godot data home, checking every file against pinned checksums.
 # Usage: scripts/get-export-templates.sh GODOT_HOME
-# The full template archive is about 1.28 GB; only four files from it (about 227 MB) are kept.
+# The full template archive is about 1.28 GB; only five files from it (about 232 MB) are kept.
+# icudt_godot.dat is ICU's line-breaking data (4,797,472 B). An export adds it once a Chinese, Japanese,
+# Korean or Thai translation is registered; without the template copy Godot falls back to the editor's
+# embedded copy, which it warns may not match the template's ICU version.
 set -euo pipefail
 
 home="${1:?usage: scripts/get-export-templates.sh GODOT_HOME}"
@@ -25,6 +28,7 @@ printf '%s  %s\n' "$sha512" "$download/templates.tpz" | sha512_check
 mkdir -p "$dest"
 unzip -q -o -j "$download/templates.tpz" \
   templates/macos.zip templates/windows_debug_x86_64.exe templates/windows_debug_x86_64_console.exe templates/version.txt \
+  templates/icudt_godot.dat \
   -d "$dest"
 verify_export_templates "$dest"
 echo "Export templates installed in $dest"

@@ -93,13 +93,17 @@ godot_template_dir() {
   fi
 }
 
-# verify_export_templates DIR: the four template files the presets use, unchanged from the 4.7.2 release.
+# verify_export_templates DIR: the five template files the presets use, unchanged from the 4.7.2 release:
+# the macOS and Windows debug templates, version.txt, and icudt_godot.dat (ICU's line-breaking data, which
+# an export packs for Chinese, Japanese, Korean and Thai; see get-export-templates.sh). Returns non-zero
+# if any file is missing or differs.
 verify_export_templates() {
   (cd "$1" && sha256_check <<'SUMS'
 88df5e2e6fee99088699be66e6d42e4da4fb0c5619d054297d755a49558a4792  macos.zip
 51498b72b3a237f882ebd7d1787f06a4bc1eaf0572daab93837adcfd3cfdc107  windows_debug_x86_64.exe
 5514c7645ee897a01f540d3cf22ede5badf92394521a08bfab66a54d7369e6e6  windows_debug_x86_64_console.exe
 38885c88f75abbc797a1db7559719800279a00cfb9fa8b2e2868a7f6f84bad2e  version.txt
+64e407b570a21a4b740531a14cd95f0cefc46cef3d8224fd09a0dd386fb7016a  icudt_godot.dat
 SUMS
   )
 }

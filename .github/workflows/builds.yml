@@ -50,14 +50,15 @@ jobs:
             echo "BUILD_DIR=$RUNNER_TEMP/test-builds"
             echo "SHORT_SHA=${BUILD_COMMIT:0:7}"
           } >> "$GITHUB_ENV"
-      # Only the four template files these presets use are kept (about 160 MB cached, from a 1.28 GB archive).
+      # Only the five template files these presets use are kept (about 165 MB cached, from a 1.28 GB archive);
+      # v2 of the key adds icudt_godot.dat, so a cache saved before it is not restored.
       # Pushes to main save the cache that pull requests then restore; the files are checked against
       # pinned SHA-256 sums on every run, cached or not.
       - name: Restore Godot export templates
         uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         with:
           path: ${{ runner.temp }}/godot-home/.local/share/godot/export_templates/4.7.2.stable
-          key: godot-export-templates-4.7.2-ca4d71c4-macos-win64-debug-v1
+          key: godot-export-templates-4.7.2-ca4d71c4-macos-win64-debug-v2
       - name: Get Godot export templates
         run: scripts/get-export-templates.sh "$GODOT_HOME"
       - name: Export and package the macOS and Windows debug builds
