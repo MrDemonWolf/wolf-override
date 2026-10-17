@@ -87,6 +87,8 @@ jobs:
           msgfmt --version | head -1
       - name: Gates catch their planted errors
         run: python3 -I -B scripts/i18n/i18n_tool.py selftest "$RUNNER_TEMP/i18n-selftest.json"
+      - name: Glossary and style guides are sound
+        run: python3 -I -B scripts/i18n/i18n_tool.py glossary
       - name: Every scene and script is in the POT file list
         run: python3 -I -B scripts/i18n/i18n_tool.py potfiles apps/game --check
       - name: Translations pass every gate
