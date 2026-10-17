@@ -18,11 +18,22 @@ extends SceneTree
 ## hides and returns.
 ##
 ## Writes into --out: NNN-slug.png stills, shots.json (per still: frame, draw calls, texture memory,
-## masks), text.log (every change of the narration, hints, objective, cards and buttons, by frame)
-## and audio.log (every SfxBank play, play_blend and stop, by frame).
+## masks and the language audit), text.log (every change of the narration, hints, objective, cards and
+## buttons, by frame) and audio.log (every SfxBank play, play_blend and stop, by frame).
+##
+## Languages (localization PR L2): --language=<code> plays the route in any language of
+## I18n.LANGUAGES (apps/game/i18n/languages.json; switched with I18n.apply before the game loads, also
+## when the language is not offered yet), or "pseudo" for English through Godot's pseudolocalization
+## (project.godot sets its form: brackets and 30% padding, no accents). Without it nothing is switched and
+## the run is the English parity run as before. Every still gets an "audit" in shots.json (_audit): the
+## visible text controls that overflow by I18n.overflows(), the characters their font chain cannot draw
+## by I18n.missing_glyphs(), and under pseudo the visible text that did not go through translation. The
+## audit is the review evidence the language PRs file beside their stills; it reads the screen after the
+## still is saved, so it never changes a still.
 ##
 ## Usage (inside render.sh): godot --fixed-fps 60 --script res://review_capture/capture.gd --
 ##        --route=R1|R2|R3|R4 --out=/work/out --size=1280x720 --variant=kb-fx|kb-calm|touch-fx
+##        [--language=<code>|pseudo]
 
 const ParityBank = preload("parity_sfx_bank.gd")
 const RNG_SEED: int = 0x5041524954
@@ -44,6 +55,8 @@ const TEXT_PATHS: Array[String] = [
 
 var route: String = "R1"
 var variant: String = "kb-fx"
+## The --language code ("es", "pseudo"), or "" for the English parity run, which switches nothing.
+var language: String = ""
 var out_dir: String = ""
 var size: Vector2i = Vector2i(1280, 720)
 var save_path: String = ""
@@ -86,7 +99,11 @@ func _run() -> void:
 	out_dir = _arg("out", OS.get_user_data_dir().path_join("parity"))
 	var dims: PackedStringArray = _arg("size", "1280x720").split("x")
 	size = Vector2i(int(dims[0]), int(dims[1]))
+	language = _arg("language", "")
 	DirAccess.make_dir_recursive_absolute(out_dir)
+	if not language.is_empty() and not _use_language(language):
+		_finish()
+		return
 	save_path = "user://parity-%s-save.json" % route
 	settings_path = "user://parity-%s-settings.cfg" % route
 	for path: String in [save_path, save_path + ".tmp", settings_path]:
@@ -137,7 +154,7 @@ func _run() -> void:
 
 func _finish() -> void:
 	var f: FileAccess = FileAccess.open(out_dir.path_join("shots.json"), FileAccess.WRITE)
-	f.store_string(JSON.stringify({"route": route, "variant": variant, "size": [size.x, size.y], "frames": frame, "joypads": Input.get_connected_joypads().size(), "notes": notes, "failed": failed, "shots": shots}, " "))
+	f.store_string(JSON.stringify({"route": route, "variant": variant, "language": language if not language.is_empty() else "en", "size": [size.x, size.y], "frames": frame, "joypads": Input.get_connected_joypads().size(), "notes": notes, "failed": failed, "shots": shots}, " "))
 	f.close()
 	f = FileAccess.open(out_dir.path_join("text.log"), FileAccess.WRITE)
 	f.store_string("\n".join(text_log) + "\n")
@@ -148,7 +165,7 @@ func _finish() -> void:
 	ParityBank.calls.clear()
 	for path: String in [save_path, save_path + ".tmp", settings_path]:
 		_remove(path)
-	print("parity done route=%s variant=%s size=%dx%d shots=%d frames=%d failed=%s notes=%s" % [route, variant, size.x, size.y, shots.size(), frame, failed, notes])
+	print("parity done route=%s variant=%s language=%s size=%dx%d shots=%d frames=%d failed=%s notes=%s" % [route, variant, language if not language.is_empty() else "en", size.x, size.y, shots.size(), frame, failed, notes])
 	quit(1 if failed else 0)
 
 
@@ -887,9 +904,77 @@ func _shot(slug: String) -> void:
 		"engineer_x": snappedf(human.position.x, 0.01),
 		"wolf_x": snappedf(wolf.position.x, 0.01),
 		"masks": [],
+		"audit": _audit(),
 	})
 	# frame_post_draw resumes after this frame's _process: start the next step at a frame boundary.
 	await process_frame
+
+
+# ---------------------------------------------------------------- languages
+
+## Switches the game to [param code] before it loads: "pseudo" is English with Godot's
+## pseudolocalization on, any code of I18n.LANGUAGES goes through I18n.apply (its catalogs and fallback
+## font). An unknown code fails the run and returns false, so a typo never gives an English run that
+## looks like a language run.
+func _use_language(code: String) -> bool:
+	if code == "pseudo":
+		I18n.apply("en")
+		TranslationServer.reload_pseudolocalization()
+		TranslationServer.pseudolocalization_enabled = true
+		return true
+	if not I18n.LANGUAGES.has(code):
+		_fail("unknown --language %s (I18n.LANGUAGES has %s, plus pseudo)" % [code, ", ".join(PackedStringArray(I18n.LANGUAGES.keys()))])
+		return false
+	I18n.apply(code)
+	return true
+
+
+## The language audit of the frame on screen, for shots.json: every visible Label, Button and
+## RichTextLabel with text, and among them those I18n.overflows() calls overflowing ("overflows"), the
+## characters their own theme font cannot draw with its fallbacks ("missing_glyphs", by
+## I18n.missing_glyphs, so no OS font hides a gap), and under pseudo the ones whose text has letters but
+## no pseudolocalization bracket ("untranslated": text no tr() reached; a line split into boxes keeps
+## "[" on its first box and "]" on its last, so either bracket counts). Each finding names the control
+## by its path under Main and quotes its text as drawn. Gotcha: I18n.text_cut switches a trimming
+## control's trimming off and back on to measure it, which re-sorts a Container parent on the next frame
+## to the same layout; it runs after the still is saved.
+func _audit() -> Dictionary:
+	var overflows: Array[String] = []
+	var missing: Array[String] = []
+	var untranslated: Array[String] = []
+	var texts: int = 0
+	for node: Node in game.find_children("*", "Control", true, false):
+		var control: Control = node as Control
+		if not control.is_visible_in_tree() or not (control is Label or control is Button or control is RichTextLabel):
+			continue
+		var raw: String = (control as RichTextLabel).get_parsed_text() if control is RichTextLabel else str(control.get("text"))
+		if raw.strip_edges().is_empty():
+			continue
+		texts += 1
+		var shown: String = raw if control is RichTextLabel else String(control.atr(raw))
+		var where: String = "%s \"%s\"" % [game.get_path_to(control), shown.left(80).c_escape()]
+		var font: Font = control.get_theme_font(&"normal_font" if control is RichTextLabel else &"font")
+		var gaps: String = I18n.missing_glyphs(shown, font)
+		if not gaps.is_empty():
+			missing.append("%s missing %s" % [where, gaps])
+		if I18n.overflows(control):
+			overflows.append(where)
+		if language == "pseudo" and not shown.contains("[") and not shown.contains("]") and _has_words(shown):
+			untranslated.append(where)
+	var found: Dictionary = {"texts": texts, "overflows": overflows, "missing_glyphs": missing}
+	if language == "pseudo":
+		found["untranslated"] = untranslated
+	return found
+
+
+## True when [param text] has at least two letters: a word, not a lone symbol such as ◀, a number or a
+## one-letter key name, which pseudolocalization has nothing to pad.
+static func _has_words(text: String) -> bool:
+	var letters: int = 0
+	for character: String in text:
+		if character.to_upper() != character.to_lower():
+			letters += 1
+	return letters >= 2
 
 
 func _remove(path: String) -> void:
