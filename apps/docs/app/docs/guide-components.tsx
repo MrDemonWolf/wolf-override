@@ -1,7 +1,13 @@
 import type { StaticImageData } from 'next/image';
+import { asMarkdown } from 'fumadocs-core/server';
+import { siteUrl } from '@/lib/seo';
 
 /*
- * MDX components for the guide pages, styled with Tailwind utilities and Fumadocs' --color-fd-*
+ * MDX components for the guide pages. When lib/source.ts renders a page to Markdown for llms.txt,
+ * asMarkdown() is true and each component returns its own Markdown (absolute links, so the text
+ * still works outside the site) instead of HTML.
+ *
+ * Styling: Tailwind utilities and Fumadocs' --color-fd-*
  * tokens so they follow the guide's light and dark themes. They render inside Fumadocs' `prose`
  * body; the typography plugin's rules sort after the margin-block utilities and before the
  * margin-top and margin-bottom ones, so margins here use separate top and bottom utilities.
@@ -25,6 +31,7 @@ type ScreenshotProps = {
  */
 export function Screenshot({ image, small, large, alt, caption }: ScreenshotProps) {
   const full = large ?? image;
+  if (asMarkdown()) return `![${alt}](${siteUrl}${full.src})\n\n*${caption}*\n\n`;
   return (
     <figure className="mt-6 mb-8 rounded-card border border-fd-border bg-fd-card">
       <a className="block overflow-hidden rounded-t-[calc(var(--radius-card)-1px)]" href={full.src} target="_blank" rel="noopener noreferrer">
@@ -69,6 +76,10 @@ const linkCard =
 
 /** A labelled navigation of link cards, two columns wide and one column at 680px and below. */
 export function LinkCards({ label, links, variant = 'cards' }: LinkCardsProps) {
+  if (asMarkdown()) {
+    const list = links.map(({ href, title, description }) => `- [${title}](${href.startsWith('/') ? siteUrl + href : href}): ${description}`);
+    return `${list.join('\n')}\n\n`;
+  }
   const actions = variant === 'actions';
   return (
     <nav className={`grid grid-cols-2 gap-[.85rem] guide-phone:grid-cols-1 ${actions ? 'mt-5 mb-7' : 'mt-6 mb-9'}`} aria-label={label}>
