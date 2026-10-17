@@ -49,8 +49,8 @@ One choice can change what your companion remembers.
   SLICE card that recaps your choices.
 - **Impact and sound** - Big moments get a short sound, a brief camera
   shake, sparks or dust and controller or phone rumble.
-- **Accessibility settings** - Reduced Motion turns off the shake,
-  hit-stop and flashes. Text Size enlarges dialogue and hints. Toggle
+- **Accessibility settings** - Reduced Motion turns off the shake
+  and hit-stop and shortens flashes. Text Size enlarges dialogue and hints. Toggle
   Holds turns every crank into press to start, press again to stop.
 - **Saves** - The safe point, every Records Access station and the
   junction's stages save; Continue restores the room and your choices.
@@ -230,7 +230,7 @@ The root `package.json` defines these commands:
 wolf-override/
 ├── apps/
 │   ├── game/         # Godot project: scenes, scripts, tests, assets
-│   │   └── i18n/     # Language table and translation catalogs
+│   │   └── i18n/     # Language table (no translations yet)
 │   └── docs/         # Public landing page and game guide (Next.js)
 ├── i18n/             # Translation template, glossary, style guides
 ├── scripts/          # Game, docs and copy checks, exports, changelog
@@ -242,6 +242,8 @@ wolf-override/
 ├── .github/          # Game checks, test builds and Pages workflows
 ├── AGENT.md          # Shared game quality guide
 ├── AGENTS.md         # Rules for coding agents
+├── PRIVATE_AGENTS.md # Provisional story and design rules
+├── PROJECT_CONTEXT.md # Provisional story and design context
 ├── CONTRIBUTING.md   # How to send a change
 ├── SECURITY.md       # How to report a vulnerability
 ├── LICENSE           # GPLv3 license text
@@ -251,7 +253,8 @@ wolf-override/
 
 Record an asset's origin and rights in
 [the asset register](apps/game/assets/manifest.json) before adding it
-to the game. Detailed story drafts stay out of this public repository.
+to the game. Spoiler-heavy story material stays out of the site, game text and
+builds.
 
 ## Credits
 
