@@ -4,7 +4,11 @@
 # re-runs it on the last build without rebuilding.
 # Fails when any exported page references the /_next/image optimiser (absent on
 # GitHub Pages), lacks the #main-content skip-link target, carries more than one
-# robots meta tag, or when any page or stylesheet references a .ttf font.
+# robots meta tag (robots and googlebot counted together), or when any page or stylesheet
+# references a .ttf font. Also fails when robots.txt lacks its Sitemap line, sitemap.xml
+# has a guide page without <lastmod>, the landing page or a guide page lacks its JSON-LD
+# block, any JSON-LD block is not valid JSON, or llms.txt, llms-full.txt or a guide
+# page's Markdown copy is missing or carries raw MDX.
 # Usage: scripts/check-docs-export.sh   (DOCS_OUT_DIR overrides the export directory)
 # Fails when apps/docs/out is missing rather than passing silently.
 set -euo pipefail
@@ -36,7 +40,7 @@ while IFS= read -r page; do
     echo "FAIL  $rel has no #main-content skip-link target" >&2
     status=1
   fi
-  robots="$(grep -o '<meta name="robots"' "$page" | wc -l | tr -d ' ')"
+  robots="$(grep -oE '<meta name="(robots|googlebot)"' "$page" | wc -l | tr -d ' ')"
   if [ "$robots" -gt 1 ]; then
     echo "FAIL  $rel has $robots robots meta tags (expected at most one)" >&2
     status=1
@@ -52,7 +56,77 @@ if find "$out" -name '*.css' -print0 | xargs -0 grep -li '\.ttf' 2>/dev/null | g
   status=1
 fi
 
+# Crawl files (apps/docs/app/robots.ts and sitemap.ts): robots.txt advertises the sitemap, and
+# every guide URL in the sitemap carries its Git date (the landing page has none by design).
+if ! grep -q '^Sitemap: https://' "$out/robots.txt" 2>/dev/null; then
+  echo "FAIL  robots.txt is missing or has no Sitemap line" >&2
+  status=1
+fi
+if [ ! -f "$out/sitemap.xml" ]; then
+  echo "FAIL  sitemap.xml is missing" >&2
+  status=1
+else
+  # Next writes <loc> and <lastmod> on separate lines, so join the file before matching;
+  # `|| true` keeps a zero count from tripping pipefail before the message below.
+  sitemap="$(tr -d '\n' < "$out/sitemap.xml")"
+  guide_urls="$( (grep -o '<loc>[^<]*/docs/[^<]*</loc>' <<< "$sitemap" || true) | wc -l | tr -d ' ')"
+  dated="$( (grep -o '<loc>[^<]*/docs/[^<]*</loc><lastmod>' <<< "$sitemap" || true) | wc -l | tr -d ' ')"
+  if [ "$guide_urls" -eq 0 ] || [ "$dated" -ne "$guide_urls" ]; then
+    echo "FAIL  sitemap.xml: $dated of $guide_urls guide URLs have <lastmod>" >&2
+    status=1
+  fi
+fi
+
+# Structured data (apps/docs/lib/structured-data.tsx): the landing page carries the site graph and
+# every guide page one BreadcrumbList; each block must parse as JSON, or search engines drop it.
+if ! python3 -I - "$out" <<'PY'
+import json, pathlib, re, sys
+out = pathlib.Path(sys.argv[1])
+failed = False
+for page in sorted(out.rglob('*.html')):
+    rel = page.relative_to(out).as_posix()
+    if rel.startswith('_next/'):
+        continue
+    blocks = re.findall(r'<script type="application/ld\+json">(.*?)</script>', page.read_text(), re.S)
+    expected = 1 if rel == 'index.html' or rel.startswith('docs/') else 0
+    if len(blocks) != expected:
+        print(f'FAIL  {rel} has {len(blocks)} JSON-LD blocks (expected {expected})', file=sys.stderr)
+        failed = True
+    for block in blocks:
+        try:
+            json.loads(block)
+        except ValueError as error:
+            print(f'FAIL  {rel} has a JSON-LD block that is not valid JSON: {error}', file=sys.stderr)
+            failed = True
+sys.exit(1 if failed else 0)
+PY
+then
+  status=1
+fi
+
+# llms.txt files (apps/docs/app/llms*, lib/source.ts): the index opens with the project H1 and
+# summary, the full text has no raw MDX components or [#heading-id] suffixes, and every guide page
+# has the Markdown copy its rel=alternate link names.
+if ! head -n 3 "$out/llms.txt" 2>/dev/null | tr '\n' ' ' | grep -q '^# WOLF//OVERRIDE  > '; then
+  echo "FAIL  llms.txt is missing or does not start with '# WOLF//OVERRIDE' and a '> ' summary" >&2
+  status=1
+fi
+if [ ! -s "$out/llms-full.txt" ]; then
+  echo "FAIL  llms-full.txt is missing or empty" >&2
+  status=1
+elif grep -qE '<(Screenshot|LinkCards)|\[#' "$out/llms-full.txt"; then
+  echo "FAIL  llms-full.txt has raw MDX components or [#heading-id] suffixes" >&2
+  status=1
+fi
+while IFS= read -r guide; do
+  rel="${guide#"$out"/docs}"
+  if [ ! -s "$out/llms.mdx/docs${rel%index.html}index.md" ]; then
+    echo "FAIL  docs${rel} has no Markdown copy at llms.mdx/docs${rel%index.html}index.md" >&2
+    status=1
+  fi
+done < <(find "$out/docs" -name index.html | sort)
+
 if [ "$status" -eq 0 ]; then
-  echo "pass  $count exported pages: no /_next/image, one #main-content each, at most one robots meta, no .ttf references"
+  echo "pass  $count exported pages: no /_next/image, one #main-content each, at most one robots meta, no .ttf references; robots.txt names the sitemap; every guide URL in sitemap.xml has <lastmod>; valid JSON-LD on the landing and guide pages; llms.txt, llms-full.txt and a Markdown copy of every guide page"
 fi
 exit "$status"

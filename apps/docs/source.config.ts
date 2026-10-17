@@ -2,7 +2,19 @@ import { defineConfig, defineDocs, frontmatterSchema, metaSchema } from 'fumadoc
 
 export const docs = defineDocs({
   dir: 'content/docs',
-  docs: { schema: frontmatterSchema },
+  docs: {
+    schema: frontmatterSchema,
+    // Each page's last Git commit date (`page.data.lastModified`, a Date) feeds the sitemap's
+    // <lastmod>. CI must check out full history (fetch-depth: 0 in .github/workflows/docs.yml):
+    // a shallow clone gives every file the same date, and Google ignores lastmod that is not
+    // "consistently and verifiably" accurate.
+    lastModified: true,
+    // Keeps a Markdown copy of each page (`getText('processed')`) for llms.txt, llms-full.txt and
+    // the per-page .md files (lib/source.ts). `function` output lets <Screenshot> and <LinkCards>
+    // write their own Markdown through asMarkdown() instead of leaking as raw JSX; headingIds off
+    // drops the `[#anchor]` suffixes Fumadocs would add to every heading.
+    postprocess: { includeProcessedMarkdown: { headingIds: false, output: 'function' } },
+  },
   meta: { schema: metaSchema },
 });
 

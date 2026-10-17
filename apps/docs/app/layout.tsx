@@ -1,9 +1,9 @@
-import type { Metadata } from 'next';
+import type { Metadata, Viewport } from 'next';
 import type { ReactNode } from 'react';
 import { RootProvider } from 'fumadocs-ui/provider/next';
 import localFont from 'next/font/local';
 import './global.css';
-import { siteUrl } from '@/lib/seo';
+import { siteDescription, siteUrl } from '@/lib/seo';
 
 // Latin-subset WOFF2 builds of the OFL fonts; licence texts sit beside them in ./fonts.
 const roboto = localFont({
@@ -28,15 +28,29 @@ export const metadata: Metadata = {
   authors: [{ name: 'Nathanial Henniges', url: 'https://mrdemonwolf.com' }],
   creator: 'Nathanial Henniges',
   publisher: 'MrDemonWolf, Inc.',
-  robots: { index: true, follow: true, googleBot: { index: true, follow: true, 'max-image-preview': 'large' } },
+  // One robots meta for every crawler; a separate googlebot copy said the same thing twice.
+  robots: { index: true, follow: true, 'max-image-preview': 'large' },
   title: {
     default: 'WOLF//OVERRIDE',
     template: '%s | WOLF//OVERRIDE',
   },
-  description: 'A side-view sci-fi horror game by MrDemonWolf, Inc.',
+  // Pages without their own description (the 404) use the same one as the landing page.
+  description: siteDescription,
+  // SVG for browsers that take it; a 96 px PNG (a multiple of 48, as Google asks for search-result
+  // favicons) for those that do not; a 180 px opaque PNG for iOS home screens. Both PNGs are
+  // rendered from the SVG mark (apps/game/assets/manifest.json, wolf-override-logo-mark).
   icons: {
-    icon: '/wolf-override-mark.svg',
+    icon: [
+      { url: '/wolf-override-mark.svg', type: 'image/svg+xml' },
+      { url: '/wolf-override-mark-96.png', type: 'image/png', sizes: '96x96' },
+    ],
+    apple: { url: '/apple-touch-icon.png', sizes: '180x180' },
   },
+};
+
+/** Browser UI colour (mobile address bar): the landing page's --color-ink background. */
+export const viewport: Viewport = {
+  themeColor: '#080f1b',
 };
 
 export default function RootLayout({ children }: { children: ReactNode }) {
