@@ -5,9 +5,13 @@
 # screen), and the UI dump and the performance probe run with godot --headless on a scratch copy.
 #
 # Usage:
-#   scripts/parity/run.sh capture <out dir> [routes] [sizes] [variants]
+#   scripts/parity/run.sh capture [--language <code>] <out dir> [routes] [sizes] [variants]
 #       Plays each route at each window size in each variant inside the render container and writes
 #       stills, shots.json, text.log and audio.log to <out dir>/<route>/<variant>/<size>/.
+#       --language plays the routes in that language (any code of apps/game/i18n/languages.json, or
+#       "pseudo" for English with pseudolocalization; capture.gd's --language), for the language PRs'
+#       stills; without it the run is the English parity run. Every still's shots.json entry carries
+#       the language audit (overflows, missing glyphs, and untranslated text under pseudo) either way.
 #       Defaults: routes "R1 R2 R3 R4", sizes "960x540 1280x720 2340x1080" (2340x1080 is the phone
 #       landscape aspect), variants "kb-fx kb-calm touch-fx" (keyboard with effects on, keyboard
 #       with effects off and Reduced Motion, touch layout with effects on). Every route also takes
@@ -67,7 +71,7 @@ prepare_headless() {
 
 # One route: every variant and size in turn, each in its own render.sh run.
 capture_route() {
-  local route="$1" out="$2" sizes="$3" variants="$4" driver="$5" status=0 dir variant size w h
+  local route="$1" out="$2" sizes="$3" variants="$4" driver="$5" language="$6" status=0 dir variant size w h
   for variant in $variants; do
     for size in $sizes; do
       dir="$out/$route/$variant/$size"
@@ -77,7 +81,8 @@ capture_route() {
       "$root/tools/render/render.sh" --name "${PARITY_NAME:-lighter-parity}-$route" --driver "$driver" \
           --screen 2560x1440 --timeout "${PARITY_TIMEOUT:-2700}" "$game_src" "$dir" -- \
           --fixed-fps 60 --resolution "${w}x${h}" --script res://review_capture/capture.gd -- \
-          --route="$route" --variant="$variant" --size="$size" --out=/work/out > "$dir/godot.log" 2>&1 || true
+          --route="$route" --variant="$variant" --size="$size" --out=/work/out ${language:+--language="$language"} \
+          > "$dir/godot.log" 2>&1 || true
       if [ -f "$dir/shots.json" ] && grep -q '"failed": false' "$dir/shots.json" && ! grep -qE "$errors" "$dir/godot.log"; then
         echo "ok    $route $variant $size $(grep -o 'shots=[0-9]*' "$dir/godot.log" | tail -1)"
       else
@@ -92,10 +97,16 @@ capture_route() {
 cmd="${1:-}"
 case "$cmd" in
   capture)
-    out="$(mkdir -p "${2:?out dir}" && cd "$2" && pwd)"
-    routes="${3:-R1 R2 R3 R4}"
-    sizes="${4:-960x540 1280x720 2340x1080}"
-    variants="${5:-kb-fx kb-calm touch-fx}"
+    shift
+    language=""
+    if [ "${1:-}" = "--language" ]; then
+      language="${2:?--language needs a code}"
+      shift 2
+    fi
+    out="$(mkdir -p "${1:?out dir}" && cd "$1" && pwd)"
+    routes="${2:-R1 R2 R3 R4}"
+    sizes="${3:-960x540 1280x720 2340x1080}"
+    variants="${4:-kb-fx kb-calm touch-fx}"
     driver="$(mktemp -d)"
     trap 'rm -rf "$driver"' EXIT
     cp "$here/capture.gd" "$here/parity_sfx_bank.gd" "$driver/"
@@ -105,7 +116,7 @@ case "$cmd" in
       while [ "$(jobs -rp | wc -l | tr -d ' ')" -ge "${PARITY_JOBS:-2}" ]; do
         sleep 2
       done
-      capture_route "$route" "$out" "$sizes" "$variants" "$driver" &
+      capture_route "$route" "$out" "$sizes" "$variants" "$driver" "$language" &
       pids+=("$!")
     done
     for pid in "${pids[@]}"; do
@@ -140,7 +151,7 @@ case "$cmd" in
     echo "ok    perf $label"
     ;;
   *)
-    sed -n '2,37p' "$0" >&2
+    sed -n '2,41p' "$0" >&2
     exit 2
     ;;
 esac
