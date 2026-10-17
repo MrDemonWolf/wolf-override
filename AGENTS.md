@@ -1,5 +1,7 @@
 # Repository agent instructions
 
+The game is called WOLF OVERRIDE, two words with no slashes, by Nathanial's decision (October 17, 2026). Write that name in code, game text, art, the website, docs and Notion; the old "WOLF//OVERRIDE" stays only as an alternative name for listings such as IGDB or inside quotes of history. The repository name `wolf-override`, the domain, URLs and file names do not change.
+
 Read [AGENT.md](AGENT.md) before game, site or README work. It is the shared, public guide for playable quality, credits, asset provenance and honest test claims.
 
 Read `PRIVATE_AGENTS.md`, `PROJECT_CONTEXT.md` and `docs/next-session.md` before story or gameplay changes; research, design notes, reviews and plans go to Notion through Codex, with the repo keeping rules, decisions, the manifest, credits and [docs/NOTES.md](docs/NOTES.md). They hold provisional story and design decisions and are tracked in this repository by Nathanial's decision (October 11, 2026), so they are public. Keep spoiler-heavy material out of the website, in-game text and build output. The latest explicit user decision wins.
