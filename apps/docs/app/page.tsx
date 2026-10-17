@@ -1,13 +1,17 @@
 import Link from 'next/link';
 import LandingNavigation from './landing-navigation';
 import BrandLockup from './brand-lockup';
-import Downloads, { ArrowIcon, sourceBuildHref } from './downloads';
+import Downloads, { ArrowIcon } from './downloads';
 import { card, inlineLink, landingWidth, navLink, sectionAnchor, sectionCopy, sectionTitle } from './landing-classes';
-import corridorCapture480 from './images/corridor-start-capture-480.webp';
-import corridorCapture960 from './images/corridor-start-capture-960.webp';
-import corridorCapture1600 from './images/corridor-start-capture-1600.webp';
+import recordsCapture480 from './images/records-access-doors-capture-480.webp';
+import recordsCapture960 from './images/records-access-doors-capture-960.webp';
+import recordsCapture1600 from './images/records-access-doors-capture-1600.webp';
+import junctionCapture480 from './images/service-junction-doors-capture-480.webp';
+import junctionCapture960 from './images/service-junction-doors-capture-960.webp';
+import junctionCapture1600 from './images/service-junction-doors-capture-1600.webp';
 import { pageMetadata, siteDescription } from '@/lib/seo';
 import { homeStructuredData, JsonLd } from '@/lib/structured-data';
+import { gameVersion } from '@/lib/version';
 
 // Static export has no image optimiser, so the hero ships hand-encoded WebP sizes of the key art.
 const keyArtSrcSet = ['640', '1024', '1672'].map((w) => `/title-corridor-key-art-provisional-${w}.webp ${w}w`).join(', ');
@@ -17,9 +21,55 @@ export const metadata = {
   title: { absolute: 'WOLF//OVERRIDE | Sci-fi Horror Adventure' },
 };
 
-// Hero call-to-action buttons; the primary lifts on hover unless reduced motion is requested.
-const heroAction =
-  'inline-flex min-h-13 items-center justify-between gap-[1.2rem] rounded-control border px-[1.2rem] py-[.85rem] font-heading font-bold leading-[1.3] transition-[background-color,border-color,color,translate] duration-180 ease-[ease] motion-reduce:transition-none phone:w-full';
+/**
+ * The hero's three audience doors: one link each for players, people who want the build and developers.
+ * "Get the game" scrolls to the Get the build section, which holds the page's one link to the source-build
+ * guide (sourceBuildHref in downloads.tsx), so that link is not repeated here.
+ */
+const audiences = [
+  { href: '/docs/controls/first-steps/', kicker: 'I want to play', title: 'How to play' },
+  { href: '#downloads', kicker: 'I want the game', title: 'Get the game' },
+  { href: '/docs/development/', kicker: 'I want to build it', title: 'Build it' },
+] as const;
+
+// An audience link in the hero; the border and text light up on hover. 3.25rem tall, above the 44px target.
+const audienceLink =
+  'flex min-h-13 flex-col justify-center gap-[.15rem] rounded-control border border-line-strong bg-surface/92 px-4 py-[.6rem] transition-[background-color,border-color,color] duration-180 ease-[ease] hover-always:border-accent hover-always:text-accent motion-reduce:transition-none';
+
+/**
+ * Current source-build captures for the gameplay section, made with tools/render/render.sh (see each
+ * image's entry in apps/game/assets/manifest.json). Phones crop each 16:9 frame to 4:3 around its middle,
+ * so the in-game text stays larger; the link opens the full 1600px frame.
+ */
+const captures = [
+  {
+    title: 'Records Access',
+    small: recordsCapture480,
+    medium: recordsCapture960,
+    large: recordsCapture1600,
+    alt: 'Gameplay frame in Records Access: the engineer stands at the red PURGE QUEUE console beside the shut steel entry door, WOLF waits by the MIRROR PORT, and the objective reads COPY PURGE ORDER.',
+  },
+  {
+    title: 'Service Junction',
+    small: junctionCapture480,
+    medium: junctionCapture960,
+    large: junctionCapture1600,
+    alt: 'Gameplay frame in the Service Junction: the engineer stands at the yellow valve wheel under a row of station plates (BREAKER LIVE, RELIEF VENT, VALVE 0 / 3, SEALED DOOR, TANK RELEASE), the blast door stands shut behind the SEALED DOOR plate, WOLF walks by the breaker at the left, and the objective reads CRANK THE VALVE.',
+  },
+] as const;
+
+/** What a player can do in the current source build, one short line each and spoiler-free. */
+const playableNow = [
+  'Three rooms: a maintenance corridor, Records Access and the Service Junction.',
+  'Steel doors that open as you work through each room.',
+  'Knocked down? Press RETRY to go back to the step you were on.',
+  'An end card when you finish the current slice.',
+  'Keyboard, controller and touch controls.',
+  'Settings for text size, reduced motion, rebinding and toggle holds.',
+] as const;
+
+/** What is planned but not in the build yet. No dates: nothing here has one. */
+const comingNext = ['More languages. The game is in English only for now.', 'More chapters of the story.'] as const;
 
 // Story and progress: two equal columns, stacked on phones.
 const twoColumns = 'grid grid-cols-[1fr_1fr] gap-20 py-28 compact:gap-10 phone:grid-cols-[1fr] phone:gap-6 phone:py-18';
@@ -59,11 +109,26 @@ const footerGroups = [
       ['/docs/privacy/', 'Privacy'],
     ],
   },
+  {
+    title: 'Developers',
+    label: 'Developer guide',
+    links: [
+      ['/docs/development/', 'Developer home'],
+      ['/docs/development/setup/', 'Setup'],
+      ['/docs/development/testing/', 'Testing & CI'],
+      ['https://github.com/MrDemonWolf/wolf-override', 'Source on GitHub'],
+    ],
+  },
 ] as const;
 
 const footerLink = 'inline-flex min-h-11 items-center text-muted';
 
+// Heading of the Playable now and Coming lists in the gameplay section.
+const listTitle = 'mb-4 font-heading text-[1.1rem] font-bold';
+
 export default function HomePage() {
+  // Read from apps/game/project.godot at build time (lib/version.ts), the same number the title screen shows.
+  const version = gameVersion();
   return (
     // header, main and footer are siblings so assistive tech sees three top-level landmarks (banner, main, contentinfo).
     // data-landing keeps the root dark as well (see the end of global.css).
@@ -106,15 +171,25 @@ export default function HomePage() {
             </h1>
             <p className="mb-4 text-[clamp(1.4rem,2.3vw,2rem)] leading-[1.35] phone:mb-[.8rem] phone:text-[1.3rem]">WOLF has a will of his own.</p>
             <p className="max-w-[38ch] leading-[1.75] text-[#cfdee4] phone:max-w-[42ch]">Explore THE DEN as the engineer. WOLF chooses whether to help; if he refuses, you can take the manual route.</p>
-            <div className="mt-8 flex flex-wrap gap-[.85rem] phone:mt-6 phone:gap-[.65rem]">
-              <a className={`${heroAction} border-accent bg-accent text-[#081521] hover-always:-translate-y-px hover-always:brightness-106 motion-reduce:hover-always:translate-y-0`} href="#gameplay">See gameplay <span aria-hidden="true">↓</span></a>
-              <Link className={`${heroAction} border-line-strong bg-surface text-text hover-always:border-accent hover-always:bg-[color-mix(in_srgb,var(--color-surface)_82%,var(--color-accent))]`} href={sourceBuildHref}>Get the source build <ArrowIcon /></Link>
-            </div>
-            <p className="mt-4 text-caption text-[#bdd0d9]">Source build available · No public release date</p>
+            <nav aria-label="Start here" className="mt-8 grid grid-cols-3 gap-3 compact:grid-cols-1 phone:mt-6 phone:grid-cols-1 phone:gap-2">
+              {audiences.map(({ href, kicker, title }) => (
+                <Link key={href} href={href} className={audienceLink}>
+                  <span className="text-caption text-muted">{kicker}</span>
+                  <strong className="flex items-center justify-between gap-2 font-heading">{title} <ArrowIcon /></strong>
+                </Link>
+              ))}
+            </nav>
+            <p className="mt-3 flex flex-wrap items-center gap-x-3 text-caption text-[#bdd0d9]">
+              <span>Source build available · No public release date</span>
+              <Link className="inline-flex min-h-11 items-center text-accent underline underline-offset-4" href="/docs/changelog/">Version {version}: what changed</Link>
+            </p>
           </div>
-          <div className="absolute right-8 bottom-6 left-8 flex justify-between gap-4 phone:static phone:flex-col phone:gap-[.2rem] phone:px-5 phone:pb-5">
-            <span className="hud-label text-muted">Side-view sci-fi horror / Narrative adventure</span>
-            <span className="hud-label text-muted">Provisional key art · Not a gameplay capture</span>
+          {/* Phones show only the art label, over the bottom of the art; the genre already heads the copy.
+              phone:top-[17.9rem] is tied to the phone art height phone:h-80 (20rem) on the img above: 20rem minus
+              the label's height (about 2.1rem) puts the label on the art's bottom edge. Change both together. */}
+          <div className="absolute right-8 bottom-6 left-8 flex justify-between gap-4 phone:top-[17.9rem] phone:right-5 phone:bottom-auto phone:left-5">
+            <span className="hud-label text-muted phone:hidden">Side-view sci-fi horror / Narrative adventure</span>
+            <span className="hud-label text-muted phone:rounded-control phone:bg-ink/80 phone:px-2 phone:py-1 phone:text-[.68rem] phone:tracking-[.06em]">Provisional key art · Not a gameplay capture</span>
           </div>
         </section>
         <section id="story" className={`${landingWidth} ${twoColumns} ${sectionAnchor}`} aria-labelledby="story-title">
@@ -134,17 +209,36 @@ export default function HomePage() {
             <h2 id="play-title" tabIndex={-1} className={sectionTitle}>Find a way forward. Together.</h2>
             <p className={sectionCopy}>The current source build includes a maintenance corridor, Records Access and the Service Junction. This is the opening of a larger story.</p>
           </div>
-          <figure className={`${card} mt-14 phone:mt-10`}>
-            {/* The link clips the image to the frame's top corners; the figure stays unclipped so the link's focus ring shows. */}
-            <a className="block overflow-hidden rounded-t-[calc(var(--radius-card)-1px)] hover-always:text-accent" href={corridorCapture1600.src} target="_blank" rel="noopener noreferrer">
-              <img className="w-full" src={corridorCapture960.src} srcSet={`${corridorCapture480.src} 480w, ${corridorCapture960.src} 960w, ${corridorCapture1600.src} 1600w`} sizes="(max-width: 700px) calc(100vw - 2rem), min(100vw - 4rem, 1200px)" alt="Gameplay frame at the start of the maintenance corridor: the engineer and WOLF stand by the purge display while the objective card reads CHECK THE BREAKER and a tutorial box lists the move and read controls." width={corridorCapture960.width} height={corridorCapture960.height} loading="lazy" decoding="async" />
-              <span className="sr-only">(full-size image, opens in a new tab)</span>
-            </a>
-            <figcaption className="flex flex-wrap justify-between gap-x-4 gap-y-2 px-5 py-4 text-caption text-muted phone:flex-col">
-              <strong className="text-text">Source build capture, October 12, 2026</strong>
-              <span>Provisional art and UI</span>
-            </figcaption>
-          </figure>
+          <div className="mt-14 grid grid-cols-2 gap-6 phone:mt-10 phone:grid-cols-1 phone:gap-4">
+            {captures.map((capture) => (
+              <figure key={capture.title} className={`${card} min-w-0`}>
+                {/* The link clips the image to the frame's top corners; the figure stays unclipped so the link's focus ring shows. */}
+                {/* Phones crop the 16:9 capture to 4:3 from the left edge: the objective HUD, the engineer, the entry door and WOLF all sit in the left of the frame, so a centred crop cut them off. */}
+                <a className="block overflow-hidden rounded-t-[calc(var(--radius-card)-1px)] hover-always:text-accent" href={capture.large.src} target="_blank" rel="noopener noreferrer">
+                  <img className="w-full phone:aspect-[4/3] phone:object-cover phone:object-left" src={capture.medium.src} srcSet={`${capture.small.src} 480w, ${capture.medium.src} 960w, ${capture.large.src} 1600w`} sizes="(max-width: 700px) calc(100vw - 2rem), min(50vw - 3rem, 600px)" alt={capture.alt} width={capture.medium.width} height={capture.medium.height} loading="lazy" decoding="async" />
+                  <span className="sr-only">(full-size image, opens in a new tab)</span>
+                </a>
+                <figcaption className="flex flex-wrap justify-between gap-x-4 gap-y-1 px-5 py-4 text-caption text-muted">
+                  <strong className="text-text">{capture.title}</strong>
+                  <span>Source build capture, October 16, 2026 · Provisional art and UI</span>
+                </figcaption>
+              </figure>
+            ))}
+          </div>
+          <div className="mt-10 grid grid-cols-[3fr_2fr] gap-6 phone:grid-cols-1 phone:gap-4">
+            <section className={`${card} p-6`} aria-labelledby="playable-title">
+              <h3 id="playable-title" className={listTitle}>Playable now</h3>
+              <ul className="flex list-disc flex-col gap-2 pl-5 leading-[1.6] text-muted marker:text-accent">
+                {playableNow.map((line) => <li key={line}>{line}</li>)}
+              </ul>
+            </section>
+            <section className={`${card} p-6`} aria-labelledby="coming-title">
+              <h3 id="coming-title" className={listTitle}>Coming</h3>
+              <ul className="flex list-disc flex-col gap-2 pl-5 leading-[1.6] text-muted marker:text-accent">
+                {comingNext.map((line) => <li key={line}>{line}</li>)}
+              </ul>
+            </section>
+          </div>
           <div className="mt-16 mb-6 grid grid-cols-3 gap-6 phone:mt-12 phone:grid-cols-[1fr] phone:gap-4">
             {features.map(([index, title, copy]) => (
               <article key={index} className={`${card} min-w-0 p-6`}>
@@ -165,7 +259,7 @@ export default function HomePage() {
           </div>
           <div className="flex flex-col justify-center gap-4">
             {[
-              ['/docs/changelog/', 'Development updates', 'Read the changelog'],
+              ['/docs/changelog/', `Development updates · version ${version}`, 'Read the changelog'],
               ['/docs/development/', 'For source players & contributors', 'Setup & build status'],
             ].map(([href, kicker, title]) => (
               <Link key={href} href={href} className={`${card} flex flex-col gap-[.65rem] px-[1.4rem] py-5 hover-always:text-accent`}>
@@ -176,7 +270,7 @@ export default function HomePage() {
           </div>
         </section>
       </main>
-      <footer className={`${landingWidth} grid grid-cols-[minmax(15rem,1.7fr)_repeat(3,minmax(8rem,1fr))] gap-x-8 gap-y-10 border-t border-t-line pt-14 pb-6 phone:grid-cols-2 phone:gap-x-5 phone:gap-y-8 tablet:grid-cols-3 tablet:gap-x-[1.4rem] tablet:gap-y-8`}>
+      <footer className={`${landingWidth} grid grid-cols-[minmax(15rem,1.7fr)_repeat(4,minmax(8rem,1fr))] gap-x-8 gap-y-10 border-t border-t-line pt-14 pb-6 phone:grid-cols-2 phone:gap-x-5 phone:gap-y-8 tablet:grid-cols-4 tablet:gap-x-[1.4rem] tablet:gap-y-8`}>
         <div className="menu:col-span-full">
           <BrandLockup />
           <p className="mt-4 max-w-[34ch] text-[.85rem] leading-[1.75] text-muted">Original concept, core story &amp; creative vision: Nathanial Henniges.<br />Developed by MrDemonWolf, Inc. with AI assistance.</p>
@@ -186,11 +280,13 @@ export default function HomePage() {
             {/* A label, not a heading: the nav's aria-label already names the group, and three H2s here
                 would add empty topics to the page outline search engines and screen readers read. */}
             <p className="mt-1 mb-[.65rem] font-heading text-[.76rem] leading-[1.4] font-bold tracking-[.1em] text-text uppercase">{group.title}</p>
-            {group.links.map(([href, label]) => (
-              <Link key={href} href={href} className={footerLink}>{label}</Link>
-            ))}
-            {group.title === 'Project' && (
-              <a href="https://github.com/MrDemonWolf/wolf-override" className={footerLink}>Source on GitHub <span aria-hidden="true">↗</span></a>
+            {group.links.map(([href, label]) =>
+              // Off-site links use a plain anchor and an arrow that says they leave the site.
+              href.startsWith('https://') ? (
+                <a key={href} href={href} className={footerLink}>{label}&nbsp;<span aria-hidden="true">↗</span></a>
+              ) : (
+                <Link key={href} href={href} className={footerLink}>{label}</Link>
+              ),
             )}
           </nav>
         ))}
