@@ -47,8 +47,14 @@ cp apps/game/assets/fonts/Roboto-OFL.txt apps/game/assets/fonts/Montserrat-OFL.t
 
 import_game "$godot" "$logs" "$limit"
 
+# Godot prints this, as a plain line rather than a WARNING, when an export needs ICU line-breaking data
+# (a Chinese, Japanese, Korean or Thai translation is registered) and the templates lack
+# icudt_godot.dat: it then packs the editor's own copy, which may not match the template's ICU version.
+icu_fallback='Using editor embedded text server data'
+
 # export_preset PRESET PATH LOG: a debug export that must finish cleanly. Godot exits 0 even when an
-# export "completed with warnings" (a failed macOS signature is only a warning), so the log decides.
+# export "completed with warnings" (a failed macOS signature is only a warning), so the log decides; the
+# ICU fallback above fails it too.
 export_preset() {
   local rc=0
   bounded "$limit" "$godot" --headless --path apps/game --export-debug "$1" "$2" > "$3" 2>&1 || rc=$?
@@ -56,9 +62,9 @@ export_preset() {
     echo "The $1 export did not finish within ${limit}s (see $3)" >&2
     return 1
   fi
-  if [ "$rc" -ne 0 ] || grep -qE "$godot_error_lines|completed with warnings|^WARNING:" "$3"; then
+  if [ "$rc" -ne 0 ] || grep -qE "$godot_error_lines|completed with warnings|^WARNING:|$icu_fallback" "$3"; then
     echo "The $1 export failed or reported problems (see $3):" >&2
-    grep -E "$godot_error_lines|completed with warnings|^WARNING:" "$3" >&2 || true
+    grep -E "$godot_error_lines|completed with warnings|^WARNING:|$icu_fallback" "$3" >&2 || true
     return 1
   fi
 }
