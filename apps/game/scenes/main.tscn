@@ -7,7 +7,7 @@
 [ext_resource type="Texture2D" path="res://assets/characters/eng-stand.png" id="5_rowan"]
 [ext_resource type="Texture2D" path="res://assets/title-corridor-key-art-provisional.png" id="6_title_art"]
 [ext_resource type="Texture2D" path="res://assets/props/corridor-seal-atlas.png" id="7_door"]
-[ext_resource type="Texture2D" path="res://assets/director-side-left-provisional.png" id="8_director"]
+[ext_resource type="Texture2D" path="res://assets/characters/director-stand.png" id="8_director"]
 [ext_resource type="Texture2D" path="res://assets/props/corridor-purge-display.png" id="9_purge_display"]
 [ext_resource type="Script" path="res://scripts/pause_overlay.gd" id="10_pause_overlay"]
 [ext_resource type="Script" path="res://scripts/game_settings.gd" id="11_settings"]
@@ -171,8 +171,8 @@ visible = false
 z_index = 2
 texture_filter = 4
 material = SubResource("SharpSpriteMaterial")
-position = Vector2(255, 410)
-scale = Vector2(0.188, 0.188)
+position = Vector2(256, 410)
+scale = Vector2(0.181818, 0.181818)
 texture = ExtResource("8_director")
 
 [node name="PurgeTerminalArt" type="Sprite2D" parent="."]
