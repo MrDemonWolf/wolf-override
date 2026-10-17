@@ -33,6 +33,7 @@ Changes merged after 0.15.0. They become the next version when it is cut.
 - Guide text lines stop at about 70 characters; tables, cards and pictures keep the full width.
 - Guide pages have one main landmark for screen readers instead of two.
 - The README follows the MrDemonWolf house layout: short status bullets, a pick-your-path table linking Play, Get the game and Develop, current features, the scripts from package.json and the main folders.
+- The landing page and every guide page end with "© 2026 WOLF OVERRIDE by MrDemonWolf, Inc." and a link to the commit the site was built from.
 
 -- Development --
 - The game's version lives in one place, apps/game/project.godot; the macOS and Windows test builds now take it from there instead of 0.0.0.

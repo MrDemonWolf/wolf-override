@@ -1,6 +1,8 @@
 import type { Metadata } from 'next';
 
 export const siteUrl = 'https://wolfoverride.mrdemonwolf.dev';
+/** The public source repository on GitHub: the game, this website and their history. */
+export const repoUrl = 'https://github.com/MrDemonWolf/wolf-override';
 export const siteDescription = 'A side-view sci-fi horror adventure by MrDemonWolf, Inc. Explore THE DEN with an independent robotic wolf, solve puzzles and make choices he remembers. In development.';
 
 /**

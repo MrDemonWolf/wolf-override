@@ -9,7 +9,8 @@ import recordsCapture1600 from './images/records-access-doors-capture-1600.webp'
 import junctionCapture480 from './images/service-junction-doors-capture-480.webp';
 import junctionCapture960 from './images/service-junction-doors-capture-960.webp';
 import junctionCapture1600 from './images/service-junction-doors-capture-1600.webp';
-import { pageMetadata, siteDescription } from '@/lib/seo';
+import SiteCopyright from './site-copyright';
+import { pageMetadata, repoUrl, siteDescription } from '@/lib/seo';
 import { homeStructuredData, JsonLd } from '@/lib/structured-data';
 import { gameVersion } from '@/lib/version';
 
@@ -116,7 +117,7 @@ const footerGroups = [
       ['/docs/development/', 'Developer home'],
       ['/docs/development/setup/', 'Setup'],
       ['/docs/development/testing/', 'Testing & CI'],
-      ['https://github.com/MrDemonWolf/wolf-override', 'Source on GitHub'],
+      [repoUrl, 'Source on GitHub'],
     ],
   },
 ] as const;
@@ -291,7 +292,7 @@ export default function HomePage() {
           </nav>
         ))}
         <div className="col-span-full flex justify-between gap-4 border-t border-t-line pt-5 text-[.78rem] text-muted phone:flex-col">
-          <span>© 2026 MrDemonWolf, Inc.</span>
+          <SiteCopyright />
           <span>Working title · Provisional art · No public release date</span>
         </div>
       </footer>

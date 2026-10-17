@@ -1,7 +1,7 @@
 import type { BreadcrumbItem } from 'fumadocs-core/breadcrumb';
 import { getBreadcrumbItems } from 'fumadocs-core/breadcrumb';
 import { plannedPlatforms } from '@/app/downloads';
-import { siteDescription, siteUrl } from '@/lib/seo';
+import { repoUrl, siteDescription, siteUrl } from '@/lib/seo';
 import { source } from '@/lib/source';
 
 /*
@@ -69,7 +69,7 @@ export function homeStructuredData(): JsonLdObject {
         creator: { '@id': ids.author },
         publisher: { '@id': ids.organization },
         // The public source repository, already linked from every guide page.
-        sameAs: ['https://github.com/MrDemonWolf/wolf-override'],
+        sameAs: [repoUrl],
       },
     ],
   };

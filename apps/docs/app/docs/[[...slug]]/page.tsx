@@ -6,6 +6,7 @@ import { createRelativeLink } from 'fumadocs-ui/mdx';
 import { getMDXComponents } from '@/mdx-components';
 import { markdownUrl, source } from '@/lib/source';
 import { pageMetadata } from '@/lib/seo';
+import SiteCopyright from '@/app/site-copyright';
 import { breadcrumbStructuredData, JsonLd } from '@/lib/structured-data';
 
 type PageProps = { params: Promise<{ slug?: string[] }> };
@@ -19,6 +20,18 @@ type PageProps = { params: Promise<{ slug?: string[] }> };
 const readingWidth = 'max-w-[70ch]';
 const bodyReadingWidth = '[&>:is(p,ul,ol,blockquote,h2,h3,h4)]:max-w-[70ch]';
 
+/**
+ * The copyright line under every guide page, below Fumadocs' previous and next page links (its
+ * footer slot renders `children` after them, inside the page's article). The same line as the
+ * landing page footer (site-copyright.tsx); a <footer> in an article is the article's footer, not
+ * a second contentinfo landmark.
+ */
+const guideFooter = (
+  <footer className="mt-6 border-t border-fd-border pt-5 text-sm text-fd-muted-foreground">
+    <SiteCopyright />
+  </footer>
+);
+
 export default async function Page({ params }: PageProps) {
   const { slug } = await params;
   const page = source.getPage(slug);
@@ -26,7 +39,7 @@ export default async function Page({ params }: PageProps) {
   const MDX = page.data.body;
 
   return (
-    <GuidePage toc={page.data.toc} full={page.data.full}>
+    <GuidePage toc={page.data.toc} full={page.data.full} footer={{ children: guideFooter }}>
       <JsonLd data={breadcrumbStructuredData(page.url)} />
       <DocsTitle id="main-content" tabIndex={-1}>{page.data.title}</DocsTitle>
       <DocsDescription className={readingWidth}>{page.data.description}</DocsDescription>
