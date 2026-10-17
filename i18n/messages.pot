@@ -25,6 +25,7 @@
 # res://scripts/main.gd
 # res://scripts/pause_overlay.gd
 # res://scripts/pressure_line.gd
+# res://scripts/prop_screen.gd
 # res://scripts/records_room.gd
 # res://scripts/room_depth.gd
 # res://scripts/seal_leaf.gd
@@ -75,7 +76,7 @@ msgid ""
 msgstr ""
 
 #: scenes/main.tscn
-#: scripts/main.gd:4405
+#: scripts/main.gd:4421
 msgid "PAUSE"
 msgstr ""
 
@@ -157,8 +158,8 @@ msgid ""
 "\n"
 "[color=#73DDF5]PROVISIONAL ART[/color]\n"
 "Created with ChatGPT Create and the Codex image generation tool.\n"
-"The characters are whole pieces painted over\n"
-"script-drawn shape guides (October 16, 2026).\n"
+"The characters and station props are whole pieces\n"
+"painted over script-drawn shape guides (October 16, 2026).\n"
 "Nathanial reviewed and approved each set.\n"
 "The WOLF OVERRIDE mark was redrawn from a generated concept.\n"
 "\n"
@@ -231,7 +232,7 @@ msgid "BACK TO TITLE"
 msgstr ""
 
 #: scenes/main.tscn
-#: scripts/main.gd:1846
+#: scripts/main.gd:1862
 msgid "PAUSE SCROLL"
 msgstr ""
 
@@ -346,70 +347,70 @@ msgid "Default controls restored."
 msgstr ""
 
 #: scripts/game_settings.gd:608
-#: scripts/main.gd:1974
+#: scripts/main.gd:1990
 msgid "Settings could not be saved."
 msgstr ""
 
-#: scripts/junction_room.gd:798
+#: scripts/junction_room.gd:806
 msgid "LINE"
 msgstr ""
 
-#: scripts/junction_room.gd:1458
+#: scripts/junction_room.gd:1449
 msgid "BREAKER USED"
 msgstr ""
 
-#: scripts/junction_room.gd:1460
+#: scripts/junction_room.gd:1451
 msgid "VALVE USED"
 msgstr ""
 
-#: scripts/junction_room.gd:1477
+#: scripts/junction_room.gd:1468
 msgid "EXIT OPEN"
 msgstr ""
 
-#: scripts/junction_room.gd:1481
+#: scripts/junction_room.gd:1472
 msgid "EXIT OPENING"
 msgstr ""
 
-#: scripts/junction_room.gd:1484
+#: scripts/junction_room.gd:1475
 msgid "EXIT READY"
 msgstr ""
 
-#: scripts/junction_room.gd:1487
+#: scripts/junction_room.gd:1478
 msgid "EXIT LOCKED"
 msgstr ""
 
-#: scripts/main.gd:1001
+#: scripts/main.gd:1017
 msgid "LINK UNAVAILABLE"
 msgstr ""
 
-#: scripts/main.gd:1881
+#: scripts/main.gd:1897
 msgid "RESUME SCROLL"
 msgstr ""
 
-#: scripts/main.gd:1914
+#: scripts/main.gd:1930
 msgid "30 FPS"
 msgstr ""
 
-#: scripts/main.gd:1915
+#: scripts/main.gd:1931
 msgid "60 FPS"
 msgstr ""
 
-#: scripts/main.gd:1916
+#: scripts/main.gd:1932
 msgid "UNCAPPED"
 msgstr ""
 
-#: scripts/main.gd:1917
+#: scripts/main.gd:1933
 msgid "90 FPS"
 msgstr ""
 
-#: scripts/main.gd:1918
+#: scripts/main.gd:1934
 msgid "120 FPS"
 msgstr ""
 
-#: scripts/main.gd:1919
+#: scripts/main.gd:1935
 msgid "144 FPS"
 msgstr ""
 
-#: scripts/main.gd:1936
+#: scripts/main.gd:1952
 msgid "TAP RESUME TO RETURN"
 msgstr ""
