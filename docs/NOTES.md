@@ -10,6 +10,7 @@ Every moved file is still in git history at commit `1cf8d73`: open one with `git
 - [Inbox (temporary notes)](https://app.notion.com/p/3fbd61481c7b81799e00c9bc7b2c61a0): quick notes waiting to be sorted
 - [Migration record (2026-10-16)](https://app.notion.com/p/3fbd61481c7b81569636d2063f0acf00): the migration plan and the map from every moved path to its Notion page
 - [Twitch: category, Drops and integration (2026-10-16)](https://app.notion.com/p/3fbd61481c7b818c9af4dcfb19b031bd): how to get a Twitch category, Twitch Drops and Twitch integration ideas
+- [Localization (2026-10-16)](https://app.notion.com/p/3fbd61481c7b81cbbcd5cf9cc9ea0c48): the 10-language plan, design, translation pipeline and research, with its [decisions](https://app.notion.com/p/3fbd61481c7b814b8942ebf6e427926c) (adopted October 16, `docs/decisions.md` L10N-01); the tools, data, evidence and prototype stay on the `codex/localization-research` branch at `520cad1`, and the build starts with `apps/game/scripts/i18n.gd` and `apps/game/i18n/languages.json`
 
 ## Asset sources
 
