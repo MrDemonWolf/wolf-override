@@ -18,7 +18,9 @@ if [ "${1:-}" = "--suite" ]; then
   name="$2" logs="$3" work="$4" rc=0 started="$SECONDS"
   isolate_godot_home "$work/home-$name"
   cd "$root"
-  bounded "$limit" "$godot" --headless --path apps/game --script "res://tests/$name.gd" > "$logs/$name.log" 2>&1 || rc=$?
+  # --language en pins every suite to English whatever the OS locale is: the suites assert English, and
+  # I18n.saved() follows the start-up locale when nothing is saved (tests/i18n_test.gd checks the pin).
+  bounded "$limit" "$godot" --headless --language en --path apps/game --script "res://tests/$name.gd" > "$logs/$name.log" 2>&1 || rc=$?
   if [ "$rc" -eq 124 ]; then
     echo "FAIL  $name (hung: still running after ${limit}s and was stopped; see $logs/$name.log)" > "$logs/$name.result"
   elif [ "$rc" -ne 0 ] || grep -qE "$godot_error_lines" "$logs/$name.log"; then
@@ -26,7 +28,7 @@ if [ "${1:-}" = "--suite" ]; then
   elif grep -q 'instances were leaked at exit' "$logs/$name.log"; then
     # A suite also fails if it leaks objects at exit, so a leak in the game's own nodes or audio shows up.
     # Run it once more with --verbose so the log names the leaked objects; the suite still fails.
-    bounded "$limit" "$godot" --headless --verbose --path apps/game --script "res://tests/$name.gd" > "$logs/$name.verbose.log" 2>&1 || true
+    bounded "$limit" "$godot" --headless --verbose --language en --path apps/game --script "res://tests/$name.gd" > "$logs/$name.verbose.log" 2>&1 || true
     echo "FAIL  $name (leaked objects at exit; see $logs/$name.log, and $logs/$name.verbose.log for their names)" > "$logs/$name.result"
   else
     echo "pass  $name ($((SECONDS - started))s)" > "$logs/$name.result"
