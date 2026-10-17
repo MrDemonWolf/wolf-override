@@ -4,9 +4,10 @@ const GAME_SCENE: PackedScene = preload("res://scenes/main.tscn")
 const State = preload("res://scripts/m0_state.gd")
 
 var failures: int = 0
-## The MANUAL BYPASS wheel's rim (tube centre line) in its atlas region, measured from the art's
-## alpha and luma profile: 37.5 atlas px, so 9.375 world px at BypassHandle.WHEEL_SCALE.
-const WHEEL_RIM_ATLAS_RADIUS: float = 37.5
+## The MANUAL BYPASS wheel's rim (tube centre line) on the handwheel piece, measured from its alpha
+## along eight spokes about BypassHandle.HANDWHEEL_HUB: 88.5 piece px, so 9.65 world px at
+## BypassHandle.WHEEL_SCALE.
+const WHEEL_RIM_PIECE_RADIUS: float = 88.5
 ## The crank pose's grips (clock degrees, clockwise from 12): frame A holds the rim at 8 o'clock
 ## (the far glove) and 10 o'clock (the near glove); frame B has turned both an eighth of a turn with
 ## the wheel, to about half past 9 and half past 11.
@@ -698,7 +699,7 @@ func _sample_crank_grip(game: Node2D, human: M0Actor, handle: BypassHandle, grip
 ## the grip point, taken back to the world through the sprite's own transform.
 func _sample_glove(sprite: Sprite2D, handle: BypassHandle, clock_deg: float, grip: Dictionary) -> void:
 	var hub: Vector2 = handle.global_position + BypassHandle.WHEEL_OFFSET
-	var rim: float = WHEEL_RIM_ATLAS_RADIUS * BypassHandle.WHEEL_SCALE
+	var rim: float = WHEEL_RIM_PIECE_RADIUS * BypassHandle.WHEEL_SCALE
 	var clock: float = deg_to_rad(clock_deg)
 	var target: Vector2 = hub + rim * Vector2(sin(clock), -cos(clock))
 	var to_world: Transform2D = sprite.get_global_transform()
