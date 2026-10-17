@@ -1,7 +1,0 @@
-# Settings for wlc, Weblate's command-line client (https://docs.weblate.org/en/latest/wlc.html): run
-# `wlc` here to list, pull or upload the game's translations on Hosted Weblate. The project and component
-# slugs are the ones i18n/README.md ("Weblate") creates them with. An API key goes in your own
-# ~/.config/weblate, never here.
-[weblate]
-url = https://hosted.weblate.org/api/
-translation = wolf-override/game
