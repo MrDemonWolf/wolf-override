@@ -77,8 +77,8 @@ export function homeStructuredData(): JsonLdObject {
  * BreadcrumbList for a guide page: Home > guide root > section > page, from the Fumadocs page
  * tree so renamed sections follow automatically. `pageUrl` is the page's `page.url` (no trailing
  * slash). Section folders without their own page have no URL and are skipped (Google needs an
- * `item` URL on crumbs), and a section index page is listed once. Returns at least two items
- * (Google's minimum) for every page but the guide index, which is Home > guide root.
+ * `item` URL on crumbs), and a section index page is listed once. Always at least two items
+ * (Google's minimum): the guide index itself is Home > guide root.
  */
 export function breadcrumbStructuredData(pageUrl: string): JsonLdObject {
   const tree = source.getPageTree();
