@@ -1,0 +1,84 @@
+{
+ "_about": "The one per-language table. The game's I18n module (apps/game/scripts/i18n.gd) reads it once at start into I18n.LANGUAGES, and the i18n tools (i18n_tool.py, moving to scripts/i18n/ in PR L2) read the same file, so the game, the picker and the gates never keep two lists (research: codex/localization-research at 520cad1, docs/research-2026-10/localization/DESIGN.md and PLAN.md, PR L1). The export carries it (both presets export all resources, .json files included; measured with --export-pack). Nothing else lists these facts. 'languages' is keyed by Godot locale code, in the picker's order (English, then the Latin-script names A to Z, then Cyrillic, then CJK; LANGUAGES.md, 'The language picker'). Game fields: 'name' is the picker name in the language itself, never translated; 'enabled' offers the language (in the picker and to the OS-locale resolver; only English until a language's PR turns it on); 'review' is 'machine' until native review stamps it, then 'reviewed' (D2, D8; the source language has none); 'machine_tag' is the short 'machine translation' tag shown in the language itself while it is unreviewed (PIPELINE.md, 'Honest labelling'; null where the research gives none yet); 'fallback_font' is the bundled CJK subset I18n chains behind the game's fonts only while that language is on (PR L4 adds the files; DESIGN.md, 'Fonts'), null for the languages the game's own Roboto and Montserrat draw; 'reading_cps' is the reading speed in characters a second (Netflix's subtitle limits for en 20, es 17, ja 4, ko 12, zh-Hans 9, PIPELINE.md sources; null where not yet sourced, and the dialogue boxes keep English's speed for it); 'row_characters' is the most characters a dialogue row holds (42, DialogueBoxes.MAX_ROW_CHARACTERS) or null where rows run to the column width (CJK, DESIGN.md 'Per-script row limits'). The dialogue boxes start reading the last two in PR L7d. Tool fields: 'glossary' is the language's key in the glossary and style guides (i18n/glossary.json and i18n/style/, PR L5); 'script' picks the script guard; 'family' is the base language, and every file of a family with two or more files must be complete (Godot looks a message up in every loaded file of the same language, so a gap in zh_Hant shows zh_Hans text: DESIGN.md, 'A missing line falls back to its sibling file'); 'plural_forms' is the gettext header rule (CLDR, the same as Godot's core/string/locales.h); 'gender' names a row of 'gender_rules'; 'name_case' turns on the check that no case ending is glued to the name slot (Slavic languages decline names). A gender rule holds these case-insensitive regular expressions: 'forms' matches one word that shows a person's grammatical gender (past tense, agreeing adjective or participle, job noun), read across a whole clause; 'near_forms' (optional) one agreeing word too common as a modifier of things to read across a clause (Russian full adjectives, French -ie/-ise/-euse/-eux participles and adjectives), read only within the window around the name slot or a second-person pronoun; 'you' a second-person pronoun, 'first_person' a first-person subject pronoun (a clause with one is about the speaker, WOLF), 'first_forms' (optional) one word that is first person by its ending alone (Polish -łem/-łam: WOLF's own verbs, skipped unless the engineer speaks), 'pronouns' a gendered third-person pronoun (searched in running text, so CJK rules need no spaces); 'person_words' (optional) a gendered noun or honorific for a person (女の子, 小姐, 언니), searched in running text on any line where the engineer appears. A '(?!(?:...)$)' list at the head of a pattern names common nouns that end like a gendered form (puerta, стена, strona). 'extends' copies every field the row does not set from another row. Patterns are heuristics: a flag costs a look, a miss is caught by native review (PIPELINE.md, 'The engineer is never gendered').",
+ "languages": {
+  "en": {"name": "English", "enabled": true, "fallback_font": null, "reading_cps": 20, "row_characters": 42, "source": true, "glossary": "en", "script": "latin", "family": "en", "plural_forms": "nplurals=2; plural=(n != 1);"},
+  "de": {"name": "Deutsch", "enabled": false, "review": "machine", "machine_tag": "maschinelle Übersetzung", "fallback_font": null, "reading_cps": null, "row_characters": 42, "glossary": "de", "script": "latin", "family": "de", "plural_forms": "nplurals=2; plural=(n != 1);", "gender": "german"},
+  "es_ES": {"name": "Español (España)", "enabled": false, "review": "machine", "machine_tag": "traducción automática", "fallback_font": null, "reading_cps": 17, "row_characters": 42, "glossary": "es-ES", "script": "latin", "family": "es", "plural_forms": "nplurals=2; plural=(n != 1);", "gender": "spanish"},
+  "es": {"name": "Español (Latinoamérica)", "enabled": false, "review": "machine", "machine_tag": "traducción automática", "fallback_font": null, "reading_cps": 17, "row_characters": 42, "glossary": "es-419", "script": "latin", "family": "es", "plural_forms": "nplurals=2; plural=(n != 1);", "gender": "spanish"},
+  "fr": {"name": "Français", "enabled": false, "review": "machine", "machine_tag": "traduction automatique", "fallback_font": null, "reading_cps": null, "row_characters": 42, "glossary": "fr", "script": "latin", "family": "fr", "plural_forms": "nplurals=2; plural=(n > 1);", "gender": "french"},
+  "it": {"name": "Italiano", "enabled": false, "review": "machine", "machine_tag": null, "fallback_font": null, "reading_cps": null, "row_characters": 42, "glossary": "it", "script": "latin", "family": "it", "plural_forms": "nplurals=2; plural=(n != 1);", "gender": "italian"},
+  "pl": {"name": "Polski", "enabled": false, "review": "machine", "machine_tag": "tłumaczenie maszynowe", "fallback_font": null, "reading_cps": null, "row_characters": 42, "glossary": "pl", "script": "latin", "family": "pl", "plural_forms": "nplurals=3; plural=(n==1 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);", "gender": "polish", "name_case": true},
+  "pt_BR": {"name": "Português (Brasil)", "enabled": false, "review": "machine", "machine_tag": "tradução automática", "fallback_font": null, "reading_cps": null, "row_characters": 42, "glossary": "pt-BR", "script": "latin", "family": "pt", "plural_forms": "nplurals=2; plural=(n > 1);", "gender": "portuguese"},
+  "ru": {"name": "Русский", "enabled": false, "review": "machine", "machine_tag": "машинный перевод", "fallback_font": null, "reading_cps": null, "row_characters": 42, "glossary": "ru", "script": "cyrillic", "family": "ru", "plural_forms": "nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);", "gender": "russian", "name_case": true},
+  "uk": {"name": "Українська", "enabled": false, "review": "machine", "machine_tag": null, "fallback_font": null, "reading_cps": null, "row_characters": 42, "glossary": "uk", "script": "cyrillic", "family": "uk", "plural_forms": "nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);", "gender": "ukrainian", "name_case": true},
+  "ja": {"name": "日本語", "enabled": false, "review": "machine", "machine_tag": "機械翻訳", "fallback_font": "res://assets/fonts/NotoSansJP-Subset.otf", "reading_cps": 4, "row_characters": null, "glossary": "ja", "script": "cjk", "family": "ja", "plural_forms": "nplurals=1; plural=0;", "gender": "japanese"},
+  "ko": {"name": "한국어", "enabled": false, "review": "machine", "machine_tag": "기계 번역", "fallback_font": "res://assets/fonts/NotoSansKR-Subset.otf", "reading_cps": 12, "row_characters": null, "glossary": "ko", "script": "cjk", "family": "ko", "plural_forms": "nplurals=1; plural=0;", "gender": "korean"},
+  "zh_Hans": {"name": "简体中文", "enabled": false, "review": "machine", "machine_tag": "机器翻译", "fallback_font": "res://assets/fonts/NotoSansSC-Subset.otf", "reading_cps": 9, "row_characters": null, "glossary": "zh-Hans", "script": "cjk", "family": "zh", "plural_forms": "nplurals=1; plural=0;", "gender": "chinese"},
+  "zh_Hant": {"name": "繁體中文", "enabled": false, "review": "machine", "machine_tag": "機器翻譯", "fallback_font": "res://assets/fonts/NotoSansTC-Subset.otf", "reading_cps": null, "row_characters": null, "glossary": "zh-Hant", "script": "cjk", "family": "zh", "plural_forms": "nplurals=1; plural=0;", "gender": "chinese"}
+ },
+ "gender_rules": {
+  "russian": {
+   "forms": "^(?:[а-яёіїєґ'ʼ]+(?:л|ла|лся|лась)|сам[аи]?|одна|один|готова?|должна|должен|рада?|жива?|цела?|ранена?|прав[аы]?|уверена?|одета?|убита?|занята?|спасена|спасён|спасен|(?!(?:стена|смена|сцена|цена|замена|арена|вена|измена|пена|сирена|антена)$)[а-яё]+ена|(?!(?:защита|орбита|плита|элита)$)[а-яё]+(?:ита|ыта|ята)|инженер(?:ка|ки|ке|ку|кой|а|у|ом|е)?|техник|техничк[а-я]*|механик|механичк[а-я]*|сотрудниц[а-я]*|напарниц[а-я]*)$",
+   "near_forms": "^[а-яё]+(?:ая|яя|ый|ий)$",
+   "you": "\\b(?:ты|тебя|тебе|тобой|тобою)\\b",
+   "first_person": "\\bя\\b",
+   "pronouns": "\\b(?:он|она|его|её|ее|ему|ей|ним|ней|нём|нем|него|неё|нее|нему|нею)\\b"
+  },
+  "ukrainian": {
+   "extends": "russian",
+   "you": "\\b(?:ти|тебе|тобі|тобою)\\b",
+   "first_person": "\\bя\\b",
+   "pronouns": "\\b(?:він|вона|його|її|йому|їй|ним|нею|нього|неї)\\b"
+  },
+  "polish": {
+   "forms": "^(?:\\w+(?:ł|ła|łem|łam|łeś|łaś|łby|łaby|łbyś|łabyś)|sam[a]?|gotowa|gotów|jedna|jeden|pewn[ay]|szczęśliw[ay]|rann[ay]|(?!(?:strona|strony|ochrona|ochrony|zasłona|korona|zona|płyta|płyty|elita|kita)$)\\w+(?:on|ęt|yt|it|wan)[ay]|inżynier(?:ka|ki|ce|kę|ką)?|technik|techniczk\\w*|mechanik|mechaniczk\\w*)$",
+   "you": "\\b(?:ty|ciebie|cię|tobie|ci|tobą)\\b",
+   "first_person": "\\bja\\b",
+   "first_forms": "^\\w+(?:łem|łam|łbym|łabym)$",
+   "pronouns": "\\b(?:on|ona|jego|jej|go|ją|mu|niej|nim|niego|nią|niemu)\\b"
+  },
+  "spanish": {
+   "forms": "^(?!(?:cada|nada|vida|salida|partida|entrada|llegada|puerta|puertas|puerto|alerta|alertas|cierto|cierta|descubierto)$)(?:\\w+(?:ad|id|ert)[oa]s?|sol[oa]s?|list[oa]s?|segur[oa]s?|viv[oa]s?|nuev[oa]s?|content[oa]s?|quiet[oa]s?|ingenier[oa]s?|técnic[oa]s?|mecánic[oa]s?)$",
+   "you": "\\b(?:tú|te|ti|contigo|usted)\\b",
+   "first_person": "\\byo\\b",
+   "pronouns": "\\b(?:él|ella)\\b"
+  },
+  "portuguese": {
+   "forms": "^(?!(?:cada|nada|vida|partida|entrada|chegada|escada|escadas|estrada|jogada|porta|portas|alerta|alertas)$)(?:\\w+(?:ad|id|ert)[oa]s?|mort[oa]s?|viv[oa]s?|sozinh[oa]s?|pront[oa]s?|content[oa]s?|quiet[oa]s?|engenheir[oa]s?|técnic[oa]s?|mecânic[oa]s?)$",
+   "you": "\\b(?:você|tu|te|ti|contigo)\\b",
+   "first_person": "\\beu\\b",
+   "pronouns": "\\b(?:ele|ela|dele|dela)\\b"
+  },
+  "french": {
+   "forms": "^(?:\\w+ée?s?|seule?s?|prête?s?|ingénieure?s?)$",
+   "near_forms": "^(?!(?:porte|portes|sorte|sortes|vie|vies|envie|batterie|batteries|galerie|série|séries|industrie|chemise|valise|crise|brise|archive|archives|directive|directives|rive|antenne|antennes|deux|yeux|jeux|lieux|feux|mieux|eux|ceux|peux|veux|motif|motifs|objectif|objectifs|dispositif|dispositifs)$)(?:\\w+(?:rti|ni|ssi|ri)es?|\\w+(?:is|ort|ert|aint|eint|uit)es?|\\w+(?:euse|ive|enne|ière)s?|\\w+(?:eux|if|ien|ier)|mort|assis|sorti|parti|venu|perdu)$",
+   "you": "\\b(?:tu|te|toi|vous)\\b|\\bt'",
+   "first_person": "\\bje\\b|\\bj'",
+   "pronouns": "\\b(?:il|elle)\\b"
+  },
+  "italian": {
+   "forms": "^(?!(?:cosa|cose|rosa)$)(?:\\w+(?:at|it|ut|os)[oa]|sol[oa]|pront[oa]|stanc[oa]|stanchi|stanche|mort[oa]|viv[oa]|sicur[oa]|svegli[oa]|content[oa]|tranquill[oa]|ingegner[ea]|tecnic[oa]|meccanic[oa])$",
+   "you": "\\b(?:tu|te|ti)\\b",
+   "first_person": "\\bio\\b",
+   "pronouns": "\\b(?:lui|lei)\\b"
+  },
+  "german": {
+   "forms": "^(?:\\w*(?:ingenieur|techniker|mechaniker)(?:in|innen)?|\\w+erin(?:nen)?|\\w*kollegin(?:nen)?)$",
+   "you": "\\b(?:du|dich|dir)\\b",
+   "first_person": "\\bich\\b",
+   "pronouns": "\\b(?:er|sie|ihn|ihm)\\b"
+  },
+  "japanese": {
+   "pronouns": "彼女|彼(?!ら)",
+   "person_words": "女の子|男の子|少女|少年|お嬢|女性|男性|ちゃん(?!と)|くん|お姉|お兄|姉さん|兄さん"
+  },
+  "korean": {
+   "pronouns": "그녀|(?:^|\\s)그(?:는|가|의|를|에게)(?=\\s|$)",
+   "person_words": "아가씨|소녀|소년|여자|남자|언니|누나|오빠|아저씨|아줌마|부인"
+  },
+  "chinese": {
+   "pronouns": "她|他(?!们|們)",
+   "person_words": "小姐|女士|姑娘|女孩|男孩|小伙子|小夥子|先生|女人|男人|姐姐|妹妹|哥哥|弟弟"
+  }
+ }
+}
