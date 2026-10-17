@@ -648,14 +648,35 @@ static func door_body(parent: Node, body_name: String, center: Vector2, size: Ve
 	return shape
 
 
-## A station prop cut to [param region] of its own image (its painted outline, so the floor
-## reflection mirrors from its real base), [param prop_scale]d, centred on [param center_x] with its
-## base on [param base_y].
-static func make_prop(prop_name: String, texture: Texture2D, region: Rect2, prop_scale: float, center_x: float, base_y: float = FLOOR_Y) -> Sprite2D:
+## A station prop drawn whole from its own piece (each piece is cut to its painted outline, so the
+## floor reflection mirrors from its real base), [param prop_scale]d (world px per piece px: 1 / the
+## piece's density, or its real-size scale), centred on [param center_x] with its base on [param base_y]
+## (world px). The sprite keeps a region of the whole texture, so prop_point and prop_rect read every
+## prop the same way.
+static func make_prop(prop_name: String, texture: Texture2D, prop_scale: float, center_x: float, base_y: float = FLOOR_Y) -> Sprite2D:
+	var region: Rect2 = Rect2(Vector2.ZERO, texture.get_size())
 	var sprite: Sprite2D = cut(texture, region, prop_scale, prop_name)
 	sprite.centered = true
 	sprite.position = Vector2(center_x, base_y - region.size.y * prop_scale * 0.5)
 	return sprite
+
+
+## Where [param source] (a pixel of [param prop]'s piece, in piece px) is in the prop's parent's space,
+## for a centred, unrotated prop sprite (make_prop's, or a scene's own Sprite2D with or without a region).
+static func prop_point(prop: Sprite2D, source: Vector2) -> Vector2:
+	var region: Rect2 = prop.region_rect if prop.region_enabled else Rect2(Vector2.ZERO, prop.texture.get_size())
+	return prop.position + (source - region.get_center()) * prop.scale
+
+
+## [param source] (a rectangle of [param prop]'s piece, piece px) in the prop's parent's space.
+static func prop_rect(prop: Sprite2D, source: Rect2) -> Rect2:
+	return Rect2(prop_point(prop, source.position), source.size * prop.scale)
+
+
+## The whole of [param prop]'s drawn piece in its parent's space (its painted outline's box).
+static func prop_bounds(prop: Sprite2D) -> Rect2:
+	var region: Rect2 = prop.region_rect if prop.region_enabled else Rect2(Vector2.ZERO, prop.texture.get_size())
+	return prop_rect(prop, region)
 
 
 ## An additive radial glow (the shared FxKit texture and blend); also used by rooms for their station
