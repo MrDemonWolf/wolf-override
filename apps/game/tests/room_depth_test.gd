@@ -134,20 +134,21 @@ func _check_coverage(label: String, depth: RoomDepth, view: Rect2) -> void:
 		_expect(_global_rect(right_edge).end.x > view.end.x, "%s: the right near strip's outer edge is off screen" % label)
 
 
-## The engineer, WOLF and the Director use art downscaled from the masters in art-source/characters,
-## drawn at the masters' world size (1536 x 0.047 and 1015 x 0.0733 world px tall), sampled through
-## the shared sharp_sprite material; each floor reflection samples with the same mip bias.
+## The engineer, WOLF and the Director are whole pieces from assets/characters, each drawn at its
+## world height (the engineer at the pieces' own 1/8, the Director at his own 1/5.5, WOLF at
+## Main.WOLF_ART_SCALE, the size he was drawn before the repaint), sampled through the shared
+## sharp_sprite material; each floor reflection samples with the same mip bias.
 func _check_characters(game: Node2D) -> void:
 	var characters: Dictionary = {
-		"engineer": [game.get_node("Human/BodySprite"), Vector2i(256, 384), 1536.0 * 0.047],
-		"WOLF": [game.get_node("Wolf/BodySprite"), Vector2i(761, 406), 1015.0 * 0.0733],
-		"Director": [game.get_node("IntroDirector"), Vector2i(256, 384), 1536.0 * 0.047],
+		"engineer": [game.get_node("Human/BodySprite"), Vector2i(217, 562), 562.0 / 8.0],
+		"WOLF": [game.get_node("Wolf/BodySprite"), Vector2i(1028, 549), 549.0 * Main.WOLF_ART_SCALE],
+		"Director": [game.get_node("IntroDirector"), Vector2i(114, 391), 391.0 / 5.5],
 	}
 	var shared: Material = null
 	for label: String in characters:
 		var sprite: Sprite2D = characters[label][0]
 		var shader_material: ShaderMaterial = sprite.material as ShaderMaterial
-		_expect(Vector2i(sprite.texture.get_size()) == characters[label][1], "the %s texture is the downscaled %s (got %s)" % [label, characters[label][1], sprite.texture.get_size()])
+		_expect(Vector2i(sprite.texture.get_size()) == characters[label][1], "the %s texture is its whole piece, %s (got %s)" % [label, characters[label][1], sprite.texture.get_size()])
 		_expect(absf(sprite.texture.get_height() * sprite.scale.y - float(characters[label][2])) < 0.01, "the %s keeps its world height (%.2f px)" % [label, sprite.texture.get_height() * sprite.scale.y])
 		_expect(sprite.texture_filter == CanvasItem.TEXTURE_FILTER_LINEAR_WITH_MIPMAPS and sprite.texture.get_image().has_mipmaps(), "the %s samples a mipmapped texture" % label)
 		_expect(shader_material != null and shader_material.shader.resource_path == "res://assets/shaders/sharp_sprite.gdshader" and is_equal_approx(FloorReflection.lod_bias_of(sprite), -0.5), "the %s draws through the sharp sprite material at a -0.5 mip bias" % label)
