@@ -1,0 +1,78 @@
+---
+title: Accessibility
+description: Every accessibility option in the source game in one place, what it does and where to find it.
+---
+
+**What this page is for:** find what you need, then the setting that helps and where it is.
+
+## Quick list
+
+| If you need… | Use this | Where |
+| --- | --- | --- |
+| Less shake, flashing and flicker | **REDUCED MOTION** | Settings → Display |
+| Bigger text | **TEXT SIZE**, 100% to 200% | Settings → Display |
+| No holding buttons down | **TOGGLE HOLDS** | Settings → Controls |
+| Different keys or buttons | Rebind an action | Settings → Controls |
+| A stick that doesn't drift | **Stick deadzone** | Settings → Controls |
+| Quieter or no sound | **Master** and **Effects** sliders | Settings → Audio |
+| Time to think | Nothing to change: there are no timers on choices | — |
+
+- **Open Settings** from the title screen or from Pause.
+- **Every setting is saved** and applies at once.
+- **Details of each setting:** [Settings](/docs/controls/settings/).
+
+## Reduced motion
+
+Turn on **REDUCED MOTION** in Settings → Display. It changes:
+
+- **Camera:** no camera shake and no hit-stop (the short freeze on a hit).
+- **Screen flashes:** shorter.
+- **Knockdowns:** the engineer is shown lying on the floor at once, instead of falling. The thud, red wash and fade stay.
+- **Service Junction door:** its charged seam holds steady instead of strobing. Its lamp stays steady red.
+- **Ceiling lamps:** their flicker becomes one gentler dip.
+- **Corridor beacons:** the flashing red lamps stay lit and steady.
+- **Starting logo:** the mascot doesn't hop and the loading bar doesn't sweep.
+
+Sounds and controller rumble stay the same.
+
+## Text and reading
+
+- **TEXT SIZE** enlarges the dialogue, hints, cards, the tutorial prompt, the answer buttons and station names. Menus keep their size.
+- **Each dialogue box stays up long enough to read.** The last one stays until you move on.
+- **Want it faster?** In the opening, the closing scene and at a station that says **continue**, press interact for the next line.
+- **Questions have no timer.** They stay up until you answer.
+- **The knockdown screen waits** for you to press **RETRY**. It never moves on by itself.
+
+## Controls
+
+- **One button set.** Every room uses move, interact, two answers and pause. No new buttons appear later.
+- **TOGGLE HOLDS** turns every hold into press once to start, press again to stop. See [Hold to crank](/docs/controls/input/#toggle-holds).
+- **Rebinding** works for Move, Interact, both answers and Pause on keyboard and controller. See [Rebind an action](/docs/controls/settings/#rebind-an-action).
+- **Touch builds** put the two answers side by side at the bottom, within thumb reach.
+
+## Colour and light
+
+- **The sentry's beam** has a pale line down its middle and dashed edges. It stays visible to players who see red poorly.
+- **That beam was checked** in protanopia and deuteranopia simulations, not with players.
+
+<Callout title="Flashing: an estimate, not a measurement">
+  The Service Junction's blast and fuse were checked on rendered frames against WCAG's general-flash threshold. Both stayed under it, with Reduced Motion on and off. This is an estimate from rendered images, not a measurement on a real display.
+</Callout>
+
+<Details>
+<Summary>The flash estimate in numbers</Summary>
+
+- 300 rendered frames at 60 frames a second, from the lit fuse through the knockdown.
+- At most about 12% of the worst-placed 10-degree patch flashed more than three times a second at the blast (the limit is 25%).
+- About 2.5% while the fuse burns, with no red flash.
+- The corridor's beacons flash 80 to 96 times a minute, about 1.3 to 1.6 times a second.
+
+</Details>
+
+## What has not been tested
+
+- **These settings were checked** by automated tests and rendered stills, not by players.
+- **No complete route** has been played by hand yet.
+- **Controllers and physical touch devices** have not been playtested.
+
+Found a barrier? [Report it](/docs/controls/troubleshooting/#report-a-bug). It helps.

@@ -1,13 +1,19 @@
 ---
 title: Maintenance corridor
-description: Optional step-by-step help for the breaker, coolant relay, and safe point.
+description: Step-by-step help for the breaker, the coolant relay and the safe point in the first room. Contains puzzle solutions.
 ---
 
 import corridor480 from '../../../app/images/corridor-start-capture-480.webp';
 import corridor960 from '../../../app/images/corridor-start-capture-960.webp';
 import corridor1600 from '../../../app/images/corridor-start-capture-1600.webp';
 
-**Puzzle solutions for the first source room follow.** For a spoiler-light introduction, use [Start here](/docs/).
+<Callout type="warn" title="Spoilers: puzzle solutions for the first room">
+  For a spoiler-free start, read [First steps](/docs/controls/first-steps/) instead.
+</Callout>
+
+**What this page is for:** how to get through the first room, step by step.
+
+**Route:** Breaker → Coolant relay → Safe point.
 
 <Screenshot
   image={corridor960}
@@ -19,32 +25,107 @@ import corridor1600 from '../../../app/images/corridor-start-capture-1600.webp';
 
 ## 1. Read the corridor
 
-After the opening, a short card names the engineer and a prompt shows how to move; you can move straight away, and your first step fades the card before the opening lines begin. Those lines come as short boxes one after another, each held for a reading time set by its length: why the engineer trusts WOLF, then WOLF and the engineer. Move the engineer with **A/D** or the arrow keys. An interaction prompt appears near a station. The engineer starts beside the red purge display at the far left. Reading it with **E** is optional context and is not needed to open the door; WOLF sums it up when you walk past (or at the breaker, if you get there before you have had time to read the opening lines; the hint then offers **continue**, and interacting goes on through his lines to his question), so you can head straight right to the breaker. If you stop with the engineer over a machine, they sidestep out beside it on their own; any move takes over at once.
+**Do this:**
 
-These are default keys. If you changed bindings, use the inputs shown by the game. See [Controls](/docs/controls/input/).
+1. Move with **A / D** or the arrow keys. Your first step fades the name card.
+2. Optional: press **E** at the red purge display on the far left to read it.
+3. Head right toward the breaker.
+
+- **The opening lines** play as short boxes while you walk.
+- **You can skip the display.** WOLF sums it up when you walk past.
+- **Keys are defaults.** If you rebound them, use what the game shows. See [Controls](/docs/controls/input/).
+
+<Details>
+<Summary>What you'll see</Summary>
+
+- A card names the engineer, and a prompt shows how to move. You can move straight away.
+- The opening lines say why the engineer trusts WOLF, then WOLF and the engineer talk.
+- If you reach the breaker before the lines are done, WOLF sums up the display there. The hint offers **continue**, and interact goes on through his lines to his question.
+- If you stop with the engineer over a machine, they sidestep out beside it. Any move takes over at once.
+
+</Details>
 
 ## 2. Arm the breaker
 
-Move right to the amber **BREAKER**. Interact to hear WOLF ask about the relay's **COOLANT FAULT** tag. Choose answer **1** or **2**, then interact again to arm power.
+**Do this:**
 
-The answer changes his response at the relay and is remembered later. Repeated station use does not add duplicate consequences.
+1. Go right to the amber **BREAKER**.
+2. Press interact. WOLF asks about the relay's **COOLANT FAULT** tag.
+3. Choose answer **1** or **2**.
+4. Press interact again to arm the power.
+
+- **Your answer changes** how WOLF acts at the relay. He remembers it later.
+- **Using the station again** adds no extra consequences.
 
 ## 3. Open the sealed door
 
-Continue right to the blue **COOLANT RELAY**. The handwheel on the wall to its right, beside the rolling door, is the **MANUAL BYPASS**. The door stands in a bolted steel blast frame under a **RESTRICTED AREA** sign, and while the corridor is locked down the two caged red lamps on the corridor wall flash like rotating beacons (with **REDUCED MOTION** on in [Settings](/docs/controls/settings/) they stay lit and steady).
+Go right to the blue **COOLANT RELAY**. The handwheel beside the door is the **MANUAL BYPASS**. Your answer decides which route opens.
 
-### WOLF-assisted route
+| Your answer | What happens | Do this |
+| --- | --- | --- |
+| **1** (warn WOLF about the risk) | WOLF takes the relay's live contact himself | Press interact at the relay |
+| **2** (tell him to go now) | WOLF refuses | Crank the **MANUAL BYPASS** |
 
-If you chose **1**, telling WOLF about the risk, interact at the relay to signal him. The engineer steps back while he walks up to the relay's left side and takes the live contact himself, his nose at the relay's edge. You hear his joints whir as he answers and as he moves off to it. Once he has taken the surge the relay's **COOLANT FAULT** tag fades away. He holds it while the seal's rolling door winds up into its hood; once it is part way up, a heavier striped inner door behind it slides sideways into the wall, and the doorway opens once both are clear.
+### Route 1: WOLF helps
 
-### Engineer-only route
+1. Press interact at the relay to signal WOLF.
+2. Step back. WOLF takes the surge.
+3. The door opens.
 
-If you chose **2**, skipping the risk talk and telling WOLF to go now, he refuses, and the relay's hint points you to the **MANUAL BYPASS**. Hold interact at the handle (**HOLD E** by default, **CRANK** on touch) for about two seconds; the engineer steps up beside the wheel and leans into it with both hands on its rim, and the wheel gives a little with a soft click the moment you press. With **TOGGLE HOLDS** on in [Settings](/docs/controls/settings/#controls), one press starts the crank and it keeps turning until it locks over, you press again or you walk away. Coolant hisses from the relay, louder and brighter as the turns add up, and sprays down onto the floor from the relief pipe on its side, and an alarm sounds while you crank, the row of lights under **MANUAL BYPASS** counts the turns, and turns you have made stay done if you let go. WOLF stands back from the relay while you work. When it locks over, the hiss and the alarm cut out, the relay's **COOLANT FAULT** tag fades away and the door rolls up, with the inner door sliding aside behind it.
+<Details>
+<Summary>What you'll see</Summary>
 
-The handle works on both routes, so you can also crank it yourself after WOLF offers; it just takes longer than letting him take the relay. Until it locks over, the hint keeps counting the turns and says you can still let WOLF take the relay, and he waits back from the relay, ready, while you stand at it or at the handle. Both routes open the door. You never switch to controlling WOLF.
+- He walks up to the relay's left side and takes the live contact, his nose at its edge.
+- His joints whir as he answers and as he moves off.
+- The **COOLANT FAULT** tag fades away.
+- The rolling door winds up into its hood. Part way up, a heavier striped inner door slides sideways into the wall. The doorway opens once both are clear.
+
+</Details>
+
+### Route 2: you crank it
+
+1. Go to the **MANUAL BYPASS** wheel to the right of the relay.
+2. Hold interact (**HOLD E**, **CRANK** on touch) for about two seconds.
+3. Keep holding until it locks over. The door opens.
+
+- **Hard to hold?** Turn on [TOGGLE HOLDS](/docs/controls/input/#toggle-holds): one press does it.
+- **Turns stay done** if you let go.
+- **You can crank on route 1 too.** It just takes longer than letting WOLF take the relay.
+- **You never control WOLF.** Both routes open the door.
+
+<Details>
+<Summary>What you'll see</Summary>
+
+- The engineer steps up beside the wheel and leans into it with both hands on its rim. It gives with a soft click the moment you press.
+- Coolant hisses from the relay, louder and brighter as the turns add up, and sprays onto the floor from its relief pipe.
+- An alarm sounds while you crank. The row of lights under **MANUAL BYPASS** counts the turns.
+- WOLF stands back from the relay while you work.
+- When it locks over, the hiss and the alarm stop, the **COOLANT FAULT** tag fades and the door rolls up, with the inner door sliding aside behind it.
+- If WOLF offered to help, the hint keeps counting your turns and says you can still let him take the relay. He waits back from it, ready.
+- The door stands in a bolted steel blast frame under a **RESTRICTED AREA** sign. While the corridor is locked down, two caged red lamps flash like beacons. With **REDUCED MOTION** on they stay lit and steady.
+
+</Details>
 
 ## 4. Use the safe point
 
-Walk through the door to the green **SAFE POINT** and interact. The room is shown cut open along its near side, so the door is the only way in. While you walk through, WOLF follows you no further than the relay's left side; once you are at the safe point he comes up to the open doorway and stands there, facing you, in front of the frame's far side and the wall-mounted **MANUAL BYPASS** wheel (his body hides the wheel while he is there), and clear of the relay, the safe point and you. If you step back into the doorway he leaves it to you and waits by the relay again; edging about just short of the safe point does not send him back and forth. A short chirp confirms the save, and the corridor's lights switch over with a clunk. WOLF recalls the answer from this run. The checkpoint saves positions, door state, display name, and memory; if it could not be written, the message asks you to use the safe point again.
+**Do this:**
 
-Interact again to enter Records Access, which saves as well. A valid checkpoint enables **Continue** on the title screen. For the next room, open the [Records Access guide](/docs/walkthrough/records-access/).
+1. Walk through the door to the green **SAFE POINT**.
+2. Press interact. A chirp confirms the save.
+3. Press interact again to enter Records Access.
+
+- **This is your first save.** It turns on **Continue** on the title screen.
+- **If the save fails,** the message asks you to use the safe point again.
+- **Next room:** [Records Access](/docs/walkthrough/records-access/).
+
+<Details>
+<Summary>What you'll see</Summary>
+
+- The safe point room is shown cut open along its near side. The door is the only way in.
+- While you walk through, WOLF follows no further than the relay's left side.
+- Once you are at the safe point, he comes to the open doorway and faces you, in front of the **MANUAL BYPASS** wheel.
+- If you step back into the doorway, he waits by the relay again. Edging about just short of the safe point does not send him back and forth.
+- The lights switch over with a clunk, and WOLF recalls your answer from this run.
+- The save stores positions, the door, the display name and WOLF's memory. Entering Records Access saves again.
+
+</Details>
