@@ -1381,8 +1381,8 @@ func _watch_lane(game: Node2D) -> void:
 	# (PanelFront, right after the sentry at its depth), so neither shows over the box or the feed.
 	if sentry.is_visible_in_tree() and not sentry.visual.wrecked:
 		var panel: Rect2 = JunctionRoom.prop_rect(room.bolt_panel_art, JunctionRoom.BOLT_PANEL_REGION)
-		var art_front: float = (Sentry.ACTIVE_TREAD_X - Sentry.ACTIVE_REGION.position.x) * Sentry.ART_SCALE
-		var art_back: float = (Sentry.ACTIVE_REGION.end.x - Sentry.ACTIVE_TREAD_X) * Sentry.ART_SCALE
+		var art_front: float = Sentry.ACTIVE_TREAD_X * Sentry.ART_SCALE
+		var art_back: float = (Sentry.ACTIVE_SIZE.x - Sentry.ACTIVE_TREAD_X) * Sentry.ART_SCALE
 		var parts: Dictionary = {"body": Rect2(sentry.position.x - (art_back if facing > 0.0 else art_front), Sentry.FLOOR_Y - Sentry.DRAWN_HEIGHT, art_front + art_back, Sentry.DRAWN_HEIGHT)}
 		var slit: Rect2 = Sentry.lens_rect()
 		if sentry.visual.is_lit() and sentry.visual.reach > slit.end.x:
