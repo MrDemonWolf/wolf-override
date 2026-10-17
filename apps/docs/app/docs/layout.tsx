@@ -30,10 +30,8 @@ export default function Layout({ children }: { children: ReactNode }) {
       sidebar={{ 'aria-label': 'Guide navigation' }}
     >
       <SidebarDrawerShim />
-      {/* display: contents keeps the page article and table of contents in Fumadocs' grid while giving the docs a main landmark. */}
-      <main id="guide-main" className="contents">
-        {children}
-      </main>
+      {/* No <main> wrapper here: Fumadocs 16.17's DocsLayout already renders the page's one main landmark. A second one failed axe (duplicate and nested main). */}
+      {children}
     </DocsLayout>
   );
 }

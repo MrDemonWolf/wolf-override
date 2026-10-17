@@ -3,13 +3,38 @@ title: Start here
 description: Your quick guide to playing WOLF//OVERRIDE, a story-driven sci-fi horror adventure in development.
 ---
 
+**TL;DR:** WOLF//OVERRIDE is a sci-fi horror adventure in development. Pick your path below: **Play**, **Get the game and support** or **Develop**.
+
 **Play the engineer. Get through THE DEN with WOLF.** Explore a side-view facility, solve a path forward, and choose how you respond to an independent robotic companion.
 
-The current source chapter has three rooms, an opening scene, a cooperation or manual door puzzle, a remembered disagreement, and checkpoints. This website is the guide.
+## Pick your path
+
+<LinkCards
+  label="Pick your path"
+  columns={3}
+  links={[
+    { href: '/docs/controls/first-steps/', title: 'Play', description: 'First steps, controls, settings, saving, fixes and the walkthrough' },
+    { href: '/docs/get-game/', title: 'Get the game and support', description: 'Download, changelog, about, credits, legal and privacy' },
+    { href: '/docs/development/', title: 'Develop', description: 'Set up, build, test and see what exists' },
+  ]}
+/>
+
+- **Find any page** in the guide menu: on the left on wider screens, behind the menu button at the top on phones and other narrow screens.
+- **Search** with the search box at the top of the menu (the magnifier button on phones), or press **Ctrl+K** (**⌘K** on a Mac).
+- **This website is the guide.** The menu groups pages the same way: Play, Get the game and support, Develop.
+
+## What you can play now
+
+- The current source chapter has three rooms: a maintenance corridor, Records Access and the Service Junction.
+- It has an opening scene, a cooperation or manual door puzzle, a remembered disagreement, and checkpoints.
 
 ## Get the game
 
-**Status:** there is no packaged installer or public release yet. You can try the current development build by downloading its source and opening it with Godot 4.7.2; the source archive is a development snapshot, not a ready-to-run app.
+<Callout title="No installer yet">
+  There is no packaged installer or public release yet. The source archive is a development snapshot, not a ready-to-run app.
+</Callout>
+
+- You can try the current development build: download its source and open it with **Godot 4.7.2**.
 
 <LinkCards
   label="Get the game"
@@ -19,8 +44,6 @@ The current source chapter has three rooms, an opening scene, a cooperation or m
     { href: '/docs/get-game/', title: 'How to run it', description: 'Install Godot and open the project' },
   ]}
 />
-
-For the full guide, including controls, chapter help, development history, credits, and licensing, use the sections in the sidebar below.
 
 ## Start playing
 
@@ -33,39 +56,30 @@ For the full guide, including controls, chapter help, development history, credi
 
 3. Choose **New Game**. Advance the opening at your pace, then follow the movement and interaction prompts.
 
-The opening shows WOLF and the Director before the engineer enters. **E** advances a beat; **Esc** pauses, and Pause offers **Skip Opening**. These are default keys; the [Input](/docs/controls/input/) page lists the controller and touch equivalents.
-
-**First time playing?** Follow the spoiler-light [First steps tutorial](/docs/controls/first-steps/) for movement, interaction prompts, choices, and checkpoints.
+- The opening shows WOLF and the Director before the engineer enters.
+- **E** advances a beat. **Esc** pauses, and Pause offers **Skip Opening**.
+- These are default keys. [Controls](/docs/controls/input/) lists the controller and touch equivalents.
+- **First time playing?** Follow the spoiler-light [First steps tutorial](/docs/controls/first-steps/) for movement, interaction prompts, choices, and checkpoints.
 
 ## Your first goal
 
-Restore power and open the sealed maintenance door. Read the station labels and the nearby interaction prompt. Objective cards appear briefly when your goal changes.
-
-WOLF can help or refuse. You keep control of the engineer, and a manual route lets you continue if he declines. A choice you make in the corridor is remembered later.
-
-**Stuck?** The [optional chapter walkthrough](/docs/walkthrough/) separates the corridor, Records Access and Service Junction solutions. It reveals only the current source chapter.
+- **Goal:** restore power and open the sealed maintenance door.
+- Read the station labels and the nearby interaction prompt.
+- Objective cards appear briefly when your goal changes.
+- WOLF can help or refuse. You keep control of the engineer, and a manual route lets you continue if he declines.
+- A choice you make in the corridor is remembered later.
+- **Stuck?** The [optional chapter walkthrough](/docs/walkthrough/) separates the corridor, Records Access and Service Junction solutions. It reveals only the current source chapter.
 
 ## Save your progress
 
-Use the green **SAFE POINT** beyond the door; Records Access and the Service Junction then save automatically at key moments. **Continue** on the title screen resumes a valid checkpoint without replaying the opening. [Saving](/docs/controls/saves/) explains Return to Title, New Game, and where the single checkpoint file lives.
-
-## Explore the guide
-
-<LinkCards
-  label="Guide sections"
-  links={[
-    { href: '/docs/controls/', title: 'Play and settings', description: 'Inputs, preferences, checkpoints, and quick fixes' },
-    { href: '/docs/walkthrough/', title: 'Chapter walkthrough', description: 'Optional solutions, split by room' },
-    { href: '/docs/about/', title: 'About the game', description: 'Premise and current gameplay direction' },
-    { href: '/docs/development/story/', title: 'Development story', description: 'How the concept became the current prototype' },
-    { href: '/docs/development/', title: 'Development', description: 'Source setup, status, and testing' },
-    { href: '/docs/changelog/', title: 'Changelog', description: 'Public source changes by date' },
-    { href: '/docs/credits/', title: 'Credits and references', description: 'Creators, tools, research, and asset rights' },
-    { href: '/docs/legal/', title: 'Legal and licensing', description: 'Code license, asset rights, and third-party names' },
-    { href: '/docs/privacy/', title: 'Privacy', description: 'What the game and this site store and send' },
-  ]}
-/>
+- Use the green **SAFE POINT** beyond the door.
+- Records Access and the Service Junction then save automatically at key moments.
+- **Continue** on the title screen resumes a valid checkpoint without replaying the opening.
+- [Saving](/docs/controls/saves/) explains Return to Title, New Game, and where the single checkpoint file lives.
 
 ## What to expect
 
-Characters and environments use provisional artwork. Final animation, sound, the wider campaign, and release packages are still in development. The current chapter is a small beginning, and its puzzles do not select a campaign ending. [Testing and deployment](/docs/development/testing/) lists what has actually been checked, including that complete routes have not been played by hand.
+- Characters and environments use provisional artwork.
+- Final animation, sound, the wider campaign, and release packages are still in development.
+- The current chapter is a small beginning, and its puzzles do not select a campaign ending.
+- [Testing and deployment](/docs/development/testing/) lists what has actually been checked, including that complete routes have not been played by hand.

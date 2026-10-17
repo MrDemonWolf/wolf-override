@@ -62,6 +62,13 @@ type LinkCardsProps = {
   links: GuideLink[];
   /** `cards`: the guide's section index. `actions`: the download and setup buttons. */
   variant?: 'cards' | 'actions';
+  /**
+   * 2 (default): two columns, one at 680px and below. 3: one column, three side by side from
+   * Tailwind's xl breakpoint (1280px viewport), where the guide column is wide enough for three
+   * cards; narrower screens stack them, since the tablet column fits two and a 2 + 1 split looks
+   * like a missing card.
+   */
+  columns?: 2 | 3;
 };
 
 /*
@@ -75,15 +82,16 @@ type LinkCardsProps = {
 const linkCard =
   'flex flex-col gap-[.35rem] rounded-card border border-[color-mix(in_srgb,var(--color-fd-border)_68%,var(--color-fd-primary)_32%)] bg-[color-mix(in_srgb,var(--color-fd-background)_84%,transparent)] bg-[image:linear-gradient(145deg,color-mix(in_srgb,var(--color-fd-primary)_11%,transparent),transparent_72%),none] px-5 py-[1.15rem] text-fd-foreground no-underline inset-shadow-[0_1px_rgb(255_255_255/.17)] shadow-[0_10px_24px_rgba(0,8,26,.08)] backdrop-blur-lg backdrop-saturate-130 transition-[border-color,translate,box-shadow] duration-180 ease-[ease] hover-always:-translate-y-0.5 hover-always:border-fd-primary hover-always:inset-shadow-[0_1px_rgb(255_255_255/.2)] hover-always:shadow-[0_14px_30px_rgba(0,8,26,.12)] motion-reduce:transition-none motion-reduce:hover-always:translate-y-0';
 
-/** A labelled navigation of link cards, two columns wide and one column at 680px and below. */
-export function LinkCards({ label, links, variant = 'cards' }: LinkCardsProps) {
+/** A labelled navigation of link cards; `columns` sets the grid (see {@link LinkCardsProps}). */
+export function LinkCards({ label, links, variant = 'cards', columns = 2 }: LinkCardsProps) {
   if (asMarkdown()) {
     const list = links.map(({ href, title, description }) => `- [${title}](${href.startsWith('/') ? siteUrl + href : href}): ${description}`);
     return `${list.join('\n')}\n\n`;
   }
   const actions = variant === 'actions';
+  const grid = columns === 3 ? 'grid-cols-1 xl:grid-cols-3' : 'grid-cols-2 guide-phone:grid-cols-1';
   return (
-    <nav className={`grid grid-cols-2 gap-[.85rem] guide-phone:grid-cols-1 ${actions ? 'mt-5 mb-7' : 'mt-6 mb-9'}`} aria-label={label}>
+    <nav className={`grid gap-[.85rem] ${grid} ${actions ? 'mt-5 mb-7' : 'mt-6 mb-9'}`} aria-label={label}>
       {links.map(({ href, title, description }) => (
         <a key={href} href={href} className={`${linkCard} ${actions ? 'min-h-22 justify-center' : 'min-h-24 guide-phone:min-h-0'}`}>
           <strong className={actions ? 'text-[1rem]' : 'text-[1rem]/[1.35]'}>{title}</strong>
