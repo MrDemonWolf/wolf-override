@@ -445,7 +445,7 @@ func _check_story_kept() -> void:
 	await process_frame
 	game.set("opening_lines_held", false)
 	game.call("_drop_box_queue")
-	game.debug_place(200.0, 120.0)
+	game.debug_place(Main.PURGE_DISPLAY_MAX_X - 10.0, 80.0)
 	game.call("_speak_stakes")
 	await _play(0.5, "stakes kept")
 	game.call("_interact")
