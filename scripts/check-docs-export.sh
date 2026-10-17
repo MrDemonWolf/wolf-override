@@ -4,7 +4,9 @@
 # re-runs it on the last build without rebuilding.
 # Fails when any exported page references the /_next/image optimiser (absent on
 # GitHub Pages), lacks the #main-content skip-link target, carries more than one
-# robots meta tag, or when any page or stylesheet references a .ttf font.
+# robots meta tag (robots and googlebot counted together), or when any page or stylesheet
+# references a .ttf font. Also fails when robots.txt lacks its Sitemap line or sitemap.xml
+# has a guide page without <lastmod>.
 # Usage: scripts/check-docs-export.sh   (DOCS_OUT_DIR overrides the export directory)
 # Fails when apps/docs/out is missing rather than passing silently.
 set -euo pipefail
@@ -36,7 +38,7 @@ while IFS= read -r page; do
     echo "FAIL  $rel has no #main-content skip-link target" >&2
     status=1
   fi
-  robots="$(grep -o '<meta name="robots"' "$page" | wc -l | tr -d ' ')"
+  robots="$(grep -oE '<meta name="(robots|googlebot)"' "$page" | wc -l | tr -d ' ')"
   if [ "$robots" -gt 1 ]; then
     echo "FAIL  $rel has $robots robots meta tags (expected at most one)" >&2
     status=1
@@ -52,7 +54,28 @@ if find "$out" -name '*.css' -print0 | xargs -0 grep -li '\.ttf' 2>/dev/null | g
   status=1
 fi
 
+# Crawl files (apps/docs/app/robots.ts and sitemap.ts): robots.txt advertises the sitemap, and
+# every guide URL in the sitemap carries its Git date (the landing page has none by design).
+if ! grep -q '^Sitemap: https://' "$out/robots.txt" 2>/dev/null; then
+  echo "FAIL  robots.txt is missing or has no Sitemap line" >&2
+  status=1
+fi
+if [ ! -f "$out/sitemap.xml" ]; then
+  echo "FAIL  sitemap.xml is missing" >&2
+  status=1
+else
+  # Next writes <loc> and <lastmod> on separate lines, so join the file before matching;
+  # `|| true` keeps a zero count from tripping pipefail before the message below.
+  sitemap="$(tr -d '\n' < "$out/sitemap.xml")"
+  guide_urls="$( (grep -o '<loc>[^<]*/docs/[^<]*</loc>' <<< "$sitemap" || true) | wc -l | tr -d ' ')"
+  dated="$( (grep -o '<loc>[^<]*/docs/[^<]*</loc><lastmod>' <<< "$sitemap" || true) | wc -l | tr -d ' ')"
+  if [ "$guide_urls" -eq 0 ] || [ "$dated" -ne "$guide_urls" ]; then
+    echo "FAIL  sitemap.xml: $dated of $guide_urls guide URLs have <lastmod>" >&2
+    status=1
+  fi
+fi
+
 if [ "$status" -eq 0 ]; then
-  echo "pass  $count exported pages: no /_next/image, one #main-content each, at most one robots meta, no .ttf references"
+  echo "pass  $count exported pages: no /_next/image, one #main-content each, at most one robots meta, no .ttf references; robots.txt names the sitemap; every guide URL in sitemap.xml has <lastmod>"
 fi
 exit "$status"
