@@ -181,7 +181,9 @@ export default function HomePage() {
         </div>
         {footerGroups.map((group) => (
           <nav key={group.title} aria-label={group.label} className="flex flex-col items-start gap-1">
-            <h2 className="mt-1 mb-[.65rem] font-heading text-[.76rem] leading-[1.4] font-bold tracking-[.1em] text-text uppercase">{group.title}</h2>
+            {/* A label, not a heading: the nav's aria-label already names the group, and three H2s here
+                would add empty topics to the page outline search engines and screen readers read. */}
+            <p className="mt-1 mb-[.65rem] font-heading text-[.76rem] leading-[1.4] font-bold tracking-[.1em] text-text uppercase">{group.title}</p>
             {group.links.map(([href, label]) => (
               <Link key={href} href={href} className={footerLink}>{label}</Link>
             ))}
