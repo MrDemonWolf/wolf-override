@@ -210,8 +210,9 @@ static func forget(catalog: Translation) -> void:
 ## off. Only while that language is on, because Font.get_height() is the tallest font of the whole
 ## chain: with Noto Sans JP behind it, Roboto's line height grew from 21 to 25 px at 17 px (measured,
 ## Godot 4.7.2), which moved every Latin label. Changing a Font's fallbacks emits its changed signal, so
-## every Control using it lays itself out again. A fallback file that is not in the build yet is
-## skipped with a warning (the CJK subsets arrive in PR L4).
+## every Control using it lays itself out again. Fallbacks that belong to no language stay where they
+## are (Roboto's Montserrat-Symbols-Subset.ttf, set in its import, which draws the arrows and the empty
+## square Roboto lacks). A fallback file that is not in the build is skipped with a warning.
 static func use_fallback(language: String) -> void:
 	var others: Array[Font] = []
 	for code: String in LANGUAGES:

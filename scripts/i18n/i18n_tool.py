@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
-"""The game's one i18n tool: the PO files, every translation gate, the POT file list, the font subset
-and the counts.
+"""The game's one i18n tool: the PO files, every translation gate, the POT file list, the bundled
+fallback fonts and the counts.
 
 Purpose
     Every localization step that is not a Godot run lives here once, as a subcommand:
@@ -10,11 +10,12 @@ Purpose
                               tools, add-ons and the import cache), so a new subfolder is never missed.
                               With --check it prints nothing and exits 1 when GAME's project.godot holds
                               another list (CI runs it, so a new script cannot stay out of the POT).
-    subset SRC OUT TRANS      writes OUT, a subset of the OpenType font SRC (Noto Sans JP) holding
-                              printable ASCII, kana, CJK punctuation, full-width forms, "日本語" (the
-                              language list's own name) and every character of TRANS's "ja" texts;
-                              prints its size next to SRC's and a JIS X 0208 level-1 subset's (measure).
-                              (The prototype's subset; PR L4 makes the fixed common sets of decision D7.)
+    fonts CACHE               rebuilds the bundled fallback fonts (PR L4, decision D7): each CJK
+                              language's Noto Sans subset cut to its fixed common set (fixed_charset),
+                              from the recorded Noto release (NOTO_SOURCES, downloaded into CACHE and
+                              checked by SHA-256), the symbols font behind Roboto (symbols_font) and the
+                              character lists the game's glyph test reads (CHARSETS_FILE). Prints the
+                              sizes. Rerun only to change a set; the outputs are committed.
     fill POT TRANS OUTDIR     writes OUTDIR/<lang>.po for every language in TRANS from the POT: each
                               message keeps the POT's comments and gets TRANS's context as a "#." note,
                               its marks as "#. i18n: ..." (MARKS) and its translation, stamped
@@ -48,9 +49,10 @@ Purpose
                               whose text is no msgid of POT, by file, as JSON at OUT.
 
 Contract
-    python3 -I -B scripts/i18n/i18n_tool.py <subcommand> ...   (stdlib only; `subset` needs hb-subset,
+    python3 -I -B scripts/i18n/i18n_tool.py <subcommand> ...   (stdlib only; `fonts` needs hb-subset and hb-info,
     `check` needs msgfmt, both from gettext and harfbuzz in Homebrew or apt). Paths are arguments, read
-    from the current folder; nothing outside them is written. Two files are read from the repository
+    from the current folder; nothing outside them is written, except that `fonts` rewrites the
+    fallback fonts and character lists it owns (FONTS, below). Two files are read from the repository
     this tool sits in: every per-language fact from apps/game/i18n/languages.json (LANGUAGES, the same
     table the game's I18n reads, so the game and the tools never keep two lists), and the glossary from
     i18n/glossary.json (GLOSSARY_FILE). A PO whose language is not in the table stops `check`.
@@ -231,11 +233,49 @@ def line_measures(english: str, text: str, glossary_key: str, glossary: dict) ->
 #: both ways; a Cyrillic "Е:" for the key token passes it (no Latin letter is left) but fails key_token_ok,
 #: since the hint bar replaces only the Latin "E:".
 SCRIPT_GUARD = {"cyrillic": re.compile(r"[\u0400-\u04FF]"), "latin": re.compile(r"[A-Za-z]")}
-#: Ranges every Japanese subset keeps whatever the texts use: printable ASCII, CJK symbols and
-#: punctuation, hiragana, katakana, half- and full-width forms (so a later line's kana never tofus).
-JA_BASE_RANGES = [(0x20, 0x7E), (0x3000, 0x303F), (0x3040, 0x309F), (0x30A0, 0x30FF), (0xFF00, 0xFFEF)]
-#: The language list's own Japanese name (I18n.LANGUAGES), drawn in every language.
-JA_ALWAYS = "日本語"
+#: Where the CJK fallback fonts come from (PR L4, decision D7): the Noto Sans CJK 2.004 release of
+#: notofonts/noto-cjk, its region-specific subset OTFs (each a whole language font, not yet cut down).
+NOTO_RELEASE = "https://github.com/notofonts/noto-cjk/releases/download/Sans2.004/"
+#: Per language: the release asset, the Regular OTF inside it and that OTF's SHA-256 (measured on
+#: October 16, 2026; the Japanese one matches the research prototype's dff723ba...5073).
+NOTO_SOURCES = {
+    "ja": ("16_NotoSansJP.zip", "NotoSansJP-Regular.otf", "dff723ba59d57d136764a04b9b2d03205544f7cd785a711442d6d2d085ac5073"),
+    "ko": ("17_NotoSansKR.zip", "NotoSansKR-Regular.otf", "69975a0ac8472717870aefeab0a4d52739308d90856b9955313b2ad5e0148d68"),
+    "zh_Hans": ("18_NotoSansSC.zip", "NotoSansSC-Regular.otf", "faa6c9df652116dde789d351359f3d7e5d2285a2b2a1f04a2d7244df706d5ea9"),
+    "zh_Hant": ("19_NotoSansTC.zip", "NotoSansTC-Regular.otf", "5bab0cb3c1cf89dde07c4a95a4054b195afbcfe784d69d75c340780712237537"),
+}
+#: Each CJK language's national common-character set, as (codec, rows): a row is (first lead byte, last
+#: lead byte, trail-byte ranges, last code or None), decoded cell by cell. Sources: JIS X 0208 rows 1-8
+#: (symbols, kana) and 16-47 (the 2,965 level-1 kanji) in EUC-JP; GB 2312 rows 1-9 (symbols) and 16-55
+#: (the 3,755 level-1 hanzi); Big5's symbols (A140-A3BF) and its 5,401 frequently used hanzi
+#: (A440-C67E); KS X 1001 rows 1-12 (symbols, jamo) and 16-40 (the 2,350 Hangul syllables) in EUC-KR.
+#: Korean leaves out hanja: modern game text is written in Hangul.
+CJK_STANDARD_SETS = {
+    "ja": ("euc_jp", [(0xA1, 0xA8, [(0xA1, 0xFE)], None), (0xB0, 0xCF, [(0xA1, 0xFE)], None)]),
+    "zh_Hans": ("gb2312", [(0xA1, 0xA9, [(0xA1, 0xFE)], None), (0xB0, 0xD7, [(0xA1, 0xFE)], None)]),
+    "zh_Hant": ("big5", [(0xA1, 0xA3, [(0x40, 0x7E), (0xA1, 0xFE)], 0xA3BF), (0xA4, 0xC6, [(0x40, 0x7E), (0xA1, 0xFE)], 0xC67E)]),
+    "ko": ("euc_kr", [(0xA1, 0xAC, [(0xA1, 0xFE)], None), (0xB0, 0xC8, [(0xA1, 0xFE)], None)]),
+}
+#: Kept in every CJK subset: CJK symbols and punctuation, and the full-width forms and signs
+#: (U+FF01-FF60, U+FFE0-FFE6), which every CJK text may use whatever its standard lists.
+CJK_COMMON_RANGES = [(0x3000, 0x303F), (0xFF01, 0xFF60), (0xFFE0, 0xFFE6)]
+#: Kept in one language's subset only: Japanese keeps all of hiragana (U+3097-3098 are unassigned) and
+#: katakana (with the marks the JIS rows lack) and the half-width katakana; Korean keeps all of the compatibility jamo (ㅋㅋ).
+CJK_EXTRA_RANGES = {"ja": [(0x3041, 0x3096), (0x3099, 0x309F), (0x30A0, 0x30FF), (0xFF61, 0xFF9F)], "ko": [(0x3131, 0x318E)]}
+#: Characters below this are left out of the CJK subsets: Latin, Greek and Cyrillic, which the game's
+#: Roboto and Montserrat draw first anyway (the fallback is only asked for what they lack).
+CJK_MIN_CODEPOINT = 0x2000
+#: The game's English characters that Roboto (the body font) lacks and Montserrat has (measured with
+#: hb-info): the arrow in the debug overlay's relay line (main.gd debug_snapshot), the empty square of
+#: the debug zones' toggles and the touch arrows of the tutorial prompt (main.gd). With the OS fallback
+#: off (PR L4) they come from SYMBOLS_FONT, chained behind Roboto; tests/i18n_test.gd fails when the
+#: game's text gains another character a theme font cannot draw.
+SYMBOLS = "\u2192\u25a1\u25b6\u25c0"
+#: The symbols fallback: SYMBOLS cut from Montserrat with Roboto's vertical metrics (symbols_font).
+SYMBOLS_FONT = REPO / "apps" / "game" / "assets" / "fonts" / "Montserrat-Symbols-Subset.ttf"
+#: The fixed character lists the CJK subsets are cut to and the game's glyph test reads. Under tests/,
+#: which the export leaves out (export_presets.cfg), since the game itself never needs them.
+CHARSETS_FILE = REPO / "apps" / "game" / "tests" / "support" / "cjk_charsets.json"
 #: The hint bar replaces "E:" with the bound key (main.gd _refresh_ui), so it must survive. Counted only
 #: where no letter comes before it: "PAUSE:" ends in "E:" too (the game's own replace is a plain
 #: substring replace and would hit it; see ../README.md, "Code changes outside I18n").
@@ -465,35 +505,151 @@ def potfiles(game: Path, check_only: bool = False) -> None:
              f"drop {sorted(listed - wanted)} (or fix the order); paste the line `i18n_tool.py potfiles` prints")
 
 
-def subset(src: Path, out: Path, trans: Path) -> None:
-    """Writes the Japanese fallback subset and prints its size against the full font and a JIS L1 set."""
-    texts = json.loads(trans.read_text(encoding="utf-8"))["translations"]["ja"].values()
-    used = {ord(c) for text in texts for c in text if c != "\n"} | {ord(c) for c in JA_ALWAYS}
-    base = {cp for lo, hi in JA_BASE_RANGES for cp in range(lo, hi + 1)}
-    kanji = sorted(cp for cp in used if cp not in base)
-    _hb_subset(src, out, base | used)
-    # Measure only: JIS X 0208 level-1 kanji (EUC-JP rows 0xB0-0xCF), the usual "everyday" set.
-    level1 = set()
-    for row in range(0xB0, 0xD0):
-        for cell in range(0xA1, 0xFF):
-            try:
-                level1.add(ord(bytes([row, cell]).decode("euc_jp")))
-            except UnicodeDecodeError:
-                pass
-    measure = out.with_name(out.stem + "-jis-l1-measure" + out.suffix)
-    _hb_subset(src, measure, base | used | level1)
-    print(json.dumps({
-        "source_bytes": src.stat().st_size, "subset_bytes": out.stat().st_size, "subset_codepoints": len(base | used),
-        "codepoints_beyond_base_in_texts": len(kanji), "kanji_not_in_jis_l1": "".join(chr(c) for c in kanji if c not in level1),
-        "jis_l1_kanji": len(level1), "jis_l1_subset_bytes": measure.stat().st_size,
-    }, ensure_ascii=False, indent=1))
-    measure.unlink()
+def fixed_charset(code: str) -> str:
+    """The wanted character set of CJK language ``code`` (decision D7): every character of its national
+    standard's common set (CJK_STANDARD_SETS, read through Python's own codecs, so no list is copied by
+    hand), CJK_COMMON_RANGES and CJK_EXTRA_RANGES, and the language's own picker name and "machine
+    translation" tag from LANGUAGES, minus everything below CJK_MIN_CODEPOINT (the game fonts draw those
+    first). Pure; the characters come back sorted by code point, so the file written from it is stable.
+    `fonts` keeps only those the Noto font has (font_codepoints)."""
+    codec, rows = CJK_STANDARD_SETS[code]
+    points = {cp for lo, hi in CJK_COMMON_RANGES + CJK_EXTRA_RANGES.get(code, []) for cp in range(lo, hi + 1)}
+    for lead_lo, lead_hi, trail_ranges, last in rows:
+        for lead in range(lead_lo, lead_hi + 1):
+            for trail_lo, trail_hi in trail_ranges:
+                for trail in range(trail_lo, trail_hi + 1):
+                    if last is not None and (lead << 8 | trail) > last:
+                        continue
+                    try:
+                        points.update(ord(c) for c in bytes([lead, trail]).decode(codec))
+                    except UnicodeDecodeError:
+                        pass  # an unassigned cell of the standard
+    row = LANGUAGES[code]
+    points.update(ord(c) for c in str(row["name"]) + str(row.get("machine_tag") or "") if c != " ")
+    return "".join(chr(cp) for cp in sorted(points) if cp >= CJK_MIN_CODEPOINT)
 
 
-def _hb_subset(src: Path, out: Path, codepoints: set[int]) -> None:
-    """hb-subset of ``src`` to ``out`` keeping ``codepoints`` (glyph names dropped, layout kept)."""
+def fonts(cache: Path) -> None:
+    """Rebuilds the bundled fallback fonts (PR L4) and prints their sizes as JSON. For every language
+    whose LANGUAGES row names a "fallback_font": fetches its NOTO_SOURCES zip into ``cache`` unless it is
+    there, checks the OTF's SHA-256, and writes that file as an hb-subset of the OTF to fixed_charset.
+    Then writes SYMBOLS_FONT (symbols_font) and CHARSETS_FILE, the lists the game's glyph test checks
+    each subset against. Side effects: downloads into ``cache`` and rewrites those files in the
+    repository; Godot's .import files and the asset register are kept by hand."""
+    import urllib.request
+    import zipfile
+    cache.mkdir(parents=True, exist_ok=True)
+    sizes, charsets = {}, {}
+    for code, row in LANGUAGES.items():
+        if not row.get("fallback_font"):
+            continue
+        asset, member, sha = NOTO_SOURCES[code]
+        archive = cache / asset
+        if not archive.exists():
+            urllib.request.urlretrieve(NOTO_RELEASE + asset, archive)
+        data = zipfile.ZipFile(archive).read(member)
+        if hashlib.sha256(data).hexdigest() != sha:
+            sys.exit(f"{archive}:{member} is not the recorded Noto file (SHA-256 {sha})")
+        source = cache / member
+        source.write_bytes(data)
+        wanted = fixed_charset(code)
+        have = font_codepoints(source)
+        charsets[code] = "".join(c for c in wanted if ord(c) in have)
+        lacking = "".join(c for c in wanted if ord(c) not in have)
+        own = {c for c in str(row["name"]) + str(row.get("machine_tag") or "") if c != " "}
+        if own & set(lacking):
+            sys.exit(f"{member} cannot draw {code}'s own name or tag: {''.join(sorted(own & set(lacking)))}")
+        out = _game_path(row["fallback_font"])
+        _hb_subset(source, out, {ord(c) for c in charsets[code]})
+        sizes[code] = {"characters": len(charsets[code]), "not_in_noto": lacking, "source_bytes": len(data),
+                       "subset_bytes": out.stat().st_size}
+    symbols_font()
+    if font_codepoints(SYMBOLS_FONT) != {ord(c) for c in SYMBOLS}:
+        sys.exit(f"{SYMBOLS_FONT} lacks some of SYMBOLS")
+    about = ("The fixed character set of each CJK fallback subset (decision D7), written by "
+             "`scripts/i18n/i18n_tool.py fonts` from the national standards' common sets (i18n_tool.py, "
+             "fixed_charset), each cut to the characters its Noto font has; tests/i18n_test.gd checks that every character is drawable by that "
+             "language's subset. Do not edit by hand: change the tool and rerun it.")
+    CHARSETS_FILE.write_text(json.dumps({"_about": about, "charsets": charsets}, ensure_ascii=False, indent=1) + "\n", encoding="utf-8")
+    sizes["symbols"] = {"characters": len(SYMBOLS), "subset_bytes": SYMBOLS_FONT.stat().st_size}
+    print(json.dumps(sizes, indent=1))
+
+
+def symbols_font() -> None:
+    """Writes SYMBOLS_FONT: SYMBOLS cut from Montserrat-Variable.ttf at weight 400 (Roboto-Regular.tres's
+    weight), with its vertical metrics scaled down to Roboto's (match_vertical_metrics), so chaining it
+    behind Roboto draws those characters without changing Roboto's line height. Side effect: rewrites
+    that file."""
+    fonts_dir = REPO / "apps" / "game" / "assets" / "fonts"
+    _hb_subset(fonts_dir / "Montserrat-Variable.ttf", SYMBOLS_FONT, {ord(c) for c in SYMBOLS}, ["--instance=wght=400"])
+    match_vertical_metrics(SYMBOLS_FONT, fonts_dir / "Roboto-Variable.ttf")
+
+
+def font_codepoints(path: Path) -> set[int]:
+    """The code points the font at ``path`` maps to a glyph (its cmap), read with HarfBuzz's hb-info."""
+    listing = subprocess.run(["hb-info", "--list-unicodes", str(path)], check=True, capture_output=True, text=True).stdout
+    return {int(m, 16) for m in re.findall(r"^U\+([0-9A-F]+)\t", listing, re.M)}
+
+
+def _tables(data: bytes) -> dict[str, tuple[int, int, int]]:
+    """The sfnt table directory of font ``data``: tag -> (record offset, table offset, table length)."""
+    count = int.from_bytes(data[4:6], "big")
+    tables = {}
+    for i in range(count):
+        record = 12 + 16 * i
+        tag = data[record:record + 4].decode("latin-1")
+        tables[tag] = (record, int.from_bytes(data[record + 8:record + 12], "big"), int.from_bytes(data[record + 12:record + 16], "big"))
+    return tables
+
+
+def _checksum(block: bytes) -> int:
+    """The OpenType checksum of ``block``: the sum of its big-endian uint32 words, zero-padded, mod 2^32."""
+    block += b"\0" * (-len(block) % 4)
+    return sum(int.from_bytes(block[i:i + 4], "big") for i in range(0, len(block), 4)) & 0xFFFFFFFF
+
+
+def match_vertical_metrics(path: Path, reference: Path) -> None:
+    """Rewrites the vertical metrics of the font at ``path`` (hhea ascender, descender and line gap;
+    OS/2 typo ascender, descender, line gap and win ascent and descent) to ``reference``'s, scaled by
+    the two fonts' units per em and rounded toward zero, then fixes the table checksums and head's
+    checkSumAdjustment. Why: Godot's Font.get_height() is the tallest of the whole fallback chain
+    (DESIGN.md, "Fonts"), and FreeType takes a face's ascent from hhea (falling back to OS/2), so a
+    fallback whose metrics are no larger than its base font's leaves the base's line height alone.
+    Stdlib only (struct-free byte edits), so the tool needs no fontTools. Side effect: rewrites ``path``."""
+    data, ref = bytearray(path.read_bytes()), reference.read_bytes()
+    tables, ref_tables = _tables(bytes(data)), _tables(ref)
+
+    def field(blob: bytes, where: dict, tag: str, offset: int, signed: bool) -> int:
+        start = where[tag][1] + offset
+        return int.from_bytes(blob[start:start + 2], "big", signed=signed)
+
+    scale = field(data, tables, "head", 18, False) / field(ref, ref_tables, "head", 18, False)
+    # (table, offset, signed): hhea ascender, descender, lineGap; OS/2 sTypoAscender, sTypoDescender,
+    # sTypoLineGap, usWinAscent, usWinDescent (OpenType spec offsets).
+    fields = [("hhea", 4, True), ("hhea", 6, True), ("hhea", 8, True), ("OS/2", 68, True), ("OS/2", 70, True),
+              ("OS/2", 72, True), ("OS/2", 74, False), ("OS/2", 76, False)]
+    for tag, offset, signed in fields:
+        value = int(field(ref, ref_tables, tag, offset, signed) * scale)  # int() rounds toward zero
+        start = tables[tag][1] + offset
+        data[start:start + 2] = value.to_bytes(2, "big", signed=signed)
+    head = tables["head"][1]
+    data[head + 8:head + 12] = bytes(4)  # checkSumAdjustment is left out of every checksum
+    for record, offset, length in tables.values():
+        data[record + 4:record + 8] = _checksum(bytes(data[offset:offset + length])).to_bytes(4, "big")
+    data[head + 8:head + 12] = ((0xB1B0AFBA - _checksum(bytes(data))) & 0xFFFFFFFF).to_bytes(4, "big")
+    path.write_bytes(bytes(data))
+
+
+def _game_path(resource: str) -> Path:
+    """The file in the repository behind a game path such as "res://assets/fonts/x.otf"."""
+    return REPO / "apps" / "game" / resource.removeprefix("res://")
+
+
+def _hb_subset(src: Path, out: Path, codepoints: set[int], extra: list[str] | None = None) -> None:
+    """hb-subset of ``src`` to ``out`` keeping ``codepoints`` (glyph names dropped, layout kept);
+    ``extra`` adds hb-subset options such as --instance."""
     unicodes = ",".join(f"{cp:04X}" for cp in sorted(codepoints))
-    subprocess.run(["hb-subset", f"--output-file={out}", f"--unicodes={unicodes}", str(src)], check=True)
+    subprocess.run(["hb-subset", f"--output-file={out}", f"--unicodes={unicodes}", *(extra or []), str(src)], check=True)
 
 
 def fill(pot: Path, trans: Path, outdir: Path) -> None:
@@ -1091,7 +1247,7 @@ def main(argv: list[str]) -> None:
             flags.add(arg)
         else:
             args.append(Path(arg))
-    plain = {"subset": (subset, 3), "fill": (fill, 3), "backprompt": (backprompt, 2), "selftest": (selftest, 1),
+    plain = {"fonts": (fonts, 1), "fill": (fill, 3), "backprompt": (backprompt, 2), "selftest": (selftest, 1),
              "hardcoded": (hardcoded, 3)}
     command = argv[0] if argv else ""
     if command == "potfiles" and len(args) == 1 and flags <= {"--check"} and back is None:
