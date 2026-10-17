@@ -7,7 +7,8 @@
 # robots meta tag (robots and googlebot counted together), or when any page or stylesheet
 # references a .ttf font. Also fails when robots.txt lacks its Sitemap line, sitemap.xml
 # has a guide page without <lastmod>, the landing page or a guide page lacks its JSON-LD
-# block, or any JSON-LD block is not valid JSON.
+# block, any JSON-LD block is not valid JSON, or llms.txt, llms-full.txt or a guide
+# page's Markdown copy is missing or carries raw MDX.
 # Usage: scripts/check-docs-export.sh   (DOCS_OUT_DIR overrides the export directory)
 # Fails when apps/docs/out is missing rather than passing silently.
 set -euo pipefail
@@ -103,7 +104,29 @@ then
   status=1
 fi
 
+# llms.txt files (apps/docs/app/llms*, lib/source.ts): the index opens with the project H1 and
+# summary, the full text has no raw MDX components or [#heading-id] suffixes, and every guide page
+# has the Markdown copy its rel=alternate link names.
+if ! head -n 3 "$out/llms.txt" 2>/dev/null | tr '\n' ' ' | grep -q '^# WOLF//OVERRIDE  > '; then
+  echo "FAIL  llms.txt is missing or does not start with '# WOLF//OVERRIDE' and a '> ' summary" >&2
+  status=1
+fi
+if [ ! -s "$out/llms-full.txt" ]; then
+  echo "FAIL  llms-full.txt is missing or empty" >&2
+  status=1
+elif grep -qE '<(Screenshot|LinkCards)|\[#' "$out/llms-full.txt"; then
+  echo "FAIL  llms-full.txt has raw MDX components or [#heading-id] suffixes" >&2
+  status=1
+fi
+while IFS= read -r guide; do
+  rel="${guide#"$out"/docs}"
+  if [ ! -s "$out/llms.mdx/docs${rel%index.html}index.md" ]; then
+    echo "FAIL  docs${rel} has no Markdown copy at llms.mdx/docs${rel%index.html}index.md" >&2
+    status=1
+  fi
+done < <(find "$out/docs" -name index.html | sort)
+
 if [ "$status" -eq 0 ]; then
-  echo "pass  $count exported pages: no /_next/image, one #main-content each, at most one robots meta, no .ttf references; robots.txt names the sitemap; every guide URL in sitemap.xml has <lastmod>; valid JSON-LD on the landing and guide pages"
+  echo "pass  $count exported pages: no /_next/image, one #main-content each, at most one robots meta, no .ttf references; robots.txt names the sitemap; every guide URL in sitemap.xml has <lastmod>; valid JSON-LD on the landing and guide pages; llms.txt, llms-full.txt and a Markdown copy of every guide page"
 fi
 exit "$status"

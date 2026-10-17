@@ -167,7 +167,7 @@ The root `package.json` defines these commands:
 - `bun run docs:test` - Run the docs unit tests.
 - `bun run docs:build` - Build the static site, then check the export
   (no image optimiser, skip-link target, one robots meta, WOFF2-only
-  fonts).
+  fonts, robots.txt and dated sitemap, valid JSON-LD, llms.txt files).
 - `bun run docs:check-export` - Re-run that export check on the last
   build.
 - `bun run check:copies` - Fail on code copied (six or more matching
