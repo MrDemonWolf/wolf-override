@@ -18,17 +18,24 @@ extends EditorPlugin
 ## Gotchas: relies on editor internals (node class names, dialog wiring) that can change in any release;
 ## it waits 30 frames before the scan check because the scan has not started on the first frames.
 ## History: first written as the research-godot step's probe (it wrote a .pot and a .csv into
-## res://i18n_probe/out); moved here and changed to one POT at I18N_POT_OUT (step prototype, 2026-10-16).
+## res://i18n_probe/out); changed to one POT at I18N_POT_OUT by the prototype step (2026-10-16); moved
+## from the research branch codex/localization-research at 520cad1 (prototype/tools/pot_addon/) to
+## scripts/i18n/pot_addon/ in PR L2, unchanged.
 
+## The absolute .pot path from I18N_POT_OUT; empty when the plugin should stay idle.
 var out_path: String = ""
+## Frames processed so far, for the 30-frame wait before the first scan check.
 var frames: int = 0
 
 
+## Reads I18N_POT_OUT and processes only when it is set.
 func _enter_tree() -> void:
 	out_path = OS.get_environment("I18N_POT_OUT")
 	set_process(not out_path.is_empty())
 
 
+## Once the editor's first filesystem scan is over, finds the LocalizationEditor's save dialog and
+## emits its file_selected with [member out_path], which runs the real generator, then quits.
 func _process(_delta: float) -> void:
 	frames += 1
 	if frames < 30 or EditorInterface.get_resource_filesystem().is_scanning():
@@ -50,6 +57,7 @@ func _process(_delta: float) -> void:
 	_finish("done", 0 if FileAccess.file_exists(out_path) else 1)
 
 
+## Prints "POT_PROBE <message>" (extract_pot.sh greps for it) and quits the editor with [param code].
 func _finish(message: String, code: int) -> void:
 	print("POT_PROBE " + message)
 	EditorInterface.get_base_control().get_tree().quit(code)
