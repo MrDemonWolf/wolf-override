@@ -88,7 +88,7 @@ Every pull request and push to main runs a checksum-verified Godot 4.7.2 import 
 
 Every pull request runs docs type checks, the docs tests and a production Pages build before merge. Main-branch docs changes then deploy the website to GitHub Pages, one deployment at a time in push order. Build and deployment jobs have time limits. A newer push to a pull request cancels that pull request's older runs; every push to main runs in full.
 
-The **Test builds** workflow exports the macOS and Windows test builds described below. It runs beside the checks rather than after them and is not a required check, so a failed export does not block a merge, and a failed check does not stop the builds. It does not create installers or releases.
+The **Test builds** workflow exports the macOS and Windows test builds described below. It runs beside the checks rather than after them and is not a required check, so a failed export does not block a merge, and a failed check does not stop the builds. It does not create installers or releases. `scripts/get-export-templates.sh` takes the five files the presets need from Godot's official 4.7.2 template archive and checks each against a pinned checksum: the macOS and Windows debug templates, `version.txt`, and `icudt_godot.dat`, ICU's line-breaking data, which an export packs once a Chinese, Japanese, Korean or Thai translation is registered. `scripts/export-game.sh` fails an export that logs Godot's fallback to the editor's own copy of that data instead.
 
 ## Test builds
 
