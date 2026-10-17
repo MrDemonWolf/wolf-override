@@ -1,16 +1,20 @@
 #!/usr/bin/env python3
-"""The i18n prototype's one Python tool: the font subset, the PO files, their checks and the counts.
+"""The game's one i18n tool: the PO files, every translation gate, the POT file list, the font subset
+and the counts.
 
 Purpose
-    Every step of the prototype that is not a Godot run lives here once, as a subcommand:
+    Every localization step that is not a Godot run lives here once, as a subcommand:
 
-    potfiles GAME             prints project.godot's translations_pot_files line for GAME (apps/game):
+    potfiles GAME [--check]   prints project.godot's translations_pot_files line for GAME (apps/game):
                               every .tscn and .gd at any depth except POT_SKIP (the tests, the debug
                               tools, add-ons and the import cache), so a new subfolder is never missed.
+                              With --check it prints nothing and exits 1 when GAME's project.godot holds
+                              another list (CI runs it, so a new script cannot stay out of the POT).
     subset SRC OUT TRANS      writes OUT, a subset of the OpenType font SRC (Noto Sans JP) holding
                               printable ASCII, kana, CJK punctuation, full-width forms, "日本語" (the
                               language list's own name) and every character of TRANS's "ja" texts;
                               prints its size next to SRC's and a JIS X 0208 level-1 subset's (measure).
+                              (The prototype's subset; PR L4 makes the fixed common sets of decision D7.)
     fill POT TRANS OUTDIR     writes OUTDIR/<lang>.po for every language in TRANS from the POT: each
                               message keeps the POT's comments and gets TRANS's context as a "#." note,
                               its marks as "#. i18n: ..." (MARKS) and its translation, stamped
@@ -19,32 +23,40 @@ Purpose
                               by language and entry_key, with no English, so the back-translation is
                               independent. Each text says who speaks and how the engineer appears; each
                               answer carries a structured "engineer_gendered" next to its free-text notes.
-    check POT PODIR BACK OUT  every automated gate on the PO files, as JSON at OUT: msgfmt --check-format,
-                              the research-pipeline step's per-line measures (printf and named
-                              placeholders, BBCode tags, speaker tag, glossary; ../../pipeline/tools/
-                              trial.py, imported, not copied), line breaks (BREAKS_KEEP), the "E:" key
-                              token the hint bar replaces, the script guard (SCRIPT_GUARD), the engineer-
-                              gender gate (gendered_words, and the back-translation's engineer_gendered),
-                              the Slavic name-case gate (NAME_CASE), the plural forms of every msgstr[n],
-                              the sibling-file completeness gate (family_gaps), and chrF of Codex's
-                              back-translation (BACK, JSON) against the English. Exits 1 when any language
-                              fails (a failed line, a non-zero msgfmt or a sibling gap), so CI can gate on it.
-    selftest OUT              runs the gates above on fixed planted cases (SELFTEST, FAMILY_SELFTEST)
-                              and writes the result as JSON at OUT; exits 1 if a planted error passes or
-                              a clean line fails. The negative control for gates no prototype msgid
-                              exercises yet (named and printf placeholders, BBCode, plural forms, the
-                              "you", pronoun and name-case checks, sibling files).
+    check POT PODIR OUT [--back BACK] [--release]
+                              every automated gate on the PO files in PODIR (apps/game/i18n), as JSON at
+                              OUT: msgfmt --check-format, the per-line measures (printf and named
+                              placeholders, BBCode tags, speaker tag, glossary: line_measures, folded in
+                              from the research pipeline step's trial tool), line breaks (BREAKS_KEEP), the
+                              "E:" key token the hint bar replaces, the script guard (SCRIPT_GUARD), the
+                              engineer-gender gate (gendered_words, and the back-translation's
+                              engineer_gendered), the Slavic name-case gate (NAME_CASE), the plural forms of
+                              every msgstr[n], the sibling-file completeness gate (family_gaps), and chrF of
+                              Codex's back-translation (BACK, JSON; optional) against the English. With
+                              --release it also runs the release gates (release_problems): no fuzzy entry
+                              in a language whose review state is "reviewed", and no untranslated or fuzzy
+                              line marked "#. i18n: story". Exits 1 when any language fails (a failed line,
+                              a non-zero msgfmt, a sibling gap or a release problem), so CI can gate on it.
+                              A PODIR with no PO file passes: only English exists until PR L9.
+    selftest OUT              runs the gates above on fixed planted cases (SELFTEST, FAMILY_SELFTEST,
+                              RELEASE_SELFTEST) and writes the result as JSON at OUT; exits 1 if a planted
+                              error passes or a clean line fails. The negative control for gates no real
+                              msgid exercises yet (named and printf placeholders, BBCode, plural forms, the
+                              "you", pronoun and name-case checks, sibling files, the release gates).
     hardcoded POT INVENTORY OUT
                               player-facing strings of the strings step's inventory (in scope and shown)
                               whose text is no msgid of POT, by file, as JSON at OUT.
 
 Contract
-    python3 -I -B tools/i18n_tool.py <subcommand> ...   (stdlib only; `subset` needs hb-subset, `check`
-    needs msgfmt, both from Homebrew). Paths are arguments; nothing outside them is written. Every
-    per-language fact comes from languages.json beside this file (LANGUAGES); a PO whose language is not
-    in it stops `check`.
-    TRANS is translations/claude.json: {"context": {msgid: note}, "marks": {msgid: "engineer=... slot=...
-    speaker=..."}, "translations": {lang: {msgid: text}}}.
+    python3 -I -B scripts/i18n/i18n_tool.py <subcommand> ...   (stdlib only; `subset` needs hb-subset,
+    `check` needs msgfmt, both from gettext and harfbuzz in Homebrew or apt). Paths are arguments, read
+    from the current folder; nothing outside them is written. Two files are read from the repository
+    this tool sits in: every per-language fact from apps/game/i18n/languages.json (LANGUAGES, the same
+    table the game's I18n reads, so the game and the tools never keep two lists), and the glossary from
+    i18n/glossary.json (GLOSSARY_FILE). A PO whose language is not in the table stops `check`.
+    TRANS is a translations file: {"context": {msgid: note}, "marks": {msgid: "engineer=... slot=...
+    speaker=..."}, "translations": {lang: {msgid: text}}} (the prototype's translations/claude.json).
+    BACK is {"back": {"<lang>-<entry_key>": {"english": ..., "notes": ..., "engineer_gendered": bool}}}.
 
 Gotchas
     - The PO parser here reads what Godot's generator and this tool write (msgctxt, msgid, msgid_plural,
@@ -72,7 +84,15 @@ Gotchas
       next to its name slot. A flag is resolved by rewording or by a reviewer's "# gender-ok: <name>
       <date>" comment on the entry; native review of the gender-risk lines (PIPELINE.md) stays the real
       check.
-    - Run with python3 -I -B so nothing is written next to the tools (no __pycache__ in the docs tree).
+    - Run with python3 -I -B so nothing is written next to the tool (no __pycache__ in the repository).
+
+History
+    Moved from the research branch codex/localization-research at 520cad1
+    (docs/research-2026-10/localization/prototype/tools/i18n_tool.py; its fix-step versions are cited
+    there) in PR L2 of the localization plan. The measures it imported from that branch's
+    pipeline/tools/trial.py (placeholders_ok, bbcode_ok, chrf and check_line's tag and glossary checks)
+    are folded in here, so the build keeps one copy; trial.py's font-width estimate and glyph report are
+    not, since the game's own glyph and overflow checks (I18n, tests/i18n_test.gd) replace them.
 """
 from __future__ import annotations
 
@@ -81,19 +101,129 @@ import json
 import re
 import subprocess
 import sys
+from collections import Counter
+from datetime import datetime, timezone
 from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
-PIPELINE_TOOLS = HERE.parent.parent / "pipeline" / "tools"
-sys.path.insert(0, str(PIPELINE_TOOLS))
-import trial  # noqa: E402  (the research-pipeline step's measures: chrf, check_line, placeholders_ok)
+#: The repository this tool sits in (scripts/i18n/ is two levels down).
+REPO = HERE.parent.parent
 
-#: The one per-language table (languages.json beside this file): glossary key, script, family, plural rule,
-#: gender rule and the name-case flag for every language the tools know. Read once here; PR L1 moves the
-#: file into the game so I18n reads it too (PLAN.md), and nothing keeps a second list.
-LANGUAGES_FILE = HERE / "languages.json"
+#: The one per-language table: glossary key, script, family, plural rule, gender rule and the name-case
+#: flag for every language the tools know, in the same file the game's I18n reads into I18n.LANGUAGES
+#: (PR L1). Read once here, so the game, the picker and the gates never keep two lists.
+LANGUAGES_FILE = REPO / "apps" / "game" / "i18n" / "languages.json"
 _TABLE = json.loads(LANGUAGES_FILE.read_text(encoding="utf-8"))
 LANGUAGES: dict[str, dict] = _TABLE["languages"]
+#: The glossary the per-line gate reads: "keep" (words copied through untranslated in every script) and
+#: "terms" (per English term and glossary key, the "required" form a translation must contain and its
+#: accepted "variants"). Outside res:// on purpose: a .json inside the game would be exported (DESIGN.md,
+#: "Outside res://"). PR L5 grows it from the research trial's glossary with decisions D9 and D11.
+GLOSSARY_FILE = REPO / "i18n" / "glossary.json"
+
+# ------------------------------------------------------------------------- per-line measures
+# Folded in from the research pipeline step's trial tool (codex/localization-research at 520cad1,
+# docs/research-2026-10/localization/pipeline/tools/trial.py), which this tool used to import.
+
+#: Positional inserts filled by Godot's String % operator, in its full printf form: any run of the
+#: modifiers it reads (- + u 0-9 . *) before a conversion it accepts (s c d o x X f v; String::sprintf in
+#: core/string/ustring.cpp, 4.7.2-stable). The whole token is compared, so "%02d" turned into "%d" or a
+#: dropped "%.1f" is a mismatch. "%%" is a token too: String % reads it as a literal percent, so a stray
+#: "%%d" (Apple's Japanese line in the pipeline trial) silently eats a placeholder and must count as a
+#: mismatch. A space is not a modifier, so "100% sure" holds no token.
+POSITIONAL = re.compile(r"%%|%[-+u0-9.*]*[scdoxXfv]")
+#: Named inserts filled by String.format: {name} on the end card, the build plan's {current} and {total},
+#: and indexed ones such as {0}. Any word of letters, digits and _ counts, so a misspelt or dropped one is
+#: caught: String.format leaves an unknown key on screen as literal text, and msgfmt's c-format check
+#: ignores braces.
+NAMED = re.compile(r"\{[A-Za-z0-9_]+\}")
+#: A BBCode tag as RichTextLabel reads it: [b], [/b], [color=#ff8800], [font_size=19]. The credits are one
+#: BBCode msgid, so its tags must survive translation.
+BBCODE = re.compile(r"\[(/?)([a-z_]+)(?:=[^\]]*)?\]")
+#: The speaker tag a WOLF line starts with in English; DialogueBoxes reads it to colour the box, so a
+#: translation must keep it in front.
+WOLF_TAG = "WOLF: "
+
+
+def placeholders_ok(english: str, text: str) -> bool:
+    """True when ``text`` keeps ``english``'s inserts: the positional ones (POSITIONAL) in the same
+    order, since %s and %d are filled left to right, and the named ones (NAMED) as a multiset, since a
+    translator may move them. Pure."""
+    return (POSITIONAL.findall(english) == POSITIONAL.findall(text)
+            and Counter(NAMED.findall(english)) == Counter(NAMED.findall(text)))
+
+
+def _bbcode_nests(text: str) -> bool:
+    """True when every closing tag in ``text`` closes the innermost open tag and none stays open."""
+    stack: list[str] = []
+    for match in BBCODE.finditer(text):
+        if not match.group(1):
+            stack.append(match.group(2))
+        elif not stack or stack.pop() != match.group(2):
+            return False
+    return not stack
+
+
+def bbcode_ok(english: str, text: str) -> bool:
+    """True when ``text`` has exactly ``english``'s BBCode tags, attribute values included, as a multiset
+    (a translator may move a bold word), and they nest properly wherever the English does (a tag with no
+    closing form, such as [br], makes the English itself not nest, and then only the multiset counts).
+    Pure."""
+    if Counter(m.group(0) for m in BBCODE.finditer(english)) != Counter(m.group(0) for m in BBCODE.finditer(text)):
+        return False
+    return _bbcode_nests(text) or not _bbcode_nests(english)
+
+
+def chrf(hypothesis: str, reference: str, max_n: int = 6, beta: float = 2.0) -> float:
+    """chrF (Popović 2015: character n-gram F-score up to ``max_n``, recall weighted by ``beta``) of
+    ``hypothesis`` against ``reference``, 0..100, case and spaces ignored. Used on a back-translation
+    against the English: a cheap drift proxy that punishes paraphrase as well as wrong meaning, so it only
+    flags a line for a person (PIPELINE.md, "chrF on its own is not a gate"). Pure."""
+    hyp, ref = hypothesis.replace(" ", "").lower(), reference.replace(" ", "").lower()
+    precisions, recalls = [], []
+    for n in range(1, max_n + 1):
+        h = Counter(hyp[i:i + n] for i in range(len(hyp) - n + 1))
+        r = Counter(ref[i:i + n] for i in range(len(ref) - n + 1))
+        if not h or not r:
+            continue
+        overlap = sum((h & r).values())
+        precisions.append(overlap / sum(h.values()))
+        recalls.append(overlap / sum(r.values()))
+    if not precisions:
+        return 0.0
+    p, r = sum(precisions) / len(precisions), sum(recalls) / len(recalls)
+    return 0.0 if p + r == 0 else round(100 * (1 + beta ** 2) * p * r / (beta ** 2 * p + r), 1)
+
+
+def glossary_missing(english: str, text: str, glossary_key: str, glossary: dict) -> list[str]:
+    """The glossary terms ``english`` uses whose required form (or an accepted variant) for
+    ``glossary_key`` (a languages.json "glossary" value such as "es-419") is not in ``text``. An
+    upper-case term ("SAFE POINT", a plate) matches anywhere; any other term only as a whole word. A term
+    with no entry for the language is not checked. Pure."""
+    missing = []
+    for term, forms in glossary["terms"].items():
+        hit = term in english if term.isupper() else re.search(r"\b" + re.escape(term) + r"\b", english)
+        if hit and glossary_key in forms:
+            allowed = [forms[glossary_key]["required"]] + forms[glossary_key].get("variants", [])
+            if not any(form in text for form in allowed):
+                missing.append(term)
+    return missing
+
+
+def line_measures(english: str, text: str, glossary_key: str, glossary: dict) -> dict:
+    """The language-independent measures of one translation ``text`` of ``english``: placeholders_ok,
+    wolf_ok (WOLF named at least as often; reported, not a gate), tag_ok (a line that starts with
+    WOLF_TAG keeps it in front), char_ratio (length against the English; reported) and glossary_missing.
+    `check` adds the per-language gates. Pure."""
+    return {
+        "placeholders_ok": placeholders_ok(english, text),
+        "wolf_ok": text.count("WOLF") >= english.count("WOLF"),
+        "tag_ok": (not english.startswith(WOLF_TAG)) or text.startswith(WOLF_TAG),
+        "char_ratio": round(len(text) / len(english), 2),
+        "glossary_missing": glossary_missing(english, text, glossary_key, glossary),
+    }
+
+
 #: The script guard, ported once from ConPaws' locales-script test (written there after a Russian word
 #: slipped into its pt-BR file): a Latin-script or CJK text holds no Cyrillic letter, and a Cyrillic
 #: text holds no Latin letter outside the glossary's "keep" words (WOLF, the "E:" key token, the studio
@@ -305,13 +435,34 @@ def engineer_roles(entry: dict) -> set[str]:
 
 # ---------------------------------------------------------------------------------------- subcommands
 
-def potfiles(game: Path) -> None:
-    """Prints the translations_pot_files setting for ``game`` (apps/game): every .tscn and .gd under it,
-    at any depth, except POT_SKIP. Walking the whole tree is what makes the CI equality check meaningful:
-    a scene in a new subfolder (the lighter plan's scenes/ui/) is listed without anyone adding it."""
+def pot_files(game: Path) -> list[str]:
+    """Every .tscn and .gd under ``game`` (apps/game), at any depth, as sorted res:// paths, except
+    POT_SKIP. Walking the whole tree is what makes the CI equality check meaningful: a scene in a new
+    subfolder (the lighter plan's scenes/ui/) is listed without anyone adding it. Pure (reads the tree)."""
     files = sorted(p.relative_to(game).as_posix() for p in list(game.rglob("*.tscn")) + list(game.rglob("*.gd")))
-    kept = [f"res://{f}" for f in files if not f.startswith(POT_SKIP)]
-    print("locale/translations_pot_files=PackedStringArray(" + ", ".join(json.dumps(f) for f in kept) + ")")
+    return [f"res://{f}" for f in files if not f.startswith(POT_SKIP)]
+
+
+#: The project.godot key (under [internationalization]) that lists the files Godot's POT generator reads.
+POT_FILES_KEY = "locale/translations_pot_files"
+
+
+def potfiles(game: Path, check_only: bool = False) -> None:
+    """Prints the translations_pot_files line for ``game`` (pot_files), ready for project.godot. With
+    ``check_only`` it prints nothing when ``game``/project.godot already holds exactly that line, and
+    otherwise names the files to add or drop and exits 1 (the CI check)."""
+    line = POT_FILES_KEY + "=PackedStringArray(" + ", ".join(json.dumps(f) for f in pot_files(game)) + ")"
+    if not check_only:
+        print(line)
+        return
+    project = (game / "project.godot").read_text(encoding="utf-8")
+    current = next((row for row in project.splitlines() if row.startswith(POT_FILES_KEY + "=")), None)
+    if current == line:
+        return
+    listed = set(re.findall(r'"([^"]*)"', current or ""))
+    wanted = set(pot_files(game))
+    sys.exit(f"{POT_FILES_KEY} in {game / 'project.godot'} is out of date: add {sorted(wanted - listed)}, "
+             f"drop {sorted(listed - wanted)} (or fix the order); paste the line `i18n_tool.py potfiles` prints")
 
 
 def subset(src: Path, out: Path, trans: Path) -> None:
@@ -353,6 +504,8 @@ def fill(pot: Path, trans: Path, outdir: Path) -> None:
     data = json.loads(trans.read_text(encoding="utf-8"))
     entries = read_po(pot)
     outdir.mkdir(parents=True, exist_ok=True)
+    # gettext's header date form; the run's own time, so the file says when it was written.
+    revised = datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M+0000")
     for lang, texts in data["translations"].items():
         unused = set(texts) - {e["msgid"] for e in entries}
         if unused:
@@ -360,17 +513,17 @@ def fill(pot: Path, trans: Path, outdir: Path) -> None:
         out = []
         for entry in entries:
             if not entry["msgid"]:
-                header = ("Project-Id-Version: WOLF//OVERRIDE i18n prototype\\n", "PO-Revision-Date: 2026-10-16 00:00+0000\\n",
+                header = ("Project-Id-Version: WOLF//OVERRIDE\\n", f"PO-Revision-Date: {revised}\\n",
                           "Last-Translator: Claude (Anthropic), machine translation, unreviewed\\n", "Language-Team: none\\n", "MIME-Version: 1.0\\n",
                           "Content-Type: text/plain; charset=UTF-8\\n", "Content-Transfer-Encoding: 8bit\\n",
                           f"Language: {lang}\\n", f"Plural-Forms: {LANGUAGES[lang]['plural_forms']}\\n")
-                out.append("# Sample translations for the scratch prototype (proof only; not reviewed).\n"
+                out.append("# Machine translation by Claude (Anthropic); no native speaker has reviewed it yet.\n"
                            'msgid ""\nmsgstr ""\n' + "\n".join(f'"{h}"' for h in header))
                 continue
             # A plural entry gets one msgstr per plural form of the language.
             forms = plural_count(lang) if "msgid_plural" in entry else 1
             done = dict(entry, comments=list(entry["comments"]), msgstr=[""] * forms)
-            if any(token != "%%" for token in trial.POSITIONAL.findall(entry["msgid"])) and not any(c.startswith("#,") for c in done["comments"]):
+            if any(token != "%%" for token in POSITIONAL.findall(entry["msgid"])) and not any(c.startswith("#,") for c in done["comments"]):
                 # Godot's generator writes no format flag; with it msgfmt --check-format compares the
                 # translation's printf inserts with the msgid's (the pipeline step's msgfmt gate).
                 done["comments"].append("#, c-format")
@@ -563,7 +716,7 @@ def nplurals(header: str) -> int:
 def plural_problems(entry: dict, forms: int) -> list[str]:
     """What is wrong with a plural entry's msgstr[n] for a language with ``forms`` plural forms: the
     wrong number of forms, an empty form, or a form whose inserts differ from its English (form 0 against
-    msgid, the others against msgid_plural; trial.placeholders_ok). Empty for a non-plural entry. A wrong
+    msgid, the others against msgid_plural; placeholders_ok). Empty for a non-plural entry. A wrong
     count matters beyond the line: Godot's PO loader rejects the whole file for it, as it does for a
     msgid_plural under a header with no Plural-Forms line (core/io/translation_loader_po.cpp; an
     unparsable rule is plural_header_ok's job, see Gotchas)."""
@@ -574,8 +727,45 @@ def plural_problems(entry: dict, forms: int) -> list[str]:
         english = entry["msgid"] if index == 0 else entry["msgid_plural"]
         if not text:
             problems.append(f"msgstr[{index}] is empty")
-        elif not trial.placeholders_ok(english, text):
+        elif not placeholders_ok(english, text):
             problems.append(f"msgstr[{index}] inserts differ from the English")
+    return problems
+
+
+#: The mark a story-critical line carries ("#. i18n: story", written as "# TRANSLATORS: i18n: story" in
+#: the source by PR L7c): a release may not ship it untranslated in any language (release_problems).
+STORY_MARK = "story"
+
+
+def _message_id(entry: dict) -> tuple[str, str]:
+    """An entry's (msgctxt, msgid): what makes a message one message ("CONTINUE" with a context tag is
+    another message than plain "CONTINUE")."""
+    return entry.get("msgctxt", ""), entry["msgid"]
+
+
+def release_problems(entries: list[dict], pot_entries: list[dict], review: str) -> list[str]:
+    """The release gates (PIPELINE.md, "When the English changes", step 7) for one language's PO
+    ``entries`` against the POT's ``pot_entries``, where ``review`` is the language's review state in
+    languages.json ("machine" or "reviewed"):
+      - in a "reviewed" language, every fuzzy entry (is_fuzzy), since msgmerge marks a line fuzzy when
+        its English changed and a reviewed language may not ship a line nobody re-read;
+      - in any language, every message marked STORY_MARK (in the POT or the PO) that the PO lacks, leaves
+        empty (any msgstr[n]) or has fuzzy, since Godot then shows the English line in the middle of
+        the story.
+    Each problem is one sentence naming the msgid. Empty when the language may ship. Pure.
+    Not part of the everyday `check`: a language in progress has many untranslated lines on purpose
+    (the prototype's left 115 each), so only release CI runs `check --release`."""
+    problems = []
+    if review == "reviewed":
+        problems += [f"fuzzy in a reviewed language: {e['msgid']!r}" for e in entries if e["msgid"] and is_fuzzy(e)]
+    by_id = {_message_id(e): e for e in entries if e["msgid"]}
+    story = {_message_id(e) for e in pot_entries + entries if e["msgid"] and STORY_MARK in marks(e)}
+    for key in sorted(story):
+        entry = by_id.get(key)
+        if entry is None or not entry["msgstr"] or not all(entry["msgstr"]):
+            problems.append(f"story line untranslated: {key[1]!r}")
+        elif is_fuzzy(entry):
+            problems.append(f"story line fuzzy: {key[1]!r}")
     return problems
 
 
@@ -583,22 +773,25 @@ def plural_problems(entry: dict, forms: int) -> list[str]:
 LINE_GATES = ("placeholders_ok", "tag_ok", "breaks_ok", "key_token_ok", "script_ok", "bbcode_ok", "gender_ok", "name_case_ok")
 
 
-def check(pot: Path, podir: Path, back: Path, out: Path) -> None:
-    """Runs every automated gate on the PO files, writes the report to ``out`` and exits 1 when any
-    language fails: a failed line, a non-zero msgfmt, a gap in a language with a sibling file
+def check(pot: Path, podir: Path, out: Path, back: Path | None = None, release: bool = False) -> None:
+    """Runs every automated gate on the PO files in ``podir``, writes the report to ``out`` and exits 1
+    when any language fails: a failed line, a non-zero msgfmt, a gap in a language with a sibling file
     (family_gaps), a header Plural-Forms rule other than languages.json's (plural_header_ok), a comment
-    that would make Godot skip a line (fuzzy_notes), or a msgid whose call sites disagree on a mark
-    (mark_conflicts, in the POT or the PO). A PO whose language is not in languages.json stops the run."""
-    glossary = trial.load("glossary.json")
-    fonts = trial.Fonts()
-    backs = json.loads(back.read_text(encoding="utf-8"))["back"] if back.exists() else {}
+    that would make Godot skip a line (fuzzy_notes), a msgid whose call sites disagree on a mark
+    (mark_conflicts, in the POT or the PO), or, with ``release``, a release problem (release_problems).
+    ``back`` is the back-translation file; without it no line has a back-translation (back_missing) and
+    only the back-translation's own gate is skipped. A PO whose language is not in languages.json stops
+    the run; a ``podir`` with no PO file writes a report with no language and passes."""
+    glossary = json.loads(GLOSSARY_FILE.read_text(encoding="utf-8"))
+    backs = json.loads(back.read_text(encoding="utf-8"))["back"] if back is not None else {}
+    pot_entries = read_po(pot)
     po_entries = {po.stem: read_po(po) for po in sorted(podir.glob("*.po"))}
     unknown = sorted(set(po_entries) - set(LANGUAGES))
     if unknown:
         sys.exit(f"PO files for languages missing from {LANGUAGES_FILE.name}: {unknown}")
     gaps = family_gaps(po_entries)
     pot_conflicts = {msgid: mark_conflicts(entry) for msgid, entry in messages(pot).items() if mark_conflicts(entry)}
-    report: dict = {"pot_messages": len(messages(pot)), "pot_mark_conflicts": pot_conflicts, "languages": {}}
+    report: dict = {"pot_messages": len(messages(pot)), "pot_mark_conflicts": pot_conflicts, "release": release, "languages": {}}
     for lang, entries in po_entries.items():
         fmt = subprocess.run(["msgfmt", "--check-format", "--check-header", "-o", "/dev/null", "--statistics", str(podir / f"{lang}.po")],
                              capture_output=True, text=True)
@@ -608,14 +801,12 @@ def check(pot: Path, podir: Path, back: Path, out: Path) -> None:
         for entry in translated:
             english, text = entry["msgid"], entry["msgstr"][0]
             roles = engineer_roles(entry)
-            measures = trial.check_line({"text": english, "surface": "dialogue"}, text, LANGUAGES[lang]["glossary"], glossary, fonts)
-            measures.pop("missing_glyphs", None)  # the game's own glyph test (i18n_test.gd) checks the real font chain
-            measures.pop("width_ratio_est", None)
+            measures = line_measures(english, text, LANGUAGES[lang]["glossary"], glossary)
             keep_breaks = any(BREAKS_KEEP in c for c in entry["comments"])
             measures["breaks_ok"] = (text.count("\n") == english.count("\n")) if keep_breaks else text.count("\n") <= english.count("\n")
             measures["key_token_ok"] = len(KEY_TOKEN.findall(english)) == len(KEY_TOKEN.findall(text))
             measures["script_ok"] = script_ok(text, lang, glossary["keep"])
-            measures["bbcode_ok"] = trial.bbcode_ok(english, text)
+            measures["bbcode_ok"] = bbcode_ok(english, text)
             gender_stamped = any(c.startswith("# gender-ok:") for c in entry["comments"])
             measures["engineer_roles"] = sorted(roles)
             measures["gender_words"] = gendered_words(text, lang, roles)
@@ -628,7 +819,7 @@ def check(pot: Path, podir: Path, back: Path, out: Path) -> None:
             if item:
                 measures["back"] = item["english"]
                 measures["back_notes"] = item.get("notes", "")
-                measures["chrf"] = trial.chrf(item["english"], english)
+                measures["chrf"] = chrf(item["english"], english)
                 measures["drift_flag"] = measures["chrf"] < 35 and len(english.split()) > 4
             # A missing answer or one filed before the engineer_gendered field existed reads None: no
             # verdict, so only an explicit true fails the line (back_missing counts the lines with none).
@@ -640,9 +831,11 @@ def check(pot: Path, podir: Path, back: Path, out: Path) -> None:
         notes = [e["msgid"] for e in entries if e["msgid"] and fuzzy_notes(e)]
         conflicts = {e["msgid"]: mark_conflicts(e) for e in entries if e["msgid"] and mark_conflicts(e)}
         header_ok = plural_header_ok(header, lang)
+        shipping = release_problems(entries, pot_entries, LANGUAGES[lang].get("review", "")) if release else []
         report["languages"][lang] = {
             "ok": (fmt.returncode == 0 and not failed and not gaps.get(lang) and header_ok and not notes
-                   and not conflicts and not pot_conflicts),
+                   and not conflicts and not pot_conflicts and not shipping),
+            "release_problems": shipping,
             "msgfmt_rc": fmt.returncode, "msgfmt": (fmt.stdout + fmt.stderr).strip(),
             "plural_header_ok": header_ok, "fuzzy_notes": notes, "mark_conflicts": conflicts,
             "translated": len(translated), "fuzzy": [e["msgid"] for e in entries if e["msgid"] and is_fuzzy(e)],
@@ -655,8 +848,13 @@ def check(pot: Path, podir: Path, back: Path, out: Path) -> None:
         gap = "" if data["family_gaps"] is None else f", {len(data['family_gaps'])} sibling gaps"
         print(f"{lang}: msgfmt rc {data['msgfmt_rc']} ({data['msgfmt']}); {data['translated']} checked, "
               f"{len(data['failed'])} failed, {len(data['drift_flags'])} drift flags, "
-              f"{data['back_missing']} without a back-translation{gap}")
-    if not all(data["ok"] for data in report["languages"].values()):
+              f"{data['back_missing']} without a back-translation{gap}"
+              + (f", {len(data['release_problems'])} release problems" if release else ""))
+    if not report["languages"]:
+        print(f"no PO files in {podir}: nothing to check")
+    if pot_conflicts:
+        print(f"the POT's call sites disagree on marks: {pot_conflicts}")
+    if pot_conflicts or not all(data["ok"] for data in report["languages"].values()):
         sys.exit(1)
 
 
@@ -793,16 +991,39 @@ FAMILY_SELFTEST = [
     ("es alone misses B: English shows, no gap", {"es": {"A": ("a", False)}}, []),
 ]
 
+#: Planted cases for the release gates (release_problems): (what, review state, PO entries, POT entries,
+#: must it report a problem). An entry is (msgid, msgstr list, fuzzy, story-marked); the story mark is
+#: written the way the generator writes it ("#. TRANSLATORS: i18n: story").
+RELEASE_SELFTEST = [
+    ("machine language, one fuzzy line: may ship", "machine", [("A", ["a"], True, False)], [("A", [""], False, False)], False),
+    ("reviewed language, one fuzzy line: may not ship", "reviewed", [("A", ["a"], True, False)], [("A", [""], False, False)], True),
+    ("reviewed language, every line translated: may ship", "reviewed", [("A", ["a"], False, False), ("B", ["b"], False, False)], [("A", [""], False, False), ("B", [""], False, False)], False),
+    ("story line translated: may ship", "machine", [("S", ["s"], False, True)], [("S", [""], False, True)], False),
+    ("story line left empty: may not ship", "machine", [("S", [""], False, True)], [("S", [""], False, True)], True),
+    ("story line fuzzy in a machine language: may not ship", "machine", [("S", ["s"], True, True)], [("S", [""], False, True)], True),
+    ("story line missing from the PO (marked in the POT only): may not ship", "machine", [("A", ["a"], False, False)], [("A", [""], False, False), ("S", [""], False, True)], True),
+    ("story plural with an empty form: may not ship", "machine", [("S", ["s", ""], False, True)], [("S", ["", ""], False, True)], True),
+    ("untranslated line with no story mark: may ship", "machine", [("A", [""], False, False)], [("A", [""], False, False)], False),
+]
+
+
+def _planted_entries(rows: list[tuple]) -> list[dict]:
+    """RELEASE_SELFTEST's (msgid, msgstr list, fuzzy, story) rows as parsed PO entries (read_po's form),
+    with the gettext fuzzy flag and the story mark as comment lines. Pure."""
+    return [{"msgid": msgid, "msgstr": list(texts),
+             "comments": (["#, fuzzy"] if fuzzy else []) + ([f"#. TRANSLATORS: i18n: {STORY_MARK}"] if story else [])}
+            for msgid, texts, fuzzy, story in rows]
+
 
 def selftest(out: Path) -> None:
-    """Runs SELFTEST and FAMILY_SELFTEST through the gates, writes each case's result to ``out`` and exits
+    """Runs SELFTEST, FAMILY_SELFTEST and RELEASE_SELFTEST through the gates, writes each case's result to ``out`` and exits
     1 on a mismatch. Touches nothing else."""
     results = []
     for gate, lang, english, text, expected, mark in SELFTEST:
         if gate == "placeholders":
-            passed = trial.placeholders_ok(english, text)
+            passed = placeholders_ok(english, text)
         elif gate == "bbcode":
-            passed = trial.bbcode_ok(english, text)
+            passed = bbcode_ok(english, text)
         elif gate in ("gender", "name_case"):
             roles = engineer_roles({"msgid": text, "comments": [f"#. i18n: engineer={mark}"] if mark else []})
             passed = (not gendered_words(text, lang, roles)) if gate == "gender" else name_case_ok(text, lang, roles)
@@ -822,6 +1043,10 @@ def selftest(out: Path) -> None:
         flagged = sorted(lang for lang, gap in family_gaps(po).items() if gap)
         results.append({"gate": "family", "case": what, "expected_gaps": expected_gaps, "gaps": flagged,
                         "as_expected": flagged == sorted(expected_gaps)})
+    for what, review, po, pot, expect_problem in RELEASE_SELFTEST:
+        found = release_problems(_planted_entries(po), _planted_entries(pot), review)
+        results.append({"gate": "release", "case": what, "expected_problem": expect_problem, "problems": found,
+                        "as_expected": bool(found) == expect_problem})
     wrong = [r for r in results if not r["as_expected"]]
     out.write_text(json.dumps({"cases": len(results), "as_expected": len(results) - len(wrong), "results": results},
                               ensure_ascii=False, indent=1) + "\n", encoding="utf-8")
@@ -854,9 +1079,30 @@ def hardcoded(pot: Path, inventory: Path, out: Path) -> None:
     print(json.dumps(summary, indent=1))
 
 
-if __name__ == "__main__":
-    commands = {"potfiles": (potfiles, 1), "subset": (subset, 3), "fill": (fill, 3), "backprompt": (backprompt, 2),
-                "check": (check, 4), "selftest": (selftest, 1), "hardcoded": (hardcoded, 3)}
-    if len(sys.argv) < 2 or sys.argv[1] not in commands or len(sys.argv) - 2 != commands[sys.argv[1]][1]:
+def main(argv: list[str]) -> None:
+    """Runs the subcommand ``argv`` names (see the module notes); a wrong call prints the notes and exits
+    1. Flags (--check, --back BACK, --release) are read only where the notes list them."""
+    args, flags, back = [], set(), None
+    rest = iter(argv[1:])
+    for arg in rest:
+        if arg == "--back":
+            back = Path(next(rest, ""))
+        elif arg.startswith("--"):
+            flags.add(arg)
+        else:
+            args.append(Path(arg))
+    plain = {"subset": (subset, 3), "fill": (fill, 3), "backprompt": (backprompt, 2), "selftest": (selftest, 1),
+             "hardcoded": (hardcoded, 3)}
+    command = argv[0] if argv else ""
+    if command == "potfiles" and len(args) == 1 and flags <= {"--check"} and back is None:
+        potfiles(args[0], "--check" in flags)
+    elif command == "check" and len(args) == 3 and flags <= {"--release"}:
+        check(*args, back=back, release="--release" in flags)
+    elif command in plain and len(args) == plain[command][1] and not flags and back is None:
+        plain[command][0](*args)
+    else:
         sys.exit(__doc__)
-    commands[sys.argv[1]][0](*(Path(a) for a in sys.argv[2:]))
+
+
+if __name__ == "__main__":
+    main(sys.argv[1:])
