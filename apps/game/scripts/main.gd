@@ -803,11 +803,11 @@ var speaker_column_key: String = ""
 ## is not drawn at 1/8: WOLF keeps about the size he was drawn before (the default for the open
 ## WOLF-size question, 2026-10-16, until Nathanial picks another). The earlier body ran 56 px behind
 ## his origin and 59.1 ahead (115.1 x 61.6 world px); the piece is cut to his outline and centred, so
-## it reaches as far each way, and 0.109 keeps his tail tip where it was (56.03 px back, inside the
-## Service Junction's right edge at his spot by the exit, WOLF_BAIT_X): 112.1 x 59.8 world px, 3 %
+## it reaches as far each way, and 0.1089 keeps his tail tip where it was (55.97 px back, inside the
+## Service Junction's right edge at his spot by the exit, WOLF_BAIT_X): 111.9 x 59.8 world px, 3 %
 ## smaller than before.
 const WOLF_ART_PATH: String = "res://assets/characters/wolf-stand.png"
-const WOLF_ART_SCALE: float = 0.109
+const WOLF_ART_SCALE: float = 0.1089
 ## The sprite's centre from WOLF's origin: his feet (the piece's bottom row) stand where the earlier
 ## art's did, 15.4 world px below the origin (-14.5 + 549 / 2 * WOLF_ART_SCALE). x stays 0 so he
 ## mirrors in place.
