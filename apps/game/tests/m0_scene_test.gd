@@ -68,7 +68,7 @@ func _run() -> void:
 	_expect(note_width <= continue_note.size.x and continue_note.position.y >= continue_button.position.y + continue_button.size.y and continue_note.position.y + continue_note.size.y <= credits_button.position.y, "Continue caption fits between the title button rows")
 	if not _require(title_art.texture != null and title_art.texture.resource_path == "res://assets/title-corridor-key-art-provisional.png", "title shows the corridor artwork"):
 		return
-	if not _require(title_logo.text == "WOLF//OVERRIDE" and title_mark.texture != null and title_mark.texture.resource_path == "res://assets/logo-mark.svg", "title loads the branded WOLF//OVERRIDE logo"):
+	if not _require(title_logo.text == "WOLF OVERRIDE" and title_mark.texture != null and title_mark.texture.resource_path == "res://assets/logo-mark.svg", "title loads the branded WOLF OVERRIDE logo"):
 		return
 	credits_button.pressed.emit()
 	if not _require(credits_screen.visible and not title_logo.visible and game.get("title_open"), "Credits opens cleanly without starting the game"):

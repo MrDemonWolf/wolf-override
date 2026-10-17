@@ -26,7 +26,11 @@ import zipfile
 from datetime import datetime, timezone
 from pathlib import Path
 
-APP = "WOLF--OVERRIDE.app"
+# Godot's macOS export names the app, its executable and its pack after application/config/name
+# passed through OS::get_safe_dir_name (platform/macos/export/export_plugin.cpp, 4.7.2-stable), which
+# keeps spaces and turns "/" into "-": "WOLF OVERRIDE" since 2026-10-17 (it was "WOLF--OVERRIDE").
+EXE = "WOLF OVERRIDE"
+APP = f"{EXE}.app"
 REQUIRED_IN_PACK = ["assets/changelog.txt", "assets/fonts/Roboto-OFL.txt", "assets/fonts/Montserrat-OFL.txt"]
 FORBIDDEN_IN_PACK = re.compile(
     r"^(tests|tools|review|capture|trial|assets/trial|art-source)/|\.md$|^assets/manifest\.json$"
@@ -82,7 +86,7 @@ def check_pack(data: bytes, label: str) -> int:
 def readme(platform: str, commit: str) -> str:
     built = datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M UTC")
     target = "macOS (one app for Apple silicon and Intel Macs)" if platform == "macos" else "Windows (64-bit)"
-    return f"""WOLF//OVERRIDE test build
+    return f"""WOLF OVERRIDE test build
 Platform: {target}
 Commit: {commit}
 Built: {built}
@@ -129,12 +133,12 @@ def add_notices(archive: zipfile.ZipFile, notices: Path, platform: str, commit: 
 def package_macos(export: Path, output: Path, notices: Path, commit: str) -> None:
     with zipfile.ZipFile(export) as archive:
         entries = {info.filename: info for info in archive.infolist()}
-        binary = entries.get(f"{APP}/Contents/MacOS/WOLF--OVERRIDE")
+        binary = entries.get(f"{APP}/Contents/MacOS/{EXE}")
         if binary is None or not (binary.external_attr >> 16) & 0o111:
             fail("the macOS app's executable is missing or lost its executable bit")
         if f"{APP}/Contents/_CodeSignature/CodeResources" not in entries:
             fail("the macOS app has no signature (Godot's built-in ad-hoc signing did not run)")
-        files = check_pack(archive.read(f"{APP}/Contents/Resources/WOLF--OVERRIDE.pck"), "macOS")
+        files = check_pack(archive.read(f"{APP}/Contents/Resources/{EXE}.pck"), "macOS")
     shutil.copyfile(export, output)
     # Appending leaves Godot's entries, their permission bits and the app's signature untouched.
     with zipfile.ZipFile(output, "a", compression=zipfile.ZIP_DEFLATED) as archive:

@@ -10,7 +10,7 @@ config_version=5
 
 [application]
 
-config/name="WOLF//OVERRIDE"
+config/name="WOLF OVERRIDE"
 config/version="0.15.0"
 run/main_scene="res://scenes/studio_logo.tscn"
 config/features=PackedStringArray("4.7", "GL Compatibility")
@@ -18,6 +18,10 @@ config/icon="res://assets/logo-mark.svg"
 boot_splash/bg_color=Color(0, 0, 0, 1)
 boot_splash/image="res://assets/brand/studio-logo-boot.png"
 config/quit_on_go_back=false
+config/use_custom_user_dir=true
+config/custom_user_dir_name="Godot/app_userdata/WOLF--OVERRIDE"
+config/custom_user_dir_name.linuxbsd="godot/app_userdata/WOLF--OVERRIDE"
+config/custom_user_dir_name.web="godot/app_userdata/WOLF--OVERRIDE"
 
 [display]
 

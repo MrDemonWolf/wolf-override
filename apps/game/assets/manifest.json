@@ -527,7 +527,7 @@
       "rights_review_status": "Derivative screenshot using the registered provisional game art and the bundled OFL fonts. Underlying commercial asset-rights review remains open; no new third-party artwork acquired.",
       "modifications": "1600x900 scripted still, recaptured October 12, 2026 after the coolant relay's art, the wall-mounted MANUAL BYPASS and the painted light at the corridor's door end changed (replacing the October 11 capture at this path, which showed the earlier relay and the floor-stand bypass); no image edits (SHA-256 2eb6dabb8667352b...). Published as 480, 960 and 1600 px WebP copies. Rendered in software, so its pixels differ slightly from a GPU capture. Not a hands-on route or release acceptance test.",
       "source_reference": "apps/game/scenes/main.tscn and scripts/main.gd on October 12, 2026; New Game with the opening skipped (the debug new-game call), 300 frames into the corridor, with the objective CHECK THE BREAKER, the tutorial prompt and the opening lines, keyboard layout, WOLF at rest clear of the engineer",
-      "implementation_status": "Current public gameplay frame on the landing page (480/960/1600 srcset sized to the frame) and in the corridor walkthrough, captioned as a source-build capture with provisional art and UI. It shows the layered corridor (corridor-far, -mid and -near), the station props (the Look 2 coolant relay on its plinth at the right) and the downscaled character sprites in this register.",
+      "implementation_status": "Gameplay frame in the corridor walkthrough (480/960/1600 srcset), captioned as a source-build capture with provisional art and UI. It was the landing page's gameplay frame until October 16, 2026, when the Records Access and Service Junction door captures replaced it there. It shows the layered corridor (corridor-far, -mid and -near), the station props (the Look 2 coolant relay on its plinth at the right) and the downscaled character sprites in this register.",
       "terms_reference": "GPL-3.0-or-later for the project code and UI shown (see LICENSE); the pictured art keeps the terms recorded on its own entries (provisional generated art: https://openai.com/policies/terms-of-use/); fonts under SIL Open Font License 1.1"
     },
     {
@@ -556,6 +556,36 @@
       "modifications": "960x540 scripted still, recaptured October 10, 2026 after the pressure bulkhead and the station name plates were added, and again the same day after the RELIEF VENT plate joined the row (each replacing the earlier capture at this path), and again on October 11, 2026 after the TANK RELEASE plate, the ARM THE BREAKER objective and the Checkpoint saved. hint; no image edits beyond the downscale. Not a hands-on route or release acceptance test. Recaptured on October 14, 2026 after the doors landed (the steel entry swing door shut behind the engineer, the blast door in its cross-wall), replacing the October 11 capture at this path; no image edits beyond the downscale (SHA-256 9b4174340aba2f24...). Rendered in software, so colours can differ slightly from a GPU.",
       "source_reference": "apps/game/scripts/junction_room.gd and scripts/main.gd on October 14, 2026 (the codex/doors branch); just after entering the Service Junction from the Records exit, its entry door shut, WOLF walking back from reading the valve's gauge, before the breaker is armed, keyboard layout",
       "implementation_status": "Gameplay frame at the top of the Service Junction walkthrough, captioned as a source-build capture with provisional art and UI. Recaptured after the junction door became a pressure bulkhead and the station names moved onto plates in one row, and again after the release was renamed TANK RELEASE and autosaves began showing Checkpoint saved. Recaptured on October 14, 2026 after the doors replaced the bulkhead and the hatches.",
+      "terms_reference": "GPL-3.0-or-later for the project code and UI shown (see LICENSE); the pictured art keeps the terms recorded on its own entries (provisional generated art: https://openai.com/policies/terms-of-use/); fonts under SIL Open Font License 1.1"
+    },
+    {
+      "asset_id": "records-access-doors-capture-2026-10-16",
+      "path": "apps/docs/app/images/records-access-doors-capture.png",
+      "published_copy": [
+        "apps/docs/app/images/records-access-doors-capture-480.webp",
+        "apps/docs/app/images/records-access-doors-capture-960.webp",
+        "apps/docs/app/images/records-access-doors-capture-1600.webp"
+      ],
+      "source_or_tool": "Godot 4.7.2 capture of the repository source game on October 16, 2026 at 1600x900, rendered off-screen by tools/render/render.sh (Godot's Linux build in a container with a virtual screen and Mesa software OpenGL) from the parity capture driver scripts/parity/capture.gd (route R3, still 003-at-purge-queue, keyboard with effects on, isolated user data) on main at a5b7771; WebP derivatives encoded with cwebp 1.6.0 (libwebp, quality 86; the 960 and 480 px copies resized by cwebp)",
+      "rights_review_status": "Derivative screenshot using the registered provisional game art and the bundled OFL fonts. Underlying commercial asset-rights review remains open; no new third-party artwork acquired.",
+      "modifications": "1600x900 scripted still, no image edits (SHA-256 d20989533b872d0a...). Published as 480, 960 and 1600 px WebP copies. Rendered in software, so its pixels differ slightly from a GPU capture. Not a hands-on route or release acceptance test.",
+      "source_reference": "apps/game/scenes/main.tscn and scripts/main.gd on October 16, 2026; continued from the Records Access entry save, the engineer walked to the PURGE QUEUE with the steel entry swing door shut behind them, objective COPY PURGE ORDER, keyboard layout",
+      "implementation_status": "Gameplay frame on the landing page (480/960/1600 srcset; phones crop it to 4:3), captioned as a source-build capture with provisional art and UI. Shows the October 16 entry door.",
+      "terms_reference": "GPL-3.0-or-later for the project code and UI shown (see LICENSE); the pictured art keeps the terms recorded on its own entries (provisional generated art: https://openai.com/policies/terms-of-use/); fonts under SIL Open Font License 1.1"
+    },
+    {
+      "asset_id": "service-junction-doors-capture-2026-10-16",
+      "path": "apps/docs/app/images/service-junction-doors-capture.png",
+      "published_copy": [
+        "apps/docs/app/images/service-junction-doors-capture-480.webp",
+        "apps/docs/app/images/service-junction-doors-capture-960.webp",
+        "apps/docs/app/images/service-junction-doors-capture-1600.webp"
+      ],
+      "source_or_tool": "Godot 4.7.2 capture of the repository source game on October 16, 2026 at 1600x900, rendered off-screen by tools/render/render.sh (Godot's Linux build in a container with a virtual screen and Mesa software OpenGL) from the parity capture driver scripts/parity/capture.gd (route R4, still 014-at-valve, keyboard with effects on, isolated user data) on main at a5b7771; WebP derivatives encoded with cwebp 1.6.0 (libwebp, quality 86; the 960 and 480 px copies resized by cwebp)",
+      "rights_review_status": "Derivative screenshot using the registered provisional game art and the bundled OFL fonts. Underlying commercial asset-rights review remains open; no new third-party artwork acquired.",
+      "modifications": "1600x900 scripted still, no image edits (SHA-256 21f50424178b86d1...). Published as 480, 960 and 1600 px WebP copies. Rendered in software, so its pixels differ slightly from a GPU capture. Not a hands-on route or release acceptance test. The same R4 run later reported driver failures at this window size (no END OF SLICE card, no sentry knockdown); this still was taken before them.",
+      "source_reference": "apps/game/scripts/junction_room.gd and scripts/main.gd on October 16, 2026; continued from the Service Junction entry save, the breaker armed, the engineer at the valve before cranking, the steel blast door shut in its cross-wall behind the SEALED DOOR plate, objective CRANK THE VALVE, keyboard layout",
+      "implementation_status": "Gameplay frame on the landing page (480/960/1600 srcset; phones crop it to 4:3), captioned as a source-build capture with provisional art and UI. Shows the October 16 blast door.",
       "terms_reference": "GPL-3.0-or-later for the project code and UI shown (see LICENSE); the pictured art keeps the terms recorded on its own entries (provisional generated art: https://openai.com/policies/terms-of-use/); fonts under SIL Open Font License 1.1"
     },
     {

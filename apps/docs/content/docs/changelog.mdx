@@ -19,6 +19,7 @@ Changes merged after 0.15.0. They become the next version when it is cut.
 
 ### Gameplay
 
+- The game is now called WOLF OVERRIDE.
 - The title screen shows the game's version number under **CHANGELOG**.
 - The in-game credits add SciPy and Playwright to the tools and list the October 2026 door hardware and "how it should play" research.
 - New character art, approved by Nathanial Henniges: WOLF, the engineer, the Director and the sentry are repainted, one whole image per pose.
@@ -46,6 +47,17 @@ Changes merged after 0.15.0. They become the next version when it is cut.
 - Legal lists the CC0 sound recordings and every kind of AI-made art, including the doors, the door end and the engineer's collapse and crank frames.
 - Credits and Legal say how the new whole-piece characters were made.
 - Credits and Legal say how the new whole-piece machines were made.
+- The landing page starts with three links, one per reader: How to play, Get the game and Build it.
+- The landing page lists what is playable now and what is coming (more languages, more chapters); the hero and the build-progress card link the current version.
+- The landing page shows October 16 captures of Records Access and the Service Junction with their doors, in place of the October 12 corridor capture; phones crop them to 4:3 from the left, so the objective, the engineer, the door and WOLF stay in frame.
+- The landing page no longer repeats the source-build button in its hero, and its footer adds a Developers group.
+- The guide menu is grouped for three readers: **Play**, **Get the game and support** and **Develop**. Page addresses are unchanged.
+- Start here opens with a one-line summary and three path cards, and its sections are short bullet lists.
+- Start here no longer points to a "sidebar below": on phones and other narrow screens the guide menu opens from the menu button at the top.
+- Menu names: Input is now **Controls**, Play and settings is **Play overview**, Development is **Developer home**, and the walkthrough is marked as having spoilers.
+- The guide has search (**Ctrl+K**, or **⌘K** on a Mac); it runs in the browser from an index built with the site.
+- Guide text lines stop at about 70 characters; tables, cards and pictures keep the full width.
+- Guide pages have one main landmark for screen readers instead of two.
 
 ### Development
 
@@ -58,7 +70,7 @@ Changes merged after 0.15.0. They become the next version when it is cut.
 
 ### How it was checked
 
-- **Checked:** headless test suites, the docs checks and build, rendered stills of the title screen, and headless browser screenshots of the credits and legal pages; not played by hand.
+- **Checked:** headless test suites, the docs checks and build, rendered stills of the title screen, and headless browser screenshots of the credits, legal and landing pages, and an axe scan of the landing page; headless browser screenshots of the guide home, the changelog and the open guide menu at phone, tablet and desktop sizes, and an axe scan of guide pages; not played by hand.
 - **New characters checked:** headless test suites and rendered stills (1280x720 and a phone shape) of each pose, before and after; not played by hand, so nothing was judged in motion.
 - **New machines checked:** headless test suites and rendered stills (1280x720 and a phone shape) of each room, before and after; not played by hand.
 

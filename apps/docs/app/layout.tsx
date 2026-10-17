@@ -59,7 +59,8 @@ export default function RootLayout({ children }: { children: ReactNode }) {
       <body>
         <a className="skip-link" href="#main-content">Skip to content</a>
         {/* Fumadocs 16.13+ toggles the theme on a bare "D" key press; single-character shortcuts are switched off (WCAG 2.1.4). */}
-        <RootProvider search={{ enabled: false }} theme={{ defaultTheme: 'dark', enableSystem: false, hotKey: false }}>
+        {/* Search is static: the browser downloads the index from app/api/search.json/route.ts and searches it locally, since the GitHub Pages export has no server. Its default hotkey is Ctrl/Cmd+K, never a bare key. */}
+        <RootProvider search={{ options: { type: 'static', api: '/api/search.json' } }} theme={{ defaultTheme: 'dark', enableSystem: false, hotKey: false }}>
           {children}
         </RootProvider>
       </body>
