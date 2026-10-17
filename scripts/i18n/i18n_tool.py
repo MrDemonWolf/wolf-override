@@ -27,8 +27,8 @@ Purpose
     check POT PODIR OUT [--back BACK] [--release]
                               every automated gate on the PO files in PODIR (apps/game/i18n), as JSON at
                               OUT: msgfmt --check-format, the per-line measures (printf and named
-                              placeholders, BBCode tags, speaker tag, glossary: line_measures, folded in
-                              from the research pipeline step's trial tool), line breaks (BREAKS_KEEP), the
+                              placeholders, BBCode tags, speaker tag, glossary's required and avoid forms:
+                              line_measures, folded in from the research pipeline step's trial tool), line breaks (BREAKS_KEEP), the
                               "E:" key token the hint bar replaces, the script guard (SCRIPT_GUARD), the
                               engineer-gender gate (gendered_words, and the back-translation's
                               engineer_gendered), the Slavic name-case gate (NAME_CASE), the plural forms of
@@ -39,11 +39,18 @@ Purpose
                               line marked "#. i18n: story". Exits 1 when any language fails (a failed line,
                               a non-zero msgfmt, a sibling gap or a release problem), so CI can gate on it.
                               A PODIR with no PO file passes: only English exists until PR L9.
+    glossary                  checks the glossary (i18n/glossary.json) and the style guides (i18n/style/)
+                              against each other and languages.json (glossary_problems): every covered
+                              language has a form for every term and a guide with every section, forms
+                              pass their script guard, open terms require nothing. Exits 1 on any problem.
+    weblate-glossary OUTDIR   writes OUTDIR/<lang>.tbx, the glossary for upload to Weblate's glossary
+                              (PR L5, decision D8; i18n/README.md). Generated, never committed.
     selftest OUT              runs the gates above on fixed planted cases (SELFTEST, FAMILY_SELFTEST,
-                              RELEASE_SELFTEST) and writes the result as JSON at OUT; exits 1 if a planted
-                              error passes or a clean line fails. The negative control for gates no real
-                              msgid exercises yet (named and printf placeholders, BBCode, plural forms, the
-                              "you", pronoun and name-case checks, sibling files, the release gates).
+                              RELEASE_SELFTEST, GLOSSARY_SELFTEST) and writes the result as JSON at OUT;
+                              exits 1 if a planted error passes or a clean line fails. The negative control
+                              for gates no real msgid exercises yet (named and printf placeholders, BBCode,
+                              plural forms, the "you", pronoun and name-case checks, sibling files, the
+                              release gates, the glossary's avoid forms and its shape).
     hardcoded POT INVENTORY OUT
                               player-facing strings of the strings step's inventory (in scope and shown)
                               whose text is no msgid of POT, by file, as JSON at OUT.
@@ -54,8 +61,9 @@ Contract
     from the current folder; nothing outside them is written, except that `fonts` rewrites the
     fallback fonts and character lists it owns (FONTS, below). Two files are read from the repository
     this tool sits in: every per-language fact from apps/game/i18n/languages.json (LANGUAGES, the same
-    table the game's I18n reads, so the game and the tools never keep two lists), and the glossary from
-    i18n/glossary.json (GLOSSARY_FILE). A PO whose language is not in the table stops `check`.
+    table the game's I18n reads, so the game and the tools never keep two lists), the glossary from
+    i18n/glossary.json (GLOSSARY_FILE) and the style guides from i18n/style/ (STYLE_DIR). A PO whose
+    language is not in the table stops `check`.
     TRANS is a translations file: {"context": {msgid: note}, "marks": {msgid: "engineer=... slot=...
     speaker=..."}, "translations": {lang: {msgid: text}}} (the prototype's translations/claude.json).
     BACK is {"back": {"<lang>-<entry_key>": {"english": ..., "notes": ..., "engineer_gendered": bool}}}.
@@ -98,6 +106,7 @@ History
 """
 from __future__ import annotations
 
+import copy
 import hashlib
 import json
 import re
@@ -117,10 +126,12 @@ REPO = HERE.parent.parent
 LANGUAGES_FILE = REPO / "apps" / "game" / "i18n" / "languages.json"
 _TABLE = json.loads(LANGUAGES_FILE.read_text(encoding="utf-8"))
 LANGUAGES: dict[str, dict] = _TABLE["languages"]
-#: The glossary the per-line gate reads: "keep" (words copied through untranslated in every script) and
-#: "terms" (per English term and glossary key, the "required" form a translation must contain and its
-#: accepted "variants"). Outside res:// on purpose: a .json inside the game would be exported (DESIGN.md,
-#: "Outside res://"). PR L5 grows it from the research trial's glossary with decisions D9 and D11.
+#: The glossary the per-line gate reads: "keep" (words copied through untranslated in every script),
+#: "inherit" (es-ES takes es-419's forms) and "terms" (per English term and glossary key, the "required"
+#: form a translation must contain, its accepted "variants" and the "avoid" forms it must not; the file's
+#: "_about" has every field). Outside res:// on purpose: a .json inside the game would be exported
+#: (DESIGN.md, "Outside res://"). PR L5 grew it from the research trial's glossary to the 10 languages with
+#: decisions D9 and D11.
 GLOSSARY_FILE = REPO / "i18n" / "glossary.json"
 
 # ------------------------------------------------------------------------- per-line measures
@@ -197,32 +208,73 @@ def chrf(hypothesis: str, reference: str, max_n: int = 6, beta: float = 2.0) -> 
     return 0.0 if p + r == 0 else round(100 * (1 + beta ** 2) * p * r / (beta ** 2 * p + r), 1)
 
 
+def term_used(term: str, english: str) -> bool:
+    """True when the English line ``english`` uses the glossary ``term``: an all-capitals term ("SAFE
+    POINT", a plate) anywhere, any other term only as a whole word and in that case, so "breaker" does
+    not match "Breaker" at a sentence's start (give that a capitalised term of its own if it matters).
+    Pure."""
+    return term in english if term.isupper() else bool(re.search(r"\b" + re.escape(term) + r"\b", english))
+
+
+def term_form(forms: dict, glossary_key: str, glossary: dict) -> dict | None:
+    """One term's form for ``glossary_key`` (a languages.json "glossary" value such as "es-419"): its own
+    entry in ``forms`` (a glossary "terms" value), else the entry of the key it inherits from (the
+    glossary's "inherit": es-ES takes es-419's), else None (the term is not checked in that language).
+    Pure."""
+    if glossary_key in forms:
+        return forms[glossary_key]
+    base = glossary.get("inherit", {}).get(glossary_key)
+    return forms.get(base) if base else None
+
+
 def glossary_missing(english: str, text: str, glossary_key: str, glossary: dict) -> list[str]:
-    """The glossary terms ``english`` uses whose required form (or an accepted variant) for
-    ``glossary_key`` (a languages.json "glossary" value such as "es-419") is not in ``text``. An
-    upper-case term ("SAFE POINT", a plate) matches anywhere; any other term only as a whole word. A term
-    with no entry for the language is not checked. Pure."""
+    """The glossary terms ``english`` uses (term_used) whose required form or one of its accepted
+    "variants" for ``glossary_key`` is not in ``text`` (exact, case-sensitive substrings: for Slavic
+    languages "required" is a stem every case form contains). A term with no form for the language
+    (term_form), or an "open" one whose "required" is null and which has no variants, is not checked:
+    its word is still a reviewer's. Pure."""
     missing = []
     for term, forms in glossary["terms"].items():
-        hit = term in english if term.isupper() else re.search(r"\b" + re.escape(term) + r"\b", english)
-        if hit and glossary_key in forms:
-            allowed = [forms[glossary_key]["required"]] + forms[glossary_key].get("variants", [])
-            if not any(form in text for form in allowed):
-                missing.append(term)
+        form = term_form(forms, glossary_key, glossary)
+        if form is None or not term_used(term, english):
+            continue
+        allowed = [f for f in [form.get("required")] + form.get("variants", []) if f]
+        if allowed and not any(f in text for f in allowed):
+            missing.append(term)
     return missing
+
+
+def glossary_avoided(english: str, text: str, glossary_key: str, glossary: dict) -> list[str]:
+    """The "avoid" forms ``text`` contains for the glossary terms ``english`` uses, in ``glossary_key``'s
+    form (term_form), each as "<term>: <form>". An avoid form is a word a back-translation or decision D11
+    showed to be a wrong reading (es "interruptor" for breaker reads as "switch"). It is matched
+    case-insensitively at the start of a word, so plates in capitals and inflected forms (автомата) are
+    caught; a longer word that merely starts with it (автоматически) is flagged too, and is resolved by
+    narrowing the avoid list, not by the translator. Only lines that use the term are read, so the word
+    stays free elsewhere. Pure."""
+    found = []
+    for term, forms in glossary["terms"].items():
+        form = term_form(forms, glossary_key, glossary)
+        if form is None or not term_used(term, english):
+            continue
+        for bad in form.get("avoid", []):
+            if re.search(r"(?<!\w)" + re.escape(bad), text, re.IGNORECASE):
+                found.append(f"{term}: {bad}")
+    return found
 
 
 def line_measures(english: str, text: str, glossary_key: str, glossary: dict) -> dict:
     """The language-independent measures of one translation ``text`` of ``english``: placeholders_ok,
     wolf_ok (WOLF named at least as often; reported, not a gate), tag_ok (a line that starts with
-    WOLF_TAG keeps it in front), char_ratio (length against the English; reported) and glossary_missing.
-    `check` adds the per-language gates. Pure."""
+    WOLF_TAG keeps it in front), char_ratio (length against the English; reported), glossary_missing and
+    glossary_avoided. `check` adds the per-language gates. Pure."""
     return {
         "placeholders_ok": placeholders_ok(english, text),
         "wolf_ok": text.count("WOLF") >= english.count("WOLF"),
         "tag_ok": (not english.startswith(WOLF_TAG)) or text.startswith(WOLF_TAG),
         "char_ratio": round(len(text) / len(english), 2),
         "glossary_missing": glossary_missing(english, text, glossary_key, glossary),
+        "glossary_avoided": glossary_avoided(english, text, glossary_key, glossary),
     }
 
 
@@ -748,6 +800,196 @@ def script_ok(text: str, lang: str, keep: list[str]) -> bool:
     return not SCRIPT_GUARD["latin"].search(text)
 
 
+# ------------------------------------------------------------------ glossary and style guides
+#: The per-language style guides (PR L5): i18n/style/<glossary key>.md for every key the glossary covers,
+#: plus README.md, the rules every language shares. Outside res:// with the glossary (DESIGN.md).
+STYLE_DIR = REPO / "i18n" / "style"
+#: The shared guide's file stem; every per-language guide links it.
+STYLE_SHARED = "README"
+#: The headings every per-language guide carries, in any order, so a native reviewer finds the same
+#: things in every language and a new guide cannot leave out the engineer's rules (decision D9).
+STYLE_SECTIONS = ("## Address and register", "## The engineer", "## WOLF", "## Names",
+                  "## Quotes and punctuation", "## Open questions")
+#: A glossary form's states: "trial" (the research trial's word), "proposed" (written in PR L5; gated)
+#: and "open" (a reviewer's word: "required" is null and only "avoid" is gated).
+GLOSSARY_STATUSES = ("trial", "proposed", "open")
+#: The fields a glossary form may hold besides "status" and "required"; each is a list of strings.
+GLOSSARY_LISTS = ("variants", "proposals", "avoid")
+
+
+def glossary_codes(glossary: dict) -> dict[str, str]:
+    """The Godot locale code of each glossary key ``glossary`` covers ("es-419" -> "es"), from
+    languages.json's "glossary" fields; a key no row names is left out (glossary_problems reports it).
+    Pure."""
+    by_key = {row["glossary"]: code for code, row in LANGUAGES.items()}
+    return {key: by_key[key] for key in glossary.get("languages", []) if key in by_key}
+
+
+def glossary_problems(glossary: dict, styles: dict[str, str]) -> list[str]:
+    """Every way ``glossary`` (i18n/glossary.json, parsed) and ``styles`` (style guide text by file stem,
+    read_styles) fall short of the shape the gates and the reviewers rely on, as readable lines; empty
+    when both are sound. Checked: each covered key is a languages.json "glossary" value and has a style
+    guide with every STYLE_SECTIONS heading, and no guide is for another key; "inherit" maps covered keys;
+    every term has a "note" and a form for every covered key that inherits nothing; each form has a known
+    status, a "required" string unless open (null when open), list fields only, and no "avoid" form that
+    is also an accepted one; every word (forms and the stored names) passes its language's script guard
+    (script_ok), so no Latin plate word slips into the Russian glossary; Korean names carry a particle
+    class. Pure: the selftest plants broken copies through it."""
+    problems: list[str] = []
+    keys = glossary.get("languages", [])
+    codes = glossary_codes(glossary)
+    keep = glossary.get("keep", [])
+    problems += [f"languages: {key} is no languages.json glossary key" for key in keys if key not in codes]
+    inherit = glossary.get("inherit", {})
+    problems += [f"inherit: {k} -> {v} names a key the glossary does not cover" for k, v in inherit.items()
+                 if k not in keys or v not in keys]
+    for term, forms in glossary.get("terms", {}).items():
+        if not str(forms.get("note", "")).strip():
+            problems.append(f"{term}: no note")
+        for key in sorted(set(forms) - {"note"} - set(keys)):
+            problems.append(f"{term}: form for {key}, which the glossary does not cover")
+        for key in keys:
+            form = forms.get(key)
+            if form is None:
+                if key not in inherit:
+                    problems.append(f"{term}: no form for {key}")
+                continue
+            status = form.get("status")
+            if status not in GLOSSARY_STATUSES:
+                problems.append(f"{term} [{key}]: status {status!r} is not one of {GLOSSARY_STATUSES}")
+            required = form.get("required")
+            if status == "open" and required is not None:
+                problems.append(f"{term} [{key}]: open, so 'required' must be null")
+            if status != "open" and not (isinstance(required, str) and required):
+                problems.append(f"{term} [{key}]: {status}, so it needs a 'required' form")
+            for field in sorted(set(form) - {"status", "required", *GLOSSARY_LISTS}):
+                problems.append(f"{term} [{key}]: unknown field {field!r}")
+            if not all(isinstance(form.get(field, []), list) for field in GLOSSARY_LISTS):
+                problems.append(f"{term} [{key}]: {', '.join(GLOSSARY_LISTS)} must be lists")
+                continue
+            accepted = {f.casefold() for f in [required] + form.get("variants", []) if f}
+            problems += [f"{term} [{key}]: avoid form {bad!r} is also accepted" for bad in form.get("avoid", [])
+                         if bad.casefold() in accepted]
+            words = [w for w in [required] + [w for field in GLOSSARY_LISTS for w in form.get(field, [])] if w]
+            if key in codes:
+                problems += [f"{term} [{key}]: {word!r} fails the {LANGUAGES[codes[key]]['script']} script guard"
+                             for word in words if not script_ok(word, codes[key], keep)]
+    for name, written in glossary.get("names", {}).items():
+        for key, word in written.items():
+            if key == "ko_particles":
+                if word not in ("consonant", "vowel"):
+                    problems.append(f"names {name}: ko_particles must be 'consonant' or 'vowel'")
+            elif key not in codes:
+                problems.append(f"names {name}: {key} is not a covered key")
+            elif not script_ok(word, codes[key], keep):
+                problems.append(f"names {name} [{key}]: {word!r} fails the script guard")
+        if "ko" in written and "ko_particles" not in written:
+            problems.append(f"names {name}: a Korean name needs its ko_particles")
+    if STYLE_SHARED not in styles:
+        problems.append(f"style: no {STYLE_SHARED}.md, the shared guide")
+    for key in keys:
+        text = styles.get(key)
+        if text is None:
+            problems.append(f"style: no {key}.md")
+            continue
+        lines = set(text.splitlines())
+        problems += [f"style {key}.md: no '{heading}' section" for heading in STYLE_SECTIONS if heading not in lines]
+        if f"({STYLE_SHARED}.md)" not in text:
+            problems.append(f"style {key}.md: does not link the shared guide ({STYLE_SHARED}.md)")
+    problems += [f"style: {stem}.md is for no covered key" for stem in sorted(set(styles) - set(keys) - {STYLE_SHARED})]
+    return problems
+
+
+def read_styles() -> dict[str, str]:
+    """Every style guide in STYLE_DIR as {file stem: text}."""
+    return {path.stem: path.read_text(encoding="utf-8") for path in sorted(STYLE_DIR.glob("*.md"))}
+
+
+def glossary_check() -> None:
+    """The `glossary` subcommand: prints glossary_problems for the repository's glossary and style guides
+    and exits 1 when there is any (CI runs it), else prints what it covered. Writes nothing."""
+    glossary = json.loads(GLOSSARY_FILE.read_text(encoding="utf-8"))
+    problems = glossary_problems(glossary, read_styles())
+    for problem in problems:
+        print(problem)
+    if problems:
+        sys.exit(1)
+    forms = [form for forms in glossary["terms"].values() for key, form in forms.items() if key != "note"]
+    print(f"glossary: {len(glossary['terms'])} terms in {len(glossary['languages'])} languages "
+          f"({sum(f['status'] == 'open' for f in forms)} forms still open), {len(read_styles())} style guides: sound")
+
+
+#: The TBX namespace-free root Weblate's glossary upload reads (TBX 2008 "martif", as in Weblate's own
+#: example, docs.weblate.org/en/latest/formats/tbx.html, read October 17, 2026).
+TBX_DOCTYPE = '<?xml version="1.0" encoding="UTF-8"?>\n<!DOCTYPE martif PUBLIC "ISO 12200:1999A//DTD MARTIF core (DXFcdV04)//EN" "TBXcdv04.dtd">\n'
+
+
+def weblate_glossary(outdir: Path) -> None:
+    """The `weblate-glossary` subcommand: writes OUTDIR/<Godot code>.tbx for every language the glossary
+    covers, for upload to the Weblate project's glossary (i18n/README.md, "Weblate"). The glossary stays
+    the one source: these files are generated, never committed, and uploaded again whenever
+    i18n/glossary.json changes. Per file, each term is one termEntry: its "note" as the source
+    explanation (<descrip>, which Weblate shows beside the term), the English term, and, in the target
+    language, the required form with the status, accepted variants and avoid forms as a translator note
+    (<note from="translator">); an open term has no target term, only its proposals and avoid forms as a
+    language note (<descrip> in the target langSet), so Weblate shows it untranslated. Avoid forms are not
+    written as Weblate "forbidden" entries: Weblate keys a glossary entry by its source term, and our gate
+    (glossary_avoided) already fails them. The "keep" words go in as read-only ("Translation needed: No")
+    and the stored names as terms. Exits 1 when glossary_problems finds anything, so a broken glossary is
+    never uploaded."""
+    from xml.etree import ElementTree as ET
+    glossary = json.loads(GLOSSARY_FILE.read_text(encoding="utf-8"))
+    problems = glossary_problems(glossary, read_styles())
+    if problems:
+        sys.exit("fix the glossary first:\n" + "\n".join(problems))
+    xml_lang = "{http://www.w3.org/XML/1998/namespace}lang"
+    outdir.mkdir(parents=True, exist_ok=True)
+    for key, code in glossary_codes(glossary).items():
+        root = ET.Element("martif", {"type": "TBX", xml_lang: "en"})
+        desc = ET.SubElement(ET.SubElement(ET.SubElement(root, "martifHeader"), "fileDesc"), "sourceDesc")
+        ET.SubElement(desc, "p").text = (f"WOLF//OVERRIDE glossary for {LANGUAGES[code]['name']} ({key}), generated "
+                                         "from i18n/glossary.json by scripts/i18n/i18n_tool.py weblate-glossary")
+        body = ET.SubElement(ET.SubElement(root, "text"), "body")
+
+        def entry(source: str, explanation: str, read_only: bool = False) -> ET.Element:
+            """One termEntry with the English ``source`` term and its source ``explanation``; with
+            ``read_only`` it is marked untranslatable, as Weblate's TBX reader expects."""
+            node = ET.SubElement(body, "termEntry")
+            ET.SubElement(node, "descrip").text = explanation
+            if read_only:
+                ET.SubElement(node, "descrip", {"type": "Translation needed"}).text = "No"
+            ET.SubElement(ET.SubElement(ET.SubElement(node, "langSet", {xml_lang: "en"}), "tig"), "term").text = source
+            return node
+
+        for term, forms in glossary["terms"].items():
+            node = entry(term, forms["note"])
+            form = term_form(forms, key, glossary)
+            if form is None:
+                continue
+            lang_set = ET.SubElement(node, "langSet", {xml_lang: code})
+            notes = [f"status: {form['status']}"]
+            notes += [f"{field}: {', '.join(form[field])}" for field in GLOSSARY_LISTS if form.get(field)]
+            if form.get("required"):
+                tig = ET.SubElement(lang_set, "tig")
+                ET.SubElement(tig, "term").text = form["required"]
+                ET.SubElement(tig, "note", {"from": "translator"}).text = "; ".join(notes)
+            else:
+                ET.SubElement(lang_set, "descrip").text = "; ".join(["a reviewer's word"] + notes)
+        # Placeholders are left out: as glossary terms they would match every line, and the placeholder
+        # gate (placeholders_ok) already guards them.
+        for word in glossary["keep"]:
+            if not (POSITIONAL.fullmatch(word) or NAMED.fullmatch(word)):
+                entry(word, "Copied through untranslated in every language.", read_only=True)
+        for name, written in glossary["names"].items():
+            node = entry(name, "One of the engineer's three provisional first names (decision D9).")
+            tig = ET.SubElement(ET.SubElement(node, "langSet", {xml_lang: code}), "tig")
+            ET.SubElement(tig, "term").text = written.get(key, name)
+        ET.indent(root, space=" ")
+        path = outdir / f"{code}.tbx"
+        path.write_text(TBX_DOCTYPE + ET.tostring(root, encoding="unicode") + "\n", encoding="utf-8")
+        print(f"{path}: {len(body)} entries")
+
+
 def gendered_words(text: str, lang: str, roles: set[str]) -> list[str]:
     """The words of ``text`` that show the engineer's gender in ``lang``, for a line where the engineer
     appears as ``roles`` (engineer_roles). Six checks, from gender_rule(lang):
@@ -981,7 +1223,8 @@ def check(pot: Path, podir: Path, out: Path, back: Path | None = None, release: 
             # verdict, so only an explicit true fails the line (back_missing counts the lines with none).
             back_gender_ok = gender_stamped or measures["back_engineer_gendered"] is not True
             measures["ok"] = (all(measures[k] for k in LINE_GATES) and back_gender_ok
-                              and not measures["glossary_missing"] and not measures["plural_problems"])
+                              and not measures["glossary_missing"] and not measures["glossary_avoided"]
+                              and not measures["plural_problems"])
             rows.append({"msgid": english, "msgstr": text, **measures})
         failed = [r["msgid"] for r in rows if not r["ok"]]
         notes = [e["msgid"] for e in entries if e["msgid"] and fuzzy_notes(e)]
@@ -1136,6 +1379,43 @@ SELFTEST = [
     ("marks", "de", "", ["#. TRANSLATORS: i18n: engineer=name", "#. i18n: slot=key"], True, ""),
     ("marks", "de", "", ["#. TRANSLATORS: i18n: engineer=name", "#. i18n: engineer=you"], False, ""),
     ("marks", "de", "", ["#. TRANSLATORS: i18n: slot=choice", "#. i18n: slot=key"], False, ""),
+    # The glossary gate on the repository's own i18n/glossary.json (glossary_missing, glossary_avoided):
+    # required forms, avoid forms (decision D11), open terms, es-ES inheriting es-419, capitalised variants.
+    ("glossary", "es", "Head right to the breaker.", "Ve a la derecha, al disyuntor.", True, ""),
+    ("glossary", "es", "Head right to the breaker.", "Ve a la derecha, al interruptor.", False, ""),
+    ("glossary", "es_ES", "Head right to the breaker.", "Id a la derecha, al interruptor.", False, ""),
+    ("glossary", "es", "Open the door.", "Abre el interruptor de la puerta.", True, ""),
+    ("glossary", "es_ES", "Get to the SAFE POINT.", "Ve al PUNTO SEGURO.", True, ""),
+    ("glossary", "es_ES", "Get to the SAFE POINT.", "Ve al LUGAR SEGURO.", False, ""),
+    ("glossary", "es", "CHAPTER 1  /  LOCKDOWN", "CAPÍTULO 1  /  CIERRE DE EMERGENCIA", True, ""),
+    ("glossary", "es", "CHAPTER 1  /  LOCKDOWN", "CAPÍTULO 1  /  BLOQUEO", False, ""),
+    ("glossary", "ru", "Get to the TANK RELEASE.", "Иди к пульту «ОТЦЕПКА БАКА».", True, ""),
+    ("glossary", "ru", "Get to the TANK RELEASE.", "Иди к пульту «СБРОС БАКА».", False, ""),
+    ("glossary", "ru", "Find the breaker.", "Найди автомат.", False, ""),
+    ("glossary", "ru", "The sentry stops on the mark.", "Страж останавливается на отметке.", True, ""),
+    ("glossary", "pt_BR", "The coolant cloud is thick.", "A nuvem de líquido de arrefecimento é densa.", True, ""),
+    ("glossary", "pt_BR", "The coolant cloud is thick.", "A nuvem de refrigerante é densa.", False, ""),
+    ("glossary", "de", "Get to the SAFE POINT.", "Geh zum SICHERUNGSPUNKT.", True, ""),
+    ("glossary", "ja", "Get to the SAFE POINT.", "安全な場所へ。", False, ""),
+]
+#: Planted cases for glossary_problems: (what, a change made to a copy of the repository's glossary and
+#: style guides, must it report a problem). The first is the files as they are, which must be sound.
+GLOSSARY_SELFTEST = [
+    ("the repository's glossary and style guides", lambda g, s: None, False),
+    ("a Russian form in Latin letters", lambda g, s: g["terms"]["relay"]["ru"].update(required="rele"), True),
+    ("a Cyrillic letter in a German form", lambda g, s: g["terms"]["relay"]["de"].update(required="Relaиs"), True),
+    ("an open form with a required word", lambda g, s: g["terms"]["breaker"]["es-419"].update(required="disyuntor"), True),
+    ("a proposed form with no required word", lambda g, s: g["terms"]["relay"]["fr"].update(required=None), True),
+    ("an unknown status", lambda g, s: g["terms"]["relay"]["de"].update(status="final"), True),
+    ("an avoided word that is also accepted", lambda g, s: g["terms"]["coolant"]["pt-BR"].update(variants=["Refrigerante"]), True),
+    ("a term with no French form", lambda g, s: g["terms"]["relay"].pop("fr"), True),
+    ("a term with no note", lambda g, s: g["terms"]["relay"].pop("note"), True),
+    ("a language key languages.json does not know", lambda g, s: g["languages"].append("xx"), True),
+    ("a Korean name with no particle class", lambda g, s: g["names"]["Alex"].pop("ko_particles"), True),
+    ("a covered language with no style guide", lambda g, s: s.pop("ko"), True),
+    ("a style guide without the engineer's section", lambda g, s: s.update(pl=s["pl"].replace("## The engineer\n", "")), True),
+    ("a style guide for a language the glossary does not cover", lambda g, s: s.update(it=s["de"]), True),
+    ("no shared style guide", lambda g, s: s.pop(STYLE_SHARED), True),
 ]
 #: Planted sibling-file cases for family_gaps: (what, {lang: {msgid: (msgstr, fuzzy)}}, languages that
 #: must report a gap).
@@ -1172,11 +1452,17 @@ def _planted_entries(rows: list[tuple]) -> list[dict]:
 
 
 def selftest(out: Path) -> None:
-    """Runs SELFTEST, FAMILY_SELFTEST and RELEASE_SELFTEST through the gates, writes each case's result to ``out`` and exits
-    1 on a mismatch. Touches nothing else."""
+    """Runs SELFTEST, FAMILY_SELFTEST, RELEASE_SELFTEST and GLOSSARY_SELFTEST through the gates, writes
+    each case's result to ``out`` and exits 1 on a mismatch. Reads the repository's glossary and style
+    guides (the glossary cases test the real terms); writes nothing else."""
+    glossary = json.loads(GLOSSARY_FILE.read_text(encoding="utf-8"))
+    styles = read_styles()
     results = []
     for gate, lang, english, text, expected, mark in SELFTEST:
-        if gate == "placeholders":
+        if gate == "glossary":
+            key = LANGUAGES[lang]["glossary"]
+            passed = not glossary_missing(english, text, key, glossary) and not glossary_avoided(english, text, key, glossary)
+        elif gate == "placeholders":
             passed = placeholders_ok(english, text)
         elif gate == "bbcode":
             passed = bbcode_ok(english, text)
@@ -1202,6 +1488,12 @@ def selftest(out: Path) -> None:
     for what, review, po, pot, expect_problem in RELEASE_SELFTEST:
         found = release_problems(_planted_entries(po), _planted_entries(pot), review)
         results.append({"gate": "release", "case": what, "expected_problem": expect_problem, "problems": found,
+                        "as_expected": bool(found) == expect_problem})
+    for what, change, expect_problem in GLOSSARY_SELFTEST:
+        planted_glossary, planted_styles = copy.deepcopy(glossary), dict(styles)
+        change(planted_glossary, planted_styles)
+        found = glossary_problems(planted_glossary, planted_styles)
+        results.append({"gate": "glossary_shape", "case": what, "expected_problem": expect_problem, "problems": found,
                         "as_expected": bool(found) == expect_problem})
     wrong = [r for r in results if not r["as_expected"]]
     out.write_text(json.dumps({"cases": len(results), "as_expected": len(results) - len(wrong), "results": results},
@@ -1248,7 +1540,7 @@ def main(argv: list[str]) -> None:
         else:
             args.append(Path(arg))
     plain = {"fonts": (fonts, 1), "fill": (fill, 3), "backprompt": (backprompt, 2), "selftest": (selftest, 1),
-             "hardcoded": (hardcoded, 3)}
+             "hardcoded": (hardcoded, 3), "glossary": (glossary_check, 0), "weblate-glossary": (weblate_glossary, 1)}
     command = argv[0] if argv else ""
     if command == "potfiles" and len(args) == 1 and flags <= {"--check"} and back is None:
         potfiles(args[0], "--check" in flags)

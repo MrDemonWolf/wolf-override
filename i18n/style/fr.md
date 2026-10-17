@@ -1,0 +1,38 @@
+# Français: style guide
+
+File `fr.po`, glossary key `fr`. Read [the shared guide](README.md) first.
+
+## Address and register
+
+- **tu** between characters and in hints, never vous.
+- Buttons and objectives in the infinitive (CONTINUER, QUITTER).
+
+## The engineer
+
+Participles and adjectives agree (seul/seule, prêt/prête, sorti/sortie), and job nouns do too
+(ingénieur/ingénieure, technicien/technicienne). So:
+- Use an adverbial phrase: "sans aide", "à découvert".
+- Avoid the passé composé with être about the engineer ("tu es sorti·e"): use avoir verbs, the present,
+  or a noun ("ta sortie").
+- Name the department: INGÉNIERIE DE MAINTENANCE.
+- No iel or inclusive dots unless Nathanial chooses them.
+
+## WOLF
+
+WOLF is **il**. He says tu. Calm and dry; no exclamation marks.
+
+## Names
+
+As written; possessives with "de %s".
+
+## Quotes and punctuation
+
+- Quotes « … » with a no-break space (U+00A0) inside each guillemet.
+- A no-break space (U+00A0) before ; : ! ? (the game's fonts lack the narrow U+202F).
+- Capitals keep their accents (DÉRIVATION, not DERIVATION).
+
+## Open questions
+
+- **TANK RELEASE**: a reviewer's word; LARGAGE RÉSERVOIR and LARGAGE CUVE are proposals.
+- **LOCKDOWN**: CONFINEMENT or VERROUILLAGE, for a reviewer.
+- **SERVICE JUNCTION**: a reviewer's word.
