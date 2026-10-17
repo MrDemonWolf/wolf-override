@@ -45,5 +45,5 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   const { slug } = await params;
   const page = source.getPage(slug);
   if (!page) notFound();
-  return pageMetadata(page.data.title, page.data.description ?? `Read ${page.data.title} in the WOLF//OVERRIDE game guide.`, `${page.url}/`, markdownUrl(page.url));
+  return pageMetadata(page.data.title, page.data.description ?? `Read ${page.data.title} in the WOLF OVERRIDE game guide.`, `${page.url}/`, markdownUrl(page.url));
 }

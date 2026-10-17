@@ -10,7 +10,7 @@ import type { ComponentProps } from 'react';
 export default function BrandLink({ href = '/', className }: ComponentProps<'a'>) {
   return (
     <Link href={href} className={className} prefetch={false}>
-      WOLF//OVERRIDE
+      WOLF OVERRIDE
     </Link>
   );
 }
