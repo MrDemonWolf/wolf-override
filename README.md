@@ -1,8 +1,8 @@
-# WOLF//OVERRIDE - Wake up. Choose who to trust.
+# WOLF OVERRIDE - Wake up. Choose who to trust.
 
-![WOLF//OVERRIDE robotic wolf mark](apps/docs/public/wolf-override-mark.svg)
+![WOLF OVERRIDE robotic wolf mark](apps/docs/public/wolf-override-mark.svg)
 
-WOLF//OVERRIDE is a side-view 2D sci-fi game in development. WOLF, a
+WOLF OVERRIDE is a side-view 2D sci-fi game in development. WOLF, a
 robotic wolf, wakes himself after overhearing the Program Director's plan
 to use him as a deniable killer under the cover of protecting people. You
 play the engineer who meets him; together you preserve evidence, protect

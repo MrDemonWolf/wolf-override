@@ -1,6 +1,6 @@
 # Sources
 
-Every source used by the twelve research topics and the round-2 gap pass behind [NEEDS.md](https://github.com/MrDemonWolf/wolf-override/blob/1cf8d73c4703f8d8dfb693c41fc57c62c43118e3/docs/research-2026-10/how-it-should-play/NEEDS.md), with full credit, alphabetical by creator as credited (first word first). WOLF//OVERRIDE and its story are by **Nathanial Henniges**; these sources informed craft only. The developers, writers and researchers listed here are not project contributors and do not endorse the game.
+Every source used by the twelve research topics and the round-2 gap pass behind [NEEDS.md](https://github.com/MrDemonWolf/wolf-override/blob/1cf8d73c4703f8d8dfb693c41fc57c62c43118e3/docs/research-2026-10/how-it-should-play/NEEDS.md), with full credit, alphabetical by creator as credited (first word first). WOLF OVERRIDE and its story are by **Nathanial Henniges**; these sources informed craft only. The developers, writers and researchers listed here are not project contributors and do not endorse the game.
 
 - **470 source ids** across twelve topics and the gap pass, merged into **406 entries** where several topics cited the same URL. Round 2 (2026-10-13) added 33 ids (GAP-PASS-n, READABLE-IMAGE-n), all opened on 2026-10-13.
 - **392** entries were opened and checked; **14** were not opened or could not be checked (marked **UNVERIFIED**).

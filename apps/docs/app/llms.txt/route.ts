@@ -17,7 +17,7 @@ export async function GET() {
     .join('\n')
     .replace(/\]\(\/docs([^)]*)\)/g, (_, path: string) => `](${siteUrl}/docs${path}/)`);
   const body =
-    `# WOLF//OVERRIDE\n\n> ${siteDescription}\n\n` +
+    `# WOLF OVERRIDE\n\n> ${siteDescription}\n\n` +
     `Spoiler-light player guide; walkthrough pages label their spoilers. Every page in full, as Markdown: ${siteUrl}/llms-full.txt\n\n` +
     `## Game guide\n${tree}\n\n` +
     `## Optional\n\n- [Source code](https://github.com/MrDemonWolf/wolf-override): the Godot project and this website (GPL-3.0-or-later code; art and branding have their own terms)\n`;

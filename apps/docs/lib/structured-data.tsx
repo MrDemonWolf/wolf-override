@@ -33,9 +33,9 @@ export function homeStructuredData(): JsonLdObject {
       {
         '@type': 'WebSite',
         '@id': ids.website,
-        name: 'WOLF//OVERRIDE',
-        // The plain-text spelling people type, since "//" is easy to drop.
-        alternateName: ['WOLF OVERRIDE'],
+        name: 'WOLF OVERRIDE',
+        // The stylised name the game had until October 17, 2026, kept so older links and listings match.
+        alternateName: ['WOLF//OVERRIDE'],
         url: `${siteUrl}/`,
         inLanguage: 'en',
         publisher: { '@id': ids.organization },
@@ -55,7 +55,9 @@ export function homeStructuredData(): JsonLdObject {
       {
         '@type': 'VideoGame',
         '@id': ids.game,
-        name: 'WOLF//OVERRIDE',
+        name: 'WOLF OVERRIDE',
+        // The same former name as the WebSite entry above.
+        alternateName: ['WOLF//OVERRIDE'],
         description: siteDescription,
         url: `${siteUrl}/`,
         image: `${siteUrl}/share-card.jpg`,

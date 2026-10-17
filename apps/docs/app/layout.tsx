@@ -24,15 +24,15 @@ const montserrat = localFont({
 
 export const metadata: Metadata = {
   metadataBase: new URL(`${siteUrl}/`),
-  applicationName: 'WOLF//OVERRIDE',
+  applicationName: 'WOLF OVERRIDE',
   authors: [{ name: 'Nathanial Henniges', url: 'https://mrdemonwolf.com' }],
   creator: 'Nathanial Henniges',
   publisher: 'MrDemonWolf, Inc.',
   // One robots meta for every crawler; a separate googlebot copy said the same thing twice.
   robots: { index: true, follow: true, 'max-image-preview': 'large' },
   title: {
-    default: 'WOLF//OVERRIDE',
-    template: '%s | WOLF//OVERRIDE',
+    default: 'WOLF OVERRIDE',
+    template: '%s | WOLF OVERRIDE',
   },
   // Pages without their own description (the 404) use the same one as the landing page.
   description: siteDescription,

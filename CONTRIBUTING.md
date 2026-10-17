@@ -1,6 +1,6 @@
-# Contributing to WOLF//OVERRIDE
+# Contributing to WOLF OVERRIDE
 
-Thanks for your interest. WOLF//OVERRIDE is an early, source-only game by
+Thanks for your interest. WOLF OVERRIDE is an early, source-only game by
 Nathanial Henniges, developed by MrDemonWolf, Inc. with AI assistance
 under his direction and review. Contributions are welcome when they keep
 the game playable, honest about what has been checked, and free of
