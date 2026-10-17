@@ -19,31 +19,39 @@ description: Who created WOLF//OVERRIDE, what informed its development, and whic
 - **No AI runs inside the game or the website.** AI tools were used to make the game, always with human review.
 - One row per tool. "Used for" is what the tool did for this project.
 
-| Tool | Made by | Used for |
-| --- | --- | --- |
-| Godot 4.7.2 | Godot Engine contributors | The game engine: typed GDScript and built-in Godot nodes |
-| Claude Code | Anthropic | AI coding assistant: research, writing and code, with human review |
-| Codex | OpenAI | AI coding assistant: research, writing and code, with human review |
-| Codex built-in image generation tool | OpenAI | Provisional art in edit mode: layered rooms, station props, door and door-end paint, redrawn sprites, the collapse frames and the current title image (see [Provisional art](#provisional-art)) |
-| ChatGPT | OpenAI | Research, writing and code assistance, with human review |
-| ChatGPT Create | OpenAI | The first provisional art, in the private MDW WOLF//OVERRIDE [Game] project: the first sprites, the first title image, room paintings, machine sheets and the logo concept |
-| Render container | Project script (`tools/render/render.sh`) on Docker, run through Colima on macOS | Rendered game captures off-screen, so no game window opens on the developer's Mac: the official Linux build of Godot 4.7.2 with a virtual screen (Xvfb) and software OpenGL (Mesa llvmpipe) |
-| `scripts/check-copies.py` | Project script | Finds copied code (six or more matching lines in two places) in every pull request |
-| Playwright | Microsoft | Headless Chromium: Chrome's WebP encoder for the website's images, and website screenshots for reviews |
-| Pillow | Pillow contributors | Image crops and downscales (junction tank, near room layers, collapse frames, characters); door construction drawings with NumPy and SciPy |
-| NumPy | NumPy contributors | Construction drawings of the corridor door end and the doors, paint cleanup and atlases |
-| SciPy | SciPy contributors | Construction drawings, paint cleanup and later touch-ups such as the brushed kick plates and the pipe seen through the junction's exit |
-| ImageMagick | ImageMagick Studio | Canvas extension of an early sprite |
-| cwebp (libwebp) | Google | The website's WebP images |
-| Next.js, Fumadocs, MDX, Tailwind CSS 4, TypeScript and Bun | Their projects | This website |
-| GitHub CLI | GitHub | Opening, checking and merging pull requests |
-| GitHub Actions | GitHub | Automated checks and test builds |
-| GitHub Pages | GitHub | Hosting this website |
+| Tool | Used for |
+| --- | --- |
+| Godot 4.7.2 (Godot Engine contributors) | The game engine: typed GDScript and built-in Godot nodes |
+| Claude Code (Anthropic) | AI coding assistant: research, writing and code, with human review |
+| Codex (OpenAI) | AI coding assistant: research, writing and code, with human review |
+| Codex built-in image generation tool (OpenAI) | Provisional art in edit mode: layered rooms, station props, door and door-end paint, redrawn sprites, the collapse frames and the current title image (see [Provisional art](#provisional-art)) |
+| ChatGPT (OpenAI) | Research, writing and code assistance, with human review |
+| ChatGPT Create (OpenAI) | The first provisional art, in the private MDW WOLF//OVERRIDE [Game] project: the first sprites, the first title image, room paintings, machine sheets and the logo concept |
+| Render container (project script `tools/render/render.sh`) | Rendered game captures off-screen, in Docker run through Colima on macOS, so no game window opens on the developer's Mac: the official Linux build of Godot 4.7.2 with a virtual screen (Xvfb) and software OpenGL (Mesa llvmpipe) |
+| `scripts/check-copies.py` (project script) | Finds copied code (six or more matching lines in two places) in every pull request |
+| Playwright (Microsoft) | Headless Chromium: Chrome's WebP encoder for the website's images, and website screenshots for reviews |
+| Pillow (Pillow contributors) | Image crops and downscales (junction tank, near room layers, collapse frames, characters); door construction drawings with NumPy and SciPy |
+| NumPy (NumPy contributors) | Construction drawings of the corridor door end and the doors, paint cleanup and atlases |
+| SciPy (SciPy contributors) | Construction drawings, paint cleanup and later touch-ups such as the brushed kick plates and the pipe seen through the junction's exit |
+| ImageMagick (ImageMagick Studio) | Canvas extension of an early sprite |
+| cwebp (libwebp, Google) | The website's WebP images |
+| Next.js, Fumadocs, MDX, Tailwind CSS 4, TypeScript and Bun | This website |
+| GitHub CLI (GitHub) | Opening, checking and merging pull requests |
+| GitHub Actions (GitHub) | Automated checks and test builds |
+| GitHub Pages (GitHub) | Hosting this website |
 
 - Screenshots of the game are scripted captures from Godot.
 
 <Callout title="About C2PA content credentials">
-C2PA content credentials are metadata inside an image that record it was made with an AI tool. The raw images from the Codex image tool that the game uses are kept byte for byte, with their content credentials, in the repository's history. Files the project's scripts derived from them (crops and atlases) carry none, and some early room plates had none when generated. The [asset register](https://github.com/MrDemonWolf/wolf-override/blob/main/apps/game/assets/manifest.json) records which applies to each file.
+C2PA content credentials are metadata inside an image that record it was made with an AI tool. Which images keep them:
+
+- **Kept in history:** the raw Codex image tool outputs behind the corridor door end, its additions and the doors (October 12 to 14, 2026) are kept byte for byte, with their content credentials, in the repository's history.
+- **Title image:** the shipped PNG keeps its own content credentials.
+- **None present:** the Service Junction rooms, its station machines and the sentry had no content credentials when generated.
+- **Prompts only:** for the October 8 corridor and Records Access plates, the station props and the redrawn sprites, the generation prompts are kept in private art notes; the raw outputs are not in the repository.
+- **Derived files:** crops and atlases made by the project's scripts carry none.
+
+The [asset register](https://github.com/MrDemonWolf/wolf-override/blob/main/apps/game/assets/manifest.json) records which applies to each file.
 </Callout>
 
 ## Fonts in use
@@ -75,7 +83,7 @@ Each file's source, licence and processing are recorded in the [asset register](
 
 ## Provisional art
 
-- **All current art is provisional** and AI-generated, then reviewed by a person.
+- **All current game art is provisional;** most of it is AI-generated, then reviewed by a person. The logo was redrawn by the project as original SVG paths.
 - **Approved:** Nathanial Henniges reviewed and approved each set for this prototype.
 - **Rights:** each file's source and pending rights review are in the [asset register](https://github.com/MrDemonWolf/wolf-override/blob/main/apps/game/assets/manifest.json).
 
@@ -88,7 +96,7 @@ Each file's source, licence and processing are recorded in the [asset register](
 | Service Junction room, its station machines, the sentry | Codex image tool, with the approved sets as style references |
 | Corridor door end and its additions | Shapes drawn by scripts from real hardware; Codex image tool painted inside them |
 | Doors of Records Access and the Service Junction | Shapes drawn by scripts from real hardware; Codex image tool painted inside them; approved October 14, 2026 |
-| The engineer's collapse (five frames) | Codex image tool over drawn pose guides |
+| The engineer's collapse (five frames) and crank frames (two) | Collapse: Codex image tool over drawn pose guides. Crank: cut from the engineer's sprite by a script; the Codex image tool repainted the arms and seams |
 
 <Details>
 <Summary>Full notes on the provisional art</Summary>
