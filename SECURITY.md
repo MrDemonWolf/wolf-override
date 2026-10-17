@@ -1,6 +1,6 @@
 # Security policy
 
-WOLF//OVERRIDE is a source-only game and a static website. Neither runs a
+WOLF OVERRIDE is a source-only game and a static website. Neither runs a
 server, takes accounts or sends data, so most reports will concern the
 game's handling of its own save and settings files, the website build, or
 the GitHub Actions workflows. Problems in Godot, GitHub Pages or other
