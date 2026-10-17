@@ -722,7 +722,7 @@ def fill(pot: Path, trans: Path, outdir: Path) -> None:
         out = []
         for entry in entries:
             if not entry["msgid"]:
-                header = ("Project-Id-Version: WOLF//OVERRIDE\\n", f"PO-Revision-Date: {revised}\\n",
+                header = ("Project-Id-Version: WOLF OVERRIDE\\n", f"PO-Revision-Date: {revised}\\n",
                           "Last-Translator: Claude (Anthropic), machine translation, unreviewed\\n", "Language-Team: none\\n", "MIME-Version: 1.0\\n",
                           "Content-Type: text/plain; charset=UTF-8\\n", "Content-Transfer-Encoding: 8bit\\n",
                           f"Language: {lang}\\n", f"Plural-Forms: {LANGUAGES[lang]['plural_forms']}\\n")
@@ -948,7 +948,7 @@ def weblate_glossary(outdir: Path) -> None:
     for key, code in glossary_codes(glossary).items():
         root = ET.Element("martif", {"type": "TBX", xml_lang: "en"})
         desc = ET.SubElement(ET.SubElement(ET.SubElement(root, "martifHeader"), "fileDesc"), "sourceDesc")
-        ET.SubElement(desc, "p").text = (f"WOLF//OVERRIDE glossary for {LANGUAGES[code]['name']} ({key}), generated "
+        ET.SubElement(desc, "p").text = (f"WOLF OVERRIDE glossary for {LANGUAGES[code]['name']} ({key}), generated "
                                          "from i18n/glossary.json by scripts/i18n/i18n_tool.py weblate-glossary")
         body = ET.SubElement(ET.SubElement(root, "text"), "body")
 

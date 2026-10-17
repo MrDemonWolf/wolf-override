@@ -1,4 +1,4 @@
-# Translating WOLF//OVERRIDE: the shared style guide
+# Translating WOLF OVERRIDE: the shared style guide
 
 Read this first, then the guide for your language in this folder and the terms in
 [`../glossary.json`](../glossary.json). These rules hold in every language. Your language's guide adds only
@@ -11,7 +11,7 @@ are in `apps/game/i18n/`, and the template every file is made from is [`../messa
 
 ## The game and its people
 
-WOLF//OVERRIDE is a grounded military sci-fi game with a dark-horror edge, set inside a sealed base.
+WOLF OVERRIDE is a grounded military sci-fi game with a dark-horror edge, set inside a sealed base.
 - **The engineer** is the only playable character, a systems engineer the player names Rowan, Alex or
   Morgan. The engineer is non-binary and uses they/them. **No language may show the engineer's gender**
   (decision D9).
