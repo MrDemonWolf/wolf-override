@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: WOLF OVERRIDE\n"
-"PO-Revision-Date: 2026-10-19 13:38+0000\n"
+"PO-Revision-Date: 2026-10-19 13:53+0000\n"
 "Last-Translator: Claude (Anthropic), machine translation, unreviewed\n"
 "Language-Team: none\n"
 "MIME-Version: 1.0\n"
@@ -966,11 +966,11 @@ msgid "No camera shake or hit-stop; screen flashes are shorter."
 msgstr "Sin sacudidas de cámara ni pausas en los golpes; los destellos duran menos."
 
 # machine-translated by Claude (Anthropic), unreviewed
-#. TRANSLATORS: DISPLAY caption (100 px, beside a 100%-200% list).
+#. TRANSLATORS: DISPLAY caption (100 px, beside a 100%-200% list). TAMAÑO DEL TEXTO ran under the list in the stills.
 #. i18n: speaker=ui
 #: scripts/game_settings.gd:301
 msgid "TEXT SIZE"
-msgstr "TAMAÑO DEL TEXTO"
+msgstr "TEXTO"
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: Tooltip of TEXT SIZE. Cards: the location and objective cards at the top.
