@@ -31,7 +31,7 @@ description: A dated, honest record of how each part of WOLF OVERRIDE was checke
 | Camera, room art, props, characters | Headless suites and rendered stills | No |
 | Sounds | Headless suites that watch which clips start | No, and not checked by ear |
 | Text and text size | Headless suites and rendered stills | No, not read by a player on a screen |
-| Languages and fonts | Headless suites; rendered Spanish stills | Spanish not reviewed by a native speaker; not played by hand |
+| Languages and fonts | Headless suites; rendered stills in every translation | No translation reviewed by a native speaker; not played by hand |
 | Logo screen | Headless suite and rendered stills | Not watched in a game window or on a device |
 | macOS and Windows test builds | Exported headless, packages checked | Not opened on a Mac or a Windows PC as part of this |
 | iOS | A temporary simulator export | Not on a physical device |
@@ -173,6 +173,19 @@ The two Spanish files (`es.po` and `es_ES.po`, 158 lines each) passed every gate
 Rebased on main the same day, after the HUD (#126) and the AI disclosure in the credits (#128) were marked, the template held 268 messages, and the Spanish files covered 158. Every check still passed, so `i18n_tool.py check` now also fails an offered language that leaves any template line untranslated; on the 158-line files it reports 111 untranslated lines in each. The 111 new lines (hints, objectives, top cards, the tutorial, the touch button's words and the AI disclosure, translated word for word) were written fresh, and Codex back-translated them independently (224 texts, then one changed line). No line showed the engineer's gender; two kept lines got a drift flag for wording, not meaning. The merged back-translation file (536 texts) is in the same Notion record. `i18n_test` (2,493 checks) now also judges every word the touch USE button shows, the tutorial prompt, and every short line of each language drawn in the hint bar and the top card, where it may take one row more than English and at most three; a planted three-row hint failed it. The longer AUDIO note the review proposed ran to two rows and failed that layout check, so it was kept as before. Rendered stills of the four routes in Spanish (keyboard and touch, 1280x720) show the HUD in Spanish in the corridor, Records and the junction. Two mismatches remain: the TANK RELEASE and MANUAL BYPASS plates, not in the template yet, show English while the hints name them SOLTAR TANQUE and BYPASS MANUAL, and WOLF's touch line names the English answer button USE MANUAL PORT. Routes R2 and R4 again stopped part way (R2 at the relay question, R4 after the fuse), which was not re-checked in English on this base.
 
 When the story was marked (PR L7c), the template grew to 411 messages, and the coverage check failed both Spanish files on the 145 new lines. Claude translated them for both files (Spain's differs only by its word list and one order to the base's staff in the vosotros form), and WOLF's touch line now names the answer button as USAR PUERTO MANUAL, the button's own translation. Codex back-translated the 146 lines of each file independently (292 texts); ten lines whose back-translation read ambiguously (the readout, the bolted door, which way "vuelve" points) were reworded and back-translated again. Every gate passes, no line shows the engineer's gender, and three short lines carry a drift flag for wording, not meaning. All 29 headless suites pass (`i18n_test` 4,028 checks, which lay out every short Spanish line in the hint bar and top card). The merged back-translation file goes to the same Notion record. Not reviewed by a native speaker, not played by hand, and no Spanish stills of the story were rendered.
+
+</Details>
+
+### Portuguese, French and German (October 19, 2026)
+
+- **Checked:** every translation check with Codex's back-translation, the headless suites, and rendered stills in each language.
+- **Not checked:** no native speaker has read them, and nobody has played in them.
+- **Covers the menus and the HUD,** like Spanish: dialogue, the story and most station names still show English.
+
+<Details>
+<Summary>Full record</Summary>
+
+The three files (`pt_BR.po`, `fr.po` and `de.po`, 268 lines each) were written fresh from the template and passed every gate of `i18n_tool.py check --back --release`. Codex back-translated all 804 lines in three independent sessions, then the 28 and 16 lines changed after them in two more; no line was flagged as showing the engineer's gender. The gender gate first flagged nine lines: three Portuguese nouns (*teclado*, *lado*, *líquido*), now in the rule's exception list with planted cases, and three French participles about machines, reworded. `i18n_test` (5,581 checks) then found overflows in all three languages: title lines, a button, the controller column, the touch USE button and station plates running into their neighbours. Each was fixed by a shorter word, noted on its line and in the style guides. Codex's notes led to clearer German for eight lines and Portuguese for three. Rendered stills of the four routes in each language (keyboard and touch, 1280x720) were looked at. Problems seen: the German SICHERUNGSPUNKT plate is cut by the screen's right edge in the corridor's touch framing; the title's credit line in French and German runs a little past the button column; and routes R2 and R4 stop part way, as they do in English, so the knockdown card itself was not captured. These are headless checks and stills: not reviewed by a native speaker, not played by hand.
 
 </Details>
 
