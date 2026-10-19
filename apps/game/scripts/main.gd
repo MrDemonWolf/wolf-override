@@ -3109,6 +3109,8 @@ func _hide_end_card() -> void:
 
 func _choose_mirror(route_id: String) -> void:
 	if route_id == "wolf" and absf(wolf.position.x - WOLF_MIRROR_X) > 42.0:
+		# TRANSLATORS: WOLF, still walking to the mirror. %s is the key or button for the manual port; the touch form names its button.
+		# i18n: story speaker=WOLF slot=key
 		status_line = "WOLF: %s" % HudText.key(I18n.KEY.tr("I'm still checking the drive. Wait for me, or press %s for the manual port."), [HudText.ANSWER_2], I18n.KEY.tr("I'm still checking the drive. Wait for me, or tap USE MANUAL PORT."))
 		return
 	if not state.preserve_mirror_trace(route_id):
@@ -3893,7 +3895,8 @@ func _tank_rehung() -> void:
 	sfx_bank.play(&"clank", -6.0, 1.1)
 	if not fail_active:
 		# Still telling the miss (WOLF breaking off, say), it waits its turn after those boxes.
-		_say_next("The winch has the tank back on the clamp. The TANK RELEASE is ready again.")
+		# TRANSLATORS: i18n: story speaker=narrator
+		_say_next(I18n.KEY.tr("The winch has the tank back on the clamp. The TANK RELEASE is ready again."))
 
 
 ## The sentry's servo winds down to nothing as it goes over.
