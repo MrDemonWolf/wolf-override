@@ -1,14 +1,11 @@
-extends SceneTree
-
-const GAME: PackedScene = preload("res://scenes/main.tscn")
-var failures: int = 0
-
-
-func _initialize() -> void:
-	call_deferred("_run")
+extends "res://tests/support/game_suite.gd"
+## Settings: values saved and loaded, hostile settings files, rebinding keys and controller buttons, and
+## the display page.
+## Bookkeeping, spawning and the waits come from the shared suite kit (tests/support/game_suite.gd).
 
 
 func _run() -> void:
+	check_name = "Settings"
 	await _check_hostile_settings()
 	var path: String = "user://settings-test-%s.cfg" % OS.get_process_id()
 	var corrupt: ConfigFile = ConfigFile.new()
@@ -22,7 +19,7 @@ func _run() -> void:
 	corrupt.set_value("bindings", "interact_keyboard", {"type": "key", "code": KEY_I})
 	corrupt.set_value("bindings", "choice_1_keyboard", {"type": "key", "code": KEY_I})
 	corrupt.save(path)
-	var game: Node2D = GAME.instantiate() as Node2D
+	var game: Node2D = MAIN_SCENE.instantiate() as Node2D
 	game.set("settings_path", path)
 	game.set("save_path", "user://settings-save-test-%s.json" % OS.get_process_id())
 	root.add_child(game)
@@ -151,7 +148,7 @@ func _run() -> void:
 	_expect(not paused and game.get("title_open") and title_settings.has_focus(), "Back from title settings returns to the title with Settings focused")
 	game.queue_free()
 	await process_frame
-	var reloaded: Node2D = GAME.instantiate() as Node2D
+	var reloaded: Node2D = MAIN_SCENE.instantiate() as Node2D
 	reloaded.set("settings_path", path)
 	root.add_child(reloaded)
 	var restored: GameSettings = reloaded.get("settings_menu") as GameSettings
@@ -181,7 +178,7 @@ func _run() -> void:
 	swaps.set_value("bindings", "move_left_keyboard", {"type": "key", "code": KEY_Q})
 	swaps.set_value("bindings", "move_right_keyboard", {"type": "key", "code": KEY_Q})
 	swaps.save(path)
-	var swapped_game: Node2D = GAME.instantiate() as Node2D
+	var swapped_game: Node2D = MAIN_SCENE.instantiate() as Node2D
 	swapped_game.set("settings_path", path)
 	root.add_child(swapped_game)
 	var swapped: GameSettings = swapped_game.get("settings_menu") as GameSettings
@@ -192,9 +189,7 @@ func _run() -> void:
 	swapped_game.queue_free()
 	await process_frame
 	DirAccess.remove_absolute(ProjectSettings.globalize_path(path))
-	if failures == 0:
-		print("Settings persistence and rebinding checks passed")
-	quit(1 if failures > 0 else 0)
+	finish("Settings persistence and rebinding checks passed")
 
 
 func _check_hostile_settings() -> void:
@@ -210,7 +205,7 @@ func _check_hostile_settings() -> void:
 	}
 	for label: String in cases:
 		_write_text(path, cases[label])
-		var game: Node2D = GAME.instantiate() as Node2D
+		var game: Node2D = MAIN_SCENE.instantiate() as Node2D
 		game.set("settings_path", path)
 		game.set("save_path", save_path)
 		root.add_child(game)
@@ -272,9 +267,3 @@ func _controller_button(code: JoyButton, pressed: bool) -> InputEventJoypadButto
 	event.button_index = code
 	event.pressed = pressed
 	return event
-
-
-func _expect(condition: bool, message: String) -> void:
-	if not condition:
-		failures += 1
-		push_error("Settings check failed: " + message)

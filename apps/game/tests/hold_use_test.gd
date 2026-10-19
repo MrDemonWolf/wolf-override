@@ -1,9 +1,10 @@
-extends SceneTree
-
-var failures: int = 0
+extends "res://tests/support/game_suite.gd"
+## HoldUse, the held-USE timer, as pure logic: when a hold starts, ticks and lets go.
+## Bookkeeping, spawning and the waits come from the shared suite kit (tests/support/game_suite.gd).
 
 
 func _initialize() -> void:
+	check_name = "HoldUse"
 	var hold: HoldUse = HoldUse.new()
 	_expect(hold.advance(0.5, true, &"") == 0 and hold.ticks == 0 and not hold.holding, "holding USE away from any station counts nothing")
 	_expect(hold.advance(0.3, true, &"valve") == 0 and hold.holding and hold.ticks == 0, "0.3 s held is not yet a tick")
@@ -42,12 +43,4 @@ func _initialize() -> void:
 		bypass.advance(1.0 / 60.0, true, &"bypass", BypassHandle.TICK_SECONDS)
 		frames += 1
 	_expect(absf(frames / 60.0 - BypassHandle.TICKS_NEEDED * BypassHandle.TICK_SECONDS) <= 2.0 / 60.0 and absf(BypassHandle.TICKS_NEEDED * BypassHandle.TICK_SECONDS - 2.0) < 0.001, "the bypass's eight notches take about 2 s of held USE (%d frames)" % frames)
-	if failures == 0:
-		print("HoldUse checks passed")
-	quit(1 if failures > 0 else 0)
-
-
-func _expect(condition: bool, label: String) -> void:
-	if not condition:
-		failures += 1
-		push_error("HoldUse check failed: " + label)
+	finish("HoldUse checks passed")

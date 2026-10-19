@@ -68,10 +68,6 @@ const ROBOTO_FILE: String = "res://assets/fonts/Roboto-Variable.ttf"
 var _checks: int = 0
 
 
-func _initialize() -> void:
-	call_deferred("_run")
-
-
 func _run() -> void:
 	check_name = "Languages"
 	_check_pinned()

@@ -20,17 +20,13 @@ var shown_checked: int = 0
 var rows_at_200: int = 0
 
 
-func _initialize() -> void:
-	call_deferred("_run")
-
-
 ## One game through every check, then the kit's teardown (no sound, node or file left behind) and
 ## exit status. Its settings file, [code]path[/code], is the one _check_text_size saves to and reads
 ## back in a second game.
 func _run() -> void:
 	check_name = "Text boxes"
 	var path: String = "user://text-boxes-test-%s.cfg" % OS.get_process_id()
-	game = await spawn_game("%s-save.json" % path, path, _keep_running) as Main
+	game = await spawn_game("%s-save.json" % path, path, keep_running) as Main
 	story = game.get_node("CanvasLayer/BottomBar/Story") as Label
 	speaker = game.get_node("CanvasLayer/BottomBar/Speaker") as Label
 	bar = game.get_node("CanvasLayer/BottomBar") as Control
@@ -50,12 +46,6 @@ func _run() -> void:
 	# its save and settings files.
 	await end_game(game)
 	finish("")
-
-
-## Passed to spawn_game for the games this suite drives itself: they keep running when the window
-## has no focus (a headless run never has it), instead of pausing.
-static func _keep_running(spawned: Node) -> void:
-	spawned.set("auto_pause_on_focus_loss", false)
 
 
 ## STORY-2: 1.2 s plus 0.33 s a word, or plus 0.05 s a character (at most 7 s), whichever is longer.
@@ -643,7 +633,7 @@ func _check_station_names() -> void:
 func _check_prompts_clear(path: String) -> void:
 	for touch: bool in [false, true]:
 		for index: int in TextSize.STEPS.size():
-			var fresh: Main = await spawn_game("%s-prompts.json" % path, "%s-prompts.cfg" % path, _keep_running) as Main
+			var fresh: Main = await spawn_game("%s-prompts.json" % path, "%s-prompts.cfg" % path, keep_running) as Main
 			fresh.touch_enabled = touch
 			fresh.settings_menu.text_size.select(index)
 			fresh.settings_menu.text_size.item_selected.emit(index)
