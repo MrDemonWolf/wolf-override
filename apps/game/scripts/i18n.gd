@@ -5,8 +5,9 @@ extends RefCounted
 ## codex/localization-research at 520cad1, docs/research-2026-10/localization/DESIGN.md and PLAN.md),
 ## from the scratch prototype's version (that branch's prototype/evidence/game.patch). Since PR L6
 ## Settings applies the saved language at start-up and offers the LANGUAGE list (GameSettings), which
-## stays hidden while only English is offered; the game's text is marked in L7, so until then only
-## English exists and nothing changes on screen.
+## stays hidden while only English is offered. Since PR L7a the menus are marked for translation, and
+## since PR L9 Spanish (es, Latin America, and its Spain adaptation es_ES, both machine-translated and
+## labelled so) is offered; the HUD and story lines are marked in L7b and L7c and show English until then.
 ##
 ## The rule: English stays the game's internal text. Constants, status_line, saves, comparisons and the
 ## tests keep the English words, and text is translated only where it is drawn, in one of three ways:
@@ -477,12 +478,8 @@ static func designed_rect(control: Control) -> Rect2:
 
 ## True when [param control] hides part of its own text: a Label with more rows than it shows; a Label
 ## or Button that clips or trims its text while the whole text needs more width than it has; or a
-## RichTextLabel with no scroll bar whose content is taller than it is. The whole text's width is the
-## control's own minimum width with clipping and trimming switched off for the measurement, so its own
-## font, size, LabelSettings, upper-casing, style margins, icon and OptionButton arrow all count (a bare
-## Font.get_string_size would miss the last five). Gotcha: the two properties are set back at once, but
-## each change emits minimum_size_changed, so a Container parent sorts again on the next frame, to the
-## same layout.
+## RichTextLabel with no scroll bar whose content is taller than it is. The whole text's width is
+## [method needed_width] (a bare Font.get_string_size would miss the style margins, icon and arrow).
 static func text_cut(control: Control) -> bool:
 	if control is RichTextLabel:
 		var rich: RichTextLabel = control as RichTextLabel
@@ -495,13 +492,23 @@ static func text_cut(control: Control) -> bool:
 			return false
 	elif not control is Button:
 		return false
+	if not bool(control.get("clip_text")) and int(control.get("text_overrun_behavior")) == TextServer.OVERRUN_NO_TRIMMING:
+		return false
+	return needed_width(control) > control.size.x + OVERFLOW_TOLERANCE_PX
+
+
+## The width (px) [param control] (a Label or Button) needs to show its whole text on one row: its own
+## minimum width with clipping and trimming switched off for the measurement, so its own font, size,
+## LabelSettings, upper-casing, style margins, icon and OptionButton arrow all count. Used by
+## [method text_cut] and by tests/i18n_test.gd, which compares a translation's need with English's where
+## the English layout already trims. Gotcha: the two properties are set back at once, but each change
+## emits minimum_size_changed, so a Container parent sorts again on the next frame, to the same layout.
+static func needed_width(control: Control) -> float:
 	var clip: bool = bool(control.get("clip_text"))
 	var overrun: int = int(control.get("text_overrun_behavior"))
-	if not clip and overrun == TextServer.OVERRUN_NO_TRIMMING:
-		return false
 	control.set("clip_text", false)
 	control.set("text_overrun_behavior", TextServer.OVERRUN_NO_TRIMMING)
 	var needed: float = control.get_minimum_size().x
 	control.set("clip_text", clip)
 	control.set("text_overrun_behavior", overrun)
-	return needed > control.size.x + OVERFLOW_TOLERANCE_PX
+	return needed

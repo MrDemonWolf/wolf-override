@@ -57,6 +57,8 @@ Changes merged after 0.15.0. They become the next version when it is cut.
 - With Reduce Motion on, the dock bay's red beacon and the corridor's lockdown light through its doorway hold steady, the torn lock hangs still and the pad's standby light does not breathe. Switching it mid-game applies at once.
 
 -- Settings --
+- Spanish (machine translation, review pending): LANGUAGE offers Español (Latinoamérica) and Español (España), each marked "traducción automática".
+- In Spanish the title, Pause, Settings, the credits with the AI disclosure, the hints, objectives, cards, tutorial and touch buttons, and a few station names are translated; dialogue, the story and most station names still show English.
 - Key names follow your keyboard layout on Windows, macOS and Linux: on a French AZERTY keyboard Move left reads Q, not A. A symbol key shows the symbol printed on it, such as & on the AZERTY 1 key, and a letter the game's fonts cannot draw (Greek, Hebrew, Arabic, Thai) shows its QWERTY name.
 
 -- Website --
@@ -94,6 +96,7 @@ Changes merged after 0.15.0. They become the next version when it is cut.
 - New Install a test build page: numbered macOS and Windows steps, warnings and system requirements, moved out of Testing.
 - Get the game is the one home for install steps; Start here, Setup and Troubleshooting link to it.
 - New Platforms and languages page: what runs where today; English only, more languages planned.
+- Platforms, Settings, FAQ, Credits and Legal list Spanish, its review state and who made it; Localization adds the Spanish files and the store rows to use once a store page exists.
 - New Support and bug reports page: GitHub issues, F12 bug captures, security reports and Discord. Troubleshooting, FAQ, Accessibility and the landing footer link to it.
 - About the game lists how it plays as short bullets; the story text is unchanged.
 - Privacy matches the code again: the debug unlock line, no language setting, the system language read at start, bug captures and the guide's search; checked October 18, 2026.
@@ -137,6 +140,11 @@ Changes merged after 0.15.0. They become the next version when it is cut.
 - The title, Pause and Settings text is marked for translation, with no change to the English: the volume rows and the rebind prompt name things in words instead of internal ids, key and button names can be translated, and Settings' note and Pause's hint follow a language change and fall back to English when a translation does not fit its blanks.
 - tools/render/render.sh --keyboard <layout> (and PARITY_KEYBOARD for parity captures) renders with another keyboard layout, such as French AZERTY.
 - The HUD is marked for translation, with no change to the English: hints, objectives, top cards, the tutorial and the touch buttons' words; a key in a hint is filled in after translation, so a language can put it where its grammar needs it.
+- The Spanish files are written by Claude with a note on every line, back-translated by Codex and passed through every translation check; Spain's file changes only the words for controller, press, Intro and phones.
+- i18n_test lays out every offered language in the game and fails any text that needs more room than English, at every TEXT SIZE.
+- The station names' overlap check is shared by text_boxes_test and i18n_test, and the Spanish gender check knows *teclado* (keyboard) and *lado* (side) are nouns.
+- i18n_tool.py check fails an offered language that leaves any line of the template untranslated, and reads the glossary's fixed words (PUNTO SEGURO) apart from the gender check.
+- i18n_test checks every word the touch USE button shows and the tutorial prompt in every offered language, and that no short line takes more than one row beyond English in the hint bar or the top card.
 
 -- How it was checked --
 - Checked: headless test suites, the docs checks and build, rendered stills of the title screen, and headless browser screenshots of the credits, legal and landing pages, and an axe scan of the landing page; headless browser screenshots of the guide home, the changelog and the open guide menu at phone, tablet and desktop sizes, and an axe scan of guide pages; the README's links checked against the built site and its commands against package.json; headless browser screenshots of the rewritten player pages, their facts checked against the game's code; headless browser screenshots of the new and rewritten user pages, the privacy claims checked against the game's code; headless browser screenshots of the developer pages, with honesty-note counts kept and their commands run or marked not run; headless browser screenshots of the docs style guide, Developer home and Contributing; not played by hand.
@@ -151,6 +159,7 @@ Changes merged after 0.15.0. They become the next version when it is cut.
 - Dock bay Reduce Motion checked: headless tests of the beacon, the lockdown light and the torn lock with it switched on mid-scene; not played by hand.
 - Language setting checked: headless test suites and rendered Settings stills in English and pseudo-English, with every language turned on for the capture only; not played by hand.
 - Menus marked for translation checked: headless test suites (29), a switch to a test Spanish catalog and back, the English menus' text and stills compared with the previous version (unchanged apart from the changelog's own new lines), rendered title, Pause and Settings stills in pseudo-English (keyboard and touch) and with a French AZERTY layout; not played by hand.
+- Spanish checked: the translation checks with Codex's back-translation, headless test suites and rendered Spanish stills (keyboard and touch, 1280x720); not reviewed by a native speaker, not played by hand.
 
 == 0.15.0 - October 16, 2026 ==
 Summary: real doors in Records Access and the Service Junction, a copied-code check, notes moved to Notion and groundwork for more languages.

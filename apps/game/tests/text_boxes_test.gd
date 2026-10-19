@@ -572,23 +572,16 @@ func _check_station_names() -> void:
 			game.debug_tools.actions.jump(jump)
 			for frame: int in 3:
 				await process_frame
-			var labels: Array[Label] = []
-			var candidates: Array = game._corridor_station_labels()
-			candidates.append_array(game.records_room.station_labels)
-			candidates.append_array(game.junction_room.station_labels)
-			for label: Label in candidates:
-				if label.is_visible_in_tree() and not label.text.is_empty():
-					labels.append(label)
-			for a: int in labels.size():
-				var rect: Rect2 = labels[a].get_global_rect()
-				var key: String = "%s|%s|%s" % [jump, labels[a].get_path(), labels[a].text]
+			var labels: Array[Label] = shown_station_labels(game)
+			for label: Label in labels:
+				var rect: Rect2 = label.get_global_rect()
+				var key: String = "%s|%s|%s" % [jump, label.get_path(), label.text]
 				if index == 0:
 					bottoms[key] = rect.end.y
-				elif bottoms.has(key) and labels[a] != game.get_node("RelayLabel"):
-					_expect(absf(rect.end.y - float(bottoms[key])) <= 1.5, "%d%%, %s: %s keeps its bottom edge where it was at 100%% (%.1f vs %.1f)" % [percent, jump, labels[a].text, rect.end.y, bottoms[key]])
-				for b: int in range(a + 1, labels.size()):
-					var other: Rect2 = labels[b].get_global_rect()
-					_expect(not rect.grow(-0.5).intersects(other.grow(-0.5)), "%d%%, %s: %s and %s do not overlap (%s, %s)" % [percent, jump, labels[a].text, labels[b].text, rect, other])
+				elif bottoms.has(key) and label != game.get_node("RelayLabel"):
+					_expect(absf(rect.end.y - float(bottoms[key])) <= 1.5, "%d%%, %s: %s keeps its bottom edge where it was at 100%% (%.1f vs %.1f)" % [percent, jump, label.text, rect.end.y, bottoms[key]])
+			for overlap: String in overlapping_labels(labels):
+				_expect(false, "%d%%, %s: no two station names overlap, but %s" % [percent, jump, overlap])
 			if jump == &"corridor_start":
 				for label: Label in [game.get_node("BreakerLabel"), game.get_node("RelayLabel"), game.bypass_handle.fault_tag] as Array[Label]:
 					_expect(label.modulate.a > 0.99, "%d%%: %s is not faded at the corridor's start (alpha %.2f)" % [percent, label.text, label.modulate.a])

@@ -3,8 +3,8 @@
  "languages": {
   "en": {"name": "English", "enabled": true, "fallback_font": null, "reading_cps": 20, "row_characters": 42, "source": true, "glossary": "en", "script": "latin", "family": "en", "plural_forms": "nplurals=2; plural=(n != 1);"},
   "de": {"name": "Deutsch", "enabled": false, "review": "machine", "machine_tag": "maschinelle Übersetzung", "fallback_font": null, "reading_cps": null, "row_characters": 42, "glossary": "de", "script": "latin", "family": "de", "plural_forms": "nplurals=2; plural=(n != 1);", "gender": "german"},
-  "es_ES": {"name": "Español (España)", "enabled": false, "review": "machine", "machine_tag": "traducción automática", "fallback_font": null, "reading_cps": 17, "row_characters": 42, "glossary": "es-ES", "script": "latin", "family": "es", "plural_forms": "nplurals=2; plural=(n != 1);", "gender": "spanish"},
-  "es": {"name": "Español (Latinoamérica)", "enabled": false, "review": "machine", "machine_tag": "traducción automática", "fallback_font": null, "reading_cps": 17, "row_characters": 42, "glossary": "es-419", "script": "latin", "family": "es", "plural_forms": "nplurals=2; plural=(n != 1);", "gender": "spanish"},
+  "es_ES": {"name": "Español (España)", "enabled": true, "review": "machine", "machine_tag": "traducción automática", "fallback_font": null, "reading_cps": 17, "row_characters": 42, "glossary": "es-ES", "script": "latin", "family": "es", "plural_forms": "nplurals=2; plural=(n != 1);", "gender": "spanish"},
+  "es": {"name": "Español (Latinoamérica)", "enabled": true, "review": "machine", "machine_tag": "traducción automática", "fallback_font": null, "reading_cps": 17, "row_characters": 42, "glossary": "es-419", "script": "latin", "family": "es", "plural_forms": "nplurals=2; plural=(n != 1);", "gender": "spanish"},
   "fr": {"name": "Français", "enabled": false, "review": "machine", "machine_tag": "traduction automatique", "fallback_font": null, "reading_cps": null, "row_characters": 42, "glossary": "fr", "script": "latin", "family": "fr", "plural_forms": "nplurals=2; plural=(n > 1);", "gender": "french"},
   "it": {"name": "Italiano", "enabled": false, "review": "machine", "machine_tag": null, "fallback_font": null, "reading_cps": null, "row_characters": 42, "glossary": "it", "script": "latin", "family": "it", "plural_forms": "nplurals=2; plural=(n != 1);", "gender": "italian"},
   "pl": {"name": "Polski", "enabled": false, "review": "machine", "machine_tag": "tłumaczenie maszynowe", "fallback_font": null, "reading_cps": null, "row_characters": 42, "glossary": "pl", "script": "latin", "family": "pl", "plural_forms": "nplurals=3; plural=(n==1 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);", "gender": "polish", "name_case": true},
@@ -38,7 +38,7 @@
    "pronouns": "\\b(?:on|ona|jego|jej|go|ją|mu|niej|nim|niego|nią|niemu)\\b"
   },
   "spanish": {
-   "forms": "^(?!(?:cada|nada|vida|salida|partida|entrada|llegada|puerta|puertas|puerto|alerta|alertas|cierto|cierta|descubierto)$)(?:\\w+(?:ad|id|ert)[oa]s?|sol[oa]s?|list[oa]s?|segur[oa]s?|viv[oa]s?|nuev[oa]s?|content[oa]s?|quiet[oa]s?|ingenier[oa]s?|técnic[oa]s?|mecánic[oa]s?)$",
+   "forms": "^(?!(?:cada|nada|vida|salida|partida|entrada|llegada|puerta|puertas|puerto|alerta|alertas|cierto|cierta|descubierto|teclado|teclados|lado|lados)$)(?:\\w+(?:ad|id|ert)[oa]s?|sol[oa]s?|list[oa]s?|segur[oa]s?|viv[oa]s?|nuev[oa]s?|content[oa]s?|quiet[oa]s?|ingenier[oa]s?|técnic[oa]s?|mecánic[oa]s?)$",
    "you": "\\b(?:tú|te|ti|contigo|usted)\\b",
    "first_person": "\\byo\\b",
    "pronouns": "\\b(?:él|ella)\\b"

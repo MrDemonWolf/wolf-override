@@ -1,12 +1,12 @@
 ---
 title: Localization
-description: How WOLF OVERRIDE will show other languages, which files hold the language work, and the commands that check it.
+description: How WOLF OVERRIDE shows other languages, which files hold the language work, and the commands that check it.
 ---
 
 **What this page is for:** how languages work in the code today, and how to check translation files.
 
-<Callout title="English only for now">
-  The groundwork for more languages is built, but no translation exists yet. The game shows English whatever language your computer uses, and its language setting stays hidden until a second language ships. Players: [Platforms and languages](/docs/platforms/).
+<Callout title="Spanish is the first language">
+  Spanish (Latin America and Spain) covers the menus and the HUD as a machine translation, not yet reviewed by a native speaker. Dialogue and the story are marked next and show English until then. Players: [Platforms and languages](/docs/platforms/).
 </Callout>
 
 ## Words used here
@@ -22,7 +22,7 @@ description: How WOLF OVERRIDE will show other languages, which files hold the l
 - **One table:** `apps/game/i18n/languages.json` lists the planned language files. For each: its name in its own language, whether it is offered, its review state, its fallback font, a reading speed and a row limit.
 - **English stays inside:** constants, saves, comparisons and tests keep the English words. Text is translated only where it is drawn.
 - **Why:** code compares English text (speaker tags, key tokens and the like) and saves store the English choice, so translating earlier would break them.
-- **Settings is wired:** Settings applies the saved language (`[general] language` in `settings.cfg`), or the system's when none is saved, as the game loads. Its **LANGUAGE** row on the **GENERAL** tab stays hidden while only English is offered. The game's text is marked for translation next, so nothing changes on screen yet.
+- **Settings is wired:** Settings applies the saved language (`[general] language` in `settings.cfg`), or the system's when none is saved, as the game loads. Its **LANGUAGE** row on the **GENERAL** tab shows once a second language is offered.
 - **Menus are marked:** the title, Pause and Settings text is in the template. Scene captions translate themselves. Captions set in code carry the `I18n.KEY.tr()` mark so the generator finds them. Text built in code (the Settings note, key and button names, Pause's hint) is translated with `tr()` as it is built, and built again when the language changes.
 - **The HUD is marked:** hints, objectives, top cards, the tutorial, the touch **USE** button and the CONTINUE and RETRY prompts are in the template. Their Labels translate in code, not by themselves, and the HUD is drawn again when the language changes.
 - **Key prompts are templates:** a hint that names a key is written `"%s: arm the breaker."` and built with `HudText.key` (`apps/game/scripts/hud_text.gd`) and a key token. The game still reads the English `E: arm the breaker.`; where it is drawn, `HudText.localise` translates the template and then puts in the key, button or touch word in use, so a translation can move the key. The save-error line and WOLF's manual-port line have a whole touch form of their own ("Tap USE here again.").
@@ -38,7 +38,7 @@ description: How WOLF OVERRIDE will show other languages, which files hold the l
 | --- | --- |
 | `apps/game/scripts/i18n.gd` | The language module |
 | `apps/game/i18n/languages.json` | The language table the game and the tools both read |
-| `apps/game/i18n/<code>.po` | Catalogs, one per language (none yet) |
+| `apps/game/i18n/<code>.po` | Catalogs, one per language: `es.po` and `es_ES.po` so far |
 | `i18n/messages.pot` | The template, outside the game so it is not exported |
 | `i18n/glossary.json` | Fixed terms for each language |
 | `i18n/style/` | The translators' style guides: one shared, one per language |
@@ -78,6 +78,7 @@ You need Python 3 (standard library only) and GNU gettext's `msgfmt` (`brew inst
 - The engineer is never given a gender; Slavic name endings.
 - Plural forms and their header.
 - Sibling files, such as the two Chinese and two Spanish files.
+- Coverage: a language that is offered (`enabled` in `languages.json`) must translate every line of the template.
 - Comments that would make Godot skip a line.
 - `--back <file>` adds a back-translation's checks.
 - `--release` adds the release gates: no fuzzy line in a language marked reviewed, no untranslated line marked as story.
@@ -88,7 +89,7 @@ You need Python 3 (standard library only) and GNU gettext's `msgfmt` (`brew inst
 <Details>
 <Summary>Self-test, glossary and fonts in detail</Summary>
 
-- **`selftest`** runs the gates on 155 planted cases (115 for the line, plural, comment and sibling gates, 9 for the release gates, 16 for the glossary on its real terms and 15 broken copies of the glossary and style guides). It fails if any planted error passes or any clean line fails.
+- **`selftest`** runs the gates on 167 planted cases (121 for the line, plural, comment and sibling gates, 9 for the release gates, 6 for the coverage gate, 16 for the glossary on its real terms and 15 broken copies of the glossary and style guides). It fails if any planted error passes or any clean line fails.
 - **`glossary`** checks that every one of the 10 languages' 11 files (Italian and Ukrainian, Tier 1, are not covered yet) has a form for every term and a guide with the same sections, that every word is in its language's alphabet, and that a term still left to reviewers requires nothing. It exits 1 on any problem.
 - **`fonts`** downloads the Noto Sans CJK 2.004 release files from GitHub into the folder (unless they are there), checks each font's SHA-256, and cuts Noto Sans JP, KR, SC and TC down to each language's fixed common character set with HarfBuzz's `hb-subset` (`brew install harfbuzz`). It writes the symbols font Roboto chains and the character lists in `apps/game/tests/support/cjk_charsets.json`, then runs `pickerfonts`, and prints the sizes. Its output is committed, so it only runs again to change a character set.
 - **`pickerfonts`** cuts each CJK language's own name and "machine translation" tag out of its committed subset (`picker_font` in `languages.json`) and gives the cut Montserrat's line height, so the list's rows keep their height.
@@ -100,10 +101,31 @@ You need Python 3 (standard library only) and GNU gettext's `msgfmt` (`brew inst
 
 - **`godot` job:** regenerates the template and fails when the committed one differs.
 - **`i18n` job:** `selftest`, `glossary`, `potfiles --check` and `check`. It needs no Godot.
-- **Headless suites:** `i18n_test` checks the language table, locale lookup and fonts, including the language list's own font chain; `settings_test` checks the **LANGUAGE** row and its saved setting, and that the menus' built text (prompts, key names, the Settings note, Pause's hint) follows a language change; `i18n_test` also checks the HUD's key prompts and, in a game, the hint, tutorial, top card and touch button in a test language. What it found: [What was checked](/docs/development/evidence/#languages-october-16-2026).
+- **Headless suites:** `i18n_test` checks the language table, locale lookup and fonts, including the language list's own font chain, and lays out every offered language in the game (title, credits, changelog, Settings, Pause, touch buttons and every word the USE button shows, the tutorial, and station names at every **TEXT SIZE**), failing anything that needs more room than English, and draws every short line of each language in the hint bar and the top card, failing one that takes more than one row beyond English or more than three rows; `settings_test` checks the **LANGUAGE** row and its saved setting, and that the menus' built text (prompts, key names, the Settings note, Pause's hint) follows a language change; `i18n_test` also checks the HUD's key prompts and, in a game, the hint, tutorial, top card and touch button in a test language. What it found: [What was checked](/docs/development/evidence/#languages-october-16-2026).
 - **Every suite runs in English** (`--language en`), whatever your computer's language.
 
-## Add a language (later)
+## Spanish
+
+- **Two files:** `es.po` is Latin-American Spanish, the base. `es_ES.po` is Spain's adaptation of it, changed only by the Spain list in `i18n/style/es-ES.md`.
+- **Which file a player gets:** Spain's region gets `es_ES`; every other Spanish locale gets `es`.
+- **Every line has a note:** a `#. TRANSLATORS:` line says where it shows and how much room it has, and `#. i18n:` marks say who speaks and how the player is addressed.
+- **Some words were cut to fit,** such as EMPEZAR for NEW GAME. The list is in `i18n/style/es-419.md`, "Open questions".
+- **Review state:** machine translation, not reviewed. See [Credits](/docs/credits/#translations).
+
+## Store pages
+
+No store page exists yet. When one does, list only languages that ship, and say how they were made.
+
+| Steam language row | Interface | Full audio | Subtitles |
+| --- | --- | --- | --- |
+| Spanish - Latin America | Yes | No | No |
+| Spanish - Spain | Yes | No | No |
+
+- **Subtitles: no,** because the game has no voice yet, and its dialogue is not translated yet.
+- **About This Game:** say "Spanish: machine-translated, community review in progress" until a native speaker reviews it.
+- **Content Survey:** disclose the AI translation under AI-generated content (decision D2), as the conservative reading of Valve's January 2026 rules.
+
+## Add a language
 
 Each language comes in its own pull request. There is no translation website.
 

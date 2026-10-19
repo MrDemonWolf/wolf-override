@@ -136,7 +136,7 @@
   },
   "LOCKDOWN": {
    "note": "The base sealing itself shut: the chapter name on the title (CHAPTER 1  /  LOCKDOWN) and a top card. Not a blockage or a lockout.",
-   "es-419": {"status": "open", "required": null, "avoid": ["BLOQUEO"], "proposals": ["CIERRE DE EMERGENCIA"]},
+   "es-419": {"status": "open", "required": null, "avoid": ["BLOQUEO"], "proposals": ["CIERRE DE EMERGENCIA", "CIERRE TOTAL"]},
    "pt-BR": {"status": "open", "required": null, "proposals": ["CONFINAMENTO"]},
    "de": {"status": "proposed", "required": "ABRIEGELUNG"},
    "fr": {"status": "open", "required": null, "proposals": ["CONFINEMENT", "VERROUILLAGE"]},

@@ -38,23 +38,27 @@ Purpose
                               guard (SCRIPT_GUARD), the
                               engineer-gender gate (gendered_words, and the back-translation's
                               engineer_gendered), the Slavic name-case gate (NAME_CASE), the plural forms of
-                              every msgstr[n], the sibling-file completeness gate (family_gaps), and chrF of
+                              every msgstr[n], the sibling-file completeness gate (family_gaps), the
+                              coverage gate (coverage_gaps: an offered language, "enabled" in
+                              languages.json, translates every POT message), and chrF of
                               Codex's back-translation (BACK, JSON; optional) against the English. With
                               --release it also runs the release gates (release_problems): no fuzzy entry
                               in a language whose review state is "reviewed", and no untranslated or fuzzy
                               line marked "#. i18n: story". Exits 1 when any language fails (a failed line,
-                              a non-zero msgfmt, a sibling gap or a release problem), so CI can gate on it.
+                              a non-zero msgfmt, a sibling gap, an untranslated line in an offered language
+                              or a release problem), so CI can gate on it. The gender gate reads each line
+                              with its glossary terms' fixed forms blanked out (glossary_masked).
                               A PODIR with no PO file passes: only English exists until PR L9.
     glossary                  checks the glossary (i18n/glossary.json) and the style guides (i18n/style/)
                               against each other and languages.json (glossary_problems): every covered
                               language has a form for every term and a guide with every section, forms
                               pass their script guard, open terms require nothing. Exits 1 on any problem.
     selftest OUT              runs the gates above on fixed planted cases (SELFTEST, FAMILY_SELFTEST,
-                              RELEASE_SELFTEST, GLOSSARY_SELFTEST) and writes the result as JSON at OUT;
+                              RELEASE_SELFTEST, COVERAGE_SELFTEST, GLOSSARY_SELFTEST) and writes the result as JSON at OUT;
                               exits 1 if a planted error passes or a clean line fails. The negative control
                               for gates no real msgid exercises yet (named and printf placeholders, BBCode,
                               plural forms, the "you", pronoun and name-case checks, sibling files, the
-                              release gates, the glossary's avoid forms and its shape).
+                              coverage gate, the release gates, the glossary's avoid forms and its shape).
     hardcoded POT INVENTORY OUT
                               player-facing strings of the strings step's inventory (in scope and shown)
                               whose text is no msgid of POT, by file, as JSON at OUT.
@@ -246,6 +250,23 @@ def glossary_missing(english: str, text: str, glossary_key: str, glossary: dict)
         if allowed and not any(f in text for f in allowed):
             missing.append(term)
     return missing
+
+
+def glossary_masked(english: str, text: str, glossary_key: str, glossary: dict) -> str:
+    """``text`` with the required form and variants (term_form) of every glossary term that ``english``
+    uses, in any case, blanked out (case-insensitively), for the gender gate only. A term's fixed form
+    names a thing, never the engineer, but a gender rule reads its words alone: Spanish PUNTO SEGURO (the
+    safe point) holds "seguro", which the rule must keep flagging in "estás seguro". Unlike term_used,
+    the English is matched in any case, since hints write "the safe point" where the plate says SAFE
+    POINT. Pure."""
+    for term, forms in glossary["terms"].items():
+        form = term_form(forms, glossary_key, glossary)
+        if form is None or not re.search(r"\b" + re.escape(term) + r"\b", english, re.IGNORECASE):
+            continue
+        for word in [form.get("required")] + form.get("variants", []):
+            if word:
+                text = re.sub(re.escape(word), " ", text, flags=re.IGNORECASE)
+    return text
 
 
 def glossary_avoided(english: str, text: str, glossary_key: str, glossary: dict) -> list[str]:
@@ -1038,6 +1059,24 @@ def name_case_ok(text: str, lang: str, roles: set[str]) -> bool:
     return not (LANGUAGES[lang].get("name_case") and "name" in roles and NAME_CASE.search(text))
 
 
+def translated_ids(entries: list[dict]) -> set[tuple[str, str]]:
+    """The (msgctxt, msgid) of every entry in ``entries`` that Godot would show translated: a msgstr (and
+    every msgstr[n] of a plural) that is not empty, and no fuzzy flag (is_fuzzy). The one definition of
+    "translated" that the sibling gate (family_gaps) and the coverage gate (coverage_gaps) share. Pure."""
+    return {_message_id(e) for e in entries if e["msgid"] and e["msgstr"] and all(e["msgstr"]) and not is_fuzzy(e)}
+
+
+def coverage_gaps(entries: list[dict], pot_entries: list[dict], enabled: bool) -> list[str]:
+    """For an offered language (``enabled``, languages.json): the msgids of the POT's ``pot_entries`` that
+    its PO ``entries`` lack, leave empty or have fuzzy (translated_ids), sorted. Godot shows English for
+    each, so an offered language with a gap mixes languages on screen: L9's Spanish, rebased onto main's
+    109 new HUD and credits lines, would have shown them in English while every other gate passed. Empty
+    for a language that is not offered yet, which may be filled a batch at a time. Pure."""
+    if not enabled:
+        return []
+    return sorted(msgid for _, msgid in {_message_id(e) for e in pot_entries if e["msgid"]} - translated_ids(entries))
+
+
 def family_gaps(po_entries: dict[str, list[dict]]) -> dict[str, list[str]]:
     """For every language whose family (languages.json) has two or more PO files here: the msgids that a
     sibling file translates but this one leaves untranslated, fuzzy or with an empty plural form. Godot
@@ -1045,9 +1084,6 @@ def family_gaps(po_entries: dict[str, list[dict]]) -> dict[str, list[str]]:
     get_message_from_translations, 4.7.2), so such a gap shows the sibling's text (Simplified characters
     in a Traditional line, Latin-American Spanish in Spain's file), not English. A line no file of the
     family translates falls to English and is no gap; languages with no sibling are left out. Pure."""
-    def done(entries: list[dict]) -> set[tuple[str, str]]:
-        return {(e.get("msgctxt", ""), e["msgid"]) for e in entries if e["msgid"] and e["msgstr"] and all(e["msgstr"]) and not is_fuzzy(e)}
-
     families: dict[str, list[str]] = {}
     for lang in po_entries:
         families.setdefault(LANGUAGES[lang]["family"], []).append(lang)
@@ -1055,7 +1091,7 @@ def family_gaps(po_entries: dict[str, list[dict]]) -> dict[str, list[str]]:
     for langs in families.values():
         if len(langs) < 2:
             continue
-        translated = {lang: done(po_entries[lang]) for lang in langs}
+        translated = {lang: translated_ids(po_entries[lang]) for lang in langs}
         for lang in langs:
             elsewhere = set().union(*(translated[other] for other in langs if other != lang))
             gaps[lang] = sorted(msgid for _, msgid in elsewhere - translated[lang])
@@ -1178,7 +1214,7 @@ def check(pot: Path, podir: Path, out: Path, back: Path | None = None, release: 
             measures["bbcode_ok"] = bbcode_ok(english, text)
             gender_stamped = any(c.startswith("# gender-ok:") for c in entry["comments"])
             measures["engineer_roles"] = sorted(roles)
-            measures["gender_words"] = gendered_words(text, lang, roles)
+            measures["gender_words"] = gendered_words(glossary_masked(english, text, LANGUAGES[lang]["glossary"], glossary), lang, roles)
             measures["gender_ok"] = gender_stamped or not measures["gender_words"]
             measures["name_case_ok"] = name_case_ok(text, lang, roles)
             measures["plural_problems"] = plural_problems(entry, plural_count(lang))
@@ -1202,10 +1238,11 @@ def check(pot: Path, podir: Path, out: Path, back: Path | None = None, release: 
         conflicts = {e["msgid"]: mark_conflicts(e) for e in entries if e["msgid"] and mark_conflicts(e)}
         header_ok = plural_header_ok(header, lang)
         shipping = release_problems(entries, pot_entries, LANGUAGES[lang].get("review", "")) if release else []
+        untranslated = coverage_gaps(entries, pot_entries, bool(LANGUAGES[lang].get("enabled")))
         report["languages"][lang] = {
             "ok": (fmt.returncode == 0 and not failed and not gaps.get(lang) and header_ok and not notes
-                   and not conflicts and not pot_conflicts and not shipping),
-            "release_problems": shipping,
+                   and not conflicts and not pot_conflicts and not shipping and not untranslated),
+            "release_problems": shipping, "untranslated": untranslated,
             "msgfmt_rc": fmt.returncode, "msgfmt": (fmt.stdout + fmt.stderr).strip(),
             "plural_header_ok": header_ok, "fuzzy_notes": notes, "mark_conflicts": conflicts,
             "translated": len(translated), "fuzzy": [e["msgid"] for e in entries if e["msgid"] and is_fuzzy(e)],
@@ -1218,7 +1255,7 @@ def check(pot: Path, podir: Path, out: Path, back: Path | None = None, release: 
         gap = "" if data["family_gaps"] is None else f", {len(data['family_gaps'])} sibling gaps"
         print(f"{lang}: msgfmt rc {data['msgfmt_rc']} ({data['msgfmt']}); {data['translated']} checked, "
               f"{len(data['failed'])} failed, {len(data['drift_flags'])} drift flags, "
-              f"{data['back_missing']} without a back-translation{gap}"
+              f"{data['back_missing']} without a back-translation{gap}, {len(data['untranslated'])} untranslated"
               + (f", {len(data['release_problems'])} release problems" if release else ""))
     if not report["languages"]:
         print(f"no PO files in {podir}: nothing to check")
@@ -1297,6 +1334,16 @@ SELFTEST = [
     ("gender", "es", "", "%s, el nuevo técnico, revisa el panel.", False, ""),
     ("gender", "es", "", "WOLF: ¿Estás cansada?", False, "you"),
     ("gender", "es", "", "%s abre la puerta de salida.", True, ""),
+    # "teclado" (keyboard) ends like a participle; the rule's exception list keeps it clear (PR L9's
+    # TOGGLE HOLDS tooltip), while an agreeing participle in the same clause still fails.
+    ("gender", "es", "", "Presiona una vez. Teclado, control y pantalla táctil.", True, "you"),
+    ("gender", "es", "", "Teclado listo y conectada.", False, "you"),
+    # The glossary's PUNTO SEGURO is the safe point, not an adjective about the engineer (glossary_masked);
+    # "segura" beside it still is, and so is "seguro" where the English names no safe point.
+    ("gender", "es", "Return to the safe point.", "Vuelve al punto seguro.", True, "you"),
+    ("gender", "es", "You're safe at the safe point.", "Estás segura en el punto seguro.", False, "you"),
+    ("gender", "es", "Are you sure?", "¿Estás seguro?", False, "you"),
+    ("gender", "es", "", "Vuelve al otro lado de los escombros.", True, "you"),
     ("gender", "pt_BR", "", "%s está morta.", False, ""),
     ("gender", "pt_BR", "", "%s está morto.", False, ""),
     ("gender", "pt_BR", "", "WOLF: Você está certa.", False, "you"),
@@ -1414,6 +1461,18 @@ RELEASE_SELFTEST = [
 ]
 
 
+#: Planted cases for the coverage gate (coverage_gaps): (what, offered, PO entries, POT entries, the
+#: msgids it must report), entries in RELEASE_SELFTEST's (msgid, msgstr list, fuzzy, story) form.
+COVERAGE_SELFTEST = [
+    ("offered language translates every POT line", True, [("A", ["a"], False, False), ("B", ["b"], False, False)], [("A", [""], False, False), ("B", [""], False, False)], []),
+    ("offered language lacks a POT line (main's new HUD lines after a rebase)", True, [("A", ["a"], False, False)], [("A", [""], False, False), ("B", [""], False, False)], ["B"]),
+    ("offered language leaves a line empty", True, [("A", ["a"], False, False), ("B", [""], False, False)], [("A", [""], False, False), ("B", [""], False, False)], ["B"]),
+    ("offered language has a line fuzzy", True, [("A", ["a"], False, False), ("B", ["b"], True, False)], [("A", [""], False, False), ("B", [""], False, False)], ["B"]),
+    ("offered language has a plural form empty", True, [("A", ["a", ""], False, False)], [("A", ["", ""], False, False)], ["A"]),
+    ("language not offered yet may have gaps", False, [("A", ["a"], False, False)], [("A", [""], False, False), ("B", [""], False, False)], []),
+]
+
+
 def _planted_entries(rows: list[tuple]) -> list[dict]:
     """RELEASE_SELFTEST's (msgid, msgstr list, fuzzy, story) rows as parsed PO entries (read_po's form),
     with the gettext fuzzy flag and the story mark as comment lines. Pure."""
@@ -1423,7 +1482,7 @@ def _planted_entries(rows: list[tuple]) -> list[dict]:
 
 
 def selftest(out: Path) -> None:
-    """Runs SELFTEST, FAMILY_SELFTEST, RELEASE_SELFTEST and GLOSSARY_SELFTEST through the gates, writes
+    """Runs SELFTEST, FAMILY_SELFTEST, RELEASE_SELFTEST, COVERAGE_SELFTEST and GLOSSARY_SELFTEST through the gates, writes
     each case's result to ``out`` and exits 1 on a mismatch. Reads the repository's glossary and style
     guides (the glossary cases test the real terms); writes nothing else."""
     glossary = json.loads(GLOSSARY_FILE.read_text(encoding="utf-8"))
@@ -1439,7 +1498,8 @@ def selftest(out: Path) -> None:
             passed = bbcode_ok(english, text)
         elif gate in ("gender", "name_case"):
             roles = engineer_roles({"msgid": text, "comments": [f"#. i18n: engineer={mark}"] if mark else []})
-            passed = (not gendered_words(text, lang, roles)) if gate == "gender" else name_case_ok(text, lang, roles)
+            masked = glossary_masked(english, text, LANGUAGES[lang]["glossary"], glossary)
+            passed = (not gendered_words(masked, lang, roles)) if gate == "gender" else name_case_ok(text, lang, roles)
         elif gate == "plural_header":
             passed = plural_header_ok(text, lang)
         elif gate == "fuzzy_note":
@@ -1460,6 +1520,10 @@ def selftest(out: Path) -> None:
         found = release_problems(_planted_entries(po), _planted_entries(pot), review)
         results.append({"gate": "release", "case": what, "expected_problem": expect_problem, "problems": found,
                         "as_expected": bool(found) == expect_problem})
+    for what, enabled, po, pot, expected_gaps in COVERAGE_SELFTEST:
+        found = coverage_gaps(_planted_entries(po), _planted_entries(pot), enabled)
+        results.append({"gate": "coverage", "case": what, "expected_gaps": expected_gaps, "gaps": found,
+                        "as_expected": found == expected_gaps})
     for what, change, expect_problem in GLOSSARY_SELFTEST:
         planted_glossary, planted_styles = copy.deepcopy(glossary), dict(styles)
         change(planted_glossary, planted_styles)
