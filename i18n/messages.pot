@@ -77,7 +77,7 @@ msgid ""
 msgstr ""
 
 #: scenes/main.tscn
-#: scripts/main.gd:4412
+#: scripts/main.gd:4419
 msgid "PAUSE"
 msgstr ""
 
@@ -233,7 +233,7 @@ msgid "BACK TO TITLE"
 msgstr ""
 
 #: scenes/main.tscn
-#: scripts/main.gd:1852
+#: scripts/main.gd:1859
 msgid "PAUSE SCROLL"
 msgstr ""
 
@@ -348,70 +348,70 @@ msgid "Default controls restored."
 msgstr ""
 
 #: scripts/game_settings.gd:608
-#: scripts/main.gd:1980
+#: scripts/main.gd:1987
 msgid "Settings could not be saved."
 msgstr ""
 
-#: scripts/junction_room.gd:811
+#: scripts/junction_room.gd:858
 msgid "LINE"
 msgstr ""
 
-#: scripts/junction_room.gd:1451
+#: scripts/junction_room.gd:1511
 msgid "BREAKER USED"
 msgstr ""
 
-#: scripts/junction_room.gd:1453
+#: scripts/junction_room.gd:1513
 msgid "VALVE USED"
 msgstr ""
 
-#: scripts/junction_room.gd:1470
+#: scripts/junction_room.gd:1530
 msgid "EXIT OPEN"
 msgstr ""
 
-#: scripts/junction_room.gd:1474
+#: scripts/junction_room.gd:1534
 msgid "EXIT OPENING"
 msgstr ""
 
-#: scripts/junction_room.gd:1477
+#: scripts/junction_room.gd:1537
 msgid "EXIT READY"
 msgstr ""
 
-#: scripts/junction_room.gd:1480
+#: scripts/junction_room.gd:1540
 msgid "EXIT LOCKED"
 msgstr ""
 
-#: scripts/main.gd:1026
+#: scripts/main.gd:1031
 msgid "LINK UNAVAILABLE"
 msgstr ""
 
-#: scripts/main.gd:1887
+#: scripts/main.gd:1894
 msgid "RESUME SCROLL"
 msgstr ""
 
-#: scripts/main.gd:1920
+#: scripts/main.gd:1927
 msgid "30 FPS"
 msgstr ""
 
-#: scripts/main.gd:1921
+#: scripts/main.gd:1928
 msgid "60 FPS"
 msgstr ""
 
-#: scripts/main.gd:1922
+#: scripts/main.gd:1929
 msgid "UNCAPPED"
 msgstr ""
 
-#: scripts/main.gd:1923
+#: scripts/main.gd:1930
 msgid "90 FPS"
 msgstr ""
 
-#: scripts/main.gd:1924
+#: scripts/main.gd:1931
 msgid "120 FPS"
 msgstr ""
 
-#: scripts/main.gd:1925
+#: scripts/main.gd:1932
 msgid "144 FPS"
 msgstr ""
 
-#: scripts/main.gd:1942
+#: scripts/main.gd:1949
 msgid "TAP RESUME TO RETURN"
 msgstr ""
