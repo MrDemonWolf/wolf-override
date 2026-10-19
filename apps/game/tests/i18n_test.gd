@@ -726,6 +726,11 @@ func _check_layouts() -> void:
 		game.call("_show_credits")
 		await frames(2)
 		_check_fits(code, "credits", game.credits_screen)
+		# Paused, the scroll button reads RESUME SCROLL, a longer word than PAUSE SCROLL.
+		game.call("_toggle_credits_pause")
+		await frames(2)
+		_check_fits(code, "credits paused", game.credits_screen)
+		game.call("_toggle_credits_pause")
 		game.call("_hide_credits")
 		game.call("_show_changelog")
 		await frames(2)
@@ -739,6 +744,17 @@ func _check_layouts() -> void:
 			settings.select_tab(tab)
 			await frames(2)
 			_check_fits(code, "Settings tab %d" % tab, settings)
+		# Waiting for a new binding, on the page that holds the bindings: the prompt in the note and
+		# CANCEL REBIND, shown only then.
+		var first_binding: Control = settings.binding_buttons.values()[0]
+		for tab: int in settings.pages.size():
+			if settings.pages[tab].is_ancestor_of(first_binding):
+				settings.select_tab(tab)
+		settings.begin_capture(GameSettings.ACTIONS[0], "keyboard")
+		await frames(2)
+		_check(settings.cancel_button.is_visible_in_tree(), "%s: CANCEL REBIND is up while a binding waits, so it is judged" % code)
+		_check_fits(code, "Settings rebind", settings)
+		settings.cancel_capture()
 		game.call("_resume_game")
 		game.debug_tools.actions.jump(&"corridor_start")
 		game.touch_enabled = true
@@ -817,11 +833,17 @@ func _check_fits(code: String, where: String, root: Node) -> void:
 ## The touch USE button with every word the game puts on it (USE, CRANK, DROP, RETRY, and CONTINUE in its
 ## touch-button context), each judged by [method _check_fit]: the corridor's layout shows only USE, so
 ## the others would never be measured. Sets the text directly, with no frame in
-## between, so the game's own _refresh_ui cannot put USE back before the check reads it.
+## between, so the game's own _refresh_ui cannot put USE back before the check reads it. A Button takes
+## its new minimum size only on the next frame, so each word's size is applied at once (the designed
+## size, grown to the word's minimum) before it is judged: without that every word was judged at USE's
+## size, and pseudo CONTINUE passed here while it overflowed in the opening's stills (PR L8).
 func _check_touch_words(code: String, game: Main) -> void:
+	var designed: Vector2 = I18n.designed_rect(game.touch_use).size
 	for word: Array in [["USE", ""], ["CRANK", ""], ["DROP", ""], [Main.RETRY_BUTTON_TEXT, ""], [Main.CONTINUE_TEXT, Main.TOUCH_BUTTON_CONTEXT]]:
 		game.touch_use.text = String(TranslationServer.translate(word[0], word[1]))
+		game.touch_use.size = designed.max(game.touch_use.get_combined_minimum_size())
 		_check_fit(code, "touch word %s|use" % word[0], game.touch_use)
+	game.touch_use.size = designed
 
 
 ## Every short message of [param code]'s catalogs (HUD_MESSAGE_CHARS or fewer characters, no BBCode),
