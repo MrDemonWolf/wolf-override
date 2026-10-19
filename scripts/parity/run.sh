@@ -10,7 +10,8 @@
 #       stills, shots.json, text.log and audio.log to <out dir>/<route>/<variant>/<size>/.
 #       --language plays the routes in that language (any code of apps/game/i18n/languages.json, or
 #       "pseudo" for English with pseudolocalization; capture.gd's --language), for the language PRs'
-#       stills; without it the run is the English parity run. Every still's shots.json entry carries
+#       stills; without it the run is the English parity run. A language run (en included) turns every
+#       language on for the run, so R1 adds the GENERAL tab and the open language list. Every still's shots.json entry carries
 #       the language audit (overflows, missing glyphs, and untranslated text under pseudo) either way.
 #       Defaults: routes "R1 R2 R3 R4", sizes "960x540 1280x720 2340x1080" (2340x1080 is the phone
 #       landscape aspect), variants "kb-fx kb-calm touch-fx" (keyboard with effects on, keyboard
