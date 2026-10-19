@@ -79,7 +79,7 @@ msgid ""
 msgstr ""
 
 #: scenes/main.tscn
-#: scripts/main.gd:4476
+#: scripts/main.gd:4507
 msgid "PAUSE"
 msgstr ""
 
@@ -120,7 +120,7 @@ msgid "NEW GAME"
 msgstr ""
 
 #: scenes/main.tscn
-#: scripts/main.gd:1036
+#: scripts/main.gd:1052
 msgid "CONTINUE"
 msgstr ""
 
@@ -236,8 +236,8 @@ msgid "BACK TO TITLE"
 msgstr ""
 
 #: scenes/main.tscn
-#: scripts/main.gd:1914
-#: scripts/main.gd:1943
+#: scripts/main.gd:1930
+#: scripts/main.gd:1971
 msgid "PAUSE SCROLL"
 msgstr ""
 
@@ -266,7 +266,7 @@ msgid "RESUME"
 msgstr ""
 
 #: scenes/main.tscn
-#: scripts/main.gd:2121
+#: scripts/main.gd:2149
 msgid "RETURN TO TITLE"
 msgstr ""
 
@@ -293,7 +293,7 @@ msgid "FULLSCREEN"
 msgstr ""
 
 #: scenes/main.tscn
-#: scripts/main.gd:2002
+#: scripts/main.gd:2030
 msgid "Window size applies on desktop."
 msgstr ""
 
@@ -724,7 +724,7 @@ msgid "Default controls restored."
 msgstr ""
 
 #: scripts/game_settings.gd:850
-#: scripts/main.gd:2042
+#: scripts/main.gd:2070
 msgid "Settings could not be saved."
 msgstr ""
 
@@ -756,67 +756,77 @@ msgstr ""
 msgid "EXIT LOCKED"
 msgstr ""
 
-#: scripts/main.gd:1036
+#: scripts/main.gd:1052
 msgid "PLAY AGAIN"
 msgstr ""
 
-#: scripts/main.gd:1041
+#: scripts/main.gd:1057
 msgid "Slice complete. PLAY AGAIN starts a fresh run."
 msgstr ""
 
-#: scripts/main.gd:1043
+#: scripts/main.gd:1059
 msgid "Saved checkpoint could not be read."
 msgstr ""
 
-#: scripts/main.gd:1043
+#: scripts/main.gd:1059
 msgid "No checkpoint yet. Saving starts at the first SAFE POINT."
 msgstr ""
 
-#: scripts/main.gd:1066
+#: scripts/main.gd:1082
 msgid "LINK UNAVAILABLE"
 msgstr ""
 
-#: scripts/main.gd:1943
-#: scripts/main.gd:1949
+#. TRANSLATORS: Heading over the AI disclosure in the credits, in the same capitals as the other headings.
+#: scripts/main.gd:1942
+msgid "AI DISCLOSURE"
+msgstr ""
+
+#. TRANSLATORS: The AI disclosure Nathanial Henniges approved word for word (October 19, 2026). Translate it faithfully and in full; do not shorten, soften or add to it. Keep WOLF OVERRIDE, Nathanial Henniges and MrDemonWolf, Inc. as written.
+#: scripts/main.gd:1944
+msgid "WOLF OVERRIDE is a solo project by Nathanial Henniges (MrDemonWolf, Inc.). AI tools were used with careful human oversight to support the creative process for art and code. The story, characters and game design are his, and every AI-assisted asset is reviewed, edited and credited."
+msgstr ""
+
+#: scripts/main.gd:1971
+#: scripts/main.gd:1977
 msgid "RESUME SCROLL"
 msgstr ""
 
-#: scripts/main.gd:1982
+#: scripts/main.gd:2010
 msgid "30 FPS"
 msgstr ""
 
-#: scripts/main.gd:1983
+#: scripts/main.gd:2011
 msgid "60 FPS"
 msgstr ""
 
-#: scripts/main.gd:1984
+#: scripts/main.gd:2012
 msgid "UNCAPPED"
 msgstr ""
 
-#: scripts/main.gd:1985
+#: scripts/main.gd:2013
 msgid "90 FPS"
 msgstr ""
 
-#: scripts/main.gd:1986
+#: scripts/main.gd:2014
 msgid "120 FPS"
 msgstr ""
 
-#: scripts/main.gd:1987
+#: scripts/main.gd:2015
 msgid "144 FPS"
 msgstr ""
 
-#: scripts/main.gd:2002
+#: scripts/main.gd:2030
 msgid "Window size is managed by iOS/Android."
 msgstr ""
 
-#: scripts/main.gd:2121
+#: scripts/main.gd:2149
 msgid "SKIP OPENING"
 msgstr ""
 
-#: scripts/main.gd:2136
+#: scripts/main.gd:2164
 msgid "TAP RESUME TO RETURN"
 msgstr ""
 
-#: scripts/main.gd:2136
+#: scripts/main.gd:2164
 msgid "%s  RESUME"
 msgstr ""

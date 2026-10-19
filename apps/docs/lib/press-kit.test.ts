@@ -2,7 +2,7 @@ import assert from 'node:assert/strict';
 import { existsSync, readFileSync } from 'node:fs';
 import path from 'node:path';
 import { contrastRatio, readToken, resolveBrandColors } from './brand-colors';
-import { assetTerms, gameName, logoColourways, logoLightCyan, longDescription, pressFiles, shortDescription, studioDescription, tagline } from './press-kit';
+import { aiDisclosure, assetTerms, gameName, logoColourways, logoLightCyan, longDescription, pressFiles, shortDescription, studioDescription, tagline } from './press-kit';
 
 /*
  * Checks for the design-system page's data (lib/press-kit.ts, lib/brand-colors.ts). The zip itself is
@@ -44,5 +44,11 @@ for (const text of [tagline, shortDescription, ...longDescription, studioDescrip
 }
 assert.equal(tagline.length, 31);
 assert.equal(shortDescription.length, 311, 'The short description differs from the approved IGDB summary');
+
+// The AI disclosure is approved word for word (docs/decisions.md, AI-01): it keeps its length, and the
+// game's credits (Main.AI_DISCLOSURE) carry the very same text, so neither can be reworded alone.
+assert.equal(aiDisclosure.length, 281, 'The AI disclosure differs from the approved text');
+const mainScript = readFileSync(path.join(process.cwd(), '../game/scripts/main.gd'), 'utf8');
+assert.ok(mainScript.includes(`const AI_DISCLOSURE: String = ${JSON.stringify(aiDisclosure)}`), 'The game credits and the site carry different AI disclosures');
 
 console.log(`Press kit data checks passed (${pressFiles.length} files, ${colours.length} colours).`);

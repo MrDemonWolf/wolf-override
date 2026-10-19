@@ -46,6 +46,17 @@ export const longDescription = [
 export const studioDescription =
   'MrDemonWolf, Inc. is the one-person studio of Nathanial Henniges, a software developer since 2012 based in Beloit, Wisconsin. He builds web apps, macOS apps, WordPress sites and open-source tools like FluffBoost, WolfWave and ConPaws, streams live coding on Twitch, makes videos on YouTube, and is now building his next game, WOLF OVERRIDE.';
 
+/**
+ * The AI disclosure, word for word as Nathanial Henniges approved it on 2026-10-19 (docs/decisions.md,
+ * AI-01). The one home of the text on the site: the Credits page (app/docs/ai-disclosure.tsx), the
+ * design-system page and the press kit's FACTS.txt and COPY.txt all read it from here, and store pages
+ * should paste it as it is. The game's credits carry the same words as Main.AI_DISCLOSURE in
+ * apps/game/scripts/main.gd; lib/press-kit.test.ts fails when the two differ. Do not reword it: a
+ * changed text needs a new approval.
+ */
+export const aiDisclosure =
+  'WOLF OVERRIDE is a solo project by Nathanial Henniges (MrDemonWolf, Inc.). AI tools were used with careful human oversight to support the creative process for art and code. The story, characters and game design are his, and every AI-assisted asset is reviewed, edited and credited.';
+
 /** Where the design-system page lives, with the trailing slash every site path uses. */
 export const designSystemPath = '/design-system/';
 
@@ -165,6 +176,6 @@ export const pressFiles: PressFile[] = [
 /** The zip's text files, in zip order: what each is called and what it holds. */
 export const pressTextFiles = [
   { zipPath: 'FACTS.txt', title: 'Facts and links' },
-  { zipPath: 'COPY.txt', title: 'Approved name, tagline and descriptions' },
+  { zipPath: 'COPY.txt', title: 'Approved name, tagline, descriptions and AI disclosure' },
   { zipPath: 'LICENSE-ASSETS.txt', title: 'How you may use these files' },
 ] as const;
