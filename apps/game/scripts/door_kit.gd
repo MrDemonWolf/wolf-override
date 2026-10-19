@@ -26,6 +26,8 @@ const WALL_LIFT: float = 0.72
 const LENS_RADIUS: float = 1.7
 const LENS_HALO: Vector2 = Vector2(18.0, 18.0)
 const LENS_HALO_ALPHA: float = 0.45
+## A badge reader's LED (an 80 x 130 mm reader at 1.1 m, its LED a few mm across): its radius.
+const READER_LED_RADIUS: float = 0.7
 ## The door light's lens over every head is a cool-white LED wall pack (doors.py WHITE), its halo this
 ## big (compose.py's 2 world px glow at full strength).
 const DOOR_LIGHT_COLOR: Color = Color8(235, 238, 240)
@@ -56,6 +58,25 @@ static func piece(parent: Node, texture: Texture2D, top_left: Vector2, piece_nam
 	return sprite
 
 
+## A doorway's stack behind the mid plate, added to [param parent] (RoomDepth.behind) in draw order: the
+## light through the hole ([param hole], [param hole_color]: hole_light), the next space and the wall's
+## thickness ([param back] at [param back_at], lifted [param back_lift]; null where the room's far plate
+## is what the hole shows), [param inner] (a leaf running inside the wall, or null), the door light's
+## pool on the threshold ([param pool]) and its graze on the far reveal ([param graze]) (doors.py
+## surface_lights: radius 5 squashed 0.3 at 0.3, radius 2.5 stretched 3 at 0.15), then the cross-wall's
+## face ([param wall] at [param wall_at], at WALL_LIFT), which it returns. Names start with [param
+## door_name].
+static func doorway(parent: Node, door_name: String, hole: PackedVector2Array, hole_color: Color, back: Texture2D, back_at: Vector2, back_lift: float, inner: Node2D, pool: Vector2, graze: Vector2, wall: Texture2D, wall_at: Vector2) -> Sprite2D:
+	hole_light(parent, door_name + "HoleLight", hole, hole_color)
+	if back != null:
+		piece(parent, back, back_at, door_name + "Back", back_lift)
+	if inner != null:
+		parent.add_child(inner)
+	glow(parent, door_name + "Pool", pool, 5.0, DOOR_LIGHT_COLOR, 0.3, 0.3)
+	glow(parent, door_name + "Graze", graze, 2.5, DOOR_LIGHT_COLOR, 0.15, 3.0)
+	return piece(parent, wall, wall_at, door_name + "Wall", WALL_LIFT)
+
+
 ## An additive soft light of radius [param radius] (world px, compose.py's glow) at [param at], at
 ## [param alpha], squashed vertically by [param squash] (a pool on the floor), added to [param parent].
 static func glow(parent: Node, glow_name: String, at: Vector2, radius: float, color: Color, alpha: float, squash: float = 1.0) -> Sprite2D:
@@ -81,6 +102,23 @@ static func hole_light(parent: Node, light_name: String, hole: PackedVector2Arra
 	return light
 
 
+## Soot and heat tint on a wall round a blown doorway: a soft dark patch (radii [param radii], world
+## px) multiplied into what is drawn under it at [param strength] (0..1) at its centre, leaning a little
+## warm (the art set's compose.py soot: a gaussian falloff, 25 % of its darkening toward the tint).
+static func soot(parent: Node, soot_name: String, at: Vector2, radii: Vector2, strength: float) -> Sprite2D:
+	var dark: Color = Color(1.0 - strength * 0.95, 1.0 - strength, 1.0 - strength * 1.05)
+	var patch: Sprite2D = Sprite2D.new()
+	patch.name = soot_name
+	patch.texture = FxKit.radial(128, [0.0, 0.45, 1.0], [dark, dark.lerp(Color.WHITE, 0.6), Color.WHITE])
+	patch.scale = radii * GLOW_WIDTH_PER_RADIUS / patch.texture.get_size()
+	patch.position = at
+	var multiply: CanvasItemMaterial = CanvasItemMaterial.new()
+	multiply.blend_mode = CanvasItemMaterial.BLEND_MODE_MUL
+	patch.material = multiply
+	parent.add_child(patch)
+	return patch
+
+
 ## The door light's halo on its painted wall pack's lens at [param at] (doors.py emitters: W(a1 + 0.27,
 ## H + 0.29, -0.05) of each door), added to [param parent].
 static func door_light(parent: Node, at: Vector2) -> Sprite2D:
@@ -92,9 +130,10 @@ static func door_light(parent: Node, at: Vector2) -> Sprite2D:
 
 
 ## A status lamp's live glass at [param at], tinted [param color], added to [param parent]: red shut,
-## amber while its door moves, green open (Palette.LAMP_SHUT, Palette.AMBER, Palette.LAMP_OPEN).
-static func lamp(parent: Node, lamp_name: String, at: Vector2, color: Color) -> Lamp:
-	var node: Lamp = Lamp.new()
+## amber while its door moves, green open (Palette.LAMP_SHUT, Palette.AMBER, Palette.LAMP_OPEN). A
+## smaller [param radius] (world px) makes a badge reader's LED (READER_LED_RADIUS).
+static func lamp(parent: Node, lamp_name: String, at: Vector2, color: Color, radius: float = LENS_RADIUS) -> Lamp:
+	var node: Lamp = Lamp.new(radius)
 	node.name = lamp_name
 	node.position = at
 	node.color = color
@@ -122,6 +161,8 @@ static func exit_sign(parent: Node, box: Rect2, facing: float) -> Sign:
 class Lamp:
 	extends Node2D
 	var halo: Sprite2D
+	## The glass's radius (world px); the halo grows with it.
+	var radius: float = LENS_RADIUS
 	var color: Color = Palette.LAMP_SHUT:
 		set(value):
 			color = value
@@ -129,14 +170,15 @@ class Lamp:
 				halo.modulate = Color(color, LENS_HALO_ALPHA)
 			queue_redraw()
 
-	func _init() -> void:
-		halo = RoomDepth.make_glow(color, LENS_HALO, LENS_HALO_ALPHA)
+	func _init(glass_radius: float = LENS_RADIUS) -> void:
+		radius = glass_radius
+		halo = RoomDepth.make_glow(color, LENS_HALO * radius / LENS_RADIUS, LENS_HALO_ALPHA)
 		halo.name = "Halo"
 		add_child(halo)
 
 	func _draw() -> void:
-		draw_circle(Vector2.ZERO, LENS_RADIUS, color.darkened(0.25))
-		draw_circle(Vector2(-0.4, -0.4), LENS_RADIUS * 0.55, color.lightened(0.35))
+		draw_circle(Vector2.ZERO, radius, color.darkened(0.25))
+		draw_circle(Vector2(-0.25, -0.25) * radius, radius * 0.55, color.lightened(0.35))
 
 
 ## The ISO 7010 E001 exit sign drawn in code (no words, so nothing painted can read wrong): the dark
