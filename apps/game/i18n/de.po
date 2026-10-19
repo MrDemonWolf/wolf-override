@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: WOLF OVERRIDE\n"
-"PO-Revision-Date: 2026-10-19 17:37+0000\n"
+"PO-Revision-Date: 2026-10-19 17:39+0000\n"
 "Last-Translator: Claude (Anthropic), machine translation, unreviewed\n"
 "Language-Team: none\n"
 "MIME-Version: 1.0\n"
@@ -340,7 +340,7 @@ msgstr "ZUM MENÜ"
 #: scripts/main.gd:1941
 #: scripts/main.gd:1982
 msgid "PAUSE SCROLL"
-msgstr "TEXT ANHALTEN"
+msgstr "ABSPANN STOPP"
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: Heading of the in-game changelog screen (590 px, 28 px). The changelog itself stays English.
@@ -863,7 +863,7 @@ msgstr "Paragraf"
 #. i18n: speaker=ui
 #: scripts/game_settings.gd:253
 msgid "THE DEN  /  LOCAL CONFIGURATION"
-msgstr "DER BAU  /  LOKALE KONFIGURATION"
+msgstr "DER WOLFSBAU  /  LOKALE KONFIGURATION"
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: Settings tab.
@@ -1039,7 +1039,7 @@ msgstr "Auf Mobilgeräten verwaltet das System die Fenstergröße."
 #: scripts/game_settings.gd:562
 #: scripts/game_settings.gd:564
 msgid "V-sync may limit the FPS cap."
-msgstr "V-Sync kann das FPS-Limit begrenzen."
+msgstr "V-Sync kann die Bildrate unter dem FPS-Limit halten."
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: AUDIO note (680 px, 15 px, one row). 'Effects' names the Effects volume slider.
@@ -1273,7 +1273,7 @@ msgstr "WOLF OVERRIDE ist ein Soloprojekt von Nathanial Henniges (MrDemonWolf, I
 #: scripts/main.gd:1982
 #: scripts/main.gd:1988
 msgid "RESUME SCROLL"
-msgstr "TEXT FORTSETZEN"
+msgstr "ABSPANN WEITER"
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: Frame-rate cap list item.
@@ -1352,14 +1352,14 @@ msgstr "%s  FORTSETZEN"
 #: scripts/main.gd:2674
 #, c-format
 msgid "The safe point could not save. Press %s here again."
-msgstr "Der Sicherungspunkt konnte nicht speichern. Drücke hier erneut %s."
+msgstr "Speichern am Sicherungspunkt fehlgeschlagen. Drücke hier erneut %s."
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: Hint bar (14 px, about 526 px wide on a keyboard and 488 px on touch; wraps). The touch form; USE is the touch button's word (BENUTZEN).
 #. i18n: speaker=hint engineer=you
 #: scripts/main.gd:2674
 msgid "The safe point could not save. Tap USE here again."
-msgstr "Der Sicherungspunkt konnte nicht speichern. Tippe hier erneut auf NUTZEN."
+msgstr "Speichern am Sicherungspunkt fehlgeschlagen. Tippe hier erneut auf NUTZEN."
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: Hint bar (14 px, about 526 px wide on a keyboard and 488 px on touch; wraps).
@@ -1451,11 +1451,11 @@ msgid "%s  MOVE"
 msgstr "%s  BEWEGEN"
 
 # machine-translated by Claude (Anthropic), unreviewed
-#. TRANSLATORS: Tutorial row (17 px) on a controller. D-pad is Kreuz, as in the CONTROLS table.
+#. TRANSLATORS: Tutorial row (17 px) on a controller. D-pad is Steuerkreuz (Kreuz li./re. in the CONTROLS table, abbreviated there).
 #. i18n: speaker=hint engineer=you
 #: scripts/main.gd:4549
 msgid "STICK / D-PAD MOVE"
-msgstr "STICK / KREUZ  BEWEGEN"
+msgstr "STICK / STEUERKREUZ  BEWEGEN"
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: Tutorial row (17 px). %s is the interact key or the USE button; two spaces after it.
@@ -1833,14 +1833,14 @@ msgstr "Finde den Schutzschalter. WOLF folgt dir."
 #. i18n: speaker=hint engineer=you
 #: scripts/main.gd:5180
 msgid "The vent is about to blow. Get off the grate now."
-msgstr "Der Druckablass bricht gleich durch. Runter vom Gitter, sofort."
+msgstr "Der Druckablass platzt gleich. Runter vom Gitter, sofort."
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: Hint bar (14 px, about 526 px wide on a keyboard and 488 px on touch; wraps).
 #. i18n: speaker=hint engineer=you
 #: scripts/main.gd:5180
 msgid "Relief vent. Get off the grate before the gauge peaks."
-msgstr "Druckablass. Runter vom Gitter, bevor die Anzeige anschlägt."
+msgstr "Druckablass. Runter vom Gitter, bevor die Anzeige am Anschlag steht."
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: Hint bar (14 px, about 526 px wide on a keyboard and 488 px on touch; wraps). %s is the key, button or touch word the player uses (it is filled in after translation); keep it first and keep the colon.
@@ -1892,7 +1892,7 @@ msgstr "Das Ventil hat keinen Strom. Schalte den Schutzschalter am Eingang ein."
 #. i18n: speaker=hint
 #: scripts/main.gd:5196
 msgid "Relief vent. It lets go when the gauge peaks."
-msgstr "Druckablass. Er gibt nach, wenn die Anzeige anschlägt."
+msgstr "Druckablass. Er gibt nach, wenn die Anzeige am Anschlag steht."
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: Hint bar (14 px, about 526 px wide on a keyboard and 488 px on touch; wraps). The line is building pressure.
@@ -1973,7 +1973,7 @@ msgstr "Die Tür ist offen. Geh hindurch."
 #. i18n: speaker=hint engineer=you
 #: scripts/main.gd:5238
 msgid "The sentry is down. Pop the exit bolt by the door."
-msgstr "Der Wächter ist ausgeschaltet. Löse den Ausgangsriegel an der Tür."
+msgstr "Der Wächter ist außer Gefecht. Löse den Ausgangsriegel an der Tür."
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: Hint bar (14 px, about 526 px wide on a keyboard and 488 px on touch; wraps).
@@ -2002,7 +2002,7 @@ msgstr "Warte, bis WOLF ihn auf der Markierung parkt."
 #: scripts/main.gd:5247
 #, c-format
 msgid "%s: drop the tank. It's parked on the mark."
-msgstr "%s: wirf den Tank ab. Er steht auf der Markierung."
+msgstr "%s: wirf den Tank ab. Der Wächter steht auf der Markierung."
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: Hint bar (14 px, about 526 px wide on a keyboard and 488 px on touch; wraps). %s is the key, button or touch word the player uses (it is filled in after translation); keep it first and keep the colon.
@@ -2052,7 +2052,7 @@ msgstr "WOLF lockt den Wächter auf die Markierung. Geh zum TANKAUSLÖSER."
 #. i18n: speaker=hint engineer=you
 #: scripts/main.gd:5260
 msgid "WOLF has broken off. Time the drop on its patrol from the TANK RELEASE."
-msgstr "WOLF hat abgebrochen. Pass den Abwurf vom TANKAUSLÖSER aus auf seine Runde ab."
+msgstr "WOLF hat abgebrochen. Wirf den Tank vom TANKAUSLÖSER aus, passend zur Runde des Wächters."
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: Hint bar (14 px, about 526 px wide on a keyboard and 488 px on touch; wraps). TANK RELEASE is a station plate: glossary TANKAUSLÖSER (the plate itself is not in the template yet, so it still reads English on screen).

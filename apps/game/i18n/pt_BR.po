@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: WOLF OVERRIDE\n"
-"PO-Revision-Date: 2026-10-19 17:37+0000\n"
+"PO-Revision-Date: 2026-10-19 17:39+0000\n"
 "Last-Translator: Claude (Anthropic), machine translation, unreviewed\n"
 "Language-Team: none\n"
 "MIME-Version: 1.0\n"
@@ -1885,7 +1885,7 @@ msgstr "Pavio aceso. Afaste-se da porta."
 #. i18n: speaker=hint engineer=you
 #: scripts/main.gd:5194
 msgid "The valve is dead. Arm the breaker by the entrance."
-msgstr "A válvula está sem energia. Arme o disjuntor da entrada."
+msgstr "A válvula está sem energia. Arme o disjuntor junto à entrada."
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: Hint bar (14 px, about 526 px wide on a keyboard and 488 px on touch; wraps).
@@ -1906,14 +1906,14 @@ msgstr "A linha está ganhando pressão. Gire a válvula junto à porta."
 #. i18n: speaker=hint engineer=you
 #: scripts/main.gd:5201
 msgid "The breaker tripped. Reset it by the entrance."
-msgstr "O disjuntor da entrada desarmou. Rearme-o."
+msgstr "O disjuntor junto à entrada desarmou. Rearme-o."
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: Hint bar (14 px, about 526 px wide on a keyboard and 488 px on touch; wraps).
 #. i18n: speaker=hint engineer=you
 #: scripts/main.gd:5203
 msgid "Arm the breaker by the entrance, then crank the valve by the door."
-msgstr "Arme o disjuntor da entrada e depois gire a válvula junto à porta."
+msgstr "Arme o disjuntor junto à entrada e depois gire a válvula junto à porta."
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: Hint bar (14 px, about 526 px wide on a keyboard and 488 px on touch; wraps).
