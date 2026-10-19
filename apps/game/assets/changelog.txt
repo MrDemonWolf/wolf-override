@@ -51,6 +51,7 @@ Changes merged after 0.15.0. They become the next version when it is cut.
 - WOLF is now a real wolf's size, by Nathanial Henniges's decision: 0.80 m at the shoulder and about 2 m nose to tail, 0.7 times his old size.
 - His waiting spots, follow distance and reach shrink with him. He stands where his nose or tail stood before at the relay, the corridor doorway, the MIRROR PORT, the dock bay and the Service Junction.
 - WOLF no longer ducks under the hanging tank: he now fits under it. Checked by automated tests and still images from scripted play only, not played by hand.
+- The credits open with the AI disclosure Nathanial Henniges approved, ready for translation.
 
 -- Accessibility --
 - With Reduce Motion on, the dock bay's red beacon and the corridor's lockdown light through its doorway hold steady, the torn lock hangs still and the pad's standby light does not breathe. Switching it mid-game applies at once.
@@ -111,6 +112,7 @@ Changes merged after 0.15.0. They become the next version when it is cut.
 - The home page menu bar stays at the top of the screen while you scroll, and its section links stop with the heading in view below it.
 - New press kit and brand guide page at /design-system/: how to write the name, the logo versions, colours, fonts, approved copy and how to credit the provisional art. The footer, the guide menu and Support link to it.
 - One press kit download (about 8 MB): the logo set, the wolf mark, three screenshots, the provisional key art, the cover, facts and the approved copy. Each file can also be downloaded on its own.
+- Credits, the press kit page and the press kit's FACTS.txt and COPY.txt show the approved AI disclosure. Legal links to it.
 
 -- Development --
 - The press kit zip is built by a script from the site's own files each time the site is built, so the repository never stores a second copy of them.
