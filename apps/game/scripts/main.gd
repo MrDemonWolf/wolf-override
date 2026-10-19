@@ -99,7 +99,8 @@ const PURGE_DISPLAY_MAX_X: float = 181.0
 ## one after another, each up for its reading time (DialogueBoxes.read_seconds, the same time box_seconds
 ## gives a line said in several boxes). The words are 23 px at 540p in a column this wide, wide enough
 ## for the approved two-row lines' rows, and wrap a little narrower where a row would hold more than
-## DialogueBoxes.MAX_ROW_CHARACTERS characters (_story_wrap_width), in DialogueBoxes.MAX_ROWS rows; the
+## the language's row limit (DialogueBoxes.row_characters, 42 characters in English; Chinese, Japanese and
+## Korean balance two rows instead) (_story_wrap_width), in DialogueBoxes.MAX_ROWS rows; the
 ## speaker's name has its own column on the left. Sizes here are at 100% TEXT SIZE (TextSize scales them).
 const DIALOGUE_FONT_SIZE: int = 23
 const DIALOGUE_COLUMN_WIDTH: float = 440.0
@@ -4897,12 +4898,12 @@ func _continue_prompt(touch_layout: bool) -> String:
 	return tr("TAP CONTINUE") if touch_layout else I18n.fill(I18n.KEY.tr("%s  CONTINUE"), [settings_menu.prompt(&"interact", controller_active)])
 
 
-## Splits status_line into its boxes again when it, the engineer's name, the input in use or the
-## text size has changed. A new line starts at its first box; the same line at another size keeps
-## its place.
+## Splits status_line into its boxes again when it, the engineer's name, the input in use, the text
+## size or the language (whose box rules differ, DialogueBoxes.split) has changed. A new line starts at
+## its first box; the same line at another size keeps its place.
 func _sync_dialogue_boxes() -> void:
 	var line: String = _shown_line()
-	var key: String = "%s|%s|%s" % [line, _first_name(), _dialogue_column_width()]
+	var key: String = "%s|%s|%s|%s" % [line, _first_name(), _dialogue_column_width(), I18n.current()]
 	if key == dialogue_key:
 		return
 	dialogue_key = key
@@ -4920,12 +4921,10 @@ func _sync_dialogue_boxes() -> void:
 	dialogue_index = clampi(dialogue_index, 0, maxi(dialogue_boxes.size() - 1, 0))
 
 
-## Whether [param words] fit the dialogue column in DialogueBoxes.MAX_ROWS rows at the current size.
+## Whether [param words] fit the dialogue column in DialogueBoxes.MAX_ROWS rows at the current size, in
+## the language shown (DialogueBoxes.fits, the one fit rule, with the Story label's font and size).
 func _dialogue_fits(words: String) -> bool:
-	var font: Font = story.get_theme_font(&"font")
-	var size: int = story.get_theme_font_size(&"font_size")
-	var width: float = DialogueBoxes.wrap_width(words, font, size, _dialogue_column_width(), DialogueBoxes.MAX_ROW_CHARACTERS)
-	return DialogueBoxes.rows(words, font, size, width).size() <= DialogueBoxes.MAX_ROWS
+	return DialogueBoxes.fits(words, story.get_theme_font(&"font"), story.get_theme_font_size(&"font_size"), _dialogue_column_width())
 
 
 ## Runs the box on screen: each stays up for its reading time and gives way to the next; the last one
@@ -5062,14 +5061,14 @@ func _speaker_column_width() -> float:
 	return speaker_column
 
 
-## The width the words on screen wrap at in [param column]: no row longer than
-## DialogueBoxes.MAX_ROW_CHARACTERS (measured once per box, size and column; the HUD is laid out every
-## frame).
+## The width the words on screen wrap at in [param column]: no row longer than the language's row limit
+## (DialogueBoxes.row_characters, 42 in English), or two balanced rows where rows run to the column
+## (measured once per box, size, column and language; the HUD is laid out every frame).
 func _story_wrap_width(column: float) -> float:
-	var key: String = "%s|%s|%s" % [story.text, story.get_theme_font_size(&"font_size"), column]
+	var key: String = "%s|%s|%s|%s" % [story.text, story.get_theme_font_size(&"font_size"), column, I18n.current()]
 	if key != story_wrap_key:
 		story_wrap_key = key
-		story_wrap = DialogueBoxes.wrap_width(story.text, story.get_theme_font(&"font"), story.get_theme_font_size(&"font_size"), column, DialogueBoxes.MAX_ROW_CHARACTERS)
+		story_wrap = DialogueBoxes.wrap_width(story.text, story.get_theme_font(&"font"), story.get_theme_font_size(&"font_size"), column, DialogueBoxes.row_characters())
 	return story_wrap
 
 
