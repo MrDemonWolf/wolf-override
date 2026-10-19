@@ -661,11 +661,23 @@ static func make_prop(prop_name: String, texture: Texture2D, prop_scale: float, 
 	return sprite
 
 
+## The part of its texture [param prop] draws, in piece px: its region when it has one (make_prop's
+## sprites), else the whole texture (a scene's own Sprite2D). The one place that choice is made: the
+## helpers below, PropScreen and the tests read every prop through it.
+static func prop_region(prop: Sprite2D) -> Rect2:
+	return prop.region_rect if prop.region_enabled else Rect2(Vector2.ZERO, prop.texture.get_size())
+
+
+## [param source] (a rectangle of [param prop]'s piece, piece px) in the sprite's own local space
+## (unscaled, about its drawn rect's origin: what the sprite's children and _draw see).
+static func prop_local(prop: Sprite2D, source: Rect2) -> Rect2:
+	return Rect2(prop.get_rect().position + source.position - prop_region(prop).position, source.size)
+
+
 ## Where [param source] (a pixel of [param prop]'s piece, in piece px) is in the prop's parent's space,
-## for a centred, unrotated prop sprite (make_prop's, or a scene's own Sprite2D with or without a region).
+## for an unrotated prop sprite (make_prop's, or a scene's own Sprite2D with or without a region).
 static func prop_point(prop: Sprite2D, source: Vector2) -> Vector2:
-	var region: Rect2 = prop.region_rect if prop.region_enabled else Rect2(Vector2.ZERO, prop.texture.get_size())
-	return prop.position + (source - region.get_center()) * prop.scale
+	return prop.position + prop_local(prop, Rect2(source, Vector2.ZERO)).position * prop.scale
 
 
 ## [param source] (a rectangle of [param prop]'s piece, piece px) in the prop's parent's space.
@@ -675,8 +687,7 @@ static func prop_rect(prop: Sprite2D, source: Rect2) -> Rect2:
 
 ## The whole of [param prop]'s drawn piece in its parent's space (its painted outline's box).
 static func prop_bounds(prop: Sprite2D) -> Rect2:
-	var region: Rect2 = prop.region_rect if prop.region_enabled else Rect2(Vector2.ZERO, prop.texture.get_size())
-	return prop_rect(prop, region)
+	return prop_rect(prop, prop_region(prop))
 
 
 ## An additive radial glow (the shared FxKit texture and blend); also used by rooms for their station

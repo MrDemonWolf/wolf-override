@@ -1272,7 +1272,7 @@ func _sprite_pixels(sprite: Sprite2D, grow: float) -> Dictionary:
 	var image: Image = sprite.texture.get_image()
 	if image.is_compressed():
 		image.decompress()
-	var region: Rect2 = sprite.region_rect if sprite.region_enabled else Rect2(Vector2.ZERO, image.get_size())
+	var region: Rect2 = RoomDepth.prop_region(sprite)
 	var local_rect: Rect2 = sprite.get_rect()
 	var xform: Transform2D = sprite.get_global_transform()
 	var inverse: Transform2D = xform.affine_inverse()

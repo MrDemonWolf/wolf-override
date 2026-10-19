@@ -49,9 +49,7 @@ static func attach(prop: Sprite2D, screen_name: String, glass_rect: Rect2, color
 
 ## The glass in the prop sprite's local space (piece px about its centre).
 func local_glass() -> Rect2:
-	var prop: Sprite2D = get_parent() as Sprite2D
-	var region: Rect2 = prop.region_rect if prop.region_enabled else Rect2(Vector2.ZERO, prop.texture.get_size())
-	return Rect2(prop.get_rect().position + glass.position - region.position, glass.size)
+	return RoomDepth.prop_local(get_parent() as Sprite2D, glass)
 
 
 func _draw() -> void:

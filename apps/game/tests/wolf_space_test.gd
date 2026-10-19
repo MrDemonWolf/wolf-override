@@ -519,9 +519,10 @@ func _painted_world(sprite: Sprite2D, axis: int) -> Vector2:
 
 
 ## The art [param sprite] draws, in texel px of its texture: its region when it has one, else the
-## whole texture. The one place the suite reads that choice (sampling, the extent scan, world spans).
+## whole texture (RoomDepth.prop_region, the game's one rule for it). The suite's sampling, extent scan
+## and world spans all read it here.
 func _art_rect(sprite: Sprite2D) -> Rect2:
-	return sprite.region_rect if sprite.region_enabled else Rect2(Vector2.ZERO, sprite.texture.get_size())
+	return RoomDepth.prop_region(sprite)
 
 
 ## The first painted line and one past the last of [param sprite]'s art along [param axis]
