@@ -12,7 +12,7 @@ Purpose
                               another list (CI runs it, so a new script cannot stay out of the POT).
     fonts CACHE               rebuilds the bundled fallback fonts (PR L4, decision D7): each CJK
                               language's Noto Sans subset cut to its fixed common set (fixed_charset),
-                              from the recorded Noto release (NOTO_SOURCES, downloaded into CACHE and
+                              with Roboto's vertical metrics (BODY_REFERENCE_FONT), from the recorded Noto release (NOTO_SOURCES, downloaded into CACHE and
                               checked by SHA-256), the symbols font behind Roboto (symbols_font) and the
                               character lists the game's glyph test reads (CHARSETS_FILE). Prints the
                               sizes. Rerun only to change a set; the outputs are committed. It ends
@@ -355,6 +355,12 @@ SYMBOLS_FONT = REPO / "apps" / "game" / "assets" / "fonts" / "Montserrat-Symbols
 #: The font the language list draws with (Montserrat-Semibold.tres's base): the picker fonts take its
 #: vertical metrics (picker_fonts), so chaining them behind it leaves the list's row height alone.
 PICKER_REFERENCE_FONT = REPO / "apps" / "game" / "assets" / "fonts" / "Montserrat-Variable.ttf"
+#: The game's body font (Roboto-Regular.tres's base). The fallbacks chained behind the game fonts (the
+#: CJK subsets and SYMBOLS_FONT) take its vertical metrics, the smaller of the two theme fonts' on both
+#: sides (Roboto's hhea 0.928 / -0.244 em against Montserrat's 0.968 / -0.251), so a chained fallback
+#: changes neither font's line height. Noto Sans CJK's own 1.16 / -0.288 em made every row taller while
+#: a CJK language was on (21 to 25 px at 23 px), and the fixed-height rows overflowed (PR L12).
+BODY_REFERENCE_FONT = REPO / "apps" / "game" / "assets" / "fonts" / "Roboto-Variable.ttf"
 #: The fixed character lists the CJK subsets are cut to and the game's glyph test reads. Under tests/,
 #: which the export leaves out (export_presets.cfg), since the game itself never needs them.
 CHARSETS_FILE = REPO / "apps" / "game" / "tests" / "support" / "cjk_charsets.json"
@@ -635,7 +641,9 @@ def own_characters(code: str) -> str:
 def fonts(cache: Path) -> None:
     """Rebuilds the bundled fallback fonts (PR L4) and prints their sizes as JSON. For every language
     whose LANGUAGES row names a "fallback_font": fetches its NOTO_SOURCES zip into ``cache`` unless it is
-    there, checks the OTF's SHA-256, and writes that file as an hb-subset of the OTF to fixed_charset.
+    there, checks the OTF's SHA-256, and writes that file as an hb-subset of the OTF to fixed_charset
+    with BODY_REFERENCE_FONT's vertical metrics (match_vertical_metrics: an ideograph spans about 0.88 em
+    above the baseline to 0.12 em below, inside Roboto's 0.928 / 0.244 em, so no glyph leaves its row).
     Then writes SYMBOLS_FONT (symbols_font) and CHARSETS_FILE, the lists the game's glyph test checks
     each subset against. Side effects: downloads into ``cache`` and rewrites those files in the
     repository; Godot's .import files and the asset register are kept by hand."""
@@ -664,6 +672,7 @@ def fonts(cache: Path) -> None:
             sys.exit(f"{member} cannot draw {code}'s own name or tag: {''.join(sorted(own & set(lacking)))}")
         out = _game_path(row["fallback_font"])
         _hb_subset(source, out, {ord(c) for c in charsets[code]})
+        match_vertical_metrics(out, BODY_REFERENCE_FONT)
         sizes[code] = {"characters": len(charsets[code]), "not_in_noto": lacking, "source_bytes": len(data),
                        "subset_bytes": out.stat().st_size}
     symbols_font()
@@ -711,7 +720,7 @@ def symbols_font() -> None:
     that file."""
     fonts_dir = REPO / "apps" / "game" / "assets" / "fonts"
     _hb_subset(fonts_dir / "Montserrat-Variable.ttf", SYMBOLS_FONT, {ord(c) for c in SYMBOLS}, ["--instance=wght=400"])
-    match_vertical_metrics(SYMBOLS_FONT, fonts_dir / "Roboto-Variable.ttf")
+    match_vertical_metrics(SYMBOLS_FONT, BODY_REFERENCE_FONT)
 
 
 def font_codepoints(path: Path) -> set[int]:

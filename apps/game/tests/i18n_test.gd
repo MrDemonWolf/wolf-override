@@ -304,9 +304,10 @@ func _check_saved() -> void:
 ## Every language's own text (its picker name, its machine-translation tag and every line of its
 ## registered catalogs) drawn by the theme fonts with only that language's fallback behind them;
 ## Font.has_char never asks the OS's fonts. A language whose fallback font is not in the build is
-## checked to be unoffered instead. Latin and Cyrillic chain nothing, so
-## their line height stays English's. Then the planted case: a German catalog holding a CJK character
-## must fail the same check.
+## checked to be unoffered instead. Every language keeps English's line height: Latin and Cyrillic
+## chain nothing, and the CJK subsets carry Roboto's vertical metrics (i18n_tool.py fonts, PR L12), since
+## Noto's own made every row taller and the fixed-height rows overflowed. Then the planted case: a German
+## catalog holding a CJK character must fail the same check.
 func _check_glyphs() -> void:
 	var roboto: Font = load(THEME_FONTS[0]) as Font
 	I18n.apply("en")
@@ -320,8 +321,8 @@ func _check_glyphs() -> void:
 		for path: String in THEME_FONTS:
 			var missing: String = I18n.missing_glyphs(text, load(path) as Font)
 			_check(missing.is_empty(), "%s: %s draws all of %s with its own chain; missing: %s" % [code, path.get_file(), text.c_escape(), missing])
-		if I18n.LANGUAGES[code]["fallback_font"] == null:
-			_check(roboto.get_height(BODY_FONT_PX) == english_height, "%s chains no fallback, so lines keep English's height (%.0f px)" % [code, roboto.get_height(BODY_FONT_PX)])
+		var why: String = "chains no fallback" if I18n.LANGUAGES[code]["fallback_font"] == null else "chains a fallback with Roboto's vertical metrics"
+		_check(roboto.get_height(BODY_FONT_PX) == english_height, "%s %s, so lines keep English's height (%.0f px, English %.0f px)" % [code, why, roboto.get_height(BODY_FONT_PX), english_height])
 	var planted: Translation = Translation.new()
 	planted.locale = "de"
 	planted.add_message(SIBLING_BOTH, "Grüße aus 日本")
