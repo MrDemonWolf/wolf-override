@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: WOLF OVERRIDE\n"
-"PO-Revision-Date: 2026-10-19 18:35+0000\n"
+"PO-Revision-Date: 2026-10-19 18:37+0000\n"
 "Last-Translator: Claude (Anthropic), machine translation, unreviewed\n"
 "Language-Team: none\n"
 "MIME-Version: 1.0\n"
@@ -1242,7 +1242,7 @@ msgstr "Gespeicherter Kontrollpunkt konnte nicht gelesen werden."
 #. i18n: speaker=ui
 #: scripts/main.gd:1070
 msgid "No checkpoint yet. Saving starts at the first SAFE POINT."
-msgstr "Noch nichts gespeichert. Ab dem ersten SPEICHERPUNKT."
+msgstr "Noch kein Spielstand. Ab dem ersten SPEICHERPUNKT."
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: Changelog button text when the browser cannot open (338 px).
