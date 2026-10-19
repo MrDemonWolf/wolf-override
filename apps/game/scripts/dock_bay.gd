@@ -199,7 +199,8 @@ const WOLF_RISE_SCALE: float = 8.0 / 6.0
 ## WOLF's marks in the bay (world px, his origin's x), from the art set's compose.py dock(): lying,
 ## centred where its still lies him (DOCK wolf_x 64 plus half the piece's 127 px at the size he was
 ## painted; drawn at a real wolf's size, Main.WOLF_ART_SCALE, he lies on the same centre, the middle of
-## the pad and the cage); getting up, his haunch where the lying piece's was; standing at the latch, his snout at the pad's head (DOCK_X + 196);
+## the pad and the cage); getting up, his haunch where the lying piece's was; standing at the latch,
+## his snout at the pad's head (DOCK_X + 196);
 ## and out in front of the cage, his snout OUT_GAP (0.3 m, compose.py OUT_GAP) clear of the hanging lock,
 ## where the art review of 2026-10-16 asked for it (touching, the lock read as carried in his mouth).
 const LIE_X: float = DOCK_X + 127.5
