@@ -235,13 +235,11 @@ static func _seeded(seed: int) -> RandomNumberGenerator:
 ## A sine sub sweeping [param sub_from] to [param sub_to] Hz under a low-passed noise burst whose
 ## cutoff falls from [param lp_from] to [param lp_to] Hz, soft-clipped for weight.
 static func _boom(rng: RandomNumberGenerator, seconds: float, sub_from: float, sub_to: float, sub_tau: float, noise_seconds: float, lp_from: float, lp_to: float, sub_mix: float) -> PackedFloat32Array:
-	var frames: int = int(seconds * MIX_RATE)
-	var out: PackedFloat32Array = PackedFloat32Array()
-	out.resize(frames)
+	var out: PackedFloat32Array = _mix_buffer(seconds)
 	var dt: float = 1.0 / MIX_RATE
 	var phase: float = 0.0
 	var low: float = 0.0
-	for i: int in frames:
+	for i: int in out.size():
 		var t: float = i * dt
 		phase += TAU * lerpf(sub_from, sub_to, t / seconds) * dt
 		var sample: float = sin(phase) * exp(-t / sub_tau) * sub_mix
@@ -256,11 +254,9 @@ static func _boom(rng: RandomNumberGenerator, seconds: float, sub_from: float, s
 
 ## 40 ms of a 420 Hz square ring with a noise tick on top: the breaker clunk and relay contact.
 static func _clank(rng: RandomNumberGenerator, seconds: float) -> PackedFloat32Array:
-	var frames: int = int(seconds * MIX_RATE)
-	var out: PackedFloat32Array = PackedFloat32Array()
-	out.resize(frames)
+	var out: PackedFloat32Array = _mix_buffer(seconds)
 	var dt: float = 1.0 / MIX_RATE
-	for i: int in frames:
+	for i: int in out.size():
 		var t: float = i * dt
 		var square: float = 1.0 if fmod(t * 420.0, 1.0) < 0.5 else -1.0
 		var sample: float = square * 0.6 * exp(-t / 0.012) + rng.randf_range(-1.0, 1.0) * exp(-t / 0.005)
@@ -270,13 +266,11 @@ static func _clank(rng: RandomNumberGenerator, seconds: float) -> PackedFloat32A
 
 ## 80 ms, 60 Hz sine with a short low noise knock: the door landing and the knockdown.
 static func _thud(rng: RandomNumberGenerator, seconds: float) -> PackedFloat32Array:
-	var frames: int = int(seconds * MIX_RATE)
-	var out: PackedFloat32Array = PackedFloat32Array()
-	out.resize(frames)
+	var out: PackedFloat32Array = _mix_buffer(seconds)
 	var dt: float = 1.0 / MIX_RATE
 	var alpha: float = dt / (1.0 / (TAU * 300.0) + dt)
 	var low: float = 0.0
-	for i: int in frames:
+	for i: int in out.size():
 		var t: float = i * dt
 		low += alpha * (rng.randf_range(-1.0, 1.0) - low)
 		var sample: float = sin(TAU * 60.0 * t) * exp(-t / 0.03) + low * 0.8 * exp(-t / 0.01)
@@ -287,13 +281,11 @@ static func _thud(rng: RandomNumberGenerator, seconds: float) -> PackedFloat32Ar
 ## Looping 110 Hz saw with a 113 Hz detune, softened by a 500 Hz low-pass; both tones complete
 ## whole cycles in one second so the loop seam is silent.
 static func _hum(seconds: float) -> PackedFloat32Array:
-	var frames: int = int(seconds * MIX_RATE)
-	var out: PackedFloat32Array = PackedFloat32Array()
-	out.resize(frames)
+	var out: PackedFloat32Array = _mix_buffer(seconds)
 	var dt: float = 1.0 / MIX_RATE
 	var alpha: float = dt / (1.0 / (TAU * 500.0) + dt)
 	var low: float = 0.0
-	for i: int in frames:
+	for i: int in out.size():
 		var t: float = i * dt
 		var saw: float = (fmod(t * 110.0, 1.0) * 2.0 - 1.0) + (fmod(t * 113.0, 1.0) * 2.0 - 1.0)
 		low += alpha * (saw * 0.5 - low)
@@ -304,13 +296,11 @@ static func _hum(seconds: float) -> PackedFloat32Array:
 ## Three 120 ms square chirps at 880 Hz, 40 ms apart, low-passed so they bark instead of buzz:
 ## the seal-charged warning.
 static func _klaxon(seconds: float) -> PackedFloat32Array:
-	var frames: int = int(seconds * MIX_RATE)
-	var out: PackedFloat32Array = PackedFloat32Array()
-	out.resize(frames)
+	var out: PackedFloat32Array = _mix_buffer(seconds)
 	var dt: float = 1.0 / MIX_RATE
 	var alpha: float = dt / (1.0 / (TAU * 2500.0) + dt)
 	var low: float = 0.0
-	for i: int in frames:
+	for i: int in out.size():
 		var t: float = i * dt
 		var cycle: float = fmod(t, 0.16)
 		var gate: float = 1.0 if t < 0.48 and cycle < 0.12 else 0.0
@@ -326,11 +316,9 @@ static func _klaxon(seconds: float) -> PackedFloat32Array:
 ## The vibrato and both tones complete whole cycles in one second, so the loop seam is silent; the
 ## room raises its pitch when the sentry locks on and lets it fall away when the sentry goes down.
 static func _servo(seconds: float) -> PackedFloat32Array:
-	var frames: int = int(seconds * MIX_RATE)
-	var out: PackedFloat32Array = PackedFloat32Array()
-	out.resize(frames)
+	var out: PackedFloat32Array = _mix_buffer(seconds)
 	var dt: float = 1.0 / MIX_RATE
-	for i: int in frames:
+	for i: int in out.size():
 		var t: float = i * dt
 		# Phase of a 1200 Hz carrier swung +/-30 Hz at 6 Hz, integrated so it stays continuous.
 		var phase: float = TAU * 1200.0 * t + (30.0 / 6.0) * sin(TAU * 6.0 * t)
@@ -340,13 +328,11 @@ static func _servo(seconds: float) -> PackedFloat32Array:
 
 ## A 90 Hz saw with a 7 Hz wobble, low-passed, looped: the arm's winch hauling the tank back up.
 static func _winch(seconds: float) -> PackedFloat32Array:
-	var frames: int = int(seconds * MIX_RATE)
-	var out: PackedFloat32Array = PackedFloat32Array()
-	out.resize(frames)
+	var out: PackedFloat32Array = _mix_buffer(seconds)
 	var dt: float = 1.0 / MIX_RATE
 	var alpha: float = dt / (1.0 / (TAU * 700.0) + dt)
 	var low: float = 0.0
-	for i: int in frames:
+	for i: int in out.size():
 		var t: float = i * dt
 		var saw: float = fmod(t * 90.0, 1.0) * 2.0 - 1.0
 		low += alpha * (saw - low)
@@ -357,12 +343,10 @@ static func _winch(seconds: float) -> PackedFloat32Array:
 ## A rising electrical whine (a sine sweeping 300 Hz to 1.8 kHz with a buzzing square edge) that
 ## swells over 0.6 s and cuts off: the exit bolt charging before it arcs.
 static func _whine(rng: RandomNumberGenerator, seconds: float) -> PackedFloat32Array:
-	var frames: int = int(seconds * MIX_RATE)
-	var out: PackedFloat32Array = PackedFloat32Array()
-	out.resize(frames)
+	var out: PackedFloat32Array = _mix_buffer(seconds)
 	var dt: float = 1.0 / MIX_RATE
 	var phase: float = 0.0
-	for i: int in frames:
+	for i: int in out.size():
 		var t: float = i * dt
 		var progress: float = t / seconds
 		phase += TAU * lerpf(300.0, 1800.0, progress * progress) * dt
@@ -375,13 +359,11 @@ static func _whine(rng: RandomNumberGenerator, seconds: float) -> PackedFloat32A
 ## Two short soft blips a fifth apart (1.32 kHz for 50 ms, then 1.98 kHz for 70 ms), each a sine
 ## with a quiet third harmonic so small speakers keep it: a station accepting a save or a copy.
 static func _chirp(seconds: float) -> PackedFloat32Array:
-	var frames: int = int(seconds * MIX_RATE)
-	var out: PackedFloat32Array = PackedFloat32Array()
-	out.resize(frames)
+	var out: PackedFloat32Array = _mix_buffer(seconds)
 	var dt: float = 1.0 / MIX_RATE
 	# [start, length, frequency] per blip.
 	var blips: Array = [[0.0, 0.05, 1320.0], [0.07, 0.07, 1980.0]]
-	for i: int in frames:
+	for i: int in out.size():
 		var t: float = i * dt
 		var sample: float = 0.0
 		for blip: Array in blips:
@@ -398,14 +380,12 @@ static func _chirp(seconds: float) -> PackedFloat32Array:
 ## A quarter-second joint motor: a saw gliding 150 Hz up to 230 Hz and back, with a 38 Hz gear ripple,
 ## low-passed at 1.6 kHz and swelling in and out: WOLF's body moving as he answers.
 static func _actuator(seconds: float) -> PackedFloat32Array:
-	var frames: int = int(seconds * MIX_RATE)
-	var out: PackedFloat32Array = PackedFloat32Array()
-	out.resize(frames)
+	var out: PackedFloat32Array = _mix_buffer(seconds)
 	var dt: float = 1.0 / MIX_RATE
 	var alpha: float = dt / (1.0 / (TAU * 1600.0) + dt)
 	var low: float = 0.0
 	var phase: float = 0.0
-	for i: int in frames:
+	for i: int in out.size():
 		var t: float = i * dt
 		phase += (150.0 + 80.0 * sin(PI * t / seconds)) * dt
 		var saw: float = fmod(phase, 1.0) * 2.0 - 1.0
@@ -418,11 +398,9 @@ static func _actuator(seconds: float) -> PackedFloat32Array:
 ## bell's ratio) that die away in about 15 ms over a 520 Hz body, so it cuts through the pump's hum and
 ## the hiss on small speakers without reading as a beep. The junction's lit fuse, once per stripe pulse.
 static func _fuse_tick(seconds: float) -> PackedFloat32Array:
-	var frames: int = int(seconds * MIX_RATE)
-	var out: PackedFloat32Array = PackedFloat32Array()
-	out.resize(frames)
+	var out: PackedFloat32Array = _mix_buffer(seconds)
 	var dt: float = 1.0 / MIX_RATE
-	for i: int in frames:
+	for i: int in out.size():
 		var t: float = i * dt
 		var ring: float = (sin(TAU * 2350.0 * t) + 0.6 * sin(TAU * 3900.0 * t)) * exp(-t / 0.006)
 		var body: float = 0.5 * sin(TAU * 520.0 * t) * exp(-t / 0.018)
@@ -809,33 +787,16 @@ static func _comb(input: PackedFloat32Array, delay_s: float, feedback: float) ->
 
 
 ## A band-pass whose centre glides exponentially from [param from_hz] to [param to_hz] over
-## [param seconds]; coefficients are refreshed every 16 samples (a swept resonant filter).
+## [param seconds]; coefficients are refreshed every BIQUAD_BLOCK samples (a swept resonant filter).
 static func _swept_bandpass(input: PackedFloat32Array, from_hz: float, to_hz: float, seconds: float, q: float) -> PackedFloat32Array:
-	var out: PackedFloat32Array = _zeros(input.size())
-	var x1: float = 0.0
-	var x2: float = 0.0
-	var y1: float = 0.0
-	var y2: float = 0.0
-	var b0: float = 0.0
-	var a1: float = 0.0
-	var a2: float = 0.0
-	for i: int in input.size():
-		if i % 16 == 0:
-			var progress: float = minf(float(i) / (seconds * DETAIL_RATE), 1.0)
-			var freq: float = from_hz * pow(to_hz / from_hz, progress)
-			var w0: float = TAU * freq / DETAIL_RATE
-			var alpha: float = sin(w0) / (2.0 * q)
-			b0 = alpha / (1.0 + alpha)
-			a1 = -2.0 * cos(w0) / (1.0 + alpha)
-			a2 = (1.0 - alpha) / (1.0 + alpha)
-		var x: float = input[i]
-		var y: float = b0 * x - b0 * x2 - a1 * y1 - a2 * y2
-		x2 = x1
-		x1 = x
-		y2 = y1
-		y1 = y
-		out[i] = y
-	return out
+	var coeffs: PackedFloat64Array = PackedFloat64Array()
+	for i: int in range(0, input.size(), BIQUAD_BLOCK):
+		var progress: float = minf(float(i) / (seconds * DETAIL_RATE), 1.0)
+		var freq: float = from_hz * pow(to_hz / from_hz, progress)
+		# _coeffs' BANDPASS is the 0 dB-peak form (b1 = 0, b2 = -b0) this glide wants; its frequency
+		# clamp (10 Hz to 0.45 * DETAIL_RATE) never bites on the zap's 4.5 kHz to 450 Hz.
+		coeffs.append_array(_coeffs(BANDPASS, freq, q, 0.0))
+	return _biquad_blocks(input, coeffs)
 
 
 ## One-pole smoothed noise in roughly -1..1, for slow wobble and amplitude flicker.
@@ -1098,10 +1059,22 @@ static func _growl_finish(x: PackedFloat32Array, hp_hz: float, lp_hz: float, pre
 
 # --- Shared DSP for the detailed recipes ---------------------------------------------------------
 
+## Samples per coefficient update in the swept filters: about 0.36 ms at DETAIL_RATE, short enough
+## that a glide never steps audibly and long enough to skip recomputing cos/sin on every sample.
+const BIQUAD_BLOCK: int = 16
+
+
+## A silent buffer of [param frames] samples.
 static func _zeros(frames: int) -> PackedFloat32Array:
 	var out: PackedFloat32Array = PackedFloat32Array()
 	out.resize(frames)
 	return out
+
+
+## A silent buffer [param seconds] long at MIX_RATE (frames truncated, as every startup recipe has
+## always sized its clip), for the simple recipes that fill it sample by sample.
+static func _mix_buffer(seconds: float) -> PackedFloat32Array:
+	return _zeros(int(seconds * MIX_RATE))
 
 
 static func _white(rng: RandomNumberGenerator, frames: int) -> PackedFloat32Array:
@@ -1186,41 +1159,43 @@ static func _coeffs(kind: int, freq: float, q: float, gain_db: float) -> PackedF
 
 ## A biquad (direct form I) over the whole buffer.
 static func _biquad(input: PackedFloat32Array, kind: int, freq: float, q: float, gain_db: float = 0.0) -> PackedFloat32Array:
-	var c: PackedFloat64Array = _coeffs(kind, freq, q, gain_db)
-	var b0: float = c[0]
-	var b1: float = c[1]
-	var b2: float = c[2]
-	var a1: float = c[3]
-	var a2: float = c[4]
+	return _biquad_blocks(input, _coeffs(kind, freq, q, gain_db))
+
+
+## A biquad whose centre follows [param freqs] (coefficients refreshed every BIQUAD_BLOCK samples).
+static func _swept_biquad(input: PackedFloat32Array, kind: int, freqs: PackedFloat32Array, q: float) -> PackedFloat32Array:
+	var coeffs: PackedFloat64Array = PackedFloat64Array()
+	for i: int in range(0, input.size(), BIQUAD_BLOCK):
+		coeffs.append_array(_coeffs(kind, freqs[i], q, 0.0))
+	return _biquad_blocks(input, coeffs)
+
+
+## The one direct form I biquad loop every filter here runs through. [param coeffs] holds normalised
+## sets of five (b0, b1, b2, a1, a2, as _coeffs returns them); set k takes over at sample
+## k * BIQUAD_BLOCK, and the last set holds to the end, so a single set is a fixed filter and one set
+## per block is a swept one. Returns a new buffer the size of [param input]; the state starts at rest.
+static func _biquad_blocks(input: PackedFloat32Array, coeffs: PackedFloat64Array) -> PackedFloat32Array:
 	var out: PackedFloat32Array = _zeros(input.size())
+	var b0: float = 0.0
+	var b1: float = 0.0
+	var b2: float = 0.0
+	var a1: float = 0.0
+	var a2: float = 0.0
+	var next_set: int = 0
 	var x1: float = 0.0
 	var x2: float = 0.0
 	var y1: float = 0.0
 	var y2: float = 0.0
 	for i: int in input.size():
+		if i % BIQUAD_BLOCK == 0 and next_set < coeffs.size():
+			b0 = coeffs[next_set]
+			b1 = coeffs[next_set + 1]
+			b2 = coeffs[next_set + 2]
+			a1 = coeffs[next_set + 3]
+			a2 = coeffs[next_set + 4]
+			next_set += 5
 		var x: float = input[i]
 		var y: float = b0 * x + b1 * x1 + b2 * x2 - a1 * y1 - a2 * y2
-		x2 = x1
-		x1 = x
-		y2 = y1
-		y1 = y
-		out[i] = y
-	return out
-
-
-## A biquad whose centre follows [param freqs] (coefficients refreshed every 16 samples).
-static func _swept_biquad(input: PackedFloat32Array, kind: int, freqs: PackedFloat32Array, q: float) -> PackedFloat32Array:
-	var c: PackedFloat64Array
-	var out: PackedFloat32Array = _zeros(input.size())
-	var x1: float = 0.0
-	var x2: float = 0.0
-	var y1: float = 0.0
-	var y2: float = 0.0
-	for i: int in input.size():
-		if i % 16 == 0:
-			c = _coeffs(kind, freqs[i], q, 0.0)
-		var x: float = input[i]
-		var y: float = c[0] * x + c[1] * x1 + c[2] * x2 - c[3] * y1 - c[4] * y2
 		x2 = x1
 		x1 = x
 		y2 = y1
