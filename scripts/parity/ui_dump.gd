@@ -5,6 +5,7 @@ extends SceneTree
 ## before and after a UI refactor and diff the two files: any line that changes is a visual change.
 ## Usage: scripts/parity/run.sh ui <out file>   (headless, --fixed-fps 60, so the waits are frames)
 
+const Kit = preload("parity_kit.gd")
 const SAVE: String = "user://parity-save.json"
 const SETTINGS: String = "user://parity-settings.cfg"
 
@@ -17,13 +18,6 @@ var auto_name: RegEx = RegEx.create_from_string("@(\\w+)@\\d+")
 
 func _initialize() -> void:
 	call_deferred("_run")
-
-
-func _arg(key: String, fallback: String) -> String:
-	for a: String in OS.get_cmdline_user_args():
-		if a.begins_with("--" + key + "="):
-			return a.substr(key.length() + 3)
-	return fallback
 
 
 func _settle(frames: int) -> void:
@@ -89,7 +83,7 @@ func _run() -> void:
 	game.call("_show_end_card")
 	await _settle(30)
 	await _snap("end-card")
-	var out: String = _arg("out", "user://ui-dump.txt")
+	var out: String = Kit.arg("out", "user://ui-dump.txt")
 	var file: FileAccess = FileAccess.open(out, FileAccess.WRITE)
 	file.store_string("\n".join(lines) + "\n")
 	file.close()

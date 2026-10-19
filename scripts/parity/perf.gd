@@ -19,6 +19,7 @@ extends SceneTree
 ## The states are reached through fixture saves and Main's debug surface, unthrottled (fps limit off).
 ## Usage: scripts/parity/run.sh perf <out dir> <label>  (godot --headless ... -- --out=<file.json>)
 
+const Kit = preload("parity_kit.gd")
 const SAVE: String = "user://perf-save.json"
 const SETTINGS: String = "user://perf-settings.cfg"
 const HOLD_FRAMES: int = 240
@@ -64,13 +65,6 @@ class Tail:
 
 func _initialize() -> void:
 	call_deferred("_run")
-
-
-func _arg(key: String, fallback: String) -> String:
-	for a: String in OS.get_cmdline_user_args():
-		if a.begins_with("--" + key + "="):
-			return a.substr(key.length() + 3)
-	return fallback
 
 
 func _run() -> void:
@@ -130,13 +124,13 @@ func _run() -> void:
 		game.call("debug_interact")
 		await _frames(5)
 	states["corridor_relay_question"] = await _hold()
-	(_records_entry_state()).save_to_disk(SAVE)
+	(Kit.records_entry_state()).save_to_disk(SAVE)
 	game.call("debug_load_checkpoint")
 	states["records"] = await _hold()
-	(_junction_entry_state()).save_to_disk(SAVE)
+	(Kit.junction_entry_state()).save_to_disk(SAVE)
 	game.call("debug_load_checkpoint")
 	states["junction_entry"] = await _hold()
-	(_after_blast_state()).save_to_disk(SAVE)
+	(Kit.after_blast_state()).save_to_disk(SAVE)
 	game.call("debug_load_checkpoint")
 	game.call("debug_place", 600.0, 560.0)
 	await _frames(5)
@@ -145,9 +139,9 @@ func _run() -> void:
 	states["junction_lane_wolf"] = await _hold()
 	result["states"] = states
 	result["final"] = _counts()
-	result["load_average"] = _arg("load", "")
+	result["load_average"] = Kit.arg("load", "")
 	result["engine"] = Engine.get_version_info()["string"]
-	var f: FileAccess = FileAccess.open(_arg("out", "user://perf.json"), FileAccess.WRITE)
+	var f: FileAccess = FileAccess.open(Kit.arg("out", "user://perf.json"), FileAccess.WRITE)
 	f.store_string(JSON.stringify(result, " ", true))
 	f.close()
 	for path: String in [SAVE, SAVE + ".tmp", SETTINGS]:
@@ -257,45 +251,6 @@ func _stats(values: PackedFloat64Array) -> Dictionary:
 func _frames(count: int) -> void:
 	for _i: int in range(count):
 		await process_frame
-
-
-# The same fixture saves as the capture driver.
-func _safe_point_state() -> M0State:
-	var st: M0State = M0State.new()
-	st.record_choice(M0State.DISCLOSE)
-	st.arm_breaker()
-	st.activate_power("wolf")
-	st.reach_checkpoint()
-	st.human_position = Vector2(860.0, 410.0)
-	st.wolf_position = Vector2(800.0, 423.0)
-	return st
-
-
-func _records_entry_state() -> M0State:
-	var st: M0State = _safe_point_state()
-	st.enter_records()
-	st.human_position = Vector2(90.0, 410.0)
-	st.wolf_position = Vector2(50.0, 423.0)
-	return st
-
-
-func _junction_entry_state() -> M0State:
-	var st: M0State = _records_entry_state()
-	st.preserve_purge_trace()
-	st.preserve_mirror_trace("wolf")
-	st.complete_chapter()
-	st.enter_junction()
-	st.human_position = Vector2(80.0, 410.0)
-	st.wolf_position = Vector2(400.0, 423.0)
-	return st
-
-
-func _after_blast_state() -> M0State:
-	var st: M0State = _junction_entry_state()
-	st.blow_door()
-	st.human_position = Vector2(420.0, 410.0)
-	st.wolf_position = Vector2(380.0, 423.0)
-	return st
 
 
 func _remove(path: String) -> void:
