@@ -6,33 +6,96 @@ extends RefCounted
 ## breaks only where the speaker changes, at its own line breaks and between sentences (inside a
 ## sentence only at a semicolon or comma, and only when the sentence alone is too long).
 
-## Reading time per box (STORY-2): the larger of a base plus this long per character (at most
-## READ_SECONDS_MAX_BY_CHARACTERS) and the base plus this long per word, the reading time the
-## October 13 wording drafts use (BBC subtitles allow about 0.33 s a word). Speaker tags are not counted.
+## Reading time per box (STORY-2): the larger of a base plus a time per character (capped) and the base
+## plus this long per word, the reading time the October 13 wording drafts use (BBC subtitles allow
+## about 0.33 s a word). Speaker tags are not counted. The time per character is one over the
+## language's "reading_cps" in I18n.LANGUAGES (languages.json: Netflix's subtitle speeds, English 20
+## characters a second, so 0.05 s; PR L7d), English's where a language has none yet.
 const READ_SECONDS_BASE: float = 1.2
-const READ_SECONDS_PER_CHARACTER: float = 0.05
 const READ_SECONDS_PER_WORD: float = 0.33
+## English's cap on the per-character time. Other languages scale it by English's speed over theirs,
+## so the cap covers the same number of characters (116) in every language: at Japanese's 4 characters
+## a second a 7 s cap would cover only 28 (DESIGN.md, "Per-language reading speed").
 const READ_SECONDS_MAX_BY_CHARACTERS: float = 7.0
 ## A box holds at most this many rows of the dialogue column (subtitle practice: two lines).
 const MAX_ROWS: int = 2
-## A row holds at most this many characters (wrap_width narrows the wrap where a row would hold more).
+## English's row limit in characters, the "row_characters" of the en row of languages.json
+## (wrap_width narrows the wrap where a row would hold more). A language whose "row_characters" is null
+## (Chinese, Japanese, Korean) runs its rows to the column width and splits a two-row box into two
+## balanced rows instead (row_characters, DESIGN.md "Per-script row limits").
 const MAX_ROW_CHARACTERS: int = 42
-## A box of this many words or more is split at its sentence breaks even when it would fit.
+## A box of this many words or more is split at its sentence breaks even when it would fit. Its
+## character equivalent is long_line_characters: the same reading time in characters.
 const LONG_LINE_WORDS: int = 20
 ## A choice's response rows follow its question after this; the answer buttons show them instead.
 const CHOICE_MARKER: String = "\n1  "
+## Marks that end a sentence. "…" counts as one; the Chinese and Japanese full stops need no space
+## after them (NO_SPACE_MARKS). Spanish ¿ and ¡ open a sentence and end none, so they need no rule: a
+## sentence breaks before them at the space after the last one's mark.
+const SENTENCE_ENDS: String = ".!?…。！？"
+## Marks a sentence too long for one box may break after, semicolons first, then commas (with the
+## fullwidth forms and Japanese's 、).
+const CLAUSE_MARKS: Array[String] = [";；", ",，、"]
+## Fullwidth marks a break follows directly: Chinese and Japanese write no space after them (the
+## prototype measured a Japanese knockdown box one box too long without them).
+const NO_SPACE_MARKS: String = "。！？；，、"
+## Characters a break never comes before, so "！？" and "。」" stay together on one side.
+const NO_BREAK_BEFORE: String = ".!?…。！？；，、」』）】〕”’»"
+## Quotation openers and the closers each takes: a sentence inside a quotation never breaks the line.
+## „ closes with “ in German and ” in Polish; " is its own closer.
+const QUOTE_PAIRS: Dictionary = {"\"": "\"", "«": "»", "„": "“”", "“": "”", "「": "」", "『": "』"}
 
 
 ## The boxes [param message] is shown as, in order. Each is "TAG: words" for a speaker in
 ## [param speakers] or plain narration. [param fits] takes a box's words (without the tag) and says
-## whether they fit the column in MAX_ROWS rows. A line with no tag after a tagged one goes on in
-## that speaker's voice, as the game's lines are written.
-static func split(message: String, speakers: Array[String], fits: Callable) -> Array[String]:
+## whether they fit the column in MAX_ROWS rows (the game and the tests pass [method fits] bound to
+## their font, size and column). A line with no tag after a tagged one goes on in that speaker's voice,
+## as the game's lines are written. [param language] (a code of I18n.LANGUAGES, "" for the one shown)
+## sets the box's length limit ([method long_line_characters]).
+static func split(message: String, speakers: Array[String], fits: Callable, language: String = "") -> Array[String]:
+	var code: String = _language(language)
 	var boxes: Array[String] = []
 	for segment: Array in segments(message, speakers):
-		for words: String in _fit(segment[1], fits):
+		for words: String in _fit(segment[1], fits, code):
 			boxes.append(words if segment[0].is_empty() else "%s: %s" % [segment[0], words])
 	return boxes
+
+
+## Whether [param words] fit a column [param width] px wide in MAX_ROWS rows at [param font_size] px of
+## [param font], wrapped by [param language]'s row rule ([method wrap_width] with
+## [method row_characters]). The one fit rule: Main's dialogue box and tests/text_boxes_test.gd both
+## split with it. Pure: it reads the words and the arguments only.
+static func fits(words: String, font: Font, font_size: int, width: float, language: String = "") -> bool:
+	return rows(words, font, font_size, wrap_width(words, font, font_size, width, row_characters(language))).size() <= MAX_ROWS
+
+
+## The most characters a dialogue row of [param language] holds ("row_characters" in I18n.LANGUAGES,
+## MAX_ROW_CHARACTERS in English), or 0 where rows run to the column width and a two-row box is balanced
+## (null in the table: Chinese, Japanese and Korean). "" is the language shown.
+static func row_characters(language: String = "") -> int:
+	return int(I18n.rule(_language(language), "row_characters", 0))
+
+
+## [param language]'s reading speed in characters a second ("reading_cps"), English's where it has
+## none yet. "" is the language shown.
+static func reading_cps(language: String = "") -> float:
+	return float(I18n.rule(_language(language), "reading_cps", I18n.rule(I18n.FALLBACK, "reading_cps", 20.0)))
+
+
+## The character equivalent of LONG_LINE_WORDS in [param language]: as many characters as its reader
+## reads in the time LONG_LINE_WORDS words take (6.6 s): 132 in English and 112 in Spanish, more than
+## two 42-character rows hold, so only the word limit binds there; 26 in Japanese (4 characters a
+## second), close to Netflix's two Japanese rows of 13, 59 in Chinese and 79 in Korean. A box holds
+## fewer characters than this. A starting point to tune from stills (DESIGN.md, "Per-script row limits").
+static func long_line_characters(language: String = "") -> int:
+	return floori(LONG_LINE_WORDS * READ_SECONDS_PER_WORD * reading_cps(language))
+
+
+## [param language] when I18n.LANGUAGES has it; the language shown (I18n.current) for ""; else English.
+static func _language(language: String) -> String:
+	if language.is_empty():
+		return I18n.current()
+	return language if I18n.LANGUAGES.has(language) else I18n.FALLBACK
 
 
 ## [param message] cut where its speaker changes, before any box fitting: each segment is
@@ -84,38 +147,56 @@ static func word_count(text: String) -> int:
 	return text.replace("\n", " ").split(" ", false).size()
 
 
-## How long [param words] needs on screen to be read.
-static func read_seconds(words: String) -> float:
+## How long [param words] needs on screen to be read in [param language] ("" is the language shown):
+## the base plus one character's time at its reading speed for each character, at most
+## READ_SECONDS_MAX_BY_CHARACTERS scaled to that speed, or the base plus READ_SECONDS_PER_WORD a word,
+## whichever is longer. A Chinese or Japanese box has no spaces, so it counts as one word and its
+## characters decide.
+static func read_seconds(words: String, language: String = "") -> float:
 	var text: String = words.replace("\n", " ")
-	var by_characters: float = minf(READ_SECONDS_BASE + READ_SECONDS_PER_CHARACTER * text.length(), READ_SECONDS_MAX_BY_CHARACTERS)
+	# English's speed over this language's: 1.0 in English, so its times stay exactly as they were.
+	var scale: float = float(I18n.rule(I18n.FALLBACK, "reading_cps", 20.0)) / reading_cps(language)
+	var cap: float = READ_SECONDS_BASE + (READ_SECONDS_MAX_BY_CHARACTERS - READ_SECONDS_BASE) * scale
+	# One character's time first, then times the count: 1.0 / 20.0 is the double 0.05, so English's
+	# times are bit for bit the 0.05 s a character they were (n / 20.0 differs in the last bit for some n).
+	var per_character: float = 1.0 / reading_cps(language)
+	var by_characters: float = minf(READ_SECONDS_BASE + per_character * text.length(), cap)
 	return maxf(by_characters, READ_SECONDS_BASE + READ_SECONDS_PER_WORD * word_count(text))
 
 
 ## The rows [param text] wraps to in a column [param width] px wide, as a Label with smart word wrap
-## lays it out: each row's [start, end) character range.
-static func rows(text: String, font: Font, font_size: int, width: float) -> Array[Vector2i]:
+## lays it out: each row's [start, end) character range. With [param whole_words] a word longer than the
+## column keeps its own row instead of breaking inside (the station names, TextSize.wrap_world_label).
+## TextParagraph breaks by the text server's word rules, which split Chinese and Japanese, written
+## without spaces, between their words too.
+static func rows(text: String, font: Font, font_size: int, width: float, whole_words: bool = false) -> Array[Vector2i]:
 	var paragraph: TextParagraph = TextParagraph.new()
 	paragraph.add_string(text, font, font_size)
 	paragraph.width = width
-	paragraph.break_flags = TextServer.BREAK_MANDATORY | TextServer.BREAK_WORD_BOUND | TextServer.BREAK_ADAPTIVE
+	paragraph.break_flags = TextServer.BREAK_MANDATORY | TextServer.BREAK_WORD_BOUND | (0 if whole_words else TextServer.BREAK_ADAPTIVE)
 	var ranges: Array[Vector2i] = []
 	for index: int in paragraph.get_line_count():
 		ranges.append(paragraph.get_line_range(index))
 	return ranges
 
 
-## The characters on each row (without the space or line break it wrapped at).
-static func row_texts(text: String, font: Font, font_size: int, width: float) -> Array[String]:
+## The characters on each row (without the space or line break it wrapped at); [param whole_words] as
+## [method rows] takes it.
+static func row_texts(text: String, font: Font, font_size: int, width: float, whole_words: bool = false) -> Array[String]:
 	var texts: Array[String] = []
-	for row: Vector2i in rows(text, font, font_size, width):
+	for row: Vector2i in rows(text, font, font_size, width, whole_words):
 		texts.append(text.substr(row.x, row.y - row.x).strip_edges())
 	return texts
 
 
 ## The width [param text] wraps at in a column [param width] px wide so that no row holds more than
 ## [param max_characters] characters: the column itself, or a little narrower where a row of narrow
-## letters would run longer. The words stay as written; only where the rows break moves.
+## letters would run longer. With [param max_characters] 0 (a language whose rows run to the column,
+## [method row_characters]) the rows are balanced instead ([method _balanced_width]). The words stay as
+## written; only where the rows break moves.
 static func wrap_width(text: String, font: Font, font_size: int, width: float, max_characters: int) -> float:
+	if max_characters <= 0:
+		return _balanced_width(text, font, font_size, width)
 	var at: float = width
 	for attempt: int in 8:
 		var narrower: float = at
@@ -133,63 +214,114 @@ static func wrap_width(text: String, font: Font, font_size: int, width: float, m
 	return at
 
 
+## The narrowest whole-pixel width at which [param text] still takes as few rows as in the column
+## [param width] px wide, plus a pixel so a Label's rounding keeps them: its rows come out as even as
+## its words allow, so no short word is left alone on the last row (the prototype's Japanese stills
+## showed "た。" and "いる。" so; DESIGN.md "Per-script row limits"). Text on one row, or on more rows
+## than a box holds, keeps the column. Found by halving: fewer than 10 layouts of the text.
+static func _balanced_width(text: String, font: Font, font_size: int, width: float) -> float:
+	var count: int = rows(text, font, font_size, width).size()
+	if count < 2 or count > MAX_ROWS:
+		return width
+	var too_narrow: float = 0.0
+	var wide_enough: float = floorf(width)
+	while wide_enough - too_narrow > 1.0:
+		var middle: float = floorf((too_narrow + wide_enough) * 0.5)
+		if rows(text, font, font_size, middle).size() <= count:
+			wide_enough = middle
+		else:
+			too_narrow = middle
+	return minf(wide_enough + 1.0, width)
+
+
 ## Splits [param line] where a sentence ends and the next one starts with a speaker's tag
-## ("FIRST COPY SECURED. WOLF: ..."); each piece after the first starts with its tag.
+## ("FIRST COPY SECURED. WOLF: ..."); each piece after the first starts with its tag. The space a piece
+## was cut at is left out (segments puts it back as the joiner).
 static func _tag_pieces(line: String, tags: Array[String]) -> Array[String]:
 	var pieces: Array[String] = []
-	for sentence: String in _sentences(line):
-		if pieces.is_empty() or not tag_of(sentence, tags).is_empty():
-			pieces.append(sentence)
+	for sentence: Array in _sentences(line):
+		if pieces.is_empty() or not tag_of(sentence[0], tags).is_empty():
+			pieces.append(sentence[0])
 		else:
-			pieces[pieces.size() - 1] += " " + sentence
+			pieces[pieces.size() - 1] += String(sentence[1]) + sentence[0]
 	return pieces
 
 
-## [param text]'s sentences: it breaks after ".", "!" or "?" and a space, never inside quotes.
-static func _sentences(text: String) -> Array[String]:
-	return _break_after(text, ".!?", true)
+## [param text]'s sentences (SENTENCE_ENDS), never broken inside a quotation, as [method _break_after]
+## gives them.
+static func _sentences(text: String) -> Array[Array]:
+	return _break_after(text, SENTENCE_ENDS, true)
 
 
-## Splits [param text] after any of [param marks] that a space follows; with
-## [param skip_quotes], not inside a quotation. The pieces rejoin with single spaces.
-static func _break_after(text: String, marks: String, skip_quotes: bool) -> Array[String]:
-	var pieces: Array[String] = []
-	var quoted: bool = false
+## Splits [param text] after any of [param marks] that a space follows, or with no space after a
+## NO_SPACE_MARKS mark; never before a NO_BREAK_BEFORE character. A quotation's closer just after a mark
+## ends the piece as the mark would ("... later.\" I ..."), also with spaces between them (French
+## "« Allez. » Puis"). With [param skip_quotes], never inside a quotation (QUOTE_PAIRS, nested quotes
+## tracked innermost first). Each piece is [words, joiner]: the joiner is what stood before it (" " at
+## a space, "" first and after a NO_SPACE_MARKS mark), so joining every joiner and its words gives
+## [param text] back.
+static func _break_after(text: String, marks: String, skip_quotes: bool) -> Array[Array]:
+	var pieces: Array[Array] = []
+	var awaited: Array[String] = []
 	var start: int = 0
+	var joiner: String = ""
 	for index: int in text.length():
 		var character: String = text[index]
-		if character == "\"":
-			quoted = not quoted
-		var ends: bool = marks.contains(character) or (character == "\"" and not quoted and index > 0 and marks.contains(text[index - 1]))
-		if ends and (not quoted or not skip_quotes) and index + 1 < text.length() and text[index + 1] == " ":
-			pieces.append(text.substr(start, index + 1 - start))
-			start = index + 2
+		var closed: bool = false
+		if not awaited.is_empty() and String(awaited.back()).contains(character):
+			awaited.pop_back()
+			closed = true
+		elif QUOTE_PAIRS.has(character):
+			awaited.append(QUOTE_PAIRS[character])
+		var ends: bool = marks.contains(character) or (closed and marks.contains(_before(text, index)))
+		if not ends or (skip_quotes and not awaited.is_empty()) or index + 1 >= text.length():
+			continue
+		var next: String = text[index + 1]
+		if next == " " or (NO_SPACE_MARKS.contains(character) and not NO_BREAK_BEFORE.contains(next)):
+			pieces.append([text.substr(start, index + 1 - start), joiner])
+			joiner = " " if next == " " else ""
+			start = index + 1 + joiner.length()
 	if start < text.length():
-		pieces.append(text.substr(start))
+		pieces.append([text.substr(start), joiner])
 	return pieces
 
 
-## The boxes one speaker's [param words] need: whole when they fit and are short, otherwise their
-## lines and sentences grouped greedily, in order, into boxes that fit.
-static func _fit(words: String, fits: Callable) -> Array[String]:
-	if _fits_box(words, fits):
+## The last character of [param text] before [param index] that is not a space (a no-break space
+## counts as one), or "".
+static func _before(text: String, index: int) -> String:
+	var at: int = index - 1
+	while at >= 0 and text[at] in [" ", "\u00a0", "\u202f"]:
+		at -= 1
+	return text[at] if at >= 0 else ""
+
+
+## The boxes one speaker's [param words] need in [param language]: whole when they fit and are short,
+## otherwise their lines and sentences grouped greedily, in order, into boxes that fit.
+static func _fit(words: String, fits: Callable, language: String) -> Array[String]:
+	if _fits_box(words, fits, language):
 		return [words]
-	# Each unit carries the separator that joined it to the one before ("\n" between written lines).
+	# Each unit carries the separator that joined it to the one before ("\n" between written lines, " "
+	# or "" inside one, as _break_after found it).
 	var units: Array[String] = []
 	var joins: Array[String] = []
-	for line_index: int in words.split("\n").size():
-		var line: String = words.split("\n")[line_index]
+	var lines: PackedStringArray = words.split("\n")
+	for line_index: int in lines.size():
 		var first: bool = true
-		for sentence: String in _sentences(line):
-			for unit: String in _clauses(sentence, fits):
-				units.append(unit)
-				joins.append("\n" if first and line_index > 0 else " ")
+		for sentence: Array in _sentences(lines[line_index]):
+			var sentence_first: bool = true
+			for unit: Array in _clauses(sentence[0], fits, language):
+				units.append(unit[0])
+				if first and line_index > 0:
+					joins.append("\n")
+				else:
+					joins.append(String(sentence[1]) if sentence_first else String(unit[1]))
 				first = false
+				sentence_first = false
 	var boxes: Array[String] = []
 	var current: String = units[0]
 	for index: int in range(1, units.size()):
 		var joined: String = current + joins[index] + units[index]
-		if _fits_box(joined, fits):
+		if _fits_box(joined, fits, language):
 			current = joined
 		else:
 			boxes.append(current)
@@ -198,28 +330,30 @@ static func _fit(words: String, fits: Callable) -> Array[String]:
 	return boxes
 
 
-## A sentence that does not fit on its own, broken after its semicolons, or failing that its commas.
-static func _clauses(sentence: String, fits: Callable) -> Array[String]:
-	if _fits_box(sentence, fits):
-		return [sentence]
-	for marks: String in [";", ","]:
-		var parts: Array[String] = _break_after(sentence, marks, true)
+## A sentence that does not fit on its own, broken after its semicolons, or failing that its commas
+## (CLAUSE_MARKS), as [words, joiner] pieces like [method _break_after]'s (the first one's joiner is "").
+static func _clauses(sentence: String, fits: Callable, language: String) -> Array[Array]:
+	if _fits_box(sentence, fits, language):
+		return [[sentence, ""]]
+	for marks: String in CLAUSE_MARKS:
+		var parts: Array[Array] = _break_after(sentence, marks, true)
 		if parts.size() > 1:
-			var grouped: Array[String] = []
-			for part: String in parts:
-				if not grouped.is_empty() and _fits_box(grouped.back() + " " + part, fits):
-					grouped[grouped.size() - 1] += " " + part
+			var grouped: Array[Array] = []
+			for part: Array in parts:
+				if not grouped.is_empty() and _fits_box(String(grouped.back()[0]) + part[1] + part[0], fits, language):
+					grouped.back()[0] += String(part[1]) + part[0]
 				else:
-					grouped.append(part)
+					grouped.append(part.duplicate())
 			return grouped
-	return [sentence]
+	return [[sentence, ""]]
 
 
-## Whether [param text] can be one box: fewer than LONG_LINE_WORDS words and [param fits] (the
-## caller's row rule, a pure test of the words at the current text size) holds for it. Both tests are
-## pure, so the order they run in does not matter. Used by _fit and _clauses.
-static func _fits_box(text: String, fits: Callable) -> bool:
-	return word_count(text) < LONG_LINE_WORDS and fits.call(text)
+## Whether [param text] can be one box in [param language]: fewer than LONG_LINE_WORDS words, fewer
+## than [method long_line_characters] characters, and [param fits] (the caller's row rule, a pure test
+## of the words at the current text size) holds for it. The tests are pure, so the order they run in
+## does not matter. Used by _fit and _clauses.
+static func _fits_box(text: String, fits: Callable, language: String) -> bool:
+	return word_count(text) < LONG_LINE_WORDS and text.length() < long_line_characters(language) and fits.call(text)
 
 
 ## A copy of [param speakers], longest tag first ([param speakers] itself is left as it is). tag_of
