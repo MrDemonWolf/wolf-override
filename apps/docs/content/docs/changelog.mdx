@@ -74,6 +74,10 @@ Changes merged after 0.15.0. They become the next version when it is cut.
 
 - With **Reduce Motion** on, the dock bay's red beacon and the corridor's lockdown light through its doorway hold steady, the torn lock hangs still and the pad's standby light does not breathe. Switching it mid-game applies at once.
 
+### Settings
+
+- Key names follow your keyboard layout on Windows, macOS and Linux: on a French AZERTY keyboard **Move left** reads Q, not A. A symbol key shows its symbol, such as -, instead of an English word.
+
 ### Website
 
 - The website, its page titles, link previews, llms.txt and the guide call the game WOLF OVERRIDE; the search-engine data keeps the old spelling with two slashes as a former name.
@@ -150,6 +154,8 @@ Changes merged after 0.15.0. They become the next version when it is cut.
 - Shared code: every `SfxBank` filter runs through one biquad loop and its short clips share one buffer helper (every sound byte for byte the same), and the end card and debug menu place their captions with one `UILabel.place`; copied game code drops from 62 lines to none.
 - Settings has a **LANGUAGE** row on a new **GENERAL** tab, hidden until a second language ships. It saves your pick and otherwise follows your system's language.
 - The language list names each language in its own words, with a smaller "machine translation" row under an unreviewed one, and draws Japanese, Korean and Chinese names with four tiny Noto Sans cuts.
+- The title, Pause and Settings text is marked for translation, with no change to the English: the volume rows and the rebind prompt name things in words instead of internal ids, key and button names can be translated, and Settings' note and Pause's hint follow a language change.
+- `tools/render/render.sh --keyboard <layout>` (and `PARITY_KEYBOARD` for parity captures) renders with another keyboard layout, such as French AZERTY.
 
 ### How it was checked
 
