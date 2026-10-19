@@ -240,10 +240,8 @@ func _check_rest_spots() -> void:
 	var main_constants: Dictionary = (game.get_script() as Script).get_script_constant_map()
 	var wolf_reach: float = M0Actor.WOLF_REACH
 	var human_reach: float = M0Actor.HUMAN_REACH
-	# [label, x, reach, door span, door open there, near piece drawn over the actors, or null where the
-	# doorway's near jamb stands past the view's right edge: the junction exit's, whose near end the
-	# approved art does not paint]; a shut door's span starts at its face on the walk line (the room side
-	# of it is open floor).
+	# [label, x, reach, door span, door open there, near piece drawn over the actors]; a shut door's span
+	# starts at its face on the walk line (the room side of it is open floor).
 	var spots: Array = [
 		["Records: engineer's leftmost spot (the shut entry)", RecordsRoom.ENTRY_DOOR_X + human_reach, human_reach, Vector2(RecordsRoom.ENTRY_SPAN.x, RECORDS_ENTRY_FACE_X), false, null],
 		["Records: WOLF's leftmost follow spot", RecordsRoom.ENTRY_DOOR_X + wolf_reach, wolf_reach, Vector2(RecordsRoom.ENTRY_SPAN.x, RECORDS_ENTRY_FACE_X), false, null],
@@ -256,8 +254,8 @@ func _check_rest_spots() -> void:
 		["Junction: the lane question", JunctionRoom.CHOICE_X, human_reach, BLAST_SPAN, true, room.door_column],
 		["Junction: WOLF by the exit", JunctionRoom.WOLF_DOWN_X, wolf_reach, JunctionRoom.EXIT_SHUT_SPAN, false, null],
 		["Junction: engineer at the exit bolt", JunctionRoom.BOLT_X, human_reach, JunctionRoom.EXIT_SHUT_SPAN, false, null],
-		["Junction: engineer behind WOLF at the open exit", JunctionRoom.HATCH_REACH_MAX_X, human_reach, JunctionRoom.EXIT_SPAN, true, null],
-		["Junction: WOLF waiting in the open exit doorway", JunctionRoom.WOLF_DOORWAY_X, wolf_reach, JunctionRoom.EXIT_SPAN, true, null],
+		["Junction: engineer behind WOLF at the open exit", JunctionRoom.HATCH_REACH_MAX_X, human_reach, JunctionRoom.EXIT_SPAN, true, room.exit_front],
+		["Junction: WOLF waiting in the open exit doorway", JunctionRoom.WOLF_DOORWAY_X, wolf_reach, JunctionRoom.EXIT_SPAN, true, room.exit_front],
 	]
 	var in_doorway: Array[String] = []
 	for spot: Array in spots:
@@ -271,10 +269,7 @@ func _check_rest_spots() -> void:
 			_expect(false, "%s (x %.1f, body %.1f..%.1f) lies across a shut door (%.1f..%.1f)" % [spot[0], x, x - reach, x + reach, span.x, span.y])
 			continue
 		var near: CanvasItem = spot[5]
-		if near == null:
-			_expect(span.y > JunctionRoom.EXIT_VIEW_RIGHT, "%s stands in an open doorway whose near jamb is past the view's edge" % spot[0])
-		else:
-			_expect(drawn_z(near) > drawn_z(wolf) and drawn_z(near) > drawn_z(human), "%s stands in an open doorway with its near piece drawn over the actors" % spot[0])
+		_expect(near != null and drawn_z(near) > drawn_z(wolf) and drawn_z(near) > drawn_z(human), "%s stands in an open doorway with its near piece drawn over the actors" % spot[0])
 		in_doorway.append("%s (x %.1f)" % [spot[0], x])
 	print("Resting spots in an open doorway, behind its near jamb: %s" % ", ".join(in_doorway))
 	_expect(records.exit_leaf.visible and records.entry_leaf.visible, "both Records leaves are still drawn at the end")

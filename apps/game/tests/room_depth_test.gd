@@ -37,8 +37,7 @@ func _run() -> void:
 			for room_name: String in rooms:
 				_check_coverage("%s, %s, shake %d" % [room_name, framing[0], int(shake)], rooms[room_name], view)
 	camera.offset = Vector2.ZERO
-	# The junction's view stops at the room's edge, like the others' (the right-end framings above).
-	_expect(JunctionRoom.EXIT_VIEW_RIGHT == RoomDepth.ROOM_WIDTH, "the junction's view stops at the room's edge, where the plates and their bleeds cover it")
+	await _check_exit_view_edge(junction, camera, half_play, touch_y)
 	# Every station stands on the floor, as tall as the art it replaced.
 	var floor_props: Dictionary = {
 		"purge display": game.get_node("PurgeTerminalArt"),
@@ -105,7 +104,9 @@ func _check_plates(room_name: String, depth: RoomDepth) -> void:
 	for index: int in depth.lamps.size():
 		var lamp_y: float = far.position.y + depth.lamps[index].y * far.size.y
 		# The approved plates (art swap PR 3) hang the ceiling lamps over the play view's top (y 160 at the
-		# keyboard framing), as the art set's phone frames show them: they stay on the far plate.
+		# keyboard framing; on main this checked y >= 168, inside the view), as the art set's phone frames
+		# show them. That framing change is an open question for Nathanial (PR #114): until he decides,
+		# this only checks that each lamp is on the far plate.
 		_expect(lamp_y > far.position.y and lamp_y < far.end.y, "%s: ceiling lamp %d (y %.0f) is on the far plate" % [room_name, index, lamp_y])
 
 
@@ -259,6 +260,48 @@ func _view_at(camera: Camera2D, at: Vector2, shake: float) -> Rect2:
 	await process_frame
 	var half: Vector2 = Vector2(960.0, 540.0) * 0.5 / camera.zoom
 	return Rect2(camera.get_screen_center_position() - half, half * 2.0)
+
+
+## The junction's play view runs on past the room's end to JunctionRoom.EXIT_VIEW_RIGHT, so the whole exit
+## doorway is in the frame. Past the mid plate's right bleed only the exit's own pieces stand between the
+## camera and the far plate: at the right end (keyboard and touch framing, shaken both ways) the painted
+## pixels of the passage (ExitBack) and the wall's near end (exit_front), and the deck mirrored on under
+## them (ExitDeckBleed, opaque by construction: the mid plate's deck rows), cover that strip down to the
+## view's bottom.
+func _check_exit_view_edge(junction: JunctionRoom, camera: Camera2D, half_play: float, touch_y: float) -> void:
+	var mid_end: float = _global_rect(junction.depth.mid_layer.get_node("RightBleed") as Sprite2D).end.x
+	var painted: Array[Sprite2D] = [junction.depth.behind.get_node("ExitBack") as Sprite2D, junction.exit_front]
+	var images: Array[Image] = []
+	for piece: Sprite2D in painted:
+		images.append(texture_image(piece.texture))
+	var deck: Rect2 = _global_rect(junction.depth.behind.get_node("ExitDeckBleed") as Sprite2D)
+	_expect(deck.position.x <= mid_end and deck.end.x >= JunctionRoom.EXIT_PAINTED_RIGHT, "the deck runs on under the exit from the mid plate's bleed to x %.0f (%s)" % [JunctionRoom.EXIT_PAINTED_RIGHT, deck])
+	camera.zoom = Vector2.ONE * 1.35
+	for camera_y: float in [360.0, touch_y]:
+		for shake: float in [-SHAKE, SHAKE]:
+			var view: Rect2 = await _view_at(camera, Vector2(JunctionRoom.EXIT_VIEW_RIGHT - half_play, camera_y), shake)
+			var gaps: int = 0
+			var first_gap: Vector2 = Vector2.ZERO
+			var x: float = mid_end
+			while x <= view.end.x:
+				var y: float = view.position.y
+				while y <= view.end.y:
+					var at: Vector2 = Vector2(x, y)
+					var covered: bool = deck.has_point(at)
+					for index: int in painted.size():
+						if covered:
+							break
+						var local: Vector2 = painted[index].get_global_transform().affine_inverse() * at
+						var px: Vector2i = Vector2i(local.floor())
+						covered = Rect2i(Vector2i.ZERO, images[index].get_size()).has_point(px) and images[index].get_pixelv(px).a > 0.5
+					if not covered:
+						if gaps == 0:
+							first_gap = at
+						gaps += 1
+					y += 2.0
+				x += 2.0
+			_expect(gaps == 0, "junction, %s play right end, shake %d: the exit's pieces cover the view past the mid plate (first gap at %s)" % ["touch" if camera_y == touch_y else "keyboard", int(shake), first_gap])
+	camera.offset = Vector2.ZERO
 
 
 ## The junction's exit door: behind the mid plate its passage, the sliding leaf and the wall's face draw in
