@@ -6,9 +6,6 @@
 /** Content column of the landing sections and footer: up to 1200px with a 2rem gutter, 1rem on phones. */
 export const landingWidth = 'mx-auto w-[min(100%-4rem,1200px)] phone:w-[calc(100%-2rem)]';
 
-/** Landing sections reached from the navigation clear the overlapping header when scrolled to. */
-export const sectionAnchor = 'scroll-mt-28 phone:scroll-mt-38';
-
 /** Section heading (h2) of the landing page. */
 export const sectionTitle = 'mb-6 text-section';
 

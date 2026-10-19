@@ -1,6 +1,6 @@
 import { Fragment } from 'react';
 import Link from 'next/link';
-import { inlineLink, landingWidth, sectionAnchor, sectionTitle } from './landing-classes';
+import { inlineLink, landingWidth, sectionTitle } from './landing-classes';
 
 /** The guide page with every way to get the game today (test build or source); the hero and this section link it. */
 export const getGameHref = '/docs/get-game/';
@@ -29,7 +29,7 @@ export default function Downloads() {
     <section
       id="downloads"
       aria-labelledby="downloads-title"
-      className={`border-y border-line bg-surface bg-[radial-gradient(circle_at_85%_8%,rgba(67,162,201,.14),transparent_42%)] py-18 min-[701px]:py-24 ${sectionAnchor}`}
+      className="border-y border-line bg-surface bg-[radial-gradient(circle_at_85%_8%,rgba(67,162,201,.14),transparent_42%)] py-18 min-[701px]:py-24"
     >
       <div className={`${landingWidth} grid gap-10 min-[701px]:grid-cols-[minmax(0,1.2fr)_minmax(0,1fr)] min-[701px]:items-start min-[701px]:gap-16`}>
         <div>
