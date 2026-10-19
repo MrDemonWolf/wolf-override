@@ -1,16 +1,15 @@
 import Link from 'next/link';
-import LandingNavigation from './landing-navigation';
-import BrandLockup from './brand-lockup';
+import SiteHeader from './site-header';
+import SiteFooter from './site-footer';
 import Downloads, { ArrowIcon, getGameHref } from './downloads';
-import { card, inlineLink, landingWidth, navLink, sectionCopy, sectionTitle } from './landing-classes';
+import { card, inlineLink, landingRoot, landingWidth, sectionCopy, sectionTitle } from './landing-classes';
 import recordsCapture480 from './images/records-access-doors-capture-480.webp';
 import recordsCapture960 from './images/records-access-doors-capture-960.webp';
 import recordsCapture1600 from './images/records-access-doors-capture-1600.webp';
 import junctionCapture480 from './images/service-junction-doors-capture-480.webp';
 import junctionCapture960 from './images/service-junction-doors-capture-960.webp';
 import junctionCapture1600 from './images/service-junction-doors-capture-1600.webp';
-import SiteCopyright from './site-copyright';
-import { pageMetadata, repoUrl, siteDescription } from '@/lib/seo';
+import { pageMetadata, siteDescription } from '@/lib/seo';
 import { homeStructuredData, JsonLd } from '@/lib/structured-data';
 import { gameVersion } from '@/lib/version';
 
@@ -82,50 +81,6 @@ const features = [
   ['03', 'Leave a memory', 'Choose how to answer during a disagreement. The game remembers your decision in later dialogue and at a checkpoint.'],
 ] as const;
 
-const footerGroups = [
-  {
-    title: 'Explore',
-    label: 'Explore the game',
-    links: [
-      ['#story', 'Story'],
-      ['#gameplay', 'Gameplay'],
-      ['#downloads', 'Get the build'],
-    ],
-  },
-  {
-    title: 'Player guide',
-    label: 'Player guide',
-    links: [
-      ['/docs/controls/first-steps/', 'First steps'],
-      ['/docs/', 'All game docs'],
-      ['/docs/changelog/', 'Changelog'],
-    ],
-  },
-  {
-    title: 'Project',
-    label: 'Project information',
-    links: [
-      ['/docs/development/story/', 'Development story'],
-      ['/docs/credits/', 'Credits & references'],
-      ['/docs/legal/', 'Legal & licensing'],
-      ['/docs/privacy/', 'Privacy'],
-      ['/docs/support/', 'Support'],
-    ],
-  },
-  {
-    title: 'Developers',
-    label: 'Developer guide',
-    links: [
-      ['/docs/development/', 'Developer home'],
-      ['/docs/development/setup/', 'Setup'],
-      ['/docs/development/testing/', 'Testing & CI'],
-      [repoUrl, 'Source on GitHub'],
-    ],
-  },
-] as const;
-
-const footerLink = 'inline-flex min-h-11 items-center text-muted';
-
 // Heading of the Playable now and Coming lists in the gameplay section.
 const listTitle = 'mb-4 font-heading text-[1.1rem] font-bold';
 
@@ -135,25 +90,9 @@ export default function HomePage() {
   return (
     // header, main and footer are siblings so assistive tech sees three top-level landmarks (banner, main, contentinfo).
     // data-landing keeps the root dark as well (see the end of global.css).
-    // overflow-clip, unlike overflow-hidden, makes no scroll container, so the sticky header below still sticks to the viewport.
-    // [html:has(&)]:scroll-pt-24 sets scroll-padding-top on the page's scroller (html) while the landing is shown: 6rem clears
-    // the sticky header (1rem offset + 4.75rem bar on wide screens, .5rem + about 4.2rem on phones), so #story, #gameplay and
-    // #downloads land with their headings below the bar, and keyboard focus scrolled into view is not hidden under it (WCAG 2.4.11).
-    <div data-landing="" className="flow-root overflow-clip bg-ink text-text scheme-dark [html:has(&)]:scroll-pt-24">
+    <div data-landing="" className={landingRoot}>
       <JsonLd data={homeStructuredData()} />
-      {/* Sticky on every width: it rests 1rem down (.5rem on phones), or below the notch when the browser reports a safe-area inset.
-          The -mb pulls the hero up under it, so sticking causes no layout jump. z-30 keeps it over the page content; the phone
-          menu panel (z-40) lives inside it. bg-panel/94 plus the blur keeps the links readable over the key art and the cards. */}
-      <header className="sticky top-[max(1rem,env(safe-area-inset-top))] z-30 mx-auto mt-4 -mb-23 flex min-h-19 w-[min(calc(100%-2rem),1232px)] items-center justify-between gap-4 rounded-control border border-accent/24 bg-panel/94 px-[clamp(1rem,2.5vw,1.75rem)] py-[.65rem] shadow-panel backdrop-blur-md phone:top-[max(.5rem,env(safe-area-inset-top))] phone:mt-2 phone:-mb-30 phone:min-h-0 phone:w-[calc(100%-1rem)] phone:px-3 phone-xs:gap-2 phone-xs:px-2">
-        <BrandLockup />
-        <nav className="ml-auto flex flex-wrap items-center justify-end gap-[.2rem] font-heading font-semibold menu:hidden" aria-label="Main navigation">
-          <a className={navLink} href="#story">Story</a>
-          <a className={navLink} href="#gameplay">Gameplay</a>
-          <a className={navLink} href="#downloads">Get the build</a>
-          <Link className={navLink} href="/docs/">Game guide</Link>
-        </nav>
-        <LandingNavigation />
-      </header>
+      <SiteHeader />
       <main id="landing-main">
         <section
           className="relative isolate flex min-h-[clamp(46rem,92svh,60rem)] items-center bg-ink before:absolute before:inset-0 before:-z-1 before:bg-[linear-gradient(90deg,rgba(8,15,27,.04)_7%,rgba(8,15,27,.62)_40%,var(--color-ink)_69%),linear-gradient(0deg,var(--color-ink),transparent_27%)] compact:min-h-[min(clamp(44rem,88svh,54rem),90vw)] phone:block phone:min-h-0 phone:before:bg-[linear-gradient(0deg,var(--color-ink)_0%,var(--color-ink)_38%,rgba(8,15,27,.68)_57%,rgba(8,15,27,0)_78%)]"
@@ -277,31 +216,7 @@ export default function HomePage() {
           </div>
         </section>
       </main>
-      <footer className={`${landingWidth} grid grid-cols-[minmax(15rem,1.7fr)_repeat(4,minmax(8rem,1fr))] gap-x-8 gap-y-10 border-t border-t-line pt-14 pb-6 phone:grid-cols-2 phone:gap-x-5 phone:gap-y-8 tablet:grid-cols-4 tablet:gap-x-[1.4rem] tablet:gap-y-8`}>
-        <div className="menu:col-span-full">
-          <BrandLockup />
-          <p className="mt-4 max-w-[34ch] text-[.85rem] leading-[1.75] text-muted">Original concept, core story &amp; creative vision: Nathanial Henniges.<br />Developed by MrDemonWolf, Inc. with AI assistance.</p>
-        </div>
-        {footerGroups.map((group) => (
-          <nav key={group.title} aria-label={group.label} className="flex flex-col items-start gap-1">
-            {/* A label, not a heading: the nav's aria-label already names the group, and three H2s here
-                would add empty topics to the page outline search engines and screen readers read. */}
-            <p className="mt-1 mb-[.65rem] font-heading text-[.76rem] leading-[1.4] font-bold tracking-[.1em] text-text uppercase">{group.title}</p>
-            {group.links.map(([href, label]) =>
-              // Off-site links use a plain anchor and an arrow that says they leave the site.
-              href.startsWith('https://') ? (
-                <a key={href} href={href} className={footerLink}>{label}&nbsp;<span aria-hidden="true">↗</span></a>
-              ) : (
-                <Link key={href} href={href} className={footerLink}>{label}</Link>
-              ),
-            )}
-          </nav>
-        ))}
-        <div className="col-span-full flex justify-between gap-4 border-t border-t-line pt-5 text-[.78rem] text-muted phone:flex-col">
-          <SiteCopyright />
-          <span>Working title · Provisional art · No public release date</span>
-        </div>
-      </footer>
+      <SiteFooter />
     </div>
   );
 }

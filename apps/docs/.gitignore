@@ -4,3 +4,6 @@ node_modules/
 out/
 next-env.d.ts
 *.tsbuildinfo
+
+# Built by scripts/build-press-kit.ts before dev and build from files the repository already holds.
+public/press/wolf-override-press-kit.zip

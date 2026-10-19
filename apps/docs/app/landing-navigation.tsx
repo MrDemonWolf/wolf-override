@@ -3,19 +3,18 @@
 import Link from 'next/link';
 import { useEffect, useRef, useState } from 'react';
 import { navLink } from './landing-classes';
+import { mainNavLinks, withBase } from './site-links';
 
 // Hamburger bars; with the menu open the outer two turn into a cross and the middle one fades out.
 const bar =
   'block h-0.5 rounded-[2px] bg-current transition-[translate,rotate,opacity] duration-180 ease-[ease] motion-reduce:transition-none';
 
-const menuLinks = [
-  ['#story', 'Story'],
-  ['#gameplay', 'Gameplay'],
-  ['#downloads', 'Get the build'],
-  ['/docs/', 'Game guide'],
-] as const;
-
-export default function LandingNavigation() {
+/**
+ * The phone menu (980px and below): a Menu button that opens the header's links in a panel.
+ * `linkBase` is prefixed to landing-section anchors: "" on the landing page, "/" on other pages,
+ * where they become ordinary page links.
+ */
+export default function LandingNavigation({ linkBase = '' }: { linkBase?: string }) {
   const [isOpen, setIsOpen] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
   const triggerRef = useRef<HTMLButtonElement>(null);
@@ -90,8 +89,9 @@ export default function LandingNavigation() {
         hidden={!isOpen}
         className="absolute top-[calc(100%+.5rem)] right-0 z-40 grid min-w-52 gap-1 rounded-control border border-line-strong bg-panel/99 p-2 shadow-[0_14px_32px_rgba(0,5,18,.3)] phone:left-2 phone:right-2 phone:min-w-0 phone:grid-cols-[1fr] tablet:left-4 tablet:right-4 tablet:min-w-0 tablet:grid-cols-4"
       >
-        {menuLinks.map(([href, label]) => {
+        {mainNavLinks.map(([anchor, label]) => {
           const className = `${navLink} justify-start tablet:justify-center`;
+          const href = withBase(anchor, linkBase);
           return href.startsWith('#') ? (
             <a key={href} href={href} className={className} onClick={handleNavigation}>{label}</a>
           ) : (
