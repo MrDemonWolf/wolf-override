@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: WOLF OVERRIDE\n"
-"PO-Revision-Date: 2026-10-19 19:16+0000\n"
+"PO-Revision-Date: 2026-10-19 19:18+0000\n"
 "Last-Translator: Claude (Anthropic), machine translation, unreviewed\n"
 "Language-Team: none\n"
 "MIME-Version: 1.0\n"
@@ -2627,7 +2627,7 @@ msgstr "WOLF se détourne du Directeur et part vers la maintenance."
 #: scripts/story_text.gd:59
 #, c-format
 msgid "%s keeps WOLF's systems running."
-msgstr "%s fait tourner les systèmes de WOLF."
+msgstr "%s veille au bon fonctionnement des systèmes de WOLF."
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: %s is the engineer's first name. They are non-binary: no gendered words about them.
@@ -2996,14 +2996,14 @@ msgstr ""
 #. i18n: story speaker=WOLF
 #: scripts/story_text.gd:186
 msgid "I'm out. I'll hold back."
-msgstr "J'abandonne. Je reste en retrait."
+msgstr "Je décroche. Je reste en retrait."
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: WOLF breaks off after a missed drop, already past the sentry.
 #. i18n: story speaker=WOLF
 #: scripts/story_text.gd:189
 msgid "I'm out."
-msgstr "J'abandonne."
+msgstr "Je décroche."
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: i18n: story speaker=narrator

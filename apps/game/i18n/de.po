@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: WOLF OVERRIDE\n"
-"PO-Revision-Date: 2026-10-19 19:16+0000\n"
+"PO-Revision-Date: 2026-10-19 19:18+0000\n"
 "Last-Translator: Claude (Anthropic), machine translation, unreviewed\n"
 "Language-Team: none\n"
 "MIME-Version: 1.0\n"
@@ -2395,7 +2395,7 @@ msgstr "Der Wächter ist hinter dir her. Zurück hinter die Trümmer."
 #. i18n: speaker=hint engineer=you
 #: scripts/main.gd:5472
 msgid "Wait for WOLF to park it on the mark."
-msgstr "Warte, bis WOLF ihn auf der Markierung parkt."
+msgstr "Warte, bis WOLF den Wächter auf der Markierung parkt."
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: Hint bar (14 px, about 526 px wide on a keyboard and 488 px on touch; wraps). %s is the key, button or touch word the player uses (it is filled in after translation); keep it first and keep the colon. It: the sentry.
@@ -2996,14 +2996,14 @@ msgstr ""
 #. i18n: story speaker=WOLF
 #: scripts/story_text.gd:186
 msgid "I'm out. I'll hold back."
-msgstr "Ich steige aus. Ich halte mich zurück."
+msgstr "Ich breche ab. Ich halte mich zurück."
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: WOLF breaks off after a missed drop, already past the sentry.
 #. i18n: story speaker=WOLF
 #: scripts/story_text.gd:189
 msgid "I'm out."
-msgstr "Ich steige aus."
+msgstr "Ich breche ab."
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: i18n: story speaker=narrator
