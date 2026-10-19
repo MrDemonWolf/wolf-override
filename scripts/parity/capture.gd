@@ -282,7 +282,8 @@ func _route_1() -> void:
 	await _walk_to(350.0)
 	await _raw(30)
 	await _shot("hint-rebound-key")
-	if variant != "touch-fx" and not _hint().begins_with("F"):
+	# Under pseudo the hint is bracketed and padded ("[____F: ...]"), so the pad is skipped first.
+	if variant != "touch-fx" and not _hint().lstrip("[_").begins_with("F"):
 		_fail("the rebound USE key (F) is not in the hint: %s" % _hint())
 	await _action_event(&"pause_game")
 	await _raw(40)
