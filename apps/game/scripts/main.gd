@@ -19,9 +19,10 @@ const CHANGELOG_UNAVAILABLE: String = "The changelog text is missing from this b
 ## How fast a held up/down input scrolls the changelog, in pixels per second.
 const CHANGELOG_SCROLL_SPEED: float = 260.0
 ## Where WOLF stands to hold the live relay contact: on the relay's left, facing it, his painted snout
-## (M0Actor.WOLF_SNOUT) a pixel short of the relay's painted left edge (x 569), so he is never drawn
-## inside the machine; the engineer has its right, towards the MANUAL BYPASS.
-const RELAY_CONTACT_X: float = 509.0
+## (M0Actor.WOLF_SNOUT) 4 px short of the relay's painted left edge (x 569), where it was before he was
+## drawn at a real wolf's size (x 509 then), so he is never drawn inside the machine; the engineer has
+## its right, towards the MANUAL BYPASS.
+const RELAY_CONTACT_X: float = 569.0 - 4.0 - M0Actor.WOLF_SNOUT
 ## The coolant relay's centre and how far either side of it the engineer can use it.
 const RELAY_X: float = 605.0
 const RELAY_REACH: float = 52.0
@@ -46,12 +47,13 @@ const WOLF_BYPASS_CLEAR_X: float = 462.0
 ## Nathanial's decision of 2026-10-14 ("WOLF comes to the doorway"): once the seal is open and the
 ## engineer has gone through it to the safe point, WOLF walks up and stands in the open doorway,
 ## facing them, while "We made it." is said. His head and forelegs are in the opening, past where the
-## curtain crosses the walk line; his snout (M0Actor.WOLF_SNOUT) stops short of the near column (drawn
-## over the actors from x 785) and his tail (M0Actor.WOLF_TAIL) clear of the relay's housing (to
-## 648.1) and its relief tailpipe, with a clear gap to the engineer. The MANUAL BYPASS gearbox is
-## bolted to the back wall behind the walkway, so he stands in front of it. wolf_space_test measures
-## the spot against the door end as drawn.
-const WOLF_DOORWAY_X: float = 716.0
+## curtain crosses the walk line; his snout (M0Actor.WOLF_SNOUT) stops 13 px short of the near column
+## (drawn over the actors from x 785), where it stopped before he was drawn at a real wolf's size (x 716
+## then), and his tail (M0Actor.WOLF_TAIL) is clear of the relay's housing (to 648.1) and its relief
+## tailpipe, with a clear gap to the engineer. The MANUAL BYPASS gearbox is bolted to the back wall
+## behind the walkway, so he stands in front of it. wolf_space_test measures the spot against the door
+## end as drawn.
+const WOLF_DOORWAY_X: float = 785.0 - 13.0 - M0Actor.WOLF_SNOUT
 ## WOLF holds the doorway while the engineer is at least a clear gap (M0Actor.CLEAR_GAP) right of it,
 ## so their two bodies never overlap; nearer, he follows no further than the relay's left side again.
 const WOLF_DOORWAY_HOLD_X: float = WOLF_DOORWAY_X + M0Actor.CLEAR_GAP
@@ -357,7 +359,7 @@ const VALVE_CRANK_X: float = JunctionRoom.VALVE_X - 29.0
 ## Where WOLF reads the mirror on his own: on the port's right, facing it, his painted snout
 ## (M0Actor.WOLF_SNOUT) 5 px short of its painted right edge (x 551.8 since the rack is drawn at its
 ## real size), so he is never drawn inside it and the engineer has its left side.
-const WOLF_MIRROR_X: float = 613.0
+const WOLF_MIRROR_X: float = 551.8 + 5.0 + M0Actor.WOLF_SNOUT
 ## How far either side of M0Actor.CLEAR_GAP the engineer has to go before WOLF changes his mind about
 ## walking up to his spot by the valve after the blast (_wolf_rubble_x).
 const WOLF_RUBBLE_HYSTERESIS: float = 24.0
@@ -674,8 +676,7 @@ var sentry_wake_remaining: float = 0.0
 var bolt_state: StringName = &"locked"
 var bolt_charge_remaining: float = 0.0
 var servo_tween: Tween
-## WOLF's body sprite at rest, as the scene sets it; ducking under the junction's hung tank squashes it
-## for a moment (_sync_wolf_leap).
+## WOLF's body sprite scale at rest, as the scene sets it; wolf_pose draws his other pieces from it.
 var wolf_sprite_scale: Vector2 = Vector2.ONE
 ## WOLF's standing piece (the scene's), and his eye and seam lights over whichever piece he shows.
 var wolf_stand_texture: Texture2D
@@ -826,25 +827,25 @@ var speaker_column_key: String = ""
 
 ## WOLF's standing piece and the scale it is drawn at (main.tscn Wolf/BodySprite uses both; the
 ## WOLF art checks in wolf_space_test and sentry_test read them from here). The piece (1028x549) was
-## painted at 8 px per world px over a guide 12 % larger than the earlier sprite's painted body, so it
-## is not drawn at 1/8: WOLF keeps about the size he was drawn before (the default for the open
-## WOLF-size question, 2026-10-16, until Nathanial picks another). The earlier body ran 56 px behind
-## his origin and 59.1 ahead (115.1 x 61.6 world px); the piece is cut to his outline and centred, so
-## it reaches as far each way, and 0.1089 keeps his tail tip where it was (55.97 px back, inside the
-## Service Junction's right edge at his spot by the exit, WOLF_BAIT_X): 111.9 x 59.8 world px, 3 %
-## smaller than before.
+## painted at 8 px per world px over a guide larger than a real wolf. Nathanial's decision of 2026-10-19
+## ("lets do real wolf size"): WOLF is drawn at a big real wolf's size, 0.80 m at the shoulder (the wolf
+## research brief, Notion: Art & look / characters), at the walk line's 40 world px per metre
+## (DoorCamera.PX_PER_M), beside the engineer's 1.76 m. His withers, the top of his back over his
+## forelegs (the piece's column 720), stand 420 of its 549 rows above his feet, so the scale is
+## 0.80 * 40 / 420 = 0.0762: 78.3 x 41.8 world px (1.96 m nose to tail tip, 1.05 m to his ear tips),
+## 0.70 of the 0.1089 he was drawn at before (111.9 x 59.8 px, 2.8 m long).
 const WOLF_ART_PATH: String = "res://assets/characters/wolf-stand.png"
-const WOLF_ART_SCALE: float = 0.1089
-## The sprite's centre from WOLF's origin: his feet (the piece's bottom row) stand where the earlier
-## art's did, 15.4 world px below the origin (-14.5 + 549 / 2 * WOLF_ART_SCALE). x stays 0 so he
-## mirrors in place.
-const WOLF_SPRITE_REST: Vector2 = Vector2(0.0, -14.5)
+const WOLF_ART_SCALE: float = 0.0762
+## Where WOLF's painted feet (the piece's bottom row) stand, world px below his origin: where the art
+## drawn before the real-size change put them (-14.5 + 274.5 * 0.1089), so his origin (y 423, which
+## saves keep) and his floor line do not move with his size.
+const WOLF_FEET_LINE: float = 15.39
 ## WOLF's painted feet sit this far below his sprite's centre, in the art's own pixels (the piece is
 ## cut to its outline: half its 549 rows).
 const WOLF_FEET_BELOW_CENTRE: float = 274.5
-## WOLF's drawn height at rest, from the tips of his ears to his feet, in world px (the piece's 549
-## rows at WOLF_ART_SCALE).
-const WOLF_DRAWN_HEIGHT: float = 549.0 * WOLF_ART_SCALE
+## The sprite's centre from WOLF's origin, so his feet stand on WOLF_FEET_LINE (main.tscn's
+## Wolf/BodySprite position is the same value). x stays 0 so he mirrors in place.
+const WOLF_SPRITE_REST: Vector2 = Vector2(0.0, WOLF_FEET_LINE - WOLF_FEET_BELOW_CENTRE * WOLF_ART_SCALE)
 const GAMEPLAY_ZOOM: float = 1.35
 ## The opening's one framing of the dock bay (layout L1; Opening stages it): zoom 1.6, x -570 .. 30, from
 ## the charger's battery screen at x -514 to the opening's casing (at the codex/opening-dock backup's
@@ -3442,25 +3443,18 @@ func _tick_lane(delta: float) -> void:
 ## the same speed past the engineer, who waits for him at the rubble line (engineer_waits_for_wolf).
 func _sync_wolf_leap() -> void:
 	var lift: float = 0.0
-	var duck: float = 0.0
 	if state.chapter_id == "junction" and state.door_blown and wolf.autonomous_target_x != M0Actor.NO_TARGET:
 		if state.sentry_down:
 			lift = JunctionRoom.wolf_tank_leap_height(wolf.position.x)
 		else:
+			# He runs under the hung tank upright: at his real size it clears his ears (JunctionRoom).
 			lift = JunctionRoom.wolf_leap_height(wolf.position.x, sentry_brain.x)
-			if drop_arm.state == &"hung":
-				# Under the hung tank he ducks (JunctionRoom.wolf_duck_depth).
-				duck = JunctionRoom.wolf_duck_depth(wolf.position.x, -1.0 if wolf.body_sprite.flip_h else 1.0)
 	wolf.speed_scale = JunctionRoom.LEAP_SPEED_SCALE if lift > 0.0 or engineer_waits_for_wolf else (HATCH_EXIT_SPEED_SCALE if hatch_exit_walking else 1.0)
-	# The duck squashes his drawn body from the feet up: the sprite is shorter and shifted down by what
-	# the squash takes off below its centre, so his feet stay on the floor.
-	var squash: float = (WOLF_DRAWN_HEIGHT - duck) / WOLF_DRAWN_HEIGHT
 	# Past the blast he never stands inside the valve: over it, he walks on the deck a pace in front of it
 	# (JunctionRoom.wolf_valve_step), his feet and his reflection lower, and he draws over the engineer
 	# there, as anything nearer the camera does. (The actors are drawn at one scale wherever they stand.)
 	var step: float = JunctionRoom.wolf_valve_step(wolf.position.x) if state.chapter_id == "junction" and state.door_blown else 0.0
-	wolf.body_sprite.scale = Vector2(wolf_sprite_scale.x, wolf_sprite_scale.y * squash)
-	wolf.body_sprite.offset.y = -lift / wolf.body_sprite.scale.y + WOLF_FEET_BELOW_CENTRE * (1.0 - squash) / squash
+	wolf.body_sprite.offset.y = -lift / wolf.body_sprite.scale.y
 	if state.chapter_id == "junction":
 		var down: float = JunctionRoom.WOLF_STEP_FORWARD * step
 		wolf.body_sprite.position.y = WOLF_SPRITE_REST.y + down

@@ -46,8 +46,9 @@ const ENGINEER_ENTER_X: float = 125.0
 const ENGINEER_WATCH_X: float = -34.0
 const ENGINEER_MEET_X: float = -44.0
 const ENGINEER_MEET_S: float = 0.45
-## WOLF stops at the opening's edge, 0.6 m from the engineer (backup round 3, review-human-2 9).
-const WOLF_DOORWAY_X: float = -140.0
+## WOLF stops at the opening's edge, his painted snout 0.6 m from the engineer's reach (backup round 3,
+## review-human-2 9): x -140 before he was drawn at a real wolf's size (Main.WOLF_ART_SCALE).
+const WOLF_DOORWAY_X: float = ENGINEER_MEET_X - M0Actor.HUMAN_REACH - 0.6 * DoorCamera.PX_PER_M - M0Actor.WOLF_SNOUT
 ## Calm walking speeds (review S6): 1.4 m/s, under Spot's 1.6 m/s maximum; the Director leaves briskly
 ## (1.6 m/s): he is going to see his order done.
 const WALK_SPEED: float = 56.0
@@ -64,12 +65,12 @@ const LATCH_S: float = 0.3
 const STEP_S: float = 0.28
 const PAW_CLEAR: float = 3.5
 ## Box 8: WOLF waits this long after the Director starts his step back; his lane is LANE px nearer the
-## camera while he passes the Director, eased in over his first LANE_IN px and out over LANE_OUT px
-## before the doorway mark.
+## camera while he passes the Director, eased in over his first LANE_IN px and out between LANE_OUT's
+## two x (world px), 20 and 5 px before the doorway mark (the backup's -160 and -145 for its -140).
 const WOLF_WAIT_S: float = 0.35
 const LANE: float = 2.0
 const LANE_IN: float = 21.0
-const LANE_OUT: Vector2 = Vector2(-160.0, -145.0)
+const LANE_OUT: Vector2 = Vector2(WOLF_DOORWAY_X - 20.0, WOLF_DOORWAY_X - 5.0)
 ## The engineer flinches at the tear (a placeholder for a drawn frame): 3 px away and 5 degrees back,
 ## held 0.3 s, then back over 0.25 s.
 const FLINCH: Vector2 = Vector2(3.0, 0.5)

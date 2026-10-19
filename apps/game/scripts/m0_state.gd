@@ -9,9 +9,11 @@ const DISCLOSE: String = "disclose_risk"
 const PRESS: String = "press_without_warning"
 const HUMAN_NAMES = ["Rowan Vale", "Alex Bennett", "Morgan Reed"]
 const MAX_SELECTED_TEXT_LENGTH: int = 200
-## Half the width of each actor's body (28 px engineer, 62 px WOLF), as main.tscn shapes them.
+## Half the width of each actor's body (28 px engineer, 44 px WOLF), as main.tscn shapes them. WOLF's
+## was 62 px before he was drawn at a real wolf's size (Main.WOLF_ART_SCALE, 2026-10-19); it shrank with
+## his art, 62 x 0.70 rounded up to an even 44, so it still spans his legs and chest.
 const HUMAN_HALF_WIDTH: float = 14.0
-const WOLF_HALF_WIDTH: float = 31.0
+const WOLF_HALF_WIDTH: float = 22.0
 ## The Service Junction's sealed door face; until the door is blown nobody can stand past it.
 const JUNCTION_DOOR_LEFT_X: float = 452.0
 ## The engineer's two answers at the relay. A save keeps the words its player saw (memory
@@ -30,7 +32,7 @@ var active_actor: String = "human"
 var name_index: int = 0
 var human_position: Vector2 = Vector2(160.0, 410.0)
 ## WOLF starts one follow gap (M0Actor.FOLLOW_GAP) behind the engineer, clear of his body.
-var wolf_position: Vector2 = Vector2(72.0, 423.0)
+var wolf_position: Vector2 = Vector2(160.0 - M0Actor.FOLLOW_GAP, 423.0)
 var memory: Dictionary = {}
 var breaker_armed: bool = false
 var door_open: bool = false

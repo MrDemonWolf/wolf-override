@@ -14,6 +14,7 @@ const TANK_LEAP_MAX_SLOPE: float = 1.4
 const TANK_LEAP_TOP_SPAN: float = 60.0
 const TANK_LEAP_LANDING: float = 20.0
 
+## WOLF's painted pixels at rest (_wolf_pixels), worked out once.
 var _wolf_pixel_cache: Dictionary = {}
 ## The lane watch (_watch_lane): frames looked at in the junction, and what read false on them.
 var lane_frames: int = 0
@@ -507,7 +508,7 @@ func _check_scene() -> void:
 	game.call("_update_controls")
 	var walk_in_gap: Array[float] = [INF]
 	var highest_bound: Array[float] = [0.0]
-	var deepest_duck: Array[float] = [0.0]
+	var upright: Array[bool] = [true]
 	var never_closer: Array[bool] = [true]
 	var last_sentry_x: Array[float] = [brain.x]
 	# Box, hint and picture agree on every frame: the "Wait" and the wait hint stay up exactly until the
@@ -515,10 +516,9 @@ func _check_scene() -> void:
 	var agreed: Array[bool] = [true]
 	_expect(await wait_until(func() -> bool:
 		# Where the two drawn bodies could meet he is up over the sentry; elsewhere they stay apart.
-		var squash: float = wolf.body_sprite.scale.y / (game.get("wolf_sprite_scale") as Vector2).y
-		var lift: float = -(wolf.body_sprite.offset.y - MainScript.WOLF_FEET_BELOW_CENTRE * (1.0 - squash) / squash) * wolf.body_sprite.scale.y
+		var lift: float = -wolf.body_sprite.offset.y * wolf.body_sprite.scale.y
 		highest_bound[0] = maxf(highest_bound[0], lift)
-		deepest_duck[0] = maxf(deepest_duck[0], (1.0 - squash) * MainScript.WOLF_DRAWN_HEIGHT)
+		upright[0] = upright[0] and wolf.body_sprite.scale == game.get("wolf_sprite_scale")
 		if brain.wolf_ahead():
 			# Still coming down the lane behind it: it never moves toward him.
 			never_closer[0] = never_closer[0] and brain.x >= last_sentry_x[0] - 0.001
@@ -541,7 +541,7 @@ func _check_scene() -> void:
 	# nothing runs over the engineer, over WOLF or across the EXIT BOLT box between them (round 3b).
 	await physics_frame
 	_expect(room.sentry.fixated and room.sentry.visual.scale.x > 0.0 and room.sentry.visual.eye == Sentry.SentryVisual.EYE_LOCKED and room.sentry.visual.reach < Sentry.lens_rect().end.x and room.sentry.visual.gap == Vector2.ZERO, "the fixated sentry faces WOLF with its eye red and draws no beam (reach %.1f)" % room.sentry.visual.reach)
-	_expect(never_closer[0] and deepest_duck[0] >= JunctionRoom.DUCK_DEPTH - 0.5, "on his way down it never closed on him, and he ducked under the hung tank (deepest %.1f px)" % deepest_duck[0])
+	_expect(never_closer[0] and upright[0], "on his way down it never closed on him, and he ran under the hung tank upright, at his rest scale")
 	_expect(wolf.body_sprite.flip_h and wolf.body_sprite.offset == Vector2.ZERO, "at his spot WOLF faces back down the lane at it, feet on the floor")
 	_expect(walk_in_gap[0] >= SentryBrain.HALF_WIDTH + M0State.WOLF_HALF_WIDTH and highest_bound[0] >= JunctionRoom.LEAP_HEIGHT - 0.5, "WOLF bounds over the sentry on his way across and never walks through it (closest on the floor %.1f px, highest %.1f px)" % [walk_in_gap[0], highest_bound[0]])
 	_expect(absf(room.sentry.position.x - brain.x) <= 4.0, "the sentry body follows its brain (%.1f vs %.1f)" % [room.sentry.position.x, brain.x])
@@ -775,12 +775,14 @@ func _check_scene() -> void:
 		if brain.state == &"patrol":
 			furthest[0] = maxf(furthest[0], brain.x)
 		return brain.state == &"patrol" and brain.facing < 0.0 and furthest[0] > 790.0, 900), "the sentry gives up on the engineer and patrols again")
-	var turn_x: float = JunctionRoom.WOLF_BAIT_X - M0Actor.WOLF_REACH - SentryBrain.HALF_WIDTH - MainScript.WOLF_SENTRY_GAP
+	# He holds where his walk ended, inside the 2 px band of his spot that M0Actor's walk stops in, so the
+	# turn and the beam's stop follow his drawn body there.
+	var turn_x: float = wolf.position.x - M0Actor.WOLF_REACH - SentryBrain.HALF_WIDTH - MainScript.WOLF_SENTRY_GAP
 	_expect(held_spot[0] and is_equal_approx(brain.far_x, turn_x) and furthest[0] <= turn_x + 0.5, "WOLF holds by the hatch, on the floor, and the patrol turns short of him (furthest %.1f, turn %.1f)" % [furthest[0], turn_x])
 	_expect(await wait_until(func() -> bool: return brain.state == &"patrol" and brain.facing > 0.0 and brain.x > 760.0, 300), "the patrol heads his way again")
 	await physics_frame
 	var beam_end: float = room.sentry.position.x + room.sentry.visual.reach
-	_expect(is_equal_approx(room.sentry.beam_stop_x, JunctionRoom.WOLF_BAIT_X - M0Actor.WOLF_REACH) and beam_end <= JunctionRoom.WOLF_BAIT_X - M0Actor.WOLF_REACH + 0.5, "facing him its beam stops at him instead of running on over him (ends %.1f)" % beam_end)
+	_expect(is_equal_approx(room.sentry.beam_stop_x, wolf.position.x - M0Actor.WOLF_REACH) and beam_end <= wolf.position.x - M0Actor.WOLF_REACH + 0.5, "facing him its beam stops at him instead of running on over him (ends %.1f)" % beam_end)
 	brain.x = DropArm.MARK_X
 	game.call("_tank_hit")
 	_expect((game.get("state") as M0State).lane_recap == "broke_off" and (game.call("end_card_recap") as Array)[2] == "SENTRY  WOLF broke off while Rowan timed the drop.", "the recap says he broke off while the engineer timed the drop")
@@ -931,7 +933,8 @@ func _check_engineer_alone(game: Node2D, path: String) -> void:
 	# starts him at his spot by the hatch, not back across the tank.
 	_expect(autosave_c != null and autosave_c.wolf_position.x < JunctionRoom.TANK_LEAP_PEAK_X - JunctionRoom.TANK_LEAP_HALF_SPAN, "autosave C has WOLF on the rubble side of the tank (x %.0f)" % (autosave_c.wolf_position.x if autosave_c != null else -1.0))
 	game.call("_load_game")
-	_expect(wolf.position.x == JunctionRoom.WOLF_DOWN_X and wolf.body_sprite.flip_h and room.arm_parked == 1.0, "Continue from autosave C starts WOLF at his spot by the hatch, facing back down the lane, with the arm up (x %.1f)" % wolf.position.x)
+	# His position is stored in 32-bit floats and his spot (887.17) is not a whole pixel, so compare closely.
+	_expect(is_equal_approx(wolf.position.x, JunctionRoom.WOLF_DOWN_X) and wolf.body_sprite.flip_h and room.arm_parked == 1.0, "Continue from autosave C starts WOLF at his spot by the hatch, facing back down the lane, with the arm up (x %.1f)" % wolf.position.x)
 	var placed_x: float = wolf.position.x
 	await physics_frame
 	_expect(absf(wolf.position.x - placed_x) <= 0.01 and wolf.autonomous_target_x == JunctionRoom.WOLF_DOWN_X and wolf.body_sprite.offset == Vector2.ZERO, "and he stays there on the floor, with no walk across the tank")
@@ -1186,7 +1189,7 @@ func _check_tank_crossing(game: Node2D) -> void:
 	var touching: Array[String] = []
 	for key: Vector4i in frames:
 		var arm_shift: int = key.w - parked_y
-		for offset: Vector2i in _wolf_pixels(0):
+		for offset: Vector2i in _wolf_pixels():
 			var pixel: Vector2i = Vector2i(key.x + (-offset.x if key.z == 1 else offset.x), key.y + offset.y)
 			if fixed.has(pixel) or arm.has(pixel - Vector2i(0, arm_shift)):
 				touching.append("x %d feet %d" % [key.x, key.y])
@@ -1213,7 +1216,7 @@ func _check_tank_crossing(game: Node2D) -> void:
 	var swept: Array[String] = []
 	for x: int in range(roundi(JunctionRoom.WOLF_RUBBLE_X), roundi(JunctionRoom.WOLF_DOWN_X) + 1):
 		var feet: int = roundi(feet_rest - JunctionRoom.wolf_tank_leap_height(x))
-		for offset: Vector2i in _wolf_pixels(0):
+		for offset: Vector2i in _wolf_pixels():
 			if obstacles.has(Vector2i(x + offset.x, feet + offset.y)):
 				swept.append("x %d" % x)
 				break
@@ -1544,7 +1547,7 @@ func _write(path: String, data: Dictionary) -> void:
 ## WOLF crosses the lane from the rubble to the far end, answering at many points of the patrol (the
 ## engineer waits at the rubble line while he dashes past them). Drawn, the sentry never closes on him
 ## before he is past it: it backs off to the end of its patrol and he bounds over it there
-## (JunctionRoom.wolf_leap_height), ducking under the hung tank on the way (JunctionRoom.wolf_duck_depth).
+## (JunctionRoom.wolf_leap_height), running upright under the hung tank on the way.
 ## Wherever the two drawn bodies could meet he is up over the sentry at the full bound, so they never
 ## overlap; the bound clears the sentry's drawn top; his painted body never comes within
 ## TANK_CLEARANCE px of the hung tank's painted body (round 3b: the two images, measured); and he is on
@@ -1555,13 +1558,11 @@ func _check_bait_walk() -> void:
 	var feet_y: float = 423.0 + MainScript.WOLF_SPRITE_REST.y + _wolf_art_feet()
 	_expect(feet_y - JunctionRoom.LEAP_HEIGHT < Sentry.FLOOR_Y - Sentry.DRAWN_HEIGHT, "at the top of his bound WOLF's painted feet (y %.1f) clear the sentry's drawn top (y %.1f)" % [feet_y - JunctionRoom.LEAP_HEIGHT, Sentry.FLOOR_Y - Sentry.DRAWN_HEIGHT])
 	_expect(JunctionRoom.wolf_leap_height(JunctionRoom.WOLF_RUBBLE_X, SentryBrain.CHASE_MIN_X) < 0.5 and JunctionRoom.wolf_leap_height(JunctionRoom.WOLF_BAIT_X, DropArm.MARK_X) == 0.0, "standing at his spot by the valve or by the hatch he is on the floor")
-	_expect(JunctionRoom.wolf_duck_depth(JunctionRoom.WOLF_RUBBLE_X, 1.0) == 0.0 and JunctionRoom.wolf_duck_depth(JunctionRoom.WOLF_BAIT_X, -1.0) == 0.0, "nor does he duck there")
 	var step: float = 1.0 / 60.0
 	var through_in: float = INF
 	var bounded: int = 0
 	var crossing_low: float = INF
-	var deepest_duck: float = 0.0
-	# (x, lift, duck) of every frame his body is near the tank, deduplicated, for the image check.
+	# (x, lift) of every frame his body is near the tank, deduplicated, for the image check.
 	var near_tank: Dictionary = {}
 	var held_clear: bool = true
 	var patrol_far: float = -INF
@@ -1582,15 +1583,13 @@ func _check_bait_walk() -> void:
 			brain.watch_x = wolf_x if bait_x >= 0.0 else -1.0
 			brain.tick(step, 500.0, false, bait_x)
 			lift = JunctionRoom.wolf_leap_height(wolf_x, brain.x)
-			var duck: float = JunctionRoom.wolf_duck_depth(wolf_x, 1.0)
-			deepest_duck = maxf(deepest_duck, duck)
 			if lift >= JunctionRoom.LEAP_HEIGHT - 0.01 and not leapt:
 				crossing_low = minf(crossing_low, brain.x)
 			leapt = leapt or lift >= JunctionRoom.LEAP_HEIGHT - 0.01
 			if lift < JunctionRoom.LEAP_HEIGHT - 0.01:
 				through_in = minf(through_in, absf(wolf_x - brain.x))
 			if absf(wolf_x - DropArm.MARK_X) < 140.0:
-				near_tank[Vector3i(roundi(wolf_x), roundi(lift * 2.0), roundi(duck * 2.0))] = true
+				near_tank[Vector2i(roundi(wolf_x), roundi(lift * 2.0))] = true
 		bounded += 1 if leapt and is_equal_approx(wolf_x, JunctionRoom.WOLF_BAIT_X) and JunctionRoom.wolf_leap_height(wolf_x, brain.x) < 0.5 else 0
 		# A miss with WOLF by the hatch: he breaks off there and holds; the sentry turns on an engineer
 		# over the rubble, gives up and patrols again, turning short of him.
@@ -1610,15 +1609,14 @@ func _check_bait_walk() -> void:
 	_expect(bounded == 40, "on every walk in WOLF bounds over the sentry and lands on the floor at his spot by the hatch (%d of 40)" % bounded)
 	_expect(through_in >= clear, "WOLF never crosses the sentry on the floor walking in to draw it (closest %.1f px)" % through_in)
 	_expect(crossing_low >= SentryBrain.PATROL_MAX_X - 0.5, "he always catches it at the end of its patrol, right of the tank (lowest %.1f)" % crossing_low)
-	_expect(deepest_duck >= JunctionRoom.DUCK_DEPTH - 0.01, "running under the hung tank he ducks")
 	var tank: Dictionary = _tank_pixels(TANK_CLEARANCE)
 	var touching: Array[String] = []
-	for key: Vector3i in near_tank:
-		var wolf_pixels: Dictionary = _wolf_pixels(key.z)
+	for key: Vector2i in near_tank:
+		var wolf_pixels: Dictionary = _wolf_pixels()
 		var lift_px: int = roundi(key.y * 0.5)
 		for offset: Vector2i in wolf_pixels:
 			if tank.has(Vector2i(key.x + offset.x, roundi(feet_y) + offset.y - lift_px)):
-				touching.append("x %d lift %.1f duck %.1f" % [key.x, key.y * 0.5, key.z * 0.5])
+				touching.append("x %d lift %.1f" % [key.x, key.y * 0.5])
 				break
 	_expect(touching.is_empty(), "WOLF's painted body stays %.0f px clear of the hung tank's on every frame of the walk in (%d near-tank frames checked; touching at %s)" % [TANK_CLEARANCE, near_tank.size(), ", ".join(touching.slice(0, 4))])
 	_expect(held_clear and patrol_far <= far_x + 0.01 and patrol_far >= DropArm.MARK_X + DropArm.HIT_REACH, "after the miss the sentry never reaches WOLF holding by the hatch, and its patrol turns short of him (furthest %.1f, turn %.1f)" % [patrol_far, far_x])
@@ -1652,27 +1650,22 @@ func _grown(painted: Array[Vector2i], grow: float) -> Dictionary:
 	return pixels
 
 
-## WOLF's painted pixels (alpha over half), facing right, at his rest scale squashed from the top by
-## [param duck_halves] half px with his feet on the floor (Main's duck), as world-pixel offsets from his
-## x and his feet row. Cached per duck.
-func _wolf_pixels(duck_halves: int) -> Dictionary:
-	if _wolf_pixel_cache.has(duck_halves):
-		return _wolf_pixel_cache[duck_halves]
+## WOLF's painted pixels (alpha over half), facing right, at his rest scale with his feet on the floor,
+## as world-pixel offsets from his x and his feet row. Worked out once.
+func _wolf_pixels() -> Dictionary:
+	if not _wolf_pixel_cache.is_empty():
+		return _wolf_pixel_cache
 	var image: Image = (load(MainScript.WOLF_ART_PATH) as Texture2D).get_image()
-	var scale_x: float = MainScript.WOLF_ART_SCALE
-	var squash: float = (MainScript.WOLF_DRAWN_HEIGHT - duck_halves * 0.5) / MainScript.WOLF_DRAWN_HEIGHT
-	var scale_y: float = scale_x * squash
+	var scale: float = MainScript.WOLF_ART_SCALE
 	# The texture's centre sits WOLF_FEET_BELOW_CENTRE texture px above his feet.
-	var centre_y: float = -MainScript.WOLF_FEET_BELOW_CENTRE * scale_y
-	var pixels: Dictionary = {}
+	var centre_y: float = -MainScript.WOLF_FEET_BELOW_CENTRE * scale
 	for dy: int in range(-70, 4):
 		for dx: int in range(-75, 76):
-			var tx: int = floori((dx + 0.5) / scale_x + image.get_width() * 0.5)
-			var ty: int = floori((dy + 0.5 - centre_y) / scale_y + image.get_height() * 0.5)
+			var tx: int = floori((dx + 0.5) / scale + image.get_width() * 0.5)
+			var ty: int = floori((dy + 0.5 - centre_y) / scale + image.get_height() * 0.5)
 			if tx >= 0 and ty >= 0 and tx < image.get_width() and ty < image.get_height() and image.get_pixel(tx, ty).a > 0.5:
-				pixels[Vector2i(dx, dy)] = true
-	_wolf_pixel_cache[duck_halves] = pixels
-	return pixels
+				_wolf_pixel_cache[Vector2i(dx, dy)] = true
+	return _wolf_pixel_cache
 
 
 ## WOLF's painted body at rest, from his art: how far it reaches behind his origin (x, his tail) and

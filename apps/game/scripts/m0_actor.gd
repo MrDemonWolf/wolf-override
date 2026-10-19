@@ -54,20 +54,22 @@ const FOLLOW_SPEED: float = 220.0
 ## The unhurried step out from over a machine (settle_x).
 const SETTLE_SPEED: float = 140.0
 ## Horizontal reach of each drawn body from its origin, rounded up from the sprites' visible pixels
-## (WOLF's run -55.97..55.97 px, the engineer's -13.6..13.6; flipping mirrors them). Kept at the earlier
-## art's values, which still cover both, so the spacing behaviour is unchanged.
+## (WOLF's run -39.17..39.17 px at his real size, the engineer's -13.6..13.6; flipping mirrors them).
+## WOLF's keeps the 4 px over his painted snout and tail tip that AVOID_TOLERANCE lets touch a machine
+## and a little more (it was 67 when he was drawn 0.70x larger, before 2026-10-19).
 ## follow_spacing_test measures the art against these.
-const WOLF_REACH: float = 67.0
+const WOLF_REACH: float = 44.0
 const HUMAN_REACH: float = 17.0
 ## How far WOLF's painted body (pixels more than half opaque) reaches ahead of his origin to his snout
 ## and behind it to his tail tip. His authored spots stand him on clear floor by these, and
 ## wolf_space_test measures the art against them.
-## Both are half the standing piece's 1028 columns at Main.WOLF_ART_SCALE: the piece is cut to his
-## outline and drawn centred on his origin.
-const WOLF_SNOUT: float = 55.97
-const WOLF_TAIL: float = 55.97
-## A follower stands this far from the engineer: both reaches plus a little air.
-const FOLLOW_GAP: float = 88.0
+## Both are half the standing piece's 1028 columns at Main.WOLF_ART_SCALE (514 x 0.0762): the piece is
+## cut to his outline and drawn centred on his origin.
+const WOLF_SNOUT: float = 39.17
+const WOLF_TAIL: float = 39.17
+## A follower stands this far from the engineer: both reaches plus a little air (WOLF_REACH 44,
+## HUMAN_REACH 17 and 4 px).
+const FOLLOW_GAP: float = 65.0
 ## The least spacing at which the two drawn bodies still do not touch. A side with less room than
 ## this (a wall or a sealed door) sends WOLF to the engineer's other side.
 const CLEAR_GAP: float = WOLF_REACH + HUMAN_REACH
@@ -83,6 +85,9 @@ const FOLLOW_EDGE: float = 12.0
 const AVOID_DETOUR: float = 100.0
 ## WOLF_REACH is rounded up past his painted nose and tail tip, so this much of it may touch a machine.
 const AVOID_TOLERANCE: float = 4.0
+## A body walking on its own stops once it is this close to its target (world px), so it never hunts
+## back and forth over the last pixel; it can rest up to this far short of an authored spot.
+const ARRIVE_TOLERANCE: float = 2.0
 const MIN_X: float = 40.0
 ## "No target" for autonomous_target_x. Real targets reach negative world x in the dock bay (left of
 ## the corridor, DockBay), so "has a target" is an exact comparison with this value, not ">= 0".
@@ -201,7 +206,7 @@ static func facing_of(node: Node2D) -> int:
 func _approach(target_x: float, delta: float) -> float:
 	var distance: float = target_x - position.x
 	var speed: float = FOLLOW_SPEED * speed_scale
-	return clampf(distance / delta, -speed, speed) if absf(distance) > 2.0 else 0.0
+	return clampf(distance / delta, -speed, speed) if absf(distance) > ARRIVE_TOLERANCE else 0.0
 
 
 ## True while this body walks across a shown keep_clear_of, close enough that the two drawn bodies overlap.
