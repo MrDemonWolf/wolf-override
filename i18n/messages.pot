@@ -352,31 +352,31 @@ msgstr ""
 msgid "Settings could not be saved."
 msgstr ""
 
-#: scripts/junction_room.gd:858
+#: scripts/junction_room.gd:876
 msgid "LINE"
 msgstr ""
 
-#: scripts/junction_room.gd:1511
+#: scripts/junction_room.gd:1531
 msgid "BREAKER USED"
 msgstr ""
 
-#: scripts/junction_room.gd:1513
+#: scripts/junction_room.gd:1533
 msgid "VALVE USED"
 msgstr ""
 
-#: scripts/junction_room.gd:1530
+#: scripts/junction_room.gd:1550
 msgid "EXIT OPEN"
 msgstr ""
 
-#: scripts/junction_room.gd:1534
+#: scripts/junction_room.gd:1554
 msgid "EXIT OPENING"
 msgstr ""
 
-#: scripts/junction_room.gd:1537
+#: scripts/junction_room.gd:1557
 msgid "EXIT READY"
 msgstr ""
 
-#: scripts/junction_room.gd:1540
+#: scripts/junction_room.gd:1560
 msgid "EXIT LOCKED"
 msgstr ""
 
