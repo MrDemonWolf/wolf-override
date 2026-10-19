@@ -128,14 +128,20 @@ static func hole_light(parent: Node, light_name: String, hole: PackedVector2Arra
 
 ## A shade multiplied into what is drawn under the polygon [param polygon] (world px), [param color]
 ## at full strength (white leaves it as it is, so a caller fades the shade by easing its colour to
-## white: a multiply cannot be faded by alpha), added to [param parent]. Users: the Junction exit's
-## reveal while it is shut, the light-catching curbs and the passage seen past a wall's near end that
-## must not outshine the doorway.
-static func shade(parent: Node, shade_name: String, polygon: PackedVector2Array, color: Color) -> Polygon2D:
+## white: a multiply cannot be faded by alpha), added to [param parent]. [param head_share] (0..1) darkens
+## it toward the head, as hole_light's fades a light: the head lets through that share of what the feet
+## do (it needs the points in hole order, the two feet, then the two heads). Users: the Junction exit's
+## reveal while it is shut, the blown blast doorway's far reveal falling into the head's shadow, the
+## light-catching curbs and the passage seen past a wall's near end that must not outshine the doorway.
+static func shade(parent: Node, shade_name: String, polygon: PackedVector2Array, color: Color, head_share: float = 1.0) -> Polygon2D:
 	var patch: Polygon2D = Polygon2D.new()
 	patch.name = shade_name
 	patch.polygon = polygon
 	patch.color = color
+	if head_share < 1.0:
+		var head: Color = Color(color * head_share, color.a)
+		patch.color = Color.WHITE
+		patch.vertex_colors = PackedColorArray([color, color, head, head])
 	patch.material = FxKit.multiply()
 	parent.add_child(patch)
 	return patch
