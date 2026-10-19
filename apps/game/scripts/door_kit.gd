@@ -9,8 +9,8 @@ extends RefCounted
 ## - in front of the mid plate, under the actors: the swing leaves, the rolling curtain and its hood,
 ##   the door light's halo (door_light) and, on the way forward only, the exit sign (Sign);
 ## - over the actors: the wall's near end ("-front") and its status lamp (Lamp).
-## Users: Main's corridor seal, RecordsRoom's two doors and JunctionRoom's three. Units are world px
-## (40 per metre at the walk line) unless a name says otherwise.
+## Users: Main's corridor seal, RecordsRoom's two doors, JunctionRoom's three and DockBay's two. Units
+## are world px (40 per metre at the walk line) unless a name says otherwise.
 
 ## World px per piece px of every projected door piece ("-back", "-wall", "-head", "-front"): they are
 ## painted at 2 px per world px (the art set's sheets D01 to D04, manifest density 2.0).
@@ -64,12 +64,14 @@ const SIGN_FACE_GLOW: float = 0.35
 const SIGN_SPILL_GLOW: float = 0.10
 
 
-## A whole painted door piece: [param texture] drawn at PIECE_SCALE with its top-left at [param
-## top_left] (world px, in [param parent]'s space; the piece's world box from the art set's doors.py
-## piece_box plus its manifest offset), its light multiplied by [param lift] (BEYOND_LIFT, WALL_LIFT, or
-## 1 as painted), added to [param parent] now (node order is draw order).
-static func piece(parent: Node, texture: Texture2D, top_left: Vector2, piece_name: String, lift: float = 1.0) -> Sprite2D:
-	var sprite: Sprite2D = RoomDepth.cut(texture, Rect2(Vector2.ZERO, texture.get_size()), PIECE_SCALE, piece_name, top_left)
+## A whole painted door piece: [param texture] drawn at [param piece_scale] world px per piece px
+## (PIECE_SCALE for the projected door pieces; the dock bay's pieces were painted at their own densities,
+## so DockBay passes 1 / density) with its top-left at [param top_left] (world px, in [param parent]'s
+## space; the piece's world box from the art set's doors.py piece_box plus its manifest offset), its
+## light multiplied by [param lift] (BEYOND_LIFT, WALL_LIFT, or 1 as painted), added to [param parent]
+## now (node order is draw order).
+static func piece(parent: Node, texture: Texture2D, top_left: Vector2, piece_name: String, lift: float = 1.0, piece_scale: float = PIECE_SCALE) -> Sprite2D:
+	var sprite: Sprite2D = RoomDepth.cut(texture, Rect2(Vector2.ZERO, texture.get_size()), piece_scale, piece_name, top_left)
 	sprite.modulate = Color(lift, lift, lift)
 	parent.add_child(sprite)
 	return sprite

@@ -689,6 +689,8 @@ var sfx_bank: SfxBank
 var relay_sparks: CPUParticles2D
 var door_dust: CPUParticles2D
 var gate_dust: CPUParticles2D
+## The opening's dock bay left of the corridor (layout L1).
+var dock_bay: DockBay
 ## True from a knockdown until the last autosave is back; the engineer has no controls meanwhile.
 var fail_active: bool = false
 var fail_tween: Tween
@@ -842,6 +844,29 @@ const WOLF_FEET_BELOW_CENTRE: float = 274.5
 ## rows at WOLF_ART_SCALE).
 const WOLF_DRAWN_HEIGHT: float = 549.0 * WOLF_ART_SCALE
 const GAMEPLAY_ZOOM: float = 1.35
+## The opening's dock bay (layout L1, Nathanial 2026-10-14; DockBay) and its marks, world px. Until the
+## beats are rebuilt round the cage, the opening plays its existing beats there, on the codex/opening-dock
+## backup's round-4 marks (9b6a2e3): WOLF on the pad, out in front of the bay and at the opening's edge;
+## the Director in front of the bay and stepped back from it; the opening's one framing (zoom 1.6).
+const L1_WOLF_DOCKED_X: float = -397.0
+const L1_WOLF_EXIT_X: float = -327.0
+const L1_WOLF_DOORWAY_X: float = -140.0
+const L1_DIRECTOR_X: float = -257.0
+const L1_DIRECTOR_BACK_X: float = -235.0
+const L1_DIRECTOR_Y: float = 410.0
+const L1_OPENING_CAMERA: Vector2 = Vector2(-195.0, 344.5)
+const L1_OPENING_ZOOM: float = 1.6
+## Play in the corridor's chapter (decided 2026-10-14): first control's view starts at x -40, so the
+## opening into the dock bay shows at its left edge. Walking left past x 160 the camera eases on one
+## continuous mapping from that framing to the whole room's, reached with the engineer at -250, so there
+## is no clamp switch and no whip-pan at the doorway (backup round 2). The room's view is centred at
+## -284 (x -640 .. 71 at 1280x720 and the play zoom): its left edge DockBay.VIEW_LEFT, just past the end
+## wall's cut, so the dark margin the plate paints beyond the wall stays out of view (first stills,
+## 2026-10-19: at the backup's -318 it showed as a black band).
+const L1_CORRIDOR_MIN_VIEW_X: float = -40.0
+const L1_WALKBACK_FROM_X: float = 160.0
+const L1_WALKBACK_TO_X: float = -250.0
+const L1_ROOM_VIEW_CENTRE: float = -284.0
 const GAMEPLAY_VIEW_WIDTH: float = 960.0 / GAMEPLAY_ZOOM
 ## The play camera's resting height. At 1.35 it puts the floor (y 440) 27 px above the context hint
 ## (screen y 405) while the junction's arm rail (y 196) stays in view. The approved whole-piece plates
@@ -936,6 +961,8 @@ func _ready() -> void:
 	# His piece is painted with its lights off; the eye and seam lights are drawn over it in code.
 	WolfLights.attach(wolf.body_sprite)
 	_setup_corridor_door()
+	dock_bay = DockBay.new()
+	add_child(dock_bay)
 	_setup_bypass()
 	_setup_corridor_labels()
 	_setup_particles()
@@ -1180,7 +1207,7 @@ func _on_reduced_motion_changed(on: bool) -> void:
 func _setup_particles() -> void:
 	relay_sparks = FxPresets.place(FxPresets.sparks(), self, "", Vector2(601.0, 390.0), 3)
 	door_dust = FxPresets.place(FxPresets.dust_burst(), self, "", Vector2(780.0, 436.0), 3, Vector2(30.0, 3.0))
-	gate_dust = FxPresets.place(FxPresets.dust_burst(), self, "", Vector2(115.0, 438.0), 3, Vector2(70.0, 3.0))
+	gate_dust = FxPresets.place(FxPresets.dust_burst(), self, "", Vector2(L1_WOLF_DOCKED_X, 438.0), 3, Vector2(70.0, 3.0))
 
 
 ## A small additive glow riding on a station status light; it takes the light's colour each refresh.
@@ -1195,7 +1222,20 @@ func _attach_status_glow(light: ColorRect) -> Sprite2D:
 func _update_gameplay_camera() -> void:
 	var half_view: float = GAMEPLAY_VIEW_WIDTH * 0.5
 	var touch_buttons: bool = touch_enabled and not controller_active
-	intro_camera.position = Vector2(clampf(human.position.x, half_view, _view_right() - half_view), GAMEPLAY_CAMERA_Y_TOUCH if touch_buttons else GAMEPLAY_CAMERA_Y)
+	var camera_y: float = GAMEPLAY_CAMERA_Y_TOUCH if touch_buttons else GAMEPLAY_CAMERA_Y
+	var low: float = half_view
+	if state.chapter_id == "lockdown":
+		low = L1_CORRIDOR_MIN_VIEW_X + half_view
+		if human.position.x < L1_WALKBACK_FROM_X:
+			# Walking back toward the dock bay: one continuous ease to the whole room's view.
+			# A wider screen (a phone's) shows more round the centre, so the room's view keeps its left
+			# edge at DockBay.VIEW_LEFT whatever the screen's shape.
+			var shown_half: float = get_viewport().get_visible_rect().size.x / GAMEPLAY_ZOOM * 0.5
+			var room_centre: float = maxf(L1_ROOM_VIEW_CENTRE, DockBay.VIEW_LEFT + shown_half)
+			var u: float = clampf((human.position.x - L1_WALKBACK_TO_X) / (L1_WALKBACK_FROM_X - L1_WALKBACK_TO_X), 0.0, 1.0)
+			intro_camera.position = Vector2(lerpf(room_centre, low, u), camera_y)
+			return
+	intro_camera.position = Vector2(clampf(human.position.x, low, _view_right() - half_view), camera_y)
 
 
 ## The play view's right edge: the room's, except in the junction, where it runs on to show the exit
@@ -1691,6 +1731,12 @@ func _queued_next(line: String) -> bool:
 	return not box_queue.is_empty() and box_queue[0] == line
 
 
+## True within reach of the corridor's purge display: from the cross-wall's opening (the dock bay
+## beyond it has no display) to PURGE_DISPLAY_MAX_X.
+static func _at_purge_display(x: float) -> bool:
+	return x >= DockBay.ROOM_RIGHT and x <= PURGE_DISPLAY_MAX_X
+
+
 ## True within reach of the corridor's breaker.
 static func _at_breaker(x: float) -> bool:
 	return absf(x - 350.0) <= 52.0
@@ -1739,7 +1785,7 @@ func _new_game() -> void:
 	hold_use.reset()
 	_sync_scene()
 	human.hide()
-	intro_director.position = Vector2(255.0, 410.0)
+	intro_director.position = Vector2(L1_DIRECTOR_X, L1_DIRECTOR_Y)
 	intro_director.show()
 	purge_terminal_art.hide()
 	$BreakerLabel.hide()
@@ -1747,17 +1793,17 @@ func _new_game() -> void:
 	$CheckpointLabel.hide()
 	for station: CanvasItem in [breaker_art, relay_art, checkpoint_art, breaker_status_light, relay_status_light, door_visual, door_lip, seal_lamp, bypass_handle]:
 		station.hide()
-	wolf.position = Vector2(115.0, 423.0)
+	wolf.position = Vector2(L1_WOLF_DOCKED_X, 423.0)
 	wolf.z_index = ACTOR_Z
 	wolf.body_sprite.position = WOLF_SPRITE_REST
 	wolf.body_sprite.modulate = Color("#365263")
-	intro_gate.position = Vector2(115.0, 365.0)
-	intro_gate.set("opening", 0.0)
-	$IntroCage.show()
-	intro_gate.show()
-	intro_camera.position = Vector2(267.0, 355.0)
+	# The dock bay's cage is still to come: the old code-drawn cage stays hidden.
+	intro_gate.hide()
+	$IntroCage.hide()
+	dock_bay.set_exit(0.0, 0.0)
+	intro_camera.position = L1_OPENING_CAMERA
 	intro_camera.position_smoothing_enabled = false
-	intro_camera.zoom = Vector2(1.8, 1.8)
+	intro_camera.zoom = Vector2.ONE * L1_OPENING_ZOOM
 	intro_alarm.color.a = 0.0
 	intro_fade.color.a = 1.0
 	intro_tween = create_tween()
@@ -1781,10 +1827,8 @@ func _advance_intro() -> void:
 			# WOLF wakes himself.
 			intro_tween = create_tween()
 			intro_tween.tween_property(wolf.body_sprite, "modulate", WOLF_AWAKE_TINT, 0.45)
-			intro_tween.parallel().tween_property(intro_camera, "zoom", Vector2(1.95, 1.95), 0.45)
 		3:
 			wolf.body_sprite.modulate = WOLF_AWAKE_TINT
-			intro_camera.zoom = Vector2(1.95, 1.95)
 			_shutter_boom()
 			intro_tween = create_tween()
 			# The gate folds aside and stays drawn, open, against the cage post.
@@ -1792,22 +1836,21 @@ func _advance_intro() -> void:
 			intro_tween.parallel().tween_property(intro_alarm, "color:a", 0.13, 0.18)
 			intro_tween.tween_callback(func() -> void: wolf.z_index = 5)
 			intro_tween.tween_property(wolf.body_sprite, "position:y", WOLF_SPRITE_REST.y + 8.0, 0.28)
-			intro_tween.tween_callback(func() -> void: wolf.autonomous_target_x = 185.0)
+			intro_tween.tween_callback(func() -> void: wolf.autonomous_target_x = L1_WOLF_EXIT_X)
 		4:
 			intro_gate.set("opening", 1.0)
 			wolf.z_index = 5
 			wolf.body_sprite.position.y = WOLF_SPRITE_REST.y + 8.0
-			wolf.autonomous_target_x = 185.0
+			wolf.autonomous_target_x = L1_WOLF_EXIT_X
 			intro_tween = create_tween()
-			intro_tween.tween_property(intro_director, "position:x", 310.0, 0.65).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
-			intro_tween.parallel().tween_property(intro_camera, "position:x", 300.0, 0.65)
+			intro_tween.tween_property(intro_director, "position:x", L1_DIRECTOR_BACK_X, 0.65).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
 			intro_tween.parallel().tween_property(intro_alarm, "color:a", 0.05, 0.65)
 		5:
-			intro_director.position.x = 310.0
+			intro_director.position.x = L1_DIRECTOR_BACK_X
 		6:
 			# The narration says it as he does it: he turns from the Director and walks off.
-			intro_director.position.x = 310.0
-			wolf.autonomous_target_x = 110.0
+			intro_director.position.x = L1_DIRECTOR_BACK_X
+			wolf.autonomous_target_x = L1_WOLF_DOORWAY_X
 		7:
 			intro_tween = create_tween()
 			intro_tween.tween_property(intro_fade, "color:a", 1.0, 0.3)
@@ -1837,7 +1880,7 @@ func _finish_intro(keep_fade: bool = false) -> void:
 	wolf.body_sprite.position = WOLF_SPRITE_REST
 	wolf.z_index = ACTOR_Z
 	wolf.position = state.wolf_position
-	wolf.autonomous_target_x = -1.0
+	wolf.autonomous_target_x = M0Actor.NO_TARGET
 	wolf.follow_side = 0
 	_sync_door()
 	_update_controls()
@@ -2343,7 +2386,7 @@ func _interact() -> void:
 		_interact_junction(x)
 		return
 	_step_beside_station(x)
-	if x <= PURGE_DISPLAY_MAX_X:
+	if _at_purge_display(x):
 		_aside("DIRECTOR / PURGE: Original program logs marked for deletion.\nWOLF: They want the source record gone. We need to preserve it.")
 	elif _at_bypass(x):
 		_interact_bypass()
@@ -3392,7 +3435,7 @@ func _tick_lane(delta: float) -> void:
 func _sync_wolf_leap() -> void:
 	var lift: float = 0.0
 	var duck: float = 0.0
-	if state.chapter_id == "junction" and state.door_blown and wolf.autonomous_target_x >= 0.0:
+	if state.chapter_id == "junction" and state.door_blown and wolf.autonomous_target_x != M0Actor.NO_TARGET:
 		if state.sentry_down:
 			lift = JunctionRoom.wolf_tank_leap_height(wolf.position.x)
 		else:
@@ -4169,7 +4212,7 @@ func _sync_records_room(animate_exit: bool = false) -> void:
 	breaker_status_light.visible = in_corridor
 	relay_status_light.visible = in_corridor
 	# Every room's backdrop sits at the same depth as the corridor's, so corridor-only dressing hides with it.
-	for corridor_only: CanvasItem in [corridor_depth, purge_terminal_art, breaker_art, relay_art, checkpoint_art, $BreakerLabel, $RelayLabel, $CheckpointLabel, bypass_handle]:
+	for corridor_only: CanvasItem in [corridor_depth, dock_bay, purge_terminal_art, breaker_art, relay_art, checkpoint_art, $BreakerLabel, $RelayLabel, $CheckpointLabel, bypass_handle]:
 		corridor_only.visible = in_corridor
 	records_room.purge_trace_preserved = state.purge_trace_preserved
 	records_room.mirror_trace_preserved = state.mirror_trace_preserved
@@ -4244,9 +4287,13 @@ func _update_controls() -> void:
 		wolf.speed_scale = HATCH_EXIT_SPEED_SCALE
 	wolf.controlled = false
 	wolf.autonomous_target_x = _wolf_target_x()
-	wolf.follow_target = human if human.controlled and wolf.autonomous_target_x < 0.0 else null
+	wolf.follow_target = human if human.controlled and wolf.autonomous_target_x == M0Actor.NO_TARGET else null
 	wolf.follow_max_x = _wolf_follow_max_x()
 	wolf.follow_min_x = _wolf_follow_min_x()
+	# The corridor's chapter reaches on through the cross-wall's opening into the dock bay.
+	var in_corridor: bool = state.chapter_id == "lockdown"
+	human.min_x = DockBay.HUMAN_MIN_X if in_corridor else M0Actor.MIN_X
+	wolf.min_x = DockBay.WOLF_MIN_X if in_corridor else M0Actor.MIN_X
 	wolf.avoid_spans = _machine_spans()
 	human.queue_redraw()
 	wolf.queue_redraw()
@@ -4264,7 +4311,7 @@ func _wolf_target_x() -> float:
 		return WOLF_HATCH_EXIT_X
 	if end_card_active:
 		# Gone through the exit door: he stays where he is, out of sight, under the card.
-		return -1.0
+		return M0Actor.NO_TARGET
 	if records_exit_walking:
 		# Leaving Records he follows the engineer out through the exit, past its near column.
 		return RECORDS_WOLF_OUT_X
@@ -4283,7 +4330,7 @@ func _wolf_target_x() -> float:
 			var mirror: Vector4 = RECORDS_STATIONS[1]
 			if not state.mirror_trace_preserved or (state.mirror_route == "wolf" and absf(human.position.x - mirror.x) <= mirror.z):
 				return WOLF_MIRROR_X
-			return -1.0
+			return M0Actor.NO_TARGET
 		"junction":
 			if wolf_scouting:
 				return JunctionRoom.WOLF_SEAM_X
@@ -4315,7 +4362,7 @@ func _wolf_target_x() -> float:
 				if wolf_baiting and (not _sentry_hunting() or wolf.position.x > sentry_brain.x):
 					return JunctionRoom.WOLF_BAIT_X
 				return _wolf_rubble_x()
-	return -1.0
+	return M0Actor.NO_TARGET
 
 
 ## Where WOLF holds back from the rubble: his spot by the valve (JunctionRoom.WOLF_RUBBLE_X), the only
@@ -4395,9 +4442,11 @@ func _wolf_follow_max_x() -> float:
 	return M0Actor.MAX_X
 
 
-## The furthest left WOLF follows to: in Records and the junction, clear of the shut entry by his drawn
-## reach.
+## The furthest left WOLF follows to: in the corridor's chapter, into the dock bay as far as he may stand
+## (DockBay.WOLF_MIN_X); in Records and the junction, clear of the shut entry by his drawn reach.
 func _wolf_follow_min_x() -> float:
+	if state.chapter_id == "lockdown":
+		return DockBay.WOLF_MIN_X
 	if state.chapter_id == "records":
 		return RecordsRoom.ENTRY_DOOR_X + M0Actor.WOLF_REACH
 	if state.chapter_id == "junction":
@@ -4432,8 +4481,9 @@ func _refresh_ui() -> void:
 		# Touch prompts name the on-screen buttons, in the same "button  action" form as the keys.
 		var move_label: String = "◀ / ▶  MOVE" if touch_layout else ("STICK / D-PAD MOVE" if controller_active else "%s  MOVE" % move_keys)
 		var read_label: String = "%s  READ DISPLAY (optional)" % ("USE" if touch_layout else interact_key)
-		# The display is optional, so once the engineer heads right the tutorial only points forward.
-		if human.position.x > 230.0:
+		# The display is optional, so once the engineer heads right the tutorial only points forward; in
+		# the dock bay it points back to the breaker.
+		if human.position.x > 230.0 or DockBay.contains_x(human.position.x):
 			tutorial_text.text = "%s\nHead right to the breaker." % move_label
 		elif tutorial_step == 0:
 			# The first controllable frame (TEACH-7): the name card and this one prompt.
@@ -4968,14 +5018,14 @@ func _context_hint() -> String:
 			return "E: secure the first copy in the container." if state.mirror_trace_preserved else "Preserve both traces before leaving."
 		return _records_route_hint()
 	if state.checkpoint_reached:
-		return "E: enter records access. The Director's purge is still running." if absf(x - 876.0) <= 52.0 else ("E: read the Director's purge display." if x <= PURGE_DISPLAY_MAX_X else "Return to the safe point to enter records access.")
+		return "E: enter records access. The Director's purge is still running." if absf(x - 876.0) <= 52.0 else ("E: read the Director's purge display." if _at_purge_display(x) else "Return to the safe point to enter records access.")
 	if state.door_open:
 		if seal_opening:
 			return SEAL_OPENING_HINT
 		if absf(x - 876.0) <= 52.0:
 			return "E: save at the safe point."
 		return "The seal is open. Move to the safe point."
-	if x <= PURGE_DISPLAY_MAX_X:
+	if _at_purge_display(x):
 		return "E: read the Director's purge display."
 	if wolf_heading_to_relay:
 		return "WOLF is moving to the contact."
@@ -5391,7 +5441,7 @@ func _debug_engineer_state() -> String:
 ## Where WOLF is heading: his own spot, or his follow spot worked out the way M0Actor.follow_x does
 ## without changing his side, or -1.
 func debug_wolf_target() -> float:
-	if wolf.autonomous_target_x >= 0.0:
+	if wolf.autonomous_target_x != M0Actor.NO_TARGET:
 		return wolf.autonomous_target_x
 	if wolf.follow_target == null or wolf.follow_side == 0:
 		return -1.0
@@ -5423,6 +5473,6 @@ func debug_wolf_why() -> String:
 				return "bait: drawing the sentry"
 			if wolf.autonomous_target_x == JunctionRoom.WOLF_RUBBLE_X:
 				return "refuse: holding at the rubble" if lane_choice == "refused" else "hold: at the rubble"
-	if wolf.autonomous_target_x >= 0.0:
+	if wolf.autonomous_target_x != M0Actor.NO_TARGET:
 		return "hold: his own spot"
 	return "follow" if wolf.follow_target != null else "waiting"

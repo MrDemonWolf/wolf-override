@@ -870,7 +870,10 @@ func _check_zones_keep_clear() -> void:
 		var hint_box: Rect2 = (game.get_node("CanvasLayer/ContextHint/Text") as Control).get_global_rect()
 		_expect(hint_text.has_area() and hint_text.size.x < hint_box.size.x, "the hint's protected area is its text, not its whole box (%s in %s)" % [hint_text, hint_box])
 		_expect(_labels_clear(geometry).is_empty(), "corridor, %s layout: %s" % [layout, _labels_clear(geometry) if not _labels_clear(geometry).is_empty() else "every name is clear"])
-		_expect(_drawn_names(geometry) >= (18 if layout == "keyboard" else 14), "corridor, %s layout: most names still find room (%d)" % [layout, _drawn_names(geometry)])
+		# Layout L1 (decided 2026-10-14): first control's view starts at x -40 so the opening into the dock
+		# bay shows, which puts the bypass's two zones past its right edge and WOLF's follow limit in the
+		# bay: three names fewer on the keyboard layout than the corridor's 18 before.
+		_expect(_drawn_names(geometry) >= (15 if layout == "keyboard" else 14), "corridor, %s layout: most names still find room (%d)" % [layout, _drawn_names(geometry)])
 		var camera_tick: Dictionary = _entry(geometry["zones"], "name", "camera x%.2f" % (game.get("intro_camera") as Camera2D).zoom.x)
 		_expect(camera_tick.has("label_rect"), "corridor, %s layout: the camera's centre is named on the bottom edge" % layout)
 	# The engineer at the bypass: the purge display's range is wholly off screen.

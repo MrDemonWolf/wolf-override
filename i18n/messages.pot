@@ -5,6 +5,7 @@
 # res://scripts/bypass_handle.gd
 # res://scripts/containment_cage.gd
 # res://scripts/dialogue_boxes.gd
+# res://scripts/dock_bay.gd
 # res://scripts/door_kit.gd
 # res://scripts/door_leaf.gd
 # res://scripts/drop_arm.gd
@@ -77,7 +78,7 @@ msgid ""
 msgstr ""
 
 #: scenes/main.tscn
-#: scripts/main.gd:4419
+#: scripts/main.gd:4468
 msgid "PAUSE"
 msgstr ""
 
@@ -233,7 +234,7 @@ msgid "BACK TO TITLE"
 msgstr ""
 
 #: scenes/main.tscn
-#: scripts/main.gd:1859
+#: scripts/main.gd:1902
 msgid "PAUSE SCROLL"
 msgstr ""
 
@@ -348,7 +349,7 @@ msgid "Default controls restored."
 msgstr ""
 
 #: scripts/game_settings.gd:608
-#: scripts/main.gd:1987
+#: scripts/main.gd:2030
 msgid "Settings could not be saved."
 msgstr ""
 
@@ -380,38 +381,38 @@ msgstr ""
 msgid "EXIT LOCKED"
 msgstr ""
 
-#: scripts/main.gd:1031
+#: scripts/main.gd:1058
 msgid "LINK UNAVAILABLE"
 msgstr ""
 
-#: scripts/main.gd:1894
+#: scripts/main.gd:1937
 msgid "RESUME SCROLL"
 msgstr ""
 
-#: scripts/main.gd:1927
+#: scripts/main.gd:1970
 msgid "30 FPS"
 msgstr ""
 
-#: scripts/main.gd:1928
+#: scripts/main.gd:1971
 msgid "60 FPS"
 msgstr ""
 
-#: scripts/main.gd:1929
+#: scripts/main.gd:1972
 msgid "UNCAPPED"
 msgstr ""
 
-#: scripts/main.gd:1930
+#: scripts/main.gd:1973
 msgid "90 FPS"
 msgstr ""
 
-#: scripts/main.gd:1931
+#: scripts/main.gd:1974
 msgid "120 FPS"
 msgstr ""
 
-#: scripts/main.gd:1932
+#: scripts/main.gd:1975
 msgid "144 FPS"
 msgstr ""
 
-#: scripts/main.gd:1949
+#: scripts/main.gd:1992
 msgid "TAP RESUME TO RETURN"
 msgstr ""

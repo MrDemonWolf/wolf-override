@@ -10,7 +10,8 @@ var controlled: bool = false:
 		if _marker != null:
 			_marker.queue_redraw()
 var follow_target: Node2D
-var autonomous_target_x: float = -1.0
+## Where this body walks on its own (world px), or NO_TARGET.
+var autonomous_target_x: float = NO_TARGET
 ## Where a follower may stand; main pulls follow_max_x back from a sealed door so WOLF never noses into it.
 var follow_min_x: float = MIN_X
 var follow_max_x: float = MAX_X
@@ -27,6 +28,9 @@ var settle_x: float = -1.0
 ## The room's machines as x spans (from, to); a follower rests clear of them when clear floor is at
 ## most AVOID_DETOUR further back from the engineer (main sets them per room).
 var avoid_spans: Array[Vector2] = []
+## The furthest left this body may stand: MIN_X, except in the corridor's chapter, where Main lets it
+## on through the cross-wall's opening into the dock bay (DockBay.HUMAN_MIN_X and WOLF_MIN_X).
+var min_x: float = MIN_X
 ## The furthest right this body may stand: MAX_X, except where Main lets it on through an open doorway at
 ## the room's edge (the junction's exit, JunctionRoom.EXIT_WALK_MAX_X).
 var max_x: float = MAX_X
@@ -80,6 +84,9 @@ const AVOID_DETOUR: float = 100.0
 ## WOLF_REACH is rounded up past his painted nose and tail tip, so this much of it may touch a machine.
 const AVOID_TOLERANCE: float = 4.0
 const MIN_X: float = 40.0
+## "No target" for autonomous_target_x. Real targets reach negative world x in the dock bay (left of
+## the corridor, DockBay), so "has a target" is an exact comparison with this value, not ">= 0".
+const NO_TARGET: float = -1.0
 const MAX_X: float = 920.0
 ## While walking past the engineer WOLF draws behind him (main orders him first) and dims a little,
 ## so the pass reads as behind rather than through.
@@ -100,7 +107,7 @@ func _physics_process(delta: float) -> void:
 		if axis == 0.0 and settle_x >= 0.0:
 			velocity.x = clampf(_approach(settle_x, delta), -SETTLE_SPEED, SETTLE_SPEED)
 			settling = true
-	elif autonomous_target_x >= 0.0:
+	elif autonomous_target_x != NO_TARGET:
 		velocity.x = _approach(autonomous_target_x, delta)
 		# Once he has walked off on his own, he picks his side afresh from the engineer's facing.
 		follow_side = 0
@@ -129,7 +136,7 @@ func _physics_process(delta: float) -> void:
 	else:
 		velocity.y += GRAVITY * delta
 	move_and_slide()
-	position.x = clampf(position.x, MIN_X, max_x)
+	position.x = clampf(position.x, min_x, max_x)
 	_tint_pass(delta)
 
 

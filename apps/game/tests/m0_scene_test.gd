@@ -88,7 +88,11 @@ func _run() -> void:
 	var intro_director: Sprite2D = game.get_node("IntroDirector") as Sprite2D
 	var intro_fade: ColorRect = game.get_node("CanvasLayer/IntroFade") as ColorRect
 	var purge_terminal_art: Sprite2D = game.get_node("PurgeTerminalArt") as Sprite2D
-	_expect(game.get("intro_active") and intro_gate.visible and intro_director.visible and not human.visible and not purge_terminal_art.visible and not human.controlled, "opening shows only WOLF and Director, without the later terminal or engineer")
+	# Layout L1 (Nathanial, 2026-10-14): the opening plays in the dock bay left of the corridor; the old
+	# code-drawn cage stays hidden until the bay's own cage comes in.
+	var dock_bay: DockBay = game.get("dock_bay") as DockBay
+	_expect(dock_bay.visible and DockBay.contains_x(wolf.position.x) and DockBay.contains_x(intro_director.position.x), "the opening plays in the dock bay, WOLF and the Director in it")
+	_expect(game.get("intro_active") and not intro_gate.visible and intro_director.visible and not human.visible and not purge_terminal_art.visible and not human.controlled, "opening shows only WOLF and Director, without the later terminal or engineer")
 	_expect(top_card.visible and hud.text.contains("CONTAINMENT"), "opening starts with a location slate")
 	await create_timer(3.2).timeout
 	game.call("_refresh_ui")
@@ -102,16 +106,14 @@ func _run() -> void:
 	await tap(&"interact")
 	_expect(game.get("intro_step") == 3 and str(game.get("status_line")) == "The latch breaks from the inside.\nWOLF steps out under his own power.", "WOLF opens containment from inside; the gate's slide and the Director are shown, not narrated")
 	await create_timer(1.2).timeout
-	_expect(intro_gate.visible and is_equal_approx(float(intro_gate.get("opening")), 1.0), "the opened gate stays drawn, folded aside, instead of vanishing")
 	await _tap_to_step(4)
 	_expect(game.get("intro_step") == 4 and str(game.get("status_line")).contains("I won't do it") and speaker.text == "DIRECTOR" and story.text == "You were in standby.", "the Director speaks first in his own box")
 	await tap(&"interact")
 	_expect(game.get("intro_step") == 4 and speaker.text == "WOLF" and story.text == "I heard you. I won't do it.", "WOLF refuses the Director in his own box, before the engineer arrives (STORY-4)")
-	_expect(intro_gate.visible and is_equal_approx(float(intro_gate.get("opening")), 1.0), "the gate is still standing open in the next beat")
 	await _tap_to_step(5)
 	_expect(game.get("intro_step") == 5 and speaker.text == "DIRECTOR" and story.text == "Lock down maintenance. WOLF does not leave this site.", "Director orders lockdown under his own tag")
 	await tap(&"interact")
-	_expect(game.get("intro_step") == 6 and not speaker.visible and story.text == "WOLF turns from the Director and heads for maintenance." and wolf.autonomous_target_x == 110.0, "the narration says WOLF turns from the Director and heads for maintenance as he walks off")
+	_expect(game.get("intro_step") == 6 and not speaker.visible and story.text == "WOLF turns from the Director and heads for maintenance." and wolf.autonomous_target_x == Main.L1_WOLF_DOORWAY_X, "the narration says WOLF turns from the Director and heads for maintenance as he walks off")
 	# Round 3c: the opening is main's (76d3a50): nothing is added on the wall behind WOLF's cage.
 	_expect(game.get_node_or_null("OpeningHatch") == null and game.get("opening_hatch") == null, "nothing new stands behind the cage in the opening")
 	await tap(&"interact")
