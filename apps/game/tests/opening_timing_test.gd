@@ -10,8 +10,9 @@ extends "res://tests/support/game_suite.gd"
 ## box 8 the Director is back at the wall before WOLF reaches him and WOLF passes in front of him, and
 ## the engineer faces WOLF; the Director is through his door, and it is shut, before a walk back could
 ## see it; and walking back finds the bay empty and quiet.
-## Reading time per box: the larger of 1.2 s + 0.05 s per character (at most 7 s) and 1.2 s + 0.33 s
-## per word, speaker tags and row breaks not counted. Time is game time (the frames' deltas).
+## Reading time per box: the game's own rule, DialogueBoxes.read_seconds in the language shown (English
+## here: the larger of 1.2 s + 0.05 s per character, at most 7 s, and 1.2 s + 0.33 s per word), on the
+## box as the Story label shows it. Time is game time (the frames' deltas).
 
 const TARGET_MIN: float = 30.0
 const TARGET_MAX: float = 45.0
@@ -22,13 +23,6 @@ const LEAF_SLACK: float = 0.5
 
 var game: Node2D
 var clock: float = 0.0
-
-
-## The box's reading time (see the suite's doc) for [param text] under [param speaker_shown].
-static func read_seconds(text: String) -> float:
-	var plain: String = text.replace("\n", " ").strip_edges()
-	var words: int = plain.split(" ", false).size()
-	return maxf(1.2 + minf(0.05 * plain.length(), 7.0 - 1.2), 1.2 + 0.33 * words)
 
 
 func _run() -> void:
@@ -80,7 +74,7 @@ func _run() -> void:
 			last_text = text
 			boxes += 1
 			box_age = 0.0
-			box_read = read_seconds(text)
+			box_read = DialogueBoxes.read_seconds(text.strip_edges())
 			shown_at[int(game.get("intro_step"))] = shown_at.get(int(game.get("intro_step")), clock)
 			if text.begins_with("Lock down maintenance"):
 				box7_t = clock
