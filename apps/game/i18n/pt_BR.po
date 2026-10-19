@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: WOLF OVERRIDE\n"
-"PO-Revision-Date: 2026-10-19 19:18+0000\n"
+"PO-Revision-Date: 2026-10-19 19:28+0000\n"
 "Last-Translator: Claude (Anthropic), machine translation, unreviewed\n"
 "Language-Team: none\n"
 "MIME-Version: 1.0\n"
@@ -1260,11 +1260,11 @@ msgid "Saved checkpoint could not be read."
 msgstr "Não foi possível ler o ponto de controle salvo."
 
 # machine-translated by Claude (Anthropic), unreviewed
-#. TRANSLATORS: Title note under CONTINUE (388 px, 15 px). SAFE POINT is the plate's exact words. Nada salvo ainda. O jogo salva a partir do primeiro PONTO SEGURO.
+#. TRANSLATORS: Title note under CONTINUE (388 px, 15 px). SAFE POINT is the plate's exact words. Cut to fit: O jogo salva a partir do primeiro (the game saves from the first) ran 65 px over the 388 px row with ainda (yet), so Nada salvo and no primeiro. Shortened to fit the 388 px row.
 #. i18n: speaker=ui
 #: scripts/main.gd:1126
 msgid "No checkpoint yet. Saving starts at the first SAFE POINT."
-msgstr "Nada salvo ainda. O jogo salva a partir do primeiro PONTO SEGURO."
+msgstr "Nada salvo. O jogo salva no primeiro PONTO SEGURO."
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: Changelog button text when the browser cannot open (338 px).
