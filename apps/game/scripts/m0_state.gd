@@ -180,16 +180,27 @@ func wolf_will_bait() -> bool:
 	return memory.get("choice_id") == DISCLOSE
 
 
+## WOLF's callback at the corridor's safe point: he quotes the answer the engineer gave at the relay and
+## says what came of it, or "" before the safe point or with no answer saved. The quote is the English the
+## save keeps ("selected_text", which may be an older wording); his words are built with I18n.format and
+## the quote as a quoted insert, so I18n.shown draws both in the current language (localization PR L7c)
+## and the line the game keeps stays English.
 func checkpoint_callback() -> String:
 	if not checkpoint_reached or memory.is_empty():
 		return ""
 	var said: String = str(memory.get("selected_text", ""))
 	if memory.get("choice_id") == PRESS:
-		return "WOLF: You said \"%s\"\nI refused. You found another way. Next time, tell me what it costs." % said
+		# TRANSLATORS: WOLF's callback at the safe point. %s is the answer the engineer chose at the relay, as the game shows it; keep the quotation marks round it in your language's style. Avoid a past tense that shows the engineer's gender ("you said", "you found").
+		# i18n: story speaker=WOLF engineer=you slot=choice keep-breaks
+		return "WOLF: " + I18n.format(I18n.KEY.tr("You said \"%s\"\nI refused. You found another way. Next time, tell me what it costs."), [said], [0])
 	if route == "cooperate":
-		return "WOLF: You said \"%s\"\nI chose the relay. We made it." % said
+		# TRANSLATORS: WOLF's callback at the safe point. %s is the answer the engineer chose at the relay, as the game shows it; keep the quotation marks round it in your language's style. Avoid a past tense that shows the engineer's gender ("you said").
+		# i18n: story speaker=WOLF engineer=you slot=choice keep-breaks
+		return "WOLF: " + I18n.format(I18n.KEY.tr("You said \"%s\"\nI chose the relay. We made it."), [said], [0])
 	# Told the risk, he offered the contact; the engineer cranked the manual bypass instead.
-	return "WOLF: You said \"%s\"\nI made my call. You cranked the bypass anyway. I stayed." % said
+	# TRANSLATORS: WOLF's callback at the safe point. %s is the answer the engineer chose at the relay, as the game shows it; keep the quotation marks round it in your language's style. Avoid a past tense that shows the engineer's gender ("you said", "you cranked").
+	# i18n: story speaker=WOLF engineer=you slot=choice keep-breaks
+	return "WOLF: " + I18n.format(I18n.KEY.tr("You said \"%s\"\nI made my call. You cranked the bypass anyway. I stayed."), [said], [0])
 
 
 func to_dict() -> Dictionary:
