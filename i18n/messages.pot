@@ -1,11 +1,12 @@
 # LANGUAGE translation for WOLF OVERRIDE for the following files:
 # res://scenes/main.tscn
 # res://scenes/studio_logo.tscn
-# res://scripts/atlas_mesh.gd
 # res://scripts/blast_leaf.gd
 # res://scripts/bypass_handle.gd
 # res://scripts/containment_cage.gd
 # res://scripts/dialogue_boxes.gd
+# res://scripts/door_kit.gd
+# res://scripts/door_leaf.gd
 # res://scripts/drop_arm.gd
 # res://scripts/floor_reflection.gd
 # res://scripts/fx/fx_kit.gd
@@ -18,7 +19,6 @@
 # res://scripts/hold_use.gd
 # res://scripts/i18n.gd
 # res://scripts/impact.gd
-# res://scripts/junction_door_layout.gd
 # res://scripts/junction_room.gd
 # res://scripts/m0_actor.gd
 # res://scripts/m0_state.gd
@@ -32,6 +32,7 @@
 # res://scripts/sentry.gd
 # res://scripts/sentry_brain.gd
 # res://scripts/sfx_bank.gd
+# res://scripts/slide_leaf.gd
 # res://scripts/studio_logo.gd
 # res://scripts/swing_leaf.gd
 # res://scripts/text_size.gd
@@ -76,7 +77,7 @@ msgid ""
 msgstr ""
 
 #: scenes/main.tscn
-#: scripts/main.gd:4437
+#: scripts/main.gd:4419
 msgid "PAUSE"
 msgstr ""
 
@@ -158,8 +159,8 @@ msgid ""
 "\n"
 "[color=#73DDF5]PROVISIONAL ART[/color]\n"
 "Created with ChatGPT Create and the Codex image generation tool.\n"
-"The characters and station props are whole pieces\n"
-"painted over script-drawn shape guides (October 16, 2026).\n"
+"The characters, station props, rooms and doors are whole\n"
+"pieces painted over script-drawn shape guides (October 16, 2026).\n"
 "Nathanial reviewed and approved each set.\n"
 "The WOLF OVERRIDE mark was redrawn from a generated concept.\n"
 "\n"
@@ -232,7 +233,7 @@ msgid "BACK TO TITLE"
 msgstr ""
 
 #: scenes/main.tscn
-#: scripts/main.gd:1871
+#: scripts/main.gd:1859
 msgid "PAUSE SCROLL"
 msgstr ""
 
@@ -347,70 +348,70 @@ msgid "Default controls restored."
 msgstr ""
 
 #: scripts/game_settings.gd:608
-#: scripts/main.gd:1999
+#: scripts/main.gd:1987
 msgid "Settings could not be saved."
 msgstr ""
 
-#: scripts/junction_room.gd:806
+#: scripts/junction_room.gd:876
 msgid "LINE"
 msgstr ""
 
-#: scripts/junction_room.gd:1449
+#: scripts/junction_room.gd:1531
 msgid "BREAKER USED"
 msgstr ""
 
-#: scripts/junction_room.gd:1451
+#: scripts/junction_room.gd:1533
 msgid "VALVE USED"
 msgstr ""
 
-#: scripts/junction_room.gd:1468
+#: scripts/junction_room.gd:1550
 msgid "EXIT OPEN"
 msgstr ""
 
-#: scripts/junction_room.gd:1472
+#: scripts/junction_room.gd:1554
 msgid "EXIT OPENING"
 msgstr ""
 
-#: scripts/junction_room.gd:1475
+#: scripts/junction_room.gd:1557
 msgid "EXIT READY"
 msgstr ""
 
-#: scripts/junction_room.gd:1478
+#: scripts/junction_room.gd:1560
 msgid "EXIT LOCKED"
 msgstr ""
 
-#: scripts/main.gd:1026
+#: scripts/main.gd:1031
 msgid "LINK UNAVAILABLE"
 msgstr ""
 
-#: scripts/main.gd:1906
+#: scripts/main.gd:1894
 msgid "RESUME SCROLL"
 msgstr ""
 
-#: scripts/main.gd:1939
+#: scripts/main.gd:1927
 msgid "30 FPS"
 msgstr ""
 
-#: scripts/main.gd:1940
+#: scripts/main.gd:1928
 msgid "60 FPS"
 msgstr ""
 
-#: scripts/main.gd:1941
+#: scripts/main.gd:1929
 msgid "UNCAPPED"
 msgstr ""
 
-#: scripts/main.gd:1942
+#: scripts/main.gd:1930
 msgid "90 FPS"
 msgstr ""
 
-#: scripts/main.gd:1943
+#: scripts/main.gd:1931
 msgid "120 FPS"
 msgstr ""
 
-#: scripts/main.gd:1944
+#: scripts/main.gd:1932
 msgid "144 FPS"
 msgstr ""
 
-#: scripts/main.gd:1961
+#: scripts/main.gd:1949
 msgid "TAP RESUME TO RETURN"
 msgstr ""

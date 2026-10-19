@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://coply0kb7snhu"
-path="res://.godot/imported/junction-entry-atlas.png-e3dcf395e0a1c1366fdf99eaa050aed9.ctex"
+uid="uid://ct7o6o7u3p2m2"
+path="res://.godot/imported/seal-curtain.png-6a0c4caed94a94b36b399c8a72687e9f.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/props/junction-entry-atlas.png"
-dest_files=["res://.godot/imported/junction-entry-atlas.png-e3dcf395e0a1c1366fdf99eaa050aed9.ctex"]
+source_file="res://assets/doors/seal-curtain.png"
+dest_files=["res://.godot/imported/seal-curtain.png-6a0c4caed94a94b36b399c8a72687e9f.ctex"]
 
 [params]
 

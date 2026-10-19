@@ -3,14 +3,15 @@ extends Node2D
 ## A side-hinged steel door leaf that swings on its hinges, drawn as a mesh in the room's camera so it
 ## turns in its own plane: shut it lies in the cross-wall's turned face, open it stands at 90 degrees
 ## against nothing but its floor stop. Its faces are flat art in the leaf's own plane (u from the
-## hinge edge to the latch edge, v up), regions of the room's door atlas; the face the camera sees
-## is drawn (the room face while it shows, else the outside face), plus the latch edge. The light is
+## hinge edge to the latch edge, v up): the whole pieces swing-leaf-room and swing-leaf-out of the
+## approved art set (2026-10-16), shared by every swing door; the face the camera sees is drawn (the
+## room face while it shows, else the outside face), then the latch edge and the closer's arm in
+## painted steel (EDGE_COLOR). The light is
 ## the design's own: each room passes the lamps its own design lit the wall round the door with
 ## ([member lights]; RecordsRoom's EXIT_LEAF_LIGHTS and ENTRY_LEAF_LIGHTS from rdesign.py, the junction
 ## entry's ENTRY_LEAF_LIGHTS from jedesign.py), applied per vertex, so the leaf never carries light that
 ## belongs to the place. Users: the Records exit and entry and the junction entry.
-## Nothing here fades: the leaf is always somewhere on its hinges. A leaf can be drawn by an AtlasMesh
-## on the same atlas ([member host]), so a room's door pieces cost one draw call between them.
+## Nothing here fades: the leaf is always somewhere on its hinges.
 
 ## The leaf is placed with the door ends' design camera, DoorCamera (x metres along the room, h metres
 ## up, d metres behind the walkway); a room with its own measured vanishing point (the Service
@@ -52,20 +53,18 @@ const WRAP: float = 0.06
 ## The paint the face art was made at (GUNSHIP albedo at reference exposure 1): a vertex's colour is
 ## the lit paint over this, per channel in sRGB.
 const PAINT: Vector3 = Vector3(0.18, 0.195, 0.235)
+## The latch edge's and the closer arm's painted steel (doors.py's leaf_edge value, 44, 50, 56), lit by
+## the same vertex light as the face.
+const EDGE_COLOR: Color = Color8(44, 50, 56)
 
 ## 0 shut, 1 open (90 degrees, on its floor stop).
 var open: float = 0.0:
 	set(value):
 		open = clampf(value, 0.0, 1.0)
 		queue_redraw()
-		if host != null:
-			host.queue_redraw()
-## The room's door atlas, and the regions of it painted flat for the room face, the outside face and
-## the latch edge (atlas px; u across from the hinge, v up).
-var texture: Texture2D
-var room_region: Rect2
-var out_region: Rect2
-var edge_region: Rect2
+## The leaf's two faces, each painted flat (u across from the hinge, v up).
+var room_face: Texture2D
+var out_face: Texture2D
 ## The hinge axis's foot (metres: x, h, d) and the wall's unit axes in plan (U along the face toward
 ## the back wall, N into the wall).
 var hinge: Vector3
@@ -83,26 +82,22 @@ var exposure: float = 1.0
 ## the door light misses keeps the room's fill instead of losing it with the door light's fit. Below zero:
 ## the same as [member exposure].
 var fill: float = -1.0
-## The AtlasMesh whose draw call draws this leaf (it then draws nothing itself), or null.
-var host: CanvasItem = null
 ## This room's vanishing point in world px (DoorCamera.project's vp_x, vp_y).
 var vpx: float = DoorCamera.VPX
 var horizon: float = DoorCamera.HORIZON
-## A small solid region of the atlas (painted steel) the closer's arm is drawn with; empty: no arm.
-var arm_region: Rect2 = Rect2()
+## Whether the surface closer's arm is drawn (on the room side of the head).
+var has_arm: bool = false
 
 
-## A leaf cut from [param atlas]: [param room], [param outside] and [param edge] are the atlas regions
-## of its room face, outside face and latch edge (each painted flat, u across, v up); [param hinge_foot]
-## is the hinge axis's foot and [param u], [param n] the wall's plan axes (see [member hinge]); [param
-## lamps] its lights (see [member lights]). It starts shut, named "SwingLeaf", in DoorCamera's default
-## vanishing point, with no closer arm: the room sets name, fill, vpx, horizon and arm_region as it needs.
-func _init(atlas: Texture2D, room: Rect2, outside: Rect2, edge: Rect2, hinge_foot: Vector3, u: Vector3, n: Vector3, lamps: Array) -> void:
+## A leaf with the faces [param room] and [param outside] (each painted flat, u across, v up);
+## [param hinge_foot] is the hinge axis's foot and [param u], [param n] the wall's plan axes (see
+## [member hinge]); [param lamps] its lights (see [member lights]). It starts shut, named "SwingLeaf",
+## in DoorCamera's default vanishing point, with no closer arm: the room sets name, fill, vpx, horizon
+## and has_arm as it needs.
+func _init(room: Texture2D, outside: Texture2D, hinge_foot: Vector3, u: Vector3, n: Vector3, lamps: Array) -> void:
 	name = "SwingLeaf"
-	texture = atlas
-	room_region = room
-	out_region = outside
-	edge_region = edge
+	room_face = room
+	out_face = outside
 	hinge = hinge_foot
 	axis_u = u
 	axis_n = n
@@ -110,16 +105,21 @@ func _init(atlas: Texture2D, room: Rect2, outside: Rect2, edge: Rect2, hinge_foo
 	texture_filter = CanvasItem.TEXTURE_FILTER_LINEAR_WITH_MIPMAPS
 
 
-## A leaf as a room's door uses it: [method _init]'s leaf (atlas, faces, hinge, axes, lights) named
-## [param leaf_name], with [param fill_exposure] as its [member fill] and its closer's arm drawn with
-## [param arm] (an empty Rect2: no arm). The Records exit and entry and the junction entry are made
-## here; a room with its own vanishing point then sets [member vpx] and [member horizon], and the room
-## adds the leaf as a child and to the AtlasMesh that draws it.
-static func make(leaf_name: String, atlas: Texture2D, room: Rect2, outside: Rect2, edge: Rect2, hinge_foot: Vector3, u: Vector3, n: Vector3, lamps: Array, fill_exposure: float, arm: Rect2) -> SwingLeaf:
-	var leaf: SwingLeaf = SwingLeaf.new(atlas, room, outside, edge, hinge_foot, u, n, lamps)
+## The steel swing leaf of the approved art set, both its faces whole pieces, as every swing door uses it.
+const ROOM_FACE: Texture2D = preload("res://assets/doors/swing-leaf-room.png")
+const OUT_FACE: Texture2D = preload("res://assets/doors/swing-leaf-out.png")
+
+
+## A leaf as a room's door uses it: [method _init]'s leaf with the shared faces (ROOM_FACE, OUT_FACE),
+## hinge, axes and lights, named [param leaf_name], with [param fill_exposure] as its [member fill] and
+## its closer's arm drawn (every swing door has one). The Records exit and entry and the junction entry
+## are made here; a room with its own vanishing point then sets [member vpx] and [member horizon], and
+## the room adds the leaf where it draws (after its mid plate).
+static func make(leaf_name: String, hinge_foot: Vector3, u: Vector3, n: Vector3, lamps: Array, fill_exposure: float) -> SwingLeaf:
+	var leaf: SwingLeaf = SwingLeaf.new(ROOM_FACE, OUT_FACE, hinge_foot, u, n, lamps)
 	leaf.name = leaf_name
 	leaf.fill = fill_exposure
-	leaf.arm_region = arm
+	leaf.has_arm = true
 	return leaf
 
 
@@ -239,13 +239,18 @@ static func _srgb(c: float) -> float:
 	return c * 12.92 if c <= 0.0031308 else 1.055 * pow(c, 1.0 / 2.4) - 0.055
 
 
-## Draws the leaf on its own unless an AtlasMesh [member host] draws it in its own call.
+## Draws the face the camera sees with its art, then the latch edge and the closer's arm in painted
+## steel over it (two draw calls).
 func _draw() -> void:
-	if host != null:
-		return
+	var theta: float = angle()
+	var face: Array = visible_face(theta)
+	var art: Texture2D = room_face if bool(face[0]) else out_face
 	var mesh: TriMesh = TriMesh.new()
-	append_mesh(mesh)
-	mesh.draw(get_canvas_item(), texture)
+	_append_quad(mesh, face[1] as Vector3, leaf_dir(theta) * LEAF_W, face[2] as Vector3, DoorKit.LEAF_TONE)
+	mesh.draw(get_canvas_item(), art)
+	var steel: TriMesh = TriMesh.new()
+	append_steel(steel)
+	steel.draw(get_canvas_item(), null)
 
 
 ## The room's pinhole camera (DoorCamera, with this leaf's vanishing point): x = vpx / PX_PER_M,
@@ -278,52 +283,47 @@ func visible_face(theta: float) -> Array:
 	return [room_shows, base, nrm]
 
 
-## Adds this leaf, at its current swing, to [param mesh] (in the order the leaf draws: the face the
-## camera sees, the latch edge, then the closer arm's two links). AtlasMesh calls it to draw a hosted
-## leaf in its own draw call; nothing is added while the leaf is hidden.
-func append_mesh(mesh: TriMesh) -> void:
+## Adds the leaf's steel at its current swing to [param mesh], untextured: the latch edge (a 44 mm strip
+## at the free end, facing the camera through the whole swing) and, with [member has_arm], the closer
+## arm's two links. Nothing is added while the leaf is hidden.
+func append_steel(mesh: TriMesh) -> void:
 	if not visible:
 		return
 	var theta: float = angle()
 	var dir: Vector3 = leaf_dir(theta)
 	var n_room: Vector3 = room_normal(theta)
-	var face: Array = visible_face(theta)
-	var nrm: Vector3 = face[2]
-	var region: Rect2 = room_region if bool(face[0]) else out_region
-	_append_quad(mesh, face[1] as Vector3, dir * LEAF_W, region, nrm)
-	# The latch edge, a 44 mm strip at the free end, faces the camera through the whole swing.
-	var edge_base: Vector3 = hinge + dir * LEAF_W
-	_append_quad(mesh, edge_base, -n_room * LEAF_T, edge_region, dir)
-	if arm_region.has_area():
+	var nrm: Vector3 = visible_face(theta)[2]
+	_append_quad(mesh, hinge + dir * LEAF_W, -n_room * LEAF_T, dir, EDGE_COLOR)
+	if has_arm:
 		var joints: PackedVector3Array = arm_joints()
 		# The arm is dark painted steel on the room side of the head, in the leaf's own light (review r2:
 		# lit as a top face it read as a pale sliver floating over the leaf).
-		var lit: Color = shade(joints[0], nrm)
-		var steel: Color = Color(lit.r * 0.85, lit.g * 0.85, lit.b * 0.85, 1.0)
+		var lit: Color = shade(joints[0], nrm) * EDGE_COLOR
+		var arm_steel: Color = Color(lit.r, lit.g, lit.b, 1.0)
 		for k: int in 2:
-			_append_link(mesh, joints[k], joints[k + 1], steel)
+			_append_link(mesh, joints[k], joints[k + 1], arm_steel)
 
 
 ## One link of the closer's arm: a thin bar between two joints, ARM_WIDTH wide on screen.
 func _append_link(mesh: TriMesh, from: Vector3, to: Vector3, color: Color) -> void:
-	var size: Vector2 = texture.get_size()
 	var a: Vector2 = _project(from)
 	var b: Vector2 = _project(to)
 	var across: Vector2 = (b - a).orthogonal().normalized() * (ARM_WIDTH * DoorCamera.PX_PER_M * 0.5)
 	var first: int = mesh.vertex_count()
-	var uv: Vector2 = arm_region.get_center() / size
 	for p: Vector2 in [a + across, b + across, b - across, a - across]:
-		mesh.add_vertex(p, uv, color)
+		mesh.add_vertex(p, Vector2.ZERO, color)
 	mesh.add_quad(first)
 
 
 ## One face as a two-column mesh: [param base] is its bottom corner on the hinge side (or the inner
-## side, for the edge), [param across] runs to its other side, rows go up the leaf.
-func _append_quad(mesh: TriMesh, base: Vector3, across: Vector3, region: Rect2, nrm: Vector3) -> void:
-	var size: Vector2 = texture.get_size()
+## side, for the edge), [param across] runs to its other side, rows go up the leaf; each vertex is lit
+## (shade) and multiplied by [param tone] (the face art's tint, or the edge's steel). UVs run over the
+## whole face texture (u from the hinge, v down from the top).
+func _append_quad(mesh: TriMesh, base: Vector3, across: Vector3, nrm: Vector3, tone: Color) -> void:
 	var first: int = mesh.vertex_count()
 	for column: int in 2:
 		for row: float in ROWS:
 			var p: Vector3 = base + across * float(column) + Vector3(0.0, LEAF_BOTTOM + row * LEAF_H, 0.0)
-			mesh.add_vertex(_project(p), (region.position + Vector2(float(column) * region.size.x, (1.0 - row) * region.size.y)) / size, shade(p, nrm))
+			var lit: Color = shade(p, nrm) * tone
+			mesh.add_vertex(_project(p), Vector2(float(column), 1.0 - row), Color(lit.r, lit.g, lit.b, 1.0))
 	mesh.add_grid(first, 2, ROWS.size())

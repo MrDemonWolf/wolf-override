@@ -3,8 +3,8 @@ extends RefCounted
 ## One textured triangle mesh, built vertex by vertex and drawn in a single
 ## RenderingServer.canvas_item_add_triangle_array call (one draw call, so pieces on the same atlas
 ## batch). The door leaves drawn as meshes in their own planes build theirs here instead of each
-## keeping four packed arrays and its own index loops: SealLeaf (the corridor's rolling curtain), and
-## on the branches that add them BlastLeaf, SwingLeaf and AtlasMesh.
+## keeping four packed arrays and its own index loops: SealLeaf (the corridor's rolling curtain),
+## BlastLeaf, SwingLeaf and SlideLeaf.
 ##
 ## What must stay true for every user: vertices and indices go into the arrays in exactly the order
 ## the caller adds them, and nothing is reordered, merged or dropped, so a mesh built here draws the
@@ -55,8 +55,9 @@ func is_empty() -> bool:
 
 
 ## Draws the mesh on [param canvas_item] with [param texture] in one call (call it from the canvas
-## item's _draw); does nothing when the mesh has no vertex.
+## item's _draw); does nothing when the mesh has no vertex. A null texture draws the vertex colours
+## alone (a swing leaf's edge and closer arm, a leaf's contact shadow).
 func draw(canvas_item: RID, texture: Texture2D) -> void:
 	if is_empty():
 		return
-	RenderingServer.canvas_item_add_triangle_array(canvas_item, indices, points, colors, uvs, PackedInt32Array(), PackedFloat32Array(), texture.get_rid())
+	RenderingServer.canvas_item_add_triangle_array(canvas_item, indices, points, colors, uvs, PackedInt32Array(), PackedFloat32Array(), texture.get_rid() if texture != null else RID())

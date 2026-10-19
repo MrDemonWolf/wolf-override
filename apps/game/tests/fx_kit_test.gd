@@ -32,7 +32,7 @@ func _check_scene() -> void:
 	var junction: JunctionRoom = game.get("junction_room") as JunctionRoom
 	var corridor: RoomDepth = game.get_node("CorridorDepth") as RoomDepth
 	# Every glow in the game draws the one glow texture with the one additive blend.
-	var glows: Array[Sprite2D] = [corridor.lamp_glows[0], records.purge_glow, records.mirror_glow, junction.breaker_glow, junction.vent_glow, junction.door_lamp_glow, junction.sentry.visual.lens_glow, game.get("seal_lamp_glow") as Sprite2D, game.get("breaker_status_glow") as Sprite2D]
+	var glows: Array[Sprite2D] = [corridor.lamp_glows[0], records.purge_glow, records.mirror_glow, junction.breaker_glow, junction.vent_glow, junction.door_lamp.halo, junction.sentry.visual.lens_glow, (game.get("seal_lamp") as DoorKit.Lamp).halo, game.get("breaker_status_glow") as Sprite2D]
 	var glow_texture: GradientTexture2D = _glow_texture()
 	for glow: Sprite2D in glows:
 		_expect(glow.texture == glow_texture and glow.material == FxKit.additive(), "%s shares the kit's glow texture and additive blend" % glow.name)
@@ -63,7 +63,8 @@ func _check_scene() -> void:
 			elif not shared.has(resource):
 				shared.append(resource)
 	_expect(stray.is_empty(), "every generated texture, ramp and blend in the scene is the kit's (not: %s)" % ", ".join(stray))
-	_expect(shared.size() >= 8 and FxKit.cached_count() <= 16, "a handful of shared resources stand in for one per sprite (%d in use, %d cached)" % [shared.size(), FxKit.cached_count()])
+	# (18 since art swap PR 3: the blown doorway's soot texture and its multiply blend.)
+	_expect(shared.size() >= 8 and FxKit.cached_count() <= 18, "a handful of shared resources stand in for one per sprite (%d in use, %d cached)" % [shared.size(), FxKit.cached_count()])
 	var made: Dictionary = _describe_all(kit)
 	# Play through what moves the light: effects and Reduced Motion both ways, bursts, the blast, the
 	# hatch, a knockdown restore and a scene sync, with frames between.

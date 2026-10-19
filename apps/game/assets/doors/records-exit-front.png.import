@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://i38ch8q6lop5"
-path="res://.godot/imported/corridor-seal-atlas.png-9eba6ea0ead955840379953f9ef1a703.ctex"
+uid="uid://d0iantfjwp20x"
+path="res://.godot/imported/records-exit-front.png-1a92ba224c0f319859007cf229b27640.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/props/corridor-seal-atlas.png"
-dest_files=["res://.godot/imported/corridor-seal-atlas.png-9eba6ea0ead955840379953f9ef1a703.ctex"]
+source_file="res://assets/doors/records-exit-front.png"
+dest_files=["res://.godot/imported/records-exit-front.png-1a92ba224c0f319859007cf229b27640.ctex"]
 
 [params]
 

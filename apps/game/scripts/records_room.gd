@@ -12,62 +12,75 @@ const CONTAINER: Texture2D = preload("res://assets/props/records-container.png")
 ## The Records doors (design: 1cf8d73:docs/research-2026-10/sources/doors-2026-10-14/records/). Each end of the
 ## room is a 300 mm cast cross-wall turned 17 degrees across the walkway, like the corridor's, with a
 ## 3'0" x 7'0" steel secure-area door in it: the entry on the left (the way in from the corridor
-## side, its outside face with the combination lock) and the exit on the right (out to the service
-## line passage toward Archive, painted into the far plate behind its doorway). Each leaf swings into
-## the room on its hinges at the far jamb (SwingLeaf), opened and closed by a concealed operator in its
-## header; nothing fades. The first copy is secured in the GSA security container left of the exit,
-## not at the door (its own whole piece, CONTAINER). Every door piece is a region of one lossless atlas,
-## drawn by two AtlasMesh nodes (one draw call each): everything behind the walk line right after the
-## mid plate (both walls with their doorways transparent, both leaves, and the entry's near column,
-## which nobody passes behind), and the exit's near column and stub over the actors. Each column carries a guarded status
-## lamp whose glass is a live-tinted quad. Positions are each piece's world top-left (placement.json).
-const DOORS_ATLAS: Texture2D = preload("res://assets/props/records-doors-atlas.png")
+## side) and the exit on the right (out to the service line passage toward Archive). Each leaf swings
+## into the room on its hinges at the far jamb (SwingLeaf), opened and closed by a concealed operator in
+## its header; nothing fades. The first copy is secured in the GSA security container left of the exit,
+## not at the door (its own whole piece, CONTAINER). The doors are whole pieces of the approved art set
+## (2026-10-16; its doors/DESIGN.md D5 and D6), stacked by DoorKit: behind the mid plate each door's lit
+## next space ("-back"), the light through its hole and its cross-wall's face ("-wall"); over the mid
+## plate the leaves, the entry's near end ("-front", which nobody passes behind: the entry stops the
+## engineer and WOLF short of it), the door lights and, over the exit, the exit sign; over the actors
+## the exit's near end with the badge reader. Each column's status lamp and the reader's LED are live
+## DoorKit lamps. Positions are each piece's world top-left (the art set's doors.py piece_box plus the
+## manifest offset).
+const ENTRY_BACK: Texture2D = preload("res://assets/doors/records-entry-back.png")
+const ENTRY_WALL: Texture2D = preload("res://assets/doors/records-entry-wall.png")
+const ENTRY_FRONT: Texture2D = preload("res://assets/doors/records-entry-front.png")
+const EXIT_BACK: Texture2D = preload("res://assets/doors/records-exit-back.png")
+const EXIT_WALL: Texture2D = preload("res://assets/doors/records-exit-wall.png")
+const EXIT_FRONT: Texture2D = preload("res://assets/doors/records-exit-front.png")
+const ENTRY_BACK_AT: Vector2 = Vector2(-10.0, 0.0)
+const ENTRY_WALL_AT: Vector2 = Vector2(56.71, 0.0)
+const ENTRY_FRONT_AT: Vector2 = Vector2(-10.0, 0.0)
+const EXIT_BACK_AT: Vector2 = Vector2(851.66, 0.0)
+const EXIT_WALL_AT: Vector2 = Vector2(791.96, 0.0)
+const EXIT_FRONT_AT: Vector2 = Vector2(889.40, 0.0)
+## Each opening on its wall's face, foot to head (doors.py W(a, h, 0) at a -0.46 and 0.46 m, h 0 and
+## 2.14 m), the light added through it (est., tuned on rendered captures until the passage reads at
+## least 1.5 times the wall round it; the exit, the room's goal, the brighter, as the art set lit it), the
+## door light's pool on the threshold and graze on the far reveal, and its wall pack's lens.
+const ENTRY_HOLE: PackedVector2Array = [Vector2(59.71, 443.30), Vector2(80.05, 436.78), Vector2(80.05, 352.16), Vector2(59.71, 356.69)]
+const EXIT_HOLE: PackedVector2Array = [Vector2(890.08, 443.30), Vector2(870.15, 436.78), Vector2(870.15, 352.16), Vector2(890.08, 356.69)]
+const ENTRY_HOLE_LIGHT: Color = Color(0.05, 0.06, 0.07)
+const EXIT_HOLE_LIGHT: Color = Color(0.12, 0.14, 0.15)
+const ENTRY_POOL: Vector2 = Vector2(64.75, 439.68)
+const ENTRY_GRAZE: Vector2 = Vector2(74.85, 385.75)
+const ENTRY_DOOR_LIGHT: Vector2 = Vector2(87.58, 339.54)
+const EXIT_POOL: Vector2 = Vector2(885.27, 439.68)
+const EXIT_GRAZE: Vector2 = Vector2(875.37, 385.75)
+const EXIT_DOOR_LIGHT: Vector2 = Vector2(862.74, 339.54)
+## The exit's flag sign over its head (doors.py sign_at: bracket 0.40 m toward the latch side).
+const EXIT_SIGN: Rect2 = Rect2(872.99, 343.50, 14.25, 8.69)
 ## Each leaf's fill (SwingLeaf.fill): the ambient and the broad floor bounce, which reach every face the
 ## door light misses (fix round 4, review r4 M1; see EXIT_LEAF_LIGHTS).
 const EXIT_LEAF_FILL: float = 0.0370
 const ENTRY_LEAF_FILL: float = 0.0509
-## World px per atlas px of the doors' pieces: the atlas is painted at 2 px per world px (install.py's
-## to_2ppw and its placement's "scale": 0.5, under 1cf8d73:docs/research-2026-10/sources/doors-2026-10-14/records/tools).
-const DOORS_SCALE: float = 0.5
-## World px per atlas px of the status lamps' glass, painted at 4 px per world px (install.py's lens()
-## and its placement's "scale": 0.25).
-const LENS_SCALE: float = 0.25
-const EXIT_WALL_REGION: Rect2 = Rect2(328.0, 2.0, 222.0, 560.0)
-const EXIT_WALL_AT: Vector2 = Vector2(791.5, 163.5)
-const EXIT_COLUMN_REGION: Rect2 = Rect2(2.0, 2.0, 45.0, 613.0)
-const EXIT_COLUMN_AT: Vector2 = Vector2(886.0, 140.0)
-const EXIT_STUB_REGION: Rect2 = Rect2(251.0, 617.0, 228.0, 86.0)
-const EXIT_STUB_AT: Vector2 = Vector2(866.0, 439.0)
-const ENTRY_WALL_REGION: Rect2 = Rect2(95.0, 2.0, 231.0, 573.0)
-const ENTRY_WALL_AT: Vector2 = Vector2(47.5, 157.0)
-const ENTRY_COLUMN_REGION: Rect2 = Rect2(49.0, 2.0, 44.0, 613.0)
-const ENTRY_COLUMN_AT: Vector2 = Vector2(41.5, 140.0)
-const ENTRY_STUB_REGION: Rect2 = Rect2(2.0, 617.0, 247.0, 91.0)
-const ENTRY_STUB_AT: Vector2 = Vector2(-40.0, 438.5)
-const LENS_REGION: Rect2 = Rect2(481.0, 617.0, 16.0, 20.0)
-const LEAF_ROOM_REGION: Rect2 = Rect2(552.0, 2.0, 73.0, 171.0)
-const LEAF_OUT_EXIT_REGION: Rect2 = Rect2(627.0, 2.0, 73.0, 171.0)
-const LEAF_OUT_ENTRY_REGION: Rect2 = Rect2(702.0, 2.0, 73.0, 171.0)
-const LEAF_EDGE_REGION: Rect2 = Rect2(777.0, 2.0, 5.0, 171.0)
-## One painted-steel pixel of the leaf's edge (low on it, under the lock front): the colour the closer's
-## arm is drawn in (SwingLeaf.arm_region; review r1, S5).
-const LEAF_ARM_REGION: Rect2 = Rect2(779.0, 132.0, 1.0, 1.0)
-## The EXIT caption's centre: the legend of the exit sign that hangs square off the cross-wall over the
-## door (its housing is painted, its face blank; review r1), clear of the near column (x 886 on).
+## The EXIT caption's centre: over the exit sign that hangs square off the cross-wall over the door,
+## clear of the near column (x 890 on).
 const EXIT_LABEL_X: float = 862.0
+## Its top edge: just over the sign's housing (y 343.5).
+const EXIT_LABEL_Y: float = 322.0
 ## Where each shut leaf's room face crosses the walk line (y 440): the doors' collision faces.
 const EXIT_DOOR_X: float = 880.0
 const ENTRY_DOOR_X: float = 70.0
 ## Each doorway on the walk line (world px, x from .x to .y), read by door_route_test and
-## wolf_space_test. The exit's runs from its shut leaf's room face to the near column's far side (its
-## painted width at DOORS_SCALE), so an engineer walking out has passed it once their origin is beyond
-## .y; the entry's runs from its near column's room side to its shut leaf's room face. The room side of
-## a shut face is open floor.
-const EXIT_SPAN: Vector2 = Vector2(EXIT_DOOR_X, EXIT_COLUMN_AT.x + EXIT_COLUMN_REGION.size.x * DOORS_SCALE)
-const ENTRY_SPAN: Vector2 = Vector2(ENTRY_COLUMN_AT.x, ENTRY_DOOR_X)
-## The guarded status lamps on the near columns' end faces (their glass is the live lens).
+## wolf_space_test. The exit's runs from its shut leaf's room face to the near column's far side (the
+## column's cut end face at the walk line, doors.py W(-0.57, 0, 0.30)), so an engineer walking out has
+## passed it once their origin is beyond .y; the entry's runs from its near column's room side (W(-0.57,
+## 0, 0.30) of the entry) to its shut leaf's room face. The room side of a shut face is open floor.
+const EXIT_COLUMN_FAR_X: float = 903.19
+## The passage seen past the exit wall's near end (EXIT_BACK right of the column's far arris, x 903.2, down
+## to its floor's near edge, doors.py "next space floor"), shaded (DoorKit.PAST_END_SHADE) so it never
+## outshines the doorway; the column covers its left edge and the curb its foot.
+const EXIT_PAST_END: PackedVector2Array = [Vector2(903.2, 0.0), Vector2(975.0, 0.0), Vector2(975.0, 466.6), Vector2(903.2, 443.4)]
+const ENTRY_COLUMN_FAR_X: float = 46.59
+const EXIT_SPAN: Vector2 = Vector2(EXIT_DOOR_X, EXIT_COLUMN_FAR_X)
+const ENTRY_SPAN: Vector2 = Vector2(ENTRY_COLUMN_FAR_X, ENTRY_DOOR_X)
+## The guarded status lamps on the near columns' end faces (their glass is the live lens), and the exit's
+## badge reader's LED at 1.1 m under its lamp (doors.py socket_parts: 48 world px lower).
 const EXIT_LAMP: Vector2 = Vector2(901.665, 345.264)
 const ENTRY_LAMP: Vector2 = Vector2(48.018, 345.264)
+const EXIT_READER: Vector2 = Vector2(901.665, 393.264)
 ## The leaves' hinge axes (foot, metres: x along the room, h up, d behind the walk line) and their
 ## walls' plan axes (U along the face toward the back wall, N into the wall), from rdesign.py.
 const EXIT_HINGE: Vector3 = Vector3(21.85451, 0.0, 0.43655)
@@ -91,8 +104,6 @@ const CONTAINER_SPAN: Vector2 = Vector2(776.0, 807.0)
 ## backcheck or 80 degrees, so 90 degrees takes this long. The entry's closer brings its leaf shut
 ## behind the engineer a moment after they come in (SwingLeaf.close_behind's timing).
 const EXIT_SWING_SECONDS: float = 3.5
-## The source row where the mid plate's walkway (its pillar and machine bases) meets the floor.
-const WALKWAY_Y: float = 742.0
 ## Each station is one whole piece at its real size (the art set's PIECES.md section 5c), its base on
 ## the floor: the PURGE QUEUE 447 x 442 px at 6.135 px per world px (72.9 x 72 world px, 1.82 x 1.80 m;
 ## it was drawn 2.8 m tall) and the MIRROR PORT, a 42U equipment rack, 352 x 443 px at 5.54 px per world
@@ -171,12 +182,13 @@ var container_art: Sprite2D
 var floor_reflections: Array[FloorReflection] = []
 var exit_leaf: SwingLeaf
 var entry_leaf: SwingLeaf
-## The door pieces behind the walk line (walls, leaves, the entry's front) and the exit's
-## front over the actors, each one draw call; the lamps' glass quads in them take the live tint.
-var plate_mesh: AtlasMesh
-var front_mesh: AtlasMesh
-var exit_lamp_quad: int = -1
-var entry_lamp_quad: int = -1
+## The entry's near end (over the mid plate, under the actors) and the exit's (over the actors).
+var entry_front: Sprite2D
+var exit_front: Sprite2D
+## The status lamps' live glass and the exit reader's LED.
+var exit_lamp: DoorKit.Lamp
+var entry_lamp: DoorKit.Lamp
+var exit_reader: DoorKit.Lamp
 ## The shut leaves stop whoever walks into them: the exit until the first copy is secured, the entry
 ## always (the corridor side is behind the engineer).
 var exit_door_shape: CollisionShape2D
@@ -191,7 +203,6 @@ func _ready() -> void:
 	depth.painting = RECORDS_FAR
 	depth.mid_painting = RECORDS_MID
 	depth.near_painting = RECORDS_NEAR
-	depth.walkway_y = WALKWAY_Y
 	depth.base_color = Color("#071221")
 	depth.lamps = lamps
 	depth.shaft_lamps = PackedInt32Array([1, 2])
@@ -210,39 +221,43 @@ func _ready() -> void:
 		floor_reflections.append(FloorReflection.attach(prop))
 	purge_screen = PropScreen.attach(purge_art, "PurgeScreen", PURGE_SCREEN, PURGE_RED)
 	mirror_screen = PropScreen.attach(mirror_art, "MirrorScreen", MIRROR_SCREEN, MIRROR_CYAN)
-	# The leaves swing on their hinges (SwingLeaf, lit per vertex); the room's door meshes draw them.
-	# Each leaf's surface closer works a regular arm to a shoe on its head, on the room side.
-	exit_leaf = SwingLeaf.make("ExitLeaf", DOORS_ATLAS, LEAF_ROOM_REGION, LEAF_OUT_EXIT_REGION, LEAF_EDGE_REGION, EXIT_HINGE, EXIT_AXIS_U, EXIT_AXIS_N, EXIT_LEAF_LIGHTS, EXIT_LEAF_FILL, LEAF_ARM_REGION)
-	entry_leaf = SwingLeaf.make("EntryLeaf", DOORS_ATLAS, LEAF_ROOM_REGION, LEAF_OUT_ENTRY_REGION, LEAF_EDGE_REGION, ENTRY_HINGE, ENTRY_AXIS_U, ENTRY_AXIS_N, ENTRY_LEAF_LIGHTS, ENTRY_LEAF_FILL, LEAF_ARM_REGION)
-	# Everything behind the walk line, in one draw call right after the mid plate: the two cross-walls
-	# (their doorways transparent, so the passage and the vestibule in the far plate show through), both
-	# leaves, and the entry's near column, lamp and stub, which nobody ever passes behind (the entry stops
-	# the engineer and WOLF short of them). The security container stands in front of the exit's wall,
-	# its own sprite right after this mesh at the same depth (the open exit leaf stops well clear of it).
-	# Contact shadows and light are painted: nothing here casts a runtime reflection.
-	plate_mesh = AtlasMesh.make(DOORS_ATLAS, "DoorPlates", RoomDepth.Z_MID)
-	plate_mesh.add_quad(EXIT_WALL_REGION, EXIT_WALL_AT, DOORS_SCALE)
-	plate_mesh.add_quad(ENTRY_WALL_REGION, ENTRY_WALL_AT, DOORS_SCALE)
-	for leaf: SwingLeaf in [exit_leaf, entry_leaf]:
-		add_child(leaf)
-		plate_mesh.add_leaf(leaf)
-	# Each lamp's glass before its column, so the painted guard bars draw over it.
-	entry_lamp_quad = plate_mesh.add_centred_quad(LENS_REGION, ENTRY_LAMP, LENS_SCALE, Palette.LAMP_SHUT)
-	plate_mesh.add_quad(ENTRY_COLUMN_REGION, ENTRY_COLUMN_AT, DOORS_SCALE)
-	plate_mesh.add_quad(ENTRY_STUB_REGION, ENTRY_STUB_AT, DOORS_SCALE)
-	depth.add_child(plate_mesh)
+	# Behind the mid plate: each doorway's next space, light and cross-wall face (DoorKit.doorway).
+	DoorKit.doorway(depth.behind, "Entry", ENTRY_HOLE, ENTRY_HOLE_LIGHT, ENTRY_BACK, ENTRY_BACK_AT, DoorKit.BEYOND_LIFT, null, ENTRY_POOL, ENTRY_GRAZE, ENTRY_WALL, ENTRY_WALL_AT)
+	DoorKit.doorway(depth.behind, "Exit", EXIT_HOLE, EXIT_HOLE_LIGHT, EXIT_BACK, EXIT_BACK_AT, DoorKit.BEYOND_LIFT, null, EXIT_POOL, EXIT_GRAZE, EXIT_WALL, EXIT_WALL_AT)
+	DoorKit.shade(depth.behind, "ExitPastEnd", EXIT_PAST_END, DoorKit.PAST_END_SHADE)
+	# Over the mid plate, under the actors: the leaves on their hinges (SwingLeaf, lit per vertex), each
+	# with its surface closer's arm on the room side, the entry's near end with its lamp (nobody passes
+	# behind it), the door lights and the exit's sign. The security container stands in front of the
+	# exit's wall, its own sprite right after these at the same depth (the open exit leaf stops well
+	# clear of it). Contact shadows and light are painted: nothing here casts a runtime reflection.
+	var over: Node2D = Node2D.new()
+	over.name = "DoorsOver"
+	over.z_as_relative = false
+	over.z_index = RoomDepth.Z_MID
+	depth.add_child(over)
+	exit_leaf = SwingLeaf.make("ExitLeaf", EXIT_HINGE, EXIT_AXIS_U, EXIT_AXIS_N, EXIT_LEAF_LIGHTS, EXIT_LEAF_FILL)
+	entry_leaf = SwingLeaf.make("EntryLeaf", ENTRY_HINGE, ENTRY_AXIS_U, ENTRY_AXIS_N, ENTRY_LEAF_LIGHTS, ENTRY_LEAF_FILL)
+	over.add_child(exit_leaf)
+	over.add_child(entry_leaf)
+	entry_front = DoorKit.piece(over, ENTRY_FRONT, ENTRY_FRONT_AT, "EntryFront")
+	entry_lamp = DoorKit.lamp(over, "EntryLamp", ENTRY_LAMP, Palette.LAMP_SHUT)
+	DoorKit.door_light(over, ENTRY_DOOR_LIGHT)
+	DoorKit.door_light(over, EXIT_DOOR_LIGHT)
+	DoorKit.exit_sign(over, EXIT_SIGN, 1.0)
 	container_art = RoomDepth.make_prop("ContainerArt", CONTAINER, CONTAINER_SCALE, CONTAINER_X, CONTAINER_BASE_Y)
-	# On the mesh's own absolute layer (AtlasMesh.make), so it sorts against the actors the same way.
+	# On the doors' own absolute layer, so it sorts against the actors the same way.
 	container_art.z_index = RoomDepth.Z_MID
 	container_art.z_as_relative = false
 	depth.add_child(container_art)
-	# The exit's near column, lamp and stub draw over the actors (they walk out behind them), always
-	# opaque, in one draw call.
-	front_mesh = AtlasMesh.make(DOORS_ATLAS, "DoorFronts", RoomDepth.Z_NEAR)
-	exit_lamp_quad = front_mesh.add_centred_quad(LENS_REGION, EXIT_LAMP, LENS_SCALE, Palette.LAMP_SHUT)
-	front_mesh.add_quad(EXIT_COLUMN_REGION, EXIT_COLUMN_AT, DOORS_SCALE)
-	front_mesh.add_quad(EXIT_STUB_REGION, EXIT_STUB_AT, DOORS_SCALE)
-	add_child(front_mesh)
+	# The exit's near end, lamp and reader draw over the actors (they walk out behind them), always opaque.
+	exit_front = DoorKit.piece(self, EXIT_FRONT, EXIT_FRONT_AT, "ExitFront")
+	exit_front.z_index = RoomDepth.Z_NEAR
+	exit_front.z_as_relative = false
+	exit_lamp = DoorKit.lamp(self, "ExitLamp", EXIT_LAMP, Palette.LAMP_SHUT)
+	exit_reader = DoorKit.lamp(self, "ExitReader", EXIT_READER, Palette.LAMP_SHUT, DoorKit.READER_LED_RADIUS)
+	for front: Node2D in [exit_lamp, exit_reader]:
+		front.z_index = RoomDepth.Z_NEAR
+		front.z_as_relative = false
 	# Each shut leaf stops whoever walks into it at its room face; refresh_state() enables the bodies.
 	exit_door_shape = SwingLeaf.make_body(self, "ExitDoor", EXIT_DOOR_X, 1.0)
 	entry_door_shape = SwingLeaf.make_body(self, "EntryDoor", ENTRY_DOOR_X, -1.0)
@@ -252,29 +267,30 @@ func _ready() -> void:
 	mirror_label = _add_station_label("MIRROR PORT", MIRROR_X, MIRROR_TEXT, STATION_LABEL_Y)
 	# The exit's name sits on the cross-wall over its door, left of the near column (which draws over
 	# the actors and would cut it; captions stay under the actors).
-	_add_station_label("EXIT", EXIT_LABEL_X, Palette.EXIT_GREEN, 276.0)
+	_add_station_label("EXIT", EXIT_LABEL_X, Palette.EXIT_GREEN, EXIT_LABEL_Y)
 	refresh_state()
 
 
-## The exit's status lamp: red shut, amber while its leaf moves, green open.
+## The exit's status lamp: red shut, amber while its leaf moves, green open; the badge reader's LED
+## goes green with it once the copy releases the door, and is red otherwise.
 func set_exit_lamp(color: Color) -> void:
-	front_mesh.set_color(exit_lamp_quad, color)
+	exit_lamp.color = color
+	exit_reader.color = Palette.LAMP_SHUT if color == Palette.LAMP_SHUT else Palette.LAMP_OPEN
 
 
-## The exit lamp's current colour (the glass quad's tint): what set_exit_lamp last set
-## (chapter_scene_test reads it).
+## The exit lamp's current colour: what set_exit_lamp last set (chapter_scene_test reads it).
 func exit_lamp_color() -> Color:
-	return front_mesh.get_color(exit_lamp_quad)
+	return exit_lamp.color
 
 
 ## The entry's status lamp: amber while its closer brings the leaf shut, red once it latches.
 func set_entry_lamp(color: Color) -> void:
-	plate_mesh.set_color(entry_lamp_quad, color)
+	entry_lamp.color = color
 
 
-## The entry lamp's current colour (the glass quad's tint): what set_entry_lamp last set.
+## The entry lamp's current colour: what set_entry_lamp last set.
 func entry_lamp_color() -> Color:
-	return plate_mesh.get_color(entry_lamp_quad)
+	return entry_lamp.color
 
 
 ## Where the security container's art is drawn (in this room, which sits at the world origin).

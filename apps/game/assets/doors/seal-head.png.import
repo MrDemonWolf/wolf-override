@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://j25vyqap3hub"
-path="res://.godot/imported/records-doors-atlas.png-d242d33ed8450b08057dc67afbea50a5.ctex"
+uid="uid://dqvwdwtde8u0y"
+path="res://.godot/imported/seal-head.png-5c7a2b3bedc1b484ae3650905d8a9c44.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/props/records-doors-atlas.png"
-dest_files=["res://.godot/imported/records-doors-atlas.png-d242d33ed8450b08057dc67afbea50a5.ctex"]
+source_file="res://assets/doors/seal-head.png"
+dest_files=["res://.godot/imported/seal-head.png-5c7a2b3bedc1b484ae3650905d8a9c44.ctex"]
 
 [params]
 

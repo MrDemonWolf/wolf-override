@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://bn8skxybt8i17"
-path="res://.godot/imported/junction-exit-atlas.png-cdfd66b60d2cb05d6b613c9f2770142a.ctex"
+uid="uid://dr3op2hf4f22o"
+path="res://.godot/imported/blast-wall.png-61c26ebc81c902f2df9f707dfbb63c53.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/props/junction-exit-atlas.png"
-dest_files=["res://.godot/imported/junction-exit-atlas.png-cdfd66b60d2cb05d6b613c9f2770142a.ctex"]
+source_file="res://assets/doors/blast-wall.png"
+dest_files=["res://.godot/imported/blast-wall.png-61c26ebc81c902f2df9f707dfbb63c53.ctex"]
 
 [params]
 

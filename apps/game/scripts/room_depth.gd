@@ -1,7 +1,9 @@
 class_name RoomDepth
 extends Node2D
-## A room built from three painted plates that share one 16:9 frame, plus the light every room
-## shares, all with built-in nodes:
+## A room built from three painted plates that share one 16:9 frame (world 0..960 x 0..540: the
+## approved whole-piece plates of 2026-10-16 are painted on that frame, the far plate and near strip at
+## 1.2 px per world px and the mid plate at 1.56), plus the light every room shares, all with built-in
+## nodes:
 ## - far: the back wall and floor, a Parallax2D that lags the camera, with additive glows and
 ##   drifting light shafts over its painted lamps, lockdown beacons (painted fixtures from
 ##   [member beacon_atlas], or a small drawn housing where a room has none), wall haze and dust;
@@ -10,6 +12,9 @@ extends Node2D
 ## - near: the plate's edge pieces only (a left strip and the same strip mirrored on the right),
 ##   drawn over the actors and scrolling faster than the floor; a piece fades back while it covers
 ##   one of the [member occluders] (the actors), so nobody is hidden at either end of the room.
+## Each room's doorways stand behind the mid plate in [member behind] (their lit next space, the
+## wall's thickness and the cross-wall's face, drawn between the far and the mid plate), so the mid
+## plate's own ceiling band still lies over a cross-wall's top.
 ## Source pixels are never edited. Main switches the depth pass with [member effects_enabled]: off,
 ## every plate moves with the floor and the near pieces, glows, haze and dust are hidden.
 ## The light moves only while the room is on screen: a hidden room (Main hides the rooms it is not
@@ -32,11 +37,17 @@ const Z_NEAR: int = 3
 ## (1 - scroll), which at 1.15 is up to 19 px at play (zoom 1.35), 32 px in the opening (zoom 1.8)
 ## and 26 px at the chapter-close shot (zoom 1.55), plus up to 10 px of camera shake.
 const NEAR_OVERHANG: float = 56.0
-## Mirrored slivers of the mid plate past each room edge and below its bottom, so camera shake at
-## the end of the camera's travel (or under the touch framing, whose view ends at the plate's
-## bottom) shows a continuation of the plate instead of its cut edge. The bottom one matters where
-## the floor is painted on the mid plate (the junction); elsewhere that strip is transparent.
+## Mirrored slivers of the mid plate past each room edge, so camera shake at the end of the camera's
+## travel shows a continuation of the plate instead of its cut edge.
 const MID_BLEED: float = 16.0
+## The plates end at world y 540 and every mid plate paints its deck down to there, but the touch
+## framing (Main.GAMEPLAY_CAMERA_Y_TOUCH 392 at zoom 1.35) shows down to y 592 and a camera shake 10 px
+## more: the far and mid plates' bottom rows are mirrored on down this far (world px).
+const BOTTOM_BLEED: float = 64.0
+## World px per atlas px of the painted beacons (beacon_atlas, corridor-beacons.png): it was painted at
+## 2 px per world px, the density of the plates it was cut to fit, and keeps it now that the plates
+## are painted at their own densities.
+const BEACON_ART_SCALE: float = 0.5
 const FAR_DUST_COUNT: int = 30
 const NEAR_DUST_COUNT: int = 12
 const GLOW_SIZE: Vector2 = Vector2(250.0, 96.0)
@@ -89,19 +100,22 @@ const BEACON_ART_PARTS: int = 4
 ## Foreground pieces on transparency; only [member near_strip_width] source pixels from its left
 ## edge are used, on both sides of the room.
 @export var near_painting: Texture2D
-## The source row where the mid plate's painted walkway meets the floor; it is drawn at FLOOR_Y.
-@export var walkway_y: float = 777.0
-## How far the far plate sits below the mid plate, so its painted ceiling lamps stay in the play view.
+## The mid plate's source row drawn at FLOOR_Y. The whole-piece mid plates paint their walk line at
+## world y 440 of the shared frame, so it is FLOOR_Y at their 1.56 px per world px (1498 / 960).
+@export var walkway_y: float = FLOOR_Y * 1498.0 / ROOM_WIDTH
+## How far the far plate sits below the mid plate (world px). The whole-piece far plates share the
+## mid plate's frame, so every room leaves it at 0.
 @export var far_drop: float = 0.0
+## How many source px of the near strip, from its left edge, are drawn (more than its width: all).
 @export var near_strip_width: float = 512.0
 ## How far past each room edge the near strips are anchored (at least NEAR_OVERHANG). A room whose
 ## painted pipe column is wider than the corridor's (57 px) anchors it further out by the
 ## difference, so the column at each end of the play view only grazes an engineer standing at the
 ## 40 / 920 clamp.
 @export var near_overhang: float = NEAR_OVERHANG
-## How many source pixels of each near strip, from the room's edge inward, are the painted column
-## that can cover an actor (the corridor's 57 px column; the junction's is 100 px).
-@export var near_column_width: float = 114.0
+## How many world px of each near strip, from the room's edge inward, are the painted column that can
+## cover an actor (the corridor's 57 px column; the junction's is 100 px).
+@export var near_column_width: float = 57.0
 @export var base_color: Color = Color("#091533")
 ## Ceiling lamp centres as fractions of the far plate, so the glows ride on its parallax.
 @export var lamps: PackedVector2Array = PackedVector2Array()
@@ -176,6 +190,11 @@ var occluders: Array[Sprite2D] = []
 var backdrop_layer: Parallax2D
 var backdrop: Sprite2D
 var mid_layer: Node2D
+## The doorways' pieces that stand behind the mid plate (their next space, the wall's thickness, the
+## leaves that run inside the wall, the cross-wall's face and the light through the hole), drawn
+## between the far and the mid plate at Z_MID: the rooms add them here after the room is built.
+## rebuild() frees it with the other layers, so a room builds its doors once, after _ready.
+var behind: Node2D
 var near_layer: Parallax2D
 var lamp_glows: Array[Sprite2D] = []
 var beacons: Array[Node2D] = []
@@ -244,7 +263,7 @@ func _process(delta: float) -> void:
 ## True when [param edge]'s painted column covers any visible occluder on screen.
 func near_covers(edge: Sprite2D) -> bool:
 	var width: float = edge.region_rect.size.x
-	var column: float = minf(near_column_width, width)
+	var column: float = minf(near_column_width / _far_scale(), width)
 	var local: Rect2 = Rect2(width - column if edge.flip_h else 0.0, 0.0, column, edge.region_rect.size.y)
 	var screen: Rect2 = edge.get_global_transform_with_canvas() * local
 	for sprite: Sprite2D in occluders:
@@ -276,6 +295,8 @@ func rebuild() -> void:
 	backdrop_layer = _add_parallax("Backdrop", BACKDROP_SCROLL, Z_BACKDROP)
 	backdrop = _plate("Painting", painting)
 	backdrop_layer.add_child(backdrop)
+	if painting != null:
+		backdrop_layer.add_child(_bottom_bleed("BottomBleed", painting, BOTTOM_BLEED / _far_scale()))
 	haze = Sprite2D.new()
 	haze.name = "Haze"
 	haze.centered = false
@@ -306,11 +327,10 @@ func rebuild() -> void:
 		var glow: Sprite2D
 		if painted_beacons:
 			var first: int = index * BEACON_ART_PARTS
-			var plate_scale: float = _plate_scale()
 			beacon.art = beacon_atlas
 			for part: int in 3:
 				var region: Rect2 = beacon_regions[first + part]
-				beacon.parts.append(Rect2(beacon_offsets[first + part] * plate_scale, region.size * plate_scale))
+				beacon.parts.append(Rect2(beacon_offsets[first + part] * BEACON_ART_SCALE, region.size * BEACON_ART_SCALE))
 				beacon.parts.append(region)
 			glow = Sprite2D.new()
 			glow.texture = beacon_atlas
@@ -318,7 +338,7 @@ func rebuild() -> void:
 			glow.region_enabled = true
 			glow.region_rect = beacon_regions[first + 3]
 			glow.offset = beacon_offsets[first + 3]
-			glow.scale = Vector2.ONE * plate_scale
+			glow.scale = Vector2.ONE * BEACON_ART_SCALE
 			glow.modulate = Color(warning_color, beacon_peak_alpha)
 			glow.material = FxKit.additive()
 		else:
@@ -331,6 +351,12 @@ func rebuild() -> void:
 		lamp_glows.append(glow)
 		_warning_glows.append(glow)
 	_settle_beacons(false)
+	behind = Node2D.new()
+	behind.name = "DoorsBehind"
+	behind.z_as_relative = false
+	behind.z_index = Z_MID
+	add_child(behind)
+	_built.append(behind)
 	mid_layer = Node2D.new()
 	mid_layer.name = "MidPlate"
 	mid_layer.z_as_relative = false
@@ -343,11 +369,7 @@ func rebuild() -> void:
 		var width: float = float(mid_painting.get_width())
 		mid_layer.add_child(_plate("LeftBleed", mid_painting, Rect2(0.0, 0.0, bleed_source, mid_painting.get_height()), true))
 		mid_layer.add_child(_plate("RightBleed", mid_painting, Rect2(width - bleed_source, 0.0, bleed_source, mid_painting.get_height()), true))
-		# The bottom rows flipped down, running past both sides (mirror repeat) to fill the corners.
-		var bottom_bleed: Sprite2D = _plate("BottomBleed", mid_painting, Rect2(-bleed_source, mid_painting.get_height() - bleed_source, width + bleed_source * 2.0, bleed_source))
-		bottom_bleed.flip_v = true
-		bottom_bleed.texture_repeat = CanvasItem.TEXTURE_REPEAT_MIRROR
-		mid_layer.add_child(bottom_bleed)
+		mid_layer.add_child(_bottom_bleed("BottomBleed", mid_painting, BOTTOM_BLEED / _plate_scale(), bleed_source))
 	far_dust = _make_dust("FarDust", FAR_DUST_COUNT, 0.18, 0.4, Z_ATMOSPHERE)
 	near_layer = _add_parallax("Near", NEAR_SCROLL, Z_NEAR)
 	if near_painting != null:
@@ -367,7 +389,11 @@ func _apply() -> void:
 	var far: Rect2 = far_rect()
 	backdrop_layer.scroll_scale = BACKDROP_SCROLL if on else Vector2.ONE
 	backdrop.position = far.position
-	backdrop.scale = Vector2.ONE * scale_factor
+	backdrop.scale = Vector2.ONE * _far_scale()
+	var far_bleed: Sprite2D = backdrop_layer.get_node_or_null("BottomBleed") as Sprite2D
+	if far_bleed != null:
+		far_bleed.scale = backdrop.scale
+		far_bleed.position = Vector2(far.position.x, far.end.y)
 	haze.visible = on
 	haze.position = Vector2(far.position.x, far.position.y + far.size.y * 0.29)
 	haze.scale = Vector2(far.size.x * (haze_end + haze_fade), far.size.y * 0.56) / haze.texture.get_size()
@@ -403,13 +429,14 @@ func _apply() -> void:
 		bottom_bleed.position = Vector2(-MID_BLEED, mid_top + mid.texture.get_height() * scale_factor)
 	near_layer.visible = on
 	var left_edge: Sprite2D = near_layer.get_node_or_null("LeftEdge") as Sprite2D
+	var near_scale: float = _far_scale()
 	if left_edge != null:
-		left_edge.scale = Vector2.ONE * scale_factor
+		left_edge.scale = Vector2.ONE * near_scale
 		left_edge.position = Vector2(-near_overhang, mid_top)
 	var right_edge: Sprite2D = near_layer.get_node_or_null("RightEdge") as Sprite2D
 	if right_edge != null:
-		right_edge.scale = Vector2.ONE * scale_factor
-		right_edge.position = Vector2(ROOM_WIDTH + near_overhang - right_edge.region_rect.size.x * scale_factor, mid_top)
+		right_edge.scale = Vector2.ONE * near_scale
+		right_edge.position = Vector2(ROOM_WIDTH + near_overhang - right_edge.region_rect.size.x * near_scale, mid_top)
 	for dust: CPUParticles2D in [far_dust, near_dust]:
 		dust.visible = on and ambient_dust
 	_sync_motion()
@@ -527,17 +554,55 @@ func _draw() -> void:
 
 
 ## Where the far plate is drawn, in the backdrop layer's space (it lines up with the room when the
-## camera is centred on the room).
+## camera is centred on the room): at the mid plate's top, far_drop lower, as wide as the room.
 func far_rect() -> Rect2:
-	var scale_factor: float = _plate_scale()
-	var size: Vector2 = painting.get_size() * scale_factor if painting != null else Vector2(ROOM_WIDTH, 540.0)
-	return Rect2(Vector2(0.0, FLOOR_Y - walkway_y * scale_factor + far_drop), size)
+	var size: Vector2 = painting.get_size() * _far_scale() if painting != null else Vector2(ROOM_WIDTH, 540.0)
+	return Rect2(Vector2(0.0, FLOOR_Y - walkway_y * _plate_scale() + far_drop), size)
 
 
-## Every plate is painted at the same size and drawn exactly as wide as the room.
+## World px per mid plate px: the mid plate is drawn exactly as wide as the room.
 func _plate_scale() -> float:
 	var reference: Texture2D = mid_painting if mid_painting != null else painting
 	return ROOM_WIDTH / float(reference.get_width()) if reference != null else 1.0
+
+
+## World px per far plate px: the far plate is drawn exactly as wide as the room too, and the near
+## strip at the same scale (each room's far plate and near strip were painted on one sheet, at one
+## density: 1.2 px per world px).
+func _far_scale() -> float:
+	var reference: Texture2D = painting if painting != null else mid_painting
+	return ROOM_WIDTH / float(reference.get_width()) if reference != null else 1.0
+
+
+## The mid plate's rows from world y [param top_y] down, mirrored on past the room's right edge to
+## world x [param reach] and on below the plate's bottom as far as BOTTOM_BLEED (mirror repeat), added to
+## [member behind] as [param bleed_name]: a doorway at the right end whose pieces run on past the edge
+## (the Junction exit) stands on the room's own deck there. In [member behind], so the doorway's pieces
+## added after it draw over it. Call after rebuild(); returns the sprite.
+func deck_bleed(bleed_name: String, top_y: float, reach: float) -> Sprite2D:
+	var plate_scale: float = _plate_scale()
+	var mid_top: float = FLOOR_Y - walkway_y * plate_scale
+	# Whole source px (a region is cut on whole px), rounded up so it reaches at least [param reach].
+	var width: float = ceilf((reach - ROOM_WIDTH) / plate_scale)
+	var top: float = (top_y - mid_top) / plate_scale
+	var bottom: float = float(mid_painting.get_height()) + BOTTOM_BLEED / plate_scale
+	var bleed: Sprite2D = _plate(bleed_name, mid_painting, Rect2(float(mid_painting.get_width()) - width, top, width, bottom - top), true)
+	bleed.texture_repeat = CanvasItem.TEXTURE_REPEAT_MIRROR
+	bleed.scale = Vector2.ONE * plate_scale
+	bleed.position = Vector2(ROOM_WIDTH, top_y)
+	behind.add_child(bleed)
+	return bleed
+
+
+## [param texture]'s bottom [param rows] source rows flipped down under it, running [param side] source
+## px past both sides (mirror repeat) to fill the corners: the touch framing and a camera shake see
+## below the plates' bottom edge (BOTTOM_BLEED). The caller places and scales it.
+func _bottom_bleed(bleed_name: String, texture: Texture2D, rows: float, side: float = 0.0) -> Sprite2D:
+	var width: float = float(texture.get_width())
+	var bleed: Sprite2D = _plate(bleed_name, texture, Rect2(-side, texture.get_height() - rows, width + side * 2.0, rows))
+	bleed.flip_v = true
+	bleed.texture_repeat = CanvasItem.TEXTURE_REPEAT_MIRROR
+	return bleed
 
 
 func _plate(plate_name: String, texture: Texture2D, region: Rect2 = Rect2(), mirrored: bool = false) -> Sprite2D:

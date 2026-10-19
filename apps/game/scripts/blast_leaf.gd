@@ -1,13 +1,16 @@
 class_name BlastLeaf
-extends Node2D
+extends DoorLeaf
 ## The corridor seal's inner blast leaf while the seal opens. A 0.36 m steel-faced concrete leaf runs
 ## in a slot 0.14..0.54 m behind the cross-wall's face on two bogies in a floor rail: shut, its
 ## leading edge sits in a receiver in the near jamb (behind the column); it slides back along the
 ## wall into a pocket in the far side, and open its leading edge stands flush in the pocket's mouth
-## (that parked edge is painted into the wall piece, so this node only draws while the seal moves).
+## (only the seal-back piece's pocket mouth shows of it then, and shut the curtain hides it, so this node
+## only draws while the seal moves).
+## Its art is the whole piece seal-blast-leaf (the approved art set, 2026-10-16): the leaf flat and
+## face-on as seen from the corridor, its leading end on the right, then its 0.36 m leading edge.
 ## It is drawn as a mesh in its own planes: the front face (t = T_LF, from the leading edge to the
 ## pocket's mouth), the leading edge (a = a_lead, t from T_LF to T_LB), and a feathered contact
-## shadow on the threshold in front of its foot (a black atlas patch, vertex alpha), all projected
+## shadow on the threshold in front of its foot (SHADOW_COLOR, vertex alpha), all projected
 ## with the door end's design camera (DoorCamera). The light belongs to the place, not to the moving
 ## leaf: each front-face vertex is shaded from LIGHT at its fixed spot. Driven only by the seal's
 ## existing open value: it starts to slide once the roller is 40 % up.
@@ -26,16 +29,15 @@ const TRAVEL_M: float = 3.65417
 const LEAF_TOP_M: float = 3.2
 const H_OPEN: float = 3.05
 const START: float = 0.4
-## Atlas regions (corridor-seal-atlas.png, round 7) and their texel densities.
-const FRONT_REGION: Rect2 = Rect2(449.0, 705.0, 158.0, 256.0)
-const EDGE_REGION: Rect2 = Rect2(613.0, 705.0, 29.0, 256.0)
-## A solid black patch: the contact shadow takes its colour from it and its feather from vertex alpha.
-const SHADOW_REGION: Rect2 = Rect2(648.0, 705.0, 8.0, 8.0)
+## The piece's texel density both ways (345 x 256 px for 4.31 x 3.2 m) and where its front face ends
+## and its leading edge's face begins (texel x: the front's 3.95 m).
+const TEXELS_PER_M: float = 80.0
+const FRONT_TEXELS: float = 3.95 * TEXELS_PER_M
+## The contact shadow's colour; its feather is vertex alpha.
+const SHADOW_COLOR: Color = Color.BLACK
 ## The contact shadow reaches this far in front of the foot (m) and is this dark at the foot.
 const SHADOW_DEPTH_M: float = 0.14
 const SHADOW_ALPHA: float = 0.62
-const U_TEXELS_PER_M: float = 40.0
-const H_TEXELS_PER_M: float = 80.0
 ## Light on the front plane: columns at fixed a (mouth first), rows at fixed h; grey vertex colour.
 const A_COLS: PackedFloat32Array = [1.4635, 1.0067, 0.5499, 0.0932, -0.3636, -0.8204, -1.2771, -1.7339, -2.1907]
 const H_ROWS: PackedFloat32Array = [0.0, 0.4, 0.8, 1.2, 1.6, 2.0, 2.4, 2.75, 3.05]
@@ -44,18 +46,10 @@ const LIGHT: PackedFloat32Array = [
 	0.612, 0.612, 0.612, 0.612, 0.612, 0.612, 0.612, 0.552, 0.552, 0.761, 0.791, 0.791, 0.821, 0.851, 0.881, 0.91, 0.582, 0.552, 0.791, 0.821, 0.821, 0.851, 0.881, 0.91, 0.94, 0.612, 0.582, 0.821, 0.851, 0.851, 0.881, 0.881, 0.91, 0.97, 0.642, 0.612, 0.881, 0.881, 0.881, 0.91, 0.91, 0.94, 0.97, 0.672, 0.642, 0.91, 0.91, 0.91, 0.91, 0.91, 0.94, 0.94, 0.701, 0.672, 0.97, 0.97, 0.97, 0.94, 0.94, 0.91, 0.91, 0.731, 0.701, 1.0, 1.0, 1.0, 0.97, 0.94, 0.91, 0.881, 0.731, 0.701, 0.463, 0.463, 0.463, 0.463, 0.493, 0.493, 0.493, 0.343, 0.343,
 ]
 
-## The seal's open value (0 shut, 1 open), the same value SealLeaf.open takes.
-var open: float = 0.0:
-	set(value):
-		open = clampf(value, 0.0, 1.0)
-		queue_redraw()
-var texture: Texture2D
-
-
-func _init(atlas: Texture2D) -> void:
-	name = "BlastLeaf"
-	texture = atlas
-	texture_filter = CanvasItem.TEXTURE_FILTER_LINEAR_WITH_MIPMAPS
+## A leaf drawn with [param art], the flat seal-blast-leaf piece. Its [member DoorLeaf.open] is the
+## seal's open value, the same value SealLeaf.open takes.
+func _init(art: Texture2D) -> void:
+	super("BlastLeaf", art)
 
 
 ## World (clamp-world) position of the point a metres along the wall, h up, t into it: the wall
@@ -99,8 +93,8 @@ static func edge_light(lead: float) -> float:
 	return 0.35 + 0.65 * sqrt(clampf((lead - (A_LEAD_SHUT + 0.1)) / 1.2, 0.0, 1.0))
 
 
-## One TriMesh, one draw call: the front face, then the leading edge, then the contact shadow (the
-## order the triangles were always drawn in, so later ones cover earlier ones as before).
+## Two TriMeshes: the front face, then the leading edge, in one textured call, then the contact shadow
+## in vertex colour alone over them.
 func _draw() -> void:
 	var lead: float = lead_at(open)
 	var size: Vector2 = texture.get_size()
@@ -114,7 +108,7 @@ func _draw() -> void:
 	if cols.size() >= 2:
 		for a: float in cols:
 			for h: float in H_ROWS:
-				var texel: Vector2 = FRONT_REGION.position + Vector2((a - lead) * U_TEXELS_PER_M, (LEAF_TOP_M - h) * H_TEXELS_PER_M)
+				var texel: Vector2 = Vector2(FRONT_TEXELS - (a - lead) * TEXELS_PER_M, (LEAF_TOP_M - h) * TEXELS_PER_M)
 				var g: float = light_at(a, h)
 				mesh.add_vertex(project(a, h, T_LF), texel / size, Color(g, g, g, 1.0))
 		mesh.add_grid(0, cols.size(), rows)
@@ -123,15 +117,15 @@ func _draw() -> void:
 	var ge: float = edge_light(lead)
 	for t: float in [T_LF, T_LB]:
 		for h: float in H_ROWS:
-			var texel: Vector2 = EDGE_REGION.position + Vector2((t - T_LF) * H_TEXELS_PER_M, (LEAF_TOP_M - h) * H_TEXELS_PER_M)
+			var texel: Vector2 = Vector2(FRONT_TEXELS + (t - T_LF) * TEXELS_PER_M, (LEAF_TOP_M - h) * TEXELS_PER_M)
 			mesh.add_vertex(project(lead, h, t), texel / size, Color(ge, ge, ge, 1.0))
 	mesh.add_grid(base, 2, rows)
 	# contact shadow on the threshold, in front of the foot: dark at the foot, clear at its far edge
 	# (a 2 x 2 grid: at the leading edge and at the mouth, each at the foot and SHADOW_DEPTH_M out)
-	var sbase: int = mesh.vertex_count()
-	var suv: Vector2 = (SHADOW_REGION.position + SHADOW_REGION.size * 0.5) / size
+	mesh.draw(get_canvas_item(), texture)
+	var shadow: TriMesh = TriMesh.new()
 	for a: float in [lead, A_MOUTH]:
 		for k: int in 2:
-			mesh.add_vertex(project(a, 0.0, T_LF - SHADOW_DEPTH_M * k), suv, Color(1.0, 1.0, 1.0, SHADOW_ALPHA * (1 - k)))
-	mesh.add_grid(sbase, 2, 2)
-	mesh.draw(get_canvas_item(), texture)
+			shadow.add_vertex(project(a, 0.0, T_LF - SHADOW_DEPTH_M * k), Vector2.ZERO, Color(SHADOW_COLOR, SHADOW_ALPHA * (1 - k)))
+	shadow.add_grid(0, 2, 2)
+	shadow.draw(get_canvas_item(), null)

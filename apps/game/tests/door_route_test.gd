@@ -32,7 +32,7 @@ const RECORDS_ENTRY_FACE_X: float = RecordsRoom.ENTRY_DOOR_X
 const BLAST_FACE_X: float = M0State.JUNCTION_DOOR_LEFT_X
 ## The blast door's doorway on the deck, far jamb foot to the near column's far side (the column's foot,
 ## JunctionRoom.DOOR_FOOT_RIGHT_X).
-const BLAST_SPAN: Vector2 = Vector2(JunctionDoorLayout.FAR_JAMB_FOOT.x, JunctionRoom.DOOR_FOOT_RIGHT_X)
+const BLAST_SPAN: Vector2 = Vector2(JunctionRoom.FAR_JAMB_FOOT.x, JunctionRoom.DOOR_FOOT_RIGHT_X)
 
 var game: Node2D
 var human: M0Actor
@@ -150,7 +150,7 @@ func _check_blast_door() -> void:
 	var started: int = Engine.get_physics_frames()
 	while Engine.get_physics_frames() - started < BEAT_FRAMES:
 		leaf_shown = leaf_shown and (_whole(room.door_leaf) or _whole(room.door_leaf_breaking) or _whole(room.door_leaf_down))
-		flew = flew or (room.door_flying and _whole(room.door_leaf_breaking) and room.door_leaf_breaking.position.x > JunctionDoorLayout.NEAR_JAMB_FOOT.x and not room.door_leaf_down.visible)
+		flew = flew or (room.door_flying and _whole(room.door_leaf_breaking) and room.door_leaf_breaking.position.x > JunctionRoom.NEAR_JAMB_FOOT.x and not room.door_leaf_down.visible)
 		if state.door_blown and not room.door_breaking and not room.door_flying and room.door_leaf_down.visible:
 			break
 		await process_frame
@@ -186,7 +186,8 @@ func _check_exit_door() -> void:
 		await process_frame
 	_expect(room.hatch_open >= 1.0 and leaf_whole and _whole(room.exit_leaf), "the exit leaf slides open into its pocket, drawn whole every frame")
 	var shut_edge: Vector3 = JunctionRoom.exit_leaf_anchor(0.0)
-	_expect(room.exit_leaf.position.x - JunctionRoom.EXIT_SPAN.x < 0.25 * (JunctionRoom.EXIT_SPAN.y - JunctionRoom.EXIT_SPAN.x) and shut_edge.x - room.exit_leaf.position.x > 0.6 * (JunctionRoom.EXIT_SPAN.y - JunctionRoom.EXIT_SPAN.x), "the open leaf has slid back to the pocket's mouth by the far jamb (leading edge x %.1f, shut %.1f)" % [room.exit_leaf.position.x, shut_edge.x])
+	var open_edge: Vector3 = JunctionRoom.exit_leaf_anchor(room.hatch_open)
+	_expect(open_edge.x - JunctionRoom.EXIT_SPAN.x < 0.25 * (JunctionRoom.EXIT_SPAN.y - JunctionRoom.EXIT_SPAN.x) and shut_edge.x - open_edge.x > 0.6 * (JunctionRoom.EXIT_SPAN.y - JunctionRoom.EXIT_SPAN.x), "the open leaf has slid back to the pocket's mouth by the far jamb (leading edge x %.1f, shut %.1f)" % [open_edge.x, shut_edge.x])
 	await wait_until(func() -> bool: return human.controlled and absf(wolf.position.x - JunctionRoom.WOLF_DOORWAY_X) < 3.0, BEAT_FRAMES)
 	# Fix round 3 (review r3, human pass): USE from the nearest spot that leaves (HATCH_REACH_MIN_X, still
 	# inside the bolt panel's reach) leaves without stepping the engineer back to the panel's side.
@@ -246,7 +247,7 @@ func _check_rest_spots() -> void:
 		["Records: WOLF's leftmost follow spot", RecordsRoom.ENTRY_DOOR_X + wolf_reach, wolf_reach, Vector2(RecordsRoom.ENTRY_SPAN.x, RECORDS_ENTRY_FACE_X), false, null],
 		["Records: engineer at the container", main_constants["RECORDS_CONTAINER_SIDE_X"], human_reach, Vector2(RECORDS_EXIT_FACE_X, RecordsRoom.EXIT_SPAN.y), false, null],
 		["Records: WOLF's rightmost follow spot", RecordsRoom.EXIT_DOOR_X - wolf_reach, wolf_reach, Vector2(RECORDS_EXIT_FACE_X, RecordsRoom.EXIT_SPAN.y), false, null],
-		["Records: WOLF following the engineer out", main_constants["RECORDS_WOLF_OUT_X"], wolf_reach, RecordsRoom.EXIT_SPAN, true, records.front_mesh],
+		["Records: WOLF following the engineer out", main_constants["RECORDS_WOLF_OUT_X"], wolf_reach, RecordsRoom.EXIT_SPAN, true, records.exit_front],
 		["Junction: WOLF clear of the blast", JunctionRoom.WOLF_CLEAR_X, wolf_reach, Vector2(BLAST_FACE_X, BLAST_SPAN.y), false, null],
 		["Junction: WOLF reading the seam", JunctionRoom.WOLF_SEAM_X, wolf_reach, Vector2(BLAST_FACE_X, BLAST_SPAN.y), false, null],
 		["Junction: WOLF at the rubble", JunctionRoom.WOLF_RUBBLE_X, wolf_reach, BLAST_SPAN, true, room.door_column],

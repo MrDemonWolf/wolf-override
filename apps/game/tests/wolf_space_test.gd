@@ -20,12 +20,12 @@ extends "res://tests/support/game_suite.gd"
 
 const TOUCH: float = 0.5
 ## The corridor's door-end pieces measured in depth, not along x, while WOLF stands in the open
-## doorway (_check_doorway): the frame (far guide, hood, operator) and the wall-mounted MANUAL BYPASS
+## doorway (_check_doorway): the seal's hood with its far guide and the wall-mounted MANUAL BYPASS
 ## stand behind the walk line.
 const DOORWAY_BY_DEPTH: Array[String] = ["the seal frame", "the MANUAL BYPASS"]
 ## The door-end pieces drawn over the actors (always opaque): standing in the doorway, none of them
 ## may hide any of WOLF.
-const DRAWN_OVER_ACTORS: Array[String] = ["CorridorDoorFront", "CorridorSealStub", "CorridorSealCamera", "SealLamp"]
+const DRAWN_OVER_ACTORS: Array[String] = ["CorridorDoorFront"]
 ## Frames WOLF is given to reach a spot and stop (his longest walk, the length of a room, takes ~260).
 const SETTLE_FRAMES: int = 600
 
@@ -333,12 +333,12 @@ func _check_rest(game: Main, label: String, own_spot: bool = true, doorway: bool
 
 ## WOLF in the corridor's open doorway, measured against the door end as drawn (Nathanial's decision
 ## of 2026-10-14): his head is in the opening, past where the shut curtain crosses the walk line; no
-## piece drawn over the actors (the near column with its jamb plate, the cut section, the camera, the
-## status lamp) hides any of his painted pixels, so he is wholly in view; the walk line crosses the
+## piece drawn over the actors (the wall's near end with its guide and stub, whose status lamp sits on
+## its painted socket) hides any of his painted pixels, so he is wholly in view; the walk line crosses the
 ## cross-wall inside its opening, between the near jamb's receiver and the inner leaf's pocket, and
 ## the inner leaf is parked in its pocket behind the walk line, so he stands between the jambs and in
-## front of the parked leaf, not in either; the frame, the far column's jamb plate (painted into the
-## wall piece) and the MANUAL BYPASS on the back wall are drawn behind him and stand behind the walk
+## front of the parked leaf, not in either; the wall's face, the hood with the far guide and the MANUAL
+## BYPASS on the back wall are drawn behind him and stand behind the walk
 ## line or above the floor; and he is inside the camera's view.
 func _check_doorway(game: Main, label: String, wolf_span: Vector2) -> void:
 	var wolf_sprite: Sprite2D = game.wolf.body_sprite
@@ -359,10 +359,10 @@ func _check_doorway(game: Main, label: String, wolf_span: Vector2) -> void:
 	var leaf: BlastLeaf = game.get("blast_leaf") as BlastLeaf
 	var parked_foot: Vector2 = BlastLeaf.project(BlastLeaf.lead_at(1.0), 0.0, BlastLeaf.T_LF)
 	_expect(not leaf.visible and BlastLeaf.lead_at(leaf.open if leaf.open > 0.0 else 1.0) >= BlastLeaf.A_MOUTH - 0.0001 and parked_foot.y < RoomDepth.FLOOR_Y - 2.0, "%s: the inner leaf is parked in its pocket, its foot behind the walk line (y %.1f), clear of WOLF" % [label, parked_foot.y])
-	for back: Sprite2D in [game.get("seal_wall") as Sprite2D, game.get_node("Door/CorridorSealFrame") as Sprite2D]:
+	for back: Sprite2D in [game.get("seal_wall") as Sprite2D, game.get("seal_head") as Sprite2D]:
 		_expect(drawn_z(back) < drawn_z(wolf_sprite), "%s draws behind the actors" % back.name)
-	var frame_rows: Vector2 = _painted_world(game.get_node("Door/CorridorSealFrame") as Sprite2D, Vector2.AXIS_Y)
-	_expect(frame_rows.y < RoomDepth.FLOOR_Y - 8.0, "%s: the seal frame (far guide, hood, operator) ends above the walk line (lowest row %.1f), behind WOLF" % [label, frame_rows.y])
+	var frame_rows: Vector2 = _painted_world(game.get("seal_head") as Sprite2D, Vector2.AXIS_Y)
+	_expect(frame_rows.y < RoomDepth.FLOOR_Y - 8.0, "%s: the seal's hood and far guide end above the walk line (lowest row %.1f), behind WOLF" % [label, frame_rows.y])
 	var hub: Vector2 = game.bypass_handle.global_position + BypassHandle.WHEEL_OFFSET
 	_expect(hub.y + BypassHandle.COLLAR_RADIUS < RoomDepth.FLOOR_Y - 20.0 and drawn_z(game.bypass_handle) < drawn_z(wolf_sprite), "%s: the MANUAL BYPASS is mounted on the back wall above the floor (its collar's foot at y %.1f), drawn behind WOLF, who stands in front of it" % [label, hub.y + BypassHandle.COLLAR_RADIUS])
 	var camera: Camera2D = game.get_viewport().get_camera_2d()
@@ -440,7 +440,7 @@ func _obstacles(game: Main) -> Array[Array]:
 			sprites = {
 				"the purge display": game.get_node("PurgeTerminalArt"), "the corridor breaker": game.get_node("BreakerArt"),
 				"the coolant relay": game.get_node("RelayArt"), "the safe point": game.get_node("CheckpointArt"),
-				"the seal frame": game.get_node("Door/CorridorSealFrame"), "the seal's near column": game.get_node("CorridorDoorFront"),
+				"the seal frame": game.get("seal_head"), "the seal's near column": game.get_node("CorridorDoorFront"),
 			}
 			# The MANUAL BYPASS is drawn in code round its wheel: its collar is its widest part.
 			found.append(["the MANUAL BYPASS", Vector2(Main.BYPASS_WHEEL.x - BypassHandle.COLLAR_RADIUS, Main.BYPASS_WHEEL.x + BypassHandle.COLLAR_RADIUS)])

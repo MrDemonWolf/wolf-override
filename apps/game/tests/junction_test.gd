@@ -392,7 +392,7 @@ func _check_scene() -> void:
 	(game.get("sfx_bank") as SfxBank).clip_started.disconnect(count_ticks)
 	_expect(fuse_ticks[0] == PressureLine.FUSE_TICKS, "the fuse's ticks are heard, %d of %d" % [fuse_ticks[0], PressureLine.FUSE_TICKS])
 	_expect(_player_for(game, &"hiss_mid") == null and _player_for(game, &"hum") == null, "the line's hiss and pump stop when the door goes")
-	_expect(room.door_leaf_breaking.visible and room.door_cracks.visible and not room.door_leaf.visible and not room.door_hole.visible, "at the blast the leaf shows breaking first")
+	_expect(room.door_leaf_breaking.visible and not room.door_leaf.visible and not room.door_hole.visible, "at the blast the leaf shows breaking first")
 	_expect(game.call("_objective") == "GO THROUGH THE DOOR" and room.door_label.text == "DOOR DOWN" and room.blast_sparks.emitting, "the blast is a real state change with sparks, and the card says to go through the door before anyone mentions the tank")
 	_expect(room.breaker_label.text == "BREAKER USED" and room.valve_label.text == "VALVE USED", "the blast uses up the breaker and the valve, in plain words")
 	var knocked: bool = false
@@ -479,15 +479,15 @@ func _check_scene() -> void:
 	root.add_child(spare)
 	spare.line_state = &"charged"
 	spare.refresh_state()
-	var steady: Color = spare.door_lamp_glow.modulate
+	var steady: Color = spare.door_lamp.halo.modulate
 	for _frame: int in 12:
 		await process_frame
-	_expect(spare.door_lamp_glow.modulate == steady and steady.a > 0.5, "with Reduced Motion the charged door lamp glows without flashing")
+	_expect(spare.door_lamp.halo.modulate == steady and steady.a > 0.5, "with Reduced Motion the charged door lamp glows without flashing")
 	spare.reduce_motion = false
 	var strobed: bool = false
 	for _frame: int in 12:
 		await process_frame
-		strobed = strobed or spare.door_lamp_glow.modulate != steady
+		strobed = strobed or spare.door_lamp.halo.modulate != steady
 	_expect(strobed, "without Reduced Motion the charged door lamp flashes")
 	spare.queue_free()
 	_expect(corridor_door.disabled, "the corridor door stays open in the junction")
@@ -734,36 +734,33 @@ func _painted_x_in_rows(image: Image, region: Rect2, at: Vector2, scale: float, 
 	return span
 
 
-## The blast door's pieces are regions of one atlas: the doorway, the leaf, the wall and the release bay
-## draw under the actors, the near column, its lamp, the wall's stub and the thrown leaf over them, so
-## whoever walks through the doorway passes behind the near column. The doorway stands across the walk
+
+## The blast door's pieces are whole pieces: the lit doorway and the wall's face behind the mid plate, the
+## shut, breaking and thrown leaf under the actors, the front (the near column with its stub) and its lamp
+## over them, so whoever walks through the doorway passes behind the near column. The doorway stands across the walk
 ## line just beyond the door body's face. The station plates share one row and size and never overlap.
 func _check_presentation(room: JunctionRoom, human: M0Actor, wolf: M0Actor) -> void:
-	var under: Array[Sprite2D] = [room.door_hole, room.door_leaf, room.door_leaf_breaking, room.door_wall, room.door_cracks, room.door_damage, room.release_bay]
-	var over: Array[Sprite2D] = [room.door_lamp, room.door_column, room.door_stub, room.door_leaf_down]
-	var atlas: bool = true
-	var order: bool = true
-	for piece: Sprite2D in under + over:
-		atlas = atlas and piece.texture == JunctionDoorLayout.ATLAS and piece.region_enabled
+	var under: Array[Node2D] = [room.door_leaf, room.door_leaf_breaking, room.door_leaf_down]
+	var over: Array[Node2D] = [room.door_lamp, room.door_column]
+	var order: bool = room.door_hole.get_parent() == room.depth.behind and room.door_wall.get_parent() == room.depth.behind and room.depth.behind.z_index < mini(human.z_index, wolf.z_index)
+	for piece: Node2D in under + over:
 		var z: int = room.z_index + piece.z_index
 		order = order and (z < mini(human.z_index, wolf.z_index) if under.has(piece) else z > maxi(human.z_index, wolf.z_index))
-	_expect(atlas, "every blast-door piece is a region of the one door atlas")
-	_expect(order, "the doorway, leaf, wall and bay draw behind the actors; the near column, stub and thrown leaf in front")
-	var far: Vector2 = JunctionDoorLayout.FAR_JAMB_FOOT
-	var near: Vector2 = JunctionDoorLayout.NEAR_JAMB_FOOT
+	_expect(room.door_leaf.texture == JunctionRoom.BLAST_SLAB and room.door_column.texture == JunctionRoom.BLAST_FRONT and room.door_wall.texture == JunctionRoom.BLAST_WALL, "the blast door's pieces are its whole pieces")
+	_expect(order, "the doorway and the wall draw behind the mid plate, the leaves behind the actors; the front and its lamp in front")
+	var far: Vector2 = JunctionRoom.FAR_JAMB_FOOT
+	var near: Vector2 = JunctionRoom.NEAR_JAMB_FOOT
 	var crossing_x: float = far.x + (near.x - far.x) * (JunctionRoom.FLOOR_Y - far.y) / (near.y - far.y)
 	_expect(far.y < JunctionRoom.FLOOR_Y and near.y > JunctionRoom.FLOOR_Y and crossing_x > M0State.JUNCTION_DOOR_LEFT_X and crossing_x < M0State.JUNCTION_DOOR_LEFT_X + JunctionRoom.DOOR_WIDTH, "the doorway crosses the walk line inside the door body (x %.1f)" % crossing_x)
 	_expect(room.door_leaf.visible and not room.door_hole.visible and not room.door_leaf_down.visible, "the shut leaf stands in the doorway before the blast")
-	# The near column's foot: in the rows a body lying on the floor fills, its painting, sealed (COLUMN)
-	# or blown (COLBLOWN), spans DOOR_FOOT_X..DOOR_FOOT_RIGHT_X of the room, which Main._start_collapse
-	# keeps a lying body clear of; the stub's painting starts below the floor line, under no lying body.
+	# The front's foot: in the rows a body lying on the floor fills, its painting, sealed (BLAST_FRONT) or
+	# blown (BLAST_FRONT_BLOWN), spans DOOR_FOOT_X..DOOR_FOOT_RIGHT_X of the room, which
+	# Main._start_collapse keeps a lying body clear of (its stub across the deck lies below the floor line).
 	var lying_top: float = JunctionRoom.FLOOR_Y - MainScript.collapse_height(MainScript.COLLAPSE_ART.size() - 1)
-	var atlas_image: Image = texture_image(JunctionDoorLayout.ATLAS)
-	var sealed_foot: Vector2 = _painted_x_in_rows(atlas_image, JunctionDoorLayout.COLUMN_REGION, JunctionDoorLayout.COLUMN_AT, JunctionDoorLayout.COLUMN_SCALE, lying_top, JunctionRoom.FLOOR_Y)
-	var blown_foot: Vector2 = _painted_x_in_rows(atlas_image, JunctionDoorLayout.COLBLOWN_REGION, JunctionDoorLayout.COLBLOWN_AT, JunctionDoorLayout.COLBLOWN_SCALE, lying_top, JunctionRoom.FLOOR_Y)
-	var stub_foot: Vector2 = _painted_x_in_rows(atlas_image, JunctionDoorLayout.STUB_REGION, JunctionDoorLayout.STUB_AT, JunctionDoorLayout.STUB_SCALE, lying_top, JunctionRoom.FLOOR_Y)
-	_expect(is_equal_approx(minf(sealed_foot.x, blown_foot.x), JunctionRoom.DOOR_FOOT_X) and maxf(sealed_foot.y, blown_foot.y) <= JunctionRoom.DOOR_FOOT_RIGHT_X, "in the rows a lying body fills the near column's painting spans x %.1f..%.1f sealed and %.1f..%.1f blown, inside JunctionRoom's foot (%.1f..%.1f)" % [sealed_foot.x, sealed_foot.y, blown_foot.x, blown_foot.y, JunctionRoom.DOOR_FOOT_X, JunctionRoom.DOOR_FOOT_RIGHT_X])
-	_expect(stub_foot.x > stub_foot.y, "the stub's painting starts below the floor line, so it covers no lying body")
+	var spans: Array[Vector2] = []
+	for front: Texture2D in [JunctionRoom.BLAST_FRONT, JunctionRoom.BLAST_FRONT_BLOWN]:
+		spans.append(_painted_x_in_rows(texture_image(front), Rect2(Vector2.ZERO, front.get_size()), JunctionRoom.BLAST_FRONT_AT, DoorKit.PIECE_SCALE, lying_top, JunctionRoom.FLOOR_Y))
+	_expect(is_equal_approx(minf(spans[0].x, spans[1].x), JunctionRoom.DOOR_FOOT_X) and maxf(spans[0].y, spans[1].y) <= JunctionRoom.DOOR_FOOT_RIGHT_X, "in the rows a lying body fills the front's painting spans x %.1f..%.1f sealed and %.1f..%.1f blown, inside JunctionRoom's foot (%.1f..%.1f)" % [spans[0].x, spans[0].y, spans[1].x, spans[1].y, JunctionRoom.DOOR_FOOT_X, JunctionRoom.DOOR_FOOT_RIGHT_X])
 	var row: bool = true
 	for label: Label in room.station_labels:
 		row = row and is_equal_approx(label.position.y, JunctionRoom.LABEL_Y) and label.get_theme_font_size(&"font_size") == JunctionRoom.LABEL_FONT_SIZE
@@ -821,7 +818,7 @@ func _check_blast_facing_door(game: Node2D, room: JunctionRoom, human: M0Actor, 
 		return
 	var body: Rect2 = await _lying_body(human, 1.0, "facing the door %s" % label)
 	var foot_x: float = room.global_position.x + JunctionRoom.DOOR_FOOT_X
-	var hidden: int = _front_pixels_in(room.door_column, body) + _front_pixels_in(room.door_stub, body)
+	var hidden: int = _front_pixels_in(room.door_column, body)
 	_expect(body.end.x <= foot_x - MainScript.LANE_FALL_CLEAR + 0.01 and hidden == 0, "facing the door %s, the whole lying body is clear of the near column and the stub (head at %.1f, the column's foot at %.1f, %d px under them)" % [label, body.end.x, foot_x, hidden])
 	_expect(await retry(game, 240), "the knockdown facing the door %s hands back" % label)
 	_expect(await wait_until(func() -> bool: return not room.door_shape.disabled and room.door_leaf.visible and not room.door_blown, 5), "the door stands sealed again after that restore")
@@ -845,7 +842,7 @@ func _check_down_facing_blown_door(game: Node2D, room: JunctionRoom, human: M0Ac
 		return
 	var body: Rect2 = await _lying_body(human, -1.0, "facing the blown door %s" % label)
 	var right_x: float = room.global_position.x + JunctionRoom.DOOR_FOOT_RIGHT_X
-	var hidden: int = _front_pixels_in(room.door_column, body) + _front_pixels_in(room.door_stub, body)
+	var hidden: int = _front_pixels_in(room.door_column, body)
 	_expect(body.position.x >= right_x + MainScript.LANE_FALL_CLEAR - 0.01 and hidden == 0, "facing the blown door %s, the whole lying body is clear of the near column and the stub (head at %.1f, the column's foot ends at %.1f, %d px under them)" % [label, body.position.x, right_x, hidden])
 	_expect(await retry(game, 240), "the knockdown facing the blown door %s hands back" % label)
 	settings.reduced_motion_changed.emit(false)
