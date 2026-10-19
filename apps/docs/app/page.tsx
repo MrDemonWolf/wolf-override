@@ -2,7 +2,7 @@ import Link from 'next/link';
 import SiteHeader from './site-header';
 import SiteFooter from './site-footer';
 import Downloads, { ArrowIcon, getGameHref } from './downloads';
-import { card, inlineLink, landingWidth, sectionCopy, sectionTitle } from './landing-classes';
+import { card, inlineLink, landingRoot, landingWidth, sectionCopy, sectionTitle } from './landing-classes';
 import recordsCapture480 from './images/records-access-doors-capture-480.webp';
 import recordsCapture960 from './images/records-access-doors-capture-960.webp';
 import recordsCapture1600 from './images/records-access-doors-capture-1600.webp';
@@ -90,11 +90,7 @@ export default function HomePage() {
   return (
     // header, main and footer are siblings so assistive tech sees three top-level landmarks (banner, main, contentinfo).
     // data-landing keeps the root dark as well (see the end of global.css).
-    // overflow-clip, unlike overflow-hidden, makes no scroll container, so the sticky SiteHeader still sticks to the viewport.
-    // [html:has(&)]:scroll-pt-24 sets scroll-padding-top on the page's scroller (html) while the landing is shown: 6rem clears
-    // the sticky header (1rem offset + 4.75rem bar on wide screens, .5rem + about 4.2rem on phones), so #story, #gameplay and
-    // #downloads land with their headings below the bar, and keyboard focus scrolled into view is not hidden under it (WCAG 2.4.11).
-    <div data-landing="" className="flow-root overflow-clip bg-ink text-text scheme-dark [html:has(&)]:scroll-pt-24">
+    <div data-landing="" className={landingRoot}>
       <JsonLd data={homeStructuredData()} />
       <SiteHeader />
       <main id="landing-main">

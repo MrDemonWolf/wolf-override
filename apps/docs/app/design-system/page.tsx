@@ -4,7 +4,7 @@ import type { ReactNode } from 'react';
 import Link from 'next/link';
 import SiteHeader from '../site-header';
 import SiteFooter from '../site-footer';
-import { card, inlineLink, landingWidth, sectionAnchor, sectionCopy } from '../landing-classes';
+import { card, inlineLink, landingRoot, landingWidth, sectionCopy } from '../landing-classes';
 import recordsCapture from '../images/records-access-doors-capture.png';
 import recordsCapture480 from '../images/records-access-doors-capture-480.webp';
 import junctionCapture from '../images/service-junction-doors-capture.png';
@@ -119,7 +119,7 @@ const groundFor = (colourway: string) => (colourway === 'for-dark-bg' || colourw
 // section titles because this page is a reference sheet, read section by section.
 const kicker = 'hud-label mb-3';
 const sectionHeading = 'mb-4 text-title font-bold';
-const sectionBox = `${landingWidth} ${sectionAnchor} border-t border-t-line py-16 phone:py-12`;
+const sectionBox = `${landingWidth} border-t border-t-line py-16 phone:py-12`;
 const subHeading = 'mt-10 mb-3 font-heading text-[1.15rem] font-bold';
 const bulletList = 'flex list-disc flex-col gap-2 pl-5 leading-[1.6] text-muted marker:text-accent';
 
@@ -185,8 +185,8 @@ export default function DesignSystemPage() {
   const cyanOnWhite = contrastRatio(colours.find((colour) => colour.token === 'color-accent')!.hex, '#ffffff').toFixed(1);
   const logoCyanOnWhite = contrastRatio(logoLightCyan, '#ffffff').toFixed(1);
   return (
-    // data-landing keeps the root dark, as on the landing page (see the end of global.css).
-    <div data-landing="" className="flow-root overflow-clip bg-ink text-text scheme-dark">
+    // data-landing keeps the root dark, as on the landing page; landingRoot clears the sticky header for the section links.
+    <div data-landing="" className={landingRoot}>
       <SiteHeader linkBase="/" />
       <main id="design-system-main">
         <section className={`${landingWidth} pt-40 pb-16 phone:pt-36 phone:pb-12`} aria-labelledby="main-content">
