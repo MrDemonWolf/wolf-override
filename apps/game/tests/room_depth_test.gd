@@ -48,7 +48,8 @@ func _run() -> void:
 			for room_name: String in rooms:
 				_check_coverage("%s, %s, shake %d" % [room_name, framing[0], int(shake)], rooms[room_name], view)
 	camera.offset = Vector2.ZERO
-	await _check_exit_view_edge(junction, camera, half_play, touch_y)
+	# The junction's view stops at the room's edge, like the others' (the right-end framings above).
+	_expect(JunctionRoom.EXIT_VIEW_RIGHT == RoomDepth.ROOM_WIDTH, "the junction's view stops at the room's edge, where the plates and their bleeds cover it")
 	# Every station stands on the floor, as tall as the art it replaced.
 	var floor_props: Dictionary = {
 		"purge display": game.get_node("PurgeTerminalArt"),
@@ -74,10 +75,11 @@ func _run() -> void:
 	# The Records stations' named sizes are their pieces' own (their half widths are read from them).
 	for station: Array in [[records.get_node("PurgeArt"), RecordsRoom.PURGE_SIZE, "PURGE QUEUE"], [records.get_node("MirrorArt"), RecordsRoom.MIRROR_SIZE, "MIRROR PORT"]]:
 		_expect(RoomDepth.prop_region(station[0]).size == station[1], "the %s's named size is its piece's (%s)" % [station[2], RoomDepth.prop_region(station[0]).size])
-	var door: Sprite2D = game.get_node("Door/Visual/DoorArt") as Sprite2D
-	# The corridor's curtain stands across the corridor in the cross-wall's turned face: it crosses the
-	# walk line (y 440) at the collision face, and its art ends at its near-jamb corner, in front of it.
-	_expect(absf(door.get_global_transform().origin.y + door.region_rect.size.y * door.scale.y * 0.5 - float(game.get("CORRIDOR_SEAL_FOOT_Y"))) < 0.5, "the corridor seal's curtain ends at its near-jamb foot")
+	# The corridor's curtain stands across the corridor in the cross-wall's turned face, drawn shut at rest
+	# over the whole painted curtain (its art's u from the near guide to the far one), and it crosses the
+	# walk line (y 440) at the collision face.
+	var curtain: SealLeaf = game.get("seal_leaf") as SealLeaf
+	_expect(curtain.visible and curtain.open == 0.0 and SealLeaf.column_u(0) > 0.99 and SealLeaf.column_u(SealLeaf.COLUMNS.size() - 1) < 0.01, "the corridor seal's curtain is drawn shut across its whole art")
 	var foot_a: Vector3 = SealLeaf.COLUMNS[4]
 	var foot_b: Vector3 = SealLeaf.COLUMNS[5]
 	var crossing_x: float = foot_a.x + (foot_b.x - foot_a.x) * (440.0 - foot_a.y) / (foot_b.y - foot_a.y)
@@ -88,7 +90,7 @@ func _run() -> void:
 	_check_junction_entry(junction)
 	# The junction's shut leaf ends on the doorway's near jamb foot, on the deck in front of the walk line.
 	var leaf: Sprite2D = junction.door_leaf
-	_expect(absf(leaf.position.y + leaf.region_rect.size.y * leaf.scale.y - JunctionDoorLayout.NEAR_JAMB_FOOT.y) < 1.0, "the junction door's leaf stands on the deck at its near jamb")
+	_expect(absf(leaf.position.y + leaf.region_rect.size.y * leaf.scale.y - JunctionRoom.NEAR_JAMB_FOOT.y) < 1.0, "the junction door's leaf stands on the deck at its near jamb")
 	var vent: Rect2 = _global_rect(junction.vent_art)
 	_expect(absf(vent.position.x - PressureLine.VENT_GRATE_MIN_X) < 0.01 and absf(vent.end.x - PressureLine.VENT_GRATE_MAX_X) < 0.01, "the relief vent art spans exactly the grate's hurtbox (%s)" % vent)
 	var tank: Rect2 = _global_rect(junction.tank)
@@ -116,14 +118,16 @@ func _check_plates(room_name: String, depth: RoomDepth) -> void:
 	var far: Rect2 = depth.far_rect()
 	for index: int in depth.lamps.size():
 		var lamp_y: float = far.position.y + depth.lamps[index].y * far.size.y
-		_expect(lamp_y >= 168.0, "%s: ceiling lamp %d (y %.0f) is inside the play view" % [room_name, index, lamp_y])
+		# The approved plates (art swap PR 3) hang the ceiling lamps over the play view's top (y 160 at the
+		# keyboard framing), as the art set's phone frames show them: they stay on the far plate.
+		_expect(lamp_y > far.position.y and lamp_y < far.end.y, "%s: ceiling lamp %d (y %.0f) is on the far plate" % [room_name, index, lamp_y])
 
 
 ## The far plate fills the view, the mid plate (with its bleeds) reaches both sides and the bottom
 ## of it, and the near strips' outer edges stay outside it. The bottom matters where the floor is
 ## painted on the mid plate (the junction): past its end the far plate's wall would show instead.
 func _check_coverage(label: String, depth: RoomDepth, view: Rect2) -> void:
-	var far: Rect2 = _global_rect(depth.backdrop)
+	var far: Rect2 = _global_rect(depth.backdrop).merge(_global_rect(depth.backdrop_layer.get_node("BottomBleed") as Sprite2D))
 	_expect(far.encloses(view), "%s: the far plate fills the view (%s vs %s)" % [label, far, view])
 	var mid_span: Rect2 = _global_rect(depth.mid_layer.get_node("Painting") as Sprite2D)
 	mid_span = mid_span.merge(_global_rect(depth.mid_layer.get_node("LeftBleed") as Sprite2D)).merge(_global_rect(depth.mid_layer.get_node("RightBleed") as Sprite2D))
@@ -277,63 +281,20 @@ func _view_at(camera: Camera2D, at: Vector2, shake: float) -> Rect2:
 	return Rect2(camera.get_screen_center_position() - half, half * 2.0)
 
 
-## The junction's play view runs on past the room's end to JunctionRoom.EXIT_VIEW_RIGHT. Past the mid
-## plate's right bleed only the exit's own pieces stand between the camera and the far plate, so at the
-## right end (keyboard and touch framing, shaken both ways) they cover that strip down to the view's
-## bottom: the deck's bleed carries it below the deck's end, which the touch framing shows, and the
-## mirrored edge strips carry the passage and the deck past their end, which a shake shows.
-func _check_exit_view_edge(junction: JunctionRoom, camera: Camera2D, half_play: float, touch_y: float) -> void:
-	var mid_span: Rect2 = _global_rect(junction.depth.mid_layer.get_node("RightBleed") as Sprite2D)
-	var cover: Array[Rect2] = []
-	for piece: Sprite2D in [junction.exit_beyond, junction.exit_front, junction.exit_deck, junction.exit_deck_bleed]:
-		cover.append(_global_rect(piece))
-	for strip_name: String in ["ExitBeyondEdgeBleed", "ExitDeckEdgeBleed", "ExitDeckBleedEdgeBleed"]:
-		var strip: Sprite2D = junction.get_node(strip_name) as Sprite2D
-		_expect(strip.flip_h and strip.texture == JunctionRoom.EXIT_ATLAS, "the exit's %s mirrors its piece's last columns" % strip_name)
-		cover.append(_global_rect(strip))
-	_expect(junction.exit_deck_bleed.flip_v and absf(_global_rect(junction.exit_deck).end.y - _global_rect(junction.exit_deck_bleed).position.y - JunctionRoom.EXIT_SEAM_TRIM * JunctionRoom.EXIT_ATLAS_SCALE) < 0.01, "the exit deck's bleed mirrors its bottom rows on from the deck's end, overlapping its edge row")
-	camera.zoom = Vector2.ONE * 1.35
-	for camera_y: float in [360.0, touch_y]:
-		for shake: float in [-SHAKE, SHAKE]:
-			var view: Rect2 = await _view_at(camera, Vector2(JunctionRoom.EXIT_VIEW_RIGHT - half_play, camera_y), shake)
-			var gaps: int = 0
-			var first_gap: Vector2 = Vector2.ZERO
-			var x: float = mid_span.end.x
-			while x <= view.end.x:
-				var y: float = view.position.y
-				while y <= view.end.y:
-					if not cover.any(func(rect: Rect2) -> bool: return rect.has_point(Vector2(x, y))):
-						if gaps == 0:
-							first_gap = Vector2(x, y)
-						gaps += 1
-					y += 2.0
-				x += 2.0
-			_expect(gaps == 0, "junction, %s play right end, shake %d: the exit's pieces cover the view past the mid plate (first gap at %s)" % ["touch" if camera_y == touch_y else "keyboard", int(shake), first_gap])
-	camera.offset = Vector2.ZERO
-
-
-## The junction's exit door: its pieces come from one atlas and draw in depth order (the passage, the
-## leaf and the wall behind the walk line under the actors, the wall in front of it and the deck over
-## them); its leaf stands on the sill shut and slides back along the wall into the pocket in the far
+## The junction's exit door: behind the mid plate its passage, the sliding leaf and the wall's face draw in
+## that order; its leaf stands on the sill shut and slides back along the wall into the pocket in the far
 ## jamb, never fading, and the near jamb stands where the walk line meets the wall.
 func _check_exit_door(junction: JunctionRoom) -> void:
-	var pieces: Array[Sprite2D] = [junction.exit_beyond, junction.exit_leaf, junction.exit_back, junction.exit_lens, junction.exit_front]
-	_expect(pieces.all(func(piece: Sprite2D) -> bool: return piece != null and piece.texture == JunctionRoom.EXIT_ATLAS), "the exit door's pieces all come from its one atlas")
-	var order: Array[int] = []
-	for piece: Sprite2D in pieces:
-		order.append(piece.get_index())
-	_expect(order[0] < order[1] and order[1] < order[2] and order[2] < order[3] and order[3] < order[4], "the passage, leaf, wall and lamp draw in that order, the front wall after them")
-	_expect(junction.exit_back.z_index < 0 and junction.exit_leaf.z_index < 0 and junction.exit_front.z_index == JunctionRoom.DOOR_FRONT_Z and junction.exit_deck.z_index == JunctionRoom.DOOR_FRONT_Z, "only the wall in front of the walk line and the deck draw over the actors")
-	var saved: float = junction.hatch_open
-	junction.hatch_open = 0.0
-	var shut: Vector2 = junction.exit_leaf.position
-	junction.hatch_open = 0.5
-	var half: Vector2 = junction.exit_leaf.position
-	junction.hatch_open = 1.0
-	var open: Vector2 = junction.exit_leaf.position
+	var behind: Node2D = junction.depth.behind
+	_expect(junction.exit_leaf.get_parent() == behind and junction.exit_wall.get_parent() == behind and behind.get_node("ExitBack").get_index() < junction.exit_leaf.get_index() and junction.exit_leaf.get_index() < junction.exit_wall.get_index(), "the passage, the leaf and the wall's face draw in that order, behind the mid plate")
+	var shut: Vector3 = JunctionRoom.exit_leaf_anchor(0.0)
+	var half: Vector3 = JunctionRoom.exit_leaf_anchor(0.5)
+	var open: Vector3 = JunctionRoom.exit_leaf_anchor(1.0)
 	# (In the junction's own camera since review r1: vanishing point (511, 162).)
 	_expect(absf(shut.x - 983.2) < 0.5 and absf(shut.y - 442.9) < 0.5, "shut, the leaf's leading edge stands on the sill inside the near jamb (%s)" % shut)
-	_expect(open.x < half.x and half.x < shut.x and open.y < shut.y and absf(open.x - 935.2) < 0.5, "opening, the leaf slides back along the wall into the far jamb's pocket (%s)" % open)
-	_expect(junction.exit_leaf.visible and junction.exit_leaf.modulate.a == 1.0 and junction.exit_leaf.scale.x < JunctionRoom.EXIT_ATLAS_SCALE, "the open leaf is still there, in the pocket and a little smaller with distance")
+	_expect(open.x < half.x and half.x < shut.x and open.y < shut.y and absf(open.x - 935.2) < 0.5 and open.z < 1.0, "opening, the leaf slides back along the wall into the far jamb's pocket, smaller with distance (%s)" % open)
+	var saved: float = junction.hatch_open
+	junction.hatch_open = 1.0
+	_expect(junction.exit_leaf.visible and junction.exit_leaf.modulate.a == 1.0, "the open leaf is still there, in the pocket")
 	junction.hatch_open = saved
 	_expect(JunctionRoom.EXIT_NEAR_JAMB_X > JunctionRoom.EXIT_DOOR_X and JunctionRoom.HUMAN_GONE_X - M0Actor.HUMAN_REACH > JunctionRoom.EXIT_NEAR_JAMB_X and JunctionRoom.WOLF_GONE_X - M0Actor.WOLF_REACH > JunctionRoom.EXIT_NEAR_JAMB_X, "walking out, each stops only once all of them is behind the near jamb")

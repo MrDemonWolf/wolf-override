@@ -5,9 +5,11 @@ extends "res://tests/support/game_suite.gd"
 ## hand on the wheel are checked in play by m0_scene_test.) Spawn, teardown and failure reporting come
 ## from the shared suite kit (tests/support/game_suite.gd).
 
-## Main's (76d3a50) corridor beacon anchors, read headless from main: CorridorDepth/Backdrop/Beacon0
-## and Beacon1 (and their WarningGlow sprites) at load.
-const MAIN_BEACONS: PackedVector2Array = [Vector2(327.36, 224.3), Vector2(632.64, 224.3)]
+## The corridor's beacon anchors (CorridorDepth/Backdrop/Beacon0 and Beacon1 and their WarningGlow
+## sprites at load): main's (76d3a50) anchors at the far plate's fractions (0.341 and 0.659 across, 0.27
+## down), on the whole-piece far plate drawn at world (0, 0) since art swap PR 3 (it shares the play
+## plate's frame; the earlier plate hung 78.5 px lower, its anchors at y 224.3).
+const MAIN_BEACONS: PackedVector2Array = [Vector2(327.36, 145.8), Vector2(632.64, 145.8)]
 ## Main's drawn beacon housing, relative to its anchor (RoomDepth.Beacon's fallback drawing).
 const MAIN_HOUSING: Rect2 = Rect2(-7.0, -4.0, 14.0, 9.0)
 ## The cross-wall's clear opening along its face (metres from the walk line, design spec round 7):
@@ -67,18 +69,20 @@ func _check_beacons(game: Node2D) -> void:
 
 
 ## The inner blast leaf behind the roller, from BlastLeaf's own geometry (lead_at, project, in metres
-## on the wall face and world px) and the live [param game]'s leaf: hidden at rest and drawn right
-## before the roller from the same atlas (so they batch); shut, it spans the opening from the near
-## jamb; it waits for the roller to be 40 % up and only moves toward its pocket; open, it is wholly in
-## the pocket with its foot behind the walk line; its edge thickness and contact shadow fit inside the
-## 0.66 m wall, and the shadow's atlas patch is solid black. Reports through _expect.
+## on the wall face and world px) and the live [param game]'s leaf: hidden at rest and drawn inside the
+## wall, behind the cross-wall's face (both in the room's layer behind the mid plate, the leaf first);
+## shut, it spans the opening from the near jamb; it waits for the roller to be 40 % up and only moves
+## toward its pocket; open, it is wholly in the pocket with its foot behind the walk line; its edge
+## thickness and contact shadow fit inside the 0.66 m wall, and the shadow is black. Reports through
+## _expect.
 func _check_blast_leaf(game: Node2D) -> void:
 	var leaf: BlastLeaf = game.get("blast_leaf") as BlastLeaf
 	var seal_leaf: SealLeaf = game.get("seal_leaf") as SealLeaf
 	if not _expect(leaf != null and seal_leaf != null, "the corridor door has its inner blast leaf"):
 		return
 	_expect(not leaf.visible, "the inner blast leaf draws only while the seal moves")
-	_expect(leaf.get_parent() == seal_leaf.get_parent() and leaf.get_index() == seal_leaf.get_index() - 1 and leaf.texture == seal_leaf.get("texture"), "the inner blast leaf draws right before the roller, from the same atlas, so they batch")
+	var wall: Sprite2D = game.get("seal_wall") as Sprite2D
+	_expect(leaf.get_parent() == wall.get_parent() and leaf.get_index() < wall.get_index() and leaf.get_parent() == (game.get_node("CorridorDepth") as RoomDepth).behind, "the inner blast leaf draws inside the wall, behind the cross-wall's face")
 	# Shut: the leaf's leading edge is in the near jamb's receiver, so the leaf spans the whole opening.
 	_expect(BlastLeaf.lead_at(0.0) < JAMB_NEAR_A and BlastLeaf.lead_at(0.0) + LEAF_LENGTH_M > BlastLeaf.A_MOUTH, "shut, the inner leaf spans the whole opening (lead %.3f m, near jamb %.3f m)" % [BlastLeaf.lead_at(0.0), JAMB_NEAR_A])
 	# It waits for the roller, then only ever moves toward its pocket.
@@ -100,15 +104,8 @@ func _check_blast_leaf(game: Node2D) -> void:
 	_expect(deepest_foot_y < RoomDepth.FLOOR_Y - 8.0, "open, the inner leaf's footprint is wholly behind the walk line (lowest foot at world y %.1f, the walk line at %.0f)" % [deepest_foot_y, RoomDepth.FLOOR_Y])
 	# Round 8: it reads heavier than the roller: a 0.30-0.45 m leading edge, and a feathered contact
 	# shadow on the threshold, in the wall's thickness (in front of the leaf's foot, behind the face),
-	# from a solid black patch of the same atlas (so it still batches).
+	# in SHADOW_COLOR.
 	_expect(BlastLeaf.T_LB - BlastLeaf.T_LF >= 0.30 and BlastLeaf.T_LB - BlastLeaf.T_LF <= 0.45 and BlastLeaf.T_LB < 0.66, "the inner leaf's leading edge is %.2f m thick, inside the 0.66 m wall" % (BlastLeaf.T_LB - BlastLeaf.T_LF))
 	var shadow_t: float = BlastLeaf.T_LF - BlastLeaf.SHADOW_DEPTH_M
 	_expect(shadow_t > 0.0 and BlastLeaf.SHADOW_ALPHA > 0.0 and BlastLeaf.SHADOW_ALPHA < 1.0, "the leaf's contact shadow lies on the threshold inside the wall (t %.2f..%.2f m), feathered from alpha %.2f to 0" % [shadow_t, BlastLeaf.T_LF, BlastLeaf.SHADOW_ALPHA])
-	var atlas_img: Image = texture_image(leaf.texture)
-	var black: bool = true
-	for y: int in range(int(BlastLeaf.SHADOW_REGION.position.y), int(BlastLeaf.SHADOW_REGION.end.y)):
-		for x: int in range(int(BlastLeaf.SHADOW_REGION.position.x), int(BlastLeaf.SHADOW_REGION.end.x)):
-			var c: Color = atlas_img.get_pixel(x, y)
-			if c.a < 0.99 or maxf(c.r, maxf(c.g, c.b)) > 0.01:
-				black = false
-	_expect(black, "the contact shadow's atlas patch is solid black")
+	_expect(BlastLeaf.SHADOW_COLOR == Color.BLACK, "the contact shadow is black")

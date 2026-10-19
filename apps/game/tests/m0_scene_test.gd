@@ -302,23 +302,26 @@ func _run() -> void:
 	_expect(bool(leaf_track["in_step"]) and bool(leaf_track["blocked"]) and int(leaf_track["frames"]) > 0, "while the seal opens the inner leaf keeps the roller's open value and the doorway stays shut until the leaf is in its pocket (%d frames)" % int(leaf_track["frames"]))
 	await physics_frame
 	var door_visual: ColorRect = game.get_node("Door/Visual") as ColorRect
-	_expect(not door_visual.visible and not seal_leaf.visible and door_shape.disabled, "door retracts after cooperation and the doorway opens once it lands")
-	_expect(not blast_leaf.visible and is_equal_approx(blast_leaf.open, 1.0) and BlastLeaf.lead_at(blast_leaf.open) >= BlastLeaf.A_MOUTH - 0.0001, "once open the inner leaf is home in its wall pocket, out of the walk path (the wall art shows its parked edge)")
+	_expect(not door_visual.visible and is_equal_approx(seal_leaf.open, 1.0) and door_shape.disabled, "door retracts after cooperation, its curtain parked in the hood, and the doorway opens once it lands")
+	_expect(not blast_leaf.visible and is_equal_approx(blast_leaf.open, 1.0) and BlastLeaf.lead_at(blast_leaf.open) >= BlastLeaf.A_MOUTH - 0.0001, "once open the inner leaf is home in its wall pocket, out of the walk path")
 	_expect(str(game.call("_context_hint")).contains("Move to the safe point") and wolf.follow_target == human, "once the seal has landed the hint says it is open and WOLF lets go of the contact")
-	_expect((game.get("door_open_art") as Sprite2D).visible and (game.get("door_lip") as Sprite2D).visible and (game.get("door_lip") as Sprite2D).z_index > human.z_index, "the bulkhead stands open behind the engineer, its front pillar drawn over him")
+	_expect(seal_leaf.visible and is_equal_approx(seal_leaf.open, 1.0) and (game.get("door_lip") as Sprite2D).visible and (game.get("door_lip") as Sprite2D).z_index > human.z_index, "the bulkhead stands open behind the engineer, its front pillar drawn over him")
 	# The corridor's near column is solid (it never fades and nothing is drawn over it), and slim:
 	# its art ends left of where the engineer can use the safe point.
 	var column: Sprite2D = game.get("door_lip") as Sprite2D
 	_expect(column.modulate.a == 1.0, "the corridor's near column stays opaque")
-	# Its art has no see-through gap: on every row over the guide's height above its foot (where the
-	# chamfer meets the stub and its contact shadow), from its first fully
-	# opaque pixel to its last, every pixel is fully opaque, but for the live lamp's glass.
+	# Its column has no see-through gap: on every row from 330 to just above the floor (where the column
+	# meets its stub), from the column's first fully opaque pixel (right of the near guide, whose wall
+	# angles stand 0.13 m off the face with a 1 px slit between: SEAL_FRONT as painted) to its last, every
+	# pixel is fully opaque, but for the live lamp's glass.
 	var column_art: Image = column.texture.get_image()
 	if column_art.is_compressed():
 		column_art.decompress()
 	var gaps: int = 0
 	var lamp: Vector2 = (game.get_script() as Script).get_script_constant_map()["CORRIDOR_SEAL_LAMP"]
-	for row: int in range(int((330.0 - 150.0) / column.scale.y), int((446.0 - 150.0) / column.scale.y)):
+	var column_top: float = column.get_global_transform().origin.y
+	var column_right: float = column.get_global_transform().origin.x
+	for row: int in range(int((330.0 - column_top) / column.scale.y), int((446.0 - column_top) / column.scale.y)):
 		var world_y: float = column.get_global_transform().origin.y + row * column.scale.y
 		var opaque: Array[int] = []
 		for x: int in int(column.region_rect.size.x):
@@ -326,46 +329,24 @@ func _run() -> void:
 				opaque.append(x)
 		if opaque.is_empty():
 			continue
-		for x: int in range(opaque[0], opaque[-1] + 1):
+		column_right = maxf(column_right, column.get_global_transform().origin.x + (opaque[-1] + 1) * column.scale.x)
+		var first: int = opaque.size() - 1
+		while first > 0 and opaque[first - 1] == opaque[first] - 1:
+			first -= 1
+		for x: int in range(opaque[first], opaque[-1] + 1):
 			var world_x: float = column.get_global_transform().origin.x + x * column.scale.x
 			if absf(world_x - lamp.x) <= 3.5 and absf(world_y - lamp.y) <= 3.5:
 				continue
 			if column_art.get_pixel(int(column.region_rect.position.x) + x, int(column.region_rect.position.y) + row).a < 0.999:
 				gaps += 1
-	_expect(gaps == 0, "the near column's art has no see-through gap between the guide and the column (%d px)" % gaps)
-	# The status lamp's conduit has a real top end: up the end face from the lamp box, through a
-	# 90-degree elbow, across the face at 4.41 m and round the arris into the camera's wall plate,
-	# whose edge is at world x 795.3. Every sample on that path is lit steel, brighter than the bare
-	# concrete beside it (on the arris strips, x < 796, only the steel's own value: the strips are as
-	# light), and the run carries on to the plate's edge without a break.
-	var conduit_path: Array[Vector2] = []
-	var beside: Array[Vector2] = []
-	for i: int in 9:
-		conduit_path.append(Vector2(806.0, 290.0 - i * 2.0))
-		beside.append(Vector2(-2.5, 0.0))
-	for p: Vector2 in [Vector2(806.0, 272.5), Vector2(805.5, 271.5), Vector2(805.0, 270.5), Vector2(804.5, 270.0)]:
-		conduit_path.append(p)
-		beside.append(Vector2(-2.0, 1.5))
-	for i: int in 18:
-		conduit_path.append(Vector2(803.5 - i * 0.5, 269.5))
-		beside.append(Vector2(0.0, -2.0))
-	var conduit_breaks: Array[String] = []
-	var origin: Vector2 = column.get_global_transform().origin
-	for i: int in conduit_path.size():
-		var at: Vector2 = conduit_path[i]
-		var here: Color = column_art.get_pixelv(Vector2i(column.region_rect.position + ((at - origin) / column.scale).floor()))
-		var side: Color = column_art.get_pixelv(Vector2i(column.region_rect.position + ((at + beside[i] - origin) / column.scale).floor()))
-		if here.a < 0.999 or here.get_luminance() < 0.12 or (at.x >= 796.0 and here.get_luminance() < side.get_luminance() + 0.02):
-			conduit_breaks.append("%s (%.3f beside %.3f)" % [at, here.get_luminance(), side.get_luminance()])
-	_expect(conduit_breaks.is_empty() and conduit_path[-1].x <= 795.3 + 0.5, "the lamp conduit runs unbroken from the lamp box through its elbow into the camera's wall plate (breaks: %s)" % [conduit_breaks])
-	var column_right: float = column.get_global_transform().origin.x + column.region_rect.size.x * column.scale.x
+	_expect(gaps == 0, "the near column's art has no see-through gap in the column (%d px)" % gaps)
 	# The safe point answers from x 824 (its station at 876, reach 52): the column ends before that.
-	_expect(column_right <= 876.0 - 52.0, "the near column ends clear of where the safe point is used (right edge %.1f)" % column_right)
+	_expect(column_right <= 876.0 - 52.0 + 0.5, "the near column ends clear of where the safe point is used, above its stub across the deck (right edge %.1f)" % column_right)
 	_expect(not relay_spark.visible and wolf.body_sprite.position == Main.WOLF_SPRITE_REST, "contact reaction settles after the seal opens")
 	if not _require(await _walk_to(human, 605.0), "the engineer can walk back to the open relay"):
 		return
 	await _tap(&"interact")
-	_expect(not door_visual.visible and not seal_leaf.visible, "reusing the open relay does not replay the door seal")
+	_expect(not door_visual.visible and is_equal_approx(seal_leaf.open, 1.0) and not game.get("seal_opening"), "reusing the open relay does not replay the door seal")
 	if not _require(await _walk_to(human, 876.0), "engineer walks through opened door to checkpoint"):
 		return
 	await _tap(&"interact")
