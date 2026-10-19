@@ -360,8 +360,10 @@ func _build_menu() -> void:
 	$Title.size.x = 690
 	$BackButton.position = Vector2(32, 414)
 	$BackButton.size = Vector2(180, 38)
+	# Two rows of the 15 px note (about 38 px) fit above BACK at y 414, so a translated note that wraps
+	# is not cut (localization PR L8).
 	note.position = Vector2(40, 372)
-	note.size = Vector2(680, 34)
+	note.size = Vector2(680, 40)
 	note.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	# The note is often filled in (an action's name, the Display note's two sentences), so show_note
 	# translates it and the Label must not translate it again.
@@ -461,10 +463,14 @@ func _notification(what: int) -> void:
 		_show_translated_note()
 
 
+## A page laid out as a column of rows (AUDIO's four volume rows): 680 px wide from (40, 138), as tall
+## as those four 48 px rows and their three 12 px gaps (228 px), so the column fits the rect it is
+## given and the overflow check (I18n.overflows) judges it by a true size; it ends at y 366, above the
+## note at 372.
 func _page_box() -> VBoxContainer:
 	var box: VBoxContainer = VBoxContainer.new()
 	box.position = Vector2(40, 138)
-	box.size = Vector2(680, 220)
+	box.size = Vector2(680, 228)
 	box.add_theme_constant_override("separation", 12)
 	add_child(box)
 	return box
@@ -810,7 +816,11 @@ func _refresh_bindings() -> void:
 		for kind: String in ["keyboard", "controller"]:
 			var button: Button = binding_buttons["%s_%s" % [action, kind]]
 			button.text = binding_label(action, kind)
-			button.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
+			# A long pair of bindings ("D-pad right / Left stick +", 212 px in English on a 206 px button)
+			# breaks onto a second row instead of being cut to "…" (localization PR L8): the row grows and
+			# the CONTROLS page scrolls.
+			button.text_overrun_behavior = TextServer.OVERRUN_NO_TRIMMING
+			button.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 			button.tooltip_text = button.text
 
 
