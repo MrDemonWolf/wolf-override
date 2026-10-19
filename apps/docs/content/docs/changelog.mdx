@@ -74,6 +74,7 @@ Changes merged after 0.15.0. They become the next version when it is cut.
 ### Accessibility
 
 - With **Reduce Motion** on, the dock bay's red beacon and the corridor's lockdown light through its doorway hold steady, the torn lock hangs still and the pad's standby light does not breathe. Switching it mid-game applies at once.
+- In Spanish each dialogue box stays up a little longer: it is timed at 17 characters a second, the subtitle speed for Spanish, instead of English's 20.
 
 ### Settings
 
@@ -171,6 +172,10 @@ Changes merged after 0.15.0. They become the next version when it is cut.
 - The in-game changelog stays in English; in another language it opens with one translated line that says so.
 - Both Spanish files translate the 145 story lines, written by Claude and back-translated by Codex, so an offered language again covers the whole template; WOLF's touch line at the mirror names the answer button in Spanish.
 - The manual-port line's touch form is marked on its own line, so it no longer carries the key mark of the form with a key.
+- Dialogue boxes follow each language's rules from the language table: its reading speed, its row limit, and for Chinese, Japanese and Korean two even rows and a box length in characters. English boxes are unchanged.
+- Boxes break after the Chinese and Japanese full stops and commas and after an ellipsis, and never inside a quotation in any of the table's languages, whatever its quotation marks.
+- One shared rule decides whether a box fits, used by the game and by `text_boxes_test`, which now checks every language at every **TEXT SIZE**.
+- Station names break between words with the same text rules, so a name written without spaces can break too.
 
 ### How it was checked
 
@@ -188,6 +193,7 @@ Changes merged after 0.15.0. They become the next version when it is cut.
 - **Menus marked for translation checked:** headless test suites (29), a switch to a test Spanish catalog and back, the English menus' text and stills compared with the previous version (unchanged apart from the changelog's own new lines), rendered title, Pause and Settings stills in pseudo-English (keyboard and touch) and with a French AZERTY layout; not played by hand.
 - **Spanish checked:** the translation checks with Codex's back-translation, headless test suites and rendered Spanish stills (keyboard and touch, 1280x720); not reviewed by a native speaker, not played by hand.
 - **Story marked for translation checked:** headless test suites (29), a switch to a test Spanish catalog and back, an old save's answer quoted in pseudo-English, every story constant's English compared with the previous version (unchanged), and four routes' stills (424, keyboard and touch) byte for byte the same as before; rendered pseudo-English stills of the routes; not played by hand.
+- **Dialogue boxes per language checked:** headless test suites, every English box, reading time and station name at every **TEXT SIZE** compared with the previous version (unchanged), and rendered stills of a Japanese sample box; not played by hand.
 - **Spanish story checked:** the translation checks with Codex's back-translation of the 145 new lines and one changed line in both files, and the headless test suites; not reviewed by a native speaker, not played by hand.
 
 ## 0.15.0 - October 16, 2026
