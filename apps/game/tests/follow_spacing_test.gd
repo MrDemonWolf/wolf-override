@@ -111,12 +111,15 @@ func _run() -> void:
 		_expect(wolf.position.x + M0Actor.WOLF_REACH - M0Actor.AVOID_TOLERANCE <= span.x + 2.5 or wolf.position.x - M0Actor.WOLF_REACH + M0Actor.AVOID_TOLERANCE >= span.y - 2.5 or absf(rest_x - human.position.x - M0Actor.FOLLOW_GAP) < 0.5, "resting there WOLF stands clear of the machine at %.0f..%.0f" % [span.x, span.y])
 	_expect(await wait_until(func() -> bool: return wolf.body_sprite.self_modulate.is_equal_approx(Color.WHITE), 120), "WOLF's dim clears once he is past")
 
-	# At the left wall there is no room behind a right-facing engineer, so WOLF stays in front.
-	_expect(await walk_to(human, 48.0), "the engineer walks to the corridor's left wall")
+	# At the left wall there is no room behind a right-facing engineer, so WOLF stays in front. (Layout
+	# L1, Nathanial 2026-10-14: the corridor's left end is the opening into the dock bay, so the nearest
+	# left wall is the bay's end wall.)
+	_expect(await walk_to(human, DockBay.HUMAN_MIN_X + 8.0), "the engineer walks to the dock bay's end wall")
 	await press_for(&"move_right", 3)
 	await _settle()
 	_expect(M0Actor.facing_of(human) == 1 and wolf.follow_side == 1, "at the wall WOLF keeps to the open side")
-	_expect_clear(human, wolf, "corridor at the left wall")
+	_expect_clear(human, wolf, "dock bay at its end wall")
+	_expect(await walk_to(human, 48.0), "the engineer walks back into the corridor")
 
 	# Against the shut seal there is no room ahead of a left-facing engineer, so WOLF stays behind.
 	await press_for(&"move_right", 300)

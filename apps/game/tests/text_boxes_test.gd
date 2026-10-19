@@ -596,8 +596,13 @@ func _check_station_names() -> void:
 				# start: a little faded at 100%, faded out at larger sizes (it grows to the right, clear of the
 				# relay's names). Standing beside the relay, where WOLF points to the bypass when he refuses,
 				# the engineer sees it in full.
+				# Layout L1 (decided 2026-10-14): first control's view starts at x -40 so the opening into the
+				# dock bay shows, which can carry the plate to the view's right edge, where it is faded out.
 				if index == 0:
-					_expect(game.bypass_handle.bypass_label.modulate.a > 0.5, "100%%: MANUAL BYPASS shows at the corridor's start (alpha %.2f)" % game.bypass_handle.bypass_label.modulate.a)
+					var plate: Label = game.bypass_handle.bypass_label
+					var view: Rect2 = game.get_viewport().get_canvas_transform().affine_inverse() * game.get_viewport().get_visible_rect()
+					var at_edge: bool = plate.get_global_rect().end.x > view.end.x - JunctionRoom.LABEL_EDGE_FADE
+					_expect(plate.modulate.a > 0.5 or at_edge, "100%%: MANUAL BYPASS shows at the corridor's start, or waits faded at the view's right edge (alpha %.2f)" % plate.modulate.a)
 				# The camera eases after the engineer in time, not frames: once it has its new target it is
 				# snapped there, so the check does not depend on how fast the frames run.
 				game.debug_place(Main.RELAY_SIDE_X, Main.RELAY_SIDE_X - 120.0)
