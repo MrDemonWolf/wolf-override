@@ -131,7 +131,7 @@ const ENTRY_DOOR_LIGHT: Vector2 = Vector2(48.76, 339.61)
 ## The entry leaf's fill (fix round 4, review r4 M1; see RecordsRoom.EXIT_LEAF_FILL).
 const ENTRY_LEAF_FILL: float = 0.0880
 ## Where the shut leaf's junction face crosses the walk line: the door's collision face. Left of WOLF's
-## tail at his spot by the entrance (WOLF_CLEAR_X - M0Actor.WOLF_REACH, x 33).
+## tail at his spot by the entrance (WOLF_CLEAR_X - M0Actor.WOLF_REACH, x 72.9).
 const ENTRY_DOOR_X: float = 30.0
 ## The guarded status lamp on the near column's end face, world px: the centre of its live glass
 ## (jedesign.py's status_lamp_screen, in junction-entry/design/entry/spec.json).
@@ -338,9 +338,10 @@ const EXIT_WALK_MAX_X: float = 1100.0
 ## WOLF in the open doorway, looking back at the engineer: his head, shoulders and forelegs in view on
 ## the threshold, his hindquarters already past the near jamb and hidden by it. Fix round 2 (review r2,
 ## human pass): at x 985 his rear stood out past the near column (x 971.5..1000 at his height) in the
-## stub's cutaway, against the passage, so the jamb cut him in half; here his tail tip (x 934 + 64 with
-## the art mirrored) stays behind the column's edge at x 1000.
-const WOLF_DOORWAY_X: float = 934.0
+## stub's cutaway, against the passage, so the jamb cut him in half; here his painted tail tip
+## (M0Actor.WOLF_TAIL, the art mirrored) stays at x 990, behind the column's edge at x 1000, where it
+## was before he was drawn at a real wolf's size (x 934 then).
+const WOLF_DOORWAY_X: float = 990.0 - M0Actor.WOLF_TAIL
 ## The engineer is at the exit from here (USE leaves through it), and walks no further while WOLF
 ## stands in the doorway (his tail at WOLF_DOORWAY_X - M0Actor.WOLF_REACH).
 ## (fix round 2: 846, was 870, so the engineer can stand behind WOLF in his new spot, their back clear
@@ -395,10 +396,13 @@ const WOLF_RUBBLE_X: float = WOLF_SEAM_X
 ## pass over the valve after the blast (walking by it on the way down the lane or back), he steps out
 ## onto the deck in front of it, about 1.3 m nearer the camera: his drawn body this much lower on the screen (the deck
 ## in this camera falls 9.3 px per metre toward the camera at the walk line), so his feet stand clearly
-## in front of the valve's base and he draws over it.
+## in front of the valve's base and he draws over it. He is all the way forward within WOLF_STEP_FULL of
+## the valve's middle and eases back over WOLF_STEP_RAMP, onto the walk line just as his painted snout
+## (M0Actor.WOLF_SNOUT) clears the valve's edge (60 px when he was drawn 0.70x larger, ending 7 px
+## inside it), so at his reading spot by the valve (WOLF_SEAM_X) he stands on the walk line.
 const WOLF_STEP_FORWARD: float = 12.0
 const WOLF_STEP_FULL: float = 40.0
-const WOLF_STEP_RAMP: float = 60.0
+const WOLF_STEP_RAMP: float = VALVE_HALF_WIDTH + M0Actor.WOLF_SNOUT - WOLF_STEP_FULL
 ## Where WOLF stands when he chooses to draw the sentry: at the far end of its lane, in front of the
 ## exit hatch (a doorway in the back wall, not a machine), facing back down the lane, his painted snout
 ## (M0Actor.WOLF_SNOUT) just clear of the bolt panel's right edge and his painted tail
@@ -414,32 +418,32 @@ const WOLF_DOWN_X: float = WOLF_BAIT_X
 ## Sentry.DRAWN_HEIGHT, y 396) by 6 px at the top of the bound, held while his legs are over its body
 ## (LEAP_CLEAR: the two bodies' contact range, SentryBrain.HALF_WIDTH plus M0State.WOLF_HALF_WIDTH, and a
 ## 5 px margin) and eased in and out over LEAP_RAMP either side, where only his snout or tail passes its
-## low treads. He runs LEAP_SPEED_SCALE times faster meanwhile, so it reads as a bound, not a hover. The
+## low treads. LEAP_RAMP is short enough that the ramp ends before the sentry's patrol turn short of
+## him at his spot by the hatch (M0Actor.WOLF_REACH + SentryBrain.HALF_WIDTH + Main.WOLF_SENTRY_GAP,
+## 74 px from his centre; LEAP_CLEAR + LEAP_RAMP is 73), so he never lifts while it patrols up to him
+## (30 px when he was drawn 0.70x larger). He runs LEAP_SPEED_SCALE times faster meanwhile, so it reads
+## as a bound, not a hover. The
 ## tank's base (y 382 at most) is lower than the top of his head at the bound, so he never bounds under
 ## it: the sentry he draws backs off ahead of him to the end of its patrol (SentryBrain.BAIT_OFFSET)
 ## and he catches it there, and the bound and both ramps stay clear of the hanging tank's painted body
 ## by a few px (sentry_test measures the two images).
 const LEAP_HEIGHT: float = 48.0
 const LEAP_CLEAR: float = SentryBrain.HALF_WIDTH + M0State.WOLF_HALF_WIDTH + 5.0
-const LEAP_RAMP: float = 30.0
+const LEAP_RAMP: float = 20.0
 const LEAP_SPEED_SCALE: float = 2.0
-## Running under the hung tank on his way down the lane, WOLF ducks: at rest the tips of his ears
-## (y 379) are higher than the tank's rounded base (y 382 at its lowest), so while his head (WOLF_HEAD_X
-## ahead of his centre) is within DUCK_CLEAR of the mark he runs crouched, his drawn body squashed
-## DUCK_DEPTH px lower with his feet on the floor, easing in and out over DUCK_RAMP. His head then
-## passes a few px under the tank's base (sentry_test measures the two images).
-const DUCK_DEPTH: float = 9.0
-const DUCK_CLEAR: float = 34.0
-const DUCK_RAMP: float = 24.0
-const WOLF_HEAD_X: float = 45.0
+## Running under the hung tank on his way down the lane, WOLF needs no duck: at a real wolf's size
+## (Main.WOLF_ART_SCALE, 2026-10-19) the tips of his ears (y 396.6) pass 14 px under the tank's rounded
+## base (y 382 at its lowest). Drawn 0.70x larger before, they stood at y 379 and he ran crouched under
+## it (sentry_test still measures the two images).
 ## Once the tank is down on the sentry, WOLF crossing from his spot by the valve to his spot by the hatch bounds
 ## clean over the crushed tank and the wreck under it in one arc (wolf_tank_leap_height): a parabola in
 ## x, so at his steady LEAP_SPEED_SCALE speed it is a fall under constant gravity, TANK_LEAP_HEIGHT at
-## its top over TANK_LEAP_PEAK_X and back on the floor TANK_LEAP_HALF_SPAN either side. He is 134 px
-## long, the tank stands 107 px over the floor about 60 px past the engineer working the release, and
-## the parked arm's shackle hangs only some 20 px above the height that clears the tank, so there is no
-## room for a short hop: he takes off a few px before his snout reaches the engineer's back, passes
-## over them on the way up and lands just short of his spot. His painted feet (y 438) pass over the
+## its top over TANK_LEAP_PEAK_X and back on the floor TANK_LEAP_HALF_SPAN either side. The arc was set
+## when he was drawn 0.70x larger (134 px long with his reach) and is kept at his real size (88 px):
+## the tank stands 107 px over the floor about 60 px past the engineer working the release, and the
+## parked arm's shackle hangs only some 20 px above the height that clears the tank, so there is no
+## room for a short hop: he takes off before he reaches the engineer's back, passes over them on the
+## way up and lands just short of his spot. His painted feet (y 438) pass over the
 ## tank's top (y 331, on the crushed hull) and his back under the shackle. The empty arm hangs too low over
 ## the tank for him to pass under it, so it winches up into its ceiling plate as the tank lands for good
 ## (ARM_PARK_RISE over ARM_PARK_SECONDS), and he waits by the valve until it is up. sentry_test measures
@@ -450,12 +454,12 @@ const TANK_LEAP_PEAK_X: float = DropArm.MARK_X - 5.0
 const TANK_LEAP_HALF_SPAN: float = 180.0
 const ARM_PARK_RISE: float = 44.0
 const ARM_PARK_SECONDS: float = 0.3
-## Where WOLF waits while the line builds and the fuse burns: back by the entrance hatch, his snout at
-## the breaker's left edge (his painted front is a few px inside M0Actor.WOLF_REACH), so he is not
-## inside the breaker, his drawn body is clear of the engineer working it from its right, his tail
+## Where WOLF waits while the line builds and the fuse burns: back by the entrance hatch, his painted
+## snout (M0Actor.WOLF_SNOUT) 6 px short of the breaker's left edge, as it was before he was drawn at a
+## real wolf's size (x 100 then), so he is not inside the breaker, his drawn body is clear of the engineer working it from its right, his tail
 ## stays in view while they crank the valve, and he is nowhere near the relief vent's grate, its
 ## steam or the door's blast zone.
-const WOLF_CLEAR_X: float = 100.0
+const WOLF_CLEAR_X: float = BREAKER_X - BREAKER_HALF_WIDTH - 6.0 - M0Actor.WOLF_SNOUT
 ## The engineer's front foot on the rubble line: where the question of how to drop the tank comes up,
 ## still outside the sentry's lane.
 const CHOICE_X: float = RUBBLE_X - M0State.HUMAN_HALF_WIDTH
@@ -1445,14 +1449,6 @@ static func wolf_tank_leap_height(wolf_x: float) -> float:
 ## WOLF_STEP_RAMP to nothing, so he walks round the front of the valve.
 static func wolf_valve_step(wolf_x: float) -> float:
 	return 1.0 - smoothstep(WOLF_STEP_FULL, WOLF_STEP_FULL + WOLF_STEP_RAMP, absf(wolf_x - VALVE_X))
-
-
-## How far WOLF ducks (px off the top of his drawn body, feet on the floor) with his centre at
-## [param wolf_x], facing [param facing] (+1 right), under the hung tank: DUCK_DEPTH while his head is
-## under its base, easing to nothing DUCK_RAMP further out.
-static func wolf_duck_depth(wolf_x: float, facing: float) -> float:
-	var head_x: float = wolf_x + signf(facing) * WOLF_HEAD_X
-	return DUCK_DEPTH * (1.0 - smoothstep(DUCK_CLEAR, DUCK_CLEAR + DUCK_RAMP, absf(head_x - DropArm.MARK_X)))
 
 
 ## True when a tank landing on a sentry centred at [param sentry_x] rests on its crushed hull: the

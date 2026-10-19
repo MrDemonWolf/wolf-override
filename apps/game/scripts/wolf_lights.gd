@@ -7,8 +7,8 @@ extends Node2D
 ## lamp and screen; one class lights every WOLF piece.
 ##
 ## It is a child of WOLF's BodySprite (see [method attach]), so it works in the piece's own pixels with
-## its origin on the piece's centre, and the sprite's transform carries it: the duck's squash (scale)
-## and WOLF's dimming while he passes behind the engineer (modulate). A child does not follow the
+## its origin on the piece's centre, and the sprite's transform carries it: its scale and WOLF's dimming
+## while he passes behind the engineer (modulate). A child does not follow the
 ## sprite's flip_h or offset, so [method _process] copies both: it mirrors x when WOLF faces left and
 ## moves with the leap's lift (offset). It draws nothing else and has no gameplay effect.
 
