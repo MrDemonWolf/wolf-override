@@ -13,6 +13,7 @@ import titleCapture from '../images/title-screen-capture.png';
 import titleCapture480 from '../images/title-screen-capture-480.webp';
 import { contrastRatio, resolveBrandColors } from '@/lib/brand-colors';
 import {
+  aiDisclosure,
   assetTerms,
   creatorCredit,
   creditLine,
@@ -374,6 +375,9 @@ export default function DesignSystemPage() {
             <li><strong className="text-text">Made with AI assistance:</strong> the key art and the game&apos;s art were made with AI image tools, then reviewed and approved by Nathanial Henniges. The wolf mark started as an AI concept (ChatGPT Create) and was redrawn by the project as SVG; the logo sets the name in Montserrat letter shapes beside it.</li>
             <li>Details for every file: <Link className="text-accent underline underline-offset-4" href="/docs/credits/#provisional-art">Credits</Link> and the <a className="text-accent underline underline-offset-4" href={`${repoUrl}/blob/main/apps/game/assets/manifest.json`}>asset register</a>.</li>
           </ul>
+          <h3 className={subHeading}>AI disclosure</h3>
+          {/* The approved text (lib/press-kit.ts aiDisclosure); press may quote it as it is, as stores will. */}
+          <p className={sectionCopy}>{aiDisclosure}</p>
         </Section>
 
         <Section id="download" index={6} title="Asset pack" tldr="One zip with everything on this page. Or pick single files below.">
