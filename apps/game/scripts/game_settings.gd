@@ -42,8 +42,10 @@ const KEY_NAME_CONTEXT: StringName = &"key name"
 ## for the translation template; nothing reads it at run time. [method key_name] translates any name with
 ## words through tr(), so this list only decides which names a translator is offered: the media, launch
 ## and modifier keys (Settings refuses modifiers) and the keypad's digits are left out, and a name with
-## one letter or none ("F5", "E") needs no translation.
-static var KEY_NAMES: Array[String] = [I18n.KEY.tr("Escape", KEY_NAME_CONTEXT), I18n.KEY.tr("Tab", KEY_NAME_CONTEXT), I18n.KEY.tr("Backspace", KEY_NAME_CONTEXT), I18n.KEY.tr("Enter", KEY_NAME_CONTEXT), I18n.KEY.tr("Kp Enter", KEY_NAME_CONTEXT), I18n.KEY.tr("Insert", KEY_NAME_CONTEXT), I18n.KEY.tr("Delete", KEY_NAME_CONTEXT), I18n.KEY.tr("Pause", KEY_NAME_CONTEXT), I18n.KEY.tr("Print", KEY_NAME_CONTEXT), I18n.KEY.tr("Clear", KEY_NAME_CONTEXT), I18n.KEY.tr("Home", KEY_NAME_CONTEXT), I18n.KEY.tr("End", KEY_NAME_CONTEXT), I18n.KEY.tr("Left", KEY_NAME_CONTEXT), I18n.KEY.tr("Up", KEY_NAME_CONTEXT), I18n.KEY.tr("Right", KEY_NAME_CONTEXT), I18n.KEY.tr("Down", KEY_NAME_CONTEXT), I18n.KEY.tr("PageUp", KEY_NAME_CONTEXT), I18n.KEY.tr("PageDown", KEY_NAME_CONTEXT), I18n.KEY.tr("CapsLock", KEY_NAME_CONTEXT), I18n.KEY.tr("NumLock", KEY_NAME_CONTEXT), I18n.KEY.tr("ScrollLock", KEY_NAME_CONTEXT), I18n.KEY.tr("Kp Multiply", KEY_NAME_CONTEXT), I18n.KEY.tr("Kp Divide", KEY_NAME_CONTEXT), I18n.KEY.tr("Kp Subtract", KEY_NAME_CONTEXT), I18n.KEY.tr("Kp Period", KEY_NAME_CONTEXT), I18n.KEY.tr("Kp Add", KEY_NAME_CONTEXT), I18n.KEY.tr("Menu", KEY_NAME_CONTEXT), I18n.KEY.tr("Help", KEY_NAME_CONTEXT), I18n.KEY.tr("Space", KEY_NAME_CONTEXT)]
+## one letter or none ("F5", "E") needs no translation. The symbol keys of a US and an ISO keyboard
+## ("Minus" to "Section") are in, since a key whose layout label matches its position keeps its word
+## ([method key_label_name]).
+static var KEY_NAMES: Array[String] = [I18n.KEY.tr("Escape", KEY_NAME_CONTEXT), I18n.KEY.tr("Tab", KEY_NAME_CONTEXT), I18n.KEY.tr("Backspace", KEY_NAME_CONTEXT), I18n.KEY.tr("Enter", KEY_NAME_CONTEXT), I18n.KEY.tr("Kp Enter", KEY_NAME_CONTEXT), I18n.KEY.tr("Insert", KEY_NAME_CONTEXT), I18n.KEY.tr("Delete", KEY_NAME_CONTEXT), I18n.KEY.tr("Pause", KEY_NAME_CONTEXT), I18n.KEY.tr("Print", KEY_NAME_CONTEXT), I18n.KEY.tr("Clear", KEY_NAME_CONTEXT), I18n.KEY.tr("Home", KEY_NAME_CONTEXT), I18n.KEY.tr("End", KEY_NAME_CONTEXT), I18n.KEY.tr("Left", KEY_NAME_CONTEXT), I18n.KEY.tr("Up", KEY_NAME_CONTEXT), I18n.KEY.tr("Right", KEY_NAME_CONTEXT), I18n.KEY.tr("Down", KEY_NAME_CONTEXT), I18n.KEY.tr("PageUp", KEY_NAME_CONTEXT), I18n.KEY.tr("PageDown", KEY_NAME_CONTEXT), I18n.KEY.tr("CapsLock", KEY_NAME_CONTEXT), I18n.KEY.tr("NumLock", KEY_NAME_CONTEXT), I18n.KEY.tr("ScrollLock", KEY_NAME_CONTEXT), I18n.KEY.tr("Kp Multiply", KEY_NAME_CONTEXT), I18n.KEY.tr("Kp Divide", KEY_NAME_CONTEXT), I18n.KEY.tr("Kp Subtract", KEY_NAME_CONTEXT), I18n.KEY.tr("Kp Period", KEY_NAME_CONTEXT), I18n.KEY.tr("Kp Add", KEY_NAME_CONTEXT), I18n.KEY.tr("Menu", KEY_NAME_CONTEXT), I18n.KEY.tr("Help", KEY_NAME_CONTEXT), I18n.KEY.tr("Space", KEY_NAME_CONTEXT), I18n.KEY.tr("Minus", KEY_NAME_CONTEXT), I18n.KEY.tr("Equal", KEY_NAME_CONTEXT), I18n.KEY.tr("BracketLeft", KEY_NAME_CONTEXT), I18n.KEY.tr("BracketRight", KEY_NAME_CONTEXT), I18n.KEY.tr("BackSlash", KEY_NAME_CONTEXT), I18n.KEY.tr("Semicolon", KEY_NAME_CONTEXT), I18n.KEY.tr("Apostrophe", KEY_NAME_CONTEXT), I18n.KEY.tr("Comma", KEY_NAME_CONTEXT), I18n.KEY.tr("Period", KEY_NAME_CONTEXT), I18n.KEY.tr("Slash", KEY_NAME_CONTEXT), I18n.KEY.tr("QuoteLeft", KEY_NAME_CONTEXT), I18n.KEY.tr("Section", KEY_NAME_CONTEXT)]
 const MAX_SETTINGS_BYTES: int = 65536
 ## Window sizes offered in Settings, by index. A first launch (no saved size) opens at
 ## DEFAULT_WINDOW_SIZE, the same size project.godot gives the first window, so the characters are
@@ -565,7 +567,8 @@ func select_tab(index: int) -> void:
 
 
 ## Shows [param message] (English) in the note under the tabs, in the current language: tr(message), with
-## [param inserts] (English messages too: action names, sentences) each translated and filled in with %.
+## [param inserts] (English messages too: action names, sentences) each translated and filled in by
+## I18n.fill, which shows the English template when a translation's conversions do not match it.
 ## Both are remembered, so a language change shows the note again in the new language. The one way the
 ## note is written, also by Main (its window-size and save-failure notes). A message with no words
 ## ("%s %s") is left as it is. Mark a literal passed here with I18n.KEY.tr(), since the template
@@ -578,13 +581,10 @@ func show_note(message: String, inserts: Array[String] = []) -> void:
 
 ## Writes the remembered note ([method show_note]) translated into the current language.
 func _show_translated_note() -> void:
-	var text: String = tr(_note_message) if I18n.has_words(_note_message) else _note_message
-	if not _note_inserts.is_empty():
-		var filled: Array[String] = []
-		for insert: String in _note_inserts:
-			filled.append(tr(insert))
-		text = text % filled
-	note.text = text
+	var filled: Array[String] = []
+	for insert: String in _note_inserts:
+		filled.append(tr(insert))
+	note.text = I18n.fill(_note_message, filled)
 
 
 func _apply_graphics() -> void:
@@ -715,7 +715,7 @@ func binding_label(action: StringName, kind: String) -> String:
 			elif event is InputEventJoypadButton:
 				labels.append(_button_label(event.button_index))
 			elif event is InputEventJoypadMotion:
-				labels.append("%s %s" % [tr("Left stick") if event.axis == JOY_AXIS_LEFT_X else tr("Axis %d") % event.axis, "−" if event.axis_value < 0 else "+"])
+				labels.append("%s %s" % [tr("Left stick") if event.axis == JOY_AXIS_LEFT_X else I18n.fill(I18n.KEY.tr("Axis %d"), [event.axis]), "−" if event.axis_value < 0 else "+"])
 	return " / ".join(labels)
 
 
@@ -742,25 +742,45 @@ func _prompt_label(action: StringName, controller: bool) -> String:
 		if controller and event is InputEventJoypadButton:
 			return _button_label(event.button_index)
 		if controller and event is InputEventJoypadMotion:
-			return tr("AXIS %d %s") % [event.axis, "−" if event.axis_value < 0 else "+"]
+			return I18n.fill(I18n.KEY.tr("AXIS %d %s"), [event.axis, "−" if event.axis_value < 0 else "+"])
 	return "?"
 
 
 ## The name of [param event]'s key as the player reads it. Where the display server can tell
 ## ([constant KEY_LABEL_SERVERS]) it is the label printed on the key in the active keyboard layout
 ## (DisplayServer.keyboard_get_label_from_physical), so on AZERTY the key bound to "Move left" by its
-## QWERTY position A reads Q; elsewhere it is the US QWERTY position's name, as before. A key that types
-## a character shows that character, because Godot names symbol keys in English words (AZERTY's 1 key
-## would read "Ampersand"); letters and digits read as they always did. A named key ("Escape", "Left")
-## is translated with the "key name" context ([constant KEY_NAMES]); one with fewer than two letters
-## ("F5") is left as it is (I18n.has_words).
+## QWERTY position A reads Q; elsewhere it is the US QWERTY position's name, as before PR L7a. The
+## physical key and its label are named by [method key_label_name].
 func key_name(event: InputEventKey) -> String:
-	var code: Key = event.physical_keycode if event.physical_keycode != KEY_NONE else event.keycode
+	var physical: Key = event.physical_keycode if event.physical_keycode != KEY_NONE else event.keycode
+	var label: Key = physical
 	if event.physical_keycode != KEY_NONE and DisplayServer.get_name() in KEY_LABEL_SERVERS:
-		code = DisplayServer.keyboard_get_label_from_physical(event.physical_keycode)
-	# Below KEY_SPECIAL a Key is the Unicode character it types; KEY_SPACE types nothing visible.
-	if code > KEY_SPACE and code < KEY_SPECIAL:
-		return String.chr(code)
+		label = DisplayServer.keyboard_get_label_from_physical(event.physical_keycode)
+	return key_label_name(physical, label)
+
+
+## The name of a key at US QWERTY position [param physical] whose keyboard layout prints [param label]
+## on it (the same Key when the layout agrees, or when the display server cannot tell).
+## - Where the layout agrees, the key keeps Godot's name for its position, exactly as before PR L7a:
+##   letters and digits are themselves ("E", "1") and symbol keys are words ("Minus", "Slash").
+## - Where it differs, a label that types a character shows that character, because Godot names symbol
+##   keys in English words (AZERTY's 1 key would read "Ampersand"); a label that is a named key shows
+##   that name.
+## - A character the game fonts cannot draw (I18n.game_fonts_draw: Greek, Hebrew, Arabic or Thai letters,
+##   since the fonts never ask the OS for a missing glyph) falls back to the position's name, so a Greek
+##   layout reads "A", not an empty box.
+## A named key ("Escape", "Minus") is translated with the "key name" context ([constant KEY_NAMES]); one
+## with fewer than two letters ("F5", "E") is left as it is (I18n.has_words). Public so the tests can
+## name a layout the headless display server cannot switch to.
+func key_label_name(physical: Key, label: Key) -> String:
+	var code: Key = physical
+	if label != physical:
+		# Below KEY_SPECIAL a Key is the Unicode character it types; KEY_SPACE types nothing visible.
+		if label > KEY_SPACE and label < KEY_SPECIAL:
+			if I18n.game_fonts_draw(String.chr(label)):
+				return String.chr(label)
+		else:
+			code = label
 	var name: String = OS.get_keycode_string(code)
 	return tr(name, KEY_NAME_CONTEXT) if I18n.has_words(name) else name
 
@@ -776,7 +796,7 @@ func _button_label(index: int) -> String:
 		JOY_BUTTON_START: return tr("START")
 		JOY_BUTTON_DPAD_LEFT: return tr("D-pad left")
 		JOY_BUTTON_DPAD_RIGHT: return tr("D-pad right")
-	return tr("BUTTON %d") % index
+	return I18n.fill(I18n.KEY.tr("BUTTON %d"), [index])
 
 
 func _forget_prompts() -> void:
