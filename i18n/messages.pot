@@ -1,11 +1,12 @@
 # LANGUAGE translation for WOLF OVERRIDE for the following files:
 # res://scenes/main.tscn
 # res://scenes/studio_logo.tscn
-# res://scripts/atlas_mesh.gd
 # res://scripts/blast_leaf.gd
 # res://scripts/bypass_handle.gd
 # res://scripts/containment_cage.gd
 # res://scripts/dialogue_boxes.gd
+# res://scripts/door_kit.gd
+# res://scripts/door_leaf.gd
 # res://scripts/drop_arm.gd
 # res://scripts/floor_reflection.gd
 # res://scripts/fx/fx_kit.gd
@@ -18,7 +19,6 @@
 # res://scripts/hold_use.gd
 # res://scripts/i18n.gd
 # res://scripts/impact.gd
-# res://scripts/junction_door_layout.gd
 # res://scripts/junction_room.gd
 # res://scripts/m0_actor.gd
 # res://scripts/m0_state.gd
@@ -32,6 +32,7 @@
 # res://scripts/sentry.gd
 # res://scripts/sentry_brain.gd
 # res://scripts/sfx_bank.gd
+# res://scripts/slide_leaf.gd
 # res://scripts/studio_logo.gd
 # res://scripts/swing_leaf.gd
 # res://scripts/text_size.gd
