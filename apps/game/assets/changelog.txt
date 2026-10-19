@@ -19,6 +19,7 @@ Changes merged after 0.15.0. They become the next version when it is cut.
 - One handwheel turns at both the MANUAL BYPASS and the VALVE.
 - The coolant tank hangs from the arm on a cable.
 - The RELIEF VENT has a relief valve standing on its grate. The danger area is still the grate.
+- After his readout WOLF stays by the MIRROR PORT while you are at it, instead of walking back across it.
 - Small spot changes: the purge display answers until x 181 (was 230), the engineer stands closer to the PURGE QUEUE, MIRROR PORT and EXIT BOLT, and WOLF reads the MIRROR PORT from x 613 (was 625).
 
 -- Website --
