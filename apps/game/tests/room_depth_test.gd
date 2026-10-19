@@ -1,26 +1,15 @@
-extends SceneTree
+extends "res://tests/support/game_suite.gd"
 ## The layered rooms: the mid plate's walkway is the floor, stations stand on it, and no plate edge
 ## shows at either end of the camera's travel, in the opening or at the chapter-close shot.
 
-const GAME_SCENE: PackedScene = preload("res://scenes/main.tscn")
 ## Camera shake moves Camera2D.offset by up to this much (world px at the play zoom).
 const SHAKE: float = 10.0
 
-var failures: int = 0
-
-
-func _initialize() -> void:
-	call_deferred("_run")
-
 
 func _run() -> void:
-	var path: String = "user://room-depth-test-%s.json" % OS.get_process_id()
-	var game: Node2D = GAME_SCENE.instantiate() as Node2D
-	game.set("save_path", path)
-	game.set("settings_path", "%s-settings.cfg" % path)
-	game.set("auto_pause_on_focus_loss", false)
-	root.add_child(game)
-	await process_frame
+	check_name = "Room depth"
+	var game: Node2D = await start_game("room-depth-test", keep_running)
+	var path: String = str(game.get("save_path"))
 	var camera: Camera2D = game.get_node("IntroCamera") as Camera2D
 	var records: RecordsRoom = game.get("records_room") as RecordsRoom
 	var junction: JunctionRoom = game.get("junction_room") as JunctionRoom
@@ -100,11 +89,8 @@ func _run() -> void:
 	game.queue_free()
 	await process_frame
 	for leftover: String in [path, "%s-settings.cfg" % path]:
-		if FileAccess.file_exists(leftover):
-			DirAccess.remove_absolute(ProjectSettings.globalize_path(leftover))
-	if failures == 0:
-		print("Room depth checks passed")
-	quit(1 if failures > 0 else 0)
+		remove_file(leftover)
+	finish("Room depth checks passed")
 
 
 func _check_plates(room_name: String, depth: RoomDepth) -> void:
@@ -257,12 +243,6 @@ func _global_rect(sprite: Sprite2D) -> Rect2:
 
 func _bottom(prop: Sprite2D) -> float:
 	return _global_rect(prop).end.y
-
-
-func _expect(condition: bool, label: String) -> void:
-	if not condition:
-		failures += 1
-		push_error("Room depth check failed: " + label)
 
 
 ## The world rect [param camera] shows at its current zoom, placed at [param at] with the shake

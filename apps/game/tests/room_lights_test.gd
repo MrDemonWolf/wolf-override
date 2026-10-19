@@ -1,26 +1,18 @@
-extends SceneTree
+extends "res://tests/support/game_suite.gd"
 ## The rooms' light: the lamp flicker's random rhythm (never faster than 3 blinks a second, gentler
 ## with Reduced Motion), lockdown beacons that settle once a room's route is cleared and come back
 ## the same way on Continue, hidden rooms that stop their dust and light tweens, and a sentry beam
 ## drawn as far as the sentry actually sees, broken over the alcove where it cannot.
 
-const GAME_SCENE: PackedScene = preload("res://scenes/main.tscn")
 const State = preload("res://scripts/m0_state.gd")
-
-var failures: int = 0
-
-
-func _initialize() -> void:
-	call_deferred("_run")
 
 
 func _run() -> void:
+	check_name = "Room lights"
 	_check_flicker_plan()
 	_check_beam_rule()
 	await _check_scene()
-	if failures == 0:
-		print("Room lights checks passed")
-	quit(1 if failures > 0 else 0)
+	finish("Room lights checks passed")
 
 
 ## Many sampled flickers: each waits 4-15 s, dips and recovers; a double blink starts its second dip
@@ -72,8 +64,8 @@ func _check_flicker_plan() -> void:
 func _check_beam_rule() -> void:
 	var far_end: float = Sentry.beam_tip_x(SentryBrain.PATROL_MAX_X, -1.0)
 	_expect(is_equal_approx(far_end, SentryBrain.PATROL_MAX_X - SentryBrain.SIGHT_RANGE), "from the far end the beam reaches the full 180 px of sight")
-	_expect(_patrolling_at(SentryBrain.PATROL_MAX_X, -1.0).tick(0.0001, far_end, true, -1.0) == &"lock", "an engineer at the beam's tip is seen")
-	_expect(_patrolling_at(SentryBrain.PATROL_MAX_X, -1.0).tick(0.0001, far_end - 2.0, true, -1.0) == &"patrol", "an engineer just past the beam's tip is not")
+	_expect(patrolling_sentry(SentryBrain.PATROL_MAX_X, -1.0).tick(0.0001, far_end, true, -1.0) == &"lock", "an engineer at the beam's tip is seen")
+	_expect(patrolling_sentry(SentryBrain.PATROL_MAX_X, -1.0).tick(0.0001, far_end - 2.0, true, -1.0) == &"patrol", "an engineer just past the beam's tip is not")
 	_expect(is_equal_approx(Sentry.beam_tip_x(560.0, 1.0), 740.0), "facing right it reaches 180 px the other way")
 	# P0-16: solid things stop it. The exit bolt's panel stands in the lane: from left of it, facing it,
 	# the beam ends on its face and nobody behind it is seen; a sentry already in front of it (its lens
@@ -81,12 +73,12 @@ func _check_beam_rule() -> void:
 	var face: float = JunctionRoom.BOLT_PANEL_X - JunctionRoom.BOLT_PANEL_HALF_WIDTH
 	_expect(is_equal_approx(SentryBrain.PANEL_FACE_X, face) and is_equal_approx(SentryBrain.LENS_AHEAD, Sentry.lens_rect().end.x), "the sight rule's panel face and lens are the drawn ones (%.2f, %.2f)" % [face, Sentry.lens_rect().end.x])
 	_expect(is_equal_approx(Sentry.beam_tip_x(700.0, 1.0), face), "facing the bolt panel from the mark the beam stops on its face")
-	_expect(_patrolling_at(700.0, 1.0).tick(0.0001, face, true, -1.0) == &"lock" and _patrolling_at(700.0, 1.0).tick(0.0001, face + 2.0, true, -1.0) == &"patrol", "it sees up to the panel's face and nobody behind it")
+	_expect(patrolling_sentry(700.0, 1.0).tick(0.0001, face, true, -1.0) == &"lock" and patrolling_sentry(700.0, 1.0).tick(0.0001, face + 2.0, true, -1.0) == &"patrol", "it sees up to the panel's face and nobody behind it")
 	_expect(is_equal_approx(Sentry.beam_tip_x(face - SentryBrain.LENS_AHEAD + 1.0, 1.0), minf(M0Actor.MAX_X, face - SentryBrain.LENS_AHEAD + 1.0 + SentryBrain.SIGHT_RANGE)), "a sentry whose lens is past the panel's face looks on past it")
 	# A missed tank on the floor stops it from either side, and hides whoever is behind it.
 	var tank: Vector2 = Vector2(DropArm.MARK_X - JunctionRoom.TANK_SIZE.x * 0.5, DropArm.MARK_X + JunctionRoom.TANK_SIZE.x * 0.5)
 	_expect(is_equal_approx(Sentry.beam_tip_x(800.0, -1.0, false, INF, tank), tank.y) and is_equal_approx(Sentry.beam_tip_x(620.0, 1.0, false, INF, tank), tank.x), "a tank on the floor stops the beam at its near face, from either side")
-	var behind: SentryBrain = _patrolling_at(800.0, -1.0)
+	var behind: SentryBrain = patrolling_sentry(800.0, -1.0)
 	behind.sight_block = tank
 	_expect(behind.tick(0.0001, tank.x - 5.0, true, -1.0) == &"patrol", "nobody behind a tank on the floor is seen")
 	# Every x it can stand at, both ways, with and without a tank down: the drawn beam ends where the
@@ -118,7 +110,7 @@ func _check_beam_rule() -> void:
 	_expect(not SentryBrain.is_exposed(SentryBrain.LANE_ENTRY_X) and not SentryBrain.is_exposed(SentryBrain.LANE_ENTRY_X + 1.0) and SentryBrain.is_exposed(SentryBrain.COVER_MAX_X + 1.0), "nobody is seen from the rubble line to the alcove's right end, the edge of what it can see")
 	_expect(is_equal_approx(Sentry.beam_tip_x(SentryBrain.PATROL_MAX_X, 1.0), M0Actor.MAX_X), "facing right from the far end the beam stops where the engineer can stand furthest, inside the room")
 	# Just short of the end, so the tick does not bounce it round first.
-	_expect(_patrolling_at(SentryBrain.PATROL_MAX_X - 1.0, 1.0).tick(0.0001, M0Actor.MAX_X, true, -1.0) == &"lock", "an engineer at that right-hand tip is seen")
+	_expect(patrolling_sentry(SentryBrain.PATROL_MAX_X - 1.0, 1.0).tick(0.0001, M0Actor.MAX_X, true, -1.0) == &"lock", "an engineer at that right-hand tip is seen")
 	# Every x the patrol and chase can put it at, both ways: the beam never covers the alcove, and
 	# every lane x between the alcove and the rubble that it sees is still under the beam.
 	var gaps_ok: bool = true
@@ -145,19 +137,13 @@ func _check_beam_rule() -> void:
 	var near_turn: float = SentryBrain.PATROL_MIN_X + 1.0
 	_expect(is_equal_approx(Sentry.beam_gap(near_turn, -1.0).x, Sentry.beam_tip_x(near_turn, -1.0)) and is_equal_approx(Sentry.beam_tip_x(near_turn, -1.0), SentryBrain.COVER_MIN_X), "there is no seen strip between the alcove and the rubble, and no beam drawn there")
 	var just_out: float = SentryBrain.COVER_MAX_X + 1.0
-	_expect(_patrolling_at(near_turn + 30.0, -1.0).tick(0.0001, just_out, SentryBrain.is_exposed(just_out), -1.0) == &"lock" and just_out > Sentry.beam_gap(near_turn + 30.0, -1.0).y, "a step out of the alcove into the lane it sees you, under the drawn beam")
+	_expect(patrolling_sentry(near_turn + 30.0, -1.0).tick(0.0001, just_out, SentryBrain.is_exposed(just_out), -1.0) == &"lock" and just_out > Sentry.beam_gap(near_turn + 30.0, -1.0).y, "a step out of the alcove into the lane it sees you, under the drawn beam")
 	_expect(Sentry.beam_gap(SentryBrain.PATROL_MAX_X, -1.0) == Vector2.ZERO, "from the far end the beam stops short of the alcove, with no break")
 
 
 func _check_scene() -> void:
-	var path: String = "user://room-lights-test-%s.json" % OS.get_process_id()
-	_remove(path)
-	var game: Node2D = GAME_SCENE.instantiate() as Node2D
-	game.set("save_path", path)
-	game.set("settings_path", "%s-settings.cfg" % path)
-	game.set("auto_pause_on_focus_loss", false)
-	root.add_child(game)
-	await process_frame
+	var game: Node2D = await start_game("room-lights-test", keep_running)
+	var path: String = str(game.get("save_path"))
 	var corridor: RoomDepth = game.get_node("CorridorDepth") as RoomDepth
 	var records: RoomDepth = (game.get("records_room") as RecordsRoom).depth
 	var junction_room: JunctionRoom = game.get("junction_room") as JunctionRoom
@@ -198,7 +184,7 @@ func _check_scene() -> void:
 	var continued_pulsing: bool = await _beacons_pulse(corridor)
 	_expect((game.get("state") as M0State).checkpoint_reached and _beacons_settled(corridor) and not continued_pulsing, "Continue from the safe point shows the corridor settled")
 	# Records: pulsing until the first copy is secured, settled after.
-	var records_state: M0State = _completed_records_state(State.DISCLOSE)
+	var records_state: M0State = completed_records_state(State.DISCLOSE)
 	records_state.chapter_complete = false
 	game.set("state", records_state)
 	game.call("_sync_scene")
@@ -214,7 +200,7 @@ func _check_scene() -> void:
 	var junction_pulsing: bool = await _beacons_pulse(junction)
 	_expect(not junction.lockdown_cleared and junction_pulsing, "the junction's beacons pulse while its line is live")
 	# Autosave D: "It's quiet now" settles the junction, and Continue keeps it settled.
-	var cleared: M0State = _completed_records_state(State.DISCLOSE)
+	var cleared: M0State = completed_records_state(State.DISCLOSE)
 	cleared.enter_junction()
 	cleared.blow_door()
 	cleared.drop_sentry()
@@ -263,8 +249,8 @@ func _check_scene() -> void:
 		_expect((depths[room_name] as RoomDepth).reduce_motion, "%s: Reduced Motion reaches the lamp flicker" % room_name)
 	game.call("_on_reduced_motion_changed", false)
 	await _check_sentry_beam(game)
-	_remove(path)
-	_remove("%s-settings.cfg" % path)
+	remove_file(path)
+	remove_file("%s-settings.cfg" % path)
 	# The lane's sound loops stop and their playback ends before quitting, so nothing is left behind.
 	game.call("_stop_junction_loops")
 	game.queue_free()
@@ -276,7 +262,7 @@ func _check_scene() -> void:
 func _check_sentry_beam(game: Node2D) -> void:
 	var room: JunctionRoom = game.get("junction_room") as JunctionRoom
 	var brain: SentryBrain = game.get("sentry_brain") as SentryBrain
-	var at_b: M0State = _completed_records_state(State.DISCLOSE)
+	var at_b: M0State = completed_records_state(State.DISCLOSE)
 	at_b.enter_junction()
 	at_b.blow_door()
 	at_b.human_position = Vector2(400.0, 410.0)
@@ -450,37 +436,3 @@ func _beacons_settled(depth: RoomDepth) -> bool:
 
 func _lens(depth: RoomDepth) -> Color:
 	return depth.beacons[0].get("lens")
-
-
-func _patrolling_at(x: float, facing: float) -> SentryBrain:
-	var brain: SentryBrain = SentryBrain.new()
-	brain.wake()
-	brain.x = x
-	brain.facing = facing
-	return brain
-
-
-func _completed_records_state(choice_id: String) -> M0State:
-	var state: M0State = State.new()
-	state.record_choice(choice_id)
-	state.arm_breaker()
-	state.activate_power("wolf" if choice_id == State.DISCLOSE else "human")
-	state.reach_checkpoint()
-	state.enter_records()
-	state.preserve_purge_trace()
-	state.preserve_mirror_trace("wolf" if choice_id == State.DISCLOSE else "manual")
-	state.complete_chapter()
-	state.human_position = Vector2(830.0, 410.0)
-	state.wolf_position = Vector2(766.0, 423.0)
-	return state
-
-
-func _remove(path: String) -> void:
-	if FileAccess.file_exists(path):
-		DirAccess.remove_absolute(ProjectSettings.globalize_path(path))
-
-
-func _expect(condition: bool, label: String) -> void:
-	if not condition:
-		failures += 1
-		push_error("Room lights check failed: " + label)
