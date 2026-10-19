@@ -2133,7 +2133,7 @@ func _show_pause_menu() -> void:
 func _show_pause_hint(tapped: bool) -> void:
 	_pause_hint_tapped = tapped
 	var hint: Label = $CanvasLayer/PauseOverlay/Panel/PauseMenu/PauseHint
-	hint.text = tr("TAP RESUME TO RETURN") if tapped else tr("%s  RESUME") % settings_menu.prompt(&"pause_game", controller_active)
+	hint.text = tr("TAP RESUME TO RETURN") if tapped else I18n.fill(I18n.KEY.tr("%s  RESUME"), [settings_menu.prompt(&"pause_game", controller_active)])
 
 
 func _return_to_title() -> void:
