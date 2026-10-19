@@ -2907,14 +2907,14 @@ msgstr "Держись позади, я рассчитаю момент."
 #. i18n: story speaker=WOLF engineer=you
 #: scripts/story_text.gd:163
 msgid "You told me the truth at the relay. I'll draw it onto the mark and keep clear of the tank. Drop it when it stops."
-msgstr "У реле я услышал правду — от тебя. Я уведу его на отметку и не подойду к баку. Сбрось бак, когда страж встанет."
+msgstr "У реле я услышал правду — от тебя. Я уведу его на отметку и не подойду к баку. Сбрось бак, когда страж остановится."
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: WOLF to the engineer, who pressed him at the relay without warning. Avoid a form that shows the engineer's gender ("you'd have sent me"): rephrase.
 #. i18n: story speaker=WOLF engineer=you
 #: scripts/story_text.gd:166
 msgid "At the relay you'd have sent me in blind. I won't walk into its sights. Time the drop from the release; it crosses the mark on every pass."
-msgstr "У реле я пошёл бы вслепую — из-за тебя. Я не полезу под его прицел. Рассчитай сброс от пульта; он проходит отметку на каждом круге."
+msgstr "У реле я пошёл бы вслепую — из-за тебя. Я не полезу под его прицел. Рассчитай момент сброса у пульта; страж проходит отметку на каждом круге."
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: WOLF, when the engineer will time the drop alone.
