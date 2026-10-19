@@ -18,6 +18,10 @@ extends "res://tests/support/game_suite.gd"
 ##   fixed character list (decision D7) and nothing outside it, the subsets and the line-breaking data
 ##   stay inside D7's size budget, every character the game's English text uses is drawn by every theme
 ##   font, and Roboto's symbols fallback leaves its line height alone;
+## - the language list (PR L6): its own font chain (I18n.picker_font) draws every language's name and
+##   "machine translation" tag in every language, holds none of the game fonts' language fallbacks, keeps
+##   the list's row height, and the game font alone cannot draw the CJK names (the check can fail); each
+##   picker font holds only its own name and tag; I18n.machine_tag follows the review state;
 ## - the sibling case: with made-up zh_Hans and zh_Hant catalogs (and es and es_ES), a line only one file
 ##   of the pair has shows English in the other, and the same lookup with every catalog kept (what an
 ##   apply() that keeps them all would leave) shows the sibling's text, so the check can fail;
@@ -77,6 +81,7 @@ func _run() -> void:
 	_check_saved()
 	_check_glyphs()
 	_check_fonts()
+	_check_picker()
 	_check_english_glyphs()
 	_check_sibling(["zh_Hans", "zh_Hant"], ["两条都有", "兩條都有"], "只有简体")
 	_check_sibling(["es", "es_ES"], ["ambas la tienen", "ambas la tienen (España)"], "solo Latinoamérica")
@@ -256,8 +261,66 @@ func _check_fonts() -> void:
 		_check(not_listed.is_empty(), "%s's list holds its picker name and tag (%s); not listed: %s" % [code, own, not_listed])
 		_check(I18n.missing_glyphs(OUTSIDE_EVERY_SET, subset) == OUTSIDE_EVERY_SET, "%s's subset lacks U+3400, outside every common set (planted miss)" % code)
 		font_bytes += FileAccess.get_file_as_bytes(path as String).size()
+		var picker: Variant = I18n.LANGUAGES[code].get("picker_font")
+		if picker is String:
+			font_bytes += FileAccess.get_file_as_bytes(picker as String).size()
 	_check(font_bytes > 0 and font_bytes <= CJK_FONT_BUDGET_BYTES, "the CJK subsets total %d B, within D7's %d B" % [font_bytes, CJK_FONT_BUDGET_BYTES])
 	_check(font_bytes + ICU_DATA_BYTES <= CJK_TOTAL_BUDGET_BYTES, "the CJK subsets and line-breaking data total %d B, within D7's %d B" % [font_bytes + ICU_DATA_BYTES, CJK_TOTAL_BUDGET_BYTES])
+
+
+## The language list's own font chain (PR L6; DESIGN.md, "Settings: the LANGUAGE option"). Every name and
+## every tag of the table, not only the offered ones, is drawn by I18n.picker_font over the list's font
+## (Montserrat Semibold, THEME_FONTS[1]) in English and in each language whose fonts are in the build,
+## since the chain must not depend on the fallback I18n.use_fallback puts behind the game fonts; that
+## fallback never joins the list's chain. The planted miss: the list's font without its own chain lacks
+## the CJK names. The picker fonts have Montserrat's vertical metrics, so the list's rows keep their
+## height at the list's sizes, and each holds its own name and tag and nothing of another CJK name.
+func _check_picker() -> void:
+	var base: FontVariation = load(THEME_FONTS[1]) as FontVariation
+	var list_font: FontVariation = I18n.picker_font(base)
+	var text: String = ""
+	for code: String in I18n.LANGUAGES:
+		text += str(I18n.LANGUAGES[code]["name"])
+		if I18n.LANGUAGES[code].get("machine_tag") is String:
+			text += I18n.LANGUAGES[code]["machine_tag"]
+	I18n.apply("en")
+	_check(I18n.missing_glyphs(text, base) != "", "planted miss: the list's font without its own chain cannot draw the CJK names (missing: %s)" % I18n.missing_glyphs(text, base))
+	for code: String in I18n.LANGUAGES:
+		if not I18n.font_chain_complete(code):
+			continue
+		I18n.apply(code)
+		var missing: String = I18n.missing_glyphs(text, list_font)
+		_check(missing.is_empty(), "at %s the language list draws every name and tag (%s); missing: %s" % [code, text, missing])
+		var game_fallback: Font = I18n.fallback_font(code)
+		_check(game_fallback == null or not list_font.fallbacks.has(game_fallback), "at %s the game fonts' fallback stays out of the list's chain" % code)
+	I18n.apply("en")
+	for px: int in [12, 14, 16, 20]:
+		_check(list_font.get_height(px) == base.get_height(px), "the list's chain keeps Montserrat's row height at %d px (%.0f, bare %.0f)" % [px, list_font.get_height(px), base.get_height(px)])
+	var names: Array[String] = []
+	for code: String in I18n.LANGUAGES:
+		if I18n.LANGUAGES[code].get("picker_font") is String:
+			names.append(str(I18n.LANGUAGES[code]["name"]))
+	for code: String in I18n.LANGUAGES:
+		var path: Variant = I18n.LANGUAGES[code].get("picker_font")
+		if not path is String:
+			continue
+		var own: Font = load(path as String) as Font
+		var row: Dictionary = I18n.LANGUAGES[code]
+		var own_text: String = (str(row["name"]) + str(row["machine_tag"])).replace(" ", "")
+		_check(own != null and I18n.missing_glyphs(own_text, own).is_empty(), "%s's picker font draws its name and tag %s" % [code, own_text])
+		for other: String in names:
+			if other != row["name"]:
+				var foreign: String = ""
+				for character: String in other.split("", false):
+					if not own_text.contains(character):
+						foreign += character
+				_check(own != null and I18n.missing_glyphs(foreign, own) == foreign, "%s's picker font holds nothing of %s but shared characters" % [code, other])
+	_check(I18n.machine_tag("es") == "traducción automática" and I18n.machine_tag("ja") == "機械翻訳", "an unreviewed language's tag is its own words (es %s, ja %s)" % [I18n.machine_tag("es"), I18n.machine_tag("ja")])
+	_check(I18n.machine_tag("en") == "" and I18n.machine_tag("it") == "" and I18n.machine_tag("xx") == "", "English, a language with no tag yet and an unknown code show no tag")
+	var spanish: Dictionary = I18n.LANGUAGES["es"]
+	spanish["review"] = "reviewed"
+	_check(I18n.machine_tag("es") == "", "a reviewed language loses its tag (got %s)" % I18n.machine_tag("es"))
+	spanish["review"] = "machine"
 
 
 ## Every character of the game's English (each string literal in TEXT_DIRS' .gd and .tscn files, code
