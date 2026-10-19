@@ -1,13 +1,13 @@
 import assert from 'node:assert/strict';
-import { existsSync } from 'node:fs';
+import { existsSync, readFileSync } from 'node:fs';
 import path from 'node:path';
 import { contrastRatio, readToken, resolveBrandColors } from './brand-colors';
-import { assetTerms, gameName, longDescription, pressFiles, shortDescription, studioDescription, tagline } from './press-kit';
+import { assetTerms, gameName, logoColourways, logoLightCyan, longDescription, pressFiles, shortDescription, studioDescription, tagline } from './press-kit';
 
 /*
- * Checks for the design-system page's data (lib/press-kit.ts, lib/brand-colors.ts). The committed
- * zip itself is checked against a fresh build by `bun scripts/build-press-kit.ts --check`, which
- * `bun run test` runs after this file.
+ * Checks for the design-system page's data (lib/press-kit.ts, lib/brand-colors.ts). The zip itself is
+ * not committed: scripts/build-press-kit.ts builds it before every `dev` and `build`, and
+ * scripts/check-docs-export.sh checks the export contains it.
  */
 
 // The contrast maths matches the WCAG reference points: black on white is 21:1, a colour on itself 1:1.
@@ -28,6 +28,14 @@ for (const colour of colours.filter((c) => ['color-text', 'color-muted', 'color-
 // Every kit file exists where the site keeps it, and each has its own name inside the zip.
 for (const file of pressFiles) assert.ok(existsSync(path.join(process.cwd(), file.source)), `Missing press kit file ${file.source}`);
 assert.equal(new Set(pressFiles.map((file) => file.zipPath)).size, pressFiles.length, 'Two press kit files share a zip path');
+
+// The logo-only cyan the page names is the one the light-background logo files really draw with.
+for (const layout of ['stacked', 'horizontal', 'mark']) {
+  const svg = readFileSync(path.join(process.cwd(), `public/brand/wolf-override-${layout}-for-light-bg.svg`), 'utf8').toLowerCase();
+  assert.ok(svg.includes(logoLightCyan), `The ${layout} logo for light backgrounds does not use ${logoLightCyan}`);
+}
+// The wolf mark has no lettering, so its captions must not mention any.
+for (const colourway of logoColourways) assert.ok(!('markNote' in colourway ? colourway.markNote : colourway.note).includes('lettering'), `Mark caption for ${colourway.id} mentions lettering`);
 
 // The copy uses the current name only; the old slashed spelling appears only where the name rules
 // mention it. The tagline and summary keep their approved lengths: a reworded text must be re-approved.

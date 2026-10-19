@@ -19,6 +19,7 @@ import {
   designSystemPath,
   gameName,
   logoColourways,
+  logoLightCyan,
   longDescription,
   pressContact,
   pressFiles,
@@ -74,7 +75,11 @@ function hrefFor(file: PressFile): string {
   return href;
 }
 
-/** A file's size on disk in KB or MB, read when the site is built (paths are relative to apps/docs). */
+/**
+ * A file's size on disk in KB or MB, read when the site is built (paths are relative to apps/docs).
+ * For a single download, pass the file the link serves: for an `href` file that is its public/ copy,
+ * not the zipped source.
+ */
 function sizeOf(source: string): string {
   const bytes = statSync(path.join(process.cwd(), source)).size;
   return bytes >= 1048576 ? `${(bytes / 1048576).toFixed(1)} MB` : `${Math.max(1, Math.round(bytes / 1024))} KB`;
@@ -175,8 +180,10 @@ function DownloadButton() {
 
 export default function DesignSystemPage() {
   const colours = resolveBrandColors();
-  // The bright cyan's contrast on white, for the note on why light grounds use the deep cyan.
+  // The bright cyan's contrast on white, for the note on why light grounds use the deep cyan, and the
+  // logo-only cyan's, for the note on why it is never used for text.
   const cyanOnWhite = contrastRatio(colours.find((colour) => colour.token === 'color-accent')!.hex, '#ffffff').toFixed(1);
+  const logoCyanOnWhite = contrastRatio(logoLightCyan, '#ffffff').toFixed(1);
   return (
     // data-landing keeps the root dark, as on the landing page (see the end of global.css).
     <div data-landing="" className="flow-root overflow-clip bg-ink text-text scheme-dark">
@@ -246,7 +253,7 @@ export default function DesignSystemPage() {
                     </a>
                     <figcaption className="px-4 py-3 text-caption">
                       <strong className="block text-text">{colourway.title}</strong>
-                      <span className="text-muted">{colourway.note}</span>
+                      <span className="text-muted">{layout.id === 'mark' && 'markNote' in colourway ? colourway.markNote : colourway.note}</span>
                     </figcaption>
                   </figure>
                 ))}
@@ -315,6 +322,9 @@ export default function DesignSystemPage() {
             <li><strong className="text-text">Contrast</strong> is the WCAG ratio, worked out from the site&apos;s own colours when this page is built. AA needs 4.5:1 for body text; AAA needs 7:1.</li>
             <li><strong className="text-text">Cyan is an accent,</strong> not a background for long text.</li>
             <li><strong className="text-text">On white,</strong> the bright cyan is too faint ({cyanOnWhite}:1). Use the deep cyan, or the logo made for light backgrounds.</li>
+            <li>
+              <strong className="text-text">Logo cyan <code className="font-mono text-accent">{logoLightCyan.toUpperCase()}</code></strong> is the rule and ring in the logo for light backgrounds. It belongs to the logo files only: don&apos;t use it for text ({logoCyanOnWhite}:1 on white).
+            </li>
           </ul>
         </Section>
 
@@ -361,7 +371,7 @@ export default function DesignSystemPage() {
           <h3 className={subHeading}>About the art</h3>
           <ul className={`${bulletList} max-w-[62ch]`}>
             <li><strong className="text-text">All current art is provisional</strong> and may change before release.</li>
-            <li><strong className="text-text">Made with AI assistance:</strong> the key art and the game&apos;s art were made with AI image tools, then reviewed and approved by Nathanial Henniges. The logo is built from the project&apos;s own drawn wolf mark and Montserrat letter shapes.</li>
+            <li><strong className="text-text">Made with AI assistance:</strong> the key art and the game&apos;s art were made with AI image tools, then reviewed and approved by Nathanial Henniges. The wolf mark started as an AI concept (ChatGPT Create) and was redrawn by the project as SVG; the logo sets the name in Montserrat letter shapes beside it.</li>
             <li>Details for every file: <Link className="text-accent underline underline-offset-4" href="/docs/credits/#provisional-art">Credits</Link> and the <a className="text-accent underline underline-offset-4" href={`${repoUrl}/blob/main/apps/game/assets/manifest.json`}>asset register</a>.</li>
           </ul>
         </Section>
@@ -386,7 +396,7 @@ export default function DesignSystemPage() {
                     <li key={file.zipPath}>
                       <a href={hrefFor(file)} download className="flex min-h-11 items-center justify-between gap-3 leading-[1.4] text-muted hover-always:text-accent">
                         <span>{file.title}</span>
-                        <span className="flex-none text-caption">{sizeOf(file.source)}</span>
+                        <span className="flex-none text-caption">{sizeOf(file.href ? `public${file.href}` : file.source)}</span>
                       </a>
                     </li>
                   ))}
@@ -399,7 +409,7 @@ export default function DesignSystemPage() {
             {assetTerms.map((term) => <li key={term}>{term}</li>)}
           </ul>
           <p className={`${sectionCopy} mt-4`}>
-            The full terms are on the <Link className="text-accent underline underline-offset-4" href="/docs/legal/">Legal page</Link>.
+            These are the press terms. The <Link className="text-accent underline underline-offset-4" href="/docs/legal/">Legal page</Link> covers the licences for everything else in the project.
           </p>
         </Section>
 

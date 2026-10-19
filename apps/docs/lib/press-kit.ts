@@ -49,7 +49,11 @@ export const studioDescription =
 /** Where the design-system page lives, with the trailing slash every site path uses. */
 export const designSystemPath = '/design-system/';
 
-/** The press kit download, as served by the site (the file is apps/docs/public/press/wolf-override-press-kit.zip). */
+/**
+ * The press kit download, as served by the site. scripts/build-press-kit.ts writes it to
+ * apps/docs/public/press/wolf-override-press-kit.zip before every `dev` and `build`; it is
+ * git-ignored, so the repository never stores a second copy of the files it packs.
+ */
 export const pressKitPath = '/press/wolf-override-press-kit.zip';
 
 /** The profiles listed for press: the publisher's confirmed profiles minus GitHub and LinkedIn, which are not marketing channels. */
@@ -102,19 +106,31 @@ export type PressFile = {
   title: string;
   /**
    * The site URL of a single-file download when the file is not served from public/ under its own
-   * path: the key art PNG is not published, so its full-width WebP is offered instead. Files under
+   * path: the key art PNG is not published, so its full-width WebP is offered instead. It must be a
+   * file under public/, because the page shows that file's size, not the zipped source's. Files under
    * app/images are served at hashed paths the page gets from their imports, so they leave this out.
    */
   href?: string;
 };
 
-/** The colourways every logo layout comes in, with the short note the page shows for each. */
+/**
+ * The cyan of the rule and the ring in the logo files made for light backgrounds (the *-for-light-bg
+ * SVGs in public/brand/ draw with it). It is not a site token: it lives only in those files, and it is
+ * too faint on white for text, so the page shows it beside the palette as a logo-only colour.
+ */
+export const logoLightCyan = '#00aced';
+
+/**
+ * The colourways every logo layout comes in, with the short note the page shows for each. `note`
+ * describes the stacked and horizontal logos (which have lettering); `markNote`, where given,
+ * describes the wolf mark alone, which has none. The hex codes are the ones the SVG files draw with.
+ */
 export const logoColourways = [
-  { id: 'for-dark-bg', title: 'For dark backgrounds', note: 'White lettering, light cyan #8BE3FF' },
-  { id: 'for-light-bg', title: 'For light backgrounds', note: 'Navy lettering, brand cyan #00ACED' },
+  { id: 'for-dark-bg', title: 'For dark backgrounds', note: 'White lettering, light cyan #8BE3FF rule', markNote: 'Light cyan #8BE3FF ring' },
+  { id: 'for-light-bg', title: 'For light backgrounds', note: `Navy lettering, cyan ${logoLightCyan.toUpperCase()} rule`, markNote: `Cyan ${logoLightCyan.toUpperCase()} ring` },
   { id: 'mono-white', title: 'One colour, white', note: 'Stamps, merch and busy photos' },
   { id: 'mono-navy', title: 'One colour, navy', note: 'Stamps, print and light photos' },
-] as const;
+] as const satisfies readonly { id: string; title: string; note: string; markNote?: string }[];
 
 // The logo files: an SVG of every layout and colourway, plus PNG exports at fixed sizes. The dark
 // mark SVG is the site's own favicon mark (public/wolf-override-mark.svg), not a second copy.
@@ -140,7 +156,7 @@ export const pressFiles: PressFile[] = [
   {
     zipPath: 'art/wolf-override-key-art-provisional-1672x941.png',
     source: '../game/assets/title-corridor-key-art-provisional.png',
-    title: 'Key art, provisional (PNG, 1672x941; single download is WebP)',
+    title: 'Key art, provisional (WebP, 1672 px wide; the zip has the PNG)',
     href: '/title-corridor-key-art-provisional-1672.webp',
   },
   { zipPath: 'art/wolf-override-cover-1200x1600.png', source: 'public/press/wolf-override-cover-1200x1600.png', title: 'Cover, 3:4 with the name (PNG, 1200x1600)' },
