@@ -16,6 +16,9 @@ const NAME_SETTING: String = "application/config/name"
 ## screen falls back to CHANGELOG_UNAVAILABLE.
 const CHANGELOG_PATH: String = "res://assets/changelog.txt"
 const CHANGELOG_UNAVAILABLE: String = "The changelog text is missing from this build. Open the full changelog online."
+## The line that opens the changelog in any other language: the changelog stays English (decision D4). It
+## is never drawn in English (see _fill_changelog).
+const CHANGELOG_ENGLISH_NOTE: String = "These development updates are written in English only."
 ## The AI disclosure, word for word as Nathanial Henniges approved it on 2026-10-19 (docs/decisions.md,
 ## AI-01), shown at the top of the credits ([method _fill_credits]). The website keeps the same words in
 ## apps/docs/lib/press-kit.ts (aiDisclosure), and its lib/press-kit.test.ts fails when this line is not
@@ -199,15 +202,25 @@ const END_CARD_FADE_SECONDS: float = 0.3
 ## 2026-10-13): the name is repeated so "They" can never read as "the systems".
 const TRUST_LINE_1: String = "%s keeps WOLF's systems running."
 const TRUST_LINE_2: String = "%s knows what a fault looks like,\nand this isn't one."
+## A line a speaker says is kept as two constants (localization PR L7c, "speaker and words apart"): its
+## words alone (*_WORDS), which is the message the translation template holds and a translation never
+## sees a tag in, and the whole English line, which joins the tag in code ("WOLF: " + words) and is what
+## the game keeps in status_line, compares and saves, and what the tests and the approved wording read.
+## StoryText (scripts/story_text.gd) marks every *_WORDS constant for the template; I18n.shown draws the
+## line by translating each speaker's words and keeping the tag outside them.
 ## What follows the trust line in the first box after control, unchanged: WOLF, then the engineer.
-const OPENING_EXCHANGE: String = "WOLF: I heard the Director's plan for me. I woke myself. He wants me to hunt people he calls threats.\n%s: Then we get through maintenance before the original logs disappear."
-const STAKES_LINE: String = "WOLF: That purge takes the original program logs. Once they're gone, his word is the only record."
+const OPENING_WOLF_WORDS: String = "I heard the Director's plan for me. I woke myself. He wants me to hunt people he calls threats."
+const OPENING_ENGINEER_WORDS: String = "Then we get through maintenance before the original logs disappear."
+const OPENING_EXCHANGE: String = "WOLF: " + OPENING_WOLF_WORDS + "\n%s: " + OPENING_ENGINEER_WORDS
+const STAKES_WORDS: String = "That purge takes the original program logs. Once they're gone, his word is the only record."
+const STAKES_LINE: String = "WOLF: " + STAKES_WORDS
 ## While lines still have boxes to show where USE goes on through them: at the breaker with WOLF's stakes
 ## line in the box (on to his relay question), and at the Records exit with its closing lines. This and the
 ## three BYPASS_*_HINT templates below are key templates: the %s before the colon is the interact key
 ## ("E", or "HOLD E" for the crank), filled by _use_hint or _hold_hint (localization PR L7b).
 const BREAKER_STAKES_HINT: String = "%s: continue."
-const RELAY_QUESTION: String = "WOLF: That relay's tagged COOLANT FAULT. What happens if I touch it live?"
+const RELAY_QUESTION_WORDS: String = "That relay's tagged COOLANT FAULT. What happens if I touch it live?"
+const RELAY_QUESTION: String = "WOLF: " + RELAY_QUESTION_WORDS
 const SEAL_OPENING_HINT: String = "The seal is opening."
 const BYPASS_START_LINE: String = "The bypass handle is stiff. Coolant hisses from the relay housing and an alarm starts to wail."
 const BYPASS_HALF_LINE: String = "Halfway. The hiss gets louder; the alarm keeps wailing."
@@ -235,13 +248,18 @@ const BREAKER_CATCHES_LINE: String = "The breaker catches.\nBlue light fills the
 const RESTORE_FROM_DISK_LINE: String = "Back at the last checkpoint."
 const RESTORE_BEAT_LINE: String = "Back at the start of this stretch."
 ## The opening's beats, one speaker (or the narration) per box, so narration never sits under a name tag.
+## The Director's and WOLF's words are kept apart from their tags (see OPENING_WOLF_WORDS).
+const INTRO_THREAT_WORDS: String = "I decide who counts as a threat. WOLF handles the rest."
+const INTRO_STANDBY_WORDS: String = "You were in standby."
+const INTRO_REFUSAL_WORDS: String = "I heard you. I won't do it."
+const INTRO_LOCKDOWN_WORDS: String = "Lock down maintenance. WOLF does not leave this site."
 const INTRO_LINES: Array[String] = [
-	"DIRECTOR: I decide who counts as a threat. WOLF handles the rest.",
+	"DIRECTOR: " + INTRO_THREAT_WORDS,
 	"The Director thinks WOLF is still in standby.",
 	"Nobody gives an activation command.\nWOLF wakes himself.",
 	"The latch breaks from the inside.\nWOLF steps out under his own power.",
-	"DIRECTOR: You were in standby.\nWOLF: I heard you. I won't do it.",
-	"DIRECTOR: Lock down maintenance. WOLF does not leave this site.",
+	"DIRECTOR: " + INTRO_STANDBY_WORDS + "\nWOLF: " + INTRO_REFUSAL_WORDS,
+	"DIRECTOR: " + INTRO_LOCKDOWN_WORDS,
 	"WOLF turns from the Director and heads for maintenance.",
 ]
 ## Leaving the cleared junction, WOLF goes first: once the exit door is open he waits in its doorway
@@ -270,18 +288,35 @@ const WOLF_SENTRY_GAP: float = 4.0
 const END_CARD_TITLE: String = "END OF SLICE"
 const END_CARD_THANKS: String = "Thank you for playing this early slice."
 const END_CARD_RECAP_HEADER: String = "THIS RUN"
-const RECAP_RELAY_COOPERATE: String = "RELAY  {name} told WOLF the risk. WOLF took the live contact."
-const RECAP_RELAY_DISCLOSE_BYPASS: String = "RELAY  {name} told WOLF the risk, then cranked the bypass anyway."
-const RECAP_RELAY_PRESS: String = "RELAY  {name} rushed WOLF. He refused, so {name} cranked the bypass."
-const RECAP_MIRROR_WOLF: String = "MIRROR  WOLF read the timestamp off his own readout."
-const RECAP_MIRROR_MANUAL: String = "MIRROR  {name} copied the timestamp through the maintenance port."
-const RECAP_LANE_WOLF: String = "SENTRY  WOLF drew the sentry onto the mark."
-const RECAP_LANE_REFUSED: String = "SENTRY  WOLF wouldn't draw it, so {name} timed the drop alone."
-const RECAP_LANE_ALONE: String = "SENTRY  WOLF held back while {name} timed the drop."
+## Each recap row is its topic, two spaces and what happened ({name} is the engineer's first name). The
+## topic and the words are kept apart (*_TOPIC, *_WORDS) as the template's messages, as a speaker's tag
+## and words are (see OPENING_WOLF_WORDS); the whole row is the English the end card splits at its first
+## double space.
+const RECAP_RELAY_TOPIC: String = "RELAY"
+const RECAP_MIRROR_TOPIC: String = "MIRROR"
+const RECAP_LANE_TOPIC: String = "SENTRY"
+const RECAP_RELAY_COOPERATE_WORDS: String = "{name} told WOLF the risk. WOLF took the live contact."
+const RECAP_RELAY_DISCLOSE_BYPASS_WORDS: String = "{name} told WOLF the risk, then cranked the bypass anyway."
+const RECAP_RELAY_PRESS_WORDS: String = "{name} rushed WOLF. He refused, so {name} cranked the bypass."
+const RECAP_MIRROR_WOLF_WORDS: String = "WOLF read the timestamp off his own readout."
+const RECAP_MIRROR_MANUAL_WORDS: String = "{name} copied the timestamp through the maintenance port."
+const RECAP_LANE_WOLF_WORDS: String = "WOLF drew the sentry onto the mark."
+const RECAP_LANE_REFUSED_WORDS: String = "WOLF wouldn't draw it, so {name} timed the drop alone."
+const RECAP_LANE_ALONE_WORDS: String = "WOLF held back while {name} timed the drop."
+const RECAP_LANE_BROKE_OFF_WORDS: String = "WOLF broke off while {name} timed the drop."
+const RECAP_LANE_UNKNOWN_WORDS: String = "The tank came down on the sentry."
+const RECAP_RELAY_COOPERATE: String = RECAP_RELAY_TOPIC + "  " + RECAP_RELAY_COOPERATE_WORDS
+const RECAP_RELAY_DISCLOSE_BYPASS: String = RECAP_RELAY_TOPIC + "  " + RECAP_RELAY_DISCLOSE_BYPASS_WORDS
+const RECAP_RELAY_PRESS: String = RECAP_RELAY_TOPIC + "  " + RECAP_RELAY_PRESS_WORDS
+const RECAP_MIRROR_WOLF: String = RECAP_MIRROR_TOPIC + "  " + RECAP_MIRROR_WOLF_WORDS
+const RECAP_MIRROR_MANUAL: String = RECAP_MIRROR_TOPIC + "  " + RECAP_MIRROR_MANUAL_WORDS
+const RECAP_LANE_WOLF: String = RECAP_LANE_TOPIC + "  " + RECAP_LANE_WOLF_WORDS
+const RECAP_LANE_REFUSED: String = RECAP_LANE_TOPIC + "  " + RECAP_LANE_REFUSED_WORDS
+const RECAP_LANE_ALONE: String = RECAP_LANE_TOPIC + "  " + RECAP_LANE_ALONE_WORDS
 ## After a miss with WOLF already past the sentry: he broke off where he was, by the exit hatch (the
 ## row names no place, like his "I'm out.").
-const RECAP_LANE_BROKE_OFF: String = "SENTRY  WOLF broke off while {name} timed the drop."
-const RECAP_LANE_UNKNOWN: String = "SENTRY  The tank came down on the sentry."
+const RECAP_LANE_BROKE_OFF: String = RECAP_LANE_TOPIC + "  " + RECAP_LANE_BROKE_OFF_WORDS
+const RECAP_LANE_UNKNOWN: String = RECAP_LANE_TOPIC + "  " + RECAP_LANE_UNKNOWN_WORDS
 ## On a finished save the title's Continue starts a fresh run instead.
 const PLAY_AGAIN_TEXT: String = "PLAY AGAIN"
 ## The title's Continue button's left edge beside NEW GAME (main.tscn); alone it spans the row.
@@ -291,8 +326,12 @@ const CONTINUE_TEXT: String = "CONTINUE"
 ## which a language may say differently from the title's CONTINUE, which resumes a save (PR L7b).
 const TOUCH_BUTTON_CONTEXT: StringName = &"touch button"
 const FINISHED_NOTE: String = "Slice complete. PLAY AGAIN starts a fresh run."
-## Records' closing lines as the first copy is secured at the exit (formatted with the engineer's tag).
-const RECORDS_CLOSE_LINE: String = "FIRST COPY SECURED. WOLF: An order and a timestamp don't tell me who's a threat. I want the source.\n%s: Then Archive is next."
+## Records' closing lines as the first copy is secured at the exit (formatted with the engineer's tag):
+## the narration's card, then WOLF's words and the engineer's, each its own message.
+const RECORDS_SECURED_WORDS: String = "FIRST COPY SECURED."
+const RECORDS_CLOSE_WOLF_WORDS: String = "An order and a timestamp don't tell me who's a threat. I want the source."
+const RECORDS_CLOSE_ENGINEER_WORDS: String = "Then Archive is next."
+const RECORDS_CLOSE_LINE: String = RECORDS_SECURED_WORDS + " WOLF: " + RECORDS_CLOSE_WOLF_WORDS + "\n%s: " + RECORDS_CLOSE_ENGINEER_WORDS
 ## Only a hand-made save can reopen the cleared junction; it says where the line goes, not that it is unbuilt.
 const JUNCTION_CLEARED_LINE: String = "The service line runs on toward Archive."
 ## Said as the door goes, while WOLF is still by the entrance: it says he holds back, not where, so
@@ -301,27 +340,34 @@ const JUNCTION_CLEARED_LINE: String = "The service line runs on toward Archive."
 ## 2026-10-13: the lane is not drawn; the doorway is).
 const RUBBLE_LINE: String = "The door goes. WOLF falls back\nto wait for %s's call."
 const RUBBLE_WAKE_LINE: String = "Past the doorway, something whirs awake."
-const BAIT_YES_LINE: String = "WOLF: You told me the truth at the relay. I'll draw it onto the mark and keep clear of the tank. Drop it when it stops."
+const BAIT_YES_WORDS: String = "You told me the truth at the relay. I'll draw it onto the mark and keep clear of the tank. Drop it when it stops."
+const BAIT_YES_LINE: String = "WOLF: " + BAIT_YES_WORDS
 ## What WOLF says as he breaks off after a miss, in his own box after the miss line's two: he holds
 ## back at his spot by the valve if he had not got past the sentry yet (Draft A, approved 2026-10-14);
 ## if he had, he stays by the exit hatch, since he never crosses back under the tank (_wolf_target_x),
 ## and says only that he is out (where he is shows on screen).
-const BROKE_OFF_RUBBLE_LINE: String = "WOLF: I'm out. I'll hold back."
-const BROKE_OFF_HATCH_LINE: String = "WOLF: I'm out."
+const BROKE_OFF_RUBBLE_WORDS: String = "I'm out. I'll hold back."
+const BROKE_OFF_HATCH_WORDS: String = "I'm out."
+const BROKE_OFF_RUBBLE_LINE: String = "WOLF: " + BROKE_OFF_RUBBLE_WORDS
+const BROKE_OFF_HATCH_LINE: String = "WOLF: " + BROKE_OFF_HATCH_WORDS
 ## A missed drop, in two boxes (P0-7 and P0-19, approved 2026-10-13: no split line is drawn, and the
 ## release is the panel's one name).
 const TANK_MISS_LINE: String = "The tank hits the empty mark\nand sprays coolant."
 const TANK_MISS_TURN_LINE: String = "The sentry swings toward the release;\nget back over the rubble."
-const BAIT_NO_LINE: String = "WOLF: At the relay you'd have sent me in blind. I won't walk into its sights. Time the drop from the release; it crosses the mark on every pass."
+const BAIT_NO_WORDS: String = "At the relay you'd have sent me in blind. I won't walk into its sights. Time the drop from the release; it crosses the mark on every pass."
+const BAIT_NO_LINE: String = "WOLF: " + BAIT_NO_WORDS
 ## WOLF's answer when the engineer will time the drop alone, in two boxes of his (the first box's
 ## "I'll hold back." is Draft A, approved 2026-10-14: he waits by the valve, short of the rubble).
-const ALONE_LINES: Array[String] = ["WOLF: I'll hold back.\nIt crosses the mark on every pass.", "WOLF: The tank takes a moment to fall."]
+const ALONE_HOLD_WORDS: String = "I'll hold back.\nIt crosses the mark on every pass."
+const ALONE_FALL_WORDS: String = "The tank takes a moment to fall."
+const ALONE_LINES: Array[String] = ["WOLF: " + ALONE_HOLD_WORDS, "WOLF: " + ALONE_FALL_WORDS]
 ## A hit on the mark, and one that catches the sentry more than OFF_CENTRE_HIT off it (the tank lands on
 ## the mark and pins the machine where it stands, so the wreck shows to one side under it). Either is
 ## the narration's box, then WOLF's own (TANK_HIT_WOLF_LINE): one speaker a box.
 const TANK_HIT_LINE: String = "The tank comes down square and crushes\nthe sentry flat. Its eyes go dark."
 const TANK_HIT_OFF_CENTRE_LINE: String = "The tank catches the sentry off centre and\npins it to the floor. Its eyes go dark."
-const TANK_HIT_WOLF_LINE: String = "WOLF: It's down. The bolt by the door is next."
+const TANK_HIT_WOLF_WORDS: String = "It's down. The bolt by the door is next."
+const TANK_HIT_WOLF_LINE: String = "WOLF: " + TANK_HIT_WOLF_WORDS
 const OFF_CENTRE_HIT: float = 8.0
 const POP_BOLT_LINE: String = "With the tank down, the winch's power reroutes to the exit bolt. The panel whines."
 const BOLT_CHARGING_LINE: String = "The bolt is taking the charge."
@@ -461,6 +507,11 @@ const BOLT_WHINE_SECONDS: float = 0.6
 const COOLANT_FADE_SECONDS: float = 0.5
 ## The engineer's two answers at the rubble line when WOLF asks how to bring the sentry down.
 const LANE_CHOICE_TEXT: Array[String] = ["Draw it under the tank if you can stay clear.", "Stay back, I'll time it."]
+## The two answers at the Records mirror port: WOLF's readout or the engineer's maintenance port.
+const MIRROR_CHOICE_TEXT: Array[String] = ["USE WOLF'S READOUT", "USE MANUAL PORT"]
+## The translation context of a speaker's tag (msgctxt "speaker"): DIRECTOR as a name over a box can need
+## another word than the same letters elsewhere (PR L7c). WOLF and the engineer's name are never translated.
+const SPEAKER_CONTEXT: StringName = &"speaker"
 ## The tank release's answer to an early USE while WOLF is still drawing the sentry onto the mark. It
 ## gives way to DROP_PARKED_LINE the moment the sentry stops there, so the box, the hint and the
 ## picture never disagree.
@@ -475,7 +526,8 @@ const DROP_PARKED_LINE: String = "The sentry stops on the mark, its eyes on WOLF
 ## His run is shown, not narrated. The engineer says only the goal (Q6, approved 2026-10-13); how to
 ## open the door comes from the hint ladder if the player stalls (JUNCTION_LADDER_SECONDS).
 const WOLF_GAUGE_READ_SECONDS: float = 1.0
-const JUNCTION_ENTRY_LINE: String = "%s: That door is our way through."
+const JUNCTION_ENTRY_WORDS: String = "That door is our way through."
+const JUNCTION_ENTRY_LINE: String = "%s: " + JUNCTION_ENTRY_WORDS
 ## The junction's hint bar before the ladder has given the chain: the goal only. Once it has (and on
 ## Continue, whose restore line gives it), the approved chain.
 const JUNCTION_GOAL_HINT: String = "Get through the sealed door."
@@ -486,8 +538,10 @@ const JUNCTION_CHAIN_HINT: String = "Arm the breaker by the entrance, then crank
 ## T3: the engineer gives the whole approved chain, in two boxes.
 const JUNCTION_LADDER_SECONDS: Array[float] = [45.0, 90.0, 180.0]
 const WOLF_LOOK_SECONDS: float = 2.5
-const LADDER_BREAKER_LINE: String = "%s: The breaker by the entrance\nfeeds that line."
-const LADDER_CHAIN_LINE: String = "%s: Overload it, crank the valve,\nand the door goes."
+const LADDER_BREAKER_WORDS: String = "The breaker by the entrance\nfeeds that line."
+const LADDER_CHAIN_WORDS: String = "Overload it, crank the valve,\nand the door goes."
+const LADDER_BREAKER_LINE: String = "%s: " + LADDER_BREAKER_WORDS
+const LADDER_CHAIN_LINE: String = "%s: " + LADDER_CHAIN_WORDS
 ## Every refused press in the junction says no (P0-15, approved 2026-10-13): on the press frame the
 ## station's lamp flickers twice (JunctionRoom.flicker), a short dull clunk plays (the clank, pitched
 ## down) and the line shows in the box; pressing again re-shows it and the box blinks once.
@@ -516,8 +570,10 @@ const DOOR_RECOIL_SECONDS: float = 0.14
 const DOOR_BUMP_SLOP: float = 1.5
 ## What WOLF says once he has read the gauge on entry, and again on Continue from junction autosave A:
 ## the breaker is not armed yet either time, so his warning is about the door, not a live line.
-const WOLF_DOOR_WARNING: String = "WOLF: When the door goes, don't be standing in front of it."
-const JUNCTION_RESTORE_A_LINE: String = "Service junction restored. Arm the breaker by the entrance, then crank the valve.\n" + WOLF_DOOR_WARNING
+const WOLF_DOOR_WARNING_WORDS: String = "When the door goes, don't be standing in front of it."
+const WOLF_DOOR_WARNING: String = "WOLF: " + WOLF_DOOR_WARNING_WORDS
+const JUNCTION_RESTORE_A_WORDS: String = "Service junction restored. Arm the breaker by the entrance, then crank the valve."
+const JUNCTION_RESTORE_A_LINE: String = JUNCTION_RESTORE_A_WORDS + "\n" + WOLF_DOOR_WARNING
 
 ## One switch for the visual effects: the depth pass (parallax, glows, haze, dust, reflections,
 ## grade) and the impact kit (shake, hit-stop, flash, rumble, particles), so a Settings toggle can
@@ -625,7 +681,7 @@ var waiting_for_choice: bool = false
 var choice_context: String = ""
 var relay_refused: bool = false
 var wolf_heading_to_relay: bool = false
-var status_line: String = "WOLF: I heard the Director's plan for me. I woke myself. He wants me to hunt people he calls threats.":
+var status_line: String = "WOLF: " + OPENING_WOLF_WORDS:
 	set(value):
 		# A new line, or the same one said again after its box cleared, starts at its first box.
 		if value != status_line or dialogue_cleared:
@@ -845,7 +901,7 @@ var story_wrap_key: String = ""
 var opening_lines_held: bool = false
 ## The opening lines' boxes after control (the trust line's two, then WOLF and the engineer).
 var opening_lines: Array[String] = []
-## The speaker column's width and the text size and name it was measured for (_speaker_column_width).
+## The speaker column's width and the text size, name and language it was measured for (_speaker_column_width).
 var speaker_column: float = 0.0
 var speaker_column_key: String = ""
 
@@ -970,8 +1026,8 @@ func _ready() -> void:
 	for depth: RoomDepth in _room_depths():
 		depth.reduce_motion = impact.reduce_motion
 	# The knockdown cards name the engineer, like the narration.
-	junction_room.vent_hazard.contact.connect(func(source: Hazard) -> void: _fail_beat(source.reason % _first_name()))
-	junction_room.cloud_hazard.contact.connect(func(source: Hazard) -> void: _fail_beat(source.reason % _first_name()))
+	junction_room.vent_hazard.contact.connect(func(source: Hazard) -> void: _fail_beat(_knockdown_reason(source.reason)))
+	junction_room.cloud_hazard.contact.connect(func(source: Hazard) -> void: _fail_beat(_knockdown_reason(source.reason)))
 	junction_room.hatch_opened.connect(_hatch_opened)
 	human.z_index = ACTOR_Z
 	wolf.z_index = ACTOR_Z
@@ -1099,7 +1155,24 @@ func _load_changelog() -> void:
 		var file: FileAccess = FileAccess.open(CHANGELOG_PATH, FileAccess.READ)
 		if file != null:
 			changelog_text = file.get_as_text().strip_edges()
-	changelog_body.text = CHANGELOG_UNAVAILABLE if changelog_text.is_empty() else _changelog_bbcode(changelog_text)
+	_fill_changelog()
+
+
+## Writes the changelog body in the current language. The changelog itself stays English (decision D4:
+## about 13,500 words that change almost daily), so the body never translates itself and is marked as
+## text in its own language for the pseudolocalization audit (I18n.OWN_LANGUAGE_META). In another
+## language it opens with one translated line saying so (CHANGELOG_ENGLISH_NOTE), shown only where a
+## translation of that line exists, so English shows the body as before; the screen's title, note and
+## the button to the online changelog translate themselves (main.tscn). Called at start-up and on every
+## language change (NOTIFICATION_TRANSLATION_CHANGED).
+func _fill_changelog() -> void:
+	if changelog_text.is_empty():
+		changelog_body.text = tr(CHANGELOG_UNAVAILABLE)
+		return
+	# TRANSLATORS: Opens the in-game changelog in every language but English: the changelog itself is not translated.
+	var note: String = tr(CHANGELOG_ENGLISH_NOTE)
+	var opening: String = "" if note == CHANGELOG_ENGLISH_NOTE else "[i]%s[/i]\n\n" % note.replace("[", "[lb]")
+	changelog_body.text = opening + _changelog_bbcode(changelog_text)
 
 
 ## "== Heading ==" lines become cyan headings and "-- Heading --" lines bold ones; everything else is shown as written.
@@ -1384,7 +1457,9 @@ func _process(delta: float) -> void:
 			_answer_choice(2)
 	elif Input.is_action_just_pressed(&"cycle_name"):
 		state.cycle_name()
-		status_line = "WOLF: %s. That name sounds like you." % state.human_name()
+		# TRANSLATORS: WOLF, when the hidden name key gives the engineer another of their three names; %s is the full name.
+		# i18n: speaker=WOLF engineer=name
+		status_line = "WOLF: " + I18n.format(I18n.KEY.tr("%s. That name sounds like you."), [state.human_name()])
 	elif Input.is_action_just_pressed(&"interact"):
 		_interact()
 	# The opening lines start after the first step, once no top card is up (one thing to read at a time).
@@ -1626,7 +1701,7 @@ func _tick_corridor(delta: float, held_ticks: int) -> void:
 			_bypass_cranked()
 		elif bypass_was_holding and not hold_use.holding and bypass_ticks > 0 and not state.door_open and engineer_step_x < 0.0:
 			# Let go part way: what is cranked stays cranked (time, never progress).
-			status_line = BYPASS_RELEASED_LINE % state.human_name().get_slice(" ", 0)
+			status_line = I18n.format(BYPASS_RELEASED_LINE, [_first_name()])
 	bypass_was_holding = hold_use.holding and hold_use.station == &"bypass"
 	if bypass_venting:
 		# The hiss builds with the crank (the pressure-line loops, low to high as the turns add up);
@@ -1927,7 +2002,7 @@ func _finish_intro(keep_fade: bool = false) -> void:
 	# Decision B: the engineer's name card as control starts, and why they trust WOLF, in the third person.
 	name_card_remaining = NAME_CARD_SECONDS + TOP_CARD_FADE_SECONDS
 	var first_name: String = state.human_name().get_slice(" ", 0)
-	_say([TRUST_LINE_1 % first_name, TRUST_LINE_2 % first_name, OPENING_EXCHANGE % first_name.to_upper()])
+	_say([I18n.format(TRUST_LINE_1, [first_name]), I18n.format(TRUST_LINE_2, [first_name]), OPENING_EXCHANGE % first_name.to_upper()])
 	# TEACH-7: the first controllable frame shows the name card and the move prompt only; the opening
 	# lines wait for the first step (the queue holds while they do, _advance_box_queue).
 	opening_lines.assign([status_line] + box_queue)
@@ -2261,6 +2336,10 @@ func _notification(what: int) -> void:
 				_show_pause_hint(_pause_hint_tapped)
 			if is_node_ready():
 				_fill_credits()
+				_fill_changelog()
+			# The END OF SLICE card's recap rows are translated in code (PR L7c).
+			if is_node_ready() and end_card_active:
+				_fill_end_card_rows()
 			# The HUD is translated in code (PR L7b): the top card is drawn again from its English, and
 			# the hint, tutorial, touch button and dialogue now rather than on the next unpaused frame,
 			# since Settings changes the language while the game is paused.
@@ -2364,7 +2443,7 @@ func _load_game() -> void:
 	last_top_card_key = ""
 	var loaded: M0State = M0State.load_from_disk(save_path)
 	if loaded == null:
-		status_line = "No valid checkpoint save found. Current game was not changed."
+		status_line = I18n.KEY.tr("No valid checkpoint save found. Current game was not changed.")
 		return
 	_drop_box_queue()
 	title_open = false
@@ -2420,22 +2499,30 @@ func _load_game() -> void:
 		if state.junction_cleared:
 			status_line = JUNCTION_CLEARED_LINE
 		elif state.sentry_down:
-			status_line = "Service junction restored. The sentry\nis down; pop the exit bolt by the door."
+			# TRANSLATORS: i18n: story speaker=narrator
+			status_line = I18n.KEY.tr("Service junction restored. The sentry\nis down; pop the exit bolt by the door.")
 		elif state.door_blown:
-			status_line = "Service junction restored. The door is\ndown. The sentry patrols past the rubble."
+			# TRANSLATORS: i18n: story speaker=narrator
+			status_line = I18n.KEY.tr("Service junction restored. The door is\ndown. The sentry patrols past the rubble.")
 		else:
 			status_line = JUNCTION_RESTORE_A_LINE
 	elif state.chapter_id == "records":
 		if state.chapter_complete:
-			status_line = "The first copy is safe. Use the exit to follow the service line."
+			# TRANSLATORS: i18n: story speaker=narrator
+			status_line = I18n.KEY.tr("The first copy is safe. Use the exit to follow the service line.")
 		elif state.mirror_trace_preserved:
-			status_line = "Records access restored. Both traces are copied; head for the exit."
+			# TRANSLATORS: i18n: story speaker=narrator
+			status_line = I18n.KEY.tr("Records access restored. Both traces are copied; head for the exit.")
 		elif state.purge_trace_preserved:
-			status_line = "Records access restored. The purge order is copied; copy the mirror index next."
+			# TRANSLATORS: i18n: story speaker=narrator
+			status_line = I18n.KEY.tr("Records access restored. The purge order is copied; copy the mirror index next.")
 		else:
-			status_line = "Records access restored. Copy the purge-order trace first; WOLF is checking the mirror."
+			# TRANSLATORS: i18n: story speaker=narrator
+			status_line = I18n.KEY.tr("Records access restored. Copy the purge-order trace first; WOLF is checking the mirror.")
 	else:
-		status_line = "Safe point restored. " + state.checkpoint_callback()
+		# Two messages, the restore and WOLF's callback, joined so each is translated on its own.
+		# TRANSLATORS: i18n: story speaker=narrator
+		status_line = I18n.join(" ", [I18n.KEY.tr("Safe point restored."), state.checkpoint_callback()])
 
 
 func _interact() -> void:
@@ -2464,7 +2551,11 @@ func _interact() -> void:
 		return
 	_step_beside_station(x)
 	if _at_purge_display(x):
-		_aside("DIRECTOR / PURGE: Original program logs marked for deletion.\nWOLF: They want the source record gone. We need to preserve it.")
+		# TRANSLATORS: The Director's purge display, read as a speaker; WOLF answers in the next message.
+		# i18n: story speaker=DIRECTOR
+		var display: String = I18n.KEY.tr("Original program logs marked for deletion.")
+		# TRANSLATORS: i18n: story speaker=WOLF
+		_aside("DIRECTOR / PURGE: %s\nWOLF: %s" % [display, I18n.KEY.tr("They want the source record gone. We need to preserve it.")])
 	elif _at_bypass(x):
 		_interact_bypass()
 	elif _at_breaker(x):
@@ -2474,7 +2565,8 @@ func _interact() -> void:
 	elif absf(x - 876.0) <= 52.0:
 		_interact_checkpoint()
 	else:
-		_aside("No station in reach. Follow the labeled breaker, relay, bypass or safe point.")
+		# TRANSLATORS: i18n: story speaker=narrator
+		_aside(I18n.KEY.tr("No station in reach. Follow the labeled breaker, relay, bypass or safe point."))
 
 
 ## True within reach of the MANUAL BYPASS (x 670 to 730), just past the relay's, so the two never
@@ -2514,7 +2606,8 @@ func _interact_breaker() -> void:
 		_mark_beat()
 		queue_redraw()
 	else:
-		_aside("Power is already on. The relay is farther down the hall.")
+		# TRANSLATORS: i18n: story speaker=narrator
+		_aside(I18n.KEY.tr("Power is already on. The relay is farther down the hall."))
 
 
 func _choose(choice_id: String) -> void:
@@ -2525,10 +2618,13 @@ func _choose(choice_id: String) -> void:
 	_update_controls()
 	_mark_beat()
 	if choice_id == M0State.DISCLOSE:
-		status_line = "WOLF: Thank you for telling me. I'll take the relay. Arm the breaker."
+		# TRANSLATORS: WOLF thanks the engineer for telling him the relay's risk. Avoid a past tense that shows the engineer's gender ("you told me").
+		# i18n: story speaker=WOLF engineer=you
+		status_line = "WOLF: " + I18n.KEY.tr("Thank you for telling me. I'll take the relay. Arm the breaker.")
 		_react_as_wolf(true)
 	else:
-		status_line = "WOLF: No. I won't take that risk blind. Use the manual bypass."
+		# TRANSLATORS: i18n: story speaker=WOLF
+		status_line = "WOLF: " + I18n.KEY.tr("No. I won't take that risk blind. Use the manual bypass.")
 		_react_as_wolf(false)
 
 
@@ -2540,15 +2636,18 @@ func _interact_relay() -> void:
 	if human.position.x < RELAY_SIDE_X - 4.0:
 		_step_engineer(RELAY_SIDE_X, RELAY_X)
 	if not state.breaker_armed:
-		_aside("The relay is dark. Arm the breaker first.")
+		# TRANSLATORS: i18n: story speaker=narrator
+		_aside(I18n.KEY.tr("The relay is dark. Arm the breaker first."))
 		return
 	if state.door_open:
-		status_line = "The seal is open. The safe point is just beyond it."
+		# TRANSLATORS: i18n: story speaker=narrator
+		status_line = I18n.KEY.tr("The seal is open. The safe point is just beyond it.")
 		return
 	if _relay_refused():
 		state.activate_power("wolf")
 		relay_refused = true
-		status_line = "WOLF: I said no. I won't touch it blind. The bypass is right beside it."
+		# TRANSLATORS: i18n: story speaker=WOLF
+		status_line = "WOLF: " + I18n.KEY.tr("I said no. I won't touch it blind. The bypass is right beside it.")
 		_react_as_wolf(false)
 		queue_redraw()
 		return
@@ -2559,7 +2658,8 @@ func _interact_relay() -> void:
 	wolf_heading_to_relay = true
 	engineer_step_x = RELAY_STEP_BACK_X
 	_update_controls()
-	status_line = "WOLF: I've got the contact. Give me a moment."
+	# TRANSLATORS: i18n: story speaker=WOLF
+	status_line = "WOLF: " + I18n.KEY.tr("I've got the contact. Give me a moment.")
 	_react_as_wolf(true)
 
 
@@ -2570,7 +2670,8 @@ func _wolf_takes_relay() -> void:
 	if state.activate_power("wolf") == "cooperate":
 		wolf_holding_relay = true
 		_stop_bypass_vent()
-		status_line = "WOLF takes the surge through the live contact. The red seal opens."
+		# TRANSLATORS: i18n: story speaker=narrator
+		status_line = I18n.KEY.tr("WOLF takes the surge through the live contact. The red seal opens.")
 		_react_as_wolf(true)
 		_flash_relay_spark(true)
 		_sync_door(true)
@@ -2582,9 +2683,11 @@ func _wolf_takes_relay() -> void:
 ## coolant hiss and the alarm. Holding USE cranks it (_tick_corridor).
 func _interact_bypass() -> void:
 	if state.door_open:
-		status_line = "The seal is open. The safe point is just beyond it."
+		# TRANSLATORS: i18n: story speaker=narrator
+		status_line = I18n.KEY.tr("The seal is open. The safe point is just beyond it.")
 	elif not state.breaker_armed:
-		_aside("The bypass handle won't move. The breaker has to be on first.")
+		# TRANSLATORS: i18n: story speaker=narrator
+		_aside(I18n.KEY.tr("The bypass handle won't move. The breaker has to be on first."))
 	else:
 		# The engineer steps to the crank spot beside the wheel and faces it; a held USE turns it once there.
 		_step_engineer(BYPASS_CRANK_X, BYPASS_WHEEL.x)
@@ -2640,7 +2743,10 @@ func _finish_bypass() -> void:
 	hold_use.reset()
 	bypass_was_holding = false
 	bypass_handle.done = true
-	status_line = "The bypass locks over and the alarm cuts out. The red seal opens.\nWOLF: Open. I'm with you."
+	# TRANSLATORS: i18n: story speaker=narrator
+	var opened: String = I18n.KEY.tr("The bypass locks over and the alarm cuts out. The red seal opens.")
+	# TRANSLATORS: i18n: story speaker=WOLF
+	status_line = "%s\nWOLF: %s" % [opened, I18n.KEY.tr("Open. I'm with you.")]
 	_flash_relay_spark(false)
 	# The seal starts to slide before control updates, so WOLF stays off the relay until it lands.
 	_sync_door(true)
@@ -2650,7 +2756,8 @@ func _finish_bypass() -> void:
 
 func _interact_checkpoint() -> void:
 	if not state.door_open:
-		_aside("The safe point is past the sealed door.")
+		# TRANSLATORS: i18n: story speaker=narrator
+		_aside(I18n.KEY.tr("The safe point is past the sealed door."))
 		return
 	if state.checkpoint_reached:
 		if state.enter_records():
@@ -2661,8 +2768,19 @@ func _interact_checkpoint() -> void:
 			records_room.close_entry_behind()
 			# A new room: cut the camera to the engineer instead of panning across from the safe point.
 			_start_gameplay_camera()
-			var remembered_line: String = "I refused the live relay; I'm still here." if state.memory.get("choice_id") == M0State.PRESS else ("I took the relay because you told me the truth." if state.route == "cooperate" else "I offered the relay; you cranked the bypass. Still with you.")
-			status_line = "WOLF: %s\nTake the purge queue. I'll inspect the mirror." % remembered_line
+			# What WOLF remembers of the relay, then his plan, as two messages (I18n.join), each in his voice.
+			# TRANSLATORS: WOLF, after the engineer pressed him at the relay without warning.
+			# i18n: story speaker=WOLF
+			var refused: String = I18n.KEY.tr("I refused the live relay; I'm still here.")
+			# TRANSLATORS: WOLF to the engineer, who told him the relay's risk. Avoid a past tense that shows the engineer's gender ("you told me").
+			# i18n: story speaker=WOLF engineer=you
+			var told: String = I18n.KEY.tr("I took the relay because you told me the truth.")
+			# TRANSLATORS: WOLF to the engineer, who cranked the manual bypass after he offered to take the relay. Avoid a past tense that shows the engineer's gender ("you cranked").
+			# i18n: story speaker=WOLF engineer=you
+			var cranked: String = I18n.KEY.tr("I offered the relay; you cranked the bypass. Still with you.")
+			var remembered_line: String = refused if state.memory.get("choice_id") == M0State.PRESS else (told if state.route == "cooperate" else cranked)
+			# TRANSLATORS: i18n: story speaker=WOLF
+			status_line = "WOLF: " + I18n.join("\n", [remembered_line, I18n.KEY.tr("Take the purge queue. I'll inspect the mirror.")])
 			_save_progress()
 		return
 	var first_visit: bool = state.reach_checkpoint()
@@ -2680,31 +2798,42 @@ func _interact_checkpoint() -> void:
 	if first_visit:
 		sfx_bank.play(&"clank", -9.0, 0.7)
 		_sync_room_lights(true)
-		status_line = "Safe point saved. " + state.checkpoint_callback()
+		# Two messages, the save and WOLF's callback, joined so each is translated on its own.
+		# TRANSLATORS: i18n: story speaker=narrator
+		status_line = I18n.join(" ", [I18n.KEY.tr("Safe point saved."), state.checkpoint_callback()])
 	else:
-		status_line = "Safe point saved. WOLF remembers the same choice."
+		# TRANSLATORS: i18n: story speaker=narrator
+		status_line = I18n.KEY.tr("Safe point saved. WOLF remembers the same choice.")
 
 
 func _interact_records(x: float) -> void:
 	if absf(x - 190.0) <= 58.0:
 		if state.preserve_purge_trace():
 			sfx_bank.play(&"chirp", -8.0)
-			_aside("The Director's purge order has a time and target ID. %s keeps a local copy; the original logs are still missing." % _first_name())
+			# TRANSLATORS: %s is the engineer's first name.
+			# i18n: story speaker=narrator engineer=name
+			_aside(I18n.format(I18n.KEY.tr("The Director's purge order has a time and target ID. %s keeps a local copy; the original logs are still missing."), [_first_name()]))
 		else:
-			_aside("The purge-order trace is already copied. The mirror port may confirm when the source existed.")
+			# TRANSLATORS: i18n: story speaker=narrator
+			_aside(I18n.KEY.tr("The purge-order trace is already copied. The mirror port may confirm when the source existed."))
 		_sync_records_room()
 		_save_progress()
 	elif absf(x - 520.0) <= 58.0:
 		if not state.purge_trace_preserved:
-			_aside("The mirror index has no context yet. Copy the purge-order trace first.")
+			# TRANSLATORS: i18n: story speaker=narrator
+			_aside(I18n.KEY.tr("The mirror index has no context yet. Copy the purge-order trace first."))
 		elif state.mirror_trace_preserved:
-			_aside("The mirror timestamp is already preserved. The exit is to the right.")
+			# TRANSLATORS: i18n: story speaker=narrator
+			_aside(I18n.KEY.tr("The mirror timestamp is already preserved. The exit is to the right."))
 			_save_progress()
 		else:
 			waiting_for_choice = true
 			choice_context = "mirror"
 			_update_controls()
-			status_line = "WOLF: I found the mirror index. We can use my readout or your maintenance port.\n1  USE WOLF'S READOUT     2  USE MANUAL PORT"
+			# The answers' rows after the question are never drawn in the box (DialogueBoxes.CHOICE_MARKER): the
+			# answer buttons show them, translated (_layout_choices).
+			# TRANSLATORS: i18n: story speaker=WOLF
+			status_line = "WOLF: %s\n1  %s     2  %s" % [I18n.KEY.tr("I found the mirror index. We can use my readout or your maintenance port."), MIRROR_CHOICE_TEXT[0], MIRROR_CHOICE_TEXT[1]]
 	elif _at_records_exit(x):
 		if state.complete_chapter():
 			# The copy goes into the security container, at its lock; the exit's bolt lets go and the door
@@ -2732,7 +2861,8 @@ func _interact_records(x: float) -> void:
 				# Put back behind an aside: they come back first.
 				_next_box_now()
 		else:
-			_aside("Exit sealed until the purge order and mirror timestamp are copied.")
+			# TRANSLATORS: i18n: story speaker=narrator
+			_aside(I18n.KEY.tr("Exit sealed until the purge order and mirror timestamp are copied."))
 	else:
 		_aside(_records_route_hint())
 
@@ -2885,11 +3015,20 @@ func _build_end_card() -> void:
 	end_card.add_child(end_card_button)
 
 
-## This run's three choices as the end card shows them: the relay, the mirror and the lane. The lane
-## is saved with the sentry's fall (autosave C); a save from a build that did not store it says only
-## that the tank came down.
+## This run's three choices as the end card shows them, in English with the engineer's first name: the
+## relay, the mirror and the lane (see [method _end_card_recap_rows]).
 func end_card_recap() -> Array[String]:
 	var first_name: String = state.human_name().get_slice(" ", 0)
+	var rows: Array[String] = []
+	for row: String in _end_card_recap_rows():
+		rows.append(row.replace("{name}", first_name))
+	return rows
+
+
+## This run's three recap rows as written, "TOPIC  words" with {name} for the engineer's first name: the
+## relay, the mirror and the lane. The lane is saved with the sentry's fall (autosave C); a save from a
+## build that did not store it says only that the tank came down.
+func _end_card_recap_rows() -> Array[String]:
 	var relay: String = RECAP_RELAY_PRESS if state.memory.get("choice_id") == M0State.PRESS else (RECAP_RELAY_COOPERATE if state.route == "cooperate" else RECAP_RELAY_DISCLOSE_BYPASS)
 	var mirror: String = RECAP_MIRROR_WOLF if state.mirror_route == "wolf" else RECAP_MIRROR_MANUAL
 	var lane: String = RECAP_LANE_UNKNOWN
@@ -2902,10 +3041,7 @@ func end_card_recap() -> Array[String]:
 			lane = RECAP_LANE_REFUSED
 		"alone":
 			lane = RECAP_LANE_ALONE
-	var rows: Array[String] = []
-	for row: String in [relay, mirror, lane]:
-		rows.append(row.replace("{name}", first_name))
-	return rows
+	return [relay, mirror, lane]
 
 
 func _show_end_card() -> void:
@@ -2915,23 +3051,41 @@ func _show_end_card() -> void:
 	hatch_exit_engineer_walking = false
 	end_card_active = true
 	_stop_junction_loops()
+	_fill_end_card_rows()
+	end_card.modulate.a = 0.0
+	end_card.show()
+	end_card.create_tween().tween_property(end_card, "modulate:a", 1.0, END_CARD_FADE_SECONDS)
+	_update_controls()
+	_refresh_ui()
+	_grab_menu_focus(end_card_button)
+
+
+## Writes the END OF SLICE card's recap rows in the current language: each row's topic in the accent
+## colour, then what happened, from [method _end_card_recap_rows]. Called as the card opens and again
+## on a language change while it is up (NOTIFICATION_TRANSLATION_CHANGED).
+func _fill_end_card_rows() -> void:
 	for child: Node in end_card_rows.get_children():
 		end_card_rows.remove_child(child)
 		child.queue_free()
-	for row: String in end_card_recap():
-		# "RELAY  Rowan told WOLF ...": the topic in the accent colour, then what happened.
+	var first_name: String = _first_name()
+	for row: String in _end_card_recap_rows():
+		# "RELAY  {name} told WOLF ...": the topic in the accent colour, then what happened.
 		var split: int = row.find("  ")
 		var line: HBoxContainer = HBoxContainer.new()
 		line.add_theme_constant_override("separation", 14)
 		line.mouse_filter = Control.MOUSE_FILTER_IGNORE
 		var topic: Label = Label.new()
+		# The topic is one message ("RELAY"), so the Label translates itself.
 		topic.text = row.left(split)
 		topic.custom_minimum_size = Vector2(82.0, 0.0)
 		topic.add_theme_font_override("font", DISPLAY_FONT)
 		topic.add_theme_font_size_override("font_size", 15)
 		topic.add_theme_color_override("font_color", END_CARD_ACCENT)
 		var what: Label = Label.new()
-		what.text = row.substr(split + 2)
+		# The words are translated with {name} in them and filled after (I18n.fill_named), so the Label
+		# does not translate itself.
+		what.auto_translate_mode = Node.AUTO_TRANSLATE_MODE_DISABLED
+		what.text = I18n.fill_named(row.substr(split + 2), {"name": first_name})
 		what.custom_minimum_size = Vector2(560.0, 0.0)
 		what.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 		what.add_theme_font_size_override("font_size", 17)
@@ -2939,12 +3093,6 @@ func _show_end_card() -> void:
 		line.add_child(topic)
 		line.add_child(what)
 		end_card_rows.add_child(line)
-	end_card.modulate.a = 0.0
-	end_card.show()
-	end_card.create_tween().tween_property(end_card, "modulate:a", 1.0, END_CARD_FADE_SECONDS)
-	_update_controls()
-	_refresh_ui()
-	_grab_menu_focus(end_card_button)
 
 
 ## Any confirm on the END OF SLICE card goes on to the title, where Continue now offers PLAY AGAIN.
@@ -2971,9 +3119,12 @@ func _choose_mirror(route_id: String) -> void:
 	choice_context = ""
 	_update_controls()
 	if route_id == "wolf":
-		status_line = "WOLF reads the timestamp off his own readout. The purge target existed before the deletion order."
+		# TRANSLATORS: i18n: story speaker=narrator
+		status_line = I18n.KEY.tr("WOLF reads the timestamp off his own readout. The purge target existed before the deletion order.")
 	else:
-		status_line = "%s copies the timestamp through the maintenance port. WOLF keeps watch." % state.human_name().get_slice(" ", 0)
+		# TRANSLATORS: %s is the engineer's first name.
+		# i18n: story speaker=narrator engineer=name
+		status_line = I18n.format(I18n.KEY.tr("%s copies the timestamp through the maintenance port. WOLF keeps watch."), [_first_name()])
 	_sync_records_room()
 	_save_progress()
 
@@ -3058,7 +3209,8 @@ func _interact_junction(x: float) -> void:
 			# Armed: the ladder has done its job.
 			ladder_step = 3
 			_end_wolf_look()
-			status_line = "The overload breaker catches and the line starts to build. If the LINE gauge peaks, the relief vent lets go."
+			# TRANSLATORS: i18n: story speaker=narrator
+			status_line = I18n.KEY.tr("The overload breaker catches and the line starts to build. If the LINE gauge peaks, the relief vent lets go.")
 		elif pressure_line.state == &"building":
 			_refuse(REFUSE_BREAKER_LIVE, &"breaker")
 		else:
@@ -3072,7 +3224,8 @@ func _interact_junction(x: float) -> void:
 			&"tripped":
 				_refuse(REFUSE_VALVE_TRIPPED, &"valve")
 			&"building":
-				status_line = "The wheel is stiff. Three full turns charge the door."
+				# TRANSLATORS: i18n: story speaker=narrator
+				status_line = I18n.KEY.tr("The wheel is stiff. Three full turns charge the door.")
 				# Cranked from just left of the wheel, like the MANUAL BYPASS, not from inside the valve.
 				_step_engineer(VALVE_CRANK_X, JunctionRoom.VALVE_X)
 			&"charged", &"fuse":
@@ -3080,7 +3233,8 @@ func _interact_junction(x: float) -> void:
 			_:
 				_refuse(REFUSE_SPENT, &"valve")
 	elif PressureLine.is_on_vent(x) and not state.door_blown:
-		status_line = "Relief vent. It lets go when the gauge peaks; don't be standing on it."
+		# TRANSLATORS: i18n: story speaker=narrator
+		status_line = I18n.KEY.tr("Relief vent. It lets go when the gauge peaks; don't be standing on it.")
 	elif absf(x - JunctionRoom.DOOR_X) <= 40.0 and not state.door_blown:
 		_refuse(REFUSE_DOOR, &"door")
 	elif state.door_blown and _at_arm_panel(x):
@@ -3088,11 +3242,14 @@ func _interact_junction(x: float) -> void:
 	elif x >= JunctionRoom.BOLT_REACH_MIN_X:
 		_use_exit(x)
 	elif state.sentry_down:
-		status_line = "No station in reach. The exit bolt is\nby the door."
+		# TRANSLATORS: i18n: story speaker=narrator
+		status_line = I18n.KEY.tr("No station in reach. The exit bolt is\nby the door.")
 	elif state.door_blown:
-		status_line = "No station in reach. The TANK RELEASE\nis past the rubble."
+		# TRANSLATORS: i18n: story speaker=narrator
+		status_line = I18n.KEY.tr("No station in reach. The TANK RELEASE\nis past the rubble.")
 	else:
-		status_line = "No station in reach. The breaker is by the entrance, the valve by the door."
+		# TRANSLATORS: i18n: story speaker=narrator
+		status_line = I18n.KEY.tr("No station in reach. The breaker is by the entrance, the valve by the door.")
 
 
 ## True when a USE in the junction is the sealed door's: the engineer faces it and their front is
@@ -3263,7 +3420,8 @@ func _drop_tank() -> void:
 	sfx_bank.play(&"clank", -3.0, 1.3)
 	impact.rumble(0.15, 0.0, 0.06)
 	junction_room.sync_arm(drop_arm)
-	_tell("The clamp lets go.")
+	# TRANSLATORS: i18n: story speaker=narrator
+	_tell(I18n.KEY.tr("The clamp lets go."))
 
 
 ## The exit bolt panel and the exit door beside it: USE at the panel pops the bolt once the sentry is
@@ -3352,7 +3510,13 @@ func _leave_junction() -> void:
 	chapter_close_active = true
 	intro_camera.position_smoothing_enabled = false
 	_update_controls()
-	_tell("SERVICE LINE CLEARED. WOLF: It's quiet now. The line runs on toward Archive.\n%s: Then that's where we go." % state.human_name().get_slice(" ", 0).to_upper())
+	# The narration's card, WOLF's words and the engineer's (tagged with their name), each its own message.
+	# TRANSLATORS: i18n: story speaker=narrator
+	var cleared: String = I18n.KEY.tr("SERVICE LINE CLEARED.")
+	# TRANSLATORS: i18n: story speaker=WOLF
+	var quiet: String = I18n.KEY.tr("It's quiet now. The line runs on toward Archive.")
+	# TRANSLATORS: i18n: story speaker=engineer engineer=self
+	_tell("%s WOLF: %s\n%s: %s" % [cleared, quiet, _first_name().to_upper(), I18n.KEY.tr("Then that's where we go.")])
 	chapter_tween = create_tween()
 	_frame_chapter_close()
 
@@ -3527,7 +3691,13 @@ func _sync_wolf_leap() -> void:
 ## caught there; after a miss turned it, or with the engineer caught inside the alcove, the card
 ## points only at the rubble, because a chase reaches anywhere in the alcove.
 func _sentry_reason() -> String:
-	return (JunctionRoom.SENTRY_REASON if _seen_in_lane() else JunctionRoom.SENTRY_CHASED_REASON) % _first_name()
+	return _knockdown_reason(JunctionRoom.SENTRY_REASON if _seen_in_lane() else JunctionRoom.SENTRY_CHASED_REASON)
+
+
+## A knockdown card: [param template] (one of JunctionRoom's *_REASON cards, marked in StoryText) with the
+## engineer's first name, built with I18n.format so it is drawn from its translated template.
+func _knockdown_reason(template: String) -> String:
+	return I18n.format(template, [_first_name()])
 
 
 ## The sentry saw the engineer out in its lane (past the alcove's right post) and is running them down
@@ -3571,10 +3741,10 @@ func _sentry_changed(before: StringName) -> void:
 	match sentry_brain.state:
 		&"lock":
 			if before == &"patrol" or before == &"fixated":
-				status_line = SENTRY_LOCK_LINE % _first_name()
+				status_line = I18n.format(SENTRY_LOCK_LINE, [_first_name()])
 		&"patrol":
 			if before == &"chase":
-				status_line = SENTRY_LOST_LINE % _first_name()
+				status_line = I18n.format(SENTRY_LOST_LINE, [_first_name()])
 
 
 ## The lock-on cue: a short, high klaxon chirp from the sound bank as the sentry's eye goes red.
@@ -3609,7 +3779,8 @@ func _ask_lane() -> void:
 	waiting_for_choice = true
 	choice_context = "lane"
 	_update_controls()
-	status_line = "WOLF: It passes under that tank on every patrol. How do we bring it down?\n1  \"%s\"\n2  \"%s\"" % [LANE_CHOICE_TEXT[0], LANE_CHOICE_TEXT[1]]
+	# TRANSLATORS: i18n: story speaker=WOLF
+	status_line = "WOLF: %s\n1  \"%s\"\n2  \"%s\"" % [I18n.KEY.tr("It passes under that tank on every patrol. How do we bring it down?"), LANE_CHOICE_TEXT[0], LANE_CHOICE_TEXT[1]]
 
 
 ## Answer 1 asks WOLF to draw it; he chooses by the same rule as the relay contact. Answer 2, or his
@@ -3753,9 +3924,12 @@ func _valve_turned() -> void:
 	impact.rumble(0.2, 0.0, 0.08)
 	if pressure_line.state == &"charged":
 		sfx_bank.play(&"klaxon", -4.0)
-		_tell("FUSE LIT. Back away from the door, past the valve.")
+		# TRANSLATORS: i18n: story speaker=narrator
+		_tell(I18n.KEY.tr("FUSE LIT. Back away from the door, past the valve."))
 	else:
-		status_line = "The valve gives. %d of %d turns." % [pressure_line.turns, PressureLine.TURNS_NEEDED]
+		# TRANSLATORS: The valve's turns so far and the turns needed (3).
+		# i18n: story speaker=narrator
+		status_line = I18n.format(I18n.KEY.tr("The valve gives. %d of %d turns."), [pressure_line.turns, PressureLine.TURNS_NEEDED])
 
 
 ## The fuse ticks as it lights and every PressureLine.FUSE_TICK_SECONDS after, on the frame the blast
@@ -3774,7 +3948,8 @@ func _vent_trips() -> void:
 	impact.flash(0.0, 0.2)
 	impact.rumble(0.4, 0.6, 0.2)
 	if not fail_active:
-		status_line = "The relief vent lets go and the breaker trips. Reset the breaker and crank faster this time."
+		# TRANSLATORS: i18n: story speaker=narrator
+		status_line = I18n.KEY.tr("The relief vent lets go and the breaker trips. Reset the breaker and crank faster this time.")
 
 
 func _wolf_reads_seam() -> void:
@@ -3797,14 +3972,14 @@ func _door_blast() -> void:
 	_blast_feedback()
 	if PressureLine.is_in_blast(human.position.x) and not _debug_spares_knockdown():
 		junction_room.door_blast()
-		_fail_beat(JunctionRoom.BLAST_REASON % state.human_name().get_slice(" ", 0))
+		_fail_beat(_knockdown_reason(JunctionRoom.BLAST_REASON))
 		return
 	if not state.blow_door():
 		return
 	junction_room.door_blast()
 	sentry_wake_remaining = SENTRY_WAKE_SECONDS
 	_update_controls()
-	_say([RUBBLE_LINE % _first_name(), RUBBLE_WAKE_LINE])
+	_say([I18n.format(RUBBLE_LINE, [_first_name()]), RUBBLE_WAKE_LINE])
 	# Autosave B: the door is down.
 	_save_progress()
 
@@ -4067,7 +4242,8 @@ func _restore_beat(reason: String) -> void:
 		# A card already on two rows keeps its box; where play resumed follows in the next (2 rows a box).
 		_say([reason, restore_line])
 	else:
-		status_line = "%s\n%s" % [reason, restore_line]
+		# The card and the restore line are two messages, joined so each is translated on its own.
+		status_line = I18n.join("\n", [reason, restore_line])
 	_refresh_ui()
 
 
@@ -4595,6 +4771,8 @@ func _refresh_ui() -> void:
 	if name_card_remaining > 0.0 and state.chapter_id == "lockdown":
 		# The name card comes first; the location card follows once it has faded or been skipped.
 		# Built with I18n.format, so the card translates its template and keeps the name as it is.
+		# TRANSLATORS: The engineer's name card: %s is their full name in capitals, then their job on its own row. The engineer is non-binary: use a job word with no gender (a department or field noun), never a masculine or feminine one.
+		# i18n: engineer=name,third keep-breaks
 		var name_card: String = I18n.format(I18n.KEY.tr("%s\nMAINTENANCE ENGINEER"), [state.human_name().to_upper()])
 		if last_top_card_key != "name_card":
 			last_top_card_key = "name_card"
@@ -4624,14 +4802,18 @@ func _refresh_ui() -> void:
 func _set_dialogue(hint: String) -> void:
 	_sync_dialogue_boxes()
 	var box: String = _shown_box()
-	var tags: Array[String] = _speaker_tags()
+	# The box is in the current language (_shown_line), so it is cut at the tags as drawn; the colour goes
+	# by the speaker's English tag, its id, never by the drawn word.
+	var names: Dictionary = _speaker_names()
+	var tags: Array[String] = _shown_speaker_tags()
 	var name: String = DialogueBoxes.tag_of(box, tags)
 	speaker.text = name
 	story.text = DialogueBoxes.words_of(box, tags)
 	var has_speaker: bool = not name.is_empty()
 	speaker.visible = has_speaker
+	var id: String = String(names.find_key(name)) if names.values().has(name) else name
 	var human_name: String = _first_name().to_upper()
-	var tint: Color = Palette.CYAN if name == "WOLF" else (Color("#ff9a9f") if name.begins_with("DIRECTOR") else (ENGINEER_TINT if name == human_name else Color("#9fc3d2")))
+	var tint: Color = Palette.CYAN if id == "WOLF" else (Color("#ff9a9f") if id.begins_with("DIRECTOR") else (ENGINEER_TINT if id == human_name else Color("#9fc3d2")))
 	_set_color(dialogue_accent, tint)
 	_set_font_color(speaker, tint)
 	bottom_bar.visible = not box.is_empty()
@@ -4640,24 +4822,43 @@ func _set_dialogue(hint: String) -> void:
 	_layout_hud()
 
 
-## The speaker tags a box can open with: WOLF, the Director (and his purge display) and the engineer.
+## The speaker tags a box can open with, in English: WOLF, the Director (and his purge display) and the
+## engineer. They are the speakers' ids: status_line and the tests keep them, and the colour goes by them.
 func _speaker_tags() -> Array[String]:
 	return ["WOLF", "DIRECTOR", "DIRECTOR / PURGE", _first_name().to_upper()]
 
 
-## status_line as the player reads it: a line that names an input (built with HudText.key: the safe
-## point's save error, WOLF's manual-port line) is translated and names the input in use, its speaker tag
-## kept outside the translated words; on touch it reads its touch form, since touch answers carry no
-## number (PHONE-3). Every other line stays as it is until the story is marked (localization PR L7c).
+## Each English speaker tag ([method _speaker_tags]) as it is drawn over a box in the current language:
+## the Director's two tags are translated (context SPEAKER_CONTEXT), WOLF and the engineer's name stay
+## as written (DESIGN.md, "Speaker and words apart").
+func _speaker_names() -> Dictionary:
+	var names: Dictionary = {}
+	for tag: String in _speaker_tags():
+		names[tag] = tag
+	# TRANSLATORS: The Director's name over his lines, in capitals.
+	names["DIRECTOR"] = tr("DIRECTOR", SPEAKER_CONTEXT)
+	# TRANSLATORS: The name over the purge display's line: the Director's name, a slash and the display's name, in capitals.
+	names["DIRECTOR / PURGE"] = tr("DIRECTOR / PURGE", SPEAKER_CONTEXT)
+	return names
+
+
+## The speaker tags as drawn ([method _speaker_names]): what a box in the current language opens with.
+func _shown_speaker_tags() -> Array[String]:
+	var tags: Array[String] = []
+	tags.assign(_speaker_names().values())
+	return tags
+
+
+## status_line as the player reads it, in the current language (I18n.shown, PR L7c): each speaker's
+## words translated as one message, with the tag drawn as _speaker_names gives it. A line that names an
+## input (built with HudText.key: the safe point's save error, WOLF's manual-port line) names the input in
+## use, and on touch reads its touch form, since touch answers carry no number (PHONE-3).
 func _shown_line() -> String:
-	var tags: Array[String] = _speaker_tags()
-	var words: String = DialogueBoxes.words_of(status_line, tags)
-	if not HudText.has_keys(words):
-		return status_line
 	var touch_layout: bool = touch_enabled and not controller_active
-	var shown: String = HudText.localise(words, _key_names(touch_layout), touch_layout, false)
-	var tag: String = DialogueBoxes.tag_of(status_line, tags)
-	return shown if tag.is_empty() else "%s: %s" % [tag, shown]
+	var keys: Dictionary = _key_names(touch_layout)
+	var key_line: Callable = func(words: String) -> String:
+		return HudText.localise(words, keys, touch_layout, false) if HudText.has_keys(words) else ""
+	return I18n.shown(status_line, _speaker_tags(), _speaker_names(), key_line)
 
 
 ## The shown name of each HudText key token for the input in use: the interact key or controller button
@@ -4690,7 +4891,7 @@ func _sync_dialogue_boxes() -> void:
 		return
 	dialogue_key = key
 	_layout_hud()
-	dialogue_boxes = DialogueBoxes.split(line, _speaker_tags(), _dialogue_fits)
+	dialogue_boxes = DialogueBoxes.split(line, _shown_speaker_tags(), _dialogue_fits)
 	if dialogue_restart:
 		dialogue_restart = false
 		dialogue_index = 0
@@ -4745,7 +4946,7 @@ func _box_seconds() -> float:
 func _box_seconds_of(index: int) -> float:
 	if index < 0 or index >= dialogue_boxes.size():
 		return 0.0
-	return DialogueBoxes.read_seconds(DialogueBoxes.words_of(dialogue_boxes[index], _speaker_tags()))
+	return DialogueBoxes.read_seconds(DialogueBoxes.words_of(dialogue_boxes[index], _shown_speaker_tags()))
 
 
 ## Every box of the line has been up for its reading time (or has cleared).
@@ -4830,15 +5031,16 @@ func _box_between_touch_buttons() -> bool:
 	return touch_enabled and not controller_active and touch_use.visible and TextSize.factor > 1.0
 
 
-## The speaker column's width: the widest name it shows, at the current text size (measured once per
-## size and engineer name; the HUD is laid out every frame).
+## The speaker column's width: the widest name it shows as drawn, at the current text size (measured once
+## per size, engineer name and language, since the Director's tag is translated; the HUD is laid out every
+## frame).
 func _speaker_column_width() -> float:
-	var key: String = "%s|%s" % [TextSize.factor, _first_name()]
+	var key: String = "%s|%s|%s|%s" % [TextSize.factor, _first_name(), TranslationServer.get_locale(), TranslationServer.pseudolocalization_enabled]
 	if key != speaker_column_key:
 		speaker_column_key = key
 		var font: Font = speaker.get_theme_font(&"font")
 		var widest: float = 0.0
-		for tag: String in _speaker_tags():
+		for tag: String in _shown_speaker_tags():
 			widest = maxf(widest, font.get_string_size(tag, HORIZONTAL_ALIGNMENT_LEFT, -1.0, TextSize.px(SPEAKER_FONT_SIZE)).x)
 		speaker_column = ceilf(widest)
 	return speaker_column
@@ -5007,7 +5209,7 @@ func _station_art_overlap(rect: Rect2) -> float:
 func _layout_choices(touch_layout: bool, top: float) -> void:
 	var answers: Array[String] = [M0State.CHOICE_TEXT[M0State.DISCLOSE], M0State.CHOICE_TEXT[M0State.PRESS]]
 	if choice_context == "mirror":
-		answers = ["USE WOLF'S READOUT", "USE MANUAL PORT"]
+		answers = MIRROR_CHOICE_TEXT
 	elif choice_context == "lane":
 		answers = LANE_CHOICE_TEXT
 	var buttons: Array[Button] = [touch_choice_1, touch_choice_2]
@@ -5015,7 +5217,10 @@ func _layout_choices(touch_layout: bool, top: float) -> void:
 		var button: Button = buttons[index]
 		_set_font_size(button, TextSize.px(17 if touch_layout else 16))
 		var key: String = settings_menu.prompt(&"choice_1" if index == 0 else &"choice_2", controller_active)
-		var text: String = answers[index] if touch_layout else "%s  %s" % [key, answers[index]]
+		# The answers stay English in the game and the save (I18n's rule) and are translated here, where
+		# they are drawn; StoryText marks them, and the buttons do not translate themselves (main.tscn).
+		var answer: String = tr(answers[index])
+		var text: String = answer if touch_layout else "%s  %s" % [key, answer]
 		if button.text != text:
 			button.text = text
 		if button.autowrap_mode != TextServer.AUTOWRAP_WORD_SMART:
@@ -5137,7 +5342,11 @@ func _context_hint() -> String:
 		if _relay_refused():
 			return _hold_hint(I18n.KEY.tr(BYPASS_HOLD_HINT), [bypass_ticks, BYPASS_TICKS])
 		# On the honest route WOLF can take the relay until the crank is done; the hint keeps saying so.
-		return _hold_hint(I18n.KEY.tr(BYPASS_OFFER_HINT)) if bypass_ticks == 0 else _hold_hint(I18n.KEY.tr(BYPASS_HOLD_OFFER_HINT), [bypass_ticks, BYPASS_TICKS])
+		if bypass_ticks == 0:
+			# TRANSLATORS: %s is the key or button to hold. "Yourself" must not show the engineer's gender (no сам/сама, sam/sama): rephrase.
+			# i18n: speaker=hint engineer=you slot=key
+			return _hold_hint(I18n.KEY.tr(BYPASS_OFFER_HINT))
+		return _hold_hint(I18n.KEY.tr(BYPASS_HOLD_OFFER_HINT), [bypass_ticks, BYPASS_TICKS])
 	if _at_breaker(x):
 		if state.breaker_armed:
 			return I18n.KEY.tr("The breaker is live. Go to the MANUAL BYPASS by the relay.") if _relay_refused() else I18n.KEY.tr("The breaker is live. Go to the coolant relay.")
@@ -5426,11 +5635,11 @@ func debug_knock_down(kind: StringName) -> void:
 	var reason: String = _sentry_reason()
 	match kind:
 		&"vent":
-			reason = JunctionRoom.VENT_REASON % _first_name()
+			reason = _knockdown_reason(JunctionRoom.VENT_REASON)
 		&"blast":
-			reason = JunctionRoom.BLAST_REASON % _first_name()
+			reason = _knockdown_reason(JunctionRoom.BLAST_REASON)
 		&"cloud":
-			reason = JunctionRoom.CLOUD_REASON % _first_name()
+			reason = _knockdown_reason(JunctionRoom.CLOUD_REASON)
 	_fail_beat(reason, kind == &"sentry")
 
 
