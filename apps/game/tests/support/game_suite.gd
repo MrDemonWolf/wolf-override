@@ -457,3 +457,45 @@ static func retry(game: Node, max_frames: int) -> bool:
 	await tree().process_frame
 	Input.action_release(&"interact")
 	return await wait_until(func() -> bool: return not bool(game.get("fail_active")) and not bool(game.get("retry_fading_in")), max_frames)
+
+
+## The "#." notes of every message in the committed translation template (i18n/messages.pot, at the
+## repository root beside apps/game; CI regenerates it and fails when it differs from the source), by
+## msgid (msgctxt ignored), joined into one string per message; empty when the file cannot be read, as in
+## an exported build. Reads only the parts of a PO file Godot's generator writes (comments, msgctxt, msgid
+## and its continued strings). Users: i18n_test (the story's marks) and companion_rules_test (WOLF's
+## lines, by their speaker=WOLF mark).
+static func template_notes() -> Dictionary:
+	var path: String = ProjectSettings.globalize_path("res://").path_join("../../i18n/messages.pot").simplify_path()
+	var notes: Dictionary = {}
+	for block: String in FileAccess.get_file_as_string(path).split("\n\n"):
+		var comments: PackedStringArray = []
+		var msgid: String = ""
+		var in_msgid: bool = false
+		for line: String in block.split("\n"):
+			if line.begins_with("#."):
+				comments.append(line)
+			elif line.begins_with("msgid "):
+				msgid = str(JSON.parse_string(line.substr(6)))
+				in_msgid = true
+			elif line.begins_with("\"") and in_msgid:
+				msgid += str(JSON.parse_string(line))
+			else:
+				in_msgid = false
+		if not msgid.is_empty():
+			notes[msgid] = String(notes.get(msgid, "")) + "\n".join(comments) + "\n"
+	return notes
+
+
+## The "i18n:" marks in [param notes] (one message's "#." lines from [method template_notes]) as key to
+## value, as scripts/i18n/i18n_tool.py reads them (MARKS): "engineer=you slot=choice keep-breaks" gives
+## {engineer: you, slot: choice, keep-breaks: ""}.
+static func template_marks(notes: String) -> Dictionary:
+	var found: Dictionary = {}
+	for line: String in notes.split("\n"):
+		var at: int = line.find("i18n:")
+		if at < 0:
+			continue
+		for word: String in line.substr(at + 5).split(" ", false):
+			found[word.get_slice("=", 0)] = word.get_slice("=", 1) if word.contains("=") else ""
+	return found

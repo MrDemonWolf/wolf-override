@@ -958,12 +958,12 @@ func _check_story_lines() -> void:
 ## of the inventory's 26 gender-risk lines (STRINGS.md) carries an engineer= mark, and WOLF's three
 ## checkpoint callbacks slot=choice as well; the name card and the callbacks keep their breaks.
 func _check_story_marks() -> void:
-	var pot: Dictionary = _pot_notes(ProjectSettings.globalize_path("res://").path_join("../../i18n/messages.pot").simplify_path())
+	var pot: Dictionary = template_notes()
 	if not _check(not pot.is_empty(), "the translation template i18n/messages.pot is readable"):
 		return
 	var story: Array[String] = StoryText.messages()
 	for message: String in story + STORY_IN_PLACE + CALLBACKS:
-		_check(pot.has(message) and _marks_of(pot[message]).has("story"), "\"%s\" is in the template with its story mark" % message.c_escape())
+		_check(pot.has(message) and template_marks(pot[message]).has("story"), "\"%s\" is in the template with its story mark" % message.c_escape())
 	var tags: Array[String] = ["WOLF", "DIRECTOR", "DIRECTOR / PURGE", "%s"]
 	var spoken: Array[String] = []
 	spoken.assign(Main.INTRO_LINES)
@@ -980,48 +980,10 @@ func _check_story_marks() -> void:
 	gender.append_array(CALLBACKS)
 	_check(gender.size() == 26, "the inventory's 26 gender-risk lines are listed (%d)" % gender.size())
 	for message: String in gender:
-		_check(pot.has(message) and _marks_of(pot[message]).has("engineer"), "the gender-risk line \"%s\" has an engineer= mark" % message.c_escape())
+		_check(pot.has(message) and template_marks(pot[message]).has("engineer"), "the gender-risk line \"%s\" has an engineer= mark" % message.c_escape())
 	for message: String in CALLBACKS:
-		_check(pot.has(message) and _marks_of(pot[message]).get("slot") == "choice" and _marks_of(pot[message]).has("keep-breaks"), "WOLF's callback \"%s\" says its %%s is a quoted answer and keeps its break" % message.c_escape())
-	_check(pot.has("%s\nMAINTENANCE ENGINEER") and _marks_of(pot["%s\nMAINTENANCE ENGINEER"]).has("keep-breaks"), "the name card keeps its break")
-
-
-## The "#." notes of every message in the POT at [param path], by msgid (msgctxt ignored), joined into
-## one string per message; empty when the file cannot be read. Reads only the parts of a PO file Godot's
-## generator writes (comments, msgctxt, msgid and its continued strings).
-func _pot_notes(path: String) -> Dictionary:
-	var text: String = FileAccess.get_file_as_string(path)
-	var notes: Dictionary = {}
-	for block: String in text.split("\n\n"):
-		var comments: PackedStringArray = []
-		var msgid: String = ""
-		var in_msgid: bool = false
-		for line: String in block.split("\n"):
-			if line.begins_with("#."):
-				comments.append(line)
-			elif line.begins_with("msgid "):
-				msgid = str(JSON.parse_string(line.substr(6)))
-				in_msgid = true
-			elif line.begins_with("\"") and in_msgid:
-				msgid += str(JSON.parse_string(line))
-			else:
-				in_msgid = false
-		if not msgid.is_empty():
-			notes[msgid] = String(notes.get(msgid, "")) + "\n".join(comments) + "\n"
-	return notes
-
-
-## The "i18n:" marks in [param notes] (one message's "#." lines) as key to value, as i18n_tool.py reads
-## them (MARKS): "engineer=you slot=choice keep-breaks" gives {engineer: you, slot: choice, keep-breaks: ""}.
-func _marks_of(notes: String) -> Dictionary:
-	var found: Dictionary = {}
-	for line: String in notes.split("\n"):
-		var at: int = line.find("i18n:")
-		if at < 0:
-			continue
-		for word: String in line.substr(at + 5).split(" ", false):
-			found[word.get_slice("=", 0)] = word.get_slice("=", 1) if word.contains("=") else ""
-	return found
+		_check(pot.has(message) and template_marks(pot[message]).get("slot") == "choice" and template_marks(pot[message]).has("keep-breaks"), "WOLF's callback \"%s\" says its %%s is a quoted answer and keeps its break" % message.c_escape())
+	_check(pot.has("%s\nMAINTENANCE ENGINEER") and template_marks(pot["%s\nMAINTENANCE ENGINEER"]).has("keep-breaks"), "the name card keeps its break")
 
 
 ## The story in a game (PR L7c), with [method _story_catalog] for "es": the opening's first box shows the
