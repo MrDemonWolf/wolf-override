@@ -137,7 +137,7 @@ msgstr "LISTA ZMIAN"
 #. i18n: speaker=ui
 #: scenes/main.tscn
 msgid "Concept: Nathanial Henniges  /  AI-assisted development"
-msgstr "Koncepcja: Nathanial Henniges  /  tworzone z pomocą AI"
+msgstr "Koncepcja: Nathanial Henniges  /  z pomocą AI"
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: The credits roll (582 px, 19 px, centred, wraps). Translate the role headings and the sentences; names, companies, tools, licences, works' titles and the address stay as written. The translation credit (decision D2) is added in each language's own text under AI-ASSISTED PRODUCTION, so the English keeps none.
@@ -340,7 +340,7 @@ msgstr "POSTĘPY PRAC"
 #. i18n: speaker=ui engineer=you
 #: scenes/main.tscn
 msgid "Source-build changes by date, not releases. Scroll with the wheel, drag the text or use up/down."
-msgstr "Zmiany w wersji według dat, nie wydania. Przewijaj kółkiem, przeciągaj tekst lub strzałkami."
+msgstr "Zmiany według dat, nie wydania. Przewijaj kółkiem, przeciągaj tekst lub używaj strzałek."
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: Tooltip of the changelog's online button. The address stays as written.
@@ -1482,7 +1482,7 @@ msgstr "Nie. Nie podejmę tego ryzyka w ciemno. Użyj ręcznego obejścia."
 #. TRANSLATORS: i18n: story speaker=narrator
 #: scripts/main.gd:2641
 msgid "The relay is dark. Arm the breaker first."
-msgstr "Przekaźnik jest ciemny. Najpierw załącz wyłącznik."
+msgstr "Przekaźnik jest bez zasilania. Najpierw załącz wyłącznik."
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: i18n: story speaker=narrator
@@ -2174,7 +2174,7 @@ msgstr "%s: załącz wyłącznik."
 #. i18n: speaker=hint engineer=you
 #: scripts/main.gd:5375
 msgid "The relay is dark. Return to the breaker first."
-msgstr "Przekaźnik jest ciemny. Najpierw wróć do wyłącznika."
+msgstr "Przekaźnik jest bez zasilania. Najpierw wróć do wyłącznika."
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: Hint bar (14 px, about 526 px wide on a keyboard and 488 px on touch; wraps). MANUAL BYPASS is a station plate: RĘCZNE OBEJŚCIE, named as 'pulpit „RĘCZNE OBEJŚCIE”' so the plate's words stay in the nominative (the plate is not in the template yet).
@@ -2914,7 +2914,7 @@ msgstr "Przy przekaźniku usłyszałem od ciebie prawdę. Ściągnę go na znacz
 #. i18n: story speaker=WOLF engineer=you
 #: scripts/story_text.gd:166
 msgid "At the relay you'd have sent me in blind. I won't walk into its sights. Time the drop from the release; it crosses the mark on every pass."
-msgstr "Przy przekaźniku posłano by mnie w ciemno. Nie wejdę mu na celownik. Zgraj zrzut z pulpitu; strażnik mija znacznik przy każdym przejściu."
+msgstr "Przy przekaźniku przez ciebie poszedłbym w ciemno. Nie wejdę mu na celownik. Zgraj zrzut z pulpitu; strażnik mija znacznik przy każdym przejściu."
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: WOLF, when the engineer will time the drop alone.
