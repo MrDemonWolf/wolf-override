@@ -37,6 +37,8 @@ Changes merged after 0.15.0. They become the next version when it is cut.
 - Past the end of the Records and Service Junction exit walls the passage is darker than the doorway, so it no longer looks like a way round the door; at the Service Junction it goes darker still while the exit is shut.
 - The corridor seal's open doorway is lit from the floor up, and the curb at its foot is darker.
 - The MANUAL BYPASS gearbox is its own picture under the wheel.
+- The opening is set in WOLF's dock bay, a room of its own left of the corridor, painted as whole pictures: the bay, the Director's door in its back wall and a lit doorway into the corridor.
+- You can walk back through the corridor's left end into the dock bay; the camera pans with you and shows the whole room.
 
 -- Website --
 - The website, its page titles, link previews, llms.txt and the guide call the game WOLF OVERRIDE; the search-engine data keeps the old spelling with two slashes as a former name.
@@ -105,6 +107,7 @@ Changes merged after 0.15.0. They become the next version when it is cut.
 - Test build zips' README.txt and the Test builds run summary link the new Install a test build page.
 - CONTRIBUTING.md links the website's copied-code check, project rules and contributing pages instead of repeating them.
 - The docs export check fails when a guide page's link preview is not an article or lacks the game's name.
+- A new dock_bay_test checks the dock bay's pictures, their sizes and register entries, and the walk and camera pan into the room.
 
 -- How it was checked --
 - Checked: headless test suites, the docs checks and build, rendered stills of the title screen, and headless browser screenshots of the credits, legal and landing pages, and an axe scan of the landing page; headless browser screenshots of the guide home, the changelog and the open guide menu at phone, tablet and desktop sizes, and an axe scan of guide pages; the README's links checked against the built site and its commands against package.json; headless browser screenshots of the rewritten player pages, their facts checked against the game's code; headless browser screenshots of the new and rewritten user pages, the privacy claims checked against the game's code; headless browser screenshots of the developer pages, with honesty-note counts kept and their commands run or marked not run; headless browser screenshots of the docs style guide, Developer home and Contributing; not played by hand.
@@ -113,6 +116,7 @@ Changes merged after 0.15.0. They become the next version when it is cut.
 - New rooms and doors checked: headless test suites and rendered stills of every door shut, moving and open, before and after, in the keyboard framing at 1280x720 and the touch framing (touch buttons on) in a 2340x1080 window, which the game letterboxes to a 1920x1080 picture; a light check on each open doorway (the space through it at least 1.5 times brighter than the wall round it: the blown blast door 1.9, the Service Junction exit 3.4); not played by hand and not run on a phone.
 - Search titles and descriptions checked: the docs checks and build, with every built page's title and description length listed.
 - Link previews checked: the docs checks and build, and the og:type, og:title and twitter:title tags read from the built pages.
+- Dock bay room checked: headless test suites and rendered stills (1280x720 and a phone shape) of the empty room, its doorway and the corridor's left end; not played by hand.
 
 == 0.15.0 - October 16, 2026 ==
 Summary: real doors in Records Access and the Service Junction, a copied-code check, notes moved to Notion and groundwork for more languages.
