@@ -126,7 +126,6 @@ func start() -> void:
 	main.wolf_lights.strength = Main.WOLF_RESTING_LIGHT
 	# Inside the bay he lies on the pad, behind the leaves: no reflection on the deck in front.
 	main.wolf_reflection.enabled = false
-	main.dock_bay.reduce_motion = main.impact.reduce_motion
 	main.dock_bay.set_standby()
 
 

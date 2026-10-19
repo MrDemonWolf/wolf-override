@@ -77,7 +77,7 @@ func _run() -> void:
 	_expect(bay.exit_reader.color.is_equal_approx(Palette.LAMP_SHUT), "shut again, the reader is red")
 	_check_states(bay)
 	_check_leaves(bay)
-	_check_lock(bay)
+	await _check_lock(bay)
 	bay.set_empty_quiet()
 
 	# Walking left from first control: the camera eases from the corridor's framing to the whole room.
@@ -161,4 +161,14 @@ func _check_lock(bay: DockBay) -> void:
 	_expect(DockBay.torn_pose(0.05, true) == Vector2.ZERO, "with Reduce Motion it hangs still at once")
 	bay.set_beacon(true)
 	_expect(bay.beacon_on and bay.beacon_glow.visible, "the bay's beacon comes on")
+	# Reduce Motion, switched on while the beacon and the lockdown light are on: both hold lit at once.
+	bay.set_lockdown(true)
+	bay.reduce_motion = true
+	await frames(20)
+	_expect(is_equal_approx(bay.beacon_glow.modulate.a, DockBay.BEACON_PEAK) and is_equal_approx(bay.lockdown_glow.modulate.a, DockBay.LOCKDOWN_PEAK), "with Reduce Motion the beacon and the lockdown light hold lit, steady")
+	bay.tear_lock()
+	await frames(10)
+	_expect(is_zero_approx(bay.torn_pivot.rotation_degrees), "with Reduce Motion the torn lock hangs still")
+	bay.reduce_motion = false
 	bay.set_beacon(false)
+	bay.set_lockdown(false)
