@@ -1,6 +1,6 @@
 ---
 title: Docs style guide
-description: How to write a page on the WOLF OVERRIDE guide so anyone can scan it in 10 seconds.
+description: "How to write a page on the WOLF OVERRIDE guide so anyone can scan it in 10 seconds: the 15 rules, the blocks to use and a page to copy."
 ---
 
 **What this page is for:** how to write a page on this site so anyone can scan it in 10 seconds.
@@ -35,6 +35,9 @@ Each rule is explained below.
 - **Rule 1.** Put one line under the title: `**What this page is for:** ...`. A TL;DR line works too.
 - **Keep it to one sentence.** The reader decides from it whether to stay.
 - **Fill in the front matter** `description` too. It feeds search results and link previews.
+- **Make the description 80 to 160 characters,** about 110 to 155 is best. The build fails outside that range, because search results cut it off.
+- **Short menu title?** Add `seoTitle` with the words people search for, up to 44 characters, such as `"Controls: keyboard, controller and touch"`. Only search results and link previews show it.
+- **Quote a front matter value** that contains a colon and a space, or the page will not build.
 
 ## Write bullets, steps and sections
 
@@ -121,7 +124,7 @@ Each rule is explained below.
 ```mdx
 ---
 title: Open a test build
-description: One sentence for search.
+description: "One sentence for search."
 ---
 
 **What this page is for:** one sentence.
