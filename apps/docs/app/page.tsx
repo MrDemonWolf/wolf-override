@@ -108,6 +108,7 @@ const footerGroups = [
       ['/docs/credits/', 'Credits & references'],
       ['/docs/legal/', 'Legal & licensing'],
       ['/docs/privacy/', 'Privacy'],
+      ['/docs/support/', 'Support'],
     ],
   },
   {

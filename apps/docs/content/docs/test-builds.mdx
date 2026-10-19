@@ -1,0 +1,109 @@
+---
+title: Install a test build
+description: Download and open an unsigned WOLF OVERRIDE debug test build on macOS or Windows, with no Godot needed.
+---
+
+**What this page is for:** download a test build and open it on macOS or Windows.
+
+- **A test build** is the game, ready to run, made automatically from each change. You don't need Godot.
+- **It is not a release.** It is an unsigned debug build for testing.
+- **Linux, iPhone, iPad and Android** have no test builds. See [Platforms and languages](/docs/platforms/).
+
+<Callout type="warn" title="Unsigned debug builds">
+  macOS and Windows warn you the first time you open one. The steps below get past the warning. Only open builds from this project's GitHub page.
+</Callout>
+
+## What you get
+
+| Fact | Detail |
+| --- | --- |
+| Platforms | macOS and Windows |
+| Made from | Every push to main, and every pull request from a branch of this repository |
+| Kept for | 14 days, then deleted |
+| Who can download | Anyone signed in to GitHub |
+| Debug tools | On from the start, no code needed ([Debug tools](/docs/development/testing/#debug-tools-and-cheat-codes)) |
+| Played before upload? | No. A green run means the export worked, not that anyone played it |
+
+- **Forks get no builds.** A pull request from a fork would be a program built from code nobody has reviewed yet.
+
+## System requirements
+
+| Need | macOS | Windows |
+| --- | --- | --- |
+| System | macOS 11 or later (Intel), macOS 13 or later (Apple silicon) | 64-bit Windows |
+| Package | One app for Apple silicon and Intel | `WOLF-OVERRIDE.exe` |
+| Graphics | OpenGL 3.3 (Godot's Compatibility renderer) | OpenGL 3.3 (Godot's Compatibility renderer) |
+
+- **These are the engine's minimums.** Nobody has tried the builds on a range of computers.
+
+## Download a build
+
+1. Sign in to GitHub.
+2. Open the [Test builds runs](https://github.com/MrDemonWolf/wolf-override/actions/workflows/builds.yml).
+3. Choose the run for the commit or pull request you want. A pull request also links its run under its checks.
+4. Download from the run's summary, or from **Artifacts** at the bottom of the page:
+   - `wolf-override-macos-debug-<commit>.zip`
+   - `wolf-override-windows-debug-<commit>.zip`
+
+- **`<commit>`** is the first seven characters of the commit the build came from.
+
+<Details>
+<Summary>Download with the GitHub CLI instead</Summary>
+
+- Run `gh run download <run id> --repo MrDemonWolf/wolf-override --name wolf-override-macos-debug-<commit>.zip`.
+- The [GitHub CLI](https://cli.github.com/) unzips it for you into a folder of that name.
+- macOS does not flag an app saved this way, so it opens without the steps below.
+
+</Details>
+
+## Open it on macOS
+
+1. Unzip the download.
+2. Open `WOLF OVERRIDE.app`.
+3. macOS says it cannot check the app. Click **Done**, not **Move to Trash**.
+4. Open **System Settings → Privacy & Security** and scroll to **Security**.
+5. Click **Open Anyway** beside the message about the app. The button stays for about an hour.
+6. Confirm with your password. Later launches open normally.
+
+- **Control-click → Open** no longer works on macOS 15 and later.
+- **Ad hoc signed:** the app is signed in a way that lets it run but does not satisfy Gatekeeper (Apple's check for unknown apps).
+
+<Details>
+<Summary>Terminal options</Summary>
+
+- **Skip steps 3 to 6:** in the folder you unzipped to, run `xattr -dr com.apple.quarantine "WOLF OVERRIDE.app"`.
+- **See the log:** `WOLF OVERRIDE.command` beside the app starts the same game from Terminal, so its log shows there.
+
+</Details>
+
+## Open it on Windows
+
+1. Right-click the downloaded zip and choose **Extract All**.
+2. Open the extracted folder.
+3. Run `WOLF-OVERRIDE.exe`.
+4. At **Windows protected your PC**, click **More info**, then **Run anyway**.
+
+<Callout type="warn" title="Smart App Control blocks test builds">
+  If **Smart App Control** is on, Windows blocks unsigned programs and offers no way to allow one. Test builds cannot run on that PC.
+</Callout>
+
+- **See the log:** `WOLF-OVERRIDE.console.exe` runs the same build with its log in a console window. This helps when you report a crash.
+
+## Saves and settings
+
+- **Shared with the source game.** A test build uses the same folder for saves, settings and the debug unlock.
+- **Where:** the paths are on [Saving and retrying](/docs/controls/saves/#where-saves-live).
+- **Want a clean start?** Move that folder aside first.
+- **Bug captures** from **F12** go to its `debug-captures` folder. See [Support](/docs/support/).
+
+## What is in the zip
+
+- **The game** for that platform.
+- **A `licenses` folder:** the game's licence (GNU GPL version 3 or later) and the notices for Godot Engine, its components and the game's typefaces.
+- **A short `README.txt`** naming the commit it was built from, with a link to its source.
+- **Art is not GPL.** The art and other media have separate rights. See [Legal](/docs/legal/).
+
+## Something went wrong?
+
+- **Won't open:** see [Troubleshooting](/docs/controls/troubleshooting/#opening-the-game).
+- **Found a bug:** see [Support and bug reports](/docs/support/).

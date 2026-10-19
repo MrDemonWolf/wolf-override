@@ -35,7 +35,8 @@ REQUIRED_IN_PACK = ["assets/changelog.txt", "assets/fonts/Roboto-OFL.txt", "asse
 FORBIDDEN_IN_PACK = re.compile(
     r"^(tests|tools|review|capture|trial|assets/trial|art-source)/|\.md$|^assets/manifest\.json$"
 )
-TESTING_URL = "https://wolfoverride.mrdemonwolf.dev/docs/development/testing/#test-builds"
+# The site's one page on downloading and opening a test build (moved out of the testing page in October 2026).
+TEST_BUILDS_URL = "https://wolfoverride.mrdemonwolf.dev/docs/test-builds/"
 CREDITS_URL = "https://wolfoverride.mrdemonwolf.dev/docs/credits/"
 LEGAL_URL = "https://wolfoverride.mrdemonwolf.dev/docs/legal/"
 SOURCE_URL = "https://github.com/MrDemonWolf/wolf-override/tree/{commit}"
@@ -95,7 +96,7 @@ This is an automatic DEBUG test build of the source game, made for testing while
 development. It is not a release. The debug tools are on. It is not signed with a developer
 certificate, so the system warns the first time you open it.
 
-How to open it and what to report: {TESTING_URL}
+How to open it and what to report: {TEST_BUILDS_URL}
 
 Original concept, core story and creative vision: Nathanial Henniges.
 Credits, references and asset sources: {CREDITS_URL}
