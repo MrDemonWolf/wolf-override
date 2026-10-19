@@ -618,7 +618,8 @@ func _check_hud() -> void:
 ## changelog screens, every Settings tab, Pause in a run, the touch layout's buttons, and the station
 ## names in the corridor, Records Access and the Service Junction at every TEXT SIZE step, where they
 ## must also stand apart (the kit's overlapping_labels, the check text_boxes_test makes in English).
-## English is judged too, so a check that flags the shipped English layout shows up as such. The
+## English runs first and sets the baseline the others are judged against (see [method _check_fits]);
+## its title must fit outright, as before PR L9. The
 ## dialogue boxes, hints and cards are not in the catalogs yet (PRs L7b and L7c); L7d's text_boxes_test
 ## loop covers them per language.
 func _check_layouts() -> void:
@@ -680,7 +681,8 @@ func _check_layouts() -> void:
 ## shipped English layout already overflows by that check (a Container page grown past its designed
 ## rect, a binding button that trims its two bindings), when the language needs no more room than English:
 ## its judged Control (I18n.outermost_container) is no larger and, where the control cuts its text, its
-## one-row width (I18n.needed_width) fits the control or is no wider than English's. English itself is recorded, not failed: L8 (layout-for-languages) owns its known overflows.
+## one-row width (I18n.needed_width) fits the control or is no wider than English's. English itself is
+## recorded, and failed only on the title: elsewhere its known overflows are L8's (layout-for-languages).
 func _check_fits(code: String, where: String, root: Node) -> void:
 	var controls: Array[Node] = [root]
 	controls.append_array(root.find_children("*", "Control", true, false))
@@ -716,6 +718,8 @@ func _check_fit(code: String, key: String, control: Control) -> void:
 	var shown: String = TranslationServer.translate(str(control.get("text"))) if control.auto_translate_mode != Node.AUTO_TRANSLATE_MODE_DISABLED else str(control.get("text"))
 	if code == I18n.FALLBACK:
 		_english_fit[key] = {"over": over, "judged": judged, "needed": needed}
+		if key.begins_with("title|"):
+			_check(not over, "the English title's %s fits (size %s)" % [shown.left(60).c_escape(), control.size])
 		return
 	var english: Dictionary = _english_fit.get(key, {"over": false})
 	var fits: bool = not over
