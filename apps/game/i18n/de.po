@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: WOLF OVERRIDE\n"
-"PO-Revision-Date: 2026-10-19 19:18+0000\n"
+"PO-Revision-Date: 2026-10-19 20:11+0000\n"
 "Last-Translator: Claude (Anthropic), machine translation, unreviewed\n"
 "Language-Team: none\n"
 "MIME-Version: 1.0\n"
@@ -3090,8 +3090,8 @@ msgid ""
 "The sentry ran %s down. Once its\n"
 "eyes go red, only the rubble is safe."
 msgstr ""
-"Der Wächter hat %s erwischt. Sobald seine\n"
-"Augen rot werden, schützen nur die Trümmer."
+"Der Wächter hat %s erwischt. Sobald die Augen\n"
+"des Wächters rot werden, schützen nur die Trümmer."
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: A knockdown card. %s is the engineer's first name, as an object: keep the name in the nominative (no case ending), and no gendered words about them.

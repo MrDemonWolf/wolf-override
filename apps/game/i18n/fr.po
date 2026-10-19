@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: WOLF OVERRIDE\n"
-"PO-Revision-Date: 2026-10-19 19:18+0000\n"
+"PO-Revision-Date: 2026-10-19 20:11+0000\n"
 "Last-Translator: Claude (Anthropic), machine translation, unreviewed\n"
 "Language-Team: none\n"
 "MIME-Version: 1.0\n"
@@ -3090,7 +3090,7 @@ msgid ""
 "The sentry ran %s down. Once its\n"
 "eyes go red, only the rubble is safe."
 msgstr ""
-"La sentinelle a fait tomber %s. Quand ses\n"
+"La sentinelle a fondu sur %s. Quand ses\n"
 "yeux virent au rouge, seuls les décombres protègent."
 
 # machine-translated by Claude (Anthropic), unreviewed
