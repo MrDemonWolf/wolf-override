@@ -86,8 +86,9 @@ static func fit_world_label(label: Label, center_x: float, top: float, room: flo
 ## WORLD_LABEL_GAP, which breaks it onto rows at its spaces, and where one word is still wider than that
 ## room (Spanish REFRIGERANTE above 100%), draws it smaller, back toward its 100% size, until it fits,
 ## and if even that is too wide, moves it off its station's centre, away from the neighbour, by what is
-## left over; when the wider one cannot be fitted again, the other is tried. Only plates fitted with [method fit_world_label] are moved; the
-## others (the MANUAL BYPASS plate, the COOLANT FAULT tag) stand still. Rects are compared in global
+## left over; when the wider one cannot be fitted again, the other is tried. Only plates fitted with [method fit_world_label] are moved
+## (the COOLANT FAULT tag is one: BypassHandle.place fits it, so Main._refit_station_labels can part it);
+## the others (the MANUAL BYPASS plate) stand still. Rects are compared in global
 ## px, so plates under different parents (the corridor's and the bypass handle's) count. Plates that do
 ## not overlap are left exactly as fitted, so the English rooms, whose names stand apart at every TEXT
 ## SIZE step (text_boxes_test), are unchanged. Call it after fitting every label of the room.

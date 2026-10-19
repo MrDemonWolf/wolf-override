@@ -83,7 +83,7 @@ const PAUSE_LEFT: float = 844.0
 const BUTTON_GAP: float = 10.0
 ## The short note ("Debug tools unlocked", a jump's result, a capture's path), wrapping to two lines;
 ## the menu hides it (it has its own status line). In play it sits in the top band between the top
-## card (ends x 466) and the DEBUG button (from x 768), above the frame-step bar, over nothing but the
+## card (ends x 466) and the DEBUG button (BUTTON_RECT, from x 762; x 756 at the theme's 78 px minimum), above the frame-step bar, over nothing but the
 ## ceiling, so it never covers an actor or a machine being debugged. The zones page's legend takes
 ## that band, so there the note takes the first of NOTE_ZONES_SLOTS that covers neither an actor nor
 ## the junction's tank: right of the overlay's column below the answer row and the tutorial card, or
