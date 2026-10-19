@@ -5,8 +5,8 @@ description: How WOLF OVERRIDE shows other languages, which files hold the langu
 
 **What this page is for:** how languages work in the code today, and how to check translation files.
 
-<Callout title="Spanish is the first language">
-  Spanish (Latin America and Spain) covers the menus, the HUD and the story as a machine translation, not yet reviewed by a native speaker. Most station names still show English. Players: [Platforms and languages](/docs/platforms/).
+<Callout title="Five translations so far">
+  German, Spanish (Latin America and Spain), French and Brazilian Portuguese cover the menus, the HUD and the story as machine translations, not yet reviewed by a native speaker. Most station names still show English. Players: [Platforms and languages](/docs/platforms/).
 </Callout>
 
 ## Words used here
@@ -98,7 +98,7 @@ You need Python 3 (standard library only) and GNU gettext's `msgfmt` (`brew inst
 <Details>
 <Summary>Self-test, glossary and fonts in detail</Summary>
 
-- **`selftest`** runs the gates on 167 planted cases (121 for the line, plural, comment and sibling gates, 9 for the release gates, 6 for the coverage gate, 16 for the glossary on its real terms and 15 broken copies of the glossary and style guides). It fails if any planted error passes or any clean line fails.
+- **`selftest`** runs the gates on 171 planted cases (125 for the line, plural, comment and sibling gates, 9 for the release gates, 6 for the coverage gate, 16 for the glossary on its real terms and 15 broken copies of the glossary and style guides). It fails if any planted error passes or any clean line fails.
 - **`glossary`** checks that every one of the 10 languages' 11 files (Italian and Ukrainian, Tier 1, are not covered yet) has a form for every term and a guide with the same sections, that every word is in its language's alphabet, and that a term still left to reviewers requires nothing. It exits 1 on any problem.
 - **`fonts`** downloads the Noto Sans CJK 2.004 release files from GitHub into the folder (unless they are there), checks each font's SHA-256, and cuts Noto Sans JP, KR, SC and TC down to each language's fixed common character set with HarfBuzz's `hb-subset` (`brew install harfbuzz`). It writes the symbols font Roboto chains and the character lists in `apps/game/tests/support/cjk_charsets.json`, then runs `pickerfonts`, and prints the sizes. Its output is committed, so it only runs again to change a character set.
 - **`pickerfonts`** cuts each CJK language's own name and "machine translation" tag out of its committed subset (`picker_font` in `languages.json`) and gives the cut Montserrat's line height, so the list's rows keep their height.
@@ -121,6 +121,14 @@ You need Python 3 (standard library only) and GNU gettext's `msgfmt` (`brew inst
 - **Some words were cut to fit,** such as EMPEZAR for NEW GAME. The list is in `i18n/style/es-419.md`, "Open questions".
 - **Review state:** machine translation, not reviewed. See [Credits](/docs/credits/#translations).
 
+## Portuguese, French and German
+
+- **Three files:** `pt_BR.po` (Brazil), `fr.po` and `de.po`, made the same way as Spanish.
+- **Portugal** gets `pt_BR`, the one Portuguese file.
+- **French spacing:** a no-break space (U+00A0) goes before `; : ! ?` and inside « ».
+- **Some words were cut to fit,** such as JOUER for NEW GAME and NUTZEN for USE. The lists are in `i18n/style/pt-BR.md`, `fr.md` and `de.md`, "Open questions", and each cut is noted on its line.
+- **Review state:** machine translation, not reviewed. See [Credits](/docs/credits/#translations).
+
 ## Store pages
 
 No store page exists yet. When one does, list only languages that ship, and say how they were made.
@@ -129,9 +137,12 @@ No store page exists yet. When one does, list only languages that ship, and say 
 | --- | --- | --- | --- |
 | Spanish - Latin America | Yes | No | No |
 | Spanish - Spain | Yes | No | No |
+| Portuguese - Brazil | Yes | No | No |
+| French | Yes | No | No |
+| German | Yes | No | No |
 
 - **Subtitles: no,** because the game has no voice yet.
-- **About This Game:** say "Spanish: machine-translated, community review in progress" until a native speaker reviews it.
+- **About This Game:** give each language a line such as "French: machine-translated, community review in progress" until a native speaker reviews it.
 - **Content Survey:** disclose the AI translation under AI-generated content (decision D2), as the conservative reading of Valve's January 2026 rules.
 
 ## Add a language

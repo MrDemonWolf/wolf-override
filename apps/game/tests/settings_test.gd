@@ -266,7 +266,7 @@ func _check_language_row(game: Node2D, path: String) -> void:
 	var menu: GameSettings = game.get("settings_menu") as GameSettings
 	var config: ConfigFile = ConfigFile.new()
 	config.load(path)
-	_expect(not menu.tabs.is_tab_hidden(GameSettings.GENERAL_TAB) and _language_items(menu) == ["English", "Español (España)", "— traducción automática", "Español (Latinoamérica)", "— traducción automática"], "as shipped the GENERAL tab shows English and both Spanish files, each with its tag (%s)" % [_language_items(menu)])
+	_expect(not menu.tabs.is_tab_hidden(GameSettings.GENERAL_TAB) and _language_items(menu) == ["English", "Deutsch", "— maschinelle Übersetzung", "Español (España)", "— traducción automática", "Español (Latinoamérica)", "— traducción automática", "Français", "— traduction automatique", "Português (Brasil)", "— tradução automática"], "as shipped the GENERAL tab shows English, then German, both Spanish files, French and Brazilian Portuguese in the table's order, each translation with its tag (%s)" % [_language_items(menu)])
 	var shipped: Dictionary = _offer(["en"])
 	menu.refresh_languages()
 	_expect(menu.tabs.is_tab_hidden(GameSettings.GENERAL_TAB) and menu.tabs.get_tab_title(GameSettings.GENERAL_TAB) == "GENERAL", "with English alone the GENERAL tab is there but hidden")
@@ -303,9 +303,8 @@ func _check_language_row(game: Node2D, path: String) -> void:
 
 
 ## The menus' worked-out text follows a language change (localization PR L7a), with a catalog made up
-## here for "pt_BR" (dropped again with I18n.forget, so no real catalog is touched). Brazilian Portuguese
-## because it ships no catalog yet: with a made-up "es" catalog the real Spanish lines (PR L9) would
-## answer too, and which of two catalogs of one locale answers first is Godot's order, not this test's.
+## here for [constant UNSHIPPED_TEST_LANGUAGE] (the suite kit's; dropped again with I18n.forget, so no
+## real catalog is touched). The made-up words are Portuguese, from when the code was "pt_BR".
 ## - prompt() forgets the labels it remembered in English (the lighter plan's S01 prompt cache), so a
 ##   controller button and a named key read in Spanish at once, and the binding buttons follow;
 ## - the note under the tabs is translated again, its action name too, and a translation whose
@@ -321,7 +320,7 @@ func _check_language_row(game: Node2D, path: String) -> void:
 func _check_menu_translation(game: Node2D) -> void:
 	var menu: GameSettings = game.get("settings_menu") as GameSettings
 	var catalog: Translation = Translation.new()
-	catalog.locale = "pt_BR"
+	catalog.locale = UNSHIPPED_TEST_LANGUAGE
 	catalog.add_message("START", "INÍCIO")
 	catalog.add_message("Escape", "Escape-pt", GameSettings.KEY_NAME_CONTEXT)
 	catalog.add_message("Pause", "Pausa (ação)")
@@ -333,7 +332,7 @@ func _check_menu_translation(game: Node2D) -> void:
 	TranslationServer.add_translation(catalog)
 	_expect(menu.prompt(&"pause_game", true) == "START" and menu.prompt(&"pause_game", false) == "Escape", "in English the Pause prompts read START and Escape (and are remembered)")
 	menu.begin_capture(&"pause_game", "keyboard")
-	I18n.apply("pt_BR")
+	I18n.apply(UNSHIPPED_TEST_LANGUAGE)
 	await process_frame
 	_expect(menu.prompt(&"pause_game", true) == "INÍCIO" and menu.prompt(&"pause_game", false) == "Escape-pt", "a language change forgets the remembered prompts (%s, %s)" % [menu.prompt(&"pause_game", true), menu.prompt(&"pause_game", false)])
 	var keyboard: Button = menu.binding_buttons["pause_game_keyboard"]

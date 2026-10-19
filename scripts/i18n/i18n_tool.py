@@ -1350,6 +1350,15 @@ SELFTEST = [
     ("gender", "pt_BR", "", "%s está morto.", False, ""),
     ("gender", "pt_BR", "", "WOLF: Você está certa.", False, "you"),
     ("gender", "pt_BR", "", "%s abre a porta da escada.", True, ""),
+    # "teclado" (keyboard), "lado" (side), "líquido" (liquid) and "dados" (data) are nouns that end like
+    # participles; the rule's exception list keeps them clear (PR L10's TOGGLE HOLDS tooltip, rubble,
+    # coolant and mirror port hints), while an agreeing participle beside them still fails.
+    ("gender", "pt_BR", "", "Teclado, controle e tela de toque.", True, "you"),
+    ("gender", "pt_BR", "", "Volte para o outro lado dos escombros.", True, "you"),
+    ("gender", "pt_BR", "", "Nuvem de líquido de arrefecimento. Saia dela.", True, "you"),
+    ("gender", "pt_BR", "", "%s: examine a porta de dados espelho.", True, "you"),
+    ("gender", "pt_BR", "", "Porta de dados pronta e você está cansado.", False, "you"),
+    ("gender", "pt_BR", "", "Do outro lado, você está cansada.", False, "you"),
     ("gender", "pl", "", "%s jest zmęczona.", False, ""),
     ("gender", "pl", "", "%s jest zmęczony.", False, ""),
     ("gender", "pl", "", "%s jest ranna.", False, ""),
@@ -1415,7 +1424,7 @@ SELFTEST = [
     ("glossary", "ru", "The sentry stops on the mark.", "Страж останавливается на отметке.", True, ""),
     ("glossary", "pt_BR", "The coolant cloud is thick.", "A nuvem de líquido de arrefecimento é densa.", True, ""),
     ("glossary", "pt_BR", "The coolant cloud is thick.", "A nuvem de refrigerante é densa.", False, ""),
-    ("glossary", "de", "Get to the SAFE POINT.", "Geh zum SICHERUNGSPUNKT.", True, ""),
+    ("glossary", "de", "Get to the SAFE POINT.", "Geh zum SPEICHERPUNKT.", True, ""),
     ("glossary", "ja", "Get to the SAFE POINT.", "安全な場所へ。", False, ""),
 ]
 #: Planted cases for glossary_problems: (what, a change made to a copy of the repository's glossary and

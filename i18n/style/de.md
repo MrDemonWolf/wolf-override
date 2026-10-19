@@ -37,5 +37,19 @@ Quotes „…“.
 - **HOLD E:**: the word order "HALTEN E:" is forced by the key token until the hint bar uses placeholders
   (localization PR L7b).
 - **SERVICE JUNCTION**: the trial's VERSORGUNGSKNOTEN reads back as "supply node"; a reviewer's word.
-- **breaker**: "Schutzschalter" is proposed rather than "Sicherung", so it is never confused with
-  SICHERUNGSPUNKT (SAFE POINT).
+- **breaker**: "Schutzschalter" is proposed rather than "Sicherung", which is a fuse.
+- **SAFE POINT**: SPEICHERPUNKT (save point), the plate's and the hints' word. PR L10's
+  SICHERUNGSPUNKT was cut on its left by the door pillar beside the plate.
+- **PR L10's choices (proposals for a reviewer):** SERVICE JUNCTION is VERSORGUNGSKNOTEN; the seal (OPEN
+  THE SEAL) is *die Schleuse*; the relief vent is *der Druckablass*, so it is never confused with the
+  valve (*das Ventil*); THE DEN is DER WOLFSBAU, since DER BAU read back as "the build". The sentry is
+  *der Wächter*, so German calls it *er*, as the noun's grammar needs.
+- **PR L10's story words (proposals for a reviewer):** the timestamp is *Zeitstempel*, WOLF's readout
+  *Anzeige*, the program logs *Protokolle*, WOLF breaking off *ich breche ab*, and the manual-port answer
+  button MANUELLEN PORT NUTZEN, the words WOLF's touch line quotes. Wherever *er* or *sein* could read as
+  WOLF, the line names *der Wächter*.
+- **Words cut to fit (PR L10)**: MRDEMONWOLF, INC. PRESENTS is VON MRDEMONWOLF, INC. (PRÄSENTIERT ran
+  18 px over), BACK TO TITLE is ZUM MENÜ, USE on the touch button is NUTZEN (BENUTZEN widened it),
+  TEXT SIZE is TEXT, BREAKER USED is SCHUTZSCHALTER AUS, VALVE USED is VENTIL LEER and EXIT READY is
+  AUSGANG FREI (the longer plates ran into their neighbours), and the controller column abbreviates
+  *li.* and *re.* Each cut is noted on its line in `de.po`.

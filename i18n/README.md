@@ -10,9 +10,9 @@ outside `apps/game` on purpose: a file inside the Godot project is imported and 
 | `style/README.md` | The rules every language shares: the engineer is never given a gender, WOLF is he, placeholders, tags, line breaks, length. |
 | `style/<key>.md` | One guide per language, named by its glossary key (`es-419`, `es-ES`, `pt-BR`, `de`, `fr`, `pl`, `ru`, `ja`, `ko`, `zh-Hans`, `zh-Hant`). |
 
-The translation files themselves are `apps/game/i18n/<code>.po` (`es.po`, `es_ES.po`, `pt_BR.po` and so
-on), beside the language table `apps/game/i18n/languages.json`. None exist yet: the first one, Spanish,
-comes with localization PR L9.
+The translation files themselves are `apps/game/i18n/<code>.po`, beside the language table
+`apps/game/i18n/languages.json`. So far: `es.po` and `es_ES.po` (localization PR L9), and `pt_BR.po`,
+`fr.po` and `de.po` (PR L10).
 
 `python3 -I -B scripts/i18n/i18n_tool.py glossary` checks the glossary and the style guides against each
 other and against the language table, and `check` applies the glossary to every translated line. Both run

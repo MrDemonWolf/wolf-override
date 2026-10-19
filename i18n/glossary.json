@@ -8,7 +8,7 @@
    "note": "Station plate (12 px label) over the spot where the engineer is out of the sentry's sight; hints name it too. Plate words stay short.",
    "es-419": {"status": "trial", "required": "PUNTO SEGURO"},
    "pt-BR": {"status": "proposed", "required": "PONTO SEGURO"},
-   "de": {"status": "trial", "required": "SICHERUNGSPUNKT"},
+   "de": {"status": "trial", "required": "SPEICHERPUNKT"},
    "fr": {"status": "proposed", "required": "POINT SÛR"},
    "pl": {"status": "proposed", "required": "PUNKT BEZPIECZNY"},
    "ru": {"status": "trial", "required": "БЕЗОПАСНАЯ ТОЧКА"},
