@@ -28,24 +28,39 @@ const CHOICE_MARKER: String = "\n1  "
 ## whether they fit the column in MAX_ROWS rows. A line with no tag after a tagged one goes on in
 ## that speaker's voice, as the game's lines are written.
 static func split(message: String, speakers: Array[String], fits: Callable) -> Array[String]:
+	var boxes: Array[String] = []
+	for segment: Array in segments(message, speakers):
+		for words: String in _fit(segment[1], fits):
+			boxes.append(words if segment[0].is_empty() else "%s: %s" % [segment[0], words])
+	return boxes
+
+
+## [param message] cut where its speaker changes, before any box fitting: each segment is
+## [tag, words, joiner], the tag ("" for narration) from [param speakers], the words without it, and the
+## joiner that stood before the segment in [param message] ("" for the first, "\n" at a written line
+## break, " " where a tagged sentence starts mid-line, "FIRST COPY SECURED. WOLF: ..."). A written line
+## with no tag after a segment goes on in that segment's words, after a "\n". A choice's response rows
+## (after [constant CHOICE_MARKER]) are left out. The one place a message is cut by speaker: [method split]
+## fits each segment into boxes, and I18n.shown translates each segment's words as one message (PR L7c),
+## so the boxes and the translation template cut the same way. Joining every segment's joiner, then
+## "tag: " when it has a tag, then its words gives the message back up to its choice rows, for the
+## messages the game writes (one space after a sentence's end and after a tag's colon).
+static func segments(message: String, speakers: Array[String]) -> Array[Array]:
 	var tags: Array[String] = _longest_first(speakers)
-	var segments: Array[Array] = []
+	var found: Array[Array] = []
 	for line: String in message.get_slice(CHOICE_MARKER, 0).split("\n"):
 		var first_piece: bool = true
 		for piece: String in _tag_pieces(line, tags):
 			var tag: String = tag_of(piece, tags)
-			if tag.is_empty() and first_piece and not segments.is_empty():
-				segments.back()[1] += "\n" + piece
+			var joiner: String = "" if found.is_empty() else ("\n" if first_piece else " ")
+			if tag.is_empty() and first_piece and not found.is_empty():
+				found.back()[1] += "\n" + piece
 			elif tag.is_empty():
-				segments.append(["", piece])
+				found.append(["", piece, joiner])
 			else:
-				segments.append([tag, piece.substr(tag.length() + 1).strip_edges()])
+				found.append([tag, piece.substr(tag.length() + 1).strip_edges(), joiner])
 			first_piece = false
-	var boxes: Array[String] = []
-	for segment: Array in segments:
-		for words: String in _fit(segment[1], fits):
-			boxes.append(words if segment[0].is_empty() else "%s: %s" % [segment[0], words])
-	return boxes
+	return found
 
 
 ## The speaker tag [param box] starts with ("WOLF" for "WOLF: ..."), or "" for narration.

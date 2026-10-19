@@ -45,16 +45,27 @@ static func key(template: String, inserts: Array, touch_template: String = "") -
 	return I18n.format(template, inserts)
 
 
-## True when [param line] was built with [method key] (or I18n.format) and so has inserts to fill.
+## True when [param line] was built with [method key] and names an input: one of its inserts is a key
+## token, or it has a touch form. A line I18n.format built with only a name or a quoted answer in it (the
+## story, PR L7c) is not one; I18n.shown fills those.
 static func has_keys(line: String) -> bool:
-	return not I18n.parts(line).is_empty()
+	var parts: Array = I18n.parts(line)
+	if parts.is_empty():
+		return false
+	if _touch_forms.has(parts[0]):
+		return true
+	for insert: Variant in parts[1]:
+		if insert is StringName:
+			return true
+	return false
 
 
 ## [param line] as the player reads it in the current language. A line built with [method key] is its
 ## translated template (or, when [param touch] is true and it has one, its translated touch form) filled
 ## with its inserts, each token replaced by its entry in [param keys] (token to the input's shown name; a
 ## token [param keys] lacks writes its English). Any other line is translated whole when
-## [param translate_plain] is true, else returned as it is (status_line's story lines are L7c's).
+## [param translate_plain] is true, else returned as it is (status_line's story lines are drawn by
+## I18n.shown, which asks this only for the lines [method has_keys] names).
 ## The fill goes through I18n.fill, so a translation whose inserts differ shows the English template.
 static func localise(line: String, keys: Dictionary, touch: bool, translate_plain: bool = true) -> String:
 	var parts: Array = I18n.parts(line)
