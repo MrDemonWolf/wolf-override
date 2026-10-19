@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: WOLF OVERRIDE\n"
-"PO-Revision-Date: 2026-10-19 17:30+0000\n"
+"PO-Revision-Date: 2026-10-19 17:37+0000\n"
 "Last-Translator: Claude (Anthropic), machine translation, unreviewed\n"
 "Language-Team: none\n"
 "MIME-Version: 1.0\n"
@@ -83,11 +83,11 @@ msgid "2  MANUAL"
 msgstr "2  MANUAL"
 
 # machine-translated by Claude (Anthropic), unreviewed
-#. TRANSLATORS: The title's top line (280 px, 18 px). The studio name stays as written.
+#. TRANSLATORS: The title's top line (280 px, 18 px). The studio name stays as written. Cut to fit: APRESENTA ran 3 px over the 280 px line, so DE (by) until PR L8 widens it.
 #. i18n: speaker=ui
 #: scenes/main.tscn
 msgid "MRDEMONWOLF, INC. PRESENTS"
-msgstr "MRDEMONWOLF, INC. APRESENTA"
+msgstr "DE MRDEMONWOLF, INC."
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: The game's name. Never translated.
@@ -147,11 +147,11 @@ msgid "CHANGELOG"
 msgstr "NOVIDADES"
 
 # machine-translated by Claude (Anthropic), unreviewed
-#. TRANSLATORS: The title's credit line (424 px, 16 px). The author's name stays as written.
+#. TRANSLATORS: The title's credit line (424 px, 16 px). The author's name stays as written. Cut to fit: Desenvolvimento assistido por IA ran 47 px over, so Feito com apoio de IA (made with AI support).
 #. i18n: speaker=ui
 #: scenes/main.tscn
 msgid "Concept: Nathanial Henniges  /  AI-assisted development"
-msgstr "Conceito: Nathanial Henniges  /  Desenvolvimento assistido por IA"
+msgstr "Conceito: Nathanial Henniges  /  Feito com apoio de IA"
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: The credits roll (582 px, 19 px, centred, wraps). Translate the role headings and the sentences; names, companies, tools, licences, works' titles and the address stay as written. The translation credit (decision D2) is added in each language's own text under AI-ASSISTED PRODUCTION, so the English keeps none.
@@ -989,7 +989,7 @@ msgstr "CONTROLE"
 #. i18n: speaker=ui
 #: scripts/game_settings.gd:345
 msgid "Stick deadzone"
-msgstr "Zona morta do analógico"
+msgstr "Zona morta do stick"
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: CONTROLS toggle: press once instead of holding a button down.
@@ -1053,7 +1053,7 @@ msgstr "O volume muda na hora. Os efeitos incluem todos os sons; ainda não há 
 #. i18n: speaker=ui engineer=you
 #: scripts/game_settings.gd:566
 msgid "Select a binding, then press a key, controller button or move a stick."
-msgstr "Escolha um comando e pressione uma tecla ou um botão do controle, ou mova um analógico."
+msgstr "Escolha um comando e pressione uma tecla ou um botão do controle, ou mova um stick."
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: GENERAL note under the language list.
@@ -1076,7 +1076,7 @@ msgstr "Pressione uma tecla para “%s”. Esc cancela."
 #: scripts/game_settings.gd:612
 #, c-format
 msgid "Press a controller input for %s. Esc cancels."
-msgstr "Pressione um botão ou analógico do controle para “%s”. Esc cancela."
+msgstr "Pressione um botão ou stick do controle para “%s”. Esc cancela."
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: Rebind note.
@@ -1101,11 +1101,11 @@ msgid "Binding saved."
 msgstr "Comando salvo."
 
 # machine-translated by Claude (Anthropic), unreviewed
-#. TRANSLATORS: A controller stick's name in the CONTROLLER column (206 px, 15 px, shared with a second binding: abbreviate).
+#. TRANSLATORS: A controller stick's name in the CONTROLLER column (206 px, 15 px, shared with a second binding: abbreviate). Stick L, as Nintendo's Brazilian materials name it; Stick esq. with D-pad esq. ran 2 px over the column.
 #. i18n: speaker=ui
 #: scripts/game_settings.gd:718
 msgid "Left stick"
-msgstr "Analóg. esq."
+msgstr "Stick L"
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: A controller axis's name; %d is its number.
@@ -1238,11 +1238,11 @@ msgid "Saved checkpoint could not be read."
 msgstr "Não foi possível ler o ponto de controle salvo."
 
 # machine-translated by Claude (Anthropic), unreviewed
-#. TRANSLATORS: Title note under CONTINUE (388 px, 15 px). SAFE POINT is the plate's exact words.
+#. TRANSLATORS: Title note under CONTINUE (388 px, 15 px). SAFE POINT is the plate's exact words. Shortened to fit the 388 px row.
 #. i18n: speaker=ui
 #: scripts/main.gd:1070
 msgid "No checkpoint yet. Saving starts at the first SAFE POINT."
-msgstr "Nada salvo ainda. O jogo salva no primeiro PONTO SEGURO."
+msgstr "Nada salvo ainda. Salva no primeiro PONTO SEGURO."
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: Changelog button text when the browser cannot open (338 px).
@@ -1451,11 +1451,11 @@ msgid "%s  MOVE"
 msgstr "%s  MOVER"
 
 # machine-translated by Claude (Anthropic), unreviewed
-#. TRANSLATORS: Tutorial row (17 px) on a controller. Analógico and D-pad, as in the CONTROLS table.
+#. TRANSLATORS: Tutorial row (17 px) on a controller. Stick and D-pad, as in the CONTROLS table.
 #. i18n: speaker=hint engineer=you
 #: scripts/main.gd:4549
 msgid "STICK / D-PAD MOVE"
-msgstr "ANALÓGICO / D-PAD  MOVER"
+msgstr "STICK / D-PAD  MOVER"
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: Tutorial row (17 px). %s is the interact key or the USE button; two spaces after it.

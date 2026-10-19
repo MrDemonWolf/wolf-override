@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: WOLF OVERRIDE\n"
-"PO-Revision-Date: 2026-10-19 17:30+0000\n"
+"PO-Revision-Date: 2026-10-19 17:37+0000\n"
 "Last-Translator: Claude (Anthropic), machine translation, unreviewed\n"
 "Language-Team: none\n"
 "MIME-Version: 1.0\n"
@@ -83,11 +83,11 @@ msgid "2  MANUAL"
 msgstr "2  MANUELL"
 
 # machine-translated by Claude (Anthropic), unreviewed
-#. TRANSLATORS: The title's top line (280 px, 18 px). The studio name stays as written.
+#. TRANSLATORS: The title's top line (280 px, 18 px). The studio name stays as written. Cut to fit: PRÄSENTIERT ran 18 px over the 280 px line, so VON (by) until PR L8 widens it.
 #. i18n: speaker=ui
 #: scenes/main.tscn
 msgid "MRDEMONWOLF, INC. PRESENTS"
-msgstr "MRDEMONWOLF, INC. PRÄSENTIERT"
+msgstr "VON MRDEMONWOLF, INC."
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: The game's name. Never translated.
@@ -327,11 +327,11 @@ msgstr ""
 "[font_size=24][b]DANKE FÜRS SPIELEN[/b][/font_size][/center]"
 
 # machine-translated by Claude (Anthropic), unreviewed
-#. TRANSLATORS: Credits and changelog button (218 px, 19 px): back to the title menu.
+#. TRANSLATORS: Credits and changelog button (218 px, 19 px): back to the title menu. Cut to fit: ZURÜCK ZUM MENÜ ran 16 px over the 218 px button, so ZUM MENÜ.
 #. i18n: speaker=ui
 #: scenes/main.tscn
 msgid "BACK TO TITLE"
-msgstr "ZURÜCK ZUM MENÜ"
+msgstr "ZUM MENÜ"
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: Credits button (218 px, 19 px) that stops the credits rolling up.
@@ -1003,7 +1003,7 @@ msgstr "UMSCHALTEN STATT HALTEN"
 #. i18n: speaker=ui engineer=you
 #: scripts/game_settings.gd:350
 msgid "Press interact once to start a crank and again to stop it, instead of holding it down. Keyboard, controller and touch."
-msgstr "Drücke BENUTZEN einmal, um eine Kurbel zu starten, und erneut, um sie anzuhalten, statt die Taste zu halten. Tastatur, Controller und Touch."
+msgstr "Drücke NUTZEN einmal, um eine Kurbel zu starten, und erneut, um sie anzuhalten, statt die Taste zu halten. Tastatur, Controller und Touch."
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: CONTROLS button.
@@ -1105,7 +1105,7 @@ msgstr "Belegung gespeichert."
 #. i18n: speaker=ui
 #: scripts/game_settings.gd:718
 msgid "Left stick"
-msgstr "Linker Stick"
+msgstr "Stick li."
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: A controller axis's name; %d is its number.
@@ -1135,14 +1135,14 @@ msgstr "START"
 #. i18n: speaker=ui
 #: scripts/game_settings.gd:797
 msgid "D-pad left"
-msgstr "Kreuz links"
+msgstr "Kreuz li."
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: A controller binding: right on the directional pad (CONTROLLER column, 206 px, shared with a second binding: abbreviate).
 #. i18n: speaker=ui
 #: scripts/game_settings.gd:798
 msgid "D-pad right"
-msgstr "Kreuz rechts"
+msgstr "Kreuz re."
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: A controller button with no name; %d is its number.
@@ -1175,18 +1175,18 @@ msgid "LINE"
 msgstr "LEITUNG"
 
 # machine-translated by Claude (Anthropic), unreviewed
-#. TRANSLATORS: Station plate (12-13 px label on a machine). ALL CAPS, as short as possible. The junction's breaker after the blast used the line up.
+#. TRANSLATORS: Station plate (12-13 px label on a machine). ALL CAPS, as short as possible. The junction's breaker after the blast used the line up. Cut to fit: VERBRAUCHT ran into RELIEF VENT, so AUS.
 #. i18n: speaker=ui
 #: scripts/junction_room.gd:1531
 msgid "BREAKER USED"
-msgstr "SCHUTZSCHALTER VERBRAUCHT"
+msgstr "SCHUTZSCHALTER AUS"
 
 # machine-translated by Claude (Anthropic), unreviewed
-#. TRANSLATORS: Station plate (12-13 px label on a machine). ALL CAPS, as short as possible. The junction's valve after the blast used the line up.
+#. TRANSLATORS: Station plate (12-13 px label on a machine). ALL CAPS, as short as possible. The junction's valve after the blast used the line up. Cut to fit: VENTIL VERBRAUCHT ran into its neighbours, so LEER (the line is spent).
 #. i18n: speaker=ui
 #: scripts/junction_room.gd:1533
 msgid "VALVE USED"
-msgstr "VENTIL VERBRAUCHT"
+msgstr "VENTIL LEER"
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: Station plate (12-13 px label on a machine). ALL CAPS, as short as possible. The junction's exit hatch, open.
@@ -1203,11 +1203,11 @@ msgid "EXIT OPENING"
 msgstr "AUSGANG ÖFFNET"
 
 # machine-translated by Claude (Anthropic), unreviewed
-#. TRANSLATORS: Station plate (12-13 px label on a machine). ALL CAPS, as short as possible. The junction's exit hatch, ready to open.
+#. TRANSLATORS: Station plate (12-13 px label on a machine). ALL CAPS, as short as possible. The junction's exit hatch, ready to open. Cut to fit: AUSGANG BEREIT ran into TANK DOWN, so FREI.
 #. i18n: speaker=ui
 #: scripts/junction_room.gd:1557
 msgid "EXIT READY"
-msgstr "AUSGANG BEREIT"
+msgstr "AUSGANG FREI"
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: Station plate (12-13 px label on a machine). ALL CAPS, as short as possible. The junction's exit hatch, locked.
@@ -1238,11 +1238,11 @@ msgid "Saved checkpoint could not be read."
 msgstr "Gespeicherter Kontrollpunkt konnte nicht gelesen werden."
 
 # machine-translated by Claude (Anthropic), unreviewed
-#. TRANSLATORS: Title note under CONTINUE (388 px, 15 px). SAFE POINT is the plate's exact words.
+#. TRANSLATORS: Title note under CONTINUE (388 px, 15 px). SAFE POINT is the plate's exact words. Shortened to fit the 388 px row.
 #. i18n: speaker=ui
 #: scripts/main.gd:1070
 msgid "No checkpoint yet. Saving starts at the first SAFE POINT."
-msgstr "Noch kein Kontrollpunkt. Gespeichert wird ab dem ersten SICHERUNGSPUNKT."
+msgstr "Noch nichts gespeichert: erst am SICHERUNGSPUNKT."
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: Changelog button text when the browser cannot open (338 px).
@@ -1359,7 +1359,7 @@ msgstr "Der Sicherungspunkt konnte nicht speichern. Drücke hier erneut %s."
 #. i18n: speaker=hint engineer=you
 #: scripts/main.gd:2674
 msgid "The safe point could not save. Tap USE here again."
-msgstr "Der Sicherungspunkt konnte nicht speichern. Tippe hier erneut auf BENUTZEN."
+msgstr "Der Sicherungspunkt konnte nicht speichern. Tippe hier erneut auf NUTZEN."
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: Hint bar (14 px, about 526 px wide on a keyboard and 488 px on touch; wraps).
@@ -1435,12 +1435,12 @@ msgid "DROP"
 msgstr "ABWERFEN"
 
 # machine-translated by Claude (Anthropic), unreviewed
-#. TRANSLATORS: The touch layout's interact button (155 px, 23 px): use the machine in front of you.
+#. TRANSLATORS: The touch layout's interact button (155 px, 23 px): use the machine in front of you. NUTZEN: BENUTZEN widened the 155 px button to 161 px.
 #. i18n: speaker=ui
 #: scripts/main.gd:4539
 #: scripts/main.gd:4550
 msgid "USE"
-msgstr "BENUTZEN"
+msgstr "NUTZEN"
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: Tutorial row (17 px). %s is the keys or the touch arrows; two spaces after it.
