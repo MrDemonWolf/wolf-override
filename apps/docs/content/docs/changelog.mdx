@@ -61,6 +61,11 @@ Changes merged after 0.15.0. They become the next version when it is cut.
 - He gets up off the pad (the charge cuts as he lifts), tears the cage's guard lock off and shoulders the mesh leaves aside. The torn lock swings on its cable and the bay's red beacon comes on.
 - Back in the bay later, the cage stands open and empty, and the pad glows on slow amber standby with an empty battery on its screen.
 - The old cage and gate drawn by code are gone.
+- The opening plays one beat at a time: pressing on shows the next words at once, and what is happening on screen finishes first.
+- The engineer walks in and watches from the dock bay's doorway. The Director steps back to the wall to let WOLF pass, then leaves by his own door as play begins.
+- With "Lock down maintenance" a klaxon sounds and the corridor's red lockdown light flashes through the doorway.
+- The engineer flinches when the lock tears, and the cage's leaves clunk as each one catches the next.
+- First control comes about 33 seconds into the opening at a steady reading pace.
 
 ### Website
 
@@ -134,6 +139,7 @@ Changes merged after 0.15.0. They become the next version when it is cut.
 - A new `dock_bay_test` checks the dock bay's pictures, their sizes and register entries, and the walk and camera pan into the room.
 - `dock_bay_test` also checks the charger's states, the leaves' push and catches, and the torn lock's swing.
 - Shared code: the charger's screen is a battery readout of `PropScreen`, `WolfLights` lights all three of WOLF's poses, and the warning beacons' pulse is one `RoomDepth.pulse` for every room and the bay.
+- The opening's staging moved out of `main.gd` into its own `Opening` node. New `opening_timing_test` and `opening_early_press_test` check the reading time, the order of the beats and that a fast reader never cuts one short.
 
 ### How it was checked
 
@@ -145,6 +151,7 @@ Changes merged after 0.15.0. They become the next version when it is cut.
 - **Link previews checked:** the docs checks and build, and the og:type, og:title and twitter:title tags read from the built pages.
 - **Dock bay room checked:** headless test suites and rendered stills (1280x720 and a phone shape) of the empty room, its doorway and the corridor's left end; not played by hand.
 - **Dock bay cage checked:** headless test suites and rendered stills (1280x720 and a phone shape) of each beat: charging, waking, getting up, the lock torn and the leaves sliding, out of the cage, and the empty bay; not played by hand.
+- **Dock bay opening checked:** headless test suites, the timed opening (first control at 33.0 s on the reading formula) and rendered stills (1280x720 and a phone shape) of every box; not played by hand, so its pace is not yet judged in motion.
 
 ## 0.15.0 - October 16, 2026
 
