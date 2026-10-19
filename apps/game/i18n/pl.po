@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: WOLF OVERRIDE\n"
-"PO-Revision-Date: 2026-10-19 20:57+0000\n"
+"PO-Revision-Date: 2026-10-19 21:08+0000\n"
 "Last-Translator: Claude (Anthropic), machine translation, unreviewed\n"
 "Language-Team: none\n"
 "MIME-Version: 1.0\n"
@@ -47,12 +47,12 @@ msgid "SAFE POINT"
 msgstr "PUNKT BEZPIECZNY"
 
 # machine-translated by Claude (Anthropic), unreviewed
-#. TRANSLATORS: The PAUSE button on the touch layout (88 px) and the Pause action's prompt.
+#. TRANSLATORS: The PAUSE button on the touch layout (88 px) and the Pause action's prompt. Cut to fit: PAUZA ran 2 px past the 88 px touch button, so STOP.
 #. i18n: speaker=ui
 #: scenes/main.tscn
 #: scripts/main.gd:4716
 msgid "PAUSE"
-msgstr "PAUZA"
+msgstr "STOP"
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: The touch layout's walk-left arrow. A symbol: copy it.
@@ -69,11 +69,11 @@ msgid "▶"
 msgstr "▶"
 
 # machine-translated by Claude (Anthropic), unreviewed
-#. TRANSLATORS: The title's top line (280 px, 18 px). The studio name stays as written.
+#. TRANSLATORS: The title's top line (280 px, 18 px). The studio name stays as written. Cut to fit: PRZEDSTAWIA ran 23 px over the 280 px line, so OD (by) until PR L8 widens it.
 #. i18n: speaker=ui
 #: scenes/main.tscn
 msgid "MRDEMONWOLF, INC. PRESENTS"
-msgstr "MRDEMONWOLF, INC. PRZEDSTAWIA"
+msgstr "OD MRDEMONWOLF, INC."
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: The game's name. Never translated.
@@ -97,12 +97,12 @@ msgid "NEW GAME"
 msgstr "NOWA GRA"
 
 # machine-translated by Claude (Anthropic), unreviewed
-#. TRANSLATORS: Title button (186 px, 21 px): continue from the saved checkpoint. The same word, with the context 'touch button', is the touch USE button's word for going on through lines (155 px, 23 px).
+#. TRANSLATORS: Title button (186 px, 21 px): continue from the saved checkpoint. The same word, with the context 'touch button', is the touch USE button's word for going on through lines (155 px, 23 px). Cut to fit: KONTYNUOWAĆ ran 26 px past the 186 px title button, so DALEJ (onward) on both buttons.
 #. i18n: speaker=ui
 #: scenes/main.tscn
 #: scripts/main.gd:1120
 msgid "CONTINUE"
-msgstr "KONTYNUOWAĆ"
+msgstr "DALEJ"
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: Title button (186 px, 18 px).
@@ -336,11 +336,11 @@ msgid "DEVELOPMENT UPDATES"
 msgstr "POSTĘPY PRAC"
 
 # machine-translated by Claude (Anthropic), unreviewed
-#. TRANSLATORS: Note under the changelog heading (582 px, 15 px).
+#. TRANSLATORS: Note under the changelog heading (582 px, 15 px). Shortened to fit the note's rows.
 #. i18n: speaker=ui engineer=you
 #: scenes/main.tscn
 msgid "Source-build changes by date, not releases. Scroll with the wheel, drag the text or use up/down."
-msgstr "Zmiany w wersji rozwojowej według dat, a nie wydania. Przewijaj kółkiem, przeciągaj tekst lub użyj góra/dół."
+msgstr "Zmiany w wersji rozwojowej według dat, nie wydania. Przewijaj kółkiem, tekstem lub góra/dół."
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: Tooltip of the changelog's online button. The address stays as written.
@@ -1168,11 +1168,11 @@ msgid "BREAKER USED"
 msgstr "WYŁĄCZNIK ZUŻYTY"
 
 # machine-translated by Claude (Anthropic), unreviewed
-#. TRANSLATORS: Station plate (12-13 px label on a machine). ALL CAPS, as short as possible. The junction's valve after the blast used the line up.
+#. TRANSLATORS: Station plate (12-13 px label on a machine). ALL CAPS, as short as possible. The junction's valve after the blast used the line up. Cut to fit: ZAWÓR ZUŻYTY ran into DOOR DOWN, so PUSTY (the line is spent).
 #. i18n: speaker=ui
 #: scripts/junction_room.gd:1533
 msgid "VALVE USED"
-msgstr "ZAWÓR ZUŻYTY"
+msgstr "ZAWÓR PUSTY"
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: Station plate (12-13 px label on a machine). ALL CAPS, as short as possible. The junction's exit hatch, open.
@@ -1189,11 +1189,11 @@ msgid "EXIT OPENING"
 msgstr "WYJŚCIE SIĘ OTWIERA"
 
 # machine-translated by Claude (Anthropic), unreviewed
-#. TRANSLATORS: Station plate (12-13 px label on a machine). ALL CAPS, as short as possible. The junction's exit hatch, ready to open.
+#. TRANSLATORS: Station plate (12-13 px label on a machine). ALL CAPS, as short as possible. The junction's exit hatch, ready to open. Cut to fit: WYJŚCIE GOTOWE ran into TANK DOWN, so WOLNE (clear).
 #. i18n: speaker=ui
 #: scripts/junction_room.gd:1557
 msgid "EXIT READY"
-msgstr "WYJŚCIE GOTOWE"
+msgstr "WYJŚCIE WOLNE"
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: Station plate (12-13 px label on a machine). ALL CAPS, as short as possible. The junction's exit hatch, locked.
@@ -1788,12 +1788,12 @@ msgid "RETRY"
 msgstr "JESZCZE RAZ"
 
 # machine-translated by Claude (Anthropic), unreviewed
-#. TRANSLATORS: Title button (186 px, 21 px): continue from the saved checkpoint. The same word, with the context 'touch button', is the touch USE button's word for going on through lines (155 px, 23 px).
+#. TRANSLATORS: Title button (186 px, 21 px): continue from the saved checkpoint. The same word, with the context 'touch button', is the touch USE button's word for going on through lines (155 px, 23 px). Cut to fit: KONTYNUOWAĆ ran 26 px past the 186 px title button, so DALEJ (onward) on both buttons.
 #. i18n: speaker=ui
 #: scripts/main.gd:4725
 msgctxt "touch button"
 msgid "CONTINUE"
-msgstr "KONTYNUOWAĆ"
+msgstr "DALEJ"
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: Touch layout's USE button word (155 px, 23 px). Turn a crank or valve.
@@ -1866,7 +1866,7 @@ msgstr "03:17 / IZOLACJA"
 #. i18n: speaker=hint engineer=you
 #: scripts/main.gd:4754
 msgid "TAP CONTINUE  /  PAUSE"
-msgstr "DOTKNIJ KONTYNUOWAĆ  /  PAUZA"
+msgstr "DOTKNIJ DALEJ  /  STOP"
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: The opening's prompt: two keys or buttons, each followed by two spaces and its action; four spaces between.
@@ -1874,14 +1874,14 @@ msgstr "DOTKNIJ KONTYNUOWAĆ  /  PAUZA"
 #: scripts/main.gd:4754
 #, c-format
 msgid "%s  CONTINUE    %s  PAUSE"
-msgstr "%s  KONTYNUOWAĆ    %s  PAUZA"
+msgstr "%s  DALEJ    %s  PAUZA"
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: Second row of the opening's first prompt: Pause offers SKIP OPENING.
 #. i18n: speaker=hint engineer=you
 #: scripts/main.gd:4757
 msgid "PAUSE: skip the opening"
-msgstr "PAUZA: pomiń wstęp"
+msgstr "STOP: pomiń wstęp"
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: A room's name on the top card (ALL CAPS). Glossary term, open for pl: WĘZEŁ SERWISOWY, chosen here; a reviewer's word.
@@ -1975,7 +1975,7 @@ msgstr "PRZYTRZYMAJ %s"
 #. i18n: speaker=hint engineer=you
 #: scripts/main.gd:4898
 msgid "TAP CONTINUE"
-msgstr "DOTKNIJ KONTYNUOWAĆ"
+msgstr "DOTKNIJ DALEJ"
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: Prompt to go on through lines: the key or button, two spaces, the action.
@@ -1983,7 +1983,7 @@ msgstr "DOTKNIJ KONTYNUOWAĆ"
 #: scripts/main.gd:4898
 #, c-format
 msgid "%s  CONTINUE"
-msgstr "%s  KONTYNUOWAĆ"
+msgstr "%s  DALEJ"
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: Hint bar (14 px, about 526 px wide on a keyboard and 488 px on touch; wraps). %s is the key, button or touch word the player uses (it is filled in after translation); keep it first and keep the colon.

@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: WOLF OVERRIDE\n"
-"PO-Revision-Date: 2026-10-19 21:00+0000\n"
+"PO-Revision-Date: 2026-10-19 21:08+0000\n"
 "Last-Translator: Claude (Anthropic), machine translation, unreviewed\n"
 "Language-Team: none\n"
 "MIME-Version: 1.0\n"
@@ -47,12 +47,12 @@ msgid "SAFE POINT"
 msgstr "БЕЗОПАСНАЯ ТОЧКА"
 
 # machine-translated by Claude (Anthropic), unreviewed
-#. TRANSLATORS: The PAUSE button on the touch layout (88 px) and the Pause action's prompt.
+#. TRANSLATORS: The PAUSE button on the touch layout (88 px) and the Pause action's prompt. Cut to fit: ПАУЗА ran 3 px past the 88 px touch button, so СТОП.
 #. i18n: speaker=ui
 #: scenes/main.tscn
 #: scripts/main.gd:4716
 msgid "PAUSE"
-msgstr "ПАУЗА"
+msgstr "СТОП"
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: The touch layout's walk-left arrow. A symbol: copy it.
@@ -69,11 +69,11 @@ msgid "▶"
 msgstr "▶"
 
 # machine-translated by Claude (Anthropic), unreviewed
-#. TRANSLATORS: The title's top line (280 px, 18 px). The studio name stays as written.
+#. TRANSLATORS: The title's top line (280 px, 18 px). The studio name stays as written. Cut to fit: ПРЕДСТАВЛЯЕТ ran 41 px over the 280 px line, so ОТ (by) until PR L8 widens it.
 #. i18n: speaker=ui
 #: scenes/main.tscn
 msgid "MRDEMONWOLF, INC. PRESENTS"
-msgstr "MRDEMONWOLF, INC. ПРЕДСТАВЛЯЕТ"
+msgstr "ОТ MRDEMONWOLF, INC."
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: The game's name. Never translated.
@@ -97,12 +97,12 @@ msgid "NEW GAME"
 msgstr "НОВАЯ ИГРА"
 
 # machine-translated by Claude (Anthropic), unreviewed
-#. TRANSLATORS: Title button (186 px, 21 px): continue from the saved checkpoint. The same word, with the context 'touch button', is the touch USE button's word for going on through lines (155 px, 23 px).
+#. TRANSLATORS: Title button (186 px, 21 px): continue from the saved checkpoint. The same word, with the context 'touch button', is the touch USE button's word for going on through lines (155 px, 23 px). Cut to fit: ПРОДОЛЖИТЬ ran 13 px past the 186 px title button and widened the touch button, so ДАЛЕЕ (onward) on both.
 #. i18n: speaker=ui
 #: scenes/main.tscn
 #: scripts/main.gd:1120
 msgid "CONTINUE"
-msgstr "ПРОДОЛЖИТЬ"
+msgstr "ДАЛЕЕ"
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: Title button (186 px, 18 px).
@@ -133,11 +133,11 @@ msgid "CHANGELOG"
 msgstr "ИЗМЕНЕНИЯ"
 
 # machine-translated by Claude (Anthropic), unreviewed
-#. TRANSLATORS: The title's credit line (424 px, 16 px). The author's name stays as written.
+#. TRANSLATORS: The title's credit line (424 px, 16 px). The author's name stays as written. Cut to fit: 'с помощью ИИ' ran 33 px over the 424 px line, so 'с ИИ'.
 #. i18n: speaker=ui
 #: scenes/main.tscn
 msgid "Concept: Nathanial Henniges  /  AI-assisted development"
-msgstr "Концепция: Nathanial Henniges  /  разработка с помощью ИИ"
+msgstr "Концепция: Nathanial Henniges  /  разработка с ИИ"
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: The credits roll (582 px, 19 px, centred, wraps). Translate the role headings and the sentences; names, companies, tools, licences, works' titles and the address stay as written. The translation credit (decision D2) is added in each language's own text under AI-ASSISTED PRODUCTION, so the English keeps none.
@@ -336,11 +336,11 @@ msgid "DEVELOPMENT UPDATES"
 msgstr "ХОД РАЗРАБОТКИ"
 
 # machine-translated by Claude (Anthropic), unreviewed
-#. TRANSLATORS: Note under the changelog heading (582 px, 15 px).
+#. TRANSLATORS: Note under the changelog heading (582 px, 15 px). Shortened to fit the note's rows.
 #. i18n: speaker=ui engineer=you
 #: scenes/main.tscn
 msgid "Source-build changes by date, not releases. Scroll with the wheel, drag the text or use up/down."
-msgstr "Изменения сборки из исходного кода по датам, а не релизы. Прокручивай колесом, перетаскивай текст или жми вверх/вниз."
+msgstr "Изменения сборки по датам, не релизы. Листай колесом, тяни текст или стрелками."
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: Tooltip of the changelog's online button. The address stays as written.
@@ -1117,18 +1117,18 @@ msgid "START"
 msgstr "START"
 
 # machine-translated by Claude (Anthropic), unreviewed
-#. TRANSLATORS: A controller binding: left on the directional pad (CONTROLLER column, 206 px, shared with a second binding: abbreviate).
+#. TRANSLATORS: A controller binding: left on the directional pad (CONTROLLER column, 206 px, shared with a second binding: abbreviate). Cut to fit: Крестовина ran over the shared 206 px cell, so Крест.
 #. i18n: speaker=ui
 #: scripts/game_settings.gd:797
 msgid "D-pad left"
-msgstr "Крестовина Л"
+msgstr "Крест Л"
 
 # machine-translated by Claude (Anthropic), unreviewed
-#. TRANSLATORS: A controller binding: right on the directional pad (CONTROLLER column, 206 px, shared with a second binding: abbreviate).
+#. TRANSLATORS: A controller binding: right on the directional pad (CONTROLLER column, 206 px, shared with a second binding: abbreviate). Cut to fit: Крестовина ran over the shared 206 px cell, so Крест.
 #. i18n: speaker=ui
 #: scripts/game_settings.gd:798
 msgid "D-pad right"
-msgstr "Крестовина П"
+msgstr "Крест П"
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: A controller button with no name; %d is its number.
@@ -1161,18 +1161,18 @@ msgid "LINE"
 msgstr "ЛИНИЯ"
 
 # machine-translated by Claude (Anthropic), unreviewed
-#. TRANSLATORS: Station plate (12-13 px label on a machine). ALL CAPS, as short as possible. The junction's breaker after the blast used the line up.
+#. TRANSLATORS: Station plate (12-13 px label on a machine). ALL CAPS, as short as possible. The junction's breaker after the blast used the line up. Cut to fit: ОТРАБОТАН ran into RELIEF VENT, so ВЫКЛ. (off).
 #. i18n: speaker=ui
 #: scripts/junction_room.gd:1531
 msgid "BREAKER USED"
-msgstr "РУБИЛЬНИК ОТРАБОТАН"
+msgstr "РУБИЛЬНИК ВЫКЛ."
 
 # machine-translated by Claude (Anthropic), unreviewed
-#. TRANSLATORS: Station plate (12-13 px label on a machine). ALL CAPS, as short as possible. The junction's valve after the blast used the line up.
+#. TRANSLATORS: Station plate (12-13 px label on a machine). ALL CAPS, as short as possible. The junction's valve after the blast used the line up. Cut to fit: ВЕНТИЛЬ ОТРАБОТАН and ВЕНТИЛЬ ПУСТ ran into DOOR DOWN, so ВЕНТ. ПУСТ (the line is spent).
 #. i18n: speaker=ui
 #: scripts/junction_room.gd:1533
 msgid "VALVE USED"
-msgstr "ВЕНТИЛЬ ОТРАБОТАН"
+msgstr "ВЕНТ. ПУСТ"
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: Station plate (12-13 px label on a machine). ALL CAPS, as short as possible. The junction's exit hatch, open.
@@ -1569,11 +1569,11 @@ msgid "The safe point could not save. Press %s here again."
 msgstr "Сохранить в безопасной точке не удалось. Нажми %s здесь ещё раз."
 
 # machine-translated by Claude (Anthropic), unreviewed
-#. TRANSLATORS: Hint bar (14 px, about 526 px wide on a keyboard and 488 px on touch; wraps). The touch form; USE is the touch button's word (ДЕЙСТВИЕ), quoted.
+#. TRANSLATORS: Hint bar (14 px, about 526 px wide on a keyboard and 488 px on touch; wraps). The touch form; USE is the touch button's word (НАЖАТЬ), quoted.
 #. i18n: speaker=hint engineer=you
 #: scripts/main.gd:2793
 msgid "The safe point could not save. Tap USE here again."
-msgstr "Сохранить в безопасной точке не удалось. Коснись «ДЕЙСТВИЕ» здесь ещё раз."
+msgstr "Сохранить в безопасной точке не удалось. Коснись «НАЖАТЬ» здесь ещё раз."
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: i18n: story speaker=narrator
@@ -1788,12 +1788,12 @@ msgid "RETRY"
 msgstr "ЕЩЁ РАЗ"
 
 # machine-translated by Claude (Anthropic), unreviewed
-#. TRANSLATORS: Title button (186 px, 21 px): continue from the saved checkpoint. The same word, with the context 'touch button', is the touch USE button's word for going on through lines (155 px, 23 px).
+#. TRANSLATORS: Title button (186 px, 21 px): continue from the saved checkpoint. The same word, with the context 'touch button', is the touch USE button's word for going on through lines (155 px, 23 px). Cut to fit: ПРОДОЛЖИТЬ ran 13 px past the 186 px title button and widened the touch button, so ДАЛЕЕ (onward) on both.
 #. i18n: speaker=ui
 #: scripts/main.gd:4725
 msgctxt "touch button"
 msgid "CONTINUE"
-msgstr "ПРОДОЛЖИТЬ"
+msgstr "ДАЛЕЕ"
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: Touch layout's USE button word (155 px, 23 px). Turn a crank or valve.
@@ -1803,19 +1803,19 @@ msgid "CRANK"
 msgstr "КРУТИТЬ"
 
 # machine-translated by Claude (Anthropic), unreviewed
-#. TRANSLATORS: Touch layout's USE button word (155 px, 23 px). Drop the hanging tank.
+#. TRANSLATORS: Touch layout's USE button word (155 px, 23 px). Drop the hanging tank. Cut to fit: СБРОСИТЬ ran past the 155 px touch button, so БРОСИТЬ (throw down).
 #. i18n: speaker=ui
 #: scripts/main.gd:4725
 msgid "DROP"
-msgstr "СБРОСИТЬ"
+msgstr "БРОСИТЬ"
 
 # machine-translated by Claude (Anthropic), unreviewed
-#. TRANSLATORS: The touch layout's interact button (155 px, 23 px): use the machine in front of you. ДЕЙСТВИЕ (action), as in the CONTROLS table: ИСПОЛЬЗОВАТЬ does not fit the button.
+#. TRANSLATORS: The touch layout's interact button (155 px, 23 px): use the machine in front of you.
 #. i18n: speaker=ui
 #: scripts/main.gd:4725
 #: scripts/main.gd:4736
 msgid "USE"
-msgstr "ДЕЙСТВИЕ"
+msgstr "НАЖАТЬ"
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: Tutorial row (17 px). %s is the keys or the touch arrows; two spaces after it.
@@ -1866,7 +1866,7 @@ msgstr "03:17 / ЗОНА СОДЕРЖАНИЯ"
 #. i18n: speaker=hint engineer=you
 #: scripts/main.gd:4754
 msgid "TAP CONTINUE  /  PAUSE"
-msgstr "КОСНИСЬ «ПРОДОЛЖИТЬ»  /  ПАУЗА"
+msgstr "КОСНИСЬ «ДАЛЕЕ»  /  СТОП"
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: The opening's prompt: two keys or buttons, each followed by two spaces and its action; four spaces between.
@@ -1874,14 +1874,14 @@ msgstr "КОСНИСЬ «ПРОДОЛЖИТЬ»  /  ПАУЗА"
 #: scripts/main.gd:4754
 #, c-format
 msgid "%s  CONTINUE    %s  PAUSE"
-msgstr "%s  ПРОДОЛЖИТЬ    %s  ПАУЗА"
+msgstr "%s  ДАЛЕЕ    %s  ПАУЗА"
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: Second row of the opening's first prompt: Pause offers SKIP OPENING.
 #. i18n: speaker=hint engineer=you
 #: scripts/main.gd:4757
 msgid "PAUSE: skip the opening"
-msgstr "ПАУЗА: пропустить вступление"
+msgstr "СТОП: пропустить вступление"
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: A room's name on the top card (ALL CAPS). Glossary term, open for ru: СЕРВИСНЫЙ УЗЕЛ, the trial's proposal, chosen here (it reads back as 'service node'); a reviewer's word.
@@ -1975,7 +1975,7 @@ msgstr "УДЕРЖИВАЙ %s"
 #. i18n: speaker=hint engineer=you
 #: scripts/main.gd:4898
 msgid "TAP CONTINUE"
-msgstr "КОСНИСЬ «ПРОДОЛЖИТЬ»"
+msgstr "КОСНИСЬ «ДАЛЕЕ»"
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: Prompt to go on through lines: the key or button, two spaces, the action.
@@ -1983,7 +1983,7 @@ msgstr "КОСНИСЬ «ПРОДОЛЖИТЬ»"
 #: scripts/main.gd:4898
 #, c-format
 msgid "%s  CONTINUE"
-msgstr "%s  ПРОДОЛЖИТЬ"
+msgstr "%s  ДАЛЕЕ"
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: Hint bar (14 px, about 526 px wide on a keyboard and 488 px on touch; wraps). %s is the key, button or touch word the player uses (it is filled in after translation); keep it first and keep the colon.
