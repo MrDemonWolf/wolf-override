@@ -1,0 +1,66 @@
+---
+title: Art pipeline
+description: How WOLF OVERRIDE's provisional art is made, reviewed, registered and put in the game, at a public-safe level.
+---
+
+**What this page is for:** the steps a picture goes through before it is in the game.
+
+- **All current game art is provisional.** Most of it is AI-generated, then reviewed by a person.
+- **Who made what, and with which tool:** [Credits: Provisional art](/docs/credits/#provisional-art).
+- **Rights:** [Legal: Artwork and other assets](/docs/legal/#artwork-and-other-assets). The art is not covered by the code's GPL licence.
+
+## Words used here
+
+- **Whole piece:** one complete image of one thing: a character in one pose, a room layer, a prop. Never a body part or a kit of parts.
+- **Plate:** one painted layer of a room: far, middle or near.
+- **Atlas:** one image holding several pieces, cut apart by the game.
+- **Asset register:** [`apps/game/assets/manifest.json`](https://github.com/MrDemonWolf/wolf-override/blob/main/apps/game/assets/manifest.json), one entry per file.
+- **C2PA content credentials:** metadata inside an image that records it was made with an AI tool. Which images keep them: [Credits](/docs/credits/#tools-used-in-the-current-source-build).
+
+## The steps
+
+1. **Design the exact shape first.** Scripts draw each piece's shape from real measurements (real doors, gearboxes, cabinets) or from the earlier art as a guide.
+2. **Paint inside the shape.** The image tool paints material and light only inside those shapes. It does not decide the shape.
+3. **Clean up.** Scripts cut out each piece and clean up the result. Later fixes are made without new paint where possible.
+4. **Check for AI tells.** Look for things that read as generated: odd lettering, extra parts, objects that hover, doors that make no sense.
+5. **Try one piece in the game first,** then the rest of the set.
+6. **Look at rendered stills.** Captures come from the [render container](/docs/development/setup/#rendered-captures), before and after.
+7. **Get approval.** Nathanial Henniges reviews and approves each set.
+8. **Register it.** Add the asset register entry in the same pull request.
+9. **Replace, don't pile up.** New art fully replaces old: delete the old files, imports, register entries and references.
+
+## How a scene is built
+
+- **Rooms** are three plates (far, middle, near) that move at different speeds as the camera follows.
+- **Each character, prop and station** is its own whole piece, stacked in code.
+- **Light is drawn by the game,** not painted in: lamp glows, flicker, beacons, haze, dust, floor reflections, and WOLF's eye and seam lights.
+- **Doors** are atlas pieces, some drawn as meshes so they can swing or slide.
+- **Lettering** (signs, stencils) is typeset in Roboto, never painted by the image tool.
+- **Code:** `room_depth.gd` builds the rooms; the map of the rest is on [Architecture](/docs/development/architecture/).
+
+## Register every file
+
+Every image, sound, font or other media file needs an entry before it is added to the game or the site. Each entry records at least:
+
+| Field | What it says |
+| --- | --- |
+| `asset_id` | A stable name |
+| `path` | Where the file is |
+| `source_or_tool` | Who or what made it |
+| `terms_reference` | The terms it was made under |
+| `rights_review_status` | Where its rights review stands |
+| `modifications` | What the project changed |
+| `implementation_status` | Whether and where it is used |
+
+- **Existing entries also keep a `source_reference`** for the prompt, review sheet or download. Follow their example.
+- **AI-generated art needs a rights note:** tool and date, references used, that a person reviewed and approved it, and that its commercial rights review is open. Details: [`CONTRIBUTING.md`](https://github.com/MrDemonWolf/wolf-override/blob/main/CONTRIBUTING.md#assets-and-provenance).
+
+<Callout type="warn" title="Do not add">
+  Music, recorded audio or third-party art without a licence that allows redistribution. Credits for people, music or tools that were not involved.
+</Callout>
+
+## Where the working files go
+
+- **Not in the game:** design notes, review sheets and raw generated images are not exported.
+- **Notes** now live in the project's Notion, indexed in [`docs/NOTES.md`](https://github.com/MrDemonWolf/wolf-override/blob/main/docs/NOTES.md).
+- **Older art records** (October 12 to 14, 2026) stay in the repository's history; the links are on [Credits](/docs/credits/#provisional-art).

@@ -1,0 +1,105 @@
+---
+title: Releases and versions
+description: How WOLF OVERRIDE development versions are numbered and cut, how the changelog grows, and how test builds are exported.
+---
+
+**What this page is for:** how versions are numbered, how to cut one, and how builds are made.
+
+<CurrentVersion />
+
+<Callout title="No release yet">
+  There is no public release, installer, store build or automatic updater. Versions are development versions of the source build, and test builds are unsigned debug builds.
+</Callout>
+
+## Version numbers
+
+| Item | Rule |
+| --- | --- |
+| Format | `0.MINOR.0` during development |
+| When it goes up | `MINOR` goes up by one per milestone (a finished piece of work, so far one working day) |
+| History | 0.1.0 (September 26, 2026) to 0.15.0 (October 16, 2026), on the [changelog](/docs/changelog/) |
+| The one source | `application/config/version` in `apps/game/project.godot` |
+| Shown in the game | The title screen shows the number only, and F12 [bug captures](/docs/development/debug-tools/#bug-captures) record it |
+| Shown on the site | The changelog's **Current version** line, read from `project.godot` when the site is built |
+| Test builds | The export presets leave their version fields empty, so the builds take the number from `project.godot` |
+
+- **Never type the version anywhere else.** Everything reads it from `project.godot` or is checked against it.
+
+## Add your changes to Next version
+
+Every pull request that changes the game, the site or the tools does this in the same pull request:
+
+1. Open `apps/docs/content/docs/changelog.mdx`.
+2. Under **Next version (in development)**, add one-line bullets in the right group: Gameplay, Art, Audio, Accessibility, Settings, Website or Development.
+3. Keep each line's honesty note: what was approved, and what was not played by hand or tried on a device.
+4. Add how it was checked to the version's **How it was checked** lines.
+5. Run `python3 scripts/export_changelog.py`.
+6. Commit the regenerated `apps/game/assets/changelog.txt`.
+
+- **Long detail** goes in the version's **Full notes** block. The in-game changelog shows the short lines only.
+- **CI fails** if `changelog.txt` is out of date. See [In-game changelog](/docs/development/testing/#in-game-changelog).
+
+## Cut a version
+
+A version is cut once per milestone.
+
+1. Rename **Next version (in development)** to `0.N.0 - <date>`, for example `0.16.0 - October 18, 2026`.
+2. Add a one-line **Summary** under the heading.
+3. Keep one **How it was checked** line for the version.
+4. Set `application/config/version` in `apps/game/project.godot` to the same `0.N.0`.
+5. Start a new, empty **Next version (in development)** at the top.
+6. Run `python3 scripts/export_changelog.py` and commit `changelog.txt`.
+
+- **The export fails** when the newest cut version on the changelog is not the version in `project.godot`.
+- **A cut version does not change afterwards.** Fixes go under the next version.
+
+## Test builds
+
+The **Test builds** workflow exports a macOS and a Windows debug build from each change. For players: [Install a test build](/docs/test-builds/).
+
+| Preset (in `apps/game/export_presets.cfg`) | Output |
+| --- | --- |
+| `macOS` | `wolf-override-macos-debug-<commit>.zip`, one app for Apple silicon and Intel |
+| `Windows Desktop` | `wolf-override-windows-debug-<commit>.zip`, with `WOLF-OVERRIDE.exe` |
+
+- **It runs beside the checks,** not after them, and is not a required check. A failed export does not block a merge, and a failed check does not stop the builds.
+- **No installers or releases** are made.
+- **Templates:** `scripts/get-export-templates.sh` takes the five files the presets need from Godot's official 4.7.2 template archive and checks each against a pinned checksum: the macOS and Windows debug templates, `version.txt`, and `icudt_godot.dat` (ICU's line-breaking data, packed once a Chinese, Japanese, Korean or Thai translation is registered).
+- **Wrong ICU data:** `scripts/export-game.sh` fails an export that logs Godot's fallback to the editor's own copy of that data.
+- **Package check:** `scripts/package_test_build.py` checks each package: the in-game changelog and font licences inside, and no tests, tools, art masters or notes.
+- **Extra files:** any new preset must include `changelog.txt` and the two font licences by name, as the current ones do.
+
+### Export on your own machine
+
+Not run as part of writing this page; CI runs it on every change.
+
+```sh
+scripts/export-game.sh <output folder>
+```
+
+| Setting | What it does |
+| --- | --- |
+| `GODOT_BIN` | The Godot binary; must be 4.7.2 to match the templates |
+| `GODOT_HOME` | An isolated Godot data folder for the templates (default: a temporary folder) |
+| `BUILD_COMMIT` | The commit named in the zips (default: the checked-out commit) |
+| `EXPORT_TIMEOUT` | Seconds an import pass or an export may take (default 600) |
+
+- **Output:** the two zips, plus Godot's logs under `<output folder>/logs/`.
+- **Licence notices** (the game's GPL licence, Godot's licence and copyright, and the font licences) go in a `licenses/` folder beside the game, never inside the signed app.
+
+## Not built yet
+
+- **Signing and notarizing:** builds are ad-hoc signed only.
+- **Store builds** for iPhone, iPad and Android: none. See [Platforms and languages](/docs/platforms/).
+- **Direct macOS updater:** planned, not integrated or enabled. See below.
+
+<Details>
+<Summary>The planned macOS updater (Sparkle)</Summary>
+
+- **Not integrated or enabled.** The game has no Sparkle framework, updater object, update feed or automatic network check.
+- **Why Sparkle:** it is a candidate for direct macOS downloads. Store builds should use their store channels.
+- **Before it could be enabled:** a Godot app needs a tested native integration and repeatable export packaging; then packaging, signing, update verification and save compatibility must be checked.
+- **Nothing created yet:** no keys, feed, native dependency or signing changes.
+- **References:** [Sparkle setup](https://sparkle-project.org/documentation/) and [programmatic setup](https://sparkle-project.org/documentation/programmatic-setup/).
+
+</Details>

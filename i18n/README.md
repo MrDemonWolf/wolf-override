@@ -16,7 +16,7 @@ comes with localization PR L9.
 
 `python3 -I -B scripts/i18n/i18n_tool.py glossary` checks the glossary and the style guides against each
 other and against the language table, and `check` applies the glossary to every translated line. Both run
-in CI. `development/testing.mdx` on the site describes every tool.
+in CI. `development/localization.mdx` on the site describes every tool.
 
 ## Review
 
