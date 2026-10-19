@@ -69,6 +69,10 @@ const ENTRY_DOOR_X: float = 70.0
 ## passed it once their origin is beyond .y; the entry's runs from its near column's room side (W(-0.57,
 ## 0, 0.30) of the entry) to its shut leaf's room face. The room side of a shut face is open floor.
 const EXIT_COLUMN_FAR_X: float = 903.19
+## The passage seen past the exit wall's near end (EXIT_BACK right of the column's far arris, x 903.2, down
+## to its floor's near edge, doors.py "next space floor"), shaded (DoorKit.PAST_END_SHADE) so it never
+## outshines the doorway; the column covers its left edge and the curb its foot.
+const EXIT_PAST_END: PackedVector2Array = [Vector2(903.2, 0.0), Vector2(975.0, 0.0), Vector2(975.0, 466.6), Vector2(903.2, 443.4)]
 const ENTRY_COLUMN_FAR_X: float = 46.59
 const EXIT_SPAN: Vector2 = Vector2(EXIT_DOOR_X, EXIT_COLUMN_FAR_X)
 const ENTRY_SPAN: Vector2 = Vector2(ENTRY_COLUMN_FAR_X, ENTRY_DOOR_X)
@@ -220,6 +224,7 @@ func _ready() -> void:
 	# Behind the mid plate: each doorway's next space, light and cross-wall face (DoorKit.doorway).
 	DoorKit.doorway(depth.behind, "Entry", ENTRY_HOLE, ENTRY_HOLE_LIGHT, ENTRY_BACK, ENTRY_BACK_AT, DoorKit.BEYOND_LIFT, null, ENTRY_POOL, ENTRY_GRAZE, ENTRY_WALL, ENTRY_WALL_AT)
 	DoorKit.doorway(depth.behind, "Exit", EXIT_HOLE, EXIT_HOLE_LIGHT, EXIT_BACK, EXIT_BACK_AT, DoorKit.BEYOND_LIFT, null, EXIT_POOL, EXIT_GRAZE, EXIT_WALL, EXIT_WALL_AT)
+	DoorKit.shade(depth.behind, "ExitPastEnd", EXIT_PAST_END, DoorKit.PAST_END_SHADE)
 	# Over the mid plate, under the actors: the leaves on their hinges (SwingLeaf, lit per vertex), each
 	# with its surface closer's arm on the room side, the entry's near end with its lamp (nobody passes
 	# behind it), the door lights and the exit's sign. The security container stands in front of the

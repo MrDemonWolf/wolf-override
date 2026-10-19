@@ -152,6 +152,12 @@ const SEAL_HOLE: PackedVector2Array = [Vector2(792.89, 455.71), Vector2(726.20, 
 ## The plant room's light through the doorway (added, est.: tuned on rendered captures until the hole
 ## reads at least 1.5 times the wall round it, the design's light-the-way-out target).
 const SEAL_HOLE_LIGHT: Color = Color(0.16, 0.19, 0.21)
+## Its light falls off toward the head to this share of it (DoorKit.hole_light): flat from foot to head
+## the open hole read as a pale pane of glass (capture review, 2026-10-18; est., tuned on captures).
+const SEAL_HOLE_HEAD_SHARE: float = 0.35
+## The near end's curb across the deck (doors.py "stub top" and "stub face" of the corridor seal, world
+## px), shaded (DoorKit.CURB_SHADE) so it reads as the wall's cut concrete, not a loose plank.
+const SEAL_CURB: PackedVector2Array = [Vector2(799.3, 451.8), Vector2(824.4, 450.2), Vector2(874.2, 468.3), Vector2(847.9, 476.9), Vector2(799.3, 458.2)]
 ## The door light's pool on the threshold and its graze on the far reveal (doors.py surface_lights:
 ## W(mid, 0, T/2) radius 5 squashed 0.3, W(a1, 0.6 H, T/2) radius 2.5 stretched 3), and the lens of the
 ## wall pack over the hood (W(a1 + 0.27, H + 0.55 + 0.29, -0.05)).
@@ -847,14 +853,13 @@ const GAMEPLAY_CAMERA_Y: float = 360.0
 ## answers take the buttons' place at the bottom during a choice, so the camera stays put.
 const GAMEPLAY_CAMERA_Y_TOUCH: float = 392.0
 ## The junction's close (the only chapter-close shot: Records keeps control while its closing lines
-## run) frames the exit door at the right edge of the view: its right edge is JUNCTION_CLOSE_RIGHT,
-## the room's edge (the approved art paints nothing past it, JunctionRoom.EXIT_VIEW_RIGHT), so the open
-## doorway they walk out through is at the frame's edge, and the view is closer than play (zoom 1.82,
-## art swap PR 3; it was 1.62 with the view reaching x 1030), its left edge (x ~433) just left of the
-## DOOR DOWN placard so no station name is cut, with the floor about 73 % down the view, above the
-## dialogue card.
+## run) frames its exit door whole and off the edge of the view (review r1): its right
+## edge runs on to JUNCTION_CLOSE_RIGHT, past the near jamb (JunctionRoom.EXIT_NEAR_JAMB_X) and the
+## wall's column into the passage beyond, so the doorway they walk out through sits inside the frame,
+## and the view is closer than play (zoom 1.62), its left edge (x ~438) just left of the DOOR DOWN
+## placard, with the floor about 70 % down the view, above the dialogue card.
 const JUNCTION_CLOSE_RIGHT: float = JunctionRoom.EXIT_VIEW_RIGHT
-const JUNCTION_CLOSE_ZOOM: float = 1.82
+const JUNCTION_CLOSE_ZOOM: float = 1.62
 const JUNCTION_CLOSE_CAMERA: Vector2 = Vector2(JUNCTION_CLOSE_RIGHT - 480.0 / JUNCTION_CLOSE_ZOOM, 373.0)
 ## Menu cards fade and slide in over this long; short enough never to hold up input or players who want little motion.
 const MENU_REVEAL_SECONDS: float = 0.12
@@ -1066,7 +1071,7 @@ func _setup_corridor_door() -> void:
 	# The doorway belongs to the corridor's plates: it shows whenever they do (the opening too).
 	blast_leaf = BlastLeaf.new(SEAL_BLAST_LEAF)
 	blast_leaf.visible = false
-	seal_wall = DoorKit.doorway(corridor_depth.behind, "CorridorSeal", SEAL_HOLE, SEAL_HOLE_LIGHT, SEAL_BACK, SEAL_BACK_AT, 1.0, blast_leaf, SEAL_POOL, SEAL_GRAZE, SEAL_WALL, SEAL_WALL_AT)
+	seal_wall = DoorKit.doorway(corridor_depth.behind, "CorridorSeal", SEAL_HOLE, SEAL_HOLE_LIGHT, SEAL_BACK, SEAL_BACK_AT, 1.0, blast_leaf, SEAL_POOL, SEAL_GRAZE, SEAL_WALL, SEAL_WALL_AT, SEAL_HOLE_HEAD_SHARE)
 	# Over the mid plate (after it in the room, on its layer), under the stations and the actors.
 	var over: Node2D = Node2D.new()
 	over.name = "CorridorSealOver"
@@ -1082,6 +1087,8 @@ func _setup_corridor_door() -> void:
 	door_lip = DoorKit.piece(self, SEAL_FRONT, SEAL_FRONT_AT, "CorridorDoorFront")
 	door_lip.z_index = KNOCKDOWN_Z
 	door_lip.visible = false
+	# A child of the near end, so it shows, hides and sorts with it (its points in the piece's own px).
+	DoorKit.shade(door_lip, "CorridorSealCurbShade", door_lip.transform.affine_inverse() * SEAL_CURB, DoorKit.CURB_SHADE)
 	seal_lamp = DoorKit.lamp(self, "SealLamp", CORRIDOR_SEAL_LAMP, Palette.LAMP_SHUT)
 	seal_lamp.z_index = KNOCKDOWN_Z
 	seal_lamp.visible = false
