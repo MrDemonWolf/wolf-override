@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: WOLF OVERRIDE\n"
-"PO-Revision-Date: 2026-10-19 13:35+0000\n"
+"PO-Revision-Date: 2026-10-19 13:38+0000\n"
 "Last-Translator: Claude (Anthropic), machine translation, unreviewed\n"
 "Language-Team: none\n"
 "MIME-Version: 1.0\n"
@@ -1058,11 +1058,11 @@ msgid "V-sync may limit the FPS cap."
 msgstr "La V-sync puede limitar el tope de FPS."
 
 # machine-translated by Claude (Anthropic), unreviewed
-#. TRANSLATORS: AUDIO note. 'Effects' names the slider.
+#. TRANSLATORS: AUDIO note (680 px, 15 px, one row). 'Effects' names the Effects volume slider.
 #. i18n: speaker=ui
 #: scripts/game_settings.gd:566
 msgid "Volume changes apply immediately. Effects carries every sound effect; there is no music or voice yet."
-msgstr "El volumen cambia al instante. Efectos incluye todos los sonidos; aún no hay música ni voces."
+msgstr "El volumen cambia al instante. Los efectos incluyen todos los sonidos; aún no hay música ni voces."
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: CONTROLS note.
