@@ -1057,7 +1057,7 @@ static func _growl_finish(x: PackedFloat32Array, hp_hz: float, lp_hz: float, pre
 	return out
 
 
-# --- Shared DSP for the detailed recipes ---------------------------------------------------------
+# --- Shared DSP: the detailed recipes' filters and the buffers every recipe fills ----------------
 
 ## Samples per coefficient update in the swept filters: about 0.36 ms at DETAIL_RATE, short enough
 ## that a glide never steps audibly and long enough to skip recomputing cos/sin on every sample.
