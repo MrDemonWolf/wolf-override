@@ -51,6 +51,7 @@ func _run() -> void:
 	await _check_exit_view_edge(junction, camera, half_play, touch_y)
 	# Every station stands on the floor, as tall as the art it replaced.
 	var floor_props: Dictionary = {
+		"purge display": game.get_node("PurgeTerminalArt"),
 		"breaker": game.get_node("BreakerArt"),
 		"relay": game.get_node("RelayArt"),
 		"safe point": game.get_node("CheckpointArt"),

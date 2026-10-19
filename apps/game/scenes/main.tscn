@@ -177,7 +177,7 @@ texture = ExtResource("8_director")
 
 [node name="PurgeTerminalArt" type="Sprite2D" parent="."]
 texture_filter = 4
-position = Vector2(125, 372.59)
+position = Vector2(125, 408.59)
 scale = Vector2(0.12925, 0.12925)
 texture = ExtResource("9_purge_display")
 
