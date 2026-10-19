@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: WOLF OVERRIDE\n"
-"PO-Revision-Date: 2026-10-19 13:14+0000\n"
+"PO-Revision-Date: 2026-10-19 13:29+0000\n"
 "Last-Translator: Claude (Anthropic), machine translation, unreviewed\n"
 "Language-Team: none\n"
 "MIME-Version: 1.0\n"
@@ -122,11 +122,11 @@ msgid "CHAPTER 1  /  LOCKDOWN"
 msgstr "CAPÍTULO 1  /  CIERRE TOTAL"
 
 # machine-translated by Claude (Anthropic), unreviewed
-#. TRANSLATORS: Title button (186 px, 21 px): start a new run.
+#. TRANSLATORS: Title button (186 px, 21 px): start a new run. NUEVA PARTIDA (213 px) and NUEVO JUEGO (193 px) do not fit until PR L8 widens the buttons.
 #. i18n: speaker=ui
 #: scenes/main.tscn
 msgid "NEW GAME"
-msgstr "NUEVA PARTIDA"
+msgstr "EMPEZAR"
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: Title button (186 px, 21 px): continue from the saved checkpoint.
@@ -356,7 +356,7 @@ msgstr "VOLVER AL MENÚ"
 #: scripts/main.gd:1914
 #: scripts/main.gd:1943
 msgid "PAUSE SCROLL"
-msgstr "PAUSAR CRÉDITOS"
+msgstr "PAUSAR TEXTO"
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: Heading of the in-game changelog screen (590 px, 28 px). The changelog itself stays English.
@@ -370,7 +370,7 @@ msgstr "NOVEDADES DEL DESARROLLO"
 #. i18n: speaker=ui engineer=you
 #: scenes/main.tscn
 msgid "Source-build changes by date, not releases. Scroll with the wheel, drag the text or use up/down."
-msgstr "Cambios de la versión en desarrollo por fecha, no lanzamientos. Desplázate con la rueda, arrastra el texto o usa arriba/abajo."
+msgstr "Cambios del código por fecha, no lanzamientos. Usa la rueda, arrastra el texto o las flechas."
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: Tooltip of the changelog's online button. The address stays as written.
@@ -384,7 +384,7 @@ msgstr "Abre wolfoverride.mrdemonwolf.dev/docs/changelog/ en tu navegador"
 #. i18n: speaker=ui
 #: scenes/main.tscn
 msgid "OPEN FULL CHANGELOG ONLINE"
-msgstr "VER TODOS LOS CAMBIOS EN LÍNEA"
+msgstr "REGISTRO COMPLETO EN LÍNEA"
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: Pause menu heading (387 px, 31 px).
@@ -1062,7 +1062,7 @@ msgstr "La V-sync puede limitar el tope de FPS."
 #. i18n: speaker=ui
 #: scripts/game_settings.gd:566
 msgid "Volume changes apply immediately. Effects carries every sound effect; there is no music or voice yet."
-msgstr "Los cambios de volumen se aplican al instante. Efectos lleva todos los sonidos; aún no hay música ni voces."
+msgstr "El volumen cambia al instante. Efectos lleva todos los sonidos; aún no hay música ni voces."
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: CONTROLS note.
@@ -1117,11 +1117,11 @@ msgid "Binding saved."
 msgstr "Asignación guardada."
 
 # machine-translated by Claude (Anthropic), unreviewed
-#. TRANSLATORS: A controller stick's name in the CONTROLLER column.
+#. TRANSLATORS: A controller stick's name in the CONTROLLER column (206 px, 15 px, shared with a second binding: abbreviate).
 #. i18n: speaker=ui
 #: scripts/game_settings.gd:718
 msgid "Left stick"
-msgstr "Stick izquierdo"
+msgstr "Stick izq."
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: A controller axis's name; %d is its number.
@@ -1147,18 +1147,18 @@ msgid "START"
 msgstr "START"
 
 # machine-translated by Claude (Anthropic), unreviewed
-#. TRANSLATORS: A controller binding: left on the directional pad.
+#. TRANSLATORS: A controller binding: left on the directional pad (CONTROLLER column, 206 px, shared with a second binding: abbreviate).
 #. i18n: speaker=ui
 #: scripts/game_settings.gd:797
 msgid "D-pad left"
-msgstr "Izquierda del pad"
+msgstr "Cruz izq."
 
 # machine-translated by Claude (Anthropic), unreviewed
-#. TRANSLATORS: A controller binding: right on the directional pad.
+#. TRANSLATORS: A controller binding: right on the directional pad (CONTROLLER column, 206 px, shared with a second binding: abbreviate).
 #. i18n: speaker=ui
 #: scripts/game_settings.gd:798
 msgid "D-pad right"
-msgstr "Derecha del pad"
+msgstr "Cruz der."
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: A controller button with no name; %d is its number.
@@ -1202,7 +1202,7 @@ msgstr "DISYUNTOR USADO"
 #. i18n: speaker=ui
 #: scripts/junction_room.gd:1533
 msgid "VALVE USED"
-msgstr "VÁLVULA USADA"
+msgstr "VÁLV. USADA"
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: Station plate (12-13 px label on a machine). ALL CAPS, as short as possible. The junction's exit hatch, open.
@@ -1258,7 +1258,7 @@ msgstr "No se pudo leer el punto de control guardado."
 #. i18n: speaker=ui
 #: scripts/main.gd:1043
 msgid "No checkpoint yet. Saving starts at the first SAFE POINT."
-msgstr "Sin punto de control. Se guarda desde el primer PUNTO SEGURO."
+msgstr "Aún sin guardar. Se guarda en el primer PUNTO SEGURO."
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: Changelog button text when the browser cannot open (338 px).
@@ -1273,7 +1273,7 @@ msgstr "ENLACE NO DISPONIBLE"
 #: scripts/main.gd:1943
 #: scripts/main.gd:1949
 msgid "RESUME SCROLL"
-msgstr "SEGUIR CRÉDITOS"
+msgstr "REANUDAR TEXTO"
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: Frame-rate cap list item.
