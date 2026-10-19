@@ -52,6 +52,13 @@ const NEAR_JAMB_FOOT: Vector2 = Vector2(491.32, 452.62)
 ## shows round the leaf, so the shut door never reads as ajar), the door light's pool and graze and its
 ## wall pack's lens (doors.py surface_lights and emitters).
 const BLAST_HOLE_LIGHT: Color = Color(0.30, 0.34, 0.36)
+## Once blown, the lane's light also falls on the doorway's far reveal (the steel-lined throat of the 0.40
+## m wall, doors.py "far jamb reveal", which is part of BLAST_WALL and draws over the hole's light), so
+## the lit opening reads its whole width, not just the 10 px strip between the reveal and the near
+## column (capture review, 2026-10-18: the doorway was only 1.26 times the wall's brightness). Added over
+## the wall piece (est., tuned on rendered captures).
+const BLAST_REVEAL: PackedVector2Array = [Vector2(465.93, 436.03), Vector2(481.1, 435.21), Vector2(481.1, 333.0), Vector2(465.93, 333.52)]
+const BLAST_REVEAL_LIGHT: Color = Color(0.16, 0.18, 0.19)
 const BLAST_POOL: Vector2 = Vector2(486.05, 443.64)
 const BLAST_GRAZE: Vector2 = Vector2(473.53, 374.20)
 const BLAST_DOOR_LIGHT: Vector2 = Vector2(461.24, 321.08)
@@ -66,14 +73,16 @@ const LEAF_SCALE: Vector2 = Vector2(25.39 / 103.0, 119.10 / 475.0)
 ## breaking leaf stood (its manifest offset 0.25 world px down), and the leaf lying in the lane
 ## (blast-slab-down, 547 x 107 px at 2.002 px per world px, 273 x 53 world px), set down on the deck as
 ## the approved art set's frames show it (the art set's compose.py: at 0.75 of its size, its bottom on
-## the deck's nosing at y 449 less its own 0.5 px offset, toned to the deck's value and blue cast). The
-## deck now ends 9 px in front of the walk line, so the earlier spot (in front of it) hung the slab off
-## the walkway's front edge; it lies under the actors, who walk the lane in front of it.
+## the deck's nosing at y 449 less its own 0.5 px offset, in the deck's blue cast). The deck now ends 9 px
+## in front of the walk line, so the earlier spot (in front of it) hung the slab off the walkway's front
+## edge; it lies under the actors, who walk the lane in front of it. Its tone (capture review,
+## 2026-10-18): toned down to the deck's own value it read as a shadow on the deck, so it keeps most of
+## its painted value, a step lighter than the deck, and reads as a steel slab lying there.
 const LEAFBREAK_AT: Vector2 = Vector2(465.0, 333.25)
 const LEAFBREAK_SCALE: float = 0.25
 const LYING_AT: Vector2 = Vector2(482.74, 404.79)
 const LYING_SCALE: float = 0.75 / 2.002
-const LYING_TONE: Color = Color8(118, 140, 170)
+const LYING_TONE: Color = Color8(205, 215, 232)
 ## Soot and heat tint round the empty doorway once it is blown (the art set dropped the painted scorch
 ## and crack lines: code soot instead, compose.py's two patches, centre and radii in world px; the
 ## upper, lighter one drawn smaller, as DoorKit.soot's patches are all as dark at their centre).
@@ -143,13 +152,37 @@ const ENTRY_LEAF_LIGHTS: Array = [
 ## (EXIT_BACK), the light through the hole, the leaf (SlideLeaf, junction-exit-leaf, sliding into the
 ## pocket), then the wall's face with the operator header over the opening and the pocket, the frame
 ## head and the door light fitting (EXIT_WALL). Over the mid plate: the status lamp on the header, lit
-## in the exit bolt's colour, the door light and the exit sign. The wall's near end stands past the
-## room's right edge (x 971 on), so no piece draws it and the view stops at the room's edge.
+## in the exit bolt's colour, the door light and the exit sign. Over the actors (they walk out behind
+## it): the wall's near end (EXIT_FRONT, x 971..1050), its narrow face strip to the near jamb, its cut
+## end face and the curb across the deck. The passage and the near end run on past the room's right
+## edge (the art set's fix sheet D05, 2026-10-18), so the view reaches EXIT_VIEW_RIGHT and the whole
+## doorway, both jambs and the passage beyond it stand in the frame.
 const EXIT_BACK: Texture2D = preload("res://assets/doors/junction-exit-back.png")
 const EXIT_WALL: Texture2D = preload("res://assets/doors/junction-exit-wall.png")
+const EXIT_FRONT: Texture2D = preload("res://assets/doors/junction-exit-front.png")
 const EXIT_LEAF_ART: Texture2D = preload("res://assets/doors/junction-exit-leaf.png")
+## Each piece's world top-left (the art set's doors.py piece_box plus the manifest offset): the passage
+## 918.27 + 0.5 and the near end 970.14 + 1.0 (sheet D05), the wall's face 869.83 + 0.5 (sheet D02).
 const EXIT_BACK_AT: Vector2 = Vector2(918.77, 0.0)
 const EXIT_WALL_AT: Vector2 = Vector2(870.33, 0.0)
+const EXIT_FRONT_AT: Vector2 = Vector2(971.14, 0.0)
+## The room deck in front of the cross-wall runs on under the near end's curb past the room's edge: the
+## mid plate's deck rows from here down (world y; the plate is opaque from y 444 at its right end) are
+## mirrored on past x 960 as far as the view reaches (RoomDepth.deck_bleed).
+const EXIT_DECK_TOP_Y: float = 444.0
+## The passage seen past the exit wall's near end (EXIT_BACK right of the column's far arris, x 1000.1, down
+## to its floor's near edge, doors.py "next space floor"), shaded (DoorKit.PAST_END_SHADE) so it never
+## outshines the doorway; the column covers its left edge and the curb its foot.
+const EXIT_PAST_END: PackedVector2Array = [Vector2(1000.1, 0.0), Vector2(EXIT_PAINTED_RIGHT, 0.0), Vector2(EXIT_PAINTED_RIGHT, 457.8), Vector2(1000.1, 443.1)]
+## When the exit is shut no light comes through it: its reveal in front of the leaf (lit by the passage
+## when open) is multiplied down to this (doors.py's shut frames: the far reveal one step under the wall),
+## and the light through the hole is off, so only the lamp and the sign are left to tell shut from open
+## at a glance. It eases to nothing as the leaf opens (est., tuned on rendered captures).
+const EXIT_SHUT_SHADE: Color = Color(0.42, 0.45, 0.48)
+## The sliding leaf's tone: DoorKit.LEAF_TONE at 0.7. It runs in the wall's middle, 0.27 m back in the
+## dark reveal, and at the shared tone the shut leaf read 1.8 times the wall round it, almost as light as
+## the open doorway (capture review, 2026-10-18; est., tuned on rendered captures).
+const EXIT_LEAF_TONE: Color = Color(0.43, 0.47, 0.505)
 ## The opening on the face (doors.py W(a, h, 0) at s -0.4 and 1.6 m, h 0 and 2.4 m), the passage's light
 ## through it (est., tuned on rendered captures; the room's goal, so brighter than the entry's), the
 ## door light's pool, graze and lens, the status lamp on the header and the flag exit sign over the
@@ -275,12 +308,17 @@ const EXIT_SPAN: Vector2 = Vector2(EXIT_FAR_JAMB_X, EXIT_NEAR_JAMB_X)
 ## span from running backwards if the geometry ever puts the face left of the jamb. door_route_test and
 ## wolf_space_test both read it, so neither derives its own.
 const EXIT_SHUT_SPAN: Vector2 = Vector2(EXIT_LEAF_SHUT_X, maxf(EXIT_LEAF_SHUT_X, EXIT_NEAR_JAMB_X))
-## The junction's camera may show this far right (Main): the room's own edge. The approved art paints
-## the room to x 970 (its doorway pieces stop there, 10 px past the edge for camera shake); the exit's
-## near jamb (x 971) and the wall's near end beyond it are not painted, so the view stops short of
-## them. The actors may walk on through the doorway this far: out of the view down the passage, far
-## enough that WOLF's body and the engineer's never share the same floor.
-const EXIT_VIEW_RIGHT: float = RoomDepth.ROOM_WIDTH
+## The junction's camera may show this far right (Main), as on main before the art swap: past the near
+## jamb (EXIT_NEAR_JAMB_X) and the wall's near end into the passage beyond, so the whole doorway reads in
+## the frame (the art swap's capture review, 2026-10-18: stopping at the room's edge left 40 screen px of
+## it). The exit's pieces (EXIT_BACK, EXIT_FRONT) are painted to x 1050 and the deck mirrored on as far,
+## which covers a camera shake (Impact.MAX_SHAKE_PX, 10) at this edge. The actors may walk on through
+## the doorway to EXIT_WALK_MAX_X: on down the passage, out of view behind the wall, far enough that
+## WOLF's body and the engineer's never share the same floor.
+const EXIT_VIEW_RIGHT: float = 1030.0
+## How far right the exit's pieces are painted (the art set's doors.py ROOM_X_WIDE): the view's reach,
+## a camera shake and 10 px spare.
+const EXIT_PAINTED_RIGHT: float = 1050.0
 const EXIT_WALK_MAX_X: float = 1100.0
 ## WOLF in the open doorway, looking back at the engineer: his head, shoulders and forelegs in view on
 ## the threshold, his hindquarters already past the near jamb and hidden by it. Fix round 2 (review r2,
@@ -454,8 +492,10 @@ const CABLE_SHADOW: Color = Color("#0d1419")
 const CABLE_BODY: Color = Color("#35434c")
 const CABLE_SHEEN: Color = Color(0.55, 0.64, 0.7, 0.55)
 ## Station name plates: their top edge, all in one row of clear wall between the far plate's pipe run
-## and the machines' tops, and their text size.
-const LABEL_Y: float = 320.0
+## and the machines' tops, and their text size. At 310 (it was 320) the DOOR plate's bottom (y ~324)
+## clears the blast door's head frame (its top at y 326 over the far jamb, doors.py "frame head"), so the
+## blown doorway shows its whole height (capture review, 2026-10-18).
+const LABEL_Y: float = 310.0
 const LABEL_FONT_SIZE: int = 12
 ## The VALVE plate sits this far left of the wheel so its longest text ends well before the door.
 const VALVE_LABEL_SHIFT: float = 28.0
@@ -581,6 +621,11 @@ var entry_tween: Tween
 ## The exit door's pieces (see EXIT_BACK): its sliding leaf, its wall's face and its status lamp.
 var exit_leaf: SlideLeaf
 var exit_wall: Sprite2D
+## The wall's near end (EXIT_FRONT), over the actors; the shade on the reveal while the exit is shut
+## (EXIT_SHUT_SHADE) and the light through its hole.
+var exit_front: Sprite2D
+var exit_shade: Polygon2D
+var exit_hole: Polygon2D
 var exit_lamp: DoorKit.Lamp
 var recesses: Recesses
 ## The exit bolt's panel drawn again over the sentry where it passes behind it.
@@ -591,6 +636,8 @@ var door_shape: CollisionShape2D
 ## DOOR_BREAK_SECONDS, then the lit empty doorway (door_hole, its light) with the soot round it and the
 ## leaf lying in the lane; the front (door_column) swaps to its blown piece.
 var door_hole: Polygon2D
+## The lane's light on the blown doorway's far reveal (BLAST_REVEAL), shown with door_hole.
+var door_reveal: Polygon2D
 var door_leaf: Sprite2D
 var door_leaf_breaking: Sprite2D
 var door_wall: Sprite2D
@@ -836,6 +883,7 @@ func _build_door() -> void:
 	# Behind the mid plate: the lane's light (once blown), the door light's pool and graze, the wall.
 	door_wall = DoorKit.doorway(depth.behind, "Blast", BLAST_HOLE, BLAST_HOLE_LIGHT, null, Vector2.ZERO, 1.0, null, BLAST_POOL, BLAST_GRAZE, BLAST_WALL, BLAST_WALL_AT)
 	door_hole = depth.behind.get_node("BlastHoleLight") as Polygon2D
+	door_reveal = DoorKit.hole_light(depth.behind, "BlastRevealLight", BLAST_REVEAL, BLAST_REVEAL_LIGHT)
 	door_leaf = _door_piece("DoorLeaf", BLAST_SLAB, LEAF_AT, Vector2.ONE, DOOR_Z)
 	door_leaf.scale = LEAF_SCALE
 	door_leaf_breaking = _door_piece("DoorLeafBreaking", BLAST_SLAB_BREAKING, LEAFBREAK_AT, Vector2.ONE * LEAFBREAK_SCALE, DOOR_Z)
@@ -914,9 +962,21 @@ func close_entry_behind() -> void:
 ## and the wall's face; over it the status lamp, the door light and the exit sign. Its lamp and leaf
 ## follow the bolt.
 func _build_exit() -> void:
+	# First in the behind layer, so the passage and the curb draw over it where they stand.
+	depth.deck_bleed("ExitDeckBleed", EXIT_DECK_TOP_Y, EXIT_PAINTED_RIGHT)
 	exit_leaf = SlideLeaf.new(EXIT_LEAF_ART, EXIT_LEAF_SIZE.x, EXIT_LEAF_SIZE.y, _exit_leaf_point)
 	exit_leaf.name = "ExitLeaf"
+	exit_leaf.tone = EXIT_LEAF_TONE
 	exit_wall = DoorKit.doorway(depth.behind, "Exit", EXIT_HOLE, EXIT_HOLE_LIGHT, EXIT_BACK, EXIT_BACK_AT, DoorKit.BEYOND_LIFT, exit_leaf, EXIT_POOL, EXIT_GRAZE, EXIT_WALL, EXIT_WALL_AT)
+	exit_hole = depth.behind.get_node("ExitHoleLight") as Polygon2D
+	# Over the passage and the reveal, under the leaf: the shut exit's shade.
+	exit_shade = DoorKit.shade(depth.behind, "ExitShutShade", EXIT_HOLE, EXIT_SHUT_SHADE)
+	depth.behind.move_child(exit_shade, exit_leaf.get_index())
+	DoorKit.shade(depth.behind, "ExitPastEnd", EXIT_PAST_END, DoorKit.PAST_END_SHADE)
+	# The wall's near end draws over the actors (they walk out behind it), always opaque, as Records'.
+	exit_front = DoorKit.piece(self, EXIT_FRONT, EXIT_FRONT_AT, "ExitFront")
+	exit_front.z_index = RoomDepth.Z_NEAR
+	exit_front.z_as_relative = false
 	var over: Node2D = _doors_over()
 	exit_lamp = DoorKit.lamp(over, "ExitLamp", EXIT_LAMP, Palette.LAMP_SHUT)
 	DoorKit.door_light(over, EXIT_DOOR_LIGHT)
@@ -1573,6 +1633,7 @@ func _show_door() -> void:
 	door_leaf.visible = not door_blown
 	door_leaf_breaking.visible = door_blown and (door_breaking or door_flying)
 	door_hole.visible = gone
+	door_reveal.visible = gone
 	for soot: Sprite2D in door_soot:
 		soot.visible = door_blown
 	door_leaf_down.visible = gone and not door_flying
@@ -1603,10 +1664,14 @@ func _set_door_flight(t: float) -> void:
 	leaf.z_index = DOOR_FRONT_Z + 1 if t >= DOOR_FLIGHT_CLEAR else DOOR_Z
 
 
-## The exit door's leaf slides back along the wall into its pocket as it opens, over the passage behind.
+## The exit door's leaf slides back along the wall into its pocket as it opens, over the passage behind;
+## the light through the hole comes up and the shut shade on the reveal goes as it does.
 func _sync_hatch() -> void:
 	if exit_leaf != null:
 		exit_leaf.queue_redraw()
+		var open: float = clampf(hatch_open, 0.0, 1.0)
+		exit_hole.color = EXIT_HOLE_LIGHT * open
+		exit_shade.color = EXIT_SHUT_SHADE.lerp(Color.WHITE, open)
 
 
 func _arm_hazard(hazard: Hazard) -> void:
