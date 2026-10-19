@@ -3109,9 +3109,15 @@ func _hide_end_card() -> void:
 
 func _choose_mirror(route_id: String) -> void:
 	if route_id == "wolf" and absf(wolf.position.x - WOLF_MIRROR_X) > 42.0:
-		# TRANSLATORS: WOLF, still walking to the mirror. %s is the key or button for the manual port; the touch form names its button.
+		# Each form is marked on its own line: Godot's generator gives a comment to every message on the
+		# line under it, and the touch form has no %s for a slot=key mark to describe.
+		# TRANSLATORS: WOLF, still walking to the mirror. %s is the key or button for the manual port.
 		# i18n: story speaker=WOLF slot=key
-		status_line = "WOLF: %s" % HudText.key(I18n.KEY.tr("I'm still checking the drive. Wait for me, or press %s for the manual port."), [HudText.ANSWER_2], I18n.KEY.tr("I'm still checking the drive. Wait for me, or tap USE MANUAL PORT."))
+		var pressed := I18n.KEY.tr("I'm still checking the drive. Wait for me, or press %s for the manual port.")
+		# TRANSLATORS: WOLF, still walking to the mirror, touch form. USE MANUAL PORT is the answer button's text: use its translation here.
+		# i18n: story speaker=WOLF
+		var tapped := I18n.KEY.tr("I'm still checking the drive. Wait for me, or tap USE MANUAL PORT.")
+		status_line = "WOLF: %s" % HudText.key(pressed, [HudText.ANSWER_2], tapped)
 		return
 	if not state.preserve_mirror_trace(route_id):
 		return
