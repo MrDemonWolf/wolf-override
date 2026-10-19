@@ -37,6 +37,8 @@
 #   PARITY_WORK   scratch folder for the headless game copy (default: $TMPDIR/wolf-parity).
 #   PARITY_GAME   game folder to use (default: apps/game in this checkout).
 #   PARITY_JOBS   routes captured at once (default 2).
+#   PARITY_KEYBOARD  XKB keyboard layout for the captures (render.sh --keyboard; "fr" is AZERTY), for
+#                 stills of key names as a player with that keyboard reads them; unset: US QWERTY.
 #   PARITY_TIMEOUT  seconds one render run may take (default 2700; a 2340x1080 R2 or R4 run takes
 #                 well over 1500 s when several render jobs share the machine).
 #   GODOT_BIN     headless godot binary (default: godot).
@@ -80,7 +82,7 @@ capture_route() {
       mkdir -p "$dir"
       w="${size%x*}" h="${size#*x}"
       "$root/tools/render/render.sh" --name "${PARITY_NAME:-lighter-parity}-$route" --driver "$driver" \
-          --screen 2560x1440 --timeout "${PARITY_TIMEOUT:-2700}" "$game_src" "$dir" -- \
+          --screen 2560x1440 --timeout "${PARITY_TIMEOUT:-2700}" ${PARITY_KEYBOARD:+--keyboard "$PARITY_KEYBOARD"} "$game_src" "$dir" -- \
           --fixed-fps 60 --resolution "${w}x${h}" --script res://review_capture/capture.gd -- \
           --route="$route" --variant="$variant" --size="$size" --out=/work/out ${language:+--language="$language"} \
           > "$dir/godot.log" 2>&1 || true
@@ -152,7 +154,7 @@ case "$cmd" in
     echo "ok    perf $label"
     ;;
   *)
-    sed -n '2,41p' "$0" >&2
+    sed -n '2,44p' "$0" >&2
     exit 2
     ;;
 esac

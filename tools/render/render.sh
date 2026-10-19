@@ -2,7 +2,7 @@
 # Runs Godot 4.7.2 against a copy of a project inside the render container (Xvfb plus Mesa software
 # OpenGL), so rendered captures never open a window on this Mac. See tools/render/README.md.
 #
-#   tools/render/render.sh [--screen WxH] [--name JOB] [--driver DIR] [--timeout SEC] PROJECT_DIR OUT_DIR -- GODOT_ARGS...
+#   tools/render/render.sh [--screen WxH] [--name JOB] [--driver DIR] [--timeout SEC] [--keyboard LAYOUT] PROJECT_DIR OUT_DIR -- GODOT_ARGS...
 #
 # PROJECT_DIR (a folder holding project.godot) is copied, without its .godot cache, to
 # ~/Library/Caches/wolf-override-render/JOB/project, imported headless, and Godot then runs there with
@@ -10,6 +10,10 @@
 # whatever the run writes to /work/out is copied back to OUT_DIR. --driver DIR copies capture scripts
 # into the project copy as res://review_capture/ (never into the real project). Every run is killed after
 # --timeout seconds (default 900) and its log is kept at JOB/run.log. The exit status is Godot's (124 = timed out).
+# --keyboard LAYOUT sets the virtual screen's keyboard layout (an XKB layout such as "fr" for AZERTY, with
+# setxkbmap from x11-xkb-utils, which Xvfb's own xserver-common package installs) before Godot starts, so
+# a capture shows key names as a player with that keyboard reads them (localization PR L7a); without it
+# the layout is Xvfb's default, US QWERTY.
 set -euo pipefail
 
 image="wolf-godot-render:4.7.2"
@@ -17,6 +21,7 @@ screen="2560x1440"
 job="default"
 driver=""
 limit=900
+keyboard=""
 here="$(cd "$(dirname "$0")" && pwd)"
 
 while [[ $# -gt 0 ]]; do
@@ -25,11 +30,12 @@ while [[ $# -gt 0 ]]; do
     --name) job="$2"; shift 2 ;;
     --driver) driver="$(cd "$2" && pwd)"; shift 2 ;;
     --timeout) limit="$2"; shift 2 ;;
+    --keyboard) keyboard="$2"; shift 2 ;;
     *) break ;;
   esac
 done
 if [[ $# -lt 3 || "$3" != "--" ]]; then
-  echo "usage: $0 [--screen WxH] [--name JOB] [--driver DIR] [--timeout SEC] PROJECT_DIR OUT_DIR -- GODOT_ARGS..." >&2
+  echo "usage: $0 [--screen WxH] [--name JOB] [--driver DIR] [--timeout SEC] [--keyboard LAYOUT] PROJECT_DIR OUT_DIR -- GODOT_ARGS..." >&2
   exit 64
 fi
 project="$(cd "$1" && pwd)"
@@ -61,8 +67,13 @@ if [[ $first_import -eq 1 ]]; then
 fi
 
 status=0
+# With --keyboard, a small shell inside xvfb-run sets the layout on the virtual screen and then becomes
+# Godot ($1 is the layout; the rest is the Godot command line, passed through untouched). The empty
+# array is spelled ${layout[@]+...} because macOS's bash 3.2 calls a plain empty "${layout[@]}" unbound.
+layout=()
+[[ -n "$keyboard" ]] && layout=(sh -c 'setxkbmap -layout "$1" && shift && exec "$@"' sh "$keyboard")
 run timeout --kill-after=10 "$limit" xvfb-run -a -s "-screen 0 ${screen}x24" \
-  godot --path /work/project --rendering-driver opengl3 --audio-driver Dummy "$@" 2>&1 | tee "$cache/run.log" || true
+  ${layout[@]+"${layout[@]}"} godot --path /work/project --rendering-driver opengl3 --audio-driver Dummy "$@" 2>&1 | tee "$cache/run.log" || true
 status=${PIPESTATUS[0]}
 [[ $status -eq 124 ]] && echo "render.sh: Godot was stopped after ${limit}s (see $cache/run.log)" >&2
 
