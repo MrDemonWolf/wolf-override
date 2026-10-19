@@ -14,6 +14,8 @@ Changes merged after 0.15.0. They become the next version when it is cut.
 - Five machines are now their real size, so they are smaller: the purge display, the PURGE QUEUE, the MIRROR PORT, the tank arm and the EXIT BOLT panel.
 - WOLF keeps his size for now, so he looks big beside the real-size machines.
 - Screens, lamps and the LINE gauge are lit by the game. The PURGE QUEUE and MIRROR PORT screens turn green once copied.
+- The corridor's purge display stands on the floor, not on a pipe.
+- Machine screens glow round their glass, so a working screen and its change to green are easier to spot.
 - One handwheel turns at both the MANUAL BYPASS and the VALVE.
 - The coolant tank hangs from the arm on a cable.
 - The RELIEF VENT has a relief valve standing on its grate. The danger area is still the grate.
