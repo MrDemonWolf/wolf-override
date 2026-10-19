@@ -78,7 +78,7 @@ Changes merged after 0.15.0. They become the next version when it is cut.
 ### Settings
 
 - Spanish (machine translation, review pending): **LANGUAGE** offers Español (Latinoamérica) and Español (España), each marked "traducción automática".
-- In Spanish the title, Pause, Settings, the credits with the AI disclosure, the hints, objectives, cards, tutorial and touch buttons, and a few station names are translated; dialogue, the story and most station names still show English.
+- In Spanish the title, Pause, Settings, the credits with the AI disclosure, the hints, objectives, cards, tutorial and touch buttons, the dialogue, narration and end card, and a few station names are translated; most station names still show English.
 - Key names follow your keyboard layout on Windows, macOS and Linux: on a French AZERTY keyboard **Move left** reads Q, not A. A symbol key shows the symbol printed on it, such as & on the AZERTY 1 key, and a letter the game's fonts cannot draw (Greek, Hebrew, Arabic, Thai) shows its QWERTY name.
 
 ### Website
@@ -169,6 +169,8 @@ Changes merged after 0.15.0. They become the next version when it is cut.
 - `i18n_test` checks every word the touch USE button shows and the tutorial prompt in every offered language, and that no short line takes more than one row beyond English in the hint bar or the top card.
 - The story is marked for translation, with no change to the English: narration, dialogue, refusals, knockdown cards, restore lines, the answers and the end card. Each speaker's words are one message without the name in front, and WOLF quotes your answer in the language you play in (an answer saved before October 13, 2026 stays in English).
 - The in-game changelog stays in English; in another language it opens with one translated line that says so.
+- Both Spanish files translate the 145 story lines, written by Claude and back-translated by Codex, so an offered language again covers the whole template; WOLF's touch line at the mirror names the answer button in Spanish.
+- The manual-port line's touch form is marked on its own line, so it no longer carries the key mark of the form with a key.
 
 ### How it was checked
 
@@ -186,6 +188,7 @@ Changes merged after 0.15.0. They become the next version when it is cut.
 - **Menus marked for translation checked:** headless test suites (29), a switch to a test Spanish catalog and back, the English menus' text and stills compared with the previous version (unchanged apart from the changelog's own new lines), rendered title, Pause and Settings stills in pseudo-English (keyboard and touch) and with a French AZERTY layout; not played by hand.
 - **Spanish checked:** the translation checks with Codex's back-translation, headless test suites and rendered Spanish stills (keyboard and touch, 1280x720); not reviewed by a native speaker, not played by hand.
 - **Story marked for translation checked:** headless test suites (29), a switch to a test Spanish catalog and back, an old save's answer quoted in pseudo-English, every story constant's English compared with the previous version (unchanged), and four routes' stills (424, keyboard and touch) byte for byte the same as before; rendered pseudo-English stills of the routes; not played by hand.
+- **Spanish story checked:** the translation checks with Codex's back-translation of the 145 new lines and one changed line in both files, and the headless test suites; not reviewed by a native speaker, not played by hand.
 
 ## 0.15.0 - October 16, 2026
 
