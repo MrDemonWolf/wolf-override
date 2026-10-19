@@ -69,25 +69,23 @@ static func fit_world_label(label: Label, center_x: float, top: float) -> void:
 
 
 ## Gives [param label] its font at [param base] px for a station name (world_px) and sizes it to its text,
-## breaking it between words (WORLD_ROW_GROWTH) when one row would be too wide.
+## breaking it between words (WORLD_ROW_GROWTH) when one row would be too wide. A language written with
+## spaces (DialogueBoxes.row_characters above 0) breaks at its spaces ([method _space_rows]), as station
+## names always have; one whose rows run to the column (Chinese, Japanese, Korean) breaks by the text
+## server's word rules (DialogueBoxes.row_texts, whole words only), so a name written without spaces
+## breaks between its words too (PR L7d).
 static func wrap_world_label(label: Label, base: int) -> void:
 	label.add_theme_font_size_override(&"font_size", world_px(base))
 	var font: Font = label.get_theme_font(&"font")
 	var limit: float = font.get_string_size(label.text, HORIZONTAL_ALIGNMENT_LEFT, -1.0, base).x * WORLD_ROW_GROWTH
 	# Words keep the spacing they were written with ("VALVE  0 / 3"); a row's ends lose their spaces.
+	# Not TextParagraph for every language: its break rules move English rows ("VALVE  0 / 3" at 150%
+	# broke as "VALVE" / "0 / 3" rather than "VALVE  0" / "/ 3", a narrower plate), and English stays as it was.
+	var rows: Array[String] = _space_rows(label.text, font, world_px(base), limit) if DialogueBoxes.row_characters() > 0 else DialogueBoxes.row_texts(label.text, font, world_px(base), limit, true)
 	var widest: float = 0.0
-	var row: String = ""
-	var rows: int = 0
-	for word: String in label.text.split(" "):
-		var joined: String = word if row.is_empty() else row + " " + word
-		if row.strip_edges().is_empty() or word.is_empty() or font.get_string_size(joined.strip_edges(), HORIZONTAL_ALIGNMENT_LEFT, -1.0, world_px(base)).x <= limit:
-			row = joined
-		else:
-			widest = maxf(widest, font.get_string_size(row.strip_edges(), HORIZONTAL_ALIGNMENT_LEFT, -1.0, world_px(base)).x)
-			rows += 1
-			row = word
-	widest = maxf(widest, font.get_string_size(row.strip_edges(), HORIZONTAL_ALIGNMENT_LEFT, -1.0, world_px(base)).x)
-	var wrapped: bool = rows > 0
+	for row: String in rows:
+		widest = maxf(widest, font.get_string_size(row, HORIZONTAL_ALIGNMENT_LEFT, -1.0, world_px(base)).x)
+	var wrapped: bool = rows.size() > 1
 	label.autowrap_mode = TextServer.AUTOWRAP_WORD if wrapped else TextServer.AUTOWRAP_OFF
 	# The plate is as wide as its widest row (and its margins); a pixel spare keeps the rows as measured.
 	label.custom_minimum_size.x = ceilf(widest) + label.get_theme_stylebox(&"normal").get_minimum_size().x + 2.0 if wrapped else 0.0
@@ -97,6 +95,25 @@ static func wrap_world_label(label: Label, base: int) -> void:
 	var measured: Vector2 = label.get_minimum_size()
 	label.size = Vector2(maxf(measured.x, label.custom_minimum_size.x), measured.y)
 	label.update_minimum_size()
+
+
+## [param text] broken greedily at its spaces into rows no wider than [param limit] px at [param size] px
+## of [param font]: each row takes words while the row still fits, and a row always takes at least one
+## word, so a word wider than [param limit] keeps a row of its own. Repeated spaces stay inside a row
+## ("VALVE  0 / 3"); each row is returned without the spaces at its ends. Used by wrap_world_label for
+## languages written with spaces.
+static func _space_rows(text: String, font: Font, size: int, limit: float) -> Array[String]:
+	var rows: Array[String] = []
+	var row: String = ""
+	for word: String in text.split(" "):
+		var joined: String = word if row.is_empty() else row + " " + word
+		if row.strip_edges().is_empty() or word.is_empty() or font.get_string_size(joined.strip_edges(), HORIZONTAL_ALIGNMENT_LEFT, -1.0, size).x <= limit:
+			row = joined
+		else:
+			rows.append(row.strip_edges())
+			row = word
+	rows.append(row.strip_edges())
+	return rows
 
 
 ## How much taller [param label] stands than its one row at 100% ([param base] px).

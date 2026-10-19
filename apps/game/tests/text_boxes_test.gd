@@ -2,7 +2,10 @@ extends "res://tests/support/game_suite.gd"
 ## Text you can read (P0-8, P0-9, P0-10, P0-13; STORY-2, STORY-3, STORY-4, STORY-8, STORY-10,
 ## TEACH-7, PHONE-3, PHONE-7). Every line constant and every dialogue literal in main.gd, as each
 ## engineer name, splits into boxes with one speaker, at most two rows of at most 42 characters at
-## 100% text size, under 20 words, read at 0.33 s a word or slower, and without a word changed. Then
+## 100% text size, under 20 words, read at 0.33 s a word or slower, and without a word changed; the
+## same corpus, in every language of I18n.LANGUAGES (translated where a catalog has it) at every TEXT
+## SIZE step, keeps each language's box rules, and Chinese, Japanese and Korean samples split without a
+## character changed into balanced boxes (localization PR L7d). Then
 ## the boxes the game shows on the way through the opening, the corridor, Records Access and the
 ## Service Junction are measured on screen, and the first controllable frame, the Records exit, the
 ## touch layout, the TEXT SIZE setting and the prompts at every size are checked. Spawn, teardown and
@@ -32,7 +35,10 @@ func _run() -> void:
 	bar = game.get_node("CanvasLayer/BottomBar") as Control
 	_check_reading_rule()
 	_check_splitting()
+	_check_language_rules()
 	_check_corpus()
+	_check_every_language()
+	_check_cjk_samples()
 	await _check_opening()
 	await _check_first_control()
 	await _check_corridor()
@@ -89,7 +95,7 @@ func _check_corpus() -> void:
 	var boxes: int = 0
 	for first: String in NAMES:
 		var tags: Array[String] = ["WOLF", "DIRECTOR", "DIRECTOR / PURGE", first.to_upper()]
-		var fits: Callable = func(words: String) -> bool: return DialogueBoxes.rows(words, font, size, DialogueBoxes.wrap_width(words, font, size, width, DialogueBoxes.MAX_ROW_CHARACTERS)).size() <= DialogueBoxes.MAX_ROWS
+		var fits: Callable = DialogueBoxes.fits.bind(font, size, width, I18n.FALLBACK)
 		for template: String in messages:
 			var message: String = template.replace("{NAME}", first.to_upper()).replace("{name}", first)
 			var split: Array[String] = DialogueBoxes.split(message, tags, fits)
@@ -108,6 +114,163 @@ func _check_box(box: String, tags: Array[String], font: Font, size: int, width: 
 	_expect(rows.size() <= DialogueBoxes.MAX_ROWS and longest <= DialogueBoxes.MAX_ROW_CHARACTERS, "a box takes at most 2 rows of at most 42 characters (%d rows, %d characters): %s (from %s)" % [rows.size(), longest, box.c_escape(), source.c_escape()])
 	_expect(DialogueBoxes.word_count(words) < DialogueBoxes.LONG_LINE_WORDS, "a box holds fewer than 20 words: %s" % box.c_escape())
 	_expect(DialogueBoxes.read_seconds(words) >= DialogueBoxes.word_count(words) * 0.33, "a box is up 0.33 s a word or longer: %s" % box.c_escape())
+
+
+## PR L7d's rules, language by language: the table's row limits, reading speeds and the box length
+## they give, and the sentence, clause and quotation marks of the languages the table lists.
+func _check_language_rules() -> void:
+	_expect(DialogueBoxes.row_characters("en") == DialogueBoxes.MAX_ROW_CHARACTERS and DialogueBoxes.row_characters("es") == 42 and DialogueBoxes.row_characters("ja") == 0 and DialogueBoxes.row_characters("ko") == 0, "rows hold 42 characters in English and Spanish and run to the column in Japanese and Korean (languages.json)")
+	_expect(DialogueBoxes.long_line_characters("en") > 2 * DialogueBoxes.MAX_ROW_CHARACTERS and DialogueBoxes.long_line_characters("es") > 2 * DialogueBoxes.MAX_ROW_CHARACTERS, "in English and Spanish the box length limit is longer than two rows, so English boxes split as before (%d, %d)" % [DialogueBoxes.long_line_characters("en"), DialogueBoxes.long_line_characters("es")])
+	_expect(DialogueBoxes.long_line_characters("ja") == 26 and DialogueBoxes.long_line_characters("zh_Hans") == 59 and DialogueBoxes.long_line_characters("ko") == 79, "a box holds as many characters as 20 words take to read: 26 in Japanese, 59 in Chinese, 79 in Korean (%d, %d, %d)" % [DialogueBoxes.long_line_characters("ja"), DialogueBoxes.long_line_characters("zh_Hans"), DialogueBoxes.long_line_characters("ko")])
+	var ten: String = "あいうえおかきくけこ"
+	_expect(is_equal_approx(DialogueBoxes.read_seconds(ten, "ja"), 1.2 + 10.0 / 4.0) and is_equal_approx(DialogueBoxes.read_seconds(ten.repeat(4), "ja"), 1.2 + 40.0 / 4.0), "Japanese is read at 4 characters a second, its cap scaled to cover as many characters as English's (%.2f s for 40)" % DialogueBoxes.read_seconds(ten.repeat(4), "ja"))
+	_expect(is_equal_approx(DialogueBoxes.read_seconds(ten.repeat(14), "ja"), 1.2 + 5.8 * 5.0) and is_equal_approx(DialogueBoxes.read_seconds(ten.repeat(14), "en"), 7.0), "the per-character time stops at English's 7 s cap scaled by speed (%.2f s in Japanese)" % DialogueBoxes.read_seconds(ten.repeat(14), "ja"))
+	var line: String = "abcdefghij abcdefghij abcdefghij"
+	_expect(DialogueBoxes.read_seconds(line, "de") == DialogueBoxes.read_seconds(line, "en") and DialogueBoxes.read_seconds(line) == DialogueBoxes.read_seconds(line, "en") and is_equal_approx(DialogueBoxes.read_seconds(line, "es"), 1.2 + 32.0 / 17.0), "a language with no speed yet reads at English's; Spanish at 17 characters a second")
+	var short: Callable = func(limit: int) -> Callable: return func(words: String) -> bool: return words.length() <= limit
+	var none: Array[String] = []
+	var cases: Array = [
+		["ja", "扉が開いた。明かりが消えた！どうする？", 8, ["扉が開いた。", "明かりが消えた！", "どうする？"], "Japanese full stops end sentences with no space after them"],
+		["ja", "本当！？行こう。", 5, ["本当！？", "行こう。"], "a break never comes between two marks"],
+		["ja", "「行こう。」と言った。次へ。", 11, ["「行こう。」と言った。", "次へ。"], "a Japanese quotation stays whole, and a full stop before its closer is not a break"],
+		["ja", "彼は「『止まれ。』と書いてある。」と言った。", 6, ["彼は「『止まれ。』と書いてある。」と言った。"], "nested 「『 quotations are tracked"],
+		["ja", "雨が降っているので、傘を持って、駅まで歩いた。", 13, ["雨が降っているので、", "傘を持って、駅まで歩いた。"], "a sentence too long breaks after 、 with no space"],
+		["zh_Hans", "今天下雨了。我们带上伞，走到车站。", 8, ["今天下雨了。", "我们带上伞，", "走到车站。"], "Chinese full stops and commas break with no space"],
+		["en", "Wait… the door is open. Go.", 21, ["Wait…", "the door is open. Go."], "an ellipsis ends a sentence"],
+		["de", "Sie sagte „Geh jetzt. Wir reden später.“ Er ging.", 41, ["Sie sagte „Geh jetzt. Wir reden später.“", "Er ging."], "a German „“ quotation stays whole"],
+		["pl", "Powiedziała „Idź. Pogadamy później.” Poszedł.", 40, ["Powiedziała „Idź. Pogadamy później.”", "Poszedł."], "a Polish „” quotation stays whole"],
+		["fr", "Il dit « Allez. Vite. » Puis il part.", 22, ["Il dit « Allez. Vite. »", "Puis il part."], "a French « » quotation stays whole, its closer after a space"],
+		["en", "He said “Go now. Talk later.” Then he left.", 30, ["He said “Go now. Talk later.”", "Then he left."], "a “” quotation stays whole"],
+		["es", "¿Listo? ¡Vamos ya!", 12, ["¿Listo?", "¡Vamos ya!"], "Spanish ¿ and ¡ open a sentence and break nothing"],
+	]
+	for case: Array in cases:
+		var boxes: Array[String] = DialogueBoxes.split(case[1], none, short.call(case[2]), case[0])
+		_expect(boxes == (case[3] as Array), "%s: %s (got %s)" % [case[0], case[4], boxes])
+
+
+## Every language of I18n.LANGUAGES at every TextSize step (PR L7d): the corpus as that language shows
+## it (each message translated where its catalog has it, the Director's tags too, with Morgan, the
+## longest preset name) splits without a letter changed into one-speaker boxes; a box that breaks its
+## language's rules (MAX_ROWS rows, its row limit, LONG_LINE_WORDS words, long_line_characters) has no
+## sentence or clause break left to split at; and where rows run to the column, two rows are balanced.
+func _check_every_language() -> void:
+	var messages: Array[String] = _corpus()
+	var tags: Array[String] = ["WOLF", "DIRECTOR", "DIRECTOR / PURGE", "MORGAN"]
+	var name_back: Callable = func(words: String) -> String:
+		var key: String = words.replace("Morgan", "%s")
+		var translated: String = String(TranslationServer.translate(key))
+		return "" if translated == key else translated.replace("%s", "Morgan")
+	var boxes: int = 0
+	var unsplittable: int = 0
+	for code: String in I18n.LANGUAGES:
+		I18n.apply(code)
+		var names: Dictionary = game.call("_speaker_names")
+		names["MORGAN"] = "MORGAN"
+		var shown_tags: Array[String] = []
+		for tag: String in tags:
+			shown_tags.append(String(names.get(tag, tag)))
+		for step: float in TextSize.STEPS:
+			_use_size(step)
+			var font: Font = story.get_theme_font(&"font")
+			var size: int = story.get_theme_font_size(&"font_size")
+			var width: float = game.call("_dialogue_column_width")
+			var fits: Callable = DialogueBoxes.fits.bind(font, size, width, code)
+			for template: String in messages:
+				var message: String = I18n.shown(template.replace("{NAME}", "MORGAN").replace("{name}", "Morgan"), tags, names, name_back)
+				var split: Array[String] = DialogueBoxes.split(message, shown_tags, fits, code)
+				_expect(_letters(message.get_slice(DialogueBoxes.CHOICE_MARKER, 0), shown_tags) == _letters("".join(split), shown_tags), "%s at %d%%: splitting changes no letter: %s" % [code, roundi(step * 100.0), message.c_escape()])
+				for box: String in split:
+					boxes += 1
+					if not _check_language_box(box, shown_tags, font, size, width, code):
+						unsplittable += 1
+	I18n.apply(I18n.FALLBACK)
+	_use_size(1.0)
+	print("text boxes: %d boxes in %d languages at %d sizes; %d are one sentence or clause too long to split" % [boxes, I18n.LANGUAGES.size(), TextSize.STEPS.size(), unsplittable])
+	_expect(boxes > messages.size() * I18n.LANGUAGES.size() * TextSize.STEPS.size(), "every language's corpus was measured at every size (%d boxes)" % boxes)
+
+
+## One box of [method _check_every_language] in [param code]: one speaker; within the language's rules
+## or, if not, with no break left in it; and, where rows run to the column, two rows the wrap chose are
+## balanced. Returns whether the box keeps the rules.
+func _check_language_box(box: String, tags: Array[String], font: Font, size: int, width: float, code: String) -> bool:
+	var words: String = DialogueBoxes.words_of(box, tags)
+	_expect(not _names_inline(words, tags), "%s: one speaker per box: %s" % [code, box.c_escape()])
+	var limit: int = DialogueBoxes.row_characters(code)
+	var wrap: float = DialogueBoxes.wrap_width(words, font, size, width, limit)
+	var rows: Array[String] = DialogueBoxes.row_texts(words, font, size, wrap)
+	var keeps: bool = rows.size() <= DialogueBoxes.MAX_ROWS and (limit == 0 or _longest_row(rows) <= limit) and DialogueBoxes.word_count(words) < DialogueBoxes.LONG_LINE_WORDS and words.length() < DialogueBoxes.long_line_characters(code)
+	if not keeps:
+		var breaks: int = DialogueBoxes.break_count(words)
+		_expect(breaks == 1 and not words.contains("\n"), "%s at %d%%: a box past the rules (%d rows, %d characters) is one sentence or clause: %s" % [code, roundi(TextSize.factor * 100.0), rows.size(), words.length(), box.c_escape()])
+	# A written line break is the English layout (a translation drops it, DESIGN.md "Layout breaks never
+	# bind a translation"), so only rows the wrap chose are judged.
+	if limit == 0 and rows.size() == 2 and not words.contains("\n"):
+		_expect(_balanced(rows, font, size), "%s at %d%%: two rows are balanced (%s)" % [code, roundi(TextSize.factor * 100.0), rows])
+	return keeps
+
+
+## Chinese, Japanese and Korean samples (neutral fixtures, not game text: the game ships no translation
+## in these languages yet) at every TextSize step: they split without a character changed into boxes
+## that keep the language's rules, each two-row box balanced so no short word is left alone on the
+## last row, and the language's bundled font draws every character.
+func _check_cjk_samples() -> void:
+	var samples: Dictionary = {
+		"ja": "今日は雨が降っている。傘を持って出かけよう。駅まで歩いて十分かかる。電車は少し遅れているらしい。",
+		"zh_Hans": "今天下雨了。我们带上伞出门吧。走到车站要十分钟。听说火车晚点了一会儿。我们只好在站台上等着。",
+		"zh_Hant": "今天下雨了。我們帶上傘出門吧。走到車站要十分鐘。聽說火車晚點了一會兒。我們只好在月台上等著。",
+		"ko": "오늘은 비가 온다. 우산을 가지고 나가자. 역까지 걸어서 십 분 걸린다. 기차가 조금 늦는다고 한다.",
+	}
+	var none: Array[String] = []
+	for code: String in samples:
+		I18n.apply(code)
+		var sample: String = samples[code]
+		_expect(I18n.missing_glyphs(sample, story.get_theme_font(&"font")).is_empty(), "%s: the bundled font draws the sample (missing: %s)" % [code, I18n.missing_glyphs(sample, story.get_theme_font(&"font"))])
+		for step: float in TextSize.STEPS:
+			_use_size(step)
+			var font: Font = story.get_theme_font(&"font")
+			var size: int = story.get_theme_font_size(&"font_size")
+			var width: float = game.call("_dialogue_column_width")
+			var boxes: Array[String] = DialogueBoxes.split(sample, none, DialogueBoxes.fits.bind(font, size, width, code), code)
+			_expect(boxes.size() > 1 and _letters("".join(boxes), none) == _letters(sample, none), "%s at %d%%: the sample splits into %d boxes without a character changed" % [code, roundi(step * 100.0), boxes.size()])
+			for box: String in boxes:
+				_expect(_check_language_box(box, none, font, size, width, code), "%s at %d%%: the box keeps the rules: %s" % [code, roundi(step * 100.0), box])
+	I18n.apply(I18n.FALLBACK)
+	_use_size(1.0)
+	# A station name written without spaces breaks between its words above 100% (TextSize.wrap_world_label).
+	I18n.apply("ja")
+	_use_size(2.0)
+	var plate: Label = (game.get_node("BreakerLabel") as Label).duplicate() as Label
+	plate.text = "非常用電源制御盤"
+	game.add_child(plate)
+	TextSize.wrap_world_label(plate, 13)
+	_expect(plate.get_line_count() > 1, "a Japanese station name breaks between its words at 200%% (%d rows)" % plate.get_line_count())
+	plate.free()
+	I18n.apply(I18n.FALLBACK)
+	_use_size(1.0)
+
+
+## Sets TEXT SIZE to [param step] (a TextSize.STEPS factor) without Settings, and lays the game's text
+## out again at it, so the Story label's font size and the dialogue column are read at that size.
+func _use_size(step: float) -> void:
+	TextSize.factor = step
+	game.call("_apply_text_size")
+
+
+## Whether two [param rows] are balanced: the shorter is at least half as wide as the longer, so no
+## short word is left alone on a row.
+static func _balanced(rows: Array[String], font: Font, size: int) -> bool:
+	var first: float = font.get_string_size(rows[0], HORIZONTAL_ALIGNMENT_LEFT, -1.0, size).x
+	var second: float = font.get_string_size(rows[1], HORIZONTAL_ALIGNMENT_LEFT, -1.0, size).x
+	return minf(first, second) >= 0.5 * maxf(first, second)
+
+
+## [param text] with the speaker tags of [param tags] and every space and line break taken out: the
+## letters a split must keep, in order, in languages written with or without spaces.
+static func _letters(text: String, tags: Array[String]) -> String:
+	var plain: String = text
+	for tag: String in DialogueBoxes.longest_first(tags):
+		plain = plain.replace(tag + ": ", "")
+	return plain.replace(" ", "").replace("\n", "")
 
 
 ## The length in characters of the longest of [param rows] (0 for none). Used by _check_box and
@@ -131,7 +294,7 @@ static func _names_inline(text: String, tags: Array[String]) -> bool:
 ## The words of [param text] with the speaker tags taken out, in order.
 static func _words(text: String, tags: Array[String]) -> PackedStringArray:
 	var plain: String = text.replace("\n", " ")
-	for tag: String in DialogueBoxes._longest_first(tags):
+	for tag: String in DialogueBoxes.longest_first(tags):
 		plain = plain.replace(tag + ": ", " ")
 	return plain.split(" ", false)
 
@@ -624,6 +787,12 @@ func _check_station_names() -> void:
 			var plate: Rect2 = Rect2(room.valve_label.position, room.valve_label.size)
 			_expect(absf(plate.end.y - plate_bottom) <= 1.5, "%d%%: the %s plate stands on its line (bottom %.1f, expected %.1f)" % [percent, text.c_escape(), plate.end.y, plate_bottom])
 			_expect(not plate.intersects(Rect2(room.line_caption.position, room.line_caption.size)), "%d%%: the %s plate clears the LINE caption" % [percent, text.c_escape()])
+			# English breaks a plate at its spaces, greedily, as it always has (TextSize._space_rows), so
+			# "VALVE  0" keeps its first row whole; the text server's word rules would break it as
+			# "VALVE" / "0 / 3", a narrower plate (PR L7d review).
+			if text == "VALVE  0 / 3" and room.valve_label.get_line_count() > 1:
+				var first_row: float = room.valve_label.get_theme_font(&"font").get_string_size("VALVE  0", HORIZONTAL_ALIGNMENT_LEFT, -1.0, room.valve_label.get_theme_font_size(&"font_size")).x
+				_expect(room.valve_label.size.x >= first_row, "%d%%: the armed valve plate keeps \"VALVE  0\" on its first row (%.1f px wide, the row %.1f px)" % [percent, room.valve_label.size.x, first_row])
 
 
 ## At every text size, keys and touch, in a fresh game: the opening's hint bar stands below the top
