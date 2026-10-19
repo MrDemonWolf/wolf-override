@@ -27,6 +27,9 @@ const GENERAL_TAB: int = 3
 ## The "machine translation" tag's size (px), under a name in the open list and under the LANGUAGE row:
 ## smaller than the 16 px names, so the name row keeps its width (DESIGN.md, "Settings").
 const TAG_FONT_PX: int = 12
+## The muted blue-grey of secondary text in this menu: the THE DEN / LOCAL CONFIGURATION subtitle, and
+## since PR L6 the "machine translation" tags, which read as notes beside the names.
+const MUTED_TEXT: Color = Color("#89acbf")
 
 ## Reduced Motion changed; Main hands it to the impact kit (no shake or hit-stop, shorter flashes).
 signal reduced_motion_changed(enabled: bool)
@@ -205,7 +208,7 @@ func _build_menu() -> void:
 	move_child(surface, 0)
 	var subtitle: Label = _label("THE DEN  /  LOCAL CONFIGURATION", 13)
 	subtitle.position = Vector2(34, 15)
-	subtitle.modulate = Color("#89acbf")
+	subtitle.modulate = MUTED_TEXT
 	subtitle.add_theme_font_override("font", CONTROL_FONT)
 	add_child(subtitle)
 	$Title.position.y = 35
@@ -341,13 +344,13 @@ func _build_general_page() -> void:
 	popup.add_theme_font_override(&"font", font)
 	popup.add_theme_font_override(&"font_separator", font)
 	popup.add_theme_font_size_override(&"font_separator_size", TAG_FONT_PX)
-	popup.add_theme_color_override(&"font_separator_color", Color("#89acbf"))
+	popup.add_theme_color_override(&"font_separator_color", MUTED_TEXT)
 	for side: StringName in [&"labeled_separator_left", &"labeled_separator_right"]:
 		popup.add_theme_stylebox_override(side, StyleBoxEmpty.new())
 	language_note = _label("", TAG_FONT_PX)
 	language_note.position = Vector2(183, 56)
 	language_note.size = Vector2(300, 20)
-	language_note.modulate = Color("#89acbf")
+	language_note.modulate = MUTED_TEXT
 	language_note.add_theme_font_override(&"font", font)
 	general.add_child(language_note)
 	for control: Node in [language, popup, language_note]:
