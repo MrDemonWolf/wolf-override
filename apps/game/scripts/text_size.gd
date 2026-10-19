@@ -69,25 +69,19 @@ static func fit_world_label(label: Label, center_x: float, top: float) -> void:
 
 
 ## Gives [param label] its font at [param base] px for a station name (world_px) and sizes it to its text,
-## breaking it between words (WORLD_ROW_GROWTH) when one row would be too wide.
+## breaking it between words (WORLD_ROW_GROWTH) when one row would be too wide. The rows come from the
+## text server's word breaking (DialogueBoxes.row_texts, whole words only), as the dialogue box's do, so a
+## Chinese or Japanese name, written without spaces, breaks between its words too (PR L7d).
 static func wrap_world_label(label: Label, base: int) -> void:
 	label.add_theme_font_size_override(&"font_size", world_px(base))
 	var font: Font = label.get_theme_font(&"font")
 	var limit: float = font.get_string_size(label.text, HORIZONTAL_ALIGNMENT_LEFT, -1.0, base).x * WORLD_ROW_GROWTH
 	# Words keep the spacing they were written with ("VALVE  0 / 3"); a row's ends lose their spaces.
+	var rows: Array[String] = DialogueBoxes.row_texts(label.text, font, world_px(base), limit, true)
 	var widest: float = 0.0
-	var row: String = ""
-	var rows: int = 0
-	for word: String in label.text.split(" "):
-		var joined: String = word if row.is_empty() else row + " " + word
-		if row.strip_edges().is_empty() or word.is_empty() or font.get_string_size(joined.strip_edges(), HORIZONTAL_ALIGNMENT_LEFT, -1.0, world_px(base)).x <= limit:
-			row = joined
-		else:
-			widest = maxf(widest, font.get_string_size(row.strip_edges(), HORIZONTAL_ALIGNMENT_LEFT, -1.0, world_px(base)).x)
-			rows += 1
-			row = word
-	widest = maxf(widest, font.get_string_size(row.strip_edges(), HORIZONTAL_ALIGNMENT_LEFT, -1.0, world_px(base)).x)
-	var wrapped: bool = rows > 0
+	for row: String in rows:
+		widest = maxf(widest, font.get_string_size(row, HORIZONTAL_ALIGNMENT_LEFT, -1.0, world_px(base)).x)
+	var wrapped: bool = rows.size() > 1
 	label.autowrap_mode = TextServer.AUTOWRAP_WORD if wrapped else TextServer.AUTOWRAP_OFF
 	# The plate is as wide as its widest row (and its margins); a pixel spare keeps the rows as measured.
 	label.custom_minimum_size.x = ceilf(widest) + label.get_theme_stylebox(&"normal").get_minimum_size().x + 2.0 if wrapped else 0.0
