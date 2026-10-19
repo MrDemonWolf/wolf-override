@@ -24,7 +24,7 @@ description: Who created WOLF OVERRIDE, what informed its development, and which
 | Godot 4.7.2 (Godot Engine contributors) | The game engine: typed GDScript and built-in Godot nodes |
 | Claude Code (Anthropic) | AI coding assistant: research, writing and code, with human review |
 | Codex (OpenAI) | AI coding assistant: research, writing and code, with human review |
-| Codex built-in image generation tool (OpenAI) | Provisional art in edit mode: layered rooms, the coolant relay and safe point, door and door-end paint, the whole-piece characters and station props (October 16, 2026) and the current title image (see [Provisional art](#provisional-art)) |
+| Codex built-in image generation tool (OpenAI) | Provisional art in edit mode: layered rooms, the coolant relay and safe point, door and door-end paint, the whole-piece characters, station props, rooms and doors (October 16, 2026) and the current title image (see [Provisional art](#provisional-art)) |
 | ChatGPT (OpenAI) | Research, writing and code assistance, with human review |
 | ChatGPT Create (OpenAI) | The first provisional art, in the private MDW WOLF//OVERRIDE [Game] project: the first sprites, the first title image, room paintings, machine sheets and the logo concept |
 | Render container (project script `tools/render/render.sh`) | Rendered game captures off-screen, in Docker run through Colima on macOS, so no game window opens on the developer's Mac: the official Linux build of Godot 4.7.2 with a virtual screen (Xvfb) and software OpenGL (Mesa llvmpipe) |
@@ -94,12 +94,11 @@ Each file's source, licence and processing are recorded in the [asset register](
 | First WOLF, engineer and Director sprites, first title image | ChatGPT Create |
 | WOLF OVERRIDE logo | Redrawn as SVG from a generated concept |
 | Title image | Codex image tool, October 2026 (details below) |
-| Corridor and Records Access rooms, the coolant relay and the safe point | Codex image tool, from the earlier ChatGPT Create room paintings and machine sheets |
-| Service Junction room | Codex image tool, with the approved sets as style references |
-| Corridor door end and its additions | Shapes drawn by scripts from real hardware; Codex image tool painted inside them |
-| Doors of Records Access and the Service Junction | Shapes drawn by scripts from real hardware; Codex image tool painted inside them; approved October 14, 2026 |
+| The coolant relay and the safe point | Codex image tool, from the earlier ChatGPT Create machine sheets |
+| Corridor door end additions still in use: the caged beacons | Shapes drawn by scripts from real hardware; Codex image tool painted inside them |
 | WOLF; the engineer standing, cranking (two poses) and knocked down (five frames); the Director; the sentry active and wrecked | Whole pieces, one image per pose: shapes drawn by scripts from the earlier art, Codex image tool painted over them; approved October 16, 2026 |
 | Station props: the purge display, both breakers, the handwheels, the VALVE, the RELIEF VENT, the tank arm and coolant tank, the TANK RELEASE and EXIT BOLT panels, the PURGE QUEUE, the MIRROR PORT, the security container | Whole pieces made the same way, five of them at real size; screens and lights drawn by the game; approved October 16, 2026 |
+| Rooms (the corridor, Records Access and the Service Junction: far, play and near plates) and every door (walls, fronts, leaves, the spaces beyond), and the MANUAL BYPASS gearbox | Whole pieces made the same way, door shapes drawn by scripts from real door hardware; status lamps, door lights and exit signs drawn by the game; approved October 16, 2026 |
 
 <Details>
 <Summary>Full notes on the provisional art</Summary>
@@ -130,6 +129,11 @@ Each file's source, licence and processing are recorded in the [asset register](
   - Python scripts drew each piece's exact shape from the earlier art as a guide;
   - the Codex built-in image generation tool in edit mode painted over those guides, one sheet per group, and scripts cut out and cleaned up each piece;
   - the lights on WOLF and the sentry are drawn by the game;
+  - Nathanial Henniges approved the set on October 16, 2026.
+- **The rooms and doors** (the corridor's, Records Access's and the Service Junction's far, play and near plates; every doorway's wall, near end, leaf and the lit space beyond it; the MANUAL BYPASS gearbox) were repainted the same way on October 16, 2026, replacing the earlier room plates and door atlases:
+  - Python scripts drew each door's exact shapes from real door hardware in the game's own camera, and each room plate's guide from the earlier plates;
+  - the Codex built-in image generation tool in edit mode painted over those guides, one sheet per group, and scripts cut out and cleaned up each piece;
+  - the status lamps, door lights and exit signs are drawn by the game; the exit sign is the ISO 7010 E001 running figure (designed by Yukio Ota), with no words;
   - Nathanial Henniges approved the set on October 16, 2026.
 - **The station props** (the corridor's purge display and breaker, the MANUAL BYPASS handwheel, and in the Service Junction the OVERLOAD BREAKER, VALVE, RELIEF VENT, tank arm, coolant tank, TANK RELEASE and EXIT BOLT panels; in Records Access the PURGE QUEUE, MIRROR PORT and security container) were repainted the same way on October 16, 2026, one whole image per machine:
   - the purge display, PURGE QUEUE, MIRROR PORT, tank arm and EXIT BOLT panel are drawn at their real sizes, smaller than before;
