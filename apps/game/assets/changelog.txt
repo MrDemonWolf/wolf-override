@@ -169,6 +169,7 @@ Changes merged after 0.15.0. They become the next version when it is cut.
 - The Portuguese gender check knows *teclado*, *lado*, *líquido* and *dados* are nouns, and the test suites' made-up catalogs share one language code that ships no file.
 - The Polish and Russian files are written fresh by Claude with a note on every line, back-translated by Codex and passed through every translation check.
 - A new translation check binds Polish and Russian one-letter words such as *w* and *в* to the next word, so none is left at a row's end.
+- An independent review's fixes for Polish and Russian: WOLF's relay lines say what the English says, the Russian breaker switches on instead of tripping, and the spent plates read as used up.
 - The Russian checks keep names, tools, web addresses and key labels in Latin letters, skip the credits' formatting tags, and know *сначала*, *зеркала*, *завал* and *отмена* are not past tenses.
 
 -- How it was checked --
