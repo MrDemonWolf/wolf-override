@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: WOLF OVERRIDE\n"
-"PO-Revision-Date: 2026-10-19 23:25+0000\n"
+"PO-Revision-Date: 2026-10-19 23:36+0000\n"
 "Last-Translator: Claude (Anthropic), machine translation, unreviewed\n"
 "Language-Team: none\n"
 "MIME-Version: 1.0\n"
@@ -2871,7 +2871,7 @@ msgstr "下がってて。タイミングはこっちで計る。"
 #. i18n: story speaker=WOLF engineer=you
 #: scripts/story_text.gd:163
 msgid "You told me the truth at the relay. I'll draw it onto the mark and keep clear of the tank. Drop it when it stops."
-msgstr "リレーで本当のことを話してくれた。あいつをマークへ誘い込んで、タンクからは離れておく。止まったら落とせ。"
+msgstr "リレーで本当のことを話してくれた。俺があいつをマークへ誘い込んで、タンクからは離れておく。止まったら落とせ。"
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: WOLF to the engineer, who pressed him at the relay without warning. Avoid a form that shows the engineer's gender ("you'd have sent me"): rephrase.
@@ -3040,7 +3040,7 @@ msgid ""
 "The sentry ran %s down. Once its\n"
 "eyes go red, only the rubble is safe."
 msgstr ""
-"セントリーが%sを追い詰めた。目が赤くなったら、\n"
+"セントリーが%sに追いついた。目が赤くなったら、\n"
 "安全なのはがれきの陰だけ。"
 
 # machine-translated by Claude (Anthropic), unreviewed

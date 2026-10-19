@@ -3,7 +3,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: WOLF OVERRIDE\n"
-"PO-Revision-Date: 2026-10-19 23:30+0000\n"
+"PO-Revision-Date: 2026-10-19 23:36+0000\n"
 "Last-Translator: Claude (Anthropic), machine translation, unreviewed\n"
 "Language-Team: none\n"
 "MIME-Version: 1.0\n"
@@ -846,11 +846,11 @@ msgid "Section"
 msgstr "章節符號"
 
 # machine-translated by Claude (Anthropic), unreviewed
-#. TRANSLATORS: Settings' small top line (13 px). The Den is the settings terminal's name: a wolf's den. THE DEN is translated by meaning: 巢穴, a wolf's den. Taiwan usage after the OpenCC conversion: local configuration: 本機設定.
+#. TRANSLATORS: Settings' small top line (13 px). The Den is the settings terminal's name: a wolf's den. THE DEN is translated by meaning: 狼穴, a wolf's den. Taiwan usage after the OpenCC conversion: local configuration: 本機設定.
 #. i18n: speaker=ui
 #: scripts/game_settings.gd:253
 msgid "THE DEN  /  LOCAL CONFIGURATION"
-msgstr "巢穴  /  本機設定"
+msgstr "狼穴  /  本機設定"
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: Settings tab.
