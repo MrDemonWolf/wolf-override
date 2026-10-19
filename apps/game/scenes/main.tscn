@@ -32,7 +32,7 @@ size = Vector2(56, 132)
 size = Vector2(28, 60)
 
 [sub_resource type="RectangleShape2D" id="WolfShape"]
-size = Vector2(62, 34)
+size = Vector2(44, 34)
 
 [sub_resource type="ShaderMaterial" id="GradeMaterial"]
 shader = ExtResource("16_grade")
@@ -118,7 +118,7 @@ horizontal_alignment = 1
 text = "ROWAN"
 
 [node name="Wolf" type="CharacterBody2D" parent="."]
-position = Vector2(72, 423)
+position = Vector2(95, 423)
 collision_mask = 2
 script = ExtResource("2_actor")
 actor_id = &"wolf"
@@ -129,16 +129,16 @@ shape = SubResource("WolfShape")
 [node name="BodySprite" type="Sprite2D" parent="Wolf"]
 texture_filter = 4
 material = SubResource("SharpSpriteMaterial")
-position = Vector2(0, -14.5)
-scale = Vector2(0.1089, 0.1089)
+position = Vector2(0, -5.5269)
+scale = Vector2(0.0762, 0.0762)
 texture = ExtResource("4_wolf")
 
 [node name="Tag" type="Label" parent="Wolf"]
 visible = false
 offset_left = -44.0
-offset_top = -74.0
+offset_top = -56.0
 offset_right = 44.0
-offset_bottom = -52.0
+offset_bottom = -34.0
 horizontal_alignment = 1
 text = "WOLF"
 
