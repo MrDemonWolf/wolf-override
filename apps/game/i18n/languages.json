@@ -38,7 +38,7 @@
    "pronouns": "\\b(?:on|ona|jego|jej|go|ją|mu|niej|nim|niego|nią|niemu)\\b"
   },
   "spanish": {
-   "forms": "^(?!(?:cada|nada|vida|salida|partida|entrada|llegada|puerta|puertas|puerto|alerta|alertas|cierto|cierta|descubierto)$)(?:\\w+(?:ad|id|ert)[oa]s?|sol[oa]s?|list[oa]s?|segur[oa]s?|viv[oa]s?|nuev[oa]s?|content[oa]s?|quiet[oa]s?|ingenier[oa]s?|técnic[oa]s?|mecánic[oa]s?)$",
+   "forms": "^(?!(?:cada|nada|vida|salida|partida|entrada|llegada|puerta|puertas|puerto|alerta|alertas|cierto|cierta|descubierto|teclado|teclados)$)(?:\\w+(?:ad|id|ert)[oa]s?|sol[oa]s?|list[oa]s?|segur[oa]s?|viv[oa]s?|nuev[oa]s?|content[oa]s?|quiet[oa]s?|ingenier[oa]s?|técnic[oa]s?|mecánic[oa]s?)$",
    "you": "\\b(?:tú|te|ti|contigo|usted)\\b",
    "first_person": "\\byo\\b",
    "pronouns": "\\b(?:él|ella)\\b"

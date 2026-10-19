@@ -1297,6 +1297,10 @@ SELFTEST = [
     ("gender", "es", "", "%s, el nuevo técnico, revisa el panel.", False, ""),
     ("gender", "es", "", "WOLF: ¿Estás cansada?", False, "you"),
     ("gender", "es", "", "%s abre la puerta de salida.", True, ""),
+    # "teclado" (keyboard) ends like a participle; the rule's exception list keeps it clear (PR L9's
+    # TOGGLE HOLDS tooltip), while an agreeing participle in the same clause still fails.
+    ("gender", "es", "", "Presiona una vez. Teclado, control y pantalla táctil.", True, "you"),
+    ("gender", "es", "", "Teclado listo y conectada.", False, "you"),
     ("gender", "pt_BR", "", "%s está morta.", False, ""),
     ("gender", "pt_BR", "", "%s está morto.", False, ""),
     ("gender", "pt_BR", "", "WOLF: Você está certa.", False, "you"),
