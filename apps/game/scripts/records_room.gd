@@ -91,8 +91,6 @@ const CONTAINER_SPAN: Vector2 = Vector2(776.0, 807.0)
 ## backcheck or 80 degrees, so 90 degrees takes this long. The entry's closer brings its leaf shut
 ## behind the engineer a moment after they come in (SwingLeaf.close_behind's timing).
 const EXIT_SWING_SECONDS: float = 3.5
-## The source row where the mid plate's walkway (its pillar and machine bases) meets the floor.
-const WALKWAY_Y: float = 742.0
 ## Each station is one whole piece at its real size (the art set's PIECES.md section 5c), its base on
 ## the floor: the PURGE QUEUE 447 x 442 px at 6.135 px per world px (72.9 x 72 world px, 1.82 x 1.80 m;
 ## it was drawn 2.8 m tall) and the MIRROR PORT, a 42U equipment rack, 352 x 443 px at 5.54 px per world
@@ -191,7 +189,6 @@ func _ready() -> void:
 	depth.painting = RECORDS_FAR
 	depth.mid_painting = RECORDS_MID
 	depth.near_painting = RECORDS_NEAR
-	depth.walkway_y = WALKWAY_Y
 	depth.base_color = Color("#071221")
 	depth.lamps = lamps
 	depth.shaft_lamps = PackedInt32Array([1, 2])

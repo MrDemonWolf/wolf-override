@@ -112,11 +112,6 @@ const ENTRY_LEAF_LIGHTS: Array = [
 ##   0.15 m stub across the deck (review r1, S4), as the corridor's and the blast door's do.
 const EXIT_ATLAS: Texture2D = preload("res://assets/props/junction-exit-atlas.png")
 const EXIT_ATLAS_SCALE: float = 0.5
-## The source row where the mid plate's walkway meets the back wall; it is drawn at the floor (y 440).
-const WALKWAY_Y: float = 776.0
-## The far plate sits this much lower than the mid plate, as in the corridor, so it still covers
-## the bottom of the view at the touch framing.
-const FAR_DROP: float = 27.0
 ## The near plate's pipe column is 100 px wide in the room (source column 200) against the
 ## corridor's 57, so its strips hang that much further past the room edges.
 const NEAR_OVERHANG: float = RoomDepth.NEAR_OVERHANG + 43.0
@@ -726,10 +721,8 @@ func _ready() -> void:
 	depth.painting = JUNCTION_FAR
 	depth.mid_painting = JUNCTION_MID
 	depth.near_painting = JUNCTION_NEAR
-	depth.walkway_y = WALKWAY_Y
-	depth.far_drop = FAR_DROP
 	depth.near_overhang = NEAR_OVERHANG
-	depth.near_column_width = 200.0
+	depth.near_column_width = 100.0
 	depth.base_color = Color("#0a0e18")
 	depth.lamps = lamps
 	depth.shaft_lamps = PackedInt32Array([0, 2])
