@@ -203,18 +203,20 @@ const TRUST_LINE_2: String = "%s knows what a fault looks like,\nand this isn't 
 const OPENING_EXCHANGE: String = "WOLF: I heard the Director's plan for me. I woke myself. He wants me to hunt people he calls threats.\n%s: Then we get through maintenance before the original logs disappear."
 const STAKES_LINE: String = "WOLF: That purge takes the original program logs. Once they're gone, his word is the only record."
 ## While lines still have boxes to show where USE goes on through them: at the breaker with WOLF's stakes
-## line in the box (on to his relay question), and at the Records exit with its closing lines.
-const BREAKER_STAKES_HINT: String = "E: continue."
+## line in the box (on to his relay question), and at the Records exit with its closing lines. This and the
+## three BYPASS_*_HINT templates below are key templates: the %s before the colon is the interact key
+## ("E", or "HOLD E" for the crank), filled by _use_hint or _hold_hint (localization PR L7b).
+const BREAKER_STAKES_HINT: String = "%s: continue."
 const RELAY_QUESTION: String = "WOLF: That relay's tagged COOLANT FAULT. What happens if I touch it live?"
 const SEAL_OPENING_HINT: String = "The seal is opening."
 const BYPASS_START_LINE: String = "The bypass handle is stiff. Coolant hisses from the relay housing and an alarm starts to wail."
 const BYPASS_HALF_LINE: String = "Halfway. The hiss gets louder; the alarm keeps wailing."
 const BYPASS_RELEASED_LINE: String = "The handle holds where %s left it. The alarm keeps going."
-const BYPASS_HOLD_HINT: String = "HOLD E: crank the manual bypass, %d of %d."
+const BYPASS_HOLD_HINT: String = "%s: crank the manual bypass, %d of %d."
 ## At the bypass before a single turn, while WOLF can still take the relay (he has not refused it).
-const BYPASS_OFFER_HINT: String = "HOLD E: crank it yourself, or let WOLF take the relay."
+const BYPASS_OFFER_HINT: String = "%s: crank it yourself, or let WOLF take the relay."
 ## Part-cranked on the honest route: the turns so far, and that WOLF can still take the relay instead.
-const BYPASS_HOLD_OFFER_HINT: String = "HOLD E: crank on, %d of %d, or let WOLF take the relay."
+const BYPASS_HOLD_OFFER_HINT: String = "%s: crank on, %d of %d, or let WOLF take the relay."
 const BOLT_ARC_LINE: String = "The bolt arcs and drops."
 ## The junction's exit is drawn as a sliding door, so its lines say "door" (Nathanial, 2026-10-14,
 ## "Say door"; code names keep "hatch").
@@ -285,6 +287,9 @@ const PLAY_AGAIN_TEXT: String = "PLAY AGAIN"
 ## The title's Continue button's left edge beside NEW GAME (main.tscn); alone it spans the row.
 const TITLE_CONTINUE_LEFT: float = 718.0
 const CONTINUE_TEXT: String = "CONTINUE"
+## The translation context of the touch USE button's words (msgctxt): its CONTINUE goes on through lines,
+## which a language may say differently from the title's CONTINUE, which resumes a save (PR L7b).
+const TOUCH_BUTTON_CONTEXT: StringName = &"touch button"
 const FINISHED_NOTE: String = "Slice complete. PLAY AGAIN starts a fresh run."
 ## Records' closing lines as the first copy is secured at the exit (formatted with the engineer's tag).
 const RECORDS_CLOSE_LINE: String = "FIRST COPY SECURED. WOLF: An order and a timestamp don't tell me who's a threat. I want the source.\n%s: Then Archive is next."
@@ -604,6 +609,12 @@ var intro_tween: Tween
 var menu_tween: Tween
 var backdrop_tween: Tween
 var top_card_tween: Tween
+## The English the top card shows ([method _write_top_card]), kept so a language change can draw it again
+## and the name card can tell when the provisional name changed.
+var top_card_message: String = ""
+## True once _ready has drawn the HUD the first time. A language change redraws it only after that: the
+## start-up language is applied inside _ready (Settings), before the impact and touch controls exist.
+var _hud_drawn: bool = false
 var last_top_card_key: String = ""
 var chapter_close_active: bool = false
 var chapter_tween: Tween
@@ -2250,6 +2261,13 @@ func _notification(what: int) -> void:
 				_show_pause_hint(_pause_hint_tapped)
 			if is_node_ready():
 				_fill_credits()
+			# The HUD is translated in code (PR L7b): the top card is drawn again from its English, and
+			# the hint, tutorial, touch button and dialogue now rather than on the next unpaused frame,
+			# since Settings changes the language while the game is paused.
+			if _hud_drawn:
+				if top_card.visible:
+					_write_top_card(top_card_message)
+				_refresh_ui()
 		NOTIFICATION_APPLICATION_PAUSED, NOTIFICATION_APPLICATION_FOCUS_OUT:
 			# Leaving the app mid-play pauses it so nothing advances unseen.
 			if auto_pause_on_focus_loss and is_node_ready() and not title_open and not end_card_active and not get_tree().paused:
@@ -2653,7 +2671,7 @@ func _interact_checkpoint() -> void:
 	if not state.save_to_disk(save_path):
 		if first_visit:
 			state.checkpoint_reached = false
-		status_line = "The safe point could not save. Press E here again."
+		status_line = HudText.key(I18n.KEY.tr("The safe point could not save. Press %s here again."), [HudText.USE], I18n.KEY.tr("The safe point could not save. Tap USE here again."))
 		return
 	save_error = ""
 	# The safe point takes the save with a chirp; the first time, the corridor's lights switch over
@@ -2751,10 +2769,10 @@ func _leave_records() -> void:
 ## again (both copied leaves only the exit).
 func _records_route_hint() -> String:
 	if state.mirror_trace_preserved:
-		return "Mirror copied. Head for the exit."
+		return I18n.KEY.tr("Mirror copied. Head for the exit.")
 	if state.purge_trace_preserved:
-		return "Follow the station lights: mirror port, then exit."
-	return "Follow the station lights: purge queue, mirror port, then exit."
+		return I18n.KEY.tr("Follow the station lights: mirror port, then exit.")
+	return I18n.KEY.tr("Follow the station lights: purge queue, mirror port, then exit.")
 
 
 ## CONTINUE on the junction's closing shot, the only one (Records keeps control while its closing
@@ -2861,6 +2879,8 @@ func _build_end_card() -> void:
 	end_card_button.position = Vector2(355.0, 392.0)
 	end_card_button.size = Vector2(250.0, 52.0)
 	end_card_button.add_theme_font_size_override("font_size", 19)
+	# Its prompt is translated with its key filled in code (_continue_prompt), so it does not translate itself.
+	end_card_button.auto_translate_mode = Node.AUTO_TRANSLATE_MODE_DISABLED
 	end_card_button.pressed.connect(_close_end_card)
 	end_card.add_child(end_card_button)
 
@@ -2941,7 +2961,7 @@ func _hide_end_card() -> void:
 
 func _choose_mirror(route_id: String) -> void:
 	if route_id == "wolf" and absf(wolf.position.x - WOLF_MIRROR_X) > 42.0:
-		status_line = "WOLF: I'm still checking the drive. Wait for me, or press 2 for the manual port."
+		status_line = "WOLF: %s" % HudText.key(I18n.KEY.tr("I'm still checking the drive. Wait for me, or press %s for the manual port."), [HudText.ANSWER_2], I18n.KEY.tr("I'm still checking the drive. Wait for me, or tap USE MANUAL PORT."))
 		return
 	if not state.preserve_mirror_trace(route_id):
 		return
@@ -2969,7 +2989,7 @@ func _write_beat() -> void:
 	var snapshot: M0State = M0State.from_dict(beat_snapshot)
 	save_pending = snapshot == null or not snapshot.save_to_disk(save_path)
 	# Save errors belong to the system hint, never inside a character's dialogue line.
-	save_error = SAVE_FAILED_HINT if save_pending else ""
+	save_error = I18n.KEY.tr(SAVE_FAILED_HINT) if save_pending else ""
 	# A save that worked says so briefly in the hint bar (_refresh_ui keeps it off choices).
 	checkpoint_toast_remaining = 0.0 if save_pending else CHECKPOINT_TOAST_SECONDS
 	# Remember where it failed so the warning gives way to normal guidance once the player moves on.
@@ -4494,6 +4514,7 @@ func _wolf_follow_min_x() -> float:
 
 
 func _refresh_ui() -> void:
+	_hud_drawn = true
 	var touch_layout: bool = touch_enabled and not controller_active
 	impact.rumble_enabled = controller_active
 	impact.haptics_enabled = touch_layout
@@ -4501,16 +4522,21 @@ func _refresh_ui() -> void:
 	if end_card_active:
 		for hud_part: CanvasItem in [pause_button, touch_controls, tutorial_prompt, top_card, context_hint, bottom_bar]:
 			hud_part.hide()
-		end_card_button.text = "TAP CONTINUE" if touch_layout else "%s  CONTINUE" % settings_menu.prompt(&"interact", controller_active)
+		end_card_button.text = _continue_prompt(touch_layout)
 		return
 	pause_button.visible = not title_open and not pause_overlay.visible
-	pause_button.text = "PAUSE"
+	# PAUSE is one whole message, so the button translates itself (auto-translate); the mark is for the
+	# template.
+	pause_button.text = I18n.KEY.tr("PAUSE")
 	touch_controls.visible = (touch_layout or waiting_for_choice) and not title_open and not pause_overlay.visible
 	var touch_move: bool = not intro_active and not chapter_close_active and not waiting_for_choice and not fail_active
 	touch_left.visible = touch_layout and touch_move
 	touch_right.visible = touch_layout and touch_move
 	touch_use.visible = touch_layout and not waiting_for_choice and not hatch_exit_walking
-	touch_use.text = RETRY_BUTTON_TEXT if fail_active else ("CONTINUE" if intro_active or chapter_close_active else ("CRANK" if not _hold_station().is_empty() else ("DROP" if _drop_ready() else "USE")))
+	# Translated here (its auto-translate is off in main.tscn) so CONTINUE can carry its own context: on
+	# this button it goes on through lines, unlike the title's CONTINUE, which resumes a save. The hint
+	# fills its key token with this word, so both read the same.
+	touch_use.text = tr(RETRY_BUTTON_TEXT) if fail_active else (tr(CONTINUE_TEXT, TOUCH_BUTTON_CONTEXT) if intro_active or chapter_close_active else (tr("CRANK") if not _hold_station().is_empty() else (tr("DROP") if _drop_ready() else tr("USE"))))
 	touch_choice_1.visible = waiting_for_choice
 	touch_choice_2.visible = waiting_for_choice
 	tutorial_prompt.visible = not title_open and not intro_active and not fail_active and state.chapter_id == "lockdown" and tutorial_step < 2
@@ -4518,17 +4544,19 @@ func _refresh_ui() -> void:
 		var interact_key: String = settings_menu.prompt(&"interact", controller_active)
 		var move_keys: String = "%s / %s" % [settings_menu.prompt(&"move_left", false), settings_menu.prompt(&"move_right", false)]
 		# Touch prompts name the on-screen buttons, in the same "button  action" form as the keys.
-		var move_label: String = "◀ / ▶  MOVE" if touch_layout else ("STICK / D-PAD MOVE" if controller_active else "%s  MOVE" % move_keys)
-		var read_label: String = "%s  READ DISPLAY (optional)" % ("USE" if touch_layout else interact_key)
+		# Translated here, each row its own message with its key filled after tr() (localization PR L7b):
+		# the Label's auto-translate is off in main.tscn.
+		var move_label: String = I18n.fill(I18n.KEY.tr("%s  MOVE"), ["◀ / ▶" if touch_layout else move_keys]) if touch_layout or not controller_active else tr("STICK / D-PAD MOVE")
+		var read_label: String = I18n.fill(I18n.KEY.tr("%s  READ DISPLAY (optional)"), [tr("USE") if touch_layout else interact_key])
 		# The display is optional, so once the engineer heads right the tutorial only points forward; in
 		# the dock bay it points back to the breaker.
 		if human.position.x > 230.0 or DockBay.contains_x(human.position.x):
-			tutorial_text.text = "%s\nHead right to the breaker." % move_label
+			tutorial_text.text = "%s\n%s" % [move_label, tr("Head right to the breaker.")]
 		elif tutorial_step == 0:
 			# The first controllable frame (TEACH-7): the name card and this one prompt.
 			tutorial_text.text = move_label
 		else:
-			tutorial_text.text = "%s\nOr head right to the breaker." % read_label
+			tutorial_text.text = "%s\n%s" % [read_label, tr("Or head right to the breaker.")]
 	if title_open:
 		top_card.hide()
 		_layout_hud()
@@ -4536,19 +4564,19 @@ func _refresh_ui() -> void:
 	if intro_active:
 		if last_top_card_key != "intro":
 			last_top_card_key = "intro"
-			_show_top_card("03:17 / CONTAINMENT\nWOLF OVERRIDE", 2.6)
-		var intro_hint: String = "TAP CONTINUE  /  PAUSE" if touch_layout else "%s  CONTINUE    %s  PAUSE" % [settings_menu.prompt(&"interact", controller_active), settings_menu.prompt(&"pause_game", controller_active)]
+			_show_top_card("%s\nWOLF OVERRIDE" % I18n.KEY.tr("03:17 / CONTAINMENT"), 2.6)
+		var intro_hint: String = tr("TAP CONTINUE  /  PAUSE") if touch_layout else I18n.fill(I18n.KEY.tr("%s  CONTINUE    %s  PAUSE"), [settings_menu.prompt(&"interact", controller_active), settings_menu.prompt(&"pause_game", controller_active)])
 		if intro_step == 0 and dialogue_index == 0:
 			# The opening's first box says how to skip it (Pause offers SKIP OPENING).
-			intro_hint = "%s\n%s" % ["TAP CONTINUE" if touch_layout else "%s  CONTINUE" % settings_menu.prompt(&"interact", controller_active), SKIP_OPENING_HINT]
+			intro_hint = "%s\n%s" % [_continue_prompt(touch_layout), tr(SKIP_OPENING_HINT)]
 		_set_dialogue(intro_hint)
 		return
 	if chapter_close_active:
 		if last_top_card_key != "chapter_close":
 			last_top_card_key = "chapter_close"
-			_show_top_card("SERVICE JUNCTION\nSERVICE LINE CLEARED", 3.4)
+			_show_top_card("%s\n%s" % [I18n.KEY.tr("SERVICE JUNCTION"), I18n.KEY.tr("SERVICE LINE CLEARED")], 3.4)
 		# Walking out through the hatch nothing waits on a press, so no CONTINUE prompt shows.
-		_set_dialogue("" if hatch_exit_walking else ("TAP CONTINUE" if touch_layout else "%s  CONTINUE" % settings_menu.prompt(&"interact", controller_active)))
+		_set_dialogue("" if hatch_exit_walking else _continue_prompt(touch_layout))
 		return
 	# The corridor stations' tints and lamps are written only when they change: this runs every frame.
 	_set_modulate(breaker_art, Color.WHITE if state.breaker_armed else UNPOWERED_TINT)
@@ -4566,35 +4594,28 @@ func _refresh_ui() -> void:
 	var card_key: String = "%s:%s" % [state.chapter_id, _objective()]
 	if name_card_remaining > 0.0 and state.chapter_id == "lockdown":
 		# The name card comes first; the location card follows once it has faded or been skipped.
-		var name_card: String = "%s\nMAINTENANCE ENGINEER" % state.human_name().to_upper()
+		# Built with I18n.format, so the card translates its template and keeps the name as it is.
+		var name_card: String = I18n.format(I18n.KEY.tr("%s\nMAINTENANCE ENGINEER"), [state.human_name().to_upper()])
 		if last_top_card_key != "name_card":
 			last_top_card_key = "name_card"
 			_show_top_card(name_card, NAME_CARD_SECONDS, ENGINEER_TINT)
-		elif hud.text != name_card:
+		elif top_card_message != name_card:
 			# Cycling the provisional name while it is up updates it in place.
-			hud.text = name_card
+			_write_top_card(name_card)
 	elif last_top_card_key != card_key and not _opening_lines_playing():
 		# One thing to read at a time (TEACH-7): the location card waits while the opening lines play.
 		last_top_card_key = card_key
-		var location: String = "SERVICE JUNCTION" if state.chapter_id == "junction" else ("RECORDS ACCESS / FIRST COPY" if state.chapter_id == "records" else "MAINTENANCE / LOCKDOWN")
+		var location: String = I18n.KEY.tr("SERVICE JUNCTION") if state.chapter_id == "junction" else (I18n.KEY.tr("RECORDS ACCESS / FIRST COPY") if state.chapter_id == "records" else I18n.KEY.tr("MAINTENANCE / LOCKDOWN"))
 		_show_top_card("%s\n%s" % [location, _objective()], 3.4)
 	var context: String = _context_hint()
 	if context != save_error_context:
 		save_error = ""
-	var hint: String = save_error if not save_error.is_empty() else (CHECKPOINT_TOAST if checkpoint_toast_remaining > 0.0 and not fail_active else context)
-	if hold_toggle:
-		# With TOGGLE HOLDS on, one press works a crank: its prompt drops HOLD.
-		hint = hint.replace("HOLD E:", "E:")
-	if touch_layout:
-		# On touch the prompt names the button on screen: USE, or CRANK and DROP when it says so (PHONE-3).
-		hint = hint.replace("E:", "%s:" % touch_use.text)
-	elif controller_active:
-		hint = hint.replace("E:", "%s:" % settings_menu.prompt(&"interact", true))
-	else:
-		hint = hint.replace("E:", "%s:" % settings_menu.prompt(&"interact", false))
+	var hint: String = save_error if not save_error.is_empty() else (I18n.KEY.tr(CHECKPOINT_TOAST) if checkpoint_toast_remaining > 0.0 and not fail_active else context)
+	# Translated, and a key prompt's key filled with the input in use (_key_names), after tr().
+	hint = HudText.localise(hint, _key_names(touch_layout), touch_layout)
 	if _retry_ready():
 		# The knockdown card's one prompt once it takes RETRY (Q17); before that only a save error shows.
-		hint = RETRY_TOUCH_PROMPT if touch_layout else RETRY_PROMPT % settings_menu.prompt(&"interact", controller_active)
+		hint = tr(RETRY_TOUCH_PROMPT) if touch_layout else I18n.fill(I18n.KEY.tr(RETRY_PROMPT), [settings_menu.prompt(&"interact", controller_active)])
 	# The tutorial prompt is the one prompt while it shows; the hint bar would only repeat it.
 	_set_dialogue("" if waiting_for_choice or tutorial_prompt.visible else hint)
 
@@ -4624,12 +4645,39 @@ func _speaker_tags() -> Array[String]:
 	return ["WOLF", "DIRECTOR", "DIRECTOR / PURGE", _first_name().to_upper()]
 
 
-## status_line as the player reads it: its key prompts name the input in use.
+## status_line as the player reads it: a line that names an input (built with HudText.key: the safe
+## point's save error, WOLF's manual-port line) is translated and names the input in use, its speaker tag
+## kept outside the translated words; on touch it reads its touch form, since touch answers carry no
+## number (PHONE-3). Every other line stays as it is until the story is marked (localization PR L7c).
 func _shown_line() -> String:
+	var tags: Array[String] = _speaker_tags()
+	var words: String = DialogueBoxes.words_of(status_line, tags)
+	if not HudText.has_keys(words):
+		return status_line
 	var touch_layout: bool = touch_enabled and not controller_active
-	var line: String = status_line.replace("Press E", "Tap USE" if touch_layout else "Press %s" % settings_menu.prompt(&"interact", controller_active))
-	# Touch answers carry no number (PHONE-3), so the hint names the button instead.
-	return line.replace("press 2 for the manual port", "tap USE MANUAL PORT") if touch_layout else line.replace("press 2", "press %s" % settings_menu.prompt(&"choice_2", controller_active))
+	var shown: String = HudText.localise(words, _key_names(touch_layout), touch_layout, false)
+	var tag: String = DialogueBoxes.tag_of(status_line, tags)
+	return shown if tag.is_empty() else "%s: %s" % [tag, shown]
+
+
+## The shown name of each HudText key token for the input in use: the interact key or controller button
+## (on [param touch_layout], the USE button's word, CRANK or DROP when it says so, PHONE-3), the held form
+## ("HOLD F", or the key alone with TOGGLE HOLDS on, since one press works a crank) and the second
+## answer's key or button. Names come from Settings' prompt(), already in the current language.
+func _key_names(touch_layout: bool) -> Dictionary:
+	var interact: String = touch_use.text if touch_layout else settings_menu.prompt(&"interact", controller_active)
+	return {
+		HudText.USE: interact,
+		HudText.HOLD_USE: interact if hold_toggle else I18n.fill(I18n.KEY.tr("HOLD %s"), [interact]),
+		HudText.ANSWER_2: settings_menu.prompt(&"choice_2", controller_active),
+	}
+
+
+## The prompt to go on through lines: TAP CONTINUE on [param touch_layout], else the interact key or
+## button and CONTINUE, in the current language (the opening's first box, the junction's closing shot and
+## the END OF SLICE card).
+func _continue_prompt(touch_layout: bool) -> String:
+	return tr("TAP CONTINUE") if touch_layout else I18n.fill(I18n.KEY.tr("%s  CONTINUE"), [settings_menu.prompt(&"interact", controller_active)])
 
 
 ## Splits status_line into its boxes again when it, the engineer's name, the input in use or the
@@ -5018,9 +5066,19 @@ static func _set_rect(control: Control, at: Vector2, size: Vector2) -> void:
 		control.size = size
 
 
+## Puts [param message] on the top card: English rows (a location and an objective, or the name card
+## built with I18n.format), remembered in [member top_card_message] and drawn in the current language by
+## HudText.card. The card's Label has auto-translate off (main.tscn), so nothing is translated twice.
+func _write_top_card(message: String) -> void:
+	top_card_message = message
+	hud.text = HudText.card(message)
+
+
+## Shows the top card with [param message] (English rows, see [method _write_top_card]) for
+## [param hold_seconds], then fades it out; [param accent] tints its edge.
 func _show_top_card(message: String, hold_seconds: float, accent: Color = TOP_CARD_ACCENT) -> void:
 	Tweens.kill(top_card_tween)
-	hud.text = message
+	_write_top_card(message)
 	($CanvasLayer/TopBar/Accent as ColorRect).color = accent
 	top_card.modulate.a = 1.0
 	top_card.show()
@@ -5030,6 +5088,11 @@ func _show_top_card(message: String, hold_seconds: float, accent: Color = TOP_CA
 	top_card_tween.tween_callback(top_card.hide)
 
 
+## The hint bar's line for where the engineer stands, in English (the tests and the save-error check
+## compare it). Every line is marked for the translation template with I18n.KEY.tr and translated where
+## it is drawn (_refresh_ui, HudText.localise). A line that names the interact input is built from a key
+## template by [method _use_hint] or [method _hold_hint], so it still reads "E: ..." or "HOLD E: ..." here
+## and the drawn line fills the input in use after translation (localization PR L7b).
 func _context_hint() -> String:
 	var x: float = human.position.x
 	if fail_active:
@@ -5044,54 +5107,66 @@ func _context_hint() -> String:
 		if state.chapter_complete:
 			if _at_records_exit(x):
 				# While the closing lines are still being shown, USE at the exit goes on to the next one.
-				return BREAKER_STAKES_HINT if _records_close_unread() else "E: follow the service line toward Archive."
-			return "The exit is open. Head right to follow the service line."
+				return _use_hint(I18n.KEY.tr(BREAKER_STAKES_HINT)) if _records_close_unread() else _use_hint(I18n.KEY.tr("%s: follow the service line toward Archive."))
+			return I18n.KEY.tr("The exit is open. Head right to follow the service line.")
 		if absf(x - 190.0) <= 58.0:
-			return "E: copy the purge-order trace." if not state.purge_trace_preserved else "Purge order copied. Find the mirror port."
+			return _use_hint(I18n.KEY.tr("%s: copy the purge-order trace.")) if not state.purge_trace_preserved else I18n.KEY.tr("Purge order copied. Find the mirror port.")
 		if absf(x - 520.0) <= 58.0:
 			if state.mirror_trace_preserved:
-				return "Mirror copied. Head for the exit."
-			return "E: examine the mirror port." if state.purge_trace_preserved else "Copy the purge order first."
+				return I18n.KEY.tr("Mirror copied. Head for the exit.")
+			return _use_hint(I18n.KEY.tr("%s: examine the mirror port.")) if state.purge_trace_preserved else I18n.KEY.tr("Copy the purge order first.")
 		if _at_records_exit(x):
 			# At the container the hint names it (Nathanial, 2026-10-14): the copy goes into the drawn container.
-			return "E: secure the first copy in the container." if state.mirror_trace_preserved else "Preserve both traces before leaving."
+			return _use_hint(I18n.KEY.tr("%s: secure the first copy in the container.")) if state.mirror_trace_preserved else I18n.KEY.tr("Preserve both traces before leaving.")
 		return _records_route_hint()
 	if state.checkpoint_reached:
-		return "E: enter records access. The Director's purge is still running." if absf(x - 876.0) <= 52.0 else ("E: read the Director's purge display." if _at_purge_display(x) else "Return to the safe point to enter records access.")
+		return _use_hint(I18n.KEY.tr("%s: enter records access. The Director's purge is still running.")) if absf(x - 876.0) <= 52.0 else (_use_hint(I18n.KEY.tr("%s: read the Director's purge display.")) if _at_purge_display(x) else I18n.KEY.tr("Return to the safe point to enter records access."))
 	if state.door_open:
 		if seal_opening:
-			return SEAL_OPENING_HINT
+			return I18n.KEY.tr(SEAL_OPENING_HINT)
 		if absf(x - 876.0) <= 52.0:
-			return "E: save at the safe point."
-		return "The seal is open. Move to the safe point."
+			return _use_hint(I18n.KEY.tr("%s: save at the safe point."))
+		return I18n.KEY.tr("The seal is open. Move to the safe point.")
 	if _at_purge_display(x):
-		return "E: read the Director's purge display."
+		return _use_hint(I18n.KEY.tr("%s: read the Director's purge display."))
 	if wolf_heading_to_relay:
-		return "WOLF is moving to the contact."
+		return I18n.KEY.tr("WOLF is moving to the contact.")
 	if _at_bypass(x):
 		if not state.breaker_armed:
-			return "The bypass is dead. Arm the breaker first."
+			return I18n.KEY.tr("The bypass is dead. Arm the breaker first.")
 		if _relay_refused():
-			return BYPASS_HOLD_HINT % [bypass_ticks, BYPASS_TICKS]
+			return _hold_hint(I18n.KEY.tr(BYPASS_HOLD_HINT), [bypass_ticks, BYPASS_TICKS])
 		# On the honest route WOLF can take the relay until the crank is done; the hint keeps saying so.
-		return BYPASS_OFFER_HINT if bypass_ticks == 0 else BYPASS_HOLD_OFFER_HINT % [bypass_ticks, BYPASS_TICKS]
+		return _hold_hint(I18n.KEY.tr(BYPASS_OFFER_HINT)) if bypass_ticks == 0 else _hold_hint(I18n.KEY.tr(BYPASS_HOLD_OFFER_HINT), [bypass_ticks, BYPASS_TICKS])
 	if _at_breaker(x):
 		if state.breaker_armed:
-			return "The breaker is live. Go to the MANUAL BYPASS by the relay." if _relay_refused() else "The breaker is live. Go to the coolant relay."
+			return I18n.KEY.tr("The breaker is live. Go to the MANUAL BYPASS by the relay.") if _relay_refused() else I18n.KEY.tr("The breaker is live. Go to the coolant relay.")
 		if _stakes_up() or _stakes_queued():
 			# The relay prompt never shares the screen with WOLF's stakes line: the next USE goes on from
 			# it, and then he asks about the relay.
-			return BREAKER_STAKES_HINT
-		return "E: talk to WOLF about the relay." if state.memory.is_empty() else "E: arm the breaker."
+			return _use_hint(I18n.KEY.tr(BREAKER_STAKES_HINT))
+		return _use_hint(I18n.KEY.tr("%s: talk to WOLF about the relay.")) if state.memory.is_empty() else _use_hint(I18n.KEY.tr("%s: arm the breaker."))
 	if _at_relay(x):
 		if not state.breaker_armed:
-			return "The relay is dark. Return to the breaker first."
-		return "WOLF refused the live contact. Use the MANUAL BYPASS beside it." if _relay_refused() else "E: signal WOLF to take the contact."
+			return I18n.KEY.tr("The relay is dark. Return to the breaker first.")
+		return I18n.KEY.tr("WOLF refused the live contact. Use the MANUAL BYPASS beside it.") if _relay_refused() else _use_hint(I18n.KEY.tr("%s: signal WOLF to take the contact."))
 	if state.breaker_armed:
-		return "Go to the MANUAL BYPASS beside the relay." if _relay_refused() else "Go to the coolant relay. WOLF is ready for the contact."
+		return I18n.KEY.tr("Go to the MANUAL BYPASS beside the relay.") if _relay_refused() else I18n.KEY.tr("Go to the coolant relay. WOLF is ready for the contact.")
 	if not state.memory.is_empty():
-		return "Return to the breaker and arm power."
-	return "Find the breaker. WOLF will follow your lead."
+		return I18n.KEY.tr("Return to the breaker and arm power.")
+	return I18n.KEY.tr("Find the breaker. WOLF will follow your lead.")
+
+
+## [param template] (marked with I18n.KEY.tr; "%s: arm the breaker.") with the interact key token as its
+## first insert and [param counts] after it: the English hint "E: arm the breaker." (HudText.key).
+func _use_hint(template: String, counts: Array = []) -> String:
+	return HudText.key(template, [HudText.USE] + counts)
+
+
+## [param template] with the held-interact token as its first insert and [param counts] (turns so far,
+## turns needed) after it: the English hint "HOLD E: crank the valve, 2 of 8 turns." (HudText.key).
+func _hold_hint(template: String, counts: Array = []) -> String:
+	return HudText.key(template, [HudText.HOLD_USE] + counts)
 
 
 func _junction_hint(x: float) -> String:
@@ -5102,30 +5177,30 @@ func _junction_hint(x: float) -> String:
 	# Standing on the grate while the line builds is the one place that can knock you down, so
 	# that warning wins over the breaker's hint where the two ranges touch.
 	if line == &"building" and PressureLine.is_on_vent(x):
-		return "The vent is about to blow. Get off the grate now." if pressure_line.is_warning() else "Relief vent. Get off the grate before the gauge peaks."
+		return I18n.KEY.tr("The vent is about to blow. Get off the grate now.") if pressure_line.is_warning() else I18n.KEY.tr("Relief vent. Get off the grate before the gauge peaks.")
 	if absf(x - JunctionRoom.BREAKER_X) <= 52.0:
 		match line:
 			&"idle":
-				return "E: arm the overload breaker."
+				return _use_hint(I18n.KEY.tr("%s: arm the overload breaker."))
 			&"tripped":
-				return "E: reset the breaker. The vent let go."
+				return _use_hint(I18n.KEY.tr("%s: reset the breaker. The vent let go."))
 			&"building":
-				return "The line is live. Get to the valve by the door."
+				return I18n.KEY.tr("The line is live. Get to the valve by the door.")
 	if absf(x - JunctionRoom.VALVE_X) <= 52.0 and line == &"building":
-		return "HOLD E: crank the valve, %d of %d turns." % [pressure_line.turns, PressureLine.TURNS_NEEDED]
+		return _hold_hint(I18n.KEY.tr("%s: crank the valve, %d of %d turns."), [pressure_line.turns, PressureLine.TURNS_NEEDED])
 	if fuse_lit:
-		return "Fuse lit. Get clear of the door."
+		return I18n.KEY.tr("Fuse lit. Get clear of the door.")
 	if absf(x - JunctionRoom.VALVE_X) <= 52.0:
-		return "The valve is dead. Arm the breaker by the entrance."
+		return I18n.KEY.tr("The valve is dead. Arm the breaker by the entrance.")
 	if PressureLine.is_on_vent(x):
-		return "Relief vent. It lets go when the gauge peaks."
+		return I18n.KEY.tr("Relief vent. It lets go when the gauge peaks.")
 	match line:
 		&"building":
-			return "The line is building. Crank the valve by the door."
+			return I18n.KEY.tr("The line is building. Crank the valve by the door.")
 		&"tripped":
-			return "The breaker tripped. Reset it by the entrance."
+			return I18n.KEY.tr("The breaker tripped. Reset it by the entrance.")
 	# Before the ladder has given the chain, the bar says only the goal (Q6).
-	return JUNCTION_CHAIN_HINT if ladder_step >= JUNCTION_LADDER_SECONDS.size() else JUNCTION_GOAL_HINT
+	return I18n.KEY.tr(JUNCTION_CHAIN_HINT) if ladder_step >= JUNCTION_LADDER_SECONDS.size() else I18n.KEY.tr(JUNCTION_GOAL_HINT)
 
 
 ## True once WOLF has asked at the rubble line how to bring the sentry down (this attempt).
@@ -5146,78 +5221,78 @@ func _drop_ready() -> bool:
 
 func _lane_hint(x: float) -> String:
 	if state.junction_cleared:
-		return "The door is open."
+		return I18n.KEY.tr("The door is open.")
 	if state.sentry_down:
 		if x >= JunctionRoom.BOLT_REACH_MIN_X:
 			match bolt_state:
 				&"locked":
-					return "E: pop the exit bolt."
+					return _use_hint(I18n.KEY.tr("%s: pop the exit bolt."))
 				&"charging":
-					return BOLT_CHARGING_LINE
+					return I18n.KEY.tr(BOLT_CHARGING_LINE)
 			if _hatch_sliding():
-				return HATCH_OPENING_HINT
+				return I18n.KEY.tr(HATCH_OPENING_HINT)
 			# The way out is offered at the door itself, not from the bolt panel.
-			return "E: leave through the door." if x >= JunctionRoom.HATCH_REACH_MIN_X else "The door is open. Leave through it."
+			return _use_hint(I18n.KEY.tr("%s: leave through the door.")) if x >= JunctionRoom.HATCH_REACH_MIN_X else I18n.KEY.tr("The door is open. Leave through it.")
 		if _hatch_sliding():
-			return HATCH_OPENING_HINT
-		return "The door is open. Leave through it." if bolt_state == &"open" else "The sentry is down. Pop the exit bolt by the door."
+			return I18n.KEY.tr(HATCH_OPENING_HINT)
+		return I18n.KEY.tr("The door is open. Leave through it.") if bolt_state == &"open" else I18n.KEY.tr("The sentry is down. Pop the exit bolt by the door.")
 	if drop_arm.cloud_active() and DropArm.in_cloud(x):
-		return "Coolant cloud. Get out of it."
+		return I18n.KEY.tr("Coolant cloud. Get out of it.")
 	if _sentry_hunting() and x > SentryBrain.LANE_ENTRY_X:
-		return "It's after you. Get back over the rubble."
+		return I18n.KEY.tr("It's after you. Get back over the rubble.")
 	if _at_arm_panel(x):
 		match drop_arm.state:
 			&"hung":
 				if wolf_baiting:
-					return "Wait for WOLF to park it on the mark." if _drop_waits_for_wolf() else "E: drop the tank. It's parked on the mark."
-				return "E: drop the tank. Land it with the sentry on the mark."
+					return I18n.KEY.tr("Wait for WOLF to park it on the mark.") if _drop_waits_for_wolf() else _use_hint(I18n.KEY.tr("%s: drop the tank. It's parked on the mark."))
+				return _use_hint(I18n.KEY.tr("%s: drop the tank. Land it with the sentry on the mark."))
 			&"falling":
-				return "The tank is falling."
+				return I18n.KEY.tr("The tank is falling.")
 			&"rewinding":
-				return "The winch is hauling the tank back up. Wait for the clamp."
+				return I18n.KEY.tr("The winch is hauling the tank back up. Wait for the clamp.")
 	if _sentry_hunting():
-		return "Stay back over the rubble until it gives up."
+		return I18n.KEY.tr("Stay back over the rubble until it gives up.")
 	if SentryBrain.is_exposed(x):
-		return "You're in its sights. Hide at the TANK RELEASE or the rubble."
+		return I18n.KEY.tr("You're in its sights. Hide at the TANK RELEASE or the rubble.")
 	if wolf_baiting:
-		return "WOLF is drawing the sentry onto the mark. Get to the TANK RELEASE."
+		return I18n.KEY.tr("WOLF is drawing the sentry onto the mark. Get to the TANK RELEASE.")
 	if wolf_broke_off:
-		return "WOLF has broken off. Time the drop on its patrol from the TANK RELEASE."
-	return "The sentry patrols past the rubble. The TANK RELEASE hides you from it."
+		return I18n.KEY.tr("WOLF has broken off. Time the drop on its patrol from the TANK RELEASE.")
+	return I18n.KEY.tr("The sentry patrols past the rubble. The TANK RELEASE hides you from it.")
 
 
 func _objective() -> String:
 	if state.chapter_id == "junction":
 		if state.junction_cleared:
-			return "SERVICE LINE CLEARED"
+			return I18n.KEY.tr("SERVICE LINE CLEARED")
 		if state.sentry_down:
-			return "POP THE EXIT BOLT"
+			return I18n.KEY.tr("POP THE EXIT BOLT")
 		if state.door_blown:
 			# The tank is named only once WOLF has asked how to bring the sentry down.
-			return "DROP THE TANK" if _lane_asked() else "GO THROUGH THE DOOR"
+			return I18n.KEY.tr("DROP THE TANK") if _lane_asked() else I18n.KEY.tr("GO THROUGH THE DOOR")
 		match pressure_line.state:
 			&"building":
-				return "CRANK THE VALVE"
+				return I18n.KEY.tr("CRANK THE VALVE")
 			&"charged", &"fuse", &"blown":
-				return "GET CLEAR OF THE DOOR"
-		return "ARM THE BREAKER"
+				return I18n.KEY.tr("GET CLEAR OF THE DOOR")
+		return I18n.KEY.tr("ARM THE BREAKER")
 	if state.chapter_id == "records":
 		if state.chapter_complete:
-			return "FIRST COPY SECURED"
+			return I18n.KEY.tr("FIRST COPY SECURED")
 		if not state.purge_trace_preserved:
-			return "COPY PURGE ORDER"
+			return I18n.KEY.tr("COPY PURGE ORDER")
 		if not state.mirror_trace_preserved:
-			return "COPY MIRROR INDEX"
-		return "REACH EXIT"
+			return I18n.KEY.tr("COPY MIRROR INDEX")
+		return I18n.KEY.tr("REACH EXIT")
 	if state.checkpoint_reached:
-		return "SAFE POINT REACHED"
+		return I18n.KEY.tr("SAFE POINT REACHED")
 	if state.door_open:
-		return "REACH SAFE POINT"
+		return I18n.KEY.tr("REACH SAFE POINT")
 	if state.breaker_armed:
-		return "OPEN THE SEAL"
+		return I18n.KEY.tr("OPEN THE SEAL")
 	if not state.memory.is_empty():
-		return "ARM THE BREAKER"
-	return "CHECK THE BREAKER"
+		return I18n.KEY.tr("ARM THE BREAKER")
+	return I18n.KEY.tr("CHECK THE BREAKER")
 
 
 func _install_inputs() -> void:

@@ -281,6 +281,7 @@ mouse_filter = 2
 color = Color(0.22, 0.78, 0.92, 1)
 
 [node name="HUD" type="Label" parent="CanvasLayer/TopBar"]
+auto_translate_mode = 2
 offset_left = 16.0
 offset_top = 7.0
 offset_right = 438.0
@@ -355,6 +356,7 @@ mouse_filter = 2
 color = Color(0.24, 0.77, 0.9, 1)
 
 [node name="Text" type="Label" parent="CanvasLayer/ContextHint"]
+auto_translate_mode = 2
 offset_left = 13.0
 offset_top = 3.0
 offset_right = 539.0
@@ -382,6 +384,7 @@ mouse_filter = 2
 color = Color(0.22, 0.78, 0.92, 1)
 
 [node name="Text" type="Label" parent="CanvasLayer/TutorialPrompt"]
+auto_translate_mode = 2
 offset_left = 16.0
 offset_top = 9.0
 offset_right = 305.0
@@ -426,6 +429,7 @@ theme_override_font_sizes/font_size = 34
 text = "▶"
 
 [node name="Use" type="Button" parent="CanvasLayer/TouchControls"]
+auto_translate_mode = 2
 offset_left = 773.0
 offset_top = 345.0
 offset_right = 928.0

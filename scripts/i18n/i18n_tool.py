@@ -34,7 +34,7 @@ Purpose
                               OUT: msgfmt --check-format, the per-line measures (printf and named
                               placeholders, BBCode tags, speaker tag, glossary's required and avoid forms:
                               line_measures, folded in from the research pipeline step's trial tool), line
-                              breaks (BREAKS_KEEP), the "E:" key token the hint bar replaces, the script
+                              breaks (BREAKS_KEEP), the "E:" key token (KEY_TOKEN), the script
                               guard (SCRIPT_GUARD), the
                               engineer-gender gate (gendered_words, and the back-translation's
                               engineer_gendered), the Slavic name-case gate (NAME_CASE), the plural forms of
@@ -335,9 +335,10 @@ PICKER_REFERENCE_FONT = REPO / "apps" / "game" / "assets" / "fonts" / "Montserra
 #: The fixed character lists the CJK subsets are cut to and the game's glyph test reads. Under tests/,
 #: which the export leaves out (export_presets.cfg), since the game itself never needs them.
 CHARSETS_FILE = REPO / "apps" / "game" / "tests" / "support" / "cjk_charsets.json"
-#: The hint bar replaces "E:" with the bound key (main.gd _refresh_ui), so it must survive. Counted only
-#: where no letter comes before it: "PAUSE:" ends in "E:" too (the game's own replace is a plain
-#: substring replace and would hit it; see ../README.md, "Code changes outside I18n").
+#: The prototype's hint bar replaced "E:" with the bound key, so it had to survive. Since PR L7b the HUD's
+#: key is a %s placeholder filled after tr() (HudText, apps/game/scripts/hud_text.gd) and no msgid holds
+#: "E:", so the gate now only fails a translation that adds one (the counts must stay equal, at zero).
+#: Counted only where no letter comes before it: "PAUSE:" ends in "E:" too.
 KEY_TOKEN = re.compile(r"(?<![^\W\d_])E:")
 #: The comment that marks a msgid whose authored line breaks carry meaning (the name card's
 #: "%s\nMAINTENANCE ENGINEER", a choice list), written by the build as "#. i18n: keep-breaks". Only those
