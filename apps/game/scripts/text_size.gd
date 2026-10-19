@@ -91,9 +91,19 @@ static func fit_world_label(label: Label, center_x: float, top: float, room: flo
 ## px, so plates under different parents (the corridor's and the bypass handle's) count. Plates that do
 ## not overlap are left exactly as fitted, so the English rooms, whose names stand apart at every TEXT
 ## SIZE step (text_boxes_test), are unchanged. Call it after fitting every label of the room.
-static func part_world_labels(labels: Array[Label]) -> void:
+## [param right_edge] (global px, INF for none) is a wall no plate may pass, handled the same way: the
+## corridor keeps its names clear of the first view's fading right edge (Main._refit_station_labels).
+static func part_world_labels(labels: Array[Label], right_edge: float = INF) -> void:
 	for _pass: int in labels.size():
 		var parted: bool = false
+		for label: Label in labels:
+			var plate: Rect2 = label.get_global_rect()
+			# Only a plate standing inside the wall is held to it; one centred past it (the corridor's SAFE
+			# POINT) is meant to wait beyond the first view.
+			if not label.text.is_empty() and plate.get_center().x < right_edge and plate.end.x > right_edge + 0.5:
+				# The wall as a plate with no width, standing level with this one.
+				if _narrow_beside(label, Rect2(right_edge + WORLD_LABEL_GAP, plate.position.y, 0.0, plate.size.y)):
+					parted = true
 		for a: int in labels.size():
 			for b: int in range(a + 1, labels.size()):
 				var first: Label = labels[a]
@@ -107,23 +117,23 @@ static func part_world_labels(labels: Array[Label]) -> void:
 					continue
 				var wider: Label = first if first.size.x >= second.size.x else second
 				var narrower: Label = second if wider == first else first
-				if _narrow_beside(wider, narrower) or _narrow_beside(narrower, wider):
+				if _narrow_beside(wider, narrower.get_global_rect()) or _narrow_beside(narrower, wider.get_global_rect()):
 					parted = true
 		if not parted:
 			return
 
 
-## Fits [param label] again (fit_world_label) into the room that clears [param neighbour]'s plate by
-## WORLD_LABEL_GAP, both centred where they stand: first broken onto rows at its current size, then, if a
+## Fits [param label] again (fit_world_label) into the room that clears [param neighbour] (the other
+## plate's global rect) by WORLD_LABEL_GAP, both centred where they stand: first broken onto rows at its current size, then, if a
 ## word is still too wide, a pixel smaller at a time down to its 100% size (its text_base_size), never
 ## below; and if it is still too wide at 100%, moved away from the neighbour by the overlap left over
 ## (the Spanish COOLANT RELAY beside the fixed MANUAL BYPASS plate at 125%: a few px). Returns true when
 ## the plate got narrower or moved; false when it was not fitted by fit_world_label or already clears the
 ## neighbour.
-static func _narrow_beside(label: Label, neighbour: Label) -> bool:
+static func _narrow_beside(label: Label, neighbour: Rect2) -> bool:
 	if not label.has_meta(&"world_top"):
 		return false
-	var distance: float = absf(label.get_global_rect().get_center().x - neighbour.get_global_rect().get_center().x)
+	var distance: float = absf(label.get_global_rect().get_center().x - neighbour.get_center().x)
 	var room: float = 2.0 * (distance - neighbour.size.x * 0.5 - WORLD_LABEL_GAP)
 	var before: float = label.size.x
 	if room >= before:
@@ -138,7 +148,7 @@ static func _narrow_beside(label: Label, neighbour: Label) -> bool:
 		fit_world_label(label, center_x, top, room, font_px)
 	if label.size.x > room:
 		# Off centre by what the two plates still lack: their half widths and the gap, less the distance.
-		var away: float = signf(label.get_global_rect().get_center().x - neighbour.get_global_rect().get_center().x)
+		var away: float = signf(label.get_global_rect().get_center().x - neighbour.get_center().x)
 		var shift: float = label.size.x * 0.5 + neighbour.size.x * 0.5 + WORLD_LABEL_GAP - distance
 		fit_world_label(label, center_x + (away if away != 0.0 else -1.0) * shift, top, room, font_px)
 		return true

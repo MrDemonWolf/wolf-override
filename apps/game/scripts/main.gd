@@ -5028,11 +5028,17 @@ func _apply_text_size() -> void:
 
 
 ## Every room's station names fitted to their size and to their words in the language shown, and
-## neighbours that would cover each other parted (TextSize.part_world_labels, PR L8): on a TEXT SIZE
+## neighbours that would cover each other parted, the corridor's kept inside its first view
+## (TextSize.part_world_labels, PR L8): on a TEXT SIZE
 ## change and on a language change, since a translated name is measured as drawn. The corridor's
 ## names keep their 100% places (text_home) to grow from.
 func _refit_station_labels() -> void:
 	bypass_handle.refit_labels()
+	# The first view's right edge (x 671) less the fade there: a name standing in that view stays whole
+	# and unfaded at the corridor's start, as text_boxes_test checks, even when a translation is longer.
+	var first_view_right: float = L1_CORRIDOR_MIN_VIEW_X + GAMEPLAY_VIEW_WIDTH - JunctionRoom.LABEL_EDGE_FADE
+	# The COOLANT FAULT tag is held inside that view first, since the relay's name rises by its growth.
+	TextSize.part_world_labels([bypass_handle.fault_tag] as Array[Label], first_view_right)
 	for label: Label in [$BreakerLabel, $RelayLabel, $CheckpointLabel] as Array[Label]:
 		if not label.has_meta(&"text_home"):
 			label.set_meta(&"text_home", Rect2(label.position, label.size))
@@ -5041,7 +5047,7 @@ func _refit_station_labels() -> void:
 		# The relay's name stands over its COOLANT FAULT tag, so it rises as far as the tag grows.
 		var lift: float = bypass_handle.fault_tag_growth() if label == $RelayLabel else 0.0
 		TextSize.fit_world_label(label, home.get_center().x, home.position.y - lift)
-	TextSize.part_world_labels(_corridor_station_labels())
+	TextSize.part_world_labels(_corridor_station_labels(), first_view_right)
 	records_room.refit_labels()
 	junction_room.refit_labels()
 
