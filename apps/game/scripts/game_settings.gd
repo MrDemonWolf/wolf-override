@@ -39,9 +39,10 @@ const KEY_LABEL_SERVERS: Array[String] = ["X11", "Wayland", "Windows", "macOS"]
 ## "Home", can be translated apart.
 const KEY_NAME_CONTEXT: StringName = &"key name"
 ## The named keys (Godot 4.7.2 core/os/keyboard.cpp, keycode_get_string) a player can bind and read, marked
-## for the translation template. [method key_name] translates any name with words through tr(), so this
-## list only decides which names a translator is offered; the media, launch and modifier keys (Settings
-## refuses modifiers) and the keypad's digits are left out, and a name with one letter or none ("F5", "E") needs no translation.
+## for the translation template; nothing reads it at run time. [method key_name] translates any name with
+## words through tr(), so this list only decides which names a translator is offered: the media, launch
+## and modifier keys (Settings refuses modifiers) and the keypad's digits are left out, and a name with
+## one letter or none ("F5", "E") needs no translation.
 static var KEY_NAMES: Array[String] = [I18n.KEY.tr("Escape", KEY_NAME_CONTEXT), I18n.KEY.tr("Tab", KEY_NAME_CONTEXT), I18n.KEY.tr("Backspace", KEY_NAME_CONTEXT), I18n.KEY.tr("Enter", KEY_NAME_CONTEXT), I18n.KEY.tr("Kp Enter", KEY_NAME_CONTEXT), I18n.KEY.tr("Insert", KEY_NAME_CONTEXT), I18n.KEY.tr("Delete", KEY_NAME_CONTEXT), I18n.KEY.tr("Pause", KEY_NAME_CONTEXT), I18n.KEY.tr("Print", KEY_NAME_CONTEXT), I18n.KEY.tr("Clear", KEY_NAME_CONTEXT), I18n.KEY.tr("Home", KEY_NAME_CONTEXT), I18n.KEY.tr("End", KEY_NAME_CONTEXT), I18n.KEY.tr("Left", KEY_NAME_CONTEXT), I18n.KEY.tr("Up", KEY_NAME_CONTEXT), I18n.KEY.tr("Right", KEY_NAME_CONTEXT), I18n.KEY.tr("Down", KEY_NAME_CONTEXT), I18n.KEY.tr("PageUp", KEY_NAME_CONTEXT), I18n.KEY.tr("PageDown", KEY_NAME_CONTEXT), I18n.KEY.tr("CapsLock", KEY_NAME_CONTEXT), I18n.KEY.tr("NumLock", KEY_NAME_CONTEXT), I18n.KEY.tr("ScrollLock", KEY_NAME_CONTEXT), I18n.KEY.tr("Kp Multiply", KEY_NAME_CONTEXT), I18n.KEY.tr("Kp Divide", KEY_NAME_CONTEXT), I18n.KEY.tr("Kp Subtract", KEY_NAME_CONTEXT), I18n.KEY.tr("Kp Period", KEY_NAME_CONTEXT), I18n.KEY.tr("Kp Add", KEY_NAME_CONTEXT), I18n.KEY.tr("Menu", KEY_NAME_CONTEXT), I18n.KEY.tr("Help", KEY_NAME_CONTEXT), I18n.KEY.tr("Space", KEY_NAME_CONTEXT)]
 const MAX_SETTINGS_BYTES: int = 65536
 ## Window sizes offered in Settings, by index. A first launch (no saved size) opens at

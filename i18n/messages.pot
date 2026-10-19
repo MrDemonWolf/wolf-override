@@ -349,321 +349,321 @@ msgstr ""
 msgid "Voice volume"
 msgstr ""
 
-#: scripts/game_settings.gd:45
+#: scripts/game_settings.gd:46
 msgctxt "key name"
 msgid "Escape"
 msgstr ""
 
-#: scripts/game_settings.gd:45
+#: scripts/game_settings.gd:46
 msgctxt "key name"
 msgid "Tab"
 msgstr ""
 
-#: scripts/game_settings.gd:45
+#: scripts/game_settings.gd:46
 msgctxt "key name"
 msgid "Backspace"
 msgstr ""
 
-#: scripts/game_settings.gd:45
+#: scripts/game_settings.gd:46
 msgctxt "key name"
 msgid "Enter"
 msgstr ""
 
-#: scripts/game_settings.gd:45
+#: scripts/game_settings.gd:46
 msgctxt "key name"
 msgid "Kp Enter"
 msgstr ""
 
-#: scripts/game_settings.gd:45
+#: scripts/game_settings.gd:46
 msgctxt "key name"
 msgid "Insert"
 msgstr ""
 
-#: scripts/game_settings.gd:45
+#: scripts/game_settings.gd:46
 msgctxt "key name"
 msgid "Delete"
 msgstr ""
 
-#: scripts/game_settings.gd:45
+#: scripts/game_settings.gd:46
 msgctxt "key name"
 msgid "Pause"
 msgstr ""
 
-#: scripts/game_settings.gd:45
+#: scripts/game_settings.gd:46
 msgctxt "key name"
 msgid "Print"
 msgstr ""
 
-#: scripts/game_settings.gd:45
+#: scripts/game_settings.gd:46
 msgctxt "key name"
 msgid "Clear"
 msgstr ""
 
-#: scripts/game_settings.gd:45
+#: scripts/game_settings.gd:46
 msgctxt "key name"
 msgid "Home"
 msgstr ""
 
-#: scripts/game_settings.gd:45
+#: scripts/game_settings.gd:46
 msgctxt "key name"
 msgid "End"
 msgstr ""
 
-#: scripts/game_settings.gd:45
+#: scripts/game_settings.gd:46
 msgctxt "key name"
 msgid "Left"
 msgstr ""
 
-#: scripts/game_settings.gd:45
+#: scripts/game_settings.gd:46
 msgctxt "key name"
 msgid "Up"
 msgstr ""
 
-#: scripts/game_settings.gd:45
+#: scripts/game_settings.gd:46
 msgctxt "key name"
 msgid "Right"
 msgstr ""
 
-#: scripts/game_settings.gd:45
+#: scripts/game_settings.gd:46
 msgctxt "key name"
 msgid "Down"
 msgstr ""
 
-#: scripts/game_settings.gd:45
+#: scripts/game_settings.gd:46
 msgctxt "key name"
 msgid "PageUp"
 msgstr ""
 
-#: scripts/game_settings.gd:45
+#: scripts/game_settings.gd:46
 msgctxt "key name"
 msgid "PageDown"
 msgstr ""
 
-#: scripts/game_settings.gd:45
+#: scripts/game_settings.gd:46
 msgctxt "key name"
 msgid "CapsLock"
 msgstr ""
 
-#: scripts/game_settings.gd:45
+#: scripts/game_settings.gd:46
 msgctxt "key name"
 msgid "NumLock"
 msgstr ""
 
-#: scripts/game_settings.gd:45
+#: scripts/game_settings.gd:46
 msgctxt "key name"
 msgid "ScrollLock"
 msgstr ""
 
-#: scripts/game_settings.gd:45
+#: scripts/game_settings.gd:46
 msgctxt "key name"
 msgid "Kp Multiply"
 msgstr ""
 
-#: scripts/game_settings.gd:45
+#: scripts/game_settings.gd:46
 msgctxt "key name"
 msgid "Kp Divide"
 msgstr ""
 
-#: scripts/game_settings.gd:45
+#: scripts/game_settings.gd:46
 msgctxt "key name"
 msgid "Kp Subtract"
 msgstr ""
 
-#: scripts/game_settings.gd:45
+#: scripts/game_settings.gd:46
 msgctxt "key name"
 msgid "Kp Period"
 msgstr ""
 
-#: scripts/game_settings.gd:45
+#: scripts/game_settings.gd:46
 msgctxt "key name"
 msgid "Kp Add"
 msgstr ""
 
-#: scripts/game_settings.gd:45
+#: scripts/game_settings.gd:46
 msgctxt "key name"
 msgid "Menu"
 msgstr ""
 
-#: scripts/game_settings.gd:45
+#: scripts/game_settings.gd:46
 msgctxt "key name"
 msgid "Help"
 msgstr ""
 
-#: scripts/game_settings.gd:45
+#: scripts/game_settings.gd:46
 msgctxt "key name"
 msgid "Space"
 msgstr ""
 
-#: scripts/game_settings.gd:250
+#: scripts/game_settings.gd:251
 msgid "THE DEN  /  LOCAL CONFIGURATION"
 msgstr ""
 
-#: scripts/game_settings.gd:262
+#: scripts/game_settings.gd:263
 msgid "DISPLAY"
 msgstr ""
 
-#: scripts/game_settings.gd:262
+#: scripts/game_settings.gd:263
 msgid "AUDIO"
 msgstr ""
 
-#: scripts/game_settings.gd:262
+#: scripts/game_settings.gd:263
 msgid "CONTROLS"
 msgstr ""
 
-#: scripts/game_settings.gd:262
+#: scripts/game_settings.gd:263
 msgid "GENERAL"
 msgstr ""
 
-#: scripts/game_settings.gd:279
+#: scripts/game_settings.gd:280
 msgid "V-SYNC"
 msgstr ""
 
-#: scripts/game_settings.gd:285
+#: scripts/game_settings.gd:286
 msgid "EDGE SMOOTHING"
 msgstr ""
 
-#: scripts/game_settings.gd:285
+#: scripts/game_settings.gd:286
 msgid "OFF"
 msgstr ""
 
-#: scripts/game_settings.gd:285
+#: scripts/game_settings.gd:286
 msgid "2× MSAA"
 msgstr ""
 
-#: scripts/game_settings.gd:285
+#: scripts/game_settings.gd:286
 msgid "4× MSAA"
 msgstr ""
 
-#: scripts/game_settings.gd:285
+#: scripts/game_settings.gd:286
 msgid "8× MSAA"
 msgstr ""
 
-#: scripts/game_settings.gd:288
+#: scripts/game_settings.gd:289
 msgid "REDUCED MOTION"
 msgstr ""
 
-#: scripts/game_settings.gd:289
+#: scripts/game_settings.gd:290
 msgid "No camera shake or hit-stop; screen flashes are shorter."
 msgstr ""
 
-#: scripts/game_settings.gd:298
+#: scripts/game_settings.gd:299
 msgid "TEXT SIZE"
 msgstr ""
 
-#: scripts/game_settings.gd:299
+#: scripts/game_settings.gd:300
 msgid "Scales the dialogue, hints, cards and station names."
 msgstr ""
 
-#: scripts/game_settings.gd:322
+#: scripts/game_settings.gd:323
 msgid "ACTION"
 msgstr ""
 
-#: scripts/game_settings.gd:322
+#: scripts/game_settings.gd:323
 msgid "KEYBOARD"
 msgstr ""
 
-#: scripts/game_settings.gd:322
+#: scripts/game_settings.gd:323
 msgid "CONTROLLER"
 msgstr ""
 
-#: scripts/game_settings.gd:342
+#: scripts/game_settings.gd:343
 msgid "Stick deadzone"
 msgstr ""
 
-#: scripts/game_settings.gd:346
+#: scripts/game_settings.gd:347
 msgid "TOGGLE HOLDS"
 msgstr ""
 
-#: scripts/game_settings.gd:347
+#: scripts/game_settings.gd:348
 msgid "Press interact once to start a crank and again to stop it, instead of holding it down. Keyboard, controller and touch."
 msgstr ""
 
-#: scripts/game_settings.gd:352
+#: scripts/game_settings.gd:353
 msgid "RESTORE DEFAULT CONTROLS"
 msgstr ""
 
-#: scripts/game_settings.gd:369
+#: scripts/game_settings.gd:370
 msgid "CANCEL REBIND"
 msgstr ""
 
-#: scripts/game_settings.gd:387
+#: scripts/game_settings.gd:388
 msgid "LANGUAGE"
 msgstr ""
 
-#: scripts/game_settings.gd:559
+#: scripts/game_settings.gd:560
 msgid "Window size is OS-managed on mobile."
 msgstr ""
 
-#: scripts/game_settings.gd:559
-#: scripts/game_settings.gd:561
+#: scripts/game_settings.gd:560
+#: scripts/game_settings.gd:562
 msgid "V-sync may limit the FPS cap."
 msgstr ""
 
-#: scripts/game_settings.gd:563
+#: scripts/game_settings.gd:564
 msgid "Volume changes apply immediately. Effects carries every sound effect; there is no music or voice yet."
 msgstr ""
 
-#: scripts/game_settings.gd:563
+#: scripts/game_settings.gd:564
 msgid "Select a binding, then press a key, controller button or move a stick."
 msgstr ""
 
-#: scripts/game_settings.gd:563
+#: scripts/game_settings.gd:564
 msgid "Until you choose a language, the game uses your system's."
 msgstr ""
 
-#: scripts/game_settings.gd:611
+#: scripts/game_settings.gd:612
 msgid "Press a keyboard input for %s. Esc cancels."
 msgstr ""
 
-#: scripts/game_settings.gd:611
+#: scripts/game_settings.gd:612
 msgid "Press a controller input for %s. Esc cancels."
 msgstr ""
 
-#: scripts/game_settings.gd:628
+#: scripts/game_settings.gd:629
 msgid "Rebind cancelled."
 msgstr ""
 
-#: scripts/game_settings.gd:643
+#: scripts/game_settings.gd:644
 msgid "Already used by %s. Choose another input or cancel."
 msgstr ""
 
-#: scripts/game_settings.gd:649
+#: scripts/game_settings.gd:650
 msgid "Binding saved."
 msgstr ""
 
-#: scripts/game_settings.gd:717
+#: scripts/game_settings.gd:718
 msgid "Left stick"
 msgstr ""
 
-#: scripts/game_settings.gd:717
+#: scripts/game_settings.gd:718
 msgid "Axis %d"
 msgstr ""
 
-#: scripts/game_settings.gd:744
+#: scripts/game_settings.gd:745
 msgid "AXIS %d %s"
 msgstr ""
 
-#: scripts/game_settings.gd:775
+#: scripts/game_settings.gd:776
 msgid "START"
 msgstr ""
 
-#: scripts/game_settings.gd:776
+#: scripts/game_settings.gd:777
 msgid "D-pad left"
 msgstr ""
 
-#: scripts/game_settings.gd:777
+#: scripts/game_settings.gd:778
 msgid "D-pad right"
 msgstr ""
 
-#: scripts/game_settings.gd:778
+#: scripts/game_settings.gd:779
 msgid "BUTTON %d"
 msgstr ""
 
-#: scripts/game_settings.gd:805
+#: scripts/game_settings.gd:806
 msgid "Default controls restored."
 msgstr ""
 
-#: scripts/game_settings.gd:829
+#: scripts/game_settings.gd:830
 #: scripts/main.gd:2042
 msgid "Settings could not be saved."
 msgstr ""
