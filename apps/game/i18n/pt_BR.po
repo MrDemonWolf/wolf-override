@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: WOLF OVERRIDE\n"
-"PO-Revision-Date: 2026-10-19 17:39+0000\n"
+"PO-Revision-Date: 2026-10-19 18:35+0000\n"
 "Last-Translator: Claude (Anthropic), machine translation, unreviewed\n"
 "Language-Team: none\n"
 "MIME-Version: 1.0\n"
@@ -1370,18 +1370,18 @@ msgid "Mirror copied. Head for the exit."
 msgstr "Você copiou o espelho. Vá até a saída."
 
 # machine-translated by Claude (Anthropic), unreviewed
-#. TRANSLATORS: Hint bar (14 px, about 526 px wide on a keyboard and 488 px on touch; wraps).
+#. TRANSLATORS: Hint bar (14 px, about 526 px wide on a keyboard and 488 px on touch; wraps). The mirror port is a data port on a terminal, never a door: porta de dados espelho, on every line that names it.
 #. i18n: speaker=hint engineer=you
 #: scripts/main.gd:2774
 msgid "Follow the station lights: mirror port, then exit."
-msgstr "Siga as luzes das estações: porta espelho, depois a saída."
+msgstr "Siga as luzes das estações: porta de dados espelho, depois a saída."
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: Hint bar (14 px, about 526 px wide on a keyboard and 488 px on touch; wraps).
 #. i18n: speaker=hint engineer=you
 #: scripts/main.gd:2775
 msgid "Follow the station lights: purge queue, mirror port, then exit."
-msgstr "Siga as luzes das estações: fila de purga, porta espelho, depois a saída."
+msgstr "Siga as luzes das estações: fila de purga, porta de dados espelho, depois a saída."
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: WOLF's line in the dialogue box (after the WOLF: tag). %s is the second answer's key or button.
@@ -1389,7 +1389,7 @@ msgstr "Siga as luzes das estações: fila de purga, porta espelho, depois a sa�
 #: scripts/main.gd:2964
 #, c-format
 msgid "I'm still checking the drive. Wait for me, or press %s for the manual port."
-msgstr "Ainda estou verificando a unidade. Espere por mim ou pressione %s para usar a porta manual."
+msgstr "Ainda estou verificando a unidade. Espere por mim ou pressione %s para usar a porta de dados manual."
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: WOLF's line, touch form. USE MANUAL PORT is the answer button's text, which is not in the template yet and shows in English, so it is quoted as shown.
@@ -1632,7 +1632,7 @@ msgstr "%s: copie o rastro da ordem de purga."
 #. i18n: speaker=hint engineer=you
 #: scripts/main.gd:5113
 msgid "Purge order copied. Find the mirror port."
-msgstr "Você copiou a ordem de purga. Encontre a porta espelho."
+msgstr "Você copiou a ordem de purga. Encontre a porta de dados espelho."
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: Hint bar (14 px, about 526 px wide on a keyboard and 488 px on touch; wraps). %s is the key, button or touch word the player uses (it is filled in after translation); keep it first and keep the colon.
@@ -1640,7 +1640,7 @@ msgstr "Você copiou a ordem de purga. Encontre a porta espelho."
 #: scripts/main.gd:5117
 #, c-format
 msgid "%s: examine the mirror port."
-msgstr "%s: examine a porta espelho."
+msgstr "%s: examine a porta de dados espelho."
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: Hint bar (14 px, about 526 px wide on a keyboard and 488 px on touch; wraps).
@@ -1689,11 +1689,11 @@ msgid "Return to the safe point to enter records access."
 msgstr "Volte ao ponto seguro para entrar no acesso aos registros."
 
 # machine-translated by Claude (Anthropic), unreviewed
-#. TRANSLATORS: Hint bar (14 px, about 526 px wide on a keyboard and 488 px on touch; wraps). The seal is the sealed door (OPEN THE SEAL).
+#. TRANSLATORS: Hint bar (14 px, about 526 px wide on a keyboard and 488 px on touch; wraps). The seal is the sealed door (OPEN THE SEAL): a comporta, here and in the objective; never selo, which is a stamp.
 #. i18n: speaker=hint
 #: scripts/main.gd:5126
 msgid "The seal is opening."
-msgstr "O selo está se abrindo."
+msgstr "A comporta está se abrindo."
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: Hint bar (14 px, about 526 px wide on a keyboard and 488 px on touch; wraps). %s is the key, button or touch word the player uses (it is filled in after translation); keep it first and keep the colon.
@@ -1708,7 +1708,7 @@ msgstr "%s: salve no ponto seguro."
 #. i18n: speaker=hint engineer=you
 #: scripts/main.gd:5129
 msgid "The seal is open. Move to the safe point."
-msgstr "O selo abriu. Vá até o ponto seguro."
+msgstr "A comporta abriu. Vá até o ponto seguro."
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: Hint bar (14 px, about 526 px wide on a keyboard and 488 px on touch; wraps). WOLF is he.
@@ -1987,7 +1987,7 @@ msgstr "Nuvem de líquido de arrefecimento. Saia dela."
 #. i18n: speaker=hint engineer=you
 #: scripts/main.gd:5242
 msgid "It's after you. Get back over the rubble."
-msgstr "Ela está atrás de você. Volte para o outro lado dos escombros."
+msgstr "A sentinela está atrás de você. Volte para o outro lado dos escombros."
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: Hint bar (14 px, about 526 px wide on a keyboard and 488 px on touch; wraps). It: the sentry; the mark is the painted spot under the tank.
@@ -2002,7 +2002,7 @@ msgstr "Espere WOLF deixá-la na marca."
 #: scripts/main.gd:5247
 #, c-format
 msgid "%s: drop the tank. It's parked on the mark."
-msgstr "%s: solte o tanque. Ela está na marca."
+msgstr "%s: solte o tanque. A sentinela está na marca."
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: Hint bar (14 px, about 526 px wide on a keyboard and 488 px on touch; wraps). %s is the key, button or touch word the player uses (it is filled in after translation); keep it first and keep the colon.
@@ -2151,7 +2151,7 @@ msgstr "CHEGAR AO PONTO SEGURO"
 #. i18n: speaker=ui
 #: scripts/main.gd:5292
 msgid "OPEN THE SEAL"
-msgstr "ABRIR O SELO"
+msgstr "ABRIR A COMPORTA"
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: Top card objective (ALL CAPS, about 420 px wide, wraps). Infinitive, as the other objectives.

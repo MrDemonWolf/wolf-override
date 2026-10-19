@@ -44,7 +44,7 @@
    "pronouns": "\\b(?:él|ella)\\b"
   },
   "portuguese": {
-   "forms": "^(?!(?:cada|nada|vida|partida|entrada|chegada|escada|escadas|estrada|jogada|porta|portas|alerta|alertas|teclado|teclados|lado|lados|líquido|líquidos)$)(?:\\w+(?:ad|id|ert)[oa]s?|mort[oa]s?|viv[oa]s?|sozinh[oa]s?|pront[oa]s?|content[oa]s?|quiet[oa]s?|engenheir[oa]s?|técnic[oa]s?|mecânic[oa]s?)$",
+   "forms": "^(?!(?:cada|nada|vida|partida|entrada|chegada|escada|escadas|estrada|jogada|porta|portas|alerta|alertas|teclado|teclados|lado|lados|líquido|líquidos|dado|dados)$)(?:\\w+(?:ad|id|ert)[oa]s?|mort[oa]s?|viv[oa]s?|sozinh[oa]s?|pront[oa]s?|content[oa]s?|quiet[oa]s?|engenheir[oa]s?|técnic[oa]s?|mecânic[oa]s?)$",
    "you": "\\b(?:você|tu|te|ti|contigo)\\b",
    "first_person": "\\beu\\b",
    "pronouns": "\\b(?:ele|ela|dele|dela)\\b"
