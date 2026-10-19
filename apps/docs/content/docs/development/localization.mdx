@@ -31,7 +31,7 @@ description: How WOLF OVERRIDE shows other languages, which files hold the langu
 - **The story's table:** `apps/game/scripts/story_text.gd` (`StoryText`) marks every story line kept in a constant, once, with its note and marks. Lines written inside a function are marked where they are said.
 - **Marks for the checks:** each story line carries `i18n: story` (the release gate), its speaker, and on the 26 lines that could show the engineer's gender an `engineer=` mark. WOLF's three callbacks also carry `slot=choice`, and a line whose break matters carries `keep-breaks`.
 - **Lines made of several messages:** a knockdown card and the restore line under it, or "Safe point saved." and WOLF's callback, are built with `I18n.join`, so each part is translated on its own.
-- **Saved answers:** the save keeps the English answer. WOLF's callback quotes it through `I18n.format`, which translates that quote where it is drawn, so an old save still reads in the current language.
+- **Saved answers:** the save keeps the English answer. WOLF's callback quotes it through `I18n.format`, which translates that quote where it is drawn. An answer saved before October 13, 2026 has older wording that is no message, so WOLF quotes it in English.
 - **End card:** each row's topic and words are separate messages. `{name}` is filled in after translation by `I18n.fill_named`, which shows the English row if a translation changes the placeholder.
 - **The changelog stays English** (decision D4). In another language it opens with one translated line that says so.
 - **CONTINUE has two meanings:** the touch button's CONTINUE (go on through lines) carries the `touch button` context, so a language can word it apart from the title's CONTINUE (resume a save).
