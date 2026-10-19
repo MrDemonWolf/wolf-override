@@ -73,10 +73,10 @@ Changes merged after 0.15.0. They become the next version when it is cut.
 - Polish (machine translation, review pending): LANGUAGE offers Polski, marked "tłumaczenie maszynowe".
 - Russian (machine translation, review pending): LANGUAGE offers Русский, marked "машинный перевод".
 - Polish and Russian translate the same parts as Spanish, the story included; most station names still show English.
-- Japanese (machine translation, review pending): LANGUAGE offers 日本語, marked "機械翻訳".
-- Korean (machine translation, review pending): LANGUAGE offers 한국어, marked "기계 번역".
-- Simplified Chinese (machine translation, review pending): LANGUAGE offers 简体中文, marked "机器翻译".
-- Traditional Chinese (machine translation, review pending): LANGUAGE offers 繁體中文, marked "機器翻譯"; Taiwan, Hong Kong and Macau get it, every other Chinese region gets 简体中文.
+- Japanese (machine translation, review pending): LANGUAGE offers Japanese, under its own name and marked as a machine translation in Japanese.
+- Korean (machine translation, review pending): LANGUAGE offers Korean, under its own name and marked as a machine translation in Korean.
+- Simplified Chinese (machine translation, review pending): LANGUAGE offers Simplified Chinese, under its own name and marked as a machine translation in Chinese.
+- Traditional Chinese (machine translation, review pending): LANGUAGE offers Traditional Chinese, under its own name and marked as a machine translation in Chinese; Taiwan, Hong Kong and Macau get it, every other Chinese region gets Simplified Chinese.
 - Japanese, Korean and Chinese translate the same parts as Spanish, the story included; most station names still show English.
 - Key names follow your keyboard layout on Windows, macOS and Linux: on a French AZERTY keyboard Move left reads Q, not A. A symbol key shows the symbol printed on it, such as & on the AZERTY 1 key, and a letter the game's fonts cannot draw (Greek, Hebrew, Arabic, Thai) shows its QWERTY name.
 - A long control binding, such as "D-pad right / Left stick +", breaks onto a second row instead of being cut short with "…".
@@ -186,7 +186,7 @@ Changes merged after 0.15.0. They become the next version when it is cut.
 - A second review's fixes: the Polish title credit keeps the word *development*, so the concept stays Nathanial's; Polish times the tank drop with *wyczuć moment*, not computer slang; Russian WOLF names the sentry where *он* could mean the console.
 - The Russian checks keep names, tools, web addresses and key labels in Latin letters, skip the credits' formatting tags, and know *сначала*, *зеркала*, *завал* and *отмена* are not past tenses.
 - The Japanese, Korean and Simplified Chinese files are written fresh by Claude with a note on every line; the Traditional Chinese file is converted from the Simplified one with OpenCC and checked line by line for Taiwan usage. Codex back-translated all four, and every translation check passes.
-- A new translation check fails a Korean line that glues a particle such as 는 or 를 to a name or key, since the right particle depends on the word's last sound.
+- A new translation check fails a Korean line that glues a particle such as *neun* or *reul* to a name or key, since the right particle depends on the word's last sound.
 - The Japanese, Korean and Chinese font subsets take Roboto's line height, so a CJK language no longer makes rows taller and overflow fixed-height text; i18n_test checks that every language keeps English's line height.
 - i18n_test fails any text that does not fit its room in every language and in pseudo-English (30% longer), the answer rows and the end card included; no overflow is let off by name.
 - text_boxes_test runs its station-name, touch, top card and prompt overlap checks in every language and in pseudo-English.
