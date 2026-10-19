@@ -78,7 +78,7 @@ Changes merged after 0.15.0. They become the next version when it is cut.
 ### Settings
 
 - Spanish (machine translation, review pending): **LANGUAGE** offers Español (Latinoamérica) and Español (España), each marked "traducción automática".
-- In Spanish the title, Pause, Settings, the credits and a few station names are translated; hints, dialogue and the story still show English.
+- In Spanish the title, Pause, Settings, the credits with the AI disclosure, the hints, objectives, cards, tutorial and touch buttons, and a few station names are translated; dialogue, the story and most station names still show English.
 - Key names follow your keyboard layout on Windows, macOS and Linux: on a French AZERTY keyboard **Move left** reads Q, not A. A symbol key shows the symbol printed on it, such as & on the AZERTY 1 key, and a letter the game's fonts cannot draw (Greek, Hebrew, Arabic, Thai) shows its QWERTY name.
 
 ### Website
@@ -164,7 +164,9 @@ Changes merged after 0.15.0. They become the next version when it is cut.
 - The HUD is marked for translation, with no change to the English: hints, objectives, top cards, the tutorial and the touch buttons' words; a key in a hint is filled in after translation, so a language can put it where its grammar needs it.
 - The Spanish files are written by Claude with a note on every line, back-translated by Codex and passed through every translation check; Spain's file changes only the words for controller, press, Intro and phones.
 - `i18n_test` lays out every offered language in the game and fails any text that needs more room than English, at every **TEXT SIZE**.
-- The station names' overlap check is shared by `text_boxes_test` and `i18n_test`, and the Spanish gender check knows *teclado* (keyboard) is a noun.
+- The station names' overlap check is shared by `text_boxes_test` and `i18n_test`, and the Spanish gender check knows *teclado* (keyboard) and *lado* (side) are nouns.
+- `i18n_tool.py check` fails an offered language that leaves any line of the template untranslated, and reads the glossary's fixed words (PUNTO SEGURO) apart from the gender check.
+- `i18n_test` checks every word the touch USE button shows and the tutorial prompt in every offered language, and that no short line takes more than one row beyond English in the hint bar or the top card.
 
 ### How it was checked
 

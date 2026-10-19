@@ -6,7 +6,7 @@ description: How WOLF OVERRIDE shows other languages, which files hold the langu
 **What this page is for:** how languages work in the code today, and how to check translation files.
 
 <Callout title="Spanish is the first language">
-  Spanish (Latin America and Spain) covers the marked menus as a machine translation, not yet reviewed by a native speaker. Hints, dialogue and the story are marked next and show English until then. Players: [Platforms and languages](/docs/platforms/).
+  Spanish (Latin America and Spain) covers the menus and the HUD as a machine translation, not yet reviewed by a native speaker. Dialogue and the story are marked next and show English until then. Players: [Platforms and languages](/docs/platforms/).
 </Callout>
 
 ## Words used here
@@ -78,6 +78,7 @@ You need Python 3 (standard library only) and GNU gettext's `msgfmt` (`brew inst
 - The engineer is never given a gender; Slavic name endings.
 - Plural forms and their header.
 - Sibling files, such as the two Chinese and two Spanish files.
+- Coverage: a language that is offered (`enabled` in `languages.json`) must translate every line of the template.
 - Comments that would make Godot skip a line.
 - `--back <file>` adds a back-translation's checks.
 - `--release` adds the release gates: no fuzzy line in a language marked reviewed, no untranslated line marked as story.
@@ -88,7 +89,7 @@ You need Python 3 (standard library only) and GNU gettext's `msgfmt` (`brew inst
 <Details>
 <Summary>Self-test, glossary and fonts in detail</Summary>
 
-- **`selftest`** runs the gates on 157 planted cases (117 for the line, plural, comment and sibling gates, 9 for the release gates, 16 for the glossary on its real terms and 15 broken copies of the glossary and style guides). It fails if any planted error passes or any clean line fails.
+- **`selftest`** runs the gates on 167 planted cases (121 for the line, plural, comment and sibling gates, 9 for the release gates, 6 for the coverage gate, 16 for the glossary on its real terms and 15 broken copies of the glossary and style guides). It fails if any planted error passes or any clean line fails.
 - **`glossary`** checks that every one of the 10 languages' 11 files (Italian and Ukrainian, Tier 1, are not covered yet) has a form for every term and a guide with the same sections, that every word is in its language's alphabet, and that a term still left to reviewers requires nothing. It exits 1 on any problem.
 - **`fonts`** downloads the Noto Sans CJK 2.004 release files from GitHub into the folder (unless they are there), checks each font's SHA-256, and cuts Noto Sans JP, KR, SC and TC down to each language's fixed common character set with HarfBuzz's `hb-subset` (`brew install harfbuzz`). It writes the symbols font Roboto chains and the character lists in `apps/game/tests/support/cjk_charsets.json`, then runs `pickerfonts`, and prints the sizes. Its output is committed, so it only runs again to change a character set.
 - **`pickerfonts`** cuts each CJK language's own name and "machine translation" tag out of its committed subset (`picker_font` in `languages.json`) and gives the cut Montserrat's line height, so the list's rows keep their height.
@@ -100,7 +101,7 @@ You need Python 3 (standard library only) and GNU gettext's `msgfmt` (`brew inst
 
 - **`godot` job:** regenerates the template and fails when the committed one differs.
 - **`i18n` job:** `selftest`, `glossary`, `potfiles --check` and `check`. It needs no Godot.
-- **Headless suites:** `i18n_test` checks the language table, locale lookup and fonts, including the language list's own font chain, and lays out every offered language in the game (title, credits, changelog, Settings, Pause, touch buttons and station names at every **TEXT SIZE**), failing anything that needs more room than English; `settings_test` checks the **LANGUAGE** row and its saved setting, and that the menus' built text (prompts, key names, the Settings note, Pause's hint) follows a language change; `i18n_test` also checks the HUD's key prompts and, in a game, the hint, tutorial, top card and touch button in a test language. What it found: [What was checked](/docs/development/evidence/#languages-october-16-2026).
+- **Headless suites:** `i18n_test` checks the language table, locale lookup and fonts, including the language list's own font chain, and lays out every offered language in the game (title, credits, changelog, Settings, Pause, touch buttons and every word the USE button shows, the tutorial, and station names at every **TEXT SIZE**), failing anything that needs more room than English, and draws every short line of each language in the hint bar and the top card, failing one that takes more than one row beyond English or more than three rows; `settings_test` checks the **LANGUAGE** row and its saved setting, and that the menus' built text (prompts, key names, the Settings note, Pause's hint) follows a language change; `i18n_test` also checks the HUD's key prompts and, in a game, the hint, tutorial, top card and touch button in a test language. What it found: [What was checked](/docs/development/evidence/#languages-october-16-2026).
 - **Every suite runs in English** (`--language en`), whatever your computer's language.
 
 ## Spanish
