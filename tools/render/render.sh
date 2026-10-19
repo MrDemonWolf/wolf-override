@@ -10,10 +10,9 @@
 # whatever the run writes to /work/out is copied back to OUT_DIR. --driver DIR copies capture scripts
 # into the project copy as res://review_capture/ (never into the real project). Every run is killed after
 # --timeout seconds (default 900) and its log is kept at JOB/run.log. The exit status is Godot's (124 = timed out).
-# --keyboard LAYOUT sets the virtual screen's keyboard layout (an XKB layout such as "fr" for AZERTY, with
-# setxkbmap from x11-xkb-utils, which Xvfb's own xserver-common package installs) before Godot starts, so
-# a capture shows key names as a player with that keyboard reads them (localization PR L7a); without it
-# the layout is Xvfb's default, US QWERTY.
+# --keyboard LAYOUT gives the virtual screen another keyboard layout (an XKB symbols name such as "fr" for
+# AZERTY or "de" for QWERTZ), so a capture shows key names as a player with that keyboard reads them
+# (localization PR L7a); without it the layout is Xvfb's default, US QWERTY.
 set -euo pipefail
 
 image="wolf-godot-render:4.7.2"
@@ -67,13 +66,20 @@ if [[ $first_import -eq 1 ]]; then
 fi
 
 status=0
-# With --keyboard, a small shell inside xvfb-run sets the layout on the virtual screen and then becomes
-# Godot ($1 is the layout; the rest is the Godot command line, passed through untouched). The empty
-# array is spelled ${layout[@]+...} because macOS's bash 3.2 calls a plain empty "${layout[@]}" unbound.
+# With --keyboard, a small shell first makes the layout the throwaway container's default, then becomes
+# the usual command ($1 is the layout; the rest is passed through untouched). Why not setxkbmap: on this
+# image's Xvfb (Debian bookworm) setxkbmap and xkbcomp both exit 0 but leave the keymap US (measured
+# October 19, 2026, dumping key <AC01> with xkbcomp), while the keymap Xvfb compiles at start-up follows
+# the files. So the "us" symbols file, the one Xvfb's default rules (evdev, pc105, us) load, is replaced
+# by one that includes LAYOUT. The empty array is spelled ${layout[@]+...} because macOS's bash 3.2 calls
+# a plain empty "${layout[@]}" unbound.
 layout=()
-[[ -n "$keyboard" ]] && layout=(sh -c 'setxkbmap -layout "$1" && shift && exec "$@"' sh "$keyboard")
-run timeout --kill-after=10 "$limit" xvfb-run -a -s "-screen 0 ${screen}x24" \
-  ${layout[@]+"${layout[@]}"} godot --path /work/project --rendering-driver opengl3 --audio-driver Dummy "$@" 2>&1 | tee "$cache/run.log" || true
+if [[ -n "$keyboard" ]]; then
+  [[ "$keyboard" =~ ^[a-z_]+(\([a-z0-9_]+\))?$ ]] || { echo "--keyboard takes an XKB layout name such as fr or de(nodeadkeys)" >&2; exit 64; }
+  layout=(sh -c 'printf "default partial alphanumeric_keys modifier_keys\nxkb_symbols \"basic\" { include \"%s\" };\n" "$1" > /usr/share/X11/xkb/symbols/us && shift && exec "$@"' sh "$keyboard")
+fi
+run timeout --kill-after=10 "$limit" ${layout[@]+"${layout[@]}"} xvfb-run -a -s "-screen 0 ${screen}x24" \
+  godot --path /work/project --rendering-driver opengl3 --audio-driver Dummy "$@" 2>&1 | tee "$cache/run.log" || true
 status=${PIPESTATUS[0]}
 [[ $status -eq 124 ]] && echo "render.sh: Godot was stopped after ${limit}s (see $cache/run.log)" >&2
 
