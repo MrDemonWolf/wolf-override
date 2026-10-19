@@ -133,11 +133,11 @@ msgid "CHANGELOG"
 msgstr "LISTA ZMIAN"
 
 # machine-translated by Claude (Anthropic), unreviewed
-#. TRANSLATORS: The title's credit line (424 px, 16 px). The author's name stays as written.
+#. TRANSLATORS: The title's credit line (424 px, 16 px). The author's name stays as written. Cut to fit: 'tworzone z pomocą AI' was too long for the row beside the buttons, so 'produkcja z AI'; the noun stays, since a bare 'z pomocą AI' reads as the concept made with AI, and the concept is Nathanial's alone.
 #. i18n: speaker=ui
 #: scenes/main.tscn
 msgid "Concept: Nathanial Henniges  /  AI-assisted development"
-msgstr "Koncepcja: Nathanial Henniges  /  z pomocą AI"
+msgstr "Koncepcja: Nathanial Henniges  /  produkcja z AI"
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: The credits roll (582 px, 19 px, centred, wraps). Translate the role headings and the sentences; names, companies, tools, licences, works' titles and the address stay as written. The translation credit (decision D2) is added in each language's own text under AI-ASSISTED PRODUCTION, so the English keeps none.
@@ -253,7 +253,7 @@ msgstr ""
 "[color=#73DDF5]EFEKTY DŹWIĘKOWE[/color]\n"
 "Większość generuje kod samej gry.\n"
 "\n"
-"Nagrana para (CC0)\n"
+"Nagrana para wodna (CC0)\n"
 "Joseph Sardin - BigSoundBank.com / LaSonotheque.org\n"
 "\n"
 "Nagrane warczenie (CC0, OpenGameArt.org)\n"
@@ -2862,7 +2862,7 @@ msgstr "Zablokowane, dopóki strażnik nie padnie."
 #. TRANSLATORS: i18n: story speaker=narrator
 #: scripts/story_text.gd:146
 msgid "Bolted. The sealed door comes first."
-msgstr "Zaryglowane. Najpierw zamknięte drzwi."
+msgstr "Zaryglowane. Najpierw przejdź przez zamknięte drzwi."
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: i18n: story speaker=narrator
@@ -2900,7 +2900,7 @@ msgstr "Ściągnij go pod zbiornik, jeśli możesz trzymać się z dala."
 #. i18n: story speaker=engineer engineer=self
 #: scripts/story_text.gd:160
 msgid "Stay back, I'll time it."
-msgstr "Zostań z tyłu, ja zgram zrzut."
+msgstr "Zostań z tyłu, ja wyczuję moment."
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: WOLF to the engineer, who told him the relay's risk. Avoid a past tense that shows the engineer's gender ("you told me"): rephrase.
@@ -2914,7 +2914,7 @@ msgstr "Przy przekaźniku usłyszałem od ciebie prawdę. Ściągnę go na znacz
 #. i18n: story speaker=WOLF engineer=you
 #: scripts/story_text.gd:166
 msgid "At the relay you'd have sent me in blind. I won't walk into its sights. Time the drop from the release; it crosses the mark on every pass."
-msgstr "Przy przekaźniku przez ciebie poszedłbym w ciemno. Nie wejdę mu na celownik. Zgraj zrzut z pulpitu; strażnik mija znacznik przy każdym przejściu."
+msgstr "Przy przekaźniku przez ciebie poszedłbym w ciemno. Nie wejdę mu na celownik. Wyczuj moment zrzutu przy pulpicie; strażnik mija znacznik przy każdym przejściu."
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: WOLF, when the engineer will time the drop alone.
@@ -3177,21 +3177,21 @@ msgstr "WOLF ściąga strażnika na znacznik."
 #. i18n: story speaker=narrator engineer=name
 #: scripts/story_text.gd:258
 msgid "WOLF wouldn't draw it, so {name} timed the drop alone."
-msgstr "WOLF nie chce ściągać strażnika, więc {name} samodzielnie zgrywa zrzut."
+msgstr "WOLF nie chce ściągać strażnika, więc {name} w pojedynkę wyczuwa moment zrzutu."
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: An end-card row. {name} is the engineer's first name; keep {name} as written. Avoid a past tense with the engineer as its subject ("timed"): rephrase.
 #. i18n: story speaker=narrator engineer=name
 #: scripts/story_text.gd:261
 msgid "WOLF held back while {name} timed the drop."
-msgstr "WOLF czeka z tyłu, a {name} zgrywa zrzut."
+msgstr "WOLF czeka z tyłu, a {name} wyczuwa moment zrzutu."
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: An end-card row. {name} is the engineer's first name; keep {name} as written. Avoid a past tense with the engineer as its subject ("timed"): rephrase.
 #. i18n: story speaker=narrator engineer=name
 #: scripts/story_text.gd:264
 msgid "WOLF broke off while {name} timed the drop."
-msgstr "WOLF się wycofuje, a {name} zgrywa zrzut."
+msgstr "WOLF się wycofuje, a {name} wyczuwa moment zrzutu."
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: An end-card row, for a save that did not store how the sentry came down.
