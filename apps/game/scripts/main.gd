@@ -563,7 +563,6 @@ const JUNCTION_RESTORE_A_LINE: String = "Service junction restored. Arm the brea
 @onready var fps_options: OptionButton = $CanvasLayer/PauseOverlay/Panel/SettingsMenu/FPSOptions
 @onready var resolution_options: OptionButton = $CanvasLayer/PauseOverlay/Panel/SettingsMenu/ResolutionOptions
 @onready var fullscreen_toggle: CheckButton = $CanvasLayer/PauseOverlay/Panel/SettingsMenu/FullscreenToggle
-@onready var settings_note: Label = $CanvasLayer/PauseOverlay/Panel/SettingsMenu/SettingsNote
 @onready var title_screen: ColorRect = $CanvasLayer/TitleScreen
 @onready var title_mark: TextureRect = $CanvasLayer/TitleScreen/LogoMark
 @onready var title_line: ColorRect = $CanvasLayer/TitleScreen/TitleLine
@@ -723,6 +722,9 @@ var hold_toggle: bool = false
 ## With TOGGLE HOLDS on, true while a press has the crank turning.
 var crank_latched: bool = false
 var credits_paused: bool = false
+## Whether Pause's hint last showed the touch line, so a language change writes it again the same way
+## ([method _show_pause_hint]).
+var _pause_hint_tapped: bool = false
 ## The exported changelog as loaded at title time; empty when the file is missing.
 var changelog_text: String = ""
 var save_error: String = ""
@@ -1029,14 +1031,16 @@ func _refresh_continue() -> void:
 	continue_button.disabled = not saved
 	# A finished slice has nothing left to continue: the button offers a fresh run (decision D). NEW GAME
 	# would do the same, so PLAY AGAIN stands alone across both buttons' row.
-	continue_button.text = PLAY_AGAIN_TEXT if finished else CONTINUE_TEXT
+	# The title's captions auto-translate; I18n.KEY.tr only marks the constants for the translation
+	# template (localization PR L7a), so the button and the note keep the English.
+	continue_button.text = I18n.KEY.tr(PLAY_AGAIN_TEXT) if finished else I18n.KEY.tr(CONTINUE_TEXT)
 	new_game_button.visible = not finished
 	continue_button.offset_left = new_game_button.offset_left if finished else TITLE_CONTINUE_LEFT
 	if finished and new_game_button.has_focus():
 		_grab_menu_focus(continue_button)
-	var reason: String = FINISHED_NOTE if finished else ""
+	var reason: String = I18n.KEY.tr(FINISHED_NOTE) if finished else ""
 	if not saved:
-		reason = UNREADABLE_CHECKPOINT_NOTE if FileAccess.file_exists(save_path) else NO_CHECKPOINT_NOTE
+		reason = I18n.KEY.tr(UNREADABLE_CHECKPOINT_NOTE) if FileAccess.file_exists(save_path) else I18n.KEY.tr(NO_CHECKPOINT_NOTE)
 	continue_note.text = reason
 	continue_button.tooltip_text = reason
 
@@ -1936,7 +1940,7 @@ func _hide_title_overlay(overlay: Control) -> void:
 
 func _toggle_credits_pause() -> void:
 	credits_paused = not credits_paused
-	credits_pause_button.text = "RESUME SCROLL" if credits_paused else "PAUSE SCROLL"
+	credits_pause_button.text = I18n.KEY.tr("RESUME SCROLL") if credits_paused else I18n.KEY.tr("PAUSE SCROLL")
 
 
 func _on_credits_body_input(event: InputEvent) -> void:
@@ -1995,9 +1999,9 @@ func _setup_settings() -> void:
 	var mobile: bool = OS.has_feature("ios") or OS.has_feature("android")
 	resolution_options.disabled = mobile
 	fullscreen_toggle.disabled = mobile
-	settings_note.text = "Window size is managed by iOS/Android." if mobile else "Window size applies on desktop."
+	settings_menu.show_note(I18n.KEY.tr("Window size is managed by iOS/Android.") if mobile else I18n.KEY.tr("Window size applies on desktop."))
 	if mobile:
-		$CanvasLayer/PauseOverlay/Panel/PauseMenu/PauseHint.text = "TAP RESUME TO RETURN"
+		_show_pause_hint(true)
 	if not mobile:
 		# The logo screen normally applied these at launch already; a direct start applies them here.
 		GameSettings.apply_saved_window(get_window(), config)
@@ -2035,7 +2039,7 @@ func _save_settings() -> void:
 	config.set_value("video", "resolution", resolution_options.selected)
 	config.set_value("video", "fullscreen", fullscreen_toggle.button_pressed)
 	if config.save(settings_path) != OK:
-		settings_note.text = "Settings could not be saved."
+		settings_menu.show_note(I18n.KEY.tr("Settings could not be saved."))
 
 
 func _on_pause_button() -> void:
@@ -2114,11 +2118,22 @@ func _show_pause_menu() -> void:
 	$CanvasLayer/PauseOverlay/Panel/Accent.show()
 	settings_menu.hide()
 	pause_menu.show()
-	$CanvasLayer/PauseOverlay/Panel/PauseMenu/TitleButton.text = "SKIP OPENING" if intro_active else "RETURN TO TITLE"
+	$CanvasLayer/PauseOverlay/Panel/PauseMenu/TitleButton.text = I18n.KEY.tr("SKIP OPENING") if intro_active else I18n.KEY.tr("RETURN TO TITLE")
 	$CanvasLayer/PauseOverlay/Panel/PauseMenu/ReturnWarning.visible = not intro_active
-	$CanvasLayer/PauseOverlay/Panel/PauseMenu/PauseHint.text = "TAP RESUME TO RETURN" if touch_enabled and not controller_active else "%s  RESUME" % settings_menu.prompt(&"pause_game", controller_active)
+	_show_pause_hint(touch_enabled and not controller_active)
 	_reveal_menu()
 	_grab_menu_focus(resume_button)
+
+
+## Writes Pause's hint in the current language: TAP RESUME TO RETURN when [param tapped] (a phone or
+## tablet at start-up; the touch layout with no controller in use when Pause opens), else the Pause key or
+## button and RESUME. The key's name goes into the translated template, so the hint is translated here
+## and its Label's auto-translate is off (main.tscn); [method _notification] writes it again, the same
+## way, when the language changes while Pause is open.
+func _show_pause_hint(tapped: bool) -> void:
+	_pause_hint_tapped = tapped
+	var hint: Label = $CanvasLayer/PauseOverlay/Panel/PauseMenu/PauseHint
+	hint.text = tr("TAP RESUME TO RETURN") if tapped else tr("%s  RESUME") % settings_menu.prompt(&"pause_game", controller_active)
 
 
 func _return_to_title() -> void:
@@ -2200,6 +2215,10 @@ func _notification(what: int) -> void:
 	match what:
 		NOTIFICATION_WM_GO_BACK_REQUEST:
 			_handle_back()
+		NOTIFICATION_TRANSLATION_CHANGED:
+			# Pause's hint is the one title or Pause text translated in code (localization PR L7a).
+			if is_node_ready() and pause_menu.visible:
+				_show_pause_hint(_pause_hint_tapped)
 		NOTIFICATION_APPLICATION_PAUSED, NOTIFICATION_APPLICATION_FOCUS_OUT:
 			# Leaving the app mid-play pauses it so nothing advances unseen.
 			if auto_pause_on_focus_loss and is_node_ready() and not title_open and not end_card_active and not get_tree().paused:
