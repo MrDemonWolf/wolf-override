@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: WOLF OVERRIDE\n"
-"PO-Revision-Date: 2026-10-19 13:29+0000\n"
+"PO-Revision-Date: 2026-10-19 13:32+0000\n"
 "Last-Translator: Claude (Anthropic), machine translation, unreviewed\n"
 "Language-Team: none\n"
 "MIME-Version: 1.0\n"
@@ -453,7 +453,7 @@ msgstr "PANTALLA COMPLETA"
 #: scenes/main.tscn
 #: scripts/main.gd:2002
 msgid "Window size applies on desktop."
-msgstr "El tamaño de la ventana solo se aplica en escritorio."
+msgstr "El tamaño de la ventana se aplica en escritorio."
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: Settings button (180 px, 18 px): close Settings.
@@ -928,7 +928,7 @@ msgstr "SUAVIZADO DE BORDES"
 #. i18n: speaker=ui
 #: scripts/game_settings.gd:288
 msgid "OFF"
-msgstr "NO"
+msgstr "DESACTIVADO"
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: Anti-aliasing list item. Technical: copy it.
@@ -1062,7 +1062,7 @@ msgstr "La V-sync puede limitar el tope de FPS."
 #. i18n: speaker=ui
 #: scripts/game_settings.gd:566
 msgid "Volume changes apply immediately. Effects carries every sound effect; there is no music or voice yet."
-msgstr "El volumen cambia al instante. Efectos lleva todos los sonidos; aún no hay música ni voces."
+msgstr "El volumen cambia al instante. Efectos incluye todos los sonidos; aún no hay música ni voces."
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: CONTROLS note.
@@ -1099,7 +1099,7 @@ msgstr "Presiona un botón o un stick del control para «%s». Esc cancela."
 #. i18n: speaker=ui
 #: scripts/game_settings.gd:629
 msgid "Rebind cancelled."
-msgstr "Cambio de tecla cancelado."
+msgstr "Reasignación cancelada."
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: Rebind note. %s is the other action's name.
@@ -1107,7 +1107,7 @@ msgstr "Cambio de tecla cancelado."
 #: scripts/game_settings.gd:644
 #, c-format
 msgid "Already used by %s. Choose another input or cancel."
-msgstr "Ya la usa «%s». Elige otra o cancela."
+msgstr "«%s» ya usa esa entrada. Elige otra o cancela."
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: Rebind note.
