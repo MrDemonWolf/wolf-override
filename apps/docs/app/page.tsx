@@ -138,10 +138,7 @@ export default function HomePage() {
     <div data-landing="" className="flow-root overflow-clip bg-ink text-text scheme-dark">
       <JsonLd data={homeStructuredData()} />
       <header className="relative z-30 mx-auto mt-4 -mb-23 flex min-h-19 w-[min(calc(100%-2rem),1232px)] items-center justify-between gap-4 rounded-control border border-accent/24 bg-panel/94 px-[clamp(1rem,2.5vw,1.75rem)] py-[.65rem] shadow-panel phone:mt-2 phone:-mb-30 phone:min-h-0 phone:w-[calc(100%-1rem)] phone:px-3 phone-xs:gap-2 phone-xs:px-2">
-        <BrandLockup
-          className="phone:min-w-0 phone:gap-[.45rem] phone-xs:gap-[.35rem]"
-          markClassName="phone:size-[1.9rem] phone-xs:size-7"
-        />
+        <BrandLockup />
         <nav className="ml-auto flex flex-wrap items-center justify-end gap-[.2rem] font-heading font-semibold menu:hidden" aria-label="Main navigation">
           <a className={navLink} href="#story">Story</a>
           <a className={navLink} href="#gameplay">Gameplay</a>
