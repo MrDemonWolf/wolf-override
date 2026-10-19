@@ -99,9 +99,9 @@ func _build() -> void:
 	sheen.set_anchors_preset(Control.PRESET_FULL_RECT)
 	sheen.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	panel.add_child(sheen)
-	var title: Label = _label("DEBUG MENU", Rect2(20.0, 10.0, 200.0, 32.0), 22, Color.WHITE)
+	var title: Label = UILabel.place(panel, "DEBUG MENU", Rect2(20.0, 10.0, 200.0, 32.0), 22, Color.WHITE)
 	title.add_theme_font_override("font", DISPLAY_FONT)
-	status_label = _label("", Rect2(190.0, 16.0, 334.0, 22.0), SMALL_FONT_SIZE, MUTED)
+	status_label = UILabel.place(panel, "", Rect2(190.0, 16.0, 334.0, 22.0), SMALL_FONT_SIZE, MUTED)
 	status_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
 	status_label.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
 	var accent: ColorRect = ColorRect.new()
@@ -157,11 +157,11 @@ func _build() -> void:
 	_build_force_page(pages[&"force"])
 	_build_save_page(pages[&"save"])
 	_build_view_page(pages[&"view"])
-	note_label = _label("", Rect2(20.0, 374.0, 504.0, 30.0), CAPTION_FONT_SIZE, ACCENT)
+	note_label = UILabel.place(panel, "", Rect2(20.0, 374.0, 504.0, 30.0), CAPTION_FONT_SIZE, ACCENT)
 	note_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	note_label.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
 	note_label.max_lines_visible = 2
-	hint_label = _label("", Rect2(20.0, 412.0, 344.0, 22.0), CAPTION_FONT_SIZE, MUTED)
+	hint_label = UILabel.place(panel, "", Rect2(20.0, 412.0, 344.0, 22.0), CAPTION_FONT_SIZE, MUTED)
 	hint_label.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
 	close_button = Button.new()
 	close_button.name = "CloseButton"
@@ -278,18 +278,6 @@ func _bar_button(row: HBoxContainer, text: String, action: Callable) -> Button:
 	button.pressed.connect(action)
 	row.add_child(button)
 	return button
-
-
-func _label(text: String, rect: Rect2, font_size: int, tint: Color) -> Label:
-	var label: Label = Label.new()
-	label.text = text
-	label.position = rect.position
-	label.size = rect.size
-	label.add_theme_font_size_override("font_size", font_size)
-	label.add_theme_color_override("font_color", tint)
-	label.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	panel.add_child(label)
-	return label
 
 
 func _caption(box: VBoxContainer, text: String, tint: Color = MUTED) -> Label:
