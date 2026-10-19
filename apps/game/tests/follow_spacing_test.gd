@@ -21,7 +21,9 @@ func _run() -> void:
 	_check_reaches(human, wolf)
 	_expect(wolf.get_index() < human.get_index() and wolf.z_index == human.z_index and wolf.keep_clear_of == human, "the engineer draws in front of WOLF at the same depth")
 
-	# The opening: the engineer is hidden, so WOLF walking out past his spot never dims.
+	# The opening: WOLF walking out never dims. (Layout L1: the engineer arrives in the doorway in box 2
+	# and watches from there, so they are no longer hidden; WOLF's walk out waits for the beats before it,
+	# which a press never snaps to their end, so watch until he has walked.)
 	game.call("_new_game")
 	var intro_dimmed: bool = false
 	var intro_walked: bool = false
@@ -31,7 +33,13 @@ func _run() -> void:
 			await physics_frame
 			intro_walked = intro_walked or absf(wolf.velocity.x) > 1.0
 			intro_dimmed = intro_dimmed or wolf.passing() or wolf.body_sprite.self_modulate.v < 0.99
-	_expect(intro_walked and not human.is_visible_in_tree() and not intro_dimmed, "in the opening WOLF walks out undimmed past the hidden engineer")
+	for _frame: int in 900:
+		if intro_walked:
+			break
+		await physics_frame
+		intro_walked = intro_walked or absf(wolf.velocity.x) > 1.0
+		intro_dimmed = intro_dimmed or wolf.passing() or wolf.body_sprite.self_modulate.v < 0.99
+	_expect(intro_walked and not intro_dimmed, "in the opening WOLF walks out undimmed")
 
 	# The corridor: the opening hands over with WOLF a follow gap behind, clear of the engineer.
 	game.call("_finish_intro")
