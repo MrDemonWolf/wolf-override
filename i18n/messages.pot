@@ -79,7 +79,7 @@ msgid ""
 msgstr ""
 
 #: scenes/main.tscn
-#: scripts/main.gd:4457
+#: scripts/main.gd:4476
 msgid "PAUSE"
 msgstr ""
 
@@ -120,6 +120,7 @@ msgid "NEW GAME"
 msgstr ""
 
 #: scenes/main.tscn
+#: scripts/main.gd:1036
 msgid "CONTINUE"
 msgstr ""
 
@@ -235,7 +236,8 @@ msgid "BACK TO TITLE"
 msgstr ""
 
 #: scenes/main.tscn
-#: scripts/main.gd:1910
+#: scripts/main.gd:1914
+#: scripts/main.gd:1943
 msgid "PAUSE SCROLL"
 msgstr ""
 
@@ -264,10 +266,7 @@ msgid "RESUME"
 msgstr ""
 
 #: scenes/main.tscn
-msgid "ESC / START TO RESUME"
-msgstr ""
-
-#: scenes/main.tscn
+#: scripts/main.gd:2121
 msgid "RETURN TO TITLE"
 msgstr ""
 
@@ -294,6 +293,7 @@ msgid "FULLSCREEN"
 msgstr ""
 
 #: scenes/main.tscn
+#: scripts/main.gd:2002
 msgid "Window size applies on desktop."
 msgstr ""
 
@@ -305,64 +305,366 @@ msgstr ""
 msgid "MrDemonWolf, Inc."
 msgstr ""
 
-#: scripts/game_settings.gd:223
+#: scripts/game_settings.gd:22
+msgid "Move left"
+msgstr ""
+
+#: scripts/game_settings.gd:22
+msgid "Move right"
+msgstr ""
+
+#: scripts/game_settings.gd:22
+msgid "Interact / continue"
+msgstr ""
+
+#: scripts/game_settings.gd:22
+msgid "Response 1"
+msgstr ""
+
+#: scripts/game_settings.gd:22
+msgid "Response 2"
+msgstr ""
+
+#: scripts/game_settings.gd:22
+msgid "Pause"
+msgstr ""
+
+#: scripts/game_settings.gd:25
+msgid "cycle name"
+msgstr ""
+
+#: scripts/game_settings.gd:31
+msgid "Master volume"
+msgstr ""
+
+#: scripts/game_settings.gd:31
+msgid "Music volume"
+msgstr ""
+
+#: scripts/game_settings.gd:31
+msgid "Effects volume"
+msgstr ""
+
+#: scripts/game_settings.gd:31
+msgid "Voice volume"
+msgstr ""
+
+#: scripts/game_settings.gd:45
+msgctxt "key name"
+msgid "Escape"
+msgstr ""
+
+#: scripts/game_settings.gd:45
+msgctxt "key name"
+msgid "Tab"
+msgstr ""
+
+#: scripts/game_settings.gd:45
+msgctxt "key name"
+msgid "Backspace"
+msgstr ""
+
+#: scripts/game_settings.gd:45
+msgctxt "key name"
+msgid "Enter"
+msgstr ""
+
+#: scripts/game_settings.gd:45
+msgctxt "key name"
+msgid "Kp Enter"
+msgstr ""
+
+#: scripts/game_settings.gd:45
+msgctxt "key name"
+msgid "Insert"
+msgstr ""
+
+#: scripts/game_settings.gd:45
+msgctxt "key name"
+msgid "Delete"
+msgstr ""
+
+#: scripts/game_settings.gd:45
+msgctxt "key name"
+msgid "Pause"
+msgstr ""
+
+#: scripts/game_settings.gd:45
+msgctxt "key name"
+msgid "Print"
+msgstr ""
+
+#: scripts/game_settings.gd:45
+msgctxt "key name"
+msgid "Clear"
+msgstr ""
+
+#: scripts/game_settings.gd:45
+msgctxt "key name"
+msgid "Home"
+msgstr ""
+
+#: scripts/game_settings.gd:45
+msgctxt "key name"
+msgid "End"
+msgstr ""
+
+#: scripts/game_settings.gd:45
+msgctxt "key name"
+msgid "Left"
+msgstr ""
+
+#: scripts/game_settings.gd:45
+msgctxt "key name"
+msgid "Up"
+msgstr ""
+
+#: scripts/game_settings.gd:45
+msgctxt "key name"
+msgid "Right"
+msgstr ""
+
+#: scripts/game_settings.gd:45
+msgctxt "key name"
+msgid "Down"
+msgstr ""
+
+#: scripts/game_settings.gd:45
+msgctxt "key name"
+msgid "PageUp"
+msgstr ""
+
+#: scripts/game_settings.gd:45
+msgctxt "key name"
+msgid "PageDown"
+msgstr ""
+
+#: scripts/game_settings.gd:45
+msgctxt "key name"
+msgid "CapsLock"
+msgstr ""
+
+#: scripts/game_settings.gd:45
+msgctxt "key name"
+msgid "NumLock"
+msgstr ""
+
+#: scripts/game_settings.gd:45
+msgctxt "key name"
+msgid "ScrollLock"
+msgstr ""
+
+#: scripts/game_settings.gd:45
+msgctxt "key name"
+msgid "Kp Multiply"
+msgstr ""
+
+#: scripts/game_settings.gd:45
+msgctxt "key name"
+msgid "Kp Divide"
+msgstr ""
+
+#: scripts/game_settings.gd:45
+msgctxt "key name"
+msgid "Kp Subtract"
+msgstr ""
+
+#: scripts/game_settings.gd:45
+msgctxt "key name"
+msgid "Kp Period"
+msgstr ""
+
+#: scripts/game_settings.gd:45
+msgctxt "key name"
+msgid "Kp Add"
+msgstr ""
+
+#: scripts/game_settings.gd:45
+msgctxt "key name"
+msgid "Menu"
+msgstr ""
+
+#: scripts/game_settings.gd:45
+msgctxt "key name"
+msgid "Help"
+msgstr ""
+
+#: scripts/game_settings.gd:45
+msgctxt "key name"
+msgid "Space"
+msgstr ""
+
+#: scripts/game_settings.gd:250
+msgid "THE DEN  /  LOCAL CONFIGURATION"
+msgstr ""
+
+#: scripts/game_settings.gd:262
+msgid "DISPLAY"
+msgstr ""
+
+#: scripts/game_settings.gd:262
+msgid "AUDIO"
+msgstr ""
+
+#: scripts/game_settings.gd:262
+msgid "CONTROLS"
+msgstr ""
+
+#: scripts/game_settings.gd:262
 msgid "GENERAL"
 msgstr ""
 
-#: scripts/game_settings.gd:239
+#: scripts/game_settings.gd:279
 msgid "V-SYNC"
 msgstr ""
 
-#: scripts/game_settings.gd:248
+#: scripts/game_settings.gd:285
+msgid "EDGE SMOOTHING"
+msgstr ""
+
+#: scripts/game_settings.gd:285
+msgid "OFF"
+msgstr ""
+
+#: scripts/game_settings.gd:285
+msgid "2× MSAA"
+msgstr ""
+
+#: scripts/game_settings.gd:285
+msgid "4× MSAA"
+msgstr ""
+
+#: scripts/game_settings.gd:285
+msgid "8× MSAA"
+msgstr ""
+
+#: scripts/game_settings.gd:288
 msgid "REDUCED MOTION"
 msgstr ""
 
-#: scripts/game_settings.gd:249
+#: scripts/game_settings.gd:289
 msgid "No camera shake or hit-stop; screen flashes are shorter."
 msgstr ""
 
-#: scripts/game_settings.gd:259
+#: scripts/game_settings.gd:298
+msgid "TEXT SIZE"
+msgstr ""
+
+#: scripts/game_settings.gd:299
 msgid "Scales the dialogue, hints, cards and station names."
 msgstr ""
 
-#: scripts/game_settings.gd:302
-msgid "TOGGLE HOLDS"
-msgstr ""
-
-#: scripts/game_settings.gd:303
-msgid "Press interact once to start a crank and again to stop it, instead of holding it down. Keyboard, controller and touch."
-msgstr ""
-
-#: scripts/game_settings.gd:308
-msgid "RESTORE DEFAULT CONTROLS"
+#: scripts/game_settings.gd:322
+msgid "ACTION"
 msgstr ""
 
 #: scripts/game_settings.gd:322
+msgid "KEYBOARD"
+msgstr ""
+
+#: scripts/game_settings.gd:322
+msgid "CONTROLLER"
+msgstr ""
+
+#: scripts/game_settings.gd:342
+msgid "Stick deadzone"
+msgstr ""
+
+#: scripts/game_settings.gd:346
+msgid "TOGGLE HOLDS"
+msgstr ""
+
+#: scripts/game_settings.gd:347
+msgid "Press interact once to start a crank and again to stop it, instead of holding it down. Keyboard, controller and touch."
+msgstr ""
+
+#: scripts/game_settings.gd:352
+msgid "RESTORE DEFAULT CONTROLS"
+msgstr ""
+
+#: scripts/game_settings.gd:369
 msgid "CANCEL REBIND"
 msgstr ""
 
-#: scripts/game_settings.gd:340
+#: scripts/game_settings.gd:387
 msgid "LANGUAGE"
 msgstr ""
 
-#: scripts/game_settings.gd:504
+#: scripts/game_settings.gd:559
+msgid "Window size is OS-managed on mobile."
+msgstr ""
+
+#: scripts/game_settings.gd:559
+#: scripts/game_settings.gd:561
+msgid "V-sync may limit the FPS cap."
+msgstr ""
+
+#: scripts/game_settings.gd:563
+msgid "Volume changes apply immediately. Effects carries every sound effect; there is no music or voice yet."
+msgstr ""
+
+#: scripts/game_settings.gd:563
+msgid "Select a binding, then press a key, controller button or move a stick."
+msgstr ""
+
+#: scripts/game_settings.gd:563
 msgid "Until you choose a language, the game uses your system's."
 msgstr ""
 
-#: scripts/game_settings.gd:548
+#: scripts/game_settings.gd:611
+msgid "Press a keyboard input for %s. Esc cancels."
+msgstr ""
+
+#: scripts/game_settings.gd:611
+msgid "Press a controller input for %s. Esc cancels."
+msgstr ""
+
+#: scripts/game_settings.gd:628
 msgid "Rebind cancelled."
 msgstr ""
 
-#: scripts/game_settings.gd:568
+#: scripts/game_settings.gd:643
+msgid "Already used by %s. Choose another input or cancel."
+msgstr ""
+
+#: scripts/game_settings.gd:649
 msgid "Binding saved."
 msgstr ""
 
-#: scripts/game_settings.gd:698
+#: scripts/game_settings.gd:717
+msgid "Left stick"
+msgstr ""
+
+#: scripts/game_settings.gd:717
+msgid "Axis %d"
+msgstr ""
+
+#: scripts/game_settings.gd:744
+msgid "AXIS %d %s"
+msgstr ""
+
+#: scripts/game_settings.gd:775
+msgid "START"
+msgstr ""
+
+#: scripts/game_settings.gd:776
+msgid "D-pad left"
+msgstr ""
+
+#: scripts/game_settings.gd:777
+msgid "D-pad right"
+msgstr ""
+
+#: scripts/game_settings.gd:778
+msgid "BUTTON %d"
+msgstr ""
+
+#: scripts/game_settings.gd:805
 msgid "Default controls restored."
 msgstr ""
 
-#: scripts/game_settings.gd:722
-#: scripts/main.gd:2038
+#: scripts/game_settings.gd:829
+#: scripts/main.gd:2042
 msgid "Settings could not be saved."
 msgstr ""
 
@@ -394,38 +696,67 @@ msgstr ""
 msgid "EXIT LOCKED"
 msgstr ""
 
-#: scripts/main.gd:1062
+#: scripts/main.gd:1036
+msgid "PLAY AGAIN"
+msgstr ""
+
+#: scripts/main.gd:1041
+msgid "Slice complete. PLAY AGAIN starts a fresh run."
+msgstr ""
+
+#: scripts/main.gd:1043
+msgid "Saved checkpoint could not be read."
+msgstr ""
+
+#: scripts/main.gd:1043
+msgid "No checkpoint yet. Saving starts at the first SAFE POINT."
+msgstr ""
+
+#: scripts/main.gd:1066
 msgid "LINK UNAVAILABLE"
 msgstr ""
 
-#: scripts/main.gd:1945
+#: scripts/main.gd:1943
+#: scripts/main.gd:1949
 msgid "RESUME SCROLL"
 msgstr ""
 
-#: scripts/main.gd:1978
+#: scripts/main.gd:1982
 msgid "30 FPS"
 msgstr ""
 
-#: scripts/main.gd:1979
+#: scripts/main.gd:1983
 msgid "60 FPS"
 msgstr ""
 
-#: scripts/main.gd:1980
+#: scripts/main.gd:1984
 msgid "UNCAPPED"
 msgstr ""
 
-#: scripts/main.gd:1981
+#: scripts/main.gd:1985
 msgid "90 FPS"
 msgstr ""
 
-#: scripts/main.gd:1982
+#: scripts/main.gd:1986
 msgid "120 FPS"
 msgstr ""
 
-#: scripts/main.gd:1983
+#: scripts/main.gd:1987
 msgid "144 FPS"
 msgstr ""
 
-#: scripts/main.gd:2000
+#: scripts/main.gd:2002
+msgid "Window size is managed by iOS/Android."
+msgstr ""
+
+#: scripts/main.gd:2121
+msgid "SKIP OPENING"
+msgstr ""
+
+#: scripts/main.gd:2136
 msgid "TAP RESUME TO RETURN"
+msgstr ""
+
+#: scripts/main.gd:2136
+msgid "%s  RESUME"
 msgstr ""
