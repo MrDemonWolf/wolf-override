@@ -44,8 +44,6 @@ Purpose
                               against each other and languages.json (glossary_problems): every covered
                               language has a form for every term and a guide with every section, forms
                               pass their script guard, open terms require nothing. Exits 1 on any problem.
-    weblate-glossary OUTDIR   writes OUTDIR/<lang>.tbx, the glossary for upload to Weblate's glossary
-                              (PR L5, decision D8; i18n/README.md). Generated, never committed.
     selftest OUT              runs the gates above on fixed planted cases (SELFTEST, FAMILY_SELFTEST,
                               RELEASE_SELFTEST, GLOSSARY_SELFTEST) and writes the result as JSON at OUT;
                               exits 1 if a planted error passes or a clean line fails. The negative control
@@ -920,77 +918,6 @@ def glossary_check() -> None:
           f"({sum(f['status'] == 'open' for f in forms)} forms still open), {len(read_styles())} style guides: sound")
 
 
-#: The TBX namespace-free root Weblate's glossary upload reads (TBX 2008 "martif", as in Weblate's own
-#: example, docs.weblate.org/en/latest/formats/tbx.html, read October 17, 2026).
-TBX_DOCTYPE = '<?xml version="1.0" encoding="UTF-8"?>\n<!DOCTYPE martif PUBLIC "ISO 12200:1999A//DTD MARTIF core (DXFcdV04)//EN" "TBXcdv04.dtd">\n'
-
-
-def weblate_glossary(outdir: Path) -> None:
-    """The `weblate-glossary` subcommand: writes OUTDIR/<Godot code>.tbx for every language the glossary
-    covers, for upload to the Weblate project's glossary (i18n/README.md, "Weblate"). The glossary stays
-    the one source: these files are generated, never committed, and uploaded again whenever
-    i18n/glossary.json changes. Per file, each term is one termEntry: its "note" as the source
-    explanation (<descrip>, which Weblate shows beside the term), the English term, and, in the target
-    language, the required form with the status, accepted variants and avoid forms as a translator note
-    (<note from="translator">); an open term has no target term, only its proposals and avoid forms as a
-    language note (<descrip> in the target langSet), so Weblate shows it untranslated. Avoid forms are not
-    written as Weblate "forbidden" entries: Weblate keys a glossary entry by its source term, and our gate
-    (glossary_avoided) already fails them. The "keep" words go in as read-only ("Translation needed: No")
-    and the stored names as terms. Exits 1 when glossary_problems finds anything, so a broken glossary is
-    never uploaded."""
-    from xml.etree import ElementTree as ET
-    glossary = json.loads(GLOSSARY_FILE.read_text(encoding="utf-8"))
-    problems = glossary_problems(glossary, read_styles())
-    if problems:
-        sys.exit("fix the glossary first:\n" + "\n".join(problems))
-    xml_lang = "{http://www.w3.org/XML/1998/namespace}lang"
-    outdir.mkdir(parents=True, exist_ok=True)
-    for key, code in glossary_codes(glossary).items():
-        root = ET.Element("martif", {"type": "TBX", xml_lang: "en"})
-        desc = ET.SubElement(ET.SubElement(ET.SubElement(root, "martifHeader"), "fileDesc"), "sourceDesc")
-        ET.SubElement(desc, "p").text = (f"WOLF OVERRIDE glossary for {LANGUAGES[code]['name']} ({key}), generated "
-                                         "from i18n/glossary.json by scripts/i18n/i18n_tool.py weblate-glossary")
-        body = ET.SubElement(ET.SubElement(root, "text"), "body")
-
-        def entry(source: str, explanation: str, read_only: bool = False) -> ET.Element:
-            """One termEntry with the English ``source`` term and its source ``explanation``; with
-            ``read_only`` it is marked untranslatable, as Weblate's TBX reader expects."""
-            node = ET.SubElement(body, "termEntry")
-            ET.SubElement(node, "descrip").text = explanation
-            if read_only:
-                ET.SubElement(node, "descrip", {"type": "Translation needed"}).text = "No"
-            ET.SubElement(ET.SubElement(ET.SubElement(node, "langSet", {xml_lang: "en"}), "tig"), "term").text = source
-            return node
-
-        for term, forms in glossary["terms"].items():
-            node = entry(term, forms["note"])
-            form = term_form(forms, key, glossary)
-            if form is None:
-                continue
-            lang_set = ET.SubElement(node, "langSet", {xml_lang: code})
-            notes = [f"status: {form['status']}"]
-            notes += [f"{field}: {', '.join(form[field])}" for field in GLOSSARY_LISTS if form.get(field)]
-            if form.get("required"):
-                tig = ET.SubElement(lang_set, "tig")
-                ET.SubElement(tig, "term").text = form["required"]
-                ET.SubElement(tig, "note", {"from": "translator"}).text = "; ".join(notes)
-            else:
-                ET.SubElement(lang_set, "descrip").text = "; ".join(["a reviewer's word"] + notes)
-        # Placeholders are left out: as glossary terms they would match every line, and the placeholder
-        # gate (placeholders_ok) already guards them.
-        for word in glossary["keep"]:
-            if not (POSITIONAL.fullmatch(word) or NAMED.fullmatch(word)):
-                entry(word, "Copied through untranslated in every language.", read_only=True)
-        for name, written in glossary["names"].items():
-            node = entry(name, "One of the engineer's three provisional first names (decision D9).")
-            tig = ET.SubElement(ET.SubElement(node, "langSet", {xml_lang: code}), "tig")
-            ET.SubElement(tig, "term").text = written.get(key, name)
-        ET.indent(root, space=" ")
-        path = outdir / f"{code}.tbx"
-        path.write_text(TBX_DOCTYPE + ET.tostring(root, encoding="unicode") + "\n", encoding="utf-8")
-        print(f"{path}: {len(body)} entries")
-
-
 def gendered_words(text: str, lang: str, roles: set[str]) -> list[str]:
     """The words of ``text`` that show the engineer's gender in ``lang``, for a line where the engineer
     appears as ``roles`` (engineer_roles). Six checks, from gender_rule(lang):
@@ -1541,7 +1468,7 @@ def main(argv: list[str]) -> None:
         else:
             args.append(Path(arg))
     plain = {"fonts": (fonts, 1), "fill": (fill, 3), "backprompt": (backprompt, 2), "selftest": (selftest, 1),
-             "hardcoded": (hardcoded, 3), "glossary": (glossary_check, 0), "weblate-glossary": (weblate_glossary, 1)}
+             "hardcoded": (hardcoded, 3), "glossary": (glossary_check, 0)}
     command = argv[0] if argv else ""
     if command == "potfiles" and len(args) == 1 and flags <= {"--check"} and back is None:
         potfiles(args[0], "--check" in flags)

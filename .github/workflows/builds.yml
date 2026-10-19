@@ -104,7 +104,7 @@ jobs:
 
           **Windows:** right-click the zip, choose **Extract All**, then run \`WOLF-OVERRIDE.exe\`. At "Windows protected your PC", click **More info**, then **Run anyway**. \`WOLF-OVERRIDE.console.exe\` runs the same build with its log in a console window. If Smart App Control is on, Windows blocks unsigned builds and there is no way to allow this one.
 
-          Licence notices are in the \`licenses\` folder in each zip. Full steps: [Testing and deployment → Test builds](https://wolfoverride.mrdemonwolf.dev/docs/development/testing/#test-builds).
+          Licence notices are in the \`licenses\` folder in each zip. Full steps: [Install a test build](https://wolfoverride.mrdemonwolf.dev/docs/test-builds/).
           EOF
       - name: Preserve export logs
         if: failure() || cancelled()

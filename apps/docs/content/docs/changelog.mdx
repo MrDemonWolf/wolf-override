@@ -1,6 +1,6 @@
 ---
 title: Changelog
-description: What changed in each development version of the WOLF//OVERRIDE source game and website, newest first. Spoiler-free.
+description: What changed in each development version of the WOLF OVERRIDE source game and website, newest first. Spoiler-free.
 ---
 
 **What this page is for:** what changed in each development version, newest first. Spoiler-free.
@@ -38,6 +38,8 @@ Changes merged after 0.15.0. They become the next version when it is cut.
 
 ### Website
 
+- The website, its page titles, link previews, llms.txt and the guide call the game WOLF OVERRIDE; the search-engine data keeps the old spelling with two slashes as a former name.
+- The title-screen picture in First steps is recaptured with the new name.
 - The changelog is split into development versions, 0.1.0 (September 26, 2026) to 0.15.0 (October 16, 2026), with short lines by group and the full notes under each version.
 - The changelog page shows the current version, read from the game's project file when the site is built.
 - What is next is up to date: sound and **TEXT SIZE** already exist.
@@ -47,6 +49,11 @@ Changes merged after 0.15.0. They become the next version when it is cut.
 - Legal lists the CC0 sound recordings and every kind of AI-made art, including the doors, the door end and the engineer's collapse and crank frames.
 - Credits and Legal say how the new whole-piece characters were made.
 - Credits and Legal say how the new whole-piece machines were made.
+- The player pages (First steps, Controls, Settings, Saving and retrying, Troubleshooting and the walkthrough) open with what each page is for, then short steps, bullets and tables; long detail folds away.
+- New Accessibility page: each need, the setting that helps and where to find it, with the flash estimate and what has not been tested.
+- New FAQ and glossary page with short, spoiler-free answers and the game's words explained.
+- Troubleshooting adds fixes for test builds that will not open, controllers, drifting sticks, small text, motion and how to report a bug.
+- Repeated facts have one home: knockdowns and save folders on Saving and retrying, cranks and TOGGLE HOLDS on Controls, accessibility settings on Accessibility.
 - The landing page starts with three links, one per reader: How to play, Get the game and Build it.
 - The landing page lists what is playable now and what is coming (more languages, more chapters); the hero and the build-progress card link the current version.
 - The landing page shows October 16 captures of Records Access and the Service Junction with their doors, in place of the October 12 corridor capture; phones crop them to 4:3 from the left, so the objective, the engineer, the door and WOLF stay in frame.
@@ -58,6 +65,15 @@ Changes merged after 0.15.0. They become the next version when it is cut.
 - The guide has search (**Ctrl+K**, or **⌘K** on a Mac); it runs in the browser from an index built with the site.
 - Guide text lines stop at about 70 characters; tables, cards and pictures keep the full width.
 - Guide pages have one main landmark for screen readers instead of two.
+- The README follows the MrDemonWolf house layout: short status bullets, a pick-your-path table linking Play, Get the game and Develop, current features, the scripts from `package.json` and the main folders.
+- The landing page and every guide page end with "© 2026 WOLF OVERRIDE by MrDemonWolf, Inc." and a link to the commit the site was built from.
+- New **Install a test build** page: numbered macOS and Windows steps, warnings and system requirements, moved out of Testing.
+- **Get the game** is the one home for install steps; Start here, Setup and Troubleshooting link to it.
+- New **Platforms and languages** page: what runs where today; English only, more languages planned.
+- New **Support and bug reports** page: GitHub issues, F12 bug captures, security reports and Discord. Troubleshooting, FAQ, Accessibility and the landing footer link to it.
+- About the game lists how it plays as short bullets; the story text is unchanged.
+- Privacy matches the code again: the debug unlock line, no language setting, the system language read at start, bug captures and the guide's search; checked October 18, 2026.
+- Legal's website privacy section is now one line linking Privacy.
 
 ### Development
 
@@ -67,10 +83,12 @@ Changes merged after 0.15.0. They become the next version when it is cut.
 - The changelog export fails if the newest version on this page is not the game's version.
 - New rule: every pull request that changes the game, the site or the tools adds its lines under Next version; a version is cut per milestone.
 - Changes that reached the game or site earlier but were missing from this page are now listed under their versions.
+- Translations are reviewed without a translation website: Claude translates, Codex back-translates, the checks run, and each language is marked machine translation until a native speaker reviews it.
+- Test build zips' `README.txt` and the Test builds run summary link the new Install a test build page.
 
 ### How it was checked
 
-- **Checked:** headless test suites, the docs checks and build, rendered stills of the title screen, and headless browser screenshots of the credits, legal and landing pages, and an axe scan of the landing page; headless browser screenshots of the guide home, the changelog and the open guide menu at phone, tablet and desktop sizes, and an axe scan of guide pages; not played by hand.
+- **Checked:** headless test suites, the docs checks and build, rendered stills of the title screen, and headless browser screenshots of the credits, legal and landing pages, and an axe scan of the landing page; headless browser screenshots of the guide home, the changelog and the open guide menu at phone, tablet and desktop sizes, and an axe scan of guide pages; the README's links checked against the built site and its commands against `package.json`; headless browser screenshots of the rewritten player pages, their facts checked against the game's code; headless browser screenshots of the new and rewritten user pages, the privacy claims checked against the game's code; not played by hand.
 - **New characters checked:** headless test suites and rendered stills (1280x720 and a phone shape) of each pose, before and after; not played by hand, so nothing was judged in motion.
 - **New machines checked:** headless test suites and rendered stills (1280x720 and a phone shape) of each room, before and after; not played by hand.
 

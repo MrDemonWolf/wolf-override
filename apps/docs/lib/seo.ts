@@ -1,6 +1,8 @@
 import type { Metadata } from 'next';
 
 export const siteUrl = 'https://wolfoverride.mrdemonwolf.dev';
+/** The public source repository on GitHub: the game, this website and their history. */
+export const repoUrl = 'https://github.com/MrDemonWolf/wolf-override';
 export const siteDescription = 'A side-view sci-fi horror adventure by MrDemonWolf, Inc. Explore THE DEN with an independent robotic wolf, solve puzzles and make choices he remembers. In development.';
 
 /**
@@ -12,12 +14,12 @@ export const siteDescription = 'A side-view sci-fi horror adventure by MrDemonWo
 export function pageMetadata(title: string, description: string, path: string, markdownPath?: string): Metadata {
   const url = `${siteUrl}${path}`;
   // Social cards get a 1200x630 crop of the provisional key art that keeps both characters (JPEG for the widest crawler support).
-  const image = { url: `${siteUrl}/share-card.jpg`, width: 1200, height: 630, alt: 'WOLF//OVERRIDE provisional key art: an engineer and robotic wolf in a research corridor.' };
+  const image = { url: `${siteUrl}/share-card.jpg`, width: 1200, height: 630, alt: 'WOLF OVERRIDE provisional key art: an engineer and robotic wolf in a research corridor.' };
   return {
     title,
     description,
     alternates: { canonical: url, ...(markdownPath && { types: { 'text/markdown': `${siteUrl}${markdownPath}` } }) },
-    openGraph: { type: 'website', siteName: 'WOLF//OVERRIDE', title, description, url, locale: 'en_US', images: [image] },
+    openGraph: { type: 'website', siteName: 'WOLF OVERRIDE', title, description, url, locale: 'en_US', images: [image] },
     twitter: { card: 'summary_large_image', title, description, images: [image] },
   };
 }

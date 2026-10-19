@@ -9,7 +9,8 @@ import recordsCapture1600 from './images/records-access-doors-capture-1600.webp'
 import junctionCapture480 from './images/service-junction-doors-capture-480.webp';
 import junctionCapture960 from './images/service-junction-doors-capture-960.webp';
 import junctionCapture1600 from './images/service-junction-doors-capture-1600.webp';
-import { pageMetadata, siteDescription } from '@/lib/seo';
+import SiteCopyright from './site-copyright';
+import { pageMetadata, repoUrl, siteDescription } from '@/lib/seo';
 import { homeStructuredData, JsonLd } from '@/lib/structured-data';
 import { gameVersion } from '@/lib/version';
 
@@ -17,8 +18,8 @@ import { gameVersion } from '@/lib/version';
 const keyArtSrcSet = ['640', '1024', '1672'].map((w) => `/title-corridor-key-art-provisional-${w}.webp ${w}w`).join(', ');
 
 export const metadata = {
-  ...pageMetadata('WOLF//OVERRIDE | Sci-fi Horror Adventure', siteDescription, '/'),
-  title: { absolute: 'WOLF//OVERRIDE | Sci-fi Horror Adventure' },
+  ...pageMetadata('WOLF OVERRIDE | Sci-fi Horror Adventure', siteDescription, '/'),
+  title: { absolute: 'WOLF OVERRIDE | Sci-fi Horror Adventure' },
 };
 
 /**
@@ -107,6 +108,7 @@ const footerGroups = [
       ['/docs/credits/', 'Credits & references'],
       ['/docs/legal/', 'Legal & licensing'],
       ['/docs/privacy/', 'Privacy'],
+      ['/docs/support/', 'Support'],
     ],
   },
   {
@@ -116,7 +118,7 @@ const footerGroups = [
       ['/docs/development/', 'Developer home'],
       ['/docs/development/setup/', 'Setup'],
       ['/docs/development/testing/', 'Testing & CI'],
-      ['https://github.com/MrDemonWolf/wolf-override', 'Source on GitHub'],
+      [repoUrl, 'Source on GitHub'],
     ],
   },
 ] as const;
@@ -167,7 +169,7 @@ export default function HomePage() {
           <div className="ml-[48%] w-[min(48%,660px)] max-w-[660px] pt-32 pr-8 pb-20 compact:ml-[46%] compact:w-[51%] phone:m-0 phone:w-full phone:max-w-none phone:px-5 phone:pt-86 phone:pb-5">
             <p className="hud-label mb-5">Sci-fi horror · In development</p>
             <h1 id="main-content" tabIndex={-1} className="mb-[1.65rem] text-[clamp(4.5rem,8.8vw,8.2rem)] leading-[.95] font-bold tracking-[-.055em] phone:mb-4 phone:text-[clamp(3rem,12.5vw,4.5rem)]">
-              WOLF<span className="text-accent">//</span><br />OVERRIDE
+              WOLF <br />OVERRIDE
             </h1>
             <p className="mb-4 text-[clamp(1.4rem,2.3vw,2rem)] leading-[1.35] phone:mb-[.8rem] phone:text-[1.3rem]">WOLF has a will of his own.</p>
             <p className="max-w-[38ch] leading-[1.75] text-[#cfdee4] phone:max-w-[42ch]">Explore THE DEN as the engineer. WOLF chooses whether to help; if he refuses, you can take the manual route.</p>
@@ -291,7 +293,7 @@ export default function HomePage() {
           </nav>
         ))}
         <div className="col-span-full flex justify-between gap-4 border-t border-t-line pt-5 text-[.78rem] text-muted phone:flex-col">
-          <span>© 2026 MrDemonWolf, Inc.</span>
+          <SiteCopyright />
           <span>Working title · Provisional art · No public release date</span>
         </div>
       </footer>

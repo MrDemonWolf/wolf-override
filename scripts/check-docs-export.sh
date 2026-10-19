@@ -107,8 +107,8 @@ fi
 # llms.txt files (apps/docs/app/llms*, lib/source.ts): the index opens with the project H1 and
 # summary, the full text has no raw MDX components or [#heading-id] suffixes, and every guide page
 # has the Markdown copy its rel=alternate link names.
-if ! head -n 3 "$out/llms.txt" 2>/dev/null | tr '\n' ' ' | grep -q '^# WOLF//OVERRIDE  > '; then
-  echo "FAIL  llms.txt is missing or does not start with '# WOLF//OVERRIDE' and a '> ' summary" >&2
+if ! head -n 3 "$out/llms.txt" 2>/dev/null | tr '\n' ' ' | grep -q '^# WOLF OVERRIDE  > '; then
+  echo "FAIL  llms.txt is missing or does not start with '# WOLF OVERRIDE' and a '> ' summary" >&2
   status=1
 fi
 if [ ! -s "$out/llms-full.txt" ]; then

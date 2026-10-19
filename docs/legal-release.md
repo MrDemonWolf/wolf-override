@@ -10,7 +10,7 @@ Drafted September 26, 2026. **Do not publish or present this as approved terms.*
 
 ## Draft privacy policy text — edit after release inventory
 
-> **WOLF//OVERRIDE Privacy Policy**  
+> **WOLF OVERRIDE Privacy Policy**  
 > Effective [date]; applies to [exact game versions/platforms] and [public website URL]. Publisher: MrDemonWolf, Inc. Contact: [owner-approved privacy/support contact].
 >
 > **Game saves.** The current game stores your progress and a selected response to one story choice in a file on your device. It also stores the chosen display name from the built-in roster, character positions, and corridor puzzle state. The current game does not send this save to us. `New Game` starts fresh play but does not currently erase the old checkpoint file. [Before release, provide a clear delete-save instruction or control for each platform and confirm how platform backups behave.]
@@ -27,8 +27,8 @@ The bracketed items block publication. Do not represent a source-code scan as pr
 
 ## Draft terms and license notice — edit before distribution
 
-> **WOLF//OVERRIDE Terms and Licenses**  
-> Effective [date]. WOLF//OVERRIDE source code and public documentation are offered under **GPL-3.0-or-later**. The [license text](../LICENSE) and corresponding source for the exact distributed version must be available with each distributed binary. Payment for a copy does not remove the GPL rights to use, modify and redistribute its covered code. [List the distinct licenses/permissions for shipped art, music, voice, fonts, marks and other assets from the final asset register.] Godot Engine is MIT licensed; include its copyright and license notice in the game credits or distribution documentation. [Publisher contact and consumer terms that apply in the actual selling regions.] Nothing in these terms limits rights granted by the GPL.
+> **WOLF OVERRIDE Terms and Licenses**  
+> Effective [date]. WOLF OVERRIDE source code and public documentation are offered under **GPL-3.0-or-later**. The [license text](../LICENSE) and corresponding source for the exact distributed version must be available with each distributed binary. Payment for a copy does not remove the GPL rights to use, modify and redistribute its covered code. [List the distinct licenses/permissions for shipped art, music, voice, fonts, marks and other assets from the final asset register.] Godot Engine is MIT licensed; include its copyright and license notice in the game credits or distribution documentation. [Publisher contact and consumer terms that apply in the actual selling regions.] Nothing in these terms limits rights granted by the GPL.
 
 Do not add a mandatory “accept restrictions on copying/modification” installer checkbox for GPL-covered code. A direct download page can present a clear **License and source** link before download, with the same information available in an in-game Credits/Legal menu. For Apple distribution, the standard EULA may conflict with GPL rights; a custom EULA option exists but does not resolve compatibility by itself. Obtain qualified legal review of the exact GPL/assets/store combination before submitting a paid Mac App Store build.
 
@@ -36,7 +36,7 @@ Do not add a mandatory “accept restrictions on copying/modification” install
 
 Show on the download/store page before installation; keep accessible from in-game Credits/Legal after installation. For a Homebrew cask, put the disclosure on the linked release page because the command-line install has no custom consent screen.
 
-> **WOLF//OVERRIDE [version] — [platform]**  
+> **WOLF OVERRIDE [version] — [platform]**  
 > Publisher: MrDemonWolf, Inc. Price: [channel-specific confirmed price]. The game saves progress and an authored story choice locally on your device. [Confirmed network/analytics statement for this exact binary.] [Verified way to remove saves.] Read the [Privacy Policy URL], [Terms and Licenses URL], and [version-matched source URL] before installing. Credits: **Game idea by Nathanial Henniges. Made with help from AI tools.** [Age/content rating, system requirements, refund and support links as applicable to this channel.]
 
 The tentative Mac App Store price is **US $4.99** and Windows is intended to be free; neither is a live offer. Decide direct Mac/Homebrew pricing and mobile pricing separately. Do not claim a Homebrew cask, App Store listing or downloadable build exists until it does.

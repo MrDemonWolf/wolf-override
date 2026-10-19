@@ -1,31 +1,80 @@
 ---
 title: Settings
-description: Display, audio, controls, and saved preferences in the source game.
+description: What each display, audio and control setting does in the source game, one line each.
 ---
 
-Open **Settings** from the title screen or Pause. Preferences persist between launches in `settings.cfg` beside the [checkpoint file](/docs/controls/saves/#where-saves-live). A damaged or unexpected settings file is ignored and the defaults load instead.
+**What this page is for:** what each setting does, one line each.
+
+- **Open Settings** from the title screen or from Pause.
+- **Settings are saved** between launches in `settings.cfg`, next to the [checkpoint file](/docs/controls/saves/#where-saves-live).
+- **A damaged settings file** is ignored, and the defaults load.
+- **Accessibility settings** are gathered on the [Accessibility](/docs/accessibility/) page.
 
 ## Display
 
 | Setting | What it does |
 | --- | --- |
-| FPS limit | 30, 60, 90, 120, 144, or uncapped |
-| V-sync | Synchronizes frame delivery with the display when supported |
-| Edge smoothing | Off, 2×, 4×, or 8× MSAA for 2D edges |
-| Reduced motion | Turns off camera shake and hit-stop, shortens screen flashes, shows a knocked-down engineer lying on the floor at once instead of collapsing (the thud, red wash and fade remain) and holds the Service Junction's charged door seam steady instead of strobing, makes the ceiling lamps' flicker a single, gentler dip, holds the corridor's flashing red beacons lit and steady, and keeps the mascot on the starting logo from hopping and its loading bar from sweeping; sounds and rumble stay |
-| Window size | Desktop: 960×540, 1280×720, or 1920×1080. Opens at 1280×720 unless your settings file already stores a window size. Changing the FPS limit, window size or fullscreen stores the size shown, so a settings file from a build before October 10, 2026 may keep 960×540; choose 1280×720 here for the larger window |
-| Fullscreen | Desktop fullscreen; the OS manages mobile window sizing. A saved window size and fullscreen apply as the game starts, on the logo screen |
-| Text size | 100%, 125%, 150%, 175% or 200%. Enlarges the dialogue, the hint line, the location and name cards, the tutorial prompt, the answer buttons and the station names over the machines; menus keep their size. From 150% (from 125% on touch builds, where the box is narrower) the speaker's name moves above the words so each row keeps its length. Station names grow up to 150% and break onto two rows between their words when larger, so neighbouring names stay apart; at 175% and 200% they stay at 150%. On touch builds, above 100% the dialogue box stands between the arrows and **USE** instead of under them, with the speaker's name above the words. In the opening and the closing shot the hint line sits below the top card, and where the tutorial prompt would cover a station name (the breaker's, at the larger sizes) it moves up into the top card's place as the card leaves, clear of the station names and the characters (at the bottom of the screen if no such place is free and no box is up, and hidden while a box is up). Applies at once and is saved |
+| FPS limit | 30, 60, 90, 120 or 144 FPS, or uncapped |
+| V-sync | Matches frames to the display, when supported |
+| Edge smoothing | Off, 2×, 4× or 8× MSAA for 2D edges |
+| Reduced motion | Turns off shake and strobing; shortens flashes ([full list](/docs/accessibility/#reduced-motion)) |
+| Window size | Desktop: 960×540, 1280×720 (default) or 1920×1080 |
+| Fullscreen | Desktop fullscreen; phones and tablets size the window themselves |
+| Text size | 100%, 125%, 150%, 175% or 200% for dialogue, hints, cards and station names |
 
-The Display tab sits under the **THE DEN / LOCAL CONFIGURATION** heading. Its note reads **V-sync may limit the FPS cap.**; on phones and tablets it starts with **Window size is OS-managed on mobile.**, since there the system sizes the window. The menu does not show your graphics hardware, switch renderers or guarantee that a device reaches the selected FPS limit.
+- **The tab's heading** reads **THE DEN / LOCAL CONFIGURATION**.
+- **Its note** reads **V-sync may limit the FPS cap.**
+- **On phones and tablets** it starts with **Window size is OS-managed on mobile.**
+- **The menu does not** show your graphics hardware, switch renderers or promise a device reaches the FPS limit.
+
+<Details>
+<Summary>Window size and fullscreen details</Summary>
+
+- The game opens at 1280×720 unless your settings file already stores a window size.
+- Changing the FPS limit, window size or fullscreen stores the size shown.
+- A settings file from a build before October 10, 2026 may keep 960×540. Choose 1280×720 here for the larger window.
+- A saved window size and fullscreen apply as the game starts, on the logo screen.
+
+</Details>
+
+<Details>
+<Summary>Text size details</Summary>
+
+- It enlarges the dialogue, the hint line, the location and name cards, the tutorial prompt, the answer buttons and the station names over the machines.
+- Menus keep their size.
+- It applies at once and is saved.
+- From 150% (from 125% on touch builds, where the box is narrower), the speaker's name moves above the words, so each row keeps its length.
+- Station names grow up to 150%. Above that they stay at 150% and break onto two rows between their words, so neighbouring names stay apart.
+- On touch builds above 100%, the dialogue box stands between the arrows and **USE** instead of under them, with the speaker's name above the words.
+- In the opening and the closing shot, the hint line sits below the top card.
+- Where the tutorial prompt would cover a station name (the breaker's, at the larger sizes), it moves up into the top card's place as the card leaves. If no such place is free and no box is up, it goes to the bottom of the screen. It hides while a box is up.
+
+</Details>
 
 ## Audio
 
-Master, Music, Effects, and Voice each have a volume slider. Effects carries every sound effect: the short sounds the game generates itself (the containment gate, the relay contact, the seal landing, the chirp when a station takes a save or a copy, WOLF's joints when he answers, the soft click as a crank starts to turn, the Records exit, and the Service Junction's pump, fuse tick, blasts, sentry, winch, tank and exit bolt) and a few processed recordings (the steam of the corridor's **MANUAL BYPASS** and the Service Junction, and two of WOLF's growls; see [sound recordings](/docs/credits/#sound-recordings)). Master and Effects are the only controls over those sounds: no display or motion setting mutes them. Music and Voice have no content yet, so those sliders change nothing for now.
+| Slider | What it changes |
+| --- | --- |
+| Master | Every sound |
+| Music | Nothing yet: there is no music |
+| Effects | Every sound effect |
+| Voice | Nothing yet: there is no voice acting |
+
+- **Effects** covers the sounds the game makes itself and a few processed recordings ([sound recordings](/docs/credits/#sound-recordings)).
+- **Only Master and Effects** control those sounds. No display or motion setting mutes them.
+
+<Details>
+<Summary>Every sound on the Effects slider</Summary>
+
+- **Made by the game:** the containment gate, the relay contact, the seal landing, the chirp when a station takes a save or a copy, WOLF's joints when he answers, the soft click as a crank starts, and the Records exit.
+- **Made by the game in the Service Junction:** the pump, fuse tick, blasts, sentry, winch, tank and exit bolt.
+- **Processed recordings:** the steam of the corridor's **MANUAL BYPASS** and the Service Junction, and two of WOLF's growls.
+
+</Details>
 
 ## Controls
 
-These six actions have keyboard and controller bindings you can change. Rebinding replaces that action's keyboard defaults (or its controller defaults) with the one input you press:
+You can change six actions on keyboard and controller:
 
 | Action | Keyboard default | Controller default |
 | --- | --- | --- |
@@ -36,10 +85,27 @@ These six actions have keyboard and controller bindings you can change. Rebindin
 | Response 2 | 2 | Y |
 | Pause | Esc | Start |
 
-Select a binding, then press the replacement key, button, or stick direction. A binding already used by another action is rejected. **Esc** or **CANCEL REBIND** cancels the capture, and **RESTORE DEFAULT CONTROLS** brings back the mappings above. The **I** key that cycles the provisional engineer name, the controller **B** button for backing out of menus, and the Android Back gesture are fixed.
+### Rebind an action
 
-Stick deadzone sets how far the controller stick must move before movement registers (0.1 to 0.8, default 0.25). Increase it if a stick drifts while untouched. Scroll the Controls panel to see its remaining options.
+1. Select the binding.
+2. Press the new key, button or stick direction.
+3. To cancel, press **Esc** or **CANCEL REBIND**.
 
-**TOGGLE HOLDS** (off by default) changes how the cranks work: the corridor's **MANUAL BYPASS** and the Service Junction's valve. With it on, one press of interact starts the crank and it keeps turning on its own; press interact again, walk away or pause to stop it, and it stops by itself once the crank is done. It works the same with the keyboard, a controller and the touch **CRANK** button, because all three press the one interact action, and while it is on the prompts drop the word **HOLD** (for example **E: crank the valve**). It is saved in `settings.cfg` with your other preferences and stays as it is when you use **RESTORE DEFAULT CONTROLS**.
+- **One input per action.** Rebinding replaces that action's keyboard (or controller) defaults with the one input you press.
+- **No doubles.** An input already used by another action is rejected.
+- **RESTORE DEFAULT CONTROLS** brings back the table above.
+- **Fixed inputs:** the **I** key (cycles the provisional engineer name), controller **B** (back in menus) and Android Back.
 
-See [Controls](/docs/controls/input/) for the full default table or [Troubleshooting](/docs/controls/troubleshooting/) if a control behaves unexpectedly.
+### Other control settings
+
+| Setting | What it does |
+| --- | --- |
+| Stick deadzone | How far the stick must move before it counts: 0.1 to 0.8, default 0.25. Raise it if the stick drifts. |
+| TOGGLE HOLDS | One press starts a crank and keeps it turning. Off by default. See [Hold to crank](/docs/controls/input/#toggle-holds). |
+
+- **Scroll the Controls panel** to see its remaining options.
+
+## Language
+
+- **English only for now.** There is no language setting yet.
+- **More languages are planned.**
