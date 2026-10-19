@@ -252,29 +252,30 @@ func _check_display_page(menu: GameSettings) -> void:
 
 
 ## LANGUAGE on the GENERAL tab (PR L6, PLAN.md and DESIGN.md "Settings: the LANGUAGE option"):
-## - with English alone offered the GENERAL tab stays hidden, the list holds English, and saving other
-##   settings writes no language, so the game keeps following the OS;
-## - with Spanish and Japanese turned on here (in I18n.LANGUAGES only, put back at the end) the tab shows,
-##   each language is named in its own words with its "machine translation" tag as a separator row under
-##   it, never translated;
+## - as shipped (Spanish offered since PR L9) the tab shows and the list holds English and both Spanish
+##   files, each Spanish one with its "traducción automática" tag;
+## - with English alone offered (set here with [method _offer]) the GENERAL tab stays hidden, the list
+##   holds English, and saving other settings writes no language, so the game keeps following the OS;
+## - with Spanish (Latin America) and Japanese offered the tab shows, each language is named in its own
+##   words with its "machine translation" tag as a separator row under it, never translated;
 ## - a pick applies the language, shows its tag under the row and saves [general] language;
 ## - a change made elsewhere (I18n.apply) moves the list's choice and the note (TRANSLATION_CHANGED).
-## [param path] is the game's settings file; its language is erased again at the end.
+## [param path] is the game's settings file; its language is erased again at the end, and the shipped
+## offered set is put back.
 func _check_language_row(game: Node2D, path: String) -> void:
 	var menu: GameSettings = game.get("settings_menu") as GameSettings
 	var config: ConfigFile = ConfigFile.new()
 	config.load(path)
+	_expect(not menu.tabs.is_tab_hidden(GameSettings.GENERAL_TAB) and _language_items(menu) == ["English", "Español (España)", "— traducción automática", "Español (Latinoamérica)", "— traducción automática"], "as shipped the GENERAL tab shows English and both Spanish files, each with its tag (%s)" % [_language_items(menu)])
+	var shipped: Dictionary = _offer(["en"])
+	menu.refresh_languages()
 	_expect(menu.tabs.is_tab_hidden(GameSettings.GENERAL_TAB) and menu.tabs.get_tab_title(GameSettings.GENERAL_TAB) == "GENERAL", "with English alone the GENERAL tab is there but hidden")
 	_expect(menu.language.item_count == 1 and menu.language.get_item_text(0) == "English" and menu.language.selected == 0 and not menu.language_note.visible, "the list holds English, chosen, with no tag")
 	_expect(not config.has_section_key(I18n.CONFIG_SECTION, I18n.CONFIG_KEY), "saving other settings writes no language, so the OS keeps deciding")
-	var turned_on: Array[String] = ["es", "ja"]
-	for code: String in turned_on:
-		(I18n.LANGUAGES[code] as Dictionary)["enabled"] = true
+	_offer(["en", "es", "ja"])
 	menu.refresh_languages()
 	_expect(not menu.tabs.is_tab_hidden(GameSettings.GENERAL_TAB), "with a second language the GENERAL tab shows")
-	var items: Array[String] = []
-	for index: int in menu.language.item_count:
-		items.append(("— %s" if menu.language.is_item_separator(index) else "%s") % menu.language.get_item_text(index))
+	var items: Array[String] = _language_items(menu)
 	_expect(items == ["English", "Español (Latinoamérica)", "— traducción automática", "日本語", "— 機械翻訳"], "each language is named in its own words, its tag a separator row under it (%s)" % [items])
 	_expect(menu.language.auto_translate_mode == Node.AUTO_TRANSLATE_MODE_DISABLED and menu.language.get_popup().auto_translate_mode == Node.AUTO_TRANSLATE_MODE_DISABLED and menu.language_note.auto_translate_mode == Node.AUTO_TRANSLATE_MODE_DISABLED, "the names and tags are never translated")
 	menu.tabs.current_tab = GameSettings.GENERAL_TAB
@@ -291,8 +292,7 @@ func _check_language_row(game: Node2D, path: String) -> void:
 	I18n.apply("en")
 	await process_frame
 	_expect(menu.language.selected == 0 and not menu.language_note.visible, "back in English the list shows English with no tag")
-	for code: String in turned_on:
-		(I18n.LANGUAGES[code] as Dictionary)["enabled"] = false
+	_restore_offered(shipped)
 	config.erase_section(I18n.CONFIG_SECTION)
 	config.save(path)
 	# Forget the pick too, or the menu's next save would write it back.
@@ -303,7 +303,9 @@ func _check_language_row(game: Node2D, path: String) -> void:
 
 
 ## The menus' worked-out text follows a language change (localization PR L7a), with a catalog made up
-## here for "es" (dropped again with I18n.forget, so no real catalog is touched):
+## here for "pt_BR" (dropped again with I18n.forget, so no real catalog is touched). Brazilian Portuguese
+## because it ships no catalog yet: with a made-up "es" catalog the real Spanish lines (PR L9) would
+## answer too, and which of two catalogs of one locale answers first is Godot's order, not this test's.
 ## - prompt() forgets the labels it remembered in English (the lighter plan's S01 prompt cache), so a
 ##   controller button and a named key read in Spanish at once, and the binding buttons follow;
 ## - the note under the tabs is translated again, its action name too, and a translation whose
@@ -319,26 +321,26 @@ func _check_language_row(game: Node2D, path: String) -> void:
 func _check_menu_translation(game: Node2D) -> void:
 	var menu: GameSettings = game.get("settings_menu") as GameSettings
 	var catalog: Translation = Translation.new()
-	catalog.locale = "es"
-	catalog.add_message("START", "INICIO")
-	catalog.add_message("Escape", "Escape-es", GameSettings.KEY_NAME_CONTEXT)
-	catalog.add_message("Pause", "Pausa (acción)")
-	catalog.add_message("Press a keyboard input for %s. Esc cancels.", "Pulsa una tecla para %s. Esc cancela.")
-	catalog.add_message("%s  RESUME", "%s  SEGUIR")
+	catalog.locale = "pt_BR"
+	catalog.add_message("START", "INÍCIO")
+	catalog.add_message("Escape", "Escape-pt", GameSettings.KEY_NAME_CONTEXT)
+	catalog.add_message("Pause", "Pausa (ação)")
+	catalog.add_message("Press a keyboard input for %s. Esc cancels.", "Pressione uma tecla para %s. Esc cancela.")
+	catalog.add_message("%s  RESUME", "%s  CONTINUAR")
 	# A broken translation (other conversions than the English), as a gap in the PO gates would ship it.
-	catalog.add_message("Press a controller input for %s. Esc cancels.", "Pulsa un botón para %d. Esc cancela.")
+	catalog.add_message("Press a controller input for %s. Esc cancels.", "Pressione um botão para %d. Esc cancela.")
 	catalog.add_message("Minus", "Menos", GameSettings.KEY_NAME_CONTEXT)
 	TranslationServer.add_translation(catalog)
 	_expect(menu.prompt(&"pause_game", true) == "START" and menu.prompt(&"pause_game", false) == "Escape", "in English the Pause prompts read START and Escape (and are remembered)")
 	menu.begin_capture(&"pause_game", "keyboard")
-	I18n.apply("es")
+	I18n.apply("pt_BR")
 	await process_frame
-	_expect(menu.prompt(&"pause_game", true) == "INICIO" and menu.prompt(&"pause_game", false) == "Escape-es", "a language change forgets the remembered prompts (%s, %s)" % [menu.prompt(&"pause_game", true), menu.prompt(&"pause_game", false)])
+	_expect(menu.prompt(&"pause_game", true) == "INÍCIO" and menu.prompt(&"pause_game", false) == "Escape-pt", "a language change forgets the remembered prompts (%s, %s)" % [menu.prompt(&"pause_game", true), menu.prompt(&"pause_game", false)])
 	var keyboard: Button = menu.binding_buttons["pause_game_keyboard"]
-	_expect(keyboard.text == "Escape-es" and keyboard.tooltip_text == keyboard.text and keyboard.auto_translate_mode == Node.AUTO_TRANSLATE_MODE_DISABLED, "the binding buttons are worked out again in the new language (%s)" % keyboard.text)
-	_expect(menu.note.text == "Pulsa una tecla para Pausa (acción). Esc cancela.", "the rebind prompt is translated whole, with the action's name (%s)" % menu.note.text)
+	_expect(keyboard.text == "Escape-pt" and keyboard.tooltip_text == keyboard.text and keyboard.auto_translate_mode == Node.AUTO_TRANSLATE_MODE_DISABLED, "the binding buttons are worked out again in the new language (%s)" % keyboard.text)
+	_expect(menu.note.text == "Pressione uma tecla para Pausa (ação). Esc cancela.", "the rebind prompt is translated whole, with the action's name (%s)" % menu.note.text)
 	menu.begin_capture(&"pause_game", "controller")
-	_expect(menu.note.text == "Press a controller input for Pausa (acción). Esc cancels.", "a translated note whose conversions differ from the English shows the English template (its insert still translated), not a blank note (%s)" % menu.note.text)
+	_expect(menu.note.text == "Press a controller input for Pausa (ação). Esc cancels.", "a translated note whose conversions differ from the English shows the English template (its insert still translated), not a blank note (%s)" % menu.note.text)
 	menu.cancel_capture()
 	var symbol: InputEventKey = InputEventKey.new()
 	symbol.physical_keycode = KEY_MINUS
@@ -359,7 +361,7 @@ func _check_menu_translation(game: Node2D) -> void:
 	var pause_menu: Control = game.get("pause_menu") as Control
 	var hint: Label = game.get_node("CanvasLayer/PauseOverlay/Panel/PauseMenu/PauseHint") as Label
 	game.call("_show_pause_hint", false)
-	_expect(hint.text == "Escape-es  SEGUIR" and hint.auto_translate_mode == Node.AUTO_TRANSLATE_MODE_DISABLED, "Pause's hint fills the translated template with the key's name (%s)" % hint.text)
+	_expect(hint.text == "Escape-pt  CONTINUAR" and hint.auto_translate_mode == Node.AUTO_TRANSLATE_MODE_DISABLED, "Pause's hint fills the translated template with the key's name (%s)" % hint.text)
 	var was_visible: bool = pause_menu.visible
 	pause_menu.show()
 	I18n.apply("en")
@@ -371,15 +373,16 @@ func _check_menu_translation(game: Node2D) -> void:
 	await process_frame
 
 
-## A saved language at start-up (PR L6), one game at a time: with Spanish offered (turned on here and off
-## again) a game whose file says [general] language=es starts in Spanish and selects it; once Spanish is
-## no longer offered the same file starts in English with the GENERAL tab hidden, and saving keeps the
-## player's pick in the file for when it comes back. [param path] is a scratch settings file.
+## A saved language at start-up (PR L6), one game at a time: with Spanish offered a game whose file says
+## [general] language=es starts in Spanish and selects it; once no Spanish file is offered (both turned
+## off here with [method _offer], since es_ES alone would still catch a saved "es") the same file starts in
+## English with the GENERAL tab hidden, and saving keeps the player's pick in the file for when it comes
+## back. The shipped offered set is put back at the end. [param path] is a scratch settings file.
 func _check_saved_language(path: String) -> void:
 	var config: ConfigFile = ConfigFile.new()
 	config.set_value(I18n.CONFIG_SECTION, I18n.CONFIG_KEY, "es")
 	config.save(path)
-	(I18n.LANGUAGES["es"] as Dictionary)["enabled"] = true
+	var shipped: Dictionary = _offer(["en", "es"])
 	var spanish: Node2D = MAIN_SCENE.instantiate() as Node2D
 	spanish.set("settings_path", path)
 	root.add_child(spanish)
@@ -387,7 +390,7 @@ func _check_saved_language(path: String) -> void:
 	_expect(TranslationServer.get_locale() == "es" and restored.language.get_item_metadata(restored.language.selected) == "es" and not restored.tabs.is_tab_hidden(GameSettings.GENERAL_TAB), "a game started with language=es saved starts in Spanish and selects it (locale %s)" % TranslationServer.get_locale())
 	spanish.queue_free()
 	await process_frame
-	(I18n.LANGUAGES["es"] as Dictionary)["enabled"] = false
+	_offer(["en"])
 	var english: Node2D = MAIN_SCENE.instantiate() as Node2D
 	english.set("settings_path", path)
 	root.add_child(english)
@@ -398,7 +401,34 @@ func _check_saved_language(path: String) -> void:
 	english_only.reduced_motion.button_pressed = false
 	english.queue_free()
 	await process_frame
+	_restore_offered(shipped)
 	I18n.apply("en")
+
+
+## The language list's rows as the player reads them, a tag separator row as "— <tag>".
+func _language_items(menu: GameSettings) -> Array[String]:
+	var items: Array[String] = []
+	for index: int in menu.language.item_count:
+		items.append(("— %s" if menu.language.is_item_separator(index) else "%s") % menu.language.get_item_text(index))
+	return items
+
+
+## Offers exactly [param codes] for the rest of this check, by turning "enabled" on or off in
+## I18n.LANGUAGES (the loaded table only; the file is untouched). Returns every row's "enabled" as it was,
+## for [method _restore_offered]. Callers refresh the menu themselves.
+func _offer(codes: Array[String]) -> Dictionary:
+	var before: Dictionary = {}
+	for code: String in I18n.LANGUAGES:
+		var row: Dictionary = I18n.LANGUAGES[code]
+		before[code] = row.get("enabled", false)
+		row["enabled"] = codes.has(code)
+	return before
+
+
+## Puts back the "enabled" values [method _offer] returned.
+func _restore_offered(before: Dictionary) -> void:
+	for code: String in before:
+		(I18n.LANGUAGES[code] as Dictionary)["enabled"] = before[code]
 
 
 func _write_text(path: String, text: String) -> void:
