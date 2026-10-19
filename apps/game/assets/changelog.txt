@@ -140,7 +140,7 @@ Changes merged after 0.15.0. They become the next version when it is cut.
 - The title, Pause and Settings text is marked for translation, with no change to the English: the volume rows and the rebind prompt name things in words instead of internal ids, key and button names can be translated, and Settings' note and Pause's hint follow a language change and fall back to English when a translation does not fit its blanks.
 - tools/render/render.sh --keyboard <layout> (and PARITY_KEYBOARD for parity captures) renders with another keyboard layout, such as French AZERTY.
 - The HUD is marked for translation, with no change to the English: hints, objectives, top cards, the tutorial and the touch buttons' words; a key in a hint is filled in after translation, so a language can put it where its grammar needs it.
-- The Spanish files are written by Claude with a note on every line, back-translated by Codex and passed through every translation check; Spain's file changes only the controller, press and Intro words.
+- The Spanish files are written by Claude with a note on every line, back-translated by Codex and passed through every translation check; Spain's file changes only the words for controller, press, Intro and phones.
 - i18n_test lays out every offered language in the game and fails any text that needs more room than English, at every TEXT SIZE.
 - The station names' overlap check is shared by text_boxes_test and i18n_test, and the Spanish gender check knows *teclado* (keyboard) is a noun.
 
