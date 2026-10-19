@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: WOLF OVERRIDE\n"
-"PO-Revision-Date: 2026-10-19 18:21+0000\n"
+"PO-Revision-Date: 2026-10-19 18:33+0000\n"
 "Last-Translator: Claude (Anthropic), machine translation, unreviewed\n"
 "Language-Team: none\n"
 "MIME-Version: 1.0\n"
@@ -1393,6 +1393,7 @@ msgid "No valid checkpoint save found. Current game was not changed."
 msgstr "No se encontró ningún punto de control válido. La partida actual no cambió."
 
 # machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: Open glossary term SERVICE JUNCTION: Cruce de servicio, the room card's CRUCE DE SERVICIO; proposed for the glossary.
 #. TRANSLATORS: i18n: story speaker=narrator
 #: scripts/main.gd:2503
 msgid ""
@@ -1403,6 +1404,7 @@ msgstr ""
 "cayó; suelta el cerrojo de salida junto a la puerta."
 
 # machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: Open glossary term SERVICE JUNCTION: Cruce de servicio, the room card's CRUCE DE SERVICIO; proposed for the glossary.
 #. TRANSLATORS: i18n: story speaker=narrator
 #: scripts/main.gd:2506
 msgid ""
@@ -1456,6 +1458,7 @@ msgid "They want the source record gone. We need to preserve it."
 msgstr "Quieren borrar el registro de origen. Tenemos que conservarlo."
 
 # machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: Open glossary term 'breaker': disyuntor chosen here, as in the HUD (never interruptor); proposed for the glossary.
 #. TRANSLATORS: i18n: story speaker=narrator
 #: scripts/main.gd:2569
 msgid "No station in reach. Follow the labeled breaker, relay, bypass or safe point."
@@ -1468,6 +1471,7 @@ msgid "Power is already on. The relay is farther down the hall."
 msgstr "Ya hay energía. El relé está más adelante en el pasillo."
 
 # machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: Open glossary term 'breaker': disyuntor chosen here, as in the HUD (never interruptor); proposed for the glossary.
 #. TRANSLATORS: WOLF thanks the engineer for telling him the relay's risk. Avoid a past tense that shows the engineer's gender ("you told me").
 #. i18n: story speaker=WOLF engineer=you
 #: scripts/main.gd:2623
@@ -1481,6 +1485,7 @@ msgid "No. I won't take that risk blind. Use the manual bypass."
 msgstr "No. No voy a correr ese riesgo a ciegas. Usa el bypass manual."
 
 # machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: Open glossary term 'breaker': disyuntor chosen here, as in the HUD (never interruptor); proposed for the glossary.
 #. TRANSLATORS: i18n: story speaker=narrator
 #: scripts/main.gd:2640
 msgid "The relay is dark. Arm the breaker first."
@@ -1512,6 +1517,7 @@ msgid "WOLF takes the surge through the live contact. The red seal opens."
 msgstr "WOLF recibe la descarga por el contacto con corriente. El sello rojo se abre."
 
 # machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: Open glossary term 'breaker': disyuntor chosen here, as in the HUD (never interruptor); proposed for the glossary.
 #. TRANSLATORS: i18n: story speaker=narrator
 #: scripts/main.gd:2690
 msgid "The bypass handle won't move. The breaker has to be on first."
@@ -1687,6 +1693,7 @@ msgid "Save failed. Use a station to try again."
 msgstr "No se pudo guardar. Usa una estación para volver a intentarlo."
 
 # machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: Open glossary term 'breaker': disyuntor chosen here, as in the HUD (never interruptor); proposed for the glossary.
 #. TRANSLATORS: i18n: story speaker=narrator
 #: scripts/main.gd:3221
 msgid "The overload breaker catches and the line starts to build. If the LINE gauge peaks, the relief vent lets go."
@@ -1725,6 +1732,7 @@ msgstr ""
 "SOLTAR TANQUE está tras los escombros."
 
 # machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: Open glossary term 'breaker': disyuntor chosen here, as in the HUD (never interruptor); proposed for the glossary.
 #. TRANSLATORS: i18n: story speaker=narrator
 #: scripts/main.gd:3260
 msgid "No station in reach. The breaker is by the entrance, the valve by the door."
@@ -1781,6 +1789,7 @@ msgid "The valve gives. %d of %d turns."
 msgstr "La válvula cede. %d de %d vueltas."
 
 # machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: Open glossary term 'breaker': disyuntor chosen here, as in the HUD (never interruptor); proposed for the glossary.
 #. TRANSLATORS: i18n: story speaker=narrator
 #: scripts/main.gd:3961
 msgid "The relief vent lets go and the breaker trips. Reset the breaker and crank faster this time."
@@ -2680,6 +2689,7 @@ msgid "Skip the risk talk. Go now."
 msgstr "Deja la charla de riesgos. Ve ya."
 
 # machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: Open glossary term 'breaker': disyuntor chosen here, as in the HUD (never interruptor); proposed for the glossary.
 #. TRANSLATORS: i18n: story speaker=narrator
 #: scripts/story_text.gd:81
 msgid ""
@@ -2763,6 +2773,7 @@ msgid "That door is our way through."
 msgstr "Esa puerta es nuestro paso."
 
 # machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: Open glossary term 'breaker': disyuntor chosen here, as in the HUD (never interruptor); proposed for the glossary.
 #. TRANSLATORS: The engineer names the next step when the player stalls (their name stands over the line).
 #. i18n: story speaker=engineer engineer=self
 #: scripts/story_text.gd:115
@@ -2791,6 +2802,7 @@ msgid "When the door goes, don't be standing in front of it."
 msgstr "Cuando la puerta reviente, no te quedes delante."
 
 # machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: Open glossary term 'breaker': disyuntor chosen here, as in the HUD (never interruptor); proposed for the glossary. Open glossary term SERVICE JUNCTION: Cruce de servicio, the room card's CRUCE DE SERVICIO; proposed for the glossary.
 #. TRANSLATORS: Continue's restore line in the junction before the door is down; WOLF's warning follows.
 #. i18n: story speaker=narrator
 #: scripts/story_text.gd:123
@@ -2804,12 +2816,14 @@ msgid "The service line runs on toward Archive."
 msgstr "La línea de servicio sigue hacia el Archivo."
 
 # machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: Open glossary term 'breaker': disyuntor chosen here, as in the HUD (never interruptor); proposed for the glossary.
 #. TRANSLATORS: i18n: story speaker=narrator
 #: scripts/story_text.gd:128
 msgid "The valve is dead. Arm the breaker first."
 msgstr "La válvula no tiene energía. Primero arma el disyuntor."
 
 # machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: Open glossary term 'breaker': disyuntor chosen here, as in the HUD (never interruptor); proposed for the glossary.
 #. TRANSLATORS: i18n: story speaker=narrator
 #: scripts/story_text.gd:130
 msgid ""
