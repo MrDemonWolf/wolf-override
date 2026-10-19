@@ -33,3 +33,14 @@ Quotes “…” or 「…」 as Korean UI usually writes them; pick one and kee
 - WOLF's speech level (반말) and how he names the Director (소장 follows Japanese 所長) are D11
   proposals.
 - **SERVICE JUNCTION**: a reviewer's word.
+- **PR L12's choices (proposals for a reviewer):** SERVICE JUNCTION is 설비 분기점 and the service line
+  설비 라인. CONTAINMENT is 격리 구역, maintenance (the place) 정비 구역, records access 기록 접근실 and a
+  trace 기록. The seal is 봉인문, the relief vent 압력 배출구, WOLF's readout 판독 화면, the purge 퍼지 (so
+  the deletion order stays 삭제 명령), Archive 아카이브, THE DEN 늑대 굴 (보금자리 read back as Home) and
+  the slice 체험판. Arm the breaker is 차단기를 올리다.
+- **Particles after a slot:** the gate `slot_particles` (`i18n_tool.py`, PR L12) fails any particle glued
+  to `%s` or `{name}` that changes with the last sound. The lines use one that never changes (의, 에게),
+  end the clause on the name (*정비 포트로 타임스탬프를 복사한 건 {name}.*), or leave a key without 을/를
+  (*여기서 다시 %s 누르세요*). The `ko_particles` field in the glossary is not used by the game yet.
+- **Register:** status and instruction lines use 합니다/하세요, story narration the plain 한다 style, and
+  WOLF and the engineer 반말 to each other. Quotes are “…”.

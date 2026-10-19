@@ -33,6 +33,7 @@ description: Who created WOLF OVERRIDE, what informed its development, and which
 | Codex (OpenAI) | AI coding assistant: research, writing and code, with human review; the back-translation that checks each translation |
 | Codex built-in image generation tool (OpenAI) | Provisional art in edit mode: layered rooms, the coolant relay and safe point, door and door-end paint, the whole-piece characters, station props, rooms and doors (October 16, 2026) and the current title image (see [Provisional art](#provisional-art)) |
 | ChatGPT (OpenAI) | Research, writing and code assistance, with human review |
+| OpenCC 1.4.2 (BYVoid and the OpenCC contributors, Apache License 2.0) | Converted the Simplified Chinese translation to Traditional Chinese with Taiwan's words (its `s2twp` setting), before it was checked line by line; not part of the game |
 | ChatGPT Create (OpenAI) | The first provisional art, in the private MDW WOLF//OVERRIDE [Game] project: the first sprites, the first title image, room paintings, machine sheets and the logo concept |
 | Render container (project script `tools/render/render.sh`) | Rendered game captures off-screen, in Docker run through Colima on macOS, so no game window opens on the developer's Mac: the official Linux build of Godot 4.7.2 with a virtual screen (Xvfb) and software OpenGL (Mesa llvmpipe) |
 | `scripts/check-copies.py` (project script) | Finds copied code (six or more matching lines in two places) in every pull request |
@@ -73,9 +74,13 @@ The [asset register](https://github.com/MrDemonWolf/wolf-override/blob/main/apps
 | Polski | Machine translation by Claude (Anthropic), cross-checked with a Codex (OpenAI) back-translation | Not yet reviewed |
 | Português (Brasil) | Machine translation by Claude (Anthropic), cross-checked with a Codex (OpenAI) back-translation | Not yet reviewed |
 | Русский | Machine translation by Claude (Anthropic), cross-checked with a Codex (OpenAI) back-translation | Not yet reviewed |
+| 日本語 | Machine translation by Claude (Anthropic), cross-checked with a Codex (OpenAI) back-translation | Not yet reviewed |
+| 한국어 | Machine translation by Claude (Anthropic), cross-checked with a Codex (OpenAI) back-translation | Not yet reviewed |
+| 简体中文 | Machine translation by Claude (Anthropic), cross-checked with a Codex (OpenAI) back-translation | Not yet reviewed |
+| 繁體中文 | Converted from the Simplified file with OpenCC, then checked for Taiwan usage by Claude (Anthropic) and cross-checked with a Codex (OpenAI) back-translation | Not yet reviewed |
 
 - **Only people who review a language are named here.** Nobody has yet.
-- **The game marks each unreviewed language** under its name, in that language: "maschinelle Übersetzung", "traducción automática", "traduction automatique", "tłumaczenie maszynowe", "tradução automática" or "машинный перевод".
+- **The game marks each unreviewed language** under its name, in that language: "maschinelle Übersetzung", "traducción automática", "traduction automatique", "tłumaczenie maszynowe", "tradução automática", "машинный перевод", "機械翻訳", "기계 번역", "机器翻译" or "機器翻譯".
 
 ## Fonts in use
 
@@ -83,7 +88,7 @@ The [asset register](https://github.com/MrDemonWolf/wolf-override/blob/main/apps
 | --- | --- | --- | --- |
 | Roboto | The Roboto Project Authors | Game and website; also the stencilled marks on the corridor's door end and its **RESTRICTED AREA** sign | [SIL Open Font License 1.1](https://openfontlicense.org/) |
 | Montserrat | The Montserrat Project Authors | Game and website; a small subset of it draws four symbols Roboto lacks (the touch arrows among them) | [SIL Open Font License 1.1](https://openfontlicense.org/) |
-| Noto Sans JP, KR, SC and TC (Noto Sans CJK 2.004) | Adobe | Game only, cut down to common characters, for the planned Japanese, Korean and Chinese translations, plus four tiny cuts for the language list; not shown yet | [SIL Open Font License 1.1](https://openfontlicense.org/) |
+| Noto Sans JP, KR, SC and TC (Noto Sans CJK 2.004) | Adobe | Game only, cut down to common characters: each draws its own translation (Japanese, Korean, Simplified or Traditional Chinese) and is used only while that language is chosen; plus four tiny cuts for the language list | [SIL Open Font License 1.1](https://openfontlicense.org/) |
 
 ## Sound
 

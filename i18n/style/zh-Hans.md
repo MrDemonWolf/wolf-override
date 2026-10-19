@@ -31,3 +31,11 @@ Stored per language (D9): 罗温, 亚历克斯, 摩根 (samples in `../glossary.
 - **TANK RELEASE**: 储罐投放 is a proposal.
 - **the Director**: 所长 follows the Japanese 所長; title or name is still open.
 - **SERVICE JUNCTION**: a reviewer's word.
+- **PR L12's choices (proposals for a reviewer):** SERVICE JUNCTION is 检修枢纽 and the service line
+  检修管线. TANK RELEASE is the proposal 储罐投放. CONTAINMENT is 收容区, maintenance (the place) 维修区,
+  records access 档案访问区 and a trace 记录. The seal is 密封门, the relief vent 泄压口, WOLF's readout
+  读数屏, the purge 清除 (the deletion order 删除指令), Archive 档案库, THE DEN 狼穴 and the slice 试玩版.
+  Arm the breaker is 合上断路器.
+- **Words outside the bundled subsets** were reworded: the browser is 网页 (浏 is not in the GB 2312
+  level-1 set), and timing the drop is 看准时机, not 掐时机 (掐 is not in the Traditional file's Big5 set,
+  and the two files should say the same).
