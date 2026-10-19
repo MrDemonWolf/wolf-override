@@ -8,7 +8,8 @@
     "build": "next build",
     "types:check": "fumadocs-mdx && next typegen && tsc --noEmit",
     "postinstall": "fumadocs-mdx",
-    "test": "bun run app/downloads.test.ts && bun run lib/version.test.ts"
+    "test": "bun run app/downloads.test.ts && bun run lib/version.test.ts && bun run lib/press-kit.test.ts && bun scripts/build-press-kit.ts --check",
+    "press-kit": "bun scripts/build-press-kit.ts"
   },
   "dependencies": {
     "fumadocs-core": "16.17.1",
