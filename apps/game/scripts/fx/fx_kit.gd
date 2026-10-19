@@ -95,6 +95,17 @@ static func additive() -> CanvasItemMaterial:
 	return material
 
 
+## The one multiplicative blend (soot and heat tint over a blown doorway, DoorKit.soot).
+static func multiply() -> CanvasItemMaterial:
+	var key: Array = [&"multiply"]
+	var material: CanvasItemMaterial = _find(key) as CanvasItemMaterial
+	if material == null:
+		material = CanvasItemMaterial.new()
+		material.blend_mode = CanvasItemMaterial.BLEND_MODE_MUL
+		_keep(key, material)
+	return material
+
+
 static func _new_ramp(offsets: Array[float], colors: Array[Color]) -> Gradient:
 	var gradient: Gradient = Gradient.new()
 	gradient.offsets = PackedFloat32Array(offsets)

@@ -53,10 +53,6 @@ const WRAP: float = 0.06
 ## The paint the face art was made at (GUNSHIP albedo at reference exposure 1): a vertex's colour is
 ## the lit paint over this, per channel in sRGB.
 const PAINT: Vector3 = Vector3(0.18, 0.195, 0.235)
-## The face art's tone against the painted cross-walls round it: the art set took the leaf one step down
-## to the walls' blue-grey cast and value (doors.py SWING_TINT 196, 214, 230 at SWING_LIFT 0.8; at full
-## value the open leaf read as a grey cabinet, the brightest clean panel by the door).
-const FACE_TINT: Color = Color(0.615, 0.671, 0.722)
 ## The latch edge's and the closer arm's painted steel (doors.py's leaf_edge value, 44, 50, 56), lit by
 ## the same vertex light as the face.
 const EDGE_COLOR: Color = Color8(44, 50, 56)
@@ -250,7 +246,7 @@ func _draw() -> void:
 	var face: Array = visible_face(theta)
 	var art: Texture2D = room_face if bool(face[0]) else out_face
 	var mesh: TriMesh = TriMesh.new()
-	_append_quad(mesh, face[1] as Vector3, leaf_dir(theta) * LEAF_W, face[2] as Vector3, FACE_TINT)
+	_append_quad(mesh, face[1] as Vector3, leaf_dir(theta) * LEAF_W, face[2] as Vector3, DoorKit.LEAF_TONE)
 	mesh.draw(get_canvas_item(), art)
 	var steel: TriMesh = TriMesh.new()
 	append_steel(steel)

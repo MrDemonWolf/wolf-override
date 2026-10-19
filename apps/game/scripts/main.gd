@@ -838,7 +838,8 @@ const WOLF_DRAWN_HEIGHT: float = 549.0 * WOLF_ART_SCALE
 const GAMEPLAY_ZOOM: float = 1.35
 const GAMEPLAY_VIEW_WIDTH: float = 960.0 / GAMEPLAY_ZOOM
 ## The play camera's resting height. At 1.35 it puts the floor (y 440) 27 px above the context hint
-## (screen y 405) while the ceiling lamps (y ~188) and the junction's arm rail (y 196) stay in view.
+## (screen y 405) while the junction's arm rail (y 196) stays in view. The approved whole-piece plates
+## (art swap PR 3) hang the rooms' ceiling lamps just over the view's top, as the art set's frames do.
 const GAMEPLAY_CAMERA_Y: float = 360.0
 ## With the touch arrows and USE on screen (their tops at screen y 345) the play camera sits lower,
 ## so feet and station bases on the floor land at screen y 335, above the buttons, instead of
@@ -846,13 +847,14 @@ const GAMEPLAY_CAMERA_Y: float = 360.0
 ## answers take the buttons' place at the bottom during a choice, so the camera stays put.
 const GAMEPLAY_CAMERA_Y_TOUCH: float = 392.0
 ## The junction's close (the only chapter-close shot: Records keeps control while its closing lines
-## run) frames its exit door whole and off the edge of the view (review r1): its right
-## edge runs on to JUNCTION_CLOSE_RIGHT, past the near jamb (JunctionRoom.EXIT_NEAR_JAMB_X) and the
-## wall's column into the passage beyond, so the doorway they walk out through sits inside the frame,
-## and the view is closer than play (zoom 1.62), its left edge (x ~438) just left of the DOOR DOWN
-## placard, with the floor about 70 % down the view, above the dialogue card.
+## run) frames the exit door at the right edge of the view: its right edge is JUNCTION_CLOSE_RIGHT,
+## the room's edge (the approved art paints nothing past it, JunctionRoom.EXIT_VIEW_RIGHT), so the open
+## doorway they walk out through is at the frame's edge, and the view is closer than play (zoom 1.82,
+## art swap PR 3; it was 1.62 with the view reaching x 1030), its left edge (x ~433) just left of the
+## DOOR DOWN placard so no station name is cut, with the floor about 73 % down the view, above the
+## dialogue card.
 const JUNCTION_CLOSE_RIGHT: float = JunctionRoom.EXIT_VIEW_RIGHT
-const JUNCTION_CLOSE_ZOOM: float = 1.62
+const JUNCTION_CLOSE_ZOOM: float = 1.82
 const JUNCTION_CLOSE_CAMERA: Vector2 = Vector2(JUNCTION_CLOSE_RIGHT - 480.0 / JUNCTION_CLOSE_ZOOM, 373.0)
 ## Menu cards fade and slide in over this long; short enough never to hold up input or players who want little motion.
 const MENU_REVEAL_SECONDS: float = 0.12

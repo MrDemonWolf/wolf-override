@@ -51,7 +51,7 @@ const NEAR_JAMB_FOOT: Vector2 = Vector2(491.32, 452.62)
 ## The lane's light through the blown doorway (added, est.: tuned on rendered captures; sealed, no light
 ## shows round the leaf, so the shut door never reads as ajar), the door light's pool and graze and its
 ## wall pack's lens (doors.py surface_lights and emitters).
-const BLAST_HOLE_LIGHT: Color = Color(0.14, 0.17, 0.19)
+const BLAST_HOLE_LIGHT: Color = Color(0.30, 0.34, 0.36)
 const BLAST_POOL: Vector2 = Vector2(486.05, 443.64)
 const BLAST_GRAZE: Vector2 = Vector2(473.53, 374.20)
 const BLAST_DOOR_LIGHT: Vector2 = Vector2(461.24, 321.08)
@@ -75,8 +75,9 @@ const LYING_AT: Vector2 = Vector2(482.74, 404.79)
 const LYING_SCALE: float = 0.75 / 2.002
 const LYING_TONE: Color = Color8(118, 140, 170)
 ## Soot and heat tint round the empty doorway once it is blown (the art set dropped the painted scorch
-## and crack lines: code soot instead, compose.py's two patches): centre, radii (world px), strength.
-const SOOT: Array = [[Vector2(492.0, 380.0), Vector2(30.0, 70.0), 0.7], [Vector2(492.0, 330.0), Vector2(16.0, 36.0), 0.45]]
+## and crack lines: code soot instead, compose.py's two patches, centre and radii in world px; the
+## upper, lighter one drawn smaller, as DoorKit.soot's patches are all as dark at their centre).
+const SOOT: Array = [[Vector2(492.0, 380.0), Vector2(30.0, 70.0)], [Vector2(492.0, 330.0), Vector2(11.0, 25.0)]]
 const VENT_PROP: Texture2D = preload("res://assets/props/relief-vent.png")
 ## The overhead arm: its ceiling plate, the arm, the winch drum and the shackle the tank's cable hangs
 ## from (the cable itself is drawn, _draw_arm). The tank is its own piece, so it can fall away.
@@ -193,7 +194,7 @@ const VALVE_DIAL_RADIUS: float = 30.0
 ## deck starts below the floor line, so it never covers a lying body. A slump that would reach under the
 ## column ends short of it on either side (Main._start_collapse).
 const DOOR_COLUMN_FOOT: float = 0.0
-const DOOR_COLUMN_RIGHT: float = 43.0
+const DOOR_COLUMN_RIGHT: float = 44.0
 const DOOR_FOOT_X: float = BLAST_FRONT_AT.x + DOOR_COLUMN_FOOT * DoorKit.PIECE_SCALE
 const DOOR_FOOT_RIGHT_X: float = BLAST_FRONT_AT.x + DOOR_COLUMN_RIGHT * DoorKit.PIECE_SCALE
 ## How long the breaking leaf shows at the blast before the blown doorway replaces it.
@@ -839,7 +840,7 @@ func _build_door() -> void:
 	door_leaf.scale = LEAF_SCALE
 	door_leaf_breaking = _door_piece("DoorLeafBreaking", BLAST_SLAB_BREAKING, LEAFBREAK_AT, Vector2.ONE * LEAFBREAK_SCALE, DOOR_Z)
 	for patch: Array in SOOT:
-		var soot: Sprite2D = DoorKit.soot(self, "DoorSoot", patch[0], patch[1], patch[2])
+		var soot: Sprite2D = DoorKit.soot(self, "DoorSoot%d" % door_soot.size(), patch[0], patch[1])
 		soot.z_index = DOOR_Z
 		door_soot.append(soot)
 	DoorKit.door_light(self, BLAST_DOOR_LIGHT).z_index = DOOR_Z

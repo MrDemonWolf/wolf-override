@@ -6,7 +6,8 @@ extends Node2D
 ## [member place], a Callable (along: float, h: float) -> Vector2 that gives the world px of the point
 ## [code]along[/code] metres from the leaf's leading edge toward its tail and [code]h[/code] metres up,
 ## for the leaf's current position; the room calls queue_redraw() when that changes. The mesh is a grid
-## of COLUMNS columns across the leaf, so the art's u is right under perspective at every column.
+## of COLUMNS columns across the leaf, so the art's u is right under perspective at every column; it is
+## toned like every door leaf (DoorKit.LEAF_TONE).
 
 ## Columns across the leaf: enough that the art stays straight while the plane recedes (the junction
 ## exit's 2.15 m leaf spans about 1.3 m of depth along its turned wall).
@@ -35,6 +36,6 @@ func _draw() -> void:
 		var along: float = (1.0 - u) * size_m.x
 		for row: int in 2:
 			var h: float = size_m.y * float(1 - row)
-			mesh.add_vertex(place.call(along, h), Vector2(u, float(row)), Color.WHITE)
+			mesh.add_vertex(place.call(along, h), Vector2(u, float(row)), DoorKit.LEAF_TONE)
 	mesh.add_grid(0, COLUMNS + 1, 2)
 	mesh.draw(get_canvas_item(), texture)

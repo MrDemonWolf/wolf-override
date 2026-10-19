@@ -21,6 +21,11 @@ const PIECE_SCALE: float = 0.5
 ## contrast-painted check): the space through a hole reads brighter than the wall round it.
 const BEYOND_LIFT: float = 1.35
 const WALL_LIFT: float = 0.72
+## A door leaf's tone against the painted cross-walls round it: one step under its art, in the walls'
+## blue-grey cast (the art set's doors.py SWING_TINT 196, 214, 230 at SWING_LIFT 0.8): at full value an
+## open leaf read as a grey cabinet and a shut sliding leaf as a lit, open doorway. SwingLeaf and the
+## Junction exit's SlideLeaf take it.
+const LEAF_TONE: Color = Color(0.615, 0.671, 0.722)
 ## The status lamp's live glass on a front piece's painted guard and base (doors.py socket_parts: a
 ## 5.2 x 6.6 world px guard round a lens about this radius), and its halo.
 const LENS_RADIUS: float = 1.7
@@ -28,6 +33,8 @@ const LENS_HALO: Vector2 = Vector2(18.0, 18.0)
 const LENS_HALO_ALPHA: float = 0.45
 ## A badge reader's LED (an 80 x 130 mm reader at 1.1 m, its LED a few mm across): its radius.
 const READER_LED_RADIUS: float = 0.7
+## The darkest a blown doorway's soot gets (compose.py soot at strength 0.7, a little warm).
+const SOOT_DARK: Color = Color(0.335, 0.3, 0.265)
 ## The door light's lens over every head is a cool-white LED wall pack (doors.py WHITE), its halo this
 ## big (compose.py's 2 world px glow at full strength).
 const DOOR_LIGHT_COLOR: Color = Color8(235, 238, 240)
@@ -59,17 +66,17 @@ static func piece(parent: Node, texture: Texture2D, top_left: Vector2, piece_nam
 
 
 ## A doorway's stack behind the mid plate, added to [param parent] (RoomDepth.behind) in draw order: the
-## light through the hole ([param hole], [param hole_color]: hole_light), the next space and the wall's
-## thickness ([param back] at [param back_at], lifted [param back_lift]; null where the room's far plate
-## is what the hole shows), [param inner] (a leaf running inside the wall, or null), the door light's
+## next space and the wall's thickness ([param back] at [param back_at], lifted [param back_lift]; null
+## where the room's far plate is what the hole shows), the light through the hole over them ([param
+## hole], [param hole_color]: hole_light), [param inner] (a leaf running inside the wall, or null), the door light's
 ## pool on the threshold ([param pool]) and its graze on the far reveal ([param graze]) (doors.py
 ## surface_lights: radius 5 squashed 0.3 at 0.3, radius 2.5 stretched 3 at 0.15), then the cross-wall's
 ## face ([param wall] at [param wall_at], at WALL_LIFT), which it returns. Names start with [param
 ## door_name].
 static func doorway(parent: Node, door_name: String, hole: PackedVector2Array, hole_color: Color, back: Texture2D, back_at: Vector2, back_lift: float, inner: Node2D, pool: Vector2, graze: Vector2, wall: Texture2D, wall_at: Vector2) -> Sprite2D:
-	hole_light(parent, door_name + "HoleLight", hole, hole_color)
 	if back != null:
 		piece(parent, back, back_at, door_name + "Back", back_lift)
+	hole_light(parent, door_name + "HoleLight", hole, hole_color)
 	if inner != null:
 		parent.add_child(inner)
 	glow(parent, door_name + "Pool", pool, 5.0, DOOR_LIGHT_COLOR, 0.3, 0.3)
@@ -103,18 +110,17 @@ static func hole_light(parent: Node, light_name: String, hole: PackedVector2Arra
 
 
 ## Soot and heat tint on a wall round a blown doorway: a soft dark patch (radii [param radii], world
-## px) multiplied into what is drawn under it at [param strength] (0..1) at its centre, leaning a little
-## warm (the art set's compose.py soot: a gaussian falloff, 25 % of its darkening toward the tint).
-static func soot(parent: Node, soot_name: String, at: Vector2, radii: Vector2, strength: float) -> Sprite2D:
-	var dark: Color = Color(1.0 - strength * 0.95, 1.0 - strength, 1.0 - strength * 1.05)
+## px) multiplied into what is drawn under it (the art set's compose.py soot, a gaussian falloff
+## leaning a little warm), at its centre SOOT_DARK. One shared texture and FxKit's multiply blend: a
+## multiply cannot be faded by alpha, so every patch is as dark at its centre and a lighter one is
+## made smaller.
+static func soot(parent: Node, soot_name: String, at: Vector2, radii: Vector2) -> Sprite2D:
 	var patch: Sprite2D = Sprite2D.new()
 	patch.name = soot_name
-	patch.texture = FxKit.radial(128, [0.0, 0.45, 1.0], [dark, dark.lerp(Color.WHITE, 0.6), Color.WHITE])
+	patch.texture = FxKit.radial(128, [0.0, 0.45, 1.0], [SOOT_DARK, SOOT_DARK.lerp(Color.WHITE, 0.6), Color.WHITE])
 	patch.scale = radii * GLOW_WIDTH_PER_RADIUS / patch.texture.get_size()
 	patch.position = at
-	var multiply: CanvasItemMaterial = CanvasItemMaterial.new()
-	multiply.blend_mode = CanvasItemMaterial.BLEND_MODE_MUL
-	patch.material = multiply
+	patch.material = FxKit.multiply()
 	parent.add_child(patch)
 	return patch
 
