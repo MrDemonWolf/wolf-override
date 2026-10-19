@@ -76,7 +76,7 @@ msgid ""
 msgstr ""
 
 #: scenes/main.tscn
-#: scripts/main.gd:4437
+#: scripts/main.gd:4412
 msgid "PAUSE"
 msgstr ""
 
@@ -158,8 +158,8 @@ msgid ""
 "\n"
 "[color=#73DDF5]PROVISIONAL ART[/color]\n"
 "Created with ChatGPT Create and the Codex image generation tool.\n"
-"The characters and station props are whole pieces\n"
-"painted over script-drawn shape guides (October 16, 2026).\n"
+"The characters, station props, rooms and doors are whole\n"
+"pieces painted over script-drawn shape guides (October 16, 2026).\n"
 "Nathanial reviewed and approved each set.\n"
 "The WOLF OVERRIDE mark was redrawn from a generated concept.\n"
 "\n"
@@ -232,7 +232,7 @@ msgid "BACK TO TITLE"
 msgstr ""
 
 #: scenes/main.tscn
-#: scripts/main.gd:1871
+#: scripts/main.gd:1852
 msgid "PAUSE SCROLL"
 msgstr ""
 
@@ -347,35 +347,35 @@ msgid "Default controls restored."
 msgstr ""
 
 #: scripts/game_settings.gd:608
-#: scripts/main.gd:1999
+#: scripts/main.gd:1980
 msgid "Settings could not be saved."
 msgstr ""
 
-#: scripts/junction_room.gd:806
+#: scripts/junction_room.gd:811
 msgid "LINE"
 msgstr ""
 
-#: scripts/junction_room.gd:1449
+#: scripts/junction_room.gd:1451
 msgid "BREAKER USED"
 msgstr ""
 
-#: scripts/junction_room.gd:1451
+#: scripts/junction_room.gd:1453
 msgid "VALVE USED"
 msgstr ""
 
-#: scripts/junction_room.gd:1468
+#: scripts/junction_room.gd:1470
 msgid "EXIT OPEN"
 msgstr ""
 
-#: scripts/junction_room.gd:1472
+#: scripts/junction_room.gd:1474
 msgid "EXIT OPENING"
 msgstr ""
 
-#: scripts/junction_room.gd:1475
+#: scripts/junction_room.gd:1477
 msgid "EXIT READY"
 msgstr ""
 
-#: scripts/junction_room.gd:1478
+#: scripts/junction_room.gd:1480
 msgid "EXIT LOCKED"
 msgstr ""
 
@@ -383,34 +383,34 @@ msgstr ""
 msgid "LINK UNAVAILABLE"
 msgstr ""
 
-#: scripts/main.gd:1906
+#: scripts/main.gd:1887
 msgid "RESUME SCROLL"
 msgstr ""
 
-#: scripts/main.gd:1939
+#: scripts/main.gd:1920
 msgid "30 FPS"
 msgstr ""
 
-#: scripts/main.gd:1940
+#: scripts/main.gd:1921
 msgid "60 FPS"
 msgstr ""
 
-#: scripts/main.gd:1941
+#: scripts/main.gd:1922
 msgid "UNCAPPED"
 msgstr ""
 
-#: scripts/main.gd:1942
+#: scripts/main.gd:1923
 msgid "90 FPS"
 msgstr ""
 
-#: scripts/main.gd:1943
+#: scripts/main.gd:1924
 msgid "120 FPS"
 msgstr ""
 
-#: scripts/main.gd:1944
+#: scripts/main.gd:1925
 msgid "144 FPS"
 msgstr ""
 
-#: scripts/main.gd:1961
+#: scripts/main.gd:1942
 msgid "TAP RESUME TO RETURN"
 msgstr ""
