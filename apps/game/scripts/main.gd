@@ -320,8 +320,11 @@ const RECAP_LANE_BROKE_OFF: String = RECAP_LANE_TOPIC + "  " + RECAP_LANE_BROKE_
 const RECAP_LANE_UNKNOWN: String = RECAP_LANE_TOPIC + "  " + RECAP_LANE_UNKNOWN_WORDS
 ## On a finished save the title's Continue starts a fresh run instead.
 const PLAY_AGAIN_TEXT: String = "PLAY AGAIN"
-## The title's Continue button's left edge beside NEW GAME (main.tscn); alone it spans the row.
-const TITLE_CONTINUE_LEFT: float = 718.0
+## The title's Continue button's left edge beside NEW GAME (main.tscn); alone it spans the row. The
+## title's column runs x 476 to 940 with two 224 px buttons 16 px apart (localization PR L8, decision
+## D10): the longest measured word, Spanish NEW GAME, needs 213 px, and English padded 30% by
+## pseudolocalization fits too.
+const TITLE_CONTINUE_LEFT: float = 716.0
 const CONTINUE_TEXT: String = "CONTINUE"
 ## The translation context of the touch USE button's words (msgctxt): its CONTINUE goes on through lines,
 ## which a language may say differently from the title's CONTINUE, which resumes a save (PR L7b).
@@ -3002,8 +3005,10 @@ func _build_end_card() -> void:
 	header.add_theme_font_override("font", DISPLAY_FONT)
 	end_card_rows = VBoxContainer.new()
 	end_card_rows.name = "Recap"
+	# Down to y 388, 4 px above CONTINUE: room for the three rows when a translation wraps some of them
+	# onto a second row (English padded 30% needs 135 px; localization PR L8).
 	end_card_rows.position = Vector2(150.0, 244.0)
-	end_card_rows.size = Vector2(660.0, 120.0)
+	end_card_rows.size = Vector2(660.0, 144.0)
 	end_card_rows.add_theme_constant_override("separation", 12)
 	end_card_rows.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	end_card.add_child(end_card_rows)
@@ -3089,7 +3094,10 @@ func _fill_end_card_rows() -> void:
 		# does not translate itself.
 		what.auto_translate_mode = Node.AUTO_TRANSLATE_MODE_DISABLED
 		what.text = I18n.fill_named(row.substr(split + 2), {"name": first_name})
-		what.custom_minimum_size = Vector2(560.0, 0.0)
+		# The words take the row's width the topic leaves (564 px beside an 82 px topic), so a longer
+		# translated topic (Spanish CENTINELA, 91 px) narrows them instead of pushing the row past the
+		# card (localization PR L8).
+		what.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 		what.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 		what.add_theme_font_size_override("font_size", 17)
 		what.add_theme_color_override("font_color", Color(0.82, 0.89, 0.94, 1))
