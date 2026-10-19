@@ -27,12 +27,14 @@ extends "res://tests/support/game_suite.gd"
 ##   apply() that keeps them all would leave) shows the sibling's text, so the check can fail;
 ## - a translated template whose inserts differ showing the English line (I18n.shown);
 ## - the overflow check: one planted overflow for each blind spot the build closes (containers, trimmed
-##   text, height), each beside a twin that fits, and the English title judged by it;
+##   text, height), each beside a twin that fits;
 ## - the HUD's key prompts (PR L7b): HudText keeps the English line, fills the translated template's key
 ##   tokens after tr(), uses a line's touch form on touch and guards a broken translation; and in a game,
 ##   the hint, tutorial, top card, touch USE button and the opening's CONTINUE prompt in another language,
 ##   with CONTINUE's touch-button context kept apart from the title's, and the top card drawn again in
-##   English when the language changes back.
+##   English when the language changes back;
+## - every offered language laid out in the game (PR L9): the title, credits, changelog, Settings, Pause,
+##   the touch buttons and the station names at every TEXT SIZE step fit, and the names stand apart.
 ## Spawn, waits and teardown come from tests/support/game_suite.gd. Every catalog this suite adds is
 ## made up here and dropped again with I18n.forget, so no real catalog is touched.
 
@@ -75,6 +77,10 @@ const TEXT_DIRS: Array[String] = ["res://scripts", "res://scenes"]
 const ROBOTO_FILE: String = "res://assets/fonts/Roboto-Variable.ttf"
 
 var _checks: int = 0
+## English's layout of each control [method _check_fit] judges, by "<where>|<node path>": whether
+## I18n.overflows found an overflow, the judged Control's size and the one-row width (px). Filled by the
+## English pass of [method _check_layouts], which runs first (I18n.offered puts English first).
+var _english_fit: Dictionary = {}
 
 
 func _run() -> void:
@@ -92,9 +98,9 @@ func _run() -> void:
 	_check_sibling(["es", "es_ES"], ["ambas la tienen", "ambas la tienen (España)"], "solo Latinoamérica")
 	_check_format_guard()
 	await _check_planted_overflows()
-	await _check_title()
 	_check_key_prompts()
 	await _check_hud()
+	await _check_layouts()
 	I18n.apply("en")
 	finish("Languages: %d checks passed." % _checks)
 
@@ -515,20 +521,6 @@ func _place(control: Control, parent: Node, rect: Rect2) -> void:
 	parent.add_child(control)
 
 
-## The real title in English, judged by the build's check: its buttons, the Brand line, the CONTINUE
-## note (shown only while there is no save, which start_game guarantees) and the version number all
-## fit, so the check finds no overflow where the game shows none.
-func _check_title() -> void:
-	var game: Main = await start_game("i18n-test") as Main
-	game.auto_pause_on_focus_loss = false
-	await frames(3)
-	var controls: Array[Control] = [game.new_game_button, game.continue_button, game.credits_button, game.changelog_button, game.get_node("CanvasLayer/TitleScreen/SettingsButton") as Button, game.get_node("CanvasLayer/TitleScreen/Brand") as Label, game.continue_note, game.title_version]
-	_check(game.continue_note.is_visible_in_tree(), "the CONTINUE note is up on a fresh title, so it is judged")
-	for control: Control in controls:
-		_check(not I18n.overflows(control), "the English title's %s fits (size %s)" % [str(control.get("text")).c_escape(), control.size])
-	await end_game(game)
-
-
 ## The made-up "es" catalog of the HUD checks: key templates (one with turn counts), the held form, a
 ## touch form, an objective and location, the name card, the tutorial, CONTINUE with and without the
 ## touch button's context, and one broken translation whose conversion differs from the English.
@@ -618,3 +610,117 @@ func _check_hud() -> void:
 	await end_game(game)
 	I18n.forget(catalog)
 	I18n.apply("en")
+
+
+## Every offered language, English first, laid out in the real game and judged by the build's
+## overflow check (I18n.overflows): the title (its buttons, the Brand line, the CONTINUE note, shown only
+## while there is no save, which start_game guarantees, and the version number), the credits and
+## changelog screens, every Settings tab, Pause in a run, the touch layout's buttons, and the station
+## names in the corridor, Records Access and the Service Junction at every TEXT SIZE step, where they
+## must also stand apart (the kit's overlapping_labels, the check text_boxes_test makes in English).
+## English is judged too, so a check that flags the shipped English layout shows up as such. The
+## dialogue boxes, hints and cards are not in the catalogs yet (PRs L7b and L7c); L7d's text_boxes_test
+## loop covers them per language.
+func _check_layouts() -> void:
+	for code: String in I18n.offered():
+		I18n.apply(code)
+		var game: Main = await start_game("i18n-layout-%s" % code, keep_running) as Main
+		await frames(3)
+		_check(game.continue_note.is_visible_in_tree(), "%s: the CONTINUE note is up on a fresh title, so it is judged" % code)
+		_check_fits(code, "title", game.get_node("CanvasLayer/TitleScreen"))
+		game.call("_show_credits")
+		await frames(2)
+		_check_fits(code, "credits", game.credits_screen)
+		game.call("_hide_credits")
+		game.call("_show_changelog")
+		await frames(2)
+		_check_fits(code, "changelog", game.changelog_screen)
+		game.call("_hide_changelog")
+		var settings: GameSettings = game.settings_menu
+		game.call("_show_title_settings")
+		for tab: int in settings.pages.size():
+			if settings.tabs.is_tab_hidden(tab):
+				continue
+			settings.select_tab(tab)
+			await frames(2)
+			_check_fits(code, "Settings tab %d" % tab, settings)
+		game.call("_resume_game")
+		game.debug_tools.actions.jump(&"corridor_start")
+		game.touch_enabled = true
+		game.call("_refresh_ui")
+		await frames(3)
+		_check_fits(code, "touch layout", game.get_node("CanvasLayer/TouchControls"))
+		_check_fit(code, "touch layout|PauseButton", game.pause_button)
+		game.touch_enabled = false
+		game.call("_pause_game")
+		await frames(2)
+		_check_fits(code, "Pause", game.pause_menu)
+		game.call("_resume_game")
+		for index: int in TextSize.STEPS.size():
+			settings.text_size.select(index)
+			settings.text_size.item_selected.emit(index)
+			var percent: int = roundi(TextSize.STEPS[index] * 100.0)
+			for jump: StringName in [&"corridor_start", &"records_mirror", &"junction_a", &"tank_down"]:
+				game.debug_tools.actions.jump(jump)
+				await frames(3)
+				var labels: Array[Label] = shown_station_labels(game)
+				for label: Label in labels:
+					_check_fit(code, "%d%% %s|%s" % [percent, jump, _game_path(label)], label)
+				var overlaps: Array[String] = overlapping_labels(labels)
+				_check(overlaps.is_empty(), "%s, %d%%, %s: no two station names overlap %s" % [code, percent, jump, overlaps])
+		settings.text_size.select(0)
+		settings.text_size.item_selected.emit(0)
+		await end_game(game)
+	I18n.apply("en")
+
+
+## Every visible Label, Button and RichTextLabel with text under [param root] fits, one check each,
+## named by [param code] and [param where]. English sets the baseline in [member _english_fit] (keyed by
+## [param where] and the node's path): a control fits when I18n.overflows finds nothing, or, where the
+## shipped English layout already overflows by that check (a Container page grown past its designed
+## rect, a binding button that trims its two bindings), when the language needs no more room than English:
+## its judged Control (I18n.outermost_container) is no larger and, where the control cuts its text, its
+## one-row width (I18n.needed_width) fits the control or is no wider than English's. English itself is recorded, not failed: L8 (layout-for-languages) owns its known overflows.
+func _check_fits(code: String, where: String, root: Node) -> void:
+	var controls: Array[Node] = [root]
+	controls.append_array(root.find_children("*", "Control", true, false))
+	for node: Node in controls:
+		if not (node is Label or node is Button or node is RichTextLabel):
+			continue
+		var control: Control = node as Control
+		var text: String = str(control.get("text"))
+		if text.is_empty() or not control.is_visible_in_tree():
+			continue
+		_check_fit(code, "%s|%s" % [where, _game_path(control)], control)
+
+
+## [param node]'s place below the game's root node as child indices ("3/0/12"), the same for every game
+## this suite starts. Not its NodePath: the root's name, and the names Godot gives nodes built in code
+## without one ("@Label@1234"), differ between instances, so the English pass's keys would never match.
+func _game_path(node: Node) -> String:
+	var steps: PackedStringArray = []
+	while node.get_parent() != null and node.get_parent() != tree().root:
+		steps.insert(0, str(node.get_index()))
+		node = node.get_parent()
+	return "/".join(steps)
+
+
+## One control of [method _check_fits] (also the station names), under [param key] in the baseline.
+func _check_fit(code: String, key: String, control: Control) -> void:
+	var over: bool = I18n.overflows(control)
+	var judged: Vector2 = I18n.outermost_container(control).size
+	# The one-row width matters only where the control cuts its text (clip or trim); a control that
+	# grows instead shows that in its judged size.
+	var cuts: bool = (control is Label or control is Button) and (bool(control.get("clip_text")) or int(control.get("text_overrun_behavior")) != TextServer.OVERRUN_NO_TRIMMING)
+	var needed: float = I18n.needed_width(control) if cuts else 0.0
+	var shown: String = TranslationServer.translate(str(control.get("text"))) if control.auto_translate_mode != Node.AUTO_TRANSLATE_MODE_DISABLED else str(control.get("text"))
+	if code == I18n.FALLBACK:
+		_english_fit[key] = {"over": over, "judged": judged, "needed": needed}
+		return
+	var english: Dictionary = _english_fit.get(key, {"over": false})
+	var fits: bool = not over
+	if over and bool(english["over"]):
+		var tolerance: float = I18n.OVERFLOW_TOLERANCE_PX
+		fits = (judged.x <= english["judged"].x + tolerance and judged.y <= english["judged"].y + tolerance
+				and needed <= maxf(control.size.x, float(english["needed"])) + tolerance)
+	_check(fits, "%s, %s: %s fits (size %s, judged %s, one row %.0f px; English: %s)" % [code, key.get_slice("|", 0), shown.left(60).c_escape(), control.size, judged, needed, english])
