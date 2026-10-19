@@ -1,4 +1,4 @@
-extends SceneTree
+extends "res://tests/support/game_suite.gd"
 ## P0-4 (WOLF-2, AUDIT 7): wherever WOLF goes and stands on his own, his painted body overlaps no
 ## station, no door frame in the walk line and not the engineer, on both relay routes, both mirror
 ## routes, every lane answer and a break-off after a miss. Each beat is reached the way play reaches it (the game's own
@@ -18,8 +18,6 @@ extends SceneTree
 ##   jamb and the walk-outs through the exits are door_route_test's.
 ## Touching (at most TOUCH px of shared painted pixels) is not an overlap.
 
-const GAME_SCENE: PackedScene = preload("res://scenes/main.tscn")
-const Suite = preload("res://tests/support/game_suite.gd")
 const TOUCH: float = 0.5
 ## The corridor's door-end pieces measured in depth, not along x, while WOLF stands in the open
 ## doorway (_check_doorway): the seal's hood with its far guide and the wall-mounted MANUAL BYPASS
@@ -31,7 +29,6 @@ const DRAWN_OVER_ACTORS: Array[String] = ["CorridorDoorFront"]
 ## Frames WOLF is given to reach a spot and stop (his longest walk, the length of a room, takes ~260).
 const SETTLE_FRAMES: int = 600
 
-var failures: int = 0
 var checked: Array[String] = []
 ## Read-once art for the painted-extent scans: each texture's uncompressed image ("image <path>",
 ## _image_of) and each region's painted extent along x or y ("<path> <region> <axis>", _painted_extent).
@@ -39,19 +36,10 @@ var checked: Array[String] = []
 var painted: Dictionary = {}
 
 
-func _initialize() -> void:
-	call_deferred("_run")
-
-
 func _run() -> void:
-	var path: String = "user://wolf-space-test-%s.json" % OS.get_process_id()
-	_remove(path)
-	var game: Main = GAME_SCENE.instantiate() as Main
-	game.save_path = path
-	game.settings_path = "%s-settings.cfg" % path
-	game.auto_pause_on_focus_loss = false
-	root.add_child(game)
-	await process_frame
+	check_name = "WOLF space"
+	var game: Main = await start_game("wolf-space-test", keep_running) as Main
+	var path: String = str(game.get("save_path"))
 	_check_reach_constants(game)
 	var actions: DebugActions = game.debug_tools.actions
 	await _corridor(game, actions, &"press")
@@ -67,8 +55,8 @@ func _run() -> void:
 	_expect(checked.size() >= 30, "every route reached its rest points (%d checked)" % checked.size())
 	game.queue_free()
 	await process_frame
-	_remove(path)
-	_remove("%s-settings.cfg" % path)
+	remove_file(path)
+	remove_file("%s-settings.cfg" % path)
 	if failures == 0:
 		print("WOLF space checks passed at %d rest points:\n  %s" % [checked.size(), "\n  ".join(checked)])
 	quit(1 if failures > 0 else 0)
@@ -94,38 +82,38 @@ func _check_reach_constants(game: Main) -> void:
 func _corridor(game: Main, actions: DebugActions, relay: StringName) -> void:
 	actions.set_relay(relay)
 	actions.jump(&"relay_question")
-	await _frames(5)
+	await frames(5)
 	_require(game.waiting_for_choice and game.choice_context == "relay", "%s: the relay question is up" % relay)
-	await _tap(&"choice_2" if relay == &"press" else &"choice_1")
-	await _frames(20)
+	await tap(&"choice_2" if relay == &"press" else &"choice_1", 1)
+	await frames(20)
 	for _step: int in 3:
 		if game.state.breaker_armed:
 			break
-		await _tap(&"interact")
-		await _frames(20)
+		await tap(&"interact", 1)
+		await frames(20)
 	_require(game.state.breaker_armed, "%s: the breaker is armed" % relay)
-	_require(await _walk_to(game.human, Main.RELAY_SIDE_X), "%s: the engineer walks to the relay" % relay)
+	_require(await walk_to_reading_on(game.human, Main.RELAY_SIDE_X), "%s: the engineer walks to the relay" % relay)
 	if relay == &"press":
 		# Rushed, USE at the relay asks WOLF to take it, and he refuses.
-		await _tap(&"interact")
+		await tap(&"interact", 1)
 		_require(game.relay_refused, "press: WOLF refuses the relay")
 	await _settle(game)
 	await _check_rest(game, "%s: corridor, engineer at the relay (WOLF %s)" % [relay, game.debug_wolf_why()])
 	if relay == &"disclose_wolf":
 		# Told, he has offered; USE at the relay signals him to take it.
-		await _tap(&"interact")
-		_require(await _wait_until(func() -> bool: return game.wolf_holding_relay, 240), "told: WOLF takes the contact")
+		await tap(&"interact", 1)
+		_require(await wait_until(func() -> bool: return game.wolf_holding_relay, 240), "told: WOLF takes the contact")
 		_expect(game.wolf.autonomous_target_x == Main.RELAY_CONTACT_X and not game.wolf.body_sprite.flip_h, "WOLF holds the contact from the relay's left, facing it")
 		await _settle(game)
 		_expect(game.wolf_holding_relay, "told: WOLF still holds the contact once his lean in has settled")
 		await _check_rest(game, "%s: corridor, WOLF on the relay contact as the seal opens" % relay)
 		await _safe_point(game, relay)
 		return
-	_require(await _walk_to(game.human, Main.BYPASS_WHEEL.x - 18.0), "%s: the engineer walks to the MANUAL BYPASS" % relay)
-	await _tap(&"interact")
-	await _frames(10)
+	_require(await walk_to_reading_on(game.human, Main.BYPASS_WHEEL.x - 18.0), "%s: the engineer walks to the MANUAL BYPASS" % relay)
+	await tap(&"interact", 1)
+	await frames(10)
 	Input.action_press(&"interact")
-	var opened: bool = await _wait_until(func() -> bool: return game.state.door_open, 400)
+	var opened: bool = await wait_until(func() -> bool: return game.state.door_open, 400)
 	Input.action_release(&"interact")
 	_require(opened and game.state.route == "fallback", "%s: the cranked bypass opens the seal" % relay)
 	_expect(game.seal_opening and game.wolf.autonomous_target_x == Main.WOLF_BYPASS_CLEAR_X, "%s: WOLF keeps off the relay while the seal opens" % relay)
@@ -141,7 +129,7 @@ func _corridor(game: Main, actions: DebugActions, relay: StringName) -> void:
 ## doorway, he leaves it to them.
 func _safe_point(game: Main, relay: StringName) -> void:
 	var facing: bool = game.wolf.body_sprite.flip_h
-	_require(await _wait_until(func() -> bool: return not game.seal_opening, 240), "%s: the seal finishes opening" % relay)
+	_require(await wait_until(func() -> bool: return not game.seal_opening, 240), "%s: the seal finishes opening" % relay)
 	if relay == &"disclose_wolf":
 		# Letting go of the contact, he edges the few px back to the open-seal limit without mirroring round.
 		var turns: int = 0
@@ -153,20 +141,20 @@ func _safe_point(game: Main, relay: StringName) -> void:
 		_expect(turns == 0, "told: WOLF keeps facing the relay as the seal lands and he edges back (%d turns)" % turns)
 	await _settle(game)
 	await _check_rest(game, "%s: corridor, the seal open and the engineer by it (WOLF %s)" % [relay, game.debug_wolf_why()], false)
-	_require(await _walk_to(game.human, 830.0), "%s: the engineer walks to the safe point" % relay)
+	_require(await walk_to_reading_on(game.human, 830.0), "%s: the engineer walks to the safe point" % relay)
 	await _settle(game)
 	_expect(game.wolf.autonomous_target_x == Main.WOLF_DOORWAY_X and absf(game.wolf.position.x - Main.WOLF_DOORWAY_X) <= 2.5, "%s: WOLF comes to the open doorway while the engineer is at the safe point (x %.1f)" % [relay, game.wolf.position.x])
 	_expect(not game.wolf.body_sprite.flip_h and game.human.position.x > game.wolf.position.x, "%s: in the doorway he faces the engineer" % relay)
 	await _check_rest(game, "%s: corridor, WOLF in the doorway with the engineer at the safe point" % relay, true, true)
-	await _tap(&"interact")
+	await tap(&"interact", 1)
 	_require(game.state.checkpoint_reached and game.state.chapter_id == "lockdown", "%s: the safe point saves" % relay)
-	await _tap_frames(&"move_left", 4)
-	await _frames(int(M0Actor.TURN_SETTLE_SECONDS * 60.0) + 10)
+	await press_for(&"move_left", 4)
+	await frames(int(M0Actor.TURN_SETTLE_SECONDS * 60.0) + 10)
 	await _settle(game)
 	_expect(absf(game.wolf.position.x - Main.WOLF_DOORWAY_X) <= 2.5 and not game.wolf.body_sprite.flip_h, "%s: the engineer turning round at the safe point leaves WOLF in the doorway, facing them (x %.1f)" % [relay, game.wolf.position.x])
 	await _check_rest(game, "%s: corridor, saved, WOLF in the doorway" % relay, true, true)
 	# Back into the doorway, the engineer would stand where he does: he gives it up and follows again.
-	_require(await _walk_to(game.human, Main.WOLF_DOORWAY_HOLD_X - 30.0), "%s: the engineer steps back into the doorway" % relay)
+	_require(await walk_to_reading_on(game.human, Main.WOLF_DOORWAY_HOLD_X - 30.0), "%s: the engineer steps back into the doorway" % relay)
 	await _settle(game)
 	_expect(game.wolf.autonomous_target_x != Main.WOLF_DOORWAY_X and game.wolf.position.x <= Main.WOLF_FOLLOW_OPEN_MAX_X + 2.5, "%s: with the engineer back in the doorway WOLF leaves it to them and waits on the relay's left (x %.1f)" % [relay, game.wolf.position.x])
 	await _check_rest(game, "%s: corridor, the engineer back in the doorway" % relay, false)
@@ -175,7 +163,7 @@ func _safe_point(game: Main, relay: StringName) -> void:
 	# back within a clear gap of him.
 	var changes: int = await _edge_between(game, Main.WOLF_DOORWAY_HOLD_X - 12.0, Main.WOLF_DOORWAY_HOLD_X + 12.0)
 	_expect(changes == 0 and game.wolf.position.x <= Main.WOLF_FOLLOW_OPEN_MAX_X + 2.5, "%s: edging about just past the doorway leaves WOLF waiting on the relay's left (%d changes of mind, x %.1f)" % [relay, changes, game.wolf.position.x])
-	_require(await _walk_to(game.human, 830.0), "%s: the engineer goes back to the safe point" % relay)
+	_require(await walk_to_reading_on(game.human, 830.0), "%s: the engineer goes back to the safe point" % relay)
 	await _settle(game)
 	_expect(game.wolf.autonomous_target_x == Main.WOLF_DOORWAY_X and absf(game.wolf.position.x - Main.WOLF_DOORWAY_X) <= 2.5, "%s: back at the safe point, WOLF comes to the doorway again (x %.1f)" % [relay, game.wolf.position.x])
 	changes = await _edge_between(game, Main.WOLF_DOORWAY_HOLD_X + 12.0, 840.0)
@@ -192,15 +180,15 @@ func _records(game: Main, actions: DebugActions, mirror: StringName) -> void:
 	await _settle(game)
 	_expect(absf(game.wolf.position.x - Main.WOLF_MIRROR_X) <= 2.0, "%s: WOLF goes to the mirror port on entry" % mirror)
 	await _check_rest(game, "%s: Records, WOLF at the mirror port on entry" % mirror)
-	_require(await _walk_to(game.human, 190.0), "%s: the engineer walks to the purge queue" % mirror)
-	await _tap(&"interact")
+	_require(await walk_to_reading_on(game.human, 190.0), "%s: the engineer walks to the purge queue" % mirror)
+	await tap(&"interact", 1)
 	_require(game.state.purge_trace_preserved, "%s: the purge order is copied" % mirror)
-	_require(await _walk_to(game.human, 520.0), "%s: the engineer walks to the mirror port" % mirror)
-	await _tap(&"interact")
+	_require(await walk_to_reading_on(game.human, 520.0), "%s: the engineer walks to the mirror port" % mirror)
+	await tap(&"interact", 1)
 	_require(game.waiting_for_choice, "%s: the mirror offers both routes" % mirror)
 	await _settle(game)
 	await _check_rest(game, "%s: Records, both at the mirror port for the choice" % mirror)
-	await _tap(&"choice_1" if mirror == &"wolf" else &"choice_2")
+	await tap(&"choice_1" if mirror == &"wolf" else &"choice_2", 1)
 	_require(game.state.mirror_trace_preserved and game.state.mirror_route == String(mirror), "%s: the mirror timestamp is copied" % mirror)
 	await _settle(game)
 	await _check_rest(game, "%s: Records, after the mirror copy (WOLF %s)" % [mirror, game.debug_wolf_why()], false)
@@ -215,29 +203,29 @@ func _junction_entry(game: Main, actions: DebugActions) -> void:
 	_require(state.complete_chapter(), "the Records chapter completes")
 	_require(state.save_to_disk(game.save_path), "the completed Records save is written")
 	game.debug_load_checkpoint()
-	await _frames(5)
+	await frames(5)
 	game.human.position.x = 830.0
-	await _tap(&"interact")
+	await tap(&"interact", 1)
 	# USE at the open exit walks them out through it; the junction begins once WOLF is through too.
-	_require(await _wait_until(func() -> bool: return game.state.chapter_id == "junction", 400) and game.wolf_scouting, "USE at the secured exit walks them out into the junction with WOLF heading for the valve")
-	_require(await _wait_until(func() -> bool: return absf(game.wolf.position.x - JunctionRoom.WOLF_SEAM_X) <= 2.0, 240), "WOLF reaches the valve")
-	await _frames(10)
+	_require(await wait_until(func() -> bool: return game.state.chapter_id == "junction", 400) and game.wolf_scouting, "USE at the secured exit walks them out into the junction with WOLF heading for the valve")
+	_require(await wait_until(func() -> bool: return absf(game.wolf.position.x - JunctionRoom.WOLF_SEAM_X) <= 2.0, 240), "WOLF reaches the valve")
+	await frames(10)
 	await _check_rest(game, "junction, WOLF reading the LINE gauge on entry")
-	_require(await _wait_until(func() -> bool: return not game.wolf_scouting, 240), "WOLF finishes reading the gauge")
-	_require(await _walk_to(game.human, JunctionRoom.BREAKER_X), "the engineer walks to the breaker")
-	await _tap(&"interact")
+	_require(await wait_until(func() -> bool: return not game.wolf_scouting, 240), "WOLF finishes reading the gauge")
+	_require(await walk_to_reading_on(game.human, JunctionRoom.BREAKER_X), "the engineer walks to the breaker")
+	await tap(&"interact", 1)
 	_require(game.pressure_line.state == &"building", "the breaker arms the line")
 	await _settle(game)
 	await _check_rest(game, "junction, WOLF clear of the vent while the line builds")
-	_require(await _walk_to(game.human, Main.VALVE_CRANK_X), "the engineer walks to the valve")
+	_require(await walk_to_reading_on(game.human, Main.VALVE_CRANK_X), "the engineer walks to the valve")
 	Input.action_press(&"interact")
-	var lit: bool = await _wait_until(func() -> bool: return game.pressure_line.state == &"fuse" or game.pressure_line.state == &"charged", 240)
+	var lit: bool = await wait_until(func() -> bool: return game.pressure_line.state == &"fuse" or game.pressure_line.state == &"charged", 240)
 	Input.action_release(&"interact")
 	_require(lit, "three turns light the fuse")
 	game.human.position.x = PressureLine.BLAST_MIN_X - 8.0
-	await _frames(2)
+	await frames(2)
 	await _check_rest(game, "junction, WOLF clear of the blast while the fuse burns")
-	_require(await _wait_until(func() -> bool: return game.state.door_blown, 400), "the door blows")
+	_require(await wait_until(func() -> bool: return game.state.door_blown, 400), "the door blows")
 	await _settle(game)
 	_expect(game.wolf.autonomous_target_x == JunctionRoom.WOLF_CLEAR_X, "after the blast WOLF keeps by the entrance while the engineer stands in his spot by the valve")
 	_expect(not game.wolf.body_sprite.flip_h, "holding by the entrance he faces the engineer and the rubble, not the way out")
@@ -247,7 +235,7 @@ func _junction_entry(game: Main, actions: DebugActions) -> void:
 	var turns: int = 0
 	var last_sign: float = 0.0
 	for step: int in 12:
-		await _tap_frames(&"move_right" if step % 2 == 0 else &"move_left", 4)
+		await press_for(&"move_right" if step % 2 == 0 else &"move_left", 4)
 		for _frame: int in 12:
 			await physics_frame
 			if absf(game.wolf.velocity.x) > 1.0:
@@ -256,7 +244,7 @@ func _junction_entry(game: Main, actions: DebugActions) -> void:
 					turns += 1
 				last_sign = moving
 	_expect(turns == 0, "edging about by the valve leaves WOLF holding (%d turns, engineer at %.1f)" % [turns, game.human.position.x])
-	_require(await _walk_to(game.human, 480.0), "the engineer walks up to the blown door")
+	_require(await walk_to_reading_on(game.human, 480.0), "the engineer walks up to the blown door")
 	await _settle(game)
 	_expect(game.wolf.autonomous_target_x == JunctionRoom.WOLF_RUBBLE_X, "then WOLF holds back from the rubble by the valve for the engineer's call")
 	await _check_rest(game, "junction, WOLF waiting for the engineer's call after the blast")
@@ -270,24 +258,24 @@ func _lane(game: Main, actions: DebugActions, lane: StringName) -> void:
 	actions.jump(&"lane")
 	_require(game.lane_choice == String(lane), "%s: the lane is answered" % lane)
 	if lane == &"wolf":
-		_require(await _wait_until(func() -> bool: return game.call("_bait_holding"), 600), "wolf: the sentry stops on the mark, drawn by WOLF")
+		_require(await wait_until(func() -> bool: return game.call("_bait_holding"), 600), "wolf: the sentry stops on the mark, drawn by WOLF")
 		await _settle(game)
 		await _check_rest(game, "wolf: lane, WOLF drawing the sentry from the far end (engineer at the rubble)")
-		_require(await _walk_to(game.human, JunctionRoom.ARM_X + 20.0), "wolf: the engineer walks into the alcove")
+		_require(await walk_to_reading_on(game.human, JunctionRoom.ARM_X + 20.0), "wolf: the engineer walks into the alcove")
 		await _check_rest(game, "wolf: lane, WOLF holding the sentry on the mark (engineer at the TANK RELEASE)")
-		await _tap(&"interact")
-		_require(await _wait_until(func() -> bool: return game.state.sentry_down, 120), "wolf: the tank comes down on the sentry")
+		await tap(&"interact", 1)
+		_require(await wait_until(func() -> bool: return game.state.sentry_down, 120), "wolf: the tank comes down on the sentry")
 	else:
 		await _settle(game)
 		_expect(game.wolf.autonomous_target_x == JunctionRoom.WOLF_RUBBLE_X, "%s: WOLF holds back from the rubble" % lane)
 		_expect(game.human.position.x > game.wolf.position.x and not game.wolf.body_sprite.flip_h, "%s: holding back by the valve he faces the engineer and the rubble" % lane)
 		await _check_rest(game, "%s: lane, WOLF holding back while the engineer takes the lane" % lane)
 		actions.jump(&"tank_down")
-		await _frames(5)
+		await frames(5)
 	await _settle(game)
 	_expect(absf(game.wolf.position.x - JunctionRoom.WOLF_DOWN_X) <= 2.0, "%s: WOLF waits by the hatch once the sentry is down" % lane)
 	await _check_rest(game, "%s: tank down, WOLF by the hatch" % lane)
-	_require(await _walk_to(game.human, JunctionRoom.BOLT_X), "%s: the engineer walks to the exit bolt" % lane)
+	_require(await walk_to_reading_on(game.human, JunctionRoom.BOLT_X), "%s: the engineer walks to the exit bolt" % lane)
 	await _settle(game)
 	await _check_rest(game, "%s: tank down, WOLF by the hatch with the engineer at the bolt" % lane)
 
@@ -301,23 +289,23 @@ func _break_off(game: Main, actions: DebugActions) -> void:
 	actions.jump(&"lane")
 	_require(game.lane_choice == "wolf" and game.wolf_baiting, "break-off: WOLF sets off to draw the sentry")
 	var brain: SentryBrain = game.sentry_brain
-	_require(await _wait_until(func() -> bool: return brain.state == &"fixated", 240), "break-off: the sentry turns to WOLF")
+	_require(await wait_until(func() -> bool: return brain.state == &"fixated", 240), "break-off: the sentry turns to WOLF")
 	# The tank falls about half a second; the sentry is still backing off far right of the mark and
 	# WOLF still on its rubble side when it lands, so it misses.
 	_require(actions.trigger_drop() == "The clamp lets go.", "break-off: the TANK RELEASE lets the tank go")
-	_require(await _wait_until(func() -> bool: return game.wolf_broke_off, 120), "break-off: the tank misses and WOLF breaks off")
+	_require(await wait_until(func() -> bool: return game.wolf_broke_off, 120), "break-off: the tank misses and WOLF breaks off")
 	_require(not game.state.sentry_down and not game.wolf_holding_far_end, "break-off: he had not got past the sentry, so he goes back, not to the hatch")
-	_expect(await _wait_until(func() -> bool: return game.status_line == Main.BROKE_OFF_RUBBLE_LINE, 1200), "break-off: WOLF says he is out and holds back (%s)" % game.status_line.c_escape())
+	_expect(await wait_until(func() -> bool: return game.status_line == Main.BROKE_OFF_RUBBLE_LINE, 1200), "break-off: WOLF says he is out and holds back (%s)" % game.status_line.c_escape())
 	await _settle(game)
 	_expect(game.wolf.autonomous_target_x == JunctionRoom.WOLF_RUBBLE_X and absf(game.wolf.position.x - JunctionRoom.WOLF_RUBBLE_X) <= 2.0, "break-off: WOLF holds back at his spot by the valve (x %.1f)" % game.wolf.position.x)
 	_expect(game.human.position.x > game.wolf.position.x and not game.wolf.body_sprite.flip_h, "break-off: settled there he faces the engineer and the rubble, not the entrance")
 	await _check_rest(game, "wolf: lane, WOLF holding back by the valve after breaking off")
 	# Let the chase, the coolant cloud and the winch finish, then bring the sentry down so its servo
 	# winds down too: no sound is still playing as the run ends.
-	_expect(await _wait_until(func() -> bool: return brain.state == &"patrol" and game.drop_arm.state == &"hung" and not game.drop_arm.cloud_active(), 900), "break-off: the sentry gives up and the tank is wound back up")
+	_expect(await wait_until(func() -> bool: return brain.state == &"patrol" and game.drop_arm.state == &"hung" and not game.drop_arm.cloud_active(), 900), "break-off: the sentry gives up and the tank is wound back up")
 	actions.jump(&"tank_down")
 	await _settle(game)
-	await _frames(60)
+	await frames(60)
 
 
 # --- Measuring ------------------------------------------------------------------------------------
@@ -359,7 +347,7 @@ func _check_doorway(game: Main, label: String, wolf_span: Vector2) -> void:
 	for node_name: String in DRAWN_OVER_ACTORS:
 		var piece: Sprite2D = game.get_node(node_name) as Sprite2D
 		_require(piece != null, "the door end draws %s" % node_name)
-		_expect(Suite.drawn_z(piece) > Suite.drawn_z(wolf_sprite), "%s draws over the actors" % node_name)
+		_expect(drawn_z(piece) > drawn_z(wolf_sprite), "%s draws over the actors" % node_name)
 		if piece.is_visible_in_tree():
 			covers.append(piece)
 	var hidden: Dictionary = _covered_pixels(wolf_sprite, covers)
@@ -372,11 +360,11 @@ func _check_doorway(game: Main, label: String, wolf_span: Vector2) -> void:
 	var parked_foot: Vector2 = BlastLeaf.project(BlastLeaf.lead_at(1.0), 0.0, BlastLeaf.T_LF)
 	_expect(not leaf.visible and BlastLeaf.lead_at(leaf.open if leaf.open > 0.0 else 1.0) >= BlastLeaf.A_MOUTH - 0.0001 and parked_foot.y < RoomDepth.FLOOR_Y - 2.0, "%s: the inner leaf is parked in its pocket, its foot behind the walk line (y %.1f), clear of WOLF" % [label, parked_foot.y])
 	for back: Sprite2D in [game.get("seal_wall") as Sprite2D, game.get("seal_head") as Sprite2D]:
-		_expect(Suite.drawn_z(back) < Suite.drawn_z(wolf_sprite), "%s draws behind the actors" % back.name)
+		_expect(drawn_z(back) < drawn_z(wolf_sprite), "%s draws behind the actors" % back.name)
 	var frame_rows: Vector2 = _painted_world(game.get("seal_head") as Sprite2D, Vector2.AXIS_Y)
 	_expect(frame_rows.y < RoomDepth.FLOOR_Y - 8.0, "%s: the seal's hood and far guide end above the walk line (lowest row %.1f), behind WOLF" % [label, frame_rows.y])
 	var hub: Vector2 = game.bypass_handle.global_position + BypassHandle.WHEEL_OFFSET
-	_expect(hub.y + BypassHandle.COLLAR_RADIUS < RoomDepth.FLOOR_Y - 20.0 and Suite.drawn_z(game.bypass_handle) < Suite.drawn_z(wolf_sprite), "%s: the MANUAL BYPASS is mounted on the back wall above the floor (its collar's foot at y %.1f), drawn behind WOLF, who stands in front of it" % [label, hub.y + BypassHandle.COLLAR_RADIUS])
+	_expect(hub.y + BypassHandle.COLLAR_RADIUS < RoomDepth.FLOOR_Y - 20.0 and drawn_z(game.bypass_handle) < drawn_z(wolf_sprite), "%s: the MANUAL BYPASS is mounted on the back wall above the floor (its collar's foot at y %.1f), drawn behind WOLF, who stands in front of it" % [label, hub.y + BypassHandle.COLLAR_RADIUS])
 	var camera: Camera2D = game.get_viewport().get_camera_2d()
 	var view: Rect2 = Rect2(camera.get_screen_center_position() - game.get_viewport_rect().size * 0.5 / camera.zoom, game.get_viewport_rect().size / camera.zoom)
 	_expect(wolf_span.x >= view.position.x and wolf_span.y <= view.end.x, "%s: WOLF (%.1f..%.1f) is inside the camera's view (%.1f..%.1f)" % [label, wolf_span.x, wolf_span.y, view.position.x, view.end.x])
@@ -437,7 +425,7 @@ func _opaque_at(sprite: Sprite2D, image: Image, local: Vector2, art: Rect2) -> b
 func _image_of(sprite: Sprite2D) -> Image:
 	var key: String = "image %s" % sprite.texture.resource_path
 	if not painted.has(key):
-		painted[key] = Suite.texture_image(sprite.texture)
+		painted[key] = texture_image(sprite.texture)
 	return painted[key]
 
 
@@ -578,77 +566,7 @@ func _edge_between(game: Main, a: float, b: float) -> int:
 			last[0] = game.wolf.autonomous_target_x
 	physics_frame.connect(watch)
 	for _pass: int in 3:
-		_require(await _walk_to(game.human, a), "the engineer edges to x %.0f" % a)
-		_require(await _walk_to(game.human, b), "the engineer edges to x %.0f" % b)
+		_require(await walk_to_reading_on(game.human, a), "the engineer edges to x %.0f" % a)
+		_require(await walk_to_reading_on(game.human, b), "the engineer edges to x %.0f" % b)
 	physics_frame.disconnect(watch)
 	return changes[0]
-
-
-## Holds [param action] down for [param count] frames.
-func _tap_frames(action: StringName, count: int) -> void:
-	Input.action_press(action)
-	await _frames(count)
-	Input.action_release(action)
-
-
-func _frames(count: int) -> void:
-	for _frame: int in count:
-		await physics_frame
-
-
-func _tap(action: StringName) -> void:
-	await process_frame
-	Input.action_press(action)
-	await process_frame
-	Input.action_release(action)
-	await process_frame
-
-
-## Walks the engineer to [param target_x] with the move keys; a story box that stops the walk is read on.
-func _walk_to(actor: M0Actor, target_x: float) -> bool:
-	for _attempt: int in 4:
-		var action: StringName = &"move_right" if target_x > actor.position.x else &"move_left"
-		Input.action_press(action)
-		var reached: bool = false
-		for _frame: int in range(360):
-			await physics_frame
-			if absf(actor.position.x - target_x) <= 6.0:
-				reached = true
-				break
-			if not actor.controlled:
-				break
-		Input.action_release(action)
-		if reached:
-			await _frames(2)
-			return true
-		# A step the game takes on its own hands control back by itself; only a story box needs reading on.
-		if not await _wait_until(func() -> bool: return actor.controlled, 60):
-			await _tap(&"interact")
-			await _frames(10)
-	return absf(actor.position.x - target_x) <= 6.0
-
-
-func _wait_until(condition: Callable, frames: int) -> bool:
-	for _frame: int in range(frames):
-		await physics_frame
-		if condition.call():
-			return true
-	return false
-
-
-func _remove(path: String) -> void:
-	if FileAccess.file_exists(path):
-		DirAccess.remove_absolute(ProjectSettings.globalize_path(path))
-
-
-func _expect(condition: bool, label: String) -> void:
-	if not condition:
-		failures += 1
-		push_error("WOLF space check failed: " + label)
-
-
-## Fails and stops the run: the steps after it need this one.
-func _require(condition: bool, label: String) -> void:
-	_expect(condition, label)
-	if not condition:
-		quit(1)

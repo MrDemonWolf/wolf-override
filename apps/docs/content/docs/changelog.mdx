@@ -109,6 +109,7 @@ Changes merged after 0.15.0. They become the next version when it is cut.
 - The changelog export fails if the newest version on this page is not the game's version.
 - New rule: every pull request that changes the game, the site or the tools adds its lines under Next version; a version is cut per milestone.
 - Changes that reached the game or site earlier but were missing from this page are now listed under their versions.
+- The headless test suites share one kit for their bookkeeping, game start and end, waits, taps, walks and fixture saves, and the parity tools share one for their arguments and fixture saves; copied test and tool code drops from 646 lines to none.
 - Translations are reviewed without a translation website: Claude translates, Codex back-translates, the checks run, and each language is marked machine translation until a native speaker reviews it.
 - Test build zips' `README.txt` and the Test builds run summary link the new Install a test build page.
 - `CONTRIBUTING.md` links the website's copied-code check, project rules and contributing pages instead of repeating them.

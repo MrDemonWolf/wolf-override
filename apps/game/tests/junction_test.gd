@@ -1,28 +1,22 @@
-extends SceneTree
+extends "res://tests/support/game_suite.gd"
+## The Service Junction: the pressure line, the v4 save format, and the scene played through (the
+## Records exit in, WOLF's scouting, the held valve, the blast and its autosaves) with its presentation.
+## Bookkeeping, spawning and the waits come from the shared suite kit (tests/support/game_suite.gd).
 
-const GAME_SCENE: PackedScene = preload("res://scenes/main.tscn")
 const State = preload("res://scripts/m0_state.gd")
 const MainScript = preload("res://scripts/main.gd")
-const Suite = preload("res://tests/support/game_suite.gd")
 ## Frames to wait for the fuse to run out, with a margin.
 const FUSE_FRAMES: int = int(PressureLine.FUSE_SECONDS * 60.0) + 60
 
-var failures: int = 0
-
-
-func _initialize() -> void:
-	call_deferred("_run")
-
 
 func _run() -> void:
+	check_name = "Junction"
 	_check_pressure_line()
 	_check_save_format()
 	await _check_redraws()
 	await _check_panel_front()
 	await _check_scene()
-	if failures == 0:
-		print("Junction checks passed")
-	quit(1 if failures > 0 else 0)
+	finish("Junction checks passed")
 
 
 ## PressureLine is pure logic: the same seconds give the same phases whether sliced or whole.
@@ -99,9 +93,9 @@ func _check_pressure_line() -> void:
 
 ## Save v4: junction progress in order, defaulting to nothing for v3 and older saves.
 func _check_save_format() -> void:
-	var records: M0State = _completed_records_state(State.DISCLOSE)
+	var records: M0State = completed_records_state(State.DISCLOSE)
 	_expect(not State.new().enter_junction() and not State.new().blow_door(), "the junction cannot begin from a new game")
-	var incomplete: M0State = _completed_records_state(State.DISCLOSE)
+	var incomplete: M0State = completed_records_state(State.DISCLOSE)
 	incomplete.chapter_complete = false
 	_expect(not incomplete.enter_junction(), "the junction waits for the secured first copy")
 	_expect(not records.blow_door(), "the door cannot blow before entering the junction")
@@ -184,14 +178,8 @@ func _check_save_format() -> void:
 ## The scene: the Records exit leads in, WOLF scouts, the line charges by held USE, the blast
 ## zone knocks down to autosave A, and a clean blast opens the door and writes autosave B.
 func _check_scene() -> void:
-	var path: String = "user://junction-test-%s.json" % OS.get_process_id()
-	if FileAccess.file_exists(path):
-		DirAccess.remove_absolute(ProjectSettings.globalize_path(path))
-	var game: Node2D = GAME_SCENE.instantiate() as Node2D
-	game.set("save_path", path)
-	game.set("settings_path", "%s-settings.cfg" % path)
-	root.add_child(game)
-	await process_frame
+	var game: Node2D = await start_game("junction-test")
+	var path: String = str(game.get("save_path"))
 	var human: M0Actor = game.get_node("Human") as M0Actor
 	var wolf: M0Actor = game.get_node("Wolf") as M0Actor
 	var camera: Camera2D = game.get_node("IntroCamera") as Camera2D
@@ -210,7 +198,7 @@ func _check_scene() -> void:
 	_expect(is_equal_approx(vent_box.position.x, PressureLine.VENT_GRATE_MIN_X) and is_equal_approx(vent_box.end.x, PressureLine.VENT_GRATE_MAX_X), "the vent hurtbox is exactly the drawn grate")
 	game.call("_new_game")
 	game.call("_finish_intro")
-	var state: M0State = _completed_records_state(State.DISCLOSE)
+	var state: M0State = completed_records_state(State.DISCLOSE)
 	game.set("state", state)
 	game.call("_sync_scene")
 	game.call("_start_gameplay_camera")
@@ -227,9 +215,9 @@ func _check_scene() -> void:
 	# Swing it again, as just after the copy is secured: a USE mid-swing waits for the leaf to reach its
 	# floor stop (mid-swing it crosses the walkway) before anyone walks through.
 	records_room.open_exit(true)
-	await _tap(&"interact")
+	await tap(&"interact")
 	_expect(state.chapter_id == "records" and game.get("records_exit_walking") and not human.controlled and float(game.get("engineer_step_x")) < 0.0, "a USE while the exit still swings waits, the engineer holding still")
-	_expect(await _wait_until(func() -> bool: return float(game.get("engineer_step_x")) >= 0.0, 360) and is_equal_approx(records_room.exit_leaf.open, 1.0), "once the leaf is on its floor stop the engineer sets off through the doorway")
+	_expect(await wait_until(func() -> bool: return float(game.get("engineer_step_x")) >= 0.0, 360) and is_equal_approx(records_room.exit_leaf.open, 1.0), "once the leaf is on its floor stop the engineer sets off through the doorway")
 	# The engineer walks out through the open doorway into the passage; nobody is cut away from the door.
 	_expect(state.chapter_id == "records" and game.get("records_exit_walking") and not human.controlled, "USE at the open exit walks the engineer out through the doorway")
 	var furthest: float = human.position.x
@@ -273,11 +261,11 @@ func _check_scene() -> void:
 	# Q6 (approved 2026-10-13): the engineer says only the goal; WOLF's run is shown, not narrated.
 	_expect(entry_line == "%s: That door is our way through." % state.human_name().get_slice(" ", 0).to_upper() and not entry_line.contains("runs ahead") and not entry_line.contains("Overload it"), "the entry line is the engineer's goal only, with no narration of WOLF's run and no chain")
 	_expect(absf(JunctionRoom.WOLF_SEAM_X + M0Actor.WOLF_REACH - (JunctionRoom.VALVE_X - JunctionRoom.VALVE_HALF_WIDTH)) <= 4.0, "his reading spot puts his snout at the valve's edge, under its LINE gauge")
-	_expect(await _wait_until(func() -> bool: return absf(wolf.position.x - JunctionRoom.WOLF_SEAM_X) <= 4.0, 120), "WOLF reaches the valve")
+	_expect(await wait_until(func() -> bool: return absf(wolf.position.x - JunctionRoom.WOLF_SEAM_X) <= 4.0, 120), "WOLF reaches the valve")
 	for _frame: int in 20:
 		await physics_frame
 	_expect(game.get("wolf_scouting") and not wolf.body_sprite.flip_h and str(game.get("status_line")) == entry_line, "at the valve he stands facing it, reading the gauge, while the line says so")
-	_expect(await _wait_until(func() -> bool: return not game.get("wolf_scouting"), 200), "WOLF reads the gauge and is done")
+	_expect(await wait_until(func() -> bool: return not game.get("wolf_scouting"), 200), "WOLF reads the gauge and is done")
 	# Round 3c (Nathanial's choice): before the breaker is armed WOLF warns about the door, not a live
 	# line, in the same words as the Continue-A restore.
 	_expect(absf(wolf.position.x - JunctionRoom.WOLF_SEAM_X) <= 6.0 and wolf.follow_target == human and str(game.get("status_line")) == "WOLF: When the door goes, don't be standing in front of it." and not str(game.get("status_line")).contains("It's live"), "after the read WOLF returns to following and warns about the door, without calling the unarmed line live")
@@ -286,11 +274,11 @@ func _check_scene() -> void:
 	_expect((game.get_node("CanvasLayer/BottomBar/Speaker") as Label).text == "WOLF" and entry_story.text == "When the door goes, don't be standing in front of it." and entry_story.get_line_count() <= 2, "his warning sits under his own tag in one box of at most two rows (%d rows)" % entry_story.get_line_count())
 	_expect(_player_for(game, &"growl_seam") != null, "WOLF growls at the seam")
 	await physics_frame
-	_expect(await _wait_until(func() -> bool: return not room.door_shape.disabled, 5), "the junction door body is live in its room")
+	_expect(await wait_until(func() -> bool: return not room.door_shape.disabled, 5), "the junction door body is live in its room")
 	_check_presentation(room, human, wolf)
 	await _check_near_fade(room)
 	# The sealed door physically blocks the engineer.
-	_expect(await _walk_to(human, 420.0), "the engineer walks to the valve")
+	_expect(await walk_to(human, 420.0), "the engineer walks to the valve")
 	Input.action_press(&"move_right")
 	for _frame: int in 120:
 		await physics_frame
@@ -300,26 +288,26 @@ func _check_scene() -> void:
 	# P0-15: pressed up against the sealed door, USE is the door's, ahead of the valve's reach.
 	Input.action_press(&"move_right")
 	await physics_frame
-	await _tap(&"interact")
+	await tap(&"interact")
 	Input.action_release(&"move_right")
 	_expect(line.state == &"idle" and str(game.get("status_line")) == "Sealed shut. Something hums behind it.\nThe valve beside it charges it.", "USE against the sealed door gets the door's own answer")
 	var valve_station: Vector4 = (game.get_script().get_script_constant_map()["JUNCTION_STATIONS"] as Array)[1]
 	game.call("debug_place", JunctionRoom.VALVE_X + valve_station.w * float(game.call("_station_offset", valve_station)), wolf.position.x)
-	await _tap(&"interact")
+	await tap(&"interact")
 	_expect(line.state == &"idle" and str(game.get("status_line")) == "The valve is dead. Arm the breaker first.", "USE at a dead valve explains the breaker")
 	var dial: Vector2 = RoomDepth.prop_point(room.valve_art, JunctionRoom.VALVE_DIAL_CENTRE)
 	var caption: Rect2 = room.line_caption.get_rect()
 	_expect(room.line_caption.text == "LINE" and caption.end.x < dial.x and caption.position.y < dial.y and caption.end.y > dial.y, "the valve's dial carries a LINE caption just left of it")
-	_expect(await _walk_to(human, 200.0), "the engineer walks back to the breaker")
+	_expect(await walk_to(human, 200.0), "the engineer walks back to the breaker")
 	await _check_vent_edges(game, human, wolf, room, line, a_bytes)
-	_expect(await _walk_to(human, 200.0), "the engineer is back at the breaker after the vent checks")
+	_expect(await walk_to(human, 200.0), "the engineer is back at the breaker after the vent checks")
 	_expect(str(game.call("_context_hint")).contains("arm the overload breaker"), "the breaker offers USE")
-	await _tap(&"interact")
+	await tap(&"interact")
 	if not _require(line.state == &"building" and game.call("_objective") == "CRANK THE VALVE", "USE at the breaker arms the line"):
 		return
 	_expect(str(game.get("status_line")).contains("LINE gauge"), "arming names the LINE gauge")
 	# Audit 23: the engineer works the breaker from its right, beside the cabinet, facing it, off the grate.
-	_expect(await _wait_until(func() -> bool: return float(game.get("engineer_step_x")) < 0.0, 40) and human.position.x - M0Actor.HUMAN_REACH >= JunctionRoom.BREAKER_X + 37.0 - 6.0 - 0.5 and not PressureLine.is_on_vent(human.position.x) and human.body_sprite.flip_h and human.controlled, "after arming, the engineer stands beside the breaker, facing it, off the vent (x %.0f)" % human.position.x)
+	_expect(await wait_until(func() -> bool: return float(game.get("engineer_step_x")) < 0.0, 40) and human.position.x - M0Actor.HUMAN_REACH >= JunctionRoom.BREAKER_X + 37.0 - 6.0 - 0.5 and not PressureLine.is_on_vent(human.position.x) and human.body_sprite.flip_h and human.controlled, "after arming, the engineer stands beside the breaker, facing it, off the vent (x %.0f)" % human.position.x)
 	_expect(not room.vent_steam.emitting and room.breaker_label.text == "BREAKER LIVE", "an armed line lights the breaker, and the vent stays quiet at the bottom of the gauge")
 	await process_frame
 	var hiss_low: AudioStreamPlayer = _player_for(game, &"hiss_low")
@@ -328,7 +316,7 @@ func _check_scene() -> void:
 	_expect(hiss_low != null and hiss_mid != null and hiss_high != null, "the armed line runs all three gauge loops together")
 	if hiss_low != null and hiss_mid != null and hiss_high != null:
 		_expect(hiss_low.volume_db > hiss_mid.volume_db and hiss_mid.volume_db > hiss_high.volume_db and hiss_high.volume_db <= -70.0, "low on the gauge the low-gauge hiss leads and the high one is silent")
-	await _tap(&"pause_game")
+	await tap(&"pause_game")
 	_expect(paused, "pause works in the junction")
 	var gauge_before: float = line.gauge
 	await create_timer(0.15, true).timeout
@@ -336,7 +324,7 @@ func _check_scene() -> void:
 	(game.get_node("CanvasLayer/PauseOverlay") as PauseOverlay).resume_requested.emit()
 	_expect(not paused and line.state == &"building", "resume keeps the armed line")
 	# Hold USE at the valve: turns persist across a release.
-	_expect(await _walk_to(human, 420.0), "the engineer reaches the valve while the line builds")
+	_expect(await walk_to(human, 420.0), "the engineer reaches the valve while the line builds")
 	_expect(str(game.call("_context_hint")).begins_with("HOLD E:"), "the live valve asks for a held USE")
 	game.set("touch_enabled", true)
 	game.call("_refresh_ui")
@@ -344,7 +332,7 @@ func _check_scene() -> void:
 	game.set("touch_enabled", false)
 	game.call("_refresh_ui")
 	Input.action_press(&"interact")
-	var first_turn: bool = await _wait_until(func() -> bool: return line.turns >= 1, 60)
+	var first_turn: bool = await wait_until(func() -> bool: return line.turns >= 1, 60)
 	Input.action_release(&"interact")
 	if not _require(first_turn and line.turns == 1 and line.state == &"building", "0.4 s of held USE is one real turn"):
 		return
@@ -354,7 +342,7 @@ func _check_scene() -> void:
 		await physics_frame
 	_expect(line.turns == 1 and room.turns == 1 and line.progress == 0.0 and room.valve_label.text == "VALVE  1 / %d" % PressureLine.TURNS_NEEDED, "releasing keeps the turn and the room and its VALVE label show it")
 	Input.action_press(&"interact")
-	var charged: bool = await _wait_until(func() -> bool: return line.turns >= 3, 90)
+	var charged: bool = await wait_until(func() -> bool: return line.turns >= 3, 90)
 	Input.action_release(&"interact")
 	if not _require(charged and line.turns == 3 and (line.state == &"charged" or line.state == &"fuse"), "holding again completes the three turns"):
 		return
@@ -362,17 +350,17 @@ func _check_scene() -> void:
 	_expect(not PressureLine.is_in_blast(JunctionRoom.WOLF_CLEAR_X) and JunctionRoom.WOLF_CLEAR_X + M0Actor.WOLF_REACH < PressureLine.BLAST_MIN_X and wolf.autonomous_target_x == JunctionRoom.WOLF_CLEAR_X, "while the fuse burns WOLF goes clear of the blast zone, drawn body and all")
 	# Stand just inside the blast zone's left edge: the fuse ends on a knockdown that reloads autosave A.
 	human.position.x = PressureLine.BLAST_MIN_X + 2.0
-	_expect(await _wait_until(func() -> bool: return game.get("fail_active"), FUSE_FRAMES), "the blast knocks down an engineer still in front of the door")
+	_expect(await wait_until(func() -> bool: return game.get("fail_active"), FUSE_FRAMES), "the blast knocks down an engineer still in front of the door")
 	_expect(room.door_blown and (room.door_leaf_breaking.visible or room.door_hole.visible) and not room.door_leaf.visible and room.blast_sparks.emitting, "the knockdown shows the door blowing, so the cause is on screen")
 	_expect(not state.door_blown and FileAccess.get_file_as_bytes(path) == a_bytes, "a knockdown blast saves nothing and never really blows the door")
 	_expect(str(game.get("status_line")).begins_with("The door went with %s in front of it." % state.human_name().get_slice(" ", 0)), "the status line names the blast as the cause")
-	_expect(await Suite.retry(game, 240), "the knockdown hands back")
+	_expect(await retry(game, 240), "the knockdown hands back")
 	state = game.get("state") as M0State
 	_expect(state.to_dict() == autosave_a.to_dict() and human.position == state.human_position and human.controlled, "the engineer is back at autosave A with controls")
 	_expect(line.state == &"idle" and room.turns == 0 and not room.vent_hazard.armed, "the restore resets the line, the wheel and the vent")
-	_expect(await _wait_until(func() -> bool: return not room.door_shape.disabled and room.door_leaf.visible and not room.door_hole.visible and not room.door_leaf_down.visible and not room.door_blown and room.breaker_label.text != "BREAKER SPENT", 5), "the door stands sealed again after the restore")
+	_expect(await wait_until(func() -> bool: return not room.door_shape.disabled and room.door_leaf.visible and not room.door_hole.visible and not room.door_leaf_down.visible and not room.door_blown and room.breaker_label.text != "BREAKER SPENT", 5), "the door stands sealed again after the restore")
 	_expect(state.memory.get("choice_id") == State.DISCLOSE and state.chapter_complete, "memory and the Records result survive the knockdown")
-	_expect(await _wait_until(func() -> bool: return Engine.time_scale == 1.0 and camera.offset == Vector2.ZERO and (game.get_node("CanvasLayer/IntroFade") as ColorRect).color.a == 0.0, 90), "time scale, camera and fade are at rest after the restore")
+	_expect(await wait_until(func() -> bool: return Engine.time_scale == 1.0 and camera.offset == Vector2.ZERO and (game.get_node("CanvasLayer/IntroFade") as ColorRect).color.a == 0.0, 90), "time scale, camera and fade are at rest after the restore")
 	# Facing the door when it blows, cranking at the valve or right up against the door: the slump
 	# towards it ends short of the near column's foot, so the column hides no part of the lying body,
 	# with Reduced Motion off and on.
@@ -381,11 +369,11 @@ func _check_scene() -> void:
 		await _check_blast_facing_door(game, room, human, M0State.JUNCTION_DOOR_LEFT_X - M0State.HUMAN_HALF_WIDTH, "against the door", reduced)
 	state = game.get("state") as M0State
 	# A clean run: arm, crank, clear the zone, and the door goes.
-	_expect(await _walk_to(human, 200.0), "the engineer returns to the breaker")
-	await _tap(&"interact")
+	_expect(await walk_to(human, 200.0), "the engineer returns to the breaker")
+	await tap(&"interact")
 	if not _require(line.state == &"building", "the breaker arms again after the knockdown"):
 		return
-	_expect(await _walk_to(human, 420.0), "the engineer reaches the valve again")
+	_expect(await walk_to(human, 420.0), "the engineer reaches the valve again")
 	# Every fuse tick is heard: the bank's fuse_tick clip, once per tick.
 	var fuse_ticks: Array[int] = [0]
 	var count_ticks: Callable = func(clip: StringName) -> void:
@@ -393,14 +381,14 @@ func _check_scene() -> void:
 			fuse_ticks[0] += 1
 	(game.get("sfx_bank") as SfxBank).clip_started.connect(count_ticks)
 	Input.action_press(&"interact")
-	charged = await _wait_until(func() -> bool: return line.turns >= 3, 120)
+	charged = await wait_until(func() -> bool: return line.turns >= 3, 120)
 	Input.action_release(&"interact")
 	if not _require(charged, "the seal charges again"):
 		return
 	# Just left of the zone, where the engineer's body still reaches past x 360: the one blast test
 	# says outside, so the door blows, nobody is knocked down and autosave B is written.
 	human.position.x = PressureLine.BLAST_MIN_X - 8.0
-	_expect(await _wait_until(func() -> bool: return state.door_blown, FUSE_FRAMES), "the fuse ends and the door blows")
+	_expect(await wait_until(func() -> bool: return state.door_blown, FUSE_FRAMES), "the fuse ends and the door blows")
 	(game.get("sfx_bank") as SfxBank).clip_started.disconnect(count_ticks)
 	_expect(fuse_ticks[0] == PressureLine.FUSE_TICKS, "the fuse's ticks are heard, %d of %d" % [fuse_ticks[0], PressureLine.FUSE_TICKS])
 	_expect(_player_for(game, &"hiss_mid") == null and _player_for(game, &"hum") == null, "the line's hiss and pump stop when the door goes")
@@ -413,21 +401,21 @@ func _check_scene() -> void:
 		knocked = knocked or game.get("fail_active")
 	_expect(not knocked and human.controlled and str(game.get("status_line")) == "The door goes. WOLF falls back\nto wait for %s's call." % state.human_name().get_slice(" ", 0), "clear of the zone the blast is not a knockdown, even at its edge, and the line says WOLF falls back to wait for the engineer's call")
 	_expect(game.get("box_queue") == ["Past the doorway, something whirs awake."], "the sentry waking past the doorway is the next box")
-	_expect(await _wait_until(func() -> bool: return room.door_hole.visible and room.door_leaf_down.visible and not room.door_leaf_breaking.visible, 45), "then the doorway stands empty on the lane and the leaf, thrown, lies beyond it")
-	_expect(await _wait_until(func() -> bool: return not room.sentry.visual.dormant and room.sentry.visual.is_lit() and room.sentry.visual.body.modulate == Color.WHITE, 90), "the blast wakes the sentry: it powers up and its eye lights")
+	_expect(await wait_until(func() -> bool: return room.door_hole.visible and room.door_leaf_down.visible and not room.door_leaf_breaking.visible, 45), "then the doorway stands empty on the lane and the leaf, thrown, lies beyond it")
+	_expect(await wait_until(func() -> bool: return not room.sentry.visual.dormant and room.sentry.visual.is_lit() and room.sentry.visual.body.modulate == Color.WHITE, 90), "the blast wakes the sentry: it powers up and its eye lights")
 	_expect(_labels_clear(room), "after the blast the station plates still sit apart in their row")
 	var autosave_b: M0State = State.load_from_disk(path)
 	_expect(autosave_b != null and autosave_b.door_blown and autosave_b.chapter_id == "junction", "autosave B records the blown door")
 	# P0-4: his spot on the near side of the rubble is the floor by the valve; while the engineer who
 	# backed off past the valve still stands there, he keeps to his spot by the entrance.
 	_expect(wolf.autonomous_target_x == JunctionRoom.WOLF_CLEAR_X, "WOLF keeps by the entrance while the engineer stands in his spot by the valve")
-	_expect(await _wait_until(func() -> bool: return room.door_shape.disabled, 5), "the door body is gone")
-	_expect(await _wait_until(func() -> bool: return Engine.time_scale == 1.0 and camera.offset == Vector2.ZERO, 90), "time scale and camera settle after the boom")
+	_expect(await wait_until(func() -> bool: return room.door_shape.disabled, 5), "the door body is gone")
+	_expect(await wait_until(func() -> bool: return Engine.time_scale == 1.0 and camera.offset == Vector2.ZERO, 90), "time scale and camera settle after the boom")
 	# Through where the door stood, up to just short of the rubble line (the lane beyond is sentry_test's).
-	_expect(await _walk_to(human, JunctionRoom.CHOICE_X - 16.0), "the engineer can walk through where the door stood")
+	_expect(await walk_to(human, JunctionRoom.CHOICE_X - 16.0), "the engineer can walk through where the door stood")
 	_expect(wolf.autonomous_target_x == JunctionRoom.WOLF_RUBBLE_X and wolf.position.x <= JunctionRoom.WOLF_RUBBLE_X + 12.0, "once they move on WOLF waits for their call by the valve, on the near side of the rubble")
 	_expect(room.z_index + room.door_hole.z_index < wolf.z_index and room.z_index + room.door_hole.z_index < human.z_index, "the torn doorway draws behind WOLF and the engineer")
-	await _tap(&"interact")
+	await tap(&"interact")
 	_expect(str(game.get("status_line")).contains("TANK RELEASE") and not game.get("waiting_for_choice"), "short of the rubble USE points at the tank release and nothing is asked yet")
 	# A blast with the engineer already past the fuse needs no second save; Continue restores B.
 	game.call("_load_game")
@@ -438,15 +426,15 @@ func _check_scene() -> void:
 	# and a stray blast call does nothing.
 	var b_bytes: PackedByteArray = FileAccess.get_file_as_bytes(path)
 	_expect(line.state == &"blown", "Continue from autosave B leaves the line spent, not idle")
-	_expect(await _walk_to(human, JunctionRoom.BREAKER_X), "the engineer walks back to the spent breaker")
-	await _tap(&"interact")
+	_expect(await walk_to(human, JunctionRoom.BREAKER_X), "the engineer walks back to the spent breaker")
+	await tap(&"interact")
 	_expect(line.state == &"blown" and str(game.get("status_line")) == "No charge left. The door is down." and not room.vent_steam.emitting, "USE at the spent breaker after Continue arms nothing")
 	for _frame: int in 30:
 		await physics_frame
 	_expect(line.state == &"blown" and line.gauge == 0.0 and not game.get("fail_active"), "no gauge builds and no vent trips after the door is down")
-	_expect(await _walk_to(human, JunctionRoom.VALVE_X), "the engineer walks to the spent valve")
+	_expect(await walk_to(human, JunctionRoom.VALVE_X), "the engineer walks to the spent valve")
 	_expect(game.call("_hold_station") == &"" and not str(game.call("_context_hint")).contains("valve is dead"), "the spent valve offers no crank and never reads as dead")
-	await _tap(&"interact")
+	await tap(&"interact")
 	_expect(str(game.get("status_line")) == "No charge left. The door is down." and line.turns == 0, "USE at the spent valve says so and takes no turns")
 	game.call("_door_blast")
 	_expect(not game.get("fail_active") and FileAccess.get_file_as_bytes(path) == b_bytes and Engine.time_scale == 1.0, "a blast with the door already down is no knockdown, no save and no hit-stop")
@@ -460,10 +448,10 @@ func _check_scene() -> void:
 	game.set("save_path", path)
 	_expect(game.get("save_pending") and str(game.get("save_error")).begins_with("Save failed"), "a failed autosave is flagged and shown")
 	game.call("_fail_beat", "Test knockdown.")
-	_expect(await Suite.retry(game, 240), "the knockdown after a failed save hands back")
+	_expect(await retry(game, 240), "the knockdown after a failed save hands back")
 	state = game.get("state") as M0State
 	_expect(state.door_blown and str(game.get("status_line")).ends_with("Back at the start of this stretch."), "the knockdown restores the unwritten beat, not the older autosave on disk")
-	await _tap(&"interact")
+	await tap(&"interact")
 	var retried: M0State = State.load_from_disk(path)
 	_expect(not game.get("save_pending") and retried != null and retried.door_blown, "the next USE retries the save and writes the beat")
 	# Knocked down in the lane just past the blown door's near column, facing back at it: the body lies
@@ -475,7 +463,7 @@ func _check_scene() -> void:
 	disk.store_string("not a save")
 	disk.close()
 	game.call("_fail_beat", "Test knockdown.")
-	_expect(await Suite.retry(game, 240), "the knockdown with an unreadable save hands back")
+	_expect(await retry(game, 240), "the knockdown with an unreadable save hands back")
 	state = game.get("state") as M0State
 	_expect(state.chapter_id == "junction" and state.door_blown, "with the save unreadable the knockdown keeps the current beat")
 	game.call("_save_progress")
@@ -660,7 +648,7 @@ func _new_every_frame(draws: Array, frames: int) -> bool:
 ## The vent's knockdown span is the grate plus half the engineer's body, and the hint agrees: just
 ## off it the trip costs only the attempt, on its edge it is a knockdown back to autosave A.
 func _check_vent_edges(game: Node2D, human: M0Actor, wolf: M0Actor, room: JunctionRoom, line: PressureLine, a_bytes: PackedByteArray) -> void:
-	await _tap(&"interact")
+	await tap(&"interact")
 	if not _require(line.state == &"building", "the breaker arms the line for the vent checks"):
 		return
 	human.position.x = PressureLine.VENT_MIN_X - 8.0
@@ -668,28 +656,28 @@ func _check_vent_edges(game: Node2D, human: M0Actor, wolf: M0Actor, room: Juncti
 	await physics_frame
 	_expect(not str(game.call("_context_hint")).begins_with("Relief vent"), "just left of the vent span there is no vent warning")
 	_expect(not room.vent_steam.emitting, "low on the gauge the vent shows no steam")
-	_expect(await _wait_until(func() -> bool: return absf(wolf.position.x - JunctionRoom.WOLF_CLEAR_X) <= 4.0, 180), "while the line builds WOLF waits at his spot")
+	_expect(await wait_until(func() -> bool: return absf(wolf.position.x - JunctionRoom.WOLF_CLEAR_X) <= 4.0, 180), "while the line builds WOLF waits at his spot")
 	_expect(JunctionRoom.WOLF_CLEAR_X + M0Actor.WOLF_REACH < PressureLine.VENT_GRATE_MIN_X and JunctionRoom.WOLF_CLEAR_X + M0Actor.WOLF_REACH < PressureLine.BLAST_MIN_X, "his spot keeps all of his drawn body off the grate and out of the blast zone")
 	_expect(JunctionRoom.WOLF_CLEAR_X + M0Actor.WOLF_REACH < JunctionRoom.BREAKER_X - M0Actor.HUMAN_REACH and JunctionRoom.WOLF_CLEAR_X - M0Actor.WOLF_REACH >= 0.0, "his spot is clear of the engineer at the breaker and inside the room")
 	_expect(JunctionRoom.WOLF_CLEAR_X + M0Actor.WOLF_REACH <= JunctionRoom.BREAKER_X - JunctionRoom.BREAKER_HALF_WIDTH + 6.0, "his snout stops at the breaker's edge: he never stands inside the machine")
 	line.gauge = PressureLine.STEAM_GAUGE + 0.05
-	_expect(await _wait_until(func() -> bool: return room.vent_steam.emitting, 5), "near the top of the gauge the vent steams")
+	_expect(await wait_until(func() -> bool: return room.vent_steam.emitting, 5), "near the top of the gauge the vent steams")
 	# Round 3 item 7: the column rises behind the actors, so it never hides an engineer on the grate.
 	_expect(room.z_index + room.vent_steam.z_index < human.z_index and room.z_index + room.vent_steam.z_index < wolf.z_index, "the vent's steam column draws behind the engineer and WOLF")
 	# P0-16 (FAIL-1): the grate the knockdown card names is drawn over the steam rising out of it.
 	_expect(room.vent_steam.z_index < room.vent_art.z_index and room.vent_puff.z_index < room.vent_art.z_index and room.vent_steam.z_as_relative and room.vent_puff.z_as_relative, "the vent's grate draws over its steam and its burst")
 	line.gauge = 0.999
-	_expect(await _wait_until(func() -> bool: return line.state == &"tripped", 10), "the gauge peaks and the vent lets go")
+	_expect(await wait_until(func() -> bool: return line.state == &"tripped", 10), "the gauge peaks and the vent lets go")
 	for _frame: int in 4:
 		await physics_frame
 	_expect(not game.get("fail_active") and str(game.get("status_line")).begins_with("The relief vent lets go"), "just off the grate a vent trip is not a knockdown")
 	_expect(_player_for(game, &"vent_burst") != null and _player_for(game, &"small_boom") != null, "the vent trip bursts steam over its thump")
 	_expect(_player_for(game, &"hiss_low") == null and _player_for(game, &"hiss_high") == null, "a tripped line stops hissing")
 	human.position.x = JunctionRoom.BREAKER_X
-	await _tap(&"interact")
+	await tap(&"interact")
 	_expect(line.state == &"building", "the breaker re-arms after the trip")
 	# The first trip's burst keeps the grate dangerous for HAZARD_SECONDS; let it pass first.
-	_expect(await _wait_until(func() -> bool: return not room.vent_hazard.armed, 60), "the first trip's burst clears")
+	_expect(await wait_until(func() -> bool: return not room.vent_hazard.armed, 60), "the first trip's burst clears")
 	human.position.x = PressureLine.VENT_MIN_X + 6.0
 	await physics_frame
 	await physics_frame
@@ -699,62 +687,27 @@ func _check_vent_edges(game: Node2D, human: M0Actor, wolf: M0Actor, room: Juncti
 	await physics_frame
 	_expect(str(game.call("_context_hint")) == "The vent is about to blow. Get off the grate now." and Color(room.vent_glow.modulate, 1.0).is_equal_approx(Color(JunctionRoom.SEAM_RED, 1.0)), "in the last moments the hint and the grate give the hard warning")
 	line.gauge = 0.999
-	_expect(await _wait_until(func() -> bool: return game.get("fail_active"), 10), "with a foot on the grate the vent trip is a knockdown")
+	_expect(await wait_until(func() -> bool: return game.get("fail_active"), 10), "with a foot on the grate the vent trip is a knockdown")
 	_expect(str(game.get("status_line")).begins_with("The relief vent let go under %s. When the gauge peaks, stay off the grate." % (game.get("state") as M0State).human_name().get_slice(" ", 0)), "the status line names the vent and the engineer, in the third person like the blast's")
 	_expect(room.display_gauge == 1.0 and room.gauge_tripped and line.gauge == 0.0, "the needle stays pinned at the top, red, as the vent knocks the engineer down")
 	await create_timer(JunctionRoom.HAZARD_SECONDS + 0.2).timeout
 	_expect(game.get("fail_active") and room.display_gauge == 1.0, "and holds there through the knockdown")
 	_expect(human.z_index > wolf.z_index and room.vent_puff.color.a <= 0.35, "the knocked-down engineer draws above WOLF and the steam burst is translucent")
-	_expect(await Suite.retry(game, 240), "the vent knockdown hands back")
+	_expect(await retry(game, 240), "the vent knockdown hands back")
 	_expect(FileAccess.get_file_as_bytes(game.get("save_path")) == a_bytes and human.position == Vector2(120.0, 410.0) and human.z_index == wolf.z_index, "the vent knockdown restores autosave A and the usual draw order")
 	_expect(str(game.get("status_line")).ends_with("Back at the last checkpoint."), "the restore line names the checkpoint it came from")
 	_expect(room.display_gauge == 0.0 and not room.gauge_tripped, "the restore puts the needle back at empty")
 	# Off the grate the needle still shows the peak for a moment after the trip, then falls back.
 	human.position.x = JunctionRoom.BREAKER_X
-	await _tap(&"interact")
+	await tap(&"interact")
 	line.gauge = 0.999
-	_expect(await _wait_until(func() -> bool: return line.state == &"tripped", 10) and room.display_gauge == 1.0 and room.gauge_tripped, "after an off-grate trip the needle reads the peak")
-	_expect(await _wait_until(func() -> bool: return room.display_gauge == 0.0 and not room.gauge_tripped, 120), "then it falls back to empty")
+	_expect(await wait_until(func() -> bool: return line.state == &"tripped", 10) and room.display_gauge == 1.0 and room.gauge_tripped, "after an off-grate trip the needle reads the peak")
+	_expect(await wait_until(func() -> bool: return room.display_gauge == 0.0 and not room.gauge_tripped, 120), "then it falls back to empty")
 	# Continue from autosave A says where to start and carries WOLF's warning about the door.
 	game.call("_load_game")
 	# Round 3 item 5: the breaker is not armed on this restore, so WOLF warns about the door, not a live line.
 	_expect(line.state == &"idle" and str(game.get("status_line")) == "Service junction restored. Arm the breaker by the entrance, then crank the valve.\nWOLF: When the door goes, don't be standing in front of it." and not str(game.get("status_line")).contains("It's live"), "Continue from autosave A carries WOLF's warning about the door, without calling the unarmed line live")
 	_expect(wolf.position.x >= 90.0, "Continue from autosave A starts WOLF clear of the room's edge (x %.0f)" % wolf.position.x)
-
-
-func _completed_records_state(choice_id: String) -> M0State:
-	var state: M0State = State.new()
-	state.record_choice(choice_id)
-	state.arm_breaker()
-	state.activate_power("wolf" if choice_id == State.DISCLOSE else "human")
-	state.reach_checkpoint()
-	state.enter_records()
-	state.preserve_purge_trace()
-	state.preserve_mirror_trace("wolf" if choice_id == State.DISCLOSE else "manual")
-	state.complete_chapter()
-	state.human_position = Vector2(830.0, 410.0)
-	state.wolf_position = Vector2(766.0, 423.0)
-	return state
-
-
-func _tap(action: StringName) -> void:
-	await process_frame
-	if action == &"pause_game":
-		# Pause is event-driven, so send a real input event.
-		Input.parse_input_event(_action_event(action, true))
-		await process_frame
-		Input.parse_input_event(_action_event(action, false))
-		return
-	Input.action_press(action)
-	await process_frame
-	Input.action_release(action)
-
-
-func _action_event(action: StringName, pressed: bool) -> InputEventAction:
-	var event: InputEventAction = InputEventAction.new()
-	event.action = action
-	event.pressed = pressed
-	return event
 
 
 ## The sound bank's player now playing [param clip], or null.
@@ -765,26 +718,6 @@ func _player_for(game: Node2D, clip: StringName) -> AudioStreamPlayer:
 			return player
 	return null
 
-
-func _wait_until(condition: Callable, frames: int) -> bool:
-	for _frame: int in range(frames):
-		await physics_frame
-		if condition.call():
-			return true
-	return false
-
-
-func _walk_to(actor: M0Actor, target_x: float) -> bool:
-	var action: StringName = &"move_right" if target_x > actor.position.x else &"move_left"
-	Input.action_press(action)
-	var reached: bool = false
-	for _frame: int in range(300):
-		await physics_frame
-		if absf(actor.position.x - target_x) <= 12.0:
-			reached = true
-			break
-	Input.action_release(action)
-	return reached
 
 ## The world x range ([min, max], or [INF, -INF] if none) of [param region]'s painted pixels (alpha over
 ## 0) placed by its top-left [param at] and [param scale], in the world rows [param top]..[param bottom].
@@ -826,7 +759,7 @@ func _check_presentation(room: JunctionRoom, human: M0Actor, wolf: M0Actor) -> v
 	var lying_top: float = JunctionRoom.FLOOR_Y - MainScript.collapse_height(MainScript.COLLAPSE_ART.size() - 1)
 	var spans: Array[Vector2] = []
 	for front: Texture2D in [JunctionRoom.BLAST_FRONT, JunctionRoom.BLAST_FRONT_BLOWN]:
-		spans.append(_painted_x_in_rows(Suite.texture_image(front), Rect2(Vector2.ZERO, front.get_size()), JunctionRoom.BLAST_FRONT_AT, DoorKit.PIECE_SCALE, lying_top, JunctionRoom.FLOOR_Y))
+		spans.append(_painted_x_in_rows(texture_image(front), Rect2(Vector2.ZERO, front.get_size()), JunctionRoom.BLAST_FRONT_AT, DoorKit.PIECE_SCALE, lying_top, JunctionRoom.FLOOR_Y))
 	_expect(is_equal_approx(minf(spans[0].x, spans[1].x), JunctionRoom.DOOR_FOOT_X) and maxf(spans[0].y, spans[1].y) <= JunctionRoom.DOOR_FOOT_RIGHT_X, "in the rows a lying body fills the front's painting spans x %.1f..%.1f sealed and %.1f..%.1f blown, inside JunctionRoom's foot (%.1f..%.1f)" % [spans[0].x, spans[0].y, spans[1].x, spans[1].y, JunctionRoom.DOOR_FOOT_X, JunctionRoom.DOOR_FOOT_RIGHT_X])
 	var row: bool = true
 	for label: Label in room.station_labels:
@@ -887,8 +820,8 @@ func _check_blast_facing_door(game: Node2D, room: JunctionRoom, human: M0Actor, 
 	var foot_x: float = room.global_position.x + JunctionRoom.DOOR_FOOT_X
 	var hidden: int = _front_pixels_in(room.door_column, body)
 	_expect(body.end.x <= foot_x - MainScript.LANE_FALL_CLEAR + 0.01 and hidden == 0, "facing the door %s, the whole lying body is clear of the near column and the stub (head at %.1f, the column's foot at %.1f, %d px under them)" % [label, body.end.x, foot_x, hidden])
-	_expect(await Suite.retry(game, 240), "the knockdown facing the door %s hands back" % label)
-	_expect(await _wait_until(func() -> bool: return not room.door_shape.disabled and room.door_leaf.visible and not room.door_blown, 5), "the door stands sealed again after that restore")
+	_expect(await retry(game, 240), "the knockdown facing the door %s hands back" % label)
+	_expect(await wait_until(func() -> bool: return not room.door_shape.disabled and room.door_leaf.visible and not room.door_blown, 5), "the door stands sealed again after that restore")
 	settings.reduced_motion_changed.emit(false)
 
 
@@ -911,7 +844,7 @@ func _check_down_facing_blown_door(game: Node2D, room: JunctionRoom, human: M0Ac
 	var right_x: float = room.global_position.x + JunctionRoom.DOOR_FOOT_RIGHT_X
 	var hidden: int = _front_pixels_in(room.door_column, body)
 	_expect(body.position.x >= right_x + MainScript.LANE_FALL_CLEAR - 0.01 and hidden == 0, "facing the blown door %s, the whole lying body is clear of the near column and the stub (head at %.1f, the column's foot ends at %.1f, %d px under them)" % [label, body.position.x, right_x, hidden])
-	_expect(await Suite.retry(game, 240), "the knockdown facing the blown door %s hands back" % label)
+	_expect(await retry(game, 240), "the knockdown facing the blown door %s hands back" % label)
 	settings.reduced_motion_changed.emit(false)
 
 
@@ -920,7 +853,7 @@ func _check_down_facing_blown_door(game: Node2D, room: JunctionRoom, human: M0Ac
 ## the floor.
 func _lying_body(human: M0Actor, fall: float, label: String) -> Rect2:
 	var sprite: Sprite2D = human.body_sprite
-	_expect(await _wait_until(func() -> bool: return sprite.texture == MainScript.COLLAPSE_ART[-1], 90) and sprite.flip_h == (fall < 0.0), "%s, they slump forward towards it and lie down" % label)
+	_expect(await wait_until(func() -> bool: return sprite.texture == MainScript.COLLAPSE_ART[-1], 90) and sprite.flip_h == (fall < 0.0), "%s, they slump forward towards it and lie down" % label)
 	# Two drawn frames, so the slump's last step has been drawn.
 	await process_frame
 	await process_frame
@@ -937,7 +870,7 @@ func _lying_body(human: M0Actor, fall: float, label: String) -> Rect2:
 func _front_pixels_in(piece: Sprite2D, area: Rect2) -> int:
 	if not piece.is_visible_in_tree():
 		return 0
-	var image: Image = Suite.texture_image(piece.texture)
+	var image: Image = texture_image(piece.texture)
 	var local_rect: Rect2 = piece.get_rect()
 	var inverse: Transform2D = piece.get_global_transform().affine_inverse()
 	var count: int = 0
@@ -960,12 +893,6 @@ func _check_near_fade(room: JunctionRoom) -> void:
 	await create_timer(0.05).timeout
 
 
-func _expect(condition: bool, label: String) -> void:
-	if not condition:
-		failures += 1
-		push_error("Junction check failed: " + label)
-
-
 ## True when every one of [param reflections] processes and shows exactly what its source does.
 func _mirroring(reflections: Array[FloorReflection]) -> bool:
 	for reflection: FloorReflection in reflections:
@@ -980,10 +907,3 @@ func _idle(reflections: Array[FloorReflection]) -> bool:
 		if reflection.is_processing():
 			return false
 	return not reflections.is_empty()
-
-
-func _require(condition: bool, label: String) -> bool:
-	_expect(condition, label)
-	if not condition:
-		quit(1)
-	return condition

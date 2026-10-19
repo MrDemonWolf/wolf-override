@@ -35,6 +35,7 @@ extends SceneTree
 ##        --route=R1|R2|R3|R4 --out=/work/out --size=1280x720 --variant=kb-fx|kb-calm|touch-fx
 ##        [--language=<code>|pseudo]
 
+const Kit = preload("parity_kit.gd")
 const ParityBank = preload("parity_sfx_bank.gd")
 const RNG_SEED: int = 0x5041524954
 const PARTICLE_SEED: int = 1337
@@ -86,20 +87,13 @@ func _initialize() -> void:
 	call_deferred("_run")
 
 
-func _arg(key: String, fallback: String) -> String:
-	for a: String in OS.get_cmdline_user_args():
-		if a.begins_with("--" + key + "="):
-			return a.substr(key.length() + 3)
-	return fallback
-
-
 func _run() -> void:
-	route = _arg("route", "R1")
-	variant = _arg("variant", "kb-fx")
-	out_dir = _arg("out", OS.get_user_data_dir().path_join("parity"))
-	var dims: PackedStringArray = _arg("size", "1280x720").split("x")
+	route = Kit.arg("route", "R1")
+	variant = Kit.arg("variant", "kb-fx")
+	out_dir = Kit.arg("out", OS.get_user_data_dir().path_join("parity"))
+	var dims: PackedStringArray = Kit.arg("size", "1280x720").split("x")
 	size = Vector2i(int(dims[0]), int(dims[1]))
-	language = _arg("language", "")
+	language = Kit.arg("language", "")
 	DirAccess.make_dir_recursive_absolute(out_dir)
 	if not language.is_empty() and not _use_language(language):
 		_finish()
@@ -115,9 +109,9 @@ func _run() -> void:
 	config.set_value("video", "reduced_motion", variant == "kb-calm")
 	config.save(settings_path)
 	if route == "R3":
-		_write_save(_records_entry_state())
+		_write_save(Kit.records_entry_state())
 	elif route == "R4":
-		_write_save(_junction_entry_state())
+		_write_save(Kit.junction_entry_state())
 	node_added.connect(_on_node_added)
 	var scene: PackedScene = load("res://scenes/main.tscn") as PackedScene
 	game = scene.instantiate() as Node2D
@@ -286,7 +280,7 @@ func _route_1() -> void:
 	_press("CanvasLayer/PauseOverlay/Panel/SettingsMenu/BackButton")
 	await _raw(30)
 	await _shot("pause-after-settings")
-	_write_save(_safe_point_state())
+	_write_save(Kit.safe_point_state())
 	_press("CanvasLayer/PauseOverlay/Panel/PauseMenu/TitleButton")
 	await _raw(60)
 	await _shot("title-with-save")
@@ -431,7 +425,7 @@ func _route_3() -> void:
 	# the other answer.
 	await _action_event(&"pause_game")
 	await _raw(30)
-	_write_save(_after_purge_state())
+	_write_save(Kit.after_purge_state())
 	_press("CanvasLayer/PauseOverlay/Panel/PauseMenu/TitleButton")
 	await _raw(40)
 	_press("CanvasLayer/TitleScreen/ContinueButton")
@@ -565,7 +559,7 @@ func _route_4() -> void:
 	await _raw(40)
 	await _shot("title-after-end")
 	# The engineer alone, from the post-blast save: the sentry sees them and gives chase.
-	_write_save(_after_blast_state())
+	_write_save(Kit.after_blast_state())
 	_press("CanvasLayer/TitleScreen/ContinueButton")
 	await _raw(80)
 	await _shot("continued-after-blast")
@@ -738,53 +732,7 @@ func _screen_touch() -> void:
 		await _raw(1)
 
 
-# ---------------------------------------------------------------- saves for R1, R3 and R4
-
-func _safe_point_state() -> M0State:
-	var st: M0State = M0State.new()
-	st.record_choice(M0State.DISCLOSE)
-	st.arm_breaker()
-	st.activate_power("wolf")
-	st.reach_checkpoint()
-	st.human_position = Vector2(860.0, 410.0)
-	st.wolf_position = Vector2(800.0, 423.0)
-	return st
-
-
-func _records_entry_state() -> M0State:
-	var st: M0State = _safe_point_state()
-	st.enter_records()
-	st.human_position = Vector2(90.0, 410.0)
-	st.wolf_position = Vector2(50.0, 423.0)
-	return st
-
-
-func _after_purge_state() -> M0State:
-	var st: M0State = _records_entry_state()
-	st.preserve_purge_trace()
-	st.human_position = Vector2(140.0, 410.0)
-	st.wolf_position = Vector2(100.0, 423.0)
-	return st
-
-
-func _junction_entry_state() -> M0State:
-	var st: M0State = _records_entry_state()
-	st.preserve_purge_trace()
-	st.preserve_mirror_trace("wolf")
-	st.complete_chapter()
-	st.enter_junction()
-	st.human_position = Vector2(80.0, 410.0)
-	st.wolf_position = Vector2(400.0, 423.0)
-	return st
-
-
-func _after_blast_state() -> M0State:
-	var st: M0State = _junction_entry_state()
-	st.blow_door()
-	st.human_position = Vector2(420.0, 410.0)
-	st.wolf_position = Vector2(380.0, 423.0)
-	return st
-
+# ---------------------------------------------------------------- saves for R1, R3 and R4 (fixture states: parity_kit.gd)
 
 func _write_save(st: M0State) -> void:
 	if not st.save_to_disk(save_path):

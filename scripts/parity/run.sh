@@ -109,7 +109,7 @@ case "$cmd" in
     variants="${4:-kb-fx kb-calm touch-fx}"
     driver="$(mktemp -d)"
     trap 'rm -rf "$driver"' EXIT
-    cp "$here/capture.gd" "$here/parity_sfx_bank.gd" "$driver/"
+    cp "$here/capture.gd" "$here/parity_sfx_bank.gd" "$here/parity_kit.gd" "$driver/"
     status=0
     pids=()
     for route in $routes; do

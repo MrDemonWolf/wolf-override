@@ -1,4 +1,4 @@
-extends SceneTree
+extends "res://tests/support/game_suite.gd"
 ## FxKit: the rooms' glows, shafts, haze, shadows and particle textures and ramps (the blast door's
 ## streaks, chips and dust jets among them) share one resource per distinct gradient, ramp and blend
 ## while Main is up; nothing writes to a shared
@@ -6,21 +6,12 @@ extends SceneTree
 ## and a scene sync, and every one still matches what it was made as); and the kit lets go of all of
 ## it when Main leaves. Without a kit every call makes a fresh resource, as before.
 
-const GAME_SCENE: PackedScene = preload("res://scenes/main.tscn")
-
-var failures: int = 0
-
-
-func _initialize() -> void:
-	call_deferred("_run")
-
 
 func _run() -> void:
+	check_name = "FxKit"
 	_check_without_kit()
 	await _check_scene()
-	if failures == 0:
-		print("FxKit checks passed")
-	quit(1 if failures > 0 else 0)
+	finish("FxKit checks passed")
 
 
 func _check_without_kit() -> void:
@@ -33,14 +24,8 @@ func _check_without_kit() -> void:
 
 
 func _check_scene() -> void:
-	var path: String = "user://fx-kit-test-%s.json" % OS.get_process_id()
-	_remove(path)
-	var game: Node2D = GAME_SCENE.instantiate() as Node2D
-	game.set("save_path", path)
-	game.set("settings_path", "%s-settings.cfg" % path)
-	game.set("auto_pause_on_focus_loss", false)
-	root.add_child(game)
-	await process_frame
+	var game: Node2D = await start_game("fx-kit-test", keep_running)
+	var path: String = str(game.get("save_path"))
 	var kit: FxKit = game.get("fx_kit") as FxKit
 	_expect(kit != null and FxKit.cached_count() > 0 and kit._cache.size() == FxKit.cached_count(), "Main's kit is the open one, and the rooms built from it")
 	var records: RecordsRoom = game.get("records_room") as RecordsRoom
@@ -109,8 +94,8 @@ func _check_scene() -> void:
 		if after.get(key) != made[key]:
 			changed.append(str(key))
 	_expect(changed.is_empty() and after.size() == made.size(), "nothing writes to a shared resource after it is made (changed: %s)" % ", ".join(changed))
-	_remove(path)
-	_remove("%s-settings.cfg" % path)
+	remove_file(path)
+	remove_file("%s-settings.cfg" % path)
 	game.call("_stop_junction_loops")
 	game.queue_free()
 	await create_timer(0.2).timeout
@@ -141,14 +126,3 @@ func _describe(resource: Resource) -> Array:
 		var material: CanvasItemMaterial = resource as CanvasItemMaterial
 		return [material.blend_mode, material.light_mode, material.particles_animation]
 	return [resource.get_class()]
-
-
-func _remove(path: String) -> void:
-	if FileAccess.file_exists(path):
-		DirAccess.remove_absolute(ProjectSettings.globalize_path(path))
-
-
-func _expect(condition: bool, label: String) -> void:
-	if not condition:
-		failures += 1
-		push_error("FxKit check failed: " + label)

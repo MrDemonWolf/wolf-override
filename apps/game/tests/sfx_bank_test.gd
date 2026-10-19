@@ -1,6 +1,8 @@
-extends SceneTree
+extends "res://tests/support/game_suite.gd"
+## SfxBank: the generated and recorded clips, their lengths and blend, and that every clip name the
+## scripts play exists.
+## Bookkeeping, spawning and the waits come from the shared suite kit (tests/support/game_suite.gd).
 
-const GAME_SCENE: PackedScene = preload("res://scenes/main.tscn")
 ## The recorded clips: 16-bit mono 44.1 kHz WAV imports, and their lengths in seconds.
 const RECORDED_SECONDS: Dictionary = {
 	&"hiss_low": 6.0,
@@ -12,15 +14,10 @@ const RECORDED_SECONDS: Dictionary = {
 	&"growl_refusal": 0.92,
 }
 
-var failures: int = 0
-
-
-func _initialize() -> void:
-	call_deferred("_run")
-
 
 func _run() -> void:
-	var game: Node2D = GAME_SCENE.instantiate() as Node2D
+	check_name = "SfxBank"
+	var game: Node2D = MAIN_SCENE.instantiate() as Node2D
 	game.set("save_path", "user://sfx-bank-test-%s.json" % OS.get_process_id())
 	game.set("settings_path", "user://sfx-bank-test-%s.cfg" % OS.get_process_id())
 	root.add_child(game)
@@ -93,9 +90,7 @@ func _run() -> void:
 	# quitting sooner leaks them at exit, which check-game.sh treats as a failure. 0.1 s was not
 	# always enough on the headless dummy driver.
 	await create_timer(0.5).timeout
-	if failures == 0:
-		print("SfxBank checks passed")
-	quit(1 if failures > 0 else 0)
+	finish("SfxBank checks passed")
 
 
 ## Every generated clip in [param lengths] is 16-bit mono at [param rate], the planned length,
@@ -205,10 +200,3 @@ func _scripts(dir: String) -> Array[String]:
 	for sub: String in DirAccess.get_directories_at(dir):
 		out.append_array(_scripts(dir.path_join(sub)))
 	return out
-
-
-func _expect(condition: bool, label: String) -> bool:
-	if not condition:
-		failures += 1
-		push_error("SfxBank check failed: " + label)
-	return condition

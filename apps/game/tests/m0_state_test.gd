@@ -1,11 +1,13 @@
-extends SceneTree
+extends "res://tests/support/game_suite.gd"
+## M0State, the save state, as pure logic: the story steps, memory, and saving and loading from disk
+## (bad files included).
+## Bookkeeping, spawning and the waits come from the shared suite kit (tests/support/game_suite.gd).
 
 const State = preload("res://scripts/m0_state.gd")
 
-var failures: int = 0
-
 
 func _initialize() -> void:
+	check_name = "M0 state"
 	var state: M0State = State.new()
 	_expect(state.memory.is_empty() and not state.door_open and state.active_actor == "human", "New Game state is clean")
 	_expect(state.record_choice(State.PRESS), "records first choice")
@@ -173,9 +175,7 @@ func _initialize() -> void:
 	_expect(blocked_loaded != null and blocked_loaded.checkpoint_reached and FileAccess.file_exists(blocked_path + ".tmp"), "a recovered checkpoint that cannot be promoted still loads and keeps its temporary copy")
 	DirAccess.remove_absolute(ProjectSettings.globalize_path(blocked_path))
 	DirAccess.remove_absolute(ProjectSettings.globalize_path(blocked_path + ".tmp"))
-	if failures == 0:
-		print("M0 state checks passed")
-	quit(1 if failures > 0 else 0)
+	finish("M0 state checks passed")
 
 
 func _write_text(path: String, body: String) -> void:
@@ -185,9 +185,3 @@ func _write_text(path: String, body: String) -> void:
 		return
 	file.store_string(body)
 	file.close()
-
-
-func _expect(condition: bool, label: String) -> void:
-	if not condition:
-		failures += 1
-		push_error("M0 state check failed: " + label)

@@ -1,26 +1,17 @@
-extends SceneTree
+extends "res://tests/support/game_suite.gd"
+## The knockdown (Impact): the collapse pieces, the engineer lying where he fell, and RETRY's timing
+## back to the checkpoint, played in the game.
+## Bookkeeping, spawning and the waits come from the shared suite kit (tests/support/game_suite.gd).
 
-const GAME_SCENE: PackedScene = preload("res://scenes/main.tscn")
 const State = preload("res://scripts/m0_state.gd")
 const MainScript = preload("res://scripts/main.gd")
-const Suite = preload("res://tests/support/game_suite.gd")
-
-var failures: int = 0
-
-
-func _initialize() -> void:
-	call_deferred("_run")
 
 
 func _run() -> void:
+	check_name = "Impact"
 	_check_collapse_pieces()
-	var path: String = "user://impact-test-%s.json" % OS.get_process_id()
-	if FileAccess.file_exists(path):
-		DirAccess.remove_absolute(ProjectSettings.globalize_path(path))
-	var game: Node2D = GAME_SCENE.instantiate() as Node2D
-	game.set("save_path", path)
-	game.set("settings_path", "%s-settings.cfg" % path)
-	root.add_child(game)
+	var game: Node2D = open_game("impact-test")
+	var path: String = str(game.get("save_path"))
 	var impact: Impact = game.get("impact") as Impact
 	var camera: Camera2D = game.get_node("IntroCamera") as Camera2D
 	var intro_fade: ColorRect = game.get_node("CanvasLayer/IntroFade") as ColorRect
@@ -43,7 +34,7 @@ func _run() -> void:
 	_expect(moved, "trauma shakes the camera through its offset")
 	_expect(camera.offset.length() <= Impact.MAX_SHAKE_PX, "shake never exceeds the 10 px cap")
 	_expect(camera.position == rest_position, "shake leaves Camera2D.position (clamp and smoothing) alone")
-	_expect(await _wait_until(func() -> bool: return impact.trauma == 0.0 and camera.offset == Vector2.ZERO, 90), "trauma decays to zero and the offset returns to zero within 90 frames")
+	_expect(await wait_until(func() -> bool: return impact.trauma == 0.0 and camera.offset == Vector2.ZERO, 90), "trauma decays to zero and the offset returns to zero within 90 frames")
 
 	# Hit-stop: the dip always ends, including when the game pauses inside it.
 	impact.hit_stop(0.08)
@@ -128,10 +119,10 @@ func _run() -> void:
 	game.call("_sync_scene")
 	human.position.x = 605.0
 	game.call("_interact_relay")
-	_expect(await _wait_until(func() -> bool: return state.door_open, 150), "WOLF takes the relay")
+	_expect(await wait_until(func() -> bool: return state.door_open, 150), "WOLF takes the relay")
 	_expect(impact.trauma > 0.0 and relay_sparks.emitting and relay_sparks.color == Color("#8be3ff"), "the relay contact adds shake and a cyan spark shower")
-	_expect(await _wait_until(func() -> bool: return door_dust.emitting, 60), "the seal's landing bursts dust at its base")
-	_expect(await _wait_until(func() -> bool: return impact.trauma == 0.0 and camera.offset == Vector2.ZERO, 120), "the corridor settles after the seal opens")
+	_expect(await wait_until(func() -> bool: return door_dust.emitting, 60), "the seal's landing bursts dust at its base")
+	_expect(await wait_until(func() -> bool: return impact.trauma == 0.0 and camera.offset == Vector2.ZERO, 120), "the corridor settles after the seal opens")
 
 	# Knockdown: the current checkpoint comes back byte for byte, memory included.
 	# Beside the SAFE POINT console, where a USE steps the engineer out to (a restore never leaves them
@@ -142,7 +133,7 @@ func _run() -> void:
 		return
 	var saved: Dictionary = state.to_dict()
 	var save_bytes: PackedByteArray = FileAccess.get_file_as_bytes(path)
-	_expect(await _walk_to(human, 700.0), "the engineer walks back toward the seal")
+	_expect(await walk_to(human, 700.0), "the engineer walks back toward the seal")
 	var hazard: Hazard = Hazard.make("TestVent", Rect2(670.0, 380.0, 60.0, 60.0), "The vent blew while you stood on it. Wait for the hiss to stop.")
 	hazard.contact.connect(func(source: Hazard) -> void: game.call("_fail_beat", source.reason))
 	game.add_child(hazard)
@@ -166,7 +157,7 @@ func _run() -> void:
 	# The painted slump is forward, so the body falls the way they faced and never turns round.
 	var seen_frames: Dictionary = {}
 	var turned: Array[bool] = [human.body_sprite.flip_h != faced_left]
-	var lying: bool = await _wait_until(func() -> bool:
+	var lying: bool = await wait_until(func() -> bool:
 		turned[0] = turned[0] or human.body_sprite.flip_h != faced_left
 		if MainScript.COLLAPSE_ART.has(human.body_sprite.texture):
 			seen_frames[MainScript.COLLAPSE_ART.find(human.body_sprite.texture)] = true
@@ -194,15 +185,15 @@ func _run() -> void:
 	await process_frame
 	_expect(reflection.texture == human.body_sprite.texture and reflection.shadow_span == Vector2.ZERO and is_equal_approx(reflection.floor_y, MainScript.HUMAN_FLOOR_Y), "their reflection and shadow are the standing ones again")
 	_expect(str(game.get("status_line")).contains("Wait for the hiss") and str(game.get("status_line")).contains("Back at the last checkpoint."), "the status line keeps the cause and says where play resumed")
-	_expect(await _wait_until(func() -> bool: return Engine.time_scale == 1.0 and camera.offset == Vector2.ZERO and intro_fade.color.a == 0.0, 90), "time scale, camera and fade are all at rest after the restore")
+	_expect(await wait_until(func() -> bool: return Engine.time_scale == 1.0 and camera.offset == Vector2.ZERO and intro_fade.color.a == 0.0, 90), "time scale, camera and fade are all at rest after the restore")
 	# Walking into the armed hazard is the other contact path.
-	_expect(await _walk_to(human, 760.0), "the engineer walks toward the vent again")
+	_expect(await walk_to(human, 760.0), "the engineer walks toward the vent again")
 	Input.action_press(&"move_left")
-	var tripped: bool = await _wait_until(func() -> bool: return game.get("fail_active"), 120)
+	var tripped: bool = await wait_until(func() -> bool: return game.get("fail_active"), 120)
 	Input.action_release(&"move_left")
 	_expect(tripped, "walking into an armed hazard knocks the engineer down")
 	var walked_turn: Array[bool] = [not human.body_sprite.flip_h]
-	var walked_down: bool = await _wait_until(func() -> bool:
+	var walked_down: bool = await wait_until(func() -> bool:
 		walked_turn[0] = walked_turn[0] or not human.body_sprite.flip_h
 		return human.body_sprite.texture == MainScript.COLLAPSE_ART[-1], 60)
 	_expect(walked_down and not walked_turn[0], "walking left into it, they slump forward to the left without turning round")
@@ -227,9 +218,9 @@ func _run() -> void:
 	game.call("_interact_breaker")
 	game.call("_choose", State.PRESS)
 	var pre_save: Dictionary = (game.get("beat_snapshot") as Dictionary).duplicate(true)
-	_expect(await _walk_to(human, 450.0), "the engineer moves on before any save exists")
+	_expect(await walk_to(human, 450.0), "the engineer moves on before any save exists")
 	game.call("_fail_beat", "Test knockdown.")
-	_expect(await Suite.retry(game, 240), "a knockdown before the first checkpoint still hands back")
+	_expect(await retry(game, 240), "a knockdown before the first checkpoint still hands back")
 	state = game.get("state") as M0State
 	_expect(state.to_dict() == pre_save and state.memory.get("choice_id") == State.PRESS and not state.checkpoint_reached and state.chapter_id == "lockdown", "without a checkpoint the beat snapshot restores the choice, not an older save")
 	_expect(human.controlled and human.position == state.human_position, "the engineer is back at the beat start")
@@ -242,7 +233,7 @@ func _run() -> void:
 	await process_frame
 	_expect(game.get("fail_active") and Engine.time_scale == 1.0 and human.body_sprite.rotation_degrees == 0.0 and human.body_sprite.texture == MainScript.COLLAPSE_ART[-1], "Reduced Motion knockdown cuts straight to lying down and skips the dip")
 	_check_lying(human, "with Reduced Motion")
-	_expect(await Suite.retry(game, 240), "the Reduced Motion knockdown restores")
+	_expect(await retry(game, 240), "the Reduced Motion knockdown restores")
 	impact.reduce_motion = false
 
 	# Intro and chapter close never knock down; the kit's intro boom still settles.
@@ -253,16 +244,14 @@ func _run() -> void:
 		game.call("_advance_intro")
 	_expect(impact.trauma > 0.0 and intro_fade.color.r == 1.0, "the containment gate boom shakes and flashes")
 	game.call("_finish_intro")
-	_expect(await _wait_until(func() -> bool: return impact.trauma == 0.0 and camera.offset == Vector2.ZERO, 90), "the gate boom settles")
+	_expect(await wait_until(func() -> bool: return impact.trauma == 0.0 and camera.offset == Vector2.ZERO, 90), "the gate boom settles")
 
 	game.queue_free()
 	# The mixer releases a stopped clip a few steps later; give it that time before quitting.
 	await create_timer(0.1).timeout
 	_expect(Engine.time_scale == 1.0, "freeing the game leaves time_scale at 1.0")
 	DirAccess.remove_absolute(ProjectSettings.globalize_path(path))
-	if failures == 0:
-		print("Impact checks passed")
-	quit(1 if failures > 0 else 0)
+	finish("Impact checks passed")
 
 
 ## P0-3: each collapse piece is cut so its soles are on its bottom row (no gap above the floor line and
@@ -319,7 +308,7 @@ func _check_lying(human: M0Actor, label: String) -> void:
 ## at about 1.5 s. Time is the game's own (the frames' deltas, as the knockdown and its tweens count it),
 ## and each moment is checked to the frame it falls in, so a slow machine does not change the result.
 func _check_retry_timing(game: Node, context: String) -> void:
-	# Its two presses stay inline, not Suite.retry: each is frame-exact and counts the press frame itself.
+	# Its two presses stay inline, not retry: each is frame-exact and counts the press frame itself.
 	var hint: Label = game.get_node("CanvasLayer/ContextHint/Text") as Label
 	var age: float = float(game.get("fail_age"))
 	var before: float = age
@@ -370,37 +359,3 @@ func _check_retry_timing(game: Node, context: String) -> void:
 		await process_frame
 	_expect(human.controlled and not bool(game.get("fail_active")) and after_press >= 0.6 - 0.001 and after_press - 0.6 <= longest_frame + 0.001, "%s: control comes back 0.6 s after RETRY, so about 1.5 s after the hit for a press at 0.9 s (%.3f s after the press, frames up to %.3f s)" % [context, after_press, longest_frame])
 	_expect(is_equal_approx(MainScript.RETRY_READY_SECONDS + MainScript.RETRY_FADE_OUT_SECONDS + MainScript.RETRY_FADE_IN_SECONDS, 1.5), "%s: 0.9 s + 0.25 s fade out + 0.35 s fade in = 1.5 s" % context)
-
-
-func _wait_until(condition: Callable, frames: int) -> bool:
-	for _frame: int in range(frames):
-		await physics_frame
-		if condition.call():
-			return true
-	return false
-
-
-func _walk_to(actor: M0Actor, target_x: float) -> bool:
-	var action: StringName = &"move_right" if target_x > actor.position.x else &"move_left"
-	Input.action_press(action)
-	var reached: bool = false
-	for _frame: int in range(300):
-		await physics_frame
-		if absf(actor.position.x - target_x) <= 12.0:
-			reached = true
-			break
-	Input.action_release(action)
-	return reached
-
-
-func _expect(condition: bool, label: String) -> void:
-	if not condition:
-		failures += 1
-		push_error("Impact check failed: " + label)
-
-
-func _require(condition: bool, label: String) -> bool:
-	_expect(condition, label)
-	if not condition:
-		quit(1)
-	return condition

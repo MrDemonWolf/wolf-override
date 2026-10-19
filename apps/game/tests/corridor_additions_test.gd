@@ -21,10 +21,6 @@ const LEAF_LENGTH_M: float = 3.95
 const WALK_A: float = 0.0
 
 
-func _initialize() -> void:
-	call_deferred("_run")
-
-
 ## One game from the title screen: the beacon and blast-leaf checks, then the kit's teardown (no
 ## sound, node or file left behind) and exit status.
 func _run() -> void:

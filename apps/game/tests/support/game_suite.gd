@@ -4,31 +4,31 @@ extends SceneTree
 ## spawn and teardown, waits, holds and image helpers that suites used to copy into themselves live
 ## here once.
 ##
-## Two ways to use it:
-## - A suite that is a plain SceneTree script extends it: `extends "res://tests/support/game_suite.gd"`,
-##   sets [member check_name] (the start of every failure message), reports with [method _expect] and
-##   ends with [method finish]. It must not declare its own `failures`: redeclaring a parent member is
-##   a parse error. It uses [constant MAIN_SCENE] instead of its own scene preload.
-## - A suite that keeps `extends SceneTree` calls the statics through
-##   `const Suite = preload("res://tests/support/game_suite.gd")`, on its own line right after the
-##   file's last top-level preload.
+## How to use it: every suite extends it, `extends "res://tests/support/game_suite.gd"`, defines
+## `_run()` (the kit's _initialize calls it deferred), sets [member check_name] (the start of every
+## failure message) first thing, reports with [method _expect] or [method _require] and ends with
+## [method finish]. It must not declare its own `failures`, `check_name` or `MAIN_SCENE`:
+## redeclaring a parent member is a parse error. It calls the statics below by their bare names, and
+## keeps only helpers that no other suite needs; a helper a second suite wants moves here.
 ##
 ## The file has no class_name, so nothing test-only enters the game's global class list, and it
 ## never ships: export_presets.cfg excludes tests/*, which covers tests/support/. check-game.sh only
 ## globs tests/*_test.gd, so it is never run as a suite itself.
 ##
-## Users (2026-10-15): follow_spacing_test (drawn_z); on the corridor, doors and text branches their
-## suites as each branch's dedupe lists them. What must stay true for every user:
-## - What the statics touch besides their arguments: the running SceneTree (tree()); the global
-##   Input actions (hold presses its action and retry presses interact, each releasing it before it
-##   returns); user:// files (remove_file deletes one, start_game deletes stale save and settings
-##   files before the game starts, end_game deletes the game's own after it is freed); and the
-##   process id (start_game puts it in the file names, so suites run side by side do not share
-##   files). Nothing else is kept between calls: the kit has no static state.
-## - frames, wait_until, hold and retry count physics frames (1/60 s of game time each at the
-##   project's physics rate, not the wall clock), so a busy machine slows those waits down but does
-##   not change what they see; retry holds its one press for a process frame. spawn_game waits one
-##   process frame. end_game waits process frames and SceneTree timers in seconds, which do follow
+## Users (2026-10-18): every tests/*_test.gd. What must stay true for every user:
+## - What the statics touch besides their arguments: the running SceneTree (tree(), and its paused
+##   flag in free_tools_game); the global Input actions and events (hold, press_for, tap, walk_to,
+##   walk_to_reading_on, retry and send_key press or send them, and each releases what it pressed
+##   before it returns); user:// files (remove_file and remove_tools_files delete them,
+##   fresh_save_path, start_game and open_game delete stale save and settings files before the game
+##   starts, end_game deletes the game's own after it is freed); and the process id (in the file
+##   names, so suites run side by side do not share files). Nothing else is kept between calls: the
+##   kit has no static state.
+## - frames, wait_until, hold, press_for, walk_to, walk_to_reading_on and retry count physics frames
+##   (1/60 s of game time each at the project's physics rate, not the wall clock), so a busy machine
+##   slows those waits down but does not change what they see; tap, settle, send_key and retry hold
+##   presses for process frames. spawn_game and start_game wait one process frame, add_game and
+##   open_game none. end_game waits process frames and SceneTree timers in seconds, which do follow
 ##   real time: the audio mixer and the loader threads it waits for run on the wall clock, not on
 ##   game frames.
 ## - end_game leaves no game, sound or file behind, because check-game fails a suite that leaks
@@ -61,36 +61,109 @@ func finish(pass_note: String = "") -> void:
 	quit(1 if failures > 0 else 0)
 
 
+## Starts the suite once the tree is up: calls the suite's own `_run()` (which every suite that
+## extends the kit defines) deferred, so it runs after the first idle frame, as a SceneTree script's
+## _initialize cannot await. A suite that does all its work in _initialize overrides this.
+func _initialize() -> void:
+	call_deferred("_run")
+
+
+## [method _expect], and on failure quits with status 1 at once, for checks the rest of the suite
+## cannot run without. Returns [param condition]. quit() only takes effect after the current frame,
+## so a caller that goes on must also stop on false: `if not _require(...): return`.
+func _require(condition: bool, label: String) -> bool:
+	_expect(condition, label)
+	if not condition:
+		quit(1)
+	return condition
+
+
 ## The running SceneTree (the suite itself), for the statics, which have no `self`.
 static func tree() -> SceneTree:
 	return Engine.get_main_loop() as SceneTree
 
 
-## Adds a new game to the tree and returns it once it has run one process frame (its _ready done).
-## [param save_path] and [param settings_path] are user:// files the game reads and writes instead
-## of the player's own; [param configure], when given, is called with the game before it enters the
-## tree (for properties its _ready reads, such as auto_pause_on_focus_loss). The caller frees it,
-## normally with [method end_game].
-static func spawn_game(save_path: String, settings_path: String, configure: Callable = Callable()) -> Node2D:
+## Instantiates the game and adds it to the tree without waiting, for suites that drive it before its
+## first frame (calling _new_game straight away, say). [param save_path] and [param settings_path]
+## are user:// files the game reads and writes instead of the player's own; [param configure], when
+## given, is called with the game before it enters the tree (for properties its _ready reads, such as
+## auto_pause_on_focus_loss; [method keep_running] is the usual one). The caller frees it.
+static func add_game(save_path: String, settings_path: String, configure: Callable = Callable()) -> Node2D:
 	var game: Node2D = MAIN_SCENE.instantiate() as Node2D
 	game.set("save_path", save_path)
 	game.set("settings_path", settings_path)
 	if configure.is_valid():
 		configure.call(game)
 	tree().root.add_child(game)
+	return game
+
+
+## [method add_game], then waits one process frame, so the game has run its first frame, and returns
+## it. The caller frees it, normally with [method end_game].
+static func spawn_game(save_path: String, settings_path: String, configure: Callable = Callable()) -> Node2D:
+	var game: Node2D = add_game(save_path, settings_path, configure)
 	await tree().process_frame
 	return game
 
 
-## [method spawn_game] with this process's own files, user://<file_stem>-<pid>.json and
-## <that>-settings.cfg (the process id keeps suites that run side by side apart), after removing any
-## left from an earlier run that was stopped. [method end_game] removes them again.
-static func start_game(file_stem: String, configure: Callable = Callable()) -> Node2D:
+## This process's own save file for [param file_stem], user://<file_stem>-<pid>.json, with its
+## settings file (<that>-settings.cfg) beside it; the process id keeps suites that run side by side
+## apart. Removes both when an earlier run that was stopped left them, and returns the save path.
+static func fresh_save_path(file_stem: String) -> String:
 	var save_path: String = "user://%s-%s.json" % [file_stem, OS.get_process_id()]
-	var settings_path: String = "%s-settings.cfg" % save_path
 	remove_file(save_path)
-	remove_file(settings_path)
-	return await spawn_game(save_path, settings_path, configure)
+	remove_file("%s-settings.cfg" % save_path)
+	return save_path
+
+
+## [method spawn_game] with [method fresh_save_path]'s files for [param file_stem]. [method end_game]
+## removes them again.
+static func start_game(file_stem: String, configure: Callable = Callable()) -> Node2D:
+	var save_path: String = fresh_save_path(file_stem)
+	return await spawn_game(save_path, "%s-settings.cfg" % save_path, configure)
+
+
+## [method start_game] without the frame wait: the game is in the tree but its first frame has not
+## run, for suites that drive it before then. Not a coroutine, so callers do not await it.
+static func open_game(file_stem: String, configure: Callable = Callable()) -> Node2D:
+	var save_path: String = fresh_save_path(file_stem)
+	return add_game(save_path, "%s-settings.cfg" % save_path, configure)
+
+
+## A configure callable for the spawners: the game keeps running when the headless window reports a
+## focus loss (Main pauses on one by default, which would stop a suite's frames counting).
+static func keep_running(game: Node) -> void:
+	game.set("auto_pause_on_focus_loss", false)
+
+
+## A game for the debug-tools suites (crank_hold, debug_tools), which name their files from one
+## [param base] path (user://<suite>-<pid>): settings in <base>.cfg, the save in <base>-save.json.
+## It keeps running on focus loss, has run its first process frame, and its DebugTools act as in a
+## debug build when [param debug_build] is true and as in a release build when false. Free it with
+## [method free_tools_game]; [method remove_tools_files] deletes the files.
+static func spawn_tools_game(base: String, debug_build: bool) -> Node2D:
+	var game: Node2D = await spawn_game(base + "-save.json", base + ".cfg", keep_running)
+	(game.get("debug_tools") as DebugTools).debug_build = debug_build
+	return game
+
+
+## Frees a [method spawn_tools_game] game between checks: lets go of interact and the two move
+## actions (a check that fails mid-press must not leave them held for the next), unpauses the tree
+## and waits two process frames for the free to land. Leaves its files for the next check.
+static func free_tools_game(game: Node) -> void:
+	for action: StringName in [&"interact", &"move_left", &"move_right"]:
+		Input.action_release(action)
+	tree().paused = false
+	game.queue_free()
+	await tree().process_frame
+	await tree().process_frame
+
+
+## Deletes the settings, save and half-written save (<base>-save.json.tmp) files of a
+## [method spawn_tools_game] game named from [param base], so a check starts from defaults.
+static func remove_tools_files(base: String) -> void:
+	for path: String in [base + ".cfg", base + "-save.json", base + "-save.json.tmp"]:
+		remove_file(path)
 
 
 ## Silences [param game]: its SfxBank's voices (stop_all) when it has one, then every
@@ -147,6 +220,169 @@ static func hold(action: StringName, max_frames: int, stop: Callable = Callable(
 		await tree().physics_frame
 	Input.action_release(action)
 	await frames(2)
+
+
+## Taps the input [param action] as a key press reaches the game: waits a process frame, presses,
+## holds for one process frame and releases, then waits [param settle_frames] more process frames.
+## pause_game is event-driven in Main (_unhandled_input), not polled, so it is sent as a real
+## InputEventAction pair instead; settle_frames does not apply to it.
+static func tap(action: StringName, settle_frames: int = 0) -> void:
+	await tree().process_frame
+	if action == &"pause_game":
+		Input.parse_input_event(action_event(action, true))
+		await tree().process_frame
+		Input.parse_input_event(action_event(action, false))
+		return
+	Input.action_press(action)
+	await tree().process_frame
+	Input.action_release(action)
+	for _frame: int in settle_frames:
+		await tree().process_frame
+
+
+## A pressed or released ([param pressed]) InputEventAction for [param action], for
+## Input.parse_input_event.
+static func action_event(action: StringName, pressed: bool) -> InputEventAction:
+	var event: InputEventAction = InputEventAction.new()
+	event.action = action
+	event.pressed = pressed
+	return event
+
+
+## Waits [param count] process frames: one pass of every node's _process and of the UI, the step
+## input events and menus answer on (not the physics frames [method frames] counts).
+static func settle(count: int) -> void:
+	for _frame: int in count:
+		await tree().process_frame
+
+
+## Sends one key event, [param code] down or up ([param pressed]) by both its keycode and its
+## physical keycode, as Input.parse_input_event, then waits a process frame so the game has seen it.
+static func send_key(code: Key, pressed: bool) -> void:
+	var event: InputEventKey = InputEventKey.new()
+	event.keycode = code
+	event.physical_keycode = code
+	event.pressed = pressed
+	Input.parse_input_event(event)
+	await tree().process_frame
+
+
+## Presses and releases the key [param code] ([method send_key] down, then up): two process frames.
+static func tap_key(code: Key) -> void:
+	await send_key(code, true)
+	await send_key(code, false)
+
+
+## Holds [param action] down for exactly [param count] physics frames, then releases it (no wait
+## after, unlike [method hold]).
+static func press_for(action: StringName, count: int) -> void:
+	Input.action_press(action)
+	await frames(count)
+	Input.action_release(action)
+
+
+## Walks [param actor] toward [param target_x] (world px) by holding move_left or move_right for up
+## to 300 physics frames (5 s of game time), stopping once it is within 12 px. Returns whether it got
+## there. One straight walk: a story box or scripted step that takes control away stops it short.
+static func walk_to(actor: M0Actor, target_x: float) -> bool:
+	var action: StringName = &"move_right" if target_x > actor.position.x else &"move_left"
+	Input.action_press(action)
+	var reached: bool = false
+	for _frame: int in 300:
+		await tree().physics_frame
+		if absf(actor.position.x - target_x) <= 12.0:
+			reached = true
+			break
+	Input.action_release(action)
+	return reached
+
+
+## Walks [param actor] to within 6 px of [param target_x] (world px) through whatever the game puts in
+## the way: up to four attempts of 360 physics frames each. When an attempt loses control, it waits up
+## to 60 frames for the game to hand control back on its own (a scripted step), and only when it does
+## not taps interact to read a story box on and waits 10 frames. After arriving it waits 2 physics
+## frames so the stop has settled. Returns whether the actor ends within 6 px.
+static func walk_to_reading_on(actor: M0Actor, target_x: float) -> bool:
+	for _attempt: int in 4:
+		var action: StringName = &"move_right" if target_x > actor.position.x else &"move_left"
+		Input.action_press(action)
+		var reached: bool = false
+		for _frame: int in 360:
+			await tree().physics_frame
+			if absf(actor.position.x - target_x) <= 6.0:
+				reached = true
+				break
+			if not actor.controlled:
+				break
+		Input.action_release(action)
+		if reached:
+			await frames(2)
+			return true
+		if not await wait_until(func() -> bool: return actor.controlled, 60):
+			await tap(&"interact", 1)
+			await frames(10)
+	return absf(actor.position.x - target_x) <= 6.0
+
+
+## True while some player in [param game]'s SfxBank is playing [param clip] (an SfxBank clip name).
+static func sounding(game: Node, clip: StringName) -> bool:
+	var sfx: SfxBank = game.get("sfx_bank") as SfxBank
+	for player: AudioStreamPlayer in sfx.players():
+		if player.playing and player.stream == sfx.streams.get(clip):
+			return true
+	return false
+
+
+## How far [method story_state] takes a run: the corridor's safe point reached, the Records room
+## entered, the chapter completed in it, the junction entered, and the junction's blast door blown.
+enum Story { CHECKPOINT_REACHED, RECORDS_ENTERED, RECORDS_DONE, JUNCTION_ENTERED, DOOR_DOWN }
+
+
+## A save state built with M0State's own steps, as play makes it: the corridor choice
+## [param choice_id] (M0State.DISCLOSE or PRESS), the breaker, the relay powered (by WOLF after a
+## disclosure, by the engineer otherwise) and the checkpoint, then on to [param through] (a
+## [enum Story] stage). Past entering Records it keeps the purge trace and the mirror trace (WOLF's readout
+## after a disclosure, the manual copy otherwise) and completes the chapter. Positions are left at
+## M0State's defaults.
+static func story_state(choice_id: String, through: Story) -> M0State:
+	var disclosed: bool = choice_id == M0State.DISCLOSE
+	var state: M0State = M0State.new()
+	state.record_choice(choice_id)
+	state.arm_breaker()
+	state.activate_power("wolf" if disclosed else "human")
+	state.reach_checkpoint()
+	if through == Story.CHECKPOINT_REACHED:
+		return state
+	state.enter_records()
+	if through == Story.RECORDS_ENTERED:
+		return state
+	state.preserve_purge_trace()
+	state.preserve_mirror_trace("wolf" if disclosed else "manual")
+	state.complete_chapter()
+	if through >= Story.JUNCTION_ENTERED:
+		state.enter_junction()
+	if through >= Story.DOOR_DOWN:
+		state.blow_door()
+	return state
+
+
+## [method story_state] through Records with the pair standing by the Records exit: the engineer at
+## (830, 410) and WOLF at (766, 423), world px.
+static func completed_records_state(choice_id: String) -> M0State:
+	var state: M0State = story_state(choice_id, Story.RECORDS_DONE)
+	state.human_position = Vector2(830.0, 410.0)
+	state.wolf_position = Vector2(766.0, 423.0)
+	return state
+
+
+## A sentry brain already awake and on patrol at [param x] (world px), facing [param facing] (1 right,
+## -1 left).
+static func patrolling_sentry(x: float, facing: float) -> SentryBrain:
+	var brain: SentryBrain = SentryBrain.new()
+	brain.wake()
+	brain.x = x
+	brain.facing = facing
+	return brain
 
 
 ## Deletes the user:// (or absolute) file at [param path] if there is one.

@@ -1,18 +1,17 @@
-extends SceneTree
+extends "res://tests/support/game_suite.gd"
+## The debug tools (DebugTools and its overlay, zones, menu, actions and captures): locked out of
+## release builds, unlocked by the keyboard, controller and logo codes, and every page, jump, toggle
+## and capture checked against the game's own state. Spawning, freeing and the settings and save
+## files come from the shared suite kit (tests/support/game_suite.gd, spawn_tools_game).
 
-const GAME_SCENE: PackedScene = preload("res://scenes/main.tscn")
-const Suite = preload("res://tests/support/game_suite.gd")
-
-var failures: int = 0
+## Where this run's files go: user://debug-tools-test-<pid>, with .cfg, -save.json and -captures.
 var base: String = ""
+## How many times DebugTools.menu_requested fired (_on_menu_requested counts it).
 var menu_requests: int = 0
 
 
-func _initialize() -> void:
-	call_deferred("_run")
-
-
 func _run() -> void:
+	check_name = "Debug tools"
 	base = "user://debug-tools-test-%s" % OS.get_process_id()
 	_clean()
 	await _check_release_gating()
@@ -55,14 +54,14 @@ func _run() -> void:
 
 ## A release build hides everything: no overlay, capture, menu or button, and nothing processes or draws.
 func _check_release_gating() -> void:
-	var game: Node2D = await _spawn(false)
+	var game: Node2D = await spawn_tools_game(base, false)
 	var tools: DebugTools = _tools(game)
 	_expect(tools != null and tools.get_parent() == game, "Main builds one DebugTools node")
 	_expect(not tools.available and not tools.unlocked, "a release build starts with the debug tools hidden")
 	_expect(_idle(tools), "hidden debug tools neither process nor draw")
 	tools.capture_dir = base + "-captures"
 	for key: Key in [KEY_F3, KEY_F12, KEY_QUOTELEFT]:
-		await _send_key(key)
+		await tap_key(key)
 	await _send_pad(JOY_BUTTON_LEFT_STICK, true)
 	await _send_pad(JOY_BUTTON_RIGHT_STICK, true)
 	await _send_pad(JOY_BUTTON_RIGHT_STICK, false)
@@ -78,24 +77,24 @@ func _check_release_gating() -> void:
 	game.set("touch_enabled", false)
 	game.call("_new_game")
 	game.call("_finish_intro")
-	await _settle(3)
+	await settle(3)
 	_expect(_idle(tools), "hidden tools stay idle during play too")
 	tools.debug_build = true
 	_expect(tools.available and tools.overlay_mode == DebugTools.Overlay.OFF and _idle(tools), "a debug build always has the tools, and with the overlay off they still cost nothing per frame")
 	_expect(not GameSettings.load_config(_settings_path()).has_section_key(DebugTools.SETTINGS_SECTION, DebugTools.SETTINGS_KEY), "a debug build stores no unlock")
-	await _free(game)
+	await free_tools_game(game)
 
 
 ## WOLFDEN on the title unlocks a release build; the unlock is stored with the settings and kept by the
 ## next launch, and Lock debug tools forgets it again.
 func _check_keyboard_code_and_storage() -> void:
-	var game: Node2D = await _spawn(false)
+	var game: Node2D = await spawn_tools_game(base, false)
 	var tools: DebugTools = _tools(game)
 	game.call("_save_settings")
 	await _type("WOLFDEX")
 	_expect(not tools.available, "a wrong word does not unlock the tools")
 	await _type("WOL")
-	await _send_key(KEY_1)
+	await tap_key(KEY_1)
 	await _type("FDEN")
 	_expect(not tools.available, "the word has to be typed without other keys in between")
 	await _type("WOLFDEN")
@@ -110,8 +109,8 @@ func _check_keyboard_code_and_storage() -> void:
 	_expect(config.has_section_key("video", "fps_limit"), "storing the unlock keeps the other settings")
 	tools.hide_note()
 	_expect(_idle(tools), "once the note has gone the unlocked tools are idle until used")
-	await _free(game)
-	game = await _spawn(false)
+	await free_tools_game(game)
+	game = await spawn_tools_game(base, false)
 	tools = _tools(game)
 	_expect(tools.available and tools.unlocked, "the next launch of a release build reads the stored unlock")
 	tools.lock()
@@ -129,19 +128,19 @@ func _check_keyboard_code_and_storage() -> void:
 	game.call("_new_game")
 	await _type("WOLFDEN")
 	_expect(not tools.available, "the code works only on the title screen")
-	await _free(game)
-	game = await _spawn(true)
+	await free_tools_game(game)
+	game = await spawn_tools_game(base, true)
 	_expect(_tools(game).available, "a debug build has them again on its next launch")
-	await _free(game)
+	await free_tools_game(game)
 
 
 ## WOLFDEN typed in capitals as the docs print it, pressing Shift for each letter, unlocks too; so does
 ## Caps Lock before it. Modifier keys neither type a letter nor break the code; any other key does.
 func _check_keyboard_code_with_modifiers() -> void:
-	var game: Node2D = await _spawn(false)
+	var game: Node2D = await spawn_tools_game(base, false)
 	var tools: DebugTools = _tools(game)
 	await _type_shifted("WOL")
-	await _send_key(KEY_1)
+	await tap_key(KEY_1)
 	await _type_shifted("FDEN")
 	_expect(not tools.available, "a key other than a modifier between the letters still breaks the code")
 	await _type_shifted("WOLFDEN")
@@ -149,21 +148,21 @@ func _check_keyboard_code_with_modifiers() -> void:
 	tools.lock()
 	tools.hide_note()
 	_expect(not tools.available, "locked again before the next try")
-	await _send_key(KEY_CAPSLOCK)
+	await tap_key(KEY_CAPSLOCK)
 	for letter: String in "WOLFDEN":
 		await _send_letter(letter, false)
-		await _send_key(KEY_CTRL)
-		await _send_key(KEY_ALT)
-		await _send_key(KEY_META)
+		await tap_key(KEY_CTRL)
+		await tap_key(KEY_ALT)
+		await tap_key(KEY_META)
 	_expect(tools.available and tools.unlocked, "Caps Lock, Ctrl, Alt and Meta between the letters do not break the code")
 	tools.lock()
 	tools.hide_note()
-	await _free(game)
+	await free_tools_game(game)
 
 
 ## Up Up Down Down Left Right Left Right, B, A on a controller unlocks them; the last A presses nothing.
 func _check_controller_code() -> void:
-	var game: Node2D = await _spawn(false)
+	var game: Node2D = await spawn_tools_game(base, false)
 	var tools: DebugTools = _tools(game)
 	var code: Array[JoyButton] = [JOY_BUTTON_DPAD_UP, JOY_BUTTON_DPAD_UP, JOY_BUTTON_DPAD_DOWN, JOY_BUTTON_DPAD_DOWN, JOY_BUTTON_DPAD_LEFT, JOY_BUTTON_DPAD_RIGHT, JOY_BUTTON_DPAD_LEFT, JOY_BUTTON_DPAD_RIGHT]
 	for button: JoyButton in code:
@@ -184,12 +183,12 @@ func _check_controller_code() -> void:
 	_expect(not game.get("title_open") and game.get("intro_active"), "the next A presses it as usual")
 	_expect(GameSettings.boolean(GameSettings.load_config(_settings_path()), DebugTools.SETTINGS_SECTION, DebugTools.SETTINGS_KEY, false), "the controller unlock is stored too")
 	tools.lock()
-	await _free(game)
+	await free_tools_game(game)
 
 
 ## Seven quick taps on the logo mark unlock them on touch; six, or a slow seventh, do not.
 func _check_logo_code() -> void:
-	var game: Node2D = await _spawn(false)
+	var game: Node2D = await spawn_tools_game(base, false)
 	var tools: DebugTools = _tools(game)
 	var logo: Control = game.get_node("CanvasLayer/TitleScreen/LogoMark") as Control
 	var centre: Vector2 = logo.get_global_rect().get_center()
@@ -208,18 +207,18 @@ func _check_logo_code() -> void:
 	await _touch(Vector2(120.0, 120.0))
 	_expect(game.get("title_open"), "taps away from the logo do nothing")
 	tools.lock()
-	await _free(game)
+	await free_tools_game(game)
 
 
 ## F3 cycles off, performance, state, state and zones, then off; only a shown overlay processes, and it
 ## keeps updating while the game is paused.
 func _check_overlay() -> void:
-	var game: Node2D = await _spawn(true)
+	var game: Node2D = await spawn_tools_game(base, true)
 	var tools: DebugTools = _tools(game)
 	game.call("_new_game")
 	game.call("_finish_intro")
-	await _settle(3)
-	await _send_key(KEY_F3)
+	await settle(3)
+	await tap_key(KEY_F3)
 	_expect(tools.overlay_mode == DebugTools.Overlay.PERFORMANCE and tools.overlay.visible and tools.layer.visible and tools.is_processing(), "F3 shows the performance page and starts refreshing it")
 	var text: String = tools.overlay.body.get_parsed_text()
 	await process_frame
@@ -234,7 +233,7 @@ func _check_overlay() -> void:
 	_expect(release_text.contains("MEM[/color]  n/a · video") and not release_text.contains(" 0 MB ·"), "the performance page says static memory is unavailable instead of 0 MB")
 	var release_state: String = DebugOverlay.state_text({"performance": release_numbers})
 	_expect(release_state.contains("video") and not release_state.contains("· 0 MB ·"), "the state page shows video memory when static memory is unavailable")
-	await _send_key(KEY_F3)
+	await tap_key(KEY_F3)
 	text = tools.overlay.body.get_parsed_text()
 	_expect(tools.overlay_mode == DebugTools.Overlay.STATE and text.contains("STATE") and not text.contains("ZONES"), "F3 again shows the state page")
 	for row: String in ["ROOM  lockdown · play · CHECK THE BREAKER", "ENGINEER  x 160", "WOLF  x", "follow", "SENTRY  not in this room", "HAZARDS", "MEMORY  —", "CHOICES  relay —", "SAVE  v%d · none on disk" % M0State.SAVE_VERSION, "CHEATS  none"]:
@@ -251,7 +250,7 @@ func _check_overlay() -> void:
 		game.call("_refresh_ui")
 		if touch:
 			game.call("_start_gameplay_camera")
-			await _settle(2)
+			await settle(2)
 		var layout: String = "touch" if touch else "keyboard"
 		for mode: int in [DebugTools.Overlay.STATE, DebugTools.Overlay.ZONES]:
 			tools.set_overlay_mode(mode)
@@ -286,9 +285,9 @@ func _check_overlay() -> void:
 	_expect(tools.overlay.body.get_parsed_text().contains("ENGINEER  x 512"), "the paused state page follows what changes")
 	paused = false
 	await process_frame
-	await _send_key(KEY_F3)
+	await tap_key(KEY_F3)
 	_expect(tools.overlay_mode == DebugTools.Overlay.ZONES and tools.overlay.body.get_parsed_text().contains("STATE + ZONES"), "F3 a third time shows the state page with zones")
-	await _send_key(KEY_F3)
+	await tap_key(KEY_F3)
 	_expect(tools.overlay_mode == DebugTools.Overlay.OFF and _idle(tools), "F3 a fourth time turns the overlay off and stops all processing")
 	var changes: Array[int] = []
 	tools.overlay_mode_changed.connect(func(mode: int) -> void: changes.append(mode))
@@ -298,14 +297,14 @@ func _check_overlay() -> void:
 	tools.set_overlay_mode(DebugTools.Overlay.STATE)
 	tools.debug_build = false
 	_expect(not tools.available and _idle(tools), "hiding the tools turns a shown overlay off")
-	await _free(game)
+	await free_tools_game(game)
 
 
 ## The game's own cards come first: Pause, Settings, the END OF SLICE card and the title's Credits and
 ## Changelog hide the overlay (which stops refreshing) until they close, and so does an answer button
 ## that would sit under it (the touch layout's choice row); the keyboard layout's answers stay clear.
 func _check_overlay_steps_aside() -> void:
-	var game: Node2D = await _spawn(true)
+	var game: Node2D = await spawn_tools_game(base, true)
 	var tools: DebugTools = _tools(game)
 	tools.set_overlay_mode(DebugTools.Overlay.STATE)
 	_expect(tools.overlay.visible and tools.is_processing(), "the overlay shows on the title")
@@ -324,7 +323,7 @@ func _check_overlay_steps_aside() -> void:
 	_expect(tools.overlay.visible, "the overlay comes back after the title's Settings")
 	game.call("_new_game")
 	game.call("_finish_intro")
-	await _settle(3)
+	await settle(3)
 	_expect(tools.overlay.visible and tools.is_processing(), "the overlay shows in play")
 	game.call("_pause_game")
 	await process_frame
@@ -338,7 +337,7 @@ func _check_overlay_steps_aside() -> void:
 	await process_frame
 	_expect(tools.overlay.visible and tools.is_processing() and tools.overlay_mode == DebugTools.Overlay.STATE, "resuming brings the same page back")
 	game.call("_ask_relay")
-	await _settle(2)
+	await settle(2)
 	var choices: Array[Control] = [game.get("touch_choice_1") as Control, game.get("touch_choice_2") as Control]
 	_expect(choices[0].visible and choices[1].visible, "the relay question shows its answers")
 	_expect(tools.overlay.visible, "in the keyboard layout the overlay stays up during a question")
@@ -348,7 +347,7 @@ func _check_overlay_steps_aside() -> void:
 	game.set("touch_enabled", true)
 	game.call("_refresh_ui")
 	await _touch(Vector2(480.0, 230.0))
-	await _settle(2)
+	await settle(2)
 	_expect(game.get("waiting_for_choice"), "the tap answered nothing")
 	_expect(choices[0].get_global_rect().position.x < DebugOverlay.footprint(false).end.x, "the touch layout's first answer sits in the overlay's column")
 	_expect(not tools.overlay.visible and not tools.is_processing(), "in the touch layout the overlay steps aside for the answers instead of covering answer 1")
@@ -357,18 +356,18 @@ func _check_overlay_steps_aside() -> void:
 		_expect(not tools.debug_button.get_global_rect().grow(8.0).intersects(choice.get_global_rect()), "the DEBUG button leaves %s clear" % choice.name)
 	game.set("waiting_for_choice", false)
 	game.call("_update_controls")
-	await _settle(2)
+	await settle(2)
 	_expect(tools.overlay.visible and tools.is_processing(), "once answered the overlay comes back")
 	tools.set_overlay_mode(DebugTools.Overlay.PERFORMANCE)
 	game.set("waiting_for_choice", true)
 	game.call("_update_controls")
-	await _settle(2)
+	await settle(2)
 	_expect(not tools.overlay.visible, "the performance page steps aside for the touch answers too")
 	game.set("waiting_for_choice", false)
 	game.call("_update_controls")
 	game.set("touch_enabled", false)
 	tools.set_overlay_mode(DebugTools.Overlay.STATE)
-	await _settle(2)
+	await settle(2)
 	game.call("_show_end_card")
 	await process_frame
 	_expect(not tools.overlay.visible and not tools.is_processing(), "the END OF SLICE card hides the overlay")
@@ -377,13 +376,13 @@ func _check_overlay_steps_aside() -> void:
 	_expect(tools.overlay.visible and tools.is_processing(), "the overlay comes back after the card")
 	tools.set_overlay_mode(DebugTools.Overlay.OFF)
 	_expect(_idle(tools), "turned off, the overlay costs nothing again")
-	await _free(game)
+	await free_tools_game(game)
 
 
 ## Main.debug_snapshot and DebugTools.dump say what the game is doing, from its own state, without
 ## changing it, as plain values a JSON file can hold.
 func _check_snapshot() -> void:
-	var game: Node2D = await _spawn(true)
+	var game: Node2D = await spawn_tools_game(base, true)
 	var tools: DebugTools = _tools(game)
 	var title: Dictionary = tools.dump()
 	_expect(title.get("beat") == "title" and title.get("room") == "lockdown" and (title.get("save") as Dictionary).get("exists") == false and (title.get("save") as Dictionary).get("checkpoint") == "none", "on the title the dump says title and that no save exists")
@@ -395,7 +394,7 @@ func _check_snapshot() -> void:
 	var state: M0State = _junction_state(false)
 	_expect(state.save_to_disk(str(game.get("save_path"))), "a junction entry save is written")
 	game.call("_load_game")
-	await _settle(2)
+	await settle(2)
 	var line: PressureLine = game.get("pressure_line") as PressureLine
 	line.arm()
 	line.crank(1.2)
@@ -413,7 +412,7 @@ func _check_snapshot() -> void:
 	state = _junction_state(true)
 	_expect(state.save_to_disk(str(game.get("save_path"))), "a door-blown save is written")
 	game.call("_load_game")
-	await _settle(2)
+	await settle(2)
 	var dump: Dictionary = tools.dump()
 	var sentry: Dictionary = dump["sentry"]
 	_expect(sentry["state"] == "patrol" and sentry["fixated_on"] == "—" and float(sentry["x"]) <= SentryBrain.PATROL_MAX_X and float(sentry["x"]) >= SentryBrain.PATROL_MIN_X, "after the blast the sentry patrols its lane, fixed on nobody")
@@ -438,7 +437,7 @@ func _check_snapshot() -> void:
 	# At the touch framing the actors stand highest on screen; the tallest page still ends above them.
 	game.set("touch_enabled", true)
 	game.call("_start_gameplay_camera")
-	await _settle(2)
+	await settle(2)
 	tools.set_overlay_mode(DebugTools.Overlay.STATE)
 	await process_frame
 	var bottom: float = tools.overlay.get_global_rect().end.y
@@ -450,20 +449,20 @@ func _check_snapshot() -> void:
 	tools.cheats_used = true
 	tools.set_overlay_mode(DebugTools.Overlay.STATE)
 	_expect(tools.overlay.body.get_parsed_text().contains("CHEATS  USED") and (tools.dump()["debug"] as Dictionary)["cheats_used"] == true, "a cheat flags the state page and the dump")
-	await _free(game)
+	await free_tools_game(game)
 
 
 ## F12 writes a screenshot (when a frame was rendered) and a JSON dump, and shows where.
 func _check_capture() -> void:
-	var game: Node2D = await _spawn(true)
+	var game: Node2D = await spawn_tools_game(base, true)
 	var tools: DebugTools = _tools(game)
 	tools.capture_dir = base + "-captures"
 	var written: Array[Dictionary] = []
 	tools.captured.connect(func(paths: Dictionary) -> void: written.append(paths))
 	game.call("_new_game")
 	game.call("_finish_intro")
-	await _settle(3)
-	await _send_key(KEY_F12)
+	await settle(3)
+	await tap_key(KEY_F12)
 	var paths: Dictionary = tools.last_capture
 	_expect(written.size() == 1 and written[0] == paths, "F12 writes one bug capture")
 	var json_path: String = str(paths.get("json", ""))
@@ -480,13 +479,13 @@ func _check_capture() -> void:
 	game.call("_resume_game")
 	tools.hide_note()
 	_expect(_idle(tools), "after a capture the tools are idle again")
-	await _free(game)
+	await free_tools_game(game)
 
 
 ## The DEBUG button shows for touch play only, clear of PAUSE, USE, the arrows and the logo; it, the
 ## backquote and both sticks ask for the debug menu.
 func _check_touch_button_and_menu_inputs() -> void:
-	var game: Node2D = await _spawn(true)
+	var game: Node2D = await spawn_tools_game(base, true)
 	var tools: DebugTools = _tools(game)
 	var button: Button = tools.debug_button
 	_expect(not button.visible, "no DEBUG button without touch")
@@ -517,7 +516,7 @@ func _check_touch_button_and_menu_inputs() -> void:
 	_expect(rect.end.y < 260.0, "the DEBUG button sits above where the actors stand")
 	game.call("_new_game")
 	game.call("_finish_intro")
-	await _settle(2)
+	await settle(2)
 	_expect(button.visible, "the DEBUG button stays for touch play")
 	game.call("_pause_game")
 	await process_frame
@@ -534,7 +533,7 @@ func _check_touch_button_and_menu_inputs() -> void:
 	button.pressed.emit()
 	_expect(menu_requests == 1 and menu.is_open and tools.menu_open and paused and tools.overlay_mode == DebugTools.Overlay.OFF, "DEBUG opens the debug menu, which holds the game still")
 	_expect(not button.visible, "an open debug menu hides the DEBUG button")
-	await _send_key(KEY_QUOTELEFT)
+	await tap_key(KEY_QUOTELEFT)
 	_expect(menu_requests == 2 and not menu.is_open and not paused, "backquote asks for the menu again, which closes it and lets the game run")
 	await _send_pad(JOY_BUTTON_LEFT_STICK, true)
 	_expect(menu_requests == 2 and not menu.is_open, "one stick press alone does not")
@@ -549,23 +548,23 @@ func _check_touch_button_and_menu_inputs() -> void:
 	await process_frame
 	tools.debug_build = false
 	_expect(not button.visible and not tools.layer.visible, "hiding the tools hides the DEBUG button")
-	await _send_key(KEY_QUOTELEFT)
+	await tap_key(KEY_QUOTELEFT)
 	_expect(menu_requests == 3, "backquote does nothing while the tools are hidden")
 	game.set("touch_enabled", false)
-	await _free(game)
+	await free_tools_game(game)
 
 ## The zones page in the corridor: it draws only on that page and only while shown; every collision
 ## shape is drawn from its real shape and every render box from its sprite's or control's rect, in the
 ## world and on screen, following the camera; the use ranges match the rules that answer USE; the
 ## legend, F5, F6 and F7 turn each category on and off; and none of it costs anything once hidden.
 func _check_zones_corridor() -> void:
-	var game: Node2D = await _spawn(true)
+	var game: Node2D = await spawn_tools_game(base, true)
 	var tools: DebugTools = _tools(game)
 	var zones: DebugZones = tools.zones
 	_expect(zones.get_parent() == tools.layer and not zones.visible and not zones.is_processing(), "the zone drawing starts hidden and idle")
 	game.call("_new_game")
 	game.call("_finish_intro")
-	await _settle(3)
+	await settle(3)
 	for page: int in [DebugTools.Overlay.PERFORMANCE, DebugTools.Overlay.STATE]:
 		tools.set_overlay_mode(page)
 		_expect(not zones.visible and not zones.is_processing(), "the %s page draws no zones" % DebugTools.OVERLAY_NAMES[page])
@@ -666,19 +665,19 @@ func _check_zones_corridor() -> void:
 				overlaps += 1
 	_expect(overlaps == 0, "ranges sharing a lane never overlap (%d)" % overlaps)
 	# Toggles: F5, F6, F7 and the legend.
-	await _send_key(KEY_F6)
+	await tap_key(KEY_F6)
 	_expect(zones.layers[DebugZones.HITBOXES] == false and not (zones.legend_buttons[DebugZones.HITBOXES] as Button).button_pressed and zones.layers[DebugZones.ZONES] and zones.layers[DebugZones.RENDER], "F6 turns the hitboxes off, and its legend button follows")
 	_expect((tools.dump()["debug"] as Dictionary)["drawn"]["hitboxes"] == false and not (tools.dump()["geometry"]["hitboxes"] as Array).is_empty(), "the dump says the hitboxes are not drawn and still reports them")
 	(zones.legend_buttons[DebugZones.HITBOXES] as Button).button_pressed = true
 	_expect(zones.layers[DebugZones.HITBOXES] == true, "the legend's button turns them back on (a tap or click)")
-	await _send_key(KEY_F5)
-	await _send_key(KEY_F7)
+	await tap_key(KEY_F5)
+	await tap_key(KEY_F7)
 	_expect(not zones.layers[DebugZones.ZONES] and not zones.layers[DebugZones.RENDER], "F5 and F7 turn the zones and the render boxes off")
-	await _send_key(KEY_F5)
-	await _send_key(KEY_F7)
+	await tap_key(KEY_F5)
+	await tap_key(KEY_F7)
 	_expect(zones.layers[DebugZones.ZONES] and zones.layers[DebugZones.RENDER], "and on again")
 	tools.set_overlay_mode(DebugTools.Overlay.STATE)
-	await _send_key(KEY_F7)
+	await tap_key(KEY_F7)
 	_expect(zones.layers[DebugZones.RENDER], "F7 does nothing off the zones page")
 	# Pause steps aside; the title shows only what is on it.
 	tools.set_overlay_mode(DebugTools.Overlay.ZONES)
@@ -689,7 +688,7 @@ func _check_zones_corridor() -> void:
 	await process_frame
 	_expect(zones.visible and zones.is_processing(), "it comes back on resume")
 	game.call("_return_to_title")
-	await _settle(2)
+	await settle(2)
 	geometry = tools.dump()["geometry"]
 	var covered_world: bool = _entry(geometry["render_boxes"], "path", "Human/BodySprite").get("covered") == true and _entry(geometry["render_boxes"], "path", "Human/BodySprite").get("active") == false
 	_expect((geometry["zones"] as Array).is_empty() and (geometry["hitboxes"] as Array).is_empty() and covered_world and _entry(geometry["render_boxes"], "path", "CanvasLayer/TitleScreen/NewGameButton").get("active") == true, "on the title only the title's own boxes are drawn; the world under it is reported as covered")
@@ -698,46 +697,41 @@ func _check_zones_corridor() -> void:
 	tools.set_overlay_mode(DebugTools.Overlay.ZONES)
 	tools.debug_build = false
 	_expect(_idle(tools), "hiding the tools hides the zone drawing too")
-	await _free(game)
+	await free_tools_game(game)
 
 
 ## The zones page over the opening, whose thin render boxes are shorter than an outline is wide: each
 ## beat draws without a negative-size rectangle (Godot would log an ERROR: line, which fails the suite),
 ## and the cutting gives nothing for a rectangle with no area.
 func _check_zones_opening() -> void:
-	var game: Node2D = await _spawn(true)
+	var game: Node2D = await spawn_tools_game(base, true)
 	var tools: DebugTools = _tools(game)
 	tools.actions.jump(&"opening")
 	tools.hide_note()
 	tools.set_overlay_mode(DebugTools.Overlay.ZONES)
-	await _settle(3)
+	await settle(3)
 	_expect(game.get("intro_active") and tools.zones.visible and tools.zones.is_processing(), "the zones page draws over the opening")
 	var beats: int = 0
 	while bool(game.get("intro_active")) and beats < 12:
 		game.call("_advance_intro")
 		beats += 1
-		await _settle(3)
+		await settle(3)
 	_expect(beats > 1 and tools.zones.visible, "the zones page drew every beat of the opening (%d)" % beats)
 	var thin: Array[Rect2] = [Rect2(0.0, 0.0, 40.0, 0.0), Rect2(0.0, 0.0, 40.0, -1.0), Rect2(0.0, 0.0, -3.0, 6.0)]
 	for rect: Rect2 in thin:
 		_expect(DebugZones.clip(rect, [Rect2(0.0, 0.0, 10.0, 10.0)]).is_empty(), "a rectangle with no area cuts to nothing (%s)" % rect)
 	tools.cheats_used = false
-	await _free(game)
+	await free_tools_game(game)
 
 
 ## Records Access: its three stations' use ranges and WOLF's spot at the mirror, from Main's constants.
 func _check_zones_records() -> void:
-	var game: Node2D = await _spawn(true)
+	var game: Node2D = await spawn_tools_game(base, true)
 	var tools: DebugTools = _tools(game)
-	var state: M0State = M0State.new()
-	state.record_choice(M0State.DISCLOSE)
-	state.arm_breaker()
-	state.activate_power("wolf")
-	state.reach_checkpoint()
-	state.enter_records()
+	var state: M0State = story_state(M0State.DISCLOSE, Story.RECORDS_ENTERED)
 	_expect(state.save_to_disk(str(game.get("save_path"))), "a Records save is written")
 	game.call("_load_game")
-	await _settle(3)
+	await settle(3)
 	tools.set_overlay_mode(DebugTools.Overlay.ZONES)
 	var geometry: Dictionary = tools.dump()["geometry"]
 	var constants: Dictionary = game.get_script().get_script_constant_map()
@@ -758,18 +752,18 @@ func _check_zones_records() -> void:
 	_expect(_entry(geometry["zones"], "name", "use: relay").is_empty() and _entry(geometry["hitboxes"], "name", "blast").is_empty(), "nothing from the other rooms is drawn")
 	_expect(_entry(geometry["hitboxes"], "path", "Door/CollisionShape2D").get("active") == false, "the corridor seal, out of play, is not in force here")
 	tools.set_overlay_mode(DebugTools.Overlay.OFF)
-	await _free(game)
+	await free_tools_game(game)
 
 
 ## The Service Junction: its hurtboxes and door from their real shapes, the blast, vent, cloud, sentry
 ## contact and tank ranges from the rules' constants and tests, the sentry's sight from its brain,
 ## the tank's footprint from the tank, and each range in force exactly while its rule is.
 func _check_zones_junction() -> void:
-	var game: Node2D = await _spawn(true)
+	var game: Node2D = await spawn_tools_game(base, true)
 	var tools: DebugTools = _tools(game)
 	_expect(_junction_state(false).save_to_disk(str(game.get("save_path"))), "a junction entry save is written")
 	game.call("_load_game")
-	await _settle(3)
+	await settle(3)
 	tools.set_overlay_mode(DebugTools.Overlay.ZONES)
 	var room: JunctionRoom = game.get("junction_room") as JunctionRoom
 	var vent_path: String = str(game.get_path_to(room.vent_hazard.get_child(0)))
@@ -808,7 +802,7 @@ func _check_zones_junction() -> void:
 	# The lane, door blown.
 	_expect(_junction_state(true).save_to_disk(str(game.get("save_path"))), "a door-blown save is written")
 	game.call("_load_game")
-	await _settle(3)
+	await settle(3)
 	var brain: SentryBrain = game.get("sentry_brain") as SentryBrain
 	geometry = tools.dump()["geometry"]
 	_expect(_entry(geometry["zones"], "name", "use: tank release")["active"] == true, "with the door blown the tank release's range answers USE")
@@ -841,14 +835,14 @@ func _check_zones_junction() -> void:
 	_expect(_entry(geometry["hitboxes"], "name", "cloud (engineer x)")["active"] == true and _entry(geometry["hitboxes"], "path", cloud_path).get("armed") == true, "after a miss the cloud's range and hurtbox are in force")
 	tools.set_overlay_mode(DebugTools.Overlay.OFF)
 	_expect(_idle(tools), "turned off in the junction, the tools are idle")
-	await _free(game)
+	await free_tools_game(game)
 
 
 ## Nothing drawn covers the touch arrows, USE, PAUSE or the hint and dialogue text, and no name sits
 ## on an actor or on another name, in the keyboard and the touch layout, in the corridor and the lane.
 ## A range wholly off screen is reported, not drawn.
 func _check_zones_keep_clear() -> void:
-	var game: Node2D = await _spawn(true)
+	var game: Node2D = await spawn_tools_game(base, true)
 	var tools: DebugTools = _tools(game)
 	game.call("_new_game")
 	game.call("_finish_intro")
@@ -856,13 +850,13 @@ func _check_zones_keep_clear() -> void:
 	# tutorial done and the opening lines up, so the hint and the dialogue both show.
 	game.set("tutorial_step", 2)
 	game.set("opening_lines_held", false)
-	await _settle(3)
+	await settle(3)
 	tools.set_overlay_mode(DebugTools.Overlay.ZONES)
 	for layout: String in ["keyboard", "touch"]:
 		game.set("touch_enabled", layout == "touch")
 		game.call("_refresh_ui")
 		tools.call("_refresh_view")
-		await _settle(2)
+		await settle(2)
 		var geometry: Dictionary = tools.dump()["geometry"]
 		var clear: Dictionary = geometry["keep_clear"]
 		var names: Array[String] = []
@@ -902,11 +896,11 @@ func _check_zones_keep_clear() -> void:
 	# The lane, door blown, touch layout: the busiest still.
 	_expect(_junction_state(true).save_to_disk(str(game.get("save_path"))), "a door-blown save is written")
 	game.call("_load_game")
-	await _settle(3)
+	await settle(3)
 	game.set("touch_enabled", true)
 	game.call("_refresh_ui")
 	tools.call("_refresh_view")
-	await _settle(2)
+	await settle(2)
 	var lane: Dictionary = tools.dump()["geometry"]
 	_expect(_labels_clear(lane).is_empty(), "the lane, touch layout: %s" % [_labels_clear(lane) if not _labels_clear(lane).is_empty() else "every name is clear"])
 	var limit: DebugZones.Item = null
@@ -918,20 +912,20 @@ func _check_zones_keep_clear() -> void:
 	game.set("touch_enabled", false)
 	tools.set_overlay_mode(DebugTools.Overlay.OFF)
 	_expect(use_rect.has_area() and _idle(tools), "turned off, the tools are idle")
-	await _free(game)
+	await free_tools_game(game)
 
 
 ## Props drawn in code (the sentry's beam, the bypass's crank lights and leader,
 ## the room lights and beacons) get render boxes from what was drawn, and the sentry's beam also
 ## declares its box for exported builds.
 func _check_custom_draw_boxes() -> void:
-	var game: Node2D = await _spawn(true)
+	var game: Node2D = await spawn_tools_game(base, true)
 	var tools: DebugTools = _tools(game)
 	_expect(_junction_state(true).save_to_disk(str(game.get("save_path"))), "a door-blown save is written")
 	game.call("_load_game")
-	await _settle(4)
+	await settle(4)
 	tools.set_overlay_mode(DebugTools.Overlay.ZONES)
-	await _settle(2)
+	await settle(2)
 	var geometry: Dictionary = tools.dump()["geometry"]
 	var room: JunctionRoom = game.get("junction_room") as JunctionRoom
 	var visual: Node2D = room.sentry.get_node("Visual") as Node2D
@@ -948,7 +942,7 @@ func _check_custom_draw_boxes() -> void:
 	visual.set("gap", Vector2(150.0, 230.0))
 	visual.set("reach", 180.0)
 	visual.queue_redraw()
-	await _settle(2)
+	await settle(2)
 	var cut: Rect2 = RenderingServer.debug_canvas_item_get_rect(visual.get_canvas_item())
 	var cut_declared: Rect2 = visual.call("debug_draw_rect")
 	_expect(cut.end.x < 160.0 and cut_declared.grow(2.0).encloses(cut) and cut.grow(2.0).encloses(cut_declared), "with its sight ending inside the alcove, the beam's declared box still matches what it drew (%s vs %s)" % [cut_declared, cut])
@@ -973,18 +967,18 @@ func _check_custom_draw_boxes() -> void:
 		var node: CanvasItem = game.get_node_or_null(path) as CanvasItem
 		_expect(node != null and not _entry(geometry["render_boxes"], "path", path).is_empty(), "%s has a render box" % path)
 	tools.set_overlay_mode(DebugTools.Overlay.OFF)
-	await _free(game)
+	await free_tools_game(game)
 
 
 ## On a controller the zones page's categories toggle with LB, RB and View, like F5 to F7, unless the
 ## button is bound to a game action; the legend names the buttons for the device in use.
 func _check_zones_controller_toggles() -> void:
-	var game: Node2D = await _spawn(true)
+	var game: Node2D = await spawn_tools_game(base, true)
 	var tools: DebugTools = _tools(game)
 	var zones: DebugZones = tools.zones
 	game.call("_new_game")
 	game.call("_finish_intro")
-	await _settle(3)
+	await settle(3)
 	tools.set_overlay_mode(DebugTools.Overlay.ZONES)
 	await _tap_pad(JOY_BUTTON_LEFT_SHOULDER)
 	_expect(not zones.layers[DebugZones.ZONES] and zones.layers[DebugZones.HITBOXES] and zones.layers[DebugZones.RENDER], "LB turns the zones off")
@@ -1012,19 +1006,14 @@ func _check_zones_controller_toggles() -> void:
 	tools.call("_refresh_view")
 	_expect(zones.legend_caption.text == DebugZones.CAPTIONS["keyboard"], "on a keyboard it names F5 to F7")
 	tools.set_overlay_mode(DebugTools.Overlay.OFF)
-	await _free(game)
+	await free_tools_game(game)
 
 
 ## A window that presents no frame never holds a capture with boxes up: after FRAME_WAIT_LIMIT frames
 ## it writes the dump without a screenshot, says the boxes are not in one, and puts the view back.
 func _check_capture_bounded_wait() -> void:
-	var game: Node2D = await _spawn(true)
+	var game: Node2D = await _capture_game()
 	var tools: DebugTools = _tools(game)
-	tools.capture_dir = base + "-captures"
-	game.call("_new_game")
-	game.call("_finish_intro")
-	await _settle(3)
-	tools.zones.set_layer(false, DebugZones.RENDER)
 	var silent: Node = Node.new()
 	silent.add_user_signal("never")
 	tools.frame_drawn_signal = Signal(silent, "never")
@@ -1037,7 +1026,7 @@ func _check_capture_bounded_wait() -> void:
 	tools.frame_drawn_signal = Signal()
 	tools.hide_note()
 	silent.free()
-	await _free(game)
+	await free_tools_game(game)
 
 
 ## The first problem with the drawn names in [param geometry], or empty: a name over a protected
@@ -1085,13 +1074,8 @@ func _rect(values: Array) -> Rect2:
 ## For capture drivers: a capture with boxes draws every category into its screenshot whatever page
 ## is up, writes the dump with the geometry, then puts the view back as it was.
 func _check_capture_with_boxes() -> void:
-	var game: Node2D = await _spawn(true)
+	var game: Node2D = await _capture_game()
 	var tools: DebugTools = _tools(game)
-	tools.capture_dir = base + "-captures"
-	game.call("_new_game")
-	game.call("_finish_intro")
-	await _settle(3)
-	tools.zones.set_layer(false, DebugZones.RENDER)
 	var shown_during: Array[bool] = []
 	tools.captured.connect(func(_paths: Dictionary) -> void: shown_during.append(tools.zones.visible and tools.zones.layers[DebugZones.RENDER] and tools.zones.layers[DebugZones.HITBOXES]))
 	var paths: Dictionary = await tools.capture_with_boxes()
@@ -1109,14 +1093,14 @@ func _check_capture_with_boxes() -> void:
 	var next: Dictionary = await tools.capture_with_boxes()
 	_expect(note_during == [false], "the previous capture's note is hidden while the next capture's frame is drawn (%s)" % [note_during])
 	_expect(tools.note.visible and tools.note_label.text.contains(str(next["json"]).get_file().get_basename()) and tools.note.get_global_rect().is_equal_approx(DebugTools.NOTE_RECT), "then the new capture's path shows in the top band, the zones page being off again")
-	await _send_key(KEY_F12)
+	await tap_key(KEY_F12)
 	var plain: Dictionary = JSON.parse_string(FileAccess.get_file_as_string(str(tools.last_capture["json"])))
 	_expect(tools.last_capture.get("with_boxes") == false and (plain.get("geometry", {}) as Dictionary).get("drawn") == false and not ((plain.get("geometry", {}) as Dictionary).get("render_boxes", []) as Array).is_empty(), "F12 with the overlay off reports the boxes as numbers without drawing them")
 	tools.hide_note()
 	_expect(_idle(tools), "after both captures the tools are idle again")
 	tools.debug_build = false
 	_expect((await tools.capture_with_boxes()).is_empty(), "hidden tools write no capture with boxes")
-	await _free(game)
+	await free_tools_game(game)
 
 
 ## The debug menu with a keyboard and a controller: backquote, L3 + R3, Esc and B open and close it,
@@ -1124,14 +1108,14 @@ func _check_capture_with_boxes() -> void:
 ## page's tab and moves into the page, Enter works its switches, LB and RB turn the pages, Android
 ## Back closes it, and it will not open over the game's own Pause.
 func _check_menu_keyboard_and_controller() -> void:
-	var game: Node2D = await _spawn(true)
+	var game: Node2D = await spawn_tools_game(base, true)
 	var tools: DebugTools = _tools(game)
 	var menu: DebugMenu = tools.menu
 	game.call("_new_game")
 	game.call("_finish_intro")
-	await _settle(3)
+	await settle(3)
 	tools.set_overlay_mode(DebugTools.Overlay.STATE)
-	await _send_key(KEY_QUOTELEFT)
+	await tap_key(KEY_QUOTELEFT)
 	_expect(menu.is_open and paused and menu.panel.is_visible_in_tree() and tools.layer.visible, "backquote opens the debug menu and holds the game still")
 	_expect(tools.overlay.visible and tools.is_processing(), "the overlay stays up and refreshing beside the open menu")
 	await process_frame
@@ -1141,23 +1125,23 @@ func _check_menu_keyboard_and_controller() -> void:
 		_expect(not card.intersects((game.get_node(path) as Control).get_global_rect()), "the menu card leaves %s clear" % path.get_file())
 	var focus: Control = root.gui_get_focus_owner()
 	_expect(focus == menu.tab_buttons[menu.page], "keyboard focus starts on the open page's tab (%s)" % focus)
-	await _send_key(KEY_RIGHT)
+	await tap_key(KEY_RIGHT)
 	_expect(menu.page == &"choices" and root.gui_get_focus_owner() == menu.tab_buttons[&"choices"], "moving along the tabs turns the page")
 	var chosen: Array[StringName] = []
 	for id: StringName in DebugMenu.PAGES:
 		if (menu.tab_buttons[id] as Button).button_pressed:
 			chosen.append(id)
 	_expect(chosen == [&"choices"], "only the open page's tab shows as chosen (%s)" % [chosen])
-	await _send_key(KEY_RIGHT)
-	await _send_key(KEY_DOWN)
+	await tap_key(KEY_RIGHT)
+	await tap_key(KEY_DOWN)
 	focus = root.gui_get_focus_owner()
 	_expect(menu.page == &"cheats" and focus is Button and (menu.pages[&"cheats"] as Control).is_ancestor_of(focus), "down moves focus into the page (%s)" % focus)
 	(menu.buttons["cheat:invincible"] as Button).grab_focus()
-	await _send_key(KEY_ENTER)
+	await tap_key(KEY_ENTER)
 	_expect(tools.actions.invincible and (menu.buttons["cheat:invincible"] as Button).text.ends_with("ON") and tools.cheats_used, "Enter on a switch turns the cheat on and says so")
-	await _send_key(KEY_ENTER)
+	await tap_key(KEY_ENTER)
 	_expect(not tools.actions.invincible and (menu.buttons["cheat:invincible"] as Button).text.ends_with("OFF"), "and off again")
-	await _send_key(KEY_ESCAPE)
+	await tap_key(KEY_ESCAPE)
 	_expect(not menu.is_open and not paused and not menu.visible and tools.overlay.visible, "Esc closes the menu and the game runs again; the overlay stays")
 	_expect(not game.get("pause_overlay").visible, "the Esc that closed the menu did not also open Pause")
 	await _send_pad(JOY_BUTTON_LEFT_STICK, true)
@@ -1184,29 +1168,29 @@ func _check_menu_keyboard_and_controller() -> void:
 	game.call("_resume_game")
 	await process_frame
 	game.call("_return_to_title")
-	await _settle(2)
+	await settle(2)
 	var title_button: Control = game.call("_title_first_button")
-	await _send_key(KEY_QUOTELEFT)
+	await tap_key(KEY_QUOTELEFT)
 	_expect(menu.is_open and paused and game.get("title_open"), "the menu opens on the title too")
-	await _send_key(KEY_ESCAPE)
+	await tap_key(KEY_ESCAPE)
 	_expect(not menu.is_open and not paused and root.gui_get_focus_owner() == title_button, "closing it on the title gives focus back to the title (%s)" % root.gui_get_focus_owner())
 	tools.set_overlay_mode(DebugTools.Overlay.OFF)
 	tools.hide_note()
 	_expect(_idle(tools), "closed, the menu costs nothing")
-	await _free(game)
+	await free_tools_game(game)
 
 
 ## The menu on touch: DEBUG opens it with no focus ring, tabs and buttons answer taps, a tap outside
 ## the card or CLOSE closes it; and on every page each button is tall enough to tap and wide enough
 ## for its whole label.
 func _check_menu_touch_and_layout() -> void:
-	var game: Node2D = await _spawn(true)
+	var game: Node2D = await spawn_tools_game(base, true)
 	var tools: DebugTools = _tools(game)
 	var menu: DebugMenu = tools.menu
 	_clean_save()
 	game.call("_new_game")
 	game.call("_finish_intro")
-	await _settle(2)
+	await settle(2)
 	await _touch(Vector2(480.0, 200.0))
 	game.set("touch_enabled", true)
 	tools.call("_refresh_view")
@@ -1254,30 +1238,26 @@ func _check_menu_touch_and_layout() -> void:
 	menu.show_page(&"view")
 	(menu.buttons["view:capture"] as Button).pressed.emit()
 	_expect(not menu.is_open and not paused, "BUG CAPTURE closes the menu first, so the capture shows the game")
-	await _settle(4)
+	await settle(4)
 	var json_path: String = str(tools.last_capture.get("json", ""))
 	var data: Variant = JSON.parse_string(FileAccess.get_file_as_string(json_path)) if FileAccess.file_exists(json_path) else null
 	_expect(data is Dictionary and ((data as Dictionary).get("debug") as Dictionary).get("menu_open") == false and ((data as Dictionary).get("debug") as Dictionary).has("cheats"), "then saves the capture, whose dump lists the cheats and presets")
 	tools.hide_note()
-	await _free(game)
+	await free_tools_game(game)
 
 
 ## The note a menu action leaves (a jump, a forced knockdown, a capture's path) sits clear of the
 ## state card, the menu card, the HUD, the controls and the answers, wraps a long path onto its two
 ## lines, and the menu hides it when it opens (its own status line takes over).
 func _check_note_placement() -> void:
-	var game: Node2D = await _spawn(true)
+	var game: Node2D = await spawn_tools_game(base, true)
 	var tools: DebugTools = _tools(game)
 	game.call("_new_game")
 	game.call("_finish_intro")
-	await _settle(3)
+	await settle(3)
 	tools.set_overlay_mode(DebugTools.Overlay.ZONES)
 	for touch: bool in [false, true]:
-		game.set("touch_enabled", touch)
-		game.call("_refresh_ui")
-		tools.call("_refresh_view")
-		tools.show_note("Saved user://debug-captures/2026-10-11_12-34-56.png")
-		await process_frame
+		await _show_capture_note(game, tools, touch)
 		var rect: Rect2 = tools.note.get_global_rect()
 		var layout: String = "touch" if touch else "keyboard"
 		_expect(Rect2(0.0, 0.0, 960.0, 540.0).encloses(rect), "the %s note is on screen (%s)" % [layout, rect])
@@ -1291,11 +1271,7 @@ func _check_note_placement() -> void:
 	# Without the zones page the note keeps to the top band, clear of the HUD and the tools' own cards.
 	tools.set_overlay_mode(DebugTools.Overlay.STATE)
 	for touch: bool in [false, true]:
-		game.set("touch_enabled", touch)
-		game.call("_refresh_ui")
-		tools.call("_refresh_view")
-		tools.show_note("Saved user://debug-captures/2026-10-11_12-34-56.png")
-		await process_frame
+		await _show_capture_note(game, tools, touch)
 		var band: Rect2 = tools.note.get_global_rect()
 		var layout: String = "touch" if touch else "keyboard"
 		_expect(band.is_equal_approx(DebugTools.NOTE_RECT) and band.end.y <= 78.0, "with no zones legend the %s note sits in the top band (%s)" % [layout, band])
@@ -1312,7 +1288,7 @@ func _check_note_placement() -> void:
 			for mode: int in [DebugTools.Overlay.STATE, DebugTools.Overlay.ZONES]:
 				tools.set_overlay_mode(mode)
 				tools.show_note(tools.actions.jump(id))
-				await _settle(3)
+				await settle(3)
 				var placed: Rect2 = tools.note.get_global_rect()
 				var room: JunctionRoom = game.get("junction_room") as JunctionRoom
 				var tank: Rect2 = game.get_viewport().get_canvas_transform() * Rect2(room.tank.global_position - JunctionRoom.TANK_SIZE * 0.5, JunctionRoom.TANK_SIZE)
@@ -1325,7 +1301,7 @@ func _check_note_placement() -> void:
 	game.call("_refresh_ui")
 	tools.actions.jump(&"corridor_start")
 	tools.set_overlay_mode(DebugTools.Overlay.ZONES)
-	await _settle(2)
+	await settle(2)
 	tools.open_menu()
 	_expect(tools.menu.is_open and not tools.note.visible, "opening the menu hides the note")
 	(tools.menu.buttons["jump:corridor_start"] as Button).pressed.emit()
@@ -1333,14 +1309,14 @@ func _check_note_placement() -> void:
 	_expect(not tools.menu.is_open and tools.note.visible and tools.note_label.text.begins_with("Jumped to") and not tools.note.get_global_rect().intersects(tools.overlay.get_global_rect()), "a jump's note shows beside the state card, not over it")
 	tools.hide_note()
 	tools.cheats_used = false
-	await _free(game)
+	await free_tools_game(game)
 
 
 ## Every jump lands on its beat through the game's own steps: the right room, beat, objective and
 ## progress, the checkpoint on disk exactly when play would have written one, the game running, and
 ## the cheats flag set. A jump from the menu's own button closes the menu so the beat plays.
 func _check_jumps() -> void:
-	var game: Node2D = await _spawn(true)
+	var game: Node2D = await spawn_tools_game(base, true)
 	var tools: DebugTools = _tools(game)
 	var actions: DebugActions = tools.actions
 	var save_path: String = str(game.get("save_path"))
@@ -1360,7 +1336,7 @@ func _check_jumps() -> void:
 		_clean_save()
 		tools.cheats_used = false
 		var note: String = actions.jump(id)
-		await _settle(3)
+		await settle(3)
 		var snapshot: Dictionary = game.call("debug_snapshot")
 		var row: Array = expected[id]
 		var state: M0State = game.get("state") as M0State
@@ -1372,90 +1348,90 @@ func _check_jumps() -> void:
 			_expect(saved != null and JSON.stringify(saved.to_dict()) == JSON.stringify(M0State.from_dict(game.get("beat_snapshot")).to_dict()) and saved.chapter_id == state.chapter_id, "jump %s's checkpoint is a valid save of the beat on screen" % id)
 	# What each beat holds, with the default choices (told, WOLF takes the relay; WOLF's readout; WOLF draws it).
 	actions.jump(&"opening")
-	await _settle(2)
+	await settle(2)
 	_expect(game.get("intro_active") and int(game.get("intro_step")) == 0, "OPENING starts the opening's first beat")
 	actions.jump(&"corridor_start")
-	await _settle(2)
+	await settle(2)
 	_expect((game.get("state") as M0State).memory.is_empty() and (game.get_node("Human") as M0Actor).controlled and str(game.call("_objective")) == "CHECK THE BREAKER", "CORRIDOR START hands over control at the start of the corridor")
 	actions.jump(&"relay_question")
-	await _settle(2)
+	await settle(2)
 	_expect(game.get("waiting_for_choice") and game.get("choice_context") == "relay" and game.get("stakes_spoken") and str(game.get("status_line")).begins_with(str(game.get_script().get_script_constant_map()["RELAY_QUESTION"])), "RELAY QUESTION has WOLF asking at the breaker, after his purge stakes")
 	game.call("_answer_choice", 1)
 	_expect((game.get("state") as M0State).memory.get("choice_id") == M0State.DISCLOSE, "and the question answers as usual")
 	actions.jump(&"safe_point")
-	await _settle(2)
+	await settle(2)
 	var state: M0State = game.get("state")
 	_expect(state.checkpoint_reached and state.route == "cooperate" and state.memory.get("choice_id") == M0State.DISCLOSE and str(game.call("_objective")) == "SAFE POINT REACHED", "CORRIDOR SAFE POINT: the seal opened by WOLF and the first checkpoint")
 	actions.jump(&"records_mirror")
-	await _settle(2)
+	await settle(2)
 	state = game.get("state")
 	_expect(state.chapter_id == "records" and state.purge_trace_preserved and state.mirror_trace_preserved and state.mirror_route == "wolf" and str(game.call("_objective")) == "REACH EXIT", "RECORDS, MIRROR COPIED: both traces, by WOLF's readout")
 	actions.jump(&"junction_a")
-	await _settle(2)
+	await settle(2)
 	state = game.get("state")
 	_expect(state.chapter_id == "junction" and not state.door_blown and (game.get("pressure_line") as PressureLine).state == &"idle" and (game.get("sentry_brain") as SentryBrain).state == &"dormant", "JUNCTION SAVE A: the sealed door, an idle line and a dormant sentry")
 	actions.jump(&"lane")
-	await _settle(2)
+	await settle(2)
 	state = game.get("state")
 	_expect(state.door_blown and not state.sentry_down and game.get("lane_choice") == "wolf" and game.get("wolf_baiting") and not game.get("waiting_for_choice") and str(game.call("_objective")) == "DROP THE TANK", "AFTER THE BLAST / LANE: the door down, WOLF asked at the rubble and drawing the sentry")
 	_expect(M0State.load_from_disk(save_path).door_blown, "its checkpoint is autosave B")
 	actions.jump(&"tank_down")
-	await _settle(2)
+	await settle(2)
 	state = game.get("state")
 	_expect(state.sentry_down and state.lane_recap == "wolf" and (game.get("sentry_brain") as SentryBrain).state == &"down" and str(game.call("_objective")) == "POP THE EXIT BOLT", "TANK DOWN: the sentry under the tank, drawn there by WOLF")
 	actions.jump(&"end_of_slice")
-	await _settle(2)
+	await settle(2)
 	var recap: Array[String] = game.call("end_card_recap")
 	_expect(game.get("end_card_active") and (game.get("state") as M0State).junction_cleared and recap.size() == 3 and recap[2].contains("WOLF drew the sentry"), "END OF SLICE: the card with this run's recap")
 	# From the menu itself.
 	tools.open_menu()
 	(tools.menu.buttons["jump:junction_a"] as Button).pressed.emit()
-	await _settle(2)
+	await settle(2)
 	_expect(not tools.menu.is_open and not paused and (game.get("state") as M0State).chapter_id == "junction" and not game.get("end_card_active") and tools.note_label.text.begins_with("Jumped to JUNCTION SAVE A"), "the menu's JUNCTION SAVE A button jumps, closes the menu and says so over the game")
 	tools.hide_note()
-	await _free(game)
+	await free_tools_game(game)
 
 
 ## The presets reach every jump that uses them, through the game's own rules: a rushed relay leaves
 ## WOLF refusing and the engineer cranking the bypass, a told one then cranked keeps the bypass route,
 ## the manual mirror, and each lane answer (WOLF draws it, alone, or he refuses after a rushed relay).
 func _check_jump_presets() -> void:
-	var game: Node2D = await _spawn(true)
+	var game: Node2D = await spawn_tools_game(base, true)
 	var tools: DebugTools = _tools(game)
 	var actions: DebugActions = tools.actions
 	actions.set_relay(&"press")
 	actions.set_mirror(&"manual")
 	_expect(actions.lane == &"refused", "a rushed relay makes the lane preset WOLF REFUSES")
 	actions.jump(&"records_mirror")
-	await _settle(2)
+	await settle(2)
 	var state: M0State = game.get("state")
 	_expect(state.memory.get("choice_id") == M0State.PRESS and state.route == "fallback" and state.mirror_route == "manual", "rushed relay: the engineer cranked the bypass; the mirror copied by hand")
 	actions.jump(&"lane")
-	await _settle(2)
+	await settle(2)
 	_expect(game.get("lane_choice") == "refused" and not game.get("wolf_baiting") and str(game.get("status_line")) == str(game.get_script().get_script_constant_map()["BAIT_NO_LINE"]), "asked to draw the sentry after a rushed relay, WOLF refuses in his own words")
 	actions.jump(&"end_of_slice")
-	await _settle(2)
+	await settle(2)
 	var recap: Array[String] = game.call("end_card_recap")
 	_expect(recap[0].contains("rushed WOLF") and recap[1].contains("maintenance port") and recap[2].contains("wouldn't draw it"), "the END OF SLICE recap tells this run (%s)" % [recap])
 	actions.set_relay(&"disclose_bypass")
 	_expect(actions.lane == &"wolf", "told the risk again, the lane preset goes back to WOLF")
 	actions.set_lane(&"alone")
 	actions.jump(&"safe_point")
-	await _settle(2)
+	await settle(2)
 	state = game.get("state")
 	_expect(state.memory.get("choice_id") == M0State.DISCLOSE and state.route == "fallback" and (game.get("bypass_handle") as BypassHandle).done, "told, then cranked: the bypass route with WOLF told the risk")
 	actions.jump(&"lane")
-	await _settle(2)
+	await settle(2)
 	_expect(game.get("lane_choice") == "alone" and not game.get("wolf_baiting") and (game.call("debug_snapshot")["wolf"] as Dictionary)["why"] == "hold: at the rubble", "ALONE: WOLF holds at the rubble while the engineer times it")
 	actions.jump(&"tank_down")
-	await _settle(2)
+	await settle(2)
 	_expect((game.get("state") as M0State).lane_recap == "alone", "and the fall is saved as timed alone")
-	await _free(game)
+	await free_tools_game(game)
 
 
 ## WOLF's lane answer follows the relay rule, so presets the rule rules out change with it, and say so.
 func _check_choice_rules() -> void:
-	var game: Node2D = await _spawn(true)
+	var game: Node2D = await spawn_tools_game(base, true)
 	var actions: DebugActions = _tools(game).actions
 	_expect(actions.relay == &"disclose_wolf" and actions.mirror == &"wolf" and actions.lane == &"wolf", "the presets start on the told, WOLF route")
 	var note: String = actions.set_lane(&"refused")
@@ -1475,18 +1451,18 @@ func _check_choice_rules() -> void:
 	_expect(actions.relay == &"press" and (tools.menu.buttons["relay:press"] as Button).button_pressed and not (tools.menu.buttons["relay:disclose_wolf"] as Button).button_pressed and tools.menu.note_label.text.begins_with("Relay: RUSHED"), "the menu's relay buttons pick one and show the note")
 	_expect(not tools.cheats_used, "choosing presets alone is not a cheat")
 	tools.menu.close()
-	await _free(game)
+	await free_tools_game(game)
 
 
 ## Invincible: the vent, the cloud, a chasing sentry and the door blast knock nobody down (the door
 ## blows as if the engineer were clear), and with it off the same contact knocks down again.
 func _check_invincible() -> void:
-	var game: Node2D = await _spawn(true)
+	var game: Node2D = await spawn_tools_game(base, true)
 	var tools: DebugTools = _tools(game)
 	var actions: DebugActions = tools.actions
 	var room: JunctionRoom = game.get("junction_room")
 	actions.jump(&"junction_a")
-	await _settle(2)
+	await settle(2)
 	tools.cheats_used = false
 	actions.set_invincible(true)
 	_expect(tools.cheats_used and game.call("_debug_spares_knockdown"), "invincibility is on, and a cheat")
@@ -1502,28 +1478,28 @@ func _check_invincible() -> void:
 	_expect(M0State.load_from_disk(str(game.get("save_path"))).door_blown, "and autosave B is written as usual")
 	actions.set_lane(&"alone")
 	actions.jump(&"lane")
-	await _settle(2)
+	await settle(2)
 	actions.set_invincible(true)
 	human.position.x = 760.0
 	await create_timer(1.6).timeout
 	var brain: SentryBrain = game.get("sentry_brain")
 	_expect(brain.state == &"chase" and brain.touches(human.position.x) and not game.get("fail_active"), "a chasing sentry on the engineer knocks nobody down (%s at %.0f, engineer %.0f)" % [brain.state, brain.x, human.position.x])
 	actions.set_invincible(false)
-	await _settle(3)
+	await settle(3)
 	_expect(game.get("fail_active"), "with invincibility off the same contact knocks down")
 	game.call("_cancel_fail")
-	await _free(game)
+	await free_tools_game(game)
 
 
 ## Freeze sentry holds the sentry where it is; instant crank finishes the junction valve and the
 ## corridor's MANUAL BYPASS through the game's own crank as soon as interact is held at them.
 func _check_freeze_and_instant_crank() -> void:
-	var game: Node2D = await _spawn(true)
+	var game: Node2D = await spawn_tools_game(base, true)
 	var tools: DebugTools = _tools(game)
 	var actions: DebugActions = tools.actions
 	actions.set_lane(&"alone")
 	actions.jump(&"lane")
-	await _settle(2)
+	await settle(2)
 	var brain: SentryBrain = game.get("sentry_brain")
 	actions.set_sentry_frozen(true)
 	var at: float = brain.x
@@ -1535,50 +1511,50 @@ func _check_freeze_and_instant_crank() -> void:
 	_expect(not is_equal_approx(brain.x, at), "unfrozen it patrols on")
 	# The valve.
 	actions.jump(&"junction_a")
-	await _settle(2)
+	await settle(2)
 	actions.set_instant_crank(true)
 	_expect(actions.is_processing(), "instant crank works each frame while it is on")
 	var line: PressureLine = game.get("pressure_line")
 	line.arm()
 	var human: M0Actor = game.get_node("Human") as M0Actor
 	human.position.x = float(game.get_script().get_script_constant_map()["VALVE_CRANK_X"])
-	await _settle(2)
+	await settle(2)
 	Input.action_press(&"interact")
-	await _settle(4)
+	await settle(4)
 	Input.action_release(&"interact")
 	_expect(line.state in [&"charged", &"fuse"] and line.turns == PressureLine.TURNS_NEEDED and str(game.get("status_line")).to_upper().begins_with("FUSE LIT"), "holding interact at the valve lands all three turns at once, and the game says the fuse is lit (%s)" % line.state)
 	human.position.x = 120.0
 	# The bypass, after a rushed relay.
 	actions.jump(&"corridor_start")
-	await _settle(2)
+	await settle(2)
 	var state: M0State = game.get("state")
 	state.record_choice(M0State.PRESS)
 	state.arm_breaker()
 	game.call("_update_controls")
 	human.position.x = float(game.get_script().get_script_constant_map()["BYPASS_CRANK_X"])
-	await _settle(2)
+	await settle(2)
 	Input.action_press(&"interact")
-	await _settle(4)
+	await settle(4)
 	Input.action_release(&"interact")
 	_expect(state.door_open and state.route == "fallback" and (game.get("bypass_handle") as BypassHandle).done, "holding interact at the MANUAL BYPASS cranks it over at once and the seal opens")
 	actions.set_instant_crank(false)
 	_expect(not actions.is_processing(), "off, it stops working each frame")
-	await _free(game)
+	await free_tools_game(game)
 
 
 ## Slow motion: 0.5x and 0.25x hold Engine.time_scale there (coming back after a hit-stop), 1x puts it
 ## back and stops the per-frame work.
 func _check_slow_motion() -> void:
-	var game: Node2D = await _spawn(true)
+	var game: Node2D = await spawn_tools_game(base, true)
 	var tools: DebugTools = _tools(game)
 	var actions: DebugActions = tools.actions
 	actions.jump(&"corridor_start")
-	await _settle(2)
+	await settle(2)
 	actions.set_slow_motion(0.5)
 	_expect(is_equal_approx(Engine.time_scale, 0.5) and actions.is_processing() and tools.cheats_used, "0.5x slows the game")
 	(game.get("impact") as Impact).end_hit_stop()
 	_expect(is_equal_approx(Engine.time_scale, 1.0), "(a hit-stop ending puts the speed back for a moment)")
-	await _settle(2)
+	await settle(2)
 	_expect(is_equal_approx(Engine.time_scale, 0.5), "and slow motion takes it again the next frame")
 	actions.set_slow_motion(0.25)
 	_expect(is_equal_approx(Engine.time_scale, 0.25), "0.25x")
@@ -1591,36 +1567,36 @@ func _check_slow_motion() -> void:
 	tools.menu.close()
 	_expect(is_equal_approx(Engine.time_scale, 1.0) and not actions.is_processing(), "1x is full speed again with no per-frame work")
 	tools.set_overlay_mode(DebugTools.Overlay.OFF)
-	await _free(game)
+	await free_tools_game(game)
 
 
 ## Frame step holds the game still and lets exactly one frame through per step: from code, period,
 ## RB and the STEP button; Esc (or RUN) plays on. The bar shows only while stepping with the menu shut.
 func _check_frame_step() -> void:
-	var game: Node2D = await _spawn(true)
+	var game: Node2D = await spawn_tools_game(base, true)
 	var tools: DebugTools = _tools(game)
 	var actions: DebugActions = tools.actions
 	var menu: DebugMenu = tools.menu
 	actions.jump(&"corridor_start")
-	await _settle(2)
+	await settle(2)
 	var probe: Node = _frame_probe()
 	game.add_child(probe)
 	actions.set_frame_step(true)
 	_expect(paused and menu.step_bar.visible and menu.visible and tools.layer.visible and not actions.is_processing(), "frame step holds the game still and shows its bar, with no per-frame work")
 	var frames: int = int(probe.get("frames"))
-	await _settle(3)
+	await settle(3)
 	_expect(int(probe.get("frames")) == frames, "nothing runs between steps")
 	actions.step_frame()
-	await _settle(4)
+	await settle(4)
 	_expect(int(probe.get("frames")) == frames + 1 and paused and actions.frames_stepped == 1 and menu.step_label.text == "FRAME STEP  1", "one step lets exactly one frame through (%d)" % (int(probe.get("frames")) - frames))
-	await _send_key(KEY_PERIOD)
-	await _settle(2)
+	await tap_key(KEY_PERIOD)
+	await settle(2)
 	_expect(int(probe.get("frames")) == frames + 2 and paused, "period steps one frame")
 	await _tap_pad(JOY_BUTTON_RIGHT_SHOULDER)
-	await _settle(2)
+	await settle(2)
 	_expect(int(probe.get("frames")) == frames + 3 and paused, "RB steps one frame")
 	menu.step_button.pressed.emit()
-	await _settle(2)
+	await settle(2)
 	_expect(int(probe.get("frames")) == frames + 4 and paused, "the STEP button steps one frame")
 	var bar: Rect2 = menu.step_bar.get_global_rect()
 	for path: String in ["CanvasLayer/PauseButton", "CanvasLayer/TopBar", "CanvasLayer/TutorialPrompt", "CanvasLayer/ContextHint"]:
@@ -1629,8 +1605,8 @@ func _check_frame_step() -> void:
 	_expect(menu.is_open and not menu.step_bar.visible and paused, "the menu opens over frame stepping and the bar steps aside")
 	menu.close()
 	_expect(paused and menu.step_bar.visible, "closing the menu goes back to stepping, still held")
-	await _send_key(KEY_ESCAPE)
-	await _settle(2)
+	await tap_key(KEY_ESCAPE)
+	await settle(2)
 	_expect(not actions.frame_step and not paused and not menu.step_bar.visible and not game.get("pause_overlay").visible and int(probe.get("frames")) > frames + 4, "Esc plays on without opening Pause")
 	actions.set_frame_step(true)
 	menu.run_button.pressed.emit()
@@ -1645,37 +1621,37 @@ func _check_frame_step() -> void:
 	var brain: SentryBrain = game.get("sentry_brain") as SentryBrain
 	var held: int = int(probe.get("frames"))
 	var sentry_x: float = brain.x
-	await _settle(30)
+	await settle(30)
 	_expect(not menu.is_open and actions.frame_step and paused and menu.step_bar.visible and int(probe.get("frames")) == held and brain.x == sentry_x, "a jump from the menu while frame stepping stays held (%d frames ran, sentry moved %.1f px)" % [int(probe.get("frames")) - held, brain.x - sentry_x])
 	actions.step_frame()
-	await _settle(2)
+	await settle(2)
 	_expect(int(probe.get("frames")) == held + 1 and paused, "after a jump the next step lets one frame through")
 	tools.open_menu()
 	(menu.buttons["save:reload"] as Button).pressed.emit()
 	held = int(probe.get("frames"))
-	await _settle(10)
+	await settle(10)
 	_expect(not menu.is_open and actions.frame_step and paused and menu.step_bar.visible and int(probe.get("frames")) == held, "RELOAD CHECKPOINT while frame stepping stays held too")
 	actions.jump(&"tank_down")
 	held = int(probe.get("frames"))
-	await _settle(10)
+	await settle(10)
 	_expect(actions.frame_step and paused and int(probe.get("frames")) == held, "a script's jump while frame stepping stays held")
 	actions.set_frame_step(false)
 	_expect(not paused, "frame step off plays on after a jump")
 	tools.cheats_used = false
 	tools.hide_note()
 	probe.free()
-	await _free(game)
+	await free_tools_game(game)
 
 
 ## Forcing: each knockdown lands with its own card through the one knockdown path, even while
 ## invincible, and its checkpoint comes back; none outside the junction; the door fuse and the tank
 ## drop run through the room's own rules.
 func _check_forcing() -> void:
-	var game: Node2D = await _spawn(true)
+	var game: Node2D = await spawn_tools_game(base, true)
 	var tools: DebugTools = _tools(game)
 	var actions: DebugActions = tools.actions
 	actions.jump(&"corridor_start")
-	await _settle(2)
+	await settle(2)
 	var note: String = actions.force_knockdown(&"vent")
 	_expect(not game.get("fail_active") and note.contains("Service Junction"), "no knockdown is forced outside the junction, and it says why")
 	_expect(not actions.trigger_blast().is_empty() and not game.get("fail_active") and actions.drop_blocked().contains("Service Junction"), "nor the fuse or the tank")
@@ -1683,19 +1659,19 @@ func _check_forcing() -> void:
 	var cards: Dictionary = {&"vent": JunctionRoom.VENT_REASON, &"blast": JunctionRoom.BLAST_REASON, &"cloud": JunctionRoom.CLOUD_REASON}
 	for kind: StringName in DebugActions.KNOCKDOWNS:
 		actions.jump(&"lane" if kind == &"sentry" else &"junction_a")
-		await _settle(2)
+		await settle(2)
 		var expected: String = str(game.call("_sentry_reason")) if kind == &"sentry" else str(cards[kind]) % str(game.call("_first_name"))
 		note = actions.force_knockdown(kind)
 		_expect(game.get("fail_active") and str(game.get("status_line")) == expected and note == "Forced the %s knockdown." % kind, "forcing the %s knockdown plays it with its own card, even while invincible" % kind)
 		_expect(actions.force_knockdown(kind).contains("already"), "a second force waits for the first")
 	# RETRY on the knockdown card (Q17), pressed the way every suite presses it; the check below says
 	# whether the room came back.
-	await Suite.retry(game, 240)
+	await retry(game, 240)
 	_expect(not game.get("fail_active") and str(game.get("status_line")).contains(str(game.get_script().get_script_constant_map()["RESTORE_FROM_DISK_LINE"])) and (game.get("state") as M0State).chapter_id == "junction" and not (game.get("state") as M0State).door_blown, "the forced knockdown brings back the beat's checkpoint (junction save A)")
 	actions.set_invincible(false)
 	# The door fuse, the engineer clear of the blast.
 	actions.jump(&"junction_a")
-	await _settle(2)
+	await settle(2)
 	note = actions.trigger_blast()
 	var line: PressureLine = game.get("pressure_line")
 	_expect(line.state in [&"charged", &"fuse"] and note.begins_with("Fuse lit") and str(game.get("status_line")).begins_with("FUSE LIT"), "LIGHT THE DOOR FUSE lights it through the pressure line")
@@ -1707,7 +1683,7 @@ func _check_forcing() -> void:
 	# The tank, on a sentry it misses (the engineer's choice still has to come first).
 	actions.set_lane(&"alone")
 	actions.jump(&"lane")
-	await _settle(2)
+	await settle(2)
 	var brain: SentryBrain = game.get("sentry_brain")
 	brain.x = DropArm.MARK_X + 120.0
 	actions.set_sentry_frozen(true)
@@ -1718,7 +1694,7 @@ func _check_forcing() -> void:
 	_expect(arm.state == &"rewinding" and not (game.get("state") as M0State).sentry_down, "with the sentry off the brackets it misses, as in play")
 	_expect(actions.trigger_drop().contains("wait for the clamp"), "while it rewinds it waits for the clamp")
 	actions.jump(&"lane")
-	await _settle(2)
+	await settle(2)
 	brain.x = DropArm.MARK_X
 	actions.trigger_drop()
 	await create_timer(DropArm.FALL_SECONDS + 0.2).timeout
@@ -1744,7 +1720,7 @@ func _check_forcing() -> void:
 	game.call("_cancel_fail")
 	impact.reset()
 	actions.jump(&"junction_a")
-	await _settle(2)
+	await settle(2)
 	tools.open_menu()
 	tools.menu.show_page(&"force")
 	(tools.menu.buttons["force:vent"] as Button).pressed.emit()
@@ -1755,23 +1731,23 @@ func _check_forcing() -> void:
 	game.call("_cancel_fail")
 	impact.reset()
 	tools.hide_note()
-	await _free(game)
+	await free_tools_game(game)
 
 
 ## SAVE NOW writes the beat through the game's own autosave (not before the first checkpoint),
 ## RELOAD CHECKPOINT goes back to it, CLEAR SAVE deletes it after a second press, and the title follows.
 func _check_saves() -> void:
-	var game: Node2D = await _spawn(true)
+	var game: Node2D = await spawn_tools_game(base, true)
 	var tools: DebugTools = _tools(game)
 	var actions: DebugActions = tools.actions
 	var save_path: String = str(game.get("save_path"))
 	_clean_save()
 	_expect(actions.save_now().begins_with("Start play"), "nothing to save on the title")
 	actions.jump(&"corridor_start")
-	await _settle(2)
+	await settle(2)
 	_expect(actions.save_now() == str(game.get_script().get_script_constant_map()["NO_CHECKPOINT_NOTE"]) and not FileAccess.file_exists(save_path), "before the first SAFE POINT there is no checkpoint to write")
 	actions.jump(&"records_entry")
-	await _settle(2)
+	await settle(2)
 	var human: M0Actor = game.get_node("Human") as M0Actor
 	human.position.x = 400.0
 	(game.get("state") as M0State).preserve_purge_trace()
@@ -1782,7 +1758,7 @@ func _check_saves() -> void:
 	human.position.x = 700.0
 	(game.get("state") as M0State).preserve_mirror_trace("manual")
 	actions.reload_checkpoint()
-	await _settle(2)
+	await settle(2)
 	var state: M0State = game.get("state")
 	_expect(state.purge_trace_preserved and not state.mirror_trace_preserved and is_equal_approx(human.position.x, 400.0), "RELOAD CHECKPOINT goes back to it")
 	tools.open_menu()
@@ -1796,24 +1772,24 @@ func _check_saves() -> void:
 	tools.menu.close()
 	_expect(actions.reload_checkpoint() == "No checkpoint to reload.", "with nothing on disk, reload says so")
 	actions.jump(&"safe_point")
-	await _settle(2)
+	await settle(2)
 	game.call("_return_to_title")
-	await _settle(2)
+	await settle(2)
 	_expect(not (game.get("continue_button") as Button).disabled, "a jump's checkpoint lets the title continue")
 	actions.clear_save()
 	_expect((game.get("continue_button") as Button).disabled, "clearing the save on the title greys out Continue")
-	await _free(game)
+	await free_tools_game(game)
 
 
 ## The effect switches reach Main's effects switch and the impact kit's shake and flash; locking the
 ## tools turns every cheat off, puts speed, pause and effects back, closes the menu and leaves them idle.
 func _check_switches_and_lock() -> void:
-	var game: Node2D = await _spawn(true)
+	var game: Node2D = await spawn_tools_game(base, true)
 	var tools: DebugTools = _tools(game)
 	var actions: DebugActions = tools.actions
 	var impact: Impact = game.get("impact")
 	actions.jump(&"corridor_start")
-	await _settle(2)
+	await settle(2)
 	tools.cheats_used = false
 	actions.set_effects(false)
 	_expect(not game.get("effects_enabled") and not (game.get("post_grade") as CanvasItem).visible and not impact.enabled and not tools.cheats_used, "VISUAL EFFECTS off turns off the game's effects switch (not a cheat)")
@@ -1847,7 +1823,7 @@ func _check_switches_and_lock() -> void:
 	_expect(not game.call("_debug_spares_knockdown") and not game.call("_debug_sentry_frozen") and not tools.handle_back(), "Main sees no cheat in force")
 	tools.hide_note()
 	_expect(_idle(tools), "locked, the tools cost nothing per frame")
-	await _free(game)
+	await free_tools_game(game)
 
 
 ## A node that counts the frames it processes (it pauses with the game).
@@ -1862,8 +1838,7 @@ func _frame_probe() -> Node:
 
 func _clean_save() -> void:
 	for path: String in [base + "-save.json", base + "-save.json.tmp"]:
-		if FileAccess.file_exists(path):
-			DirAccess.remove_absolute(ProjectSettings.globalize_path(path))
+		remove_file(path)
 
 
 ## The entry in [param list] whose [param key] is [param value], or empty.
@@ -1902,21 +1877,26 @@ func _on_menu_requested() -> void:
 	menu_requests += 1
 
 
-func _spawn(debug_build: bool) -> Node2D:
-	var game: Node2D = GAME_SCENE.instantiate() as Node2D
-	game.set("settings_path", _settings_path())
-	game.set("save_path", base + "-save.json")
-	game.set("auto_pause_on_focus_loss", false)
-	root.add_child(game)
-	await process_frame
-	_tools(game).debug_build = debug_build
+## A debug-build game in play for the capture checks: captures go to <base>-captures, a new game has
+## started past its intro, 3 process frames have run, and the RENDER category is off.
+func _capture_game() -> Node2D:
+	var game: Node2D = await spawn_tools_game(base, true)
+	var tools: DebugTools = _tools(game)
+	tools.capture_dir = base + "-captures"
+	game.call("_new_game")
+	game.call("_finish_intro")
+	await settle(3)
+	tools.zones.set_layer(false, DebugZones.RENDER)
 	return game
 
 
-func _free(game: Node2D) -> void:
-	paused = false
-	game.queue_free()
-	await process_frame
+## Switches the HUD to the touch layout ([param touch]) or the keyboard one, redraws the tools' view
+## and shows a capture's "Saved <path>" note, then waits one process frame so it is laid out.
+func _show_capture_note(game: Node2D, tools: DebugTools, touch: bool) -> void:
+	game.set("touch_enabled", touch)
+	game.call("_refresh_ui")
+	tools.call("_refresh_view")
+	tools.show_note("Saved user://debug-captures/2026-10-11_12-34-56.png")
 	await process_frame
 
 
@@ -1939,18 +1919,8 @@ func _idle(tools: DebugTools) -> bool:
 
 ## A completed Records run (disclose, WOLF's readout) carried into the junction, with the door blown or not.
 func _junction_state(door_blown: bool) -> M0State:
-	var state: M0State = M0State.new()
-	state.record_choice(M0State.DISCLOSE)
-	state.arm_breaker()
-	state.activate_power("wolf")
-	state.reach_checkpoint()
-	state.enter_records()
-	state.preserve_purge_trace()
-	state.preserve_mirror_trace("wolf")
-	state.complete_chapter()
-	state.enter_junction()
+	var state: M0State = story_state(M0State.DISCLOSE, Story.DOOR_DOWN if door_blown else Story.JUNCTION_ENTERED)
 	if door_blown:
-		state.blow_door()
 		state.human_position = Vector2(500.0, 410.0)
 		state.wolf_position = Vector2(448.0, 423.0)
 	return state
@@ -1958,7 +1928,7 @@ func _junction_state(door_blown: bool) -> M0State:
 
 func _type(word: String) -> void:
 	for letter: String in word:
-		await _send_key(OS.find_keycode_from_string(letter))
+		await tap_key(OS.find_keycode_from_string(letter))
 
 
 ## Each letter as a capital: Shift down, the letter (with its capital's text), the letter up, Shift up.
@@ -1993,16 +1963,6 @@ func _send_letter(letter: String, shift: bool) -> void:
 		await process_frame
 
 
-func _send_key(code: Key) -> void:
-	for pressed: bool in [true, false]:
-		var event: InputEventKey = InputEventKey.new()
-		event.keycode = code
-		event.physical_keycode = code
-		event.pressed = pressed
-		Input.parse_input_event(event)
-		await process_frame
-
-
 func _send_pad(index: JoyButton, pressed: bool) -> void:
 	var event: InputEventJoypadButton = InputEventJoypadButton.new()
 	event.button_index = index
@@ -2028,23 +1988,12 @@ func _touch(canvas_pos: Vector2) -> void:
 		await process_frame
 
 
-func _settle(frames: int) -> void:
-	for _i: int in range(frames):
-		await process_frame
-
-
+## Deletes everything a check may leave in user://: the kit's settings and save files for [member base]
+## and the capture folder with the captures in it.
 func _clean() -> void:
-	for path: String in [_settings_path(), base + "-save.json", base + "-save.json.tmp"]:
-		if FileAccess.file_exists(path):
-			DirAccess.remove_absolute(ProjectSettings.globalize_path(path))
+	remove_tools_files(base)
 	var captures: String = ProjectSettings.globalize_path(base + "-captures")
 	if DirAccess.dir_exists_absolute(captures):
 		for file: String in DirAccess.get_files_at(captures):
 			DirAccess.remove_absolute(captures.path_join(file))
 		DirAccess.remove_absolute(captures)
-
-
-func _expect(condition: bool, label: String) -> void:
-	if not condition:
-		failures += 1
-		push_error("Debug tools check failed: " + label)
