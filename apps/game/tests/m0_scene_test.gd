@@ -115,13 +115,15 @@ func _run() -> void:
 	await _tap_to_step(5)
 	_expect(game.get("intro_step") == 5 and speaker.text == "DIRECTOR" and story.text == "Lock down maintenance. WOLF does not leave this site.", "Director orders lockdown under his own tag")
 	await tap(&"interact")
-	_expect(game.get("intro_step") == 6 and not speaker.visible and story.text == "WOLF turns from the Director and heads for maintenance." and wolf.autonomous_target_x == Main.L1_WOLF_DOORWAY_X, "the narration says WOLF turns from the Director and heads for maintenance as he walks off")
+	_expect(game.get("intro_step") == 6 and not speaker.visible and story.text == "WOLF turns from the Director and heads for maintenance.", "the narration says WOLF turns from the Director and heads for maintenance")
+	_expect(await wait_until(func() -> bool: return wolf.autonomous_target_x == Opening.WOLF_DOORWAY_X and intro_director.position.is_equal_approx(Opening.DIRECTOR_LAST), 180), "the Director steps back to the wall; WOLF walks off toward maintenance")
 	# Round 3c: the opening is main's (76d3a50): nothing is added on the wall behind WOLF's cage.
 	_expect(game.get_node_or_null("OpeningHatch") == null and game.get("opening_hatch") == null, "nothing new stands behind the cage in the opening")
 	await tap(&"interact")
 	await create_timer(0.8).timeout
 	_expect(dock_bay.battery.percent == PropScreen.BATTERY_IDLE and not dock_bay.beacon_on and dock_bay.lock_torn and wolf.body_sprite.texture != DockBay.WOLF_LIE, "after the opening the bay is empty and quiet, the pad on standby, the lock still hanging")
-	_expect(not game.get("intro_active") and not intro_director.visible and human.visible and purge_terminal_art.visible and human.controlled and intro_fade.color.a < 0.01, "opening fades into engineer control and gameplay stations")
+	var view_left: float = (game.get_node("IntroCamera") as Camera2D).get_screen_center_position().x - 960.0 / (game.get_node("IntroCamera") as Camera2D).zoom.x * 0.5
+	_expect(not game.get("intro_active") and (not intro_director.visible or intro_director.position.x < view_left) and human.visible and purge_terminal_art.visible and human.controlled and intro_fade.color.a < 0.01, "opening fades into engineer control and gameplay stations, the Director out of view on his way out")
 	var gameplay_camera: Camera2D = game.get_node("IntroCamera") as Camera2D
 	_expect(gameplay_camera.zoom.x > 1.0 and gameplay_camera.position_smoothing_enabled, "play view is closer and follows the engineer after the opening")
 	var state: M0State = game.get("state") as M0State
