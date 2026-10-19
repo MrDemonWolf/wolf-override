@@ -1,0 +1,104 @@
+---
+title: Localization
+description: How WOLF OVERRIDE will show other languages, which files hold the language work, and the commands that check it.
+---
+
+**What this page is for:** how languages work in the code today, and how to check translation files.
+
+<Callout title="English only for now">
+  The groundwork for more languages is built, but no translation exists yet. The game shows English whatever language your computer uses, and has no language setting. Players: [Platforms and languages](/docs/platforms/).
+</Callout>
+
+## Words used here
+
+- **Localization:** making the game work in another language, including its text, fonts and layout.
+- **Catalog (`.po` file):** one language's translated lines.
+- **Template (`messages.pot`):** every English line the player reads, the file each catalog is made from.
+- **Locale:** a language code such as `es` or `pt_BR`.
+
+## How it works
+
+- **One module:** `apps/game/scripts/i18n.gd` (`I18n`) is the one place that knows which languages exist and which one the game shows.
+- **One table:** `apps/game/i18n/languages.json` lists the planned language files. For each: its name in its own language, whether it is offered, its review state, its fallback font, a reading speed and a row limit.
+- **English stays inside:** constants, saves, comparisons and tests keep the English words. Text is translated only where it is drawn.
+- **Why:** code compares English text (speaker tags, key tokens and the like) and saves store the English choice, so translating earlier would break them.
+- **Nothing is wired yet:** until the next phase connects Settings and the text, nothing changes on screen.
+- **Fonts:** the game never asks the operating system for a missing character. Chinese, Japanese and Korean use Noto Sans subsets that are already bundled but not shown yet. Fonts are credited on [Credits](/docs/credits/#fonts-in-use).
+
+## Where the files are
+
+| Path | What it holds |
+| --- | --- |
+| `apps/game/scripts/i18n.gd` | The language module |
+| `apps/game/i18n/languages.json` | The language table the game and the tools both read |
+| `apps/game/i18n/<code>.po` | Catalogs, one per language (none yet) |
+| `i18n/messages.pot` | The template, outside the game so it is not exported |
+| `i18n/glossary.json` | Fixed terms for each language |
+| `i18n/style/` | The translators' style guides: one shared, one per language |
+| `scripts/i18n/` | The tools below |
+
+- **How a language is reviewed:** [`i18n/README.md`](https://github.com/MrDemonWolf/wolf-override/blob/main/i18n/README.md#review). A language stays labelled "machine translation" until a native speaker reviews it.
+
+## Commands
+
+You need Python 3 (standard library only) and GNU gettext's `msgfmt` (`brew install gettext` on macOS).
+
+- **Template:** regenerate it with Godot's own generator, headless: `scripts/i18n/extract_pot.sh . i18n/messages.pot <log dir>`
+- **Scan list:** fail when `project.godot`'s list of files to scan leaves out a scene or script: `python3 -I -B scripts/i18n/i18n_tool.py potfiles apps/game --check`
+- **Gates:** run every gate on the catalogs; exits 1 on any failure: `python3 -I -B scripts/i18n/i18n_tool.py check i18n/messages.pot apps/game/i18n <report.json>`
+- **Self-test:** check the gates themselves on planted cases: `python3 -I -B scripts/i18n/i18n_tool.py selftest <report.json>`
+- **Glossary:** check the glossary and style guides against each other and the language table: `python3 -I -B scripts/i18n/i18n_tool.py glossary`
+- **Fonts:** rebuild the bundled Chinese, Japanese and Korean font subsets: `python3 -I -B scripts/i18n/i18n_tool.py fonts <download folder>`
+- **Parity capture:** capture the routes in a language, or `pseudo` for padded English: `scripts/parity/run.sh capture --language <code> <out dir>`
+
+<Details>
+<Summary>Template: when to run it and what it touches</Summary>
+
+- Run it after changing any text the player reads, and commit `i18n/messages.pot`.
+- It puts a small editor plugin into `apps/game/addons/` and an entry into `project.godot` for one editor run, and takes both out again afterwards, so commit only the template.
+- CI regenerates it and fails when the committed template differs.
+- `potfiles` without `--check` prints the line to paste into `locale/translations_pot_files`.
+
+</Details>
+
+<Details>
+<Summary>The gates `check` runs</Summary>
+
+- Placeholders, BBCode, speaker tags, line breaks, the key token and the alphabet.
+- The glossary in `i18n/glossary.json`: both its required words and the words it says to avoid.
+- The engineer is never given a gender; Slavic name endings.
+- Plural forms and their header.
+- Sibling files, such as the two Chinese and two Spanish files.
+- Comments that would make Godot skip a line.
+- `--back <file>` adds a back-translation's checks.
+- `--release` adds the release gates: no fuzzy line in a language marked reviewed, no untranslated line marked as story.
+- With no catalogs yet, it checks nothing and passes.
+
+</Details>
+
+<Details>
+<Summary>Self-test, glossary and fonts in detail</Summary>
+
+- **`selftest`** runs the gates on 155 planted cases (115 for the line, plural, comment and sibling gates, 9 for the release gates, 16 for the glossary on its real terms and 15 broken copies of the glossary and style guides). It fails if any planted error passes or any clean line fails.
+- **`glossary`** checks that every one of the 10 languages' 11 files (Italian and Ukrainian, Tier 1, are not covered yet) has a form for every term and a guide with the same sections, that every word is in its language's alphabet, and that a term still left to reviewers requires nothing. It exits 1 on any problem.
+- **`fonts`** downloads the Noto Sans CJK 2.004 release files from GitHub into the folder (unless they are there), checks each font's SHA-256, and cuts Noto Sans JP, KR, SC and TC down to each language's fixed common character set with HarfBuzz's `hb-subset` (`brew install harfbuzz`). It writes the symbols font Roboto chains and the character lists in `apps/game/tests/support/cjk_charsets.json`, and prints the sizes. Its output is committed, so it only runs again to change a character set.
+- **Parity capture:** takes any language of `apps/game/i18n/languages.json`, or `pseudo` for English with Godot's pseudolocalization (brackets and 30% padding). Every still's entry in `shots.json` lists the visible text that overflows its control, the characters its font cannot draw and, under `pseudo`, the text that was not translated.
+
+</Details>
+
+## Checks in CI
+
+- **`godot` job:** regenerates the template and fails when the committed one differs.
+- **`i18n` job:** `selftest`, `glossary`, `potfiles --check` and `check`. It needs no Godot.
+- **Headless suite:** `i18n_test` checks the language table, locale lookup and fonts. What it found: [What was checked](/docs/development/evidence/#languages-october-16-2026).
+- **Every suite runs in English** (`--language en`), whatever your computer's language.
+
+## Add a language (later)
+
+Each language comes in its own pull request. There is no translation website.
+
+1. Write the catalog `apps/game/i18n/<code>.po` from the template, following the glossary and style guides.
+2. Run `i18n_tool.py check`, with `--back` for an independent back-translation.
+3. Turn the language on in `languages.json` and register its catalog in `project.godot`; `i18n_test` fails if the offered languages, the files and the registered catalogs differ.
+4. Capture the routes with `scripts/parity/run.sh capture --language <code>` and look for overflow.
+5. Credit it and add a changelog line, labelled "machine translation" until a native speaker reviews it.

@@ -1,0 +1,294 @@
+---
+title: What was checked
+description: A dated, honest record of how each part of WOLF OVERRIDE was checked, and what has not been played by hand.
+---
+
+**What this page is for:** what has actually been checked, how, and what has not.
+
+<Callout type="warn" title="No complete route has been played by hand">
+  Most of the game has been checked only by headless test suites and rendered still frames. How it feels, how its timing reads and how it sounds are unproven until a hands-on playtest.
+</Callout>
+
+## Kinds of check
+
+| Kind | What it is | What it proves |
+| --- | --- | --- |
+| Headless | Godot runs the game's code with no window | The logic and rules work |
+| Rendered stills | Frames drawn in the [render container](/docs/development/setup/#rendered-captures) and looked at | How a moment looks in one frame |
+| Hands-on play | A person plays the route in a game window | How it feels, reads and sounds |
+| Export | A build is made and its package checked | The build was made and holds the right files |
+| Device | The build runs on a real phone, PC or controller | It works on that hardware |
+
+- **Never say something feels or reads well** unless it was played or read on a screen. See [Project rules](/docs/development/rules/).
+
+## At a glance
+
+| Area | How it was checked | Played by hand? |
+| --- | --- | --- |
+| First corridor | Headless suites; a partial graphical playtest of engineer movement and WOLF's follow | Partly (movement and follow only) |
+| Records Access | Headless suites (both mirror routes) and rendered stills | No |
+| Service Junction | Headless suites and rendered stills | No |
+| Camera, room art, props, characters | Headless suites and rendered stills | No |
+| Sounds | Headless suites that watch which clips start | No, and not checked by ear |
+| Text and text size | Headless suites and rendered stills | No, not read by a player on a screen |
+| Languages and fonts | Headless suites | No translation exists yet; not seen on screen |
+| Logo screen | Headless suite and rendered stills | Not watched in a game window or on a device |
+| macOS and Windows test builds | Exported headless, packages checked | Not opened on a Mac or a Windows PC as part of this |
+| iOS | A temporary simulator export | Not on a physical device |
+
+## What the headless suites cover
+
+The Godot commands on [Testing and CI](/docs/development/testing/) check all of this. Headless checks do not establish how a route feels on screen; exports and devices need separate checks.
+
+<Details>
+<Summary>Story, rooms and saves</Summary>
+
+- Import, state logic, both scripted door routes and both Records Access mirror routes.
+- The Service Junction's pressure-line timing, held crank and blast.
+- The sentry's patrol, sight, lock-on pause, chase and hold on WOLF; the tank's hit window, miss cloud and rewind.
+- Both answers at the rubble line with either relay memory; the exit bolt and closing scene.
+- Every knockdown's retry, all four autosaves and Continue from each, and save/load.
+
+</Details>
+
+<Details>
+<Summary>Light, beam and drawing order</Summary>
+
+- The lamp flicker's timing limits.
+- Lockdown beacons that settle from the save state.
+- Hidden rooms that stop their dust and light.
+- A sentry beam drawn to its real sight range, with a gap over the cover beside the **TANK RELEASE** where it cannot see, and its end at the face of the **EXIT BOLT** box or a tank on the floor, which it cannot see past.
+- The corridor seal's pieces and draw order: its wall, rolling door, near column, status lamp and its conduit, and the **MANUAL BYPASS** plate over its wheel.
+
+</Details>
+
+<Details>
+<Summary>Corridor door-end additions</Summary>
+
+- The inner door moves on the rolling door's own open value. It keeps the doorway shut while any of it is still in the opening, and parks in its pocket out of the walk path once open.
+- The engineer's crank frames show on every frame of a crank, with both gloves within 1.5 pixels of the wheel's rim.
+- The caged beacons sit at their old anchors and flash 80 to 96 times a minute in the corridor only, the glass dimming with the light. With Reduced Motion they are held lit and steady.
+
+</Details>
+
+<Details>
+<Summary>Doors after the corridor</Summary>
+
+- `door_route_test`: the Records entry and exit and the Service Junction's blast door and exit each stand across the walkway and stop the route while shut.
+- Their leaves are drawn whole in every frame while they swing, slide or are thrown, never hidden or faded.
+- No resting spot leaves a body across a shut door.
+- The **END OF SLICE** card comes only once WOLF and then the engineer are through the exit.
+- `room_depth_test`: the swing leaves' faces and light at every angle.
+- The blast door's pieces, all regions of one atlas: the doorway, leaf, wall and release bay behind the characters; the near column, stub and thrown leaf in front.
+- Its near column's foot is measured on the atlas where a knocked-down body lies. A body knocked down facing it, from the valve, against the door or from the floor beyond it, with **Reduced Motion** on and off, lies clear of the column and the stub.
+
+</Details>
+
+<Details>
+<Summary>Station names, machines and the debug tools</Summary>
+
+- Station name plates (the relief vent's among them) share one row without overlapping in any state.
+- Station names in every room fade at the edge of the view.
+- An engineer who stops over a machine sidesteps out of it.
+- Machine lights and plates are drawn behind both characters.
+- Near pipe columns fade back from a character behind them.
+- The debug tools' gating, unlock codes, overlay, state dump, bug capture and zone drawing: each hitbox matches its real shape, each render box its sprite or control, each use range the rule that answers interact, and none of it runs while hidden.
+- The debug menu with keyboard, controller and touch: every jump, the choice presets, every cheat including slow motion and frame stepping, each forced knockdown, the door fuse and the tank drop, the save actions and the effect switches.
+
+</Details>
+
+<Details>
+<Summary>WOLF as a companion: `wolf_space_test`</Summary>
+
+- It reaches every spot WOLF stands on of his own: on all three relay answers, both mirror answers, all three lane answers and a break-off after a missed drop, and where he stands while you go to the corridor's safe point and save there.
+- It measures his drawn body (its pixels more than half opaque) against each room's machines (the Records security container among them), the engineer, and the doors the walk line passes through: the Records and junction entries and exits while they are shut, the blast door's leaf and near column, and the leaf it throws.
+- At the corridor's safe point he stands in the open doorway, and there the door end is measured as drawn:
+  - his head must be past where the shut door crosses the walk line;
+  - none of his pixels may be hidden by the pieces drawn in front of the characters (the near column with its jamb plate, the cut-away wall, the camera and the status lamp);
+  - the frame, the far jamb plate, the inner door's parked edge and the wall-mounted **MANUAL BYPASS** must stand behind the walk line or above the floor and be drawn behind him;
+  - he must be inside the camera's view;
+  - stepping back into the doorway must send him back to the relay's left.
+- Standing in an open doorway behind a door's near jamb, and the walk-outs, are `door_route_test`'s.
+- The **RELIEF VENT** grate in the floor, which he stands on while he reads the valve's gauge and while he holds back by the valve, is not counted.
+- Which way he faces at some spots: towards the relay while he holds its contact; towards the engineer while he stands in the doorway at the safe point, including after they turn round there; towards the engineer and the rubble while he waits by the entrance after the blast and while he holds back beside the valve, on either lane answer that leaves him there and after breaking off.
+- He does not turn round as he lets go of the relay contact.
+- He does not run back and forth while the engineer edges about near the junction valve, or just short of the corridor's safe point, either while he waits by the relay or while he stands in the doorway.
+
+</Details>
+
+<Details>
+<Summary>WOLF as a companion: `companion_rules_test`</Summary>
+
+- Reads every row of his lines, the second row of each two-row box included, for words that would hurry you.
+- The sentry and the hazards never turn on him outside the bait he chooses, and nothing can knock him down.
+- Nothing he does on his own completes one of the engineer's steps.
+- The HUD has no meter.
+- Plays the route where he refuses the relay and the lane, with the mirror copied through the port, through to the **END OF SLICE** card.
+
+</Details>
+
+## Dated records
+
+Newest topics first. Each record keeps its full text in **Full record**.
+
+### Text and reading (October 15, 2026)
+
+- **Checked:** every line's box size, reading time and placement at every text size, with keys and on touch.
+- **Rendered stills** at 1280×720, 960×540 and the 2400×1080 and 2556×1179 phone shapes back these up.
+- **Not read by a player on a screen.**
+
+<Details>
+<Summary>Full record</Summary>
+
+The text suite (October 15, 2026) reads every line constant and every line the game says through its dialogue box in `main.gd`, with each provisional engineer name, splits each into its boxes and requires one speaker per box, at most two rows of at most 42 characters at 100% text size, fewer than 20 words, a reading time of at least 0.33 seconds a word, and no word changed by the split. It then plays through the opening, the corridor, Records Access and the Service Junction's knockdown cards and measures every box shown on screen, checks that the first controllable frame shows only the name card and the move prompt, that the Records Access exit no longer holds the engineer and its last line clears once they walk on, that touch answers sit at the bottom without numbers and the hint names the **CRANK** button and stays clear of the touch buttons, that a station's answer or the route hint cutting into WOLF's purge line or the Records Access closing lines (the engineer keeps control while they play) brings the line back after it at the box it was on, and that **USE** at the breaker or the exit brings it back first, and that **TEXT SIZE** saves, reloads and scales the dialogue, hint, cards, tutorial and station names (at 200% every box shown took at most two rows), with the answer buttons inside the screen's 20-pixel side margin and, on touch, the top card clear of the **DEBUG** button where it shows. At every text size it also jumps to the corridor, Records Access and three Service Junction states and requires no two station names to overlap, each to keep its bottom edge where it was at 100%, and the corridor's breaker and relay names and the **COOLANT FAULT** tag not to be faded at the edge of the view at the start, and the **MANUAL BYPASS** name (at the view's edge there, a little faded at 100% and faded out at larger sizes) to show in full with the engineer beside the relay (the camera is snapped to its new place first, since it eases in time and a headless run's frames are short); the Service Junction's valve plate is also put through each of its names and must stay on its line and clear of the **LINE** caption. At every size, with keys and on touch, a fresh game also requires the opening's hint line to stand below the top card and, after the first step, on the step's own frame and again once the opening lines' first box is up, the tutorial prompt to cover no station name, neither character, the box, a top card that shows, **PAUSE**, **DEBUG** or the touch buttons, and to lie over at most a tenth of its area of the machines (at 200% on touch it rests on the edge of the purge display); a prompt hidden behind a box must leave the hint line empty too. On touch it requires a box, with a speaker and without, to stay clear of the arrows and **USE**, the hint bar to stay clear of the box, and the corridor's **COOLANT RELAY** name and **COOLANT FAULT** tag to stay clear of **PAUSE** at every size. Rendered stills at 1280×720, 960×540 and the 2400×1080 and 2556×1179 phone shapes back these up; none of it has been read by a player on a screen.
+
+</Details>
+
+### Languages (October 16, 2026)
+
+- **Checked:** the language table, locale lookup, catalog pairs and the overflow check, headless.
+- **All 25 suites** also passed with the computer's language set to Spanish.
+- **No translation exists yet,** and none of this has been seen on screen.
+
+<Details>
+<Summary>Full record</Summary>
+
+The language suite (`i18n_test`, October 16, 2026) checks the groundwork for translations. Only English is offered yet, and nothing on screen changes. It requires the suite to start in English (the `--language en` flag every suite starts with), the language table `apps/game/i18n/languages.json` to hold the twelve planned language files, each with a picker name, a review state, a fallback font, a reading speed and a row limit, and nothing to be offered whose fonts are not in the build. It resolves 39 locales through the game's own table (Mexico, Argentina and the US to Latin-American Spanish, Spain to Spain's file, Portugal to Brazilian Portuguese, Taiwan, Hong Kong and Macao to Traditional Chinese, and Ukraine never to Russian) and reads the saved language. Each language's picker name and machine-translation tag must be drawable by the game's fonts with only that language's own fallback behind them, and a Chinese character planted in a German catalog must fail that check. With made-up Simplified and Traditional Chinese catalogs, and Latin-American and Spain Spanish ones, a line only one file of a pair has must show English in the other, and the same lookup with every catalog left registered must show the other file's text, so the check can fail. It also requires the offered languages other than English, the translation files in `apps/game/i18n/` and the catalogs `project.godot` registers to be the same set, so no language is offered without its file and no file ships unoffered (a planted German file fails it). The overflow check the later language work uses is tried on planted labels and buttons, one for each case the research prototype missed (text inside a container, text cut short with an ellipsis or clipped, and text that grows too tall or off the bottom of the screen), each beside a twin that fits, and on the English title, where it must find nothing. All 25 suites also passed with the computer's language set to Spanish. These are headless checks: no translation exists yet, and none of this has been seen on screen.
+
+</Details>
+
+### Bundled fonts (October 16, 2026)
+
+- **Checked:** every font draws its whole character list, within the size budget, with no system fallback.
+- **No Chinese, Japanese or Korean text** has been seen on screen in the game build.
+
+<Details>
+<Summary>Full record</Summary>
+
+The same suite checks the bundled fonts (October 16, 2026). No game font may ask the operating system for a missing character, so a character missing from the game's fonts shows the same on every computer and these checks tell the whole story. The Japanese, Korean, Simplified and Traditional Chinese subsets must each draw every character of their fixed list (3,491, 3,203, 4,337 and 5,790 characters, among them the language's own name and "machine translation" tag), and a character outside every list must be missing. Together the four subsets must stay within 5,000,000 bytes, and within 10,000,000 bytes with Godot's line-breaking data, the budget of localization decision D7 (today 3,997,912 and 8,795,384). Every character in the game's scripts and scenes must be drawable by each theme font in English (it found ten outside plain ASCII, among them the touch arrows), and Roboto's line height must stay the same with the small symbols font chained behind it, from 12 to 40 px. Turning the operating-system fallback back on for one font, planting a character the Korean subset lacks in its list, or unchaining the symbols font each failed the suite. These are headless checks: no Chinese, Japanese or Korean text has been seen on screen in the game build.
+
+</Details>
+
+### Dialogue that cuts in (October 15, 2026)
+
+- **Checked:** a station's answer that cuts into a line said in several boxes never drops a box; passed 20 runs in a row under load.
+- **Settings suite:** the Display tab's heading and window-size sentence.
+
+<Details>
+<Summary>Full record</Summary>
+
+A station's answer that cuts into a line said in several boxes never drops a box (October 15, 2026). The scene suite reads the purge display with no frame passing in between, first ahead of the opening lines (the first box comes back after the display's text, then the rest) and then over the opening exchange (it comes back after the display's text and before WOLF's stakes line). Before, which box was up when the display was read depended on how fast the machine ran, so on a busy machine the exchange could be replaced for good and the check failed now and then; it passed 20 runs in a row with eight other Godot runs going at once. The settings suite checks the Display tab under its **THE DEN / LOCAL CONFIGURATION** heading: no graphics card or renderer line, and the window-size sentence only when the game runs as a phone or tablet build.
+
+</Details>
+
+### Sounds
+
+- **Checked:** every clip name the scripts use exists, and every state-changing press starts a sound within one frame.
+- **They watch which clips the bank starts, not the speakers.** Whether the sounds are audible, balanced and pleasant has not been checked by ear.
+
+<Details>
+<Summary>Full record</Summary>
+
+Two suites guard the sounds without anyone listening. The sound bank's suite scans every game script for the clip names it passes to the bank (to play, stop or crossfade) and fails on a name the bank does not have, which is how the corridor's **MANUAL BYPASS** had played no hiss; a debug build also warns when a clip name is unknown. The press-sound suite plays both relay routes through the corridor and Records Access, the Service Junction's lane answers and its exit with the game's own input, and requires every press that changes the game's state to start a sound in the bank and change what the screen says within one frame; it also checks that the bypass hisses while it is cranked and that the relay's **COOLANT FAULT** tag is gone at the safe point on both routes. They watch which clips the bank starts, not the speakers: whether the sounds are audible, balanced and pleasant has not been checked by ear.
+
+</Details>
+
+### Fuse, tank drop, cranks and flashing (October 13, 2026)
+
+- **Checked:** the fuse lasts 2.5 seconds with five ticks; the tank's hit window is at least half a second; the bypass takes 2.0 seconds held; **TOGGLE HOLDS** works.
+- **Flashing:** an estimate from rendered frames stayed under WCAG's general-flash threshold. It is not a measurement on a display or phone.
+- **None of these timings has been played by hand.**
+
+<Details>
+<Summary>Full record</Summary>
+
+The Service Junction's fuse, the tank drop and the cranks have their own timing checks (October 13, 2026). The junction suite steps the lit fuse at 60 frames a second and requires it to last 2.5 seconds with five ticks half a second apart, the last half a second before the blast, the blast stripes to pulse once per tick at no more than 2 Hz, and every tick to be played. The sentry suite steps the patrolling sentry frame by frame and requires it to stay over the floor brackets at least half a second on every patrol pass, and a drop pressed at any moment of a patrol pass to hit through a window of at least half a second. Because the patrol turns just past the mark, inside the window, each patrol pass measures about 0.9 s, in past the mark and back out (about 1.0 s until the patrol's turn moved 9 pixels further from the alcove with the sentry's drawn contact range); a straight crossing at patrol speed would be about 0.53 s, and one at chase speed about 0.32 s. The crank suite presses interact at the **MANUAL BYPASS** and the junction valve and requires the wheel to have turned and the ratchet to have clicked on the first frame Main sees the press at each of them, the bypass held from no notches to finish after 2.0 seconds of held time (adding up the frames the game ran with the press down, so the old 3.2 seconds fails it), and, with **TOGGLE HOLDS** on, a single press to finish either crank while a move, a pause or a second press stops it; it also checks that the setting is saved and read back. The photosensitivity estimate was rerun on rendered frames (the render container, 300 frames at 60 frames a second from the lit fuse through the knockdown, with Reduced Motion off and on): the area flashing more than three times a second stayed under WCAG's general-flash threshold, at most about 12% of the worst-placed 10-degree patch (limit 25%) at the blast and about 2.5% while the fuse burns, with no red flash. That is an estimate from rendered frames, not a measurement on a display or phone, and none of these timings has been played by hand.
+
+</Details>
+
+### Approved wording (October 13 and 14, 2026)
+
+- **Checked:** every changed line against the wording approved on October 13, 2026, with the four lines approved on October 14 that say WOLF holds back.
+- **Also checked:** refused presses, the door bump, the hint ladder and the order of lines around the tank, headless and in still frames.
+- **How the refusals, the bump and the hint timing feel has not been played by hand.**
+
+<Details>
+<Summary>Full record</Summary>
+
+The wording approved on October 13, 2026, with the four lines approved on October 14 that say WOLF holds back, has its own suite. It checks every changed line against the approved text, that the changed lines it lists fit in boxes of at most two rows of 42 characters with the longest preset name (one long WOLF line in the junction is left for a later pass), that no cut line is left in the game's player text or shown in the opening, that the trust line after first control shows as two boxes in order for their reading times (pressing interact at the purge display or the breaker during the first box only delays the rest, which still come in order; a line that moves the story on, such as the tank landing or the clamp letting go, drops the boxes still to come instead), the Service Junction's goal-only entry and WOLF's warning after it, and the junction's hint ladder (stepped by hand: WOLF's look and the breaker's pulsing lamp at 45 seconds, the engineer's line at 90 and the whole chain in two boxes at 180, nothing during a choice, and nothing once the breaker is armed). For every refused press in the junction it presses interact with the game's own input and requires the clunk to start, that station's lamp to flicker and the line to show within 6 frames, and the box to blink when the same press comes again; walking into the sealed door must thud, flicker its lamp and stop the engineer at its face, with the line on the first bump only, and interact pressed 30 or 90 frames after letting go there (once the engineer has stepped off the valve's body) must still get the door's line, while a step away gets the valve's again. After a sentry knockdown, its two-row card keeps its box and where play resumed follows in the next. In real frames it also walks to the rubble line straight after the door goes, and after waiting at the door, and requires the second box (the sentry waking) to show before WOLF's question and to be up its reading time first, with the engineer held at the rubble line meanwhile; it requires WOLF's "The tank takes a moment to fall." not to come back after the clamp lets go or the tank lands; and after a real missed drop it requires the order to get back over the rubble to come as the sentry swings, within 0.8 seconds of the miss, for an engineer who stays at the release, to be left out for one already back over the rubble, never to show again after the sentry gives up, and the winch's line to come after the miss's boxes. The sentry suite also retreats over the rubble at once after a miss with WOLF drawing the sentry and requires WOLF breaking off to show after the sentry gives up, with no order to get back over the rubble. These are headless checks and still frames; how the refusals, the bump and the hint timing feel has not been played by hand.
+
+</Details>
+
+### Knockdowns and the sentry (October 14, 2026)
+
+- **Checked:** the knockdown's timing to the frame, the collapse frames, and that the sentry never overlaps the engineer on any drawn frame; passed 20 runs in a row.
+- **Rendered stills** at 1280×720 and a 2400×1080 phone shape, before and after; the beam also under protanopia and deuteranopia simulations.
+- **None of this has been played by hand.**
+
+<Details>
+<Summary>Full record</Summary>
+
+Knockdowns and the sentry have their own checks (October 14, 2026). The impact suite also checks the knockdown's timing decided on October 14 (Q17), on the first knockdown and a repeat, in the game's own time and to the frame: a press before 0.9 seconds does nothing and no prompt shows, the card takes **RETRY** from the frame that reaches 0.9 seconds and the hint then reads **E  RETRY** (**TAP RETRY** on touch, with **USE** reading **RETRY** and no arrows), the card is still up 2.5 seconds after the hit when nobody presses, and control comes back 0.6 seconds after the press (0.25 seconds of fade out and 0.35 of fade in), so about 1.5 seconds after the hit for a press at once; it counts the press's own frame, where the fade takes its first step, so a long frame there on a busy machine no longer makes it fail (with a 150-millisecond stall forced at the press, the old count failed and the new one passes). The other suites that knock the engineer down press **RETRY** the same way. The impact suite requires the knocked-down engineer to play the painted collapse frame by frame, slumping forward the way they faced without ever turning round (facing right, and walking in facing left), end up lying with their soles on the floor line (never tilted), with their floor reflection mirroring the lying body and their shadow under all of it, to stand up again as drawn before, and with Reduced Motion to lie down at once; it also reads the collapse image and requires each frame's soles on its bottom row, so nothing is drawn below the floor. The sentry suite watches every frame of its scene routes as drawn, from about 40,000 to about 190,000 Service Junction frames a run depending on how busy the machine is (WOLF drawing the sentry, timing the drop alone, misses, chases, the coolant cloud and every sentry knockdown): on none of them may the sentry's drawn body overlap the engineer's, standing or lying, its beam run past the face of the **EXIT BOLT** box or of the tank at the beam's height ahead of its scanner, or reach further than its 180-pixel sight, and the exit bolt's feed may never cross the tank. The room-lights suite checks at every position the sentry can stand that the drawn beam ends where its sight does, and the junction suite that the relief vent's grate is drawn over its steam. The sentry suite's chase knockdowns face each way (towards the sentry, away from it, and out in its lane facing back towards the alcove, where the engineer slumps forward where they stood rather than being dragged back), and in every one the engineer goes down the way they faced and the sentry ends clear of the body; with Reduced Motion, where the body lies down at once, the sentry must already stand clear of it on that first drawn frame; walking into the coolant cloud facing the tank, the lying body must end clear of the tank, and the frame watch also requires the lying engineer's painted body never to overlap a low tank. The junction suite knocks the engineer down with the door's blast while they face it, at the valve and right up against the door, and requires their whole lying body to end clear of the blast door's near column and the stub of wall in front of it, whose pixels it reads from the image; with the door down it also knocks them down just past the doorway facing back, with Reduced Motion off and on. The sentry suite also walks the engineer into the back of a patrolling sentry and into the front of one locking on, and requires them to stop where the two bodies touch on every drawn frame; the frame watch looks at each frame once the game has finished it, so it sees what is drawn. The sentry suite lets the engine take at most one physics step per drawn frame, so on a busy machine the run slows down instead of taking several steps between two drawn frames, and what it checks does not depend on how busy the machine is; it passed 20 runs in a row. The patrolling sentry rolls on after the engineer is held at its back, so on a drawn frame they may be one of its steps behind it, and the check allows exactly that step. The one locking on is met as it comes down from the far end of its lane, right of the hanging tank, so the knockdown that follows lands clear of the tank however the frames fall; before, it was met wherever it happened to be, and on some runs the engineer went down under the tank's base. At the far end of its patrol the sentry passes behind the **EXIT BOLT** box, which is drawn again over the machine and its beam wherever they cross it; on every frame where the sentry's body or beam crosses the box (about 15,000 to about 80,000 frames a run), the frame watch requires all of that crossing to be under the redrawn box. The bolt's feed beside the box (its cable box, conduit and floor gland) is drawn again with it, and on every frame where the sentry crosses a part of the feed the watch requires that crossing to be covered too; the junction suite checks that the whole feed lies inside what is drawn again and that the redrawn box's lamp dims with the lamp when a refused press flickers it. The debug tools suite also checks that the beam's declared box matches what it drew when its sight ends inside the alcove. The knockdowns and the beam were also compared in rendered stills from scripted play at 1280×720 and in a 2400×1080 phone shape, before and after, with the beam also viewed under protanopia and deuteranopia simulations. None of this has been played by hand.
+
+</Details>
+
+### Corridor door end (October 14 and 15, 2026)
+
+- **Checked:** the door-end additions by the suites above and by rendered stills on both relay routes and through the opening, at 1280×720 and a 2400×1080 phone shape.
+- **Measured:** draw calls, texture memory and an overdraw estimate per corridor state, in the render container.
+- **The beacons' flash rate is measured, not judged:** none of this has been played by hand.
+
+<Details>
+<Summary>Full record</Summary>
+
+The corridor's door-end additions (October 14 and 15, 2026: the steel blast frame and sign, the inner door, the caged beacons, the crank frames, the relief spray, the shorter ceiling light, the cut-away safe point room and WOLF in the doorway) were checked by the suites above and by rendered stills from scripted play through the render container at 1280×720 and in a 2400×1080 phone shape with the touch layout, before and after, on both relay routes and through the opening; the opening's frames were compared with main's pixel by pixel, and differ only in the light of the new beacon and, once it is in view, the door end. The image tool had left a faint copy of the door's number in the art hidden behind the door's hood; it was painted out, and in 1280×720 stills of every corridor state and the opening, before and after the fix, no pixel of the door end changed (the only differences were the ceiling lamps' flicker from run to run). Draw calls, texture memory and an overdraw estimate were measured in the render container per corridor state. The beacons' flash rate is measured, not judged: none of this has been played by hand.
+
+</Details>
+
+### Logo screen
+
+- **Checked:** its headless suite, and rendered stills at 1280×720, 1920×1080 and a 2340×1080 phone shape.
+- **The engine's boot splash itself cannot be captured,** and the logo has not been watched in a game window or on a device.
+
+<Details>
+<Summary>Full record</Summary>
+
+The MrDemonWolf, Inc. logo screen was checked by its headless suite and by rendered stills at 1280×720, 1920×1080 and a 2340×1080 phone shape, including a pixel comparison of its first frame with the boot splash image. The suite and headless probes also cover presses just after the logo (held off the title for 0.6 seconds), the sweeping loading bar, and closing the game while the title loads. A saved window size was seen applying on the logo's first frame in the render container; saved fullscreen there applies only when no size change comes with it, as it did before the logo existed, since the container has no window manager. The engine's boot splash itself cannot be captured, and the logo has not been watched in a game window or on a device.
+
+</Details>
+
+### Rooms, camera, art and sounds
+
+- **Checked only** by the headless suites and by rendered still frames at 960×540; the sharper character sprites and the 1280×720 first window also in stills at 1280×720 and 1920×937.
+- **None of them has been played by hand,** so their feel, timing, readability and sound are not yet validated.
+
+<Details>
+<Summary>Full record</Summary>
+
+The Service Junction, the closer play camera, the layered room art, the station props, the redrawn characters and the sounds were checked only by the headless suites above and by rendered still frames at 960×540; the sharper character sprites and the 1280×720 first window were also checked in stills at 1280×720 and 1920×937. None of them has been played by hand, so their feel, timing, readability and sound are not yet validated.
+
+</Details>
+
+### First source-build review
+
+- **Checked:** Godot 4.7.2 headless import, scripted state, the M0 scene, the chapter scene, and input and settings, locally.
+- **Partly played:** engineer movement and WOLF's follow behavior in a partial graphical playtest of the first corridor.
+- **Complete routes have not been played by hand.**
+
+<Details>
+<Summary>Full record</Summary>
+
+Godot 4.7.2 headless import, scripted state, M0 scene, chapter scene, and input/settings checks passed locally in the prior source-build review. Scene checks exercise both door routes, both mirror routes, and Continue restoring chapter progress. Engineer movement and WOLF's follow behavior were observed in a partial graphical playtest of the first corridor. Rendered touch, pause, and settings frames were inspected. Complete routes have not been played by hand.
+
+</Details>
+
+## Builds and devices
+
+- **macOS and Windows test builds:** exported headless and their packages checked: the app's executable bit and ad-hoc signature, the embedded Windows pack, the in-game changelog and font licences inside, and no tests or notes. Neither build has been opened on a Mac or a Windows PC as part of this.
+- **iOS simulator:** a temporary simulator export built and launched on two booted iPhone simulators; the iPhone 17e title screen was inspected.
+- **iOS template:** Godot's official 4.7.2 iOS template contained only x86_64 simulator code in a slice labeled arm64; the local simulator build used a temporary version-matched arm64 library. No distributable iOS package is published.
+- **Not tested:** touch gestures, controller hardware and physical devices.
+
+<Callout title="Still separate gates">
+  Graphical route play, hardware input, opening an export on its system, signing and physical devices remain separate gates. A green workflow does not certify a finished game or release package.
+</Callout>

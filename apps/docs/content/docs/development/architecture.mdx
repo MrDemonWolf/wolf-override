@@ -1,0 +1,93 @@
+---
+title: Architecture
+description: A map of the WOLF OVERRIDE repository, covering the Godot game, its tests, the tools and the website.
+---
+
+**What this page is for:** find where a thing lives before you change it.
+
+- **Before writing anything new,** look here for an existing script, scene or tool that already does the job. See [Project rules](/docs/development/rules/#no-copied-code).
+- **Each script** opens with a `##` doc comment that says what it is for. Read that first.
+
+## The repository
+
+| Folder | What it holds |
+| --- | --- |
+| `apps/game/` | The Godot 4.7.2 game project |
+| `apps/docs/` | This website (Next.js and Fumadocs) |
+| `scripts/` | Check, export and changelog scripts |
+| `scripts/i18n/` | Translation tools. See [Localization](/docs/development/localization/) |
+| `scripts/parity/` | Scripted route captures and performance runs |
+| `tools/render/` | The render container for captures without a game window |
+| `i18n/` | The translation template, glossary and style guides |
+| `docs/` | Project records and the notes index (`docs/NOTES.md`) |
+
+## The game
+
+```text
+apps/game/
+  project.godot        settings, the version, the input map
+  export_presets.cfg   macOS and Windows test build presets
+  scenes/              studio_logo.tscn (first scene), main.tscn (the game)
+  scripts/             game code (below)
+  tests/               headless suites, one *_test.gd each
+  assets/              art, sound, fonts, shaders, the asset register
+  i18n/                the language table
+```
+
+- **Start-up:** `studio_logo.tscn` plays the MrDemonWolf, Inc. logo, then hands over to `main.tscn`.
+- **Typed GDScript** with Godot's built-in nodes and input map.
+
+### Scripts by job
+
+| Job | Scripts |
+| --- | --- |
+| The game loop | `main.gd` (`Main`): rooms, dialogue, choices, saves, the title and menus |
+| Story state | `m0_state.gd` (pure logic), `m0_actor.gd` (the engineer's and WOLF's bodies) |
+| Rooms | `room_depth.gd` (painted plates and room light), `records_room.gd`, `junction_room.gd` |
+| Service Junction logic | `pressure_line.gd`, `drop_arm.gd`, `sentry_brain.gd` (pure logic); `sentry.gd` (its body); `hazard.gd` (hurtboxes) |
+| Doors | `seal_leaf.gd`, `blast_leaf.gd`, `swing_leaf.gd`, `bypass_handle.gd`, `junction_door_layout.gd`, `atlas_mesh.gd`, `world/door_camera.gd` |
+| Effects | `impact.gd` (shake, hit-stop, flash), `fx_presets.gd` (particles), `fx/fx_kit.gd`, `fx/palette.gd`, `fx/tri_mesh.gd`, `fx/tweens.gd`, `floor_reflection.gd`, `wolf_lights.gd` |
+| Sound | `sfx_bank.gd`: sounds generated in code, plus a few processed recordings |
+| Text and input | `dialogue_boxes.gd`, `text_size.gd`, `hold_use.gd` (held interact), `i18n.gd` |
+| Menus | `game_settings.gd` (Settings), `pause_overlay.gd`, `ui_motion.gd`, `studio_logo.gd` |
+| Debug tools | `debug/`: see [Debug tools](/docs/development/debug-tools/#where-the-code-lives) |
+
+- **Pure logic** scripts (`RefCounted`) hold rules with no drawing, so the suites can test them directly.
+- **One home per number:** shared colours are in `fx/palette.gd`; the door camera is in `world/door_camera.gd`.
+
+### Tests
+
+- **One suite per file:** `apps/game/tests/*_test.gd`, each run as `godot --headless --script`.
+- **Shared kit:** `tests/support/game_suite.gd` holds the bookkeeping every suite uses. Use it; don't copy it.
+- **How to run them:** [Testing and CI](/docs/development/testing/#game-checks).
+
+## Scripts and tools
+
+| File | What it does |
+| --- | --- |
+| `scripts/check-game.sh` | Godot import and every headless suite |
+| `scripts/godot-helpers.sh` | Shared shell helpers: an isolated Godot home and a time limit |
+| `scripts/check-copies.py` | The [copied-code check](/docs/development/testing/#copied-code-check) |
+| `scripts/export_changelog.py` | Writes the in-game changelog and checks the version |
+| `scripts/check-docs-export.sh` | Checks the built website |
+| `scripts/get-export-templates.sh` | Fetches and checks Godot's export templates |
+| `scripts/export-game.sh` | Exports and packages the test builds |
+| `scripts/package_test_build.py` | Checks and zips one test build |
+| `tools/render/render.sh` | Renders captures inside a Linux container |
+
+- **Releases and test builds:** [Releases and versions](/docs/development/releases/).
+
+## The website
+
+| Path in `apps/docs/` | What it holds |
+| --- | --- |
+| `content/docs/` | Every guide page, as MDX |
+| `app/page.tsx` | The landing page |
+| `app/docs/` | The guide layout and its components |
+| `lib/` | Page source, SEO and structured data, the version reader |
+| `mdx-components.tsx` | Components pages can use |
+
+- **Styling:** Tailwind CSS tokens and utilities, and Fumadocs components. No new bespoke CSS.
+- **Build:** a static export for GitHub Pages, deployed from `main`.
+- **The version** shown on the site is read from `apps/game/project.godot` by `lib/version.ts`.
+- **For AI assistants:** `llms.txt`, `llms-full.txt` and a Markdown copy of each page are built from the same pages.

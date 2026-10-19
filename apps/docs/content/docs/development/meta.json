@@ -1,4 +1,16 @@
 {
   "title": "Developer home",
-  "pages": ["setup", "status", "testing"]
+  "pages": [
+    "setup",
+    "contributing",
+    "rules",
+    "architecture",
+    "testing",
+    "debug-tools",
+    "evidence",
+    "localization",
+    "art-pipeline",
+    "releases",
+    "status"
+  ]
 }
