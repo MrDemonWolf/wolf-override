@@ -349,6 +349,21 @@ static func _inserts(template: String) -> PackedStringArray:
 	return found
 
 
+## True when [param text] has at least two letters, so it holds a word a translation can change: not a
+## lone symbol such as ◀, a number, or a one-letter key or button name ("E", "A"), which every language
+## writes the same way and pseudolocalization has nothing to pad. One rule for the game and the tools:
+## Settings translates a key or button name only when this holds (GameSettings), and the parity capture's
+## pseudo audit counts only such text as untranslated (scripts/parity/capture.gd). A letter is a character
+## with an upper and a lower case, so CJK text counts only through its Latin letters (none of the names
+## this is asked about are CJK).
+static func has_words(text: String) -> bool:
+	var letters: int = 0
+	for character: String in text:
+		if character.to_upper() != character.to_lower():
+			letters += 1
+	return letters >= 2
+
+
 ## [param text] with each of its lines translated on its own (the top card's location and objective).
 static func lines(text: String) -> String:
 	var out: PackedStringArray = []

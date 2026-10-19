@@ -932,22 +932,12 @@ func _audit() -> Dictionary:
 			missing.append("%s missing %s" % [where, gaps])
 		if I18n.overflows(control):
 			overflows.append(where)
-		if language == "pseudo" and not control.has_meta(I18n.OWN_LANGUAGE_META) and not shown.contains("[") and not shown.contains("]") and _has_words(shown):
+		if language == "pseudo" and not control.has_meta(I18n.OWN_LANGUAGE_META) and not shown.contains("[") and not shown.contains("]") and I18n.has_words(shown):
 			untranslated.append(where)
 	var found: Dictionary = {"texts": texts, "overflows": overflows, "missing_glyphs": missing}
 	if language == "pseudo":
 		found["untranslated"] = untranslated
 	return found
-
-
-## True when [param text] has at least two letters: a word, not a lone symbol such as ◀, a number or a
-## one-letter key name, which pseudolocalization has nothing to pad.
-static func _has_words(text: String) -> bool:
-	var letters: int = 0
-	for character: String in text:
-		if character.to_upper() != character.to_lower():
-			letters += 1
-	return letters >= 2
 
 
 func _remove(path: String) -> void:
