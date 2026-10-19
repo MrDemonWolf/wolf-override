@@ -27,7 +27,12 @@ extends "res://tests/support/game_suite.gd"
 ##   apply() that keeps them all would leave) shows the sibling's text, so the check can fail;
 ## - a translated template whose inserts differ showing the English line (I18n.shown);
 ## - the overflow check: one planted overflow for each blind spot the build closes (containers, trimmed
-##   text, height), each beside a twin that fits, and the English title judged by it.
+##   text, height), each beside a twin that fits, and the English title judged by it;
+## - the HUD's key prompts (PR L7b): HudText keeps the English line, fills the translated template's key
+##   tokens after tr(), uses a line's touch form on touch and guards a broken translation; and in a game,
+##   the hint, tutorial, top card, touch USE button and the opening's CONTINUE prompt in another language,
+##   with CONTINUE's touch-button context kept apart from the title's, and the top card drawn again in
+##   English when the language changes back.
 ## Spawn, waits and teardown come from tests/support/game_suite.gd. Every catalog this suite adds is
 ## made up here and dropped again with I18n.forget, so no real catalog is touched.
 
@@ -88,6 +93,8 @@ func _run() -> void:
 	_check_format_guard()
 	await _check_planted_overflows()
 	await _check_title()
+	_check_key_prompts()
+	await _check_hud()
 	I18n.apply("en")
 	finish("Languages: %d checks passed." % _checks)
 
@@ -520,3 +527,94 @@ func _check_title() -> void:
 	for control: Control in controls:
 		_check(not I18n.overflows(control), "the English title's %s fits (size %s)" % [str(control.get("text")).c_escape(), control.size])
 	await end_game(game)
+
+
+## The made-up "es" catalog of the HUD checks: key templates (one with turn counts), the held form, a
+## touch form, an objective and location, the name card, the tutorial, CONTINUE with and without the
+## touch button's context, and one broken translation whose conversion differs from the English.
+func _hud_catalog() -> Translation:
+	var catalog: Translation = Translation.new()
+	catalog.locale = "es"
+	catalog.add_message("%s: talk to WOLF about the relay.", "%s: habla con WOLF del relé.")
+	catalog.add_message("%s: crank the manual bypass, %d of %d.", "%s: gira el bypass manual, %d de %d.")
+	catalog.add_message("HOLD %s", "MANTÉN %s")
+	catalog.add_message("The safe point could not save. Press %s here again.", "No se pudo guardar. Pulsa %s otra vez aquí.")
+	catalog.add_message("The safe point could not save. Tap USE here again.", "No se pudo guardar. Toca USAR otra vez aquí.")
+	catalog.add_message("%s: save at the safe point.", "%d: guarda en el punto seguro.")
+	catalog.add_message("CHECK THE BREAKER", "REVISA EL DISYUNTOR")
+	catalog.add_message("MAINTENANCE / LOCKDOWN", "MANTENIMIENTO / CIERRE")
+	catalog.add_message("%s\nMAINTENANCE ENGINEER", "%s\nMANTENIMIENTO")
+	catalog.add_message("%s  MOVE", "%s  MOVER")
+	catalog.add_message("USE", "USAR")
+	catalog.add_message("CONTINUE", "CONTINUAR")
+	catalog.add_message("CONTINUE", "SEGUIR", Main.TOUCH_BUTTON_CONTEXT)
+	catalog.add_message("%s  CONTINUE", "%s  SEGUIR")
+	return catalog
+
+
+## HudText on its own (PR L7b): a key line keeps its English ("E: ...", "HOLD E: ...") for the code and
+## tests that compare it, and in another language draws the translated template with each token filled
+## by the input's shown name after tr(); a String insert that reads like a token is left alone; a line
+## with a touch form reads it on touch; a translation with other conversions shows the English template
+## filled with the shown key; a plain line is translated only when asked.
+func _check_key_prompts() -> void:
+	var catalog: Translation = _hud_catalog()
+	TranslationServer.add_translation(catalog)
+	var talk: String = HudText.key("%s: talk to WOLF about the relay.", [HudText.USE])
+	var crank: String = HudText.key("%s: crank the manual bypass, %d of %d.", [HudText.HOLD_USE, 3, 8])
+	var save: String = HudText.key("The safe point could not save. Press %s here again.", [HudText.USE], "The safe point could not save. Tap USE here again.")
+	var broken: String = HudText.key("%s: save at the safe point.", [HudText.USE])
+	var named: String = HudText.key("%s waits.", ["E"])
+	_check(talk == "E: talk to WOLF about the relay." and crank == "HOLD E: crank the manual bypass, 3 of 8." and save == "The safe point could not save. Press E here again." and named == "E waits.", "key lines keep the English the game compared before (%s; %s; %s)" % [talk, crank, save])
+	I18n.apply("es")
+	var keys: Dictionary = {HudText.USE: "F", HudText.HOLD_USE: I18n.fill("HOLD %s", ["F"])}
+	_check(HudText.localise(talk, keys, false) == "F: habla con WOLF del relé.", "the translated template gets the key after tr() (%s)" % HudText.localise(talk, keys, false))
+	_check(HudText.localise(crank, keys, false) == "MANTÉN F: gira el bypass manual, 3 de 8.", "the held key and the turn counts fill the translated template (%s)" % HudText.localise(crank, keys, false))
+	_check(HudText.localise(save, keys, false) == "No se pudo guardar. Pulsa F otra vez aquí." and HudText.localise(save, keys, true) == "No se pudo guardar. Toca USAR otra vez aquí.", "a line with a touch form reads it on touch and the key form elsewhere (%s; %s)" % [HudText.localise(save, keys, false), HudText.localise(save, keys, true)])
+	_check(HudText.localise(broken, keys, false) == "F: save at the safe point.", "a translation with other conversions shows the English template with the shown key (%s)" % HudText.localise(broken, keys, false))
+	_check(HudText.localise(named, keys, false) == "E waits.", "a String insert that reads like the key token is not taken for it (%s)" % HudText.localise(named, keys, false))
+	_check(HudText.localise("CHECK THE BREAKER", keys, false) == "REVISA EL DISYUNTOR" and HudText.localise("CHECK THE BREAKER", keys, false, false) == "CHECK THE BREAKER", "a plain line is translated, or left as it is when asked")
+	I18n.forget(catalog)
+	I18n.apply("en")
+
+
+## The HUD in a game (PR L7b), with [method _hud_catalog] for "es": in the opening the touch button's
+## CONTINUE reads its own context's word while the title's CONTINUE keeps another, and the first box's
+## prompt fills its key into the translated template; in play the top card, the tutorial and the hint
+## (keyboard, then touch, where the key is the USE button's word) are translated, and switching back to
+## English draws the top card in English again at once (NOTIFICATION_TRANSLATION_CHANGED).
+func _check_hud() -> void:
+	var catalog: Translation = _hud_catalog()
+	TranslationServer.add_translation(catalog)
+	var game: Main = await start_game("i18n-hud") as Main
+	game.auto_pause_on_focus_loss = false
+	game.call("_new_game")
+	await process_frame
+	I18n.apply("es")
+	await process_frame
+	var hint: Label = game.get_node("CanvasLayer/ContextHint/Text") as Label
+	_check(game.touch_use.text == "SEGUIR" and String(TranslationServer.translate("CONTINUE")) == "CONTINUAR", "the touch button's CONTINUE has its own context, apart from the title's (%s)" % game.touch_use.text)
+	_check(hint.text.begins_with("E  SEGUIR\n"), "the opening's first prompt fills its key into the translated template (%s)" % hint.text.c_escape())
+	game.call("_finish_intro")
+	await process_frame
+	game.call("_refresh_ui")
+	var first_name: String = game.state.human_name().to_upper()
+	_check(game.hud.text == "%s\nMANTENIMIENTO" % first_name and game.hud.auto_translate_mode == Node.AUTO_TRANSLATE_MODE_DISABLED, "the name card translates its template and keeps the name (%s)" % game.hud.text.c_escape())
+	var tutorial: Label = game.get_node("CanvasLayer/TutorialPrompt/Text") as Label
+	_check(tutorial.text.begins_with("A / D  MOVER"), "the tutorial fills its keys into the translated template (%s)" % tutorial.text.c_escape())
+	I18n.apply("en")
+	_check(game.hud.text == "%s\nMAINTENANCE ENGINEER" % first_name, "a language change draws the top card again in English at once (%s)" % game.hud.text.c_escape())
+	I18n.apply("es")
+	# Past the tutorial, which takes the hint bar's place while it shows.
+	game.tutorial_step = 2
+	game.human.position.x = 350.0
+	game.call("_refresh_ui")
+	if _check(str(game.call("_context_hint")) == "E: talk to WOLF about the relay.", "at the breaker the hint is still the English line (%s)" % game.call("_context_hint")):
+		_check(hint.text == "E: habla con WOLF del relé.", "the hint draws translated with the key (%s)" % hint.text)
+		game.touch_enabled = true
+		game.call("_refresh_ui")
+		_check(hint.text == "USAR: habla con WOLF del relé." and game.touch_use.text == "USAR", "on touch the hint's key is the USE button's translated word (%s)" % hint.text)
+		game.touch_enabled = false
+	await end_game(game)
+	I18n.forget(catalog)
+	I18n.apply("en")
