@@ -864,9 +864,12 @@ def backprompt(podir: Path, out: Path) -> None:
 
 
 def script_ok(text: str, lang: str, keep: list[str]) -> bool:
-    """The script guard (SCRIPT_GUARD) for one translation ``text`` in ``lang``."""
+    """The script guard (SCRIPT_GUARD) for one translation ``text`` in ``lang``. In a Cyrillic text the
+    BBCode tags (BBCODE) are left out first: they are markup in Latin letters that every language keeps
+    as written, and bbcode_ok checks them (the credits roll is one BBCode msgid, PR L11). Pure."""
     if LANGUAGES[lang]["script"] != "cyrillic":
         return not SCRIPT_GUARD["cyrillic"].search(text)
+    text = BBCODE.sub("", text)
     for word in sorted(keep, key=len, reverse=True):
         text = text.replace(word, "")
     return not SCRIPT_GUARD["latin"].search(text)
@@ -1320,6 +1323,12 @@ SELFTEST = [
     ("bbcode", "de", "[color=#ff8800]WOLF[/color]", "[color=#00ff00]WOLF[/color]", False, ""),
     ("bbcode", "de", "[b]A[/b] [i]B[/i]", "[i]B[/i] [b]A[/b]", True, ""),
     ("bbcode", "de", "[b][i]A[/i][/b]", "[b][i]A[/b][/i]", False, ""),
+    # The script guard (script_ok) on the repository's "keep" words: BBCode tags and kept names pass in a
+    # Cyrillic text, a Latin look-alike letter or an untranslated word does not.
+    ("script", "ru", "", "[center][color=#73DDF5]ТИТРЫ[/color]\n[b]Nathanial Henniges[/b][/center]", True, ""),
+    ("script", "ru", "", "ПAУЗА", False, ""),
+    ("script", "ru", "", "[b]Credits[/b]", False, ""),
+    ("script", "pl", "", "PAUZА", False, ""),
     ("gender", "ru", "", "Сорвало предохранительный клапан, а %s — прямо на решётке.", True, ""),
     ("gender", "ru", "", "Страж заметил: %s на открытом месте.", True, ""),
     ("gender", "ru", "", "%s стояла на решётке, и клапан сорвало.", False, ""),
@@ -1405,6 +1414,15 @@ SELFTEST = [
     ("gender", "ru", "", "WOLF: Ты усталая.", False, "you"),
     ("gender", "ru", "", "%s — у стены, а дверь закрыта.", True, ""),
     ("gender", "ru", "", "WOLF: Иди к большой двери. Найди рубильник.", True, "you"),
+    # "сначала" (first), "зеркала" (the mirror's), "завал" (rubble) and "отмена" (cancel) end like a
+    # past tense or a participle; the rule's exception lists keep them clear (PR L11's hints), while a
+    # gendered word beside them still fails.
+    ("gender", "ru", "", "Сначала скопируй приказ о зачистке.", True, "you"),
+    ("gender", "ru", "", "%s: изучи порт зеркала.", True, "you"),
+    ("gender", "ru", "", "Страж гонится за тобой. Вернись за завал.", True, "you"),
+    ("gender", "ru", "", "Нажми клавишу. Esc — отмена.", True, "you"),
+    ("gender", "ru", "", "Сначала ты устала.", False, "you"),
+    ("gender", "ru", "", "Ты сама у завала.", False, "you"),
     ("gender", "de", "", "%s ist Wartungstechnikerin.", False, ""),
     ("gender", "de", "", "%s ist Wartungsingenieur.", False, ""),
     ("gender", "de", "", "WARTUNGSINGENIEURIN", False, "third"),
@@ -1554,6 +1572,8 @@ def selftest(out: Path) -> None:
             passed = placeholders_ok(english, text)
         elif gate == "bbcode":
             passed = bbcode_ok(english, text)
+        elif gate == "script":
+            passed = script_ok(text, lang, glossary["keep"])
         elif gate in ("gender", "name_case"):
             roles = engineer_roles({"msgid": text, "comments": [f"#. i18n: engineer={mark}"] if mark else []})
             masked = glossary_masked(english, text, LANGUAGES[lang]["glossary"], glossary)
