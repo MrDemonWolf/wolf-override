@@ -1,4 +1,4 @@
-import { repoUrl } from '@/lib/seo';
+import { publisherUrl, repoUrl } from '@/lib/seo';
 
 /**
  * The commit this build came from. The docs workflow (.github/workflows/docs.yml) passes
@@ -24,7 +24,7 @@ export default function SiteCopyright({ className }: { className?: string }) {
   return (
     <p className={className}>
       © {currentYear} WOLF OVERRIDE by{' '}
-      <a href="https://www.mrdemonwolf.com" target="_blank" rel="noopener noreferrer" className={footerLink}>
+      <a href={publisherUrl} target="_blank" rel="noopener noreferrer" className={footerLink}>
         MrDemonWolf, Inc.
       </a>
       {commitSha ? (
