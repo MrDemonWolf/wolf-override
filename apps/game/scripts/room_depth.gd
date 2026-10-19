@@ -574,6 +574,26 @@ func _far_scale() -> float:
 	return ROOM_WIDTH / float(reference.get_width()) if reference != null else 1.0
 
 
+## The mid plate's rows from world y [param top_y] down, mirrored on past the room's right edge to
+## world x [param reach] and on below the plate's bottom as far as BOTTOM_BLEED (mirror repeat), added to
+## [member behind] as [param bleed_name]: a doorway at the right end whose pieces run on past the edge
+## (the Junction exit) stands on the room's own deck there. In [member behind], so the doorway's pieces
+## added after it draw over it. Call after rebuild(); returns the sprite.
+func deck_bleed(bleed_name: String, top_y: float, reach: float) -> Sprite2D:
+	var plate_scale: float = _plate_scale()
+	var mid_top: float = FLOOR_Y - walkway_y * plate_scale
+	# Whole source px (a region is cut on whole px), rounded up so it reaches at least [param reach].
+	var width: float = ceilf((reach - ROOM_WIDTH) / plate_scale)
+	var top: float = (top_y - mid_top) / plate_scale
+	var bottom: float = float(mid_painting.get_height()) + BOTTOM_BLEED / plate_scale
+	var bleed: Sprite2D = _plate(bleed_name, mid_painting, Rect2(float(mid_painting.get_width()) - width, top, width, bottom - top), true)
+	bleed.texture_repeat = CanvasItem.TEXTURE_REPEAT_MIRROR
+	bleed.scale = Vector2.ONE * plate_scale
+	bleed.position = Vector2(ROOM_WIDTH, top_y)
+	behind.add_child(bleed)
+	return bleed
+
+
 ## [param texture]'s bottom [param rows] source rows flipped down under it, running [param side] source
 ## px past both sides (mirror repeat) to fill the corners: the touch framing and a camera shake see
 ## below the plates' bottom edge (BOTTOM_BLEED). The caller places and scales it.

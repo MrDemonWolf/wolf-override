@@ -33,6 +33,16 @@ const LENS_HALO: Vector2 = Vector2(18.0, 18.0)
 const LENS_HALO_ALPHA: float = 0.45
 ## A badge reader's LED (an 80 x 130 mm reader at 1.1 m, its LED a few mm across): its radius.
 const READER_LED_RADIUS: float = 0.7
+## The next space seen past a cross-wall's near end (beside the column, not through the hole) is painted
+## as lit as the space through the doorway, so beside the doorway it read as a brighter way round the
+## door (capture review of 2026-10-18, the Records exit). It is multiplied down this far (shade), so the
+## doorway is the brightest opening in the wall: away from the door light and the hole the passage
+## falls darker (est., tuned on rendered captures).
+const PAST_END_SHADE: Color = Color(0.5, 0.53, 0.56)
+## A wall's cut curb across the deck painted lighter than the deck round it read as a loose plank
+## lying there (the corridor seal's); multiplied down this far it reads as the wall's cut concrete
+## (est., tuned on rendered captures).
+const CURB_SHADE: Color = Color(0.62, 0.64, 0.67)
 ## The darkest a blown doorway's soot gets (compose.py soot at strength 0.7, a little warm).
 const SOOT_DARK: Color = Color(0.335, 0.3, 0.265)
 ## The door light's lens over every head is a cool-white LED wall pack (doors.py WHITE), its halo this
@@ -72,11 +82,11 @@ static func piece(parent: Node, texture: Texture2D, top_left: Vector2, piece_nam
 ## pool on the threshold ([param pool]) and its graze on the far reveal ([param graze]) (doors.py
 ## surface_lights: radius 5 squashed 0.3 at 0.3, radius 2.5 stretched 3 at 0.15), then the cross-wall's
 ## face ([param wall] at [param wall_at], at WALL_LIFT), which it returns. Names start with [param
-## door_name].
-static func doorway(parent: Node, door_name: String, hole: PackedVector2Array, hole_color: Color, back: Texture2D, back_at: Vector2, back_lift: float, inner: Node2D, pool: Vector2, graze: Vector2, wall: Texture2D, wall_at: Vector2) -> Sprite2D:
+## door_name]. [param hole_head_share] is hole_light's head_share.
+static func doorway(parent: Node, door_name: String, hole: PackedVector2Array, hole_color: Color, back: Texture2D, back_at: Vector2, back_lift: float, inner: Node2D, pool: Vector2, graze: Vector2, wall: Texture2D, wall_at: Vector2, hole_head_share: float = 1.0) -> Sprite2D:
 	if back != null:
 		piece(parent, back, back_at, door_name + "Back", back_lift)
-	hole_light(parent, door_name + "HoleLight", hole, hole_color)
+	hole_light(parent, door_name + "HoleLight", hole, hole_color, hole_head_share)
 	if inner != null:
 		parent.add_child(inner)
 	glow(parent, door_name + "Pool", pool, 5.0, DOOR_LIGHT_COLOR, 0.3, 0.3)
@@ -99,14 +109,36 @@ static func glow(parent: Node, glow_name: String, at: Vector2, radius: float, co
 ## lit: the next space reads brighter than the wall round it, the way out by light. The art set lifts
 ## the far plate's paint in the hole (doors.py lift_hole, FAR_LIFT 2.2); the game cannot multiply a
 ## parallax layer's pixels, so it adds [param color] over them instead, tuned on rendered captures.
-static func hole_light(parent: Node, light_name: String, hole: PackedVector2Array, color: Color) -> Polygon2D:
+## [param head_share] (0..1) fades it toward the head: a hole whose light is flat from foot to head reads as
+## a pale pane of glass (the corridor seal's), so its light falls off upward from the lit floor. It needs
+## the hole's points in the order every hole constant gives them: the two feet, then the two heads.
+static func hole_light(parent: Node, light_name: String, hole: PackedVector2Array, color: Color, head_share: float = 1.0) -> Polygon2D:
 	var light: Polygon2D = Polygon2D.new()
 	light.name = light_name
 	light.polygon = hole
 	light.color = color
+	if head_share < 1.0:
+		var head: Color = Color(color * head_share, color.a)
+		light.color = Color.WHITE
+		light.vertex_colors = PackedColorArray([color, color, head, head])
 	light.material = FxKit.additive()
 	parent.add_child(light)
 	return light
+
+
+## A shade multiplied into what is drawn under the polygon [param polygon] (world px), [param color]
+## at full strength (white leaves it as it is, so a caller fades the shade by easing its colour to
+## white: a multiply cannot be faded by alpha), added to [param parent]. Users: the Junction exit's
+## reveal while it is shut, the light-catching curbs and the passage seen past a wall's near end that
+## must not outshine the doorway.
+static func shade(parent: Node, shade_name: String, polygon: PackedVector2Array, color: Color) -> Polygon2D:
+	var patch: Polygon2D = Polygon2D.new()
+	patch.name = shade_name
+	patch.polygon = polygon
+	patch.color = color
+	patch.material = FxKit.multiply()
+	parent.add_child(patch)
+	return patch
 
 
 ## Soot and heat tint on a wall round a blown doorway: a soft dark patch (radii [param radii], world
