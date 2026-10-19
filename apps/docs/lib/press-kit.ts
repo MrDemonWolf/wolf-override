@@ -87,8 +87,8 @@ export const assetTerms = [
   `You may use these files to write about, stream, review or promote ${gameName.name}, in print, video or online, with the credit "${creditLine}".`,
   'Do not change the logo or the wolf mark: no stretching, recolouring, effects, cropping or redrawing. Use the files as they are.',
   'You may resize screenshots and key art and crop them for layout, but do not edit what they show or present them as final art.',
-  'The key art, screenshots and logo are provisional and made with AI assistance (see the Credits page). They may change before release.',
-  `Everything else is all rights reserved by ${studioName}. These files are not covered by the GPL licence of the game's code.`,
+  `The key art, screenshots and logo are provisional and made with AI assistance (details: ${siteUrl}/docs/credits/). They may change before release.`,
+  `All other rights are reserved by ${studioName}; these files are not covered by the GPL licence of the game's code.`,
   'The fonts (Montserrat and Roboto) are under the SIL Open Font License 1.1; get them from their own projects.',
 ];
 
@@ -110,8 +110,8 @@ export type PressFile = {
 
 /** The colourways every logo layout comes in, with the short note the page shows for each. */
 export const logoColourways = [
-  { id: 'for-dark-bg', title: 'For dark backgrounds', note: 'White name, light cyan ring' },
-  { id: 'for-light-bg', title: 'For light backgrounds', note: 'Navy name, deeper cyan ring' },
+  { id: 'for-dark-bg', title: 'For dark backgrounds', note: 'White lettering, light cyan #8BE3FF' },
+  { id: 'for-light-bg', title: 'For light backgrounds', note: 'Navy lettering, brand cyan #00ACED' },
   { id: 'mono-white', title: 'One colour, white', note: 'Stamps, merch and busy photos' },
   { id: 'mono-navy', title: 'One colour, navy', note: 'Stamps, print and light photos' },
 ] as const;

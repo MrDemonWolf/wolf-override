@@ -88,7 +88,7 @@ export function pressTexts(): Record<(typeof pressTextFiles)[number]['zipPath'],
       creditLine,
       '',
     ].join('\n'),
-    'LICENSE-ASSETS.txt': [heading(`${gameName.name} press kit: how you may use these files`), bullets(assetTerms), '', `Copyright ${studioName}. All rights reserved except as stated above.`, ''].join('\n'),
+    'LICENSE-ASSETS.txt': [heading(`${gameName.name} press kit: how you may use these files`), bullets(assetTerms), '', `© ${studioName} All rights reserved except as stated above.`, ''].join('\n'),
   };
 }
 
