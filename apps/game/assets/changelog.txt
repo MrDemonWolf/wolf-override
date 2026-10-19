@@ -29,6 +29,7 @@ Changes merged after 0.15.0. They become the next version when it is cut.
 - Repeated facts have one home: knockdowns and save folders on Saving and retrying, cranks and TOGGLE HOLDS on Controls, accessibility settings on Accessibility.
 - The landing page starts with three links, one per reader: How to play, Get the game and Build it.
 - The landing page lists what is playable now and what is coming (more languages, more chapters); the hero and the build-progress card link the current version.
+- The landing page and Developer home name the unsigned macOS and Windows test builds; the hero's Get the game opens the Get the game page; Get the game and Install a test build link Privacy; First steps links Get the game.
 - The landing page shows October 16 captures of Records Access and the Service Junction with their doors, in place of the October 12 corridor capture; phones crop them to 4:3 from the left, so the objective, the engineer, the door and WOLF stay in frame.
 - The landing page no longer repeats the source-build button in its hero, and its footer adds a Developers group.
 - The guide menu is grouped for three readers: Play, Get the game and support and Develop. Page addresses are unchanged.
