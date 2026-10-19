@@ -78,9 +78,11 @@ const ENTRY_AXIS_U: Vector3 = Vector3(0.291329, 0.0, 0.956623)
 const ENTRY_AXIS_N: Vector3 = Vector3(-0.956623, 0.0, 0.291329)
 ## The GSA Class 5 security container (0.53 x 1.486 x 0.851 m) where the first copy is secured: the
 ## centre of its front, and its drawn body (side panel to front right edge) for WOLF to keep off.
-## The piece (86 x 146 px at 2 px per world px: 43 x 73 world px) is drawn centred on CONTAINER_X with
-## its base CONTAINER_BASE_Y, where the earlier container's base stood (its wheels on the deck just in
-## front of the walk line), so CONTAINER_SPAN still holds.
+## The piece (86 x 146 px at 2 px per world px: 43 x 73 world px) is a wheeled steel cabinet with a lid
+## and a handle, painted without the Class 5's dial or lock (the art set's waste/records container), so it
+## reads more as a bin than a safe; whether to repaint it is an open question for Nathanial. It is drawn
+## centred on CONTAINER_X with its base CONTAINER_BASE_Y, where the earlier container's base stood (its
+## wheels on the deck just in front of the walk line), so CONTAINER_SPAN still holds.
 const CONTAINER_X: float = 797.0
 const CONTAINER_SCALE: float = 0.5
 const CONTAINER_BASE_Y: float = 442.0
