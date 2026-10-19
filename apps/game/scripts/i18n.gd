@@ -304,6 +304,13 @@ static func format(template: String, inserts: Array) -> String:
 	return line
 
 
+## The template and inserts [method format] remembered for [param line], as [template, inserts], or an
+## empty Array when the line was not built with it. Read by HudText to fill a key prompt's tokens with the
+## input in use instead of the English ones.
+static func parts(line: String) -> Array:
+	return _formats.get(line, []) as Array
+
+
 ## [param line] as the player reads it in the current language. A line built with [method format] is
 ## its translated template filled with the same inserts; any other line is translated piece by piece
 ## where a speaker's tag in [param speakers] starts ("DIRECTOR: ...\nWOLF: ..."), so the tags stay
