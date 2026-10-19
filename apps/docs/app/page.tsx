@@ -1,7 +1,7 @@
 import Link from 'next/link';
 import LandingNavigation from './landing-navigation';
 import BrandLockup from './brand-lockup';
-import Downloads, { ArrowIcon } from './downloads';
+import Downloads, { ArrowIcon, getGameHref } from './downloads';
 import { card, inlineLink, landingWidth, navLink, sectionAnchor, sectionCopy, sectionTitle } from './landing-classes';
 import recordsCapture480 from './images/records-access-doors-capture-480.webp';
 import recordsCapture960 from './images/records-access-doors-capture-960.webp';
@@ -24,12 +24,12 @@ export const metadata = {
 
 /**
  * The hero's three audience doors: one link each for players, people who want the build and developers.
- * "Get the game" scrolls to the Get the build section, which holds the page's one link to the source-build
- * guide (sourceBuildHref in downloads.tsx), so that link is not repeated here.
+ * "Get the game" opens the Get the game guide directly rather than scrolling to the Get the build section:
+ * on phones that section sits about 4,000px down, past the story and gameplay.
  */
 const audiences = [
   { href: '/docs/controls/first-steps/', kicker: 'I want to play', title: 'How to play' },
-  { href: '#downloads', kicker: 'I want the game', title: 'Get the game' },
+  { href: getGameHref, kicker: 'I want the game', title: 'Get the game' },
   { href: '/docs/development/', kicker: 'I want to build it', title: 'Build it' },
 ] as const;
 
@@ -182,7 +182,7 @@ export default function HomePage() {
               ))}
             </nav>
             <p className="mt-3 flex flex-wrap items-center gap-x-3 text-caption text-[#bdd0d9]">
-              <span>Source build available · No public release date</span>
+              <span>Test builds and source available · No release date</span>
               <Link className="inline-flex min-h-11 items-center text-accent underline underline-offset-4" href="/docs/changelog/">Version {version}: what changed</Link>
             </p>
           </div>
