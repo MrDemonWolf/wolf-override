@@ -63,9 +63,10 @@ const DIGIT_GAP: float = 0.5
 const DIGIT_EM: float = 0.72
 ## The outline's value against the tint (lit, and on idle standby), the inset's dark glass, an unlit
 ## segment, and the screen's own light (compose.py: radius 16 at 0.2; idle 8 at 0.06), as alphas of
-## HALO_ALPHA's halo.
+## HALO_ALPHA's halo. The idle outline is a little brighter than compose.py's 0.35 (review of dock bay
+## PR 2's stills: at 1280x720 the empty battery barely read).
 const OUTLINE_LIT: float = 0.6
-const OUTLINE_IDLE: float = 0.35
+const OUTLINE_IDLE: float = 0.5
 const INSET_COLOR: Color = Color8(8, 11, 13)
 const SEGMENT_UNLIT: Color = Color8(28, 36, 40)
 const BATTERY_HALO: float = 0.25
