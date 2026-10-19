@@ -58,3 +58,11 @@ WOLF is **он**, with masculine past tense in -л. He is never declined: "с WO
 - **The seven recap and narration lines** keep their meaning without a past tense: the end card tells
   the run in the present (*{name} говорит WOLF о риске*), and the knockdown cards put the name after a
   dash or a colon (*а %s — прямо на решётке*, *Страж заметил: %s*). No English line had to change.
+- **Words cut to fit (PR L11):** MRDEMONWOLF, INC. PRESENTS is ОТ MRDEMONWOLF, INC. (ПРЕДСТАВЛЯЕТ ran
+  41 px over), CONTINUE is ДАЛЕЕ on the title and touch buttons, the touch PAUSE is СТОП, USE НАЖАТЬ
+  and DROP БРОСИТЬ (ИСПОЛЬЗОВАТЬ, ДЕЙСТВИЕ and СБРОСИТЬ widened the 155 px button), the title's credit
+  line says *разработка с ИИ*, BACK TO TITLE is В МЕНЮ, TEXT SIZE ТЕКСТ, the controller column says
+  *Крест Л/П*, BREAKER USED is РУБИЛЬНИК ВЫКЛ. and VALVE USED ВЕНТ. ПУСТ (the longer plates ran into
+  their neighbours), and the changelog note drops "source-build". Each cut is noted on its line in
+  `ru.po`.
+- **WOLF's readout** is *дисплей*: Codex read *показания* back as "testimony".
