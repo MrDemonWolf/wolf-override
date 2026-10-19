@@ -4,13 +4,48 @@ extends Control
 ## in code by [method configure] from the saved settings file, which every change writes back at once
 ## ([method _save_extra]). GENERAL holds LANGUAGE (localization PR L6, decision D10) and stays hidden
 ## while the game offers one language.
+##
+## Translation (localization PR L7a; the three ways are in I18n's class notes): captions whose whole text
+## is one message keep the English and auto-translate, marked for the translation template with
+## [code]I18n.KEY.tr()[/code] where the generator would not find them; text worked out here (the note
+## under the tabs, key and button names, the binding buttons) is translated with tr() as it is worked out,
+## on Controls whose auto-translate is off, and is worked out again on NOTIFICATION_TRANSLATION_CHANGED.
 
 const BODY_FONT: FontVariation = preload("res://assets/fonts/Roboto-Regular.tres")
 const CONTROL_FONT: FontVariation = preload("res://assets/fonts/Montserrat-Semibold.tres")
 const HEADING_FONT: FontVariation = preload("res://assets/fonts/Montserrat-Bold.tres")
 const ACTIONS: Array[StringName] = [&"move_left", &"move_right", &"interact", &"choice_1", &"choice_2", &"pause_game"]
-const ACTION_NAMES: Array[String] = ["Move left", "Move right", "Interact / continue", "Response 1", "Response 2", "Pause"]
+## The display name of each of [constant ACTIONS], in its order: English, translated where it is drawn
+## (the CONTROLS rows auto-translate; the notes call tr()). A static var rather than a const only so the
+## names can carry the I18n.KEY.tr() marks the translation template is extracted from (a const
+## initialiser cannot call a method).
+static var ACTION_NAMES: Array[String] = [I18n.KEY.tr("Move left"), I18n.KEY.tr("Move right"), I18n.KEY.tr("Interact / continue"), I18n.KEY.tr("Response 1"), I18n.KEY.tr("Response 2"), I18n.KEY.tr("Pause")]
+## Display names of the other actions a rebind can clash with (Main's _install_inputs), so the "Already
+## used by" note never shows an id. The English is the id with "_" as a space, as the note showed before.
+static var OTHER_ACTION_NAMES: Dictionary = {&"cycle_name": I18n.KEY.tr("cycle name")}
+## The AudioServer buses Settings controls, by id: the ids are the settings file's [audio] keys and the
+## bus names, never shown.
 const BUSES: Array[String] = ["Master", "Music", "Effects", "Voice"]
+## The AUDIO row caption of each of [constant BUSES], in its order (a display name, not the bus id; a
+## static var for the marks, like ACTION_NAMES).
+static var BUS_CAPTIONS: Array[String] = [I18n.KEY.tr("Master volume"), I18n.KEY.tr("Music volume"), I18n.KEY.tr("Effects volume"), I18n.KEY.tr("Voice volume")]
+## Display servers whose DisplayServer.keyboard_get_label_from_physical reads the active keyboard layout
+## (Godot 4.7.2: DisplayServerX11, DisplayServerWayland, DisplayServerWindows, DisplayServerMacOSBase).
+## Every other one (headless, Android, iOS, the web) has only the base version, which logs "Not supported
+## by this display server." and returns the code (servers/display/display_server.cpp), so there a key
+## keeps the name of its US QWERTY position, as every key did before PR L7a.
+const KEY_LABEL_SERVERS: Array[String] = ["X11", "Wayland", "Windows", "macOS"]
+## The context of the key names' messages, so "Pause" the key and "Pause" the action, or "Back" and
+## "Home", can be translated apart.
+const KEY_NAME_CONTEXT: StringName = &"key name"
+## The named keys (Godot 4.7.2 core/os/keyboard.cpp, keycode_get_string) a player can bind and read, marked
+## for the translation template; nothing reads it at run time. [method key_name] translates any name with
+## words through tr(), so this list only decides which names a translator is offered: the media, launch
+## and modifier keys (Settings refuses modifiers) and the keypad's digits are left out, and a name with
+## one letter or none ("F5", "E") needs no translation. The symbol keys of a US and an ISO keyboard
+## ("Minus" to "Section") are in, since a key whose layout label matches its position keeps its word
+## ([method key_label_name]).
+static var KEY_NAMES: Array[String] = [I18n.KEY.tr("Escape", KEY_NAME_CONTEXT), I18n.KEY.tr("Tab", KEY_NAME_CONTEXT), I18n.KEY.tr("Backspace", KEY_NAME_CONTEXT), I18n.KEY.tr("Enter", KEY_NAME_CONTEXT), I18n.KEY.tr("Kp Enter", KEY_NAME_CONTEXT), I18n.KEY.tr("Insert", KEY_NAME_CONTEXT), I18n.KEY.tr("Delete", KEY_NAME_CONTEXT), I18n.KEY.tr("Pause", KEY_NAME_CONTEXT), I18n.KEY.tr("Print", KEY_NAME_CONTEXT), I18n.KEY.tr("Clear", KEY_NAME_CONTEXT), I18n.KEY.tr("Home", KEY_NAME_CONTEXT), I18n.KEY.tr("End", KEY_NAME_CONTEXT), I18n.KEY.tr("Left", KEY_NAME_CONTEXT), I18n.KEY.tr("Up", KEY_NAME_CONTEXT), I18n.KEY.tr("Right", KEY_NAME_CONTEXT), I18n.KEY.tr("Down", KEY_NAME_CONTEXT), I18n.KEY.tr("PageUp", KEY_NAME_CONTEXT), I18n.KEY.tr("PageDown", KEY_NAME_CONTEXT), I18n.KEY.tr("CapsLock", KEY_NAME_CONTEXT), I18n.KEY.tr("NumLock", KEY_NAME_CONTEXT), I18n.KEY.tr("ScrollLock", KEY_NAME_CONTEXT), I18n.KEY.tr("Kp Multiply", KEY_NAME_CONTEXT), I18n.KEY.tr("Kp Divide", KEY_NAME_CONTEXT), I18n.KEY.tr("Kp Subtract", KEY_NAME_CONTEXT), I18n.KEY.tr("Kp Period", KEY_NAME_CONTEXT), I18n.KEY.tr("Kp Add", KEY_NAME_CONTEXT), I18n.KEY.tr("Menu", KEY_NAME_CONTEXT), I18n.KEY.tr("Help", KEY_NAME_CONTEXT), I18n.KEY.tr("Space", KEY_NAME_CONTEXT), I18n.KEY.tr("Minus", KEY_NAME_CONTEXT), I18n.KEY.tr("Equal", KEY_NAME_CONTEXT), I18n.KEY.tr("BracketLeft", KEY_NAME_CONTEXT), I18n.KEY.tr("BracketRight", KEY_NAME_CONTEXT), I18n.KEY.tr("BackSlash", KEY_NAME_CONTEXT), I18n.KEY.tr("Semicolon", KEY_NAME_CONTEXT), I18n.KEY.tr("Apostrophe", KEY_NAME_CONTEXT), I18n.KEY.tr("Comma", KEY_NAME_CONTEXT), I18n.KEY.tr("Period", KEY_NAME_CONTEXT), I18n.KEY.tr("Slash", KEY_NAME_CONTEXT), I18n.KEY.tr("QuoteLeft", KEY_NAME_CONTEXT), I18n.KEY.tr("Section", KEY_NAME_CONTEXT)]
 const MAX_SETTINGS_BYTES: int = 65536
 ## Window sizes offered in Settings, by index. A first launch (no saved size) opens at
 ## DEFAULT_WINDOW_SIZE, the same size project.godot gives the first window, so the characters are
@@ -63,13 +98,22 @@ var pages: Array[Control] = []
 ## A phone or tablet build (iOS or Android): the window is the OS's, and the Display note says so.
 var mobile: bool = OS.has_feature("ios") or OS.has_feature("android")
 ## prompt() labels by action, for keys and for a controller; the HUD asks for them every frame, so
-## they are worked out once and forgotten whenever this menu changes a binding.
+## they are worked out once and forgotten whenever this menu changes a binding or the language changes.
 var _key_prompts: Dictionary = {}
 var _pad_prompts: Dictionary = {}
+## The language the remembered prompt() labels are in (TranslationServer's locale, and whether
+## pseudolocalization was on). prompt() checks it on every call rather than clearing the labels on
+## NOTIFICATION_TRANSLATION_CHANGED: the notification reaches Main before this child, so Main's own
+## handler (Pause's hint) would still read the old language's names.
+var _prompts_language: String = ""
 ## The language the player picked (or the file held), written back as [general] language; "" while
 ## none was chosen, so the game keeps following the OS (DESIGN.md: no "follow the system" entry; the
 ## first run follows the OS, and a pick is kept).
 var _picked_language: String = ""
+## The note under the tabs as English: its message and the messages filled into it (see [method show_note]),
+## kept so a language change can translate it again.
+var _note_message: String = ""
+var _note_inserts: Array[String] = []
 @onready var note: Label = $SettingsNote
 
 
@@ -206,7 +250,7 @@ func _build_menu() -> void:
 	surface.theme_type_variation = &"TerminalPanel"
 	add_child(surface)
 	move_child(surface, 0)
-	var subtitle: Label = _label("THE DEN  /  LOCAL CONFIGURATION", 13)
+	var subtitle: Label = _label(I18n.KEY.tr("THE DEN  /  LOCAL CONFIGURATION"), 13)
 	subtitle.position = Vector2(34, 15)
 	subtitle.modulate = MUTED_TEXT
 	subtitle.add_theme_font_override("font", CONTROL_FONT)
@@ -218,9 +262,8 @@ func _build_menu() -> void:
 	tabs.theme_type_variation = &"TerminalTabBar"
 	tabs.position = Vector2(32, 81)
 	tabs.size = Vector2(696, 38)
-	for caption: String in ["DISPLAY", "AUDIO", "CONTROLS"]:
+	for caption: String in [I18n.KEY.tr("DISPLAY"), I18n.KEY.tr("AUDIO"), I18n.KEY.tr("CONTROLS"), I18n.KEY.tr("GENERAL")]:
 		tabs.add_tab(caption)
-	tabs.add_tab(I18n.KEY.tr("GENERAL"))
 	add_child(tabs)
 	tabs.tab_changed.connect(select_tab)
 	var display: Control = Control.new()
@@ -242,7 +285,7 @@ func _build_menu() -> void:
 	display.add_child(vsync)
 	vsync.disabled = DisplayServer.get_name() == "headless"
 	vsync.toggled.connect(func(_value: bool) -> void: _apply_graphics(); _save_extra())
-	antialiasing = _option_row(display, "EDGE SMOOTHING", Rect2(410, 77, 0, 0), Rect2(410, 111, 270, 42), ["OFF", "2× MSAA", "4× MSAA", "8× MSAA"])
+	antialiasing = _option_row(display, I18n.KEY.tr("EDGE SMOOTHING"), Rect2(410, 77, 0, 0), Rect2(410, 111, 270, 42), [I18n.KEY.tr("OFF"), I18n.KEY.tr("2× MSAA"), I18n.KEY.tr("4× MSAA"), I18n.KEY.tr("8× MSAA")])
 	antialiasing.item_selected.connect(func(_index: int) -> void: _apply_graphics(); _save_extra())
 	reduced_motion = CheckButton.new()
 	reduced_motion.text = "REDUCED MOTION"
@@ -255,13 +298,14 @@ func _build_menu() -> void:
 	var size_captions: Array[String] = []
 	for step: float in TextSize.STEPS:
 		size_captions.append("%d%%" % roundi(step * 100.0))
-	text_size = _option_row(display, "TEXT SIZE", Rect2(410, 198, 100, 40), Rect2(520, 196, 160, 40), size_captions)
+	text_size = _option_row(display, I18n.KEY.tr("TEXT SIZE"), Rect2(410, 198, 100, 40), Rect2(520, 196, 160, 40), size_captions)
 	text_size.tooltip_text = "Scales the dialogue, hints, cards and station names."
 	text_size.item_selected.connect(func(index: int) -> void: TextSize.factor = TextSize.STEPS[index]; text_size_changed.emit(TextSize.factor); _save_extra())
 	var audio: VBoxContainer = _page_box()
 	pages.append(audio)
-	for bus: String in BUSES:
-		var slider: HSlider = _slider_row(audio, "%s volume" % bus, 0, 100, 1)
+	for index: int in BUSES.size():
+		var bus: String = BUSES[index]
+		var slider: HSlider = _slider_row(audio, BUS_CAPTIONS[index], 0, 100, 1)
 		volumes[bus] = slider
 		slider.value_changed.connect(func(value: float) -> void: _apply_volume(bus, value); _save_extra())
 	var controls_scroll: ScrollContainer = ScrollContainer.new()
@@ -278,7 +322,7 @@ func _build_menu() -> void:
 	var header: HBoxContainer = HBoxContainer.new()
 	controls.add_child(header)
 	for index: int in 3:
-		var column: Label = _label(["ACTION", "KEYBOARD", "CONTROLLER"][index], 14)
+		var column: Label = _label([I18n.KEY.tr("ACTION"), I18n.KEY.tr("KEYBOARD"), I18n.KEY.tr("CONTROLLER")][index], 14)
 		column.custom_minimum_size.x = 220 if index == 0 else 206
 		header.add_child(column)
 	for index: int in ACTIONS.size():
@@ -289,13 +333,16 @@ func _build_menu() -> void:
 		row.add_child(caption)
 		for kind: String in ["keyboard", "controller"]:
 			var button: Button = Button.new()
+			# Key and button names are translated as they are worked out (_refresh_bindings), so the
+			# button must not translate them again.
+			button.auto_translate_mode = Node.AUTO_TRANSLATE_MODE_DISABLED
 			button.custom_minimum_size = Vector2(206, 48)
 			button.add_theme_font_size_override("font_size", 15)
 			row.add_child(button)
 			var action: StringName = ACTIONS[index]
 			binding_buttons["%s_%s" % [action, kind]] = button
 			button.pressed.connect(begin_capture.bind(action, kind))
-	deadzone = _slider_row(controls, "Stick deadzone", 0.1, 0.8, 0.05)
+	deadzone = _slider_row(controls, I18n.KEY.tr("Stick deadzone"), 0.1, 0.8, 0.05)
 	deadzone.value_changed.connect(func(value: float) -> void: _apply_deadzone(value); _save_extra())
 	# For every device at once, since every crank goes through the one interact action.
 	hold_toggle = CheckButton.new()
@@ -316,6 +363,9 @@ func _build_menu() -> void:
 	note.position = Vector2(40, 372)
 	note.size = Vector2(680, 34)
 	note.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	# The note is often filled in (an action's name, the Display note's two sentences), so show_note
+	# translates it and the Label must not translate it again.
+	note.auto_translate_mode = Node.AUTO_TRANSLATE_MODE_DISABLED
 	cancel_button = Button.new()
 	cancel_button.position = Vector2(548, 414)
 	cancel_button.size = Vector2(180, 38)
@@ -399,11 +449,16 @@ func _show_language() -> void:
 	language_note.visible = not language_note.text.is_empty()
 
 
-## The language list follows the game's language however it changed (the prototype's bug: a list that
-## kept showing the old choice after a change made elsewhere).
+## On a language change, however it was made: the language list follows it (the prototype's bug: a
+## list that kept showing the old choice after a change made elsewhere), and the text this menu works out
+## and translates itself is worked out again: the binding buttons and the note. The remembered prompt()
+## labels follow the language by themselves (see _prompts_language; the cache the lighter plan's S01
+## extends to the HUD must forget a language's key names the same way).
 func _notification(what: int) -> void:
 	if what == NOTIFICATION_TRANSLATION_CHANGED and language != null:
 		_show_language()
+		_refresh_bindings()
+		_show_translated_note()
 
 
 func _page_box() -> VBoxContainer:
@@ -501,12 +556,35 @@ func select_tab(index: int) -> void:
 		pages[page_index].visible = page_index == index
 	for node: CanvasItem in display_nodes:
 		node.visible = index == 0
-	note.text = [display_note(), "Volume changes apply immediately. Effects carries every sound effect; there is no music or voice yet.", "Select a binding, then press a key, controller button or move a stick.", I18n.KEY.tr("Until you choose a language, the game uses your system's.")][index]
+	if index == 0:
+		# The Display tab's note: the window-size sentence only where the OS manages the window (Q10).
+		if mobile:
+			show_note("%s %s", [I18n.KEY.tr(MOBILE_WINDOW_NOTE), I18n.KEY.tr(VSYNC_NOTE)])
+		else:
+			show_note(I18n.KEY.tr(VSYNC_NOTE))
+	else:
+		show_note([I18n.KEY.tr("Volume changes apply immediately. Effects carries every sound effect; there is no music or voice yet."), I18n.KEY.tr("Select a binding, then press a key, controller button or move a stick."), I18n.KEY.tr("Until you choose a language, the game uses your system's.")][index - 1])
 
 
-## The Display tab's note: the window-size sentence only where the OS manages the window (Q10).
-func display_note() -> String:
-	return "%s %s" % [MOBILE_WINDOW_NOTE, VSYNC_NOTE] if mobile else VSYNC_NOTE
+## Shows [param message] (English) in the note under the tabs, in the current language: tr(message), with
+## [param inserts] (English messages too: action names, sentences) each translated and filled in by
+## I18n.fill, which shows the English template when a translation's conversions do not match it.
+## Both are remembered, so a language change shows the note again in the new language. The one way the
+## note is written, also by Main (its window-size and save-failure notes). A message with no words
+## ("%s %s") is left as it is. Mark a literal passed here with I18n.KEY.tr(), since the template
+## generator does not look inside this call.
+func show_note(message: String, inserts: Array[String] = []) -> void:
+	_note_message = message
+	_note_inserts = inserts
+	_show_translated_note()
+
+
+## Writes the remembered note ([method show_note]) translated into the current language.
+func _show_translated_note() -> void:
+	var filled: Array[String] = []
+	for insert: String in _note_inserts:
+		filled.append(tr(insert))
+	note.text = I18n.fill(_note_message, filled)
 
 
 func _apply_graphics() -> void:
@@ -529,7 +607,10 @@ func _apply_deadzone(value: float) -> void:
 func begin_capture(action: StringName, kind: String) -> void:
 	capture_action = action
 	capture_kind = kind
-	note.text = "Press a %s input for %s. Esc cancels." % [kind, ACTION_NAMES[ACTIONS.find(action)]]
+	# One message per device, so the note names the device in words, not by its id ("keyboard"), and a
+	# translation can phrase each one whole.
+	var message: String = I18n.KEY.tr("Press a keyboard input for %s. Esc cancels.") if kind == "keyboard" else I18n.KEY.tr("Press a controller input for %s. Esc cancels.")
+	show_note(message, [ACTION_NAMES[ACTIONS.find(action)]])
 	cancel_button.show()
 
 
@@ -545,7 +626,7 @@ func _input(event: InputEvent) -> void:
 		return
 	if event is InputEventKey and event.pressed and event.keycode == KEY_ESCAPE:
 		cancel_capture()
-		note.text = "Rebind cancelled."
+		show_note(I18n.KEY.tr("Rebind cancelled."))
 		get_viewport().set_input_as_handled()
 		return
 	var pressed: bool = (event is InputEventKey and event.pressed and not event.echo) or (event is InputEventJoypadButton and event.pressed) or (event is InputEventJoypadMotion and absf(event.axis_value) >= 0.65)
@@ -558,14 +639,15 @@ func _input(event: InputEvent) -> void:
 	var conflict: StringName = _binding_conflict(capture_action, binding)
 	if not conflict.is_empty():
 		var action_index: int = ACTIONS.find(conflict)
-		var caption: String = ACTION_NAMES[action_index] if action_index >= 0 else str(conflict).replace("_", " ")
-		note.text = "Already used by %s. Choose another input or cancel." % caption
+		# An action with no display name (a debug tool's) still shows its id with "_" as a space.
+		var caption: String = ACTION_NAMES[action_index] if action_index >= 0 else str(OTHER_ACTION_NAMES.get(conflict, str(conflict).replace("_", " ")))
+		show_note(I18n.KEY.tr("Already used by %s. Choose another input or cancel."), [caption])
 		return
 	_replace_binding(capture_action, capture_kind, binding)
 	cancel_capture()
 	_refresh_bindings()
 	if _save_extra():
-		note.text = "Binding saved."
+		show_note(I18n.KEY.tr("Binding saved."))
 
 
 func _event_kind(event: InputEvent) -> String:
@@ -629,17 +711,22 @@ func binding_label(action: StringName, kind: String) -> String:
 	for event: InputEvent in InputMap.action_get_events(action):
 		if _event_kind(event) == kind:
 			if event is InputEventKey:
-				labels.append(OS.get_keycode_string(event.physical_keycode if event.physical_keycode != KEY_NONE else event.keycode))
+				labels.append(key_name(event))
 			elif event is InputEventJoypadButton:
 				labels.append(_button_label(event.button_index))
 			elif event is InputEventJoypadMotion:
-				labels.append("%s %s" % ["Left stick" if event.axis == JOY_AXIS_LEFT_X else "Axis %d" % event.axis, "−" if event.axis_value < 0 else "+"])
+				labels.append("%s %s" % [tr("Left stick") if event.axis == JOY_AXIS_LEFT_X else I18n.fill(I18n.KEY.tr("Axis %d"), [event.axis]), "−" if event.axis_value < 0 else "+"])
 	return " / ".join(labels)
 
 
-## The label of the first key (or controller input) bound to [param action], remembered until a
-## binding changes.
+## The label of the first key (or controller input) bound to [param action], in the current language and,
+## for a key, as printed on the player's keyboard ([method key_name]); remembered until a binding or the
+## language changes.
 func prompt(action: StringName, controller: bool) -> String:
+	var shown_in: String = "%s %s" % [TranslationServer.get_locale(), TranslationServer.pseudolocalization_enabled]
+	if shown_in != _prompts_language:
+		_forget_prompts()
+		_prompts_language = shown_in
 	var known: Dictionary = _pad_prompts if controller else _key_prompts
 	if known.has(action):
 		return known[action]
@@ -651,24 +738,65 @@ func prompt(action: StringName, controller: bool) -> String:
 func _prompt_label(action: StringName, controller: bool) -> String:
 	for event: InputEvent in InputMap.action_get_events(action):
 		if not controller and event is InputEventKey:
-			return OS.get_keycode_string(event.physical_keycode if event.physical_keycode != KEY_NONE else event.keycode)
+			return key_name(event)
 		if controller and event is InputEventJoypadButton:
 			return _button_label(event.button_index)
 		if controller and event is InputEventJoypadMotion:
-			return "AXIS %d %s" % [event.axis, "−" if event.axis_value < 0 else "+"]
+			return I18n.fill(I18n.KEY.tr("AXIS %d %s"), [event.axis, "−" if event.axis_value < 0 else "+"])
 	return "?"
 
 
+## The name of [param event]'s key as the player reads it. Where the display server can tell
+## ([constant KEY_LABEL_SERVERS]) it is the label printed on the key in the active keyboard layout
+## (DisplayServer.keyboard_get_label_from_physical), so on AZERTY the key bound to "Move left" by its
+## QWERTY position A reads Q; elsewhere it is the US QWERTY position's name, as before PR L7a. The
+## physical key and its label are named by [method key_label_name].
+func key_name(event: InputEventKey) -> String:
+	var physical: Key = event.physical_keycode if event.physical_keycode != KEY_NONE else event.keycode
+	var label: Key = physical
+	if event.physical_keycode != KEY_NONE and DisplayServer.get_name() in KEY_LABEL_SERVERS:
+		label = DisplayServer.keyboard_get_label_from_physical(event.physical_keycode)
+	return key_label_name(physical, label)
+
+
+## The name of a key at US QWERTY position [param physical] whose keyboard layout prints [param label]
+## on it (the same Key when the layout agrees, or when the display server cannot tell).
+## - Where the layout agrees, the key keeps Godot's name for its position, exactly as before PR L7a:
+##   letters and digits are themselves ("E", "1") and symbol keys are words ("Minus", "Slash").
+## - Where it differs, a label that types a character shows that character, because Godot names symbol
+##   keys in English words (AZERTY's 1 key would read "Ampersand"); a label that is a named key shows
+##   that name.
+## - A character the game fonts cannot draw (I18n.game_fonts_draw: Greek, Hebrew, Arabic or Thai letters,
+##   since the fonts never ask the OS for a missing glyph) falls back to the position's name, so a Greek
+##   layout reads "A", not an empty box.
+## A named key ("Escape", "Minus") is translated with the "key name" context ([constant KEY_NAMES]); one
+## with fewer than two letters ("F5", "E") is left as it is (I18n.has_words). Public so the tests can
+## name a layout the headless display server cannot switch to.
+func key_label_name(physical: Key, label: Key) -> String:
+	var code: Key = physical
+	if label != physical:
+		# Below KEY_SPECIAL a Key is the Unicode character it types; KEY_SPACE types nothing visible.
+		if label > KEY_SPACE and label < KEY_SPECIAL:
+			if I18n.game_fonts_draw(String.chr(label)):
+				return String.chr(label)
+		else:
+			code = label
+	var name: String = OS.get_keycode_string(code)
+	return tr(name, KEY_NAME_CONTEXT) if I18n.has_words(name) else name
+
+
+## The name of controller button [param index], in the current language: the face buttons keep their
+## printed letters (A, B, X, Y), the rest are translated.
 func _button_label(index: int) -> String:
 	match index:
 		JOY_BUTTON_A: return "A"
 		JOY_BUTTON_B: return "B"
 		JOY_BUTTON_X: return "X"
 		JOY_BUTTON_Y: return "Y"
-		JOY_BUTTON_START: return "START"
-		JOY_BUTTON_DPAD_LEFT: return "D-pad left"
-		JOY_BUTTON_DPAD_RIGHT: return "D-pad right"
-	return "BUTTON %d" % index
+		JOY_BUTTON_START: return tr("START")
+		JOY_BUTTON_DPAD_LEFT: return tr("D-pad left")
+		JOY_BUTTON_DPAD_RIGHT: return tr("D-pad right")
+	return I18n.fill(I18n.KEY.tr("BUTTON %d"), [index])
 
 
 func _forget_prompts() -> void:
@@ -695,7 +823,7 @@ func reset_controls() -> void:
 	deadzone.value = 0.25
 	_refresh_bindings()
 	if _save_extra():
-		note.text = "Default controls restored."
+		show_note(I18n.KEY.tr("Default controls restored."))
 
 
 func _save_extra() -> bool:
@@ -719,7 +847,7 @@ func _save_extra() -> bool:
 			if current != _family_bindings(defaults[action], kind) and not current.is_empty():
 				config.set_value("bindings", key, current[0])
 	if config.save(settings_path) != OK:
-		note.text = "Settings could not be saved."
+		show_note(I18n.KEY.tr("Settings could not be saved."))
 		return false
 	return true
 

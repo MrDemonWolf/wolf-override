@@ -1,6 +1,6 @@
 extends "res://tests/support/game_suite.gd"
 ## Settings: values saved and loaded, hostile settings files, rebinding keys and controller buttons, the
-## display page and the LANGUAGE row (localization PR L6).
+## display page, the LANGUAGE row (localization PR L6) and the menus' text in another language (PR L7a).
 ## Bookkeeping, spawning and the waits come from the shared suite kit (tests/support/game_suite.gd).
 
 
@@ -46,6 +46,7 @@ func _run() -> void:
 	_expect(paused and menu.is_visible_in_tree() and game.get("title_open"), "settings open before starting a game")
 	_check_display_page(menu)
 	await _check_language_row(game, path)
+	await _check_menu_translation(game)
 	var navigation_actions: Array[StringName] = [&"ui_left", &"ui_right", &"ui_up", &"ui_down"]
 	var navigation_buttons: Array[JoyButton] = [JOY_BUTTON_DPAD_LEFT, JOY_BUTTON_DPAD_RIGHT, JOY_BUTTON_DPAD_UP, JOY_BUTTON_DPAD_DOWN]
 	for index: int in navigation_actions.size():
@@ -299,6 +300,75 @@ func _check_language_row(game: Node2D, path: String) -> void:
 	I18n.apply("en")
 	menu.refresh_languages()
 	menu.select_tab(0)
+
+
+## The menus' worked-out text follows a language change (localization PR L7a), with a catalog made up
+## here for "es" (dropped again with I18n.forget, so no real catalog is touched):
+## - prompt() forgets the labels it remembered in English (the lighter plan's S01 prompt cache), so a
+##   controller button and a named key read in Spanish at once, and the binding buttons follow;
+## - the note under the tabs is translated again, its action name too, and a translation whose
+##   conversions differ from the English shows the English template (I18n.fill) instead of a blank note;
+## - a key name is translated with the "key name" context, so the action "Pause" and the key "Pause" stay
+##   apart, and one-letter names and a layout's symbols are never sent through tr();
+## - a key whose layout label matches its position keeps its word ("Minus"), a layout's character label
+##   is shown as itself, and one the game fonts cannot draw (Greek, Hebrew, Arabic, Thai) falls back to
+##   the QWERTY name (GameSettings.key_label_name, given the labels the headless server cannot read);
+## - Pause's hint is written again in the new language while Pause is open, and the note reads English
+##   again after the switch back.
+## [param game] has title Settings open on the CONTROLS rows' defaults.
+func _check_menu_translation(game: Node2D) -> void:
+	var menu: GameSettings = game.get("settings_menu") as GameSettings
+	var catalog: Translation = Translation.new()
+	catalog.locale = "es"
+	catalog.add_message("START", "INICIO")
+	catalog.add_message("Escape", "Escape-es", GameSettings.KEY_NAME_CONTEXT)
+	catalog.add_message("Pause", "Pausa (acción)")
+	catalog.add_message("Press a keyboard input for %s. Esc cancels.", "Pulsa una tecla para %s. Esc cancela.")
+	catalog.add_message("%s  RESUME", "%s  SEGUIR")
+	# A broken translation (other conversions than the English), as a gap in the PO gates would ship it.
+	catalog.add_message("Press a controller input for %s. Esc cancels.", "Pulsa un botón para %d. Esc cancela.")
+	catalog.add_message("Minus", "Menos", GameSettings.KEY_NAME_CONTEXT)
+	TranslationServer.add_translation(catalog)
+	_expect(menu.prompt(&"pause_game", true) == "START" and menu.prompt(&"pause_game", false) == "Escape", "in English the Pause prompts read START and Escape (and are remembered)")
+	menu.begin_capture(&"pause_game", "keyboard")
+	I18n.apply("es")
+	await process_frame
+	_expect(menu.prompt(&"pause_game", true) == "INICIO" and menu.prompt(&"pause_game", false) == "Escape-es", "a language change forgets the remembered prompts (%s, %s)" % [menu.prompt(&"pause_game", true), menu.prompt(&"pause_game", false)])
+	var keyboard: Button = menu.binding_buttons["pause_game_keyboard"]
+	_expect(keyboard.text == "Escape-es" and keyboard.tooltip_text == keyboard.text and keyboard.auto_translate_mode == Node.AUTO_TRANSLATE_MODE_DISABLED, "the binding buttons are worked out again in the new language (%s)" % keyboard.text)
+	_expect(menu.note.text == "Pulsa una tecla para Pausa (acción). Esc cancela.", "the rebind prompt is translated whole, with the action's name (%s)" % menu.note.text)
+	menu.begin_capture(&"pause_game", "controller")
+	_expect(menu.note.text == "Press a controller input for Pausa (acción). Esc cancels.", "a translated note whose conversions differ from the English shows the English template (its insert still translated), not a blank note (%s)" % menu.note.text)
+	menu.cancel_capture()
+	var symbol: InputEventKey = InputEventKey.new()
+	symbol.physical_keycode = KEY_MINUS
+	var letter: InputEventKey = InputEventKey.new()
+	letter.physical_keycode = KEY_E
+	_expect(menu.key_name(symbol) == "Menos" and menu.key_label_name(KEY_MINUS, KEY_MINUS) == "Menos", "a symbol key whose layout agrees with its position keeps its name, translated (%s)" % menu.key_name(symbol))
+	# Layouts the headless display server cannot switch to, named by their labels: French AZERTY's 1 key
+	# prints &, its A position prints Q; Russian's A position prints Cyrillic ф, which the game fonts
+	# draw; Greek α, Hebrew ש, Arabic ش and Thai ฟ are not in them, so those keys keep the QWERTY name.
+	_expect(menu.key_label_name(KEY_1, KEY_AMPERSAND) == "&" and menu.key_label_name(KEY_A, KEY_Q) == "Q", "a layout's character label is shown as the character (%s, %s)" % [menu.key_label_name(KEY_1, KEY_AMPERSAND), menu.key_label_name(KEY_A, KEY_Q)])
+	_expect(menu.key_label_name(KEY_A, "ф".unicode_at(0) as Key) == "ф", "a Cyrillic label the fonts draw is shown (%s)" % menu.key_label_name(KEY_A, "ф".unicode_at(0) as Key))
+	for native: String in ["α", "ש", "ش", "ฟ"]:
+		_expect(not I18n.game_fonts_draw(native) and menu.key_label_name(KEY_A, native.unicode_at(0) as Key) == "A", "a %s label the game fonts cannot draw falls back to the QWERTY name A (%s)" % [native, menu.key_label_name(KEY_A, native.unicode_at(0) as Key)])
+	_expect(menu.key_label_name(KEY_SEMICOLON, "ش".unicode_at(0) as Key) == "Semicolon", "an undrawable label on a symbol key falls back to the position's word, translated as a key name")
+	TranslationServer.pseudolocalization_enabled = true
+	_expect(menu.key_name(letter) == "E" and menu.key_label_name(KEY_1, KEY_AMPERSAND) == "&", "a letter and a layout's symbol are never sent through tr() (%s, %s)" % [menu.key_name(letter), menu.key_label_name(KEY_1, KEY_AMPERSAND)])
+	TranslationServer.pseudolocalization_enabled = false
+	var pause_menu: Control = game.get("pause_menu") as Control
+	var hint: Label = game.get_node("CanvasLayer/PauseOverlay/Panel/PauseMenu/PauseHint") as Label
+	game.call("_show_pause_hint", false)
+	_expect(hint.text == "Escape-es  SEGUIR" and hint.auto_translate_mode == Node.AUTO_TRANSLATE_MODE_DISABLED, "Pause's hint fills the translated template with the key's name (%s)" % hint.text)
+	var was_visible: bool = pause_menu.visible
+	pause_menu.show()
+	I18n.apply("en")
+	await process_frame
+	_expect(hint.text == "Escape  RESUME" and menu.note.text == "Press a controller input for Pause. Esc cancels.", "back in English, Pause's hint and the note are English again (%s; %s)" % [hint.text, menu.note.text])
+	pause_menu.visible = was_visible
+	I18n.forget(catalog)
+	I18n.apply("en")
+	await process_frame
 
 
 ## A saved language at start-up (PR L6), one game at a time: with Spanish offered (turned on here and off

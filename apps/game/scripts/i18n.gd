@@ -312,14 +312,7 @@ static func format(template: String, inserts: Array) -> String:
 static func shown(line: String, speakers: Array[String]) -> String:
 	if _formats.has(line):
 		var entry: Array = _formats[line]
-		var template: String = String(TranslationServer.translate(entry[0]))
-		if _inserts(template) != _inserts(entry[0]):
-			# A shipped translation whose inserts differ would make % raise a script error and the box
-			# would not draw. The PO gates (msgfmt --check-format, i18n_tool.py check) stop that before a
-			# build; this keeps a gap in them to one English line instead of a broken box.
-			push_warning("I18n: the %s translation of %s has other inserts; showing English" % [TranslationServer.get_locale(), (entry[0] as String).c_escape()])
-			template = entry[0]
-		return template % entry[1]
+		return _filled(String(TranslationServer.translate(entry[0])), entry[0], entry[1])
 	var out: PackedStringArray = []
 	for row: String in line.split("\n"):
 		var tag: String = DialogueBoxes.tag_of(row, speakers)
@@ -336,6 +329,33 @@ static func shown(line: String, speakers: Array[String]) -> String:
 	return "\n".join(out)
 
 
+## [param template] (English, with % conversions) in the current language, filled with [param inserts]:
+## the one way text built in code from a translated template is filled (Settings' note, key and button
+## names, Pause's hint), so each has [method _filled]'s guard. A template with fewer than two letters
+## ([method has_words], such as "%s %s") is not translated, so pseudolocalization does not pad it. Mark a
+## literal passed here with KEY.tr(), since the template generator does not look inside this call. With no
+## [param inserts] the translated template is returned as it is, unfilled.
+static func fill(template: String, inserts: Array) -> String:
+	var translated: String = String(TranslationServer.translate(template)) if has_words(template) else template
+	if inserts.is_empty():
+		# Nothing to fill: a message such as a save error may hold a lone "%", which % would reject.
+		return translated
+	return _filled(translated, template, inserts)
+
+
+## [param translated] % [param inserts], or [param template] (its English) % [param inserts] when the
+## translation's conversions differ from the English ones ([method _inserts]). Shared by [method shown]
+## and [method fill].
+static func _filled(translated: String, template: String, inserts: Array) -> String:
+	if _inserts(translated) != _inserts(template):
+		# A shipped translation whose inserts differ would make % raise a script error and the text would
+		# not draw. The PO gates (msgfmt --check-format, i18n_tool.py check) stop that before a build; this
+		# keeps a gap in them to one English line instead of a broken box or a blank note.
+		push_warning("I18n: the %s translation of %s has other inserts; showing English" % [TranslationServer.get_locale(), template.c_escape()])
+		return template % inserts
+	return translated % inserts
+
+
 ## The printf conversions of [param template] in order, each reduced to what % takes from the
 ## inserts: one "*" per star width or precision, then the type letter ("%02d" and "%d" are both "d").
 ## A literal "%%" takes nothing and is left out. Used by [method shown] to compare a translation with its
@@ -349,6 +369,21 @@ static func _inserts(template: String) -> PackedStringArray:
 	return found
 
 
+## True when [param text] has at least two letters, so it holds a word a translation can change: not a
+## lone symbol such as ◀, a number, or a one-letter key or button name ("E", "A"), which every language
+## writes the same way and pseudolocalization has nothing to pad. One rule for the game and the tools:
+## Settings translates a key or button name only when this holds (GameSettings), and the parity capture's
+## pseudo audit counts only such text as untranslated (scripts/parity/capture.gd). A letter is a character
+## with an upper and a lower case, so CJK text counts only through its Latin letters (none of the names
+## this is asked about are CJK).
+static func has_words(text: String) -> bool:
+	var letters: int = 0
+	for character: String in text:
+		if character.to_upper() != character.to_lower():
+			letters += 1
+	return letters >= 2
+
+
 ## [param text] with each of its lines translated on its own (the top card's location and objective).
 static func lines(text: String) -> String:
 	var out: PackedStringArray = []
@@ -359,13 +394,28 @@ static func lines(text: String) -> String:
 
 ## The characters of [param text] that [param font] and its fallbacks cannot draw, each once (line
 ## breaks and spaces skipped). Font.has_char never asks the OS's fonts, so "" means no tofu on any
-## machine. Shared by tests/i18n_test.gd and, from PR L2, the parity capture's language audit.
+## machine. Shared by tests/i18n_test.gd, [method game_fonts_draw] and, from PR L2, the parity
+## capture's language audit.
 static func missing_glyphs(text: String, font: Font) -> String:
 	var missing: String = ""
 	for character: String in text:
 		if character != "\n" and character != " " and not font.has_char(character.unicode_at(0)) and not missing.contains(character):
 			missing += character
 	return missing
+
+
+## True when both game font files ([constant BASE_FONT_PATHS], which every themed FontVariation uses as
+## its base) and their current fallbacks can draw every character of [param text]
+## ([method missing_glyphs]). Since PR L4 the fonts never ask the OS for a missing character, so a
+## character this rejects would draw as an empty box. Used by GameSettings.key_label_name to keep a
+## keyboard layout's Greek, Hebrew, Arabic or Thai letter off the screen. A font file missing from the
+## build is skipped.
+static func game_fonts_draw(text: String) -> bool:
+	for path: String in BASE_FONT_PATHS:
+		var font: Font = load(path) as Font
+		if font != null and not missing_glyphs(text, font).is_empty():
+			return false
+	return true
 
 
 ## True when [param control] cannot show all of its text as laid out. Call it on a settled frame with

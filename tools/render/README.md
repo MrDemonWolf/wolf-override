@@ -15,7 +15,7 @@ build of Godot 4.7.2 and checks it against its published SHA-512 sum.
 
 ```sh
 tools/render/render.sh [--screen WxH] [--name JOB] [--driver DIR] [--timeout SEC] \
-  PROJECT_DIR OUT_DIR -- GODOT_ARGS...
+  [--keyboard LAYOUT] PROJECT_DIR OUT_DIR -- GODOT_ARGS...
 ```
 
 - `PROJECT_DIR` is copied (without its `.godot` folder) to
@@ -27,6 +27,10 @@ tools/render/render.sh [--screen WxH] [--name JOB] [--driver DIR] [--timeout SEC
 - `--screen` sets the virtual screen (default 2560x1440). The game picks its own window size at
   start-up, so a capture script that needs another size sets `get_window().size` after the first
   frames.
+- `--keyboard LAYOUT` gives the virtual screen another keyboard layout, as an XKB layout name (`fr` is
+  French AZERTY, `de` German QWERTZ). Key names then read as on that keyboard. Without it the layout is
+  US QWERTY. It works by making LAYOUT the container's default before Xvfb starts, because `setxkbmap`
+  does not change this Xvfb's keymap. `scripts/parity/run.sh` passes `PARITY_KEYBOARD` through.
 - Every run stops after `--timeout` seconds (default 900, exit status 124). The run's log is kept at
   `~/Library/Caches/wolf-override-render/JOB/run.log`.
 - The container has its own throwaway user data, so nothing reaches the host's Godot settings or
