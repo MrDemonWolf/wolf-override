@@ -56,6 +56,7 @@ Changes merged after 0.15.0. They become the next version when it is cut.
 - Search results show clearer page titles, such as "Controls: keyboard, controller and touch", while the menu keeps the short names.
 - Every guide page has a search description of 80 to 160 characters; short ones are rewritten and the build fails without one.
 - The home page's search description is shorter, so search results show all of it.
+- Shared guide links show the game's name in their preview title, such as "Controls: keyboard, controller and touch | WOLF OVERRIDE", and are marked as articles with the date the page last changed.
 
 -- Development --
 - The game's version lives in one place, apps/game/project.godot; the macOS and Windows test builds now take it from there instead of 0.0.0.
@@ -67,11 +68,13 @@ Changes merged after 0.15.0. They become the next version when it is cut.
 - Translations are reviewed without a translation website: Claude translates, Codex back-translates, the checks run, and each language is marked machine translation until a native speaker reviews it.
 - Test build zips' README.txt and the Test builds run summary link the new Install a test build page.
 - CONTRIBUTING.md links the website's copied-code check, project rules and contributing pages instead of repeating them.
+- The docs export check fails when a guide page's link preview is not an article or lacks the game's name.
 
 -- How it was checked --
 - Checked: headless test suites, the docs checks and build, rendered stills of the title screen, and headless browser screenshots of the credits, legal and landing pages, and an axe scan of the landing page; headless browser screenshots of the guide home, the changelog and the open guide menu at phone, tablet and desktop sizes, and an axe scan of guide pages; the README's links checked against the built site and its commands against package.json; headless browser screenshots of the rewritten player pages, their facts checked against the game's code; headless browser screenshots of the new and rewritten user pages, the privacy claims checked against the game's code; headless browser screenshots of the developer pages, with honesty-note counts kept and their commands run or marked not run; headless browser screenshots of the docs style guide, Developer home and Contributing; not played by hand.
 - New characters checked: headless test suites and rendered stills (1280x720 and a phone shape) of each pose, before and after; not played by hand, so nothing was judged in motion.
 - Search titles and descriptions checked: the docs checks and build, with every built page's title and description length listed.
+- Link previews checked: the docs checks and build, and the og:type, og:title and twitter:title tags read from the built pages.
 
 == 0.15.0 - October 16, 2026 ==
 Summary: real doors in Records Access and the Service Junction, a copied-code check, notes moved to Notion and groundwork for more languages.
