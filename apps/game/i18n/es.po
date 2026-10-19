@@ -1019,7 +1019,7 @@ msgstr "PULSAR EN VEZ DE MANTENER"
 #. i18n: speaker=ui engineer=you
 #: scripts/game_settings.gd:350
 msgid "Press interact once to start a crank and again to stop it, instead of holding it down. Keyboard, controller and touch."
-msgstr "Presiona usar una vez para empezar a girar una manivela y otra vez para parar, en vez de mantener el botón. Teclado, control y pantalla táctil."
+msgstr "Presiona USAR una vez para empezar a girar una manivela y otra vez para pararla, en vez de mantener el botón. Teclado, control y pantalla táctil."
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: CONTROLS button.
