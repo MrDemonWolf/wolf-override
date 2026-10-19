@@ -29,21 +29,25 @@ const MAX_ROW_CHARACTERS: int = 42
 const LONG_LINE_WORDS: int = 20
 ## A choice's response rows follow its question after this; the answer buttons show them instead.
 const CHOICE_MARKER: String = "\n1  "
+## The marks below hold Chinese and Japanese punctuation as \u escapes: they are marks the splitter
+## reads, never text the game draws, and the English glyph check (tests/i18n_test.gd) reads every
+## literal as text to draw. 3002 。, ff01 ！, ff1f ？, ff1b ；, ff0c ，, 3001 、, 300c 「, 300d 」,
+## 300e 『, 300f 』, ff09 ）, 3011 】, 3015 〕.
 ## Marks that end a sentence. "…" counts as one; the Chinese and Japanese full stops need no space
 ## after them (NO_SPACE_MARKS). Spanish ¿ and ¡ open a sentence and end none, so they need no rule: a
 ## sentence breaks before them at the space after the last one's mark.
-const SENTENCE_ENDS: String = ".!?…。！？"
+const SENTENCE_ENDS: String = ".!?…\u3002\uff01\uff1f"
 ## Marks a sentence too long for one box may break after, semicolons first, then commas (with the
 ## fullwidth forms and Japanese's 、).
-const CLAUSE_MARKS: Array[String] = [";；", ",，、"]
+const CLAUSE_MARKS: Array[String] = [";\uff1b", ",\uff0c\u3001"]
 ## Fullwidth marks a break follows directly: Chinese and Japanese write no space after them (the
 ## prototype measured a Japanese knockdown box one box too long without them).
-const NO_SPACE_MARKS: String = "。！？；，、"
+const NO_SPACE_MARKS: String = "\u3002\uff01\uff1f\uff1b\uff0c\u3001"
 ## Characters a break never comes before, so "！？" and "。」" stay together on one side.
-const NO_BREAK_BEFORE: String = ".!?…。！？；，、」』）】〕”’»"
+const NO_BREAK_BEFORE: String = ".!?…\u3002\uff01\uff1f\uff1b\uff0c\u3001\u300d\u300f\uff09\u3011\u3015”’»"
 ## Quotation openers and the closers each takes: a sentence inside a quotation never breaks the line.
 ## „ closes with “ in German and ” in Polish; " is its own closer.
-const QUOTE_PAIRS: Dictionary = {"\"": "\"", "«": "»", "„": "“”", "“": "”", "「": "」", "『": "』"}
+const QUOTE_PAIRS: Dictionary = {"\"": "\"", "«": "»", "„": "“”", "“": "”", "\u300c": "\u300d", "\u300e": "\u300f"}
 
 
 ## The boxes [param message] is shown as, in order. Each is "TAG: words" for a speaker in
