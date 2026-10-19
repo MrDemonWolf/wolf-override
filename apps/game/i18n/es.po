@@ -1012,7 +1012,7 @@ msgstr "Zona muerta del stick"
 #. i18n: speaker=ui
 #: scripts/game_settings.gd:349
 msgid "TOGGLE HOLDS"
-msgstr "PULSAR EN VEZ DE MANTENER"
+msgstr "PRESIONAR EN VEZ DE MANTENER"
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: Tooltip of TOGGLE HOLDS. A crank: a hand wheel the engineer turns.
