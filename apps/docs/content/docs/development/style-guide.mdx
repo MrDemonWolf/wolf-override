@@ -1,0 +1,152 @@
+---
+title: Docs style guide
+description: "How to write a page on the WOLF OVERRIDE guide so anyone can scan it in 10 seconds: the 15 rules, the blocks to use and a page to copy."
+---
+
+**What this page is for:** how to write a page on this site so anyone can scan it in 10 seconds.
+
+- **Who it is for:** anyone who adds or changes a page in `apps/docs`, people and coding agents alike.
+- **The rules behind it** are on [Project rules](/docs/development/rules/). If the two differ, Project rules wins.
+
+## The 15 rules
+
+| # | Rule | In one line |
+| --- | --- | --- |
+| 1 | Start with one line | `**What this page is for:** ...` under the title. One sentence. |
+| 2 | One idea per bullet | Under about 25 words. |
+| 3 | Numbered steps | One action per step. |
+| 4 | Short sections | A heading every 3 to 6 bullets. |
+| 5 | Plain words | Define a term the first time, or link the glossary. |
+| 6 | Tables for comparisons | One short line per cell. |
+| 7 | Callouts for warnings and status | Warnings stand out; status stays calm. |
+| 8 | Details for depth | Long notes fold away. |
+| 9 | One home per fact | Link to it; never copy it. |
+| 10 | Be honest about testing | Say how it was checked. |
+| 11 | Spoiler-free outside the walkthrough | Walkthrough pages open with a spoiler callout. |
+| 12 | Story wording is Nathanial's | Do not reword story text; ask. |
+| 13 | No walls | No paragraph over about 60 words. |
+| 14 | Changelog lines | Every change adds its lines under Next version. |
+| 15 | Tailwind and Fumadocs only | No new bespoke CSS. |
+
+Each rule is explained below.
+
+## Open the page
+
+- **Rule 1.** Put one line under the title: `**What this page is for:** ...`. A TL;DR line works too.
+- **Keep it to one sentence.** The reader decides from it whether to stay.
+- **Fill in the front matter** `description` too. It feeds search results and link previews.
+- **Make the description 80 to 160 characters,** about 110 to 155 is best. The build fails outside that range, because search results cut it off.
+- **Short menu title?** Add `seoTitle` with the words people search for, up to 44 characters, such as `"Controls: keyboard, controller and touch"`. Only search results and link previews show it.
+- **Quote a front matter value** that contains a colon and a space, or the page will not build.
+
+## Write bullets, steps and sections
+
+- **Rule 2: one idea per bullet.** If a bullet needs "and also", make two bullets.
+- **Aim for under 25 words** per bullet.
+- **Start a bullet with its point in bold** when a list has several kinds of thing, as this list does.
+- **Rule 3: numbered steps** for anything the reader does, one action per step. Write them as a Markdown numbered list (`1.`, `2.`).
+- **Rule 4: short sections.** Add a heading every 3 to 6 bullets.
+- **Headings say what the reader gets,** such as "Open a test build on macOS", not a topic word such as "macOS".
+
+## Use plain words
+
+- **Rule 5.** Say it the way you would to a friend who has never seen the game.
+- **Define a game or tech term** the first time it appears on the page.
+- **Or link the glossary:** the [FAQ](/docs/faq/) explains the game's own words.
+- **Use the on-screen name** of a button or setting, in bold capitals, as the game shows it: **TEXT SIZE**, **RETRY**.
+
+## Pick the right block
+
+| Need | Use | Example on this site |
+| --- | --- | --- |
+| Compare things (platforms, settings, problems) | A Markdown table, one short line per cell | [Platforms and languages](/docs/platforms/) |
+| Warn that the reader can lose something | `<Callout type="warn" title="...">` | [Saving and retrying](/docs/controls/saves/) |
+| Give status, such as "not played by hand" | `<Callout title="...">` | [Releases and versions](/docs/development/releases/) |
+| Hold long notes, numbers or evidence | `<Details>` with a `<Summary>` line | [Accessibility](/docs/accessibility/) |
+| Send readers to other pages | The `LinkCards` component | [Start here](/docs/) |
+| Show a capture from the game | The `Screenshot` component | [First steps](/docs/controls/first-steps/) |
+
+- **Rule 6: tables** are for comparisons. Keep each cell to one short line.
+- **Rule 7: callouts** are for warnings and status, not for normal text.
+- **On the changelog,** keep a callout's text on its opening tag line. The in-game export skips lines that start with `<`.
+- **Rule 8: details** hold depth. The visible text above them must still be true on its own.
+- **The in-game changelog skips** everything inside `<Details>`, so the short lines must carry every honesty note.
+
+## Keep facts in one place
+
+- **Rule 9: one home per fact.** Write it once and link to it from everywhere else.
+- **Reviews treat a copied paragraph like copied code:** as a defect.
+- **The homes so far:**
+
+| Fact | Home |
+| --- | --- |
+| Install steps | [Get the game](/docs/get-game/) |
+| Save folders, knockdowns and retry | [Saving and retrying](/docs/controls/saves/) |
+| Cranks and **TOGGLE HOLDS** | [Controls](/docs/controls/input/) |
+| Accessibility settings | [Accessibility](/docs/accessibility/) |
+| What the copied-code check does | [Testing and CI](/docs/development/testing/#copied-code-check) |
+| Version numbers and cutting a version | [Releases and versions](/docs/development/releases/) |
+
+## Be honest about testing
+
+- **Rule 10.** Say what was checked and how: headless tests, rendered stills, hands-on play, an export or a device.
+- **Never say something feels or reads well** unless it was played, or read on a real screen.
+- **Keep honesty notes** such as "approved by Nathanial Henniges" and "not played by hand" in the visible text.
+- **The kinds of check** are listed on [What was checked](/docs/development/evidence/#kinds-of-check).
+
+## Protect the story
+
+- **Rule 11: spoiler-free outside the walkthrough.** Describe what is playable today, not what happens later.
+- **Walkthrough pages open with a spoiler callout,** `<Callout type="warn" title="Spoilers: ...">`.
+- **Rule 12: story wording is Nathanial's.** You may move or restyle story text. Do not reword it; ask him.
+- **Feature and how-to text** may be rewritten freely.
+
+## No walls of text
+
+- **Rule 13.** No paragraph over about 60 words.
+- **No section longer than one phone screen** without a heading.
+- **Check it at phone width** (390 pixels) before you open the pull request.
+
+## Add your changelog lines
+
+- **Rule 14.** Every pull request that changes the game, the site or the tools adds one-line bullets under **Next version (in development)**.
+- **Put each line in its group:** Gameplay, Art, Audio, Accessibility, Settings, Website or Development.
+- **The full steps,** including the export command, are on [Releases and versions](/docs/development/releases/#add-your-changes-to-next-version).
+
+## Style with Tailwind and Fumadocs
+
+- **Rule 15.** Use Tailwind tokens and utilities and the Fumadocs components above.
+- **Write no new bespoke CSS.**
+- **Need a new component?** Add it once in `apps/docs/app/docs/guide-components.tsx`, register it in `apps/docs/mdx-components.tsx`, and give it a doc comment.
+
+## A page to copy
+
+```mdx
+---
+title: Open a test build
+description: One sentence for search results and link previews, 80 to 160 characters long.
+---
+
+**What this page is for:** one sentence.
+
+## Do the first thing
+
+1. One action.
+2. The next action.
+
+## Know the limits
+
+- **One idea** per bullet.
+- **Another idea** per bullet.
+
+<Callout type="warn" title="Careful">
+  One or two short sentences.
+</Callout>
+```
+
+## Before you open the pull request
+
+1. Read the page at phone width.
+2. Check it against the [15 rules](#the-15-rules).
+3. Run the docs checks on [Testing and CI](/docs/development/testing/#run-the-checks).
+4. Add your lines under Next version on the [changelog](/docs/changelog/).

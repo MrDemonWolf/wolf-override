@@ -1,9 +1,12 @@
 import { Fragment } from 'react';
 import Link from 'next/link';
-import { landingWidth, sectionAnchor, sectionTitle } from './landing-classes';
+import { inlineLink, landingWidth, sectionAnchor, sectionTitle } from './landing-classes';
 
-/** The one place the landing page sends players for the current source build. */
-export const sourceBuildHref = '/docs/get-game/';
+/** The guide page with every way to get the game today (test build or source); the hero and this section link it. */
+export const getGameHref = '/docs/get-game/';
+
+/** Steps for the unsigned macOS and Windows debug test builds, which run without Godot. */
+export const testBuildsHref = '/docs/test-builds/';
 
 /** Planned distribution targets. None has a package or a release date yet. */
 export const plannedPlatforms = [
@@ -31,17 +34,24 @@ export default function Downloads() {
       <div className={`${landingWidth} grid gap-10 min-[701px]:grid-cols-[minmax(0,1.2fr)_minmax(0,1fr)] min-[701px]:items-start min-[701px]:gap-16`}>
         <div>
           <p className="hud-label mb-5">Get the build</p>
-          <h2 id="downloads-title" tabIndex={-1} className={sectionTitle}>Try the source build.</h2>
-          <p className="m-0 max-w-[50ch] text-body text-muted">
-            There is no packaged game download yet. The current development build runs from source in Godot; it is not an installer and has no release date.
-          </p>
+          <h2 id="downloads-title" tabIndex={-1} className={sectionTitle}>Try a test build.</h2>
+          <ul className="m-0 flex max-w-[50ch] list-disc flex-col gap-2 pl-5 text-body text-muted marker:text-accent">
+            <li>There is no release, installer or release date yet.</li>
+            <li>Test builds for macOS and Windows run without Godot. They are unsigned debug builds, kept for 14 days, and need a GitHub account to download.</li>
+            <li>Or run the source game in Godot 4.7.2 on Windows, macOS or Linux.</li>
+          </ul>
           <Link
-            href={sourceBuildHref}
+            href={getGameHref}
             className="mt-8 inline-flex min-h-13 items-center justify-between gap-5 rounded-control border border-accent bg-accent px-5 py-3 font-heading text-body font-bold text-ink transition-[filter,transform] hover:-translate-y-px hover:text-ink hover:brightness-105 motion-reduce:transition-none motion-reduce:hover:translate-y-0 phone:w-full"
           >
-            Get the source build
+            Get the game
             <ArrowIcon />
           </Link>
+          <p className="mt-2">
+            <Link href={testBuildsHref} className={inlineLink}>
+              Install a test build <span aria-hidden="true">→</span>
+            </Link>
+          </p>
         </div>
         <div className="rounded-card border border-line-strong bg-ink p-6">
           <h3 className="m-0 font-heading text-body font-bold">Planned platforms:</h3>

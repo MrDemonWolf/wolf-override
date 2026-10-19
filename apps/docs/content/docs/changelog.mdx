@@ -1,5 +1,6 @@
 ---
 title: Changelog
+seoTitle: "Changelog: development versions"
 description: What changed in each development version of the WOLF OVERRIDE source game and website, newest first. Spoiler-free.
 ---
 
@@ -59,6 +60,7 @@ Changes merged after 0.15.0. They become the next version when it is cut.
 - Repeated facts have one home: knockdowns and save folders on Saving and retrying, cranks and TOGGLE HOLDS on Controls, accessibility settings on Accessibility.
 - The landing page starts with three links, one per reader: How to play, Get the game and Build it.
 - The landing page lists what is playable now and what is coming (more languages, more chapters); the hero and the build-progress card link the current version.
+- The landing page and Developer home name the unsigned macOS and Windows test builds; the hero's **Get the game** opens the Get the game page; Get the game and Install a test build link Privacy; First steps links Get the game.
 - The landing page shows October 16 captures of Records Access and the Service Junction with their doors, in place of the October 12 corridor capture; phones crop them to 4:3 from the left, so the objective, the engineer, the door and WOLF stay in frame.
 - The landing page no longer repeats the source-build button in its hero, and its footer adds a Developers group.
 - The guide menu is grouped for three readers: **Play**, **Get the game and support** and **Develop**. Page addresses are unchanged.
@@ -77,6 +79,16 @@ Changes merged after 0.15.0. They become the next version when it is cut.
 - About the game lists how it plays as short bullets; the story text is unchanged.
 - Privacy matches the code again: the debug unlock line, no language setting, the system language read at start, bug captures and the guide's search; checked October 18, 2026.
 - Legal's website privacy section is now one line linking Privacy.
+- Testing is now **Testing and CI**: the commands and what CI runs, with the copied-code check explained once.
+- New developer pages: **Contributing**, **Project rules**, **Architecture**, **Debug tools**, **What was checked**, **Localization**, **Art pipeline** and **Releases and versions**.
+- **What was checked** keeps every dated test record and honesty note from Testing, each with a short summary and the full record folded under it.
+- Setup lists every tool needed (Python 3, Bun, Godot, `GODOT_BIN`), how to keep your own saves safe and the render container.
+- Current status and Developer home are short lists; the planned macOS updater moved to Releases and versions.
+- New **Docs style guide** page: the 15 rules for writing a guide page, a page to copy and a checklist. Developer home, Contributing, `CONTRIBUTING.md` and `AGENTS.md` link it.
+- Search results show clearer page titles, such as "Controls: keyboard, controller and touch", while the menu keeps the short names.
+- Every guide page has a search description of 80 to 160 characters; short ones are rewritten and the build fails without one.
+- The home page's search description is shorter, so search results show all of it.
+- Shared guide links show the game's name in their preview title, such as "Controls: keyboard, controller and touch | WOLF OVERRIDE", and are marked as articles with the date the page last changed.
 
 ### Development
 
@@ -88,12 +100,16 @@ Changes merged after 0.15.0. They become the next version when it is cut.
 - Changes that reached the game or site earlier but were missing from this page are now listed under their versions.
 - Translations are reviewed without a translation website: Claude translates, Codex back-translates, the checks run, and each language is marked machine translation until a native speaker reviews it.
 - Test build zips' `README.txt` and the Test builds run summary link the new Install a test build page.
+- `CONTRIBUTING.md` links the website's copied-code check, project rules and contributing pages instead of repeating them.
+- The docs export check fails when a guide page's link preview is not an article or lacks the game's name.
 
 ### How it was checked
 
-- **Checked:** headless test suites, the docs checks and build, rendered stills of the title screen, and headless browser screenshots of the credits, legal and landing pages, and an axe scan of the landing page; headless browser screenshots of the guide home, the changelog and the open guide menu at phone, tablet and desktop sizes, and an axe scan of guide pages; the README's links checked against the built site and its commands against `package.json`; headless browser screenshots of the rewritten player pages, their facts checked against the game's code; headless browser screenshots of the new and rewritten user pages, the privacy claims checked against the game's code; not played by hand.
+- **Checked:** headless test suites, the docs checks and build, rendered stills of the title screen, and headless browser screenshots of the credits, legal and landing pages, and an axe scan of the landing page; headless browser screenshots of the guide home, the changelog and the open guide menu at phone, tablet and desktop sizes, and an axe scan of guide pages; the README's links checked against the built site and its commands against `package.json`; headless browser screenshots of the rewritten player pages, their facts checked against the game's code; headless browser screenshots of the new and rewritten user pages, the privacy claims checked against the game's code; headless browser screenshots of the developer pages, with honesty-note counts kept and their commands run or marked not run; headless browser screenshots of the docs style guide, Developer home and Contributing; not played by hand.
 - **New characters checked:** headless test suites and rendered stills (1280x720 and a phone shape) of each pose, before and after; not played by hand, so nothing was judged in motion.
 - **New machines checked:** headless test suites and rendered stills (1280x720 and a phone shape) of each room, before and after; not played by hand.
+- **Search titles and descriptions checked:** the docs checks and build, with every built page's title and description length listed.
+- **Link previews checked:** the docs checks and build, and the og:type, og:title and twitter:title tags read from the built pages.
 
 ## 0.15.0 - October 16, 2026
 

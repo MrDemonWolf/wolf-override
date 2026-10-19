@@ -1,0 +1,46 @@
+---
+title: Contributing
+description: "How to send a change to WOLF OVERRIDE, from an issue to a merged pull request: the rules, the checks to run and the changelog lines to add."
+---
+
+**What this page is for:** the steps to send a change, in order.
+
+- **The full guide,** including licence, assets and private story material, is [`CONTRIBUTING.md`](https://github.com/MrDemonWolf/wolf-override/blob/main/CONTRIBUTING.md).
+- **Not a developer?** To report a bug, see [Support and bug reports](/docs/support/).
+
+## Before you start
+
+1. Read the [Project rules](/docs/development/rules/).
+2. For anything bigger than a small fix, open an [issue](https://github.com/MrDemonWolf/wolf-override/issues) first, so the direction can be agreed.
+3. [Set up the project](/docs/development/setup/).
+
+## Make the change
+
+1. Branch from `main`. One focused change per branch.
+2. Make the change in a small, playable step.
+3. Give new code its [doc comments](/docs/development/rules/#code-and-comments).
+4. Update the guide pages your change affects, following the [Docs style guide](/docs/development/style-guide/).
+5. Add your lines under **Next version** on the changelog and run `python3 scripts/export_changelog.py`. See [Releases and versions](/docs/development/releases/#add-your-changes-to-next-version).
+
+## Check it
+
+1. Run the checks on [Testing and CI](/docs/development/testing/#run-the-checks).
+2. If the change affects movement, pacing, readability or WOLF, play the affected route in a game window.
+3. Note what you played and what you did not.
+
+## Open the pull request
+
+1. Push your branch and open a pull request against `main`.
+2. Say what changed and how it was checked: headless, rendered stills, hands-on play, export or device.
+3. Say if you used an AI coding tool.
+4. Wait for the two required checks, `godot` and `build`. See [Continuous integration](/docs/development/testing/#continuous-integration).
+
+<Callout type="warn" title="Keep it public-safe">
+  Write plain, spoiler-free commit messages and pull request text. Security problems go through [SECURITY.md](https://github.com/MrDemonWolf/wolf-override/blob/main/SECURITY.md), not public issues.
+</Callout>
+
+## What `main` protects
+
+- **No deletion and no force-push** to `main`.
+- **Two checks must pass** before a change lands: `godot` (Game checks) and `build` (Deploy Docs).
+- **Keep intact:** the Godot pin, the stable event IDs, the existing asset sources and the engineer-only viewpoint.

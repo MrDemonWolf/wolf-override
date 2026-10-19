@@ -1,24 +1,64 @@
 ---
 title: Set up the project
-description: Play the source game with Godot 4.7.2 or run the docs site locally.
+description: Install what WOLF OVERRIDE needs, clone it, run the game and the docs site, and make captures without a game window.
 ---
 
-**Status:** there is no packaged game release or installer yet; the playable chapter slice runs from this repository in Godot 4.7.2, and unsigned debug [test builds](/docs/test-builds/) for macOS and Windows are made from each change. Bun is needed only for website work.
+**What this page is for:** get the project running on your computer and ready for checks.
 
-## Play the game
+- **Just want to play?** [Get the game](/docs/get-game/) is the one home for the install and run steps, or use a [test build](/docs/test-builds/).
+- **No release yet.** There is no packaged game or installer; the playable chapter slice runs from this repository in Godot 4.7.2.
 
-- **Steps:** [Get the game](/docs/get-game/#run-the-source-game) is the one home for the install and run steps, including the command-line way.
-- **Then:** [Start here](/docs/) introduces the first goal, [Play overview](/docs/controls/) covers input and checkpoints, and the [chapter walkthrough](/docs/walkthrough/) has optional puzzle solutions.
+## What you need
+
+| Tool | Version | Needed for |
+| --- | --- | --- |
+| [Godot](https://godotengine.org/download/archive/) | 4.7.2 stable, exactly | The game and its checks |
+| Python 3 | Any current 3.x, standard library only | The changelog export, the copied-code check, test build packaging |
+| [Bun](https://bun.sh/) | 1.4.2 (pinned in `package.json`) | The docs site and the `bun run` scripts |
+| Git | Any current | Cloning, and the copied-code check reads history |
+| GNU gettext (`msgfmt`) | Any | Only for [translation tools](/docs/development/localization/#commands) |
+| Docker (Colima on macOS) | Any | Only for [rendered captures](#rendered-captures) |
+
+## Set it up
+
+1. Clone the repository:
+
+   ```sh
+   git clone https://github.com/MrDemonWolf/wolf-override.git
+   cd wolf-override
+   ```
+
+2. Check Bun with `bun --version`, then install the docs packages with `bun install --frozen-lockfile`.
+3. Check Godot with `godot --version`. If your Godot binary has another name or path, set it with `export GODOT_BIN=/path/to/godot`.
+
+4. Run the checks once to see everything works: [Testing and CI](/docs/development/testing/#run-the-checks).
+
+## Run the game
+
+- **Steps:** [Get the game: run the source game](/docs/get-game/#run-the-source-game), in the Project Manager or from the command line.
+- **Skip the logo screen:** `godot --path apps/game -- --skip-logo`.
+- **First goal and controls:** [First steps](/docs/controls/first-steps/) and [Controls](/docs/controls/input/).
 
 ## Run the docs site
 
-The repository pins Bun 1.4.2. From the repository root, check `bun --version`, then run:
+1. Run `bun run docs:dev`.
+2. Open the local URL that Next.js prints.
+- Bun is not needed to play the game.
 
-```sh
-bun install --frozen-lockfile
-bun run docs:dev
-```
+## Keep your own saves safe
 
-Open the local URL printed by Next.js. Bun is not needed to play the game.
+- **`bun run game:check`** already gives each suite its own temporary user data folder.
+- **Running Godot yourself** for a test? Point it at a throwaway home so it cannot touch your saves, editor settings or export templates: `HOME="$(mktemp -d)" godot --headless --language en --path apps/game --script res://tests/<name>_test.gd`.
 
-For automated commands and validation limits, see [Testing and deployment](/docs/development/testing/).
+- **On Linux,** Godot reads `XDG_DATA_HOME` and `XDG_CONFIG_HOME` instead; `scripts/godot-helpers.sh` sets all three for the scripts.
+
+## Rendered captures
+
+`tools/render/render.sh` renders the game inside a Linux container, so no game window opens on your computer.
+
+- **Needs:** Docker. On macOS this repository uses [Colima](https://github.com/abiosoft/colima) (`colima start`).
+- **First run:** builds the `wolf-godot-render:4.7.2` image with the official Linux Godot 4.7.2, checked against its published SHA-512 sum.
+- **Your project is safe:** it works on a copy, with its own throwaway user data.
+- **Compare like with like:** software rendering differs slightly from a real graphics card, so compare its captures only with other captures from this tool.
+- **Not for speed:** its frame times say nothing about real performance.
+- **Usage, the smoke test and every option:** [`tools/render/README.md`](https://github.com/MrDemonWolf/wolf-override/blob/main/tools/render/README.md).

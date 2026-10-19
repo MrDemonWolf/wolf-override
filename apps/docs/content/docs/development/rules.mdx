@@ -1,0 +1,59 @@
+---
+title: Project rules
+description: The rules every change to WOLF OVERRIDE follows, in one short list, with where each one is written in full.
+---
+
+**What this page is for:** the rules every change follows, in one list.
+
+- **Full text:** [`AGENTS.md`](https://github.com/MrDemonWolf/wolf-override/blob/main/AGENTS.md) (the repository rules) and [`AGENT.md`](https://github.com/MrDemonWolf/wolf-override/blob/main/AGENT.md) (the game quality guide). They apply to people and coding agents alike.
+- **If this page and those files differ,** those files win. Please fix this page.
+
+## The game
+
+- **The engineer is the only playable character.**
+- **WOLF is an independent companion.** He helps, disagrees or refuses on his own. You never control him.
+- **Every essential step has an engineer-only way through,** so WOLF refusing never blocks the game.
+- **The game is called WOLF OVERRIDE,** two words, no slashes.
+- **Credit stays with Nathanial Henniges** for the original concept, core story and creative vision.
+- **Story wording is Nathanial's.** Do not reword story text; ask.
+- **Spoiler-free in public.** Story drafts stay out of the website, the game's text and build output.
+
+## Honest testing
+
+- **Say how it was checked:** headless, rendered stills, hands-on play, export or device. See [What was checked](/docs/development/evidence/#kinds-of-check).
+- **Never claim a feel, pacing or readability improvement** until the route was played.
+- **Keep honesty notes** such as "approved by Nathanial Henniges" or "not played by hand" in the changelog.
+- **No game window on the developer's Mac** while they work: run checks with `godot --headless`, and make captures with the [render container](/docs/development/setup/#rendered-captures).
+
+## No copied code
+
+- **Look first.** Before writing a script, scene, shader, test helper, style or tool, find one that already does the job and use or extend it. [Architecture](/docs/development/architecture/) is the map.
+- **Share, don't copy.** When two places need the same logic, move it into one shared file and delete the copies in the same change.
+- **Checked on every pull request** by the [copied-code check](/docs/development/testing/#copied-code-check), and by reviewers.
+
+## Code and comments
+
+- **Every script, class and non-obvious function gets a doc comment** (`##` in GDScript): what it is for, its inputs, outputs, units (world px, metres, seconds) and side effects.
+- **Constants say where their numbers come from.**
+- **Comments explain why,** not what the line already says.
+- **Update or delete a comment** when its code changes.
+- **Typed GDScript,** Godot's built-in nodes and the existing input map; the Godot 4.7.2 pin stays.
+
+## Changes and pull requests
+
+- **Small, playable steps.** One focused change per branch.
+- **Land through a pull request.** Never push to `main`.
+- **Push as you go,** so no work exists on only one machine.
+- **Add your changelog lines** under Next version in the same pull request. See [Releases and versions](/docs/development/releases/#add-your-changes-to-next-version).
+- **Update the guide pages** your change affects (first steps, controls, saving, walkthrough).
+
+## Assets
+
+- **Register every media file** in the asset register before it is used. See [Art pipeline](/docs/development/art-pipeline/#register-every-file).
+- **New art replaces old fully:** delete the old files, imports and references.
+- **Never invent credits** for people, music or tools that were not involved.
+
+## The website
+
+- **Style with Tailwind tokens and utilities** and Fumadocs components. No new bespoke CSS.
+- **Plain, scannable pages:** one line on what the page is for, short sections, bullets, numbered steps, tables.

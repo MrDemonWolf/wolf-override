@@ -7,7 +7,8 @@
 # robots meta tag (robots and googlebot counted together), or when any page or stylesheet
 # references a .ttf font. Also fails when robots.txt lacks its Sitemap line, sitemap.xml
 # has a guide page without <lastmod>, the landing page or a guide page lacks its JSON-LD
-# block, any JSON-LD block is not valid JSON, or llms.txt, llms-full.txt or a guide
+# block, any JSON-LD block is not valid JSON, a guide page's social card is not og:type article
+# with the game name in its og:title, or llms.txt, llms-full.txt or a guide
 # page's Markdown copy is missing or carries raw MDX.
 # Usage: scripts/check-docs-export.sh   (DOCS_OUT_DIR overrides the export directory)
 # Fails when apps/docs/out is missing rather than passing silently.
@@ -104,6 +105,20 @@ then
   status=1
 fi
 
+# Social cards (apps/docs/lib/seo.ts pageMetadata): every guide page is og:type article and its
+# og:title carries the game name, so a shared link never reads as a bare "Controls".
+while IFS= read -r guide; do
+  rel="${guide#"$out"/}"
+  if ! grep -q '<meta property="og:type" content="article"/>' "$guide"; then
+    echo "FAIL  $rel is not og:type article" >&2
+    status=1
+  fi
+  if ! grep -qE '<meta property="og:title" content="[^"]+ \| WOLF OVERRIDE"/>' "$guide"; then
+    echo "FAIL  $rel has no og:title ending in ' | WOLF OVERRIDE'" >&2
+    status=1
+  fi
+done < <(find "$out/docs" -name index.html | sort)
+
 # llms.txt files (apps/docs/app/llms*, lib/source.ts): the index opens with the project H1 and
 # summary, the full text has no raw MDX components or [#heading-id] suffixes, and every guide page
 # has the Markdown copy its rel=alternate link names.
@@ -127,6 +142,6 @@ while IFS= read -r guide; do
 done < <(find "$out/docs" -name index.html | sort)
 
 if [ "$status" -eq 0 ]; then
-  echo "pass  $count exported pages: no /_next/image, one #main-content each, at most one robots meta, no .ttf references; robots.txt names the sitemap; every guide URL in sitemap.xml has <lastmod>; valid JSON-LD on the landing and guide pages; llms.txt, llms-full.txt and a Markdown copy of every guide page"
+  echo "pass  $count exported pages: no /_next/image, one #main-content each, at most one robots meta, no .ttf references; robots.txt names the sitemap; every guide URL in sitemap.xml has <lastmod>; valid JSON-LD on the landing and guide pages; guide pages are og:type article with the game name in og:title; llms.txt, llms-full.txt and a Markdown copy of every guide page"
 fi
 exit "$status"
