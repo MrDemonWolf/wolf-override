@@ -89,6 +89,9 @@ Changes merged after 0.15.0. They become the next version when it is cut.
 - French (machine translation, review pending): **LANGUAGE** offers Français, marked "traduction automatique".
 - Brazilian Portuguese (machine translation, review pending): **LANGUAGE** offers Português (Brasil), marked "tradução automática"; Portugal gets it too.
 - German, French and Brazilian Portuguese translate the same parts as Spanish, the story included; most station names still show English.
+- Polish (machine translation, review pending): **LANGUAGE** offers Polski, marked "tłumaczenie maszynowe".
+- Russian (machine translation, review pending): **LANGUAGE** offers Русский, marked "машинный перевод".
+- Polish and Russian translate the same parts as Spanish, the story included; most station names still show English.
 - Key names follow your keyboard layout on Windows, macOS and Linux: on a French AZERTY keyboard **Move left** reads Q, not A. A symbol key shows the symbol printed on it, such as & on the AZERTY 1 key, and a letter the game's fonts cannot draw (Greek, Hebrew, Arabic, Thai) shows its QWERTY name.
 - A long control binding, such as "D-pad right / Left stick +", breaks onto a second row instead of being cut short with "…".
 
@@ -130,6 +133,7 @@ Changes merged after 0.15.0. They become the next version when it is cut.
 - New **Platforms and languages** page: what runs where today; English only, more languages planned.
 - Platforms, Settings, FAQ, Credits and Legal list Spanish, its review state and who made it; Localization adds the Spanish files and the store rows to use once a store page exists.
 - Platforms, Settings, FAQ, Status, Credits and Legal list German, French and Brazilian Portuguese, their review state and who made them; Localization adds their files and store rows.
+- Platforms, Settings, FAQ, Status and Credits list Polish and Russian, their review state and who made them; Localization adds their files, their typography rule and store rows.
 - New **Support and bug reports** page: GitHub issues, F12 bug captures, security reports and Discord. Troubleshooting, FAQ, Accessibility and the landing footer link to it.
 - About the game lists how it plays as short bullets; the story text is unchanged.
 - Privacy matches the code again: the debug unlock line, no language setting, the system language read at start, bug captures and the guide's search; checked October 18, 2026.
@@ -191,6 +195,11 @@ Changes merged after 0.15.0. They become the next version when it is cut.
 - The German, French and Brazilian Portuguese files are written fresh by Claude with a note on every line, back-translated by Codex and passed through every translation check; each word cut to fit is noted on its line.
 - WOLF's touch line at the mirror names the answer button in German, French and Brazilian Portuguese, and lines where a pronoun could read as WOLF name the sentry instead.
 - The Portuguese gender check knows *teclado*, *lado*, *líquido* and *dados* are nouns, and the test suites' made-up catalogs share one language code that ships no file.
+- The Polish and Russian files are written fresh by Claude with a note on every line, back-translated by Codex and passed through every translation check.
+- A new translation check binds Polish and Russian one-letter words such as *w* and *в* to the next word, so none is left at a row's end.
+- An independent review's fixes for Polish and Russian: WOLF's relay lines say what the English says, the Russian breaker switches on instead of tripping, and the spent plates read as used up.
+- A second review's fixes: the Polish title credit keeps the word *development*, so the concept stays Nathanial's; Polish times the tank drop with *wyczuć moment*, not computer slang; Russian WOLF names the sentry where *он* could mean the console.
+- The Russian checks keep names, tools, web addresses and key labels in Latin letters, skip the credits' formatting tags, and know *сначала*, *зеркала*, *завал* and *отмена* are not past tenses.
 - `i18n_test` fails any text that does not fit its room in every language and in pseudo-English (30% longer), the answer rows and the end card included; no overflow is let off by name.
 - `text_boxes_test` runs its station-name, touch, top card and prompt overlap checks in every language and in pseudo-English.
 - `I18n.apply_for_checks` is the one switch the suites and the parity capture use for a language or pseudo-English.
@@ -214,6 +223,7 @@ Changes merged after 0.15.0. They become the next version when it is cut.
 - **Dialogue boxes per language checked:** headless test suites, every English box, reading time and station name at every **TEXT SIZE** compared with the previous version (unchanged), and rendered stills of a Japanese sample box; not played by hand.
 - **Spanish story checked:** the translation checks with Codex's back-translation of the 145 new lines and one changed line in both files, and the headless test suites; not reviewed by a native speaker, not played by hand.
 - **German, French and Brazilian Portuguese checked:** the translation checks with Codex's back-translation, also of the 145 story lines, headless test suites (29) and rendered stills of the story in each language (keyboard and touch, 1280x720); not reviewed by a native speaker, not played by hand.
+- **Polish and Russian checked:** the translation checks with Codex's back-translation of every line, headless test suites (29) and rendered stills (keyboard and touch, 1280x720); not reviewed by a native speaker, not played by hand.
 - **Layout for languages checked:** headless test suites in every language and pseudo-English, every English station name at every **TEXT SIZE** compared with the previous version (unchanged), and rendered title, changelog, Settings and end card stills in English, Spanish, German and pseudo-English before and after; the new title layout is not yet looked at by Nathanial Henniges, and not played by hand.
 
 ## 0.15.0 - October 16, 2026

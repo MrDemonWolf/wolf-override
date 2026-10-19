@@ -42,3 +42,21 @@ WOLF is **on**, with masculine past tense. He is never declined: "z WOLF", "o WO
 - **SERVICE JUNCTION**: a reviewer's word.
 - Seven recap and narration lines tell what the engineer did, in the past. If a rewrite cannot keep
   their meaning, flag them: Nathanial decides whether the English changes (D9).
+- **PR L11's choices (proposals for a reviewer):** LOCKDOWN is BLOKADA, CONTAINMENT IZOLACJA, TANK
+  RELEASE ZRZUT ZBIORNIKA and SERVICE JUNCTION WĘZEŁ SERWISOWY. Maintenance, a place, is *strefa
+  techniczna*; the name card's job is UTRZYMANIE RUCHU (the field, not the person). The seal is *śluza*,
+  the relief vent *upust ciśnienia* (never *zawór*, the valve), the mirror *lustro*, records access
+  *dostęp do rejestrów*, the purge *czystka*, THE DEN NORA. A plate named in a hint is quoted in the
+  nominative: *pulpit „ZRZUT ZBIORNIKA”*, *„RĘCZNE OBEJŚCIE”*.
+- **Buttons in the infinitive**, as this guide asks (KONTYNUOWAĆ, UŻYĆ). Most Polish games use the
+  imperative on buttons (Kontynuuj, Użyj); a reviewer may prefer it.
+- **The seven recap and narration lines** keep their meaning without a past tense: the end card tells
+  the run in the present (*{name} mówi WOLF o ryzyku*), and the knockdown cards put the name after a
+  dash or a colon (*a %s — prosto na kratce*, *Strażnik zauważył: %s*). No English line had to change.
+- **Words cut to fit (PR L11):** MRDEMONWOLF, INC. PRESENTS is OD MRDEMONWOLF, INC. (PRZEDSTAWIA ran
+  23 px over), CONTINUE is DALEJ on the title and touch buttons (KONTYNUOWAĆ ran 26 px over), the touch
+  PAUSE is STOP (PAUZA ran 2 px over), BACK TO TITLE is MENU GŁÓWNE, TEXT SIZE is TEKST, VALVE USED is
+  ZAWÓR PUSTY and EXIT READY WYJŚCIE WOLNE (the longer plates ran into their neighbours), and the
+  changelog note drops "source-build". Each cut is noted on its line in `pl.po`.
+- **SAFE POINT** is SCHRON (shelter), on the plate and in the hints: PR L11's PUNKT BEZPIECZNY was
+  cut on its left by the door pillar beside the plate.

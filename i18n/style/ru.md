@@ -47,3 +47,24 @@ WOLF is **он**, with masculine past tense in -л. He is never declined: "с WO
 - **LOCKDOWN**: БЛОКИРОВКА reads back as "lockout"; a reviewer's word.
 - **SERVICE JUNCTION**: СЕРВИСНЫЙ УЗЕЛ reads back as "service node"; a reviewer's word.
 - The seven past-tense recap and narration lines, as for Polish.
+- **PR L11's choices (proposals for a reviewer):** the breaker is РУБИЛЬНИК (the glossary's proposal),
+  LOCKDOWN ИЗОЛЯЦИЯ, CONTAINMENT ЗОНА СОДЕРЖАНИЯ, TANK RELEASE ОТЦЕПКА БАКА and SERVICE JUNCTION
+  СЕРВИСНЫЙ УЗЕЛ. Maintenance, a place, is ТЕХЗОНА; the name card's job is ТЕХОБСЛУЖИВАНИЕ (the field, not
+  the person). The seal is *шлюз*, the relief vent *сбросной клапан* and the valve *вентиль*, the mirror
+  *зеркало*, the purge *зачистка*, THE DEN ЛОГОВО, WOLF breaking off *Я отхожу* (not the card-game *Я пас*). A plate named in a hint is
+  quoted in the nominative: *пульт «ОТЦЕПКА БАКА»*.
+- **Latin letters kept:** names, tools, web addresses, FPS, MSAA, V-SYNC and the key labels printed on
+  Russian keyboards (Esc, Tab, Enter) stay as written; they are in the glossary's `keep` list.
+- **The seven recap and narration lines** keep their meaning without a past tense: the end card tells
+  the run in the present (*{name} говорит WOLF о риске*), and the knockdown cards put the name after a
+  dash or a colon (*а %s — прямо на решётке*, *Страж заметил: %s*). No English line had to change.
+- **Words cut to fit (PR L11):** MRDEMONWOLF, INC. PRESENTS is ОТ MRDEMONWOLF, INC. (ПРЕДСТАВЛЯЕТ ran
+  41 px over), CONTINUE is ДАЛЕЕ on the title and touch buttons, the touch PAUSE is СТОП, USE НАЖАТЬ
+  and DROP БРОСИТЬ (ИСПОЛЬЗОВАТЬ, ДЕЙСТВИЕ and СБРОСИТЬ widened the 155 px button), the title's credit
+  line says *разработка с ИИ*, BACK TO TITLE is В МЕНЮ, TEXT SIZE ТЕКСТ, the controller column says
+  *Крест Л/П*, BREAKER USED and VALVE USED are both ОТРАБОТАН (used up), the plate's own machine
+  implied (with the noun they ran into their neighbours; ВЫКЛ. reads as switched off, ИСП. as исправен), and the changelog note drops "source-build". Each cut is noted on its line in
+  `ru.po`.
+- **WOLF's readout** is *дисплей*: Codex read *показания* back as "testimony".
+- **SAFE POINT** is УКРЫТИЕ (shelter), on the plate and in the hints; the glossary checks the stem
+  УКРЫТИ, so every case passes. The trial's БЕЗОПАСНАЯ ТОЧКА was cut on its left by the door pillar.
