@@ -58,5 +58,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   const { slug } = await params;
   const page = source.getPage(slug);
   if (!page) notFound();
-  return pageMetadata(page.data.title, page.data.description ?? `Read ${page.data.title} in the WOLF OVERRIDE game guide.`, `${page.url}/`, markdownUrl(page.url));
+  // seoTitle (source.config.ts) replaces the sidebar title only in <title> and the social cards;
+  // the page's heading and menu entry keep the short title.
+  return pageMetadata(page.data.seoTitle ?? page.data.title, page.data.description, `${page.url}/`, markdownUrl(page.url));
 }

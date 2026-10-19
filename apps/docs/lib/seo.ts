@@ -3,7 +3,11 @@ import type { Metadata } from 'next';
 export const siteUrl = 'https://wolfoverride.mrdemonwolf.dev';
 /** The public source repository on GitHub: the game, this website and their history. */
 export const repoUrl = 'https://github.com/MrDemonWolf/wolf-override';
-export const siteDescription = 'A side-view sci-fi horror adventure by MrDemonWolf, Inc. Explore THE DEN with an independent robotic wolf, solve puzzles and make choices he remembers. In development.';
+/**
+ * The landing page's search snippet and the game's JSON-LD description. Kept under the about 155
+ * characters Google shows before it trims a snippet (SEO plan, 2026-10-16).
+ */
+export const siteDescription = 'Side-view sci-fi horror in development by MrDemonWolf, Inc. Explore THE DEN with an independent robotic wolf, solve puzzles and make choices he remembers.';
 
 /**
  * Title, description, canonical and social-card metadata for one page. `path` is the page's
