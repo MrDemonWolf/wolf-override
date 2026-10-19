@@ -189,6 +189,7 @@ Changes merged after 0.15.0. They become the next version when it is cut.
 - Dialogue boxes per language checked: headless test suites, every English box, reading time and station name at every TEXT SIZE compared with the previous version (unchanged), and rendered stills of a Japanese sample box; not played by hand.
 - Spanish story checked: the translation checks with Codex's back-translation of the 145 new lines and one changed line in both files, and the headless test suites; not reviewed by a native speaker, not played by hand.
 - German, French and Brazilian Portuguese checked: the translation checks with Codex's back-translation, also of the 145 story lines, headless test suites (29) and rendered stills of the story in each language (keyboard and touch, 1280x720); not reviewed by a native speaker, not played by hand.
+- Polish and Russian checked: the translation checks with Codex's back-translation of every line, headless test suites (29) and rendered stills (keyboard and touch, 1280x720); not reviewed by a native speaker, not played by hand.
 
 == 0.15.0 - October 16, 2026 ==
 Summary: real doors in Records Access and the Service Junction, a copied-code check, notes moved to Notion and groundwork for more languages.
