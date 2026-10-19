@@ -80,6 +80,10 @@ Changes merged after 0.15.0. They become the next version when it is cut.
 
 - Spanish (machine translation, review pending): **LANGUAGE** offers Español (Latinoamérica) and Español (España), each marked "traducción automática".
 - In Spanish the title, Pause, Settings, the credits with the AI disclosure, the hints, objectives, cards, tutorial and touch buttons, the dialogue, narration and end card, and a few station names are translated; most station names still show English.
+- German (machine translation, review pending): **LANGUAGE** offers Deutsch, marked "maschinelle Übersetzung".
+- French (machine translation, review pending): **LANGUAGE** offers Français, marked "traduction automatique".
+- Brazilian Portuguese (machine translation, review pending): **LANGUAGE** offers Português (Brasil), marked "tradução automática"; Portugal gets it too.
+- German, French and Brazilian Portuguese translate the same parts as Spanish, the story included; most station names still show English.
 - Key names follow your keyboard layout on Windows, macOS and Linux: on a French AZERTY keyboard **Move left** reads Q, not A. A symbol key shows the symbol printed on it, such as & on the AZERTY 1 key, and a letter the game's fonts cannot draw (Greek, Hebrew, Arabic, Thai) shows its QWERTY name.
 
 ### Website
@@ -119,6 +123,7 @@ Changes merged after 0.15.0. They become the next version when it is cut.
 - **Get the game** is the one home for install steps; Start here, Setup and Troubleshooting link to it.
 - New **Platforms and languages** page: what runs where today; English only, more languages planned.
 - Platforms, Settings, FAQ, Credits and Legal list Spanish, its review state and who made it; Localization adds the Spanish files and the store rows to use once a store page exists.
+- Platforms, Settings, FAQ, Status, Credits and Legal list German, French and Brazilian Portuguese, their review state and who made them; Localization adds their files and store rows.
 - New **Support and bug reports** page: GitHub issues, F12 bug captures, security reports and Discord. Troubleshooting, FAQ, Accessibility and the landing footer link to it.
 - About the game lists how it plays as short bullets; the story text is unchanged.
 - Privacy matches the code again: the debug unlock line, no language setting, the system language read at start, bug captures and the guide's search; checked October 18, 2026.
@@ -177,6 +182,8 @@ Changes merged after 0.15.0. They become the next version when it is cut.
 - One shared rule decides whether a box fits, used by the game and by `text_boxes_test`, which now checks every language at every **TEXT SIZE**.
 - Station names in Chinese, Japanese and Korean break between words with the same text rules, so a name written without spaces can break too; names in English and other languages written with spaces still break at their spaces.
 - `opening_timing_test` times each box with the game's own reading rule instead of its own copy of it.
+- The German, French and Brazilian Portuguese files are written fresh by Claude with a note on every line, back-translated by Codex and passed through every translation check; each word cut to fit is noted on its line.
+- The Portuguese gender check knows *teclado*, *lado* and *líquido* are nouns, and the test suites' made-up catalogs share one language code that ships no file.
 
 ### How it was checked
 
