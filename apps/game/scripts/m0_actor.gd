@@ -85,6 +85,9 @@ const FOLLOW_EDGE: float = 12.0
 const AVOID_DETOUR: float = 100.0
 ## WOLF_REACH is rounded up past his painted nose and tail tip, so this much of it may touch a machine.
 const AVOID_TOLERANCE: float = 4.0
+## A body walking on its own stops once it is this close to its target (world px), so it never hunts
+## back and forth over the last pixel; it can rest up to this far short of an authored spot.
+const ARRIVE_TOLERANCE: float = 2.0
 const MIN_X: float = 40.0
 ## "No target" for autonomous_target_x. Real targets reach negative world x in the dock bay (left of
 ## the corridor, DockBay), so "has a target" is an exact comparison with this value, not ">= 0".
@@ -203,7 +206,7 @@ static func facing_of(node: Node2D) -> int:
 func _approach(target_x: float, delta: float) -> float:
 	var distance: float = target_x - position.x
 	var speed: float = FOLLOW_SPEED * speed_scale
-	return clampf(distance / delta, -speed, speed) if absf(distance) > 2.0 else 0.0
+	return clampf(distance / delta, -speed, speed) if absf(distance) > ARRIVE_TOLERANCE else 0.0
 
 
 ## True while this body walks across a shown keep_clear_of, close enough that the two drawn bodies overlap.
