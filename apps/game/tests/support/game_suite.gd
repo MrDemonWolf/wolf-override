@@ -193,6 +193,35 @@ static func end_game(game: Node, settle_seconds: float = 0.3) -> void:
 		remove_file(file)
 
 
+## The station names that show in [param game]'s rooms right now, visible and with text: the
+## corridor's (Main._corridor_station_labels), Records Access's and the Service Junction's. Shared by
+## text_boxes_test (the names stay apart at every TEXT SIZE step) and i18n_test (the same in every
+## offered language), so both judge the same set.
+static func shown_station_labels(game: Node) -> Array[Label]:
+	var candidates: Array = game.call("_corridor_station_labels")
+	candidates.append_array(game.get("records_room").get("station_labels"))
+	candidates.append_array(game.get("junction_room").get("station_labels"))
+	var shown: Array[Label] = []
+	for label: Label in candidates:
+		if label.is_visible_in_tree() and not label.text.is_empty():
+			shown.append(label)
+	return shown
+
+
+## Every pair of [param labels] whose global rects overlap, each rect shrunk by 0.5 px so names that only
+## touch pass, as "<text> and <text> overlap (<rect>, <rect>)" lines (rects in canvas px). Empty when
+## every name stands apart. Pure: reads the labels' current layout.
+static func overlapping_labels(labels: Array[Label]) -> Array[String]:
+	var found: Array[String] = []
+	for a: int in labels.size():
+		var rect: Rect2 = labels[a].get_global_rect()
+		for b: int in range(a + 1, labels.size()):
+			var other: Rect2 = labels[b].get_global_rect()
+			if rect.grow(-0.5).intersects(other.grow(-0.5)):
+				found.append("%s and %s overlap (%s, %s)" % [labels[a].text.c_escape(), labels[b].text.c_escape(), rect, other])
+	return found
+
+
 ## Waits [param count] physics frames, 1/60 s of game time each.
 static func frames(count: int) -> void:
 	for _frame: int in count:
