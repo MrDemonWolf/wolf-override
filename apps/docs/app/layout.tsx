@@ -3,7 +3,7 @@ import type { ReactNode } from 'react';
 import { RootProvider } from 'fumadocs-ui/provider/next';
 import localFont from 'next/font/local';
 import './global.css';
-import { siteDescription, siteUrl } from '@/lib/seo';
+import { siteDescription, siteUrl, titleTemplate } from '@/lib/seo';
 
 // Latin-subset WOFF2 builds of the OFL fonts; licence texts sit beside them in ./fonts.
 const roboto = localFont({
@@ -32,7 +32,7 @@ export const metadata: Metadata = {
   robots: { index: true, follow: true, 'max-image-preview': 'large' },
   title: {
     default: 'WOLF OVERRIDE',
-    template: '%s | WOLF OVERRIDE',
+    template: titleTemplate,
   },
   // Pages without their own description (the 404) use the same one as the landing page.
   description: siteDescription,

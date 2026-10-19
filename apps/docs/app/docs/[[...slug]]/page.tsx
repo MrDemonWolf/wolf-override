@@ -60,5 +60,8 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   if (!page) notFound();
   // seoTitle (source.config.ts) replaces the sidebar title only in <title> and the social cards;
   // the page's heading and menu entry keep the short title.
-  return pageMetadata(page.data.seoTitle ?? page.data.title, page.data.description, `${page.url}/`, markdownUrl(page.url));
+  return pageMetadata(page.data.seoTitle ?? page.data.title, page.data.description, `${page.url}/`, {
+    markdownPath: markdownUrl(page.url),
+    modifiedTime: page.data.lastModified,
+  });
 }
