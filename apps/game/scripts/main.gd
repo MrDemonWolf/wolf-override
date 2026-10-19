@@ -2338,6 +2338,8 @@ func _notification(what: int) -> void:
 			if is_node_ready():
 				_fill_credits()
 				_fill_changelog()
+				# The station names are measured in the language shown (PR L8).
+				_refit_station_labels()
 			# The END OF SLICE card's recap rows are translated in code (PR L7c).
 			if is_node_ready() and end_card_active:
 				_fill_end_card_rows()
@@ -5010,6 +5012,18 @@ func _dismiss_name_card() -> void:
 ## TEXT SIZE changed (or the game started): the station names take the new size and every box is
 ## laid out and split again.
 func _apply_text_size() -> void:
+	_refit_station_labels()
+	dialogue_key = ""
+	_layout_hud()
+	if is_inside_tree():
+		_refresh_ui()
+
+
+## Every room's station names fitted to their size and to their words in the language shown, and
+## neighbours that would cover each other parted (TextSize.part_world_labels, PR L8): on a TEXT SIZE
+## change and on a language change, since a translated name is measured as drawn. The corridor's
+## names keep their 100% places (text_home) to grow from.
+func _refit_station_labels() -> void:
 	bypass_handle.refit_labels()
 	for label: Label in [$BreakerLabel, $RelayLabel, $CheckpointLabel] as Array[Label]:
 		if not label.has_meta(&"text_home"):
@@ -5019,12 +5033,9 @@ func _apply_text_size() -> void:
 		# The relay's name stands over its COOLANT FAULT tag, so it rises as far as the tag grows.
 		var lift: float = bypass_handle.fault_tag_growth() if label == $RelayLabel else 0.0
 		TextSize.fit_world_label(label, home.get_center().x, home.position.y - lift)
+	TextSize.part_world_labels(_corridor_station_labels())
 	records_room.refit_labels()
 	junction_room.refit_labels()
-	dialogue_key = ""
-	_layout_hud()
-	if is_inside_tree():
-		_refresh_ui()
 
 
 ## The words' column width at the current text size: 42 characters' worth, or what the canvas leaves.
