@@ -138,8 +138,9 @@ static func _words(text: String, tags: Array[String]) -> PackedStringArray:
 
 ## Every line constant in Main (the trust line's boxes, the refusals and the opening exchange too) and
 ## JunctionRoom's knockdown cards, and every string literal main.gd says through status_line, _tell,
-## _say, _say_next or _aside, with "%s" as the engineer's name ({NAME} where it is a tag) and
-## "%d" as a number. WOLF's remembered line at the safe point is filled in with each of its three.
+## _say, _say_next or _aside or marks as a story line written in place (with "%s" as the engineer's name,
+## {NAME} where it is a tag, and "%d" as a number), and WOLF's callbacks on each relay route. A line
+## composed from pieces is read piece by piece, as each is its own message.
 func _corpus() -> Array[String]:
 	var out: Array[String] = []
 	var constants: Dictionary = (load(MAIN_SCRIPT) as Script).get_script_constant_map()
@@ -156,28 +157,30 @@ func _corpus() -> Array[String]:
 		if name.ends_with("_REASON"):
 			out.append(_fill(str(junction[name])))
 	var literal: RegEx = RegEx.create_from_string("\"((?:[^\"\\\\]|\\\\.)*)\"")
-	var remembered: Array[String] = []
+	# Only tags, placeholders and choice numbers ("%s WOLF: %s\n%s: %s"): the frame a line is composed in,
+	# whose pieces are their own literals (localization PR L7c keeps a speaker's words apart).
+	var frame: RegEx = RegEx.create_from_string("^(?:%[sd]|WOLF|DIRECTOR|PURGE|[\\s:/\"0-9])*$")
 	var source: String = FileAccess.get_file_as_string(MAIN_SCRIPT)
+	var story_marked: bool = false
 	for line: String in source.split("\n"):
-		if line.contains("var remembered_line: String ="):
-			for found: RegExMatch in literal.search_all(line):
-				if found.get_string(1).contains(" "):
-					remembered.append(found.get_string(1).c_unescape())
-	for line: String in source.split("\n"):
+		var code: String = line.strip_edges()
+		if code.begins_with("#"):
+			# A story line written in place: its marks stand in the comment right above it (StoryText's notes).
+			if code.contains("i18n:") and code.get_slice("i18n:", 1).split(" ", false).has("story"):
+				story_marked = true
+			continue
 		var said_at: int = -1
 		for call: String in ["status_line = ", "_tell(", "_say_next(", "_say([", "_aside("]:
 			if line.contains(call):
 				said_at = line.find(call)
+		if story_marked:
+			said_at = 0
+		story_marked = false
 		if said_at < 0:
 			continue
 		for found: RegExMatch in literal.search_all(line.substr(said_at)):
 			var text: String = found.get_string(1).c_unescape()
-			if not text.contains(" "):
-				continue
-			if text.begins_with("WOLF: %s\n"):
-				for said: String in remembered:
-					out.append(text.replace("%s", said))
-			else:
+			if text.contains(" ") and frame.search(text) == null:
 				out.append(_fill(text))
 	# The safe point's callbacks, on each relay route.
 	for route: Array in [[M0State.PRESS, "human"], [M0State.DISCLOSE, "wolf"], [M0State.DISCLOSE, "human"]]:

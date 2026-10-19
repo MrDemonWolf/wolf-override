@@ -35,6 +35,14 @@ extends "res://tests/support/game_suite.gd"
 ##   English when the language changes back;
 ## - every offered language laid out in the game (PR L9): the title, credits, changelog, Settings, Pause,
 ##   the touch buttons and the station names at every TEXT SIZE step fit, and the names stand apart.
+## - the story (PR L7c): in English every story line comes back from I18n.shown and from its cut by
+##   speaker unchanged; in another language each speaker's words are translated apart from the tag (the
+##   Director's tag by its own message), knockdown cards and restore lines apart, WOLF's callback with the
+##   saved answer translated and the end card's {name} filled after tr(); the committed template holds
+##   every story message with its story mark, no msgid holds a speaker's tag, and the 26 gender-risk lines
+##   carry their engineer= marks (slot=choice on the three callbacks); and in a game the opening box, a
+##   knockdown card, the end card and the answer buttons draw translated, the Director's colour kept, and
+##   an old save's answer is quoted under pseudolocalization.
 ## Spawn, waits and teardown come from tests/support/game_suite.gd. Every catalog this suite adds is
 ## made up here and dropped again with I18n.forget, so no real catalog is touched.
 
@@ -85,11 +93,75 @@ const HUD_MESSAGE_CHARS: int = 160
 ## 14 px hint are about 60 px, the room between the card and the dialogue box the hint bar keeps clear.
 const HUD_MAX_ROWS: int = 3
 
-## The language the HUD checks' made-up catalog ([method _hud_catalog]) stands in for: one in the table
-## that ships no catalog (Italian, outside decision D1's twelve files), so no real catalog answers first.
-## It was "es" until PR L9 shipped es.po, whose own lines then won the lookup. The made-up words stay
-## Spanish; only the code is borrowed.
-const HUD_TEST_LANGUAGE: String = "it"
+## The language the made-up catalogs of the HUD and story checks ([method _hud_catalog],
+## [method _story_catalog]) stand in for: one in the table that ships no catalog (Italian, outside
+## decision D1's twelve files), so no real catalog answers first. It was "es" until PR L9 shipped es.po,
+## whose own lines then won the lookup. The made-up words stay Spanish; only the code is borrowed.
+const TEST_LANGUAGE: String = "it"
+## The story lines written in place in main.gd (PR L7c), each marked where it is said rather than in
+## StoryText: _check_story_marks finds each in the template with its story mark.
+const STORY_IN_PLACE: Array[String] = [
+	"Service junction restored. The sentry\nis down; pop the exit bolt by the door.",
+	"Service junction restored. The door is\ndown. The sentry patrols past the rubble.",
+	"The first copy is safe. Use the exit to follow the service line.",
+	"Records access restored. Both traces are copied; head for the exit.",
+	"Records access restored. The purge order is copied; copy the mirror index next.",
+	"Records access restored. Copy the purge-order trace first; WOLF is checking the mirror.",
+	"Safe point restored.",
+	"Original program logs marked for deletion.",
+	"They want the source record gone. We need to preserve it.",
+	"No station in reach. Follow the labeled breaker, relay, bypass or safe point.",
+	"Power is already on. The relay is farther down the hall.",
+	"Thank you for telling me. I'll take the relay. Arm the breaker.",
+	"No. I won't take that risk blind. Use the manual bypass.",
+	"The relay is dark. Arm the breaker first.",
+	"The seal is open. The safe point is just beyond it.",
+	"I said no. I won't touch it blind. The bypass is right beside it.",
+	"I've got the contact. Give me a moment.",
+	"WOLF takes the surge through the live contact. The red seal opens.",
+	"The bypass handle won't move. The breaker has to be on first.",
+	"The bypass locks over and the alarm cuts out. The red seal opens.",
+	"Open. I'm with you.",
+	"The safe point is past the sealed door.",
+	"I refused the live relay; I'm still here.",
+	"I took the relay because you told me the truth.",
+	"I offered the relay; you cranked the bypass. Still with you.",
+	"Take the purge queue. I'll inspect the mirror.",
+	"Safe point saved.",
+	"Safe point saved. WOLF remembers the same choice.",
+	"The Director's purge order has a time and target ID. %s keeps a local copy; the original logs are still missing.",
+	"The purge-order trace is already copied. The mirror port may confirm when the source existed.",
+	"The mirror index has no context yet. Copy the purge-order trace first.",
+	"The mirror timestamp is already preserved. The exit is to the right.",
+	"I found the mirror index. We can use my readout or your maintenance port.",
+	"Exit sealed until the purge order and mirror timestamp are copied.",
+	"WOLF reads the timestamp off his own readout. The purge target existed before the deletion order.",
+	"%s copies the timestamp through the maintenance port. WOLF keeps watch.",
+	"The overload breaker catches and the line starts to build. If the LINE gauge peaks, the relief vent lets go.",
+	"The wheel is stiff. Three full turns charge the door.",
+	"Relief vent. It lets go when the gauge peaks; don't be standing on it.",
+	"No station in reach. The exit bolt is\nby the door.",
+	"No station in reach. The TANK RELEASE\nis past the rubble.",
+	"No station in reach. The breaker is by the entrance, the valve by the door.",
+	"The clamp lets go.",
+	"SERVICE LINE CLEARED.",
+	"It's quiet now. The line runs on toward Archive.",
+	"Then that's where we go.",
+	"It passes under that tank on every patrol. How do we bring it down?",
+	"FUSE LIT. Back away from the door, past the valve.",
+	"The valve gives. %d of %d turns.",
+	"The relief vent lets go and the breaker trips. Reset the breaker and crank faster this time.",
+	"The winch has the tank back on the clamp. The TANK RELEASE is ready again.",
+	"I'm still checking the drive. Wait for me, or press %s for the manual port.",
+	"I'm still checking the drive. Wait for me, or tap USE MANUAL PORT.",
+]
+## WOLF's three callbacks at the safe point (M0State.checkpoint_callback), whose %s quotes the answer the
+## engineer chose.
+const CALLBACKS: Array[String] = [
+	"You said \"%s\"\nI refused. You found another way. Next time, tell me what it costs.",
+	"You said \"%s\"\nI chose the relay. We made it.",
+	"You said \"%s\"\nI made my call. You cranked the bypass anyway. I stayed.",
+]
 
 var _checks: int = 0
 ## English's layout of each control [method _check_fit] judges, by "<where>|<node path>": whether
@@ -116,6 +188,9 @@ func _run() -> void:
 	_check_key_prompts()
 	await _check_hud()
 	await _check_layouts()
+	_check_story_lines()
+	_check_story_marks()
+	await _check_story_game()
 	I18n.apply("en")
 	finish("Languages: %d checks passed." % _checks)
 
@@ -536,12 +611,12 @@ func _place(control: Control, parent: Node, rect: Rect2) -> void:
 	parent.add_child(control)
 
 
-## The made-up catalog of the HUD checks, under [constant HUD_TEST_LANGUAGE]: key templates (one with
+## The made-up catalog of the HUD checks, under [constant TEST_LANGUAGE]: key templates (one with
 ## turn counts), the held form, a touch form, an objective and location, the name card, the tutorial, CONTINUE with and without the
 ## touch button's context, and one broken translation whose conversion differs from the English.
 func _hud_catalog() -> Translation:
 	var catalog: Translation = Translation.new()
-	catalog.locale = HUD_TEST_LANGUAGE
+	catalog.locale = TEST_LANGUAGE
 	catalog.add_message("%s: talk to WOLF about the relay.", "%s: habla con WOLF del relé.")
 	catalog.add_message("%s: crank the manual bypass, %d of %d.", "%s: gira el bypass manual, %d de %d.")
 	catalog.add_message("HOLD %s", "MANTÉN %s")
@@ -573,7 +648,7 @@ func _check_key_prompts() -> void:
 	var broken: String = HudText.key("%s: save at the safe point.", [HudText.USE])
 	var named: String = HudText.key("%s waits.", ["E"])
 	_check(talk == "E: talk to WOLF about the relay." and crank == "HOLD E: crank the manual bypass, 3 of 8." and save == "The safe point could not save. Press E here again." and named == "E waits.", "key lines keep the English the game compared before (%s; %s; %s)" % [talk, crank, save])
-	I18n.apply(HUD_TEST_LANGUAGE)
+	I18n.apply(TEST_LANGUAGE)
 	var keys: Dictionary = {HudText.USE: "F", HudText.HOLD_USE: I18n.fill("HOLD %s", ["F"])}
 	_check(HudText.localise(talk, keys, false) == "F: habla con WOLF del relé.", "the translated template gets the key after tr() (%s)" % HudText.localise(talk, keys, false))
 	_check(HudText.localise(crank, keys, false) == "MANTÉN F: gira el bypass manual, 3 de 8.", "the held key and the turn counts fill the translated template (%s)" % HudText.localise(crank, keys, false))
@@ -585,7 +660,7 @@ func _check_key_prompts() -> void:
 	I18n.apply("en")
 
 
-## The HUD in a game (PR L7b), with [method _hud_catalog] for [constant HUD_TEST_LANGUAGE]: in the
+## The HUD in a game (PR L7b), with [method _hud_catalog] for [constant TEST_LANGUAGE]: in the
 ## opening the touch button's CONTINUE reads its own context's word while the title's CONTINUE keeps another, and the first box's
 ## prompt fills its key into the translated template; in play the top card, the tutorial and the hint
 ## (keyboard, then touch, where the key is the USE button's word) are translated, and switching back to
@@ -597,7 +672,7 @@ func _check_hud() -> void:
 	game.auto_pause_on_focus_loss = false
 	game.call("_new_game")
 	await process_frame
-	I18n.apply(HUD_TEST_LANGUAGE)
+	I18n.apply(TEST_LANGUAGE)
 	await process_frame
 	var hint: Label = game.get_node("CanvasLayer/ContextHint/Text") as Label
 	_check(game.touch_use.text == "SEGUIR" and String(TranslationServer.translate("CONTINUE")) == "CONTINUAR", "the touch button's CONTINUE has its own context, apart from the title's (%s)" % game.touch_use.text)
@@ -611,7 +686,7 @@ func _check_hud() -> void:
 	_check(tutorial.text.begins_with("A / D  MOVER"), "the tutorial fills its keys into the translated template (%s)" % tutorial.text.c_escape())
 	I18n.apply("en")
 	_check(game.hud.text == "%s\nMAINTENANCE ENGINEER" % first_name, "a language change draws the top card again in English at once (%s)" % game.hud.text.c_escape())
-	I18n.apply(HUD_TEST_LANGUAGE)
+	I18n.apply(TEST_LANGUAGE)
 	# Past the tutorial, which takes the hint bar's place while it shows.
 	game.tutorial_step = 2
 	game.human.position.x = 350.0
@@ -813,3 +888,164 @@ func _check_fit(code: String, key: String, control: Control) -> void:
 		fits = (judged.x <= english["judged"].x + tolerance and judged.y <= english["judged"].y + tolerance
 				and needed <= maxf(control.size.x, float(english["needed"])) + tolerance)
 	_check(fits, "%s, %s: %s fits (size %s, judged %s, one row %.0f px; English: %s)" % [code, key.get_slice("|", 0), shown.left(60).c_escape(), control.size, judged, needed, english])
+
+
+## The made-up catalog of the story checks, under [constant TEST_LANGUAGE] (PR L7c): the opening's Director line and his tag (with
+## its "speaker" context), WOLF's words and the engineer's from the first exchange, a knockdown card and
+## the restore line under it, a relay answer and WOLF's callback that quotes it, an end-card topic and
+## row, and one end-card row whose placeholder is misspelt.
+func _story_catalog() -> Translation:
+	var catalog: Translation = Translation.new()
+	catalog.locale = TEST_LANGUAGE
+	catalog.add_message(Main.INTRO_THREAT_WORDS, "Yo decido quién es una amenaza. WOLF se ocupa del resto.")
+	catalog.add_message("DIRECTOR", "DIRECTORA DE PRUEBA", Main.SPEAKER_CONTEXT)
+	catalog.add_message(Main.OPENING_WOLF_WORDS, "Oí el plan del Director para mí.")
+	catalog.add_message(Main.OPENING_ENGINEER_WORDS, "Entonces cruzamos mantenimiento.")
+	catalog.add_message(JunctionRoom.VENT_REASON, "La válvula de alivio cedió bajo %s. Sal de la rejilla.")
+	catalog.add_message(Main.RESTORE_BEAT_LINE, "De vuelta al inicio de este tramo.")
+	catalog.add_message(M0State.CHOICE_TEXT[M0State.PRESS], "Sin charla de riesgos. Ve ya.")
+	catalog.add_message("You said \"%s\"\nI refused. You found another way. Next time, tell me what it costs.", "Dijiste «%s»\nMe negué. Hubo otro camino.")
+	catalog.add_message("Safe point restored.", "Punto seguro restaurado.")
+	catalog.add_message(Main.RECAP_RELAY_TOPIC, "RELÉ")
+	catalog.add_message(Main.RECAP_RELAY_PRESS_WORDS, "Con prisas, {name} no avisó a WOLF.")
+	catalog.add_message(Main.RECAP_MIRROR_MANUAL_WORDS, "{nombre} copió la marca de tiempo.")
+	return catalog
+
+
+## Story lines without a game (PR L7c): in English every story constant comes back from I18n.shown as it
+## is, and cut by speaker (DialogueBoxes.segments) it rejoins to itself, so the boxes stay as they were;
+## in the made-up language a tag stays outside the translated words (the Director's drawn as its tag
+## name says, WOLF's and the engineer's as written), a format's template is translated and its name kept,
+## a join translates each part, a quoted answer is translated inside WOLF's words, and a named
+## placeholder that a translation misspells shows the English row.
+func _check_story_lines() -> void:
+	var tags: Array[String] = ["WOLF", "DIRECTOR", "DIRECTOR / PURGE", "ROWAN"]
+	var lines: Array[String] = []
+	lines.assign(Main.INTRO_LINES)
+	lines.append_array(Main.ALONE_LINES)
+	for line: String in [Main.OPENING_EXCHANGE % "ROWAN", Main.STAKES_LINE, Main.RECORDS_CLOSE_LINE % "ROWAN", Main.BAIT_YES_LINE, Main.BAIT_NO_LINE, Main.TANK_HIT_WOLF_LINE, Main.JUNCTION_ENTRY_LINE % "ROWAN", Main.LADDER_CHAIN_LINE % "ROWAN", Main.JUNCTION_RESTORE_A_LINE, "%s\n1  \"%s\"\n2  \"%s\"" % [Main.RELAY_QUESTION, M0State.CHOICE_TEXT[M0State.DISCLOSE], M0State.CHOICE_TEXT[M0State.PRESS]]]:
+		lines.append(line)
+	for line: String in lines:
+		var rejoined: String = ""
+		for segment: Array in DialogueBoxes.segments(line, tags):
+			rejoined += String(segment[2]) + (String(segment[1]) if (segment[0] as String).is_empty() else "%s: %s" % [segment[0], segment[1]])
+		_check(rejoined == line.get_slice(DialogueBoxes.CHOICE_MARKER, 0), "cut by speaker, \"%s\" rejoins to itself (got \"%s\")" % [line.c_escape(), rejoined.c_escape()])
+		_check(I18n.shown(line, tags, {"DIRECTOR": "DIRECTOR"}) == line, "in English I18n.shown leaves \"%s\" as it is" % line.c_escape())
+	var catalog: Translation = _story_catalog()
+	TranslationServer.add_translation(catalog)
+	I18n.apply(TEST_LANGUAGE)
+	var names: Dictionary = {"DIRECTOR": String(TranslationServer.translate("DIRECTOR", Main.SPEAKER_CONTEXT))}
+	var opening: String = I18n.shown(Main.INTRO_LINES[0], tags, names)
+	_check(opening == "DIRECTORA DE PRUEBA: Yo decido quién es una amenaza. WOLF se ocupa del resto.", "the Director's line is his translated tag and his translated words (%s)" % opening)
+	var exchange: String = I18n.shown(Main.OPENING_EXCHANGE % "ROWAN", tags, names)
+	_check(exchange == "WOLF: Oí el plan del Director para mí.\nROWAN: Entonces cruzamos mantenimiento.", "WOLF's and the engineer's words are translated apart and their tags stay as written (%s)" % exchange.c_escape())
+	var card: String = I18n.join("\n", [I18n.format(JunctionRoom.VENT_REASON, ["Rowan"]), Main.RESTORE_BEAT_LINE])
+	_check(card == JunctionRoom.VENT_REASON % "Rowan" + "\n" + Main.RESTORE_BEAT_LINE, "a joined knockdown card keeps its English (%s)" % card.c_escape())
+	_check(I18n.shown(card, tags, names) == "La válvula de alivio cedió bajo Rowan. Sal de la rejilla.\nDe vuelta al inicio de este tramo.", "a knockdown card and the restore line under it are translated apart, the name kept (%s)" % I18n.shown(card, tags, names).c_escape())
+	var state: M0State = M0State.new()
+	state.record_choice(M0State.PRESS)
+	state.checkpoint_reached = true
+	var restored: String = I18n.join(" ", ["Safe point restored.", state.checkpoint_callback()])
+	_check(restored == "Safe point restored. WOLF: You said \"Skip the risk talk. Go now.\"\nI refused. You found another way. Next time, tell me what it costs.", "WOLF's callback keeps the English the game kept before (%s)" % restored.c_escape())
+	_check(I18n.shown(restored, tags, names) == "Punto seguro restaurado. WOLF: Dijiste «Sin charla de riesgos. Ve ya.»\nMe negué. Hubo otro camino.", "WOLF quotes the saved English answer in the current language (%s)" % I18n.shown(restored, tags, names).c_escape())
+	_check(I18n.fill_named(Main.RECAP_RELAY_PRESS_WORDS, {"name": "Rowan"}) == "Con prisas, Rowan no avisó a WOLF.", "an end-card row fills {name} after tr() (%s)" % I18n.fill_named(Main.RECAP_RELAY_PRESS_WORDS, {"name": "Rowan"}))
+	_check(I18n.fill_named(Main.RECAP_MIRROR_MANUAL_WORDS, {"name": "Rowan"}) == "Rowan copied the timestamp through the maintenance port.", "a row whose translation misspells {name} shows the English (%s)" % I18n.fill_named(Main.RECAP_MIRROR_MANUAL_WORDS, {"name": "Rowan"}))
+	I18n.forget(catalog)
+	I18n.apply("en")
+
+
+## The story's marks in the committed translation template (i18n/messages.pot, which CI regenerates and
+## compares, so it is what the source marks): every message of StoryText.messages() and every story
+## line written in place is in it with its `story` mark; every piece of the lines a speaker says (cut
+## at the tags as the boxes cut them) is a message of StoryText; no msgid opens with a speaker's tag; each
+## of the inventory's 26 gender-risk lines (STRINGS.md) carries an engineer= mark, and WOLF's three
+## checkpoint callbacks slot=choice as well; the name card and the callbacks keep their breaks.
+func _check_story_marks() -> void:
+	var pot: Dictionary = template_notes()
+	if not _check(not pot.is_empty(), "the translation template i18n/messages.pot is readable"):
+		return
+	var story: Array[String] = StoryText.messages()
+	for message: String in story + STORY_IN_PLACE + CALLBACKS:
+		_check(pot.has(message) and template_marks(pot[message]).has("story"), "\"%s\" is in the template with its story mark" % message.c_escape())
+	var tags: Array[String] = ["WOLF", "DIRECTOR", "DIRECTOR / PURGE", "%s"]
+	var spoken: Array[String] = []
+	spoken.assign(Main.INTRO_LINES)
+	spoken.append_array(Main.ALONE_LINES)
+	spoken.append_array([Main.OPENING_EXCHANGE, Main.STAKES_LINE, Main.RELAY_QUESTION, Main.RECORDS_CLOSE_LINE, Main.BAIT_YES_LINE, Main.BAIT_NO_LINE, Main.BROKE_OFF_RUBBLE_LINE, Main.BROKE_OFF_HATCH_LINE, Main.TANK_HIT_WOLF_LINE, Main.JUNCTION_ENTRY_LINE, Main.LADDER_BREAKER_LINE, Main.LADDER_CHAIN_LINE, Main.WOLF_DOOR_WARNING, Main.JUNCTION_RESTORE_A_LINE])
+	for line: String in spoken:
+		for segment: Array in DialogueBoxes.segments(line, tags):
+			_check(story.has(segment[1]), "\"%s\" of \"%s\" is a message of StoryText" % [String(segment[1]).c_escape(), line.c_escape()])
+	for row: String in [Main.RECAP_RELAY_COOPERATE, Main.RECAP_RELAY_DISCLOSE_BYPASS, Main.RECAP_RELAY_PRESS, Main.RECAP_MIRROR_WOLF, Main.RECAP_MIRROR_MANUAL, Main.RECAP_LANE_WOLF, Main.RECAP_LANE_REFUSED, Main.RECAP_LANE_ALONE, Main.RECAP_LANE_BROKE_OFF, Main.RECAP_LANE_UNKNOWN]:
+		_check(story.has(row.get_slice("  ", 0)) and story.has(row.substr(row.find("  ") + 2)), "the end-card row \"%s\" is a topic and words of StoryText" % row)
+	for msgid: String in pot:
+		_check(not (msgid.begins_with("WOLF: ") or msgid.begins_with("DIRECTOR: ") or msgid.begins_with("DIRECTOR / PURGE: ")), "no msgid holds a speaker's tag (\"%s\")" % msgid.c_escape())
+	var gender: Array[String] = [JunctionRoom.VENT_REASON, JunctionRoom.BLAST_REASON, JunctionRoom.SENTRY_REASON, JunctionRoom.SENTRY_CHASED_REASON, JunctionRoom.CLOUD_REASON, Main.BYPASS_RELEASED_LINE, Main.BYPASS_OFFER_HINT, Main.RECAP_RELAY_COOPERATE_WORDS, Main.RECAP_RELAY_DISCLOSE_BYPASS_WORDS, Main.RECAP_RELAY_PRESS_WORDS, Main.RECAP_MIRROR_MANUAL_WORDS, Main.RECAP_LANE_REFUSED_WORDS, Main.RECAP_LANE_ALONE_WORDS, Main.RECAP_LANE_BROKE_OFF_WORDS, Main.RUBBLE_LINE, Main.BAIT_YES_WORDS, Main.BAIT_NO_WORDS, Main.SENTRY_LOCK_LINE, Main.SENTRY_LOST_LINE, "Thank you for telling me. I'll take the relay. Arm the breaker.", "I took the relay because you told me the truth.", "I offered the relay; you cranked the bypass. Still with you.", "%s\nMAINTENANCE ENGINEER"]
+	gender.append_array(CALLBACKS)
+	_check(gender.size() == 26, "the inventory's 26 gender-risk lines are listed (%d)" % gender.size())
+	for message: String in gender:
+		_check(pot.has(message) and template_marks(pot[message]).has("engineer"), "the gender-risk line \"%s\" has an engineer= mark" % message.c_escape())
+	for message: String in CALLBACKS:
+		_check(pot.has(message) and template_marks(pot[message]).get("slot") == "choice" and template_marks(pot[message]).has("keep-breaks"), "WOLF's callback \"%s\" says its %%s is a quoted answer and keeps its break" % message.c_escape())
+	_check(pot.has("%s\nMAINTENANCE ENGINEER") and template_marks(pot["%s\nMAINTENANCE ENGINEER"]).has("keep-breaks"), "the name card keeps its break")
+
+
+## The story in a game (PR L7c), with [method _story_catalog] for [constant TEST_LANGUAGE]: the opening's first box shows the
+## Director's translated tag over his translated words in his own colour; a knockdown card shows
+## translated with the name kept, and the end card's rows translate their topic and fill {name}; the
+## relay's answer buttons are translated. Then an old save (its answer in the wording before October 13,
+## 2026) loads under pseudolocalization and WOLF's quote goes through tr() like every translated message,
+## while the game keeps the English line. Pseudo pads any string, so this shows only that the quote is
+## looked up: the old wording is no msgid, so in a real language it stays English.
+func _check_story_game() -> void:
+	var catalog: Translation = _story_catalog()
+	TranslationServer.add_translation(catalog)
+	var game: Main = await start_game("i18n-story") as Main
+	game.auto_pause_on_focus_loss = false
+	game.call("_new_game")
+	await process_frame
+	I18n.apply(TEST_LANGUAGE)
+	await process_frame
+	_check(game.status_line == Main.INTRO_LINES[0], "the game keeps the opening's English line (%s)" % game.status_line)
+	_check(game.speaker.text == "DIRECTORA DE PRUEBA" and game.story.text == "Yo decido quién es una amenaza. WOLF se ocupa del resto.", "the opening's box draws the Director's translated tag and words (%s / %s)" % [game.speaker.text, game.story.text])
+	_check(game.speaker.get_theme_color(&"font_color").is_equal_approx(Color("#ff9a9f")), "the translated tag keeps the Director's colour, chosen by his English tag")
+	game.call("_finish_intro")
+	await process_frame
+	game.debug_knock_down(&"vent")
+	await process_frame
+	game.call("_refresh_ui")
+	_check(game.story.text == "La válvula de alivio cedió bajo %s. Sal de la rejilla." % game.call("_first_name"), "a knockdown card draws translated with the name kept (%s)" % game.story.text)
+	game.call("_cancel_fail")
+	game.state.record_choice(M0State.PRESS)
+	game.debug_show_end_card()
+	await process_frame
+	var row: HBoxContainer = game.end_card_rows.get_child(0) as HBoxContainer
+	var topic: Label = row.get_child(0) as Label
+	var what: Label = row.get_child(1) as Label
+	_check(topic.get_text() == "RELAY" and topic.can_auto_translate() and String(topic.atr(topic.text)) == "RELÉ", "the end card's topic translates itself (%s)" % topic.atr(topic.text))
+	_check(what.text == "Con prisas, %s no avisó a WOLF." % game.call("_first_name"), "the end card's row is translated with the name filled (%s)" % what.text)
+	game.call("_hide_end_card")
+	game.call("_ask_relay")
+	game.call("_refresh_ui")
+	_check((game.get_node("CanvasLayer/TouchControls/Choice2") as Button).text.ends_with("Sin charla de riesgos. Ve ya."), "the relay's answer button is translated (%s)" % (game.get_node("CanvasLayer/TouchControls/Choice2") as Button).text)
+	I18n.forget(catalog)
+	I18n.apply("en")
+	# An old save: its answer is the wording option 2 had before October 13, 2026, which is no msgid now.
+	var old_answer: String = "Go now. We can talk after."
+	var saved: M0State = M0State.new()
+	saved.record_choice(M0State.PRESS)
+	saved.memory["selected_text"] = old_answer
+	# Past the corridor's seal by the manual bypass, as a checkpoint after that answer is.
+	saved.breaker_armed = true
+	saved.door_open = true
+	saved.route = "fallback"
+	saved.checkpoint_reached = true
+	_require(saved.save_to_disk(game.save_path), "the old save is written")
+	TranslationServer.reload_pseudolocalization()
+	TranslationServer.pseudolocalization_enabled = true
+	game.debug_load_checkpoint()
+	await process_frame
+	var shown: String = game.call("_shown_line")
+	_check(game.status_line.begins_with("Safe point restored. WOLF: You said \"%s\"" % old_answer), "the loaded game keeps the English line, the old answer quoted (%s)" % game.status_line.c_escape())
+	_check(shown.contains(String(TranslationServer.translate(old_answer))) and not shown.contains("\"%s\"" % old_answer) and shown.contains(" WOLF: "), "under pseudo WOLF quotes the old answer padded like the rest, his tag kept (%s)" % shown.c_escape())
+	TranslationServer.pseudolocalization_enabled = false
+	await end_game(game)

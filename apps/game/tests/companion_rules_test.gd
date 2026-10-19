@@ -38,7 +38,9 @@ func _run() -> void:
 
 ## Every line the game gives WOLF is read for words that would hurry the engineer: in any string in
 ## the game's scripts, the row from "WOLF: " on and each row after it in the same box, up to the next
-## speaker ("%s: ", "NAME: ") or the first choice row ("1  ...").
+## speaker ("%s: ", "NAME: ") or the first choice row ("1  ..."); and, since the story keeps a speaker's
+## words apart from the tag (localization PR L7c), every row of each message the translation template
+## marks speaker=WOLF.
 func _check_no_urgency() -> void:
 	var lines: Array[String] = []
 	var literal: RegEx = RegEx.create_from_string("\"((?:[^\"\\\\]|\\\\.)*)\"")
@@ -56,6 +58,10 @@ func _check_no_urgency() -> void:
 					wolf_speaking = false
 				elif wolf_speaking and not row.strip_edges().is_empty():
 					lines.append(row)
+	var template: Dictionary = template_notes()
+	for msgid: String in template:
+		if template_marks(template[msgid]).get("speaker") == "WOLF":
+			lines.append_array(msgid.split("\n"))
 	_expect(lines.size() >= 20, "the scan finds WOLF's lines (%d)" % lines.size())
 	for row: String in ["It crosses the mark on every pass.", "Take the purge queue. I'll inspect the mirror.", "I chose the relay. We made it."]:
 		_expect(lines.has(row), "the scan reads the second row of WOLF's two-row boxes (\"%s\")" % row)

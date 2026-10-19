@@ -377,7 +377,8 @@ NAME_SLOT = re.compile(r"%s|\{name\}")
 #:                            referred to without the slot ("the engineer", "they", the name card), or
 #:                            speaking (the six lines tagged with the engineer's upper-case name);
 #:   slot=key|choice          what a %s holds when it is not the name (a key name, a quoted choice);
-#:   speaker=WOLF|narrator|hint|ui   who says the line (given to the back-translator).
+#:   speaker=WOLF|DIRECTOR|engineer|narrator|hint|ui   who says the line (given to the back-translator);
+#:                            the story's speakers are marked in PR L7c (apps/game/scripts/story_text.gd).
 #: With no engineer= mark, a msgid with a NAME_SLOT counts as engineer=name unless slot= says otherwise
 #: (the safe default: more lines checked). Every inventory gender-risk line gets a mark in PR L7c.
 MARKS = re.compile(r"i18n:\s*(.*)")
@@ -840,8 +841,9 @@ def backprompt(podir: Path, out: Path) -> None:
         "into plain, literal English, keeping placeholders (%s, %d), the token 'E:' and line breaks (\\n) exactly "
         "as they appear. Do not guess what the original English was; translate only what is written. Context: a "
         "2D sci-fi game; WOLF is a robot wolf (he), the Director a human (he), the sentry a machine; the player "
-        "character is a non-binary engineer (they/them). Each item says who speaks ('speaker': WOLF, narrator, "
-        "hint for the hint bar that addresses the player, ui) and how the engineer appears in it ('engineer'). "
+        "character is a non-binary engineer (they/them). Each item says who speaks ('speaker': WOLF, DIRECTOR, "
+        "engineer, narrator, hint for the hint bar that addresses the player, ui) and how the engineer appears "
+        "in it ('engineer'). "
         "After each back-translation add 'notes' listing anything ambiguous, unidiomatic or gendered in the "
         "source text (empty string if none), and 'engineer_gendered': true only if the text shows the "
         "grammatical gender of the engineer: when the engineer is addressed, by a verb, adjective or participle "

@@ -33,6 +33,7 @@ From the repository root, in this order:
 - **A suite fails** if it reports an error, leaks objects at exit, or is still running after 240 seconds.
 - **Leaks:** a leaking suite runs once more with verbose output, so its log names the leaked objects.
 - **Hung:** a suite still running at the limit is stopped and reported as hung. Each import pass has the same limit.
+- **The translation template:** `i18n_test` and `companion_rules_test` read the committed `i18n/messages.pot` (its story and speaker marks). After changing player text, regenerate it before running them. See [Localization](/docs/development/localization/#commands).
 - **macOS:** works without GNU `timeout`.
 - **Logs** are kept, and their folder printed, only when a check fails.
 

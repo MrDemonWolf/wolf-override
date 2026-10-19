@@ -18,7 +18,11 @@ extends RefCounted
 ##   English for the code and is drawn through HudText (PR L7b), which fills the key after tr().
 ## - Text kept between frames (status_line, the top card, a knockdown card) stays English and is
 ##   translated where it is drawn, by [method shown] and [method lines]; its Label has auto-translate
-##   off, so nothing is translated twice.
+##   off, so nothing is translated twice. Since PR L7c the story (status_line's narration, dialogue,
+##   refusals, knockdown cards and restore lines) is drawn this way: each message is its words without
+##   the speaker's tag, so no msgid holds "WOLF: " (the tag is composed in code and the speaker's
+##   colour goes by its English tag), and a line made of several messages is built with [method join]
+##   or cut at its speakers' tags.
 ## Why: code compares English text (key tokens, speaker tags, the speaker's colour, end-card topics,
 ## DialogueBoxes' sentence rules) and the save stores the English choice, so translating at the source
 ## would break all of them and every test that asserts English.
@@ -36,6 +40,7 @@ extends RefCounted
 ##   them a literal that is not also marked somewhere with tr() or KEY.tr().
 ## - A formatted line ("... %s ...") can only be translated from its template, so lines with inserts are
 ##   built with [method format], which remembers the template and the inserts for [method shown].
+##   Named placeholders ({name}, the end card) are filled after tr() by [method fill_named].
 
 ## The language table, read once from this file into [member LANGUAGES]. It lives inside the project
 ## so the export carries it (both presets export all resources, which in Godot 4.7.2 includes .json
@@ -73,6 +78,10 @@ static var KEY: Object = _make_key()
 ## never pruned: the game formats a few dozen distinct lines (names times knockdown reasons), not an
 ## unbounded stream.
 static var _formats: Dictionary = {}
+## Joiner and parts of every line built with [method join], by the finished English line.
+static var _joins: Dictionary = {}
+## A named placeholder as [method fill_named] fills it: "{name}".
+static var _placeholder: RegEx = RegEx.create_from_string("\\{[A-Za-z_][A-Za-z0-9_]*\\}")
 ## One printf conversion as String % reads it (core/string/ustring.cpp sprintf, 4.7.2): flags, a width
 ## or *, a precision or .*, then the type letter; "%%" is matched too so it can be skipped as a literal.
 static var _conversion: RegEx = RegEx.create_from_string("%%|%[-+ 0#]*(\\*|\\d+)?(\\.(\\*|\\d+))?[scdoxXfv]")
@@ -299,43 +308,104 @@ static func _row(language: String) -> Dictionary:
 
 
 ## [param template] % [param inserts], remembering both so [method shown] can translate the template
-## and fill it again. The result is the English line, used as status_line as before.
-static func format(template: String, inserts: Array) -> String:
+## and fill it again. The result is the English line, used as status_line as before. [param quoted] lists
+## the indexes of inserts that are English text of their own, such as the answer a save quotes (WOLF's
+## "You said ..."): [method shown] translates those too, so an old save quotes its English choice in the
+## current language (PR L7c; the save itself keeps English, DESIGN.md). Every other insert (a name, a
+## count, a HudText key token) is filled as it is.
+static func format(template: String, inserts: Array, quoted: Array[int] = []) -> String:
 	var line: String = template % inserts
-	_formats[line] = [template, inserts]
+	_formats[line] = [template, inserts, quoted]
 	return line
 
 
-## The template and inserts [method format] remembered for [param line], as [template, inserts], or an
-## empty Array when the line was not built with it. Read by HudText to fill a key prompt's tokens with the
-## input in use instead of the English ones.
+## [param pieces] joined with [param joiner], remembering them so [method shown] translates each on
+## its own: for a line made of separate messages that no speaker tag divides (a knockdown card and the
+## restore line under it, "Safe point saved. " and WOLF's callback). Returns the English line. Like
+## [method format], it is never pruned: the game joins a few dozen distinct lines.
+static func join(joiner: String, pieces: Array[String]) -> String:
+	var line: String = joiner.join(pieces)
+	_joins[line] = [joiner, pieces]
+	return line
+
+
+## The template and inserts [method format] remembered for [param line], as [template, inserts, quoted],
+## or an empty Array when the line was not built with it. Read by HudText to fill a key prompt's tokens
+## with the input in use instead of the English ones.
 static func parts(line: String) -> Array:
 	return _formats.get(line, []) as Array
 
 
-## [param line] as the player reads it in the current language. A line built with [method format] is
-## its translated template filled with the same inserts; any other line is translated piece by piece
-## where a speaker's tag in [param speakers] starts ("DIRECTOR: ...\nWOLF: ..."), so the tags stay
-## English and outside the translated text. A piece with no translation stays English. The speaker
-## pieces are a stopgap until speaker and words are stored apart (DESIGN.md, PR L7c).
-static func shown(line: String, speakers: Array[String]) -> String:
-	if _formats.has(line):
-		var entry: Array = _formats[line]
-		return _filled(String(TranslationServer.translate(entry[0])), entry[0], entry[1])
-	var out: PackedStringArray = []
-	for row: String in line.split("\n"):
-		var tag: String = DialogueBoxes.tag_of(row, speakers)
-		if tag.is_empty() and not out.is_empty():
-			# A row with no tag goes on the message above it (an authored line break inside it).
-			out[out.size() - 1] += "\n" + row
-		else:
-			out.append(row)
-	for index: int in out.size():
-		var tag: String = DialogueBoxes.tag_of(out[index], speakers)
-		var words: String = DialogueBoxes.words_of(out[index], speakers)
-		var translated: String = String(TranslationServer.translate(words))
-		out[index] = translated if tag.is_empty() else "%s: %s" % [tag, translated]
-	return "\n".join(out)
+## [param line] (English, as the game keeps it) as the player reads it in the current language: the one
+## way a story line, or any other line kept between frames, reaches the screen translated (PR L7c).
+## - A line built with [method join] is each part shown in turn and joined again.
+## - Any other line is cut by speaker as the dialogue boxes cut it (DialogueBoxes.segments, with
+##   [param speakers] the English tags it can open with), and each segment's words are one message: a
+##   segment built with [method format] is its translated template filled with its inserts, else its
+##   words are translated whole. A tag is drawn as [param tag_names] gives it ("DIRECTOR" in the current
+##   language), or as it is (WOLF and the engineer's name stay as written); a tag is never part of a
+##   msgid, so a translation never carries one. A choice's response rows are left as they are (the
+##   answer buttons draw them).
+## - [param words_shown], when valid, is asked first for each segment's words and returns how they read,
+##   or "" to leave them to the rules above: the HUD's key lines (HudText.localise, which fills a key with
+##   the input in use and knows the touch forms).
+## In English every message translates to itself, so the line comes back as it was.
+static func shown(line: String, speakers: Array[String] = [], tag_names: Dictionary = {}, words_shown: Callable = Callable()) -> String:
+	if _joins.has(line):
+		var joined: Array = _joins[line]
+		var out: PackedStringArray = []
+		for part: String in joined[1]:
+			out.append(shown(part, speakers, tag_names, words_shown))
+		return (joined[0] as String).join(out)
+	var question: String = line.get_slice(DialogueBoxes.CHOICE_MARKER, 0)
+	var said: String = ""
+	for segment: Array in DialogueBoxes.segments(question, speakers):
+		var tag: String = segment[0]
+		var words: String = _shown_words(segment[1], speakers, tag_names, words_shown)
+		said += String(segment[2]) + (words if tag.is_empty() else "%s: %s" % [tag_names.get(tag, tag), words])
+	return said + line.substr(question.length())
+
+
+## One segment's [param words] as [method shown] draws them: [param words_shown]'s answer when it gives
+## one, a [method join]ed or [method format]ted line by its own rules, else the words translated whole
+## (left as they are when they hold no word, [method has_words]).
+static func _shown_words(words: String, speakers: Array[String], tag_names: Dictionary, words_shown: Callable) -> String:
+	if words_shown.is_valid():
+		var answer: String = words_shown.call(words)
+		if not answer.is_empty():
+			return answer
+	if _joins.has(words):
+		return shown(words, speakers, tag_names, words_shown)
+	if _formats.has(words):
+		var entry: Array = _formats[words]
+		var inserts: Array = (entry[1] as Array).duplicate()
+		for index: int in entry[2]:
+			inserts[index] = String(TranslationServer.translate(String(inserts[index])))
+		return _filled(String(TranslationServer.translate(entry[0])), entry[0], inserts)
+	return String(TranslationServer.translate(words)) if has_words(words) else words
+
+
+## [param template] (English with named placeholders such as {name}) in the current language, filled
+## from [param values] (placeholder name to text) by String.format. A translation whose placeholders
+## differ from the English ones shows the English template, as [method _filled] does for % conversions,
+## so a misspelt {nmae} never reaches the screen. Mark a literal passed here with KEY.tr() (the end card's
+## rows, PR L7c).
+static func fill_named(template: String, values: Dictionary) -> String:
+	var translated: String = String(TranslationServer.translate(template))
+	if _named(translated) != _named(template):
+		push_warning("I18n: the %s translation of %s has other placeholders; showing English" % [TranslationServer.get_locale(), template.c_escape()])
+		translated = template
+	return translated.format(values)
+
+
+## The named placeholders of [param template] ("{name}"), sorted, each once.
+static func _named(template: String) -> PackedStringArray:
+	var found: PackedStringArray = []
+	for match: RegExMatch in _placeholder.search_all(template):
+		if not found.has(match.get_string()):
+			found.append(match.get_string())
+	found.sort()
+	return found
 
 
 ## [param template] (English, with % conversions) in the current language, filled with [param inserts]:
