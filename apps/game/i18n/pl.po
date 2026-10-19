@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: WOLF OVERRIDE\n"
-"PO-Revision-Date: 2026-10-19 21:43+0000\n"
+"PO-Revision-Date: 2026-10-19 21:44+0000\n"
 "Last-Translator: Claude (Anthropic), machine translation, unreviewed\n"
 "Language-Team: none\n"
 "MIME-Version: 1.0\n"
@@ -1566,14 +1566,14 @@ msgstr "Weź kolejkę czystki. Ja sprawdzę lustro."
 #: scripts/main.gd:2793
 #, c-format
 msgid "The safe point could not save. Press %s here again."
-msgstr "Nie udało się zapisać w schronie. Naciśnij tu ponownie %s."
+msgstr "Błąd zapisu w schronie. Jeszcze raz naciśnij tu %s."
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: Hint bar (14 px, about 526 px wide on a keyboard and 488 px on touch; wraps). The touch form; USE is the touch button's word (UŻYĆ), named as 'przycisk UŻYĆ'.
 #. i18n: speaker=hint engineer=you
 #: scripts/main.gd:2793
 msgid "The safe point could not save. Tap USE here again."
-msgstr "Nie udało się zapisać w schronie. Dotknij tu ponownie przycisku UŻYĆ."
+msgstr "Błąd zapisu w schronie. Dotknij tu ponownie przycisku UŻYĆ."
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: i18n: story speaker=narrator
