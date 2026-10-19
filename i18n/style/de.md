@@ -37,8 +37,9 @@ Quotes „…“.
 - **HOLD E:**: the word order "HALTEN E:" is forced by the key token until the hint bar uses placeholders
   (localization PR L7b).
 - **SERVICE JUNCTION**: the trial's VERSORGUNGSKNOTEN reads back as "supply node"; a reviewer's word.
-- **breaker**: "Schutzschalter" is proposed rather than "Sicherung", so it is never confused with
-  SICHERUNGSPUNKT (SAFE POINT).
+- **breaker**: "Schutzschalter" is proposed rather than "Sicherung", which is a fuse.
+- **SAFE POINT**: SPEICHERPUNKT (save point), the plate's and the hints' word. PR L10's
+  SICHERUNGSPUNKT was cut on its left by the door pillar beside the plate.
 - **PR L10's choices (proposals for a reviewer):** SERVICE JUNCTION is VERSORGUNGSKNOTEN; the seal (OPEN
   THE SEAL) is *die Schleuse*; the relief vent is *der Druckablass*, so it is never confused with the
   valve (*das Ventil*); THE DEN is DER WOLFSBAU, since DER BAU read back as "the build". The sentry is

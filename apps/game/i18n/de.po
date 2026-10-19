@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: WOLF OVERRIDE\n"
-"PO-Revision-Date: 2026-10-19 17:39+0000\n"
+"PO-Revision-Date: 2026-10-19 18:35+0000\n"
 "Last-Translator: Claude (Anthropic), machine translation, unreviewed\n"
 "Language-Team: none\n"
 "MIME-Version: 1.0\n"
@@ -26,7 +26,7 @@ msgid "WOLF"
 msgstr "WOLF"
 
 # machine-translated by Claude (Anthropic), unreviewed
-#. TRANSLATORS: Station plate (12-13 px label on a machine). ALL CAPS, as short as possible. A circuit breaker on a power line (glossary 'BREAKER': SCHUTZSCHALTER, never Sicherung, which would read like SICHERUNGSPUNKT).
+#. TRANSLATORS: Station plate (12-13 px label on a machine). ALL CAPS, as short as possible. A circuit breaker on a power line (glossary 'BREAKER': SCHUTZSCHALTER, never Sicherung, which is a fuse).
 #. i18n: speaker=ui
 #: scenes/main.tscn
 msgid "BREAKER"
@@ -44,7 +44,7 @@ msgstr "KÜHLMITTELRELAIS"
 #. i18n: speaker=ui
 #: scenes/main.tscn
 msgid "SAFE POINT"
-msgstr "SICHERUNGSPUNKT"
+msgstr "SPEICHERPUNKT"
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: The PAUSE button on the touch layout (88 px) and the Pause action's prompt.
@@ -1242,7 +1242,7 @@ msgstr "Gespeicherter Kontrollpunkt konnte nicht gelesen werden."
 #. i18n: speaker=ui
 #: scripts/main.gd:1070
 msgid "No checkpoint yet. Saving starts at the first SAFE POINT."
-msgstr "Noch nichts gespeichert: erst am SICHERUNGSPUNKT."
+msgstr "Noch nichts gespeichert. Ab dem ersten SPEICHERPUNKT."
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: Changelog button text when the browser cannot open (338 px).
@@ -1352,14 +1352,14 @@ msgstr "%s  FORTSETZEN"
 #: scripts/main.gd:2674
 #, c-format
 msgid "The safe point could not save. Press %s here again."
-msgstr "Speichern am Sicherungspunkt fehlgeschlagen. Drücke hier erneut %s."
+msgstr "Speichern am Speicherpunkt fehlgeschlagen. Drücke hier erneut %s."
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: Hint bar (14 px, about 526 px wide on a keyboard and 488 px on touch; wraps). The touch form; USE is the touch button's word (BENUTZEN).
 #. i18n: speaker=hint engineer=you
 #: scripts/main.gd:2674
 msgid "The safe point could not save. Tap USE here again."
-msgstr "Speichern am Sicherungspunkt fehlgeschlagen. Tippe hier erneut auf NUTZEN."
+msgstr "Speichern am Speicherpunkt fehlgeschlagen. Tippe hier erneut auf NUTZEN."
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: Hint bar (14 px, about 526 px wide on a keyboard and 488 px on touch; wraps).
@@ -1686,7 +1686,7 @@ msgstr "%s: lies die Löschanzeige des Direktors."
 #. i18n: speaker=hint engineer=you
 #: scripts/main.gd:5123
 msgid "Return to the safe point to enter records access."
-msgstr "Kehr zum Sicherungspunkt zurück, um den Aktenzugang zu betreten."
+msgstr "Kehr zum Speicherpunkt zurück, um den Aktenzugang zu betreten."
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: Hint bar (14 px, about 526 px wide on a keyboard and 488 px on touch; wraps). The seal is the sealed door (OPEN THE SEAL): die Schleuse, here and in the objective.
@@ -1701,14 +1701,14 @@ msgstr "Die Schleuse öffnet sich."
 #: scripts/main.gd:5128
 #, c-format
 msgid "%s: save at the safe point."
-msgstr "%s: speichere am Sicherungspunkt."
+msgstr "%s: speichere am Speicherpunkt."
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: Hint bar (14 px, about 526 px wide on a keyboard and 488 px on touch; wraps).
 #. i18n: speaker=hint engineer=you
 #: scripts/main.gd:5129
 msgid "The seal is open. Move to the safe point."
-msgstr "Die Schleuse ist offen. Geh zum Sicherungspunkt."
+msgstr "Die Schleuse ist offen. Geh zum Speicherpunkt."
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: Hint bar (14 px, about 526 px wide on a keyboard and 488 px on touch; wraps). WOLF is he.
@@ -2137,14 +2137,14 @@ msgstr "AUSGANG ERREICHEN"
 #. i18n: speaker=ui
 #: scripts/main.gd:5288
 msgid "SAFE POINT REACHED"
-msgstr "SICHERUNGSPUNKT ERREICHT"
+msgstr "SPEICHERPUNKT ERREICHT"
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: Top card objective (ALL CAPS, about 420 px wide, wraps). Infinitive, as the other objectives.
 #. i18n: speaker=ui
 #: scripts/main.gd:5290
 msgid "REACH SAFE POINT"
-msgstr "SICHERUNGSPUNKT ERREICHEN"
+msgstr "SPEICHERPUNKT ERREICHEN"
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: Top card objective (ALL CAPS, about 420 px wide, wraps). Infinitive, as the other objectives. The seal is the sealed door.
