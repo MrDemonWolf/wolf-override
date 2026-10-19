@@ -183,6 +183,7 @@ Changes merged after 0.15.0. They become the next version when it is cut.
 - Station names in Chinese, Japanese and Korean break between words with the same text rules, so a name written without spaces can break too; names in English and other languages written with spaces still break at their spaces.
 - `opening_timing_test` times each box with the game's own reading rule instead of its own copy of it.
 - The German, French and Brazilian Portuguese files are written fresh by Claude with a note on every line, back-translated by Codex and passed through every translation check; each word cut to fit is noted on its line.
+- WOLF's touch line at the mirror names the answer button in German, French and Brazilian Portuguese, and lines where a pronoun could read as WOLF name the sentry instead.
 - The Portuguese gender check knows *teclado*, *lado*, *líquido* and *dados* are nouns, and the test suites' made-up catalogs share one language code that ships no file.
 
 ### How it was checked
@@ -203,7 +204,7 @@ Changes merged after 0.15.0. They become the next version when it is cut.
 - **Story marked for translation checked:** headless test suites (29), a switch to a test Spanish catalog and back, an old save's answer quoted in pseudo-English, every story constant's English compared with the previous version (unchanged), and four routes' stills (424, keyboard and touch) byte for byte the same as before; rendered pseudo-English stills of the routes; not played by hand.
 - **Dialogue boxes per language checked:** headless test suites, every English box, reading time and station name at every **TEXT SIZE** compared with the previous version (unchanged), and rendered stills of a Japanese sample box; not played by hand.
 - **Spanish story checked:** the translation checks with Codex's back-translation of the 145 new lines and one changed line in both files, and the headless test suites; not reviewed by a native speaker, not played by hand.
-- **German, French and Brazilian Portuguese checked:** the translation checks with Codex's back-translation, headless test suites and rendered stills in each language (keyboard and touch, 1280x720); not reviewed by a native speaker, not played by hand.
+- **German, French and Brazilian Portuguese checked:** the translation checks with Codex's back-translation, also of the 145 story lines, headless test suites (29) and rendered stills of the story in each language (keyboard and touch, 1280x720); not reviewed by a native speaker, not played by hand.
 
 ## 0.15.0 - October 16, 2026
 
