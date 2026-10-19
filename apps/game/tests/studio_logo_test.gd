@@ -1,16 +1,15 @@
-extends SceneTree
+extends "res://tests/support/game_suite.gd"
+## The studio logo at launch: when it is skipped, its timeline (and with Reduced Motion), the handover
+## to the title, and skipping while the title still loads.
+## Bookkeeping, spawning and the waits come from the shared suite kit (tests/support/game_suite.gd).
 
 const LOGO_SCENE: PackedScene = preload("res://scenes/studio_logo.tscn")
 
-var failures: int = 0
 var settings_path: String = ""
 
 
-func _initialize() -> void:
-	call_deferred("_run")
-
-
 func _run() -> void:
+	check_name = "Studio logo"
 	settings_path = "user://studio-logo-test-%s.cfg" % OS.get_process_id()
 	var children_before: int = root.get_child_count()
 	_check_skip_rules()
@@ -24,7 +23,7 @@ func _run() -> void:
 	await _settle(2)
 	_expect(root.get_child_count() == children_before and current_scene == null, "every logo, title and handover cover is freed")
 	DirAccess.remove_absolute(ProjectSettings.globalize_path(settings_path))
-	quit(1 if failures > 0 else 0)
+	finish()
 
 
 func _check_skip_rules() -> void:
@@ -238,9 +237,3 @@ func _key(code: Key, pressed: bool) -> InputEventKey:
 	event.physical_keycode = code
 	event.pressed = pressed
 	return event
-
-
-func _expect(condition: bool, label: String) -> void:
-	if not condition:
-		failures += 1
-		push_error("Studio logo check failed: " + label)

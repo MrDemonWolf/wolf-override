@@ -1,18 +1,14 @@
-extends SceneTree
-
-const GAME_SCENE: PackedScene = preload("res://scenes/main.tscn")
-
-var failures: int = 0
-
-
-func _initialize() -> void:
-	call_deferred("_run")
+extends "res://tests/support/game_suite.gd"
+## The title and HUD controls: the in-game changelog screen and its scrolling, menus, pause and
+## Android Back on keyboard, controller and touch, and a HUD that only rewrites its text when it changes.
+## Bookkeeping, spawning and the waits come from the shared suite kit (tests/support/game_suite.gd).
 
 
 func _run() -> void:
+	check_name = "UI and controls"
 	var path: String = "user://ui-controls-test-%s.cfg" % OS.get_process_id()
 	var old_fps: int = Engine.max_fps
-	var game: Node2D = GAME_SCENE.instantiate() as Node2D
+	var game: Node2D = MAIN_SCENE.instantiate() as Node2D
 	game.set("settings_path", path)
 	game.set("save_path", "%s-save.json" % path)
 	root.add_child(game)
@@ -42,7 +38,7 @@ func _run() -> void:
 	var note_width: float = changelog_note.get_theme_font("font").get_string_size(changelog_note.text, HORIZONTAL_ALIGNMENT_CENTER, -1.0, changelog_note.get_theme_font_size("font_size")).x
 	_expect(changelog_note.text.contains("drag the text") and note_width <= changelog_note.size.x, "the changelog note mentions dragging the text and fits on its one line")
 	# Touch readers have no wheel or keys: dragging the text itself moves the page, as the on-screen note promises.
-	await _settle(4)
+	await settle(4)
 	var body_centre: Vector2 = changelog_body.global_position + changelog_body.size * 0.5
 	var changelog_bar: VScrollBar = changelog_body.get_v_scroll_bar()
 	_expect(changelog_bar.max_value > changelog_bar.page + 200.0, "the exported changelog is taller than one page")
@@ -146,8 +142,8 @@ func _run() -> void:
 	var overlay: PauseOverlay = game.get_node("CanvasLayer/PauseOverlay") as PauseOverlay
 	_expect(paused and overlay.visible, "pause freezes the game and opens the menu")
 	_expect(root.gui_get_focus_owner() == null, "pause opened in touch mode leaves no focused button")
-	await _send_key(KEY_DOWN, true)
-	await _send_key(KEY_DOWN, false)
+	await send_key(KEY_DOWN, true)
+	await send_key(KEY_DOWN, false)
 	_expect((game.get_node("CanvasLayer/PauseOverlay/Panel/PauseMenu/ResumeButton") as Button).has_focus(), "the first arrow press in a touch-opened pause menu focuses Resume without moving past it")
 	(game.get_node("CanvasLayer/PauseOverlay/Panel/PauseMenu/SettingsButton") as Button).pressed.emit()
 	_expect((game.get_node("CanvasLayer/PauseOverlay/Panel/SettingsMenu") as Control).visible, "settings open while paused")
@@ -286,7 +282,7 @@ func _run() -> void:
 	await process_frame
 	tap.pressed = false
 	Input.parse_input_event(tap)
-	await _settle(2)
+	await settle(2)
 	_expect(game.get("title_open") and not end_card.visible, "a tap on the card's button goes on to the title")
 	game.set("touch_enabled", false)
 	new_game.pressed.emit()
@@ -296,7 +292,7 @@ func _run() -> void:
 	await process_frame
 	_expect(end_card.visible and end_button.has_focus() and end_button.text.ends_with("  CONTINUE") and not end_button.text.begins_with("E "), "with a controller the card's button has focus and its prompt names the controller button (%s)" % end_button.text)
 	Input.parse_input_event(_controller_button(JOY_BUTTON_A, true))
-	await _settle(2)
+	await settle(2)
 	Input.parse_input_event(_controller_button(JOY_BUTTON_A, false))
 	await process_frame
 	_expect(game.get("title_open") and not end_card.visible, "controller A on the card goes on to the title")
@@ -315,9 +311,7 @@ func _run() -> void:
 	# The bypass alarm from the touch crank may still be sounding; the mixer releases a stopped clip a
 	# few steps later, so give it that time before quitting.
 	await create_timer(0.1).timeout
-	if failures == 0:
-		print("UI and controls checks passed")
-	quit(1 if failures > 0 else 0)
+	finish("UI and controls checks passed")
 
 
 ## The HUD refresh runs every frame. With nothing changed it must not set a theme override again
@@ -327,7 +321,7 @@ func _check_hud_writes_on_change(game: Node2D) -> void:
 	game.set("controller_active", false)
 	game.call("_new_game")
 	game.call("_finish_intro")
-	await _settle(2)
+	await settle(2)
 	var themed: Array[Control] = [game.get_node("CanvasLayer/BottomBar/Speaker") as Control, game.get_node("CanvasLayer/TouchControls/Choice1") as Control, game.get_node("CanvasLayer/TouchControls/Choice2") as Control]
 	var notified: Array[int] = [0]
 	var count: Callable = func() -> void: notified[0] += 1
@@ -379,7 +373,7 @@ func _controller_button(index: JoyButton, pressed: bool) -> InputEventJoypadButt
 
 
 func _send_escape(pressed: bool) -> void:
-	await _send_key(KEY_ESCAPE, pressed)
+	await send_key(KEY_ESCAPE, pressed)
 
 
 ## A one-finger drag over `pos` that moves `delta_y` pixels in three steps, pushed through the real input path.
@@ -433,23 +427,3 @@ func _send_mouse_drag(canvas_pos: Vector2, canvas_delta_y: float, device: int) -
 	press.global_position = press.position
 	Input.parse_input_event(press)
 	await process_frame
-
-
-func _settle(frames: int) -> void:
-	for _i: int in range(frames):
-		await process_frame
-
-
-func _send_key(code: Key, pressed: bool) -> void:
-	var event: InputEventKey = InputEventKey.new()
-	event.keycode = code
-	event.physical_keycode = code
-	event.pressed = pressed
-	Input.parse_input_event(event)
-	await process_frame
-
-
-func _expect(condition: bool, label: String) -> void:
-	if not condition:
-		failures += 1
-		push_error("UI and controls check failed: " + label)

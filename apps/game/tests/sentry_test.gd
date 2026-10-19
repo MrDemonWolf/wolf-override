@@ -1,13 +1,11 @@
-extends SceneTree
+extends "res://tests/support/game_suite.gd"
 ## Blowback beats 4-6: the sentry brain and the drop arm as pure logic, the junction's later guards
 ## and saves, and the scene routes past the door (WOLF draws the sentry; the engineer times the drop
 ## alone after WOLF refuses; a miss with its cloud and rewind; sentry and cloud knockdowns back to
 ## autosave B; the exit bolt, the closing beat and Continue from B, C and D).
 
-const GAME_SCENE: PackedScene = preload("res://scenes/main.tscn")
 const State = preload("res://scripts/m0_state.gd")
 const MainScript = preload("res://scripts/main.gd")
-const Suite = preload("res://tests/support/game_suite.gd")
 ## How far WOLF's painted body stays from the hung tank's on his way down the lane, in px.
 const TANK_CLEARANCE: float = 3.0
 ## The bound over the crushed tank (_check_tank_leap_shape): its steepest rise or fall in px up per px
@@ -16,7 +14,6 @@ const TANK_LEAP_MAX_SLOPE: float = 1.4
 const TANK_LEAP_TOP_SPAN: float = 60.0
 const TANK_LEAP_LANDING: float = 20.0
 
-var failures: int = 0
 var _wolf_pixel_cache: Dictionary = {}
 ## The lane watch (_watch_lane): frames looked at in the junction, and what read false on them.
 var lane_frames: int = 0
@@ -49,14 +46,13 @@ func _initialize() -> void:
 
 
 func _run() -> void:
+	check_name = "Sentry"
 	_check_brain()
 	_check_arm()
 	_check_drop_window()
 	_check_state_guards()
 	await _check_scene()
-	if failures == 0:
-		print("Sentry checks passed")
-	quit(1 if failures > 0 else 0)
+	finish("Sentry checks passed")
 
 
 func _check_brain() -> void:
@@ -83,8 +79,8 @@ func _check_brain() -> void:
 	_expect(is_equal_approx(SentryBrain.PATROL_MIN_X - SentryBrain.DRAWN_HALF_WIDTH, SentryBrain.COVER_MAX_X + M0Actor.HUMAN_REACH), "the patrol turns where its drawn front meets an engineer drawn at the alcove's right end")
 	_expect(SentryBrain.DRAWN_HALF_WIDTH >= Sentry.drawn_half_width() and SentryBrain.DRAWN_HALF_WIDTH - Sentry.drawn_half_width() < 1.0, "the rule's drawn half width is the painted machine's, rounded up (%.2f)" % Sentry.drawn_half_width())
 	_expect(SentryBrain.PATROL_MIN_X < DropArm.MARK_X and SentryBrain.PATROL_MAX_X > DropArm.MARK_X + DropArm.HIT_REACH, "the patrol crosses the mark and leaves the hit window at its far end on every pass")
-	var sliced: SentryBrain = _patrolling_at(SentryBrain.PATROL_MAX_X, -1.0)
-	var whole: SentryBrain = _patrolling_at(SentryBrain.PATROL_MAX_X, -1.0)
+	var sliced: SentryBrain = patrolling_sentry(SentryBrain.PATROL_MAX_X, -1.0)
+	var whole: SentryBrain = patrolling_sentry(SentryBrain.PATROL_MAX_X, -1.0)
 	var lowest: float = INF
 	var highest: float = -INF
 	for _frame: int in 600:
@@ -98,16 +94,16 @@ func _check_brain() -> void:
 		_expect(lowest - cover_x > SentryBrain.CONTACT_RANGE - 0.01, "a patrolling sentry never runs into an engineer hidden at %.0f" % cover_x)
 	# Detection: only in the lane, only ahead (or touching), never in the alcove. Seeing someone starts
 	# the lock-on beat, never the chase itself.
-	_expect(_patrolling_at(700.0, -1.0).tick(0.001, 600.0, true, -1.0) == &"lock", "an exposed engineer ahead inside its sight is seen")
-	_expect(_patrolling_at(840.0, -1.0).tick(0.001, 665.0, true, -1.0) == &"lock", "175 px ahead is inside its sight")
-	_expect(_patrolling_at(840.0, -1.0).tick(0.001, 650.0, true, -1.0) == &"patrol", "190 px ahead is past its sight")
-	_expect(_patrolling_at(700.0, -1.0).tick(0.001, JunctionRoom.ARM_X, SentryBrain.is_exposed(JunctionRoom.ARM_X), -1.0) == &"patrol", "the alcove hides the engineer")
-	_expect(_patrolling_at(700.0, -1.0).tick(0.001, 760.0, true, -1.0) == &"patrol", "behind it and out of reach is unseen")
-	_expect(_patrolling_at(700.0, -1.0).tick(0.001, 720.0, true, -1.0) == &"lock", "walking into it from behind is noticed")
-	_expect(_patrolling_at(620.0, -1.0).tick(0.001, 530.0, false, -1.0) == &"patrol", "an engineer back over the rubble is never seen")
+	_expect(patrolling_sentry(700.0, -1.0).tick(0.001, 600.0, true, -1.0) == &"lock", "an exposed engineer ahead inside its sight is seen")
+	_expect(patrolling_sentry(840.0, -1.0).tick(0.001, 665.0, true, -1.0) == &"lock", "175 px ahead is inside its sight")
+	_expect(patrolling_sentry(840.0, -1.0).tick(0.001, 650.0, true, -1.0) == &"patrol", "190 px ahead is past its sight")
+	_expect(patrolling_sentry(700.0, -1.0).tick(0.001, JunctionRoom.ARM_X, SentryBrain.is_exposed(JunctionRoom.ARM_X), -1.0) == &"patrol", "the alcove hides the engineer")
+	_expect(patrolling_sentry(700.0, -1.0).tick(0.001, 760.0, true, -1.0) == &"patrol", "behind it and out of reach is unseen")
+	_expect(patrolling_sentry(700.0, -1.0).tick(0.001, 720.0, true, -1.0) == &"lock", "walking into it from behind is noticed")
+	_expect(patrolling_sentry(620.0, -1.0).tick(0.001, 530.0, false, -1.0) == &"patrol", "an engineer back over the rubble is never seen")
 	_check_lock_on()
 	# Chase.
-	var chaser: SentryBrain = _patrolling_at(700.0, -1.0)
+	var chaser: SentryBrain = patrolling_sentry(700.0, -1.0)
 	chaser.tick(0.001, 600.0, true, -1.0)
 	chaser.tick(SentryBrain.LOCK_SECONDS, 600.0, true, -1.0)
 	var start_x: float = chaser.x
@@ -131,15 +127,15 @@ func _check_brain() -> void:
 	var parked_x: float = chaser.x
 	chaser.tick(0.02, 500.0, false, -1.0)
 	_expect(chaser.facing > 0.0 and is_equal_approx(chaser.x - parked_x, SentryBrain.PATROL_SPEED * 0.02), "after a chase it turns and walks back into its patrol instead of jumping")
-	var walk_back_sliced: SentryBrain = _patrolling_at(SentryBrain.CHASE_MIN_X, -1.0)
-	var walk_back_whole: SentryBrain = _patrolling_at(SentryBrain.CHASE_MIN_X, -1.0)
+	var walk_back_sliced: SentryBrain = patrolling_sentry(SentryBrain.CHASE_MIN_X, -1.0)
+	var walk_back_whole: SentryBrain = patrolling_sentry(SentryBrain.CHASE_MIN_X, -1.0)
 	for _frame: int in 300:
 		walk_back_sliced.tick(3.0 / 300.0, 500.0, false, -1.0)
 	walk_back_whole.tick(3.0, 500.0, false, -1.0)
 	_expect(absf(walk_back_sliced.x - walk_back_whole.x) < 0.01 and walk_back_sliced.facing == walk_back_whole.facing, "walking back in lands the same with sliced and whole deltas")
-	_expect(not _patrolling_at(700.0, -1.0).touches(700.0), "a patrolling sentry is not contact")
+	_expect(not patrolling_sentry(700.0, -1.0).touches(700.0), "a patrolling sentry is not contact")
 	# Fixated on WOLF.
-	var fixated: SentryBrain = _patrolling_at(SentryBrain.PATROL_MAX_X, -1.0)
+	var fixated: SentryBrain = patrolling_sentry(SentryBrain.PATROL_MAX_X, -1.0)
 	_expect(fixated.tick(0.1, 100.0, false, JunctionRoom.WOLF_BAIT_X) == &"fixated", "WOLF drawing it fixates it")
 	fixated.tick(2.0, 100.0, false, JunctionRoom.WOLF_BAIT_X)
 	_expect(is_equal_approx(fixated.x, JunctionRoom.WOLF_BAIT_X - SentryBrain.BAIT_OFFSET) and is_equal_approx(fixated.x, DropArm.MARK_X) and fixated.facing > 0.0, "it parks just short of WOLF, on the floor mark, facing him with its back to the release")
@@ -160,31 +156,31 @@ func _check_brain() -> void:
 	_expect(JunctionRoom.WOLF_BAIT_X - wolf_art.y >= bolt_panel_right - M0Actor.AVOID_TOLERANCE, "his painted snout stops at the exit bolt panel's right edge (snout %.1f, panel %.1f)" % [JunctionRoom.WOLF_BAIT_X - wolf_art.y, bolt_panel_right])
 	_expect(JunctionRoom.WOLF_DOWN_X - M0Actor.WOLF_REACH > DropArm.MARK_X + JunctionRoom.TANK_SIZE.x * 0.5 + SentryBrain.HALF_WIDTH, "once it is down WOLF waits clear of the tank and the wreck under it")
 	_check_bait_walk()
-	var from_left: SentryBrain = _patrolling_at(SentryBrain.PATROL_MIN_X, 1.0)
+	var from_left: SentryBrain = patrolling_sentry(SentryBrain.PATROL_MIN_X, 1.0)
 	from_left.tick(2.0, 100.0, false, JunctionRoom.WOLF_BAIT_X)
 	_expect(is_equal_approx(from_left.x, DropArm.MARK_X), "it parks on the mark from either side")
 	_expect(fixated.tick(0.001, 690.0, true, JunctionRoom.WOLF_BAIT_X) == &"lock", "walking into a fixated sentry breaks its hold")
 	_expect(fixated.tick(SentryBrain.LOCK_SECONDS, 690.0, true, JunctionRoom.WOLF_BAIT_X) == &"chase" and fixated.touches(690.0), "after the lock-on beat it runs down whoever walked into it")
-	var released: SentryBrain = _patrolling_at(SentryBrain.PATROL_MAX_X, -1.0)
+	var released: SentryBrain = patrolling_sentry(SentryBrain.PATROL_MAX_X, -1.0)
 	released.tick(0.1, 100.0, false, JunctionRoom.WOLF_BAIT_X)
 	_expect(released.tick(0.1, 100.0, false, -1.0) == &"patrol", "when WOLF stops drawing it, it patrols again")
 	# Holding: only a fixated sentry stopped on its hold point (the mark) counts.
-	var arriving: SentryBrain = _patrolling_at(SentryBrain.PATROL_MAX_X, -1.0)
+	var arriving: SentryBrain = patrolling_sentry(SentryBrain.PATROL_MAX_X, -1.0)
 	arriving.tick(0.1, 100.0, false, JunctionRoom.WOLF_BAIT_X)
 	_expect(arriving.state == &"fixated" and not arriving.is_holding(JunctionRoom.WOLF_BAIT_X), "a fixated sentry still on its way in is not holding")
 	arriving.tick(2.0, 100.0, false, JunctionRoom.WOLF_BAIT_X)
 	_expect(arriving.is_holding(JunctionRoom.WOLF_BAIT_X) and arriving.x == DropArm.MARK_X, "stopped on the mark it is holding")
-	_expect(not _patrolling_at(DropArm.MARK_X, -1.0).is_holding(JunctionRoom.WOLF_BAIT_X), "a patrolling sentry crossing the mark is not holding")
+	_expect(not patrolling_sentry(DropArm.MARK_X, -1.0).is_holding(JunctionRoom.WOLF_BAIT_X), "a patrolling sentry crossing the mark is not holding")
 	_check_keeps_distance()
 	_check_obstacle()
 	# Down and paused.
-	var down: SentryBrain = _patrolling_at(700.0, -1.0)
+	var down: SentryBrain = patrolling_sentry(700.0, -1.0)
 	_expect(down.knock_down() and not down.knock_down() and not down.wake() and not down.alert(), "the tank downs it once and nothing wakes it")
 	_expect(down.tick(1.0, 700.0, true, JunctionRoom.WOLF_BAIT_X) == &"down" and down.x == 700.0 and not down.touches(700.0), "a downed sentry ignores everything")
-	var paused: SentryBrain = _patrolling_at(700.0, -1.0)
+	var paused: SentryBrain = patrolling_sentry(700.0, -1.0)
 	paused.paused = true
 	_expect(paused.tick(1.0, 600.0, true, JunctionRoom.WOLF_BAIT_X) == &"patrol" and paused.x == 700.0, "a paused sentry neither moves nor sees")
-	var alerted: SentryBrain = _patrolling_at(800.0, -1.0)
+	var alerted: SentryBrain = patrolling_sentry(800.0, -1.0)
 	_expect(alerted.alert() and alerted.state == &"lock" and alerted.x == 800.0, "a missed drop turns it on the engineer, locking on first")
 	alerted.tick(0.2, SentryBrain.COVER_MIN_X, false, -1.0)
 	_expect(alerted.alert() and alerted.state == &"lock" and is_equal_approx(alerted.lock_remaining, SentryBrain.LOCK_SECONDS - 0.2), "a second alert does not restart the beat")
@@ -194,7 +190,7 @@ func _check_brain() -> void:
 	alerted.tick(SentryBrain.LOSE_SECONDS, SentryBrain.RUBBLE_X, false, -1.0)
 	_expect(alerted.state == &"patrol" and not alerted.turned_by_miss, "losing the engineer behind the rubble clears the mark")
 	# Seen first: the chase is the sentry's own, and a miss during it does not relabel it.
-	var spotter: SentryBrain = _patrolling_at(700.0, -1.0)
+	var spotter: SentryBrain = patrolling_sentry(700.0, -1.0)
 	spotter.tick(0.001, 640.0, true, -1.0)
 	_expect(spotter.state == &"lock" and not spotter.turned_by_miss, "a sentry that sees the engineer is not marked as turned by a miss")
 	_expect(spotter.alert() and not spotter.turned_by_miss, "a miss during its own lock-on beat leaves it unmarked")
@@ -216,7 +212,7 @@ func _check_brain() -> void:
 ## holding (the drop waits) until he is past it; then it parks on the mark facing him. With WOLF
 ## holding the far end without drawing it (far_x), its patrol turns short of him.
 func _check_keeps_distance() -> void:
-	var wary: SentryBrain = _patrolling_at(DropArm.MARK_X, 1.0)
+	var wary: SentryBrain = patrolling_sentry(DropArm.MARK_X, 1.0)
 	wary.watch_x = JunctionRoom.WOLF_RUBBLE_X + 40.0
 	_expect(wary.tick(0.5, 100.0, false, JunctionRoom.WOLF_BAIT_X) == &"fixated" and wary.x >= DropArm.MARK_X - 0.01 and wary.facing < 0.0, "drawn with WOLF still behind it, it turns to face him and does not close on him (x %.1f)" % wary.x)
 	_expect(not wary.is_holding(JunctionRoom.WOLF_BAIT_X) and wary.wolf_ahead(), "nor is it holding while he is still coming")
@@ -238,12 +234,12 @@ func _check_keeps_distance() -> void:
 	wary.watch_x = JunctionRoom.WOLF_BAIT_X
 	wary.tick(2.0, 100.0, false, JunctionRoom.WOLF_BAIT_X)
 	_expect(is_equal_approx(wary.x, DropArm.MARK_X) and wary.facing > 0.0 and wary.is_holding(JunctionRoom.WOLF_BAIT_X), "then it parks on the mark facing him, and holds")
-	var near_start: SentryBrain = _patrolling_at(SentryBrain.PATROL_MIN_X, -1.0)
+	var near_start: SentryBrain = patrolling_sentry(SentryBrain.PATROL_MIN_X, -1.0)
 	near_start.watch_x = JunctionRoom.WOLF_RUBBLE_X + 40.0
 	near_start.tick(0.1, 100.0, false, JunctionRoom.WOLF_BAIT_X)
 	_expect(near_start.x >= SentryBrain.PATROL_MIN_X - 0.01, "drawn from the near end of its patrol it still never comes toward him")
 	# WOLF holding the far end after breaking off: the patrol turns short of him.
-	var held_off: SentryBrain = _patrolling_at(SentryBrain.PATROL_MIN_X, 1.0)
+	var held_off: SentryBrain = patrolling_sentry(SentryBrain.PATROL_MIN_X, 1.0)
 	held_off.far_x = 805.0
 	var lowest: float = INF
 	var highest: float = -INF
@@ -252,7 +248,7 @@ func _check_keeps_distance() -> void:
 		lowest = minf(lowest, held_off.x)
 		highest = maxf(highest, held_off.x)
 	_expect(highest <= 805.01 and highest >= 800.0 and highest > DropArm.MARK_X + DropArm.HIT_REACH and lowest < DropArm.MARK_X, "with WOLF holding the far end its patrol turns short of him and still crosses the mark and the whole far side of the hit window (%.1f..%.1f)" % [lowest, highest])
-	var outside: SentryBrain = _patrolling_at(SentryBrain.PATROL_MAX_X, 1.0)
+	var outside: SentryBrain = patrolling_sentry(SentryBrain.PATROL_MAX_X, 1.0)
 	outside.far_x = 805.0
 	outside.tick(0.1, 100.0, false, -1.0)
 	_expect(outside.x < SentryBrain.PATROL_MAX_X and is_equal_approx(SentryBrain.PATROL_MAX_X - outside.x, SentryBrain.PATROL_SPEED * 0.1) and outside.facing < 0.0, "past that turn already, it walks back in at patrol speed rather than jump")
@@ -264,12 +260,12 @@ func _check_keeps_distance() -> void:
 func _check_obstacle() -> void:
 	var footprint: Vector2 = DropArm.footprint()
 	_expect(is_equal_approx(footprint.x, DropArm.MARK_X - DropArm.HIT_RANGE) and is_equal_approx(footprint.y, DropArm.MARK_X + DropArm.HIT_RANGE), "the tank's footprint is the floor brackets")
-	var chaser: SentryBrain = _patrolling_at(800.0, -1.0)
+	var chaser: SentryBrain = patrolling_sentry(800.0, -1.0)
 	chaser.alert()
 	chaser.obstacle = footprint
 	chaser.tick(SentryBrain.LOCK_SECONDS + 2.0, JunctionRoom.ARM_X, false, -1.0)
 	_expect(chaser.state == &"chase" and is_equal_approx(chaser.x - SentryBrain.HALF_WIDTH, footprint.y), "a chase from the far side stops with its body at the tank's edge (x %.1f)" % chaser.x)
-	var sliced: SentryBrain = _patrolling_at(800.0, -1.0)
+	var sliced: SentryBrain = patrolling_sentry(800.0, -1.0)
 	sliced.alert()
 	sliced.obstacle = footprint
 	var nearest: float = INF
@@ -280,22 +276,22 @@ func _check_obstacle() -> void:
 	chaser.obstacle = Vector2.ZERO
 	chaser.tick(0.5, JunctionRoom.ARM_X, false, -1.0)
 	_expect(chaser.x < footprint.x, "once the tank is up it carries on past the mark")
-	var grazed: SentryBrain = _patrolling_at(DropArm.MARK_X + DropArm.HIT_REACH + 1.0, -1.0)
+	var grazed: SentryBrain = patrolling_sentry(DropArm.MARK_X + DropArm.HIT_REACH + 1.0, -1.0)
 	grazed.alert()
 	grazed.obstacle = footprint
 	var grazed_x: float = grazed.x
 	grazed.tick(SentryBrain.LOCK_SECONDS + 1.0, JunctionRoom.ARM_X, false, -1.0)
 	_expect(grazed.x == grazed_x, "a sentry the missed tank grazed holds where it stands rather than drive further under it")
-	var from_left: SentryBrain = _patrolling_at(SentryBrain.PATROL_MIN_X, 1.0)
+	var from_left: SentryBrain = patrolling_sentry(SentryBrain.PATROL_MIN_X, 1.0)
 	from_left.obstacle = footprint
 	from_left.tick(1.0, 100.0, false, -1.0)
 	_expect(from_left.x <= SentryBrain.PATROL_MIN_X + 0.01 and from_left.facing < 0.0, "a patrol coming from the near side turns back at the tank instead of driving further into it")
-	var left_chaser: SentryBrain = _patrolling_at(640.0, 1.0)
+	var left_chaser: SentryBrain = patrolling_sentry(640.0, 1.0)
 	left_chaser.alert()
 	left_chaser.obstacle = footprint
 	left_chaser.tick(SentryBrain.LOCK_SECONDS + 1.0, 820.0, true, -1.0)
 	_expect(left_chaser.state == &"chase" and is_equal_approx(left_chaser.x + SentryBrain.HALF_WIDTH, footprint.x), "a chase from the near side stops with its body at the tank's other edge (x %.1f)" % left_chaser.x)
-	var from_right: SentryBrain = _patrolling_at(SentryBrain.PATROL_MAX_X, -1.0)
+	var from_right: SentryBrain = patrolling_sentry(SentryBrain.PATROL_MAX_X, -1.0)
 	from_right.obstacle = footprint
 	from_right.tick(1.0, 100.0, false, -1.0)
 	_expect(from_right.x - SentryBrain.HALF_WIDTH >= footprint.y - 0.01 and from_right.facing > 0.0, "and so does one coming from the far side")
@@ -307,7 +303,7 @@ func _check_obstacle() -> void:
 ## the chase; it cannot run anyone down until then.
 func _check_lock_on() -> void:
 	_expect(SentryBrain.LOCK_SECONDS >= 0.4 and SentryBrain.LOCK_SECONDS <= 0.6, "the lock-on beat lasts about half a second")
-	var locking: SentryBrain = _patrolling_at(700.0, -1.0)
+	var locking: SentryBrain = patrolling_sentry(700.0, -1.0)
 	locking.tick(0.001, 600.0, true, -1.0)
 	var seen_x: float = locking.x
 	_expect(is_equal_approx(seen_x, 700.0 - SentryBrain.PATROL_SPEED * 0.001) and is_equal_approx(locking.lock_remaining, SentryBrain.LOCK_SECONDS), "it locks on where it saw the engineer")
@@ -316,8 +312,8 @@ func _check_lock_on() -> void:
 	locking.tick(0.01, 600.0, true, -1.0)
 	_expect(locking.state == &"chase" and locking.x == seen_x, "at the end of the beat the chase starts from where it stood")
 	# From the far end, so the chase after the beat has room before it reaches the engineer.
-	var sliced: SentryBrain = _patrolling_at(SentryBrain.PATROL_MAX_X, -1.0)
-	var whole: SentryBrain = _patrolling_at(SentryBrain.PATROL_MAX_X, -1.0)
+	var sliced: SentryBrain = patrolling_sentry(SentryBrain.PATROL_MAX_X, -1.0)
+	var whole: SentryBrain = patrolling_sentry(SentryBrain.PATROL_MAX_X, -1.0)
 	sliced.tick(0.001, 680.0, true, -1.0)
 	whole.tick(0.001, 680.0, true, -1.0)
 	var far_seen_x: float = whole.x
@@ -331,25 +327,25 @@ func _check_lock_on() -> void:
 	_expect(is_equal_approx(whole.x, 680.0 + SentryBrain.CONTACT_RANGE) and whole.touches(680.0) and whole.facing < 0.0, "the chase stops at contact range, facing the engineer (%.1f)" % whole.x)
 	whole.tick(0.1, 680.0 + SentryBrain.CONTACT_RANGE - 3.0, true, -1.0)
 	_expect(is_equal_approx(whole.x, 680.0 + SentryBrain.CONTACT_RANGE) and whole.facing < 0.0, "an engineer who steps closer is not backed away from")
-	var behind: SentryBrain = _patrolling_at(700.0, -1.0)
+	var behind: SentryBrain = patrolling_sentry(700.0, -1.0)
 	behind.tick(0.001, 720.0, true, -1.0)
 	behind.tick(0.1, 720.0, true, -1.0)
 	_expect(behind.state == &"lock" and behind.facing > 0.0, "locking on to someone behind it, it turns to face them")
-	var touching: SentryBrain = _patrolling_at(700.0, -1.0)
+	var touching: SentryBrain = patrolling_sentry(700.0, -1.0)
 	touching.tick(0.001, 700.0, true, -1.0)
 	_expect(touching.state == &"lock" and not touching.touches(700.0), "an engineer touching it is not run down during the beat")
-	var held: SentryBrain = _patrolling_at(700.0, -1.0)
+	var held: SentryBrain = patrolling_sentry(700.0, -1.0)
 	held.tick(0.001, 600.0, true, -1.0)
 	held.paused = true
 	held.tick(1.0, 600.0, true, -1.0)
 	_expect(held.state == &"lock" and is_equal_approx(held.lock_remaining, SentryBrain.LOCK_SECONDS), "a paused sentry holds its beat")
 	held.paused = false
 	_expect(held.knock_down() and held.state == &"down", "the tank can land on it mid-beat")
-	var restored: SentryBrain = _patrolling_at(700.0, -1.0)
+	var restored: SentryBrain = patrolling_sentry(700.0, -1.0)
 	restored.tick(0.001, 600.0, true, -1.0)
 	restored.reset(true, false, DropArm.MARK_X)
 	_expect(restored.state == &"patrol" and restored.lock_remaining == 0.0, "a restore drops the beat")
-	var dropped: SentryBrain = _patrolling_at(700.0, -1.0)
+	var dropped: SentryBrain = patrolling_sentry(700.0, -1.0)
 	dropped.tick(0.001, 600.0, true, -1.0)
 	_expect(dropped.tick(SentryBrain.LOCK_SECONDS, 500.0, false, -1.0) == &"chase", "an engineer who gets back over the rubble during the beat is still chased")
 	dropped.tick(SentryBrain.LOSE_SECONDS, 500.0, false, -1.0)
@@ -413,7 +409,7 @@ func _check_arm() -> void:
 
 
 func _check_state_guards() -> void:
-	var state: M0State = _completed_records_state(State.DISCLOSE)
+	var state: M0State = completed_records_state(State.DISCLOSE)
 	_expect(not state.drop_sentry() and not state.clear_junction(), "nothing in the lane happens outside the junction")
 	state.enter_junction()
 	_expect(not state.drop_sentry() and not state.clear_junction(), "the sentry cannot go down before the door")
@@ -423,17 +419,12 @@ func _check_state_guards() -> void:
 	_expect(state.clear_junction() and not state.clear_junction() and state.junction_cleared, "the junction clears once")
 	var round_trip: M0State = State.from_dict(JSON.parse_string(JSON.stringify(state.to_dict())))
 	_expect(round_trip != null and round_trip.junction_cleared and round_trip.sentry_down and round_trip.door_blown, "a cleared junction round-trips through JSON")
-	_expect(state.wolf_will_bait() and not _completed_records_state(State.PRESS).wolf_will_bait(), "WOLF offers to draw the sentry only with the relay risk disclosed")
+	_expect(state.wolf_will_bait() and not completed_records_state(State.PRESS).wolf_will_bait(), "WOLF offers to draw the sentry only with the relay risk disclosed")
 
 
 func _check_scene() -> void:
-	var path: String = "user://sentry-test-%s.json" % OS.get_process_id()
-	_remove(path)
-	var game: Node2D = GAME_SCENE.instantiate() as Node2D
-	game.set("save_path", path)
-	game.set("settings_path", "%s-settings.cfg" % path)
-	root.add_child(game)
-	await process_frame
+	var game: Node2D = await start_game("sentry-test")
+	var path: String = str(game.get("save_path"))
 	var human: M0Actor = game.get_node("Human") as M0Actor
 	var wolf: M0Actor = game.get_node("Wolf") as M0Actor
 	var camera: Camera2D = game.get_node("IntroCamera") as Camera2D
@@ -482,11 +473,11 @@ func _check_scene() -> void:
 	for _frame: int in 20:
 		await physics_frame
 	_expect(brain.x == frozen_x and arm.state == &"hung", "the sentry does not move while the question is open")
-	await _tap(&"pause_game")
+	await tap(&"pause_game")
 	_expect(paused, "pause works during the lane question")
 	(game.get_node("CanvasLayer/PauseOverlay") as PauseOverlay).resume_requested.emit()
 	_expect(not paused and game.get("waiting_for_choice"), "resume returns to the open question")
-	await _tap(&"choice_1")
+	await tap(&"choice_1")
 	_expect(game.get("wolf_baiting") and game.get("lane_choice") == "wolf" and wolf.autonomous_target_x == JunctionRoom.WOLF_BAIT_X and str(game.get("status_line")) == "WOLF: You told me the truth at the relay. I'll draw it onto the mark and keep clear of the tank. Drop it when it stops.", "with the risk disclosed WOLF chooses to draw it, and says it is because of the relay")
 	# Round 3b: the engineer lets him go first at the rubble line, so he never runs through them later at
 	# the release; they get their controls back once he is past them.
@@ -494,7 +485,7 @@ func _check_scene() -> void:
 	var choice_x: float = human.position.x
 	Input.action_press(&"move_right")
 	var waited_in_place: Array[bool] = [true]
-	var passed: bool = await _wait_until(func() -> bool:
+	var passed: bool = await wait_until(func() -> bool:
 		if game.get("engineer_waits_for_wolf"):
 			waited_in_place[0] = waited_in_place[0] and absf(human.position.x - choice_x) < 0.5 and not human.controlled
 		return not game.get("engineer_waits_for_wolf"), 120)
@@ -505,7 +496,7 @@ func _check_scene() -> void:
 	human.position.x = JunctionRoom.ARM_X
 	await physics_frame
 	_expect(not brain.is_holding(JunctionRoom.WOLF_BAIT_X) and str(game.call("_context_hint")) == "Wait for WOLF to park it on the mark." and not game.call("_drop_ready"), "at the release before WOLF has it on the mark the hint says to wait")
-	await _tap(&"interact")
+	await tap(&"interact")
 	_expect(arm.state == &"hung" and str(game.get("status_line")) == "Wait. WOLF hasn't got it on the mark yet.", "USE at the release before it is parked leaves the tank hanging")
 	# Once it is after the engineer WOLF has backed off, so the release no longer waits for him.
 	var drawing_state: StringName = brain.state
@@ -522,7 +513,7 @@ func _check_scene() -> void:
 	# Box, hint and picture agree on every frame: the "Wait" and the wait hint stay up exactly until the
 	# sentry is parked, and on that frame the line says it has stopped and the hint offers the drop.
 	var agreed: Array[bool] = [true]
-	_expect(await _wait_until(func() -> bool:
+	_expect(await wait_until(func() -> bool:
 		# Where the two drawn bodies could meet he is up over the sentry; elsewhere they stay apart.
 		var squash: float = wolf.body_sprite.scale.y / (game.get("wolf_sprite_scale") as Vector2).y
 		var lift: float = -(wolf.body_sprite.offset.y - MainScript.WOLF_FEET_BELOW_CENTRE * (1.0 - squash) / squash) * wolf.body_sprite.scale.y
@@ -554,7 +545,7 @@ func _check_scene() -> void:
 	_expect(wolf.body_sprite.flip_h and wolf.body_sprite.offset == Vector2.ZERO, "at his spot WOLF faces back down the lane at it, feet on the floor")
 	_expect(walk_in_gap[0] >= SentryBrain.HALF_WIDTH + M0State.WOLF_HALF_WIDTH and highest_bound[0] >= JunctionRoom.LEAP_HEIGHT - 0.5, "WOLF bounds over the sentry on his way across and never walks through it (closest on the floor %.1f px, highest %.1f px)" % [walk_in_gap[0], highest_bound[0]])
 	_expect(absf(room.sentry.position.x - brain.x) <= 4.0, "the sentry body follows its brain (%.1f vs %.1f)" % [room.sentry.position.x, brain.x])
-	_expect(await _walk_to(human, JunctionRoom.ARM_X), "the engineer crosses to the panel")
+	_expect(await walk_to(human, JunctionRoom.ARM_X), "the engineer crosses to the panel")
 	_expect(not game.get("fail_active") and brain.state == &"fixated", "crossing while it holds on WOLF is safe")
 	_expect(absf(human.position.x - wolf.position.x) >= M0Actor.WOLF_REACH + M0Actor.HUMAN_REACH, "WOLF drawing it stands clear of the engineer at the release (%.1f px apart)" % absf(human.position.x - wolf.position.x))
 	_expect(str(game.call("_context_hint")).contains("drop the tank. It's parked") and game.call("_drop_ready"), "with it parked the release offers the drop")
@@ -565,9 +556,9 @@ func _check_scene() -> void:
 	_expect(touch_use.text == "DROP", "touch relabels USE to DROP at the panel")
 	game.set("touch_enabled", false)
 	game.call("_refresh_ui")
-	await _tap(&"interact")
+	await tap(&"interact")
 	_expect(arm.state == &"falling", "USE at the panel lets the tank go")
-	_expect(await _wait_until(func() -> bool: return (game.get("state") as M0State).sentry_down, 60), "the tank lands on the parked sentry")
+	_expect(await wait_until(func() -> bool: return (game.get("state") as M0State).sentry_down, 60), "the tank lands on the parked sentry")
 	_expect(str(game.get("status_line")) == "The tank comes down square and crushes\nthe sentry flat. Its eyes go dark." and absf(brain.x - DropArm.MARK_X) <= 8.0, "a hit on the mark is told as square, the narration in its own box")
 	_expect(game.get("box_queue") == ["WOLF: It's down. The bolt by the door is next."], "then WOLF's own box says the bolt by the door is next")
 	_expect(brain.state == &"down" and room.sentry_down and room.coolant_burst.emitting and room.hit_sparks.emitting, "the hit is a real state change with coolant and sparks")
@@ -578,37 +569,37 @@ func _check_scene() -> void:
 	var autosave_c: M0State = State.load_from_disk(path)
 	_expect(autosave_c != null and autosave_c.sentry_down and autosave_c.door_blown and autosave_c.memory.get("choice_id") == State.DISCLOSE, "autosave C records the sentry down with the relay memory")
 	_expect(autosave_c != null and autosave_c.lane_recap == "wolf", "autosave C keeps how the sentry came down for the END OF SLICE recap")
-	_expect(await _wait_until(func() -> bool: return Engine.time_scale == 1.0 and camera.offset == Vector2.ZERO, 90), "time scale and camera settle after BOOM 2")
+	_expect(await wait_until(func() -> bool: return Engine.time_scale == 1.0 and camera.offset == Vector2.ZERO, 90), "time scale and camera settle after BOOM 2")
 	game.call("_load_game")
 	_expect(brain.state == &"down" and brain.x == DropArm.MARK_X and arm.state == &"landed" and room.sentry.visual.wrecked and room.tank.position.y > JunctionRoom.TANK_REST_Y and str(game.get("status_line")) == "Service junction restored. The sentry\nis down; pop the exit bolt by the door.", "Continue from autosave C shows the sentry down under the tank")
 	_check_crushed(room, brain, "Continue from autosave C")
-	_expect(await _wait_until(func() -> bool: return absf(wolf.position.x - JunctionRoom.WOLF_DOWN_X) <= 2.0, 240) and wolf.body_sprite.flip_h, "after Continue from autosave C WOLF waits by the hatch, facing back at the engineer")
-	_expect(await _walk_to(human, JunctionRoom.BOLT_X), "the engineer reaches the exit bolt")
+	_expect(await wait_until(func() -> bool: return absf(wolf.position.x - JunctionRoom.WOLF_DOWN_X) <= 2.0, 240) and wolf.body_sprite.flip_h, "after Continue from autosave C WOLF waits by the hatch, facing back at the engineer")
+	_expect(await walk_to(human, JunctionRoom.BOLT_X), "the engineer reaches the exit bolt")
 	_expect(wolf.position.x - M0Actor.WOLF_REACH > human.position.x + M0Actor.HUMAN_REACH - 2.0 * M0Actor.AVOID_TOLERANCE and wolf.position.x - M0Actor.WOLF_REACH > DropArm.MARK_X + JunctionRoom.TANK_SIZE.x * 0.5, "at the bolt the engineer and WOLF both stand clear of each other and of the tank (WOLF %.0f, engineer %.0f)" % [wolf.position.x, human.position.x])
 	_expect(str(game.call("_context_hint")).contains("pop the exit bolt"), "the bolt panel offers USE")
-	await _tap(&"interact")
+	await tap(&"interact")
 	_expect(game.get("bolt_state") == &"charging", "USE starts the bolt's whine")
 	for _frame: int in 12:
 		await physics_frame
 	_expect(game.get("bolt_state") == &"charging" and room.bolt_charge > 0.0 and room.bolt_charge < 1.0, "the whine rises before the arc")
-	_expect(_sounding(game, &"whine") and _sounding(game, &"bolt_arc"), "the arc's build starts under the whine, so its crack lands on the drop")
-	_expect(await _wait_until(func() -> bool: return game.get("bolt_state") == &"open", 60), "the bolt arcs after the whine")
+	_expect(sounding(game, &"whine") and sounding(game, &"bolt_arc"), "the arc's build starts under the whine, so its crack lands on the drop")
+	_expect(await wait_until(func() -> bool: return game.get("bolt_state") == &"open", 60), "the bolt arcs after the whine")
 	_expect(room.bolt_sparks.emitting and (game.get("impact") as Impact).trauma > 0.0, "the arc throws sparks and shakes the view")
 	_expect(room.hatch_open < 1.0 and str(game.get("status_line")) == "The bolt arcs and drops.", "while the hatch is still opening the line says only that the bolt dropped")
 	_expect(room.hatch_label.text == "EXIT OPENING" and str(game.call("_context_hint")) == "The door is opening.", "while the hatch slides its plate and hint say it is opening, not open")
-	await _tap(&"interact")
+	await tap(&"interact")
 	_expect(not game.get("chapter_close_active") and not (game.get("state") as M0State).junction_cleared, "USE at a hatch still sliding does not leave through it")
-	_expect(await _wait_until(func() -> bool: return room.hatch_open >= 1.0 and Engine.time_scale == 1.0, 60), "the hatch slides open")
-	_expect(await _wait_until(func() -> bool: return str(game.get("status_line")) == "The bolt arcs and drops.\nThe door slides open.", 6), "the line says the hatch slid open once it has")
+	_expect(await wait_until(func() -> bool: return room.hatch_open >= 1.0 and Engine.time_scale == 1.0, 60), "the hatch slides open")
+	_expect(await wait_until(func() -> bool: return str(game.get("status_line")) == "The bolt arcs and drops.\nThe door slides open.", 6), "the line says the hatch slid open once it has")
 	_expect(room.hatch_label.text == "EXIT OPEN" and str(game.call("_context_hint")) == "The door is open. Leave through it.", "once the hatch is open its plate reads EXIT OPEN and, at the bolt panel, the hint points to the open door")
 	# WOLF steps into the open doorway and waits there, looking back at the engineer.
-	_expect(await _wait_until(func() -> bool: return absf(wolf.position.x - JunctionRoom.WOLF_DOORWAY_X) <= 2.0, 120), "WOLF steps into the open doorway (x %.0f)" % wolf.position.x)
+	_expect(await wait_until(func() -> bool: return absf(wolf.position.x - JunctionRoom.WOLF_DOORWAY_X) <= 2.0, 120), "WOLF steps into the open doorway (x %.0f)" % wolf.position.x)
 	# Main sets his facing in its per-frame update, and under load physics can step more than once before
 	# the next process frame, so wait for the turn rather than reading it after one physics frame (fix round
 	# 4, review r4 S2).
-	var turned: bool = await _wait_until(func() -> bool: return wolf.body_sprite.flip_h, 30)
+	var turned: bool = await wait_until(func() -> bool: return wolf.body_sprite.flip_h, 30)
 	_expect(turned and wolf.position.x - M0Actor.WOLF_REACH < JunctionRoom.EXIT_NEAR_JAMB_X - 40.0, "in the doorway he waits looking back at the engineer, his head and shoulders in view")
-	await _tap(&"interact")
+	await tap(&"interact")
 	_expect(not game.get("chapter_close_active") and not (game.get("state") as M0State).junction_cleared, "USE at the bolt panel does not leave: the way out is the door itself")
 	# The engineer walks up to the door, and no further than WOLF in its doorway allows.
 	Input.action_press(&"move_right")
@@ -619,21 +610,21 @@ func _check_scene() -> void:
 	_expect(human.position.x >= JunctionRoom.HATCH_REACH_MIN_X and human.position.x <= JunctionRoom.HATCH_REACH_MAX_X + 1.0, "walking on, the engineer reaches the door and stops behind WOLF (x %.0f)" % human.position.x)
 	_expect(wolf.position.x - M0Actor.WOLF_REACH >= human.position.x + M0Actor.HUMAN_REACH - 1.0, "at the door the engineer and WOLF are not drawn over each other")
 	_expect(str(game.call("_context_hint")) == "E: leave through the door.", "at the door the hint offers the way out")
-	await _tap(&"interact")
+	await tap(&"interact")
 	var state: M0State = game.get("state") as M0State
 	_expect(state.junction_cleared and game.get("chapter_close_active") and not human.controlled and (game.get_node("CanvasLayer/TopBar/HUD") as Label).text.contains("SERVICE LINE CLEARED"), "USE at the open hatch clears the junction into a closing beat")
 	var autosave_d: M0State = State.load_from_disk(path)
 	_expect(autosave_d != null and autosave_d.junction_cleared, "autosave D records the cleared junction")
 	await create_timer(0.6).timeout
 	_expect(_close_cuts_no_label(camera, room), "the closing shot cuts no junction label at its edges")
-	await _tap(&"pause_game")
+	await tap(&"pause_game")
 	_expect(paused, "pause works during the closing beat")
 	(game.get_node("CanvasLayer/PauseOverlay") as PauseOverlay).resume_requested.emit()
 	var hatch_start_x: float = human.position.x
 	# Continue goes through the closing lines' boxes first (one speaker each), then starts the walk.
 	_expect((game.get_node("CanvasLayer/BottomBar/Story") as Label).text == "SERVICE LINE CLEARED.", "the closing lines start with their own first box")
 	for _press: int in 3:
-		await _tap(&"interact")
+		await tap(&"interact")
 		if game.get("hatch_exit_walking"):
 			break
 	# The two leave through the open door before the card, one at a time: WOLF walks on through it until
@@ -654,14 +645,14 @@ func _check_scene() -> void:
 	_expect(not touch_use.visible and not (game.get_node("CanvasLayer/ContextHint") as Control).visible, "nor does the touch CONTINUE button show during the walk")
 	game.set("touch_enabled", false)
 	game.call("_refresh_ui")
-	await _tap(&"interact")
+	await tap(&"interact")
 	_expect(game.get("hatch_exit_walking") and not game.get("end_card_active"), "a second press does not cut the walk short")
 	var one_at_a_time: Array[bool] = [true]
 	var wolf_first: Array[bool] = [true]
 	var never_faded: Array[bool] = [true]
 	var card_after_both: Array[bool] = [true]
 	var wolf_seen_walking: Array[bool] = [false]
-	_expect(await _wait_until(func() -> bool:
+	_expect(await wait_until(func() -> bool:
 		# What shows of each (left of the near jamb, which hides the rest) never overlaps.
 		var wolf_shown: Vector2 = Vector2(wolf.position.x - M0Actor.WOLF_REACH, minf(wolf.position.x + M0Actor.WOLF_REACH, JunctionRoom.EXIT_NEAR_JAMB_X))
 		var human_shown: Vector2 = Vector2(human.position.x - M0Actor.HUMAN_REACH, minf(human.position.x + M0Actor.HUMAN_REACH, JunctionRoom.EXIT_NEAR_JAMB_X))
@@ -695,7 +686,7 @@ func _check_scene() -> void:
 	_expect(end_button.text == "TAP CONTINUE" and end_button.is_visible_in_tree(), "on touch the card's button says TAP CONTINUE")
 	game.set("touch_enabled", false)
 	game.call("_refresh_ui")
-	await _tap(&"pause_game")
+	await tap(&"pause_game")
 	_expect(not paused and game.get("title_open"), "Pause (or Back) on the card goes on to the title instead of pausing")
 	_expect(not continue_button.disabled and continue_button.text == "PLAY AGAIN" and (game.get_node("CanvasLayer/TitleScreen/ContinueNote") as Label).text == "Slice complete. PLAY AGAIN starts a fresh run.", "on a finished save the title offers PLAY AGAIN and says why")
 	var new_game_button: Button = game.get_node("CanvasLayer/TitleScreen/NewGameButton") as Button
@@ -722,17 +713,17 @@ func _check_scene() -> void:
 	# shares these coordinates, so the engineer is placed once that has happened.
 	await physics_frame
 	human.position.x = JunctionRoom.BOLT_X
-	await _tap(&"interact")
+	await tap(&"interact")
 	_expect(str(game.get("status_line")) == "The service line runs on toward Archive." and str(game.call("_context_hint")) == "The door is open.", "the open hatch has no developer note in the dialogue or the hint")
 	# The card answers the interact key, its own button and Back too.
 	for way: String in ["interact", "button", "back"]:
 		game.set("chapter_close_active", true)
 		game.call("_finish_chapter_close")
 		# (They walk out through the exit door first, from wherever the restore stood them.)
-		_expect(await _wait_until(func() -> bool: return bool(game.get("end_card_active")), 420), "the card is up again (%s)" % way)
+		_expect(await wait_until(func() -> bool: return bool(game.get("end_card_active")), 420), "the card is up again (%s)" % way)
 		match way:
 			"interact":
-				await _tap(&"interact")
+				await tap(&"interact")
 			"button":
 				end_button.pressed.emit()
 			"back":
@@ -744,8 +735,8 @@ func _check_scene() -> void:
 	# WOLF breaks off after a miss while drawing the sentry.
 	await _start_at_b(game, State.DISCLOSE)
 	_expect(await _walk_until_choice(game), "the question comes up again on a new attempt")
-	await _tap(&"choice_1")
-	_expect(await _wait_until(func() -> bool: return brain.state == &"fixated", 120), "WOLF is drawing the sentry")
+	await tap(&"choice_1")
+	_expect(await wait_until(func() -> bool: return brain.state == &"fixated", 120), "WOLF is drawing the sentry")
 	game.call("_tank_miss")
 	_expect(not game.get("wolf_baiting") and game.get("wolf_broke_off") and wolf.autonomous_target_x == JunctionRoom.WOLF_RUBBLE_X and brain.state == &"lock", "after a miss WOLF breaks off back to his spot by the valve and the sentry turns, locking on first")
 	_expect(str(game.get("status_line")) == "The tank hits the empty mark\nand sprays coolant." and (game.get("box_queue") as Array) == ["The sentry swings toward the release;\nget back over the rubble.", "WOLF: I'm out. I'll hold back."] and not game.get("wolf_holding_far_end"), "not yet past the sentry, WOLF says in his own box after the miss that he is out and holding back")
@@ -756,13 +747,13 @@ func _check_scene() -> void:
 			miss_boxes.append(str(game.get("status_line")))
 	await physics_frame
 	_expect(str(game.call("_context_hint")).contains("until it gives up"), "back over the rubble the hint says to wait out the chase")
-	_expect(await _wait_until(func() -> bool:
+	_expect(await wait_until(func() -> bool:
 		log_box.call()
 		return brain.state == &"patrol", 240), "the chase ends with the engineer over the rubble")
 	_expect(str(game.call("_context_hint")).contains("WOLF has broken off"), "then the hint says WOLF has stepped back")
 	# Back over the rubble before the sentry swung, the order to get back over it is dropped (it would
 	# be stale); the sentry giving up cuts in, and WOLF breaking off still follows once that line is read.
-	await _wait_until(func() -> bool:
+	await wait_until(func() -> bool:
 		log_box.call()
 		return miss_boxes.back() == "WOLF: I'm out. I'll hold back.", 1200)
 	var lost_at: int = miss_boxes.find("The sentry loses Rowan behind the rubble\nand rolls back to its patrol.")
@@ -772,28 +763,28 @@ func _check_scene() -> void:
 	# stops at him; and the END OF SLICE recap says he broke off.
 	await _start_at_b(game, State.DISCLOSE)
 	_expect(await _walk_until_choice(game), "the question comes up on another attempt")
-	await _tap(&"choice_1")
-	_expect(await _wait_until(func() -> bool: return game.call("_bait_holding"), 300), "WOLF has it held on the mark from his spot by the hatch")
+	await tap(&"choice_1")
+	_expect(await wait_until(func() -> bool: return game.call("_bait_holding"), 300), "WOLF has it held on the mark from his spot by the hatch")
 	game.call("_tank_miss")
 	_expect(game.get("wolf_holding_far_end") and game.get("wolf_broke_off") and not game.get("wolf_baiting") and wolf.autonomous_target_x == JunctionRoom.WOLF_BAIT_X and (game.get("box_queue") as Array).back() == "WOLF: I'm out.", "past it when it missed, WOLF breaks off where he is, by the hatch, and says only that he is out (Nathanial's rewrite)")
 	human.position.x = 500.0
 	var held_spot: Array[bool] = [true]
 	var furthest: Array[float] = [-INF]
-	_expect(await _wait_until(func() -> bool:
+	_expect(await wait_until(func() -> bool:
 		held_spot[0] = held_spot[0] and absf(wolf.position.x - JunctionRoom.WOLF_BAIT_X) <= 4.0 and is_zero_approx(wolf.body_sprite.offset.y)
 		if brain.state == &"patrol":
 			furthest[0] = maxf(furthest[0], brain.x)
 		return brain.state == &"patrol" and brain.facing < 0.0 and furthest[0] > 790.0, 900), "the sentry gives up on the engineer and patrols again")
 	var turn_x: float = JunctionRoom.WOLF_BAIT_X - M0Actor.WOLF_REACH - SentryBrain.HALF_WIDTH - MainScript.WOLF_SENTRY_GAP
 	_expect(held_spot[0] and is_equal_approx(brain.far_x, turn_x) and furthest[0] <= turn_x + 0.5, "WOLF holds by the hatch, on the floor, and the patrol turns short of him (furthest %.1f, turn %.1f)" % [furthest[0], turn_x])
-	_expect(await _wait_until(func() -> bool: return brain.state == &"patrol" and brain.facing > 0.0 and brain.x > 760.0, 300), "the patrol heads his way again")
+	_expect(await wait_until(func() -> bool: return brain.state == &"patrol" and brain.facing > 0.0 and brain.x > 760.0, 300), "the patrol heads his way again")
 	await physics_frame
 	var beam_end: float = room.sentry.position.x + room.sentry.visual.reach
 	_expect(is_equal_approx(room.sentry.beam_stop_x, JunctionRoom.WOLF_BAIT_X - M0Actor.WOLF_REACH) and beam_end <= JunctionRoom.WOLF_BAIT_X - M0Actor.WOLF_REACH + 0.5, "facing him its beam stops at him instead of running on over him (ends %.1f)" % beam_end)
 	brain.x = DropArm.MARK_X
 	game.call("_tank_hit")
 	_expect((game.get("state") as M0State).lane_recap == "broke_off" and (game.call("end_card_recap") as Array)[2] == "SENTRY  WOLF broke off while Rowan timed the drop.", "the recap says he broke off while the engineer timed the drop")
-	_expect(await _wait_until(func() -> bool: return Engine.time_scale == 1.0, 90), "time scale settles after that hit")
+	_expect(await wait_until(func() -> bool: return Engine.time_scale == 1.0, 90), "time scale settles after that hit")
 	await _check_engineer_alone(game, path)
 	await _check_cloud(game, path)
 	await _check_chased_cards(game, path)
@@ -815,8 +806,8 @@ func _check_scene() -> void:
 	game.call("_pause_game")
 	(game.get_node("CanvasLayer/PauseOverlay/Panel/PauseMenu/TitleButton") as Button).pressed.emit()
 	_expect(continue_button.disabled and (game.get_node("CanvasLayer/TitleScreen/ContinueNote") as Label).text == "Saved checkpoint could not be read.", "the title refuses to continue from it")
-	_remove(path)
-	_remove("%s-settings.cfg" % path)
+	remove_file(path)
+	remove_file("%s-settings.cfg" % path)
 	game.queue_free()
 	await create_timer(0.1).timeout
 	_expect(Engine.time_scale == 1.0, "freeing the game leaves time_scale at 1.0")
@@ -833,26 +824,26 @@ func _check_engineer_alone(game: Node2D, path: String) -> void:
 	var b_dict: Dictionary = await _start_at_b(game, State.PRESS)
 	var b_bytes: PackedByteArray = FileAccess.get_file_as_bytes(path)
 	_expect(await _walk_until_choice(game), "the PRESS route gets the same question")
-	await _tap(&"choice_1")
+	await tap(&"choice_1")
 	var refusal: String = str(game.get("status_line"))
-	_expect(_sounding(game, &"growl_refusal"), "WOLF's refusal comes with his recorded growl")
+	_expect(sounding(game, &"growl_refusal"), "WOLF's refusal comes with his recorded growl")
 	_expect(game.get("lane_choice") == "refused" and not game.get("wolf_baiting") and wolf.autonomous_target_x == JunctionRoom.WOLF_RUBBLE_X, "with the risk withheld WOLF refuses to draw it")
 	_expect(refusal.begins_with("WOLF: At the relay") and refusal.contains("Time the drop from the release;") and not refusal.contains("You said"), "his refusal names the relay choice openly and points at the engineer's way through")
 	for _frame: int in 60:
 		await physics_frame
 	_expect(wolf.position.x <= JunctionRoom.WOLF_RUBBLE_X + 6.0 and brain.state == &"patrol", "WOLF stays back by the valve and the sentry keeps patrolling")
 	# Step into its path: it sees, chases and runs the engineer down.
-	_expect(await _wait_until(func() -> bool: return brain.facing < 0.0 and brain.x <= 780.0 and brain.x >= 720.0, 300), "the sentry comes back down the lane")
+	_expect(await wait_until(func() -> bool: return brain.facing < 0.0 and brain.x <= 780.0 and brain.x >= 720.0, 300), "the sentry comes back down the lane")
 	human.position.x = 640.0
 	human.body_sprite.flip_h = false
-	_expect(await _wait_until(func() -> bool: return brain.state == &"lock", 5), "it sees the engineer and locks on")
+	_expect(await wait_until(func() -> bool: return brain.state == &"lock", 5), "it sees the engineer and locks on")
 	var locked_x: float = brain.x
-	_expect(_sounding(game, &"klaxon") and room.sentry.visual.eye == Sentry.SentryVisual.EYE_LOCKED, "locking on turns its eye red with a short alarm")
+	_expect(sounding(game, &"klaxon") and room.sentry.visual.eye == Sentry.SentryVisual.EYE_LOCKED, "locking on turns its eye red with a short alarm")
 	for _frame: int in 12:
 		await physics_frame
 	_expect(brain.state == &"lock" and brain.x == locked_x and absf(room.sentry.position.x - locked_x) <= 4.0 and not game.get("fail_active"), "through the lock-on beat it stands still")
 	_expect(str(game.call("_context_hint")).contains("after you"), "the hint warns the engineer as soon as it locks on")
-	_expect(await _wait_until(func() -> bool: return game.get("fail_active"), 90), "sentry contact in the lane is a knockdown")
+	_expect(await wait_until(func() -> bool: return game.get("fail_active"), 90), "sentry contact in the lane is a knockdown")
 	_expect(str(game.get("status_line")).begins_with(JunctionRoom.SENTRY_REASON % (game.get("state") as M0State).human_name().get_slice(" ", 0)) and str(game.get("status_line")).begins_with("The sentry saw Rowan out in the open.\nStay close to the TANK RELEASE."), "the status line names the sentry and the engineer, says they were caught out in the open, and points at the TANK RELEASE")
 	_expect(SentryBrain.is_exposed(human.position.x) and human.position.x > SentryBrain.COVER_MAX_X, "and the engineer was indeed caught past the right post (x %.0f)" % human.position.x)
 	# Round 3c item 3: the body lies where the card says they were caught: past the right post (facing
@@ -864,23 +855,23 @@ func _check_engineer_alone(game: Node2D, path: String) -> void:
 	var release_right: float = JunctionRoom.ARM_X + JunctionRoom.ARM_PANEL_HALF_WIDTH
 	_expect(body_rect.position.x >= SentryBrain.COVER_MAX_X + 3.0 and body_rect.position.x >= release_right + 3.0, "the body lies past the alcove's right post, clear of the TANK RELEASE (body %.1f..%.1f, post %.0f, release ends %.1f)" % [body_rect.position.x, body_rect.end.x, SentryBrain.COVER_MAX_X, release_right])
 	_expect(room.sentry.position.x > human.position.x and sentry_rect.position.x - body_rect.end.x >= 3.0, "the sentry rolls back off the body and stands clear of it (gap %.1f px)" % (sentry_rect.position.x - body_rect.end.x))
-	_expect(await Suite.retry(game, 240), "the knockdown hands back")
+	_expect(await retry(game, 240), "the knockdown hands back")
 	var state: M0State = game.get("state") as M0State
 	_expect(FileAccess.get_file_as_bytes(path) == b_bytes and state.to_dict() == b_dict and state.memory.get("choice_id") == State.PRESS, "it restores autosave B with the relay memory intact and saves nothing")
 	_expect(brain.state == &"patrol" and brain.x > SentryBrain.PATROL_MAX_X - 60.0 and arm.state == &"hung" and game.get("lane_choice") == "" and human.controlled, "the restore puts the sentry back at the far end under a hung tank")
-	_expect(await _wait_until(func() -> bool: return Engine.time_scale == 1.0 and (game.get_node("IntroCamera") as Camera2D).offset == Vector2.ZERO, 90), "time scale and camera are at rest after the restore")
+	_expect(await wait_until(func() -> bool: return Engine.time_scale == 1.0 and (game.get_node("IntroCamera") as Camera2D).offset == Vector2.ZERO, 90), "time scale and camera are at rest after the restore")
 	_expect(await _walk_until_choice(game), "the question comes up again after the restore")
-	await _tap(&"choice_2")
+	await tap(&"choice_2")
 	_expect(game.get("lane_choice") == "alone" and str(game.get("status_line")).contains("I'll hold back."), "answer 2 leaves the drop to the engineer")
 	_expect(await _cross_to_panel(game), "the engineer slips into the alcove behind the sentry")
 	for _frame: int in 240:
 		await physics_frame
 	_expect(not game.get("fail_active") and brain.state == &"patrol", "a full patrol passes the alcove without seeing the engineer")
 	# A miss: drop while it is at the far end.
-	_expect(await _wait_until(func() -> bool: return brain.x >= 830.0, 300), "the sentry reaches the far end")
-	await _tap(&"interact")
+	_expect(await wait_until(func() -> bool: return brain.x >= 830.0, 300), "the sentry reaches the far end")
+	await tap(&"interact")
 	var lowest_base: Array[float] = [-INF]
-	_expect(await _wait_until(func() -> bool:
+	_expect(await wait_until(func() -> bool:
 		lowest_base[0] = maxf(lowest_base[0], room.tank.position.y + JunctionRoom.TANK_SIZE.y * 0.5)
 		return arm.state == &"rewinding", 60), "the drop misses")
 	await process_frame
@@ -890,7 +881,7 @@ func _check_engineer_alone(game: Node2D, path: String) -> void:
 	var on_floor_seconds: Array[float] = [0.0]
 	var sentry_into_tank: Array[float] = [INF]
 	var came_from_right: bool = brain.x > DropArm.MARK_X
-	_expect(await _wait_until(func() -> bool:
+	_expect(await wait_until(func() -> bool:
 		if is_equal_approx(room.tank.position.y, JunctionRoom.landed_tank_y(false)):
 			on_floor_seconds[0] += 1.0 / 60.0
 		if arm.blocks_lane():
@@ -903,29 +894,29 @@ func _check_engineer_alone(game: Node2D, path: String) -> void:
 	_expect(lowest_base[0] > Sentry.FLOOR_Y - 8.0 and lowest_base[0] > Sentry.FLOOR_Y - Sentry.WRECK_CRUSH_HEIGHT + 8.0, "a missed tank comes down to the floor, not to the sentry's height (base %.1f)" % lowest_base[0])
 	await physics_frame
 	_expect(room.cloud_hazard.armed, "the cloud's hurtbox is live while it vents")
-	_expect(_sounding(game, &"coolant_cloud"), "the cloud hisses while it vents")
-	_expect(await _wait_until(func() -> bool:
+	_expect(sounding(game, &"coolant_cloud"), "the cloud hisses while it vents")
+	_expect(await wait_until(func() -> bool:
 		if arm.blocks_lane():
 			var edge_gap: float = (brain.x - SentryBrain.HALF_WIDTH - DropArm.footprint().y) if came_from_right else (DropArm.footprint().x - brain.x - SentryBrain.HALF_WIDTH)
 			sentry_into_tank[0] = minf(sentry_into_tank[0], edge_gap)
 		return room.tank.position.y == JunctionRoom.TANK_REST_Y, 40) and arm.state == &"rewinding" and brain.state in [&"lock", &"chase"], "the winch has the tank back up while the sentry is still after the engineer")
 	_expect(sentry_into_tank[0] >= -0.01, "the sentry never drives into the tank while it is down (closest edge %.1f px)" % sentry_into_tank[0])
-	await _tap(&"interact")
+	await tap(&"interact")
 	_expect(arm.state == &"rewinding" and str(game.get("status_line")) == "Not yet. The tank is still going back up.", "the panel refuses a second drop during the rewind")
-	_expect(await _walk_to(human, 500.0), "the engineer retreats over the rubble")
+	_expect(await walk_to(human, 500.0), "the engineer retreats over the rubble")
 	_expect(not game.get("fail_active"), "getting back over the rubble in time avoids the knockdown")
-	_expect(await _wait_until(func() -> bool: return brain.state == &"patrol", 200), "the sentry gives up and patrols again")
-	_expect(await _wait_until(func() -> bool: return not arm.cloud_active() and not room.cloud_hazard.armed, 200), "the cloud clears")
+	_expect(await wait_until(func() -> bool: return brain.state == &"patrol", 200), "the sentry gives up and patrols again")
+	_expect(await wait_until(func() -> bool: return not arm.cloud_active() and not room.cloud_hazard.armed, 200), "the cloud clears")
 	await process_frame
-	_expect(not _sounding(game, &"coolant_cloud"), "its hiss stops with it")
-	_expect(await _wait_until(func() -> bool: return arm.state == &"hung", 400), "the rewind re-hangs the tank")
+	_expect(not sounding(game, &"coolant_cloud"), "its hiss stops with it")
+	_expect(await wait_until(func() -> bool: return arm.state == &"hung", 400), "the rewind re-hangs the tank")
 	# The timed hit: tap as it closes on the mark, leading it by the 0.45 s fall.
 	_expect(await _cross_to_panel(game), "the engineer is back in the alcove")
 	var lead: float = SentryBrain.PATROL_SPEED * DropArm.FALL_SECONDS
-	_expect(await _wait_until(func() -> bool: return brain.facing < 0.0 and brain.x <= DropArm.MARK_X + lead + 8.0 and brain.x >= DropArm.MARK_X + lead - 8.0, 400), "the sentry comes toward the mark")
-	await _tap(&"interact")
+	_expect(await wait_until(func() -> bool: return brain.facing < 0.0 and brain.x <= DropArm.MARK_X + lead + 8.0 and brain.x >= DropArm.MARK_X + lead - 8.0, 400), "the sentry comes toward the mark")
+	await tap(&"interact")
 	var last_live_x: Array[float] = [brain.x]
-	_expect(await _wait_until(func() -> bool:
+	_expect(await wait_until(func() -> bool:
 		if brain.state != &"down":
 			last_live_x[0] = brain.x
 		return (game.get("state") as M0State).sentry_down, 60), "a drop timed on the patrol lands on it")
@@ -982,7 +973,7 @@ func _check_cloud(game: Node2D, path: String) -> void:
 	arm.advance(DropArm.FALL_SECONDS, 0.0)
 	_expect(arm.cloud_active(), "a forced miss vents the cloud")
 	# The room syncs the arm from Main._process, which a single physics frame does not always include.
-	_expect(await _wait_until(func() -> bool: return room.cloud_hazard.armed and room.coolant_cloud.emitting, 5), "the cloud arms its hurtbox")
+	_expect(await wait_until(func() -> bool: return room.cloud_hazard.armed and room.coolant_cloud.emitting, 5), "the cloud arms its hurtbox")
 	# Stopped over the exit bolt's box, the engineer's usual sidestep to its left would end in the cloud:
 	# it never carries them into a hazard they are not already in.
 	var beside_cloud_x: float = DropArm.MARK_X + DropArm.CLOUD_HALF_WIDTH + M0State.HUMAN_HALF_WIDTH + 20.0
@@ -999,7 +990,7 @@ func _check_cloud(game: Node2D, path: String) -> void:
 	human.position.x = DropArm.MARK_X - DropArm.CLOUD_HALF_WIDTH - M0State.HUMAN_HALF_WIDTH - 6.0
 	human.body_sprite.flip_h = false
 	Input.action_press(&"move_right")
-	var walked_in: bool = await _wait_until(func() -> bool: return game.get("fail_active"), 60)
+	var walked_in: bool = await wait_until(func() -> bool: return game.get("fail_active"), 60)
 	Input.action_release(&"move_right")
 	_expect(walked_in, "walking into the coolant cloud is a knockdown")
 	_expect(await _expect_lying(game, 1.0, "in the coolant cloud"), "caught by the cloud facing the tank, the engineer slumps forward towards it onto the floor")
@@ -1007,14 +998,14 @@ func _check_cloud(game: Node2D, path: String) -> void:
 	var lying_rect: Rect2 = _painted_body(human.body_sprite)
 	_expect(tank_left - lying_rect.end.x >= 3.0, "and the lying body ends clear of the tank on the floor (body ends %.1f, tank starts %.1f)" % [lying_rect.end.x, tank_left])
 	_expect(str(game.get("status_line")).begins_with("The coolant cloud caught %s. Let it clear before crossing the mark." % (game.get("state") as M0State).human_name().get_slice(" ", 0)), "the status line names the cloud and the engineer")
-	_expect(await Suite.retry(game, 240), "the cloud knockdown hands back")
+	_expect(await retry(game, 240), "the cloud knockdown hands back")
 	_expect((game.get("state") as M0State).to_dict() == b_dict and not arm.cloud_active() and not room.cloud_hazard.armed and brain.state == &"patrol", "it restores autosave B with the cloud gone")
 	# A hit well off the mark is told as one: the tank catches the sentry off centre, not square.
 	brain.state = &"dormant"
 	brain.x = DropArm.MARK_X + DropArm.HIT_REACH - 4.0
 	game.set("lane_choice", "alone")
 	arm.drop()
-	_expect(await _wait_until(func() -> bool: return (game.get("state") as M0State).sentry_down, 60) and absf(brain.x - DropArm.MARK_X) > 8.0, "a drop on a sentry near the bracket's edge still hits")
+	_expect(await wait_until(func() -> bool: return (game.get("state") as M0State).sentry_down, 60) and absf(brain.x - DropArm.MARK_X) > 8.0, "a drop on a sentry near the bracket's edge still hits")
 	_expect(str(game.get("status_line")) == "The tank catches the sentry off centre and\npins it to the floor. Its eyes go dark." and game.get("box_queue") == ["WOLF: It's down. The bolt by the door is next."], "an off-centre hit is told as off centre, not square, then WOLF's own box")
 
 
@@ -1033,39 +1024,39 @@ func _check_chased_cards(game: Node2D, path: String) -> void:
 	# Facing the sentry as it comes: they slump forward towards it, and it rolls back off them.
 	human.body_sprite.flip_h = false
 	_expect(brain.state == &"patrol" and brain.x >= 830.0 and arm.drop(), "the drop goes with the sentry at the far end")
-	_expect(await _wait_until(func() -> bool: return arm.state == &"rewinding", 60) and brain.turned_by_miss, "the miss turns the sentry on the release")
-	_expect(await _wait_until(func() -> bool: return game.get("fail_active"), 120), "a chase after a miss runs down an engineer who stays at the release")
+	_expect(await wait_until(func() -> bool: return arm.state == &"rewinding", 60) and brain.turned_by_miss, "the miss turns the sentry on the release")
+	_expect(await wait_until(func() -> bool: return game.get("fail_active"), 120), "a chase after a miss runs down an engineer who stays at the release")
 	var status: String = str(game.get("status_line"))
 	_expect(not SentryBrain.is_exposed(human.position.x) and status.begins_with(chased) and not status.contains("alcove's posts") and not status.contains("in its lane"), "caught between the posts after a miss, the card points only at the rubble (%s)" % status)
 	await _expect_shove_fall(game, "after a miss", false)
-	_expect(await Suite.retry(game, 240), "the knockdown after a miss hands back")
+	_expect(await retry(game, 240), "the knockdown after a miss hands back")
 	_expect((game.get("state") as M0State).to_dict() == b_dict and not brain.turned_by_miss, "it restores autosave B with the sentry patrolling again")
 	# Seen out in the lane, then caught after ducking into the alcove: the alcove advice would be wrong.
 	game.set("lane_choice", "alone")
-	_expect(await _wait_until(func() -> bool: return brain.facing < 0.0 and brain.x <= 780.0 and brain.x >= 720.0, 300), "the sentry comes back down the lane")
+	_expect(await wait_until(func() -> bool: return brain.facing < 0.0 and brain.x <= 780.0 and brain.x >= 720.0, 300), "the sentry comes back down the lane")
 	human.position.x = 640.0
-	_expect(await _wait_until(func() -> bool: return brain.state == &"lock", 5) and not brain.turned_by_miss, "it sees the engineer in the lane")
+	_expect(await wait_until(func() -> bool: return brain.state == &"lock", 5) and not brain.turned_by_miss, "it sees the engineer in the lane")
 	human.position.x = JunctionRoom.ARM_X
 	# Facing away from it: they slump forward, away from it.
 	human.body_sprite.flip_h = true
-	_expect(await _wait_until(func() -> bool: return game.get("fail_active"), 120), "the chase reaches the engineer in the alcove")
+	_expect(await wait_until(func() -> bool: return game.get("fail_active"), 120), "the chase reaches the engineer in the alcove")
 	status = str(game.get("status_line"))
 	_expect(not SentryBrain.is_exposed(human.position.x) and status.begins_with(chased) and not status.contains("alcove's posts"), "caught inside the alcove, the card points only at the rubble (%s)" % status)
 	await _expect_shove_fall(game, "inside the alcove", true)
-	_expect(await Suite.retry(game, 240), "that knockdown hands back too")
+	_expect(await retry(game, 240), "that knockdown hands back too")
 	# Out in the lane facing back towards the alcove: they slump forward where they stand, towards it,
 	# never turned round or dragged back against the fall.
 	game.set("lane_choice", "alone")
-	_expect(await _wait_until(func() -> bool: return brain.facing < 0.0 and brain.x <= 780.0 and brain.x >= 720.0, 300), "the sentry comes back down the lane again")
+	_expect(await wait_until(func() -> bool: return brain.facing < 0.0 and brain.x <= 780.0 and brain.x >= 720.0, 300), "the sentry comes back down the lane again")
 	human.position.x = 640.0
 	human.body_sprite.flip_h = true
-	_expect(await _wait_until(func() -> bool: return brain.state == &"lock", 5) and not brain.turned_by_miss, "it sees the engineer in the lane, facing the alcove")
-	_expect(await _wait_until(func() -> bool: return game.get("fail_active"), 120), "the chase runs them down in the lane")
+	_expect(await wait_until(func() -> bool: return brain.state == &"lock", 5) and not brain.turned_by_miss, "it sees the engineer in the lane, facing the alcove")
+	_expect(await wait_until(func() -> bool: return game.get("fail_active"), 120), "the chase runs them down in the lane")
 	_expect(str(game.get("status_line")).begins_with(JunctionRoom.SENTRY_REASON % (game.get("state") as M0State).human_name().get_slice(" ", 0)), "the card is the one for being seen out in the lane")
 	var stood_x: float = human.position.x
 	await _expect_shove_fall(game, "in the lane facing the alcove", true)
 	_expect(is_equal_approx(float(game.get("collapse_to_x")), stood_x), "facing the alcove, the boots stay where they stood (x %.1f, lying at %.1f)" % [stood_x, float(game.get("collapse_to_x"))])
-	_expect(await Suite.retry(game, 240), "the knockdown in the lane hands back")
+	_expect(await retry(game, 240), "the knockdown in the lane hands back")
 	# With Reduced Motion the collapse cuts straight to lying, so the sentry is put clear of the body on
 	# that same frame instead of rolling back over the next ones: after a miss, caught at the release
 	# facing away from it (the lying body reaches back towards it).
@@ -1077,7 +1068,7 @@ func _check_chased_cards(game: Node2D, path: String) -> void:
 	human.position.x = JunctionRoom.ARM_X
 	human.body_sprite.flip_h = true
 	_expect(brain.state == &"patrol" and brain.x >= 830.0 and arm.drop(), "with Reduced Motion on, the drop goes with the sentry at the far end (sentry %s at %.1f)" % [brain.state, brain.x])
-	_expect(await _wait_until(func() -> bool: return arm.state == &"rewinding", 60) and brain.turned_by_miss, "with Reduced Motion on, the miss turns the sentry on the release (arm %s, sentry %s at %.1f)" % [arm.state, brain.state, brain.x])
+	_expect(await wait_until(func() -> bool: return arm.state == &"rewinding", 60) and brain.turned_by_miss, "with Reduced Motion on, the miss turns the sentry on the release (arm %s, sentry %s at %.1f)" % [arm.state, brain.state, brain.x])
 	# The first drawn frame of the knockdown (it starts in Main's frame, so it is checked on drawn frames).
 	# The wait is counted in physics steps, game time, since a fast machine draws many frames a step.
 	var until: int = Engine.get_physics_frames() + 240
@@ -1090,7 +1081,7 @@ func _check_chased_cards(game: Node2D, path: String) -> void:
 	var first_gap: float = machine_rect.position.x - lying_rect.end.x
 	_expect(human.body_sprite.texture == MainScript.COLLAPSE_ART[-1] and first_gap >= 3.0, "with Reduced Motion, on the first frame they lie down the sentry already stands clear of them (gap %.1f px)" % first_gap)
 	impact.reduce_motion = false
-	_expect(await Suite.retry(game, 240), "the Reduced Motion knockdown hands back")
+	_expect(await retry(game, 240), "the Reduced Motion knockdown hands back")
 
 
 ## The sentry is solid: an engineer who walks into it stops where the drawn bodies touch
@@ -1103,7 +1094,7 @@ func _check_walk_into(game: Node2D) -> void:
 	await _start_at_b(game, State.PRESS)
 	game.set("lane_choice", "alone")
 	# Its back: patrolling up the lane, away from the engineer, who walks faster than it.
-	_expect(await _wait_until(func() -> bool: return brain.state == &"patrol" and brain.facing > 0.0 and brain.x >= 690.0 and brain.x <= 720.0, 600), "the sentry patrols up the lane, its back to the alcove")
+	_expect(await wait_until(func() -> bool: return brain.state == &"patrol" and brain.facing > 0.0 and brain.x >= 690.0 and brain.x <= 720.0, 600), "the sentry patrols up the lane, its back to the alcove")
 	human.position.x = brain.x - SentryBrain.CONTACT_RANGE - 12.0
 	human.body_sprite.flip_h = false
 	# It rolls on after the engineer is held at contact each frame, so on a drawn frame they trail it by its
@@ -1116,19 +1107,19 @@ func _check_walk_into(game: Node2D) -> void:
 	# on its first stretch down from the far end, right of the hung tank, so the bodies touch, and the
 	# engineer goes down, clear of the tank whatever the frame timing (the lane watch counts a collapse
 	# frame that reaches into the tank's base).
-	_expect(await _wait_until(func() -> bool: return brain.state == &"patrol" and brain.facing < 0.0 and brain.x <= 800.0 and brain.x >= 790.0, 600), "the sentry comes back down the lane")
+	_expect(await wait_until(func() -> bool: return brain.state == &"patrol" and brain.facing < 0.0 and brain.x <= 800.0 and brain.x >= 790.0, 600), "the sentry comes back down the lane")
 	human.position.x = brain.x - 90.0
 	human.body_sprite.flip_h = false
-	_expect(await _wait_until(func() -> bool: return brain.state == &"lock", 5), "it sees the engineer in the lane and locks on")
+	_expect(await wait_until(func() -> bool: return brain.state == &"lock", 5), "it sees the engineer in the lane and locks on")
 	closest = await _closest_walking_in(game, &"move_right", int(SentryBrain.LOCK_SECONDS * 60.0) + 30, &"lock")
 	_expect(closest.x >= SentryBrain.CONTACT_RANGE - 0.01 and closest.x <= SentryBrain.CONTACT_RANGE + 1.0, "walking into its front while it locks on, the engineer stops where the bodies touch (closest %.2f px)" % closest.x)
-	_expect(await _wait_until(func() -> bool: return game.get("fail_active"), 120), "the chase that follows runs them down")
+	_expect(await wait_until(func() -> bool: return game.get("fail_active"), 120), "the chase that follows runs them down")
 	_expect(absf(human.position.x - brain.x) >= SentryBrain.CONTACT_RANGE - 0.01, "it knocks them down at contact range (%.1f px)" % absf(human.position.x - brain.x))
 	var room: JunctionRoom = game.get("junction_room") as JunctionRoom
 	var tank_right: float = room.global_position.x + DropArm.MARK_X + JunctionRoom.TANK_SIZE.x * 0.5
 	var first_pose: Vector2 = MainScript.collapse_span(0, float(game.get("collapse_fall")), float(game.get("collapse_from_x")))
 	_expect(float(game.get("collapse_fall")) > 0.0 and first_pose.x > tank_right + 4.0, "met right of the hung tank, they go down clear of it from the first frame (body from x %.1f, tank to %.1f)" % [first_pose.x, tank_right])
-	_expect(await Suite.retry(game, 240), "that knockdown hands back")
+	_expect(await retry(game, 240), "that knockdown hands back")
 
 
 ## Holds [param action] for [param frames] physics steps, or until the sentry leaves [param while_state]
@@ -1174,7 +1165,7 @@ func _check_tank_crossing(game: Node2D) -> void:
 	var highest: Array[float] = [0.0]
 	var frames: Dictionary = {}
 	var steady: Array[bool] = [true]
-	var arrived: bool = await _wait_until(func() -> bool:
+	var arrived: bool = await wait_until(func() -> bool:
 		if room.arm_parked < 1.0:
 			waited[0] = waited[0] and absf(wolf.position.x - start_x) < 0.5
 		var lift: float = -wolf.body_sprite.offset.y * wolf.body_sprite.scale.y
@@ -1291,14 +1282,7 @@ func _sprite_pixels(sprite: Sprite2D, grow: float) -> Dictionary:
 			var ty: int = clampi(floori(region.position.y + v * region.size.y), 0, image.get_height() - 1)
 			if image.get_pixel(tx, ty).a > 0.5:
 				painted.append(Vector2i(wx, wy))
-	var reach: int = ceili(grow)
-	var pixels: Dictionary = {}
-	for pixel: Vector2i in painted:
-		for dy: int in range(-reach, reach + 1):
-			for dx: int in range(-reach, reach + 1):
-				if dx * dx + dy * dy <= grow * grow:
-					pixels[pixel + Vector2i(dx, dy)] = true
-	return pixels
+	return _grown(painted, grow)
 
 
 ## Round 3c item 3 and P0-3: a chase's knockdown: the sentry stops where the bodies touch, the engineer
@@ -1322,7 +1306,7 @@ func _expect_shove_fall(game: Node2D, label: String, facing_left: bool) -> void:
 func _expect_lying(game: Node2D, fall: float, label: String) -> bool:
 	var human: M0Actor = game.get_node("Human") as M0Actor
 	var sprite: Sprite2D = human.body_sprite
-	var down: bool = await _wait_until(func() -> bool: return sprite.texture == MainScript.COLLAPSE_ART[-1], 90)
+	var down: bool = await wait_until(func() -> bool: return sprite.texture == MainScript.COLLAPSE_ART[-1], 90)
 	var rect: Rect2 = _drawn_rect(sprite)
 	var reflection: FloorReflection = game.get("human_reflection") as FloorReflection
 	var span: Vector2 = reflection.shadow_span + Vector2.ONE * human.position.x
@@ -1452,7 +1436,7 @@ func _drawn_rect(sprite: Sprite2D) -> Rect2:
 
 ## Autosave B: the door is down, the engineer just left of the old door line, WOLF back by the valve.
 func _start_at_b(game: Node2D, choice_id: String) -> Dictionary:
-	var state: M0State = _completed_records_state(choice_id)
+	var state: M0State = completed_records_state(choice_id)
 	state.enter_junction()
 	state.blow_door()
 	state.human_position = Vector2(400.0, 410.0)
@@ -1488,7 +1472,7 @@ func _close_cuts_no_label(camera: Camera2D, room: JunctionRoom) -> bool:
 
 func _walk_until_choice(game: Node2D) -> bool:
 	Input.action_press(&"move_right")
-	var asked: bool = await _wait_until(func() -> bool: return game.get("waiting_for_choice"), 300)
+	var asked: bool = await wait_until(func() -> bool: return game.get("waiting_for_choice"), 300)
 	Input.action_release(&"move_right")
 	return asked
 
@@ -1497,9 +1481,9 @@ func _walk_until_choice(game: Node2D) -> bool:
 func _cross_to_panel(game: Node2D) -> bool:
 	var brain: SentryBrain = game.get("sentry_brain") as SentryBrain
 	var human: M0Actor = game.get_node("Human") as M0Actor
-	if not await _wait_until(func() -> bool: return brain.state == &"patrol" and brain.facing > 0.0 and brain.x >= 700.0, 400):
+	if not await wait_until(func() -> bool: return brain.state == &"patrol" and brain.facing > 0.0 and brain.x >= 700.0, 400):
 		return false
-	return await _walk_to(human, JunctionRoom.ARM_X) and not game.get("fail_active")
+	return await walk_to(human, JunctionRoom.ARM_X) and not game.get("fail_active")
 
 
 ## P0-21 (PUZ-6, FAIL-6, Nathanial's Q7): the tank window is at least about half a second on patrol.
@@ -1512,7 +1496,7 @@ func _check_drop_window() -> void:
 	var straight: float = 2.0 * DropArm.HIT_REACH / SentryBrain.PATROL_SPEED
 	_expect(straight >= 0.5, "a straight crossing of the whole hit window takes %.2f s (at least 0.5 s; 0.34 s before)" % straight)
 	for far_x: float in [SentryBrain.PATROL_MAX_X, 805.0]:
-		var brain: SentryBrain = _patrolling_at(far_x, -1.0)
+		var brain: SentryBrain = patrolling_sentry(far_x, -1.0)
 		brain.far_x = far_x
 		var passes: Array[float] = []
 		var run: int = 0
@@ -1528,7 +1512,7 @@ func _check_drop_window() -> void:
 	# Press windows: for every frame of a patrol cycle, drop then and see whether it lands as a hit.
 	var hits: Array[bool] = []
 	for start: int in 240:
-		var sentry: SentryBrain = _patrolling_at(SentryBrain.PATROL_MAX_X, -1.0)
+		var sentry: SentryBrain = patrolling_sentry(SentryBrain.PATROL_MAX_X, -1.0)
 		for _frame: int in start:
 			sentry.tick(1.0 / 60.0, 100.0, false, -1.0)
 		var arm: DropArm = DropArm.new()
@@ -1551,58 +1535,10 @@ func _check_drop_window() -> void:
 	print("Tank window: %.2f s per straight crossing at patrol speed, %.2f s at chase speed, press windows on patrol %s" % [straight, 2.0 * DropArm.HIT_REACH / SentryBrain.CHASE_SPEED, str(windows)])
 
 
-func _patrolling_at(x: float, facing: float) -> SentryBrain:
-	var brain: SentryBrain = SentryBrain.new()
-	brain.wake()
-	brain.x = x
-	brain.facing = facing
-	return brain
-
-
-func _completed_records_state(choice_id: String) -> M0State:
-	var state: M0State = State.new()
-	state.record_choice(choice_id)
-	state.arm_breaker()
-	state.activate_power("wolf" if choice_id == State.DISCLOSE else "human")
-	state.reach_checkpoint()
-	state.enter_records()
-	state.preserve_purge_trace()
-	state.preserve_mirror_trace("wolf" if choice_id == State.DISCLOSE else "manual")
-	state.complete_chapter()
-	state.human_position = Vector2(830.0, 410.0)
-	state.wolf_position = Vector2(766.0, 423.0)
-	return state
-
-
 func _write(path: String, data: Dictionary) -> void:
 	var file: FileAccess = FileAccess.open(path, FileAccess.WRITE)
 	file.store_string(JSON.stringify(data))
 	file.close()
-
-
-func _remove(path: String) -> void:
-	if FileAccess.file_exists(path):
-		DirAccess.remove_absolute(ProjectSettings.globalize_path(path))
-
-
-func _tap(action: StringName) -> void:
-	await process_frame
-	if action == &"pause_game":
-		# Pause is event-driven, so send a real input event.
-		Input.parse_input_event(_action_event(action, true))
-		await process_frame
-		Input.parse_input_event(_action_event(action, false))
-		return
-	Input.action_press(action)
-	await process_frame
-	Input.action_release(action)
-
-
-func _action_event(action: StringName, pressed: bool) -> InputEventAction:
-	var event: InputEventAction = InputEventAction.new()
-	event.action = action
-	event.pressed = pressed
-	return event
 
 
 ## WOLF crosses the lane from the rubble to the far end, answering at many points of the patrol (the
@@ -1700,6 +1636,12 @@ func _tank_pixels(grow: float) -> Dictionary:
 			var ty: int = floori((wy + 0.5 - origin.y) / scale)
 			if tx >= 0 and ty >= 0 and tx < image.get_width() and ty < image.get_height() and image.get_pixel(tx, ty).a > 0.5:
 				painted.append(Vector2i(wx, wy))
+	return _grown(painted, grow)
+
+
+## [param painted] world pixels grown by [param grow] px in every direction (a disc of that radius
+## round each one), as a set: Vector2i keys, true values.
+func _grown(painted: Array[Vector2i], grow: float) -> Dictionary:
 	var reach: int = ceili(grow)
 	var pixels: Dictionary = {}
 	for pixel: Vector2i in painted:
@@ -1760,46 +1702,3 @@ func _wolf_art_feet() -> float:
 				bottom = y
 				break
 	return (bottom + 1 - image.get_height() * 0.5) * MainScript.WOLF_ART_SCALE
-
-
-## True while some player in the sound bank is playing [param clip].
-func _sounding(game: Node2D, clip: StringName) -> bool:
-	var sfx: SfxBank = game.get("sfx_bank") as SfxBank
-	for player: AudioStreamPlayer in sfx.players():
-		if player.playing and player.stream == sfx.streams.get(clip):
-			return true
-	return false
-
-
-func _wait_until(condition: Callable, frames: int) -> bool:
-	for _frame: int in range(frames):
-		await physics_frame
-		if condition.call():
-			return true
-	return false
-
-
-func _walk_to(actor: M0Actor, target_x: float) -> bool:
-	var action: StringName = &"move_right" if target_x > actor.position.x else &"move_left"
-	Input.action_press(action)
-	var reached: bool = false
-	for _frame: int in range(300):
-		await physics_frame
-		if absf(actor.position.x - target_x) <= 12.0:
-			reached = true
-			break
-	Input.action_release(action)
-	return reached
-
-
-func _expect(condition: bool, label: String) -> void:
-	if not condition:
-		failures += 1
-		push_error("Sentry check failed: " + label)
-
-
-func _require(condition: bool, label: String) -> bool:
-	_expect(condition, label)
-	if not condition:
-		quit(1)
-	return condition

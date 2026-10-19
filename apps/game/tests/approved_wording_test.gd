@@ -1,4 +1,4 @@
-extends SceneTree
+extends "res://tests/support/game_suite.gd"
 ## The wording Nathanial approved on 2026-10-13 (1cf8d73:docs/research-2026-10/how-it-should-play/
 ## drafts-2026-10-13.md, items 1 and 3-7), with the four lines where WOLF holds back that he chose on
 ## 2026-10-14 (drafts-wolf-space-2026-10-14.md, Draft A), as the game shows it: every changed line, the trust line as
@@ -8,10 +8,8 @@ extends SceneTree
 ## and none of the cut lines left anywhere in the game's scripts or on screen. Since 2026-10-14 ("Say
 ## door") the junction's exit, drawn as a sliding door, is a door in every line about it.
 
-const GAME_SCENE: PackedScene = preload("res://scenes/main.tscn")
 const MainScript = preload("res://scripts/main.gd")
 const State = preload("res://scripts/m0_state.gd")
-const Suite = preload("res://tests/support/game_suite.gd")
 ## A press must be heard, seen on its station's lamp and answered in the box within this many frames.
 const ANSWER_FRAMES: int = 6
 ## Lines cut on 2026-10-13 (P0-19 / Q5: N1, N4, N5, N14 and the two clauses; Q6's chain on entry).
@@ -50,7 +48,6 @@ const CUT_LINES: Array[String] = [
 	"hatches",
 ]
 
-var failures: int = 0
 var game: Node2D
 var human: M0Actor
 var wolf: M0Actor
@@ -61,19 +58,12 @@ var started: Array[StringName] = []
 var path: String
 
 
-func _initialize() -> void:
-	call_deferred("_run")
-
-
 func _run() -> void:
-	path = "user://approved-wording-test-%s.json" % OS.get_process_id()
-	_remove(path)
+	check_name = "Approved wording"
 	_check_sources()
 	_check_constants()
-	game = GAME_SCENE.instantiate() as Node2D
-	game.set("save_path", path)
-	game.set("settings_path", "%s-settings.cfg" % path)
-	root.add_child(game)
+	game = open_game("approved-wording-test")
+	path = str(game.get("save_path"))
 	human = game.get_node("Human") as M0Actor
 	wolf = game.get_node("Wolf") as M0Actor
 	room = game.get("junction_room") as JunctionRoom
@@ -92,14 +82,8 @@ func _run() -> void:
 	await _check_blast_boxes()
 	await _check_story_moves_on()
 	await _check_miss_boxes()
-	bank.stop_all()
-	game.queue_free()
-	_remove(path)
-	_remove("%s-settings.cfg" % path)
-	await create_timer(0.5).timeout
-	if failures == 0:
-		print("Approved wording checks passed")
-	quit(1 if failures > 0 else 0)
+	await end_game(game, 0.4)
+	finish("Approved wording checks passed")
 
 
 ## No cut line or dropped name is left in any script a player's text comes from.
@@ -286,7 +270,7 @@ func _check_junction_entry() -> void:
 	game.set("checkpoint_toast_remaining", 0.0)
 	human.position.x = 120.0
 	_expect(str(game.call("_context_hint")) == "Get through the sealed door.", "the hint bar shows the goal only")
-	_expect(await _wait_until(func() -> bool: return str(game.get("status_line")) == "WOLF: When the door goes, don't be standing in front of it.", 400), "then WOLF's approved door warning, once he has read the gauge")
+	_expect(await wait_until(func() -> bool: return str(game.get("status_line")) == "WOLF: When the door goes, don't be standing in front of it.", 400), "then WOLF's approved door warning, once he has read the gauge")
 	_expect(not game.get("wolf_scouting"), "and he follows again")
 
 
@@ -358,7 +342,7 @@ func _check_refusals() -> void:
 	await _refused("row 7b, the exit before the door is down", &"bolt", "Bolted. The sealed door comes first.", &"clank")
 	# Row 3: the breaker while the line builds; row 3b: breaker and valve while the fuse burns.
 	await _place(breaker_x, true)
-	await _tap(&"interact")
+	await tap(&"interact")
 	_expect(line.state == &"building", "the breaker arms the line")
 	await _refused("row 3, the breaker while the line builds", &"breaker", "Already live. Crank the valve by the door.", &"clank")
 	line.crank(2.0)
@@ -379,9 +363,9 @@ func _check_refusals() -> void:
 	line.reset()
 	room.sync_line(line)
 	Input.action_press(&"move_right")
-	_expect(await _wait_until(func() -> bool: return human.position.x + M0State.HUMAN_HALF_WIDTH >= M0State.JUNCTION_DOOR_LEFT_X - 1.0, 120), "the engineer walks up against the sealed door")
+	_expect(await wait_until(func() -> bool: return human.position.x + M0State.HUMAN_HALF_WIDTH >= M0State.JUNCTION_DOOR_LEFT_X - 1.0, 120), "the engineer walks up against the sealed door")
 	# The bump's own flicker has to be over, so the USE's flicker is its own.
-	_expect(await _wait_until(func() -> bool: return not room.flickering(&"door"), 60), "the bump's flicker is over")
+	_expect(await wait_until(func() -> bool: return not room.flickering(&"door"), 60), "the bump's flicker is over")
 	game.set("status_line", "")
 	await _refused("row 2, USE at the sealed door", &"door", "Sealed shut. Something hums behind it.\nThe valve beside it charges it.", &"clank")
 	Input.action_release(&"move_right")
@@ -390,12 +374,12 @@ func _check_refusals() -> void:
 	for wait: int in [30, 90]:
 		await _place(380.0, false)
 		Input.action_press(&"move_right")
-		_expect(await _wait_until(func() -> bool: return human.position.x + M0State.HUMAN_HALF_WIDTH >= M0State.JUNCTION_DOOR_LEFT_X - 1.0, 120), "the engineer walks up against the sealed door again")
+		_expect(await wait_until(func() -> bool: return human.position.x + M0State.HUMAN_HALF_WIDTH >= M0State.JUNCTION_DOOR_LEFT_X - 1.0, 120), "the engineer walks up against the sealed door again")
 		# Held into the door, as a player does, until a frame has seen the engineer at its face: a slow
 		# frame can run several physics steps, so letting go on the first touch can miss that frame.
-		_expect(await _wait_until(func() -> bool: return bool(game.get("door_faced")), 60), "a frame sees the engineer at the sealed door's face")
+		_expect(await wait_until(func() -> bool: return bool(game.get("door_faced")), 60), "a frame sees the engineer at the sealed door's face")
 		Input.action_release(&"move_right")
-		_expect(await _wait_until(func() -> bool: return not room.flickering(&"door"), 60), "the bump's flicker is over")
+		_expect(await wait_until(func() -> bool: return not room.flickering(&"door"), 60), "the bump's flicker is over")
 		for _frame: int in wait:
 			await physics_frame
 		_expect(human.position.x < JunctionRoom.VALVE_X, "let go at the door, the engineer settles off the valve's body (x %.1f)" % human.position.x)
@@ -428,7 +412,7 @@ func _check_refusals() -> void:
 	var arm: DropArm = game.get("drop_arm") as DropArm
 	(game.get("sentry_brain") as SentryBrain).x = SentryBrain.PATROL_MAX_X
 	game.call("debug_drop_tank")
-	_expect(await _wait_until(func() -> bool: return arm.state == &"rewinding" and not arm.on_floor(), 300), "the missed tank is winching back up")
+	_expect(await wait_until(func() -> bool: return arm.state == &"rewinding" and not arm.on_floor(), 300), "the missed tank is winching back up")
 	await _place(release_x, false)
 	await _refused("row 5b, DROP while the tank winches up", &"release", "Not yet. The tank is still going back up.", &"clank")
 	# Row 6: the release once the sentry is down.
@@ -451,7 +435,7 @@ func _check_door_bump() -> void:
 	# The bump's flicker lasts 0.14 s; a slow frame can start and end it while the walk is still being
 	# watched, so any frame that sees it counts.
 	var flickered: Array[bool] = [false]
-	_expect(await _wait_until(func() -> bool:
+	_expect(await wait_until(func() -> bool:
 		flickered[0] = flickered[0] or room.flickering(&"door")
 		return human.position.x + M0State.HUMAN_HALF_WIDTH >= M0State.JUNCTION_DOOR_LEFT_X - 1.0, 120), "the engineer walks into the sealed door")
 	var frames: int = await _frames_until(func() -> bool:
@@ -467,7 +451,7 @@ func _check_door_bump() -> void:
 	game.set("status_line", "WOLF: Quiet.")
 	started.clear()
 	Input.action_press(&"move_right")
-	_expect(await _wait_until(func() -> bool: return started.has(&"thud") and room.flickering(&"door"), 120), "a second push thuds again and flickers the door's lamp")
+	_expect(await wait_until(func() -> bool: return started.has(&"thud") and room.flickering(&"door"), 120), "a second push thuds again and flickers the door's lamp")
 	_expect(str(game.get("status_line")) == "WOLF: Quiet.", "but only the first bump says why")
 	Input.action_release(&"move_right")
 
@@ -502,7 +486,7 @@ func _check_knockdown_boxes() -> void:
 	var reason: String = JunctionRoom.SENTRY_REASON % "Rowan"
 	game.call("_fail_beat", reason, true)
 	_expect(bool(game.get("fail_active")), "the sentry knockdown starts")
-	_expect(await Suite.retry(game, 300), "the knockdown restores the checkpoint")
+	_expect(await retry(game, 300), "the knockdown restores the checkpoint")
 	var c: Dictionary = (MainScript as GDScript).get_script_constant_map()
 	var queue: Array = game.get("box_queue")
 	_expect(str(game.get("status_line")) == reason and queue.size() == 1 and (queue[0] == c["RESTORE_FROM_DISK_LINE"] or queue[0] == c["RESTORE_BEAT_LINE"]), "after restore the two-row card keeps its box and the restore line comes next (box \"%s\", then %s)" % [str(game.get("status_line")).c_escape(), str(queue)])
@@ -543,7 +527,7 @@ func _check_blast_boxes() -> void:
 			await process_frame
 			log_box.call()
 		Input.action_press(&"move_right")
-		var asked: bool = await _wait_until(func() -> bool:
+		var asked: bool = await wait_until(func() -> bool:
 			log_box.call()
 			return bool(game.get("waiting_for_choice")), 900)
 		Input.action_release(&"move_right")
@@ -579,7 +563,7 @@ func _check_story_moves_on() -> void:
 	game.call("_advance_box_queue", 30.0)
 	game.call("_advance_box_queue", 30.0)
 	_expect(str(game.get("status_line")) == c["TANK_HIT_WOLF_LINE"] and (game.get("box_queue") as Array).is_empty(), "WOLF's box after the hit stays up; \"%s\" never comes back over the crushed sentry" % str(alone[1]))
-	_expect(await _wait_until(func() -> bool: return Engine.time_scale == 1.0, 90), "time scale settles after the hit")
+	_expect(await wait_until(func() -> bool: return Engine.time_scale == 1.0, 90), "time scale settles after the hit")
 
 
 ## Item 3 S15 in play: the order to get back over the rubble comes as the sentry swings into its chase,
@@ -600,14 +584,14 @@ func _check_miss_boxes() -> void:
 		brain.facing = 1.0
 		# A real drop, far from the sentry: the tank misses and the winch has it back up later.
 		game.call("_drop_tank")
-		_expect(await _wait_until(func() -> bool: return (game.get("drop_arm") as DropArm).state == &"rewinding", 60), "%s: the drop misses" % how)
+		_expect(await wait_until(func() -> bool: return (game.get("drop_arm") as DropArm).state == &"rewinding", 60), "%s: the drop misses" % how)
 		if how == "back at once":
 			human.position.x = 500.0
 		var seen: Array[String] = [str(game.get("status_line"))]
 		var turn_ms: Array[int] = [-1]
 		var started_at: int = Time.get_ticks_msec()
 		var swung: Array[bool] = [false]
-		var ended: bool = await _wait_until(func() -> bool:
+		var ended: bool = await wait_until(func() -> bool:
 			var line: String = str(game.get("status_line"))
 			if seen.back() != line:
 				seen.append(line)
@@ -624,7 +608,7 @@ func _check_miss_boxes() -> void:
 			"stay":
 				_expect(ended and seen[0] == miss and turn_at == 1, "staying at the release: the miss, then the order to get back over the rubble before the sentry reaches them (seen %s)" % str(seen).c_escape())
 				_expect(turn_ms[0] >= 0 and turn_ms[0] <= int((SentryBrain.LOCK_SECONDS + 0.3) * 1000.0), "the order comes as the sentry swings, after its %.1f s lock-on beat (%d ms)" % [SentryBrain.LOCK_SECONDS, turn_ms[0]])
-				_expect(await Suite.retry(game, 300), "the knockdown restores")
+				_expect(await retry(game, 300), "the knockdown restores")
 			"back at once":
 				_expect(ended and seen[0] == miss and turn_at < 0 and seen.has(lost), "back over the rubble before it swings: no stale order, then the sentry giving up (seen %s)" % str(seen).c_escape())
 			_:
@@ -635,7 +619,7 @@ func _check_miss_boxes() -> void:
 ## Walks to the rubble line and answers WOLF's question with [param response].
 func _answer_lane(response: int) -> void:
 	Input.action_press(&"move_right")
-	var asked: bool = await _wait_until(func() -> bool: return bool(game.get("waiting_for_choice")), 300)
+	var asked: bool = await wait_until(func() -> bool: return bool(game.get("waiting_for_choice")), 300)
 	Input.action_release(&"move_right")
 	_expect(asked, "WOLF asks at the rubble line")
 	game.call("_choose_lane", response)
@@ -652,15 +636,7 @@ func _answer_lane(response: int) -> void:
 ## A fresh run into the junction's entry, as USE at the Records exit makes it (autosave A).
 func _enter_fresh_junction() -> void:
 	game.call("debug_new_game", true)
-	var state: M0State = State.new()
-	state.record_choice(State.DISCLOSE)
-	state.arm_breaker()
-	state.activate_power("wolf")
-	state.reach_checkpoint()
-	state.enter_records()
-	state.preserve_purge_trace()
-	state.preserve_mirror_trace("wolf")
-	state.complete_chapter()
+	var state: M0State = story_state(State.DISCLOSE, Story.RECORDS_DONE)
 	game.set("state", state)
 	game.call("_sync_scene")
 	game.call("_enter_junction")
@@ -670,17 +646,7 @@ func _enter_fresh_junction() -> void:
 
 ## Continue at autosave B (door down) or, with [param sentry_down], autosave C.
 func _start_at(sentry_down: bool) -> void:
-	var state: M0State = State.new()
-	state.record_choice(State.DISCLOSE)
-	state.arm_breaker()
-	state.activate_power("wolf")
-	state.reach_checkpoint()
-	state.enter_records()
-	state.preserve_purge_trace()
-	state.preserve_mirror_trace("wolf")
-	state.complete_chapter()
-	state.enter_junction()
-	state.blow_door()
+	var state: M0State = story_state(State.DISCLOSE, Story.DOOR_DOWN)
 	state.human_position = Vector2(JunctionRoom.CHOICE_X - 30.0, 410.0)
 	state.wolf_position = Vector2(JunctionRoom.WOLF_RUBBLE_X, 423.0)
 	if sentry_down:
@@ -726,29 +692,3 @@ func _frames_until(condition: Callable) -> int:
 		if condition.call():
 			return frame
 	return ANSWER_FRAMES + 30
-
-
-func _tap(action: StringName) -> void:
-	await process_frame
-	Input.action_press(action)
-	await process_frame
-	Input.action_release(action)
-
-
-func _wait_until(condition: Callable, frames: int) -> bool:
-	for _frame: int in range(frames):
-		await physics_frame
-		if condition.call():
-			return true
-	return false
-
-
-func _remove(file: String) -> void:
-	if FileAccess.file_exists(file):
-		DirAccess.remove_absolute(ProjectSettings.globalize_path(file))
-
-
-func _expect(condition: bool, label: String) -> void:
-	if not condition:
-		failures += 1
-		push_error("Approved wording check failed: " + label)
