@@ -68,7 +68,7 @@ static func split(message: String, speakers: Array[String], fits: Callable, lang
 ## Whether [param words] fit a column [param width] px wide in MAX_ROWS rows at [param font_size] px of
 ## [param font], wrapped by [param language]'s row rule ([method wrap_width] with
 ## [method row_characters]). The one fit rule: Main's dialogue box and tests/text_boxes_test.gd both
-## split with it. Pure: it reads the words and the arguments only.
+## split with it. Pure for a named [param language]; with "" it also reads the language shown.
 static func fits(words: String, font: Font, font_size: int, width: float, language: String = "") -> bool:
 	return rows(words, font, font_size, wrap_width(words, font, font_size, width, row_characters(language))).size() <= MAX_ROWS
 
@@ -83,7 +83,13 @@ static func row_characters(language: String = "") -> int:
 ## [param language]'s reading speed in characters a second ("reading_cps"), English's where it has
 ## none yet. "" is the language shown.
 static func reading_cps(language: String = "") -> float:
-	return float(I18n.rule(_language(language), "reading_cps", I18n.rule(I18n.FALLBACK, "reading_cps", 20.0)))
+	return float(I18n.rule(_language(language), "reading_cps", _english_cps()))
+
+
+## English's reading speed, the en row's "reading_cps" (20, the speed READ_SECONDS_MAX_BY_CHARACTERS
+## and the old 0.05 s a character were written for), or 20 if the table lost it.
+static func _english_cps() -> float:
+	return float(I18n.rule(I18n.FALLBACK, "reading_cps", 20.0))
 
 
 ## The character equivalent of LONG_LINE_WORDS in [param language]: as many characters as its reader
@@ -159,7 +165,7 @@ static func word_count(text: String) -> int:
 static func read_seconds(words: String, language: String = "") -> float:
 	var text: String = words.replace("\n", " ")
 	# English's speed over this language's: 1.0 in English, so its times stay exactly as they were.
-	var scale: float = float(I18n.rule(I18n.FALLBACK, "reading_cps", 20.0)) / reading_cps(language)
+	var scale: float = _english_cps() / reading_cps(language)
 	var cap: float = READ_SECONDS_BASE + (READ_SECONDS_MAX_BY_CHARACTERS - READ_SECONDS_BASE) * scale
 	# One character's time first, then times the count: 1.0 / 20.0 is the double 0.05, so English's
 	# times are bit for bit the 0.05 s a character they were (n / 20.0 differs in the last bit for some n).
