@@ -338,7 +338,7 @@ func _check_menu_translation(game: Node2D) -> void:
 	_expect(keyboard.text == "Escape-es" and keyboard.tooltip_text == keyboard.text and keyboard.auto_translate_mode == Node.AUTO_TRANSLATE_MODE_DISABLED, "the binding buttons are worked out again in the new language (%s)" % keyboard.text)
 	_expect(menu.note.text == "Pulsa una tecla para Pausa (acción). Esc cancela.", "the rebind prompt is translated whole, with the action's name (%s)" % menu.note.text)
 	menu.begin_capture(&"pause_game", "controller")
-	_expect(menu.note.text == "Press a controller input for Pause (acción). Esc cancels.", "a translated note whose conversions differ from the English shows the English template, not a blank note (%s)" % menu.note.text)
+	_expect(menu.note.text == "Press a controller input for Pausa (acción). Esc cancels.", "a translated note whose conversions differ from the English shows the English template (its insert still translated), not a blank note (%s)" % menu.note.text)
 	menu.cancel_capture()
 	var symbol: InputEventKey = InputEventKey.new()
 	symbol.physical_keycode = KEY_MINUS
