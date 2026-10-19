@@ -1,0 +1,1347 @@
+# Machine translation by Claude (Anthropic); no native speaker has reviewed it yet.
+msgid ""
+msgstr ""
+"Project-Id-Version: WOLF OVERRIDE\n"
+"PO-Revision-Date: 2026-10-19 13:14+0000\n"
+"Last-Translator: Claude (Anthropic), machine translation, unreviewed\n"
+"Language-Team: none\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: es\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: The engineer's name tag over their head in the corridor (the default first name). Names stay as written.
+#. i18n: speaker=ui
+#: scenes/main.tscn
+msgid "ROWAN"
+msgstr "ROWAN"
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: WOLF's name tag over him. WOLF stays WOLF in every language.
+#. i18n: speaker=ui
+#: scenes/main.tscn
+msgid "WOLF"
+msgstr "WOLF"
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: Station plate (12-13 px label on a machine). ALL CAPS, as short as possible. A circuit breaker on a power line (glossary 'BREAKER', open for es: DISYUNTOR chosen here, never INTERRUPTOR).
+#. i18n: speaker=ui
+#: scenes/main.tscn
+msgid "BREAKER"
+msgstr "DISYUNTOR"
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: Station plate (12-13 px label on a machine). ALL CAPS, as short as possible. The electrical relay on the coolant line.
+#. i18n: speaker=ui
+#: scenes/main.tscn
+msgid "COOLANT RELAY"
+msgstr "RELÉ DE REFRIGERANTE"
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: Station plate (12-13 px label on a machine). ALL CAPS, as short as possible. The spot out of the sentry's sight where the game saves (glossary).
+#. i18n: speaker=ui
+#: scenes/main.tscn
+msgid "SAFE POINT"
+msgstr "PUNTO SEGURO"
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: The first tutorial prompt (289 px, 17 px). The letters are the default keys and stay as they are; two spaces after each key.
+#. i18n: speaker=hint engineer=you
+#: scenes/main.tscn
+msgid ""
+"A / D  MOVE\n"
+"E  READ DISPLAY (optional)"
+msgstr ""
+"A / D  MOVERSE\n"
+"E  LEER PANTALLA (opcional)"
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: The PAUSE button on the touch layout (88 px) and the Pause action's prompt.
+#. i18n: speaker=ui
+#: scenes/main.tscn
+#: scripts/main.gd:4476
+msgid "PAUSE"
+msgstr "PAUSA"
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: The touch layout's walk-left arrow. A symbol: copy it.
+#. i18n: speaker=ui
+#: scenes/main.tscn
+msgid "◀"
+msgstr "◀"
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: The touch layout's walk-right arrow. A symbol: copy it.
+#. i18n: speaker=ui
+#: scenes/main.tscn
+msgid "▶"
+msgstr "▶"
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: The touch layout's interact button (155 px, 23 px): use the machine in front of you.
+#. i18n: speaker=ui
+#: scenes/main.tscn
+msgid "USE"
+msgstr "USAR"
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: Touch answer button 1 at a choice: let WOLF do it. The digit and the two spaces stay.
+#. i18n: speaker=ui
+#: scenes/main.tscn
+msgid "1  WOLF"
+msgstr "1  WOLF"
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: Touch answer button 2 at a choice: do it by hand, without WOLF. The digit and the two spaces stay.
+#. i18n: speaker=ui
+#: scenes/main.tscn
+msgid "2  MANUAL"
+msgstr "2  MANUAL"
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: The title's top line (280 px, 18 px). The studio name stays as written.
+#. i18n: speaker=ui
+#: scenes/main.tscn
+msgid "MRDEMONWOLF, INC. PRESENTS"
+msgstr "MRDEMONWOLF, INC. PRESENTA"
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: The game's name. Never translated.
+#. i18n: speaker=ui
+#: scenes/main.tscn
+msgid "WOLF OVERRIDE"
+msgstr "WOLF OVERRIDE"
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: The title's chapter line (388 px, 20 px). LOCKDOWN: the base sealing itself shut (glossary, open for es; not BLOQUEO). CIERRE TOTAL chosen here for length; a reviewer's word.
+#. i18n: speaker=ui
+#: scenes/main.tscn
+msgid "CHAPTER 1  /  LOCKDOWN"
+msgstr "CAPÍTULO 1  /  CIERRE TOTAL"
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: Title button (186 px, 21 px): start a new run.
+#. i18n: speaker=ui
+#: scenes/main.tscn
+msgid "NEW GAME"
+msgstr "NUEVA PARTIDA"
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: Title button (186 px, 21 px): continue from the saved checkpoint.
+#. i18n: speaker=ui
+#: scenes/main.tscn
+#: scripts/main.gd:1036
+msgid "CONTINUE"
+msgstr "CONTINUAR"
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: Title button (186 px, 18 px).
+#. i18n: speaker=ui
+#: scenes/main.tscn
+msgid "CREDITS"
+msgstr "CRÉDITOS"
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: Title and Pause button (186 px on the title, 18 px) that opens Settings.
+#. i18n: speaker=ui
+#: scenes/main.tscn
+msgid "SETTINGS"
+msgstr "AJUSTES"
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: Tooltip of the title's CHANGELOG button.
+#. i18n: speaker=ui
+#: scenes/main.tscn
+msgid "Development updates, in the game and online"
+msgstr "Novedades del desarrollo, en el juego y en línea"
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: Title button (230 px, 18 px) that opens the list of development changes.
+#. i18n: speaker=ui
+#: scenes/main.tscn
+msgid "CHANGELOG"
+msgstr "NOVEDADES"
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: The title's credit line (424 px, 16 px). The author's name stays as written.
+#. i18n: speaker=ui
+#: scenes/main.tscn
+msgid "Concept: Nathanial Henniges  /  AI-assisted development"
+msgstr "Concepto: Nathanial Henniges  /  Desarrollo asistido por IA"
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: The credits roll (582 px, 19 px, centred, wraps). Translate the role headings and the sentences; names, companies, tools, licences, works' titles and the address stay as written. The translation credit (decision D2) is added in each language's own text under AI-ASSISTED PRODUCTION, so the English keeps none.
+#. i18n: speaker=ui
+#: scenes/main.tscn
+msgid ""
+"[center][color=#73DDF5]ORIGINAL CONCEPT, CORE STORY & CREATIVE VISION[/color]\n"
+"[font_size=30][b]Nathanial Henniges[/b][/font_size]\n"
+"\n"
+"\n"
+"[color=#73DDF5]DEVELOPMENT[/color]\n"
+"[font_size=26][b]MrDemonWolf, Inc.[/b][/font_size]\n"
+"\n"
+"\n"
+"[color=#73DDF5]AI-ASSISTED PRODUCTION[/color]\n"
+"ChatGPT and Codex (OpenAI) and Claude Code by Anthropic\n"
+"assisted with research, writing and code.\n"
+"Nathanial directed and reviewed the work.\n"
+"\n"
+"\n"
+"[color=#73DDF5]PROVISIONAL ART[/color]\n"
+"Created with ChatGPT Create and the Codex image generation tool.\n"
+"The characters, station props, rooms and doors are whole\n"
+"pieces painted over script-drawn shape guides (October 16, 2026).\n"
+"Nathanial reviewed and approved each set.\n"
+"The WOLF OVERRIDE mark was redrawn from a generated concept.\n"
+"\n"
+"\n"
+"[color=#73DDF5]SOUND EFFECTS[/color]\n"
+"Most are generated by the game's own code.\n"
+"\n"
+"Recorded steam (CC0)\n"
+"Joseph Sardin - BigSoundBank.com / LaSonotheque.org\n"
+"\n"
+"Recorded growls (CC0, OpenGameArt.org)\n"
+"pauliuw, bonebrah and AntumDeluge\n"
+"(bear growl from the U.S. Fish & Wildlife Service)\n"
+"\n"
+"No music or voice yet.\n"
+"\n"
+"\n"
+"[color=#73DDF5]TYPEFACES[/color]\n"
+"Roboto and Montserrat\n"
+"SIL Open Font License 1.1\n"
+"\n"
+"\n"
+"[color=#73DDF5]BUILT WITH[/color]\n"
+"Godot 4.7.2  /  GDScript\n"
+"Next.js  /  Fumadocs  /  Tailwind CSS  /  Bun\n"
+"Pillow  /  NumPy  /  SciPy  /  ImageMagick  /  cwebp\n"
+"Playwright\n"
+"\n"
+"\n"
+"[color=#73DDF5]RESEARCH & CRAFT REFERENCES[/color]\n"
+"Fumito Ueda / The Last Guardian\n"
+"Companion behavior and visual storytelling\n"
+"\n"
+"Naughty Dog / The Last of Us Part II\n"
+"Reviewed controls and readable presentation\n"
+"\n"
+"Game Accessibility Guidelines\n"
+"Player-paced text and recognizable interactions\n"
+"\n"
+"Godot 4.7 Camera2D reference\n"
+"Camera follow and smoothing\n"
+"\n"
+"Nielsen Norman Group\n"
+"Mobile screenshot readability\n"
+"\n"
+"NIST AI Risk Management Framework\n"
+"National Archives records guidance\n"
+"\n"
+"Real door hardware and safety standards (October 2026)\n"
+"Shapes, sizes and colours of the doors\n"
+"\n"
+"How it should play: about 400 sources (October 2026)\n"
+"Valve, Playdead, Naughty Dog, Nintendo and others\n"
+"Pacing, controls, the companion and playtesting\n"
+"\n"
+"References inform craft, not the origin of this game.\n"
+"Original concept, core story and creative vision:\n"
+"Nathanial Henniges.\n"
+"Referenced creators are not project contributors.\n"
+"\n"
+"Full sources, tools and asset credits:\n"
+"wolfoverride.mrdemonwolf.dev/docs/credits/\n"
+"\n"
+"\n"
+"[font_size=24][b]THANK YOU FOR PLAYING[/b][/font_size][/center]"
+msgstr ""
+"[center][color=#73DDF5]CONCEPTO ORIGINAL, HISTORIA PRINCIPAL Y VISIÓN CREATIVA[/color]\n"
+"[font_size=30][b]Nathanial Henniges[/b][/font_size]\n"
+"\n"
+"\n"
+"[color=#73DDF5]DESARROLLO[/color]\n"
+"[font_size=26][b]MrDemonWolf, Inc.[/b][/font_size]\n"
+"\n"
+"\n"
+"[color=#73DDF5]PRODUCCIÓN ASISTIDA POR IA[/color]\n"
+"ChatGPT y Codex (OpenAI) y Claude Code de Anthropic\n"
+"ayudaron con la investigación, la redacción y el código.\n"
+"Nathanial dirigió y revisó el trabajo.\n"
+"Español: traducción automática de Claude (Anthropic),\n"
+"verificada con Codex (OpenAI). Aún sin revisión nativa.\n"
+"\n"
+"\n"
+"[color=#73DDF5]ARTE PROVISIONAL[/color]\n"
+"Creado con ChatGPT Create y la herramienta de imágenes de Codex.\n"
+"Los personajes, los objetos de las estaciones, las salas y las puertas\n"
+"son piezas enteras pintadas sobre guías de formas dibujadas por código\n"
+"(16 de octubre de 2026). Nathanial revisó y aprobó cada conjunto.\n"
+"La marca WOLF OVERRIDE se redibujó a partir de un concepto generado.\n"
+"\n"
+"[color=#73DDF5]EFECTOS DE SONIDO[/color]\n"
+"La mayoría los genera el propio código del juego.\n"
+"\n"
+"Vapor grabado (CC0)\n"
+"Joseph Sardin - BigSoundBank.com / LaSonotheque.org\n"
+"\n"
+"Gruñidos grabados (CC0, OpenGameArt.org)\n"
+"pauliuw, bonebrah y AntumDeluge\n"
+"(gruñido de oso del U.S. Fish & Wildlife Service)\n"
+"\n"
+"Aún no hay música ni voces.\n"
+"\n"
+"[color=#73DDF5]TIPOGRAFÍAS[/color]\n"
+"Roboto y Montserrat\n"
+"SIL Open Font License 1.1\n"
+"\n"
+"[color=#73DDF5]HECHO CON[/color]\n"
+"Godot 4.7.2  /  GDScript\n"
+"Next.js  /  Fumadocs  /  Tailwind CSS  /  Bun\n"
+"Pillow  /  NumPy  /  SciPy  /  ImageMagick  /  cwebp\n"
+"Playwright\n"
+"\n"
+"[color=#73DDF5]REFERENCIAS DE INVESTIGACIÓN Y OFICIO[/color]\n"
+"Fumito Ueda / The Last Guardian\n"
+"Comportamiento del compañero y narrativa visual\n"
+"\n"
+"Naughty Dog / The Last of Us Part II\n"
+"Controles revisados y presentación legible\n"
+"\n"
+"Game Accessibility Guidelines\n"
+"Texto al ritmo de quien juega e interacciones reconocibles\n"
+"\n"
+"Referencia de Camera2D de Godot 4.7\n"
+"Seguimiento y suavizado de la cámara\n"
+"\n"
+"Nielsen Norman Group\n"
+"Legibilidad de capturas de pantalla en móviles\n"
+"\n"
+"NIST AI Risk Management Framework\n"
+"Guía de registros de los National Archives\n"
+"\n"
+"Herrajes de puertas y normas de seguridad reales (octubre de 2026)\n"
+"Formas, tamaños y colores de las puertas\n"
+"\n"
+"Cómo debería jugarse: unas 400 fuentes (octubre de 2026)\n"
+"Valve, Playdead, Naughty Dog, Nintendo y otros\n"
+"Ritmo, controles, el compañero y las pruebas de juego\n"
+"\n"
+"Las referencias orientan el oficio, no el origen de este juego.\n"
+"Concepto original, historia principal y visión creativa:\n"
+"Nathanial Henniges.\n"
+"Los creadores citados no colaboran en el proyecto.\n"
+"\n"
+"Fuentes completas, herramientas y créditos de recursos:\n"
+"wolfoverride.mrdemonwolf.dev/docs/credits/\n"
+"\n"
+"\n"
+"[font_size=24][b]GRACIAS POR JUGAR[/b][/font_size][/center]"
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: Credits and changelog button (218 px, 19 px): back to the title menu.
+#. i18n: speaker=ui
+#: scenes/main.tscn
+msgid "BACK TO TITLE"
+msgstr "VOLVER AL MENÚ"
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: Credits button (218 px, 19 px) that stops the credits rolling up.
+#. i18n: speaker=ui
+#: scenes/main.tscn
+#: scripts/main.gd:1914
+#: scripts/main.gd:1943
+msgid "PAUSE SCROLL"
+msgstr "PAUSAR CRÉDITOS"
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: Heading of the in-game changelog screen (590 px, 28 px). The changelog itself stays English.
+#. i18n: speaker=ui
+#: scenes/main.tscn
+msgid "DEVELOPMENT UPDATES"
+msgstr "NOVEDADES DEL DESARROLLO"
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: Note under the changelog heading (582 px, 15 px).
+#. i18n: speaker=ui engineer=you
+#: scenes/main.tscn
+msgid "Source-build changes by date, not releases. Scroll with the wheel, drag the text or use up/down."
+msgstr "Cambios de la versión en desarrollo por fecha, no lanzamientos. Desplázate con la rueda, arrastra el texto o usa arriba/abajo."
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: Tooltip of the changelog's online button. The address stays as written.
+#. i18n: speaker=ui engineer=you
+#: scenes/main.tscn
+msgid "Opens wolfoverride.mrdemonwolf.dev/docs/changelog/ in your browser"
+msgstr "Abre wolfoverride.mrdemonwolf.dev/docs/changelog/ en tu navegador"
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: Changelog screen button (338 px, 17 px) that opens the website's changelog.
+#. i18n: speaker=ui
+#: scenes/main.tscn
+msgid "OPEN FULL CHANGELOG ONLINE"
+msgstr "VER TODOS LOS CAMBIOS EN LÍNEA"
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: Pause menu heading (387 px, 31 px).
+#. i18n: speaker=ui
+#: scenes/main.tscn
+msgid "SESSION PAUSED"
+msgstr "SESIÓN EN PAUSA"
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: Pause menu button: back to the game.
+#. i18n: speaker=ui
+#: scenes/main.tscn
+msgid "RESUME"
+msgstr "REANUDAR"
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: Pause menu button (350 px, 19 px): leave the run for the title menu.
+#. i18n: speaker=ui
+#: scenes/main.tscn
+#: scripts/main.gd:2121
+msgid "RETURN TO TITLE"
+msgstr "VOLVER AL MENÚ"
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: Warning under RETURN TO TITLE (378 px, 14 px).
+#. i18n: speaker=ui engineer=you
+#: scenes/main.tscn
+msgid ""
+"Returning keeps your last checkpoint.\n"
+"Unsaved progress will be lost."
+msgstr ""
+"Al volver se conserva tu último punto de control.\n"
+"Perderás el avance sin guardar."
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: Settings heading (690 px, 27 px).
+#. i18n: speaker=ui
+#: scenes/main.tscn
+msgid "SYSTEM SETTINGS"
+msgstr "AJUSTES DEL SISTEMA"
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: DISPLAY row caption (about 170 px, 19 px) beside the frame-rate cap list.
+#. i18n: speaker=ui
+#: scenes/main.tscn
+msgid "FPS LIMIT"
+msgstr "LÍMITE DE FPS"
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: DISPLAY row caption (about 170 px, 19 px) beside the window size list.
+#. i18n: speaker=ui
+#: scenes/main.tscn
+msgid "WINDOW SIZE"
+msgstr "VENTANA"
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: DISPLAY toggle (355 px, 18 px).
+#. i18n: speaker=ui
+#: scenes/main.tscn
+msgid "FULLSCREEN"
+msgstr "PANTALLA COMPLETA"
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: Settings note on a computer build.
+#. i18n: speaker=ui
+#: scenes/main.tscn
+#: scripts/main.gd:2002
+msgid "Window size applies on desktop."
+msgstr "El tamaño de la ventana solo se aplica en escritorio."
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: Settings button (180 px, 18 px): close Settings.
+#. i18n: speaker=ui
+#: scenes/main.tscn
+msgid "BACK"
+msgstr "VOLVER"
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: The studio's name on its logo screen. Stays as written.
+#. i18n: speaker=ui
+#: scenes/studio_logo.tscn
+msgid "MrDemonWolf, Inc."
+msgstr "MrDemonWolf, Inc."
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: CONTROLS row caption (220 px, 16 px) and the name in the rebind notes: the action.
+#. i18n: speaker=ui
+#: scripts/game_settings.gd:22
+msgid "Move left"
+msgstr "Mover a la izquierda"
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: CONTROLS row caption (220 px, 16 px): the action.
+#. i18n: speaker=ui
+#: scripts/game_settings.gd:22
+msgid "Move right"
+msgstr "Mover a la derecha"
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: CONTROLS row caption (220 px, 16 px): use a machine, or go on to the next line.
+#. i18n: speaker=ui
+#: scripts/game_settings.gd:22
+msgid "Interact / continue"
+msgstr "Usar / continuar"
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: CONTROLS row caption (220 px, 16 px): answer 1 at a choice.
+#. i18n: speaker=ui
+#: scripts/game_settings.gd:22
+msgid "Response 1"
+msgstr "Respuesta 1"
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: CONTROLS row caption (220 px, 16 px): answer 2 at a choice.
+#. i18n: speaker=ui
+#: scripts/game_settings.gd:22
+msgid "Response 2"
+msgstr "Respuesta 2"
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: CONTROLS row caption (220 px, 16 px) for the pause action, and the Pause key's name (A keyboard key's name in the CONTROLS table (206 px button, 15 px) and in the rebind notes. Use the name printed on Spanish keyboards where there is one; short.)
+#. i18n: speaker=ui
+#: scripts/game_settings.gd:22
+msgid "Pause"
+msgstr "Pausa"
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: An action's name in the note 'Already used by %s': the debug key that changes the engineer's first name. Lower case.
+#. i18n: speaker=ui
+#: scripts/game_settings.gd:25
+msgid "cycle name"
+msgstr "cambiar de nombre"
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: AUDIO slider caption.
+#. i18n: speaker=ui
+#: scripts/game_settings.gd:31
+msgid "Master volume"
+msgstr "Volumen general"
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: AUDIO slider caption.
+#. i18n: speaker=ui
+#: scripts/game_settings.gd:31
+msgid "Music volume"
+msgstr "Volumen de la música"
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: AUDIO slider caption.
+#. i18n: speaker=ui
+#: scripts/game_settings.gd:31
+msgid "Effects volume"
+msgstr "Volumen de los efectos"
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: AUDIO slider caption.
+#. i18n: speaker=ui
+#: scripts/game_settings.gd:31
+msgid "Voice volume"
+msgstr "Volumen de las voces"
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: A keyboard key's name in the CONTROLS table (206 px button, 15 px) and in the rebind notes. Use the name printed on Spanish keyboards where there is one; short.
+#. i18n: speaker=ui
+#: scripts/game_settings.gd:48
+msgctxt "key name"
+msgid "Escape"
+msgstr "Esc"
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: A keyboard key's name in the CONTROLS table (206 px button, 15 px) and in the rebind notes. Use the name printed on Spanish keyboards where there is one; short.
+#. i18n: speaker=ui
+#: scripts/game_settings.gd:48
+msgctxt "key name"
+msgid "Tab"
+msgstr "Tab"
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: A keyboard key's name in the CONTROLS table (206 px button, 15 px) and in the rebind notes. Use the name printed on Spanish keyboards where there is one; short.
+#. i18n: speaker=ui
+#: scripts/game_settings.gd:48
+msgctxt "key name"
+msgid "Backspace"
+msgstr "Retroceso"
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: A keyboard key's name in the CONTROLS table (206 px button, 15 px) and in the rebind notes. Use the name printed on Spanish keyboards where there is one; short.
+#. i18n: speaker=ui
+#: scripts/game_settings.gd:48
+msgctxt "key name"
+msgid "Enter"
+msgstr "Enter"
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: A keyboard key's name in the CONTROLS table (206 px button, 15 px) and in the rebind notes. Use the name printed on Spanish keyboards where there is one; short.
+#. i18n: speaker=ui
+#: scripts/game_settings.gd:48
+msgctxt "key name"
+msgid "Kp Enter"
+msgstr "Enter numérico"
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: A keyboard key's name in the CONTROLS table (206 px button, 15 px) and in the rebind notes. Use the name printed on Spanish keyboards where there is one; short.
+#. i18n: speaker=ui
+#: scripts/game_settings.gd:48
+msgctxt "key name"
+msgid "Insert"
+msgstr "Insert"
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: A keyboard key's name in the CONTROLS table (206 px button, 15 px) and in the rebind notes. Use the name printed on Spanish keyboards where there is one; short.
+#. i18n: speaker=ui
+#: scripts/game_settings.gd:48
+msgctxt "key name"
+msgid "Delete"
+msgstr "Supr"
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: CONTROLS row caption (220 px, 16 px) for the pause action, and the Pause key's name (A keyboard key's name in the CONTROLS table (206 px button, 15 px) and in the rebind notes. Use the name printed on Spanish keyboards where there is one; short.)
+#. i18n: speaker=ui
+#: scripts/game_settings.gd:48
+msgctxt "key name"
+msgid "Pause"
+msgstr "Pausa"
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: A keyboard key's name in the CONTROLS table (206 px button, 15 px) and in the rebind notes. Use the name printed on Spanish keyboards where there is one; short.
+#. i18n: speaker=ui
+#: scripts/game_settings.gd:48
+msgctxt "key name"
+msgid "Print"
+msgstr "Impr Pant"
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: A keyboard key's name in the CONTROLS table (206 px button, 15 px) and in the rebind notes. Use the name printed on Spanish keyboards where there is one; short.
+#. i18n: speaker=ui
+#: scripts/game_settings.gd:48
+msgctxt "key name"
+msgid "Clear"
+msgstr "Borrar"
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: A keyboard key's name in the CONTROLS table (206 px button, 15 px) and in the rebind notes. Use the name printed on Spanish keyboards where there is one; short.
+#. i18n: speaker=ui
+#: scripts/game_settings.gd:48
+msgctxt "key name"
+msgid "Home"
+msgstr "Inicio"
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: A keyboard key's name in the CONTROLS table (206 px button, 15 px) and in the rebind notes. Use the name printed on Spanish keyboards where there is one; short.
+#. i18n: speaker=ui
+#: scripts/game_settings.gd:48
+msgctxt "key name"
+msgid "End"
+msgstr "Fin"
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: A keyboard key's name in the CONTROLS table (206 px button, 15 px) and in the rebind notes. Use the name printed on Spanish keyboards where there is one; short.
+#. i18n: speaker=ui
+#: scripts/game_settings.gd:48
+msgctxt "key name"
+msgid "Left"
+msgstr "Flecha izquierda"
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: A keyboard key's name in the CONTROLS table (206 px button, 15 px) and in the rebind notes. Use the name printed on Spanish keyboards where there is one; short.
+#. i18n: speaker=ui
+#: scripts/game_settings.gd:48
+msgctxt "key name"
+msgid "Up"
+msgstr "Flecha arriba"
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: A keyboard key's name in the CONTROLS table (206 px button, 15 px) and in the rebind notes. Use the name printed on Spanish keyboards where there is one; short.
+#. i18n: speaker=ui
+#: scripts/game_settings.gd:48
+msgctxt "key name"
+msgid "Right"
+msgstr "Flecha derecha"
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: A keyboard key's name in the CONTROLS table (206 px button, 15 px) and in the rebind notes. Use the name printed on Spanish keyboards where there is one; short.
+#. i18n: speaker=ui
+#: scripts/game_settings.gd:48
+msgctxt "key name"
+msgid "Down"
+msgstr "Flecha abajo"
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: A keyboard key's name in the CONTROLS table (206 px button, 15 px) and in the rebind notes. Use the name printed on Spanish keyboards where there is one; short.
+#. i18n: speaker=ui
+#: scripts/game_settings.gd:48
+msgctxt "key name"
+msgid "PageUp"
+msgstr "Re Pág"
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: A keyboard key's name in the CONTROLS table (206 px button, 15 px) and in the rebind notes. Use the name printed on Spanish keyboards where there is one; short.
+#. i18n: speaker=ui
+#: scripts/game_settings.gd:48
+msgctxt "key name"
+msgid "PageDown"
+msgstr "Av Pág"
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: A keyboard key's name in the CONTROLS table (206 px button, 15 px) and in the rebind notes. Use the name printed on Spanish keyboards where there is one; short.
+#. i18n: speaker=ui
+#: scripts/game_settings.gd:48
+msgctxt "key name"
+msgid "CapsLock"
+msgstr "Bloq Mayús"
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: A keyboard key's name in the CONTROLS table (206 px button, 15 px) and in the rebind notes. Use the name printed on Spanish keyboards where there is one; short.
+#. i18n: speaker=ui
+#: scripts/game_settings.gd:48
+msgctxt "key name"
+msgid "NumLock"
+msgstr "Bloq Num"
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: A keyboard key's name in the CONTROLS table (206 px button, 15 px) and in the rebind notes. Use the name printed on Spanish keyboards where there is one; short.
+#. i18n: speaker=ui
+#: scripts/game_settings.gd:48
+msgctxt "key name"
+msgid "ScrollLock"
+msgstr "Bloq Despl"
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: A keyboard key's name in the CONTROLS table (206 px button, 15 px) and in the rebind notes. Use the name printed on Spanish keyboards where there is one; short.
+#. i18n: speaker=ui
+#: scripts/game_settings.gd:48
+msgctxt "key name"
+msgid "Kp Multiply"
+msgstr "Num *"
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: A keyboard key's name in the CONTROLS table (206 px button, 15 px) and in the rebind notes. Use the name printed on Spanish keyboards where there is one; short.
+#. i18n: speaker=ui
+#: scripts/game_settings.gd:48
+msgctxt "key name"
+msgid "Kp Divide"
+msgstr "Num /"
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: A keyboard key's name in the CONTROLS table (206 px button, 15 px) and in the rebind notes. Use the name printed on Spanish keyboards where there is one; short.
+#. i18n: speaker=ui
+#: scripts/game_settings.gd:48
+msgctxt "key name"
+msgid "Kp Subtract"
+msgstr "Num -"
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: A keyboard key's name in the CONTROLS table (206 px button, 15 px) and in the rebind notes. Use the name printed on Spanish keyboards where there is one; short.
+#. i18n: speaker=ui
+#: scripts/game_settings.gd:48
+msgctxt "key name"
+msgid "Kp Period"
+msgstr "Num ."
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: A keyboard key's name in the CONTROLS table (206 px button, 15 px) and in the rebind notes. Use the name printed on Spanish keyboards where there is one; short.
+#. i18n: speaker=ui
+#: scripts/game_settings.gd:48
+msgctxt "key name"
+msgid "Kp Add"
+msgstr "Num +"
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: A keyboard key's name in the CONTROLS table (206 px button, 15 px) and in the rebind notes. Use the name printed on Spanish keyboards where there is one; short.
+#. i18n: speaker=ui
+#: scripts/game_settings.gd:48
+msgctxt "key name"
+msgid "Menu"
+msgstr "Menú"
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: A keyboard key's name in the CONTROLS table (206 px button, 15 px) and in the rebind notes. Use the name printed on Spanish keyboards where there is one; short.
+#. i18n: speaker=ui
+#: scripts/game_settings.gd:48
+msgctxt "key name"
+msgid "Help"
+msgstr "Ayuda"
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: A keyboard key's name in the CONTROLS table (206 px button, 15 px) and in the rebind notes. Use the name printed on Spanish keyboards where there is one; short.
+#. i18n: speaker=ui
+#: scripts/game_settings.gd:48
+msgctxt "key name"
+msgid "Space"
+msgstr "Espacio"
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: A keyboard key's name in the CONTROLS table (206 px button, 15 px) and in the rebind notes. Use the name printed on Spanish keyboards where there is one; short.
+#. i18n: speaker=ui
+#: scripts/game_settings.gd:48
+msgctxt "key name"
+msgid "Minus"
+msgstr "Menos"
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: A keyboard key's name in the CONTROLS table (206 px button, 15 px) and in the rebind notes. Use the name printed on Spanish keyboards where there is one; short.
+#. i18n: speaker=ui
+#: scripts/game_settings.gd:48
+msgctxt "key name"
+msgid "Equal"
+msgstr "Igual"
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: A keyboard key's name in the CONTROLS table (206 px button, 15 px) and in the rebind notes. Use the name printed on Spanish keyboards where there is one; short.
+#. i18n: speaker=ui
+#: scripts/game_settings.gd:48
+msgctxt "key name"
+msgid "BracketLeft"
+msgstr "Corchete izquierdo"
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: A keyboard key's name in the CONTROLS table (206 px button, 15 px) and in the rebind notes. Use the name printed on Spanish keyboards where there is one; short.
+#. i18n: speaker=ui
+#: scripts/game_settings.gd:48
+msgctxt "key name"
+msgid "BracketRight"
+msgstr "Corchete derecho"
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: A keyboard key's name in the CONTROLS table (206 px button, 15 px) and in the rebind notes. Use the name printed on Spanish keyboards where there is one; short.
+#. i18n: speaker=ui
+#: scripts/game_settings.gd:48
+msgctxt "key name"
+msgid "BackSlash"
+msgstr "Barra invertida"
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: A keyboard key's name in the CONTROLS table (206 px button, 15 px) and in the rebind notes. Use the name printed on Spanish keyboards where there is one; short.
+#. i18n: speaker=ui
+#: scripts/game_settings.gd:48
+msgctxt "key name"
+msgid "Semicolon"
+msgstr "Punto y coma"
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: A keyboard key's name in the CONTROLS table (206 px button, 15 px) and in the rebind notes. Use the name printed on Spanish keyboards where there is one; short.
+#. i18n: speaker=ui
+#: scripts/game_settings.gd:48
+msgctxt "key name"
+msgid "Apostrophe"
+msgstr "Apóstrofo"
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: A keyboard key's name in the CONTROLS table (206 px button, 15 px) and in the rebind notes. Use the name printed on Spanish keyboards where there is one; short.
+#. i18n: speaker=ui
+#: scripts/game_settings.gd:48
+msgctxt "key name"
+msgid "Comma"
+msgstr "Coma"
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: A keyboard key's name in the CONTROLS table (206 px button, 15 px) and in the rebind notes. Use the name printed on Spanish keyboards where there is one; short.
+#. i18n: speaker=ui
+#: scripts/game_settings.gd:48
+msgctxt "key name"
+msgid "Period"
+msgstr "Punto"
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: A keyboard key's name in the CONTROLS table (206 px button, 15 px) and in the rebind notes. Use the name printed on Spanish keyboards where there is one; short.
+#. i18n: speaker=ui
+#: scripts/game_settings.gd:48
+msgctxt "key name"
+msgid "Slash"
+msgstr "Barra"
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: A keyboard key's name in the CONTROLS table (206 px button, 15 px) and in the rebind notes. Use the name printed on Spanish keyboards where there is one; short.
+#. i18n: speaker=ui
+#: scripts/game_settings.gd:48
+msgctxt "key name"
+msgid "QuoteLeft"
+msgstr "Acento grave"
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: A keyboard key's name in the CONTROLS table (206 px button, 15 px) and in the rebind notes. Use the name printed on Spanish keyboards where there is one; short.
+#. i18n: speaker=ui
+#: scripts/game_settings.gd:48
+msgctxt "key name"
+msgid "Section"
+msgstr "Sección"
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: Settings' small top line (13 px). The Den is the settings terminal's name: a wolf's den.
+#. i18n: speaker=ui
+#: scripts/game_settings.gd:253
+msgid "THE DEN  /  LOCAL CONFIGURATION"
+msgstr "LA GUARIDA  /  CONFIGURACIÓN LOCAL"
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: Settings tab.
+#. i18n: speaker=ui
+#: scripts/game_settings.gd:265
+msgid "DISPLAY"
+msgstr "PANTALLA"
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: Settings tab.
+#. i18n: speaker=ui
+#: scripts/game_settings.gd:265
+msgid "AUDIO"
+msgstr "AUDIO"
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: Settings tab.
+#. i18n: speaker=ui
+#: scripts/game_settings.gd:265
+msgid "CONTROLS"
+msgstr "CONTROLES"
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: Settings tab holding the LANGUAGE row.
+#. i18n: speaker=ui
+#: scripts/game_settings.gd:265
+msgid "GENERAL"
+msgstr "GENERAL"
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: DISPLAY toggle (272 px): vertical sync. The short technical name is common in Spanish menus.
+#. i18n: speaker=ui
+#: scripts/game_settings.gd:282
+msgid "V-SYNC"
+msgstr "V-SYNC"
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: DISPLAY caption over the anti-aliasing list (270 px).
+#. i18n: speaker=ui
+#: scripts/game_settings.gd:288
+msgid "EDGE SMOOTHING"
+msgstr "SUAVIZADO DE BORDES"
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: Anti-aliasing list item: none.
+#. i18n: speaker=ui
+#: scripts/game_settings.gd:288
+msgid "OFF"
+msgstr "NO"
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: Anti-aliasing list item. Technical: copy it.
+#. i18n: speaker=ui
+#: scripts/game_settings.gd:288
+msgid "2× MSAA"
+msgstr "2× MSAA"
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: Anti-aliasing list item. Technical: copy it.
+#. i18n: speaker=ui
+#: scripts/game_settings.gd:288
+msgid "4× MSAA"
+msgstr "4× MSAA"
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: Anti-aliasing list item. Technical: copy it.
+#. i18n: speaker=ui
+#: scripts/game_settings.gd:288
+msgid "8× MSAA"
+msgstr "8× MSAA"
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: DISPLAY toggle (272 px): the accessibility option for less camera shake and flashing.
+#. i18n: speaker=ui
+#: scripts/game_settings.gd:291
+msgid "REDUCED MOTION"
+msgstr "MENOS MOVIMIENTO"
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: Tooltip of REDUCED MOTION. Hit-stop: the brief freeze on a hit.
+#. i18n: speaker=ui
+#: scripts/game_settings.gd:292
+msgid "No camera shake or hit-stop; screen flashes are shorter."
+msgstr "Sin sacudidas de cámara ni pausas en los golpes; los destellos duran menos."
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: DISPLAY caption (100 px, beside a 100%-200% list).
+#. i18n: speaker=ui
+#: scripts/game_settings.gd:301
+msgid "TEXT SIZE"
+msgstr "TEXTO"
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: Tooltip of TEXT SIZE. Cards: the location and objective cards at the top.
+#. i18n: speaker=ui
+#: scripts/game_settings.gd:302
+msgid "Scales the dialogue, hints, cards and station names."
+msgstr "Cambia el tamaño de los diálogos, las pistas, los carteles y los nombres de las estaciones."
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: CONTROLS table column heading (220 px, 14 px).
+#. i18n: speaker=ui
+#: scripts/game_settings.gd:325
+msgid "ACTION"
+msgstr "ACCIÓN"
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: CONTROLS table column heading (206 px, 14 px).
+#. i18n: speaker=ui
+#: scripts/game_settings.gd:325
+msgid "KEYBOARD"
+msgstr "TECLADO"
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: CONTROLS table column heading (206 px, 14 px): a gamepad.
+#. i18n: speaker=ui
+#: scripts/game_settings.gd:325
+msgid "CONTROLLER"
+msgstr "CONTROL"
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: CONTROLS slider caption: how far a stick must move before it counts.
+#. i18n: speaker=ui
+#: scripts/game_settings.gd:345
+msgid "Stick deadzone"
+msgstr "Zona muerta del stick"
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: CONTROLS toggle: press once instead of holding a button down.
+#. i18n: speaker=ui
+#: scripts/game_settings.gd:349
+msgid "TOGGLE HOLDS"
+msgstr "PULSAR EN VEZ DE MANTENER"
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: Tooltip of TOGGLE HOLDS. A crank: a hand wheel the engineer turns.
+#. i18n: speaker=ui engineer=you
+#: scripts/game_settings.gd:350
+msgid "Press interact once to start a crank and again to stop it, instead of holding it down. Keyboard, controller and touch."
+msgstr "Presiona usar una vez para empezar a girar una manivela y otra vez para parar, en vez de mantener el botón. Teclado, control y pantalla táctil."
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: CONTROLS button.
+#. i18n: speaker=ui
+#: scripts/game_settings.gd:355
+msgid "RESTORE DEFAULT CONTROLS"
+msgstr "RESTAURAR LOS CONTROLES ORIGINALES"
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: Settings button (180 px) shown while the game waits for a new key.
+#. i18n: speaker=ui
+#: scripts/game_settings.gd:372
+msgid "CANCEL REBIND"
+msgstr "CANCELAR"
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: GENERAL caption (160 px) beside the language list.
+#. i18n: speaker=ui
+#: scripts/game_settings.gd:390
+msgid "LANGUAGE"
+msgstr "IDIOMA"
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: Settings note on a phone or tablet.
+#. i18n: speaker=ui
+#: scripts/game_settings.gd:562
+msgid "Window size is OS-managed on mobile."
+msgstr "En móviles, el sistema controla el tamaño de la ventana."
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: Settings note: vertical sync can hold the frame rate below the chosen cap.
+#. i18n: speaker=ui
+#: scripts/game_settings.gd:562
+#: scripts/game_settings.gd:564
+msgid "V-sync may limit the FPS cap."
+msgstr "La V-sync puede limitar el tope de FPS."
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: AUDIO note. 'Effects' names the slider.
+#. i18n: speaker=ui
+#: scripts/game_settings.gd:566
+msgid "Volume changes apply immediately. Effects carries every sound effect; there is no music or voice yet."
+msgstr "Los cambios de volumen se aplican al instante. Efectos lleva todos los sonidos; aún no hay música ni voces."
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: CONTROLS note.
+#. i18n: speaker=ui engineer=you
+#: scripts/game_settings.gd:566
+msgid "Select a binding, then press a key, controller button or move a stick."
+msgstr "Elige una asignación y presiona una tecla o un botón del control, o mueve un stick."
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: GENERAL note under the language list.
+#. i18n: speaker=ui engineer=you
+#: scripts/game_settings.gd:566
+msgid "Until you choose a language, the game uses your system's."
+msgstr "Hasta que elijas un idioma, el juego usa el de tu sistema."
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: Rebind note. %s is the action's name (Move left).
+#. i18n: speaker=ui engineer=you slot=key
+#: scripts/game_settings.gd:612
+#, c-format
+msgid "Press a keyboard input for %s. Esc cancels."
+msgstr "Presiona una tecla para «%s». Esc cancela."
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: Rebind note. %s is the action's name (Move left).
+#. i18n: speaker=ui engineer=you slot=key
+#: scripts/game_settings.gd:612
+#, c-format
+msgid "Press a controller input for %s. Esc cancels."
+msgstr "Presiona un botón o un stick del control para «%s». Esc cancela."
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: Rebind note.
+#. i18n: speaker=ui
+#: scripts/game_settings.gd:629
+msgid "Rebind cancelled."
+msgstr "Cambio de tecla cancelado."
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: Rebind note. %s is the other action's name.
+#. i18n: speaker=ui engineer=you slot=key
+#: scripts/game_settings.gd:644
+#, c-format
+msgid "Already used by %s. Choose another input or cancel."
+msgstr "Ya la usa «%s». Elige otra o cancela."
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: Rebind note.
+#. i18n: speaker=ui
+#: scripts/game_settings.gd:650
+msgid "Binding saved."
+msgstr "Asignación guardada."
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: A controller stick's name in the CONTROLLER column.
+#. i18n: speaker=ui
+#: scripts/game_settings.gd:718
+msgid "Left stick"
+msgstr "Stick izquierdo"
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: A controller axis's name; %d is its number.
+#. i18n: speaker=ui
+#: scripts/game_settings.gd:718
+#, c-format
+msgid "Axis %d"
+msgstr "Eje %d"
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: A controller axis binding; %d its number, %s its direction (+ or −).
+#. i18n: speaker=ui slot=key
+#: scripts/game_settings.gd:745
+#, c-format
+msgid "AXIS %d %s"
+msgstr "EJE %d %s"
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: The controller's Start button, as printed on it.
+#. i18n: speaker=ui
+#: scripts/game_settings.gd:796
+msgid "START"
+msgstr "START"
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: A controller binding: left on the directional pad.
+#. i18n: speaker=ui
+#: scripts/game_settings.gd:797
+msgid "D-pad left"
+msgstr "Izquierda del pad"
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: A controller binding: right on the directional pad.
+#. i18n: speaker=ui
+#: scripts/game_settings.gd:798
+msgid "D-pad right"
+msgstr "Derecha del pad"
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: A controller button with no name; %d is its number.
+#. i18n: speaker=ui
+#: scripts/game_settings.gd:799
+#, c-format
+msgid "BUTTON %d"
+msgstr "BOTÓN %d"
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: CONTROLS note after RESTORE DEFAULT CONTROLS.
+#. i18n: speaker=ui
+#: scripts/game_settings.gd:826
+msgid "Default controls restored."
+msgstr "Se restauraron los controles originales."
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: Settings error note.
+#. i18n: speaker=ui
+#: scripts/game_settings.gd:850
+#: scripts/main.gd:2042
+msgid "Settings could not be saved."
+msgstr "No se pudieron guardar los ajustes."
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: Station plate (12-13 px label on a machine). ALL CAPS, as short as possible. The caption by the Service Junction's pressure line dial.
+#. i18n: speaker=ui
+#: scripts/junction_room.gd:884
+msgid "LINE"
+msgstr "LÍNEA"
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: Station plate (12-13 px label on a machine). ALL CAPS, as short as possible. The junction's breaker after the blast used the line up.
+#. i18n: speaker=ui
+#: scripts/junction_room.gd:1531
+msgid "BREAKER USED"
+msgstr "DISYUNTOR USADO"
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: Station plate (12-13 px label on a machine). ALL CAPS, as short as possible. The junction's valve after the blast used the line up.
+#. i18n: speaker=ui
+#: scripts/junction_room.gd:1533
+msgid "VALVE USED"
+msgstr "VÁLVULA USADA"
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: Station plate (12-13 px label on a machine). ALL CAPS, as short as possible. The junction's exit hatch, open.
+#. i18n: speaker=ui
+#: scripts/junction_room.gd:1550
+msgid "EXIT OPEN"
+msgstr "SALIDA ABIERTA"
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: Station plate (12-13 px label on a machine). ALL CAPS, as short as possible. The junction's exit hatch while it slides open.
+#. i18n: speaker=ui
+#: scripts/junction_room.gd:1554
+msgid "EXIT OPENING"
+msgstr "SALIDA ABRIÉNDOSE"
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: Station plate (12-13 px label on a machine). ALL CAPS, as short as possible. The junction's exit hatch, ready to open.
+#. i18n: speaker=ui
+#: scripts/junction_room.gd:1557
+msgid "EXIT READY"
+msgstr "SALIDA LISTA"
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: Station plate (12-13 px label on a machine). ALL CAPS, as short as possible. The junction's exit hatch, locked.
+#. i18n: speaker=ui
+#: scripts/junction_room.gd:1560
+msgid "EXIT LOCKED"
+msgstr "SALIDA BLOQUEADA"
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: Title button (the width of two buttons) once the slice is finished: start a fresh run.
+#. i18n: speaker=ui
+#: scripts/main.gd:1036
+msgid "PLAY AGAIN"
+msgstr "JUGAR DE NUEVO"
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: Title note under PLAY AGAIN (388 px, 15 px). Slice: this playable part of the game. Quote the PLAY AGAIN button exactly.
+#. i18n: speaker=ui
+#: scripts/main.gd:1041
+msgid "Slice complete. PLAY AGAIN starts a fresh run."
+msgstr "Demo terminada. JUGAR DE NUEVO empieza una partida nueva."
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: Title note under CONTINUE (388 px, 15 px).
+#. i18n: speaker=ui
+#: scripts/main.gd:1043
+msgid "Saved checkpoint could not be read."
+msgstr "No se pudo leer el punto de control guardado."
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: Title note under CONTINUE (388 px, 15 px). SAFE POINT is the plate's exact words.
+#. i18n: speaker=ui
+#: scripts/main.gd:1043
+msgid "No checkpoint yet. Saving starts at the first SAFE POINT."
+msgstr "Sin punto de control. Se guarda desde el primer PUNTO SEGURO."
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: Changelog button text when the browser cannot open (338 px).
+#. i18n: speaker=ui
+#: scripts/main.gd:1066
+msgid "LINK UNAVAILABLE"
+msgstr "ENLACE NO DISPONIBLE"
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: Credits button (218 px, 19 px) that starts the credits rolling again.
+#. i18n: speaker=ui
+#: scripts/main.gd:1943
+#: scripts/main.gd:1949
+msgid "RESUME SCROLL"
+msgstr "SEGUIR CRÉDITOS"
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: Frame-rate cap list item.
+#. i18n: speaker=ui
+#: scripts/main.gd:1982
+msgid "30 FPS"
+msgstr "30 FPS"
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: Frame-rate cap list item.
+#. i18n: speaker=ui
+#: scripts/main.gd:1983
+msgid "60 FPS"
+msgstr "60 FPS"
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: Frame-rate cap list item: no cap.
+#. i18n: speaker=ui
+#: scripts/main.gd:1984
+msgid "UNCAPPED"
+msgstr "SIN LÍMITE"
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: Frame-rate cap list item.
+#. i18n: speaker=ui
+#: scripts/main.gd:1985
+msgid "90 FPS"
+msgstr "90 FPS"
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: Frame-rate cap list item.
+#. i18n: speaker=ui
+#: scripts/main.gd:1986
+msgid "120 FPS"
+msgstr "120 FPS"
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: Frame-rate cap list item.
+#. i18n: speaker=ui
+#: scripts/main.gd:1987
+msgid "144 FPS"
+msgstr "144 FPS"
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: Pause Settings note on a phone or tablet.
+#. i18n: speaker=ui
+#: scripts/main.gd:2002
+msgid "Window size is managed by iOS/Android."
+msgstr "iOS/Android controla el tamaño de la ventana."
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: Pause menu button during the opening sequence (350 px, 19 px).
+#. i18n: speaker=ui
+#: scripts/main.gd:2121
+msgid "SKIP OPENING"
+msgstr "SALTAR INTRODUCCIÓN"
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: Pause hint on touch screens.
+#. i18n: speaker=ui engineer=you
+#: scripts/main.gd:2136
+msgid "TAP RESUME TO RETURN"
+msgstr "TOCA REANUDAR PARA VOLVER"
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: Pause hint: %s is the Pause key or button's name, then two spaces.
+#. i18n: speaker=ui slot=key
+#: scripts/main.gd:2136
+#, c-format
+msgid "%s  RESUME"
+msgstr "%s  REANUDAR"
