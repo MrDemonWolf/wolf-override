@@ -147,6 +147,7 @@ Changes merged after 0.15.0. They become the next version when it is cut.
 - `dock_bay_test` also checks the charger's states, the leaves' push and catches, and the torn lock's swing.
 - Shared code: the charger's screen is a battery readout of `PropScreen`, `WolfLights` lights all three of WOLF's poses, and the warning beacons' pulse is one `RoomDepth.pulse` for every room and the bay.
 - The opening's staging moved out of `main.gd` into its own `Opening` node. New `opening_timing_test` and `opening_early_press_test` check the reading time, the order of the beats and that a fast reader never cuts one short.
+- Shared code: every `SfxBank` filter runs through one biquad loop and its short clips share one buffer helper (every sound byte for byte the same), and the end card and debug menu place their captions with one `UILabel.place`; copied game code drops from 62 lines to none.
 
 ### How it was checked
 

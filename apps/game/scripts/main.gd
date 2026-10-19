@@ -2787,7 +2787,7 @@ func _build_end_card() -> void:
 	sheen.set_anchors_preset(Control.PRESET_FULL_RECT)
 	sheen.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	panel.add_child(sheen)
-	var title: Label = _end_card_label(END_CARD_TITLE, Rect2(130.0, 92.0, 700.0, 46.0), 32, Color.WHITE)
+	var title: Label = UILabel.place(end_card, END_CARD_TITLE, Rect2(130.0, 92.0, 700.0, 46.0), 32, Color.WHITE)
 	title.add_theme_font_override("font", DISPLAY_FONT)
 	title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	var line: ColorRect = ColorRect.new()
@@ -2796,8 +2796,8 @@ func _build_end_card() -> void:
 	line.size = Vector2(280.0, 3.0)
 	line.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	end_card.add_child(line)
-	_end_card_label(END_CARD_THANKS, Rect2(130.0, 162.0, 700.0, 28.0), 18, Color(0.82, 0.89, 0.94, 1)).horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	var header: Label = _end_card_label(END_CARD_RECAP_HEADER, Rect2(150.0, 212.0, 660.0, 24.0), 15, END_CARD_ACCENT)
+	UILabel.place(end_card, END_CARD_THANKS, Rect2(130.0, 162.0, 700.0, 28.0), 18, Color(0.82, 0.89, 0.94, 1)).horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	var header: Label = UILabel.place(end_card, END_CARD_RECAP_HEADER, Rect2(150.0, 212.0, 660.0, 24.0), 15, END_CARD_ACCENT)
 	header.add_theme_font_override("font", DISPLAY_FONT)
 	end_card_rows = VBoxContainer.new()
 	end_card_rows.name = "Recap"
@@ -2813,18 +2813,6 @@ func _build_end_card() -> void:
 	end_card_button.add_theme_font_size_override("font_size", 19)
 	end_card_button.pressed.connect(_close_end_card)
 	end_card.add_child(end_card_button)
-
-
-func _end_card_label(text: String, rect: Rect2, font_size: int, tint: Color) -> Label:
-	var label: Label = Label.new()
-	label.text = text
-	label.position = rect.position
-	label.size = rect.size
-	label.add_theme_font_size_override("font_size", font_size)
-	label.add_theme_color_override("font_color", tint)
-	label.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	end_card.add_child(label)
-	return label
 
 
 ## This run's three choices as the end card shows them: the relay, the mirror and the lane. The lane

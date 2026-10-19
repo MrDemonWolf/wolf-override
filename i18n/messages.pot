@@ -37,6 +37,7 @@
 # res://scripts/studio_logo.gd
 # res://scripts/swing_leaf.gd
 # res://scripts/text_size.gd
+# res://scripts/ui_label.gd
 # res://scripts/ui_motion.gd
 # res://scripts/wolf_lights.gd
 # res://scripts/world/door_camera.gd
@@ -78,7 +79,7 @@ msgid ""
 msgstr ""
 
 #: scenes/main.tscn
-#: scripts/main.gd:4469
+#: scripts/main.gd:4457
 msgid "PAUSE"
 msgstr ""
 
