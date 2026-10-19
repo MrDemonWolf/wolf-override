@@ -305,51 +305,63 @@ msgstr ""
 msgid "MrDemonWolf, Inc."
 msgstr ""
 
-#: scripts/game_settings.gd:209
+#: scripts/game_settings.gd:223
+msgid "GENERAL"
+msgstr ""
+
+#: scripts/game_settings.gd:239
 msgid "V-SYNC"
 msgstr ""
 
-#: scripts/game_settings.gd:218
+#: scripts/game_settings.gd:248
 msgid "REDUCED MOTION"
 msgstr ""
 
-#: scripts/game_settings.gd:219
+#: scripts/game_settings.gd:249
 msgid "No camera shake or hit-stop; screen flashes are shorter."
 msgstr ""
 
-#: scripts/game_settings.gd:229
+#: scripts/game_settings.gd:259
 msgid "Scales the dialogue, hints, cards and station names."
 msgstr ""
 
-#: scripts/game_settings.gd:272
+#: scripts/game_settings.gd:302
 msgid "TOGGLE HOLDS"
 msgstr ""
 
-#: scripts/game_settings.gd:273
+#: scripts/game_settings.gd:303
 msgid "Press interact once to start a crank and again to stop it, instead of holding it down. Keyboard, controller and touch."
 msgstr ""
 
-#: scripts/game_settings.gd:278
+#: scripts/game_settings.gd:308
 msgid "RESTORE DEFAULT CONTROLS"
 msgstr ""
 
-#: scripts/game_settings.gd:291
+#: scripts/game_settings.gd:322
 msgid "CANCEL REBIND"
 msgstr ""
 
-#: scripts/game_settings.gd:436
+#: scripts/game_settings.gd:340
+msgid "LANGUAGE"
+msgstr ""
+
+#: scripts/game_settings.gd:504
+msgid "Until you choose a language, the game uses your system's."
+msgstr ""
+
+#: scripts/game_settings.gd:548
 msgid "Rebind cancelled."
 msgstr ""
 
-#: scripts/game_settings.gd:456
+#: scripts/game_settings.gd:568
 msgid "Binding saved."
 msgstr ""
 
-#: scripts/game_settings.gd:586
+#: scripts/game_settings.gd:698
 msgid "Default controls restored."
 msgstr ""
 
-#: scripts/game_settings.gd:608
+#: scripts/game_settings.gd:722
 #: scripts/main.gd:2038
 msgid "Settings could not be saved."
 msgstr ""

@@ -86,6 +86,13 @@ func _run() -> void:
 		var bordered_focus: StyleBoxFlat = bordered.get_theme_stylebox("focus") as StyleBoxFlat
 		var bordered_normal: StyleBoxFlat = bordered.get_theme_stylebox("normal") as StyleBoxFlat
 		_expect(bordered_focus != null and bordered_normal != null and bordered_focus.border_color.is_equal_approx(ring.border_color) and bordered_focus.border_width_left == ring.border_width_left and bordered_focus.expand_margin_left == 0.0 and bordered_focus.bg_color.a == 0.0 and bordered_focus.corner_radius_top_left == 0 and bordered_normal.corner_radius_top_left == 0 and bordered_normal.border_width_left < bordered_focus.border_width_left, "%s keeps a squared terminal ring inside its border" % bordered.name)
+	# LANGUAGE (PR L6) is a Settings row like FPS: the same squared ring and style, with the list's own
+	# font chain (I18n.picker_font over Montserrat Semibold) on the button and in the open list.
+	var fps_options: Button = game.get_node("CanvasLayer/PauseOverlay/Panel/SettingsMenu/FPSOptions") as Button
+	var language: OptionButton = shared_settings.language
+	var list_font: Font = language.get_theme_font("font")
+	_expect(language.get_theme_stylebox("focus") == fps_options.get_theme_stylebox("focus") and language.get_theme_stylebox("normal") == fps_options.get_theme_stylebox("normal"), "LANGUAGE wears the Settings rows' squared terminal style and ring")
+	_expect(list_font is FontVariation and (list_font as FontVariation).base_font == GameSettings.CONTROL_FONT.base_font and not list_font.fallbacks.is_empty() and language.get_popup().get_theme_font("font") == list_font and language.get_popup().get_theme_font("font_separator") == list_font, "LANGUAGE and its list draw with the list's own font chain")
 	game.call("_new_game")
 	game.call("_finish_intro")
 	game.set("touch_enabled", true)

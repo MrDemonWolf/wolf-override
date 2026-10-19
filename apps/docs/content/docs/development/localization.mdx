@@ -6,7 +6,7 @@ description: How WOLF OVERRIDE will show other languages, which files hold the l
 **What this page is for:** how languages work in the code today, and how to check translation files.
 
 <Callout title="English only for now">
-  The groundwork for more languages is built, but no translation exists yet. The game shows English whatever language your computer uses, and has no language setting. Players: [Platforms and languages](/docs/platforms/).
+  The groundwork for more languages is built, but no translation exists yet. The game shows English whatever language your computer uses, and its language setting stays hidden until a second language ships. Players: [Platforms and languages](/docs/platforms/).
 </Callout>
 
 ## Words used here
@@ -22,7 +22,8 @@ description: How WOLF OVERRIDE will show other languages, which files hold the l
 - **One table:** `apps/game/i18n/languages.json` lists the planned language files. For each: its name in its own language, whether it is offered, its review state, its fallback font, a reading speed and a row limit.
 - **English stays inside:** constants, saves, comparisons and tests keep the English words. Text is translated only where it is drawn.
 - **Why:** code compares English text (speaker tags, key tokens and the like) and saves store the English choice, so translating earlier would break them.
-- **Nothing is wired yet:** until the next phase connects Settings and the text, nothing changes on screen.
+- **Settings is wired:** Settings applies the saved language (`[general] language` in `settings.cfg`), or the system's when none is saved, as the game loads. Its **LANGUAGE** row on the **GENERAL** tab stays hidden while only English is offered. The game's text is marked for translation next, so nothing changes on screen yet.
+- **The language list's font:** the list draws with its own font chain (`I18n.picker_font`): Montserrat plus four tiny Noto Sans cuts that hold only the Japanese, Korean and Chinese names and their "machine translation" tags, so those names draw in every language without a CJK font behind the game's fonts.
 - **Fonts:** the game never asks the operating system for a missing character. Chinese, Japanese and Korean use Noto Sans subsets that are already bundled but not shown yet. Fonts are credited on [Credits](/docs/credits/#fonts-in-use).
 
 ## Where the files are
@@ -49,6 +50,7 @@ You need Python 3 (standard library only) and GNU gettext's `msgfmt` (`brew inst
 - **Self-test:** check the gates themselves on planted cases: `python3 -I -B scripts/i18n/i18n_tool.py selftest <report.json>`
 - **Glossary:** check the glossary and style guides against each other and the language table: `python3 -I -B scripts/i18n/i18n_tool.py glossary`
 - **Fonts:** rebuild the bundled Chinese, Japanese and Korean font subsets: `python3 -I -B scripts/i18n/i18n_tool.py fonts <download folder>`
+- **Language list fonts:** rebuild only the four tiny cuts the language list uses, with no download: `python3 -I -B scripts/i18n/i18n_tool.py pickerfonts`
 - **Parity capture:** capture the routes in a language, or `pseudo` for padded English: `scripts/parity/run.sh capture --language <code> <out dir>`
 
 <Details>
@@ -81,8 +83,9 @@ You need Python 3 (standard library only) and GNU gettext's `msgfmt` (`brew inst
 
 - **`selftest`** runs the gates on 155 planted cases (115 for the line, plural, comment and sibling gates, 9 for the release gates, 16 for the glossary on its real terms and 15 broken copies of the glossary and style guides). It fails if any planted error passes or any clean line fails.
 - **`glossary`** checks that every one of the 10 languages' 11 files (Italian and Ukrainian, Tier 1, are not covered yet) has a form for every term and a guide with the same sections, that every word is in its language's alphabet, and that a term still left to reviewers requires nothing. It exits 1 on any problem.
-- **`fonts`** downloads the Noto Sans CJK 2.004 release files from GitHub into the folder (unless they are there), checks each font's SHA-256, and cuts Noto Sans JP, KR, SC and TC down to each language's fixed common character set with HarfBuzz's `hb-subset` (`brew install harfbuzz`). It writes the symbols font Roboto chains and the character lists in `apps/game/tests/support/cjk_charsets.json`, and prints the sizes. Its output is committed, so it only runs again to change a character set.
-- **Parity capture:** takes any language of `apps/game/i18n/languages.json`, or `pseudo` for English with Godot's pseudolocalization (brackets and 30% padding). Every still's entry in `shots.json` lists the visible text that overflows its control, the characters its font cannot draw and, under `pseudo`, the text that was not translated.
+- **`fonts`** downloads the Noto Sans CJK 2.004 release files from GitHub into the folder (unless they are there), checks each font's SHA-256, and cuts Noto Sans JP, KR, SC and TC down to each language's fixed common character set with HarfBuzz's `hb-subset` (`brew install harfbuzz`). It writes the symbols font Roboto chains and the character lists in `apps/game/tests/support/cjk_charsets.json`, then runs `pickerfonts`, and prints the sizes. Its output is committed, so it only runs again to change a character set.
+- **`pickerfonts`** cuts each CJK language's own name and "machine translation" tag out of its committed subset (`picker_font` in `languages.json`) and gives the cut Montserrat's line height, so the list's rows keep their height.
+- **Parity capture:** takes any language of `apps/game/i18n/languages.json`, or `pseudo` for English with Godot's pseudolocalization (brackets and 30% padding). Every still's entry in `shots.json` lists the visible text that overflows its control, the characters its font cannot draw and, under `pseudo`, the text that was not translated (the language names, never translated, are left out). A language run, `--language en` included, turns every language on for that run only, so route R1 adds stills of the **GENERAL** tab and the open language list.
 
 </Details>
 
@@ -90,7 +93,7 @@ You need Python 3 (standard library only) and GNU gettext's `msgfmt` (`brew inst
 
 - **`godot` job:** regenerates the template and fails when the committed one differs.
 - **`i18n` job:** `selftest`, `glossary`, `potfiles --check` and `check`. It needs no Godot.
-- **Headless suite:** `i18n_test` checks the language table, locale lookup and fonts. What it found: [What was checked](/docs/development/evidence/#languages-october-16-2026).
+- **Headless suites:** `i18n_test` checks the language table, locale lookup and fonts, including the language list's own font chain; `settings_test` checks the **LANGUAGE** row and its saved setting. What it found: [What was checked](/docs/development/evidence/#languages-october-16-2026).
 - **Every suite runs in English** (`--language en`), whatever your computer's language.
 
 ## Add a language (later)

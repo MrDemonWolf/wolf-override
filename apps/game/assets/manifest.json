@@ -750,6 +750,16 @@
       "implementation_status": "In the build since localization PR L4 (2026-10-16) as the Japanese fallback font (apps/game/i18n/languages.json, fallback_font), chained behind the game fonts by I18n only while Japanese is on. Japanese is not offered yet, so players never see it; tests/i18n_test.gd checks it draws its whole list and stays within decision D7's size budget. Not seen on screen in the game build."
     },
     {
+      "asset_id": "noto-sans-jp-picker-font",
+      "path": "apps/game/assets/fonts/NotoSansJP-Picker.otf",
+      "source_or_tool": "Cut from apps/game/assets/fonts/NotoSansJP-Subset.otf (entry noto-sans-jp-subset-font) with hb-subset (HarfBuzz 14.6.0) and its vertical metrics rewritten to Montserrat-Variable.ttf's by `python3 -I -B scripts/i18n/i18n_tool.py pickerfonts` (picker_fonts, match_vertical_metrics), 2026-10-19, localization PR L6.",
+      "source_reference": "https://github.com/notofonts/noto-cjk/releases/tag/Sans2.004 (same font as noto-sans-jp-subset-font)",
+      "terms_reference": "SIL Open Font License 1.1; bundled license text is in apps/game/assets/fonts/NotoSansJP-OFL.txt",
+      "rights_review_status": "Redistributed under SIL Open Font License 1.1 as a Modified Version (a subset with changed vertical metrics); license text with the copyright notice included beside it. The only Reserved Font Name is 'Source', so the subset keeps the Noto name (localization decision D7).",
+      "modifications": "Subset only, outlines unchanged: the 7 characters of the Japanese picker name 日本語 and its 'machine translation' tag 機械翻訳 (日本械機翻訳語). The hhea and OS/2 ascender, descender, line gap and win ascent and descent were set to Montserrat's, scaled to the font's units per em and rounded toward zero, so it never makes the language list's rows taller. 3,868 B, SHA-256 7cb6ccbd3afb3bd8a931019d07701f090def5d8b43aafb4044e80f088a88a27a. Godot import with allow_system_fallback off.",
+      "implementation_status": "In the build since localization PR L6 (2026-10-19) as one of the language list's own fallbacks (apps/game/i18n/languages.json, picker_font; I18n.picker_font), behind the list's Montserrat in every language. The LANGUAGE row stays hidden until a second language is offered, so players do not see it yet; tests/i18n_test.gd checks the list's chain draws every name and tag."
+    },
+    {
       "asset_id": "noto-sans-kr-subset-font",
       "path": "apps/game/assets/fonts/NotoSansKR-Subset.otf",
       "source_or_tool": "Noto Sans CJK KR 2.004 (Adobe and Google), the release's region-specific subset OTF NotoSansKR-Regular.otf (4,644,748 B, SHA-256 69975a0ac8472717870aefeab0a4d52739308d90856b9955313b2ad5e0148d68) from the notofonts/noto-cjk GitHub release Sans2.004 (2022-01-27, asset 17_NotoSansKR.zip), downloaded 2026-10-16; cut down with hb-subset (HarfBuzz 14.6.0) by `python3 -I -B scripts/i18n/i18n_tool.py fonts <cache>`, which checks that SHA-256 before cutting.",
@@ -758,6 +768,16 @@
       "rights_review_status": "Redistributed under SIL Open Font License 1.1 as a Modified Version (a subset); license text with the copyright notice included beside it. The only Reserved Font Name is 'Source', so the subset keeps the Noto name (localization decision D7, settled October 16, 2026).",
       "modifications": "Subset only, no outlines changed: 3,203 characters (KS X 1001 rows 1-12 (symbols and jamo) and its 2,350 Hangul syllables, and all compatibility jamo (no hanja), CJK symbols and punctuation, the full-width forms and the language's own picker name and 'machine translation' tag; Latin, Greek and Cyrillic below U+2000 left out because the game fonts draw them first; left out of the wanted set: 14 symbols of KS X 1001 rows 1-12 the Noto font lacks (superscript n, subscript digits, vulgar fractions, ∼, ≒, ◈)). 477,944 B, SHA-256 5d50bedd0950ef057c8528247215f04d4aeeddf493721302c1c573803a6fc7f5. The character list is apps/game/tests/support/cjk_charsets.json. Godot import with allow_system_fallback off.",
       "implementation_status": "In the build since localization PR L4 (2026-10-16) as the Korean fallback font (apps/game/i18n/languages.json, fallback_font), chained behind the game fonts by I18n only while Korean is on. Korean is not offered yet, so players never see it; tests/i18n_test.gd checks it draws its whole list and stays within decision D7's size budget. Not seen on screen in the game build."
+    },
+    {
+      "asset_id": "noto-sans-kr-picker-font",
+      "path": "apps/game/assets/fonts/NotoSansKR-Picker.otf",
+      "source_or_tool": "Cut from apps/game/assets/fonts/NotoSansKR-Subset.otf (entry noto-sans-kr-subset-font) with hb-subset (HarfBuzz 14.6.0) and its vertical metrics rewritten to Montserrat-Variable.ttf's by `python3 -I -B scripts/i18n/i18n_tool.py pickerfonts` (picker_fonts, match_vertical_metrics), 2026-10-19, localization PR L6.",
+      "source_reference": "https://github.com/notofonts/noto-cjk/releases/tag/Sans2.004 (same font as noto-sans-kr-subset-font)",
+      "terms_reference": "SIL Open Font License 1.1; bundled license text is in apps/game/assets/fonts/NotoSansKR-OFL.txt",
+      "rights_review_status": "Redistributed under SIL Open Font License 1.1 as a Modified Version (a subset with changed vertical metrics); license text with the copyright notice included beside it. The only Reserved Font Name is 'Source', so the subset keeps the Noto name (localization decision D7).",
+      "modifications": "Subset only, outlines unchanged: the 7 characters of the Korean picker name 한국어 and its 'machine translation' tag 기계 번역 (계국기번어역한). The hhea and OS/2 ascender, descender, line gap and win ascent and descent were set to Montserrat's, scaled to the font's units per em and rounded toward zero, so it never makes the language list's rows taller. 2,684 B, SHA-256 91e01578a94eb8327425ffff89f9f2205218b4a2a8ec9e4bda653ac2a50d1126. Godot import with allow_system_fallback off.",
+      "implementation_status": "In the build since localization PR L6 (2026-10-19) as one of the language list's own fallbacks (apps/game/i18n/languages.json, picker_font; I18n.picker_font), behind the list's Montserrat in every language. The LANGUAGE row stays hidden until a second language is offered, so players do not see it yet; tests/i18n_test.gd checks the list's chain draws every name and tag."
     },
     {
       "asset_id": "noto-sans-sc-subset-font",
@@ -770,6 +790,16 @@
       "implementation_status": "In the build since localization PR L4 (2026-10-16) as the Simplified Chinese fallback font (apps/game/i18n/languages.json, fallback_font), chained behind the game fonts by I18n only while Simplified Chinese is on. Simplified Chinese is not offered yet, so players never see it; tests/i18n_test.gd checks it draws its whole list and stays within decision D7's size budget. Not seen on screen in the game build."
     },
     {
+      "asset_id": "noto-sans-sc-picker-font",
+      "path": "apps/game/assets/fonts/NotoSansSC-Picker.otf",
+      "source_or_tool": "Cut from apps/game/assets/fonts/NotoSansSC-Subset.otf (entry noto-sans-sc-subset-font) with hb-subset (HarfBuzz 14.6.0) and its vertical metrics rewritten to Montserrat-Variable.ttf's by `python3 -I -B scripts/i18n/i18n_tool.py pickerfonts` (picker_fonts, match_vertical_metrics), 2026-10-19, localization PR L6.",
+      "source_reference": "https://github.com/notofonts/noto-cjk/releases/tag/Sans2.004 (same font as noto-sans-sc-subset-font)",
+      "terms_reference": "SIL Open Font License 1.1; bundled license text is in apps/game/assets/fonts/NotoSansSC-OFL.txt",
+      "rights_review_status": "Redistributed under SIL Open Font License 1.1 as a Modified Version (a subset with changed vertical metrics); license text with the copyright notice included beside it. The only Reserved Font Name is 'Source', so the subset keeps the Noto name (localization decision D7).",
+      "modifications": "Subset only, outlines unchanged: the 8 characters of the Simplified Chinese picker name 简体中文 and its 'machine translation' tag 机器翻译 (中体器文机简翻译). The hhea and OS/2 ascender, descender, line gap and win ascent and descent were set to Montserrat's, scaled to the font's units per em and rounded toward zero, so it never makes the language list's rows taller. 3,700 B, SHA-256 2ae00725f927fd16417fd897d91e03c7805bc2e97d4dd2da12b199518ae5ddaf. Godot import with allow_system_fallback off.",
+      "implementation_status": "In the build since localization PR L6 (2026-10-19) as one of the language list's own fallbacks (apps/game/i18n/languages.json, picker_font; I18n.picker_font), behind the list's Montserrat in every language. The LANGUAGE row stays hidden until a second language is offered, so players do not see it yet; tests/i18n_test.gd checks the list's chain draws every name and tag."
+    },
+    {
       "asset_id": "noto-sans-tc-subset-font",
       "path": "apps/game/assets/fonts/NotoSansTC-Subset.otf",
       "source_or_tool": "Noto Sans CJK TC 2.004 (Adobe and Google), the release's region-specific subset OTF NotoSansTC-Regular.otf (5,683,368 B, SHA-256 5bab0cb3c1cf89dde07c4a95a4054b195afbcfe784d69d75c340780712237537) from the notofonts/noto-cjk GitHub release Sans2.004 (2022-01-27, asset 19_NotoSansTC.zip), downloaded 2026-10-16; cut down with hb-subset (HarfBuzz 14.6.0) by `python3 -I -B scripts/i18n/i18n_tool.py fonts <cache>`, which checks that SHA-256 before cutting.",
@@ -778,6 +808,16 @@
       "rights_review_status": "Redistributed under SIL Open Font License 1.1 as a Modified Version (a subset); license text with the copyright notice included beside it. The only Reserved Font Name is 'Source', so the subset keeps the Noto name (localization decision D7, settled October 16, 2026).",
       "modifications": "Subset only, no outlines changed: 5,790 characters (Big5's symbols (A140-A3BF) and its 5,401 frequently used hanzi (A440-C67E), CJK symbols and punctuation, the full-width forms and the language's own picker name and 'machine translation' tag; Latin, Greek and Cyrillic below U+2000 left out because the game fonts draw them first; left out of the wanted set: ‾, ∼ and ≒ (not in the Noto font)). 1,603,408 B, SHA-256 8d1aec23fc8a5416d18642b851b9059dc5a38f0296cfd49b48426a6de9a6ccf0. The character list is apps/game/tests/support/cjk_charsets.json. Godot import with allow_system_fallback off.",
       "implementation_status": "In the build since localization PR L4 (2026-10-16) as the Traditional Chinese fallback font (apps/game/i18n/languages.json, fallback_font), chained behind the game fonts by I18n only while Traditional Chinese is on. Traditional Chinese is not offered yet, so players never see it; tests/i18n_test.gd checks it draws its whole list and stays within decision D7's size budget. Not seen on screen in the game build."
+    },
+    {
+      "asset_id": "noto-sans-tc-picker-font",
+      "path": "apps/game/assets/fonts/NotoSansTC-Picker.otf",
+      "source_or_tool": "Cut from apps/game/assets/fonts/NotoSansTC-Subset.otf (entry noto-sans-tc-subset-font) with hb-subset (HarfBuzz 14.6.0) and its vertical metrics rewritten to Montserrat-Variable.ttf's by `python3 -I -B scripts/i18n/i18n_tool.py pickerfonts` (picker_fonts, match_vertical_metrics), 2026-10-19, localization PR L6.",
+      "source_reference": "https://github.com/notofonts/noto-cjk/releases/tag/Sans2.004 (same font as noto-sans-tc-subset-font)",
+      "terms_reference": "SIL Open Font License 1.1; bundled license text is in apps/game/assets/fonts/NotoSansTC-OFL.txt",
+      "rights_review_status": "Redistributed under SIL Open Font License 1.1 as a Modified Version (a subset with changed vertical metrics); license text with the copyright notice included beside it. The only Reserved Font Name is 'Source', so the subset keeps the Noto name (localization decision D7).",
+      "modifications": "Subset only, outlines unchanged: the 8 characters of the Traditional Chinese picker name 繁體中文 and its 'machine translation' tag 機器翻譯 (中器文機繁翻譯體). The hhea and OS/2 ascender, descender, line gap and win ascent and descent were set to Montserrat's, scaled to the font's units per em and rounded toward zero, so it never makes the language list's rows taller. 4,880 B, SHA-256 850a19477c7a01e11285f96c7e287e0dc6d4f96f1e66f0109cbe2297128e6bae. Godot import with allow_system_fallback off.",
+      "implementation_status": "In the build since localization PR L6 (2026-10-19) as one of the language list's own fallbacks (apps/game/i18n/languages.json, picker_font; I18n.picker_font), behind the list's Montserrat in every language. The LANGUAGE row stays hidden until a second language is offered, so players do not see it yet; tests/i18n_test.gd checks the list's chain draws every name and tag."
     },
     {
       "asset_id": "montserrat-symbols-subset-font",

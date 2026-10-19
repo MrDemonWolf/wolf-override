@@ -3,9 +3,10 @@ extends RefCounted
 ## The game's languages: the one place that knows which languages exist, which one the game shows and
 ## how a line reaches the screen translated. Built in PR L1 of the localization plan (research branch
 ## codex/localization-research at 520cad1, docs/research-2026-10/localization/DESIGN.md and PLAN.md),
-## from the scratch prototype's version (that branch's prototype/evidence/game.patch). Nothing in the
-## game calls it yet: until Phase 1 wires Settings and the text, only English exists and nothing
-## changes on screen.
+## from the scratch prototype's version (that branch's prototype/evidence/game.patch). Since PR L6
+## Settings applies the saved language at start-up and offers the LANGUAGE list (GameSettings), which
+## stays hidden while only English is offered; the game's text is marked in L7, so until then only
+## English exists and nothing changes on screen.
 ##
 ## The rule: English stays the game's internal text. Constants, status_line, saves, comparisons and the
 ## tests keep the English words, and text is translated only where it is drawn, in one of three ways:
@@ -49,13 +50,19 @@ const BASE_FONT_PATHS: Array[String] = ["res://assets/fonts/Roboto-Variable.ttf"
 ## The settings file's section and key for the chosen language (absent: follow the start-up locale).
 const CONFIG_SECTION: String = "general"
 const CONFIG_KEY: String = "language"
+## Metadata name set (true) on a Control whose text is written in its own language and never translated:
+## the language list's names and tags (GameSettings). The pseudolocalization audit (scripts/parity/
+## capture.gd) does not count such text as untranslated, while Controls whose auto-translate is off for
+## other reasons (lines I18n.shown translates) are still checked.
+const OWN_LANGUAGE_META: StringName = &"i18n_own_language"
 ## Pixels a measured size may exceed its room by before [method overflows] calls it an overflow: text
 ## widths are fractional and Controls round their sizes, so an exact fit can measure up to a pixel over.
 const OVERFLOW_TOLERANCE_PX: float = 1.0
 
 ## Every language the table knows, by Godot locale code ("en", "es", "zh_Hant"), in the picker's order,
 ## each a row of languages.json ("name", "enabled", "review", "machine_tag", "fallback_font",
-## "reading_cps", "row_characters" and the tools' fields; the file's "_about" explains each). Read-only:
+## "picker_font", "reading_cps", "row_characters" and the tools' fields; the file's "_about" explains
+## each). Read-only:
 ## the game never changes it. Only rows with "enabled" true are offered (see [method offered]).
 static var LANGUAGES: Dictionary = _load_table()
 ## Extraction marker: KEY.tr(TEXT) returns TEXT untranslated (see the class notes).
@@ -234,6 +241,38 @@ static func use_fallback(language: String) -> void:
 			chain.append(own)
 		if chain != base.fallbacks:
 			base.fallbacks = chain
+
+
+## The language list's own font (DESIGN.md, "Settings: the LANGUAGE option"): a copy of [param base]
+## (the list's FontVariation, Settings' Montserrat Semibold) whose own fallbacks are every language's
+## "picker_font", in table order. A FontVariation with fallbacks of its own uses them instead of its
+## base font's, so this chain never holds the fallback [method use_fallback] puts behind the game fonts,
+## and the game fonts never hold these: 日本語, 한국어, 简体中文 and 繁體中文 and their tags draw in every
+## language, and no Latin line grows (each picker font has Montserrat's vertical metrics, so the list's
+## rows keep their height too; tests/i18n_test.gd checks both).
+## Gotcha: a fallback chain is searched character by character in order, so a character two names
+## share (中, 文, 器, 翻, 機) is drawn by the first picker font that has it; Godot 4.7.2's text server
+## did not prefer a fallback by the run's language (measured with language support overrides set), so
+## the order is the table's and the shared characters' shapes differ only slightly between the regions.
+## A picker font that is not in the build is skipped; the glyph test then fails.
+static func picker_font(base: FontVariation) -> FontVariation:
+	var font: FontVariation = base.duplicate() as FontVariation
+	var chain: Array[Font] = []
+	for code: String in LANGUAGES:
+		var path: Variant = _row(code).get("picker_font")
+		if path is String and ResourceLoader.exists(path as String):
+			chain.append(load(path as String) as Font)
+	font.fallbacks = chain
+	return font
+
+
+## The short "machine translation" tag of [param language], written in that language, while its row's
+## review state is "machine" (PIPELINE.md, "Honest labelling"); "" once it is "reviewed", for the source
+## language, for an unknown code and while the research has given the language no tag (null).
+static func machine_tag(language: String) -> String:
+	var row: Dictionary = _row(language)
+	var tag: Variant = row.get("machine_tag")
+	return tag as String if row.get("review") == "machine" and tag is String else ""
 
 
 ## The bundled fallback font of [param language] ("fallback_font" in its row), or null when it has none

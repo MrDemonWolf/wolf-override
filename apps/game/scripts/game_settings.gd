@@ -1,5 +1,9 @@
 class_name GameSettings
 extends Control
+## The Settings menu, shared by the title and Pause: its DISPLAY, AUDIO, CONTROLS and GENERAL tabs, built
+## in code by [method configure] from the saved settings file, which every change writes back at once
+## ([method _save_extra]). GENERAL holds LANGUAGE (localization PR L6, decision D10) and stays hidden
+## while the game offers one language.
 
 const BODY_FONT: FontVariation = preload("res://assets/fonts/Roboto-Regular.tres")
 const CONTROL_FONT: FontVariation = preload("res://assets/fonts/Montserrat-Semibold.tres")
@@ -17,6 +21,15 @@ const DEFAULT_WINDOW_SIZE: int = 1
 ## tablets, where the OS sizes the window; the V-sync sentence applies everywhere.
 const MOBILE_WINDOW_NOTE: String = "Window size is OS-managed on mobile."
 const VSYNC_NOTE: String = "V-sync may limit the FPS cap."
+## The GENERAL tab's index, after the three older tabs so their indices (which the parity capture, the UI
+## dump and the tests use) stay as they were while the tab is hidden (PR L6).
+const GENERAL_TAB: int = 3
+## The "machine translation" tag's size (px), under a name in the open list and under the LANGUAGE row:
+## smaller than the 16 px names, so the name row keeps its width (DESIGN.md, "Settings").
+const TAG_FONT_PX: int = 12
+## The muted blue-grey of secondary text in this menu: the THE DEN / LOCAL CONFIGURATION subtitle, and
+## since PR L6 the "machine translation" tags, which read as notes beside the names.
+const MUTED_TEXT: Color = Color("#89acbf")
 
 ## Reduced Motion changed; Main hands it to the impact kit (no shake or hit-stop, shorter flashes).
 signal reduced_motion_changed(enabled: bool)
@@ -31,6 +44,12 @@ var vsync: CheckButton
 var antialiasing: OptionButton
 var reduced_motion: CheckButton
 var text_size: OptionButton
+## LANGUAGE on the GENERAL tab: one item per offered language, named in its own language (never
+## translated), each item's metadata its I18n code; an unreviewed language's tag follows as a labelled
+## separator, so it is a second, smaller row nobody can select.
+var language: OptionButton
+## Under LANGUAGE: the chosen language's "machine translation" tag while it is unreviewed, else hidden.
+var language_note: Label
 var volumes: Dictionary = {}
 var binding_buttons: Dictionary = {}
 var defaults: Dictionary = {}
@@ -47,6 +66,10 @@ var mobile: bool = OS.has_feature("ios") or OS.has_feature("android")
 ## they are worked out once and forgotten whenever this menu changes a binding.
 var _key_prompts: Dictionary = {}
 var _pad_prompts: Dictionary = {}
+## The language the player picked (or the file held), written back as [general] language; "" while
+## none was chosen, so the game keeps following the OS (DESIGN.md: no "follow the system" entry; the
+## first run follows the OS, and a pick is kept).
+var _picked_language: String = ""
 @onready var note: Label = $SettingsNote
 
 
@@ -59,6 +82,12 @@ func configure(path: String) -> void:
 	vsync.set_pressed_no_signal(boolean(config, "video", "vsync", true))
 	antialiasing.select(clampi(int(number(config, "video", "msaa_2d", 0)), 0, 3))
 	reduced_motion.set_pressed_no_signal(boolean(config, "video", "reduced_motion", false))
+	# The saved language, or the start-up locale's when none was chosen (I18n.saved), applied before the
+	# menus are drawn; a saved code stays saved even while it is not offered.
+	var saved_language: Variant = config.get_value(I18n.CONFIG_SECTION, I18n.CONFIG_KEY, "")
+	_picked_language = saved_language if saved_language is String else ""
+	I18n.apply(I18n.saved(config))
+	refresh_languages()
 	TextSize.factor = TextSize.nearest_step(number(config, "video", "text_size", 1.0))
 	text_size.select(TextSize.STEPS.find(TextSize.factor))
 	_apply_graphics()
@@ -179,7 +208,7 @@ func _build_menu() -> void:
 	move_child(surface, 0)
 	var subtitle: Label = _label("THE DEN  /  LOCAL CONFIGURATION", 13)
 	subtitle.position = Vector2(34, 15)
-	subtitle.modulate = Color("#89acbf")
+	subtitle.modulate = MUTED_TEXT
 	subtitle.add_theme_font_override("font", CONTROL_FONT)
 	add_child(subtitle)
 	$Title.position.y = 35
@@ -191,6 +220,7 @@ func _build_menu() -> void:
 	tabs.size = Vector2(696, 38)
 	for caption: String in ["DISPLAY", "AUDIO", "CONTROLS"]:
 		tabs.add_tab(caption)
+	tabs.add_tab(I18n.KEY.tr("GENERAL"))
 	add_child(tabs)
 	tabs.tab_changed.connect(select_tab)
 	var display: Control = Control.new()
@@ -279,6 +309,7 @@ func _build_menu() -> void:
 	reset.custom_minimum_size.y = 40
 	controls.add_child(reset)
 	reset.pressed.connect(reset_controls)
+	_build_general_page()
 	$Title.size.x = 690
 	$BackButton.position = Vector2(32, 414)
 	$BackButton.size = Vector2(180, 38)
@@ -292,6 +323,87 @@ func _build_menu() -> void:
 	cancel_button.hide()
 	add_child(cancel_button)
 	cancel_button.pressed.connect(cancel_capture)
+
+
+## The GENERAL page (pages[GENERAL_TAB]), laid out like DISPLAY's left column: the LANGUAGE caption, its
+## list and the tag note under it. The list and the note draw with I18n.picker_font, so every name and
+## tag draws in any language, and never translate (I18n.OWN_LANGUAGE_META marks them for the pseudo
+## audit). [method refresh_languages] fills the list.
+func _build_general_page() -> void:
+	var general: Control = Control.new()
+	general.position = Vector2(32, 126)
+	general.size = Vector2(696, 240)
+	add_child(general)
+	pages.append(general)
+	# The list takes the longest name's width (fit_to_longest_item), at least 300 px: "Español
+	# (Latinoamérica)" is about 250 px, the width DISPLAY could not give (D10).
+	language = _option_row(general, I18n.KEY.tr("LANGUAGE"), Rect2(8, 12, 160, 40), Rect2(183, 12, 300, 40), [])
+	var font: FontVariation = I18n.picker_font(CONTROL_FONT)
+	language.add_theme_font_override(&"font", font)
+	var popup: PopupMenu = language.get_popup()
+	popup.add_theme_font_override(&"font", font)
+	popup.add_theme_font_override(&"font_separator", font)
+	popup.add_theme_font_size_override(&"font_separator_size", TAG_FONT_PX)
+	popup.add_theme_color_override(&"font_separator_color", MUTED_TEXT)
+	for side: StringName in [&"labeled_separator_left", &"labeled_separator_right"]:
+		popup.add_theme_stylebox_override(side, StyleBoxEmpty.new())
+	language_note = _label("", TAG_FONT_PX)
+	language_note.position = Vector2(183, 56)
+	language_note.size = Vector2(300, 20)
+	language_note.modulate = MUTED_TEXT
+	language_note.add_theme_font_override(&"font", font)
+	general.add_child(language_note)
+	for control: Node in [language, popup, language_note]:
+		control.auto_translate_mode = Node.AUTO_TRANSLATE_MODE_DISABLED
+		control.set_meta(I18n.OWN_LANGUAGE_META, true)
+	language.item_selected.connect(func(index: int) -> void: pick_language(str(language.get_item_metadata(index))))
+
+
+## Fills LANGUAGE with I18n.offered(), each language's tag under it while it is unreviewed, shows the
+## current language as chosen, and hides the GENERAL tab while only one language is offered ("With one
+## language it stays hidden", PLAN.md L6). Called by [method configure]; a test that turns a language on
+## in I18n.LANGUAGES calls it again.
+func refresh_languages() -> void:
+	language.clear()
+	var offered: PackedStringArray = I18n.offered()
+	for code: String in offered:
+		language.add_item(str((I18n.LANGUAGES[code] as Dictionary)["name"]))
+		language.set_item_metadata(language.item_count - 1, code)
+		var tag: String = I18n.machine_tag(code)
+		if not tag.is_empty():
+			language.add_separator(tag)
+	tabs.set_tab_hidden(GENERAL_TAB, offered.size() < 2)
+	_show_language()
+
+
+## Switches the game to [param code] (an offered language) for good: applies it, which redraws every
+## auto-translating Control and, through NOTIFICATION_TRANSLATION_CHANGED, this list, and saves it as
+## [general] language.
+func pick_language(code: String) -> void:
+	_picked_language = code
+	I18n.apply(code)
+	_save_extra()
+
+
+## Shows the game's current language as LANGUAGE's choice, and its tag under the row while it is
+## unreviewed. The current language is read from TranslationServer, so a change made anywhere (this
+## list, a capture or a test calling I18n.apply) shows here.
+func _show_language() -> void:
+	var code: String = I18n.resolve(TranslationServer.get_locale())
+	for index: int in language.item_count:
+		if language.get_item_metadata(index) == code:
+			language.select(index)
+	# The closed button shapes the name as its own language (TextServer's language for the run).
+	language.language = code
+	language_note.text = I18n.machine_tag(code)
+	language_note.visible = not language_note.text.is_empty()
+
+
+## The language list follows the game's language however it changed (the prototype's bug: a list that
+## kept showing the old choice after a change made elsewhere).
+func _notification(what: int) -> void:
+	if what == NOTIFICATION_TRANSLATION_CHANGED and language != null:
+		_show_language()
 
 
 func _page_box() -> VBoxContainer:
@@ -315,7 +427,7 @@ func _label(caption: String, font_size: int) -> Label:
 ## [param label_rect]'s position (and at its size, unless that is zero, when the label keeps its own),
 ## then an OptionButton at [param option_rect] (page px) holding [param items] in order, label first in
 ## the tree. Returns the OptionButton; the caller connects it and sets anything else. The DISPLAY
-## page's EDGE SMOOTHING and TEXT SIZE rows are made with it.
+## page's EDGE SMOOTHING and TEXT SIZE rows and the GENERAL page's LANGUAGE row are made with it.
 func _option_row(page: Control, caption: String, label_rect: Rect2, option_rect: Rect2, items: Array[String]) -> OptionButton:
 	var label: Label = _label(caption, 16)
 	label.position = label_rect.position
@@ -389,7 +501,7 @@ func select_tab(index: int) -> void:
 		pages[page_index].visible = page_index == index
 	for node: CanvasItem in display_nodes:
 		node.visible = index == 0
-	note.text = [display_note(), "Volume changes apply immediately. Effects carries every sound effect; there is no music or voice yet.", "Select a binding, then press a key, controller button or move a stick."][index]
+	note.text = [display_note(), "Volume changes apply immediately. Effects carries every sound effect; there is no music or voice yet.", "Select a binding, then press a key, controller button or move a stick.", I18n.KEY.tr("Until you choose a language, the game uses your system's.")][index]
 
 
 ## The Display tab's note: the window-size sentence only where the OS manages the window (Q10).
@@ -592,6 +704,8 @@ func _save_extra() -> bool:
 	config.set_value("video", "msaa_2d", antialiasing.selected)
 	config.set_value("video", "reduced_motion", reduced_motion.button_pressed)
 	config.set_value("video", "text_size", TextSize.factor)
+	if not _picked_language.is_empty():
+		config.set_value(I18n.CONFIG_SECTION, I18n.CONFIG_KEY, _picked_language)
 	for bus: String in BUSES:
 		config.set_value("audio", bus, (volumes[bus] as HSlider).value)
 	config.set_value("controls", "deadzone", deadzone.value)

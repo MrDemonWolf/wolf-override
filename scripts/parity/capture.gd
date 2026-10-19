@@ -29,7 +29,10 @@ extends SceneTree
 ## visible text controls that overflow by I18n.overflows(), the characters their font chain cannot draw
 ## by I18n.missing_glyphs(), and under pseudo the visible text that did not go through translation. The
 ## audit is the review evidence the language PRs file beside their stills; it reads the screen after the
-## still is saved, so it never changes a still.
+## still is saved, so it never changes a still. A language run (also --language=en) offers every language
+## whose fonts are in the build, as Settings will once more languages ship, so R1 adds two stills of the
+## GENERAL tab, its LANGUAGE row and the open list (PR L6); the English parity run, with no --language,
+## keeps English alone and its stills as before.
 ##
 ## Usage (inside render.sh): godot --fixed-fps 60 --script res://review_capture/capture.gd --
 ##        --route=R1|R2|R3|R4 --out=/work/out --size=1280x720 --variant=kb-fx|kb-calm|touch-fx
@@ -214,7 +217,8 @@ func _sample() -> void:
 # ---------------------------------------------------------------- routes
 
 ## R1: title and menus. Title reveal, Credits (top and part-scrolled), Changelog (top and scrolled),
-## Settings (three tabs, a rebind prompt and the saved binding), controller prompts on the title,
+## Settings (three tabs, a rebind prompt and the saved binding; in a language run also GENERAL and the
+## open language list), controller prompts on the title,
 ## Pause during the opening (SKIP OPENING), Pause and its Settings in play, the rebound key in a hint,
 ## the title's Continue note with a save present, Continue, and the END OF SLICE card.
 func _route_1() -> void:
@@ -256,6 +260,15 @@ func _route_1() -> void:
 	await _key(KEY_F)
 	await _raw(10)
 	await _shot("settings-rebind-saved")
+	if not language.is_empty():
+		menu.tabs.current_tab = GameSettings.GENERAL_TAB
+		await _raw(20)
+		await _shot("settings-general")
+		menu.language.show_popup()
+		await _raw(20)
+		await _shot("settings-language-list")
+		menu.language.get_popup().hide()
+		await _raw(10)
 	_press("CanvasLayer/PauseOverlay/Panel/SettingsMenu/BackButton")
 	await _raw(30)
 	_press("CanvasLayer/TitleScreen/NewGameButton")
@@ -865,16 +878,27 @@ func _shot(slug: String) -> void:
 ## font). An unknown code fails the run and returns false, so a typo never gives an English run that
 ## looks like a language run.
 func _use_language(code: String) -> bool:
+	if code != "pseudo" and not I18n.LANGUAGES.has(code):
+		_fail("unknown --language %s (I18n.LANGUAGES has %s, plus pseudo)" % [code, ", ".join(PackedStringArray(I18n.LANGUAGES.keys()))])
+		return false
+	_offer_every_language()
 	if code == "pseudo":
 		I18n.apply("en")
 		TranslationServer.reload_pseudolocalization()
 		TranslationServer.pseudolocalization_enabled = true
 		return true
-	if not I18n.LANGUAGES.has(code):
-		_fail("unknown --language %s (I18n.LANGUAGES has %s, plus pseudo)" % [code, ", ".join(PackedStringArray(I18n.LANGUAGES.keys()))])
-		return false
 	I18n.apply(code)
 	return true
+
+
+## Turns on, in this run's I18n.LANGUAGES only, every language whose fonts are in the build, so Settings
+## shows the GENERAL tab and the full LANGUAGE list a language PR's reviewer needs to see; languages.json
+## is not touched. Settings applies the start-up locale at load, which _use_language has set, so the run
+## still plays in the language asked for.
+func _offer_every_language() -> void:
+	for code: String in I18n.LANGUAGES:
+		if I18n.font_chain_complete(code):
+			(I18n.LANGUAGES[code] as Dictionary)["enabled"] = true
 
 
 ## The language audit of the frame on screen, for shots.json: every visible Label, Button and
@@ -882,7 +906,8 @@ func _use_language(code: String) -> bool:
 ## characters their own theme font cannot draw with its fallbacks ("missing_glyphs", by
 ## I18n.missing_glyphs, so no OS font hides a gap), and under pseudo the ones whose text has letters but
 ## no pseudolocalization bracket ("untranslated": text no tr() reached; a line split into boxes keeps
-## "[" on its first box and "]" on its last, so either bracket counts). Each finding names the control
+## "[" on its first box and "]" on its last, so either bracket counts; text marked
+## I18n.OWN_LANGUAGE_META, such as the language names, is never translated and not counted). Each finding names the control
 ## by its path under Main and quotes its text as drawn. Gotcha: I18n.text_cut switches a trimming
 ## control's trimming off and back on to measure it, which re-sorts a Container parent on the next frame
 ## to the same layout; it runs after the still is saved.
@@ -907,7 +932,7 @@ func _audit() -> Dictionary:
 			missing.append("%s missing %s" % [where, gaps])
 		if I18n.overflows(control):
 			overflows.append(where)
-		if language == "pseudo" and not shown.contains("[") and not shown.contains("]") and _has_words(shown):
+		if language == "pseudo" and not control.has_meta(I18n.OWN_LANGUAGE_META) and not shown.contains("[") and not shown.contains("]") and _has_words(shown):
 			untranslated.append(where)
 	var found: Dictionary = {"texts": texts, "overflows": overflows, "missing_glyphs": missing}
 	if language == "pseudo":
