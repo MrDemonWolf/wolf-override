@@ -33,9 +33,10 @@ const audiences = [
   { href: '/docs/development/', kicker: 'I want to build it', title: 'Build it' },
 ] as const;
 
-// An audience link in the hero; the border and text light up on hover. 3.25rem tall, above the 44px target.
+// An audience link in the hero; the border and text light up on hover. 3.25rem tall (3rem on phones, so the version link
+// still shows on a 390x844 first screen), both above the 44px target.
 const audienceLink =
-  'flex min-h-13 flex-col justify-center gap-[.15rem] rounded-control border border-line-strong bg-surface/92 px-4 py-[.6rem] transition-[background-color,border-color,color] duration-180 ease-[ease] hover-always:border-accent hover-always:text-accent motion-reduce:transition-none';
+  'flex min-h-13 flex-col justify-center gap-[.15rem] rounded-control border border-line-strong bg-surface/92 px-4 py-[.6rem] transition-[background-color,border-color,color] duration-180 ease-[ease] hover-always:border-accent hover-always:text-accent motion-reduce:transition-none phone:min-h-12 phone:py-[.5rem]';
 
 /**
  * Current source-build captures for the gameplay section, made with tools/render/render.sh (see each
@@ -166,14 +167,14 @@ export default function HomePage() {
             fetchPriority="high"
             decoding="async"
           />
-          <div className="ml-[48%] w-[min(48%,660px)] max-w-[660px] pt-32 pr-8 pb-20 compact:ml-[46%] compact:w-[51%] phone:m-0 phone:w-full phone:max-w-none phone:px-5 phone:pt-86 phone:pb-5">
+          <div className="ml-[48%] w-[min(48%,660px)] max-w-[660px] pt-32 pr-8 pb-20 compact:ml-[46%] compact:w-[51%] phone:m-0 phone:w-full phone:max-w-none phone:px-5 phone:pt-83 phone:pb-5">
             <p className="hud-label mb-5">Sci-fi horror · In development</p>
-            <h1 id="main-content" tabIndex={-1} className="mb-[1.65rem] text-[clamp(4.5rem,8.8vw,8.2rem)] leading-[.95] font-bold tracking-[-.055em] phone:mb-4 phone:text-[clamp(3rem,12.5vw,4.5rem)]">
+            <h1 id="main-content" tabIndex={-1} className="mb-[1.65rem] text-[clamp(4.5rem,8.8vw,8.2rem)] leading-[.95] font-bold tracking-[-.055em] phone:mb-3 phone:text-[clamp(3rem,12.5vw,4.5rem)]">
               WOLF <br />OVERRIDE
             </h1>
             <p className="mb-4 text-[clamp(1.4rem,2.3vw,2rem)] leading-[1.35] phone:mb-[.8rem] phone:text-[1.3rem]">WOLF has a will of his own.</p>
             <p className="max-w-[38ch] leading-[1.75] text-[#cfdee4] phone:max-w-[42ch]">Explore THE DEN as the engineer. WOLF chooses whether to help; if he refuses, you can take the manual route.</p>
-            <nav aria-label="Start here" className="mt-8 grid grid-cols-3 gap-3 compact:grid-cols-1 phone:mt-6 phone:grid-cols-1 phone:gap-2">
+            <nav aria-label="Start here" className="mt-8 grid grid-cols-3 gap-3 compact:grid-cols-1 phone:mt-5 phone:grid-cols-1 phone:gap-2">
               {audiences.map(({ href, kicker, title }) => (
                 <Link key={href} href={href} className={audienceLink}>
                   <span className="text-caption text-muted">{kicker}</span>
@@ -181,7 +182,7 @@ export default function HomePage() {
                 </Link>
               ))}
             </nav>
-            <p className="mt-3 flex flex-wrap items-center gap-x-3 text-caption text-[#bdd0d9]">
+            <p className="mt-3 flex flex-wrap items-center gap-x-3 phone:mt-2 text-caption text-[#bdd0d9]">
               <span>Test builds and source available · No release date</span>
               <Link className="inline-flex min-h-11 items-center text-accent underline underline-offset-4" href="/docs/changelog/">Version {version}: what changed</Link>
             </p>
