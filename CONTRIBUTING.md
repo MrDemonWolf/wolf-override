@@ -59,7 +59,9 @@ The [setup](https://wolfoverride.mrdemonwolf.dev/docs/development/setup/),
 and [project rules](https://wolfoverride.mrdemonwolf.dev/docs/development/rules/)
 pages describe the commands, their limits and the rules in more detail.
 The [contributing](https://wolfoverride.mrdemonwolf.dev/docs/development/contributing/)
-page has the steps from issue to pull request.
+page has the steps from issue to pull request, and the
+[docs style guide](https://wolfoverride.mrdemonwolf.dev/docs/development/style-guide/)
+says how to write a guide page.
 
 ## Branches and pull requests
 
