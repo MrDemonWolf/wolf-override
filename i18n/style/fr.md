@@ -38,10 +38,10 @@ As written; possessives with "de %s".
 - **SERVICE JUNCTION**: a reviewer's word.
 - **PR L10's choices (proposals for a reviewer):** LOCKDOWN is VERROUILLAGE, because CONFINEMENT is the
   opening card's CONTAINMENT; TANK RELEASE is LARGAGE RÉSERVOIR, and the tank *le réservoir*; SERVICE
-  JUNCTION is JONCTION DE SERVICE; the seal (OPEN THE SEAL) is *le sas*.
+  JUNCTION is JONCTION DE SERVICE; the seal (OPEN THE SEAL) is *le sas*; VALVE USED is VANNE ÉPUISÉE (spent).
 - **The gender gate and participles:** the French rule flags any word in -é or -ée on a line that
   addresses the player, so PR L10 says *vient de sauter* rather than *a sauté*, even about a machine.
 - **Words cut to fit (PR L10)**: NEW GAME is JOUER (it pairs with REJOUER), COOLANT RELAY is RELAIS
   REFROID. (the full words ran into MANUAL BYPASS from 125% TEXT SIZE up; the hints keep *relais de
-  refroidissement*), VALVE USED is VANNE VIDE, TEXT SIZE is TEXTE, and the title's credit line says
+  refroidissement*), TEXT SIZE is TEXTE, and the title's credit line says
   *Développement aidé par IA*. Each cut is noted on its line in `fr.po`.

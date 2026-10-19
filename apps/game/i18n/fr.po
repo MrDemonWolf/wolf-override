@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: WOLF OVERRIDE\n"
-"PO-Revision-Date: 2026-10-19 17:37+0000\n"
+"PO-Revision-Date: 2026-10-19 18:35+0000\n"
 "Last-Translator: Claude (Anthropic), machine translation, unreviewed\n"
 "Language-Team: none\n"
 "MIME-Version: 1.0\n"
@@ -1182,11 +1182,11 @@ msgid "BREAKER USED"
 msgstr "DISJONCTEUR UTILISÉ"
 
 # machine-translated by Claude (Anthropic), unreviewed
-#. TRANSLATORS: Station plate (12-13 px label on a machine). ALL CAPS, as short as possible. The junction's valve after the blast used the line up. Cut to fit: VANNE UTILISÉE ran into DOOR DOWN, so VANNE VIDE (the line is spent).
+#. TRANSLATORS: Station plate (12-13 px label on a machine). ALL CAPS, as short as possible. The junction's valve after the blast used the line up.
 #. i18n: speaker=ui
 #: scripts/junction_room.gd:1533
 msgid "VALVE USED"
-msgstr "VANNE VIDE"
+msgstr "VANNE ÉPUISÉE"
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: Station plate (12-13 px label on a machine). ALL CAPS, as short as possible. The junction's exit hatch, open.
@@ -1987,7 +1987,7 @@ msgstr "Nuage de liquide de refroidissement. Sors-en."
 #. i18n: speaker=hint engineer=you
 #: scripts/main.gd:5242
 msgid "It's after you. Get back over the rubble."
-msgstr "Elle te poursuit. Repasse derrière les décombres."
+msgstr "La sentinelle te poursuit. Repasse derrière les décombres."
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: Hint bar (14 px, about 526 px wide on a keyboard and 488 px on touch; wraps). It: the sentry; the mark is the painted spot under the tank.
@@ -2002,7 +2002,7 @@ msgstr "Attends que WOLF la gare sur le repère."
 #: scripts/main.gd:5247
 #, c-format
 msgid "%s: drop the tank. It's parked on the mark."
-msgstr "%s : lâche le réservoir. Elle est sur le repère."
+msgstr "%s : lâche le réservoir. La sentinelle est sur le repère."
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: Hint bar (14 px, about 526 px wide on a keyboard and 488 px on touch; wraps). %s is the key, button or touch word the player uses (it is filled in after translation); keep it first and keep the colon.
