@@ -18,8 +18,8 @@ const FILL_ALPHA: float = 0.85
 ## stations' status lights use): this many times the glass's size, at this alpha. It is what lets a
 ## working screen pull the eye from across the room, and its colour change (the MIRROR PORT's cyan to
 ## green once copied) shows on the wall round it, not only on the small glass.
-const HALO_SPREAD: float = 1.9
-const HALO_ALPHA: float = 0.5
+const HALO_SPREAD: float = 3.0
+const HALO_ALPHA: float = 0.8
 ## The readout's rows: their share of the glass's width, top to bottom. Fixed, so a still is the same
 ## every run; short and long rows read as a log, not as words.
 const ROWS: PackedFloat32Array = [0.72, 0.55, 0.83, 0.4, 0.66, 0.5]
