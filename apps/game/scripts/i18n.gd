@@ -185,6 +185,25 @@ static func saved(config: ConfigFile) -> String:
 	return resolve(value if value is String and not (value as String).is_empty() else TranslationServer.get_locale())
 
 
+## The language the game shows now: TranslationServer's locale when it is a code of [member LANGUAGES]
+## (also one [method apply] switched to before its PR offers it, as tests and captures do), else the
+## table's language for it ([method table_language]) when the table has that, else [constant FALLBACK].
+## Pseudolocalization keeps English's code. Read by DialogueBoxes for its per-language rules (PR L7d).
+static func current() -> String:
+	var locale: String = TranslationServer.get_locale()
+	if LANGUAGES.has(locale):
+		return locale
+	var language: String = table_language(locale)
+	return language if LANGUAGES.has(language) else FALLBACK
+
+
+## [param language]'s value of [param field] in [member LANGUAGES] ("reading_cps", "row_characters"),
+## or [param otherwise] when the language is unknown or the value is null (not yet sourced).
+static func rule(language: String, field: String, otherwise: Variant) -> Variant:
+	var value: Variant = _row(language).get(field)
+	return otherwise if value == null else value
+
+
 ## Switches the game to [param code]: puts that language's fallback font (and only that one) behind the
 ## game fonts, keeps only that language's catalogs registered, then sets TranslationServer's locale,
 ## which notifies every node (NOTIFICATION_TRANSLATION_CHANGED) so auto-translating Controls redraw.
