@@ -1062,15 +1062,9 @@ func _hide_changelog() -> void:
 ## hood, sign and door light over it, and the wall's near end with the status lamp over the actors.
 func _setup_corridor_door() -> void:
 	# The doorway belongs to the corridor's plates: it shows whenever they do (the opening too).
-	var behind: Node2D = corridor_depth.behind
-	DoorKit.hole_light(behind, "SealHoleLight", SEAL_HOLE, SEAL_HOLE_LIGHT)
-	DoorKit.piece(behind, SEAL_BACK, SEAL_BACK_AT, "CorridorSealBack")
 	blast_leaf = BlastLeaf.new(SEAL_BLAST_LEAF)
 	blast_leaf.visible = false
-	behind.add_child(blast_leaf)
-	DoorKit.glow(behind, "SealPool", SEAL_POOL, 5.0, DoorKit.DOOR_LIGHT_COLOR, 0.3, 0.3)
-	DoorKit.glow(behind, "SealGraze", SEAL_GRAZE, 2.5, DoorKit.DOOR_LIGHT_COLOR, 0.15, 3.0)
-	seal_wall = DoorKit.piece(behind, SEAL_WALL, SEAL_WALL_AT, "CorridorSealWall", DoorKit.WALL_LIFT)
+	seal_wall = DoorKit.doorway(corridor_depth.behind, "CorridorSeal", SEAL_HOLE, SEAL_HOLE_LIGHT, SEAL_BACK, SEAL_BACK_AT, 1.0, blast_leaf, SEAL_POOL, SEAL_GRAZE, SEAL_WALL, SEAL_WALL_AT)
 	# Over the mid plate (after it in the room, on its layer), under the stations and the actors.
 	var over: Node2D = Node2D.new()
 	over.name = "CorridorSealOver"
