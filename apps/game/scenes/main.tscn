@@ -440,6 +440,7 @@ grow_horizontal = 0
 theme_type_variation = &"TouchButton"
 theme_override_font_sizes/font_size = 23
 text = "USE"
+autowrap_mode = 3
 
 [node name="Choice1" type="Button" parent="CanvasLayer/TouchControls"]
 visible = false
@@ -654,19 +655,21 @@ text = "[center][color=#73DDF5]ORIGINAL CONCEPT, CORE STORY & CREATIVE VISION[/c
 
 [node name="CreditsBackButton" type="Button" parent="CanvasLayer/TitleScreen/CreditsScreen"]
 offset_left = 189.0
-offset_top = 453.0
+offset_top = 439.0
 offset_right = 407.0
-offset_bottom = 502.0
+offset_bottom = 503.0
 theme_override_font_sizes/font_size = 19
 text = "BACK TO TITLE"
+autowrap_mode = 3
 
 [node name="CreditsPauseButton" type="Button" parent="CanvasLayer/TitleScreen/CreditsScreen"]
 offset_left = 553.0
-offset_top = 453.0
+offset_top = 439.0
 offset_right = 771.0
-offset_bottom = 502.0
+offset_bottom = 503.0
 theme_override_font_sizes/font_size = 19
 text = "PAUSE SCROLL"
+autowrap_mode = 3
 
 [node name="ChangelogScreen" type="ColorRect" parent="CanvasLayer/TitleScreen"]
 visible = false

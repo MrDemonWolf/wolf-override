@@ -369,8 +369,10 @@ func _build_menu() -> void:
 	# translates it and the Label must not translate it again.
 	note.auto_translate_mode = Node.AUTO_TRANSLATE_MODE_DISABLED
 	cancel_button = Button.new()
-	cancel_button.position = Vector2(548, 414)
-	cancel_button.size = Vector2(180, 38)
+	# 260 px, right-aligned with the page at x 728: CANCEL REBIND in another language, or padded 30% by
+	# pseudolocalization, outgrew the 180 px it had (localization PR L8). BACK ends at x 212.
+	cancel_button.position = Vector2(468, 414)
+	cancel_button.size = Vector2(260, 38)
 	cancel_button.text = "CANCEL REBIND"
 	cancel_button.hide()
 	add_child(cancel_button)
