@@ -40,6 +40,13 @@ Changes merged after 0.15.0. They become the next version when it is cut.
 - Guide pages have one main landmark for screen readers instead of two.
 - The README follows the MrDemonWolf house layout: short status bullets, a pick-your-path table linking Play, Get the game and Develop, current features, the scripts from package.json and the main folders.
 - The landing page and every guide page end with "© 2026 WOLF OVERRIDE by MrDemonWolf, Inc." and a link to the commit the site was built from.
+- New Install a test build page: numbered macOS and Windows steps, warnings and system requirements, moved out of Testing.
+- Get the game is the one home for install steps; Start here, Setup and Troubleshooting link to it.
+- New Platforms and languages page: what runs where today; English only, more languages planned.
+- New Support and bug reports page: GitHub issues, F12 bug captures, security reports and Discord. Troubleshooting, FAQ, Accessibility and the landing footer link to it.
+- About the game lists how it plays as short bullets; the story text is unchanged.
+- Privacy matches the code again: the debug unlock line, no language setting, the system language read at start, bug captures and the guide's search; checked October 18, 2026.
+- Legal's website privacy section is now one line linking Privacy.
 
 -- Development --
 - The game's version lives in one place, apps/game/project.godot; the macOS and Windows test builds now take it from there instead of 0.0.0.
@@ -49,9 +56,10 @@ Changes merged after 0.15.0. They become the next version when it is cut.
 - New rule: every pull request that changes the game, the site or the tools adds its lines under Next version; a version is cut per milestone.
 - Changes that reached the game or site earlier but were missing from this page are now listed under their versions.
 - Translations are reviewed without a translation website: Claude translates, Codex back-translates, the checks run, and each language is marked machine translation until a native speaker reviews it.
+- Test build zips' README.txt and the Test builds run summary link the new Install a test build page.
 
 -- How it was checked --
-- Checked: headless test suites, the docs checks and build, rendered stills of the title screen, and headless browser screenshots of the credits, legal and landing pages, and an axe scan of the landing page; headless browser screenshots of the guide home, the changelog and the open guide menu at phone, tablet and desktop sizes, and an axe scan of guide pages; the README's links checked against the built site and its commands against package.json; headless browser screenshots of the rewritten player pages, their facts checked against the game's code; not played by hand.
+- Checked: headless test suites, the docs checks and build, rendered stills of the title screen, and headless browser screenshots of the credits, legal and landing pages, and an axe scan of the landing page; headless browser screenshots of the guide home, the changelog and the open guide menu at phone, tablet and desktop sizes, and an axe scan of guide pages; the README's links checked against the built site and its commands against package.json; headless browser screenshots of the rewritten player pages, their facts checked against the game's code; headless browser screenshots of the new and rewritten user pages, the privacy claims checked against the game's code; not played by hand.
 - New characters checked: headless test suites and rendered stills (1280x720 and a phone shape) of each pose, before and after; not played by hand, so nothing was judged in motion.
 
 == 0.15.0 - October 16, 2026 ==
