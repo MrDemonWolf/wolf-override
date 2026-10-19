@@ -343,11 +343,12 @@ const EXIT_WALK_MAX_X: float = 1100.0
 ## was before he was drawn at a real wolf's size (x 934 then).
 const WOLF_DOORWAY_X: float = 990.0 - M0Actor.WOLF_TAIL
 ## The engineer is at the exit from here (USE leaves through it), and walks no further while WOLF
-## stands in the doorway (his tail at WOLF_DOORWAY_X - M0Actor.WOLF_REACH).
+## stands in the doorway (his tail at WOLF_DOORWAY_X - M0Actor.WOLF_REACH, less the
+## M0Actor.ARRIVE_TOLERANCE short of it that he may rest, coming from his spot by the hatch).
 ## (fix round 2: 846, was 870, so the engineer can stand behind WOLF in his new spot, their back clear
 ## of the bolt panel's edge but for STATION_OVERLAP)
 const HATCH_REACH_MIN_X: float = 846.0
-const HATCH_REACH_MAX_X: float = WOLF_DOORWAY_X - M0Actor.WOLF_REACH - M0Actor.HUMAN_REACH
+const HATCH_REACH_MAX_X: float = WOLF_DOORWAY_X - M0Actor.ARRIVE_TOLERANCE - M0Actor.WOLF_REACH - M0Actor.HUMAN_REACH
 ## Walking out, each is gone once their whole drawn body is past the near jamb.
 const WOLF_GONE_X: float = EXIT_NEAR_JAMB_X + M0Actor.WOLF_REACH + 3.0
 const HUMAN_GONE_X: float = EXIT_NEAR_JAMB_X + M0Actor.HUMAN_REACH + 3.0
@@ -405,10 +406,11 @@ const WOLF_STEP_FULL: float = 40.0
 const WOLF_STEP_RAMP: float = VALVE_HALF_WIDTH + M0Actor.WOLF_SNOUT - WOLF_STEP_FULL
 ## Where WOLF stands when he chooses to draw the sentry: at the far end of its lane, in front of the
 ## exit hatch (a doorway in the back wall, not a machine), facing back down the lane, his painted snout
-## (M0Actor.WOLF_SNOUT) just clear of the bolt panel's right edge and his painted tail
-## (M0Actor.WOLF_TAIL) inside the room's right edge. It parks BAIT_OFFSET short of him, on the
-## mark, facing him with its back to the TANK RELEASE, so the engineer working the release is behind
-## it and never between the two; his drawn body stays far outside the floor brackets and the tank.
+## (M0Actor.WOLF_SNOUT) at x 848, 27 px clear of the bolt panel's right edge as it was before he was
+## drawn at a real wolf's size, and his painted tail (M0Actor.WOLF_TAIL) inside the room's right edge;
+## the spot is x 887.2 (SentryBrain.BAIT_OFFSET holds the number). It parks BAIT_OFFSET short of him,
+## on the mark, facing him with its back to the TANK RELEASE, so the engineer working the release is
+## behind it and never between the two; his drawn body stays far outside the floor brackets and the tank.
 const WOLF_BAIT_X: float = DropArm.MARK_X + SentryBrain.BAIT_OFFSET
 ## Where WOLF waits once the sentry is down, through the bolt and the closing beat: the same spot, in
 ## full view by the hatch he says is next, clear of the crushed sentry and the tank on it.
@@ -443,14 +445,16 @@ const LEAP_SPEED_SCALE: float = 2.0
 ## the tank stands 107 px over the floor about 60 px past the engineer working the release, and the
 ## parked arm's shackle hangs only some 20 px above the height that clears the tank, so there is no
 ## room for a short hop: he takes off before he reaches the engineer's back, passes over them on the
-## way up and lands just short of his spot. His painted feet (y 438) pass over the
+## way up and lands just short of his spot. Its top is 13 px left of the tank's middle (the mark): it
+## was 5 when his spot by the hatch was x 904, and moved 8 with that spot (to 887.2, SentryBrain.BAIT_OFFSET)
+## so he still lands at least 20 px short of it (sentry_test). His painted feet (y 438) pass over the
 ## tank's top (y 331, on the crushed hull) and his back under the shackle. The empty arm hangs too low over
 ## the tank for him to pass under it, so it winches up into its ceiling plate as the tank lands for good
 ## (ARM_PARK_RISE over ARM_PARK_SECONDS), and he waits by the valve until it is up. sentry_test measures
 ## his painted body against the tank's, the wreck's and the arm's images on every frame of the crossing
 ## and at every x (3 px clear).
 const TANK_LEAP_HEIGHT: float = 122.0
-const TANK_LEAP_PEAK_X: float = DropArm.MARK_X - 5.0
+const TANK_LEAP_PEAK_X: float = DropArm.MARK_X - 13.0
 const TANK_LEAP_HALF_SPAN: float = 180.0
 const ARM_PARK_RISE: float = 44.0
 const ARM_PARK_SECONDS: float = 0.3

@@ -933,7 +933,8 @@ func _check_engineer_alone(game: Node2D, path: String) -> void:
 	# starts him at his spot by the hatch, not back across the tank.
 	_expect(autosave_c != null and autosave_c.wolf_position.x < JunctionRoom.TANK_LEAP_PEAK_X - JunctionRoom.TANK_LEAP_HALF_SPAN, "autosave C has WOLF on the rubble side of the tank (x %.0f)" % (autosave_c.wolf_position.x if autosave_c != null else -1.0))
 	game.call("_load_game")
-	_expect(wolf.position.x == JunctionRoom.WOLF_DOWN_X and wolf.body_sprite.flip_h and room.arm_parked == 1.0, "Continue from autosave C starts WOLF at his spot by the hatch, facing back down the lane, with the arm up (x %.1f)" % wolf.position.x)
+	# His position is stored in 32-bit floats and his spot (887.17) is not a whole pixel, so compare closely.
+	_expect(is_equal_approx(wolf.position.x, JunctionRoom.WOLF_DOWN_X) and wolf.body_sprite.flip_h and room.arm_parked == 1.0, "Continue from autosave C starts WOLF at his spot by the hatch, facing back down the lane, with the arm up (x %.1f)" % wolf.position.x)
 	var placed_x: float = wolf.position.x
 	await physics_frame
 	_expect(absf(wolf.position.x - placed_x) <= 0.01 and wolf.autonomous_target_x == JunctionRoom.WOLF_DOWN_X and wolf.body_sprite.offset == Vector2.ZERO, "and he stays there on the floor, with no walk across the tank")
