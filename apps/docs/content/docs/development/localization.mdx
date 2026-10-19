@@ -5,8 +5,8 @@ description: How WOLF OVERRIDE shows other languages, which files hold the langu
 
 **What this page is for:** how languages work in the code today, and how to check translation files.
 
-<Callout title="Five translations so far">
-  German, Spanish (Latin America and Spain), French and Brazilian Portuguese cover the menus, the HUD and the story as machine translations, not yet reviewed by a native speaker. Most station names still show English. Players: [Platforms and languages](/docs/platforms/).
+<Callout title="Seven translations so far">
+  German, Spanish (Latin America and Spain), French, Polish, Brazilian Portuguese and Russian cover the menus, the HUD and the story as machine translations, not yet reviewed by a native speaker. Most station names still show English. Players: [Platforms and languages](/docs/platforms/).
 </Callout>
 
 ## Words used here
@@ -130,6 +130,16 @@ You need Python 3 (standard library only) and GNU gettext's `msgfmt` (`brew inst
 - **Some words were cut to fit,** such as JOUER for NEW GAME and NUTZEN for USE. The lists are in `i18n/style/pt-BR.md`, `fr.md` and `de.md`, "Open questions", and each cut is noted on its line.
 - **Review state:** machine translation, not reviewed. See [Credits](/docs/credits/#translations).
 
+## Polish and Russian
+
+- **Two files:** `pl.po` and `ru.po`, made the same way as Spanish.
+- **No one-letter word ends a row:** *a, i, o, u, w, z* and *а, в, и, к, о, с, у, я* are bound to the next word with a no-break space (U+00A0). `check` fails a line that leaves one free.
+- **The engineer has no past tense:** both languages show gender in the past tense, so those lines use the present, a noun or an impersonal form.
+- **Names stay in their own form,** after a colon or a dash where the sentence would decline them.
+- **Russian keeps some words in Latin letters:** names, tools, web addresses and key labels such as Esc. They are listed under `keep` in `i18n/glossary.json`.
+- **Word choices for reviewers** are in `i18n/style/pl.md` and `ru.md`, "Open questions".
+- **Review state:** machine translation, not reviewed. See [Credits](/docs/credits/#translations).
+
 ## Store pages
 
 No store page exists yet. When one does, list only languages that ship, and say how they were made.
@@ -141,6 +151,8 @@ No store page exists yet. When one does, list only languages that ship, and say 
 | Portuguese - Brazil | Yes | No | No |
 | French | Yes | No | No |
 | German | Yes | No | No |
+| Polish | Yes | No | No |
+| Russian | Yes | No | No |
 
 - **Subtitles: no,** because the game has no voice yet.
 - **About This Game:** give each language a line such as "French: machine-translated, community review in progress" until a native speaker reviews it.

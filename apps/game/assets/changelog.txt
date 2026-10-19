@@ -64,6 +64,9 @@ Changes merged after 0.15.0. They become the next version when it is cut.
 - French (machine translation, review pending): LANGUAGE offers Français, marked "traduction automatique".
 - Brazilian Portuguese (machine translation, review pending): LANGUAGE offers Português (Brasil), marked "tradução automática"; Portugal gets it too.
 - German, French and Brazilian Portuguese translate the same parts as Spanish, the story included; most station names still show English.
+- Polish (machine translation, review pending): LANGUAGE offers Polski, marked "tłumaczenie maszynowe".
+- Russian (machine translation, review pending): LANGUAGE offers Русский, marked "машинный перевод".
+- Polish and Russian translate the same parts as Spanish, the story included; most station names still show English.
 - Key names follow your keyboard layout on Windows, macOS and Linux: on a French AZERTY keyboard Move left reads Q, not A. A symbol key shows the symbol printed on it, such as & on the AZERTY 1 key, and a letter the game's fonts cannot draw (Greek, Hebrew, Arabic, Thai) shows its QWERTY name.
 
 -- Website --
@@ -103,6 +106,7 @@ Changes merged after 0.15.0. They become the next version when it is cut.
 - New Platforms and languages page: what runs where today; English only, more languages planned.
 - Platforms, Settings, FAQ, Credits and Legal list Spanish, its review state and who made it; Localization adds the Spanish files and the store rows to use once a store page exists.
 - Platforms, Settings, FAQ, Status, Credits and Legal list German, French and Brazilian Portuguese, their review state and who made them; Localization adds their files and store rows.
+- Platforms, Settings, FAQ, Status and Credits list Polish and Russian, their review state and who made them; Localization adds their files, their typography rule and store rows.
 - New Support and bug reports page: GitHub issues, F12 bug captures, security reports and Discord. Troubleshooting, FAQ, Accessibility and the landing footer link to it.
 - About the game lists how it plays as short bullets; the story text is unchanged.
 - Privacy matches the code again: the debug unlock line, no language setting, the system language read at start, bug captures and the guide's search; checked October 18, 2026.
@@ -163,6 +167,9 @@ Changes merged after 0.15.0. They become the next version when it is cut.
 - The German, French and Brazilian Portuguese files are written fresh by Claude with a note on every line, back-translated by Codex and passed through every translation check; each word cut to fit is noted on its line.
 - WOLF's touch line at the mirror names the answer button in German, French and Brazilian Portuguese, and lines where a pronoun could read as WOLF name the sentry instead.
 - The Portuguese gender check knows *teclado*, *lado*, *líquido* and *dados* are nouns, and the test suites' made-up catalogs share one language code that ships no file.
+- The Polish and Russian files are written fresh by Claude with a note on every line, back-translated by Codex and passed through every translation check.
+- A new translation check binds Polish and Russian one-letter words such as *w* and *в* to the next word, so none is left at a row's end.
+- The Russian checks keep names, tools, web addresses and key labels in Latin letters, skip the credits' formatting tags, and know *сначала*, *зеркала*, *завал* and *отмена* are not past tenses.
 
 -- How it was checked --
 - Checked: headless test suites, the docs checks and build, rendered stills of the title screen, and headless browser screenshots of the credits, legal and landing pages, and an axe scan of the landing page; headless browser screenshots of the guide home, the changelog and the open guide menu at phone, tablet and desktop sizes, and an axe scan of guide pages; the README's links checked against the built site and its commands against package.json; headless browser screenshots of the rewritten player pages, their facts checked against the game's code; headless browser screenshots of the new and rewritten user pages, the privacy claims checked against the game's code; headless browser screenshots of the developer pages, with honesty-note counts kept and their commands run or marked not run; headless browser screenshots of the docs style guide, Developer home and Contributing; not played by hand.

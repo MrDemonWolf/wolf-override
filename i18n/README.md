@@ -12,7 +12,7 @@ outside `apps/game` on purpose: a file inside the Godot project is imported and 
 
 The translation files themselves are `apps/game/i18n/<code>.po`, beside the language table
 `apps/game/i18n/languages.json`. So far: `es.po` and `es_ES.po` (localization PR L9), and `pt_BR.po`,
-`fr.po` and `de.po` (PR L10).
+`fr.po` and `de.po` (PR L10), and `pl.po` and `ru.po` (PR L11).
 
 `python3 -I -B scripts/i18n/i18n_tool.py glossary` checks the glossary and the style guides against each
 other and against the language table, and `check` applies the glossary to every translated line. Both run
