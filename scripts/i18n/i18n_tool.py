@@ -1350,6 +1350,13 @@ SELFTEST = [
     ("gender", "pt_BR", "", "%s está morto.", False, ""),
     ("gender", "pt_BR", "", "WOLF: Você está certa.", False, "you"),
     ("gender", "pt_BR", "", "%s abre a porta da escada.", True, ""),
+    # "teclado" (keyboard), "lado" (side) and "líquido" (liquid) are nouns that end like participles; the
+    # rule's exception list keeps them clear (PR L10's TOGGLE HOLDS tooltip, rubble and coolant hints),
+    # while an agreeing participle beside them still fails.
+    ("gender", "pt_BR", "", "Teclado, controle e tela de toque.", True, "you"),
+    ("gender", "pt_BR", "", "Volte para o outro lado dos escombros.", True, "you"),
+    ("gender", "pt_BR", "", "Nuvem de líquido de arrefecimento. Saia dela.", True, "you"),
+    ("gender", "pt_BR", "", "Do outro lado, você está cansada.", False, "you"),
     ("gender", "pl", "", "%s jest zmęczona.", False, ""),
     ("gender", "pl", "", "%s jest zmęczony.", False, ""),
     ("gender", "pl", "", "%s jest ranna.", False, ""),
