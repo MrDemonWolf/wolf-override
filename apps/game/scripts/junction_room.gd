@@ -59,6 +59,18 @@ const BLAST_HOLE_LIGHT: Color = Color(0.30, 0.34, 0.36)
 ## the wall piece (est., tuned on rendered captures).
 const BLAST_REVEAL: PackedVector2Array = [Vector2(465.93, 436.03), Vector2(481.1, 435.21), Vector2(481.1, 333.0), Vector2(465.93, 333.52)]
 const BLAST_REVEAL_LIGHT: Color = Color(0.16, 0.18, 0.19)
+## Both lights fall off from the lit lane floor toward the head (DoorKit.hole_light's head_share): flat
+## from foot to head the reveal's light read as a pale grey slab still standing in the doorway, its
+## square top under the dark head (capture review r2, 2026-10-19). The hole keeps some light at its
+## head, as the corridor seal's (SEAL_HOLE_HEAD_SHARE); the reveal's head, in the shadow of the
+## doorway's head, is left unlit (est., tuned on rendered captures).
+const BLAST_HOLE_HEAD_SHARE: float = 0.35
+const BLAST_REVEAL_HEAD_SHARE: float = 0.0
+## The reveal's painted steel is lit evenly from foot to head, so unlit at its head it still read as a
+## grey slab: it is also multiplied down toward the head to this share (DoorKit.shade's head_share),
+## falling into the head's shadow so it reads as the throat of the wall, lit from the lane's floor
+## (est., tuned on rendered captures).
+const BLAST_REVEAL_SHADOW: float = 0.4
 const BLAST_POOL: Vector2 = Vector2(486.05, 443.64)
 const BLAST_GRAZE: Vector2 = Vector2(473.53, 374.20)
 const BLAST_DOOR_LIGHT: Vector2 = Vector2(461.24, 321.08)
@@ -172,7 +184,10 @@ const EXIT_FRONT_AT: Vector2 = Vector2(971.14, 0.0)
 const EXIT_DECK_TOP_Y: float = 444.0
 ## The passage seen past the exit wall's near end (EXIT_BACK right of the column's far arris, x 1000.1, down
 ## to its floor's near edge, doors.py "next space floor"), shaded (DoorKit.PAST_END_SHADE) so it never
-## outshines the doorway; the column covers its left edge and the curb its foot.
+## outshines the doorway; the column covers its left edge and the curb its foot. While the exit is shut
+## it is multiplied down by EXIT_SHUT_SHADE as well, as the doorway's reveal is: at PAST_END_SHADE alone
+## the passage floor beside the wall's end stayed the brightest opening at the shut exit (capture review
+## r2, 2026-10-19: luma 0.228 against the shut doorway's 0.136 and the wall's 0.122).
 const EXIT_PAST_END: PackedVector2Array = [Vector2(1000.1, 0.0), Vector2(EXIT_PAINTED_RIGHT, 0.0), Vector2(EXIT_PAINTED_RIGHT, 457.8), Vector2(1000.1, 443.1)]
 ## When the exit is shut no light comes through it: its reveal in front of the leaf (lit by the passage
 ## when open) is multiplied down to this (doors.py's shut frames: the far reveal one step under the wall),
@@ -626,6 +641,8 @@ var exit_wall: Sprite2D
 var exit_front: Sprite2D
 var exit_shade: Polygon2D
 var exit_hole: Polygon2D
+## The shade on the passage seen past the wall's near end (EXIT_PAST_END), darker while the exit is shut.
+var exit_past_end: Polygon2D
 var exit_lamp: DoorKit.Lamp
 var recesses: Recesses
 ## The exit bolt's panel drawn again over the sentry where it passes behind it.
@@ -636,7 +653,8 @@ var door_shape: CollisionShape2D
 ## DOOR_BREAK_SECONDS, then the lit empty doorway (door_hole, its light) with the soot round it and the
 ## leaf lying in the lane; the front (door_column) swaps to its blown piece.
 var door_hole: Polygon2D
-## The lane's light on the blown doorway's far reveal (BLAST_REVEAL), shown with door_hole.
+## The lane's light on the blown doorway's far reveal (BLAST_REVEAL) with its shadow toward the head (a
+## child), shown with door_hole.
 var door_reveal: Polygon2D
 var door_leaf: Sprite2D
 var door_leaf_breaking: Sprite2D
@@ -881,9 +899,11 @@ func _build_door() -> void:
 	door_shape = RoomDepth.door_body(self, "Door", Vector2(DOOR_X, FLOOR_Y - DOOR_HEIGHT * 0.5), Vector2(DOOR_WIDTH, DOOR_HEIGHT))
 	door_body = door_shape.get_parent() as StaticBody2D
 	# Behind the mid plate: the lane's light (once blown), the door light's pool and graze, the wall.
-	door_wall = DoorKit.doorway(depth.behind, "Blast", BLAST_HOLE, BLAST_HOLE_LIGHT, null, Vector2.ZERO, 1.0, null, BLAST_POOL, BLAST_GRAZE, BLAST_WALL, BLAST_WALL_AT)
+	door_wall = DoorKit.doorway(depth.behind, "Blast", BLAST_HOLE, BLAST_HOLE_LIGHT, null, Vector2.ZERO, 1.0, null, BLAST_POOL, BLAST_GRAZE, BLAST_WALL, BLAST_WALL_AT, BLAST_HOLE_HEAD_SHARE)
 	door_hole = depth.behind.get_node("BlastHoleLight") as Polygon2D
-	door_reveal = DoorKit.hole_light(depth.behind, "BlastRevealLight", BLAST_REVEAL, BLAST_REVEAL_LIGHT)
+	door_reveal = DoorKit.hole_light(depth.behind, "BlastRevealLight", BLAST_REVEAL, BLAST_REVEAL_LIGHT, BLAST_REVEAL_HEAD_SHARE)
+	# Its shadow, a child so it shows and hides with the light (the shut leaf covers the reveal).
+	DoorKit.shade(door_reveal, "Shadow", BLAST_REVEAL, Color.WHITE, BLAST_REVEAL_SHADOW)
 	door_leaf = _door_piece("DoorLeaf", BLAST_SLAB, LEAF_AT, Vector2.ONE, DOOR_Z)
 	door_leaf.scale = LEAF_SCALE
 	door_leaf_breaking = _door_piece("DoorLeafBreaking", BLAST_SLAB_BREAKING, LEAFBREAK_AT, Vector2.ONE * LEAFBREAK_SCALE, DOOR_Z)
@@ -972,7 +992,7 @@ func _build_exit() -> void:
 	# Over the passage and the reveal, under the leaf: the shut exit's shade.
 	exit_shade = DoorKit.shade(depth.behind, "ExitShutShade", EXIT_HOLE, EXIT_SHUT_SHADE)
 	depth.behind.move_child(exit_shade, exit_leaf.get_index())
-	DoorKit.shade(depth.behind, "ExitPastEnd", EXIT_PAST_END, DoorKit.PAST_END_SHADE)
+	exit_past_end = DoorKit.shade(depth.behind, "ExitPastEnd", EXIT_PAST_END, DoorKit.PAST_END_SHADE)
 	# The wall's near end draws over the actors (they walk out behind it), always opaque, as Records'.
 	exit_front = DoorKit.piece(self, EXIT_FRONT, EXIT_FRONT_AT, "ExitFront")
 	exit_front.z_index = RoomDepth.Z_NEAR
@@ -1665,13 +1685,15 @@ func _set_door_flight(t: float) -> void:
 
 
 ## The exit door's leaf slides back along the wall into its pocket as it opens, over the passage behind;
-## the light through the hole comes up and the shut shade on the reveal goes as it does.
+## the light through the hole comes up and the shut shades on the reveal and past the wall's end go as it
+## does.
 func _sync_hatch() -> void:
 	if exit_leaf != null:
 		exit_leaf.queue_redraw()
 		var open: float = clampf(hatch_open, 0.0, 1.0)
 		exit_hole.color = EXIT_HOLE_LIGHT * open
 		exit_shade.color = EXIT_SHUT_SHADE.lerp(Color.WHITE, open)
+		exit_past_end.color = (DoorKit.PAST_END_SHADE * EXIT_SHUT_SHADE).lerp(DoorKit.PAST_END_SHADE, open)
 
 
 func _arm_hazard(hazard: Hazard) -> void:
