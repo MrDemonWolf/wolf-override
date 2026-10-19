@@ -65,6 +65,9 @@ func _run() -> void:
 	for prop_name: String in floor_props:
 		var prop: Sprite2D = floor_props[prop_name]
 		_expect(is_equal_approx(snappedf(_bottom(prop), 0.5), 440.0), "the %s's base is on the floor (y 440, got %.2f)" % [prop_name, _bottom(prop)])
+	# The Records stations' named sizes are their pieces' own (their half widths are read from them).
+	for station: Array in [[records.get_node("PurgeArt"), RecordsRoom.PURGE_SIZE, "PURGE QUEUE"], [records.get_node("MirrorArt"), RecordsRoom.MIRROR_SIZE, "MIRROR PORT"]]:
+		_expect(RoomDepth.prop_region(station[0]).size == station[1], "the %s's named size is its piece's (%s)" % [station[2], RoomDepth.prop_region(station[0]).size])
 	var door: Sprite2D = game.get_node("Door/Visual/DoorArt") as Sprite2D
 	# The corridor's curtain stands across the corridor in the cross-wall's turned face: it crosses the
 	# walk line (y 440) at the collision face, and its art ends at its near-jamb corner, in front of it.

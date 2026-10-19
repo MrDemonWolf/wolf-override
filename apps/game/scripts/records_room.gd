@@ -95,13 +95,17 @@ const WALKWAY_Y: float = 742.0
 ## the floor: the PURGE QUEUE 447 x 442 px at 6.135 px per world px (72.9 x 72 world px, 1.82 x 1.80 m;
 ## it was drawn 2.8 m tall) and the MIRROR PORT, a 42U equipment rack, 352 x 443 px at 5.54 px per world
 ## px (63.5 x 80 world px, 1.59 x 2.0 m; it was 2.77 m).
+## Each piece's own pixel size (piece px, records-purge-queue.png and records-mirror-port.png, as the
+## asset register lists them), centre x (world px) and scale (world px per piece px).
+const PURGE_SIZE: Vector2 = Vector2(447.0, 442.0)
 const PURGE_X: float = 190.0
 const PURGE_SCALE: float = 1.0 / 6.135
+const MIRROR_SIZE: Vector2 = Vector2(352.0, 443.0)
 const MIRROR_X: float = 520.0
 const MIRROR_SCALE: float = 1.0 / 5.5402
 ## Half each station's drawn width (world px), for Main's station table.
-const PURGE_HALF_WIDTH: float = 447.0 * PURGE_SCALE * 0.5
-const MIRROR_HALF_WIDTH: float = 352.0 * MIRROR_SCALE * 0.5
+const PURGE_HALF_WIDTH: float = PURGE_SIZE.x * PURGE_SCALE * 0.5
+const MIRROR_HALF_WIDTH: float = MIRROR_SIZE.x * MIRROR_SCALE * 0.5
 ## The screens' glass and the status lights, in piece px (measured on the pieces): the purge light is
 ## the slot in the bar under its screen, the mirror's the indicator window between its two drive bays.
 const PURGE_SCREEN: Rect2 = Rect2(86.0, 28.0, 160.0, 96.0)
