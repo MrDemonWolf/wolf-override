@@ -4813,6 +4813,13 @@ func _set_dialogue(hint: String) -> void:
 	speaker.visible = has_speaker
 	var id: String = String(names.find_key(name)) if names.values().has(name) else name
 	var human_name: String = _first_name().to_upper()
+	# WOLF and the engineer's name are written the same in every language, so the pseudolocalization
+	# audit (scripts/parity/capture.gd) does not count them as untranslated; the Director's tag is.
+	# The audit reads whether the metadata is there, so it is removed for the Director's tag.
+	if id == "WOLF" or id == human_name:
+		speaker.set_meta(I18n.OWN_LANGUAGE_META, true)
+	else:
+		speaker.remove_meta(I18n.OWN_LANGUAGE_META)
 	var tint: Color = Palette.CYAN if id == "WOLF" else (Color("#ff9a9f") if id.begins_with("DIRECTOR") else (ENGINEER_TINT if id == human_name else Color("#9fc3d2")))
 	_set_color(dialogue_accent, tint)
 	_set_font_color(speaker, tint)
