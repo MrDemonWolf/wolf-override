@@ -36,3 +36,9 @@ Quotes “…”. Plates in capitals keep their accents.
 - **LOCKDOWN**: "CONFINAMENTO" is a proposal; whether BLOQUEIO reads as "blockage" here, as in Spanish,
   is for a reviewer.
 - **SERVICE JUNCTION**: a reviewer's word.
+- **PR L10's choices (proposals for a reviewer):** LOCKDOWN is CONFINAMENTO; SERVICE JUNCTION is JUNÇÃO
+  DE SERVIÇO; the seal (OPEN THE SEAL) is *o selo*; the stick is *stick*, and the left stick *Stick L*,
+  as Nintendo's Brazilian materials name it.
+- **Words cut to fit (PR L10)**: MRDEMONWOLF, INC. PRESENTS is DE MRDEMONWOLF, INC. (APRESENTA ran 3 px
+  over), the title's credit line says *Feito com apoio de IA*, and VALVE USED is VÁLV. USADA. Each cut
+  is noted on its line in `pt_BR.po`.
