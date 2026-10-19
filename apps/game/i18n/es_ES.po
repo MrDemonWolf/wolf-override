@@ -1046,7 +1046,7 @@ msgstr "La V-sync puede limitar el tope de FPS."
 #. i18n: speaker=ui
 #: scripts/game_settings.gd:566
 msgid "Volume changes apply immediately. Effects carries every sound effect; there is no music or voice yet."
-msgstr "El volumen cambia al instante. El volumen de los efectos incluye todos los sonidos; aún no hay música ni voces."
+msgstr "El volumen cambia al instante. Los efectos incluyen todos los sonidos; aún no hay música ni voces."
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: CONTROLS note.
