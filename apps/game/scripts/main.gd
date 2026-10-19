@@ -1886,8 +1886,11 @@ func _wolf_pose(pose: StringName, lift: float = 0.0) -> void:
 		scale_factor = DockBay.WOLF_RISE_SCALE
 	wolf.body_sprite.texture = texture
 	wolf.body_sprite.scale = wolf_sprite_scale * scale_factor
-	var feet: float = WOLF_SPRITE_REST.y + WOLF_FEET_BELOW_CENTRE * WOLF_ART_SCALE
-	wolf.body_sprite.position = Vector2(WOLF_SPRITE_REST.x, feet + lift - texture.get_height() * wolf.body_sprite.scale.y * 0.5)
+	# The piece's centre moves by half the difference in drawn height from the standing piece's, so the
+	# standing piece lands exactly on WOLF_SPRITE_REST (tests compare it exactly).
+	var stand_height: float = wolf_stand_texture.get_height() * wolf_sprite_scale.y
+	var height: float = texture.get_height() * wolf.body_sprite.scale.y
+	wolf.body_sprite.position = WOLF_SPRITE_REST + Vector2(0.0, lift + (stand_height - height) * 0.5)
 	if wolf_lights != null:
 		wolf_lights.pose = pose
 
