@@ -15,7 +15,12 @@ Purpose
                               from the recorded Noto release (NOTO_SOURCES, downloaded into CACHE and
                               checked by SHA-256), the symbols font behind Roboto (symbols_font) and the
                               character lists the game's glyph test reads (CHARSETS_FILE). Prints the
-                              sizes. Rerun only to change a set; the outputs are committed.
+                              sizes. Rerun only to change a set; the outputs are committed. It ends
+                              with `pickerfonts`, so the picker's cuts follow a changed subset.
+    pickerfonts               rebuilds only the language list's tiny fonts (PR L6, picker_fonts): for
+                              every language whose row names a "picker_font", its own picker name and
+                              "machine translation" tag cut from its committed fallback subset, with
+                              Montserrat's vertical metrics. Needs no download. Prints the sizes.
     fill POT TRANS OUTDIR     writes OUTDIR/<lang>.po for every language in TRANS from the POT: each
                               message keeps the POT's comments and gets TRANS's context as a "#." note,
                               its marks as "#. i18n: ..." (MARKS) and its translation, stamped
@@ -55,10 +60,10 @@ Purpose
                               whose text is no msgid of POT, by file, as JSON at OUT.
 
 Contract
-    python3 -I -B scripts/i18n/i18n_tool.py <subcommand> ...   (stdlib only; `fonts` needs hb-subset and hb-info,
-    `check` needs msgfmt, both from gettext and harfbuzz in Homebrew or apt). Paths are arguments, read
-    from the current folder; nothing outside them is written, except that `fonts` rewrites the
-    fallback fonts and character lists it owns (FONTS, below). Two files are read from the repository
+    python3 -I -B scripts/i18n/i18n_tool.py <subcommand> ...   (stdlib only; `fonts` and `pickerfonts` need hb-subset and
+    hb-info, `check` needs msgfmt, both from gettext and harfbuzz in Homebrew or apt). Paths are arguments,
+    read from the current folder; nothing outside them is written, except that `fonts` rewrites the
+    fallback fonts and character lists it owns (FONTS, below) and `pickerfonts` the picker fonts. Two files are read from the repository
     this tool sits in: every per-language fact from apps/game/i18n/languages.json (LANGUAGES, the same
     table the game's I18n reads, so the game and the tools never keep two lists), the glossary from
     i18n/glossary.json (GLOSSARY_FILE) and the style guides from i18n/style/ (STYLE_DIR). A PO whose
@@ -324,6 +329,9 @@ CJK_MIN_CODEPOINT = 0x2000
 SYMBOLS = "\u2192\u25a1\u25b6\u25c0"
 #: The symbols fallback: SYMBOLS cut from Montserrat with Roboto's vertical metrics (symbols_font).
 SYMBOLS_FONT = REPO / "apps" / "game" / "assets" / "fonts" / "Montserrat-Symbols-Subset.ttf"
+#: The font the language list draws with (Montserrat-Semibold.tres's base): the picker fonts take its
+#: vertical metrics (picker_fonts), so chaining them behind it leaves the list's row height alone.
+PICKER_REFERENCE_FONT = REPO / "apps" / "game" / "assets" / "fonts" / "Montserrat-Variable.ttf"
 #: The fixed character lists the CJK subsets are cut to and the game's glyph test reads. Under tests/,
 #: which the export leaves out (export_presets.cfg), since the game itself never needs them.
 CHARSETS_FILE = REPO / "apps" / "game" / "tests" / "support" / "cjk_charsets.json"
@@ -575,9 +583,17 @@ def fixed_charset(code: str) -> str:
                         points.update(ord(c) for c in bytes([lead, trail]).decode(codec))
                     except UnicodeDecodeError:
                         pass  # an unassigned cell of the standard
-    row = LANGUAGES[code]
-    points.update(ord(c) for c in str(row["name"]) + str(row.get("machine_tag") or "") if c != " ")
+    points.update(ord(c) for c in own_characters(code))
     return "".join(chr(cp) for cp in sorted(points) if cp >= CJK_MIN_CODEPOINT)
+
+
+def own_characters(code: str) -> str:
+    """The characters of language ``code``'s own picker name and "machine translation" tag (its
+    LANGUAGES row's "name" and "machine_tag") from CJK_MIN_CODEPOINT up, each once, sorted by code point:
+    what its fallback subset must hold (fixed_charset, fonts) and all its picker font holds
+    (picker_fonts). Spaces and Latin letters are left out, since the game fonts draw them first. Pure."""
+    row = LANGUAGES[code]
+    return "".join(sorted({c for c in str(row["name"]) + str(row.get("machine_tag") or "") if ord(c) >= CJK_MIN_CODEPOINT}))
 
 
 def fonts(cache: Path) -> None:
@@ -607,7 +623,7 @@ def fonts(cache: Path) -> None:
         have = font_codepoints(source)
         charsets[code] = "".join(c for c in wanted if ord(c) in have)
         lacking = "".join(c for c in wanted if ord(c) not in have)
-        own = {c for c in str(row["name"]) + str(row.get("machine_tag") or "") if c != " "}
+        own = set(own_characters(code))
         if own & set(lacking):
             sys.exit(f"{member} cannot draw {code}'s own name or tag: {''.join(sorted(own & set(lacking)))}")
         out = _game_path(row["fallback_font"])
@@ -623,7 +639,33 @@ def fonts(cache: Path) -> None:
              "language's subset. Do not edit by hand: change the tool and rerun it.")
     CHARSETS_FILE.write_text(json.dumps({"_about": about, "charsets": charsets}, ensure_ascii=False, indent=1) + "\n", encoding="utf-8")
     sizes["symbols"] = {"characters": len(SYMBOLS), "subset_bytes": SYMBOLS_FONT.stat().st_size}
+    sizes["picker"] = picker_fonts()
     print(json.dumps(sizes, indent=1))
+
+
+def picker_fonts() -> dict[str, dict]:
+    """Writes the language list's own fonts (PR L6; DESIGN.md, "Settings: the LANGUAGE option") and
+    returns their sizes by language. For every LANGUAGES row with a "picker_font": that language's
+    own_characters cut with hb-subset from its committed "fallback_font" (which `fonts` cut to hold them,
+    so no download is needed), then given Montserrat-Variable.ttf's vertical metrics
+    (match_vertical_metrics), because the list draws with Montserrat and a fallback with taller metrics
+    would make every row of the list taller (Font.get_height is the tallest of the chain). The game
+    chains all of them behind the list's font at once (I18n.picker_font), so 日本語, 한국어, 简体中文
+    and 繁體中文 and their tags draw in every language without a CJK font behind the game's own fonts.
+    Side effect: rewrites those files; their .import files and the asset register are kept by hand."""
+    sizes = {}
+    for code, row in LANGUAGES.items():
+        if not row.get("picker_font"):
+            continue
+        source, out = _game_path(row["fallback_font"]), _game_path(row["picker_font"])
+        wanted = own_characters(code)
+        lacking = "".join(c for c in wanted if ord(c) not in font_codepoints(source))
+        if lacking:
+            sys.exit(f"{source} cannot draw {code}'s own name or tag ({lacking}): rerun `fonts`")
+        _hb_subset(source, out, {ord(c) for c in wanted})
+        match_vertical_metrics(out, PICKER_REFERENCE_FONT)
+        sizes[code] = {"characters": wanted, "subset_bytes": out.stat().st_size}
+    return sizes
 
 
 def symbols_font() -> None:
@@ -1468,7 +1510,8 @@ def main(argv: list[str]) -> None:
         else:
             args.append(Path(arg))
     plain = {"fonts": (fonts, 1), "fill": (fill, 3), "backprompt": (backprompt, 2), "selftest": (selftest, 1),
-             "hardcoded": (hardcoded, 3), "glossary": (glossary_check, 0)}
+             "hardcoded": (hardcoded, 3), "glossary": (glossary_check, 0),
+             "pickerfonts": (lambda: print(json.dumps(picker_fonts(), ensure_ascii=False, indent=1)), 0)}
     command = argv[0] if argv else ""
     if command == "potfiles" and len(args) == 1 and flags <= {"--check"} and back is None:
         potfiles(args[0], "--check" in flags)
