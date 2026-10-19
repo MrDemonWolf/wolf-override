@@ -57,10 +57,9 @@ A version is cut once per milestone.
 
 The **Test builds** workflow exports a macOS and a Windows debug build from each change. For players: [Install a test build](/docs/test-builds/).
 
-| Preset (in `apps/game/export_presets.cfg`) | Output |
-| --- | --- |
-| `macOS` | `wolf-override-macos-debug-<commit>.zip`, one app for Apple silicon and Intel |
-| `Windows Desktop` | `wolf-override-windows-debug-<commit>.zip`, with `WOLF-OVERRIDE.exe` |
+- **Presets** live in `apps/game/export_presets.cfg`:
+  - `macOS` makes `wolf-override-macos-debug-<commit>.zip`, one app for Apple silicon and Intel.
+  - `Windows Desktop` makes `wolf-override-windows-debug-<commit>.zip`, with `WOLF-OVERRIDE.exe`.
 
 - **It runs beside the checks,** not after them, and is not a required check. A failed export does not block a merge, and a failed check does not stop the builds.
 - **No installers or releases** are made.

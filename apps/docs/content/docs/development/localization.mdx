@@ -43,15 +43,13 @@ description: How WOLF OVERRIDE will show other languages, which files hold the l
 
 You need Python 3 (standard library only) and GNU gettext's `msgfmt` (`brew install gettext` on macOS).
 
-| Command | What it does |
-| --- | --- |
-| `scripts/i18n/extract_pot.sh . i18n/messages.pot <log dir>` | Regenerates the template with Godot's own generator, headless |
-| `python3 -I -B scripts/i18n/i18n_tool.py potfiles apps/game --check` | Fails when `project.godot`'s scan list leaves out a scene or script |
-| `python3 -I -B scripts/i18n/i18n_tool.py check i18n/messages.pot apps/game/i18n <report.json>` | Runs every gate on the catalogs; exits 1 on any failure |
-| `python3 -I -B scripts/i18n/i18n_tool.py selftest <report.json>` | Checks the gates themselves on planted cases |
-| `python3 -I -B scripts/i18n/i18n_tool.py glossary` | Checks the glossary and style guides against each other and the language table |
-| `python3 -I -B scripts/i18n/i18n_tool.py fonts <download folder>` | Rebuilds the bundled Chinese, Japanese and Korean font subsets |
-| `scripts/parity/run.sh capture --language <code> <out dir>` | Captures the routes in a language, or `pseudo` for padded English |
+- **Template:** regenerate it with Godot's own generator, headless: `scripts/i18n/extract_pot.sh . i18n/messages.pot <log dir>`
+- **Scan list:** fail when `project.godot`'s list of files to scan leaves out a scene or script: `python3 -I -B scripts/i18n/i18n_tool.py potfiles apps/game --check`
+- **Gates:** run every gate on the catalogs; exits 1 on any failure: `python3 -I -B scripts/i18n/i18n_tool.py check i18n/messages.pot apps/game/i18n <report.json>`
+- **Self-test:** check the gates themselves on planted cases: `python3 -I -B scripts/i18n/i18n_tool.py selftest <report.json>`
+- **Glossary:** check the glossary and style guides against each other and the language table: `python3 -I -B scripts/i18n/i18n_tool.py glossary`
+- **Fonts:** rebuild the bundled Chinese, Japanese and Korean font subsets: `python3 -I -B scripts/i18n/i18n_tool.py fonts <download folder>`
+- **Parity capture:** capture the routes in a language, or `pseudo` for padded English: `scripts/parity/run.sh capture --language <code> <out dir>`
 
 <Details>
 <Summary>Template: when to run it and what it touches</Summary>

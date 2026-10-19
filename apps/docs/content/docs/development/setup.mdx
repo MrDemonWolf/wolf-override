@@ -28,17 +28,8 @@ description: Install what WOLF OVERRIDE needs, clone it, run the game and the do
    cd wolf-override
    ```
 
-2. Check Bun with `bun --version`, then install the docs packages:
-
-   ```sh
-   bun install --frozen-lockfile
-   ```
-
-3. Check Godot with `godot --version`. If your Godot binary has another name or path, set `GODOT_BIN`:
-
-   ```sh
-   export GODOT_BIN=/path/to/godot
-   ```
+2. Check Bun with `bun --version`, then install the docs packages with `bun install --frozen-lockfile`.
+3. Check Godot with `godot --version`. If your Godot binary has another name or path, set it with `export GODOT_BIN=/path/to/godot`.
 
 4. Run the checks once to see everything works: [Testing and CI](/docs/development/testing/#run-the-checks).
 
@@ -50,21 +41,14 @@ description: Install what WOLF OVERRIDE needs, clone it, run the game and the do
 
 ## Run the docs site
 
-```sh
-bun run docs:dev
-```
-
-- Open the local URL that Next.js prints.
+1. Run `bun run docs:dev`.
+2. Open the local URL that Next.js prints.
 - Bun is not needed to play the game.
 
 ## Keep your own saves safe
 
 - **`bun run game:check`** already gives each suite its own temporary user data folder.
-- **Running Godot yourself** for a test? Point it at a throwaway home so it cannot touch your saves, editor settings or export templates:
-
-  ```sh
-  HOME="$(mktemp -d)" godot --headless --language en --path apps/game --script res://tests/<name>_test.gd
-  ```
+- **Running Godot yourself** for a test? Point it at a throwaway home so it cannot touch your saves, editor settings or export templates: `HOME="$(mktemp -d)" godot --headless --language en --path apps/game --script res://tests/<name>_test.gd`.
 
 - **On Linux,** Godot reads `XDG_DATA_HOME` and `XDG_CONFIG_HOME` instead; `scripts/godot-helpers.sh` sets all three for the scripts.
 

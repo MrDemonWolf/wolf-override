@@ -79,14 +79,13 @@ apps/game/
 
 ## The website
 
-```text
-apps/docs/
-  content/docs/        every guide page, as MDX
-  app/page.tsx         the landing page
-  app/docs/            the guide layout and its components
-  lib/                 page source, SEO and structured data, the version reader
-  mdx-components.tsx   components pages can use
-```
+| Path in `apps/docs/` | What it holds |
+| --- | --- |
+| `content/docs/` | Every guide page, as MDX |
+| `app/page.tsx` | The landing page |
+| `app/docs/` | The guide layout and its components |
+| `lib/` | Page source, SEO and structured data, the version reader |
+| `mdx-components.tsx` | Components pages can use |
 
 - **Styling:** Tailwind CSS tokens and utilities, and Fumadocs components. No new bespoke CSS.
 - **Build:** a static export for GitHub Pages, deployed from `main`.
