@@ -107,9 +107,13 @@ Changes merged after 0.15.0. They become the next version when it is cut.
 - The home page's search description is shorter, so search results show all of it.
 - Shared guide links show the game's name in their preview title, such as "Controls: keyboard, controller and touch | WOLF OVERRIDE", and are marked as articles with the date the page last changed.
 - The site header, guide menu bar and link previews show the new WOLF OVERRIDE logo, approved by Nathanial Henniges.
+- The home page menu bar stays at the top of the screen while you scroll, and its section links stop with the heading in view below it.
+- New press kit and brand guide page at /design-system/: how to write the name, the logo versions, colours, fonts, approved copy and how to credit the provisional art. The footer, the guide menu and Support link to it.
+- One press kit download (about 8 MB): the logo set, the wolf mark, three screenshots, the provisional key art, the cover, facts and the approved copy. Each file can also be downloaded on its own.
 
 ### Development
 
+- The press kit zip is built by a script from the site's own files each time the site is built, so the repository never stores a second copy of them.
 - The game's version lives in one place, `apps/game/project.godot`; the macOS and Windows test builds now take it from there instead of 0.0.0.
 - F12 bug captures record the game's version.
 - The in-game changelog shows the short lines only; the full notes stay on the website's changelog.
