@@ -1,4 +1,4 @@
-extends SceneTree
+extends "res://tests/support/game_suite.gd"
 ## The round-2 press probe kept as a test (P0-14, SOUND-2): every press that changes the game's state
 ## starts a sound in the sound bank within one frame and changes what the screen says. It plays both
 ## relay routes through the corridor and Records Access with real presses, then the Service
@@ -6,7 +6,6 @@ extends SceneTree
 ## is cranked (P0-1, SOUND-1) and that the relay's COOLANT FAULT tag is gone once the relay is dealt
 ## with (P0-2, PUZ-7).
 
-const GAME_SCENE: PackedScene = preload("res://scenes/main.tscn")
 ## Game variables that are part of a press's outcome beyond the save: the closing shots, the walk out,
 ## the lane answer, WOLF heading for the relay or refusing it, the bypass venting, the exit bolt and the
 ## walk out through the Records exit door.
@@ -15,7 +14,6 @@ const STATE_VARS: Array[String] = ["chapter_close_active", "hatch_exit_walking",
 ## seal) may take before the test gives up on it.
 const BEAT_SECONDS: float = 15.0
 
-var failures: int = 0
 var game: Node2D
 var bank: SfxBank
 var human: M0Actor
@@ -28,17 +26,9 @@ var presses: int = 0
 var heard: int = 0
 
 
-func _initialize() -> void:
-	call_deferred("_run")
-
-
 func _run() -> void:
-	var path: String = "user://press-sound-test-%s.json" % OS.get_process_id()
-	_remove(path)
-	game = GAME_SCENE.instantiate() as Node2D
-	game.set("save_path", path)
-	game.set("settings_path", "%s-settings.cfg" % path)
-	root.add_child(game)
+	check_name = "Press sound"
+	game = open_game("press-sound-test")
 	bank = game.get("sfx_bank") as SfxBank
 	human = game.get_node("Human") as M0Actor
 	wolf = game.get_node("Wolf") as M0Actor
@@ -52,15 +42,10 @@ func _run() -> void:
 
 	_expect(presses >= 20, "the probe checked the slice's state-changing presses (%d)" % presses)
 	print("Press probe: %d state-changing presses, %d heard within one frame" % [presses, heard])
-	bank.stop_all()
-	game.queue_free()
-	_remove(path)
-	_remove("%s-settings.cfg" % path)
-	# Let the mixer release stopped clips before quitting, as the SfxBank suite does.
-	await create_timer(0.5).timeout
-	if failures == 0:
-		print("Press sound checks passed")
-	quit(1 if failures > 0 else 0)
+	# The kit's teardown stops the bank and every player and lets the mixer release them (about 0.5 s
+	# in all, as before) before it frees the game and removes its files.
+	await end_game(game, 0.4)
+	finish("Press sound checks passed")
 
 
 ## Disclose at the relay: WOLF takes the surge; the safe point; Records with WOLF's mirror readout;
@@ -293,18 +278,8 @@ func _place(human_x: float, wolf_x: float) -> void:
 	await _frames(1)
 
 
+## Waits [param count] process frames (not the kit's physics frames): the probe times a press's sound
+## against the frame the press lands on, which is a process frame.
 func _frames(count: int) -> void:
 	for _frame: int in count:
 		await process_frame
-
-
-func _remove(path: String) -> void:
-	if FileAccess.file_exists(path):
-		DirAccess.remove_absolute(ProjectSettings.globalize_path(path))
-
-
-func _expect(condition: bool, label: String) -> bool:
-	if not condition:
-		failures += 1
-		push_error("Press sound check failed: " + label)
-	return condition
