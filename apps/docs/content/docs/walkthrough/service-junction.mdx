@@ -35,7 +35,8 @@ import junction960 from '../../../app/images/service-junction-entry-capture-960.
 - WOLF runs ahead to the valve, reads its **LINE** gauge, warns you not to stand in front of the door when it goes, then follows you again.
 - If you don't arm the breaker, help comes a little at a time. After about 45 seconds WOLF looks at the breaker while its lamp pulses. After about a minute and a half the engineer says the breaker feeds that line. After about three minutes the engineer says the whole way, and the hint line gives it too.
 - Arming the breaker ends these hints. Continue from this room's first save gives the whole way at once.
-- A press that can't work yet still answers: the lamp flickers twice, a dull clunk plays and a line says why. Press again and the box blinks as the line comes back.
+- A press that can't work yet still answers: the machine's lamp flickers twice, a dull clunk plays and a line says why and what to do instead. The valve, for example, says it is dead until the breaker is armed. Press again and the box blinks as the line comes back.
+- The sealed door answers for itself once you walk up to it, and keeps answering after you let go, until you move again.
 - Walking into the sealed door gives a dull thud and a flicker of its seam lamp. Only the first bump says why.
 
 </Details>
@@ -77,6 +78,15 @@ import junction960 from '../../../app/images/service-junction-entry-capture-960.
 - **How cranking works:** [Hold to crank](/docs/controls/input/#hold-to-crank).
 - **Turns stay done** if you let go, pause or step away.
 - **The card reads CRANK THE VALVE** until the door is charged.
+
+<Details>
+<Summary>What you'll see</Summary>
+
+- The engineer steps to the left of the wheel, facing it, and starts cranking once there.
+- The wheel gives a little with a soft click the moment you press.
+- Then each 0.4 seconds held is one turn: the wheel turns a quarter, a click sounds and the **VALVE** label counts it.
+
+</Details>
 
 ## 3. Get clear of the door
 
@@ -175,14 +185,16 @@ Past the doorway, a **sentry** machine patrols. A coolant tank hangs over a stri
 <Details>
 <Summary>More about drops and misses</Summary>
 
-- A tank that catches the sentry's near end still counts. One that only brushes it is a miss.
-- On patrol, the sentry turns just past the mark, so each pass gives you a short window.
+- **The hit rule:** the tank hits if at least a quarter of the sentry's body is over the mark when it lands. So a tank that catches the sentry's near end still counts. One that only brushes it is a miss.
+- **The drop window on patrol:** the sentry turns just past the mark, so each time it comes by it is over the mark for a little under a second.
+- **The drop window in a chase:** a chasing sentry crosses the mark in about a third of a second.
 - While WOLF draws it, the sentry watches only him: it faces away from the release with its eye red and shows no beam. If it turns on you instead, WOLF keeps clear and the release works at once.
 - After a miss while WOLF draws it, he breaks off. If he is past the sentry, he stays by the exit door and its patrol turns short of him. If not, he goes back beside the valve and waits facing you.
 - A missed tank is dented and lies on the empty mark, spraying coolant. While it is down, the sentry can't drive through it and waits at its edge.
 - The line after a miss comes in two boxes. The second, telling you to get back over the rubble, is left out if you are already there. If WOLF was drawing the sentry, a third says he is out.
 - Knocked down, the engineer slumps forward and the sentry rolls back off them. Caught by the cloud facing the tank, they stagger back from it as they fall.
 - The knockdown line tells you why: seen out in the open (stay close to the release), or caught after its eyes went red (only the rubble is safe).
+- Run down out in the open while facing away from the release, the engineer ends up lying on the floor past the right-hand end of the tint.
 
 </Details>
 
@@ -200,7 +212,7 @@ Past the doorway, a **sentry** machine patrols. A coolant tank hangs over a stri
 <Details>
 <Summary>What you'll see</Summary>
 
-- WOLF goes to wait by the exit door, clear of the tank. If he was back beside the valve, the empty arm winches up first and he bounds over the crushed tank.
+- WOLF goes to wait by the exit door, clear of the tank. If he was back beside the valve, the empty arm winches up first and he bounds over the crushed tank, in one arc that also carries him over the engineer if they are still at the release.
 - The conduit into the cable box beside the **EXIT BOLT** box lights up, and the plate changes from **EXIT LOCKED** to **EXIT READY**.
 - The panel whines, the bolt arcs and drops, and the exit door slides into its wall pocket. Its plate reads **EXIT OPENING**, then its lamp turns green.
 - WOLF waits in the doorway, looking back at you. From the **EXIT BOLT** box the hint only says the door is open.
