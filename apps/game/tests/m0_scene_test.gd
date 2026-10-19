@@ -68,6 +68,8 @@ func _run() -> void:
 		return
 	var credits_body: RichTextLabel = credits_screen.get_node("CreditsBody") as RichTextLabel
 	_expect(credits_body.text.contains("Nathanial Henniges") and credits_body.text.contains("Godot 4.7.2"), "in-game credits name the creator and production tools")
+	var credits_shown: String = credits_body.get_parsed_text()
+	_expect(credits_shown.begins_with(Main.AI_DISCLOSURE_HEADING + "\n" + Main.AI_DISCLOSURE) and credits_shown.contains("ORIGINAL CONCEPT"), "credits open with the approved AI disclosure, then the scene's credits")
 	game.call("_process", 1.0)
 	_expect(credits_body.get_v_scroll_bar().value > 0.0, "credits scroll during title playback")
 	credits_pause_button.pressed.emit()

@@ -16,6 +16,13 @@ const NAME_SETTING: String = "application/config/name"
 ## screen falls back to CHANGELOG_UNAVAILABLE.
 const CHANGELOG_PATH: String = "res://assets/changelog.txt"
 const CHANGELOG_UNAVAILABLE: String = "The changelog text is missing from this build. Open the full changelog online."
+## The AI disclosure, word for word as Nathanial Henniges approved it on 2026-10-19 (docs/decisions.md,
+## AI-01), shown at the top of the credits ([method _fill_credits]). The website keeps the same words in
+## apps/docs/lib/press-kit.ts (aiDisclosure), and its lib/press-kit.test.ts fails when this line is not
+## exactly that text, so neither copy can be reworded alone; a changed text needs a new approval.
+const AI_DISCLOSURE: String = "WOLF OVERRIDE is a solo project by Nathanial Henniges (MrDemonWolf, Inc.). AI tools were used with careful human oversight to support the creative process for art and code. The story, characters and game design are his, and every AI-assisted asset is reviewed, edited and credited."
+## The credits heading over [constant AI_DISCLOSURE], in the scene's credits heading style.
+const AI_DISCLOSURE_HEADING: String = "AI DISCLOSURE"
 ## How fast a held up/down input scrolls the changelog, in pixels per second.
 const CHANGELOG_SCROLL_SPEED: float = 260.0
 ## Where WOLF stands to hold the live relay contact: on the relay's left, facing it, his painted snout
@@ -722,6 +729,10 @@ var hold_toggle: bool = false
 ## With TOGGLE HOLDS on, true while a press has the crank turning.
 var crank_latched: bool = false
 var credits_paused: bool = false
+## The credits body as the scene writes it, in English, read once at start-up. [method _fill_credits]
+## translates it as one message (the template's msgid is this scene text) and puts the AI disclosure
+## block above it.
+var _credits_english: String = ""
 ## Whether Pause's hint last showed the touch line, so a language change writes it again the same way
 ## ([method _show_pause_hint]).
 var _pause_hint_tapped: bool = false
@@ -1008,6 +1019,11 @@ func _ready() -> void:
 	credits_back_button.pressed.connect(_hide_credits)
 	credits_pause_button.pressed.connect(_toggle_credits_pause)
 	credits_body.gui_input.connect(_on_credits_body_input)
+	# The body is now built in code, so its auto-translate is turned off here (not in the scene, where
+	# a disabled mode would also keep the template generator from extracting the scene text).
+	_credits_english = credits_body.text
+	credits_body.auto_translate_mode = Node.AUTO_TRANSLATE_MODE_DISABLED
+	_fill_credits()
 	changelog_button.pressed.connect(_show_changelog)
 	changelog_back_button.pressed.connect(_hide_changelog)
 	changelog_online_button.pressed.connect(_open_changelog)
@@ -1917,6 +1933,18 @@ func _show_credits() -> void:
 	_grab_menu_focus(credits_back_button)
 
 
+## Writes the credits body: the AI disclosure block, then the scene's credits, each translated into the
+## current language as its own message. Appending to the scene text instead would change the one msgid
+## auto-translate looks up, leaving the whole body untranslated. Called at start-up and on every
+## language change (NOTIFICATION_TRANSLATION_CHANGED); it leaves the scroll position alone.
+func _fill_credits() -> void:
+	# TRANSLATORS: Heading over the AI disclosure in the credits, in the same capitals as the other headings.
+	var heading: String = tr(AI_DISCLOSURE_HEADING)
+	# TRANSLATORS: The AI disclosure Nathanial Henniges approved word for word (October 19, 2026). Translate it faithfully and in full; do not shorten, soften or add to it. Keep WOLF OVERRIDE, Nathanial Henniges and MrDemonWolf, Inc. as written.
+	var disclosure: String = tr(AI_DISCLOSURE)
+	credits_body.text = "[center][color=#73DDF5]%s[/color]\n%s[/center]\n\n\n%s" % [heading, disclosure, tr(_credits_english)]
+
+
 func _hide_credits() -> void:
 	_hide_title_overlay(credits_screen)
 	_grab_menu_focus(credits_button)
@@ -2216,9 +2244,12 @@ func _notification(what: int) -> void:
 		NOTIFICATION_WM_GO_BACK_REQUEST:
 			_handle_back()
 		NOTIFICATION_TRANSLATION_CHANGED:
-			# Pause's hint is the one title or Pause text translated in code (localization PR L7a).
+			# Pause's hint (localization PR L7a) and the credits body are the title and Pause text
+			# translated in code; every other Control there auto-translates.
 			if is_node_ready() and pause_menu.visible:
 				_show_pause_hint(_pause_hint_tapped)
+			if is_node_ready():
+				_fill_credits()
 		NOTIFICATION_APPLICATION_PAUSED, NOTIFICATION_APPLICATION_FOCUS_OUT:
 			# Leaving the app mid-play pauses it so nothing advances unseen.
 			if auto_pause_on_focus_loss and is_node_ready() and not title_open and not end_card_active and not get_tree().paused:
