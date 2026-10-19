@@ -37,7 +37,7 @@ extends SceneTree
 ## The game scene every suite plays.
 const MAIN_SCENE: PackedScene = preload("res://scenes/main.tscn")
 
-## The language a suite's made-up catalog stands in for (i18n_test's HUD checks, settings_test's menu
+## The language a suite's made-up catalog stands in for (i18n_test's HUD and story checks, settings_test's menu
 ## translation): one in languages.json that ships no catalog (Italian, outside decision D1's twelve
 ## files), so no real catalog of the same locale answers first. Which of two catalogs of one locale
 ## answers is Godot's order, not the test's. It was "es" until PR L9 shipped es.po, and settings_test's
