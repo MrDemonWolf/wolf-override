@@ -170,8 +170,7 @@ func _check_every_language() -> void:
 		for tag: String in tags:
 			shown_tags.append(String(names.get(tag, tag)))
 		for step: float in TextSize.STEPS:
-			TextSize.factor = step
-			game.call("_apply_text_size")
+			_use_size(step)
 			var font: Font = story.get_theme_font(&"font")
 			var size: int = story.get_theme_font_size(&"font_size")
 			var width: float = game.call("_dialogue_column_width")
@@ -185,8 +184,7 @@ func _check_every_language() -> void:
 					if not _check_language_box(box, shown_tags, font, size, width, code):
 						unsplittable += 1
 	I18n.apply(I18n.FALLBACK)
-	TextSize.factor = 1.0
-	game.call("_apply_text_size")
+	_use_size(1.0)
 	print("text boxes: %d boxes in %d languages at %d sizes; %d are one sentence or clause too long to split" % [boxes, I18n.LANGUAGES.size(), TextSize.STEPS.size(), unsplittable])
 	_expect(boxes > messages.size() * I18n.LANGUAGES.size() * TextSize.STEPS.size(), "every language's corpus was measured at every size (%d boxes)" % boxes)
 
@@ -228,8 +226,7 @@ func _check_cjk_samples() -> void:
 		var sample: String = samples[code]
 		_expect(I18n.missing_glyphs(sample, story.get_theme_font(&"font")).is_empty(), "%s: the bundled font draws the sample (missing: %s)" % [code, I18n.missing_glyphs(sample, story.get_theme_font(&"font"))])
 		for step: float in TextSize.STEPS:
-			TextSize.factor = step
-			game.call("_apply_text_size")
+			_use_size(step)
 			var font: Font = story.get_theme_font(&"font")
 			var size: int = story.get_theme_font_size(&"font_size")
 			var width: float = game.call("_dialogue_column_width")
@@ -238,11 +235,10 @@ func _check_cjk_samples() -> void:
 			for box: String in boxes:
 				_expect(_check_language_box(box, none, font, size, width, code), "%s at %d%%: the box keeps the rules: %s" % [code, roundi(step * 100.0), box])
 	I18n.apply(I18n.FALLBACK)
-	TextSize.factor = 1.0
-	game.call("_apply_text_size")
+	_use_size(1.0)
 	# A station name written without spaces breaks between its words above 100% (TextSize.wrap_world_label).
 	I18n.apply("ja")
-	TextSize.factor = 2.0
+	_use_size(2.0)
 	var plate: Label = (game.get_node("BreakerLabel") as Label).duplicate() as Label
 	plate.text = "非常用電源制御盤"
 	game.add_child(plate)
@@ -250,7 +246,13 @@ func _check_cjk_samples() -> void:
 	_expect(plate.get_line_count() > 1, "a Japanese station name breaks between its words at 200%% (%d rows)" % plate.get_line_count())
 	plate.free()
 	I18n.apply(I18n.FALLBACK)
-	TextSize.factor = 1.0
+	_use_size(1.0)
+
+
+## Sets TEXT SIZE to [param step] (a TextSize.STEPS factor) without Settings, and lays the game's text
+## out again at it, so the Story label's font size and the dialogue column are read at that size.
+func _use_size(step: float) -> void:
+	TextSize.factor = step
 	game.call("_apply_text_size")
 
 
