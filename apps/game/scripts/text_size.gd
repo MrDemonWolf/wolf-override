@@ -68,21 +68,25 @@ const WORLD_LABEL_GAP: float = 2.0
 ## from the machine under it, so its bottom edge stays where it was. [param room] (px, the whole plate
 ## with its margins) is the most width the plate may take before it breaks onto rows; INF leaves only
 ## WORLD_ROW_GROWTH's limit, and [method part_world_labels] passes less where a neighbour stands close.
-## Remembers [param center_x] and [param top] on the label, so part_world_labels can fit it again.
-static func fit_world_label(label: Label, center_x: float, top: float, room: float = INF) -> void:
+## [param font_px] above 0 draws the name at that size instead of world_px (part_world_labels steps a
+## name that cannot break narrow enough back toward its 100% size). Remembers [param center_x] and
+## [param top] on the label, so part_world_labels can fit it again.
+static func fit_world_label(label: Label, center_x: float, top: float, room: float = INF, font_px: int = 0) -> void:
 	var base: int = int(label.get_meta(&"text_base_size", label.get_theme_font_size(&"font_size")))
 	label.set_meta(&"world_center_x", center_x)
 	label.set_meta(&"world_top", top)
-	wrap_world_label(label, base, room)
+	wrap_world_label(label, base, room, font_px)
 	label.position = Vector2(center_x - label.size.x * 0.5, top - world_growth(label, base))
 
 
 ## Neighbouring station names that would cover each other part (localization PR L8, decision D3: the
 ## plates are translated, and a longer name must not run into the next one). Each pair of [param labels]
-## whose plates overlap, both shown with words (their own visible flag, so a room fitted while hidden
-## is parted too), has its wider plate fitted again with only the room that clears the other plate by
-## WORLD_LABEL_GAP, which breaks it onto rows at its spaces; when the wider one cannot get narrower (a
-## single word), the other is tried. Only plates fitted with [method fit_world_label] are moved; the
+## whose plates overlap, both with words (shown or not: a room hides its names while the engineer is
+## elsewhere), has its wider plate fitted again with only the room that clears the other plate by
+## WORLD_LABEL_GAP, which breaks it onto rows at its spaces, and where one word is still wider than that
+## room (Spanish REFRIGERANTE above 100%), draws it smaller, back toward its 100% size, until it fits,
+## and if even that is too wide, moves it off its station's centre, away from the neighbour, by what is
+## left over; when the wider one cannot be fitted again, the other is tried. Only plates fitted with [method fit_world_label] are moved; the
 ## others (the MANUAL BYPASS plate, the COOLANT FAULT tag) stand still. Rects are compared in global
 ## px, so plates under different parents (the corridor's and the bypass handle's) count. Plates that do
 ## not overlap are left exactly as fitted, so the English rooms, whose names stand apart at every TEXT
@@ -94,7 +98,9 @@ static func part_world_labels(labels: Array[Label]) -> void:
 			for b: int in range(a + 1, labels.size()):
 				var first: Label = labels[a]
 				var second: Label = labels[b]
-				if not (first.visible and second.visible) or first.text.is_empty() or second.text.is_empty():
+				# Visibility is not asked: a room hides its names while the engineer is elsewhere and shows
+				# them again without fitting them, so they are parted whether shown now or not.
+				if first.text.is_empty() or second.text.is_empty():
 					continue
 				# Touching plates are apart, as the test's overlap check counts them (grow -0.5).
 				if not first.get_global_rect().grow(-0.5).intersects(second.get_global_rect().grow(-0.5)):
@@ -108,17 +114,34 @@ static func part_world_labels(labels: Array[Label]) -> void:
 
 
 ## Fits [param label] again (fit_world_label) into the room that clears [param neighbour]'s plate by
-## WORLD_LABEL_GAP, both centred where they stand. Returns true when the plate got narrower; false when
-## it was not fitted by fit_world_label, has no room left at all, or cannot break any narrower.
+## WORLD_LABEL_GAP, both centred where they stand: first broken onto rows at its current size, then, if a
+## word is still too wide, a pixel smaller at a time down to its 100% size (its text_base_size), never
+## below; and if it is still too wide at 100%, moved away from the neighbour by the overlap left over
+## (the Spanish COOLANT RELAY beside the fixed MANUAL BYPASS plate at 125%: a few px). Returns true when
+## the plate got narrower or moved; false when it was not fitted by fit_world_label or already clears the
+## neighbour.
 static func _narrow_beside(label: Label, neighbour: Label) -> bool:
 	if not label.has_meta(&"world_top"):
 		return false
 	var distance: float = absf(label.get_global_rect().get_center().x - neighbour.get_global_rect().get_center().x)
 	var room: float = 2.0 * (distance - neighbour.size.x * 0.5 - WORLD_LABEL_GAP)
 	var before: float = label.size.x
-	if room <= 0.0 or room >= before:
+	if room >= before:
 		return false
-	fit_world_label(label, float(label.get_meta(&"world_center_x")), float(label.get_meta(&"world_top")), room)
+	var center_x: float = float(label.get_meta(&"world_center_x"))
+	var top: float = float(label.get_meta(&"world_top"))
+	var base: int = int(label.get_meta(&"text_base_size", label.get_theme_font_size(&"font_size")))
+	var font_px: int = label.get_theme_font_size(&"font_size")
+	fit_world_label(label, center_x, top, room, font_px)
+	while label.size.x > room and font_px > base:
+		font_px -= 1
+		fit_world_label(label, center_x, top, room, font_px)
+	if label.size.x > room:
+		# Off centre by what the two plates still lack: their half widths and the gap, less the distance.
+		var away: float = signf(label.get_global_rect().get_center().x - neighbour.get_global_rect().get_center().x)
+		var shift: float = label.size.x * 0.5 + neighbour.size.x * 0.5 + WORLD_LABEL_GAP - distance
+		fit_world_label(label, center_x + (away if away != 0.0 else -1.0) * shift, top, room, font_px)
+		return true
 	return label.size.x < before - 0.5
 
 
@@ -129,9 +152,10 @@ static func _narrow_beside(label: Label, neighbour: Label) -> bool:
 ## server's word rules (DialogueBoxes.row_texts, whole words only), so a name written without spaces
 ## breaks between its words too (PR L7d). The rows are measured on the name as drawn in the language
 ## shown, and a plate also breaks when it is wider than [param room] (px, margins included; PR L8, see
-## [method part_world_labels]).
-static func wrap_world_label(label: Label, base: int, room: float = INF) -> void:
-	label.add_theme_font_size_override(&"font_size", world_px(base))
+## [method part_world_labels]); [param font_px] above 0 replaces world_px(base) as its size.
+static func wrap_world_label(label: Label, base: int, room: float = INF, font_px: int = 0) -> void:
+	var px: int = font_px if font_px > 0 else world_px(base)
+	label.add_theme_font_size_override(&"font_size", px)
 	var font: Font = label.get_theme_font(&"font")
 	# The rows are worked out from the name as it is drawn: the label translates its English text itself
 	# (auto-translate), so measuring label.text would break a translated name by its English length.
@@ -143,10 +167,10 @@ static func wrap_world_label(label: Label, base: int, room: float = INF) -> void
 	# Words keep the spacing they were written with ("VALVE  0 / 3"); a row's ends lose their spaces.
 	# Not TextParagraph for every language: its break rules move English rows ("VALVE  0 / 3" at 150%
 	# broke as "VALVE" / "0 / 3" rather than "VALVE  0" / "/ 3", a narrower plate), and English stays as it was.
-	var rows: Array[String] = _space_rows(shown, font, world_px(base), limit) if DialogueBoxes.row_characters() > 0 else DialogueBoxes.row_texts(shown, font, world_px(base), limit, true)
+	var rows: Array[String] = _space_rows(shown, font, px, limit) if DialogueBoxes.row_characters() > 0 else DialogueBoxes.row_texts(shown, font, px, limit, true)
 	var widest: float = 0.0
 	for row: String in rows:
-		widest = maxf(widest, font.get_string_size(row, HORIZONTAL_ALIGNMENT_LEFT, -1.0, world_px(base)).x)
+		widest = maxf(widest, font.get_string_size(row, HORIZONTAL_ALIGNMENT_LEFT, -1.0, px).x)
 	var wrapped: bool = rows.size() > 1
 	label.autowrap_mode = TextServer.AUTOWRAP_WORD if wrapped else TextServer.AUTOWRAP_OFF
 	# The plate is as wide as its widest row (and its margins); a pixel spare keeps the rows as measured.
