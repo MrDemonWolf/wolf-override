@@ -180,8 +180,6 @@ const NAME_CARD_SECONDS: float = 2.6
 const TOP_CARD_FADE_SECONDS: float = 0.45
 const TOP_CARD_ACCENT: Color = Color(0.22, 0.78, 0.92, 1)
 const ENGINEER_TINT: Color = Color("#f4d5ae")
-## WOLF lit up as he wakes in the opening.
-const WOLF_AWAKE_TINT: Color = Color("#9deeff")
 ## A corridor station drawn while the breaker is off.
 const UNPOWERED_TINT: Color = Color("#879ba5")
 const DISPLAY_FONT: FontVariation = preload("res://assets/fonts/Montserrat-Bold.tres")
@@ -523,7 +521,6 @@ const JUNCTION_RESTORE_A_LINE: String = "Service junction restored. Arm the brea
 @onready var human: M0Actor = $Human
 @onready var wolf: M0Actor = $Wolf
 @onready var relay_spark: Line2D = $RelaySpark
-@onready var intro_gate: Sprite2D = $IntroGate
 @onready var intro_camera: Camera2D = $IntroCamera
 @onready var intro_director: Sprite2D = $IntroDirector
 @onready var intro_alarm: ColorRect = $CanvasLayer/IntroAlarm
@@ -680,6 +677,11 @@ var servo_tween: Tween
 ## WOLF's body sprite at rest, as the scene sets it; ducking under the junction's hung tank squashes it
 ## for a moment (_sync_wolf_leap).
 var wolf_sprite_scale: Vector2 = Vector2.ONE
+## WOLF's standing piece (the scene's), and his eye and seam lights over whichever piece he shows.
+var wolf_stand_texture: Texture2D
+var wolf_lights: WolfLights
+## The opening's break-out (box 4) while it plays.
+var break_out_tween: Tween
 ## WOLF's floor reflection and its contact line at rest (fix round 2: his step forward of the valve moves
 ## both with his feet, JunctionRoom.wolf_valve_step).
 var wolf_reflection: FloorReflection
@@ -688,7 +690,7 @@ var impact: Impact
 var sfx_bank: SfxBank
 var relay_sparks: CPUParticles2D
 var door_dust: CPUParticles2D
-var gate_dust: CPUParticles2D
+var lock_chips: CPUParticles2D
 ## The opening's dock bay left of the corridor (layout L1).
 var dock_bay: DockBay
 ## True from a knockdown until the last autosave is back; the engineer has no controls meanwhile.
@@ -844,18 +846,28 @@ const WOLF_FEET_BELOW_CENTRE: float = 274.5
 ## rows at WOLF_ART_SCALE).
 const WOLF_DRAWN_HEIGHT: float = 549.0 * WOLF_ART_SCALE
 const GAMEPLAY_ZOOM: float = 1.35
-## The opening's dock bay (layout L1, Nathanial 2026-10-14; DockBay) and its marks, world px. Until the
-## beats are rebuilt round the cage, the opening plays its existing beats there, on the codex/opening-dock
-## backup's round-4 marks (9b6a2e3): WOLF on the pad, out in front of the bay and at the opening's edge;
-## the Director in front of the bay and stepped back from it; the opening's one framing (zoom 1.6).
-const L1_WOLF_DOCKED_X: float = -397.0
-const L1_WOLF_EXIT_X: float = -327.0
+## The opening's dock bay (layout L1, Nathanial 2026-10-14; DockBay) and its marks, world px, on the
+## codex/opening-dock backup's round-4 marks (9b6a2e3): WOLF at the opening's edge after he walks out
+## (DockBay holds his marks in the cage); the Director in front of the bay and stepped back from it;
+## the opening's one framing (zoom 1.6: x -570 .. 30, the charger's battery screen at x -514 to the
+## opening's casing; at the backup's centre, -195, the screen was cut off by the view's left edge).
 const L1_WOLF_DOORWAY_X: float = -140.0
 const L1_DIRECTOR_X: float = -257.0
 const L1_DIRECTOR_BACK_X: float = -235.0
 const L1_DIRECTOR_Y: float = 410.0
-const L1_OPENING_CAMERA: Vector2 = Vector2(-195.0, 344.5)
+const L1_OPENING_CAMERA: Vector2 = Vector2(-270.0, 344.5)
 const L1_OPENING_ZOOM: float = 1.6
+## Box 3 (backup round 3, review-human-2 should-fix 3): the wake eases the pad, the screen and WOLF's
+## lights from amber to blue over this long.
+const L1_WAKE_SECONDS: float = 0.8
+## Box 4 (backup round 4): WOLF gets up off the pad (the charge cuts as he lifts) and stands at the latch
+## over this long; once the leaves have coasted open he steps down out of the bay over L1_STEP_DOWN_S.
+const L1_LATCH_SECONDS: float = 0.3
+const L1_STEP_DOWN_S: float = 0.28
+## A calm walk (review S6): 1.4 m/s, under Spot's 1.6 m/s maximum.
+const L1_WOLF_SPEED: float = 56.0
+## WOLF's eye and seams while he rests on the pad (compose.py: resting lights at half strength).
+const WOLF_RESTING_LIGHT: float = 0.5
 ## Play in the corridor's chapter (decided 2026-10-14): first control's view starts at x -40, so the
 ## opening into the dock bay shows at its left edge. Walking left past x 160 the camera eases on one
 ## continuous mapping from that framing to the whole room's, reached with the engineer at -250, so there
@@ -959,7 +971,8 @@ func _ready() -> void:
 	wolf.keep_clear_of = human
 	wolf_sprite_scale = wolf.body_sprite.scale
 	# His piece is painted with its lights off; the eye and seam lights are drawn over it in code.
-	WolfLights.attach(wolf.body_sprite)
+	wolf_stand_texture = wolf.body_sprite.texture
+	wolf_lights = WolfLights.attach(wolf.body_sprite)
 	_setup_corridor_door()
 	dock_bay = DockBay.new()
 	add_child(dock_bay)
@@ -1203,11 +1216,18 @@ func _on_reduced_motion_changed(on: bool) -> void:
 
 
 ## One-shot particle presets parked at the places that already answer the player: the relay
-## contact, the seal's landing and the containment gate.
+## contact, the seal's landing and the guard lock on WOLF's cage in the opening.
 func _setup_particles() -> void:
 	relay_sparks = FxPresets.place(FxPresets.sparks(), self, "", Vector2(601.0, 390.0), 3)
 	door_dust = FxPresets.place(FxPresets.dust_burst(), self, "", Vector2(780.0, 436.0), 3, Vector2(30.0, 3.0))
-	gate_dust = FxPresets.place(FxPresets.dust_burst(), self, "", Vector2(L1_WOLF_DOCKED_X, 438.0), 3, Vector2(70.0, 3.0))
+	# The guard lock's sheared bolts throw a few chips of dark paint up and back at about 1 m/s, falling
+	# under gravity (backup round 2, review-real-2 S6 and review-tells-2 M2: a puff of glowing dust there
+	# read as an effect, not as steel giving way); the boom, the lock's drop and the beacon carry it.
+	lock_chips = FxPresets.place(FxPresets.chips(Color("#2b2f31"), 5), self, "LockChips", DockBay.LOCK_LENS, 3)
+	lock_chips.direction = Vector2(-0.45, -1.0)
+	lock_chips.initial_velocity_min = 25.0
+	lock_chips.initial_velocity_max = 55.0
+	lock_chips.gravity = Vector2(0.0, 392.0)
 
 
 ## A small additive glow riding on a station status light; it takes the light's colour each refresh.
@@ -1793,13 +1813,17 @@ func _new_game() -> void:
 	$CheckpointLabel.hide()
 	for station: CanvasItem in [breaker_art, relay_art, checkpoint_art, breaker_status_light, relay_status_light, door_visual, door_lip, seal_lamp, bypass_handle]:
 		station.hide()
-	wolf.position = Vector2(L1_WOLF_DOCKED_X, 423.0)
-	wolf.z_index = ACTOR_Z
-	wolf.body_sprite.position = WOLF_SPRITE_REST
-	wolf.body_sprite.modulate = Color("#365263")
-	# The dock bay's cage is still to come: the old code-drawn cage stays hidden.
-	intro_gate.hide()
-	$IntroCage.hide()
+	# WOLF charging, lying on the pad in his shut cage, his eye and seams dim.
+	wolf.position = Vector2(DockBay.LIE_X, 423.0)
+	wolf.z_index = DockBay.WOLF_CAGED_Z
+	# Inside the bay he stands on the pad, behind the leaves: no reflection on the deck in front.
+	wolf_reflection.enabled = false
+	_wolf_pose(&"lie", DockBay.PAD_LIFT)
+	wolf_lights.tint = WolfLights.LIGHT
+	wolf_lights.strength = WOLF_RESTING_LIGHT
+	Tweens.kill(break_out_tween)
+	dock_bay.reduce_motion = impact.reduce_motion
+	dock_bay.set_standby()
 	dock_bay.set_exit(0.0, 0.0)
 	intro_camera.position = L1_OPENING_CAMERA
 	intro_camera.position_smoothing_enabled = false
@@ -1824,38 +1848,122 @@ func _advance_intro() -> void:
 		status_line = INTRO_LINES[intro_step]
 	match intro_step:
 		2:
-			# WOLF wakes himself.
+			# WOLF wakes himself: the pad's light, the battery screen and his eye and seams turn blue.
 			intro_tween = create_tween()
-			intro_tween.tween_property(wolf.body_sprite, "modulate", WOLF_AWAKE_TINT, 0.45)
+			intro_tween.tween_method(_wake_at, 0.0, 1.0, L1_WAKE_SECONDS)
 		3:
-			wolf.body_sprite.modulate = WOLF_AWAKE_TINT
-			_shutter_boom()
-			intro_tween = create_tween()
-			# The gate folds aside and stays drawn, open, against the cage post.
-			intro_tween.tween_property(intro_gate, "opening", 1.0, 0.65).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
-			intro_tween.parallel().tween_property(intro_alarm, "color:a", 0.13, 0.18)
-			intro_tween.tween_callback(func() -> void: wolf.z_index = 5)
-			intro_tween.tween_property(wolf.body_sprite, "position:y", WOLF_SPRITE_REST.y + 8.0, 0.28)
-			intro_tween.tween_callback(func() -> void: wolf.autonomous_target_x = L1_WOLF_EXIT_X)
+			_wake_at(1.0)
+			_break_out()
 		4:
-			intro_gate.set("opening", 1.0)
-			wolf.z_index = 5
-			wolf.body_sprite.position.y = WOLF_SPRITE_REST.y + 8.0
-			wolf.autonomous_target_x = L1_WOLF_EXIT_X
-			intro_tween = create_tween()
-			intro_tween.tween_property(intro_director, "position:x", L1_DIRECTOR_BACK_X, 0.65).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
-			intro_tween.parallel().tween_property(intro_alarm, "color:a", 0.05, 0.65)
+			_break_out_end()
 		5:
 			intro_director.position.x = L1_DIRECTOR_BACK_X
 		6:
 			# The narration says it as he does it: he turns from the Director and walks off.
 			intro_director.position.x = L1_DIRECTOR_BACK_X
 			wolf.autonomous_target_x = L1_WOLF_DOORWAY_X
+			wolf.speed_scale = L1_WOLF_SPEED / M0Actor.FOLLOW_SPEED
 		7:
 			intro_tween = create_tween()
 			intro_tween.tween_property(intro_fade, "color:a", 1.0, 0.3)
 			intro_tween.tween_callback(_finish_intro.bind(true))
 			intro_tween.tween_property(intro_fade, "color:a", 0.0, 0.35)
+
+
+## WOLF's body shows [param pose]: &"stand" (his standing piece, as everywhere after the opening),
+## &"lie" (on the dock's pad) or &"rise" (getting up off it). One place swaps the piece, its scale (each
+## piece drawn at the standing piece's density's share of WOLF_ART_SCALE, so he keeps one size) and its
+## height, so his feet stay on his origin's floor line ([param lift] world px higher: the dock's pad,
+## DockBay.PAD_LIFT), and points his lights at the same piece.
+func _wolf_pose(pose: StringName, lift: float = 0.0) -> void:
+	var texture: Texture2D = wolf_stand_texture
+	var scale_factor: float = 1.0
+	if pose == &"lie":
+		texture = DockBay.WOLF_LIE
+		scale_factor = DockBay.WOLF_LIE_SCALE
+	elif pose == &"rise":
+		texture = DockBay.WOLF_RISE
+		scale_factor = DockBay.WOLF_RISE_SCALE
+	wolf.body_sprite.texture = texture
+	wolf.body_sprite.scale = wolf_sprite_scale * scale_factor
+	# The piece's centre moves by half the difference in drawn height from the standing piece's, so the
+	# standing piece lands exactly on WOLF_SPRITE_REST (tests compare it exactly).
+	var stand_height: float = wolf_stand_texture.get_height() * wolf_sprite_scale.y
+	var height: float = texture.get_height() * wolf.body_sprite.scale.y
+	wolf.body_sprite.position = WOLF_SPRITE_REST + Vector2(0.0, lift + (stand_height - height) * 0.5)
+	if wolf_lights != null:
+		wolf_lights.pose = pose
+
+
+## The wake at [param t] (0 charging .. 1 awake): the dock's light and screen (DockBay.set_wake) and
+## WOLF's lights from dim cyan to bright blue.
+func _wake_at(t: float) -> void:
+	dock_bay.set_wake(t)
+	wolf_lights.tint = WolfLights.LIGHT.lerp(DockBay.WAKE_BLUE, t)
+	wolf_lights.strength = lerpf(WOLF_RESTING_LIGHT, 1.0, t)
+
+
+## Box 4's break-out: WOLF gets up off the pad (the charge cuts on his first frame of movement), stands
+## at the latch and forces the guard lock (the boom, the lock torn off, the bay's beacon, the Director
+## stepping back), shoulders the leaves aside with his feet planted while they coast to the stop, then
+## steps down out of the bay to stand clear of the hanging lock.
+func _break_out() -> void:
+	Tweens.kill(break_out_tween)
+	break_out_tween = create_tween()
+	break_out_tween.tween_callback(_wolf_rises)
+	break_out_tween.tween_interval(L1_LATCH_SECONDS)
+	break_out_tween.tween_callback(_wolf_at_latch)
+	break_out_tween.tween_callback(_lock_tears)
+	break_out_tween.tween_method(func(t: float) -> void: dock_bay.set_lead_travel(DockBay.leaf_travel(t)), 0.0, DockBay.leaf_seconds(), DockBay.leaf_seconds())
+	break_out_tween.tween_callback(_wolf_steps_down)
+	break_out_tween.tween_property(wolf.body_sprite, "position:y", WOLF_SPRITE_REST.y + DockBay.STEP_DOWN, L1_STEP_DOWN_S)
+	break_out_tween.parallel().tween_property(wolf, "position:x", DockBay.OUT_X, L1_STEP_DOWN_S)
+
+
+## The break-out's end state at once (a press before it has played out).
+func _break_out_end() -> void:
+	if break_out_tween == null or not break_out_tween.is_valid():
+		return
+	Tweens.kill(break_out_tween)
+	if not dock_bay.lock_torn:
+		_lock_tears()
+	dock_bay.set_lead_travel(DockBay.lead_open_travel())
+	_wolf_pose(&"stand")
+	_wolf_steps_down()
+	wolf.position.x = DockBay.OUT_X
+	wolf.body_sprite.position.y = WOLF_SPRITE_REST.y + DockBay.STEP_DOWN
+
+
+## WOLF lifts off the pad: the getting-up piece, his haunch where it lay, and the coupling breaks as
+## he lifts, so the pad's light and the battery screen go dark on this frame.
+func _wolf_rises() -> void:
+	wolf.position.x = DockBay.RISE_X
+	_wolf_pose(&"rise", DockBay.PAD_LIFT)
+	dock_bay.set_charge(DockBay.WAKE_BLUE, 0.0)
+	dock_bay.set_battery(PropScreen.BATTERY_OFF)
+
+
+## WOLF up on his feet inside the cage, his nose at the latch.
+func _wolf_at_latch() -> void:
+	_wolf_pose(&"stand", DockBay.PAD_LIFT)
+	wolf.position.x = DockBay.LATCH_X
+
+
+## WOLF steps down out of the bay: from here on he draws over the cage, the torn lock included, as every
+## actor on the walk line does.
+func _wolf_steps_down() -> void:
+	wolf.z_index = ACTOR_Z
+	wolf_reflection.enabled = effects_enabled
+
+
+## WOLF forces the guard lock: the boom and the shake, the lock torn off and swinging on its cable, the
+## bay's beacon on, and the Director steps back from the cage, still facing it (Q-B).
+func _lock_tears() -> void:
+	_shutter_boom()
+	dock_bay.tear_lock()
+	dock_bay.set_beacon(true)
+	var step_back: Tween = create_tween()
+	step_back.tween_property(intro_director, "position:x", L1_DIRECTOR_BACK_X, 0.65).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
 
 
 func _finish_intro(keep_fade: bool = false) -> void:
@@ -1865,9 +1973,9 @@ func _finish_intro(keep_fade: bool = false) -> void:
 		Tweens.kill(intro_tween)
 		intro_fade.color.a = 0.0
 	intro_alarm.color.a = 0.0
-	intro_gate.hide()
-	$IntroCage.hide()
+	Tweens.kill(break_out_tween)
 	intro_director.hide()
+	dock_bay.set_empty_quiet()
 	human.show()
 	purge_terminal_art.show()
 	$BreakerLabel.show()
@@ -1876,8 +1984,11 @@ func _finish_intro(keep_fade: bool = false) -> void:
 	for station: CanvasItem in [breaker_art, relay_art, checkpoint_art, breaker_status_light, relay_status_light, door_visual, bypass_handle]:
 		station.show()
 	_start_gameplay_camera()
-	wolf.body_sprite.modulate = Color.WHITE
-	wolf.body_sprite.position = WOLF_SPRITE_REST
+	_wolf_pose(&"stand")
+	wolf_lights.tint = WolfLights.LIGHT
+	wolf_lights.strength = 1.0
+	wolf_reflection.enabled = effects_enabled
+	wolf.speed_scale = 1.0
 	wolf.z_index = ACTOR_Z
 	wolf.position = state.wolf_position
 	wolf.autonomous_target_x = M0Actor.NO_TARGET
@@ -2300,20 +2411,21 @@ func _load_game() -> void:
 	checkpoint_toast_remaining = 0.0
 	tutorial_step = 2
 	Tweens.kill(intro_tween)
-	intro_gate.hide()
+	Tweens.kill(break_out_tween)
 	intro_director.hide()
 	intro_fade.color.a = 0.0
 	intro_alarm.color.a = 0.0
 	human.show()
-	$IntroCage.hide()
+	dock_bay.set_empty_quiet()
 	wolf.z_index = ACTOR_Z
-	wolf.body_sprite.position = WOLF_SPRITE_REST
+	_wolf_pose(&"stand")
+	wolf_lights.tint = WolfLights.LIGHT
+	wolf_lights.strength = 1.0
 	purge_terminal_art.show()
 	$BreakerLabel.show()
 	$RelayLabel.show()
 	$CheckpointLabel.show()
 	queue_redraw()
-	wolf.body_sprite.modulate = Color.WHITE
 	state = loaded
 	save_error = ""
 	save_pending = false
@@ -4034,13 +4146,13 @@ func _cancel_fail() -> void:
 	human.z_index = ACTOR_Z
 
 
-## The containment gate letting go in the opening: a boom, a kick and dust at its base.
+## The guard lock tearing off WOLF's cage in the opening: a boom, a kick and chips of paint off its sheared bolts.
 func _shutter_boom() -> void:
 	sfx_bank.play(&"boom", -2.0)
 	impact.add_trauma(0.6)
 	impact.flash(0.09, 0.0)
 	impact.rumble(0.5, 0.9, 0.25)
-	impact.burst(gate_dust)
+	impact.burst(lock_chips)
 
 
 ## The seal finishing opening: the curtain is up in the hood, the doorway opens and WOLF lets go of the
@@ -4089,10 +4201,9 @@ func _sync_scene() -> void:
 	sentry_wake_remaining = 0.0
 	Tweens.kill(wolf_reaction_tween)
 	Tweens.kill(relay_spark_tween)
-	wolf.body_sprite.position = WOLF_SPRITE_REST
+	_wolf_pose(&"stand")
 	wolf.body_sprite.rotation_degrees = 0.0
 	wolf.body_sprite.offset = Vector2.ZERO
-	wolf.body_sprite.scale = wolf_sprite_scale
 	wolf.speed_scale = 1.0
 	_stand_up()
 	human.z_index = ACTOR_Z

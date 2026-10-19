@@ -803,28 +803,37 @@ func _flicker(glow: Sprite2D) -> void:
 ## [member beacon_lens_trough], its lens fall and rise together in one sequence, so the lamp and the
 ## light it casts never disagree.
 func _pulse(index: int, phase: float) -> void:
-	var glow: Sprite2D = _warning_glows[index]
-	var beacon: Beacon = beacons[index] as Beacon
-	var low_alpha: float = beacon_peak_alpha * beacon_trough
-	var low_lens: Color = warning_color.darkened(beacon_lens_trough)
-	var tween: Tween = create_tween().set_loops()
-	_beacon_tweens.append(tween)
-	if not beacon_flash:
+	_beacon_tweens.append(pulse(self, _warning_glows[index], beacons[index], &"lens", warning_color, beacon_peak_alpha, beacon_trough, beacon_lens_trough, beacon_flash, phase))
+
+
+## One warning beacon's endless pulse, made by [param owner] (the tween's node): [param glow]'s alpha
+## falls from [param peak] to peak x [param trough] and recovers, and while [param lens_trough] is over 0
+## the [param lens_property] colour of [param lens] (the lit globe) darkens that much with it and
+## returns to [param color]. [param flash] gives a real rotating beacon's rhythm (BEACON_FLASH_*: a fast
+## rise, a slower fall, one flash every 0.68 s) instead of the slow 2.6 s breathe, started [param phase]
+## seconds into its cycle. Returns the looping tween; the caller kills it (Tweens.kill) to stop it.
+## Users: every room's lockdown beacons (_pulse) and DockBay's "door forced" beacon.
+static func pulse(owner: Node, glow: CanvasItem, lens: Object, lens_property: StringName, color: Color, peak: float, trough: float, lens_trough: float, flash: bool, phase: float) -> Tween:
+	var low_alpha: float = peak * trough
+	var low_lens: Color = color.darkened(lens_trough)
+	var tween: Tween = owner.create_tween().set_loops()
+	if not flash:
 		tween.tween_interval(phase)
-	var fall: float = BEACON_FLASH_FALL_SECONDS if beacon_flash else BEACON_PULSE_SECONDS
-	var rise: float = BEACON_FLASH_RISE_SECONDS if beacon_flash else BEACON_PULSE_SECONDS
-	var fall_trans: Tween.TransitionType = Tween.TRANS_EXPO if beacon_flash else Tween.TRANS_SINE
-	var fall_ease: Tween.EaseType = Tween.EASE_OUT if beacon_flash else Tween.EASE_IN_OUT
-	var rise_ease: Tween.EaseType = Tween.EASE_IN if beacon_flash else Tween.EASE_IN_OUT
+	var fall: float = BEACON_FLASH_FALL_SECONDS if flash else BEACON_PULSE_SECONDS
+	var rise: float = BEACON_FLASH_RISE_SECONDS if flash else BEACON_PULSE_SECONDS
+	var fall_trans: Tween.TransitionType = Tween.TRANS_EXPO if flash else Tween.TRANS_SINE
+	var fall_ease: Tween.EaseType = Tween.EASE_OUT if flash else Tween.EASE_IN_OUT
+	var rise_ease: Tween.EaseType = Tween.EASE_IN if flash else Tween.EASE_IN_OUT
 	tween.tween_property(glow, "modulate:a", low_alpha, fall).set_trans(fall_trans).set_ease(fall_ease)
-	if beacon_lens_trough > 0.0:
-		tween.parallel().tween_property(beacon, "lens", low_lens, fall).set_trans(fall_trans).set_ease(fall_ease)
-	tween.tween_property(glow, "modulate:a", beacon_peak_alpha, rise).set_trans(Tween.TRANS_SINE).set_ease(rise_ease)
-	if beacon_lens_trough > 0.0:
-		tween.parallel().tween_property(beacon, "lens", warning_color, rise).set_trans(Tween.TRANS_SINE).set_ease(rise_ease)
-	if beacon_flash and phase > 0.0:
+	if lens_trough > 0.0:
+		tween.parallel().tween_property(lens, NodePath(lens_property), low_lens, fall).set_trans(fall_trans).set_ease(fall_ease)
+	tween.tween_property(glow, "modulate:a", peak, rise).set_trans(Tween.TRANS_SINE).set_ease(rise_ease)
+	if lens_trough > 0.0:
+		tween.parallel().tween_property(lens, NodePath(lens_property), color, rise).set_trans(Tween.TRANS_SINE).set_ease(rise_ease)
+	if flash and phase > 0.0:
 		# Start part way through the cycle (an interval inside the loop would repeat every cycle).
 		tween.custom_step(phase)
+	return tween
 
 
 func _drift(shaft: Sprite2D, phase: float) -> void:

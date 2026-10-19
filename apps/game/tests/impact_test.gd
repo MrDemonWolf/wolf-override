@@ -242,9 +242,10 @@ func _run() -> void:
 	_expect(not game.get("fail_active"), "the opening ignores knockdowns")
 	for _step: int in 3:
 		game.call("_advance_intro")
-	_expect(impact.trauma > 0.0 and intro_fade.color.r == 1.0, "the containment gate boom shakes and flashes")
+	# The boom comes as the guard lock tears off WOLF's cage, once he is up at the latch (Main.L1_LATCH_SECONDS).
+	_expect(await wait_until(func() -> bool: return impact.trauma > 0.0 and intro_fade.color.r == 1.0, 60), "the cage's lock boom shakes and flashes")
 	game.call("_finish_intro")
-	_expect(await wait_until(func() -> bool: return impact.trauma == 0.0 and camera.offset == Vector2.ZERO, 90), "the gate boom settles")
+	_expect(await wait_until(func() -> bool: return impact.trauma == 0.0 and camera.offset == Vector2.ZERO, 90), "the lock boom settles")
 
 	game.queue_free()
 	# The mixer releases a stopped clip a few steps later; give it that time before quitting.

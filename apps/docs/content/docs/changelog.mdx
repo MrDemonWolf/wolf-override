@@ -57,6 +57,10 @@ Changes merged after 0.15.0. They become the next version when it is cut.
 - The **MANUAL BYPASS** gearbox is its own picture under the wheel.
 - The opening is set in WOLF's dock bay, a room of its own left of the corridor, painted as whole pictures: the bay, the Director's door in its back wall and a lit doorway into the corridor.
 - You can walk back through the corridor's left end into the dock bay; the camera pans with you and shows the whole room.
+- WOLF starts the opening lying on a wireless charging pad inside a mesh cage. The charger's screen shows his battery: 64 %, then 100 % as he wakes.
+- He gets up off the pad (the charge cuts as he lifts), tears the cage's guard lock off and shoulders the mesh leaves aside. The torn lock swings on its cable and the bay's red beacon comes on.
+- Back in the bay later, the cage stands open and empty, and the pad glows on slow amber standby with an empty battery on its screen.
+- The old cage and gate drawn by code are gone.
 
 ### Website
 
@@ -128,6 +132,8 @@ Changes merged after 0.15.0. They become the next version when it is cut.
 - `CONTRIBUTING.md` links the website's copied-code check, project rules and contributing pages instead of repeating them.
 - The docs export check fails when a guide page's link preview is not an article or lacks the game's name.
 - A new `dock_bay_test` checks the dock bay's pictures, their sizes and register entries, and the walk and camera pan into the room.
+- `dock_bay_test` also checks the charger's states, the leaves' push and catches, and the torn lock's swing.
+- Shared code: the charger's screen is a battery readout of `PropScreen`, `WolfLights` lights all three of WOLF's poses, and the warning beacons' pulse is one `RoomDepth.pulse` for every room and the bay.
 
 ### How it was checked
 
@@ -138,6 +144,7 @@ Changes merged after 0.15.0. They become the next version when it is cut.
 - **Search titles and descriptions checked:** the docs checks and build, with every built page's title and description length listed.
 - **Link previews checked:** the docs checks and build, and the og:type, og:title and twitter:title tags read from the built pages.
 - **Dock bay room checked:** headless test suites and rendered stills (1280x720 and a phone shape) of the empty room, its doorway and the corridor's left end; not played by hand.
+- **Dock bay cage checked:** headless test suites and rendered stills (1280x720 and a phone shape) of each beat: charging, waking, getting up, the lock torn and the leaves sliding, out of the cage, and the empty bay; not played by hand.
 
 ## 0.15.0 - October 16, 2026
 
