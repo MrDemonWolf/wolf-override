@@ -879,16 +879,11 @@ func _shot(slug: String) -> void:
 ## font). An unknown code fails the run and returns false, so a typo never gives an English run that
 ## looks like a language run.
 func _use_language(code: String) -> bool:
-	if code != "pseudo" and not I18n.LANGUAGES.has(code):
+	if code != I18n.PSEUDO and not I18n.LANGUAGES.has(code):
 		_fail("unknown --language %s (I18n.LANGUAGES has %s, plus pseudo)" % [code, ", ".join(PackedStringArray(I18n.LANGUAGES.keys()))])
 		return false
 	_offer_every_language()
-	if code == "pseudo":
-		I18n.apply("en")
-		TranslationServer.reload_pseudolocalization()
-		TranslationServer.pseudolocalization_enabled = true
-		return true
-	I18n.apply(code)
+	I18n.apply_for_checks(code)
 	return true
 
 

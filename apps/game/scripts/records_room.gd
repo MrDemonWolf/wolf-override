@@ -329,10 +329,12 @@ func _fit_label(label: Label) -> void:
 	TextSize.fit_world_label(label, center.x, center.y)
 
 
-## TEXT SIZE changed: every name takes the new size.
+## TEXT SIZE or the language changed, or a name's words did: every name takes its size and words,
+## and neighbours that would cover each other part (TextSize.part_world_labels, PR L8).
 func refit_labels() -> void:
 	for label: Label in station_labels:
 		_fit_label(label)
+	TextSize.part_world_labels(station_labels)
 
 
 ## A name the edge of the view would cut fades out instead (JunctionRoom.fade_at_view_edge).
@@ -363,8 +365,7 @@ func refresh_state() -> void:
 	mirror_glow.modulate = Color(_mirror_light_color(), 0.6)
 	purge_screen.tint = _purge_light_color()
 	mirror_screen.tint = _mirror_light_color()
-	for label: Label in station_labels:
-		_fit_label(label)
+	refit_labels()
 	if exit_tween == null or not exit_tween.is_running():
 		exit_leaf.open = 1.0 if chapter_complete else 0.0
 		set_exit_lamp(Palette.LAMP_OPEN if chapter_complete else Palette.LAMP_SHUT)

@@ -1157,10 +1157,18 @@ func _fit_label(label: Label) -> void:
 	TextSize.fit_world_label(label, float(label.get_meta(&"center_x")), LABEL_Y)
 
 
-## TEXT SIZE changed: every plate, and the LINE caption by the valve's dial, takes the new size.
-func refit_labels() -> void:
+## Every plate fitted to its text again, then neighbours that would cover each other parted
+## (TextSize.part_world_labels, PR L8). Called whenever a plate's words or size change.
+func _fit_labels() -> void:
 	for label: Label in station_labels:
 		_fit_label(label)
+	TextSize.part_world_labels(station_labels)
+
+
+## TEXT SIZE or the language changed: every plate, and the LINE caption by the valve's dial, takes the
+## new size and words.
+func refit_labels() -> void:
+	_fit_labels()
 	_place_line_caption()
 
 
@@ -1559,8 +1567,7 @@ func refresh_state() -> void:
 	else:
 		hatch_label.text = "EXIT LOCKED"
 		hatch_label.add_theme_color_override("font_color", Palette.LABEL_MUTED)
-	for label: Label in station_labels:
-		_fit_label(label)
+	_fit_labels()
 	_sync_lamp()
 	_sync_vent_glow()
 	_sync_exit_lamp()

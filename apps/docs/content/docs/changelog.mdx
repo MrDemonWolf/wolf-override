@@ -70,6 +70,11 @@ Changes merged after 0.15.0. They become the next version when it is cut.
 - His waiting spots, follow distance and reach shrink with him. He stands where his nose or tail stood before at the relay, the corridor doorway, the **MIRROR PORT**, the dock bay and the Service Junction.
 - WOLF no longer ducks under the hanging tank: he now fits under it. Checked by automated tests and still images from scripted play only, not played by hand.
 - The credits open with the AI disclosure Nathanial Henniges approved, ready for translation.
+- The title makes room for other languages: its column is wider, the buttons are 224 pixels each, and the **CONTINUE** note and the credit line can take a second row. Not yet looked at by Nathanial Henniges.
+- **PAUSE** is a little wider, and the **DEBUG** button moves left with it.
+- The changelog screen's note wraps onto two rows instead of running past the panel, and its two buttons can take two rows.
+- The end card's recap rows make room for a longer topic and wrap their words where needed.
+- Station names are measured in the language you play in. A longer name breaks onto rows to keep the English name's width; names that would touch break, get smaller or move a little apart; the corridor's names stay inside its first view. English names are unchanged.
 
 ### Accessibility
 
@@ -85,6 +90,7 @@ Changes merged after 0.15.0. They become the next version when it is cut.
 - Brazilian Portuguese (machine translation, review pending): **LANGUAGE** offers Português (Brasil), marked "tradução automática"; Portugal gets it too.
 - German, French and Brazilian Portuguese translate the same parts as Spanish, the story included; most station names still show English.
 - Key names follow your keyboard layout on Windows, macOS and Linux: on a French AZERTY keyboard **Move left** reads Q, not A. A symbol key shows the symbol printed on it, such as & on the AZERTY 1 key, and a letter the game's fonts cannot draw (Greek, Hebrew, Arabic, Thai) shows its QWERTY name.
+- A long control binding, such as "D-pad right / Left stick +", breaks onto a second row instead of being cut short with "…".
 
 ### Website
 
@@ -185,6 +191,9 @@ Changes merged after 0.15.0. They become the next version when it is cut.
 - The German, French and Brazilian Portuguese files are written fresh by Claude with a note on every line, back-translated by Codex and passed through every translation check; each word cut to fit is noted on its line.
 - WOLF's touch line at the mirror names the answer button in German, French and Brazilian Portuguese, and lines where a pronoun could read as WOLF name the sentry instead.
 - The Portuguese gender check knows *teclado*, *lado*, *líquido* and *dados* are nouns, and the test suites' made-up catalogs share one language code that ships no file.
+- `i18n_test` fails any text that does not fit its room in every language and in pseudo-English (30% longer), the answer rows and the end card included; no overflow is let off by name.
+- `text_boxes_test` runs its station-name, touch, top card and prompt overlap checks in every language and in pseudo-English.
+- `I18n.apply_for_checks` is the one switch the suites and the parity capture use for a language or pseudo-English.
 
 ### How it was checked
 
@@ -205,6 +214,7 @@ Changes merged after 0.15.0. They become the next version when it is cut.
 - **Dialogue boxes per language checked:** headless test suites, every English box, reading time and station name at every **TEXT SIZE** compared with the previous version (unchanged), and rendered stills of a Japanese sample box; not played by hand.
 - **Spanish story checked:** the translation checks with Codex's back-translation of the 145 new lines and one changed line in both files, and the headless test suites; not reviewed by a native speaker, not played by hand.
 - **German, French and Brazilian Portuguese checked:** the translation checks with Codex's back-translation, also of the 145 story lines, headless test suites (29) and rendered stills of the story in each language (keyboard and touch, 1280x720); not reviewed by a native speaker, not played by hand.
+- **Layout for languages checked:** headless test suites in every language and pseudo-English, every English station name at every **TEXT SIZE** compared with the previous version (unchanged), and rendered title, changelog, Settings and end card stills in English, Spanish, German and pseudo-English before and after; the new title layout is not yet looked at by Nathanial Henniges, and not played by hand.
 
 ## 0.15.0 - October 16, 2026
 

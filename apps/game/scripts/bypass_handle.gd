@@ -166,7 +166,9 @@ func place(wheel_centre: Vector2, relay_x: float) -> void:
 	coolant_hiss.position = RELIEF_OUTLET - wheel_centre
 	_relay_x = relay_x
 	# The tag grows upward too, over the relay's name, which main lifts by as much (fault_tag_growth).
-	fault_tag.position = Vector2(relay_x - wheel_centre.x - fault_tag.size.x * 0.5, FAULT_TAG_TOP - wheel_centre.y - fault_tag_growth())
+	# Fitted like the rooms' names (TextSize.fit_world_label: centred, its foot kept), so the corridor's
+	# parting can narrow it or move it inside the first view when a translation is longer (PR L8).
+	TextSize.fit_world_label(fault_tag, relay_x - wheel_centre.x, FAULT_TAG_TOP - wheel_centre.y)
 	# A larger TEXT SIZE grows the plate upward, so its foot stays over the wheel, and to the right of
 	# where it stood at 100%, clear of the COOLANT FAULT tag (the wider of the relay's two names), so
 	# the relay's names and this plate never run into each other.
@@ -247,14 +249,14 @@ func _plate(node_name: String, caption: String, text_color: Color, edge: Color, 
 	return label
 
 
-## TEXT SIZE changed: both plates take the new size (the MANUAL BYPASS plate keeps its two rows; the
-## COOLANT FAULT tag breaks onto two above 100%, TextSize.wrap_world_label) and are placed again.
+## TEXT SIZE or the language changed: both plates take the new size (the MANUAL BYPASS plate keeps its
+## two rows; the COOLANT FAULT tag breaks onto two above 100%, fitted in [method place]) and are placed
+## again.
 func refit_labels() -> void:
 	TextSize.size_label(bypass_label, LABEL_FONT_SIZE)
 	bypass_label.custom_minimum_size.x = float(bypass_label.get_meta(&"wrap_width")) * TextSize.world_factor()
 	bypass_label.size = Vector2.ZERO
 	bypass_label.size = bypass_label.get_combined_minimum_size()
-	TextSize.wrap_world_label(fault_tag, LABEL_FONT_SIZE)
 	place(position, _relay_x)
 
 

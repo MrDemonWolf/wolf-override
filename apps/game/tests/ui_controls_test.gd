@@ -33,10 +33,11 @@ func _run() -> void:
 	changelog.pressed.emit()
 	_expect(changelog_screen.visible and not title_logo.visible and game.get("title_open") and changelog_back.has_focus(), "CHANGELOG opens the in-game screen over the title without starting a game")
 	_expect(changelog_body.get_parsed_text().begins_with(first_heading.substr(3, first_heading.length() - 6)) and changelog_body.get_v_scroll_bar().value == 0.0, "the changelog screen shows the text from its newest heading")
-	# The one-line note above the text must stay inside its label; a longer wording once clipped at the panel edge.
+	# The note above the text must stay inside its label, which wraps it onto two rows inside the panel
+	# (localization PR L8: on one row it ran 50 px past the panel's edge); a longer wording once clipped.
 	var changelog_note: Label = changelog_screen.get_node("ChangelogNote") as Label
-	var note_width: float = changelog_note.get_theme_font("font").get_string_size(changelog_note.text, HORIZONTAL_ALIGNMENT_CENTER, -1.0, changelog_note.get_theme_font_size("font_size")).x
-	_expect(changelog_note.text.contains("drag the text") and note_width <= changelog_note.size.x, "the changelog note mentions dragging the text and fits on its one line")
+	await settle(1)
+	_expect(changelog_note.text.contains("drag the text") and changelog_note.is_visible_in_tree() and not I18n.overflows(changelog_note), "the changelog note mentions dragging the text and fits its label (%s, %d rows)" % [changelog_note.size, changelog_note.get_line_count()])
 	# Touch readers have no wheel or keys: dragging the text itself moves the page, as the on-screen note promises.
 	await settle(4)
 	var body_centre: Vector2 = changelog_body.global_position + changelog_body.size * 0.5
