@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: WOLF OVERRIDE\n"
-"PO-Revision-Date: 2026-10-19 21:43+0000\n"
+"PO-Revision-Date: 2026-10-19 22:03+0000\n"
 "Last-Translator: Claude (Anthropic), machine translation, unreviewed\n"
 "Language-Team: none\n"
 "MIME-Version: 1.0\n"
@@ -1260,11 +1260,11 @@ msgid "Saved checkpoint could not be read."
 msgstr "Не удалось прочитать сохранение."
 
 # machine-translated by Claude (Anthropic), unreviewed
-#. TRANSLATORS: Title note under CONTINUE (388 px, 15 px). SAFE POINT is the plate's word, УКРЫТИЕ (shelter).
+#. TRANSLATORS: Title note under CONTINUE (388 px, 15 px). SAFE POINT is the plate's word, УКРЫТИЕ (shelter). Shortened to fit the 388 px row: the game saves from the first УКРЫТИЕ ran 8 px over.
 #. i18n: speaker=ui
 #: scripts/main.gd:1127
 msgid "No checkpoint yet. Saving starts at the first SAFE POINT."
-msgstr "Сохранений нет. Игра сохраняется с первого УКРЫТИЯ."
+msgstr "Сохранений нет. Первое сохранение — в УКРЫТИИ."
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: Changelog button text when the browser cannot open (338 px).
