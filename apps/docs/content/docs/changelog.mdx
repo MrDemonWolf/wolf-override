@@ -175,7 +175,8 @@ Changes merged after 0.15.0. They become the next version when it is cut.
 - Dialogue boxes follow each language's rules from the language table: its reading speed, its row limit, and for Chinese, Japanese and Korean two even rows and a box length in characters. English boxes are unchanged.
 - Boxes break after the Chinese and Japanese full stops and commas and after an ellipsis, and never inside a quotation in any of the table's languages, whatever its quotation marks.
 - One shared rule decides whether a box fits, used by the game and by `text_boxes_test`, which now checks every language at every **TEXT SIZE**.
-- Station names break between words with the same text rules, so a name written without spaces can break too.
+- Station names in Chinese, Japanese and Korean break between words with the same text rules, so a name written without spaces can break too; names in English and other languages written with spaces still break at their spaces.
+- `opening_timing_test` times each box with the game's own reading rule instead of its own copy of it.
 
 ### How it was checked
 
