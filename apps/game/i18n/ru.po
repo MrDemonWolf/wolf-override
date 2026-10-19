@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: WOLF OVERRIDE\n"
-"PO-Revision-Date: 2026-10-19 20:57+0000\n"
+"PO-Revision-Date: 2026-10-19 21:00+0000\n"
 "Last-Translator: Claude (Anthropic), machine translation, unreviewed\n"
 "Language-Team: none\n"
 "MIME-Version: 1.0\n"
@@ -1617,7 +1617,7 @@ msgstr "Метка времени зеркала уже сохранена. Вы
 #. TRANSLATORS: i18n: story speaker=WOLF
 #: scripts/main.gd:2837
 msgid "I found the mirror index. We can use my readout or your maintenance port."
-msgstr "Я нашёл индекс зеркала. Можно взять мои показания или твой сервисный порт."
+msgstr "Я нашёл индекс зеркала. Можно взять данные с моего дисплея или твой сервисный порт."
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: i18n: story speaker=narrator
@@ -1667,7 +1667,7 @@ msgstr "Я ещё проверяю диск. Подожди меня или к�
 #. TRANSLATORS: i18n: story speaker=narrator
 #: scripts/main.gd:3132
 msgid "WOLF reads the timestamp off his own readout. The purge target existed before the deletion order."
-msgstr "WOLF считывает метку времени со своих показаний. Цель зачистки существовала до приказа об удалении."
+msgstr "WOLF считывает метку времени со своего дисплея. Цель зачистки существовала до приказа об удалении."
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: %s is the engineer's first name.
@@ -2720,7 +2720,7 @@ msgstr "Возврат к началу этого участка."
 #. i18n: story speaker=engineer engineer=self
 #: scripts/story_text.gd:97
 msgid "USE WOLF'S READOUT"
-msgstr "ВЗЯТЬ ПОКАЗАНИЯ WOLF"
+msgstr "ВЗЯТЬ ДАННЫЕ С ДИСПЛЕЯ WOLF"
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: An answer the engineer can give WOLF at the mirror port (a button, in capitals).
@@ -3156,7 +3156,7 @@ msgstr "{name} торопит WOLF. WOLF отказывается, и {name} к
 #. i18n: story speaker=narrator
 #: scripts/story_text.gd:249
 msgid "WOLF read the timestamp off his own readout."
-msgstr "WOLF считывает метку времени со своих показаний."
+msgstr "WOLF считывает метку времени со своего дисплея."
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: An end-card row. {name} is the engineer's first name; keep {name} as written. Avoid a past tense with the engineer as its subject ("copied"): rephrase.

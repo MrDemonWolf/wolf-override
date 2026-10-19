@@ -47,3 +47,14 @@ WOLF is **он**, with masculine past tense in -л. He is never declined: "с WO
 - **LOCKDOWN**: БЛОКИРОВКА reads back as "lockout"; a reviewer's word.
 - **SERVICE JUNCTION**: СЕРВИСНЫЙ УЗЕЛ reads back as "service node"; a reviewer's word.
 - The seven past-tense recap and narration lines, as for Polish.
+- **PR L11's choices (proposals for a reviewer):** the breaker is РУБИЛЬНИК (the glossary's proposal),
+  LOCKDOWN ИЗОЛЯЦИЯ, CONTAINMENT ЗОНА СОДЕРЖАНИЯ, TANK RELEASE ОТЦЕПКА БАКА and SERVICE JUNCTION
+  СЕРВИСНЫЙ УЗЕЛ. Maintenance, a place, is ТЕХЗОНА; the name card's job is ТЕХОБСЛУЖИВАНИЕ (the field, not
+  the person). The seal is *шлюз*, the relief vent *сбросной клапан* and the valve *вентиль*, the mirror
+  *зеркало*, the purge *зачистка*, THE DEN ЛОГОВО, WOLF breaking off *Я пас*. A plate named in a hint is
+  quoted in the nominative: *пульт «ОТЦЕПКА БАКА»*.
+- **Latin letters kept:** names, tools, web addresses, FPS, MSAA, V-SYNC and the key labels printed on
+  Russian keyboards (Esc, Tab, Enter) stay as written; they are in the glossary's `keep` list.
+- **The seven recap and narration lines** keep their meaning without a past tense: the end card tells
+  the run in the present (*{name} говорит WOLF о риске*), and the knockdown cards put the name after a
+  dash or a colon (*а %s — прямо на решётке*, *Страж заметил: %s*). No English line had to change.
