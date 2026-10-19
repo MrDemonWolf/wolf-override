@@ -76,6 +76,21 @@ const TEXT_DIRS: Array[String] = ["res://scripts", "res://scenes"]
 ## Roboto's own file: the line-height check compares it, with its symbols fallback, to a bare copy.
 const ROBOTO_FILE: String = "res://assets/fonts/Roboto-Variable.ttf"
 
+## The longest message (characters) [method _check_hud_rows] lays out in the HUD: the longest HUD line is
+## 75 characters in English (WOLF's manual-port line) and 92 in Spanish, so 160 holds every HUD line with
+## room. The credits are left out by their BBCode, not their length; the menus' notes and captions are
+## laid out too, which costs nothing and holds them to the same rule.
+const HUD_MESSAGE_CHARS: int = 160
+## The most rows a HUD line may take in the hint bar or the top card at 100% TEXT SIZE: three rows of the
+## 14 px hint are about 60 px, the room between the card and the dialogue box the hint bar keeps clear.
+const HUD_MAX_ROWS: int = 3
+
+## The language the HUD checks' made-up catalog ([method _hud_catalog]) stands in for: one in the table
+## that ships no catalog (Italian, outside decision D1's twelve files), so no real catalog answers first.
+## It was "es" until PR L9 shipped es.po, whose own lines then won the lookup. The made-up words stay
+## Spanish; only the code is borrowed.
+const HUD_TEST_LANGUAGE: String = "it"
+
 var _checks: int = 0
 ## English's layout of each control [method _check_fit] judges, by "<where>|<node path>": whether
 ## I18n.overflows found an overflow, the judged Control's size and the one-row width (px). Filled by the
@@ -521,12 +536,12 @@ func _place(control: Control, parent: Node, rect: Rect2) -> void:
 	parent.add_child(control)
 
 
-## The made-up "es" catalog of the HUD checks: key templates (one with turn counts), the held form, a
-## touch form, an objective and location, the name card, the tutorial, CONTINUE with and without the
+## The made-up catalog of the HUD checks, under [constant HUD_TEST_LANGUAGE]: key templates (one with
+## turn counts), the held form, a touch form, an objective and location, the name card, the tutorial, CONTINUE with and without the
 ## touch button's context, and one broken translation whose conversion differs from the English.
 func _hud_catalog() -> Translation:
 	var catalog: Translation = Translation.new()
-	catalog.locale = "es"
+	catalog.locale = HUD_TEST_LANGUAGE
 	catalog.add_message("%s: talk to WOLF about the relay.", "%s: habla con WOLF del relé.")
 	catalog.add_message("%s: crank the manual bypass, %d of %d.", "%s: gira el bypass manual, %d de %d.")
 	catalog.add_message("HOLD %s", "MANTÉN %s")
@@ -558,7 +573,7 @@ func _check_key_prompts() -> void:
 	var broken: String = HudText.key("%s: save at the safe point.", [HudText.USE])
 	var named: String = HudText.key("%s waits.", ["E"])
 	_check(talk == "E: talk to WOLF about the relay." and crank == "HOLD E: crank the manual bypass, 3 of 8." and save == "The safe point could not save. Press E here again." and named == "E waits.", "key lines keep the English the game compared before (%s; %s; %s)" % [talk, crank, save])
-	I18n.apply("es")
+	I18n.apply(HUD_TEST_LANGUAGE)
 	var keys: Dictionary = {HudText.USE: "F", HudText.HOLD_USE: I18n.fill("HOLD %s", ["F"])}
 	_check(HudText.localise(talk, keys, false) == "F: habla con WOLF del relé.", "the translated template gets the key after tr() (%s)" % HudText.localise(talk, keys, false))
 	_check(HudText.localise(crank, keys, false) == "MANTÉN F: gira el bypass manual, 3 de 8.", "the held key and the turn counts fill the translated template (%s)" % HudText.localise(crank, keys, false))
@@ -570,8 +585,8 @@ func _check_key_prompts() -> void:
 	I18n.apply("en")
 
 
-## The HUD in a game (PR L7b), with [method _hud_catalog] for "es": in the opening the touch button's
-## CONTINUE reads its own context's word while the title's CONTINUE keeps another, and the first box's
+## The HUD in a game (PR L7b), with [method _hud_catalog] for [constant HUD_TEST_LANGUAGE]: in the
+## opening the touch button's CONTINUE reads its own context's word while the title's CONTINUE keeps another, and the first box's
 ## prompt fills its key into the translated template; in play the top card, the tutorial and the hint
 ## (keyboard, then touch, where the key is the USE button's word) are translated, and switching back to
 ## English draws the top card in English again at once (NOTIFICATION_TRANSLATION_CHANGED).
@@ -582,7 +597,7 @@ func _check_hud() -> void:
 	game.auto_pause_on_focus_loss = false
 	game.call("_new_game")
 	await process_frame
-	I18n.apply("es")
+	I18n.apply(HUD_TEST_LANGUAGE)
 	await process_frame
 	var hint: Label = game.get_node("CanvasLayer/ContextHint/Text") as Label
 	_check(game.touch_use.text == "SEGUIR" and String(TranslationServer.translate("CONTINUE")) == "CONTINUAR", "the touch button's CONTINUE has its own context, apart from the title's (%s)" % game.touch_use.text)
@@ -596,7 +611,7 @@ func _check_hud() -> void:
 	_check(tutorial.text.begins_with("A / D  MOVER"), "the tutorial fills its keys into the translated template (%s)" % tutorial.text.c_escape())
 	I18n.apply("en")
 	_check(game.hud.text == "%s\nMAINTENANCE ENGINEER" % first_name, "a language change draws the top card again in English at once (%s)" % game.hud.text.c_escape())
-	I18n.apply("es")
+	I18n.apply(HUD_TEST_LANGUAGE)
 	# Past the tutorial, which takes the hint bar's place while it shows.
 	game.tutorial_step = 2
 	game.human.position.x = 350.0
@@ -619,9 +634,10 @@ func _check_hud() -> void:
 ## names in the corridor, Records Access and the Service Junction at every TEXT SIZE step, where they
 ## must also stand apart (the kit's overlapping_labels, the check text_boxes_test makes in English).
 ## English runs first and sets the baseline the others are judged against (see [method _check_fits]);
-## its title must fit outright, as before PR L9. The
-## dialogue boxes, hints and cards are not in the catalogs yet (PRs L7b and L7c); L7d's text_boxes_test
-## loop covers them per language.
+## its title must fit outright, as before PR L9. The HUD (PR L7b's hints, objectives, cards, tutorial
+## and touch words) is judged by [method _check_touch_words], the tutorial prompt's fit and
+## [method _check_hud_rows]. The dialogue boxes are not in the catalogs yet (PR L7c); L7d's
+## text_boxes_test loop covers them per language.
 func _check_layouts() -> void:
 	for code: String in I18n.offered():
 		I18n.apply(code)
@@ -652,7 +668,13 @@ func _check_layouts() -> void:
 		await frames(3)
 		_check_fits(code, "touch layout", game.get_node("CanvasLayer/TouchControls"))
 		_check_fit(code, "touch layout|PauseButton", game.pause_button)
+		_check_touch_words(code, game)
 		game.touch_enabled = false
+		game.call("_refresh_ui")
+		await frames(2)
+		if game.tutorial_prompt.visible:
+			_check_fits(code, "tutorial", game.tutorial_prompt)
+		_check_hud_rows(code, game)
 		game.call("_pause_game")
 		await frames(2)
 		_check_fits(code, "Pause", game.pause_menu)
@@ -694,6 +716,69 @@ func _check_fits(code: String, where: String, root: Node) -> void:
 		if text.is_empty() or not control.is_visible_in_tree():
 			continue
 		_check_fit(code, "%s|%s" % [where, _game_path(control)], control)
+
+
+## The touch USE button with every word the game puts on it (USE, CRANK, DROP, RETRY, and CONTINUE in its
+## touch-button context), each judged by [method _check_fit] against English's own fit: the corridor's
+## layout shows only USE, so the others would never be measured. Sets the text directly, with no frame in
+## between, so the game's own _refresh_ui cannot put USE back before the check reads it.
+func _check_touch_words(code: String, game: Main) -> void:
+	for word: Array in [["USE", ""], ["CRANK", ""], ["DROP", ""], [Main.RETRY_BUTTON_TEXT, ""], [Main.CONTINUE_TEXT, Main.TOUCH_BUTTON_CONTEXT]]:
+		game.touch_use.text = String(TranslationServer.translate(word[0], word[1]))
+		_check_fit(code, "touch word %s|use" % word[0], game.touch_use)
+
+
+## Every short message of [param code]'s catalogs (HUD_MESSAGE_CHARS or fewer characters, no BBCode),
+## filled with sample inserts ([method _sample_inserts]) as the HUD fills it, drawn where the HUD draws
+## its lines: the hint bar at the keyboard and the touch widths (via the game's own _set_dialogue, which
+## sizes it) and the top card. Each may take at most one row more than its English in the same Label,
+## and never more than HUD_MAX_ROWS rows: the hint bar and the card grow with their rows, so a
+## translation cannot overflow them, but it can push them over the room (PR L9 review: the HUD hints
+## need the fit check). English is the baseline and is not judged itself.
+func _check_hud_rows(code: String, game: Main) -> void:
+	if code == I18n.FALLBACK:
+		return
+	var messages: PackedStringArray = []
+	for catalog: Translation in TranslationServer.get_translations():
+		if TranslationServer.standardize_locale(catalog.locale) == code:
+			for msgid: String in catalog.get_message_list():
+				if msgid.length() <= HUD_MESSAGE_CHARS and not msgid.contains("[") and not messages.has(msgid):
+					messages.append(msgid)
+	_check(messages.size() > 100, "%s: the HUD row check reads the language's catalog (%d short messages)" % [code, messages.size()])
+	var widest: int = 0
+	for touch: bool in [false, true]:
+		game.touch_enabled = touch
+		for msgid: String in messages:
+			var inserts: Array = _sample_inserts(msgid)
+			var english: String = msgid % inserts if not inserts.is_empty() else msgid
+			var shown: String = I18n.fill(msgid, inserts)
+			var targets: Array[Label] = [game.context_hint_text]
+			if not touch:
+				targets.append(game.hud)
+			for label: Label in targets:
+				var rows: Array[int] = []
+				for text: String in [english, shown]:
+					if label == game.context_hint_text:
+						game.call("_set_dialogue", text)
+					else:
+						label.text = text
+					rows.append(label.get_line_count())
+				widest = maxi(widest, rows[1])
+				var where: String = ("touch hint bar" if touch else "hint bar") if label == game.context_hint_text else "top card"
+				_check(rows[1] <= mini(rows[0] + 1, HUD_MAX_ROWS) or rows[1] <= rows[0], "%s, %s: %s takes %d rows (English %d)" % [code, where, shown.c_escape().left(70), rows[1], rows[0]])
+	game.touch_enabled = false
+	game.call("_refresh_ui")
+	print("%s: %d HUD messages laid out; the most rows any took: %d" % [code, messages.size(), widest])
+
+
+## The inserts the HUD would fill [param template] with, one per printf conversion of its English (I18n's
+## own reading of them): the key token's shown name "E" for %s (the HUD's widest common case is a key or
+## a short button word) and 8 for %d (the bypass's and the valve's turn counts are single digits).
+func _sample_inserts(template: String) -> Array:
+	var inserts: Array = []
+	for token: String in I18n._inserts(template):
+		inserts.append(8 if token == "d" else "E")
+	return inserts
 
 
 ## [param node]'s place below the game's root node as child indices ("3/0/12"), the same for every game
