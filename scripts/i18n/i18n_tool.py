@@ -37,7 +37,8 @@ Purpose
                               breaks (BREAKS_KEEP), the "E:" key token (KEY_TOKEN), the script
                               guard (SCRIPT_GUARD), the
                               engineer-gender gate (gendered_words, and the back-translation's
-                              engineer_gendered), the Slavic name-case gate (NAME_CASE), the plural forms of
+                              engineer_gendered), the Slavic name-case gate (NAME_CASE), the one-letter
+                              row-end gate (row_end_words), the plural forms of
                               every msgstr[n], the sibling-file completeness gate (family_gaps), the
                               coverage gate (coverage_gaps: an offered language, "enabled" in
                               languages.json, translates every POT message), and chrF of
@@ -57,7 +58,7 @@ Purpose
                               RELEASE_SELFTEST, COVERAGE_SELFTEST, GLOSSARY_SELFTEST) and writes the result as JSON at OUT;
                               exits 1 if a planted error passes or a clean line fails. The negative control
                               for gates no real msgid exercises yet (named and printf placeholders, BBCode,
-                              plural forms, the "you", pronoun and name-case checks, sibling files, the
+                              plural forms, the "you", pronoun, name-case and row-end checks, sibling files, the
                               coverage gate, the release gates, the glossary's avoid forms and its shape).
     hardcoded POT INVENTORY OUT
                               player-facing strings of the strings step's inventory (in scope and shown)
@@ -401,6 +402,12 @@ GENDER_WINDOW = 3
 #: A letter glued to the name slot ("заметил %sа"): a case ending, which Slavic languages add to names
 #: and which depends on the name's gender. Checked for languages whose row sets name_case.
 NAME_CASE = re.compile(r"(?:%s|\{name\})[^\W\d_]")
+#: The breaks a one-letter word may not stand before (row_end_words): an ordinary space, where the game
+#: may end a row, and a written line break, which always ends one. A no-break space (U+00A0) is neither:
+#: Godot's TextServer breaks no row at it (ICU line breaking, class GL; DialogueBoxes.rows) and the
+#: world labels break only at ordinary spaces (TextSize._space_rows), so a bound word goes to the next
+#: row with the word after it.
+ROW_END_BREAKS = " \n"
 #: Skipped by `potfiles`, the only exclusions: the tests and the debug tools (out of scope per the strings
 #: step), the editor add-ons and Godot's import cache. Every other .tscn and .gd under the game is listed.
 POT_SKIP = ("tests/", "scripts/debug/", "addons/", ".godot/")
@@ -1055,6 +1062,27 @@ def gendered_words(text: str, lang: str, roles: set[str]) -> list[str]:
     return list(dict.fromkeys(hits))
 
 
+def row_end_pattern(lang: str) -> re.Pattern | None:
+    """The pattern for ``lang``'s one-letter words that may not end a row (its languages.json
+    "row_end_words": Polish a i o u w z, Russian а в и к о с у я, from the style guides' typography
+    rule), matched case-insensitively as a whole word (no letter before it) followed by one of
+    ROW_END_BREAKS; None for a language with no such words. The game breaks its rows itself, so where a
+    row ends is not known here: the gate asks for every such word to be bound to the next one with a
+    no-break space, which then ends no row at any TEXT SIZE. Group 1 is the word. Pure."""
+    words = LANGUAGES.get(lang, {}).get("row_end_words")
+    if not words:
+        return None
+    return re.compile(r"(?<![^\W\d_])(" + "|".join(map(re.escape, words)) + r")(?=[" + ROW_END_BREAKS + "])", re.IGNORECASE)
+
+
+def row_end_words(text: str, lang: str) -> list[str]:
+    """The one-letter words of ``text`` (row_end_pattern) that are followed by an ordinary space or a
+    written line break, so they could end a row in ``lang``, in order (case kept). Empty when every one
+    is bound to the next word with U+00A0, or the language has no such rule (the gate passes). Pure."""
+    pattern = row_end_pattern(lang)
+    return [match.group(1) for match in pattern.finditer(text)] if pattern else []
+
+
 def name_case_ok(text: str, lang: str, roles: set[str]) -> bool:
     """False when ``lang`` declines names (languages.json name_case) and a letter is glued to the name
     slot in ``text`` (NAME_CASE), the case ending PIPELINE.md's nominative-only rule forbids."""
@@ -1177,7 +1205,8 @@ def release_problems(entries: list[dict], pot_entries: list[dict], review: str) 
 
 
 #: The per-line gates that must all hold for a line to pass (each a boolean measure in the report).
-LINE_GATES = ("placeholders_ok", "tag_ok", "breaks_ok", "key_token_ok", "script_ok", "bbcode_ok", "gender_ok", "name_case_ok")
+LINE_GATES = ("placeholders_ok", "tag_ok", "breaks_ok", "key_token_ok", "script_ok", "bbcode_ok", "gender_ok", "name_case_ok",
+              "row_end_ok")
 
 
 def check(pot: Path, podir: Path, out: Path, back: Path | None = None, release: bool = False) -> None:
@@ -1219,6 +1248,8 @@ def check(pot: Path, podir: Path, out: Path, back: Path | None = None, release: 
             measures["gender_words"] = gendered_words(glossary_masked(english, text, LANGUAGES[lang]["glossary"], glossary), lang, roles)
             measures["gender_ok"] = gender_stamped or not measures["gender_words"]
             measures["name_case_ok"] = name_case_ok(text, lang, roles)
+            measures["row_end_words"] = row_end_words(text, lang)
+            measures["row_end_ok"] = not measures["row_end_words"]
             measures["plural_problems"] = plural_problems(entry, plural_count(lang))
             measures["back_key"] = f"{lang}-{entry_key(entry)}"
             item = backs.get(measures["back_key"])
@@ -1392,6 +1423,22 @@ SELFTEST = [
     ("name_case", "ru", "", "Страж заметил: %s на открытом месте.", True, ""),
     ("name_case", "pl", "", "Strażnik zobaczył %sa.", False, ""),
     ("name_case", "ja", "", "%sは無事だ。", True, ""),
+    # One-letter words at a row's end (row_end_words, PR L11): an ordinary space or a written break after
+    # one fails, a no-break space (U+00A0) passes, in capitals too; a letter that ends a longer word, a
+    # one-letter word at the very end, and a language with no such rule are clear.
+    ("row_end", "pl", "", "Idź w prawo, do wyłącznika.", False, ""),
+    ("row_end", "pl", "", "Idź w\u00a0prawo, do wyłącznika.", True, ""),
+    ("row_end", "pl", "", "IDŹ W PRAWO", False, ""),
+    ("row_end", "pl", "", "Przeciąż go, przekręć zawór,\na\u00a0drzwi puszczą.", True, ""),
+    ("row_end", "pl", "", "Strażnik krzywo trafia i\nprzygważdża go.", False, ""),
+    ("row_end", "pl", "", "Wróć za gruzowisko.", True, ""),
+    ("row_end", "pl", "", "%d z %d obrotów.", False, ""),
+    ("row_end", "ru", "", "Иди к реле хладагента.", False, ""),
+    ("row_end", "ru", "", "Иди к\u00a0реле хладагента.", True, ""),
+    ("row_end", "ru", "", "Я\u00a0останусь позади.", True, ""),
+    ("row_end", "ru", "", "Бак падает и\nприжимает его к\u00a0полу.", False, ""),
+    ("row_end", "ru", "", "Страж патрулирует за завалом.", True, ""),
+    ("row_end", "de", "", "Geh a und b.", True, ""),
     ("plural", "ru", "The valve gives. %d of %d turns.", ["Клапан поддаётся. %d из %d оборота.", "Клапан поддаётся. %d из %d оборотов.", "Клапан поддаётся. %d из %d оборотов."], True, ""),
     ("plural", "ru", "The valve gives. %d of %d turns.", ["Клапан поддаётся. %d из %d оборота.", "Клапан поддаётся. %d из %d оборотов."], False, ""),
     ("plural", "ru", "The valve gives. %d of %d turns.", ["Клапан поддаётся. %d из %d оборота.", "Клапан поддаётся. %d оборотов.", "Клапан поддаётся. %d из %d оборотов."], False, ""),
@@ -1511,6 +1558,8 @@ def selftest(out: Path) -> None:
             roles = engineer_roles({"msgid": text, "comments": [f"#. i18n: engineer={mark}"] if mark else []})
             masked = glossary_masked(english, text, LANGUAGES[lang]["glossary"], glossary)
             passed = (not gendered_words(masked, lang, roles)) if gate == "gender" else name_case_ok(text, lang, roles)
+        elif gate == "row_end":
+            passed = not row_end_words(text, lang)
         elif gate == "plural_header":
             passed = plural_header_ok(text, lang)
         elif gate == "fuzzy_note":

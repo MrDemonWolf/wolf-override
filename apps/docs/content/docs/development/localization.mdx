@@ -85,6 +85,7 @@ You need Python 3 (standard library only) and GNU gettext's `msgfmt` (`brew inst
 - Placeholders, BBCode, speaker tags, line breaks, the key token and the alphabet.
 - The glossary in `i18n/glossary.json`: both its required words and the words it says to avoid.
 - The engineer is never given a gender; Slavic name endings.
+- Polish and Russian one-letter words (such as *w* and *в*) are bound to the next word with a no-break space, so none ends a row.
 - Plural forms and their header.
 - Sibling files, such as the two Chinese and two Spanish files.
 - Coverage: a language that is offered (`enabled` in `languages.json`) must translate every line of the template.
@@ -98,7 +99,7 @@ You need Python 3 (standard library only) and GNU gettext's `msgfmt` (`brew inst
 <Details>
 <Summary>Self-test, glossary and fonts in detail</Summary>
 
-- **`selftest`** runs the gates on 171 planted cases (125 for the line, plural, comment and sibling gates, 9 for the release gates, 6 for the coverage gate, 16 for the glossary on its real terms and 15 broken copies of the glossary and style guides). It fails if any planted error passes or any clean line fails.
+- **`selftest`** runs the gates on 186 planted cases (140 for the line, plural, comment and sibling gates, 9 for the release gates, 6 for the coverage gate, 16 for the glossary on its real terms and 15 broken copies of the glossary and style guides). It fails if any planted error passes or any clean line fails.
 - **`glossary`** checks that every one of the 10 languages' 11 files (Italian and Ukrainian, Tier 1, are not covered yet) has a form for every term and a guide with the same sections, that every word is in its language's alphabet, and that a term still left to reviewers requires nothing. It exits 1 on any problem.
 - **`fonts`** downloads the Noto Sans CJK 2.004 release files from GitHub into the folder (unless they are there), checks each font's SHA-256, and cuts Noto Sans JP, KR, SC and TC down to each language's fixed common character set with HarfBuzz's `hb-subset` (`brew install harfbuzz`). It writes the symbols font Roboto chains and the character lists in `apps/game/tests/support/cjk_charsets.json`, then runs `pickerfonts`, and prints the sizes. Its output is committed, so it only runs again to change a character set.
 - **`pickerfonts`** cuts each CJK language's own name and "machine translation" tag out of its committed subset (`picker_font` in `languages.json`) and gives the cut Montserrat's line height, so the list's rows keep their height.
