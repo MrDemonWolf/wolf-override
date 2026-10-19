@@ -1,7 +1,7 @@
 import type { BreadcrumbItem } from 'fumadocs-core/breadcrumb';
 import { getBreadcrumbItems } from 'fumadocs-core/breadcrumb';
 import { plannedPlatforms } from '@/app/downloads';
-import { repoUrl, siteDescription, siteUrl } from '@/lib/seo';
+import { publisherProfiles, publisherUrl, repoUrl, siteDescription, siteUrl } from '@/lib/seo';
 import { source } from '@/lib/source';
 
 /*
@@ -34,8 +34,9 @@ export function homeStructuredData(): JsonLdObject {
         '@type': 'WebSite',
         '@id': ids.website,
         name: 'WOLF OVERRIDE',
-        // The stylised name the game had until October 17, 2026, kept so older links and listings match.
-        alternateName: ['WOLF//OVERRIDE'],
+        // The stylised name the game had until October 17, 2026, kept so older links and listings
+        // match, and the title-case spelling people type into search.
+        alternateName: ['WOLF//OVERRIDE', 'Wolf Override'],
         url: `${siteUrl}/`,
         inLanguage: 'en',
         publisher: { '@id': ids.organization },
@@ -44,7 +45,8 @@ export function homeStructuredData(): JsonLdObject {
         '@type': 'Organization',
         '@id': ids.organization,
         name: 'MrDemonWolf, Inc.',
-        url: 'https://www.mrdemonwolf.com',
+        url: publisherUrl,
+        sameAs: publisherProfiles,
       },
       {
         '@type': 'Person',
@@ -56,8 +58,8 @@ export function homeStructuredData(): JsonLdObject {
         '@type': 'VideoGame',
         '@id': ids.game,
         name: 'WOLF OVERRIDE',
-        // The same former name as the WebSite entry above.
-        alternateName: ['WOLF//OVERRIDE'],
+        // The same alternate names as the WebSite entry above.
+        alternateName: ['WOLF//OVERRIDE', 'Wolf Override'],
         description: siteDescription,
         url: `${siteUrl}/`,
         image: `${siteUrl}/share-card.jpg`,

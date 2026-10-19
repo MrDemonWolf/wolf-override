@@ -3,6 +3,22 @@ import type { Metadata } from 'next';
 export const siteUrl = 'https://wolfoverride.mrdemonwolf.dev';
 /** The public source repository on GitHub: the game, this website and their history. */
 export const repoUrl = 'https://github.com/MrDemonWolf/wolf-override';
+/** The publisher MrDemonWolf, Inc.'s official website: the JSON-LD Organization's `url` and the footer link. */
+export const publisherUrl = 'https://www.mrdemonwolf.com';
+/**
+ * The publisher's official profiles, the JSON-LD Organization's `sameAs`, so search engines tie
+ * them to the same company. Confirmed by Nathanial Henniges for MrDemonWolf, Inc.'s IGDB company
+ * entry (2026-10-18); add a profile here only once he has confirmed it.
+ */
+export const publisherProfiles = [
+  'https://twitch.tv/mrdemonwolf',
+  'https://youtube.com/@mrdemonwolf',
+  'https://github.com/MrDemonWolf',
+  'https://discord.com/invite/A9x3qEN',
+  'https://x.com/mrdemonwolf',
+  'https://bsky.app/profile/mrdemonwolf.com',
+  'https://www.linkedin.com/company/mrdemonwolf',
+];
 /**
  * The landing page's search snippet and the game's JSON-LD description. Kept under the about 155
  * characters Google shows before it trims a snippet (SEO plan, 2026-10-16).
