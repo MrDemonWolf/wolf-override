@@ -213,6 +213,13 @@ const OUT_X: float = TORN_AT.x - OUT_GAP - M0Actor.WOLF_SNOUT
 ## toward the camera on the bay floor (backup round 4: 12 px, so his lane clears the bay's face).
 const PAD_LIFT: float = -3.4
 const STEP_DOWN: float = 12.0
+## The corridor's lockdown light seen through the opening (decision 7: it comes on with "Lock down
+## maintenance", inside the opening's view): the corridor's red warning light spilling into the passage
+## beyond the hole and out over its threshold, flashing in the corridor beacons' rhythm (est., tuned on
+## rendered stills: the hole's middle, a glow a little wider than the hole, as strong as a beacon's).
+const LOCKDOWN_AT: Vector2 = Vector2(-34.0, 395.0)
+const LOCKDOWN_GLOW: Vector2 = Vector2(70.0, 130.0)
+const LOCKDOWN_PEAK: float = 0.35
 ## The leaves' push (decision 3, recommended; Q-F, "shoulders the leaves aside, calm and deliberate";
 ## backup round 3, review-real-2 S8): WOLF takes the lead leaf SWEEP_PX, accelerating it over
 ## SWEEP_ACCEL_S to LEAF_V0 and holding it there; released, the moving leaves coast to the stop with
@@ -246,6 +253,10 @@ var lead_travel: float = 0.0
 var lock_torn: bool = false
 var lock_age: float = -1.0
 var beacon_on: bool = false
+## The corridor's lockdown light through the opening (set_lockdown).
+var lockdown_glow: Sprite2D
+var lockdown_on: bool = false
+var _lockdown_tween: Tween
 ## Reduce Motion (Main copies impact.reduce_motion): the beacon holds lit, the lock does not swing and
 ## the standby light does not breathe.
 var reduce_motion: bool = false
@@ -408,6 +419,10 @@ func _build_cage_front() -> void:
 	beacon_glow.position = BEACON_LENS
 	room.add_child(beacon_glow)
 	beacon_lens = DoorKit.lamp(room, "BeaconLens", BEACON_LENS, RoomDepth.WARNING_RED, BEACON_LENS_RADIUS)
+	lockdown_glow = RoomDepth.make_glow(RoomDepth.WARNING_RED, LOCKDOWN_GLOW, LOCKDOWN_PEAK)
+	lockdown_glow.name = "LockdownGlow"
+	lockdown_glow.position = LOCKDOWN_AT
+	room.add_child(lockdown_glow)
 
 
 func _process(delta: float) -> void:
@@ -479,8 +494,19 @@ func set_beacon(on: bool) -> void:
 		_beacon_tween = RoomDepth.pulse(self, beacon_glow, beacon_lens, &"color", RoomDepth.WARNING_RED, BEACON_PEAK, BEACON_TROUGH, BEACON_LENS_TROUGH, true, 0.0)
 
 
+## The corridor's lockdown light through the opening on (flashing; held lit with Reduce Motion) or off.
+func set_lockdown(on: bool) -> void:
+	lockdown_on = on
+	Tweens.kill(_lockdown_tween)
+	_lockdown_tween = null
+	lockdown_glow.visible = on
+	lockdown_glow.modulate.a = LOCKDOWN_PEAK
+	if on and not reduce_motion:
+		_lockdown_tween = RoomDepth.pulse(self, lockdown_glow, null, &"", RoomDepth.WARNING_RED, LOCKDOWN_PEAK, BEACON_TROUGH, 0.0, true, 0.0)
+
+
 ## The opening's first frame: WOLF charging on the pad (amber, 64 %), the cage shut and locked, the
-## beacon dark.
+## beacon and the corridor's lockdown light dark.
 func set_standby() -> void:
 	set_charge(AMBER, CHARGING_K, true)
 	set_battery(CHARGING_PERCENT, AMBER)
@@ -491,6 +517,7 @@ func set_standby() -> void:
 	lock_lens.visible = true
 	torn_pivot.visible = false
 	set_beacon(false)
+	set_lockdown(false)
 
 
 ## The bay after the opening, empty and quiet: the pad back on slow amber standby with the screen
