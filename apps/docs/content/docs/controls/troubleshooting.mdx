@@ -1,19 +1,59 @@
 ---
 title: Troubleshooting
-description: Quick fixes for missing prompts, checkpoints, controls, sound, and source setup.
+description: Quick fixes for prompts, checkpoints, controls, sound, readability, motion and opening the game.
 ---
+
+**What this page is for:** find your problem in the left column, then try the fix on the right.
+
+## Playing
 
 | Problem | Try this |
 | --- | --- |
-| The objective card disappeared | It only shows briefly when your goal changes. Check station labels and the nearby prompt, or open the [walkthrough](/docs/walkthrough/). |
-| WOLF will not help at the relay | Use the **MANUAL BYPASS** wheel beside the relay: hold interact until it locks over (about two seconds), or turn on **TOGGLE HOLDS** in Settings so one press does it. His refusal keeps an engineer-only route open. |
-| Continue is disabled | Read the note under Continue. **No checkpoint yet**: reach and use the safe point first. **Saved checkpoint could not be read**: the file is damaged; start a New Game and use the safe point to replace it. |
-| The hint says **Save failed** | Use a station (pressing interact anywhere in Records Access or the Service Junction also works) to retry the save. See [Saving](/docs/controls/saves/). |
-| The screen went red and the engineer is lying on the floor | You were knocked down. The dialogue line names the cause and the fix; press interact when the hint offers **RETRY** (from just under a second after the hit) and play resumes from the room's last checkpoint with your choices intact. See the [Service Junction guide](/docs/walkthrough/service-junction/). |
-| I want to go back to my last checkpoint | Open Pause, choose **Return to Title** (unsaved progress is lost), then **Continue**. There are no load or restart hotkeys. |
-| Movement or choices use unexpected keys | Open [Settings](/docs/controls/settings/) and check the Controls tab, or choose **RESTORE DEFAULT CONTROLS**. |
-| The game closed when I pressed Back on Android | Back closes the game only from the title screen. During play it pauses; in menus it steps back one level. |
-| There is no sound | The game has sound effects only: short generated effects (the gate, the relay, the seal, the exit, the stations' save chirp, WOLF's joint whir, the click when a crank starts turning, and the Service Junction's pump hum, fuse tick, blast, sentry, tank and exit bolt), recorded steam for the corridor's **MANUAL BYPASS** and the Service Junction's pressure line, relief vent and coolant cloud, and WOLF's growls. There is no music or voice yet. If those are silent, check the Master and Effects sliders in [Settings](/docs/controls/settings/). |
-| The game will not open | Verify Godot 4.7.2 and import the project through the editor; see [source setup](/docs/development/setup/). |
+| The objective card disappeared | It shows only when your goal changes. Read the station names and the nearby prompt, or open the [walkthrough](/docs/walkthrough/). |
+| WOLF will not help at the relay | Crank the **MANUAL BYPASS** wheel beside it. See [Hold to crank](/docs/controls/input/#hold-to-crank). His refusal keeps your own route open. |
+| Holding a button is hard | Turn on [TOGGLE HOLDS](/docs/controls/input/#toggle-holds): one press keeps a crank turning. |
+| The screen went red and the engineer is on the floor | You were knocked down. Read the line, then press interact at **RETRY**. See [Knockdowns](/docs/controls/saves/#knockdowns). |
+| I want to go back to my last checkpoint | Pause, choose **Return to Title**, then **Continue**. Unsaved progress is lost. |
 
-Report reproducible problems through [GitHub Issues](https://github.com/MrDemonWolf/wolf-override/issues). Include your OS, Godot version, input method, and steps. Omit private notes and personal paths from logs.
+## Saves
+
+| Problem | Try this |
+| --- | --- |
+| Continue is greyed out | Read the note under it. See [Why is Continue greyed out?](/docs/controls/saves/#why-is-continue-greyed-out) |
+| The hint says **Save failed** | Press interact at a station, or anywhere in Records Access or the Service Junction, to try again. See [If a save fails](/docs/controls/saves/#if-a-save-fails). |
+
+## Controls
+
+| Problem | Try this |
+| --- | --- |
+| Keys or buttons do the wrong thing | Open [Settings](/docs/controls/settings/#controls), Controls tab. Check the bindings or choose **RESTORE DEFAULT CONTROLS**. |
+| The controller does nothing | Check that your system sees the controller. Controllers have not been playtested yet, so please [report it](#report-a-bug). |
+| The character drifts with the stick untouched | Raise **Stick deadzone** in [Settings](/docs/controls/settings/#other-control-settings). |
+| The game closed when I pressed Back on Android | Back closes the game only from the title screen. In play it pauses; in menus it steps back. |
+
+## Seeing and hearing
+
+| Problem | Try this |
+| --- | --- |
+| The text is too small | Raise **TEXT SIZE** in [Settings](/docs/controls/settings/#display), up to 200%. |
+| Shake, flashes or flicker bother me | Turn on **REDUCED MOTION**. See [Accessibility](/docs/accessibility/#reduced-motion). |
+| There is no sound | Check the **Master** and **Effects** sliders in [Settings](/docs/controls/settings/#audio). There is no music or voice yet, only sound effects. |
+
+## Opening the game
+
+| Problem | Try this |
+| --- | --- |
+| The source game will not open | Check you have **Godot 4.7.2** and imported the project. See [source setup](/docs/development/setup/). |
+| A test build says it cannot be checked (macOS) or **Windows protected your PC** | Test builds are not signed. Follow [Open it on macOS](/docs/development/testing/#open-it-on-macos) or [Open it on Windows](/docs/development/testing/#open-it-on-windows). |
+| Windows blocks the test build with no way to allow it | **Smart App Control** is on. It blocks unsigned programs, so test builds cannot run on that PC. |
+
+## Report a bug
+
+1. Note what you did, step by step, and what went wrong.
+2. In a test build, press **F12** to save a bug capture (a screenshot and a data file). See [Debug tools](/docs/development/testing/#debug-tools-and-cheat-codes).
+3. Open a [GitHub issue](https://github.com/MrDemonWolf/wolf-override/issues).
+4. Include your OS, Godot version (for the source game), input method and the steps.
+
+<Callout type="warn" title="Keep personal details out">
+  Leave private notes and personal paths (like your user name in a folder path) out of logs and captures you share.
+</Callout>
