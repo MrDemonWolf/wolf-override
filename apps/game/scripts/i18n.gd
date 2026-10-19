@@ -221,6 +221,26 @@ static func apply(code: String) -> void:
 	TranslationServer.set_locale(language)
 
 
+## The code the layout checks use for English through Godot's pseudolocalization: every message padded
+## by project.godot's expansion_ratio (0.3, 30% longer) and bracketed, a stand-in for languages not
+## translated yet. Never offered to players; [method apply_for_checks] takes it.
+const PSEUDO: String = "pseudo"
+
+
+## [method apply] for the layout checks (tests/i18n_test.gd, tests/text_boxes_test.gd and the parity
+## capture's --language, localization PR L8): [constant PSEUDO] applies English and turns Godot's
+## pseudolocalization on, reloading its settings first; any other code turns it off and is applied.
+## The one place both are switched, so the suites and the capture driver pad text the same way.
+static func apply_for_checks(code: String) -> void:
+	if code == PSEUDO:
+		apply(FALLBACK)
+		TranslationServer.reload_pseudolocalization()
+		TranslationServer.pseudolocalization_enabled = true
+	else:
+		TranslationServer.pseudolocalization_enabled = false
+		apply(code)
+
+
 ## Registers with TranslationServer every known catalog whose locale is [param language] and removes
 ## every other one, first adding the catalogs registered now to [member _catalogs].
 static func _register_only(language: String) -> void:

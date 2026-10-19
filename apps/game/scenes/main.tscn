@@ -396,9 +396,9 @@ text = "A / D  MOVE\nE  READ DISPLAY (optional)"
 
 [node name="PauseButton" type="Button" parent="CanvasLayer"]
 visible = false
-offset_left = 854.0
+offset_left = 844.0
 offset_top = 16.0
-offset_right = 942.0
+offset_right = 946.0
 offset_bottom = 72.0
 grow_horizontal = 0
 theme_type_variation = &"TouchButton"
@@ -440,6 +440,7 @@ grow_horizontal = 0
 theme_type_variation = &"TouchButton"
 theme_override_font_sizes/font_size = 23
 text = "USE"
+autowrap_mode = 3
 
 [node name="Choice1" type="Button" parent="CanvasLayer/TouchControls"]
 visible = false
@@ -488,32 +489,32 @@ mouse_filter = 2
 theme_type_variation = &"TitleVeil"
 
 [node name="Brand" type="Label" parent="CanvasLayer/TitleScreen"]
-offset_left = 516.0
+offset_left = 476.0
 offset_top = 106.0
-offset_right = 796.0
+offset_right = 832.0
 offset_bottom = 137.0
 theme_override_colors/font_color = Color(0.61, 0.77, 0.85, 1)
 theme_override_font_sizes/font_size = 18
 text = "MRDEMONWOLF, INC. PRESENTS"
 
 [node name="LogoMark" type="TextureRect" parent="CanvasLayer/TitleScreen"]
-offset_left = 816.0
+offset_left = 852.0
 offset_top = 48.0
-offset_right = 904.0
+offset_right = 940.0
 offset_bottom = 136.0
 texture = ExtResource("3_logo")
 expand_mode = 1
 stretch_mode = 5
 
 [node name="TitleLine" type="ColorRect" parent="CanvasLayer/TitleScreen"]
-offset_left = 516.0
+offset_left = 476.0
 offset_top = 153.0
-offset_right = 904.0
+offset_right = 940.0
 offset_bottom = 157.0
 color = Color(0.10, 0.76, 0.92, 1)
 
 [node name="GameTitle" type="Label" parent="CanvasLayer/TitleScreen"]
-offset_left = 510.0
+offset_left = 470.0
 offset_top = 175.0
 offset_right = 940.0
 offset_bottom = 271.0
@@ -522,52 +523,53 @@ theme_override_font_sizes/font_size = 42
 text = "WOLF OVERRIDE"
 
 [node name="Subtitle" type="Label" parent="CanvasLayer/TitleScreen"]
-offset_left = 516.0
+offset_left = 476.0
 offset_top = 282.0
-offset_right = 904.0
+offset_right = 940.0
 offset_bottom = 313.0
 theme_override_colors/font_color = Color(0.68, 0.78, 0.85, 1)
 theme_override_font_sizes/font_size = 20
 text = "CHAPTER 1  /  LOCKDOWN"
 
 [node name="NewGameButton" type="Button" parent="CanvasLayer/TitleScreen"]
-offset_left = 516.0
-offset_top = 349.0
-offset_right = 702.0
-offset_bottom = 399.0
+offset_left = 476.0
+offset_top = 341.0
+offset_right = 700.0
+offset_bottom = 391.0
 theme_override_font_sizes/font_size = 21
 text = "NEW GAME"
 
 [node name="ContinueButton" type="Button" parent="CanvasLayer/TitleScreen"]
-offset_left = 718.0
-offset_top = 349.0
-offset_right = 904.0
-offset_bottom = 399.0
+offset_left = 716.0
+offset_top = 341.0
+offset_right = 940.0
+offset_bottom = 391.0
 theme_override_font_sizes/font_size = 21
 text = "CONTINUE"
 
 [node name="ContinueNote" type="Label" parent="CanvasLayer/TitleScreen"]
-offset_left = 516.0
-offset_top = 401.0
-offset_right = 904.0
-offset_bottom = 422.0
+offset_left = 476.0
+offset_top = 393.0
+offset_right = 940.0
+offset_bottom = 433.0
 theme_override_colors/font_color = Color(0.59, 0.70, 0.77, 1)
 theme_override_font_sizes/font_size = 15
 horizontal_alignment = 2
+autowrap_mode = 3
 
 [node name="CreditsButton" type="Button" parent="CanvasLayer/TitleScreen"]
-offset_left = 516.0
-offset_top = 425.0
-offset_right = 702.0
-offset_bottom = 469.0
+offset_left = 476.0
+offset_top = 437.0
+offset_right = 700.0
+offset_bottom = 481.0
 theme_override_font_sizes/font_size = 18
 text = "CREDITS"
 
 [node name="SettingsButton" type="Button" parent="CanvasLayer/TitleScreen"]
-offset_left = 718.0
-offset_top = 425.0
-offset_right = 904.0
-offset_bottom = 469.0
+offset_left = 716.0
+offset_top = 437.0
+offset_right = 940.0
+offset_bottom = 481.0
 theme_override_font_sizes/font_size = 18
 text = "SETTINGS"
 
@@ -581,12 +583,13 @@ text = "CHANGELOG"
 tooltip_text = "Development updates, in the game and online"
 
 [node name="Credit" type="Label" parent="CanvasLayer/TitleScreen"]
-offset_left = 516.0
-offset_top = 485.0
+offset_left = 476.0
+offset_top = 489.0
 offset_right = 940.0
-offset_bottom = 514.0
+offset_bottom = 533.0
 theme_override_colors/font_color = Color(0.59, 0.70, 0.77, 1)
 theme_override_font_sizes/font_size = 16
+autowrap_mode = 3
 text = "Concept: Nathanial Henniges  /  AI-assisted development"
 
 [node name="VersionLabel" type="Label" parent="CanvasLayer/TitleScreen"]
@@ -652,19 +655,21 @@ text = "[center][color=#73DDF5]ORIGINAL CONCEPT, CORE STORY & CREATIVE VISION[/c
 
 [node name="CreditsBackButton" type="Button" parent="CanvasLayer/TitleScreen/CreditsScreen"]
 offset_left = 189.0
-offset_top = 453.0
+offset_top = 439.0
 offset_right = 407.0
-offset_bottom = 502.0
+offset_bottom = 503.0
 theme_override_font_sizes/font_size = 19
 text = "BACK TO TITLE"
+autowrap_mode = 3
 
 [node name="CreditsPauseButton" type="Button" parent="CanvasLayer/TitleScreen/CreditsScreen"]
 offset_left = 553.0
-offset_top = 453.0
+offset_top = 439.0
 offset_right = 771.0
-offset_bottom = 502.0
+offset_bottom = 503.0
 theme_override_font_sizes/font_size = 19
 text = "PAUSE SCROLL"
+autowrap_mode = 3
 
 [node name="ChangelogScreen" type="ColorRect" parent="CanvasLayer/TitleScreen"]
 visible = false
@@ -712,18 +717,19 @@ color = Color(0.10, 0.76, 0.92, 1)
 offset_left = 189.0
 offset_top = 100.0
 offset_right = 771.0
-offset_bottom = 122.0
+offset_bottom = 138.0
 theme_override_colors/font_color = Color(0.59, 0.70, 0.77, 1)
 theme_override_font_sizes/font_size = 15
 horizontal_alignment = 1
+autowrap_mode = 3
 text = "Source-build changes by date, not releases. Scroll with the wheel, drag the text or use up/down."
 
 [node name="ChangelogBody" type="RichTextLabel" parent="CanvasLayer/TitleScreen/ChangelogScreen"]
 auto_translate_mode = 2
 offset_left = 189.0
-offset_top = 130.0
+offset_top = 144.0
 offset_right = 771.0
-offset_bottom = 433.0
+offset_bottom = 427.0
 theme_override_colors/default_color = Color(0.82, 0.89, 0.94, 1)
 theme_override_font_sizes/normal_font_size = 17
 bbcode_enabled = true
@@ -731,19 +737,21 @@ metadata/i18n_own_language = true
 
 [node name="ChangelogBackButton" type="Button" parent="CanvasLayer/TitleScreen/ChangelogScreen"]
 offset_left = 189.0
-offset_top = 453.0
+offset_top = 439.0
 offset_right = 407.0
-offset_bottom = 502.0
+offset_bottom = 503.0
 theme_override_font_sizes/font_size = 19
 text = "BACK TO TITLE"
+autowrap_mode = 3
 
 [node name="ChangelogOnlineButton" type="Button" parent="CanvasLayer/TitleScreen/ChangelogScreen"]
 offset_left = 433.0
-offset_top = 453.0
+offset_top = 439.0
 offset_right = 771.0
-offset_bottom = 502.0
+offset_bottom = 503.0
 theme_override_font_sizes/font_size = 17
 text = "OPEN FULL CHANGELOG ONLINE"
+autowrap_mode = 3
 tooltip_text = "Opens wolfoverride.mrdemonwolf.dev/docs/changelog/ in your browser"
 
 [node name="IntroFade" type="ColorRect" parent="CanvasLayer"]

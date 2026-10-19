@@ -33,8 +33,10 @@ extends "res://tests/support/game_suite.gd"
 ##   the hint, tutorial, top card, touch USE button and the opening's CONTINUE prompt in another language,
 ##   with CONTINUE's touch-button context kept apart from the title's, and the top card drawn again in
 ##   English when the language changes back;
-## - every offered language laid out in the game (PR L9): the title, credits, changelog, Settings, Pause,
-##   the touch buttons and the station names at every TEXT SIZE step fit, and the names stand apart.
+## - every offered language, and English padded 30% by pseudolocalization, laid out in the game (PR L9,
+##   PR L8): the title, credits, changelog, Settings, Pause, the touch buttons, the HUD's rows, the answer
+##   rows, the end card and the station names at every TEXT SIZE step fit outright (KNOWN_OVERFLOWS is
+##   empty), and the names stand apart.
 ## - the story (PR L7c): in English every story line comes back from I18n.shown and from its cut by
 ##   speaker unchanged; in another language each speaker's words are translated apart from the tag (the
 ##   Director's tag by its own message), knockdown cards and restore lines apart, WOLF's callback with the
@@ -158,11 +160,13 @@ const CALLBACKS: Array[String] = [
 	"You said \"%s\"\nI made my call. You cranked the bypass anyway. I stayed.",
 ]
 
+## Controls allowed to overflow, pinned by their "<where>|<node path>" key as [method _check_fit] names
+## them (DESIGN.md: "known overflows pinned by name"). Empty since PR L8 (layout-for-languages): every
+## control fits outright in every language and under pseudolocalization. A control added here needs a
+## reason beside it and Nathanial's review, since its text is cut or runs past its room.
+const KNOWN_OVERFLOWS: Array[String] = []
+
 var _checks: int = 0
-## English's layout of each control [method _check_fit] judges, by "<where>|<node path>": whether
-## I18n.overflows found an overflow, the judged Control's size and the one-row width (px). Filled by the
-## English pass of [method _check_layouts], which runs first (I18n.offered puts English first).
-var _english_fit: Dictionary = {}
 
 
 func _run() -> void:
@@ -697,20 +701,24 @@ func _check_hud() -> void:
 	I18n.apply("en")
 
 
-## Every offered language, English first, laid out in the real game and judged by the build's
-## overflow check (I18n.overflows): the title (its buttons, the Brand line, the CONTINUE note, shown only
-## while there is no save, which start_game guarantees, and the version number), the credits and
-## changelog screens, every Settings tab, Pause in a run, the touch layout's buttons, and the station
-## names in the corridor, Records Access and the Service Junction at every TEXT SIZE step, where they
-## must also stand apart (the kit's overlapping_labels, the check text_boxes_test makes in English).
-## English runs first and sets the baseline the others are judged against (see [method _check_fits]);
-## its title must fit outright, as before PR L9. The HUD (PR L7b's hints, objectives, cards, tutorial
-## and touch words) is judged by [method _check_touch_words], the tutorial prompt's fit and
-## [method _check_hud_rows]. The dialogue boxes are not in the catalogs yet (PR L7c); L7d's
-## text_boxes_test loop covers them per language.
+## Every offered language, English first, then English padded 30% by pseudolocalization
+## (I18n.PSEUDO, the stand-in for languages still to come), laid out in the real game and judged
+## by the build's overflow check (I18n.overflows), each surface in a state that shows it: the title (its
+## buttons, the Brand line, the CONTINUE note, shown only while there is no save, which start_game
+## guarantees, and the version number), the credits and changelog screens, every Settings tab, Pause in
+## a run, the touch layout's buttons, the answer rows with keys and on touch, the end card, and the
+## station names in the corridor, Records Access and the Service Junction at every TEXT SIZE step, where
+## they must also stand apart (the kit's overlapping_labels, the check text_boxes_test makes). Every
+## control must fit outright ([method _check_fit]; PR L8 emptied [constant KNOWN_OVERFLOWS]). The HUD
+## (PR L7b's hints, objectives, cards, tutorial and touch words) is judged by
+## [method _check_touch_words], the tutorial prompt's fit and [method _check_hud_rows]; the dialogue
+## boxes by text_boxes_test's loop over every language (PR L7d).
 func _check_layouts() -> void:
-	for code: String in I18n.offered():
-		I18n.apply(code)
+	var codes: Array[String] = []
+	codes.assign(I18n.offered())
+	codes.append(I18n.PSEUDO)
+	for code: String in codes:
+		I18n.apply_for_checks(code)
 		var game: Main = await start_game("i18n-layout-%s" % code, keep_running) as Main
 		await frames(3)
 		_check(game.continue_note.is_visible_in_tree(), "%s: the CONTINUE note is up on a fresh title, so it is judged" % code)
@@ -718,6 +726,11 @@ func _check_layouts() -> void:
 		game.call("_show_credits")
 		await frames(2)
 		_check_fits(code, "credits", game.credits_screen)
+		# Paused, the scroll button reads RESUME SCROLL, a longer word than PAUSE SCROLL.
+		game.call("_toggle_credits_pause")
+		await frames(2)
+		_check_fits(code, "credits paused", game.credits_screen)
+		game.call("_toggle_credits_pause")
 		game.call("_hide_credits")
 		game.call("_show_changelog")
 		await frames(2)
@@ -731,6 +744,17 @@ func _check_layouts() -> void:
 			settings.select_tab(tab)
 			await frames(2)
 			_check_fits(code, "Settings tab %d" % tab, settings)
+		# Waiting for a new binding, on the page that holds the bindings: the prompt in the note and
+		# CANCEL REBIND, shown only then.
+		var first_binding: Control = settings.binding_buttons.values()[0]
+		for tab: int in settings.pages.size():
+			if settings.pages[tab].is_ancestor_of(first_binding):
+				settings.select_tab(tab)
+		settings.begin_capture(GameSettings.ACTIONS[0], "keyboard")
+		await frames(2)
+		_check(settings.cancel_button.is_visible_in_tree(), "%s: CANCEL REBIND is up while a binding waits, so it is judged" % code)
+		_check_fits(code, "Settings rebind", settings)
+		settings.cancel_capture()
 		game.call("_resume_game")
 		game.debug_tools.actions.jump(&"corridor_start")
 		game.touch_enabled = true
@@ -763,18 +787,36 @@ func _check_layouts() -> void:
 				_check(overlaps.is_empty(), "%s, %d%%, %s: no two station names overlap %s" % [code, percent, jump, overlaps])
 		settings.text_size.select(0)
 		settings.text_size.item_selected.emit(0)
+		await _check_choices_and_end_card(code, game)
 		await end_game(game)
-	I18n.apply("en")
+	I18n.apply_for_checks(I18n.FALLBACK)
+
+
+## The relay's two answers, with keys (under the top card, with their keys) and on touch (at the
+## bottom), then the END OF SLICE card with its recap rows after the answer, each judged by
+## [method _check_fits] in [param game] in [param code]: these show only in those states, so a pass
+## that never reached them would never judge them.
+func _check_choices_and_end_card(code: String, game: Main) -> void:
+	game.debug_tools.actions.jump(&"corridor_start")
+	game.call("_ask_relay")
+	for touch: bool in [false, true]:
+		game.touch_enabled = touch
+		game.call("_refresh_ui")
+		await frames(2)
+		for button: Button in [game.touch_choice_1, game.get_node("CanvasLayer/TouchControls/Choice2") as Button]:
+			_check(button.is_visible_in_tree(), "%s: the answer %s is up %s, so it is judged" % [code, button.name, "on touch" if touch else "with keys"])
+			_check_fit(code, "answers %s|%s" % ["touch" if touch else "keys", _game_path(button)], button)
+	game.touch_enabled = false
+	game.call("_answer_choice", 1)
+	game.debug_show_end_card()
+	await frames(2)
+	_check(game.end_card.is_visible_in_tree() and game.end_card_rows.get_child_count() > 0, "%s: the end card is up with its recap rows, so they are judged" % code)
+	_check_fits(code, "end card", game.end_card)
+	game.call("_hide_end_card")
 
 
 ## Every visible Label, Button and RichTextLabel with text under [param root] fits, one check each,
-## named by [param code] and [param where]. English sets the baseline in [member _english_fit] (keyed by
-## [param where] and the node's path): a control fits when I18n.overflows finds nothing, or, where the
-## shipped English layout already overflows by that check (a Container page grown past its designed
-## rect, a binding button that trims its two bindings), when the language needs no more room than English:
-## its judged Control (I18n.outermost_container) is no larger and, where the control cuts its text, its
-## one-row width (I18n.needed_width) fits the control or is no wider than English's. English itself is
-## recorded, and failed only on the title: elsewhere its known overflows are L8's (layout-for-languages).
+## named by [param code] and [param where] ([method _check_fit]).
 func _check_fits(code: String, where: String, root: Node) -> void:
 	var controls: Array[Node] = [root]
 	controls.append_array(root.find_children("*", "Control", true, false))
@@ -789,31 +831,45 @@ func _check_fits(code: String, where: String, root: Node) -> void:
 
 
 ## The touch USE button with every word the game puts on it (USE, CRANK, DROP, RETRY, and CONTINUE in its
-## touch-button context), each judged by [method _check_fit] against English's own fit: the corridor's
-## layout shows only USE, so the others would never be measured. Sets the text directly, with no frame in
-## between, so the game's own _refresh_ui cannot put USE back before the check reads it.
+## touch-button context), each judged by [method _check_fit]: the corridor's layout shows only USE, so
+## the others would never be measured. Sets the text directly, with no frame in
+## between, so the game's own _refresh_ui cannot put USE back before the check reads it. A Button takes
+## its new minimum size only on the next frame, so each word's size is applied at once (the designed
+## size, grown to the word's minimum) before it is judged: without that every word was judged at USE's
+## size, and pseudo CONTINUE passed here while it overflowed in the opening's stills (PR L8).
 func _check_touch_words(code: String, game: Main) -> void:
+	var designed: Vector2 = I18n.designed_rect(game.touch_use).size
 	for word: Array in [["USE", ""], ["CRANK", ""], ["DROP", ""], [Main.RETRY_BUTTON_TEXT, ""], [Main.CONTINUE_TEXT, Main.TOUCH_BUTTON_CONTEXT]]:
 		game.touch_use.text = String(TranslationServer.translate(word[0], word[1]))
+		game.touch_use.size = designed.max(game.touch_use.get_combined_minimum_size())
 		_check_fit(code, "touch word %s|use" % word[0], game.touch_use)
+	game.touch_use.size = designed
 
 
 ## Every short message of [param code]'s catalogs (HUD_MESSAGE_CHARS or fewer characters, no BBCode),
-## filled with sample inserts ([method _sample_inserts]) as the HUD fills it, drawn where the HUD draws
-## its lines: the hint bar at the keyboard and the touch widths (via the game's own _set_dialogue, which
-## sizes it) and the top card. Each may take at most one row more than its English in the same Label,
-## and never more than HUD_MAX_ROWS rows: the hint bar and the card grow with their rows, so a
-## translation cannot overflow them, but it can push them over the room (PR L9 review: the HUD hints
-## need the fit check). English is the baseline and is not judged itself.
+## or under I18n.PSEUDO of the committed translation template (every message the game marks, each
+## padded 30%), filled with sample inserts ([method _sample_inserts]) as the HUD fills it, drawn where the
+## HUD draws its lines: the hint bar at the keyboard and the touch widths (via the game's own
+## _set_dialogue, which sizes it) and the top card. Each may take at most one row more than its English
+## in the same Label, and never more than HUD_MAX_ROWS rows: the hint bar and the card grow with their
+## rows, so a translation cannot overflow them, but it can push them over the room (PR L9 review: the
+## HUD hints need the fit check). English is the baseline and is not judged itself; the HUD's labels
+## never translate their own text, so the English rows are the English text's even under pseudo.
 func _check_hud_rows(code: String, game: Main) -> void:
 	if code == I18n.FALLBACK:
 		return
 	var messages: PackedStringArray = []
-	for catalog: Translation in TranslationServer.get_translations():
-		if TranslationServer.standardize_locale(catalog.locale) == code:
-			for msgid: String in catalog.get_message_list():
-				if msgid.length() <= HUD_MESSAGE_CHARS and not msgid.contains("[") and not messages.has(msgid):
-					messages.append(msgid)
+	var sources: Array[PackedStringArray] = []
+	if code == I18n.PSEUDO:
+		sources.append(PackedStringArray(template_notes().keys()))
+	else:
+		for catalog: Translation in TranslationServer.get_translations():
+			if TranslationServer.standardize_locale(catalog.locale) == code:
+				sources.append(catalog.get_message_list())
+	for source: PackedStringArray in sources:
+		for msgid: String in source:
+			if msgid.length() <= HUD_MESSAGE_CHARS and not msgid.contains("[") and not messages.has(msgid):
+				messages.append(msgid)
 	_check(messages.size() > 100, "%s: the HUD row check reads the language's catalog (%d short messages)" % [code, messages.size()])
 	var widest: int = 0
 	for touch: bool in [false, true]:
@@ -862,7 +918,11 @@ func _game_path(node: Node) -> String:
 	return "/".join(steps)
 
 
-## One control of [method _check_fits] (also the station names), under [param key] in the baseline.
+## One control of [method _check_fits] (also the station names, the touch words and the answers),
+## named by [param key] ("<where>|<node path>"): it fits when I18n.overflows finds nothing (no growing
+## past its designed rect or the viewport, no cut or trimmed text), unless the key is pinned in
+## [constant KNOWN_OVERFLOWS]. The failure names the control's size, its judged Container's size and,
+## where it cuts its text, the width one row of it needs (px).
 func _check_fit(code: String, key: String, control: Control) -> void:
 	var over: bool = I18n.overflows(control)
 	var judged: Vector2 = I18n.outermost_container(control).size
@@ -870,19 +930,8 @@ func _check_fit(code: String, key: String, control: Control) -> void:
 	# grows instead shows that in its judged size.
 	var cuts: bool = (control is Label or control is Button) and (bool(control.get("clip_text")) or int(control.get("text_overrun_behavior")) != TextServer.OVERRUN_NO_TRIMMING)
 	var needed: float = I18n.needed_width(control) if cuts else 0.0
-	var shown: String = TranslationServer.translate(str(control.get("text"))) if control.auto_translate_mode != Node.AUTO_TRANSLATE_MODE_DISABLED else str(control.get("text"))
-	if code == I18n.FALLBACK:
-		_english_fit[key] = {"over": over, "judged": judged, "needed": needed}
-		if key.begins_with("title|"):
-			_check(not over, "the English title's %s fits (size %s)" % [shown.left(60).c_escape(), control.size])
-		return
-	var english: Dictionary = _english_fit.get(key, {"over": false})
-	var fits: bool = not over
-	if over and bool(english["over"]):
-		var tolerance: float = I18n.OVERFLOW_TOLERANCE_PX
-		fits = (judged.x <= english["judged"].x + tolerance and judged.y <= english["judged"].y + tolerance
-				and needed <= maxf(control.size.x, float(english["needed"])) + tolerance)
-	_check(fits, "%s, %s: %s fits (size %s, judged %s, one row %.0f px; English: %s)" % [code, key.get_slice("|", 0), shown.left(60).c_escape(), control.size, judged, needed, english])
+	var shown: String = String(control.atr(str(control.get("text"))))
+	_check(not over or KNOWN_OVERFLOWS.has(key), "%s, %s: %s fits (size %s, judged %s, one row %.0f px; %s)" % [code, key.get_slice("|", 0), shown.left(60).c_escape(), control.size, judged, needed, key.get_slice("|", 1)])
 
 
 ## The made-up catalog of the story checks, under [constant UNSHIPPED_TEST_LANGUAGE] (PR L7c): the opening's Director line and his tag (with
