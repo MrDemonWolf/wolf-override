@@ -162,6 +162,7 @@ Changes merged after 0.15.0. They become the next version when it is cut.
 - Language setting checked: headless test suites and rendered Settings stills in English and pseudo-English, with every language turned on for the capture only; not played by hand.
 - Menus marked for translation checked: headless test suites (29), a switch to a test Spanish catalog and back, the English menus' text and stills compared with the previous version (unchanged apart from the changelog's own new lines), rendered title, Pause and Settings stills in pseudo-English (keyboard and touch) and with a French AZERTY layout; not played by hand.
 - Spanish checked: the translation checks with Codex's back-translation, headless test suites and rendered Spanish stills (keyboard and touch, 1280x720); not reviewed by a native speaker, not played by hand.
+- Story marked for translation checked: headless test suites (29), a switch to a test Spanish catalog and back, an old save's answer quoted in pseudo-English, every story constant's English compared with the previous version (unchanged), and four routes' stills (424, keyboard and touch) byte for byte the same as before; rendered pseudo-English stills of the routes; not played by hand.
 
 == 0.15.0 - October 16, 2026 ==
 Summary: real doors in Records Access and the Service Junction, a copied-code check, notes moved to Notion and groundwork for more languages.
