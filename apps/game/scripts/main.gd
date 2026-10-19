@@ -65,19 +65,24 @@ const BYPASS_TICKS: int = BypassHandle.TICKS_NEEDED
 const BYPASS_ALARM_SECONDS: float = 1.1
 ## Where the engineer steps back to, clear of the relay, while WOLF takes the live contact.
 const RELAY_STEP_BACK_X: float = 736.0
-## The Director's purge display (PurgeTerminalArt): one whole piece at its real size (the art set's
-## PIECES.md section 5c, k 0.517: 497 x 486 px at 7.74 px per world px, 64.2 x 62.8 world px), a floor
-## console standing against the back wall, centred on PURGE_DISPLAY_X. Its plinth stands on the floor
-## (PURGE_DISPLAY_FOOT_Y: RoomDepth.FLOOR_Y, where the corridor's painted back-wall pillars meet the floor);
-## at the art set's y 404 it rested on the painted pipe rail 36 px up and read as a console perched on a
-## pipe. Its screen is painted dark; PurgeScreen lights it in the purge order's red over
-## PURGE_DISPLAY_SCREEN (piece px, measured on purge-display.png).
+## The Director's purge display (PurgeTerminalArt): one whole piece at its real size, 1.84 x 1.80 m
+## (the art set's PIECES.md section 5c), a floor console standing against the back wall, centred on
+## PURGE_DISPLAY_X. Its plinth stands on the floor (PURGE_DISPLAY_FOOT_Y: RoomDepth.FLOOR_Y, where the
+## corridor's painted back-wall pillars meet the floor); at the art set's y 404 it rested on the painted
+## pipe rail 36 px up and read as a console perched on a pipe. The floor is the walk line (40 world px
+## per metre, DoorCamera), so the art set's scale for y 404 (k 0.517, 1 / 7.737, worked out 5.6 m
+## further back at depth scale 0.872) would draw it only 1.57 m tall; PURGE_DISPLAY_SCALE is that
+## scale over 0.872: the 497 x 486 px piece at 6.75 px per world px, 73.6 x 72 world px, as tall as the
+## Records PURGE QUEUE (also 1.80 m, RecordsRoom.PURGE_SCALE). Its screen is painted dark; PurgeScreen
+## lights it in the purge order's red over PURGE_DISPLAY_SCREEN (piece px, measured on purge-display.png).
 const PURGE_DISPLAY_X: float = 125.0
 const PURGE_DISPLAY_FOOT_Y: float = RoomDepth.FLOOR_Y
+const PURGE_DISPLAY_SCALE: float = 1.0 / 6.75
 const PURGE_DISPLAY_SCREEN: Rect2 = Rect2(94.0, 32.0, 178.0, 106.0)
 ## The purge display's reach; walking past it the first time WOLF says what the purge takes. Its
-## right edge (x 157) plus the engineer's reach and 2.5 px, as the larger display's was (230 from 210.5).
-const PURGE_DISPLAY_MAX_X: float = 177.0
+## right edge (x 161.8) plus the engineer's reach (M0Actor.HUMAN_REACH 17) and 2.5 px, as the larger
+## display's was (230 from 210.5).
+const PURGE_DISPLAY_MAX_X: float = 181.0
 ## The dialogue box (STORY-2, STORY-3, STORY-4): a message shows as DialogueBoxes' one-speaker boxes,
 ## one after another, each up for its reading time (DialogueBoxes.read_seconds, the same time box_seconds
 ## gives a line said in several boxes). The words are 23 px at 540p in a column this wide, wide enough
@@ -948,7 +953,9 @@ func _ready() -> void:
 	breaker_status_light.position = breaker_light.position
 	breaker_status_light.size = breaker_light.size
 	breaker_status_glow = _attach_status_glow(breaker_status_light)
-	# The purge display stands on its foot (main.tscn holds the same place for the editor).
+	# The purge display stands on its foot at its real size (main.tscn holds the same place and scale
+	# for the editor).
+	purge_terminal_art.scale = Vector2.ONE * PURGE_DISPLAY_SCALE
 	purge_terminal_art.position = Vector2(PURGE_DISPLAY_X, PURGE_DISPLAY_FOOT_Y - purge_terminal_art.texture.get_height() * purge_terminal_art.scale.y * 0.5)
 	PropScreen.attach(purge_terminal_art, "PurgeScreen", PURGE_DISPLAY_SCREEN, RecordsRoom.PURGE_RED)
 	relay_status_glow = _attach_status_glow(relay_status_light)

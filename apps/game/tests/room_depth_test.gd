@@ -66,6 +66,11 @@ func _run() -> void:
 	for prop_name: String in floor_props:
 		var prop: Sprite2D = floor_props[prop_name]
 		_expect(is_equal_approx(snappedf(_bottom(prop), 0.5), 440.0), "the %s's base is on the floor (y 440, got %.2f)" % [prop_name, _bottom(prop)])
+	# The corridor's purge display and the Records PURGE QUEUE are both 1.80 m consoles on the walk line,
+	# so they are drawn the same height (72 world px at 40 px per metre).
+	var display_height: float = RoomDepth.prop_bounds(floor_props["purge display"]).size.y
+	var queue_height: float = RoomDepth.prop_bounds(floor_props["purge queue"]).size.y
+	_expect(absf(display_height - queue_height) < 0.5, "the purge display is as tall as the purge queue (%.1f and %.1f px)" % [display_height, queue_height])
 	# The Records stations' named sizes are their pieces' own (their half widths are read from them).
 	for station: Array in [[records.get_node("PurgeArt"), RecordsRoom.PURGE_SIZE, "PURGE QUEUE"], [records.get_node("MirrorArt"), RecordsRoom.MIRROR_SIZE, "MIRROR PORT"]]:
 		_expect(RoomDepth.prop_region(station[0]).size == station[1], "the %s's named size is its piece's (%s)" % [station[2], RoomDepth.prop_region(station[0]).size])
