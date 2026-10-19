@@ -49,8 +49,10 @@ export function pageMetadata(
   guide?: { markdownPath: string; modifiedTime?: Date },
 ): Metadata {
   const url = `${siteUrl}${path}`;
-  // Social cards get a 1200x630 crop of the provisional key art that keeps both characters (JPEG for the widest crawler support).
-  const image = { url: `${siteUrl}/share-card.jpg`, width: 1200, height: 630, alt: 'WOLF OVERRIDE provisional key art: an engineer and robotic wolf in a research corridor.' };
+  // Social cards get a 1200x630 crop of the provisional key art that keeps both characters, with the
+  // stacked WOLF OVERRIDE logo on its dark right side so a shared link shows the name (JPEG for the
+  // widest crawler support).
+  const image = { url: `${siteUrl}/share-card.jpg`, width: 1200, height: 630, alt: 'The WOLF OVERRIDE logo beside the provisional key art: an engineer and robotic wolf in a research corridor.' };
   const cardTitle = guide ? titleTemplate.replace('%s', title) : title;
   const card = { siteName: 'WOLF OVERRIDE', title: cardTitle, description, url, locale: 'en_US', images: [image] };
   return {
