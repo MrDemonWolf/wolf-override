@@ -9,7 +9,7 @@
 # has a guide page without <lastmod>, the landing page or a guide page lacks its JSON-LD
 # block, any JSON-LD block is not valid JSON, a guide page's social card is not og:type article
 # with the game name in its og:title, or llms.txt, llms-full.txt or a guide
-# page's Markdown copy is missing or carries raw MDX.
+# page's Markdown copy is missing or carries raw MDX, or when the press kit zip is missing.
 # Usage: scripts/check-docs-export.sh   (DOCS_OUT_DIR overrides the export directory)
 # Fails when apps/docs/out is missing rather than passing silently.
 set -euo pipefail
@@ -141,7 +141,14 @@ while IFS= read -r guide; do
   fi
 done < <(find "$out/docs" -name index.html | sort)
 
+# The press kit zip is git-ignored and built by apps/docs/scripts/build-press-kit.ts as part of the
+# docs build, so the export must contain it or the design-system page's download link is dead.
+if [ ! -s "$out/press/wolf-override-press-kit.zip" ]; then
+  echo "FAIL  press/wolf-override-press-kit.zip is missing from the export (the docs build script makes it)" >&2
+  status=1
+fi
+
 if [ "$status" -eq 0 ]; then
-  echo "pass  $count exported pages: no /_next/image, one #main-content each, at most one robots meta, no .ttf references; robots.txt names the sitemap; every guide URL in sitemap.xml has <lastmod>; valid JSON-LD on the landing and guide pages; guide pages are og:type article with the game name in og:title; llms.txt, llms-full.txt and a Markdown copy of every guide page"
+  echo "pass  $count exported pages: no /_next/image, one #main-content each, at most one robots meta, no .ttf references; robots.txt names the sitemap; every guide URL in sitemap.xml has <lastmod>; valid JSON-LD on the landing and guide pages; guide pages are og:type article with the game name in og:title; llms.txt, llms-full.txt and a Markdown copy of every guide page; the press kit zip"
 fi
 exit "$status"

@@ -1,18 +1,18 @@
 /*
  * Builds the press kit zip the design-system page offers: apps/docs/public/press/wolf-override-press-kit.zip.
  *
- * Usage (from apps/docs, or through the root package scripts):
- *   bun scripts/build-press-kit.ts           rewrite the committed zip
- *   bun scripts/build-press-kit.ts --check   fail (exit 1) when the committed zip differs from a fresh build
+ * Usage (from apps/docs): `bun scripts/build-press-kit.ts`. The docs app's `dev` and `build` scripts
+ * run it first, so the zip is always fresh and `next build` exports it (and the page reads its size).
+ * The zip is git-ignored: every file in it already lives in the repository, and committing the zip
+ * would store an extra multi-megabyte copy in Git history on every logo, screenshot or copy change.
  *
  * Contents: every file in lib/press-kit.ts `pressFiles` (logo set, wolf mark, screenshots, key art,
  * cover), read from where the site already keeps it, plus three text files written here from the same
- * module the page renders (FACTS.txt, COPY.txt, LICENSE-ASSETS.txt). Nothing is copied by hand, so
- * after a logo, screenshot or copy change, run this and commit the zip; `bun run docs:test` runs the
- * --check mode so a stale zip fails CI. The zip is byte-stable (lib/zip.ts), and its size is capped at
- * 25 MB so the download stays quick on a phone connection.
+ * module the page renders (FACTS.txt, COPY.txt, LICENSE-ASSETS.txt). The zip is byte-stable
+ * (lib/zip.ts), so rebuilding unchanged inputs gives the same file, and its size is capped at 25 MB so
+ * the download stays quick on a phone connection.
  */
-import { readFileSync, writeFileSync } from 'node:fs';
+import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 import * as kit from '@/lib/press-kit';
 import { buildZip, type ZipEntry } from '@/lib/zip';
@@ -88,20 +88,8 @@ export function pressKitEntries(): ZipEntry[] {
 if (import.meta.main) {
   const zip = buildZip(pressKitEntries());
   if (zip.length > maxBytes) throw new Error(`Press kit is ${(zip.length / 1048576).toFixed(1)} MB, over the 25 MB budget`);
-  if (process.argv.includes('--check')) {
-    let committed: Buffer | undefined;
-    try {
-      committed = readFileSync(pressKitFile);
-    } catch {
-      // A missing zip is reported below like a stale one.
-    }
-    if (!committed?.equals(zip)) {
-      console.error(`${kit.pressKitPath} is missing or out of date: run "bun scripts/build-press-kit.ts" in apps/docs and commit the zip.`);
-      process.exit(1);
-    }
-    console.log(`Press kit is up to date (${kit.pressFiles.length + kit.pressTextFiles.length} files, ${(zip.length / 1048576).toFixed(1)} MB).`);
-  } else {
-    writeFileSync(pressKitFile, zip);
-    console.log(`Wrote ${kit.pressKitPath} (${kit.pressFiles.length + kit.pressTextFiles.length} files, ${(zip.length / 1048576).toFixed(1)} MB).`);
-  }
+  // public/press/ also holds the committed cover, but create it anyway so a fresh checkout never fails here.
+  mkdirSync(path.dirname(pressKitFile), { recursive: true });
+  writeFileSync(pressKitFile, zip);
+  console.log(`Wrote ${kit.pressKitPath} (${kit.pressFiles.length + kit.pressTextFiles.length} files, ${(zip.length / 1048576).toFixed(1)} MB).`);
 }

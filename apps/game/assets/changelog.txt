@@ -77,7 +77,7 @@ Changes merged after 0.15.0. They become the next version when it is cut.
 - One press kit download (about 8 MB): the logo set, the wolf mark, three screenshots, the provisional key art, the cover, facts and the approved copy. Each file can also be downloaded on its own.
 
 -- Development --
-- The press kit zip is rebuilt by a script from the site's own files, and the website tests fail when the committed zip is out of date.
+- The press kit zip is built by a script from the site's own files each time the site is built, so the repository never stores a second copy of them.
 - The game's version lives in one place, apps/game/project.godot; the macOS and Windows test builds now take it from there instead of 0.0.0.
 - F12 bug captures record the game's version.
 - The in-game changelog shows the short lines only; the full notes stay on the website's changelog.
