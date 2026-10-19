@@ -2341,8 +2341,10 @@ func _notification(what: int) -> void:
 			if is_node_ready():
 				_fill_credits()
 				_fill_changelog()
-				# The station names are measured in the language shown (PR L8).
-				_refit_station_labels()
+				# The station names are measured in the language shown (PR L8). Settings applies the saved
+				# language during _ready, before the bypass handle exists; _ready fits them itself after.
+				if bypass_handle != null:
+					_refit_station_labels()
 			# The END OF SLICE card's recap rows are translated in code (PR L7c).
 			if is_node_ready() and end_card_active:
 				_fill_end_card_rows()

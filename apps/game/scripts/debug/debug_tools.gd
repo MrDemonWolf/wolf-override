@@ -75,12 +75,12 @@ const FRAME_WAIT_LIMIT: int = 10
 ## The touch DEBUG button, in the 960x540 canvas: top right, ending BUTTON_GAP left of PAUSE (main.tscn's
 ## PauseButton spans x 844..946 since localization PR L8 gave PAUSE room for a longer word) and above
 ## the title's logo mark (from y 48), so it never covers PAUSE, USE, the arrows or the actors lower down.
-## Its width is at least the TouchButton theme's minimum, which can be wider than asked for, so the
-## button grows to the left, never into the gap. At 72 px it spans x 758..830, clear of the note
-## (NOTE_RECT, to x 754).
-const BUTTON_RECT: Rect2 = Rect2(758.0, 10.0, 72.0, 34.0)
+## Its width is at least the TouchButton theme's minimum, which can be wider than asked for (78 px),
+## so the button grows to the left, never into the gap. At 78 px it spans x 756..834, clear of the
+## note (NOTE_RECT, to x 754); the gap to PAUSE is 10 px (14 before PAUSE grew).
+const BUTTON_RECT: Rect2 = Rect2(762.0, 10.0, 72.0, 34.0)
 const PAUSE_LEFT: float = 844.0
-const BUTTON_GAP: float = 14.0
+const BUTTON_GAP: float = 10.0
 ## The short note ("Debug tools unlocked", a jump's result, a capture's path), wrapping to two lines;
 ## the menu hides it (it has its own status line). In play it sits in the top band between the top
 ## card (ends x 466) and the DEBUG button (from x 768), above the frame-step bar, over nothing but the
