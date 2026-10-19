@@ -47,6 +47,7 @@ func _run() -> void:
 	await _check_story_kept()
 	await _check_touch()
 	await _check_text_size(path)
+	await _check_overlaps_every_language(path)
 	print("text boxes: %d boxes measured on screen; the longest box takes %d rows at 200%%" % [shown_checked, rows_at_200])
 	# The rooms' jumps leave clips playing; end_game stops them before freeing the game and removes
 	# its save and settings files.
@@ -382,12 +383,14 @@ func _measure_shown(context: String) -> void:
 	_expect(story.position.y + story.size.y <= bar.size.y + 0.5 and story.get_line_count() * story.get_line_height() <= story.size.y + 0.5, "%s: the words fit inside the box" % context)
 
 
-## Runs the game for [param seconds] of game time in 1/60 s steps, measuring every box shown.
-func _play(seconds: float, context: String) -> void:
+## Runs the game for [param seconds] of game time in 1/60 s steps, measuring every box shown (unless
+## [param measure] is false: the English box rules do not hold another language's boxes, which
+## _check_every_language checks on their own).
+func _play(seconds: float, context: String, measure: bool = true) -> void:
 	var last: String = ""
 	for _step: int in roundi(seconds * 60.0):
 		game.call("_process", 1.0 / 60.0)
-		if story.text != last:
+		if measure and story.text != last:
 			last = story.text
 			_measure_shown(context)
 	await process_frame
@@ -622,16 +625,20 @@ func _check_story_kept() -> void:
 
 
 ## P0-10: on touch the answers sit at the bottom without numbers, the hint names the button on screen
-## and stays clear of USE.
-func _check_touch() -> void:
+## and stays clear of USE. In [param code] other than English (localization PR L8) only the places are
+## checked: the answers apart at the bottom corners, the hint bar clear of the buttons and the box; the
+## English words (the answers, CRANK, the tutorial's line) are English's alone.
+func _check_touch(code: String = I18n.FALLBACK) -> void:
+	var english: bool = code == I18n.FALLBACK
 	game.touch_enabled = true
 	game.controller_active = false
 	await _to_relay_question()
 	var choice_1: Button = game.get_node("CanvasLayer/TouchControls/Choice1") as Button
 	var choice_2: Button = game.get_node("CanvasLayer/TouchControls/Choice2") as Button
-	_expect(choice_1.visible and not choice_1.text.begins_with("1") and not choice_2.text.begins_with("2") and choice_1.text == M0State.CHOICE_TEXT[M0State.DISCLOSE], "touch answers carry no number (%s / %s)" % [choice_1.text, choice_2.text])
-	_expect(choice_1.position.y > 300.0 and choice_2.position.y > 300.0 and choice_1.get_global_rect().end.y <= bar.get_global_rect().position.y and choice_1.position.x < 100.0 and choice_2.get_global_rect().end.x > 860.0, "touch answers sit at the bottom corners, just above the question (%s, %s)" % [choice_1.get_global_rect(), choice_2.get_global_rect()])
-	_expect(not choice_1.get_global_rect().intersects(choice_2.get_global_rect()), "the two answers do not overlap")
+	if english:
+		_expect(choice_1.visible and not choice_1.text.begins_with("1") and not choice_2.text.begins_with("2") and choice_1.text == M0State.CHOICE_TEXT[M0State.DISCLOSE], "touch answers carry no number (%s / %s)" % [choice_1.text, choice_2.text])
+	_expect(choice_1.position.y > 300.0 and choice_2.position.y > 300.0 and choice_1.get_global_rect().end.y <= bar.get_global_rect().position.y and choice_1.position.x < 100.0 and choice_2.get_global_rect().end.x > 860.0, "%s: touch answers sit at the bottom corners, just above the question (%s, %s)" % [code, choice_1.get_global_rect(), choice_2.get_global_rect()])
+	_expect(not choice_1.get_global_rect().intersects(choice_2.get_global_rect()), "%s: the two answers do not overlap" % code)
 	game.call("_answer_choice", 1)
 	# At the valve the hint names CRANK, the button on screen, and stays clear of USE.
 	game.debug_tools.actions.jump(&"junction_a")
@@ -643,10 +650,14 @@ func _check_touch() -> void:
 	var hint_panel: Control = game.get_node("CanvasLayer/ContextHint") as Control
 	var hint: Label = hint_panel.get_node("Text") as Label
 	var use: Button = game.get_node("CanvasLayer/TouchControls/Use") as Button
-	_expect(use.text == "CRANK" and hint.text.begins_with("HOLD CRANK:"), "on touch the crank hint names the CRANK button (%s)" % hint.text)
+	if english:
+		_expect(use.text == "CRANK" and hint.text.begins_with("HOLD CRANK:"), "on touch the crank hint names the CRANK button (%s)" % hint.text)
 	for button: Button in [use, game.get_node("CanvasLayer/TouchControls/Left") as Button, game.get_node("CanvasLayer/TouchControls/Right") as Button]:
-		_expect(not hint_panel.get_global_rect().intersects(button.get_global_rect()), "the hint bar stays clear of %s (%s vs %s)" % [button.text, hint_panel.get_global_rect(), button.get_global_rect()])
-	_expect(not hint_panel.get_global_rect().intersects(bar.get_global_rect()), "the hint bar sits above the dialogue box")
+		_expect(not hint_panel.get_global_rect().intersects(button.get_global_rect()), "%s: the hint bar stays clear of %s (%s vs %s)" % [code, button.text, hint_panel.get_global_rect(), button.get_global_rect()])
+	_expect(not hint_panel.get_global_rect().intersects(bar.get_global_rect()), "%s: the hint bar sits above the dialogue box" % code)
+	if not english:
+		game.touch_enabled = false
+		return
 	# The touch tutorial names its button in the same "button  action" form as the keys.
 	game.debug_new_game(true)
 	await process_frame
@@ -656,6 +667,34 @@ func _check_touch() -> void:
 	var tutorial_text: Label = game.get_node("CanvasLayer/TutorialPrompt/Text") as Label
 	_expect(tutorial_text.text.begins_with("USE  READ DISPLAY (optional)"), "the touch tutorial reads USE  READ DISPLAY (optional) (%s)" % tutorial_text.text.c_escape())
 	game.touch_enabled = false
+
+
+## The overlap checks of this suite, which ran in English above, in every other offered language and
+## then under pseudolocalization (I18n.PSEUDO, English 30% longer, the stand-in for languages still to
+## come): the touch answers and hint bar (_check_touch), the top card against PAUSE and DEBUG at 200%
+## (_check_top_card_clear), the station names at every TEXT SIZE step with the touch layout
+## (_check_station_names) and the prompts at every size (_check_prompts_clear). Localization PR L8
+## runs these instead of writing an overlap check of its own (DESIGN.md, "The build's version"). The
+## language is switched with the game running, as Settings does, then set back to English.
+func _check_overlaps_every_language(path: String) -> void:
+	var settings: GameSettings = game.settings_menu
+	var codes: Array[String] = []
+	for code: String in I18n.offered():
+		if code != I18n.FALLBACK:
+			codes.append(code)
+	codes.append(I18n.PSEUDO)
+	for code: String in codes:
+		I18n.apply_for_checks(code)
+		await process_frame
+		await _check_touch(code)
+		settings.text_size.select(TextSize.STEPS.size() - 1)
+		settings.text_size.item_selected.emit(TextSize.STEPS.size() - 1)
+		await _check_top_card_clear(code)
+		await _check_station_names(code)
+		await _check_prompts_clear(path, code)
+		settings.text_size.select(0)
+		settings.text_size.item_selected.emit(0)
+	I18n.apply_for_checks(I18n.FALLBACK)
 
 
 ## The TEXT SIZE setting: 100% to 200%, saved, and every HUD text and station name scaled.
@@ -678,37 +717,8 @@ func _check_text_size(path: String) -> void:
 	await _play(1.0, "200% opening lines")
 	Input.action_release(&"move_right")
 	await _play(20.0, "200% opening lines")
-	game.debug_tools.actions.jump(&"records_mirror")
-	await process_frame
-	_place_at_records_exit()
-	game.call("_interact")
-	await _play(12.0, "200% records exit")
+	await _check_top_card_clear(I18n.FALLBACK)
 	_expect(rows_at_200 >= 1 and rows_at_200 <= 3, "at 200%% a box takes at most 3 rows (%d)" % rows_at_200)
-	for path_name: String in ["CanvasLayer/TopBar", "CanvasLayer/ContextHint", "CanvasLayer/TutorialPrompt", "CanvasLayer/BottomBar"]:
-		var rect: Rect2 = (game.get_node(path_name) as Control).get_global_rect()
-		_expect(rect.position.x >= 0.0 and rect.end.x <= 960.0 and rect.position.y >= 0.0 and rect.end.y <= 540.0, "%s stays on the canvas at 200%% (%s)" % [path_name, rect])
-	var card: Rect2 = game.top_card.get_global_rect()
-	_expect(not card.intersects((game.get_node("CanvasLayer/PauseButton") as Control).get_global_rect()), "the top card stays clear of PAUSE at 200%")
-	# The answers keep the HUD's side margin (keys, under the top card), and on touch the top card
-	# stays clear of the DEBUG button where it shows, its words still fitting.
-	await _to_relay_question()
-	for button_path: String in ["CanvasLayer/TouchControls/Choice1", "CanvasLayer/TouchControls/Choice2"]:
-		var answer: Rect2 = (game.get_node(button_path) as Control).get_global_rect()
-		_expect(answer.position.x >= Main.HUD_SIDE_MARGIN - 0.5 and answer.end.x <= 960.0 - Main.HUD_SIDE_MARGIN + 0.5, "at 200%% the answer keeps the side margin (%s)" % answer)
-	game.call("_answer_choice", 1)
-	game.touch_enabled = true
-	game.controller_active = false
-	game.debug_tools.call("_refresh_view")
-	game.call("_refresh_ui")
-	await process_frame
-	var debug_button: Control = game.debug_tools.debug_button
-	if debug_button.visible:
-		_expect(not game.top_card.get_global_rect().intersects(debug_button.get_global_rect()), "at 200%% on touch the top card stays clear of DEBUG (%s vs %s)" % [game.top_card.get_global_rect(), debug_button.get_global_rect()])
-		_expect(game.hud.get_line_count() * game.hud.get_line_height() <= game.hud.size.y + 1.0, "the narrower top card still fits its words (%d rows)" % game.hud.get_line_count())
-	else:
-		print("text boxes: the DEBUG button is not shown in this build; its check is skipped")
-	game.touch_enabled = false
-	game.debug_tools.call("_refresh_view")
 	# A fresh game reads the saved size back; a broken value falls back to the nearest step.
 	# Not end_game for this one: it would remove the settings file the first game still saves to.
 	var again: Main = await spawn_game("%s-again.json" % path, path) as Main
@@ -723,11 +733,50 @@ func _check_text_size(path: String) -> void:
 	_expect(is_equal_approx(TextSize.nearest_step(1.3), 1.25) and is_equal_approx(TextSize.nearest_step(9.0), 2.0) and is_equal_approx(TextSize.nearest_step(-1.0), 1.0), "a hand-edited size snaps to the nearest step")
 
 
+## At 200% TEXT SIZE in [param code] (the language already applied, the size already chosen): Records'
+## exit run for 12 s (its boxes measured in English only), the top card, hint bar, tutorial prompt and box
+## on the canvas, the top card clear of PAUSE, the answers inside the side margin, and on touch the top
+## card clear of DEBUG with its words still fitting. Called by _check_text_size in English and by
+## _check_overlaps_every_language in every other language (localization PR L8).
+func _check_top_card_clear(code: String) -> void:
+	game.debug_tools.actions.jump(&"records_mirror")
+	await process_frame
+	_place_at_records_exit()
+	game.call("_interact")
+	await _play(12.0, "200% records exit", code == I18n.FALLBACK)
+	for path_name: String in ["CanvasLayer/TopBar", "CanvasLayer/ContextHint", "CanvasLayer/TutorialPrompt", "CanvasLayer/BottomBar"]:
+		var rect: Rect2 = (game.get_node(path_name) as Control).get_global_rect()
+		_expect(rect.position.x >= 0.0 and rect.end.x <= 960.0 and rect.position.y >= 0.0 and rect.end.y <= 540.0, "%s: %s stays on the canvas at 200%% (%s)" % [code, path_name, rect])
+	var card: Rect2 = game.top_card.get_global_rect()
+	_expect(not card.intersects((game.get_node("CanvasLayer/PauseButton") as Control).get_global_rect()), "%s: the top card stays clear of PAUSE at 200%%" % code)
+	# The answers keep the HUD's side margin (keys, under the top card), and on touch the top card
+	# stays clear of the DEBUG button where it shows, its words still fitting.
+	await _to_relay_question()
+	for button_path: String in ["CanvasLayer/TouchControls/Choice1", "CanvasLayer/TouchControls/Choice2"]:
+		var answer: Rect2 = (game.get_node(button_path) as Control).get_global_rect()
+		_expect(answer.position.x >= Main.HUD_SIDE_MARGIN - 0.5 and answer.end.x <= 960.0 - Main.HUD_SIDE_MARGIN + 0.5, "%s: at 200%% the answer keeps the side margin (%s)" % [code, answer])
+	game.call("_answer_choice", 1)
+	game.touch_enabled = true
+	game.controller_active = false
+	game.debug_tools.call("_refresh_view")
+	game.call("_refresh_ui")
+	await process_frame
+	var debug_button: Control = game.debug_tools.debug_button
+	if debug_button.visible:
+		_expect(not game.top_card.get_global_rect().intersects(debug_button.get_global_rect()), "%s: at 200%% on touch the top card stays clear of DEBUG (%s vs %s)" % [code, game.top_card.get_global_rect(), debug_button.get_global_rect()])
+		_expect(game.hud.get_line_count() * game.hud.get_line_height() <= game.hud.size.y + 1.0, "%s: the narrower top card still fits its words (%d rows)" % [code, game.hud.get_line_count()])
+	else:
+		print("text boxes: the DEBUG button is not shown in this build; its check is skipped")
+	game.touch_enabled = false
+	game.debug_tools.call("_refresh_view")
+
+
 ## At every text size the station names in each room, in each state, stay apart: a name breaks
 ## between its words above 100% (TextSize.WORLD_ROW_GROWTH) instead of running into its neighbours,
 ## stands where it stood at 100% (its bottom edge), and the corridor's are not faded out at the start
-## (the MANUAL BYPASS plate, at the view's edge there, once the engineer walks towards it).
-func _check_station_names() -> void:
+## (the MANUAL BYPASS plate, at the view's edge there, once the engineer walks towards it). Run in
+## English and, by _check_overlaps_every_language, in [param code], every other language (PR L8).
+func _check_station_names(code: String = I18n.FALLBACK) -> void:
 	var settings: GameSettings = game.settings_menu
 	var bottoms: Dictionary = {}
 	for index: int in TextSize.STEPS.size():
@@ -745,12 +794,12 @@ func _check_station_names() -> void:
 				if index == 0:
 					bottoms[key] = rect.end.y
 				elif bottoms.has(key) and label != game.get_node("RelayLabel"):
-					_expect(absf(rect.end.y - float(bottoms[key])) <= 1.5, "%d%%, %s: %s keeps its bottom edge where it was at 100%% (%.1f vs %.1f)" % [percent, jump, label.text, rect.end.y, bottoms[key]])
+					_expect(absf(rect.end.y - float(bottoms[key])) <= 1.5, "%s, %d%%, %s: %s keeps its bottom edge where it was at 100%% (%.1f vs %.1f)" % [code, percent, jump, label.text, rect.end.y, bottoms[key]])
 			for overlap: String in overlapping_labels(labels):
-				_expect(false, "%d%%, %s: no two station names overlap, but %s" % [percent, jump, overlap])
+				_expect(false, "%s, %d%%, %s: no two station names overlap, but %s" % [code, percent, jump, overlap])
 			if jump == &"corridor_start":
 				for label: Label in [game.get_node("BreakerLabel"), game.get_node("RelayLabel"), game.bypass_handle.fault_tag] as Array[Label]:
-					_expect(label.modulate.a > 0.99, "%d%%: %s is not faded at the corridor's start (alpha %.2f)" % [percent, label.text, label.modulate.a])
+					_expect(label.modulate.a > 0.99, "%s, %d%%: %s is not faded at the corridor's start (alpha %.2f)" % [code, percent, label.text, label.modulate.a])
 				# The MANUAL BYPASS plate (the engineer-only fallback) stands at the view's right edge at the
 				# start: a little faded at 100%, faded out at larger sizes (it grows to the right, clear of the
 				# relay's names). Standing beside the relay, where WOLF points to the bypass when he refuses,
@@ -761,7 +810,7 @@ func _check_station_names() -> void:
 					var plate: Label = game.bypass_handle.bypass_label
 					var view: Rect2 = game.get_viewport().get_canvas_transform().affine_inverse() * game.get_viewport().get_visible_rect()
 					var at_edge: bool = plate.get_global_rect().end.x > view.end.x - JunctionRoom.LABEL_EDGE_FADE
-					_expect(plate.modulate.a > 0.5 or at_edge, "100%%: MANUAL BYPASS shows at the corridor's start, or waits faded at the view's right edge (alpha %.2f)" % plate.modulate.a)
+					_expect(plate.modulate.a > 0.5 or at_edge, "%s, 100%%: MANUAL BYPASS shows at the corridor's start, or waits faded at the view's right edge (alpha %.2f)" % [code, plate.modulate.a])
 				# The camera eases after the engineer in time, not frames: once it has its new target it is
 				# snapped there, so the check does not depend on how fast the frames run.
 				game.debug_place(Main.RELAY_SIDE_X, Main.RELAY_SIDE_X - 120.0)
@@ -769,10 +818,10 @@ func _check_station_names() -> void:
 				game.intro_camera.reset_smoothing()
 				for frame: int in 3:
 					await process_frame
-				_expect(game.bypass_handle.bypass_label.modulate.a > 0.99, "%d%%: MANUAL BYPASS shows in full with the engineer beside the relay (alpha %.2f)" % [percent, game.bypass_handle.bypass_label.modulate.a])
+				_expect(game.bypass_handle.bypass_label.modulate.a > 0.99, "%s, %d%%: MANUAL BYPASS shows in full with the engineer beside the relay (alpha %.2f)" % [code, percent, game.bypass_handle.bypass_label.modulate.a])
 				var relay_name: Rect2 = (game.get_node("RelayLabel") as Label).get_global_rect()
-				_expect(relay_name.end.y <= game.bypass_handle.fault_tag.get_global_rect().position.y + 0.5, "%d%%: COOLANT RELAY stands above its COOLANT FAULT tag" % percent)
-		await _check_touch_layout(percent)
+				_expect(relay_name.end.y <= game.bypass_handle.fault_tag.get_global_rect().position.y + 0.5, "%s, %d%%: COOLANT RELAY stands above its COOLANT FAULT tag" % [code, percent])
+		await _check_touch_layout(percent, code)
 		# The valve's plate changes its words as it is worked ("VALVE  0 / 3" keeps a double space):
 		# each stands on the same line and clears the LINE caption by the dial.
 		game.debug_tools.actions.jump(&"junction_a")
@@ -785,12 +834,12 @@ func _check_station_names() -> void:
 			await process_frame
 			await process_frame
 			var plate: Rect2 = Rect2(room.valve_label.position, room.valve_label.size)
-			_expect(absf(plate.end.y - plate_bottom) <= 1.5, "%d%%: the %s plate stands on its line (bottom %.1f, expected %.1f)" % [percent, text.c_escape(), plate.end.y, plate_bottom])
-			_expect(not plate.intersects(Rect2(room.line_caption.position, room.line_caption.size)), "%d%%: the %s plate clears the LINE caption" % [percent, text.c_escape()])
+			_expect(absf(plate.end.y - plate_bottom) <= 1.5, "%s, %d%%: the %s plate stands on its line (bottom %.1f, expected %.1f)" % [code, percent, text.c_escape(), plate.end.y, plate_bottom])
+			_expect(not plate.intersects(Rect2(room.line_caption.position, room.line_caption.size)), "%s, %d%%: the %s plate clears the LINE caption" % [code, percent, text.c_escape()])
 			# English breaks a plate at its spaces, greedily, as it always has (TextSize._space_rows), so
 			# "VALVE  0" keeps its first row whole; the text server's word rules would break it as
 			# "VALVE" / "0 / 3", a narrower plate (PR L7d review).
-			if text == "VALVE  0 / 3" and room.valve_label.get_line_count() > 1:
+			if code == I18n.FALLBACK and text == "VALVE  0 / 3" and room.valve_label.get_line_count() > 1:
 				var first_row: float = room.valve_label.get_theme_font(&"font").get_string_size("VALVE  0", HORIZONTAL_ALIGNMENT_LEFT, -1.0, room.valve_label.get_theme_font_size(&"font_size")).x
 				_expect(room.valve_label.size.x >= first_row, "%d%%: the armed valve plate keeps \"VALVE  0\" on its first row (%.1f px wide, the row %.1f px)" % [percent, room.valve_label.size.x, first_row])
 
@@ -799,15 +848,16 @@ func _check_station_names() -> void:
 ## card, not on it, and after the first step the tutorial prompt (moved off the station names where
 ## it would cover the breaker's, see Main._tutorial_prompt_place) is checked on the step's own frame,
 ## before any box, and again once the opening lines' first box is up, so a slow machine cannot change
-## what is checked.
-func _check_prompts_clear(path: String) -> void:
+## what is checked. Run in English and, by _check_overlaps_every_language, in [param code], every other
+## language (PR L8).
+func _check_prompts_clear(path: String, code: String = I18n.FALLBACK) -> void:
 	for touch: bool in [false, true]:
 		for index: int in TextSize.STEPS.size():
 			var fresh: Main = await spawn_game("%s-prompts.json" % path, "%s-prompts.cfg" % path, keep_running) as Main
 			fresh.touch_enabled = touch
 			fresh.settings_menu.text_size.select(index)
 			fresh.settings_menu.text_size.item_selected.emit(index)
-			var context: String = "%d%%, %s" % [roundi(TextSize.STEPS[index] * 100.0), "touch" if touch else "keys"]
+			var context: String = "%s, %d%%, %s" % [code, roundi(TextSize.STEPS[index] * 100.0), "touch" if touch else "keys"]
 			fresh.new_game_button.pressed.emit()
 			for frame: int in 40:
 				await process_frame
@@ -821,7 +871,7 @@ func _check_prompts_clear(path: String) -> void:
 			Input.action_press(&"move_right")
 			await process_frame
 			_expect(not fresh.bottom_bar.visible, "%s: no box is up on the frame of the first step" % context)
-			_check_prompt_clear(fresh, touch, false, context)
+			_check_prompt_clear(fresh, touch, false, context, code == I18n.FALLBACK)
 			for frame: int in 5:
 				await process_frame
 			Input.action_release(&"move_right")
@@ -829,7 +879,7 @@ func _check_prompts_clear(path: String) -> void:
 			# frame's real delta), so the wait is bounded by real time, not a frame count: headless frames
 			# on an idle machine can run 600 of them in under that fade.
 			await _wait_real(func() -> bool: return fresh.bottom_bar.visible, 10000)
-			_check_prompt_clear(fresh, touch, true, context)
+			_check_prompt_clear(fresh, touch, true, context, code == I18n.FALLBACK)
 			_expect(fresh.bottom_bar.visible, "%s: the opening lines' first box comes up while the tutorial prompt shows" % context)
 			# A quick free, not end_game: its settle time on each of the 10 games adds up, and the files
 			# are shared by every fresh game here, so they are removed once after the loop.
@@ -844,15 +894,15 @@ func _check_prompts_clear(path: String) -> void:
 ## on the canvas, over no station name, neither actor, the box, a top card that shows (one leaving
 ## goes at once when the prompt takes its place), PAUSE, DEBUG or the touch buttons, and
 ## over at most Main.TUTORIAL_ART_OVERLAP of its area of the machines. Where it waits hidden behind a
-## box, the hint bar is empty too.
-func _check_prompt_clear(fresh: Main, touch: bool, box_up: bool, context: String) -> void:
+## box, the hint bar is empty too. Only in English ([param english]) is the prompt's line itself read.
+func _check_prompt_clear(fresh: Main, touch: bool, box_up: bool, context: String, english: bool) -> void:
 	context += ", box up" if box_up else ", no box yet"
 	if not fresh.tutorial_prompt.visible:
 		_expect(box_up and fresh.tutorial_prompt_slot == &"waiting" and not (fresh.get_node("CanvasLayer/ContextHint") as Control).visible, "%s: the tutorial prompt is hidden only while it waits behind a box, with the hint bar empty (%s)" % [context, fresh.tutorial_prompt_slot])
 		return
 	var prompt: Rect2 = fresh.tutorial_prompt.get_global_rect()
 	# A long frame under load can carry the engineer past the display, where the prompt only points on.
-	_expect(fresh.tutorial_text.text.contains("right to the breaker.") and prompt.position.y >= 0.0 and prompt.end.y <= Main.DIALOGUE_BOTTOM and prompt.position.x >= 0.0 and prompt.end.x <= 960.0, "%s: after the first step the tutorial prompt shows on the canvas (%s)" % [context, prompt])
+	_expect((not english or fresh.tutorial_text.text.contains("right to the breaker.")) and prompt.position.y >= 0.0 and prompt.end.y <= Main.DIALOGUE_BOTTOM and prompt.position.x >= 0.0 and prompt.end.x <= 960.0, "%s: after the first step the tutorial prompt shows on the canvas (%s)" % [context, prompt])
 	for label: Label in fresh._corridor_station_labels():
 		if label.is_visible_in_tree() and label.modulate.a > 0.05:
 			var name_rect: Rect2 = label.get_global_transform_with_canvas() * Rect2(Vector2.ZERO, label.size)
@@ -878,9 +928,9 @@ func _check_prompt_clear(fresh: Main, touch: bool, box_up: bool, context: String
 		_expect(not prompt.intersects(other.get_global_rect()), "%s: the tutorial prompt stays clear of %s (%s vs %s)" % [context, other.name, prompt, other.get_global_rect()])
 
 
-## On touch at [param percent]: a box, with a name or without, stays clear of ◀ ▶ and USE, and the
-## corridor's names and the COOLANT FAULT tag stay clear of PAUSE.
-func _check_touch_layout(percent: int) -> void:
+## On touch at [param percent] in [param code]: a box, with a name or without, stays clear of ◀ ▶ and
+## USE, and the corridor's names and the COOLANT FAULT tag stay clear of PAUSE.
+func _check_touch_layout(percent: int, code: String) -> void:
 	game.debug_tools.actions.jump(&"corridor_start")
 	game.touch_enabled = true
 	game.controller_active = false
@@ -889,16 +939,16 @@ func _check_touch_layout(percent: int) -> void:
 		await process_frame
 		await process_frame
 		var box: Rect2 = bar.get_global_rect()
-		_expect(bar.visible, "%d%%, touch: the box shows (%s)" % [percent, line])
+		_expect(bar.visible, "%s, %d%%, touch: the box shows (%s)" % [code, percent, line])
 		for button: Control in [game.touch_left, game.touch_right, game.touch_use]:
-			_expect(not box.intersects(button.get_global_rect()), "%d%%, touch: the box stays clear of %s (%s vs %s)" % [percent, (button as Button).text, box, button.get_global_rect()])
+			_expect(not box.intersects(button.get_global_rect()), "%s, %d%%, touch: the box stays clear of %s (%s vs %s)" % [code, percent, (button as Button).text, box, button.get_global_rect()])
 		var hint_panel: Control = game.get_node("CanvasLayer/ContextHint") as Control
 		if hint_panel.visible:
-			_expect(not hint_panel.get_global_rect().intersects(box), "%d%%, touch: the hint bar stays clear of the box" % percent)
+			_expect(not hint_panel.get_global_rect().intersects(box), "%s, %d%%, touch: the hint bar stays clear of the box" % [code, percent])
 	var pause: Rect2 = game.pause_button.get_global_rect()
 	for label: Label in [game.get_node("RelayLabel"), game.bypass_handle.fault_tag] as Array[Label]:
 		var on_screen: Rect2 = label.get_global_transform_with_canvas() * Rect2(Vector2.ZERO, label.size)
-		_expect(not on_screen.intersects(pause), "%d%%, touch: %s stays clear of PAUSE (%s vs %s)" % [percent, label.text, on_screen, pause])
+		_expect(not on_screen.intersects(pause), "%s, %d%%, touch: %s stays clear of PAUSE (%s vs %s)" % [code, percent, label.text, on_screen, pause])
 	game.touch_enabled = false
 	await process_frame
 

@@ -160,9 +160,6 @@ const CALLBACKS: Array[String] = [
 	"You said \"%s\"\nI made my call. You cranked the bypass anyway. I stayed.",
 ]
 
-## The layout pass's stand-in for languages not translated yet: English through Godot's
-## pseudolocalization, every message padded by project.godot's expansion_ratio (0.3, 30% longer).
-const PSEUDO: String = "pseudo"
 ## Controls allowed to overflow, pinned by their "<where>|<node path>" key as [method _check_fit] names
 ## them (DESIGN.md: "known overflows pinned by name"). Empty since PR L8 (layout-for-languages): every
 ## control fits outright in every language and under pseudolocalization. A control added here needs a
@@ -705,7 +702,7 @@ func _check_hud() -> void:
 
 
 ## Every offered language, English first, then English padded 30% by pseudolocalization
-## ([constant PSEUDO], the stand-in for languages still to come), laid out in the real game and judged
+## (I18n.PSEUDO, the stand-in for languages still to come), laid out in the real game and judged
 ## by the build's overflow check (I18n.overflows), each surface in a state that shows it: the title (its
 ## buttons, the Brand line, the CONTINUE note, shown only while there is no save, which start_game
 ## guarantees, and the version number), the credits and changelog screens, every Settings tab, Pause in
@@ -719,9 +716,9 @@ func _check_hud() -> void:
 func _check_layouts() -> void:
 	var codes: Array[String] = []
 	codes.assign(I18n.offered())
-	codes.append(PSEUDO)
+	codes.append(I18n.PSEUDO)
 	for code: String in codes:
-		_use_layout_language(code)
+		I18n.apply_for_checks(code)
 		var game: Main = await start_game("i18n-layout-%s" % code, keep_running) as Main
 		await frames(3)
 		_check(game.continue_note.is_visible_in_tree(), "%s: the CONTINUE note is up on a fresh title, so it is judged" % code)
@@ -776,21 +773,7 @@ func _check_layouts() -> void:
 		settings.text_size.item_selected.emit(0)
 		await _check_choices_and_end_card(code, game)
 		await end_game(game)
-	TranslationServer.pseudolocalization_enabled = false
-	I18n.apply("en")
-
-
-## Switches the layout pass to [param code]: an offered language through I18n.apply, or
-## [constant PSEUDO], English with Godot's pseudolocalization on (as the parity capture's --language
-## pseudo does), which every other code turns off again.
-func _use_layout_language(code: String) -> void:
-	if code == PSEUDO:
-		I18n.apply("en")
-		TranslationServer.reload_pseudolocalization()
-		TranslationServer.pseudolocalization_enabled = true
-	else:
-		TranslationServer.pseudolocalization_enabled = false
-		I18n.apply(code)
+	I18n.apply_for_checks(I18n.FALLBACK)
 
 
 ## The relay's two answers, with keys (under the top card, with their keys) and on touch (at the
@@ -842,7 +825,7 @@ func _check_touch_words(code: String, game: Main) -> void:
 
 
 ## Every short message of [param code]'s catalogs (HUD_MESSAGE_CHARS or fewer characters, no BBCode),
-## or under [constant PSEUDO] of the committed translation template (every message the game marks, each
+## or under I18n.PSEUDO of the committed translation template (every message the game marks, each
 ## padded 30%), filled with sample inserts ([method _sample_inserts]) as the HUD fills it, drawn where the
 ## HUD draws its lines: the hint bar at the keyboard and the touch widths (via the game's own
 ## _set_dialogue, which sizes it) and the top card. Each may take at most one row more than its English
@@ -855,7 +838,7 @@ func _check_hud_rows(code: String, game: Main) -> void:
 		return
 	var messages: PackedStringArray = []
 	var sources: Array[PackedStringArray] = []
-	if code == PSEUDO:
+	if code == I18n.PSEUDO:
 		sources.append(PackedStringArray(template_notes().keys()))
 	else:
 		for catalog: Translation in TranslationServer.get_translations():
