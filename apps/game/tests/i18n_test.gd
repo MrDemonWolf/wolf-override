@@ -409,8 +409,9 @@ func _check_sibling(pair: Array[String], words: Array[String], only_first: Strin
 
 
 ## A formatted line whose translation has other inserts than its English shows the English line rather
-## than raising a script error (I18n.shown), and a matching translation is still used. The two msgids
-## are made up here and live only in a catalog that is dropped again.
+## than raising a script error (I18n.shown, and I18n.fill for text built in code), and a matching
+## translation is still used. The two msgids are made up here and live only in a catalog that is dropped
+## again.
 func _check_format_guard() -> void:
 	var broken: String = "I18N GUARD CHECK %s of %d"
 	var fine: String = "I18N GUARD FINE %s"
@@ -423,6 +424,8 @@ func _check_format_guard() -> void:
 	var english: String = I18n.format(broken, ["A", 3])
 	_check(I18n.shown(english, []) == "I18N GUARD CHECK A of 3", "a translation with other inserts shows the English line (got %s)" % I18n.shown(english, []))
 	_check(I18n.shown(I18n.format(fine, ["A"]), []) == "I18N GUARD GUT A", "a translation with the same inserts is used (got %s)" % I18n.shown(I18n.format(fine, ["A"]), []))
+	_check(I18n.fill(broken, ["A", 3]) == "I18N GUARD CHECK A of 3" and I18n.fill(fine, ["A"]) == "I18N GUARD GUT A", "I18n.fill shares the guard (got %s, %s)" % [I18n.fill(broken, ["A", 3]), I18n.fill(fine, ["A"])])
+	_check(I18n.fill("I18N GUARD 100% DONE", []) == "I18N GUARD 100% DONE", "I18n.fill with nothing to fill leaves a lone % alone")
 	I18n.forget(extra)
 	I18n.apply("en")
 
