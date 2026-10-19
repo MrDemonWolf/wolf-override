@@ -40,6 +40,10 @@ Quotes “…”. Plates in capitals keep their accents.
   DE SERVIÇO; the seal (OPEN THE SEAL) is *a comporta* (*selo* is a stamp); the mirror port and the
   manual port are *porta de dados* (a bare *porta* reads as a door); the stick is *stick*, and the left
   stick *Stick L*, as Nintendo's Brazilian materials name it.
+- **PR L10's story words (proposals for a reviewer):** the timestamp is *carimbo de data e hora*, WOLF's
+  readout *visor*, the program logs *registros*, and the manual-port answer button USAR PORTA DE DADOS
+  MANUAL, the words WOLF's touch line quotes. Where *ela* could mean something else, the line names *a
+  sentinela*.
 - **Words cut to fit (PR L10)**: MRDEMONWOLF, INC. PRESENTS is DE MRDEMONWOLF, INC. (APRESENTA ran 3 px
-  over), the title's credit line says *Feito com apoio de IA*, and VALVE USED is VÁLV. USADA. Each cut
+  over), the title's save note says *Nada salvo. O jogo salva no primeiro PONTO SEGURO.*, the title's credit line says *Feito com apoio de IA*, and VALVE USED is VÁLV. USADA. Each cut
   is noted on its line in `pt_BR.po`.

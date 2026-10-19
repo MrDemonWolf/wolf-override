@@ -41,6 +41,11 @@ As written; possessives with "de %s".
   JUNCTION is JONCTION DE SERVICE; the seal (OPEN THE SEAL) is *le sas*.
 - **The gender gate and participles:** the French rule flags any word in -é or -ée on a line that
   addresses the player, so PR L10 says *vient de sauter* rather than *a sauté*, even about a machine.
+- **PR L10's story words (proposals for a reviewer):** the timestamp is *horodatage*, WOLF's readout
+  *écran*, the program logs *journaux*, WOLF breaking off *je décroche*, and the manual-port answer
+  button UTILISER LE PORT MANUEL, the words WOLF's touch line quotes. Lines that name the engineer keep
+  -é participles away from the name (*la manivelle reste là où %s la lâche*), and a possessive that could
+  be WOLF's names *la sentinelle*.
 - **Words cut to fit (PR L10)**: NEW GAME is JOUER (it pairs with REJOUER), COOLANT RELAY is RELAIS
   REFROID. (the full words ran into MANUAL BYPASS from 125% TEXT SIZE up; the hints keep *relais de
   refroidissement*), VALVE USED is VANNE VIDE (VANNE ÉPUISÉE ran into DOOR DOWN too), TEXT SIZE is

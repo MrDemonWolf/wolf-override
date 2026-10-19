@@ -44,6 +44,10 @@ Quotes „…“.
   THE SEAL) is *die Schleuse*; the relief vent is *der Druckablass*, so it is never confused with the
   valve (*das Ventil*); THE DEN is DER WOLFSBAU, since DER BAU read back as "the build". The sentry is
   *der Wächter*, so German calls it *er*, as the noun's grammar needs.
+- **PR L10's story words (proposals for a reviewer):** the timestamp is *Zeitstempel*, WOLF's readout
+  *Anzeige*, the program logs *Protokolle*, WOLF breaking off *ich breche ab*, and the manual-port answer
+  button MANUELLEN PORT NUTZEN, the words WOLF's touch line quotes. Wherever *er* or *sein* could read as
+  WOLF, the line names *der Wächter*.
 - **Words cut to fit (PR L10)**: MRDEMONWOLF, INC. PRESENTS is VON MRDEMONWOLF, INC. (PRÄSENTIERT ran
   18 px over), BACK TO TITLE is ZUM MENÜ, USE on the touch button is NUTZEN (BENUTZEN widened it),
   TEXT SIZE is TEXT, BREAKER USED is SCHUTZSCHALTER AUS, VALVE USED is VENTIL LEER and EXIT READY is
