@@ -62,8 +62,8 @@ WOLF is **он**, with masculine past tense in -л. He is never declined: "с WO
   41 px over), CONTINUE is ДАЛЕЕ on the title and touch buttons, the touch PAUSE is СТОП, USE НАЖАТЬ
   and DROP БРОСИТЬ (ИСПОЛЬЗОВАТЬ, ДЕЙСТВИЕ and СБРОСИТЬ widened the 155 px button), the title's credit
   line says *разработка с ИИ*, BACK TO TITLE is В МЕНЮ, TEXT SIZE ТЕКСТ, the controller column says
-  *Крест Л/П*, BREAKER USED is РУБИЛЬНИК ИСП. and VALVE USED ВЕНТИЛЬ ИСП. (the longer plates ran into
-  their neighbours; ВЫКЛ. would read as switched off, ПУСТ as empty), and the changelog note drops "source-build". Each cut is noted on its line in
+  *Крест Л/П*, BREAKER USED and VALVE USED are both ОТРАБОТАН (used up), the plate's own machine
+  implied (with the noun they ran into their neighbours; ВЫКЛ. reads as switched off, ИСП. as исправен), and the changelog note drops "source-build". Each cut is noted on its line in
   `ru.po`.
 - **WOLF's readout** is *дисплей*: Codex read *показания* back as "testimony".
 - **SAFE POINT** is УКРЫТИЕ (shelter), on the plate and in the hints; the glossary checks the stem

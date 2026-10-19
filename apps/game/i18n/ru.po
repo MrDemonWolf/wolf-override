@@ -1161,18 +1161,18 @@ msgid "LINE"
 msgstr "ЛИНИЯ"
 
 # machine-translated by Claude (Anthropic), unreviewed
-#. TRANSLATORS: Station plate (12-13 px label on a machine). ALL CAPS, as short as possible. The junction's breaker after the blast used the line up. Cut to fit: ОТРАБОТАН ran into RELIEF VENT, so ИСП. (used; ВЫКЛ., off, would invite switching it back on).
+#. TRANSLATORS: Station plate (12-13 px label on a machine). ALL CAPS, as short as possible. The junction's breaker after the blast used the line up. Cut to fit: РУБИЛЬНИК ОТРАБОТАН ran into RELIEF VENT, so the plate on the breaker says only ОТРАБОТАН (used up), as the valve's does. Not ВЫКЛ. (off, which invites switching it back on), ИСП. (read back as исправен, OK) or ОТРАБ. (read back as tripped).
 #. i18n: speaker=ui
 #: scripts/junction_room.gd:1531
 msgid "BREAKER USED"
-msgstr "РУБИЛЬНИК ИСП."
+msgstr "ОТРАБОТАН"
 
 # machine-translated by Claude (Anthropic), unreviewed
-#. TRANSLATORS: Station plate (12-13 px label on a machine). ALL CAPS, as short as possible. The junction's valve after the blast used the line up. Cut to fit: ВЕНТИЛЬ ОТРАБОТАН and ВЕНТИЛЬ ПУСТ ran into DOOR DOWN, so ВЕНТИЛЬ ИСП. (used; ВЕНТ. could read as the relief vent).
+#. TRANSLATORS: Station plate (12-13 px label on a machine). ALL CAPS, as short as possible. The junction's valve after the blast used the line up. Cut to fit: ВЕНТИЛЬ ОТРАБОТАН and ВЕНТИЛЬ ПУСТ ran into DOOR DOWN, so the plate on the valve says only ОТРАБОТАН (used up), as the breaker's does. Not ВЕНТ. (reads as the relief vent or ventilation), ВЕНТИЛЬ ИСП. (3 px too wide, and ИСП. read back as исправен, OK) or ВЕНТИЛЬ ВСЁ (read back as VALVE ALL).
 #. i18n: speaker=ui
 #: scripts/junction_room.gd:1533
 msgid "VALVE USED"
-msgstr "ВЕНТИЛЬ ИСП."
+msgstr "ОТРАБОТАН"
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: Station plate (12-13 px label on a machine). ALL CAPS, as short as possible. The junction's exit hatch, open.
