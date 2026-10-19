@@ -200,7 +200,7 @@ func _check_language_box(box: String, tags: Array[String], font: Font, size: int
 	var rows: Array[String] = DialogueBoxes.row_texts(words, font, size, wrap)
 	var keeps: bool = rows.size() <= DialogueBoxes.MAX_ROWS and (limit == 0 or _longest_row(rows) <= limit) and DialogueBoxes.word_count(words) < DialogueBoxes.LONG_LINE_WORDS and words.length() < DialogueBoxes.long_line_characters(code)
 	if not keeps:
-		var breaks: int = DialogueBoxes._break_after(words, DialogueBoxes.SENTENCE_ENDS + "".join(DialogueBoxes.CLAUSE_MARKS), true).size()
+		var breaks: int = DialogueBoxes.break_count(words)
 		_expect(breaks == 1 and not words.contains("\n"), "%s at %d%%: a box past the rules (%d rows, %d characters) is one sentence or clause: %s" % [code, roundi(TextSize.factor * 100.0), rows.size(), words.length(), box.c_escape()])
 	# A written line break is the English layout (a translation drops it, DESIGN.md "Layout breaks never
 	# bind a translation"), so only rows the wrap chose are judged.
@@ -268,7 +268,7 @@ static func _balanced(rows: Array[String], font: Font, size: int) -> bool:
 ## letters a split must keep, in order, in languages written with or without spaces.
 static func _letters(text: String, tags: Array[String]) -> String:
 	var plain: String = text
-	for tag: String in DialogueBoxes._longest_first(tags):
+	for tag: String in DialogueBoxes.longest_first(tags):
 		plain = plain.replace(tag + ": ", "")
 	return plain.replace(" ", "").replace("\n", "")
 
@@ -294,7 +294,7 @@ static func _names_inline(text: String, tags: Array[String]) -> bool:
 ## The words of [param text] with the speaker tags taken out, in order.
 static func _words(text: String, tags: Array[String]) -> PackedStringArray:
 	var plain: String = text.replace("\n", " ")
-	for tag: String in DialogueBoxes._longest_first(tags):
+	for tag: String in DialogueBoxes.longest_first(tags):
 		plain = plain.replace(tag + ": ", " ")
 	return plain.split(" ", false)
 
@@ -787,6 +787,12 @@ func _check_station_names() -> void:
 			var plate: Rect2 = Rect2(room.valve_label.position, room.valve_label.size)
 			_expect(absf(plate.end.y - plate_bottom) <= 1.5, "%d%%: the %s plate stands on its line (bottom %.1f, expected %.1f)" % [percent, text.c_escape(), plate.end.y, plate_bottom])
 			_expect(not plate.intersects(Rect2(room.line_caption.position, room.line_caption.size)), "%d%%: the %s plate clears the LINE caption" % [percent, text.c_escape()])
+			# English breaks a plate at its spaces, greedily, as it always has (TextSize._space_rows), so
+			# "VALVE  0" keeps its first row whole; the text server's word rules would break it as
+			# "VALVE" / "0 / 3", a narrower plate (PR L7d review).
+			if text == "VALVE  0 / 3" and room.valve_label.get_line_count() > 1:
+				var first_row: float = room.valve_label.get_theme_font(&"font").get_string_size("VALVE  0", HORIZONTAL_ALIGNMENT_LEFT, -1.0, room.valve_label.get_theme_font_size(&"font_size")).x
+				_expect(room.valve_label.size.x >= first_row, "%d%%: the armed valve plate keeps \"VALVE  0\" on its first row (%.1f px wide, the row %.1f px)" % [percent, room.valve_label.size.x, first_row])
 
 
 ## At every text size, keys and touch, in a fresh game: the opening's hint bar stands below the top

@@ -119,7 +119,7 @@ static func _language(language: String) -> String:
 ## "tag: " when it has a tag, then its words gives the message back up to its choice rows, for the
 ## messages the game writes (one space after a sentence's end and after a tag's colon).
 static func segments(message: String, speakers: Array[String]) -> Array[Array]:
-	var tags: Array[String] = _longest_first(speakers)
+	var tags: Array[String] = longest_first(speakers)
 	var found: Array[Array] = []
 	for line: String in message.get_slice(CHOICE_MARKER, 0).split("\n"):
 		var first_piece: bool = true
@@ -138,7 +138,7 @@ static func segments(message: String, speakers: Array[String]) -> Array[Array]:
 
 ## The speaker tag [param box] starts with ("WOLF" for "WOLF: ..."), or "" for narration.
 static func tag_of(box: String, speakers: Array[String]) -> String:
-	for tag: String in _longest_first(speakers):
+	for tag: String in longest_first(speakers):
 		if box.begins_with(tag + ": "):
 			return tag
 	return ""
@@ -263,6 +263,14 @@ static func _sentences(text: String) -> Array[Array]:
 	return _break_after(text, SENTENCE_ENDS, true)
 
 
+## How many pieces [param text] could break into for a box: at its sentence ends and its clause marks
+## (SENTENCE_ENDS and every CLAUSE_MARKS), never inside a quotation. 1 means no break is left, so a box
+## too long for the rules can be split no further (tests/text_boxes_test.gd checks that such a box is
+## one sentence or clause).
+static func break_count(text: String) -> int:
+	return _break_after(text, SENTENCE_ENDS + "".join(CLAUSE_MARKS), true).size()
+
+
 ## Splits [param text] after any of [param marks] that a space follows, or with no space after a
 ## NO_SPACE_MARKS mark; never before a NO_BREAK_BEFORE character. A quotation's closer just after a mark
 ## ends the piece as the mark would ("... later.\" I ..."), also with spaces between them (French
@@ -369,7 +377,7 @@ static func _fits_box(text: String, fits: Callable, language: String) -> bool:
 ## A copy of [param speakers], longest tag first ([param speakers] itself is left as it is). tag_of
 ## and split try tags in this order, so where one tag could also match the start of a longer one's
 ## box the longer tag wins. text_boxes_test walks the tags in the same order.
-static func _longest_first(speakers: Array[String]) -> Array[String]:
+static func longest_first(speakers: Array[String]) -> Array[String]:
 	var sorted: Array[String] = speakers.duplicate()
 	sorted.sort_custom(func(a: String, b: String) -> bool: return a.length() > b.length())
 	return sorted
