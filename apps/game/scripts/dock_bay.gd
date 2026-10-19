@@ -45,11 +45,11 @@ const PENDANT_XS: PackedFloat32Array = [-250.0, -527.0]
 const PENDANT_Y: float = 250.0
 const COOL: Color = Color8(150, 200, 235)
 ## The room's ends for the actors (world px): the end wall's cut is at x -644..-626 (the plate's left
-## wall), so the engineer (17 px reach) stops at -606 and WOLF, whose body reaches further, at -556
-## (GreyboxBay round 2's marks, which the plate was painted to). The room's right edge is the
-## cross-wall's cut end, the near column's right face.
+## wall), so the engineer (17 px reach) stops at -606 (GreyboxBay round 2's mark, which the plate was
+## painted to), the reach of their body at -623, and WOLF stops with his reach (M0Actor.WOLF_REACH) at
+## the same line. The room's right edge is the cross-wall's cut end, the near column's right face.
 const HUMAN_MIN_X: float = -606.0
-const WOLF_MIN_X: float = -556.0
+const WOLF_MIN_X: float = HUMAN_MIN_X - M0Actor.HUMAN_REACH + M0Actor.WOLF_REACH
 const ROOM_RIGHT: float = 8.0
 ## The plate's left edge (world px), and the furthest left a view of the room shows: 14 px past the end
 ## wall's cut (-626), so the dark margin the plate paints beyond the wall (x -680 .. -626) stays out of
@@ -197,8 +197,9 @@ const WOLF_RISE: Texture2D = preload("res://assets/characters/wolf-rise.png")
 const WOLF_LIE_SCALE: float = 8.0 / 8.0
 const WOLF_RISE_SCALE: float = 8.0 / 6.0
 ## WOLF's marks in the bay (world px, his origin's x), from the art set's compose.py dock(): lying,
-## centred where its still lies him (DOCK wolf_x 64 plus half the piece's 127 px); getting up, his
-## haunch where the lying piece's was; standing at the latch, his snout at the pad's head (DOCK_X + 196);
+## centred where its still lies him (DOCK wolf_x 64 plus half the piece's 127 px at the size he was
+## painted; drawn at a real wolf's size, Main.WOLF_ART_SCALE, he lies on the same centre, the middle of
+## the pad and the cage); getting up, his haunch where the lying piece's was; standing at the latch, his snout at the pad's head (DOCK_X + 196);
 ## and out in front of the cage, his snout OUT_GAP (0.3 m, compose.py OUT_GAP) clear of the hanging lock,
 ## where the art review of 2026-10-16 asked for it (touching, the lock read as carried in his mouth).
 const LIE_X: float = DOCK_X + 127.5

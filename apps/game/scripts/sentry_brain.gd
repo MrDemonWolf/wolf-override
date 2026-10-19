@@ -62,7 +62,7 @@ const LOSE_SECONDS: float = 2.5
 ## A fixated sentry parks this far short of the one drawing it, on the side toward the rubble. WOLF
 ## draws it from the far end of its lane, by the exit hatch (JunctionRoom.WOLF_BAIT_X, 904), so the
 ## parked sentry faces him with its back to the TANK RELEASE: the engineer at the release is behind it,
-## never between the two. His drawn body (M0Actor.WOLF_REACH, 67) stays far outside the floor brackets
+## never between the two. His drawn body (M0Actor.WOLF_REACH, 44) stays far outside the floor brackets
 ## and the tank's footprint, and inside the room's right edge (the view ends at x 960). Until he is
 ## past it, it keeps at least this far ahead of him as he comes down the lane and never closes on him,
 ## backing off as far as the end of its patrol (PATROL_MAX_X): he catches up with it there and bounds
