@@ -38,7 +38,8 @@ Purpose
                               guard (SCRIPT_GUARD), the
                               engineer-gender gate (gendered_words, and the back-translation's
                               engineer_gendered), the Slavic name-case gate (NAME_CASE), the one-letter
-                              row-end gate (row_end_words), the plural forms of
+                              row-end gate (row_end_words), the Korean slot-particle gate
+                              (slot_particles), the plural forms of
                               every msgstr[n], the sibling-file completeness gate (family_gaps), the
                               coverage gate (coverage_gaps: an offered language, "enabled" in
                               languages.json, translates every POT message), and chrF of
@@ -58,7 +59,7 @@ Purpose
                               RELEASE_SELFTEST, COVERAGE_SELFTEST, GLOSSARY_SELFTEST) and writes the result as JSON at OUT;
                               exits 1 if a planted error passes or a clean line fails. The negative control
                               for gates no real msgid exercises yet (named and printf placeholders, BBCode,
-                              plural forms, the "you", pronoun, name-case and row-end checks, sibling files, the
+                              plural forms, the "you", pronoun, name-case, row-end and slot-particle checks, sibling files, the
                               coverage gate, the release gates, the glossary's avoid forms and its shape).
     hardcoded POT INVENTORY OUT
                               player-facing strings of the strings step's inventory (in scope and shown)
@@ -402,6 +403,11 @@ GENDER_WINDOW = 3
 #: A letter glued to the name slot ("заметил %sа"): a case ending, which Slavic languages add to names
 #: and which depends on the name's gender. Checked for languages whose row sets name_case.
 NAME_CASE = re.compile(r"(?:%s|\{name\})[^\W\d_]")
+#: The letters glued to a slot (%s or {name}), as group 1: in Korean the particle that follows a word
+#: changes with the word's last sound (로완은, 알렉스는; 키를, 탭을), and a slot's last sound is not known
+#: when the line is translated (the names, the keys and the touch words all fill it). Checked for the
+#: languages whose row lists "slot_particles" (slot_particles).
+SLOT_GLUE = re.compile(r"(?:%s|\{name\})([^\W\d_]+)")
 #: The breaks a one-letter word may not stand before (row_end_words): an ordinary space, where the game
 #: may end a row, and a written line break, which always ends one. A no-break space (U+00A0) is neither:
 #: Godot's TextServer breaks no row at it (ICU line breaking, class GL; DialogueBoxes.rows) and the
@@ -1086,6 +1092,19 @@ def row_end_words(text: str, lang: str) -> list[str]:
     return [match.group(1) for match in pattern.finditer(text)] if pattern else []
 
 
+def slot_particles(text: str, lang: str) -> list[str]:
+    """The letters glued to a slot in ``text`` (SLOT_GLUE) that do not start with one of ``lang``'s
+    "slot_particles" (languages.json): the particles that read the same after any last sound, such as
+    Korean 의, 도, 에게 and 한테. A glued 은/는, 이/가, 을/를, 과/와 or 으로/로 is right for one name or key
+    and wrong for another, so the line must be reworded (the ko style guide: no such particle after the
+    name slot). Every slot counts, the name's and a key's alike. Empty for a clean line or a language
+    with no such list (the gate passes). Pure."""
+    allowed = sorted(LANGUAGES.get(lang, {}).get("slot_particles") or [], key=len, reverse=True)
+    if not allowed:
+        return []
+    return [glued for glued in SLOT_GLUE.findall(text) if not glued.startswith(tuple(allowed))]
+
+
 def name_case_ok(text: str, lang: str, roles: set[str]) -> bool:
     """False when ``lang`` declines names (languages.json name_case) and a letter is glued to the name
     slot in ``text`` (NAME_CASE), the case ending PIPELINE.md's nominative-only rule forbids."""
@@ -1209,7 +1228,7 @@ def release_problems(entries: list[dict], pot_entries: list[dict], review: str) 
 
 #: The per-line gates that must all hold for a line to pass (each a boolean measure in the report).
 LINE_GATES = ("placeholders_ok", "tag_ok", "breaks_ok", "key_token_ok", "script_ok", "bbcode_ok", "gender_ok", "name_case_ok",
-              "row_end_ok")
+              "row_end_ok", "slot_particles_ok")
 
 
 def check(pot: Path, podir: Path, out: Path, back: Path | None = None, release: bool = False) -> None:
@@ -1253,6 +1272,8 @@ def check(pot: Path, podir: Path, out: Path, back: Path | None = None, release: 
             measures["name_case_ok"] = name_case_ok(text, lang, roles)
             measures["row_end_words"] = row_end_words(text, lang)
             measures["row_end_ok"] = not measures["row_end_words"]
+            measures["slot_particles"] = slot_particles(text, lang)
+            measures["slot_particles_ok"] = not measures["slot_particles"]
             measures["plural_problems"] = plural_problems(entry, plural_count(lang))
             measures["back_key"] = f"{lang}-{entry_key(entry)}"
             item = backs.get(measures["back_key"])
@@ -1457,6 +1478,19 @@ SELFTEST = [
     ("row_end", "ru", "", "Бак падает и\nприжимает его к\u00a0полу.", False, ""),
     ("row_end", "ru", "", "Страж патрулирует за завалом.", True, ""),
     ("row_end", "de", "", "Geh a und b.", True, ""),
+    # Korean particles glued to a slot (slot_particles, PR L12): one that changes with the last sound
+    # fails, whoever fills the slot; one that never changes, a space, a quote mark or a language with no
+    # list passes.
+    ("slot_particles", "ko", "", "%s는 WOLF의 시스템을 돌본다.", False, ""),
+    ("slot_particles", "ko", "", "{name}이 바이패스를 돌렸다.", False, ""),
+    ("slot_particles", "ko", "", "여기서 %s를 다시 누르세요.", False, ""),
+    ("slot_particles", "ko", "", "%s와 WOLF가 간다.", False, ""),
+    ("slot_particles", "ko", "", "WOLF는 %s의 신호를 기다린다.", True, ""),
+    ("slot_particles", "ko", "", "냉각재 구름이 %s에게 닥쳤다.", True, ""),
+    ("slot_particles", "ko", "", "여기서 다시 %s 누르세요.", True, ""),
+    ("slot_particles", "ko", "", "“%s”라고 했지.", True, ""),
+    ("slot_particles", "ko", "", "정비 포트로 타임스탬프를 복사한 건 {name}.", True, ""),
+    ("slot_particles", "ja", "", "%sは無事だ。", True, ""),
     ("plural", "ru", "The valve gives. %d of %d turns.", ["Клапан поддаётся. %d из %d оборота.", "Клапан поддаётся. %d из %d оборотов.", "Клапан поддаётся. %d из %d оборотов."], True, ""),
     ("plural", "ru", "The valve gives. %d of %d turns.", ["Клапан поддаётся. %d из %d оборота.", "Клапан поддаётся. %d из %d оборотов."], False, ""),
     ("plural", "ru", "The valve gives. %d of %d turns.", ["Клапан поддаётся. %d из %d оборота.", "Клапан поддаётся. %d оборотов.", "Клапан поддаётся. %d из %d оборотов."], False, ""),
@@ -1580,6 +1614,8 @@ def selftest(out: Path) -> None:
             passed = (not gendered_words(masked, lang, roles)) if gate == "gender" else name_case_ok(text, lang, roles)
         elif gate == "row_end":
             passed = not row_end_words(text, lang)
+        elif gate == "slot_particles":
+            passed = not slot_particles(text, lang)
         elif gate == "plural_header":
             passed = plural_header_ok(text, lang)
         elif gate == "fuzzy_note":
