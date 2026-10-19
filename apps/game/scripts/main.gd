@@ -4294,7 +4294,14 @@ func _wolf_target_x() -> float:
 		return WOLF_BYPASS_CLEAR_X
 	match state.chapter_id:
 		"records":
-			return -1.0 if state.mirror_trace_preserved else WOLF_MIRROR_X
+			# After his readout he holds his spot at the port, facing it, while the engineer is still at
+			# its station (RECORDS_STATIONS' mirror row: centre x and use reach): following at once
+			# walked him back across the port and the engineer, his tail over the rack's base, while
+			# the readout line was still up.
+			var mirror: Vector4 = RECORDS_STATIONS[1]
+			if not state.mirror_trace_preserved or (state.mirror_route == "wolf" and absf(human.position.x - mirror.x) <= mirror.z):
+				return WOLF_MIRROR_X
+			return -1.0
 		"junction":
 			if wolf_scouting:
 				return JunctionRoom.WOLF_SEAM_X

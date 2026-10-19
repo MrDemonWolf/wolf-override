@@ -64,6 +64,11 @@ func _run() -> void:
 	_expect(state.mirror_trace_preserved and state.mirror_route == "wolf" and not game.get("waiting_for_choice"), "WOLF readout preserves timestamp once")
 	_expect(state.memory.get("choice_id") == State.DISCLOSE and state.memory.get("event_id") == State.EVENT_ID, "chapter preserves the actual relay memory")
 	_expect(str(game.call("_context_hint")) == "Mirror copied. Head for the exit.", "once the mirror timestamp is copied the mirror port's hint says so instead of offering it again")
+	# The readout beat: he holds his reading spot, facing the port, while the engineer is still at it,
+	# rather than walking back across the port and the engineer to follow.
+	for _frame in range(90):
+		await physics_frame
+	_expect(absf(wolf.position.x - wolf_mirror_x) <= 2.0 and wolf.body_sprite.flip_h, "after his readout WOLF stays at the mirror port's right, facing it, while the engineer is at it (x %.0f)" % wolf.position.x)
 	if not await _walk_to(human, 700.0):
 		_fail("engineer can walk on from the mirror port")
 		return
