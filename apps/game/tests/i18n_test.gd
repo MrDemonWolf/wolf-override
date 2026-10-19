@@ -93,11 +93,6 @@ const HUD_MESSAGE_CHARS: int = 160
 ## 14 px hint are about 60 px, the room between the card and the dialogue box the hint bar keeps clear.
 const HUD_MAX_ROWS: int = 3
 
-## The language the made-up catalogs of the HUD and story checks ([method _hud_catalog],
-## [method _story_catalog]) stand in for: one in the table that ships no catalog (Italian, outside
-## decision D1's twelve files), so no real catalog answers first. It was "es" until PR L9 shipped es.po,
-## whose own lines then won the lookup. The made-up words stay Spanish; only the code is borrowed.
-const TEST_LANGUAGE: String = "it"
 ## The story lines written in place in main.gd (PR L7c), each marked where it is said rather than in
 ## StoryText: _check_story_marks finds each in the template with its story mark.
 const STORY_IN_PLACE: Array[String] = [
@@ -611,12 +606,12 @@ func _place(control: Control, parent: Node, rect: Rect2) -> void:
 	parent.add_child(control)
 
 
-## The made-up catalog of the HUD checks, under [constant TEST_LANGUAGE]: key templates (one with
+## The made-up catalog of the HUD checks, under [constant UNSHIPPED_TEST_LANGUAGE]: key templates (one with
 ## turn counts), the held form, a touch form, an objective and location, the name card, the tutorial, CONTINUE with and without the
 ## touch button's context, and one broken translation whose conversion differs from the English.
 func _hud_catalog() -> Translation:
 	var catalog: Translation = Translation.new()
-	catalog.locale = TEST_LANGUAGE
+	catalog.locale = UNSHIPPED_TEST_LANGUAGE
 	catalog.add_message("%s: talk to WOLF about the relay.", "%s: habla con WOLF del relé.")
 	catalog.add_message("%s: crank the manual bypass, %d of %d.", "%s: gira el bypass manual, %d de %d.")
 	catalog.add_message("HOLD %s", "MANTÉN %s")
@@ -648,7 +643,7 @@ func _check_key_prompts() -> void:
 	var broken: String = HudText.key("%s: save at the safe point.", [HudText.USE])
 	var named: String = HudText.key("%s waits.", ["E"])
 	_check(talk == "E: talk to WOLF about the relay." and crank == "HOLD E: crank the manual bypass, 3 of 8." and save == "The safe point could not save. Press E here again." and named == "E waits.", "key lines keep the English the game compared before (%s; %s; %s)" % [talk, crank, save])
-	I18n.apply(TEST_LANGUAGE)
+	I18n.apply(UNSHIPPED_TEST_LANGUAGE)
 	var keys: Dictionary = {HudText.USE: "F", HudText.HOLD_USE: I18n.fill("HOLD %s", ["F"])}
 	_check(HudText.localise(talk, keys, false) == "F: habla con WOLF del relé.", "the translated template gets the key after tr() (%s)" % HudText.localise(talk, keys, false))
 	_check(HudText.localise(crank, keys, false) == "MANTÉN F: gira el bypass manual, 3 de 8.", "the held key and the turn counts fill the translated template (%s)" % HudText.localise(crank, keys, false))
@@ -660,7 +655,7 @@ func _check_key_prompts() -> void:
 	I18n.apply("en")
 
 
-## The HUD in a game (PR L7b), with [method _hud_catalog] for [constant TEST_LANGUAGE]: in the
+## The HUD in a game (PR L7b), with [method _hud_catalog] for [constant UNSHIPPED_TEST_LANGUAGE]: in the
 ## opening the touch button's CONTINUE reads its own context's word while the title's CONTINUE keeps another, and the first box's
 ## prompt fills its key into the translated template; in play the top card, the tutorial and the hint
 ## (keyboard, then touch, where the key is the USE button's word) are translated, and switching back to
@@ -672,7 +667,7 @@ func _check_hud() -> void:
 	game.auto_pause_on_focus_loss = false
 	game.call("_new_game")
 	await process_frame
-	I18n.apply(TEST_LANGUAGE)
+	I18n.apply(UNSHIPPED_TEST_LANGUAGE)
 	await process_frame
 	var hint: Label = game.get_node("CanvasLayer/ContextHint/Text") as Label
 	_check(game.touch_use.text == "SEGUIR" and String(TranslationServer.translate("CONTINUE")) == "CONTINUAR", "the touch button's CONTINUE has its own context, apart from the title's (%s)" % game.touch_use.text)
@@ -686,7 +681,7 @@ func _check_hud() -> void:
 	_check(tutorial.text.begins_with("A / D  MOVER"), "the tutorial fills its keys into the translated template (%s)" % tutorial.text.c_escape())
 	I18n.apply("en")
 	_check(game.hud.text == "%s\nMAINTENANCE ENGINEER" % first_name, "a language change draws the top card again in English at once (%s)" % game.hud.text.c_escape())
-	I18n.apply(TEST_LANGUAGE)
+	I18n.apply(UNSHIPPED_TEST_LANGUAGE)
 	# Past the tutorial, which takes the hint bar's place while it shows.
 	game.tutorial_step = 2
 	game.human.position.x = 350.0
@@ -890,13 +885,13 @@ func _check_fit(code: String, key: String, control: Control) -> void:
 	_check(fits, "%s, %s: %s fits (size %s, judged %s, one row %.0f px; English: %s)" % [code, key.get_slice("|", 0), shown.left(60).c_escape(), control.size, judged, needed, english])
 
 
-## The made-up catalog of the story checks, under [constant TEST_LANGUAGE] (PR L7c): the opening's Director line and his tag (with
+## The made-up catalog of the story checks, under [constant UNSHIPPED_TEST_LANGUAGE] (PR L7c): the opening's Director line and his tag (with
 ## its "speaker" context), WOLF's words and the engineer's from the first exchange, a knockdown card and
 ## the restore line under it, a relay answer and WOLF's callback that quotes it, an end-card topic and
 ## row, and one end-card row whose placeholder is misspelt.
 func _story_catalog() -> Translation:
 	var catalog: Translation = Translation.new()
-	catalog.locale = TEST_LANGUAGE
+	catalog.locale = UNSHIPPED_TEST_LANGUAGE
 	catalog.add_message(Main.INTRO_THREAT_WORDS, "Yo decido quién es una amenaza. WOLF se ocupa del resto.")
 	catalog.add_message("DIRECTOR", "DIRECTORA DE PRUEBA", Main.SPEAKER_CONTEXT)
 	catalog.add_message(Main.OPENING_WOLF_WORDS, "Oí el plan del Director para mí.")
@@ -933,7 +928,7 @@ func _check_story_lines() -> void:
 		_check(I18n.shown(line, tags, {"DIRECTOR": "DIRECTOR"}) == line, "in English I18n.shown leaves \"%s\" as it is" % line.c_escape())
 	var catalog: Translation = _story_catalog()
 	TranslationServer.add_translation(catalog)
-	I18n.apply(TEST_LANGUAGE)
+	I18n.apply(UNSHIPPED_TEST_LANGUAGE)
 	var names: Dictionary = {"DIRECTOR": String(TranslationServer.translate("DIRECTOR", Main.SPEAKER_CONTEXT))}
 	var opening: String = I18n.shown(Main.INTRO_LINES[0], tags, names)
 	_check(opening == "DIRECTORA DE PRUEBA: Yo decido quién es una amenaza. WOLF se ocupa del resto.", "the Director's line is his translated tag and his translated words (%s)" % opening)
@@ -989,7 +984,7 @@ func _check_story_marks() -> void:
 	_check(pot.has("%s\nMAINTENANCE ENGINEER") and template_marks(pot["%s\nMAINTENANCE ENGINEER"]).has("keep-breaks"), "the name card keeps its break")
 
 
-## The story in a game (PR L7c), with [method _story_catalog] for [constant TEST_LANGUAGE]: the opening's first box shows the
+## The story in a game (PR L7c), with [method _story_catalog] for [constant UNSHIPPED_TEST_LANGUAGE]: the opening's first box shows the
 ## Director's translated tag over his translated words in his own colour; a knockdown card shows
 ## translated with the name kept, and the end card's rows translate their topic and fill {name}; the
 ## relay's answer buttons are translated. Then an old save (its answer in the wording before October 13,
@@ -1003,7 +998,7 @@ func _check_story_game() -> void:
 	game.auto_pause_on_focus_loss = false
 	game.call("_new_game")
 	await process_frame
-	I18n.apply(TEST_LANGUAGE)
+	I18n.apply(UNSHIPPED_TEST_LANGUAGE)
 	await process_frame
 	_check(game.status_line == Main.INTRO_LINES[0], "the game keeps the opening's English line (%s)" % game.status_line)
 	_check(game.speaker.text == "DIRECTORA DE PRUEBA" and game.story.text == "Yo decido quién es una amenaza. WOLF se ocupa del resto.", "the opening's box draws the Director's translated tag and words (%s / %s)" % [game.speaker.text, game.story.text])
