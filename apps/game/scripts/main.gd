@@ -690,7 +690,7 @@ var impact: Impact
 var sfx_bank: SfxBank
 var relay_sparks: CPUParticles2D
 var door_dust: CPUParticles2D
-var gate_dust: CPUParticles2D
+var lock_chips: CPUParticles2D
 ## The opening's dock bay left of the corridor (layout L1).
 var dock_bay: DockBay
 ## True from a knockdown until the last autosave is back; the engineer has no controls meanwhile.
@@ -1216,11 +1216,18 @@ func _on_reduced_motion_changed(on: bool) -> void:
 
 
 ## One-shot particle presets parked at the places that already answer the player: the relay
-## contact, the seal's landing and the foot of WOLF's cage in the opening.
+## contact, the seal's landing and the guard lock on WOLF's cage in the opening.
 func _setup_particles() -> void:
 	relay_sparks = FxPresets.place(FxPresets.sparks(), self, "", Vector2(601.0, 390.0), 3)
 	door_dust = FxPresets.place(FxPresets.dust_burst(), self, "", Vector2(780.0, 436.0), 3, Vector2(30.0, 3.0))
-	gate_dust = FxPresets.place(FxPresets.dust_burst(), self, "", Vector2(DockBay.LATCH_X, 438.0), 3, Vector2(40.0, 3.0))
+	# The guard lock's sheared bolts throw a few chips of dark paint up and back at about 1 m/s, falling
+	# under gravity (backup round 2, review-real-2 S6 and review-tells-2 M2: a puff of glowing dust there
+	# read as an effect, not as steel giving way); the boom, the lock's drop and the beacon carry it.
+	lock_chips = FxPresets.place(FxPresets.chips(Color("#2b2f31"), 5), self, "LockChips", DockBay.LOCK_LENS, 3)
+	lock_chips.direction = Vector2(-0.45, -1.0)
+	lock_chips.initial_velocity_min = 25.0
+	lock_chips.initial_velocity_max = 55.0
+	lock_chips.gravity = Vector2(0.0, 392.0)
 
 
 ## A small additive glow riding on a station status light; it takes the light's colour each refresh.
@@ -4136,13 +4143,13 @@ func _cancel_fail() -> void:
 	human.z_index = ACTOR_Z
 
 
-## The guard lock tearing off WOLF's cage in the opening: a boom, a kick and dust at the cage's foot.
+## The guard lock tearing off WOLF's cage in the opening: a boom, a kick and chips of paint off its sheared bolts.
 func _shutter_boom() -> void:
 	sfx_bank.play(&"boom", -2.0)
 	impact.add_trauma(0.6)
 	impact.flash(0.09, 0.0)
 	impact.rumble(0.5, 0.9, 0.25)
-	impact.burst(gate_dust)
+	impact.burst(lock_chips)
 
 
 ## The seal finishing opening: the curtain is up in the hood, the doorway opens and WOLF lets go of the
