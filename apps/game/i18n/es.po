@@ -319,7 +319,7 @@ msgstr ""
 "Seguimiento y suavizado de la cámara\n"
 "\n"
 "Nielsen Norman Group\n"
-"Legibilidad de capturas de pantalla en móviles\n"
+"Legibilidad de capturas de pantalla en dispositivos móviles\n"
 "\n"
 "NIST AI Risk Management Framework\n"
 "Guía de registros de los National Archives\n"
@@ -1047,7 +1047,7 @@ msgstr "IDIOMA"
 #. i18n: speaker=ui
 #: scripts/game_settings.gd:562
 msgid "Window size is OS-managed on mobile."
-msgstr "En móviles, el sistema controla el tamaño de la ventana."
+msgstr "En dispositivos móviles, el sistema controla el tamaño de la ventana."
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: Settings note: vertical sync can hold the frame rate below the chosen cap.
