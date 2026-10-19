@@ -148,6 +148,8 @@ Changes merged after 0.15.0. They become the next version when it is cut.
 - Shared code: the charger's screen is a battery readout of `PropScreen`, `WolfLights` lights all three of WOLF's poses, and the warning beacons' pulse is one `RoomDepth.pulse` for every room and the bay.
 - The opening's staging moved out of `main.gd` into its own `Opening` node. New `opening_timing_test` and `opening_early_press_test` check the reading time, the order of the beats and that a fast reader never cuts one short.
 - Shared code: every `SfxBank` filter runs through one biquad loop and its short clips share one buffer helper (every sound byte for byte the same), and the end card and debug menu place their captions with one `UILabel.place`; copied game code drops from 62 lines to none.
+- Settings has a **LANGUAGE** row on a new **GENERAL** tab, hidden until a second language ships. It saves your pick and otherwise follows your system's language.
+- The language list names each language in its own words, with a smaller "machine translation" row under an unreviewed one, and draws Japanese, Korean and Chinese names with four tiny Noto Sans cuts.
 
 ### How it was checked
 
@@ -161,6 +163,7 @@ Changes merged after 0.15.0. They become the next version when it is cut.
 - **Dock bay cage checked:** headless test suites and rendered stills (1280x720 and a phone shape) of each beat: charging, waking, getting up, the lock torn and the leaves sliding, out of the cage, and the empty bay; not played by hand.
 - **Dock bay opening checked:** headless test suites, the timed opening (first control at 33.0 s on the reading formula) and rendered stills (1280x720 and a phone shape) of every box; not played by hand, so its pace is not yet judged in motion.
 - **Dock bay Reduce Motion checked:** headless tests of the beacon, the lockdown light and the torn lock with it switched on mid-scene; not played by hand.
+- **Language setting checked:** headless test suites and rendered Settings stills in English and pseudo-English, with every language turned on for the capture only; not played by hand.
 
 ## 0.15.0 - October 16, 2026
 
