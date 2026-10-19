@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: WOLF OVERRIDE\n"
-"PO-Revision-Date: 2026-10-19 21:10+0000\n"
+"PO-Revision-Date: 2026-10-19 21:43+0000\n"
 "Last-Translator: Claude (Anthropic), machine translation, unreviewed\n"
 "Language-Team: none\n"
 "MIME-Version: 1.0\n"
@@ -40,11 +40,11 @@ msgid "COOLANT RELAY"
 msgstr "PRZEKAŹNIK CHŁODZIWA"
 
 # machine-translated by Claude (Anthropic), unreviewed
-#. TRANSLATORS: Station plate (12-13 px label on a machine). ALL CAPS, as short as possible. The spot out of the sentry's sight where the game saves (glossary).
+#. TRANSLATORS: Station plate (12-13 px label on a machine). ALL CAPS, as short as possible. The spot out of the sentry's sight where the game saves (glossary: SCHRON, shelter). PUNKT BEZPIECZNY was cut on its left by the door pillar beside the plate.
 #. i18n: speaker=ui
 #: scenes/main.tscn
 msgid "SAFE POINT"
-msgstr "PUNKT BEZPIECZNY"
+msgstr "SCHRON"
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: The PAUSE button on the touch layout (88 px) and the Pause action's prompt. Cut to fit: PAUZA ran 2 px past the 88 px touch button, so STOP.
@@ -1260,11 +1260,11 @@ msgid "Saved checkpoint could not be read."
 msgstr "Nie udało się odczytać zapisu."
 
 # machine-translated by Claude (Anthropic), unreviewed
-#. TRANSLATORS: Title note under CONTINUE (388 px, 15 px). SAFE POINT is the plate's exact words, quoted in the nominative (style guide: plates never change case).
+#. TRANSLATORS: Title note under CONTINUE (388 px, 15 px). SAFE POINT is the plate's word, SCHRON (shelter).
 #. i18n: speaker=ui
 #: scripts/main.gd:1127
 msgid "No checkpoint yet. Saving starts at the first SAFE POINT."
-msgstr "Brak zapisu. Pierwszy zapis: „PUNKT BEZPIECZNY”."
+msgstr "Brak zapisu. Zapis od pierwszego SCHRONU."
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: Changelog button text when the browser cannot open (338 px).
@@ -1438,7 +1438,7 @@ msgstr "Dostęp do rejestrów przywrócony. Najpierw skopiuj ślad rozkazu czyst
 #. TRANSLATORS: i18n: story speaker=narrator
 #: scripts/main.gd:2526
 msgid "Safe point restored."
-msgstr "Punkt bezpieczny przywrócony."
+msgstr "Schron przywrócony."
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: The Director's purge display, read as a speaker; WOLF answers in the next message.
@@ -1457,7 +1457,7 @@ msgstr "Chcą, żeby źródłowy zapis zniknął. Musimy go zachować."
 #. TRANSLATORS: i18n: story speaker=narrator
 #: scripts/main.gd:2570
 msgid "No station in reach. Follow the labeled breaker, relay, bypass or safe point."
-msgstr "Żadnej stacji w zasięgu. Idź do oznaczonego wyłącznika, przekaźnika, obejścia albo punktu bezpiecznego."
+msgstr "Żadnej stacji w zasięgu. Idź do oznaczonego wyłącznika, przekaźnika, obejścia albo schronu."
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: i18n: story speaker=narrator
@@ -1489,7 +1489,7 @@ msgstr "Przekaźnik jest ciemny. Najpierw załącz wyłącznik."
 #: scripts/main.gd:2645
 #: scripts/main.gd:2688
 msgid "The seal is open. The safe point is just beyond it."
-msgstr "Śluza jest otwarta. Punkt bezpieczny jest tuż za nią."
+msgstr "Śluza jest otwarta. Schron jest tuż za nią."
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: i18n: story speaker=WOLF
@@ -1531,7 +1531,7 @@ msgstr "Otwarte. Jestem z tobą."
 #. TRANSLATORS: i18n: story speaker=narrator
 #: scripts/main.gd:2761
 msgid "The safe point is past the sealed door."
-msgstr "Punkt bezpieczny jest za zamkniętą śluzą."
+msgstr "Schron jest za zamkniętą śluzą."
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: WOLF, after the engineer pressed him at the relay without warning.
@@ -1566,26 +1566,26 @@ msgstr "Weź kolejkę czystki. Ja sprawdzę lustro."
 #: scripts/main.gd:2793
 #, c-format
 msgid "The safe point could not save. Press %s here again."
-msgstr "Nie udało się zapisać w punkcie bezpiecznym. Naciśnij tu ponownie %s."
+msgstr "Nie udało się zapisać w schronie. Naciśnij tu ponownie %s."
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: Hint bar (14 px, about 526 px wide on a keyboard and 488 px on touch; wraps). The touch form; USE is the touch button's word (UŻYĆ), named as 'przycisk UŻYĆ'.
 #. i18n: speaker=hint engineer=you
 #: scripts/main.gd:2793
 msgid "The safe point could not save. Tap USE here again."
-msgstr "Nie udało się zapisać w punkcie bezpiecznym. Dotknij tu ponownie przycisku UŻYĆ."
+msgstr "Nie udało się zapisać w schronie. Dotknij tu ponownie przycisku UŻYĆ."
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: i18n: story speaker=narrator
 #: scripts/main.gd:2804
 msgid "Safe point saved."
-msgstr "Zapisano w punkcie bezpiecznym."
+msgstr "Zapisano w schronie."
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: i18n: story speaker=narrator
 #: scripts/main.gd:2807
 msgid "Safe point saved. WOLF remembers the same choice."
-msgstr "Zapisano w punkcie bezpiecznym. WOLF pamięta ten sam wybór."
+msgstr "Zapisano w schronie. WOLF pamięta ten sam wybór."
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: %s is the engineer's first name.
@@ -1869,12 +1869,12 @@ msgid "TAP CONTINUE  /  PAUSE"
 msgstr "DOTKNIJ DALEJ  /  STOP"
 
 # machine-translated by Claude (Anthropic), unreviewed
-#. TRANSLATORS: The opening's prompt: two keys or buttons, each followed by two spaces and its action; four spaces between.
+#. TRANSLATORS: The opening's prompt: two keys or buttons, each followed by two spaces and its action; four spaces between. PAUSE is the touch button's word (STOP/СТОП), which the keyboard layout shows too, so the prompt matches it.
 #. i18n: speaker=hint engineer=you slot=key
 #: scripts/main.gd:4754
 #, c-format
 msgid "%s  CONTINUE    %s  PAUSE"
-msgstr "%s  DALEJ    %s  PAUZA"
+msgstr "%s  DALEJ    %s  STOP"
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: Second row of the opening's first prompt: Pause offers SKIP OPENING.
@@ -2076,7 +2076,7 @@ msgstr "%s: przeczytaj ekran czystki Dyrektora."
 #. i18n: speaker=hint engineer=you
 #: scripts/main.gd:5343
 msgid "Return to the safe point to enter records access."
-msgstr "Wróć do punktu bezpiecznego, by otworzyć dostęp do rejestrów."
+msgstr "Wróć do schronu, by otworzyć dostęp do rejestrów."
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: Hint bar (14 px, about 526 px wide on a keyboard and 488 px on touch; wraps). The seal is the sealed door (OPEN THE SEAL): śluza, here and in the objective.
@@ -2091,14 +2091,14 @@ msgstr "Śluza się otwiera."
 #: scripts/main.gd:5348
 #, c-format
 msgid "%s: save at the safe point."
-msgstr "%s: zapisz w punkcie bezpiecznym."
+msgstr "%s: zapisz w schronie."
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: Hint bar (14 px, about 526 px wide on a keyboard and 488 px on touch; wraps).
 #. i18n: speaker=hint engineer=you
 #: scripts/main.gd:5349
 msgid "The seal is open. Move to the safe point."
-msgstr "Śluza jest otwarta. Idź do punktu bezpiecznego."
+msgstr "Śluza jest otwarta. Idź do schronu."
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: Hint bar (14 px, about 526 px wide on a keyboard and 488 px on touch; wraps). WOLF is he.
@@ -2530,14 +2530,14 @@ msgstr "DOTRZEĆ DO WYJŚCIA"
 #. i18n: speaker=ui
 #: scripts/main.gd:5512
 msgid "SAFE POINT REACHED"
-msgstr "PUNKT BEZPIECZNY OSIĄGNIĘTY"
+msgstr "SCHRON OSIĄGNIĘTY"
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: Top card objective (ALL CAPS, about 420 px wide, wraps). Infinitive, as the other objectives.
 #. i18n: speaker=ui
 #: scripts/main.gd:5514
 msgid "REACH SAFE POINT"
-msgstr "CEL: PUNKT BEZPIECZNY"
+msgstr "DOTRZEĆ DO SCHRONU"
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: Top card objective (ALL CAPS, about 420 px wide, wraps). Infinitive, as the other objectives. The seal is the sealed door.

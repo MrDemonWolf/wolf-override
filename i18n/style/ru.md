@@ -66,3 +66,5 @@ WOLF is **он**, with masculine past tense in -л. He is never declined: "с WO
   their neighbours), and the changelog note drops "source-build". Each cut is noted on its line in
   `ru.po`.
 - **WOLF's readout** is *дисплей*: Codex read *показания* back as "testimony".
+- **SAFE POINT** is УКРЫТИЕ (shelter), on the plate and in the hints; the glossary checks the stem
+  УКРЫТИ, so every case passes. The trial's БЕЗОПАСНАЯ ТОЧКА was cut on its left by the door pillar.
