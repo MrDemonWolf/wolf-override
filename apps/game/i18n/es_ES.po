@@ -370,7 +370,7 @@ msgstr "NOVEDADES DEL DESARROLLO"
 #. i18n: speaker=ui engineer=you
 #: scenes/main.tscn
 msgid "Source-build changes by date, not releases. Scroll with the wheel, drag the text or use up/down."
-msgstr "Cambios del código por fecha, no lanzamientos. Usa la rueda, arrastra el texto o las flechas."
+msgstr "Cambios del código por fecha, no lanzamientos. Usa la rueda o las flechas, o arrastra el texto."
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: Tooltip of the changelog's online button. The address stays as written.
