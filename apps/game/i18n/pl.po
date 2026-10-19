@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: WOLF OVERRIDE\n"
-"PO-Revision-Date: 2026-10-19 21:08+0000\n"
+"PO-Revision-Date: 2026-10-19 21:10+0000\n"
 "Last-Translator: Claude (Anthropic), machine translation, unreviewed\n"
 "Language-Team: none\n"
 "MIME-Version: 1.0\n"
@@ -340,7 +340,7 @@ msgstr "POSTĘPY PRAC"
 #. i18n: speaker=ui engineer=you
 #: scenes/main.tscn
 msgid "Source-build changes by date, not releases. Scroll with the wheel, drag the text or use up/down."
-msgstr "Zmiany w wersji rozwojowej według dat, nie wydania. Przewijaj kółkiem, tekstem lub góra/dół."
+msgstr "Zmiany w wersji według dat, nie wydania. Przewijaj kółkiem, przeciągaj tekst lub strzałkami."
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: Tooltip of the changelog's online button. The address stays as written.
