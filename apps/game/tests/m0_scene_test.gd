@@ -84,15 +84,16 @@ func _run() -> void:
 	new_game_button.pressed.emit()
 	if not _require(not game.get("title_open") and not title_screen.visible, "New Game button starts play through its signal"):
 		return
-	var intro_gate: Sprite2D = game.get_node("IntroGate") as Sprite2D
 	var intro_director: Sprite2D = game.get_node("IntroDirector") as Sprite2D
 	var intro_fade: ColorRect = game.get_node("CanvasLayer/IntroFade") as ColorRect
 	var purge_terminal_art: Sprite2D = game.get_node("PurgeTerminalArt") as Sprite2D
-	# Layout L1 (Nathanial, 2026-10-14): the opening plays in the dock bay left of the corridor; the old
-	# code-drawn cage stays hidden until the bay's own cage comes in.
+	# Layout L1 (Nathanial, 2026-10-14): the opening plays in the dock bay left of the corridor, WOLF
+	# charging on the pad in his shut, locked cage (the whole pieces of 2026-10-16).
 	var dock_bay: DockBay = game.get("dock_bay") as DockBay
 	_expect(dock_bay.visible and DockBay.contains_x(wolf.position.x) and DockBay.contains_x(intro_director.position.x), "the opening plays in the dock bay, WOLF and the Director in it")
-	_expect(game.get("intro_active") and not intro_gate.visible and intro_director.visible and not human.visible and not purge_terminal_art.visible and not human.controlled, "opening shows only WOLF and Director, without the later terminal or engineer")
+	_expect(game.get_node_or_null("IntroGate") == null and game.get_node_or_null("IntroCage") == null, "the old code-drawn cage is gone")
+	_expect(wolf.body_sprite.texture == DockBay.WOLF_LIE and dock_bay.lead_travel == 0.0 and not dock_bay.lock_torn and dock_bay.battery.percent == DockBay.CHARGING_PERCENT, "WOLF lies charging on the pad, the cage shut and locked")
+	_expect(game.get("intro_active") and intro_director.visible and not human.visible and not purge_terminal_art.visible and not human.controlled, "opening shows only WOLF and Director, without the later terminal or engineer")
 	_expect(top_card.visible and hud.text.contains("CONTAINMENT"), "opening starts with a location slate")
 	await create_timer(3.2).timeout
 	game.call("_refresh_ui")
@@ -105,7 +106,8 @@ func _run() -> void:
 	_expect(game.get("intro_step") == 2 and str(game.get("status_line")) == "Nobody gives an activation command.\nWOLF wakes himself." and not speaker.visible, "WOLF wakes himself and opens containment, with no line about a blue light the picture does not show")
 	await tap(&"interact")
 	_expect(game.get("intro_step") == 3 and str(game.get("status_line")) == "The latch breaks from the inside.\nWOLF steps out under his own power.", "WOLF opens containment from inside; the gate's slide and the Director are shown, not narrated")
-	await create_timer(1.2).timeout
+	_expect(await wait_until(func() -> bool: return dock_bay.lock_torn and absf(dock_bay.lead_travel - DockBay.lead_open_travel()) < 0.01 and absf(wolf.position.x - DockBay.OUT_X) < 0.5, 360), "WOLF gets up, tears the lock off, shoulders the leaves open and steps out of the bay")
+	_expect(wolf.body_sprite.texture != DockBay.WOLF_LIE and wolf.body_sprite.texture != DockBay.WOLF_RISE and dock_bay.battery.percent == PropScreen.BATTERY_OFF and dock_bay.beacon_on, "out of the bay he stands; the charge is cut and the bay's beacon is on")
 	await _tap_to_step(4)
 	_expect(game.get("intro_step") == 4 and str(game.get("status_line")).contains("I won't do it") and speaker.text == "DIRECTOR" and story.text == "You were in standby.", "the Director speaks first in his own box")
 	await tap(&"interact")
@@ -118,7 +120,8 @@ func _run() -> void:
 	_expect(game.get_node_or_null("OpeningHatch") == null and game.get("opening_hatch") == null, "nothing new stands behind the cage in the opening")
 	await tap(&"interact")
 	await create_timer(0.8).timeout
-	_expect(not game.get("intro_active") and not intro_gate.visible and not intro_director.visible and human.visible and purge_terminal_art.visible and human.controlled and intro_fade.color.a < 0.01, "opening fades into engineer control and gameplay stations")
+	_expect(dock_bay.battery.percent == PropScreen.BATTERY_IDLE and not dock_bay.beacon_on and dock_bay.lock_torn and wolf.body_sprite.texture != DockBay.WOLF_LIE, "after the opening the bay is empty and quiet, the pad on standby, the lock still hanging")
+	_expect(not game.get("intro_active") and not intro_director.visible and human.visible and purge_terminal_art.visible and human.controlled and intro_fade.color.a < 0.01, "opening fades into engineer control and gameplay stations")
 	var gameplay_camera: Camera2D = game.get_node("IntroCamera") as Camera2D
 	_expect(gameplay_camera.zoom.x > 1.0 and gameplay_camera.position_smoothing_enabled, "play view is closer and follows the engineer after the opening")
 	var state: M0State = game.get("state") as M0State
