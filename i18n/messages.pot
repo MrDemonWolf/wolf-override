@@ -17,6 +17,7 @@
 # res://scripts/game_settings.gd
 # res://scripts/hazard.gd
 # res://scripts/hold_use.gd
+# res://scripts/hud_text.gd
 # res://scripts/i18n.gd
 # res://scripts/impact.gd
 # res://scripts/junction_room.gd
@@ -73,13 +74,7 @@ msgid "SAFE POINT"
 msgstr ""
 
 #: scenes/main.tscn
-msgid ""
-"A / D  MOVE\n"
-"E  READ DISPLAY (optional)"
-msgstr ""
-
-#: scenes/main.tscn
-#: scripts/main.gd:4507
+#: scripts/main.gd:4499
 msgid "PAUSE"
 msgstr ""
 
@@ -89,10 +84,6 @@ msgstr ""
 
 #: scenes/main.tscn
 msgid "▶"
-msgstr ""
-
-#: scenes/main.tscn
-msgid "USE"
 msgstr ""
 
 #: scenes/main.tscn
@@ -120,7 +111,7 @@ msgid "NEW GAME"
 msgstr ""
 
 #: scenes/main.tscn
-#: scripts/main.gd:1052
+#: scripts/main.gd:1047
 msgid "CONTINUE"
 msgstr ""
 
@@ -236,8 +227,8 @@ msgid "BACK TO TITLE"
 msgstr ""
 
 #: scenes/main.tscn
-#: scripts/main.gd:1930
-#: scripts/main.gd:1971
+#: scripts/main.gd:1925
+#: scripts/main.gd:1954
 msgid "PAUSE SCROLL"
 msgstr ""
 
@@ -266,7 +257,7 @@ msgid "RESUME"
 msgstr ""
 
 #: scenes/main.tscn
-#: scripts/main.gd:2149
+#: scripts/main.gd:2132
 msgid "RETURN TO TITLE"
 msgstr ""
 
@@ -293,7 +284,7 @@ msgid "FULLSCREEN"
 msgstr ""
 
 #: scenes/main.tscn
-#: scripts/main.gd:2030
+#: scripts/main.gd:2013
 msgid "Window size applies on desktop."
 msgstr ""
 
@@ -724,7 +715,7 @@ msgid "Default controls restored."
 msgstr ""
 
 #: scripts/game_settings.gd:850
-#: scripts/main.gd:2070
+#: scripts/main.gd:2053
 msgid "Settings could not be saved."
 msgstr ""
 
@@ -756,77 +747,519 @@ msgstr ""
 msgid "EXIT LOCKED"
 msgstr ""
 
-#: scripts/main.gd:1052
+#: scripts/main.gd:1047
 msgid "PLAY AGAIN"
 msgstr ""
 
-#: scripts/main.gd:1057
+#: scripts/main.gd:1052
 msgid "Slice complete. PLAY AGAIN starts a fresh run."
 msgstr ""
 
-#: scripts/main.gd:1059
+#: scripts/main.gd:1054
 msgid "Saved checkpoint could not be read."
 msgstr ""
 
-#: scripts/main.gd:1059
+#: scripts/main.gd:1054
 msgid "No checkpoint yet. Saving starts at the first SAFE POINT."
 msgstr ""
 
-#: scripts/main.gd:1082
+#: scripts/main.gd:1077
 msgid "LINK UNAVAILABLE"
 msgstr ""
 
-#. TRANSLATORS: Heading over the AI disclosure in the credits, in the same capitals as the other headings.
-#: scripts/main.gd:1942
-msgid "AI DISCLOSURE"
-msgstr ""
-
-#. TRANSLATORS: The AI disclosure Nathanial Henniges approved word for word (October 19, 2026). Translate it faithfully and in full; do not shorten, soften or add to it. Keep WOLF OVERRIDE, Nathanial Henniges and MrDemonWolf, Inc. as written.
-#: scripts/main.gd:1944
-msgid "WOLF OVERRIDE is a solo project by Nathanial Henniges (MrDemonWolf, Inc.). AI tools were used with careful human oversight to support the creative process for art and code. The story, characters and game design are his, and every AI-assisted asset is reviewed, edited and credited."
-msgstr ""
-
-#: scripts/main.gd:1971
-#: scripts/main.gd:1977
+#: scripts/main.gd:1954
+#: scripts/main.gd:1960
 msgid "RESUME SCROLL"
 msgstr ""
 
-#: scripts/main.gd:2010
+#: scripts/main.gd:1993
 msgid "30 FPS"
 msgstr ""
 
-#: scripts/main.gd:2011
+#: scripts/main.gd:1994
 msgid "60 FPS"
 msgstr ""
 
-#: scripts/main.gd:2012
+#: scripts/main.gd:1995
 msgid "UNCAPPED"
 msgstr ""
 
-#: scripts/main.gd:2013
+#: scripts/main.gd:1996
 msgid "90 FPS"
 msgstr ""
 
-#: scripts/main.gd:2014
+#: scripts/main.gd:1997
 msgid "120 FPS"
 msgstr ""
 
-#: scripts/main.gd:2015
+#: scripts/main.gd:1998
 msgid "144 FPS"
 msgstr ""
 
-#: scripts/main.gd:2030
+#: scripts/main.gd:2013
 msgid "Window size is managed by iOS/Android."
 msgstr ""
 
-#: scripts/main.gd:2149
+#: scripts/main.gd:2132
 msgid "SKIP OPENING"
 msgstr ""
 
-#: scripts/main.gd:2164
+#: scripts/main.gd:2147
 msgid "TAP RESUME TO RETURN"
 msgstr ""
 
-#: scripts/main.gd:2164
+#: scripts/main.gd:2147
 msgid "%s  RESUME"
+msgstr ""
+
+#: scripts/main.gd:2643
+msgid "The safe point could not save. Press %s here again."
+msgstr ""
+
+#: scripts/main.gd:2643
+msgid "The safe point could not save. Tap USE here again."
+msgstr ""
+
+#: scripts/main.gd:2741
+#: scripts/main.gd:5085
+msgid "Mirror copied. Head for the exit."
+msgstr ""
+
+#: scripts/main.gd:2743
+msgid "Follow the station lights: mirror port, then exit."
+msgstr ""
+
+#: scripts/main.gd:2744
+msgid "Follow the station lights: purge queue, mirror port, then exit."
+msgstr ""
+
+#: scripts/main.gd:2933
+msgid "I'm still checking the drive. Wait for me, or press %s for the manual port."
+msgstr ""
+
+#: scripts/main.gd:2933
+msgid "I'm still checking the drive. Wait for me, or tap USE MANUAL PORT."
+msgstr ""
+
+#: scripts/main.gd:2961
+msgid "Save failed. Use a station to try again."
+msgstr ""
+
+#: scripts/main.gd:4508
+msgid "RETRY"
+msgstr ""
+
+#: scripts/main.gd:4508
+msgctxt "touch button"
+msgid "CONTINUE"
+msgstr ""
+
+#: scripts/main.gd:4508
+msgid "CRANK"
+msgstr ""
+
+#: scripts/main.gd:4508
+msgid "DROP"
+msgstr ""
+
+#: scripts/main.gd:4508
+#: scripts/main.gd:4519
+msgid "USE"
+msgstr ""
+
+#: scripts/main.gd:4518
+msgid "%s  MOVE"
+msgstr ""
+
+#: scripts/main.gd:4518
+msgid "STICK / D-PAD MOVE"
+msgstr ""
+
+#: scripts/main.gd:4519
+msgid "%s  READ DISPLAY (optional)"
+msgstr ""
+
+#: scripts/main.gd:4523
+msgid "Head right to the breaker."
+msgstr ""
+
+#: scripts/main.gd:4528
+msgid "Or head right to the breaker."
+msgstr ""
+
+#: scripts/main.gd:4536
+msgid "03:17 / CONTAINMENT"
+msgstr ""
+
+#: scripts/main.gd:4537
+msgid "TAP CONTINUE  /  PAUSE"
+msgstr ""
+
+#: scripts/main.gd:4537
+msgid "%s  CONTINUE    %s  PAUSE"
+msgstr ""
+
+#: scripts/main.gd:4540
+msgid "PAUSE: skip the opening"
+msgstr ""
+
+#: scripts/main.gd:4546
+#: scripts/main.gd:4577
+msgid "SERVICE JUNCTION"
+msgstr ""
+
+#: scripts/main.gd:4546
+#: scripts/main.gd:5236
+msgid "SERVICE LINE CLEARED"
+msgstr ""
+
+#: scripts/main.gd:4567
+msgid ""
+"%s\n"
+"MAINTENANCE ENGINEER"
+msgstr ""
+
+#: scripts/main.gd:4577
+msgid "RECORDS ACCESS / FIRST COPY"
+msgstr ""
+
+#: scripts/main.gd:4577
+msgid "MAINTENANCE / LOCKDOWN"
+msgstr ""
+
+#: scripts/main.gd:4582
+msgid "Checkpoint saved."
+msgstr ""
+
+#: scripts/main.gd:4587
+msgid "TAP RETRY"
+msgstr ""
+
+#: scripts/main.gd:4587
+msgid "%s  RETRY"
+msgstr ""
+
+#: scripts/main.gd:4640
+msgid "HOLD %s"
+msgstr ""
+
+#: scripts/main.gd:4649
+msgid "TAP CONTINUE"
+msgstr ""
+
+#: scripts/main.gd:4649
+msgid "%s  CONTINUE"
+msgstr ""
+
+#: scripts/main.gd:5079
+#: scripts/main.gd:5116
+msgid "%s: continue."
+msgstr ""
+
+#: scripts/main.gd:5079
+msgid "%s: follow the service line toward Archive."
+msgstr ""
+
+#: scripts/main.gd:5080
+msgid "The exit is open. Head right to follow the service line."
+msgstr ""
+
+#: scripts/main.gd:5082
+msgid "%s: copy the purge-order trace."
+msgstr ""
+
+#: scripts/main.gd:5082
+msgid "Purge order copied. Find the mirror port."
+msgstr ""
+
+#: scripts/main.gd:5086
+msgid "%s: examine the mirror port."
+msgstr ""
+
+#: scripts/main.gd:5086
+msgid "Copy the purge order first."
+msgstr ""
+
+#: scripts/main.gd:5089
+msgid "%s: secure the first copy in the container."
+msgstr ""
+
+#: scripts/main.gd:5089
+msgid "Preserve both traces before leaving."
+msgstr ""
+
+#: scripts/main.gd:5092
+msgid "%s: enter records access. The Director's purge is still running."
+msgstr ""
+
+#: scripts/main.gd:5092
+#: scripts/main.gd:5100
+msgid "%s: read the Director's purge display."
+msgstr ""
+
+#: scripts/main.gd:5092
+msgid "Return to the safe point to enter records access."
+msgstr ""
+
+#: scripts/main.gd:5095
+msgid "The seal is opening."
+msgstr ""
+
+#: scripts/main.gd:5097
+msgid "%s: save at the safe point."
+msgstr ""
+
+#: scripts/main.gd:5098
+msgid "The seal is open. Move to the safe point."
+msgstr ""
+
+#: scripts/main.gd:5102
+msgid "WOLF is moving to the contact."
+msgstr ""
+
+#: scripts/main.gd:5105
+msgid "The bypass is dead. Arm the breaker first."
+msgstr ""
+
+#: scripts/main.gd:5107
+msgid "%s: crank the manual bypass, %d of %d."
+msgstr ""
+
+#: scripts/main.gd:5109
+msgid "%s: crank it yourself, or let WOLF take the relay."
+msgstr ""
+
+#: scripts/main.gd:5109
+msgid "%s: crank on, %d of %d, or let WOLF take the relay."
+msgstr ""
+
+#: scripts/main.gd:5112
+msgid "The breaker is live. Go to the MANUAL BYPASS by the relay."
+msgstr ""
+
+#: scripts/main.gd:5112
+msgid "The breaker is live. Go to the coolant relay."
+msgstr ""
+
+#: scripts/main.gd:5117
+msgid "%s: talk to WOLF about the relay."
+msgstr ""
+
+#: scripts/main.gd:5117
+msgid "%s: arm the breaker."
+msgstr ""
+
+#: scripts/main.gd:5120
+msgid "The relay is dark. Return to the breaker first."
+msgstr ""
+
+#: scripts/main.gd:5121
+msgid "WOLF refused the live contact. Use the MANUAL BYPASS beside it."
+msgstr ""
+
+#: scripts/main.gd:5121
+msgid "%s: signal WOLF to take the contact."
+msgstr ""
+
+#: scripts/main.gd:5123
+msgid "Go to the MANUAL BYPASS beside the relay."
+msgstr ""
+
+#: scripts/main.gd:5123
+msgid "Go to the coolant relay. WOLF is ready for the contact."
+msgstr ""
+
+#: scripts/main.gd:5125
+msgid "Return to the breaker and arm power."
+msgstr ""
+
+#: scripts/main.gd:5126
+msgid "Find the breaker. WOLF will follow your lead."
+msgstr ""
+
+#: scripts/main.gd:5149
+msgid "The vent is about to blow. Get off the grate now."
+msgstr ""
+
+#: scripts/main.gd:5149
+msgid "Relief vent. Get off the grate before the gauge peaks."
+msgstr ""
+
+#: scripts/main.gd:5153
+msgid "%s: arm the overload breaker."
+msgstr ""
+
+#: scripts/main.gd:5155
+msgid "%s: reset the breaker. The vent let go."
+msgstr ""
+
+#: scripts/main.gd:5157
+msgid "The line is live. Get to the valve by the door."
+msgstr ""
+
+#: scripts/main.gd:5159
+msgid "%s: crank the valve, %d of %d turns."
+msgstr ""
+
+#: scripts/main.gd:5161
+msgid "Fuse lit. Get clear of the door."
+msgstr ""
+
+#: scripts/main.gd:5163
+msgid "The valve is dead. Arm the breaker by the entrance."
+msgstr ""
+
+#: scripts/main.gd:5165
+msgid "Relief vent. It lets go when the gauge peaks."
+msgstr ""
+
+#: scripts/main.gd:5168
+msgid "The line is building. Crank the valve by the door."
+msgstr ""
+
+#: scripts/main.gd:5170
+msgid "The breaker tripped. Reset it by the entrance."
+msgstr ""
+
+#: scripts/main.gd:5172
+msgid "Arm the breaker by the entrance, then crank the valve by the door."
+msgstr ""
+
+#: scripts/main.gd:5172
+msgid "Get through the sealed door."
+msgstr ""
+
+#: scripts/main.gd:5193
+msgid "The door is open."
+msgstr ""
+
+#: scripts/main.gd:5198
+msgid "%s: pop the exit bolt."
+msgstr ""
+
+#: scripts/main.gd:5200
+msgid "The bolt is taking the charge."
+msgstr ""
+
+#: scripts/main.gd:5202
+#: scripts/main.gd:5206
+msgid "The door is opening."
+msgstr ""
+
+#: scripts/main.gd:5204
+msgid "%s: leave through the door."
+msgstr ""
+
+#: scripts/main.gd:5204
+#: scripts/main.gd:5207
+msgid "The door is open. Leave through it."
+msgstr ""
+
+#: scripts/main.gd:5207
+msgid "The sentry is down. Pop the exit bolt by the door."
+msgstr ""
+
+#: scripts/main.gd:5209
+msgid "Coolant cloud. Get out of it."
+msgstr ""
+
+#: scripts/main.gd:5211
+msgid "It's after you. Get back over the rubble."
+msgstr ""
+
+#: scripts/main.gd:5216
+msgid "Wait for WOLF to park it on the mark."
+msgstr ""
+
+#: scripts/main.gd:5216
+msgid "%s: drop the tank. It's parked on the mark."
+msgstr ""
+
+#: scripts/main.gd:5217
+msgid "%s: drop the tank. Land it with the sentry on the mark."
+msgstr ""
+
+#: scripts/main.gd:5219
+msgid "The tank is falling."
+msgstr ""
+
+#: scripts/main.gd:5221
+msgid "The winch is hauling the tank back up. Wait for the clamp."
+msgstr ""
+
+#: scripts/main.gd:5223
+msgid "Stay back over the rubble until it gives up."
+msgstr ""
+
+#: scripts/main.gd:5225
+msgid "You're in its sights. Hide at the TANK RELEASE or the rubble."
+msgstr ""
+
+#: scripts/main.gd:5227
+msgid "WOLF is drawing the sentry onto the mark. Get to the TANK RELEASE."
+msgstr ""
+
+#: scripts/main.gd:5229
+msgid "WOLF has broken off. Time the drop on its patrol from the TANK RELEASE."
+msgstr ""
+
+#: scripts/main.gd:5230
+msgid "The sentry patrols past the rubble. The TANK RELEASE hides you from it."
+msgstr ""
+
+#: scripts/main.gd:5238
+msgid "POP THE EXIT BOLT"
+msgstr ""
+
+#: scripts/main.gd:5241
+msgid "DROP THE TANK"
+msgstr ""
+
+#: scripts/main.gd:5241
+msgid "GO THROUGH THE DOOR"
+msgstr ""
+
+#: scripts/main.gd:5244
+msgid "CRANK THE VALVE"
+msgstr ""
+
+#: scripts/main.gd:5246
+msgid "GET CLEAR OF THE DOOR"
+msgstr ""
+
+#: scripts/main.gd:5247
+#: scripts/main.gd:5263
+msgid "ARM THE BREAKER"
+msgstr ""
+
+#: scripts/main.gd:5250
+msgid "FIRST COPY SECURED"
+msgstr ""
+
+#: scripts/main.gd:5252
+msgid "COPY PURGE ORDER"
+msgstr ""
+
+#: scripts/main.gd:5254
+msgid "COPY MIRROR INDEX"
+msgstr ""
+
+#: scripts/main.gd:5255
+msgid "REACH EXIT"
+msgstr ""
+
+#: scripts/main.gd:5257
+msgid "SAFE POINT REACHED"
+msgstr ""
+
+#: scripts/main.gd:5259
+msgid "REACH SAFE POINT"
+msgstr ""
+
+#: scripts/main.gd:5261
+msgid "OPEN THE SEAL"
+msgstr ""
+
+#: scripts/main.gd:5264
+msgid "CHECK THE BREAKER"
 msgstr ""
