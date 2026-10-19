@@ -257,9 +257,17 @@ var beacon_on: bool = false
 var lockdown_glow: Sprite2D
 var lockdown_on: bool = false
 var _lockdown_tween: Tween
-## Reduce Motion (Main copies impact.reduce_motion): the beacon holds lit, the lock does not swing and
-## the standby light does not breathe.
-var reduce_motion: bool = false
+## Reduce Motion (Main copies impact.reduce_motion, at start and whenever the setting changes): the
+## beacon and the corridor's lockdown light hold lit, the lock does not swing and the standby light does
+## not breathe. A change applies at once to the lights that are on.
+var reduce_motion: bool = false:
+	set(value):
+		if value == reduce_motion:
+			return
+		reduce_motion = value
+		if is_node_ready():
+			set_beacon(beacon_on)
+			set_lockdown(lockdown_on)
 var _beacon_tween: Tween
 var _clock: float = 0.0
 ## The cross-wall's cut end over the actors.

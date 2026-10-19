@@ -960,6 +960,7 @@ func _ready() -> void:
 	wolf_lights = WolfLights.attach(wolf.body_sprite)
 	_setup_corridor_door()
 	dock_bay = DockBay.new()
+	dock_bay.reduce_motion = impact.reduce_motion
 	add_child(dock_bay)
 	opening = Opening.new()
 	opening.name = "Opening"
@@ -1196,12 +1197,13 @@ func _setup_impact() -> void:
 	add_child(sfx_bank)
 
 
-## Reduced Motion reaches the impact kit, the junction's seam strobe, the bypass's fault-tag pulse and
-## the rooms' lamp flicker.
+## Reduced Motion reaches the impact kit, the junction's seam strobe, the bypass's fault-tag pulse, the
+## rooms' lamp flicker and the dock bay's beacon, lockdown light, lock swing and standby breathing.
 func _on_reduced_motion_changed(on: bool) -> void:
 	impact.reduce_motion = on
 	junction_room.reduce_motion = on
 	bypass_handle.reduce_motion = on
+	dock_bay.reduce_motion = on
 	for depth: RoomDepth in _room_depths():
 		depth.reduce_motion = on
 
