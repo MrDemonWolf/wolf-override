@@ -2,7 +2,7 @@ import Link from 'next/link';
 import LandingNavigation from './landing-navigation';
 import BrandLockup from './brand-lockup';
 import Downloads, { ArrowIcon, getGameHref } from './downloads';
-import { card, inlineLink, landingWidth, navLink, sectionAnchor, sectionCopy, sectionTitle } from './landing-classes';
+import { card, inlineLink, landingWidth, navLink, sectionCopy, sectionTitle } from './landing-classes';
 import recordsCapture480 from './images/records-access-doors-capture-480.webp';
 import recordsCapture960 from './images/records-access-doors-capture-960.webp';
 import recordsCapture1600 from './images/records-access-doors-capture-1600.webp';
@@ -135,9 +135,16 @@ export default function HomePage() {
   return (
     // header, main and footer are siblings so assistive tech sees three top-level landmarks (banner, main, contentinfo).
     // data-landing keeps the root dark as well (see the end of global.css).
-    <div data-landing="" className="flow-root overflow-clip bg-ink text-text scheme-dark">
+    // overflow-clip, unlike overflow-hidden, makes no scroll container, so the sticky header below still sticks to the viewport.
+    // [html:has(&)]:scroll-pt-24 sets scroll-padding-top on the page's scroller (html) while the landing is shown: 6rem clears
+    // the sticky header (1rem offset + 4.75rem bar on wide screens, .5rem + about 4.2rem on phones), so #story, #gameplay and
+    // #downloads land with their headings below the bar, and keyboard focus scrolled into view is not hidden under it (WCAG 2.4.11).
+    <div data-landing="" className="flow-root overflow-clip bg-ink text-text scheme-dark [html:has(&)]:scroll-pt-24">
       <JsonLd data={homeStructuredData()} />
-      <header className="relative z-30 mx-auto mt-4 -mb-23 flex min-h-19 w-[min(calc(100%-2rem),1232px)] items-center justify-between gap-4 rounded-control border border-accent/24 bg-panel/94 px-[clamp(1rem,2.5vw,1.75rem)] py-[.65rem] shadow-panel phone:mt-2 phone:-mb-30 phone:min-h-0 phone:w-[calc(100%-1rem)] phone:px-3 phone-xs:gap-2 phone-xs:px-2">
+      {/* Sticky on every width: it rests 1rem down (.5rem on phones), or below the notch when the browser reports a safe-area inset.
+          The -mb pulls the hero up under it, so sticking causes no layout jump. z-30 keeps it over the page content; the phone
+          menu panel (z-40) lives inside it. bg-panel/94 plus the blur keeps the links readable over the key art and the cards. */}
+      <header className="sticky top-[max(1rem,env(safe-area-inset-top))] z-30 mx-auto mt-4 -mb-23 flex min-h-19 w-[min(calc(100%-2rem),1232px)] items-center justify-between gap-4 rounded-control border border-accent/24 bg-panel/94 px-[clamp(1rem,2.5vw,1.75rem)] py-[.65rem] shadow-panel backdrop-blur-md phone:top-[max(.5rem,env(safe-area-inset-top))] phone:mt-2 phone:-mb-30 phone:min-h-0 phone:w-[calc(100%-1rem)] phone:px-3 phone-xs:gap-2 phone-xs:px-2">
         <BrandLockup />
         <nav className="ml-auto flex flex-wrap items-center justify-end gap-[.2rem] font-heading font-semibold menu:hidden" aria-label="Main navigation">
           <a className={navLink} href="#story">Story</a>
@@ -192,7 +199,7 @@ export default function HomePage() {
             <span className="hud-label text-muted phone:rounded-control phone:bg-ink/80 phone:px-2 phone:py-1 phone:text-[.68rem] phone:tracking-[.06em]">Provisional key art · Not a gameplay capture</span>
           </div>
         </section>
-        <section id="story" className={`${landingWidth} ${twoColumns} ${sectionAnchor}`} aria-labelledby="story-title">
+        <section id="story" className={`${landingWidth} ${twoColumns}`} aria-labelledby="story-title">
           <div>
             <p className="hud-label mb-5">Inside THE DEN</p>
             <h2 id="story-title" tabIndex={-1} className={sectionTitle}>Built to obey.<br /><em className="text-accent not-italic">Awake to refuse.</em></h2>
@@ -203,7 +210,7 @@ export default function HomePage() {
             <Link className={inlineLink} href="/docs/about/">Meet the game&apos;s world <span aria-hidden="true">→</span></Link>
           </div>
         </section>
-        <section id="gameplay" className={`${landingWidth} border-t border-t-line py-24 phone:py-18 ${sectionAnchor}`} aria-labelledby="play-title">
+        <section id="gameplay" className={`${landingWidth} border-t border-t-line py-24 phone:py-18`} aria-labelledby="play-title">
           <div className="max-w-[760px]">
             <p className="hud-label mb-5">The relationship is the game</p>
             <h2 id="play-title" tabIndex={-1} className={sectionTitle}>Find a way forward. Together.</h2>
