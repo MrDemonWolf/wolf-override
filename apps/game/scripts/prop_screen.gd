@@ -10,9 +10,16 @@ extends Node2D
 ## draws over it. [member glass] is in the piece's own pixels (piece px), as measured on the PNG.
 
 ## The glass's glow: the tint darkened this much (so the rows stand out on it) at this alpha over the
-## dark painted glass.
-const FILL_DARKEN: float = 0.35
-const FILL_ALPHA: float = 0.8
+## dark painted glass. Review of art swap PR 2: at 0.35 a lit station read flat and dim at 1280x720
+## next to the earlier painted glass, so the fill is only lightly darkened.
+const FILL_DARKEN: float = 0.2
+const FILL_ALPHA: float = 0.85
+## The light the lit glass throws round itself (the shared additive RoomDepth.make_glow, as the
+## stations' status lights use): this many times the glass's size, at this alpha. It is what lets a
+## working screen pull the eye from across the room, and its colour change (the MIRROR PORT's cyan to
+## green once copied) shows on the wall round it, not only on the small glass.
+const HALO_SPREAD: float = 1.9
+const HALO_ALPHA: float = 0.5
 ## The readout's rows: their share of the glass's width, top to bottom. Fixed, so a still is the same
 ## every run; short and long rows read as a log, not as words.
 const ROWS: PackedFloat32Array = [0.72, 0.55, 0.83, 0.4, 0.66, 0.5]
@@ -29,21 +36,31 @@ const EDGE_ALPHA: float = 0.35
 
 ## The glass, in piece px.
 var glass: Rect2 = Rect2()
-## The screen's light; set it to follow the state (call queue_redraw after a change).
+## The halo round the glass (HALO_SPREAD, HALO_ALPHA); made by attach, tinted with [member tint].
+var halo: Sprite2D
+## The screen's light; setting it redraws the glass and retints the halo, so it can follow the state.
 var tint: Color = Color.WHITE:
 	set(value):
 		tint = value
+		if halo != null:
+			halo.modulate = Color(value, HALO_ALPHA)
 		queue_redraw()
 
 
 ## Adds a screen named [param screen_name] over [param glass] (piece px) of [param prop], lit
-## [param color]. Returns it so the caller can change its tint later.
+## [param color], with its halo. Returns it so the caller can change its tint later.
 static func attach(prop: Sprite2D, screen_name: String, glass_rect: Rect2, color: Color) -> PropScreen:
 	var screen: PropScreen = PropScreen.new()
 	screen.name = screen_name
 	screen.glass = glass_rect
-	screen.tint = color
 	prop.add_child(screen)
+	var rect: Rect2 = screen.local_glass()
+	screen.halo = RoomDepth.make_glow(color, rect.size * HALO_SPREAD, HALO_ALPHA)
+	screen.halo.name = "Halo"
+	screen.halo.position = rect.get_center()
+	# A child draws after its parent's _draw, so the halo also lifts the glass and its rows.
+	screen.add_child(screen.halo)
+	screen.tint = color
 	return screen
 
 
