@@ -157,10 +157,14 @@ static func wrap_world_label(label: Label, base: int, room: float = INF, font_px
 	var px: int = font_px if font_px > 0 else world_px(base)
 	label.add_theme_font_size_override(&"font_size", px)
 	var font: Font = label.get_theme_font(&"font")
-	# The rows are worked out from the name as it is drawn: the label translates its English text itself
-	# (auto-translate), so measuring label.text would break a translated name by its English length.
+	# The rows are worked out from the name as it is drawn (the label translates its English text itself),
+	# and no row may be wider than the shorter of the drawn and the English name at 100%: a longer
+	# translation breaks onto rows to keep the English plate's footprint, which the rooms were laid out
+	# for (Spanish RELÉ DE REFRIGERANTE in one row reached the view's edge at the corridor's start and
+	# faded out). For English both are the same name, so its plates are unchanged.
 	var shown: String = String(label.atr(label.text))
-	var limit: float = font.get_string_size(shown, HORIZONTAL_ALIGNMENT_LEFT, -1.0, base).x * WORLD_ROW_GROWTH
+	var one_row: float = minf(font.get_string_size(shown, HORIZONTAL_ALIGNMENT_LEFT, -1.0, base).x, font.get_string_size(label.text, HORIZONTAL_ALIGNMENT_LEFT, -1.0, base).x)
+	var limit: float = one_row * WORLD_ROW_GROWTH
 	# A neighbour close by (part_world_labels) leaves less: the plate's margins and the spare pixel below
 	# come out of the room it gives.
 	limit = minf(limit, room - label.get_theme_stylebox(&"normal").get_minimum_size().x - 2.0)
