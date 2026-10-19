@@ -1783,7 +1783,7 @@ msgstr "%s: arma el disyuntor."
 #. i18n: speaker=hint engineer=you
 #: scripts/main.gd:5151
 msgid "The relay is dark. Return to the breaker first."
-msgstr "El relé no tiene luz. Primero vuelve al disyuntor."
+msgstr "El relé no tiene energía. Primero vuelve al disyuntor."
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: Hint bar (14 px, about 526 px wide on a keyboard and 488 px on touch; wraps). MANUAL BYPASS is a station plate: BYPASS MANUAL (the plate is not in the template yet). WOLF is he.
