@@ -176,6 +176,7 @@ Changes merged after 0.15.0. They become the next version when it is cut.
 - The Polish and Russian files are written fresh by Claude with a note on every line, back-translated by Codex and passed through every translation check.
 - A new translation check binds Polish and Russian one-letter words such as *w* and *в* to the next word, so none is left at a row's end.
 - An independent review's fixes for Polish and Russian: WOLF's relay lines say what the English says, the Russian breaker switches on instead of tripping, and the spent plates read as used up.
+- A second review's fixes: the Polish title credit keeps the word *development*, so the concept stays Nathanial's; Polish times the tank drop with *wyczuć moment*, not computer slang; Russian WOLF names the sentry where *он* could mean the console.
 - The Russian checks keep names, tools, web addresses and key labels in Latin letters, skip the credits' formatting tags, and know *сначала*, *зеркала*, *завал* and *отмена* are not past tenses.
 - i18n_test fails any text that does not fit its room in every language and in pseudo-English (30% longer), the answer rows and the end card included; no overflow is let off by name.
 - text_boxes_test runs its station-name, touch, top card and prompt overlap checks in every language and in pseudo-English.
