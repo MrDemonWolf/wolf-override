@@ -340,7 +340,7 @@ msgstr "ХОД РАЗРАБОТКИ"
 #. i18n: speaker=ui engineer=you
 #: scenes/main.tscn
 msgid "Source-build changes by date, not releases. Scroll with the wheel, drag the text or use up/down."
-msgstr "Изменения сборки по датам, не релизы. Листай колесом, тяни текст или стрелками."
+msgstr "Изменения сборки по датам, не релизы. Листай колесом, тяни текст или жми стрелки."
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: Tooltip of the changelog's online button. The address stays as written.
@@ -1161,18 +1161,18 @@ msgid "LINE"
 msgstr "ЛИНИЯ"
 
 # machine-translated by Claude (Anthropic), unreviewed
-#. TRANSLATORS: Station plate (12-13 px label on a machine). ALL CAPS, as short as possible. The junction's breaker after the blast used the line up. Cut to fit: ОТРАБОТАН ran into RELIEF VENT, so ВЫКЛ. (off).
+#. TRANSLATORS: Station plate (12-13 px label on a machine). ALL CAPS, as short as possible. The junction's breaker after the blast used the line up. Cut to fit: ОТРАБОТАН ran into RELIEF VENT, so ИСП. (used; ВЫКЛ., off, would invite switching it back on).
 #. i18n: speaker=ui
 #: scripts/junction_room.gd:1531
 msgid "BREAKER USED"
-msgstr "РУБИЛЬНИК ВЫКЛ."
+msgstr "РУБИЛЬНИК ИСП."
 
 # machine-translated by Claude (Anthropic), unreviewed
-#. TRANSLATORS: Station plate (12-13 px label on a machine). ALL CAPS, as short as possible. The junction's valve after the blast used the line up. Cut to fit: ВЕНТИЛЬ ОТРАБОТАН and ВЕНТИЛЬ ПУСТ ran into DOOR DOWN, so ВЕНТ. ПУСТ (the line is spent).
+#. TRANSLATORS: Station plate (12-13 px label on a machine). ALL CAPS, as short as possible. The junction's valve after the blast used the line up. Cut to fit: ВЕНТИЛЬ ОТРАБОТАН and ВЕНТИЛЬ ПУСТ ran into DOOR DOWN, so ВЕНТИЛЬ ИСП. (used; ВЕНТ. could read as the relief vent).
 #. i18n: speaker=ui
 #: scripts/junction_room.gd:1533
 msgid "VALVE USED"
-msgstr "ВЕНТ. ПУСТ"
+msgstr "ВЕНТИЛЬ ИСП."
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: Station plate (12-13 px label on a machine). ALL CAPS, as short as possible. The junction's exit hatch, open.
@@ -1617,7 +1617,7 @@ msgstr "Метка времени зеркала уже сохранена. Вы
 #. TRANSLATORS: i18n: story speaker=WOLF
 #: scripts/main.gd:2837
 msgid "I found the mirror index. We can use my readout or your maintenance port."
-msgstr "Я нашёл индекс зеркала. Можно взять данные с моего дисплея или твой сервисный порт."
+msgstr "Я нашёл индекс зеркала. Можно взять данные с моего дисплея или через твой сервисный порт."
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: i18n: story speaker=narrator
@@ -1688,7 +1688,7 @@ msgstr "Сохранить не удалось. Используй станци�
 #. TRANSLATORS: i18n: story speaker=narrator
 #: scripts/main.gd:3222
 msgid "The overload breaker catches and the line starts to build. If the LINE gauge peaks, the relief vent lets go."
-msgstr "Рубильник перегрузки срабатывает, и давление в линии начинает расти. Если стрелка «ЛИНИЯ» дойдёт до предела, сработает сбросной клапан."
+msgstr "Рубильник перегрузки включается, и давление в линии начинает расти. Если стрелка «ЛИНИЯ» дойдёт до предела, сработает сбросной клапан."
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: i18n: story speaker=narrator
@@ -2680,7 +2680,7 @@ msgid ""
 "The breaker catches.\n"
 "Blue light fills the coolant relay."
 msgstr ""
-"Рубильник срабатывает.\n"
+"Рубильник включается.\n"
 "Синий свет заливает реле хладагента."
 
 # machine-translated by Claude (Anthropic), unreviewed
@@ -2856,7 +2856,7 @@ msgstr ""
 #. TRANSLATORS: i18n: story speaker=narrator
 #: scripts/story_text.gd:144
 msgid "Locked out until the sentry is down."
-msgstr "Заблокировано, пока страж не повержен."
+msgstr "Заблокировано, пока страж не будет повержен."
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: i18n: story speaker=narrator
@@ -2907,14 +2907,14 @@ msgstr "Держись позади, я рассчитаю момент."
 #. i18n: story speaker=WOLF engineer=you
 #: scripts/story_text.gd:163
 msgid "You told me the truth at the relay. I'll draw it onto the mark and keep clear of the tank. Drop it when it stops."
-msgstr "Спасибо за правду у реле. Я уведу его на отметку и не подойду к баку. Сбрось бак, когда он встанет."
+msgstr "У реле я услышал правду — от тебя. Я уведу его на отметку и не подойду к баку. Сбрось бак, когда страж встанет."
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: WOLF to the engineer, who pressed him at the relay without warning. Avoid a form that shows the engineer's gender ("you'd have sent me"): rephrase.
 #. i18n: story speaker=WOLF engineer=you
 #: scripts/story_text.gd:166
 msgid "At the relay you'd have sent me in blind. I won't walk into its sights. Time the drop from the release; it crosses the mark on every pass."
-msgstr "У реле меня чуть не отправили вслепую. Я не полезу под его прицел. Рассчитай сброс от пульта; он проходит отметку на каждом круге."
+msgstr "У реле я пошёл бы вслепую — из-за тебя. Я не полезу под его прицел. Рассчитай сброс от пульта; он проходит отметку на каждом круге."
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: WOLF, when the engineer will time the drop alone.
@@ -2988,14 +2988,14 @@ msgstr ""
 #. i18n: story speaker=WOLF
 #: scripts/story_text.gd:186
 msgid "I'm out. I'll hold back."
-msgstr "Я пас. Держусь позади."
+msgstr "Я отхожу. Держусь позади."
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: WOLF breaks off after a missed drop, already past the sentry.
 #. i18n: story speaker=WOLF
 #: scripts/story_text.gd:189
 msgid "I'm out."
-msgstr "Я пас."
+msgstr "Я отхожу."
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: i18n: story speaker=narrator
