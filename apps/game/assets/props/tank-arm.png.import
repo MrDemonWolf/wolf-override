@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://43d2qckwdhvi"
-path="res://.godot/imported/junction-tank-arm.png-e199809f8fbd368bedd47e51a08bffd8.ctex"
+uid="uid://b8d3rpa0m6ucm"
+path="res://.godot/imported/tank-arm.png-035f9a8160bb01ab40317e295ada77c7.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/props/junction-tank-arm.png"
-dest_files=["res://.godot/imported/junction-tank-arm.png-e199809f8fbd368bedd47e51a08bffd8.ctex"]
+source_file="res://assets/props/tank-arm.png"
+dest_files=["res://.godot/imported/tank-arm.png-035f9a8160bb01ab40317e295ada77c7.ctex"]
 
 [params]
 

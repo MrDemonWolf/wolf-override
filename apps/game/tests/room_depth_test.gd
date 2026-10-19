@@ -51,6 +51,7 @@ func _run() -> void:
 	await _check_exit_view_edge(junction, camera, half_play, touch_y)
 	# Every station stands on the floor, as tall as the art it replaced.
 	var floor_props: Dictionary = {
+		"purge display": game.get_node("PurgeTerminalArt"),
 		"breaker": game.get_node("BreakerArt"),
 		"relay": game.get_node("RelayArt"),
 		"safe point": game.get_node("CheckpointArt"),
@@ -65,6 +66,14 @@ func _run() -> void:
 	for prop_name: String in floor_props:
 		var prop: Sprite2D = floor_props[prop_name]
 		_expect(is_equal_approx(snappedf(_bottom(prop), 0.5), 440.0), "the %s's base is on the floor (y 440, got %.2f)" % [prop_name, _bottom(prop)])
+	# The corridor's purge display and the Records PURGE QUEUE are both 1.80 m consoles on the walk line,
+	# so they are drawn the same height (72 world px at 40 px per metre).
+	var display_height: float = RoomDepth.prop_bounds(floor_props["purge display"]).size.y
+	var queue_height: float = RoomDepth.prop_bounds(floor_props["purge queue"]).size.y
+	_expect(absf(display_height - queue_height) < 0.5, "the purge display is as tall as the purge queue (%.1f and %.1f px)" % [display_height, queue_height])
+	# The Records stations' named sizes are their pieces' own (their half widths are read from them).
+	for station: Array in [[records.get_node("PurgeArt"), RecordsRoom.PURGE_SIZE, "PURGE QUEUE"], [records.get_node("MirrorArt"), RecordsRoom.MIRROR_SIZE, "MIRROR PORT"]]:
+		_expect(RoomDepth.prop_region(station[0]).size == station[1], "the %s's named size is its piece's (%s)" % [station[2], RoomDepth.prop_region(station[0]).size])
 	var door: Sprite2D = game.get_node("Door/Visual/DoorArt") as Sprite2D
 	# The corridor's curtain stands across the corridor in the cross-wall's turned face: it crosses the
 	# walk line (y 440) at the collision face, and its art ends at its near-jamb corner, in front of it.
@@ -84,7 +93,8 @@ func _run() -> void:
 	_expect(absf(vent.position.x - PressureLine.VENT_GRATE_MIN_X) < 0.01 and absf(vent.end.x - PressureLine.VENT_GRATE_MAX_X) < 0.01, "the relief vent art spans exactly the grate's hurtbox (%s)" % vent)
 	var tank: Rect2 = _global_rect(junction.tank)
 	var arm: Rect2 = _global_rect(junction.arm_art)
-	_expect(absf(tank.position.y - arm.end.y) < 0.01 and absf(tank.get_center().x - DropArm.MARK_X) < 0.01, "the hung tank sits on the arm's cut line, centred over the mark")
+	var shackle: Vector2 = junction.global_position + RoomDepth.prop_point(junction.arm_art, JunctionRoom.ARM_SHACKLE)
+	_expect(absf(shackle.x - DropArm.MARK_X) < 0.01 and absf(arm.end.y - shackle.y) < 0.01 and tank.position.y > shackle.y and absf(tank.get_center().x - DropArm.MARK_X) < 0.01, "the hung tank hangs centred over the mark below the arm's shackle, on its cable (shackle %s, tank top %.1f)" % [shackle, tank.position.y])
 	_check_records_doors(records)
 	_check_characters(game)
 	game.queue_free()

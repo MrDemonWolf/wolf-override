@@ -4,8 +4,11 @@ class_name RecordsRoom
 const RECORDS_FAR: Texture2D = preload("res://assets/rooms/records-far.png")
 const RECORDS_MID: Texture2D = preload("res://assets/rooms/records-mid.png")
 const RECORDS_NEAR: Texture2D = preload("res://assets/rooms/records-near.png")
+## The two stations and the security container are whole pieces of the approved art set (2026-10-16),
+## painted with their screens and lights dark: the screens (PropScreen) and status lights are drawn here.
 const PURGE_QUEUE: Texture2D = preload("res://assets/props/records-purge-queue.png")
 const MIRROR_PORT: Texture2D = preload("res://assets/props/records-mirror-port.png")
+const CONTAINER: Texture2D = preload("res://assets/props/records-container.png")
 ## The Records doors (design: 1cf8d73:docs/research-2026-10/sources/doors-2026-10-14/records/). Each end of the
 ## room is a 300 mm cast cross-wall turned 17 degrees across the walkway, like the corridor's, with a
 ## 3'0" x 7'0" steel secure-area door in it: the entry on the left (the way in from the corridor
@@ -13,10 +16,10 @@ const MIRROR_PORT: Texture2D = preload("res://assets/props/records-mirror-port.p
 ## line passage toward Archive, painted into the far plate behind its doorway). Each leaf swings into
 ## the room on its hinges at the far jamb (SwingLeaf), opened and closed by a concealed operator in its
 ## header; nothing fades. The first copy is secured in the GSA security container left of the exit,
-## not at the door. Every piece is a region of one lossless atlas, drawn by two AtlasMesh nodes (one
-## draw call each): everything behind the walk line right after the mid plate (both walls with their
-## doorways transparent, the container, both leaves, and the entry's near column, which nobody passes
-## behind), and the exit's near column and stub over the actors. Each column carries a guarded status
+## not at the door (its own whole piece, CONTAINER). Every door piece is a region of one lossless atlas,
+## drawn by two AtlasMesh nodes (one draw call each): everything behind the walk line right after the
+## mid plate (both walls with their doorways transparent, both leaves, and the entry's near column,
+## which nobody passes behind), and the exit's near column and stub over the actors. Each column carries a guarded status
 ## lamp whose glass is a live-tinted quad. Positions are each piece's world top-left (placement.json).
 const DOORS_ATLAS: Texture2D = preload("res://assets/props/records-doors-atlas.png")
 ## Each leaf's fill (SwingLeaf.fill): the ambient and the broad floor bounce, which reach every face the
@@ -41,8 +44,6 @@ const ENTRY_COLUMN_REGION: Rect2 = Rect2(49.0, 2.0, 44.0, 613.0)
 const ENTRY_COLUMN_AT: Vector2 = Vector2(41.5, 140.0)
 const ENTRY_STUB_REGION: Rect2 = Rect2(2.0, 617.0, 247.0, 91.0)
 const ENTRY_STUB_AT: Vector2 = Vector2(-40.0, 438.5)
-const CONTAINER_REGION: Rect2 = Rect2(784.0, 2.0, 88.0, 134.0)
-const CONTAINER_AT: Vector2 = Vector2(775.0, 375.0)
 const LENS_REGION: Rect2 = Rect2(481.0, 617.0, 16.0, 20.0)
 const LEAF_ROOM_REGION: Rect2 = Rect2(552.0, 2.0, 73.0, 171.0)
 const LEAF_OUT_EXIT_REGION: Rect2 = Rect2(627.0, 2.0, 73.0, 171.0)
@@ -77,7 +78,14 @@ const ENTRY_AXIS_U: Vector3 = Vector3(0.291329, 0.0, 0.956623)
 const ENTRY_AXIS_N: Vector3 = Vector3(-0.956623, 0.0, 0.291329)
 ## The GSA Class 5 security container (0.53 x 1.486 x 0.851 m) where the first copy is secured: the
 ## centre of its front, and its drawn body (side panel to front right edge) for WOLF to keep off.
+## The piece (86 x 146 px at 2 px per world px: 43 x 73 world px) is a wheeled steel cabinet with a lid
+## and a handle, painted without the Class 5's dial or lock (the art set's waste/records container), so it
+## reads more as a bin than a safe; whether to repaint it is an open question for Nathanial. It is drawn
+## centred on CONTAINER_X with its base CONTAINER_BASE_Y, where the earlier container's base stood (its
+## wheels on the deck just in front of the walk line), so CONTAINER_SPAN still holds.
 const CONTAINER_X: float = 797.0
+const CONTAINER_SCALE: float = 0.5
+const CONTAINER_BASE_Y: float = 442.0
 const CONTAINER_SPAN: Vector2 = Vector2(776.0, 807.0)
 ## A low-energy operator swings the exit's leaf open: ANSI/BHMA A156.19 asks 3 s or longer to
 ## backcheck or 80 degrees, so 90 degrees takes this long. The entry's closer brings its leaf shut
@@ -85,15 +93,34 @@ const CONTAINER_SPAN: Vector2 = Vector2(776.0, 807.0)
 const EXIT_SWING_SECONDS: float = 3.5
 ## The source row where the mid plate's walkway (its pillar and machine bases) meets the floor.
 const WALKWAY_Y: float = 742.0
-## Each prop is cut to its painted outline and scaled to the height of the art it replaced
-## (purge 111, mirror 111 px); its base sits on the floor.
-const PURGE_REGION: Rect2 = Rect2(51.0, 54.0, 417.0, 409.0)
-const PURGE_SCALE: float = 0.274
-const MIRROR_REGION: Rect2 = Rect2(69.0, 31.0, 373.0, 468.0)
-const MIRROR_SCALE: float = 0.239
-## The status lights sit on the bar under the purge screen and under the mirror's screen.
-const PURGE_LIGHT: Rect2 = Rect2(163.0, 360.5, 16.0, 4.0)
-const MIRROR_LIGHT: Rect2 = Rect2(511.0, 348.0, 20.0, 4.0)
+## Each station is one whole piece at its real size (the art set's PIECES.md section 5c), its base on
+## the floor: the PURGE QUEUE 447 x 442 px at 6.135 px per world px (72.9 x 72 world px, 1.82 x 1.80 m;
+## it was drawn 2.8 m tall) and the MIRROR PORT, a 42U equipment rack, 352 x 443 px at 5.54 px per world
+## px (63.5 x 80 world px, 1.59 x 2.0 m; it was 2.77 m).
+## Each piece's own pixel size (piece px, records-purge-queue.png and records-mirror-port.png, as the
+## asset register lists them), centre x (world px) and scale (world px per piece px).
+const PURGE_SIZE: Vector2 = Vector2(447.0, 442.0)
+const PURGE_X: float = 190.0
+const PURGE_SCALE: float = 1.0 / 6.135
+const MIRROR_SIZE: Vector2 = Vector2(352.0, 443.0)
+const MIRROR_X: float = 520.0
+const MIRROR_SCALE: float = 1.0 / 5.5402
+## Half each station's drawn width (world px), for Main's station table.
+const PURGE_HALF_WIDTH: float = PURGE_SIZE.x * PURGE_SCALE * 0.5
+const MIRROR_HALF_WIDTH: float = MIRROR_SIZE.x * MIRROR_SCALE * 0.5
+## The screens' glass and the status lights, in piece px (measured on the pieces): the purge light is
+## the slot in the bar under its screen, the mirror's the indicator window between its two drive bays.
+const PURGE_SCREEN: Rect2 = Rect2(86.0, 28.0, 160.0, 96.0)
+const PURGE_LIGHT: Rect2 = Rect2(119.0, 133.0, 61.0, 7.0)
+const MIRROR_SCREEN: Rect2 = Rect2(125.0, 12.0, 109.0, 64.0)
+const MIRROR_LIGHT: Rect2 = Rect2(172.0, 183.0, 7.0, 19.0)
+## The purge order's red and the mirror's cyan: each station's screen and status light until its trace
+## is copied, then both go green (the corridor's purge display shows the same order in PURGE_RED).
+const PURGE_RED: Color = Color("#d86b70")
+const MIRROR_CYAN: Color = Color("#73b9d2")
+## The two station names' row (their top edge): just over the taller station, the MIRROR PORT (its top
+## at y 360), so each name reads as its machine's now that both stand at their real size.
+const STATION_LABEL_Y: float = 340.0
 ## The lights each leaf sees, as they light the wall and reveal round it (rdesign.py), in the leaf's own
 ## exposure: [position (m), colour * intensity, reach (m), down exponent, wrap, fill]. Fix round 4 (review r4,
 ## M1): the door light is the design's own again (reach 1.4 m, down 2.0) as a true Lambert source, so the
@@ -135,14 +162,19 @@ var station_labels: Array[Label] = []
 var depth: RoomDepth
 var purge_glow: Sprite2D
 var mirror_glow: Sprite2D
+var purge_art: Sprite2D
+var mirror_art: Sprite2D
+var purge_screen: PropScreen
+var mirror_screen: PropScreen
+## The security container's sprite (drawn behind the walk line with the door walls, before the leaves).
+var container_art: Sprite2D
 var floor_reflections: Array[FloorReflection] = []
 var exit_leaf: SwingLeaf
 var entry_leaf: SwingLeaf
-## The door pieces behind the walk line (walls, container, leaves, the entry's front) and the exit's
+## The door pieces behind the walk line (walls, leaves, the entry's front) and the exit's
 ## front over the actors, each one draw call; the lamps' glass quads in them take the live tint.
 var plate_mesh: AtlasMesh
 var front_mesh: AtlasMesh
-var container_quad: int = -1
 var exit_lamp_quad: int = -1
 var entry_lamp_quad: int = -1
 ## The shut leaves stop whoever walks into them: the exit until the first copy is secured, the entry
@@ -169,26 +201,28 @@ func _ready() -> void:
 	depth.near_left_edge = false
 	depth.near_right_edge = false
 	add_child(depth)
-	var purge_art: Sprite2D = RoomDepth.make_prop("PurgeArt", PURGE_QUEUE, PURGE_REGION, PURGE_SCALE, 190.0)
-	var mirror_art: Sprite2D = RoomDepth.make_prop("MirrorArt", MIRROR_PORT, MIRROR_REGION, MIRROR_SCALE, 520.0)
+	purge_art = RoomDepth.make_prop("PurgeArt", PURGE_QUEUE, PURGE_SCALE, PURGE_X)
+	mirror_art = RoomDepth.make_prop("MirrorArt", MIRROR_PORT, MIRROR_SCALE, MIRROR_X)
 	for prop: Sprite2D in [purge_art, mirror_art]:
 		# One step under this node's own drawing, so the status lights drawn in _draw() sit on the art.
 		prop.z_index = -1
 		add_child(prop)
 		floor_reflections.append(FloorReflection.attach(prop))
+	purge_screen = PropScreen.attach(purge_art, "PurgeScreen", PURGE_SCREEN, PURGE_RED)
+	mirror_screen = PropScreen.attach(mirror_art, "MirrorScreen", MIRROR_SCREEN, MIRROR_CYAN)
 	# The leaves swing on their hinges (SwingLeaf, lit per vertex); the room's door meshes draw them.
 	# Each leaf's surface closer works a regular arm to a shoe on its head, on the room side.
 	exit_leaf = SwingLeaf.make("ExitLeaf", DOORS_ATLAS, LEAF_ROOM_REGION, LEAF_OUT_EXIT_REGION, LEAF_EDGE_REGION, EXIT_HINGE, EXIT_AXIS_U, EXIT_AXIS_N, EXIT_LEAF_LIGHTS, EXIT_LEAF_FILL, LEAF_ARM_REGION)
 	entry_leaf = SwingLeaf.make("EntryLeaf", DOORS_ATLAS, LEAF_ROOM_REGION, LEAF_OUT_ENTRY_REGION, LEAF_EDGE_REGION, ENTRY_HINGE, ENTRY_AXIS_U, ENTRY_AXIS_N, ENTRY_LEAF_LIGHTS, ENTRY_LEAF_FILL, LEAF_ARM_REGION)
 	# Everything behind the walk line, in one draw call right after the mid plate: the two cross-walls
-	# (their doorways transparent, so the passage and the vestibule in the far plate show through), the
-	# security container in front of the exit's wall, both leaves, and the entry's near column, lamp
-	# and stub, which nobody ever passes behind (the entry stops the engineer and WOLF short of them).
+	# (their doorways transparent, so the passage and the vestibule in the far plate show through), both
+	# leaves, and the entry's near column, lamp and stub, which nobody ever passes behind (the entry stops
+	# the engineer and WOLF short of them). The security container stands in front of the exit's wall,
+	# its own sprite right after this mesh at the same depth (the open exit leaf stops well clear of it).
 	# Contact shadows and light are painted: nothing here casts a runtime reflection.
 	plate_mesh = AtlasMesh.make(DOORS_ATLAS, "DoorPlates", RoomDepth.Z_MID)
 	plate_mesh.add_quad(EXIT_WALL_REGION, EXIT_WALL_AT, DOORS_SCALE)
 	plate_mesh.add_quad(ENTRY_WALL_REGION, ENTRY_WALL_AT, DOORS_SCALE)
-	container_quad = plate_mesh.add_quad(CONTAINER_REGION, CONTAINER_AT, DOORS_SCALE)
 	for leaf: SwingLeaf in [exit_leaf, entry_leaf]:
 		add_child(leaf)
 		plate_mesh.add_leaf(leaf)
@@ -197,6 +231,11 @@ func _ready() -> void:
 	plate_mesh.add_quad(ENTRY_COLUMN_REGION, ENTRY_COLUMN_AT, DOORS_SCALE)
 	plate_mesh.add_quad(ENTRY_STUB_REGION, ENTRY_STUB_AT, DOORS_SCALE)
 	depth.add_child(plate_mesh)
+	container_art = RoomDepth.make_prop("ContainerArt", CONTAINER, CONTAINER_SCALE, CONTAINER_X, CONTAINER_BASE_Y)
+	# On the mesh's own absolute layer (AtlasMesh.make), so it sorts against the actors the same way.
+	container_art.z_index = RoomDepth.Z_MID
+	container_art.z_as_relative = false
+	depth.add_child(container_art)
 	# The exit's near column, lamp and stub draw over the actors (they walk out behind them), always
 	# opaque, in one draw call.
 	front_mesh = AtlasMesh.make(DOORS_ATLAS, "DoorFronts", RoomDepth.Z_NEAR)
@@ -207,10 +246,10 @@ func _ready() -> void:
 	# Each shut leaf stops whoever walks into it at its room face; refresh_state() enables the bodies.
 	exit_door_shape = SwingLeaf.make_body(self, "ExitDoor", EXIT_DOOR_X, 1.0)
 	entry_door_shape = SwingLeaf.make_body(self, "EntryDoor", ENTRY_DOOR_X, -1.0)
-	purge_glow = _add_glow("PurgeGlow", PURGE_LIGHT.get_center())
-	mirror_glow = _add_glow("MirrorGlow", MIRROR_LIGHT.get_center())
-	purge_label = _add_station_label("PURGE QUEUE", 190.0, Palette.LABEL_ALERT)
-	mirror_label = _add_station_label("MIRROR PORT", 520.0, MIRROR_TEXT)
+	purge_glow = _add_glow("PurgeGlow", RoomDepth.prop_rect(purge_art, PURGE_LIGHT).get_center())
+	mirror_glow = _add_glow("MirrorGlow", RoomDepth.prop_rect(mirror_art, MIRROR_LIGHT).get_center())
+	purge_label = _add_station_label("PURGE QUEUE", PURGE_X, Palette.LABEL_ALERT, STATION_LABEL_Y)
+	mirror_label = _add_station_label("MIRROR PORT", MIRROR_X, MIRROR_TEXT, STATION_LABEL_Y)
 	# The exit's name sits on the cross-wall over its door, left of the near column (which draws over
 	# the actors and would cut it; captions stay under the actors).
 	_add_station_label("EXIT", EXIT_LABEL_X, Palette.EXIT_GREEN, 276.0)
@@ -238,9 +277,9 @@ func entry_lamp_color() -> Color:
 	return plate_mesh.get_color(entry_lamp_quad)
 
 
-## Where the security container's art is drawn (world).
+## Where the security container's art is drawn (in this room, which sits at the world origin).
 func container_rect() -> Rect2:
-	return plate_mesh.quad_rect(container_quad)
+	return RoomDepth.prop_bounds(container_art)
 
 
 ## An additive glow over a drawn machine light; refresh_state() tints it with the light's colour. It
@@ -306,6 +345,8 @@ func refresh_state() -> void:
 	mirror_label.add_theme_color_override("font_color", Palette.GREEN if mirror_trace_preserved else MIRROR_TEXT)
 	purge_glow.modulate = Color(_purge_light_color(), 0.6)
 	mirror_glow.modulate = Color(_mirror_light_color(), 0.6)
+	purge_screen.tint = _purge_light_color()
+	mirror_screen.tint = _mirror_light_color()
 	for label: Label in station_labels:
 		_fit_label(label)
 	if exit_tween == null or not exit_tween.is_running():
@@ -353,13 +394,13 @@ func _draw() -> void:
 
 
 func _draw_machine_lights() -> void:
-	draw_rect(PURGE_LIGHT, _purge_light_color())
-	draw_rect(MIRROR_LIGHT, _mirror_light_color())
+	draw_rect(RoomDepth.prop_rect(purge_art, PURGE_LIGHT), _purge_light_color())
+	draw_rect(RoomDepth.prop_rect(mirror_art, MIRROR_LIGHT), _mirror_light_color())
 
 
 func _purge_light_color() -> Color:
-	return Palette.GREEN if purge_trace_preserved else Color("#d86b70")
+	return Palette.GREEN if purge_trace_preserved else PURGE_RED
 
 
 func _mirror_light_color() -> Color:
-	return Palette.GREEN if mirror_trace_preserved else Color("#73b9d2")
+	return Palette.GREEN if mirror_trace_preserved else MIRROR_CYAN

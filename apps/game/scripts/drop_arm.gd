@@ -13,7 +13,7 @@ extends RefCounted
 
 const MARK_X: float = 700.0
 ## Half the floor brackets, which are drawn this wide either side of the mark: the tank's own
-## footprint (JunctionRoom.TANK_SIZE.x is 46.4 px), so what lands inside them is under the tank.
+## footprint (JunctionRoom.TANK_SIZE.x is 46 px), so what lands inside them is under the tank.
 const HIT_RANGE: float = 24.0
 ## How much of the sentry's body must be under the tank's footprint for a graze to count: a quarter of
 ## it (half of SentryBrain.HALF_WIDTH), 13 px.

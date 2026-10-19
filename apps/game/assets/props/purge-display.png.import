@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://dddmqytbgffwq"
-path="res://.godot/imported/junction-bolt-panel.png-6f6a14ecaf047c2a2aac152bbfd49959.ctex"
+uid="uid://dckh8x3jhgm1s"
+path="res://.godot/imported/purge-display.png-e332954685575c7ef102ca64a5ef2e67.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/props/junction-bolt-panel.png"
-dest_files=["res://.godot/imported/junction-bolt-panel.png-6f6a14ecaf047c2a2aac152bbfd49959.ctex"]
+source_file="res://assets/props/purge-display.png"
+dest_files=["res://.godot/imported/purge-display.png-e332954685575c7ef102ca64a5ef2e67.ctex"]
 
 [params]
 

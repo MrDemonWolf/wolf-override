@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://dxfqtnnuxexxq"
-path="res://.godot/imported/corridor-purge-display.png-f68142f6cf36d286636255eaf046cda8.ctex"
+uid="uid://bl0kyd0wd8jul"
+path="res://.godot/imported/valve-body.png-15eb68910db06f17542a6ee5ff731184.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/props/corridor-purge-display.png"
-dest_files=["res://.godot/imported/corridor-purge-display.png-f68142f6cf36d286636255eaf046cda8.ctex"]
+source_file="res://assets/props/valve-body.png"
+dest_files=["res://.godot/imported/valve-body.png-15eb68910db06f17542a6ee5ff731184.ctex"]
 
 [params]
 

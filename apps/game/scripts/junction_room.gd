@@ -19,20 +19,25 @@ signal hatch_opened
 const JUNCTION_FAR: Texture2D = preload("res://assets/rooms/junction-far.png")
 const JUNCTION_MID: Texture2D = preload("res://assets/rooms/junction-mid.png")
 const JUNCTION_NEAR: Texture2D = preload("res://assets/rooms/junction-near.png")
-const BREAKER_PROP: Texture2D = preload("res://assets/props/corridor-breaker.png")
-const VALVE_PROP: Texture2D = preload("res://assets/props/junction-valve.png")
+## The station props are whole pieces of the approved art set (2026-10-16), each painted with its lights
+## and screens dark, so every lamp, gauge face and glow is drawn here over it.
+const BREAKER_PROP: Texture2D = preload("res://assets/props/breaker.png")
+## The VALVE's pump body with its wheel shaft bare: the handwheel (BypassHandle.HANDWHEEL, the same
+## piece as the corridor's MANUAL BYPASS) is its own sprite on the shaft, so only the wheel turns.
+const VALVE_PROP: Texture2D = preload("res://assets/props/valve-body.png")
 ## The blast door: a hinged steel leaf (2.3 x 2.6 m, 0.30 m) in a 0.40 m cast-concrete cross-wall that
 ## stands ACROSS the walkway, its face turned 17 degrees to the camera like the corridor's door end.
 ## Every piece is one region of one lossless atlas (JunctionDoorLayout, generated from the design's
 ## placement.json). Under the actors: the empty doorway (blown), the shut or breaking leaf, the wall
 ## with the doorway at alpha 0, the blast damage, the TANK RELEASE bay. Over them: the near column
 ## with the status lamp, the wall's stub across the deck and, once blown, the leaf lying in the lane.
-const VENT_PROP: Texture2D = preload("res://assets/props/junction-relief-vent.png")
-const ARM_PROP: Texture2D = preload("res://assets/props/junction-tank-arm.png")
-## The tank cut out of the tank-arm image (rows 361..743), so it can fall away from the arm.
-const TANK_PROP: Texture2D = preload("res://assets/props/junction-tank.png")
-const ARM_PANEL_PROP: Texture2D = preload("res://assets/props/junction-arm-panel.png")
-const BOLT_PANEL_PROP: Texture2D = preload("res://assets/props/junction-bolt-panel.png")
+const VENT_PROP: Texture2D = preload("res://assets/props/relief-vent.png")
+## The overhead arm: its ceiling plate, the arm, the winch drum and the shackle the tank's cable hangs
+## from (the cable itself is drawn, _draw_arm). The tank is its own piece, so it can fall away.
+const ARM_PROP: Texture2D = preload("res://assets/props/tank-arm.png")
+const TANK_PROP: Texture2D = preload("res://assets/props/coolant-tank.png")
+const ARM_PANEL_PROP: Texture2D = preload("res://assets/props/arm-panel.png")
+const BOLT_PANEL_PROP: Texture2D = preload("res://assets/props/bolt-panel.png")
 ## The entry (review r1, M5; design: 1cf8d73:docs/research-2026-10/sources/doors-2026-10-14/junction-entry/): the
 ## engineer comes in from the service line passage the Records exit opens on, through a 3'0" x 7'0"
 ## hollow-metal steel door in a 300 mm cast cross-wall closing the room's left end, turned 17 degrees
@@ -115,17 +120,26 @@ const FAR_DROP: float = 27.0
 ## The near plate's pipe column is 100 px wide in the room (source column 200) against the
 ## corridor's 57, so its strips hang that much further past the room edges.
 const NEAR_OVERHANG: float = RoomDepth.NEAR_OVERHANG + 43.0
-## Each prop is cut to its painted outline (source pixels) and scaled; its base sits on the floor.
-## The breaker uses the corridor's cut and scale (see main.tscn), so both rooms show the same machine.
-const BREAKER_REGION: Rect2 = Rect2(81.0, 46.0, 342.0, 433.0)
-const BREAKER_SCALE: float = 0.225
-const VALVE_REGION: Rect2 = Rect2(3.0, 11.0, 506.0, 490.0)
-const VALVE_SCALE: float = 0.2
-## The painted wheel (centre and rim radius) and gauge face on the valve image, in source pixels.
-const VALVE_WHEEL_CENTRE: Vector2 = Vector2(255.0, 272.0)
-const VALVE_WHEEL_RADIUS: float = 92.0
-const VALVE_DIAL_CENTRE: Vector2 = Vector2(255.0, 64.0)
-const VALVE_DIAL_RADIUS: float = 37.0
+## Each prop is one whole piece cut to its painted outline; its base sits on the floor. Sizes are the
+## pieces' own pixel sizes (assets/manifest.json) and scales are world px per piece px: 1 / the piece's
+## density, or for the real-size pieces (the art set's PIECES.md section 5c) its real-size scale.
+## The breaker is drawn the same in the corridor (main.tscn BreakerArt), so both rooms show one machine:
+## 303 x 388 px at 4 px per world px (75.75 x 97 world px, 1.9 x 2.4 m).
+const BREAKER_SIZE: Vector2 = Vector2(303.0, 388.0)
+const BREAKER_SCALE: float = 0.25
+## The breaker's lamp bar: the glass of the slot over its handle, piece px (measured on breaker.png).
+const BREAKER_LAMP: Rect2 = Rect2(110.0, 57.0, 60.0, 12.0)
+## The lamp bar of a breaker centred on x 0 with its base on the floor (world px): a room adds its
+## breaker's x (the corridor's BreakerStatusLight too, Main).
+const BREAKER_LIGHT_AT: Rect2 = Rect2((BREAKER_LAMP.position.x - BREAKER_SIZE.x * 0.5) * BREAKER_SCALE, FLOOR_Y - (BREAKER_SIZE.y - BREAKER_LAMP.position.y) * BREAKER_SCALE, BREAKER_LAMP.size.x * BREAKER_SCALE, BREAKER_LAMP.size.y * BREAKER_SCALE)
+## The valve body: 409 x 395 px at 4 px per world px (102.25 x 98.75 world px).
+const VALVE_SIZE: Vector2 = Vector2(409.0, 395.0)
+const VALVE_SCALE: float = 0.25
+## The bare wheel shaft (the handwheel's hub goes here) and the LINE gauge's glass (centre and radius),
+## piece px, measured on valve-body.png.
+const VALVE_SHAFT: Vector2 = Vector2(203.0, 211.0)
+const VALVE_DIAL_CENTRE: Vector2 = Vector2(204.0, 42.0)
+const VALVE_DIAL_RADIUS: float = 30.0
 ## The blast door's near column (JunctionDoorLayout COLUMN, COLBLOWN once blown) draws over the actors
 ## (DOOR_FRONT_Z) in every door state. In the rows a body lying on the floor fills (Main.COLLAPSE_TOPS),
 ## its painting starts at source column DOOR_COLUMN_FOOT of either cut and ends at the cut's right
@@ -151,17 +165,33 @@ const DOOR_FLIGHT_TURN: float = 1.5
 const DOOR_FLIGHT_GROW: float = 1.22
 ## The share of the flight after which the leaf is clear of the near column and draws in front of it.
 const DOOR_FLIGHT_CLEAR: float = 0.3
-const VENT_REGION: Rect2 = Rect2(8.0, 35.0, 743.0, 183.0)
-const ARM_REGION: Rect2 = Rect2(88.0, 9.0, 388.0, 352.0)
-## Where the tank was cut out of the tank-arm image.
-const TANK_REGION: Rect2 = Rect2(144.0, 361.0, 211.0, 382.0)
-const TANK_ART_SCALE: float = 0.22
-const ARM_PANEL_REGION: Rect2 = Rect2(79.0, 26.0, 354.0, 463.0)
-const ARM_PANEL_SCALE: float = 0.14
-const ARM_PANEL_LIGHT: Rect2 = Rect2(206.0, 88.0, 92.0, 20.0)
-const BOLT_PANEL_REGION: Rect2 = Rect2(0.0, 68.0, 512.0, 393.0)
-const BOLT_PANEL_SCALE: float = 0.15
-const BOLT_PANEL_LIGHT: Rect2 = Rect2(222.0, 118.0, 70.0, 20.0)
+## The relief vent: 288 x 177 px, its floor grate the piece's whole width (vent_scale).
+const VENT_SIZE: Vector2 = Vector2(288.0, 177.0)
+## The tank arm at its real size (PIECES.md 5c, k 0.75: 340 x 310 px at 5.333 px per world px, 63.75
+## x 58.1 world px; its winch drum was twice a real one's size). It hangs with its shackle over the
+## mark (ARM_SHACKLE), its ceiling plate's top at ARM_TOP_Y, where the earlier arm's plate hung, so the
+## rods from the gantry keep their length.
+const ARM_SIZE: Vector2 = Vector2(340.0, 310.0)
+const ARM_SCALE: float = 0.1875
+const ARM_TOP_Y: float = 220.5
+## The foot of the arm's shackle (piece px), where the tank's cable hangs from, and the two bolt blocks
+## on its ceiling plate the rods come down to (piece x), measured on tank-arm.png.
+const ARM_SHACKLE: Vector2 = Vector2(140.0, 310.0)
+const ARM_ROD_XS: PackedFloat32Array = [35.0, 265.0]
+## The coolant tank: 184 x 334 px at 4 px per world px (46 x 83.5 world px, its size before).
+const TANK_PIXELS: Vector2 = Vector2(184.0, 334.0)
+const TANK_ART_SCALE: float = 0.25
+## The ARM PANEL: 199 x 260 px at 4 px per world px; its lamp's glass in piece px.
+const ARM_PANEL_SIZE: Vector2 = Vector2(199.0, 260.0)
+const ARM_PANEL_SCALE: float = 0.25
+const ARM_PANEL_LIGHT: Rect2 = Rect2(73.0, 35.0, 52.0, 13.0)
+## The EXIT BOLT's floor junction box at its real size (PIECES.md 5c, k 0.822: 241 x 185 px at 4.866 px
+## per world px, 49.5 x 38 world px, 1.24 x 0.95 m), its lamp's glass and the row its painted cable
+## ends meet the feed's cable box at (piece px, measured on bolt-panel.png).
+const BOLT_PANEL_SIZE: Vector2 = Vector2(241.0, 185.0)
+const BOLT_PANEL_SCALE: float = 1.0 / 4.8662
+const BOLT_PANEL_LIGHT: Rect2 = Rect2(104.0, 21.0, 31.0, 13.0)
+const BOLT_PANEL_CABLES_Y: float = 74.0
 ## The exit atlas's pieces: (atlas region, world top-left). placement.json in the design record.
 const EXIT_BEYOND: Rect2 = Rect2(228.0, 0.0, 198.0, 616.0)
 const EXIT_BEYOND_AT: Vector2 = Vector2(933.0, 140.0)
@@ -249,8 +279,8 @@ const HATCH_REACH_MAX_X: float = WOLF_DOORWAY_X - M0Actor.WOLF_REACH - M0Actor.H
 ## Walking out, each is gone once their whole drawn body is past the near jamb.
 const WOLF_GONE_X: float = EXIT_NEAR_JAMB_X + M0Actor.WOLF_REACH + 3.0
 const HUMAN_GONE_X: float = EXIT_NEAR_JAMB_X + M0Actor.HUMAN_REACH + 3.0
-## The breaker's status light rides on the amber bar painted at the top of its cabinet.
-const BREAKER_LIGHT: Rect2 = Rect2(BREAKER_X - 11.0, 358.0, 18.0, 5.0)
+## The breaker's status light lies on the lamp bar's glass over its handle (BREAKER_LIGHT_AT).
+const BREAKER_LIGHT: Rect2 = Rect2(BREAKER_LIGHT_AT.position + Vector2(BREAKER_X, 0.0), BREAKER_LIGHT_AT.size)
 ## Station centres, left to right.
 const BREAKER_X: float = 200.0
 const VENT_X: float = 300.0
@@ -259,10 +289,10 @@ const DOOR_X: float = 480.0
 ## The rubble line is the sentry's lane boundary.
 const RUBBLE_X: float = SentryBrain.RUBBLE_X
 ## Half the drawn width of the machines the actors must not stand inside.
-const BREAKER_HALF_WIDTH: float = BREAKER_REGION.size.x * BREAKER_SCALE * 0.5
-const VALVE_HALF_WIDTH: float = VALVE_REGION.size.x * VALVE_SCALE * 0.5
-const ARM_PANEL_HALF_WIDTH: float = ARM_PANEL_REGION.size.x * ARM_PANEL_SCALE * 0.5
-const BOLT_PANEL_HALF_WIDTH: float = BOLT_PANEL_REGION.size.x * BOLT_PANEL_SCALE * 0.5
+const BREAKER_HALF_WIDTH: float = BREAKER_SIZE.x * BREAKER_SCALE * 0.5
+const VALVE_HALF_WIDTH: float = VALVE_SIZE.x * VALVE_SCALE * 0.5
+const ARM_PANEL_HALF_WIDTH: float = ARM_PANEL_SIZE.x * ARM_PANEL_SCALE * 0.5
+const BOLT_PANEL_HALF_WIDTH: float = BOLT_PANEL_SIZE.x * BOLT_PANEL_SCALE * 0.5
 ## The TANK RELEASE stands at the left end of the alcove that hides the engineer from the sentry, just
 ## inside its left post, so the engineer works it from beside it, inside the cover (Main's
 ## JUNCTION_STATIONS).
@@ -336,10 +366,10 @@ const WOLF_HEAD_X: float = 45.0
 ## x, so at his steady LEAP_SPEED_SCALE speed it is a fall under constant gravity, TANK_LEAP_HEIGHT at
 ## its top over TANK_LEAP_PEAK_X and back on the floor TANK_LEAP_HALF_SPAN either side. He is 134 px
 ## long, the tank stands 107 px over the floor about 60 px past the engineer working the release, and
-## the parked arm's claw hangs only some 10 px above the height that clears the tank, so there is no
+## the parked arm's shackle hangs only some 20 px above the height that clears the tank, so there is no
 ## room for a short hop: he takes off a few px before his snout reaches the engineer's back, passes
 ## over them on the way up and lands just short of his spot. His painted feet (y 438) pass over the
-## tank's top (y 331, on the crushed hull) and his back under the claw. The empty arm hangs too low over
+## tank's top (y 331, on the crushed hull) and his back under the shackle. The empty arm hangs too low over
 ## the tank for him to pass under it, so it winches up into its ceiling plate as the tank lands for good
 ## (ARM_PARK_RISE over ARM_PARK_SECONDS), and he waits by the valve until it is up. sentry_test measures
 ## his painted body against the tank's, the wreck's and the arm's images on every frame of the crossing
@@ -363,7 +393,7 @@ const CHOICE_X: float = RUBBLE_X - M0State.HUMAN_HALF_WIDTH
 ## (Main.CHOICE_ROW_TOP), and its base (y 382) clears the sentry's scanner fin (Sentry.DRAWN_HEIGHT)
 ## as it patrols underneath.
 const TANK_REST_Y: float = 340.0
-const TANK_SIZE: Vector2 = TANK_REGION.size * TANK_ART_SCALE
+const TANK_SIZE: Vector2 = TANK_PIXELS * TANK_ART_SCALE
 ## The middle of the tank's shadow: on the floor stripes under it.
 const SHADOW_Y: float = FLOOR_Y + 1.0
 ## The arm's ceiling plate hangs on two rods from the mid plate's overhead gantry (its underside).
@@ -425,12 +455,12 @@ const ARM_LABEL_SHIFT: float = 20.0
 const EXIT_LABEL_X: float = 792.0
 ## The feed from the TANK RELEASE to the exit bolt panel runs under the floor and comes up at the
 ## bolt panel (_draw_bolt_feed), so nothing runs across the lane where the tank comes down. Its cable
-## box is centred at this height, behind the ends of the panel's painted cables. Dead while the winch
-## holds the tank; once the tank is down its power runs to the bolt (amber), warming to white through
-## the whine and green once the bolt drops.
-const BOLT_FEED_Y: float = 404.0
-## The cable box (behind the three painted cable ends) and the floor gland the conduit comes up from.
-const FEED_BOX: Vector2 = Vector2(8.0, 34.0)
+## box is centred on the row of the panel's painted cable ends (BOLT_PANEL_CABLES_Y), behind them. Dead
+## while the winch holds the tank; once the tank is down its power runs to the bolt (amber), warming to
+## white through the whine and green once the bolt drops.
+## The cable box (behind the three painted cable ends, which span 88 piece px, 18 world px, of the
+## panel's left edge, plus 2 px either side) and the floor gland the conduit comes up from.
+const FEED_BOX: Vector2 = Vector2(8.0, 22.0)
 const FEED_GLAND: Vector2 = Vector2(12.0, 3.0)
 ## The box's and gland's painted-steel face, a step lighter than the conduit.
 const FEED_STEEL: Color = Color("#2a3741")
@@ -466,15 +496,6 @@ const SEAM_FLICKER_ALPHA: float = 0.75
 ## Hint ladder T1: the breaker's lamp pulses while WOLF looks at it, this many times a second (at most
 ## 2 Hz, well under three flashes a second; steady and bright with Reduced Motion).
 const BREAKER_PULSE_HZ: float = 1.5
-## Cuts the turning wheel out of the valve image as a disc, so only the wheel turns over the
-## painted one.
-const WHEEL_MASK: String = """shader_type canvas_item;
-uniform vec2 centre;
-uniform float radius;
-void fragment() {
-	COLOR.a *= 1.0 - smoothstep(radius - 0.006, radius, distance(UV, centre));
-}
-"""
 
 ## Ceiling lamp centres as fractions of the far plate, measured from the plate; the lockdown
 ## beacons sit on the tops of its two braced pillars.
@@ -725,11 +746,11 @@ func _ready() -> void:
 	recesses.z_index = -2
 	add_child(recesses)
 	_build_bay()
-	breaker_art = RoomDepth.make_prop("BreakerArt", BREAKER_PROP, BREAKER_REGION, BREAKER_SCALE, BREAKER_X)
-	vent_art = RoomDepth.make_prop("VentArt", VENT_PROP, VENT_REGION, vent_scale(), (PressureLine.VENT_GRATE_MIN_X + PressureLine.VENT_GRATE_MAX_X) * 0.5)
-	valve_art = RoomDepth.make_prop("ValveArt", VALVE_PROP, VALVE_REGION, VALVE_SCALE, VALVE_X)
-	arm_panel_art = RoomDepth.make_prop("ArmPanelArt", ARM_PANEL_PROP, ARM_PANEL_REGION, ARM_PANEL_SCALE, ARM_X)
-	bolt_panel_art = RoomDepth.make_prop("BoltPanelArt", BOLT_PANEL_PROP, BOLT_PANEL_REGION, BOLT_PANEL_SCALE, BOLT_PANEL_X)
+	breaker_art = RoomDepth.make_prop("BreakerArt", BREAKER_PROP, BREAKER_SCALE, BREAKER_X)
+	vent_art = RoomDepth.make_prop("VentArt", VENT_PROP, vent_scale(), (PressureLine.VENT_GRATE_MIN_X + PressureLine.VENT_GRATE_MAX_X) * 0.5)
+	valve_art = RoomDepth.make_prop("ValveArt", VALVE_PROP, VALVE_SCALE, VALVE_X)
+	arm_panel_art = RoomDepth.make_prop("ArmPanelArt", ARM_PANEL_PROP, ARM_PANEL_SCALE, ARM_X)
+	bolt_panel_art = RoomDepth.make_prop("BoltPanelArt", BOLT_PANEL_PROP, BOLT_PANEL_SCALE, BOLT_PANEL_X)
 	_build_entry()
 	_build_exit()
 	for prop: Sprite2D in [breaker_art, vent_art, valve_art, arm_panel_art, bolt_panel_art]:
@@ -737,23 +758,10 @@ func _ready() -> void:
 		prop.z_index = -1
 		add_child(prop)
 		floor_reflections.append(FloorReflection.attach(prop))
-	# Only the wheel turns: a disc cut from the same image, over the painted wheel.
-	valve_wheel = Sprite2D.new()
-	valve_wheel.name = "ValveWheel"
-	valve_wheel.texture = VALVE_PROP
-	valve_wheel.texture_filter = CanvasItem.TEXTURE_FILTER_LINEAR_WITH_MIPMAPS
-	valve_wheel.region_enabled = true
-	valve_wheel.region_rect = Rect2(VALVE_WHEEL_CENTRE - Vector2.ONE * VALVE_WHEEL_RADIUS, Vector2.ONE * VALVE_WHEEL_RADIUS * 2.0)
-	valve_wheel.scale = Vector2.ONE * VALVE_SCALE
-	valve_wheel.position = prop_point(valve_art, VALVE_WHEEL_CENTRE)
+	# Only the wheel turns: the handwheel piece on the valve's bare shaft, at its own size (1.0x).
+	valve_wheel = BypassHandle.make_wheel("ValveWheel", BypassHandle.HANDWHEEL_SCALE)
+	valve_wheel.position = RoomDepth.prop_point(valve_art, VALVE_SHAFT)
 	valve_wheel.z_index = -1
-	var mask: Shader = Shader.new()
-	mask.code = WHEEL_MASK
-	var wheel_material: ShaderMaterial = ShaderMaterial.new()
-	wheel_material.shader = mask
-	wheel_material.set_shader_parameter("centre", VALVE_WHEEL_CENTRE / VALVE_PROP.get_size())
-	wheel_material.set_shader_parameter("radius", VALVE_WHEEL_RADIUS / VALVE_PROP.get_size().x)
-	valve_wheel.material = wheel_material
 	add_child(valve_wheel)
 	breaker_glow = RoomDepth.make_glow(Palette.AMBER, Vector2(64.0, 30.0), 0.5)
 	breaker_glow.name = "BreakerGlow"
@@ -807,20 +815,10 @@ func _ready() -> void:
 	refresh_state()
 
 
-## The relief vent is drawn exactly as wide as its grate's hurtbox (PressureLine.VENT_GRATE_*), so
-## what is drawn is what hurts.
+## The relief vent is drawn exactly as wide as its grate's hurtbox (PressureLine.VENT_GRATE_*): the
+## grate is the piece's whole width (0.25, its own 4 px per world px), so what is drawn is what hurts.
 static func vent_scale() -> float:
-	return (PressureLine.VENT_GRATE_MAX_X - PressureLine.VENT_GRATE_MIN_X) / VENT_REGION.size.x
-
-
-## Where [param source] (a pixel of [param prop]'s image) is in this room.
-static func prop_point(prop: Sprite2D, source: Vector2) -> Vector2:
-	return prop.position + (source - prop.region_rect.get_center()) * prop.scale
-
-
-## [param source] (a rectangle of [param prop]'s image) in this room.
-static func prop_rect(prop: Sprite2D, source: Rect2) -> Rect2:
-	return Rect2(prop_point(prop, source.position), source.size * prop.scale)
+	return (PressureLine.VENT_GRATE_MAX_X - PressureLine.VENT_GRATE_MIN_X) / VENT_SIZE.x
 
 
 ## The door: a 56x132 body on the floor layer whose face stops the engineer just short of the shut
@@ -1012,16 +1010,9 @@ func _build_lane() -> void:
 	tank.position = Vector2(DropArm.MARK_X, TANK_REST_Y)
 	tank.z_index = 1
 	add_child(tank)
-	# The arm stays where the tank-arm image put it relative to the tank: centred over the mark,
-	# its shackle on the tank's cut line.
-	arm_art = Sprite2D.new()
-	arm_art.name = "ArmArt"
-	arm_art.texture = ARM_PROP
-	arm_art.texture_filter = CanvasItem.TEXTURE_FILTER_LINEAR_WITH_MIPMAPS
-	arm_art.region_enabled = true
-	arm_art.region_rect = ARM_REGION
-	arm_art.scale = Vector2.ONE * TANK_ART_SCALE
-	arm_art.position = tank.position + (ARM_REGION.get_center() - TANK_REGION.get_center()) * TANK_ART_SCALE
+	# The arm hangs from its ceiling plate (top at ARM_TOP_Y) with its shackle over the mark; the tank
+	# hangs under it on the cable _draw_arm draws.
+	arm_art = RoomDepth.make_prop("ArmArt", ARM_PROP, ARM_SCALE, DropArm.MARK_X + (ARM_SIZE.x * 0.5 - ARM_SHACKLE.x) * ARM_SCALE, ARM_TOP_Y + ARM_SIZE.y * ARM_SCALE)
 	arm_rest_y = arm_art.position.y
 	arm_art.z_index = 1
 	add_child(arm_art)
@@ -1051,7 +1042,7 @@ func _build_lane() -> void:
 	# The bolt's short in the panel: hot streaks spat out of the panel's face, falling (FxPresets.streaks).
 	bolt_sparks = FxPresets.streaks(22)
 	bolt_sparks.spread = 75.0
-	FxPresets.place(bolt_sparks, self, "BoltSparks", prop_rect(bolt_panel_art, BOLT_PANEL_LIGHT).get_center(), 3)
+	FxPresets.place(bolt_sparks, self, "BoltSparks", RoomDepth.prop_rect(bolt_panel_art, BOLT_PANEL_LIGHT).get_center(), 3)
 
 
 ## A station name on its plate, centred on [param center_x] in the label row. It draws over the
@@ -1088,7 +1079,7 @@ func _place_line_caption() -> void:
 	TextSize.size_label(line_caption, LINE_CAPTION_FONT_SIZE)
 	line_caption.size = Vector2.ZERO
 	line_caption.size = line_caption.get_combined_minimum_size()
-	var dial: Vector2 = prop_point(valve_art, VALVE_DIAL_CENTRE)
+	var dial: Vector2 = RoomDepth.prop_point(valve_art, VALVE_DIAL_CENTRE)
 	line_caption.position = Vector2(dial.x - VALVE_DIAL_RADIUS * VALVE_SCALE - 2.0 - line_caption.size.x, dial.y - line_caption.size.y * 0.5)
 
 
@@ -1690,7 +1681,7 @@ func _draw() -> void:
 	_draw_arm_panel_light()
 	_draw_arm()
 	_draw_floor_mark()
-	draw_rect(prop_rect(bolt_panel_art, BOLT_PANEL_LIGHT), bolt_lamp_color())
+	draw_rect(RoomDepth.prop_rect(bolt_panel_art, BOLT_PANEL_LIGHT), bolt_lamp_color())
 
 
 ## What Recesses draws under the props: the release's feed to the exit bolt (the bay itself is painted,
@@ -1738,7 +1729,8 @@ func bolt_feed_marks() -> Array:
 ## cables, the conduit from it down to the floor, and the floor gland it goes into.
 func bolt_feed_parts() -> Array[Rect2]:
 	var x: float = bolt_feed_x()
-	var box: Rect2 = Rect2(x - FEED_BOX.x * 0.5, BOLT_FEED_Y - FEED_BOX.y * 0.5, FEED_BOX.x, FEED_BOX.y)
+	var cables_y: float = RoomDepth.prop_point(bolt_panel_art, Vector2(0.0, BOLT_PANEL_CABLES_Y)).y
+	var box: Rect2 = Rect2(x - FEED_BOX.x * 0.5, cables_y - FEED_BOX.y * 0.5, FEED_BOX.x, FEED_BOX.y)
 	var gland: Rect2 = Rect2(x - FEED_GLAND.x * 0.5, FLOOR_Y - FEED_GLAND.y, FEED_GLAND.x, FEED_GLAND.y)
 	var conduit: Rect2 = Rect2(x - 2.5, box.end.y, 5.0, gland.position.y - box.end.y)
 	return [box, conduit, gland]
@@ -1747,7 +1739,7 @@ func bolt_feed_parts() -> Array[Rect2]:
 ## Where the feed comes up: over the bolt panel's left edge, the box taking in the ends of its painted
 ## cables.
 func bolt_feed_x() -> float:
-	return prop_point(bolt_panel_art, BOLT_PANEL_REGION.position).x + FEED_BOX.x * 0.5 + 1.0
+	return RoomDepth.prop_bounds(bolt_panel_art).position.x + FEED_BOX.x * 0.5 + 1.0
 
 
 ## The feed's core: dead until the tank is down, then the bolt's own light (amber, warming to white
@@ -1775,7 +1767,7 @@ func bolt_panel_cover() -> Array[Rect2]:
 ## What stands in front of the sentry's lane at the exit bolt: the panel's box and the bolt's feed (whose
 ## floor gland reaches a pixel past the panel's left edge).
 func bolt_front_rect() -> Rect2:
-	var front: Rect2 = prop_rect(bolt_panel_art, BOLT_PANEL_REGION)
+	var front: Rect2 = RoomDepth.prop_bounds(bolt_panel_art)
 	for part: Rect2 in bolt_feed_parts():
 		front = front.merge(part)
 	return front
@@ -1785,8 +1777,8 @@ func bolt_front_rect() -> Rect2:
 ## light in [param light]; under the image, the bolt's feed (bolt_feed_marks), so the cable box and
 ## conduit stay in front of the machine with the painted cables over them.
 func draw_panel_front(canvas: CanvasItem, cover: Array[Rect2], light: Color) -> void:
-	var panel: Rect2 = prop_rect(bolt_panel_art, BOLT_PANEL_REGION)
-	var lamp: Rect2 = prop_rect(bolt_panel_art, BOLT_PANEL_LIGHT)
+	var panel: Rect2 = RoomDepth.prop_bounds(bolt_panel_art)
+	var lamp: Rect2 = RoomDepth.prop_rect(bolt_panel_art, BOLT_PANEL_LIGHT)
 	var marks: Array = bolt_feed_marks()
 	for front: Rect2 in cover:
 		for mark: Array in marks:
@@ -1796,7 +1788,7 @@ func draw_panel_front(canvas: CanvasItem, cover: Array[Rect2], light: Color) -> 
 		var part: Rect2 = front.intersection(panel)
 		if not part.has_area():
 			continue
-		var source: Rect2 = Rect2(BOLT_PANEL_REGION.position + (part.position - panel.position) / BOLT_PANEL_SCALE, part.size / BOLT_PANEL_SCALE)
+		var source: Rect2 = Rect2((part.position - panel.position) / BOLT_PANEL_SCALE, part.size / BOLT_PANEL_SCALE)
 		# Sampled like the whole sprite (no clamp at the cut), so the redrawn strip matches the art under it.
 		canvas.draw_texture_rect_region(BOLT_PANEL_PROP, part, source, Color.WHITE, false, false)
 		var lit: Rect2 = lamp.intersection(part)
@@ -1855,7 +1847,7 @@ static func alcove_rect() -> Rect2:
 ## peak): red through the hard warning, and pinned red at the top for a while after the vent lets go
 ## (display_gauge). The VALVE plate counts the real turns.
 func _draw_gauge() -> void:
-	var centre: Vector2 = prop_point(valve_art, VALVE_DIAL_CENTRE)
+	var centre: Vector2 = RoomDepth.prop_point(valve_art, VALVE_DIAL_CENTRE)
 	var face: float = VALVE_DIAL_RADIUS * VALVE_SCALE
 	# A fresh face over the painted one, so its painted needle never reads as a second reading.
 	# The lit face is the valve's lamp: it goes dark in a refusal's flicker.
@@ -1907,21 +1899,23 @@ func _breaker_light_color() -> Color:
 ## the sentry is down.
 func _draw_arm_panel_light() -> void:
 	var light: Color = Palette.DIM if sentry_down else (Palette.GREEN if arm_state == &"hung" else Palette.AMBER)
-	draw_rect(prop_rect(arm_panel_art, ARM_PANEL_LIGHT), light.lerp(FLICKER_DARK, 1.0 - lamp_level(&"release")))
+	draw_rect(RoomDepth.prop_rect(arm_panel_art, ARM_PANEL_LIGHT), light.lerp(FLICKER_DARK, 1.0 - lamp_level(&"release")))
 
 
-## The rods that hang the arm's ceiling plate from the gantry, and, only while the winch hauls a
-## missed tank back up, the steel cable from its shackle down to the tank (a dark braided body with a
-## faint sheen, in the painted winch cable's tones). A released tank falls free and lies free: no
-## cable while it falls, once it is down, or while a missed one still lies on the floor.
+## The rods that hang the arm's ceiling plate from the gantry (down to its two bolt blocks,
+## ARM_ROD_XS), and, while the tank hangs from the winch (ready, or hauled back up after a miss), the
+## steel cable from the arm's shackle down to the tank's lug (a dark braided body with a faint sheen,
+## in the painted winch cable's tones). A released tank falls free and lies free: no cable while it
+## falls, once it is down, or while a missed one still lies on the floor.
 func _draw_arm() -> void:
-	var plate_top: float = arm_art.position.y - ARM_REGION.size.y * TANK_ART_SCALE * 0.5 + 2.0
-	for rod_x: float in [DropArm.MARK_X - 26.0, DropArm.MARK_X + 34.0]:
+	var plate_top: float = RoomDepth.prop_bounds(arm_art).position.y + 2.0
+	for rod: float in ARM_ROD_XS:
+		var rod_x: float = RoomDepth.prop_point(arm_art, Vector2(rod, 0.0)).x
 		draw_line(Vector2(rod_x, GANTRY_Y), Vector2(rod_x, plate_top), Palette.STEEL_DARK, 5.0)
 		draw_line(Vector2(rod_x - 1.5, GANTRY_Y), Vector2(rod_x - 1.5, plate_top), Palette.STEEL, 1.0)
-	if tank_drop <= 0.0 or arm_state != &"rewinding" or tank_on_floor:
+	if not (arm_state == &"hung" or arm_state == &"rewinding") or tank_on_floor:
 		return
-	var cable_top: Vector2 = Vector2(DropArm.MARK_X, TANK_REST_Y - TANK_SIZE.y * 0.5)
+	var cable_top: Vector2 = RoomDepth.prop_point(arm_art, ARM_SHACKLE)
 	var tank_top: Vector2 = Vector2(DropArm.MARK_X, tank.position.y - TANK_SIZE.y * 0.5)
 	draw_line(cable_top, tank_top, CABLE_SHADOW, 4.0)
 	draw_line(cable_top, tank_top, CABLE_BODY, 2.5)

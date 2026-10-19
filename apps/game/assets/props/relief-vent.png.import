@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://buc1oyq5651va"
-path="res://.godot/imported/junction-relief-vent.png-c01d673190bc3b4dbb29f047f8225898.ctex"
+uid="uid://g322ejf84tex"
+path="res://.godot/imported/relief-vent.png-828f320bfa10d9a218069c6fe6713c9d.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/props/junction-relief-vent.png"
-dest_files=["res://.godot/imported/junction-relief-vent.png-c01d673190bc3b4dbb29f047f8225898.ctex"]
+source_file="res://assets/props/relief-vent.png"
+dest_files=["res://.godot/imported/relief-vent.png-828f320bfa10d9a218069c6fe6713c9d.ctex"]
 
 [params]
 

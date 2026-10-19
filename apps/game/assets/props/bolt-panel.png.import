@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://cm4gxlhbf8d7y"
-path="res://.godot/imported/corridor-breaker.png-be47d83599765f7630dc41c11292fb53.ctex"
+uid="uid://cvi0ky1c271dg"
+path="res://.godot/imported/bolt-panel.png-6d5114f7a452b466352560ded5acea71.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/props/corridor-breaker.png"
-dest_files=["res://.godot/imported/corridor-breaker.png-be47d83599765f7630dc41c11292fb53.ctex"]
+source_file="res://assets/props/bolt-panel.png"
+dest_files=["res://.godot/imported/bolt-panel.png-6d5114f7a452b466352560ded5acea71.ctex"]
 
 [params]
 

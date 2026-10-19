@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://excgpno6ca5o"
-path="res://.godot/imported/junction-tank.png-99383eac5a9d74156b8155ee34978183.ctex"
+uid="uid://bs74gligj8yyx"
+path="res://.godot/imported/handwheel.png-d29aeacf983e1482ec10822615549326.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/props/junction-tank.png"
-dest_files=["res://.godot/imported/junction-tank.png-99383eac5a9d74156b8155ee34978183.ctex"]
+source_file="res://assets/props/handwheel.png"
+dest_files=["res://.godot/imported/handwheel.png-d29aeacf983e1482ec10822615549326.ctex"]
 
 [params]
 

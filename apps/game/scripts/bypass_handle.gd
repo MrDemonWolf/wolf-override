@@ -20,11 +20,16 @@ const TICK_SECONDS: float = 0.25
 const TICK_DEGREES: float = 360.0 / TICKS_NEEDED
 ## Letting go mid-tick, the wheel springs back to its last notch this fast.
 const SPRING_BACK_SECONDS: float = 0.12
-## The handwheel art: a region of the door end's atlas (4 source px per world px, centred on the
-## wheel's axis).
-const WHEEL_ART: Texture2D = preload("res://assets/props/corridor-seal-atlas.png")
-const WHEEL_REGION: Rect2 = Rect2(730.0, 619.0, 88.0, 88.0)
-const WHEEL_SCALE: float = 0.25
+## The handwheel: one whole piece of the approved art set (2026-10-16), a steel gate-valve wheel face
+## on, 200 x 198 px at 5.5 px per world px (36.4 world px, 0.9 m across). The same piece is the
+## Service Junction VALVE's wheel (JunctionRoom), drawn there at its own size (HANDWHEEL_SCALE); here
+## it is drawn at 0.6x (WHEEL_SCALE: 21.8 world px, the 0.525 m wheel of a wall gearbox).
+const HANDWHEEL: Texture2D = preload("res://assets/props/handwheel.png")
+const HANDWHEEL_SCALE: float = 1.0 / 5.5
+const WHEEL_SCALE: float = 0.6 * HANDWHEEL_SCALE
+## The centre of the wheel's hub on the piece (piece px, measured on handwheel.png): the axis it turns
+## about, 2 px below the piece's own centre.
+const HANDWHEEL_HUB: Vector2 = Vector2(100.0, 101.0)
 ## The wheel's hub from the gameplay point, on the wall gearbox at 1.0 m: the crank pose's glove
 ## (the engineer at BYPASS_CRANK_X) lands on its rim at 8 o'clock.
 const WHEEL_OFFSET: Vector2 = Vector2(-6.0, 2.0)
@@ -116,13 +121,7 @@ var _relay_x: float = 0.0
 
 func _init() -> void:
 	name = "BypassHandle"
-	wheel = Sprite2D.new()
-	wheel.name = "Wheel"
-	wheel.texture = WHEEL_ART
-	wheel.region_enabled = true
-	wheel.region_rect = WHEEL_REGION
-	wheel.texture_filter = CanvasItem.TEXTURE_FILTER_LINEAR_WITH_MIPMAPS
-	wheel.scale = Vector2.ONE * WHEEL_SCALE
+	wheel = make_wheel("Wheel", WHEEL_SCALE)
 	wheel.position = WHEEL_OFFSET
 	add_child(wheel)
 	bypass_label = _plate("BypassLabel", "MANUAL BYPASS", LABEL_TEXT, Palette.PLATE_EDGE, LABEL_WIDTH, READOUT_HEIGHT)
@@ -134,6 +133,19 @@ func _init() -> void:
 	coolant_hiss = FxPresets.relief_jet()
 	# place() moves it onto the relief valve's outlet once the wheel's centre is known.
 	FxPresets.place(coolant_hiss, self, "CoolantHiss", Vector2.ZERO)
+
+
+## A handwheel sprite named [param wheel_name], drawn at [param wheel_scale] (world px per piece px),
+## that turns about its hub: its origin is the hub (HANDWHEEL_HUB), so setting its position puts the
+## hub there and rotation_degrees turns it in place. Not added to any parent.
+static func make_wheel(wheel_name: String, wheel_scale: float) -> Sprite2D:
+	var sprite: Sprite2D = Sprite2D.new()
+	sprite.name = wheel_name
+	sprite.texture = HANDWHEEL
+	sprite.texture_filter = CanvasItem.TEXTURE_FILTER_LINEAR_WITH_MIPMAPS
+	sprite.offset = HANDWHEEL.get_size() * 0.5 - HANDWHEEL_HUB
+	sprite.scale = Vector2.ONE * wheel_scale
+	return sprite
 
 
 ## Places the handle with its wheel at [param wheel_centre] and the COOLANT FAULT tag centred on

@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://5ouqq2kyhglu"
-path="res://.godot/imported/junction-arm-panel.png-b997782fc9ff3f54580163c672dbe7df.ctex"
+uid="uid://qo2eexr2quv2"
+path="res://.godot/imported/breaker.png-aa0638d4334d5ea36079821fed2bcae1.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/props/junction-arm-panel.png"
-dest_files=["res://.godot/imported/junction-arm-panel.png-b997782fc9ff3f54580163c672dbe7df.ctex"]
+source_file="res://assets/props/breaker.png"
+dest_files=["res://.godot/imported/breaker.png-aa0638d4334d5ea36079821fed2bcae1.ctex"]
 
 [params]
 

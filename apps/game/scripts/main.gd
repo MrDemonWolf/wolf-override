@@ -65,8 +65,24 @@ const BYPASS_TICKS: int = BypassHandle.TICKS_NEEDED
 const BYPASS_ALARM_SECONDS: float = 1.1
 ## Where the engineer steps back to, clear of the relay, while WOLF takes the live contact.
 const RELAY_STEP_BACK_X: float = 736.0
-## The purge display's reach; walking past it the first time WOLF says what the purge takes.
-const PURGE_DISPLAY_MAX_X: float = 230.0
+## The Director's purge display (PurgeTerminalArt): one whole piece at its real size, 1.84 x 1.80 m
+## (the art set's PIECES.md section 5c), a floor console standing against the back wall, centred on
+## PURGE_DISPLAY_X. Its plinth stands on the floor (PURGE_DISPLAY_FOOT_Y: RoomDepth.FLOOR_Y, where the
+## corridor's painted back-wall pillars meet the floor); at the art set's y 404 it rested on the painted
+## pipe rail 36 px up and read as a console perched on a pipe. The floor is the walk line (40 world px
+## per metre, DoorCamera), so the art set's scale for y 404 (k 0.517, 1 / 7.737, worked out 5.6 m
+## further back at depth scale 0.872) would draw it only 1.57 m tall; PURGE_DISPLAY_SCALE is that
+## scale over 0.872: the 497 x 486 px piece at 6.75 px per world px, 73.6 x 72 world px, as tall as the
+## Records PURGE QUEUE (also 1.80 m, RecordsRoom.PURGE_SCALE). Its screen is painted dark; PurgeScreen
+## lights it in the purge order's red over PURGE_DISPLAY_SCREEN (piece px, measured on purge-display.png).
+const PURGE_DISPLAY_X: float = 125.0
+const PURGE_DISPLAY_FOOT_Y: float = RoomDepth.FLOOR_Y
+const PURGE_DISPLAY_SCALE: float = 1.0 / 6.75
+const PURGE_DISPLAY_SCREEN: Rect2 = Rect2(94.0, 32.0, 178.0, 106.0)
+## The purge display's reach; walking past it the first time WOLF says what the purge takes. Its
+## right edge (x 161.8) plus the engineer's reach (M0Actor.HUMAN_REACH 17) and 2.5 px, as the larger
+## display's was (230 from 210.5).
+const PURGE_DISPLAY_MAX_X: float = 181.0
 ## The dialogue box (STORY-2, STORY-3, STORY-4): a message shows as DialogueBoxes' one-speaker boxes,
 ## one after another, each up for its reading time (DialogueBoxes.read_seconds, the same time box_seconds
 ## gives a line said in several boxes). The words are 23 px at 540p in a column this wide, wide enough
@@ -295,8 +311,8 @@ const BOLT_CHARGING_LINE: String = "The bolt is taking the charge."
 ## from its right, towards the MANUAL BYPASS, clear of where WOLF stands off it (WOLF_BYPASS_CLEAR_X)
 ## and of his contact (RELAY_SIDE_X). The Records security container, where the first copy is
 ## secured, is worked from its right, where its lock is, towards the exit (RECORDS_CONTAINER_SIDE_X).
-const CORRIDOR_STATIONS: Array[Vector4] = [Vector4(350.0, 38.0, 52.0, 0.0), Vector4(RELAY_X, 43.0, RELAY_REACH, 1.0), Vector4(876.0, 35.0, 52.0, 0.0)]
-const RECORDS_STATIONS: Array[Vector4] = [Vector4(190.0, 56.0, 58.0, 0.0), Vector4(520.0, 45.0, 58.0, -1.0), Vector4(RecordsRoom.CONTAINER_X, 10.0, 58.0, 1.0)]
+const CORRIDOR_STATIONS: Array[Vector4] = [Vector4(350.0, JunctionRoom.BREAKER_HALF_WIDTH, 52.0, 0.0), Vector4(RELAY_X, 43.0, RELAY_REACH, 1.0), Vector4(876.0, 35.0, 52.0, 0.0)]
+const RECORDS_STATIONS: Array[Vector4] = [Vector4(RecordsRoom.PURGE_X, RecordsRoom.PURGE_HALF_WIDTH, 58.0, 0.0), Vector4(RecordsRoom.MIRROR_X, RecordsRoom.MIRROR_HALF_WIDTH, 58.0, -1.0), Vector4(RecordsRoom.CONTAINER_X, 10.0, 58.0, 1.0)]
 ## The Records exit's USE reaches this far either side of x 830 (the security container and the exit
 ## door both stand inside it; once the exit is open it also reaches on through the doorway).
 const RECORDS_EXIT_X: float = 830.0
@@ -318,7 +334,7 @@ const RECORDS_WAIT_SECONDS: float = 3.0
 ## right, inside the alcove's posts, and the exit bolt from its left, clear of the hatch and of the
 ## downed sentry (JunctionRoom.BOLT_X).
 const JUNCTION_STATIONS: Array[Vector4] = [
-	Vector4(JunctionRoom.BREAKER_X, 37.0, 52.0, 1.0),
+	Vector4(JunctionRoom.BREAKER_X, JunctionRoom.BREAKER_HALF_WIDTH, 52.0, 1.0),
 	Vector4(JunctionRoom.VALVE_X, 18.0, 52.0, -1.0),
 	Vector4(JunctionRoom.ARM_X, JunctionRoom.ARM_PANEL_HALF_WIDTH, SentryBrain.COVER_MAX_X - JunctionRoom.ARM_X, 1.0),
 	Vector4(JunctionRoom.BOLT_PANEL_X, JunctionRoom.BOLT_PANEL_HALF_WIDTH, 58.0, -1.0),
@@ -331,9 +347,9 @@ const RELAY_SIDE_X: float = RELAY_X + RELAY_REACH - 2.0
 ## The junction valve is cranked from just left of its wheel, like the MANUAL BYPASS.
 const VALVE_CRANK_X: float = JunctionRoom.VALVE_X - 29.0
 ## Where WOLF reads the mirror on his own: on the port's right, facing it, his painted snout
-## (M0Actor.WOLF_SNOUT) just short of its painted right edge (x 564), so he is never drawn inside it
-## and the engineer has its left side.
-const WOLF_MIRROR_X: float = 625.0
+## (M0Actor.WOLF_SNOUT) 5 px short of its painted right edge (x 551.8 since the rack is drawn at its
+## real size), so he is never drawn inside it and the engineer has its left side.
+const WOLF_MIRROR_X: float = 613.0
 ## How far either side of M0Actor.CLEAR_GAP the engineer has to go before WOLF changes his mind about
 ## walking up to his spot by the valve after the blast (_wolf_rubble_x).
 const WOLF_RUBBLE_HYSTERESIS: float = 24.0
@@ -932,7 +948,16 @@ func _ready() -> void:
 	# Each room's near edge pieces fade back while they cover the engineer or WOLF.
 	for depth: RoomDepth in _room_depths():
 		depth.occluders = [human.body_sprite, wolf.body_sprite]
+	# The corridor's breaker is the junction's machine: its light lies on the same lamp bar.
+	var breaker_light: Rect2 = Rect2(JunctionRoom.BREAKER_LIGHT_AT.position + Vector2(breaker_art.position.x, 0.0), JunctionRoom.BREAKER_LIGHT_AT.size)
+	breaker_status_light.position = breaker_light.position
+	breaker_status_light.size = breaker_light.size
 	breaker_status_glow = _attach_status_glow(breaker_status_light)
+	# The purge display stands on its foot at its real size (main.tscn holds the same place and scale
+	# for the editor).
+	purge_terminal_art.scale = Vector2.ONE * PURGE_DISPLAY_SCALE
+	purge_terminal_art.position = Vector2(PURGE_DISPLAY_X, PURGE_DISPLAY_FOOT_Y - purge_terminal_art.texture.get_height() * purge_terminal_art.scale.y * 0.5)
+	PropScreen.attach(purge_terminal_art, "PurgeScreen", PURGE_DISPLAY_SCREEN, RecordsRoom.PURGE_RED)
 	relay_status_glow = _attach_status_glow(relay_status_light)
 	_apply_text_size()
 	_apply_effects()
@@ -4269,7 +4294,14 @@ func _wolf_target_x() -> float:
 		return WOLF_BYPASS_CLEAR_X
 	match state.chapter_id:
 		"records":
-			return -1.0 if state.mirror_trace_preserved else WOLF_MIRROR_X
+			# After his readout he holds his spot at the port, facing it, while the engineer is still at
+			# its station (RECORDS_STATIONS' mirror row: centre x and use reach): following at once
+			# walked him back across the port and the engineer, his tail over the rack's base, while
+			# the readout line was still up.
+			var mirror: Vector4 = RECORDS_STATIONS[1]
+			if not state.mirror_trace_preserved or (state.mirror_route == "wolf" and absf(human.position.x - mirror.x) <= mirror.z):
+				return WOLF_MIRROR_X
+			return -1.0
 		"junction":
 			if wolf_scouting:
 				return JunctionRoom.WOLF_SEAM_X
@@ -4954,7 +4986,7 @@ func _context_hint() -> String:
 			return "E: secure the first copy in the container." if state.mirror_trace_preserved else "Preserve both traces before leaving."
 		return _records_route_hint()
 	if state.checkpoint_reached:
-		return "E: enter records access. The Director's purge is still running." if absf(x - 876.0) <= 52.0 else ("E: read the Director's purge display." if x <= 230.0 else "Return to the safe point to enter records access.")
+		return "E: enter records access. The Director's purge is still running." if absf(x - 876.0) <= 52.0 else ("E: read the Director's purge display." if x <= PURGE_DISPLAY_MAX_X else "Return to the safe point to enter records access.")
 	if state.door_open:
 		if seal_opening:
 			return SEAL_OPENING_HINT

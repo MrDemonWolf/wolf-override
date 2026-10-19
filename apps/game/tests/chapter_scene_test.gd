@@ -43,7 +43,7 @@ func _run() -> void:
 	await _tap(&"interact")
 	_expect(state.purge_trace_preserved and game.call("_objective") == "COPY MIRROR INDEX", "purge trace advances objective")
 	# Audit 23: a USE over the middle of a machine steps the engineer out beside it, facing it.
-	_expect(await _wait_until(func() -> bool: return float(game.get("engineer_step_x")) < 0.0, 40) and human.position.x + M0Actor.HUMAN_REACH <= 190.0 - 56.0 + 18.0 and not human.body_sprite.flip_h and human.controlled, "after copying the purge order the engineer stands beside the purge queue, facing it (x %.0f)" % human.position.x)
+	_expect(await _wait_until(func() -> bool: return float(game.get("engineer_step_x")) < 0.0, 40) and human.position.x + M0Actor.HUMAN_REACH <= RecordsRoom.PURGE_X - RecordsRoom.PURGE_HALF_WIDTH + 18.0 and not human.body_sprite.flip_h and human.controlled, "after copying the purge order the engineer stands beside the purge queue, facing it (x %.0f)" % human.position.x)
 	var purge_save: M0State = State.load_from_disk(path)
 	_expect(purge_save != null and absf(purge_save.human_position.x - human.position.x) <= 0.5, "the purge-copy autosave keeps the spot the engineer stepped out to, not the middle of the purge queue")
 	if not await _walk_to(human, 350.0):
@@ -59,11 +59,16 @@ func _run() -> void:
 		await physics_frame
 	_expect(absf(wolf.position.x - wolf_mirror_x) <= 42.0, "WOLF autonomously reaches the mirror")
 	_expect(await _wait_until(func() -> bool: return absf(wolf.position.x - wolf_mirror_x) <= 2.0 and wolf.body_sprite.flip_h, 120), "WOLF stops on the mirror port's right, facing it")
-	_expect(wolf.position.x - M0Actor.WOLF_REACH >= 520.0 + 45.0 - 18.0 and human.position.x + M0Actor.HUMAN_REACH < 520.0 - 45.0 + 18.0 and not human.body_sprite.flip_h, "neither WOLF nor the engineer is drawn inside the mirror port: he reads it from its right, they stand on its left (engineer x %.0f, WOLF x %.0f)" % [human.position.x, wolf.position.x])
+	_expect(wolf.position.x - M0Actor.WOLF_REACH >= RecordsRoom.MIRROR_X + RecordsRoom.MIRROR_HALF_WIDTH - 18.0 and human.position.x + M0Actor.HUMAN_REACH < RecordsRoom.MIRROR_X - RecordsRoom.MIRROR_HALF_WIDTH + 18.0 and not human.body_sprite.flip_h, "neither WOLF nor the engineer is drawn inside the mirror port: he reads it from its right, they stand on its left (engineer x %.0f, WOLF x %.0f)" % [human.position.x, wolf.position.x])
 	await _tap(&"choice_1")
 	_expect(state.mirror_trace_preserved and state.mirror_route == "wolf" and not game.get("waiting_for_choice"), "WOLF readout preserves timestamp once")
 	_expect(state.memory.get("choice_id") == State.DISCLOSE and state.memory.get("event_id") == State.EVENT_ID, "chapter preserves the actual relay memory")
 	_expect(str(game.call("_context_hint")) == "Mirror copied. Head for the exit.", "once the mirror timestamp is copied the mirror port's hint says so instead of offering it again")
+	# The readout beat: he holds his reading spot, facing the port, while the engineer is still at it,
+	# rather than walking back across the port and the engineer to follow.
+	for _frame in range(90):
+		await physics_frame
+	_expect(absf(wolf.position.x - wolf_mirror_x) <= 2.0 and wolf.body_sprite.flip_h, "after his readout WOLF stays at the mirror port's right, facing it, while the engineer is at it (x %.0f)" % wolf.position.x)
 	if not await _walk_to(human, 700.0):
 		_fail("engineer can walk on from the mirror port")
 		return
@@ -124,7 +129,7 @@ func _run() -> void:
 	over_queue.human_position = Vector2(188.2, 410.0)
 	over_queue.save_to_disk(path)
 	game.call("_load_game")
-	_expect(absf(human.position.x - (190.0 - 56.0)) <= 0.5 and not human.body_sprite.flip_h, "Continue over the PURGE QUEUE puts the engineer beside it, facing it (x %.1f)" % human.position.x)
+	_expect(absf(human.position.x - (RecordsRoom.PURGE_X - RecordsRoom.PURGE_HALF_WIDTH - M0Actor.HUMAN_REACH + Main.STATION_OVERLAP)) <= 0.5 and not human.body_sprite.flip_h, "Continue over the PURGE QUEUE puts the engineer beside it, facing it (x %.1f)" % human.position.x)
 	var beside_port: M0State = _checkpoint_state(State.PRESS)
 	beside_port.enter_records()
 	beside_port.human_position = Vector2(464.0, 410.0)

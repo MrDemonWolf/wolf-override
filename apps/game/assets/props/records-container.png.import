@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://dut117yg3pi3b"
-path="res://.godot/imported/junction-valve.png-7d59b0d529045c14035847e6eef4995b.ctex"
+uid="uid://bi6xcuody6fqf"
+path="res://.godot/imported/records-container.png-2a2db0d8572e5f626954aed4de0408d1.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/props/junction-valve.png"
-dest_files=["res://.godot/imported/junction-valve.png-7d59b0d529045c14035847e6eef4995b.ctex"]
+source_file="res://assets/props/records-container.png"
+dest_files=["res://.godot/imported/records-container.png-2a2db0d8572e5f626954aed4de0408d1.ctex"]
 
 [params]
 
