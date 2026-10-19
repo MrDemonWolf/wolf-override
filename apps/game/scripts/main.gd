@@ -124,41 +124,45 @@ const SKIP_OPENING_HINT: String = "PAUSE: skip the opening"
 const CORRIDOR_DOOR_LEFT_X: float = 752.0
 ## The corridor seal is a rolling steel door in a cast cross-wall that stands across the corridor
 ## (Nathanial's approved composition: a heavy portal across the way, its face seen at a slight
-## angle). The door is only the door: the scene's DoorArt is the shut curtain, SealLeaf winds it up
-## into the hood in its own plane, CorridorDoorOpen is its bottom bar tucked under the hood, and the
-## seal frame (far guide, hood, operator) draws over the curtain. The wall round it: CorridorSealWall
-## is the cross-wall behind the walk line with the doorway transparent (so the machinery room in the
-## far plate shows through it), drawn with the mid plate under everything else; the near column (its
-## guide, frame, end face, lamp socket and push buttons), the camera on its arm and the wall itself,
-## carried along its own line to the camera as a section cut at 0.36 m (so the plant room is closed on
-## the camera side and the door is the only way in; drawn as a clean cutaway, one dark section poche,
-## Nathanial's decision of 2026-10-14), draw over the actors, always opaque, and the column
-## is slim enough that nobody stopping at the safe point stands behind it. The curtain crosses the
-## walk line at the collision face (x 752, y 440). Every piece is a region of one lossless atlas (one
-## texture, so they batch); the wall, column, camera and stub are 2 px per world px, the rest 4 px;
-## positions are each piece's top-left.
-const CORRIDOR_SEAL_ATLAS: Texture2D = preload("res://assets/props/corridor-seal-atlas.png")
-const CORRIDOR_SEAL_CURTAIN_REGION: Rect2 = Rect2(391.0, 2.0, 279.0, 581.0)
-const CORRIDOR_SEAL_OPEN_REGION: Rect2 = Rect2(449.0, 619.0, 277.0, 82.0)
-const CORRIDOR_SEAL_FRAME_REGION: Rect2 = Rect2(2.0, 2.0, 387.0, 564.0)
-const CORRIDOR_SEAL_WALL_REGION: Rect2 = Rect2(672.0, 2.0, 267.0, 613.0)
-const CORRIDOR_SEAL_COLUMN_REGION: Rect2 = Rect2(941.0, 2.0, 74.0, 606.0)
-const CORRIDOR_SEAL_CAMERA_REGION: Rect2 = Rect2(858.0, 619.0, 49.0, 18.0)
-const CORRIDOR_SEAL_STUB_REGION: Rect2 = Rect2(2.0, 619.0, 443.0, 195.0)
-const CORRIDOR_SEAL_LENS_REGION: Rect2 = Rect2(822.0, 619.0, 32.0, 40.0)
-const CORRIDOR_SEAL_CURTAIN_AT: Vector2 = Vector2(721.75, 311.25)
-const CORRIDOR_SEAL_OPEN_AT: Vector2 = Vector2(722.25, 311.5)
-const CORRIDOR_SEAL_FRAME_AT: Vector2 = Vector2(700.5, 289.5)
-const CORRIDOR_SEAL_WALL_AT: Vector2 = Vector2(684.0, 150.0)
-const CORRIDOR_SEAL_COLUMN_AT: Vector2 = Vector2(785.0, 150.0)
-const CORRIDOR_SEAL_CAMERA_AT: Vector2 = Vector2(762.5, 267.5)
-const CORRIDOR_SEAL_STUB_AT: Vector2 = Vector2(762.5, 440.0)
-const CORRIDOR_SEAL_SCALE: float = 0.25
-const CORRIDOR_SEAL_FRONT_SCALE: float = 0.5
-## Where the shut curtain's art ends at the bottom (its near-jamb corner, in front of the walk line).
-const CORRIDOR_SEAL_FOOT_Y: float = 311.25 + 581.0 * 0.25
-## The guarded status lamp on the near column's end: its socket and guard are painted, its glass is
-## this live lens (red while shut, amber while the curtain moves, green open: Palette.LAMP_SHUT,
+## angle), drawn from the whole pieces of the approved art set (2026-10-16; its doors/DESIGN.md D4,
+## "one door language"). Behind the mid plate (RoomDepth.behind): the light through the doorway onto
+## the plant room in the far plate (SEAL_HOLE), SEAL_BACK (the inner blast leaf's pocket mouth, its
+## floor rail, the far reveal and the threshold), the inner blast leaf while it slides (BlastLeaf),
+## the door light's pool, then SEAL_WALL, the 0.66 m cross-wall's face with the hole, header and door
+## light fitting, running up past the mid plate's ceiling band. Over the mid plate, under the actors:
+## the curtain (SealLeaf: shut, rolling up into its hood, or parked with its bottom bar under it),
+## SEAL_HEAD (the hood bolted to the header and the far guide), the exit sign and the door light's
+## halo. Over the actors, always opaque: SEAL_FRONT (the wall's near end with the near guide and the
+## stub across the deck) and the live status lamp. The curtain crosses the walk line at the collision
+## face (x 752, y 440). Each piece's top-left is its world box in the art set's doors.py (piece_box
+## plus the manifest's offset); every projected piece is at DoorKit.PIECE_SCALE.
+const SEAL_BACK: Texture2D = preload("res://assets/doors/seal-back.png")
+const SEAL_WALL: Texture2D = preload("res://assets/doors/seal-wall.png")
+const SEAL_HEAD: Texture2D = preload("res://assets/doors/seal-head.png")
+const SEAL_FRONT: Texture2D = preload("res://assets/doors/seal-front.png")
+const SEAL_CURTAIN: Texture2D = preload("res://assets/doors/seal-curtain.png")
+const SEAL_BLAST_LEAF: Texture2D = preload("res://assets/doors/seal-blast-leaf.png")
+const SEAL_BACK_AT: Vector2 = Vector2(724.80, 311.13)
+const SEAL_WALL_AT: Vector2 = Vector2(708.43, 0.0)
+const SEAL_HEAD_AT: Vector2 = Vector2(706.50, 294.24)
+const SEAL_FRONT_AT: Vector2 = Vector2(787.96, 0.0)
+## The opening on the wall's face, foot to head (world px, doors.py W(a, h, 0) at a -2.10 and 1.45 m,
+## h 0 and 3.05 m): the light through it.
+const SEAL_HOLE: PackedVector2Array = [Vector2(792.89, 455.71), Vector2(726.20, 430.09), Vector2(726.20, 312.38), Vector2(792.89, 326.90)]
+## The plant room's light through the doorway (added, est.: tuned on rendered captures until the hole
+## reads at least 1.5 times the wall round it, the design's light-the-way-out target).
+const SEAL_HOLE_LIGHT: Color = Color(0.16, 0.19, 0.21)
+## The door light's pool on the threshold and its graze on the far reveal (doors.py surface_lights:
+## W(mid, 0, T/2) radius 5 squashed 0.3, W(a1, 0.6 H, T/2) radius 2.5 stretched 3), and the lens of the
+## wall pack over the hood (W(a1 + 0.27, H + 0.55 + 0.29, -0.05)).
+const SEAL_POOL: Vector2 = Vector2(770.04, 441.60)
+const SEAL_GRAZE: Vector2 = Vector2(737.76, 358.98)
+const SEAL_DOOR_LIGHT: Vector2 = Vector2(719.85, 279.22)
+## The flag exit sign over the hood (doors.py sign_at: a 0.40 x 0.20 m housing 0.12 m over the hood,
+## its bracket 0.87 m toward the near jamb so it centres over the opening on screen).
+const SEAL_SIGN: Rect2 = Rect2(752.14, 286.03, 14.80, 8.61)
+## The guarded status lamp on the near column's end: its socket and guard are painted on SEAL_FRONT,
+## its glass is this live lens (DoorKit.Lamp) (red while shut, amber while the curtain moves, green open: Palette.LAMP_SHUT,
 ## Palette.AMBER and Palette.LAMP_OPEN, as every door's status lamp), as on the approved
 ## door concept; the lines that call it "the red seal" point at it.
 const CORRIDOR_SEAL_LAMP: Vector2 = Vector2(807.908, 344.759)
@@ -524,7 +528,6 @@ const JUNCTION_RESTORE_A_LINE: String = "Service junction restored. Arm the brea
 @onready var checkpoint_art: Sprite2D = $CheckpointArt
 @onready var breaker_status_light: ColorRect = $BreakerStatusLight
 @onready var relay_status_light: ColorRect = $RelayStatusLight
-@onready var door_art: Sprite2D = $Door/Visual/DoorArt
 @onready var door_shape: CollisionShape2D = $Door/CollisionShape2D
 @onready var door_visual: ColorRect = $Door/Visual
 @onready var top_card: Panel = $CanvasLayer/TopBar
@@ -719,23 +722,18 @@ var save_pending: bool = false
 var floor_reflections: Array[FloorReflection] = []
 var breaker_status_glow: Sprite2D
 var relay_status_glow: Sprite2D
-## The corridor bulkhead standing open, and its near column drawn over the actors.
-var door_open_art: Sprite2D
+## The seal's wall's near end (SEAL_FRONT), drawn over the actors.
 var door_lip: Sprite2D
-## The cross-wall round the seal (with the mid plate), and the camera and the wall's stub drawn over
-## the actors with the near column.
+## The cross-wall's face round the seal (behind the mid plate), and the hood with the far guide over
+## the curtain.
 var seal_wall: Sprite2D
-var seal_camera: Sprite2D
-var seal_stub: Sprite2D
-## The seal's frame (far guide, hood, operator), drawn over the curtain and under the actors.
-var seal_frame: Sprite2D
-## The seal's live status lamp lens and its small glow (lit only while moving or open).
-var seal_lamp: Sprite2D
-var seal_lamp_glow: Sprite2D
-## The seal's rolling curtain winding up into its hood while the seal opens.
+var seal_head: Sprite2D
+## The seal's live status lamp (its halo lit only while open).
+var seal_lamp: DoorKit.Lamp
+## The seal's rolling curtain: shut, winding up into its hood while the seal opens, parked open.
 var seal_leaf: SealLeaf
 ## The inner blast leaf behind the roller, sliding back into its wall pocket while the seal opens
-## (the parked leaf's edge is painted into the wall piece, so this draws only while it moves).
+## (parked in its pocket, out of sight, so this draws only while it moves).
 var blast_leaf: BlastLeaf
 ## True from the moment the seal starts to open until its curtain is up in the hood.
 var seal_opening: bool = false
@@ -1060,50 +1058,37 @@ func _hide_changelog() -> void:
 	_grab_menu_focus(changelog_button)
 
 
-## The seal's layers round the scene's shut DoorArt: the cross-wall with the mid plate, the tucked bar
-## once open, the curtain mesh while it rises, the seal frame over the curtain, the near column, the
-## camera and the wall's stub over the actors (always opaque), and the lamp's live lens under the
-## column's painted guard bars.
+## The seal's pieces, back to front (see SEAL_BACK): the doorway behind the mid plate, the curtain,
+## hood, sign and door light over it, and the wall's near end with the status lamp over the actors.
 func _setup_corridor_door() -> void:
-	# The wall belongs to the corridor's plates: it shows whenever they do (the opening too), drawn
-	# right after the mid plate.
-	seal_wall = _seal_sprite("CorridorSealWall", CORRIDOR_SEAL_WALL_REGION, CORRIDOR_SEAL_WALL_AT, CORRIDOR_SEAL_FRONT_SCALE)
-	seal_wall.z_as_relative = false
-	seal_wall.z_index = RoomDepth.Z_MID
-	corridor_depth.add_child(seal_wall)
-	door_open_art = _seal_sprite("CorridorDoorOpen", CORRIDOR_SEAL_OPEN_REGION, CORRIDOR_SEAL_OPEN_AT)
-	seal_leaf = SealLeaf.new(CORRIDOR_SEAL_ATLAS, CORRIDOR_SEAL_CURTAIN_REGION, CORRIDOR_SEAL_CURTAIN_AT, CORRIDOR_SEAL_SCALE)
-	blast_leaf = BlastLeaf.new(CORRIDOR_SEAL_ATLAS)
-	seal_frame = _seal_sprite("CorridorSealFrame", CORRIDOR_SEAL_FRAME_REGION, CORRIDOR_SEAL_FRAME_AT)
-	door_lip = _seal_sprite("CorridorDoorFront", CORRIDOR_SEAL_COLUMN_REGION, CORRIDOR_SEAL_COLUMN_AT, CORRIDOR_SEAL_FRONT_SCALE)
+	# The doorway belongs to the corridor's plates: it shows whenever they do (the opening too).
+	var behind: Node2D = corridor_depth.behind
+	DoorKit.hole_light(behind, "SealHoleLight", SEAL_HOLE, SEAL_HOLE_LIGHT)
+	DoorKit.piece(behind, SEAL_BACK, SEAL_BACK_AT, "CorridorSealBack")
+	blast_leaf = BlastLeaf.new(SEAL_BLAST_LEAF)
+	blast_leaf.visible = false
+	behind.add_child(blast_leaf)
+	DoorKit.glow(behind, "SealPool", SEAL_POOL, 5.0, DoorKit.DOOR_LIGHT_COLOR, 0.3, 0.3)
+	DoorKit.glow(behind, "SealGraze", SEAL_GRAZE, 2.5, DoorKit.DOOR_LIGHT_COLOR, 0.15, 3.0)
+	seal_wall = DoorKit.piece(behind, SEAL_WALL, SEAL_WALL_AT, "CorridorSealWall", DoorKit.WALL_LIFT)
+	# Over the mid plate (after it in the room, on its layer), under the stations and the actors.
+	var over: Node2D = Node2D.new()
+	over.name = "CorridorSealOver"
+	over.z_as_relative = false
+	over.z_index = RoomDepth.Z_MID
+	corridor_depth.add_child(over)
+	seal_leaf = SealLeaf.new(SEAL_CURTAIN)
+	over.add_child(seal_leaf)
+	seal_head = DoorKit.piece(over, SEAL_HEAD, SEAL_HEAD_AT, "CorridorSealHead")
+	DoorKit.exit_sign(over, SEAL_SIGN, 1.0)
+	DoorKit.door_light(over, SEAL_DOOR_LIGHT)
+	# The wall's near end and the lamp over the actors, always opaque.
+	door_lip = DoorKit.piece(self, SEAL_FRONT, SEAL_FRONT_AT, "CorridorDoorFront")
 	door_lip.z_index = KNOCKDOWN_Z
-	seal_camera = _seal_sprite("CorridorSealCamera", CORRIDOR_SEAL_CAMERA_REGION, CORRIDOR_SEAL_CAMERA_AT, CORRIDOR_SEAL_FRONT_SCALE)
-	seal_camera.z_index = KNOCKDOWN_Z
-	seal_stub = _seal_sprite("CorridorSealStub", CORRIDOR_SEAL_STUB_REGION, CORRIDOR_SEAL_STUB_AT, CORRIDOR_SEAL_FRONT_SCALE)
-	seal_stub.z_index = KNOCKDOWN_Z
-	seal_lamp = _seal_sprite("SealLamp", CORRIDOR_SEAL_LENS_REGION, CORRIDOR_SEAL_LAMP - CORRIDOR_SEAL_LENS_REGION.size * CORRIDOR_SEAL_SCALE * 0.5)
+	door_lip.visible = false
+	seal_lamp = DoorKit.lamp(self, "SealLamp", CORRIDOR_SEAL_LAMP, Palette.LAMP_SHUT)
 	seal_lamp.z_index = KNOCKDOWN_Z
-	seal_lamp_glow = RoomDepth.make_glow(Palette.LAMP_OPEN, Vector2(22.0, 22.0), 0.45)
-	seal_lamp_glow.name = "SealLampGlow"
-	seal_lamp_glow.position = CORRIDOR_SEAL_LAMP
-	seal_lamp_glow.z_index = KNOCKDOWN_Z
-	# The tucked bar, the inner blast leaf, the rising curtain and the frame draw right after the shut
-	# curtain (the door body's children, in that order), so the atlas pieces batch into one draw call;
-	# their positions stay world positions.
-	var door_body: Node2D = door_visual.get_parent() as Node2D
-	for art: Node2D in [door_open_art, blast_leaf, seal_leaf, seal_frame]:
-		art.visible = false
-		art.position -= door_body.global_position
-		door_body.add_child(art)
-	for art: Node2D in [door_lip, seal_camera, seal_stub, seal_lamp, seal_lamp_glow]:
-		art.visible = false
-		add_child(art)
-
-
-## One piece of the corridor seal, cut from CORRIDOR_SEAL_ATLAS and placed by its world top-left; the
-## caller adds it where it draws.
-func _seal_sprite(node_name: String, region: Rect2, top_left: Vector2, scale_factor: float = CORRIDOR_SEAL_SCALE) -> Sprite2D:
-	return RoomDepth.cut(CORRIDOR_SEAL_ATLAS, region, scale_factor, node_name, top_left)
+	seal_lamp.visible = false
 
 
 ## The MANUAL BYPASS on the relay's right, with the relay's COOLANT FAULT tag (a touch left of the
@@ -1757,7 +1742,7 @@ func _new_game() -> void:
 	$BreakerLabel.hide()
 	$RelayLabel.hide()
 	$CheckpointLabel.hide()
-	for station: CanvasItem in [breaker_art, relay_art, checkpoint_art, breaker_status_light, relay_status_light, door_visual, door_open_art, door_lip, seal_camera, seal_stub, seal_frame, seal_lamp, seal_lamp_glow, bypass_handle]:
+	for station: CanvasItem in [breaker_art, relay_art, checkpoint_art, breaker_status_light, relay_status_light, door_visual, door_lip, seal_lamp, bypass_handle]:
 		station.hide()
 	wolf.position = Vector2(115.0, 423.0)
 	wolf.z_index = ACTOR_Z
@@ -4193,8 +4178,9 @@ func _sync_records_room(animate_exit: bool = false) -> void:
 
 
 ## The corridor seal: a rolling steel door in the cross-wall, shut, or standing open on the plant room
-## beyond. Opening in play winds the curtain up into its hood (SealLeaf), and the doorway stays shut
-## until it is up, with its thud and dust. Its front pillar shows either way.
+## beyond with the curtain parked in its hood. Opening in play winds the curtain up (SealLeaf) while
+## the inner blast leaf slides into its pocket, and the doorway stays shut until it is up, with its
+## thud and dust. Its front pillar shows either way.
 func _sync_door(animate: bool = false) -> void:
 	Tweens.kill(door_tween)
 	var in_corridor: bool = state.chapter_id == "lockdown"
@@ -4205,22 +4191,16 @@ func _sync_door(animate: bool = false) -> void:
 	door_visual.scale = Vector2.ONE
 	door_visual.modulate = Color.WHITE
 	door_visual.visible = in_corridor and not state.door_open
-	door_open_art.visible = in_corridor and state.door_open
 	door_lip.visible = in_corridor
-	seal_camera.visible = in_corridor
-	seal_stub.visible = in_corridor
-	seal_frame.visible = in_corridor
 	seal_lamp.visible = in_corridor
 	_set_seal_lamp(Palette.AMBER if sliding else (Palette.LAMP_OPEN if state.door_open else Palette.LAMP_SHUT))
-	seal_lamp_glow.visible = in_corridor and state.door_open
-	seal_leaf.open = 0.0
-	seal_leaf.visible = sliding
+	seal_lamp.halo.visible = state.door_open
+	seal_leaf.open = 1.0 if state.door_open and not sliding else 0.0
 	blast_leaf.open = 0.0
 	blast_leaf.visible = sliding
 	if sliding:
 		door_tween = create_tween()
 		door_tween.tween_method(_set_seal_open, 0.0, 1.0, CORRIDOR_DOOR_OPEN_SECONDS).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN_OUT)
-		door_tween.tween_callback(seal_leaf.hide)
 		door_tween.tween_callback(blast_leaf.hide)
 		door_tween.tween_callback(_set_seal_lamp.bind(Palette.LAMP_OPEN))
 		door_tween.tween_callback(_door_lands)
@@ -4233,10 +4213,9 @@ func _set_seal_open(value: float) -> void:
 
 
 ## The seal's status lamp: red while shut, amber while the curtain moves, green open; only the lens
-## is live, and only the open lamp throws a glow.
+## is live, and only the open lamp throws a glow (_sync_door).
 func _set_seal_lamp(color: Color) -> void:
-	seal_lamp.modulate = color
-	seal_lamp_glow.modulate = Color(color, 0.45)
+	seal_lamp.color = color
 
 
 func _update_controls() -> void:

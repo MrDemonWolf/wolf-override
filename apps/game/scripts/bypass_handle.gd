@@ -3,8 +3,8 @@ extends Node2D
 ## The corridor's MANUAL BYPASS: a 0.525 m handwheel on a worm gearbox, on a steel backplate anchored
 ## to the corridor wall at the cross-wall's corner, with its hub at 1.0 m; an enclosed chain guard
 ## runs straight up the wall in two clamp brackets to the door operator's manual input. The backplate,
-## gearbox and guard are painted into the corridor's mid plate; only the wheel is drawn here, so it
-## can turn. Its hub sits WHEEL_OFFSET from the gameplay point (Main's BYPASS_WHEEL), under the hand
+## gearbox and guard are one whole piece (GEARBOX) and the wheel another on its shaft, so only the
+## wheel turns. Its hub sits WHEEL_OFFSET from the gameplay point (Main's BYPASS_WHEEL), under the hand
 ## of the engineer's crank pose. A row of crank lights along the bottom of its name plate, above the
 ## head of the engineer cranking it and clear of WOLF beside them, counts the held-USE ticks. It also carries the relay's
 ## COOLANT FAULT tag, until WOLF takes the surge or the bypass locks over, and the coolant that jets
@@ -27,6 +27,13 @@ const SPRING_BACK_SECONDS: float = 0.12
 const HANDWHEEL: Texture2D = preload("res://assets/props/handwheel.png")
 const HANDWHEEL_SCALE: float = 1.0 / 5.5
 const WHEEL_SCALE: float = 0.6 * HANDWHEEL_SCALE
+## The MANUAL BYPASS worm gearbox on its wall backplate with the chain guard running up: one whole piece
+## of the approved art set (2026-10-16), 122 x 164 px at 5.5 px per world px (22.2 x 29.8 world px), its
+## shaft boss GEARBOX_SHAFT world px from its top-left (measured on bypass-gearbox.png, as the art set's
+## compose step placed it under the hub).
+const GEARBOX: Texture2D = preload("res://assets/props/bypass-gearbox.png")
+const GEARBOX_SCALE: float = 1.0 / 5.5
+const GEARBOX_SHAFT: Vector2 = Vector2(12.0, 21.0)
 ## The centre of the wheel's hub on the piece (piece px, measured on handwheel.png): the axis it turns
 ## about, 2 px below the piece's own centre.
 const HANDWHEEL_HUB: Vector2 = Vector2(100.0, 101.0)
@@ -107,6 +114,7 @@ var hold_fraction: float = 0.0
 ## The relay is dealt with (WOLF took the surge, or the bypass locked over): the COOLANT FAULT tag is
 ## gone (PUZ-7). Set through clear_fault.
 var fault_cleared: bool = false
+var gearbox: Sprite2D
 var wheel: Sprite2D
 var bypass_label: Label
 var fault_tag: Label
@@ -121,6 +129,9 @@ var _relay_x: float = 0.0
 
 func _init() -> void:
 	name = "BypassHandle"
+	# The gearbox under the wheel, its shaft boss on the wheel's hub.
+	gearbox = RoomDepth.cut(GEARBOX, Rect2(Vector2.ZERO, GEARBOX.get_size()), GEARBOX_SCALE, "Gearbox", WHEEL_OFFSET - GEARBOX_SHAFT)
+	add_child(gearbox)
 	wheel = make_wheel("Wheel", WHEEL_SCALE)
 	wheel.position = WHEEL_OFFSET
 	add_child(wheel)
