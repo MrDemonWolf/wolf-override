@@ -13,7 +13,8 @@ extends RefCounted
 ## - A Control whose whole text is one message keeps Godot's auto-translate (scene buttons, Settings
 ##   captions): it is given the English and translates itself, also when the language changes.
 ## - Text worked out every frame (hints, prompts) calls tr() where it is worked out; a template is
-##   translated first and filled after (tr(TEMPLATE) % key).
+##   translated first and filled after (tr(TEMPLATE) % key). A HUD line that names a key keeps its
+##   English for the code and is drawn through HudText (PR L7b), which fills the key after tr().
 ## - Text kept between frames (status_line, the top card, a knockdown card) stays English and is
 ##   translated where it is drawn, by [method shown] and [method lines]; its Label has auto-translate
 ##   off, so nothing is translated twice.
