@@ -1,5 +1,5 @@
 class_name BlastLeaf
-extends Node2D
+extends DoorLeaf
 ## The corridor seal's inner blast leaf while the seal opens. A 0.36 m steel-faced concrete leaf runs
 ## in a slot 0.14..0.54 m behind the cross-wall's face on two bogies in a floor rail: shut, its
 ## leading edge sits in a receiver in the near jamb (behind the column); it slides back along the
@@ -46,19 +46,10 @@ const LIGHT: PackedFloat32Array = [
 	0.612, 0.612, 0.612, 0.612, 0.612, 0.612, 0.612, 0.552, 0.552, 0.761, 0.791, 0.791, 0.821, 0.851, 0.881, 0.91, 0.582, 0.552, 0.791, 0.821, 0.821, 0.851, 0.881, 0.91, 0.94, 0.612, 0.582, 0.821, 0.851, 0.851, 0.881, 0.881, 0.91, 0.97, 0.642, 0.612, 0.881, 0.881, 0.881, 0.91, 0.91, 0.94, 0.97, 0.672, 0.642, 0.91, 0.91, 0.91, 0.91, 0.91, 0.94, 0.94, 0.701, 0.672, 0.97, 0.97, 0.97, 0.94, 0.94, 0.91, 0.91, 0.731, 0.701, 1.0, 1.0, 1.0, 0.97, 0.94, 0.91, 0.881, 0.731, 0.701, 0.463, 0.463, 0.463, 0.463, 0.493, 0.493, 0.493, 0.343, 0.343,
 ]
 
-## The seal's open value (0 shut, 1 open), the same value SealLeaf.open takes.
-var open: float = 0.0:
-	set(value):
-		open = clampf(value, 0.0, 1.0)
-		queue_redraw()
-var texture: Texture2D
-
-
-## A leaf drawn with [param art], the flat seal-blast-leaf piece.
+## A leaf drawn with [param art], the flat seal-blast-leaf piece. Its [member DoorLeaf.open] is the
+## seal's open value, the same value SealLeaf.open takes.
 func _init(art: Texture2D) -> void:
-	name = "BlastLeaf"
-	texture = art
-	texture_filter = CanvasItem.TEXTURE_FILTER_LINEAR_WITH_MIPMAPS
+	super("BlastLeaf", art)
 
 
 ## World (clamp-world) position of the point a metres along the wall, h up, t into it: the wall

@@ -1,5 +1,5 @@
 class_name SealLeaf
-extends Node2D
+extends DoorLeaf
 ## The corridor seal's rolling steel curtain, shut, rolling up and parked open. The door stands across
 ## the corridor in the cross-wall's turned face, so the curtain is drawn as a mesh in that plane: COLUMNS
 ## are vertical lines of the curtain (world x, the floor's y under them, and world px per metre of
@@ -40,20 +40,10 @@ const HOOD_SHADOW_FLOOR: float = 0.42
 ## Rows of the mesh (metres), so the shadow's falloff is smooth.
 const ROWS: PackedFloat32Array = [0.0, 0.4, 0.709, 0.95, 1.2, 1.45, 1.7, 2.024, 2.5, 3.07]
 
-## 0 shut, 1 wound up into the hood.
-var open: float = 0.0:
-	set(value):
-		open = clampf(value, 0.0, 1.0)
-		queue_redraw()
-## The curtain's art (seal-curtain.png).
-var texture: Texture2D
-
-
-## A curtain drawn with [param art], the flat seal-curtain piece.
+## A curtain drawn with [param art], the flat seal-curtain piece; [member DoorLeaf.open] 0 is shut, 1
+## wound up into the hood.
 func _init(art: Texture2D) -> void:
-	name = "SealLeaf"
-	texture = art
-	texture_filter = CanvasItem.TEXTURE_FILTER_LINEAR_WITH_MIPMAPS
+	super("SealLeaf", art)
 
 
 ## How lit the curtain is at [param h] metres up, under the hood's shadow.
