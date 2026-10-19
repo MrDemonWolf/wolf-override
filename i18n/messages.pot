@@ -76,7 +76,7 @@ msgid ""
 msgstr ""
 
 #: scenes/main.tscn
-#: scripts/main.gd:4421
+#: scripts/main.gd:4423
 msgid "PAUSE"
 msgstr ""
 
@@ -232,7 +232,7 @@ msgid "BACK TO TITLE"
 msgstr ""
 
 #: scenes/main.tscn
-#: scripts/main.gd:1862
+#: scripts/main.gd:1864
 msgid "PAUSE SCROLL"
 msgstr ""
 
@@ -347,7 +347,7 @@ msgid "Default controls restored."
 msgstr ""
 
 #: scripts/game_settings.gd:608
-#: scripts/main.gd:1990
+#: scripts/main.gd:1992
 msgid "Settings could not be saved."
 msgstr ""
 
@@ -379,38 +379,38 @@ msgstr ""
 msgid "EXIT LOCKED"
 msgstr ""
 
-#: scripts/main.gd:1017
+#: scripts/main.gd:1019
 msgid "LINK UNAVAILABLE"
 msgstr ""
 
-#: scripts/main.gd:1897
+#: scripts/main.gd:1899
 msgid "RESUME SCROLL"
 msgstr ""
 
-#: scripts/main.gd:1930
+#: scripts/main.gd:1932
 msgid "30 FPS"
 msgstr ""
 
-#: scripts/main.gd:1931
+#: scripts/main.gd:1933
 msgid "60 FPS"
 msgstr ""
 
-#: scripts/main.gd:1932
+#: scripts/main.gd:1934
 msgid "UNCAPPED"
 msgstr ""
 
-#: scripts/main.gd:1933
+#: scripts/main.gd:1935
 msgid "90 FPS"
 msgstr ""
 
-#: scripts/main.gd:1934
+#: scripts/main.gd:1936
 msgid "120 FPS"
 msgstr ""
 
-#: scripts/main.gd:1935
+#: scripts/main.gd:1937
 msgid "144 FPS"
 msgstr ""
 
-#: scripts/main.gd:1952
+#: scripts/main.gd:1954
 msgid "TAP RESUME TO RETURN"
 msgstr ""
