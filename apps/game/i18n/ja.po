@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: WOLF OVERRIDE\n"
-"PO-Revision-Date: 2026-10-20 00:30+0000\n"
+"PO-Revision-Date: 2026-10-20 02:00+0000\n"
 "Last-Translator: Claude (Anthropic), machine translation, unreviewed\n"
 "Language-Team: none\n"
 "MIME-Version: 1.0\n"
@@ -2569,11 +2569,11 @@ msgid "I heard you. I won't do it."
 msgstr "聞いていた。俺はやらない。"
 
 # machine-translated by Claude (Anthropic), unreviewed
-#. TRANSLATORS: The Director's order after WOLF refuses.
+#. TRANSLATORS: The Director's order after WOLF refuses. WOLFは、 (as for WOLF): with WOLFを the row broke between WOLF and its particle (PR L12's stills); the comma gives the box a clean break.
 #. i18n: story speaker=DIRECTOR
 #: scripts/story_text.gd:53
 msgid "Lock down maintenance. WOLF does not leave this site."
-msgstr "整備区画を封鎖しろ。WOLFをこの施設から出すな。"
+msgstr "整備区画を封鎖しろ。WOLFは、この施設から出すな。"
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: i18n: story speaker=narrator
