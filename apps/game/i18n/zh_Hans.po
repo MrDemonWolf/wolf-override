@@ -2801,7 +2801,7 @@ msgstr "已经通电了。转动门边的阀门。"
 #. TRANSLATORS: i18n: story speaker=narrator
 #: scripts/story_text.gd:138
 msgid "No charge left. The door is down."
-msgstr "已经没有电荷了。门已经倒了。"
+msgstr "已经没有充能了。门已经炸开了。"
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: i18n: story speaker=narrator
@@ -2970,7 +2970,7 @@ msgid ""
 "the sentry flat. Its eyes go dark."
 msgstr ""
 "储罐正正砸下，把哨兵\n"
-"压得粉碎。它的眼睛暗了下去。"
+"压扁了。它的眼睛暗了下去。"
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: i18n: story speaker=narrator
