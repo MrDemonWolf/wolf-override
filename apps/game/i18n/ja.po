@@ -1205,7 +1205,7 @@ msgid ""
 "I refused. You found another way. Next time, tell me what it costs."
 msgstr ""
 "「%s」と言ったな。\n"
-"俺は断った。それでも別の道を見つけた。次は、何が代償か先に教えてくれ。"
+"俺は断った。そっちは別の道を見つけた。次は、何が代償か先に教えてくれ。"
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: WOLF's callback at the safe point. %s is the answer the engineer chose at the relay, as the game shows it; keep the quotation marks round it in your language's style. Avoid a past tense that shows the engineer's gender ("you said").
@@ -2623,7 +2623,7 @@ msgstr "あのパージで原本のプログラムログが消される。消え
 #. i18n: story speaker=WOLF
 #: scripts/story_text.gd:73
 msgid "That relay's tagged COOLANT FAULT. What happens if I touch it live?"
-msgstr "あのリレーにはCOOLANT FAULTの札が付いてる。通電中に触ったらどうなる？"
+msgstr "あのリレーにはCOOLANT FAULTの札が付いてる。通電中に俺が触ったらどうなる？"
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: An answer the engineer can give WOLF at the relay (a button). WOLF may quote it later.
