@@ -440,11 +440,11 @@ msgid "MrDemonWolf, Inc."
 msgstr "MrDemonWolf, Inc."
 
 # machine-translated by Claude (Anthropic), unreviewed
-#. TRANSLATORS: Station plate (12-13 px label on a machine). ALL CAPS, as short as possible. The corridor's hand-cranked bypass wheel beside the relay; the hints name it with the same words.
+#. TRANSLATORS: Station plate (12-13 px label on a machine). ALL CAPS, as short as possible. The corridor's hand-cranked bypass wheel beside the relay; the hints name it with the same words. 装置 (device) is added so the plate breaks onto two rows at every TEXT SIZE, as the English does: four characters fit one row at 100% and broke onto two above it, moving the plate's foot (text_boxes_test).
 #. i18n: speaker=ui
 #: scripts/bypass_handle.gd:141
 msgid "MANUAL BYPASS"
-msgstr "手动旁路"
+msgstr "手动旁路装置"
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: CONTROLS row caption (220 px, 16 px) and the name in the rebind notes: the action.
