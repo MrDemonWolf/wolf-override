@@ -2678,7 +2678,7 @@ msgstr "FILA DE PURGA"
 #: scripts/records_room.gd:269
 #: scripts/records_room.gd:364
 msgid "MIRROR PORT"
-msgstr "PORTA ESPELHO"
+msgstr "PORTA DE DADOS ESPELHO"
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: Station plate (12-13 px label on a machine). ALL CAPS, as short as possible. The name over Records Access's exit door, beside a green exit sign.

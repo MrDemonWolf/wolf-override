@@ -2630,7 +2630,7 @@ msgstr "ブレーカーを確認"
 #: scripts/records_room.gd:268
 #: scripts/records_room.gd:362
 msgid "PURGE QUEUE"
-msgstr "パージ待機列"
+msgstr "パージキュー"
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: Station plate (12-13 px label on a machine). ALL CAPS, as short as possible. The Records Access data port that holds the mirror index the engineer copies.
