@@ -9,6 +9,8 @@ No target was exported or device-tested. Godot 4.7.2 is installed and M0 launche
 | iPad | Apple export setup plus tablet layout | Actual iPad UI/input/resume/save testing. |
 | Android | SDK/JDK/packages required by actual engine pin; export/signing steps | Export separately from real-device input/resume/save/TTS fallback. |
 
+Languages in the Mac and Windows exports (the `.lproj` folders, the catalogs in the pack, the store language lists) are recorded once, on the website's [Localization page, Exports](../apps/docs/content/docs/development/localization.mdx#exports).
+
 Mac first; validate other targets early after M0. Targets do not imply simultaneous release. Record date, engine/templates, OS/device, build identifier and each observed result. Headless checks, export success, graphical play and actual-device validation are different evidence.
 
 ## Touchscreen input (deferred)
