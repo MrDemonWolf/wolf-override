@@ -69,8 +69,14 @@ static func split(message: String, speakers: Array[String], fits: Callable, lang
 ## [param font], wrapped by [param language]'s row rule ([method wrap_width] with
 ## [method row_characters]). The one fit rule: Main's dialogue box and tests/text_boxes_test.gd both
 ## split with it. Pure for a named [param language]; with "" it also reads the language shown.
+## A box whose rows must break at spaces ([method breaks_at_spaces], Korean) fits only when it takes
+## one row or [method keep_words] finds a space that leaves each row on one row: the text server would
+## pack it into two rows by breaking inside words, so such a box is split at its sentences instead.
 static func fits(words: String, font: Font, font_size: int, width: float, language: String = "") -> bool:
-	return rows(words, font, font_size, wrap_width(words, font, font_size, width, row_characters(language))).size() <= MAX_ROWS
+	var limit: int = row_characters(language)
+	if limit == 0 and breaks_at_spaces(words) and rows(words, font, font_size, width).size() > 1:
+		return keep_words(words, font, font_size, width) != words
+	return rows(words, font, font_size, wrap_width(words, font, font_size, width, limit)).size() <= MAX_ROWS
 
 
 ## The most characters a dialogue row of [param language] holds ("row_characters" in I18n.LANGUAGES,
@@ -230,8 +236,9 @@ static func wrap_width(text: String, font: Font, font_size: int, width: float, m
 ## showed "た。" and "いる。" so; DESIGN.md "Per-script row limits"). Rows are counted with whole words
 ## ([method rows]' whole_words): narrowing the width must never move a break inside a word, which the
 ## Label's smart wrap would otherwise do once a word no longer fits (PR L12's Korean stills broke
-## "있" / "다." and "게" / "이지가"; Japanese "向" / "け"). Two rows break at a space or after a Chinese or
-## Japanese comma or full stop instead where one can ([method _mark_width]). Text on one
+## "있" / "다." and "게" / "이지가"; Japanese "向" / "け"). Two rows break after a Chinese or Japanese
+## comma or full stop instead where one can ([method _mark_width]); Korean rows break at the space
+## [method keep_words] puts a line break in. Text on one
 ## row, or on more rows than a box holds, keeps the column. Found by halving: fewer than 10 layouts of
 ## the text.
 static func _balanced_width(text: String, font: Font, font_size: int, width: float) -> float:
@@ -253,40 +260,75 @@ static func _balanced_width(text: String, font: Font, font_size: int, width: flo
 	return minf(wide_enough + 1.0, width)
 
 
-## The width at which two rows of [param text] break at a space or right after one of NO_SPACE_MARKS
-## (the Chinese and Japanese full stops and commas), or 0 when none can. Why: Chinese and Japanese are
-## written without spaces, and the text server breaks Korean between any two syllables too (Unicode's
-## line rules for Hangul), so the evenest width alone split words (PR L12's stills: "背を向" / "け、",
-## Korean "있" / "다." and "게" / "이지가"), where a reader expects the break at a comma or a space. The
-## break that leaves the most even rows wins among those whose shorter row is at least half as wide as
-## the longer (the balance tests/text_boxes_test.gd asks of every two-row box); when none is that even,
-## the most even break at a space still wins over a split word. The first row is laid exactly as wide
-## as the text before the break, since a wider one would take the next syllables too, so only a break
-## at or past the middle qualifies (the second row must fit that width), and both must fit [param width].
-## Pure: lays the text out once per candidate.
+## The width at which two rows of [param text] break right after one of NO_SPACE_MARKS (the Chinese and
+## Japanese full stops and commas), choosing the mark that leaves the most even rows, or 0 when none
+## does. Why: these scripts are written without spaces and the text server may break between any two
+## characters, so the evenest width alone split a verb from its ending (PR L12's stills: "背を向" /
+## "け、"), where a reader expects the break at the comma. A mark only counts when the shorter row is
+## at least half as wide as the longer (the balance tests/text_boxes_test.gd asks of every two-row
+## box) and both rows fit [param width]; the first row is then laid exactly that wide, so a mark before
+## the middle never qualifies (its second row would not fit). Pure: lays the text out once per mark.
 static func _mark_width(text: String, font: Font, font_size: int, width: float) -> float:
-	var best: Array[float] = [0.0, INF]
-	var uneven: Array[float] = [0.0, INF]
+	var best: float = 0.0
+	var best_gap: float = INF
 	for index: int in text.length() - 1:
-		var at_space: bool = text[index] == " "
-		if not (at_space or NO_SPACE_MARKS.contains(text[index])) or NO_BREAK_BEFORE.contains(text[index + 1]):
+		if not NO_SPACE_MARKS.contains(text[index]) or NO_BREAK_BEFORE.contains(text[index + 1]):
 			continue
-		var end: int = index if at_space else index + 1
-		var first: float = font.get_string_size(text.left(end).strip_edges(), HORIZONTAL_ALIGNMENT_LEFT, -1.0, font_size).x
+		var first: float = font.get_string_size(text.left(index + 1), HORIZONTAL_ALIGNMENT_LEFT, -1.0, font_size).x
 		var second: float = font.get_string_size(text.substr(index + 1).strip_edges(), HORIZONTAL_ALIGNMENT_LEFT, -1.0, font_size).x
-		var gap: float = absf(first - second)
-		var even: bool = minf(first, second) >= 0.5 * maxf(first, second)
-		var slot: Array[float] = best if even else uneven
-		if (not even and not at_space) or gap >= slot[1]:
+		if minf(first, second) < 0.5 * maxf(first, second) or absf(first - second) >= best_gap:
 			continue
 		var at: float = ceilf(first) + 1.0
 		if at > width:
 			continue
 		var laid: Array[Vector2i] = rows(text, font, font_size, at, true)
-		if laid.size() == 2 and laid[0].y >= end and laid[0].y <= index + 1:
-			slot[0] = at
-			slot[1] = gap
-	return best[0] if best[0] > 0.0 else uneven[0]
+		if laid.size() == 2 and laid[0].y == index + 1:
+			best = at
+			best_gap = absf(first - second)
+	return best
+
+
+## [param text] with the space where its two rows should break turned into a line break, for a box
+## written with spaces between words and none of NO_SPACE_MARKS (Korean) that takes two rows in a column
+## [param width] px wide; otherwise [param text] unchanged. Why: the text server breaks Hangul between
+## any two syllables (Unicode's line rules; it offers no keep-all), so a Korean box broke inside its
+## words wherever a row filled ("있" / "다.", "게" / "이지가": PR L12's stills), and no wrap width can
+## move a break to a space before the middle. The space chosen leaves the most even rows that each fit
+## the column on one row. Text with a written line break, on one row, or with no such space is
+## returned as it is. The game calls it where the rows run to the column (DialogueBoxes.row_characters
+## 0) and shows the result; the words themselves are unchanged. Pure.
+static func keep_words(text: String, font: Font, font_size: int, width: float) -> String:
+	if not breaks_at_spaces(text) or rows(text, font, font_size, width).size() < 2:
+		return text
+	var best: int = -1
+	var best_gap: float = INF
+	for index: int in text.length():
+		if text[index] != " ":
+			continue
+		var first: String = text.left(index).strip_edges()
+		var second: String = text.substr(index + 1).strip_edges()
+		if first.is_empty() or second.is_empty():
+			continue
+		if rows(first, font, font_size, width, true).size() != 1 or rows(second, font, font_size, width, true).size() != 1:
+			continue
+		var gap: float = absf(font.get_string_size(first, HORIZONTAL_ALIGNMENT_LEFT, -1.0, font_size).x - font.get_string_size(second, HORIZONTAL_ALIGNMENT_LEFT, -1.0, font_size).x)
+		if gap < best_gap:
+			best = index
+			best_gap = gap
+	return text if best < 0 else text.left(best).strip_edges() + "\n" + text.substr(best + 1).strip_edges()
+
+
+## Whether [param text]'s rows may break only at its spaces: it has a space, no written line break and
+## none of NO_SPACE_MARKS (the marks of the languages written without spaces). In the shipped languages
+## whose rows run to the column this is Korean, which the text server would otherwise break between
+## syllables ([method keep_words]). Pure.
+static func breaks_at_spaces(text: String) -> bool:
+	if not text.contains(" ") or text.contains("\n"):
+		return false
+	for mark: String in NO_SPACE_MARKS:
+		if text.contains(mark):
+			return false
+	return true
 
 
 ## Splits [param line] where a sentence ends and the next one starts with a speaker's tag
