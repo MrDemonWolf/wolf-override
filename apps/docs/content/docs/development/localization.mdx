@@ -6,7 +6,7 @@ description: How WOLF OVERRIDE shows other languages, which files hold the langu
 **What this page is for:** how languages work in the code today, and how to check translation files.
 
 <Callout title="Eleven translations so far">
-  German, Spanish (Latin America and Spain), French, Polish, Brazilian Portuguese, Russian, Japanese, Korean and Chinese (Simplified and Traditional) cover the menus, the HUD and the story as machine translations, not yet reviewed by a native speaker. Most station names still show English. Players: [Platforms and languages](/docs/platforms/).
+  German, Spanish (Latin America and Spain), French, Polish, Brazilian Portuguese, Russian, Japanese, Korean and Chinese (Simplified and Traditional) cover the menus, the HUD and the story as machine translations, not yet reviewed by a native speaker. Players: [Platforms and languages](/docs/platforms/).
 </Callout>
 
 ## Words used here
@@ -157,12 +157,26 @@ You need Python 3 (standard library only) and GNU gettext's `msgfmt` (`brew inst
 - **Words outside the font subsets were reworded,** such as がれき for 瓦礫. The lists and the word choices for reviewers are in `i18n/style/ja.md`, `ko.md`, `zh-Hans.md` and `zh-Hant.md`, "Open questions".
 - **Review state:** machine translation, not reviewed. See [Credits](/docs/credits/#translations).
 
+## Exports
+
+**What the Mac and Windows builds carry for each language.** Measured on the test build of commit `670b8ed` (October 19, 2026).
+
+- **Both builds:** the game's pack holds `languages.json`, every offered language's `.po` file, the four CJK font subsets and their picker fonts, and the ICU line-breaking data (`icudt_godot.dat`).
+- **Mac:** Godot writes a `<code>.lproj` folder with an `InfoPlist.strings` into `Contents/Resources` for English and for each registered catalog: `de`, `en`, `es`, `es_ES`, `fr`, `ja`, `ko`, `pl`, `pt_BR`, `ru`, `zh_Hans`, `zh_Hant`.
+- **What the folders do:** macOS reads them as the app's languages. The Mac App Store builds its language list from them.
+- **The name stays WOLF OVERRIDE** in every language: the folders hold no translated name.
+- **Windows:** has no language list to declare. Everything rides in the `.exe`'s embedded pack.
+- **The check:** `scripts/package_test_build.py` fails a test build whose pack lacks the table or an offered language's catalog, or whose Mac app has other `.lproj` folders than the offered languages.
+- **Not checked yet:** how App Store Connect names `es` and `es_ES`, and whether it reads `zh_Hans` and `zh_Hant` with an underscore. That needs a TestFlight build, and none exists.
+- **Later, with the phone builds:** Android's `locales_config` and its `values-pt-rBR` folder names, and iOS's own language list.
+
 ## Store pages
 
 No store page exists yet. When one does, list only languages that ship, and say how they were made.
 
 | Steam language row | Interface | Full audio | Subtitles |
 | --- | --- | --- | --- |
+| English | Yes | No | No |
 | Spanish - Latin America | Yes | No | No |
 | Spanish - Spain | Yes | No | No |
 | Portuguese - Brazil | Yes | No | No |
@@ -178,6 +192,7 @@ No store page exists yet. When one does, list only languages that ship, and say 
 - **Subtitles: no,** because the game has no voice yet.
 - **About This Game:** give each language a line such as "French: machine-translated, community review in progress" until a native speaker reviews it.
 - **Content Survey:** disclose the AI translation under AI-generated content (decision D2), as the conservative reading of Valve's January 2026 rules.
+- **Mac App Store:** its language list comes from the app's `.lproj` folders (see [Exports](#exports)). Say in the description that each translation is machine-made until it is reviewed.
 
 ## Add a language
 
