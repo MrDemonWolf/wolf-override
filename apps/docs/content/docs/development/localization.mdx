@@ -5,8 +5,8 @@ description: How WOLF OVERRIDE shows other languages, which files hold the langu
 
 **What this page is for:** how languages work in the code today, and how to check translation files.
 
-<Callout title="Seven translations so far">
-  German, Spanish (Latin America and Spain), French, Polish, Brazilian Portuguese and Russian cover the menus, the HUD and the story as machine translations, not yet reviewed by a native speaker. Most station names still show English. Players: [Platforms and languages](/docs/platforms/).
+<Callout title="Eleven translations so far">
+  German, Spanish (Latin America and Spain), French, Polish, Brazilian Portuguese, Russian, Japanese, Korean and Chinese (Simplified and Traditional) cover the menus, the HUD and the story as machine translations, not yet reviewed by a native speaker. Most station names still show English. Players: [Platforms and languages](/docs/platforms/).
 </Callout>
 
 ## Words used here
@@ -32,14 +32,15 @@ description: How WOLF OVERRIDE shows other languages, which files hold the langu
 - **Marks for the checks:** each story line carries `i18n: story` (the release gate), its speaker, and on the 26 lines that could show the engineer's gender an `engineer=` mark. WOLF's three callbacks also carry `slot=choice`, and a line whose break matters carries `keep-breaks`.
 - **Lines made of several messages:** a knockdown card and the restore line under it, or "Safe point saved." and WOLF's callback, are built with `I18n.join`, so each part is translated on its own.
 - **Saved answers:** the save keeps the English answer. WOLF's callback quotes it through `I18n.format`, which translates that quote where it is drawn. An answer saved before October 13, 2026 has older wording that is no message, so WOLF quotes it in English.
-- **Dialogue boxes per language:** `DialogueBoxes` reads each language's reading speed and row limit from the table. Chinese, Japanese and Korean rows run to the column, a two-row box is split into two even rows, and a box holds as many characters as 20 English words take to read (26 in Japanese).
+- **Dialogue boxes per language:** `DialogueBoxes` reads each language's reading speed and row limit from the table. Chinese, Japanese and Korean rows run to the column, a two-row box is split into two even rows between whole words (after a comma or full stop where one sits near the middle; Korean at a space, `DialogueBoxes.keep_words`), and a box holds as many characters as 20 English words take to read (26 in Japanese).
 - **End card:** each row's topic and words are separate messages. `{name}` is filled in after translation by `I18n.fill_named`, which shows the English row if a translation changes the placeholder.
 - **The changelog stays English** (decision D4). In another language it opens with one translated line that says so.
 - **CONTINUE has two meanings:** the touch button's CONTINUE (go on through lines) carries the `touch button` context, so a language can word it apart from the title's CONTINUE (resume a save).
 - **Key names:** `GameSettings.key_name` shows the label printed on the key in the player's layout (`DisplayServer.keyboard_get_label_from_physical`, Windows, macOS and Linux only), and translates named keys such as Escape. A key keeps its QWERTY name where the layout agrees, or where `I18n.game_fonts_draw` says the game fonts lack the label's letter.
 - **Filling templates:** text built in code from a template (`"%s  RESUME"`) goes through `I18n.fill`, which shares `I18n.shown`'s guard: a translation with other `%` conversions shows the English instead of a script error.
 - **The language list's font:** the list draws with its own font chain (`I18n.picker_font`): Montserrat plus four tiny Noto Sans cuts that hold only the Japanese, Korean and Chinese names and their "machine translation" tags, so those names draw in every language without a CJK font behind the game's fonts.
-- **Fonts:** the game never asks the operating system for a missing character. Chinese, Japanese and Korean use Noto Sans subsets that are already bundled but not shown yet. Fonts are credited on [Credits](/docs/credits/#fonts-in-use).
+- **Fonts:** the game never asks the operating system for a missing character. Chinese, Japanese and Korean use bundled Noto Sans subsets: `I18n.use_fallback` puts only the chosen language's subset behind the game fonts. Fonts are credited on [Credits](/docs/credits/#fonts-in-use).
+- **Row heights stay English's:** each CJK subset carries Roboto's vertical metrics, so a CJK language never makes a row taller. Noto's own metrics made rows 4 px taller at body size, and fixed-height rows overflowed.
 
 ## Where the files are
 
@@ -47,7 +48,7 @@ description: How WOLF OVERRIDE shows other languages, which files hold the langu
 | --- | --- |
 | `apps/game/scripts/i18n.gd` | The language module |
 | `apps/game/i18n/languages.json` | The language table the game and the tools both read |
-| `apps/game/i18n/<code>.po` | Catalogs, one per language: `es.po` and `es_ES.po` so far |
+| `apps/game/i18n/<code>.po` | Catalogs, one per language file: 11 so far |
 | `i18n/messages.pot` | The template, outside the game so it is not exported |
 | `i18n/glossary.json` | Fixed terms for each language |
 | `i18n/style/` | The translators' style guides: one shared, one per language |
@@ -86,6 +87,7 @@ You need Python 3 (standard library only) and GNU gettext's `msgfmt` (`brew inst
 - The glossary in `i18n/glossary.json`: both its required words and the words it says to avoid.
 - The engineer is never given a gender; Slavic name endings.
 - Polish and Russian one-letter words (such as *w* and *в*) are bound to the next word with a no-break space, so none ends a row.
+- Korean particles: none that changes with the last sound (은/는, 이/가, 을/를) is glued to a name or key slot.
 - Plural forms and their header.
 - Sibling files, such as the two Chinese and two Spanish files.
 - Coverage: a language that is offered (`enabled` in `languages.json`) must translate every line of the template.
@@ -99,9 +101,9 @@ You need Python 3 (standard library only) and GNU gettext's `msgfmt` (`brew inst
 <Details>
 <Summary>Self-test, glossary and fonts in detail</Summary>
 
-- **`selftest`** runs the gates on 186 planted cases (140 for the line, plural, comment and sibling gates, 9 for the release gates, 6 for the coverage gate, 16 for the glossary on its real terms and 15 broken copies of the glossary and style guides). It fails if any planted error passes or any clean line fails.
+- **`selftest`** runs the gates on 206 planted cases (160 for the line, plural, comment and sibling gates, 9 for the release gates, 6 for the coverage gate, 16 for the glossary on its real terms and 15 broken copies of the glossary and style guides). It fails if any planted error passes or any clean line fails.
 - **`glossary`** checks that every one of the 10 languages' 11 files (Italian and Ukrainian, Tier 1, are not covered yet) has a form for every term and a guide with the same sections, that every word is in its language's alphabet, and that a term still left to reviewers requires nothing. It exits 1 on any problem.
-- **`fonts`** downloads the Noto Sans CJK 2.004 release files from GitHub into the folder (unless they are there), checks each font's SHA-256, and cuts Noto Sans JP, KR, SC and TC down to each language's fixed common character set with HarfBuzz's `hb-subset` (`brew install harfbuzz`). It writes the symbols font Roboto chains and the character lists in `apps/game/tests/support/cjk_charsets.json`, then runs `pickerfonts`, and prints the sizes. Its output is committed, so it only runs again to change a character set.
+- **`fonts`** downloads the Noto Sans CJK 2.004 release files from GitHub into the folder (unless they are there), checks each font's SHA-256, cuts Noto Sans JP, KR, SC and TC down to each language's fixed common character set with HarfBuzz's `hb-subset` (`brew install harfbuzz`), and gives each cut Roboto's vertical metrics. It writes the symbols font Roboto chains and the character lists in `apps/game/tests/support/cjk_charsets.json`, then runs `pickerfonts`, and prints the sizes. Its output is committed, so it only runs again to change a character set.
 - **`pickerfonts`** cuts each CJK language's own name and "machine translation" tag out of its committed subset (`picker_font` in `languages.json`) and gives the cut Montserrat's line height, so the list's rows keep their height.
 - **Parity capture:** takes any language of `apps/game/i18n/languages.json`, or `pseudo` for English with Godot's pseudolocalization (brackets and 30% padding). Every still's entry in `shots.json` lists the visible text that overflows its control, the characters its font cannot draw and, under `pseudo`, the text that was not translated (the language names, never translated, are left out). A language run, `--language en` included, turns every language on for that run only, so route R1 adds stills of the **GENERAL** tab and the open language list.
 
@@ -142,6 +144,19 @@ You need Python 3 (standard library only) and GNU gettext's `msgfmt` (`brew inst
 - **Some words were cut to fit,** such as DALEJ and ДАЛЕЕ for CONTINUE. The lists and the word choices for reviewers are in `i18n/style/pl.md` and `ru.md`, "Open questions", and each cut is noted on its line.
 - **Review state:** machine translation, not reviewed. See [Credits](/docs/credits/#translations).
 
+## Japanese, Korean and Chinese
+
+- **Four files:** `ja.po`, `ko.po` and `zh_Hans.po`, made the same way as Spanish, and `zh_Hant.po`.
+- **Traditional Chinese is converted, not translated again:** OpenCC (`s2twp`, Taiwan phrases) turns `zh_Hans.po` into Traditional characters, then each line is checked for Taiwan usage. A line the check changed says so in its note, such as 存取 for access.
+- **Which file a player gets:** Taiwan, Hong Kong and Macau get `zh_Hant`; every other Chinese locale gets `zh_Hans`. The two must translate the same lines (the sibling gate).
+- **Each turns on only its own font:** the chosen language's Noto Sans subset, with Roboto's line height.
+- **Reading speed:** a dialogue box is timed at the language's subtitle speed: 4 characters a second in Japanese, 12 in Korean, 9 in Chinese. Rows run to the column width.
+- **The engineer:** no pronoun (彼女, 그녀, 她) and no gendered word stands for the engineer. The name is in Latin letters, as in every language.
+- **Korean rows break at spaces:** the text server would break Hangul between any two syllables, so the game puts a two-row box's break at the space that leaves the most even rows, and splits a box that needs split words at its sentences.
+- **Korean particles:** a particle such as 은 or 는 depends on the name's last sound, so lines use one that never changes (의, 에게) or end the clause on the name.
+- **Words outside the font subsets were reworded,** such as がれき for 瓦礫. The lists and the word choices for reviewers are in `i18n/style/ja.md`, `ko.md`, `zh-Hans.md` and `zh-Hant.md`, "Open questions".
+- **Review state:** machine translation, not reviewed. See [Credits](/docs/credits/#translations).
+
 ## Store pages
 
 No store page exists yet. When one does, list only languages that ship, and say how they were made.
@@ -155,6 +170,10 @@ No store page exists yet. When one does, list only languages that ship, and say 
 | German | Yes | No | No |
 | Polish | Yes | No | No |
 | Russian | Yes | No | No |
+| Japanese | Yes | No | No |
+| Korean | Yes | No | No |
+| Simplified Chinese | Yes | No | No |
+| Traditional Chinese | Yes | No | No |
 
 - **Subtitles: no,** because the game has no voice yet.
 - **About This Game:** give each language a line such as "French: machine-translated, community review in progress" until a native speaker reviews it.

@@ -12,7 +12,7 @@
    "fr": {"status": "proposed", "required": "POINT SÛR"},
    "pl": {"status": "proposed", "required": "SCHRON"},
    "ru": {"status": "proposed", "required": "УКРЫТИ"},
-   "ja": {"status": "trial", "required": "セーフポイント"},
+   "ja": {"status": "proposed", "required": "安全地点"},
    "ko": {"status": "proposed", "required": "안전 지점"},
    "zh-Hans": {"status": "proposed", "required": "安全点"},
    "zh-Hant": {"status": "proposed", "required": "安全點"}

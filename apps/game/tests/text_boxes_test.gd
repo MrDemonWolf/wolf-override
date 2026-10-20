@@ -197,23 +197,31 @@ func _check_language_box(box: String, tags: Array[String], font: Font, size: int
 	var words: String = DialogueBoxes.words_of(box, tags)
 	_expect(not _names_inline(words, tags), "%s: one speaker per box: %s" % [code, box.c_escape()])
 	var limit: int = DialogueBoxes.row_characters(code)
-	var wrap: float = DialogueBoxes.wrap_width(words, font, size, width, limit)
-	var rows: Array[String] = DialogueBoxes.row_texts(words, font, size, wrap)
+	# What the game shows (main.gd _story_wrap_width): Korean with its row break at a space.
+	var shown: String = DialogueBoxes.keep_words(words, font, size, width) if limit == 0 else words
+	var wrap: float = DialogueBoxes.wrap_width(shown, font, size, width, limit)
+	var rows: Array[String] = DialogueBoxes.row_texts(shown, font, size, wrap)
 	var keeps: bool = rows.size() <= DialogueBoxes.MAX_ROWS and (limit == 0 or _longest_row(rows) <= limit) and DialogueBoxes.word_count(words) < DialogueBoxes.LONG_LINE_WORDS and words.length() < DialogueBoxes.long_line_characters(code)
 	if not keeps:
 		var breaks: int = DialogueBoxes.break_count(words)
 		_expect(breaks == 1 and not words.contains("\n"), "%s at %d%%: a box past the rules (%d rows, %d characters) is one sentence or clause: %s" % [code, roundi(TextSize.factor * 100.0), rows.size(), words.length(), box.c_escape()])
 	# A written line break is the English layout (a translation drops it, DESIGN.md "Layout breaks never
 	# bind a translation"), so only rows the wrap chose are judged.
-	if limit == 0 and rows.size() == 2 and not words.contains("\n"):
+	# Text whose rows break only at spaces (Korean, DialogueBoxes.breaks_at_spaces) breaks at a space,
+	# never between two syllables of a word (PR L12's stills: "있" / "다."); its rows are as even as
+	# whole words allow, so the balance is asked only of rows the wrap chose.
+	if limit == 0 and rows.size() == 2 and DialogueBoxes.breaks_at_spaces(words):
+		_expect(not keeps or " ".join(rows) == words, "%s at %d%%: two rows break at a space (%s)" % [code, roundi(TextSize.factor * 100.0), rows])
+	elif limit == 0 and rows.size() == 2 and not words.contains("\n"):
 		_expect(_balanced(rows, font, size), "%s at %d%%: two rows are balanced (%s)" % [code, roundi(TextSize.factor * 100.0), rows])
 	return keeps
 
 
-## Chinese, Japanese and Korean samples (neutral fixtures, not game text: the game ships no translation
-## in these languages yet) at every TextSize step: they split without a character changed into boxes
-## that keep the language's rules, each two-row box balanced so no short word is left alone on the
-## last row, and the language's bundled font draws every character.
+## Chinese, Japanese and Korean samples (neutral fixtures, not game text; the shipped catalogs are
+## checked by _check_every_language) at every TextSize step: they split without a character changed
+## into boxes that keep the language's rules, each two-row box balanced so no short word is left alone
+## on the last row, and the language's bundled font draws every character. Two rows break at a comma
+## or (Korean) a space past the middle rather than inside a word (PR L12).
 func _check_cjk_samples() -> void:
 	var samples: Dictionary = {
 		"ja": "今日は雨が降っている。傘を持って出かけよう。駅まで歩いて十分かかる。電車は少し遅れているらしい。",
@@ -237,6 +245,20 @@ func _check_cjk_samples() -> void:
 				_expect(_check_language_box(box, none, font, size, width, code), "%s at %d%%: the box keeps the rules: %s" % [code, roundi(step * 100.0), box])
 	I18n.apply(I18n.FALLBACK)
 	_use_size(1.0)
+	# Two rows break after the comma past the middle; the evenest width alone would split the verb
+	# (降り出したの / で、). A comma before the middle is passed over: its second row would not fit.
+	# Korean breaks at a space: the text server would break between any two syllables (PR L12).
+	for case: Array in [["ja", "雨が降り出したので、駅まで歩いた。", "、"], ["ja", "雨なので、私たちは駅までゆっくり歩いていった。", ""], ["ko", "오늘은 비가 와서 우리는 역까지 천천히 걸어갔다.", " "]]:
+		I18n.apply(case[0])
+		var mark_font: Font = story.get_theme_font(&"font")
+		var mark_size: int = story.get_theme_font_size(&"font_size")
+		var text: String = case[1]
+		var column: float = ceilf(mark_font.get_string_size(text, HORIZONTAL_ALIGNMENT_LEFT, -1.0, mark_size).x * 0.75)
+		var shown: String = DialogueBoxes.keep_words(text, mark_font, mark_size, column)
+		var mark_rows: Array[String] = DialogueBoxes.row_texts(shown, mark_font, mark_size, DialogueBoxes.wrap_width(shown, mark_font, mark_size, column, 0))
+		var at_break: bool = mark_rows.size() == 2 and (mark_rows[0].ends_with("、") if case[2] == "、" else " ".join(mark_rows) == text)
+		_expect(mark_rows.size() == 2 and _balanced(mark_rows, mark_font, mark_size) and at_break == (case[2] != ""), "%s: two rows break at a comma or space past the middle, never inside a word (%s)" % [case[0], mark_rows])
+	I18n.apply(I18n.FALLBACK)
 	# A station name written without spaces breaks between its words above 100% (TextSize.wrap_world_label).
 	I18n.apply("ja")
 	_use_size(2.0)

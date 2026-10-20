@@ -12,7 +12,7 @@ Purpose
                               another list (CI runs it, so a new script cannot stay out of the POT).
     fonts CACHE               rebuilds the bundled fallback fonts (PR L4, decision D7): each CJK
                               language's Noto Sans subset cut to its fixed common set (fixed_charset),
-                              from the recorded Noto release (NOTO_SOURCES, downloaded into CACHE and
+                              with Roboto's vertical metrics (BODY_REFERENCE_FONT), from the recorded Noto release (NOTO_SOURCES, downloaded into CACHE and
                               checked by SHA-256), the symbols font behind Roboto (symbols_font) and the
                               character lists the game's glyph test reads (CHARSETS_FILE). Prints the
                               sizes. Rerun only to change a set; the outputs are committed. It ends
@@ -38,7 +38,8 @@ Purpose
                               guard (SCRIPT_GUARD), the
                               engineer-gender gate (gendered_words, and the back-translation's
                               engineer_gendered), the Slavic name-case gate (NAME_CASE), the one-letter
-                              row-end gate (row_end_words), the plural forms of
+                              row-end gate (row_end_words), the Korean slot-particle gate
+                              (slot_particles), the plural forms of
                               every msgstr[n], the sibling-file completeness gate (family_gaps), the
                               coverage gate (coverage_gaps: an offered language, "enabled" in
                               languages.json, translates every POT message), and chrF of
@@ -58,7 +59,7 @@ Purpose
                               RELEASE_SELFTEST, COVERAGE_SELFTEST, GLOSSARY_SELFTEST) and writes the result as JSON at OUT;
                               exits 1 if a planted error passes or a clean line fails. The negative control
                               for gates no real msgid exercises yet (named and printf placeholders, BBCode,
-                              plural forms, the "you", pronoun, name-case and row-end checks, sibling files, the
+                              plural forms, the "you", pronoun, name-case, row-end and slot-particle checks, sibling files, the
                               coverage gate, the release gates, the glossary's avoid forms and its shape).
     hardcoded POT INVENTORY OUT
                               player-facing strings of the strings step's inventory (in scope and shown)
@@ -354,6 +355,12 @@ SYMBOLS_FONT = REPO / "apps" / "game" / "assets" / "fonts" / "Montserrat-Symbols
 #: The font the language list draws with (Montserrat-Semibold.tres's base): the picker fonts take its
 #: vertical metrics (picker_fonts), so chaining them behind it leaves the list's row height alone.
 PICKER_REFERENCE_FONT = REPO / "apps" / "game" / "assets" / "fonts" / "Montserrat-Variable.ttf"
+#: The game's body font (Roboto-Regular.tres's base). The fallbacks chained behind the game fonts (the
+#: CJK subsets and SYMBOLS_FONT) take its vertical metrics, the smaller of the two theme fonts' on both
+#: sides (Roboto's hhea 0.928 / -0.244 em against Montserrat's 0.968 / -0.251), so a chained fallback
+#: changes neither font's line height. Noto Sans CJK's own 1.16 / -0.288 em made every row taller while
+#: a CJK language was on (21 to 25 px at 23 px), and the fixed-height rows overflowed (PR L12).
+BODY_REFERENCE_FONT = REPO / "apps" / "game" / "assets" / "fonts" / "Roboto-Variable.ttf"
 #: The fixed character lists the CJK subsets are cut to and the game's glyph test reads. Under tests/,
 #: which the export leaves out (export_presets.cfg), since the game itself never needs them.
 CHARSETS_FILE = REPO / "apps" / "game" / "tests" / "support" / "cjk_charsets.json"
@@ -402,6 +409,11 @@ GENDER_WINDOW = 3
 #: A letter glued to the name slot ("заметил %sа"): a case ending, which Slavic languages add to names
 #: and which depends on the name's gender. Checked for languages whose row sets name_case.
 NAME_CASE = re.compile(r"(?:%s|\{name\})[^\W\d_]")
+#: The letters glued to a slot (%s or {name}), as group 1: in Korean the particle that follows a word
+#: changes with the word's last sound (로완은, 알렉스는; 키를, 탭을), and a slot's last sound is not known
+#: when the line is translated (the names, the keys and the touch words all fill it). Checked for the
+#: languages whose row lists "slot_particles" (slot_particles).
+SLOT_GLUE = re.compile(r"(?:%s|\{name\})([^\W\d_]+)")
 #: The breaks a one-letter word may not stand before (row_end_words): an ordinary space, where the game
 #: may end a row, and a written line break, which always ends one. A no-break space (U+00A0) is neither:
 #: Godot's TextServer breaks no row at it (ICU line breaking, class GL; DialogueBoxes.rows) and the
@@ -629,7 +641,9 @@ def own_characters(code: str) -> str:
 def fonts(cache: Path) -> None:
     """Rebuilds the bundled fallback fonts (PR L4) and prints their sizes as JSON. For every language
     whose LANGUAGES row names a "fallback_font": fetches its NOTO_SOURCES zip into ``cache`` unless it is
-    there, checks the OTF's SHA-256, and writes that file as an hb-subset of the OTF to fixed_charset.
+    there, checks the OTF's SHA-256, and writes that file as an hb-subset of the OTF to fixed_charset
+    with BODY_REFERENCE_FONT's vertical metrics (match_vertical_metrics: an ideograph spans about 0.88 em
+    above the baseline to 0.12 em below, inside Roboto's 0.928 / 0.244 em, so no glyph leaves its row).
     Then writes SYMBOLS_FONT (symbols_font) and CHARSETS_FILE, the lists the game's glyph test checks
     each subset against. Side effects: downloads into ``cache`` and rewrites those files in the
     repository; Godot's .import files and the asset register are kept by hand."""
@@ -658,6 +672,7 @@ def fonts(cache: Path) -> None:
             sys.exit(f"{member} cannot draw {code}'s own name or tag: {''.join(sorted(own & set(lacking)))}")
         out = _game_path(row["fallback_font"])
         _hb_subset(source, out, {ord(c) for c in charsets[code]})
+        match_vertical_metrics(out, BODY_REFERENCE_FONT)
         sizes[code] = {"characters": len(charsets[code]), "not_in_noto": lacking, "source_bytes": len(data),
                        "subset_bytes": out.stat().st_size}
     symbols_font()
@@ -705,7 +720,7 @@ def symbols_font() -> None:
     that file."""
     fonts_dir = REPO / "apps" / "game" / "assets" / "fonts"
     _hb_subset(fonts_dir / "Montserrat-Variable.ttf", SYMBOLS_FONT, {ord(c) for c in SYMBOLS}, ["--instance=wght=400"])
-    match_vertical_metrics(SYMBOLS_FONT, fonts_dir / "Roboto-Variable.ttf")
+    match_vertical_metrics(SYMBOLS_FONT, BODY_REFERENCE_FONT)
 
 
 def font_codepoints(path: Path) -> set[int]:
@@ -1086,6 +1101,19 @@ def row_end_words(text: str, lang: str) -> list[str]:
     return [match.group(1) for match in pattern.finditer(text)] if pattern else []
 
 
+def slot_particles(text: str, lang: str) -> list[str]:
+    """The letters glued to a slot in ``text`` (SLOT_GLUE) that do not start with one of ``lang``'s
+    "slot_particles" (languages.json): the particles that read the same after any last sound, such as
+    Korean 의, 도, 에게 and 한테. A glued 은/는, 이/가, 을/를, 과/와 or 으로/로 is right for one name or key
+    and wrong for another, so the line must be reworded (the ko style guide: no such particle after the
+    name slot). Every slot counts, the name's and a key's alike. Empty for a clean line or a language
+    with no such list (the gate passes). Pure."""
+    allowed = sorted(LANGUAGES.get(lang, {}).get("slot_particles") or [], key=len, reverse=True)
+    if not allowed:
+        return []
+    return [glued for glued in SLOT_GLUE.findall(text) if not glued.startswith(tuple(allowed))]
+
+
 def name_case_ok(text: str, lang: str, roles: set[str]) -> bool:
     """False when ``lang`` declines names (languages.json name_case) and a letter is glued to the name
     slot in ``text`` (NAME_CASE), the case ending PIPELINE.md's nominative-only rule forbids."""
@@ -1209,7 +1237,7 @@ def release_problems(entries: list[dict], pot_entries: list[dict], review: str) 
 
 #: The per-line gates that must all hold for a line to pass (each a boolean measure in the report).
 LINE_GATES = ("placeholders_ok", "tag_ok", "breaks_ok", "key_token_ok", "script_ok", "bbcode_ok", "gender_ok", "name_case_ok",
-              "row_end_ok")
+              "row_end_ok", "slot_particles_ok")
 
 
 def check(pot: Path, podir: Path, out: Path, back: Path | None = None, release: bool = False) -> None:
@@ -1253,6 +1281,8 @@ def check(pot: Path, podir: Path, out: Path, back: Path | None = None, release: 
             measures["name_case_ok"] = name_case_ok(text, lang, roles)
             measures["row_end_words"] = row_end_words(text, lang)
             measures["row_end_ok"] = not measures["row_end_words"]
+            measures["slot_particles"] = slot_particles(text, lang)
+            measures["slot_particles_ok"] = not measures["slot_particles"]
             measures["plural_problems"] = plural_problems(entry, plural_count(lang))
             measures["back_key"] = f"{lang}-{entry_key(entry)}"
             item = backs.get(measures["back_key"])
@@ -1457,6 +1487,19 @@ SELFTEST = [
     ("row_end", "ru", "", "Бак падает и\nприжимает его к\u00a0полу.", False, ""),
     ("row_end", "ru", "", "Страж патрулирует за завалом.", True, ""),
     ("row_end", "de", "", "Geh a und b.", True, ""),
+    # Korean particles glued to a slot (slot_particles, PR L12): one that changes with the last sound
+    # fails, whoever fills the slot; one that never changes, a space, a quote mark or a language with no
+    # list passes.
+    ("slot_particles", "ko", "", "%s는 WOLF의 시스템을 돌본다.", False, ""),
+    ("slot_particles", "ko", "", "{name}이 바이패스를 돌렸다.", False, ""),
+    ("slot_particles", "ko", "", "여기서 %s를 다시 누르세요.", False, ""),
+    ("slot_particles", "ko", "", "%s와 WOLF가 간다.", False, ""),
+    ("slot_particles", "ko", "", "WOLF는 %s의 신호를 기다린다.", True, ""),
+    ("slot_particles", "ko", "", "냉각재 구름이 %s에게 닥쳤다.", True, ""),
+    ("slot_particles", "ko", "", "여기서 다시 %s 누르세요.", True, ""),
+    ("slot_particles", "ko", "", "“%s”라고 했지.", True, ""),
+    ("slot_particles", "ko", "", "정비 포트로 타임스탬프를 복사한 건 {name}.", True, ""),
+    ("slot_particles", "ja", "", "%sは無事だ。", True, ""),
     ("plural", "ru", "The valve gives. %d of %d turns.", ["Клапан поддаётся. %d из %d оборота.", "Клапан поддаётся. %d из %d оборотов.", "Клапан поддаётся. %d из %d оборотов."], True, ""),
     ("plural", "ru", "The valve gives. %d of %d turns.", ["Клапан поддаётся. %d из %d оборота.", "Клапан поддаётся. %d из %d оборотов."], False, ""),
     ("plural", "ru", "The valve gives. %d of %d turns.", ["Клапан поддаётся. %d из %d оборота.", "Клапан поддаётся. %d оборотов.", "Клапан поддаётся. %d из %d оборотов."], False, ""),
@@ -1580,6 +1623,8 @@ def selftest(out: Path) -> None:
             passed = (not gendered_words(masked, lang, roles)) if gate == "gender" else name_case_ok(text, lang, roles)
         elif gate == "row_end":
             passed = not row_end_words(text, lang)
+        elif gate == "slot_particles":
+            passed = not slot_particles(text, lang)
         elif gate == "plural_header":
             passed = plural_header_ok(text, lang)
         elif gate == "fuzzy_note":

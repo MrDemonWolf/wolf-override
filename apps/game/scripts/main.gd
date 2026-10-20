@@ -900,6 +900,10 @@ var dialogue_restart: bool = true
 ## for (_story_wrap_width measures again only when that key changes).
 var story_wrap: float = 0.0
 var story_wrap_key: String = ""
+## The box's words as _set_dialogue split them. The Story label shows them as they are, or, where rows
+## run to the column, with the row break DialogueBoxes.keep_words chooses (Korean), so a label's text
+## is never what decides when it is measured again.
+var story_words: String = ""
 ## At first control the opening lines wait (TEACH-7): the name card and the move prompt come first,
 ## the rest of the tutorial after the first step, and the lines once the name card has gone.
 var opening_lines_held: bool = false
@@ -4830,7 +4834,11 @@ func _set_dialogue(hint: String) -> void:
 	var tags: Array[String] = _shown_speaker_tags()
 	var name: String = DialogueBoxes.tag_of(box, tags)
 	speaker.text = name
-	story.text = DialogueBoxes.words_of(box, tags)
+	var words: String = DialogueBoxes.words_of(box, tags)
+	# Set only when the words change: _story_wrap_width may have put a row break into the label's text.
+	if words != story_words:
+		story_words = words
+		story.text = words
 	var has_speaker: bool = not name.is_empty()
 	speaker.visible = has_speaker
 	var id: String = String(names.find_key(name)) if names.values().has(name) else name
@@ -5090,12 +5098,18 @@ func _speaker_column_width() -> float:
 
 ## The width the words on screen wrap at in [param column]: no row longer than the language's row limit
 ## (DialogueBoxes.row_characters, 42 in English), or two balanced rows where rows run to the column
-## (measured once per box, size, column and language; the HUD is laid out every frame).
+## (measured once per box, size, column and language; the HUD is laid out every frame). Where rows run
+## to the column it also sets the Story label's text: story_words with the row break
+## DialogueBoxes.keep_words puts at a space (Korean), or the words as they are.
 func _story_wrap_width(column: float) -> float:
-	var key: String = "%s|%s|%s|%s" % [story.text, story.get_theme_font_size(&"font_size"), column, I18n.current()]
+	var key: String = "%s|%s|%s|%s" % [story_words, story.get_theme_font_size(&"font_size"), column, I18n.current()]
 	if key != story_wrap_key:
 		story_wrap_key = key
-		story_wrap = DialogueBoxes.wrap_width(story.text, story.get_theme_font(&"font"), story.get_theme_font_size(&"font_size"), column, DialogueBoxes.row_characters())
+		var font: Font = story.get_theme_font(&"font")
+		var size: int = story.get_theme_font_size(&"font_size")
+		var limit: int = DialogueBoxes.row_characters()
+		story.text = DialogueBoxes.keep_words(story_words, font, size, column) if limit == 0 else story_words
+		story_wrap = DialogueBoxes.wrap_width(story.text, font, size, column, limit)
 	return story_wrap
 
 

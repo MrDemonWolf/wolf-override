@@ -1,0 +1,3162 @@
+# Machine translation by Claude (Anthropic); no native speaker has reviewed it yet.
+msgid ""
+msgstr ""
+"Project-Id-Version: WOLF OVERRIDE\n"
+"PO-Revision-Date: 2026-10-20 02:12+0000\n"
+"Last-Translator: Claude (Anthropic), machine translation, unreviewed\n"
+"Language-Team: none\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: ko\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: The engineer's name tag over their head in the corridor (the default first name). Names stay as written. Kept in Latin capitals: the game fills the name from one list in every language (m0_state.gd), so the tag matches the dialogue.
+#. i18n: speaker=ui
+#: scenes/main.tscn
+msgid "ROWAN"
+msgstr "ROWAN"
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: WOLF's name tag over him. WOLF stays WOLF in every language.
+#. i18n: speaker=ui
+#: scenes/main.tscn
+msgid "WOLF"
+msgstr "WOLF"
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: Station plate (12-13 px label on a machine). ALL CAPS, as short as possible. A circuit breaker on a power line (glossary 'BREAKER': 차단기).
+#. i18n: speaker=ui
+#: scenes/main.tscn
+msgid "BREAKER"
+msgstr "차단기"
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: Station plate (12-13 px label on a machine). ALL CAPS, as short as possible. The electrical relay on the coolant line.
+#. i18n: speaker=ui
+#: scenes/main.tscn
+msgid "COOLANT RELAY"
+msgstr "냉각재 릴레이"
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: Station plate (12-13 px label on a machine). ALL CAPS, as short as possible. The spot out of the sentry's sight where the game saves (glossary).
+#. i18n: speaker=ui
+#: scenes/main.tscn
+msgid "SAFE POINT"
+msgstr "안전 지점"
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: The PAUSE button on the touch layout (88 px) and the Pause action's prompt.
+#. i18n: speaker=ui
+#: scenes/main.tscn
+#: scripts/main.gd:4732
+msgid "PAUSE"
+msgstr "일시정지"
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: The touch layout's walk-left arrow. A symbol: copy it.
+#. i18n: speaker=ui
+#: scenes/main.tscn
+msgid "◀"
+msgstr "◀"
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: The touch layout's walk-right arrow. A symbol: copy it.
+#. i18n: speaker=ui
+#: scenes/main.tscn
+msgid "▶"
+msgstr "▶"
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: The title's top line (280 px, 18 px). The studio name stays as written. 제공 (presented by) after the studio name, as Korean film credits write it.
+#. i18n: speaker=ui
+#: scenes/main.tscn
+msgid "MRDEMONWOLF, INC. PRESENTS"
+msgstr "MRDEMONWOLF, INC. 제공"
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: The game's name. Never translated.
+#. i18n: speaker=ui
+#: scenes/main.tscn
+msgid "WOLF OVERRIDE"
+msgstr "WOLF OVERRIDE"
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: The title's chapter line (388 px, 20 px). LOCKDOWN: the base sealing itself shut (glossary: 봉쇄).
+#. i18n: speaker=ui
+#: scenes/main.tscn
+msgid "CHAPTER 1  /  LOCKDOWN"
+msgstr "1장  /  봉쇄"
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: Title button (186 px, 21 px): start a new run.
+#. i18n: speaker=ui
+#: scenes/main.tscn
+msgid "NEW GAME"
+msgstr "새 게임"
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: Title button (186 px, 21 px): continue from the saved checkpoint. The same word, with the context 'touch button', is the touch USE button's word for going on through lines (155 px, 23 px). The usual Korean menu word for continuing from a save; the touch button's CONTINUE is 계속.
+#. i18n: speaker=ui
+#: scenes/main.tscn
+#: scripts/main.gd:1127
+msgid "CONTINUE"
+msgstr "이어하기"
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: Title button (186 px, 18 px).
+#. i18n: speaker=ui
+#: scenes/main.tscn
+msgid "CREDITS"
+msgstr "크레딧"
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: Title and Pause button (186 px on the title, 18 px) that opens Settings.
+#. i18n: speaker=ui
+#: scenes/main.tscn
+msgid "SETTINGS"
+msgstr "설정"
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: Tooltip of the title's CHANGELOG button.
+#. i18n: speaker=ui
+#: scenes/main.tscn
+msgid "Development updates, in the game and online"
+msgstr "개발 업데이트: 게임 안과 온라인"
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: Title button (230 px, 18 px) that opens the list of development changes.
+#. i18n: speaker=ui
+#: scenes/main.tscn
+msgid "CHANGELOG"
+msgstr "변경 내역"
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: The title's credit line (424 px, 16 px). The author's name stays as written.
+#. i18n: speaker=ui
+#: scenes/main.tscn
+msgid "Concept: Nathanial Henniges  /  AI-assisted development"
+msgstr "콘셉트: Nathanial Henniges  /  AI 지원 개발"
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: The credits roll (582 px, 19 px, centred, wraps). Translate the role headings and the sentences; names, companies, tools, licences, works' titles and the address stay as written. The translation credit (decision D2) is added in each language's own text under AI-ASSISTED PRODUCTION, so the English keeps none. The translation credit is the row after Nathanial's; the English row break inside the art sentence is dropped so the count stays the English one. TYPEFACES adds Noto Sans KR, the font that draws the Korean text (OFL 1.1, as the site's credits list).
+#. i18n: speaker=ui
+#: scenes/main.tscn
+msgid ""
+"[center][color=#73DDF5]ORIGINAL CONCEPT, CORE STORY & CREATIVE VISION[/color]\n"
+"[font_size=30][b]Nathanial Henniges[/b][/font_size]\n"
+"\n"
+"\n"
+"[color=#73DDF5]DEVELOPMENT[/color]\n"
+"[font_size=26][b]MrDemonWolf, Inc.[/b][/font_size]\n"
+"\n"
+"\n"
+"[color=#73DDF5]AI-ASSISTED PRODUCTION[/color]\n"
+"ChatGPT and Codex (OpenAI) and Claude Code by Anthropic\n"
+"assisted with research, writing and code.\n"
+"Nathanial directed and reviewed the work.\n"
+"\n"
+"\n"
+"[color=#73DDF5]PROVISIONAL ART[/color]\n"
+"Created with ChatGPT Create and the Codex image generation tool.\n"
+"The characters, station props, rooms and doors are whole\n"
+"pieces painted over script-drawn shape guides (October 16, 2026).\n"
+"Nathanial reviewed and approved each set.\n"
+"The WOLF OVERRIDE mark was redrawn from a generated concept.\n"
+"\n"
+"\n"
+"[color=#73DDF5]SOUND EFFECTS[/color]\n"
+"Most are generated by the game's own code.\n"
+"\n"
+"Recorded steam (CC0)\n"
+"Joseph Sardin - BigSoundBank.com / LaSonotheque.org\n"
+"\n"
+"Recorded growls (CC0, OpenGameArt.org)\n"
+"pauliuw, bonebrah and AntumDeluge\n"
+"(bear growl from the U.S. Fish & Wildlife Service)\n"
+"\n"
+"No music or voice yet.\n"
+"\n"
+"\n"
+"[color=#73DDF5]TYPEFACES[/color]\n"
+"Roboto and Montserrat\n"
+"SIL Open Font License 1.1\n"
+"\n"
+"\n"
+"[color=#73DDF5]BUILT WITH[/color]\n"
+"Godot 4.7.2  /  GDScript\n"
+"Next.js  /  Fumadocs  /  Tailwind CSS  /  Bun\n"
+"Pillow  /  NumPy  /  SciPy  /  ImageMagick  /  cwebp\n"
+"Playwright\n"
+"\n"
+"\n"
+"[color=#73DDF5]RESEARCH & CRAFT REFERENCES[/color]\n"
+"Fumito Ueda / The Last Guardian\n"
+"Companion behavior and visual storytelling\n"
+"\n"
+"Naughty Dog / The Last of Us Part II\n"
+"Reviewed controls and readable presentation\n"
+"\n"
+"Game Accessibility Guidelines\n"
+"Player-paced text and recognizable interactions\n"
+"\n"
+"Godot 4.7 Camera2D reference\n"
+"Camera follow and smoothing\n"
+"\n"
+"Nielsen Norman Group\n"
+"Mobile screenshot readability\n"
+"\n"
+"NIST AI Risk Management Framework\n"
+"National Archives records guidance\n"
+"\n"
+"Real door hardware and safety standards (October 2026)\n"
+"Shapes, sizes and colours of the doors\n"
+"\n"
+"How it should play: about 400 sources (October 2026)\n"
+"Valve, Playdead, Naughty Dog, Nintendo and others\n"
+"Pacing, controls, the companion and playtesting\n"
+"\n"
+"References inform craft, not the origin of this game.\n"
+"Original concept, core story and creative vision:\n"
+"Nathanial Henniges.\n"
+"Referenced creators are not project contributors.\n"
+"\n"
+"Full sources, tools and asset credits:\n"
+"wolfoverride.mrdemonwolf.dev/docs/credits/\n"
+"\n"
+"\n"
+"[font_size=24][b]THANK YOU FOR PLAYING[/b][/font_size][/center]"
+msgstr ""
+"[center][color=#73DDF5]오리지널 콘셉트, 핵심 스토리 및 크리에이티브 비전[/color]\n"
+"[font_size=30][b]Nathanial Henniges[/b][/font_size]\n"
+"\n"
+"\n"
+"[color=#73DDF5]개발[/color]\n"
+"[font_size=26][b]MrDemonWolf, Inc.[/b][/font_size]\n"
+"\n"
+"\n"
+"[color=#73DDF5]AI 지원 제작[/color]\n"
+"ChatGPT와 Codex(OpenAI), Anthropic의 Claude Code가\n"
+"리서치, 글쓰기, 코드 작업을 도왔습니다.\n"
+"Nathanial이 작업을 지휘하고 검토했습니다.\n"
+"한국어: Claude(Anthropic)의 기계 번역, Codex(OpenAI)의 역번역으로 확인. 아직 원어민 검토를 거치지 않았습니다.\n"
+"\n"
+"\n"
+"[color=#73DDF5]임시 아트[/color]\n"
+"ChatGPT Create와 Codex 이미지 생성 도구로 만들었습니다.\n"
+"캐릭터, 스테이션 소품, 방, 문은 스크립트로 그린 형태 가이드 위에 통째로 그린 조각입니다(2026년 10월 16일).\n"
+"Nathanial이 각 세트를 검토하고 승인했습니다.\n"
+"WOLF OVERRIDE 마크는 생성된 콘셉트를 바탕으로 다시 그렸습니다.\n"
+"\n"
+"\n"
+"[color=#73DDF5]효과음[/color]\n"
+"대부분은 게임 자체 코드로 생성합니다.\n"
+"\n"
+"녹음된 증기 소리(CC0)\n"
+"Joseph Sardin - BigSoundBank.com / LaSonotheque.org\n"
+"\n"
+"녹음된 으르렁 소리(CC0, OpenGameArt.org)\n"
+"pauliuw, bonebrah, AntumDeluge\n"
+"(곰 울음소리 출처: U.S. Fish & Wildlife Service)\n"
+"\n"
+"아직 음악과 음성은 없습니다.\n"
+"\n"
+"\n"
+"[color=#73DDF5]서체[/color]\n"
+"Roboto, Montserrat, Noto Sans KR\n"
+"SIL Open Font License 1.1\n"
+"\n"
+"\n"
+"[color=#73DDF5]제작 도구[/color]\n"
+"Godot 4.7.2  /  GDScript\n"
+"Next.js  /  Fumadocs  /  Tailwind CSS  /  Bun\n"
+"Pillow  /  NumPy  /  SciPy  /  ImageMagick  /  cwebp\n"
+"Playwright\n"
+"\n"
+"\n"
+"[color=#73DDF5]리서치 및 제작 참고 자료[/color]\n"
+"Fumito Ueda / The Last Guardian\n"
+"동반자의 행동과 시각적 스토리텔링\n"
+"\n"
+"Naughty Dog / The Last of Us Part II\n"
+"조작 방식과 읽기 쉬운 표현 검토\n"
+"\n"
+"Game Accessibility Guidelines\n"
+"플레이어 속도에 맞춘 텍스트와 알아보기 쉬운 상호작용\n"
+"\n"
+"Godot 4.7 Camera2D 레퍼런스\n"
+"카메라 추적과 스무딩\n"
+"\n"
+"Nielsen Norman Group\n"
+"모바일 스크린샷 가독성\n"
+"\n"
+"NIST AI Risk Management Framework\n"
+"National Archives 기록 관리 지침\n"
+"\n"
+"실제 문 하드웨어와 안전 기준(2026년 10월)\n"
+"문의 모양, 크기, 색상\n"
+"\n"
+"플레이 방향: 약 400개 자료(2026년 10월)\n"
+"Valve, Playdead, Naughty Dog, Nintendo 외\n"
+"속도감, 조작, 동반자, 플레이테스트\n"
+"\n"
+"참고 자료는 제작 기술을 위한 것이며, 이 게임의 기원이 아닙니다.\n"
+"오리지널 콘셉트, 핵심 스토리, 크리에이티브 비전:\n"
+"Nathanial Henniges.\n"
+"언급된 제작자들은 프로젝트 기여자가 아닙니다.\n"
+"\n"
+"전체 출처, 도구, 에셋 크레딧:\n"
+"wolfoverride.mrdemonwolf.dev/docs/credits/\n"
+"\n"
+"\n"
+"[font_size=24][b]플레이해 주셔서 감사합니다[/b][/font_size][/center]"
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: Credits and changelog button (218 px, 19 px): back to the title menu.
+#. i18n: speaker=ui
+#: scenes/main.tscn
+msgid "BACK TO TITLE"
+msgstr "타이틀로"
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: Credits button (218 px, 19 px) that stops the credits rolling up.
+#. i18n: speaker=ui
+#: scenes/main.tscn
+#: scripts/main.gd:2024
+#: scripts/main.gd:2065
+msgid "PAUSE SCROLL"
+msgstr "스크롤 정지"
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: Heading of the in-game changelog screen (590 px, 28 px). The changelog itself stays English.
+#. i18n: speaker=ui
+#: scenes/main.tscn
+msgid "DEVELOPMENT UPDATES"
+msgstr "개발 업데이트"
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: Note under the changelog heading (582 px, 15 px).
+#. i18n: speaker=ui engineer=you
+#: scenes/main.tscn
+msgid "Source-build changes by date, not releases. Scroll with the wheel, drag the text or use up/down."
+msgstr "릴리스가 아니라 소스 빌드의 변경 사항을 날짜순으로 보여 줍니다. 휠, 텍스트 드래그, 위/아래 키로 스크롤하세요."
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: Tooltip of the changelog's online button. The address stays as written.
+#. i18n: speaker=ui engineer=you
+#: scenes/main.tscn
+msgid "Opens wolfoverride.mrdemonwolf.dev/docs/changelog/ in your browser"
+msgstr "브라우저에서 wolfoverride.mrdemonwolf.dev/docs/changelog/ 열기"
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: Changelog screen button (338 px, 17 px) that opens the website's changelog.
+#. i18n: speaker=ui
+#: scenes/main.tscn
+msgid "OPEN FULL CHANGELOG ONLINE"
+msgstr "전체 변경 내역 온라인으로 보기"
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: Pause menu heading (387 px, 31 px).
+#. i18n: speaker=ui
+#: scenes/main.tscn
+msgid "SESSION PAUSED"
+msgstr "세션 일시정지"
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: Pause menu button: back to the game.
+#. i18n: speaker=ui
+#: scenes/main.tscn
+msgid "RESUME"
+msgstr "재개"
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: Pause menu button (350 px, 19 px): leave the run for the title menu.
+#. i18n: speaker=ui
+#: scenes/main.tscn
+#: scripts/main.gd:2243
+msgid "RETURN TO TITLE"
+msgstr "타이틀로 돌아가기"
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: Warning under RETURN TO TITLE (378 px, 14 px).
+#. i18n: speaker=ui engineer=you
+#: scenes/main.tscn
+msgid ""
+"Returning keeps your last checkpoint.\n"
+"Unsaved progress will be lost."
+msgstr ""
+"돌아가도 마지막 체크포인트는 유지됩니다.\n"
+"저장하지 않은 진행 상황은 사라집니다."
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: Settings heading (690 px, 27 px).
+#. i18n: speaker=ui
+#: scenes/main.tscn
+msgid "SYSTEM SETTINGS"
+msgstr "시스템 설정"
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: DISPLAY row caption (about 170 px, 19 px) beside the frame-rate cap list.
+#. i18n: speaker=ui
+#: scenes/main.tscn
+msgid "FPS LIMIT"
+msgstr "FPS 제한"
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: DISPLAY row caption (about 170 px, 19 px) beside the window size list.
+#. i18n: speaker=ui
+#: scenes/main.tscn
+msgid "WINDOW SIZE"
+msgstr "창 크기"
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: DISPLAY toggle (355 px, 18 px).
+#. i18n: speaker=ui
+#: scenes/main.tscn
+msgid "FULLSCREEN"
+msgstr "전체 화면"
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: Settings note on a computer build.
+#. i18n: speaker=ui
+#: scenes/main.tscn
+#: scripts/main.gd:2124
+msgid "Window size applies on desktop."
+msgstr "창 크기는 데스크톱에서 적용됩니다."
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: Settings button (180 px, 18 px): close Settings.
+#. i18n: speaker=ui
+#: scenes/main.tscn
+msgid "BACK"
+msgstr "뒤로"
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: The studio's name on its logo screen. Stays as written.
+#. i18n: speaker=ui
+#: scenes/studio_logo.tscn
+msgid "MrDemonWolf, Inc."
+msgstr "MrDemonWolf, Inc."
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: CONTROLS row caption (220 px, 16 px) and the name in the rebind notes: the action.
+#. i18n: speaker=ui
+#: scripts/game_settings.gd:22
+msgid "Move left"
+msgstr "왼쪽 이동"
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: CONTROLS row caption (220 px, 16 px): the action.
+#. i18n: speaker=ui
+#: scripts/game_settings.gd:22
+msgid "Move right"
+msgstr "오른쪽 이동"
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: CONTROLS row caption (220 px, 16 px): use a machine, or go on to the next line.
+#. i18n: speaker=ui
+#: scripts/game_settings.gd:22
+msgid "Interact / continue"
+msgstr "상호작용 / 계속"
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: CONTROLS row caption (220 px, 16 px): answer 1 at a choice.
+#. i18n: speaker=ui
+#: scripts/game_settings.gd:22
+msgid "Response 1"
+msgstr "응답 1"
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: CONTROLS row caption (220 px, 16 px): answer 2 at a choice.
+#. i18n: speaker=ui
+#: scripts/game_settings.gd:22
+msgid "Response 2"
+msgstr "응답 2"
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: CONTROLS row caption (220 px, 16 px) for the pause action, and the Pause key's name (A keyboard key's name in the CONTROLS table (206 px button, 15 px) and in the rebind notes. Use the name printed on Korean keyboards where there is one; short.)
+#. i18n: speaker=ui
+#: scripts/game_settings.gd:22
+msgid "Pause"
+msgstr "일시정지"
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: An action's name in the note 'Already used by %s': the debug key that changes the engineer's first name. Lower case.
+#. i18n: speaker=ui
+#: scripts/game_settings.gd:25
+msgid "cycle name"
+msgstr "이름 변경"
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: AUDIO slider caption.
+#. i18n: speaker=ui
+#: scripts/game_settings.gd:31
+msgid "Master volume"
+msgstr "마스터 볼륨"
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: AUDIO slider caption.
+#. i18n: speaker=ui
+#: scripts/game_settings.gd:31
+msgid "Music volume"
+msgstr "음악 볼륨"
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: AUDIO slider caption.
+#. i18n: speaker=ui
+#: scripts/game_settings.gd:31
+msgid "Effects volume"
+msgstr "효과음 볼륨"
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: AUDIO slider caption.
+#. i18n: speaker=ui
+#: scripts/game_settings.gd:31
+msgid "Voice volume"
+msgstr "음성 볼륨"
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: A keyboard key's name in the CONTROLS table (206 px button, 15 px) and in the rebind notes. Use the name printed on Korean keyboards where there is one; short.
+#. i18n: speaker=ui
+#: scripts/game_settings.gd:48
+msgctxt "key name"
+msgid "Escape"
+msgstr "Esc"
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: A keyboard key's name in the CONTROLS table (206 px button, 15 px) and in the rebind notes. Use the name printed on Korean keyboards where there is one; short.
+#. i18n: speaker=ui
+#: scripts/game_settings.gd:48
+msgctxt "key name"
+msgid "Tab"
+msgstr "Tab"
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: A keyboard key's name in the CONTROLS table (206 px button, 15 px) and in the rebind notes. Use the name printed on Korean keyboards where there is one; short.
+#. i18n: speaker=ui
+#: scripts/game_settings.gd:48
+msgctxt "key name"
+msgid "Backspace"
+msgstr "Backspace"
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: A keyboard key's name in the CONTROLS table (206 px button, 15 px) and in the rebind notes. Use the name printed on Korean keyboards where there is one; short.
+#. i18n: speaker=ui
+#: scripts/game_settings.gd:48
+msgctxt "key name"
+msgid "Enter"
+msgstr "Enter"
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: A keyboard key's name in the CONTROLS table (206 px button, 15 px) and in the rebind notes. Use the name printed on Korean keyboards where there is one; short.
+#. i18n: speaker=ui
+#: scripts/game_settings.gd:48
+msgctxt "key name"
+msgid "Kp Enter"
+msgstr "키패드 Enter"
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: A keyboard key's name in the CONTROLS table (206 px button, 15 px) and in the rebind notes. Use the name printed on Korean keyboards where there is one; short.
+#. i18n: speaker=ui
+#: scripts/game_settings.gd:48
+msgctxt "key name"
+msgid "Insert"
+msgstr "Insert"
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: A keyboard key's name in the CONTROLS table (206 px button, 15 px) and in the rebind notes. Use the name printed on Korean keyboards where there is one; short.
+#. i18n: speaker=ui
+#: scripts/game_settings.gd:48
+msgctxt "key name"
+msgid "Delete"
+msgstr "Delete"
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: CONTROLS row caption (220 px, 16 px) for the pause action, and the Pause key's name (A keyboard key's name in the CONTROLS table (206 px button, 15 px) and in the rebind notes. Use the name printed on Korean keyboards where there is one; short.)
+#. i18n: speaker=ui
+#: scripts/game_settings.gd:48
+msgctxt "key name"
+msgid "Pause"
+msgstr "Pause"
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: A keyboard key's name in the CONTROLS table (206 px button, 15 px) and in the rebind notes. Use the name printed on Korean keyboards where there is one; short.
+#. i18n: speaker=ui
+#: scripts/game_settings.gd:48
+msgctxt "key name"
+msgid "Print"
+msgstr "PrtSc"
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: A keyboard key's name in the CONTROLS table (206 px button, 15 px) and in the rebind notes. Use the name printed on Korean keyboards where there is one; short.
+#. i18n: speaker=ui
+#: scripts/game_settings.gd:48
+msgctxt "key name"
+msgid "Clear"
+msgstr "Clear"
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: A keyboard key's name in the CONTROLS table (206 px button, 15 px) and in the rebind notes. Use the name printed on Korean keyboards where there is one; short.
+#. i18n: speaker=ui
+#: scripts/game_settings.gd:48
+msgctxt "key name"
+msgid "Home"
+msgstr "Home"
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: A keyboard key's name in the CONTROLS table (206 px button, 15 px) and in the rebind notes. Use the name printed on Korean keyboards where there is one; short.
+#. i18n: speaker=ui
+#: scripts/game_settings.gd:48
+msgctxt "key name"
+msgid "End"
+msgstr "End"
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: A keyboard key's name in the CONTROLS table (206 px button, 15 px) and in the rebind notes. Use the name printed on Korean keyboards where there is one; short.
+#. i18n: speaker=ui
+#: scripts/game_settings.gd:48
+msgctxt "key name"
+msgid "Left"
+msgstr "왼쪽 화살표"
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: A keyboard key's name in the CONTROLS table (206 px button, 15 px) and in the rebind notes. Use the name printed on Korean keyboards where there is one; short.
+#. i18n: speaker=ui
+#: scripts/game_settings.gd:48
+msgctxt "key name"
+msgid "Up"
+msgstr "위쪽 화살표"
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: A keyboard key's name in the CONTROLS table (206 px button, 15 px) and in the rebind notes. Use the name printed on Korean keyboards where there is one; short.
+#. i18n: speaker=ui
+#: scripts/game_settings.gd:48
+msgctxt "key name"
+msgid "Right"
+msgstr "오른쪽 화살표"
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: A keyboard key's name in the CONTROLS table (206 px button, 15 px) and in the rebind notes. Use the name printed on Korean keyboards where there is one; short.
+#. i18n: speaker=ui
+#: scripts/game_settings.gd:48
+msgctxt "key name"
+msgid "Down"
+msgstr "아래쪽 화살표"
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: A keyboard key's name in the CONTROLS table (206 px button, 15 px) and in the rebind notes. Use the name printed on Korean keyboards where there is one; short.
+#. i18n: speaker=ui
+#: scripts/game_settings.gd:48
+msgctxt "key name"
+msgid "PageUp"
+msgstr "PgUp"
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: A keyboard key's name in the CONTROLS table (206 px button, 15 px) and in the rebind notes. Use the name printed on Korean keyboards where there is one; short.
+#. i18n: speaker=ui
+#: scripts/game_settings.gd:48
+msgctxt "key name"
+msgid "PageDown"
+msgstr "PgDn"
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: A keyboard key's name in the CONTROLS table (206 px button, 15 px) and in the rebind notes. Use the name printed on Korean keyboards where there is one; short.
+#. i18n: speaker=ui
+#: scripts/game_settings.gd:48
+msgctxt "key name"
+msgid "CapsLock"
+msgstr "Caps Lock"
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: A keyboard key's name in the CONTROLS table (206 px button, 15 px) and in the rebind notes. Use the name printed on Korean keyboards where there is one; short.
+#. i18n: speaker=ui
+#: scripts/game_settings.gd:48
+msgctxt "key name"
+msgid "NumLock"
+msgstr "Num Lock"
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: A keyboard key's name in the CONTROLS table (206 px button, 15 px) and in the rebind notes. Use the name printed on Korean keyboards where there is one; short.
+#. i18n: speaker=ui
+#: scripts/game_settings.gd:48
+msgctxt "key name"
+msgid "ScrollLock"
+msgstr "Scroll Lock"
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: A keyboard key's name in the CONTROLS table (206 px button, 15 px) and in the rebind notes. Use the name printed on Korean keyboards where there is one; short.
+#. i18n: speaker=ui
+#: scripts/game_settings.gd:48
+msgctxt "key name"
+msgid "Kp Multiply"
+msgstr "키패드 *"
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: A keyboard key's name in the CONTROLS table (206 px button, 15 px) and in the rebind notes. Use the name printed on Korean keyboards where there is one; short.
+#. i18n: speaker=ui
+#: scripts/game_settings.gd:48
+msgctxt "key name"
+msgid "Kp Divide"
+msgstr "키패드 /"
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: A keyboard key's name in the CONTROLS table (206 px button, 15 px) and in the rebind notes. Use the name printed on Korean keyboards where there is one; short.
+#. i18n: speaker=ui
+#: scripts/game_settings.gd:48
+msgctxt "key name"
+msgid "Kp Subtract"
+msgstr "키패드 -"
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: A keyboard key's name in the CONTROLS table (206 px button, 15 px) and in the rebind notes. Use the name printed on Korean keyboards where there is one; short.
+#. i18n: speaker=ui
+#: scripts/game_settings.gd:48
+msgctxt "key name"
+msgid "Kp Period"
+msgstr "키패드 ."
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: A keyboard key's name in the CONTROLS table (206 px button, 15 px) and in the rebind notes. Use the name printed on Korean keyboards where there is one; short.
+#. i18n: speaker=ui
+#: scripts/game_settings.gd:48
+msgctxt "key name"
+msgid "Kp Add"
+msgstr "키패드 +"
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: A keyboard key's name in the CONTROLS table (206 px button, 15 px) and in the rebind notes. Use the name printed on Korean keyboards where there is one; short.
+#. i18n: speaker=ui
+#: scripts/game_settings.gd:48
+msgctxt "key name"
+msgid "Menu"
+msgstr "메뉴"
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: A keyboard key's name in the CONTROLS table (206 px button, 15 px) and in the rebind notes. Use the name printed on Korean keyboards where there is one; short.
+#. i18n: speaker=ui
+#: scripts/game_settings.gd:48
+msgctxt "key name"
+msgid "Help"
+msgstr "도움말"
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: A keyboard key's name in the CONTROLS table (206 px button, 15 px) and in the rebind notes. Use the name printed on Korean keyboards where there is one; short.
+#. i18n: speaker=ui
+#: scripts/game_settings.gd:48
+msgctxt "key name"
+msgid "Space"
+msgstr "스페이스"
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: A keyboard key's name in the CONTROLS table (206 px button, 15 px) and in the rebind notes. Use the name printed on Korean keyboards where there is one; short.
+#. i18n: speaker=ui
+#: scripts/game_settings.gd:48
+msgctxt "key name"
+msgid "Minus"
+msgstr "빼기"
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: A keyboard key's name in the CONTROLS table (206 px button, 15 px) and in the rebind notes. Use the name printed on Korean keyboards where there is one; short.
+#. i18n: speaker=ui
+#: scripts/game_settings.gd:48
+msgctxt "key name"
+msgid "Equal"
+msgstr "등호"
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: A keyboard key's name in the CONTROLS table (206 px button, 15 px) and in the rebind notes. Use the name printed on Korean keyboards where there is one; short.
+#. i18n: speaker=ui
+#: scripts/game_settings.gd:48
+msgctxt "key name"
+msgid "BracketLeft"
+msgstr "왼쪽 대괄호"
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: A keyboard key's name in the CONTROLS table (206 px button, 15 px) and in the rebind notes. Use the name printed on Korean keyboards where there is one; short.
+#. i18n: speaker=ui
+#: scripts/game_settings.gd:48
+msgctxt "key name"
+msgid "BracketRight"
+msgstr "오른쪽 대괄호"
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: A keyboard key's name in the CONTROLS table (206 px button, 15 px) and in the rebind notes. Use the name printed on Korean keyboards where there is one; short.
+#. i18n: speaker=ui
+#: scripts/game_settings.gd:48
+msgctxt "key name"
+msgid "BackSlash"
+msgstr "백슬래시"
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: A keyboard key's name in the CONTROLS table (206 px button, 15 px) and in the rebind notes. Use the name printed on Korean keyboards where there is one; short.
+#. i18n: speaker=ui
+#: scripts/game_settings.gd:48
+msgctxt "key name"
+msgid "Semicolon"
+msgstr "세미콜론"
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: A keyboard key's name in the CONTROLS table (206 px button, 15 px) and in the rebind notes. Use the name printed on Korean keyboards where there is one; short.
+#. i18n: speaker=ui
+#: scripts/game_settings.gd:48
+msgctxt "key name"
+msgid "Apostrophe"
+msgstr "아포스트로피"
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: A keyboard key's name in the CONTROLS table (206 px button, 15 px) and in the rebind notes. Use the name printed on Korean keyboards where there is one; short.
+#. i18n: speaker=ui
+#: scripts/game_settings.gd:48
+msgctxt "key name"
+msgid "Comma"
+msgstr "쉼표"
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: A keyboard key's name in the CONTROLS table (206 px button, 15 px) and in the rebind notes. Use the name printed on Korean keyboards where there is one; short.
+#. i18n: speaker=ui
+#: scripts/game_settings.gd:48
+msgctxt "key name"
+msgid "Period"
+msgstr "마침표"
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: A keyboard key's name in the CONTROLS table (206 px button, 15 px) and in the rebind notes. Use the name printed on Korean keyboards where there is one; short.
+#. i18n: speaker=ui
+#: scripts/game_settings.gd:48
+msgctxt "key name"
+msgid "Slash"
+msgstr "슬래시"
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: A keyboard key's name in the CONTROLS table (206 px button, 15 px) and in the rebind notes. Use the name printed on Korean keyboards where there is one; short.
+#. i18n: speaker=ui
+#: scripts/game_settings.gd:48
+msgctxt "key name"
+msgid "QuoteLeft"
+msgstr "백틱"
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: A keyboard key's name in the CONTROLS table (206 px button, 15 px) and in the rebind notes. Use the name printed on Korean keyboards where there is one; short.
+#. i18n: speaker=ui
+#: scripts/game_settings.gd:48
+msgctxt "key name"
+msgid "Section"
+msgstr "섹션 기호"
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: Settings' small top line (13 px). The Den is the settings terminal's name: a wolf's den. THE DEN is translated by meaning: 늑대 굴, a wolf's den (굴 alone also reads as oyster, and 보금자리 read back as Home).
+#. i18n: speaker=ui
+#: scripts/game_settings.gd:253
+msgid "THE DEN  /  LOCAL CONFIGURATION"
+msgstr "늑대 굴  /  로컬 설정"
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: Settings tab.
+#. i18n: speaker=ui
+#: scripts/game_settings.gd:265
+msgid "DISPLAY"
+msgstr "화면"
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: Settings tab.
+#. i18n: speaker=ui
+#: scripts/game_settings.gd:265
+msgid "AUDIO"
+msgstr "오디오"
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: Settings tab.
+#. i18n: speaker=ui
+#: scripts/game_settings.gd:265
+msgid "CONTROLS"
+msgstr "조작"
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: Settings tab holding the LANGUAGE row.
+#. i18n: speaker=ui
+#: scripts/game_settings.gd:265
+msgid "GENERAL"
+msgstr "일반"
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: DISPLAY toggle (272 px): vertical sync. 수직 동기화, the usual Korean menu word.
+#. i18n: speaker=ui
+#: scripts/game_settings.gd:282
+msgid "V-SYNC"
+msgstr "수직 동기화"
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: DISPLAY caption over the anti-aliasing list (270 px). The usual Korean menu word for edge smoothing.
+#. i18n: speaker=ui
+#: scripts/game_settings.gd:288
+msgid "EDGE SMOOTHING"
+msgstr "안티앨리어싱"
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: Anti-aliasing list item: none.
+#. i18n: speaker=ui
+#: scripts/game_settings.gd:288
+msgid "OFF"
+msgstr "끄기"
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: Anti-aliasing list item. Technical: copy it.
+#. i18n: speaker=ui
+#: scripts/game_settings.gd:288
+msgid "2× MSAA"
+msgstr "2× MSAA"
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: Anti-aliasing list item. Technical: copy it.
+#. i18n: speaker=ui
+#: scripts/game_settings.gd:288
+msgid "4× MSAA"
+msgstr "4× MSAA"
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: Anti-aliasing list item. Technical: copy it.
+#. i18n: speaker=ui
+#: scripts/game_settings.gd:288
+msgid "8× MSAA"
+msgstr "8× MSAA"
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: DISPLAY toggle (272 px): the accessibility option for less camera shake and flashing.
+#. i18n: speaker=ui
+#: scripts/game_settings.gd:291
+msgid "REDUCED MOTION"
+msgstr "움직임 줄이기"
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: Tooltip of REDUCED MOTION. Hit-stop: the brief freeze on a hit.
+#. i18n: speaker=ui
+#: scripts/game_settings.gd:292
+msgid "No camera shake or hit-stop; screen flashes are shorter."
+msgstr "화면 흔들림과 히트 스톱이 없고, 화면 번쩍임이 짧아집니다."
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: DISPLAY caption (100 px, beside a 100%-200% list).
+#. i18n: speaker=ui
+#: scripts/game_settings.gd:301
+msgid "TEXT SIZE"
+msgstr "글자 크기"
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: Tooltip of TEXT SIZE. Cards: the location and objective cards at the top.
+#. i18n: speaker=ui
+#: scripts/game_settings.gd:302
+msgid "Scales the dialogue, hints, cards and station names."
+msgstr "대화, 힌트, 카드, 스테이션 이름의 크기를 조절합니다."
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: CONTROLS table column heading (220 px, 14 px).
+#. i18n: speaker=ui
+#: scripts/game_settings.gd:325
+msgid "ACTION"
+msgstr "동작"
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: CONTROLS table column heading (206 px, 14 px).
+#. i18n: speaker=ui
+#: scripts/game_settings.gd:325
+msgid "KEYBOARD"
+msgstr "키보드"
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: CONTROLS table column heading (206 px, 14 px): a gamepad.
+#. i18n: speaker=ui
+#: scripts/game_settings.gd:325
+msgid "CONTROLLER"
+msgstr "컨트롤러"
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: CONTROLS slider caption: how far a stick must move before it counts.
+#. i18n: speaker=ui
+#: scripts/game_settings.gd:345
+msgid "Stick deadzone"
+msgstr "스틱 데드존"
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: CONTROLS toggle: press once instead of holding a button down.
+#. i18n: speaker=ui
+#: scripts/game_settings.gd:349
+msgid "TOGGLE HOLDS"
+msgstr "길게 누르기 전환"
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: Tooltip of TOGGLE HOLDS. A crank: a hand wheel the engineer turns.
+#. i18n: speaker=ui engineer=you
+#: scripts/game_settings.gd:350
+msgid "Press interact once to start a crank and again to stop it, instead of holding it down. Keyboard, controller and touch."
+msgstr "상호작용을 한 번 누르면 크랭크를 돌리기 시작하고, 다시 누르면 멈춥니다. 계속 누르고 있을 필요가 없습니다. 키보드, 컨트롤러, 터치 공통."
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: CONTROLS button.
+#. i18n: speaker=ui
+#: scripts/game_settings.gd:355
+msgid "RESTORE DEFAULT CONTROLS"
+msgstr "기본 조작으로 복원"
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: Settings button (180 px) shown while the game waits for a new key.
+#. i18n: speaker=ui
+#: scripts/game_settings.gd:376
+msgid "CANCEL REBIND"
+msgstr "변경 취소"
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: GENERAL caption (160 px) beside the language list.
+#. i18n: speaker=ui
+#: scripts/game_settings.gd:394
+msgid "LANGUAGE"
+msgstr "언어"
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: Settings note on a phone or tablet.
+#. i18n: speaker=ui
+#: scripts/game_settings.gd:570
+msgid "Window size is OS-managed on mobile."
+msgstr "모바일에서는 창 크기를 OS가 관리합니다."
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: Settings note: vertical sync can hold the frame rate below the chosen cap.
+#. i18n: speaker=ui
+#: scripts/game_settings.gd:570
+#: scripts/game_settings.gd:572
+msgid "V-sync may limit the FPS cap."
+msgstr "수직 동기화로 FPS 상한이 제한될 수 있습니다."
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: AUDIO note (680 px, 15 px, one row). 'Effects' names the Effects volume slider. Volume changes apply immediately is shortened to 변경 즉시 적용 to keep the note on one row.
+#. i18n: speaker=ui
+#: scripts/game_settings.gd:574
+msgid "Volume changes apply immediately. Effects carries every sound effect; there is no music or voice yet."
+msgstr "변경 즉시 적용. 효과음 볼륨이 모든 효과음을 조절하며, 음악과 음성은 아직 없습니다."
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: CONTROLS note.
+#. i18n: speaker=ui engineer=you
+#: scripts/game_settings.gd:574
+msgid "Select a binding, then press a key, controller button or move a stick."
+msgstr "바인딩을 선택한 뒤 키나 컨트롤러 버튼을 누르거나 스틱을 움직이세요."
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: GENERAL note under the language list.
+#. i18n: speaker=ui engineer=you
+#: scripts/game_settings.gd:574
+msgid "Until you choose a language, the game uses your system's."
+msgstr "언어를 고르기 전까지는 시스템 언어를 사용합니다."
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: Rebind note. %s is the action's name (Move left). No particle after the slot that changes with its last sound (slot_particles): the action's name is followed by 동작 (action).
+#. i18n: speaker=ui engineer=you slot=key
+#: scripts/game_settings.gd:620
+msgid "Press a keyboard input for %s. Esc cancels."
+msgstr "%s 동작에 쓸 키보드 입력을 누르세요. Esc: 취소."
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: Rebind note. %s is the action's name (Move left). No particle after the slot that changes with its last sound (slot_particles): the action's name is followed by 동작 (action).
+#. i18n: speaker=ui engineer=you slot=key
+#: scripts/game_settings.gd:620
+msgid "Press a controller input for %s. Esc cancels."
+msgstr "%s 동작에 쓸 컨트롤러 입력을 누르세요. Esc: 취소."
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: Rebind note.
+#. i18n: speaker=ui
+#: scripts/game_settings.gd:637
+msgid "Rebind cancelled."
+msgstr "변경을 취소했습니다."
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: Rebind note. %s is the other action's name. No particle after the slot that changes with its last sound (slot_particles): the action's name is followed by 동작 (action).
+#. i18n: speaker=ui engineer=you slot=key
+#: scripts/game_settings.gd:652
+msgid "Already used by %s. Choose another input or cancel."
+msgstr "이미 %s 동작에 쓰이고 있습니다. 다른 입력을 고르거나 취소하세요."
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: Rebind note.
+#. i18n: speaker=ui
+#: scripts/game_settings.gd:658
+msgid "Binding saved."
+msgstr "바인딩을 저장했습니다."
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: A controller stick's name in the CONTROLLER column (206 px, 15 px, shared with a second binding: abbreviate).
+#. i18n: speaker=ui
+#: scripts/game_settings.gd:726
+msgid "Left stick"
+msgstr "왼쪽 스틱"
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: A controller axis's name; %d is its number.
+#. i18n: speaker=ui
+#: scripts/game_settings.gd:726
+msgid "Axis %d"
+msgstr "축 %d"
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: A controller axis binding; %d its number, %s its direction (+ or −).
+#. i18n: speaker=ui slot=key
+#: scripts/game_settings.gd:753
+msgid "AXIS %d %s"
+msgstr "축 %d %s"
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: The controller's Start button, as printed on it.
+#. i18n: speaker=ui
+#: scripts/game_settings.gd:804
+msgid "START"
+msgstr "START"
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: A controller binding: left on the directional pad (CONTROLLER column, 206 px, shared with a second binding: abbreviate).
+#. i18n: speaker=ui
+#: scripts/game_settings.gd:805
+msgid "D-pad left"
+msgstr "방향 패드 왼쪽"
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: A controller binding: right on the directional pad (CONTROLLER column, 206 px, shared with a second binding: abbreviate).
+#. i18n: speaker=ui
+#: scripts/game_settings.gd:806
+msgid "D-pad right"
+msgstr "방향 패드 오른쪽"
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: A controller button with no name; %d is its number.
+#. i18n: speaker=ui
+#: scripts/game_settings.gd:807
+msgid "BUTTON %d"
+msgstr "버튼 %d"
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: CONTROLS note after RESTORE DEFAULT CONTROLS.
+#. i18n: speaker=ui
+#: scripts/game_settings.gd:838
+msgid "Default controls restored."
+msgstr "기본 조작으로 복원했습니다."
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: Settings error note.
+#. i18n: speaker=ui
+#: scripts/game_settings.gd:862
+#: scripts/main.gd:2164
+msgid "Settings could not be saved."
+msgstr "설정을 저장하지 못했습니다."
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: Station plate (12-13 px label on a machine). ALL CAPS, as short as possible. The caption by the Service Junction's pressure line dial. The hints quote this plate as 라인 게이지.
+#. i18n: speaker=ui
+#: scripts/junction_room.gd:884
+msgid "LINE"
+msgstr "라인"
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: Station plate (12-13 px label on a machine). ALL CAPS, as short as possible. The junction's breaker after the blast used the line up.
+#. i18n: speaker=ui
+#: scripts/junction_room.gd:1539
+msgid "BREAKER USED"
+msgstr "차단기 소진"
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: Station plate (12-13 px label on a machine). ALL CAPS, as short as possible. The junction's valve after the blast used the line up.
+#. i18n: speaker=ui
+#: scripts/junction_room.gd:1541
+msgid "VALVE USED"
+msgstr "밸브 소진"
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: Station plate (12-13 px label on a machine). ALL CAPS, as short as possible. The junction's exit hatch, open.
+#. i18n: speaker=ui
+#: scripts/junction_room.gd:1558
+msgid "EXIT OPEN"
+msgstr "출구 열림"
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: Station plate (12-13 px label on a machine). ALL CAPS, as short as possible. The junction's exit hatch while it slides open.
+#. i18n: speaker=ui
+#: scripts/junction_room.gd:1562
+msgid "EXIT OPENING"
+msgstr "출구 여는 중"
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: Station plate (12-13 px label on a machine). ALL CAPS, as short as possible. The junction's exit hatch, ready to open.
+#. i18n: speaker=ui
+#: scripts/junction_room.gd:1565
+msgid "EXIT READY"
+msgstr "출구 준비됨"
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: Station plate (12-13 px label on a machine). ALL CAPS, as short as possible. The junction's exit hatch, locked.
+#. i18n: speaker=ui
+#: scripts/junction_room.gd:1568
+msgid "EXIT LOCKED"
+msgstr "출구 잠김"
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: WOLF's callback at the safe point. %s is the answer the engineer chose at the relay, as the game shows it; keep the quotation marks round it in your language's style. Avoid a past tense that shows the engineer's gender ("you said", "you found"). WOLF speaks plain informal speech (반말). Korean verbs show no gender. A direct quote takes 라고 whatever its last sound, so the quoted answer needs no particle choice.
+#. i18n: story speaker=WOLF engineer=you slot=choice keep-breaks
+#: scripts/m0_state.gd:195
+msgid ""
+"You said \"%s\"\n"
+"I refused. You found another way. Next time, tell me what it costs."
+msgstr ""
+"“%s”라고 했지.\n"
+"난 거절했어. 넌 다른 방법을 찾았고. 다음엔 대가가 뭔지 말해 줘."
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: WOLF's callback at the safe point. %s is the answer the engineer chose at the relay, as the game shows it; keep the quotation marks round it in your language's style. Avoid a past tense that shows the engineer's gender ("you said").
+#. i18n: story speaker=WOLF engineer=you slot=choice keep-breaks
+#: scripts/m0_state.gd:199
+msgid ""
+"You said \"%s\"\n"
+"I chose the relay. We made it."
+msgstr ""
+"“%s”라고 했지.\n"
+"난 릴레이를 택했어. 우린 해냈어."
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: WOLF's callback at the safe point. %s is the answer the engineer chose at the relay, as the game shows it; keep the quotation marks round it in your language's style. Avoid a past tense that shows the engineer's gender ("you said", "you cranked").
+#. i18n: story speaker=WOLF engineer=you slot=choice keep-breaks
+#: scripts/m0_state.gd:203
+msgid ""
+"You said \"%s\"\n"
+"I made my call. You cranked the bypass anyway. I stayed."
+msgstr ""
+"“%s”라고 했지.\n"
+"난 내 판단을 내렸어. 그래도 넌 바이패스를 돌렸지. 난 곁에 남았어."
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: Title button (the width of two buttons) once the slice is finished: start a fresh run.
+#. i18n: speaker=ui
+#: scripts/main.gd:1127
+msgid "PLAY AGAIN"
+msgstr "다시 플레이"
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: Title note under PLAY AGAIN (388 px, 15 px). Slice: this playable part of the game. Quote the PLAY AGAIN button exactly. Slice is 체험판 (the playable demo part), here and on the end card.
+#. i18n: speaker=ui
+#: scripts/main.gd:1132
+msgid "Slice complete. PLAY AGAIN starts a fresh run."
+msgstr "체험판 완료. “다시 플레이”를 누르면 처음부터 시작합니다."
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: Title note under CONTINUE (388 px, 15 px).
+#. i18n: speaker=ui
+#: scripts/main.gd:1134
+msgid "Saved checkpoint could not be read."
+msgstr "저장된 체크포인트를 읽지 못했습니다."
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: Title note under CONTINUE (388 px, 15 px). SAFE POINT is the plate's exact words.
+#. i18n: speaker=ui
+#: scripts/main.gd:1134
+msgid "No checkpoint yet. Saving starts at the first SAFE POINT."
+msgstr "체크포인트 없음. 첫 안전 지점부터 저장됩니다."
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: Changelog button text when the browser cannot open (338 px).
+#. i18n: speaker=ui
+#: scripts/main.gd:1157
+msgid "LINK UNAVAILABLE"
+msgstr "링크 열기 불가"
+
+# machine-translated by Claude (Anthropic), unreviewed
+#: scripts/main.gd:1178
+msgid "The changelog text is missing from this build. Open the full changelog online."
+msgstr "이 빌드에는 변경 내역 텍스트가 없습니다. 전체 변경 내역은 온라인에서 보세요."
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: Opens the in-game changelog in every language but English: the changelog itself is not translated.
+#: scripts/main.gd:1181
+msgid "These development updates are written in English only."
+msgstr "개발 업데이트는 영어로만 제공됩니다."
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: WOLF, when the hidden name key gives the engineer another of their three names; %s is the full name. No particle after the slot that changes with its last sound (slot_particles): the full name stands alone before a full stop.
+#. i18n: speaker=WOLF engineer=name
+#: scripts/main.gd:1470
+msgid "%s. That name sounds like you."
+msgstr "%s. 그 이름, 너답네."
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: Credits heading (19 px, centred).
+#. i18n: speaker=ui
+#. TRANSLATORS: Heading over the AI disclosure in the credits, in the same capitals as the other headings.
+#: scripts/main.gd:2036
+msgid "AI DISCLOSURE"
+msgstr "AI 사용 고지"
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: Credits paragraph (582 px, 19 px, wraps). Translated word for word.
+#. i18n: speaker=ui
+#. TRANSLATORS: The AI disclosure Nathanial Henniges approved word for word (October 19, 2026). Translate it faithfully and in full; do not shorten, soften or add to it. Keep WOLF OVERRIDE, Nathanial Henniges and MrDemonWolf, Inc. as written.
+#: scripts/main.gd:2038
+msgid "WOLF OVERRIDE is a solo project by Nathanial Henniges (MrDemonWolf, Inc.). AI tools were used with careful human oversight to support the creative process for art and code. The story, characters and game design are his, and every AI-assisted asset is reviewed, edited and credited."
+msgstr "WOLF OVERRIDE는 Nathanial Henniges(MrDemonWolf, Inc.)의 1인 프로젝트입니다. AI 도구는 사람의 세심한 감독 아래 아트와 코드의 창작 과정을 돕는 데 사용되었습니다. 스토리, 캐릭터, 게임 디자인은 그의 것이며, AI의 도움을 받은 모든 에셋은 검토와 편집을 거쳐 크레딧에 표기됩니다."
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: Credits button (218 px, 19 px) that starts the credits rolling again.
+#. i18n: speaker=ui
+#: scripts/main.gd:2065
+#: scripts/main.gd:2071
+msgid "RESUME SCROLL"
+msgstr "스크롤 재개"
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: Frame-rate cap list item.
+#. i18n: speaker=ui
+#: scripts/main.gd:2104
+msgid "30 FPS"
+msgstr "30 FPS"
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: Frame-rate cap list item.
+#. i18n: speaker=ui
+#: scripts/main.gd:2105
+msgid "60 FPS"
+msgstr "60 FPS"
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: Frame-rate cap list item: no cap.
+#. i18n: speaker=ui
+#: scripts/main.gd:2106
+msgid "UNCAPPED"
+msgstr "제한 없음"
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: Frame-rate cap list item.
+#. i18n: speaker=ui
+#: scripts/main.gd:2107
+msgid "90 FPS"
+msgstr "90 FPS"
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: Frame-rate cap list item.
+#. i18n: speaker=ui
+#: scripts/main.gd:2108
+msgid "120 FPS"
+msgstr "120 FPS"
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: Frame-rate cap list item.
+#. i18n: speaker=ui
+#: scripts/main.gd:2109
+msgid "144 FPS"
+msgstr "144 FPS"
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: Pause Settings note on a phone or tablet.
+#. i18n: speaker=ui
+#: scripts/main.gd:2124
+msgid "Window size is managed by iOS/Android."
+msgstr "창 크기는 iOS/Android가 관리합니다."
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: Pause menu button during the opening sequence (350 px, 19 px).
+#. i18n: speaker=ui
+#: scripts/main.gd:2243
+msgid "SKIP OPENING"
+msgstr "오프닝 건너뛰기"
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: Pause hint on touch screens.
+#. i18n: speaker=ui engineer=you
+#: scripts/main.gd:2258
+msgid "TAP RESUME TO RETURN"
+msgstr "“재개”를 탭해 돌아가기"
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: Pause hint: %s is the Pause key or button's name, then two spaces.
+#. i18n: speaker=ui slot=key
+#: scripts/main.gd:2258
+msgid "%s  RESUME"
+msgstr "%s  재개"
+
+# machine-translated by Claude (Anthropic), unreviewed
+#: scripts/main.gd:2458
+msgid "No valid checkpoint save found. Current game was not changed."
+msgstr "유효한 체크포인트 저장이 없습니다. 현재 게임은 바뀌지 않았습니다."
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: Open glossary term SERVICE JUNCTION: 설비 분기점, the room card's word; a reviewer's word. Status and instruction lines use 합니다/하세요; story narration uses the plain 한다 style.
+#. TRANSLATORS: i18n: story speaker=narrator
+#: scripts/main.gd:2515
+msgid ""
+"Service junction restored. The sentry\n"
+"is down; pop the exit bolt by the door."
+msgstr ""
+"설비 분기점이 복구되었습니다. 센트리가 쓰러졌습니다.\n"
+"문 옆의 출구 볼트를 해제하세요."
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: Open glossary term SERVICE JUNCTION: 설비 분기점, the room card's word; a reviewer's word.
+#. TRANSLATORS: i18n: story speaker=narrator
+#: scripts/main.gd:2518
+msgid ""
+"Service junction restored. The door is\n"
+"down. The sentry patrols past the rubble."
+msgstr ""
+"설비 분기점이 복구되었습니다. 문이 날아갔습니다.\n"
+"센트리가 잔해 너머를 순찰합니다."
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: The service line is 설비 라인, matching the junction's 설비 분기점.
+#. TRANSLATORS: i18n: story speaker=narrator
+#: scripts/main.gd:2524
+msgid "The first copy is safe. Use the exit to follow the service line."
+msgstr "첫 번째 사본은 안전합니다. 출구로 나가 설비 라인을 따라가세요."
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: Records access, the room, is 기록 접근실; a trace is 기록.
+#. TRANSLATORS: i18n: story speaker=narrator
+#: scripts/main.gd:2527
+msgid "Records access restored. Both traces are copied; head for the exit."
+msgstr "기록 접근실이 복구되었습니다. 두 기록을 모두 복사했습니다. 출구로 가세요."
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: i18n: story speaker=narrator
+#: scripts/main.gd:2530
+msgid "Records access restored. The purge order is copied; copy the mirror index next."
+msgstr "기록 접근실이 복구되었습니다. 퍼지 명령을 복사했습니다. 다음은 미러 색인을 복사하세요."
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: i18n: story speaker=narrator
+#: scripts/main.gd:2533
+msgid "Records access restored. Copy the purge-order trace first; WOLF is checking the mirror."
+msgstr "기록 접근실이 복구되었습니다. 먼저 퍼지 명령 기록을 복사하세요. WOLF가 미러를 확인하고 있습니다."
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: i18n: story speaker=narrator
+#: scripts/main.gd:2537
+msgid "Safe point restored."
+msgstr "안전 지점이 복구되었습니다."
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: The Director's purge display, read as a speaker; WOLF answers in the next message. A machine display's terse wording.
+#. i18n: story speaker=DIRECTOR
+#: scripts/main.gd:2568
+msgid "Original program logs marked for deletion."
+msgstr "원본 프로그램 로그: 삭제 대상으로 지정됨."
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: i18n: story speaker=WOLF
+#: scripts/main.gd:2570
+msgid "They want the source record gone. We need to preserve it."
+msgstr "저들은 원본 기록을 없애려 해. 우리가 지켜야 해."
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: i18n: story speaker=narrator
+#: scripts/main.gd:2581
+msgid "No station in reach. Follow the labeled breaker, relay, bypass or safe point."
+msgstr "닿는 곳에 스테이션이 없습니다. 표시된 차단기, 릴레이, 바이패스, 안전 지점을 찾아가세요."
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: i18n: story speaker=narrator
+#: scripts/main.gd:2622
+msgid "Power is already on. The relay is farther down the hall."
+msgstr "전원은 이미 켜져 있습니다. 릴레이는 복도 더 안쪽에 있습니다."
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: WOLF thanks the engineer for telling him the relay's risk. Avoid a past tense that shows the engineer's gender ("you told me"). Arm the breaker: 차단기를 올리다, the everyday Korean for switching a breaker on.
+#. i18n: story speaker=WOLF engineer=you
+#: scripts/main.gd:2635
+msgid "Thank you for telling me. I'll take the relay. Arm the breaker."
+msgstr "말해 줘서 고마워. 릴레이는 내가 맡을게. 차단기를 올려."
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: i18n: story speaker=WOLF
+#: scripts/main.gd:2639
+msgid "No. I won't take that risk blind. Use the manual bypass."
+msgstr "아니. 모르는 채로 그런 위험은 안 져. 수동 바이패스를 써."
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: i18n: story speaker=narrator
+#: scripts/main.gd:2652
+msgid "The relay is dark. Arm the breaker first."
+msgstr "릴레이가 꺼져 있습니다. 먼저 차단기를 올리세요."
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: The seal (the red sealed door) is 봉인문 everywhere.
+#. TRANSLATORS: i18n: story speaker=narrator
+#: scripts/main.gd:2656
+#: scripts/main.gd:2699
+msgid "The seal is open. The safe point is just beyond it."
+msgstr "봉인문이 열렸습니다. 안전 지점은 바로 그 너머입니다."
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: i18n: story speaker=WOLF
+#: scripts/main.gd:2662
+msgid "I said no. I won't touch it blind. The bypass is right beside it."
+msgstr "싫다고 했잖아. 모르는 채로는 안 건드려. 바이패스가 바로 옆에 있어."
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: i18n: story speaker=WOLF
+#: scripts/main.gd:2674
+msgid "I've got the contact. Give me a moment."
+msgstr "접점은 내가 잡았어. 잠깐만."
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: i18n: story speaker=narrator
+#: scripts/main.gd:2686
+msgid "WOLF takes the surge through the live contact. The red seal opens."
+msgstr "WOLF가 전류가 흐르는 접점으로 서지를 받아 낸다. 붉은 봉인문이 열린다."
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: i18n: story speaker=narrator
+#: scripts/main.gd:2702
+msgid "The bypass handle won't move. The breaker has to be on first."
+msgstr "바이패스 손잡이가 움직이지 않습니다. 먼저 차단기를 올려야 합니다."
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: i18n: story speaker=narrator
+#: scripts/main.gd:2759
+msgid "The bypass locks over and the alarm cuts out. The red seal opens."
+msgstr "바이패스가 넘어가 고정되고 경보가 멎는다. 붉은 봉인문이 열린다."
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: i18n: story speaker=WOLF
+#: scripts/main.gd:2761
+msgid "Open. I'm with you."
+msgstr "열렸어. 함께 갈게."
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: i18n: story speaker=narrator
+#: scripts/main.gd:2772
+msgid "The safe point is past the sealed door."
+msgstr "안전 지점은 봉인문 너머에 있습니다."
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: WOLF, after the engineer pressed him at the relay without warning.
+#. i18n: story speaker=WOLF
+#: scripts/main.gd:2786
+msgid "I refused the live relay; I'm still here."
+msgstr "전기가 흐르는 릴레이는 거절했어. 그래도 난 여기 있어."
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: WOLF to the engineer, who told him the relay's risk. Avoid a past tense that shows the engineer's gender ("you told me").
+#. i18n: story speaker=WOLF engineer=you
+#: scripts/main.gd:2789
+msgid "I took the relay because you told me the truth."
+msgstr "네가 사실을 말해 줬으니까 릴레이를 맡았어."
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: WOLF to the engineer, who cranked the manual bypass after he offered to take the relay. Avoid a past tense that shows the engineer's gender ("you cranked").
+#. i18n: story speaker=WOLF engineer=you
+#: scripts/main.gd:2792
+msgid "I offered the relay; you cranked the bypass. Still with you."
+msgstr "난 릴레이를 맡겠다고 했고, 넌 바이패스를 돌렸지. 그래도 함께야."
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: Purge is 퍼지 throughout (queue, order, display), so the deletion order (삭제 명령) stays a different word.
+#. TRANSLATORS: i18n: story speaker=WOLF
+#: scripts/main.gd:2795
+msgid "Take the purge queue. I'll inspect the mirror."
+msgstr "퍼지 대기열은 네가 맡아. 난 미러를 살펴볼게."
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: Hint bar (14 px, about 526 px wide on a keyboard and 488 px on touch; wraps). %s is the key or button. No particle after the slot that changes with its last sound (slot_particles): the key is left without 을/를, as Korean prompts often write it.
+#. i18n: speaker=hint engineer=you slot=key
+#: scripts/main.gd:2804
+msgid "The safe point could not save. Press %s here again."
+msgstr "안전 지점에서 저장하지 못했습니다. 여기서 다시 %s 누르세요."
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: Hint bar (14 px, about 526 px wide on a keyboard and 488 px on touch; wraps). The touch form; USE is the touch button's word (USAR).
+#. i18n: speaker=hint engineer=you
+#: scripts/main.gd:2804
+msgid "The safe point could not save. Tap USE here again."
+msgstr "안전 지점에서 저장하지 못했습니다. 여기서 “사용”을 다시 탭하세요."
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: i18n: story speaker=narrator
+#: scripts/main.gd:2815
+msgid "Safe point saved."
+msgstr "안전 지점에 저장했습니다."
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: i18n: story speaker=narrator
+#: scripts/main.gd:2818
+msgid "Safe point saved. WOLF remembers the same choice."
+msgstr "안전 지점에 저장했습니다. WOLF도 같은 선택을 기억합니다."
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: %s is the engineer's first name. No particle after the slot that changes with its last sound (slot_particles): 에게 (to), so the copy stays with the engineer.
+#. i18n: story speaker=narrator engineer=name
+#: scripts/main.gd:2827
+msgid "The Director's purge order has a time and target ID. %s keeps a local copy; the original logs are still missing."
+msgstr "소장의 퍼지 명령에는 시각과 대상 ID가 있다. 로컬 사본 하나가 %s에게 남는다. 원본 로그는 여전히 없다."
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: i18n: story speaker=narrator
+#: scripts/main.gd:2830
+msgid "The purge-order trace is already copied. The mirror port may confirm when the source existed."
+msgstr "퍼지 명령 기록은 이미 복사했습니다. 미러 포트에서 원본이 언제 존재했는지 확인할 수 있을지도 모릅니다."
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: i18n: story speaker=narrator
+#: scripts/main.gd:2836
+msgid "The mirror index has no context yet. Copy the purge-order trace first."
+msgstr "미러 색인만으로는 아직 맥락이 없습니다. 먼저 퍼지 명령 기록을 복사하세요."
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: i18n: story speaker=narrator
+#: scripts/main.gd:2839
+msgid "The mirror timestamp is already preserved. The exit is to the right."
+msgstr "미러 타임스탬프는 이미 보존했습니다. 출구는 오른쪽입니다."
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: WOLF's readout is 판독 화면, as in the answer USE WOLF'S READOUT.
+#. TRANSLATORS: i18n: story speaker=WOLF
+#: scripts/main.gd:2848
+msgid "I found the mirror index. We can use my readout or your maintenance port."
+msgstr "미러 색인을 찾았어. 내 판독 화면을 쓰거나 네 정비 포트를 쓰면 돼."
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: i18n: story speaker=narrator
+#: scripts/main.gd:2877
+msgid "Exit sealed until the purge order and mirror timestamp are copied."
+msgstr "퍼지 명령과 미러 타임스탬프를 복사할 때까지 출구는 봉쇄됩니다."
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: Hint bar (14 px, about 526 px wide on a keyboard and 488 px on touch; wraps).
+#. i18n: speaker=hint engineer=you
+#: scripts/main.gd:2914
+#: scripts/main.gd:5377
+msgid "Mirror copied. Head for the exit."
+msgstr "미러 복사 완료. 출구로 가세요."
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: Hint bar (14 px, about 526 px wide on a keyboard and 488 px on touch; wraps).
+#. i18n: speaker=hint engineer=you
+#: scripts/main.gd:2916
+msgid "Follow the station lights: mirror port, then exit."
+msgstr "스테이션 불빛을 따라가세요: 미러 포트, 그다음 출구."
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: Hint bar (14 px, about 526 px wide on a keyboard and 488 px on touch; wraps).
+#. i18n: speaker=hint engineer=you
+#: scripts/main.gd:2917
+msgid "Follow the station lights: purge queue, mirror port, then exit."
+msgstr "스테이션 불빛을 따라가세요: 퍼지 대기열, 미러 포트, 그다음 출구."
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: WOLF's line in the dialogue box (after the WOLF: tag). %s is the second answer's key or button. No particle after the slot that changes with its last sound (slot_particles): the key is left without 을/를.
+#. TRANSLATORS: WOLF, still walking to the mirror. %s is the key or button for the manual port.
+#. i18n: story speaker=WOLF slot=key
+#: scripts/main.gd:3133
+msgid "I'm still checking the drive. Wait for me, or press %s for the manual port."
+msgstr "아직 드라이브를 확인하는 중이야. 기다리든지, %s 눌러서 수동 포트를 써."
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: WOLF, still walking to the mirror, touch form. USE MANUAL PORT is the answer button's text: use its translation here.
+#. i18n: story speaker=WOLF
+#: scripts/main.gd:3136
+msgid "I'm still checking the drive. Wait for me, or tap USE MANUAL PORT."
+msgstr "아직 드라이브를 확인하는 중이야. 기다리든지, “수동 포트 사용”을 탭해."
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: i18n: story speaker=narrator
+#: scripts/main.gd:3148
+msgid "WOLF reads the timestamp off his own readout. The purge target existed before the deletion order."
+msgstr "WOLF가 자기 판독 화면에서 타임스탬프를 읽는다. 퍼지 대상은 삭제 명령보다 먼저 존재했다."
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: %s is the engineer's first name. No particle after the slot that changes with its last sound (slot_particles): 의 (copying the timestamp is %s's job): a clause ending on the bare name read back as unfinished.
+#. i18n: story speaker=narrator engineer=name
+#: scripts/main.gd:3152
+msgid "%s copies the timestamp through the maintenance port. WOLF keeps watch."
+msgstr "정비 포트로 타임스탬프를 복사하는 건 %s의 몫이다. WOLF가 망을 본다."
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: Hint bar (14 px, about 526 px wide on a keyboard and 488 px on touch; wraps).
+#. i18n: speaker=hint engineer=you
+#: scripts/main.gd:3168
+msgid "Save failed. Use a station to try again."
+msgstr "저장 실패. 스테이션을 사용해 다시 시도하세요."
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: The relief vent is 압력 배출구 everywhere.
+#. TRANSLATORS: i18n: story speaker=narrator
+#: scripts/main.gd:3238
+msgid "The overload breaker catches and the line starts to build. If the LINE gauge peaks, the relief vent lets go."
+msgstr "과부하 차단기가 올라가고 라인 압력이 오르기 시작한다. 라인 게이지가 정점에 이르면 압력 배출구가 터진다."
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: i18n: story speaker=narrator
+#: scripts/main.gd:3253
+msgid "The wheel is stiff. Three full turns charge the door."
+msgstr "핸들이 뻑뻑하다. 세 바퀴를 끝까지 돌리면 문이 충전된다."
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: i18n: story speaker=narrator
+#: scripts/main.gd:3262
+msgid "Relief vent. It lets go when the gauge peaks; don't be standing on it."
+msgstr "압력 배출구입니다. 게이지가 정점에 이르면 터지니, 그 위에 서 있지 마세요."
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: i18n: story speaker=narrator
+#: scripts/main.gd:3271
+msgid ""
+"No station in reach. The exit bolt is\n"
+"by the door."
+msgstr "닿는 곳에 스테이션이 없습니다. 출구 볼트는 문 옆에 있습니다."
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: i18n: story speaker=narrator
+#: scripts/main.gd:3274
+msgid ""
+"No station in reach. The TANK RELEASE\n"
+"is past the rubble."
+msgstr "닿는 곳에 스테이션이 없습니다. 탱크 투하는 잔해 너머에 있습니다."
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: i18n: story speaker=narrator
+#: scripts/main.gd:3277
+msgid "No station in reach. The breaker is by the entrance, the valve by the door."
+msgstr "닿는 곳에 스테이션이 없습니다. 차단기는 입구 옆에, 밸브는 문 옆에 있습니다."
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: i18n: story speaker=narrator
+#: scripts/main.gd:3449
+msgid "The clamp lets go."
+msgstr "클램프가 풀린다."
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: i18n: story speaker=narrator
+#: scripts/main.gd:3540
+msgid "SERVICE LINE CLEARED."
+msgstr "설비 라인 개통."
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: Archive, the next area, is 아카이브.
+#. TRANSLATORS: i18n: story speaker=WOLF
+#: scripts/main.gd:3542
+msgid "It's quiet now. The line runs on toward Archive."
+msgstr "이제 조용하네. 라인은 아카이브 쪽으로 이어져."
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: The engineer speaks plain informal speech to WOLF, with no gendered word.
+#. TRANSLATORS: i18n: story speaker=engineer engineer=self
+#: scripts/main.gd:3544
+msgid "Then that's where we go."
+msgstr "그럼 거기로 가자."
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: i18n: story speaker=WOLF
+#: scripts/main.gd:3808
+msgid "It passes under that tank on every patrol. How do we bring it down?"
+msgstr "저 녀석은 순찰할 때마다 저 탱크 밑을 지나가. 어떻게 쓰러뜨리지?"
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: i18n: story speaker=narrator
+#: scripts/main.gd:3922
+msgid "The winch has the tank back on the clamp. The TANK RELEASE is ready again."
+msgstr "윈치가 탱크를 다시 클램프에 걸었습니다. 탱크 투하를 다시 쓸 수 있습니다."
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: i18n: story speaker=narrator
+#: scripts/main.gd:3954
+msgid "FUSE LIT. Back away from the door, past the valve."
+msgstr "퓨즈 점화. 밸브 너머까지 문에서 물러나세요."
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: The valve's turns so far and the turns needed (3).
+#. i18n: story speaker=narrator
+#: scripts/main.gd:3958
+msgid "The valve gives. %d of %d turns."
+msgstr "밸브가 돌아간다. %d / %d 바퀴."
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: i18n: story speaker=narrator
+#: scripts/main.gd:3978
+msgid "The relief vent lets go and the breaker trips. Reset the breaker and crank faster this time."
+msgstr "압력 배출구가 터져 차단기가 내려갔습니다. 차단기를 다시 올리고 이번엔 더 빨리 돌리세요."
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: Touch layout's USE button word (155 px, 23 px). Shown on the knockdown card.
+#. i18n: speaker=ui
+#: scripts/main.gd:4741
+msgid "RETRY"
+msgstr "재시도"
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: Title button (186 px, 21 px): continue from the saved checkpoint. The same word, with the context 'touch button', is the touch USE button's word for going on through lines (155 px, 23 px).
+#. i18n: speaker=ui
+#: scripts/main.gd:4741
+msgctxt "touch button"
+msgid "CONTINUE"
+msgstr "계속"
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: Touch layout's USE button word (155 px, 23 px). Turn a crank or valve.
+#. i18n: speaker=ui
+#: scripts/main.gd:4741
+msgid "CRANK"
+msgstr "돌리기"
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: Touch layout's USE button word (155 px, 23 px). Drop the hanging tank.
+#. i18n: speaker=ui
+#: scripts/main.gd:4741
+msgid "DROP"
+msgstr "투하"
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: The touch layout's interact button (155 px, 23 px): use the machine in front of you.
+#. i18n: speaker=ui
+#: scripts/main.gd:4741
+#: scripts/main.gd:4752
+msgid "USE"
+msgstr "사용"
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: Tutorial row (17 px). %s is the keys or the touch arrows; two spaces after it.
+#. i18n: speaker=hint engineer=you slot=key
+#: scripts/main.gd:4751
+msgid "%s  MOVE"
+msgstr "%s  이동"
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: Tutorial row (17 px) on a controller. Stick and D-pad (방향 패드), as in the CONTROLS table.
+#. i18n: speaker=hint engineer=you
+#: scripts/main.gd:4751
+msgid "STICK / D-PAD MOVE"
+msgstr "스틱 / 방향 패드로 이동"
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: Tutorial row (17 px). %s is the interact key or the USE button; two spaces after it.
+#. i18n: speaker=hint engineer=you slot=key
+#: scripts/main.gd:4752
+msgid "%s  READ DISPLAY (optional)"
+msgstr "%s  화면 읽기 (선택)"
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: Tutorial row (17 px).
+#. i18n: speaker=hint engineer=you
+#: scripts/main.gd:4756
+msgid "Head right to the breaker."
+msgstr "오른쪽 차단기로 가세요."
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: Tutorial row (17 px) under READ DISPLAY (optional).
+#. i18n: speaker=hint engineer=you
+#: scripts/main.gd:4761
+msgid "Or head right to the breaker."
+msgstr "또는 오른쪽 차단기로 가세요."
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: The opening's top card, over WOLF OVERRIDE. A clock time and the place. CONTAINMENT, the place, is 격리 구역 (containment area).
+#. i18n: speaker=ui
+#: scripts/main.gd:4769
+msgid "03:17 / CONTAINMENT"
+msgstr "03:17 / 격리 구역"
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: The opening's prompt on touch: the touch button's CONTINUE word and the PAUSE button.
+#. i18n: speaker=hint engineer=you
+#: scripts/main.gd:4770
+msgid "TAP CONTINUE  /  PAUSE"
+msgstr "“계속” 탭  /  일시정지"
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: The opening's prompt: two keys or buttons, each followed by two spaces and its action; four spaces between.
+#. i18n: speaker=hint engineer=you slot=key
+#: scripts/main.gd:4770
+msgid "%s  CONTINUE    %s  PAUSE"
+msgstr "%s  계속    %s  일시정지"
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: Second row of the opening's first prompt: Pause offers SKIP OPENING.
+#. i18n: speaker=hint engineer=you
+#: scripts/main.gd:4773
+msgid "PAUSE: skip the opening"
+msgstr "일시정지: 오프닝 건너뛰기"
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: A room's name on the top card (ALL CAPS). Glossary term, open for ko: 설비 분기점 (facility junction point, where the base's service lines branch) chosen here; a reviewer's word.
+#. i18n: speaker=ui
+#: scripts/main.gd:4779
+#: scripts/main.gd:4812
+msgid "SERVICE JUNCTION"
+msgstr "설비 분기점"
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: Top card objective when the junction is done (ALL CAPS).
+#. i18n: speaker=ui
+#: scripts/main.gd:4779
+#: scripts/main.gd:5532
+msgid "SERVICE LINE CLEARED"
+msgstr "설비 라인 개통"
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: The name card: %s is the engineer's first name in capitals, then their job. 정비 엔지니어 names the job with no gender. 엔지니어 is a job word with no gender in Korean.
+#. TRANSLATORS: The engineer's name card: %s is their full name in capitals, then their job on its own row. The engineer is non-binary: use a job word with no gender (a department or field noun), never a masculine or feminine one.
+#. i18n: engineer=name,third keep-breaks
+#: scripts/main.gd:4802
+msgid ""
+"%s\n"
+"MAINTENANCE ENGINEER"
+msgstr ""
+"%s\n"
+"정비 엔지니어"
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: Top card location (ALL CAPS): the room, then the chapter.
+#. i18n: speaker=ui
+#: scripts/main.gd:4812
+msgid "RECORDS ACCESS / FIRST COPY"
+msgstr "기록 접근실 / 첫 번째 사본"
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: Top card location (ALL CAPS). LOCKDOWN as on the title's chapter line (봉쇄).
+#. i18n: speaker=ui
+#: scripts/main.gd:4812
+msgid "MAINTENANCE / LOCKDOWN"
+msgstr "정비 구역 / 봉쇄"
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: Hint bar (14 px, about 526 px wide on a keyboard and 488 px on touch; wraps). Shown for two seconds after a save.
+#. i18n: speaker=hint
+#: scripts/main.gd:4817
+msgid "Checkpoint saved."
+msgstr "체크포인트 저장됨."
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: The knockdown card's prompt on touch: the RETRY button's word.
+#. i18n: speaker=hint engineer=you
+#: scripts/main.gd:4822
+msgid "TAP RETRY"
+msgstr "“재시도” 탭"
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: The knockdown card's prompt: the key or button, two spaces, the action.
+#. i18n: speaker=hint engineer=you slot=key
+#: scripts/main.gd:4822
+msgid "%s  RETRY"
+msgstr "%s  재시도"
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: The Director's name over his lines, in capitals.
+#: scripts/main.gd:4876
+msgctxt "speaker"
+msgid "DIRECTOR"
+msgstr "소장"
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: The name over the purge display's line: the Director's name, a slash and the display's name, in capitals.
+#: scripts/main.gd:4878
+msgctxt "speaker"
+msgid "DIRECTOR / PURGE"
+msgstr "소장 / 퍼지"
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: Fills the held-key token of a hint (HOLD E): %s is the key or button. The key first, as Korean prompts write it.
+#. i18n: speaker=hint engineer=you slot=key
+#: scripts/main.gd:4909
+msgid "HOLD %s"
+msgstr "%s 길게 누르기"
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: Prompt on touch to go on through lines: the touch button's CONTINUE word.
+#. i18n: speaker=hint engineer=you
+#: scripts/main.gd:4918
+msgid "TAP CONTINUE"
+msgstr "“계속” 탭"
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: Prompt to go on through lines: the key or button, two spaces, the action.
+#. i18n: speaker=hint engineer=you slot=key
+#: scripts/main.gd:4918
+msgid "%s  CONTINUE"
+msgstr "%s  계속"
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: Hint bar (14 px, about 526 px wide on a keyboard and 488 px on touch; wraps). %s is the key, button or touch word the player uses (it is filled in after translation); keep it first and keep the colon. Hints use the noun form (~하기) after the key, as Korean game prompts do.
+#. i18n: speaker=hint engineer=you slot=key
+#: scripts/main.gd:5371
+#: scripts/main.gd:5412
+msgid "%s: continue."
+msgstr "%s: 계속."
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: Hint bar (14 px, about 526 px wide on a keyboard and 488 px on touch; wraps). %s is the key, button or touch word the player uses (it is filled in after translation); keep it first and keep the colon. Archive is the next area's name.
+#. i18n: speaker=hint engineer=you slot=key
+#: scripts/main.gd:5371
+msgid "%s: follow the service line toward Archive."
+msgstr "%s: 설비 라인을 따라 아카이브로."
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: Hint bar (14 px, about 526 px wide on a keyboard and 488 px on touch; wraps).
+#. i18n: speaker=hint engineer=you
+#: scripts/main.gd:5372
+msgid "The exit is open. Head right to follow the service line."
+msgstr "출구가 열렸습니다. 오른쪽으로 가서 설비 라인을 따라가세요."
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: Hint bar (14 px, about 526 px wide on a keyboard and 488 px on touch; wraps). %s is the key, button or touch word the player uses (it is filled in after translation); keep it first and keep the colon.
+#. i18n: speaker=hint engineer=you slot=key
+#: scripts/main.gd:5374
+msgid "%s: copy the purge-order trace."
+msgstr "%s: 퍼지 명령 기록 복사."
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: Hint bar (14 px, about 526 px wide on a keyboard and 488 px on touch; wraps).
+#. i18n: speaker=hint engineer=you
+#: scripts/main.gd:5374
+msgid "Purge order copied. Find the mirror port."
+msgstr "퍼지 명령 복사 완료. 미러 포트를 찾으세요."
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: Hint bar (14 px, about 526 px wide on a keyboard and 488 px on touch; wraps). %s is the key, button or touch word the player uses (it is filled in after translation); keep it first and keep the colon.
+#. i18n: speaker=hint engineer=you slot=key
+#: scripts/main.gd:5378
+msgid "%s: examine the mirror port."
+msgstr "%s: 미러 포트 조사."
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: Hint bar (14 px, about 526 px wide on a keyboard and 488 px on touch; wraps).
+#. i18n: speaker=hint engineer=you
+#: scripts/main.gd:5378
+msgid "Copy the purge order first."
+msgstr "먼저 퍼지 명령을 복사하세요."
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: Hint bar (14 px, about 526 px wide on a keyboard and 488 px on touch; wraps). %s is the key, button or touch word the player uses (it is filled in after translation); keep it first and keep the colon.
+#. i18n: speaker=hint engineer=you slot=key
+#: scripts/main.gd:5381
+msgid "%s: secure the first copy in the container."
+msgstr "%s: 첫 번째 사본을 컨테이너에 보관."
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: Hint bar (14 px, about 526 px wide on a keyboard and 488 px on touch; wraps).
+#. i18n: speaker=hint engineer=you
+#: scripts/main.gd:5381
+msgid "Preserve both traces before leaving."
+msgstr "떠나기 전에 두 기록을 모두 보존하세요."
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: Hint bar (14 px, about 526 px wide on a keyboard and 488 px on touch; wraps). %s is the key, button or touch word the player uses (it is filled in after translation); keep it first and keep the colon. The Director is he.
+#. i18n: speaker=hint engineer=you slot=key
+#: scripts/main.gd:5384
+msgid "%s: enter records access. The Director's purge is still running."
+msgstr "%s: 기록 접근실 진입. 소장의 퍼지가 아직 진행 중입니다."
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: Hint bar (14 px, about 526 px wide on a keyboard and 488 px on touch; wraps). %s is the key, button or touch word the player uses (it is filled in after translation); keep it first and keep the colon.
+#. i18n: speaker=hint engineer=you slot=key
+#: scripts/main.gd:5384
+#: scripts/main.gd:5392
+msgid "%s: read the Director's purge display."
+msgstr "%s: 소장의 퍼지 화면 읽기."
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: Hint bar (14 px, about 526 px wide on a keyboard and 488 px on touch; wraps).
+#. i18n: speaker=hint engineer=you
+#: scripts/main.gd:5384
+msgid "Return to the safe point to enter records access."
+msgstr "안전 지점으로 돌아가 기록 접근실에 들어가세요."
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: Hint bar (14 px, about 526 px wide on a keyboard and 488 px on touch; wraps). The seal is the sealed door (OPEN THE SEAL): 봉인문, here and in the objective.
+#. i18n: speaker=hint
+#: scripts/main.gd:5387
+msgid "The seal is opening."
+msgstr "봉인문이 열리고 있습니다."
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: Hint bar (14 px, about 526 px wide on a keyboard and 488 px on touch; wraps). %s is the key, button or touch word the player uses (it is filled in after translation); keep it first and keep the colon.
+#. i18n: speaker=hint engineer=you slot=key
+#: scripts/main.gd:5389
+msgid "%s: save at the safe point."
+msgstr "%s: 안전 지점에서 저장."
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: Hint bar (14 px, about 526 px wide on a keyboard and 488 px on touch; wraps).
+#. i18n: speaker=hint engineer=you
+#: scripts/main.gd:5390
+msgid "The seal is open. Move to the safe point."
+msgstr "봉인문이 열렸습니다. 안전 지점으로 이동하세요."
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: Hint bar (14 px, about 526 px wide on a keyboard and 488 px on touch; wraps). WOLF is he.
+#. i18n: speaker=hint
+#: scripts/main.gd:5394
+msgid "WOLF is moving to the contact."
+msgstr "WOLF가 접점으로 이동하고 있습니다."
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: Hint bar (14 px, about 526 px wide on a keyboard and 488 px on touch; wraps).
+#. i18n: speaker=hint engineer=you
+#: scripts/main.gd:5397
+msgid "The bypass is dead. Arm the breaker first."
+msgstr "바이패스에 전원이 없습니다. 먼저 차단기를 올리세요."
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: Hint bar (14 px, about 526 px wide on a keyboard and 488 px on touch; wraps). %s is the key, button or touch word the player uses (it is filled in after translation); keep it first and keep the colon. %d of %d: turns so far and turns needed.
+#. i18n: speaker=hint engineer=you slot=key
+#: scripts/main.gd:5399
+msgid "%s: crank the manual bypass, %d of %d."
+msgstr "%s: 수동 바이패스 돌리기, %d/%d."
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: Hint bar (14 px, about 526 px wide on a keyboard and 488 px on touch; wraps). %s is the key, button or touch word the player uses (it is filled in after translation); keep it first and keep the colon. 'Yourself': 직접, which shows no gender.
+#. TRANSLATORS: %s is the key or button to hold. "Yourself" must not show the engineer's gender (no сам/сама, sam/sama): rephrase.
+#. i18n: speaker=hint engineer=you slot=key
+#: scripts/main.gd:5404
+msgid "%s: crank it yourself, or let WOLF take the relay."
+msgstr "%s: 직접 돌리거나, 릴레이를 WOLF에게 맡기기."
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: Hint bar (14 px, about 526 px wide on a keyboard and 488 px on touch; wraps). %s is the key, button or touch word the player uses (it is filled in after translation); keep it first and keep the colon. %d of %d: turns so far and turns needed.
+#. i18n: speaker=hint engineer=you slot=key
+#: scripts/main.gd:5405
+msgid "%s: crank on, %d of %d, or let WOLF take the relay."
+msgstr "%s: 계속 돌리기(%d/%d), 또는 릴레이를 WOLF에게 맡기기."
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: Hint bar (14 px, about 526 px wide on a keyboard and 488 px on touch; wraps). MANUAL BYPASS is a station plate: BYPASS MANUAL (the plate is not in the template yet). MANUAL BYPASS, the plate, is 수동 바이패스.
+#. i18n: speaker=hint engineer=you
+#: scripts/main.gd:5408
+msgid "The breaker is live. Go to the MANUAL BYPASS by the relay."
+msgstr "차단기가 켜졌습니다. 릴레이 옆 수동 바이패스로 가세요."
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: Hint bar (14 px, about 526 px wide on a keyboard and 488 px on touch; wraps).
+#. i18n: speaker=hint engineer=you
+#: scripts/main.gd:5408
+msgid "The breaker is live. Go to the coolant relay."
+msgstr "차단기가 켜졌습니다. 냉각재 릴레이로 가세요."
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: Hint bar (14 px, about 526 px wide on a keyboard and 488 px on touch; wraps). %s is the key, button or touch word the player uses (it is filled in after translation); keep it first and keep the colon.
+#. i18n: speaker=hint engineer=you slot=key
+#: scripts/main.gd:5413
+msgid "%s: talk to WOLF about the relay."
+msgstr "%s: WOLF와 릴레이에 대해 이야기하기."
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: Hint bar (14 px, about 526 px wide on a keyboard and 488 px on touch; wraps). %s is the key, button or touch word the player uses (it is filled in after translation); keep it first and keep the colon.
+#. i18n: speaker=hint engineer=you slot=key
+#: scripts/main.gd:5413
+msgid "%s: arm the breaker."
+msgstr "%s: 차단기 올리기."
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: Hint bar (14 px, about 526 px wide on a keyboard and 488 px on touch; wraps).
+#. i18n: speaker=hint engineer=you
+#: scripts/main.gd:5416
+msgid "The relay is dark. Return to the breaker first."
+msgstr "릴레이가 꺼져 있습니다. 먼저 차단기로 돌아가세요."
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: Hint bar (14 px, about 526 px wide on a keyboard and 488 px on touch; wraps). MANUAL BYPASS is a station plate: BYPASS MANUAL (the plate is not in the template yet). WOLF is he.
+#. i18n: speaker=hint engineer=you
+#: scripts/main.gd:5417
+msgid "WOLF refused the live contact. Use the MANUAL BYPASS beside it."
+msgstr "WOLF가 전기가 흐르는 접점을 거절했습니다. 바로 옆 수동 바이패스를 사용하세요."
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: Hint bar (14 px, about 526 px wide on a keyboard and 488 px on touch; wraps). %s is the key, button or touch word the player uses (it is filled in after translation); keep it first and keep the colon.
+#. i18n: speaker=hint engineer=you slot=key
+#: scripts/main.gd:5417
+msgid "%s: signal WOLF to take the contact."
+msgstr "%s: WOLF에게 접점을 맡기라고 신호하기."
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: Hint bar (14 px, about 526 px wide on a keyboard and 488 px on touch; wraps). MANUAL BYPASS is a station plate: BYPASS MANUAL (the plate is not in the template yet).
+#. i18n: speaker=hint engineer=you
+#: scripts/main.gd:5419
+msgid "Go to the MANUAL BYPASS beside the relay."
+msgstr "릴레이 옆 수동 바이패스로 가세요."
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: Hint bar (14 px, about 526 px wide on a keyboard and 488 px on touch; wraps). WOLF is he.
+#. i18n: speaker=hint engineer=you
+#: scripts/main.gd:5419
+msgid "Go to the coolant relay. WOLF is ready for the contact."
+msgstr "냉각재 릴레이로 가세요. WOLF가 접점을 맡을 준비가 됐습니다."
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: Hint bar (14 px, about 526 px wide on a keyboard and 488 px on touch; wraps).
+#. i18n: speaker=hint engineer=you
+#: scripts/main.gd:5421
+msgid "Return to the breaker and arm power."
+msgstr "차단기로 돌아가 전원을 올리세요."
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: Hint bar (14 px, about 526 px wide on a keyboard and 488 px on touch; wraps).
+#. i18n: speaker=hint engineer=you
+#: scripts/main.gd:5422
+msgid "Find the breaker. WOLF will follow your lead."
+msgstr "차단기를 찾으세요. WOLF가 뒤따릅니다."
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: Hint bar (14 px, about 526 px wide on a keyboard and 488 px on touch; wraps). The relief vent under a floor grate.
+#. i18n: speaker=hint engineer=you
+#: scripts/main.gd:5445
+msgid "The vent is about to blow. Get off the grate now."
+msgstr "배출구가 곧 터집니다. 지금 격자에서 내려오세요."
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: Hint bar (14 px, about 526 px wide on a keyboard and 488 px on touch; wraps).
+#. i18n: speaker=hint engineer=you
+#: scripts/main.gd:5445
+msgid "Relief vent. Get off the grate before the gauge peaks."
+msgstr "압력 배출구입니다. 게이지가 정점에 이르기 전에 격자에서 내려오세요."
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: Hint bar (14 px, about 526 px wide on a keyboard and 488 px on touch; wraps). %s is the key, button or touch word the player uses (it is filled in after translation); keep it first and keep the colon.
+#. i18n: speaker=hint engineer=you slot=key
+#: scripts/main.gd:5449
+msgid "%s: arm the overload breaker."
+msgstr "%s: 과부하 차단기 올리기."
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: Hint bar (14 px, about 526 px wide on a keyboard and 488 px on touch; wraps). %s is the key, button or touch word the player uses (it is filled in after translation); keep it first and keep the colon.
+#. i18n: speaker=hint engineer=you slot=key
+#: scripts/main.gd:5451
+msgid "%s: reset the breaker. The vent let go."
+msgstr "%s: 차단기 다시 올리기. 배출구가 터졌습니다."
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: Hint bar (14 px, about 526 px wide on a keyboard and 488 px on touch; wraps). The line is the pressure line.
+#. i18n: speaker=hint engineer=you
+#: scripts/main.gd:5453
+msgid "The line is live. Get to the valve by the door."
+msgstr "라인에 압력이 찼습니다. 문 옆 밸브로 가세요."
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: Hint bar (14 px, about 526 px wide on a keyboard and 488 px on touch; wraps). %s is the key, button or touch word the player uses (it is filled in after translation); keep it first and keep the colon. %d of %d: turns so far and turns needed.
+#. i18n: speaker=hint engineer=you slot=key
+#: scripts/main.gd:5455
+msgid "%s: crank the valve, %d of %d turns."
+msgstr "%s: 밸브 돌리기, %d/%d 바퀴."
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: Hint bar (14 px, about 526 px wide on a keyboard and 488 px on touch; wraps).
+#. TRANSLATORS: i18n: story speaker=narrator
+#: scripts/main.gd:5457
+#: scripts/story_text.gd:136
+msgid "Fuse lit. Get clear of the door."
+msgstr "퓨즈 점화. 문에서 떨어지세요."
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: Hint bar (14 px, about 526 px wide on a keyboard and 488 px on touch; wraps).
+#. i18n: speaker=hint engineer=you
+#: scripts/main.gd:5459
+msgid "The valve is dead. Arm the breaker by the entrance."
+msgstr "밸브에 압력이 없습니다. 입구 옆 차단기를 올리세요."
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: Hint bar (14 px, about 526 px wide on a keyboard and 488 px on touch; wraps).
+#. i18n: speaker=hint
+#: scripts/main.gd:5461
+msgid "Relief vent. It lets go when the gauge peaks."
+msgstr "압력 배출구입니다. 게이지가 정점에 이르면 터집니다."
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: Hint bar (14 px, about 526 px wide on a keyboard and 488 px on touch; wraps). The line is building pressure.
+#. i18n: speaker=hint engineer=you
+#: scripts/main.gd:5464
+msgid "The line is building. Crank the valve by the door."
+msgstr "라인 압력이 오르고 있습니다. 문 옆 밸브를 돌리세요."
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: Hint bar (14 px, about 526 px wide on a keyboard and 488 px on touch; wraps).
+#. i18n: speaker=hint engineer=you
+#: scripts/main.gd:5466
+msgid "The breaker tripped. Reset it by the entrance."
+msgstr "차단기가 내려갔습니다. 입구 옆에서 다시 올리세요."
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: Hint bar (14 px, about 526 px wide on a keyboard and 488 px on touch; wraps).
+#. i18n: speaker=hint engineer=you
+#: scripts/main.gd:5468
+msgid "Arm the breaker by the entrance, then crank the valve by the door."
+msgstr "입구 옆 차단기를 올린 뒤, 문 옆 밸브를 돌리세요."
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: Hint bar (14 px, about 526 px wide on a keyboard and 488 px on touch; wraps).
+#. i18n: speaker=hint engineer=you
+#: scripts/main.gd:5468
+msgid "Get through the sealed door."
+msgstr "봉쇄된 문을 통과하세요."
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: Hint bar (14 px, about 526 px wide on a keyboard and 488 px on touch; wraps).
+#. i18n: speaker=hint
+#: scripts/main.gd:5489
+msgid "The door is open."
+msgstr "문이 열렸습니다."
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: Hint bar (14 px, about 526 px wide on a keyboard and 488 px on touch; wraps). %s is the key, button or touch word the player uses (it is filled in after translation); keep it first and keep the colon. Release the bolt that locks the exit door.
+#. i18n: speaker=hint engineer=you slot=key
+#: scripts/main.gd:5494
+msgid "%s: pop the exit bolt."
+msgstr "%s: 출구 볼트 해제."
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: Hint bar (14 px, about 526 px wide on a keyboard and 488 px on touch; wraps).
+#. TRANSLATORS: i18n: story speaker=narrator
+#: scripts/main.gd:5496
+#: scripts/story_text.gd:199
+msgid "The bolt is taking the charge."
+msgstr "볼트가 충전되고 있다."
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: Hint bar (14 px, about 526 px wide on a keyboard and 488 px on touch; wraps).
+#. i18n: speaker=hint
+#: scripts/main.gd:5498
+#: scripts/main.gd:5502
+msgid "The door is opening."
+msgstr "문이 열리고 있습니다."
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: Hint bar (14 px, about 526 px wide on a keyboard and 488 px on touch; wraps). %s is the key, button or touch word the player uses (it is filled in after translation); keep it first and keep the colon.
+#. i18n: speaker=hint engineer=you slot=key
+#: scripts/main.gd:5500
+msgid "%s: leave through the door."
+msgstr "%s: 문으로 나가기."
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: Hint bar (14 px, about 526 px wide on a keyboard and 488 px on touch; wraps).
+#. i18n: speaker=hint engineer=you
+#: scripts/main.gd:5500
+#: scripts/main.gd:5503
+msgid "The door is open. Leave through it."
+msgstr "문이 열렸습니다. 문으로 나가세요."
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: Hint bar (14 px, about 526 px wide on a keyboard and 488 px on touch; wraps). The sentry is a robot (it).
+#. i18n: speaker=hint engineer=you
+#: scripts/main.gd:5503
+msgid "The sentry is down. Pop the exit bolt by the door."
+msgstr "센트리가 쓰러졌습니다. 문 옆 출구 볼트를 해제하세요."
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: Hint bar (14 px, about 526 px wide on a keyboard and 488 px on touch; wraps).
+#. i18n: speaker=hint engineer=you
+#: scripts/main.gd:5505
+msgid "Coolant cloud. Get out of it."
+msgstr "냉각재 구름입니다. 거기서 벗어나세요."
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: Hint bar (14 px, about 526 px wide on a keyboard and 488 px on touch; wraps). It: the sentry. It: the sentry, named so the line reads alone.
+#. i18n: speaker=hint engineer=you
+#: scripts/main.gd:5507
+msgid "It's after you. Get back over the rubble."
+msgstr "센트리가 쫓아옵니다. 잔해 뒤로 물러나세요."
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: Hint bar (14 px, about 526 px wide on a keyboard and 488 px on touch; wraps). It: the sentry; the mark is the painted spot under the tank.
+#. i18n: speaker=hint engineer=you
+#: scripts/main.gd:5512
+msgid "Wait for WOLF to park it on the mark."
+msgstr "WOLF가 센트리를 표시 위에 세울 때까지 기다리세요."
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: Hint bar (14 px, about 526 px wide on a keyboard and 488 px on touch; wraps). %s is the key, button or touch word the player uses (it is filled in after translation); keep it first and keep the colon. It: the sentry.
+#. i18n: speaker=hint engineer=you slot=key
+#: scripts/main.gd:5512
+msgid "%s: drop the tank. It's parked on the mark."
+msgstr "%s: 탱크 떨어뜨리기. 센트리가 표시 위에 있습니다."
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: Hint bar (14 px, about 526 px wide on a keyboard and 488 px on touch; wraps). %s is the key, button or touch word the player uses (it is filled in after translation); keep it first and keep the colon.
+#. i18n: speaker=hint engineer=you slot=key
+#: scripts/main.gd:5513
+msgid "%s: drop the tank. Land it with the sentry on the mark."
+msgstr "%s: 탱크 떨어뜨리기. 센트리가 표시 위에 있을 때 맞히세요."
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: Hint bar (14 px, about 526 px wide on a keyboard and 488 px on touch; wraps).
+#. i18n: speaker=hint
+#: scripts/main.gd:5515
+msgid "The tank is falling."
+msgstr "탱크가 떨어지고 있습니다."
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: Hint bar (14 px, about 526 px wide on a keyboard and 488 px on touch; wraps).
+#. i18n: speaker=hint engineer=you
+#: scripts/main.gd:5517
+msgid "The winch is hauling the tank back up. Wait for the clamp."
+msgstr "윈치가 탱크를 다시 끌어올리고 있습니다. 클램프가 걸릴 때까지 기다리세요."
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: Hint bar (14 px, about 526 px wide on a keyboard and 488 px on touch; wraps). It: the sentry.
+#. i18n: speaker=hint engineer=you
+#: scripts/main.gd:5519
+msgid "Stay back over the rubble until it gives up."
+msgstr "센트리가 포기할 때까지 잔해 뒤에 머무르세요."
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: Hint bar (14 px, about 526 px wide on a keyboard and 488 px on touch; wraps). TANK RELEASE is a station plate: glossary SOLTAR TANQUE (the plate itself is not in the template yet, so it still reads English on screen).
+#. i18n: speaker=hint engineer=you
+#: scripts/main.gd:5521
+msgid "You're in its sights. Hide at the TANK RELEASE or the rubble."
+msgstr "센트리의 시야에 들어갔습니다. 탱크 투하나 잔해 뒤에 숨으세요."
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: Hint bar (14 px, about 526 px wide on a keyboard and 488 px on touch; wraps). TANK RELEASE is a station plate: glossary SOLTAR TANQUE (the plate itself is not in the template yet, so it still reads English on screen).
+#. i18n: speaker=hint engineer=you
+#: scripts/main.gd:5523
+msgid "WOLF is drawing the sentry onto the mark. Get to the TANK RELEASE."
+msgstr "WOLF가 센트리를 표시 쪽으로 유인하고 있습니다. 탱크 투하로 가세요."
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: Hint bar (14 px, about 526 px wide on a keyboard and 488 px on touch; wraps). TANK RELEASE is a station plate: glossary SOLTAR TANQUE (the plate itself is not in the template yet, so it still reads English on screen). Its patrol: the sentry's.
+#. i18n: speaker=hint engineer=you
+#: scripts/main.gd:5525
+msgid "WOLF has broken off. Time the drop on its patrol from the TANK RELEASE."
+msgstr "WOLF가 물러났습니다. 탱크 투하에서 센트리의 순찰에 맞춰 떨어뜨리세요."
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: Hint bar (14 px, about 526 px wide on a keyboard and 488 px on touch; wraps). TANK RELEASE is a station plate: glossary SOLTAR TANQUE (the plate itself is not in the template yet, so it still reads English on screen).
+#. i18n: speaker=hint engineer=you
+#: scripts/main.gd:5526
+msgid "The sentry patrols past the rubble. The TANK RELEASE hides you from it."
+msgstr "센트리가 잔해 너머를 순찰합니다. 탱크 투하 뒤에 있으면 들키지 않습니다."
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: Top card objective (ALL CAPS, about 420 px wide, wraps). Infinitive, as the other objectives. Objectives use the noun form, as Korean objective cards do.
+#. i18n: speaker=ui
+#: scripts/main.gd:5534
+msgid "POP THE EXIT BOLT"
+msgstr "출구 볼트 해제"
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: Top card objective (ALL CAPS, about 420 px wide, wraps). Infinitive, as the other objectives.
+#. i18n: speaker=ui
+#: scripts/main.gd:5537
+msgid "DROP THE TANK"
+msgstr "탱크 떨어뜨리기"
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: Top card objective (ALL CAPS, about 420 px wide, wraps). Infinitive, as the other objectives.
+#. i18n: speaker=ui
+#: scripts/main.gd:5537
+msgid "GO THROUGH THE DOOR"
+msgstr "문 통과하기"
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: Top card objective (ALL CAPS, about 420 px wide, wraps). Infinitive, as the other objectives.
+#. i18n: speaker=ui
+#: scripts/main.gd:5540
+msgid "CRANK THE VALVE"
+msgstr "밸브 돌리기"
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: Top card objective (ALL CAPS, about 420 px wide, wraps). Infinitive, as the other objectives.
+#. i18n: speaker=ui
+#: scripts/main.gd:5542
+msgid "GET CLEAR OF THE DOOR"
+msgstr "문에서 떨어지기"
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: Top card objective (ALL CAPS, about 420 px wide, wraps). Infinitive, as the other objectives.
+#. i18n: speaker=ui
+#: scripts/main.gd:5543
+#: scripts/main.gd:5559
+msgid "ARM THE BREAKER"
+msgstr "차단기 올리기"
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: Top card objective (ALL CAPS, about 420 px wide, wraps). Infinitive, as the other objectives. Done state.
+#. i18n: speaker=ui
+#: scripts/main.gd:5546
+msgid "FIRST COPY SECURED"
+msgstr "첫 번째 사본 확보"
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: Top card objective (ALL CAPS, about 420 px wide, wraps). Infinitive, as the other objectives.
+#. i18n: speaker=ui
+#: scripts/main.gd:5548
+msgid "COPY PURGE ORDER"
+msgstr "퍼지 명령 복사"
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: Top card objective (ALL CAPS, about 420 px wide, wraps). Infinitive, as the other objectives.
+#. i18n: speaker=ui
+#: scripts/main.gd:5550
+msgid "COPY MIRROR INDEX"
+msgstr "미러 색인 복사"
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: Top card objective (ALL CAPS, about 420 px wide, wraps). Infinitive, as the other objectives.
+#. i18n: speaker=ui
+#: scripts/main.gd:5551
+msgid "REACH EXIT"
+msgstr "출구 도달"
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: Top card objective (ALL CAPS, about 420 px wide, wraps). Infinitive, as the other objectives. Done state; SAFE POINT is the plate's words.
+#. i18n: speaker=ui
+#: scripts/main.gd:5553
+msgid "SAFE POINT REACHED"
+msgstr "안전 지점 도달"
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: Top card objective (ALL CAPS, about 420 px wide, wraps). Infinitive, as the other objectives.
+#. i18n: speaker=ui
+#: scripts/main.gd:5555
+msgid "REACH SAFE POINT"
+msgstr "안전 지점으로"
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: Top card objective (ALL CAPS, about 420 px wide, wraps). Infinitive, as the other objectives. The seal is the sealed door.
+#. i18n: speaker=ui
+#: scripts/main.gd:5557
+msgid "OPEN THE SEAL"
+msgstr "봉인문 열기"
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: Top card objective (ALL CAPS, about 420 px wide, wraps). Infinitive, as the other objectives.
+#. i18n: speaker=ui
+#: scripts/main.gd:5560
+msgid "CHECK THE BREAKER"
+msgstr "차단기 확인"
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: The Director, the opening's first line. The Director speaks a cold plain style (한다).
+#. i18n: story speaker=DIRECTOR
+#: scripts/story_text.gd:38
+msgid "I decide who counts as a threat. WOLF handles the rest."
+msgstr "누가 위협인지는 내가 정한다. 나머지는 WOLF가 처리한다."
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: i18n: story speaker=narrator
+#: scripts/story_text.gd:40
+msgid "The Director thinks WOLF is still in standby."
+msgstr "소장은 WOLF가 아직 대기 상태라고 생각한다."
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: i18n: story speaker=narrator
+#: scripts/story_text.gd:42
+msgid ""
+"Nobody gives an activation command.\n"
+"WOLF wakes himself."
+msgstr ""
+"아무도 기동 명령을 내리지 않는다.\n"
+"WOLF는 스스로 깨어난다."
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: i18n: story speaker=narrator
+#: scripts/story_text.gd:44
+msgid ""
+"The latch breaks from the inside.\n"
+"WOLF steps out under his own power."
+msgstr ""
+"걸쇠가 안쪽에서 부서진다.\n"
+"WOLF가 제 힘으로 걸어 나온다."
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: The Director to WOLF, who has woken on his own.
+#. i18n: story speaker=DIRECTOR
+#: scripts/story_text.gd:47
+msgid "You were in standby."
+msgstr "넌 대기 상태였을 텐데."
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: WOLF's answer to the Director: he heard the plan and refuses it.
+#. i18n: story speaker=WOLF
+#: scripts/story_text.gd:50
+msgid "I heard you. I won't do it."
+msgstr "다 들었어. 난 안 해."
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: The Director's order after WOLF refuses.
+#. i18n: story speaker=DIRECTOR
+#: scripts/story_text.gd:53
+msgid "Lock down maintenance. WOLF does not leave this site."
+msgstr "정비 구역을 봉쇄해. WOLF는 이 시설을 떠나지 못한다."
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: i18n: story speaker=narrator
+#: scripts/story_text.gd:55
+msgid "WOLF turns from the Director and heads for maintenance."
+msgstr "WOLF는 소장에게서 돌아서서 정비 구역으로 향한다."
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: %s is the engineer's first name. They are non-binary: no gendered words about them. No particle after the slot that changes with its last sound (slot_particles): 의 (it is %s's job).
+#. i18n: story speaker=narrator engineer=name
+#: scripts/story_text.gd:59
+msgid "%s keeps WOLF's systems running."
+msgstr "WOLF의 시스템을 계속 돌아가게 하는 건 %s의 몫이다."
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: %s is the engineer's first name. They are non-binary: no gendered words about them. No particle after the slot that changes with its last sound (slot_particles): 에게 (to %s, a fault is familiar).
+#. i18n: story speaker=narrator engineer=name
+#: scripts/story_text.gd:62
+msgid ""
+"%s knows what a fault looks like,\n"
+"and this isn't one."
+msgstr ""
+"고장이 어떤 모습인지, %s에게는 익숙하다.\n"
+"이건 고장이 아니다."
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: i18n: story speaker=WOLF
+#: scripts/story_text.gd:64
+msgid "I heard the Director's plan for me. I woke myself. He wants me to hunt people he calls threats."
+msgstr "소장이 날 두고 세운 계획을 들었어. 난 스스로 깨어났어. 소장은 자기가 위협이라 부르는 사람들을 내가 사냥하길 원해."
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: The engineer answers WOLF (their name stands over the line). No gendered forms for the speaker.
+#. i18n: story speaker=engineer engineer=self
+#: scripts/story_text.gd:67
+msgid "Then we get through maintenance before the original logs disappear."
+msgstr "그럼 원본 로그가 사라지기 전에 정비 구역을 빠져나가자."
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: i18n: story speaker=WOLF
+#: scripts/story_text.gd:70
+msgid "That purge takes the original program logs. Once they're gone, his word is the only record."
+msgstr "저 퍼지가 원본 프로그램 로그를 지워. 그게 사라지면 소장의 말만이 유일한 기록이 돼."
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: WOLF's question at the coolant relay; the engineer answers with one of two choices. COOLANT FAULT is the tag painted on the relay. COOLANT FAULT is the tag painted on the relay and stays English (decision D3).
+#. i18n: story speaker=WOLF
+#: scripts/story_text.gd:73
+msgid "That relay's tagged COOLANT FAULT. What happens if I touch it live?"
+msgstr "저 릴레이에 COOLANT FAULT 표시가 붙어 있어. 전기가 흐를 때 내가 만지면 어떻게 돼?"
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: An answer the engineer can give WOLF at the relay (a button). WOLF may quote it later.
+#. i18n: story speaker=engineer engineer=self
+#: scripts/story_text.gd:76
+msgid "The relay may vent coolant. Your call."
+msgstr "릴레이에서 냉각재가 샐 수도 있어. 판단은 네게 맡길게."
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: An answer the engineer can give WOLF at the relay (a button). WOLF may quote it later.
+#. i18n: story speaker=engineer engineer=self
+#: scripts/story_text.gd:79
+msgid "Skip the risk talk. Go now."
+msgstr "위험 얘기는 됐어. 지금 가."
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: i18n: story speaker=narrator
+#: scripts/story_text.gd:81
+msgid ""
+"The breaker catches.\n"
+"Blue light fills the coolant relay."
+msgstr ""
+"차단기가 걸린다.\n"
+"푸른 빛이 냉각재 릴레이를 채운다."
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: i18n: story speaker=narrator
+#: scripts/story_text.gd:83
+msgid "The bypass handle is stiff. Coolant hisses from the relay housing and an alarm starts to wail."
+msgstr "바이패스 손잡이가 뻑뻑하다. 릴레이 하우징에서 냉각재가 쉭쉭 새어 나오고 경보가 울리기 시작한다."
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: i18n: story speaker=narrator
+#: scripts/story_text.gd:85
+msgid "Halfway. The hiss gets louder; the alarm keeps wailing."
+msgstr "절반. 쉭쉭 소리가 커지고 경보는 계속 울린다."
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: %s is the engineer's first name. Avoid a past tense with the engineer as its subject ("left"): it shows their gender in Polish and Russian. Rephrase. No particle after the slot that changes with its last sound (slot_particles): 의 (where %s's hand stopped), with no past tense about the engineer.
+#. i18n: story speaker=narrator engineer=name
+#: scripts/story_text.gd:88
+msgid "The handle holds where %s left it. The alarm keeps going."
+msgstr "손잡이는 %s의 손이 멈춘 자리에 그대로 있다. 경보는 계속 울린다."
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: i18n: story speaker=narrator
+#: scripts/story_text.gd:91
+msgid "Back at the last checkpoint."
+msgstr "마지막 체크포인트로 돌아왔다."
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: i18n: story speaker=narrator
+#: scripts/story_text.gd:93
+msgid "Back at the start of this stretch."
+msgstr "이 구간의 시작 지점으로 돌아왔다."
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: An answer the engineer can give WOLF at the mirror port (a button, in capitals).
+#. i18n: story speaker=engineer engineer=self
+#: scripts/story_text.gd:97
+msgid "USE WOLF'S READOUT"
+msgstr "WOLF의 판독 화면 사용"
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: An answer the engineer can give WOLF at the mirror port (a button, in capitals).
+#. i18n: story speaker=engineer engineer=self
+#: scripts/story_text.gd:100
+msgid "USE MANUAL PORT"
+msgstr "수동 포트 사용"
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: The narration's card as the first copy is secured; WOLF speaks next.
+#. i18n: story speaker=narrator
+#: scripts/story_text.gd:103
+msgid "FIRST COPY SECURED."
+msgstr "첫 번째 사본 확보."
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: i18n: story speaker=WOLF
+#: scripts/story_text.gd:105
+msgid "An order and a timestamp don't tell me who's a threat. I want the source."
+msgstr "명령 하나와 타임스탬프로는 누가 위협인지 알 수 없어. 원본이 필요해."
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: The engineer answers WOLF (their name stands over the line). Archive is the next place.
+#. i18n: story speaker=engineer engineer=self
+#: scripts/story_text.gd:108
+msgid "Then Archive is next."
+msgstr "그럼 다음은 아카이브야."
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: The engineer, entering the junction (their name stands over the line).
+#. i18n: story speaker=engineer engineer=self
+#: scripts/story_text.gd:112
+msgid "That door is our way through."
+msgstr "저 문이 우리가 지나갈 길이야."
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: The engineer names the next step when the player stalls (their name stands over the line).
+#. i18n: story speaker=engineer engineer=self
+#: scripts/story_text.gd:115
+msgid ""
+"The breaker by the entrance\n"
+"feeds that line."
+msgstr ""
+"입구 옆 차단기가\n"
+"저 라인에 전원을 대."
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: The engineer gives the whole chain when the player stalls (their name stands over the line).
+#. i18n: story speaker=engineer engineer=self
+#: scripts/story_text.gd:118
+msgid ""
+"Overload it, crank the valve,\n"
+"and the door goes."
+msgstr ""
+"과부하를 걸고 밸브를 돌리면\n"
+"문이 날아가."
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: i18n: story speaker=WOLF
+#: scripts/story_text.gd:120
+msgid "When the door goes, don't be standing in front of it."
+msgstr "문이 날아갈 때 그 앞에 서 있지 마."
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: Open glossary term SERVICE JUNCTION: 설비 분기점, the room card's word; a reviewer's word.
+#. TRANSLATORS: Continue's restore line in the junction before the door is down; WOLF's warning follows.
+#. i18n: story speaker=narrator
+#: scripts/story_text.gd:123
+msgid "Service junction restored. Arm the breaker by the entrance, then crank the valve."
+msgstr "설비 분기점이 복구되었습니다. 입구 옆 차단기를 올린 뒤 밸브를 돌리세요."
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: i18n: story speaker=narrator
+#: scripts/story_text.gd:125
+msgid "The service line runs on toward Archive."
+msgstr "설비 라인은 아카이브 쪽으로 이어진다."
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: i18n: story speaker=narrator
+#: scripts/story_text.gd:128
+msgid "The valve is dead. Arm the breaker first."
+msgstr "밸브에 압력이 없습니다. 먼저 차단기를 올리세요."
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: i18n: story speaker=narrator
+#: scripts/story_text.gd:130
+msgid ""
+"The vent let go and the breaker tripped.\n"
+"Reset it by the entrance."
+msgstr ""
+"배출구가 터져 차단기가 내려갔습니다.\n"
+"입구 옆에서 다시 올리세요."
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: i18n: story speaker=narrator
+#: scripts/story_text.gd:132
+msgid ""
+"Sealed shut. Something hums behind it.\n"
+"The valve beside it charges it."
+msgstr ""
+"단단히 봉쇄되어 있다. 그 뒤에서 무언가 웅웅거린다.\n"
+"옆의 밸브가 문을 충전한다."
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: i18n: story speaker=narrator
+#: scripts/story_text.gd:134
+msgid "Already live. Crank the valve by the door."
+msgstr "이미 전원이 들어와 있습니다. 문 옆 밸브를 돌리세요."
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: i18n: story speaker=narrator
+#: scripts/story_text.gd:138
+msgid "No charge left. The door is down."
+msgstr "남은 충전이 없다. 문은 이미 날아갔다."
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: i18n: story speaker=narrator
+#: scripts/story_text.gd:140
+msgid "Not yet. The tank is still going back up."
+msgstr "아직이다. 탱크가 아직 올라가는 중이다."
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: i18n: story speaker=narrator
+#: scripts/story_text.gd:142
+msgid ""
+"The tank is down on the sentry.\n"
+"The exit bolt is by the door."
+msgstr ""
+"탱크가 센트리 위로 떨어졌다.\n"
+"출구 볼트는 문 옆에 있다."
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: i18n: story speaker=narrator
+#: scripts/story_text.gd:144
+msgid "Locked out until the sentry is down."
+msgstr "센트리를 쓰러뜨릴 때까지 잠겨 있다."
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: i18n: story speaker=narrator
+#: scripts/story_text.gd:146
+msgid "Bolted. The sealed door comes first."
+msgstr "볼트로 잠겨 있다. 봉쇄된 문이 먼저다."
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: i18n: story speaker=narrator
+#: scripts/story_text.gd:148
+msgid "Wait. WOLF hasn't got it on the mark yet."
+msgstr "기다리세요. WOLF가 아직 센트리를 표시 위에 세우지 못했습니다."
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: %s is the engineer's first name, as an object ("for their call"): keep the name in the nominative (no case ending), and no gendered words about them. No particle after the slot that changes with its last sound (slot_particles): 의 (%s's call).
+#. i18n: story speaker=narrator engineer=name
+#: scripts/story_text.gd:152
+msgid ""
+"The door goes. WOLF falls back\n"
+"to wait for %s's call."
+msgstr ""
+"문이 날아간다. WOLF는 물러나\n"
+"%s의 신호를 기다린다."
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: i18n: story speaker=narrator
+#: scripts/story_text.gd:154
+msgid "Past the doorway, something whirs awake."
+msgstr "문간 너머에서 무언가가 윙 소리를 내며 깨어난다."
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: An answer the engineer can give WOLF at the rubble (a button): WOLF draws the sentry under the tank.
+#. i18n: story speaker=engineer engineer=self
+#: scripts/story_text.gd:157
+msgid "Draw it under the tank if you can stay clear."
+msgstr "휘말리지 않을 수 있으면 저걸 탱크 밑으로 유인해."
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: An answer the engineer can give WOLF at the rubble (a button): the engineer times the drop.
+#. i18n: story speaker=engineer engineer=self
+#: scripts/story_text.gd:160
+msgid "Stay back, I'll time it."
+msgstr "물러나 있어. 타이밍은 내가 잴게."
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: WOLF to the engineer, who told him the relay's risk. Avoid a past tense that shows the engineer's gender ("you told me"): rephrase.
+#. i18n: story speaker=WOLF engineer=you
+#: scripts/story_text.gd:163
+msgid "You told me the truth at the relay. I'll draw it onto the mark and keep clear of the tank. Drop it when it stops."
+msgstr "릴레이에서 넌 내게 사실을 말해 줬어. 내가 저걸 표시 위로 유인하고 탱크에선 떨어져 있을게. 멈추면 떨어뜨려."
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: WOLF to the engineer, who pressed him at the relay without warning. Avoid a form that shows the engineer's gender ("you'd have sent me"): rephrase.
+#. i18n: story speaker=WOLF engineer=you
+#: scripts/story_text.gd:166
+msgid "At the relay you'd have sent me in blind. I won't walk into its sights. Time the drop from the release; it crosses the mark on every pass."
+msgstr "릴레이에서 넌 날 아무것도 모른 채 들여보내려 했어. 난 저 녀석 시야엔 안 들어가. 탱크 투하에서 타이밍을 맞춰. 지나갈 때마다 표시를 지나가니까."
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: WOLF, when the engineer will time the drop alone.
+#. i18n: story speaker=WOLF
+#: scripts/story_text.gd:169
+msgid ""
+"I'll hold back.\n"
+"It crosses the mark on every pass."
+msgstr ""
+"난 뒤에 있을게.\n"
+"저 녀석은 지나갈 때마다 표시를 지나가."
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: i18n: story speaker=WOLF
+#: scripts/story_text.gd:171
+msgid "The tank takes a moment to fall."
+msgstr "탱크가 떨어지는 데 잠깐 걸려."
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: i18n: story speaker=narrator
+#: scripts/story_text.gd:173
+msgid "The sentry stops on the mark, its eyes on WOLF. Drop the tank now."
+msgstr "센트리가 표시 위에 멈춰 WOLF를 노려본다. 지금 탱크를 떨어뜨리세요."
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: %s is the engineer's first name, as an object: keep the name in the nominative (no case ending), and no gendered words about them. No particle after the slot that changes with its last sound (slot_particles): 의 (%s's position is found).
+#. i18n: story speaker=narrator engineer=name
+#: scripts/story_text.gd:176
+msgid ""
+"The sentry stops and its eyes snap red.\n"
+"It has %s; get back over the rubble."
+msgstr ""
+"센트리가 멈추고 눈이 순간 붉게 변한다.\n"
+"%s의 위치가 잡혔다. 잔해 뒤로 물러나세요."
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: %s is the engineer's first name, as an object: keep the name in the nominative (no case ending), and no gendered words about them. No particle after the slot that changes with its last sound (slot_particles): 의 (loses sight of %s's figure).
+#. i18n: story speaker=narrator engineer=name
+#: scripts/story_text.gd:179
+msgid ""
+"The sentry loses %s behind the rubble\n"
+"and rolls back to its patrol."
+msgstr ""
+"센트리는 잔해 뒤에서 %s의 모습을 놓치고\n"
+"순찰로 돌아간다."
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: i18n: story speaker=narrator
+#: scripts/story_text.gd:181
+msgid ""
+"The tank hits the empty mark\n"
+"and sprays coolant."
+msgstr ""
+"탱크가 빈 표시 위에 떨어져\n"
+"냉각재를 뿜는다."
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: i18n: story speaker=narrator
+#: scripts/story_text.gd:183
+msgid ""
+"The sentry swings toward the release;\n"
+"get back over the rubble."
+msgstr ""
+"센트리가 탱크 투하 쪽으로 몸을 돌린다.\n"
+"잔해 뒤로 물러나세요."
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: WOLF breaks off after a missed drop, short of the sentry.
+#. i18n: story speaker=WOLF
+#: scripts/story_text.gd:186
+msgid "I'm out. I'll hold back."
+msgstr "난 빠질게. 뒤에 있을게."
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: WOLF breaks off after a missed drop, already past the sentry.
+#. i18n: story speaker=WOLF
+#: scripts/story_text.gd:189
+msgid "I'm out."
+msgstr "난 빠질게."
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: i18n: story speaker=narrator
+#: scripts/story_text.gd:191
+msgid ""
+"The tank comes down square and crushes\n"
+"the sentry flat. Its eyes go dark."
+msgstr ""
+"탱크가 정통으로 떨어져\n"
+"센트리를 납작하게 짓누른다. 눈빛이 꺼진다."
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: i18n: story speaker=narrator
+#: scripts/story_text.gd:193
+msgid ""
+"The tank catches the sentry off centre and\n"
+"pins it to the floor. Its eyes go dark."
+msgstr ""
+"탱크가 센트리를 비스듬히 맞혀\n"
+"바닥에 짓눌러 고정한다. 눈빛이 꺼진다."
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: i18n: story speaker=WOLF
+#: scripts/story_text.gd:195
+msgid "It's down. The bolt by the door is next."
+msgstr "쓰러졌어. 다음은 문 옆 볼트야."
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: i18n: story speaker=narrator
+#: scripts/story_text.gd:197
+msgid "With the tank down, the winch's power reroutes to the exit bolt. The panel whines."
+msgstr "탱크가 떨어지자 윈치의 전력이 출구 볼트로 돌려진다. 패널이 날카롭게 운다."
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: i18n: story speaker=narrator
+#: scripts/story_text.gd:201
+msgid "The bolt arcs and drops."
+msgstr "볼트에서 불꽃이 튀며 떨어져 나간다."
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: i18n: story speaker=narrator
+#: scripts/story_text.gd:203
+msgid ""
+"The bolt arcs and drops.\n"
+"The door slides open."
+msgstr ""
+"볼트에서 불꽃이 튀며 떨어져 나간다.\n"
+"문이 미끄러지듯 열린다."
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: A knockdown card. %s is the engineer's first name, as an object: keep the name in the nominative (no case ending), and no gendered words about them. No particle after the slot that changes with its last sound (slot_particles): 의 (under %s's feet).
+#. i18n: story speaker=narrator engineer=name
+#: scripts/story_text.gd:207
+msgid "The relief vent let go under %s. When the gauge peaks, stay off the grate."
+msgstr "%s의 발밑에서 압력 배출구가 터졌다. 게이지가 정점에 이르면 격자 위에 서지 마세요."
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: A knockdown card. %s is the engineer's first name, as an object: keep the name in the nominative (no case ending), and no gendered words about them. No particle after the slot that changes with its last sound (slot_particles): 의 (right in front of %s).
+#. i18n: story speaker=narrator engineer=name
+#: scripts/story_text.gd:210
+msgid "The door went with %s in front of it. When the fuse lights, back away past the valve."
+msgstr "%s의 바로 앞에서 문이 터져 나갔다. 퓨즈에 불이 붙으면 밸브 너머로 물러나세요."
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: A knockdown card. %s is the engineer's first name, as an object: keep the name in the nominative (no case ending), and no gendered words about them. TANK RELEASE is a station's name plate. No particle after the slot that changes with its last sound (slot_particles): 의 (caught sight of %s's figure).
+#. i18n: story speaker=narrator engineer=name
+#: scripts/story_text.gd:213
+msgid ""
+"The sentry saw %s out in the open.\n"
+"Stay close to the TANK RELEASE."
+msgstr ""
+"센트리가 탁 트인 곳에서 %s의 모습을 포착했다.\n"
+"탱크 투하 가까이에 있으세요."
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: A knockdown card. %s is the engineer's first name, as an object: keep the name in the nominative (no case ending), and no gendered words about them. No particle after the slot that changes with its last sound (slot_particles): 의 (ran after %s and caught up).
+#. i18n: story speaker=narrator engineer=name
+#: scripts/story_text.gd:216
+msgid ""
+"The sentry ran %s down. Once its\n"
+"eyes go red, only the rubble is safe."
+msgstr ""
+"센트리가 %s의 뒤를 쫓아 따라잡았다. 눈이 붉어지면\n"
+"안전한 곳은 잔해 뒤뿐이다."
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: A knockdown card. %s is the engineer's first name, as an object: keep the name in the nominative (no case ending), and no gendered words about them. No particle after the slot that changes with its last sound (slot_particles): 에게 (the cloud came upon %s).
+#. i18n: story speaker=narrator engineer=name
+#: scripts/story_text.gd:219
+msgid "The coolant cloud caught %s. Let it clear before crossing the mark."
+msgstr "냉각재 구름이 %s에게 닥쳤다. 구름이 걷힌 뒤에 표시를 지나가세요."
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: The end card's title, in capitals: the end of this early part of the game.
+#. i18n: story
+#: scripts/story_text.gd:223
+msgid "END OF SLICE"
+msgstr "체험판 끝"
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: i18n: story
+#: scripts/story_text.gd:225
+msgid "Thank you for playing this early slice."
+msgstr "이 초기 체험판을 플레이해 주셔서 감사합니다."
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: The heading over this run's choices on the end card, in capitals.
+#. i18n: story
+#: scripts/story_text.gd:228
+msgid "THIS RUN"
+msgstr "이번 플레이"
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: An end-card topic, in capitals: the coolant relay.
+#. i18n: story
+#: scripts/story_text.gd:231
+msgid "RELAY"
+msgstr "릴레이"
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: An end-card topic, in capitals: the mirror port.
+#. i18n: story
+#: scripts/story_text.gd:234
+msgid "MIRROR"
+msgstr "미러"
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: An end-card topic, in capitals: the sentry machine.
+#. i18n: story
+#: scripts/story_text.gd:237
+msgid "SENTRY"
+msgstr "센트리"
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: An end-card row. {name} is the engineer's first name; keep {name} as written. Avoid a past tense with the engineer as its subject ("told"): it shows their gender in Polish and Russian. Rephrase. No particle after the slot that changes with its last sound (slot_particles): the end-card rows end a clause on the name (it was {name} who ...), as Korean recaps can.
+#. i18n: story speaker=narrator engineer=name
+#: scripts/story_text.gd:240
+msgid "{name} told WOLF the risk. WOLF took the live contact."
+msgstr "WOLF에게 위험을 알린 건 {name}. WOLF가 전기가 흐르는 접점을 맡았다."
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: An end-card row. {name} is the engineer's first name; keep {name} as written. Avoid a past tense with the engineer as its subject ("told", "cranked"): rephrase. No particle after the slot that changes with its last sound (slot_particles): it was {name} who told WOLF the risk and still cranked the bypass.
+#. i18n: story speaker=narrator engineer=name
+#: scripts/story_text.gd:243
+msgid "{name} told WOLF the risk, then cranked the bypass anyway."
+msgstr "WOLF에게 위험을 알리고도 바이패스를 직접 돌린 건 {name}."
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: An end-card row. {name} is the engineer's first name; keep {name} as written. Avoid a past tense with the engineer as its subject ("rushed", "cranked"): rephrase. No particle after the slot that changes with its last sound (slot_particles): 의 (at {name}'s urging; the bypass became {name}'s job). He (WOLF) is written WOLF.
+#. i18n: story speaker=narrator engineer=name
+#: scripts/story_text.gd:246
+msgid "{name} rushed WOLF. He refused, so {name} cranked the bypass."
+msgstr "{name}의 재촉에 WOLF는 거절했고, 바이패스는 {name}의 몫이 됐다."
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: An end-card row.
+#. i18n: story speaker=narrator
+#: scripts/story_text.gd:249
+msgid "WOLF read the timestamp off his own readout."
+msgstr "WOLF가 자기 판독 화면에서 타임스탬프를 읽었다."
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: An end-card row. {name} is the engineer's first name; keep {name} as written. Avoid a past tense with the engineer as its subject ("copied"): rephrase. No particle after the slot that changes with its last sound (slot_particles): it was {name} who copied the timestamp.
+#. i18n: story speaker=narrator engineer=name
+#: scripts/story_text.gd:252
+msgid "{name} copied the timestamp through the maintenance port."
+msgstr "정비 포트로 타임스탬프를 복사한 건 {name}."
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: An end-card row.
+#. i18n: story speaker=narrator
+#: scripts/story_text.gd:255
+msgid "WOLF drew the sentry onto the mark."
+msgstr "WOLF가 센트리를 표시 위로 유인했다."
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: An end-card row. {name} is the engineer's first name; keep {name} as written. Avoid a past tense with the engineer as its subject ("timed") and an agreeing word for "alone" (solo/sola, seul/seule): rephrase. No particle after the slot that changes with its last sound (slot_particles): a space, then 혼자의 (alone), which shows no gender.
+#. i18n: story speaker=narrator engineer=name
+#: scripts/story_text.gd:258
+msgid "WOLF wouldn't draw it, so {name} timed the drop alone."
+msgstr "WOLF가 유인하지 않아, 투하 타이밍은 {name} 혼자의 몫이었다."
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: An end-card row. {name} is the engineer's first name; keep {name} as written. Avoid a past tense with the engineer as its subject ("timed"): rephrase. No particle after the slot that changes with its last sound (slot_particles): 에게 (left the timing to {name}).
+#. i18n: story speaker=narrator engineer=name
+#: scripts/story_text.gd:261
+msgid "WOLF held back while {name} timed the drop."
+msgstr "투하 타이밍을 {name}에게 맡기고 WOLF는 뒤로 물러나 있었다."
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: An end-card row. {name} is the engineer's first name; keep {name} as written. Avoid a past tense with the engineer as its subject ("timed"): rephrase. No particle after the slot that changes with its last sound (slot_particles): 의 (the timing was {name}'s).
+#. i18n: story speaker=narrator engineer=name
+#: scripts/story_text.gd:264
+msgid "WOLF broke off while {name} timed the drop."
+msgstr "WOLF는 중간에 빠지고, 투하 타이밍은 {name}의 몫이었다."
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: An end-card row, for a save that did not store how the sentry came down.
+#. i18n: story speaker=narrator
+#: scripts/story_text.gd:267
+msgid "The tank came down on the sentry."
+msgstr "탱크가 센트리 위로 떨어졌다."
