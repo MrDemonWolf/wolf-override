@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: WOLF OVERRIDE\n"
-"PO-Revision-Date: 2026-10-19 23:36+0000\n"
+"PO-Revision-Date: 2026-10-20 00:35+0000\n"
 "Last-Translator: Claude (Anthropic), machine translation, unreviewed\n"
 "Language-Team: none\n"
 "MIME-Version: 1.0\n"
@@ -1665,11 +1665,11 @@ msgid "WOLF reads the timestamp off his own readout. The purge target existed be
 msgstr "WOLF가 자기 판독 화면에서 타임스탬프를 읽는다. 퍼지 대상은 삭제 명령보다 먼저 존재했다."
 
 # machine-translated by Claude (Anthropic), unreviewed
-#. TRANSLATORS: %s is the engineer's first name. No particle after the slot that changes with its last sound (slot_particles): the clause ends on the name (it is %s who copies), as on the end card.
+#. TRANSLATORS: %s is the engineer's first name. No particle after the slot that changes with its last sound (slot_particles): 의 (copying the timestamp is %s's job): a clause ending on the bare name read back as unfinished.
 #. i18n: story speaker=narrator engineer=name
 #: scripts/main.gd:3148
 msgid "%s copies the timestamp through the maintenance port. WOLF keeps watch."
-msgstr "정비 포트로 타임스탬프를 복사하는 건 %s. WOLF가 망을 본다."
+msgstr "정비 포트로 타임스탬프를 복사하는 건 %s의 몫이다. WOLF가 망을 본다."
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: Hint bar (14 px, about 526 px wide on a keyboard and 488 px on touch; wraps).

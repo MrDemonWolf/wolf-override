@@ -210,10 +210,11 @@ func _check_language_box(box: String, tags: Array[String], font: Font, size: int
 	return keeps
 
 
-## Chinese, Japanese and Korean samples (neutral fixtures, not game text: the game ships no translation
-## in these languages yet) at every TextSize step: they split without a character changed into boxes
-## that keep the language's rules, each two-row box balanced so no short word is left alone on the
-## last row, and the language's bundled font draws every character.
+## Chinese, Japanese and Korean samples (neutral fixtures, not game text; the shipped catalogs are
+## checked by _check_every_language) at every TextSize step: they split without a character changed
+## into boxes that keep the language's rules, each two-row box balanced so no short word is left alone
+## on the last row, and the language's bundled font draws every character. Two rows break at a comma
+## past the middle rather than inside a word (PR L12).
 func _check_cjk_samples() -> void:
 	var samples: Dictionary = {
 		"ja": "今日は雨が降っている。傘を持って出かけよう。駅まで歩いて十分かかる。電車は少し遅れているらしい。",
@@ -237,6 +238,18 @@ func _check_cjk_samples() -> void:
 				_expect(_check_language_box(box, none, font, size, width, code), "%s at %d%%: the box keeps the rules: %s" % [code, roundi(step * 100.0), box])
 	I18n.apply(I18n.FALLBACK)
 	_use_size(1.0)
+	# Two rows break after the comma past the middle; the evenest width alone would split the verb
+	# (降り出したの / で、). A comma before the middle is passed over: its second row would not fit.
+	I18n.apply("ja")
+	var mark_font: Font = story.get_theme_font(&"font")
+	var mark_size: int = story.get_theme_font_size(&"font_size")
+	for case: Array in [["雨が降り出したので、駅まで歩いた。", "、"], ["雨なので、私たちは駅までゆっくり歩いていった。", ""]]:
+		var text: String = case[0]
+		var column: float = ceilf(mark_font.get_string_size(text, HORIZONTAL_ALIGNMENT_LEFT, -1.0, mark_size).x * 0.75)
+		var mark_rows: Array[String] = DialogueBoxes.row_texts(text, mark_font, mark_size, DialogueBoxes.wrap_width(text, mark_font, mark_size, column, 0))
+		var ends_at_mark: bool = mark_rows.size() == 2 and mark_rows[0].ends_with("、")
+		_expect(mark_rows.size() == 2 and _balanced(mark_rows, mark_font, mark_size) and ends_at_mark == (case[1] == "、"), "two Japanese rows break at a comma past the middle, never one before it (%s)" % [mark_rows])
+	I18n.apply(I18n.FALLBACK)
 	# A station name written without spaces breaks between its words above 100% (TextSize.wrap_world_label).
 	I18n.apply("ja")
 	_use_size(2.0)

@@ -47,3 +47,6 @@ Stored per language (D9): ローワン, アレックス, モーガン (samples i
   prefer です/ます for the system messages.
 - **Words outside the bundled subset** (JIS X 0208 level 1) were reworded: rubble is がれき, not 瓦礫,
   and the relay housing is 本体, not 筐体.
+- **SAFE POINT** is 安全地点 (glossary), on the plate and in the hints: the trial's セーフポイント broke its
+  last kana onto a row of its own on the plate. The spent plates write 使用済 without み, as Japanese
+  labels do (バルブ使用済み left み alone on a second row).

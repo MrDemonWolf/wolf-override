@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: WOLF OVERRIDE\n"
-"PO-Revision-Date: 2026-10-19 23:36+0000\n"
+"PO-Revision-Date: 2026-10-20 00:30+0000\n"
 "Last-Translator: Claude (Anthropic), machine translation, unreviewed\n"
 "Language-Team: none\n"
 "MIME-Version: 1.0\n"
@@ -40,11 +40,11 @@ msgid "COOLANT RELAY"
 msgstr "冷却材リレー"
 
 # machine-translated by Claude (Anthropic), unreviewed
-#. TRANSLATORS: Station plate (12-13 px label on a machine). ALL CAPS, as short as possible. The spot out of the sentry's sight where the game saves (glossary).
+#. TRANSLATORS: Station plate (12-13 px label on a machine). ALL CAPS, as short as possible. The spot out of the sentry's sight where the game saves (glossary). SAFE POINT is 安全地点 (glossary): the trial's セーフポイント broke its last kana onto a row of its own on the plate (PR L12's stills).
 #. i18n: speaker=ui
 #: scenes/main.tscn
 msgid "SAFE POINT"
-msgstr "セーフポイント"
+msgstr "安全地点"
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: The PAUSE button on the touch layout (88 px) and the Pause action's prompt. ポーズ, the usual game word, rather than 一時停止, which is longer than the 88 px button.
@@ -1155,18 +1155,18 @@ msgid "LINE"
 msgstr "ライン"
 
 # machine-translated by Claude (Anthropic), unreviewed
-#. TRANSLATORS: Station plate (12-13 px label on a machine). ALL CAPS, as short as possible. The junction's breaker after the blast used the line up.
+#. TRANSLATORS: Station plate (12-13 px label on a machine). ALL CAPS, as short as possible. The junction's breaker after the blast used the line up. 使用済 without its み, as Japanese labels write it: VALVE USED, the same length, broke its み onto a row of its own.
 #. i18n: speaker=ui
 #: scripts/junction_room.gd:1539
 msgid "BREAKER USED"
-msgstr "ブレーカー使用済み"
+msgstr "ブレーカー使用済"
 
 # machine-translated by Claude (Anthropic), unreviewed
-#. TRANSLATORS: Station plate (12-13 px label on a machine). ALL CAPS, as short as possible. The junction's valve after the blast used the line up.
+#. TRANSLATORS: Station plate (12-13 px label on a machine). ALL CAPS, as short as possible. The junction's valve after the blast used the line up. 使用済 without its み, as Japanese labels write it: バルブ使用済み broke its み onto a row of its own.
 #. i18n: speaker=ui
 #: scripts/junction_room.gd:1541
 msgid "VALVE USED"
-msgstr "バルブ使用済み"
+msgstr "バルブ使用済"
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: Station plate (12-13 px label on a machine). ALL CAPS, as short as possible. The junction's exit hatch, open.
@@ -1255,7 +1255,7 @@ msgstr "保存したチェックポイントを読み込めなかった。"
 #. i18n: speaker=ui
 #: scripts/main.gd:1130
 msgid "No checkpoint yet. Saving starts at the first SAFE POINT."
-msgstr "チェックポイントなし。最初のセーフポイントから保存。"
+msgstr "チェックポイントなし。最初の安全地点から保存。"
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: Changelog button text when the browser cannot open (338 px).
@@ -1433,7 +1433,7 @@ msgstr "記録アクセス復旧。まずパージ命令の記録をコピーし
 #. TRANSLATORS: i18n: story speaker=narrator
 #: scripts/main.gd:2533
 msgid "Safe point restored."
-msgstr "セーフポイント復旧。"
+msgstr "安全地点復旧。"
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: The Director's purge display, read as a speaker; WOLF answers in the next message. A machine display's terse wording.
@@ -1452,7 +1452,7 @@ msgstr "やつらは原本の記録を消したがっている。守らないと
 #. TRANSLATORS: i18n: story speaker=narrator
 #: scripts/main.gd:2577
 msgid "No station in reach. Follow the labeled breaker, relay, bypass or safe point."
-msgstr "届く範囲にステーションはない。表示のあるブレーカー、リレー、バイパス、セーフポイントを目指そう。"
+msgstr "届く範囲にステーションはない。表示のあるブレーカー、リレー、バイパス、安全地点を目指そう。"
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: i18n: story speaker=narrator
@@ -1485,7 +1485,7 @@ msgstr "リレーに電気が来ていない。先にブレーカーを入れよ
 #: scripts/main.gd:2652
 #: scripts/main.gd:2695
 msgid "The seal is open. The safe point is just beyond it."
-msgstr "封鎖扉が開いた。セーフポイントはそのすぐ先だ。"
+msgstr "封鎖扉が開いた。安全地点はそのすぐ先だ。"
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: i18n: story speaker=WOLF
@@ -1527,7 +1527,7 @@ msgstr "開いた。一緒に行く。"
 #. TRANSLATORS: i18n: story speaker=narrator
 #: scripts/main.gd:2768
 msgid "The safe point is past the sealed door."
-msgstr "セーフポイントは封鎖扉の先だ。"
+msgstr "安全地点は封鎖扉の先だ。"
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: WOLF, after the engineer pressed him at the relay without warning.
@@ -1562,26 +1562,26 @@ msgstr "パージキューは任せる。俺はミラーを調べる。"
 #. i18n: speaker=hint engineer=you slot=key
 #: scripts/main.gd:2800
 msgid "The safe point could not save. Press %s here again."
-msgstr "セーフポイントで保存できなかった。ここでもう一度 %s を押そう。"
+msgstr "安全地点で保存できなかった。ここでもう一度 %s を押そう。"
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: Hint bar (14 px, about 526 px wide on a keyboard and 488 px on touch; wraps). The touch form; USE is the touch button's word (USAR).
 #. i18n: speaker=hint engineer=you
 #: scripts/main.gd:2800
 msgid "The safe point could not save. Tap USE here again."
-msgstr "セーフポイントで保存できなかった。ここでもう一度「使う」をタップしよう。"
+msgstr "安全地点で保存できなかった。ここでもう一度「使う」をタップしよう。"
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: i18n: story speaker=narrator
 #: scripts/main.gd:2811
 msgid "Safe point saved."
-msgstr "セーフポイントで保存した。"
+msgstr "安全地点で保存した。"
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: i18n: story speaker=narrator
 #: scripts/main.gd:2814
 msgid "Safe point saved. WOLF remembers the same choice."
-msgstr "セーフポイントで保存した。WOLFも同じ選択を覚えている。"
+msgstr "安全地点で保存した。WOLFも同じ選択を覚えている。"
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: %s is the engineer's first name.
@@ -2058,7 +2058,7 @@ msgstr "%s：所長のパージ表示を読む。"
 #. i18n: speaker=hint engineer=you
 #: scripts/main.gd:5370
 msgid "Return to the safe point to enter records access."
-msgstr "セーフポイントに戻って記録アクセスに入ろう。"
+msgstr "安全地点に戻って記録アクセスに入ろう。"
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: Hint bar (14 px, about 526 px wide on a keyboard and 488 px on touch; wraps). The seal is the sealed door (OPEN THE SEAL): 封鎖扉, here and in the objective.
@@ -2072,14 +2072,14 @@ msgstr "封鎖扉が開いていく。"
 #. i18n: speaker=hint engineer=you slot=key
 #: scripts/main.gd:5375
 msgid "%s: save at the safe point."
-msgstr "%s：セーフポイントで保存。"
+msgstr "%s：安全地点で保存。"
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: Hint bar (14 px, about 526 px wide on a keyboard and 488 px on touch; wraps).
 #. i18n: speaker=hint engineer=you
 #: scripts/main.gd:5376
 msgid "The seal is open. Move to the safe point."
-msgstr "封鎖扉が開いた。セーフポイントへ向かおう。"
+msgstr "封鎖扉が開いた。安全地点へ向かおう。"
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: Hint bar (14 px, about 526 px wide on a keyboard and 488 px on touch; wraps). WOLF is he.
@@ -2498,14 +2498,14 @@ msgstr "出口へ向かう"
 #. i18n: speaker=ui
 #: scripts/main.gd:5539
 msgid "SAFE POINT REACHED"
-msgstr "セーフポイント到達"
+msgstr "安全地点到達"
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: Top card objective (ALL CAPS, about 420 px wide, wraps). Infinitive, as the other objectives.
 #. i18n: speaker=ui
 #: scripts/main.gd:5541
 msgid "REACH SAFE POINT"
-msgstr "セーフポイントへ向かう"
+msgstr "安全地点へ向かう"
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: Top card objective (ALL CAPS, about 420 px wide, wraps). Infinitive, as the other objectives. The seal is the sealed door.

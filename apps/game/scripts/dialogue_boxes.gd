@@ -227,21 +227,58 @@ static func wrap_width(text: String, font: Font, font_size: int, width: float, m
 ## The narrowest whole-pixel width at which [param text] still takes as few rows as in the column
 ## [param width] px wide, plus a pixel so a Label's rounding keeps them: its rows come out as even as
 ## its words allow, so no short word is left alone on the last row (the prototype's Japanese stills
-## showed "た。" and "いる。" so; DESIGN.md "Per-script row limits"). Text on one row, or on more rows
-## than a box holds, keeps the column. Found by halving: fewer than 10 layouts of the text.
+## showed "た。" and "いる。" so; DESIGN.md "Per-script row limits"). Rows are counted with whole words
+## ([method rows]' whole_words): narrowing the width must never move a break inside a word, which the
+## Label's smart wrap would otherwise do once a word no longer fits (PR L12's Korean stills broke
+## "있" / "다." and "게" / "이지가"; Japanese "向" / "け"). Two rows break after a Chinese or Japanese
+## comma or full stop instead where one gives rows nearly as even ([method _mark_width]). Text on one
+## row, or on more rows than a box holds, keeps the column. Found by halving: fewer than 10 layouts of
+## the text.
 static func _balanced_width(text: String, font: Font, font_size: int, width: float) -> float:
-	var count: int = rows(text, font, font_size, width).size()
+	var count: int = rows(text, font, font_size, width, true).size()
 	if count < 2 or count > MAX_ROWS:
 		return width
+	if count == 2:
+		var at_mark: float = _mark_width(text, font, font_size, width)
+		if at_mark > 0.0:
+			return at_mark
 	var too_narrow: float = 0.0
 	var wide_enough: float = floorf(width)
 	while wide_enough - too_narrow > 1.0:
 		var middle: float = floorf((too_narrow + wide_enough) * 0.5)
-		if rows(text, font, font_size, middle).size() <= count:
+		if rows(text, font, font_size, middle, true).size() <= count:
 			wide_enough = middle
 		else:
 			too_narrow = middle
 	return minf(wide_enough + 1.0, width)
+
+
+## The width at which two rows of [param text] break right after one of NO_SPACE_MARKS (the Chinese and
+## Japanese full stops and commas), choosing the mark that leaves the most even rows, or 0 when none
+## does. Why: these scripts are written without spaces and the text server may break between any two
+## characters, so the evenest width alone split a verb from its ending (PR L12's stills: "背を向" /
+## "け、"), where a reader expects the break at the comma. A mark only counts when the shorter row is
+## at least half as wide as the longer (the balance tests/text_boxes_test.gd asks of every two-row
+## box) and both rows fit [param width]; the first row is then laid exactly that wide, so a mark before
+## the middle never qualifies (its second row would not fit). Pure: lays the text out once per mark.
+static func _mark_width(text: String, font: Font, font_size: int, width: float) -> float:
+	var best: float = 0.0
+	var best_gap: float = INF
+	for index: int in text.length() - 1:
+		if not NO_SPACE_MARKS.contains(text[index]) or NO_BREAK_BEFORE.contains(text[index + 1]):
+			continue
+		var first: float = font.get_string_size(text.left(index + 1), HORIZONTAL_ALIGNMENT_LEFT, -1.0, font_size).x
+		var second: float = font.get_string_size(text.substr(index + 1).strip_edges(), HORIZONTAL_ALIGNMENT_LEFT, -1.0, font_size).x
+		if minf(first, second) < 0.5 * maxf(first, second) or absf(first - second) >= best_gap:
+			continue
+		var at: float = ceilf(first) + 1.0
+		if at > width:
+			continue
+		var laid: Array[Vector2i] = rows(text, font, font_size, at, true)
+		if laid.size() == 2 and laid[0].y == index + 1:
+			best = at
+			best_gap = absf(first - second)
+	return best
 
 
 ## Splits [param line] where a sentence ends and the next one starts with a speaker's tag
