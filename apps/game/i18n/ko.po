@@ -1400,7 +1400,7 @@ msgid ""
 "Service junction restored. The door is\n"
 "down. The sentry patrols past the rubble."
 msgstr ""
-"설비 분기점이 복구되었습니다. 문이 무너졌습니다.\n"
+"설비 분기점이 복구되었습니다. 문이 날아갔습니다.\n"
 "센트리가 잔해 너머를 순찰합니다."
 
 # machine-translated by Claude (Anthropic), unreviewed
@@ -2799,7 +2799,7 @@ msgstr "이미 전원이 들어와 있습니다. 문 옆 밸브를 돌리세요.
 #. TRANSLATORS: i18n: story speaker=narrator
 #: scripts/story_text.gd:138
 msgid "No charge left. The door is down."
-msgstr "남은 충전이 없다. 문은 무너졌다."
+msgstr "남은 충전이 없다. 문은 이미 날아갔다."
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: i18n: story speaker=narrator
