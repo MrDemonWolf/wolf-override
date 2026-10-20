@@ -289,6 +289,10 @@ msgstr ""
 msgid "MrDemonWolf, Inc."
 msgstr ""
 
+#: scripts/bypass_handle.gd:141
+msgid "MANUAL BYPASS"
+msgstr ""
+
 #: scripts/game_settings.gd:22
 msgid "Move left"
 msgstr ""
@@ -712,31 +716,87 @@ msgstr ""
 msgid "Settings could not be saved."
 msgstr ""
 
-#: scripts/junction_room.gd:884
+#: scripts/junction_room.gd:873
+#: scripts/junction_room.gd:1566
+msgid "OVERLOAD BREAKER"
+msgstr ""
+
+#: scripts/junction_room.gd:875
+msgid "RELIEF VENT"
+msgstr ""
+
+#: scripts/junction_room.gd:877
+#: scripts/junction_room.gd:1552
+msgid "VALVE"
+msgstr ""
+
+#: scripts/junction_room.gd:879
+#: scripts/junction_room.gd:1571
+msgid "SEALED DOOR"
+msgstr ""
+
+#: scripts/junction_room.gd:881
+#: scripts/junction_room.gd:1575
+msgid "TANK RELEASE"
+msgstr ""
+
+#: scripts/junction_room.gd:883
+msgid "TANK DOWN"
+msgstr ""
+
+#: scripts/junction_room.gd:886
 msgid "LINE"
 msgstr ""
 
-#: scripts/junction_room.gd:1539
-msgid "BREAKER USED"
-msgstr ""
-
-#: scripts/junction_room.gd:1541
+#: scripts/junction_room.gd:1547
 msgid "VALVE USED"
 msgstr ""
 
-#: scripts/junction_room.gd:1558
+#: scripts/junction_room.gd:1549
+msgid "FUSE LIT"
+msgstr ""
+
+#: scripts/junction_room.gd:1551
+msgid "VALVE  %d / %d"
+msgstr ""
+
+#: scripts/junction_room.gd:1560
+msgid "BREAKER USED"
+msgstr ""
+
+#: scripts/junction_room.gd:1566
+msgid "BREAKER TRIPPED"
+msgstr ""
+
+#: scripts/junction_room.gd:1566
+msgid "BREAKER LIVE"
+msgstr ""
+
+#: scripts/junction_room.gd:1571
+msgid "DOOR DOWN"
+msgstr ""
+
+#: scripts/junction_room.gd:1575
+msgid "RELEASE USED"
+msgstr ""
+
+#: scripts/junction_room.gd:1575
+msgid "WINCHING UP"
+msgstr ""
+
+#: scripts/junction_room.gd:1579
 msgid "EXIT OPEN"
 msgstr ""
 
-#: scripts/junction_room.gd:1562
+#: scripts/junction_room.gd:1583
 msgid "EXIT OPENING"
 msgstr ""
 
-#: scripts/junction_room.gd:1565
+#: scripts/junction_room.gd:1586
 msgid "EXIT READY"
 msgstr ""
 
-#: scripts/junction_room.gd:1568
+#: scripts/junction_room.gd:1589
 msgid "EXIT LOCKED"
 msgstr ""
 
@@ -1604,6 +1664,28 @@ msgstr ""
 
 #: scripts/main.gd:5560
 msgid "CHECK THE BREAKER"
+msgstr ""
+
+#: scripts/records_room.gd:268
+#: scripts/records_room.gd:362
+msgid "PURGE QUEUE"
+msgstr ""
+
+#: scripts/records_room.gd:269
+#: scripts/records_room.gd:364
+msgid "MIRROR PORT"
+msgstr ""
+
+#: scripts/records_room.gd:272
+msgid "EXIT"
+msgstr ""
+
+#: scripts/records_room.gd:362
+msgid "PURGE COPIED"
+msgstr ""
+
+#: scripts/records_room.gd:364
+msgid "MIRROR COPIED"
 msgstr ""
 
 #. TRANSLATORS: The Director, the opening's first line.

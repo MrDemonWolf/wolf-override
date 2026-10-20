@@ -135,7 +135,10 @@ func _init() -> void:
 	wheel = make_wheel("Wheel", WHEEL_SCALE)
 	wheel.position = WHEEL_OFFSET
 	add_child(wheel)
-	bypass_label = _plate("BypassLabel", "MANUAL BYPASS", LABEL_TEXT, Palette.PLATE_EDGE, LABEL_WIDTH, READOUT_HEIGHT)
+	# The plate keeps its English name and translates as drawn; I18n.KEY.tr() marks it for the template
+	# (localization PR L13). The COOLANT FAULT tag stays English: it counts as words painted on the
+	# relay (decision D3; "keep" in i18n/glossary.json).
+	bypass_label = _plate("BypassLabel", I18n.KEY.tr("MANUAL BYPASS"), LABEL_TEXT, Palette.PLATE_EDGE, LABEL_WIDTH, READOUT_HEIGHT)
 	readout = Node2D.new()
 	readout.name = "CrankReadout"
 	readout.draw.connect(_draw_readout)

@@ -50,7 +50,7 @@ msgstr "PONTO SEGURO"
 #. TRANSLATORS: The PAUSE button on the touch layout (88 px) and the Pause action's prompt.
 #. i18n: speaker=ui
 #: scenes/main.tscn
-#: scripts/main.gd:4716
+#: scripts/main.gd:4732
 msgid "PAUSE"
 msgstr "PAUSA"
 
@@ -100,7 +100,7 @@ msgstr "NOVO JOGO"
 #. TRANSLATORS: Title button (186 px, 21 px): continue from the saved checkpoint. The same word, with the context 'touch button', is the touch USE button's word for going on through lines (155 px, 23 px).
 #. i18n: speaker=ui
 #: scenes/main.tscn
-#: scripts/main.gd:1120
+#: scripts/main.gd:1127
 msgid "CONTINUE"
 msgstr "CONTINUAR"
 
@@ -323,8 +323,8 @@ msgstr "VOLTAR AO MENU"
 #. TRANSLATORS: Credits button (218 px, 19 px) that stops the credits rolling up.
 #. i18n: speaker=ui
 #: scenes/main.tscn
-#: scripts/main.gd:2017
-#: scripts/main.gd:2058
+#: scripts/main.gd:2024
+#: scripts/main.gd:2065
 msgid "PAUSE SCROLL"
 msgstr "PAUSAR TEXTO"
 
@@ -374,7 +374,7 @@ msgstr "RETOMAR"
 #. TRANSLATORS: Pause menu button (350 px, 19 px): leave the run for the title menu.
 #. i18n: speaker=ui
 #: scenes/main.tscn
-#: scripts/main.gd:2236
+#: scripts/main.gd:2243
 msgid "RETURN TO TITLE"
 msgstr "VOLTAR AO MENU"
 
@@ -421,7 +421,7 @@ msgstr "TELA CHEIA"
 #. TRANSLATORS: Settings note on a computer build.
 #. i18n: speaker=ui
 #: scenes/main.tscn
-#: scripts/main.gd:2117
+#: scripts/main.gd:2124
 msgid "Window size applies on desktop."
 msgstr "O tamanho da janela vale no computador."
 
@@ -438,6 +438,13 @@ msgstr "VOLTAR"
 #: scenes/studio_logo.tscn
 msgid "MrDemonWolf, Inc."
 msgstr "MrDemonWolf, Inc."
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: Station plate (12-13 px label on a machine). ALL CAPS, as short as possible. The corridor's hand-cranked bypass wheel beside the relay; the hints name it with the same words.
+#. i18n: speaker=ui
+#: scripts/bypass_handle.gd:141
+msgid "MANUAL BYPASS"
+msgstr "BYPASS MANUAL"
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: CONTROLS row caption (220 px, 16 px) and the name in the rebind notes: the action.
@@ -1001,57 +1008,57 @@ msgstr "RESTAURAR CONTROLES PADRÃO"
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: Settings button (180 px) shown while the game waits for a new key.
 #. i18n: speaker=ui
-#: scripts/game_settings.gd:372
+#: scripts/game_settings.gd:376
 msgid "CANCEL REBIND"
 msgstr "CANCELAR"
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: GENERAL caption (160 px) beside the language list.
 #. i18n: speaker=ui
-#: scripts/game_settings.gd:390
+#: scripts/game_settings.gd:394
 msgid "LANGUAGE"
 msgstr "IDIOMA"
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: Settings note on a phone or tablet.
 #. i18n: speaker=ui
-#: scripts/game_settings.gd:562
+#: scripts/game_settings.gd:570
 msgid "Window size is OS-managed on mobile."
 msgstr "Em celulares e tablets, o sistema controla o tamanho da janela."
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: Settings note: vertical sync can hold the frame rate below the chosen cap.
 #. i18n: speaker=ui
-#: scripts/game_settings.gd:562
-#: scripts/game_settings.gd:564
+#: scripts/game_settings.gd:570
+#: scripts/game_settings.gd:572
 msgid "V-sync may limit the FPS cap."
 msgstr "O V-sync pode limitar o teto de FPS."
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: AUDIO note (680 px, 15 px, one row). 'Effects' names the Effects volume slider.
 #. i18n: speaker=ui
-#: scripts/game_settings.gd:566
+#: scripts/game_settings.gd:574
 msgid "Volume changes apply immediately. Effects carries every sound effect; there is no music or voice yet."
 msgstr "O volume muda na hora. Os efeitos incluem todos os sons; ainda não há música nem vozes."
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: CONTROLS note.
 #. i18n: speaker=ui engineer=you
-#: scripts/game_settings.gd:566
+#: scripts/game_settings.gd:574
 msgid "Select a binding, then press a key, controller button or move a stick."
 msgstr "Escolha um comando e pressione uma tecla ou um botão do controle, ou mova um stick."
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: GENERAL note under the language list.
 #. i18n: speaker=ui engineer=you
-#: scripts/game_settings.gd:566
+#: scripts/game_settings.gd:574
 msgid "Until you choose a language, the game uses your system's."
 msgstr "Até você escolher um idioma, o jogo usa o do seu sistema."
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: Rebind note. %s is the action's name (Move left).
 #. i18n: speaker=ui engineer=you slot=key
-#: scripts/game_settings.gd:612
+#: scripts/game_settings.gd:620
 #, c-format
 msgid "Press a keyboard input for %s. Esc cancels."
 msgstr "Pressione uma tecla para “%s”. Esc cancela."
@@ -1059,7 +1066,7 @@ msgstr "Pressione uma tecla para “%s”. Esc cancela."
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: Rebind note. %s is the action's name (Move left).
 #. i18n: speaker=ui engineer=you slot=key
-#: scripts/game_settings.gd:612
+#: scripts/game_settings.gd:620
 #, c-format
 msgid "Press a controller input for %s. Esc cancels."
 msgstr "Pressione um botão ou stick do controle para “%s”. Esc cancela."
@@ -1067,14 +1074,14 @@ msgstr "Pressione um botão ou stick do controle para “%s”. Esc cancela."
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: Rebind note.
 #. i18n: speaker=ui
-#: scripts/game_settings.gd:629
+#: scripts/game_settings.gd:637
 msgid "Rebind cancelled."
 msgstr "Reatribuição cancelada."
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: Rebind note. %s is the other action's name.
 #. i18n: speaker=ui engineer=you slot=key
-#: scripts/game_settings.gd:644
+#: scripts/game_settings.gd:652
 #, c-format
 msgid "Already used by %s. Choose another input or cancel."
 msgstr "“%s” já usa essa entrada. Escolha outra ou cancele."
@@ -1082,21 +1089,21 @@ msgstr "“%s” já usa essa entrada. Escolha outra ou cancele."
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: Rebind note.
 #. i18n: speaker=ui
-#: scripts/game_settings.gd:650
+#: scripts/game_settings.gd:658
 msgid "Binding saved."
 msgstr "Comando salvo."
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: A controller stick's name in the CONTROLLER column (206 px, 15 px, shared with a second binding: abbreviate). Stick L, as Nintendo's Brazilian materials name it; Stick esq. with D-pad esq. ran 2 px over the column.
 #. i18n: speaker=ui
-#: scripts/game_settings.gd:718
+#: scripts/game_settings.gd:726
 msgid "Left stick"
 msgstr "Stick L"
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: A controller axis's name; %d is its number.
 #. i18n: speaker=ui
-#: scripts/game_settings.gd:718
+#: scripts/game_settings.gd:726
 #, c-format
 msgid "Axis %d"
 msgstr "Eixo %d"
@@ -1104,7 +1111,7 @@ msgstr "Eixo %d"
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: A controller axis binding; %d its number, %s its direction (+ or −).
 #. i18n: speaker=ui slot=key
-#: scripts/game_settings.gd:745
+#: scripts/game_settings.gd:753
 #, c-format
 msgid "AXIS %d %s"
 msgstr "EIXO %d %s"
@@ -1112,28 +1119,28 @@ msgstr "EIXO %d %s"
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: The controller's Start button, as printed on it.
 #. i18n: speaker=ui
-#: scripts/game_settings.gd:796
+#: scripts/game_settings.gd:804
 msgid "START"
 msgstr "START"
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: A controller binding: left on the directional pad (CONTROLLER column, 206 px, shared with a second binding: abbreviate).
 #. i18n: speaker=ui
-#: scripts/game_settings.gd:797
+#: scripts/game_settings.gd:805
 msgid "D-pad left"
 msgstr "D-pad esq."
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: A controller binding: right on the directional pad (CONTROLLER column, 206 px, shared with a second binding: abbreviate).
 #. i18n: speaker=ui
-#: scripts/game_settings.gd:798
+#: scripts/game_settings.gd:806
 msgid "D-pad right"
 msgstr "D-pad dir."
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: A controller button with no name; %d is its number.
 #. i18n: speaker=ui
-#: scripts/game_settings.gd:799
+#: scripts/game_settings.gd:807
 #, c-format
 msgid "BUTTON %d"
 msgstr "BOTÃO %d"
@@ -1141,64 +1148,160 @@ msgstr "BOTÃO %d"
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: CONTROLS note after RESTORE DEFAULT CONTROLS.
 #. i18n: speaker=ui
-#: scripts/game_settings.gd:826
+#: scripts/game_settings.gd:838
 msgid "Default controls restored."
 msgstr "Controles padrão restaurados."
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: Settings error note.
 #. i18n: speaker=ui
-#: scripts/game_settings.gd:850
-#: scripts/main.gd:2157
+#: scripts/game_settings.gd:862
+#: scripts/main.gd:2164
 msgid "Settings could not be saved."
 msgstr "Não foi possível salvar as opções."
 
 # machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: Station plate (12-13 px label on a machine). ALL CAPS, as short as possible. The Service Junction's overload breaker, before it is armed.
+#. i18n: speaker=ui
+#: scripts/junction_room.gd:873
+#: scripts/junction_room.gd:1566
+msgid "OVERLOAD BREAKER"
+msgstr "DISJUNTOR DE SOBRECARGA"
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: Station plate (12-13 px label on a machine). ALL CAPS, as short as possible. The pressure line's relief vent over a floor grate; it vents when the LINE gauge peaks.
+#. i18n: speaker=ui
+#: scripts/junction_room.gd:875
+msgid "RELIEF VENT"
+msgstr "RESPIRO DE ALÍVIO"
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: Station plate (12-13 px label on a machine). ALL CAPS, as short as possible. The pressure line's handwheel valve, before the breaker is armed.
+#. i18n: speaker=ui
+#: scripts/junction_room.gd:877
+#: scripts/junction_room.gd:1552
+msgid "VALVE"
+msgstr "VÁLVULA"
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: Station plate (12-13 px label on a machine). ALL CAPS, as short as possible. A placard over the sealed blast door the pressure line can blow open.
+#. i18n: speaker=ui
+#: scripts/junction_room.gd:879
+#: scripts/junction_room.gd:1571
+msgid "SEALED DOOR"
+msgstr "PORTA HERMÉTICA"
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: Station plate (12-13 px label on a machine). ALL CAPS, as short as possible. The lever that drops the hanging coolant tank; the hints name it with the same words.
+#. i18n: speaker=ui
+#: scripts/junction_room.gd:881
+#: scripts/junction_room.gd:1575
+msgid "TANK RELEASE"
+msgstr "SOLTAR TANQUE"
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: Station plate (12-13 px label on a machine). ALL CAPS, as short as possible. Over the dropped coolant tank once it lies on the floor.
+#. i18n: speaker=ui
+#: scripts/junction_room.gd:883
+msgid "TANK DOWN"
+msgstr "TANQUE NO CHÃO"
+
+# machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: Station plate (12-13 px label on a machine). ALL CAPS, as short as possible. The caption by the Service Junction's pressure line dial.
 #. i18n: speaker=ui
-#: scripts/junction_room.gd:884
+#: scripts/junction_room.gd:886
 msgid "LINE"
 msgstr "LINHA"
 
 # machine-translated by Claude (Anthropic), unreviewed
-#. TRANSLATORS: Station plate (12-13 px label on a machine). ALL CAPS, as short as possible. The junction's breaker after the blast used the line up.
-#. i18n: speaker=ui
-#: scripts/junction_room.gd:1531
-msgid "BREAKER USED"
-msgstr "DISJUNTOR USADO"
-
-# machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: Station plate (12-13 px label on a machine). ALL CAPS, as short as possible. The junction's valve after the blast used the line up.
 #. i18n: speaker=ui
-#: scripts/junction_room.gd:1533
+#: scripts/junction_room.gd:1547
 msgid "VALVE USED"
 msgstr "VÁLV. USADA"
 
 # machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: Station plate (12-13 px label on a machine). ALL CAPS, as short as possible. The valve's plate once the pressure charge is set and its fuse burns; the same words open a hint.
+#. i18n: speaker=ui
+#: scripts/junction_room.gd:1549
+msgid "FUSE LIT"
+msgstr "PAVIO ACESO"
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: Station plate (12-13 px label on a machine). ALL CAPS, as short as possible. The valve's plate while it is cranked: turns done of turns needed ("VALVE  3 / 8"). Keep both %d and the two spaces before them.
+#. i18n: speaker=ui
+#: scripts/junction_room.gd:1551
+#, c-format
+msgid "VALVE  %d / %d"
+msgstr "VÁLVULA  %d / %d"
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: Station plate (12-13 px label on a machine). ALL CAPS, as short as possible. The junction's breaker after the blast used the line up.
+#. i18n: speaker=ui
+#: scripts/junction_room.gd:1560
+msgid "BREAKER USED"
+msgstr "DISJUNTOR USADO"
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: Station plate (12-13 px label on a machine). ALL CAPS, as short as possible. The overload breaker after the pressure line tripped it (it cut out).
+#. i18n: speaker=ui
+#: scripts/junction_room.gd:1566
+msgid "BREAKER TRIPPED"
+msgstr "DISJUNTOR DESARMADO"
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: Station plate (12-13 px label on a machine). ALL CAPS, as short as possible. The overload breaker once armed: the line has power.
+#. i18n: speaker=ui
+#: scripts/junction_room.gd:1566
+msgid "BREAKER LIVE"
+msgstr "DISJUNTOR ATIVO"
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: Station plate (12-13 px label on a machine). ALL CAPS, as short as possible. The blast door's placard after the blast threw the door out of its frame.
+#. i18n: speaker=ui
+#: scripts/junction_room.gd:1571
+msgid "DOOR DOWN"
+msgstr "PORTA DERRUBADA"
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: Station plate (12-13 px label on a machine). ALL CAPS, as short as possible. The TANK RELEASE lever's plate once its tank has been dropped for good.
+#. i18n: speaker=ui
+#: scripts/junction_room.gd:1575
+msgid "RELEASE USED"
+msgstr "PAINEL USADO"
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: Station plate (12-13 px label on a machine). ALL CAPS, as short as possible. The TANK RELEASE lever's plate while the winch hauls a missed tank back up to its clamp.
+#. i18n: speaker=ui
+#: scripts/junction_room.gd:1575
+msgid "WINCHING UP"
+msgstr "IÇANDO TANQUE"
+
+# machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: Station plate (12-13 px label on a machine). ALL CAPS, as short as possible. The junction's exit hatch, open.
 #. i18n: speaker=ui
-#: scripts/junction_room.gd:1550
+#: scripts/junction_room.gd:1579
 msgid "EXIT OPEN"
 msgstr "SAÍDA ABERTA"
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: Station plate (12-13 px label on a machine). ALL CAPS, as short as possible. The junction's exit hatch while it slides open.
 #. i18n: speaker=ui
-#: scripts/junction_room.gd:1554
+#: scripts/junction_room.gd:1583
 msgid "EXIT OPENING"
 msgstr "SAÍDA ABRINDO"
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: Station plate (12-13 px label on a machine). ALL CAPS, as short as possible. The junction's exit hatch, ready to open.
 #. i18n: speaker=ui
-#: scripts/junction_room.gd:1557
+#: scripts/junction_room.gd:1586
 msgid "EXIT READY"
 msgstr "SAÍDA PRONTA"
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: Station plate (12-13 px label on a machine). ALL CAPS, as short as possible. The junction's exit hatch, locked.
 #. i18n: speaker=ui
-#: scripts/junction_room.gd:1560
+#: scripts/junction_room.gd:1589
 msgid "EXIT LOCKED"
 msgstr "SAÍDA TRAVADA"
 
@@ -1241,53 +1344,53 @@ msgstr ""
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: Title button (the width of two buttons) once the slice is finished: start a fresh run.
 #. i18n: speaker=ui
-#: scripts/main.gd:1120
+#: scripts/main.gd:1127
 msgid "PLAY AGAIN"
 msgstr "JOGAR DE NOVO"
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: Title note under PLAY AGAIN (388 px, 15 px). Slice: this playable part of the game. Quote the PLAY AGAIN button exactly.
 #. i18n: speaker=ui
-#: scripts/main.gd:1125
+#: scripts/main.gd:1132
 msgid "Slice complete. PLAY AGAIN starts a fresh run."
 msgstr "Demo concluída. JOGAR DE NOVO começa uma nova partida."
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: Title note under CONTINUE (388 px, 15 px).
 #. i18n: speaker=ui
-#: scripts/main.gd:1127
+#: scripts/main.gd:1134
 msgid "Saved checkpoint could not be read."
 msgstr "Não foi possível ler o ponto de controle salvo."
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: Title note under CONTINUE (388 px, 15 px). SAFE POINT is the plate's exact words. Cut to fit: O jogo salva a partir do primeiro (the game saves from the first) ran 65 px over the 388 px row with ainda (yet), so Nada salvo and no primeiro. Shortened to fit the 388 px row.
 #. i18n: speaker=ui
-#: scripts/main.gd:1127
+#: scripts/main.gd:1134
 msgid "No checkpoint yet. Saving starts at the first SAFE POINT."
 msgstr "Nada salvo. O jogo salva no primeiro PONTO SEGURO."
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: Changelog button text when the browser cannot open (338 px).
 #. i18n: speaker=ui
-#: scripts/main.gd:1150
+#: scripts/main.gd:1157
 msgid "LINK UNAVAILABLE"
 msgstr "LINK INDISPONÍVEL"
 
 # machine-translated by Claude (Anthropic), unreviewed
-#: scripts/main.gd:1171
+#: scripts/main.gd:1178
 msgid "The changelog text is missing from this build. Open the full changelog online."
 msgstr "Esta versão não inclui o texto das novidades. Abra a lista completa on-line."
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: Opens the in-game changelog in every language but English: the changelog itself is not translated.
-#: scripts/main.gd:1174
+#: scripts/main.gd:1181
 msgid "These development updates are written in English only."
 msgstr "Estas novidades do desenvolvimento estão escritas só em inglês."
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: WOLF, when the hidden name key gives the engineer another of their three names; %s is the full name.
 #. i18n: speaker=WOLF engineer=name
-#: scripts/main.gd:1463
+#: scripts/main.gd:1470
 #, c-format
 msgid "%s. That name sounds like you."
 msgstr "%s. Esse nome tem a sua cara."
@@ -1296,7 +1399,7 @@ msgstr "%s. Esse nome tem a sua cara."
 #. TRANSLATORS: Credits heading (19 px, centred).
 #. i18n: speaker=ui
 #. TRANSLATORS: Heading over the AI disclosure in the credits, in the same capitals as the other headings.
-#: scripts/main.gd:2029
+#: scripts/main.gd:2036
 msgid "AI DISCLOSURE"
 msgstr "DECLARAÇÃO SOBRE IA"
 
@@ -1304,98 +1407,98 @@ msgstr "DECLARAÇÃO SOBRE IA"
 #. TRANSLATORS: Credits paragraph (582 px, 19 px, wraps). Translated word for word.
 #. i18n: speaker=ui
 #. TRANSLATORS: The AI disclosure Nathanial Henniges approved word for word (October 19, 2026). Translate it faithfully and in full; do not shorten, soften or add to it. Keep WOLF OVERRIDE, Nathanial Henniges and MrDemonWolf, Inc. as written.
-#: scripts/main.gd:2031
+#: scripts/main.gd:2038
 msgid "WOLF OVERRIDE is a solo project by Nathanial Henniges (MrDemonWolf, Inc.). AI tools were used with careful human oversight to support the creative process for art and code. The story, characters and game design are his, and every AI-assisted asset is reviewed, edited and credited."
 msgstr "WOLF OVERRIDE é um projeto solo de Nathanial Henniges (MrDemonWolf, Inc.). Ferramentas de IA foram usadas com cuidadosa supervisão humana para apoiar o processo criativo na arte e no código. A história, os personagens e o design do jogo são dele, e cada recurso feito com ajuda de IA é revisado, editado e creditado."
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: Credits button (218 px, 19 px) that starts the credits rolling again.
 #. i18n: speaker=ui
-#: scripts/main.gd:2058
-#: scripts/main.gd:2064
+#: scripts/main.gd:2065
+#: scripts/main.gd:2071
 msgid "RESUME SCROLL"
 msgstr "RETOMAR TEXTO"
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: Frame-rate cap list item.
 #. i18n: speaker=ui
-#: scripts/main.gd:2097
+#: scripts/main.gd:2104
 msgid "30 FPS"
 msgstr "30 FPS"
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: Frame-rate cap list item.
 #. i18n: speaker=ui
-#: scripts/main.gd:2098
+#: scripts/main.gd:2105
 msgid "60 FPS"
 msgstr "60 FPS"
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: Frame-rate cap list item: no cap.
 #. i18n: speaker=ui
-#: scripts/main.gd:2099
+#: scripts/main.gd:2106
 msgid "UNCAPPED"
 msgstr "SEM LIMITE"
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: Frame-rate cap list item.
 #. i18n: speaker=ui
-#: scripts/main.gd:2100
+#: scripts/main.gd:2107
 msgid "90 FPS"
 msgstr "90 FPS"
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: Frame-rate cap list item.
 #. i18n: speaker=ui
-#: scripts/main.gd:2101
+#: scripts/main.gd:2108
 msgid "120 FPS"
 msgstr "120 FPS"
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: Frame-rate cap list item.
 #. i18n: speaker=ui
-#: scripts/main.gd:2102
+#: scripts/main.gd:2109
 msgid "144 FPS"
 msgstr "144 FPS"
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: Pause Settings note on a phone or tablet.
 #. i18n: speaker=ui
-#: scripts/main.gd:2117
+#: scripts/main.gd:2124
 msgid "Window size is managed by iOS/Android."
 msgstr "O iOS/Android controla o tamanho da janela."
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: Pause menu button during the opening sequence (350 px, 19 px).
 #. i18n: speaker=ui
-#: scripts/main.gd:2236
+#: scripts/main.gd:2243
 msgid "SKIP OPENING"
 msgstr "PULAR ABERTURA"
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: Pause hint on touch screens.
 #. i18n: speaker=ui engineer=you
-#: scripts/main.gd:2251
+#: scripts/main.gd:2258
 msgid "TAP RESUME TO RETURN"
 msgstr "TOQUE EM RETOMAR PARA VOLTAR"
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: Pause hint: %s is the Pause key or button's name, then two spaces.
 #. i18n: speaker=ui slot=key
-#: scripts/main.gd:2251
+#: scripts/main.gd:2258
 #, c-format
 msgid "%s  RESUME"
 msgstr "%s  RETOMAR"
 
 # machine-translated by Claude (Anthropic), unreviewed
-#: scripts/main.gd:2447
+#: scripts/main.gd:2458
 msgid "No valid checkpoint save found. Current game was not changed."
 msgstr "Nenhum ponto de controle válido encontrado. A partida atual não mudou."
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: Open glossary term SERVICE JUNCTION: Junção de serviço, the room card's JUNÇÃO DE SERVIÇO; a reviewer's word.
 #. TRANSLATORS: i18n: story speaker=narrator
-#: scripts/main.gd:2504
+#: scripts/main.gd:2515
 msgid ""
 "Service junction restored. The sentry\n"
 "is down; pop the exit bolt by the door."
@@ -1406,7 +1509,7 @@ msgstr ""
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: Open glossary term SERVICE JUNCTION: Junção de serviço, the room card's JUNÇÃO DE SERVIÇO; a reviewer's word.
 #. TRANSLATORS: i18n: story speaker=narrator
-#: scripts/main.gd:2507
+#: scripts/main.gd:2518
 msgid ""
 "Service junction restored. The door is\n"
 "down. The sentry patrols past the rubble."
@@ -1416,158 +1519,158 @@ msgstr ""
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: i18n: story speaker=narrator
-#: scripts/main.gd:2513
+#: scripts/main.gd:2524
 msgid "The first copy is safe. Use the exit to follow the service line."
 msgstr "A primeira cópia está segura. Use a saída para seguir a linha de serviço."
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: i18n: story speaker=narrator
-#: scripts/main.gd:2516
+#: scripts/main.gd:2527
 msgid "Records access restored. Both traces are copied; head for the exit."
 msgstr "Acesso aos registros restabelecido. Os dois rastros estão copiados; vá até a saída."
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: i18n: story speaker=narrator
-#: scripts/main.gd:2519
+#: scripts/main.gd:2530
 msgid "Records access restored. The purge order is copied; copy the mirror index next."
 msgstr "Acesso aos registros restabelecido. A ordem de purga está copiada; agora copie o índice espelho."
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: i18n: story speaker=narrator
-#: scripts/main.gd:2522
+#: scripts/main.gd:2533
 msgid "Records access restored. Copy the purge-order trace first; WOLF is checking the mirror."
 msgstr "Acesso aos registros restabelecido. Primeiro copie o rastro da ordem de purga; WOLF está verificando o espelho."
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: i18n: story speaker=narrator
-#: scripts/main.gd:2526
+#: scripts/main.gd:2537
 msgid "Safe point restored."
 msgstr "Ponto seguro restabelecido."
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: The Director's purge display, read as a speaker; WOLF answers in the next message.
 #. i18n: story speaker=DIRECTOR
-#: scripts/main.gd:2557
+#: scripts/main.gd:2568
 msgid "Original program logs marked for deletion."
 msgstr "Registros originais do programa marcados para exclusão."
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: i18n: story speaker=WOLF
-#: scripts/main.gd:2559
+#: scripts/main.gd:2570
 msgid "They want the source record gone. We need to preserve it."
 msgstr "Querem apagar o registro de origem. Precisamos preservá-lo."
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: i18n: story speaker=narrator
-#: scripts/main.gd:2570
+#: scripts/main.gd:2581
 msgid "No station in reach. Follow the labeled breaker, relay, bypass or safe point."
 msgstr "Nenhuma estação ao alcance. Siga as placas: disjuntor, relé, bypass ou ponto seguro."
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: i18n: story speaker=narrator
-#: scripts/main.gd:2611
+#: scripts/main.gd:2622
 msgid "Power is already on. The relay is farther down the hall."
 msgstr "A energia já está ligada. O relé fica mais adiante no corredor."
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: WOLF thanks the engineer for telling him the relay's risk. Avoid a past tense that shows the engineer's gender ("you told me").
 #. i18n: story speaker=WOLF engineer=you
-#: scripts/main.gd:2624
+#: scripts/main.gd:2635
 msgid "Thank you for telling me. I'll take the relay. Arm the breaker."
 msgstr "Agradeço por me contar. Eu cuido do relé. Arme o disjuntor."
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: i18n: story speaker=WOLF
-#: scripts/main.gd:2628
+#: scripts/main.gd:2639
 msgid "No. I won't take that risk blind. Use the manual bypass."
 msgstr "Não. Não vou correr esse risco às cegas. Use o bypass manual."
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: i18n: story speaker=narrator
-#: scripts/main.gd:2641
+#: scripts/main.gd:2652
 msgid "The relay is dark. Arm the breaker first."
 msgstr "O relé está sem energia. Primeiro arme o disjuntor."
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: i18n: story speaker=narrator
-#: scripts/main.gd:2645
-#: scripts/main.gd:2688
+#: scripts/main.gd:2656
+#: scripts/main.gd:2699
 msgid "The seal is open. The safe point is just beyond it."
 msgstr "A comporta está aberta. O ponto seguro fica logo depois dela."
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: i18n: story speaker=WOLF
-#: scripts/main.gd:2651
+#: scripts/main.gd:2662
 msgid "I said no. I won't touch it blind. The bypass is right beside it."
 msgstr "Eu disse não. Não vou mexer nele às cegas. O bypass está bem ao lado."
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: i18n: story speaker=WOLF
-#: scripts/main.gd:2663
+#: scripts/main.gd:2674
 msgid "I've got the contact. Give me a moment."
 msgstr "Estou com o contato. Me dê um momento."
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: i18n: story speaker=narrator
-#: scripts/main.gd:2675
+#: scripts/main.gd:2686
 msgid "WOLF takes the surge through the live contact. The red seal opens."
 msgstr "WOLF recebe a descarga pelo contato com corrente. A comporta vermelha se abre."
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: i18n: story speaker=narrator
-#: scripts/main.gd:2691
+#: scripts/main.gd:2702
 msgid "The bypass handle won't move. The breaker has to be on first."
 msgstr "A manivela do bypass não se move. Primeiro o disjuntor precisa estar ligado."
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: i18n: story speaker=narrator
-#: scripts/main.gd:2748
+#: scripts/main.gd:2759
 msgid "The bypass locks over and the alarm cuts out. The red seal opens."
 msgstr "O bypass trava na posição e o alarme para. A comporta vermelha se abre."
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: i18n: story speaker=WOLF
-#: scripts/main.gd:2750
+#: scripts/main.gd:2761
 msgid "Open. I'm with you."
 msgstr "Aberta. Estou com você."
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: i18n: story speaker=narrator
-#: scripts/main.gd:2761
+#: scripts/main.gd:2772
 msgid "The safe point is past the sealed door."
 msgstr "O ponto seguro fica depois da porta hermética."
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: WOLF, after the engineer pressed him at the relay without warning.
 #. i18n: story speaker=WOLF
-#: scripts/main.gd:2775
+#: scripts/main.gd:2786
 msgid "I refused the live relay; I'm still here."
 msgstr "Recusei o relé com corrente; ainda estou aqui."
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: WOLF to the engineer, who told him the relay's risk. Avoid a past tense that shows the engineer's gender ("you told me").
 #. i18n: story speaker=WOLF engineer=you
-#: scripts/main.gd:2778
+#: scripts/main.gd:2789
 msgid "I took the relay because you told me the truth."
 msgstr "Eu peguei o relé porque você me contou a verdade."
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: WOLF to the engineer, who cranked the manual bypass after he offered to take the relay. Avoid a past tense that shows the engineer's gender ("you cranked").
 #. i18n: story speaker=WOLF engineer=you
-#: scripts/main.gd:2781
+#: scripts/main.gd:2792
 msgid "I offered the relay; you cranked the bypass. Still with you."
 msgstr "Eu me ofereci para o relé; você girou o bypass. Ainda estou com você."
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: i18n: story speaker=WOLF
-#: scripts/main.gd:2784
+#: scripts/main.gd:2795
 msgid "Take the purge queue. I'll inspect the mirror."
 msgstr "Fique com a fila de purga. Eu examino o espelho."
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: Hint bar (14 px, about 526 px wide on a keyboard and 488 px on touch; wraps). %s is the key or button.
 #. i18n: speaker=hint engineer=you slot=key
-#: scripts/main.gd:2793
+#: scripts/main.gd:2804
 #, c-format
 msgid "The safe point could not save. Press %s here again."
 msgstr "O ponto seguro não conseguiu salvar. Pressione %s aqui de novo."
@@ -1575,79 +1678,79 @@ msgstr "O ponto seguro não conseguiu salvar. Pressione %s aqui de novo."
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: Hint bar (14 px, about 526 px wide on a keyboard and 488 px on touch; wraps). The touch form; USE is the touch button's word (USAR).
 #. i18n: speaker=hint engineer=you
-#: scripts/main.gd:2793
+#: scripts/main.gd:2804
 msgid "The safe point could not save. Tap USE here again."
 msgstr "O ponto seguro não conseguiu salvar. Toque em USAR aqui de novo."
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: i18n: story speaker=narrator
-#: scripts/main.gd:2804
+#: scripts/main.gd:2815
 msgid "Safe point saved."
 msgstr "Jogo salvo no ponto seguro."
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: i18n: story speaker=narrator
-#: scripts/main.gd:2807
+#: scripts/main.gd:2818
 msgid "Safe point saved. WOLF remembers the same choice."
 msgstr "Jogo salvo no ponto seguro. WOLF se lembra da mesma escolha."
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: %s is the engineer's first name.
 #. i18n: story speaker=narrator engineer=name
-#: scripts/main.gd:2816
+#: scripts/main.gd:2827
 #, c-format
 msgid "The Director's purge order has a time and target ID. %s keeps a local copy; the original logs are still missing."
 msgstr "A ordem de purga do Diretor tem horário e ID de alvo. %s guarda uma cópia local; os registros originais ainda não apareceram."
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: i18n: story speaker=narrator
-#: scripts/main.gd:2819
+#: scripts/main.gd:2830
 msgid "The purge-order trace is already copied. The mirror port may confirm when the source existed."
 msgstr "O rastro da ordem de purga já foi copiado. A porta de dados espelho pode confirmar quando a origem existiu."
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: i18n: story speaker=narrator
-#: scripts/main.gd:2825
+#: scripts/main.gd:2836
 msgid "The mirror index has no context yet. Copy the purge-order trace first."
 msgstr "O índice espelho ainda não tem contexto. Primeiro copie o rastro da ordem de purga."
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: i18n: story speaker=narrator
-#: scripts/main.gd:2828
+#: scripts/main.gd:2839
 msgid "The mirror timestamp is already preserved. The exit is to the right."
 msgstr "O carimbo de data e hora do espelho já está preservado. A saída fica à direita."
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: i18n: story speaker=WOLF
-#: scripts/main.gd:2837
+#: scripts/main.gd:2848
 msgid "I found the mirror index. We can use my readout or your maintenance port."
 msgstr "Encontrei o índice espelho. Podemos usar o meu visor ou a sua porta de dados de manutenção."
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: i18n: story speaker=narrator
-#: scripts/main.gd:2866
+#: scripts/main.gd:2877
 msgid "Exit sealed until the purge order and mirror timestamp are copied."
 msgstr "Saída lacrada até copiar a ordem de purga e o carimbo de data e hora do espelho."
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: Hint bar (14 px, about 526 px wide on a keyboard and 488 px on touch; wraps).
 #. i18n: speaker=hint engineer=you
-#: scripts/main.gd:2903
-#: scripts/main.gd:5336
+#: scripts/main.gd:2914
+#: scripts/main.gd:5377
 msgid "Mirror copied. Head for the exit."
 msgstr "Você copiou o espelho. Vá até a saída."
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: Hint bar (14 px, about 526 px wide on a keyboard and 488 px on touch; wraps). The mirror port is a data port on a terminal, never a door: porta de dados espelho, on every line that names it.
 #. i18n: speaker=hint engineer=you
-#: scripts/main.gd:2905
+#: scripts/main.gd:2916
 msgid "Follow the station lights: mirror port, then exit."
 msgstr "Siga as luzes das estações: porta de dados espelho, depois a saída."
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: Hint bar (14 px, about 526 px wide on a keyboard and 488 px on touch; wraps).
 #. i18n: speaker=hint engineer=you
-#: scripts/main.gd:2906
+#: scripts/main.gd:2917
 msgid "Follow the station lights: purge queue, mirror port, then exit."
 msgstr "Siga as luzes das estações: fila de purga, porta de dados espelho, depois a saída."
 
@@ -1655,7 +1758,7 @@ msgstr "Siga as luzes das estações: fila de purga, porta de dados espelho, dep
 #. TRANSLATORS: WOLF's line in the dialogue box (after the WOLF: tag). %s is the second answer's key or button.
 #. TRANSLATORS: WOLF, still walking to the mirror. %s is the key or button for the manual port.
 #. i18n: story speaker=WOLF slot=key
-#: scripts/main.gd:3117
+#: scripts/main.gd:3133
 #, c-format
 msgid "I'm still checking the drive. Wait for me, or press %s for the manual port."
 msgstr "Ainda estou verificando a unidade. Espere por mim ou pressione %s para usar a porta de dados manual."
@@ -1663,20 +1766,20 @@ msgstr "Ainda estou verificando a unidade. Espere por mim ou pressione %s para u
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: WOLF, still walking to the mirror, touch form. USE MANUAL PORT is the answer button's text: use its translation here.
 #. i18n: story speaker=WOLF
-#: scripts/main.gd:3120
+#: scripts/main.gd:3136
 msgid "I'm still checking the drive. Wait for me, or tap USE MANUAL PORT."
 msgstr "Ainda estou verificando a unidade. Espere por mim ou toque em USAR PORTA DE DADOS MANUAL."
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: i18n: story speaker=narrator
-#: scripts/main.gd:3132
+#: scripts/main.gd:3148
 msgid "WOLF reads the timestamp off his own readout. The purge target existed before the deletion order."
 msgstr "WOLF lê o carimbo de data e hora no próprio visor. O alvo da purga existia antes da ordem de exclusão."
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: %s is the engineer's first name.
 #. i18n: story speaker=narrator engineer=name
-#: scripts/main.gd:3136
+#: scripts/main.gd:3152
 #, c-format
 msgid "%s copies the timestamp through the maintenance port. WOLF keeps watch."
 msgstr "%s copia o carimbo de data e hora pela porta de dados de manutenção. WOLF fica de vigia."
@@ -1684,31 +1787,31 @@ msgstr "%s copia o carimbo de data e hora pela porta de dados de manutenção. W
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: Hint bar (14 px, about 526 px wide on a keyboard and 488 px on touch; wraps).
 #. i18n: speaker=hint engineer=you
-#: scripts/main.gd:3152
+#: scripts/main.gd:3168
 msgid "Save failed. Use a station to try again."
 msgstr "Não foi possível salvar. Use uma estação para tentar de novo."
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: i18n: story speaker=narrator
-#: scripts/main.gd:3222
+#: scripts/main.gd:3238
 msgid "The overload breaker catches and the line starts to build. If the LINE gauge peaks, the relief vent lets go."
 msgstr "O disjuntor de sobrecarga engata e a linha começa a ganhar pressão. Se o manômetro da LINHA chegar ao máximo, o respiro de alívio cede."
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: i18n: story speaker=narrator
-#: scripts/main.gd:3237
+#: scripts/main.gd:3253
 msgid "The wheel is stiff. Three full turns charge the door."
 msgstr "O volante está duro. Três voltas completas carregam a porta."
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: i18n: story speaker=narrator
-#: scripts/main.gd:3246
+#: scripts/main.gd:3262
 msgid "Relief vent. It lets go when the gauge peaks; don't be standing on it."
 msgstr "Respiro de alívio. Ele cede quando o manômetro chega ao máximo; não fique em cima dele."
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: i18n: story speaker=narrator
-#: scripts/main.gd:3255
+#: scripts/main.gd:3271
 msgid ""
 "No station in reach. The exit bolt is\n"
 "by the door."
@@ -1718,7 +1821,7 @@ msgstr ""
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: i18n: story speaker=narrator
-#: scripts/main.gd:3258
+#: scripts/main.gd:3274
 msgid ""
 "No station in reach. The TANK RELEASE\n"
 "is past the rubble."
@@ -1728,77 +1831,77 @@ msgstr ""
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: i18n: story speaker=narrator
-#: scripts/main.gd:3261
+#: scripts/main.gd:3277
 msgid "No station in reach. The breaker is by the entrance, the valve by the door."
 msgstr "Nenhuma estação ao alcance. O disjuntor fica na entrada; a válvula, junto à porta."
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: i18n: story speaker=narrator
-#: scripts/main.gd:3433
+#: scripts/main.gd:3449
 msgid "The clamp lets go."
 msgstr "A garra se solta."
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: i18n: story speaker=narrator
-#: scripts/main.gd:3524
+#: scripts/main.gd:3540
 msgid "SERVICE LINE CLEARED."
 msgstr "LINHA DE SERVIÇO LIBERADA."
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: i18n: story speaker=WOLF
-#: scripts/main.gd:3526
+#: scripts/main.gd:3542
 msgid "It's quiet now. The line runs on toward Archive."
 msgstr "Agora está tudo quieto. A linha segue até o Arquivo."
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: i18n: story speaker=engineer engineer=self
-#: scripts/main.gd:3528
+#: scripts/main.gd:3544
 msgid "Then that's where we go."
 msgstr "Então é para lá que vamos."
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: i18n: story speaker=WOLF
-#: scripts/main.gd:3792
+#: scripts/main.gd:3808
 msgid "It passes under that tank on every patrol. How do we bring it down?"
 msgstr "A sentinela passa sob aquele tanque em cada ronda. Como a derrubamos?"
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: i18n: story speaker=narrator
-#: scripts/main.gd:3906
+#: scripts/main.gd:3922
 msgid "The winch has the tank back on the clamp. The TANK RELEASE is ready again."
 msgstr "O guincho prendeu o tanque de volta na garra. O painel SOLTAR TANQUE está pronto de novo."
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: i18n: story speaker=narrator
-#: scripts/main.gd:3938
+#: scripts/main.gd:3954
 msgid "FUSE LIT. Back away from the door, past the valve."
 msgstr "PAVIO ACESO. Afaste-se da porta, para além da válvula."
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: The valve's turns so far and the turns needed (3).
 #. i18n: story speaker=narrator
-#: scripts/main.gd:3942
+#: scripts/main.gd:3958
 #, c-format
 msgid "The valve gives. %d of %d turns."
 msgstr "A válvula cede. %d de %d voltas."
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: i18n: story speaker=narrator
-#: scripts/main.gd:3962
+#: scripts/main.gd:3978
 msgid "The relief vent lets go and the breaker trips. Reset the breaker and crank faster this time."
 msgstr "O respiro de alívio cede e o disjuntor desarma. Rearme o disjuntor e gire mais rápido desta vez."
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: Touch layout's USE button word (155 px, 23 px). Shown on the knockdown card.
 #. i18n: speaker=ui
-#: scripts/main.gd:4725
+#: scripts/main.gd:4741
 msgid "RETRY"
 msgstr "TENTAR DE NOVO"
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: Title button (186 px, 21 px): continue from the saved checkpoint. The same word, with the context 'touch button', is the touch USE button's word for going on through lines (155 px, 23 px).
 #. i18n: speaker=ui
-#: scripts/main.gd:4725
+#: scripts/main.gd:4741
 msgctxt "touch button"
 msgid "CONTINUE"
 msgstr "CONTINUAR"
@@ -1806,29 +1909,29 @@ msgstr "CONTINUAR"
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: Touch layout's USE button word (155 px, 23 px). Turn a crank or valve.
 #. i18n: speaker=ui
-#: scripts/main.gd:4725
+#: scripts/main.gd:4741
 msgid "CRANK"
 msgstr "GIRAR"
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: Touch layout's USE button word (155 px, 23 px). Drop the hanging tank.
 #. i18n: speaker=ui
-#: scripts/main.gd:4725
+#: scripts/main.gd:4741
 msgid "DROP"
 msgstr "SOLTAR"
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: The touch layout's interact button (155 px, 23 px): use the machine in front of you.
 #. i18n: speaker=ui
-#: scripts/main.gd:4725
-#: scripts/main.gd:4736
+#: scripts/main.gd:4741
+#: scripts/main.gd:4752
 msgid "USE"
 msgstr "USAR"
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: Tutorial row (17 px). %s is the keys or the touch arrows; two spaces after it.
 #. i18n: speaker=hint engineer=you slot=key
-#: scripts/main.gd:4735
+#: scripts/main.gd:4751
 #, c-format
 msgid "%s  MOVE"
 msgstr "%s  MOVER"
@@ -1836,14 +1939,14 @@ msgstr "%s  MOVER"
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: Tutorial row (17 px) on a controller. Stick and D-pad, as in the CONTROLS table.
 #. i18n: speaker=hint engineer=you
-#: scripts/main.gd:4735
+#: scripts/main.gd:4751
 msgid "STICK / D-PAD MOVE"
 msgstr "STICK / D-PAD  MOVER"
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: Tutorial row (17 px). %s is the interact key or the USE button; two spaces after it.
 #. i18n: speaker=hint engineer=you slot=key
-#: scripts/main.gd:4736
+#: scripts/main.gd:4752
 #, c-format
 msgid "%s  READ DISPLAY (optional)"
 msgstr "%s  LER TELA (opcional)"
@@ -1851,35 +1954,35 @@ msgstr "%s  LER TELA (opcional)"
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: Tutorial row (17 px).
 #. i18n: speaker=hint engineer=you
-#: scripts/main.gd:4740
+#: scripts/main.gd:4756
 msgid "Head right to the breaker."
 msgstr "Vá para a direita, até o disjuntor."
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: Tutorial row (17 px) under READ DISPLAY (optional).
 #. i18n: speaker=hint engineer=you
-#: scripts/main.gd:4745
+#: scripts/main.gd:4761
 msgid "Or head right to the breaker."
 msgstr "Ou vá para a direita, até o disjuntor."
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: The opening's top card, over WOLF OVERRIDE. A clock time and the place.
 #. i18n: speaker=ui
-#: scripts/main.gd:4753
+#: scripts/main.gd:4769
 msgid "03:17 / CONTAINMENT"
 msgstr "03:17 / CONTENÇÃO"
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: The opening's prompt on touch: the touch button's CONTINUE word and the PAUSE button.
 #. i18n: speaker=hint engineer=you
-#: scripts/main.gd:4754
+#: scripts/main.gd:4770
 msgid "TAP CONTINUE  /  PAUSE"
 msgstr "TOQUE EM CONTINUAR  /  PAUSA"
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: The opening's prompt: two keys or buttons, each followed by two spaces and its action; four spaces between.
 #. i18n: speaker=hint engineer=you slot=key
-#: scripts/main.gd:4754
+#: scripts/main.gd:4770
 #, c-format
 msgid "%s  CONTINUE    %s  PAUSE"
 msgstr "%s  CONTINUAR    %s  PAUSA"
@@ -1887,23 +1990,23 @@ msgstr "%s  CONTINUAR    %s  PAUSA"
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: Second row of the opening's first prompt: Pause offers SKIP OPENING.
 #. i18n: speaker=hint engineer=you
-#: scripts/main.gd:4757
+#: scripts/main.gd:4773
 msgid "PAUSE: skip the opening"
 msgstr "PAUSA: pule a abertura"
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: A room's name on the top card (ALL CAPS). Glossary term, open for pt-BR: JUNÇÃO DE SERVIÇO chosen here; a reviewer's word.
 #. i18n: speaker=ui
-#: scripts/main.gd:4763
-#: scripts/main.gd:4796
+#: scripts/main.gd:4779
+#: scripts/main.gd:4812
 msgid "SERVICE JUNCTION"
 msgstr "JUNÇÃO DE SERVIÇO"
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: Top card objective when the junction is done (ALL CAPS).
 #. i18n: speaker=ui
-#: scripts/main.gd:4763
-#: scripts/main.gd:5491
+#: scripts/main.gd:4779
+#: scripts/main.gd:5532
 msgid "SERVICE LINE CLEARED"
 msgstr "LINHA DE SERVIÇO LIBERADA"
 
@@ -1911,7 +2014,7 @@ msgstr "LINHA DE SERVIÇO LIBERADA"
 #. TRANSLATORS: The name card: %s is the engineer's first name in capitals, then their job. Name the department, not the person (no engenheiro/engenheira).
 #. TRANSLATORS: The engineer's name card: %s is their full name in capitals, then their job on its own row. The engineer is non-binary: use a job word with no gender (a department or field noun), never a masculine or feminine one.
 #. i18n: engineer=name,third keep-breaks
-#: scripts/main.gd:4786
+#: scripts/main.gd:4802
 #, c-format
 msgid ""
 "%s\n"
@@ -1923,49 +2026,49 @@ msgstr ""
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: Top card location (ALL CAPS): the room, then the chapter.
 #. i18n: speaker=ui
-#: scripts/main.gd:4796
+#: scripts/main.gd:4812
 msgid "RECORDS ACCESS / FIRST COPY"
 msgstr "ACESSO AOS REGISTROS / PRIMEIRA CÓPIA"
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: Top card location (ALL CAPS). LOCKDOWN as on the title's chapter line (CONFINAMENTO).
 #. i18n: speaker=ui
-#: scripts/main.gd:4796
+#: scripts/main.gd:4812
 msgid "MAINTENANCE / LOCKDOWN"
 msgstr "MANUTENÇÃO / CONFINAMENTO"
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: Hint bar (14 px, about 526 px wide on a keyboard and 488 px on touch; wraps). Shown for two seconds after a save.
 #. i18n: speaker=hint
-#: scripts/main.gd:4801
+#: scripts/main.gd:4817
 msgid "Checkpoint saved."
 msgstr "Ponto de controle salvo."
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: The knockdown card's prompt on touch: the RETRY button's word.
 #. i18n: speaker=hint engineer=you
-#: scripts/main.gd:4806
+#: scripts/main.gd:4822
 msgid "TAP RETRY"
 msgstr "TOQUE EM TENTAR DE NOVO"
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: The knockdown card's prompt: the key or button, two spaces, the action.
 #. i18n: speaker=hint engineer=you slot=key
-#: scripts/main.gd:4806
+#: scripts/main.gd:4822
 #, c-format
 msgid "%s  RETRY"
 msgstr "%s  TENTAR DE NOVO"
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: The Director's name over his lines, in capitals.
-#: scripts/main.gd:4856
+#: scripts/main.gd:4876
 msgctxt "speaker"
 msgid "DIRECTOR"
 msgstr "DIRETOR"
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: The name over the purge display's line: the Director's name, a slash and the display's name, in capitals.
-#: scripts/main.gd:4858
+#: scripts/main.gd:4878
 msgctxt "speaker"
 msgid "DIRECTOR / PURGE"
 msgstr "DIRETOR / PURGA"
@@ -1973,7 +2076,7 @@ msgstr "DIRETOR / PURGA"
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: Fills the held-key token of a hint (HOLD E): %s is the key or button.
 #. i18n: speaker=hint engineer=you slot=key
-#: scripts/main.gd:4889
+#: scripts/main.gd:4909
 #, c-format
 msgid "HOLD %s"
 msgstr "SEGURE %s"
@@ -1981,14 +2084,14 @@ msgstr "SEGURE %s"
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: Prompt on touch to go on through lines: the touch button's CONTINUE word.
 #. i18n: speaker=hint engineer=you
-#: scripts/main.gd:4898
+#: scripts/main.gd:4918
 msgid "TAP CONTINUE"
 msgstr "TOQUE EM CONTINUAR"
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: Prompt to go on through lines: the key or button, two spaces, the action.
 #. i18n: speaker=hint engineer=you slot=key
-#: scripts/main.gd:4898
+#: scripts/main.gd:4918
 #, c-format
 msgid "%s  CONTINUE"
 msgstr "%s  CONTINUAR"
@@ -1996,8 +2099,8 @@ msgstr "%s  CONTINUAR"
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: Hint bar (14 px, about 526 px wide on a keyboard and 488 px on touch; wraps). %s is the key, button or touch word the player uses (it is filled in after translation); keep it first and keep the colon.
 #. i18n: speaker=hint engineer=you slot=key
-#: scripts/main.gd:5330
 #: scripts/main.gd:5371
+#: scripts/main.gd:5412
 #, c-format
 msgid "%s: continue."
 msgstr "%s: continue."
@@ -2005,7 +2108,7 @@ msgstr "%s: continue."
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: Hint bar (14 px, about 526 px wide on a keyboard and 488 px on touch; wraps). %s is the key, button or touch word the player uses (it is filled in after translation); keep it first and keep the colon. Archive is the next area's name.
 #. i18n: speaker=hint engineer=you slot=key
-#: scripts/main.gd:5330
+#: scripts/main.gd:5371
 #, c-format
 msgid "%s: follow the service line toward Archive."
 msgstr "%s: siga a linha de serviço até o Arquivo."
@@ -2013,14 +2116,14 @@ msgstr "%s: siga a linha de serviço até o Arquivo."
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: Hint bar (14 px, about 526 px wide on a keyboard and 488 px on touch; wraps).
 #. i18n: speaker=hint engineer=you
-#: scripts/main.gd:5331
+#: scripts/main.gd:5372
 msgid "The exit is open. Head right to follow the service line."
 msgstr "A saída abriu. Vá para a direita e siga a linha de serviço."
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: Hint bar (14 px, about 526 px wide on a keyboard and 488 px on touch; wraps). %s is the key, button or touch word the player uses (it is filled in after translation); keep it first and keep the colon.
 #. i18n: speaker=hint engineer=you slot=key
-#: scripts/main.gd:5333
+#: scripts/main.gd:5374
 #, c-format
 msgid "%s: copy the purge-order trace."
 msgstr "%s: copie o rastro da ordem de purga."
@@ -2028,14 +2131,14 @@ msgstr "%s: copie o rastro da ordem de purga."
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: Hint bar (14 px, about 526 px wide on a keyboard and 488 px on touch; wraps).
 #. i18n: speaker=hint engineer=you
-#: scripts/main.gd:5333
+#: scripts/main.gd:5374
 msgid "Purge order copied. Find the mirror port."
 msgstr "Você copiou a ordem de purga. Encontre a porta de dados espelho."
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: Hint bar (14 px, about 526 px wide on a keyboard and 488 px on touch; wraps). %s is the key, button or touch word the player uses (it is filled in after translation); keep it first and keep the colon.
 #. i18n: speaker=hint engineer=you slot=key
-#: scripts/main.gd:5337
+#: scripts/main.gd:5378
 #, c-format
 msgid "%s: examine the mirror port."
 msgstr "%s: examine a porta de dados espelho."
@@ -2043,14 +2146,14 @@ msgstr "%s: examine a porta de dados espelho."
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: Hint bar (14 px, about 526 px wide on a keyboard and 488 px on touch; wraps).
 #. i18n: speaker=hint engineer=you
-#: scripts/main.gd:5337
+#: scripts/main.gd:5378
 msgid "Copy the purge order first."
 msgstr "Primeiro copie a ordem de purga."
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: Hint bar (14 px, about 526 px wide on a keyboard and 488 px on touch; wraps). %s is the key, button or touch word the player uses (it is filled in after translation); keep it first and keep the colon.
 #. i18n: speaker=hint engineer=you slot=key
-#: scripts/main.gd:5340
+#: scripts/main.gd:5381
 #, c-format
 msgid "%s: secure the first copy in the container."
 msgstr "%s: guarde a primeira cópia no contêiner."
@@ -2058,14 +2161,14 @@ msgstr "%s: guarde a primeira cópia no contêiner."
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: Hint bar (14 px, about 526 px wide on a keyboard and 488 px on touch; wraps).
 #. i18n: speaker=hint engineer=you
-#: scripts/main.gd:5340
+#: scripts/main.gd:5381
 msgid "Preserve both traces before leaving."
 msgstr "Preserve os dois rastros antes de sair."
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: Hint bar (14 px, about 526 px wide on a keyboard and 488 px on touch; wraps). %s is the key, button or touch word the player uses (it is filled in after translation); keep it first and keep the colon. The Director is he.
 #. i18n: speaker=hint engineer=you slot=key
-#: scripts/main.gd:5343
+#: scripts/main.gd:5384
 #, c-format
 msgid "%s: enter records access. The Director's purge is still running."
 msgstr "%s: entre no acesso aos registros. A purga do Diretor continua."
@@ -2073,8 +2176,8 @@ msgstr "%s: entre no acesso aos registros. A purga do Diretor continua."
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: Hint bar (14 px, about 526 px wide on a keyboard and 488 px on touch; wraps). %s is the key, button or touch word the player uses (it is filled in after translation); keep it first and keep the colon.
 #. i18n: speaker=hint engineer=you slot=key
-#: scripts/main.gd:5343
-#: scripts/main.gd:5351
+#: scripts/main.gd:5384
+#: scripts/main.gd:5392
 #, c-format
 msgid "%s: read the Director's purge display."
 msgstr "%s: leia a tela de purga do Diretor."
@@ -2082,21 +2185,21 @@ msgstr "%s: leia a tela de purga do Diretor."
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: Hint bar (14 px, about 526 px wide on a keyboard and 488 px on touch; wraps).
 #. i18n: speaker=hint engineer=you
-#: scripts/main.gd:5343
+#: scripts/main.gd:5384
 msgid "Return to the safe point to enter records access."
 msgstr "Volte ao ponto seguro para entrar no acesso aos registros."
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: Hint bar (14 px, about 526 px wide on a keyboard and 488 px on touch; wraps). The seal is the sealed door (OPEN THE SEAL): a comporta, here and in the objective; never selo, which is a stamp.
 #. i18n: speaker=hint
-#: scripts/main.gd:5346
+#: scripts/main.gd:5387
 msgid "The seal is opening."
 msgstr "A comporta está se abrindo."
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: Hint bar (14 px, about 526 px wide on a keyboard and 488 px on touch; wraps). %s is the key, button or touch word the player uses (it is filled in after translation); keep it first and keep the colon.
 #. i18n: speaker=hint engineer=you slot=key
-#: scripts/main.gd:5348
+#: scripts/main.gd:5389
 #, c-format
 msgid "%s: save at the safe point."
 msgstr "%s: salve no ponto seguro."
@@ -2104,28 +2207,28 @@ msgstr "%s: salve no ponto seguro."
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: Hint bar (14 px, about 526 px wide on a keyboard and 488 px on touch; wraps).
 #. i18n: speaker=hint engineer=you
-#: scripts/main.gd:5349
+#: scripts/main.gd:5390
 msgid "The seal is open. Move to the safe point."
 msgstr "A comporta abriu. Vá até o ponto seguro."
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: Hint bar (14 px, about 526 px wide on a keyboard and 488 px on touch; wraps). WOLF is he.
 #. i18n: speaker=hint
-#: scripts/main.gd:5353
+#: scripts/main.gd:5394
 msgid "WOLF is moving to the contact."
 msgstr "WOLF está indo até o contato."
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: Hint bar (14 px, about 526 px wide on a keyboard and 488 px on touch; wraps).
 #. i18n: speaker=hint engineer=you
-#: scripts/main.gd:5356
+#: scripts/main.gd:5397
 msgid "The bypass is dead. Arm the breaker first."
 msgstr "O bypass está sem energia. Primeiro arme o disjuntor."
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: Hint bar (14 px, about 526 px wide on a keyboard and 488 px on touch; wraps). %s is the key, button or touch word the player uses (it is filled in after translation); keep it first and keep the colon. %d of %d: turns so far and turns needed.
 #. i18n: speaker=hint engineer=you slot=key
-#: scripts/main.gd:5358
+#: scripts/main.gd:5399
 #, c-format
 msgid "%s: crank the manual bypass, %d of %d."
 msgstr "%s: gire o bypass manual, %d de %d."
@@ -2134,7 +2237,7 @@ msgstr "%s: gire o bypass manual, %d de %d."
 #. TRANSLATORS: Hint bar (14 px, about 526 px wide on a keyboard and 488 px on touch; wraps). %s is the key, button or touch word the player uses (it is filled in after translation); keep it first and keep the colon. 'Yourself' without an agreeing word (por conta própria, not você mesmo/mesma).
 #. TRANSLATORS: %s is the key or button to hold. "Yourself" must not show the engineer's gender (no сам/сама, sam/sama): rephrase.
 #. i18n: speaker=hint engineer=you slot=key
-#: scripts/main.gd:5363
+#: scripts/main.gd:5404
 #, c-format
 msgid "%s: crank it yourself, or let WOLF take the relay."
 msgstr "%s: gire por conta própria ou deixe WOLF cuidar do relé."
@@ -2142,7 +2245,7 @@ msgstr "%s: gire por conta própria ou deixe WOLF cuidar do relé."
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: Hint bar (14 px, about 526 px wide on a keyboard and 488 px on touch; wraps). %s is the key, button or touch word the player uses (it is filled in after translation); keep it first and keep the colon. %d of %d: turns so far and turns needed.
 #. i18n: speaker=hint engineer=you slot=key
-#: scripts/main.gd:5364
+#: scripts/main.gd:5405
 #, c-format
 msgid "%s: crank on, %d of %d, or let WOLF take the relay."
 msgstr "%s: continue girando, %d de %d, ou deixe WOLF cuidar do relé."
@@ -2150,21 +2253,21 @@ msgstr "%s: continue girando, %d de %d, ou deixe WOLF cuidar do relé."
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: Hint bar (14 px, about 526 px wide on a keyboard and 488 px on touch; wraps). MANUAL BYPASS is a station plate: BYPASS MANUAL (the plate is not in the template yet).
 #. i18n: speaker=hint engineer=you
-#: scripts/main.gd:5367
+#: scripts/main.gd:5408
 msgid "The breaker is live. Go to the MANUAL BYPASS by the relay."
 msgstr "O disjuntor tem energia. Vá ao BYPASS MANUAL junto ao relé."
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: Hint bar (14 px, about 526 px wide on a keyboard and 488 px on touch; wraps).
 #. i18n: speaker=hint engineer=you
-#: scripts/main.gd:5367
+#: scripts/main.gd:5408
 msgid "The breaker is live. Go to the coolant relay."
 msgstr "O disjuntor tem energia. Vá ao relé de arrefecimento."
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: Hint bar (14 px, about 526 px wide on a keyboard and 488 px on touch; wraps). %s is the key, button or touch word the player uses (it is filled in after translation); keep it first and keep the colon.
 #. i18n: speaker=hint engineer=you slot=key
-#: scripts/main.gd:5372
+#: scripts/main.gd:5413
 #, c-format
 msgid "%s: talk to WOLF about the relay."
 msgstr "%s: fale com WOLF sobre o relé."
@@ -2172,7 +2275,7 @@ msgstr "%s: fale com WOLF sobre o relé."
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: Hint bar (14 px, about 526 px wide on a keyboard and 488 px on touch; wraps). %s is the key, button or touch word the player uses (it is filled in after translation); keep it first and keep the colon.
 #. i18n: speaker=hint engineer=you slot=key
-#: scripts/main.gd:5372
+#: scripts/main.gd:5413
 #, c-format
 msgid "%s: arm the breaker."
 msgstr "%s: arme o disjuntor."
@@ -2180,21 +2283,21 @@ msgstr "%s: arme o disjuntor."
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: Hint bar (14 px, about 526 px wide on a keyboard and 488 px on touch; wraps).
 #. i18n: speaker=hint engineer=you
-#: scripts/main.gd:5375
+#: scripts/main.gd:5416
 msgid "The relay is dark. Return to the breaker first."
 msgstr "O relé está sem energia. Primeiro volte ao disjuntor."
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: Hint bar (14 px, about 526 px wide on a keyboard and 488 px on touch; wraps). MANUAL BYPASS is a station plate: BYPASS MANUAL (the plate is not in the template yet). WOLF is he.
 #. i18n: speaker=hint engineer=you
-#: scripts/main.gd:5376
+#: scripts/main.gd:5417
 msgid "WOLF refused the live contact. Use the MANUAL BYPASS beside it."
 msgstr "WOLF recusou o contato com corrente. Use o BYPASS MANUAL ao lado."
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: Hint bar (14 px, about 526 px wide on a keyboard and 488 px on touch; wraps). %s is the key, button or touch word the player uses (it is filled in after translation); keep it first and keep the colon.
 #. i18n: speaker=hint engineer=you slot=key
-#: scripts/main.gd:5376
+#: scripts/main.gd:5417
 #, c-format
 msgid "%s: signal WOLF to take the contact."
 msgstr "%s: faça sinal para WOLF pegar o contato."
@@ -2202,49 +2305,49 @@ msgstr "%s: faça sinal para WOLF pegar o contato."
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: Hint bar (14 px, about 526 px wide on a keyboard and 488 px on touch; wraps). MANUAL BYPASS is a station plate: BYPASS MANUAL (the plate is not in the template yet).
 #. i18n: speaker=hint engineer=you
-#: scripts/main.gd:5378
+#: scripts/main.gd:5419
 msgid "Go to the MANUAL BYPASS beside the relay."
 msgstr "Vá ao BYPASS MANUAL ao lado do relé."
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: Hint bar (14 px, about 526 px wide on a keyboard and 488 px on touch; wraps). WOLF is he.
 #. i18n: speaker=hint engineer=you
-#: scripts/main.gd:5378
+#: scripts/main.gd:5419
 msgid "Go to the coolant relay. WOLF is ready for the contact."
 msgstr "Vá ao relé de arrefecimento. WOLF já pode pegar o contato."
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: Hint bar (14 px, about 526 px wide on a keyboard and 488 px on touch; wraps).
 #. i18n: speaker=hint engineer=you
-#: scripts/main.gd:5380
+#: scripts/main.gd:5421
 msgid "Return to the breaker and arm power."
 msgstr "Volte ao disjuntor e ligue a energia."
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: Hint bar (14 px, about 526 px wide on a keyboard and 488 px on touch; wraps).
 #. i18n: speaker=hint engineer=you
-#: scripts/main.gd:5381
+#: scripts/main.gd:5422
 msgid "Find the breaker. WOLF will follow your lead."
 msgstr "Encontre o disjuntor. WOLF vai seguir você."
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: Hint bar (14 px, about 526 px wide on a keyboard and 488 px on touch; wraps). The relief vent under a floor grate.
 #. i18n: speaker=hint engineer=you
-#: scripts/main.gd:5404
+#: scripts/main.gd:5445
 msgid "The vent is about to blow. Get off the grate now."
 msgstr "O respiro vai estourar. Saia da grade agora."
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: Hint bar (14 px, about 526 px wide on a keyboard and 488 px on touch; wraps).
 #. i18n: speaker=hint engineer=you
-#: scripts/main.gd:5404
+#: scripts/main.gd:5445
 msgid "Relief vent. Get off the grate before the gauge peaks."
 msgstr "Respiro de alívio. Saia da grade antes que o manômetro chegue ao máximo."
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: Hint bar (14 px, about 526 px wide on a keyboard and 488 px on touch; wraps). %s is the key, button or touch word the player uses (it is filled in after translation); keep it first and keep the colon.
 #. i18n: speaker=hint engineer=you slot=key
-#: scripts/main.gd:5408
+#: scripts/main.gd:5449
 #, c-format
 msgid "%s: arm the overload breaker."
 msgstr "%s: arme o disjuntor de sobrecarga."
@@ -2252,7 +2355,7 @@ msgstr "%s: arme o disjuntor de sobrecarga."
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: Hint bar (14 px, about 526 px wide on a keyboard and 488 px on touch; wraps). %s is the key, button or touch word the player uses (it is filled in after translation); keep it first and keep the colon.
 #. i18n: speaker=hint engineer=you slot=key
-#: scripts/main.gd:5410
+#: scripts/main.gd:5451
 #, c-format
 msgid "%s: reset the breaker. The vent let go."
 msgstr "%s: rearme o disjuntor. O respiro cedeu."
@@ -2260,14 +2363,14 @@ msgstr "%s: rearme o disjuntor. O respiro cedeu."
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: Hint bar (14 px, about 526 px wide on a keyboard and 488 px on touch; wraps). The line is the pressure line.
 #. i18n: speaker=hint engineer=you
-#: scripts/main.gd:5412
+#: scripts/main.gd:5453
 msgid "The line is live. Get to the valve by the door."
 msgstr "A linha está ativa. Vá até a válvula junto à porta."
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: Hint bar (14 px, about 526 px wide on a keyboard and 488 px on touch; wraps). %s is the key, button or touch word the player uses (it is filled in after translation); keep it first and keep the colon. %d of %d: turns so far and turns needed.
 #. i18n: speaker=hint engineer=you slot=key
-#: scripts/main.gd:5414
+#: scripts/main.gd:5455
 #, c-format
 msgid "%s: crank the valve, %d of %d turns."
 msgstr "%s: gire a válvula, %d de %d voltas."
@@ -2275,7 +2378,7 @@ msgstr "%s: gire a válvula, %d de %d voltas."
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: Hint bar (14 px, about 526 px wide on a keyboard and 488 px on touch; wraps).
 #. TRANSLATORS: i18n: story speaker=narrator
-#: scripts/main.gd:5416
+#: scripts/main.gd:5457
 #: scripts/story_text.gd:136
 msgid "Fuse lit. Get clear of the door."
 msgstr "Pavio aceso. Afaste-se da porta."
@@ -2283,56 +2386,56 @@ msgstr "Pavio aceso. Afaste-se da porta."
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: Hint bar (14 px, about 526 px wide on a keyboard and 488 px on touch; wraps).
 #. i18n: speaker=hint engineer=you
-#: scripts/main.gd:5418
+#: scripts/main.gd:5459
 msgid "The valve is dead. Arm the breaker by the entrance."
 msgstr "A válvula está sem energia. Arme o disjuntor junto à entrada."
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: Hint bar (14 px, about 526 px wide on a keyboard and 488 px on touch; wraps).
 #. i18n: speaker=hint
-#: scripts/main.gd:5420
+#: scripts/main.gd:5461
 msgid "Relief vent. It lets go when the gauge peaks."
 msgstr "Respiro de alívio. Ele cede quando o manômetro chega ao máximo."
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: Hint bar (14 px, about 526 px wide on a keyboard and 488 px on touch; wraps). The line is building pressure.
 #. i18n: speaker=hint engineer=you
-#: scripts/main.gd:5423
+#: scripts/main.gd:5464
 msgid "The line is building. Crank the valve by the door."
 msgstr "A linha está ganhando pressão. Gire a válvula junto à porta."
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: Hint bar (14 px, about 526 px wide on a keyboard and 488 px on touch; wraps).
 #. i18n: speaker=hint engineer=you
-#: scripts/main.gd:5425
+#: scripts/main.gd:5466
 msgid "The breaker tripped. Reset it by the entrance."
 msgstr "O disjuntor junto à entrada desarmou. Rearme-o."
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: Hint bar (14 px, about 526 px wide on a keyboard and 488 px on touch; wraps).
 #. i18n: speaker=hint engineer=you
-#: scripts/main.gd:5427
+#: scripts/main.gd:5468
 msgid "Arm the breaker by the entrance, then crank the valve by the door."
 msgstr "Arme o disjuntor junto à entrada e depois gire a válvula junto à porta."
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: Hint bar (14 px, about 526 px wide on a keyboard and 488 px on touch; wraps).
 #. i18n: speaker=hint engineer=you
-#: scripts/main.gd:5427
+#: scripts/main.gd:5468
 msgid "Get through the sealed door."
 msgstr "Passe pela porta hermética."
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: Hint bar (14 px, about 526 px wide on a keyboard and 488 px on touch; wraps).
 #. i18n: speaker=hint
-#: scripts/main.gd:5448
+#: scripts/main.gd:5489
 msgid "The door is open."
 msgstr "A porta está aberta."
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: Hint bar (14 px, about 526 px wide on a keyboard and 488 px on touch; wraps). %s is the key, button or touch word the player uses (it is filled in after translation); keep it first and keep the colon. Release the bolt that locks the exit door.
 #. i18n: speaker=hint engineer=you slot=key
-#: scripts/main.gd:5453
+#: scripts/main.gd:5494
 #, c-format
 msgid "%s: pop the exit bolt."
 msgstr "%s: solte o ferrolho da saída."
@@ -2340,7 +2443,7 @@ msgstr "%s: solte o ferrolho da saída."
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: Hint bar (14 px, about 526 px wide on a keyboard and 488 px on touch; wraps).
 #. TRANSLATORS: i18n: story speaker=narrator
-#: scripts/main.gd:5455
+#: scripts/main.gd:5496
 #: scripts/story_text.gd:199
 msgid "The bolt is taking the charge."
 msgstr "O ferrolho está recebendo a carga."
@@ -2348,15 +2451,15 @@ msgstr "O ferrolho está recebendo a carga."
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: Hint bar (14 px, about 526 px wide on a keyboard and 488 px on touch; wraps).
 #. i18n: speaker=hint
-#: scripts/main.gd:5457
-#: scripts/main.gd:5461
+#: scripts/main.gd:5498
+#: scripts/main.gd:5502
 msgid "The door is opening."
 msgstr "A porta está abrindo."
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: Hint bar (14 px, about 526 px wide on a keyboard and 488 px on touch; wraps). %s is the key, button or touch word the player uses (it is filled in after translation); keep it first and keep the colon.
 #. i18n: speaker=hint engineer=you slot=key
-#: scripts/main.gd:5459
+#: scripts/main.gd:5500
 #, c-format
 msgid "%s: leave through the door."
 msgstr "%s: saia pela porta."
@@ -2364,43 +2467,43 @@ msgstr "%s: saia pela porta."
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: Hint bar (14 px, about 526 px wide on a keyboard and 488 px on touch; wraps).
 #. i18n: speaker=hint engineer=you
-#: scripts/main.gd:5459
-#: scripts/main.gd:5462
+#: scripts/main.gd:5500
+#: scripts/main.gd:5503
 msgid "The door is open. Leave through it."
 msgstr "A porta abriu. Saia por ela."
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: Hint bar (14 px, about 526 px wide on a keyboard and 488 px on touch; wraps). The sentry is a robot (it).
 #. i18n: speaker=hint engineer=you
-#: scripts/main.gd:5462
+#: scripts/main.gd:5503
 msgid "The sentry is down. Pop the exit bolt by the door."
 msgstr "A sentinela caiu. Solte o ferrolho da saída junto à porta."
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: Hint bar (14 px, about 526 px wide on a keyboard and 488 px on touch; wraps).
 #. i18n: speaker=hint engineer=you
-#: scripts/main.gd:5464
+#: scripts/main.gd:5505
 msgid "Coolant cloud. Get out of it."
 msgstr "Nuvem de líquido de arrefecimento. Saia dela."
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: Hint bar (14 px, about 526 px wide on a keyboard and 488 px on touch; wraps). It: the sentry.
 #. i18n: speaker=hint engineer=you
-#: scripts/main.gd:5466
+#: scripts/main.gd:5507
 msgid "It's after you. Get back over the rubble."
 msgstr "A sentinela está atrás de você. Volte para o outro lado dos escombros."
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: Hint bar (14 px, about 526 px wide on a keyboard and 488 px on touch; wraps). It: the sentry; the mark is the painted spot under the tank.
 #. i18n: speaker=hint engineer=you
-#: scripts/main.gd:5471
+#: scripts/main.gd:5512
 msgid "Wait for WOLF to park it on the mark."
 msgstr "Espere WOLF levar a sentinela até a marca."
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: Hint bar (14 px, about 526 px wide on a keyboard and 488 px on touch; wraps). %s is the key, button or touch word the player uses (it is filled in after translation); keep it first and keep the colon. It: the sentry.
 #. i18n: speaker=hint engineer=you slot=key
-#: scripts/main.gd:5471
+#: scripts/main.gd:5512
 #, c-format
 msgid "%s: drop the tank. It's parked on the mark."
 msgstr "%s: solte o tanque. A sentinela está na marca."
@@ -2408,7 +2511,7 @@ msgstr "%s: solte o tanque. A sentinela está na marca."
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: Hint bar (14 px, about 526 px wide on a keyboard and 488 px on touch; wraps). %s is the key, button or touch word the player uses (it is filled in after translation); keep it first and keep the colon.
 #. i18n: speaker=hint engineer=you slot=key
-#: scripts/main.gd:5472
+#: scripts/main.gd:5513
 #, c-format
 msgid "%s: drop the tank. Land it with the sentry on the mark."
 msgstr "%s: solte o tanque. Faça-o cair com a sentinela na marca."
@@ -2416,150 +2519,187 @@ msgstr "%s: solte o tanque. Faça-o cair com a sentinela na marca."
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: Hint bar (14 px, about 526 px wide on a keyboard and 488 px on touch; wraps).
 #. i18n: speaker=hint
-#: scripts/main.gd:5474
+#: scripts/main.gd:5515
 msgid "The tank is falling."
 msgstr "O tanque está caindo."
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: Hint bar (14 px, about 526 px wide on a keyboard and 488 px on touch; wraps).
 #. i18n: speaker=hint engineer=you
-#: scripts/main.gd:5476
+#: scripts/main.gd:5517
 msgid "The winch is hauling the tank back up. Wait for the clamp."
 msgstr "O guincho está içando o tanque de volta. Espere a garra prendê-lo."
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: Hint bar (14 px, about 526 px wide on a keyboard and 488 px on touch; wraps). It: the sentry.
 #. i18n: speaker=hint engineer=you
-#: scripts/main.gd:5478
+#: scripts/main.gd:5519
 msgid "Stay back over the rubble until it gives up."
 msgstr "Fique do outro lado dos escombros até ela desistir."
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: Hint bar (14 px, about 526 px wide on a keyboard and 488 px on touch; wraps). TANK RELEASE is a station plate: glossary SOLTAR TANQUE (the plate itself is not in the template yet, so it still reads English on screen).
 #. i18n: speaker=hint engineer=you
-#: scripts/main.gd:5480
+#: scripts/main.gd:5521
 msgid "You're in its sights. Hide at the TANK RELEASE or the rubble."
 msgstr "Você está na mira dela. Esconda-se no painel SOLTAR TANQUE ou atrás dos escombros."
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: Hint bar (14 px, about 526 px wide on a keyboard and 488 px on touch; wraps). TANK RELEASE is a station plate: glossary SOLTAR TANQUE (the plate itself is not in the template yet, so it still reads English on screen).
 #. i18n: speaker=hint engineer=you
-#: scripts/main.gd:5482
+#: scripts/main.gd:5523
 msgid "WOLF is drawing the sentry onto the mark. Get to the TANK RELEASE."
 msgstr "WOLF está atraindo a sentinela para a marca. Vá ao painel SOLTAR TANQUE."
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: Hint bar (14 px, about 526 px wide on a keyboard and 488 px on touch; wraps). TANK RELEASE is a station plate: glossary SOLTAR TANQUE (the plate itself is not in the template yet, so it still reads English on screen). Its patrol: the sentry's.
 #. i18n: speaker=hint engineer=you
-#: scripts/main.gd:5484
+#: scripts/main.gd:5525
 msgid "WOLF has broken off. Time the drop on its patrol from the TANK RELEASE."
 msgstr "WOLF recuou. No painel SOLTAR TANQUE, acerte a queda com a ronda da sentinela."
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: Hint bar (14 px, about 526 px wide on a keyboard and 488 px on touch; wraps). TANK RELEASE is a station plate: glossary SOLTAR TANQUE (the plate itself is not in the template yet, so it still reads English on screen).
 #. i18n: speaker=hint engineer=you
-#: scripts/main.gd:5485
+#: scripts/main.gd:5526
 msgid "The sentry patrols past the rubble. The TANK RELEASE hides you from it."
 msgstr "A sentinela patrulha além dos escombros. O painel SOLTAR TANQUE esconde você dela."
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: Top card objective (ALL CAPS, about 420 px wide, wraps). Infinitive, as the other objectives.
 #. i18n: speaker=ui
-#: scripts/main.gd:5493
+#: scripts/main.gd:5534
 msgid "POP THE EXIT BOLT"
 msgstr "SOLTAR O FERROLHO DA SAÍDA"
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: Top card objective (ALL CAPS, about 420 px wide, wraps). Infinitive, as the other objectives.
 #. i18n: speaker=ui
-#: scripts/main.gd:5496
+#: scripts/main.gd:5537
 msgid "DROP THE TANK"
 msgstr "SOLTAR O TANQUE"
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: Top card objective (ALL CAPS, about 420 px wide, wraps). Infinitive, as the other objectives.
 #. i18n: speaker=ui
-#: scripts/main.gd:5496
+#: scripts/main.gd:5537
 msgid "GO THROUGH THE DOOR"
 msgstr "PASSAR PELA PORTA"
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: Top card objective (ALL CAPS, about 420 px wide, wraps). Infinitive, as the other objectives.
 #. i18n: speaker=ui
-#: scripts/main.gd:5499
+#: scripts/main.gd:5540
 msgid "CRANK THE VALVE"
 msgstr "GIRAR A VÁLVULA"
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: Top card objective (ALL CAPS, about 420 px wide, wraps). Infinitive, as the other objectives.
 #. i18n: speaker=ui
-#: scripts/main.gd:5501
+#: scripts/main.gd:5542
 msgid "GET CLEAR OF THE DOOR"
 msgstr "AFASTAR-SE DA PORTA"
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: Top card objective (ALL CAPS, about 420 px wide, wraps). Infinitive, as the other objectives.
 #. i18n: speaker=ui
-#: scripts/main.gd:5502
-#: scripts/main.gd:5518
+#: scripts/main.gd:5543
+#: scripts/main.gd:5559
 msgid "ARM THE BREAKER"
 msgstr "ARMAR O DISJUNTOR"
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: Top card objective (ALL CAPS, about 420 px wide, wraps). Infinitive, as the other objectives. Done state.
 #. i18n: speaker=ui
-#: scripts/main.gd:5505
+#: scripts/main.gd:5546
 msgid "FIRST COPY SECURED"
 msgstr "PRIMEIRA CÓPIA GUARDADA"
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: Top card objective (ALL CAPS, about 420 px wide, wraps). Infinitive, as the other objectives.
 #. i18n: speaker=ui
-#: scripts/main.gd:5507
+#: scripts/main.gd:5548
 msgid "COPY PURGE ORDER"
 msgstr "COPIAR A ORDEM DE PURGA"
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: Top card objective (ALL CAPS, about 420 px wide, wraps). Infinitive, as the other objectives.
 #. i18n: speaker=ui
-#: scripts/main.gd:5509
+#: scripts/main.gd:5550
 msgid "COPY MIRROR INDEX"
 msgstr "COPIAR O ÍNDICE ESPELHO"
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: Top card objective (ALL CAPS, about 420 px wide, wraps). Infinitive, as the other objectives.
 #. i18n: speaker=ui
-#: scripts/main.gd:5510
+#: scripts/main.gd:5551
 msgid "REACH EXIT"
 msgstr "CHEGAR À SAÍDA"
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: Top card objective (ALL CAPS, about 420 px wide, wraps). Infinitive, as the other objectives. Done state; SAFE POINT is the plate's words.
 #. i18n: speaker=ui
-#: scripts/main.gd:5512
+#: scripts/main.gd:5553
 msgid "SAFE POINT REACHED"
 msgstr "NO PONTO SEGURO"
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: Top card objective (ALL CAPS, about 420 px wide, wraps). Infinitive, as the other objectives.
 #. i18n: speaker=ui
-#: scripts/main.gd:5514
+#: scripts/main.gd:5555
 msgid "REACH SAFE POINT"
 msgstr "CHEGAR AO PONTO SEGURO"
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: Top card objective (ALL CAPS, about 420 px wide, wraps). Infinitive, as the other objectives. The seal is the sealed door.
 #. i18n: speaker=ui
-#: scripts/main.gd:5516
+#: scripts/main.gd:5557
 msgid "OPEN THE SEAL"
 msgstr "ABRIR A COMPORTA"
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: Top card objective (ALL CAPS, about 420 px wide, wraps). Infinitive, as the other objectives.
 #. i18n: speaker=ui
-#: scripts/main.gd:5519
+#: scripts/main.gd:5560
 msgid "CHECK THE BREAKER"
 msgstr "VERIFICAR O DISJUNTOR"
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: Station plate (12-13 px label on a machine). ALL CAPS, as short as possible. The Records Access machine holding the queued purge order the engineer copies.
+#. i18n: speaker=ui
+#: scripts/records_room.gd:268
+#: scripts/records_room.gd:362
+msgid "PURGE QUEUE"
+msgstr "FILA DE PURGA"
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: Station plate (12-13 px label on a machine). ALL CAPS, as short as possible. The Records Access data port that holds the mirror index the engineer copies.
+#. i18n: speaker=ui
+#: scripts/records_room.gd:269
+#: scripts/records_room.gd:364
+msgid "MIRROR PORT"
+msgstr "PORTA DE DADOS ESPELHO"
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: Station plate (12-13 px label on a machine). ALL CAPS, as short as possible. The name over Records Access's exit door, beside a green exit sign.
+#. i18n: speaker=ui
+#: scripts/records_room.gd:272
+msgid "EXIT"
+msgstr "SAÍDA"
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: Station plate (12-13 px label on a machine). ALL CAPS, as short as possible. The PURGE QUEUE's plate once the purge order is copied.
+#. i18n: speaker=ui
+#: scripts/records_room.gd:362
+msgid "PURGE COPIED"
+msgstr "PURGA COPIADA"
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: Station plate (12-13 px label on a machine). ALL CAPS, as short as possible. The MIRROR PORT's plate once the mirror index is copied.
+#. i18n: speaker=ui
+#: scripts/records_room.gd:364
+msgid "MIRROR COPIED"
+msgstr "ESPELHO COPIADO"
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: The Director, the opening's first line.

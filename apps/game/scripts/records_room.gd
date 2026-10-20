@@ -263,11 +263,13 @@ func _ready() -> void:
 	entry_door_shape = SwingLeaf.make_body(self, "EntryDoor", ENTRY_DOOR_X, -1.0)
 	purge_glow = _add_glow("PurgeGlow", RoomDepth.prop_rect(purge_art, PURGE_LIGHT).get_center())
 	mirror_glow = _add_glow("MirrorGlow", RoomDepth.prop_rect(mirror_art, MIRROR_LIGHT).get_center())
-	purge_label = _add_station_label("PURGE QUEUE", PURGE_X, Palette.LABEL_ALERT, STATION_LABEL_Y)
-	mirror_label = _add_station_label("MIRROR PORT", MIRROR_X, MIRROR_TEXT, STATION_LABEL_Y)
+	# The plates keep their English text and translate as drawn (Label auto-translation); I18n.KEY.tr()
+	# only marks each name for the template (localization PR L13: decision D3 translates the plates).
+	purge_label = _add_station_label(I18n.KEY.tr("PURGE QUEUE"), PURGE_X, Palette.LABEL_ALERT, STATION_LABEL_Y)
+	mirror_label = _add_station_label(I18n.KEY.tr("MIRROR PORT"), MIRROR_X, MIRROR_TEXT, STATION_LABEL_Y)
 	# The exit's name sits on the cross-wall over its door, left of the near column (which draws over
 	# the actors and would cut it; captions stay under the actors).
-	_add_station_label("EXIT", EXIT_LABEL_X, Palette.EXIT_GREEN, EXIT_LABEL_Y)
+	_add_station_label(I18n.KEY.tr("EXIT"), EXIT_LABEL_X, Palette.EXIT_GREEN, EXIT_LABEL_Y)
 	refresh_state()
 
 
@@ -357,9 +359,9 @@ func set_active(active: bool) -> void:
 ## the first copy is secured, then open on its floor stop; the entry shut). A door already swinging
 ## finishes its swing.
 func refresh_state() -> void:
-	purge_label.text = "PURGE COPIED" if purge_trace_preserved else "PURGE QUEUE"
+	purge_label.text = I18n.KEY.tr("PURGE COPIED") if purge_trace_preserved else I18n.KEY.tr("PURGE QUEUE")
 	purge_label.add_theme_color_override("font_color", Palette.GREEN if purge_trace_preserved else Palette.LABEL_ALERT)
-	mirror_label.text = "MIRROR COPIED" if mirror_trace_preserved else "MIRROR PORT"
+	mirror_label.text = I18n.KEY.tr("MIRROR COPIED") if mirror_trace_preserved else I18n.KEY.tr("MIRROR PORT")
 	mirror_label.add_theme_color_override("font_color", Palette.GREEN if mirror_trace_preserved else MIRROR_TEXT)
 	purge_glow.modulate = Color(_purge_light_color(), 0.6)
 	mirror_glow.modulate = Color(_mirror_light_color(), 0.6)

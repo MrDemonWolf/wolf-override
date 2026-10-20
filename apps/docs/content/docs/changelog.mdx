@@ -86,21 +86,22 @@ Changes merged after 0.15.0. They become the next version when it is cut.
 ### Settings
 
 - Spanish (machine translation, review pending): **LANGUAGE** offers Español (Latinoamérica) and Español (España), each marked "traducción automática".
-- In Spanish the title, Pause, Settings, the credits with the AI disclosure, the hints, objectives, cards, tutorial and touch buttons, the dialogue, narration and end card, and a few station names are translated; most station names still show English.
+- In Spanish the title, Pause, Settings, the credits with the AI disclosure, the hints, objectives, cards, tutorial and touch buttons, the dialogue, narration and end card, and the station names are translated.
 - German (machine translation, review pending): **LANGUAGE** offers Deutsch, marked "maschinelle Übersetzung".
 - French (machine translation, review pending): **LANGUAGE** offers Français, marked "traduction automatique".
 - Brazilian Portuguese (machine translation, review pending): **LANGUAGE** offers Português (Brasil), marked "tradução automática"; Portugal gets it too.
-- German, French and Brazilian Portuguese translate the same parts as Spanish, the story included; most station names still show English.
+- German, French and Brazilian Portuguese translate the same parts as Spanish, the story included.
 - Polish (machine translation, review pending): **LANGUAGE** offers Polski, marked "tłumaczenie maszynowe".
 - Russian (machine translation, review pending): **LANGUAGE** offers Русский, marked "машинный перевод".
-- Polish and Russian translate the same parts as Spanish, the story included; most station names still show English.
+- Polish and Russian translate the same parts as Spanish, the story included.
 - Japanese (machine translation, review pending): **LANGUAGE** offers Japanese, under its own name and marked as a machine translation in Japanese.
 - Korean (machine translation, review pending): **LANGUAGE** offers Korean, under its own name and marked as a machine translation in Korean.
 - Simplified Chinese (machine translation, review pending): **LANGUAGE** offers Simplified Chinese, under its own name and marked as a machine translation in Chinese.
 - Traditional Chinese (machine translation, review pending): **LANGUAGE** offers Traditional Chinese, under its own name and marked as a machine translation in Chinese; Taiwan, Hong Kong and Macau get it, every other Chinese region gets Simplified Chinese.
-- Japanese, Korean and Chinese translate the same parts as Spanish, the story included; most station names still show English.
+- Japanese, Korean and Chinese translate the same parts as Spanish, the story included.
 - Key names follow your keyboard layout on Windows, macOS and Linux: on a French AZERTY keyboard **Move left** reads Q, not A. A symbol key shows the symbol printed on it, such as & on the AZERTY 1 key, and a letter the game's fonts cannot draw (Greek, Hebrew, Arabic, Thai) shows its QWERTY name.
 - A long control binding, such as "D-pad right / Left stick +", breaks onto a second row instead of being cut short with "…".
+- Every station name is translated in every language now, Records Access, the Service Junction and the **MANUAL BYPASS** included, in the words the hints use. The **COOLANT FAULT** tag and the words painted on the doors stay English.
 
 ### Website
 
@@ -215,6 +216,8 @@ Changes merged after 0.15.0. They become the next version when it is cut.
 - `i18n_test` fails any text that does not fit its room in every language and in pseudo-English (30% longer), the answer rows and the end card included; no overflow is let off by name.
 - `text_boxes_test` runs its station-name, touch, top card and prompt overlap checks in every language and in pseudo-English.
 - `I18n.apply_for_checks` is the one switch the suites and the parity capture use for a language or pseudo-English.
+- The test builds fail when a language the game offers has no catalog in the pack, or when the Mac app's language folders (`.lproj`) differ from the offered languages.
+- The Localization page lists what the Mac and Windows exports carry for each language and what the stores need, with Steam's English row added.
 
 ### How it was checked
 

@@ -8,7 +8,10 @@ Usage:
 Checks (any failure exits non-zero):
 - the game pack holds the in-game changelog and the font licences, and none of the tests, tool or
   review drivers, art masters, trial assets, Markdown notes or the asset register;
-- macOS: the app's executable keeps its executable bit and Godot's ad-hoc signature is present;
+- the game pack holds the language table and one catalog per offered language (localization PR L13);
+- macOS: the app's executable keeps its executable bit and Godot's ad-hoc signature is present, and
+  Contents/Resources holds exactly one <locale>.lproj folder per offered language, English included,
+  which is what macOS and the Mac App Store read as the app's language list (PR L13);
 - Windows: the pack is embedded in the .exe and the debug console wrapper sits beside it.
 
 The notices (the game's GPL licence, Godot's, and the fonts') go in a licenses/ folder beside the
@@ -41,6 +44,32 @@ CREDITS_URL = "https://wolfoverride.mrdemonwolf.dev/docs/credits/"
 LEGAL_URL = "https://wolfoverride.mrdemonwolf.dev/docs/legal/"
 SOURCE_URL = "https://github.com/MrDemonWolf/wolf-override/tree/{commit}"
 GAME_LICENSE = Path(__file__).resolve().parent.parent / "LICENSE"
+
+# The one per-language table, read through the i18n tool so this script keeps no second reader or list
+# (scripts/i18n/i18n_tool.py, LANGUAGES). python3 -I leaves the script's own folder off sys.path, so the
+# tool's folder is added by hand, and no bytecode is written next to it (export-game.sh runs this without -B).
+sys.dont_write_bytecode = True
+sys.path.insert(0, str(Path(__file__).resolve().parent / "i18n"))
+from i18n_tool import LANGUAGES  # noqa: E402
+
+# The table's own path inside the game pack (apps/game/i18n/languages.json): I18n reads it at start.
+LANGUAGE_TABLE_IN_PACK = "i18n/languages.json"
+
+
+def offered_languages() -> list[str]:
+    """The languages the game offers: every languages.json code whose "enabled" is true, English included.
+
+    tests/i18n_test.gd keeps this list equal to project.godot's registered catalogs, and Godot's macOS
+    export writes one <locale>.lproj folder per registered catalog's locale plus en.lproj
+    (platform/macos/export/export_plugin.cpp, 4.7.2-stable; measured on the 670b8ed test build), so the
+    offered list is also the app's expected folder list.
+    """
+    return sorted(code for code, row in LANGUAGES.items() if row.get("enabled"))
+
+
+def catalogs_in_pack() -> list[str]:
+    """Pack paths of the offered languages' catalogs, i18n/<code>.po; English, the source, has none."""
+    return [f"i18n/{code}.po" for code in offered_languages() if not LANGUAGES[code].get("source")]
 
 
 def fail(message: str) -> None:
@@ -78,6 +107,9 @@ def check_pack(data: bytes, label: str) -> int:
     missing = [path for path in REQUIRED_IN_PACK if path not in paths]
     if missing:
         fail(f"{label} pack is missing {', '.join(missing)} (check the preset's include filter)")
+    languages = [path for path in [LANGUAGE_TABLE_IN_PACK, *catalogs_in_pack()] if path not in paths]
+    if languages:
+        fail(f"{label} pack is missing language files {', '.join(languages)} (check the preset's filters)")
     unwanted = sorted(path for path in paths if FORBIDDEN_IN_PACK.search(path))
     if unwanted:
         fail(f"{label} pack holds files the game does not use at run time: {', '.join(unwanted)}")
@@ -131,6 +163,25 @@ def add_notices(archive: zipfile.ZipFile, notices: Path, platform: str, commit: 
     archive.writestr(info, readme(platform, commit))
 
 
+def check_lproj(entries: dict[str, zipfile.ZipInfo]) -> list[str]:
+    """The app's .lproj folder names, checked against the offered languages; returns the locales found.
+
+    A missing folder hides a language from macOS's per-app language setting and the App Store's list; an
+    extra one advertises a language the game does not offer. Each folder must hold InfoPlist.strings,
+    the file Godot writes into it.
+    """
+    prefix = f"{APP}/Contents/Resources/"
+    found = sorted({name[len(prefix) :].split("/")[0].removesuffix(".lproj") for name in entries
+                    if name.startswith(prefix) and name[len(prefix) :].split("/")[0].endswith(".lproj")})
+    expected = offered_languages()
+    if found != expected:
+        fail(f"the macOS app's .lproj folders are {found}, but the offered languages are {expected}")
+    empty = [code for code in found if f"{prefix}{code}.lproj/InfoPlist.strings" not in entries]
+    if empty:
+        fail(f"the macOS app's .lproj folders lack InfoPlist.strings: {', '.join(empty)}")
+    return found
+
+
 def package_macos(export: Path, output: Path, notices: Path, commit: str) -> None:
     with zipfile.ZipFile(export) as archive:
         entries = {info.filename: info for info in archive.infolist()}
@@ -140,11 +191,12 @@ def package_macos(export: Path, output: Path, notices: Path, commit: str) -> Non
         if f"{APP}/Contents/_CodeSignature/CodeResources" not in entries:
             fail("the macOS app has no signature (Godot's built-in ad-hoc signing did not run)")
         files = check_pack(archive.read(f"{APP}/Contents/Resources/{EXE}.pck"), "macOS")
+        locales = check_lproj(entries)
     shutil.copyfile(export, output)
     # Appending leaves Godot's entries, their permission bits and the app's signature untouched.
     with zipfile.ZipFile(output, "a", compression=zipfile.ZIP_DEFLATED) as archive:
         add_notices(archive, notices, "macos", commit)
-    print(f"macOS: {files} files in the pack; app signed ad hoc; wrote {output.name}")
+    print(f"macOS: {files} files in the pack; app signed ad hoc; .lproj for {', '.join(locales)}; wrote {output.name}")
 
 
 def package_windows(export: Path, output: Path, notices: Path, commit: str) -> None:
@@ -156,7 +208,7 @@ def package_windows(export: Path, output: Path, notices: Path, commit: str) -> N
         archive.write(export, export.name)
         archive.write(console, console.name)
         add_notices(archive, notices, "windows", commit)
-    print(f"Windows: {files} files in the embedded pack; wrote {output.name}")
+    print(f"Windows: {files} files in the embedded pack, {len(catalogs_in_pack())} catalogs; wrote {output.name}")
 
 
 def main() -> None:

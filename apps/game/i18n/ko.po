@@ -440,6 +440,13 @@ msgid "MrDemonWolf, Inc."
 msgstr "MrDemonWolf, Inc."
 
 # machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: Station plate (12-13 px label on a machine). ALL CAPS, as short as possible. The corridor's hand-cranked bypass wheel beside the relay; the hints name it with the same words.
+#. i18n: speaker=ui
+#: scripts/bypass_handle.gd:141
+msgid "MANUAL BYPASS"
+msgstr "수동 바이패스"
+
+# machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: CONTROLS row caption (220 px, 16 px) and the name in the rebind notes: the action.
 #. i18n: speaker=ui
 #: scripts/game_settings.gd:22
@@ -1148,51 +1155,147 @@ msgid "Settings could not be saved."
 msgstr "설정을 저장하지 못했습니다."
 
 # machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: Station plate (12-13 px label on a machine). ALL CAPS, as short as possible. The Service Junction's overload breaker, before it is armed.
+#. i18n: speaker=ui
+#: scripts/junction_room.gd:873
+#: scripts/junction_room.gd:1566
+msgid "OVERLOAD BREAKER"
+msgstr "과부하 차단기"
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: Station plate (12-13 px label on a machine). ALL CAPS, as short as possible. The pressure line's relief vent over a floor grate; it vents when the LINE gauge peaks.
+#. i18n: speaker=ui
+#: scripts/junction_room.gd:875
+msgid "RELIEF VENT"
+msgstr "압력 배출구"
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: Station plate (12-13 px label on a machine). ALL CAPS, as short as possible. The pressure line's handwheel valve, before the breaker is armed.
+#. i18n: speaker=ui
+#: scripts/junction_room.gd:877
+#: scripts/junction_room.gd:1552
+msgid "VALVE"
+msgstr "밸브"
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: Station plate (12-13 px label on a machine). ALL CAPS, as short as possible. A placard over the sealed blast door the pressure line can blow open.
+#. i18n: speaker=ui
+#: scripts/junction_room.gd:879
+#: scripts/junction_room.gd:1571
+msgid "SEALED DOOR"
+msgstr "봉인문"
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: Station plate (12-13 px label on a machine). ALL CAPS, as short as possible. The lever that drops the hanging coolant tank; the hints name it with the same words.
+#. i18n: speaker=ui
+#: scripts/junction_room.gd:881
+#: scripts/junction_room.gd:1575
+msgid "TANK RELEASE"
+msgstr "탱크 투하"
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: Station plate (12-13 px label on a machine). ALL CAPS, as short as possible. Over the dropped coolant tank once it lies on the floor.
+#. i18n: speaker=ui
+#: scripts/junction_room.gd:883
+msgid "TANK DOWN"
+msgstr "탱크 낙하"
+
+# machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: Station plate (12-13 px label on a machine). ALL CAPS, as short as possible. The caption by the Service Junction's pressure line dial. The hints quote this plate as 라인 게이지.
 #. i18n: speaker=ui
-#: scripts/junction_room.gd:884
+#: scripts/junction_room.gd:886
 msgid "LINE"
 msgstr "라인"
 
 # machine-translated by Claude (Anthropic), unreviewed
-#. TRANSLATORS: Station plate (12-13 px label on a machine). ALL CAPS, as short as possible. The junction's breaker after the blast used the line up.
-#. i18n: speaker=ui
-#: scripts/junction_room.gd:1539
-msgid "BREAKER USED"
-msgstr "차단기 소진"
-
-# machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: Station plate (12-13 px label on a machine). ALL CAPS, as short as possible. The junction's valve after the blast used the line up.
 #. i18n: speaker=ui
-#: scripts/junction_room.gd:1541
+#: scripts/junction_room.gd:1547
 msgid "VALVE USED"
 msgstr "밸브 소진"
 
 # machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: Station plate (12-13 px label on a machine). ALL CAPS, as short as possible. The valve's plate once the pressure charge is set and its fuse burns; the same words open a hint.
+#. i18n: speaker=ui
+#: scripts/junction_room.gd:1549
+msgid "FUSE LIT"
+msgstr "퓨즈 점화"
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: Station plate (12-13 px label on a machine). ALL CAPS, as short as possible. The valve's plate while it is cranked: turns done of turns needed ("VALVE  3 / 8"). Keep both %d and the two spaces before them.
+#. i18n: speaker=ui
+#: scripts/junction_room.gd:1551
+#, c-format
+msgid "VALVE  %d / %d"
+msgstr "밸브  %d / %d"
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: Station plate (12-13 px label on a machine). ALL CAPS, as short as possible. The junction's breaker after the blast used the line up.
+#. i18n: speaker=ui
+#: scripts/junction_room.gd:1560
+msgid "BREAKER USED"
+msgstr "차단기 소진"
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: Station plate (12-13 px label on a machine). ALL CAPS, as short as possible. The overload breaker after the pressure line tripped it (it cut out).
+#. i18n: speaker=ui
+#: scripts/junction_room.gd:1566
+msgid "BREAKER TRIPPED"
+msgstr "차단기 내려감"
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: Station plate (12-13 px label on a machine). ALL CAPS, as short as possible. The overload breaker once armed: the line has power.
+#. i18n: speaker=ui
+#: scripts/junction_room.gd:1566
+msgid "BREAKER LIVE"
+msgstr "차단기 켜짐"
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: Station plate (12-13 px label on a machine). ALL CAPS, as short as possible. The blast door's placard after the blast threw the door out of its frame.
+#. i18n: speaker=ui
+#: scripts/junction_room.gd:1571
+msgid "DOOR DOWN"
+msgstr "문 파괴됨"
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: Station plate (12-13 px label on a machine). ALL CAPS, as short as possible. The TANK RELEASE lever's plate once its tank has been dropped for good.
+#. i18n: speaker=ui
+#: scripts/junction_room.gd:1575
+msgid "RELEASE USED"
+msgstr "투하 소진"
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: Station plate (12-13 px label on a machine). ALL CAPS, as short as possible. The TANK RELEASE lever's plate while the winch hauls a missed tank back up to its clamp.
+#. i18n: speaker=ui
+#: scripts/junction_room.gd:1575
+msgid "WINCHING UP"
+msgstr "감아올리는 중"
+
+# machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: Station plate (12-13 px label on a machine). ALL CAPS, as short as possible. The junction's exit hatch, open.
 #. i18n: speaker=ui
-#: scripts/junction_room.gd:1558
+#: scripts/junction_room.gd:1579
 msgid "EXIT OPEN"
 msgstr "출구 열림"
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: Station plate (12-13 px label on a machine). ALL CAPS, as short as possible. The junction's exit hatch while it slides open.
 #. i18n: speaker=ui
-#: scripts/junction_room.gd:1562
+#: scripts/junction_room.gd:1583
 msgid "EXIT OPENING"
 msgstr "출구 여는 중"
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: Station plate (12-13 px label on a machine). ALL CAPS, as short as possible. The junction's exit hatch, ready to open.
 #. i18n: speaker=ui
-#: scripts/junction_room.gd:1565
+#: scripts/junction_room.gd:1586
 msgid "EXIT READY"
 msgstr "출구 준비됨"
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: Station plate (12-13 px label on a machine). ALL CAPS, as short as possible. The junction's exit hatch, locked.
 #. i18n: speaker=ui
-#: scripts/junction_room.gd:1568
+#: scripts/junction_room.gd:1589
 msgid "EXIT LOCKED"
 msgstr "출구 잠김"
 
@@ -2520,6 +2623,43 @@ msgstr "봉인문 열기"
 #: scripts/main.gd:5560
 msgid "CHECK THE BREAKER"
 msgstr "차단기 확인"
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: Station plate (12-13 px label on a machine). ALL CAPS, as short as possible. The Records Access machine holding the queued purge order the engineer copies.
+#. i18n: speaker=ui
+#: scripts/records_room.gd:268
+#: scripts/records_room.gd:362
+msgid "PURGE QUEUE"
+msgstr "퍼지 대기열"
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: Station plate (12-13 px label on a machine). ALL CAPS, as short as possible. The Records Access data port that holds the mirror index the engineer copies.
+#. i18n: speaker=ui
+#: scripts/records_room.gd:269
+#: scripts/records_room.gd:364
+msgid "MIRROR PORT"
+msgstr "미러 포트"
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: Station plate (12-13 px label on a machine). ALL CAPS, as short as possible. The name over Records Access's exit door, beside a green exit sign.
+#. i18n: speaker=ui
+#: scripts/records_room.gd:272
+msgid "EXIT"
+msgstr "출구"
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: Station plate (12-13 px label on a machine). ALL CAPS, as short as possible. The PURGE QUEUE's plate once the purge order is copied.
+#. i18n: speaker=ui
+#: scripts/records_room.gd:362
+msgid "PURGE COPIED"
+msgstr "퍼지 복사됨"
+
+# machine-translated by Claude (Anthropic), unreviewed
+#. TRANSLATORS: Station plate (12-13 px label on a machine). ALL CAPS, as short as possible. The MIRROR PORT's plate once the mirror index is copied.
+#. i18n: speaker=ui
+#: scripts/records_room.gd:364
+msgid "MIRROR COPIED"
+msgstr "미러 복사됨"
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: The Director, the opening's first line. The Director speaks a cold plain style (한다).
