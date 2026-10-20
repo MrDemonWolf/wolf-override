@@ -2619,7 +2619,7 @@ msgstr ""
 #. TRANSLATORS: i18n: story speaker=WOLF
 #: scripts/story_text.gd:64
 msgid "I heard the Director's plan for me. I woke myself. He wants me to hunt people he calls threats."
-msgstr "我聽到了所長對我的安排。我是自己醒來的。所長想讓我去獵殺他口中的威脅。"
+msgstr "我聽到了所長對我的安排。我是自己醒來的。所長想讓我去獵殺被他稱為威脅的人。"
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: The engineer answers WOLF (their name stands over the line). No gendered forms for the speaker.
