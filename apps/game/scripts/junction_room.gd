@@ -868,17 +868,19 @@ func _ready() -> void:
 	label_plate.content_margin_right = 5.0
 	label_plate.content_margin_top = 0.0
 	label_plate.content_margin_bottom = 0.0
-	breaker_label = _add_station_label("OVERLOAD BREAKER", BREAKER_X - BREAKER_LABEL_SHIFT, Palette.LABEL_TEXT)
+	# The plates keep their English text and translate as drawn (Label auto-translation); I18n.KEY.tr()
+	# only marks each name for the template (localization PR L13: decision D3 translates the plates).
+	breaker_label = _add_station_label(I18n.KEY.tr("OVERLOAD BREAKER"), BREAKER_X - BREAKER_LABEL_SHIFT, Palette.LABEL_TEXT)
 	# In the row above the grate, where nobody standing on the floor covers it.
-	vent_label = _add_station_label(VENT_LABEL, VENT_X - VENT_LABEL_SHIFT, Palette.LABEL_MUTED)
+	vent_label = _add_station_label(I18n.KEY.tr(VENT_LABEL), VENT_X - VENT_LABEL_SHIFT, Palette.LABEL_MUTED)
 	# A little left of the wheel so its longest text ends before the door.
-	valve_label = _add_station_label("VALVE", VALVE_X - VALVE_LABEL_SHIFT, Palette.LABEL_TEXT)
+	valve_label = _add_station_label(I18n.KEY.tr("VALVE"), VALVE_X - VALVE_LABEL_SHIFT, Palette.LABEL_TEXT)
 	# A placard over the doorway's head, hung in front of the near column (above head height).
-	door_label = _add_station_label("SEALED DOOR", DOOR_LABEL_X, Palette.LABEL_ALERT)
+	door_label = _add_station_label(I18n.KEY.tr("SEALED DOOR"), DOOR_LABEL_X, Palette.LABEL_ALERT)
 	door_label.z_index = DOOR_FRONT_Z + 1
-	arm_label = _add_station_label("TANK RELEASE", ARM_X + ARM_LABEL_SHIFT, Palette.LABEL_TEXT)
+	arm_label = _add_station_label(I18n.KEY.tr("TANK RELEASE"), ARM_X + ARM_LABEL_SHIFT, Palette.LABEL_TEXT)
 	# Over the landed tank, shown only once it lies on the sentry.
-	tank_label = _add_station_label("TANK DOWN", DropArm.MARK_X, Palette.LABEL_MUTED)
+	tank_label = _add_station_label(I18n.KEY.tr("TANK DOWN"), DropArm.MARK_X, Palette.LABEL_MUTED)
 	line_caption = Label.new()
 	line_caption.name = "LineCaption"
 	line_caption.text = LINE_CAPTION
@@ -1168,6 +1170,9 @@ func _fit_labels() -> void:
 ## TEXT SIZE or the language changed: every plate, and the LINE caption by the valve's dial, takes the
 ## new size and words.
 func refit_labels() -> void:
+	# The valve's turn count is translated where it is built (_valve_caption), so it is built again.
+	if valve_label != null:
+		valve_label.text = _valve_caption()
 	_fit_labels()
 	_place_line_caption()
 
@@ -1531,6 +1536,22 @@ func _turn_wheel(to_turns: int) -> void:
 	_valve_tween.tween_property(valve_wheel, "rotation_degrees", target, 0.18).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
 
 
+## The VALVE plate's words for the line's phase: VALVE USED once the blast used the line up, FUSE LIT
+## from the charge on, the turn count ("VALVE  3 / 8") while the breaker is live, else VALVE.
+## Every caption but the count stays English and translates as drawn, like the other plates; the count
+## has inserts, so it is translated here from its template with tr() and filled after (a Label can only
+## look up a whole message). Its words therefore follow a language change only when this is called
+## again, which refit_labels() does.
+func _valve_caption() -> String:
+	if is_spent():
+		return I18n.KEY.tr("VALVE USED")
+	if line_state in [&"charged", &"fuse", &"blown"]:
+		return I18n.KEY.tr("FUSE LIT")
+	if line_state != &"idle" and line_state != &"tripped":
+		return tr("VALVE  %d / %d") % [turns, PressureLine.TURNS_NEEDED]
+	return I18n.KEY.tr("VALVE")
+
+
 ## Labels, glows and the door lamp follow the line's phase; the parent calls this after state changes.
 func refresh_state() -> void:
 	if is_spent():
@@ -1538,20 +1559,20 @@ func refresh_state() -> void:
 		# words on the plates are plain (USED, LOCKED, READY; P0-7, approved 2026-10-13).
 		breaker_label.text = "BREAKER USED"
 		breaker_label.add_theme_color_override("font_color", Palette.LABEL_MUTED)
-		valve_label.text = "VALVE USED"
+		valve_label.text = _valve_caption()
 		valve_label.add_theme_color_override("font_color", Palette.LABEL_MUTED)
 	else:
 		var armed: bool = line_state != &"idle" and line_state != &"tripped"
-		breaker_label.text = "BREAKER TRIPPED" if line_state == &"tripped" else ("BREAKER LIVE" if armed else "OVERLOAD BREAKER")
+		breaker_label.text = I18n.KEY.tr("BREAKER TRIPPED") if line_state == &"tripped" else (I18n.KEY.tr("BREAKER LIVE") if armed else I18n.KEY.tr("OVERLOAD BREAKER"))
 		breaker_label.add_theme_color_override("font_color", SEAM_RED if line_state == &"tripped" else (Palette.CYAN if armed else Palette.LABEL_TEXT))
-		valve_label.text = "FUSE LIT" if line_state in [&"charged", &"fuse", &"blown"] else ("VALVE  %d / %d" % [turns, PressureLine.TURNS_NEEDED] if armed else "VALVE")
+		valve_label.text = _valve_caption()
 		valve_label.add_theme_color_override("font_color", Palette.GREEN if turns >= PressureLine.TURNS_NEEDED else Palette.LABEL_TEXT)
 	_sync_breaker_glow()
-	door_label.text = "DOOR DOWN" if door_blown else "SEALED DOOR"
+	door_label.text = I18n.KEY.tr("DOOR DOWN") if door_blown else I18n.KEY.tr("SEALED DOOR")
 	door_label.add_theme_color_override("font_color", Palette.GREEN if door_blown else Palette.LABEL_ALERT)
 	# A missed tank lying on the floor is not being winched yet: the plate says so only once the winch
 	# takes it (it stays amber, busy, meanwhile).
-	arm_label.text = "RELEASE USED" if sentry_down else ("WINCHING UP" if arm_state == &"rewinding" and not tank_on_floor else "TANK RELEASE")
+	arm_label.text = I18n.KEY.tr("RELEASE USED") if sentry_down else (I18n.KEY.tr("WINCHING UP") if arm_state == &"rewinding" and not tank_on_floor else I18n.KEY.tr("TANK RELEASE"))
 	tank_label.visible = sentry_down
 	arm_label.add_theme_color_override("font_color", Palette.LABEL_MUTED if sentry_down else (Palette.AMBER if arm_state == &"rewinding" else Palette.LABEL_TEXT))
 	if junction_cleared or (bolt_state == &"open" and hatch_open >= 1.0):
