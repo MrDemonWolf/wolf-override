@@ -1683,7 +1683,7 @@ msgstr "저장 실패. 스테이션을 사용해 다시 시도하세요."
 #. TRANSLATORS: i18n: story speaker=narrator
 #: scripts/main.gd:3238
 msgid "The overload breaker catches and the line starts to build. If the LINE gauge peaks, the relief vent lets go."
-msgstr "과부하 차단기가 걸리고 라인 압력이 오르기 시작한다. 라인 게이지가 정점에 이르면 압력 배출구가 터진다."
+msgstr "과부하 차단기가 올라가고 라인 압력이 오르기 시작한다. 라인 게이지가 정점에 이르면 압력 배출구가 터진다."
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: i18n: story speaker=narrator
@@ -2878,7 +2878,7 @@ msgstr "릴레이에서 넌 내게 사실을 말해 줬어. 내가 저걸 표시
 #. i18n: story speaker=WOLF engineer=you
 #: scripts/story_text.gd:166
 msgid "At the relay you'd have sent me in blind. I won't walk into its sights. Time the drop from the release; it crosses the mark on every pass."
-msgstr "릴레이에서 넌 날 아무것도 모른 채 들여보내려 했어. 저 녀석 시야엔 안 들어가. 탱크 투하에서 타이밍을 맞춰. 지나갈 때마다 표시를 지나가니까."
+msgstr "릴레이에서 넌 날 아무것도 모른 채 들여보내려 했어. 난 저 녀석 시야엔 안 들어가. 탱크 투하에서 타이밍을 맞춰. 지나갈 때마다 표시를 지나가니까."
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: WOLF, when the engineer will time the drop alone.
