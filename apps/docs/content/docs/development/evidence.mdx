@@ -176,6 +176,19 @@ When the story was marked (PR L7c), the template grew to 411 messages, and the c
 
 </Details>
 
+### All languages: completeness and exports (October 19, 2026)
+
+- **Checked:** all 11 files pass every release gate with nothing untranslated or fuzzy; the headless suites; title, Settings and plate stills; the Mac and Windows test builds' language files.
+- **Not checked:** no native speaker has read them, nobody has played in them, and no App Store or Steam build exists.
+- **Covers the station names now:** Records Access, the Service Junction and the **MANUAL BYPASS** plates were still English and are translated.
+
+<Details>
+<Summary>Full record</Summary>
+
+On main at `670b8ed`, `i18n_tool.py check --release` passed all 11 files (411 messages each, 0 untranslated, 0 fuzzy, 0 failed). A search of the game's scripts for player text outside the template then found 19 station plates still in English: the Records Access and Service Junction plates and their state words, and the **MANUAL BYPASS** plate. Decision D3 translates the plates, so they were marked and translated in the words the hints already use; the **COOLANT FAULT** tag stays English (painted signage, D3). The template now holds 430 messages, and all 11 files pass with 0 untranslated, 0 fuzzy and 0 failed. Codex back-translated the 209 new texts in one session and found no gendered form; its notes moved the Portuguese **MIRROR PORT** and the Japanese **PURGE QUEUE** plates to the hints' own words, checked in a second session. All 29 headless suites pass (`i18n_test`: 20,194 language checks); `text_boxes_test` first found the four-character Chinese **MANUAL BYPASS** plate breaking onto two rows only above 100%, so it adds 装置 and keeps two rows, as the English does. Rendered stills: the title and the Settings **GENERAL** tab in all 12 languages, switched live in one game, each with its own words and machine-translation tag (Spanish and Spain share the same title words by design); the Records Access and Service Junction plates in German, French, Russian, Japanese and Simplified Chinese, all inside their plates. The Mac and Windows test builds of `670b8ed` hold `languages.json`, all 11 catalogs, the CJK fonts and the ICU data, and the Mac app has one `.lproj` folder per language. These are headless checks and stills: not reviewed by a native speaker, not played by hand.
+
+</Details>
+
 ### Japanese, Korean and Chinese (October 19, 2026)
 
 - **Checked:** every translation check with Codex's back-translation of every line, the headless suites, and rendered stills in all four files.
