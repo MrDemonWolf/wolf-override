@@ -1,0 +1,14 @@
+# Issue chooser settings. Blank issues stay on, so ordinary bug reports keep
+# working as the Support page describes; the translation form sits beside them.
+# The contact links send questions and security problems away from public issues.
+blank_issues_enabled: true
+contact_links:
+  - name: Ask a question or chat on Discord
+    url: https://discord.com/invite/A9x3qEN
+    about: Questions, chat and quick translation notes go to the MrDemonWolf Discord server.
+  - name: Report a security problem privately
+    url: https://github.com/MrDemonWolf/wolf-override/blob/main/SECURITY.md
+    about: Do not post security problems in a public issue. SECURITY.md says how to report one.
+  - name: Support and bug reports guide
+    url: https://wolfoverride.mrdemonwolf.dev/docs/support/
+    about: What to include in a bug report and how to save an F12 bug capture.
