@@ -71,13 +71,24 @@ var _next_voice: int = 0
 var _detail_task: int = -1
 ## Filled by the worker; read only after the task has completed.
 var _detail: Dictionary = {}
+## The detailed clips once a bank in this process has rendered them, shared by every later bank. They
+## come from fixed seeds, so each bank would render the same bytes again: about 0.5 s of a worker
+## thread each, which freeing the bank waits for (_exit_tree). The game makes one bank, so this only
+## spares the suites that open a new game many times (text_boxes_languages_test opens 10 per
+## language; measured 2026-10-24 on the development Mac, freeing each game took 0.57 s of its 0.73 s
+## before this; sharing it made the language checks three times faster). Empty until the first
+## render has been merged. The clips are read-only once made, so banks can share them.
+static var _detail_rendered: Dictionary = {}
 
 
 func _ready() -> void:
 	var start: int = Time.get_ticks_usec()
 	_render_startup()
 	generation_ms = float(Time.get_ticks_usec() - start) / 1000.0
-	_detail_task = WorkerThreadPool.add_task(_render_detail.bind(_detail), false, "SfxBank detailed clips")
+	if _detail_rendered.is_empty():
+		_detail_task = WorkerThreadPool.add_task(_render_detail.bind(_detail), false, "SfxBank detailed clips")
+	else:
+		streams.merge(_detail_rendered, true)
 	for index: int in VOICES:
 		_voices.append(_add_player("Voice%d" % index))
 	for loop_name: StringName in LOOPS:
@@ -96,6 +107,7 @@ func wait_for_detail() -> void:
 	WorkerThreadPool.wait_for_task_completion(_detail_task)
 	_detail_task = -1
 	streams.merge(_detail, true)
+	_detail_rendered = _detail
 
 
 ## Plays [param clip] on a free voice (or that loop's own player) and returns the player, or null
