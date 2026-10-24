@@ -82,7 +82,8 @@ heavy_suites=(
   approved_wording_test     # 83
   follow_spacing_test       # 74
   m0_scene_test             # 72
-  text_boxes_languages_test # 47
+  text_boxes_languages_1_test # 50
+  text_boxes_languages_2_test # 45
   junction_test             # 47
   opening_timing_test       # 40
   i18n_test                 # 37
