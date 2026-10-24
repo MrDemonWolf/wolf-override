@@ -713,7 +713,7 @@ func _check_hud() -> void:
 ## control must fit outright ([method _check_fit]; PR L8 emptied [constant KNOWN_OVERFLOWS]). The HUD
 ## (PR L7b's hints, objectives, cards, tutorial and touch words) is judged by
 ## [method _check_touch_words], the tutorial prompt's fit and [method _check_hud_rows]; the dialogue
-## boxes by text_boxes_test's loop over every language (PR L7d).
+## boxes by text_boxes_languages_test's loop over every language (PR L7d).
 func _check_layouts() -> void:
 	var codes: Array[String] = []
 	codes.assign(I18n.offered())

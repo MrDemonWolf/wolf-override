@@ -67,8 +67,9 @@ static func split(message: String, speakers: Array[String], fits: Callable, lang
 
 ## Whether [param words] fit a column [param width] px wide in MAX_ROWS rows at [param font_size] px of
 ## [param font], wrapped by [param language]'s row rule ([method wrap_width] with
-## [method row_characters]). The one fit rule: Main's dialogue box and tests/text_boxes_test.gd both
-## split with it. Pure for a named [param language]; with "" it also reads the language shown.
+## [method row_characters]). The one fit rule: Main's dialogue box and the text-box suites
+## (tests/support/text_boxes_suite.gd) both split with it. Pure for a named [param language]; with
+## "" it also reads the language shown.
 ## A box whose rows must break at spaces ([method breaks_at_spaces], Korean) fits only when it takes
 ## one row or [method keep_words] finds a space that leaves each row on one row: the text server would
 ## pack it into two rows by breaking inside words, so such a box is split at its sentences instead.
@@ -265,9 +266,9 @@ static func _balanced_width(text: String, font: Font, font_size: int, width: flo
 ## does. Why: these scripts are written without spaces and the text server may break between any two
 ## characters, so the evenest width alone split a verb from its ending (PR L12's stills: "背を向" /
 ## "け、"), where a reader expects the break at the comma. A mark only counts when the shorter row is
-## at least half as wide as the longer (the balance tests/text_boxes_test.gd asks of every two-row
-## box) and both rows fit [param width]; the first row is then laid exactly that wide, so a mark before
-## the middle never qualifies (its second row would not fit). Pure: lays the text out once per mark.
+## at least half as wide as the longer (the balance tests/support/text_boxes_suite.gd asks of every
+## two-row box) and both rows fit [param width]; the first row is then laid exactly that wide, so a
+## mark before the middle never qualifies (its second row would not fit). Pure: lays the text out once per mark.
 static func _mark_width(text: String, font: Font, font_size: int, width: float) -> float:
 	var best: float = 0.0
 	var best_gap: float = INF
@@ -352,8 +353,8 @@ static func _sentences(text: String) -> Array[Array]:
 
 ## How many pieces [param text] could break into for a box: at its sentence ends and its clause marks
 ## (SENTENCE_ENDS and every CLAUSE_MARKS), never inside a quotation. 1 means no break is left, so a box
-## too long for the rules can be split no further (tests/text_boxes_test.gd checks that such a box is
-## one sentence or clause).
+## too long for the rules can be split no further (the text-box suites, tests/support/text_boxes_suite.gd,
+## check that such a box is one sentence or clause).
 static func break_count(text: String) -> int:
 	return _break_after(text, SENTENCE_ENDS + "".join(CLAUSE_MARKS), true).size()
 

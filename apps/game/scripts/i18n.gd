@@ -227,7 +227,7 @@ static func apply(code: String) -> void:
 const PSEUDO: String = "pseudo"
 
 
-## [method apply] for the layout checks (tests/i18n_test.gd, tests/text_boxes_test.gd and the parity
+## [method apply] for the layout checks (tests/i18n_test.gd, tests/text_boxes_languages_test.gd and the parity
 ## capture's --language, localization PR L8): [constant PSEUDO] applies English and turns Godot's
 ## pseudolocalization on, reloading its settings first; any other code turns it off and is applied.
 ## The one place both are switched, so the suites and the capture driver pad text the same way.
@@ -547,8 +547,8 @@ static func game_fonts_draw(text: String) -> bool:
 ##   give it (each checked only where it gives one: a Control laid out at zero size sizes itself), nor
 ##   leave the viewport; an autowrap Label that grows downward is caught, and one that hides rows too.
 ## The fourth blind spot, two Controls that each fit but cover each other, is not checked here on
-## purpose: tests/text_boxes_test.gd already intersects the rects that matter, and PR L8 runs those
-## checks in every language instead of a second overlap check.
+## purpose: the text-box suites (tests/support/text_boxes_suite.gd) already intersect the rects that
+## matter, and PR L8 runs those checks in every language instead of a second overlap check.
 ## Units: px in the control's canvas, with [constant OVERFLOW_TOLERANCE_PX] of slack.
 static func overflows(control: Control) -> bool:
 	if not control.is_visible_in_tree():
