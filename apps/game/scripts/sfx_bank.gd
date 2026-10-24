@@ -74,7 +74,7 @@ var _detail: Dictionary = {}
 ## The detailed clips once a bank in this process has rendered them, shared by every later bank. They
 ## come from fixed seeds, so each bank would render the same bytes again: about 0.5 s of a worker
 ## thread each, which freeing the bank waits for (_exit_tree). The game makes one bank, so this only
-## spares the suites that open a new game many times (text_boxes_languages_test opens 10 per
+## spares the suites that open a new game many times (text_boxes_languages_*_test open 10 per
 ## language; measured 2026-10-24 on the development Mac, freeing each game took 0.57 s of its 0.73 s
 ## before this; sharing it made the language checks three times faster). Empty until the first
 ## render has been merged. The clips are read-only once made, so banks can share them.

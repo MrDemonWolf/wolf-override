@@ -227,7 +227,7 @@ static func apply(code: String) -> void:
 const PSEUDO: String = "pseudo"
 
 
-## [method apply] for the layout checks (tests/i18n_test.gd, tests/text_boxes_languages_test.gd and the parity
+## [method apply] for the layout checks (tests/i18n_test.gd, tests/support/text_boxes_suite.gd and the parity
 ## capture's --language, localization PR L8): [constant PSEUDO] applies English and turns Godot's
 ## pseudolocalization on, reloading its settings first; any other code turns it off and is applied.
 ## The one place both are switched, so the suites and the capture driver pad text the same way.

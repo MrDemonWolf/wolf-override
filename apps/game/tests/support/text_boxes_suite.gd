@@ -3,10 +3,12 @@ extends "res://tests/support/game_suite.gd"
 ## with its dialogue box, and every check of text you can read, so the suites that split the work
 ## between them share one copy. Its users and what each runs:
 ## - tests/text_boxes_test.gd: the English checks, from the reading rule to the TEXT SIZE setting.
-## - tests/text_boxes_languages_test.gd: the corpus and the overlap checks in every other language.
+## - tests/text_boxes_languages_1_test.gd and tests/text_boxes_languages_2_test.gd: one shard each of
+##   the corpus and overlap checks in every other language ([method run_language_shard]).
 ## The language checks were one suite with the English ones until CI ran it in 235 s of a 240 s limit
-## (run 39370708132, 2026-10-20); split in two, each suite takes well under 120 s (the numbers are in
-## scripts/check-game.sh's HEAVY_SUITES list). A check's text and contract did not change in the split.
+## (run 39370708132, 2026-10-20); split into three suites, each of which takes well under 120 s (the measured
+## seconds are in scripts/check-game.sh's heavy_suites list). No check's text or condition changed in
+## the split.
 ##
 ## Like the suite kit it has no class_name and never ships (export_presets.cfg excludes tests/*), and
 ## check-game.sh only globs tests/*_test.gd, so it is never run as a suite itself.
@@ -24,16 +26,36 @@ var shown_checked: int = 0
 var rows_at_200: int = 0
 
 
+## How many suites share the checks in every language: tests/text_boxes_languages_<n>_test.gd, n from
+## 1 to this. Two, because all 14 languages in one suite took 90 s in the Linux render container even
+## with the frame cap lifted (_spawn_uncapped; 2026-10-24), and CI ran within a few seconds of the
+## container before. A third shard needs only a third suite file and this number raised.
+const LANGUAGE_SHARDS: int = 2
+
+
 ## Starts the suite's game: spawns it with its settings at a user:// file named after [param file_tag]
 ## and the process id (save file beside it), keeps it running on focus loss, and finds its dialogue box.
 ## Returns the settings path, which _check_text_size and _check_prompts_clear write to.
 func open_text_game(file_tag: String) -> String:
 	var path: String = "user://%s-%s.cfg" % [file_tag, OS.get_process_id()]
-	game = await spawn_game("%s-save.json" % path, path, keep_running) as Main
+	game = await _spawn_uncapped("%s-save.json" % path, path, keep_running)
 	story = game.get_node("CanvasLayer/BottomBar/Story") as Label
 	speaker = game.get_node("CanvasLayer/BottomBar/Speaker") as Label
 	bar = game.get_node("CanvasLayer/BottomBar") as Control
 	return path
+
+
+## The suite kit's spawn_game (same arguments and wait), then the frame cap lifted again: a game sets
+## Engine.max_fps from its settings as it starts (Main, fps_limit, 60 by default). Linux honours the cap
+## headless and macOS does not, so on CI every process frame these checks wait for took 1/60 s: 0.65 s
+## for the 40 frames each fresh game in _check_prompts_clear waits, and the language checks ran 177 s
+## on CI against 36 s on the development Mac, and 90 s in the Linux render container uncapped
+## (measured 2026-10-24, CI run 40140303467). Uncapped, CI frames run as the Mac's do; the game's physics still ticks at 60 a
+## second of real time, so no check here sees a different game. Returns the game, as Main.
+func _spawn_uncapped(save_path: String, settings_path: String, configure: Callable = Callable()) -> Main:
+	var spawned: Main = await spawn_game(save_path, settings_path, configure) as Main
+	Engine.max_fps = 0
+	return spawned
 
 
 ## Ends the suite: the kit's teardown (the rooms' jumps leave clips playing; end_game stops them before
@@ -41,6 +63,31 @@ func open_text_game(file_tag: String) -> String:
 func close_text_game() -> void:
 	await end_game(game)
 	finish("")
+
+
+## One language suite, shard [param shard] of [constant LANGUAGE_SHARDS] (from 1): its share of the
+## languages ([method shard_codes]) for the box rules (_check_every_language) and for the overlap checks
+## (_check_overlaps_every_language), in a game already in play (debug_new_game, as the English suite's
+## checks leave it before theirs). The whole suite: it opens, checks and closes its own game.
+func run_language_shard(shard: int) -> void:
+	check_name = "Text boxes in every language (%d of %d)" % [shard, LANGUAGE_SHARDS]
+	var path: String = await open_text_game("text-boxes-languages-%d" % shard)
+	game.debug_new_game(true)
+	await process_frame
+	_check_every_language(shard)
+	await _check_overlaps_every_language(path, shard)
+	await close_text_game()
+
+
+## The codes of [param codes] that shard [param shard] (from 1, of [constant LANGUAGE_SHARDS]) checks:
+## every LANGUAGE_SHARDS-th, from index shard - 1, so each shard gets a spread of long and short
+## languages rather than a run of one script.
+static func shard_codes(codes: Array[String], shard: int) -> Array[String]:
+	var mine: Array[String] = []
+	for index: int in codes.size():
+		if index % LANGUAGE_SHARDS == shard - 1:
+			mine.append(codes[index])
+	return mine
 
 
 ## Runs [param target]'s clock in game time, 1/60 s a step, until [param condition] holds or
@@ -164,11 +211,13 @@ func _check_language_rules() -> void:
 ## language's rules (MAX_ROWS rows, its row limit, LONG_LINE_WORDS words, long_line_characters) has no
 ## sentence or clause break left to split at; and where rows run to the column, two rows are balanced.
 ## Each message is shown in a language once, before the size loop: the shown text does not depend on
-## the size, only its layout does.
-func _check_every_language() -> void:
+## the size, only its layout does. Shard [param shard] of [constant LANGUAGE_SHARDS] takes its share of
+## the languages ([method shard_codes]).
+func _check_every_language(shard: int) -> void:
 	var messages: Array[String] = _corpus()
-	var codes: Array[String] = []
-	codes.assign(I18n.LANGUAGES.keys())
+	var all_codes: Array[String] = []
+	all_codes.assign(I18n.LANGUAGES.keys())
+	var codes: Array[String] = shard_codes(all_codes, shard)
 	var tags: Array[String] = ["WOLF", "DIRECTOR", "DIRECTOR / PURGE", "MORGAN"]
 	var name_back: Callable = func(words: String) -> String:
 		var key: String = words.replace("Morgan", "%s")
@@ -202,7 +251,7 @@ func _check_every_language() -> void:
 	I18n.apply(I18n.FALLBACK)
 	_use_size(1.0)
 	print("text boxes: %d boxes in %d languages at %d sizes; %d are one sentence or clause too long to split" % [boxes, codes.size(), TextSize.STEPS.size(), unsplittable])
-	_expect(boxes > messages.size() * codes.size() * TextSize.STEPS.size(), "every language's corpus was measured at every size (%d boxes)" % boxes)
+	_expect(not codes.is_empty() and boxes > messages.size() * codes.size() * TextSize.STEPS.size(), "every language's corpus was measured at every size (%d boxes)" % boxes)
 
 
 ## One box of [method _check_every_language] in [param code]: one speaker; within the language's rules
@@ -713,14 +762,17 @@ func _check_touch(code: String = I18n.FALLBACK) -> void:
 ## (_check_top_card_clear), the station names at every TEXT SIZE step with the touch layout
 ## (_check_station_names) and the prompts at every size (_check_prompts_clear). Localization PR L8
 ## runs these instead of writing an overlap check of its own (DESIGN.md, "The build's version"). The
-## language is switched with the game running, as Settings does, then set back to English.
-func _check_overlaps_every_language(path: String) -> void:
+## language is switched with the game running, as Settings does, then set back to English. Shard
+## [param shard] of [constant LANGUAGE_SHARDS] takes its share of the languages ([method shard_codes]).
+func _check_overlaps_every_language(path: String, shard: int) -> void:
 	var settings: GameSettings = game.settings_menu
-	var codes: Array[String] = []
+	var all_codes: Array[String] = []
 	for code: String in I18n.offered():
 		if code != I18n.FALLBACK:
-			codes.append(code)
-	codes.append(I18n.PSEUDO)
+			all_codes.append(code)
+	all_codes.append(I18n.PSEUDO)
+	var codes: Array[String] = shard_codes(all_codes, shard)
+	_expect(not codes.is_empty(), "shard %d of %d has languages to check" % [shard, LANGUAGE_SHARDS])
 	for code: String in codes:
 		I18n.apply_for_checks(code)
 		await process_frame
@@ -759,7 +811,7 @@ func _check_text_size(path: String) -> void:
 	_expect(rows_at_200 >= 1 and rows_at_200 <= 3, "at 200%% a box takes at most 3 rows (%d)" % rows_at_200)
 	# A fresh game reads the saved size back; a broken value falls back to the nearest step.
 	# Not end_game for this one: it would remove the settings file the first game still saves to.
-	var again: Main = await spawn_game("%s-again.json" % path, path) as Main
+	var again: Main = await _spawn_uncapped("%s-again.json" % path, path)
 	_expect(is_equal_approx(TextSize.factor, 2.0) and again.settings_menu.text_size.selected == 4, "a new session opens at the saved 200%")
 	again.queue_free()
 	await process_frame
@@ -891,7 +943,7 @@ func _check_station_names(code: String = I18n.FALLBACK) -> void:
 func _check_prompts_clear(path: String, code: String = I18n.FALLBACK) -> void:
 	for touch: bool in [false, true]:
 		for index: int in TextSize.STEPS.size():
-			var fresh: Main = await spawn_game("%s-prompts.json" % path, "%s-prompts.cfg" % path, keep_running) as Main
+			var fresh: Main = await _spawn_uncapped("%s-prompts.json" % path, "%s-prompts.cfg" % path, keep_running)
 			fresh.touch_enabled = touch
 			fresh.settings_menu.text_size.select(index)
 			fresh.settings_menu.text_size.item_selected.emit(index)
