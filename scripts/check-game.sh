@@ -69,9 +69,39 @@ fi
 
 cpus="$(getconf _NPROCESSORS_ONLN 2>/dev/null || echo 2)"
 jobs="${CHECK_JOBS:-$((cpus < 4 ? cpus : 4))}"
+# The slowest suites start first, so none is left running alone at the end while the other slots sit
+# idle (longest first; alphabetical order put text_boxes_test last and made a 404 s run on CI). Keep it
+# to the slow ones, slowest first, and re-measure when a suite grows: the "pass NAME (Ns)" lines below.
+# Seconds per suite, 4 at a time: CI (ubuntu-24.04), run 39370708132 (2026-10-20), except the two
+# text-box suites, split from one 235 s suite on 2026-10-24, whose seconds are from the development
+# Mac that day (it kept within a few seconds of CI on the other suites).
+heavy_suites=(
+  companion_rules_test      # 87
+  wolf_space_test           # 86
+  sentry_test               # 84
+  approved_wording_test     # 83
+  follow_spacing_test       # 74
+  m0_scene_test             # 72
+  text_boxes_languages_test # 47
+  junction_test             # 47
+  opening_timing_test       # 40
+  i18n_test                 # 37
+  text_boxes_test           # 20
+)
 suites=()
+for name in "${heavy_suites[@]}"; do
+  if [ ! -f "apps/game/tests/$name.gd" ]; then
+    echo "scripts/check-game.sh lists $name first, but apps/game/tests/$name.gd does not exist: update heavy_suites" >&2
+    exit 1
+  fi
+  suites+=("$name")
+done
+# Then every other suite, alphabetically (the glob's order).
 for test in apps/game/tests/*_test.gd; do
-  suites+=("$(basename "$test" .gd)")
+  name="$(basename "$test" .gd)"
+  if [[ " ${heavy_suites[*]} " != *" $name "* ]]; then
+    suites+=("$name")
+  fi
 done
 started="$SECONDS"
 printf '%s\n' "${suites[@]}" | xargs -P "$jobs" -I{} "$root/scripts/check-game.sh" --suite {} "$logs" "$work"
