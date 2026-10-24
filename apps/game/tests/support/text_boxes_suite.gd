@@ -6,9 +6,9 @@ extends "res://tests/support/game_suite.gd"
 ## - tests/text_boxes_languages_1_test.gd and tests/text_boxes_languages_2_test.gd: one shard each of
 ##   the corpus and overlap checks in every other language ([method run_language_shard]).
 ## The language checks were one suite with the English ones until CI ran it in 235 s of a 240 s limit
-## (run 39370708132, 2026-10-20); split into three suites, each of which takes well under 120 s (the measured
-## seconds are in scripts/check-game.sh's heavy_suites list). No check's text or condition changed in
-## the split.
+## (run 39370708132, 2026-10-20); split into three suites, the longest takes 45 s there (run
+## 40141935412; scripts/check-game.sh's heavy_suites list has each). No check's text or condition
+## changed in the split.
 ##
 ## Like the suite kit it has no class_name and never ships (export_presets.cfg excludes tests/*), and
 ## check-game.sh only globs tests/*_test.gd, so it is never run as a suite itself.
@@ -28,8 +28,8 @@ var rows_at_200: int = 0
 
 ## How many suites share the checks in every language: tests/text_boxes_languages_<n>_test.gd, n from
 ## 1 to this. Two, because all 14 languages in one suite took 90 s in the Linux render container even
-## with the frame cap lifted (_spawn_uncapped; 2026-10-24), and CI ran within a few seconds of the
-## container before. A third shard needs only a third suite file and this number raised.
+## with the frame cap lifted (_spawn_uncapped; 2026-10-24); as two, each takes 45 s on CI (run
+## 40141935412). A third shard needs only a third suite file and this number raised.
 const LANGUAGE_SHARDS: int = 2
 
 

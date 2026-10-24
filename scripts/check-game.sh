@@ -72,22 +72,22 @@ jobs="${CHECK_JOBS:-$((cpus < 4 ? cpus : 4))}"
 # The slowest suites start first, so none is left running alone at the end while the other slots sit
 # idle (longest first; alphabetical order put text_boxes_test last and made a 404 s run on CI). Keep it
 # to the slow ones, slowest first, and re-measure when a suite grows: the "pass NAME (Ns)" lines below.
-# Seconds per suite, 4 at a time: CI (ubuntu-24.04), run 39370708132 (2026-10-20), except the two
-# text-box suites, split from one 235 s suite on 2026-10-24, whose seconds are from the development
-# Mac that day (it kept within a few seconds of CI on the other suites).
+# Seconds per suite on CI (ubuntu-24.04, 4 at a time), run 40141935412 (2026-10-24): 235 s of suites
+# in all, against 404 s in run 39370708132 before this order and the text-box split.
 heavy_suites=(
-  companion_rules_test      # 87
-  wolf_space_test           # 86
-  sentry_test               # 84
-  approved_wording_test     # 83
-  follow_spacing_test       # 74
-  m0_scene_test             # 72
-  text_boxes_languages_1_test # 50
+  companion_rules_test        # 87
+  wolf_space_test             # 86
+  sentry_test                 # 84
+  approved_wording_test       # 82
+  follow_spacing_test         # 74
+  m0_scene_test               # 72
+  junction_test               # 47
+  text_boxes_languages_1_test # 45
   text_boxes_languages_2_test # 45
-  junction_test             # 47
-  opening_timing_test       # 40
-  i18n_test                 # 37
-  text_boxes_test           # 20
+  opening_timing_test         # 39
+  debug_tools_test            # 33
+  i18n_test                   # 32
+  text_boxes_test             # 16
 )
 suites=()
 for name in "${heavy_suites[@]}"; do

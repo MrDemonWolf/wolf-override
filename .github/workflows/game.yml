@@ -17,7 +17,7 @@ concurrency:
 jobs:
   godot:
     runs-on: ubuntu-24.04
-    # The job's steps besides the suites take about a minute; 20 leaves the check step its 15.
+    # The steps besides the suites take about a minute (run 40141935412); 20 leaves the check step its 15.
     timeout-minutes: 20
     defaults:
       run:
@@ -47,7 +47,8 @@ jobs:
           echo "GODOT_BIN=$godot_bin" >> "$GITHUB_ENV"
       - name: Import and run headless checks
         # Measured: 404 s of suites before the text-box split and longest-first order (run 39370708132),
-        # 224 s after on the development Mac (2026-10-24). 15 minutes leaves room for the full-slice route suite still to come.
+        # 235 s after (run 40141935412, the job 4 min 27 s). 15 minutes leaves room for the full-slice
+        # route suite still to come.
         timeout-minutes: 15
         env:
           CHECK_LOG_DIR: ${{ runner.temp }}/wolf-check-logs
