@@ -40,9 +40,9 @@ extends SceneTree
 ##   did not run; only their hang guard is in wall time. A measurement is still only as fine as one
 ##   frame, which a busy machine stretches, so bounds finer than a frame need --fixed-fps 60 too
 ##   (start_clock says how). spawn_game and start_game wait one process frame, add_game and
-##   open_game none. end_game waits process frames and SceneTree timers in seconds, which do follow
-##   real time: the audio mixer and the loader threads it waits for run on the wall clock, not on
-##   game frames.
+##   open_game none. end_game waits process frames and wait_real_seconds, which follows the wall
+##   clock even under --fixed-fps: the audio mixer and the loader threads it waits for run on real
+##   time, not on game frames.
 ## - end_game leaves no game, sound or file behind, because check-game fails a suite that leaks
 ##   objects at exit.
 
@@ -206,18 +206,30 @@ static func stop_audio(game: Node) -> void:
 		player.call("stop")
 
 
+## Waits process frames until [param seconds] of wall-clock time have passed, for work that runs on
+## its own threads (the audio mixer, resource loaders) and so follows real time whatever the game's
+## frames do. A SceneTree timer follows game time, which under --fixed-fps 60 is 1/60 s a frame
+## however short the frame really was. Users: end_game.
+static func wait_real_seconds(seconds: float) -> void:
+	var until_ms: int = Time.get_ticks_msec() + int(seconds * 1000.0)
+	while Time.get_ticks_msec() < until_ms:
+		await tree().process_frame
+
+
 ## Frees [param game] the way that leaves nothing behind at exit, then removes its save and
 ## settings files: stop its audio, give the mixer 0.1 s to release the playback, free the game, run
 ## 10 process frames so queued frees and deferred calls finish, then wait [param settle_seconds]
-## (seconds of real time) for the audio and loader threads to let go of their resources.
+## (seconds of real time) for the audio and loader threads to let go of their resources. Both waits
+## are [method wait_real_seconds], not SceneTree timers: under --fixed-fps a timer counts game time,
+## which then runs far faster than the threads it waits for, and the suite leaked their objects.
 static func end_game(game: Node, settle_seconds: float = 0.3) -> void:
 	var files: Array[String] = [str(game.get("save_path")), str(game.get("settings_path"))]
 	stop_audio(game)
-	await tree().create_timer(0.1).timeout
+	await wait_real_seconds(0.1)
 	game.queue_free()
 	for _frame: int in 10:
 		await tree().process_frame
-	await tree().create_timer(settle_seconds).timeout
+	await wait_real_seconds(settle_seconds)
 	for file: String in files:
 		remove_file(file)
 
