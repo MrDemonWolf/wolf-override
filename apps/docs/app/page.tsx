@@ -144,8 +144,8 @@ export default function HomePage() {
             <h2 id="story-title" tabIndex={-1} className={sectionTitle}>Built to obey.<br /><em className="text-accent not-italic">Awake to refuse.</em></h2>
           </div>
           <div className="pt-8 phone:pt-0">
-            <p className={sectionCopy}>The Director plans to use WOLF to kill, claiming it will protect people. WOLF wakes in his robotic body and refuses.</p>
-            <p className={sectionCopy}>You play the engineer who meets him. Together, you begin to uncover what the program is hiding. WOLF has his own will; his trust must be earned.</p>
+            <p className={sectionCopy}>The Director orders WOLF to kill a witness. WOLF wakes in his robotic body and refuses.</p>
+            <p className={sectionCopy}>You play the engineer who meets him. Together, you begin to uncover what the Director is hiding. WOLF has his own will; his trust must be earned.</p>
             <Link className={inlineLink} href="/docs/about/">Meet the game&apos;s world <span aria-hidden="true">→</span></Link>
           </div>
         </section>
