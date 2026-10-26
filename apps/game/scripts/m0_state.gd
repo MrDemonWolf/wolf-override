@@ -1,8 +1,22 @@
 class_name M0State
 extends RefCounted
+## The slice's progress and the checkpoint file that keeps it: who the engineer is, where both actors
+## stand, the relay choice WOLF remembers and every chapter beat. to_dict and from_dict are the save
+## format (from_dict rejects anything a real run could not produce); save_to_disk and load_from_disk
+## write and read it without losing newer progress to a failed write.
 
 const SAVE_VERSION: int = 4
 const SAVE_PATH: String = "user://m0-save.json"
+## The save file's write counter, one higher at every save_to_disk. It sits beside to_dict()'s fields
+## rather than in them, so it is not progress: from_dict ignores it, and older builds load the file too.
+const GENERATION_KEY: String = "generation"
+## The counter's ceiling: 2^53, the largest whole number JSON's doubles hold exactly. One save a second
+## would take 285 million years to reach it.
+const MAX_GENERATION: int = 9007199254740992
+## The largest checkpoint file read. A v4 save is under 1 KiB even with the longest choice wording
+## (MAX_SELECTED_TEXT_LENGTH), so 64 KiB, the settings file's limit (GameSettings.MAX_SETTINGS_BYTES),
+## leaves room for every future field while a huge or wrong file is turned away before it is read.
+const MAX_CHECKPOINT_BYTES: int = 65536
 const CHAPTER_IDS: Array[String] = ["lockdown", "records", "junction"]
 const EVENT_ID: String = "relay_disagreement"
 const DISCLOSE: String = "disclose_risk"
@@ -350,50 +364,69 @@ static func from_dict(raw: Variant) -> M0State:
 	return state
 
 
+## Writes this state as the checkpoint at [param path] (through AtomicFile, so a crash mid-write leaves
+## the old checkpoint whole) and returns true when [param path] holds it. The file is to_dict() plus a
+## GENERATION_KEY one higher than either copy already on disk, which is how load_from_disk tells the
+## newer of the checkpoint and a leftover temporary copy apart. On false the new progress may sit in
+## the temporary copy only; load_from_disk still finds it there.
 func save_to_disk(path: String = SAVE_PATH) -> bool:
-	var temp_path: String = path + ".tmp"
-	var file: FileAccess = FileAccess.open(temp_path, FileAccess.WRITE)
-	if file == null:
-		return false
-	var stored: bool = file.store_string(JSON.stringify(to_dict()))
-	file.flush()
-	var write_error: Error = file.get_error()
-	file.close()
-	if not stored or write_error != OK:
-		return false
-	return DirAccess.rename_absolute(ProjectSettings.globalize_path(temp_path), ProjectSettings.globalize_path(path)) == OK
+	var data: Dictionary = to_dict()
+	data[GENERATION_KEY] = maxi(_generation_of(read_json(path)), _generation_of(read_json(AtomicFile.temp_path(path)))) + 1
+	return AtomicFile.write_text(path, JSON.stringify(data))
 
 
+## The checkpoint saved at [param path], or null when there is none worth loading. Of the checkpoint
+## and its temporary copy (AtomicFile.temp_path) it returns the newer valid one by GENERATION_KEY, the
+## checkpoint on a tie (so saves from before generations, both at 0, load as they always did). When
+## the temporary copy wins it is moved over the checkpoint, so the next save cannot overwrite the only
+## copy of that progress; a move that fails keeps the temporary copy for the next load.
 static func load_from_disk(path: String = SAVE_PATH) -> M0State:
-	var loaded: M0State = _read_checkpoint(path)
-	if loaded != null:
-		return loaded
-	# Only used when the main checkpoint is missing or unreadable, e.g. the first save or a rename that removed the old file first.
-	var temp_path: String = path + ".tmp"
-	var recovered: M0State = _read_checkpoint(temp_path)
-	if recovered != null:
-		var global_temp: String = ProjectSettings.globalize_path(temp_path)
-		var global_path: String = ProjectSettings.globalize_path(path)
-		# Promote the recovered copy; fall back to copying so the only readable checkpoint never
-		# stays at .tmp, where the next save would overwrite it.
-		if DirAccess.rename_absolute(global_temp, global_path) != OK and not DirAccess.dir_exists_absolute(global_path):
-			DirAccess.copy_absolute(global_temp, global_path)
-	return recovered
+	var temp_path: String = AtomicFile.temp_path(path)
+	var main_data: Variant = read_json(path)
+	var temp_data: Variant = read_json(temp_path)
+	var main_state: M0State = _checkpoint_from(main_data)
+	var temp_state: M0State = _checkpoint_from(temp_data)
+	if temp_state == null:
+		return main_state
+	if main_state != null and _generation_of(main_data) >= _generation_of(temp_data):
+		return main_state
+	AtomicFile.promote(temp_path, path)
+	return temp_state
 
 
-static func _read_checkpoint(path: String) -> M0State:
+## The parsed JSON in the save file at [param path], or null when it is missing, larger than
+## MAX_CHECKPOINT_BYTES, unopenable or not JSON. Reads only; the debug tools' SAVE page uses it too.
+static func read_json(path: String) -> Variant:
 	if not FileAccess.file_exists(path):
 		return null
 	var file: FileAccess = FileAccess.open(path, FileAccess.READ)
 	if file == null:
+		return null
+	if file.get_length() > MAX_CHECKPOINT_BYTES:
+		file.close()
+		push_warning("Checkpoint file is too large; ignoring it: " + path)
 		return null
 	var body: String = file.get_as_text()
 	file.close()
 	var json: JSON = JSON.new()
 	if json.parse(body) != OK:
 		return null
-	var loaded: M0State = from_dict(json.data)
+	return json.data
+
+
+## The state in parsed save [param data] when it is valid and past the first checkpoint, else null.
+static func _checkpoint_from(data: Variant) -> M0State:
+	var loaded: M0State = from_dict(data)
 	return loaded if loaded != null and loaded.checkpoint_reached else null
+
+
+## The GENERATION_KEY of parsed save [param data]: 0 when it is missing or not a whole number of at
+## least 0 (every save written before generations, or a hand-edited one).
+static func _generation_of(data: Variant) -> int:
+	if not (data is Dictionary):
+		return 0
+	var generation: Variant = (data as Dictionary).get(GENERATION_KEY)
+	return int(generation) if _whole_in_range(generation, 0, MAX_GENERATION) else 0
 
 
 static func _whole_in_range(value: Variant, low: int, high: int) -> bool:

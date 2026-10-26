@@ -127,18 +127,21 @@ func _initialize() -> void:
 	_expect(v3_loaded != null and v3_loaded.chapter_id == "records" and v3_loaded.purge_trace_preserved and v3_loaded.mirror_trace_preserved and v3_loaded.mirror_route == "wolf" and not v3_loaded.chapter_complete, "literal v3 records save keeps its chapter and both traces")
 
 	var recovery_path: String = "user://m0-state-recovery-%s.json" % OS.get_process_id()
+	var recovery_temp: String = AtomicFile.temp_path(recovery_path)
 	_expect(records.save_to_disk(recovery_path), "recovery fixture saves")
-	DirAccess.rename_absolute(ProjectSettings.globalize_path(recovery_path), ProjectSettings.globalize_path(recovery_path + ".tmp"))
+	_expect(_move(recovery_path, recovery_temp), "the fixture moves to the temporary copy")
 	var recovered: M0State = State.load_from_disk(recovery_path)
 	_expect(recovered != null and recovered.to_dict() == records.to_dict(), "surviving temporary save loads when the main file is missing")
-	_expect(FileAccess.file_exists(recovery_path) and not FileAccess.file_exists(recovery_path + ".tmp"), "recovered temporary save is promoted into place")
-	DirAccess.rename_absolute(ProjectSettings.globalize_path(recovery_path), ProjectSettings.globalize_path(recovery_path + ".tmp"))
+	_expect(FileAccess.file_exists(recovery_path) and not FileAccess.file_exists(recovery_temp), "recovered temporary save is promoted into place")
+	_expect(_move(recovery_path, recovery_temp), "the fixture moves to the temporary copy again")
 	_expect(write_text(recovery_path, "not json"), "test file opens for writing: " + recovery_path)
 	recovered = State.load_from_disk(recovery_path)
 	_expect(recovered != null and recovered.to_dict() == records.to_dict(), "surviving temporary save replaces an unreadable main file")
-	for leftover: String in [recovery_path, recovery_path + ".tmp"]:
+	for leftover: String in [recovery_path, recovery_temp]:
 		if FileAccess.file_exists(leftover):
 			DirAccess.remove_absolute(ProjectSettings.globalize_path(leftover))
+	_check_newer_copy_wins(state, records)
+	_check_size_cap(records)
 
 	var malformed_bodies: Dictionary = {
 		"non-JSON": "WOLF OVERRIDE save",
@@ -163,16 +166,66 @@ func _initialize() -> void:
 		_expect(State.from_dict(below_floor) == null, "rejects WOLF position below the floor")
 	# A blocked promotion must not lose the only readable checkpoint.
 	var blocked_path: String = "user://m0-blocked-%s.json" % OS.get_process_id()
+	var blocked_temp: String = AtomicFile.temp_path(blocked_path)
 	var blocked_state: M0State = M0State.new()
 	blocked_state.record_choice(M0State.DISCLOSE)
 	blocked_state.arm_breaker()
 	blocked_state.activate_power("wolf")
 	blocked_state.reach_checkpoint()
-	blocked_state.save_to_disk(blocked_path)
-	DirAccess.rename_absolute(ProjectSettings.globalize_path(blocked_path), ProjectSettings.globalize_path(blocked_path + ".tmp"))
+	_expect(blocked_state.save_to_disk(blocked_path), "the blocked fixture saves")
+	_expect(_move(blocked_path, blocked_temp), "the blocked fixture moves to the temporary copy")
 	DirAccess.make_dir_absolute(ProjectSettings.globalize_path(blocked_path))
 	var blocked_loaded: M0State = M0State.load_from_disk(blocked_path)
-	_expect(blocked_loaded != null and blocked_loaded.checkpoint_reached and FileAccess.file_exists(blocked_path + ".tmp"), "a recovered checkpoint that cannot be promoted still loads and keeps its temporary copy")
+	_expect(blocked_loaded != null and blocked_loaded.checkpoint_reached and FileAccess.file_exists(blocked_temp), "a recovered checkpoint that cannot be promoted still loads and keeps its temporary copy")
 	DirAccess.remove_absolute(ProjectSettings.globalize_path(blocked_path))
-	DirAccess.remove_absolute(ProjectSettings.globalize_path(blocked_path + ".tmp"))
+	DirAccess.remove_absolute(ProjectSettings.globalize_path(blocked_temp))
 	finish("M0 state checks passed")
+
+
+## Moves the file at [param from] over [param to] and returns whether the rename worked, so a fixture
+## that did not move fails its suite instead of letting a recovery check pass untested (Codex M8).
+func _move(from: String, to: String) -> bool:
+	return DirAccess.rename_absolute(ProjectSettings.globalize_path(from), ProjectSettings.globalize_path(to)) == OK
+
+
+## A save whose rename into place failed leaves the newer progress in the temporary copy beside an
+## older checkpoint (Codex M9). Loading must pick the newer copy by its generation and move it into
+## place; an older temporary copy must lose to the checkpoint; and two saves without a generation
+## (every save before it) keep loading the checkpoint, as they always did. [param older] and
+## [param newer] are two valid checkpoints with different progress. Uses a path of its own, empty at
+## the start, so the generations it counts begin at 1.
+func _check_newer_copy_wins(older: M0State, newer: M0State) -> void:
+	var path: String = "user://m0-state-newer-%s.json" % OS.get_process_id()
+	var temp: String = AtomicFile.temp_path(path)
+	_expect(older.save_to_disk(path), "the older checkpoint saves")
+	var older_body: String = FileAccess.get_file_as_string(path)
+	_expect(newer.save_to_disk(path), "the newer checkpoint saves")
+	_expect(not FileAccess.file_exists(temp), "a save that went into place leaves no temporary copy")
+	# Stand in for a failed rename: the newer save stays in the temporary copy, the older one in place.
+	_expect(_move(path, temp) and write_text(path, older_body), "the failed-rename files are set up")
+	var loaded: M0State = State.load_from_disk(path)
+	_expect(loaded != null and loaded.to_dict() == newer.to_dict(), "a newer temporary copy wins over an older checkpoint")
+	_expect(not FileAccess.file_exists(temp) and State.load_from_disk(path).to_dict() == newer.to_dict(), "the newer copy is moved into place, so the next save cannot overwrite it")
+	_expect(write_text(temp, older_body), "an older temporary copy is set up")
+	loaded = State.load_from_disk(path)
+	_expect(loaded != null and loaded.to_dict() == newer.to_dict() and FileAccess.file_exists(temp), "an older temporary copy loses to the checkpoint and is left alone")
+	_expect(newer.save_to_disk(path), "a save over a stale temporary copy works")
+	var after: Dictionary = State.read_json(path)
+	_expect(int(after.get(State.GENERATION_KEY, 0)) == 3, "each save counts one past both copies on disk (got %s)" % after.get(State.GENERATION_KEY))
+	_expect(write_text(path, JSON.stringify(older.to_dict())) and write_text(temp, JSON.stringify(newer.to_dict())), "two saves from before generations are set up")
+	loaded = State.load_from_disk(path)
+	_expect(loaded != null and loaded.to_dict() == older.to_dict(), "without generations the checkpoint loads, as before")
+	for leftover: String in [path, temp]:
+		DirAccess.remove_absolute(ProjectSettings.globalize_path(leftover))
+
+
+## A checkpoint file over State.MAX_CHECKPOINT_BYTES is not read, even when its JSON is a valid save.
+## [param valid] is a checkpoint that loads at its normal size.
+func _check_size_cap(valid: M0State) -> void:
+	var path: String = "user://m0-state-oversized-%s.json" % OS.get_process_id()
+	var body: String = JSON.stringify(valid.to_dict())
+	var padded: String = body.left(-1) + ", \"padding\": \"%s\"}" % "x".repeat(State.MAX_CHECKPOINT_BYTES)
+	_expect(write_text(path, padded), "test file opens for writing: " + path)
+	_expect(State.read_json(path) == null and State.load_from_disk(path) == null, "a checkpoint over the size cap is turned away")
+	_expect(write_text(path, body) and State.load_from_disk(path) != null, "the same save at its normal size loads")
+	DirAccess.remove_absolute(ProjectSettings.globalize_path(path))

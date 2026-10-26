@@ -176,6 +176,14 @@ func configure(path: String) -> void:
 	select_tab(0)
 
 
+## Writes [param config] to the settings file at [param path] through AtomicFile, so a crash or a full
+## disk mid-write never leaves a half-written file that load_config would turn into defaults. Returns
+## true when [param path] holds it. Every settings writer (this menu, Main's display options, the debug
+## unlock) saves through here; ConfigFile.save would write straight over the live file.
+static func save_config(config: ConfigFile, path: String) -> bool:
+	return AtomicFile.write_text(path, config.encode_to_text())
+
+
 ## Reads a settings file without letting it construct objects or load resources.
 ## ConfigFile.load parses object and resource forms before any value can be checked.
 static func load_config(path: String) -> ConfigFile:
@@ -858,7 +866,7 @@ func _save_extra() -> bool:
 			var current: Array[Dictionary] = _family_bindings(InputMap.action_get_events(action), kind)
 			if current != _family_bindings(defaults[action], kind) and not current.is_empty():
 				config.set_value("bindings", key, current[0])
-	if config.save(settings_path) != OK:
+	if not save_config(config, settings_path):
 		show_note(I18n.KEY.tr("Settings could not be saved."))
 		return false
 	return true

@@ -536,16 +536,26 @@ func reload_checkpoint() -> String:
 	return Main.RESTORE_FROM_DISK_LINE
 
 
-## Deletes the checkpoint (and a leftover temporary copy); the title's buttons follow.
+## Deletes the checkpoint and its temporary copy (AtomicFile.temp_path); the title's buttons follow.
+## Returns the note the SAVE page shows, naming what was actually removed: the checkpoint, only a
+## leftover temporary copy, nothing, or a file that would not go (so a failed delete never reads as done).
 func clear_save() -> String:
 	var path: String = game.save_path
-	var removed: bool = false
-	for file: String in [path, path + ".tmp"]:
+	var removed: Array[String] = []
+	var stuck: bool = false
+	for file: String in [path, AtomicFile.temp_path(path)]:
 		if FileAccess.file_exists(file):
-			removed = DirAccess.remove_absolute(ProjectSettings.globalize_path(file)) == OK or removed
+			if DirAccess.remove_absolute(ProjectSettings.globalize_path(file)) == OK:
+				removed.append(file)
+			else:
+				stuck = true
 	game.debug_save_changed()
 	changed.emit()
-	return "Checkpoint deleted." if removed else "No checkpoint on disk."
+	if stuck:
+		return "A save file could not be deleted."
+	if removed.has(path):
+		return "Checkpoint deleted."
+	return "Leftover temporary save deleted." if not removed.is_empty() else "No checkpoint on disk."
 
 
 # --- Effect switches ----------------------------------------------------------------------------

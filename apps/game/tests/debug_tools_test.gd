@@ -1781,6 +1781,9 @@ func _check_saves() -> void:
 	_expect(not (game.get("continue_button") as Button).disabled, "a jump's checkpoint lets the title continue")
 	actions.clear_save()
 	_expect((game.get("continue_button") as Button).disabled, "clearing the save on the title greys out Continue")
+	var leftover: String = AtomicFile.temp_path(save_path)
+	_expect(write_text(leftover, "{}") and actions.clear_save() == "Leftover temporary save deleted." and not FileAccess.file_exists(leftover), "with only a leftover temporary copy, CLEAR SAVE says that is what it deleted")
+	_expect(actions.clear_save() == "No checkpoint on disk.", "with nothing left, CLEAR SAVE says so")
 	await free_tools_game(game)
 
 

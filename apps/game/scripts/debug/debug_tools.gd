@@ -563,7 +563,7 @@ func _store_unlock() -> void:
 		config.set_value(SETTINGS_SECTION, SETTINGS_KEY, true)
 	elif config.has_section_key(SETTINGS_SECTION, SETTINGS_KEY):
 		config.erase_section_key(SETTINGS_SECTION, SETTINGS_KEY)
-	if config.save(settings_path) != OK:
+	if not GameSettings.save_config(config, settings_path):
 		push_warning("The debug unlock could not be saved with the settings.")
 
 
@@ -762,17 +762,12 @@ func _read_save_info(path: String, exists: bool) -> Dictionary:
 	if not exists:
 		return info
 	save_reads += 1
-	var json: JSON = JSON.new()
-	var file: FileAccess = FileAccess.open(path, FileAccess.READ)
-	if file == null or json.parse(file.get_as_text()) != OK:
-		info["checkpoint"] = "unreadable"
-		return info
-	var saved: M0State = M0State.from_dict(json.data)
+	var data: Variant = M0State.read_json(path)
+	var saved: M0State = M0State.from_dict(data)
 	if saved == null or not saved.checkpoint_reached:
 		info["checkpoint"] = "unreadable"
 		return info
-	if json.data is Dictionary:
-		info["file_version"] = int((json.data as Dictionary).get("version", 0))
+	info["file_version"] = int((data as Dictionary).get("version", 0))
 	info["checkpoint"] = checkpoint_label(saved)
 	return info
 

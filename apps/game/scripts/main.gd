@@ -2160,7 +2160,7 @@ func _save_settings() -> void:
 	config.set_value("video", "fps_limit", fps_options.get_selected_id())
 	config.set_value("video", "resolution", resolution_options.selected)
 	config.set_value("video", "fullscreen", fullscreen_toggle.button_pressed)
-	if config.save(settings_path) != OK:
+	if not GameSettings.save_config(config, settings_path):
 		settings_menu.show_note(I18n.KEY.tr("Settings could not be saved."))
 
 
