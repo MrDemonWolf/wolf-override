@@ -235,7 +235,7 @@ Changes merged after 0.15.0. They become the next version when it is cut.
 - The two opening suites read the game on every frame and run at a fixed 60 frames per second, so a busy machine's long frames no longer move the beats they measure.
 - `render.sh` exits with Godot's status, so a crashed or timed-out render fails; it also fails when the project does not import.
 - An unknown route or variant fails a parity capture instead of passing with no stills.
-- `render.sh` and the parity runs check job, route, variant and size names before clearing any folder. `tools/render/self_test.sh` checks this without Docker.
+- `render.sh` and the parity runs check job, route, variant and size names before clearing any folder. `tools/render/self_test.sh` checks this without Docker, and Game checks runs it.
 - `compare.py` no longer compares a masked still with itself.
 - The docs export check names a page with no robots tag instead of stopping.
 

@@ -34,6 +34,10 @@ jobs:
         env:
           BASE_REF: ${{ github.base_ref }}
         run: python3 scripts/check-copies.py --base "origin/$BASE_REF"
+      # render.sh's exit status and its name checks (Codex review findings M1 and M2), against a
+      # stand-in docker: no container or Godot, a second or two.
+      - name: render.sh self-test
+        run: tools/render/self_test.sh
       - name: Get pinned Godot 4.7.2
         run: |
           curl --fail --location --retry 3 \
