@@ -24,8 +24,14 @@
 #   scripts/parity/run.sh perf <out dir> <label>
 #       Headless CPU-side performance probe (startup including load(main.tscn), per-state frame and
 #       _process time, _refresh_ui, and the junction room's and its Recesses' _draw in microseconds,
-#       node and object counts) into <out dir>/<label>.json. Texture memory is 0 headless; the
-#       capture driver records RENDER_TEXTURE_MEM_USED per still in the render container instead.
+#       the opening's frames and hitches in the dock bay, room loads, one language pass, node and
+#       object counts, static memory and resident set) into <out dir>/<label>.json. A run whose log
+#       says objects leaked at exit fails. Texture memory is 0 headless; the capture driver records
+#       RENDER_TEXTURE_MEM_USED per still in the render container instead.
+#   scripts/parity/run.sh resources <out file>
+#       Headless memory snapshot before and after main.tscn enters the tree (resources.gd): the
+#       Performance object counts, static memory, resident set, and every cached resource with its
+#       size, as JSON into <out file>, with its log beside it as <out file>.log.
 #   Compare captures with scripts/parity/compare.py (exact changed-pixel counts; --self-test checks
 #   it), UI dumps with diff, and perf runs with scripts/parity/perf_summary.py.
 #
@@ -173,10 +179,27 @@ case "$cmd" in
       echo "perf run reported errors (see $out/$label.log)" >&2
       exit 1
     fi
+    # Godot only warns about objects leaked at exit, so $errors does not catch it; a leak means the
+    # probe's teardown (or the game's) let a stream or node outlive the game, as check-game.sh treats it.
+    if grep -q 'leaked at exit' "$out/$label.log"; then
+      echo "perf run leaked objects at exit (see $out/$label.log; run it with --verbose for their names)" >&2
+      exit 1
+    fi
     echo "ok    perf $label"
     ;;
+  resources)
+    out="${2:?out file}"
+    isolate_home
+    prepare_headless
+    "$godot" --headless --path "$game" --script res://parity/resources.gd -- --out="$out" > "$out.log" 2>&1
+    if grep -qE "$errors" "$out.log" || [ ! -s "$out" ]; then
+      echo "resources run reported errors (see $out.log)" >&2
+      exit 1
+    fi
+    echo "ok    resources -> $out"
+    ;;
   *)
-    sed -n '2,48p' "$0" >&2
+    sed -n '2,54p' "$0" >&2
     exit 2
     ;;
 esac

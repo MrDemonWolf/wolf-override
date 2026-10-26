@@ -3,7 +3,8 @@
 
 Each folder holds one or more <label>.json runs from the same commit; take them interleaved in the
 same session (before, after, before, after, ...) so a busy machine affects both sides alike. Every
-figure is the median across that folder's runs; the last column is after against before.
+figure is the median across that folder's runs; the last column is after against before. A figure
+only one side has (say, a run from before the probe measured it) shows "-" on the other side.
 Usage: python3 -I scripts/parity/perf_summary.py <before dir> <after dir>
 """
 import json
@@ -27,9 +28,25 @@ def figures(run: dict) -> dict[str, float]:
         for key in ("junction_draw_us", "recesses_draw_us"):
             if s.get(key, -1.0) >= 0.0:
                 out[f"{state} {key.replace('_draw_us', ' _draw us')}"] = s[key]
-    final = run["final"]
-    for key in ("nodes", "objects", "resources", "static_mb"):
-        out[f"final {key}"] = float(final[key])
+    opening = run.get("opening")
+    if opening:
+        out["opening new game call ms"] = opening["new_game_call_ms"]
+        out["opening frame p99 ms"] = opening["frame_ms"]["p99"]
+        out["opening frame max ms"] = opening["frame_ms"]["max"]
+        out[f"opening frames over {opening['hitch_ms']:g} ms"] = float(opening["over_hitch_ms"])
+    for room, times in run.get("room_loads", {}).items():
+        out[f"load {room} call ms"] = times["call_ms"]
+        out[f"load {room} through first frame ms"] = times["through_first_frame_ms"]
+    for code, times in run.get("languages", {}).items():
+        out[f"language {code} through first frame ms"] = times["through_first_frame_ms"]
+    # Memory figures; rss_mb and peak_rss_mb are -1 where the system does not give them
+    # (parity_kit.gd's rss_mb), and those are left out rather than averaged in.
+    for part in ("final", "after_languages"):
+        for key in ("nodes", "objects", "resources", "static_mb", "static_max_mb", "rss_mb"):
+            if run.get(part, {}).get(key, -1) >= 0:
+                out[f"{part.replace('_', ' ')} {key}"] = float(run[part][key])
+    if run.get("peak_rss_mb", -1) >= 0:
+        out["peak rss_mb"] = float(run["peak_rss_mb"])
     return out
 
 
@@ -43,14 +60,19 @@ def main() -> int:
         return 1
     print(f"| Figure (median of {len(sides[0])} before, {len(sides[1])} after) | Before | After | Change |")
     print("|---|---:|---:|---:|")
-    for key in sides[0][0]:
-        before = statistics.median(f[key] for f in sides[0] if key in f)
-        after_values = [f[key] for f in sides[1] if key in f]
-        if not after_values:
-            continue
-        after = statistics.median(after_values)
-        change = "" if before == 0 else f"{(after - before) / before * 100.0:+.1f}%"
-        print(f"| {key} | {before:.3f} | {after:.3f} | {change} |")
+    # Every figure either side has, in first-seen order (dicts keep insertion order).
+    keys = list(dict.fromkeys(k for side in sides for run in side for k in run))
+    for key in keys:
+        medians = []
+        for side in sides:
+            values = [f[key] for f in side if key in f]
+            medians.append(statistics.median(values) if values else None)
+        before, after = medians
+        change = ""
+        if before is not None and after is not None and before != 0:
+            change = f"{(after - before) / before * 100.0:+.1f}%"
+        cells = ["-" if v is None else f"{v:.3f}" for v in medians]
+        print(f"| {key} | {cells[0]} | {cells[1]} | {change} |")
     return 0
 
 
