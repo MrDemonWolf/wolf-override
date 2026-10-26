@@ -65,6 +65,7 @@ static func attach(target: Sprite2D, strength: float = 0.32) -> FloorReflection:
 	return reflection
 
 
+## While enabled and active, mirrors the source every frame and notes the frame, so _catch_up does not mirror it twice.
 func _process(_delta: float) -> void:
 	_mirrored_frame = Engine.get_process_frames()
 	_mirror()
@@ -77,6 +78,10 @@ func _catch_up() -> void:
 		_mirror()
 
 
+## Matches the source as drawn now: shown with it, its image and cut taken again if they changed, flipped
+## below floor_y and squashed by SQUASH, its rotation reversed, its tint (modulate x self_modulate). The
+## contact shadow sits under the source at floor_y (its resting width), or under shadow_span while that is
+## set (a 64 px texture stretched to the span plus 6 px). Parent-space px.
 func _mirror() -> void:
 	if source == null:
 		return
@@ -133,18 +138,22 @@ static func lod_bias_of(sprite: Sprite2D) -> float:
 	return float(bias) if bias is float or bias is int else 0.0
 
 
+## Half of [param sprite]'s drawn height in its own px: its region's, else its texture's, else 0.
 static func _half_height(sprite: Sprite2D) -> float:
 	if sprite.region_enabled:
 		return sprite.region_rect.size.y * 0.5
 	return float(sprite.texture.get_height()) * 0.5 if sprite.texture != null else 0.0
 
 
+## Half of [param sprite]'s drawn width in its own px: its region's, else its texture's, else 0.
 static func _half_width(sprite: Sprite2D) -> float:
 	if sprite.region_enabled:
 		return sprite.region_rect.size.x * 0.5
 	return float(sprite.texture.get_width()) * 0.5 if sprite.texture != null else 0.0
 
 
+## A new, unparented soft contact shadow named after [param owner_name]: a 64 px radial fade scaled to
+## [param width] (parent px, at least 24) by 12 px, on the floor layer (Z_FLOOR).
 static func _make_shadow(owner_name: String, width: float) -> Sprite2D:
 	var shadow: Sprite2D = Sprite2D.new()
 	shadow.name = owner_name + "Shadow"

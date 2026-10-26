@@ -61,6 +61,7 @@ var _white_rest: Color = Color(0.0, 0.0, 0.0, 0.0)
 var _red_rest: float = 0.0
 
 
+## Keeps the kit processing while the tree is paused, and seeds the shake noise (seed 7) so a shake is the same each run.
 func _init() -> void:
 	# Shake settles and hit-stops end while the tree is paused, so nothing stays frozen off-centre.
 	process_mode = Node.PROCESS_MODE_ALWAYS
@@ -68,12 +69,15 @@ func _init() -> void:
 	_noise.frequency = 1.0
 
 
+## Gives the kit what it acts on: [param target_camera] for the shake (its offset), and the full-screen
+## [param fade] and [param alarm] overlays the white flash and red wash borrow. Main calls it once.
 func setup(target_camera: Camera2D, fade: ColorRect, alarm: ColorRect) -> void:
 	camera = target_camera
 	white_flash = fade
 	red_wash = alarm
 
 
+## Leaving the tree, puts everything back at rest (reset), so time scale never stays dipped.
 func _exit_tree() -> void:
 	reset()
 
@@ -83,6 +87,9 @@ func motion_allowed() -> bool:
 	return enabled and not reduce_motion
 
 
+## While there is trauma: decays it to 0 over TRAUMA_DECAY_SECONDS ([param delta] in seconds) and shakes
+## the camera's offset by noise sampled at SHAKE_RATE, trauma squared x MAX_SHAKE_PX (world px); centres
+## the camera when it reaches 0.
 func _process(delta: float) -> void:
 	if trauma <= 0.0:
 		return
@@ -99,6 +106,8 @@ func _process(delta: float) -> void:
 	camera.offset = Vector2(sample_x, sample_y) * amplitude
 
 
+## Adds [param amount] (0..1) to the shake, capped at 1. Does nothing while motion is not allowed
+## (motion_allowed) or the debug menu's shake switch is off.
 func add_trauma(amount: float) -> void:
 	if not motion_allowed() or not shake_enabled:
 		return
@@ -116,6 +125,7 @@ func hit_stop(seconds: float) -> void:
 	timer.timeout.connect(_end_hit_stop.bind(_stop_serial))
 
 
+## A hit-stop's timer ran out: puts time scale back to 1, but only if no later hit-stop or reset has taken over ([param serial] still the latest).
 func _end_hit_stop(serial: int) -> void:
 	if serial == _stop_serial:
 		Engine.time_scale = 1.0
@@ -149,6 +159,7 @@ func flash(white_seconds: float, red_seconds: float) -> void:
 	_flash_tween.chain().tween_callback(_end_flash)
 
 
+## Stops the flash under way, if any, and puts both overlays back at the colours they had before it.
 func _end_flash() -> void:
 	Tweens.kill(_flash_tween)
 	_flash_tween = null
@@ -186,6 +197,7 @@ func reset() -> void:
 	_end_flash()
 
 
+## Centres the camera (no shake offset).
 func _settle_camera() -> void:
 	if camera != null:
 		camera.offset = Vector2.ZERO

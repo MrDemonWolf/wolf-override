@@ -22,6 +22,8 @@ const ACTOR_LAYER_BIT: int = 1
 var _inside: Array[M0Actor] = []
 
 
+## Sets the physics up so the hazard detects bodies on the actor layer (ACTOR_LAYER_BIT) without being on
+## any layer or detectable itself, and follows bodies coming and going.
 func _init() -> void:
 	collision_layer = 0
 	collision_mask = ACTOR_LAYER_BIT
@@ -44,6 +46,8 @@ static func make(hazard_name: String, rect: Rect2, cause: String) -> Hazard:
 	return hazard
 
 
+## The engineer's body ([param body] with actor_id "human"; anything else is ignored) came inside: notes
+## him, and reports contact at once while armed.
 func _on_body_entered(body: Node2D) -> void:
 	if not (body is M0Actor) or (body as M0Actor).actor_id != &"human":
 		return
@@ -54,6 +58,7 @@ func _on_body_entered(body: Node2D) -> void:
 		contact.emit(self)
 
 
+## An actor's [param body] left: it no longer counts as inside, so arming later reports nothing for it.
 func _on_body_exited(body: Node2D) -> void:
 	if body is M0Actor:
 		_inside.erase(body as M0Actor)
