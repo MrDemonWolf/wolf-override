@@ -14,6 +14,9 @@ signal input_seen(event: InputEvent)
 @onready var _settings_menu: GameSettings = get_node_or_null("Panel/SettingsMenu") as GameSettings
 
 
+## While shown, forwards every [param event] as input_seen, then turns a Pause or Back press into
+## back_requested (settings showing) or resume_requested and marks it handled. A press while Settings
+## waits for a new key binding is left for the menu to take.
 func _input(event: InputEvent) -> void:
 	if not visible:
 		return
