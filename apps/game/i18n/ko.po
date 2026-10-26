@@ -2664,11 +2664,11 @@ msgid "MIRROR COPIED"
 msgstr "미러 복사됨"
 
 # machine-translated by Claude (Anthropic), unreviewed
-#. TRANSLATORS: The Director, the opening's first line: an order to WOLF, whom he thinks is in standby, to kill a witness, the records worker. The worker's gender is not given: use a neutral form where the language has one.
+#. TRANSLATORS: The Director, the opening's first line. He speaks about WOLF, not to him, believing WOLF is in standby (WOLF overhears): WOLF is to kill a witness, the records worker. "He" is WOLF. The worker's gender is not given: use a neutral form where the language has one.
 #. i18n: story speaker=DIRECTOR
 #: scripts/story_text.gd:38
-msgid "The records worker is a witness. WOLF, when you wake, kill the worker."
-msgstr "기록 담당자가 증인이다. WOLF, 깨어나면 그 기록 담당자를 죽여라."
+msgid "The records worker saw too much. When WOLF wakes, he kills the worker."
+msgstr "기록 담당자는 너무 많이 봤다. WOLF는 깨어나면 그 기록 담당자를 죽인다."
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: i18n: story speaker=narrator

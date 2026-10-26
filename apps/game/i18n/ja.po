@@ -2664,11 +2664,11 @@ msgid "MIRROR COPIED"
 msgstr "ミラーコピー済"
 
 # machine-translated by Claude (Anthropic), unreviewed
-#. TRANSLATORS: The Director, the opening's first line: an order to WOLF, whom he thinks is in standby, to kill a witness, the records worker. The worker's gender is not given: use a neutral form where the language has one.
+#. TRANSLATORS: The Director, the opening's first line. He speaks about WOLF, not to him, believing WOLF is in standby (WOLF overhears): WOLF is to kill a witness, the records worker. "He" is WOLF. The worker's gender is not given: use a neutral form where the language has one.
 #. i18n: story speaker=DIRECTOR
 #: scripts/story_text.gd:38
-msgid "The records worker is a witness. WOLF, when you wake, kill the worker."
-msgstr "記録係が証人だ。WOLF、目を覚ましたら記録係を殺せ。"
+msgid "The records worker saw too much. When WOLF wakes, he kills the worker."
+msgstr "記録係は見すぎた。WOLFは目を覚ましたら、記録係を殺す。"
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: i18n: story speaker=narrator
