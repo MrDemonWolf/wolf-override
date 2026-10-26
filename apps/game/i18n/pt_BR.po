@@ -2746,6 +2746,7 @@ msgstr "Você estava em espera."
 #. TRANSLATORS: WOLF's answer to the Director: he heard the order to kill the witness and refuses it.
 #. TRANSLATORS: WOLF's answer to the Director: he heard the order to kill the witness and refuses it.
 #. TRANSLATORS: WOLF's answer to the Director: he heard the order to kill the witness and refuses it.
+#. TRANSLATORS: WOLF's answer to the Director: he heard the order to kill the witness and refuses it.
 #. i18n: story speaker=WOLF
 #: scripts/story_text.gd:50
 msgid "I heard you. I won't do it."
@@ -2891,7 +2892,7 @@ msgstr "PRIMEIRA CÓPIA GUARDADA."
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: i18n: story speaker=WOLF
 #: scripts/story_text.gd:106
-msgid "An order and a timestamp show the Director is erasing something. I want the source."
+msgid "An order and a timestamp: the Director is erasing something. I want the source."
 msgstr "Uma ordem e um carimbo de data e hora mostram que o Diretor está apagando algo. Quero a origem."
 
 # machine-translated by Claude (Anthropic), unreviewed

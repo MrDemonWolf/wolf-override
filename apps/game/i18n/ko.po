@@ -2707,6 +2707,7 @@ msgstr "넌 대기 상태였을 텐데."
 #. TRANSLATORS: WOLF's answer to the Director: he heard the order to kill the witness and refuses it.
 #. TRANSLATORS: WOLF's answer to the Director: he heard the order to kill the witness and refuses it.
 #. TRANSLATORS: WOLF's answer to the Director: he heard the order to kill the witness and refuses it.
+#. TRANSLATORS: WOLF's answer to the Director: he heard the order to kill the witness and refuses it.
 #. i18n: story speaker=WOLF
 #: scripts/story_text.gd:50
 msgid "I heard you. I won't do it."
@@ -2849,7 +2850,7 @@ msgstr "첫 번째 사본 확보."
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: i18n: story speaker=WOLF
 #: scripts/story_text.gd:106
-msgid "An order and a timestamp show the Director is erasing something. I want the source."
+msgid "An order and a timestamp: the Director is erasing something. I want the source."
 msgstr "명령 하나와 타임스탬프로 소장이 뭔가를 지우고 있다는 게 드러나. 원본이 필요해."
 
 # machine-translated by Claude (Anthropic), unreviewed

@@ -344,7 +344,7 @@ const FINISHED_NOTE: String = "Slice complete. PLAY AGAIN starts a fresh run."
 ## Records' closing lines as the first copy is secured at the exit (formatted with the engineer's tag):
 ## the narration's card, then WOLF's words and the engineer's, each its own message.
 const RECORDS_SECURED_WORDS: String = "FIRST COPY SECURED."
-const RECORDS_CLOSE_WOLF_WORDS: String = "An order and a timestamp show the Director is erasing something. I want the source."
+const RECORDS_CLOSE_WOLF_WORDS: String = "An order and a timestamp: the Director is erasing something. I want the source."
 const RECORDS_CLOSE_ENGINEER_WORDS: String = "Then Archive is next."
 const RECORDS_CLOSE_LINE: String = RECORDS_SECURED_WORDS + " WOLF: " + RECORDS_CLOSE_WOLF_WORDS + "\n%s: " + RECORDS_CLOSE_ENGINEER_WORDS
 ## Only a hand-made save can reopen the cleared junction; it says where the line goes, not that it is unbuilt.

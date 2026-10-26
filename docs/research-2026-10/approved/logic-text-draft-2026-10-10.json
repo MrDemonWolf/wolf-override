@@ -624,10 +624,10 @@
       "where": "apps/game/scripts/main.gd _interact_records (complete_chapter)",
       "trigger": "Securing the first copy at the Records exit.",
       "speaker": "WOLF",
-      "current": "FIRST COPY SECURED. WOLF: An order and a timestamp show the Director is erasing something. I want the source.\n{NAME}: Then Archive is next.",
-      "proposed": "FIRST COPY SECURED. WOLF: An order and a timestamp show the Director is erasing something. I want the source.\n{NAME}: Then Archive is next.",
+      "current": "FIRST COPY SECURED. WOLF: An order and a timestamp: the Director is erasing something. I want the source.\n{NAME}: Then Archive is next.",
+      "proposed": "FIRST COPY SECURED. WOLF: An order and a timestamp: the Director is erasing something. I want the source.\n{NAME}: Then Archive is next.",
       "alternatives": [],
-      "notes": "Problem 10: 'A list' named nothing on screen; this names what was actually copied (the purge order's trace and the mirror timestamp). Fit: 2 of 3 rows, untagged box (855 px text width, Roboto 17 px); alt 1: 2 of 3 rows, untagged box (855 px text width, Roboto 17 px). 2026-10-26: 'Who's a threat' is the retired threat-label framing. The line names the Director because nothing else in its box gives 'he' an antecedent, and translators see the message alone.",
+      "notes": "Problem 10: 'A list' named nothing on screen; this names what was actually copied (the purge order's trace and the mirror timestamp). Fit: 2 of 3 rows, untagged box (855 px text width, Roboto 17 px); alt 1: 2 of 3 rows, untagged box (855 px text width, Roboto 17 px). 2026-10-26: 'Who's a threat' is the retired threat-label framing. The line names the Director because nothing else in its box gives 'he' an antecedent, and translators see the message alone. Written with a colon ('An order and a timestamp: the Director is erasing something.') because the LINES.md wording ('...show the Director is erasing something.') split WOLF's words into two boxes; this one stays one box, as before.",
       "status": "drafted by Claude 2026-10-26 for the story canon of 2026-10-26 (docs/decisions.md ST-01 to ST-07; LINES.md change 8); waiting for Nathanial's read. IMPLEMENTED on branch story/canon-rewrite-2026-10.",
       "history": [
         {

@@ -2707,6 +2707,7 @@ msgstr "お前は待機中のはずだ。"
 #. TRANSLATORS: WOLF's answer to the Director: he heard the order to kill the witness and refuses it.
 #. TRANSLATORS: WOLF's answer to the Director: he heard the order to kill the witness and refuses it.
 #. TRANSLATORS: WOLF's answer to the Director: he heard the order to kill the witness and refuses it.
+#. TRANSLATORS: WOLF's answer to the Director: he heard the order to kill the witness and refuses it.
 #. i18n: story speaker=WOLF
 #: scripts/story_text.gd:50
 msgid "I heard you. I won't do it."
@@ -2849,7 +2850,7 @@ msgstr "最初のコピーを確保。"
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: i18n: story speaker=WOLF
 #: scripts/story_text.gd:106
-msgid "An order and a timestamp show the Director is erasing something. I want the source."
+msgid "An order and a timestamp: the Director is erasing something. I want the source."
 msgstr "命令とタイムスタンプで、所長が何かを消しているとわかる。原本が欲しい。"
 
 # machine-translated by Claude (Anthropic), unreviewed

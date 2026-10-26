@@ -2722,6 +2722,7 @@ msgstr "你本該處於待機狀態。"
 #. TRANSLATORS: WOLF's answer to the Director: he heard the order to kill the witness and refuses it.
 #. TRANSLATORS: WOLF's answer to the Director: he heard the order to kill the witness and refuses it.
 #. TRANSLATORS: WOLF's answer to the Director: he heard the order to kill the witness and refuses it.
+#. TRANSLATORS: WOLF's answer to the Director: he heard the order to kill the witness and refuses it.
 #. i18n: story speaker=WOLF
 #: scripts/story_text.gd:50
 msgid "I heard you. I won't do it."
@@ -2865,7 +2866,7 @@ msgstr "第一份副本已儲存。"
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: i18n: story speaker=WOLF
 #: scripts/story_text.gd:106
-msgid "An order and a timestamp show the Director is erasing something. I want the source."
+msgid "An order and a timestamp: the Director is erasing something. I want the source."
 msgstr "一道指令加一個時間戳記，說明所長在抹掉什麼東西。我要源頭。"
 
 # machine-translated by Claude (Anthropic), unreviewed

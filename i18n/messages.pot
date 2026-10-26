@@ -1839,7 +1839,7 @@ msgstr ""
 
 #. TRANSLATORS: i18n: story speaker=WOLF
 #: scripts/story_text.gd:106
-msgid "An order and a timestamp show the Director is erasing something. I want the source."
+msgid "An order and a timestamp: the Director is erasing something. I want the source."
 msgstr ""
 
 #. TRANSLATORS: The engineer answers WOLF (their name stands over the line). Archive is the next place.
