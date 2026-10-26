@@ -25,7 +25,7 @@ driver=""
 limit=900
 keyboard=""
 here="$(cd "$(dirname "$0")" && pwd)"
-# shellcheck source=validate_names.sh
+# shellcheck source-path=SCRIPTDIR source=validate_names.sh
 source "$here/validate_names.sh"
 
 while [[ $# -gt 0 ]]; do

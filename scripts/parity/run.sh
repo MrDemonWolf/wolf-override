@@ -53,7 +53,7 @@ here="$root/scripts/parity"
 godot="${GODOT_BIN:-godot}"
 game_src="${PARITY_GAME:-$root/apps/game}"
 errors='^ERROR:|SCRIPT ERROR|Parse Error|USER ERROR'
-# shellcheck source=../../tools/render/validate_names.sh
+# shellcheck source-path=SCRIPTDIR source=../../tools/render/validate_names.sh
 source "$root/tools/render/validate_names.sh"
 
 isolate_home() {
