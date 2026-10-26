@@ -65,7 +65,7 @@ func _check_no_urgency() -> void:
 	_expect(lines.size() >= 20, "the scan finds WOLF's lines (%d)" % lines.size())
 	for row: String in ["It crosses the mark on every pass.", "Take the purge queue. I'll inspect the mirror.", "I chose the relay. We made it."]:
 		_expect(lines.has(row), "the scan reads the second row of WOLF's two-row boxes (\"%s\")" % row)
-	for row: String in ["%s: Then we get through maintenance before the original logs disappear.", "1  USE WOLF'S READOUT     2  USE MANUAL PORT"]:
+	for row: String in ["%s: Then we get through maintenance before he reaches that witness.", "1  USE WOLF'S READOUT     2  USE MANUAL PORT"]:
 		_expect(not lines.has(row), "and stops at the next speaker or the choices (\"%s\")" % row)
 	for line: String in lines:
 		for word: String in URGENCY:
