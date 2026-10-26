@@ -283,6 +283,10 @@ var exit_open: float = 0.0
 var reader_ok: float = 0.0
 
 
+## Builds the whole bay once, back to front: the room layer at RoomDepth.Z_MID (the plate and its two
+## pendant lights), D2 the Director's exit, D1 the opening into the corridor, the dock and its cage
+## front, and the near column on the front layer (Main.KNOCKDOWN_Z). Ends with the exit shut and WOLF's
+## dock on standby.
 func _ready() -> void:
 	name = "DockBay"
 	room = Node2D.new()
@@ -435,6 +439,9 @@ func _build_cage_front() -> void:
 	room.add_child(lockdown_glow)
 
 
+## Each frame ([param delta] seconds): sets the charge light's strength, breathing by BREATHE_SHARE over
+## BREATHE_SECONDS on standby unless Reduced Motion, and once the cage lock is torn plays its drop and
+## swing (torn_pose) on its pivot.
 func _process(delta: float) -> void:
 	_clock += delta
 	var k: float = charge_k

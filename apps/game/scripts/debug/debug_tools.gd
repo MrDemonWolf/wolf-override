@@ -178,6 +178,9 @@ func setup(main: Main) -> void:
 	_apply()
 
 
+## Builds the tools' nodes once, all hidden, from setup: the DebugLayer canvas layer (LAYER) holding
+## the zone drawing, the menu, the overlay, the note and the DEBUG button (kept BUTTON_GAP left of PAUSE,
+## canvas px), and the DebugActions child. Each child's own setup runs here.
 func _build() -> void:
 	layer = CanvasLayer.new()
 	layer.name = "DebugLayer"
@@ -347,6 +350,8 @@ func _choice_under_overlay() -> bool:
 	return false
 
 
+## While the overlay shows, refreshes its text every REFRESH_SECONDS (counting [param delta] seconds), not
+## every frame.
 func _process(delta: float) -> void:
 	_refresh_left -= delta
 	if _refresh_left <= 0.0:
@@ -354,6 +359,8 @@ func _process(delta: float) -> void:
 		_refresh_overlay()
 
 
+## Rewrites the overlay's text for its page: performance, or the state dump without geometry (zones page
+## flagged). Nothing when off.
 func _refresh_overlay() -> void:
 	if overlay_mode == Overlay.PERFORMANCE:
 		overlay.show_performance(performance())
@@ -361,6 +368,10 @@ func _refresh_overlay() -> void:
 		overlay.show_state(dump(false), overlay_mode == Overlay.ZONES, state_width())
 
 
+## Reads every [param event] for the tools: the unlock codes on the title, and once available F3
+## (overlay), F12 (capture), backquote or L3 + R3 (menu), F5 to F7 or the pad toggles on the zones page,
+## and frame-step presses. Leaves Settings' rebind alone. Each key or button it uses is marked handled;
+## the rest pass on to Main.
 func _input(event: InputEvent) -> void:
 	if game == null:
 		return
@@ -473,6 +484,9 @@ func _rebinding() -> bool:
 	return settings != null and not settings.capture_action.is_empty()
 
 
+## Follows the title's cheat codes: typed letters against KEY_CODE (any other key starts it again;
+## modifiers are skipped) and controller presses against PAD_CODE. A full code unlocks the tools; the
+## pad code's last press, and later its release, are kept from the focused title button.
 func _watch_codes(event: InputEvent) -> void:
 	if event is InputEventKey and event.pressed and not event.is_echo():
 		if _is_modifier(event as InputEventKey):
@@ -498,6 +512,7 @@ func _watch_codes(event: InputEvent) -> void:
 			get_viewport().set_input_as_handled()
 
 
+## True when the last controller presses kept are exactly PAD_CODE, in order.
 func _pad_code_entered() -> bool:
 	if _pad.size() != PAD_CODE.size():
 		return false
@@ -507,6 +522,7 @@ func _pad_code_entered() -> bool:
 	return true
 
 
+## True for a modifier key (MODIFIER_KEYS) by its logical or physical code, which a typed code skips over.
 static func _is_modifier(event: InputEventKey) -> bool:
 	return MODIFIER_KEYS.has(event.keycode) or MODIFIER_KEYS.has(event.physical_keycode)
 
@@ -522,6 +538,8 @@ static func _letter(event: InputEventKey) -> String:
 	return ""
 
 
+## Counts left clicks or taps on the title's logo mark: LOGO_TAPS in a row, each within LOGO_TAP_GAP_MSEC
+## of the last, unlock the tools. Only while the title listens for codes.
 func _on_logo_input(event: InputEvent) -> void:
 	# A tap on a phone arrives here as the mouse click Godot emulates from the touch.
 	if not (event is InputEventMouseButton and event.pressed and (event as InputEventMouseButton).button_index == MOUSE_BUTTON_LEFT):
@@ -555,6 +573,8 @@ func lock() -> void:
 	show_note(LOCKED_NOTE)
 
 
+## Writes the unlock into the settings file (SETTINGS_SECTION / SETTINGS_KEY), or removes it when locked,
+## keeping the file's other keys. Warns, and changes nothing else, when the file cannot be written.
 func _store_unlock() -> void:
 	if settings_path.is_empty():
 		return
@@ -572,6 +592,8 @@ func cycle_overlay() -> void:
 	set_overlay_mode((overlay_mode + 1) % OVERLAY_NAMES.size())
 
 
+## Shows overlay page [param mode] (an Overlay value, clamped to OFF..ZONES) at once and emits
+## overlay_mode_changed. Does nothing while the tools are unavailable.
 func set_overlay_mode(mode: int) -> void:
 	if not available:
 		return
@@ -642,6 +664,10 @@ func await_drawn_frame(drawn: Signal, frames: int) -> bool:
 	return came[0]
 
 
+## Saves a bug capture under capture_dir, named by the time (a suffix keeps it unique): the full dump()
+## as JSON and, when [param screenshot] and a frame is drawn, the screen as PNG. [param with_boxes] is
+## recorded in the paths. Returns {"json", "png" ("" with no image), "with_boxes"}, also kept as
+## last_capture, emits captured and shows a note; {} when unavailable or the JSON cannot be written.
 func _write_capture(with_boxes: bool, screenshot: bool = true) -> Dictionary:
 	if not available:
 		return {}
@@ -678,6 +704,8 @@ func _screenshot() -> Image:
 	return image if image != null and not image.is_empty() else null
 
 
+## The local date and time as a file-name stem ("YYYY-MM-DDTHH-MM-SS-mmm", colons as dashes, milliseconds
+## from the engine clock).
 static func _timestamp() -> String:
 	return "%s-%03d" % [Time.get_datetime_string_from_system(false, false).replace(":", "-"), Time.get_ticks_msec() % 1000]
 
@@ -757,6 +785,10 @@ func save_info(fresh: bool = true) -> Dictionary:
 	return info.duplicate()
 
 
+## Reads the save at [param path] (when [param exists]) into the overlay's summary: {"version" (this
+## build's), "path", "exists", "checkpoint"} plus "file_version" for a readable checkpoint. "checkpoint"
+## is "none" with no file, "unreadable" for one from_dict rejects or that has no checkpoint, else
+## checkpoint_label. Counts the read in save_reads.
 func _read_save_info(path: String, exists: bool) -> Dictionary:
 	var info: Dictionary = {"version": M0State.SAVE_VERSION, "path": path, "exists": exists, "checkpoint": "none"}
 	if not exists:
@@ -831,6 +863,7 @@ func note_avoids() -> Array[Rect2]:
 	return rects
 
 
+## Moves the note to note_rect() and wraps it there, except in the title's one-line slot.
 func _place_note() -> void:
 	var rect: Rect2 = note_rect()
 	note.position = rect.position
@@ -839,12 +872,14 @@ func _place_note() -> void:
 	note_label.autowrap_mode = TextServer.AUTOWRAP_OFF if rect == TITLE_NOTE_RECT else TextServer.AUTOWRAP_WORD_SMART
 
 
+## Hides the note now, cancelling its timer.
 func hide_note() -> void:
 	if _note_tween != null and _note_tween.is_valid():
 		_note_tween.kill()
 	_note_done()
 
 
+## The note's time is up: hides it and lets the layer hide if nothing else on it shows.
 func _note_done() -> void:
 	_note_tween = null
 	note.hide()

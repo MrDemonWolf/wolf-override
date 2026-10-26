@@ -142,6 +142,8 @@ class SentryVisual:
 	var dormant: bool = false
 	var _wake_tween: Tween
 
+	## Builds the active body and the hidden wreck from their whole pieces, and the lens glow at the slit's
+	## front edge.
 	func _init() -> void:
 		body = _art("Body", Sentry.ACTIVE_ART, Sentry.ACTIVE_TREAD_X)
 		wreck = _art("Wreck", Sentry.WRECK_ART, Sentry.WRECK_TREAD_X)
@@ -153,6 +155,7 @@ class SentryVisual:
 		add_child(lens_glow)
 		_sync_glow()
 
+	## True while the eye shows (not wrecked and not EYE_OFF), when the lamp, lens and beam are drawn lit.
 	func is_lit() -> bool:
 		return not wrecked and eye != EYE_OFF
 
@@ -188,6 +191,8 @@ class SentryVisual:
 		else:
 			body.modulate = tint
 
+	## Shows the lens glow in the eye's colour while lit and glows are allowed (Main's effects), hides it
+	## otherwise.
 	func _sync_glow() -> void:
 		if lens_glow == null:
 			return
@@ -208,6 +213,10 @@ class SentryVisual:
 		add_child(sprite)
 		return sprite
 
+	## Draws what the art cannot show, in this node's space (facing +x): the hull's lamp in the eye's colour
+	## (haloed while lit), and while lit the beam from the lens out to [member reach], broken across the
+	## alcove's [member gap] with a faint edge there and a hard tip where its sight ends, then the lens.
+	## Nothing once wrecked.
 	func _draw() -> void:
 		if wrecked:
 			return
@@ -266,6 +275,7 @@ class SentryVisual:
 		var t: float = clampf(inverse_lerp(lens.end.x, reach, at), 0.0, 1.0) if reach > lens.end.x else 1.0
 		return Vector2(lerpf(lens.size.y * 0.5, Sentry.BEAM_SPREAD, t), lerpf(Sentry.BEAM_ALPHA, Sentry.BEAM_TIP_ALPHA, t))
 
+	## A faint line across the beam at [param at] px ahead of the origin, where the alcove cuts its sight off.
 	func _draw_edge(at: float, lens: Rect2) -> void:
 		var y: float = lens.get_center().y
 		var half: float = _beam_section(at, lens).x
@@ -327,12 +337,16 @@ static func lens_rect() -> Rect2:
 	return Rect2(left, top, LENS.size.x * ART_SCALE, LENS.size.y * ART_SCALE)
 
 
+## The body collides with nothing and detects nothing (the brain decides every contact); it floats, so the
+## floor never pushes it.
 func _init() -> void:
 	collision_layer = 0
 	collision_mask = 0
 	motion_mode = CharacterBody2D.MOTION_MODE_FLOATING
 
 
+## Adds the body's box (BODY_SIZE, standing on its origin) and its drawing (SentryVisual) with a floor
+## reflection for the body and the wreck, and stands it on the floor at target_x (world px).
 func _ready() -> void:
 	var shape: CollisionShape2D = CollisionShape2D.new()
 	var box: RectangleShape2D = RectangleShape2D.new()
@@ -348,6 +362,8 @@ func _ready() -> void:
 	position = Vector2(target_x, FLOOR_Y)
 
 
+## Moves the body towards target_x along the floor at up to max_speed (world px/s), stopping within
+## 0.5 px, keeps it on FLOOR_Y and redraws the beam's reach for where it now is.
 func _physics_process(delta: float) -> void:
 	var distance: float = target_x - position.x
 	velocity = Vector2(clampf(distance / delta, -max_speed, max_speed) if absf(distance) > 0.5 and delta > 0.0 else 0.0, 0.0)
@@ -464,6 +480,7 @@ func keel_over(at_x: float) -> void:
 	_down_tween.tween_property(visual, "position", Vector2.ZERO, 0.3).set_trans(Tween.TRANS_BOUNCE).set_ease(Tween.EASE_OUT)
 
 
+## Stops the fall tween of the sentry going down, if one is running.
 func _kill_tween() -> void:
 	Tweens.kill(_down_tween)
 	_down_tween = null

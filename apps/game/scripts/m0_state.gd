@@ -67,14 +67,19 @@ var junction_cleared: bool = false
 var lane_recap: String = ""
 
 
+## The engineer's name from HUMAN_NAMES at name_index.
 func human_name() -> String:
 	return HUMAN_NAMES[name_index]
 
 
+## Steps name_index to the next of HUMAN_NAMES, wrapping round.
 func cycle_name() -> void:
 	name_index = (name_index + 1) % HUMAN_NAMES.size()
 
 
+## Saves the engineer's answer at the relay as WOLF's memory (the six fields from_dict checks, with the
+## words from CHOICE_TEXT). [param choice_id] is DISCLOSE or PRESS. False, changing nothing, when an
+## answer is already saved or the id is unknown.
 func record_choice(choice_id: String) -> bool:
 	if not memory.is_empty() or not CHOICE_TEXT.has(choice_id):
 		return false
@@ -89,6 +94,7 @@ func record_choice(choice_id: String) -> bool:
 	return true
 
 
+## Arms the breaker. False, changing nothing, before the relay answer or once it is armed.
 func arm_breaker() -> bool:
 	if memory.is_empty() or breaker_armed:
 		return false
@@ -96,6 +102,10 @@ func arm_breaker() -> bool:
 	return true
 
 
+## Powers the relay as [param actor_id] ("wolf" or "human") and opens the door. Returns the route taken,
+## "cooperate" (WOLF) or "fallback" (the engineer), which it also stores; or, changing nothing,
+## "not_ready" (breaker not armed), "already_open", "refused" (WOLF was not told the risk) or
+## "invalid_actor".
 func activate_power(actor_id: String) -> String:
 	if not breaker_armed:
 		return "not_ready"
@@ -113,6 +123,7 @@ func activate_power(actor_id: String) -> String:
 	return route
 
 
+## Marks the corridor's safe point reached. False, changing nothing, before the door opens or once reached.
 func reach_checkpoint() -> bool:
 	if not door_open or checkpoint_reached:
 		return false
@@ -120,6 +131,8 @@ func reach_checkpoint() -> bool:
 	return true
 
 
+## Moves the chapter from "lockdown" to "records" and stands both actors at the records room's entry
+## spots (world px). False, changing nothing, before the checkpoint or outside "lockdown".
 func enter_records() -> bool:
 	if not checkpoint_reached or chapter_id != "lockdown":
 		return false
@@ -131,6 +144,7 @@ func enter_records() -> bool:
 	return true
 
 
+## Marks the purge trace kept. False, changing nothing, outside "records" or once kept.
 func preserve_purge_trace() -> bool:
 	if chapter_id != "records" or purge_trace_preserved:
 		return false
@@ -138,6 +152,8 @@ func preserve_purge_trace() -> bool:
 	return true
 
 
+## Marks the mirror trace kept and stores [param selected_route] ("wolf" or "manual") as mirror_route.
+## False, changing nothing, outside "records", before the purge trace, once kept or for any other route.
 func preserve_mirror_trace(selected_route: String) -> bool:
 	if chapter_id != "records" or not purge_trace_preserved or mirror_trace_preserved or (selected_route != "wolf" and selected_route != "manual"):
 		return false
@@ -146,6 +162,7 @@ func preserve_mirror_trace(selected_route: String) -> bool:
 	return true
 
 
+## Closes the records chapter once both traces are kept. False, changing nothing, otherwise or once closed.
 func complete_chapter() -> bool:
 	if chapter_id != "records" or not purge_trace_preserved or not mirror_trace_preserved or chapter_complete:
 		return false
@@ -164,6 +181,7 @@ func enter_junction() -> bool:
 	return true
 
 
+## Marks the junction's sealed door blown. False, changing nothing, outside "junction" or once blown.
 func blow_door() -> bool:
 	if chapter_id != "junction" or door_blown:
 		return false
@@ -217,6 +235,8 @@ func checkpoint_callback() -> String:
 	return "WOLF: " + I18n.format(I18n.KEY.tr("You said \"%s\"\nI made my call. You cranked the bypass anyway. I stayed."), [said], [0])
 
 
+## The save format (SAVE_VERSION) as a fresh Dictionary: identity, both positions as [x, y] world px,
+## a deep copy of memory, the puzzle, the chapter and the junction's beats. from_dict reads it back.
 func to_dict() -> Dictionary:
 	return {
 		"version": SAVE_VERSION,
@@ -241,6 +261,9 @@ func to_dict() -> Dictionary:
 	}
 
 
+## The state a save holds, or null when [param raw] is not one a real run could produce: a wrong type or
+## version, a field out of range, a position off the floor, or beats out of their order. Reads save
+## versions 1 to SAVE_VERSION; fields a version lacks keep their defaults. Has no side effects.
 static func from_dict(raw: Variant) -> M0State:
 	if not (raw is Dictionary):
 		return null
@@ -429,12 +452,16 @@ static func _generation_of(data: Variant) -> int:
 	return int(generation) if _whole_in_range(generation, 0, MAX_GENERATION) else 0
 
 
+## True when [param value] is a whole number (an int, or a float with no fraction, as JSON gives) from
+## [param low] to [param high] inclusive.
 static func _whole_in_range(value: Variant, low: int, high: int) -> bool:
 	if typeof(value) != TYPE_INT and typeof(value) != TYPE_FLOAT:
 		return false
 	return value >= low and value <= high and int(value) == value
 
 
+## True when [param value] is a saved [x, y] pair of numbers inside the slice's walkable box: x from 40
+## to 920 (M0Actor.MIN_X..MAX_X) and y from 0 to [param floor_height] (world px).
 static func _valid_position(value: Variant, floor_height: float) -> bool:
 	if not (value is Array) or value.size() != 2:
 		return false

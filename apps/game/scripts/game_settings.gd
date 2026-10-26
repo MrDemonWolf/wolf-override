@@ -117,6 +117,11 @@ var _note_inserts: Array[String] = []
 @onready var note: Label = $SettingsNote
 
 
+## Builds the menu and applies the settings file at [param path] (kept as settings_path, read through
+## load_config): graphics, language, text size, bus volumes (making any missing bus), dead zone, hold
+## toggle and saved key bindings. A saved binding that clashes with another is dropped back to the
+## default, repeating until the map has no clash, so a deliberate swap of two keys survives. Remembers
+## the project's default bindings first, for reset_controls. Ends on the DISPLAY tab. Main calls it once.
 func configure(path: String) -> void:
 	settings_path = path
 	for action: StringName in ACTIONS:
@@ -215,6 +220,8 @@ static func load_config(path: String) -> ConfigFile:
 	return config
 
 
+## [param config]'s value at [param section]/[param key] as a float, or [param fallback] when it is
+## missing, not a number or not finite.
 static func number(config: ConfigFile, section: String, key: String, fallback: float) -> float:
 	var value: Variant = config.get_value(section, key, fallback)
 	if (value is int or value is float) and is_finite(float(value)):
@@ -222,6 +229,7 @@ static func number(config: ConfigFile, section: String, key: String, fallback: f
 	return fallback
 
 
+## [param config]'s value at [param section]/[param key] when it is a bool, else [param fallback].
 static func boolean(config: ConfigFile, section: String, key: String, fallback: bool) -> bool:
 	var value: Variant = config.get_value(section, key, fallback)
 	return value if value is bool else fallback
@@ -232,6 +240,8 @@ static func saved_window_index(config: ConfigFile) -> int:
 	return clampi(int(number(config, "video", "resolution", DEFAULT_WINDOW_SIZE)), 0, WINDOW_SIZES.size() - 1)
 
 
+## The window size (screen px) at [param index] in WINDOW_SIZES, or the DEFAULT_WINDOW_SIZE one for an
+## index out of range.
 static func window_size(index: int) -> Vector2i:
 	return WINDOW_SIZES[index] if index >= 0 and index < WINDOW_SIZES.size() else WINDOW_SIZES[DEFAULT_WINDOW_SIZE]
 
@@ -250,6 +260,10 @@ static func apply_saved_window(window: Window, config: ConfigFile) -> void:
 		window.mode = Window.MODE_FULLSCREEN
 
 
+## Builds every control of the menu in code, once, from configure: the backdrop panel, the tab bar and
+## the four pages (DISPLAY, AUDIO, CONTROLS, GENERAL), the note under the tabs and CANCEL REBIND. Each
+## control is connected to apply its change and save the file at once (_save_extra). Positions are
+## menu px.
 func _build_menu() -> void:
 	var surface: Panel = Panel.new()
 	surface.position = Vector2(24, 126)
@@ -486,6 +500,7 @@ func _page_box() -> VBoxContainer:
 	return box
 
 
+## A new, unparented Label reading [param caption] at [param font_size] (px), centred vertically.
 func _label(caption: String, font_size: int) -> Label:
 	var label: Label = Label.new()
 	label.text = caption
@@ -514,6 +529,9 @@ func _option_row(page: Control, caption: String, label_rect: Rect2, option_rect:
 	return option
 
 
+## Adds a row to [param parent]: a 220 px caption, an HSlider from [param minimum] to [param maximum] in
+## [param step]s, and a label showing the value as a percentage (the value itself on a 0..100 slider,
+## the value x 100 otherwise). Returns the slider; the caller connects it and sets its value.
 func _slider_row(parent: Node, caption: String, minimum: float, maximum: float, step: float) -> HSlider:
 	var row: HBoxContainer = HBoxContainer.new()
 	row.custom_minimum_size.y = 48
@@ -566,6 +584,8 @@ func apply_theme() -> void:
 		button.add_theme_font_size_override("font_size", 16)
 
 
+## Shows page [param index] (0 DISPLAY, 1 AUDIO, 2 CONTROLS, 3 GENERAL) and its note, hiding the others,
+## and cancels a rebind in progress. It does not move the tab bar, whose tab_changed calls it.
 func select_tab(index: int) -> void:
 	cancel_capture()
 	for page_index: int in pages.size():
@@ -603,23 +623,31 @@ func _show_translated_note() -> void:
 	note.text = I18n.fill(_note_message, filled)
 
 
+## Applies the DISPLAY page's vsync (when the toggle is enabled on this platform) and edge smoothing
+## (the viewport's 2D MSAA) to the running game. Saves nothing.
 func _apply_graphics() -> void:
 	if not vsync.disabled:
 		DisplayServer.window_set_vsync_mode(DisplayServer.VSYNC_ENABLED if vsync.button_pressed else DisplayServer.VSYNC_DISABLED)
 	get_viewport().msaa_2d = antialiasing.selected as Viewport.MSAA
 
 
+## Sets AudioServer bus [param bus] to [param value] percent (0..100, as linear gain to dB), muting it at
+## 0. Saves nothing.
 func _apply_volume(bus: String, value: float) -> void:
 	var index: int = AudioServer.get_bus_index(bus)
 	AudioServer.set_bus_mute(index, value <= 0.0)
 	AudioServer.set_bus_volume_db(index, linear_to_db(maxf(value / 100.0, 0.0001)))
 
 
+## Sets the stick dead zone of every action in ACTIONS to [param value] (0..1 of the stick's travel).
+## Saves nothing.
 func _apply_deadzone(value: float) -> void:
 	for action: StringName in ACTIONS:
 		InputMap.action_set_deadzone(action, value)
 
 
+## Starts rebinding [param action] for [param kind] ("keyboard" or "controller"): the next press of that
+## kind goes to _input, which binds it. Shows how to cancel in the note and the CANCEL REBIND button.
 func begin_capture(action: StringName, kind: String) -> void:
 	capture_action = action
 	capture_kind = kind
@@ -630,6 +658,7 @@ func begin_capture(action: StringName, kind: String) -> void:
 	cancel_button.show()
 
 
+## Stops a rebind in progress, if any, and hides CANCEL REBIND. Leaves the note as it is.
 func cancel_capture() -> void:
 	capture_action = &""
 	capture_kind = ""
@@ -637,6 +666,10 @@ func cancel_capture() -> void:
 		cancel_button.hide()
 
 
+## During a rebind (begin_capture), takes the next press of the captured kind ([param event]: a key, a
+## controller button, or a stick pushed at least 0.65 of the way) and binds it to the action, unless
+## another action already uses it, which the note names instead. Escape cancels. Bound presses are
+## marked handled and saved at once. Ignores everything outside a rebind or while the menu is hidden.
 func _input(event: InputEvent) -> void:
 	if capture_action.is_empty() or not is_visible_in_tree():
 		return
@@ -666,10 +699,13 @@ func _input(event: InputEvent) -> void:
 		show_note(I18n.KEY.tr("Binding saved."))
 
 
+## "keyboard" for a key event, "controller" for a controller button or stick, "" for anything else.
 func _event_kind(event: InputEvent) -> String:
 	return "keyboard" if event is InputEventKey else ("controller" if event is InputEventJoypadButton or event is InputEventJoypadMotion else "")
 
 
+## The first action other than [param target] (and other than the engine's ui_ actions) that
+## [param event] already triggers, or an empty StringName when none does.
 func _binding_conflict(target: StringName, event: InputEvent) -> StringName:
 	for action: StringName in InputMap.get_actions():
 		if not action.begins_with("ui_") and action != target and InputMap.action_has_event(action, event):
@@ -677,6 +713,8 @@ func _binding_conflict(target: StringName, event: InputEvent) -> StringName:
 	return &""
 
 
+## Makes [param event] the only binding of [param kind] for [param action] in the InputMap, keeping the
+## other kind's, and forgets the remembered prompt labels. Saves nothing.
 func _replace_binding(action: StringName, kind: String, event: InputEvent) -> void:
 	_forget_prompts()
 	for old: InputEvent in InputMap.action_get_events(action):
@@ -685,6 +723,9 @@ func _replace_binding(action: StringName, kind: String, event: InputEvent) -> vo
 	InputMap.action_add_event(action, event)
 
 
+## [param event] as the settings file stores a binding: {"type": "key", "code": the physical key} (or the
+## logical one when no physical is set), {"type": "button", "code"} or {"type": "axis", "code",
+## "direction": -1 or 1}; {} for any other event. _decode_binding reads it back.
 func _encode_binding(event: InputEvent) -> Dictionary:
 	if event is InputEventKey:
 		return {"type": "key", "code": event.physical_keycode if event.physical_keycode != KEY_NONE else event.keycode}
@@ -695,6 +736,10 @@ func _encode_binding(event: InputEvent) -> Dictionary:
 	return {}
 
 
+## The input event a saved binding [param data] (from _encode_binding) stands for, or null when it is not
+## one a player could have made: an unknown type, a code out of range, a bare modifier key, or an axis
+## direction other than -1 or 1. Keys come back as physical keys, so a binding follows the key's
+## position whatever the layout.
 func _decode_binding(data: Dictionary) -> InputEvent:
 	if not data.get("code") is int:
 		return null
@@ -722,6 +767,8 @@ func _decode_binding(data: Dictionary) -> InputEvent:
 	return null
 
 
+## Every [param kind] ("keyboard" or "controller") binding of [param action] by name in the current
+## language, joined by " / ", as the CONTROLS page's buttons show them; "" when it has none.
 func binding_label(action: StringName, kind: String) -> String:
 	var labels: PackedStringArray = []
 	for event: InputEvent in InputMap.action_get_events(action):
@@ -751,6 +798,8 @@ func prompt(action: StringName, controller: bool) -> String:
 	return label
 
 
+## The name of [param action]'s first key binding (or, when [param controller], its first controller
+## button or stick), worked out afresh; "?" when it has none. prompt remembers it.
 func _prompt_label(action: StringName, controller: bool) -> String:
 	for event: InputEvent in InputMap.action_get_events(action):
 		if not controller and event is InputEventKey:
@@ -815,11 +864,14 @@ func _button_label(index: int) -> String:
 	return I18n.fill(I18n.KEY.tr("BUTTON %d"), [index])
 
 
+## Drops the remembered prompt labels, so the next prompt call works them out again.
 func _forget_prompts() -> void:
 	_key_prompts.clear()
 	_pad_prompts.clear()
 
 
+## Writes every action's current bindings onto the CONTROLS page's buttons (wrapping a long pair onto a
+## second row) and forgets the remembered prompt labels.
 func _refresh_bindings() -> void:
 	_forget_prompts()
 	for action: StringName in ACTIONS:
@@ -834,6 +886,8 @@ func _refresh_bindings() -> void:
 			button.tooltip_text = button.text
 
 
+## Puts every action in ACTIONS back to the project's default bindings and the dead zone back to 0.25,
+## cancelling a rebind in progress, then saves and says so in the note.
 func reset_controls() -> void:
 	cancel_capture()
 	for action: StringName in ACTIONS:
@@ -846,6 +900,10 @@ func reset_controls() -> void:
 		show_note(I18n.KEY.tr("Default controls restored."))
 
 
+## Writes everything this menu holds into the settings file at settings_path (read first, so the keys
+## Main writes, such as the window size, are kept): video, language once picked, volumes, controls, and
+## only the bindings that differ from the defaults. Returns false, with a note, when the file could not
+## be written.
 func _save_extra() -> bool:
 	var config: ConfigFile = load_config(settings_path)
 	config.set_value("video", "vsync", vsync.button_pressed)
@@ -872,6 +930,8 @@ func _save_extra() -> bool:
 	return true
 
 
+## The [param kind] ("keyboard" or "controller") events among [param events], each encoded by
+## _encode_binding, in their order.
 func _family_bindings(events: Array[InputEvent], kind: String) -> Array[Dictionary]:
 	var result: Array[Dictionary] = []
 	for event: InputEvent in events:

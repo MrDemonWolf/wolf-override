@@ -1,5 +1,9 @@
 class_name PauseOverlay
 extends ColorRect
+## The pause screen's dimmed backdrop (CanvasLayer/PauseOverlay in main.tscn), holding the pause menu and
+## the settings menu. It runs while the tree is paused, so it turns Pause and Back presses into
+## [signal resume_requested] (pause menu showing) or [signal back_requested] (settings showing) for Main to
+## act on; it changes no state of its own.
 
 signal resume_requested
 signal back_requested
@@ -10,6 +14,9 @@ signal input_seen(event: InputEvent)
 @onready var _settings_menu: GameSettings = get_node_or_null("Panel/SettingsMenu") as GameSettings
 
 
+## While shown, forwards every [param event] as input_seen, then turns a Pause or Back press into
+## back_requested (settings showing) or resume_requested and marks it handled. A press while Settings
+## waits for a new key binding is left for the menu to take.
 func _input(event: InputEvent) -> void:
 	if not visible:
 		return

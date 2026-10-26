@@ -90,6 +90,10 @@ static func wants_skip(args: PackedStringArray, display_name: String) -> bool:
 	return args.has(SKIP_ARG) or display_name == "headless"
 
 
+## Starts the logo: reads Reduced Motion and the saved window from the settings file, or, when the
+## launch asks to skip (wants_skip), changes straight to the title and does nothing else. Otherwise
+## applies the saved window (desktop only), starts the background loads of the assets to warm, holds
+## quitting until they finish, and shows the first frame.
 func _ready() -> void:
 	_mascot_top = mascot.position.y
 	var config: ConfigFile = GameSettings.load_config(settings_path)
@@ -119,6 +123,8 @@ static func wants_saved_window(config: ConfigFile, mobile: bool) -> bool:
 	return not mobile and (config.has_section_key("video", "resolution") or config.has_section_key("video", "fullscreen"))
 
 
+## A window close or Android Back while quitting is held marks quit_requested (_process quits once the
+## loads are done); leaving the tree gives quitting back to the engine.
 func _notification(what: int) -> void:
 	if what == NOTIFICATION_WM_CLOSE_REQUEST or what == NOTIFICATION_WM_GO_BACK_REQUEST:
 		if not get_tree().auto_accept_quit:
@@ -133,6 +139,10 @@ func _release_quit() -> void:
 	get_tree().quit_on_go_back = true
 
 
+## Each frame until the hand-over: collects finished loads, quits when asked and nothing is loading,
+## and (unless manual_clock) moves the logo on by [param delta] seconds, capped at MAX_STEP, faster when
+## skipping. It holds at FADE_AT with the loading bar fading in until the title has loaded, and hands
+## over at END_AT.
 func _process(delta: float) -> void:
 	if handed_over:
 		return
@@ -157,6 +167,8 @@ func _process(delta: float) -> void:
 		_hand_over()
 
 
+## Any key, mouse button, controller button or touch press skips to the closing fade (skip) and is
+## marked handled. Ignored after the hand-over or under manual_clock.
 func _input(event: InputEvent) -> void:
 	if handed_over or manual_clock:
 		return
@@ -177,6 +189,7 @@ func skip() -> void:
 	_apply()
 
 
+## True once the title scene has loaded and no test holds it back (hold_load).
 func is_loaded() -> bool:
 	return main_scene != null and not hold_load
 
@@ -188,6 +201,9 @@ func seek(time: float, bar: float = 0.0) -> void:
 	_apply()
 
 
+## Draws the logo as it is at elapsed seconds: the grin from SWAP_AT with its hop (none under Reduced
+## Motion), the company name fading in, the loading bar at bar_alpha (sweeping, or glowing in place
+## under Reduced Motion) and the fade to the title from FADE_AT.
 func _apply() -> void:
 	grin_mouth.visible = elapsed >= SWAP_AT
 	var hop: float = clampf((elapsed - SWAP_AT) / BOUNCE_SECONDS, 0.0, 1.0)
@@ -211,6 +227,10 @@ func _apply() -> void:
 	fade.color.a = clampf((elapsed - FADE_AT) / FADE_SECONDS, 0.0, 1.0)
 
 
+## Collects every background load that has finished (failed ones too, so none stays pending). Once the
+## warmed assets are all in it requests the title scene, and when that arrives keeps it in main_scene
+## (loading it directly if the background load failed), lets the warmed assets go and gives quitting
+## back. Nothing once the title is loaded.
 func _poll_load() -> void:
 	if main_scene != null:
 		return
@@ -274,6 +294,8 @@ class HandoverCover extends ColorRect:
 	## When the title's first frame ran, in Time.get_ticks_msec(); -1 until then.
 	var title_since: int = -1
 
+	## Once the title is the current scene, clears the cover over HANDOVER_SECONDS (at most one MAX_STEP per
+	## frame) and frees it, with its layer, when it is clear and INPUT_GUARD_SECONDS have passed.
 	func _process(delta: float) -> void:
 		var scene: Node = get_tree().current_scene
 		if scene == null or scene.scene_file_path != MAIN_SCENE:
@@ -284,6 +306,7 @@ class HandoverCover extends ColorRect:
 		if color.a <= 0.0 and Time.get_ticks_msec() - title_since >= INPUT_GUARD_SECONDS * 1000.0:
 			get_parent().queue_free()
 
+	## Swallows every key, mouse button, controller button and touch event while the cover is up.
 	func _input(event: InputEvent) -> void:
 		if event is InputEventKey or event is InputEventMouseButton or event is InputEventJoypadButton or event is InputEventScreenTouch:
 			get_viewport().set_input_as_handled()

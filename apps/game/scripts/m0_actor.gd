@@ -1,5 +1,10 @@
 class_name M0Actor
 extends CharacterBody2D
+## One of the slice's two walking bodies, the engineer ([member actor_id] "human") or WOLF ("wolf"). Each
+## physics step it moves one of three ways: by the player's move input while [member controlled], towards
+## [member autonomous_target_x] when Main sends it somewhere on its own, or beside [member follow_target]
+## (WOLF following the engineer). Positions and limits are world px, speeds world px per second. It also
+## draws the control marker at its feet and dims WOLF while he walks past the engineer.
 
 @export var actor_id: StringName = &"human"
 @onready var body_sprite: Sprite2D = get_node_or_null("BodySprite") as Sprite2D
@@ -100,6 +105,10 @@ const PASS_TINT_RATE: float = 6.0
 const GRAVITY: float = 900.0
 
 
+## Moves the body one physics step ([param delta] seconds): player input (capped at walk_max_x, easing to
+## settle_x when no input is held), else autonomous_target_x, else the follow spot from follow_x, else
+## standing still. Sets velocity (world px/s) and the sprite's facing, applies GRAVITY, slides, clamps x
+## to min_x..max_x and updates the pass tint.
 func _physics_process(delta: float) -> void:
 	var following: bool = false
 	var settling: bool = false
@@ -203,6 +212,9 @@ static func facing_of(node: Node2D) -> int:
 	return -1 if actor != null and actor.body_sprite != null and actor.body_sprite.flip_h else 1
 
 
+## The x velocity (world px/s) that walks this body to [param target_x] (world px) this step of
+## [param delta] seconds without overshooting: capped at FOLLOW_SPEED x speed_scale, and 0 once within
+## ARRIVE_TOLERANCE.
 func _approach(target_x: float, delta: float) -> float:
 	var distance: float = target_x - position.x
 	var speed: float = FOLLOW_SPEED * speed_scale
@@ -215,6 +227,8 @@ func passing() -> bool:
 		and absf(position.x - keep_clear_of.position.x) < CLEAR_GAP
 
 
+## Eases the body sprite's self_modulate towards PASS_TINT while [method passing], back to white otherwise,
+## at PASS_TINT_RATE per second over [param delta] seconds. Does nothing without a keep_clear_of.
 func _tint_pass(delta: float) -> void:
 	if body_sprite == null or keep_clear_of == null:
 		return
@@ -222,6 +236,8 @@ func _tint_pass(delta: float) -> void:
 	body_sprite.self_modulate = body_sprite.self_modulate.lerp(tint, minf(PASS_TINT_RATE * delta, 1.0))
 
 
+## Adds the control marker as its own top-level canvas item at MARKER_Z (z not relative to this body), so
+## no art drawn over the actors cuts it.
 func _ready() -> void:
 	_marker = Node2D.new()
 	_marker.name = "ControlMarker"

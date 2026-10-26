@@ -243,6 +243,8 @@ func reset(door_blown: bool, down: bool, down_x: float) -> void:
 	far_x = PATROL_MAX_X
 
 
+## Enters the lock state: holds still for LOCK_SECONDS before the chase, with the lost-sight timer and a
+## miss's turn cleared.
 func _lock_on() -> void:
 	state = &"lock"
 	lock_remaining = LOCK_SECONDS
@@ -250,6 +252,9 @@ func _lock_on() -> void:
 	turned_by_miss = false
 
 
+## Walks the patrol at PATROL_SPEED (world px/s) for [param delta] seconds, bouncing off PATROL_MIN_X and
+## the far end (_far_end) and keeping any overshoot, so one long step and several short ones land the
+## same. Outside the range (a chase parked it there) it walks back in instead of jumping.
 func _patrol(delta: float) -> void:
 	# Outside the patrol range (a chase parked it short of the rubble): face back into it and walk
 	# there at patrol speed rather than jumping in.
@@ -287,6 +292,9 @@ func _hold_on(bait_x: float, delta: float) -> void:
 		facing = signf(look - x)
 
 
+## Steps x towards [param target_x], held within [param min_x]..the far end, at up to [param speed]
+## (world px/s) for [param delta] seconds, facing the way it moves; it lands exactly on the goal when it
+## is within this step.
 func _move_toward(target_x: float, speed: float, delta: float, min_x: float = CHASE_MIN_X) -> void:
 	var goal: float = clampf(target_x, min_x, maxf(min_x, _far_end()))
 	var step: float = speed * delta
@@ -318,6 +326,9 @@ func _stop_at_obstacle(from_x: float) -> void:
 		facing = 1.0 if from_right else -1.0
 
 
+## True when the engineer at [param engineer_x] (world px) is seen: [param engineer_exposed] (not in
+## cover) and either within CONTACT_RANGE on either side or ahead of it inside its sight (sight_end_x,
+## cut short by a tank lying in the way).
 func _sees(engineer_x: float, engineer_exposed: bool) -> bool:
 	if not engineer_exposed:
 		return false
