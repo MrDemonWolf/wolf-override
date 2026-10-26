@@ -19,12 +19,13 @@ extends SceneTree
 ## - What the statics touch besides their arguments: the running SceneTree (tree(), and its paused
 ##   flag in free_tools_game); the global Input actions and events (hold, press_for, tap, walk_to,
 ##   walk_to_reading_on, retry, send_key and continue_until (with its two users) press or send them,
-##   and each releases what it pressed
-##   before it returns); user:// files (remove_file and remove_tools_files delete them,
+##   and each releases what it pressed before it returns; tap_now releases on the next process frame
+##   instead); user:// files (remove_file and remove_tools_files delete them, write_text writes one,
 ##   fresh_save_path, start_game and open_game delete stale save and settings files before the game
-##   starts, end_game deletes the game's own after it is freed); and the process id (in the file
-##   names, so suites run side by side do not share files). Nothing else is kept between calls: the
-##   kit has no static state.
+##   starts, end_game deletes the game's own after it is freed); the root's children
+##   (start_clock adds a GameClock the caller frees, wait_game_seconds adds and frees its own); and
+##   the process id (in the file names, so suites run side by side do not share files). Nothing else
+##   is kept between calls: the kit has no static state.
 ## - The parity capture driver (scripts/parity/capture.gd) preloads this file for continue_until,
 ##   finish_opening and finish_closing_lines, so a played route and the suites press through the
 ##   opening and the closing lines the same way; those three must keep working outside a suite (they
@@ -33,10 +34,15 @@ extends SceneTree
 ##   finish_opening and finish_closing_lines count physics frames
 ##   (1/60 s of game time each at the project's physics rate, not the wall clock), so a busy machine
 ##   slows those waits down but does not change what they see; tap, settle, send_key and retry hold
-##   presses for process frames. spawn_game and start_game wait one process frame, add_game and
-##   open_game none. end_game waits process frames and SceneTree timers in seconds, which do follow
-##   real time: the audio mixer and the loader threads it waits for run on the wall clock, not on
-##   game frames.
+##   presses for process frames, and tap_now presses for one without waiting. GameClock, start_clock
+##   and wait_game_seconds measure and wait in game time (the summed process deltas the game itself
+##   runs on), never the wall clock, so a busy machine's late frames no longer count as time the game
+##   did not run; only their hang guard is in wall time. A measurement is still only as fine as one
+##   frame, which a busy machine stretches, so bounds finer than a frame need --fixed-fps 60 too
+##   (start_clock says how). spawn_game and start_game wait one process frame, add_game and
+##   open_game none. end_game waits process frames and wait_real_seconds, which follows the wall
+##   clock even under --fixed-fps: the audio mixer and the loader threads it waits for run on real
+##   time, not on game frames.
 ## - end_game leaves no game, sound or file behind, because check-game fails a suite that leaks
 ##   objects at exit.
 
@@ -80,6 +86,16 @@ func finish(pass_note: String = "") -> void:
 ## _initialize cannot await. A suite that does all its work in _initialize overrides this.
 func _initialize() -> void:
 	call_deferred("_run")
+
+
+## Checks that every frame [param clock] has seen was exactly 1/60 s of game time, as it is under
+## `--fixed-fps 60`, for a suite whose bounds are finer than a frame on a loaded machine (see
+## [method start_clock]). Reported as a failed check, so a run without the flag says how to fix it
+## instead of failing a timing check for no fault of the game. Users: opening_timing_test and
+## opening_early_press_test, which check-game.sh lists in fixed_fps_suites.
+func _expect_fixed_fps(clock: GameClock) -> bool:
+	var even: bool = is_equal_approx(clock.largest_step, 1.0 / 60.0) and is_equal_approx(clock.smallest_step, 1.0 / 60.0)
+	return _expect(even, "every frame was 1/60 s of game time (%.4f to %.4f s): run it as check-game.sh does, with --fixed-fps 60" % [clock.smallest_step, clock.largest_step])
 
 
 ## [method _expect], and on failure quits with status 1 at once, for checks the rest of the suite
@@ -191,18 +207,30 @@ static func stop_audio(game: Node) -> void:
 		player.call("stop")
 
 
+## Waits process frames until [param seconds] of wall-clock time have passed, for work that runs on
+## its own threads (the audio mixer, resource loaders) and so follows real time whatever the game's
+## frames do. A SceneTree timer follows game time, which under --fixed-fps 60 is 1/60 s a frame
+## however short the frame really was. Users: end_game.
+static func wait_real_seconds(seconds: float) -> void:
+	var until_ms: int = Time.get_ticks_msec() + int(seconds * 1000.0)
+	while Time.get_ticks_msec() < until_ms:
+		await tree().process_frame
+
+
 ## Frees [param game] the way that leaves nothing behind at exit, then removes its save and
 ## settings files: stop its audio, give the mixer 0.1 s to release the playback, free the game, run
 ## 10 process frames so queued frees and deferred calls finish, then wait [param settle_seconds]
-## (seconds of real time) for the audio and loader threads to let go of their resources.
+## (seconds of real time) for the audio and loader threads to let go of their resources. Both waits
+## are [method wait_real_seconds], not SceneTree timers: under --fixed-fps a timer counts game time,
+## which then runs far faster than the threads it waits for, and the suite leaked their objects.
 static func end_game(game: Node, settle_seconds: float = 0.3) -> void:
 	var files: Array[String] = [str(game.get("save_path")), str(game.get("settings_path"))]
 	stop_audio(game)
-	await tree().create_timer(0.1).timeout
+	await wait_real_seconds(0.1)
 	game.queue_free()
 	for _frame: int in 10:
 		await tree().process_frame
-	await tree().create_timer(settle_seconds).timeout
+	await wait_real_seconds(settle_seconds)
 	for file: String in files:
 		remove_file(file)
 
@@ -252,6 +280,80 @@ static func wait_until(condition: Callable, max_frames: int) -> bool:
 	return false
 
 
+## A stopwatch in game time: the sum of the process deltas the game's own _process, tweens and
+## SceneTree timers advance by, in seconds. Suites measure with it instead of Time.get_ticks_msec,
+## because on a busy machine (check-game.sh runs four suites at once, CI runners share cores) frames
+## come late and the wall clock runs ahead of everything the game counts, so an upper bound in wall
+## time fails for no fault of the game. It is not a count of physics frames at 1/60 s either: the
+## opening's beats, the box reading times and the logo run on process deltas, and when frames come
+## late those drift apart from the physics count (Godot runs at most max_physics_steps_per_frame
+## physics steps per process frame and drops the rest).
+## Read [member seconds] right after `await process_frame`: SceneTree emits process_frame before any
+## node's _process, so at that point [member seconds] is the game time of the state the suite sees
+## (every frame the game has finished), not one frame ahead. The clock is a node: it only runs in
+## the tree, stops while the tree is paused (it inherits the root's pausable mode, as the game's
+## pausable nodes do), and the caller frees it (check-game fails a suite that leaks it).
+## [method start_clock] makes one; [method wait_game_seconds] uses one.
+class GameClock extends Node:
+	## Game time since the clock entered the tree, in seconds.
+	var seconds: float = 0.0
+	## Each frame adds at most this many seconds (INF: the whole delta). StudioLogo clamps its own
+	## steps to StudioLogo.MAX_STEP, so a suite timing the logo clamps the same and counts what the
+	## logo counts; a long frame (a load hitch) then adds what it adds to the logo, not its length.
+	var max_step: float = INF
+	## The longest and shortest frames the clock has seen, in seconds, before clamping (INF and 0
+	## until the first frame). A suite that measures beats to the frame checks both are exactly
+	## 1/60 s, so it knows it ran under --fixed-fps 60 (see [method start_clock]).
+	var largest_step: float = 0.0
+	var smallest_step: float = INF
+
+	func _process(delta: float) -> void:
+		largest_step = maxf(largest_step, delta)
+		smallest_step = minf(smallest_step, delta)
+		seconds += minf(delta, max_step)
+
+
+## A new [GameClock] added under the root, starting at 0 s of game time from the next process frame;
+## each step is clamped to [param max_step] seconds. The caller frees it (`clock.free()`).
+## What game time does not fix: a suite reads the game once a frame, so an event is placed only to
+## the frame it happened in, and the game itself moves a whole frame's delta at once (a tween started
+## in a frame already takes that frame's step). On a loaded machine one frame can last 0.1 s or more,
+## so a bound finer than that still fails there. Suites with such bounds run under `--fixed-fps 60`
+## (check-game.sh's fixed_fps_suites), where every frame is 1/60 s of game time however long it
+## takes on the wall clock, and check it with [method _expect_fixed_fps].
+static func start_clock(max_step: float = INF) -> GameClock:
+	var clock: GameClock = GameClock.new()
+	clock.max_step = max_step
+	tree().root.add_child(clock)
+	return clock
+
+
+## How much wall-clock time a game-time wait may take per second it waits, plus HANG_GUARD_BASE_MS:
+## only a guard against a game that stops making frames at all. It lets the game run ten times slower
+## than real time before it ends a wait, far slower than a busy machine makes it run, so it never
+## decides a check; the game-time limit does. check-game.sh's SUITE_TIMEOUT (240 s) would stop a
+## hung suite too, but without saying which wait hung.
+const HANG_GUARD_PER_SECOND_MS: int = 10000
+## The fixed part of the hang guard, in milliseconds (see HANG_GUARD_PER_SECOND_MS).
+const HANG_GUARD_BASE_MS: int = 30000
+
+
+## Waits process frames until [param done] (when given) holds, checked before each frame, or until
+## [param seconds] of game time ([GameClock], each step clamped to [param max_step]) have passed.
+## Returns the game time it waited, in seconds; the caller checks [param done] again for which one
+## ended it. A generous wall-clock limit (HANG_GUARD_PER_SECOND_MS) only ends the wait if frames stop.
+static func wait_game_seconds(seconds: float, done: Callable = Callable(), max_step: float = INF) -> float:
+	var clock: GameClock = start_clock(max_step)
+	var guard_ms: int = Time.get_ticks_msec() + HANG_GUARD_BASE_MS + int(seconds * HANG_GUARD_PER_SECOND_MS)
+	while clock.seconds < seconds and Time.get_ticks_msec() < guard_ms:
+		if done.is_valid() and done.call():
+			break
+		await tree().process_frame
+	var waited: float = clock.seconds
+	clock.free()
+	return waited
+
+
 ## Holds the input [param action] down for up to [param max_frames] physics frames, stopping early
 ## once [param stop] (when given) holds, checked before each frame. Then releases it and waits two
 ## physics frames, so the release has been seen before the caller looks.
@@ -283,6 +385,19 @@ static func tap(action: StringName, settle_frames: int = 0) -> void:
 		await tree().process_frame
 
 
+## Presses the input [param action] now and releases it on the next process frame, without waiting:
+## the same press [method tap] makes (seen by this frame's _process when called right after
+## `await process_frame`, held for one process frame), for a suite that reads the game every frame
+## and must not skip the frames a blocking tap spends. The release is a one-shot process_frame
+## connection; a connection made while process_frame is being emitted first runs on the next
+## emission, because Godot calls the connections it had when the emission began. Not for
+## pause_game, which Main reads as an event (see [method tap]). Leave at least one frame between
+## two calls for one action: a press on the frame its last release runs on may be released at once.
+static func tap_now(action: StringName) -> void:
+	Input.action_press(action)
+	tree().process_frame.connect(func() -> void: Input.action_release(action), CONNECT_ONE_SHOT)
+
+
 ## A pressed or released ([param pressed]) InputEventAction for [param action], for
 ## Input.parse_input_event.
 static func action_event(action: StringName, pressed: bool) -> InputEventAction:
@@ -290,6 +405,40 @@ static func action_event(action: StringName, pressed: bool) -> InputEventAction:
 	event.action = action
 	event.pressed = pressed
 	return event
+
+
+## A key event for [param code], down or up ([param pressed]), by both its keycode and its physical
+## keycode, as a keyboard sends it, for Input.parse_input_event, Viewport.push_input or a node's
+## _input. Users: send_key, settings_test and studio_logo_test.
+static func key_event(code: Key, pressed: bool = true) -> InputEventKey:
+	var event: InputEventKey = InputEventKey.new()
+	event.keycode = code
+	event.physical_keycode = code
+	event.pressed = pressed
+	return event
+
+
+## A controller button event for [param button], down or up ([param pressed]), on the first
+## controller (device 0). Users: settings_test and ui_controls_test.
+static func controller_button(button: JoyButton, pressed: bool) -> InputEventJoypadButton:
+	var event: InputEventJoypadButton = InputEventJoypadButton.new()
+	event.button_index = button
+	event.pressed = pressed
+	return event
+
+
+## Writes [param text] to the user:// (or absolute) file at [param path], replacing what it held, for
+## suites that hand the game a settings, script or save file of their own. Returns whether the file
+## opened for writing; callers report it (`_expect(write_text(...), "...")`), because a fixture that
+## was never written would let the check after it pass or fail for the wrong reason. Users:
+## m0_state_test, settings_test and studio_logo_test.
+static func write_text(path: String, text: String) -> bool:
+	var file: FileAccess = FileAccess.open(path, FileAccess.WRITE)
+	if file == null:
+		return false
+	file.store_string(text)
+	file.close()
+	return true
 
 
 ## Waits [param count] process frames: one pass of every node's _process and of the UI, the step
@@ -302,11 +451,7 @@ static func settle(count: int) -> void:
 ## Sends one key event, [param code] down or up ([param pressed]) by both its keycode and its
 ## physical keycode, as Input.parse_input_event, then waits a process frame so the game has seen it.
 static func send_key(code: Key, pressed: bool) -> void:
-	var event: InputEventKey = InputEventKey.new()
-	event.keycode = code
-	event.physical_keycode = code
-	event.pressed = pressed
-	Input.parse_input_event(event)
+	Input.parse_input_event(key_event(code, pressed))
 	await tree().process_frame
 
 

@@ -53,19 +53,19 @@ func _run() -> void:
 		var stick: InputEventJoypadMotion = InputEventJoypadMotion.new()
 		stick.axis = JOY_AXIS_LEFT_X if index < 2 else JOY_AXIS_LEFT_Y
 		stick.axis_value = -1.0 if index % 2 == 0 else 1.0
-		_expect(InputMap.action_has_event(navigation_actions[index], _controller_button(navigation_buttons[index], true)) and InputMap.action_has_event(navigation_actions[index], stick), "menu direction keeps D-pad and stick mappings: %s" % navigation_actions[index])
+		_expect(InputMap.action_has_event(navigation_actions[index], controller_button(navigation_buttons[index], true)) and InputMap.action_has_event(navigation_actions[index], stick), "menu direction keeps D-pad and stick mappings: %s" % navigation_actions[index])
 	await process_frame
-	Input.parse_input_event(_controller_button(JOY_BUTTON_B, true))
+	Input.parse_input_event(controller_button(JOY_BUTTON_B, true))
 	await process_frame
 	var title_settings: Button = game.get_node("CanvasLayer/TitleScreen/SettingsButton") as Button
 	_expect(not paused and not game.get("pause_overlay").visible and game.get("title_open"), "controller B closes title settings through native event dispatch")
 	_expect(title_settings.has_focus(), "controller B from title settings leaves the title Settings button focused")
-	Input.parse_input_event(_controller_button(JOY_BUTTON_B, false))
+	Input.parse_input_event(controller_button(JOY_BUTTON_B, false))
 	await process_frame
 	title_settings.pressed.emit()
-	Input.parse_input_event(_key(KEY_ESCAPE))
+	Input.parse_input_event(key_event(KEY_ESCAPE))
 	await process_frame
-	Input.parse_input_event(_key(KEY_ESCAPE, false))
+	Input.parse_input_event(key_event(KEY_ESCAPE, false))
 	await process_frame
 	_expect(not paused and game.get("title_open") and title_settings.has_focus(), "Esc from title settings leaves the title Settings button focused")
 	title_settings.pressed.emit()
@@ -73,9 +73,9 @@ func _run() -> void:
 	_expect(not paused and game.get("title_open") and title_settings.has_focus(), "Android Back from title settings leaves the title Settings button focused")
 	title_settings.pressed.emit()
 	(game.get_node("CanvasLayer/PauseOverlay/Panel/SettingsMenu/BackButton") as Button).grab_focus()
-	Input.parse_input_event(_controller_button(JOY_BUTTON_A, true))
+	Input.parse_input_event(controller_button(JOY_BUTTON_A, true))
 	await process_frame
-	Input.parse_input_event(_controller_button(JOY_BUTTON_A, false))
+	Input.parse_input_event(controller_button(JOY_BUTTON_A, false))
 	await process_frame
 	_expect(not paused and not game.get("pause_overlay").visible, "controller A activates the focused settings Back button")
 	_expect(title_settings.has_focus(), "the settings Back button leaves the title Settings button focused")
@@ -86,9 +86,9 @@ func _run() -> void:
 	_expect(root.gui_get_focus_owner() == null, "touch-opened title settings focus nothing")
 	(game.get_node("CanvasLayer/PauseOverlay/Panel/SettingsMenu/BackButton") as Button).pressed.emit()
 	_expect(not paused and root.gui_get_focus_owner() == null, "touch Back from title settings focuses nothing")
-	Input.parse_input_event(_key(KEY_DOWN))
+	Input.parse_input_event(key_event(KEY_DOWN))
 	await process_frame
-	Input.parse_input_event(_key(KEY_DOWN, false))
+	Input.parse_input_event(key_event(KEY_DOWN, false))
 	await process_frame
 	_expect(title_settings.has_focus(), "a key press after touch Back from title settings selects the title Settings button")
 	game.set("touch_enabled", false)
@@ -112,22 +112,22 @@ func _run() -> void:
 	_expect(root.msaa_2d == Viewport.MSAA_4X, "edge smoothing applies to the game viewport")
 	menu.tabs.current_tab = 2
 	menu.begin_capture(&"interact", "keyboard")
-	menu._input(_key(KEY_I))
+	menu._input(key_event(KEY_I))
 	_expect(menu.prompt(&"interact", false) == "E" and not menu.capture_action.is_empty(), "name-cycling shortcut cannot be assigned to interaction")
 	menu.cancel_capture()
 	menu.begin_capture(&"interact", "keyboard")
-	menu._input(_key(KEY_Q))
+	menu._input(key_event(KEY_Q))
 	_expect(menu.prompt(&"interact", false) == "Q" and menu.capture_action.is_empty(), "keyboard rebind changes the actual InputMap and ends capture")
 	menu.begin_capture(&"choice_1", "keyboard")
-	menu._input(_key(KEY_Q))
+	menu._input(key_event(KEY_Q))
 	_expect(menu.prompt(&"choice_1", false) == "1" and not menu.capture_action.is_empty(), "duplicate gameplay binding is rejected without losing the old key")
-	menu._input(_key(KEY_ESCAPE))
+	menu._input(key_event(KEY_ESCAPE))
 	_expect(menu.capture_action.is_empty() and paused, "Escape cancels rebinding without unpausing")
 	menu.begin_capture(&"choice_1", "controller")
-	Input.parse_input_event(_controller_button(JOY_BUTTON_B, true))
+	Input.parse_input_event(controller_button(JOY_BUTTON_B, true))
 	await process_frame
 	_expect(menu.prompt(&"choice_1", true) == "B" and paused and menu.is_visible_in_tree() and menu.capture_action.is_empty(), "controller B rebind is consumed before menu cancellation")
-	Input.parse_input_event(_controller_button(JOY_BUTTON_B, false))
+	Input.parse_input_event(controller_button(JOY_BUTTON_B, false))
 	await process_frame
 	menu.begin_capture(&"move_left", "controller")
 	var axis: InputEventJoypadMotion = InputEventJoypadMotion.new()
@@ -200,14 +200,14 @@ func _check_hostile_settings() -> void:
 	var path: String = "user://settings-hostile-%s.cfg" % pid
 	var script_path: String = "user://evil-%s.gd" % pid
 	var save_path: String = "user://settings-hostile-save-%s.json" % pid
-	_write_text(script_path, "extends RefCounted\n\n\nstatic func _static_init() -> void:\n\tEngine.set_meta(\"wolf_settings_poc\", true)\n\n\nfunc _init() -> void:\n\tEngine.set_meta(\"wolf_settings_poc\", true)\n")
+	_expect(write_text(script_path, "extends RefCounted\n\n\nstatic func _static_init() -> void:\n\tEngine.set_meta(\"wolf_settings_poc\", true)\n\n\nfunc _init() -> void:\n\tEngine.set_meta(\"wolf_settings_poc\", true)\n"), "test file opens for writing: " + script_path)
 	var cases: Dictionary = {
 		"object payload": "[video]\nfps_limit=Object(RefCounted,\"script\":Resource(\"%s\"))\n" % script_path,
 		"truncated file": "[video\nfps_limit=",
 		"oversized file": "[video]\nfps_limit=30\n" + ";".repeat(GameSettings.MAX_SETTINGS_BYTES),
 	}
 	for label: String in cases:
-		_write_text(path, cases[label])
+		_expect(write_text(path, cases[label]), "test file opens for writing: " + path)
 		var game: Node2D = MAIN_SCENE.instantiate() as Node2D
 		game.set("settings_path", path)
 		game.set("save_path", save_path)
@@ -428,24 +428,3 @@ func _offer(codes: Array[String]) -> Dictionary:
 func _restore_offered(before: Dictionary) -> void:
 	for code: String in before:
 		(I18n.LANGUAGES[code] as Dictionary)["enabled"] = before[code]
-
-
-func _write_text(path: String, text: String) -> void:
-	var file: FileAccess = FileAccess.open(path, FileAccess.WRITE)
-	file.store_string(text)
-	file.close()
-
-
-func _key(code: Key, pressed: bool = true) -> InputEventKey:
-	var event: InputEventKey = InputEventKey.new()
-	event.keycode = code
-	event.physical_keycode = code
-	event.pressed = pressed
-	return event
-
-
-func _controller_button(code: JoyButton, pressed: bool) -> InputEventJoypadButton:
-	var event: InputEventJoypadButton = InputEventJoypadButton.new()
-	event.button_index = code
-	event.pressed = pressed
-	return event

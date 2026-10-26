@@ -244,14 +244,12 @@ func _check_trust_boxes() -> void:
 		Input.action_press(&"interact")
 		await process_frame
 		Input.action_release(&"interact")
-		var started_at: int = Time.get_ticks_msec()
-		while Time.get_ticks_msec() - started_at < 25000:
+		# Up to 25 s of game time for the boxes to play out (the wall clock only guards against a hang).
+		await wait_game_seconds(25.0, func() -> bool:
 			var line: String = str(game.get("status_line"))
 			if seen.is_empty() or seen.back() != line:
 				seen.append(line)
-			if line == box_3:
-				break
-			await process_frame
+			return line == box_3)
 		var cut_in: String = seen[1] if seen.size() > 1 else ""
 		var expected: Array[String] = [box_1, cut_in, box_2, box_3]
 		if not at_breaker:
@@ -496,45 +494,47 @@ func _check_knockdown_boxes() -> void:
 ## doorway, something whirs awake.". Reaching the line brings it up at once and holds the engineer
 ## there; WOLF's question waits until it has been up its reading time. Waiting at the door first, it
 ## comes on its own and the question still waits out the rest of its time.
+## Times are game time (a [GameClock]): the reading times run on the game's process deltas, and on a
+## busy machine the wall clock runs ahead of them.
 func _check_blast_boxes() -> void:
 	var c: Dictionary = (MainScript as GDScript).get_script_constant_map()
 	var box_1: String = c["RUBBLE_LINE"] % "Rowan"
 	var wake: String = c["RUBBLE_WAKE_LINE"]
-	for wait_ms: int in [0, 6000]:
+	for wait_s: float in [0.0, 6.0]:
 		await _start_at(false)
 		game.call("_say", [box_1, wake] as Array[String])
+		var clock: GameClock = start_clock()
 		var seen: Array[String] = [box_1]
-		var wake_at: Array[int] = [-1]
+		var wake_at: Array[float] = [-1.0]
 		var held: Array[bool] = [false]
 		var held_x: Array[float] = [INF]
-		# The longest gap between two looks at the box: the wake box can come up that long before it is
-		# seen, so the measured time can come out short by that much.
-		var last_look: Array[int] = [Time.get_ticks_msec(), 0]
+		# The longest gap between two looks at the box, in game seconds: the wake box can come up that
+		# long before it is seen, so the measured time can come out short by that much.
+		var last_look: Array[float] = [0.0, 0.0]
 		var log_box: Callable = func() -> void:
-			var now: int = Time.get_ticks_msec()
-			last_look[1] = maxi(last_look[1], now - last_look[0])
-			last_look[0] = now
+			last_look[1] = maxf(last_look[1], clock.seconds - last_look[0])
+			last_look[0] = clock.seconds
 			var line: String = str(game.get("status_line"))
 			if seen.back() != line:
 				seen.append(line)
 				if line == wake:
-					wake_at[0] = Time.get_ticks_msec()
+					wake_at[0] = clock.seconds
 			if not held[0] and bool(game.get("lane_question_held")):
 				held[0] = true
 				held_x[0] = human.position.x
-		var started_at: int = Time.get_ticks_msec()
-		while Time.get_ticks_msec() - started_at < wait_ms:
-			await process_frame
+		await wait_game_seconds(wait_s, func() -> bool:
 			log_box.call()
+			return false)
 		Input.action_press(&"move_right")
 		var asked: bool = await wait_until(func() -> bool:
 			log_box.call()
 			return bool(game.get("waiting_for_choice")), 900)
 		Input.action_release(&"move_right")
-		var wake_ms: int = Time.get_ticks_msec() - wake_at[0]
-		var label: String = "walking to the rubble line at once" if wait_ms == 0 else "waiting at the door first"
+		var wake_s: float = clock.seconds - wake_at[0]
+		clock.free()
+		var label: String = "walking to the rubble line at once" if wait_s == 0.0 else "waiting at the door first"
 		_expect(asked and seen.size() >= 2 and seen[seen.size() - 2] == wake and seen.find(wake) == seen.size() - 2 and str(seen.back()).begins_with("WOLF: It passes under that tank"), "%s: the sentry waking is shown before WOLF's question replaces it (seen %s)" % [label, str(seen).c_escape()])
-		_expect(wake_at[0] >= 0 and wake_ms >= int(MainScript.box_seconds(wake) * 1000.0) - maxi(50, last_look[1]), "%s: the question waits until that box has been up its reading time (%d ms of %.2f s, frames up to %d ms apart)" % [label, wake_ms, MainScript.box_seconds(wake), last_look[1]])
+		_expect(wake_at[0] >= 0.0 and wake_s >= MainScript.box_seconds(wake) - maxf(0.05, last_look[1]), "%s: the question waits until that box has been up its reading time (%.2f s of %.2f s, looks up to %.3f s apart)" % [label, wake_s, MainScript.box_seconds(wake), last_look[1]])
 		# The hold applies in _process, and a slow frame runs up to max_physics_steps_per_frame walk steps
 		# before it, so the engineer can stop that far past the line; once held, they must not move on.
 		var step: float = M0Actor.WALK_SPEED / float(Engine.physics_ticks_per_second)
@@ -588,15 +588,16 @@ func _check_miss_boxes() -> void:
 		if how == "back at once":
 			human.position.x = 500.0
 		var seen: Array[String] = [str(game.get("status_line"))]
-		var turn_ms: Array[int] = [-1]
-		var started_at: int = Time.get_ticks_msec()
+		# When the order came, in game seconds after the miss (a [GameClock]; see _check_blast_boxes).
+		var turn_s: Array[float] = [-1.0]
+		var clock: GameClock = start_clock()
 		var swung: Array[bool] = [false]
 		var ended: bool = await wait_until(func() -> bool:
 			var line: String = str(game.get("status_line"))
 			if seen.back() != line:
 				seen.append(line)
 				if line == turn:
-					turn_ms[0] = Time.get_ticks_msec() - started_at
+					turn_s[0] = clock.seconds
 			if how == "back after the swing" and line == turn and not swung[0]:
 				swung[0] = true
 				human.position.x = 500.0
@@ -607,12 +608,13 @@ func _check_miss_boxes() -> void:
 		match how:
 			"stay":
 				_expect(ended and seen[0] == miss and turn_at == 1, "staying at the release: the miss, then the order to get back over the rubble before the sentry reaches them (seen %s)" % str(seen).c_escape())
-				_expect(turn_ms[0] >= 0 and turn_ms[0] <= int((SentryBrain.LOCK_SECONDS + 0.3) * 1000.0), "the order comes as the sentry swings, after its %.1f s lock-on beat (%d ms)" % [SentryBrain.LOCK_SECONDS, turn_ms[0]])
+				_expect(turn_s[0] >= 0.0 and turn_s[0] <= SentryBrain.LOCK_SECONDS + 0.3, "the order comes as the sentry swings, after its %.1f s lock-on beat (%.2f s)" % [SentryBrain.LOCK_SECONDS, turn_s[0]])
 				_expect(await retry(game, 300), "the knockdown restores")
 			"back at once":
 				_expect(ended and seen[0] == miss and turn_at < 0 and seen.has(lost), "back over the rubble before it swings: no stale order, then the sentry giving up (seen %s)" % str(seen).c_escape())
 			_:
 				_expect(ended and seen[0] == miss and turn_at == 1 and seen.find(lost) > turn_at and seen.rfind(turn) == turn_at, "back over the rubble after it swings: the order once, then the sentry giving up, and the order never again (seen %s)" % str(seen).c_escape())
+		clock.free()
 		_expect(seen.back().contains("back on the clamp") or how == "stay", "%s: the winch's line comes last, after the miss's boxes (seen %s)" % [how, str(seen).c_escape()])
 
 

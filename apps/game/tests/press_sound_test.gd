@@ -10,7 +10,7 @@ extends "res://tests/support/game_suite.gd"
 ## the lane answer, WOLF heading for the relay or refusing it, the bypass venting, the exit bolt and the
 ## walk out through the Records exit door.
 const STATE_VARS: Array[String] = ["chapter_close_active", "hatch_exit_walking", "lane_choice", "wolf_heading_to_relay", "relay_refused", "bypass_venting", "bolt_state", "records_exit_walking"]
-## How long, in seconds of real time, a scripted beat (WOLF walking to the relay, the crank, the
+## How long, in seconds of game time, a scripted beat (WOLF walking to the relay, the crank, the
 ## seal) may take before the test gives up on it.
 const BEAT_SECONDS: float = 15.0
 
@@ -52,7 +52,7 @@ func _run() -> void:
 ## the first copy and its closing shot; into the junction; WOLF draws the sentry.
 func _route_wolf_takes_relay() -> void:
 	game.call("debug_new_game", true)
-	await _frames(5)
+	await settle(5)
 	await _ask_relay()
 	await _press(&"choice_1", "telling WOLF the risk at the breaker")
 	_expect(started.has(&"actuator"), "WOLF's answer at the relay is heard as his joints move (heard %s)" % [started])
@@ -77,7 +77,7 @@ func _route_wolf_takes_relay() -> void:
 ## Records with the manual port; into the junction; WOLF refuses the sentry, then the engineer goes alone.
 func _route_bypass() -> void:
 	game.call("debug_new_game", true)
-	await _frames(5)
+	await settle(5)
 	await _ask_relay()
 	await _press(&"choice_2", "pressing WOLF at the breaker")
 	await _press(&"interact", "arming the corridor breaker after his refusal")
@@ -94,7 +94,7 @@ func _route_bypass() -> void:
 	var locked: bool = await _until(func() -> bool: return (game.get("state") as M0State).door_open)
 	Input.action_release(&"interact")
 	_expect(locked and (game.get("state") as M0State).route == "fallback", "holding interact cranks the bypass until it locks over")
-	await _frames(2)
+	await settle(2)
 	_expect(not _hissing(), "the hiss stops once the bypass locks over")
 	_expect(await _until(func() -> bool: return not _fault_shown()), "the COOLANT FAULT tag fades once the bypass locks over")
 	_expect(await _until(func() -> bool: return human.controlled and not bool(game.get("seal_opening"))), "the seal opens on the engineer's own work")
@@ -114,7 +114,7 @@ func _junction_exit() -> void:
 	state.drop_sentry()
 	state.human_position = Vector2(JunctionRoom.BOLT_X, state.human_position.y)
 	game.call("_sync_scene")
-	await _frames(2)
+	await settle(2)
 	await _press(&"interact", "popping the exit bolt", JunctionRoom.BOLT_X)
 	_expect(await _until(func() -> bool: return float((game.get("junction_room") as JunctionRoom).hatch_open) >= 1.0), "the bolt arcs and the hatch slides open")
 	# USE at the bolt panel does nothing once the door is open: the engineer walks up to the doorway.
@@ -152,7 +152,7 @@ func _safe_point() -> void:
 	_expect(started.has(&"chirp"), "the safe point takes the save with a chirp (heard %s)" % [started])
 	# A reload from the safe point keeps the tag away too.
 	game.call("debug_load_checkpoint")
-	await _frames(2)
+	await settle(2)
 	_expect(not _fault_shown(), "after Continue from the safe point the relay shows no COOLANT FAULT tag")
 	await _place(876.0, 800.0)
 	await _press(&"interact", "going on into Records Access")
@@ -193,7 +193,7 @@ func _lane_answer(response: int, label: String) -> void:
 		state.blow_door()
 		state.human_position = Vector2(JunctionRoom.CHOICE_X, state.human_position.y)
 		game.call("_sync_scene")
-		await _frames(2)
+		await settle(2)
 	game.call("_ask_lane")
 	await _press(&"choice_1" if response == 1 else &"choice_2", label)
 
@@ -260,13 +260,11 @@ func _hissing() -> bool:
 	return false
 
 
-## Waits (game time runs) until [param condition] holds, up to BEAT_SECONDS of real time.
+## Waits process frames until [param condition] holds, up to BEAT_SECONDS of game time (the kit's
+## wait_game_seconds: on a busy machine late frames could use up a real-time limit before the game
+## had played the beat). Returns whether it holds.
 func _until(condition: Callable) -> bool:
-	var deadline: int = Time.get_ticks_msec() + int(BEAT_SECONDS * 1000.0)
-	while Time.get_ticks_msec() < deadline:
-		if condition.call():
-			return true
-		await process_frame
+	await wait_game_seconds(BEAT_SECONDS, condition)
 	return bool(condition.call())
 
 
@@ -275,11 +273,4 @@ func _until(condition: Callable) -> bool:
 func _place(human_x: float, wolf_x: float) -> void:
 	await _until(func() -> bool: return float(game.get("engineer_step_x")) < 0.0)
 	game.call("debug_place", human_x, wolf_x)
-	await _frames(1)
-
-
-## Waits [param count] process frames (not the kit's physics frames): the probe times a press's sound
-## against the frame the press lands on, which is a process frame.
-func _frames(count: int) -> void:
-	for _frame: int in count:
-		await process_frame
+	await settle(1)

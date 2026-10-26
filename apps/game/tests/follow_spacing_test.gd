@@ -43,11 +43,11 @@ func _run() -> void:
 
 	# The corridor: the opening hands over with WOLF a follow gap behind, clear of the engineer.
 	game.call("_finish_intro")
-	await _settle()
+	await frames(SETTLE_FRAMES)
 	_expect_clear(human, wolf, "corridor start")
 	_expect(wolf.position.x < human.position.x, "WOLF starts on the engineer's left, away from where he faces")
 	_expect(await walk_to(human, 450.0), "the engineer walks right along the corridor")
-	await _settle()
+	await frames(SETTLE_FRAMES)
 	_expect_clear(human, wolf, "corridor at rest after walking right")
 	_expect(wolf.follow_side == -1 and absf(human.position.x - wolf.position.x - M0Actor.FOLLOW_GAP) <= 2.5, "walking right, WOLF rests one follow gap behind on the left")
 
@@ -64,7 +64,7 @@ func _run() -> void:
 				last_side = wolf.follow_side
 		Input.action_release(action)
 	_expect(side_changes == 0 and wolf.follow_side == -1, "taps shorter than the settle time leave WOLF on his side (%d changes)" % side_changes)
-	await _settle()
+	await frames(SETTLE_FRAMES)
 	_expect_clear(human, wolf, "corridor at rest after quick taps")
 
 	# A short turn just before following pauses (a choice prompt) still has to settle once play resumes.
@@ -81,7 +81,7 @@ func _run() -> void:
 		held_side = held_side and wolf.follow_side == -1
 	_expect(held_side, "a pause in following does not skip the turn settle")
 	await press_for(&"move_right", 3)
-	await _settle()
+	await frames(SETTLE_FRAMES)
 	_expect(wolf.follow_side == -1, "facing right again, WOLF keeps his side behind")
 
 	# A real turn moves him to the other side once, behind the engineer and dimmed while passing.
@@ -124,7 +124,7 @@ func _run() -> void:
 	# left wall is the bay's end wall.)
 	_expect(await walk_to(human, DockBay.HUMAN_MIN_X + 8.0), "the engineer walks to the dock bay's end wall")
 	await press_for(&"move_right", 3)
-	await _settle()
+	await frames(SETTLE_FRAMES)
 	_expect(M0Actor.facing_of(human) == 1 and wolf.follow_side == 1, "at the wall WOLF keeps to the open side")
 	_expect_clear(human, wolf, "dock bay at its end wall")
 	_expect(await walk_to(human, 48.0), "the engineer walks back into the corridor")
@@ -132,7 +132,7 @@ func _run() -> void:
 	# Against the shut seal there is no room ahead of a left-facing engineer, so WOLF stays behind.
 	await press_for(&"move_right", 300)
 	await press_for(&"move_left", 3)
-	await _settle()
+	await frames(SETTLE_FRAMES)
 	_expect(human.position.x > 700.0 and M0Actor.facing_of(human) == -1 and wolf.follow_side == -1, "at the shut seal WOLF keeps to the open side")
 	_expect(wolf.position.x <= Main.CORRIDOR_DOOR_LEFT_X - M0Actor.WOLF_REACH + 0.5, "WOLF never noses into the shut seal")
 	_expect_clear(human, wolf, "corridor at the shut seal")
@@ -142,10 +142,10 @@ func _run() -> void:
 	state.chapter_complete = false
 	game.set("state", state)
 	game.call("_sync_scene")
-	await _settle()
+	await frames(SETTLE_FRAMES)
 	_expect_clear(human, wolf, "records at rest after a load")
 	_expect(await walk_to(human, 420.0), "the engineer walks into Records")
-	await _settle()
+	await frames(SETTLE_FRAMES)
 	_expect_clear(human, wolf, "records at rest after walking")
 
 	# The junction: WOLF comes in ahead, reads the seam on his own, then comes back clear.
@@ -167,12 +167,12 @@ func _run() -> void:
 		return true
 	_expect(await wait_until(seam_read, 240), "WOLF reaches the seam and reads it")
 	_expect(absf(read_x[0] - JunctionRoom.WOLF_SEAM_X) <= 4.0, "WOLF reads the seam from its authored spot")
-	await _settle()
+	await frames(SETTLE_FRAMES)
 	_expect_clear(human, wolf, "junction at rest after scouting")
 	# A left-facing engineer by the sealed door leaves no room on his right, so WOLF holds on his left.
 	_expect(await walk_to(human, JunctionRoom.VALVE_X), "the engineer walks to the valve")
 	await press_for(&"move_left", 3)
-	await _settle()
+	await frames(SETTLE_FRAMES)
 	_expect(wolf.follow_side == -1 and wolf.position.x < human.position.x, "beside the sealed door WOLF keeps to the open side")
 	_expect_clear(human, wolf, "junction at the valve")
 	_expect(wolf.position.x + M0State.WOLF_HALF_WIDTH <= M0State.JUNCTION_DOOR_LEFT_X, "WOLF stays short of the sealed door")
@@ -182,10 +182,10 @@ func _run() -> void:
 	state.human_position = Vector2(640.0, 410.0)
 	state.wolf_position = Vector2(JunctionRoom.WOLF_RUBBLE_X, 423.0)
 	game.call("_sync_scene")
-	await _settle()
+	await frames(SETTLE_FRAMES)
 	_expect_clear(human, wolf, "junction lane at rest")
 	_expect(await walk_to(human, 760.0), "the engineer walks toward the exit bolt")
-	await _settle()
+	await frames(SETTLE_FRAMES)
 	_expect_clear(human, wolf, "junction lane at rest after walking")
 
 	# Nobody rests inside a machine, in any room: stopped over a station's body the engineer sidesteps
@@ -242,7 +242,7 @@ func _check_stations(game: Node2D, human: M0Actor, state: M0State, stations: Arr
 ## junction's plates instead of showing in part, and every name is sized to its text.
 func _check_label_edges(game: Node2D, human: M0Actor, labels: Array[Label], room: String) -> void:
 	human.position.x = 480.0
-	await _settle()
+	await frames(SETTLE_FRAMES)
 	var viewport: Viewport = game.get_viewport()
 	var view: Rect2 = viewport.get_canvas_transform().affine_inverse() * viewport.get_visible_rect()
 	var faded: int = 0
@@ -314,11 +314,6 @@ func _expect_clear(human: M0Actor, wolf: M0Actor, where: String) -> void:
 	var wolf_span: Vector2 = _world_span(wolf)
 	var clear: bool = wolf_span.y <= human_span.x or wolf_span.x >= human_span.y
 	_expect(clear, "%s: WOLF (%.0f..%.0f) and the engineer (%.0f..%.0f) do not overlap" % [where, wolf_span.x, wolf_span.y, human_span.x, human_span.y])
-
-
-func _settle() -> void:
-	for _frame: int in SETTLE_FRAMES:
-		await physics_frame
 
 
 ## The kit's completed Records run (a disclosure, the pair by the Records exit) with WOLF 24 px
