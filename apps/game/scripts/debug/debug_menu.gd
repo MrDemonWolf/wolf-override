@@ -60,6 +60,7 @@ var run_button: Button
 var _clear_armed: bool = false
 
 
+## Names the node, fills the screen without taking the mouse, and starts hidden; setup builds the rest.
 func _init() -> void:
 	name = "DebugMenu"
 	set_anchors_preset(Control.PRESET_FULL_RECT)
@@ -67,6 +68,9 @@ func _init() -> void:
 	visible = false
 
 
+## Wires this to the game [param main], the DebugTools [param owner_tools] that owns it and the
+## [param owner_actions] it runs, builds every control once (_build) and follows the actions' changes
+## and frame steps. DebugTools calls it once.
 func setup(main: Main, owner_tools: DebugTools, owner_actions: DebugActions) -> void:
 	game = main
 	tools = owner_tools
@@ -78,6 +82,9 @@ func setup(main: Main, owner_tools: DebugTools, owner_actions: DebugActions) -> 
 
 # --- Building -----------------------------------------------------------------------------------
 
+## Builds the whole menu once, hidden: the backdrop, the card (MENU_RECT, canvas px) with its title,
+## status line, tab row, the six pages in a scroll box, the note and hint lines and CLOSE, then the
+## frame-step bar, and shows the current page.
 func _build() -> void:
 	backdrop = ColorRect.new()
 	backdrop.name = "Backdrop"
@@ -176,6 +183,7 @@ func _build() -> void:
 	show_page(page)
 
 
+## Fills [param box] with JUMP: one button per DebugActions.JUMPS beat, each jumping and closing the menu.
 func _build_jump_page(box: VBoxContainer) -> void:
 	_caption(box, "JUMP TO A BEAT. Built from the CHOICES page; a checkpoint beat writes its save, as play does.")
 	var grid: GridContainer = _grid(box, 2)
@@ -183,6 +191,7 @@ func _build_jump_page(box: VBoxContainer) -> void:
 		_button(grid, "jump:%s" % id, DebugActions.JUMP_NAMES[id], _run_and_close.bind(actions.jump.bind(id)))
 
 
+## Fills [param box] with CHOICES: one radio row each for the relay, mirror and lane presets.
 func _build_choices_page(box: VBoxContainer) -> void:
 	_caption(box, "THE RUN'S EARLIER CHOICES, used by the next jump.")
 	_caption(box, "RELAY (what WOLF was told, then who opened the seal)", ACCENT)
@@ -193,6 +202,7 @@ func _build_choices_page(box: VBoxContainer) -> void:
 	_radio(_grid(box, 3), "lane", DebugActions.LANE_OPTIONS, actions.set_lane)
 
 
+## Fills [param box] with CHEATS: the four cheat switches and a radio row of SLOW_MOTION speeds.
 func _build_cheats_page(box: VBoxContainer) -> void:
 	_caption(box, "CHEATS. Any cheat marks the overlay and every dump CHEATS USED.")
 	var grid: GridContainer = _grid(box, 2)
@@ -209,6 +219,8 @@ func _build_cheats_page(box: VBoxContainer) -> void:
 		button.button_group = group
 
 
+## Fills [param box] with FORCE: one knockdown button per kind, the fuse and tank triggers (each closes
+## the menu), and the caption refresh fills with why any of them is off.
 func _build_force_page(box: VBoxContainer) -> void:
 	_caption(box, "FORCE A KNOCKDOWN (lands even while invincible; the beat's checkpoint comes back).")
 	var grid: GridContainer = _grid(box, 2)
@@ -221,6 +233,7 @@ func _build_force_page(box: VBoxContainer) -> void:
 	force_reason = _caption(box, "")
 
 
+## Fills [param box] with SAVE: the checkpoint caption, SAVE NOW, RELOAD CHECKPOINT and CLEAR SAVE (pressed twice).
 func _build_save_page(box: VBoxContainer) -> void:
 	save_caption = _caption(box, "")
 	var grid: GridContainer = _grid(box, 1)
@@ -229,6 +242,7 @@ func _build_save_page(box: VBoxContainer) -> void:
 	_button(grid, "save:clear", "CLEAR SAVE", _on_clear_save)
 
 
+## Fills [param box] with VIEW: the overlay cycle, the bug capture, the three effect switches and LOCK DEBUG TOOLS.
 func _build_view_page(box: VBoxContainer) -> void:
 	_caption(box, "WHAT YOU SEE. The switches are not cheats and are not saved.")
 	var grid: GridContainer = _grid(box, 2)
@@ -241,6 +255,7 @@ func _build_view_page(box: VBoxContainer) -> void:
 	lock.add_theme_color_override("font_color", WARN)
 
 
+## Builds the frame-step bar (STEP_BAR_RECT, canvas px), hidden, with its counter and its STEP and RUN buttons.
 func _build_step_bar() -> void:
 	step_bar = PanelContainer.new()
 	step_bar.name = "FrameStepBar"
@@ -280,6 +295,7 @@ func _bar_button(row: HBoxContainer, text: String, action: Callable) -> Button:
 	return button
 
 
+## Adds a wrapping caption reading [param text] in [param tint] to [param box] and returns it.
 func _caption(box: VBoxContainer, text: String, tint: Color = MUTED) -> Label:
 	var label: Label = Label.new()
 	label.text = text
@@ -291,6 +307,7 @@ func _caption(box: VBoxContainer, text: String, tint: Color = MUTED) -> Label:
 	return label
 
 
+## Adds a full-width grid of [param columns] columns (6 px gaps) to [param box] and returns it.
 func _grid(box: VBoxContainer, columns: int) -> GridContainer:
 	var grid: GridContainer = GridContainer.new()
 	grid.columns = columns
@@ -394,6 +411,7 @@ func close(settle: bool = true) -> void:
 	closed.emit()
 
 
+## On opening, gives focus to the current page's tab, or to nothing in the touch layout (no focus ring under a finger).
 func _focus_first() -> void:
 	if _touch_layout():
 		get_viewport().gui_release_focus()
@@ -401,10 +419,13 @@ func _focus_first() -> void:
 		(tab_buttons[page] as Button).grab_focus()
 
 
+## True when the menu is laid out for touch: touch controls are on and no controller is in use.
 func _touch_layout() -> bool:
 	return game.touch_enabled and not game.controller_active
 
 
+## Shows page [param id] (one of PAGES) and presses its tab, scrolled to the top, disarming CLEAR SAVE,
+## relinking focus and refreshing. Ignores an unknown id.
 func show_page(id: StringName) -> void:
 	if not pages.has(id):
 		return
@@ -456,6 +477,8 @@ func step_page(by: int) -> void:
 		(tab_buttons[page] as Button).grab_focus()
 
 
+## While open: Esc, B or Pause closes the menu; LB and RB turn the page; after touch, the first key or
+## controller press only gives the tab focus. Each of these marks [param event] handled.
 func _input(event: InputEvent) -> void:
 	if not is_open:
 		return
@@ -480,6 +503,7 @@ func _input(event: InputEvent) -> void:
 				return
 
 
+## A left click or tap on the backdrop, outside the card, closes the menu.
 func _on_backdrop_input(event: InputEvent) -> void:
 	if event is InputEventMouseButton and event.pressed and (event as InputEventMouseButton).button_index == MOUSE_BUTTON_LEFT:
 		close()
@@ -507,6 +531,7 @@ func _run_and_close(action: Callable) -> void:
 		tools.show_note(note)
 
 
+## CLEAR SAVE's first press arms it and asks for a second; the second deletes the checkpoint (DebugActions.clear_save).
 func _on_clear_save() -> void:
 	if not _clear_armed:
 		_clear_armed = true
@@ -517,6 +542,7 @@ func _on_clear_save() -> void:
 	_run(actions.clear_save)
 
 
+## Steps the F3 overlay to its next mode and names it in the note.
 func _on_cycle_overlay() -> void:
 	tools.cycle_overlay()
 	note_label.text = "Overlay: %s." % DebugTools.OVERLAY_NAMES[tools.overlay_mode]
@@ -531,11 +557,13 @@ func _on_capture() -> void:
 	tools.capture()
 
 
+## Closes the menu and locks the debug tools away (DebugTools.lock).
 func _on_lock() -> void:
 	close()
 	tools.lock()
 
 
+## A cheat, preset or switch changed: refreshes the open menu and the frame-step bar.
 func _on_actions_changed() -> void:
 	if is_open:
 		refresh()
@@ -590,12 +618,14 @@ func refresh() -> void:
 	hint_label.text = "TAP OUTSIDE TO CLOSE" if _touch_layout() else ("B  CLOSE   LB / RB  PAGE" if controller else "ESC  CLOSE   `  TOGGLE")
 
 
+## Presses or releases button [param id] without emitting its signals; does nothing for an unknown id.
 func _set_pressed(id: String, on: bool) -> void:
 	var button: Button = buttons.get(id) as Button
 	if button != null and button.button_pressed != on:
 		button.set_pressed_no_signal(on)
 
 
+## Sets switch [param id] to [param on] (no signals) and labels it "[param caption]  ON" or "OFF".
 func _switch(id: String, caption: String, on: bool) -> void:
 	_set_pressed(id, on)
 	(buttons[id] as Button).text = "%s  %s" % [caption, "ON" if on else "OFF"]
@@ -617,6 +647,7 @@ func refresh_step_bar() -> void:
 	_sync_visible()
 
 
+## Shows this node while the menu or the step bar is up, and lets DebugTools show or hide its layer to match.
 func _sync_visible() -> void:
 	visible = is_open or step_bar.visible
 	if tools != null:
