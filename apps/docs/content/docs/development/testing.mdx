@@ -30,6 +30,7 @@ From the repository root, in this order:
 - **Suites:** then every `apps/game/tests/*_test.gd` suite runs, up to four at a time.
 - **Your saves are safe:** each suite gets its own temporary user data folder, so it never touches your saves or editor settings.
 - **English always:** every suite starts with `--language en`, whatever language your computer uses.
+- **Fixed frame rate:** `opening_timing_test` and `opening_early_press_test` start with `--fixed-fps 60`, so every frame is 1/60 s of game time even on a busy machine. They fail without it.
 - **A suite fails** if it reports an error, leaks objects at exit, or is still running after 240 seconds.
 - **Leaks:** a leaking suite runs once more with verbose output, so its log names the leaked objects.
 - **Hung:** a suite still running at the limit is stopped and reported as hung. Each import pass has the same limit.
@@ -42,6 +43,8 @@ Run one suite on its own:
 ```sh
 godot --headless --language en --path apps/game --script res://tests/<name>_test.gd
 ```
+
+For the two opening suites, add `--fixed-fps 60` after `--headless`.
 
 | Setting | What it does |
 | --- | --- |
