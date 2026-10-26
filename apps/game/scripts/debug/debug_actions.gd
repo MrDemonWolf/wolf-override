@@ -57,14 +57,19 @@ class Stepper:
 	extends Node
 	var on_frame: Callable
 
+	## Names the node and orders it after every other node (PROCESS_LAST); it starts idle until a step
+	## turns it on.
 	func _init() -> void:
 		name = "FrameStepper"
 		process_priority = DebugActions.PROCESS_LAST
 		set_process(false)
 
+	## Entering the tree would start processing; the stepper waits for step_frame instead.
 	func _ready() -> void:
 		set_process(false)
 
+	## Runs once per step, after every other node's process this frame: turns itself off and calls
+	## [member on_frame] (DebugActions holds the tree still again there).
 	func _process(_delta: float) -> void:
 		set_process(false)
 		on_frame.call()
@@ -93,6 +98,8 @@ var _step_pending: bool = false
 var _effects_before: Variant = null
 
 
+## Names the node and orders it before Main (PROCESS_FIRST); it starts idle, with no physics process,
+## until a cheat that needs a frame turns it on (_update_processing).
 func _init() -> void:
 	name = "DebugActions"
 	process_priority = PROCESS_FIRST
@@ -105,6 +112,8 @@ func _ready() -> void:
 	_update_processing()
 
 
+## Wires this to the game [param main] and the DebugTools [param owner_tools] that owns it, and adds the
+## frame Stepper as a child. DebugTools calls it once, before any other method here.
 func setup(main: Main, owner_tools: DebugTools) -> void:
 	game = main
 	tools = owner_tools
@@ -139,6 +148,8 @@ func set_relay(option: StringName) -> String:
 	return note
 
 
+## The records mirror's route later jumps use ([param option]: "wolf" or "manual"). Returns the note
+## saying so, or "" (changing nothing) for an unknown option.
 func set_mirror(option: StringName) -> String:
 	if not MIRROR_OPTIONS.has(option):
 		return ""
@@ -147,6 +158,9 @@ func set_mirror(option: StringName) -> String:
 	return "Mirror: %s. The next jump uses it." % OPTION_NAMES[option]
 
 
+## How later lane, tank and end jumps bring the sentry down ([param option], one of LANE_OPTIONS).
+## WOLF's answer follows the relay rule, so a lane the relay preset rules out changes the relay preset
+## with it, and the note says so. Returns the note, or "" (changing nothing) for an unknown option.
 func set_lane(option: StringName) -> String:
 	if not LANE_OPTIONS.has(option):
 		return ""
@@ -249,6 +263,9 @@ func _answer_lane() -> void:
 	game.debug_answer_lane(2 if lane == &"alone" else 1)
 
 
+## Stands the engineer at [param human_x] in [param state] and WOLF at [param wolf_x], or one follow gap
+## behind the engineer when it is below 0; WOLF is kept within M0Actor.MIN_X..MAX_X (world px). Only x
+## changes.
 func _set_positions(state: M0State, human_x: float, wolf_x: float = -1.0) -> void:
 	state.human_position.x = human_x
 	state.wolf_position.x = clampf(wolf_x if wolf_x >= 0.0 else human_x - M0Actor.FOLLOW_GAP, M0Actor.MIN_X, M0Actor.MAX_X)
@@ -261,6 +278,8 @@ func _side_spot(station: Vector4, side: float) -> float:
 
 # --- Cheats -------------------------------------------------------------------------------------
 
+## Turns invincibility [param on] or off: while on, knockdowns do not land (spares_knockdown), except
+## one forced from the menu. Returns the note.
 func set_invincible(on: bool) -> String:
 	invincible = on
 	return _cheat_changed(on, "Invincible: knockdowns do not land; the door blows as if you were clear." if on else "Invincible off.")
@@ -291,6 +310,7 @@ func set_slow_motion(scale: float) -> String:
 	return _cheat_changed(scale != 1.0, "Speed %sx." % _speed_text(scale))
 
 
+## [param scale] as the speed notes write it: "1" for full speed, else the number ("0.5").
 static func _speed_text(scale: float) -> String:
 	return "1" if scale == 1.0 else str(scale)
 
@@ -318,6 +338,8 @@ func step_frame() -> void:
 	stepper.set_process(true)
 
 
+## The Stepper's frame has run: pauses the tree again while frame stepping is still on, then reports the
+## step (frame_stepped and changed).
 func _on_stepped() -> void:
 	_step_pending = false
 	if frame_step:
@@ -326,6 +348,9 @@ func _on_stepped() -> void:
 	changed.emit()
 
 
+## The shared tail of every cheat setter: a cheat turned [param on] marks the run as cheated
+## (DebugTools.cheats_used), processing follows the cheats that need it, and changed is emitted. Returns
+## [param note] unchanged for the setter to return.
 func _cheat_changed(on: bool, note: String) -> String:
 	if on:
 		tools.cheats_used = true
@@ -334,10 +359,13 @@ func _cheat_changed(on: bool, note: String) -> String:
 	return note
 
 
+## Processes only while the tools are available and instant crank or slow motion is on (the only cheats that need a frame).
 func _update_processing() -> void:
 	set_process(tools != null and tools.available and (instant_crank or slow_motion != 1.0))
 
 
+## Each unpaused frame, before Main: puts slow motion back when something reset Engine.time_scale to 1,
+## and with instant crank on primes a held crank to finish this frame (_prime_crank).
 func _process(_delta: float) -> void:
 	if get_tree().paused:
 		return
@@ -490,6 +518,8 @@ func trigger_drop() -> String:
 	return "The clamp lets go."
 
 
+## Why a play action (a force, a drop, a save) cannot run now: the title or the opening is up, a closing
+## scene or a knockdown is playing. "" when play is running.
 func _play_blocked() -> String:
 	if game.title_open or game.intro_active:
 		return "Start play first (jump to a beat)."
@@ -570,6 +600,7 @@ func set_effects(on: bool) -> String:
 	return "Visual effects %s." % ("on" if on else "off")
 
 
+## Turns Impact's camera shake [param on] or off. Returns the note.
 func set_shake(on: bool) -> String:
 	shake_on = on
 	game.impact.shake_enabled = on
@@ -577,6 +608,7 @@ func set_shake(on: bool) -> String:
 	return "Camera shake %s." % ("on" if on else "off")
 
 
+## Turns Impact's screen flashes [param on] or off. Returns the note.
 func set_flash(on: bool) -> String:
 	flash_on = on
 	game.impact.flash_enabled = on
