@@ -1,14 +1,18 @@
 // Mirrored floor reflection: fades away from the contact line and wobbles slightly, as on a wet floor.
 // Cheap enough for mobile: one texture read, no screen copy.
+// Every reflection draws through one shared material (floor_reflection.tres), so the four values that
+// differ per sprite are instance uniforms, set on each FloorReflection node with
+// set_instance_shader_parameter: one material means the shader is drawn once at the logo screen
+// (StudioLogo's warm-up) instead of each reflection building its own material at run time (SMOOTH-6).
 shader_type canvas_item;
 
-uniform float strength : hint_range(0.0, 1.0) = 0.28;
+instance uniform float strength : hint_range(0.0, 1.0) = 0.28;
 // Horizontal wobble in texture pixels; the owner sets it so it is about one world pixel.
-uniform float wobble_px = 20.0;
+instance uniform float wobble_px = 20.0;
 // The UV rows this sprite shows, so region sprites fade across their own height.
-uniform vec2 uv_span = vec2(0.0, 1.0);
+instance uniform vec2 uv_span = vec2(0.0, 1.0);
 // Mipmap LOD bias, matching the source sprite's (sharp_sprite.gdshader) so a character and its reflection agree.
-uniform float lod_bias = 0.0;
+instance uniform float lod_bias = 0.0;
 
 varying vec4 tint;
 

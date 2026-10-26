@@ -9,7 +9,11 @@ extends Sprite2D
 const SQUASH: float = 0.55
 ## Drawn above the backdrop and haze, below every prop and actor.
 const Z_FLOOR: int = -2
-const SHADER: Shader = preload("res://assets/shaders/floor_reflection.gdshader")
+## The one material every reflection draws through. Its shader's per-sprite values (strength, lod_bias,
+## wobble_px, uv_span) are instance uniforms, set on each node, so no reflection builds a material of its
+## own, and StudioLogo draws this one material once at the logo screen so its shader is ready before
+## the first room shows (SMOOTH-6).
+const MATERIAL: ShaderMaterial = preload("res://assets/shaders/floor_reflection.tres")
 
 var source: Sprite2D
 ## The contact line in the parent's space, taken from the source's resting bottom edge.
@@ -50,11 +54,9 @@ static func attach(target: Sprite2D, strength: float = 0.32) -> FloorReflection:
 	reflection.flip_v = true
 	var half_height: float = _half_height(target)
 	reflection.floor_y = target.position.y + half_height * target.scale.y
-	var material: ShaderMaterial = ShaderMaterial.new()
-	material.shader = SHADER
-	material.set_shader_parameter("strength", strength)
-	material.set_shader_parameter("lod_bias", lod_bias_of(target))
-	reflection.material = material
+	reflection.material = MATERIAL
+	reflection.set_instance_shader_parameter(&"strength", strength)
+	reflection.set_instance_shader_parameter(&"lod_bias", lod_bias_of(target))
 	reflection._take_image()
 	reflection.shadow = _make_shadow(target.name, _half_width(target) * target.scale.x * 1.7)
 	reflection.shadow_rest_scale = reflection.shadow.scale.x
@@ -114,20 +116,17 @@ static func set_all_active(reflections: Array[FloorReflection], value: bool) -> 
 
 
 ## Copies the source's image and cut, and the shader's view of them (the cut's rows and the wobble,
-## which is in source pixels).
+## which is in source pixels) into this node's instance uniforms, which the shared MATERIAL reads.
 func _take_image() -> void:
 	texture = source.texture
 	region_enabled = source.region_enabled
 	region_rect = source.region_rect
-	var shader_material: ShaderMaterial = material as ShaderMaterial
-	if shader_material == null:
-		return
-	shader_material.set_shader_parameter("wobble_px", 1.2 / maxf(absf(source.scale.y), 0.001))
+	set_instance_shader_parameter(&"wobble_px", 1.2 / maxf(absf(source.scale.y), 0.001))
 	if source.region_enabled and source.texture != null:
 		var texture_height: float = float(source.texture.get_height())
-		shader_material.set_shader_parameter("uv_span", Vector2(source.region_rect.position.y, source.region_rect.end.y) / texture_height)
+		set_instance_shader_parameter(&"uv_span", Vector2(source.region_rect.position.y, source.region_rect.end.y) / texture_height)
 	else:
-		shader_material.set_shader_parameter("uv_span", Vector2(0.0, 1.0))
+		set_instance_shader_parameter(&"uv_span", Vector2(0.0, 1.0))
 
 
 ## The mipmap LOD bias a sprite samples with: its sharp_sprite material's lod_bias, or 0.0.

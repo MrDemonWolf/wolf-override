@@ -11,6 +11,8 @@ extends Control
 ## which Godot reports as 0% until it is done, so a filling bar would sit still.
 ## The game's assets load on worker threads first and the title scene after them: in Godot 4.7.2 a scene
 ## whose scripts preload assets while compiling on a worker thread leaks the engine's load tokens at exit.
+## While the logo is up it also draws each of the game's canvas shaders once, unseen (warm_shaders), so the
+## title and the first room do not stall compiling them on their first frame (SMOOTH-6).
 ## Any key, mouse button, controller button or touch skips to the title as soon as it has loaded, and
 ## presses are swallowed for a moment after the cut so a player still mashing to skip never picks a
 ## title option unseen. A saved window size and fullscreen apply on the first frame, not at the title.
@@ -25,6 +27,16 @@ const MAIN_SCENE: String = "res://scenes/main.tscn"
 const ASSET_DIR: String = "res://assets"
 const BRAND_DIR: String = "res://assets/brand"
 const SKIP_ARG: String = "--skip-logo"
+## The game's canvas shaders that warm_shaders draws once while the logo is up. The renderer compiles a
+## shader the first time something draws with it, which stalls that frame (on a phone, a visible hitch);
+## drawn here, the compile lands under the logo, which waits for the title's load anyway. The shared
+## floor reflection material is drawn as itself; sharp_sprite and post_grade are main.tscn sub-resource
+## materials, so fresh materials on the same Shader resources stand in for them (the compiled program
+## belongs to the Shader, not to a material, and the shaders stay loaded until main.tscn holds them: the
+## asset warm-up keeps every file under ASSET_DIR, these two included, until the title has loaded).
+const WARM_SHADERS: Array[Shader] = [preload("res://assets/shaders/sharp_sprite.gdshader"), preload("res://assets/shaders/post_grade.gdshader")]
+## Name of the node that holds the shader warm-up's draws, under Background so nothing of it shows.
+const WARM_NODE: String = "ShaderWarmup"
 ## The smirk holds this long, then the grin's mouth replaces it.
 const SWAP_AT: float = 0.45
 ## The hop as the grin lands: up BOUNCE_PX and back down over BOUNCE_SECONDS.
@@ -111,6 +123,7 @@ func _ready() -> void:
 	list_warm_assets(ASSET_DIR, loading)
 	for path: String in loading:
 		ResourceLoader.load_threaded_request(path)
+	warm_shaders()
 	# A close or Back press now waits for the loads (see _notification) instead of quitting under them.
 	get_tree().auto_accept_quit = false
 	get_tree().quit_on_go_back = false
@@ -258,6 +271,41 @@ func _poll_load() -> void:
 		_warm.clear()
 		if not quit_requested:
 			_release_quit()
+
+
+## Draws every material the game's canvas uses once, unseen, so the renderer compiles each shader now,
+## under the logo, rather than on the frame the title or a room first shows it: WARM_SHADERS, the shared
+## FloorReflection.MATERIAL, and a CanvasItemMaterial in each blend mode (FxKit's additive and multiply
+## glows and soot use two of them; each mode is its own generated shader, and all five cost a few tiny
+## draws once). Each is an 8x8 px ColorRect in a fully transparent colour: not modulate alpha, which the
+## renderer culls without drawing, but the draw's own colour, so the shader runs and writes nothing. They
+## sit behind the opaque Background as well, so even a blend mode that ignores alpha (post_grade's
+## multiply writes alpha 1) never reaches the screen. The node frees itself after the first frame drawn
+## (RenderingServer.frame_post_draw). Adds one child (WARM_NODE) at index 0; returns it.
+func warm_shaders() -> Control:
+	var holder: Control = Control.new()
+	holder.name = WARM_NODE
+	holder.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	var materials: Array[Material] = [FloorReflection.MATERIAL]
+	for shader: Shader in WARM_SHADERS:
+		var shader_material: ShaderMaterial = ShaderMaterial.new()
+		shader_material.shader = shader
+		materials.append(shader_material)
+	for mode: int in [CanvasItemMaterial.BLEND_MODE_MIX, CanvasItemMaterial.BLEND_MODE_ADD, CanvasItemMaterial.BLEND_MODE_SUB, CanvasItemMaterial.BLEND_MODE_MUL, CanvasItemMaterial.BLEND_MODE_PREMULT_ALPHA]:
+		var blend: CanvasItemMaterial = CanvasItemMaterial.new()
+		blend.blend_mode = mode as CanvasItemMaterial.BlendMode
+		materials.append(blend)
+	for material_to_warm: Material in materials:
+		var draw: ColorRect = ColorRect.new()
+		draw.color = Color(1.0, 1.0, 1.0, 0.0)
+		draw.size = Vector2(8.0, 8.0)
+		draw.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		draw.material = material_to_warm
+		holder.add_child(draw)
+	add_child(holder)
+	move_child(holder, 0)
+	RenderingServer.frame_post_draw.connect(holder.queue_free, CONNECT_ONE_SHOT)
+	return holder
 
 
 ## The resources under `dir` that are warmed before the title scene.

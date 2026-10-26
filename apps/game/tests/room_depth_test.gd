@@ -138,7 +138,8 @@ func _check_coverage(label: String, depth: RoomDepth, view: Rect2) -> void:
 ## The engineer, WOLF and the Director are whole pieces from assets/characters, each drawn at its
 ## world height (the engineer at the pieces' own 1/8, the Director at his own 1/5.5, WOLF at
 ## Main.WOLF_ART_SCALE, the size he was drawn before the repaint), sampled through the shared
-## sharp_sprite material; each floor reflection samples with the same mip bias.
+## sharp_sprite material; each floor reflection samples with the same mip bias (an instance uniform of
+## the one shared FloorReflection.MATERIAL).
 func _check_characters(game: Node2D) -> void:
 	var characters: Dictionary = {
 		"engineer": [game.get_node("Human/BodySprite"), Vector2i(217, 562), 562.0 / 8.0],
@@ -156,9 +157,12 @@ func _check_characters(game: Node2D) -> void:
 		_expect(shared == null or shared == shader_material, "the characters share one sharp sprite material")
 		shared = shader_material
 		var reflection: FloorReflection = sprite.get_parent().get_node(NodePath(sprite.name + "Reflection")) as FloorReflection
-		_expect(reflection != null and is_equal_approx(float((reflection.material as ShaderMaterial).get_shader_parameter("lod_bias")), -0.5), "the %s's floor reflection samples with the same mip bias" % label)
+		_expect(reflection != null and is_equal_approx(float(reflection.get_instance_shader_parameter(&"lod_bias")), -0.5), "the %s's floor reflection samples with the same mip bias" % label)
+		_expect(reflection != null and reflection.material == FloorReflection.MATERIAL, "the %s's floor reflection draws through the one shared reflection material" % label)
 	var breaker: Sprite2D = game.get_node("BreakerArt") as Sprite2D
-	_expect(FloorReflection.lod_bias_of(breaker) == 0.0 and is_equal_approx(float((breaker.get_parent().get_node("BreakerArtReflection").material as ShaderMaterial).get_shader_parameter("lod_bias")), 0.0), "props keep the default mip selection, and so do their reflections")
+	var breaker_reflection: FloorReflection = breaker.get_parent().get_node("BreakerArtReflection") as FloorReflection
+	_expect(FloorReflection.lod_bias_of(breaker) == 0.0 and is_equal_approx(float(breaker_reflection.get_instance_shader_parameter(&"lod_bias")), 0.0), "props keep the default mip selection, and so do their reflections")
+	_expect(breaker_reflection.material == FloorReflection.MATERIAL, "a prop's floor reflection draws through the same shared material as the characters'")
 
 
 ## The Records doors stand across the walkway: each shut leaf's room face meets the walk line (y 440)
