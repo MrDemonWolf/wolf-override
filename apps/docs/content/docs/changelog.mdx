@@ -233,6 +233,11 @@ Changes merged after 0.15.0. They become the next version when it is cut.
 - The parity capture's R2 and R4 routes read the opening and the closing lines through with the test suites' own helpers, and R4 leaves from the open exit door, so both reach their end again.
 - The opening, studio logo, wording and press-sound suites time things in game time, not the wall clock or a count of physics frames; the test kit's one game clock and its key, controller-button and file helpers replace the suites' copies.
 - The two opening suites read the game on every frame and run at a fixed 60 frames per second, so a busy machine's long frames no longer move the beats they measure.
+- `render.sh` exits with Godot's status, so a crashed or timed-out render fails; it also fails when the project does not import.
+- An unknown route or variant fails a parity capture instead of passing with no stills.
+- `render.sh` and the parity runs check job, route, variant and size names before clearing any folder. `tools/render/self_test.sh` checks this without Docker, and Game checks runs it.
+- `compare.py` no longer compares a masked still with itself.
+- The docs export check names a page with no robots tag instead of stopping.
 
 ### How it was checked
 

@@ -53,6 +53,11 @@ const BREAKER_X: float = Main.CORRIDOR_STATIONS[0].x
 const SEAL_X: float = Main.CORRIDOR_STATIONS[2].x
 const ParityBank = preload("parity_sfx_bank.gd")
 const RNG_SEED: int = 0x5041524954
+## The routes and variants this driver plays. Anything else fails the run before the game loads, so a
+## typo never writes an empty, "failed": false shots.json that run.sh would count as ok (Codex review
+## finding M6). tools/render/validate_names.sh keeps the same lists for run.sh's own early check.
+const ROUTES: PackedStringArray = ["R1", "R2", "R3", "R4"]
+const VARIANTS: PackedStringArray = ["kb-fx", "kb-calm", "touch-fx"]
 const PARTICLE_SEED: int = 1337
 const TEXT_PATHS: Array[String] = [
 	"CanvasLayer/TopBar/HUD",
@@ -110,6 +115,10 @@ func _run() -> void:
 	size = Vector2i(int(dims[0]), int(dims[1]))
 	language = Kit.arg("language", "")
 	DirAccess.make_dir_recursive_absolute(out_dir)
+	if not ROUTES.has(route) or not VARIANTS.has(variant):
+		_fail("unknown route %s or variant %s (routes %s, variants %s)" % [route, variant, ROUTES, VARIANTS])
+		_finish()
+		return
 	if not language.is_empty() and not _use_language(language):
 		_finish()
 		return
@@ -157,7 +166,9 @@ func _run() -> void:
 		"R4":
 			await _route_4()
 		_:
-			notes.append("unknown route %s" % route)
+			# Unreachable after the ROUTES check above; kept failing so a route added to ROUTES without
+			# a branch here cannot pass empty.
+			_fail("route %s has no steps" % route)
 	_finish()
 
 

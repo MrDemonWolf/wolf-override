@@ -36,12 +36,16 @@
 #                 and cache folder (<prefix>-<route>), so give every parallel harness its own prefix.
 #   PARITY_WORK   scratch folder for the headless game copy (default: $TMPDIR/wolf-parity).
 #   PARITY_GAME   game folder to use (default: apps/game in this checkout).
-#   PARITY_JOBS   routes captured at once (default 2).
+#   PARITY_JOBS   routes captured at once (default 2; a whole number of at least 1).
 #   PARITY_KEYBOARD  XKB keyboard layout for the captures (render.sh --keyboard; "fr" is AZERTY), for
 #                 stills of key names as a player with that keyboard reads them; unset: US QWERTY.
 #   PARITY_TIMEOUT  seconds one render run may take (default 2700; a 2340x1080 R2 or R4 run takes
 #                 well over 1500 s when several render jobs share the machine).
 #   GODOT_BIN     headless godot binary (default: godot).
+#
+# Routes, variants, sizes and PARITY_NAME are checked by tools/render/validate_names.sh before any
+# folder is cleared (they become paths for rm -rf and render.sh's cache), and a capture counts as ok
+# only when render.sh exits 0, shots.json says "failed": false and the log has no errors.
 set -euo pipefail
 
 root="$(cd "$(dirname "$0")/../.." && pwd)"
@@ -49,6 +53,8 @@ here="$root/scripts/parity"
 godot="${GODOT_BIN:-godot}"
 game_src="${PARITY_GAME:-$root/apps/game}"
 errors='^ERROR:|SCRIPT ERROR|Parse Error|USER ERROR'
+# shellcheck source-path=SCRIPTDIR source=../../tools/render/validate_names.sh
+source "$root/tools/render/validate_names.sh"
 
 isolate_home() {
   : "${PARITY_HOME:?set PARITY_HOME to a scratch folder so Godot never uses the real user data}"
@@ -74,22 +80,27 @@ prepare_headless() {
 
 # One route: every variant and size in turn, each in its own render.sh run.
 capture_route() {
-  local route="$1" out="$2" sizes="$3" variants="$4" driver="$5" language="$6" status=0 dir variant size w h
+  local route="$1" out="$2" sizes="$3" variants="$4" driver="$5" language="$6" status=0 dir variant size w h rc
   for variant in $variants; do
     for size in $sizes; do
+      # Checked again here, next to the rm -rf, so the guard travels with the deletion.
+      check_route "$route" && check_variant "$variant" && check_size "$size" || return 64
       dir="$out/$route/$variant/$size"
       rm -rf "$dir"
       mkdir -p "$dir"
       w="${size%x*}" h="${size#*x}"
+      rc=0
       "$root/tools/render/render.sh" --name "${PARITY_NAME:-lighter-parity}-$route" --driver "$driver" \
           --screen 2560x1440 --timeout "${PARITY_TIMEOUT:-2700}" ${PARITY_KEYBOARD:+--keyboard "$PARITY_KEYBOARD"} "$game_src" "$dir" -- \
           --fixed-fps 60 --resolution "${w}x${h}" --script res://review_capture/capture.gd -- \
           --route="$route" --variant="$variant" --size="$size" --out=/work/out ${language:+--language="$language"} \
-          > "$dir/godot.log" 2>&1 || true
-      if [ -f "$dir/shots.json" ] && grep -q '"failed": false' "$dir/shots.json" && ! grep -qE "$errors" "$dir/godot.log"; then
+          > "$dir/godot.log" 2>&1 || rc=$?
+      # render.sh's status is Godot's (capture.gd quits 1 on a failed run; 124 is a timeout), so a
+      # crash or a timeout with an old shots.json-shaped file left behind still fails here.
+      if [ "$rc" -eq 0 ] && [ -f "$dir/shots.json" ] && grep -q '"failed": false' "$dir/shots.json" && ! grep -qE "$errors" "$dir/godot.log"; then
         echo "ok    $route $variant $size $(grep -o 'shots=[0-9]*' "$dir/godot.log" | tail -1)"
       else
-        echo "FAIL  $route $variant $size (see $dir/godot.log)" >&2
+        echo "FAIL  $route $variant $size (render.sh exit $rc; see $dir/godot.log)" >&2
         status=1
       fi
     done
@@ -106,17 +117,28 @@ case "$cmd" in
       language="${2:?--language needs a code}"
       shift 2
     fi
-    out="$(mkdir -p "${1:?out dir}" && cd "$1" && pwd)"
+    : "${1:?out dir}"
     routes="${2:-R1 R2 R3 R4}"
     sizes="${3:-960x540 1280x720 2340x1080}"
     variants="${4:-kb-fx kb-calm touch-fx}"
+    jobs_max="${PARITY_JOBS:-2}"
+    # 0 or a word would never let a route start: the wait below would loop for ever.
+    [[ "$jobs_max" =~ ^[1-9][0-9]*$ ]] || { echo "PARITY_JOBS must be a whole number of at least 1, not '$jobs_max'" >&2; exit 64; }
+    bad=0
+    for route in $routes; do
+      check_route "$route" && check_name "${PARITY_NAME:-lighter-parity}-$route" PARITY_NAME || bad=1
+    done
+    for variant in $variants; do check_variant "$variant" || bad=1; done
+    for size in $sizes; do check_size "$size" || bad=1; done
+    [ "$bad" -eq 0 ] || exit 64
+    out="$(mkdir -p "$1" && cd "$1" && pwd)"
     driver="$(mktemp -d)"
     trap 'rm -rf "$driver"' EXIT
     cp "$here/capture.gd" "$here/parity_sfx_bank.gd" "$here/parity_kit.gd" "$driver/"
     status=0
     pids=()
     for route in $routes; do
-      while [ "$(jobs -rp | wc -l | tr -d ' ')" -ge "${PARITY_JOBS:-2}" ]; do
+      while [ "$(jobs -rp | wc -l | tr -d ' ')" -ge "$jobs_max" ]; do
         sleep 2
       done
       capture_route "$route" "$out" "$sizes" "$variants" "$driver" "$language" &
@@ -154,7 +176,7 @@ case "$cmd" in
     echo "ok    perf $label"
     ;;
   *)
-    sed -n '2,44p' "$0" >&2
+    sed -n '2,48p' "$0" >&2
     exit 2
     ;;
 esac

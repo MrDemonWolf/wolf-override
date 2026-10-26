@@ -3,8 +3,8 @@
 # after `next build`, so it always checks a fresh export; `bun run docs:check-export`
 # re-runs it on the last build without rebuilding.
 # Fails when any exported page references the /_next/image optimiser (absent on
-# GitHub Pages), lacks the #main-content skip-link target, carries more than one
-# robots meta tag (robots and googlebot counted together), or when any page or stylesheet
+# GitHub Pages), lacks the #main-content skip-link target, carries no robots meta tag or more
+# than one (robots and googlebot counted together), or when any page or stylesheet
 # references a .ttf font. Also fails when robots.txt lacks its Sitemap line, sitemap.xml
 # has a guide page without <lastmod>, the landing page or a guide page lacks its JSON-LD
 # block, any JSON-LD block is not valid JSON, a guide page's social card is not og:type article
@@ -46,8 +46,14 @@ while IFS= read -r page; do
     echo "FAIL  $rel has no strict-origin-when-cross-origin referrer policy" >&2
     status=1
   fi
-  robots="$(grep -oE '<meta name="(robots|googlebot)"' "$page" | wc -l | tr -d ' ')"
-  if [ "$robots" -gt 1 ]; then
+  # grep exits 1 when a page has none; under pipefail that ended the whole script with no FAIL line
+  # (Codex review finding M3), so the count is taken even then.
+  robots="$( (grep -oE '<meta name="(robots|googlebot)"' "$page" || true) | wc -l | tr -d ' ')"
+  # Every page gets one: the root layout's index/follow, or Next's own noindex on the 404 page.
+  if [ "$robots" -eq 0 ]; then
+    echo "FAIL  $rel has no robots meta tag (the root layout gives every page one)" >&2
+    status=1
+  elif [ "$robots" -gt 1 ]; then
     echo "FAIL  $rel has $robots robots meta tags (expected at most one)" >&2
     status=1
   fi
@@ -158,6 +164,6 @@ python3 -I "$root/scripts/check-docs-links.py" --self-test || status=1
 python3 -I "$root/scripts/check-docs-links.py" "$out" || status=1
 
 if [ "$status" -eq 0 ]; then
-  echo "pass  $count exported pages: no /_next/image, one #main-content each, at most one robots meta, no .ttf references; robots.txt names the sitemap; every guide URL in sitemap.xml has <lastmod>; valid JSON-LD on the landing and guide pages; guide pages are og:type article with the game name in og:title; llms.txt, llms-full.txt and a Markdown copy of every guide page; the press kit zip"
+  echo "pass  $count exported pages: no /_next/image, one #main-content each, exactly one robots meta, no .ttf references; robots.txt names the sitemap; every guide URL in sitemap.xml has <lastmod>; valid JSON-LD on the landing and guide pages; guide pages are og:type article with the game name in og:title; llms.txt, llms-full.txt and a Markdown copy of every guide page; the press kit zip"
 fi
 exit "$status"

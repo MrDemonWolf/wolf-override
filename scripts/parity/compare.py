@@ -26,6 +26,7 @@ import argparse
 import concurrent.futures
 import filecmp
 import json
+import os
 import pathlib
 import subprocess
 import sys
@@ -41,9 +42,18 @@ def runs(base: pathlib.Path) -> list[pathlib.Path]:
 
 
 def masked(path: pathlib.Path, masks: list, tmp: pathlib.Path) -> pathlib.Path:
+    """path with every mask rectangle [x, y, w, h] (px) painted black, as a new PNG in tmp; path itself
+    when there are no masks.
+
+    Each call gets its own file from mkstemp. A name built from the still (its folder and file name)
+    is the same for the baseline and the candidate, which share both, so the candidate's copy
+    overwrote the baseline's and the candidate was compared with itself; the comparison threads also
+    share tmp (Codex review finding M4)."""
     if not masks:
         return path
-    out = tmp / (path.parent.name + "-" + path.name)
+    handle, name = tempfile.mkstemp(suffix=".png", dir=tmp)
+    os.close(handle)
+    out = pathlib.Path(name)
     draw = [a for m in masks for a in ("-draw", "rectangle %d,%d %d,%d" % (m[0], m[1], m[0] + m[2] - 1, m[1] + m[3] - 1))]
     subprocess.run(["magick", str(path), "-fill", "black", *draw, str(out)], check=True)
     return out
@@ -167,22 +177,33 @@ def self_test() -> int:
         smaller = make("small.png", "-size", "48x27", "xc:black")
         if changed_pixels(base, smaller, [], None, t) != INCOMPARABLE:
             failures.append("different sizes were not reported as incomparable")
-        # A whole comparison: one changed pixel in one still must fail it.
-        for side, still in (("a", base), ("b", one)):
+        def write_run(side: str, still: pathlib.Path, masks: list) -> pathlib.Path:
+            """A one-run capture folder <side>/R0/kb-fx/96x54 whose first still is `still` with `masks`."""
             run = t / side / "R0" / "kb-fx" / "96x54"
             run.mkdir(parents=True)
             (run / "001-x.png").write_bytes(still.read_bytes())
             (run / "002-y.png").write_bytes(base.read_bytes())
             (run / "text.log").write_text("1\tx\ty\n")
             (run / "audio.log").write_text("\n")
-            (run / "shots.json").write_text(json.dumps({"frames": 2, "failed": False, "shots": [{"file": "001-x.png", "masks": []}, {"file": "002-y.png", "masks": []}]}))
-        if compare(t / "a", t / "b", None, 2) != 1:
+            (run / "shots.json").write_text(json.dumps({"frames": 2, "failed": False, "shots": [{"file": "001-x.png", "masks": masks}, {"file": "002-y.png", "masks": []}]}))
+            return t / side
+
+        # A whole comparison: one changed pixel in one still must fail it.
+        plain, changed = write_run("a", base, []), write_run("b", one, [])
+        if compare(plain, changed, None, 2) != 1:
             failures.append("a run with one changed pixel compared as identical")
-        if compare(t / "a", t / "a", None, 2) != 0:
+        if compare(plain, plain, None, 2) != 0:
             failures.append("a run compared against itself was not identical")
+        # Masked stills: the same still names on both sides, so a shared temporary file would compare
+        # the candidate with itself. A mask away from the changed pixel (5,5) must still fail the run;
+        # one over it must pass.
+        if compare(plain, write_run("c", one, [[0, 0, 2, 2]]), None, 2) != 1:
+            failures.append("a masked run with one changed pixel outside the mask compared as identical")
+        if compare(plain, write_run("d", one, [[5, 5, 1, 1]]), None, 2) != 0:
+            failures.append("a run whose only changed pixel is masked was not identical")
     for f in failures:
         print("SELF-TEST FAIL: " + f)
-    print("self-test %s" % ("failed" if failures else "passed: 1/255 in one channel of one pixel = 1, ten pixels = 10, alpha only = 1, re-encoded = 0, size mismatch fails, one changed pixel fails a run"))
+    print("self-test %s" % ("failed" if failures else "passed: 1/255 in one channel of one pixel = 1, ten pixels = 10, alpha only = 1, re-encoded = 0, size mismatch fails, one changed pixel fails a run, masked or not, and a masked change passes"))
     return 1 if failures else 0
 
 

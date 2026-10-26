@@ -33,6 +33,13 @@ tools/render/render.sh [--screen WxH] [--name JOB] [--driver DIR] [--timeout SEC
   does not change this Xvfb's keymap. `scripts/parity/run.sh` passes `PARITY_KEYBOARD` through.
 - Every run stops after `--timeout` seconds (default 900, exit status 124). The run's log is kept at
   `~/Library/Caches/wolf-override-render/JOB/run.log`.
+- The exit status is Godot's: 0 only when the run passed. A crash or a failed capture script exits
+  non-zero, and the output is still copied back for a look.
+- A project that does not import fails before the run, with the import's status and its log at
+  `JOB/import.log`. On a fresh cache only the second import pass is judged.
+- `JOB` is one folder name: letters, digits, `.`, `_` and `-`, never `.` or `..`. A bad `--name`,
+  `--screen`, `--timeout` or `--keyboard` exits 64 before any folder is touched. The checks live in
+  `validate_names.sh`, which `scripts/parity/run.sh` shares for its routes, variants and sizes.
 - The container has its own throwaway user data, so nothing reaches the host's Godot settings or
   saves.
 
@@ -43,6 +50,15 @@ mkdir -p /tmp/smoke-driver && cp tools/render/smoke_capture.gd /tmp/smoke-driver
 tools/render/render.sh --driver /tmp/smoke-driver apps/game OUT -- \
   --resolution 1280x720 --script res://review_capture/smoke_capture.gd
 ```
+
+## Self-test
+
+```sh
+tools/render/self_test.sh
+```
+
+It needs no Docker. It checks the name rules and runs `render.sh` against a stand-in `docker` to
+check the exit status, the import check and that a refused name touches nothing.
 
 ## Limits
 
