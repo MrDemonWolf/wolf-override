@@ -13,7 +13,11 @@
 # Steps: import apps/game if it has no .godot yet (import_game's two passes), copy pot_addon/ (next to
 # this script) into apps/game/addons/i18n_pot, enable it in project.godot, run the editor headless with
 # I18N_POT_OUT set, then remove the addon and put project.godot back exactly as it was, also on failure.
-# Exit status: the editor run's (0 when the POT was written), or import_game's failure.
+# It refuses to start when apps/game/addons/i18n_pot already exists, and removes apps/game/addons only
+# when it made that folder itself.
+# Exit status: the editor run's (0 when the POT was written; 124 when it ran past EDITOR_LIMIT), 1 when
+# import_game fails (no POT is made from a broken import), or 1 when apps/game/addons/i18n_pot is already
+# there (it is never overwritten or deleted when this run did not make it).
 # Heavy (an import and an editor start): on a shared machine, take the heavy-run slot first.
 # Gotchas:
 # - It edits ROOT's project.godot and apps/game/addons/ for the length of the run, and the trap puts both
@@ -38,19 +42,36 @@ source "$root/scripts/godot-helpers.sh"
 project="$root/apps/game"
 addon="$project/addons/i18n_pot"
 backup="$logs/project.godot.before"
+# Seconds the headless editor run may take. It takes a few seconds; the bound only stops a hung editor,
+# and stays well inside game.yml's 5-minute step so the step reports this script's message, not a kill.
+EDITOR_LIMIT=180
+# The addon folder is this script's own scratch space, so a folder already there (a killed run's
+# leftover, or someone's own files) is left alone and the run stops before changing anything.
+if [ -e "$addon" ]; then
+  echo "extract_pot.sh: $addon already exists; remove it (a killed run leaves it) and run again" >&2
+  exit 1
+fi
+made_addons=0
+[ -d "$project/addons" ] || made_addons=1
 cp "$project/project.godot" "$backup"
+# Called by the EXIT trap below.
 restore() {
   cp "$backup" "$project/project.godot"
   rm -rf "$addon"
-  rmdir "$project/addons" 2>/dev/null || true
-  rm -rf "$logs/home"
+  if [ "$made_addons" -eq 1 ]; then
+    rmdir "$project/addons" 2>/dev/null || true
+  fi
+  rm -rf "${logs:?}/home"
 }
 trap restore EXIT
 isolate_godot_home "$logs/home"
 cd "$root"
 if [ ! -d "$project/.godot" ]; then
   started=$SECONDS
-  import_game "$godot" "$logs" 400 || echo "extract_pot.sh: the import reported problems (see $logs)" >&2
+  if ! import_game "$godot" "$logs" 400; then
+    echo "extract_pot.sh: the import failed (see $logs); no template is made from a broken import" >&2
+    exit 1
+  fi
   echo "import took $((SECONDS - started))s"
 fi
 mkdir -p "$addon"
@@ -58,7 +79,7 @@ cp "$here/pot_addon/pot_probe.gd" "$here/pot_addon/plugin.cfg" "$addon/"
 printf '\n[editor_plugins]\n\nenabled=PackedStringArray("res://addons/i18n_pot/plugin.cfg")\n' >> "$project/project.godot"
 started=$SECONDS
 rc=0
-I18N_POT_OUT="$out" bounded 300 "$godot" --headless --editor --path apps/game > "$logs/pot.log" 2>&1 || rc=$?
+I18N_POT_OUT="$out" bounded "$EDITOR_LIMIT" "$godot" --headless --editor --path apps/game > "$logs/pot.log" 2>&1 || rc=$?
 echo "editor POT run rc=$rc took $((SECONDS - started))s"
 grep -E "POT_PROBE" "$logs/pot.log" || true
 exit "$rc"

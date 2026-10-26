@@ -1,6 +1,7 @@
 # shellcheck shell=bash
 # Shared helpers for the scripts that drive the pinned Godot binary headlessly.
-# Source this file from bash (scripts/check-game.sh, scripts/export-game.sh); do not run it.
+# Source this file from bash (scripts/check-game.sh, export-game.sh, get-godot.sh, get-export-templates.sh,
+# i18n/extract_pot.sh); do not run it.
 
 # isolate_godot_home DIR: point Godot's user and editor data at DIR, so a run never touches real saves,
 # editor settings or export templates. Godot resolves them from HOME on macOS and XDG_* on Linux.

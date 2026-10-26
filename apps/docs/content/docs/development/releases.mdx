@@ -39,6 +39,12 @@ Every pull request that changes the game, the site or the tools does this in the
 - **Long detail** goes in the version's **Full notes** block. The in-game changelog shows the short lines only.
 - **CI fails** if `changelog.txt` is out of date. See [In-game changelog](/docs/development/testing/#in-game-changelog).
 
+### Dependency updates
+
+- **Dependabot's pull requests** bump the website's packages and the workflows' actions. They cannot add their own changelog line.
+- **Before you merge one,** add a Development line by hand, such as "Updated the website's packages," and run the export.
+- **Dependabot waits** 7 days after a release before it proposes it, and 14 days for a major version. A broken release is usually pulled by then.
+
 ## Cut a version
 
 A version is cut once per milestone.

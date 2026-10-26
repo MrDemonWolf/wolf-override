@@ -238,6 +238,12 @@ Changes merged after 0.15.0. They become the next version when it is cut.
 - `render.sh` and the parity runs check job, route, variant and size names before clearing any folder. `tools/render/self_test.sh` checks this without Docker, and Game checks runs it.
 - `compare.py` no longer compares a masked still with itself.
 - The docs export check names a page with no robots tag instead of stopping.
+- One script, `scripts/get-godot.sh`, fetches and checks the pinned Godot for Game checks and Test builds, replacing a copy in each.
+- Game checks' `i18n` job is now `tools`: it also runs shellcheck and the copy check's, `render.sh`'s and `compare.py`'s self-tests, and retries the gettext install.
+- The translation template check also runs after a failed suite when the import was clean, and fails when its own import fails.
+- `extract_pot.sh` never deletes an `addons` folder it did not make.
+- The site's checks fetch history without old file contents, and the site redeploys when the game version, key art or credit line it reads changes.
+- Every workflow names the exact release of each pinned action, and Dependabot waits 7 days for a release (14 for a major one).
 
 ### How it was checked
 
@@ -263,6 +269,7 @@ Changes merged after 0.15.0. They become the next version when it is cut.
 - **Layout for languages checked:** headless test suites in every language and pseudo-English, every English station name at every **TEXT SIZE** compared with the previous version (unchanged), and rendered title, changelog, Settings and end card stills in English, Spanish, German and pseudo-English before and after; the new title layout is not yet looked at by Nathanial Henniges, and not played by hand.
 - **Translation reports checked:** the docs checks, tests and build, and the issue form's YAML parsed; the form itself shows on GitHub only once merged.
 - **Full slice and parity routes checked:** headless test suites (32, with `full_slice_test` at 128 s on CI) and rendered stills of R2 and R4 in all 3 variants and 3 sizes (18 runs, none failed); not played by hand.
+- **Workflow changes checked:** every workflow on the pull request (Game checks with the new `tools` job, Deploy Docs, Test builds) and Test builds run once by hand; the game itself did not change.
 
 ## 0.15.0 - October 16, 2026
 
