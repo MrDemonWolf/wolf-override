@@ -97,6 +97,9 @@ class Item:
 	## It has a name, but no place was free of the protected controls, text, actors and other names.
 	var label_hidden: bool = false
 
+	## The item as plain values for the JSON dump: its category, name, kind, source, path, world and screen
+	## rects ([x, y, w, h]) and whether it is active, plus its extra fields, and label_rect or label_hidden
+	## when it has them.
 	func to_dict() -> Dictionary:
 		var data: Dictionary = {
 			"category": str(category), "name": name, "kind": kind, "source": source, "path": path,
@@ -117,10 +120,12 @@ class LabelSpace:
 	const CELL: float = 64.0
 	var cells: Dictionary = {}
 
+	## Marks [param rect] (screen px) taken, in every grid cell it touches.
 	func add(rect: Rect2) -> void:
 		for key: Vector2i in _keys(rect):
 			(cells.get_or_add(key, []) as Array).append(rect)
 
+	## True when [param rect] (screen px) overlaps no rectangle taken so far.
 	func is_free(rect: Rect2) -> bool:
 		for x: int in range(floori(rect.position.x / CELL), floori(rect.end.x / CELL) + 1):
 			for y: int in range(floori(rect.position.y / CELL), floori(rect.end.y / CELL) + 1):
@@ -141,6 +146,7 @@ class LabelSpace:
 					found.append(other)
 		return found
 
+	## The grid cells (CELL px square) [param rect] touches, edges included.
 	static func _keys(rect: Rect2) -> Array[Vector2i]:
 		var keys: Array[Vector2i] = []
 		var start: Vector2i = Vector2i(floori(rect.position.x / CELL), floori(rect.position.y / CELL))
@@ -180,6 +186,7 @@ var _draw_scripts: Dictionary = {}
 var _widths: Dictionary = {}
 
 
+## Names the node and fills the screen without taking the mouse, hidden and idle until set_shown.
 func _init() -> void:
 	name = "DebugZones"
 	mouse_filter = Control.MOUSE_FILTER_IGNORE
@@ -188,12 +195,17 @@ func _init() -> void:
 	set_process(false)
 
 
+## Wires this to the game [param main], leaves [param skip] (the debug tools' own nodes) out of the
+## render boxes, and builds the legend. DebugTools calls it once.
 func setup(main: Main, skip: Node) -> void:
 	game = main
 	skip_root = skip
 	_build_legend()
 
 
+## Builds the legend card at LEGEND_RECT (canvas px): the device caption and one toggle button per
+## category, with the theme's button look at LEGEND_BUTTON_PADDING. Its buttons never take keyboard or
+## controller focus.
 func _build_legend() -> void:
 	legend = PanelContainer.new()
 	legend.name = "DrawLegend"
@@ -263,6 +275,7 @@ func set_layer(on: bool, category: StringName) -> void:
 	layers_changed.emit()
 
 
+## Turns [param category]'s drawing over (F5 to F7, LB, RB or View); see set_layer.
 func toggle_layer(category: StringName) -> void:
 	set_layer(not bool(layers.get(category, false)), category)
 
@@ -273,6 +286,7 @@ func set_device(device: String) -> void:
 		legend_caption.text = CAPTIONS.get(device, CAPTIONS["keyboard"])
 
 
+## Labels [param category]'s legend button with a filled or empty box and tints it with its colour while on, muted while off.
 func _style_button(category: StringName) -> void:
 	var button: Button = legend_buttons.get(category) as Button
 	if button == null:
@@ -302,6 +316,7 @@ func refresh_now() -> void:
 	queue_redraw()
 
 
+## While shown: redraws every frame, and gathers the render candidates again every REFRESH_SECONDS ([param delta] in seconds).
 func _process(delta: float) -> void:
 	_refresh_left -= delta
 	if _refresh_left <= 0.0:
@@ -393,10 +408,13 @@ func _camera_centre_limits() -> Vector2:
 	return Vector2(half_view, 960.0 - half_view)
 
 
+## True while the title is up (or no game is wired): the rules' zones and hitboxes are left out then, and only
+## render boxes are drawn.
 func _title_open() -> bool:
 	return game == null or game.title_open
 
 
+## The game's live progress (Main.state).
 func _state() -> M0State:
 	return game.state
 
@@ -629,6 +647,8 @@ func _begin_pass() -> void:
 			_blockers.append(control.get_global_rect())
 
 
+## Protects [param rect] (screen px), belonging to [param node] and reported as [param label]: nothing
+## drawn this pass covers it, and the node's own render box is drawn whole.
 func _add_clear(node: CanvasItem, rect: Rect2, label: String) -> void:
 	_clear.append(rect)
 	_clear_names.append(label)
@@ -703,6 +723,8 @@ func _gather_candidates() -> Array[CanvasItem]:
 	return found
 
 
+## Appends [param node] and its descendants that draw a box or draw by themselves to [param found], in
+## tree order, skipping skip_root and everything under it.
 func _collect(node: Node, found: Array[CanvasItem]) -> void:
 	if node == skip_root:
 		return
@@ -712,6 +734,7 @@ func _collect(node: Node, found: Array[CanvasItem]) -> void:
 		_collect(child, found)
 
 
+## True for a sprite, polygon, line, or a Control that draws something itself (not one of LAYOUT_ONLY).
 static func _draws_box(item: CanvasItem) -> bool:
 	if item is Sprite2D or item is AnimatedSprite2D or item is Polygon2D or item is Line2D:
 		return true
@@ -879,6 +902,8 @@ static func _custom_bounds_source(item: CanvasItem) -> String:
 	return "nothing drawn" if OS.has_feature("editor") else "editor builds only"
 
 
+## The box round [param points], each moved by [param offset], grown by [param grow] on every side; an
+## empty box at [param offset] when there are none.
 static func _points_rect(points: PackedVector2Array, offset: Vector2, grow: float) -> Rect2:
 	if points.is_empty():
 		return Rect2(offset, Vector2.ZERO)
@@ -921,10 +946,12 @@ static func effective_alpha(item: CanvasItem) -> float:
 	return alpha
 
 
+## True for skip_root (the debug tools) and every node under it.
 func _skipped(node: Node) -> bool:
 	return skip_root != null and (node == skip_root or skip_root.is_ancestor_of(node))
 
 
+## [param node]'s path for the dump: relative to Main when under it, else absolute.
 func _path(node: Node) -> String:
 	return str(game.get_path_to(node)) if game != null and (node == game or game.is_ancestor_of(node)) else str(node.get_path())
 
@@ -1010,10 +1037,12 @@ func _to_world(rect: Rect2) -> Rect2:
 	return game.get_global_transform() * rect if game != null else rect
 
 
+## The viewport's canvas transform (world to screen, following the camera); identity outside the tree.
 func _canvas() -> Transform2D:
 	return get_viewport().get_canvas_transform() if is_inside_tree() else Transform2D.IDENTITY
 
 
+## [param point] in Main's space as a screen point (canvas px).
 func _world_to_screen(point: Vector2) -> Vector2:
 	var world: Vector2 = game.get_global_transform() * point if game != null else point
 	return _canvas() * world
@@ -1024,6 +1053,7 @@ func _view() -> Rect2:
 	return get_viewport().get_visible_rect() if is_inside_tree() else Rect2(0.0, 0.0, 960.0, 540.0)
 
 
+## The floor line (RoomDepth.FLOOR_Y) as a screen y (canvas px), where the rule lanes start.
 func _floor_screen_y() -> float:
 	return _world_to_screen(Vector2(0.0, RoomDepth.FLOOR_Y)).y
 
@@ -1217,6 +1247,11 @@ func _place_box_labels(rules: Array[Item], render: Array[Item]) -> void:
 			_fit_box_label(space, view, item, font, false)
 
 
+## Finds a free place in [param space] (inside [param view]) for [param item]'s name: the four left
+## corner spots (above or inside first, by [param outside_first]), then the right ones, then above an
+## actor on it, then up to LEADER_STEPS lines up or down its left edge with a leader line. Sets
+## label_rect and takes the place, or sets label_hidden when none is free. Does nothing for an item off
+## the view.
 func _fit_box_label(space: LabelSpace, view: Rect2, item: Item, font: Font, outside_first: bool) -> void:
 	if not item.screen.intersects(view):
 		return
@@ -1268,10 +1303,12 @@ func _text_width(font: Font, text: String) -> float:
 	return _widths[text]
 
 
+## The height of one drawn name at FONT_SIZE (ascent and descent, plus 1 px), or FONT_SIZE + 1 with no font.
 static func _label_height(font: Font) -> float:
 	return (font.get_ascent(FONT_SIZE) + font.get_descent(FONT_SIZE) if font != null else float(FONT_SIZE)) + 1.0
 
 
+## True when [param span] (from x, to y) overlaps any of [param spans]; touching ends do not count.
 static func _overlaps(spans: Array, span: Vector2) -> bool:
 	for other: Vector2 in spans:
 		if span.x < other.y and other.x < span.y:
@@ -1279,10 +1316,12 @@ static func _overlaps(spans: Array, span: Vector2) -> bool:
 	return false
 
 
+## [param rect] as [x, y, width, height], as the dump writes rectangles.
 static func rect_array(rect: Rect2) -> Array[float]:
 	return [rect.position.x, rect.position.y, rect.size.x, rect.size.y]
 
 
+## [param size] as whole pixels, "W×H".
 static func _size_text(size: Vector2) -> String:
 	return "%.0f×%.0f" % [size.x, size.y]
 
@@ -1324,6 +1363,7 @@ static func clip(rect: Rect2, cuts: Array[Rect2]) -> Array[Rect2]:
 
 # --- Drawing ----------------------------------------------------------------------------------
 
+## Draws every shown category's items, render boxes first, then zones, then hitboxes on top, from the last gathering.
 func _draw() -> void:
 	if game == null:
 		return
@@ -1338,6 +1378,7 @@ func _draw() -> void:
 				_draw_item(item, font)
 
 
+## Draws [param item] in its category's colour by its kind: range or ray, spot, limit, shape or rect, else a render box.
 func _draw_item(item: Item, font: Font) -> void:
 	var tint: Color = COLORS[item.category]
 	match item.kind:
@@ -1390,6 +1431,9 @@ func _marker(points: PackedVector2Array, color: Color, outline: bool) -> void:
 		draw_polyline(PackedVector2Array([points[0], points[1], points[2], points[0]]), SHADOW, 1.0)
 
 
+## Draws a rule range (or a ray, with an arrow tip on its facing end) as a bar with end ticks in its
+## lane, shading its screen_area above the floor when it has one; a live hitbox range in ARMED. Nothing
+## for an item given no lane.
 func _draw_range(item: Item, tint: Color, font: Font) -> void:
 	if int(item.extra.get("lane", 0)) < 0:
 		return
@@ -1414,6 +1458,7 @@ func _draw_range(item: Item, tint: Color, font: Font) -> void:
 	_draw_label(item, Color(color, strength).lightened(0.25), font)
 
 
+## Draws a spot as a tick down to its lane and, unless tick_only, a marker on top; white for the spot WOLF is heading for. Nothing for an item given no lane.
 func _draw_spot(item: Item, tint: Color, font: Font) -> void:
 	if int(item.extra.get("lane", 0)) < 0:
 		return
@@ -1427,6 +1472,7 @@ func _draw_spot(item: Item, tint: Color, font: Font) -> void:
 	_draw_label(item, color, font)
 
 
+## Draws a limit as a dashed line from its top down to limit_bottom, with its name. Nothing while off screen.
 func _draw_limit(item: Item, tint: Color, font: Font) -> void:
 	if not bool(item.extra.get("on_screen", true)):
 		return
@@ -1452,6 +1498,7 @@ func limit_bottom(item: Item) -> float:
 	return maxf(bottom, floor_y)
 
 
+## Draws a hitbox outline, filled in ARMED while armed or a live rule rect; a disabled shape is reported only.
 func _draw_box(item: Item, tint: Color, font: Font) -> void:
 	var color: Color = ARMED if item.active and (bool(item.extra.get("armed", false)) or item.kind == "rect") else tint
 	if item.kind == "shape" and not item.active:
@@ -1464,6 +1511,8 @@ func _draw_box(item: Item, tint: Color, font: Font) -> void:
 	_draw_label(item, color, font)
 
 
+## Draws a render box's outline and name; a protected control's box is drawn whole. Nothing for a box that is
+## not active (hidden, covered, too faint per MIN_ALPHA, or off screen).
 func _draw_render_box(item: Item, tint: Color, font: Font) -> void:
 	if not item.active:
 		return
