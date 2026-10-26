@@ -975,7 +975,7 @@ func _check_fit(code: String, key: String, control: Control) -> void:
 func _story_catalog() -> Translation:
 	var catalog: Translation = Translation.new()
 	catalog.locale = UNSHIPPED_TEST_LANGUAGE
-	catalog.add_message(Main.INTRO_ORDER_WORDS, "Quien lleva los registros es testigo. WOLF, al despertar, acaba con esa persona.")
+	catalog.add_message(Main.INTRO_ORDER_WORDS, "Testigo en registros. WOLF, al despertar, acaba con esa persona.")
 	catalog.add_message("DIRECTOR", "DIRECTORA DE PRUEBA", Main.SPEAKER_CONTEXT)
 	catalog.add_message(Main.OPENING_WOLF_WORDS, "Oí la orden del Director.")
 	catalog.add_message(Main.OPENING_ENGINEER_WORDS, "Entonces cruzamos mantenimiento.")
@@ -1014,7 +1014,7 @@ func _check_story_lines() -> void:
 	I18n.apply(UNSHIPPED_TEST_LANGUAGE)
 	var names: Dictionary = {"DIRECTOR": String(TranslationServer.translate("DIRECTOR", Main.SPEAKER_CONTEXT))}
 	var opening: String = I18n.shown(Main.INTRO_LINES[0], tags, names)
-	_check(opening == "DIRECTORA DE PRUEBA: Quien lleva los registros es testigo. WOLF, al despertar, acaba con esa persona.", "the Director's line is his translated tag and his translated words (%s)" % opening)
+	_check(opening == "DIRECTORA DE PRUEBA: Testigo en registros. WOLF, al despertar, acaba con esa persona.", "the Director's line is his translated tag and his translated words (%s)" % opening)
 	var exchange: String = I18n.shown(Main.OPENING_EXCHANGE % "ROWAN", tags, names)
 	_check(exchange == "WOLF: Oí la orden del Director.\nROWAN: Entonces cruzamos mantenimiento.", "WOLF's and the engineer's words are translated apart and their tags stay as written (%s)" % exchange.c_escape())
 	var card: String = I18n.join("\n", [I18n.format(JunctionRoom.VENT_REASON, ["Rowan"]), Main.RESTORE_BEAT_LINE])
@@ -1084,7 +1084,7 @@ func _check_story_game() -> void:
 	I18n.apply(UNSHIPPED_TEST_LANGUAGE)
 	await process_frame
 	_check(game.status_line == Main.INTRO_LINES[0], "the game keeps the opening's English line (%s)" % game.status_line)
-	_check(game.speaker.text == "DIRECTORA DE PRUEBA" and game.story.text == "Quien lleva los registros es testigo. WOLF, al despertar, acaba con esa persona.", "the opening's box draws the Director's translated tag and words (%s / %s)" % [game.speaker.text, game.story.text])
+	_check(game.speaker.text == "DIRECTORA DE PRUEBA" and game.story.text == "Testigo en registros. WOLF, al despertar, acaba con esa persona.", "the opening's box draws the Director's translated tag and words (%s / %s)" % [game.speaker.text, game.story.text])
 	_check(game.speaker.get_theme_color(&"font_color").is_equal_approx(Color("#ff9a9f")), "the translated tag keeps the Director's colour, chosen by his English tag")
 	game.call("_finish_intro")
 	await process_frame
