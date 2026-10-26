@@ -2744,9 +2744,6 @@ msgstr "Tu étais en veille."
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: WOLF's answer to the Director: he heard the order to kill the witness and refuses it.
-#. TRANSLATORS: WOLF's answer to the Director: he heard the order to kill the witness and refuses it.
-#. TRANSLATORS: WOLF's answer to the Director: he heard the order to kill the witness and refuses it.
-#. TRANSLATORS: WOLF's answer to the Director: he heard the order to kill the witness and refuses it.
 #. i18n: story speaker=WOLF
 #: scripts/story_text.gd:50
 msgid "I heard you. I won't do it."
