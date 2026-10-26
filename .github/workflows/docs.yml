@@ -1,11 +1,18 @@
 name: Deploy Docs
 
 on:
+  # Pull requests always run (the build check is required). Pushes to main deploy only when the site's
+  # inputs change: the site itself, its checks, and the game files the build reads. Keep the game files
+  # in step with apps/docs/lib/version.ts (project.godot's version), lib/press-kit.ts (the key art under
+  # apps/game/assets) and lib/press-kit.test.ts (main.gd's credit line).
   pull_request:
   push:
     branches: [main]
     paths:
       - 'apps/docs/**'
+      - 'apps/game/project.godot'
+      - 'apps/game/scripts/main.gd'
+      - 'apps/game/assets/title-corridor-key-art-provisional.png'
       - 'scripts/check-docs-*.sh'
       - 'scripts/check-docs-*.py'
       - '.github/workflows/docs.yml'
@@ -33,6 +40,9 @@ jobs:
           # Full history, so each guide page's sitemap <lastmod> is its real last commit date
           # (apps/docs/source.config.ts); a shallow clone would date every page to the latest commit.
           fetch-depth: 0
+          # `git log` dates need only commits and trees, so old file contents (blobs) are not fetched;
+          # the checked-out commit's own files still are.
+          filter: blob:none
       - uses: oven-sh/setup-bun@0c5077e51419868618aeaa5fe8019c62421857d6 # v2.2.0
         with:
           bun-version: 1.4.2
