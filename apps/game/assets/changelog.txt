@@ -245,6 +245,7 @@ Changes merged after 0.15.0. They become the next version when it is cut.
 - Layout for languages checked: headless test suites in every language and pseudo-English, every English station name at every TEXT SIZE compared with the previous version (unchanged), and rendered title, changelog, Settings and end card stills in English, Spanish, German and pseudo-English before and after; the new title layout is not yet looked at by Nathanial Henniges, and not played by hand.
 - Translation reports checked: the docs checks, tests and build, and the issue form's YAML parsed; the form itself shows on GitHub only once merged.
 - Full slice and parity routes checked: headless test suites (32, with full_slice_test at 128 s on CI) and rendered stills of R2 and R4 in all 3 variants and 3 sizes (18 runs, none failed); not played by hand.
+- Workflow changes checked: every workflow on the pull request (Game checks with the new tools job, Deploy Docs, Test builds) and Test builds run once by hand; the game itself did not change.
 
 == 0.15.0 - October 16, 2026 ==
 Summary: real doors in Records Access and the Service Junction, a copied-code check, notes moved to Notion and groundwork for more languages.
