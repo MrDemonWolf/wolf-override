@@ -109,7 +109,7 @@
       "current": "WOLF: That purge erases what the witness saved. Once it's gone, his word is the only record.",
       "proposed": "WOLF: That purge erases what the witness saved. Once it's gone, his word is the only record.",
       "alternatives": [],
-      "notes": "Decision C (2026-10-11, still valid): the stakes line is required on the main path, and the optional purge display keeps the details (PURGE_DISPLAY_READ). Current line, 2026-10-26: WOLF says the purge erases what the witness saved, so the Director is destroying the records clerk's preserved record (ST-04). It says the witness saved something, never what, so the slice does not reveal the investigator or the detention (spoiler line). 'His word is the only record' now means that without the witness's record the Director's account stands unchecked; it states no new fact. Do not make it say the engineer will copy the originals themselves: in Records the clerk's originals are 'still missing' and only the purge order's trace is copied. Fit: 1 of 3 rows, tagged box (715 px text width, Roboto 17 px). Keep option: Nathanial may keep the old line; then the purge display and the Records purge-queue line keep 'logs' too. The reasoning for the old line is under history.",
+      "notes": "Decision C (2026-10-11, still valid): the stakes line is required on the main path, and the optional purge display keeps the details (PURGE_DISPLAY_READ). Current line, 2026-10-26: WOLF says the purge erases what the witness saved, so the Director is destroying the records worker's preserved record (ST-04). It says the witness saved something, never what, so the slice does not reveal the investigator or the detention (spoiler line). 'His word is the only record' now means that without the witness's record the Director's account stands unchecked; it states no new fact. Do not make it say the engineer will copy the originals themselves: in Records the worker's originals are 'still missing' and only the purge order's trace is copied. Fit: 1 of 3 rows, tagged box (715 px text width, Roboto 17 px). Keep option: Nathanial may keep the old line; then the purge display and the Records purge-queue line keep 'logs' too. The reasoning for the old line is under history.",
       "status": "drafted by Claude 2026-10-26 for the story canon of 2026-10-26 (docs/decisions.md ST-01 to ST-07; LINES.md change 4); waiting for Nathanial's read. IMPLEMENTED on branch story/canon-rewrite-2026-10.",
       "history": [
         {
@@ -130,12 +130,19 @@
       "where": "apps/game/scripts/main.gd _interact (x <= 230)",
       "trigger": "USE at the purge display (optional).",
       "speaker": "DIRECTOR",
-      "current": "DIRECTOR / PURGE: Records clerk's archive marked for deletion.\nWOLF: They want the source record gone. We need to preserve it.",
-      "proposed": "DIRECTOR / PURGE: Records clerk's archive marked for deletion.\nWOLF: They want the source record gone. We need to preserve it.",
+      "current": "DIRECTOR / PURGE: Records worker's archive marked for deletion.\nWOLF: They want the source record gone. We need to preserve it.",
+      "proposed": "DIRECTOR / PURGE: Records worker's archive marked for deletion.\nWOLF: They want the source record gone. We need to preserve it.",
       "alternatives": [],
-      "notes": "The optional purge display keeps the details, now that STAKES_LINE carries the stakes on the main path. Current line, 2026-10-26: the display names the records clerk's archive as the Director's deletion target. 'Original program logs' pointed at the program as the wrongdoer, and ST-01 says it was made for good. WOLF's reply ('They want the source record gone. We need to preserve it.') is the approved 2026-10-11 wording, unchanged. Fit: 2 of 3 rows, untagged box (855 px text width, Roboto 17 px).",
-      "status": "drafted by Claude 2026-10-26 for the story canon of 2026-10-26 (docs/decisions.md ST-01 to ST-07; LINES.md change 5); waiting for Nathanial's read. IMPLEMENTED on branch story/canon-rewrite-2026-10.",
+      "notes": "The optional purge display keeps the details, now that STAKES_LINE carries the stakes on the main path. Current line, 2026-10-26: the display names the records worker's archive as the Director's deletion target. 'Original program logs' pointed at the program as the wrongdoer, and ST-01 says it was made for good. WOLF's reply ('They want the source record gone. We need to preserve it.') is the approved 2026-10-11 wording, unchanged. Fit: 2 of 3 rows, untagged box (855 px text width, Roboto 17 px).",
+      "status": "drafted by Claude 2026-10-26 for the story canon of 2026-10-26 (docs/decisions.md ST-01 to ST-10; LINES.md change 5; 'records worker' per ST-09); waiting for Nathanial's read. IMPLEMENTED on branch story/canon-rewrite-2026-10.",
       "history": [
+        {
+          "current": "DIRECTOR / PURGE: Records clerk's archive marked for deletion.\nWOLF: They want the source record gone. We need to preserve it.",
+          "proposed": "DIRECTOR / PURGE: Records clerk's archive marked for deletion.\nWOLF: They want the source record gone. We need to preserve it.",
+          "alternatives": [],
+          "status": "drafted by Claude 2026-10-26 (LINES.md change 5); reworded 2026-10-26 for ST-09",
+          "notes": "First 2026-10-26 draft, before Nathanial chose 'records worker' as the only term (ST-09)."
+        },
         {
           "current": "DIRECTOR / PURGE: Original program logs marked for deletion.\nWOLF: They want the source record gone. We need to preserve it.",
           "proposed": "DIRECTOR / PURGE: Original program logs marked for deletion.\nWOLF: They want the source record gone. We need to preserve it.",
@@ -151,13 +158,20 @@
       "where": "apps/game/scripts/main.gd _new_game (status_line)",
       "trigger": "First opening beat.",
       "speaker": "DIRECTOR",
-      "current": "DIRECTOR: New order, WOLF. The records clerk is a witness. Kill the clerk tonight.\nThe Director thinks WOLF is still in standby.",
-      "proposed": "DIRECTOR: New order, WOLF. The records clerk is a witness. Kill the clerk tonight.\nThe Director thinks WOLF is still in standby.",
+      "current": "DIRECTOR: The records worker is a witness. WOLF, when you wake, kill the worker.\nThe Director thinks WOLF is still in standby.",
+      "proposed": "DIRECTOR: The records worker is a witness. WOLF, when you wake, kill the worker.\nThe Director thinks WOLF is still in standby.",
       "alternatives": [],
-      "notes": "Problem 12: the narration row currently sits under the DIRECTOR tag. The code fix (tag a box only when every row has that speaker) is separate; 'He' becomes 'The Director' so the row reads correctly once it is untagged or on its own beat. Fit: 2 of 3 rows, tagged box (715 px text width, Roboto 17 px). 2026-10-26: ST-04: WOLF hears the Director order him to kill the witness. Alternative (DRAFTED): 'The records clerk is a witness. WOLF, when you wake, kill the clerk.' The constant is renamed INTRO_ORDER_WORDS. Still two beats (the narration row is its own beat).",
+      "notes": "Problem 12: the narration row currently sits under the DIRECTOR tag. The code fix (tag a box only when every row has that speaker) is separate; 'He' becomes 'The Director' so the row reads correctly once it is untagged or on its own beat. Fit: 2 of 3 rows, tagged box (715 px text width, Roboto 17 px). 2026-10-26: ST-04: WOLF hears the Director order him to kill the witness. Nathanial approved the drafted alternative on 2026-10-26, with 'records worker' for the witness (ST-09): 'when you wake' fits the Director believing WOLF is in standby. The constant is renamed INTRO_ORDER_WORDS. Still two beats (the narration row is its own beat).",
       "implementation": "Implemented (step: speaker tags, 2026-10-11) as the alternative: two beats, the Director's line under his tag, then the narration line untagged. _set_dialogue now tags a box only when every line is that speaker's.",
-      "status": "drafted by Claude 2026-10-26 for the story canon of 2026-10-26 (docs/decisions.md ST-01 to ST-07; LINES.md change 1); waiting for Nathanial's read. IMPLEMENTED on branch story/canon-rewrite-2026-10.",
+      "status": "approved by Nathanial 2026-10-26 (the drafted alternative, worded 'records worker'; docs/decisions.md ST-09). IMPLEMENTED on branch story/canon-rewrite-2026-10.",
       "history": [
+        {
+          "current": "DIRECTOR: New order, WOLF. The records clerk is a witness. Kill the clerk tonight.\nThe Director thinks WOLF is still in standby.",
+          "proposed": "DIRECTOR: New order, WOLF. The records clerk is a witness. Kill the clerk tonight.\nThe Director thinks WOLF is still in standby.",
+          "alternatives": [],
+          "status": "drafted by Claude 2026-10-26 (LINES.md change 1); replaced 2026-10-26 by Nathanial's approved alternative",
+          "notes": "The drafted line said 'records clerk'; Nathanial chose the alternative and the term 'records worker' (ST-09)."
+        },
         {
           "current": "DIRECTOR: I decide who counts as a threat. WOLF handles the rest.\nHe thinks WOLF is still in standby.",
           "proposed": "DIRECTOR: I decide who counts as a threat. WOLF handles the rest.\nThe Director thinks WOLF is still in standby.",
@@ -590,12 +604,19 @@
       "where": "apps/game/scripts/main.gd _choose_mirror ('wolf')",
       "trigger": "After choosing USE WOLF'S READOUT.",
       "speaker": "NARRATION",
-      "current": "WOLF reads the timestamp off his own readout. The clerk's files existed before the deletion order.",
-      "proposed": "WOLF reads the timestamp off his own readout. The clerk's files existed before the deletion order.",
+      "current": "WOLF reads the timestamp off his own readout. The worker's files existed before the deletion order.",
+      "proposed": "WOLF reads the timestamp off his own readout. The worker's files existed before the deletion order.",
       "alternatives": [],
-      "notes": "Problem 21 (2026-10-11, still valid): WOLF reads the timestamp himself, because 'brings' conflicts with the rule that WOLF never fetches, and 'by his own choice' read oddly right after the player picked his readout. Current line, 2026-10-26: the second sentence says 'the clerk's files', because 'the purge target' was written for the retired target-list premise and could now read as a person. The timestamp shows the files existed before the deletion order, so the purge erased real records. Fit: 1 of 3 rows, untagged box (855 px text width, Roboto 17 px).",
-      "status": "drafted by Claude 2026-10-26 for the story canon of 2026-10-26 (docs/decisions.md ST-01 to ST-07; LINES.md change 7); waiting for Nathanial's read. IMPLEMENTED on branch story/canon-rewrite-2026-10.",
+      "notes": "Problem 21 (2026-10-11, still valid): WOLF reads the timestamp himself, because 'brings' conflicts with the rule that WOLF never fetches, and 'by his own choice' read oddly right after the player picked his readout. Current line, 2026-10-26: the second sentence says 'the worker's files' (the records worker, ST-09), because 'the purge target' was written for the retired target-list premise and could now read as a person. The timestamp shows the files existed before the deletion order, so the purge erased real records. Fit: 1 of 3 rows, untagged box (855 px text width, Roboto 17 px).",
+      "status": "drafted by Claude 2026-10-26 for the story canon of 2026-10-26 (docs/decisions.md ST-01 to ST-10; LINES.md change 7; 'records worker' per ST-09); waiting for Nathanial's read. IMPLEMENTED on branch story/canon-rewrite-2026-10.",
       "history": [
+        {
+          "current": "WOLF reads the timestamp off his own readout. The clerk's files existed before the deletion order.",
+          "proposed": "WOLF reads the timestamp off his own readout. The clerk's files existed before the deletion order.",
+          "alternatives": [],
+          "status": "drafted by Claude 2026-10-26 (LINES.md change 7); reworded 2026-10-26 for ST-09",
+          "notes": "First 2026-10-26 draft, before Nathanial chose 'records worker' as the only term (ST-09)."
+        },
         {
           "current": "WOLF brings the mirror timestamp by his own choice. The purge target existed before the deletion order.",
           "proposed": "WOLF reads the timestamp off his own readout. The purge target existed before the deletion order.",

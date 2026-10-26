@@ -6,7 +6,7 @@
 
 The one current statement of the WOLF OVERRIDE story. Nathanial handed it over on 2026-10-26; it supersedes every older draft that conflicts with it, and the latest explicit decision from Nathanial wins. Nathanial Henniges originated the game and its core story.
 
-- **Status words:** APPROVED (Nathanial's words, or an earlier approval that still holds), DRAFTED (Claude's connective tissue or line wording, waiting for his read), IMPLEMENTED (in the game on a branch or main), OPEN (not decided).
+- **Status words:** APPROVED (Nathanial's words, or an earlier approval that still holds), DRAFTED (Claude's connective tissue or line wording, waiting for his read), PROPOSED (Nathanial's own idea, marked by him as a maybe; not locked), IMPLEMENTED (in the game on a branch or main), OPEN (not decided).
 - **Spoilers:** this section is spoiler-heavy. The investigator, the detention and the engineer's unwitting role stay out of the website, the README, in-game text and build output. Public text may say that WOLF hears an order to kill a witness and refuses.
 - **Superseded drafts:** word for word in [archive/story-before-2026-10-26.md](archive/story-before-2026-10-26.md) and in Git history at `229e4a73`. They are not canon.
 
@@ -28,7 +28,8 @@ The one current statement of the WOLF OVERRIDE story. Nathanial handed it over o
 
 - **Spine (APPROVED):** wrongdoing, then corroborating evidence, then discovery, then consequence.
 - **In the slice (DRAFTED):** the Director's purge erases what the witness saved; Records Access copies a first trace of it without saying what the proof is about. The slice says nothing of the investigator, the detention or the engineer's role.
-- **End (APPROVED):** chosen family and WOLF's independence carry through, and the engineer pets WOLF at sunrise after they leave THE DEN together. No world-extinction stakes. No ending count is locked; the number and shape of the endings are OPEN.
+- **End (APPROVED):** chosen family and WOLF's independence carry through, and the engineer pets WOLF at sunrise after they leave THE DEN together. The game has multiple endings (APPROVED, ST-08); how many and which ones are OPEN, and no ending count is locked. World stakes come only through the proposed Director escalation (PROPOSED, ST-10), never as WOLF's collective punishment.
+- **Later chapters (PROPOSED, ST-10):** the Director may escalate to wanting to nuke the world to cover up his crimes. It is a candidate for later stakes and a possible driver of the endings; open questions in O-13.
 
 ### Characters
 
@@ -36,13 +37,13 @@ The one current statement of the WOLF OVERRIDE story. Nathanial handed it over o
 | --- | --- | --- | --- |
 | WOLF | he/him | An AI made for good, in his existing robotic wolf body. Independent, autonomous, can refuse anyone. Refuses the kill order. | APPROVED |
 | The engineer | they/them | The only playable viewpoint. Unknowingly helped through an ordinary maintenance job and learns it later, with WOLF. | APPROVED |
-| The Director | he/him | Deliberately evil; protects his personal power. Detained the investigator under a false label; orders the witness killed. | APPROVED |
+| The Director | he/him | Deliberately evil; protects his personal power. Detained the investigator under a false label; orders the witness killed. PROPOSED (ST-10): may later escalate to wanting to nuke the world to cover up his crimes. | APPROVED; escalation PROPOSED |
 | The investigator | open | Tried to expose the Director; falsely labelled dangerous and secretly detained. Can be found and possibly saved. | APPROVED; fate OPEN |
-| The records worker (the witness) | open | Preserved proof of the detention; the person the Director orders WOLF to kill. Called "the records clerk" in game text (DRAFTED). | APPROVED; fate OPEN |
+| The records worker (the witness) | open | Preserved proof of the detention; the person the Director orders WOLF to kill. Always "the records worker" (or "the worker") in game text and notes (APPROVED, ST-09). | APPROVED; fate OPEN |
 
 ### Decisions
 
-Authority for every row: Nathanial, story rewrite handoff, 2026-10-26.
+Authority for ST-01 to ST-07: Nathanial, story rewrite handoff, 2026-10-26. Authority for ST-08 to ST-10: Nathanial's answers to the PR #142 questions, 2026-10-26.
 
 | ID | Status | Decision |
 |---|---|---|
@@ -52,7 +53,10 @@ Authority for every row: Nathanial, story rewrite handoff, 2026-10-26.
 | ST-04 | APPROVED | A separate records worker preserved proof of the detention. In the opening WOLF hears the Director order him to kill this witness. WOLF wakes himself in his existing body, refuses and escapes containment. He has killed no one. |
 | ST-05 | APPROVED | Sequence: the detention and the engineer's unwitting help before the game; the kill-the-witness order, self-awakening, refusal and escape at the opening; cooperation through the lockdown; later discovery of the missing investigator and the engineer's role; then finding and protecting the investigator and preserving corroborating proof. Spine: wrongdoing, corroborating evidence, discovery, consequence. |
 | ST-06 | APPROVED | The engineer is the sole playable viewpoint (they/them). WOLF (he/him) is autonomous and can refuse; an engineer-only fallback always exists. The 2026-10-13 opening staging stays where compatible. Original game and core story credit stays with Nathanial Henniges. |
-| ST-07 | APPROVED | Rewrite the current canon cleanly: superseded premise, motives and targets leave active Notion, Markdown, public copy, dialogue, translations and tests. Old originals stay archived as non-authoritative, outside default entry points; Git history stays. THE PACK, THE SHUTDOWN and EXTINCTION and world-extinction stakes are retired; no new ending count is locked. Chosen family, independence and the sunrise petting payoff stay. |
+| ST-07 | APPROVED | Rewrite the current canon cleanly: superseded premise, motives and targets leave active Notion, Markdown, public copy, dialogue, translations and tests. Old originals stay archived as non-authoritative, outside default entry points; Git history stays. THE PACK, THE SHUTDOWN and EXTINCTION are retired as an ending outline; no ending count is locked (multiple endings: ST-08). Revised 2026-10-26 by ST-10: world stakes come only through the proposed Director escalation, not locked, and never as WOLF's collective punishment. Chosen family, independence and the sunrise petting payoff stay. |
+| ST-08 | APPROVED | The game has multiple endings. How many, and which ones, stay OPEN (O-04); no ending count is locked. Nothing may imply a single ending. |
+| ST-09 | APPROVED | The witness is "the records worker" (short: "the worker") in every game line, note, translation and record; no other job title. The Director's opening order line is approved wording: "The records worker is a witness. WOLF, when you wake, kill the worker." The other slice lines stay DRAFTED. |
+| ST-10 | PROPOSED | Nathanial's idea, explicitly a maybe and not locked: later in the story the Director escalates to wanting to nuke the world to cover up his crimes. A candidate for later-chapter stakes and a possible driver of the multiple endings. It is the Director's crime, never WOLF's collective punishment. Spoiler: keep it out of the website, README, in-game text and build output. Open questions in O-13. |
 
 ### Open questions
 
@@ -61,15 +65,16 @@ Authority for every row: Nathanial, story rewrite handoff, 2026-10-26.
 | O-01 | Final names | Engineer default, Director, investigator, records worker. Older candidates are not mapped to the new roles. |
 | O-02 | W.O.L.F. acronym expansion | Simply open. |
 | O-03 | The investigator's fate | Found and saved, or not. |
-| O-04 | Endings and their count | Nothing locked; the sunrise petting payoff stays. |
+| O-04 | Endings: how many and which | Multiple endings are APPROVED (ST-08); the count and the endings themselves are open. The sunrise petting payoff stays. |
 | O-05 | Any shutdown idea | Retired as an ending outline; it comes back only by Nathanial's choice. |
 | O-06 | Separation and reunion beat | R4-14 proposal; crisis and tasks open. |
 | O-07 | The Director's other abuses | Beyond the false label, the detention and the kill order. |
 | O-08 | The engineer's exact maintenance job | Earlier examples were illustrations only. |
 | O-09 | The witness's fate and whereabouts during the slice | DRAFTED: in hiding. |
 | O-10 | Setting words | "Grounded military sci-fi" and SITE 51 as a military installation: keep, or soften for an AI made for good. |
-| O-11 | The exact opening order line and the other slice lines | DRAFTED on 2026-10-26 in `apps/game/scripts/main.gd`; Nathanial reads them. |
+| O-11 | The other slice lines | The opening order line is APPROVED (ST-09). WOLF's first words, the purge stakes and the three Records Access lines stay DRAFTED in `apps/game/scripts/main.gd`; Nathanial reads them. |
 | O-12 | Tagline and press kit copy | "Built to obey. Awake to refuse." is kept until Nathanial answers; the press kit summary was redrafted (DRAFTED) and the live IGDB and Twitch listings wait for his approval. |
+| O-13 | The Director's proposed escalation (ST-10) | How he would do it; when and how it is revealed; how WOLF and the engineer stop it (the engineer-only fallback still applies); how it branches the endings. |
 
 ## Revision 4 and solo-protagonist rows (September 2026)
 
@@ -104,14 +109,14 @@ Rowan Vale remains provisional, with Alex Bennett/Morgan Reed alternatives; Adri
 ## Superseded where conflicting
 The unclear-threat-only opening; Engineer as permanent personal name; generic forced shutdown as preferred bittersweet ending; friendship equated with obedience; automatic two-ending removal; irrevocably fixed three-ending count; character switching and playable WOLF sections. Historical terminal/mockup ideas, later body transfer and hidden-backup fourth endings are not current canon.
 
-Retired on 2026-10-26 (ST-01 to ST-07):
+Retired on 2026-10-26 (ST-01 to ST-07; ST-10 revises the last item):
 - the hitman or "hunt dangerous actors" purpose and the deniable-killer cover story;
 - "Warfighter Operations and Logistics Framework" as the W.O.L.F. expansion;
 - the Director protecting "the essential program", or people "threatening the program";
 - the earlier false-hostile-label incident, the "first ordered hit" and the rogue-WOLF scapegoat of September 28;
 - the engineer maintaining WOLF's equipment "without knowing the program's true purpose" as an opening fact;
 - THE PACK, THE SHUTDOWN and EXTINCTION as an ending outline, the voluntary-shutdown route and the two-or-three count question;
-- "prevent catastrophe", "doom humanity", collective punishment and world-extinction stakes.
+- "prevent catastrophe", "doom humanity", collective punishment and world-extinction stakes as WOLF's threat or the premise (the Director's proposed escalation, ST-10, is a separate idea, not locked).
 
 ## Preserved
 Godot/GDScript, actual side-view 2D gameplay, Mac-first five-target plan, small independent-identity presets, deterministic memory, optional WOLF speech with fallback, accessible/fair choices, original placeholders and bounded M0. The original self-awakening, the Director/evidence mission (now ST-02 to ST-05) and chosen-family direction remain. No runtime AI/backend/paid APIs or unauthorized repository/setup changes.

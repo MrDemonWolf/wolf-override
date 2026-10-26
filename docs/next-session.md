@@ -1,10 +1,11 @@
 # Next-session handoff — credits and first playable chapter
 
 ## Current story canon (October 26, 2026)
-- **Canon:** the section "Story canon (October 26, 2026)" in [decisions](decisions.md) (ST-01 to ST-07, open questions O-01 to O-12). It supersedes every older story draft below.
+- **Canon:** the section "Story canon (October 26, 2026)" in [decisions](decisions.md) (ST-01 to ST-10, open questions O-01 to O-13). It supersedes every older story draft below.
 - **Notion:** [Story canon — For Nathanial](https://app.notion.com/p/405d61481c7b81cbbb0af666eb815d3f) and [Story canon — AI reference](https://app.notion.com/p/405d61481c7b81fd8cc5cd5be0b4c4f0), indexed in [NOTES.md](NOTES.md).
 - **History:** Superseded story drafts (before 2026-10-26) are in [docs/archive/story-before-2026-10-26.md](archive/story-before-2026-10-26.md) and Git history at `229e4a73`; they are not canon. Dated logs below keep their wording as records.
-- **Next story task:** Nathanial reads the DRAFTED slice lines (the opening order, WOLF's first words, the purge stakes and three Records Access lines) and the open questions.
+- **Answered 2026-10-26:** the opening order line is APPROVED; "records worker" is the only term for the witness; multiple endings are APPROVED, count open (ST-08, ST-09); the Director's nuclear cover-up escalation is PROPOSED, not locked (ST-10, O-13).
+- **Next story task:** Nathanial reads the remaining DRAFTED slice lines (WOLF's first words, the purge stakes and three Records Access lines) and the open questions.
 
 ## Current checkpoint — October 10, 2026 (read this first)
 - **Merged to main:** PR #40 (site Phase 3: Tailwind tokens, WOFF2 fonts, WebP art, dark-only landing, accessibility, README), #41 (dependencies incl. Next.js 16.3.8 security fixes; Dependabot #32-#37 closed as superseded), #42 (game: Service Junction action room, impact kit, procedural sound, knockdown, zoom 1.35, layered room art, menu theme, depth pass, in-game changelog), #43 (privacy page, SECURITY.md, CONTRIBUTING.md, AI wording). All merged branches deleted; only `main` remains on GitHub.
