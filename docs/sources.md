@@ -1,4 +1,4 @@
-# Sources and verification — Revision 4
+# Sources and verification
 ## Creative authority
 Nathanial Henniges originated the game and core story. The current story canon is Nathanial's handoff of October 26, 2026 ([decisions](decisions.md), "Story canon (October 26, 2026)"); his earlier conversations are the source for the Director/evidence mission, natural-name direction, WOLF's companion/chosen-family identity and sunrise petting. Rowan Vale is the user's preferred provisional M0 engineer name. The acronym expansion is open. `wolfoverride://` is a proposed future URL scheme, with no M0 platform registration.
 
@@ -15,7 +15,7 @@ The temporary departure/reunion in [story-map.md](https://github.com/MrDemonWolf
 ## Cover-up research, not fictional fact or new canon
 - [DOJ case involving an assault followed by false reports that the victim attacked first](https://www.justice.gov/archives/opa/pr/former-federal-prison-lieutenant-sentenced-using-excessive-force-and-obstructing): supports the plausibility of a sanitized threat narrative. The game incident is fictional and still undecided (informed the superseded September 28 draft).
 - [NARA Universal Electronic Records Management Requirements](https://www.archives.gov/records-mgmt/policy/universalermrequirements): records have lifecycle and metadata requirements; the proposed investigation compares original authorization, altered summary and an independent source rather than one magic file (informed the superseded September 28 draft).
-- [NIST AI Risk Management Framework Core](https://airc.nist.gov/airmf-resources/airmf/5-sec-core/): leadership responsibility for deployment risk informs the question of who authorized the target classification, even if the Director blames WOLF (informed the superseded September 28 draft).
+- [NIST AI Risk Management Framework Core](https://airc.nist.gov/airmf-resources/airmf/5-sec-core/): leadership is responsible for deployment risk, which informs the question of who authorized the misuse of WOLF. History: it first informed the superseded September 28 draft, where the Director blamed WOLF.
 - [GAO review of VA whistleblower protections](https://files.gao.gov/reports/GAO-25-106780/index.html): retaliation allegations and evidence gaps inform why a fictional records worker might fear coming forward. It does not establish the game's victim, witness or outcome (informed the superseded September 28 draft; still fits the witness of the October 26 canon).
 
 ## Live records read back during this update

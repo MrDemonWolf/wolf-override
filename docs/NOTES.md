@@ -52,7 +52,7 @@ Every moved file is still in git history at commit `1cf8d73`: open one with `git
 | --- | --- |
 | `docs/art-and-voice.md` | [Art and voice](https://app.notion.com/p/3fbd61481c7b81bdacaad37580309c41) |
 | `docs/camera-terminal-ui-review.md` | [Camera terminal ui review](https://app.notion.com/p/3fbd61481c7b814b90e6f7086f841e1c) |
-| `docs/chatgpt-story-handoff.md` | [Chatgpt story handoff](https://app.notion.com/p/3fbd61481c7b81389054ceffc4706a6e) (archived 2026-10-26: superseded story, not canon) |
+| `docs/chatgpt-story-handoff.md` | [Chatgpt story handoff](https://app.notion.com/p/3fbd61481c7b81389054ceffc4706a6e) (rewritten 2026-10-26 as the current story brief; the Sep 30 brief is [archived](https://app.notion.com/p/405d61481c7b813591d0d6f81b730d54), not canon) |
 | `docs/docs-review.md` | [Docs review](https://app.notion.com/p/3fbd61481c7b8155852bfbe914ba1bda) |
 | `docs/duplicates-audit.md` | [Duplicates audit](https://app.notion.com/p/3fbd61481c7b81ecb2f7ea9ba1c016c7) |
 | `docs/game-bible.md` | [Game bible](https://app.notion.com/p/3fbd61481c7b819f85defc462c8f9fff) (story rewritten 2026-10-26; its old Details are archived, not canon) |
