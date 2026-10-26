@@ -105,6 +105,13 @@ Changes merged after 0.15.0. They become the next version when it is cut.
 
 ### Website
 
+- Next.js is updated to 16.4.3 with the October security fixes; the website stays a static export.
+- Zod, used by the docs build, is updated to 4.6.7 with its collection-validation security fix.
+- Every page limits the referrer sent to other sites to the site's origin.
+- The site build now checks internal links and heading targets, including a test with deliberately broken links.
+- The developer guide explains live website checks and recovery through a revert pull request; a recovery was not performed.
+- The homepage links to the current language status instead of saying English only; Privacy explains the saved language choice, checked against the code.
+
 - The website, its page titles, link previews, llms.txt and the guide call the game WOLF OVERRIDE; the search-engine data keeps the old spelling with two slashes as a former name.
 - The title-screen picture in First steps is recaptured with the new name.
 - The changelog is split into development versions, 0.1.0 (September 26, 2026) to 0.15.0 (October 16, 2026), with short lines by group and the full notes under each version.

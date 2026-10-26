@@ -70,7 +70,7 @@ const playableNow = [
 ] as const;
 
 /** What is planned but not in the build yet. No dates: nothing here has one. */
-const comingNext = ['More languages. The game is in English only for now.', 'More chapters of the story.'] as const;
+const comingNext = ['More chapters of the story.'] as const;
 
 // Story and progress: two equal columns, stacked on phones.
 const twoColumns = 'grid grid-cols-[1fr_1fr] gap-20 py-28 compact:gap-10 phone:grid-cols-[1fr] phone:gap-6 phone:py-18';
@@ -177,6 +177,7 @@ export default function HomePage() {
               <ul className="flex list-disc flex-col gap-2 pl-5 leading-[1.6] text-muted marker:text-accent">
                 {playableNow.map((line) => <li key={line}>{line}</li>)}
               </ul>
+              <Link className={inlineLink} href="/docs/platforms/#languages">Languages and translation review status <span aria-hidden="true">→</span></Link>
             </section>
             <section className={`${card} p-6`} aria-labelledby="coming-title">
               <h3 id="coming-title" className={listTitle}>Coming</h3>

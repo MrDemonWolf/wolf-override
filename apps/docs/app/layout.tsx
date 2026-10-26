@@ -28,6 +28,8 @@ export const metadata: Metadata = {
   authors: [{ name: 'Nathanial Henniges', url: 'https://mrdemonwolf.com' }],
   creator: 'Nathanial Henniges',
   publisher: 'MrDemonWolf, Inc.',
+  // GitHub Pages cannot set a custom response header; apply the policy to every exported page.
+  referrer: 'strict-origin-when-cross-origin',
   // One robots meta for every crawler; a separate googlebot copy said the same thing twice.
   robots: { index: true, follow: true, 'max-image-preview': 'large' },
   title: {
