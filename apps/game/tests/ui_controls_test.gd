@@ -120,7 +120,11 @@ func _run() -> void:
 	game.call("_refresh_ui")
 	_expect(use.text == "CRANK", "touch USE reads CRANK at the live bypass")
 	use.button_down.emit()
-	await create_timer(1.0).timeout
+	# A second of game time held, as frames (60 physics frames, 1/60 s each) rather than a SceneTree
+	# timer, so the turns are counted after a fixed number of game frames, the way the kit's other
+	# waits count; the crank advances on process deltas, which never sum to less than the physics time
+	# (Godot only drops physics steps when frames come late), so it has had at least a second.
+	await frames(60)
 	var held_turns: int = int(game.get("bypass_ticks"))
 	_expect(held_turns >= 2 and not crank_state.door_open, "holding touch USE cranks the bypass (%d turns after a second)" % held_turns)
 	game.call("_pause_game")
@@ -175,22 +179,22 @@ func _run() -> void:
 	await _send_escape(true)
 	await _send_escape(false)
 	_expect(paused and overlay.visible, "physical Escape pauses during play")
-	Input.parse_input_event(_controller_button(JOY_BUTTON_START, true))
+	Input.parse_input_event(controller_button(JOY_BUTTON_START, true))
 	await process_frame
-	Input.parse_input_event(_controller_button(JOY_BUTTON_START, false))
+	Input.parse_input_event(controller_button(JOY_BUTTON_START, false))
 	await process_frame
 	await process_frame
 	_expect(not paused and not overlay.visible, "controller Start resumes without re-pausing")
 	var menu: GameSettings = game.get("settings_menu") as GameSettings
-	menu.call("_replace_binding", &"interact", "controller", _controller_button(JOY_BUTTON_B, false))
-	menu.call("_replace_binding", &"choice_2", "controller", _controller_button(JOY_BUTTON_A, false))
+	menu.call("_replace_binding", &"interact", "controller", controller_button(JOY_BUTTON_B, false))
+	menu.call("_replace_binding", &"choice_2", "controller", controller_button(JOY_BUTTON_A, false))
 	game.call("_new_game")
 	await process_frame
-	Input.parse_input_event(_controller_button(JOY_BUTTON_B, true))
+	Input.parse_input_event(controller_button(JOY_BUTTON_B, true))
 	await process_frame
 	await process_frame
 	_expect(game.get("intro_active") and game.get("intro_step") == 1, "remapped B continues the intro instead of triggering native menu cancel")
-	Input.parse_input_event(_controller_button(JOY_BUTTON_B, false))
+	Input.parse_input_event(controller_button(JOY_BUTTON_B, false))
 	await process_frame
 	game.call("_finish_intro")
 	(game.get_node("Human") as M0Actor).position.x = 350.0
@@ -202,10 +206,10 @@ func _run() -> void:
 		game.call("_interact")
 	first_choice.grab_focus()
 	await process_frame
-	Input.parse_input_event(_controller_button(JOY_BUTTON_A, true))
+	Input.parse_input_event(controller_button(JOY_BUTTON_A, true))
 	await process_frame
 	_expect((game.get("state") as M0State).memory.get("choice_id") == M0State.PRESS and not game.get("waiting_for_choice"), "remapped A selects the second response even when native menu focus is on the first")
-	Input.parse_input_event(_controller_button(JOY_BUTTON_A, false))
+	Input.parse_input_event(controller_button(JOY_BUTTON_A, false))
 	await process_frame
 	menu.reset_controls()
 	game.call("_pause_game")
@@ -248,17 +252,17 @@ func _run() -> void:
 	game.call("_interact")
 	game.call("_pause_game")
 	title_button.pressed.emit()
-	Input.parse_input_event(_controller_button(JOY_BUTTON_X, true))
+	Input.parse_input_event(controller_button(JOY_BUTTON_X, true))
 	await process_frame
-	Input.parse_input_event(_controller_button(JOY_BUTTON_X, false))
+	Input.parse_input_event(controller_button(JOY_BUTTON_X, false))
 	await process_frame
 	_expect(game.get("title_open") and not game.get("waiting_for_choice") and (game.get("state") as M0State).memory.is_empty(), "returning to the title drops a pending choice")
 	# A controller picked up on a touch device starts from a sensible menu control, not a stray press.
 	game.set("controller_active", false)
 	root.gui_release_focus()
-	Input.parse_input_event(_controller_button(JOY_BUTTON_A, true))
+	Input.parse_input_event(controller_button(JOY_BUTTON_A, true))
 	await process_frame
-	Input.parse_input_event(_controller_button(JOY_BUTTON_A, false))
+	Input.parse_input_event(controller_button(JOY_BUTTON_A, false))
 	await process_frame
 	_expect(game.get("title_open") and game.get("controller_active") and new_game.has_focus(), "the first controller press on an unfocused touch title focuses New Game without starting a game")
 	# On a touch-opened pause menu, B is still the cancel press: it resumes rather than only revealing focus.
@@ -269,9 +273,9 @@ func _run() -> void:
 	await process_frame
 	game.call("_pause_game")
 	_expect(paused and root.gui_get_focus_owner() == null, "a touch-opened pause menu starts unfocused")
-	Input.parse_input_event(_controller_button(JOY_BUTTON_B, true))
+	Input.parse_input_event(controller_button(JOY_BUTTON_B, true))
 	await process_frame
-	Input.parse_input_event(_controller_button(JOY_BUTTON_B, false))
+	Input.parse_input_event(controller_button(JOY_BUTTON_B, false))
 	await process_frame
 	_expect(not paused and not overlay.visible, "controller B on a touch-opened pause menu resumes play like any cancel press")
 	# The END OF SLICE card (decision D) answers touch, controller and keyboard through the real input path.
@@ -299,9 +303,9 @@ func _run() -> void:
 	game.call("_show_end_card")
 	await process_frame
 	_expect(end_card.visible and end_button.has_focus() and end_button.text.ends_with("  CONTINUE") and not end_button.text.begins_with("E "), "with a controller the card's button has focus and its prompt names the controller button (%s)" % end_button.text)
-	Input.parse_input_event(_controller_button(JOY_BUTTON_A, true))
+	Input.parse_input_event(controller_button(JOY_BUTTON_A, true))
 	await settle(2)
-	Input.parse_input_event(_controller_button(JOY_BUTTON_A, false))
+	Input.parse_input_event(controller_button(JOY_BUTTON_A, false))
 	await process_frame
 	_expect(game.get("title_open") and not end_card.visible, "controller A on the card goes on to the title")
 	new_game.pressed.emit()
@@ -371,13 +375,6 @@ func _has_button(action: StringName, index: JoyButton) -> bool:
 		if event is InputEventJoypadButton and event.button_index == index:
 			return true
 	return false
-
-
-func _controller_button(index: JoyButton, pressed: bool) -> InputEventJoypadButton:
-	var event: InputEventJoypadButton = InputEventJoypadButton.new()
-	event.button_index = index
-	event.pressed = pressed
-	return event
 
 
 func _send_escape(pressed: bool) -> void:
