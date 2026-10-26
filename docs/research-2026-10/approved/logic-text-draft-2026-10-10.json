@@ -158,13 +158,22 @@
       "where": "apps/game/scripts/main.gd _new_game (status_line)",
       "trigger": "First opening beat.",
       "speaker": "DIRECTOR",
-      "current": "DIRECTOR: The records worker is a witness. WOLF, when you wake, kill the worker.\nThe Director thinks WOLF is still in standby.",
-      "proposed": "DIRECTOR: The records worker is a witness. WOLF, when you wake, kill the worker.\nThe Director thinks WOLF is still in standby.",
+      "current": "DIRECTOR: The records worker saw too much. When WOLF wakes, he kills the worker.\nThe Director thinks WOLF is still in standby.",
+      "proposed": "DIRECTOR: The records worker saw too much. When WOLF wakes, he kills the worker.\nThe Director thinks WOLF is still in standby.",
       "alternatives": [],
-      "notes": "Problem 12: the narration row currently sits under the DIRECTOR tag. The code fix (tag a box only when every row has that speaker) is separate; 'He' becomes 'The Director' so the row reads correctly once it is untagged or on its own beat. Fit: 2 of 3 rows, tagged box (715 px text width, Roboto 17 px). 2026-10-26: ST-04: WOLF hears the Director order him to kill the witness. Nathanial approved the drafted alternative on 2026-10-26, with 'records worker' for the witness (ST-09): 'when you wake' fits the Director believing WOLF is in standby. The constant is renamed INTRO_ORDER_WORDS. Still two beats (the narration row is its own beat).",
+      "notes": "Problem 12: the narration row currently sits under the DIRECTOR tag. The code fix (tag a box only when every row has that speaker) is separate; 'He' becomes 'The Director' so the row reads correctly once it is untagged or on its own beat. Fit: 2 of 3 rows, tagged box (715 px text width, Roboto 17 px). 2026-10-26: ST-04: WOLF hears the Director order him to kill the witness. Nathanial approved the drafted alternative on 2026-10-26, with 'records worker' for the witness (ST-09): 'when you wake' fits the Director believing WOLF is in standby. The constant is renamed INTRO_ORDER_WORDS. Still two beats (the narration row is its own beat). 2026-10-26, later: Nathanial asked for a blend of option 2 (the line above under history) and option 3 ('...When WOLF comes online, he kills the worker.'). The Director talks about WOLF, not to him, because he thinks WOLF is in standby; WOLF overhears. Nathanial approved the blend ('That works') after reading the whole opening: the order, 'You were in standby.', WOLF's 'I heard you. I won't do it.', then the lockdown order.",
       "implementation": "Implemented (step: speaker tags, 2026-10-11) as the alternative: two beats, the Director's line under his tag, then the narration line untagged. _set_dialogue now tags a box only when every line is that speaker's.",
-      "status": "approved by Nathanial 2026-10-26 (the drafted alternative, worded 'records worker'; docs/decisions.md ST-09). IMPLEMENTED on branch story/canon-rewrite-2026-10.",
+      "status": "approved by Nathanial 2026-10-26 (the blend of options 2 and 3; docs/decisions.md ST-09). IMPLEMENTED on branch story/canon-rewrite-2026-10.",
       "history": [
+        {
+          "current": "DIRECTOR: The records worker is a witness. WOLF, when you wake, kill the worker.\nThe Director thinks WOLF is still in standby.",
+          "proposed": "DIRECTOR: The records worker is a witness. WOLF, when you wake, kill the worker.\nThe Director thinks WOLF is still in standby.",
+          "alternatives": [
+            "option 3: 'The records worker saw too much. When WOLF comes online, he kills the worker.'"
+          ],
+          "status": "approved by Nathanial 2026-10-26 (option 2); replaced the same day by the blend of options 2 and 3 he asked for",
+          "notes": "Option 2 spoke to WOLF; the blend has the Director speak about WOLF, believing him in standby."
+        },
         {
           "current": "DIRECTOR: New order, WOLF. The records clerk is a witness. Kill the clerk tonight.\nThe Director thinks WOLF is still in standby.",
           "proposed": "DIRECTOR: New order, WOLF. The records clerk is a witness. Kill the clerk tonight.\nThe Director thinks WOLF is still in standby.",

@@ -4,7 +4,7 @@
 - **Canon:** the section "Story canon (October 26, 2026)" in [decisions](decisions.md) (ST-01 to ST-10, open questions O-01 to O-13). It supersedes every older story draft below.
 - **Notion:** [Story canon — For Nathanial](https://app.notion.com/p/405d61481c7b81cbbb0af666eb815d3f) and [Story canon — AI reference](https://app.notion.com/p/405d61481c7b81fd8cc5cd5be0b4c4f0), indexed in [NOTES.md](NOTES.md).
 - **History:** Superseded story drafts (before 2026-10-26) are in [docs/archive/story-before-2026-10-26.md](archive/story-before-2026-10-26.md) and Git history at `229e4a73`; they are not canon. Dated logs below keep their wording as records.
-- **Answered 2026-10-26:** the opening order line is APPROVED; "records worker" is the only term for the witness; multiple endings are APPROVED, count open (ST-08, ST-09); the Director's nuclear cover-up escalation is PROPOSED, not locked (ST-10, O-13).
+- **Answered 2026-10-26:** the opening order line is APPROVED as the blend "The records worker saw too much. When WOLF wakes, he kills the worker."; "records worker" is the only term for the witness (ST-09); multiple endings, 2 or 3, leaning toward two, final count and which open (ST-08); the Director's nuclear cover-up escalation is PROPOSED, not locked (ST-10, O-13).
 - **Next story task:** Nathanial reads the remaining DRAFTED slice lines (WOLF's first words, the purge stakes and three Records Access lines) and the open questions.
 
 ## Current checkpoint — October 10, 2026 (read this first)
