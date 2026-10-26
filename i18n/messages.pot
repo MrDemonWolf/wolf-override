@@ -1,6 +1,7 @@
 # LANGUAGE translation for WOLF OVERRIDE for the following files:
 # res://scenes/main.tscn
 # res://scenes/studio_logo.tscn
+# res://scripts/atomic_file.gd
 # res://scripts/blast_leaf.gd
 # res://scripts/bypass_handle.gd
 # res://scripts/dialogue_boxes.gd
@@ -542,176 +543,176 @@ msgctxt "key name"
 msgid "Section"
 msgstr ""
 
-#: scripts/game_settings.gd:253
+#: scripts/game_settings.gd:261
 msgid "THE DEN  /  LOCAL CONFIGURATION"
 msgstr ""
 
-#: scripts/game_settings.gd:265
+#: scripts/game_settings.gd:273
 msgid "DISPLAY"
 msgstr ""
 
-#: scripts/game_settings.gd:265
+#: scripts/game_settings.gd:273
 msgid "AUDIO"
 msgstr ""
 
-#: scripts/game_settings.gd:265
+#: scripts/game_settings.gd:273
 msgid "CONTROLS"
 msgstr ""
 
-#: scripts/game_settings.gd:265
+#: scripts/game_settings.gd:273
 msgid "GENERAL"
 msgstr ""
 
-#: scripts/game_settings.gd:282
+#: scripts/game_settings.gd:290
 msgid "V-SYNC"
 msgstr ""
 
-#: scripts/game_settings.gd:288
+#: scripts/game_settings.gd:296
 msgid "EDGE SMOOTHING"
 msgstr ""
 
-#: scripts/game_settings.gd:288
+#: scripts/game_settings.gd:296
 msgid "OFF"
 msgstr ""
 
-#: scripts/game_settings.gd:288
+#: scripts/game_settings.gd:296
 msgid "2× MSAA"
 msgstr ""
 
-#: scripts/game_settings.gd:288
+#: scripts/game_settings.gd:296
 msgid "4× MSAA"
 msgstr ""
 
-#: scripts/game_settings.gd:288
+#: scripts/game_settings.gd:296
 msgid "8× MSAA"
 msgstr ""
 
-#: scripts/game_settings.gd:291
+#: scripts/game_settings.gd:299
 msgid "REDUCED MOTION"
 msgstr ""
 
-#: scripts/game_settings.gd:292
+#: scripts/game_settings.gd:300
 msgid "No camera shake or hit-stop; screen flashes are shorter."
 msgstr ""
 
-#: scripts/game_settings.gd:301
+#: scripts/game_settings.gd:309
 msgid "TEXT SIZE"
 msgstr ""
 
-#: scripts/game_settings.gd:302
+#: scripts/game_settings.gd:310
 msgid "Scales the dialogue, hints, cards and station names."
 msgstr ""
 
-#: scripts/game_settings.gd:325
+#: scripts/game_settings.gd:333
 msgid "ACTION"
 msgstr ""
 
-#: scripts/game_settings.gd:325
+#: scripts/game_settings.gd:333
 msgid "KEYBOARD"
 msgstr ""
 
-#: scripts/game_settings.gd:325
+#: scripts/game_settings.gd:333
 msgid "CONTROLLER"
 msgstr ""
 
-#: scripts/game_settings.gd:345
+#: scripts/game_settings.gd:353
 msgid "Stick deadzone"
 msgstr ""
 
-#: scripts/game_settings.gd:349
+#: scripts/game_settings.gd:357
 msgid "TOGGLE HOLDS"
 msgstr ""
 
-#: scripts/game_settings.gd:350
+#: scripts/game_settings.gd:358
 msgid "Press interact once to start a crank and again to stop it, instead of holding it down. Keyboard, controller and touch."
 msgstr ""
 
-#: scripts/game_settings.gd:355
+#: scripts/game_settings.gd:363
 msgid "RESTORE DEFAULT CONTROLS"
 msgstr ""
 
-#: scripts/game_settings.gd:376
+#: scripts/game_settings.gd:384
 msgid "CANCEL REBIND"
 msgstr ""
 
-#: scripts/game_settings.gd:394
+#: scripts/game_settings.gd:402
 msgid "LANGUAGE"
 msgstr ""
 
-#: scripts/game_settings.gd:570
+#: scripts/game_settings.gd:578
 msgid "Window size is OS-managed on mobile."
 msgstr ""
 
-#: scripts/game_settings.gd:570
-#: scripts/game_settings.gd:572
+#: scripts/game_settings.gd:578
+#: scripts/game_settings.gd:580
 msgid "V-sync may limit the FPS cap."
 msgstr ""
 
-#: scripts/game_settings.gd:574
+#: scripts/game_settings.gd:582
 msgid "Volume changes apply immediately. Effects carries every sound effect; there is no music or voice yet."
 msgstr ""
 
-#: scripts/game_settings.gd:574
+#: scripts/game_settings.gd:582
 msgid "Select a binding, then press a key, controller button or move a stick."
 msgstr ""
 
-#: scripts/game_settings.gd:574
+#: scripts/game_settings.gd:582
 msgid "Until you choose a language, the game uses your system's."
 msgstr ""
 
-#: scripts/game_settings.gd:620
+#: scripts/game_settings.gd:628
 msgid "Press a keyboard input for %s. Esc cancels."
 msgstr ""
 
-#: scripts/game_settings.gd:620
+#: scripts/game_settings.gd:628
 msgid "Press a controller input for %s. Esc cancels."
 msgstr ""
 
-#: scripts/game_settings.gd:637
+#: scripts/game_settings.gd:645
 msgid "Rebind cancelled."
 msgstr ""
 
-#: scripts/game_settings.gd:652
+#: scripts/game_settings.gd:660
 msgid "Already used by %s. Choose another input or cancel."
 msgstr ""
 
-#: scripts/game_settings.gd:658
+#: scripts/game_settings.gd:666
 msgid "Binding saved."
 msgstr ""
 
-#: scripts/game_settings.gd:726
+#: scripts/game_settings.gd:734
 msgid "Left stick"
 msgstr ""
 
-#: scripts/game_settings.gd:726
+#: scripts/game_settings.gd:734
 msgid "Axis %d"
 msgstr ""
 
-#: scripts/game_settings.gd:753
+#: scripts/game_settings.gd:761
 msgid "AXIS %d %s"
 msgstr ""
 
-#: scripts/game_settings.gd:804
+#: scripts/game_settings.gd:812
 msgid "START"
 msgstr ""
 
-#: scripts/game_settings.gd:805
+#: scripts/game_settings.gd:813
 msgid "D-pad left"
 msgstr ""
 
-#: scripts/game_settings.gd:806
+#: scripts/game_settings.gd:814
 msgid "D-pad right"
 msgstr ""
 
-#: scripts/game_settings.gd:807
+#: scripts/game_settings.gd:815
 msgid "BUTTON %d"
 msgstr ""
 
-#: scripts/game_settings.gd:838
+#: scripts/game_settings.gd:846
 msgid "Default controls restored."
 msgstr ""
 
-#: scripts/game_settings.gd:862
+#: scripts/game_settings.gd:870
 #: scripts/main.gd:2164
 msgid "Settings could not be saved."
 msgstr ""
@@ -802,7 +803,7 @@ msgstr ""
 
 #. TRANSLATORS: WOLF's callback at the safe point. %s is the answer the engineer chose at the relay, as the game shows it; keep the quotation marks round it in your language's style. Avoid a past tense that shows the engineer's gender ("you said", "you found").
 #. i18n: story speaker=WOLF engineer=you slot=choice keep-breaks
-#: scripts/m0_state.gd:195
+#: scripts/m0_state.gd:209
 msgid ""
 "You said \"%s\"\n"
 "I refused. You found another way. Next time, tell me what it costs."
@@ -810,7 +811,7 @@ msgstr ""
 
 #. TRANSLATORS: WOLF's callback at the safe point. %s is the answer the engineer chose at the relay, as the game shows it; keep the quotation marks round it in your language's style. Avoid a past tense that shows the engineer's gender ("you said").
 #. i18n: story speaker=WOLF engineer=you slot=choice keep-breaks
-#: scripts/m0_state.gd:199
+#: scripts/m0_state.gd:213
 msgid ""
 "You said \"%s\"\n"
 "I chose the relay. We made it."
@@ -818,7 +819,7 @@ msgstr ""
 
 #. TRANSLATORS: WOLF's callback at the safe point. %s is the answer the engineer chose at the relay, as the game shows it; keep the quotation marks round it in your language's style. Avoid a past tense that shows the engineer's gender ("you said", "you cranked").
 #. i18n: story speaker=WOLF engineer=you slot=choice keep-breaks
-#: scripts/m0_state.gd:203
+#: scripts/m0_state.gd:217
 msgid ""
 "You said \"%s\"\n"
 "I made my call. You cranked the bypass anyway. I stayed."
