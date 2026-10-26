@@ -215,6 +215,12 @@ Changes merged after 0.15.0. They become the next version when it is cut.
 - render.sh and the parity runs check job, route, variant and size names before clearing any folder. tools/render/self_test.sh checks this without Docker, and Game checks runs it.
 - compare.py no longer compares a masked still with itself.
 - The docs export check names a page with no robots tag instead of stopping.
+- One script, scripts/get-godot.sh, fetches and checks the pinned Godot for Game checks and Test builds, replacing a copy in each.
+- Game checks' i18n job is now tools: it also runs shellcheck and the copy check's, render.sh's and compare.py's self-tests, and retries the gettext install.
+- The translation template check also runs after a failed suite when the import was clean, and fails when its own import fails.
+- extract_pot.sh never deletes an addons folder it did not make.
+- The site's checks fetch history without old file contents, and the site redeploys when the game version, key art or credit line it reads changes.
+- Every workflow names the exact release of each pinned action, and Dependabot waits 7 days for a release (14 for a major one).
 
 -- How it was checked --
 - Checked: headless test suites, the docs checks and build, rendered stills of the title screen, and headless browser screenshots of the credits, legal and landing pages, and an axe scan of the landing page; headless browser screenshots of the guide home, the changelog and the open guide menu at phone, tablet and desktop sizes, and an axe scan of guide pages; the README's links checked against the built site and its commands against package.json; headless browser screenshots of the rewritten player pages, their facts checked against the game's code; headless browser screenshots of the new and rewritten user pages, the privacy claims checked against the game's code; headless browser screenshots of the developer pages, with honesty-note counts kept and their commands run or marked not run; headless browser screenshots of the docs style guide, Developer home and Contributing; not played by hand.
