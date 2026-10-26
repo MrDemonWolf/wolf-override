@@ -1,8 +1,9 @@
 extends RefCounted
-## Shared helpers for the parity tools (capture.gd, perf.gd, ui_dump.gd), so they do not each keep a
-## copy: the command-line reader and the fixture saves the routes and the probe start from. Never
-## shipped: run.sh copies it beside the tools (res://parity/ for the headless runs, and into the
-## capture driver folder that render.sh puts at res://review_capture/), and each tool loads it with
+## Shared helpers for the parity tools (capture.gd, perf.gd, resources.gd, ui_dump.gd), so they do
+## not each keep a copy: the command-line reader, the fixture saves the routes and the probes start
+## from, and the object, memory and RSS figures the probes record. Never shipped: run.sh copies it
+## beside the tools (res://parity/ for the headless runs, and into the capture driver folder that
+## render.sh puts at res://review_capture/), and each tool loads it with
 ## `const Kit = preload("parity_kit.gd")`, a path relative to the tool itself. All statics, no state.
 
 
@@ -69,3 +70,54 @@ static func after_blast_state() -> M0State:
 	st.human_position = Vector2(420.0, 410.0)
 	st.wolf_position = Vector2(380.0, 423.0)
 	return st
+
+
+## The object and memory figures every probe records, as one Dictionary (perf.gd per state and at the
+## end, resources.gd before and after main.tscn): Performance's node, object, resource and orphan-node
+## counts, static memory now and at its peak in this process (MB, Godot's own allocator), and the
+## process's resident set size in MB from [method rss_mb] ("rss_mb" now, "peak_rss_mb" the system's
+## high-water mark or -1 where it gives none). Reading RSS can start a child process (macOS), so call
+## this between measurements, never inside a timed span.
+static func counts() -> Dictionary:
+	var rss: PackedFloat64Array = rss_mb()
+	return {
+		"nodes": int(Performance.get_monitor(Performance.OBJECT_NODE_COUNT)),
+		"objects": int(Performance.get_monitor(Performance.OBJECT_COUNT)),
+		"resources": int(Performance.get_monitor(Performance.OBJECT_RESOURCE_COUNT)),
+		"orphan_nodes": int(Performance.get_monitor(Performance.OBJECT_ORPHAN_NODE_COUNT)),
+		"static_mb": snappedf(Performance.get_monitor(Performance.MEMORY_STATIC) / 1048576.0, 0.01),
+		"static_max_mb": snappedf(Performance.get_monitor(Performance.MEMORY_STATIC_MAX) / 1048576.0, 0.01),
+		"rss_mb": rss[0],
+		"peak_rss_mb": rss[1],
+	}
+
+
+## This process's resident set size in MB, [now, peak so far], each -1 when unknown (float64, so the
+## figures stay at their 0.1 MB rounding in the JSON, which a Vector2's float32 would not). Godot has
+## no call for it, so: on Linux (CI, the render container) VmRSS and VmHWM from /proc/self/status, the
+## kernel's own figures; elsewhere (macOS) `ps -o rss= -p <pid>` (KB) for now and no peak, since ps
+## has no high-water mark (a caller wanting one keeps the largest of its samples, as perf.gd does).
+## /proc files report a length of 0, so the status file is read line by line rather than whole.
+static func rss_mb() -> PackedFloat64Array:
+	var status: FileAccess = FileAccess.open("/proc/self/status", FileAccess.READ) if FileAccess.file_exists("/proc/self/status") else null
+	if status != null:
+		var now: float = -1.0
+		var peak: float = -1.0
+		while not status.eof_reached():
+			var line: String = status.get_line()
+			if line.begins_with("VmRSS:"):
+				now = _status_mb(line)
+			elif line.begins_with("VmHWM:"):
+				peak = _status_mb(line)
+		return PackedFloat64Array([now, peak])
+	var out: Array = []
+	if OS.execute("ps", ["-o", "rss=", "-p", str(OS.get_process_id())], out) == 0 and not out.is_empty():
+		var kb: String = str(out[0]).strip_edges()
+		if kb.is_valid_int():
+			return PackedFloat64Array([snappedf(kb.to_float() / 1024.0, 0.1), -1.0])
+	return PackedFloat64Array([-1.0, -1.0])
+
+
+## The MB in a /proc/self/status line such as "VmRSS:	  331560 kB" (the figure is always in kB).
+static func _status_mb(line: String) -> float:
+	return snappedf(line.get_slice(":", 1).strip_edges().get_slice(" ", 0).to_float() / 1024.0, 0.1)
