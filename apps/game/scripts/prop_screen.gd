@@ -162,7 +162,8 @@ func _draw_battery() -> void:
 	draw_rect(at.call(OUTLINE.grow(-OUTLINE_INSET)), INSET_COLOR)
 	if idle:
 		return
-	var lit: int = maxi(1, roundi(percent / 100.0 * SEGMENTS))
+	# Any charge lights at least one segment, so a nearly flat battery still reads as charging; 0% lights none.
+	var lit: int = 0 if percent <= 0 else maxi(1, roundi(percent / 100.0 * SEGMENTS))
 	for index: int in SEGMENTS:
 		var segment: Rect2 = Rect2(SEGMENT_FIRST + Vector2(SEGMENT_STEP * index, 0.0), SEGMENT_SIZE)
 		draw_rect(at.call(segment), tint if index < lit else SEGMENT_UNLIT)
