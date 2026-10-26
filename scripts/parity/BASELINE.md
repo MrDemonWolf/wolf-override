@@ -71,9 +71,15 @@ returns for the touch. That catches a prompt cached per device or binding (S01) 
 | Route | Stills | What it covers |
 |---|---:|---|
 | R1 title and menus | 21 | Title reveal; Credits at the top and part-scrolled; Changelog at the top and scrolled; title with controller prompts; Settings Display, Audio and Controls tabs, a rebind prompt and the saved binding; Pause during the opening (SKIP OPENING); the opening skipped; the rebound key in a hint (checked: the hint starts with F); Pause in play, its Settings and back; the title's Continue with a save; Continue to the safe point; END OF SLICE; back to the title. |
-| R2 corridor | 51 | The opening beat by beat; Pause while the objective card slides in; first control; a 6-frame camera pan; the breaker, with a device switch; the relay question (resized to 3/4 and back, and with controller prompts); disclose and signal WOLF (seal at 0, mid and open; a resize in play; safe point; the cut to Records as 5 frames); press, the refusal and the manual bypass let go part way, then finished; disclose and crank the bypass without WOLF. |
+| R2 corridor | 51 | The opening's first 7 beats on fixed presses, then the rest read through box by box; Pause while the objective card slides in; first control, in the corridor; a 6-frame camera pan; the breaker, with a device switch; the relay question (resized to 3/4 and back, and with controller prompts); disclose and signal WOLF (seal at 0, mid and open; a resize in play; safe point; the cut to Records as 5 frames); press, the refusal and the manual bypass let go part way, then finished; disclose and crank the bypass without WOLF. |
 | R3 Records | 25 | From a Records entry save: the purge queue, with a device switch, and the purge copy; the mirror question (also with controller prompts) and WOLF's readout; Continue from a save just after the purge copy; the question again and the manual port; the exit lift; the chapter close (paused while it frames); the cut to the junction as 5 frames. |
-| R4 junction to the end | 115 | From a junction entry save: the breaker and the line; the vent knockdown as 6 frames, paused mid-fall, the card and the restore; the valve, with a device switch, and the crank; the fuse as 32 consecutive frames and the blast (8 frames, every 2nd); the lane question (also with controller prompts) and WOLF drawing the sentry; the sentry fixated; the tank drop as 30 consecutive frames; the bolt, the hatch sliding and open; the walk-out (8 frames); END OF SLICE; then from a post-blast save the engineer alone, the sentry's patrol, chase and knockdown, and the restore. |
+| R4 junction to the end | 115 | From a junction entry save: the breaker and the line; the vent knockdown as 6 frames, paused mid-fall, the card and the restore; the valve, with a device switch, and the crank; the fuse as 32 consecutive frames and the blast (8 frames, every 2nd); the lane question (also with controller prompts) and WOLF drawing the sentry; the sentry fixated; the tank drop as 30 consecutive frames; the bolt at its panel, the hatch sliding and open; USE at the open door itself; the closing lines read through box by box; the walk-out (8 frames); END OF SLICE; then from a post-blast save the engineer alone, the sentry's patrol, chase and knockdown, and the restore. |
+
+**Run R2 and R4 after any change to the opening or the doors.** R2 plays the whole opening and the
+corridor seal; R4 leaves through the junction's exit door. A change there can stop these routes while
+every headless suite still passes: on October 24, 2026 R2 stopped in the dock bay (the opening had
+grown past the route's fixed presses) and R4 at the bolt panel (USE now leaves from the door itself).
+`tests/full_slice_test.gd` plays the same way through headless, but takes no stills.
 
 The consecutive fuse and tank-drop sequences are what critique C1 asks S02 to compare (the
 junction's redraw changes). The driver fails a run (and `run.sh` reports `FAIL`) when a button it
@@ -356,6 +362,26 @@ the same 115 stills with 0 changed pixels, the same text and audio logs and the 
 Both runs stopped at the closing beat, which the closing-box presses then fixed. With `d5c7217c` R4
 completes with no failure: 115 stills and 2,653 frames, the first 99 stills byte-identical to the
 `8af8d3f8` run.
+
+## Driver change: R2 and R4 read through (October 26, 2026)
+
+What changed in `capture.gd`:
+
+- R2 keeps its 7 fixed opening presses and stills, then reads the rest of the opening through
+  (`Suite.finish_opening`). It fails the run if play starts inside the dock bay.
+- R2 reads the breaker talk through (`Suite.continue_until`), so WOLF's stakes and the opening lines
+  come before the relay question, however many boxes they take.
+- R2 takes the breaker, relay, bypass and seal positions from Main's constants.
+- R4 walks from the bolt panel to the open exit door (`Suite.OPEN_EXIT_X`) and uses it there, then
+  reads the closing lines through (`Suite.finish_closing_lines`).
+- R4 waits for the title's CONTINUE before its last still.
+
+Checked in the render container on `test/r2-r4-full-slice`: all 18 runs of R2 and R4 (3 variants,
+3 sizes) passed with no notes. R2 takes 51 stills in 8,541 frames. R4 takes 115 stills in 3,157
+frames (`kb-fx`), 3,151 (`kb-calm`) and 3,155 (`touch-fx`).
+
+R2 and R4 captures from earlier drivers cannot be compared with these. Re-take their baseline from
+this driver.
 
 ## S00a: maps refreshed on 9c7371d
 

@@ -18,13 +18,19 @@ extends SceneTree
 ## Users (2026-10-18): every tests/*_test.gd. What must stay true for every user:
 ## - What the statics touch besides their arguments: the running SceneTree (tree(), and its paused
 ##   flag in free_tools_game); the global Input actions and events (hold, press_for, tap, walk_to,
-##   walk_to_reading_on, retry and send_key press or send them, and each releases what it pressed
+##   walk_to_reading_on, retry, send_key and continue_until (with its two users) press or send them,
+##   and each releases what it pressed
 ##   before it returns); user:// files (remove_file and remove_tools_files delete them,
 ##   fresh_save_path, start_game and open_game delete stale save and settings files before the game
 ##   starts, end_game deletes the game's own after it is freed); and the process id (in the file
 ##   names, so suites run side by side do not share files). Nothing else is kept between calls: the
 ##   kit has no static state.
-## - frames, wait_until, hold, press_for, walk_to, walk_to_reading_on and retry count physics frames
+## - The parity capture driver (scripts/parity/capture.gd) preloads this file for continue_until,
+##   finish_opening and finish_closing_lines, so a played route and the suites press through the
+##   opening and the closing lines the same way; those three must keep working outside a suite (they
+##   use only tree(), tap and the game's own nodes).
+## - frames, wait_until, hold, press_for, walk_to, walk_to_reading_on, retry, continue_until,
+##   finish_opening and finish_closing_lines count physics frames
 ##   (1/60 s of game time each at the project's physics rate, not the wall clock), so a busy machine
 ##   slows those waits down but does not change what they see; tap, settle, send_key and retry hold
 ##   presses for process frames. spawn_game and start_game wait one process frame, add_game and
@@ -359,6 +365,76 @@ static func walk_to_reading_on(actor: M0Actor, target_x: float) -> bool:
 			await tap(&"interact", 1)
 			await frames(10)
 	return absf(actor.position.x - target_x) <= 6.0
+
+
+## Where a played route stands to leave through the junction's open exit door: the middle of the reach
+## its USE leaves from (JunctionRoom.HATCH_REACH_MIN_X 846 to HATCH_REACH_MAX_X, about 888; world px).
+## Not door_route_test's leave_x (HATCH_REACH_MIN_X + 0.5), which it reaches by placing the engineer:
+## a walk stops within a few px of its target (up to 6 for walk_to_reading_on, 3 for the capture's
+## _walk_to, at 3.2 px a frame), so aimed at the window's edge it can stop short of it and the USE
+## then works the bolt panel instead (the parity R4 failure of 2026-10-24, engineer at x 760.7).
+const OPEN_EXIT_X: float = (JunctionRoom.HATCH_REACH_MIN_X + JunctionRoom.HATCH_REACH_MAX_X) * 0.5
+
+
+## How long [method finish_opening] lets the opening run at most, in physics frames: 90 s of game
+## time, the bound opening_timing_test plays it in (first control comes 30 to 45 s in when every box is
+## read through, so this is about twice that).
+const OPENING_MAX_FRAMES: int = 90 * 60
+## How long one conversation read through with [method continue_until] may take at most, in physics
+## frames: 60 s of game time. continue_until reads every box for its full reading time (up to 7 s
+## each), and the corridor breaker's talk runs WOLF's stakes and the opening lines before his question
+## (Main._interact_breaker), about 30 s. Users: full_slice_test and the parity capture's R2.
+const TALK_FRAMES: int = 60 * 60
+## How long [method finish_closing_lines] lets the junction's closing lines run at most, in physics
+## frames: 30 s of game time, several times the three boxes' reading time (about 2 s each).
+const CLOSING_MAX_FRAMES: int = 30 * 60
+
+
+## Presses CONTINUE (a [method tap] of interact) the way a player reading every box does, until
+## [param done] holds: the box the Story label shows is pressed on once it has been up for its reading
+## time (DialogueBoxes.read_seconds, the game's own rule, in the language shown), and pressed again
+## after each further reading time when it has not moved on (a press during a beat that is still
+## playing may only queue it). Checks [param done] before each physics frame and gives up after
+## [param max_frames] of them (1/60 s of game time each, so a busy machine slows it down without
+## changing what it presses). Returns whether [param done] holds at the end. Shared by the suites and
+## the parity capture driver (scripts/parity/capture.gd), which preloads this file for it.
+static func continue_until(game: Node, done: Callable, max_frames: int) -> bool:
+	var story: Label = game.get_node("CanvasLayer/BottomBar/Story") as Label
+	var shown: String = story.text
+	var age: int = 0
+	for _frame: int in max_frames:
+		if done.call():
+			return true
+		if story.text != shown:
+			shown = story.text
+			age = 0
+		elif age >= ceili(DialogueBoxes.read_seconds(shown.strip_edges()) * Engine.physics_ticks_per_second):
+			await tap(&"interact")
+			age = 0
+		await tree().physics_frame
+		age += 1
+	return bool(done.call())
+
+
+## Plays the rest of the opening that is running in [param game] ([method continue_until], reading
+## every box) until it hands over to play (Main.intro_active false), at most [constant
+## OPENING_MAX_FRAMES] physics frames. Returns "" once it has, or a failure note naming the beat and box
+## it stuck on. Control itself comes a moment later, under the fade into play: callers wait for
+## M0Actor.controlled.
+static func finish_opening(game: Node) -> String:
+	if await continue_until(game, func() -> bool: return not bool(game.get("intro_active")), OPENING_MAX_FRAMES):
+		return ""
+	return "the opening never handed over to play: still at beat %d after %d s of game time, on the box \"%s\"" % [int(game.get("intro_step")), OPENING_MAX_FRAMES / 60, (game.get_node("CanvasLayer/BottomBar/Story") as Label).text.c_escape()]
+
+
+## Reads the junction's closing lines in [param game] through ([method continue_until]) after USE at
+## its open exit door, until the walk out starts (Main.hatch_exit_walking) or the END OF SLICE card is
+## up (Main.end_card_active), at most [constant CLOSING_MAX_FRAMES] physics frames. Returns "" once it
+## has, or a failure note naming the box it stuck on.
+static func finish_closing_lines(game: Node) -> String:
+	if await continue_until(game, func() -> bool: return bool(game.get("hatch_exit_walking")) or bool(game.get("end_card_active")), CLOSING_MAX_FRAMES):
+		return ""
+	return "the closing lines never led to the walk out: after %d s of game time the box shows \"%s\"" % [CLOSING_MAX_FRAMES / 60, (game.get_node("CanvasLayer/BottomBar/Story") as Label).text.c_escape()]
 
 
 ## True while some player in [param game]'s SfxBank is playing [param clip] (an SfxBank clip name).

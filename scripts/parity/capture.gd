@@ -3,7 +3,12 @@ extends SceneTree
 ## res://, and run.sh hands it to tools/render/render.sh, which copies it into the render container's
 ## project copy as res://review_capture/). It plays one route through input actions and button
 ## presses, on fixed frame counts and fixed waits, and takes the same stills at the same moments on
-## every run, so a refactor can be compared pixel for pixel. No window opens on the host.
+## every run, so a refactor can be compared pixel for pixel. No window opens on the host. The
+## opening (R2) and the junction's closing lines (R4) are read through with the suites' own helpers
+## (Suite.finish_opening and Suite.finish_closing_lines, tests/support/game_suite.gd), which press
+## each box after its reading time in game frames, so a longer opening or one more closing box still
+## reaches play and the END OF SLICE card instead of stalling the route; the stills before them stay on
+## fixed frame counts. Run R2 and R4 after any change to the opening or the doors (BASELINE.md).
 ##
 ## Determinism: run with --fixed-fps 60; each room's lamp flicker gets a fixed seed and restarts,
 ## and every CPUParticles2D that enters the tree is given a fixed seed. The container's virtual screen
@@ -39,6 +44,13 @@ extends SceneTree
 ##        [--language=<code>|pseudo]
 
 const Kit = preload("parity_kit.gd")
+## The headless suites' kit, for the shared route steps (finish_opening, finish_closing_lines,
+## continue_until, OPEN_EXIT_X). The render container's project copy includes tests/ (render.sh copies
+## the whole game folder), so the path resolves there too.
+const Suite = preload("res://tests/support/game_suite.gd")
+## The corridor's breaker and seal (the safe point) as Main's station markers place them (world px).
+const BREAKER_X: float = Main.CORRIDOR_STATIONS[0].x
+const SEAL_X: float = Main.CORRIDOR_STATIONS[2].x
 const ParityBank = preload("parity_sfx_bank.gd")
 const RNG_SEED: int = 0x5041524954
 const PARTICLE_SEED: int = 1337
@@ -279,7 +291,7 @@ func _route_1() -> void:
 	_press("CanvasLayer/PauseOverlay/Panel/PauseMenu/TitleButton")
 	await _raw(60)
 	await _shot("opening-skipped")
-	await _walk_to(350.0)
+	await _walk_to(BREAKER_X)
 	await _raw(30)
 	await _shot("hint-rebound-key")
 	# Under pseudo the hint is bracketed and padded ("[____F: ...]"), so the pad is skipped first.
@@ -309,8 +321,9 @@ func _route_1() -> void:
 	await _shot("title-after-end-card")
 
 
-## R2: the corridor. The opening beat by beat, first control (and Pause while the objective card
-## slides in), a camera pan, the breaker (with a device switch), the relay question (resized, and with
+## R2: the corridor. The opening's first beats on fixed presses, then the rest read through
+## (Suite.finish_opening), first control (and Pause while the objective card slides in) in the
+## corridor past the dock bay, a camera pan, the breaker (with a device switch), the relay question (resized, and with
 ## controller prompts),
 ## then the three outcomes: disclose and signal WOLF (the seal at 0, mid and open, the safe point and
 ## the cut to Records), press and the manual bypass (released part way), and disclose with the bypass.
@@ -325,6 +338,9 @@ func _route_2() -> void:
 	await _tap(&"interact")
 	await _raw(30)
 	await _shot("opening-fade")
+	var note: String = await Suite.finish_opening(game)
+	if not note.is_empty():
+		_fail(note)
 	await _raw(12)
 	await _action_event(&"pause_game")
 	await _raw(60)
@@ -332,10 +348,14 @@ func _route_2() -> void:
 	_press("CanvasLayer/PauseOverlay/Panel/PauseMenu/ResumeButton")
 	await _raw(40)
 	await _shot("first-control")
+	# Play starts in the corridor, past the dock bay's cross-wall (Main._finish_intro places the
+	# engineer at the save's spot); x -34 here was the 2026-10-24 failure, the opening not yet over.
+	if human.position.x <= DockBay.ROOM_RIGHT:
+		_fail("first control in the dock bay, not the corridor (engineer at x %.1f)" % human.position.x)
 	Input.action_press(&"move_right")
 	await _burst("pan", 6, 3)
 	Input.action_release(&"move_right")
-	await _walk_to(350.0)
+	await _walk_to(BREAKER_X)
 	await _raw(30)
 	await _shot("at-breaker")
 	await _device_switch("breaker")
@@ -343,8 +363,7 @@ func _route_2() -> void:
 	await _raw(30)
 	if not game.get("waiting_for_choice"):
 		await _shot("breaker-stakes")
-		await _tap(&"interact")
-		await _raw(30)
+		await _ask_at_breaker()
 	await _shot("relay-question")
 	_set_size(Vector2i(size.x * 3 / 4, size.y * 3 / 4))
 	await _raw(20)
@@ -356,10 +375,9 @@ func _route_2() -> void:
 	await _answer(1)
 	await _raw(40)
 	await _shot("disclosed")
-	await _tap(&"interact")
-	await _raw(30)
+	await _read_on_to_armed_breaker()
 	await _shot("breaker-armed")
-	await _walk_to(605.0)
+	await _walk_to(Main.RELAY_X)
 	await _raw(40)
 	await _shot("at-relay")
 	await _tap(&"interact")
@@ -378,7 +396,7 @@ func _route_2() -> void:
 	await _shot("play-resized")
 	_set_size(size)
 	await _raw(20)
-	await _walk_to(876.0)
+	await _walk_to(SEAL_X)
 	await _raw(10)
 	await _tap(&"interact")
 	await _raw(50)
@@ -389,9 +407,9 @@ func _route_2() -> void:
 	await _shot("records-entry")
 	# Outcome 2: press, WOLF refuses, the manual bypass let go part way, then finished.
 	await _new_run_skipping_opening()
-	await _walk_to(350.0)
+	await _walk_to(BREAKER_X)
 	await _breaker_choice(2)
-	await _walk_to(605.0)
+	await _walk_to(Main.RELAY_X)
 	await _raw(40)
 	await _shot("relay-refused")
 	await _tap(&"interact")
@@ -402,7 +420,7 @@ func _route_2() -> void:
 	await _crank_bypass("press")
 	# Outcome 3: disclose, then crank the bypass without signalling WOLF.
 	await _new_run_skipping_opening()
-	await _walk_to(350.0)
+	await _walk_to(BREAKER_X)
 	await _breaker_choice(1)
 	await _crank_bypass("disclose")
 
@@ -482,8 +500,9 @@ func _route_3() -> void:
 ## R4: the junction from its entry save to the end. The vent knockdown (paused mid-fall) and the
 ## restore, the breaker and the line, a device switch at the valve, the crank, the fuse (32 consecutive
 ## frames) and the blast as frame sequences, the lane question (also with controller prompts), WOLF
-## drawing the sentry, the tank drop (30 consecutive frames), the bolt, the hatch, the walk
-## out and the END OF SLICE card; then Continue from the post-blast save, the engineer alone, the
+## drawing the sentry, the tank drop (30 consecutive frames), the bolt at its panel, the hatch, USE at
+## the open door itself (from Suite.OPEN_EXIT_X, behind WOLF in its doorway, as a player leaves), the
+## closing lines read through (Suite.finish_closing_lines), the walk out and the END OF SLICE card; then Continue from the post-blast save, the engineer alone, the
 ## sentry's chase and its knockdown.
 func _route_4() -> void:
 	_press("CanvasLayer/TitleScreen/ContinueButton")
@@ -555,21 +574,27 @@ func _route_4() -> void:
 	await _wait_until(func() -> bool: return (game.get("junction_room") as JunctionRoom).hatch_open >= 1.0, 200)
 	await _raw(10)
 	await _shot("hatch-open")
+	# USE leaves from the door, not from the bolt panel (Main._use_exit needs x >= HATCH_REACH_MIN_X;
+	# from BOLT_PANEL_X it did nothing and the END OF SLICE card never came, 2026-10-24).
+	await _walk_to(Suite.OPEN_EXIT_X)
+	if human.position.x < JunctionRoom.HATCH_REACH_MIN_X:
+		_fail("the engineer stopped short of the open exit door (x %.1f)" % human.position.x)
 	await _tap(&"interact")
 	await _raw(100)
 	await _shot("closing-beat")
-	# CONTINUE goes through the closing lines' boxes first (one speaker each, P0-9), then starts the
-	# walk out; 3 presses cover the 3 boxes, and the END OF SLICE wait below fails the run otherwise.
-	for _press: int in 3:
-		await _tap(&"interact")
-		if game.get("hatch_exit_walking"):
-			break
+	# CONTINUE goes through the closing lines' boxes first (one speaker each, P0-9), then starts the walk.
+	var note: String = await Suite.finish_closing_lines(game)
+	if not note.is_empty():
+		_fail(note)
 	await _burst("walk-out", 8, 8)
 	if not await _wait_until(func() -> bool: return bool(game.get("end_card_active")), 300):
 		_fail("the END OF SLICE card never showed")
 	await _raw(40)
 	await _shot("end-card")
 	await _tap(&"interact")
+	# The card's confirm goes on to the title; CONTINUE there must be up before it is pressed.
+	if not await _wait_until(func() -> bool: return (game.get_node("CanvasLayer/TitleScreen/ContinueButton") as Button).is_visible_in_tree(), 300):
+		_fail("the title's CONTINUE never showed after the END OF SLICE card")
 	await _raw(40)
 	await _shot("title-after-end")
 	# The engineer alone, from the post-blast save: the sentry sees them and gives chase.
@@ -614,6 +639,9 @@ func _sentry_walking_back() -> bool:
 	return b.state == &"patrol" and b.facing < 0.0 and b.x <= 780.0 and b.x >= 700.0
 
 
+## Back to the title, NEW GAME, and SKIP OPENING from Pause, for R2's second and third outcomes. A skip
+## that leaves the opening running fails the run, and the opening is then read through
+## (Suite.finish_opening) so the outcome still starts from play.
 func _new_run_skipping_opening() -> void:
 	await _action_event(&"pause_game")
 	await _raw(30)
@@ -625,22 +653,41 @@ func _new_run_skipping_opening() -> void:
 	await _raw(30)
 	_press("CanvasLayer/PauseOverlay/Panel/PauseMenu/TitleButton")
 	await _raw(50)
+	if bool(game.get("intro_active")):
+		_fail("SKIP OPENING left the opening running")
+	var note: String = await Suite.finish_opening(game)
+	if not note.is_empty():
+		_fail(note)
 
 
+## USE at the breaker until WOLF asks about the relay: his stakes line and any opening lines still to
+## read come first (Main._interact_breaker), each read through (Suite.continue_until). Fails the run
+## when no question comes within Suite.TALK_FRAMES.
+func _ask_at_breaker() -> void:
+	if not await Suite.continue_until(game, func() -> bool: return bool(game.get("waiting_for_choice")), Suite.TALK_FRAMES):
+		_fail("WOLF never asked about the relay at the breaker")
+
+
+## After the relay answer, reads WOLF's reply through until the breaker is armed and the engineer has
+## control again. Fails the run when that takes longer than Suite.TALK_FRAMES.
+func _read_on_to_armed_breaker() -> void:
+	if not await Suite.continue_until(game, func() -> bool: return (game.get("state") as M0State).breaker_armed and human.controlled and not bool(game.get("waiting_for_choice")), Suite.TALK_FRAMES):
+		_fail("the breaker was never armed after the relay answer")
+
+
+## The breaker's talk from USE to the relay answer [param response] (1 disclose, 2 press) and on to the
+## armed breaker, without stills, for R2's second and third outcomes.
 func _breaker_choice(response: int) -> void:
 	await _tap(&"interact")
 	await _raw(30)
-	if not game.get("waiting_for_choice"):
-		await _tap(&"interact")
-		await _raw(30)
+	await _ask_at_breaker()
 	await _answer(response)
 	await _raw(40)
-	await _tap(&"interact")
-	await _raw(30)
+	await _read_on_to_armed_breaker()
 
 
 func _crank_bypass(tag: String) -> void:
-	await _walk_to(700.0)
+	await _walk_to(Main.BYPASS_WHEEL.x)
 	await _raw(10)
 	await _shot("%s-at-bypass" % tag)
 	await _tap(&"interact")

@@ -75,6 +75,7 @@ jobs="${CHECK_JOBS:-$((cpus < 4 ? cpus : 4))}"
 # Seconds per suite on CI (ubuntu-24.04, 4 at a time), run 40141935412 (2026-10-24): 235 s of suites
 # in all, against 404 s in run 39370708132 before this order and the text-box split.
 heavy_suites=(
+  full_slice_test             # 128 in run 40367197439 (2026-10-26): plays the whole slice in game time
   companion_rules_test        # 87
   wolf_space_test             # 86
   sentry_test                 # 84
