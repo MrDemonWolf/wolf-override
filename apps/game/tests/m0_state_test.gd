@@ -176,4 +176,3 @@ func _initialize() -> void:
 	DirAccess.remove_absolute(ProjectSettings.globalize_path(blocked_path))
 	DirAccess.remove_absolute(ProjectSettings.globalize_path(blocked_path + ".tmp"))
 	finish("M0 state checks passed")
-

@@ -94,7 +94,8 @@ func _initialize() -> void:
 ## instead of failing a timing check for no fault of the game. Users: opening_timing_test and
 ## opening_early_press_test, which check-game.sh lists in fixed_fps_suites.
 func _expect_fixed_fps(clock: GameClock) -> bool:
-	return _expect(is_equal_approx(clock.largest_step, 1.0 / 60.0), "every frame was 1/60 s of game time (largest %.4f s): run it as check-game.sh does, with --fixed-fps 60" % clock.largest_step)
+	var even: bool = is_equal_approx(clock.largest_step, 1.0 / 60.0) and is_equal_approx(clock.smallest_step, 1.0 / 60.0)
+	return _expect(even, "every frame was 1/60 s of game time (%.4f to %.4f s): run it as check-game.sh does, with --fixed-fps 60" % [clock.smallest_step, clock.largest_step])
 
 
 ## [method _expect], and on failure quits with status 1 at once, for checks the rest of the suite
@@ -300,13 +301,15 @@ class GameClock extends Node:
 	## steps to StudioLogo.MAX_STEP, so a suite timing the logo clamps the same and counts what the
 	## logo counts; a long frame (a load hitch) then adds what it adds to the logo, not its length.
 	var max_step: float = INF
-	## The longest frame the clock has seen, in seconds, before clamping. A suite that measures beats
-	## to the frame checks it is exactly 1/60 s, so it knows it ran under --fixed-fps 60 (see
-	## [method start_clock]).
+	## The longest and shortest frames the clock has seen, in seconds, before clamping (INF and 0
+	## until the first frame). A suite that measures beats to the frame checks both are exactly
+	## 1/60 s, so it knows it ran under --fixed-fps 60 (see [method start_clock]).
 	var largest_step: float = 0.0
+	var smallest_step: float = INF
 
 	func _process(delta: float) -> void:
 		largest_step = maxf(largest_step, delta)
+		smallest_step = minf(smallest_step, delta)
 		seconds += minf(delta, max_step)
 
 
@@ -317,7 +320,7 @@ class GameClock extends Node:
 ## in a frame already takes that frame's step). On a loaded machine one frame can last 0.1 s or more,
 ## so a bound finer than that still fails there. Suites with such bounds run under `--fixed-fps 60`
 ## (check-game.sh's fixed_fps_suites), where every frame is 1/60 s of game time however long it
-## takes on the wall clock, and check [member GameClock.largest_step] to be sure they did.
+## takes on the wall clock, and check it with [method _expect_fixed_fps].
 static func start_clock(max_step: float = INF) -> GameClock:
 	var clock: GameClock = GameClock.new()
 	clock.max_step = max_step
