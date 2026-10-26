@@ -10,7 +10,7 @@
 # block, any JSON-LD block is not valid JSON, a guide page's social card is not og:type article
 # with the game name in its og:title, or llms.txt, llms-full.txt or a guide
 # page's Markdown copy is missing or carries a raw component tag, or when the press kit zip is missing.
-# Also checks the referrer policy and resolves internal links and fragments with check-docs-links.py.
+# Also checks the referrer policy and the Content-Security-Policy meta tag, and resolves internal links and fragments with check-docs-links.py.
 # Usage: scripts/check-docs-export.sh   (DOCS_OUT_DIR overrides the export directory)
 # Fails when apps/docs/out is missing rather than passing silently.
 set -euo pipefail
@@ -44,6 +44,11 @@ while IFS= read -r page; do
   fi
   if ! grep -q '<meta name="referrer" content="strict-origin-when-cross-origin"' "$page"; then
     echo "FAIL  $rel has no strict-origin-when-cross-origin referrer policy" >&2
+    status=1
+  fi
+  # GitHub Pages cannot send headers, so the root layout writes the policy as a meta tag (apps/docs/lib/csp.ts).
+  if ! grep -q '<meta http-equiv="Content-Security-Policy" content="default-src ' "$page"; then
+    echo "FAIL  $rel has no Content-Security-Policy meta tag" >&2
     status=1
   fi
   # grep exits 1 when a page has none; under pipefail that ended the whole script with no FAIL line
@@ -175,6 +180,6 @@ python3 -I "$root/scripts/check-docs-links.py" --self-test || status=1
 python3 -I "$root/scripts/check-docs-links.py" "$out" || status=1
 
 if [ "$status" -eq 0 ]; then
-  echo "pass  $count exported pages: no /_next/image, one #main-content each, exactly one robots meta, no .ttf references; robots.txt names the sitemap; every guide URL in sitemap.xml has <lastmod>; valid JSON-LD on the landing and guide pages; guide pages are og:type article with the game name in og:title; llms.txt, llms-full.txt and a Markdown copy of every guide page, with no raw component tags; the press kit zip"
+  echo "pass  $count exported pages: no /_next/image, one #main-content each, a CSP meta tag each, exactly one robots meta, no .ttf references; robots.txt names the sitemap; every guide URL in sitemap.xml has <lastmod>; valid JSON-LD on the landing and guide pages; guide pages are og:type article with the game name in og:title; llms.txt, llms-full.txt and a Markdown copy of every guide page, with no raw component tags; the press kit zip"
 fi
 exit "$status"
