@@ -12,15 +12,25 @@ root="$(cd "$(dirname "$0")/.." && pwd)"
 source "$root/scripts/godot-helpers.sh"
 godot="${GODOT_BIN:-godot}"
 limit="${SUITE_TIMEOUT:-240}"
+# Suites that run with --fixed-fps 60: every process frame is then 1/60 s of game time, however long it
+# takes on the wall clock. These measure the opening's beats against bounds of 0.02 to 0.1 s, finer than
+# one frame when four suites share the CPU (a frame then lasts 0.1 s or more, and the game moves a whole
+# frame at once), so in real time they failed under load (PR #140's stress runs). Each checks it got the
+# flag (GameSuite._expect_fixed_fps); tests/support/game_suite.gd's start_clock says more.
+fixed_fps_suites=(opening_timing_test opening_early_press_test)
 
 # Internal: `check-game.sh --suite NAME LOG_DIR WORK_DIR` runs one suite and writes NAME.result.
 if [ "${1:-}" = "--suite" ]; then
   name="$2" logs="$3" work="$4" rc=0 started="$SECONDS"
   isolate_godot_home "$work/home-$name"
+  frame_args=()
+  if [[ " ${fixed_fps_suites[*]} " == *" $name "* ]]; then
+    frame_args=(--fixed-fps 60)
+  fi
   cd "$root"
   # --language en pins every suite to English whatever the OS locale is: the suites assert English, and
   # I18n.saved() follows the start-up locale when nothing is saved (tests/i18n_test.gd checks the pin).
-  bounded "$limit" "$godot" --headless --language en --path apps/game --script "res://tests/$name.gd" > "$logs/$name.log" 2>&1 || rc=$?
+  bounded "$limit" "$godot" --headless ${frame_args[@]+"${frame_args[@]}"} --language en --path apps/game --script "res://tests/$name.gd" > "$logs/$name.log" 2>&1 || rc=$?
   if [ "$rc" -eq 124 ]; then
     echo "FAIL  $name (hung: still running after ${limit}s and was stopped; see $logs/$name.log)" > "$logs/$name.result"
   elif [ "$rc" -ne 0 ] || grep -qE "$godot_error_lines" "$logs/$name.log"; then
@@ -28,7 +38,7 @@ if [ "${1:-}" = "--suite" ]; then
   elif grep -q 'instances were leaked at exit' "$logs/$name.log"; then
     # A suite also fails if it leaks objects at exit, so a leak in the game's own nodes or audio shows up.
     # Run it once more with --verbose so the log names the leaked objects; the suite still fails.
-    bounded "$limit" "$godot" --headless --verbose --language en --path apps/game --script "res://tests/$name.gd" > "$logs/$name.verbose.log" 2>&1 || true
+    bounded "$limit" "$godot" --headless ${frame_args[@]+"${frame_args[@]}"} --verbose --language en --path apps/game --script "res://tests/$name.gd" > "$logs/$name.verbose.log" 2>&1 || true
     echo "FAIL  $name (leaked objects at exit; see $logs/$name.log, and $logs/$name.verbose.log for their names)" > "$logs/$name.result"
   else
     echo "pass  $name ($((SECONDS - started))s)" > "$logs/$name.result"
@@ -85,7 +95,6 @@ heavy_suites=(
   junction_test               # 47
   text_boxes_languages_1_test # 45
   text_boxes_languages_2_test # 45
-  opening_timing_test         # 39
   debug_tools_test            # 33
   i18n_test                   # 32
   text_boxes_test             # 16

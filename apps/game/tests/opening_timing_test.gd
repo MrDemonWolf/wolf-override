@@ -13,12 +13,13 @@ extends "res://tests/support/game_suite.gd"
 ## Reading time per box: the game's own rule, DialogueBoxes.read_seconds in the language shown (English
 ## here: the larger of 1.2 s + 0.05 s per character, at most 7 s, and 1.2 s + 0.33 s per word), on the
 ## box as the Story label shows it. Time is game time: the process deltas the opening itself runs on
-## (its beats are tweens and the dock bay's _process), summed by the kit's GameClock and read right
-## after each process frame. It used to count each physics frame as 1/60 s, a second clock that drifts
-## from the first when frames come late: Godot then runs at most max_physics_steps_per_frame physics
-## steps a frame and drops the rest, so on a loaded machine the count fell behind the opening's own
-## time and moved the measured beats; the taps' own frames were not counted either. The bounds are
-## unchanged.
+## (its beats are tweens and the dock bay's _process), summed by the kit's GameClock. Every check reads
+## the game once per process frame, right after it, and the presses are tap_now, so no frame goes
+## unread: a blocking tap used to spend two frames between the checks above it and those below, so the
+## caption and the light it switches on were read on different frames. The bounds (0.1 s, 0.02 s) are
+## finer than a frame on a loaded machine, so check-game.sh runs this suite with --fixed-fps 60, where
+## every frame is 1/60 s of game time, and the suite checks that it was (the kit's start_clock says
+## why game time alone is not enough). The bounds are unchanged.
 
 const TARGET_MIN: float = 30.0
 const TARGET_MAX: float = 45.0
@@ -85,10 +86,9 @@ func _run() -> void:
 			if text.begins_with("Lock down maintenance"):
 				box7_t = now
 		elif not pressed and now - box_shown >= box_read:
-			await tap(&"interact")
+			# Seen by this frame's _process; what it changes is read on the next pass, like everything else.
+			tap_now(&"interact")
 			pressed = true
-			# The tap took frames: what the checks below see is the game as it is now.
-			now = clock.seconds
 		max_wash = maxf(max_wash, alarm.color.a)
 		if wake_t < 0.0 and bay.charge_color != DockBay.AMBER:
 			wake_t = now
@@ -117,6 +117,7 @@ func _run() -> void:
 			passed_in_front = passed_in_front and wolf.z_index > director.z_index
 		if human.visible and human.position.x == Opening.ENGINEER_WATCH_X:
 			engineer_faced_wolf = engineer_faced_wolf and human.body_sprite.flip_h
+	_expect_fixed_fps(clock)
 	clock.free()
 	var reading: float = first_control
 	_expect(first_control >= TARGET_MIN and first_control <= TARGET_MAX, "first control %.1f s in (30 to 45 s)" % first_control)

@@ -20,7 +20,7 @@ extends SceneTree
 ##   flag in free_tools_game); the global Input actions and events (hold, press_for, tap, walk_to,
 ##   walk_to_reading_on, retry, send_key and continue_until (with its two users) press or send them,
 ##   and each releases what it pressed
-##   before it returns); user:// files (remove_file and remove_tools_files delete them, write_text
+##   before it returns; tap_now releases on the next process frame instead); user:// files (remove_file and remove_tools_files delete them, write_text
 ##   writes one, fresh_save_path, start_game and open_game delete stale save and settings files
 ##   before the game starts, end_game deletes the game's own after it is freed); the root's children
 ##   (start_clock adds a GameClock the caller frees, wait_game_seconds adds and frees its own); and
@@ -34,10 +34,12 @@ extends SceneTree
 ##   finish_opening and finish_closing_lines count physics frames
 ##   (1/60 s of game time each at the project's physics rate, not the wall clock), so a busy machine
 ##   slows those waits down but does not change what they see; tap, settle, send_key and retry hold
-##   presses for process frames. GameClock, start_clock and wait_game_seconds measure and wait in
-##   game time (the summed process deltas the game itself runs on), never the wall clock, so a check
-##   with an upper bound on how long something took does not fail on a busy machine; only their hang
-##   guard is in wall time. spawn_game and start_game wait one process frame, add_game and
+##   presses for process frames, and tap_now presses for one without waiting. GameClock, start_clock
+##   and wait_game_seconds measure and wait in game time (the summed process deltas the game itself
+##   runs on), never the wall clock, so a busy machine's late frames no longer count as time the game
+##   did not run; only their hang guard is in wall time. A measurement is still only as fine as one
+##   frame, which a busy machine stretches, so bounds finer than a frame need --fixed-fps 60 too
+##   (start_clock says how). spawn_game and start_game wait one process frame, add_game and
 ##   open_game none. end_game waits process frames and SceneTree timers in seconds, which do follow
 ##   real time: the audio mixer and the loader threads it waits for run on the wall clock, not on
 ##   game frames.
@@ -84,6 +86,15 @@ func finish(pass_note: String = "") -> void:
 ## _initialize cannot await. A suite that does all its work in _initialize overrides this.
 func _initialize() -> void:
 	call_deferred("_run")
+
+
+## Checks that every frame [param clock] has seen was exactly 1/60 s of game time, as it is under
+## `--fixed-fps 60`, for a suite whose bounds are finer than a frame on a loaded machine (see
+## [method start_clock]). Reported as a failed check, so a run without the flag says how to fix it
+## instead of failing a timing check for no fault of the game. Users: opening_timing_test and
+## opening_early_press_test, which check-game.sh lists in fixed_fps_suites.
+func _expect_fixed_fps(clock: GameClock) -> bool:
+	return _expect(is_equal_approx(clock.largest_step, 1.0 / 60.0), "every frame was 1/60 s of game time (largest %.4f s): run it as check-game.sh does, with --fixed-fps 60" % clock.largest_step)
 
 
 ## [method _expect], and on failure quits with status 1 at once, for checks the rest of the suite
@@ -277,13 +288,24 @@ class GameClock extends Node:
 	## steps to StudioLogo.MAX_STEP, so a suite timing the logo clamps the same and counts what the
 	## logo counts; a long frame (a load hitch) then adds what it adds to the logo, not its length.
 	var max_step: float = INF
+	## The longest frame the clock has seen, in seconds, before clamping. A suite that measures beats
+	## to the frame checks it is exactly 1/60 s, so it knows it ran under --fixed-fps 60 (see
+	## [method start_clock]).
+	var largest_step: float = 0.0
 
 	func _process(delta: float) -> void:
+		largest_step = maxf(largest_step, delta)
 		seconds += minf(delta, max_step)
 
 
 ## A new [GameClock] added under the root, starting at 0 s of game time from the next process frame;
 ## each step is clamped to [param max_step] seconds. The caller frees it (`clock.free()`).
+## What game time does not fix: a suite reads the game once a frame, so an event is placed only to
+## the frame it happened in, and the game itself moves a whole frame's delta at once (a tween started
+## in a frame already takes that frame's step). On a loaded machine one frame can last 0.1 s or more,
+## so a bound finer than that still fails there. Suites with such bounds run under `--fixed-fps 60`
+## (check-game.sh's fixed_fps_suites), where every frame is 1/60 s of game time however long it
+## takes on the wall clock, and check [member GameClock.largest_step] to be sure they did.
 static func start_clock(max_step: float = INF) -> GameClock:
 	var clock: GameClock = GameClock.new()
 	clock.max_step = max_step
@@ -346,6 +368,18 @@ static func tap(action: StringName, settle_frames: int = 0) -> void:
 	Input.action_release(action)
 	for _frame: int in settle_frames:
 		await tree().process_frame
+
+
+## Presses the input [param action] now and releases it on the next process frame, without waiting:
+## the same press [method tap] makes (seen by this frame's _process when called right after
+## `await process_frame`, held for one process frame), for a suite that reads the game every frame
+## and must not skip the frames a blocking tap spends. The release is a one-shot process_frame
+## connection; a connection made while process_frame is being emitted first runs on the next
+## emission, because Godot calls the connections it had when the emission began. Not for
+## pause_game, which Main reads as an event (see [method tap]).
+static func tap_now(action: StringName) -> void:
+	Input.action_press(action)
+	tree().process_frame.connect(func() -> void: Input.action_release(action), CONNECT_ONE_SHOT)
 
 
 ## A pressed or released ([param pressed]) InputEventAction for [param action], for

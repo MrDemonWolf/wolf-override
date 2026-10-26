@@ -4,9 +4,10 @@ extends "res://tests/support/game_suite.gd"
 ## snapped to its end. The actions still play whole and in order (the engineer arrives, WOLF wakes,
 ## gets up, tears the lock, the leaves coast open for their full time, he steps out, then walks to the
 ## doorway), each after the one before it, and the last press still hands over to play.
-## Times are game time, the process deltas the opening runs on, from the kit's GameClock read right
-## after each process frame (opening_timing_test says why counting physics frames as 1/60 s each
-## drifted from it when frames came late). The bounds are unchanged.
+## Times are game time, the process deltas the opening runs on, from the kit's GameClock. As in
+## opening_timing_test, every check reads the game once per process frame and the presses are tap_now,
+## and check-game.sh runs the suite with --fixed-fps 60, which it checks: the leaves' 0.05 s bound is
+## finer than one frame on a loaded machine. The bounds are unchanged.
 
 ## Seconds between presses: faster than any box can be read.
 const PRESS_GAP: float = 0.3
@@ -35,11 +36,10 @@ func _run() -> void:
 		# the last box's action before going on; every earlier press comes at once.
 		var last: bool = int(game.get("intro_step")) >= int(Main.INTRO_LINES.size()) - 1
 		if now >= next_press and (not last or walk_t > 0.0 and absf(wolf.position.x - Opening.WOLF_DOORWAY_X) < 1.0):
-			await tap(&"interact")
+			# Seen by this frame's _process; what it changes is read on the next pass, like everything else.
+			tap_now(&"interact")
 			presses += 1
 			next_press = now + PRESS_GAP
-			# The tap took frames: what the checks below see is the game as it is now.
-			now = clock.seconds
 		if arrived_t < 0.0 and human.visible and absf(human.position.x - Opening.ENGINEER_WATCH_X) < 0.5:
 			arrived_t = now
 		if wake_t < 0.0 and bay.charge_color != DockBay.AMBER:
@@ -52,6 +52,7 @@ func _run() -> void:
 			open_t = now
 		if walk_t < 0.0 and wolf.autonomous_target_x == Opening.WOLF_DOORWAY_X:
 			walk_t = now
+	_expect_fixed_fps(clock)
 	clock.free()
 	_expect(wake_t > 0.0 and rise_t > wake_t and tear_t > rise_t and open_t > tear_t and walk_t > open_t, "the actions play in order: wake %.2f, rise %.2f, tear %.2f, open %.2f, walk %.2f" % [wake_t, rise_t, tear_t, open_t, walk_t])
 	_expect(wake_t - Opening.WAKE_DELAY >= -0.02 and rise_t - wake_t >= Opening.WAKE_S - 0.02, "the wake plays whole before WOLF gets up")
