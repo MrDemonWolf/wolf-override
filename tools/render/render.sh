@@ -9,7 +9,10 @@
 # GODOT_ARGS. Inside the container the project is /work/project and the output folder is /work/out;
 # whatever the run writes to /work/out is copied back to OUT_DIR. --driver DIR copies capture scripts
 # into the project copy as res://review_capture/ (never into the real project). Every run is killed after
-# --timeout seconds (default 900) and its log is kept at JOB/run.log. The exit status is Godot's (124 = timed out).
+# --timeout seconds (default 900) and its log is kept at JOB/run.log. The exit status is Godot's (124 = timed out),
+# or the import's when the project does not import (its log is JOB/import.log), or 64 for a bad option.
+# JOB must be one path segment (tools/render/validate_names.sh): it names the folder that rsync --delete,
+# find -delete and the container mount act on, so it is checked before anything is touched.
 # --keyboard LAYOUT gives the virtual screen another keyboard layout (an XKB symbols name such as "fr" for
 # AZERTY or "de" for QWERTZ), so a capture shows key names as a player with that keyboard reads them
 # (localization PR L7a); without it the layout is Xvfb's default, US QWERTY.
@@ -22,6 +25,8 @@ driver=""
 limit=900
 keyboard=""
 here="$(cd "$(dirname "$0")" && pwd)"
+# shellcheck source=validate_names.sh
+source "$here/validate_names.sh"
 
 while [[ $# -gt 0 ]]; do
   case "$1" in
@@ -37,6 +42,10 @@ if [[ $# -lt 3 || "$3" != "--" ]]; then
   echo "usage: $0 [--screen WxH] [--name JOB] [--driver DIR] [--timeout SEC] [--keyboard LAYOUT] PROJECT_DIR OUT_DIR -- GODOT_ARGS..." >&2
   exit 64
 fi
+check_name "$job" "--name" || exit 64
+check_size "$screen" || exit 64
+[[ "$limit" =~ ^[1-9][0-9]*$ ]] || { echo "--timeout takes a whole number of seconds above 0" >&2; exit 64; }
+[[ -z "$keyboard" || "$keyboard" =~ ^[a-z_]+(\([a-z0-9_]+\))?$ ]] || { echo "--keyboard takes an XKB layout name such as fr or de(nodeadkeys)" >&2; exit 64; }
 project="$(cd "$1" && pwd)"
 out="$2"
 shift 3
@@ -59,13 +68,19 @@ find "$cache/out" -mindepth 1 -delete
 run() { docker run --rm -v "$cache":/work "$image" "$@"; }
 first_import=0
 [[ -d "$cache/project/.godot" ]] || first_import=1
-run timeout "$limit" godot --headless --path /work/project --import >"$cache/import.log" 2>&1 || true
+import_project() { run timeout "$limit" godot --headless --path /work/project --import >"$cache/import.log" 2>&1; }
 if [[ $first_import -eq 1 ]]; then
-  # A fresh import can log font errors that the second pass clears.
-  run timeout "$limit" godot --headless --path /work/project --import >"$cache/import.log" 2>&1 || true
+  # A fresh import can log font errors that a second pass over the same files clears, so the first
+  # pass's status is not judged; the final pass below must succeed.
+  import_project || true
+fi
+import_status=0
+import_project || import_status=$?
+if [[ $import_status -ne 0 ]]; then
+  echo "render.sh: the import failed with status $import_status (see $cache/import.log)" >&2
+  exit "$import_status"
 fi
 
-status=0
 # With --keyboard, a small shell first makes the layout the throwaway container's default, then becomes
 # the usual command ($1 is the layout; the rest is passed through untouched). Why not setxkbmap: on this
 # image's Xvfb (Debian bookworm) setxkbmap and xkbcomp both exit 0 but leave the keymap US (measured
@@ -75,12 +90,19 @@ status=0
 # a plain empty "${layout[@]}" unbound.
 layout=()
 if [[ -n "$keyboard" ]]; then
-  [[ "$keyboard" =~ ^[a-z_]+(\([a-z0-9_]+\))?$ ]] || { echo "--keyboard takes an XKB layout name such as fr or de(nodeadkeys)" >&2; exit 64; }
   layout=(sh -c 'printf "default partial alphanumeric_keys modifier_keys\nxkb_symbols \"basic\" { include \"%s\" };\n" "$1" > /usr/share/X11/xkb/symbols/us && shift && exec "$@"' sh "$keyboard")
 fi
+# PIPESTATUS must be read by the very next command: an "|| true" after the pipeline (as this line once
+# had, for set -e) replaces it with that true's (0), so a crash or a timeout exited 0 (Codex review
+# finding M1). set +e lets the pipeline fail without ending the script, and the copy below still runs.
+set +e
 run timeout --kill-after=10 "$limit" ${layout[@]+"${layout[@]}"} xvfb-run -a -s "-screen 0 ${screen}x24" \
-  godot --path /work/project --rendering-driver opengl3 --audio-driver Dummy "$@" 2>&1 | tee "$cache/run.log" || true
-status=${PIPESTATUS[0]}
+  godot --path /work/project --rendering-driver opengl3 --audio-driver Dummy "$@" 2>&1 | tee "$cache/run.log"
+pipe=("${PIPESTATUS[@]}")
+set -e
+status=${pipe[0]}
+# A log that could not be written is a failed run too, even when Godot itself exited 0.
+[[ $status -eq 0 && ${pipe[1]} -ne 0 ]] && status=${pipe[1]}
 [[ $status -eq 124 ]] && echo "render.sh: Godot was stopped after ${limit}s (see $cache/run.log)" >&2
 
 mkdir -p "$out"
