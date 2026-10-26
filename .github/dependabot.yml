@@ -1,4 +1,6 @@
 version: 2
+# Dependabot's pull requests cannot write their own changelog line: add one by hand before merging
+# (apps/docs/content/docs/development/releases.mdx, "Dependency updates").
 updates:
   # Each group takes only minor and patch updates, so a major version (a likely breaking
   # change, like TypeScript 5 to 7) arrives as its own pull request instead of hiding in a group.
@@ -6,6 +8,11 @@ updates:
     directory: /
     schedule:
       interval: monthly
+    # A new release waits 7 days (14 for a major version) before Dependabot proposes it, so a broken or
+    # hijacked release is usually pulled or fixed first (CI audit finding CI-13).
+    cooldown:
+      default-days: 7
+      semver-major-days: 14
     groups:
       actions:
         patterns: ['*']
@@ -14,6 +21,9 @@ updates:
     directory: /
     schedule:
       interval: monthly
+    cooldown:
+      default-days: 7
+      semver-major-days: 14
     groups:
       bun:
         patterns: ['*']
