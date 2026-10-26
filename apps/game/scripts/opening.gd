@@ -155,6 +155,9 @@ func queue_beat(beat: Callable) -> void:
 		_next_beat()
 
 
+## Runs queued beats in order until one returns a running Tween, which becomes the beat playing; this
+## runs again, once, when that tween finishes. Instant beats (null or a finished tween) run straight
+## through. Clears the playing beat when the queue is empty.
 func _next_beat() -> void:
 	while not _queue.is_empty():
 		var beat: Callable = _queue.pop_front()
@@ -344,6 +347,8 @@ func exiting() -> bool:
 	return _exit != null and _exit.is_running()
 
 
+## Hides the Director and puts him back as the opening first stands him: full opacity, at the actors'
+## depth (Main.ACTOR_Z), on his mark (DIRECTOR_X, DIRECTOR_Y, world px).
 func _director_gone() -> void:
 	var director: Sprite2D = main.intro_director
 	director.hide()
@@ -387,6 +392,8 @@ func stop() -> void:
 	_leaf_clock = -1.0
 
 
+## Drops every queued beat and kills the one playing (so its finished signal never runs the next), and
+## ends box 8's walk.
 func _stop_beats() -> void:
 	_queue.clear()
 	Tweens.kill(_beat)

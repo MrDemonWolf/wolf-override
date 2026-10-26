@@ -127,6 +127,10 @@ var _pulse: float = 0.0
 var _relay_x: float = 0.0
 
 
+## Builds the handle's children once, before it enters the tree: the gearbox piece with its shaft boss
+## on the wheel's hub, the wheel at WHEEL_OFFSET, the MANUAL BYPASS plate with the crank readout in its
+## foot, the COOLANT FAULT tag and the coolant jet (not yet placed: [method place] puts the plates and
+## the jet where they belong).
 func _init() -> void:
 	name = "BypassHandle"
 	# The gearbox under the wheel, its shaft boss on the wheel's hub.
@@ -211,6 +215,9 @@ func clear_fault(cleared: bool, animate: bool) -> void:
 		fault_tag.hide()
 
 
+## While shown: throbs the COOLANT FAULT tag with the alarm (PULSE_SECONDS a cycle, [param delta]
+## seconds a step) while venting, or holds it amber with Reduced Motion, and fades either plate the edge
+## of the view cuts.
 func _process(delta: float) -> void:
 	if not is_visible_in_tree():
 		return
@@ -281,6 +288,9 @@ func show_hold(fraction: float) -> void:
 		wheel.rotation_degrees = target
 
 
+## Turns the wheel to the notch for [member ticks] (TICK_DEGREES each): eased over 0.18 s for a new tick,
+## or set at once at 0 ticks, mid-hold (show_hold turns it on from there) or outside the tree. Called
+## whenever ticks is set to a new value.
 func _turn_wheel() -> void:
 	Tweens.kill(_wheel_tween)
 	# Mid-hold the notch just reached is where the wheel is; show_hold adds the next part turn.
