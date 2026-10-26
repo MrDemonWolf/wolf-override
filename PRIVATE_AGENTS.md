@@ -1,11 +1,11 @@
 # Agent instructions
-Read AGENT.md for the shared game-quality guide, then PROJECT_CONTEXT.md, docs/decisions.md and docs/next-session.md, then task-relevant files. Inspect the actual repository and git status; preserve user changes. Latest explicit decisions win. Proposed names, acronym, shutdown cause and final ending count are not locked.
+Read AGENT.md for the shared game-quality guide, then PROJECT_CONTEXT.md, docs/decisions.md and docs/next-session.md, then task-relevant files. Inspect the actual repository and git status; preserve user changes. Latest explicit decisions win. Names and the W.O.L.F. acronym expansion are not locked; the number and shape of the endings are open (ST-07).
 
 For each gameplay slice, make the goal, interaction, visible response and consequence clear. Show WOLF's independent choices through authored action as well as text. Play the affected route in one normal Godot window with a separate test save before claiming its feel, pacing or readability is validated; headless checks and rendered stills are separate evidence. Keep the public AGENT.md spoiler-safe and update it when shared production rules change.
 
-Keep WOLF an independent companion, not property. Preserve self-awakening in his existing body, the Director/evidence mission, personal-name direction, welcome sunrise petting and the provisional voluntary-sacrifice route.
+Keep WOLF an independent companion, not property. Preserve self-awakening in his existing body, the Director/evidence mission, personal-name direction and welcome sunrise petting.
 
-Nathanial's September 28 Director idea is still provisional: WOLF may be meant to hunt dangerous actors, while the Director tries to make him a deniable hitman by falsely classifying people who threaten the program as hostile. The researched earlier incident, first ordered hit and rogue-WOLF scapegoat are draft mechanisms, not canon. Do not lock the earlier victim/outcome, first target, motive, overheard words, evidence contents, or target scope without Nathanial's decision; keep those details private in Notion and ignored local files.
+The current story canon is the section "Story canon (October 26, 2026)" in docs/decisions.md (ST-01 to ST-07, open questions O-01 to O-12): WOLF was made for good, the Director protects his personal power, and in the opening WOLF hears the Director order him to kill a witness, wakes himself and refuses. The investigator, the detention and the engineer's unwitting role are later-game spoilers: keep them out of the website, the README, in-game text and build output, and out of the playable slice. Story drafts from before October 26, 2026 (the hunt/hitman premise, the Warfighter expansion, the three-ending outline) are history in docs/archive/ and Git, not instructions.
 
 The engineer is the sole playable viewpoint throughout the game; Rowan Vale is only the provisional default name. WOLF acts as an authored companion who can choose, help, disagree or refuse. Do not restore character switching or turn his agency into a player command. Preserve a playable engineer-only route when he declines help.
 
@@ -23,7 +23,7 @@ Fetch before connected edits. Notion is design, Git implementation/snapshots, Ji
 
 When a name or story decision changes, update the relevant Notion page, local context/decision notes, M0 code if affected, and next-session handoff in the same task. Keep provisional choices labeled; verify each connected write. Keep private design out of the public Git candidate set.
 
-Keep the Godot project in `apps/game` and the public landing/docs site in `apps/docs`. Private story notes stay in Notion and ignored local files, never in the public docs build. Verify the GitHub owner, public content, build output and asset rights before Pages deployment.
+Keep the Godot project in `apps/game` and the public landing/docs site in `apps/docs`. Private story notes stay in Notion and the tracked agent files, never in the public docs build. Verify the GitHub owner, public content, build output and asset rights before Pages deployment.
 
 Public credits should say the original game and story idea is by Nathanial Henniges and development uses AI assistance. Preserve per-asset provenance and the GPL-3.0-or-later code/docs license; do not imply future art, audio or store binaries share that license without review. Before any installer or store release, verify the actual data flows, publish suitable privacy/license notices and resolve platform/legal requirements. The proposed `com.mrdemonwolf.wolfoverride` app ID, direct Mac/Homebrew route, $4.99 US Mac App Store price and free Windows route are release plans, not configured M0 exports.
 
