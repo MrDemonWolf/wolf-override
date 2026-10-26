@@ -19,10 +19,10 @@ extends SceneTree
 ## - What the statics touch besides their arguments: the running SceneTree (tree(), and its paused
 ##   flag in free_tools_game); the global Input actions and events (hold, press_for, tap, walk_to,
 ##   walk_to_reading_on, retry, send_key and continue_until (with its two users) press or send them,
-##   and each releases what it pressed
-##   before it returns; tap_now releases on the next process frame instead); user:// files (remove_file and remove_tools_files delete them, write_text
-##   writes one, fresh_save_path, start_game and open_game delete stale save and settings files
-##   before the game starts, end_game deletes the game's own after it is freed); the root's children
+##   and each releases what it pressed before it returns; tap_now releases on the next process frame
+##   instead); user:// files (remove_file and remove_tools_files delete them, write_text writes one,
+##   fresh_save_path, start_game and open_game delete stale save and settings files before the game
+##   starts, end_game deletes the game's own after it is freed); the root's children
 ##   (start_clock adds a GameClock the caller frees, wait_game_seconds adds and frees its own); and
 ##   the process id (in the file names, so suites run side by side do not share files). Nothing else
 ##   is kept between calls: the kit has no static state.
@@ -388,7 +388,8 @@ static func tap(action: StringName, settle_frames: int = 0) -> void:
 ## and must not skip the frames a blocking tap spends. The release is a one-shot process_frame
 ## connection; a connection made while process_frame is being emitted first runs on the next
 ## emission, because Godot calls the connections it had when the emission began. Not for
-## pause_game, which Main reads as an event (see [method tap]).
+## pause_game, which Main reads as an event (see [method tap]). Leave at least one frame between
+## two calls for one action: a press on the frame its last release runs on may be released at once.
 static func tap_now(action: StringName) -> void:
 	Input.action_press(action)
 	tree().process_frame.connect(func() -> void: Input.action_release(action), CONNECT_ONE_SHOT)
