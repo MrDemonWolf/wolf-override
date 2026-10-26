@@ -1548,10 +1548,10 @@ msgid "Safe point restored."
 msgstr "Speicherpunkt wiederhergestellt."
 
 # machine-translated by Claude (Anthropic), unreviewed
-#. TRANSLATORS: The Director's purge display, read as a speaker; WOLF answers in the next message. The records clerk is the witness; no gendered form for them.
+#. TRANSLATORS: The Director's purge display, read as a speaker; WOLF answers in the next message. The records worker is the witness; no gendered form for them.
 #. i18n: story speaker=DIRECTOR
 #: scripts/main.gd:2573
-msgid "Records clerk's archive marked for deletion."
+msgid "Records worker's archive marked for deletion."
 msgstr "Archiv der Archivkraft zur Löschung markiert."
 
 # machine-translated by Claude (Anthropic), unreviewed
@@ -1695,11 +1695,11 @@ msgid "Safe point saved. WOLF remembers the same choice."
 msgstr "Am Speicherpunkt gespeichert. WOLF erinnert sich an dieselbe Entscheidung."
 
 # machine-translated by Claude (Anthropic), unreviewed
-#. TRANSLATORS: %s is the engineer's first name. The clerk is the records clerk, the witness; no gendered form for them.
+#. TRANSLATORS: %s is the engineer's first name. The worker is the records worker, the witness; no gendered form for them.
 #. i18n: story speaker=narrator engineer=name
 #: scripts/main.gd:2832
 #, c-format
-msgid "The Director's purge order has a time and file ID. %s keeps a local copy; the clerk's originals are still missing."
+msgid "The Director's purge order has a time and file ID. %s keeps a local copy; the worker's originals are still missing."
 msgstr "Der Löschbefehl des Direktors enthält eine Uhrzeit und eine Datei-ID. %s behält eine lokale Kopie; die Originale der Archivkraft fehlen noch."
 
 # machine-translated by Claude (Anthropic), unreviewed
@@ -1771,10 +1771,10 @@ msgid "I'm still checking the drive. Wait for me, or tap USE MANUAL PORT."
 msgstr "Ich prüfe das Laufwerk noch. Warte auf mich, oder tippe auf MANUELLEN PORT NUTZEN."
 
 # machine-translated by Claude (Anthropic), unreviewed
-#. TRANSLATORS: The clerk is the records clerk, the witness; no gendered form for them.
+#. TRANSLATORS: The worker is the records worker, the witness; no gendered form for them.
 #. i18n: story speaker=narrator
 #: scripts/main.gd:3154
-msgid "WOLF reads the timestamp off his own readout. The clerk's files existed before the deletion order."
+msgid "WOLF reads the timestamp off his own readout. The worker's files existed before the deletion order."
 msgstr "WOLF liest den Zeitstempel von seiner eigenen Anzeige ab. Die Dateien der Archivkraft existierten schon vor der Löschanweisung."
 
 # machine-translated by Claude (Anthropic), unreviewed
@@ -2703,11 +2703,11 @@ msgid "MIRROR COPIED"
 msgstr "SPIEGEL KOPIERT"
 
 # machine-translated by Claude (Anthropic), unreviewed
-#. TRANSLATORS: The Director, the opening's first line: an order to WOLF, whom he thinks is in standby, to kill a witness, the records clerk. The clerk's gender is not given: use a neutral form where the language has one.
+#. TRANSLATORS: The Director, the opening's first line: an order to WOLF, whom he thinks is in standby, to kill a witness, the records worker. The worker's gender is not given: use a neutral form where the language has one.
 #. i18n: story speaker=DIRECTOR
 #: scripts/story_text.gd:38
-msgid "New order, WOLF. The records clerk is a witness. Kill the clerk tonight."
-msgstr "Neuer Befehl, WOLF. Die Archivkraft kann aussagen. Töte sie heute Nacht."
+msgid "The records worker is a witness. WOLF, when you wake, kill the worker."
+msgstr "Die Archivkraft kann aussagen. WOLF, wenn du erwachst, töte die Archivkraft."
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: i18n: story speaker=narrator
