@@ -41,7 +41,7 @@ Quotes “…”. Plates in capitals keep their accents.
   manual port are *porta de dados* (a bare *porta* reads as a door); the stick is *stick*, and the left
   stick *Stick L*, as Nintendo's Brazilian materials name it.
 - **PR L10's story words (proposals for a reviewer):** the timestamp is *carimbo de data e hora*, WOLF's
-  readout *visor*, the program logs *registros*, and the manual-port answer button USAR PORTA DE DADOS
+  readout *visor*, the records clerk (2026-10-26) *a pessoa arquivista*, and the manual-port answer button USAR PORTA DE DADOS
   MANUAL, the words WOLF's touch line quotes. Where *ela* could mean something else, the line names *a
   sentinela*.
 - **Words cut to fit (PR L10)**: MRDEMONWOLF, INC. PRESENTS is DE MRDEMONWOLF, INC. (APRESENTA ran 3 px

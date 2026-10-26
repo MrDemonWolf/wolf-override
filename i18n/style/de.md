@@ -45,7 +45,7 @@ Quotes „…“.
   valve (*das Ventil*); THE DEN is DER WOLFSBAU, since DER BAU read back as "the build". The sentry is
   *der Wächter*, so German calls it *er*, as the noun's grammar needs.
 - **PR L10's story words (proposals for a reviewer):** the timestamp is *Zeitstempel*, WOLF's readout
-  *Anzeige*, the program logs *Protokolle*, WOLF breaking off *ich breche ab*, and the manual-port answer
+  *Anzeige*, the records clerk (2026-10-26) *die Archivkraft*, WOLF breaking off *ich breche ab*, and the manual-port answer
   button MANUELLEN PORT NUTZEN, the words WOLF's touch line quotes. Wherever *er* or *sein* could read as
   WOLF, the line names *der Wächter*.
 - **Words cut to fit (PR L10)**: MRDEMONWOLF, INC. PRESENTS is VON MRDEMONWOLF, INC. (PRÄSENTIERT ran

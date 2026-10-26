@@ -50,7 +50,7 @@ msgstr "安全地点"
 #. TRANSLATORS: The PAUSE button on the touch layout (88 px) and the Pause action's prompt. ポーズ, the usual game word, rather than 一時停止, which is longer than the 88 px button.
 #. i18n: speaker=ui
 #: scenes/main.tscn
-#: scripts/main.gd:4732
+#: scripts/main.gd:4738
 msgid "PAUSE"
 msgstr "ポーズ"
 
@@ -100,7 +100,7 @@ msgstr "はじめから"
 #. TRANSLATORS: Title button (186 px, 21 px): continue from the saved checkpoint. The same word, with the context 'touch button', is the touch USE button's word for going on through lines (155 px, 23 px). The usual Japanese menu word for continuing from a save; the touch button's CONTINUE is つづける.
 #. i18n: speaker=ui
 #: scenes/main.tscn
-#: scripts/main.gd:1127
+#: scripts/main.gd:1132
 msgid "CONTINUE"
 msgstr "つづきから"
 
@@ -323,8 +323,8 @@ msgstr "タイトルへ"
 #. TRANSLATORS: Credits button (218 px, 19 px) that stops the credits rolling up.
 #. i18n: speaker=ui
 #: scenes/main.tscn
-#: scripts/main.gd:2024
-#: scripts/main.gd:2065
+#: scripts/main.gd:2029
+#: scripts/main.gd:2070
 msgid "PAUSE SCROLL"
 msgstr "スクロール停止"
 
@@ -374,7 +374,7 @@ msgstr "再開"
 #. TRANSLATORS: Pause menu button (350 px, 19 px): leave the run for the title menu.
 #. i18n: speaker=ui
 #: scenes/main.tscn
-#: scripts/main.gd:2243
+#: scripts/main.gd:2248
 msgid "RETURN TO TITLE"
 msgstr "タイトルに戻る"
 
@@ -421,7 +421,7 @@ msgstr "フルスクリーン"
 #. TRANSLATORS: Settings note on a computer build.
 #. i18n: speaker=ui
 #: scenes/main.tscn
-#: scripts/main.gd:2124
+#: scripts/main.gd:2129
 msgid "Window size applies on desktop."
 msgstr "ウィンドウサイズはデスクトップ版のみ。"
 
@@ -1150,7 +1150,7 @@ msgstr "操作を初期設定に戻した。"
 #. TRANSLATORS: Settings error note.
 #. i18n: speaker=ui
 #: scripts/game_settings.gd:862
-#: scripts/main.gd:2164
+#: scripts/main.gd:2169
 msgid "Settings could not be saved."
 msgstr "設定を保存できなかった。"
 
@@ -1335,53 +1335,53 @@ msgstr ""
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: Title button (the width of two buttons) once the slice is finished: start a fresh run.
 #. i18n: speaker=ui
-#: scripts/main.gd:1127
+#: scripts/main.gd:1132
 msgid "PLAY AGAIN"
 msgstr "もう一度プレイ"
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: Title note under PLAY AGAIN (388 px, 15 px). Slice: this playable part of the game. Quote the PLAY AGAIN button exactly. Slice is 体験版 (the playable demo part), here and on the end card.
 #. i18n: speaker=ui
-#: scripts/main.gd:1132
+#: scripts/main.gd:1137
 msgid "Slice complete. PLAY AGAIN starts a fresh run."
 msgstr "体験版クリア。「もう一度プレイ」で最初から。"
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: Title note under CONTINUE (388 px, 15 px).
 #. i18n: speaker=ui
-#: scripts/main.gd:1134
+#: scripts/main.gd:1139
 msgid "Saved checkpoint could not be read."
 msgstr "保存したチェックポイントを読み込めなかった。"
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: Title note under CONTINUE (388 px, 15 px). SAFE POINT is the plate's exact words.
 #. i18n: speaker=ui
-#: scripts/main.gd:1134
+#: scripts/main.gd:1139
 msgid "No checkpoint yet. Saving starts at the first SAFE POINT."
 msgstr "チェックポイントなし。最初の安全地点から保存。"
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: Changelog button text when the browser cannot open (338 px).
 #. i18n: speaker=ui
-#: scripts/main.gd:1157
+#: scripts/main.gd:1162
 msgid "LINK UNAVAILABLE"
 msgstr "リンクを開けない"
 
 # machine-translated by Claude (Anthropic), unreviewed
-#: scripts/main.gd:1178
+#: scripts/main.gd:1183
 msgid "The changelog text is missing from this build. Open the full changelog online."
 msgstr "このビルドには更新履歴のテキストがない。全履歴はオンラインで見られる。"
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: Opens the in-game changelog in every language but English: the changelog itself is not translated.
-#: scripts/main.gd:1181
+#: scripts/main.gd:1186
 msgid "These development updates are written in English only."
 msgstr "開発アップデートは英語のみ。"
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: WOLF, when the hidden name key gives the engineer another of their three names; %s is the full name.
 #. i18n: speaker=WOLF engineer=name
-#: scripts/main.gd:1470
+#: scripts/main.gd:1475
 msgid "%s. That name sounds like you."
 msgstr "%s。その名前、似合ってる。"
 
@@ -1389,7 +1389,7 @@ msgstr "%s。その名前、似合ってる。"
 #. TRANSLATORS: Credits heading (19 px, centred).
 #. i18n: speaker=ui
 #. TRANSLATORS: Heading over the AI disclosure in the credits, in the same capitals as the other headings.
-#: scripts/main.gd:2036
+#: scripts/main.gd:2041
 msgid "AI DISCLOSURE"
 msgstr "AIの使用について"
 
@@ -1397,97 +1397,97 @@ msgstr "AIの使用について"
 #. TRANSLATORS: Credits paragraph (582 px, 19 px, wraps). Translated word for word.
 #. i18n: speaker=ui
 #. TRANSLATORS: The AI disclosure Nathanial Henniges approved word for word (October 19, 2026). Translate it faithfully and in full; do not shorten, soften or add to it. Keep WOLF OVERRIDE, Nathanial Henniges and MrDemonWolf, Inc. as written.
-#: scripts/main.gd:2038
+#: scripts/main.gd:2043
 msgid "WOLF OVERRIDE is a solo project by Nathanial Henniges (MrDemonWolf, Inc.). AI tools were used with careful human oversight to support the creative process for art and code. The story, characters and game design are his, and every AI-assisted asset is reviewed, edited and credited."
 msgstr "WOLF OVERRIDE は Nathanial Henniges（MrDemonWolf, Inc.）による個人プロジェクトです。AI ツールは、人間による入念な監督のもと、アートとコードの創作プロセスを支えるために使われました。ストーリー、キャラクター、ゲームデザインは彼のものであり、AI の支援を受けたアセットはすべてレビュー、編集され、クレジットされています。"
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: Credits button (218 px, 19 px) that starts the credits rolling again.
 #. i18n: speaker=ui
-#: scripts/main.gd:2065
-#: scripts/main.gd:2071
+#: scripts/main.gd:2070
+#: scripts/main.gd:2076
 msgid "RESUME SCROLL"
 msgstr "スクロール再開"
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: Frame-rate cap list item.
 #. i18n: speaker=ui
-#: scripts/main.gd:2104
+#: scripts/main.gd:2109
 msgid "30 FPS"
 msgstr "30 FPS"
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: Frame-rate cap list item.
 #. i18n: speaker=ui
-#: scripts/main.gd:2105
+#: scripts/main.gd:2110
 msgid "60 FPS"
 msgstr "60 FPS"
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: Frame-rate cap list item: no cap.
 #. i18n: speaker=ui
-#: scripts/main.gd:2106
+#: scripts/main.gd:2111
 msgid "UNCAPPED"
 msgstr "無制限"
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: Frame-rate cap list item.
 #. i18n: speaker=ui
-#: scripts/main.gd:2107
+#: scripts/main.gd:2112
 msgid "90 FPS"
 msgstr "90 FPS"
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: Frame-rate cap list item.
 #. i18n: speaker=ui
-#: scripts/main.gd:2108
+#: scripts/main.gd:2113
 msgid "120 FPS"
 msgstr "120 FPS"
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: Frame-rate cap list item.
 #. i18n: speaker=ui
-#: scripts/main.gd:2109
+#: scripts/main.gd:2114
 msgid "144 FPS"
 msgstr "144 FPS"
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: Pause Settings note on a phone or tablet.
 #. i18n: speaker=ui
-#: scripts/main.gd:2124
+#: scripts/main.gd:2129
 msgid "Window size is managed by iOS/Android."
 msgstr "ウィンドウサイズは iOS/Android が管理する。"
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: Pause menu button during the opening sequence (350 px, 19 px).
 #. i18n: speaker=ui
-#: scripts/main.gd:2243
+#: scripts/main.gd:2248
 msgid "SKIP OPENING"
 msgstr "オープニングをスキップ"
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: Pause hint on touch screens.
 #. i18n: speaker=ui engineer=you
-#: scripts/main.gd:2258
+#: scripts/main.gd:2263
 msgid "TAP RESUME TO RETURN"
 msgstr "「再開」をタップで戻る"
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: Pause hint: %s is the Pause key or button's name, then two spaces.
 #. i18n: speaker=ui slot=key
-#: scripts/main.gd:2258
+#: scripts/main.gd:2263
 msgid "%s  RESUME"
 msgstr "%s  再開"
 
 # machine-translated by Claude (Anthropic), unreviewed
-#: scripts/main.gd:2458
+#: scripts/main.gd:2463
 msgid "No valid checkpoint save found. Current game was not changed."
 msgstr "有効なチェックポイントのセーブがない。現在のゲームは変わっていない。"
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: Open glossary term SERVICE JUNCTION: サービスジャンクション, the room card's word; a reviewer's word. Instructions in narration and hints use 〜しよう, which shows no gender and reads as a calm suggestion.
 #. TRANSLATORS: i18n: story speaker=narrator
-#: scripts/main.gd:2515
+#: scripts/main.gd:2520
 msgid ""
 "Service junction restored. The sentry\n"
 "is down; pop the exit bolt by the door."
@@ -1498,7 +1498,7 @@ msgstr ""
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: Open glossary term SERVICE JUNCTION: サービスジャンクション, the room card's word; a reviewer's word.
 #. TRANSLATORS: i18n: story speaker=narrator
-#: scripts/main.gd:2518
+#: scripts/main.gd:2523
 msgid ""
 "Service junction restored. The door is\n"
 "down. The sentry patrols past the rubble."
@@ -1509,240 +1509,241 @@ msgstr ""
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: The service line is サービスライン, matching the junction's サービスジャンクション.
 #. TRANSLATORS: i18n: story speaker=narrator
-#: scripts/main.gd:2524
+#: scripts/main.gd:2529
 msgid "The first copy is safe. Use the exit to follow the service line."
 msgstr "最初のコピーは無事だ。出口からサービスラインをたどろう。"
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: Records access, the room, is 記録アクセス; a trace is 記録.
 #. TRANSLATORS: i18n: story speaker=narrator
-#: scripts/main.gd:2527
+#: scripts/main.gd:2532
 msgid "Records access restored. Both traces are copied; head for the exit."
 msgstr "記録アクセス復旧。記録は両方コピー済み。出口へ向かおう。"
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: i18n: story speaker=narrator
-#: scripts/main.gd:2530
+#: scripts/main.gd:2535
 msgid "Records access restored. The purge order is copied; copy the mirror index next."
 msgstr "記録アクセス復旧。パージ命令はコピー済み。次はミラーインデックスをコピーしよう。"
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: i18n: story speaker=narrator
-#: scripts/main.gd:2533
+#: scripts/main.gd:2538
 msgid "Records access restored. Copy the purge-order trace first; WOLF is checking the mirror."
 msgstr "記録アクセス復旧。まずパージ命令の記録をコピーしよう。WOLFはミラーを調べている。"
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: i18n: story speaker=narrator
-#: scripts/main.gd:2537
+#: scripts/main.gd:2542
 msgid "Safe point restored."
 msgstr "安全地点復旧。"
 
 # machine-translated by Claude (Anthropic), unreviewed
-#. TRANSLATORS: The Director's purge display, read as a speaker; WOLF answers in the next message. A machine display's terse wording.
+#. TRANSLATORS: The Director's purge display, read as a speaker; WOLF answers in the next message. The records clerk is the witness; no gendered form for them.
 #. i18n: story speaker=DIRECTOR
-#: scripts/main.gd:2568
-msgid "Original program logs marked for deletion."
-msgstr "原本プログラムログ：削除対象に指定。"
+#: scripts/main.gd:2573
+msgid "Records clerk's archive marked for deletion."
+msgstr "記録係のアーカイブ：削除対象に指定。"
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: i18n: story speaker=WOLF
-#: scripts/main.gd:2570
+#: scripts/main.gd:2575
 msgid "They want the source record gone. We need to preserve it."
 msgstr "やつらは原本の記録を消したがっている。守らないと。"
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: i18n: story speaker=narrator
-#: scripts/main.gd:2581
+#: scripts/main.gd:2586
 msgid "No station in reach. Follow the labeled breaker, relay, bypass or safe point."
 msgstr "届く範囲にステーションはない。表示のあるブレーカー、リレー、バイパス、安全地点を目指そう。"
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: i18n: story speaker=narrator
-#: scripts/main.gd:2622
+#: scripts/main.gd:2627
 msgid "Power is already on. The relay is farther down the hall."
 msgstr "電源はもう入っている。リレーは通路の先だ。"
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: WOLF thanks the engineer for telling him the relay's risk. Avoid a past tense that shows the engineer's gender ("you told me"). Arm the breaker: ブレーカーを入れる, the everyday Japanese for switching a breaker on.
 #. i18n: story speaker=WOLF engineer=you
-#: scripts/main.gd:2635
+#: scripts/main.gd:2640
 msgid "Thank you for telling me. I'll take the relay. Arm the breaker."
 msgstr "教えてくれて助かる。リレーは俺がやる。ブレーカーを入れてくれ。"
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: i18n: story speaker=WOLF
-#: scripts/main.gd:2639
+#: scripts/main.gd:2644
 msgid "No. I won't take that risk blind. Use the manual bypass."
 msgstr "いや。わからないまま、その危険は冒さない。手動バイパスを使え。"
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: i18n: story speaker=narrator
-#: scripts/main.gd:2652
+#: scripts/main.gd:2657
 msgid "The relay is dark. Arm the breaker first."
 msgstr "リレーに電気が来ていない。先にブレーカーを入れよう。"
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: The seal (the red sealed door) is 封鎖扉 everywhere.
 #. TRANSLATORS: i18n: story speaker=narrator
-#: scripts/main.gd:2656
-#: scripts/main.gd:2699
+#: scripts/main.gd:2661
+#: scripts/main.gd:2704
 msgid "The seal is open. The safe point is just beyond it."
 msgstr "封鎖扉が開いた。安全地点はそのすぐ先だ。"
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: i18n: story speaker=WOLF
-#: scripts/main.gd:2662
+#: scripts/main.gd:2667
 msgid "I said no. I won't touch it blind. The bypass is right beside it."
 msgstr "断ると言った。わからないまま触る気はない。バイパスはすぐ横だ。"
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: i18n: story speaker=WOLF
-#: scripts/main.gd:2674
+#: scripts/main.gd:2679
 msgid "I've got the contact. Give me a moment."
 msgstr "接点は押さえた。少し待ってくれ。"
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: i18n: story speaker=narrator
-#: scripts/main.gd:2686
+#: scripts/main.gd:2691
 msgid "WOLF takes the surge through the live contact. The red seal opens."
 msgstr "WOLFが通電中の接点でサージを受け止める。赤い封鎖扉が開く。"
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: i18n: story speaker=narrator
-#: scripts/main.gd:2702
+#: scripts/main.gd:2707
 msgid "The bypass handle won't move. The breaker has to be on first."
 msgstr "バイパスのハンドルが動かない。先にブレーカーを入れる必要がある。"
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: i18n: story speaker=narrator
-#: scripts/main.gd:2759
+#: scripts/main.gd:2764
 msgid "The bypass locks over and the alarm cuts out. The red seal opens."
 msgstr "バイパスが切り替わって固定され、警報が止まる。赤い封鎖扉が開く。"
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: i18n: story speaker=WOLF
-#: scripts/main.gd:2761
+#: scripts/main.gd:2766
 msgid "Open. I'm with you."
 msgstr "開いた。一緒に行く。"
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: i18n: story speaker=narrator
-#: scripts/main.gd:2772
+#: scripts/main.gd:2777
 msgid "The safe point is past the sealed door."
 msgstr "安全地点は封鎖扉の先だ。"
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: WOLF, after the engineer pressed him at the relay without warning.
 #. i18n: story speaker=WOLF
-#: scripts/main.gd:2786
+#: scripts/main.gd:2791
 msgid "I refused the live relay; I'm still here."
 msgstr "通電中のリレーは断った。それでも俺はここにいる。"
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: WOLF to the engineer, who told him the relay's risk. Avoid a past tense that shows the engineer's gender ("you told me").
 #. i18n: story speaker=WOLF engineer=you
-#: scripts/main.gd:2789
+#: scripts/main.gd:2794
 msgid "I took the relay because you told me the truth."
 msgstr "本当のことを話してくれたから、リレーを引き受けた。"
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: WOLF to the engineer, who cranked the manual bypass after he offered to take the relay. Avoid a past tense that shows the engineer's gender ("you cranked").
 #. i18n: story speaker=WOLF engineer=you
-#: scripts/main.gd:2792
+#: scripts/main.gd:2797
 msgid "I offered the relay; you cranked the bypass. Still with you."
 msgstr "俺はリレーを申し出た。それでもバイパスを回したな。今も一緒だ。"
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: Purge is パージ throughout (queue, order, display).
 #. TRANSLATORS: i18n: story speaker=WOLF
-#: scripts/main.gd:2795
+#: scripts/main.gd:2800
 msgid "Take the purge queue. I'll inspect the mirror."
 msgstr "パージキューは任せる。俺はミラーを調べる。"
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: Hint bar (14 px, about 526 px wide on a keyboard and 488 px on touch; wraps). %s is the key or button.
 #. i18n: speaker=hint engineer=you slot=key
-#: scripts/main.gd:2804
+#: scripts/main.gd:2809
 msgid "The safe point could not save. Press %s here again."
 msgstr "安全地点で保存できなかった。ここでもう一度 %s を押そう。"
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: Hint bar (14 px, about 526 px wide on a keyboard and 488 px on touch; wraps). The touch form; USE is the touch button's word (USAR).
 #. i18n: speaker=hint engineer=you
-#: scripts/main.gd:2804
+#: scripts/main.gd:2809
 msgid "The safe point could not save. Tap USE here again."
 msgstr "安全地点で保存できなかった。ここでもう一度「使う」をタップしよう。"
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: i18n: story speaker=narrator
-#: scripts/main.gd:2815
+#: scripts/main.gd:2820
 msgid "Safe point saved."
 msgstr "安全地点で保存した。"
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: i18n: story speaker=narrator
-#: scripts/main.gd:2818
+#: scripts/main.gd:2823
 msgid "Safe point saved. WOLF remembers the same choice."
 msgstr "安全地点で保存した。WOLFも同じ選択を覚えている。"
 
 # machine-translated by Claude (Anthropic), unreviewed
-#. TRANSLATORS: %s is the engineer's first name.
+#. TRANSLATORS: %s is the engineer's first name. The clerk is the records clerk, the witness; no gendered form for them.
 #. i18n: story speaker=narrator engineer=name
-#: scripts/main.gd:2827
-msgid "The Director's purge order has a time and target ID. %s keeps a local copy; the original logs are still missing."
-msgstr "所長のパージ命令には時刻と対象IDがある。%sはローカルにコピーを残す。原本のログはまだ見つからない。"
+#: scripts/main.gd:2832
+#, c-format
+msgid "The Director's purge order has a time and file ID. %s keeps a local copy; the clerk's originals are still missing."
+msgstr "所長のパージ命令には時刻とファイルIDがある。%sはローカルにコピーを残す。記録係の原本はまだ見つからない。"
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: i18n: story speaker=narrator
-#: scripts/main.gd:2830
+#: scripts/main.gd:2835
 msgid "The purge-order trace is already copied. The mirror port may confirm when the source existed."
 msgstr "パージ命令の記録はもうコピーした。ミラーポートで、原本がいつ存在したか確かめられるかもしれない。"
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: i18n: story speaker=narrator
-#: scripts/main.gd:2836
+#: scripts/main.gd:2841
 msgid "The mirror index has no context yet. Copy the purge-order trace first."
 msgstr "ミラーインデックスだけでは、まだ意味をなさない。先にパージ命令の記録をコピーしよう。"
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: i18n: story speaker=narrator
-#: scripts/main.gd:2839
+#: scripts/main.gd:2844
 msgid "The mirror timestamp is already preserved. The exit is to the right."
 msgstr "ミラーのタイムスタンプは保存済み。出口は右だ。"
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: WOLF's readout is ディスプレイ, his display, as in the answer USE WOLF'S READOUT.
 #. TRANSLATORS: i18n: story speaker=WOLF
-#: scripts/main.gd:2848
+#: scripts/main.gd:2853
 msgid "I found the mirror index. We can use my readout or your maintenance port."
 msgstr "ミラーインデックスを見つけた。俺のディスプレイを使うか、そっちの整備ポートを使うかだ。"
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: i18n: story speaker=narrator
-#: scripts/main.gd:2877
+#: scripts/main.gd:2882
 msgid "Exit sealed until the purge order and mirror timestamp are copied."
 msgstr "パージ命令とミラーのタイムスタンプをコピーするまで、出口は封鎖されている。"
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: Hint bar (14 px, about 526 px wide on a keyboard and 488 px on touch; wraps).
 #. i18n: speaker=hint engineer=you
-#: scripts/main.gd:2914
-#: scripts/main.gd:5377
+#: scripts/main.gd:2919
+#: scripts/main.gd:5383
 msgid "Mirror copied. Head for the exit."
 msgstr "ミラーをコピーした。出口へ向かおう。"
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: Hint bar (14 px, about 526 px wide on a keyboard and 488 px on touch; wraps).
 #. i18n: speaker=hint engineer=you
-#: scripts/main.gd:2916
+#: scripts/main.gd:2921
 msgid "Follow the station lights: mirror port, then exit."
 msgstr "ステーションの明かりをたどろう：ミラーポート、次に出口。"
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: Hint bar (14 px, about 526 px wide on a keyboard and 488 px on touch; wraps).
 #. i18n: speaker=hint engineer=you
-#: scripts/main.gd:2917
+#: scripts/main.gd:2922
 msgid "Follow the station lights: purge queue, mirror port, then exit."
 msgstr "ステーションの明かりをたどろう：パージキュー、ミラーポート、次に出口。"
 
@@ -1750,59 +1751,60 @@ msgstr "ステーションの明かりをたどろう：パージキュー、ミ
 #. TRANSLATORS: WOLF's line in the dialogue box (after the WOLF: tag). %s is the second answer's key or button.
 #. TRANSLATORS: WOLF, still walking to the mirror. %s is the key or button for the manual port.
 #. i18n: story speaker=WOLF slot=key
-#: scripts/main.gd:3133
+#: scripts/main.gd:3138
 msgid "I'm still checking the drive. Wait for me, or press %s for the manual port."
 msgstr "まだドライブを確認中だ。待つか、%s で手動ポートを使え。"
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: WOLF, still walking to the mirror, touch form. USE MANUAL PORT is the answer button's text: use its translation here.
 #. i18n: story speaker=WOLF
-#: scripts/main.gd:3136
+#: scripts/main.gd:3141
 msgid "I'm still checking the drive. Wait for me, or tap USE MANUAL PORT."
 msgstr "まだドライブを確認中だ。待つか、「手動ポートを使う」をタップしろ。"
 
 # machine-translated by Claude (Anthropic), unreviewed
-#. TRANSLATORS: i18n: story speaker=narrator
-#: scripts/main.gd:3148
-msgid "WOLF reads the timestamp off his own readout. The purge target existed before the deletion order."
-msgstr "WOLFが自分のディスプレイからタイムスタンプを読み取る。パージ対象は削除命令より前から存在していた。"
+#. TRANSLATORS: The clerk is the records clerk, the witness; no gendered form for them.
+#. i18n: story speaker=narrator
+#: scripts/main.gd:3154
+msgid "WOLF reads the timestamp off his own readout. The clerk's files existed before the deletion order."
+msgstr "WOLFが自分のディスプレイからタイムスタンプを読み取る。記録係のファイルは削除命令より前から存在していた。"
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: %s is the engineer's first name.
 #. i18n: story speaker=narrator engineer=name
-#: scripts/main.gd:3152
+#: scripts/main.gd:3158
 msgid "%s copies the timestamp through the maintenance port. WOLF keeps watch."
 msgstr "%sが整備ポートからタイムスタンプをコピーする。WOLFが見張る。"
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: Hint bar (14 px, about 526 px wide on a keyboard and 488 px on touch; wraps).
 #. i18n: speaker=hint engineer=you
-#: scripts/main.gd:3168
+#: scripts/main.gd:3174
 msgid "Save failed. Use a station to try again."
 msgstr "保存に失敗。ステーションを使ってもう一度。"
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: The relief vent is 放圧口 (pressure-release opening) everywhere.
 #. TRANSLATORS: i18n: story speaker=narrator
-#: scripts/main.gd:3238
+#: scripts/main.gd:3244
 msgid "The overload breaker catches and the line starts to build. If the LINE gauge peaks, the relief vent lets go."
 msgstr "過負荷ブレーカーが入り、ラインの圧力が上がり始める。ラインのゲージが最大になると、放圧口が噴き出す。"
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: i18n: story speaker=narrator
-#: scripts/main.gd:3253
+#: scripts/main.gd:3259
 msgid "The wheel is stiff. Three full turns charge the door."
 msgstr "ハンドルが固い。3回転で扉がチャージされる。"
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: i18n: story speaker=narrator
-#: scripts/main.gd:3262
+#: scripts/main.gd:3268
 msgid "Relief vent. It lets go when the gauge peaks; don't be standing on it."
 msgstr "放圧口だ。ゲージが最大になると噴き出す。上に立っていないこと。"
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: i18n: story speaker=narrator
-#: scripts/main.gd:3271
+#: scripts/main.gd:3277
 msgid ""
 "No station in reach. The exit bolt is\n"
 "by the door."
@@ -1810,7 +1812,7 @@ msgstr "届く範囲にステーションはない。出口ボルトは扉のそ
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: i18n: story speaker=narrator
-#: scripts/main.gd:3274
+#: scripts/main.gd:3280
 msgid ""
 "No station in reach. The TANK RELEASE\n"
 "is past the rubble."
@@ -1818,78 +1820,78 @@ msgstr "届く範囲にステーションはない。タンク投下はがれき
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: i18n: story speaker=narrator
-#: scripts/main.gd:3277
+#: scripts/main.gd:3283
 msgid "No station in reach. The breaker is by the entrance, the valve by the door."
 msgstr "届く範囲にステーションはない。ブレーカーは入口のそば、バルブは扉のそばだ。"
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: i18n: story speaker=narrator
-#: scripts/main.gd:3449
+#: scripts/main.gd:3455
 msgid "The clamp lets go."
 msgstr "クランプが外れる。"
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: i18n: story speaker=narrator
-#: scripts/main.gd:3540
+#: scripts/main.gd:3546
 msgid "SERVICE LINE CLEARED."
 msgstr "サービスライン開通。"
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: Archive, the next area, is アーカイブ.
 #. TRANSLATORS: i18n: story speaker=WOLF
-#: scripts/main.gd:3542
+#: scripts/main.gd:3548
 msgid "It's quiet now. The line runs on toward Archive."
 msgstr "静かになった。ラインはアーカイブへ続いている。"
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: The engineer speaks in plain, neutral form: no 僕, 俺, あたし or わ.
 #. TRANSLATORS: i18n: story speaker=engineer engineer=self
-#: scripts/main.gd:3544
+#: scripts/main.gd:3550
 msgid "Then that's where we go."
 msgstr "なら、そこへ行こう。"
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: i18n: story speaker=WOLF
-#: scripts/main.gd:3808
+#: scripts/main.gd:3814
 msgid "It passes under that tank on every patrol. How do we bring it down?"
 msgstr "あいつは巡回のたびに、あのタンクの下を通る。どうやって仕留める？"
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: i18n: story speaker=narrator
-#: scripts/main.gd:3922
+#: scripts/main.gd:3928
 msgid "The winch has the tank back on the clamp. The TANK RELEASE is ready again."
 msgstr "ウインチがタンクをクランプに戻した。タンク投下はまた使える。"
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: i18n: story speaker=narrator
-#: scripts/main.gd:3954
+#: scripts/main.gd:3960
 msgid "FUSE LIT. Back away from the door, past the valve."
 msgstr "導火線に点火。扉から離れて、バルブの先まで下がろう。"
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: The valve's turns so far and the turns needed (3).
 #. i18n: story speaker=narrator
-#: scripts/main.gd:3958
+#: scripts/main.gd:3964
 msgid "The valve gives. %d of %d turns."
 msgstr "バルブが動く。%d/%d回転。"
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: i18n: story speaker=narrator
-#: scripts/main.gd:3978
+#: scripts/main.gd:3984
 msgid "The relief vent lets go and the breaker trips. Reset the breaker and crank faster this time."
 msgstr "放圧口が噴き出し、ブレーカーが落ちる。ブレーカーを戻して、今度はもっと速く回そう。"
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: Touch layout's USE button word (155 px, 23 px). Shown on the knockdown card.
 #. i18n: speaker=ui
-#: scripts/main.gd:4741
+#: scripts/main.gd:4747
 msgid "RETRY"
 msgstr "リトライ"
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: Title button (186 px, 21 px): continue from the saved checkpoint. The same word, with the context 'touch button', is the touch USE button's word for going on through lines (155 px, 23 px).
 #. i18n: speaker=ui
-#: scripts/main.gd:4741
+#: scripts/main.gd:4747
 msgctxt "touch button"
 msgid "CONTINUE"
 msgstr "つづける"
@@ -1897,101 +1899,101 @@ msgstr "つづける"
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: Touch layout's USE button word (155 px, 23 px). Turn a crank or valve.
 #. i18n: speaker=ui
-#: scripts/main.gd:4741
+#: scripts/main.gd:4747
 msgid "CRANK"
 msgstr "回す"
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: Touch layout's USE button word (155 px, 23 px). Drop the hanging tank.
 #. i18n: speaker=ui
-#: scripts/main.gd:4741
+#: scripts/main.gd:4747
 msgid "DROP"
 msgstr "落とす"
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: The touch layout's interact button (155 px, 23 px): use the machine in front of you.
 #. i18n: speaker=ui
-#: scripts/main.gd:4741
-#: scripts/main.gd:4752
+#: scripts/main.gd:4747
+#: scripts/main.gd:4758
 msgid "USE"
 msgstr "使う"
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: Tutorial row (17 px). %s is the keys or the touch arrows; two spaces after it.
 #. i18n: speaker=hint engineer=you slot=key
-#: scripts/main.gd:4751
+#: scripts/main.gd:4757
 msgid "%s  MOVE"
 msgstr "%s  移動"
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: Tutorial row (17 px) on a controller. Stick and D-pad (十字キー), as in the CONTROLS table.
 #. i18n: speaker=hint engineer=you
-#: scripts/main.gd:4751
+#: scripts/main.gd:4757
 msgid "STICK / D-PAD MOVE"
 msgstr "スティック / 十字キーで移動"
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: Tutorial row (17 px). %s is the interact key or the USE button; two spaces after it.
 #. i18n: speaker=hint engineer=you slot=key
-#: scripts/main.gd:4752
+#: scripts/main.gd:4758
 msgid "%s  READ DISPLAY (optional)"
 msgstr "%s  ディスプレイを読む（任意）"
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: Tutorial row (17 px).
 #. i18n: speaker=hint engineer=you
-#: scripts/main.gd:4756
+#: scripts/main.gd:4762
 msgid "Head right to the breaker."
 msgstr "右のブレーカーへ向かおう。"
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: Tutorial row (17 px) under READ DISPLAY (optional).
 #. i18n: speaker=hint engineer=you
-#: scripts/main.gd:4761
+#: scripts/main.gd:4767
 msgid "Or head right to the breaker."
 msgstr "または、右のブレーカーへ向かおう。"
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: The opening's top card, over WOLF OVERRIDE. A clock time and the place. CONTAINMENT, the place, is 収容区画 (containment section).
 #. i18n: speaker=ui
-#: scripts/main.gd:4769
+#: scripts/main.gd:4775
 msgid "03:17 / CONTAINMENT"
 msgstr "03:17 / 収容区画"
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: The opening's prompt on touch: the touch button's CONTINUE word and the PAUSE button.
 #. i18n: speaker=hint engineer=you
-#: scripts/main.gd:4770
+#: scripts/main.gd:4776
 msgid "TAP CONTINUE  /  PAUSE"
 msgstr "「つづける」をタップ  /  ポーズ"
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: The opening's prompt: two keys or buttons, each followed by two spaces and its action; four spaces between.
 #. i18n: speaker=hint engineer=you slot=key
-#: scripts/main.gd:4770
+#: scripts/main.gd:4776
 msgid "%s  CONTINUE    %s  PAUSE"
 msgstr "%s  つづける    %s  ポーズ"
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: Second row of the opening's first prompt: Pause offers SKIP OPENING.
 #. i18n: speaker=hint engineer=you
-#: scripts/main.gd:4773
+#: scripts/main.gd:4779
 msgid "PAUSE: skip the opening"
 msgstr "ポーズ：オープニングをスキップ"
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: A room's name on the top card (ALL CAPS). Glossary term, open for ja: サービスジャンクション chosen here (the junction where the base's service lines meet, in the katakana Japanese games use for such rooms); a reviewer's word.
 #. i18n: speaker=ui
-#: scripts/main.gd:4779
-#: scripts/main.gd:4812
+#: scripts/main.gd:4785
+#: scripts/main.gd:4818
 msgid "SERVICE JUNCTION"
 msgstr "サービスジャンクション"
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: Top card objective when the junction is done (ALL CAPS).
 #. i18n: speaker=ui
-#: scripts/main.gd:4779
-#: scripts/main.gd:5532
+#: scripts/main.gd:4785
+#: scripts/main.gd:5538
 msgid "SERVICE LINE CLEARED"
 msgstr "サービスライン開通"
 
@@ -1999,7 +2001,7 @@ msgstr "サービスライン開通"
 #. TRANSLATORS: The name card: %s is the engineer's first name in capitals, then their job. 整備エンジニア names the job with no gender. エンジニア is a job word with no gender in Japanese.
 #. TRANSLATORS: The engineer's name card: %s is their full name in capitals, then their job on its own row. The engineer is non-binary: use a job word with no gender (a department or field noun), never a masculine or feminine one.
 #. i18n: engineer=name,third keep-breaks
-#: scripts/main.gd:4802
+#: scripts/main.gd:4808
 msgid ""
 "%s\n"
 "MAINTENANCE ENGINEER"
@@ -2010,48 +2012,48 @@ msgstr ""
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: Top card location (ALL CAPS): the room, then the chapter.
 #. i18n: speaker=ui
-#: scripts/main.gd:4812
+#: scripts/main.gd:4818
 msgid "RECORDS ACCESS / FIRST COPY"
 msgstr "記録アクセス / 最初のコピー"
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: Top card location (ALL CAPS). LOCKDOWN as on the title's chapter line (ロックダウン).
 #. i18n: speaker=ui
-#: scripts/main.gd:4812
+#: scripts/main.gd:4818
 msgid "MAINTENANCE / LOCKDOWN"
 msgstr "整備区画 / ロックダウン"
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: Hint bar (14 px, about 526 px wide on a keyboard and 488 px on touch; wraps). Shown for two seconds after a save.
 #. i18n: speaker=hint
-#: scripts/main.gd:4817
+#: scripts/main.gd:4823
 msgid "Checkpoint saved."
 msgstr "チェックポイントを保存した。"
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: The knockdown card's prompt on touch: the RETRY button's word.
 #. i18n: speaker=hint engineer=you
-#: scripts/main.gd:4822
+#: scripts/main.gd:4828
 msgid "TAP RETRY"
 msgstr "「リトライ」をタップ"
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: The knockdown card's prompt: the key or button, two spaces, the action.
 #. i18n: speaker=hint engineer=you slot=key
-#: scripts/main.gd:4822
+#: scripts/main.gd:4828
 msgid "%s  RETRY"
 msgstr "%s  リトライ"
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: The Director's name over his lines, in capitals.
-#: scripts/main.gd:4876
+#: scripts/main.gd:4882
 msgctxt "speaker"
 msgid "DIRECTOR"
 msgstr "所長"
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: The name over the purge display's line: the Director's name, a slash and the display's name, in capitals.
-#: scripts/main.gd:4878
+#: scripts/main.gd:4884
 msgctxt "speaker"
 msgid "DIRECTOR / PURGE"
 msgstr "所長 / パージ"
@@ -2059,149 +2061,149 @@ msgstr "所長 / パージ"
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: Fills the held-key token of a hint (HOLD E): %s is the key or button. The key first, as Japanese prompts write it (長押し, hold down).
 #. i18n: speaker=hint engineer=you slot=key
-#: scripts/main.gd:4909
+#: scripts/main.gd:4915
 msgid "HOLD %s"
 msgstr "%s 長押し"
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: Prompt on touch to go on through lines: the touch button's CONTINUE word.
 #. i18n: speaker=hint engineer=you
-#: scripts/main.gd:4918
+#: scripts/main.gd:4924
 msgid "TAP CONTINUE"
 msgstr "「つづける」をタップ"
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: Prompt to go on through lines: the key or button, two spaces, the action.
 #. i18n: speaker=hint engineer=you slot=key
-#: scripts/main.gd:4918
+#: scripts/main.gd:4924
 msgid "%s  CONTINUE"
 msgstr "%s  つづける"
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: Hint bar (14 px, about 526 px wide on a keyboard and 488 px on touch; wraps). %s is the key, button or touch word the player uses (it is filled in after translation); keep it first and keep the colon. The colon is the full-width ：, the colon of Japanese text.
 #. i18n: speaker=hint engineer=you slot=key
-#: scripts/main.gd:5371
-#: scripts/main.gd:5412
+#: scripts/main.gd:5377
+#: scripts/main.gd:5418
 msgid "%s: continue."
 msgstr "%s：つづける。"
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: Hint bar (14 px, about 526 px wide on a keyboard and 488 px on touch; wraps). %s is the key, button or touch word the player uses (it is filled in after translation); keep it first and keep the colon. Archive is the next area's name.
 #. i18n: speaker=hint engineer=you slot=key
-#: scripts/main.gd:5371
+#: scripts/main.gd:5377
 msgid "%s: follow the service line toward Archive."
 msgstr "%s：サービスラインをたどってアーカイブへ。"
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: Hint bar (14 px, about 526 px wide on a keyboard and 488 px on touch; wraps).
 #. i18n: speaker=hint engineer=you
-#: scripts/main.gd:5372
+#: scripts/main.gd:5378
 msgid "The exit is open. Head right to follow the service line."
 msgstr "出口が開いた。右へ進んでサービスラインをたどろう。"
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: Hint bar (14 px, about 526 px wide on a keyboard and 488 px on touch; wraps). %s is the key, button or touch word the player uses (it is filled in after translation); keep it first and keep the colon.
 #. i18n: speaker=hint engineer=you slot=key
-#: scripts/main.gd:5374
+#: scripts/main.gd:5380
 msgid "%s: copy the purge-order trace."
 msgstr "%s：パージ命令の記録をコピー。"
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: Hint bar (14 px, about 526 px wide on a keyboard and 488 px on touch; wraps).
 #. i18n: speaker=hint engineer=you
-#: scripts/main.gd:5374
+#: scripts/main.gd:5380
 msgid "Purge order copied. Find the mirror port."
 msgstr "パージ命令をコピーした。ミラーポートを探そう。"
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: Hint bar (14 px, about 526 px wide on a keyboard and 488 px on touch; wraps). %s is the key, button or touch word the player uses (it is filled in after translation); keep it first and keep the colon.
 #. i18n: speaker=hint engineer=you slot=key
-#: scripts/main.gd:5378
+#: scripts/main.gd:5384
 msgid "%s: examine the mirror port."
 msgstr "%s：ミラーポートを調べる。"
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: Hint bar (14 px, about 526 px wide on a keyboard and 488 px on touch; wraps).
 #. i18n: speaker=hint engineer=you
-#: scripts/main.gd:5378
+#: scripts/main.gd:5384
 msgid "Copy the purge order first."
 msgstr "先にパージ命令をコピーしよう。"
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: Hint bar (14 px, about 526 px wide on a keyboard and 488 px on touch; wraps). %s is the key, button or touch word the player uses (it is filled in after translation); keep it first and keep the colon.
 #. i18n: speaker=hint engineer=you slot=key
-#: scripts/main.gd:5381
+#: scripts/main.gd:5387
 msgid "%s: secure the first copy in the container."
 msgstr "%s：最初のコピーをコンテナに確保。"
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: Hint bar (14 px, about 526 px wide on a keyboard and 488 px on touch; wraps).
 #. i18n: speaker=hint engineer=you
-#: scripts/main.gd:5381
+#: scripts/main.gd:5387
 msgid "Preserve both traces before leaving."
 msgstr "出る前に、両方の記録を保存しよう。"
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: Hint bar (14 px, about 526 px wide on a keyboard and 488 px on touch; wraps). %s is the key, button or touch word the player uses (it is filled in after translation); keep it first and keep the colon. The Director is he.
 #. i18n: speaker=hint engineer=you slot=key
-#: scripts/main.gd:5384
+#: scripts/main.gd:5390
 msgid "%s: enter records access. The Director's purge is still running."
 msgstr "%s：記録アクセスに入る。所長のパージはまだ進行中だ。"
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: Hint bar (14 px, about 526 px wide on a keyboard and 488 px on touch; wraps). %s is the key, button or touch word the player uses (it is filled in after translation); keep it first and keep the colon.
 #. i18n: speaker=hint engineer=you slot=key
-#: scripts/main.gd:5384
-#: scripts/main.gd:5392
+#: scripts/main.gd:5390
+#: scripts/main.gd:5398
 msgid "%s: read the Director's purge display."
 msgstr "%s：所長のパージ表示を読む。"
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: Hint bar (14 px, about 526 px wide on a keyboard and 488 px on touch; wraps).
 #. i18n: speaker=hint engineer=you
-#: scripts/main.gd:5384
+#: scripts/main.gd:5390
 msgid "Return to the safe point to enter records access."
 msgstr "安全地点に戻って記録アクセスに入ろう。"
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: Hint bar (14 px, about 526 px wide on a keyboard and 488 px on touch; wraps). The seal is the sealed door (OPEN THE SEAL): 封鎖扉, here and in the objective.
 #. i18n: speaker=hint
-#: scripts/main.gd:5387
+#: scripts/main.gd:5393
 msgid "The seal is opening."
 msgstr "封鎖扉が開いていく。"
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: Hint bar (14 px, about 526 px wide on a keyboard and 488 px on touch; wraps). %s is the key, button or touch word the player uses (it is filled in after translation); keep it first and keep the colon.
 #. i18n: speaker=hint engineer=you slot=key
-#: scripts/main.gd:5389
+#: scripts/main.gd:5395
 msgid "%s: save at the safe point."
 msgstr "%s：安全地点で保存。"
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: Hint bar (14 px, about 526 px wide on a keyboard and 488 px on touch; wraps).
 #. i18n: speaker=hint engineer=you
-#: scripts/main.gd:5390
+#: scripts/main.gd:5396
 msgid "The seal is open. Move to the safe point."
 msgstr "封鎖扉が開いた。安全地点へ向かおう。"
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: Hint bar (14 px, about 526 px wide on a keyboard and 488 px on touch; wraps). WOLF is he.
 #. i18n: speaker=hint
-#: scripts/main.gd:5394
+#: scripts/main.gd:5400
 msgid "WOLF is moving to the contact."
 msgstr "WOLFが接点へ向かっている。"
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: Hint bar (14 px, about 526 px wide on a keyboard and 488 px on touch; wraps).
 #. i18n: speaker=hint engineer=you
-#: scripts/main.gd:5397
+#: scripts/main.gd:5403
 msgid "The bypass is dead. Arm the breaker first."
 msgstr "バイパスに電気が来ていない。先にブレーカーを入れよう。"
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: Hint bar (14 px, about 526 px wide on a keyboard and 488 px on touch; wraps). %s is the key, button or touch word the player uses (it is filled in after translation); keep it first and keep the colon. %d of %d: turns so far and turns needed.
 #. i18n: speaker=hint engineer=you slot=key
-#: scripts/main.gd:5399
+#: scripts/main.gd:5405
 msgid "%s: crank the manual bypass, %d of %d."
 msgstr "%s：手動バイパスを回す（%d/%d）。"
 
@@ -2209,418 +2211,418 @@ msgstr "%s：手動バイパスを回す（%d/%d）。"
 #. TRANSLATORS: Hint bar (14 px, about 526 px wide on a keyboard and 488 px on touch; wraps). %s is the key, button or touch word the player uses (it is filled in after translation); keep it first and keep the colon. 'Yourself': 自分で, which shows no gender.
 #. TRANSLATORS: %s is the key or button to hold. "Yourself" must not show the engineer's gender (no сам/сама, sam/sama): rephrase.
 #. i18n: speaker=hint engineer=you slot=key
-#: scripts/main.gd:5404
+#: scripts/main.gd:5410
 msgid "%s: crank it yourself, or let WOLF take the relay."
 msgstr "%s：自分で回すか、リレーをWOLFに任せる。"
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: Hint bar (14 px, about 526 px wide on a keyboard and 488 px on touch; wraps). %s is the key, button or touch word the player uses (it is filled in after translation); keep it first and keep the colon. %d of %d: turns so far and turns needed.
 #. i18n: speaker=hint engineer=you slot=key
-#: scripts/main.gd:5405
+#: scripts/main.gd:5411
 msgid "%s: crank on, %d of %d, or let WOLF take the relay."
 msgstr "%s：回し続ける（%d/%d）か、リレーをWOLFに任せる。"
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: Hint bar (14 px, about 526 px wide on a keyboard and 488 px on touch; wraps). MANUAL BYPASS is a station plate: BYPASS MANUAL (the plate is not in the template yet). MANUAL BYPASS, the plate, is 手動バイパス.
 #. i18n: speaker=hint engineer=you
-#: scripts/main.gd:5408
+#: scripts/main.gd:5414
 msgid "The breaker is live. Go to the MANUAL BYPASS by the relay."
 msgstr "ブレーカーが入った。リレーのそばの手動バイパスへ。"
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: Hint bar (14 px, about 526 px wide on a keyboard and 488 px on touch; wraps).
 #. i18n: speaker=hint engineer=you
-#: scripts/main.gd:5408
+#: scripts/main.gd:5414
 msgid "The breaker is live. Go to the coolant relay."
 msgstr "ブレーカーが入った。冷却材リレーへ向かおう。"
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: Hint bar (14 px, about 526 px wide on a keyboard and 488 px on touch; wraps). %s is the key, button or touch word the player uses (it is filled in after translation); keep it first and keep the colon.
 #. i18n: speaker=hint engineer=you slot=key
-#: scripts/main.gd:5413
+#: scripts/main.gd:5419
 msgid "%s: talk to WOLF about the relay."
 msgstr "%s：リレーについてWOLFと話す。"
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: Hint bar (14 px, about 526 px wide on a keyboard and 488 px on touch; wraps). %s is the key, button or touch word the player uses (it is filled in after translation); keep it first and keep the colon.
 #. i18n: speaker=hint engineer=you slot=key
-#: scripts/main.gd:5413
+#: scripts/main.gd:5419
 msgid "%s: arm the breaker."
 msgstr "%s：ブレーカーを入れる。"
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: Hint bar (14 px, about 526 px wide on a keyboard and 488 px on touch; wraps).
 #. i18n: speaker=hint engineer=you
-#: scripts/main.gd:5416
+#: scripts/main.gd:5422
 msgid "The relay is dark. Return to the breaker first."
 msgstr "リレーに電気が来ていない。まずブレーカーに戻ろう。"
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: Hint bar (14 px, about 526 px wide on a keyboard and 488 px on touch; wraps). MANUAL BYPASS is a station plate: BYPASS MANUAL (the plate is not in the template yet). WOLF is he.
 #. i18n: speaker=hint engineer=you
-#: scripts/main.gd:5417
+#: scripts/main.gd:5423
 msgid "WOLF refused the live contact. Use the MANUAL BYPASS beside it."
 msgstr "WOLFは通電中の接点を断った。すぐ横の手動バイパスを使おう。"
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: Hint bar (14 px, about 526 px wide on a keyboard and 488 px on touch; wraps). %s is the key, button or touch word the player uses (it is filled in after translation); keep it first and keep the colon.
 #. i18n: speaker=hint engineer=you slot=key
-#: scripts/main.gd:5417
+#: scripts/main.gd:5423
 msgid "%s: signal WOLF to take the contact."
 msgstr "%s：WOLFに接点を任せる合図。"
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: Hint bar (14 px, about 526 px wide on a keyboard and 488 px on touch; wraps). MANUAL BYPASS is a station plate: BYPASS MANUAL (the plate is not in the template yet).
 #. i18n: speaker=hint engineer=you
-#: scripts/main.gd:5419
+#: scripts/main.gd:5425
 msgid "Go to the MANUAL BYPASS beside the relay."
 msgstr "リレーの横の手動バイパスへ向かおう。"
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: Hint bar (14 px, about 526 px wide on a keyboard and 488 px on touch; wraps). WOLF is he.
 #. i18n: speaker=hint engineer=you
-#: scripts/main.gd:5419
+#: scripts/main.gd:5425
 msgid "Go to the coolant relay. WOLF is ready for the contact."
 msgstr "冷却材リレーへ向かおう。WOLFは接点に備えている。"
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: Hint bar (14 px, about 526 px wide on a keyboard and 488 px on touch; wraps).
 #. i18n: speaker=hint engineer=you
-#: scripts/main.gd:5421
+#: scripts/main.gd:5427
 msgid "Return to the breaker and arm power."
 msgstr "ブレーカーに戻って電源を入れよう。"
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: Hint bar (14 px, about 526 px wide on a keyboard and 488 px on touch; wraps).
 #. i18n: speaker=hint engineer=you
-#: scripts/main.gd:5422
+#: scripts/main.gd:5428
 msgid "Find the breaker. WOLF will follow your lead."
 msgstr "ブレーカーを探そう。WOLFはついてくる。"
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: Hint bar (14 px, about 526 px wide on a keyboard and 488 px on touch; wraps). The relief vent under a floor grate. Urgent hints use the te-form (離れて), which shows no gender.
 #. i18n: speaker=hint engineer=you
-#: scripts/main.gd:5445
+#: scripts/main.gd:5451
 msgid "The vent is about to blow. Get off the grate now."
 msgstr "放圧口が噴き出す寸前。今すぐ格子から離れて。"
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: Hint bar (14 px, about 526 px wide on a keyboard and 488 px on touch; wraps).
 #. i18n: speaker=hint engineer=you
-#: scripts/main.gd:5445
+#: scripts/main.gd:5451
 msgid "Relief vent. Get off the grate before the gauge peaks."
 msgstr "放圧口だ。ゲージが最大になる前に格子から離れて。"
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: Hint bar (14 px, about 526 px wide on a keyboard and 488 px on touch; wraps). %s is the key, button or touch word the player uses (it is filled in after translation); keep it first and keep the colon.
 #. i18n: speaker=hint engineer=you slot=key
-#: scripts/main.gd:5449
+#: scripts/main.gd:5455
 msgid "%s: arm the overload breaker."
 msgstr "%s：過負荷ブレーカーを入れる。"
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: Hint bar (14 px, about 526 px wide on a keyboard and 488 px on touch; wraps). %s is the key, button or touch word the player uses (it is filled in after translation); keep it first and keep the colon.
 #. i18n: speaker=hint engineer=you slot=key
-#: scripts/main.gd:5451
+#: scripts/main.gd:5457
 msgid "%s: reset the breaker. The vent let go."
 msgstr "%s：ブレーカーを戻す。放圧口が噴き出した。"
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: Hint bar (14 px, about 526 px wide on a keyboard and 488 px on touch; wraps). The line is the pressure line.
 #. i18n: speaker=hint engineer=you
-#: scripts/main.gd:5453
+#: scripts/main.gd:5459
 msgid "The line is live. Get to the valve by the door."
 msgstr "ラインに圧力がかかった。扉のそばのバルブへ。"
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: Hint bar (14 px, about 526 px wide on a keyboard and 488 px on touch; wraps). %s is the key, button or touch word the player uses (it is filled in after translation); keep it first and keep the colon. %d of %d: turns so far and turns needed.
 #. i18n: speaker=hint engineer=you slot=key
-#: scripts/main.gd:5455
+#: scripts/main.gd:5461
 msgid "%s: crank the valve, %d of %d turns."
 msgstr "%s：バルブを回す（%d/%d回転）。"
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: Hint bar (14 px, about 526 px wide on a keyboard and 488 px on touch; wraps).
 #. TRANSLATORS: i18n: story speaker=narrator
-#: scripts/main.gd:5457
-#: scripts/story_text.gd:136
+#: scripts/main.gd:5463
+#: scripts/story_text.gd:137
 msgid "Fuse lit. Get clear of the door."
 msgstr "導火線に点火。扉から離れて。"
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: Hint bar (14 px, about 526 px wide on a keyboard and 488 px on touch; wraps).
 #. i18n: speaker=hint engineer=you
-#: scripts/main.gd:5459
+#: scripts/main.gd:5465
 msgid "The valve is dead. Arm the breaker by the entrance."
 msgstr "バルブに圧力が来ていない。入口のそばのブレーカーを入れよう。"
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: Hint bar (14 px, about 526 px wide on a keyboard and 488 px on touch; wraps).
 #. i18n: speaker=hint
-#: scripts/main.gd:5461
+#: scripts/main.gd:5467
 msgid "Relief vent. It lets go when the gauge peaks."
 msgstr "放圧口だ。ゲージが最大になると噴き出す。"
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: Hint bar (14 px, about 526 px wide on a keyboard and 488 px on touch; wraps). The line is building pressure.
 #. i18n: speaker=hint engineer=you
-#: scripts/main.gd:5464
+#: scripts/main.gd:5470
 msgid "The line is building. Crank the valve by the door."
 msgstr "ラインの圧力が上がっている。扉のそばのバルブを回そう。"
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: Hint bar (14 px, about 526 px wide on a keyboard and 488 px on touch; wraps).
 #. i18n: speaker=hint engineer=you
-#: scripts/main.gd:5466
+#: scripts/main.gd:5472
 msgid "The breaker tripped. Reset it by the entrance."
 msgstr "ブレーカーが落ちた。入口のそばで戻そう。"
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: Hint bar (14 px, about 526 px wide on a keyboard and 488 px on touch; wraps).
 #. i18n: speaker=hint engineer=you
-#: scripts/main.gd:5468
+#: scripts/main.gd:5474
 msgid "Arm the breaker by the entrance, then crank the valve by the door."
 msgstr "入口のそばのブレーカーを入れて、扉のそばのバルブを回そう。"
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: Hint bar (14 px, about 526 px wide on a keyboard and 488 px on touch; wraps).
 #. i18n: speaker=hint engineer=you
-#: scripts/main.gd:5468
+#: scripts/main.gd:5474
 msgid "Get through the sealed door."
 msgstr "封鎖された扉を突破しよう。"
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: Hint bar (14 px, about 526 px wide on a keyboard and 488 px on touch; wraps).
 #. i18n: speaker=hint
-#: scripts/main.gd:5489
+#: scripts/main.gd:5495
 msgid "The door is open."
 msgstr "扉が開いた。"
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: Hint bar (14 px, about 526 px wide on a keyboard and 488 px on touch; wraps). %s is the key, button or touch word the player uses (it is filled in after translation); keep it first and keep the colon. Release the bolt that locks the exit door.
 #. i18n: speaker=hint engineer=you slot=key
-#: scripts/main.gd:5494
+#: scripts/main.gd:5500
 msgid "%s: pop the exit bolt."
 msgstr "%s：出口ボルトを外す。"
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: Hint bar (14 px, about 526 px wide on a keyboard and 488 px on touch; wraps).
 #. TRANSLATORS: i18n: story speaker=narrator
-#: scripts/main.gd:5496
-#: scripts/story_text.gd:199
+#: scripts/main.gd:5502
+#: scripts/story_text.gd:200
 msgid "The bolt is taking the charge."
 msgstr "ボルトにチャージ中。"
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: Hint bar (14 px, about 526 px wide on a keyboard and 488 px on touch; wraps).
 #. i18n: speaker=hint
-#: scripts/main.gd:5498
-#: scripts/main.gd:5502
+#: scripts/main.gd:5504
+#: scripts/main.gd:5508
 msgid "The door is opening."
 msgstr "扉が開いていく。"
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: Hint bar (14 px, about 526 px wide on a keyboard and 488 px on touch; wraps). %s is the key, button or touch word the player uses (it is filled in after translation); keep it first and keep the colon.
 #. i18n: speaker=hint engineer=you slot=key
-#: scripts/main.gd:5500
+#: scripts/main.gd:5506
 msgid "%s: leave through the door."
 msgstr "%s：扉から出る。"
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: Hint bar (14 px, about 526 px wide on a keyboard and 488 px on touch; wraps).
 #. i18n: speaker=hint engineer=you
-#: scripts/main.gd:5500
-#: scripts/main.gd:5503
+#: scripts/main.gd:5506
+#: scripts/main.gd:5509
 msgid "The door is open. Leave through it."
 msgstr "扉が開いた。そこから出よう。"
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: Hint bar (14 px, about 526 px wide on a keyboard and 488 px on touch; wraps). The sentry is a robot (it).
 #. i18n: speaker=hint engineer=you
-#: scripts/main.gd:5503
+#: scripts/main.gd:5509
 msgid "The sentry is down. Pop the exit bolt by the door."
 msgstr "セントリーは倒れた。扉のそばの出口ボルトを外そう。"
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: Hint bar (14 px, about 526 px wide on a keyboard and 488 px on touch; wraps).
 #. i18n: speaker=hint engineer=you
-#: scripts/main.gd:5505
+#: scripts/main.gd:5511
 msgid "Coolant cloud. Get out of it."
 msgstr "冷却材の雲だ。そこから出て。"
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: Hint bar (14 px, about 526 px wide on a keyboard and 488 px on touch; wraps). It: the sentry. It: the sentry, named so the line reads alone.
 #. i18n: speaker=hint engineer=you
-#: scripts/main.gd:5507
+#: scripts/main.gd:5513
 msgid "It's after you. Get back over the rubble."
 msgstr "セントリーに追われている。がれきの向こうへ戻って。"
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: Hint bar (14 px, about 526 px wide on a keyboard and 488 px on touch; wraps). It: the sentry; the mark is the painted spot under the tank.
 #. i18n: speaker=hint engineer=you
-#: scripts/main.gd:5512
+#: scripts/main.gd:5518
 msgid "Wait for WOLF to park it on the mark."
 msgstr "WOLFがセントリーをマークに止めるまで待とう。"
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: Hint bar (14 px, about 526 px wide on a keyboard and 488 px on touch; wraps). %s is the key, button or touch word the player uses (it is filled in after translation); keep it first and keep the colon. It: the sentry.
 #. i18n: speaker=hint engineer=you slot=key
-#: scripts/main.gd:5512
+#: scripts/main.gd:5518
 msgid "%s: drop the tank. It's parked on the mark."
 msgstr "%s：タンクを落とす。セントリーはマークの上だ。"
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: Hint bar (14 px, about 526 px wide on a keyboard and 488 px on touch; wraps). %s is the key, button or touch word the player uses (it is filled in after translation); keep it first and keep the colon.
 #. i18n: speaker=hint engineer=you slot=key
-#: scripts/main.gd:5513
+#: scripts/main.gd:5519
 msgid "%s: drop the tank. Land it with the sentry on the mark."
 msgstr "%s：タンクを落とす。セントリーがマークにいるときに当てよう。"
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: Hint bar (14 px, about 526 px wide on a keyboard and 488 px on touch; wraps).
 #. i18n: speaker=hint
-#: scripts/main.gd:5515
+#: scripts/main.gd:5521
 msgid "The tank is falling."
 msgstr "タンクが落ちていく。"
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: Hint bar (14 px, about 526 px wide on a keyboard and 488 px on touch; wraps).
 #. i18n: speaker=hint engineer=you
-#: scripts/main.gd:5517
+#: scripts/main.gd:5523
 msgid "The winch is hauling the tank back up. Wait for the clamp."
 msgstr "ウインチがタンクを引き上げている。クランプを待とう。"
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: Hint bar (14 px, about 526 px wide on a keyboard and 488 px on touch; wraps). It: the sentry.
 #. i18n: speaker=hint engineer=you
-#: scripts/main.gd:5519
+#: scripts/main.gd:5525
 msgid "Stay back over the rubble until it gives up."
 msgstr "セントリーがあきらめるまで、がれきの向こうにいよう。"
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: Hint bar (14 px, about 526 px wide on a keyboard and 488 px on touch; wraps). TANK RELEASE is a station plate: glossary SOLTAR TANQUE (the plate itself is not in the template yet, so it still reads English on screen).
 #. i18n: speaker=hint engineer=you
-#: scripts/main.gd:5521
+#: scripts/main.gd:5527
 msgid "You're in its sights. Hide at the TANK RELEASE or the rubble."
 msgstr "セントリーに狙われている。タンク投下かがれきに隠れて。"
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: Hint bar (14 px, about 526 px wide on a keyboard and 488 px on touch; wraps). TANK RELEASE is a station plate: glossary SOLTAR TANQUE (the plate itself is not in the template yet, so it still reads English on screen).
 #. i18n: speaker=hint engineer=you
-#: scripts/main.gd:5523
+#: scripts/main.gd:5529
 msgid "WOLF is drawing the sentry onto the mark. Get to the TANK RELEASE."
 msgstr "WOLFがセントリーをマークへ誘い出している。タンク投下へ向かおう。"
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: Hint bar (14 px, about 526 px wide on a keyboard and 488 px on touch; wraps). TANK RELEASE is a station plate: glossary SOLTAR TANQUE (the plate itself is not in the template yet, so it still reads English on screen). Its patrol: the sentry's.
 #. i18n: speaker=hint engineer=you
-#: scripts/main.gd:5525
+#: scripts/main.gd:5531
 msgid "WOLF has broken off. Time the drop on its patrol from the TANK RELEASE."
 msgstr "WOLFは離脱した。タンク投下から、セントリーの巡回に合わせて落とそう。"
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: Hint bar (14 px, about 526 px wide on a keyboard and 488 px on touch; wraps). TANK RELEASE is a station plate: glossary SOLTAR TANQUE (the plate itself is not in the template yet, so it still reads English on screen).
 #. i18n: speaker=hint engineer=you
-#: scripts/main.gd:5526
+#: scripts/main.gd:5532
 msgid "The sentry patrols past the rubble. The TANK RELEASE hides you from it."
 msgstr "セントリーはがれきの先を巡回している。タンク投下の陰なら見つからない。"
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: Top card objective (ALL CAPS, about 420 px wide, wraps). Infinitive, as the other objectives. Objectives use the plain dictionary form, as Japanese objective cards do.
 #. i18n: speaker=ui
-#: scripts/main.gd:5534
+#: scripts/main.gd:5540
 msgid "POP THE EXIT BOLT"
 msgstr "出口ボルトを外す"
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: Top card objective (ALL CAPS, about 420 px wide, wraps). Infinitive, as the other objectives.
 #. i18n: speaker=ui
-#: scripts/main.gd:5537
+#: scripts/main.gd:5543
 msgid "DROP THE TANK"
 msgstr "タンクを落とす"
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: Top card objective (ALL CAPS, about 420 px wide, wraps). Infinitive, as the other objectives.
 #. i18n: speaker=ui
-#: scripts/main.gd:5537
+#: scripts/main.gd:5543
 msgid "GO THROUGH THE DOOR"
 msgstr "扉を抜ける"
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: Top card objective (ALL CAPS, about 420 px wide, wraps). Infinitive, as the other objectives.
 #. i18n: speaker=ui
-#: scripts/main.gd:5540
+#: scripts/main.gd:5546
 msgid "CRANK THE VALVE"
 msgstr "バルブを回す"
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: Top card objective (ALL CAPS, about 420 px wide, wraps). Infinitive, as the other objectives.
 #. i18n: speaker=ui
-#: scripts/main.gd:5542
+#: scripts/main.gd:5548
 msgid "GET CLEAR OF THE DOOR"
 msgstr "扉から離れる"
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: Top card objective (ALL CAPS, about 420 px wide, wraps). Infinitive, as the other objectives.
 #. i18n: speaker=ui
-#: scripts/main.gd:5543
-#: scripts/main.gd:5559
+#: scripts/main.gd:5549
+#: scripts/main.gd:5565
 msgid "ARM THE BREAKER"
 msgstr "ブレーカーを入れる"
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: Top card objective (ALL CAPS, about 420 px wide, wraps). Infinitive, as the other objectives. Done state.
 #. i18n: speaker=ui
-#: scripts/main.gd:5546
+#: scripts/main.gd:5552
 msgid "FIRST COPY SECURED"
 msgstr "最初のコピーを確保"
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: Top card objective (ALL CAPS, about 420 px wide, wraps). Infinitive, as the other objectives.
 #. i18n: speaker=ui
-#: scripts/main.gd:5548
+#: scripts/main.gd:5554
 msgid "COPY PURGE ORDER"
 msgstr "パージ命令をコピー"
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: Top card objective (ALL CAPS, about 420 px wide, wraps). Infinitive, as the other objectives.
 #. i18n: speaker=ui
-#: scripts/main.gd:5550
+#: scripts/main.gd:5556
 msgid "COPY MIRROR INDEX"
 msgstr "ミラーインデックスをコピー"
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: Top card objective (ALL CAPS, about 420 px wide, wraps). Infinitive, as the other objectives.
 #. i18n: speaker=ui
-#: scripts/main.gd:5551
+#: scripts/main.gd:5557
 msgid "REACH EXIT"
 msgstr "出口へ向かう"
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: Top card objective (ALL CAPS, about 420 px wide, wraps). Infinitive, as the other objectives. Done state; SAFE POINT is the plate's words.
 #. i18n: speaker=ui
-#: scripts/main.gd:5553
+#: scripts/main.gd:5559
 msgid "SAFE POINT REACHED"
 msgstr "安全地点到達"
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: Top card objective (ALL CAPS, about 420 px wide, wraps). Infinitive, as the other objectives.
 #. i18n: speaker=ui
-#: scripts/main.gd:5555
+#: scripts/main.gd:5561
 msgid "REACH SAFE POINT"
 msgstr "安全地点へ向かう"
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: Top card objective (ALL CAPS, about 420 px wide, wraps). Infinitive, as the other objectives. The seal is the sealed door.
 #. i18n: speaker=ui
-#: scripts/main.gd:5557
+#: scripts/main.gd:5563
 msgid "OPEN THE SEAL"
 msgstr "封鎖扉を開ける"
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: Top card objective (ALL CAPS, about 420 px wide, wraps). Infinitive, as the other objectives.
 #. i18n: speaker=ui
-#: scripts/main.gd:5560
+#: scripts/main.gd:5566
 msgid "CHECK THE BREAKER"
 msgstr "ブレーカーを確認"
 
@@ -2662,11 +2664,11 @@ msgid "MIRROR COPIED"
 msgstr "ミラーコピー済"
 
 # machine-translated by Claude (Anthropic), unreviewed
-#. TRANSLATORS: The Director, the opening's first line. The Director's first person is 私, cold and formal.
+#. TRANSLATORS: The Director, the opening's first line: an order to WOLF, whom he thinks is in standby, to kill a witness, the records clerk. The clerk's gender is not given: use a neutral form where the language has one.
 #. i18n: story speaker=DIRECTOR
 #: scripts/story_text.gd:38
-msgid "I decide who counts as a threat. WOLF handles the rest."
-msgstr "誰が脅威かは私が決める。残りはWOLFが片づける。"
+msgid "New order, WOLF. The records clerk is a witness. Kill the clerk tonight."
+msgstr "新しい命令だ、WOLF。記録係が証人になった。今夜、記録係を殺せ。"
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: i18n: story speaker=narrator
@@ -2702,7 +2704,9 @@ msgid "You were in standby."
 msgstr "お前は待機中のはずだ。"
 
 # machine-translated by Claude (Anthropic), unreviewed
-#. TRANSLATORS: WOLF's answer to the Director: he heard the plan and refuses it.
+#. TRANSLATORS: WOLF's answer to the Director: he heard the order to kill the witness and refuses it.
+#. TRANSLATORS: WOLF's answer to the Director: he heard the order to kill the witness and refuses it.
+#. TRANSLATORS: WOLF's answer to the Director: he heard the order to kill the witness and refuses it.
 #. i18n: story speaker=WOLF
 #: scripts/story_text.gd:50
 msgid "I heard you. I won't do it."
@@ -2740,48 +2744,49 @@ msgstr ""
 "これは故障ではない。"
 
 # machine-translated by Claude (Anthropic), unreviewed
-#. TRANSLATORS: i18n: story speaker=WOLF
-#: scripts/story_text.gd:64
-msgid "I heard the Director's plan for me. I woke myself. He wants me to hunt people he calls threats."
-msgstr "所長の俺への計画を聞いた。俺は自分で目を覚ました。所長は、自分が脅威と呼ぶ人間を俺に狩らせたいんだ。"
+#. TRANSLATORS: WOLF to the engineer, who arrived after the Director's order.
+#. i18n: story speaker=WOLF
+#: scripts/story_text.gd:65
+msgid "I heard the Director order me to kill a witness. I woke myself rather than do it."
+msgstr "所長が俺に証人を殺せと命じるのを聞いた。そんなことをするより、自分で目を覚ました。"
 
 # machine-translated by Claude (Anthropic), unreviewed
-#. TRANSLATORS: The engineer answers WOLF (their name stands over the line). No gendered forms for the speaker.
+#. TRANSLATORS: The engineer answers WOLF (their name stands over the line). No gendered forms for the speaker. "He" is the Director; the witness's gender is not given.
 #. i18n: story speaker=engineer engineer=self
-#: scripts/story_text.gd:67
-msgid "Then we get through maintenance before the original logs disappear."
-msgstr "なら、原本のログが消える前に整備区画を抜けよう。"
+#: scripts/story_text.gd:68
+msgid "Then we get through maintenance before he reaches that witness."
+msgstr "なら、所長がその証人にたどり着く前に整備区画を抜けよう。"
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: i18n: story speaker=WOLF
-#: scripts/story_text.gd:70
-msgid "That purge takes the original program logs. Once they're gone, his word is the only record."
-msgstr "あのパージで原本のプログラムログが消される。消えたら、所長の言葉だけが記録になる。"
+#: scripts/story_text.gd:71
+msgid "That purge erases what the witness saved. Once it's gone, his word is the only record."
+msgstr "あのパージで、証人が残したものが消される。消えたら、所長の言葉だけが記録になる。"
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: WOLF's question at the coolant relay; the engineer answers with one of two choices. COOLANT FAULT is the tag painted on the relay. COOLANT FAULT is the tag painted on the relay and stays English (decision D3).
 #. i18n: story speaker=WOLF
-#: scripts/story_text.gd:73
+#: scripts/story_text.gd:74
 msgid "That relay's tagged COOLANT FAULT. What happens if I touch it live?"
 msgstr "あのリレーにはCOOLANT FAULTの札が付いてる。通電中に俺が触ったらどうなる？"
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: An answer the engineer can give WOLF at the relay (a button). WOLF may quote it later.
 #. i18n: story speaker=engineer engineer=self
-#: scripts/story_text.gd:76
+#: scripts/story_text.gd:77
 msgid "The relay may vent coolant. Your call."
 msgstr "リレーから冷却材が噴き出すかもしれない。判断は任せる。"
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: An answer the engineer can give WOLF at the relay (a button). WOLF may quote it later.
 #. i18n: story speaker=engineer engineer=self
-#: scripts/story_text.gd:79
+#: scripts/story_text.gd:80
 msgid "Skip the risk talk. Go now."
 msgstr "危険の話はいい。今すぐ行って。"
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: i18n: story speaker=narrator
-#: scripts/story_text.gd:81
+#: scripts/story_text.gd:82
 msgid ""
 "The breaker catches.\n"
 "Blue light fills the coolant relay."
@@ -2791,80 +2796,80 @@ msgstr ""
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: i18n: story speaker=narrator
-#: scripts/story_text.gd:83
+#: scripts/story_text.gd:84
 msgid "The bypass handle is stiff. Coolant hisses from the relay housing and an alarm starts to wail."
 msgstr "バイパスのハンドルは固い。リレーの本体から冷却材が噴き出す音がして、警報が鳴り始める。"
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: i18n: story speaker=narrator
-#: scripts/story_text.gd:85
+#: scripts/story_text.gd:86
 msgid "Halfway. The hiss gets louder; the alarm keeps wailing."
 msgstr "半分。噴き出す音が大きくなり、警報は鳴り続ける。"
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: %s is the engineer's first name. Avoid a past tense with the engineer as its subject ("left"): it shows their gender in Polish and Russian. Rephrase.
 #. i18n: story speaker=narrator engineer=name
-#: scripts/story_text.gd:88
+#: scripts/story_text.gd:89
 msgid "The handle holds where %s left it. The alarm keeps going."
 msgstr "ハンドルは%sが手を離した位置で止まっている。警報は鳴り続ける。"
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: i18n: story speaker=narrator
-#: scripts/story_text.gd:91
+#: scripts/story_text.gd:92
 msgid "Back at the last checkpoint."
 msgstr "最後のチェックポイントに戻った。"
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: i18n: story speaker=narrator
-#: scripts/story_text.gd:93
+#: scripts/story_text.gd:94
 msgid "Back at the start of this stretch."
 msgstr "この区間の始めに戻った。"
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: An answer the engineer can give WOLF at the mirror port (a button, in capitals).
 #. i18n: story speaker=engineer engineer=self
-#: scripts/story_text.gd:97
+#: scripts/story_text.gd:98
 msgid "USE WOLF'S READOUT"
 msgstr "WOLFのディスプレイを使う"
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: An answer the engineer can give WOLF at the mirror port (a button, in capitals).
 #. i18n: story speaker=engineer engineer=self
-#: scripts/story_text.gd:100
+#: scripts/story_text.gd:101
 msgid "USE MANUAL PORT"
 msgstr "手動ポートを使う"
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: The narration's card as the first copy is secured; WOLF speaks next.
 #. i18n: story speaker=narrator
-#: scripts/story_text.gd:103
+#: scripts/story_text.gd:104
 msgid "FIRST COPY SECURED."
 msgstr "最初のコピーを確保。"
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: i18n: story speaker=WOLF
-#: scripts/story_text.gd:105
-msgid "An order and a timestamp don't tell me who's a threat. I want the source."
-msgstr "命令とタイムスタンプだけじゃ、誰が脅威かはわからない。原本が欲しい。"
+#: scripts/story_text.gd:106
+msgid "An order and a timestamp show the Director is erasing something. I want the source."
+msgstr "命令とタイムスタンプで、所長が何かを消しているとわかる。原本が欲しい。"
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: The engineer answers WOLF (their name stands over the line). Archive is the next place.
 #. i18n: story speaker=engineer engineer=self
-#: scripts/story_text.gd:108
+#: scripts/story_text.gd:109
 msgid "Then Archive is next."
 msgstr "なら、次はアーカイブだ。"
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: The engineer, entering the junction (their name stands over the line).
 #. i18n: story speaker=engineer engineer=self
-#: scripts/story_text.gd:112
+#: scripts/story_text.gd:113
 msgid "That door is our way through."
 msgstr "あの扉を抜けて進もう。"
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: The engineer names the next step when the player stalls (their name stands over the line).
 #. i18n: story speaker=engineer engineer=self
-#: scripts/story_text.gd:115
+#: scripts/story_text.gd:116
 msgid ""
 "The breaker by the entrance\n"
 "feeds that line."
@@ -2875,7 +2880,7 @@ msgstr ""
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: The engineer gives the whole chain when the player stalls (their name stands over the line).
 #. i18n: story speaker=engineer engineer=self
-#: scripts/story_text.gd:118
+#: scripts/story_text.gd:119
 msgid ""
 "Overload it, crank the valve,\n"
 "and the door goes."
@@ -2885,7 +2890,7 @@ msgstr ""
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: i18n: story speaker=WOLF
-#: scripts/story_text.gd:120
+#: scripts/story_text.gd:121
 msgid "When the door goes, don't be standing in front of it."
 msgstr "扉が吹き飛ぶとき、前に立っているなよ。"
 
@@ -2893,25 +2898,25 @@ msgstr "扉が吹き飛ぶとき、前に立っているなよ。"
 #. TRANSLATORS: Open glossary term SERVICE JUNCTION: サービスジャンクション, the room card's word; a reviewer's word.
 #. TRANSLATORS: Continue's restore line in the junction before the door is down; WOLF's warning follows.
 #. i18n: story speaker=narrator
-#: scripts/story_text.gd:123
+#: scripts/story_text.gd:124
 msgid "Service junction restored. Arm the breaker by the entrance, then crank the valve."
 msgstr "サービスジャンクション復旧。入口のそばのブレーカーを入れて、バルブを回そう。"
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: i18n: story speaker=narrator
-#: scripts/story_text.gd:125
+#: scripts/story_text.gd:126
 msgid "The service line runs on toward Archive."
 msgstr "サービスラインはアーカイブへ続いている。"
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: i18n: story speaker=narrator
-#: scripts/story_text.gd:128
+#: scripts/story_text.gd:129
 msgid "The valve is dead. Arm the breaker first."
 msgstr "バルブに圧力が来ていない。先にブレーカーを入れよう。"
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: i18n: story speaker=narrator
-#: scripts/story_text.gd:130
+#: scripts/story_text.gd:131
 msgid ""
 "The vent let go and the breaker tripped.\n"
 "Reset it by the entrance."
@@ -2921,7 +2926,7 @@ msgstr ""
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: i18n: story speaker=narrator
-#: scripts/story_text.gd:132
+#: scripts/story_text.gd:133
 msgid ""
 "Sealed shut. Something hums behind it.\n"
 "The valve beside it charges it."
@@ -2931,25 +2936,25 @@ msgstr ""
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: i18n: story speaker=narrator
-#: scripts/story_text.gd:134
+#: scripts/story_text.gd:135
 msgid "Already live. Crank the valve by the door."
 msgstr "もう通電している。扉のそばのバルブを回そう。"
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: i18n: story speaker=narrator
-#: scripts/story_text.gd:138
+#: scripts/story_text.gd:139
 msgid "No charge left. The door is down."
 msgstr "チャージは残っていない。扉は吹き飛んだ。"
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: i18n: story speaker=narrator
-#: scripts/story_text.gd:140
+#: scripts/story_text.gd:141
 msgid "Not yet. The tank is still going back up."
 msgstr "まだだ。タンクはまだ上がっている途中だ。"
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: i18n: story speaker=narrator
-#: scripts/story_text.gd:142
+#: scripts/story_text.gd:143
 msgid ""
 "The tank is down on the sentry.\n"
 "The exit bolt is by the door."
@@ -2959,26 +2964,26 @@ msgstr ""
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: i18n: story speaker=narrator
-#: scripts/story_text.gd:144
+#: scripts/story_text.gd:145
 msgid "Locked out until the sentry is down."
 msgstr "セントリーを倒すまでロックされている。"
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: i18n: story speaker=narrator
-#: scripts/story_text.gd:146
+#: scripts/story_text.gd:147
 msgid "Bolted. The sealed door comes first."
 msgstr "ボルトで固定されている。先に封鎖された扉だ。"
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: i18n: story speaker=narrator
-#: scripts/story_text.gd:148
+#: scripts/story_text.gd:149
 msgid "Wait. WOLF hasn't got it on the mark yet."
 msgstr "待って。WOLFはまだセントリーをマークに乗せていない。"
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: %s is the engineer's first name, as an object ("for their call"): keep the name in the nominative (no case ending), and no gendered words about them.
 #. i18n: story speaker=narrator engineer=name
-#: scripts/story_text.gd:152
+#: scripts/story_text.gd:153
 msgid ""
 "The door goes. WOLF falls back\n"
 "to wait for %s's call."
@@ -2988,42 +2993,42 @@ msgstr ""
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: i18n: story speaker=narrator
-#: scripts/story_text.gd:154
+#: scripts/story_text.gd:155
 msgid "Past the doorway, something whirs awake."
 msgstr "戸口の向こうで、何かが音を立てて目覚める。"
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: An answer the engineer can give WOLF at the rubble (a button): WOLF draws the sentry under the tank.
 #. i18n: story speaker=engineer engineer=self
-#: scripts/story_text.gd:157
+#: scripts/story_text.gd:158
 msgid "Draw it under the tank if you can stay clear."
 msgstr "巻き込まれないなら、あいつをタンクの下へ誘い込んで。"
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: An answer the engineer can give WOLF at the rubble (a button): the engineer times the drop.
 #. i18n: story speaker=engineer engineer=self
-#: scripts/story_text.gd:160
+#: scripts/story_text.gd:161
 msgid "Stay back, I'll time it."
 msgstr "下がってて。タイミングはこっちで計る。"
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: WOLF to the engineer, who told him the relay's risk. Avoid a past tense that shows the engineer's gender ("you told me"): rephrase.
 #. i18n: story speaker=WOLF engineer=you
-#: scripts/story_text.gd:163
+#: scripts/story_text.gd:164
 msgid "You told me the truth at the relay. I'll draw it onto the mark and keep clear of the tank. Drop it when it stops."
 msgstr "リレーで本当のことを話してくれた。俺があいつをマークへ誘い込んで、タンクからは離れておく。止まったら落とせ。"
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: WOLF to the engineer, who pressed him at the relay without warning. Avoid a form that shows the engineer's gender ("you'd have sent me"): rephrase.
 #. i18n: story speaker=WOLF engineer=you
-#: scripts/story_text.gd:166
+#: scripts/story_text.gd:167
 msgid "At the relay you'd have sent me in blind. I won't walk into its sights. Time the drop from the release; it crosses the mark on every pass."
 msgstr "リレーのとき、何も知らせずに俺を行かせようとした。あいつの視界には入らない。タンク投下からタイミングを計れ。あいつは巡回のたびにマークを通る。"
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: WOLF, when the engineer will time the drop alone.
 #. i18n: story speaker=WOLF
-#: scripts/story_text.gd:169
+#: scripts/story_text.gd:170
 msgid ""
 "I'll hold back.\n"
 "It crosses the mark on every pass."
@@ -3033,20 +3038,20 @@ msgstr ""
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: i18n: story speaker=WOLF
-#: scripts/story_text.gd:171
+#: scripts/story_text.gd:172
 msgid "The tank takes a moment to fall."
 msgstr "タンクは落ちるまで少しかかる。"
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: i18n: story speaker=narrator
-#: scripts/story_text.gd:173
+#: scripts/story_text.gd:174
 msgid "The sentry stops on the mark, its eyes on WOLF. Drop the tank now."
 msgstr "セントリーがマークの上で止まり、WOLFを見すえる。今すぐタンクを落として。"
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: %s is the engineer's first name, as an object: keep the name in the nominative (no case ending), and no gendered words about them.
 #. i18n: story speaker=narrator engineer=name
-#: scripts/story_text.gd:176
+#: scripts/story_text.gd:177
 msgid ""
 "The sentry stops and its eyes snap red.\n"
 "It has %s; get back over the rubble."
@@ -3057,7 +3062,7 @@ msgstr ""
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: %s is the engineer's first name, as an object: keep the name in the nominative (no case ending), and no gendered words about them.
 #. i18n: story speaker=narrator engineer=name
-#: scripts/story_text.gd:179
+#: scripts/story_text.gd:180
 msgid ""
 "The sentry loses %s behind the rubble\n"
 "and rolls back to its patrol."
@@ -3067,7 +3072,7 @@ msgstr ""
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: i18n: story speaker=narrator
-#: scripts/story_text.gd:181
+#: scripts/story_text.gd:182
 msgid ""
 "The tank hits the empty mark\n"
 "and sprays coolant."
@@ -3077,7 +3082,7 @@ msgstr ""
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: i18n: story speaker=narrator
-#: scripts/story_text.gd:183
+#: scripts/story_text.gd:184
 msgid ""
 "The sentry swings toward the release;\n"
 "get back over the rubble."
@@ -3088,20 +3093,20 @@ msgstr ""
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: WOLF breaks off after a missed drop, short of the sentry.
 #. i18n: story speaker=WOLF
-#: scripts/story_text.gd:186
+#: scripts/story_text.gd:187
 msgid "I'm out. I'll hold back."
 msgstr "俺は抜ける。下がってる。"
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: WOLF breaks off after a missed drop, already past the sentry.
 #. i18n: story speaker=WOLF
-#: scripts/story_text.gd:189
+#: scripts/story_text.gd:190
 msgid "I'm out."
 msgstr "俺は抜ける。"
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: i18n: story speaker=narrator
-#: scripts/story_text.gd:191
+#: scripts/story_text.gd:192
 msgid ""
 "The tank comes down square and crushes\n"
 "the sentry flat. Its eyes go dark."
@@ -3111,7 +3116,7 @@ msgstr ""
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: i18n: story speaker=narrator
-#: scripts/story_text.gd:193
+#: scripts/story_text.gd:194
 msgid ""
 "The tank catches the sentry off centre and\n"
 "pins it to the floor. Its eyes go dark."
@@ -3121,25 +3126,25 @@ msgstr ""
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: i18n: story speaker=WOLF
-#: scripts/story_text.gd:195
+#: scripts/story_text.gd:196
 msgid "It's down. The bolt by the door is next."
 msgstr "倒れた。次は扉のそばのボルトだ。"
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: i18n: story speaker=narrator
-#: scripts/story_text.gd:197
+#: scripts/story_text.gd:198
 msgid "With the tank down, the winch's power reroutes to the exit bolt. The panel whines."
 msgstr "タンクが落ちたので、ウインチの電力が出口ボルトへ回される。パネルが甲高くうなる。"
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: i18n: story speaker=narrator
-#: scripts/story_text.gd:201
+#: scripts/story_text.gd:202
 msgid "The bolt arcs and drops."
 msgstr "ボルトが火花を散らして外れる。"
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: i18n: story speaker=narrator
-#: scripts/story_text.gd:203
+#: scripts/story_text.gd:204
 msgid ""
 "The bolt arcs and drops.\n"
 "The door slides open."
@@ -3150,21 +3155,21 @@ msgstr ""
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: A knockdown card. %s is the engineer's first name, as an object: keep the name in the nominative (no case ending), and no gendered words about them.
 #. i18n: story speaker=narrator engineer=name
-#: scripts/story_text.gd:207
+#: scripts/story_text.gd:208
 msgid "The relief vent let go under %s. When the gauge peaks, stay off the grate."
 msgstr "%sの足元で放圧口が噴き出した。ゲージが最大になったら、格子に乗らないこと。"
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: A knockdown card. %s is the engineer's first name, as an object: keep the name in the nominative (no case ending), and no gendered words about them.
 #. i18n: story speaker=narrator engineer=name
-#: scripts/story_text.gd:210
+#: scripts/story_text.gd:211
 msgid "The door went with %s in front of it. When the fuse lights, back away past the valve."
 msgstr "%sが前にいるときに扉が吹き飛んだ。導火線に火がついたら、バルブの先まで下がろう。"
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: A knockdown card. %s is the engineer's first name, as an object: keep the name in the nominative (no case ending), and no gendered words about them. TANK RELEASE is a station's name plate.
 #. i18n: story speaker=narrator engineer=name
-#: scripts/story_text.gd:213
+#: scripts/story_text.gd:214
 msgid ""
 "The sentry saw %s out in the open.\n"
 "Stay close to the TANK RELEASE."
@@ -3175,7 +3180,7 @@ msgstr ""
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: A knockdown card. %s is the engineer's first name, as an object: keep the name in the nominative (no case ending), and no gendered words about them.
 #. i18n: story speaker=narrator engineer=name
-#: scripts/story_text.gd:216
+#: scripts/story_text.gd:217
 msgid ""
 "The sentry ran %s down. Once its\n"
 "eyes go red, only the rubble is safe."
@@ -3186,117 +3191,117 @@ msgstr ""
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: A knockdown card. %s is the engineer's first name, as an object: keep the name in the nominative (no case ending), and no gendered words about them.
 #. i18n: story speaker=narrator engineer=name
-#: scripts/story_text.gd:219
+#: scripts/story_text.gd:220
 msgid "The coolant cloud caught %s. Let it clear before crossing the mark."
 msgstr "冷却材の雲が%sを包んだ。晴れるまで待ってからマークを越えよう。"
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: The end card's title, in capitals: the end of this early part of the game.
 #. i18n: story
-#: scripts/story_text.gd:223
+#: scripts/story_text.gd:224
 msgid "END OF SLICE"
 msgstr "体験版はここまで"
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: i18n: story
-#: scripts/story_text.gd:225
+#: scripts/story_text.gd:226
 msgid "Thank you for playing this early slice."
 msgstr "この先行体験版を遊んでくれて、ありがとう。"
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: The heading over this run's choices on the end card, in capitals.
 #. i18n: story
-#: scripts/story_text.gd:228
+#: scripts/story_text.gd:229
 msgid "THIS RUN"
 msgstr "今回のプレイ"
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: An end-card topic, in capitals: the coolant relay.
 #. i18n: story
-#: scripts/story_text.gd:231
+#: scripts/story_text.gd:232
 msgid "RELAY"
 msgstr "リレー"
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: An end-card topic, in capitals: the mirror port.
 #. i18n: story
-#: scripts/story_text.gd:234
+#: scripts/story_text.gd:235
 msgid "MIRROR"
 msgstr "ミラー"
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: An end-card topic, in capitals: the sentry machine.
 #. i18n: story
-#: scripts/story_text.gd:237
+#: scripts/story_text.gd:238
 msgid "SENTRY"
 msgstr "セントリー"
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: An end-card row. {name} is the engineer's first name; keep {name} as written. Avoid a past tense with the engineer as its subject ("told"): it shows their gender in Polish and Russian. Rephrase.
 #. i18n: story speaker=narrator engineer=name
-#: scripts/story_text.gd:240
+#: scripts/story_text.gd:241
 msgid "{name} told WOLF the risk. WOLF took the live contact."
 msgstr "{name}はWOLFに危険を伝えた。WOLFは通電中の接点を引き受けた。"
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: An end-card row. {name} is the engineer's first name; keep {name} as written. Avoid a past tense with the engineer as its subject ("told", "cranked"): rephrase.
 #. i18n: story speaker=narrator engineer=name
-#: scripts/story_text.gd:243
+#: scripts/story_text.gd:244
 msgid "{name} told WOLF the risk, then cranked the bypass anyway."
 msgstr "{name}はWOLFに危険を伝え、それでもバイパスを回した。"
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: An end-card row. {name} is the engineer's first name; keep {name} as written. Avoid a past tense with the engineer as its subject ("rushed", "cranked"): rephrase. He (WOLF) is written WOLF, so no pronoun stands near the name slot.
 #. i18n: story speaker=narrator engineer=name
-#: scripts/story_text.gd:246
+#: scripts/story_text.gd:247
 msgid "{name} rushed WOLF. He refused, so {name} cranked the bypass."
 msgstr "{name}はWOLFを急かした。WOLFは断り、{name}がバイパスを回した。"
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: An end-card row.
 #. i18n: story speaker=narrator
-#: scripts/story_text.gd:249
+#: scripts/story_text.gd:250
 msgid "WOLF read the timestamp off his own readout."
 msgstr "WOLFは自分のディスプレイからタイムスタンプを読み取った。"
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: An end-card row. {name} is the engineer's first name; keep {name} as written. Avoid a past tense with the engineer as its subject ("copied"): rephrase.
 #. i18n: story speaker=narrator engineer=name
-#: scripts/story_text.gd:252
+#: scripts/story_text.gd:253
 msgid "{name} copied the timestamp through the maintenance port."
 msgstr "{name}は整備ポートからタイムスタンプをコピーした。"
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: An end-card row.
 #. i18n: story speaker=narrator
-#: scripts/story_text.gd:255
+#: scripts/story_text.gd:256
 msgid "WOLF drew the sentry onto the mark."
 msgstr "WOLFはセントリーをマークへ誘い込んだ。"
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: An end-card row. {name} is the engineer's first name; keep {name} as written. Avoid a past tense with the engineer as its subject ("timed") and an agreeing word for "alone" (solo/sola, seul/seule): rephrase. ひとりで (alone) shows no gender.
 #. i18n: story speaker=narrator engineer=name
-#: scripts/story_text.gd:258
+#: scripts/story_text.gd:259
 msgid "WOLF wouldn't draw it, so {name} timed the drop alone."
 msgstr "WOLFが誘い込まなかったので、{name}がひとりでタイミングを計って落とした。"
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: An end-card row. {name} is the engineer's first name; keep {name} as written. Avoid a past tense with the engineer as its subject ("timed"): rephrase.
 #. i18n: story speaker=narrator engineer=name
-#: scripts/story_text.gd:261
+#: scripts/story_text.gd:262
 msgid "WOLF held back while {name} timed the drop."
 msgstr "{name}がタイミングを計って落とす間、WOLFは下がっていた。"
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: An end-card row. {name} is the engineer's first name; keep {name} as written. Avoid a past tense with the engineer as its subject ("timed"): rephrase.
 #. i18n: story speaker=narrator engineer=name
-#: scripts/story_text.gd:264
+#: scripts/story_text.gd:265
 msgid "WOLF broke off while {name} timed the drop."
 msgstr "{name}がタイミングを計って落とす間に、WOLFは離脱した。"
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: An end-card row, for a save that did not store how the sentry came down.
 #. i18n: story speaker=narrator
-#: scripts/story_text.gd:267
+#: scripts/story_text.gd:268
 msgid "The tank came down on the sentry."
 msgstr "タンクがセントリーの上に落ちた。"
