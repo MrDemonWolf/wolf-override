@@ -65,7 +65,8 @@ static func attach(target: Sprite2D, strength: float = 0.32) -> FloorReflection:
 	return reflection
 
 
-## While enabled and active, mirrors the source every frame and notes the frame, so _catch_up does not mirror it twice.
+## While enabled and active, mirrors the source every frame and notes the frame, so _catch_up does not
+## mirror it twice.
 func _process(_delta: float) -> void:
 	_mirrored_frame = Engine.get_process_frames()
 	_mirror()

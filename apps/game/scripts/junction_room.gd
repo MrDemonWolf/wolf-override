@@ -776,13 +776,15 @@ class PanelFront:
 	var cover: Array[Rect2] = []
 	var colors: Array[Color] = []
 
-	## Samples with mipmaps like the room's art, and processes after Main (priority 100), which moves the sentry first.
+	## Samples with mipmaps like the room's art, and processes after Main (priority 100), which moves the
+	## sentry first.
 	func _init() -> void:
 		texture_filter = CanvasItem.TEXTURE_FILTER_LINEAR_WITH_MIPMAPS
 		# After Main's frame, which moves the sentry, so the cover is where the sentry is drawn.
 		process_priority = 100
 
-	## Redraws only when the spots the sentry crosses the panel, or the colours they are drawn in, have changed.
+	## Redraws only when the spots the sentry crosses the panel, or the colours they are drawn in, have
+	## changed.
 	func _process(_delta: float) -> void:
 		var now: Array[Rect2] = room.bolt_panel_cover()
 		var look: Array[Color] = [room.bolt_lamp_color(), room.bolt_feed_color()]
@@ -791,7 +793,8 @@ class PanelFront:
 			colors = look
 			queue_redraw()
 
-	## Draws the bolt panel again over the spots in [member cover], in its lamp's colour; nothing while the sentry is clear.
+	## Draws the bolt panel again over the spots in [member cover], in its lamp's colour; nothing while the
+	## sentry is clear.
 	func _draw() -> void:
 		if not cover.is_empty():
 			room.draw_panel_front(self, cover, colors[0])

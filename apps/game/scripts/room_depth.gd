@@ -241,7 +241,8 @@ class Beacon:
 		draw_rect(Rect2(-5.0, -2.0, 10.0, 5.0), lens)
 
 
-## Puts the base fill on the backdrop's absolute depth (Z_BACKDROP), seeds the flicker randomness and builds every layer (rebuild).
+## Puts the base fill on the backdrop's absolute depth (Z_BACKDROP), seeds the flicker randomness and
+## builds every layer (rebuild).
 func _ready() -> void:
 	# The base fill drawn here must sit under the backdrop whatever the owning room's own z-index is.
 	z_as_relative = false
@@ -557,7 +558,8 @@ func _settle_beacons(animate: bool) -> void:
 			_pulse(index, (BEACON_FLASH_PHASE_SECONDS if beacon_flash else 0.5) * index)
 
 
-## Fills the room's base colour behind everything, only for a room built without a far plate (the plate covers it otherwise).
+## Fills the room's base colour behind everything, only for a room built without a far plate (the plate
+## covers it otherwise).
 func _draw() -> void:
 	# The opaque far plate covers every framing (room_depth_test checks it), so the base fill only
 	# shows for a room built without one.

@@ -350,7 +350,8 @@ func _choice_under_overlay() -> bool:
 	return false
 
 
-## While the overlay shows, refreshes its text every REFRESH_SECONDS (counting [param delta] seconds), not every frame.
+## While the overlay shows, refreshes its text every REFRESH_SECONDS (counting [param delta] seconds), not
+## every frame.
 func _process(delta: float) -> void:
 	_refresh_left -= delta
 	if _refresh_left <= 0.0:
@@ -358,7 +359,8 @@ func _process(delta: float) -> void:
 		_refresh_overlay()
 
 
-## Rewrites the overlay's text for its page: performance, or the state dump without geometry (zones page flagged). Nothing when off.
+## Rewrites the overlay's text for its page: performance, or the state dump without geometry (zones page
+## flagged). Nothing when off.
 func _refresh_overlay() -> void:
 	if overlay_mode == Overlay.PERFORMANCE:
 		overlay.show_performance(performance())
@@ -702,7 +704,8 @@ func _screenshot() -> Image:
 	return image if image != null and not image.is_empty() else null
 
 
-## The local date and time as a file-name stem ("YYYY-MM-DDTHH-MM-SS-mmm", colons as dashes, milliseconds from the engine clock).
+## The local date and time as a file-name stem ("YYYY-MM-DDTHH-MM-SS-mmm", colons as dashes, milliseconds
+## from the engine clock).
 static func _timestamp() -> String:
 	return "%s-%03d" % [Time.get_datetime_string_from_system(false, false).replace(":", "-"), Time.get_ticks_msec() % 1000]
 

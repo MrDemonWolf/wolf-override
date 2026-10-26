@@ -359,7 +359,8 @@ func _cheat_changed(on: bool, note: String) -> String:
 	return note
 
 
-## Processes only while the tools are available and instant crank or slow motion is on (the only cheats that need a frame).
+## Processes only while the tools are available and instant crank or slow motion is on (the only cheats
+## that need a frame).
 func _update_processing() -> void:
 	set_process(tools != null and tools.available and (instant_crank or slow_motion != 1.0))
 

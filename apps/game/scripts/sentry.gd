@@ -142,7 +142,8 @@ class SentryVisual:
 	var dormant: bool = false
 	var _wake_tween: Tween
 
-	## Builds the active body and the hidden wreck from their whole pieces, and the lens glow at the slit's front edge.
+	## Builds the active body and the hidden wreck from their whole pieces, and the lens glow at the slit's
+	## front edge.
 	func _init() -> void:
 		body = _art("Body", Sentry.ACTIVE_ART, Sentry.ACTIVE_TREAD_X)
 		wreck = _art("Wreck", Sentry.WRECK_ART, Sentry.WRECK_TREAD_X)
@@ -190,7 +191,8 @@ class SentryVisual:
 		else:
 			body.modulate = tint
 
-	## Shows the lens glow in the eye's colour while lit and glows are allowed (Main's effects), hides it otherwise.
+	## Shows the lens glow in the eye's colour while lit and glows are allowed (Main's effects), hides it
+	## otherwise.
 	func _sync_glow() -> void:
 		if lens_glow == null:
 			return
@@ -335,7 +337,8 @@ static func lens_rect() -> Rect2:
 	return Rect2(left, top, LENS.size.x * ART_SCALE, LENS.size.y * ART_SCALE)
 
 
-## The body collides with nothing and detects nothing (the brain decides every contact); it floats, so the floor never pushes it.
+## The body collides with nothing and detects nothing (the brain decides every contact); it floats, so the
+## floor never pushes it.
 func _init() -> void:
 	collision_layer = 0
 	collision_mask = 0

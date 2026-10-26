@@ -286,7 +286,8 @@ func set_device(device: String) -> void:
 		legend_caption.text = CAPTIONS.get(device, CAPTIONS["keyboard"])
 
 
-## Labels [param category]'s legend button with a filled or empty box and tints it with its colour while on, muted while off.
+## Labels [param category]'s legend button with a filled or empty box and tints it with its colour while
+## on, muted while off.
 func _style_button(category: StringName) -> void:
 	var button: Button = legend_buttons.get(category) as Button
 	if button == null:
@@ -316,7 +317,8 @@ func refresh_now() -> void:
 	queue_redraw()
 
 
-## While shown: redraws every frame, and gathers the render candidates again every REFRESH_SECONDS ([param delta] in seconds).
+## While shown: redraws every frame, and gathers the render candidates again every REFRESH_SECONDS
+## ([param delta] in seconds).
 func _process(delta: float) -> void:
 	_refresh_left -= delta
 	if _refresh_left <= 0.0:
@@ -1363,7 +1365,8 @@ static func clip(rect: Rect2, cuts: Array[Rect2]) -> Array[Rect2]:
 
 # --- Drawing ----------------------------------------------------------------------------------
 
-## Draws every shown category's items, render boxes first, then zones, then hitboxes on top, from the last gathering.
+## Draws every shown category's items, render boxes first, then zones, then hitboxes on top, from the last
+## gathering.
 func _draw() -> void:
 	if game == null:
 		return
@@ -1378,7 +1381,8 @@ func _draw() -> void:
 				_draw_item(item, font)
 
 
-## Draws [param item] in its category's colour by its kind: range or ray, spot, limit, shape or rect, else a render box.
+## Draws [param item] in its category's colour by its kind: range or ray, spot, limit, shape or rect, else
+## a render box.
 func _draw_item(item: Item, font: Font) -> void:
 	var tint: Color = COLORS[item.category]
 	match item.kind:
@@ -1458,7 +1462,8 @@ func _draw_range(item: Item, tint: Color, font: Font) -> void:
 	_draw_label(item, Color(color, strength).lightened(0.25), font)
 
 
-## Draws a spot as a tick down to its lane and, unless tick_only, a marker on top; white for the spot WOLF is heading for. Nothing for an item given no lane.
+## Draws a spot as a tick down to its lane and, unless tick_only, a marker on top; white for the spot WOLF
+## is heading for. Nothing for an item given no lane.
 func _draw_spot(item: Item, tint: Color, font: Font) -> void:
 	if int(item.extra.get("lane", 0)) < 0:
 		return

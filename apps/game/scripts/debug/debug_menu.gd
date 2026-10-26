@@ -233,7 +233,8 @@ func _build_force_page(box: VBoxContainer) -> void:
 	force_reason = _caption(box, "")
 
 
-## Fills [param box] with SAVE: the checkpoint caption, SAVE NOW, RELOAD CHECKPOINT and CLEAR SAVE (pressed twice).
+## Fills [param box] with SAVE: the checkpoint caption, SAVE NOW, RELOAD CHECKPOINT and CLEAR SAVE (pressed
+## twice).
 func _build_save_page(box: VBoxContainer) -> void:
 	save_caption = _caption(box, "")
 	var grid: GridContainer = _grid(box, 1)
@@ -242,7 +243,8 @@ func _build_save_page(box: VBoxContainer) -> void:
 	_button(grid, "save:clear", "CLEAR SAVE", _on_clear_save)
 
 
-## Fills [param box] with VIEW: the overlay cycle, the bug capture, the three effect switches and LOCK DEBUG TOOLS.
+## Fills [param box] with VIEW: the overlay cycle, the bug capture, the three effect switches and LOCK
+## DEBUG TOOLS.
 func _build_view_page(box: VBoxContainer) -> void:
 	_caption(box, "WHAT YOU SEE. The switches are not cheats and are not saved.")
 	var grid: GridContainer = _grid(box, 2)
@@ -255,7 +257,8 @@ func _build_view_page(box: VBoxContainer) -> void:
 	lock.add_theme_color_override("font_color", WARN)
 
 
-## Builds the frame-step bar (STEP_BAR_RECT, canvas px), hidden, with its counter and its STEP and RUN buttons.
+## Builds the frame-step bar (STEP_BAR_RECT, canvas px), hidden, with its counter and its STEP and RUN
+## buttons.
 func _build_step_bar() -> void:
 	step_bar = PanelContainer.new()
 	step_bar.name = "FrameStepBar"
@@ -411,7 +414,8 @@ func close(settle: bool = true) -> void:
 	closed.emit()
 
 
-## On opening, gives focus to the current page's tab, or to nothing in the touch layout (no focus ring under a finger).
+## On opening, gives focus to the current page's tab, or to nothing in the touch layout (no focus ring
+## under a finger).
 func _focus_first() -> void:
 	if _touch_layout():
 		get_viewport().gui_release_focus()
@@ -531,7 +535,8 @@ func _run_and_close(action: Callable) -> void:
 		tools.show_note(note)
 
 
-## CLEAR SAVE's first press arms it and asks for a second; the second deletes the checkpoint (DebugActions.clear_save).
+## CLEAR SAVE's first press arms it and asks for a second; the second deletes the checkpoint
+## (DebugActions.clear_save).
 func _on_clear_save() -> void:
 	if not _clear_armed:
 		_clear_armed = true

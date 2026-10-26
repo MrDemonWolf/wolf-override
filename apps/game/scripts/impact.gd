@@ -61,7 +61,8 @@ var _white_rest: Color = Color(0.0, 0.0, 0.0, 0.0)
 var _red_rest: float = 0.0
 
 
-## Keeps the kit processing while the tree is paused, and seeds the shake noise (seed 7) so a shake is the same each run.
+## Keeps the kit processing while the tree is paused, and seeds the shake noise (seed 7) so a shake is the
+## same each run.
 func _init() -> void:
 	# Shake settles and hit-stops end while the tree is paused, so nothing stays frozen off-centre.
 	process_mode = Node.PROCESS_MODE_ALWAYS
@@ -125,7 +126,8 @@ func hit_stop(seconds: float) -> void:
 	timer.timeout.connect(_end_hit_stop.bind(_stop_serial))
 
 
-## A hit-stop's timer ran out: puts time scale back to 1, but only if no later hit-stop or reset has taken over ([param serial] still the latest).
+## A hit-stop's timer ran out: puts time scale back to 1, but only if no later hit-stop or reset has taken
+## over ([param serial] still the latest).
 func _end_hit_stop(serial: int) -> void:
 	if serial == _stop_serial:
 		Engine.time_scale = 1.0

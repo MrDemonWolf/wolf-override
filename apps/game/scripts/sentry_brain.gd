@@ -243,7 +243,8 @@ func reset(door_blown: bool, down: bool, down_x: float) -> void:
 	far_x = PATROL_MAX_X
 
 
-## Enters the lock state: holds still for LOCK_SECONDS before the chase, with the lost-sight timer and a miss's turn cleared.
+## Enters the lock state: holds still for LOCK_SECONDS before the chase, with the lost-sight timer and a
+## miss's turn cleared.
 func _lock_on() -> void:
 	state = &"lock"
 	lock_remaining = LOCK_SECONDS
