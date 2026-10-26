@@ -1,5 +1,11 @@
 class_name Main
 extends Node2D
+## The game's root (scenes/main.tscn): it owns the title screen, the opening, the slice's three rooms
+## (corridor, records room, junction) and every overlay over them (pause, settings, credits, changelog,
+## end card, knockdown card). It reads input, moves the play between beats in [member state] (an M0State),
+## saves that state at checkpoints and keeps the HUD, the camera and each room's machines in step with it.
+## The rooms' drawing and the opening's staging live in their own nodes (RecordsRoom, JunctionRoom,
+## DockBay, Opening), which Main builds in _ready and drives; positions are world px, times seconds.
 
 const SITE_URL: String = "https://wolfoverride.mrdemonwolf.dev"
 const CHANGELOG_URL: String = SITE_URL + "/docs/changelog/"

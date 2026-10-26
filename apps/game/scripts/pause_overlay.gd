@@ -1,5 +1,9 @@
 class_name PauseOverlay
 extends ColorRect
+## The pause screen's dimmed backdrop (CanvasLayer/PauseOverlay in main.tscn), holding the pause menu and
+## the settings menu. It runs while the tree is paused, so it turns Pause and Back presses into
+## [signal resume_requested] (pause menu showing) or [signal back_requested] (settings showing) for Main to
+## act on; it changes no state of its own.
 
 signal resume_requested
 signal back_requested
