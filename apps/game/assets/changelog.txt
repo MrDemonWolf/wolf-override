@@ -57,6 +57,8 @@ Changes merged after 0.15.0. They become the next version when it is cut.
 - The changelog screen's note wraps onto two rows instead of running past the panel, and its two buttons can take two rows.
 - The end card's recap rows make room for a longer topic and wrap their words where needed.
 - Station names are measured in the language you play in. A longer name breaks onto rows to keep the English name's width; names that would touch break, get smaller or move a little apart; the corridor's names stay inside its first view. English names are unchanged.
+- A checkpoint save that could not replace the old file is no longer lost: the game loads whichever copy of the save is newer and puts it in place.
+- The charger's battery readout lights no segment at 0%.
 
 -- Accessibility --
 - With Reduce Motion on, the dock bay's red beacon and the corridor's lockdown light through its doorway hold steady, the torn lock hangs still and the pad's standby light does not breathe. Switching it mid-game applies at once.
@@ -82,6 +84,7 @@ Changes merged after 0.15.0. They become the next version when it is cut.
 - Key names follow your keyboard layout on Windows, macOS and Linux: on a French AZERTY keyboard Move left reads Q, not A. A symbol key shows the symbol printed on it, such as & on the AZERTY 1 key, and a letter the game's fonts cannot draw (Greek, Hebrew, Arabic, Thai) shows its QWERTY name.
 - A long control binding, such as "D-pad right / Left stick +", breaks onto a second row instead of being cut short with "…".
 - Every station name is translated in every language now, Records Access, the Service Junction and the MANUAL BYPASS included, in the words the hints use. The COOLANT FAULT tag and the words painted on the doors stay English.
+- Settings are written to a temporary file first and then swapped in, so a crash while saving cannot leave a broken settings file.
 
 -- Website --
 - Next.js is updated to 16.4.3 with the October security fixes; the website stays a static export.
@@ -221,6 +224,9 @@ Changes merged after 0.15.0. They become the next version when it is cut.
 - extract_pot.sh never deletes an addons folder it did not make.
 - The site's checks fetch history without old file contents, and the site redeploys when the game version, key art or credit line it reads changes.
 - Every workflow names the exact release of each pinned action, and Dependabot waits 7 days for a release (14 for a major one).
+- One shared AtomicFile writes the checkpoint and the settings file through a temporary copy.
+- m0_state_test checks that a newer temporary save wins, an older one loses, old saves load as before and an oversized save is turned away.
+- The debug tools' CLEAR SAVE note names what it actually deleted.
 
 -- How it was checked --
 - Checked: headless test suites, the docs checks and build, rendered stills of the title screen, and headless browser screenshots of the credits, legal and landing pages, and an axe scan of the landing page; headless browser screenshots of the guide home, the changelog and the open guide menu at phone, tablet and desktop sizes, and an axe scan of guide pages; the README's links checked against the built site and its commands against package.json; headless browser screenshots of the rewritten player pages, their facts checked against the game's code; headless browser screenshots of the new and rewritten user pages, the privacy claims checked against the game's code; headless browser screenshots of the developer pages, with honesty-note counts kept and their commands run or marked not run; headless browser screenshots of the docs style guide, Developer home and Contributing; not played by hand.
