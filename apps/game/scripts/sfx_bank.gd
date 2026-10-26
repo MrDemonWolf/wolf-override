@@ -81,6 +81,9 @@ var _detail: Dictionary = {}
 static var _detail_rendered: Dictionary = {}
 
 
+## Renders the start-up clips on this thread (timed into generation_ms, in ms), starts the detailed
+## clips on a worker thread unless an earlier bank already rendered them (then shares those), and adds
+## the VOICES one-shot players and one player per loop, all on BUS.
 func _ready() -> void:
 	var start: int = Time.get_ticks_usec()
 	_render_startup()
@@ -95,6 +98,7 @@ func _ready() -> void:
 		_loop_players[loop_name] = _add_player(String(loop_name).capitalize().replace(" ", "") + "Loop")
 
 
+## Waits for the detailed clips' worker to finish, so no thread outlives the bank.
 func _exit_tree() -> void:
 	wait_for_detail()
 
@@ -164,11 +168,13 @@ func stop(clip: StringName) -> void:
 		_warn_unknown(clip)
 
 
+## Stops each loop named in [param clips] (see stop).
 func stop_each(clips: Array[StringName]) -> void:
 	for clip: StringName in clips:
 		stop(clip)
 
 
+## Stops every one-shot voice and every loop at once.
 func stop_all() -> void:
 	for player: AudioStreamPlayer in _voices:
 		player.stop()
@@ -183,6 +189,7 @@ func _warn_unknown(clip: StringName) -> void:
 		push_warning("SfxBank: no clip or loop named &\"%s\"; nothing plays or stops" % clip)
 
 
+## Every player the bank owns, the one-shot voices then the loops (a new array; tests and tools read it).
 func players() -> Array[AudioStreamPlayer]:
 	var all: Array[AudioStreamPlayer] = _voices.duplicate()
 	for player: AudioStreamPlayer in _loop_players.values():
@@ -190,6 +197,7 @@ func players() -> Array[AudioStreamPlayer]:
 	return all
 
 
+## Adds an AudioStreamPlayer named [param player_name] on BUS as a child and returns it.
 func _add_player(player_name: String) -> AudioStreamPlayer:
 	var player: AudioStreamPlayer = AudioStreamPlayer.new()
 	player.name = player_name
@@ -209,6 +217,8 @@ func generate() -> void:
 	streams.merge(detail, true)
 
 
+## Renders the start-up clips into streams from one generator seeded with SEED, in a fixed order (so
+## each clip's bytes never change), then adds the RECORDED clips. Runs on the calling thread.
 func _render_startup() -> void:
 	var rng: RandomNumberGenerator = RandomNumberGenerator.new()
 	rng.seed = SEED
@@ -238,6 +248,7 @@ static func _render_detail(into: Dictionary) -> void:
 	into[&"growl_warning"] = _wav(_growl_warning(_seeded(SEED ^ String(&"warning").hash())), false, DETAIL_RATE)
 
 
+## A new generator seeded with [param seed], so each detailed clip has its own fixed noise.
 static func _seeded(seed: int) -> RandomNumberGenerator:
 	var rng: RandomNumberGenerator = RandomNumberGenerator.new()
 	rng.seed = seed
@@ -650,6 +661,9 @@ static func _n_wave(out: PackedFloat32Array, at: float, amp: float, width: float
 		out[start + k] += amp * (1.0 - 2.0 * float(k) / float(w - 1))
 
 
+## Adds an arc's strike to [param out] (DETAIL_RATE samples) at [param at] seconds and [param amp]: an
+## N-wave crack, then 0.3 s of fast-decaying noise ringing [param modes] (each [Hz, level, decay
+## seconds]).
 static func _b_crack(rng: RandomNumberGenerator, out: PackedFloat32Array, at: float, amp: float, modes: Array) -> void:
 	_n_wave(out, at, amp * 1.4, 0.0009)
 	var start: int = int(at * DETAIL_RATE)
@@ -783,6 +797,8 @@ static func _harmonic_table(rng: RandomNumberGenerator, harmonics: int, tilt: fl
 	return table
 
 
+## [param table]'s value at [param phase] (0..1 of one cycle; wraps past 1), linearly interpolated
+## between its two nearest samples.
 static func _table_read(table: PackedFloat32Array, phase: float) -> float:
 	var pos: float = phase * table.size()
 	var index: int = int(pos) % table.size()
@@ -843,6 +859,10 @@ const GROWL_CONTOUR: Dictionary = {"swell_hz": 2.4, "swell_db": 5.0, "f1_sweep":
 const GROWL_TAIL: float = 0.06
 
 
+## WOLF's lane warning growl, DETAILED's length at DETAIL_RATE: the glottal source shaped by GROWL_SHAPE
+## through the vocal-tract formants, a ringing chassis and a grille rattle, soft-clipped, with
+## GROWL_CONTOUR's swell and two snarl bursts applied before and after the clipping. [param rng] gives
+## the jitter and noise.
 static func _growl_warning(rng: RandomNumberGenerator) -> PackedFloat32Array:
 	var seconds: float = DETAILED[&"growl_warning"]
 	var shape: Dictionary = GROWL_SHAPE
@@ -1089,6 +1109,7 @@ static func _mix_buffer(seconds: float) -> PackedFloat32Array:
 	return _zeros(int(seconds * MIX_RATE))
 
 
+## [param frames] samples of uniform white noise in -1..1 from [param rng].
 static func _white(rng: RandomNumberGenerator, frames: int) -> PackedFloat32Array:
 	var out: PackedFloat32Array = _zeros(frames)
 	for i: int in frames:
@@ -1102,6 +1123,7 @@ static func _mix(out: PackedFloat32Array, layer: PackedFloat32Array, gain: float
 		out[i] += layer[i] * gain
 
 
+## The largest absolute sample in [param x] (0 for none).
 static func _peak(x: PackedFloat32Array) -> float:
 	var peak: float = 0.0
 	for sample: float in x:
@@ -1109,6 +1131,7 @@ static func _peak(x: PackedFloat32Array) -> float:
 	return peak
 
 
+## The root mean square level of [param x] (0 for none).
 static func _rms(x: PackedFloat32Array) -> float:
 	var sum: float = 0.0
 	for sample: float in x:
@@ -1116,6 +1139,7 @@ static func _rms(x: PackedFloat32Array) -> float:
 	return sqrt(sum / maxf(x.size(), 1))
 
 
+## A copy of [param x] scaled so its peak is 1; an all-silent buffer is copied unchanged.
 static func _normalised(x: PackedFloat32Array) -> PackedFloat32Array:
 	var out: PackedFloat32Array = x.duplicate()
 	var peak: float = _peak(out)
