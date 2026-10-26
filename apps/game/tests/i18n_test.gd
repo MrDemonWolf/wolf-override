@@ -186,12 +186,45 @@ func _run() -> void:
 	await _check_planted_overflows()
 	_check_key_prompts()
 	await _check_hud()
+	await _check_hidden_screens()
 	await _check_layouts()
 	_check_story_lines()
 	_check_story_marks()
 	await _check_story_game()
 	I18n.apply("en")
 	finish("Languages: %d checks passed." % _checks)
+
+
+## SMOOTH-4: a language change made while the credits and changelog screens are hidden leaves their
+## bodies as they were (nothing lays out text nobody sees), and each screen writes its body in the new
+## language as it opens. Spanish is used because both the AI disclosure heading and the changelog's
+## English note have Spanish translations; the check reads the bodies through tr() so it follows the
+## catalog rather than repeating its words.
+func _check_hidden_screens() -> void:
+	var game: Main = await start_game("i18n-hidden-screens") as Main
+	await process_frame
+	var credits_body: RichTextLabel = game.credits_screen.get_node("CreditsBody") as RichTextLabel
+	var changelog_body: RichTextLabel = game.changelog_screen.get_node("ChangelogBody") as RichTextLabel
+	var credits_english: String = credits_body.text
+	var changelog_english: String = changelog_body.text
+	I18n.apply("es")
+	await process_frame
+	var heading: String = game.tr(Main.AI_DISCLOSURE_HEADING)
+	var note: String = game.tr(Main.CHANGELOG_ENGLISH_NOTE)
+	_check(heading != Main.AI_DISCLOSURE_HEADING and note != Main.CHANGELOG_ENGLISH_NOTE, "Spanish translates the credits heading and the changelog note, so the check below can tell the languages apart")
+	_check(credits_body.text == credits_english and changelog_body.text == changelog_english, "a language change leaves the hidden credits and changelog bodies alone")
+	game.call("_show_credits")
+	_check(credits_body.text.contains(heading), "the credits write their body in the new language as they open")
+	game.call("_hide_credits")
+	game.call("_show_changelog")
+	_check(changelog_body.text.contains(note), "the changelog writes its body in the new language as it opens")
+	I18n.apply("en")
+	_check(changelog_body.text == changelog_english, "a language change while the changelog is up writes it again at once")
+	game.call("_hide_changelog")
+	game.call("_show_credits")
+	_check(credits_body.text == credits_english, "back in English, the credits open in English again")
+	game.call("_hide_credits")
+	await end_game(game)
 
 
 ## _expect, counting the checks that ran so the pass note can say how many.
