@@ -105,7 +105,7 @@ const STORY_IN_PLACE: Array[String] = [
 	"Records access restored. The purge order is copied; copy the mirror index next.",
 	"Records access restored. Copy the purge-order trace first; WOLF is checking the mirror.",
 	"Safe point restored.",
-	"Records clerk's archive marked for deletion.",
+	"Records worker's archive marked for deletion.",
 	"They want the source record gone. We need to preserve it.",
 	"No station in reach. Follow the labeled breaker, relay, bypass or safe point.",
 	"Power is already on. The relay is farther down the hall.",
@@ -126,13 +126,13 @@ const STORY_IN_PLACE: Array[String] = [
 	"Take the purge queue. I'll inspect the mirror.",
 	"Safe point saved.",
 	"Safe point saved. WOLF remembers the same choice.",
-	"The Director's purge order has a time and file ID. %s keeps a local copy; the clerk's originals are still missing.",
+	"The Director's purge order has a time and file ID. %s keeps a local copy; the worker's originals are still missing.",
 	"The purge-order trace is already copied. The mirror port may confirm when the source existed.",
 	"The mirror index has no context yet. Copy the purge-order trace first.",
 	"The mirror timestamp is already preserved. The exit is to the right.",
 	"I found the mirror index. We can use my readout or your maintenance port.",
 	"Exit sealed until the purge order and mirror timestamp are copied.",
-	"WOLF reads the timestamp off his own readout. The clerk's files existed before the deletion order.",
+	"WOLF reads the timestamp off his own readout. The worker's files existed before the deletion order.",
 	"%s copies the timestamp through the maintenance port. WOLF keeps watch.",
 	"The overload breaker catches and the line starts to build. If the LINE gauge peaks, the relief vent lets go.",
 	"The wheel is stiff. Three full turns charge the door.",
@@ -975,7 +975,7 @@ func _check_fit(code: String, key: String, control: Control) -> void:
 func _story_catalog() -> Translation:
 	var catalog: Translation = Translation.new()
 	catalog.locale = UNSHIPPED_TEST_LANGUAGE
-	catalog.add_message(Main.INTRO_ORDER_WORDS, "Nueva orden, WOLF. Hay que silenciar a quien lleva los registros.")
+	catalog.add_message(Main.INTRO_ORDER_WORDS, "Quien lleva los registros es testigo. WOLF, al despertar, acaba con esa persona.")
 	catalog.add_message("DIRECTOR", "DIRECTORA DE PRUEBA", Main.SPEAKER_CONTEXT)
 	catalog.add_message(Main.OPENING_WOLF_WORDS, "Oí la orden del Director.")
 	catalog.add_message(Main.OPENING_ENGINEER_WORDS, "Entonces cruzamos mantenimiento.")
@@ -1014,7 +1014,7 @@ func _check_story_lines() -> void:
 	I18n.apply(UNSHIPPED_TEST_LANGUAGE)
 	var names: Dictionary = {"DIRECTOR": String(TranslationServer.translate("DIRECTOR", Main.SPEAKER_CONTEXT))}
 	var opening: String = I18n.shown(Main.INTRO_LINES[0], tags, names)
-	_check(opening == "DIRECTORA DE PRUEBA: Nueva orden, WOLF. Hay que silenciar a quien lleva los registros.", "the Director's line is his translated tag and his translated words (%s)" % opening)
+	_check(opening == "DIRECTORA DE PRUEBA: Quien lleva los registros es testigo. WOLF, al despertar, acaba con esa persona.", "the Director's line is his translated tag and his translated words (%s)" % opening)
 	var exchange: String = I18n.shown(Main.OPENING_EXCHANGE % "ROWAN", tags, names)
 	_check(exchange == "WOLF: Oí la orden del Director.\nROWAN: Entonces cruzamos mantenimiento.", "WOLF's and the engineer's words are translated apart and their tags stay as written (%s)" % exchange.c_escape())
 	var card: String = I18n.join("\n", [I18n.format(JunctionRoom.VENT_REASON, ["Rowan"]), Main.RESTORE_BEAT_LINE])
@@ -1084,7 +1084,7 @@ func _check_story_game() -> void:
 	I18n.apply(UNSHIPPED_TEST_LANGUAGE)
 	await process_frame
 	_check(game.status_line == Main.INTRO_LINES[0], "the game keeps the opening's English line (%s)" % game.status_line)
-	_check(game.speaker.text == "DIRECTORA DE PRUEBA" and game.story.text == "Nueva orden, WOLF. Hay que silenciar a quien lleva los registros.", "the opening's box draws the Director's translated tag and words (%s / %s)" % [game.speaker.text, game.story.text])
+	_check(game.speaker.text == "DIRECTORA DE PRUEBA" and game.story.text == "Quien lleva los registros es testigo. WOLF, al despertar, acaba con esa persona.", "the opening's box draws the Director's translated tag and words (%s / %s)" % [game.speaker.text, game.story.text])
 	_check(game.speaker.get_theme_color(&"font_color").is_equal_approx(Color("#ff9a9f")), "the translated tag keeps the Director's colour, chosen by his English tag")
 	game.call("_finish_intro")
 	await process_frame

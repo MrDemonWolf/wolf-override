@@ -101,7 +101,7 @@ func _run() -> void:
 	game.call("_refresh_ui")
 	_expect(not top_card.visible, "opening slate fades away and does not reappear each frame")
 	# Audit 12: the Director's lines carry his tag; the narration has its own untagged boxes.
-	_expect(speaker.visible and speaker.text == "DIRECTOR" and story.text == "New order, WOLF. The records clerk is a witness. Kill the clerk tonight.", "the Director's first line sits alone under his tag")
+	_expect(speaker.visible and speaker.text == "DIRECTOR" and story.text == "The records worker is a witness. WOLF, when you wake, kill the worker.", "the Director's first line sits alone under his tag")
 	await tap(&"interact")
 	_expect(game.get("intro_step") == 1 and not speaker.visible and story.text == "The Director thinks WOLF is still in standby.", "the narration after it gets its own untagged box, naming the Director")
 	await tap(&"interact")
@@ -178,23 +178,23 @@ func _run() -> void:
 	var opening_boxes: Array[String] = [Main.TRUST_LINE_1 % "Rowan", Main.TRUST_LINE_2 % "Rowan", Main.OPENING_EXCHANGE % "ROWAN"]
 	_expect(str(game.get("status_line")) == opening_boxes[0] and game.get("box_queue") == opening_boxes.slice(1), "the first step starts the opening lines at the trust line's first box")
 	game.call("_interact")
-	_expect(str(game.get("status_line")).begins_with("DIRECTOR / PURGE: Records clerk's archive marked for deletion") and game.get("box_queue") == opening_boxes, "reading the display ahead of the opening lines holds them all back behind it, the box it cut into first")
+	_expect(str(game.get("status_line")).begins_with("DIRECTOR / PURGE: Records worker's archive marked for deletion") and game.get("box_queue") == opening_boxes, "reading the display ahead of the opening lines holds them all back behind it, the box it cut into first")
 	# Brought on to the opening exchange, its box is up and unread: reading the display again puts it
 	# back at the front of the queue instead of replacing it for good (the old flaky case on CI).
 	for box: int in 3:
 		game.call("_next_box_now")
 	_expect(str(game.get("status_line")) == opening_boxes[2] and (game.get("box_queue") as Array).is_empty(), "the opening exchange is the box up")
 	game.call("_interact")
-	_expect(str(game.get("status_line")).contains("Records clerk's archive marked for deletion") and game.get("box_queue") == [opening_boxes[2]], "reading the display over the unread opening exchange brings the exchange back after it")
+	_expect(str(game.get("status_line")).contains("Records worker's archive marked for deletion") and game.get("box_queue") == [opening_boxes[2]], "reading the display over the unread opening exchange brings the exchange back after it")
 	exchange_shown[0] = false
 	game.call("_refresh_ui")
-	_expect(str(game.get("status_line")).contains("Records clerk's archive marked for deletion"), "purge display establishes evidence stakes without inventory")
+	_expect(str(game.get("status_line")).contains("Records worker's archive marked for deletion"), "purge display establishes evidence stakes without inventory")
 	_expect(not tutorial_prompt.visible, "reading the display clears the opening tutorial")
 	var start_x: float = human.position.x
 	if not _require(await walk_to(human, 350.0), "active engineer reaches breaker by moving right"):
 		return
 	_expect(human.position.x > start_x and wolf.position.x > 225.0 and wolf.position.x < human.position.x, "WOLF follows the engineer autonomously")
-	_expect(str(game.get("status_line")).contains("Records clerk's archive marked for deletion"), "walking straight on past the display leaves its text up to be read")
+	_expect(str(game.get("status_line")).contains("Records worker's archive marked for deletion"), "walking straight on past the display leaves its text up to be read")
 	# The exchange follows once the display's text has been read, and the stakes wait for it to be read
 	# in turn. Each line shows box by box, each box up its reading time: about 15 s of standing still.
 	_expect(await wait_until(func() -> bool:
@@ -407,7 +407,7 @@ func _run() -> void:
 	if not _require(await walk_to(human, 350.0), "engineer reaches breaker on fresh fallback play"):
 		return
 	await process_frame
-	_expect(game.get("tutorial_step") == 2 and not tutorial_prompt.visible and not str(game.get("status_line")).contains("Records clerk's archive"), "reaching the breaker clears the tutorial without reading the display")
+	_expect(game.get("tutorial_step") == 2 and not tutorial_prompt.visible and not str(game.get("status_line")).contains("Records worker's archive"), "reaching the breaker clears the tutorial without reading the display")
 	_expect(str(game.get("status_line")).contains("keeps WOLF's systems running") and not game.get("stakes_spoken"), "walking right at once leaves the opening box up to be read")
 	await tap(&"interact")
 	_expect(str(game.get("status_line")).begins_with("WOLF: That purge erases what the witness saved.") and not game.get("waiting_for_choice"), "USE at the breaker before the opening box was read: WOLF says what the purge takes first, and the question waits")

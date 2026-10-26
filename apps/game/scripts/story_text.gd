@@ -33,7 +33,7 @@ static func messages() -> Array[String]:
 	return [
 		# The opening (INTRO_LINES). Its untagged beats are whole messages; the Director's and WOLF's words
 		# are kept apart from their tags.
-		# TRANSLATORS: The Director, the opening's first line: an order to WOLF, whom he thinks is in standby, to kill a witness, the records clerk. The clerk's gender is not given: use a neutral form where the language has one.
+		# TRANSLATORS: The Director, the opening's first line: an order to WOLF, whom he thinks is in standby, to kill a witness, the records worker. The worker's gender is not given: use a neutral form where the language has one.
 		# i18n: story speaker=DIRECTOR
 		I18n.KEY.tr(Main.INTRO_ORDER_WORDS),
 		# TRANSLATORS: i18n: story speaker=narrator

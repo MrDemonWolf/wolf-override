@@ -260,8 +260,8 @@ const RESTORE_BEAT_LINE: String = "Back at the start of this stretch."
 ## The opening's beats, one speaker (or the narration) per box, so narration never sits under a name tag.
 ## The Director's and WOLF's words are kept apart from their tags (see OPENING_WOLF_WORDS).
 ## The first beat is the order WOLF overhears in what the Director takes for standby: kill the witness, the
-## records clerk (story canon 2026-10-26, ST-04; wording DRAFTED).
-const INTRO_ORDER_WORDS: String = "New order, WOLF. The records clerk is a witness. Kill the clerk tonight."
+## records worker (story canon 2026-10-26, ST-04; wording APPROVED by Nathanial, 2026-10-26).
+const INTRO_ORDER_WORDS: String = "The records worker is a witness. WOLF, when you wake, kill the worker."
 const INTRO_STANDBY_WORDS: String = "You were in standby."
 const INTRO_REFUSAL_WORDS: String = "I heard you. I won't do it."
 const INTRO_LOCKDOWN_WORDS: String = "Lock down maintenance. WOLF does not leave this site."
@@ -2593,9 +2593,9 @@ func _interact() -> void:
 		return
 	_step_beside_station(x)
 	if _at_purge_display(x):
-		# TRANSLATORS: The Director's purge display, read as a speaker; WOLF answers in the next message. The records clerk is the witness; no gendered form for them.
+		# TRANSLATORS: The Director's purge display, read as a speaker; WOLF answers in the next message. The records worker is the witness; no gendered form for them.
 		# i18n: story speaker=DIRECTOR
-		var display: String = I18n.KEY.tr("Records clerk's archive marked for deletion.")
+		var display: String = I18n.KEY.tr("Records worker's archive marked for deletion.")
 		# TRANSLATORS: i18n: story speaker=WOLF
 		_aside("DIRECTOR / PURGE: %s\nWOLF: %s" % [display, I18n.KEY.tr("They want the source record gone. We need to preserve it.")])
 	elif _at_bypass(x):
@@ -2852,9 +2852,9 @@ func _interact_records(x: float) -> void:
 	if absf(x - 190.0) <= 58.0:
 		if state.preserve_purge_trace():
 			sfx_bank.play(&"chirp", -8.0)
-			# TRANSLATORS: %s is the engineer's first name. The clerk is the records clerk, the witness; no gendered form for them.
+			# TRANSLATORS: %s is the engineer's first name. The worker is the records worker, the witness; no gendered form for them.
 			# i18n: story speaker=narrator engineer=name
-			_aside(I18n.format(I18n.KEY.tr("The Director's purge order has a time and file ID. %s keeps a local copy; the clerk's originals are still missing."), [_first_name()]))
+			_aside(I18n.format(I18n.KEY.tr("The Director's purge order has a time and file ID. %s keeps a local copy; the worker's originals are still missing."), [_first_name()]))
 		else:
 			# TRANSLATORS: i18n: story speaker=narrator
 			_aside(I18n.KEY.tr("The purge-order trace is already copied. The mirror port may confirm when the source existed."))
@@ -3174,9 +3174,9 @@ func _choose_mirror(route_id: String) -> void:
 	choice_context = ""
 	_update_controls()
 	if route_id == "wolf":
-		# TRANSLATORS: The clerk is the records clerk, the witness; no gendered form for them.
+		# TRANSLATORS: The worker is the records worker, the witness; no gendered form for them.
 		# i18n: story speaker=narrator
-		status_line = I18n.KEY.tr("WOLF reads the timestamp off his own readout. The clerk's files existed before the deletion order.")
+		status_line = I18n.KEY.tr("WOLF reads the timestamp off his own readout. The worker's files existed before the deletion order.")
 	else:
 		# TRANSLATORS: %s is the engineer's first name.
 		# i18n: story speaker=narrator engineer=name
