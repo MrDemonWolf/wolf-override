@@ -18,7 +18,7 @@ func _run() -> void:
 	corrupt.set_value("video", "reduced_motion", "bad")
 	corrupt.set_value("bindings", "interact_keyboard", {"type": "key", "code": KEY_I})
 	corrupt.set_value("bindings", "choice_1_keyboard", {"type": "key", "code": KEY_I})
-	corrupt.save(path)
+	_expect(corrupt.save(path) == OK, "the corrupt settings fixture is written")
 	var game: Node2D = MAIN_SCENE.instantiate() as Node2D
 	game.set("settings_path", path)
 	game.set("save_path", "user://settings-save-test-%s.json" % OS.get_process_id())
