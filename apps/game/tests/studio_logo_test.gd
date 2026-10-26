@@ -110,7 +110,7 @@ func _check_reduced_motion() -> void:
 ## Played through, the logo hands over to main.tscn after the animation, under a cover that clears.
 ## How long it played is measured in the logo's own game time (each frame's delta clamped to
 ## StudioLogo.MAX_STEP, as the logo clamps it), not on the wall clock: on a busy machine frames come
-## late and the wall clock ran past END_AT + 1.5 s while the logo itself was on time. The game-time
+## late and the wall clock can run past END_AT + 1.5 s while the logo itself is on time. The game-time
 ## limits (8 s here, 3 s for the cover) are what fail a stuck logo; wait_game_seconds' wall-clock
 ## guard only stops the wait if frames stop altogether.
 func _check_handover() -> void:

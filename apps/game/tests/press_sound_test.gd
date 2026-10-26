@@ -261,7 +261,7 @@ func _hissing() -> bool:
 
 
 ## Waits process frames until [param condition] holds, up to BEAT_SECONDS of game time (the kit's
-## wait_game_seconds: a busy machine's late frames used to eat the real-time limit before the game
+## wait_game_seconds: on a busy machine late frames could use up a real-time limit before the game
 ## had played the beat). Returns whether it holds.
 func _until(condition: Callable) -> bool:
 	await wait_game_seconds(BEAT_SECONDS, condition)

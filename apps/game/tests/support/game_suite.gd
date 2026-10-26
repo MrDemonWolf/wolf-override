@@ -267,23 +267,19 @@ static func wait_until(condition: Callable, max_frames: int) -> bool:
 ## Read [member seconds] right after `await process_frame`: SceneTree emits process_frame before any
 ## node's _process, so at that point [member seconds] is the game time of the state the suite sees
 ## (every frame the game has finished), not one frame ahead. The clock is a node: it only runs in
-## the tree, pauses with the tree like the game does, and the caller frees it (check-game fails a
-## suite that leaks it). [method start_clock] makes one; [method wait_game_seconds] uses one.
+## the tree, stops while the tree is paused (it inherits the root's pausable mode, as the game's
+## pausable nodes do), and the caller frees it (check-game fails a suite that leaks it).
+## [method start_clock] makes one; [method wait_game_seconds] uses one.
 class GameClock extends Node:
 	## Game time since the clock entered the tree, in seconds.
 	var seconds: float = 0.0
-	## The longest single step added so far, in seconds: how far apart two looks a frame apart can
-	## be, for checks that allow for when in a frame something happened.
-	var longest_step: float = 0.0
 	## Each frame adds at most this many seconds (INF: the whole delta). StudioLogo clamps its own
 	## steps to StudioLogo.MAX_STEP, so a suite timing the logo clamps the same and counts what the
 	## logo counts; a long frame (a load hitch) then adds what it adds to the logo, not its length.
 	var max_step: float = INF
 
 	func _process(delta: float) -> void:
-		var step: float = minf(delta, max_step)
-		seconds += step
-		longest_step = maxf(longest_step, step)
+		seconds += minf(delta, max_step)
 
 
 ## A new [GameClock] added under the root, starting at 0 s of game time from the next process frame;
