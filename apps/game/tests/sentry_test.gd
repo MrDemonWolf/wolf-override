@@ -623,10 +623,8 @@ func _check_scene() -> void:
 	var hatch_start_x: float = human.position.x
 	# Continue goes through the closing lines' boxes first (one speaker each), then starts the walk.
 	_expect((game.get_node("CanvasLayer/BottomBar/Story") as Label).text == "SERVICE LINE CLEARED.", "the closing lines start with their own first box")
-	for _press: int in 3:
-		await tap(&"interact")
-		if game.get("hatch_exit_walking"):
-			break
+	var closing_note: String = await finish_closing_lines(game)
+	_expect(closing_note.is_empty(), closing_note)
 	# The two leave through the open door before the card, one at a time: WOLF walks on through it until
 	# the near jamb hides him, then the engineer walks through after him (never drawn over each other).
 	_expect(game.get("hatch_exit_walking") and not game.get("end_card_active") and not human.controlled, "Continue on the closing beat walks them out through the hatch first")
