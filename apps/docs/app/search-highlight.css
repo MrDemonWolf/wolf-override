@@ -1,0 +1,12 @@
+/*
+ * The search dialog's highlight of the words that match the query, as Fumadocs ships it: the
+ * primary colour token, underlined. It lives outside global.css on purpose: Tailwind's
+ * Lightning CSS optimiser warns on ::highlight() (see the @source not note there), and Tailwind's
+ * PostCSS plugin leaves a file with no Tailwind directives, like this one, untouched. fumadocs-core's
+ * useHighlightQuery registers the "fd-search" highlight only on search results, so the rule
+ * needs no scope. Delete this file and that @source line once a fixed Lightning CSS ships.
+ */
+::highlight(fd-search) {
+  color: var(--color-fd-primary);
+  text-decoration-line: underline;
+}
