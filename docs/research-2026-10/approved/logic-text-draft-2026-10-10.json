@@ -109,7 +109,7 @@
       "current": "WOLF: That purge erases what the witness saved. Once it's gone, his word is the only record.",
       "proposed": "WOLF: That purge erases what the witness saved. Once it's gone, his word is the only record.",
       "alternatives": [],
-      "notes": "Decision C: required on the main path; the optional display keeps the details (PURGE_DISPLAY_READ, unchanged). WOLF says it in the proposal and alternative 1 because the threat-label stakes are his; alternative 2 gives it to the engineer. 'his word is the only record' restates what the opening already shows (the Director decides who counts as a threat); no new fact. Do not make it say the engineer will copy the logs themselves: in Records the logs are 'still missing' and only the purge order's trace is copied. Fit: 1 of 3 rows, tagged box (715 px text width, Roboto 17 px); alt 1: 2 of 3 rows, tagged box (715 px text width, Roboto 17 px); alt 2: 1 of 3 rows, tagged box (715 px text width, Roboto 17 px). 2026-10-26: The purge now erases the witness's preserved record. It says the witness saved something, never what. Keep option: Nathanial may keep the old line, then the purge display and Records lines keep 'logs' too.",
+      "notes": "Decision C (2026-10-11, still valid): the stakes line is required on the main path, and the optional purge display keeps the details (PURGE_DISPLAY_READ). Current line, 2026-10-26: WOLF says the purge erases what the witness saved, so the Director is destroying the records clerk's preserved record (ST-04). It says the witness saved something, never what, so the slice does not reveal the investigator or the detention (spoiler line). 'His word is the only record' now means that without the witness's record the Director's account stands unchecked; it states no new fact. Do not make it say the engineer will copy the originals themselves: in Records the clerk's originals are 'still missing' and only the purge order's trace is copied. Fit: 1 of 3 rows, tagged box (715 px text width, Roboto 17 px). Keep option: Nathanial may keep the old line; then the purge display and the Records purge-queue line keep 'logs' too. The reasoning for the old line is under history.",
       "status": "drafted by Claude 2026-10-26 for the story canon of 2026-10-26 (docs/decisions.md ST-01 to ST-07; LINES.md change 4); waiting for Nathanial's read. IMPLEMENTED on branch story/canon-rewrite-2026-10.",
       "history": [
         {
@@ -119,7 +119,8 @@
             "WOLF: That display is the Director's purge. Without the original logs, nobody can check who he calls a threat.",
             "{NAME}: He's purging the original program logs. We save what we can before they're gone."
           ],
-          "status": "approved by Nathanial 2026-10-11 (as drafted)"
+          "status": "approved by Nathanial 2026-10-11 (as drafted)",
+          "notes": "Decision C: required on the main path; the optional display keeps the details (PURGE_DISPLAY_READ, unchanged). WOLF says it in the proposal and alternative 1 because the threat-label stakes are his; alternative 2 gives it to the engineer. 'his word is the only record' restates what the opening already shows (the Director decides who counts as a threat); no new fact. Do not make it say the engineer will copy the logs themselves: in Records the logs are 'still missing' and only the purge order's trace is copied. Fit: 1 of 3 rows, tagged box (715 px text width, Roboto 17 px); alt 1: 2 of 3 rows, tagged box (715 px text width, Roboto 17 px); alt 2: 1 of 3 rows, tagged box (715 px text width, Roboto 17 px)."
         }
       ]
     },
@@ -132,14 +133,15 @@
       "current": "DIRECTOR / PURGE: Records clerk's archive marked for deletion.\nWOLF: They want the source record gone. We need to preserve it.",
       "proposed": "DIRECTOR / PURGE: Records clerk's archive marked for deletion.\nWOLF: They want the source record gone. We need to preserve it.",
       "alternatives": [],
-      "notes": "Unchanged on purpose: the display keeps the details now that STAKES_LINE carries the stakes on the main path. Fit: 2 of 3 rows, untagged box (855 px text width, Roboto 17 px). 2026-10-26: 'Program logs' pointed at the program as the wrongdoer; ST-01 says it was made for good. The Director's target is now the witness's record. WOLF's reply is unchanged.",
+      "notes": "The optional purge display keeps the details, now that STAKES_LINE carries the stakes on the main path. Current line, 2026-10-26: the display names the records clerk's archive as the Director's deletion target. 'Original program logs' pointed at the program as the wrongdoer, and ST-01 says it was made for good. WOLF's reply ('They want the source record gone. We need to preserve it.') is the approved 2026-10-11 wording, unchanged. Fit: 2 of 3 rows, untagged box (855 px text width, Roboto 17 px).",
       "status": "drafted by Claude 2026-10-26 for the story canon of 2026-10-26 (docs/decisions.md ST-01 to ST-07; LINES.md change 5); waiting for Nathanial's read. IMPLEMENTED on branch story/canon-rewrite-2026-10.",
       "history": [
         {
           "current": "DIRECTOR / PURGE: Original program logs marked for deletion.\nWOLF: They want the source record gone. We need to preserve it.",
           "proposed": "DIRECTOR / PURGE: Original program logs marked for deletion.\nWOLF: They want the source record gone. We need to preserve it.",
           "alternatives": [],
-          "status": "approved by Nathanial 2026-10-11 (as drafted)"
+          "status": "approved by Nathanial 2026-10-11 (as drafted)",
+          "notes": "Unchanged on purpose: the display keeps the details now that STAKES_LINE carries the stakes on the main path. Fit: 2 of 3 rows, untagged box (855 px text width, Roboto 17 px)."
         }
       ]
     },
@@ -591,7 +593,7 @@
       "current": "WOLF reads the timestamp off his own readout. The clerk's files existed before the deletion order.",
       "proposed": "WOLF reads the timestamp off his own readout. The clerk's files existed before the deletion order.",
       "alternatives": [],
-      "notes": "Problem 21: 'by his own choice' right after the player picked his readout reads oddly, and 'brings' conflicts with the rule that WOLF never fetches. The alternative is the approved MIRROR TIMESTAMP examine text (item-text-2026-10-09), so the status line and the case entry could match word for word. Fit: 1 of 3 rows, untagged box (855 px text width, Roboto 17 px); alt 1: 2 of 3 rows, untagged box (855 px text width, Roboto 17 px). 2026-10-26: 'Purge target' was written for the retired target-list premise and could now read as a person; the purge points at the clerk's files.",
+      "notes": "Problem 21 (2026-10-11, still valid): WOLF reads the timestamp himself, because 'brings' conflicts with the rule that WOLF never fetches, and 'by his own choice' read oddly right after the player picked his readout. Current line, 2026-10-26: the second sentence says 'the clerk's files', because 'the purge target' was written for the retired target-list premise and could now read as a person. The timestamp shows the files existed before the deletion order, so the purge erased real records. Fit: 1 of 3 rows, untagged box (855 px text width, Roboto 17 px).",
       "status": "drafted by Claude 2026-10-26 for the story canon of 2026-10-26 (docs/decisions.md ST-01 to ST-07; LINES.md change 7); waiting for Nathanial's read. IMPLEMENTED on branch story/canon-rewrite-2026-10.",
       "history": [
         {
@@ -600,7 +602,8 @@
           "alternatives": [
             "The mirror timestamp shows the purge target existed before the deletion order. WOLF reads it out by his own choice."
           ],
-          "status": "approved by Nathanial 2026-10-11 (as drafted)"
+          "status": "approved by Nathanial 2026-10-11 (as drafted)",
+          "notes": "Problem 21: 'by his own choice' right after the player picked his readout reads oddly, and 'brings' conflicts with the rule that WOLF never fetches. The alternative is the approved MIRROR TIMESTAMP examine text (item-text-2026-10-09), so the status line and the case entry could match word for word. Fit: 1 of 3 rows, untagged box (855 px text width, Roboto 17 px); alt 1: 2 of 3 rows, untagged box (855 px text width, Roboto 17 px)."
         }
       ]
     },
