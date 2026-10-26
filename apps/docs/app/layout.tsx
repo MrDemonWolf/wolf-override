@@ -3,7 +3,10 @@ import type { ReactNode } from 'react';
 import { RootProvider } from 'fumadocs-ui/provider/next';
 import localFont from 'next/font/local';
 import './global.css';
+// After global.css: the search-term highlight Tailwind cannot optimise without warnings (see the file).
+import './search-highlight.css';
 import { siteDescription, siteUrl, titleTemplate } from '@/lib/seo';
+import { contentSecurityPolicy } from '@/lib/csp';
 
 // Latin-subset WOFF2 builds of the OFL fonts; licence texts sit beside them in ./fonts.
 const roboto = localFont({
@@ -58,6 +61,10 @@ export const viewport: Viewport = {
 export default function RootLayout({ children }: { children: ReactNode }) {
   return (
     <html lang="en" className={`${roboto.variable} ${montserrat.variable}`} suppressHydrationWarning>
+      <head>
+        {/* GitHub Pages cannot send a CSP header, so every page carries the policy as a meta tag (lib/csp.ts). */}
+        <meta httpEquiv="Content-Security-Policy" content={contentSecurityPolicy(process.env.NODE_ENV === 'development')} />
+      </head>
       <body>
         <a className="skip-link" href="#main-content">Skip to content</a>
         {/* Fumadocs 16.13+ toggles the theme on a bare "D" key press; single-character shortcuts are switched off (WCAG 2.1.4). */}

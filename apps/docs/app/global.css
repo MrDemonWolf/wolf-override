@@ -1,6 +1,15 @@
 @import "tailwindcss";
 @import "fumadocs-ui/css/ocean.css";
 @import "fumadocs-ui/css/preset.css";
+/*
+ * Fumadocs' search dialog (fumadocs-ui 16.17.x, dist/components/dialog/search.js) styles the matched
+ * words with [&_::highlight(fd-search)] utilities. ::highlight() is valid CSS (the Custom Highlight
+ * API), but Lightning CSS 1.32, which Tailwind uses to optimise this file, does not know it and
+ * printed two "not recognized as a valid pseudo-element" warnings on every build (CI-14). No newer
+ * fumadocs-ui drops the classes, so they are left out here, and app/search-highlight.css carries the
+ * same two declarations outside Tailwind's optimiser.
+ */
+@source not inline("[&_::highlight(fd-search)]:text-fd-primary [&_::highlight(fd-search)]:underline");
 
 /*
  * Site design tokens. `static` keeps every variable in the output even when

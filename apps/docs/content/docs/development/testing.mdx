@@ -93,11 +93,12 @@ The same script keeps the in-game changelog in step with the website.
 - No page uses the image optimiser GitHub Pages lacks.
 - Each page has its skip-link target and at most one robots tag.
 - Each page limits the referrer sent to other sites to this site's origin.
+- Each page carries the site's Content Security Policy, a list of where it may load files from, as a meta tag.
 - Internal links and heading links point to files and IDs in the export; external sites are not checked.
 - Every font is WOFF2.
 - `robots.txt` names the sitemap, and every guide page in the sitemap has its last-changed date.
 - The landing and guide pages carry valid structured data.
-- `llms.txt`, `llms-full.txt` and every guide page's Markdown copy exist, without raw MDX.
+- `llms.txt`, `llms-full.txt` and every guide page's Markdown copy exist, with no raw component tags outside code blocks.
 
 ## Translation checks
 
@@ -111,6 +112,7 @@ The translation tools in `scripts/i18n/` have their own page: [Localization](/do
 4. Check the press kit download, sitemap and any published GitHub Release links.
 
 - **A build pass is not a live check.** Record which browser and screen sizes you tried.
+- **A punycode warning** (`DEP0040`) in the deploy step's log is known and harmless. It comes from GitHub's deploy action, not the site.
 - **No published releases yet:** test-build artifacts need a GitHub account and expire; they are not release downloads.
 
 ## Recover a broken website deployment

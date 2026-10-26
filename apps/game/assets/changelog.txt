@@ -151,6 +151,9 @@ Changes merged after 0.15.0. They become the next version when it is cut.
 - One press kit download (about 8 MB): the logo set, the wolf mark, three screenshots, the provisional key art, the cover, facts and the approved copy. Each file can also be downloaded on its own.
 - Credits, the press kit page and the press kit's FACTS.txt and COPY.txt show the approved AI disclosure. Legal links to it.
 - Support has a "Spotted a translation mistake?" section linking the new translation issue form and the Discord server; Platforms and languages links to it.
+- The guide's Markdown copies (llms-full.txt and each page's .md) show notes as quotes and folded notes as plain text, not stray code tags.
+- Every page carries a Content Security Policy, so it loads scripts, styles, fonts and images only from the site itself.
+- Search results still underline the words you typed, and the site builds without its two CSS warnings.
 
 -- Development --
 - The press kit zip is built by a script from the site's own files each time the site is built, so the repository never stores a second copy of them.
@@ -228,6 +231,7 @@ Changes merged after 0.15.0. They become the next version when it is cut.
 - m0_state_test checks that a newer temporary save wins, an older one loses, old saves load as before and an oversized save is turned away.
 - The debug tools' CLEAR SAVE note names what it actually deleted.
 - Every game script the code review named now has doc comments on its class and methods: what each does, its inputs and outputs, units and side effects. The code itself is unchanged.
+- The site's export check fails when a page lacks its security policy, or a Markdown copy has a raw component tag.
 
 -- How it was checked --
 - Checked: headless test suites, the docs checks and build, rendered stills of the title screen, and headless browser screenshots of the credits, legal and landing pages, and an axe scan of the landing page; headless browser screenshots of the guide home, the changelog and the open guide menu at phone, tablet and desktop sizes, and an axe scan of guide pages; the README's links checked against the built site and its commands against package.json; headless browser screenshots of the rewritten player pages, their facts checked against the game's code; headless browser screenshots of the new and rewritten user pages, the privacy claims checked against the game's code; headless browser screenshots of the developer pages, with honesty-note counts kept and their commands run or marked not run; headless browser screenshots of the docs style guide, Developer home and Contributing; not played by hand.
@@ -252,6 +256,7 @@ Changes merged after 0.15.0. They become the next version when it is cut.
 - Layout for languages checked: headless test suites in every language and pseudo-English, every English station name at every TEXT SIZE compared with the previous version (unchanged), and rendered title, changelog, Settings and end card stills in English, Spanish, German and pseudo-English before and after; the new title layout is not yet looked at by Nathanial Henniges, and not played by hand.
 - Translation reports checked: the docs checks, tests and build, and the issue form's YAML parsed; the form itself shows on GitHub only once merged.
 - Full slice and parity routes checked: headless test suites (32, with full_slice_test at 128 s on CI) and rendered stills of R2 and R4 in all 3 variants and 3 sizes (18 runs, none failed); not played by hand.
+- Site security policy and Markdown copies checked: the docs checks and build, with no CSS warnings, and a headless browser over all 41 built pages, search, fonts and the press kit download, with no policy violations.
 - Workflow changes checked: every workflow on the pull request (Game checks with the new tools job, Deploy Docs, Test builds) and Test builds run once by hand; the game itself did not change.
 
 == 0.15.0 - October 16, 2026 ==
