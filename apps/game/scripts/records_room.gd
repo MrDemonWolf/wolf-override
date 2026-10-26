@@ -197,6 +197,10 @@ var exit_tween: Tween
 var entry_tween: Tween
 
 
+## Builds the whole room once: its RoomDepth plates and lamps, the PURGE QUEUE and MIRROR PORT machines
+## with their screens, lights' glows and name plates, the entry and exit doors (leaves, near ends, lamps,
+## reader and the bodies that stop the actors at a shut leaf), the security container and the EXIT
+## plate. Positions are world px.
 func _ready() -> void:
 	depth = RoomDepth.new()
 	depth.name = "Depth"
@@ -407,19 +411,23 @@ func close_entry_behind() -> void:
 	entry_tween = entry_leaf.close_behind(self, entry_tween, func() -> void: set_entry_lamp(Palette.LAMP_SHUT))
 
 
+## Draws what the plates and sprites cannot show: the two machines' status lights.
 func _draw() -> void:
 	# The records plates are the Depth child's layers; the doors are their own nodes.
 	_draw_machine_lights()
 
 
+## Draws each machine's status light on its prop (PURGE_LIGHT, MIRROR_LIGHT) in its current colour.
 func _draw_machine_lights() -> void:
 	draw_rect(RoomDepth.prop_rect(purge_art, PURGE_LIGHT), _purge_light_color())
 	draw_rect(RoomDepth.prop_rect(mirror_art, MIRROR_LIGHT), _mirror_light_color())
 
 
+## The PURGE QUEUE light: green once its trace is kept, red before.
 func _purge_light_color() -> Color:
 	return Palette.GREEN if purge_trace_preserved else PURGE_RED
 
 
+## The MIRROR PORT light: green once its trace is kept, cyan before.
 func _mirror_light_color() -> Color:
 	return Palette.GREEN if mirror_trace_preserved else MIRROR_CYAN

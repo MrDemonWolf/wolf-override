@@ -227,6 +227,8 @@ class Beacon:
 	## globe and the guard in turn.
 	var parts: Array[Rect2] = []
 
+	## Draws the beacon at its anchor: with [member art], the fixture, the globe tinted by [member lens] and
+	## the guard from [member parts]; without it, a plain housing on its bracket with a [member lens] face.
 	func _draw() -> void:
 		if art != null:
 			draw_texture_rect_region(art, parts[0], parts[1])
@@ -239,6 +241,7 @@ class Beacon:
 		draw_rect(Rect2(-5.0, -2.0, 10.0, 5.0), lens)
 
 
+## Puts the base fill on the backdrop's absolute depth (Z_BACKDROP), seeds the flicker randomness and builds every layer (rebuild).
 func _ready() -> void:
 	# The base fill drawn here must sit under the backdrop whatever the owning room's own z-index is.
 	z_as_relative = false
@@ -247,6 +250,9 @@ func _ready() -> void:
 	rebuild()
 
 
+## While shown with its near strip up, fades each near edge column to NEAR_FADE_ALPHA while it covers an
+## occluder (the engineer or WOLF), and back to opaque otherwise, at NEAR_FADE_SPEED per second
+## ([param delta] in seconds).
 func _process(delta: float) -> void:
 	if not is_visible_in_tree():
 		return
@@ -274,6 +280,7 @@ func near_covers(edge: Sprite2D) -> bool:
 	return false
 
 
+## When the room is shown or hidden (once ready), starts or stops its lamp, shaft and beacon motion to match.
 func _notification(what: int) -> void:
 	# Main shows only the room in play; the others stop moving until they show again.
 	if what == NOTIFICATION_VISIBILITY_CHANGED and is_node_ready():
@@ -382,6 +389,10 @@ func rebuild() -> void:
 	_apply()
 
 
+## Lays every built layer out for the current exports and effects switch: the far plate, its bleed and
+## the haze (the backdrop's parallax and the haze only while effects are on), the lamps' glows (painted
+## lamps' kept hidden), the mid plate at the walkway and its bleeds, the near edge columns (shown only
+## with effects on) and the dust. World px. Called by rebuild and when effects_enabled changes.
 func _apply() -> void:
 	var on: bool = effects_enabled
 	var scale_factor: float = _plate_scale()
@@ -546,6 +557,7 @@ func _settle_beacons(animate: bool) -> void:
 			_pulse(index, (BEACON_FLASH_PHASE_SECONDS if beacon_flash else 0.5) * index)
 
 
+## Fills the room's base colour behind everything, only for a room built without a far plate (the plate covers it otherwise).
 func _draw() -> void:
 	# The opaque far plate covers every framing (room_depth_test checks it), so the base fill only
 	# shows for a room built without one.
@@ -605,6 +617,8 @@ func _bottom_bleed(bleed_name: String, texture: Texture2D, rows: float, side: fl
 	return bleed
 
 
+## A new, unparented sprite named [param plate_name] showing [param texture] from its top-left corner,
+## cut to [param region] when that has an area, flipped sideways when [param mirrored].
 func _plate(plate_name: String, texture: Texture2D, region: Rect2 = Rect2(), mirrored: bool = false) -> Sprite2D:
 	var plate: Sprite2D = Sprite2D.new()
 	plate.name = plate_name
@@ -616,6 +630,8 @@ func _plate(plate_name: String, texture: Texture2D, region: Rect2 = Rect2(), mir
 	return plate
 
 
+## Adds a parallax layer scrolling at [param scroll] of the camera's movement, at absolute depth
+## [param z], as a built child (rebuild frees it). Returns it.
 func _add_parallax(layer_name: String, scroll: Vector2, z: int) -> Parallax2D:
 	var layer: Parallax2D = Parallax2D.new()
 	layer.name = layer_name
@@ -627,6 +643,9 @@ func _add_parallax(layer_name: String, scroll: Vector2, z: int) -> Parallax2D:
 	return layer
 
 
+## Adds a slow drifting dust field of [param count] motes, sized [param scale_min]..[param scale_max] of
+## a 16 px dot, over the room (a 1000 x 300 world px box) at absolute depth [param z], as a built child.
+## It starts already full (14 s of preprocess). Returns it.
 func _make_dust(dust_name: String, count: int, scale_min: float, scale_max: float, z: int) -> CPUParticles2D:
 	var dust: CPUParticles2D = CPUParticles2D.new()
 	dust.name = dust_name
@@ -836,6 +855,8 @@ static func pulse(owner: Node, glow: CanvasItem, lens: Object, lens_property: St
 	return tween
 
 
+## Loops a slow sway on [param shaft]: each cycle waits [param phase] seconds, then skews and dims it
+## over 6.5 s and back over 6.5 s. The tween is kept for _stop_motion.
 func _drift(shaft: Sprite2D, phase: float) -> void:
 	var tween: Tween = _loop()
 	tween.tween_interval(phase)
@@ -845,6 +866,7 @@ func _drift(shaft: Sprite2D, phase: float) -> void:
 	tween.parallel().tween_property(shaft, "modulate:a", 1.0, 6.5).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
 
 
+## A new endlessly looping tween on this node, kept with the room's motion so _stop_motion ends it.
 func _loop() -> Tween:
 	var tween: Tween = create_tween().set_loops()
 	_tweens.append(tween)
