@@ -453,6 +453,41 @@ read-through. Hitch counts follow the machine's load: at load 81, one earlier ru
   memory pressure (99 MB at the end of the same runs), so compare it only between runs taken side by
   side. On Linux the probe reads the kernel's own peak (`VmHWM`).
 
+## PR 10: fonts, textures and shaders (October 26, 2026)
+
+What changed: a language switch loads only that language's fallback font, the dock bay plate and the
+title key art import VRAM-compressed, floor reflections share one material, the logo screen draws each
+canvas shader once, and the credits and changelog follow a language change when they next open.
+
+How it was measured:
+
+1. Six `run.sh perf` runs of each side, interleaved, on an M1 Pro at load 8-23 with other agents'
+   jobs running: `main` at `551b355` against the branch. Medians below.
+2. One `run.sh resources` run of each side.
+3. R1 and R2 at 1280x720 `kb-fx` in the render container, both sides, and the logo screen played
+   there for 120 frames.
+
+| Figure | Before | After |
+|---|---:|---:|
+| switch to de, es, es_ES, fr, pl, pt_BR, ru, through first frame | 25.2-41.7 ms | 12.2-26.2 ms |
+| switch to en, through first frame | 21.8 ms | 5.3 ms |
+| switch to ja, ko, zh_Hans, zh_Hant, through first frame | 46.8-50.8 ms | 42.4-52.8 ms |
+| static memory, end of the perf run | 155.9 MB | 148.6 MB |
+| static memory, 2 s in (resources run) | 153.6 MB | 146.3 MB |
+| texture memory per still, render container (R1 / R2) | 83.3 / 81.7 MB | 73.3 / 71.6 MB |
+
+- Godot 4.7.2 re-shapes a hidden Control on a language switch as fully as a visible one (a scratch
+  benchmark: 200 hidden Labels cost about as much as 200 shown ones, and an OptionButton about
+  0.35 ms). In play nearly every Control is hidden: 86 Buttons, 82 Labels, 5 OptionButtons. With the
+  pause menu, title and debug tools out of the tree, a switch's font step fell from about 12.7 to
+  2.5 ms. The game's own work on a switch is about 1.5 ms. So most of a switch is the engine, and
+  only taking hidden menus out of the tree would remove it.
+- The container's software renderer decodes the two compressed textures to RGBA8 (Godot warns
+  "ETC2 -> RGBA8"), so its stills show the compression: a slight softening, no banding. The texture
+  memory it reports still falls by 10 MB; on a GPU with S3TC or ETC2 the two take a quarter or less.
+- The logo screen's stills are identical before and after; the warm-up node is gone after the first
+  drawn frame. llvmpipe cannot show a GPU compile hitch, so that is left to a device check.
+
 ## S00a: maps refreshed on 9c7371d
 
 Figures from `python3 -I scripts/parity/surface.py` at `9c7371d` (the critique's maps were taken at

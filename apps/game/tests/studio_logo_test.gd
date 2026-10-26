@@ -62,6 +62,7 @@ func _check_timeline() -> void:
 	var top: float = logo.mascot.position.y
 	_expect(not logo.grin_mouth.visible and logo.company_name.modulate.a == 0.0 and logo.fade.color.a == 0.0 and not logo.load_bar.visible, "the first frame is the smirk alone, as on the boot splash")
 	_expect(logo.mascot.position == Vector2(408, 86) and logo.mascot.size == Vector2(144, 300), "the mascot sits where the boot splash draws it")
+	_check_shader_warmup(logo)
 	logo.seek(StudioLogo.SWAP_AT - 0.01)
 	_expect(not logo.grin_mouth.visible, "the smirk holds until the swap")
 	logo.seek(StudioLogo.SWAP_AT + StudioLogo.BOUNCE_SECONDS * 0.5)
@@ -92,6 +93,37 @@ func _check_timeline() -> void:
 	_expect(inside and starts.max() - starts.min() > track * 0.5, "the loading bar sweeps a short segment across its track instead of sitting near full")
 	_expect(not auto_accept_quit and not quit_on_go_back, "closing during the background load waits for it")
 	await _free_logo(logo)
+
+
+## The shader warm-up (SMOOTH-6) on a playing logo: one transparent draw for each of the game's canvas
+## shaders and each blend mode, behind the opaque Background so nothing of it can show. Headless never
+## draws a frame, so the node's freeing after the first drawn frame is left to the rendered checks.
+func _check_shader_warmup(logo: StudioLogo) -> void:
+	var holder: Control = logo.get_node_or_null(StudioLogo.WARM_NODE) as Control
+	_expect(holder != null and holder.get_index() < logo.get_node("Background").get_index(), "the shader warm-up draws behind the logo's opaque background")
+	if holder == null:
+		return
+	var shaders: Array[Shader] = []
+	var blends: Array[int] = []
+	var transparent: bool = true
+	for draw: ColorRect in holder.get_children():
+		transparent = transparent and draw.color.a == 0.0 and draw.modulate.a == 1.0
+		if draw.material is ShaderMaterial:
+			shaders.append((draw.material as ShaderMaterial).shader)
+		elif draw.material is CanvasItemMaterial:
+			blends.append((draw.material as CanvasItemMaterial).blend_mode)
+	_expect(transparent, "each warm-up draw is a transparent colour, not a culled zero modulate")
+	var wanted: Array[Shader] = StudioLogo.WARM_SHADERS.duplicate()
+	wanted.append(FloorReflection.MATERIAL.shader)
+	var covered: bool = shaders.size() == wanted.size()
+	for shader: Shader in wanted:
+		covered = covered and shaders.has(shader)
+	var shared: bool = holder.get_children().any(func(draw: ColorRect) -> bool: return draw.material == FloorReflection.MATERIAL)
+	_expect(covered and shared, "the warm-up draws sharp_sprite, post_grade and the shared floor reflection material itself")
+	blends.sort()
+	var every_mode: Array[int] = [CanvasItemMaterial.BLEND_MODE_MIX, CanvasItemMaterial.BLEND_MODE_ADD, CanvasItemMaterial.BLEND_MODE_SUB, CanvasItemMaterial.BLEND_MODE_MUL, CanvasItemMaterial.BLEND_MODE_PREMULT_ALPHA]
+	every_mode.sort()
+	_expect(blends == every_mode, "the warm-up draws every CanvasItemMaterial blend mode once")
 
 
 func _check_reduced_motion() -> void:

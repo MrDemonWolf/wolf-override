@@ -815,6 +815,12 @@ var _credits_english: String = ""
 var _pause_hint_tapped: bool = false
 ## The exported changelog as loaded at title time; empty when the file is missing.
 var changelog_text: String = ""
+## True while the credits or the changelog body was written in another language than the one shown: a
+## language change while its screen is hidden only sets this, and the screen writes its body again as
+## it opens ([method _show_credits], [method _show_changelog]), so a switch does not lay out a body
+## nobody can see (SMOOTH-4).
+var _credits_stale: bool = false
+var _changelog_stale: bool = false
 var save_error: String = ""
 var save_error_context: String = ""
 ## True while the last autosave failed to write. The beat snapshot then holds that autosave: a
@@ -1177,8 +1183,9 @@ func _load_changelog() -> void:
 ## text in its own language for the pseudolocalization audit (I18n.OWN_LANGUAGE_META). In another
 ## language it opens with one translated line saying so (CHANGELOG_ENGLISH_NOTE), shown only where a
 ## translation of that line exists, so English shows the body as before; the screen's title, note and
-## the button to the online changelog translate themselves (main.tscn). Called at start-up and on every
-## language change (NOTIFICATION_TRANSLATION_CHANGED).
+## the button to the online changelog translate themselves (main.tscn). Called at start-up, on a
+## language change while the screen is up (NOTIFICATION_TRANSLATION_CHANGED), and as the screen opens
+## after a change made while it was hidden (_changelog_stale).
 func _fill_changelog() -> void:
 	if changelog_text.is_empty():
 		changelog_body.text = tr(CHANGELOG_UNAVAILABLE)
@@ -1204,6 +1211,9 @@ static func _changelog_bbcode(text: String) -> String:
 
 
 func _show_changelog() -> void:
+	if _changelog_stale:
+		_changelog_stale = false
+		_fill_changelog()
 	_show_title_overlay(changelog_screen)
 	changelog_body.get_v_scroll_bar().value = 0.0
 	_grab_menu_focus(changelog_back_button)
@@ -2026,6 +2036,9 @@ func _finish_intro(keep_fade: bool = false) -> void:
 
 
 func _show_credits() -> void:
+	if _credits_stale:
+		_credits_stale = false
+		_fill_credits()
 	credits_paused = false
 	credits_pause_button.text = "PAUSE SCROLL"
 	_show_title_overlay(credits_screen)
@@ -2035,8 +2048,9 @@ func _show_credits() -> void:
 
 ## Writes the credits body: the AI disclosure block, then the scene's credits, each translated into the
 ## current language as its own message. Appending to the scene text instead would change the one msgid
-## auto-translate looks up, leaving the whole body untranslated. Called at start-up and on every
-## language change (NOTIFICATION_TRANSLATION_CHANGED); it leaves the scroll position alone.
+## auto-translate looks up, leaving the whole body untranslated. Called at start-up, on a language
+## change while the screen is up (NOTIFICATION_TRANSLATION_CHANGED), and as the screen opens after a
+## change made while it was hidden (_credits_stale); it leaves the scroll position alone.
 func _fill_credits() -> void:
 	# TRANSLATORS: Heading over the AI disclosure in the credits, in the same capitals as the other headings.
 	var heading: String = tr(AI_DISCLOSURE_HEADING)
@@ -2349,8 +2363,13 @@ func _notification(what: int) -> void:
 			if is_node_ready() and pause_menu.visible:
 				_show_pause_hint(_pause_hint_tapped)
 			if is_node_ready():
-				_fill_credits()
-				_fill_changelog()
+				# A hidden credits or changelog screen is written again when it next opens (SMOOTH-4).
+				_credits_stale = not credits_screen.visible
+				if not _credits_stale:
+					_fill_credits()
+				_changelog_stale = not changelog_screen.visible
+				if not _changelog_stale:
+					_fill_changelog()
 				# The station names are measured in the language shown (PR L8). Settings applies the saved
 				# language during _ready, before the bypass handle exists; _ready fits them itself after.
 				if bypass_handle != null:

@@ -78,6 +78,10 @@ Changes merged after 0.15.0. They become the next version when it is cut.
 - A checkpoint save that could not replace the old file is no longer lost: the game loads whichever copy of the save is newer and puts it in place.
 - The charger's battery readout lights no segment at 0%.
 
+### Art
+
+- The dock bay and the title's key art are stored as compressed textures, like the other rooms' pictures, so they take at most a quarter of the video memory they did.
+
 ### Accessibility
 
 - With **Reduce Motion** on, the dock bay's red beacon and the corridor's lockdown light through its doorway hold steady, the torn lock hangs still and the pad's standby light does not breathe. Switching it mid-game applies at once.
@@ -257,6 +261,9 @@ Changes merged after 0.15.0. They become the next version when it is cut.
 - The site's export check fails when a page lacks its security policy, or a Markdown copy has a raw component tag.
 - The headless perf probe also measures the dock bay opening, room loads, a language switch and memory, and fails a run that leaks objects at exit.
 - A new headless probe lists the loaded resources and their sizes before and after the game starts.
+- A language switch loads only that language's fallback font, not all four Chinese, Japanese and Korean ones: switching between the other languages takes about half as long (headless).
+- Floor reflections share one material, and the studio logo screen draws each of the game's shaders once, unseen, so the title and the first room do not stop to prepare them.
+- The credits and changelog are written in a new language when they next open, not while they are hidden.
 
 ### How it was checked
 
@@ -284,6 +291,7 @@ Changes merged after 0.15.0. They become the next version when it is cut.
 - **Full slice and parity routes checked:** headless test suites (32, with `full_slice_test` at 128 s on CI) and rendered stills of R2 and R4 in all 3 variants and 3 sizes (18 runs, none failed); not played by hand.
 - **Site security policy and Markdown copies checked:** the docs checks and build, with no CSS warnings, and a headless browser over all 41 built pages, search, fonts and the press kit download, with no policy violations.
 - **Workflow changes checked:** every workflow on the pull request (Game checks with the new `tools` job, Deploy Docs, Test builds) and Test builds run once by hand; the game itself did not change.
+- **Fonts, textures and shaders checked:** headless test suites, six headless perf runs and a memory snapshot of each side, and rendered stills of the title, the opening and the logo screen before and after (no banding); the GPU hitch on a real device is not yet checked, and not played by hand.
 
 ## 0.15.0 - October 16, 2026
 

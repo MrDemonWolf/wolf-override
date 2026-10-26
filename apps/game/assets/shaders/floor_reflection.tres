@@ -1,0 +1,6 @@
+[gd_resource type="ShaderMaterial" load_steps=2 format=3]
+
+[ext_resource type="Shader" uid="uid://cxxuouax54fjw" path="res://assets/shaders/floor_reflection.gdshader" id="1_shader"]
+
+[resource]
+shader = ExtResource("1_shader")
