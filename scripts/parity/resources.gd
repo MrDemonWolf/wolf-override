@@ -17,13 +17,12 @@ extends SceneTree
 ## - "stored": for an imported file, the size of its imported copy under .godot/imported (the
 ##   .ctex, .sample or .fontdata the game loads; a VRAM-compressed texture's is far below its "bytes"),
 ##   or -1.
+## Nothing here names a game class (SfxBank, Main) as a type: a typed name or a preload loads that
+## script, and every resource it preloads, while this script is parsed, before the "before" snapshot.
+## The suites' kit comes the same way, through Kit.suite(), only for the teardown.
 ## Usage: scripts/parity/run.sh resources <out file>  (godot --headless ... -- --out=<file.json>)
 
 const Kit = preload("parity_kit.gd")
-## The suites' kit, for its teardown (end_game), as perf.gd uses it. Loaded only for the teardown,
-## and nothing here names a game class (SfxBank, Main) as a type: a preload or a typed name loads that
-## script, and with it every resource it preloads, before the "before" snapshot.
-const SUITE_PATH: String = "res://tests/support/game_suite.gd"
 ## Frames the game runs before the "after" snapshot: 2 s of game time, by which the title is up and
 ## the detailed clips' worker (about 0.5 s, SfxBank) has finished; the probe also waits for it.
 const AFTER_FRAMES: int = 120
@@ -58,7 +57,7 @@ func _run() -> void:
 	f.store_string(JSON.stringify(result, " ", false))
 	f.close()
 	# Stops the audio and lets the mixer let go before freeing, then removes the save and settings.
-	await load(SUITE_PATH).end_game(game)
+	await Kit.suite().end_game(game)
 	print("resources done")
 	quit()
 

@@ -23,7 +23,7 @@ extends SceneTree
 ##   call through the first frame after it, in ms (the first switch into a script loads its fonts);
 ## - node, object and resource counts, static memory now and at its peak, and the process's resident
 ##   set (Kit.counts) per state and at the end, plus the largest resident set seen ("peak_rss_mb").
-## The run ends with Suite.end_game, the suites' own teardown (stop the audio, let the mixer let go,
+## The run ends with the suites' kit's end_game (Kit.suite()), their own teardown (stop the audio, let the mixer let go,
 ## free the game), so a clip still playing does not leak its stream and playback at exit; run.sh
 ## fails a perf run whose log says anything leaked.
 ## Texture memory (RENDER_TEXTURE_MEM_USED) is 0 with the headless dummy renderer, so it is not taken
@@ -32,8 +32,6 @@ extends SceneTree
 ## Usage: scripts/parity/run.sh perf <out dir> <label>  (godot --headless ... -- --out=<file.json>)
 
 const Kit = preload("parity_kit.gd")
-## The suites' kit, for its teardown (end_game) and remove_file; capture.gd preloads it the same way.
-const Suite = preload("res://tests/support/game_suite.gd")
 const SAVE: String = "user://perf-save.json"
 const SETTINGS: String = "user://perf-settings.cfg"
 const HOLD_FRAMES: int = 240
@@ -95,7 +93,7 @@ func _initialize() -> void:
 
 func _run() -> void:
 	for path: String in [SAVE, SAVE + ".tmp", SETTINGS]:
-		Suite.remove_file(path)
+		_remove(path)
 	var config: ConfigFile = ConfigFile.new()
 	config.set_value("video", "fps_limit", 0)
 	config.set_value("video", "vsync", false)
@@ -180,8 +178,8 @@ func _run() -> void:
 	# keeps the wait out of the teardown's frames). end_game removes SAVE and SETTINGS (the game's
 	# save_path and settings_path); the save's .tmp is the probe's own to remove.
 	(game.get("sfx_bank") as SfxBank).wait_for_detail()
-	await Suite.end_game(game)
-	Suite.remove_file(SAVE + ".tmp")
+	await Kit.suite().end_game(game)
+	_remove(SAVE + ".tmp")
 	print("perf done")
 	quit()
 
@@ -361,4 +359,9 @@ func _stats(values: PackedFloat64Array) -> Dictionary:
 func _frames(count: int) -> void:
 	for _i: int in range(count):
 		await process_frame
+
+
+func _remove(path: String) -> void:
+	if FileAccess.file_exists(path):
+		DirAccess.remove_absolute(ProjectSettings.globalize_path(path))
 

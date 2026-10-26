@@ -72,6 +72,14 @@ static func after_blast_state() -> M0State:
 	return st
 
 
+## The suites' kit (tests/support/game_suite.gd), loaded on first use, for the probes' teardown
+## (end_game: stop the audio, let the mixer let go, free the game). The probes never preload it: it
+## preloads main.tscn, so a preload would load the whole game while the probe's own script is parsed,
+## before perf.gd times load(main.tscn) and before resources.gd's "before" snapshot.
+static func suite() -> GDScript:
+	return load("res://tests/support/game_suite.gd") as GDScript
+
+
 ## The object and memory figures every probe records, as one Dictionary (perf.gd per state and at the
 ## end, resources.gd before and after main.tscn): Performance's node, object, resource and orphan-node
 ## counts, static memory now and at its peak in this process (MB, Godot's own allocator), and the
