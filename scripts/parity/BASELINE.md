@@ -363,6 +363,26 @@ Both runs stopped at the closing beat, which the closing-box presses then fixed.
 completes with no failure: 115 stills and 2,653 frames, the first 99 stills byte-identical to the
 `8af8d3f8` run.
 
+## Driver change: R2 and R4 read through (October 26, 2026)
+
+What changed in `capture.gd`:
+
+- R2 keeps its 7 fixed opening presses and stills, then reads the rest of the opening through
+  (`Suite.finish_opening`). It fails the run if play starts inside the dock bay.
+- R2 reads the breaker talk through (`Suite.continue_until`), so WOLF's stakes and the opening lines
+  come before the relay question, however many boxes they take.
+- R2 takes the breaker, relay, bypass and seal positions from Main's constants.
+- R4 walks from the bolt panel to the open exit door (`Suite.OPEN_EXIT_X`) and uses it there, then
+  reads the closing lines through (`Suite.finish_closing_lines`).
+- R4 waits for the title's CONTINUE before its last still.
+
+Checked in the render container on `test/r2-r4-full-slice`: all 18 runs of R2 and R4 (3 variants,
+3 sizes) passed with no notes. R2 takes 51 stills in 8,541 frames. R4 takes 115 stills in 3,157
+frames (`kb-fx`), 3,151 (`kb-calm`) and 3,155 (`touch-fx`).
+
+R2 and R4 captures from earlier drivers cannot be compared with these. Re-take their baseline from
+this driver.
+
 ## S00a: maps refreshed on 9c7371d
 
 Figures from `python3 -I scripts/parity/surface.py` at `9c7371d` (the critique's maps were taken at
