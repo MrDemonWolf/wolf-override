@@ -2,7 +2,7 @@
 
 ## Current story canon (October 26, 2026)
 - **Canon:** the section "Story canon (October 26, 2026)" in [decisions](decisions.md) (ST-01 to ST-07, open questions O-01 to O-12). It supersedes every older story draft below.
-- **Notion:** the "Story canon" pages under Story & characters, indexed in [NOTES.md](NOTES.md).
+- **Notion:** [Story canon — For Nathanial](https://app.notion.com/p/405d61481c7b81cbbb0af666eb815d3f) and [Story canon — AI reference](https://app.notion.com/p/405d61481c7b81fd8cc5cd5be0b4c4f0), indexed in [NOTES.md](NOTES.md).
 - **History:** Superseded story drafts (before 2026-10-26) are in [docs/archive/story-before-2026-10-26.md](archive/story-before-2026-10-26.md) and Git history at `229e4a73`; they are not canon. Dated logs below keep their wording as records.
 - **Next story task:** Nathanial reads the DRAFTED slice lines (the opening order, WOLF's first words, the purge stakes and three Records Access lines) and the open questions.
 
