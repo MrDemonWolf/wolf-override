@@ -380,6 +380,11 @@ const OPEN_EXIT_X: float = (JunctionRoom.HATCH_REACH_MIN_X + JunctionRoom.HATCH_
 ## time, the bound opening_timing_test plays it in (first control comes 30 to 45 s in when every box is
 ## read through, so this is about twice that).
 const OPENING_MAX_FRAMES: int = 90 * 60
+## How long one conversation read through with [method continue_until] may take at most, in physics
+## frames: 60 s of game time. continue_until reads every box for its full reading time (up to 7 s
+## each), and the corridor breaker's talk runs WOLF's stakes and the opening lines before his question
+## (Main._interact_breaker), about 30 s. Users: full_slice_test and the parity capture's R2.
+const TALK_FRAMES: int = 60 * 60
 ## How long [method finish_closing_lines] lets the junction's closing lines run at most, in physics
 ## frames: 30 s of game time, several times the three boxes' reading time (about 2 s each).
 const CLOSING_MAX_FRAMES: int = 30 * 60

@@ -18,10 +18,6 @@ extends "res://tests/support/game_suite.gd"
 ## How long a beat between two inputs may take at most, in physics frames: 15 s of game time (the
 ## longest, WOLF walking to the sentry's mark and holding it there, takes about 6 s).
 const BEAT_FRAMES: int = 900
-## How long a conversation may take at most, in physics frames: 60 s of game time. continue_until reads
-## every box for its full reading time (up to 7 s each), and the breaker's talk runs WOLF's stakes and
-## the opening lines before his question, so it needs longer than one beat.
-const TALK_FRAMES: int = 3600
 
 var game: Main
 var human: M0Actor
