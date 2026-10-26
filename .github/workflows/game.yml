@@ -29,15 +29,14 @@ jobs:
           # Full history on pull requests, so the copy check can find the merge base;
           # one commit otherwise. (1 comes first: 0 is falsy in an expression.)
           fetch-depth: ${{ github.event_name != 'pull_request' && 1 || 0 }}
+          # The copy check reads only the merge base's and HEAD's files, so the history comes without
+          # old file contents (blobs); git fetches the few merge-base files it needs on demand.
+          filter: blob:none
       - name: Check for copied code
         if: github.event_name == 'pull_request'
         env:
           BASE_REF: ${{ github.base_ref }}
         run: python3 scripts/check-copies.py --base "origin/$BASE_REF"
-      # render.sh's exit status and its name checks (Codex review findings M1 and M2), against a
-      # stand-in docker: no container or Godot, a second or two.
-      - name: render.sh self-test
-        run: tools/render/self_test.sh
       - name: Get pinned Godot 4.7.2
         run: scripts/get-godot.sh "$RUNNER_TEMP/godot"
       - name: Import and run headless checks
@@ -74,11 +73,14 @@ jobs:
           if-no-files-found: ignore
           retention-days: 7
 
-  # The translation gates that need no Godot (scripts/i18n/i18n_tool.py; localization PR L2). Every step
-  # fails the job on a non-zero exit: the tool exits 1 on any failed gate.
-  i18n:
+  # The checks that need no Godot: the tools' own self-tests, shellcheck, and the translation gates
+  # (scripts/i18n/i18n_tool.py; localization PR L2). A minute or two, so a broken tool shows up before
+  # the long godot job ends. Every step fails the job on a non-zero exit. It was the `i18n` job until
+  # CI audit finding CI-5 gave it the self-tests too; required checks name jobs, so `tools` is the
+  # name to require.
+  tools:
     runs-on: ubuntu-24.04
-    timeout-minutes: 5
+    timeout-minutes: 10
     defaults:
       run:
         shell: bash
@@ -86,9 +88,55 @@ jobs:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
+      # Warnings and errors only: the runner's shellcheck (0.9) and newer ones differ in their info-level
+      # notes (0.10 added SC2329 for functions that only a trap calls). -x follows `source` lines.
+      - name: Shell scripts pass shellcheck
+        run: |
+          shellcheck --version | sed -n 2p
+          find scripts tools -name '*.sh' -print0 | xargs -0 shellcheck -x -S warning
+      - name: Copy check catches its planted copies
+        run: python3 -I -B scripts/check-copies.py --self-test
+      # render.sh's exit status and its name checks (Codex review findings M1 and M2), against a
+      # stand-in docker: no container or Godot, a second or two. It runs validate_names.sh --self-test too.
+      - name: render.sh self-test
+        run: tools/render/self_test.sh
+      # compare.py calls ImageMagick 7's `magick`; Ubuntu 24.04 packages only ImageMagick 6 (`convert`).
+      # So the pinned 7.1.2-31 AppImage is fetched and checked against its SHA-256 when `magick` is
+      # missing. APPIMAGE_EXTRACT_AND_RUN runs it without FUSE, which the runner lacks.
+      - name: Get ImageMagick 7
+        run: |
+          if ! command -v magick >/dev/null; then
+            mkdir -p "$RUNNER_TEMP/magick/bin"
+            curl --fail --location --retry 3 --silent --show-error \
+              https://github.com/ImageMagick/ImageMagick/releases/download/7.1.2-31/ImageMagick-7.1.2-31-gcc-x86_64.AppImage \
+              -o "$RUNNER_TEMP/magick/bin/magick"
+            printf '%s  %s\n' b22dee096a68e7eb6771a6f98c16490ea78d399ffa27f34ca2ec4f02e707fd9c "$RUNNER_TEMP/magick/bin/magick" | sha256sum --check
+            chmod +x "$RUNNER_TEMP/magick/bin/magick"
+            echo "APPIMAGE_EXTRACT_AND_RUN=1" >> "$GITHUB_ENV"
+            echo "$RUNNER_TEMP/magick/bin" >> "$GITHUB_PATH"
+          fi
+      - name: Parity compare catches its planted changes
+        run: |
+          magick -version | head -1
+          python3 -I -B scripts/parity/compare.py --self-test
+      # gettext is usually on the runner image already. When it is not, the install is tried first
+      # without `apt-get update` (which fetches every package list and is the slow, flaky part), then
+      # with it, three times in all with a pause between, because the Ubuntu mirrors fail now and then.
       - name: Get gettext (msgfmt)
         run: |
-          command -v msgfmt || { sudo apt-get update -q && sudo apt-get install -y -q gettext; }
+          if ! command -v msgfmt >/dev/null; then
+            for attempt in 1 2 3; do
+              if sudo apt-get install -y -q --no-install-recommends gettext \
+                || { sudo apt-get update -q && sudo apt-get install -y -q --no-install-recommends gettext; }; then
+                break
+              fi
+              if [ "$attempt" -eq 3 ]; then
+                echo "Could not install gettext after 3 tries" >&2
+                exit 1
+              fi
+              sleep $((attempt * 15))
+            done
+          fi
           msgfmt --version | head -1
       - name: Gates catch their planted errors
         run: python3 -I -B scripts/i18n/i18n_tool.py selftest "$RUNNER_TEMP/i18n-selftest.json"
