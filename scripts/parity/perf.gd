@@ -23,9 +23,9 @@ extends SceneTree
 ##   call through the first frame after it, in ms (the first switch into a script loads its fonts);
 ## - node, object and resource counts, static memory now and at its peak, and the process's resident
 ##   set (Kit.counts) per state and at the end, plus the largest resident set seen ("peak_rss_mb").
-## The run ends with the suites' kit's end_game (Kit.suite()), their own teardown (stop the audio, let the mixer let go,
-## free the game), so a clip still playing does not leak its stream and playback at exit; run.sh
-## fails a perf run whose log says anything leaked.
+## The run ends with the suites' own teardown, end_game (through Kit.suite()): stop the audio, let
+## the mixer let go, free the game. Freeing the game with clips still playing leaked their streams
+## and playbacks at exit; run.sh fails a perf run whose log says anything leaked.
 ## Texture memory (RENDER_TEXTURE_MEM_USED) is 0 with the headless dummy renderer, so it is not taken
 ## here: the capture driver records it per still in the render container, and compare.py reports it.
 ## The states are reached through fixture saves and Main's debug surface, unthrottled (fps limit off).
