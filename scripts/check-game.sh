@@ -76,6 +76,11 @@ if ! import_game "$godot" "$logs" "$limit"; then
   keep_work=1
   exit 1
 fi
+# In GitHub Actions, tell later steps the import finished cleanly: game.yml's translation-template step
+# reuses this import and runs even after a suite fails, but only when this line was written.
+if [ -n "${GITHUB_OUTPUT:-}" ]; then
+  echo "imported=true" >> "$GITHUB_OUTPUT"
+fi
 
 cpus="$(getconf _NPROCESSORS_ONLN 2>/dev/null || echo 2)"
 jobs="${CHECK_JOBS:-$((cpus < 4 ? cpus : 4))}"
