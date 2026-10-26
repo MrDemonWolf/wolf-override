@@ -24,12 +24,14 @@ driver at the same version) and record the commit here.
 
 | File | What it does |
 |---|---|
-| `run.sh` | `capture` (render container), `ui` and `perf` (headless). See its header for arguments and environment. |
+| `run.sh` | `capture` (render container), `ui`, `perf` and `resources` (headless). See its header for arguments and environment. |
 | `capture.gd` | Input-driven capture driver: routes R1-R4, fixed seeds, stills, text and audio logs, controller stills and mid-play device switches. Since localization PR L2 it also takes `--language <code>` (or `pseudo`; `run.sh capture --language <code> ...`) and writes a language audit (overflows, missing glyphs, untranslated text under pseudo) into each still's `shots.json` entry; without `--language` it switches nothing: at 1280x720 kb-fx the 212 English stills of R1-R4 and their text and audio logs were byte-identical to the driver before it (October 16, 2026; R2 and R4 stop early with the same notes on both drivers, a drift of those route scripts from the game on `main` at `daace6a`, not from this change). |
 | `parity_sfx_bank.gd` | SfxBank subclass the driver swaps in to log every `play`, `play_blend`, `stop` and `stop_all` by frame. |
 | `compare.py` | Compares two capture folders still by still with an exact count of changed pixels (any channel, any amount), and their text and audio logs byte for byte. `--self-test` checks the count on known changes. |
 | `ui_dump.gd` | Headless resolved-property dump (rect, alpha, font, size, colour, stylebox, text) of every visible HUD and menu control in 13 states. |
-| `perf.gd` | Headless CPU-side probe: startup (including `load(main.tscn)`), per-state frame and `_process` time, `_refresh_ui` µs, the junction room's and its Recesses' `_draw` µs, junction redraws per frame, counts. |
+| `perf.gd` | Headless CPU-side probe: startup (including `load(main.tscn)`), per-state frame and `_process` time, `_refresh_ui` µs, the junction room's and its Recesses' `_draw` µs, junction redraws per frame, the dock bay opening's frames over 8 ms, room loads, one language pass, counts, static memory and resident set. A run that leaks objects at exit fails. |
+| `resources.gd` | Headless memory snapshot before and after `main.tscn`: object counts, static memory, resident set, and every cached resource with its size. |
+| `parity_kit.gd` | What the tools share: the argument reader, the fixture saves, the counts and resident set, and the suites' kit for teardown. |
 | `perf_summary.py` | Before/after table of perf runs (medians). |
 | `surface.py` | The code-size figures and the surface tests and debug tools use on Main (S00a map refresh). |
 
@@ -44,6 +46,7 @@ python3 -I scripts/parity/compare.py --self-test
 # UI dump and perf (headless; HOME must point at scratch user data).
 PARITY_HOME=<scratch home> PARITY_WORK=<scratch> scripts/parity/run.sh ui <file>
 PARITY_HOME=<scratch home> PARITY_WORK=<scratch> scripts/parity/run.sh perf <dir> <label>
+PARITY_HOME=<scratch home> PARITY_WORK=<scratch> scripts/parity/run.sh resources <file.json>
 python3 -I scripts/parity/perf_summary.py <before dir> <after dir>
 ```
 
@@ -382,6 +385,73 @@ frames (`kb-fx`), 3,151 (`kb-calm`) and 3,155 (`touch-fx`).
 
 R2 and R4 captures from earlier drivers cannot be compared with these. Re-take their baseline from
 this driver.
+
+## Perf and memory baseline (October 26, 2026)
+
+What this adds: the first figures for the dock bay opening, room loads, the language switch,
+resident set and loaded resources. Measured on `apps/game` at `0aff522` (`main` with PR #146), with
+the probe from the branch that added them.
+
+How it was taken:
+
+1. Six `run.sh perf` runs in one session on an M1 Pro, at load 42-59, with other agents' jobs
+   running. Figures below are medians of the six.
+2. One `run.sh resources` run in the same session.
+
+Before this change, `perf.gd` freed the game while clips still played. Three of four runs leaked
+2 `AudioStreamWAV` and 2 `AudioStreamPlaybackWAV` at exit. It now ends with the suites' `end_game`.
+None of the 6 runs here leaked, nor 8 earlier runs of the same teardown.
+
+### Startup and states
+
+| Figure | Median |
+|---|---:|
+| `load(main.tscn)` | 954.7 ms |
+| load to first frame | 1,077.0 ms |
+| load to SfxBank background clips done | 1,770.2 ms |
+| frame p99, title / corridor start / Records / junction entry | 0.79 / 1.64 / 1.27 / 1.52 ms |
+
+### Opening, room loads and languages
+
+| Figure | Median |
+|---|---:|
+| opening: `debug_new_game(false)` call | 1.68 ms |
+| opening: frame p99 / max over 1,200 frames | 1.31 / 2.62 ms |
+| opening: frames over 8 ms | 0 (one run had 2, at 25.6 and 20.3 ms, frames 225-226) |
+| load corridor safe point, call / through first frame | 1.20 / 2.79 ms |
+| load Records entry, call / through first frame | 0.92 / 4.41 ms |
+| load junction entry, call / through first frame | 1.31 / 4.71 ms |
+| load junction after the blast, call / through first frame | 1.39 / 3.25 ms |
+| switch language, Latin and Cyrillic (de, es, es_ES, fr, pl, pt_BR, ru), through first frame | 23.4-25.6 ms |
+| switch language, CJK (ja, ko, zh_Hans, zh_Hant), through first frame | 48.9-59.2 ms |
+
+The opening waits at its first box, so these frames are its staging in the dock bay, not a
+read-through. Hitch counts follow the machine's load: at load 81, one earlier run had 69 frames over
+8 ms.
+
+### Memory
+
+| Figure | Before `main.tscn` | After (2 s in, title up) |
+|---|---:|---:|
+| objects | 1,584 | 4,167 |
+| resources (Performance) | 57 | 199 |
+| nodes | 1 | 711 |
+| orphan nodes | 0 | 0 |
+| static memory | 27.3 MB | 153.6 MB |
+| resources in the cache | 24 | 160 |
+| textures in the cache | 0 | 80: 69.9 MB as RGBA8, 18.9 MB imported |
+| recorded sounds (`AudioStreamWAV`) | 0 | 7: 2.5 MB |
+| fonts | 3: 1.2 MB | 7: 1.2 MB |
+| translations (file size) | 11: 1.5 MB | 11: 1.5 MB |
+
+- The sound bank's 16 generated clips add 0.5 MB of PCM, outside the cache.
+- The largest textures: the title key art (1672x941, 6.3 MB as RGBA8), then the four room mids
+  (5.0-5.3 MB each).
+- At the end of the perf run: 713 nodes, 4,207 objects, static memory 155.9 MB (157.1 MB peak).
+  After the language pass: static peak 165.3 MB.
+- Resident set on macOS (`ps`): a median peak of 211.5 MB over the run's samples. It swings with
+  memory pressure (99 MB at the end of the same runs), so compare it only between runs taken side by
+  side. On Linux the probe reads the kernel's own peak (`VmHWM`).
 
 ## S00a: maps refreshed on 9c7371d
 
