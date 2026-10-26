@@ -261,7 +261,7 @@ const RESTORE_BEAT_LINE: String = "Back at the start of this stretch."
 ## The Director's and WOLF's words are kept apart from their tags (see OPENING_WOLF_WORDS).
 ## The first beat is the order WOLF overhears in what the Director takes for standby: the Director speaks
 ## about WOLF, not to him, and sets him to kill the witness, the records worker (story canon 2026-10-26,
-## ST-04). Wording DRAFTED: Nathanial asked for a blend of options 2 and 3 on 2026-10-26; it awaits his final OK.
+## ST-04). Wording APPROVED by Nathanial on 2026-10-26: the blend of options 2 and 3 he asked for (ST-09).
 const INTRO_ORDER_WORDS: String = "The records worker saw too much. When WOLF wakes, he kills the worker."
 const INTRO_STANDBY_WORDS: String = "You were in standby."
 const INTRO_REFUSAL_WORDS: String = "I heard you. I won't do it."
