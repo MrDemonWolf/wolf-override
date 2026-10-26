@@ -43,6 +43,10 @@ static func promote(from: String, to: String) -> bool:
 	var global_to: String = ProjectSettings.globalize_path(to)
 	if DirAccess.rename_absolute(global_from, global_to) == OK:
 		return true
+	# Neither a rename nor a copy can replace a folder standing at [param to]; copying onto one only
+	# logs an engine error.
+	if DirAccess.dir_exists_absolute(global_to):
+		return false
 	if DirAccess.copy_absolute(global_from, global_to) != OK:
 		return false
 	# A copy left behind is harmless: it holds the same content as [param to].
