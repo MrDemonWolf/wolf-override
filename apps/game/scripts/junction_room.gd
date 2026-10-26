@@ -739,6 +739,7 @@ class TankSprite:
 			dented = value
 			dent.visible = dented
 
+	## Adds the dent, hidden until [member dented] is set; its points are the cut's own px about its centre.
 	func _init() -> void:
 		dent = Polygon2D.new()
 		dent.name = "Dent"
@@ -755,6 +756,7 @@ class Recesses:
 	extends Node2D
 	var room: JunctionRoom
 
+	## Draws the room's recesses (JunctionRoom.draw_recesses) on this node, under the props.
 	func _draw() -> void:
 		room.draw_recesses(self)
 
@@ -774,11 +776,13 @@ class PanelFront:
 	var cover: Array[Rect2] = []
 	var colors: Array[Color] = []
 
+	## Samples with mipmaps like the room's art, and processes after Main (priority 100), which moves the sentry first.
 	func _init() -> void:
 		texture_filter = CanvasItem.TEXTURE_FILTER_LINEAR_WITH_MIPMAPS
 		# After Main's frame, which moves the sentry, so the cover is where the sentry is drawn.
 		process_priority = 100
 
+	## Redraws only when the spots the sentry crosses the panel, or the colours they are drawn in, have changed.
 	func _process(_delta: float) -> void:
 		var now: Array[Rect2] = room.bolt_panel_cover()
 		var look: Array[Color] = [room.bolt_lamp_color(), room.bolt_feed_color()]
@@ -787,6 +791,7 @@ class PanelFront:
 			colors = look
 			queue_redraw()
 
+	## Draws the bolt panel again over the spots in [member cover], in its lamp's colour; nothing while the sentry is clear.
 	func _draw() -> void:
 		if not cover.is_empty():
 			room.draw_panel_front(self, cover, colors[0])
@@ -801,6 +806,10 @@ class PanelFront:
 		return bounds
 
 
+## Builds the whole room once: its RoomDepth plates and lamps, the recesses, the station props (breaker,
+## vent, valve with its turning wheel, tank release, bolt panel) with their glows and name plates, the
+## vent hurtbox, the blast door's pieces, the entry and exit doors, the particles and the sentry's lane.
+## Positions are world px.
 func _ready() -> void:
 	depth = RoomDepth.new()
 	depth.name = "Depth"
@@ -1044,6 +1053,8 @@ static func exit_leaf_anchor(open: float) -> Vector3:
 	return Vector3(p.x, p.y, DoorCamera.depth_scale(z_m) * (DoorCamera.D0 + z_shut) / DoorCamera.D0)
 
 
+## Builds the vent's steam column and puff behind the grate, and the blast's sparks, chips and dust and
+## the thrown leaf's landing dust at the doorway, each placed at its own z. None of them emits yet.
 func _build_particles() -> void:
 	# Behind the vent's grate (one step under the props) and the actors: the column rises from inside
 	# the grate, which stays drawn over it, so the grate the card names reads through the steam.
@@ -1247,6 +1258,8 @@ func breaker_pulse_level() -> float:
 	return 0.5 - 0.5 * cos(breaker_pulse_elapsed * BREAKER_PULSE_HZ * TAU)
 
 
+## Moves the breaker's pulse and any station lamp flicker on by [param delta] seconds; when a flicker
+## ends, puts the lamps it touched back as the state shows them. Redraws as they change.
 func _advance_flicker(delta: float) -> void:
 	if breaker_pulse_remaining > 0.0:
 		breaker_pulse_remaining = maxf(breaker_pulse_remaining - delta, 0.0)
@@ -1428,6 +1441,8 @@ func _check_redraw() -> void:
 	_redraw_if_changed.call_deferred()
 
 
+## Redraws the room, or the recesses, only when a value its drawing reads has changed since it was last
+## drawn (draw_inputs, recesses_inputs). Queued at most once per frame.
 func _redraw_if_changed() -> void:
 	_redraw_check_queued = false
 	if draw_inputs() != _drawn_inputs:
@@ -1525,6 +1540,8 @@ func show_crank(fraction: float) -> void:
 		valve_wheel.rotation_degrees = target
 
 
+## Turns the VALVE's wheel to [param to_turns] quarter turns (90 degrees each): eased over 0.18 s for a
+## new turn, or set at once at 0 or mid-hold (show_crank turns it on from there).
 func _turn_wheel(to_turns: int) -> void:
 	Tweens.kill(_valve_tween)
 	var target: float = 90.0 * to_turns
@@ -1724,6 +1741,8 @@ func _sync_hatch() -> void:
 		exit_past_end.color = (DoorKit.PAST_END_SHADE * EXIT_SHUT_SHADE).lerp(DoorKit.PAST_END_SHADE, open)
 
 
+## Arms [param hazard] for HAZARD_SECONDS, then disarms it; a later call replaces the window under way.
+## The engineer already inside when it arms is reported at once (Hazard.armed emits contact).
 func _arm_hazard(hazard: Hazard) -> void:
 	Tweens.kill(_hazard_tween)
 	hazard.armed = true
@@ -1781,6 +1800,9 @@ func reset_transient() -> void:
 	refresh_state()
 
 
+## Draws what the room's plates and sprites cannot show: the gauge, the breaker's light, the blast zone,
+## the release's light, its rods and cable, the floor mark and the bolt panel's light. Notes what it drew
+## from (draw_inputs) so a redraw is asked for only when one of those changes.
 func _draw() -> void:
 	_drawn_inputs = draw_inputs()
 	# The plates are the Depth child's layers and the machines are sprites; this draws what they
@@ -1988,11 +2010,14 @@ func _draw_blast_zone() -> void:
 		draw_line(Vector2(edge, FLOOR_Y - 12.0), Vector2(edge, FLOOR_Y + 9.0), Color(SEAM_RED, lerpf(0.7, 1.0, pulse)), 2.0)
 
 
+## Draws the breaker's status light in its phase colour, whitened by its pulse and darkened by a flicker.
 func _draw_breaker_light() -> void:
 	var light: Color = _breaker_light_color().lerp(Color.WHITE, 0.6 * breaker_pulse_level())
 	draw_rect(BREAKER_LIGHT, light.lerp(FLICKER_DARK, 1.0 - lamp_level(&"breaker")))
 
 
+## The breaker light's colour for the line's phase: dim once the door is blown, red when tripped,
+## Palette.BREAKER_IDLE while idle, else cyan (live).
 func _breaker_light_color() -> Color:
 	if door_blown:
 		return Palette.DIM
