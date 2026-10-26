@@ -232,6 +232,8 @@ Changes merged after 0.15.0. They become the next version when it is cut.
 - The debug tools' CLEAR SAVE note names what it actually deleted.
 - Every game script the code review named now has doc comments on its class and methods: what each does, its inputs and outputs, units and side effects. The code itself is unchanged.
 - The site's export check fails when a page lacks its security policy, or a Markdown copy has a raw component tag.
+- The headless perf probe also measures the dock bay opening, room loads, a language switch and memory, and fails a run that leaks objects at exit.
+- A new headless probe lists the loaded resources and their sizes before and after the game starts.
 
 -- How it was checked --
 - Checked: headless test suites, the docs checks and build, rendered stills of the title screen, and headless browser screenshots of the credits, legal and landing pages, and an axe scan of the landing page; headless browser screenshots of the guide home, the changelog and the open guide menu at phone, tablet and desktop sizes, and an axe scan of guide pages; the README's links checked against the built site and its commands against package.json; headless browser screenshots of the rewritten player pages, their facts checked against the game's code; headless browser screenshots of the new and rewritten user pages, the privacy claims checked against the game's code; headless browser screenshots of the developer pages, with honesty-note counts kept and their commands run or marked not run; headless browser screenshots of the docs style guide, Developer home and Contributing; not played by hand.
