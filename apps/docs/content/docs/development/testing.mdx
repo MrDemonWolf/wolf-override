@@ -127,14 +127,15 @@ The translation tools in `scripts/i18n/` have their own page: [Localization](/do
 
 | Workflow | When | What it runs |
 | --- | --- | --- |
-| **Game checks**, `godot` job | Every pull request and push to main; manual runs too | Copied-code check, checksum-verified Godot 4.7.2 import, `scripts/check-game.sh`, then a fresh translation template that must match `i18n/messages.pot` |
-| **Game checks**, `i18n` job | Same | Translation gates' self-test, the glossary and style-guide check, the scan-list check and `i18n_tool.py check`. Needs no Godot |
+| **Game checks**, `godot` job | Every pull request and push to main; manual runs too | Copied-code check, checksum-verified Godot 4.7.2 (`scripts/get-godot.sh`), `scripts/check-game.sh`, then a fresh translation template that must match `i18n/messages.pot` |
+| **Game checks**, `tools` job | Same | Shellcheck, the self-tests of the copy check, `render.sh` and `compare.py`, then the translation gates. Needs no Godot |
 | **Deploy Docs**, `build` job | Every pull request and push to main | `docs:check`, `docs:test`, `docs:build` |
 | **Deploy Docs**, deploy | Main-branch docs changes | Deploys the site to GitHub Pages, one deployment at a time, in push order |
 | **Test builds** | Beside the checks | macOS and Windows debug exports. Not a required check. See [Releases and versions](/docs/development/releases/#test-builds) |
 
 - **Required to merge:** the `godot` check and the `build` check.
-- **Time limits:** the game check step has a 10-minute limit on top of each suite's own. Build and deployment jobs have limits too.
+- **Template after a failure:** the translation template step still runs when a suite fails, as long as the import was clean.
+- **Time limits:** the game check step has a 15-minute limit on top of each suite's own. Build and deployment jobs have limits too.
 - **Failed logs:** failing or cancelled check logs are kept as downloadable artifacts for seven days. Log pipelines keep the command's failure status.
 - **Newer pushes:** a newer push to a pull request cancels that pull request's older runs. Every push to main runs in full.
 
