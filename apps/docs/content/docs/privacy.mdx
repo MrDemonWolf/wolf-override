@@ -9,6 +9,7 @@ description: What the WOLF OVERRIDE source game and this website store on your d
 - **The game sends nothing.** It makes no network requests.
 - **The website stores one setting:** your light or dark theme, and only if you change it.
 - **Checked against the code on October 18, 2026.** This page describes the current source game and test builds. It is not legal advice.
+- **Language storage rechecked on October 26, 2026:** choosing a language saves it locally.
 
 ## The game
 
@@ -36,7 +37,7 @@ The game writes these to its own folder on your device:
 - **Audio:** the slider levels.
 - **Controls:** controller deadzone, Toggle Holds and your key bindings.
 - **Debug unlock:** a `[debug] unlocked` line, only after you unlock the debug tools with the title-screen code. Locking them again removes it.
-- **No language yet.** The game has no language setting, so it stores no language choice.
+- **Language:** your choice in Settings, saved under `[general] language`.
 
 #### Bug captures (`debug-captures/`) [#bug-captures]
 
@@ -57,7 +58,7 @@ The game runs on the Godot engine, which also writes to the same folder on deskt
 
 #### What it reads and does not read
 
-- **Your system language:** Godot reads it when the game starts. The game offers English only, so it always shows English. The language is not saved or sent.
+- **Your system language:** Godot reads it at startup to choose an offered language when you have no saved choice. It is not sent anywhere. Availability: [Platforms and languages](/docs/platforms/#languages).
 - **No text entry.** The engineer's name is picked from a fixed list.
 - **Not read:** your account name, location or clipboard.
 - **GPU model:** only the engine's log records it. The game never shows it.

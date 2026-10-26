@@ -10,6 +10,7 @@
 # block, any JSON-LD block is not valid JSON, a guide page's social card is not og:type article
 # with the game name in its og:title, or llms.txt, llms-full.txt or a guide
 # page's Markdown copy is missing or carries raw MDX, or when the press kit zip is missing.
+# Also checks the referrer policy and resolves internal links and fragments with check-docs-links.py.
 # Usage: scripts/check-docs-export.sh   (DOCS_OUT_DIR overrides the export directory)
 # Fails when apps/docs/out is missing rather than passing silently.
 set -euo pipefail
@@ -39,6 +40,10 @@ while IFS= read -r page; do
   fi
   if ! grep -q 'id="main-content"' "$page"; then
     echo "FAIL  $rel has no #main-content skip-link target" >&2
+    status=1
+  fi
+  if ! grep -q '<meta name="referrer" content="strict-origin-when-cross-origin"' "$page"; then
+    echo "FAIL  $rel has no strict-origin-when-cross-origin referrer policy" >&2
     status=1
   fi
   robots="$(grep -oE '<meta name="(robots|googlebot)"' "$page" | wc -l | tr -d ' ')"
@@ -147,6 +152,10 @@ if [ ! -s "$out/press/wolf-override-press-kit.zip" ]; then
   echo "FAIL  press/wolf-override-press-kit.zip is missing from the export (the docs build script makes it)" >&2
   status=1
 fi
+
+# Run the checker against planted failures too, so a broken checker cannot silently pass CI.
+python3 -I "$root/scripts/check-docs-links.py" --self-test || status=1
+python3 -I "$root/scripts/check-docs-links.py" "$out" || status=1
 
 if [ "$status" -eq 0 ]; then
   echo "pass  $count exported pages: no /_next/image, one #main-content each, at most one robots meta, no .ttf references; robots.txt names the sitemap; every guide URL in sitemap.xml has <lastmod>; valid JSON-LD on the landing and guide pages; guide pages are og:type article with the game name in og:title; llms.txt, llms-full.txt and a Markdown copy of every guide page; the press kit zip"

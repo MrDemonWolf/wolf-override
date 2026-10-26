@@ -89,6 +89,8 @@ The same script keeps the in-game changelog in step with the website.
 
 - No page uses the image optimiser GitHub Pages lacks.
 - Each page has its skip-link target and at most one robots tag.
+- Each page limits the referrer sent to other sites to this site's origin.
+- Internal links and heading links point to files and IDs in the export; external sites are not checked.
 - Every font is WOFF2.
 - `robots.txt` names the sitemap, and every guide page in the sitemap has its last-changed date.
 - The landing and guide pages carry valid structured data.
@@ -97,6 +99,26 @@ The same script keeps the in-game changelog in step with the website.
 ## Translation checks
 
 The translation tools in `scripts/i18n/` have their own page: [Localization](/docs/development/localization/#commands).
+
+## Check a website deployment
+
+1. Open the **Deploy Docs** run for the merged commit and confirm both build and deploy passed.
+2. Open the website and check the footer's **built from** link names that commit.
+3. Try the homepage, guide search, phone menu and a missing page's return links.
+4. Check the press kit download, sitemap and any published GitHub Release links.
+
+- **A build pass is not a live check.** Record which browser and screen sizes you tried.
+- **No published releases yet:** test-build artifacts need a GitHub account and expire; they are not release downloads.
+
+## Recover a broken website deployment
+
+1. Find the last working deployment and the pull request that introduced the problem.
+2. Open a revert pull request for that change; preserve unrelated work and run the docs checks.
+3. Merge the reviewed revert and wait for **Deploy Docs** to finish.
+4. Repeat [Check a website deployment](#check-a-website-deployment).
+
+- **Re-running the broken commit** deploys the same broken content.
+- **A website revert** does not change game downloads or subscriber data.
 
 ## Continuous integration
 
