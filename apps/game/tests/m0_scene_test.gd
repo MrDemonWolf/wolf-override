@@ -101,7 +101,7 @@ func _run() -> void:
 	game.call("_refresh_ui")
 	_expect(not top_card.visible, "opening slate fades away and does not reappear each frame")
 	# Audit 12: the Director's lines carry his tag; the narration has its own untagged boxes.
-	_expect(speaker.visible and speaker.text == "DIRECTOR" and story.text == "The records worker is a witness. WOLF, when you wake, kill the worker.", "the Director's first line sits alone under his tag")
+	_expect(speaker.visible and speaker.text == "DIRECTOR" and story.text == "The records worker saw too much. When WOLF wakes, he kills the worker.", "the Director's first line sits alone under his tag")
 	await tap(&"interact")
 	_expect(game.get("intro_step") == 1 and not speaker.visible and story.text == "The Director thinks WOLF is still in standby.", "the narration after it gets its own untagged box, naming the Director")
 	await tap(&"interact")
