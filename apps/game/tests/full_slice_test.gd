@@ -15,8 +15,8 @@ extends "res://tests/support/game_suite.gd"
 ## so a busy machine slows it down without changing what it sees. Station positions come from the
 ## rooms' and Main's own constants.
 
-## How long a beat between two inputs may take at most, in physics frames: 15 s of game time (the
-## longest, WOLF walking to the sentry's mark and holding it there, takes about 6 s).
+## How long a beat between two inputs may take at most, in physics frames: 15 s of game time, the
+## same bound door_route_test gives a beat; conversations read box by box get the kit's TALK_FRAMES.
 const BEAT_FRAMES: int = 900
 
 var game: Main
@@ -45,7 +45,7 @@ func _run() -> void:
 
 
 ## NEW GAME on the title, then the opening read through to first control, which must come in the
-## corridor side of the dock bay's doorway with the engineer free to walk.
+## corridor, past the dock bay's cross-wall (DockBay.ROOM_RIGHT), with the engineer free to walk.
 func _play_opening() -> bool:
 	var new_game: Button = game.get_node("CanvasLayer/TitleScreen/NewGameButton") as Button
 	if not _require(game.title_open and new_game.is_visible_in_tree() and not new_game.disabled, "the title offers NEW GAME"):
@@ -57,7 +57,9 @@ func _play_opening() -> bool:
 	var note: String = await finish_opening(game)
 	if not _require(note.is_empty(), note):
 		return false
-	return _require(await wait_until(func() -> bool: return human.controlled, BEAT_FRAMES), "the opening hands control to the engineer (engineer at x %.1f)" % human.position.x)
+	if not _require(await wait_until(func() -> bool: return human.controlled, BEAT_FRAMES), "the opening hands control to the engineer"):
+		return false
+	return _require(human.position.x > DockBay.ROOM_RIGHT, "play starts in the corridor, past the dock bay (engineer at x %.1f)" % human.position.x)
 
 
 ## The corridor: the breaker and its question (disclose), the relay WOLF powers, the seal opening, the
