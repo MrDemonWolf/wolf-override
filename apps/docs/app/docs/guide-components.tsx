@@ -1,12 +1,15 @@
 import type { ComponentProps } from 'react';
 import type { StaticImageData } from 'next/image';
 import { asMarkdown } from 'fumadocs-core/server';
+import { Callout as FumadocsCallout } from 'fumadocs-ui/components/callout';
 import { siteUrl } from '@/lib/seo';
 
 /*
  * MDX components for the guide pages. When lib/source.ts renders a page to Markdown for llms.txt,
  * asMarkdown() is true and each component returns its own Markdown (absolute links, so the text
- * still works outside the site) instead of HTML.
+ * still works outside the site) instead of HTML. A component that never calls asMarkdown() is
+ * written into the Markdown as a bare JSX tag under its minified build name (such as `<eg>`), so
+ * every component a page uses needs a Markdown form here or in its own file.
  *
  * Styling: Tailwind utilities and Fumadocs' --color-fd-*
  * tokens so they follow the guide's light and dark themes. They render inside Fumadocs' `prose`
@@ -109,10 +112,33 @@ export function LinkCards({ label, links, variant = 'cards', columns = 2 }: Link
  * scripts/export_changelog.py leaves everything inside it out of the in-game changelog. Closed by default.
  */
 export function Details({ className, ...props }: ComponentProps<'details'>) {
+  // The Markdown copies have no collapsing: the summary line and the notes follow as plain text.
+  if (asMarkdown()) return <>{props.children}</>;
   return <details {...props} className={['mt-4 mb-6 rounded-card border border-fd-border bg-fd-card px-4 py-2', className].filter(Boolean).join(' ')} />;
 }
 
 /** The always-visible line of a {@link Details} block: the click and keyboard target that opens it. */
 export function Summary({ className, ...props }: ComponentProps<'summary'>) {
+  // A bold paragraph in the Markdown copies, so the line still reads as the block's heading.
+  if (asMarkdown()) return <p><strong>{props.children}</strong></p>;
   return <summary {...props} className={['cursor-pointer py-1 font-medium text-fd-foreground', className].filter(Boolean).join(' ')} />;
+}
+
+/**
+ * Fumadocs' Callout (the guide's `<Callout type="warn" title="...">` notes) with a Markdown form:
+ * in the Markdown copies it is a block quote that opens with the bold title, written by
+ * fumadocs-core's own Markdown renderer from the plain `blockquote`, `p` and `strong` elements
+ * below. On the site it is Fumadocs' Callout unchanged. Registered over the default in
+ * mdx-components.tsx, and used by current-version.tsx.
+ */
+export function Callout({ title, children, ...props }: ComponentProps<typeof FumadocsCallout>) {
+  if (asMarkdown()) {
+    return (
+      <blockquote>
+        {title ? <p><strong>{title}</strong></p> : null}
+        {children}
+      </blockquote>
+    );
+  }
+  return <FumadocsCallout title={title} {...props}>{children}</FumadocsCallout>;
 }
