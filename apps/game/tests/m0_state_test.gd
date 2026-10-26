@@ -166,18 +166,19 @@ func _initialize() -> void:
 		_expect(State.from_dict(below_floor) == null, "rejects WOLF position below the floor")
 	# A blocked promotion must not lose the only readable checkpoint.
 	var blocked_path: String = "user://m0-blocked-%s.json" % OS.get_process_id()
+	var blocked_temp: String = AtomicFile.temp_path(blocked_path)
 	var blocked_state: M0State = M0State.new()
 	blocked_state.record_choice(M0State.DISCLOSE)
 	blocked_state.arm_breaker()
 	blocked_state.activate_power("wolf")
 	blocked_state.reach_checkpoint()
 	_expect(blocked_state.save_to_disk(blocked_path), "the blocked fixture saves")
-	_expect(_move(blocked_path, blocked_path + ".tmp"), "the blocked fixture moves to the temporary copy")
+	_expect(_move(blocked_path, blocked_temp), "the blocked fixture moves to the temporary copy")
 	DirAccess.make_dir_absolute(ProjectSettings.globalize_path(blocked_path))
 	var blocked_loaded: M0State = M0State.load_from_disk(blocked_path)
-	_expect(blocked_loaded != null and blocked_loaded.checkpoint_reached and FileAccess.file_exists(blocked_path + ".tmp"), "a recovered checkpoint that cannot be promoted still loads and keeps its temporary copy")
+	_expect(blocked_loaded != null and blocked_loaded.checkpoint_reached and FileAccess.file_exists(blocked_temp), "a recovered checkpoint that cannot be promoted still loads and keeps its temporary copy")
 	DirAccess.remove_absolute(ProjectSettings.globalize_path(blocked_path))
-	DirAccess.remove_absolute(ProjectSettings.globalize_path(blocked_path + ".tmp"))
+	DirAccess.remove_absolute(ProjectSettings.globalize_path(blocked_temp))
 	finish("M0 state checks passed")
 
 
