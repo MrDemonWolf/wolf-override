@@ -270,12 +270,15 @@ static func forget(catalog: Translation) -> void:
 ## every Control using it lays itself out again. Fallbacks that belong to no language stay where they
 ## are (Roboto's Montserrat-Symbols-Subset.ttf, set in its import, which draws the arrows and the empty
 ## square Roboto lacks). A fallback file that is not in the build is skipped with a warning.
+## Only [param language]'s own fallback file is loaded: another language's is recognised in the chain by
+## its path, never loaded to compare. Loading every one made each switch (and the English start-up)
+## read all four CJK subsets, 0.5-1.6 MB each (SMOOTH-3), when at most one is ever in use.
 static func use_fallback(language: String) -> void:
-	var others: Array[Font] = []
+	var others: PackedStringArray = []
 	for code: String in LANGUAGES:
-		var font: Font = fallback_font(code) if code != language else null
-		if font != null:
-			others.append(font)
+		var path: Variant = _row(code).get("fallback_font")
+		if code != language and path is String:
+			others.append(path as String)
 	var own: Font = fallback_font(language)
 	if own == null and not font_chain_complete(language):
 		push_warning("I18n: the %s fallback font is not in the build: %s" % [language, _row(language)["fallback_font"]])
@@ -285,7 +288,7 @@ static func use_fallback(language: String) -> void:
 			continue
 		var chain: Array[Font] = []
 		for font: Font in base.fallbacks:
-			if not others.has(font) and font != own:
+			if not others.has(font.resource_path) and font != own:
 				chain.append(font)
 		if own != null:
 			chain.append(own)
