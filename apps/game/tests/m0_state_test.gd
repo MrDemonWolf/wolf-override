@@ -133,7 +133,7 @@ func _initialize() -> void:
 	_expect(recovered != null and recovered.to_dict() == records.to_dict(), "surviving temporary save loads when the main file is missing")
 	_expect(FileAccess.file_exists(recovery_path) and not FileAccess.file_exists(recovery_path + ".tmp"), "recovered temporary save is promoted into place")
 	DirAccess.rename_absolute(ProjectSettings.globalize_path(recovery_path), ProjectSettings.globalize_path(recovery_path + ".tmp"))
-	_write_text(recovery_path, "not json")
+	_expect(write_text(recovery_path, "not json"), "test file opens for writing: " + recovery_path)
 	recovered = State.load_from_disk(recovery_path)
 	_expect(recovered != null and recovered.to_dict() == records.to_dict(), "surviving temporary save replaces an unreadable main file")
 	for leftover: String in [recovery_path, recovery_path + ".tmp"]:
@@ -150,7 +150,7 @@ func _initialize() -> void:
 	for label: String in malformed_bodies:
 		var malformed_path: String = "user://m0-state-malformed-%s-%d.json" % [OS.get_process_id(), malformed_index]
 		malformed_index += 1
-		_write_text(malformed_path, malformed_bodies[label])
+		_expect(write_text(malformed_path, malformed_bodies[label]), "test file opens for writing: " + malformed_path)
 		_expect(State.load_from_disk(malformed_path) == null, "rejects a malformed save (%s)" % label)
 		DirAccess.remove_absolute(ProjectSettings.globalize_path(malformed_path))
 
@@ -177,11 +177,3 @@ func _initialize() -> void:
 	DirAccess.remove_absolute(ProjectSettings.globalize_path(blocked_path + ".tmp"))
 	finish("M0 state checks passed")
 
-
-func _write_text(path: String, body: String) -> void:
-	var file: FileAccess = FileAccess.open(path, FileAccess.WRITE)
-	if file == null:
-		_expect(false, "test file opens for writing: " + path)
-		return
-	file.store_string(body)
-	file.close()

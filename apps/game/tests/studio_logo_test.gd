@@ -96,7 +96,7 @@ func _check_timeline() -> void:
 
 func _check_reduced_motion() -> void:
 	var text: String = "[video]\nreduced_motion=true\nvsync=false\n"
-	write_text(settings_path, text)
+	_expect(write_text(settings_path, text), "test file opens for writing: " + settings_path)
 	var logo: StudioLogo = _add_logo(false)
 	logo.manual_clock = true
 	var top: float = logo.mascot.position.y

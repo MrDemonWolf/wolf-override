@@ -200,14 +200,14 @@ func _check_hostile_settings() -> void:
 	var path: String = "user://settings-hostile-%s.cfg" % pid
 	var script_path: String = "user://evil-%s.gd" % pid
 	var save_path: String = "user://settings-hostile-save-%s.json" % pid
-	write_text(script_path, "extends RefCounted\n\n\nstatic func _static_init() -> void:\n\tEngine.set_meta(\"wolf_settings_poc\", true)\n\n\nfunc _init() -> void:\n\tEngine.set_meta(\"wolf_settings_poc\", true)\n")
+	_expect(write_text(script_path, "extends RefCounted\n\n\nstatic func _static_init() -> void:\n\tEngine.set_meta(\"wolf_settings_poc\", true)\n\n\nfunc _init() -> void:\n\tEngine.set_meta(\"wolf_settings_poc\", true)\n"), "test file opens for writing: " + script_path)
 	var cases: Dictionary = {
 		"object payload": "[video]\nfps_limit=Object(RefCounted,\"script\":Resource(\"%s\"))\n" % script_path,
 		"truncated file": "[video\nfps_limit=",
 		"oversized file": "[video]\nfps_limit=30\n" + ";".repeat(GameSettings.MAX_SETTINGS_BYTES),
 	}
 	for label: String in cases:
-		write_text(path, cases[label])
+		_expect(write_text(path, cases[label]), "test file opens for writing: " + path)
 		var game: Node2D = MAIN_SCENE.instantiate() as Node2D
 		game.set("settings_path", path)
 		game.set("save_path", save_path)

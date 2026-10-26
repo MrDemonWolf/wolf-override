@@ -378,12 +378,17 @@ static func controller_button(button: JoyButton, pressed: bool) -> InputEventJoy
 
 
 ## Writes [param text] to the user:// (or absolute) file at [param path], replacing what it held, for
-## suites that hand the game a settings or script file of their own. Users: settings_test and
-## studio_logo_test.
-static func write_text(path: String, text: String) -> void:
+## suites that hand the game a settings, script or save file of their own. Returns whether the file
+## opened for writing; callers report it (`_expect(write_text(...), "...")`), because a fixture that
+## was never written would let the check after it pass or fail for the wrong reason. Users:
+## m0_state_test, settings_test and studio_logo_test.
+static func write_text(path: String, text: String) -> bool:
 	var file: FileAccess = FileAccess.open(path, FileAccess.WRITE)
+	if file == null:
+		return false
 	file.store_string(text)
 	file.close()
+	return true
 
 
 ## Waits [param count] process frames: one pass of every node's _process and of the UI, the step
