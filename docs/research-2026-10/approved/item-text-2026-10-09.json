@@ -1,4 +1,5 @@
 {
+ "superseded_2026_10_26": "Superseded in part 2026-10-26 (docs/decisions.md, Story canon ST-01 to ST-07): the vocabulary 'people he calls threats' and 'I decide who counts as a threat' is retired, and 'target ID' / 'the purge target' now read 'file ID' / 'the worker's files' in the game. The do-not-reveal list is now the investigator, the detention, the engineer's unwitting role and what the witness's proof contains; the witness may be named only as 'a witness' or 'the records worker' (never another job title, ST-09). The drafts below keep their wording as a record.",
  "brief": {
   "voice_rules": [
    "Every line is a DRAFT for Nathanial to approve item by item. Nothing spawns or ships until he signs off (approved=false never spawns).",

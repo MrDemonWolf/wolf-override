@@ -12,6 +12,7 @@ Every moved file is still in git history at commit `1cf8d73`: open one with `git
 - [Twitch: category, Drops and integration (2026-10-16)](https://app.notion.com/p/3fbd61481c7b818c9af4dcfb19b031bd): how to get a Twitch category, Twitch Drops and Twitch integration ideas
 - [Website SEO (October 2026)](https://app.notion.com/p/3fed61481c7b8190a987cc31ef06ea28): what the SEO work changed on the site (PRs #84, #85, #86, #108, #109), Nathanial's to-do list (Search Console, Bing, profile links) and the full researched plan with its sources
 - [Localization (2026-10-16)](https://app.notion.com/p/3fbd61481c7b81cbbcd5cf9cc9ea0c48): the 10-language plan, design, translation pipeline and research, with its [decisions](https://app.notion.com/p/3fbd61481c7b814b8942ebf6e427926c) (adopted October 16, `docs/decisions.md` L10N-01); the tools, data, evidence and prototype stay on the `codex/localization-research` branch at `520cad1`, and the build starts with `apps/game/scripts/i18n.gd` and `apps/game/i18n/languages.json`
+- Story canon (2026-10-26), two pages under [Story & characters](https://app.notion.com/p/3fcd61481c7b81619248f56376333d31): [Story canon — For Nathanial](https://app.notion.com/p/405d61481c7b81cbbb0af666eb815d3f) and [Story canon — AI reference](https://app.notion.com/p/405d61481c7b81fd8cc5cd5be0b4c4f0); the superseded story pages sit under [Story archive](https://app.notion.com/p/405d61481c7b81e9a8a2e6087ef64d51). The repo's home for the canon is `docs/decisions.md`, "Story canon (October 26, 2026)".
 
 ## Asset sources
 
@@ -51,14 +52,14 @@ Every moved file is still in git history at commit `1cf8d73`: open one with `git
 | --- | --- |
 | `docs/art-and-voice.md` | [Art and voice](https://app.notion.com/p/3fbd61481c7b81bdacaad37580309c41) |
 | `docs/camera-terminal-ui-review.md` | [Camera terminal ui review](https://app.notion.com/p/3fbd61481c7b814b90e6f7086f841e1c) |
-| `docs/chatgpt-story-handoff.md` | [Chatgpt story handoff](https://app.notion.com/p/3fbd61481c7b81389054ceffc4706a6e) |
+| `docs/chatgpt-story-handoff.md` | [Chatgpt story handoff](https://app.notion.com/p/3fbd61481c7b81389054ceffc4706a6e) (rewritten 2026-10-26 as the current story brief; the Sep 30 brief is [archived](https://app.notion.com/p/405d61481c7b813591d0d6f81b730d54), not canon) |
 | `docs/docs-review.md` | [Docs review](https://app.notion.com/p/3fbd61481c7b8155852bfbe914ba1bda) |
 | `docs/duplicates-audit.md` | [Duplicates audit](https://app.notion.com/p/3fbd61481c7b81ecb2f7ea9ba1c016c7) |
-| `docs/game-bible.md` | [Game bible](https://app.notion.com/p/3fbd61481c7b819f85defc462c8f9fff) |
+| `docs/game-bible.md` | [Game bible](https://app.notion.com/p/3fbd61481c7b819f85defc462c8f9fff) (story rewritten 2026-10-26; its old Details are archived, not canon) |
 | `docs/marketing-research-review.md` | [Marketing research review](https://app.notion.com/p/3fbd61481c7b81b08543ffb7b4554c4c) |
 | `docs/marketing-ui-review.md` | [Marketing ui review](https://app.notion.com/p/3fbd61481c7b81aeaa2be130784cf530) |
 | `docs/setup-macos.md` | [Setup macos](https://app.notion.com/p/3fbd61481c7b8123bdd5cff035c7750c) |
-| `docs/story-map.md` | [Story map](https://app.notion.com/p/3fbd61481c7b8124a125f52c6da905af) |
+| `docs/story-map.md` | [Story map](https://app.notion.com/p/3fbd61481c7b8124a125f52c6da905af) (story rewritten 2026-10-26; its old Details are archived, not canon) |
 | `docs/ui-gameplay-audit.md` | [Ui gameplay audit](https://app.notion.com/p/3fbd61481c7b8180a62deb3afc3391df) |
 
 ## How it should play

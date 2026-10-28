@@ -19,7 +19,7 @@ For each bounded gameplay change, identify the player's immediate goal, the acti
 
 Run the relevant headless checks after code changes. For a claim about movement, pacing, readability, controls or WOLF's behavior, also play the affected route in one normal game window with a separate test save. Record what was observed and which paths remain unplayed. A still render or headless test does not prove game feel. Exports and devices need their own checks.
 
-Keep public copy accurate about what is playable today. Nathanial Henniges originated the game and core story; research informs craft and does not replace that credit. Detailed story drafts stay in Notion and ignored local files.
+Keep public copy accurate about what is playable today. Nathanial Henniges originated the game and core story; research informs craft and does not replace that credit. Detailed story drafts stay in Notion and the tracked agent files.
 
 Credit Nathanial's original concept, core story and creative vision explicitly. Add outside research to both in-game credits and the public source list only after consulting it; say what it informed. Keep reviewed suggestions distinct from implemented features. Referenced developers are research sources, not project contributors or endorsers.
 

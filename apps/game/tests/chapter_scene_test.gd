@@ -75,7 +75,7 @@ func _run() -> void:
 	_require(state.chapter_complete and game.call("_objective") == "FIRST COPY SECURED", "first chapter resolves after two traces")
 	_require(records.exit_leaf.open < 0.25 and records.exit_lamp_color() == Palette.AMBER, "securing the copy starts the exit's leaf swinging on its hinges, its status lamp amber")
 	_require(await _wait_until(func() -> bool: return absf(human.position.x - float(main_constants["RECORDS_CONTAINER_SIDE_X"])) <= 0.5 and human.body_sprite.flip_h, 60), "the engineer secures the copy at the security container's lock, facing it (x %.1f)" % human.position.x)
-	_require(str(game.get("status_line")).contains("An order and a timestamp don't tell me who's a threat"), "WOLF names what was copied when he questions the Director's target labels")
+	_require(str(game.get("status_line")).contains("An order and a timestamp: the Director is erasing something"), "WOLF names what was copied and what it shows of the Director")
 	# STORY-8: securing the first copy holds no closing shot; its lines run, one box at a time, while the
 	# engineer keeps control, and USE at the exit goes through them before it leaves.
 	_require(not game.get("chapter_close_active") and await _wait_until(func() -> bool: return human.controlled, 60), "securing the first copy keeps control while its closing lines run")

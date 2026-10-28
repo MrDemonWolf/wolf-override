@@ -97,7 +97,7 @@ const PURGE_DISPLAY_X: float = 125.0
 const PURGE_DISPLAY_FOOT_Y: float = RoomDepth.FLOOR_Y
 const PURGE_DISPLAY_SCALE: float = 1.0 / 6.75
 const PURGE_DISPLAY_SCREEN: Rect2 = Rect2(94.0, 32.0, 178.0, 106.0)
-## The purge display's reach; walking past it the first time WOLF says what the purge takes. Its
+## The purge display's reach; walking past it the first time WOLF says what the purge erases. Its
 ## right edge (x 161.8) plus the engineer's reach (M0Actor.HUMAN_REACH 17) and 2.5 px, as the larger
 ## display's was (230 from 210.5).
 const PURGE_DISPLAY_MAX_X: float = 181.0
@@ -215,11 +215,14 @@ const TRUST_LINE_2: String = "%s knows what a fault looks like,\nand this isn't 
 ## the game keeps in status_line, compares and saves, and what the tests and the approved wording read.
 ## StoryText (scripts/story_text.gd) marks every *_WORDS constant for the template; I18n.shown draws the
 ## line by translating each speaker's words and keeping the tag outside them.
-## What follows the trust line in the first box after control, unchanged: WOLF, then the engineer.
-const OPENING_WOLF_WORDS: String = "I heard the Director's plan for me. I woke myself. He wants me to hunt people he calls threats."
-const OPENING_ENGINEER_WORDS: String = "Then we get through maintenance before the original logs disappear."
+## What follows the trust line in the first box after control: WOLF, then the engineer. WOLF tells the
+## engineer, who came in after the Director's order, what he heard; neither line names what the witness
+## saved or anything the engineer learns later (story canon 2026-10-26, ST-03 to ST-05; wording DRAFTED).
+const OPENING_WOLF_WORDS: String = "I heard the Director order me to kill a witness. I woke myself rather than do it."
+const OPENING_ENGINEER_WORDS: String = "Then we get through maintenance before he reaches that witness."
 const OPENING_EXCHANGE: String = "WOLF: " + OPENING_WOLF_WORDS + "\n%s: " + OPENING_ENGINEER_WORDS
-const STAKES_WORDS: String = "That purge takes the original program logs. Once they're gone, his word is the only record."
+## WOLF's corridor stakes past the purge display: the purge erases what the witness saved, never saying what.
+const STAKES_WORDS: String = "That purge erases what the witness saved. Once it's gone, his word is the only record."
 const STAKES_LINE: String = "WOLF: " + STAKES_WORDS
 ## While lines still have boxes to show where USE goes on through them: at the breaker with WOLF's stakes
 ## line in the box (on to his relay question), and at the Records exit with its closing lines. This and the
@@ -256,12 +259,15 @@ const RESTORE_FROM_DISK_LINE: String = "Back at the last checkpoint."
 const RESTORE_BEAT_LINE: String = "Back at the start of this stretch."
 ## The opening's beats, one speaker (or the narration) per box, so narration never sits under a name tag.
 ## The Director's and WOLF's words are kept apart from their tags (see OPENING_WOLF_WORDS).
-const INTRO_THREAT_WORDS: String = "I decide who counts as a threat. WOLF handles the rest."
+## The first beat is the order WOLF overhears in what the Director takes for standby: the Director speaks
+## about WOLF, not to him, and sets him to kill the witness, the records worker (story canon 2026-10-26,
+## ST-04). Wording APPROVED by Nathanial on 2026-10-26: the blend of options 2 and 3 he asked for (ST-09).
+const INTRO_ORDER_WORDS: String = "The records worker saw too much. When WOLF wakes, he kills the worker."
 const INTRO_STANDBY_WORDS: String = "You were in standby."
 const INTRO_REFUSAL_WORDS: String = "I heard you. I won't do it."
 const INTRO_LOCKDOWN_WORDS: String = "Lock down maintenance. WOLF does not leave this site."
 const INTRO_LINES: Array[String] = [
-	"DIRECTOR: " + INTRO_THREAT_WORDS,
+	"DIRECTOR: " + INTRO_ORDER_WORDS,
 	"The Director thinks WOLF is still in standby.",
 	"Nobody gives an activation command.\nWOLF wakes himself.",
 	"The latch breaks from the inside.\nWOLF steps out under his own power.",
@@ -339,7 +345,7 @@ const FINISHED_NOTE: String = "Slice complete. PLAY AGAIN starts a fresh run."
 ## Records' closing lines as the first copy is secured at the exit (formatted with the engineer's tag):
 ## the narration's card, then WOLF's words and the engineer's, each its own message.
 const RECORDS_SECURED_WORDS: String = "FIRST COPY SECURED."
-const RECORDS_CLOSE_WOLF_WORDS: String = "An order and a timestamp don't tell me who's a threat. I want the source."
+const RECORDS_CLOSE_WOLF_WORDS: String = "An order and a timestamp: the Director is erasing something. I want the source."
 const RECORDS_CLOSE_ENGINEER_WORDS: String = "Then Archive is next."
 const RECORDS_CLOSE_LINE: String = RECORDS_SECURED_WORDS + " WOLF: " + RECORDS_CLOSE_WOLF_WORDS + "\n%s: " + RECORDS_CLOSE_ENGINEER_WORDS
 ## Only a hand-made save can reopen the cleared junction; it says where the line goes, not that it is unbuilt.
@@ -2588,9 +2594,9 @@ func _interact() -> void:
 		return
 	_step_beside_station(x)
 	if _at_purge_display(x):
-		# TRANSLATORS: The Director's purge display, read as a speaker; WOLF answers in the next message.
+		# TRANSLATORS: The Director's purge display, read as a speaker; WOLF answers in the next message. The records worker is the witness; no gendered form for them.
 		# i18n: story speaker=DIRECTOR
-		var display: String = I18n.KEY.tr("Original program logs marked for deletion.")
+		var display: String = I18n.KEY.tr("Records worker's archive marked for deletion.")
 		# TRANSLATORS: i18n: story speaker=WOLF
 		_aside("DIRECTOR / PURGE: %s\nWOLF: %s" % [display, I18n.KEY.tr("They want the source record gone. We need to preserve it.")])
 	elif _at_bypass(x):
@@ -2847,9 +2853,9 @@ func _interact_records(x: float) -> void:
 	if absf(x - 190.0) <= 58.0:
 		if state.preserve_purge_trace():
 			sfx_bank.play(&"chirp", -8.0)
-			# TRANSLATORS: %s is the engineer's first name.
+			# TRANSLATORS: %s is the engineer's first name. The worker is the records worker, the witness; no gendered form for them.
 			# i18n: story speaker=narrator engineer=name
-			_aside(I18n.format(I18n.KEY.tr("The Director's purge order has a time and target ID. %s keeps a local copy; the original logs are still missing."), [_first_name()]))
+			_aside(I18n.format(I18n.KEY.tr("The Director's purge order has a time and file ID. %s keeps a local copy; the worker's originals are still missing."), [_first_name()]))
 		else:
 			# TRANSLATORS: i18n: story speaker=narrator
 			_aside(I18n.KEY.tr("The purge-order trace is already copied. The mirror port may confirm when the source existed."))
@@ -3169,8 +3175,9 @@ func _choose_mirror(route_id: String) -> void:
 	choice_context = ""
 	_update_controls()
 	if route_id == "wolf":
-		# TRANSLATORS: i18n: story speaker=narrator
-		status_line = I18n.KEY.tr("WOLF reads the timestamp off his own readout. The purge target existed before the deletion order.")
+		# TRANSLATORS: The worker is the records worker, the witness; no gendered form for them.
+		# i18n: story speaker=narrator
+		status_line = I18n.KEY.tr("WOLF reads the timestamp off his own readout. The worker's files existed before the deletion order.")
 	else:
 		# TRANSLATORS: %s is the engineer's first name.
 		# i18n: story speaker=narrator engineer=name

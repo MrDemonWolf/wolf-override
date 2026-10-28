@@ -1,5 +1,5 @@
 {
-  "status": "approved by Nathanial 2026-10-11 (all 123 lines, including the 9 added in round 2 and the 6 added in round 3); 2026-10-13: 24 lines reworded or split and 4 added through the October 13 wording drafts (items 1, 3, 4, 5, 6, 7), and 7 more given notes or superseded markers only; each reworded or split line keeps its earlier text in 'history'; 2026-10-14: 2 lines reworded and 2 added (the lines that put WOLF 'at the rubble', Draft A in the WOLF-space drafts), with their earlier text in 'history'; 2026-10-14 (\"Say door\" and the container hint): 3 lines reworded and 9 added (the junction exit's lines say 'door', the tank's hit is two boxes, the Records exit hint names the container), with their earlier text in 'history'",
+  "status": "approved by Nathanial 2026-10-11 (all 123 lines, including the 9 added in round 2 and the 6 added in round 3); 2026-10-13: 24 lines reworded or split and 4 added through the October 13 wording drafts (items 1, 3, 4, 5, 6, 7), and 7 more given notes or superseded markers only; each reworded or split line keeps its earlier text in 'history'; 2026-10-14: 2 lines reworded and 2 added (the lines that put WOLF 'at the rubble', Draft A in the WOLF-space drafts), with their earlier text in 'history'; 2026-10-14 (\"Say door\" and the container hint): 3 lines reworded and 9 added (the junction exit's lines say 'door', the tank's hit is two boxes, the Records exit hint names the container), with their earlier text in 'history'; 2026-10-26: 6 lines (OPENING_BOX's last box, STAKES_LINE, PURGE_DISPLAY_READ, INTRO_STANDBY, MIRROR_WOLF_RESULT, FIRST_COPY_CLOSE) redrafted for the story canon of 2026-10-26, each with its earlier text in 'history' and status 'drafted', waiting for Nathanial's read",
   "date": "2026-10-10",
   "source": "Logic audit of 2026-10-10 (327 real-game screenshots, 24 problems) and Nathanial's decisions A-D. Every string here is a proposal; nothing ships until Nathanial approves it.",
   "placeholders": {
@@ -40,7 +40,7 @@
         "{name} has serviced WOLF's systems without ever being told what they were for. Now WOLF has told them, and refused it.",
         "{name} knows WOLF from the inside, every joint and patch. Nothing in him reads as a malfunction."
       ],
-      "notes": "Decision B, third person, they/them. Uses only established facts: the engineer maintained WOLF's equipment without knowing the program's purpose, and the Director treats WOLF as a malfunction. No duration ('for years') is stated on purpose; that would be a new fact. Put it FIRST in the box (see OPENING_BOX): with the current _set_dialogue rule a narration row placed under WOLF's line would be shown under the WOLF name tag. Alternative 1 wraps to two rows, so with it the opening box would need four rows; use it only as its own beat before the WOLF exchange. Fit: 1 of 3 rows, untagged box (855 px text width, Roboto 17 px); alt 1: 2 of 3 rows, untagged box (855 px text width, Roboto 17 px); alt 2: 1 of 3 rows, untagged box (855 px text width, Roboto 17 px). 2026-10-13: two boxes in order after first control; the name is repeated so 'They' cannot read as 'the systems'. They/them stays available for later lines.",
+      "notes": "Decision B, third person, they/them. Uses only established facts: the engineer maintained WOLF's equipment without knowing the program's purpose, and the Director treats WOLF as a malfunction. No duration ('for years') is stated on purpose; that would be a new fact. Put it FIRST in the box (see OPENING_BOX): with the current _set_dialogue rule a narration row placed under WOLF's line would be shown under the WOLF name tag. Alternative 1 wraps to two rows, so with it the opening box would need four rows; use it only as its own beat before the WOLF exchange. Fit: 1 of 3 rows, untagged box (855 px text width, Roboto 17 px); alt 1: 2 of 3 rows, untagged box (855 px text width, Roboto 17 px); alt 2: 1 of 3 rows, untagged box (855 px text width, Roboto 17 px). 2026-10-13: two boxes in order after first control; the name is repeated so 'They' cannot read as 'the systems'. They/them stays available for later lines. Superseded 2026-10-26: the engineer's unwitting role is a later discovery (ST-03), not an established opening fact; the two approved boxes still fit (ordinary maintenance).",
       "status": "approved by Nathanial 2026-10-13 (item 4 (P0-9), option A; through clickable choices after reading the drafts)",
       "history": [
         {
@@ -67,22 +67,33 @@
       "where": "apps/game/scripts/main.gd _finish_intro (status_line)",
       "trigger": "The opening gameplay box, replacing the current two-row WOLF / engineer exchange.",
       "speaker": "NARRATION",
-      "current": "WOLF: I heard the Director's plan for me. I woke myself. He wants me to hunt people he calls threats.\n{NAME}: Then we get through maintenance before the original logs disappear.",
-      "proposed": "{name} keeps WOLF's systems running.\n\n{name} knows what a fault looks like,\nand this isn't one.\n\nWOLF: I heard the Director's plan for me. I woke myself. He wants me to hunt people he calls threats.\n{NAME}: Then we get through maintenance before the original logs disappear.",
+      "current": "{name} keeps WOLF's systems running.\n\n{name} knows what a fault looks like,\nand this isn't one.\n\nWOLF: I heard the Director order me to kill a witness. I woke myself rather than do it.\n{NAME}: Then we get through maintenance before he reaches that witness.",
+      "proposed": "{name} keeps WOLF's systems running.\n\n{name} knows what a fault looks like,\nand this isn't one.\n\nWOLF: I heard the Director order me to kill a witness. I woke myself rather than do it.\n{NAME}: Then we get through maintenance before he reaches that witness.",
       "alternatives": [],
-      "notes": "Composite of TRUST_LINE plus the two existing lines, unchanged. Mixed speakers, so the box is untagged with inline names (the format other multi-speaker beats use). Measured: three rows at the untagged width, which is the most the box holds (3 x 21 px in a 67 px label). Fit: 3 of 3 rows, untagged box (855 px text width, Roboto 17 px). 2026-10-13: the trust line becomes its own two boxes; the WOLF and engineer rows that followed it are unchanged and come next as one box (splitting them is the opening rebuild, item 2, not built yet).",
-      "status": "approved by Nathanial 2026-10-13 (item 4 (P0-9), option A; through clickable choices after reading the drafts)",
+      "notes": "Composite of TRUST_LINE plus the two existing lines, unchanged. Mixed speakers, so the box is untagged with inline names (the format other multi-speaker beats use). Measured: three rows at the untagged width, which is the most the box holds (3 x 21 px in a 67 px label). Fit: 3 of 3 rows, untagged box (855 px text width, Roboto 17 px). 2026-10-13: the trust line becomes its own two boxes; the WOLF and engineer rows that followed it are unchanged and come next as one box (splitting them is the opening rebuild, item 2, not built yet). 2026-10-26: The old WOLF row stated the retired hunt purpose (ST-01); WOLF now tells the engineer, who arrived after the order, that he heard the order to kill a witness (ST-04). The engineer's answer sets a goal without revealing their own role or the investigator (ST-03, ST-05).",
+      "status": "drafted by Claude 2026-10-26 for the story canon of 2026-10-26 (docs/decisions.md ST-01 to ST-07; LINES.md change 2); waiting for Nathanial's read. IMPLEMENTED on branch story/canon-rewrite-2026-10.",
       "history": [
         {
           "proposed": "{name} keeps WOLF's systems running. They know what a fault looks like, and this isn't one.\nWOLF: I heard the Director's plan for me. I woke myself. He wants me to hunt people he calls threats.\n{NAME}: Then we get through maintenance before the original logs disappear.",
           "alternatives": [],
           "status": "approved by Nathanial 2026-10-11 (as drafted)"
+        },
+        {
+          "current": "WOLF: I heard the Director's plan for me. I woke myself. He wants me to hunt people he calls threats.\n{NAME}: Then we get through maintenance before the original logs disappear.",
+          "proposed": "{name} keeps WOLF's systems running.\n\n{name} knows what a fault looks like,\nand this isn't one.\n\nWOLF: I heard the Director's plan for me. I woke myself. He wants me to hunt people he calls threats.\n{NAME}: Then we get through maintenance before the original logs disappear.",
+          "alternatives": [],
+          "status": "approved by Nathanial 2026-10-13 (item 4 (P0-9), option A; through clickable choices after reading the drafts)",
+          "boxes": [
+            "{name} keeps WOLF's systems running.",
+            "{name} knows what a fault looks like,\nand this isn't one.",
+            "WOLF: I heard the Director's plan for me. I woke myself. He wants me to hunt people he calls threats.\n{NAME}: Then we get through maintenance before the original logs disappear."
+          ]
         }
       ],
       "boxes": [
         "{name} keeps WOLF's systems running.",
         "{name} knows what a fault looks like,\nand this isn't one.",
-        "WOLF: I heard the Director's plan for me. I woke myself. He wants me to hunt people he calls threats.\n{NAME}: Then we get through maintenance before the original logs disappear."
+        "WOLF: I heard the Director order me to kill a witness. I woke myself rather than do it.\n{NAME}: Then we get through maintenance before he reaches that witness."
       ],
       "approved": {
         "date": "2026-10-13",
@@ -95,14 +106,23 @@
       "where": "apps/game/scripts/main.gd _process / corridor (new one-shot line)",
       "trigger": "Once per run, the first time the engineer walks right past the purge display (x > 230) after the opening box. The engineer spawns at x 160, inside the display's reach, so it cannot fire on spawn. Never repeats; not on the purge display read.",
       "speaker": "WOLF",
-      "current": null,
-      "proposed": "WOLF: That purge takes the original program logs. Once they're gone, his word is the only record.",
-      "alternatives": [
-        "WOLF: That display is the Director's purge. Without the original logs, nobody can check who he calls a threat.",
-        "{NAME}: He's purging the original program logs. We save what we can before they're gone."
-      ],
-      "notes": "Decision C: required on the main path; the optional display keeps the details (PURGE_DISPLAY_READ, unchanged). WOLF says it in the proposal and alternative 1 because the threat-label stakes are his; alternative 2 gives it to the engineer. 'his word is the only record' restates what the opening already shows (the Director decides who counts as a threat); no new fact. Do not make it say the engineer will copy the logs themselves: in Records the logs are 'still missing' and only the purge order's trace is copied. Fit: 1 of 3 rows, tagged box (715 px text width, Roboto 17 px); alt 1: 2 of 3 rows, tagged box (715 px text width, Roboto 17 px); alt 2: 1 of 3 rows, tagged box (715 px text width, Roboto 17 px).",
-      "status": "approved by Nathanial 2026-10-11 (as drafted)"
+      "current": "WOLF: That purge erases what the witness saved. Once it's gone, his word is the only record.",
+      "proposed": "WOLF: That purge erases what the witness saved. Once it's gone, his word is the only record.",
+      "alternatives": [],
+      "notes": "Decision C (2026-10-11, still valid): the stakes line is required on the main path, and the optional purge display keeps the details (PURGE_DISPLAY_READ). Current line, 2026-10-26: WOLF says the purge erases what the witness saved, so the Director is destroying the records worker's preserved record (ST-04). It says the witness saved something, never what, so the slice does not reveal the investigator or the detention (spoiler line). 'His word is the only record' now means that without the witness's record the Director's account stands unchecked; it states no new fact. Do not make it say the engineer will copy the originals themselves: in Records the worker's originals are 'still missing' and only the purge order's trace is copied. Fit: 1 of 3 rows, tagged box (715 px text width, Roboto 17 px). Keep option: Nathanial may keep the old line; then the purge display and the Records purge-queue line keep 'logs' too. The reasoning for the old line is under history.",
+      "status": "drafted by Claude 2026-10-26 for the story canon of 2026-10-26 (docs/decisions.md ST-01 to ST-07; LINES.md change 4); waiting for Nathanial's read. IMPLEMENTED on branch story/canon-rewrite-2026-10.",
+      "history": [
+        {
+          "current": null,
+          "proposed": "WOLF: That purge takes the original program logs. Once they're gone, his word is the only record.",
+          "alternatives": [
+            "WOLF: That display is the Director's purge. Without the original logs, nobody can check who he calls a threat.",
+            "{NAME}: He's purging the original program logs. We save what we can before they're gone."
+          ],
+          "status": "approved by Nathanial 2026-10-11 (as drafted)",
+          "notes": "Decision C: required on the main path; the optional display keeps the details (PURGE_DISPLAY_READ, unchanged). WOLF says it in the proposal and alternative 1 because the threat-label stakes are his; alternative 2 gives it to the engineer. 'his word is the only record' restates what the opening already shows (the Director decides who counts as a threat); no new fact. Do not make it say the engineer will copy the logs themselves: in Records the logs are 'still missing' and only the purge order's trace is copied. Fit: 1 of 3 rows, tagged box (715 px text width, Roboto 17 px); alt 1: 2 of 3 rows, tagged box (715 px text width, Roboto 17 px); alt 2: 1 of 3 rows, tagged box (715 px text width, Roboto 17 px)."
+        }
+      ]
     },
     {
       "id": "PURGE_DISPLAY_READ",
@@ -110,11 +130,27 @@
       "where": "apps/game/scripts/main.gd _interact (x <= 230)",
       "trigger": "USE at the purge display (optional).",
       "speaker": "DIRECTOR",
-      "current": "DIRECTOR / PURGE: Original program logs marked for deletion.\nWOLF: They want the source record gone. We need to preserve it.",
-      "proposed": "DIRECTOR / PURGE: Original program logs marked for deletion.\nWOLF: They want the source record gone. We need to preserve it.",
+      "current": "DIRECTOR / PURGE: Records worker's archive marked for deletion.\nWOLF: They want the source record gone. We need to preserve it.",
+      "proposed": "DIRECTOR / PURGE: Records worker's archive marked for deletion.\nWOLF: They want the source record gone. We need to preserve it.",
       "alternatives": [],
-      "notes": "Unchanged on purpose: the display keeps the details now that STAKES_LINE carries the stakes on the main path. Fit: 2 of 3 rows, untagged box (855 px text width, Roboto 17 px).",
-      "status": "approved by Nathanial 2026-10-11 (as drafted)"
+      "notes": "The optional purge display keeps the details, now that STAKES_LINE carries the stakes on the main path. Current line, 2026-10-26: the display names the records worker's archive as the Director's deletion target. 'Original program logs' pointed at the program as the wrongdoer, and ST-01 says it was made for good. WOLF's reply ('They want the source record gone. We need to preserve it.') is the approved 2026-10-11 wording, unchanged. Fit: 2 of 3 rows, untagged box (855 px text width, Roboto 17 px).",
+      "status": "drafted by Claude 2026-10-26 for the story canon of 2026-10-26 (docs/decisions.md ST-01 to ST-10; LINES.md change 5; 'records worker' per ST-09); waiting for Nathanial's read. IMPLEMENTED on branch story/canon-rewrite-2026-10.",
+      "history": [
+        {
+          "current": "DIRECTOR / PURGE: Records clerk's archive marked for deletion.\nWOLF: They want the source record gone. We need to preserve it.",
+          "proposed": "DIRECTOR / PURGE: Records clerk's archive marked for deletion.\nWOLF: They want the source record gone. We need to preserve it.",
+          "alternatives": [],
+          "status": "drafted by Claude 2026-10-26 (LINES.md change 5); reworded 2026-10-26 for ST-09",
+          "notes": "First 2026-10-26 draft, before Nathanial chose 'records worker' as the only term (ST-09)."
+        },
+        {
+          "current": "DIRECTOR / PURGE: Original program logs marked for deletion.\nWOLF: They want the source record gone. We need to preserve it.",
+          "proposed": "DIRECTOR / PURGE: Original program logs marked for deletion.\nWOLF: They want the source record gone. We need to preserve it.",
+          "alternatives": [],
+          "status": "approved by Nathanial 2026-10-11 (as drafted)",
+          "notes": "Unchanged on purpose: the display keeps the details now that STAKES_LINE carries the stakes on the main path. Fit: 2 of 3 rows, untagged box (855 px text width, Roboto 17 px)."
+        }
+      ]
     },
     {
       "id": "INTRO_STANDBY",
@@ -122,14 +158,38 @@
       "where": "apps/game/scripts/main.gd _new_game (status_line)",
       "trigger": "First opening beat.",
       "speaker": "DIRECTOR",
-      "current": "DIRECTOR: I decide who counts as a threat. WOLF handles the rest.\nHe thinks WOLF is still in standby.",
-      "proposed": "DIRECTOR: I decide who counts as a threat. WOLF handles the rest.\nThe Director thinks WOLF is still in standby.",
-      "alternatives": [
-        "Split into two beats: 'DIRECTOR: I decide who counts as a threat. WOLF handles the rest.' then the narration 'The Director thinks WOLF is still in standby.'"
-      ],
-      "notes": "Problem 12: the narration row currently sits under the DIRECTOR tag. The code fix (tag a box only when every row has that speaker) is separate; 'He' becomes 'The Director' so the row reads correctly once it is untagged or on its own beat. Fit: 2 of 3 rows, tagged box (715 px text width, Roboto 17 px).",
+      "current": "DIRECTOR: The records worker saw too much. When WOLF wakes, he kills the worker.\nThe Director thinks WOLF is still in standby.",
+      "proposed": "DIRECTOR: The records worker saw too much. When WOLF wakes, he kills the worker.\nThe Director thinks WOLF is still in standby.",
+      "alternatives": [],
+      "notes": "Problem 12: the narration row currently sits under the DIRECTOR tag. The code fix (tag a box only when every row has that speaker) is separate; 'He' becomes 'The Director' so the row reads correctly once it is untagged or on its own beat. Fit: 2 of 3 rows, tagged box (715 px text width, Roboto 17 px). 2026-10-26: ST-04: WOLF hears the Director order him to kill the witness. Nathanial approved the drafted alternative on 2026-10-26, with 'records worker' for the witness (ST-09): 'when you wake' fits the Director believing WOLF is in standby. The constant is renamed INTRO_ORDER_WORDS. Still two beats (the narration row is its own beat). 2026-10-26, later: Nathanial asked for a blend of option 2 (the line above under history) and option 3 ('...When WOLF comes online, he kills the worker.'). The Director talks about WOLF, not to him, because he thinks WOLF is in standby; WOLF overhears. Nathanial approved the blend ('That works') after reading the whole opening: the order, 'You were in standby.', WOLF's 'I heard you. I won't do it.', then the lockdown order.",
       "implementation": "Implemented (step: speaker tags, 2026-10-11) as the alternative: two beats, the Director's line under his tag, then the narration line untagged. _set_dialogue now tags a box only when every line is that speaker's.",
-      "status": "approved by Nathanial 2026-10-11 (as drafted)"
+      "status": "approved by Nathanial 2026-10-26 (the blend of options 2 and 3; docs/decisions.md ST-09). IMPLEMENTED on branch story/canon-rewrite-2026-10.",
+      "history": [
+        {
+          "current": "DIRECTOR: The records worker is a witness. WOLF, when you wake, kill the worker.\nThe Director thinks WOLF is still in standby.",
+          "proposed": "DIRECTOR: The records worker is a witness. WOLF, when you wake, kill the worker.\nThe Director thinks WOLF is still in standby.",
+          "alternatives": [
+            "option 3: 'The records worker saw too much. When WOLF comes online, he kills the worker.'"
+          ],
+          "status": "approved by Nathanial 2026-10-26 (option 2); replaced the same day by the blend of options 2 and 3 he asked for",
+          "notes": "Option 2 spoke to WOLF; the blend has the Director speak about WOLF, believing him in standby."
+        },
+        {
+          "current": "DIRECTOR: New order, WOLF. The records clerk is a witness. Kill the clerk tonight.\nThe Director thinks WOLF is still in standby.",
+          "proposed": "DIRECTOR: New order, WOLF. The records clerk is a witness. Kill the clerk tonight.\nThe Director thinks WOLF is still in standby.",
+          "alternatives": [],
+          "status": "drafted by Claude 2026-10-26 (LINES.md change 1); replaced 2026-10-26 by Nathanial's approved alternative",
+          "notes": "The drafted line said 'records clerk'; Nathanial chose the alternative and the term 'records worker' (ST-09)."
+        },
+        {
+          "current": "DIRECTOR: I decide who counts as a threat. WOLF handles the rest.\nHe thinks WOLF is still in standby.",
+          "proposed": "DIRECTOR: I decide who counts as a threat. WOLF handles the rest.\nThe Director thinks WOLF is still in standby.",
+          "alternatives": [
+            "Split into two beats: 'DIRECTOR: I decide who counts as a threat. WOLF handles the rest.' then the narration 'The Director thinks WOLF is still in standby.'"
+          ],
+          "status": "approved by Nathanial 2026-10-11 (as drafted)"
+        }
+      ]
     },
     {
       "id": "INTRO_LOCKDOWN",
@@ -553,13 +613,29 @@
       "where": "apps/game/scripts/main.gd _choose_mirror ('wolf')",
       "trigger": "After choosing USE WOLF'S READOUT.",
       "speaker": "NARRATION",
-      "current": "WOLF brings the mirror timestamp by his own choice. The purge target existed before the deletion order.",
-      "proposed": "WOLF reads the timestamp off his own readout. The purge target existed before the deletion order.",
-      "alternatives": [
-        "The mirror timestamp shows the purge target existed before the deletion order. WOLF reads it out by his own choice."
-      ],
-      "notes": "Problem 21: 'by his own choice' right after the player picked his readout reads oddly, and 'brings' conflicts with the rule that WOLF never fetches. The alternative is the approved MIRROR TIMESTAMP examine text (item-text-2026-10-09), so the status line and the case entry could match word for word. Fit: 1 of 3 rows, untagged box (855 px text width, Roboto 17 px); alt 1: 2 of 3 rows, untagged box (855 px text width, Roboto 17 px).",
-      "status": "approved by Nathanial 2026-10-11 (as drafted)"
+      "current": "WOLF reads the timestamp off his own readout. The worker's files existed before the deletion order.",
+      "proposed": "WOLF reads the timestamp off his own readout. The worker's files existed before the deletion order.",
+      "alternatives": [],
+      "notes": "Problem 21 (2026-10-11, still valid): WOLF reads the timestamp himself, because 'brings' conflicts with the rule that WOLF never fetches, and 'by his own choice' read oddly right after the player picked his readout. Current line, 2026-10-26: the second sentence says 'the worker's files' (the records worker, ST-09), because 'the purge target' was written for the retired target-list premise and could now read as a person. The timestamp shows the files existed before the deletion order, so the purge erased real records. Fit: 1 of 3 rows, untagged box (855 px text width, Roboto 17 px).",
+      "status": "drafted by Claude 2026-10-26 for the story canon of 2026-10-26 (docs/decisions.md ST-01 to ST-10; LINES.md change 7; 'records worker' per ST-09); waiting for Nathanial's read. IMPLEMENTED on branch story/canon-rewrite-2026-10.",
+      "history": [
+        {
+          "current": "WOLF reads the timestamp off his own readout. The clerk's files existed before the deletion order.",
+          "proposed": "WOLF reads the timestamp off his own readout. The clerk's files existed before the deletion order.",
+          "alternatives": [],
+          "status": "drafted by Claude 2026-10-26 (LINES.md change 7); reworded 2026-10-26 for ST-09",
+          "notes": "First 2026-10-26 draft, before Nathanial chose 'records worker' as the only term (ST-09)."
+        },
+        {
+          "current": "WOLF brings the mirror timestamp by his own choice. The purge target existed before the deletion order.",
+          "proposed": "WOLF reads the timestamp off his own readout. The purge target existed before the deletion order.",
+          "alternatives": [
+            "The mirror timestamp shows the purge target existed before the deletion order. WOLF reads it out by his own choice."
+          ],
+          "status": "approved by Nathanial 2026-10-11 (as drafted)",
+          "notes": "Problem 21: 'by his own choice' right after the player picked his readout reads oddly, and 'brings' conflicts with the rule that WOLF never fetches. The alternative is the approved MIRROR TIMESTAMP examine text (item-text-2026-10-09), so the status line and the case entry could match word for word. Fit: 1 of 3 rows, untagged box (855 px text width, Roboto 17 px); alt 1: 2 of 3 rows, untagged box (855 px text width, Roboto 17 px)."
+        }
+      ]
     },
     {
       "id": "MIRROR_MEANING",
@@ -581,13 +657,21 @@
       "where": "apps/game/scripts/main.gd _interact_records (complete_chapter)",
       "trigger": "Securing the first copy at the Records exit.",
       "speaker": "WOLF",
-      "current": "FIRST COPY SECURED. WOLF: A list doesn't tell me who's a threat. I want the source.\n{NAME}: Then Archive is next.",
-      "proposed": "FIRST COPY SECURED. WOLF: An order and a timestamp don't tell me who's a threat. I want the source.\n{NAME}: Then Archive is next.",
-      "alternatives": [
-        "FIRST COPY SECURED. WOLF: Two traces don't tell me who's a threat. I want the source.\n{NAME}: Then Archive is next."
-      ],
-      "notes": "Problem 10: 'A list' named nothing on screen; this names what was actually copied (the purge order's trace and the mirror timestamp). Fit: 2 of 3 rows, untagged box (855 px text width, Roboto 17 px); alt 1: 2 of 3 rows, untagged box (855 px text width, Roboto 17 px).",
-      "status": "approved by Nathanial 2026-10-11 (as drafted)"
+      "current": "FIRST COPY SECURED. WOLF: An order and a timestamp: the Director is erasing something. I want the source.\n{NAME}: Then Archive is next.",
+      "proposed": "FIRST COPY SECURED. WOLF: An order and a timestamp: the Director is erasing something. I want the source.\n{NAME}: Then Archive is next.",
+      "alternatives": [],
+      "notes": "Problem 10: 'A list' named nothing on screen; this names what was actually copied (the purge order's trace and the mirror timestamp). Fit: 2 of 3 rows, untagged box (855 px text width, Roboto 17 px); alt 1: 2 of 3 rows, untagged box (855 px text width, Roboto 17 px). 2026-10-26: 'Who's a threat' is the retired threat-label framing. The line names the Director because nothing else in its box gives 'he' an antecedent, and translators see the message alone. Written with a colon ('An order and a timestamp: the Director is erasing something.') because the LINES.md wording ('...show the Director is erasing something.') split WOLF's words into two boxes; this one stays one box, as before.",
+      "status": "drafted by Claude 2026-10-26 for the story canon of 2026-10-26 (docs/decisions.md ST-01 to ST-07; LINES.md change 8); waiting for Nathanial's read. IMPLEMENTED on branch story/canon-rewrite-2026-10.",
+      "history": [
+        {
+          "current": "FIRST COPY SECURED. WOLF: A list doesn't tell me who's a threat. I want the source.\n{NAME}: Then Archive is next.",
+          "proposed": "FIRST COPY SECURED. WOLF: An order and a timestamp don't tell me who's a threat. I want the source.\n{NAME}: Then Archive is next.",
+          "alternatives": [
+            "FIRST COPY SECURED. WOLF: Two traces don't tell me who's a threat. I want the source.\n{NAME}: Then Archive is next."
+          ],
+          "status": "approved by Nathanial 2026-10-11 (as drafted)"
+        }
+      ]
     },
     {
       "id": "JUNCTION_ENTRY",

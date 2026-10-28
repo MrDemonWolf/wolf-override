@@ -194,7 +194,7 @@ func _check_trust_boxes() -> void:
 	game.set("opening_lines_held", false)
 	var box_1: String = "Rowan keeps WOLF's systems running."
 	var box_2: String = "Rowan knows what a fault looks like,\nand this isn't one."
-	var box_3: String = "WOLF: I heard the Director's plan for me. I woke myself. He wants me to hunt people he calls threats.\nROWAN: Then we get through maintenance before the original logs disappear."
+	var box_3: String = "WOLF: I heard the Director order me to kill a witness. I woke myself rather than do it.\nROWAN: Then we get through maintenance before he reaches that witness."
 	# The boxes are timed by the game's own clock; step it by hand so nothing else moves meanwhile.
 	game.set("box_queue_seconds", MainScript.box_seconds(box_1))
 	_expect(str(game.get("status_line")) == box_1 and game.get("box_queue") == [box_2, box_3], "first control shows the trust line's first box, with the second and the exchange to come")

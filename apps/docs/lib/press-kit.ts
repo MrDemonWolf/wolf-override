@@ -5,9 +5,12 @@ import { publisherProfileLinks, publisherUrl, siteUrl } from '@/lib/seo';
  * The words of the design-system page (/design-system/) and of the press kit zip, in one place.
  * The page renders them as HTML; scripts/build-press-kit.ts writes the same values into the zip's
  * FACTS.txt, COPY.txt and LICENSE-ASSETS.txt, so the page and the download can never say different
- * things. Every description here is copy Nathanial Henniges approved for the IGDB and Twitch
- * listings on 2026-10-16 (tagline, summary, storyline) and 2026-10-17 (studio description); do not
- * reword it here, and add no story beyond what the public landing page already says.
+ * things. Nathanial Henniges approved the tagline on 2026-10-16 and the studio description on
+ * 2026-10-17 for the IGDB and Twitch listings. The summary and storyline he approved on 2026-10-16 named
+ * a premise his story canon of 2026-10-26 retired (docs/decisions.md, ST-07), so they were redrafted
+ * that day and are DRAFTED until he reads them; the live IGDB and Twitch listings keep the old copy
+ * until then. Do not reword anything else here without his approval, and add no story beyond what the
+ * public landing page already says.
  */
 
 /** The game's name, and the rules for writing it (Nathanial's decision, October 17, 2026). */
@@ -32,14 +35,14 @@ export const creatorCredit = 'Original concept, core story and creative vision: 
 /** Approved tagline (31 characters). */
 export const tagline = 'Built to obey. Awake to refuse.';
 
-/** Approved short description: the IGDB summary (about 310 characters). */
+/** Short description, the IGDB summary (about 310 characters): DRAFTED 2026-10-26, waiting for approval. */
 export const shortDescription =
-  'A side-view sci-fi horror adventure. WOLF is a robotic wolf with a will of his own. The Director plans to use him to kill. He refuses. You play the engineer who meets him inside THE DEN. Solve puzzles, make choices he remembers and earn his trust. He can help you, or say no. In development by MrDemonWolf, Inc.';
+  'A side-view sci-fi horror adventure. WOLF is a robotic wolf with a will of his own. The Director orders him to kill a witness. He refuses. You play the engineer who meets him inside THE DEN. Solve puzzles, make choices he remembers and earn his trust. He can help you, or say no. In development by MrDemonWolf, Inc.';
 
-/** Approved long description: the IGDB storyline, two paragraphs, premise only. */
+/** Long description, the IGDB storyline, two paragraphs, premise only: DRAFTED 2026-10-26, waiting for approval. */
 export const longDescription = [
-  'WOLF was built to obey. The Director plans to use him to kill, claiming it will protect people. WOLF wakes in his robotic body and refuses.',
-  'You play the engineer who meets him inside THE DEN. Together, you begin to uncover what the program is hiding. WOLF has his own will. He can help you or refuse, and he remembers your choices. His trust must be earned.',
+  'WOLF was made to help people. The Director orders him to kill a witness. WOLF wakes in his robotic body and refuses.',
+  'You play the engineer who meets him inside THE DEN. Together, you begin to uncover what the Director is hiding. WOLF has his own will. He can help you or refuse, and he remembers your choices. His trust must be earned.',
 ];
 
 /** Approved studio description (the IGDB company entry, final October 17, 2026). */

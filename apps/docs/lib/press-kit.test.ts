@@ -38,12 +38,13 @@ for (const layout of ['stacked', 'horizontal', 'mark']) {
 for (const colourway of logoColourways) assert.ok(!('markNote' in colourway ? colourway.markNote : colourway.note).includes('lettering'), `Mark caption for ${colourway.id} mentions lettering`);
 
 // The copy uses the current name only; the old slashed spelling appears only where the name rules
-// mention it. The tagline and summary keep their approved lengths: a reworded text must be re-approved.
+// mention it. The tagline and summary keep their pinned lengths: a reworded text must be re-approved
+// (the summary's length is the draft of 2026-10-26, waiting for Nathanial's approval).
 for (const text of [tagline, shortDescription, ...longDescription, studioDescription, ...assetTerms]) {
   assert.ok(!text.includes(gameName.former), `Copy uses the retired name: ${text.slice(0, 40)}`);
 }
 assert.equal(tagline.length, 31);
-assert.equal(shortDescription.length, 311, 'The short description differs from the approved IGDB summary');
+assert.equal(shortDescription.length, 315, 'The short description differs from the drafted IGDB summary');
 
 // The AI disclosure is approved word for word (docs/decisions.md, AI-01): it keeps its length, and the
 // game's credits (Main.AI_DISCLOSURE) carry the very same text, so neither can be reworded alone.

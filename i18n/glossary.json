@@ -172,6 +172,19 @@
    "ko": {"status": "proposed", "required": "소장"},
    "zh-Hans": {"status": "proposed", "required": "所长"},
    "zh-Hant": {"status": "proposed", "required": "所長"}
+  },
+  "records worker": {
+   "note": "The records worker (Nathanial's term, 2026-10-26): the witness the Director orders WOLF to kill (story canon of 2026-10-26). The Director's order line is approved wording; the other lines are drafts and shorten the term to 'the worker', which this key does not match, so translate that the same way. Their gender is not given: use a neutral form where the language has one, and a stem every case form contains for Slavic languages (Polish and Russian say 'the person from the archive': osoba z archiwum, человек из архива).",
+   "es-419": {"status": "proposed", "required": "archivista"},
+   "pt-BR": {"status": "proposed", "required": "arquivista"},
+   "de": {"status": "proposed", "required": "Archivkraft"},
+   "fr": {"status": "proposed", "required": "archiviste"},
+   "pl": {"status": "proposed", "required": "archiwum"},
+   "ru": {"status": "proposed", "required": "из архива"},
+   "ja": {"status": "proposed", "required": "記録係"},
+   "ko": {"status": "proposed", "required": "기록 담당자"},
+   "zh-Hans": {"status": "proposed", "required": "档案员"},
+   "zh-Hant": {"status": "proposed", "required": "檔案員"}
   }
  },
  "names": {

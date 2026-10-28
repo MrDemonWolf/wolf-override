@@ -42,7 +42,7 @@ As written; possessives with "de %s".
 - **The gender gate and participles:** the French rule flags any word in -é or -ée on a line that
   addresses the player, so PR L10 says *vient de sauter* rather than *a sauté*, even about a machine.
 - **PR L10's story words (proposals for a reviewer):** the timestamp is *horodatage*, WOLF's readout
-  *écran*, the program logs *journaux*, WOLF breaking off *je décroche*, and the manual-port answer
+  *écran*, the records worker (2026-10-26) *l'archiviste*, WOLF breaking off *je décroche*, and the manual-port answer
   button UTILISER LE PORT MANUEL, the words WOLF's touch line quotes. Lines that name the engineer keep
   -é participles away from the name (*la manivelle reste là où %s la lâche*), and a possessive that could
   be WOLF's names *la sentinelle*.
