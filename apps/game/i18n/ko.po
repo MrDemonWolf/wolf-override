@@ -2756,10 +2756,11 @@ msgid "Then we get through maintenance before he reaches that witness."
 msgstr "그럼 소장이 그 증인에게 닿기 전에 정비 구역을 빠져나가자."
 
 # machine-translated by Claude (Anthropic), unreviewed
+# Updated by Codex (OpenAI), machine translation, unreviewed, 2026-10-30.
 #. TRANSLATORS: i18n: story speaker=WOLF
 #: scripts/story_text.gd:71
-msgid "That purge erases what the witness saved. Once it's gone, his word is the only record."
-msgstr "저 퍼지가 증인이 남긴 걸 지워. 그게 사라지면 소장의 말만이 유일한 기록이 돼."
+msgid "That purge erases what the witness saved. We need to save what we can."
+msgstr "저 퍼지가 증인이 남긴 걸 지워. 구할 수 있는 건 구해야 해."
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: WOLF's question at the coolant relay; the engineer answers with one of two choices. COOLANT FAULT is the tag painted on the relay. COOLANT FAULT is the tag painted on the relay and stays English (decision D3).

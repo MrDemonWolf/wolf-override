@@ -199,7 +199,7 @@ func _run() -> void:
 	# in turn. Each line shows box by box, each box up its reading time: about 15 s of standing still.
 	_expect(await wait_until(func() -> bool:
 		watch_exchange.call()
-		return str(game.get("status_line")) == "WOLF: That purge erases what the witness saved. Once it's gone, his word is the only record.", 2400), "once the display's text has been up long enough to read, WOLF says what the purge takes")
+		return str(game.get("status_line")) == "WOLF: That purge erases what the witness saved. We need to save what we can.", 2400), "once the display's text has been up long enough to read, WOLF urges preservation without claiming all proof is lost")
 	process_frame.disconnect(watch_exchange)
 	_expect(exchange_shown[0], "the opening exchange shows again after the display's text and before the stakes")
 	if not _require(await walk_to(human, 450.0), "engineer can move beyond the breaker"):
@@ -555,13 +555,16 @@ func _run() -> void:
 		return
 	await tap(&"interact")
 	_expect(str(game.get("status_line")).begins_with("WOLF: That purge erases") and not game.get("waiting_for_choice"), "the stakes line comes before the breaker question on every new run")
-	# The relay prompt never shares the screen with the stakes: the hint only offers to go on. The stakes
-	# show as two boxes; by 400 frames the second is up, so the next USE goes on to the question.
+	# A shorter warning may finish and resume interrupted opening lines; neither may open the choice.
 	for _frame in range(400):
 		await physics_frame
-	_expect(str(game.call("_context_hint")) == "E: continue." and not game.get("waiting_for_choice") and str(game.get("status_line")).begins_with("WOLF: That purge erases"), "with WOLF's stakes up at the breaker the hint offers only to go on, never the relay prompt, and nothing opens the question on a timer")
-	await tap(&"interact")
-	_expect(game.get("waiting_for_choice") and str(game.get("status_line")).begins_with("WOLF: That relay's tagged COOLANT FAULT"), "going on from the stakes, WOLF asks about the relay")
+	_expect(not game.get("waiting_for_choice") and str(game.call("_context_hint")) in ["E: continue.", "E: talk to WOLF about the relay."] and (str(game.get("status_line")).begins_with("WOLF: That purge erases") or (game.get("opening_lines") as Array).has(game.get("status_line"))), "the warning or interrupted opening lines remain readable, and the relay question waits for USE regardless of warning length")
+	# USE reads any resumed opening boxes before it asks; eight bounds the current short sequence.
+	for _press: int in 8:
+		await tap(&"interact")
+		if game.get("waiting_for_choice"):
+			break
+	_expect(game.get("waiting_for_choice") and str(game.get("status_line")).begins_with("WOLF: That relay's tagged COOLANT FAULT"), "going on through the stakes and any resumed opening lines, WOLF asks about the relay")
 	await tap(&"choice_1")
 	await tap(&"interact")
 	if not _require(state.breaker_armed, "breaker arms on the disclose-then-bypass route"):

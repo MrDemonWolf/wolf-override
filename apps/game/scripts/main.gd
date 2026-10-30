@@ -221,8 +221,8 @@ const TRUST_LINE_2: String = "%s knows what a fault looks like,\nand this isn't 
 const OPENING_WOLF_WORDS: String = "I heard the Director order me to kill a witness. I woke myself rather than do it."
 const OPENING_ENGINEER_WORDS: String = "Then we get through maintenance before he reaches that witness."
 const OPENING_EXCHANGE: String = "WOLF: " + OPENING_WOLF_WORDS + "\n%s: " + OPENING_ENGINEER_WORDS
-## WOLF's corridor stakes past the purge display: the purge erases what the witness saved, never saying what.
-const STAKES_WORDS: String = "That purge erases what the witness saved. Once it's gone, his word is the only record."
+## WOLF urges preservation without claiming every record will be lost; surviving evidence is canon.
+const STAKES_WORDS: String = "That purge erases what the witness saved. We need to save what we can."
 const STAKES_LINE: String = "WOLF: " + STAKES_WORDS
 ## While lines still have boxes to show where USE goes on through them: at the breaker with WOLF's stakes
 ## line in the box (on to his relay question), and at the Records exit with its closing lines. This and the

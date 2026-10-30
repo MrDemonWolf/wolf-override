@@ -1766,7 +1766,7 @@ msgstr ""
 
 #. TRANSLATORS: i18n: story speaker=WOLF
 #: scripts/story_text.gd:71
-msgid "That purge erases what the witness saved. Once it's gone, his word is the only record."
+msgid "That purge erases what the witness saved. We need to save what we can."
 msgstr ""
 
 #. TRANSLATORS: WOLF's question at the coolant relay; the engineer answers with one of two choices. COOLANT FAULT is the tag painted on the relay.
