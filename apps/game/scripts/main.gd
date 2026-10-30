@@ -3061,7 +3061,10 @@ func _build_end_card() -> void:
 	line.size = Vector2(280.0, 3.0)
 	line.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	end_card.add_child(line)
-	UILabel.place(end_card, END_CARD_THANKS, Rect2(130.0, 162.0, 700.0, 28.0), 18, Color(0.82, 0.89, 0.94, 1)).horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	# The body font needs 47 px for two 18 px lines; 48 leaves room before the heading at y 212.
+	var next_goal: Label = UILabel.place(end_card, END_CARD_THANKS, Rect2(130.0, 162.0, 700.0, 48.0), 18, Color(0.82, 0.89, 0.94, 1))
+	next_goal.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	next_goal.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	var header: Label = UILabel.place(end_card, END_CARD_RECAP_HEADER, Rect2(150.0, 212.0, 660.0, 24.0), 15, END_CARD_ACCENT)
 	header.add_theme_font_override("font", DISPLAY_FONT)
 	end_card_rows = VBoxContainer.new()
