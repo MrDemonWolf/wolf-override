@@ -1,5 +1,13 @@
 # Next-session handoff — credits and first playable chapter
 
+## Story review continuation — October 30, 2026
+
+- Approved in Nathanial's handoff: some evidence survives the purge, enough for a clue requiring corroboration; the engineer repaired a freight lift later used by security to move the investigator, and discovers that connection during the investigation.
+- Exact records, destination and dialogue remain proposals. No new gameplay is implemented by this update.
+- Current question: what does the surviving clue reveal first? A: a transfer linked to the freight lift (recommended); B: the records worker's hiding place; C: a contradiction showing a record was changed. Await Nathanial's answer; no default approval.
+- Local review HTML is saved in this chat's scratch folder as `story-review.html`, outside the public site and game build. Chrome control was unavailable; opening and rendered inspection remain pending.
+- Hook trust remains owner-controlled. No trust settings were changed or bypassed.
+
 ## Current story canon (October 26, 2026)
 - **Canon:** the section "Story canon (October 26, 2026)" in [decisions](decisions.md) (ST-01 to ST-10, open questions O-01 to O-13). It supersedes every older story draft below.
 - **Notion:** [Story canon — For Nathanial](https://app.notion.com/p/405d61481c7b81cbbb0af666eb815d3f) and [Story canon — AI reference](https://app.notion.com/p/405d61481c7b81fd8cc5cd5be0b4c4f0), indexed in [NOTES.md](NOTES.md).

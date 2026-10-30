@@ -20,14 +20,14 @@ The one current statement of the WOLF OVERRIDE story. Nathanial handed it over o
 
 ### Story in order
 
-1. **Before the game (APPROVED):** the Director has the investigator detained under a false label. The engineer's ordinary maintenance job unknowingly helps; the exact job is OPEN. The records worker preserves proof of the detention.
+1. **Before the game (APPROVED):** the Director has the investigator detained under a false label. The engineer repaired a freight lift; security later used it to move the investigator, without the engineer knowing. They discover the connection during the investigation. The records worker preserves proof of the detention.
 2. **Opening (APPROVED):** WOLF hears the Director order him to kill the witness (not the investigator), wakes himself, refuses and escapes containment. The staging of 2026-10-13 stays: the engineer arrives in the bay doorway after the Director's order line and he never notices them.
 3. **Early play (APPROVED):** the engineer and WOLF cooperate through the lockdown. WOLF can refuse; an engineer-only fallback always exists. IMPLEMENTED as the slice: corridor, Records Access and the Service Junction.
 4. **Later investigation (APPROVED):** with WOLF, the engineer discovers the missing investigator and their own unwitting role, not at the opening. DRAFTED: both discoveries land in the same stretch.
 5. **Consequence (APPROVED):** they search for the investigator, try to find and protect them, and preserve corroborating proof. The investigator's final fate is OPEN.
 
 - **Spine (APPROVED):** wrongdoing, then corroborating evidence, then discovery, then consequence.
-- **In the slice (DRAFTED):** the Director's purge erases what the witness saved; Records Access copies a first trace of it without saying what the proof is about. The slice says nothing of the investigator, the detention or the engineer's role.
+- **Purge outcome (APPROVED, October 30 handoff):** some evidence survives, enough for a clue; other sources must corroborate what happened. What the clue reveals first is OPEN. Exact records, destination and dialogue remain proposals. The existing slice wording is DRAFTED and has not been updated for this decision; it reveals nothing of the investigator, detention or engineer's role.
 - **End (APPROVED):** chosen family and WOLF's independence carry through, and the engineer pets WOLF at sunrise after they leave THE DEN together. The game has multiple endings, 2 or 3 (APPROVED, ST-08); Nathanial leans toward two different endings to keep it simple. The final count and which endings are OPEN. The sunrise petting payoff stays APPROVED. World stakes come only through the proposed Director escalation (PROPOSED, ST-10), never as WOLF's collective punishment.
 - **Later chapters (PROPOSED, ST-10):** the Director may escalate to wanting to nuke the world to cover up his crimes. It is a candidate for later stakes and a possible driver of the endings; open questions in O-13.
 
@@ -49,7 +49,7 @@ Authority for ST-01 to ST-07: Nathanial, story rewrite handoff, 2026-10-26. Auth
 |---|---|---|
 | ST-01 | APPROVED | W.O.L.F. was made for good, to help bring the world together, not to kill workers or start a war. He stays an independent person and companion; his origin is not ownership. No acronym expansion is approved; the "Warfighter Operations and Logistics Framework" expansion and the "hunt dangerous actors" purpose are retired. |
 | ST-02 | APPROVED | The Director is deliberately evil and protects his personal power. He falsely labels an investigator dangerous and secretly detains them to silence exposure. The investigator can be searched for and possibly saved; their fate is open. |
-| ST-03 | APPROVED | The engineer unknowingly helped through an ordinary maintenance job. They discover it with WOLF later in the investigation, not at the opening. Earlier sample jobs and dialogue were illustrations, not approvals. |
+| ST-03 | APPROVED | The engineer repaired a freight lift before the game. Security later used it to move the investigator. The engineer discovers this connection with WOLF during the investigation, not at the opening. Approved in Nathanial's October 30 handoff; exact records, destination and dialogue remain proposals. |
 | ST-04 | APPROVED | A separate records worker preserved proof of the detention. In the opening WOLF hears the Director order him to kill this witness. WOLF wakes himself in his existing body, refuses and escapes containment. He has killed no one. |
 | ST-05 | APPROVED | Sequence: the detention and the engineer's unwitting help before the game; the kill-the-witness order, self-awakening, refusal and escape at the opening; cooperation through the lockdown; later discovery of the missing investigator and the engineer's role; then finding and protecting the investigator and preserving corroborating proof. Spine: wrongdoing, corroborating evidence, discovery, consequence. |
 | ST-06 | APPROVED | The engineer is the sole playable viewpoint (they/them). WOLF (he/him) is autonomous and can refuse; an engineer-only fallback always exists. The 2026-10-13 opening staging stays where compatible. Original game and core story credit stays with Nathanial Henniges. |
@@ -69,7 +69,7 @@ Authority for ST-01 to ST-07: Nathanial, story rewrite handoff, 2026-10-26. Auth
 | O-05 | Any shutdown idea | Retired as an ending outline; it comes back only by Nathanial's choice. |
 | O-06 | Separation and reunion beat | R4-14 proposal; crisis and tasks open. |
 | O-07 | The Director's other abuses | Beyond the false label, the detention and the kill order. |
-| O-08 | The engineer's exact maintenance job | Earlier examples were illustrations only. |
+| O-08 | Freight lift discovery details | Job answered in Nathanial's October 30 handoff (ST-03): repaired a freight lift later used by security to move the investigator. Exact records, destination and dialogue remain proposals. |
 | O-09 | The witness's fate and whereabouts during the slice | DRAFTED: in hiding. |
 | O-10 | Setting words | "Grounded military sci-fi" and SITE 51 as a military installation: keep, or soften for an AI made for good. |
 | O-11 | The other slice lines | The opening order line is APPROVED (ST-09). WOLF's first words, the purge stakes and the three Records Access lines stay DRAFTED in `apps/game/scripts/main.gd`; Nathanial reads them. |
