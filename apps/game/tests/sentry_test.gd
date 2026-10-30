@@ -712,7 +712,7 @@ func _check_scene() -> void:
 	game.call("_finish_intro")
 	game.call("_load_game")
 	state = game.get("state") as M0State
-	_expect(state.chapter_id == "investigation" and state.investigation_step == 4 and human.controlled, "a direct checkpoint restore preserves completed Chapter 1 instead of reopening the old cleared Junction")
+	_expect(state.chapter_id == "investigation" and state.investigation_step == 4 and game.get("end_card_active") and not human.controlled, "a direct completed-checkpoint restore shows the Chapter 1 card instead of reopening play")
 	# The card answers the interact key, its own button and Back too.
 	for way: String in ["interact", "button", "back"]:
 		game.call("_finish_intro")
@@ -1436,6 +1436,8 @@ func _drawn_rect(sprite: Sprite2D) -> Rect2:
 
 ## Autosave B: the door is down, the engineer just left of the old door line, WOLF back by the valve.
 func _start_at_b(game: Node2D, choice_id: String) -> Dictionary:
+	# This direct scene fixture also follows isolated card tests, which deliberately leave the card up.
+	game.call("_hide_end_card")
 	var state: M0State = completed_records_state(choice_id)
 	state.enter_junction()
 	state.blow_door()
