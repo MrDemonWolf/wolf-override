@@ -2804,10 +2804,11 @@ msgid "Then we get through maintenance before he reaches that witness."
 msgstr "Entonces cruzamos mantenimiento antes de que él llegue hasta esa persona testigo."
 
 # machine-translated by Claude (Anthropic), unreviewed
+# Updated by Codex (OpenAI), machine translation, unreviewed, 2026-10-30.
 #. TRANSLATORS: i18n: story speaker=WOLF
 #: scripts/story_text.gd:71
-msgid "That purge erases what the witness saved. Once it's gone, his word is the only record."
-msgstr "Esa purga borra lo que guardó la persona testigo. Cuando desaparezca, su palabra será el único registro."
+msgid "That purge erases what the witness saved. We need to save what we can."
+msgstr "Esa purga borra lo que guardó la persona testigo. Tenemos que salvar lo que podamos."
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: WOLF's question at the coolant relay; the engineer answers with one of two choices. COOLANT FAULT is the tag painted on the relay.

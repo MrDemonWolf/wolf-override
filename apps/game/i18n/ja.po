@@ -2756,10 +2756,11 @@ msgid "Then we get through maintenance before he reaches that witness."
 msgstr "なら、所長がその証人にたどり着く前に整備区画を抜けよう。"
 
 # machine-translated by Claude (Anthropic), unreviewed
+# Updated by Codex (OpenAI), machine translation, unreviewed, 2026-10-30.
 #. TRANSLATORS: i18n: story speaker=WOLF
 #: scripts/story_text.gd:71
-msgid "That purge erases what the witness saved. Once it's gone, his word is the only record."
-msgstr "あのパージで、証人が残したものが消される。消えたら、所長の言葉だけが記録になる。"
+msgid "That purge erases what the witness saved. We need to save what we can."
+msgstr "あのパージで、証人が残したものが消される。救えるものを救おう。"
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: WOLF's question at the coolant relay; the engineer answers with one of two choices. COOLANT FAULT is the tag painted on the relay. COOLANT FAULT is the tag painted on the relay and stays English (decision D3).

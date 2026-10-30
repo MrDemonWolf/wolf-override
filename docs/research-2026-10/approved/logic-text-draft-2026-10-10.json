@@ -106,11 +106,11 @@
       "where": "apps/game/scripts/main.gd _process / corridor (new one-shot line)",
       "trigger": "Once per run, the first time the engineer walks right past the purge display (x > 230) after the opening box. The engineer spawns at x 160, inside the display's reach, so it cannot fire on spawn. Never repeats; not on the purge display read.",
       "speaker": "WOLF",
-      "current": "WOLF: That purge erases what the witness saved. Once it's gone, his word is the only record.",
-      "proposed": "WOLF: That purge erases what the witness saved. Once it's gone, his word is the only record.",
+      "current": "WOLF: That purge erases what the witness saved. We need to save what we can.",
+      "proposed": "WOLF: That purge erases what the witness saved. We need to save what we can.",
       "alternatives": [],
-      "notes": "Decision C (2026-10-11, still valid): the stakes line is required on the main path, and the optional purge display keeps the details (PURGE_DISPLAY_READ). Current line, 2026-10-26: WOLF says the purge erases what the witness saved, so the Director is destroying the records worker's preserved record (ST-04). It says the witness saved something, never what, so the slice does not reveal the investigator or the detention (spoiler line). 'His word is the only record' now means that without the witness's record the Director's account stands unchecked; it states no new fact. Do not make it say the engineer will copy the originals themselves: in Records the worker's originals are 'still missing' and only the purge order's trace is copied. Fit: 1 of 3 rows, tagged box (715 px text width, Roboto 17 px). Keep option: Nathanial may keep the old line; then the purge display and the Records purge-queue line keep 'logs' too. The reasoning for the old line is under history.",
-      "status": "drafted by Claude 2026-10-26 for the story canon of 2026-10-26 (docs/decisions.md ST-01 to ST-07; LINES.md change 4); waiting for Nathanial's read. IMPLEMENTED on branch story/canon-rewrite-2026-10.",
+      "notes": "Decision C keeps this line on the main path. Revised October 30 under Nathanial's authorization to write connective dialogue using the craft research. The purge threatens the witness's records, but WOLF does not claim every copy is lost: some evidence survives by approved canon. The line names no investigator, detention, freight lift or engineer involvement. Records still copies an order and timestamp; this revision does not implement the later transfer clue. Exact wording remains a draft, not a new approval.",
+      "status": "Draft wording by Codex, October 30, 2026; implemented on story/freight-lift-evidence for review, not separately approved or played by hand.",
       "history": [
         {
           "current": null,

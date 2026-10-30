@@ -2758,10 +2758,11 @@ msgid "Then we get through maintenance before he reaches that witness."
 msgstr "那我们就赶在所长找到那个证人之前穿过维修区。"
 
 # machine-translated by Claude (Anthropic), unreviewed
+# Updated by Codex (OpenAI), machine translation, unreviewed, 2026-10-30.
 #. TRANSLATORS: i18n: story speaker=WOLF
 #: scripts/story_text.gd:71
-msgid "That purge erases what the witness saved. Once it's gone, his word is the only record."
-msgstr "那次清除会抹掉证人保存下来的东西。一旦它消失，所长的话就成了唯一的记录。"
+msgid "That purge erases what the witness saved. We need to save what we can."
+msgstr "那次清除会抹掉证人保存下来的东西。能保住多少就保住多少。"
 
 # machine-translated by Claude (Anthropic), unreviewed
 #. TRANSLATORS: WOLF's question at the coolant relay; the engineer answers with one of two choices. COOLANT FAULT is the tag painted on the relay. COOLANT FAULT is the tag painted on the relay and stays English (decision D3).

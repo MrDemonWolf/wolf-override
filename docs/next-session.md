@@ -1,5 +1,18 @@
 # Next-session handoff — credits and first playable chapter
 
+## Story review continuation — October 30, 2026
+
+- Approved in Nathanial's handoff: some evidence survives the purge, enough for a clue requiring corroboration; the engineer repaired a freight lift later used by security to move the investigator, and discovers that connection during the investigation.
+- Exact records, destination and dialogue remain proposals. No new gameplay is implemented by this update.
+- Answered: Nathanial chose A; the surviving clue first reveals a transfer linked to the freight lift. Exact record, location, destination and dialogue remain drafts. Use research to write connective scenes; keep major plot choices with Nathanial.
+- Purge wording revised on `story/freight-lift-evidence` for review: WOLF urges saving what they can instead of claiming the Director's word becomes the only record. English, 11 translation entries, template, wording fixture, corridor test and changelog updated. Exact wording remains drafted. Records still preserves an order and mirror timestamp, not the later transfer clue. No art or approved opening-order change.
+- The shorter warning exposed a timing assumption in the corridor test: interrupted opening dialogue intentionally resumes after it. Preserve that queue behavior. The regression now accepts either the warning or resumed opening lines while checking that the relay choice still waits for USE; the separate wording suite verifies opening-line order.
+- Final relevant checks passed: headless corridor and approved-wording suites (70 s each), language suite (20,200 checks), all 11 catalog gates, regenerated POT, changelog parity and whitespace. No hands-on play, game-feel or rendered-capture claim.
+- Docs typecheck and build/export checks passed (2,547 links, 41 exported pages). Build warned that locally installed Next.js 16.4.0 has a known security vulnerability; `apps/docs/package.json` declares 16.4.3. Dependency reconciliation/security review remains separate and unfinished. No hands-on game play or rendered capture claimed.
+- Preserve registered cover `wolf-override-cover-provisional`, source painting `title-corridor-key-art-provisional`, their derivatives, and Look 2 direction. Cover inspected visually. No files approved for deletion; dependency and image review must precede any removal.
+- Local review HTML is saved in this chat's scratch folder as `story-review.html`, outside the public site and game build. Chrome control was unavailable; opening and rendered inspection remain pending.
+- Hook trust remains owner-controlled. No trust settings were changed or bypassed.
+
 ## Current story canon (October 26, 2026)
 - **Canon:** the section "Story canon (October 26, 2026)" in [decisions](decisions.md) (ST-01 to ST-10, open questions O-01 to O-13). It supersedes every older story draft below.
 - **Notion:** [Story canon — For Nathanial](https://app.notion.com/p/405d61481c7b81cbbb0af666eb815d3f) and [Story canon — AI reference](https://app.notion.com/p/405d61481c7b81fd8cc5cd5be0b4c4f0), indexed in [NOTES.md](NOTES.md).

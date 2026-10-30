@@ -7,6 +7,10 @@ The story canon of October 26, 2026 (section "Story canon (October 26, 2026)" in
 
 Nathanial Henniges originated the game and core story. Outside game narrative research can inform pacing, interaction and presentation, but does not replace his premise or establish new canon on its own.
 
+## October 30 story decisions
+
+Nathanial's continuation handoff approves two refinements: some evidence survives the purge, enough for a clue that needs corroboration; and the engineer repaired a freight lift before the game, which security later used to move the investigator. The engineer discovers that connection during the investigation. Nathanial then chose A: the first clue reveals a transfer linked to the freight lift. Exact records, destination and dialogue remain proposals. These are design decisions, not implemented gameplay. See `docs/decisions.md` for authority. Use the craft research linked in `docs/NOTES.md` to draft scenes and dialogue; Nathanial keeps major story decisions.
+
 ## Adopted direction
 W.O.L.F. is an AI made for good, to help bring the world together; he was never meant to kill workers or start a war, and that origin never makes him property (ST-01). He already occupies his robotic wolf body. In the opening he hears the Director order him to kill a witness, a records worker who preserved proof of the Director's wrongdoing. Nobody activates him: WOLF wakes himself, refuses and escapes containment inside THE DEN, where he meets the systems-engineer protagonist (ST-04). He has killed no one. The engineer once did an ordinary maintenance job that, unknown to them, helped the Director; they discover that later in the investigation, with WOLF, never at the opening (ST-03).
 
