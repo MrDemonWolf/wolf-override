@@ -4,7 +4,9 @@
 
 - Approved in Nathanial's handoff: some evidence survives the purge, enough for a clue requiring corroboration; the engineer repaired a freight lift later used by security to move the investigator, and discovers that connection during the investigation.
 - Exact records, destination and dialogue remain proposals. No new gameplay is implemented by this update.
-- Current question: what does the surviving clue reveal first? A: a transfer linked to the freight lift (recommended); B: the records worker's hiding place; C: a contradiction showing a record was changed. Await Nathanial's answer; no default approval.
+- Answered: Nathanial chose A; the surviving clue first reveals a transfer linked to the freight lift. Exact record, location, destination and dialogue remain drafts. Use research to write connective scenes; keep major plot choices with Nathanial.
+- Initial source audit: approved opening order is present in `apps/game/scripts/main.gd`; its `STAKES_WORDS` still claims the Director's word becomes the only record, which needs revision for surviving evidence. Records currently preserves an order and mirror timestamp, not the approved transfer clue. No gameplay changes made yet.
+- Preserve registered cover `wolf-override-cover-provisional`, source painting `title-corridor-key-art-provisional`, their derivatives, and Look 2 direction. Cover inspected visually. No files approved for deletion; dependency and image review must precede any removal.
 - Local review HTML is saved in this chat's scratch folder as `story-review.html`, outside the public site and game build. Chrome control was unavailable; opening and rendered inspection remain pending.
 - Hook trust remains owner-controlled. No trust settings were changed or bypassed.
 

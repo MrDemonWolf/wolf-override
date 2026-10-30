@@ -14,6 +14,8 @@ Every moved file is still in git history at commit `1cf8d73`: open one with `git
 - [Localization (2026-10-16)](https://app.notion.com/p/3fbd61481c7b81cbbcd5cf9cc9ea0c48): the 10-language plan, design, translation pipeline and research, with its [decisions](https://app.notion.com/p/3fbd61481c7b814b8942ebf6e427926c) (adopted October 16, `docs/decisions.md` L10N-01); the tools, data, evidence and prototype stay on the `codex/localization-research` branch at `520cad1`, and the build starts with `apps/game/scripts/i18n.gd` and `apps/game/i18n/languages.json`
 - Story canon (2026-10-26), two pages under [Story & characters](https://app.notion.com/p/3fcd61481c7b81619248f56376333d31): [Story canon — For Nathanial](https://app.notion.com/p/405d61481c7b81cbbb0af666eb815d3f) and [Story canon — AI reference](https://app.notion.com/p/405d61481c7b81fd8cc5cd5be0b4c4f0); the superseded story pages sit under [Story archive](https://app.notion.com/p/405d61481c7b81e9a8a2e6087ef64d51). The repo's home for the canon is `docs/decisions.md`, "Story canon (October 26, 2026)".
 
+- [Story and art craft rules](https://app.notion.com/p/408d61481c7b80bfab36dd1f37c509c1): evidence source/limits, character knowledge, distinct voices, independent WOLF and Look 2 staging. Read for scene drafts; research examples do not approve plot choices. Nathanial's later surviving-evidence and freight-lift decisions supersede its older open questions.
+
 ## Asset sources
 
 | Old location | Notion page |
