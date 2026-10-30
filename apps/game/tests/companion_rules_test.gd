@@ -302,12 +302,12 @@ func _check_engineer_only_route(game: Main, actions: DebugActions) -> void:
 	# The way out is offered at the open door itself, behind WOLF waiting in its doorway.
 	_require(await walk_to_reading_on(game.human, JunctionRoom.HATCH_REACH_MAX_X + 4.0), "the engineer walks up to the open exit door")
 	for _step: int in 8:
-		if game.end_card_active:
+		if game.state.chapter_id == "investigation":
 			break
 		await tap(&"interact", 1)
-		await wait_until(func() -> bool: return game.end_card_active, 240)
-	_require(game.state.junction_cleared and game.end_card_active, "the engineer leaves through the exit door to the END OF SLICE card")
-	_check_no_meter(game, "END OF SLICE card")
+		await wait_until(func() -> bool: return game.state.chapter_id == "investigation", 240)
+	_require(game.state.junction_cleared and game.state.chapter_id == "investigation" and not game.end_card_active, "the engineer-only route reaches the investigation without WOLF's cooperation")
+	_check_no_meter(game, "investigation entry")
 
 
 # --- Helpers --------------------------------------------------------------------------------------

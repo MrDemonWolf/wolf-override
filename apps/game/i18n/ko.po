@@ -3304,3 +3304,103 @@ msgstr "WOLF는 중간에 빠지고, 투하 타이밍은 {name}의 몫이었다.
 #: scripts/story_text.gd:268
 msgid "The tank came down on the sentry."
 msgstr "탱크가 센트리 위로 떨어졌다."
+
+# Machine-translated by Codex (OpenAI), unreviewed; 2026-10-30.
+msgid "Maintenance annex. Read the surviving transfer fragment, then compare the lift readout and escort record."
+msgstr "정비 별관. 남은 이송 기록을 읽고 승강기 기록과 호송 기록을 대조하자."
+
+# Machine-translated by Codex (OpenAI), unreviewed; 2026-10-30.
+msgid "READ TRANSFER FRAGMENT"
+msgstr "이송 기록 읽기"
+
+# Machine-translated by Codex (OpenAI), unreviewed; 2026-10-30.
+msgid "COMPARE LIFT READOUT"
+msgstr "승강기 기록 대조"
+
+# Machine-translated by Codex (OpenAI), unreviewed; 2026-10-30.
+msgid "READ ESCORT RECORD"
+msgstr "호송 기록 읽기"
+
+# Machine-translated by Codex (OpenAI), unreviewed; 2026-10-30.
+msgid "FIND THE INVESTIGATOR"
+msgstr "조사관 찾기"
+
+# Machine-translated by Codex (OpenAI), unreviewed; 2026-10-30.
+msgid "MAINTENANCE ANNEX"
+msgstr "정비 별관"
+
+# Machine-translated by Codex (OpenAI), unreviewed; 2026-10-30.
+msgid "ESCORT FILE"
+msgstr "호송 기록"
+
+# Machine-translated by Codex (OpenAI), unreviewed; 2026-10-30.
+msgid "TRANSFER FRAGMENT"
+msgstr "이송 기록 조각"
+
+# Machine-translated by Codex (OpenAI), unreviewed; 2026-10-30.
+msgid "LIFT READOUT"
+msgstr "승강기 기록"
+
+# Machine-translated by Codex (OpenAI), unreviewed; 2026-10-30.
+#. i18n: story speaker=engineer engineer=self
+msgid "Freight lift. Transfer completed. The load and destination are missing."
+msgstr "화물 승강기. 이송 완료. 적재물과 목적지가 빠져 있어."
+
+# Machine-translated by Codex (OpenAI), unreviewed; 2026-10-30.
+#. i18n: story speaker=WOLF
+msgid "What was on it?"
+msgstr "뭘 실었던 거지?"
+
+# Machine-translated by Codex (OpenAI), unreviewed; 2026-10-30.
+#. i18n: story speaker=engineer engineer=self
+msgid "The lift made the trip. This movement came from its controller, not the archive. It doesn't identify the load."
+msgstr "승강기가 운행했어. 이건 기록 보관소가 아니라 제어기에서 나온 운행 기록이야. 뭘 실었는지는 없어."
+
+# Machine-translated by Codex (OpenAI), unreviewed; 2026-10-30.
+#. i18n: story speaker=WOLF
+msgid "Then we need the escort record."
+msgstr "그럼 호송 기록이 필요하겠군."
+
+# Machine-translated by Codex (OpenAI), unreviewed; 2026-10-30.
+#. i18n: story speaker=engineer engineer=self
+msgid "Security escort. An investigator. Same transfer."
+msgstr "보안팀 호송. 조사관. 같은 이송이야."
+
+# Machine-translated by Codex (OpenAI), unreviewed; 2026-10-30.
+#. i18n: story speaker=engineer engineer=self
+msgid "The lift was isolated. I signed it back into service. Security used it after that."
+msgstr "승강기는 사용 중지 상태였어. 내가 운행 재개를 승인했지. 그 뒤에 보안팀이 사용했어."
+
+# Machine-translated by Codex (OpenAI), unreviewed; 2026-10-30.
+#. i18n: story speaker=WOLF engineer=you
+msgid "What did they tell you?"
+msgstr "뭐라고 들었지?"
+
+# Machine-translated by Codex (OpenAI), unreviewed; 2026-10-30.
+#. i18n: story speaker=engineer engineer=self
+msgid "A lift fault. Nothing about an investigator."
+msgstr "승강기 고장이라고. 조사관 얘기는 없었어."
+
+# Machine-translated by Codex (OpenAI), unreviewed; 2026-10-30.
+#. i18n: story speaker=engineer engineer=self
+msgid "We need to find where they took them."
+msgstr "어디로 데려갔는지 찾아야 해."
+
+# Machine-translated by Codex (OpenAI), unreviewed; 2026-10-30.
+#. i18n: story
+msgid "CHAPTER 1 COMPLETE"
+msgstr "1장 완료"
+
+# Machine-translated by Codex (OpenAI), unreviewed; 2026-10-30.
+#. i18n: story
+msgid "Next: find where security took the investigator."
+msgstr "다음 목표: 보안팀이 조사관을 데려간 곳 찾기."
+
+# Machine-translated by Codex (OpenAI), unreviewed; 2026-10-30.
+#. i18n: speaker=hint slot=key
+msgid "%s: inspect the next source."
+msgstr "%s: 다음 자료 확인."
+
+# Machine-translated by Codex (OpenAI), unreviewed; 2026-10-30.
+msgid "Chapter 1 complete. PLAY AGAIN starts a fresh run."
+msgstr "1장 완료. 다시 플레이하면 새로 시작합니다."

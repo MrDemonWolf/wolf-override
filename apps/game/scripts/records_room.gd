@@ -171,6 +171,9 @@ var mirror_label: Label
 ## Every station name; each fades out as it reaches the edge of the view, like the junction's.
 var station_labels: Array[Label] = []
 var depth: RoomDepth
+## Annex mode reuses the registered room art with truthful terminal labels; no physical lift is shown.
+var investigation: bool = false
+var container_label: Label
 var purge_glow: Sprite2D
 var mirror_glow: Sprite2D
 var purge_art: Sprite2D
@@ -271,6 +274,8 @@ func _ready() -> void:
 	# only marks each name for the template (localization PR L13: decision D3 translates the plates).
 	purge_label = _add_station_label(I18n.KEY.tr("PURGE QUEUE"), PURGE_X, Palette.LABEL_ALERT, STATION_LABEL_Y)
 	mirror_label = _add_station_label(I18n.KEY.tr("MIRROR PORT"), MIRROR_X, MIRROR_TEXT, STATION_LABEL_Y)
+	container_label = _add_station_label(I18n.KEY.tr("ESCORT FILE"), CONTAINER_X, MIRROR_TEXT, STATION_LABEL_Y)
+	container_label.hide()
 	# The exit's name sits on the cross-wall over its door, left of the near column (which draws over
 	# the actors and would cut it; captions stay under the actors).
 	_add_station_label(I18n.KEY.tr("EXIT"), EXIT_LABEL_X, Palette.EXIT_GREEN, EXIT_LABEL_Y)
@@ -367,6 +372,10 @@ func refresh_state() -> void:
 	purge_label.add_theme_color_override("font_color", Palette.GREEN if purge_trace_preserved else Palette.LABEL_ALERT)
 	mirror_label.text = I18n.KEY.tr("MIRROR COPIED") if mirror_trace_preserved else I18n.KEY.tr("MIRROR PORT")
 	mirror_label.add_theme_color_override("font_color", Palette.GREEN if mirror_trace_preserved else MIRROR_TEXT)
+	if investigation:
+		purge_label.text = I18n.KEY.tr("TRANSFER FRAGMENT")
+		mirror_label.text = I18n.KEY.tr("LIFT READOUT")
+	container_label.visible = investigation
 	purge_glow.modulate = Color(_purge_light_color(), 0.6)
 	mirror_glow.modulate = Color(_mirror_light_color(), 0.6)
 	purge_screen.tint = _purge_light_color()

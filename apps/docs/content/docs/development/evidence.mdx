@@ -28,6 +28,7 @@ description: A dated, honest record of how each part of WOLF OVERRIDE was checke
 | First corridor | Headless suites; a partial graphical playtest of engineer movement and WOLF's follow | Partly (movement and follow only) |
 | Records Access | Headless suites (both mirror routes) and rendered stills | No |
 | Service Junction | Headless suites and rendered stills | No |
+| Maintenance annex | New implementation candidate; final route, save and rendering checks pending | No |
 | Camera, room art, props, characters | Headless suites and rendered stills | No |
 | Sounds | Headless suites that watch which clips start | No, and not checked by ear |
 | Text and text size | Headless suites and rendered stills | No, not read by a player on a screen |
@@ -77,7 +78,7 @@ The Godot commands on [Testing and CI](/docs/development/testing/) check all of 
 - `door_route_test`: the Records entry and exit and the Service Junction's blast door and exit each stand across the walkway and stop the route while shut.
 - Their leaves are drawn whole in every frame while they swing, slide or are thrown, never hidden or faded.
 - No resting spot leaves a body across a shut door.
-- The **END OF SLICE** card comes only once WOLF and then the engineer are through the exit.
+- Earlier route checks covered WOLF and then the engineer walking through the Junction exit. The annex candidate continues beyond it; final chapter-complete checks are pending.
 - `room_depth_test`: the swing leaves' faces and light at every angle.
 - The blast door's pieces, all regions of one atlas: the doorway, leaf, wall and release bay behind the characters; the near column, stub and thrown leaf in front.
 - Its near column's foot is measured on the atlas where a knocked-down body lies. A body knocked down facing it, from the valve, against the door or from the floor beyond it, with **Reduced Motion** on and off, lies clear of the column and the stub.
@@ -123,7 +124,7 @@ The Godot commands on [Testing and CI](/docs/development/testing/) check all of 
 - The sentry and the hazards never turn on him outside the bait he chooses, and nothing can knock him down.
 - Nothing he does on his own completes one of the engineer's steps.
 - The HUD has no meter.
-- Plays the route where he refuses the relay and the lane, with the mirror copied through the port, through to the **END OF SLICE** card.
+- Earlier companion checks covered refusal at the relay and lane, with the mirror copied through the port. The extended route through the annex needs its own final check.
 
 </Details>
 

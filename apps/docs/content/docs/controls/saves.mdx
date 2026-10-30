@@ -17,6 +17,7 @@ description: When WOLF OVERRIDE saves, what Continue, New Game and RETRY do, wha
 | Maintenance corridor | Using the green **SAFE POINT** beyond the sealed door (your first save) |
 | Records Access | Entering from the safe point, copying the purge-order trace, preserving the mirror timestamp, securing the first copy at the exit |
 | Service Junction | Entering the room, blowing the sealed door, bringing down the sentry, leaving through the exit door |
+| Maintenance annex | Entering the room, each of its three record checks, using the final exit after the closing dialogue |
 
 - **You will see Checkpoint saved.** in the hint line for about two seconds (never over a choice). The safe point says it in its own line.
 - **A save stores** the room, both characters' positions, puzzle state, the engineer's display name and the remembered choice.
@@ -37,7 +38,19 @@ description: When WOLF OVERRIDE saves, what Continue, New Game and RETRY do, wha
 | Entering the room | Door sealed, breaker ready to arm, valve turns back to zero |
 | Blowing the door | Door down, breaker and valve used, sentry patrolling from the far end, tank hung over the mark |
 | Bringing down the sentry | Sentry down under the tank, exit bolt still to pop |
-| Leaving through the exit door | Nothing to continue: the slice is finished, and the title offers **PLAY AGAIN** |
+| Leaving through the exit door | The maintenance annex, ready for its first record check |
+
+### Maintenance annex: what Continue brings back
+
+| Save | Continue restores |
+| --- | --- |
+| Entering the room | The first record check is ready |
+| First or second record checked | The next station is ready; completed checks stay kept |
+| Third record checked | The closing discovery can be read again before leaving |
+| Final exit used after the dialogue | The chapter is finished, and the title offers **PLAY AGAIN** |
+
+- Essential checks use the engineer's own access; WOLF's participation does not gate them.
+- [Annex walkthrough](/docs/walkthrough/maintenance-annex/) lists the station order without revealing the records' contents.
 
 ## Knockdowns
 

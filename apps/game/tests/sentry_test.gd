@@ -651,6 +651,8 @@ func _check_scene() -> void:
 	var card_after_both: Array[bool] = [true]
 	var wolf_seen_walking: Array[bool] = [false]
 	_expect(await wait_until(func() -> bool:
+		if state.chapter_id != "junction":
+			return true
 		# What shows of each (left of the near jamb, which hides the rest) never overlaps.
 		var wolf_shown: Vector2 = Vector2(wolf.position.x - M0Actor.WOLF_REACH, minf(wolf.position.x + M0Actor.WOLF_REACH, JunctionRoom.EXIT_NEAR_JAMB_X))
 		var human_shown: Vector2 = Vector2(human.position.x - M0Actor.HUMAN_REACH, minf(human.position.x + M0Actor.HUMAN_REACH, JunctionRoom.EXIT_NEAR_JAMB_X))
@@ -661,13 +663,17 @@ func _check_scene() -> void:
 		if wolf.position.x > JunctionRoom.WOLF_DOORWAY_X + 4.0 and wolf.position.x < JunctionRoom.WOLF_GONE_X - 4.0:
 			wolf_seen_walking[0] = true
 		never_faded[0] = never_faded[0] and human.modulate.a == 1.0 and wolf.modulate.a == 1.0
-		if game.get("end_card_active"):
+		if state.chapter_id == "junction" and human.position.x >= JunctionRoom.HUMAN_GONE_X - 3.0:
 			card_after_both[0] = human.position.x >= JunctionRoom.HUMAN_GONE_X - 3.0 and wolf.position.x >= JunctionRoom.WOLF_GONE_X - 3.0 and wolf.position.x - M0Actor.WOLF_REACH > human.position.x + M0Actor.HUMAN_REACH
-		return bool(game.get("end_card_active")), 300), "the END OF SLICE card follows the walk")
+		return state.chapter_id == "investigation", 900), "the investigation follows the Junction walk out")
 	_expect(one_at_a_time[0] and wolf_first[0], "WOLF goes through first and the engineer only moves once he has gone, so the two are never drawn over each other in the doorway")
 	_expect(wolf_seen_walking[0] and never_faded[0], "WOLF is seen walking on through the doorway, and nobody fades out: the near jamb hides them")
-	_expect(card_after_both[0] and human.position.x > JunctionRoom.EXIT_NEAR_JAMB_X + M0Actor.HUMAN_REACH and wolf.position.x > JunctionRoom.EXIT_NEAR_JAMB_X + M0Actor.WOLF_REACH, "the card comes up only once both have gone through, behind the near jamb (engineer x %.0f, WOLF x %.0f)" % [human.position.x, wolf.position.x])
-	# Decision D: the closing beat leads to the END OF SLICE card with this run's choices, then the title.
+	_expect(card_after_both[0] and not game.get("end_card_active"), "both pass the near jamb before the annex transition, without ending Chapter 1")
+	# Isolate the completed card UI; full_slice_test proves all three evidence reads through player input.
+	for step: int in range(1, 5):
+		_expect(state.investigate(step), "card fixture completes investigation step %d" % step)
+	game.call("_save_progress")
+	game.call("debug_show_end_card")
 	var end_card: Control = game.get_node("CanvasLayer/EndCard") as Control
 	var end_button: Button = end_card.get_node("EndCardContinue") as Button
 	_expect(game.get("end_card_active") and end_card.visible and not game.get("title_open") and not game.get("chapter_close_active") and not human.controlled, "the closing beat leads to the END OF SLICE card, not straight to the title")
@@ -675,7 +681,7 @@ func _check_scene() -> void:
 	for label: Label in end_card.find_children("*", "Label", true, false):
 		recap_text += label.text + "\n"
 	var first_name: String = state.human_name().get_slice(" ", 0)
-	_expect(recap_text.contains("END OF SLICE") and recap_text.contains("Thank you for playing this early slice.") and recap_text.contains("THIS RUN"), "the card thanks the player under END OF SLICE")
+	_expect(recap_text.contains(MainScript.END_CARD_TITLE) and recap_text.contains(MainScript.END_CARD_THANKS) and recap_text.contains("THIS RUN"), "the Chapter 1 card states the next goal above this run's recap")
 	_expect(recap_text.contains("%s told WOLF the risk. WOLF took the live contact." % first_name) and recap_text.contains("WOLF read the timestamp off his own readout.") and recap_text.contains("WOLF drew the sentry onto the mark."), "the recap names this run's relay, mirror and lane choices")
 	_expect(not (game.get_node("CanvasLayer/BottomBar") as Control).visible and not (game.get_node("CanvasLayer/PauseButton") as Control).visible and not (game.get_node("CanvasLayer/TouchControls") as Control).visible, "nothing of the play HUD shows over the card")
 	_expect(end_button.text == "E  CONTINUE", "the card's prompt names the interact key")
@@ -686,7 +692,7 @@ func _check_scene() -> void:
 	game.call("_refresh_ui")
 	await tap(&"pause_game")
 	_expect(not paused and game.get("title_open"), "Pause (or Back) on the card goes on to the title instead of pausing")
-	_expect(not continue_button.disabled and continue_button.text == "PLAY AGAIN" and (game.get_node("CanvasLayer/TitleScreen/ContinueNote") as Label).text == "Slice complete. PLAY AGAIN starts a fresh run.", "on a finished save the title offers PLAY AGAIN and says why")
+	_expect(not continue_button.disabled and continue_button.text == "PLAY AGAIN" and (game.get_node("CanvasLayer/TitleScreen/ContinueNote") as Label).text == MainScript.FINISHED_NOTE, "on a finished save the title offers PLAY AGAIN and says why")
 	var new_game_button: Button = game.get_node("CanvasLayer/TitleScreen/NewGameButton") as Button
 	_expect(not new_game_button.visible and is_equal_approx(continue_button.offset_left, new_game_button.offset_left) and game.call("_title_first_button") == continue_button, "NEW GAME would do the same, so PLAY AGAIN stands alone across the row and takes the first focus")
 	var finished_path: String = str(game.get("save_path"))
@@ -702,23 +708,16 @@ func _check_scene() -> void:
 	_expect(not game.get("title_open") and game.get("intro_active") and state.chapter_id == "lockdown" and state.memory.is_empty(), "PLAY AGAIN starts a fresh run with the opening")
 	_expect(human.modulate.a == 1.0 and wolf.modulate.a == 1.0 and not game.get("hatch_exit_walking"), "a fresh run shows both again after they walked out through the exit door")
 	_expect(FileAccess.get_file_as_bytes(path) == finished_bytes, "like New Game, a fresh run keeps the finished save until it saves over it")
-	# Only a hand-made save could reopen the cleared junction; it never calls the line unbuilt.
+	# A direct debug load preserves the completed annex; the title's PLAY AGAIN path was checked above.
 	game.call("_finish_intro")
 	game.call("_load_game")
 	state = game.get("state") as M0State
-	_expect(state.junction_cleared and room.hatch_open == 1.0 and human.controlled and game.call("_objective") == "SERVICE LINE CLEARED" and str(game.get("status_line")) == "The service line runs on toward Archive.", "a restored cleared junction says where the line goes")
-	# The corridor seal's body (switched off outside the corridor at the end of the restore's frame)
-	# shares these coordinates, so the engineer is placed once that has happened.
-	await physics_frame
-	human.position.x = JunctionRoom.BOLT_X
-	await tap(&"interact")
-	_expect(str(game.get("status_line")) == "The service line runs on toward Archive." and str(game.call("_context_hint")) == "The door is open.", "the open hatch has no developer note in the dialogue or the hint")
+	_expect(state.chapter_id == "investigation" and state.investigation_step == 4 and human.controlled, "a direct checkpoint restore preserves completed Chapter 1 instead of reopening the old cleared Junction")
 	# The card answers the interact key, its own button and Back too.
 	for way: String in ["interact", "button", "back"]:
-		game.set("chapter_close_active", true)
-		game.call("_finish_chapter_close")
-		# (They walk out through the exit door first, from wherever the restore stood them.)
-		_expect(await wait_until(func() -> bool: return bool(game.get("end_card_active")), 420), "the card is up again (%s)" % way)
+		game.call("_finish_intro")
+		game.call("debug_show_end_card")
+		_expect(game.get("end_card_active"), "the isolated Chapter 1 card is up again (%s)" % way)
 		match way:
 			"interact":
 				await tap(&"interact")

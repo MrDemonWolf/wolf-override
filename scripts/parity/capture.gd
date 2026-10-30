@@ -513,7 +513,8 @@ func _route_3() -> void:
 ## frames) and the blast as frame sequences, the lane question (also with controller prompts), WOLF
 ## drawing the sentry, the tank drop (30 consecutive frames), the bolt at its panel, the hatch, USE at
 ## the open door itself (from Suite.OPEN_EXIT_X, behind WOLF in its doorway, as a player leaves), the
-## closing lines read through (Suite.finish_closing_lines), the walk out and the END OF SLICE card; then Continue from the post-blast save, the engineer alone, the
+## closing lines read through (Suite.finish_closing_lines), the walk out, the annex's three evidence
+## reads and Chapter 1 end card; then Continue from the post-blast save, the engineer alone, the
 ## sentry's chase and its knockdown.
 func _route_4() -> void:
 	_press("CanvasLayer/TitleScreen/ContinueButton")
@@ -598,8 +599,22 @@ func _route_4() -> void:
 	if not note.is_empty():
 		_fail(note)
 	await _burst("walk-out", 8, 8)
-	if not await _wait_until(func() -> bool: return bool(game.get("end_card_active")), 300):
-		_fail("the END OF SLICE card never showed")
+	if not await _wait_until(func() -> bool: return (game.get("state") as M0State).chapter_id == "investigation" and human.controlled, 900):
+		_fail("the Junction walk out never reached the investigation")
+	await _shot("investigation-entry")
+	var evidence_stations: Array[float] = [RecordsRoom.PURGE_X, RecordsRoom.MIRROR_X, RecordsRoom.CONTAINER_X]
+	for station: int in evidence_stations.size():
+		await _walk_to(evidence_stations[station])
+		await _tap(&"interact")
+		await _raw(2)
+		await _shot("investigation-evidence-%d" % (station + 1))
+		if not await Suite.continue_until(game, func() -> bool: return (game.get("state") as M0State).investigation_step == station + 1 and (game.get("box_queue") as Array).is_empty() and bool(game.call("_dialogue_read")), Suite.TALK_FRAMES):
+			_fail("investigation evidence %d never finished reading" % (station + 1))
+		await _shot("investigation-read-%d" % (station + 1))
+	await _walk_to(Main.RECORDS_EXIT_X + 10.0)
+	await _tap(&"interact")
+	if not await Suite.continue_until(game, func() -> bool: return bool(game.get("end_card_active")), Suite.TALK_FRAMES):
+		_fail("the Chapter 1 end card never showed after the repair discovery")
 	await _raw(40)
 	await _shot("end-card")
 	await _tap(&"interact")

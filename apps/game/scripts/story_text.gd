@@ -107,6 +107,32 @@ static func messages() -> Array[String]:
 		# TRANSLATORS: The engineer answers WOLF (their name stands over the line). Archive is the next place.
 		# i18n: story speaker=engineer engineer=self
 		I18n.KEY.tr(Main.RECORDS_CLOSE_ENGINEER_WORDS),
+		# Later Chapter 1 investigation: speaker tags stay outside translated words.
+		# TRANSLATORS: The engineer reads a partial transfer entry; no passenger identity yet.
+		# i18n: story speaker=engineer engineer=self
+		I18n.KEY.tr(Main.INVESTIGATION_FRAGMENT_WORDS),
+		# TRANSLATORS: WOLF asks about the unidentified load, which could be cargo or a person.
+		# i18n: story speaker=WOLF
+		I18n.KEY.tr(Main.INVESTIGATION_FRAGMENT_WOLF_WORDS),
+		# TRANSLATORS: The engineer distinguishes a controller movement log from an archive copy.
+		# i18n: story speaker=engineer engineer=self
+		I18n.KEY.tr(Main.INVESTIGATION_CONTROLLER_WORDS),
+		# TRANSLATORS: i18n: story speaker=WOLF
+		I18n.KEY.tr(Main.INVESTIGATION_CONTROLLER_WOLF_WORDS),
+		# TRANSLATORS: The investigator's gender is unspecified.
+		# i18n: story speaker=engineer engineer=self
+		I18n.KEY.tr(Main.INVESTIGATION_ESCORT_WORDS),
+		# TRANSLATORS: The engineer uses they/them; avoid gendered first-person forms.
+		# i18n: story speaker=engineer engineer=self
+		I18n.KEY.tr(Main.INVESTIGATION_REPAIR_WORDS),
+		# TRANSLATORS: WOLF asks what the engineer was told before repairing the lift.
+		# i18n: story speaker=WOLF engineer=you
+		I18n.KEY.tr(Main.INVESTIGATION_QUESTION_WORDS),
+		# TRANSLATORS: i18n: story speaker=engineer engineer=self
+		I18n.KEY.tr(Main.INVESTIGATION_ANSWER_WORDS),
+		# TRANSLATORS: The engineer proposes finding the investigator; the investigator's gender is unspecified.
+		# i18n: story speaker=engineer engineer=self
+		I18n.KEY.tr(Main.INVESTIGATION_NEXT_WORDS),
 		# The Service Junction.
 		# TRANSLATORS: The engineer, entering the junction (their name stands over the line).
 		# i18n: story speaker=engineer engineer=self

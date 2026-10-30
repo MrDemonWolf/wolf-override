@@ -3354,3 +3354,123 @@ msgstr "WOLF recuou enquanto {name} acertava a queda."
 #: scripts/story_text.gd:268
 msgid "The tank came down on the sentry."
 msgstr "O tanque caiu sobre a sentinela."
+
+# Machine translation by Codex (OpenAI), unreviewed, 2026-10-30.
+#: scripts/main.gd
+msgid "Maintenance annex. Read the surviving transfer fragment, then compare the lift readout and escort record."
+msgstr "Anexo de manutenção. Leia o fragmento de transferência restante e compare a leitura do elevador com o registro de escolta."
+
+# Machine translation by Codex (OpenAI), unreviewed, 2026-10-30.
+#: scripts/main.gd
+msgid "READ TRANSFER FRAGMENT"
+msgstr "LER FRAGMENTO DE TRANSFERÊNCIA"
+
+# Machine translation by Codex (OpenAI), unreviewed, 2026-10-30.
+#: scripts/main.gd
+msgid "COMPARE LIFT READOUT"
+msgstr "COMPARAR LEITURA DO ELEVADOR"
+
+# Machine translation by Codex (OpenAI), unreviewed, 2026-10-30.
+#: scripts/main.gd
+msgid "READ ESCORT RECORD"
+msgstr "LER REGISTRO DE ESCOLTA"
+
+# Machine translation by Codex (OpenAI), unreviewed, 2026-10-30.
+#: scripts/main.gd
+msgid "FIND THE INVESTIGATOR"
+msgstr "ENCONTRAR A PESSOA INVESTIGADORA"
+
+# Machine translation by Codex (OpenAI), unreviewed, 2026-10-30.
+#: scripts/main.gd
+msgid "MAINTENANCE ANNEX"
+msgstr "ANEXO DE MANUTENÇÃO"
+
+# Machine translation by Codex (OpenAI), unreviewed, 2026-10-30.
+#: scripts/main.gd
+msgid "ESCORT FILE"
+msgstr "ARQUIVO DE ESCOLTA"
+
+# Machine translation by Codex (OpenAI), unreviewed, 2026-10-30.
+#: scripts/main.gd
+msgid "TRANSFER FRAGMENT"
+msgstr "FRAGMENTO DE TRANSFERÊNCIA"
+
+# Machine translation by Codex (OpenAI), unreviewed, 2026-10-30.
+#: scripts/main.gd
+msgid "LIFT READOUT"
+msgstr "LEITURA DO ELEVADOR"
+
+# Machine translation by Codex (OpenAI), unreviewed, 2026-10-30.
+#. i18n: story speaker=engineer engineer=self
+#: scripts/story_text.gd
+msgid "Freight lift. Transfer completed. The load and destination are missing."
+msgstr "Elevador de carga. Transferência concluída. Faltam a carga e o destino."
+
+# Machine translation by Codex (OpenAI), unreviewed, 2026-10-30.
+#. i18n: story speaker=WOLF
+#: scripts/story_text.gd
+msgid "What was on it?"
+msgstr "O que ele levava?"
+
+# Machine translation by Codex (OpenAI), unreviewed, 2026-10-30.
+#. i18n: story speaker=engineer engineer=self
+#: scripts/story_text.gd
+msgid "The lift made the trip. This movement came from its controller, not the archive. It doesn't identify the load."
+msgstr "O elevador fez a viagem. Este movimento veio do controlador, não do arquivo. Não identifica a carga."
+
+# Machine translation by Codex (OpenAI), unreviewed, 2026-10-30.
+#. i18n: story speaker=WOLF
+#: scripts/story_text.gd
+msgid "Then we need the escort record."
+msgstr "Então precisamos do registro de escolta."
+
+# Machine translation by Codex (OpenAI), unreviewed, 2026-10-30.
+#. i18n: story speaker=engineer engineer=self
+#: scripts/story_text.gd
+msgid "Security escort. An investigator. Same transfer."
+msgstr "Escolta de segurança. Uma pessoa investigadora. A mesma transferência."
+
+# Machine translation by Codex (OpenAI), unreviewed, 2026-10-30.
+#. i18n: story speaker=engineer engineer=self
+#: scripts/story_text.gd
+# gender-ok: Codex 2026-10-30; agreement describes records, equipment or another noun, never the engineer. Machine translation still unreviewed.
+msgid "The lift was isolated. I signed it back into service. Security used it after that."
+msgstr "O elevador estava isolado. Assinei a liberação para voltar ao serviço. A segurança o usou depois."
+
+# Machine translation by Codex (OpenAI), unreviewed, 2026-10-30.
+#. i18n: story speaker=WOLF
+#: scripts/story_text.gd
+msgid "What did they tell you?"
+msgstr "O que disseram a você?"
+
+# Machine translation by Codex (OpenAI), unreviewed, 2026-10-30.
+#. i18n: story speaker=engineer engineer=self
+#: scripts/story_text.gd
+msgid "A lift fault. Nothing about an investigator."
+msgstr "Um defeito no elevador. Nada sobre uma pessoa investigadora."
+
+# Machine translation by Codex (OpenAI), unreviewed, 2026-10-30.
+#. i18n: story speaker=engineer engineer=self
+#: scripts/story_text.gd
+msgid "We need to find where they took them."
+msgstr "Precisamos descobrir para onde levaram essa pessoa."
+
+# Machine translation by Codex (OpenAI), unreviewed, 2026-10-30.
+#: scripts/story_text.gd
+msgid "CHAPTER 1 COMPLETE"
+msgstr "CAPÍTULO 1 CONCLUÍDO"
+
+# Machine translation by Codex (OpenAI), unreviewed, 2026-10-30.
+#: scripts/story_text.gd
+msgid "Next: find where security took the investigator."
+msgstr "A seguir: descobrir para onde a segurança levou a pessoa investigadora."
+
+# Machine translation by Codex (OpenAI), unreviewed, 2026-10-30.
+#: scripts/main.gd
+msgid "%s: inspect the next source."
+msgstr "%s: examinar a próxima fonte."
+
+# Machine translation by Codex (OpenAI), unreviewed, 2026-10-30.
+#: scripts/main.gd
+msgid "Chapter 1 complete. PLAY AGAIN starts a fresh run."
+msgstr "Capítulo 1 concluído. JOGAR NOVAMENTE inicia uma nova partida."
