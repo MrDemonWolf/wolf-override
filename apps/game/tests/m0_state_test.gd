@@ -179,7 +179,40 @@ func _initialize() -> void:
 	_expect(blocked_loaded != null and blocked_loaded.checkpoint_reached and FileAccess.file_exists(blocked_temp), "a recovered checkpoint that cannot be promoted still loads and keeps its temporary copy")
 	DirAccess.remove_absolute(ProjectSettings.globalize_path(blocked_path))
 	DirAccess.remove_absolute(ProjectSettings.globalize_path(blocked_temp))
+	_check_investigation()
 	finish("M0 state checks passed")
+
+
+## Annex progress is ordered, survives saves, and old completed slices continue before the new reveal.
+func _check_investigation() -> void:
+	var annex: M0State = completed_records_state(State.PRESS)
+	_expect(not annex.enter_investigation(), "annex cannot skip the junction")
+	annex.enter_junction()
+	annex.blow_door()
+	annex.drop_sentry()
+	annex.clear_junction()
+	var old: Dictionary = annex.to_dict()
+	old["version"] = 4
+	old.erase("investigation_step")
+	var migrated: M0State = State.from_dict(old)
+	_expect(migrated != null and migrated.junction_cleared and migrated.investigation_step == 0, "old cleared-junction save retains new investigation to play")
+	_expect(annex.enter_investigation() and not annex.enter_investigation(), "junction enters annex exactly once")
+	_expect(not annex.investigate(2) and not annex.investigate(-1), "annex cannot skip a source")
+	for step: int in range(1, 5):
+		_expect(annex.investigate(step) and not annex.investigate(step), "annex beat records once: %s" % step)
+		var restored: M0State = State.from_dict(JSON.parse_string(JSON.stringify(annex.to_dict())))
+		_expect(restored != null and restored.investigation_step == step, "annex beat roundtrips: %s" % step)
+	_expect(not annex.investigate(5), "annex stops after explicit chapter exit")
+	for value: Variant in [-1, 5, 1.5, "3", true]:
+		var malformed: Dictionary = annex.to_dict()
+		malformed["investigation_step"] = value
+		_expect(State.from_dict(malformed) == null, "annex rejects invalid step %s" % value)
+	var impossible: Dictionary = annex.to_dict()
+	impossible["junction_cleared"] = false
+	_expect(State.from_dict(impossible) == null, "annex requires completed junction")
+	impossible = annex.to_dict()
+	impossible["version"] = 4
+	_expect(State.from_dict(impossible) == null, "old schema cannot claim annex progress")
 
 
 ## Moves the file at [param from] over [param to] and returns whether the rename worked, so a fixture

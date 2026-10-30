@@ -1333,7 +1333,7 @@ func _check_jumps() -> void:
 		&"junction_a": ["junction", "play", true],
 		&"lane": ["junction", "play", true],
 		&"tank_down": ["junction", "play", true],
-		&"end_of_slice": ["junction", "END OF SLICE card", true],
+		&"end_of_slice": ["investigation", "CHAPTER 1 COMPLETE card", true],
 	}
 	for id: StringName in DebugActions.JUMPS:
 		_clean_save()

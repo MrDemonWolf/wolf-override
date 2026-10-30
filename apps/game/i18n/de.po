@@ -3354,3 +3354,122 @@ msgstr "WOLF brach ab, während {name} den Abwurf abpasste."
 #: scripts/story_text.gd:268
 msgid "The tank came down on the sentry."
 msgstr "Der Tank ist auf den Wächter gestürzt."
+
+# Machine translation by Codex (OpenAI), unreviewed, 2026-10-30.
+#: scripts/main.gd
+msgid "Maintenance annex. Read the surviving transfer fragment, then compare the lift readout and escort record."
+msgstr "Wartungsanbau. Lies das verbliebene Transferfragment und vergleiche dann die Aufzugsdaten mit dem Begleitprotokoll."
+
+# Machine translation by Codex (OpenAI), unreviewed, 2026-10-30.
+#: scripts/main.gd
+msgid "READ TRANSFER FRAGMENT"
+msgstr "TRANSFERFRAGMENT LESEN"
+
+# Machine translation by Codex (OpenAI), unreviewed, 2026-10-30.
+#: scripts/main.gd
+msgid "COMPARE LIFT READOUT"
+msgstr "AUFZUGSDATEN VERGLEICHEN"
+
+# Machine translation by Codex (OpenAI), unreviewed, 2026-10-30.
+#: scripts/main.gd
+msgid "READ ESCORT RECORD"
+msgstr "BEGLEITPROTOKOLL LESEN"
+
+# Machine translation by Codex (OpenAI), unreviewed, 2026-10-30.
+#: scripts/main.gd
+msgid "FIND THE INVESTIGATOR"
+msgstr "ERMITTLUNGSPERSON FINDEN"
+
+# Machine translation by Codex (OpenAI), unreviewed, 2026-10-30.
+#: scripts/main.gd
+msgid "MAINTENANCE ANNEX"
+msgstr "WARTUNGSANBAU"
+
+# Machine translation by Codex (OpenAI), unreviewed, 2026-10-30.
+#: scripts/main.gd
+msgid "ESCORT FILE"
+msgstr "BEGLEITAKTE"
+
+# Machine translation by Codex (OpenAI), unreviewed, 2026-10-30.
+#: scripts/main.gd
+msgid "TRANSFER FRAGMENT"
+msgstr "TRANSFERFRAGMENT"
+
+# Machine translation by Codex (OpenAI), unreviewed, 2026-10-30.
+#: scripts/main.gd
+msgid "LIFT READOUT"
+msgstr "AUFZUGSDATEN"
+
+# Machine translation by Codex (OpenAI), unreviewed, 2026-10-30.
+#. i18n: story speaker=engineer engineer=self
+#: scripts/story_text.gd
+msgid "Freight lift. Transfer completed. The load and destination are missing."
+msgstr "Lastenaufzug. Transfer abgeschlossen. Angaben zu Ladung und Ziel fehlen."
+
+# Machine translation by Codex (OpenAI), unreviewed, 2026-10-30.
+#. i18n: story speaker=WOLF
+#: scripts/story_text.gd
+msgid "What was on it?"
+msgstr "Was war darin?"
+
+# Machine translation by Codex (OpenAI), unreviewed, 2026-10-30.
+#. i18n: story speaker=engineer engineer=self
+#: scripts/story_text.gd
+msgid "The lift made the trip. This movement came from its controller, not the archive. It doesn't identify the load."
+msgstr "Der Aufzug ist gefahren. Diese Bewegung stammt aus seiner Steuerung, nicht aus dem Archiv. Die Ladung geht daraus nicht hervor."
+
+# Machine translation by Codex (OpenAI), unreviewed, 2026-10-30.
+#. i18n: story speaker=WOLF
+#: scripts/story_text.gd
+msgid "Then we need the escort record."
+msgstr "Dann brauchen wir das Begleitprotokoll."
+
+# Machine translation by Codex (OpenAI), unreviewed, 2026-10-30.
+#. i18n: story speaker=engineer engineer=self
+#: scripts/story_text.gd
+msgid "Security escort. An investigator. Same transfer."
+msgstr "Sicherheitsbegleitung. Eine Ermittlungsperson. Derselbe Transfer."
+
+# Machine translation by Codex (OpenAI), unreviewed, 2026-10-30.
+#. i18n: story speaker=engineer engineer=self
+#: scripts/story_text.gd
+msgid "The lift was isolated. I signed it back into service. Security used it after that."
+msgstr "Der Aufzug war stillgelegt. Ich habe ihn wieder für den Betrieb freigegeben. Danach hat der Sicherheitsdienst ihn benutzt."
+
+# Machine translation by Codex (OpenAI), unreviewed, 2026-10-30.
+#. i18n: story speaker=WOLF
+#: scripts/story_text.gd
+msgid "What did they tell you?"
+msgstr "Was hat man dir gesagt?"
+
+# Machine translation by Codex (OpenAI), unreviewed, 2026-10-30.
+#. i18n: story speaker=engineer engineer=self
+#: scripts/story_text.gd
+msgid "A lift fault. Nothing about an investigator."
+msgstr "Eine Aufzugsstörung. Nichts von einer Ermittlungsperson."
+
+# Machine translation by Codex (OpenAI), unreviewed, 2026-10-30.
+#. i18n: story speaker=engineer engineer=self
+#: scripts/story_text.gd
+msgid "We need to find where they took them."
+msgstr "Wir müssen herausfinden, wohin sie diese Person gebracht haben."
+
+# Machine translation by Codex (OpenAI), unreviewed, 2026-10-30.
+#: scripts/story_text.gd
+msgid "CHAPTER 1 COMPLETE"
+msgstr "KAPITEL 1 ABGESCHLOSSEN"
+
+# Machine translation by Codex (OpenAI), unreviewed, 2026-10-30.
+#: scripts/story_text.gd
+msgid "Next: find where security took the investigator."
+msgstr "Als Nächstes: Finde heraus, wohin der Sicherheitsdienst die Ermittlungsperson gebracht hat."
+
+# Machine translation by Codex (OpenAI), unreviewed, 2026-10-30.
+#: scripts/main.gd
+msgid "%s: inspect the next source."
+msgstr "%s: nächste Quelle prüfen."
+
+# Machine translation by Codex (OpenAI), unreviewed, 2026-10-30.
+#: scripts/main.gd
+msgid "Chapter 1 complete. PLAY AGAIN starts a fresh run."
+msgstr "Kapitel 1 abgeschlossen. NOCH MAL SPIELEN beginnt einen neuen Durchlauf."

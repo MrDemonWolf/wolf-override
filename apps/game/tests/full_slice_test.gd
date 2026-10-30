@@ -1,11 +1,11 @@
 extends "res://tests/support/game_suite.gd"
-## The whole built slice in one headless run, played only through the inputs a player has (the title's
+## Chapter 1's cooperative and engineer-only routes, played only through the inputs a player has (the title's
 ## NEW GAME button, the move and USE actions, the answer keys), with no debug jumps, fixture saves or
-## direct calls into the game: NEW GAME, the opening read box by box, the corridor's breaker (telling
-## WOLF the truth), the relay WOLF powers, the seal and the safe point; Records' purge queue, the mirror
-## port (WOLF's readout) and the exit; the Service Junction's breaker, the valve crank, the blast, the
-## lane question (WOLF draws the sentry), the tank drop, the exit bolt and the open exit door; then the
-## closing lines, the walk out and the END OF SLICE card. Each step must hand on to the next, so a
+## direct calls into the game: NEW GAME, the opening read box by box, the corridor's breaker and
+## cooperative relay or manual bypass, the seal and safe point; Records' purge queue, WOLF's readout
+## or manual mirror port and exit; Junction's breaker, valve, blast, WOLF's distraction or a manually
+## timed tank drop, the exit bolt and open door; then the
+## closing lines, the investigation's three evidence reads and the chapter-end card. Each step must hand on to the next, so a
 ## change that breaks the route between rooms (the hand-over from the opening, a door that never
 ## opens, an exit whose USE moved) fails here even when every room's own suite passes.
 ##
@@ -28,20 +28,15 @@ var state: M0State:
 
 
 func _run() -> void:
-	check_name = "Full slice"
-	game = await start_game("full-slice-test", keep_running) as Main
-	human = game.human
-	wolf = game.wolf
-	if not await _play_opening():
-		return
-	if not await _play_corridor():
-		return
-	if not await _play_records():
-		return
-	if not await _play_junction():
-		return
-	await end_game(game)
-	finish("Full slice checks passed: NEW GAME to the END OF SLICE card")
+	check_name = "Full Chapter 1"
+	for engineer_only: bool in [false, true]:
+		game = await start_game("full-chapter-one-%s" % ("manual" if engineer_only else "cooperative"), keep_running) as Main
+		human = game.human
+		wolf = game.wolf
+		if not await _play_opening() or not await _play_corridor(engineer_only) or not await _play_records(engineer_only) or not await _play_junction(engineer_only) or not await _play_investigation():
+			return
+		await end_game(game)
+	finish("Full Chapter 1 checks passed: NEW GAME to chapter end, cooperative and engineer-only")
 
 
 ## NEW GAME on the title, then the opening read through to first control, which must come in the
@@ -62,20 +57,25 @@ func _play_opening() -> bool:
 	return _require(human.position.x > DockBay.ROOM_RIGHT, "play starts in the corridor, past the dock bay (engineer at x %.1f)" % human.position.x)
 
 
-## The corridor: the breaker and its question (disclose), the relay WOLF powers, the seal opening, the
-## safe point and the cut to Records.
-func _play_corridor() -> bool:
+## Plays the corridor with disclosure/WOLF help or refusal/manual bypass according to [param engineer_only].
+func _play_corridor(engineer_only: bool) -> bool:
 	if not _require(await walk_to_reading_on(human, Main.CORRIDOR_STATIONS[0].x), "the engineer walks from the dock bay to the corridor's breaker (stopped at x %.1f)" % human.position.x):
 		return false
 	await tap(&"interact", 1)
 	if not _require(await continue_until(game, func() -> bool: return game.waiting_for_choice, TALK_FRAMES), "USE at the breaker asks whether to tell WOLF"):
 		return false
-	await tap(&"choice_1", 1)
+	await tap(&"choice_2" if engineer_only else &"choice_1", 1)
 	if not _require(await continue_until(game, func() -> bool: return state.breaker_armed and human.controlled and not game.waiting_for_choice, TALK_FRAMES), "telling WOLF arms the breaker and hands control back"):
 		return false
 	if not _require(await walk_to_reading_on(human, Main.RELAY_X), "the engineer walks to the relay"):
 		return false
 	await tap(&"interact", 1)
+	if engineer_only:
+		if not _require(await continue_until(game, func() -> bool: return game.relay_refused and not game.waiting_for_choice, TALK_FRAMES), "WOLF's refusal leaves the engineer's bypass available"):
+			return false
+		if not _require(await walk_to_reading_on(human, Main.BYPASS_WHEEL.x), "the engineer reaches the manual bypass"):
+			return false
+		await hold(&"interact", BEAT_FRAMES, func() -> bool: return state.door_open)
 	if not _require(await wait_until(func() -> bool: return state.door_open and not game.seal_opening, BEAT_FRAMES), "WOLF powers the relay and the seal opens"):
 		return false
 	if not _require(await walk_to_reading_on(human, Main.CORRIDOR_STATIONS[2].x), "the engineer walks to the open seal"):
@@ -84,9 +84,8 @@ func _play_corridor() -> bool:
 	return _require(await continue_until(game, func() -> bool: return state.chapter_id == "records" and human.controlled, TALK_FRAMES), "USE at the seal reaches the safe point and goes on into Records")
 
 
-## Records Access: the purge queue, the mirror port with WOLF's readout, then the exit and its closing
-## lines into the Service Junction.
-func _play_records() -> bool:
+## Copies Records using WOLF's readout or engineer access, then follows the existing exit into Junction.
+func _play_records(engineer_only: bool) -> bool:
 	if not _require(await walk_to_reading_on(human, RecordsRoom.PURGE_X), "the engineer walks to the purge queue"):
 		return false
 	await tap(&"interact", 1)
@@ -97,7 +96,7 @@ func _play_records() -> bool:
 	await tap(&"interact", 1)
 	if not _require(await continue_until(game, func() -> bool: return game.waiting_for_choice, TALK_FRAMES), "USE at the mirror port asks who reads it"):
 		return false
-	await tap(&"choice_1", 1)
+	await tap(&"choice_2" if engineer_only else &"choice_1", 1)
 	if not _require(await continue_until(game, func() -> bool: return state.mirror_trace_preserved and human.controlled, TALK_FRAMES), "WOLF's readout copies the mirror trace"):
 		return false
 	if not _require(await walk_to_reading_on(human, Main.RECORDS_EXIT_X), "the engineer walks to the Records exit"):
@@ -106,10 +105,8 @@ func _play_records() -> bool:
 	return _require(await continue_until(game, func() -> bool: return state.chapter_id == "junction" and human.controlled and not game.wolf_scouting, TALK_FRAMES), "USE at the exit reads the closing lines and walks on into the Service Junction")
 
 
-## The Service Junction: the breaker, the valve crank, the blast, the lane question (WOLF draws the
-## sentry), the tank drop, the exit bolt, USE at the open door, the closing lines, the walk out and the
-## END OF SLICE card.
-func _play_junction() -> bool:
+## Clears Junction with WOLF's distraction or an engineer-timed drop, then enters the investigation.
+func _play_junction(engineer_only: bool) -> bool:
 	if not _require(await walk_to_reading_on(human, JunctionRoom.BREAKER_X), "the engineer walks to the junction's breaker"):
 		return false
 	await tap(&"interact", 1)
@@ -130,13 +127,17 @@ func _play_junction() -> bool:
 	Input.action_release(&"move_right")
 	if not _require(asked, "past the blown door WOLF asks how to bring the sentry down"):
 		return false
-	await tap(&"choice_1", 1)
+	await tap(&"choice_2" if engineer_only else &"choice_1", 1)
 	var brain: SentryBrain = game.sentry_brain
-	if not _require(await wait_until(func() -> bool: return brain.state == &"fixated" and absf(brain.x - DropArm.MARK_X) < 1.0 and absf(wolf.position.x - JunctionRoom.WOLF_BAIT_X) < 4.0, BEAT_FRAMES), "WOLF draws the sentry and holds it on the mark"):
+	if not engineer_only and not _require(await wait_until(func() -> bool: return brain.state == &"fixated" and absf(brain.x - DropArm.MARK_X) < 1.0 and absf(wolf.position.x - JunctionRoom.WOLF_BAIT_X) < 4.0, BEAT_FRAMES), "WOLF draws the sentry and holds it on the mark"):
 		return false
 	if not _require(await walk_to_reading_on(human, JunctionRoom.ARM_X), "the engineer walks to the tank release"):
 		return false
-	await tap(&"interact", 1)
+	if engineer_only:
+		if not _require(await drop_on_patrol(game, BEAT_FRAMES), "the engineer times the drop from cover without WOLF"):
+			return false
+	else:
+		await tap(&"interact", 1)
 	if not _require(await wait_until(func() -> bool: return state.sentry_down, BEAT_FRAMES), "the tank drop brings the sentry down"):
 		return false
 	if not _require(await walk_to_reading_on(human, JunctionRoom.BOLT_PANEL_X), "the engineer walks to the exit bolt"):
@@ -153,7 +154,22 @@ func _play_junction() -> bool:
 	var note: String = await finish_closing_lines(game)
 	if not _require(note.is_empty(), note):
 		return false
-	if not _require(await wait_until(func() -> bool: return game.end_card_active, BEAT_FRAMES), "WOLF and then the engineer walk out through the exit door to the END OF SLICE card"):
+	return _require(await wait_until(func() -> bool: return state.chapter_id == "investigation" and human.controlled, BEAT_FRAMES), "the Junction exit leads into the investigation rather than ending Chapter 1 early")
+
+
+## Reads each annex station through player movement and USE, then leaves only after the final reveal.
+func _play_investigation() -> bool:
+	for station: int in 3:
+		var station_x: float = [RecordsRoom.PURGE_X, RecordsRoom.MIRROR_X, RecordsRoom.CONTAINER_X][station]
+		if not _require(await walk_to_reading_on(human, station_x), "the engineer reaches investigation station %d" % (station + 1)):
+			return false
+		await tap(&"interact", 1)
+		if not _require(await continue_until(game, func() -> bool: return state.investigation_step == station + 1 and game.box_queue.is_empty() and bool(game.call("_dialogue_read")), TALK_FRAMES), "the evidence at station %d is preserved and read" % (station + 1)):
+			return false
+	if not _require(await walk_to_reading_on(human, RecordsRoom.EXIT_DOOR_X), "the engineer reaches the investigation exit after the repair discovery"):
+		return false
+	await tap(&"interact", 1)
+	if not _require(await continue_until(game, func() -> bool: return game.end_card_active, TALK_FRAMES), "the approved repair revelation leads to the Chapter 1 end card"):
 		return false
 	var titles: Array[Node] = game.end_card.find_children("*", "Label", true, false).filter(func(label: Node) -> bool: return (label as Label).text == Main.END_CARD_TITLE)
-	return _expect(game.end_card.visible and titles.size() == 1, "the END OF SLICE card is up with its title")
+	return _expect(game.end_card.visible and titles.size() == 1 and state.investigation_step == 4, "the Chapter 1 card follows the saved repair revelation")

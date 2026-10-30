@@ -3322,3 +3322,103 @@ msgstr "{name} 看準時機放下儲罐時，WOLF 中途撤開了。"
 #: scripts/story_text.gd:268
 msgid "The tank came down on the sentry."
 msgstr "儲罐砸在了哨兵身上。"
+
+# Machine-translated by Codex (OpenAI), unreviewed; 2026-10-30.
+msgid "Maintenance annex. Read the surviving transfer fragment, then compare the lift readout and escort record."
+msgstr "維修附樓。讀取殘存的轉運記錄，再對照升降機讀數和押送記錄。"
+
+# Machine-translated by Codex (OpenAI), unreviewed; 2026-10-30.
+msgid "READ TRANSFER FRAGMENT"
+msgstr "讀取轉運片段"
+
+# Machine-translated by Codex (OpenAI), unreviewed; 2026-10-30.
+msgid "COMPARE LIFT READOUT"
+msgstr "對照升降機讀數"
+
+# Machine-translated by Codex (OpenAI), unreviewed; 2026-10-30.
+msgid "READ ESCORT RECORD"
+msgstr "讀取押送記錄"
+
+# Machine-translated by Codex (OpenAI), unreviewed; 2026-10-30.
+msgid "FIND THE INVESTIGATOR"
+msgstr "尋找調查員"
+
+# Machine-translated by Codex (OpenAI), unreviewed; 2026-10-30.
+msgid "MAINTENANCE ANNEX"
+msgstr "維修附樓"
+
+# Machine-translated by Codex (OpenAI), unreviewed; 2026-10-30.
+msgid "ESCORT FILE"
+msgstr "押送記錄"
+
+# Machine-translated by Codex (OpenAI), unreviewed; 2026-10-30.
+msgid "TRANSFER FRAGMENT"
+msgstr "轉運片段"
+
+# Machine-translated by Codex (OpenAI), unreviewed; 2026-10-30.
+msgid "LIFT READOUT"
+msgstr "升降機讀數"
+
+# Machine-translated by Codex (OpenAI), unreviewed; 2026-10-30.
+#. i18n: story speaker=engineer engineer=self
+msgid "Freight lift. Transfer completed. The load and destination are missing."
+msgstr "貨運升降機。轉運完成。載荷和目的地資訊缺失。"
+
+# Machine-translated by Codex (OpenAI), unreviewed; 2026-10-30.
+#. i18n: story speaker=WOLF
+msgid "What was on it?"
+msgstr "裡面載的是什麼？"
+
+# Machine-translated by Codex (OpenAI), unreviewed; 2026-10-30.
+#. i18n: story speaker=engineer engineer=self
+msgid "The lift made the trip. This movement came from its controller, not the archive. It doesn't identify the load."
+msgstr "升降機確實運行過。這條運行記錄來自控制器，而不是檔案庫。它沒有標明載荷。"
+
+# Machine-translated by Codex (OpenAI), unreviewed; 2026-10-30.
+#. i18n: story speaker=WOLF
+msgid "Then we need the escort record."
+msgstr "那就需要押送記錄。"
+
+# Machine-translated by Codex (OpenAI), unreviewed; 2026-10-30.
+#. i18n: story speaker=engineer engineer=self
+msgid "Security escort. An investigator. Same transfer."
+msgstr "安保押送。一名調查員。是同一次轉運。"
+
+# Machine-translated by Codex (OpenAI), unreviewed; 2026-10-30.
+#. i18n: story speaker=engineer engineer=self
+msgid "The lift was isolated. I signed it back into service. Security used it after that."
+msgstr "升降機原本已停用。是我簽字讓它恢復運行的。之後安保使用了它。"
+
+# Machine-translated by Codex (OpenAI), unreviewed; 2026-10-30.
+#. i18n: story speaker=WOLF engineer=you
+msgid "What did they tell you?"
+msgstr "他們當時是怎麼跟你說的？"
+
+# Machine-translated by Codex (OpenAI), unreviewed; 2026-10-30.
+#. i18n: story speaker=engineer engineer=self
+msgid "A lift fault. Nothing about an investigator."
+msgstr "升降機故障。沒提過調查員。"
+
+# Machine-translated by Codex (OpenAI), unreviewed; 2026-10-30.
+#. i18n: story speaker=engineer engineer=self
+msgid "We need to find where they took them."
+msgstr "我們得查出他們把調查員帶去了哪裡。"
+
+# Machine-translated by Codex (OpenAI), unreviewed; 2026-10-30.
+#. i18n: story
+msgid "CHAPTER 1 COMPLETE"
+msgstr "第一章完成"
+
+# Machine-translated by Codex (OpenAI), unreviewed; 2026-10-30.
+#. i18n: story
+msgid "Next: find where security took the investigator."
+msgstr "下一步：查出安保把調查員帶去了哪裡。"
+
+# Machine-translated by Codex (OpenAI), unreviewed; 2026-10-30.
+#. i18n: speaker=hint slot=key
+msgid "%s: inspect the next source."
+msgstr "%s：檢查下一份資料。"
+
+# Machine-translated by Codex (OpenAI), unreviewed; 2026-10-30.
+msgid "Chapter 1 complete. PLAY AGAIN starts a fresh run."
+msgstr "第一章完成。選擇再次遊玩可重新開始。"
