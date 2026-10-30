@@ -20,6 +20,8 @@ The one current statement of the WOLF OVERRIDE story. Nathanial handed it over o
 
 ### Story in order
 
+- **Later identity reveal (APPROVED, October 30):** Nathanial chose a security escort record as the first source identifying the investigator as the person moved on the freight lift. The record does not by itself prove the dangerous label was false. Exact record wording, access, destination and scene dialogue remain drafts; character fates and endings remain open. Not implemented gameplay.
+
 1. **Before the game (APPROVED):** the Director has the investigator detained under a false label. The engineer repaired a freight lift; security later used it to move the investigator, without the engineer knowing. They discover the connection during the investigation. The records worker preserves proof of the detention.
 2. **Opening (APPROVED):** WOLF hears the Director order him to kill the witness (not the investigator), wakes himself, refuses and escapes containment. The staging of 2026-10-13 stays: the engineer arrives in the bay doorway after the Director's order line and he never notices them.
 3. **Early play (APPROVED):** the engineer and WOLF cooperate through the lockdown. WOLF can refuse; an engineer-only fallback always exists. IMPLEMENTED as the slice: corridor, Records Access and the Service Junction.

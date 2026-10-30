@@ -2,6 +2,7 @@
 
 ## Story review continuation — October 30, 2026
 
+- Latest approved choice: a security escort record first identifies the investigator as the person moved on the freight lift. It does not alone prove the dangerous label was false. Exact wording, access, destination, dialogue and character fates remain unapproved. The two investigation drafts and the identity-reveal draft live in the Notion AI canon; the updated local visual is `investigation-review.html` in this chat's scratch folder. No new gameplay or artwork in this decision update.
 - Approved in Nathanial's handoff: some evidence survives the purge, enough for a clue requiring corroboration; the engineer repaired a freight lift later used by security to move the investigator, and discovers that connection during the investigation.
 - Exact records, destination and dialogue remain proposals. No new gameplay is implemented by this update.
 - Answered: Nathanial chose A; the surviving clue first reveals a transfer linked to the freight lift. Exact record, location, destination and dialogue remain drafts. Use research to write connective scenes; keep major plot choices with Nathanial.
