@@ -296,7 +296,7 @@ const HATCH_EXIT_SPEED_SCALE: float = 0.55
 ## With WOLF holding the far end of the junction's lane, the sentry's body turns this far short of his
 ## drawn body (SentryBrain.far_x).
 const WOLF_SENTRY_GAP: float = 4.0
-## The end of the built route (decision D): the END OF SLICE card with this run's choices, then the title.
+## The approved Chapter 1 boundary: the completion card with this run's choices, then the title.
 ## The third row's topic is SENTRY, the thing on screen, not the lane (P0-7, approved 2026-10-13).
 const END_CARD_TITLE: String = "CHAPTER 1 COMPLETE"
 const END_CARD_THANKS: String = "Next: find where security took the investigator."
@@ -358,7 +358,7 @@ const INVESTIGATION_REPAIR_WORDS: String = "The lift was isolated. I signed it b
 const INVESTIGATION_QUESTION_WORDS: String = "What did they tell you?"
 const INVESTIGATION_ANSWER_WORDS: String = "A lift fault. Nothing about an investigator."
 const INVESTIGATION_NEXT_WORDS: String = "We need to find where they took them."
-## Only a hand-made save can reopen the cleared junction; it says where the line goes, not that it is unbuilt.
+## A restored cleared junction still points onward; using its open hatch continues into the annex.
 const JUNCTION_CLEARED_LINE: String = "The service line runs on toward Archive."
 ## Said as the door goes, while WOLF is still by the entrance: it says he holds back, not where, so
 ## it holds on every frame, by the entrance and at his spot by the valve short of the rubble (Draft A,
@@ -2563,7 +2563,9 @@ func _load_game() -> void:
 		else:
 			status_line = JUNCTION_RESTORE_A_LINE
 	elif state.chapter_id == "investigation":
-		if state.investigation_step in [1, 2, 3]:
+		if state.investigation_step == 4:
+			_show_end_card()
+		elif state.investigation_step in [1, 2, 3]:
 			_say(_investigation_lines(state.investigation_step))
 		else:
 			_say([_investigation_objective()])
@@ -2971,7 +2973,7 @@ func _records_route_hint() -> String:
 
 
 ## CONTINUE on the junction's closing shot, the only one (Records keeps control while its closing
-## lines run): out through the hatch, the END OF SLICE card, then the title (decision D).
+## lines run): out through the hatch and on to the maintenance annex investigation.
 func _finish_chapter_close() -> void:
 	if hatch_exit_walking:
 		# Already on their way out; the card follows on its own.
@@ -2984,7 +2986,7 @@ func _finish_chapter_close() -> void:
 ## The two leave through the open exit door, WOLF first: he walks on from the doorway through the
 ## wall until the near jamb hides all of him, while the engineer waits where they are; then the
 ## engineer walks through after him until it hides them too, the doorway stands empty for a moment,
-## and the END OF SLICE card comes up. One at a time, they are never drawn over each other in it.
+## and the annex begins. One at a time, they are never drawn over each other in the doorway.
 func _walk_out_through_hatch() -> void:
 	hatch_exit_walking = true
 	hatch_exit_engineer_walking = false
@@ -3009,7 +3011,7 @@ func _wait_until_through(body: M0Actor, x: float, then: Callable, waited: float 
 	chapter_tween.tween_callback(_wait_until_through.bind(body, x, then, waited + 0.05))
 
 
-## WOLF is through: the engineer walks through after him, then the END OF SLICE card.
+## WOLF is through: the engineer follows before the annex transition.
 func _engineer_follows_out() -> void:
 	if not hatch_exit_walking:
 		return
@@ -3018,7 +3020,7 @@ func _engineer_follows_out() -> void:
 	_wait_until_through(human, HATCH_EXIT_X, _doorway_empty)
 
 
-## Both are through and out of sight: the empty doorway holds for a moment, then the card.
+## Both are through and out of sight: hold the empty doorway briefly, then enter the annex.
 func _doorway_empty() -> void:
 	if not hatch_exit_walking:
 		return
@@ -3027,7 +3029,7 @@ func _doorway_empty() -> void:
 	chapter_tween.tween_callback(_enter_investigation)
 
 
-## The END OF SLICE card over the closing shot: the thanks line, this run's choices and one CONTINUE
+## The Chapter 1 completion card: the next goal, this run's choices and one CONTINUE
 ## (the interact button, a click or tap on it, Back or Pause) on to the title.
 func _build_end_card() -> void:
 	end_card = ColorRect.new()
@@ -3306,7 +3308,11 @@ func _investigation_lines(step: int) -> Array[String]:
 func _interact_investigation(x: float) -> void:
 	if not box_queue.is_empty() or not _dialogue_read():
 		if not _next_box():
-			_next_box_now()
+			if box_queue.is_empty():
+				# A fresh USE acknowledges the last box; it never also activates a source or exit.
+				dialogue_cleared = true
+			else:
+				_next_box_now()
 		return
 	var requested: int = 0
 	if absf(x - RecordsRoom.PURGE_X) <= 58.0:
@@ -3315,7 +3321,7 @@ func _interact_investigation(x: float) -> void:
 		requested = 2
 	elif absf(x - RecordsRoom.CONTAINER_X) <= 58.0:
 		requested = 3
-	if state.investigation_step == 3 and x >= RECORDS_EXIT_X:
+	if state.investigation_step == 3 and x >= RecordsRoom.EXIT_DOOR_X - M0Actor.HUMAN_REACH:
 		state.investigate(4)
 		_save_progress()
 		_show_end_card()
@@ -3579,7 +3585,11 @@ func _use_exit(x: float) -> void:
 	elif not state.sentry_down:
 		_refuse(REFUSE_EXIT_SENTRY, &"bolt")
 	elif state.junction_cleared:
-		_tell(JUNCTION_CLEARED_LINE)
+		# Older builds saved their final junction here; Continue must still reach the new annex.
+		if x >= JunctionRoom.HATCH_REACH_MIN_X:
+			_enter_investigation()
+		else:
+			_tell(JUNCTION_CLEARED_LINE)
 	else:
 		match bolt_state:
 			&"locked":

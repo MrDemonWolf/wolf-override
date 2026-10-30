@@ -6,7 +6,8 @@ extends "res://tests/support/game_suite.gd"
 ## - WOLF-8: none of WOLF's own actions completes a step that is the engineer's (the safe point, the
 ##   copies, the breaker, the valve, the tank drop, the bolt).
 ## - STORY-9: no meter in the HUD, and the engineer-only route (WOLF refuses the relay and the lane,
-##   the engineer copies the mirror through the port) reaches every essential step to END OF SLICE.
+##   the engineer copies the mirror through the port) reaches the annex; full_slice_test continues that
+##   same fallback route through the Chapter 1 evidence and completion card.
 
 ## Words that would have WOLF set the pace (NEEDS WOLF-1), matched in lower case.
 const URGENCY: Array[String] = ["hurry", "quick", "come on", "keep moving", "faster", "now!", "move it", "let's go", "get moving", "speed up", "too slow", "what are you waiting", "run!"]
@@ -291,9 +292,7 @@ func _check_engineer_only_route(game: Main, actions: DebugActions) -> void:
 	var brain: SentryBrain = game.sentry_brain
 	_require(await wait_until(func() -> bool: return game.human.controlled and brain.state == &"patrol" and brain.facing > 0.0 and brain.x >= 700.0, 600), "the sentry heads away down the lane")
 	_require(await walk_to_reading_on(game.human, JunctionRoom.ARM_X) and not game.fail_active, "the engineer slips into the alcove")
-	var lead: float = SentryBrain.PATROL_SPEED * DropArm.FALL_SECONDS
-	_require(await wait_until(func() -> bool: return brain.facing < 0.0 and absf(brain.x - DropArm.MARK_X - lead) <= 8.0, 600), "the sentry comes back toward the mark")
-	await tap(&"interact", 1)
+	_require(await drop_on_patrol(game, 600), "the engineer times the tank release as the sentry comes back toward the mark")
 	_require(await wait_until(func() -> bool: return game.state.sentry_down, 90), "the engineer's timed drop brings the sentry down")
 	_require(await walk_to_reading_on(game.human, JunctionRoom.BOLT_X), "the engineer walks to the exit bolt")
 	await tap(&"interact", 1)

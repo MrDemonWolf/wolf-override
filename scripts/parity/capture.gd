@@ -606,12 +606,20 @@ func _route_4() -> void:
 	for station: int in evidence_stations.size():
 		await _walk_to(evidence_stations[station])
 		await _tap(&"interact")
+		# The entry's unread box may consume that press; read it before recording a station as inspected.
+		if not await Suite.continue_until(game, func() -> bool: return (game.get("state") as M0State).investigation_step == station + 1, Suite.TALK_FRAMES):
+			_fail("investigation evidence %d never opened" % (station + 1))
 		await _raw(2)
 		await _shot("investigation-evidence-%d" % (station + 1))
+		if station == 2:
+			if not await Suite.continue_until(game, func() -> bool: return str(game.get("status_line")).ends_with(Main.INVESTIGATION_REPAIR_WORDS), Suite.TALK_FRAMES):
+				_fail("the engineer's repair revelation never appeared")
+			await _raw(2)
+			await _shot("investigation-engineer-repair")
 		if not await Suite.continue_until(game, func() -> bool: return (game.get("state") as M0State).investigation_step == station + 1 and (game.get("box_queue") as Array).is_empty() and bool(game.call("_dialogue_read")), Suite.TALK_FRAMES):
 			_fail("investigation evidence %d never finished reading" % (station + 1))
 		await _shot("investigation-read-%d" % (station + 1))
-	await _walk_to(Main.RECORDS_EXIT_X + 10.0)
+	await _walk_to(RecordsRoom.EXIT_DOOR_X)
 	await _tap(&"interact")
 	if not await Suite.continue_until(game, func() -> bool: return bool(game.get("end_card_active")), Suite.TALK_FRAMES):
 		_fail("the Chapter 1 end card never showed after the repair discovery")

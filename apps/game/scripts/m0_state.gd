@@ -1,6 +1,6 @@
 class_name M0State
 extends RefCounted
-## The slice's progress and the checkpoint file that keeps it: who the engineer is, where both actors
+## Chapter 1's progress and the checkpoint file that keeps it: who the engineer is, where both actors
 ## stand, the relay choice WOLF remembers and every chapter beat. to_dict and from_dict are the save
 ## format (from_dict rejects anything a real run could not produce); save_to_disk and load_from_disk
 ## write and read it without losing newer progress to a failed write.
@@ -13,7 +13,7 @@ const GENERATION_KEY: String = "generation"
 ## The counter's ceiling: 2^53, the largest whole number JSON's doubles hold exactly. One save a second
 ## would take 285 million years to reach it.
 const MAX_GENERATION: int = 9007199254740992
-## The largest checkpoint file read. A v4 save is under 1 KiB even with the longest choice wording
+## The largest checkpoint file read. A v5 save is under 1 KiB even with the longest choice wording
 ## (MAX_SELECTED_TEXT_LENGTH), so 64 KiB, the settings file's limit (GameSettings.MAX_SETTINGS_BYTES),
 ## leaves room for every future field while a huge or wrong file is turned away before it is read.
 const MAX_CHECKPOINT_BYTES: int = 65536
@@ -63,7 +63,7 @@ var sentry_down: bool = false
 var junction_cleared: bool = false
 ## Ordered annex progress: 0 none, 1 fragment, 2 controller, 3 escort/repair, 4 explicit chapter exit.
 var investigation_step: int = 0
-## How the sentry came down, for the END OF SLICE recap: "wolf" (he drew it onto the mark), "refused"
+## How the sentry came down, for the Chapter 1 recap: "wolf" (he drew it onto the mark), "refused"
 ## (he would not, so the engineer timed it), "alone" (he held back by the valve while the engineer timed
 ## it), or empty before the fall. Optional in the file, so v4 saves without it still load.
 var lane_recap: String = ""

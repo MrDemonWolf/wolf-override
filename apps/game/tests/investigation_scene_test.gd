@@ -9,17 +9,23 @@ var game: Main
 func _run() -> void:
 	check_name = "Investigation scene"
 	game = await start_game("investigation-scene", keep_running) as Main
-	game._new_game()
-	game._finish_intro()
-	# The completed-junction fixture has already read the corridor tutorial and opening boxes.
-	game.opening_lines_held = false
-	game.opening_lines.clear()
-	game.state = completed_records_state(M0State.PRESS)
-	game.state.enter_junction()
-	game.state.blow_door()
-	game.state.drop_sentry()
-	game.state.clear_junction()
-	game._enter_investigation()
+	var legacy: M0State = completed_records_state(M0State.PRESS)
+	legacy.enter_junction()
+	legacy.blow_door()
+	legacy.drop_sentry()
+	legacy.clear_junction()
+	legacy.human_position.x = JunctionRoom.HATCH_REACH_MIN_X + M0State.HUMAN_HALF_WIDTH
+	legacy.wolf_position.x = JunctionRoom.WOLF_DOWN_X
+	var old_save: Dictionary = legacy.to_dict()
+	old_save["version"] = 4
+	old_save.erase("investigation_step")
+	_expect(write_text(game.save_path, JSON.stringify(old_save)), "literal v4 completed-junction fixture is saved")
+	game._refresh_continue()
+	_expect(game.continue_button.text == "CONTINUE", "old completed slice now offers Continue, not Play Again")
+	game.continue_button.pressed.emit()
+	await frames(3)
+	_expect(game.state.chapter_id == "junction" and game.human.controlled, "real Continue loads legacy junction progress")
+	await tap(&"interact", 1)
 	await frames(3)
 	_expect(game.state.chapter_id == "investigation" and game.records_room.visible and not game.junction_room.visible, "junction hands control to the reused annex room")
 	_expect(game.human.controlled and not game.wolf.controlled and game.records_room.investigation, "engineer retains control and annex labels are distinct")
@@ -49,12 +55,22 @@ func _run() -> void:
 	_expect(game.get_tree().paused, "pause remains available during the final reveal")
 	await tap(&"pause_game", 1)
 	_expect(not game.get_tree().paused, "pause returns to the final reveal")
-	await _read_all()
-	_expect(await walk_to_reading_on(game.human, Main.RECORDS_EXIT_X), "engineer reaches annex exit")
+	# A fast reader can advance each box explicitly, including the final one, without a forced timer.
+	for _press: int in 32:
+		if game.box_queue.is_empty() and game.dialogue_index == game.dialogue_boxes.size() - 1:
+			break
+		await tap(&"interact", 1)
+	_expect(game.box_queue.is_empty() and game.dialogue_age < game._box_seconds(), "final box is reached before its reading timer finishes")
+	await tap(&"interact", 1)
+	_expect(game.dialogue_cleared and game.state.investigation_step == 3 and not game.end_card_active, "one USE acknowledges the final box immediately without also completing the chapter")
+	_expect(await walk_to_reading_on(game.human, RecordsRoom.EXIT_DOOR_X), "engineer reaches annex exit")
 	await tap(&"interact", 1)
 	_expect(game.state.investigation_step == 4 and game.end_card_active, "explicit exit completes Chapter 1 after the reveal")
 	var saved: M0State = M0State.load_from_disk(game.save_path)
 	_expect(saved != null and saved.investigation_step == 4, "chapter completion is persisted")
+	game._load_game()
+	await frames(3)
+	_expect(game.state.investigation_step == 4 and game.end_card_active and not game.human.controlled, "direct Load of a completed chapter restores its card instead of stranding the engineer")
 	await end_game(game)
 	finish("Investigation scene checks passed")
 

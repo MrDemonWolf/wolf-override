@@ -134,11 +134,10 @@ func _play_junction(engineer_only: bool) -> bool:
 	if not _require(await walk_to_reading_on(human, JunctionRoom.ARM_X), "the engineer walks to the tank release"):
 		return false
 	if engineer_only:
-		# Lead the left-moving patrol by the tank's fall time; its existing graze window absorbs input latency.
-		var release_x: float = DropArm.MARK_X + SentryBrain.PATROL_SPEED * DropArm.FALL_SECONDS
-		if not _require(await wait_until(func() -> bool: return brain.state == &"patrol" and brain.facing < 0.0 and absf(brain.x - release_x) <= 8.0, BEAT_FRAMES), "the engineer waits in cover for a drop opportunity without WOLF"):
+		if not _require(await drop_on_patrol(game, BEAT_FRAMES), "the engineer times the drop from cover without WOLF"):
 			return false
-	await tap(&"interact", 1)
+	else:
+		await tap(&"interact", 1)
 	if not _require(await wait_until(func() -> bool: return state.sentry_down, BEAT_FRAMES), "the tank drop brings the sentry down"):
 		return false
 	if not _require(await walk_to_reading_on(human, JunctionRoom.BOLT_PANEL_X), "the engineer walks to the exit bolt"):
@@ -167,7 +166,7 @@ func _play_investigation() -> bool:
 		await tap(&"interact", 1)
 		if not _require(await continue_until(game, func() -> bool: return state.investigation_step == station + 1 and game.box_queue.is_empty() and bool(game.call("_dialogue_read")), TALK_FRAMES), "the evidence at station %d is preserved and read" % (station + 1)):
 			return false
-	if not _require(await walk_to_reading_on(human, Main.RECORDS_EXIT_X + 10.0), "the engineer reaches the investigation exit after the repair discovery"):
+	if not _require(await walk_to_reading_on(human, RecordsRoom.EXIT_DOOR_X), "the engineer reaches the investigation exit after the repair discovery"):
 		return false
 	await tap(&"interact", 1)
 	if not _require(await continue_until(game, func() -> bool: return game.end_card_active, TALK_FRAMES), "the approved repair revelation leads to the Chapter 1 end card"):
