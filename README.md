@@ -12,7 +12,7 @@ One choice can change what your companion remembers.
 
 ![Provisional title art: the engineer and WOLF at a locked research corridor](apps/game/assets/title-corridor-key-art-provisional.png)
 
-**Status:** development version `0.15.0`, one chapter slice.
+**Status:** development version `0.15.0`, a Chapter 1 source prototype.
 
 - **Runs from source** in Godot 4.7.2. There is no installer, store
   release or release date.
@@ -27,8 +27,8 @@ One choice can change what your companion remembers.
 
 ## Features
 
-- **One playable engineer** - Move through three side-view rooms: a
-  maintenance corridor, Records Access and the Service Junction.
+- **One playable engineer** - Move through a maintenance corridor,
+  Records Access, the Service Junction and a maintenance records annex.
 - **An independent companion** - WOLF follows, takes his own tasks and
   can refuse. You never control him.
 - **Cooperation with a fallback** - Open a powered door together, or
@@ -45,15 +45,17 @@ One choice can change what your companion remembers.
   while shut.
 - **Knockdown and retry** - Junction hazards knock the engineer down.
   Play resumes from the room's last automatic save with choices intact.
-- **An end card** - Leaving the junction ends the slice on an END OF
-  SLICE card that recaps your choices.
+- **A later investigation** - Compare three sources in the annex,
+  with readable, replayable records and an engineer-only route.
+- **A chapter end card** - Finish the annex to reach CHAPTER 1 COMPLETE,
+  a recap of your choices and the next objective.
 - **Impact and sound** - Big moments get a short sound, a brief camera
   shake, sparks or dust and controller or phone rumble.
 - **Accessibility settings** - Reduced Motion turns off the shake
   and hit-stop and shortens flashes. Text Size enlarges dialogue and hints. Toggle
   Holds turns every crank into press to start, press again to stop.
-- **Saves** - The safe point, every Records Access station and the
-  junction's stages save; Continue restores the room and your choices.
+- **Saves** - The safe point, Records Access, the junction's stages and
+  annex checks save; Continue restores the room, choices and readable evidence.
 - **Input and settings** - Keyboard, controller and touch, six
   rebindable actions, FPS limit, V-sync, MSAA, window size and audio.
 - **In-game changelog** - The title screen's Changelog shows these

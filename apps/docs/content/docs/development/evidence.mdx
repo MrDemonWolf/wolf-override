@@ -28,7 +28,7 @@ description: A dated, honest record of how each part of WOLF OVERRIDE was checke
 | First corridor | Headless suites; a partial graphical playtest of engineer movement and WOLF's follow | Partly (movement and follow only) |
 | Records Access | Headless suites (both mirror routes) and rendered stills | No |
 | Service Junction | Headless suites and rendered stills | No |
-| Maintenance annex | New implementation candidate; final route, save and rendering checks pending | No |
+| Maintenance annex | Input-driven cooperative and engineer-only routes; ordered sources, replay, Pause and save migration checks; container-rendered stills | No |
 | Camera, room art, props, characters | Headless suites and rendered stills | No |
 | Sounds | Headless suites that watch which clips start | No, and not checked by ear |
 | Text and text size | Headless suites and rendered stills | No, not read by a player on a screen |
@@ -78,7 +78,7 @@ The Godot commands on [Testing and CI](/docs/development/testing/) check all of 
 - `door_route_test`: the Records entry and exit and the Service Junction's blast door and exit each stand across the walkway and stop the route while shut.
 - Their leaves are drawn whole in every frame while they swing, slide or are thrown, never hidden or faded.
 - No resting spot leaves a body across a shut door.
-- Earlier route checks covered WOLF and then the engineer walking through the Junction exit. The annex candidate continues beyond it; final chapter-complete checks are pending.
+- Both input-driven chapter routes continue through the Junction exit, the annex checks and the **CHAPTER 1 COMPLETE** card.
 - `room_depth_test`: the swing leaves' faces and light at every angle.
 - The blast door's pieces, all regions of one atlas: the doorway, leaf, wall and release bay behind the characters; the near column, stub and thrown leaf in front.
 - Its near column's foot is measured on the atlas where a knocked-down body lies. A body knocked down facing it, from the valve, against the door or from the floor beyond it, with **Reduced Motion** on and off, lies clear of the column and the stub.
@@ -124,7 +124,17 @@ The Godot commands on [Testing and CI](/docs/development/testing/) check all of 
 - The sentry and the hazards never turn on him outside the bait he chooses, and nothing can knock him down.
 - Nothing he does on his own completes one of the engineer's steps.
 - The HUD has no meter.
-- Earlier companion checks covered refusal at the relay and lane, with the mirror copied through the port. The extended route through the annex needs its own final check.
+- The engineer-only input-driven route uses the manual bypass, mirror port and timed tank drop, then completes the annex without requiring WOLF's help.
+
+### Chapter 1 verification — October 30, 2026
+
+- All 33 headless suites passed in 342 seconds, including both complete input-driven routes.
+- The annex suite checks source order, replay, Pause, older saves, unfinished-reveal resume and explicit chapter completion.
+- All 11 catalog gates passed; the language suite passed 21,011 checks, including the wrapped translated completion goal.
+- Container R4 captures passed at 1280×720 with keyboard prompts and 960×540 with the touch layout. Annex frames reported no overflow or missing glyphs.
+- One older tank-drop transition frame reported a layout warning in both runs. The full sentence fits in the inspected frame and the next frame has no warning; a transient Label metric is suspected, not confirmed. The warning is retained.
+- A focused German completion-card render verified the two-line goal after the language suite found a real overflow.
+- No hands-on game-feel, native-language, physical-device or released-build validation is claimed.
 
 </Details>
 
