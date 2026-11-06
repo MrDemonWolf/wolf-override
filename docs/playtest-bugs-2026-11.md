@@ -49,6 +49,17 @@ Status words: **Open** (not started), **Cause found** (reproduced and understood
   4. Apply to Settings first (the page Nathanial saw), then the title, pause, end card and debug menu.
 - **How to check:** rendered stills of each menu at 100% and 150% text size; a headless test that every menu label's size is one of the scale's values; then Nathanial reads them.
 
+## B6. Desktop: buttons feel too big
+
+- **Status:** Cause found
+- **Seen:** Mac debug build, Settings, November 6. Toggles, dropdowns, tabs and BACK are large for a mouse; the menu looks like a phone screen on a desktop.
+- **Cause (confirmed in code):** every control uses one size for finger and pointer. `game_settings.gd` sets rows and controls at 40 to 48 canvas px tall (lines 306, 310, 323, 361, 373, 537) and 206 to 272 px wide; that is the 44 px touch minimum. The 960×540 canvas is scaled ×1.33 at the default 1280×720 window, so a toggle is 58 to 64 screen px tall on a Mac, and ×2 at 1920×1080.
+- **Fix:**
+  1. Two control sizes in the shared row layout from B3: **pointer** (about 32 canvas px tall, narrower widths) and **touch** (the current 44 to 48). Pick by the last input used (`DisplayServer.is_touchscreen_available()` and the last event class), the same way the HUD already picks keyboard, controller or touch prompts.
+  2. Tabs, BACK and binding buttons use the same two sizes.
+  3. Keep the touch size on iOS and Android, so B1's phone fix and this never fight.
+- **How to check:** rendered stills of Settings at 1280×720 with pointer sizing and at the iPhone size with touch sizing; a headless test that each control's height matches the mode; then Nathanial opens Settings on both.
+
 ## B4. Mac: Settings tabs may not switch sections
 
 - **Status:** Open, unconfirmed
