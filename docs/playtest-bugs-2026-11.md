@@ -4,6 +4,17 @@
 
 Status words: **Open** (not started), **Cause found** (reproduced and understood), **Fixing** (branch open), **Fixed** (merged, waiting for Nathanial to confirm in play), **Closed** (confirmed by hand).
 
+## Priority (Nathanial, November 6, 2026)
+
+"The story is good, fine for now. It needs better UI/UX and gameplay." So story work pauses at the current canon; the order of work is:
+
+1. **Look and feel of the rooms:** B13 (art direction, corridor first), with B12 (stray bar) fixed along the way.
+2. **Playing with hands:** B11 (click and tap the world and its labels), B1 (iPhone fills the screen).
+3. **Reading and talking:** B10 (dialogue and prompt redesign), B5 (type scale), B9 (loops become lights).
+4. **Menus:** B3, B6 (Settings layout and control size), B7, B8 (title focus ring and idle motion), B2 (FPS, size, fullscreen), B4 (tabs, once confirmed).
+
+Each step ships as one small branch with a Mac and iPhone build for Nathanial to play before the next starts.
+
 ## B1. iPhone: the game does not fill the screen
 
 - **Status:** Open
